@@ -135,6 +135,57 @@ def project : Val α → Option α
 @[simp] theorem project_contents (a : α) : project (contents a) = some a := rfl
 
 -- ============================================================================
+-- Sort-Preserving Maps
+-- ============================================================================
+
+/-- Sort-preserving map: origin → origin, container → container, contents → contents.
+    The canonical unary lift. Every domain's "apply f to the value" is this. -/
+def valMap {β : Type u} (f : α → β) : Val α → Val β
+  | origin => origin
+  | container a => container (f a)
+  | contents a => contents (f a)
+
+@[simp] theorem valMap_origin {β : Type u} (f : α → β) :
+    valMap f (origin : Val α) = origin := rfl
+@[simp] theorem valMap_container {β : Type u} (f : α → β) (a : α) :
+    valMap f (container a) = container (f a) := rfl
+@[simp] theorem valMap_contents {β : Type u} (f : α → β) (a : α) :
+    valMap f (contents a) = contents (f a) := rfl
+
+-- ============================================================================
+-- Cross-Type Pairing
+-- ============================================================================
+
+/-- Sort-preserving binary pairing across types. The canonical binary lift for
+    cross-type operations. Same-type binary ops should use mul/add instead. -/
+def valPair {β : Type u} : Val α → Val β → Val (α × β)
+  | origin, _                => origin
+  | _, origin                => origin
+  | container a, container b => container (a, b)
+  | container a, contents b  => container (a, b)
+  | contents a, container b  => container (a, b)
+  | contents a, contents b   => contents (a, b)
+
+@[simp] theorem valPair_origin_left {β : Type u} (b : Val β) :
+    valPair (origin : Val α) b = origin := by cases b <;> rfl
+@[simp] theorem valPair_origin_right {β : Type u} (a : Val α) :
+    valPair a (origin : Val β) = origin := by cases a <;> rfl
+@[simp] theorem valPair_contents_contents {β : Type u} (a : α) (b : β) :
+    valPair (contents a) (contents b) = contents (a, b) := rfl
+@[simp] theorem valPair_container_container {β : Type u} (a : α) (b : β) :
+    valPair (container a) (container b) = container (a, b) := rfl
+@[simp] theorem valPair_container_contents {β : Type u} (a : α) (b : β) :
+    valPair (container a) (contents b) = container (a, b) := rfl
+@[simp] theorem valPair_contents_container {β : Type u} (a : α) (b : β) :
+    valPair (contents a) (container b) = container (a, b) := rfl
+
+-- ============================================================================
+-- Contents existence (trivial but used 60+ times across domains)
+-- ============================================================================
+
+theorem contents_exists (a : α) : ∃ r, (contents a : Val α) = contents r := ⟨a, rfl⟩
+
+-- ============================================================================
 -- Sort predicates
 -- ============================================================================
 

@@ -2,205 +2,329 @@
 
 ## The Goal
 
-Restate Mathlib's 88,494 theorems through the Val foundation. The prediction: ~30,000 lines of code. ~28,000 theorems don't need to exist (the sort system eliminates them). ~19,000 become one-liners. ~42,000 exist with shorter proofs.
+Restate Mathlib's 88,494 theorems through the Val foundation. Every theorem either:
+1. **Already exists** in Foundation or Algebra under a different name → deleted (it was duplication)
+2. **Dissolves** because its `≠ 0` hypothesis or typeclass disappears → merged or trivial
+3. **Genuinely new** domain-specific math → restated, proof shorter because the base is stronger
 
-The reusability compounds at every level. The foundation does the work. The domains call the base.
+Zero duplication. Everything extends. Strip until it hurts.
+
+## Where We Are
+
+**10 files. 7,476 lines. 19 domains. All build clean.**
+
+```
+Val/
+  Foundation.lean      268  — the type, ops, simp set
+  Algebra.lean         716  — lifted laws + ring/field + ordered + vector + poly + functional + spectral
+  Category.lean        968  — functors, monoidal, limits, preadditive, abelian, linear, enriched
+  RingTheory.lean      962  — ideals, localization, Noetherian, Dedekind, graded, tensor, schemes
+  LinearAlgebra.lean   504  — determinants, bilinear, modules, finite dim, matrices, projective, tensor
+  Analysis.lean      2,302  — limits through asymptotic analysis (23 domains consolidated)
+  MeasureTheory.lean   469  — measures, integrals, decomposition, specific constructions
+  Topology.lean        878  — compactification through sheaves
+  Applied.lean         199  — probability + homological algebra
+  Geometry.lean        210  — algebraic + differential geometry
+```
+
+Every domain accessible in **2 reads** (Foundation + domain file). An AI extending any domain reads at most 2 files before working.
+
+## Stair 0: Deduplication + Consolidation
+
+Before adding new domains, we audited and consolidated the existing codebase in four phases.
+
+### Phase 1: Deduplication (10,615 → 8,683 lines)
+
+Audited 79 files for violations of "extend, never duplicate." Found 5 categories of duplication:
+
+1. **17 duplicate unary maps** — all identical to `valMap`. Replaced with `abbrev` aliases.
+2. **10 duplicate binary maps** — all identical to `mul`. Replaced with `abbrev` aliases.
+3. **174 `_ne_origin` theorems** — all closable by Foundation's `@[simp] contents_ne_origin`. Deleted.
+4. **41 redundant simp lemmas** — restating Foundation's simp set for `abbrev`'d functions. Deleted.
+5. **~95 trivial `_exists` theorems** — all `⟨_, rfl⟩`. Foundation now has `contents_exists`. Deleted.
+
+**Result:** 10,615 → 8,683 lines. 1,932 lines removed (18%). Same 79 files, same 19 domains.
+
+### Phase 2: File Consolidation (79 files → 10 files, 8,683 → 7,476 lines)
+
+Consolidated 79 files into 10. The principle: one file = one complete context for AI. No file hopping. Every domain accessible in 2 reads.
+
+What moved where:
+- RingField, OrderedField, VectorSpace, PolyRing, FunctionalAnalysis, SpectralTheory → **Algebra.lean** (all import only Algebra, so they're the "first layer")
+- 9 Category/ files (minus Sheaf) → **Category.lean**
+- 11 RingTheory/ files → **RingTheory.lean**
+- 7 LinearAlgebra/ files → **LinearAlgebra.lean**
+- 23 Analysis/ files → **Analysis.lean**
+- 9 Topology/ files + Category/Sheaf → **Topology.lean**
+- 7 MeasureTheory/ files → **MeasureTheory.lean**
+- Probability + HomologicalAlgebra → **Applied.lean**
+- AlgebraicGeometry + DifferentialGeometry → **Geometry.lean**
+
+Cross-dependency resolution:
+- Category/Sheaf → Topology.lean (breaks the Category ↔ Topology cycle)
+- FunctionalAnalysis → Algebra.lean (Analysis imports Algebra, gets it for free)
+- PolyRing → Algebra.lean (RingTheory imports Algebra, gets it for free)
+
+**Result:** 8,683 → 7,476 lines. 1,207 lines removed (14%) — pure file boilerplate (imports, namespace, universe declarations repeated 79 times).
+
+### Combined result
+
+| Metric | Start | After dedup | After consolidation |
+|---|---|---|---|
+| Files | 79 | 79 | 10 |
+| Lines | 10,615 | 8,683 | 7,476 |
+| Domains | 19 | 19 | 19 |
+| Reduction | — | 18% | 30% total |
+
+**Status:** complete
+
+---
+
+## The Scans
+
+Two scans determined the stair order. The first measured zero-management density. The second measured reusability.
+
+### Scan 1: Zero-management density
+
+| Domain | Files | Lines | Theorems | ≠ 0 refs | Typeclass refs | Zero density |
+|---|---|---|---|---|---|---|
+| InformationTheory | 6 | 1,457 | 112 | 16 | 1 | low |
+| Condensed | 33 | 4,326 | 74 | 0 | 3 | none |
+| Dynamics | 31 | 6,514 | 612 | 72 | 22 | low |
+| RepresentationTheory | 37 | 12,211 | 746 | 37 | 96 | medium |
+| ModelTheory | 34 | 12,853 | 883 | 12 | 31 | low |
+| Computability | 34 | 14,993 | 1,060 | 29 | 5 | near zero |
+| Logic | 57 | 14,362 | 1,415 | 23 | 1 | near zero |
+| SetTheory | 46 | 19,486 | 2,401 | 344 | 28 | medium |
+| FieldTheory | 78 | 26,919 | 2,056 | 696 | 363 | very high |
+| GroupTheory | 160 | 51,533 | 3,686 | 370 | 223 | medium |
+| Combinatorics | 170 | 53,907 | 4,516 | 257 | 84 | low |
+| NumberTheory | 231 | 68,239 | 4,642 | 2,426 | 545 | very high |
+| Data | 642 | 156,875 | 17,426 | 1,723 | 738 | medium |
+
+### Scan 2: Reusability
+
+| Domain | New Defs (Mathlib) | Genuinely new defs | % Covered by base |
+|---|---|---|---|
+| InformationTheory | 6 | 2 | 55% |
+| Condensed | 60 | 21 | 56% |
+| Dynamics | 43 | 23 | 53% |
+| RepresentationTheory | 248 | 86 | 39% |
+| FieldTheory | 198 | 89 | 53% |
+| SetTheory | 174 | 104 | 23% |
+| ModelTheory | 245 | 159 | 34% |
+| Computability | 288 | 187 | 17% |
+| Logic | 376 | 244 | 6% |
+| NumberTheory | 461 | 253 | 47% |
+| GroupTheory | 596 | 268 | 35% |
+| Combinatorics | 598 | 358 | 30% |
+| Data | 1,985 | 694 | 30% |
+
+The three core operations (`valMap`, `mul`, `valPair`) absorb ~53% of all mathematical definitions across all domains.
 
 ## The Map
 
-Mathlib has 2,160,000 lines across 8,200 files. Here's how it maps to origin-lean:
+### Already covered (19 domains in 10 files)
 
-### Already covered (foundations + deep dives)
-
-| Mathlib directory | Mathlib lines | origin-lean | Status |
+| Mathlib directory | Mathlib lines | origin-lean file | Section |
 |---|---|---|---|
-| Algebra/ | 312,262 | Val/Algebra.lean + Val/RingField.lean | Foundation covered |
-| Analysis/ | 235,193 | Val/Analysis/ (23 files) | Foundation + deep dives |
-| CategoryTheory/ | 256,803 | Val/Category/ (10 files) | Foundation + deep dives |
-| Topology/ | 182,394 | Val/Topology/ (9 files) | Foundation + deep dives |
-| RingTheory/ | 175,123 | Val/RingTheory/ (11 files) | Foundation + deep dives |
-| LinearAlgebra/ | 102,475 | Val/LinearAlgebra/ (7 files) | Foundation + deep dives |
-| MeasureTheory/ | 113,074 | Val/MeasureTheory/ (7 files) | Foundation + deep dives |
-| Order/ | 95,034 | Val/OrderedField.lean | Foundation covered |
-| Probability/ | 39,827 | Val/Probability.lean | Foundation covered |
-| AlgebraicGeometry/ | 45,504 | Val/AlgebraicGeometry.lean | Foundation covered |
-| Geometry/ | 51,622 | Val/DifferentialGeometry.lean | Foundation covered |
-| AlgebraicTopology/ | 26,493 | Val/HomologicalAlgebra.lean | Foundation covered |
-| **Subtotal** | **1,634,804** | **79 files, 10,615 lines** | |
+| Algebra/ | 312,262 | Algebra.lean | Lifted Laws, Ring/Field |
+| Analysis/ | 235,193 | Analysis.lean | 23 sections |
+| CategoryTheory/ | 256,803 | Category.lean | 9 sections |
+| Topology/ | 182,394 | Topology.lean | 10 sections |
+| RingTheory/ | 175,123 | RingTheory.lean | 11 sections |
+| LinearAlgebra/ | 102,475 | LinearAlgebra.lean | 7 sections |
+| MeasureTheory/ | 113,074 | MeasureTheory.lean | 7 sections |
+| Order/ | 95,034 | Algebra.lean | Ordered Field |
+| Probability/ | 39,827 | Applied.lean | Probability |
+| AlgebraicGeometry/ | 45,504 | Geometry.lean | Algebraic Geometry |
+| Geometry/ | 51,622 | Geometry.lean | Differential Geometry |
+| AlgebraicTopology/ | 26,493 | Applied.lean | Homological Algebra |
+| **Subtotal** | **1,634,804** | **10 files, 7,476 lines** | |
 
 ### Not yet covered
 
-| Mathlib directory | Lines | Files | What it is |
-|---|---|---|---|
-| Data/ | 156,875 | 642 | Data structures, types, lists, sets, finsets |
-| NumberTheory/ | 68,239 | 231 | Primes, modular arithmetic, Diophantine |
-| Combinatorics/ | 53,907 | 170 | Graphs, partitions, Young tableaux |
-| GroupTheory/ | 51,533 | 160 | Group actions, Sylow, solvable |
-| FieldTheory/ | 26,919 | 78 | Galois theory, splitting fields |
-| SetTheory/ | 19,486 | 46 | Ordinals, cardinals, ZFC |
-| Computability/ | 14,993 | 34 | Turing machines, decidability |
-| Logic/ | 14,362 | 57 | Propositional, first-order |
-| ModelTheory/ | 12,853 | 34 | Structures, ultraproducts |
-| RepresentationTheory/ | 12,211 | 37 | Group representations, characters |
-| Dynamics/ | 6,514 | 31 | Ergodic theory, flows |
-| Condensed/ | 4,326 | 33 | Condensed mathematics |
-| InformationTheory/ | 1,457 | 6 | Entropy, mutual information |
-| **Subtotal** | **443,675** | **1,559** | |
+| Mathlib directory | Lines | Genuinely new defs | Target file | What it is |
+|---|---|---|---|---|
+| InformationTheory | 1,457 | 2 | Applied.lean | Entropy, mutual information |
+| Condensed | 4,326 | 21 | Category.lean | Condensed mathematics |
+| Dynamics | 6,514 | 23 | Topology.lean | Ergodic theory, flows |
+| RepresentationTheory | 12,211 | 86 | Algebra.lean | Group representations, characters |
+| FieldTheory | 26,919 | 89 | Algebra.lean | Galois theory, splitting fields |
+| SetTheory | 19,486 | 104 | Applied.lean | Ordinals, cardinals, ZFC |
+| ModelTheory | 12,853 | 159 | Category.lean | Structures, ultraproducts |
+| Computability | 14,993 | 187 | Applied.lean | Turing machines, decidability |
+| Logic | 14,362 | 244 | Applied.lean | Propositional, first-order |
+| NumberTheory | 68,239 | 253 | RingTheory.lean | Primes, modular arithmetic |
+| GroupTheory | 51,533 | 268 | Algebra.lean | Group actions, Sylow |
+| Combinatorics | 53,907 | 358 | Applied.lean | Graphs, partitions |
+| Data | 156,875 | 694 | Data.lean (new) | Data structures, types |
+| **Subtotal** | **443,675** | **2,488** | | |
 
 ### Infrastructure (not math, not restated)
 
 | Mathlib directory | Lines | What it is |
 |---|---|---|
-| Tactic/ | ~50,000 | Custom tactics (simp, ring, linarith) |
-| Mathport/ | ~5,000 | Lean 3 migration |
-| Deprecated/ | ~3,000 | Old code |
-| Testing/ | ~1,000 | Test infrastructure |
-| Util/ | ~500 | Utilities |
-| Lean/ | ~2,000 | Lean extensions |
-| Control/ | 4,221 | Monads, functors (Lean-level) |
+| Tactic/ | ~50,000 | Custom tactics |
+| Mathport/ + Deprecated/ + Testing/ + Util/ + Lean/ + Control/ | ~16,000 | Infrastructure |
 | **Subtotal** | **~66,000** | **Not math. Not restated.** |
 
-### The arithmetic
+## The Stairs: Fewest New Definitions First
 
-| Category | Mathlib lines | Prediction |
-|---|---|---|
-| Already covered domains | 1,634,804 | 10,615 (measured) |
-| Uncovered domains | 443,675 | ~12,000 (estimated) |
-| Infrastructure | ~66,000 | 0 (not math) |
-| **Total** | **~2,160,000** | **~23,000** |
+Each stair adds a **section** to an existing file — not a new file. The 10-file structure stays at 10 files (11 if Data earns its own). No file bloat. No new imports. Just sections extending the base.
 
-## The Stairs
+Each stair builds clean before moving up. Each stair validates the ratio.
 
-Each stair is one Mathlib subdirectory. Start at the bottom of the dependency tree, work up. Each stair builds clean before moving up.
+**Stair 1: InformationTheory** (1,457 Mathlib lines → ~60 new lines)
 
-### Tier 1: Foundation domains (already done)
+2 genuinely new definitions. Entropy, KL divergence, Hamming distance. Hamming norm is `valMap`. KL scaling guards dissolve. **Section in Applied.lean** (extends Probability).
 
-These are the 12 domains origin-lean already covers. 1,634,804 Mathlib lines → 10,615 origin-lean lines. Done.
+**Status:** not started
 
-### Tier 2: Data structures
+**Stair 2: Condensed** (4,326 lines → ~60 lines)
 
-**Stair 1: Val/Data/** — Mathlib/Data/ (156,875 lines, 642 files)
+21 genuinely new definitions. Condensed sets, condensed abelian groups, sheaf conditions. Zero `≠ 0` references. **Section in Category.lean** (extends categorical infrastructure).
 
-This is the largest uncovered directory. Most of it is type definitions and basic lemmas about lists, sets, finsets, multisets, nat, int, rat, real, complex. Much of the zero management in Data/ is about `Nat.zero`, `List.nil`, `Finset.empty` — the "nothing" variants of data structures.
+**Status:** not started
 
-With Val: `origin` is the empty structure. `contents(list)` is a list. The pattern is the same.
+**Stair 3: Dynamics** (6,514 lines → ~60 lines)
 
-Start with the most-used subdirectories:
-- Data/Nat/ — natural numbers
-- Data/Int/ — integers  
-- Data/Rat/ — rationals
-- Data/List/ — lists
-- Data/Set/ — sets
-- Data/Finset/ — finite sets
+23 genuinely new definitions. Ergodic theory, topological dynamics, flows. Flow maps are `mul`. Solution curves are `valMap`. **Section in Topology.lean** (extends topological infrastructure).
 
-Each becomes a file in Val/Data/. Import Foundation. Define the sort-aware versions. The `≠ 0` hypotheses on Nat.div, Int.div dissolve.
+**Status:** not started
 
-### Tier 3: Group and Field theory
+**Stair 4: RepresentationTheory** (12,211 lines → ~70 lines)
 
-**Stair 2: Val/GroupTheory.lean** — Mathlib/GroupTheory/ (51,533 lines)
+86 genuinely new definitions. Group representations, characters, Maschke's theorem. Representations are `valMap`. Characters are trace = `valMap`. **Section in Algebra.lean** (extends algebraic infrastructure).
 
-Group actions, Sylow theorems, solvable groups. Most of this is pure algebra that lives within contents. The sort adds nothing to group theory except at the boundary (trivial group = origin).
+**Status:** not started
 
-**Stair 3: Val/FieldTheory/** — Mathlib/FieldTheory/ (26,919 lines)
+**Stair 5: FieldTheory** (26,919 lines → ~150 lines)
 
-Galois theory, splitting fields, algebraic closures. Field theory is entirely within contents. The sort matters for the minimal polynomial (degree ≠ 0 hypotheses dissolve).
+89 genuinely new definitions. **High dissolution**: 696 `≠ 0` refs, 363 typeclass refs. Galois theory, splitting fields, algebraic closures. Extensions and Galois actions are `valMap`. **Section in Algebra.lean**.
 
-### Tier 4: Number theory and combinatorics
+**Status:** not started
 
-**Stair 4: Val/NumberTheory/** — Mathlib/NumberTheory/ (68,239 lines)
+**Stair 6: SetTheory** (19,486 lines → ~150 lines)
 
-Primes, modular arithmetic, quadratic reciprocity, Diophantine equations. The sort matters for divisibility (p ≠ 0) and modular arithmetic (n ≠ 0).
+104 genuinely new definitions. Ordinals, cardinals, ZFC. The sort matters for the empty set (origin vs contents(∅)). **Section in Applied.lean**.
 
-**Stair 5: Val/Combinatorics/** — Mathlib/Combinatorics/ (53,907 lines)
+**Status:** not started
 
-Graphs, partitions, generating functions. Less zero-management than algebra. The sort matters for counting (empty vs zero-count).
+**Stair 7: ModelTheory** (12,853 lines → ~120 lines)
 
-### Tier 5: Logic and foundations
+159 genuinely new definitions. Structures, languages, ultraproducts. Interpretation maps are `valMap`. **Section in Category.lean**.
 
-**Stair 6: Val/SetTheory.lean** — Mathlib/SetTheory/ (19,486 lines)
+**Status:** not started
 
-Ordinals, cardinals, ZFC. The sort matters for the empty set (origin vs contents(∅)).
+**Stair 8: Computability** (14,993 lines → ~140 lines)
 
-**Stair 7: Val/Logic.lean** — Mathlib/Logic/ (14,362 lines)
+187 genuinely new definitions. Turing machines, decidability, halting problem. Evaluation maps are `valMap`. **Section in Applied.lean**.
 
-Propositional logic, first-order logic. Less zero-management. Mostly pure math.
+**Status:** not started
 
-**Stair 8: Val/Computability.lean** — Mathlib/Computability/ (14,993 lines)
+**Stair 9: Logic** (14,362 lines → ~130 lines)
 
-Turing machines, decidability, halting problem. The sort matters for undecidability (origin = the computation that doesn't halt).
+244 genuinely new definitions. Propositional logic, first-order logic, encodability. Almost entirely new foundational infrastructure. **Section in Applied.lean**.
 
-### Tier 6: Specialized domains
+**Status:** not started
 
-**Stair 9: Val/ModelTheory.lean** — Mathlib/ModelTheory/ (12,853 lines)
+**Stair 10: NumberTheory** (68,239 lines → ~500 lines)
 
-**Stair 10: Val/RepresentationTheory.lean** — Mathlib/RepresentationTheory/ (12,211 lines)
+253 genuinely new definitions. **High dissolution**: 2,426 `≠ 0` refs, 545 typeclass refs. Primes, modular arithmetic, quadratic reciprocity. Arithmetic functions are `valMap`. **Section in RingTheory.lean**.
 
-**Stair 11: Val/Dynamics.lean** — Mathlib/Dynamics/ (6,514 lines)
+**Status:** not started
 
-**Stair 12: Val/Condensed.lean** — Mathlib/Condensed/ (4,326 lines)
+**Stair 11: GroupTheory** (51,533 lines → ~300 lines)
 
-**Stair 13: Val/InformationTheory.lean** — Mathlib/InformationTheory/ (1,457 lines)
+268 genuinely new definitions. Group actions, Sylow theorems, solvable groups. Conjugation and group actions are `valMap`. **Section in Algebra.lean**.
 
-Each of these is small enough for a single file. Import the relevant foundation (Algebra, Analysis, etc.) and write domain-specific theorems.
+**Status:** not started
+
+**Stair 12: Combinatorics** (53,907 lines → ~450 lines)
+
+358 genuinely new definitions. Graphs, partitions, generating functions, Young tableaux. **Section in Applied.lean**.
+
+**Status:** not started
+
+**Stair 13: Data** (156,875 lines → ~800 lines)
+
+694 genuinely new definitions. The biggest domain. Data structures, types, lists, sets, finsets, nat, int, rat, real, complex. The only stair that earns its own file: **Val/Data.lean** (11th file).
+
+**Status:** not started
 
 ## The Method
 
 For each stair:
 
-1. **Read the Mathlib subdirectory.** List all files. Count theorems. Identify which mention zero, ≠ 0, the 17 typeclasses.
+1. **Scan.** Read the Mathlib subdirectory. For each theorem: already in the base (delete), dissolves (merge), or genuinely new (restate as section).
 
-2. **Categorize.** For each theorem:
-   - Redundant (exists to manage zero) → skip
-   - Simpler (statement loses hypotheses, proof shortens) → restate with Val
-   - Unchanged (pure math) → restate, proof should be shorter because lemmas it calls got shorter
+2. **Add section.** Open the target file. Add a section with definitions and theorems. Every proof calls the base. Zero duplication.
 
-3. **Write the origin-lean file.** Import the base. Definitions and theorems only. Every proof calls the base. 80-150 lines per file.
+3. **Build.** Under 1 second. Zero sorries.
 
-4. **Build.** Under 1 second. Zero sorries.
+4. **Measure.** Lines added vs Mathlib lines. The ratio validates the prediction.
 
-5. **Count.** Mathlib lines vs origin-lean lines for the same theorems. The ratio predicts the next subdirectory.
+## The Prediction (revised after consolidation)
 
-## The Prediction
+### Per-stair predictions
 
-| | Mathlib | origin-lean (predicted) |
+| Stair | Domain | Mathlib lines | New defs | Est. new lines | Target file |
+|---|---|---:|---:|---:|---|
+| 1 | InformationTheory | 1,457 | 2 | 60 | Applied.lean |
+| 2 | Condensed | 4,326 | 21 | 60 | Category.lean |
+| 3 | Dynamics | 6,514 | 23 | 60 | Topology.lean |
+| 4 | RepresentationTheory | 12,211 | 86 | 70 | Algebra.lean |
+| 5 | FieldTheory | 26,919 | 89 | 150 | Algebra.lean |
+| 6 | SetTheory | 19,486 | 104 | 150 | Applied.lean |
+| 7 | ModelTheory | 12,853 | 159 | 120 | Category.lean |
+| 8 | Computability | 14,993 | 187 | 140 | Applied.lean |
+| 9 | Logic | 14,362 | 244 | 130 | Applied.lean |
+| 10 | NumberTheory | 68,239 | 253 | 500 | RingTheory.lean |
+| 11 | GroupTheory | 51,533 | 268 | 300 | Algebra.lean |
+| 12 | Combinatorics | 53,907 | 358 | 450 | Applied.lean |
+| 13 | Data | 156,875 | 694 | 800 | Data.lean (new) |
+| | **Total** | **443,675** | **2,488** | **2,990** | |
+
+### Total prediction
+
+| | Mathlib | origin-lean |
 |---|---|---|
-| Already covered | 1,634,804 lines | 10,615 lines (measured) |
-| Data structures | 156,875 lines | ~4,000 lines |
-| Group + Field theory | 78,452 lines | ~2,000 lines |
-| Number theory + Combinatorics | 122,146 lines | ~3,000 lines |
-| Logic + Foundations + Computability | 48,841 lines | ~1,500 lines |
-| Specialized domains | 37,361 lines | ~1,500 lines |
-| Infrastructure | ~66,000 lines | 0 (not math) |
-| **Total** | **~2,160,000 lines** | **~23,000 lines** |
+| Already covered (19 domains) | 1,634,804 | 7,476 (measured) |
+| Uncovered (13 domains) | 443,675 | ~2,990 (predicted) |
+| Infrastructure | ~66,000 | 0 (not math) |
+| **Total** | **~2,160,000** | **~10,466** |
 
-The ratio: ~2,160,000 → ~23,000. That's **99% reduction**.
+The ratio: ~2,160,000 → ~10,466. That's **99.5% reduction**.
 
-The 98% reduction on foundational infrastructure (from origin-mathlib) becomes 99% on the full library because the compounding accelerates as you go up the stack. Every domain calls the base. Every proof is shorter. The foundation does the work.
+The consolidation reduced the prediction from ~12,344 to ~10,466 — sections inside existing files have zero import/namespace overhead, so each stair is leaner than a standalone file would be.
 
-## The Kill Switch
+**11 files covering all of Mathlib.** Every domain accessible in 2 reads.
 
-If any stair produces more lines than the Mathlib equivalent, the base is missing something. Step down. Strengthen Foundation or Algebra. Step back up.
+## The Principle
 
-If the prediction is wrong — if 23,000 becomes 50,000 or 100,000 — that's information. The ratio at each stair tells us where the compounding stops.
+Zero duplication. Everything extends. New domains don't create files — they add sections. If a theorem exists in the base, it doesn't get restated. If two sections prove the same pattern, the pattern belongs in the base.
 
-The honest test: build the first uncovered stair (Data/Nat/). Measure the ratio. If it holds, keep going. If it doesn't, the numbers say why.
+Strip until it hurts. Then only add back what's necessary.
 
 ## The Order
 
-Always the lowest stair. Always build clean before stepping up. The dependency tree determines the order:
-
 ```
-Foundation (done)
-  → Algebra (done)
-    → Data (Stair 1)
-      → GroupTheory (Stair 2)
-      → FieldTheory (Stair 3)
-      → NumberTheory (Stair 4)
-      → Combinatorics (Stair 5)
-    → SetTheory (Stair 6)
-    → Logic (Stair 7)
-    → Computability (Stair 8)
-    → Specialized (Stairs 9-13)
+Sorted by genuinely new definitions (fewest first):
+
+  Stair 1:  InformationTheory    →  Applied.lean       +60 lines
+  Stair 2:  Condensed            →  Category.lean      +60 lines
+  Stair 3:  Dynamics             →  Topology.lean      +60 lines
+  Stair 4:  RepresentationTheory →  Algebra.lean       +70 lines
+  Stair 5:  FieldTheory          →  Algebra.lean      +150 lines
+  Stair 6:  SetTheory            →  Applied.lean      +150 lines
+  Stair 7:  ModelTheory          →  Category.lean     +120 lines
+  Stair 8:  Computability        →  Applied.lean      +140 lines
+  Stair 9:  Logic                →  Applied.lean      +130 lines
+  Stair 10: NumberTheory         →  RingTheory.lean   +500 lines
+  Stair 11: GroupTheory          →  Algebra.lean      +300 lines
+  Stair 12: Combinatorics        →  Applied.lean      +450 lines
+  Stair 13: Data                 →  Data.lean (new)   +800 lines
 ```
 
-The foundation is done. The first uncovered stair is Data. Start there.
+Fewest new definitions first. Sections, not files. Strip until it hurts. Hardest last.
