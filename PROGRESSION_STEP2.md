@@ -1,5 +1,7 @@
 # What Comes Next
 
+> **STATUS: COMPLETE.** Deep dives done. 79 files, 10,615 lines, all build clean. This document is history and reference only. See [PROGRESSION_STEP3.md](PROGRESSION_STEP3.md) for current work.
+
 ## Where We Are
 
 19 files. 2,611 lines. 19 domains. Builds in under 1 second. Zero Mathlib. Zero typeclasses.

@@ -1,5 +1,7 @@
 # Progression: Building the Foundation That Makes Everything Trivial
 
+> **STATUS: COMPLETE.** This document is history and reference only. The foundation is built. See [PROGRESSION_STEP3.md](PROGRESSION_STEP3.md) for current work.
+
 ## The Goal
 
 Make Foundation.lean so complete that adding a new mathematical domain is like adding a new model to a Django app. You create one file. You import Foundation. You write your domain-specific definitions. Every proof is trivial because the base handles everything. Foundation is the app. Every domain is a model.
