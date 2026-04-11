@@ -1,6 +1,8 @@
 # origin-lean
 
-How many lines of code does it take to do the same math as Mathlib?
+Mathematics, refactored. 2.16M lines of Mathlib collapsed into a 10,885-line origin-aware kernel. Three constructors. Four rules. All of math. Zero-overhead verification for the next generation of non-hallucinating AI.
+
+---
 
 Mathlib is the largest formal mathematics library ever built. 2,160,000 lines. 88,494 theorems. 8,200 files. An extraordinary achievement by a community of rigorous thinkers.
 
