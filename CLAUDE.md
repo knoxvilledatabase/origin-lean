@@ -33,9 +33,17 @@ Read in this order:
 
 4. **[README.md](README.md)** — the big picture, the numbers, the tree.
 
+## How We Got Here
+
+Read these for context. The architecture decisions only make sense with the history.
+
+5. **[PROGRESSION.md](PROGRESSION.md)** (COMPLETE, history only) — the full circle. We started standalone (509 theorems). Went into Mathlib to learn (82 files, 15,343 lines, learned the abstract base model). Tried to copy Mathlib's typeclasses into a Prelude (diamond inheritance, failed). Came back to standalone with everything we learned. This document explains why explicit parameters, why not typeclasses, why the Django model, why the stair rule. The lessons here are load-bearing.
+
+6. **[PROGRESSION_STEP2.md](PROGRESSION_STEP2.md)** (COMPLETE, history only) — how 19 files became 79 files. The deep dives, the domain folder structure, the method for extending. Reference for how each domain was added.
+
 ## What Is Next
 
-**Read [PROGRESSION_STEP3.md](PROGRESSION_STEP3.md).** That is the current work.
+7. **[PROGRESSION_STEP3.md](PROGRESSION_STEP3.md)** — the active work. Restate all 88,494 Mathlib theorems. 13 stairs. Start with Data/Nat/. This is what you should be working on.
 
 Steps 1 and 2 are complete (history only):
 - [PROGRESSION.md](PROGRESSION.md) — how we got here (the full circle from standalone to Mathlib and back). Read for context and lessons learned. Do not re-do this work.
