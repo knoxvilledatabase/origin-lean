@@ -1,5 +1,0 @@
-{"log":
- [{"message":
-   ".> LEAN_PATH=././.lake/build/lib DYLD_LIBRARY_PATH= /Users/tallbr00/.elan/toolchains/leanprover--lean4---v4.14.0/bin/lean -DautoImplicit=false ././././Val/Foundation.lean -R ./././. -o ././.lake/build/lib/Val/Foundation.olean -i ././.lake/build/lib/Val/Foundation.ilean -c ././.lake/build/ir/Val/Foundation.c --json",
-   "level": "trace"}],
- "depHash": "3791432905447092850"}
