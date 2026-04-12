@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import Val.Algebra
+import Val.Algebra.Core
 
 /-!
 # Val α: Data Structures — 156,875 Mathlib Lines → ~800 Lines

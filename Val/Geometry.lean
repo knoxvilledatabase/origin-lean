@@ -1,9 +1,9 @@
 /-
 Released under MIT license.
 -/
-import Val.RingTheory
-import Val.Category
-import Val.Analysis
+import Val.RingTheory.Core
+import Val.Category.Core
+import Val.Analysis.Core
 
 /-!
 # Val α: Geometry — Algebraic Geometry + Differential Geometry

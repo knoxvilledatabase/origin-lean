@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import Val.Algebra
+import Val.Algebra.Core
 
 /-!
 # Val α: Linear Algebra
