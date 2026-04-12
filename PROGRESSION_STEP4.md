@@ -578,11 +578,20 @@ NumberTheory has higher zero-management density (64%) than FieldTheory (51%), bu
 | FieldTheory | 2,163 | 938 (43.4%) | 255 (11.8%) | 970 (44.8%) | 55.2% |
 | NumberTheory | 5,253 | 1,338 (25.5%) | 798 (15.2%) | 3,117 (59.3%) | 40.7% |
 | InformationTheory | 118 | 53 (44.9%) | 24 (20.3%) | 41 (34.7%) | 65.3% |
-| **Total** | **7,534** | **2,329 (30.9%)** | **1,077 (14.3%)** | **4,128 (54.8%)** | **45.2%** |
+| Condensed | 74 | 20 (27.0%) | 0 (0%) | 54 (73.0%) | 27.0% |
+| Dynamics | 673 | 418 (62.1%) | 52 (7.7%) | 203 (30.2%) | 69.8% |
+| RepresentationTheory | 747 | 345 (46.2%) | 3 (0.4%) | 399 (53.4%) | 46.6% |
+| **Total** | **9,028** | **3,112 (34.5%)** | **1,132 (12.5%)** | **4,784 (53.0%)** | **47.0%** |
 
-**7,534 of Mathlib's 88,494 theorems exhaustively mapped (8.5%). 45.2% collapse across three domains.**
+**9,028 of Mathlib's 88,494 theorems exhaustively mapped (10.2%). 47.0% collapse across six domains.**
 
-The honest ratio: **for every 2 theorems in Mathlib, ~1 collapses and ~1 is genuinely new math.** The Val foundation absorbs infrastructure and zero-management. It does not absorb the mathematics itself.
+The pattern: **B1 (structural plumbing) dominates collapse at 34.5%. B2 (zero-management) contributes 12.5%. Together they account for 47% of all theorems.** The remaining 53% is irreducible domain-specific mathematics.
+
+The collapse rate varies dramatically by domain character:
+- **Infrastructure-heavy** (Dynamics 69.8%, InformationTheory 65.3%): lots of iterator/simp plumbing
+- **Algebraic** (FieldTheory 55.2%, RepresentationTheory 46.6%): balanced plumbing + real math
+- **Deep math** (NumberTheory 40.7%, Condensed 27.0%): dominated by genuinely new results
+- **Zero-management** is highest in arithmetic domains (NumberTheory 15.2%, InformationTheory 20.3%) and near-zero in pure categorical/topological domains (Condensed 0%, RepresentationTheory 0.4%)
 
 ## Domain Priority (revised with actuals)
 
