@@ -555,15 +555,32 @@ NumberTheory has higher zero-management density (64%) than FieldTheory (51%), bu
 - **Highest B1:** Zsqrtd/Basic.lean (49.3%), Real/Irrational.lean (54%), Divisors.lean (25%)
 - **Deepest B3:** ModularForms/ (63%), LSeries/ (60%), FLT/ (75%)
 
-## Combined Results: Two Domains Mapped
+## InformationTheory: Exhaustive Mapping
+
+6 files. 118 theorems. The smallest domain. Base strengthened before mapping with `valMap_preserves_mul_general`, `valMap_preserves_add_general`, `valMap_preserves_neg_general`, `norm_mul_contents`, `trace_add_contents`, `valMap_involution`, `norm_conj_contents`.
+
+| File | Theorems | B1 | B2 | B3 |
+|---|---|---|---|---|
+| Hamming.lean | 52 | 36 | 14 | 2 |
+| Coding/UniquelyDecodable.lean | 2 | 0 | 0 | 2 |
+| Coding/KraftMcMillan.lean | 6 | 1 | 0 | 5 |
+| KullbackLeibler/Basic.lean | 27 | 8 | 2 | 17 |
+| KullbackLeibler/ChainRule.lean | 6 | 0 | 0 | 6 |
+| KullbackLeibler/KLFun.lean | 25 | 8 | 8 | 9 |
+| **Total** | **118** | **53 (44.9%)** | **24 (20.3%)** | **41 (34.7%)** |
+
+**65.3% collapse** — the highest of any domain mapped. Hamming.lean is 96% infrastructure (type synonym API + zero-management around the norm). KL chain rule is 100% genuinely new. The B2 concentration in KLFun.lean (8 of 25) reflects the `x * log x` singularity at zero — exactly what Val's sort dispatch dissolves.
+
+## Combined Results: Three Domains Mapped
 
 | Domain | Theorems | B1 | B2 | B3 | Collapse |
 |---|---|---|---|---|---|
 | FieldTheory | 2,163 | 938 (43.4%) | 255 (11.8%) | 970 (44.8%) | 55.2% |
 | NumberTheory | 5,253 | 1,338 (25.5%) | 798 (15.2%) | 3,117 (59.3%) | 40.7% |
-| **Total** | **7,416** | **2,276 (30.7%)** | **1,053 (14.2%)** | **4,087 (55.1%)** | **44.9%** |
+| InformationTheory | 118 | 53 (44.9%) | 24 (20.3%) | 41 (34.7%) | 65.3% |
+| **Total** | **7,534** | **2,329 (30.9%)** | **1,077 (14.3%)** | **4,128 (54.8%)** | **45.2%** |
 
-**7,416 of Mathlib's 88,494 theorems exhaustively mapped (8.4%). 44.9% collapse across two domains.**
+**7,534 of Mathlib's 88,494 theorems exhaustively mapped (8.5%). 45.2% collapse across three domains.**
 
 The honest ratio: **for every 2 theorems in Mathlib, ~1 collapses and ~1 is genuinely new math.** The Val foundation absorbs infrastructure and zero-management. It does not absorb the mathematics itself.
 

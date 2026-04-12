@@ -210,6 +210,62 @@ theorem mul_sort (f : α → α → α) (a b : Val α) :
   · intros va vb ha hb; subst ha; subst hb; rfl
 
 -- ============================================================================
+-- valMap as Multiplicative Homomorphism
+-- ============================================================================
+
+/-- valMap preserves multiplicative structure: if f respects mul, so does valMap f. -/
+theorem valMap_preserves_mul_general {β : Type u} (f : α → β)
+    (mulA : α → α → α) (mulB : β → β → β)
+    (hf : ∀ a b, f (mulA a b) = mulB (f a) (f b))
+    (x y : Val α) :
+    valMap f (mul mulA x y) = mul mulB (valMap f x) (valMap f y) := by
+  cases x <;> cases y <;> simp [mul, valMap, hf]
+
+/-- valMap preserves additive structure: if f respects add, so does valMap f. -/
+theorem valMap_preserves_add_general {β : Type u} (f : α → β)
+    (addA : α → α → α) (addB : β → β → β)
+    (hf : ∀ a b, f (addA a b) = addB (f a) (f b))
+    (x y : Val α) :
+    valMap f (add addA x y) = add addB (valMap f x) (valMap f y) := by
+  cases x <;> cases y <;> simp [add, valMap, hf]
+
+/-- valMap preserves negation: if f respects neg, so does valMap f. -/
+theorem valMap_preserves_neg_general {β : Type u} (f : α → β)
+    (negA : α → α) (negB : β → β)
+    (hf : ∀ a, f (negA a) = negB (f a))
+    (x : Val α) :
+    valMap f (neg negA x) = neg negB (valMap f x) := by
+  cases x <;> simp [neg, valMap, hf]
+
+/-- Multiplicative norm: if N respects mul, then N on contents respects mul. -/
+theorem norm_mul_contents (mulF : α → α → α) (N : α → α)
+    (hN : ∀ a b, N (mulF a b) = mulF (N a) (N b)) (a b : α) :
+    valMap N (mul mulF (contents a) (contents b)) =
+    mul mulF (valMap N (contents a)) (valMap N (contents b)) := by
+  simp [mul, valMap, hN]
+
+/-- Additive trace: if T respects add, then T on contents respects add. -/
+theorem trace_add_contents (addF : α → α → α) (T : α → α)
+    (hT : ∀ a b, T (addF a b) = addF (T a) (T b)) (a b : α) :
+    valMap T (add addF (contents a) (contents b)) =
+    add addF (valMap T (contents a)) (valMap T (contents b)) := by
+  simp [add, valMap, hT]
+
+-- ============================================================================
+-- Involution / Star / Conjugation
+-- ============================================================================
+
+/-- An involution on α lifts to an involution on Val α via valMap. -/
+theorem valMap_involution (f : α → α) (hf : ∀ a, f (f a) = a)
+    (x : Val α) : valMap f (valMap f x) = x := by
+  cases x <;> simp [valMap, hf]
+
+/-- Norm via conjugation: x * conj(x) is contents when x is contents. -/
+theorem norm_conj_contents (mulF : α → α → α) (conjF : α → α) (a : α) :
+    mul mulF (contents a) (valMap conjF (contents a)) =
+    contents (mulF a (conjF a)) := by simp [mul, valMap]
+
+-- ============================================================================
 -- SECTION 2: Ring and Field Laws
 -- ============================================================================
 
