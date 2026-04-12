@@ -520,6 +520,14 @@ theorem val_one_smul (scaleF : α → β → β) (one : α)
 theorem contents_preserves_smul (f : α → β → β) (a : α) (v : β) :
     contents (f a v) = smul f (contents a) (contents v) := by rfl
 
+/-- valMap preserves scalar multiplication when f respects the action. -/
+theorem valMap_preserves_smul {γ : Type u} (f : β → γ)
+    (smulB : α → β → β) (smulC : α → γ → γ)
+    (hf : ∀ a v, f (smulB a v) = smulC a (f v))
+    (s : Val α) (v : Val β) :
+    valMap f (smul smulB s v) = smul smulC s (valMap f v) := by
+  cases s <;> cases v <;> simp [smul, valMap, hf]
+
 end VectorSpaces
 
 -- ============================================================================

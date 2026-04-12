@@ -221,6 +221,12 @@ def valPair {β : Type u} : Val α → Val β → Val (α × β)
 @[simp] theorem valPair_contents_container {β : Type u} (a : α) (b : β) :
     valPair (contents a) (container b) = container (a, b) := rfl
 
+/-- Component-wise valMap distributes over valPair. -/
+theorem valPair_valMap {β α' β' : Type u} (f : α → α') (g : β → β')
+    (x : Val α) (y : Val β) :
+    valPair (valMap f x) (valMap g y) = valMap (fun p => (f p.1, g p.2)) (valPair x y) := by
+  cases x <;> cases y <;> simp [valMap, valPair]
+
 -- ============================================================================
 -- Contents existence (trivial but used 60+ times across domains)
 -- ============================================================================
@@ -252,6 +258,22 @@ def isContents : Val α → Prop
 @[simp] theorem isContents_origin : isContents (origin : Val α) = False := rfl
 @[simp] theorem isContents_container (a : α) : isContents (container a : Val α) = False := rfl
 @[simp] theorem isContents_contents (a : α) : isContents (contents a : Val α) = True := rfl
+
+-- ============================================================================
+-- Sort-Predicate Interaction with Operations
+-- ============================================================================
+
+@[simp] theorem isContents_mul_contents (f : α → α → α) (a b : α) :
+    isContents (mul f (contents a) (contents b)) = True := rfl
+
+@[simp] theorem isContents_add_contents (f : α → α → α) (a b : α) :
+    isContents (add f (contents a) (contents b)) = True := rfl
+
+@[simp] theorem isOrigin_mul_origin_left (f : α → α → α) (x : Val α) :
+    isOrigin (mul f origin x) = True := by cases x <;> rfl
+
+@[simp] theorem isOrigin_mul_origin_right (f : α → α → α) (x : Val α) :
+    isOrigin (mul f x origin) = True := by cases x <;> rfl
 
 -- ============================================================================
 -- Sort disjointness
