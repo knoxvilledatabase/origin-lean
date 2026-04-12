@@ -183,7 +183,7 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 |---|---|---|---|---|---|---|---|
 | 1 | InformationTheory | 41 | 427 | 0 | 427 | 10.4 | 10,477 |
 | 2 | Condensed | 49 | 320 | 0 | 320 | 6.5 | 10,797 |
-| 3 | Dynamics | | | | | | |
+| 3 | Dynamics | 205 | 976 | 0 | 976 | 4.7 | 11,773 |
 | ... | ... | | | | | | |
 | 19 | Algebra | | | | | | |
 
