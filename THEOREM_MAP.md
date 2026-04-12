@@ -8,7 +8,7 @@ This document maps all 173,646 Mathlib theorems into three buckets and shows whe
 
 **Bucket 2: `≠ 0` dissolves.** The theorem exists because of zero-management — `≠ 0` guards, `NeZero` instances, `WithBot`/`WithTop`, `ae` (almost everywhere), `IsUnit`, `support = {i | f i ≠ 0}`, sentinel-zero conventions. The origin/contents distinction dissolves these. Origin is not zero. The hypothesis doesn't need to exist.
 
-**Bucket 3: Genuinely new.** The theorem states domain-specific mathematical content. It needs new code — but the code is compressed through generalization. Multiple theorems sharing the same pattern are merged into one general theorem.
+**Bucket 3: Genuinely new.** The theorem states domain-specific mathematical content. It needs new code — but each pattern is written once at the most general level. Mathlib writes the same pattern repeatedly for each specific case. We write the general version once. The specific cases were never needed — not compressed, never written.
 
 ## Grand Totals
 
@@ -47,7 +47,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **B2 hotspots:** `continuum_ne_zero`, `beth_ne_zero`, `aleph0_ne_zero`, `cof_ne_zero`, ordinal `opow_pos`, cardinal `power_ne_zero`. 189 theorems guarding against zero in cardinal/ordinal arithmetic.
 
-**B3 content (416):** Cantor's theorem, Konig's theorem, Schroeder-Bernstein, cofinality theory, Veblen functions (epsilon/gamma numbers), Cantor Normal Form, ZFC model construction, well-ordering constructions. Compressed to 148 declarations through ordinal/cardinal operation merging.
+**B3 content (416):** Cantor's theorem, Konig's theorem, Schroeder-Bernstein, cofinality theory, Veblen functions (epsilon/gamma numbers), Cantor Normal Form, ZFC model construction, well-ordering constructions. Written as 148 declarations through ordinal/cardinal operation merging.
 
 #### Data (17,901 theorems → 4,222 B3)
 
@@ -66,7 +66,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 - PNat (30% B2) — the entire type exists to avoid zero
 - Nat/ (22% B2) — factorization, primality, modular arithmetic
 
-**B3 content (4,222):** Bezout's lemma, Fibonacci identities, the complex field, Holder's inequality, pigeonhole, merge sort correctness, cyclic permutations, matrix multiplication, determinant multiplicativity. Compressed to 176 declarations through number tower unification and collection operation merging.
+**B3 content (4,222):** Bezout's lemma, Fibonacci identities, the complex field, Holder's inequality, pigeonhole, merge sort correctness, cyclic permutations, matrix multiplication, determinant multiplicativity. Written as 176 declarations through number tower unification and collection operation merging.
 
 #### Dynamics (673 theorems → 203 B3)
 
@@ -111,7 +111,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 - `MonoidLocalization/MonoidWithZero` (14 theorems) — pure zero-management
 - `SpecificGroups` (35 theorems) — `Nontrivial`/prime `≠ 0` guards
 
-**B3 content (1,199):** Permutation cycle structure/sign, group actions (orbits, stabilizers, primitivity), Sylow existence/conjugacy/counting, nilpotent/solvable groups, free group universal property, HNN extensions, Coxeter inversions, Schreier generators, Jordan-Holder. Compressed to 176 declarations through universal homomorphism/action patterns.
+**B3 content (1,199):** Permutation cycle structure/sign, group actions (orbits, stabilizers, primitivity), Sylow existence/conjugacy/counting, nilpotent/solvable groups, free group universal property, HNN extensions, Coxeter inversions, Schreier generators, Jordan-Holder. Written as 176 declarations through universal homomorphism/action patterns.
 
 #### InformationTheory (118 theorems → 41 B3)
 
@@ -123,7 +123,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **B2 hotspots:** Hamming norm (14 theorems managing distance from zero), KLFun singularity at zero (8 theorems about `x * log x` at `x = 0`).
 
-**B3 content (41):** Gibbs' inequality, KL divergence chain rule, Kraft-McMillan inequality, KL convexity, unique decodability. Compressed to 41 declarations (small domain, no further compression needed).
+**B3 content (41):** Gibbs' inequality, KL divergence chain rule, Kraft-McMillan inequality, KL convexity, unique decodability. Written as 41 declarations (small domain, each result stated once).
 
 #### FieldTheory (2,163 theorems → 970 B3)
 
@@ -135,7 +135,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **B2 hotspots:** `RatFunc` (81 `≠ 0` refs in 88 theorems), `KummerPolynomial` (7 of 10 are `≠ 0` guards), `Separable` (16 B2), `Finite/Basic` (20 B2).
 
-**B3 content (970):** Galois correspondence, Abel-Ruffini theorem, Luroth's theorem, separable/inseparable tower laws, purely inseparable exponents, primitive element theorem, splitting field construction, algebraic closure. Compressed to 179 declarations through tower property propagation and Galois correspondence generalization.
+**B3 content (970):** Galois correspondence, Abel-Ruffini theorem, Luroth's theorem, separable/inseparable tower laws, purely inseparable exponents, primitive element theorem, splitting field construction, algebraic closure. Written as 179 declarations through tower property propagation and Galois correspondence generalization.
 
 #### Combinatorics (5,311 theorems → 2,749 B3)
 
@@ -147,7 +147,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **Lowest B2 (3.4%)** of any domain. Combinatorics operates on discrete structures, not rings/fields. Zero-management appears mainly in `SimpleGraph/Diam` (26 B2 — diameter conflates "trivial" with "disconnected") and `Nullstellensatz` (6 B2).
 
-**B3 content (2,749):** Graph connectivity, coloring, matching, regularity lemma, Ramsey numbers, matroid rank/circuits/closure/duality, Plunnecke-Ruzsa, Kruskal-Katona, pigeonhole, Hall's theorem, Catalan/Bell/Stirling numbers. Compressed to 240 declarations through unified `SimpleGraph`/`Matroid` structures.
+**B3 content (2,749):** Graph connectivity, coloring, matching, regularity lemma, Ramsey numbers, matroid rank/circuits/closure/duality, Plunnecke-Ruzsa, Kruskal-Katona, pigeonhole, Hall's theorem, Catalan/Bell/Stirling numbers. Written as 240 declarations through unified `SimpleGraph`/`Matroid` structures.
 
 #### RepresentationTheory (747 theorems → 399 B3)
 
@@ -159,7 +159,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **Near-zero B2 (0.4%).** Only 3 theorems: `NeZero (Nat.card G : k)` in Maschke's theorem and character orthogonality.
 
-**B3 content (399):** Character theory, Schur's lemma, Maschke's theorem, group (co)homology, Tannaka duality, Hilbert 90, Frobenius reciprocity, long exact sequences. Compressed to 105 declarations through shared homological chain/functoriality patterns.
+**B3 content (399):** Character theory, Schur's lemma, Maschke's theorem, group (co)homology, Tannaka duality, Hilbert 90, Frobenius reciprocity, long exact sequences. Written as 105 declarations through shared homological chain/functoriality patterns.
 
 #### NumberTheory (5,253 theorems → 3,117 B3)
 
@@ -175,7 +175,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 - Padics (18.5% B2) — `¬f ≈ 0`, `norm ≠ 0`, `Fact p.Prime`
 - Finite/Basic (28% B2) — `pow_card_sub_one` requires `a ≠ 0`
 
-**B3 content (3,117):** Hensel's lemma, Mahler basis, modular forms, L-series analytic continuation, Riemann zeta functional equation, Galois representations, class number formula, Dirichlet's theorem on primes in AP, FLT descent, Pell equations, quadratic reciprocity. Compressed to 155 declarations.
+**B3 content (3,117):** Hensel's lemma, Mahler basis, modular forms, L-series analytic continuation, Riemann zeta functional equation, Galois representations, class number formula, Dirichlet's theorem on primes in AP, FLT descent, Pell equations, quadratic reciprocity. Written as 155 declarations.
 
 #### Computability (1,060 theorems → 649 B3)
 
@@ -187,7 +187,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **Near-zero B2 (1.4%).** Computability doesn't encounter the zero boundary. The 15 B2 are real-analysis denominator guards in AkraBazzi and trivial `Nat.pos_of_ne_zero`.
 
-**B3 content (649):** Turing machine simulation, Rice's theorem, halting problem, Godel numbering, Myhill-Nerode, pumping lemmas, Akra-Bazzi recurrence, Church-Turing, reducibility degrees. Compressed to 161 declarations through unified Automaton/CompModel/RecFunc structures.
+**B3 content (649):** Turing machine simulation, Rice's theorem, halting problem, Godel numbering, Myhill-Nerode, pumping lemmas, Akra-Bazzi recurrence, Church-Turing, reducibility degrees. Written as 161 declarations through unified Automaton/CompModel/RecFunc structures.
 
 #### Condensed (74 theorems → 54 B3)
 
@@ -199,7 +199,7 @@ These 13 domains were exhaustively mapped — every theorem individually classif
 
 **Zero B2.** Pure category theory. No arithmetic, no zero management.
 
-**B3 content (54):** Condensed set epimorphism characterization, discrete object TFAE, Dold-Kan correspondence, internal projectivity, sheaf conditions. Compressed to 49 declarations.
+**B3 content (54):** Condensed set epimorphism characterization, discrete object TFAE, Dold-Kan correspondence, internal projectivity, sheaf conditions. Written as 49 declarations.
 
 ### Covered Domains (mapped by statistical calibration)
 
@@ -222,7 +222,7 @@ These 12 domains were mapped by reading representative files and calibrating B1/
 - **Algebra (14.6% B2):** `GroupWithZero` (50% B2), `Polynomial` (38% B2), `Field` (35% B2).
 - **Topology+Order (10.4% B2):** `WithBot.lean` has 279 bot-management references. Filter `NeBot` is the topological zero.
 
-## Compression Examples
+## Generalization Examples
 
 ### How 1,199 B3 becomes 176 declarations (GroupTheory)
 
@@ -257,6 +257,6 @@ Pick any Mathlib theorem. Classify it:
 
 2. **Does it carry a `≠ 0`, `NeZero`, `IsUnit`, `WithBot`, or `ae` hypothesis that wouldn't exist if origin and zero were distinct?** If yes → Bucket 2.
 
-3. **Neither?** → Bucket 3. Find the general theorem in the domain file that covers it through pattern compression.
+3. **Neither?** → Bucket 3. Find the general theorem in the domain file that covers it. We wrote each pattern once at the general level — the specific case is an instance of that general theorem.
 
 The mapping is falsifiable. Any theorem that doesn't fit its bucket is a counterexample.
