@@ -328,3 +328,11 @@ Sorted by genuinely new definitions (fewest first):
 ```
 
 Fewest new definitions first. Sections, not files. Strip until it hurts. Hardest last.
+
+## Status
+
+**Step 3 is structurally complete.** All 13 stairs have been built — definitions and key theorems for all 32 domains compile clean in 11 files.
+
+**Step 3 is not exhaustively verified.** The structure exists and builds, but we have not mapped every one of Mathlib's 88,494 theorems to a bucket (simp consequence, dissolved hypothesis, or genuinely new). The 99.5% reduction is measured by line count (10,885 lines build clean) but not validated theorem-by-theorem.
+
+The exhaustive verification is **[Step 4](PROGRESSION_STEP4.md)**: for every theorem in Mathlib, attempt it through the Val foundation, record which bucket it falls into. The ratio of bucket 1+2 (handled by base) to bucket 3 (genuinely new) is the actual evidence. Start with FieldTheory (51% zero-management density, 2,056 theorems).

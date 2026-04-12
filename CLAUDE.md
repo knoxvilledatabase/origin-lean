@@ -39,7 +39,11 @@ Read in this order:
 
 6. **[PROGRESSION_STEP2.md](PROGRESSION_STEP2.md)** (COMPLETE, history only) — how 19 files became 79 files. Deep dives, domain folder structure.
 
-7. **[PROGRESSION_STEP3.md](PROGRESSION_STEP3.md)** (COMPLETE) — how 79 files became 11 files covering all 32 domains. The deduplication, consolidation, and stair execution. The scans, the method, the results.
+7. **[PROGRESSION_STEP3.md](PROGRESSION_STEP3.md)** (STRUCTURALLY COMPLETE) — how 79 files became 11 files covering all 32 domains. Deduplication, consolidation, stair execution. Structure built and compiling, but not exhaustively verified against Mathlib's theorem list.
+
+## What Is Next
+
+8. **[PROGRESSION_STEP4.md](PROGRESSION_STEP4.md)** — the active work. Exhaustive theorem mapping: for every Mathlib theorem, attempt through Val, record which bucket (simp consequence, dissolved, genuinely new). This validates the 99.5% claim with evidence. Start with FieldTheory (2,056 theorems, 51% zero-management density).
 
 ## The Architecture
 
