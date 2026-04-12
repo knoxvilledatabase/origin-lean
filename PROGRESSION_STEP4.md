@@ -512,16 +512,67 @@ The honest ratio: **for every 2 theorems in Mathlib's FieldTheory, ~1 collapses 
 
 **Status:** complete — see Final Totals above. 55.2% collapse (1,193 of 2,163 theorems). Prediction of 85-90% was overestimated. Honest ratio: ~1 in 2 theorems collapses.
 
-## After FieldTheory
+## NumberTheory: Exhaustive Mapping
 
-The next domain depends on the results. If the ratio holds for FieldTheory, pick the next highest-yield domain (NumberTheory at 64% density, but 4,642 theorems — larger). If the ratio breaks, diagnose why before continuing.
+231 files. 5,253 theorems. 64% zero-management density. The second domain mapped.
 
-## Domain Priority (by expected yield)
+Base strengthened before mapping: added `valMap_injective`, `valMap_surjective`, `valMap_ext`, `contents_congr`, `container_congr` to Foundation.lean.
 
-| Domain | Theorems | ≠ 0 + TC density | Expected bucket 1+2 % |
+### Per-batch results
+
+| Batch | Subdirectories | Theorems | B1 | B2 | B3 | Collapse |
+|---|---|---|---|---|---|---|
+| 1 | Padics + ArithmeticFunction | 679 | 184 | 106 | 389 | 42.7% |
+| 2 | NumberField + Cyclotomic | 1,215 | 367 | 202 | 646 | 46.8% |
+| 3 | LSeries + ModularForms | 1,109 | 257 | 171 | 681 | 38.6% |
+| 4 | LegendreSymbol + FLT + Zsqrtd + Real + Height + MulChar + DirichletChar + Harmonic | 1,037 | 308 | 149 | 580 | 44.1% |
+| 5 | EulerProduct + ClassNumber + RamificationInertia + Transcendental + DiophApprox + top-level | 1,213 | 222 | 170 | 821 | 32.3% |
+
+### Final totals
+
+| Bucket | Count | Percentage |
+|---|---|---|
+| **Bucket 1: Simp consequence** | 1,338 | 25.5% |
+| **Bucket 2: Dissolves (≠ 0 / NeZero)** | 798 | 15.2% |
+| **Bucket 3: Genuinely new** | 3,117 | 59.3% |
+| **Total** | **5,253** | 100% |
+
+**40.7% collapse.** 2,136 theorems are simp consequences (1,338) or dissolved `≠ 0` guards (798). 3,117 are genuinely new.
+
+### What this means
+
+NumberTheory has higher zero-management density (64%) than FieldTheory (51%), but **lower collapse rate** (40.7% vs 55.2%). Why:
+
+1. **NumberTheory is deeper math.** Modular forms, L-series analytic continuation, Fermat's Last Theorem, Pell equations, transcendence proofs — these are among the deepest results in Mathlib. The bucket 3 percentage (59.3%) reflects irreducible mathematical content.
+
+2. **B2 is higher than FieldTheory** (15.2% vs 11.8%). The density signal was right — NumberTheory does have more `≠ 0` hypotheses that dissolve. But the higher density also means more B3 theorems that *use* `≠ 0` as part of their proof, not as their sole purpose.
+
+3. **B1 is lower than FieldTheory** (25.5% vs 43.4%). NumberTheory has fewer wrapper/coercion/definitional theorems and more substantive results.
+
+### Hotspots
+
+- **Highest B2:** Cyclotomic/ (32%), RamificationInertia/ (31.6%), Padics/ (18.5%)
+- **Highest B1:** Zsqrtd/Basic.lean (49.3%), Real/Irrational.lean (54%), Divisors.lean (25%)
+- **Deepest B3:** ModularForms/ (63%), LSeries/ (60%), FLT/ (75%)
+
+## Combined Results: Two Domains Mapped
+
+| Domain | Theorems | B1 | B2 | B3 | Collapse |
+|---|---|---|---|---|---|
+| FieldTheory | 2,163 | 938 (43.4%) | 255 (11.8%) | 970 (44.8%) | 55.2% |
+| NumberTheory | 5,253 | 1,338 (25.5%) | 798 (15.2%) | 3,117 (59.3%) | 40.7% |
+| **Total** | **7,416** | **2,276 (30.7%)** | **1,053 (14.2%)** | **4,087 (55.1%)** | **44.9%** |
+
+**7,416 of Mathlib's 88,494 theorems exhaustively mapped (8.4%). 44.9% collapse across two domains.**
+
+The honest ratio: **for every 2 theorems in Mathlib, ~1 collapses and ~1 is genuinely new math.** The Val foundation absorbs infrastructure and zero-management. It does not absorb the mathematics itself.
+
+## Domain Priority (revised with actuals)
+
+| Domain | Theorems | Predicted collapse | Actual collapse |
 |---|---|---|---|
-| FieldTheory | 2,056 | 51% | ~85-90% |
-| NumberTheory | 4,642 | 64% | ~85-90% |
+| FieldTheory | 2,163 | ~85-90% | **55.2%** |
+| NumberTheory | 5,253 | ~85-90% | **40.7%** |
 | Data | 17,426 | 14% | ~70-80% |
 | GroupTheory | 3,686 | 16% | ~70-80% |
 | SetTheory | 2,401 | 15% | ~65-75% |
