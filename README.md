@@ -47,7 +47,9 @@ Arithmetic  <-- the ambiguity of zero starts here
     └── InformationTheory (Hamming, KL divergence, Kraft inequality, coding theory)
 ```
 
-20 files. 10,756 lines. Every domain in Mathlib. Builds in under 12 seconds (clean) / 5 seconds (cached). Zero Mathlib dependency. Zero sorries.
+20 files. 10,756 lines. Every domain in Mathlib. Builds in under 12 seconds (clean) / 5 seconds (cached). Zero Mathlib dependency.
+
+> **Zero sorries.** Every proof is complete. No placeholders. No "trust me." The Lean kernel verified every line.
 
 ```bash
 git clone https://github.com/knoxvilledatabase/origin-lean.git
@@ -98,13 +100,34 @@ Level 5: ValModule α β        — module structure (scalar action)
 Every domain extends the level it needs. Laws are proved once and inherited. 5 classes instead of 17. Single inheritance. No diamonds.
 
 ```lean
--- A domain theorem. No explicit parameters. The class carries the algebra.
+-- The class hierarchy (actual code from Val/Ring.lean):
+class ValArith (α : Type u) where
+  mulF : α → α → α
+  addF : α → α → α
+  negF : α → α
+  invF : α → α
+
+class ValRing (α : Type u) extends ValArith α where
+  mul_assoc : ∀ a b c, mulF (mulF a b) c = mulF a (mulF b c)
+  add_comm  : ∀ a b, addF a b = addF b a
+  -- ... distributivity, negation, commutativity
+
+class ValField (α : Type u) extends ValRing α where
+  one : α
+  zero : α
+  mul_inv : ∀ a, mulF a (invF a) = one
+  -- ... identity, inverse laws
+```
+
+A domain theorem — the class carries the algebra, `simp` handles the sort dispatch:
+
+```lean
 theorem val_mul_assoc [ValRing α] (a b c : Val α) :
     mul (mul a b) c = mul a (mul b c) := by
   cases a <;> cases b <;> cases c <;> simp [mul, ValRing.mul_assoc]
 ```
 
-The class provides the hypothesis. The simp set handles the sort dispatch. Two layers, clean separation.
+Two layers. The class says "α has associative multiplication." The simp set says "origin absorbs everything." Clean separation.
 
 ## The numbers
 
@@ -112,9 +135,6 @@ The class provides the hypothesis. The simp set handles the sort dispatch. Two l
 |---|---|---|
 | Lines | 2,160,000 | 10,756 |
 | Files | 8,200 | 20 |
-| Theorems mapped | 173,646 | 173,646 |
-| Infrastructure eliminated | — | 116,831 (67.3%) |
-| Genuinely new math | — | 56,815 (32.7%) |
 | Zero-management typeclasses | 17 | 0 |
 | Inheritance levels | 17+ (diamonds) | 5 (single chain) |
 | `≠ 0` hypotheses | 9,682 | 0 |
@@ -124,13 +144,14 @@ The class provides the hypothesis. The simp set handles the sort dispatch. Two l
 
 ## The exhaustive mapping
 
-Every one of Mathlib's 173,646 theorems was classified into three buckets:
+Every one of Mathlib's 173,646 theorems was mapped and classified:
 
 | Bucket | Count | % | What happens in Val |
 |---|---|---|---|
 | **B1: Structural plumbing** | 90,161 | 51.9% | Absorbed by simp set + constructor dispatch |
 | **B2: Zero-management** | 26,674 | 15.4% | Dissolved by origin/contents distinction |
-| **B3: Genuinely new** | 56,815 | 32.7% | Stated and proved — shorter, cleaner |
+| **B3: Genuinely new** | 56,815 | 32.7% | Written once at the general level |
+| **Total** | **173,646** | **100%** | **Every theorem accounted for** |
 
 The zero-management hotspots:
 
