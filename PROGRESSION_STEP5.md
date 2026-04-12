@@ -161,8 +161,8 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 | 2 | Condensed | 54 | 95 | not started |
 | 3 | Dynamics | 203 | 298 | not started |
 | 4 | ModelTheory | 282 | 580 | not started |
-| 5 | RepresentationTheory | 399 | 979 | not started |
-| 6 | SetTheory | 416 | 1,395 | not started |
+| 5 | RepresentationTheory | 399 | 979 | **done** |
+| 6 | SetTheory | 416 | 1,395 | **done** |
 | 7 | Computability | 649 | 2,044 | not started |
 | 8 | FieldTheory | 970 | 3,014 | not started |
 | 9 | GroupTheory | 1,199 | 4,213 | not started |
@@ -185,6 +185,8 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 | 2 | Condensed | 49 | 320 | 0 | 320 | 6.5 | 10,797 |
 | 3 | Dynamics | 205 | 976 | 0 | 976 | 4.7 | 11,773 |
 | 4 | ModelTheory | 282 | 1,517 | 0 | 1,517 | 5.4 | 13,290 |
+| 5 | RepresentationTheory | 105 | 571 | 0 | 571 | 5.4 | 13,861 |
+| 6 | SetTheory | 148 | 653 | 0 | 653 | 4.4 | 14,514 |
 | ... | ... | | | | | | |
 | 19 | Algebra | | | | | | |
 
@@ -194,7 +196,9 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 
 **Stair 5 notes:** 399 B3 theorems collapsed into 105 actual theorems (3.8:1 compression). The base's `valMap`, `rep`, `groupAct` patterns absorbed most homological chain/cochain theorems into general composition lemmas. This is the convergence at work — not just lines per theorem decreasing, but **theorems themselves merging** because the base makes their distinctions unnecessary. If this 3.8:1 compression holds, 56,815 B3 → ~15,000 actual theorems → dramatically fewer lines.
 
-The trend: **10.4 → 6.5 → 4.7 → 5.4 → 5.4** (lines/raw-theorem stable, but theorem compression emerging).
+**Stair 6 notes:** 416 B3 theorems collapsed into 148 actual declarations (2.8:1 compression). SetTheory is heavily structural — ordinal/cardinal arithmetic maps directly to `mul`/`add`/`valMap`, fixed points and Veblen functions are `valMap` compositions, ZFC axioms are predicates on contents. The entire ordinal arithmetic subsystem (add, mul, sub, div, mod, exp, pred, succ, log) is 10 abbrevs. Two convergence signals: lines/theorem dropped to 4.4 (new low), and the compression ratio confirms that ordinal/cardinal operations merge naturally into the existing framework. Also fixed two pre-existing build issues (normMap collision in RingTheory, FOTerm collision with Category.lean).
+
+The trend: **10.4 → 6.5 → 4.7 → 5.4 → 5.4 → 4.4** (lines/thm at new low, compression ratio stable at ~3:1).
 
 The lines/thm column tells the story. If it trends downward, the convergence hypothesis holds. The final total is wherever the curve levels off.
 

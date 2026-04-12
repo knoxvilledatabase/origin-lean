@@ -697,14 +697,14 @@ theorem adjoinElem_single (addF mulF : α → α → α) (zero c₀ a : α) :
 -- § Algebraic: Norm Map
 -- ============================================================================
 
-/-- Norm map preserves sort. -/
-abbrev normMap (N : α → α) : Val α → Val α := valMap N
+/-- Algebraic norm map preserves sort. -/
+abbrev algNormMap (N : α → α) : Val α → Val α := valMap N
 
-/-- Norm is multiplicative within contents. -/
-theorem normMap_mul (mulF : α → α → α) (N : α → α)
+/-- Algebraic norm is multiplicative within contents. -/
+theorem algNormMap_mul (mulF : α → α → α) (N : α → α)
     (hN : ∀ a b, N (mulF a b) = mulF (N a) (N b)) (a b : α) :
-    normMap N (mul mulF (contents a) (contents b)) =
-    mul mulF (normMap N (contents a)) (normMap N (contents b)) := by
+    algNormMap N (mul mulF (contents a) (contents b)) =
+    mul mulF (algNormMap N (contents a)) (algNormMap N (contents b)) := by
   show contents (N (mulF a b)) = contents (mulF (N a) (N b))
   rw [hN]
 
