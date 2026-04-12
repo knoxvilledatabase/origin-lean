@@ -153,6 +153,48 @@ def valMap {β : Type u} (f : α → β) : Val α → Val β
     valMap f (contents a) = contents (f a) := rfl
 
 -- ============================================================================
+-- valMap: Structural Properties
+-- ============================================================================
+
+/-- valMap preserves injectivity. If f is injective, valMap f is injective. -/
+theorem valMap_injective {β : Type u} {f : α → β}
+    (hf : ∀ a b, f a = f b → a = b) :
+    ∀ x y : Val α, valMap f x = valMap f y → x = y := by
+  intro x y h
+  cases x <;> cases y <;> simp [valMap] at h ⊢ <;> exact hf _ _ h
+
+/-- valMap preserves surjectivity. If f is surjective, valMap f is surjective. -/
+theorem valMap_surjective {β : Type u} {f : α → β}
+    (hf : ∀ b, ∃ a, f a = b) :
+    ∀ y : Val β, ∃ x : Val α, valMap f x = y := by
+  intro y; cases y with
+  | origin => exact ⟨origin, rfl⟩
+  | container b => obtain ⟨a, ha⟩ := hf b; exact ⟨container a, by simp [ha]⟩
+  | contents b => obtain ⟨a, ha⟩ := hf b; exact ⟨contents a, by simp [ha]⟩
+
+/-- valMap id = id -/
+theorem valMap_id : valMap (id : α → α) = id := by
+  funext x; cases x <;> rfl
+
+/-- valMap (g ∘ f) = valMap g ∘ valMap f -/
+theorem valMap_comp {β γ : Type u} (f : α → β) (g : β → γ) :
+    valMap (g ∘ f) = valMap g ∘ valMap f := by
+  funext x; cases x <;> rfl
+
+/-- valMap extensionality: pointwise equal functions give equal valMaps. -/
+theorem valMap_ext {β : Type u} {f g : α → β} (h : ∀ a, f a = g a)
+    (x : Val α) : valMap f x = valMap g x := by
+  cases x <;> simp [valMap, h]
+
+/-- Contents congruence: equal α values give equal contents. -/
+@[simp] theorem contents_congr {a b : α} (h : a = b) :
+    (contents a : Val α) = contents b := by rw [h]
+
+/-- Container congruence: equal α values give equal containers. -/
+@[simp] theorem container_congr {a b : α} (h : a = b) :
+    (container a : Val α) = container b := by rw [h]
+
+-- ============================================================================
 -- Cross-Type Pairing
 -- ============================================================================
 

@@ -39,17 +39,8 @@ variable {α β γ δ : Type u}
 -- boundary" over α.
 
 -- ============================================================================
--- Functor Laws (valMap defined in Foundation.lean)
--- ============================================================================
-
-/-- valMap id = id -/
-theorem valMap_id : valMap (id : α → α) = id := by
-  funext x; cases x <;> rfl
-
-/-- valMap (g ∘ f) = valMap g ∘ valMap f -/
-theorem valMap_comp (f : α → β) (g : β → γ) :
-    valMap (g ∘ f) = valMap g ∘ valMap f := by
-  funext x; cases x <;> rfl
+-- Functor Laws: valMap_id, valMap_comp, valMap_injective, valMap_surjective,
+-- valMap_bijective all defined in Foundation.lean
 
 -- ============================================================================
 -- valMap Preserves Operations
