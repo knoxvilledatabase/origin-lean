@@ -41,9 +41,11 @@ Read in this order:
 
 7. **[PROGRESSION_STEP3.md](PROGRESSION_STEP3.md)** (STRUCTURALLY COMPLETE) — how 79 files became 11 files covering all 32 domains. Deduplication, consolidation, stair execution. Structure built and compiling, but not exhaustively verified against Mathlib's theorem list.
 
+8. **[PROGRESSION_STEP4.md](PROGRESSION_STEP4.md)** (COMPLETE) — exhaustive theorem mapping of all 173,646 Mathlib theorems. 67.3% are infrastructure Val absorbs. 32.7% (56,815) are genuinely new mathematics.
+
 ## What Is Next
 
-8. **[PROGRESSION_STEP4.md](PROGRESSION_STEP4.md)** — the active work. Exhaustive theorem mapping: for every Mathlib theorem, attempt through Val, record which bucket (simp consequence, dissolved, genuinely new). This validates the 99.5% claim with evidence. Start with FieldTheory (2,056 theorems, 51% zero-management density).
+9. **[PROGRESSION_STEP5.md](PROGRESSION_STEP5.md)** — the active work. Write the 56,815 genuinely new theorems on the Val foundation. Priority: Analysis + Algebra + Data first (AI inference impact). Target: ~150,000 lines total, 93% reduction from Mathlib. The training corpus that proves AI can learn math with less energy.
 
 ## The Architecture
 
