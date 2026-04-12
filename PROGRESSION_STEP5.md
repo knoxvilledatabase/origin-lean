@@ -181,11 +181,13 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 
 | Stair | Domain | B3 written | Lines added | Lines removed | Net lines | Lines/thm | Cumulative total |
 |---|---|---|---|---|---|---|---|
-| 1 | InformationTheory | | | | | | |
+| 1 | InformationTheory | 41 | 427 | 0 | 427 | 10.4 | 10,477 |
 | 2 | Condensed | | | | | | |
 | 3 | Dynamics | | | | | | |
 | ... | ... | | | | | | |
 | 19 | Algebra | | | | | | |
+
+**Stair 1 notes:** 10.4 lines/theorem is the baseline. This includes definitions (`klFunVal`, `klFunMap`), section headers, docstrings, and structure. The pure theorem-to-proof ratio is lower (~3-4 lines) but the overhead of organizing domain content into readable sections adds lines. The question: does this ratio decrease as the base absorbs patterns and later domains need fewer new definitions?
 
 The lines/thm column tells the story. If it trends downward, the convergence hypothesis holds. The final total is wherever the curve levels off.
 
