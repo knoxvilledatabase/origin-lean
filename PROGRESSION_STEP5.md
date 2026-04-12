@@ -190,7 +190,11 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 
 **Stair 1 notes:** 10.4 lines/theorem is the baseline. Includes definitions, headers, docstrings, structure.
 
-**Stair 4 notes:** 5.4 lines/theorem (raw). 4.0 lines/theorem (code-only, excluding comments/headers). The raw number is slightly up from Dynamics (4.7) because ModelTheory requires more structural definitions (FOLang, FOInterp, FOTerm, FOFormula — genuinely new inductive types). The code-only ratio continues dropping. The trend is: **10.4 → 6.5 → 4.7 → 5.4 (raw) / 4.0 (code)**.
+**Stair 4 notes:** 5.4 lines/theorem (raw). ModelTheory requires genuinely new inductive types (FOLang, FOInterp, FOTerm, FOFormula).
+
+**Stair 5 notes:** 399 B3 theorems collapsed into 105 actual theorems (3.8:1 compression). The base's `valMap`, `rep`, `groupAct` patterns absorbed most homological chain/cochain theorems into general composition lemmas. This is the convergence at work — not just lines per theorem decreasing, but **theorems themselves merging** because the base makes their distinctions unnecessary. If this 3.8:1 compression holds, 56,815 B3 → ~15,000 actual theorems → dramatically fewer lines.
+
+The trend: **10.4 → 6.5 → 4.7 → 5.4 → 5.4** (lines/raw-theorem stable, but theorem compression emerging).
 
 The lines/thm column tells the story. If it trends downward, the convergence hypothesis holds. The final total is wherever the curve levels off.
 

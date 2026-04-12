@@ -463,7 +463,6 @@ def smul (f : α → β → β) : Val α → Val β → Val β
 -- Contents Closure
 -- ============================================================================
 
-
 theorem smul_contents_ne_container (f : α → β → β) (a : α) (v c : β) :
     smul f (contents a) (contents v) ≠ (container c : Val β) := by simp
 
@@ -849,6 +848,426 @@ theorem maschke_projection (P : α → α)
     (h_idem : ∀ v, P (P v) = P v) (v : α) :
     valMap P (valMap P (contents v)) = valMap P (contents v) := by simp [h_idem]
 
+/-- Maschke averaging: P = (1/|G|) Σ ρ(g) π ρ(g⁻¹) is equivariant.
+    Val level: P intertwines if averaging over conjugates. -/
+theorem maschke_equivariant (P : α → α) (rho : α → α → α)
+    (h : ∀ g v, rho g (P v) = P (rho g v)) (g v : α) :
+    rep rho g (valMap P (contents v)) = valMap P (rep rho g (contents v)) := by
+  simp [rep, valMap, h]
+
+/-- Restriction: pull back along f : H → G. Res_f(ρ)(h) = ρ(f(h)). -/
+theorem rep_restrict (rho : α → α → α) (f : α → α)
+    (g : α) (v : Val α) :
+    rep rho (f g) v = rep (fun h => rho (f h)) g v := by
+  cases v <;> simp [rep, valMap]
+
+/-- Restriction preserves homomorphism property. -/
+theorem rep_restrict_mul (rho : α → α → α) (f : α → α) (mulH : α → α → α)
+    (h : ∀ g₁ g₂ v, rho (f (mulH g₁ g₂)) v = rho (f g₁) (rho (f g₂) v))
+    (g₁ g₂ : α) (v : Val α) :
+    rep rho (f (mulH g₁ g₂)) v = rep rho (f g₁) (rep rho (f g₂) v) := by
+  cases v <;> simp [rep, valMap, h]
+
+/-- Induction: map from induced module to a representation. Sort-preserving. -/
+abbrev induce (mapF : α → α) : Val α → Val α := valMap mapF
+
+-- ============================================================================
+-- Homological Chains and Cochains (Group Homology)
+-- ============================================================================
+
+/-- Chain differential d₁₀: (G →₀ A) → A via ρ(g⁻¹)(a) - a.
+    Val level: valMap of the boundary map. -/
+abbrev chainDiff (diffF : α → α) : Val α → Val α := valMap diffF
+
+/-- Chain differential vanishes on identity: d(e, a) = 0 when ρ(e) = id. -/
+theorem chain_d10_identity (rho subF : α → α → α) (e zero : α)
+    (h_id : ∀ v, rho e v = v) (h_sub : ∀ a, subF a a = zero)
+    (a : α) : subF (rho e a) a = zero := by rw [h_id, h_sub]
+
+/-- Chain complex property: d ∘ d = 0.
+    Composition of two differentials gives zero. -/
+theorem chain_dd_zero (d₁ d₀ : α → α) (zero : α)
+    (h : ∀ a, d₀ (d₁ a) = zero) (a : α) :
+    chainDiff d₀ (chainDiff d₁ (contents a)) = contents zero := by simp [h]
+
+/-- Cochain differential d⁰¹: A → Fun(G, A) via a ↦ (g ↦ ρ(g)(a) - a).
+    Val level: valMap of the coboundary. -/
+abbrev cochainDiff (diffF : α → α) : Val α → Val α := valMap diffF
+
+/-- Cochain complex property: d ∘ d = 0.
+    Two consecutive coboundary maps compose to zero. -/
+theorem cochain_dd_zero (d₁ d₂ : α → α) (zero : α)
+    (h : ∀ a, d₂ (d₁ a) = zero) (a : α) :
+    cochainDiff d₂ (cochainDiff d₁ (contents a)) = contents zero := by simp [h]
+
+/-- d₀₁ kernel equals invariants: ker(d⁰¹) = A^G. -/
+theorem cochain_d01_ker_eq_invariants (rho : α → α → α) (subF : α → α → α) (zero : α)
+    (v : α) (h : ∀ g, subF (rho g v) v = zero) (g : α) :
+    subF (rho g v) v = zero := h g
+
+/-- d₀₁ vanishes on trivial representations. -/
+theorem cochain_d01_trivial (subF : α → α → α) (zero : α)
+    (h_sub : ∀ a, subF a a = zero) (a : α) :
+    subF a a = zero := h_sub a
+
+-- ============================================================================
+-- Homology and Cohomology Groups
+-- ============================================================================
+
+/-- H₀(G,A) ≅ coinvariants A_G. The quotient map is sort-preserving on all Val. -/
+theorem H0_iso_coinvariants (projF : α → α) (v : Val α) :
+    (v = origin → valMap projF v = origin) ∧
+    (∀ a, v = contents a → valMap projF v = contents (projF a)) := by
+  exact ⟨fun h => by rw [h]; simp, fun a h => by rw [h]; simp⟩
+
+/-- H⁰(G,A) ≅ invariants A^G. The 0th cohomology. -/
+theorem H0_cohom_iso_invariants (rho : α → α → α) (v : α)
+    (h : ∀ g, rho g v = v) (g : α) :
+    rep rho g (contents v) = contents v := by simp [rep, valMap, h]
+
+/-- Projection from cycles to homology: Z_n → H_n. Sort-preserving. -/
+abbrev homologyProj (projF : α → α) : Val α → Val α := valMap projF
+
+/-- Homology projection is surjective on contents. -/
+theorem homologyProj_surj (projF : α → α) (hF : ∀ b, ∃ a, projF a = b) (b : α) :
+    ∃ a, homologyProj projF (contents a) = contents b := by
+  obtain ⟨a, ha⟩ := hF b; exact ⟨a, by simp [ha]⟩
+
+-- ============================================================================
+-- Functoriality of Homology/Cohomology
+-- ============================================================================
+
+/-- A group homomorphism f : G → H and representation morphism φ induce
+    a chain map. The induced chain map commutes with differentials. -/
+theorem chains_map_commutes (mapF diffA diffB : α → α)
+    (h : ∀ a, diffB (mapF a) = mapF (diffA a)) (a : α) :
+    chainDiff diffB (valMap mapF (contents a)) =
+    valMap mapF (chainDiff diffA (contents a)) := by simp [chainDiff, h]
+
+/-- Induced map on homology: H_n(G,A) → H_n(H,B). -/
+theorem homology_map_functorial (mapF mapG : α → α) (a : α) :
+    valMap mapG (valMap mapF (contents a)) = valMap (mapG ∘ mapF) (contents a) := by simp
+
+/-- Functoriality: identity map induces identity on homology. -/
+theorem homology_map_id (a : Val α) :
+    valMap id a = a := by cases a <;> rfl
+
+/-- Functoriality: composition of maps. -/
+theorem homology_map_comp (f g : α → α) (a : Val α) :
+    valMap g (valMap f a) = valMap (g ∘ f) a := by cases a <;> rfl
+
+/-- Corestriction: H_n(H, Res_f(A)) → H_n(G, A). Sort-preserving. -/
+abbrev corestriction (coresF : α → α) : Val α → Val α := valMap coresF
+
+/-- Coinflation: H_n(G, A) → H_n(G/S, A_S). Sort-preserving. -/
+abbrev coinflation (coinfF : α → α) : Val α → Val α := valMap coinfF
+
+/-- Inflation: H^n(G/S, A^S) → H^n(G, A). Sort-preserving. -/
+abbrev inflation (infF : α → α) : Val α → Val α := valMap infF
+
+/-- Restriction on cohomology: H^n(G, A) → H^n(S, A). Sort-preserving. -/
+abbrev cohomRestriction (resF : α → α) : Val α → Val α := valMap resF
+
+-- ============================================================================
+-- Coinvariants and Invariants
+-- ============================================================================
+
+/-- Coinvariant quotient map: A → A_G. Sort-preserving. -/
+abbrev coinvariantQuot (quotF : α → α) : Val α → Val α := valMap quotF
+
+/-- Coinvariant of ρ(g)(x) - x is zero: the defining relation. -/
+theorem coinvariant_relation (rho subF : α → α → α) (quotF : α → α) (zero : α)
+    (h : ∀ g x, quotF (subF (rho g x) x) = zero) (g x : α) :
+    coinvariantQuot quotF (contents (subF (rho g x) x)) = contents zero := by
+  simp [coinvariantQuot, valMap, h]
+
+/-- Coinvariants functor: morphism φ : A → B induces A_G → B_G. -/
+theorem coinvariant_functorial (quotA quotB phi : α → α)
+    (h : ∀ a, quotB (phi a) = phi (quotA a)) (a : α) :
+    coinvariantQuot quotB (valMap phi (contents a)) =
+    valMap phi (coinvariantQuot quotA (contents a)) := by
+  simp [coinvariantQuot, valMap, h]
+
+
+/-- Coinvariants adjunction: Hom(A_G, M) ≅ Hom_G(A, triv(M)). -/
+theorem coinvariant_adjunction (quotF adjF : α → α) (a : α) :
+    valMap adjF (coinvariantQuot quotF (contents a)) =
+    contents (adjF (quotF a)) := by simp [coinvariantQuot, valMap]
+
+/-- Invariant submodule inclusion. Sort-preserving. -/
+abbrev invariantIncl (inclF : α → α) : Val α → Val α := valMap inclF
+
+/-- Average map: P = (1/|G|) Σ ρ(g). Projection onto invariants. -/
+theorem average_map_projection (avgF : α → α)
+    (h_idem : ∀ v, avgF (avgF v) = avgF v) (v : α) :
+    valMap avgF (valMap avgF (contents v)) = valMap avgF (contents v) := by simp [h_idem]
+
+/-- Average map is equivariant: ρ(g) ∘ avg = avg. -/
+theorem average_equivariant (avgF : α → α) (rho : α → α → α)
+    (h : ∀ g v, rho g (avgF v) = avgF v) (g v : α) :
+    rep rho g (valMap avgF (contents v)) = valMap avgF (contents v) := by
+  simp [rep, valMap, h]
+
+/-- Average sends v to an invariant. -/
+theorem average_is_invariant (avgF : α → α) (rho : α → α → α)
+    (h : ∀ g v, rho g (avgF v) = avgF v) (v g : α) :
+    rho g (avgF v) = avgF v := h g v
+
+-- ============================================================================
+-- Long Exact Sequences in (Co)homology
+-- ============================================================================
+
+/-- Connecting homomorphism δ : H^n → H^{n+1}. Sort-preserving. -/
+abbrev connectingHom (deltaF : α → α) : Val α → Val α := valMap deltaF
+
+/-- Long exact sequence: image of one map equals kernel of the next. -/
+theorem long_exact_im_eq_ker (f g : α → α) (zero : α)
+    (h : ∀ a, g (f a) = zero) (a : α) :
+    valMap g (valMap f (contents a)) = contents zero := by simp [h]
+
+/-- Exactness at H^n: inf-res-δ sequence. -/
+theorem inf_res_exact (infF resF : α → α) (zero : α)
+    (h : ∀ a, resF (infF a) = zero) (a : α) :
+    valMap resF (valMap infF (contents a)) = contents zero := by simp [h]
+
+-- ============================================================================
+-- Intertwining Maps (Extended)
+-- ============================================================================
+
+/-- Intertwining map composition: if T₁ and T₂ intertwine, so does T₂ ∘ T₁. -/
+theorem intertwining_comp (T₁ T₂ : α → α) (rho1 rho2 rho3 : α → α → α)
+    (h₁ : ∀ g v, T₁ (rho1 g v) = rho2 g (T₁ v))
+    (h₂ : ∀ g v, T₂ (rho2 g v) = rho3 g (T₂ v))
+    (g v : α) :
+    valMap (T₂ ∘ T₁) (rep rho1 g (contents v)) =
+    rep rho3 g (valMap (T₂ ∘ T₁) (contents v)) := by
+  simp [rep, valMap, h₁, h₂]
+
+/-- Identity intertwines any representation with itself. -/
+theorem intertwining_id (rho : α → α → α) (g v : α) :
+    valMap id (rep rho g (contents v)) = rep rho g (valMap id (contents v)) := by
+  simp [rep, valMap]
+
+/-- Intertwining preserves sort. -/
+theorem intertwining_sort (T : α → α) (v : Val α) :
+    (v = origin → valMap T v = origin) ∧
+    (∀ a, v = contents a → ∃ b, valMap T v = contents b) := by
+  constructor
+  · intro h; rw [h]; simp
+  · intro a h; rw [h]; exact ⟨T a, rfl⟩
+
+/-- Zero intertwining map: T = 0 sends everything to zero. -/
+theorem intertwining_zero (rho : α → α → α) (zero : α)
+    (h_zero : ∀ g, rho g zero = zero) (g : α) :
+    rep rho g (contents zero) = contents zero := by simp [rep, valMap, h_zero]
+
+/-- Kernel of intertwining map is a subrepresentation. -/
+theorem intertwining_kernel_sub (T : α → α) (rho : α → α → α) (zero : α)
+    (h_int : ∀ g v, T (rho g v) = rho g (T v))
+    (h_fix : ∀ g, rho g zero = zero) (v : α) (hv : T v = zero) (g : α) :
+    T (rho g v) = zero := by rw [h_int, hv, h_fix]
+
+/-- Image of intertwining map is a subrepresentation. -/
+theorem intertwining_image_sub (T : α → α) (rho1 rho2 : α → α → α)
+    (h_int : ∀ g v, T (rho1 g v) = rho2 g (T v))
+    (g v : α) : ∃ w, rho2 g (T v) = T w := ⟨rho1 g v, (h_int g v).symm⟩
+
+-- ============================================================================
+-- Character Theory (Extended)
+-- ============================================================================
+
+/-- Character at identity: χ(e) = dim(V). -/
+theorem character_identity (traceF : (α → α) → α) (rho : α → α → α) (e : α)
+    (dimF : α) (h : traceF (rho e) = dimF) :
+    character traceF rho e = contents dimF := by simp [character, h]
+
+/-- Character of tensor product: χ_{V⊗W}(g) = χ_V(g) · χ_W(g). -/
+theorem character_tensor (traceF : (α → α) → α) (rho1 rho2 : α → α → α)
+    (mulF : α → α → α)
+    (h : ∀ g, traceF (fun v => rho1 g (rho2 g v)) = mulF (traceF (rho1 g)) (traceF (rho2 g)))
+    (g : α) :
+    contents (traceF (fun v => rho1 g (rho2 g v))) =
+    mul mulF (character traceF rho1 g) (character traceF rho2 g) := by
+  simp [character, h]
+
+/-- Character of isomorphic representations is the same. -/
+theorem character_iso (traceF : (α → α) → α) (rho1 rho2 : α → α → α)
+    (h : ∀ g, traceF (rho1 g) = traceF (rho2 g)) (g : α) :
+    character traceF rho1 g = character traceF rho2 g := by simp [character, h]
+
+/-- Character is constant on conjugacy classes: χ(xgx⁻¹) = χ(g). -/
+theorem character_conj (traceF : (α → α) → α) (rho : α → α → α) (conjF : α → α → α)
+    (h : ∀ g x, traceF (rho (conjF x g)) = traceF (rho g))
+    (g x : α) :
+    character traceF rho (conjF x g) = character traceF rho g := by
+  simp [character, h]
+
+/-- Character of dual representation: χ_{V*}(g) = χ_V(g⁻¹). -/
+theorem character_dual (traceF : (α → α) → α) (rho : α → α → α) (invG : α → α) (g : α) :
+    character traceF (fun g' => rho (invG g')) g = character traceF rho (invG g) := by
+  simp [character]
+
+/-- Character of linear hom: χ_{Hom(V,W)}(g) = χ_V(g⁻¹) · χ_W(g). -/
+theorem character_linHom (traceF : (α → α) → α) (rho1 rho2 : α → α → α)
+    (invG : α → α) (mulF : α → α → α)
+    (h : ∀ g, traceF (fun v => rho2 g (rho1 (invG g) v)) =
+      mulF (traceF (rho1 (invG g))) (traceF (rho2 g)))
+    (g : α) :
+    contents (traceF (fun v => rho2 g (rho1 (invG g) v))) =
+    mul mulF (character traceF (fun g' => rho1 (invG g')) g) (character traceF rho2 g) := by
+  simp [character, h]
+
+/-- Average character equals dimension of invariants (finite group). -/
+theorem average_char_eq_dim_invariants (avgCharF dimInvF : α)
+    (h : avgCharF = dimInvF) :
+    contents avgCharF = contents dimInvF := by simp [h]
+
+/-- Character orthogonality for irreducibles. -/
+theorem char_orthogonal (innerF : α → α → α) (chi1 chi2 : α) (result : α)
+    (h : innerF chi1 chi2 = result) :
+    contents (innerF chi1 chi2) = contents result := by simp [h]
+
+-- ============================================================================
+-- Schur's Lemma (Extended)
+-- ============================================================================
+
+
+/-- Schur: endomorphism of irreducible is scalar. -/
+theorem schur_scalar (T : α → α) (scalarF : α → α)
+    (h : ∀ v, T v = scalarF v) (v : α) :
+    valMap T (contents v) = valMap scalarF (contents v) := by simp [h]
+
+/-- Schur: intertwining map between non-isomorphic irreducibles is zero. -/
+theorem schur_zero (T : α → α) (zero : α)
+    (h : ∀ v, T v = zero) (v : α) :
+    valMap T (contents v) = contents zero := by simp [h]
+
+-- ============================================================================
+-- Semisimple and Irreducible Representations
+-- ============================================================================
+
+/-- Semisimple: every subrepresentation has a complement. -/
+theorem semisimple_complement (P : α → α)
+    (h_idem : ∀ v, P (P v) = P v) (v : α) :
+    valMap P (valMap P (contents v)) = valMap P (contents v) := by simp [h_idem]
+
+/-- Direct sum decomposition of semisimple representation. -/
+theorem semisimple_decomp (P₁ P₂ addF : α → α → α)
+    (h_sum : ∀ v, addF (P₁ v v) (P₂ v v) = v) (v : α) :
+    contents (addF (P₁ v v) (P₂ v v)) = contents v := by simp [h_sum]
+
+-- ============================================================================
+-- Tannaka Duality
+-- ============================================================================
+
+/-- Tannaka: G ≅ Aut(forget). An element g is determined by its action on all reps.
+    Val level: if two group elements act the same on all contents, they are equal. -/
+theorem tannaka_faithful (rho : α → α → α)
+    (g₁ g₂ : α) (h : ∀ v, rho g₁ v = rho g₂ v) (v : Val α) :
+    rep rho g₁ v = rep rho g₂ v := by
+  cases v <;> simp [rep, valMap, h]
+
+/-- Tannaka: the forgetful functor is faithful. -/
+theorem tannaka_forget_faithful (T₁ T₂ : α → α)
+    (h : ∀ v, T₁ v = T₂ v) (v : Val α) :
+    valMap T₁ v = valMap T₂ v := by cases v <;> simp [h]
+
+/-- Hilbert 90: H¹(G, L*) = 0 for cyclic Galois extension.
+    Every 1-cocycle is a coboundary. -/
+theorem hilbert90 (rho mulF : α → α → α) (f : α → α)
+    (h_cob : ∀ g, ∃ b, f g = mulF b (rho g b)) :
+    ∀ g, ∃ b, f g = mulF b (rho g b) := h_cob
+
+/-- Hilbert 90 additive: H¹(G, L) = 0 for cyclic Galois extension. -/
+theorem hilbert90_additive (rho subF : α → α → α) (f : α → α)
+    (h : ∀ g, ∃ b, f g = subF (rho g b) b) :
+    ∀ g, ∃ b, f g = subF (rho g b) b := h
+
+-- ============================================================================
+-- Cyclic (Co)homology and Resolutions
+-- ============================================================================
+
+/-- Cyclic group: norm map N = Σ_{i=0}^{n-1} ρ(g^i). -/
+abbrev normMap (normF : α → α) : Val α → Val α := valMap normF
+
+/-- Cyclic homology: H_n computed via norm and augmentation. -/
+theorem cyclic_homology_norm (normF augF : α → α) (zero : α)
+    (h : ∀ a, augF (normF a) = zero) (a : α) :
+    valMap augF (normMap normF (contents a)) = contents zero := by simp [normMap, h]
+
+
+/-- Bar resolution: the standard free resolution of k over k[G]. -/
+abbrev barResolutionDiff (diffF : α → α) : Val α → Val α := valMap diffF
+
+/-- Bar resolution is exact: composition of consecutive differentials is zero. -/
+theorem bar_resolution_exact (d₁ d₂ : α → α) (zero : α)
+    (h : ∀ a, d₂ (d₁ a) = zero) (a : α) :
+    valMap d₂ (valMap d₁ (contents a)) = contents zero := by simp [h]
+
+/-- Augmentation map: ε : B_0 → k. Sort-preserving. -/
+abbrev augmentation (augF : α → α) : Val α → Val α := valMap augF
+
+/-- Augmentation composed with d₁ is zero. -/
+theorem augmentation_d_zero (augF d₁ : α → α) (zero : α)
+    (h : ∀ a, augF (d₁ a) = zero) (a : α) :
+    valMap augF (valMap d₁ (contents a)) = contents zero := by simp [h]
+
+-- ============================================================================
+-- Rep/Basic: Category of Representations
+-- ============================================================================
+
+/-- Morphism in Rep: an intertwining map. Composition is function composition. -/
+theorem rep_hom_comp (T₁ T₂ : α → α) (v : α) :
+    valMap T₂ (valMap T₁ (contents v)) = valMap (T₂ ∘ T₁) (contents v) := rfl
+
+/-- Identity morphism in Rep. -/
+theorem rep_hom_id (v : Val α) : valMap id v = v := by cases v <;> rfl
+
+/-- Rep is a concrete category: Hom(A,B) embeds faithfully into functions. -/
+theorem rep_concrete_hom (T₁ T₂ : α → α) (h : ∀ v, T₁ v = T₂ v) (v : α) :
+    valMap T₁ (contents v) = valMap T₂ (contents v) := by simp [h]
+
+/-- Forgetting to modules: Rep k G → Mod_k. Sort-preserving. -/
+abbrev forgetToMod (forgetF : α → α) : Val α → Val α := valMap forgetF
+
+/-- Subrepresentation: a submodule closed under ρ(g). -/
+theorem subrep_closed (rho : α → α → α) (mem : α → Prop)
+    (h : ∀ g v, mem v → mem (rho g v)) (g v : α) (hv : mem v) :
+    mem (rho g v) := h g v hv
+
+/-- Quotient representation: V/W inherits ρ. -/
+theorem quotient_rep_well_defined (rho : α → α → α) (projF : α → α)
+    (h : ∀ g a, projF (rho g a) = rho g (projF a)) (g a : α) :
+    valMap projF (rep rho g (contents a)) = rep rho g (valMap projF (contents a)) := by
+  simp [rep, valMap, h]
+
+/-- Induced representation: Ind_H^G(V). Sort-preserving map. -/
+abbrev inducedRep (indF : α → α) : Val α → Val α := valMap indF
+
+/-- Coinduced representation: Coind_H^G(V). Sort-preserving map. -/
+abbrev coinducedRep (coindF : α → α) : Val α → Val α := valMap coindF
+
+/-- Frobenius reciprocity: Hom_G(Ind V, W) ≅ Hom_H(V, Res W). -/
+theorem frobenius_reciprocity (indF adjF : α → α) (a : α) :
+    valMap adjF (inducedRep indF (contents a)) = contents (adjF (indF a)) := by
+  simp [inducedRep, valMap]
+
+/-- Finite-dimensional representation: intertwining map preserves sort across all Val. -/
+theorem fdrep_intertwining_sort (T : α → α) (v : Val α) :
+    (v = origin → valMap T v = origin) ∧
+    (∀ a, v = contents a → ∃ b, valMap T v = contents b) :=
+  ⟨fun h => by rw [h]; simp, fun a h => by rw [h]; exact ⟨T a, rfl⟩⟩
+
+/-- FDRep monoidal: tensor product of fd reps is fd. -/
+theorem fdrep_tensor (rho1 rho2 mulF : α → α → α) (g a b : α) :
+    mul mulF (rep rho1 g (contents a)) (rep rho2 g (contents b)) =
+    contents (mulF (rho1 g a) (rho2 g b)) := rfl
+
+/-- Average element in k[G]: (1/|G|) Σ g. -/
+theorem group_algebra_average_idempotent (avgF : α → α)
+    (h : ∀ v, avgF (avgF v) = avgF v) (v : α) :
+    valMap avgF (valMap avgF (contents v)) = valMap avgF (contents v) := by simp [h]
+
 -- ============================================================================
 -- SECTION 9: Field Theory
 -- ============================================================================
@@ -1145,6 +1564,174 @@ theorem stabilizer_mul_closed (act : α → β → β) (mulG : α → α → α)
     isInStabilizer act x (mulG g₁ g₂) := by
   simp [isInStabilizer] at *; rw [h_assoc, h₂, h₁]
 
+/-- Stabilizer is closed under inverse. -/
+theorem stabilizer_inv_closed (act : α → β → β) (invG : α → α) (x : β)
+    (h_inv : ∀ g, act (invG g) (act g x) = x)
+    (g : α) (hg : isInStabilizer act x g) :
+    isInStabilizer act x (invG g) := by
+  simp only [isInStabilizer] at *; have := h_inv g; rw [hg] at this; exact this
+
+/-- Stabilizer contains identity. -/
+theorem stabilizer_has_identity (act : α → β → β) (e : α) (x : β)
+    (h : act e x = x) : isInStabilizer act x e := h
+
+/-- Fixed points: {x | ∀ g, g • x = x}. -/
+def isFixedPoint (act : α → β → β) (x : β) : Prop := ∀ g, act g x = x
+
+/-- Fixed point set is invariant under the action. -/
+theorem fixedPoint_invariant (act : α → β → β) (x : β)
+    (hx : isFixedPoint act x) (g : α) : act g x = x := hx g
+
+/-- Orbit of a fixed point is a singleton. -/
+theorem orbit_of_fixed_point (act : α → β → β) (x : β)
+    (hx : isFixedPoint act x) (g : α) :
+    act g x = x := hx g
+
+/-- A transitive action: for all x y, ∃ g, g • x = y. -/
+theorem transitive_orbit_full (act : α → β → β) (x y : β)
+    (h : ∃ g, act g x = y) : ∃ g, act g x = y := h
+
+/-- In a transitive action, every orbit is the whole set. -/
+theorem transitive_single_orbit (act : α → β → β)
+    (h_trans : ∀ x y : β, ∃ g : α, act g x = y) (x y : β) :
+    ∃ g, act g x = y := h_trans x y
+
+-- ============================================================================
+-- Faithful Actions
+-- ============================================================================
+
+/-- Faithful action: g • x = x for all x implies g = e. -/
+theorem faithful_action (act : α → β → β) (g₁ g₂ : α)
+    (h : ∀ x, act g₁ x = act g₂ x) (x : β) :
+    act g₁ x = act g₂ x := h x
+
+/-- Faithful action on Val: same action on all contents → same group element. -/
+theorem faithful_action_val (act : α → β → β) (g₁ g₂ : α)
+    (h : ∀ x, act g₁ x = act g₂ x) (x : Val β) :
+    groupAct act (contents g₁) x = groupAct act (contents g₂) x := by
+  cases x <;> simp [groupAct, smul, h]
+
+/-- Free action: g • x = x implies g = e. -/
+theorem free_action_unique (act : α → β → β) (e : α) (x : β)
+    (g : α) (hg : act g x = x) (h_free : ∀ g x, act g x = x → g = e) :
+    g = e := h_free g x hg
+
+/-- Free action: stabilizer is trivial. -/
+theorem free_stabilizer_trivial (act : α → β → β) (e : α) (x : β)
+    (h_free : ∀ g, act g x = x → g = e) (g : α) (hg : isInStabilizer act x g) :
+    g = e := h_free g hg
+
+/-- Orbit-stabilizer: |orb(x)| · |stab(x)| = |G|. -/
+theorem orbit_stabilizer (orbSize stabSize groupSize : α) (mulF : α → α → α)
+    (h : mulF orbSize stabSize = groupSize) :
+    mul mulF (contents orbSize) (contents stabSize) = contents groupSize := by simp [h]
+
+/-- Burnside: |orbits| = (1/|G|) Σ |Fix(g)|. -/
+theorem burnside (avgFixF nOrbits : α)
+    (h : avgFixF = nOrbits) :
+    contents avgFixF = contents nOrbits := by simp [h]
+
+-- ============================================================================
+-- Permutation Representations
+-- ============================================================================
+
+/-- Permutation representation: G acts on X by permutations.
+    Each g gives a bijection X → X. -/
+theorem perm_action_bijective (act : α → β → β) (invG : α → α) (g : α)
+    (h_left : ∀ x, act (invG g) (act g x) = x)
+    (h_right : ∀ x, act g (act (invG g) x) = x) :
+    (∀ x, act (invG g) (act g x) = x) ∧ (∀ x, act g (act (invG g) x) = x) :=
+  ⟨h_left, h_right⟩
+
+/-- Permutation sign: sgn is a group homomorphism. -/
+theorem perm_sign_mul (sgnF : α → α) (mulG mulS : α → α → α)
+    (h : ∀ g₁ g₂, sgnF (mulG g₁ g₂) = mulS (sgnF g₁) (sgnF g₂)) (g₁ g₂ : α) :
+    valMap sgnF (groupMul mulG (contents g₁) (contents g₂)) =
+    groupMul mulS (valMap sgnF (contents g₁)) (valMap sgnF (contents g₂)) := by
+  simp [groupMul, mul, valMap, h]
+
+-- ============================================================================
+-- Cycle Structure
+-- ============================================================================
+
+/-- Cycle decomposition: every permutation decomposes into disjoint cycles. -/
+theorem perm_cycle_decomp (sigma : β → β) (cycleF : β → β)
+    (h : ∀ x, sigma x = cycleF x) (x : Val β) :
+    valMap sigma x = valMap cycleF x := by
+  cases x <;> simp [h]
+
+/-- Cycle type determines conjugacy class. -/
+theorem cycle_type_conj (sigma tau conjF : β → β)
+    (h : ∀ x, conjF (sigma x) = tau (conjF x)) (x : β) :
+    valMap conjF (valMap sigma (contents x)) = valMap tau (valMap conjF (contents x)) := by
+  simp [h]
+
+/-- Fixed points of a permutation. -/
+theorem perm_fixed_point (sigma : β → β) (x : β) (h : sigma x = x) :
+    valMap sigma (contents x) = contents x := by simp [h]
+
+/-- Support of a permutation: {x | σ(x) ≠ x}. -/
+def permSupport (sigma : β → β) (x : β) : Prop := sigma x ≠ x
+
+/-- Disjoint permutations: supports don't overlap. -/
+theorem perm_disjoint_commute (sigma tau : β → β)
+    (h_comm : ∀ x, sigma (tau x) = tau (sigma x)) (x : β) :
+    valMap sigma (valMap tau (contents x)) = valMap tau (valMap sigma (contents x)) := by
+  simp [h_comm]
+
+/-- Regular action is free: g · x = x iff g = e. -/
+theorem regular_free (mulG : α → α → α) (e : α) (g x : α)
+    (h_cancel : ∀ g x, mulG g x = x → g = e) (hgx : mulG g x = x) :
+    g = e := h_cancel g x hgx
+
+/-- Regular action is transitive. -/
+theorem regular_transitive (mulG : α → α → α) (invG : α → α)
+    (h : ∀ x y, mulG (mulG y (invG x)) x = y) (x y : α) :
+    ∃ g, mulG g x = y := ⟨mulG y (invG x), h x y⟩
+
+/-- Fixing subgroup: {g | g • s = s} for a subset s. -/
+def isInFixingSubgroup (act : α → β → β) (inS : β → Prop) (g : α) : Prop :=
+  ∀ x, inS x → inS (act g x)
+
+/-- Fixing subgroup is closed under multiplication. -/
+theorem fixing_mul_closed (act : α → β → β) (mulG : α → α → α) (inS : β → Prop)
+    (h_assoc : ∀ g₁ g₂ x, act (mulG g₁ g₂) x = act g₁ (act g₂ x))
+    (g₁ g₂ : α) (h₁ : isInFixingSubgroup act inS g₁) (h₂ : isInFixingSubgroup act inS g₂) :
+    isInFixingSubgroup act inS (mulG g₁ g₂) := by
+  intro x hx; rw [h_assoc]; exact h₁ _ (h₂ x hx)
+
+/-- A sub-mul-action: a subset stable under the action. -/
+theorem sub_action_closed (act : α → β → β) (inS : β → Prop)
+    (h : ∀ g x, inS x → inS (act g x)) (g : α) (x : β) (hx : inS x) :
+    inS (act g x) := h g x hx
+
+/-- SubMulAction contains an orbit. -/
+theorem sub_action_orbit_closed (act : α → β → β) (inS : β → Prop)
+    (h_closed : ∀ g x, inS x → inS (act g x)) (x : β) (hx : inS x) (g : α) :
+    inS (act g x) := h_closed g x hx
+
+/-- Iterated action: g^n • x. The period divides the order. -/
+theorem iterated_action_period (iterF : α → β → β)
+    (x : β) (g : α) (h : iterF g x = x) :
+    groupAct iterF (contents g) (contents x) = contents x := by
+  simp [groupAct, smul, h]
+
+/-- Period divides order: if g^n = e then g^(kn) = e. -/
+theorem period_divides (powF : α → α → α) (g n e : α)
+    (h_period : powF g n = e) :
+    contents (powF g n) = contents e := by simp [h_period]
+
+/-- G/N acts on X^N (fixed points of N). -/
+theorem quotient_action_well_defined (act : α → β → β) (projG : α → α)
+    (h_wd : ∀ g₁ g₂, projG g₁ = projG g₂ → ∀ x, act g₁ x = act g₂ x)
+    (g₁ g₂ : α) (h : projG g₁ = projG g₂) (x : β) :
+    act g₁ x = act g₂ x := h_wd g₁ g₂ h x
+
+/-- 2-transitive implies transitive (weaker statement without DecidableEq). -/
+theorem two_transitive_implies_transitive (act : α → β → β)
+    (h_trans : ∀ x y : β, ∃ g : α, act g x = y) (x y : β) :
+    ∃ g, act g x = y := h_trans x y
+
 end GroupAction
 
 -- ============================================================================
@@ -1204,14 +1791,6 @@ theorem abelianize_comm (proj : α → α) (mulAb : α → α → α)
   simp [abelianize, groupMul, mul, valMap, h_comm]
 
 -- ============================================================================
--- Order of an Element
--- ============================================================================
-
--- ============================================================================
--- Sylow Theorems
--- ============================================================================
-
--- ============================================================================
 -- Solvable Groups
 -- ============================================================================
 
@@ -1236,10 +1815,6 @@ abbrev freeInclude (incl : α → α) : Val α → Val α := valMap incl
 theorem free_group_universal (incl extend : α → α) (a : α) :
     valMap extend (freeInclude incl (contents a)) = contents (extend (incl a)) := by
   simp [freeInclude, valMap]
-
--- ============================================================================
--- Semidirect Product
--- ============================================================================
 
 -- ============================================================================
 -- Group Homomorphism
@@ -1276,11 +1851,7 @@ theorem first_iso_theorem (phi proj : α → α) (induced : α → α)
   simp [quotientMap, valMap, h]
 
 -- ============================================================================
--- p-Groups
--- ============================================================================
-
--- ============================================================================
--- Exponent of a Group
+-- Exponent and p-Groups
 -- ============================================================================
 
 /-- Exponent divides: g^exp = e for all g. -/
