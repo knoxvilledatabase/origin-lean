@@ -182,7 +182,7 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 | Stair | Domain | B3 written | Lines added | Lines removed | Net lines | Lines/thm | Cumulative total |
 |---|---|---|---|---|---|---|---|
 | 1 | InformationTheory | 41 | 427 | 0 | 427 | 10.4 | 10,477 |
-| 2 | Condensed | | | | | | |
+| 2 | Condensed | 49 | 320 | 0 | 320 | 6.5 | 10,797 |
 | 3 | Dynamics | | | | | | |
 | ... | ... | | | | | | |
 | 19 | Algebra | | | | | | |
