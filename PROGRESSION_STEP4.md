@@ -573,31 +573,52 @@ NumberTheory has higher zero-management density (64%) than FieldTheory (51%), bu
 
 ## Combined Results: Three Domains Mapped
 
+## ALL 13 UNCOVERED DOMAINS: COMPLETE RESULTS
+
+Sorted by collapse rate (highest first):
+
 | Domain | Theorems | B1 | B2 | B3 | Collapse |
 |---|---|---|---|---|---|
-| SetTheory | 2,501 | 1,896 (75.8%) | 189 (7.6%) | 416 (16.6%) | 83.4% |
-| Dynamics | 673 | 418 (62.1%) | 52 (7.7%) | 203 (30.2%) | 69.8% |
-| ModelTheory | 883 | 600 (67.9%) | 1 (0.1%) | 282 (31.9%) | 68.1% |
-| InformationTheory | 118 | 53 (44.9%) | 24 (20.3%) | 41 (34.7%) | 65.3% |
-| FieldTheory | 2,163 | 938 (43.4%) | 255 (11.8%) | 970 (44.8%) | 55.2% |
-| RepresentationTheory | 747 | 345 (46.2%) | 3 (0.4%) | 399 (53.4%) | 46.6% |
-| NumberTheory | 5,253 | 1,338 (25.5%) | 798 (15.2%) | 3,117 (59.3%) | 40.7% |
-| Computability | 1,060 | 396 (37.4%) | 15 (1.4%) | 649 (61.2%) | 38.8% |
-| Condensed | 74 | 20 (27.0%) | 0 (0%) | 54 (73.0%) | 27.0% |
-| **Total** | **13,472** | **6,004 (44.6%)** | **1,337 (9.9%)** | **6,131 (45.5%)** | **54.5%** |
+| Logic | 1,538 | 1,525 (99.2%) | 13 (0.8%) | 0 (0%) | **100%** |
+| SetTheory | 2,501 | 1,896 (75.8%) | 189 (7.6%) | 416 (16.6%) | **83.4%** |
+| Data | 17,901 | 11,912 (66.5%) | 1,767 (9.9%) | 4,222 (23.6%) | **76.4%** |
+| Dynamics | 673 | 418 (62.1%) | 52 (7.7%) | 203 (30.2%) | **69.8%** |
+| ModelTheory | 883 | 600 (67.9%) | 1 (0.1%) | 282 (31.9%) | **68.1%** |
+| GroupTheory | 3,686 | 2,220 (60.2%) | 267 (7.2%) | 1,199 (32.5%) | **67.5%** |
+| InformationTheory | 118 | 53 (44.9%) | 24 (20.3%) | 41 (34.7%) | **65.3%** |
+| FieldTheory | 2,163 | 938 (43.4%) | 255 (11.8%) | 970 (44.8%) | **55.2%** |
+| Combinatorics | 5,311 | 2,381 (44.8%) | 181 (3.4%) | 2,749 (51.8%) | **48.2%** |
+| RepresentationTheory | 747 | 345 (46.2%) | 3 (0.4%) | 399 (53.4%) | **46.6%** |
+| NumberTheory | 5,253 | 1,338 (25.5%) | 798 (15.2%) | 3,117 (59.3%) | **40.7%** |
+| Computability | 1,060 | 396 (37.4%) | 15 (1.4%) | 649 (61.2%) | **38.8%** |
+| Condensed | 74 | 20 (27.0%) | 0 (0%) | 54 (73.0%) | **27.0%** |
+| **TOTAL** | **41,908** | **24,042 (57.4%)** | **3,565 (8.5%)** | **14,301 (34.1%)** | **65.9%** |
 
-**13,472 of Mathlib's 88,494 theorems exhaustively mapped (15.2%). 54.5% collapse across nine domains.**
+**41,908 theorems exhaustively mapped across all 13 uncovered domains. 65.9% collapse.**
 
-The pattern is now clear across 9 domains:
-- **B1 (structural plumbing) = 44.6%** — the dominant factor. Simp lemmas, lift lemmas, coercion wrappers, typeclass instances, definitional unfoldings. Val's simp set and constructor dispatch absorb these.
-- **B2 (zero-management) = 9.9%** — the secondary factor. `≠ 0` guards, `NeZero` instances, positivity lemmas. Val's origin/contents distinction dissolves these.
-- **B3 (genuinely new math) = 45.5%** — the irreducible content. Real theorems that need real proofs in any foundation.
+### The definitive breakdown
 
-The collapse rate varies by domain character:
-- **Infrastructure-heavy** (SetTheory 83.4%, Dynamics 69.8%, ModelTheory 68.1%): dominated by structural plumbing
-- **Mixed** (InformationTheory 65.3%, FieldTheory 55.2%, RepresentationTheory 46.6%): balanced
-- **Deep math** (NumberTheory 40.7%, Computability 38.8%, Condensed 27.0%): dominated by genuinely new results
-- **Zero-management** is highest in arithmetic domains (InformationTheory 20.3%, NumberTheory 15.2%, FieldTheory 11.8%) and near-zero in foundational/categorical domains (Condensed 0%, ModelTheory 0.1%, RepresentationTheory 0.4%)
+- **B1 (structural plumbing) = 57.4%** — the dominant factor by far. Simp lemmas, lift lemmas, coercion wrappers, typeclass instances, definitional unfoldings, membership rewrites, lattice/order boilerplate. Val's simp set and constructor dispatch absorb these.
+- **B2 (zero-management) = 8.5%** — the secondary factor. `≠ 0` guards, `NeZero` instances, positivity lemmas, sentinel-zero conventions (`orderOf`, `index`, `exponent` returning 0 for "undefined"), `support` definitions (`{i | f i ≠ 0}`). Val's origin/contents distinction dissolves these.
+- **B3 (genuinely new math) = 34.1%** — the irreducible content. Real theorems that need real proofs in any foundation.
+
+### The pattern across 13 domains
+
+Three tiers emerge:
+- **Pure infrastructure** (Logic 100%, SetTheory 83.4%, Data 76.4%): these are the scaffolding of Mathlib. Most theorems are definitional plumbing that any stronger type system absorbs.
+- **Mixed domains** (Dynamics 69.8%, ModelTheory 68.1%, GroupTheory 67.5%, InformationTheory 65.3%, FieldTheory 55.2%): balanced between plumbing and genuine math.
+- **Deep math domains** (Combinatorics 48.2%, RepresentationTheory 46.6%, NumberTheory 40.7%, Computability 38.8%, Condensed 27.0%): dominated by irreducible mathematical content that Val does not absorb.
+
+### Zero-management hotspots
+
+The B2 concentration reveals exactly where Val's sort dispatch matters most:
+- **ENNReal** (41% B2): extended nonneg reals with `≠ 0` AND `≠ ∞` guards on every operation
+- **Nat/** (22% B2): factorization, primality, modular arithmetic all thread `≠ 0`
+- **InformationTheory** (20.3% B2): KL divergence singularity at zero, Hamming norm
+- **NumberTheory** (15.2% B2): p-adic valuations, cyclotomic `NeZero n`, ramification indices
+- **Finsupp/DFinsupp** (27-30% B2): `support = {i | f i ≠ 0}` is pure zero-management
+- **ZMod** (39% B2): every theorem carries `[NeZero n]`
+- **PNat** (30% B2): the entire type exists to avoid zero
 
 ## Domain Priority (revised with actuals)
 
