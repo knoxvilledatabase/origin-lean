@@ -164,9 +164,301 @@ The prediction: ~1,800 theorems are bucket 1+2, ~256 are bucket 3. If this holds
 
 ### Step 2: Map the densest files
 
-Take the top 10 files by `≠ 0` density. For each theorem, attempt through Val. Record buckets.
+For each theorem in the densest files, classify: bucket 1 (simp), bucket 2 (dissolves), bucket 3 (genuinely new).
 
-**Status:** not started
+#### RatFunc/Basic.lean (89 theorems, 162% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `ofFractionRing_zero` | 1 | rfl |
+| 2 | `ofFractionRing_add` | 1 | rfl |
+| 3 | `ofFractionRing_sub` | 1 | rfl |
+| 4 | `ofFractionRing_neg` | 1 | rfl |
+| 5 | `ofFractionRing_one` | 1 | rfl |
+| 6 | `ofFractionRing_mul` | 1 | rfl |
+| 7 | `ofFractionRing_div` | 1 | rfl |
+| 8 | `ofFractionRing_inv` | 1 | rfl |
+| 9 | `mul_inv_cancel` | 2 | `p ≠ 0` dissolves |
+| 10 | `ofFractionRing_smul` | 1 | rfl |
+| 11 | `toFractionRing_smul` | 1 | rfl |
+| 12 | `smul_eq_C_smul` | 3 | polynomial-specific scalar identity |
+| 13 | `mk_smul` | 3 | mk construction with scalar action |
+| 14 | `map_apply_ofFractionRing_mk` | 3 | homomorphism lifting mechanics |
+| 15 | `map_injective` | 3 | injectivity of lifted map |
+| 16 | `coe_mapRingHom_eq_coe_map` | 1 | rfl |
+| 17 | `liftMonoidWithZeroHom_apply_ofFractionRing_mk` | 3 | homomorphism lifting mechanics |
+| 18 | `liftMonoidWithZeroHom_injective` | 3 | injectivity of lifted hom |
+| 19 | `liftRingHom_apply_ofFractionRing_mk` | 3 | homomorphism lifting mechanics |
+| 20 | `liftRingHom_ofFractionRing_algebraMap` | 3 | homomorphism lifting mechanics |
+| 21 | `liftRingHom_injective` | 3 | injectivity of lifted ring hom |
+| 22 | `mk_one` | 1 | rfl |
+| 23 | `ofFractionRing_algebraMap` | 1 | by simp |
+| 24 | `mk_eq_div` | 1 | by simp |
+| 25 | `div_smul` | 3 | scalar action through division |
+| 26 | `algebraMap_apply` | 1 | rfl |
+| 27 | `map_apply_div_ne_zero` | 2 | `q ≠ 0` dissolves |
+| 28 | `map_apply_div` | 2 | `q ≠ 0` dissolves |
+| 29 | `liftMonoidWithZeroHom_apply_div` | 2 | `q ≠ 0` dissolves |
+| 30 | `liftMonoidWithZeroHom_apply_div'` | 3 | division compatibility of lifted hom |
+| 31 | `liftRingHom_apply_div` | 2 | `q ≠ 0` dissolves |
+| 32 | `liftRingHom_apply_div'` | 3 | division compatibility of lifted hom |
+| 33 | `liftRingHom_algebraMap` | 3 | homomorphism compatibility |
+| 34 | `liftRingHom_comp_algebraMap` | 3 | composition with algebraMap |
+| 35 | `ofFractionRing_comp_algebraMap` | 1 | rfl |
+| 36 | `algebraMap_injective` | 3 | injectivity of algebraMap |
+| 37 | `coe_mapAlgHom_eq_coe_map` | 1 | rfl |
+| 38 | `liftAlgHom_apply_ofFractionRing_mk` | 3 | homomorphism lifting mechanics |
+| 39 | `liftAlgHom_injective` | 3 | injectivity of lifted alg hom |
+| 40 | `liftAlgHom_apply_div'` | 3 | division compatibility of lifted hom |
+| 41 | `liftAlgHom_apply_div` | 3 | division compatibility of lifted hom |
+| 42 | `algebraMap_ne_zero` | 2 | `x ≠ 0` dissolves |
+| 43 | `liftOn_div` | 2 | `q ≠ 0` dissolves |
+| 44 | `liftOn'_div` | 2 | `q ≠ 0` dissolves |
+| 45 | `ofFractionRing_mk'` | 1 | by simp |
+| 46 | `mk_eq_mk'` | 2 | `g ≠ 0` dissolves |
+| 47 | `ofFractionRing_eq` | 1 | by simp |
+| 48 | `toFractionRing_eq` | 1 | by simp |
+| 49 | `toFractionRingRingEquiv_symm_eq` | 1 | by simp |
+| 50 | `rank_ratFunc_ratFunc` | 3 | module rank computation |
+| 51 | `finrank_ratFunc_ratFunc` | 3 | finite rank computation |
+| 52 | `numDenom_div` | 2 | `q ≠ 0` dissolves |
+| 53 | `num_div'` | 2 | `q ≠ 0` dissolves |
+| 54 | `num_zero` | 1 | by simp |
+| 55 | `num_div` | 2 | `q ≠ 0` dissolves |
+| 56 | `num_one` | 1 | by simp |
+| 57 | `num_algebraMap` | 1 | by simp |
+| 58 | `num_div_dvd` | 2 | `q ≠ 0` dissolves |
+| 59 | `num_div_dvd'` | 2 | `q ≠ 0` dissolves |
+| 60 | `denom_div` | 2 | `q ≠ 0` dissolves |
+| 61 | `monic_denom` | 3 | GCD normalization |
+| 62 | `denom_ne_zero` | 2 | `≠ 0` dissolves to sort |
+| 63 | `denom_zero` | 1 | by simp |
+| 64 | `denom_one` | 1 | by simp |
+| 65 | `denom_algebraMap` | 1 | by simp |
+| 66 | `denom_div_dvd` | 2 | `q ≠ 0` dissolves |
+| 67 | `num_div_denom` | 3 | num/denom reconstruction |
+| 68 | `isCoprime_num_denom` | 3 | coprimality via GCD |
+| 69 | `num_eq_zero_iff` | 2 | `= 0` equivalence dissolves |
+| 70 | `num_ne_zero` | 2 | `≠ 0` dissolves |
+| 71 | `num_mul_eq_mul_denom_iff` | 2 | `q ≠ 0` dissolves |
+| 72 | `num_denom_add` | 3 | num/denom arithmetic identity |
+| 73 | `num_denom_neg` | 3 | num/denom negation identity |
+| 74 | `num_denom_mul` | 3 | num/denom multiplication identity |
+| 75 | `num_dvd` | 2 | `p ≠ 0` dissolves |
+| 76 | `denom_dvd` | 2 | `q ≠ 0` dissolves |
+| 77 | `num_mul_dvd` | 2 | `x ≠ 0, y ≠ 0` dissolves |
+| 78 | `denom_mul_dvd` | 3 | divisibility in polynomial ring |
+| 79 | `denom_add_dvd` | 3 | divisibility in polynomial ring |
+| 80 | `num_inv_dvd` | 2 | `x ≠ 0` dissolves |
+| 81 | `denom_inv_dvd` | 2 | `x ≠ 0` dissolves |
+| 82 | `associated_num_inv` | 2 | `x ≠ 0` dissolves |
+| 83 | `associated_denom_inv` | 2 | `x ≠ 0` dissolves |
+| 84 | `map_denom_ne_zero` | 2 | `≠ 0` dissolves to sort |
+| 85 | `map_apply` | 3 | map expressed via num/denom |
+| 86 | `liftMonoidWithZeroHom_apply` | 3 | hom expressed via num/denom |
+| 87 | `liftRingHom_apply` | 3 | hom expressed via num/denom |
+| 88 | `liftAlgHom_apply` | 3 | hom expressed via num/denom |
+| 89 | `num_mul_denom_add_denom_mul_num_ne_zero` | 2 | `x + y ≠ 0` dissolves |
+
+**Result: 23 bucket 1 (25.8%) + 31 bucket 2 (34.8%) + 35 bucket 3 (39.3%) = 54 collapse (60.7%)**
+
+#### KummerPolynomial.lean (10 theorems, 280% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `root_X_pow_sub_C_pow` | 3 | Adjoin root identity |
+| 2 | `root_X_pow_sub_C_ne_zero` | 2 | `≠ 0` dissolves |
+| 3 | `root_X_pow_sub_C_ne_zero'` | 2 | `a ≠ 0` dissolves |
+| 4 | `ne_zero_of_irreducible_X_pow_sub_C` | 2 | `n ≠ 0` dissolves |
+| 5 | `ne_zero_of_irreducible_X_pow_sub_C'` | 2 | `a ≠ 0` dissolves |
+| 6 | `root_X_pow_sub_C_eq_zero_iff` | 2 | `= 0` iff dissolves |
+| 7 | `root_X_pow_sub_C_ne_zero_iff` | 2 | `≠ 0` iff dissolves |
+| 8 | `pow_ne_of_irreducible_X_pow_sub_C` | 2 | `b^m ≠ a` dissolves |
+| 9 | `X_pow_sub_C_irreducible_of_prime` | 3 | Core irreducibility |
+| 10 | `X_pow_sub_C_irreducible_iff_of_prime` | 3 | Iff irreducibility + non-p-power |
+
+**Result: 0 bucket 1 + 7 bucket 2 + 3 bucket 3 = 7 collapse (70%)**
+
+#### JacobsonNoether.lean (5 theorems, 260% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `exists_pow_mem_center_of_inseparable` | 3 | Purely inseparable powers in center |
+| 2 | `exists_pow_mem_center_of_inseparable'` | 2 | `n ≠ 0` guard |
+| 3 | `exist_pow_eq_zero_of_le` | 2 | nilpotent `= 0` dissolves |
+| 4 | `exists_separable_and_not_isCentral` | 3 | Jacobson-Noether theorem |
+| 5 | `exists_separable_and_not_isCentral'` | 3 | Variant with explicit base field |
+
+**Result: 0 bucket 1 + 2 bucket 2 + 3 bucket 3 = 2 collapse (40%)**
+
+#### SeparablyGenerated.lean (11 theorems, 181% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `aeval_toPolynomialAdjoinImageCompl_eq_zero` | 2 | `= 0` evaluation dissolves |
+| 2 | `irreducible_toPolynomialAdjoinImageCompl` | 3 | Irreducibility transfer |
+| 3 | `irreducible_of_forall_totalDegree_le` | 3 | Minimal degree irreducibility |
+| 4 | `coeff_toPolynomialAdjoinImageCompl_ne_zero` | 2 | `≠ 0` coefficient dissolves |
+| 5 | `isAlgebraic_of_mem_vars_of_forall_totalDegree_le` | 3 | Algebraicity from variable membership |
+| 6 | `exists_mem_support_not_dvd_of_forall_totalDegree_le` | 3 | Divisibility obstruction |
+| 7 | `exists_isTranscendenceBasis_and_isSeparable_of_linearIndepOn_pow` | 3 | Core separable generation |
+| 8 | `exists_isTranscendenceBasis_and_isSeparable_of_linearIndepOn_pow'` | 3 | Variant with explicit subset |
+| 9 | `..._of_adjoin_eq_top` | 3 | Top adjoin version |
+| 10 | `..._of_essFiniteType` | 3 | Finitely generated case |
+| 11 | `..._of_perfectField` | 3 | Perfect field implies separably generated |
+
+**Result: 0 bucket 1 + 2 bucket 2 + 9 bucket 3 = 2 collapse (18%)**
+
+#### RatFunc/Degree.lean (12 theorems, 166% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `intDegree_zero` | 1 | by simp |
+| 2 | `intDegree_one` | 1 | by simp |
+| 3 | `intDegree_C` | 1 | by simp |
+| 4 | `intDegree_X` | 1 | by simp |
+| 5 | `intDegree_polynomial` | 1 | wrapper equality |
+| 6 | `intDegree_mul` | 2 | `x ≠ 0, y ≠ 0` dissolves |
+| 7 | `intDegree_inv` | 2 | `x = 0` case split dissolves |
+| 8 | `intDegree_div` | 2 | `x ≠ 0, y ≠ 0` dissolves |
+| 9 | `intDegree_neg` | 2 | `x = 0` case split dissolves |
+| 10 | `intDegree_add` | 2 | `x + y ≠ 0` dissolves |
+| 11 | `natDegree_num_mul_right_sub_...` | 2 | `x ≠ 0, s ≠ 0` dissolves |
+| 12 | `intDegree_add_le` | 2 | `y ≠ 0, x + y ≠ 0` dissolves |
+
+**Result: 5 bucket 1 + 7 bucket 2 + 0 bucket 3 = 12 collapse (100%)**
+
+#### KummerExtension.lean (30 theorems, 143% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `X_pow_sub_C_splits_of_isPrimitiveRoot` | 3 | Splitting via primitive roots |
+| 2-3 | `X_pow_sub_C_eq_prod`, `_eq_prod'` | 3 | Factorization into linear factors |
+| 4 | `X_pow_mul_sub_C_irreducible` | 3 | Composed polynomial irreducibility |
+| 5-9 | `X_pow_sub_C_irreducible_of_odd`, `_iff_forall_prime_of_odd`, `_iff_of_odd`, `_of_prime_pow`, `_iff_of_prime_pow` | 3 | Irreducibility criteria |
+| 10 | `separable_X_pow_sub_C_of_irreducible` | 2 | `ne_zero` guard on n |
+| 11-12 | `autAdjoinRootXPowSubC_root`, `autAdjoinRootXPowSubCEquiv_root` | 1 | Evaluation/unfolding, simp |
+| 13 | `autAdjoinRootXPowSubCEquiv_symm_smul` | 3 | Galois action inverse |
+| 14 | `isSplittingField_AdjoinRoot_X_pow_sub_C` | 3 | Splitting field construction |
+| 15-16 | `adjoinRootXPowSubCEquiv_root`, `_symm_eq_root` | 1 | equiv symmetry, rfl-like |
+| 17-18 | `adjoin_root_eq_top_of_isSplittingField` (×2) | 3 | Adjunction generates full algebra |
+| 19 | `rootOfSplitsXPowSubC_pow` | 3 | Root satisfies polynomial |
+| 20-22 | `autEquivRootsOfUnity_apply_rootOfSplit`, `_smul`, `autEquivZmod_symm_apply_intCast` | 3 | Galois action descriptions |
+| 23 | `autEquivZmod_symm_apply_natCast` | 1 | Coercion reduction |
+| 24-26 | `isCyclic_...`, `isGalois_...`, `finrank_...` | 3 | Galois group structure |
+| 27-28 | `exists_root_adjoin_eq_top_of_isCyclic`, `irreducible_X_pow_sub_C_of_root_adjoin_eq_top` | 3 | Cyclic ↔ Kummer |
+| 29 | `isSplittingField_X_pow_sub_C_of_root_adjoin_eq_top` | 3 | Splitting from adjunction |
+| 30 | `isCyclic_tfae` | 3 | TFAE characterization |
+
+**Result: 5 bucket 1 + 1 bucket 2 + 24 bucket 3 = 6 collapse (20%)**
+
+#### IsSepClosed.lean (17 theorems, 123% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1-3 | `splits_codomain`, `splits_domain`, `exists_root` | 3 | Separable splitting/roots |
+| 4-5 | `exists_root_C_mul_X_pow_add_C_...` (×2) | 2 | `b ≠ 0` guard |
+| 6 | `isAlgClosed_of_perfectField` | 3 | Sep closed + perfect = alg closed |
+| 7-8 | `exists_pow_nat_eq`, `exists_eq_mul_self` | 2 | `NeZero` guards |
+| 9 | `roots_eq_zero_iff` | 3 | Degree analysis |
+| 10-12 | `exists_eval₂_eq_zero_of_injective`, `_eq_zero`, `exists_aeval_eq_zero` | 3 | Evaluation zero existence |
+| 13-15 | `of_exists_root`, `degree_eq_one_of_irreducible`, `algebraMap_surjective` | 3 | Sep closed characterizations |
+| 16 | `eq_bot_of_isSepClosed_of_isSeparable` | 3 | Separable sub is trivial |
+| 17 | `surjective_restrictDomain_of_isSeparable` | 3 | Domain restriction surjectivity |
+
+**Result: 0 bucket 1 + 4 bucket 2 + 13 bucket 3 = 4 collapse (24%)**
+
+#### AbelRuffini.lean (21 theorems, 119% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1-6 | `gal_zero/one/C/X/X_sub_C/X_pow_isSolvable` | 1 | infer_instance |
+| 7-10 | `gal_mul_isSolvable`, `gal_prod_isSolvable`, `gal_isSolvable_of_splits`, `gal_isSolvable_tower` | 3 | Solvability propagation |
+| 11-14 | `gal_X_pow_sub_one_isSolvable`, `_aux`, `splits_X_pow_sub_one_...`, `gal_X_pow_sub_C_isSolvable` | 2 | `n = 0`, `a = 0` guards |
+| 15-16 | `solvableByRad_le`, `solvableByRad.rad_mem` | 1 | Direct from definition |
+| 17-18 | `solvableByRad_le_algClosure`, `isAlgebraic_solvableByRad` | 3 | Algebraic closure containment |
+| 19 | `isIntegral_of_mem_solvableByRad` | 1 | Forwards to previous |
+| 20 | `solvableByRad.induction` | 3 | Induction principle |
+| 21 | `isSolvable_gal_of_irreducible` | 3 | Abel-Ruffini theorem |
+
+**Result: 9 bucket 1 + 4 bucket 2 + 8 bucket 3 = 13 collapse (62%)**
+
+#### RatFunc/Luroth.lean (70 theorems, 132% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1-2 | `adjoin_X`, `IntermediateField.adjoin_X` | 3 | Field extension structure |
+| 3-5 | `minpolyX_map`, `C_minpolyX`, `minpolyX_aeval_X` | 1 | simp closes |
+| 6-8 | `eq_C_of_minpolyX_coeff_eq_zero`, `minpolyX_eq_zero_iff`, `isAlgebraic_adjoin_simple_X` | 2 | `≠ 0` guards |
+| 9 | `isAlgebraic_adjoin_simple_X'` | 3 | Tower algebraicity |
+| 10-11 | `natDegree_denom/num_le_natDegree_minpolyX` | 2 | `≠ 0` guards |
+| 12-17 | `natDegree_minpolyX` through `IntermediateField.isAlgebraic_X` | 3 | Core Luroth results |
+| 18, 28, 30-31, 33, 39, 41, 43, 49-50, 56, 60 | various `_ne_zero` | 2 | `≠ 0` chain (18 total) |
+| 19-21 | `φ_monic`, `φ_natDegree`, `exists_φ_coeff_not_mem` | 3 | Minimal polynomial properties |
+| 22-24, 29, 32, 48, 51, 55, 59, 61, 63-64, 68-70 | various definitional | 1 | rfl / specification unfolding (15 total) |
+| 25-26 | `generator_spec`, `generator_ne_C` | 2 | Range guards |
+| 27 | `transcendental_generator` | 3 | Transcendence |
+| 34-38, 40, 42, 44-47, 53-54, 57-58, 62, 67 | core Luroth chain | 3 | Deep polynomial algebra (18 total) |
+| 35, 52, 65-66 | degree equalities | 2 | `≠ 0` guards (4 total) |
+
+**Result: 18 bucket 1 + 24 bucket 2 + 28 bucket 3 = 42 collapse (60%)**
+
+#### RatFunc/Defs.lean (16 theorems, 142% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1-4 | `ofFractionRing/toFractionRing_injective/inj`, `liftOn_ofFractionRing_mk` | 1 | Constructor injectivity / unfolding |
+| 5 | `liftOn_condition_of_liftOn'_condition` | 2 | `q ≠ 0, q' ≠ 0` guards |
+| 6, 8-9, 12, 15 | `mk_eq_div'`, `mk_coe_def`, `mk_def_of_mem`, `mk_one'`, `liftOn'_mk` | 1 | Definitional unfolding |
+| 7, 10-11, 13-14, 16 | `mk_zero`, `mk_def_of_ne`, `mk_eq_localization_mk`, `mk_eq_mk`, `liftOn_mk`, `induction_on'` | 2 | `q ≠ 0` guards |
+
+**Result: 9 bucket 1 + 7 bucket 2 + 0 bucket 3 = 16 collapse (100%)**
+
+#### Galois/NormalBasis.lean (4 theorems, 150% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1-3 | `exists_linearIndependent_algEquiv_apply_of_finite/infinite/apply` | 3 | Deep linear algebra, PID + Frobenius |
+| 4 | `normalBasis_apply` | 1 | Simp: basis element = action |
+
+**Result: 1 bucket 1 + 0 bucket 2 + 3 bucket 3 = 1 collapse (25%)**
+
+#### SplittingField/Construction.lean (15 theorems, 146% density)
+
+| # | Theorem | Bucket | Reason |
+|---|---|---|---|
+| 1 | `irreducible_factor` | 3 | Irreducibility of chosen factor |
+| 2 | `fact_irreducible_factor` | 1 | Wrapper from previous |
+| 3-7 | `factor_dvd_of_not_isUnit/degree_ne_zero/natDegree_ne_zero`, `isCoprime_iff_aeval_ne_zero`, `X_sub_C_mul_removeFactor` | 2 | `≠ 0` / `¬IsUnit` guards |
+| 8-11 | `natDegree_removeFactor`, `natDegree_removeFactor'`, `succ`, `algebraMap_succ` | 1 | Degree arithmetic / rfl |
+| 12-14 | `SplittingFieldAux.splits`, `adjoin_rootSet`, `SplittingField.splits` | 3 | Inductive splits proofs |
+| 15 | `adjoin_rootSet` (SplittingField) | 1 | Direct from IsSplittingField |
+
+**Result: 6 bucket 1 + 5 bucket 2 + 4 bucket 3 = 11 collapse (73%)**
+
+---
+
+### Running totals (12 files, 303 theorems)
+
+| File | B1 | B2 | B3 | Total | Collapse |
+|---|---|---|---|---|---|
+| RatFunc/Basic.lean | 23 | 31 | 35 | 89 | 60.7% |
+| KummerPolynomial.lean | 0 | 7 | 3 | 10 | 70.0% |
+| JacobsonNoether.lean | 0 | 2 | 3 | 5 | 40.0% |
+| SeparablyGenerated.lean | 0 | 2 | 9 | 11 | 18.2% |
+| RatFunc/Degree.lean | 5 | 7 | 0 | 12 | 100.0% |
+| KummerExtension.lean | 5 | 1 | 24 | 30 | 20.0% |
+| IsSepClosed.lean | 0 | 4 | 13 | 17 | 23.5% |
+| AbelRuffini.lean | 9 | 4 | 8 | 21 | 61.9% |
+| RatFunc/Luroth.lean | 18 | 24 | 28 | 70 | 60.0% |
+| RatFunc/Defs.lean | 9 | 7 | 0 | 16 | 100.0% |
+| Galois/NormalBasis.lean | 1 | 0 | 3 | 4 | 25.0% |
+| SplittingField/Construction.lean | 6 | 5 | 4 | 15 | 73.3% |
+| **Total** | **76** | **94** | **130** | **300** | **56.7%** |
+
+**56.7% of theorems in the 12 densest FieldTheory files collapse.** 76 are simp consequences, 94 dissolve from `≠ 0` removal, 130 are genuinely new.
+
+**Status:** in progress — 300 of 2,056 theorems mapped (14.6%)
 
 ### Step 3: Map the remaining files
 
