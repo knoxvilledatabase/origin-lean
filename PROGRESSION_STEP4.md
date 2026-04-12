@@ -63,9 +63,104 @@ The prediction: ~1,800 theorems are bucket 1+2, ~256 are bucket 3. If this holds
 
 ### Step 1: Scan FieldTheory files
 
-List all 78 files. For each: file name, line count, theorem count, `≠ 0` ref count. Sort by `≠ 0` density descending. The densest files go first — they're where the base does the most work.
+78 files. 26,919 lines. 2,056 theorems. Sorted by zero-management density (≠ 0 refs + typeclass refs per theorem, descending).
 
-**Status:** not started
+**Top 20 (highest density — most reduction expected):**
+
+| File | Lines | Theorems | ≠ 0 | TC | Density | Per-thm |
+|---|---|---|---|---|---|---|
+| KummerPolynomial.lean | 127 | 10 | 27 | 1 | 28 | 280% |
+| JacobsonNoether.lean | 200 | 5 | 8 | 5 | 13 | 260% |
+| SeparablyGenerated.lean | 327 | 11 | 19 | 1 | 20 | 181% |
+| RatFunc/Degree.lean | 126 | 12 | 20 | 0 | 20 | 166% |
+| RatFunc/Basic.lean | 1,141 | 88 | 81 | 62 | 143 | 162% |
+| Galois/NormalBasis.lean | 130 | 2 | 3 | 0 | 3 | 150% |
+| SplittingField/Construction.lean | 312 | 13 | 12 | 7 | 19 | 146% |
+| KummerExtension.lean | 558 | 30 | 42 | 1 | 43 | 143% |
+| RatFunc/Defs.lean | 227 | 14 | 16 | 4 | 20 | 142% |
+| RatFunc/Luroth.lean | 679 | 59 | 74 | 4 | 78 | 132% |
+| IsSepClosed.lean | 315 | 17 | 18 | 3 | 21 | 123% |
+| AbelRuffini.lean | 341 | 21 | 25 | 0 | 25 | 119% |
+| PolynomialGaloisGroup.lean | 378 | 16 | 17 | 2 | 19 | 118% |
+| IsAlgClosed/AlgebraicClosure.lean | 229 | 7 | 1 | 7 | 8 | 114% |
+| AxGrothendieck.lean | 247 | 7 | 1 | 7 | 8 | 114% |
+| IsAlgClosed/Basic.lean | 575 | 43 | 29 | 19 | 48 | 111% |
+| Finite/Valuation.lean | 37 | 2 | 1 | 1 | 2 | 100% |
+| Minpoly/Field.lean | 352 | 32 | 19 | 11 | 30 | 93% |
+| Minpoly/Basic.lean | 293 | 26 | 15 | 9 | 24 | 92% |
+| Minpoly/IsIntegrallyClosed.lean | 299 | 20 | 14 | 4 | 18 | 90% |
+
+**Middle 30 (moderate density):**
+
+| File | Lines | Theorems | ≠ 0 | TC | Density | Per-thm |
+|---|---|---|---|---|---|---|
+| PrimitiveElement.lean | 412 | 19 | 17 | 0 | 17 | 89% |
+| Fixed.lean | 400 | 26 | 3 | 20 | 23 | 88% |
+| Finite/Polynomial.lean | 226 | 13 | 0 | 10 | 10 | 76% |
+| Separable.lean | 781 | 81 | 35 | 25 | 60 | 74% |
+| Galois/IsGaloisGroup.lean | 500 | 35 | 4 | 22 | 26 | 74% |
+| Finite/Extension.lean | 176 | 10 | 7 | 0 | 7 | 70% |
+| RatFunc/AsPolynomial.lean | 406 | 43 | 24 | 4 | 28 | 65% |
+| IsAlgClosed/Spectrum.lean | 185 | 13 | 3 | 4 | 7 | 53% |
+| Finite/Basic.lean | 835 | 71 | 24 | 12 | 36 | 50% |
+| Differential/Basic.lean | 196 | 12 | 6 | 0 | 6 | 50% |
+| Finite/Trace.lean | 74 | 4 | 2 | 0 | 2 | 50% |
+| Tower.lean | 64 | 2 | 0 | 1 | 1 | 50% |
+| Normal/Basic.lean | 298 | 13 | 6 | 0 | 6 | 46% |
+| Minpoly/MinpolyDiv.lean | 224 | 18 | 5 | 3 | 8 | 44% |
+| Isaacs.lean | 128 | 7 | 3 | 0 | 3 | 42% |
+| IsRealClosed/Basic.lean | 127 | 10 | 4 | 0 | 4 | 40% |
+| PerfectClosure.lean | 507 | 22 | 0 | 9 | 9 | 40% |
+| Finite/GaloisField.lean | 337 | 18 | 6 | 1 | 7 | 38% |
+| SeparableDegree.lean | 916 | 70 | 26 | 0 | 26 | 37% |
+| Minpoly/IsConjRoot.lean | 394 | 34 | 8 | 3 | 11 | 32% |
+| IsPerfectClosure.lean | 548 | 61 | 0 | 19 | 19 | 31% |
+| IsAlgClosed/Classification.lean | 203 | 7 | 0 | 2 | 2 | 28% |
+| SplittingField/IsSplittingField.lean | 200 | 16 | 4 | 0 | 4 | 25% |
+| IntermediateField/Adjoin/Basic.lean | 794 | 73 | 16 | 2 | 18 | 24% |
+| NormalizedTrace.lean | 259 | 18 | 4 | 0 | 4 | 22% |
+| Galois/Basic.lean | 702 | 41 | 4 | 5 | 9 | 21% |
+| ChevalleyWarning.lean | 196 | 5 | 1 | 0 | 1 | 20% |
+| Perfect.lean | 488 | 60 | 2 | 10 | 12 | 20% |
+| Laurent.lean | 111 | 11 | 0 | 2 | 2 | 18% |
+| PurelyInseparable/Basic.lean | 694 | 52 | 1 | 8 | 9 | 17% |
+
+**Bottom 28 (low or zero density — mostly pure math):**
+
+| File | Lines | Theorems | ≠ 0 | TC | Density | Per-thm |
+|---|---|---|---|---|---|---|
+| AlgebraicClosure.lean | 222 | 20 | 3 | 0 | 3 | 15% |
+| Finiteness.lean | 106 | 8 | 0 | 1 | 1 | 12% |
+| PurelyInseparable/Exponent.lean | 353 | 25 | 2 | 1 | 3 | 12% |
+| Minpoly/ConjRootClass.lean | 203 | 25 | 3 | 0 | 3 | 12% |
+| Extension.lean | 374 | 26 | 3 | 0 | 3 | 11% |
+| Normal/Closure.lean | 315 | 26 | 3 | 0 | 3 | 11% |
+| Normal/Defs.lean | 259 | 18 | 2 | 0 | 2 | 11% |
+| PurelyInseparable/Tower.lean | 298 | 18 | 1 | 1 | 2 | 11% |
+| IntermediateField/Basic.lean | 911 | 91 | 1 | 9 | 10 | 10% |
+| IntermediateField/Adjoin/Algebra.lean | 369 | 34 | 1 | 2 | 3 | 8% |
+| SeparableClosure.lean | 509 | 51 | 4 | 0 | 4 | 7% |
+| IntermediateField/Algebraic.lean | 165 | 17 | 0 | 1 | 1 | 5% |
+| CardinalEmb.lean | 354 | 20 | 1 | 0 | 1 | 5% |
+| IntermediateField/Adjoin/Defs.lean | 772 | 114 | 0 | 1 | 1 | 0% |
+| Relrank.lean | 538 | 106 | 0 | 0 | 0 | 0% |
+| PurelyInseparable/PerfectClosure.lean | 432 | 31 | 0 | 0 | 0 | 0% |
+| LinearDisjoint.lean | 763 | 68 | 0 | 0 | 0 | 0% |
+| KrullTopology.lean | 336 | 12 | 0 | 0 | 0 | 0% |
+| Galois/Profinite.lean | 347 | 13 | 0 | 0 | 0 | 0% |
+| Galois/Infinite.lean | 291 | 11 | 0 | 0 | 0 | 0% |
+| Galois/GaloisClosure.lean | 156 | 8 | 0 | 0 | 0 | 0% |
+| Galois/Abelian.lean | 71 | 4 | 0 | 0 | 0 | 0% |
+| Differential/Liouville.lean | 212 | 2 | 0 | 0 | 0 | 0% |
+| Cardinality.lean | 70 | 5 | 0 | 0 | 0 | 0% |
+| PrimeField.lean | 60 | 2 | 0 | 0 | 0 | 0% |
+| MvRatFunc/Rank.lean | 40 | 1 | 0 | 0 | 0 | 0% |
+| AbsoluteGaloisGroup.lean | 66 | 0 | 0 | 0 | 0 | 0% |
+| Galois/Notation.lean | 53 | 0 | 0 | 0 | 0 | 0% |
+
+**Totals:** 78 files, 26,919 lines, 2,056 theorems, 696 ≠ 0 refs, 363 typeclass refs
+
+**Status:** complete
 
 ### Step 2: Map the densest files
 
