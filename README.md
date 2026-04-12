@@ -1,6 +1,6 @@
 # origin-lean
 
-Mathematics, refactored. 2.16M lines of Mathlib collapsed into a 10,781-line origin-aware kernel. Three constructors. Five inheritance levels. All of math. Zero-overhead verification for the next generation of non-hallucinating AI.
+Mathematics, refactored. 2.16M lines of Mathlib collapsed into a 10,756-line origin-aware kernel. Three constructors. Five inheritance levels. All of math. Zero-overhead verification for the next generation of non-hallucinating AI.
 
 ---
 
@@ -35,7 +35,7 @@ Arithmetic  <-- the ambiguity of zero starts here
     └── InformationTheory (Hamming, KL divergence, Kraft inequality, coding theory)
 ```
 
-20 files. 10,781 lines. Every domain in Mathlib. Builds in under 1 second. Zero Mathlib dependency. Zero sorries.
+20 files. 10,756 lines. Every domain in Mathlib. Builds in under 12 seconds (clean) / 5 seconds (cached). Zero Mathlib dependency. Zero sorries.
 
 ```bash
 git clone https://github.com/knoxvilledatabase/origin-lean.git
@@ -98,7 +98,7 @@ The class provides the hypothesis. The simp set handles the sort dispatch. Two l
 
 | | Mathlib | origin-lean |
 |---|---|---|
-| Lines | 2,160,000 | 10,781 |
+| Lines | 2,160,000 | 10,756 |
 | Files | 8,200 | 20 |
 | Theorems mapped | 173,646 | 173,646 |
 | Infrastructure eliminated | — | 116,831 (67.3%) |
@@ -107,7 +107,7 @@ The class provides the hypothesis. The simp set handles the sort dispatch. Two l
 | Inheritance levels | 17+ (diamonds) | 5 (single chain) |
 | `≠ 0` hypotheses | 9,682 | 0 |
 | Mathlib dependency | is Mathlib | 0 |
-| Build time | minutes | <1 second |
+| Build time | minutes | <12 seconds (clean) |
 | Reduction | — | **99.5%** |
 
 ## The exhaustive mapping
