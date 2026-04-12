@@ -153,6 +153,31 @@ Every one of Mathlib's 173,646 theorems was mapped and classified:
 | **B3: Genuinely new** | 56,815 | 32.7% | Written once at the general level |
 | **Total** | **173,646** | **100%** | **Every theorem accounted for** |
 
+**Methodology:** Each theorem classified by reading the declaration, checking if `by simp` closes its Val translation (B1), if a `≠ 0` / `NeZero` hypothesis dissolves when origin replaces zero (B2), or neither (B3). Calibrated by compiling representative files across each domain. Full domain-by-domain mapping: [THEOREM_MAP.md](THEOREM_MAP.md).
+
+**Concrete example — what generalization looks like:**
+
+Mathlib writes "homomorphism preserves multiplication" separately for each type of homomorphism:
+
+```
+-- Mathlib: 6 separate theorems across GroupTheory
+MonoidHom.map_mul, MulEquiv.map_mul, RingHom.map_mul,
+AlgHom.map_mul, AlgEquiv.map_mul, MulAction.map_mul
+```
+
+origin-lean writes it once:
+
+```lean
+-- origin-lean: 1 general theorem
+theorem universal_hom_mul [ValRing α] (f : α → α)
+    (hf : ∀ a b, f (ValArith.mulF a b) = ValArith.mulF (f a) (f b))
+    (a b : α) :
+    valMap f (mul (contents a) (contents b)) =
+    mul (valMap f (contents a)) (valMap f (contents b)) := by simp [mul, valMap, hf]
+```
+
+The 6 Mathlib theorems are instances of this one. They were never needed — not compressed, never written.
+
 The zero-management hotspots:
 
 | Domain | B2 % | What Val dissolves |
@@ -166,7 +191,7 @@ The zero-management hotspots:
 ## The file structure
 
 ```
-ValClass/
+Val/
   Foundation.lean          166  — Level 0: Val type, valMap, sort dispatch
   Arith.lean               155  — Level 1: ValArith class, operations
   Ring.lean                140  — Level 2: ValRing, lifted ring laws
@@ -211,4 +236,4 @@ This is a Human-AI collaboration. The human held the architecture and enforced t
 
 The journey: standalone (509 theorems) → Mathlib (learned the abstract base model architecture) → standalone again → deduplication (18% removed) → exhaustive mapping (173,646 theorems, 67.3% collapse) → class-based refactor (5 levels, single inheritance) → complete coverage (56,815 genuinely new theorems in 10,756 lines).
 
-This work exists because of the timing. The concept is 2,500 years old. The formal verification tools, the AI that can implement across domains, and the adversarial loop that stress-tests every claim. A project like this was not possible before now.
+This work exists because of the timing. The formal verification tools, the AI that can implement across domains, and the adversarial loop that stress-tests every claim — these didn't exist together until now.
