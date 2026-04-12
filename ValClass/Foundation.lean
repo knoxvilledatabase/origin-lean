@@ -76,6 +76,18 @@ def valPair {β : Type u} : Val α → Val β → Val (α × β)
     valPair a (origin : Val β) = origin := by cases a <;> rfl
 @[simp] theorem valPair_contents_contents {β : Type u} (a : α) (b : β) :
     valPair (contents a) (contents b) = contents (a, b) := rfl
+@[simp] theorem valPair_container_container {β : Type u} (a : α) (b : β) :
+    valPair (container a) (container b) = container (a, b) := rfl
+@[simp] theorem valPair_container_contents {β : Type u} (a : α) (b : β) :
+    valPair (container a) (contents b) = container (a, b) := rfl
+@[simp] theorem valPair_contents_container {β : Type u} (a : α) (b : β) :
+    valPair (contents a) (container b) = container (a, b) := rfl
+
+-- ============================================================================
+-- Contents Existence (eliminates trivial ⟨_, rfl⟩ patterns)
+-- ============================================================================
+
+theorem contents_exists (a : α) : ∃ r, (contents a : Val α) = contents r := ⟨a, rfl⟩
 
 -- ============================================================================
 -- Sort Predicates
