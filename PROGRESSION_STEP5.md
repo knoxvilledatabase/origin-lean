@@ -188,6 +188,7 @@ The order is smallest B3 count first. Each stair teaches the base something. The
 | 5 | RepresentationTheory | 105 | 571 | 0 | 571 | 5.4 | 13,861 |
 | 6 | SetTheory | 148 | 653 | 0 | 653 | 4.4 | 14,514 |
 | 7 | Computability | 161 | 687 | 0 | 687 | 1.1 | 15,201 |
+| 8 | FieldTheory | 180 | 884 | 0 | 884 | 0.91 | 16,085 |
 | ... | ... | | | | | | |
 | 19 | Algebra | | | | | | |
 
