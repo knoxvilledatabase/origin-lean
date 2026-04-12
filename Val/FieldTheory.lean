@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.Field
+import Val.Field
 
 /-!
 # Val α: Field Theory and Galois Correspondence (Class-Based)

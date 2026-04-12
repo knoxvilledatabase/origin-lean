@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.OrderedField
+import Val.OrderedField
 
 /-!
 # Val α: Algebra (Class-Based) — The Biggest Domain
@@ -542,10 +542,6 @@ theorem localize_add [ValArith α] (a₁ s₁ a₂ s₂ : α) :
 /-- Cauchy completion: equivalence classes of Cauchy sequences. -/
 def cauchyComplete (limitF : (Nat → α) → α) (seq : Nat → α) : Val α :=
   contents (limitF seq)
-
-/-- Completion is always contents. -/
-theorem completion_contents (limitF : (Nat → α) → α) (seq : Nat → α) :
-    ∃ r, cauchyComplete limitF seq = contents r := ⟨limitF seq, rfl⟩
 
 -- ============================================================================
 -- 15. BILINEAR FORMS

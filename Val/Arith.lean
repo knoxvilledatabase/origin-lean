@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.Foundation
+import Val.Foundation
 
 /-!
 # Val α: Level 1 — ValArith (Raw Operations)

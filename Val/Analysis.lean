@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.OrderedField
+import Val.OrderedField
 
 /-!
 # Val α: Analysis (Class-Based)
@@ -774,9 +774,6 @@ def minimaxVal (minimaxF : α → α) : Val α → Val α := valMap minimaxF
     conjugate, residue, conformal, distribution, Sobolev norm, flow, etc. -/
 theorem analysis_unary_origin (f : α → α) :
     valMap f (origin : Val α) = origin := rfl
-
-theorem analysis_unary_contents (f : α → α) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
 
 theorem analysis_unary_container (f : α → α) (a : α) :
     valMap f (container a) = container (f a) := rfl

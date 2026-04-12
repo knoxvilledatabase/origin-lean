@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.Ring
+import Val.Ring
 
 /-!
 # Val α: Group Theory (Class-Based)

@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.Ring
+import Val.Ring
 
 /-!
 # Val α: Ring Theory (Class-Based)
@@ -469,13 +469,6 @@ theorem restrict_extend {β : Type u} (f g : α → α) (v : Val (α × β))
   | origin => rfl
   | container p => simp [baseChange, valMap]; exact Prod.ext (h p.1) rfl
   | contents p => simp [baseChange, valMap]; exact Prod.ext (h p.1) rfl
-
--- Tensor-hom adjunction: structural
-theorem tensor_valMap_left {β : Type u} (f : α → α) (a : α) (b : β) :
-    tensor (valMap f (contents a)) (contents b) = contents (f a, b) := rfl
-
-theorem tensor_valMap_right {β : Type u} (g : β → β) (a : α) (b : β) :
-    tensor (contents a) (valMap g (contents b)) = contents (a, g b) := rfl
 
 -- Bimodule: scalar action on both sides
 theorem bimodule_assoc [ValRing α] (f g : α → α) (v : Val α)

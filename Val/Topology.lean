@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.OrderedField
+import Val.OrderedField
 
 /-!
 # Val α: Topology + Order (Class-Based)

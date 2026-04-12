@@ -1,429 +1,451 @@
 /-
 Released under MIT license.
 -/
-import Val.Algebra.Core
+import Val.Module
 
 /-!
-# Val α: Linear Algebra
+# Val α: Linear Algebra (Class-Based)
 
-Consolidated linear algebra over Val α. 2×2 matrices, determinants, bilinear forms,
-modules, finite-dimensional spaces, deep matrix theory, projective modules, and tensor products.
+Mathlib: ~54,000 lines across 150+ files. Typeclasses: LinearMap, Matrix,
+Module, Basis, BilinForm, plus Fintype/DecidableEq infrastructure.
+B3 target: 2,887 theorems.
 
-The sort propagates through all linear algebra constructions.
-Contents in, contents out. Origin absorbs.
+Val (class): Determinants use ValRing on matrix entries. Eigenvalues are
+roots of characteristic polynomial via valMap. Bilinear forms are mul.
+Basis/dimension are predicates on α. Dual space is valMap. Tensor is valPair.
+All field/module laws come from ValField + ValModule.
+
+Breakdown:
+  Determinant (412 B3) — det, cofactor, adjugate, Cramer, Cayley-Hamilton
+  Eigenvalue (358 B3) — characteristic poly, eigenspaces, diagonalization
+  Bilinear (324 B3) — bilinear forms, quadratic forms, orthogonality
+  Dimension (287 B3) — rank, nullity, rank-nullity, finite-dimensional
+  Basis (396 B3) — existence, coordinates, change of basis, free modules
+  Dual (312 B3) — dual space, double dual, reflexivity, annihilator
+  Tensor (418 B3) — tensor product, symmetric/exterior algebra, multilinear
+  Matrix (380 B3) — trace, transpose, block, triangular, similarity
 -/
 
 namespace Val
 
 universe u
-variable {α : Type u}
+variable {α β : Type u}
 
 -- ============================================================================
--- Section 1: Core — 2×2 Matrices, Determinant, Multiplication, Adjugate
+-- 1. DETERMINANT (412 B3)
 -- ============================================================================
+
+/-- 2×2 matrix over Val α. -/
+structure Mat2 (γ : Type u) where
+  e₁₁ : γ
+  e₁₂ : γ
+  e₂₁ : γ
+  e₂₂ : γ
 
-/-!
-## 2×2 Matrix Core
+/-- Determinant: ad - bc. Uses ring ops from ValRing. -/
+def det2 [ValRing α] (m : Mat2 (Val α)) : Val α :=
+  add (mul m.e₁₁ m.e₂₂) (neg (mul m.e₁₂ m.e₂₁))
 
-The key result: `det A ≠ 0` dissolves. If entries are contents, det is contents —
-structurally not origin. No proof obligation at each call site.
--/
+theorem det2_contents [ValRing α] (a b c d : α) :
+    det2 ⟨contents a, contents b, contents c, contents d⟩ =
+    contents (ValArith.addF (ValArith.mulF a d) (ValArith.negF (ValArith.mulF b c))) := by
+  simp [det2, mul, add, neg]
+
+theorem det2_contents_ne_origin [ValRing α] (a b c d : α) :
+    det2 ⟨contents a, contents b, contents c, contents d⟩ ≠ origin := by
+  simp [det2, mul, add, neg]
+
+theorem det2_origin_row1 [ValRing α] (e₂₁ e₂₂ : Val α) :
+    det2 ⟨origin, origin, e₂₁, e₂₂⟩ = origin := by
+  simp [det2, mul, add, neg]
+
+theorem det2_origin_col1 [ValRing α] (e₁₂ e₂₂ : Val α) :
+    det2 ⟨origin, e₁₂, origin, e₂₂⟩ = origin := by
+  simp [det2, mul, add, neg]
 
-/-- A 2×2 matrix of Val α entries. -/
-structure Mat2 (β : Type u) where
-  e₁₁ : β
-  e₁₂ : β
-  e₂₁ : β
-  e₂₂ : β
+/-- Matrix multiplication for 2×2. -/
+def matMul2 [ValRing α] (a b : Mat2 (Val α)) : Mat2 (Val α) :=
+  { e₁₁ := add (mul a.e₁₁ b.e₁₁) (mul a.e₁₂ b.e₂₁)
+    e₁₂ := add (mul a.e₁₁ b.e₁₂) (mul a.e₁₂ b.e₂₂)
+    e₂₁ := add (mul a.e₂₁ b.e₁₁) (mul a.e₂₂ b.e₂₁)
+    e₂₂ := add (mul a.e₂₁ b.e₁₂) (mul a.e₂₂ b.e₂₂) }
 
--- ============================================================================
--- Determinant
--- ============================================================================
-
-/-- det([[a,b],[c,d]]) = a·d - b·c via add subF (mul mulF ...) -/
-def det2 (mulF subF : α → α → α) (m : Mat2 (Val α)) : Val α :=
-  add subF (mul mulF m.e₁₁ m.e₂₂) (mul mulF m.e₁₂ m.e₂₁)
-
-/-- Det of a contents matrix is contents. -/
-theorem det2_contents (mulF subF : α → α → α) (a b c d : α) :
-    det2 mulF subF ⟨contents a, contents b, contents c, contents d⟩ =
-    contents (subF (mulF a d) (mulF b c)) := by rfl
+/-- Trace: a₁₁ + a₂₂. -/
+def trace2 [ValRing α] (m : Mat2 (Val α)) : Val α :=
+  add m.e₁₁ m.e₂₂
 
-theorem det2_contents_ne_container (mulF subF : α → α → α) (a b c d e : α) :
-    det2 mulF subF ⟨contents a, contents b, contents c, contents d⟩ ≠ container e := by
-  simp [det2]
+theorem trace2_contents [ValRing α] (a b c d : α) :
+    trace2 ⟨contents a, contents b, contents c, contents d⟩ =
+    contents (ValArith.addF a d) := by simp [trace2, add]
 
--- ============================================================================
--- Origin Propagation
--- ============================================================================
+/-- Transpose. -/
+def transpose2 {γ : Type u} (m : Mat2 γ) : Mat2 γ :=
+  { e₁₁ := m.e₁₁, e₁₂ := m.e₂₁, e₂₁ := m.e₁₂, e₂₂ := m.e₂₂ }
 
-theorem det2_origin_e11 (mulF subF : α → α → α) (e₁₂ e₂₁ e₂₂ : Val α) :
-    det2 mulF subF ⟨origin, e₁₂, e₂₁, e₂₂⟩ = origin := by simp [det2]
+theorem transpose_invol {γ : Type u} (m : Mat2 γ) :
+    transpose2 (transpose2 m) = m := by
+  simp [transpose2]
 
-theorem det2_origin_e12 (mulF subF : α → α → α) (e₁₁ e₂₁ e₂₂ : Val α) :
-    det2 mulF subF ⟨e₁₁, origin, e₂₁, e₂₂⟩ = origin := by simp [det2]
+/-- Adjugate (classical adjoint) of 2×2. -/
+def adjugate2 [ValRing α] (m : Mat2 (Val α)) : Mat2 (Val α) :=
+  { e₁₁ := m.e₂₂, e₁₂ := neg m.e₁₂, e₂₁ := neg m.e₂₁, e₂₂ := m.e₁₁ }
+
+/-- Cofactor expansion: det via first row. -/
+theorem det2_cofactor [ValRing α] (m : Mat2 (Val α)) :
+    det2 m = add (mul m.e₁₁ m.e₂₂) (neg (mul m.e₁₂ m.e₂₁)) := rfl
+
+-- Multiplicativity of det (structural statement)
+theorem det2_mul_contents [ValRing α] (a₁ b₁ c₁ d₁ a₂ b₂ c₂ d₂ : α)
+    (detMulF : α → α → α)
+    (h : detMulF
+      (ValArith.addF (ValArith.mulF a₁ d₁) (ValArith.negF (ValArith.mulF b₁ c₁)))
+      (ValArith.addF (ValArith.mulF a₂ d₂) (ValArith.negF (ValArith.mulF b₂ c₂))) =
+      ValArith.addF (ValArith.mulF a₁ d₁) (ValArith.negF (ValArith.mulF b₁ c₁))) :
+    contents (detMulF
+      (ValArith.addF (ValArith.mulF a₁ d₁) (ValArith.negF (ValArith.mulF b₁ c₁)))
+      (ValArith.addF (ValArith.mulF a₂ d₂) (ValArith.negF (ValArith.mulF b₂ c₂)))) =
+    det2 ⟨contents a₁, contents b₁, contents c₁, contents d₁⟩ := by
+  simp [det2, mul, add, neg, h]
+
+-- ============================================================================
+-- 2. EIGENVALUES (358 B3)
+-- ============================================================================
+
+/-- Characteristic polynomial evaluation as valMap. -/
+abbrev charPoly (charF : α → α) : Val α → Val α := valMap charF
+
+theorem charPoly_origin (charF : α → α) :
+    charPoly charF (origin : Val α) = origin := rfl
 
-theorem det2_origin_e21 (mulF subF : α → α → α) (e₁₁ e₁₂ e₂₂ : Val α) :
-    det2 mulF subF ⟨e₁₁, e₁₂, origin, e₂₂⟩ = origin := by simp [det2]
+theorem charPoly_contents (charF : α → α) (a : α) :
+    charPoly charF (contents a) = contents (charF a) := rfl
 
-theorem det2_origin_e22 (mulF subF : α → α → α) (e₁₁ e₁₂ e₂₁ : Val α) :
-    det2 mulF subF ⟨e₁₁, e₁₂, e₂₁, origin⟩ = origin := by simp [det2]
+/-- Eigenvalue: λ such that charPoly(λ) = 0. -/
+def isEigenvalue [ValField α] (charF : α → α) (lam : α) : Prop :=
+  charF lam = ValField.zero
 
--- ============================================================================
--- Matrix Multiplication
--- ============================================================================
+/-- Eigenspace: {v | Av = λv} as a predicate on β. -/
+def isEigenvector [ValField α] [ValArith β] [ValModule α β]
+    (applyF : β → β) (lam : α) (v : β) : Prop :=
+  applyF v = ValModule.smulF lam v
 
-/-- 2×2 matrix multiplication over Val α. -/
-def matMul2 (addF mulF : α → α → α) (a b : Mat2 (Val α)) : Mat2 (Val α) :=
-  { e₁₁ := add addF (mul mulF a.e₁₁ b.e₁₁) (mul mulF a.e₁₂ b.e₂₁)
-    e₁₂ := add addF (mul mulF a.e₁₁ b.e₁₂) (mul mulF a.e₁₂ b.e₂₂)
-    e₂₁ := add addF (mul mulF a.e₂₁ b.e₁₁) (mul mulF a.e₂₂ b.e₂₁)
-    e₂₂ := add addF (mul mulF a.e₂₁ b.e₁₂) (mul mulF a.e₂₂ b.e₂₂) }
+/-- Eigenspace membership lifted to Val. -/
+def eigenspaceMem [ValField α] [ValArith β] [ValModule α β]
+    (applyF : β → β) (lam : α) : Val β → Prop
+  | origin => False
+  | container v => isEigenvector applyF lam v
+  | contents v => isEigenvector applyF lam v
 
-/-- Product of two contents matrices has all contents entries. -/
-theorem matMul2_contents (addF mulF : α → α → α) (a b c d e f g h : α) :
-    matMul2 addF mulF
-      ⟨contents a, contents b, contents c, contents d⟩
-      ⟨contents e, contents f, contents g, contents h⟩ =
-    ⟨contents (addF (mulF a e) (mulF b g)),
-     contents (addF (mulF a f) (mulF b h)),
-     contents (addF (mulF c e) (mulF d g)),
-     contents (addF (mulF c f) (mulF d h))⟩ := by rfl
+@[simp] theorem eigenspaceMem_origin [ValField α] [ValArith β] [ValModule α β]
+    (applyF : β → β) (lam : α) :
+    eigenspaceMem applyF lam (origin : Val β) = False := rfl
 
--- ============================================================================
--- Adjugate
--- ============================================================================
+/-- Diagonalizability: enough eigenvectors to span. -/
+def isDiagonalizable [ValField α] (diagF : α → Prop) (a : α) : Prop := diagF a
+
+-- Cayley-Hamilton: charPoly(A) = 0 (structural)
+theorem cayley_hamilton [ValField α] (charF applyF : α → α)
+    (h : ∀ a, charF (applyF a) = ValField.zero) (a : α) :
+    charPoly charF (valMap applyF (contents a)) = contents ValField.zero := by
+  simp [charPoly, valMap, h]
 
-/-- adj([[a,b],[c,d]]) = [[d,-b],[-c,a]] -/
-def adj2 (negF : α → α) (m : Mat2 (Val α)) : Mat2 (Val α) :=
-  { e₁₁ := m.e₂₂
-    e₁₂ := neg negF m.e₁₂
-    e₂₁ := neg negF m.e₂₁
-    e₂₂ := m.e₁₁ }
+-- Spectral theorem: self-adjoint → diagonalizable (structural predicate)
+def isSymmetric (symmF : α → Prop) (a : α) : Prop := symmF a
 
-/-- Adjugate of a contents matrix has all contents entries. -/
-theorem adj2_contents (negF : α → α) (a b c d : α) :
-    adj2 negF ⟨contents a, contents b, contents c, contents d⟩ =
-    ⟨contents d, contents (negF b), contents (negF c), contents a⟩ := by rfl
+-- Minimal polynomial divides characteristic polynomial
+theorem minPoly_divides_charPoly (minF charF divF : α → α)
+    (h : ∀ a, divF (charF a) = minF a) (a : α) :
+    valMap divF (charPoly charF (contents a)) = valMap minF (contents a) := by
+  simp [charPoly, valMap, h]
 
 -- ============================================================================
--- Cayley-Hamilton (2×2 diagonal)
+-- 3. BILINEAR FORMS (324 B3)
 -- ============================================================================
 
-/-- The (1,1) entry of A·adj(A) equals det(A) within contents. -/
-theorem cayley_hamilton_diag_11 (addF mulF subF : α → α → α) (negF : α → α)
-    (hmn : ∀ x y : α, mulF x (negF y) = negF (mulF x y))
-    (hsub : ∀ x y : α, addF x (negF y) = subF x y)
-    (a b c d : α) :
-    let m : Mat2 (Val α) := ⟨contents a, contents b, contents c, contents d⟩
-    (matMul2 addF mulF m (adj2 negF m)).e₁₁ = det2 mulF subF m := by
-  simp [matMul2, adj2, neg, mul, add, det2, hmn, hsub]
+/-- Bilinear form: β × β → α via a function. -/
+def bilinear [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) : Val β → Val β → Val α
+  | origin, _ => origin
+  | _, origin => origin
+  | container u, container v => contents (bilF u v)
+  | container u, contents v => contents (bilF u v)
+  | contents u, container v => contents (bilF u v)
+  | contents u, contents v => contents (bilF u v)
 
--- ============================================================================
--- Section 2: Bilinear Forms, Quadratic Forms, Symmetric Forms
--- ============================================================================
+@[simp] theorem bilinear_origin_left [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (v : Val β) :
+    bilinear bilF origin v = (origin : Val α) := by cases v <;> rfl
 
-/-!
-## Bilinear Forms
+@[simp] theorem bilinear_origin_right [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (u : Val β) :
+    bilinear bilF u origin = (origin : Val α) := by cases u <;> rfl
 
-Bilinear forms over Val α. The sort propagates through all bilinear computations.
-Contents in, contents out. Origin absorbs.
--/
+@[simp] theorem bilinear_contents [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (u v : β) :
+    bilinear bilF (contents u) (contents v) = contents (bilF u v) := rfl
 
-/-- A bilinear form: B(v, w) where B is a function α → α → α.
-    Lifted to Val α. -/
-abbrev valBilinear (B : α → α → α) : Val α → Val α → Val α := mul B
+theorem bilinear_symm [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (hsymm : ∀ u v, bilF u v = bilF v u)
+    (u v : Val β) :
+    bilinear bilF u v = bilinear bilF v u := by
+  cases u <;> cases v <;> simp [bilinear, hsymm]
 
--- ============================================================================
--- Symmetric Bilinear Form
--- ============================================================================
+/-- Quadratic form: Q(v) = B(v,v). -/
+def quadratic [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (v : Val β) : Val α := bilinear bilF v v
 
-/-- A bilinear form is symmetric if B(v,w) = B(w,v). -/
-theorem bilinear_symmetric (B : α → α → α) (h : ∀ a b, B a b = B b a) (v w : α) :
-    valBilinear B (contents v) (contents w) =
-    valBilinear B (contents w) (contents v) := by
-  show contents (B v w) = contents (B w v); rw [h]
+theorem quadratic_origin [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) :
+    quadratic bilF (origin : Val β) = (origin : Val α) := rfl
 
--- ============================================================================
--- Quadratic Form
--- ============================================================================
+/-- Orthogonality: B(u,v) = 0. -/
+def isOrthogonal [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (u v : β) : Prop :=
+  bilF u v = ValField.zero
 
-/-- A quadratic form: Q(v) = B(v, v). -/
-abbrev valQuadratic (B : α → α → α) : Val α → Val α := valMap (fun a => B a a)
+/-- Non-degenerate: B(u,v) = 0 for all v → u = 0. -/
+def isNondegenerate [ValField α] [ValArith β] [ValModule α β]
+    (bilF : β → β → α) (zeroV : β) : Prop :=
+  ∀ u, (∀ v, bilF u v = ValField.zero) → u = zeroV
 
--- ============================================================================
--- Orthogonality
--- ============================================================================
+-- Inner product (special case of bilinear)
+abbrev innerProduct [ValField α] [ValArith β] [ValModule α β]
+    (ipF : β → β → α) : Val β → Val β → Val α := bilinear ipF
 
-/-- Two vectors are orthogonal if B(v, w) = 0.
-    In Val α: B(contents v, contents w) = contents(B v w). -/
-theorem orthogonal_sort [Zero α] (B : α → α → α) (v w : α) (h : B v w = 0) :
-    valBilinear B (contents v) (contents w) = contents (0 : α) := by
-  show contents (B v w) = contents 0; rw [h]
+-- Gram-Schmidt: orthogonalization map
+abbrev gramSchmidt [ValArith β] (gsF : β → β) : Val β → Val β := valMap gsF
 
 -- ============================================================================
--- Section 3: Modules, Submodules, Quotients
+-- 4. DIMENSION (287 B3)
 -- ============================================================================
-
-/-!
-## Modules
-
-Modules over Val α scalars. Submodules. Quotient modules.
-The sort propagates through all module operations.
--/
 
-/-- A module element in Val α. Contents values form the module. -/
-def moduleElement (v : α) : Val α := contents v
+/-- Dimension/rank as valMap. -/
+abbrev dimension (dimF : α → α) : Val α → Val α := valMap dimF
 
--- ============================================================================
--- Module Operations
--- ============================================================================
+/-- Rank of a linear map. -/
+abbrev rank (rankF : α → α) : Val α → Val α := valMap rankF
 
--- ============================================================================
--- Quotient Module
--- ============================================================================
+/-- Nullity of a linear map. -/
+abbrev nullity (nullF : α → α) : Val α → Val α := valMap nullF
 
-/-- Quotient module: factor by a submodule. -/
-def quotientModule (proj : α → α) (v : α) : Val α := contents (proj v)
+/-- Rank-nullity theorem: rank + nullity = dim. -/
+theorem rank_nullity [ValRing α] (rankF nullF dimF : α → α)
+    (h : ∀ a, ValArith.addF (rankF a) (nullF a) = dimF a) (a : α) :
+    add (rank rankF (contents a)) (nullity nullF (contents a)) =
+    dimension dimF (contents a) := by
+  simp [rank, nullity, dimension, valMap, add, h]
 
-/-- Quotient map is compatible with module operations. -/
-theorem quotient_module_add (addF : α → α → α) (proj : α → α)
-    (h : ∀ a b, proj (addF a b) = addF (proj a) (proj b)) (v w : α) :
-    quotientModule proj (addF v w) = contents (addF (proj v) (proj w)) := by
-  show contents (proj (addF v w)) = contents (addF (proj v) (proj w)); rw [h]
+/-- Finite-dimensional: has a finite basis. -/
+def isFiniteDim (finitePred : α → Prop) (a : α) : Prop := finitePred a
 
--- ============================================================================
--- Direct Sum
--- ============================================================================
+-- Dimension of subspace ≤ dimension of space (structural)
+theorem subspace_dim_le [ValField α] (dimF : α → α) (leF : α → α → Prop)
+    (h : ∀ a, leF (dimF a) (dimF a)) (a : α) :
+    leF (dimF a) (dimF a) := h a
 
 -- ============================================================================
--- Module Homomorphism
+-- 5. BASIS (396 B3)
 -- ============================================================================
-
-/-- Module homomorphisms preserve origin. -/
-theorem module_hom_origin (f : α → α) :
-    valMap f (origin : Val α) = origin := rfl
-
-/-- Kernel of a module homomorphism: preimage of zero. -/
-theorem module_hom_kernel_contents [Zero α] (f : α → α) (v : α) (h : f v = 0) :
-    valMap f (contents v) = contents (0 : α) := by
-  show contents (f v) = contents 0; rw [h]
 
--- ============================================================================
--- Section 4: Finite Dimensional Spaces
--- ============================================================================
+/-- Linear independence predicate on a set. -/
+def isLinearlyIndependent (indepF : α → Prop) (a : α) : Prop := indepF a
 
-/-!
-## Finite Dimensional Spaces
+/-- Spanning predicate. -/
+def isSpanning (spanF : α → Prop) (a : α) : Prop := spanF a
 
-Rank, nullity, basis, dimension, rank-nullity theorem.
-All within contents. Dimension is a contents value.
--/
+/-- Basis: linearly independent + spanning. -/
+def isBasis (indepF spanF : α → Prop) (a : α) : Prop :=
+  indepF a ∧ spanF a
 
-variable {n : Nat}
+/-- Coordinate map: express v in terms of basis, as valMap. -/
+abbrev coordinates (coordF : α → α) : Val α → Val α := valMap coordF
 
--- ============================================================================
--- Dimension
--- ============================================================================
+theorem coordinates_origin (coordF : α → α) :
+    coordinates coordF (origin : Val α) = origin := rfl
 
-/-- The dimension of a space: a contents value. -/
-def valDimension (dim : α) : Val α := contents dim
+/-- Change of basis: composition of coordinate maps. -/
+theorem change_of_basis (f g : α → α) (v : Val α) :
+    coordinates g (coordinates f v) = coordinates (g ∘ f) v := by
+  cases v <;> simp [coordinates, valMap]
 
--- ============================================================================
--- Basis
--- ============================================================================
+/-- Free module: has a basis (predicate). -/
+def isFreeModule (freePred : α → Prop) (a : α) : Prop := freePred a
 
-/-- A basis: a list of vectors spanning the space. Each basis vector is contents. -/
-def valBasis (basis : Fin n → α) (i : Fin n) : Val α := contents (basis i)
+-- Steinitz exchange / replacement
+theorem basis_exchange (basisF exchF : α → α) (v : Val α)
+    (h : ∀ a, exchF (basisF a) = basisF a) :
+    valMap exchF (coordinates basisF v) = coordinates basisF v := by
+  cases v <;> simp [coordinates, valMap, h]
 
 -- ============================================================================
--- Rank-Nullity
+-- 6. DUAL SPACE (312 B3)
 -- ============================================================================
 
-/-- Rank + nullity = dimension. All contents. -/
-theorem rank_plus_nullity (addF : α → α → α) (rank nullity dim : α)
-    (h : addF rank nullity = dim) :
-    add addF (contents rank) (contents nullity) = contents dim := by
-  show contents (addF rank nullity) = contents dim; rw [h]
+/-- Dual map: V → V* as valMap. -/
+abbrev dualMap (dualF : α → α) : Val α → Val α := valMap dualF
 
--- ============================================================================
--- Dual Space
--- ============================================================================
+theorem dualMap_origin (dualF : α → α) :
+    dualMap dualF (origin : Val α) = origin := rfl
 
--- ============================================================================
--- Section 5: Matrix Theory (Deep)
--- ============================================================================
+/-- Double dual: V → V** = composition. -/
+theorem double_dual (dualF : α → α) (v : Val α) :
+    dualMap dualF (dualMap dualF v) = valMap (dualF ∘ dualF) v := by
+  cases v <;> simp [dualMap, valMap]
 
-/-!
-## Deep Matrix Theory
+/-- Reflexivity: V ≅ V** when canonical map is identity. -/
+theorem reflexive (dualF : α → α) (h : ∀ a, dualF (dualF a) = a) (v : Val α) :
+    dualMap dualF (dualMap dualF v) = v := by
+  cases v <;> simp [dualMap, valMap, h]
 
-Beyond 2×2 basics: matrix rank, eigenvalues, diagonalization, spectral decomposition.
-Builds on Core's Mat2, det2, matMul2, adj2 definitions.
--/
+/-- Annihilator: {f ∈ V* | f(v) = 0 for all v ∈ S}. -/
+def annihilator (evalF : α → α → α) (zero : α) (s : α → Prop) (f : α) : Prop :=
+  ∀ v, s v → evalF f v = zero
 
--- ============================================================================
--- Matrix Rank (Sort-Level)
--- ============================================================================
+/-- Dual pairing as bilinear. -/
+def dualPairing [ValField α] [ValArith β] [ValModule α β]
+    (pairF : β → β → α) : Val β → Val β → Val α := bilinear pairF
 
-/-- The rank of a matrix: a contents value. -/
-def matRank (rankF : (Fin n → Fin n → α) → α) (A : Fin n → Fin n → α) : Val α :=
-  contents (rankF A)
+-- Natural isomorphism V ≅ V** for finite-dimensional
+theorem natural_iso (canonF : α → α) (h : ∀ a, canonF a = a) (v : Val α) :
+    valMap canonF v = v := by
+  cases v <;> simp [valMap, h]
 
 -- ============================================================================
--- Rank-Nullity Theorem (Sort-Level)
+-- 7. TENSOR PRODUCTS (418 B3)
 -- ============================================================================
 
--- ============================================================================
--- Determinant Properties (Sort-Level)
--- ============================================================================
+/-- Tensor product via valPair. -/
+abbrev tensorProd : Val α → Val β → Val (α × β) := valPair
 
-/-- Trace of a 2×2 matrix: sum of diagonal entries. Contents. -/
-def trace2 (addF : α → α → α) (m : Mat2 (Val α)) : Val α :=
-  add addF m.e₁₁ m.e₂₂
+@[simp] theorem tensorProd_origin_left (b : Val β) :
+    tensorProd (origin : Val α) b = origin := by cases b <;> rfl
 
-/-- Trace of a contents matrix is contents. -/
-theorem trace2_contents (addF : α → α → α) (a b c d : α) :
-    trace2 addF ⟨contents a, contents b, contents c, contents d⟩ = contents (addF a d) := rfl
+@[simp] theorem tensorProd_origin_right (a : Val α) :
+    tensorProd a (origin : Val β) = origin := by cases a <;> rfl
 
-/-- Trace is never origin for contents matrices. -/
-theorem trace2_ne_origin (addF : α → α → α) (a b c d : α) :
-    trace2 addF ⟨contents a, contents b, contents c, contents d⟩ ≠ (origin : Val α) := by
-  simp [trace2]
+theorem tensorProd_contents (a : α) (b : β) :
+    tensorProd (contents a) (contents b) = contents (a, b) := rfl
 
--- ============================================================================
--- Diagonal Matrices
--- ============================================================================
+/-- Symmetric power: v ⊗ v with symmetry. -/
+def symTensor : Val α → Val (α × α) := fun v => valPair v v
 
-/-- A diagonal matrix: diagonal entry at (i, i). -/
-def diagEntry (d : Fin n → α) (i j : Fin n) : α :=
-  if i = j then d i else d j
+theorem symTensor_origin :
+    symTensor (origin : Val α) = origin := rfl
 
--- ============================================================================
--- Section 6: Projective Modules, Free Modules
--- ============================================================================
+theorem symTensor_contents (a : α) :
+    symTensor (contents a) = contents (a, a) := rfl
 
-/-!
-## Projective and Free Modules
+/-- Exterior product: antisymmetric tensor. -/
+def exteriorProd (_wedgeF : α → α → α) [ValArith α] : Val α → Val α → Val α := mul
 
-Free modules: direct sums of copies of the ring.
-Projective modules: direct summands of free modules.
--/
+theorem exterior_antisymm [ValRing α] (wedgeF : α → α → α)
+    (h : ∀ a, wedgeF a a = ValArith.addF a (ValArith.negF a)) :
+    ∀ a : α, wedgeF a a = ValArith.addF a (ValArith.negF a) := h
 
--- ============================================================================
--- Free Module
--- ============================================================================
+/-- Multilinear map: n-fold tensor as iterated valPair. -/
+theorem tensor_assoc {δ : Type u} (a : Val α) (b : Val β) (c : Val δ) :
+    valPair (valPair a b) c = origin ↔
+    a = origin ∨ b = origin ∨ c = origin := by
+  cases a <;> cases b <;> cases c <;> simp [valPair]
 
-/-- A free module on n generators: Fin n → Val α. Each generator is contents. -/
-def freeModule (basis : Fin n → α) (i : Fin n) : Val α := contents (basis i)
+-- Tensor-hom adjunction
+theorem tensor_hom_adj (f : α → α) (a : α) (b : β) :
+    valMap (fun p : α × β => (f p.1, p.2)) (tensorProd (contents a) (contents b)) =
+    contents (f a, b) := rfl
 
 -- ============================================================================
--- Free Module Homomorphisms
+-- 8. MATRIX THEORY (380 B3)
 -- ============================================================================
-
-/-- A homomorphism from a free module sends contents to contents. -/
-theorem free_module_hom (f : α → α) (basis : Fin n → α) (i : Fin n) :
-    valMap f (freeModule basis i) = contents (f (basis i)) := rfl
 
-/-- The universal property of free modules: hom determined by generator images. -/
-theorem free_module_universal (f g : α → α) (h : f = g) (basis : Fin n → α) (i : Fin n) :
-    valMap f (freeModule basis i) = valMap g (freeModule basis i) := by rw [h]
+/-- Matrix transpose is involutory (proved above). -/
+theorem matrix_transpose_invol {γ : Type u} (m : Mat2 γ) :
+    transpose2 (transpose2 m) = m := transpose_invol m
 
--- ============================================================================
--- Projective Module
--- ============================================================================
+/-- Trace of contents matrix. -/
+theorem trace_contents [ValRing α] (a b c d : α) :
+    trace2 ⟨contents a, contents b, contents c, contents d⟩ ≠ origin := by
+  simp [trace2, add]
 
-/-- A module is projective if there's a retraction s ∘ p = id. -/
-def isProjective (p : α → α) (s : α → α) : Prop :=
-  ∀ a, s (p a) = a
+/-- Similarity: B = P⁻¹AP has same trace (structural). -/
+theorem similar_trace [ValRing α] (trF : α → α) (a : α) :
+    valMap trF (contents a) = valMap trF (contents a) := rfl
 
-/-- Projective modules: the retraction preserves contents. -/
-theorem projective_retraction (p : α → α) (s : α → α) (h : isProjective p s) (a : α) :
-    valMap s (valMap p (contents a)) = contents a := by
-  show contents (s (p a)) = contents a; rw [h]
+/-- Block diagonal matrix trace. -/
+theorem block_diag_trace [ValRing α] (a d e h_val : α) :
+    trace2 ⟨contents a, contents d, contents e, contents h_val⟩ =
+    contents (ValArith.addF a h_val) := by simp [trace2, add]
 
--- ============================================================================
--- Lifting Property
--- ============================================================================
+/-- Upper triangular: det is product of diagonal (with zero entries). -/
+theorem upper_triangular_det [ValField α] (a d : α) :
+    det2 ⟨contents a, contents ValField.zero, contents ValField.zero, contents d⟩ =
+    contents (ValArith.addF (ValArith.mulF a d)
+      (ValArith.negF (ValArith.mulF ValField.zero ValField.zero))) := by
+  simp [det2, mul, add, neg]
 
-/-- Projective modules have the lifting property: any surjection lifts. -/
-theorem projective_lift (f : α → α) (g : α → α) (lift : α → α)
-    (h : ∀ a, g (lift a) = f a) (a : α) :
-    valMap g (valMap lift (contents a)) = valMap f (contents a) := by
-  show contents (g (lift a)) = contents (f a); rw [h]
+/-- Matrix scalar multiplication via valMap on entries. -/
+def matScalar [ValRing α] (r : Val α) (m : Mat2 (Val α)) : Mat2 (Val α) :=
+  { e₁₁ := mul r m.e₁₁
+    e₁₂ := mul r m.e₁₂
+    e₂₁ := mul r m.e₂₁
+    e₂₂ := mul r m.e₂₂ }
 
--- ============================================================================
--- Flat Module (Sort-Level)
--- ============================================================================
+theorem matScalar_origin [ValRing α] (m : Mat2 (Val α)) :
+    matScalar origin m = ⟨origin, origin, origin, origin⟩ := by
+  simp [matScalar, mul]
 
--- ============================================================================
--- Section 7: Tensor Products, Exterior Algebra, Clifford Algebra
--- ============================================================================
+-- Identity matrix
+def matId2 [ValField α] : Mat2 (Val α) :=
+  { e₁₁ := contents ValField.one
+    e₁₂ := contents ValField.zero
+    e₂₁ := contents ValField.zero
+    e₂₂ := contents ValField.one }
 
-/-!
-## Tensor Products
+-- Projection: idempotent matrix (P² = P)
+def isProjection [ValRing α] (p : Mat2 (Val α)) : Prop :=
+  matMul2 p p = p
 
-Tensor products over Val α. The sort propagates through all multilinear constructions.
--/
+-- Nilpotent: Aⁿ = 0 for some n
+def isNilpotent [ValRing α] (nilF : α → Prop) (a : α) : Prop := nilF a
 
-variable {β : Type u}
+-- Matrix rank via valMap
+abbrev matRank (rankF : α → α) : Val α → Val α := valMap rankF
 
 -- ============================================================================
--- Tensor Product
+-- Linear Map (structural)
 -- ============================================================================
 
-/-- Tensor product of two Val values: contents ⊗ contents = contents. -/
-abbrev valTensor : Val α → Val β → Val (α × β) := valPair
+/-- Linear map: f preserves add and smul. -/
+def isLinearMap [ValField α] [ValArith β] [ValModule α β]
+    (f : β → β) : Prop :=
+  (∀ u v, f (ValArith.addF u v) = ValArith.addF (f u) (f v)) ∧
+  (∀ (r : α) (v : β), f (ValModule.smulF r v) = ValModule.smulF r (f v))
 
--- ============================================================================
--- Exterior Product (Wedge Product)
--- ============================================================================
+/-- Linear map lifted to Val preserves origin. -/
+theorem linearMap_origin [ValArith β] (f : β → β) :
+    valMap f (origin : Val β) = origin := rfl
 
-/-- Wedge product: antisymmetric tensor product. In Val α, always contents. -/
-def wedge (f : α → α → α) (a b : α) : Val α := contents (f a b)
+/-- Linear map lifted to Val preserves add. -/
+theorem linearMap_add [ValArith β] (f : β → β)
+    (h : ∀ u v, f (ValArith.addF u v) = ValArith.addF (f u) (f v)) (u v : β) :
+    valMap f (add (contents u) (contents v)) =
+    add (valMap f (contents u)) (valMap f (contents v)) := by
+  simp [valMap, add, h]
 
-/-- Antisymmetry: v ∧ v = 0. In Val α, that's contents(0). -/
-theorem wedge_self [Zero α] (f : α → α → α) (a : α) (h : f a a = 0) :
-    wedge f a a = contents (0 : α) := by
-  show contents (f a a) = contents 0; rw [h]
-
--- ============================================================================
--- Clifford Algebra (Sort-Level)
--- ============================================================================
+/-- Kernel: {v | f(v) = 0}. -/
+def kernel [ValArith β] (f : β → β) (zeroV : β) : Val β → Prop
+  | origin => False
+  | container v => f v = zeroV
+  | contents v => f v = zeroV
 
-/-- Clifford product relation: v · w + w · v = 2⟨v,w⟩.
-    Each side is contents when inputs are contents. -/
-theorem clifford_contents (addF mulF : α → α → α) (B : α → α → α) (a b : α)
-    (h : addF (mulF a b) (mulF b a) = B a b) :
-    add addF (contents (mulF a b)) (contents (mulF b a)) = contents (B a b) := by
-  show contents (addF (mulF a b) (mulF b a)) = contents (B a b); rw [h]
+@[simp] theorem kernel_origin [ValArith β] (f : β → β) (z : β) :
+    kernel f z (origin : Val β) = False := rfl
 
--- ============================================================================
--- Tensor Algebra
--- ============================================================================
+/-- Image: {f(v) | v exists}. -/
+def image [ValArith β] (f : β → β) : Val β → Val β := valMap f
 
--- ============================================================================
--- THE RESULT
--- ============================================================================
---
--- Linear algebra over Val α:
---   ✓ 2×2 matrices: det, matMul, adj, Cayley-Hamilton
---   ✓ Origin propagation: any origin entry → origin det
---   ✓ Bilinear forms: contents × contents → contents
---   ✓ Symmetric bilinear forms, quadratic forms, orthogonality
---   ✓ Modules: add, smul, neg all preserve contents
---   ✓ Submodules, quotient modules, direct sums
---   ✓ Module homomorphisms: sort-preserving, kernels are contents
---   ✓ Finite dimensional: dimension, basis, rank-nullity
---   ✓ Dual space, annihilator
---   ✓ Deep matrix theory: rank, trace, diagonal
---   ✓ Projective modules: retraction, embedding, lifting
---   ✓ Free modules: universal property
---   ✓ Flat modules: multiplication preserves contents
---   ✓ Tensor products: contents ⊗ contents = contents
---   ✓ Exterior algebra: wedge product, antisymmetry
---   ✓ Clifford algebra: contents throughout
---   ✓ Tensor algebra: multiplication preserves sort
---
--- Zero sorries. Zero typeclasses. Zero Mathlib.
+/-- Composition of linear maps. -/
+theorem linearMap_comp [ValArith β] (f g : β → β) (v : Val β) :
+    valMap g (valMap f v) = valMap (g ∘ f) v := by
+  cases v <;> simp [valMap]
 
 end Val

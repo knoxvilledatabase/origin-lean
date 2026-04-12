@@ -9,6 +9,3 @@ package «origin-lean» where
 @[default_target]
 lean_lib Val where
   srcDir := "."
-
-lean_lib ValClass where
-  srcDir := "."

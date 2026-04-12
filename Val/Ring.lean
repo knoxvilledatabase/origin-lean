@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.Arith
+import Val.Arith
 
 /-!
 # Val α: Level 2 — ValRing (Ring Laws)

@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.OrderedField
+import Val.OrderedField
 
 /-!
 # Val α: Number Theory (Class-Based)
@@ -650,9 +650,6 @@ theorem mordell_equation [ValField α] (x y k : α)
       ValArith.addF (ValArith.mulF x (ValArith.mulF x x)) k) :
     contents (ValArith.mulF y y) =
     contents (ValArith.addF (ValArith.mulF x (ValArith.mulF x x)) k) := by simp [h]
-
-theorem waring [ValField α] (gF : α → α) (k : α) :
-    valMap gF (contents k) = contents (gF k) := rfl
 
 theorem vinogradov (isSumThreePrimes : α → Prop) (n : α)
     (h : isSumThreePrimes n) : isSumThreePrimes n := h

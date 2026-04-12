@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import ValClass.Ring
+import Val.Ring
 
 /-!
 # Val α: Category Theory + Algebraic Topology (Class-Based)
@@ -101,10 +101,6 @@ abbrev valFunctor {β : Type u} (f : α → β) : Val α → Val β := valMap f
 
 /-- Functor preserves identity. -/
 theorem functor_id : valFunctor (id : α → α) = id := valMap_id
-
-/-- Functor preserves composition. -/
-theorem functor_comp {β γ : Type u} (f : α → β) (g : β → γ) :
-    valFunctor (g ∘ f) = valFunctor g ∘ valFunctor f := valMap_comp f g
 
 /-- Functor maps origin to origin. -/
 theorem functor_origin {β : Type u} (f : α → β) :
