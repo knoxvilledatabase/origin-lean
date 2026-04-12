@@ -196,14 +196,6 @@ theorem quotient_module_add (addF : α → α → α) (proj : α → α)
 -- Direct Sum
 -- ============================================================================
 
-/-- Direct sum projection to first component. -/
-theorem direct_sum_proj1 (v w : α) :
-    valMap Prod.fst (contents (v, w) : Val (α × α)) = contents v := rfl
-
-/-- Direct sum projection to second component. -/
-theorem direct_sum_proj2 (v w : α) :
-    valMap Prod.snd (contents (v, w) : Val (α × α)) = contents w := rfl
-
 -- ============================================================================
 -- Module Homomorphism
 -- ============================================================================

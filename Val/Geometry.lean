@@ -52,10 +52,6 @@ theorem spec_point_excludes_container (p : SpecPoint α) (c : α) :
 -- Scheme Morphisms
 -- ============================================================================
 
-/-- Composition of scheme morphisms. -/
-theorem scheme_morphism_comp (f g : α → α) :
-    valMap (g ∘ f) = valMap g ∘ valMap f := valMap_comp f g
-
 -- ============================================================================
 -- Local Rings: Localization at Primes
 -- ============================================================================
@@ -114,10 +110,6 @@ theorem quotient_rule_contents (mulF addF : α → α → α) (invF negF : α �
 -- ============================================================================
 -- Smooth Maps
 -- ============================================================================
-
-/-- Composition of smooth maps preserves sort. -/
-theorem smooth_comp (f g : α → α) :
-    valMap (g ∘ f) = valMap g ∘ valMap f := valMap_comp f g
 
 -- ============================================================================
 -- Manifold Charts

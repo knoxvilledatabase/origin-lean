@@ -228,10 +228,6 @@ theorem measurable_ne_origin (f : S → Val α) (hf : isMeasurableFunc f) (s : S
 def simpleFunc (vals : List α) (assign : S → Fin vals.length) (s : S) : Val α :=
   contents (vals.get (assign s))
 
-/-- Simple functions are contents-valued. -/
-theorem simple_func_contents (vals : List α) (assign : S → Fin vals.length) (s : S) :
-    ∃ r, simpleFunc vals assign s = contents r := ⟨vals.get (assign s), rfl⟩
-
 -- ============================================================================
 -- § Function: Integral of Simple Functions
 -- ============================================================================

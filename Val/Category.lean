@@ -129,9 +129,6 @@ theorem monad_join_assoc :
 theorem monad_right_unit_origin :
     valJoin (valMap (contents : α → Val α) (origin : Val α)) = origin := rfl
 
-theorem monad_right_unit_contents (a : α) :
-    valJoin (valMap (contents : α → Val α) (contents a)) = contents a := rfl
-
 theorem monad_right_unit_container_flattens (a : α) :
     valJoin (valMap (contents : α → Val α) (container a)) = contents a := rfl
 
@@ -714,10 +711,6 @@ def mapAdd (addF : β → β → β) (f g : Val α → Val β) (x : Val α) : Va
   | contents a, container b => container (addF a b)
   | contents a, contents b => contents (addF a b)
 
-/-- The sum of two valMaps on contents is contents. -/
-theorem mapAdd_contents (addF : β → β → β) (f g : α → β) (a : α) :
-    mapAdd addF (valMap f) (valMap g) (contents a) = contents (addF (f a) (g a)) := rfl
-
 /-- The zero map: everything to origin. -/
 theorem zero_map_origin (x : Val α) :
     (fun _ : Val α => (origin : Val β)) x = origin := rfl
@@ -725,14 +718,6 @@ theorem zero_map_origin (x : Val α) :
 -- ============================================================================
 -- Additive Category: Biproducts
 -- ============================================================================
-
-/-- Biproduct projection to first component. -/
-theorem biproduct_proj1 (a : α) (b : β) :
-    valMap Prod.fst (contents (a, b) : Val (α × β)) = contents a := rfl
-
-/-- Biproduct projection to second component. -/
-theorem biproduct_proj2 (a : α) (b : β) :
-    valMap Prod.snd (contents (a, b) : Val (α × β)) = contents b := rfl
 
 -- ============================================================================
 -- Linear Category: Enriched Over a Ring

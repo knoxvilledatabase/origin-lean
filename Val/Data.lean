@@ -264,8 +264,6 @@ theorem valEmbed_preserves_sort {β : Type u} (embedF : α → β) (v : Val α) 
 
 theorem origin_ne_empty_list : (origin : Val (List α)) ≠ contents [] := by simp
 
-theorem empty_list_ne_origin : (contents [] : Val (List α)) ≠ origin := by simp
-
 -- ============================================================================
 -- Cons
 -- ============================================================================

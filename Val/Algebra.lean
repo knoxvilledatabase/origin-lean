@@ -1200,10 +1200,6 @@ theorem kernel_normal (phi : α → α) (mulG : α → α → α) (invG : α →
     isInKernel phi e (mulG g (mulG n (invG g))) := by
   simp [isInKernel] at *; rw [h_hom, h_hom, hn, h_inv, h_cancel]
 
-/-- Image of a homomorphism: φ maps contents to contents. -/
-theorem group_hom_image (phi : α → α) (g : α) :
-    valMap phi (contents g) = contents (phi g) := rfl
-
 -- ============================================================================
 -- First Isomorphism Theorem
 -- ============================================================================
