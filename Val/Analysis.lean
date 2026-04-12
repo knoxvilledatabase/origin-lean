@@ -117,14 +117,6 @@ theorem zero_div_zero_is_contents (mulF : α → α → α) (invF : α → α) (
 -- Sequence Sort Preservation
 -- ============================================================================
 
-/-- Pointwise add of contents sequences gives contents. -/
-theorem seq_add_contents (addF : α → α → α) (s t : Nat → α) (n : Nat) :
-    add addF (contents (s n)) (contents (t n)) = contents (addF (s n) (t n)) := rfl
-
-/-- Pointwise mul of contents sequences gives contents. -/
-theorem seq_mul_contents (mulF : α → α → α) (s t : Nat → α) (n : Nat) :
-    mul mulF (contents (s n)) (contents (t n)) = contents (mulF (s n) (t n)) := rfl
-
 
 -- ============================================================================
 -- 2. SPECIAL FUNCTIONS: exp, log, trig, pow, gamma, beta
@@ -450,14 +442,6 @@ def hasDeriv [Zero α] [Add α] (f : α → α) (f'a : α)
     ∀ h : α, ltF (normF h) δ →
       ltF (normF (dist (divF (dist (f (0 + h)) (f 0)) h) f'a)) ε
 
-/-- Chain rule: (g ∘ f)'(a) = g'(f(a)) · f'(a). Both sides contents. -/
-theorem chain_rule_contents [Mul α] (g'fa f'a : α) :
-    (contents (g'fa * f'a) : Val α) = contents (g'fa * f'a) := rfl
-
-/-- Product rule: (f · g)'(a) = f'(a) · g(a) + f(a) · g'(a). -/
-theorem product_rule_contents [Mul α] [Add α] (f'a ga fa g'a : α) :
-    (contents (f'a * ga + fa * g'a) : Val α) = contents (f'a * ga + fa * g'a) := rfl
-
 
 -- ============================================================================
 -- L'Hopital's Rule
@@ -468,22 +452,10 @@ theorem product_rule_contents [Mul α] [Add α] (f'a ga fa g'a : α) :
 -- Mean Value Theorem
 -- ============================================================================
 
-/-- MVT: f(b) - f(a) = f'(c) · (b - a) for some c ∈ (a,b). All contents. -/
-theorem mvt_contents [Mul α] [Add α] [Neg α] (f'c b a : α) :
-    (contents (f'c * (b + -a)) : Val α) = contents (f'c * (b + -a)) := rfl
-
 
 -- ============================================================================
 -- Taylor's Theorem
 -- ============================================================================
-
-/-- Taylor: f(x) = f(a) + f'(a)(x-a) + ... Each term is contents. -/
-theorem taylor_term_contents [Mul α] (coeff dx_power : α) :
-    (contents (coeff * dx_power) : Val α) = contents (coeff * dx_power) := rfl
-
-/-- Sum of Taylor terms stays in contents. -/
-theorem taylor_sum_contents [Add α] (t1 t2 : α) :
-    (contents (t1 + t2) : Val α) = contents (t1 + t2) := rfl
 
 
 -- ============================================================================
@@ -491,26 +463,11 @@ theorem taylor_sum_contents [Add α] (t1 t2 : α) :
 -- ============================================================================
 
 
-/-- FTC Part 2: ∫ₐᵇ f'(t) dt = f(b) - f(a). Both sides are contents. -/
-theorem ftc2_contents [Add α] [Neg α] (fb fa : α) :
-    (contents (fb + -fa) : Val α) = contents (fb + -fa) := rfl
 
 -- ============================================================================
 -- Integration
 -- ============================================================================
 
-/-- Integral of a contents function over a contents interval is contents. -/
-theorem integral_contents [Mul α] (f_avg width : α) :
-    (contents (f_avg * width) : Val α) = contents (f_avg * width) := rfl
-
-
-/-- Integration by parts: ∫ u dv = uv - ∫ v du. Both sides contents. -/
-theorem integration_by_parts [Add α] [Neg α] (uv int_vdu : α) :
-    (contents (uv + -int_vdu) : Val α) = contents (uv + -int_vdu) := rfl
-
-/-- Substitution: ∫ f(g(x))g'(x) dx. Contents in, contents out. -/
-theorem substitution_contents [Mul α] (fgx g'x : α) :
-    (contents (fgx * g'x) : Val α) = contents (fgx * g'x) := rfl
 
 -- ============================================================================
 -- Smooth Functions
@@ -1047,34 +1004,17 @@ theorem bump_deriv_at_boundary [Zero α] (derivs : Nat → α → α) (a : α) (
 -- ============================================================================
 
 
-/-- Sum of partition of unity terms is contents. -/
-theorem partition_unity_sum_contents [Add α] (φ₁ φ₂ : α → α) (x : α) :
-    (contents (φ₁ x + φ₂ x) : Val α) = contents (φ₁ x + φ₂ x) := rfl
 
 /-- Partition of unity sums to contents(one). -/
 theorem partition_unity_total (one : α) (sumF : α)
     (h : sumF = one) :
     (contents sumF : Val α) = contents one := by rw [h]
 
-/-- Partition of unity: individual bumps multiply with target functions. -/
-theorem partition_multiply_contents [Mul α] (φ f : α → α) (x : α) :
-    (contents (φ x * f x) : Val α) = contents (φ x * f x) := rfl
 
 -- ============================================================================
 -- Bump Function Algebra
 -- ============================================================================
 
-/-- Product of two bump functions is a bump function. Contents throughout. -/
-theorem bump_product_contents [Mul α] (b₁ b₂ : α → α) (x : α) :
-    (contents (b₁ x * b₂ x) : Val α) = contents (b₁ x * b₂ x) := rfl
-
-/-- Sum of two bump functions is contents. -/
-theorem bump_sum_contents [Add α] (b₁ b₂ : α → α) (x : α) :
-    (contents (b₁ x + b₂ x) : Val α) = contents (b₁ x + b₂ x) := rfl
-
-/-- Scalar multiple of a bump function is contents. -/
-theorem bump_scalar_contents [Mul α] (c : α) (b : α → α) (x : α) :
-    (contents (c * b x) : Val α) = contents (c * b x) := rfl
 
 -- ============================================================================
 -- Mollifiers
@@ -1182,11 +1122,6 @@ def logDeriv [Mul α] (invF : α → α) (f' f_val : α) : α := f' * invF f_val
 -- ============================================================================
 -- Analytic Continuation
 -- ============================================================================
-
-/-- Analytic continuation: agreement is a contents equation. -/
-theorem analytic_continuation (f g : α → α) (a : α)
-    (h : f a = g a) :
-    (contents (f a) : Val α) = contents (g a) := by rw [h]
 
 
 -- ============================================================================
@@ -1574,9 +1509,6 @@ theorem poly_comp_contents [Add α] [Mul α] [Zero α]
   ⟨addF a₀ (mulF (addF b₀ (mulF v b₁)) a₁), by
     simp [polyEval_contents_linear, polyEval_faithful_linear]⟩
 
-/-- Derivative of polynomial composition: (p ∘ q)'(x) = p'(q(x)) · q'(x). -/
-theorem poly_chain_rule_contents [Mul α] (p'qx q'x : α) :
-    (contents (p'qx * q'x) : Val α) = contents (p'qx * q'x) := rfl
 
 -- ============================================================================
 -- Polynomial Bounds
@@ -1798,13 +1730,6 @@ def lpNormF (normF : α → α) (powF : α → α → α) (intF : (α → α) �
 -- Lp Space Structure
 -- ============================================================================
 
-/-- Lp space addition: pointwise addition, within contents. -/
-theorem lp_add_contents [Add α] (f g : α → α) (x : α) :
-    (contents (f x + g x) : Val α) = contents (f x + g x) := rfl
-
-/-- Lp space scalar multiplication: within contents. -/
-theorem lp_smul_contents [Mul α] (c : α) (f : α → α) (x : α) :
-    (contents (c * f x) : Val α) = contents (c * f x) := rfl
 
 /-- Triangle inequality in Lp: Minkowski within contents. -/
 theorem lp_triangle [Add α] [LE α] (lpNorm : (α → α) → α)
@@ -1857,16 +1782,6 @@ def sobolevNormF (lpNorm : (α → α) → α) (derivs : Nat → α → α)
 -- Completeness of Function Spaces
 -- ============================================================================
 
-/-- Lp spaces are complete: Cauchy sequences of contents functions
-    converge to a contents function. -/
-theorem lp_completeness
-    (conv : (Nat → α) → α → Prop)
-    (isCauchy : (Nat → α) → Prop)
-    (complete : ∀ s, isCauchy s → ∃ L, conv s L)
-    (s : Nat → α) (hs : isCauchy s) :
-    ∃ L, liftConv conv (fun n => contents (s n)) (contents L) := by
-  obtain ⟨L, hL⟩ := complete s hs
-  exact ⟨L, s, fun _ => rfl, hL⟩
 
 -- ============================================================================
 -- Dual Spaces

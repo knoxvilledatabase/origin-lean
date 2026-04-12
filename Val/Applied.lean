@@ -37,10 +37,6 @@ theorem contentsRV_ne_origin (X : S → Val α) (hX : ∀ s, ∃ a, X s = conten
 -- Expectation
 -- ============================================================================
 
-/-- Expectation of a single outcome: f · P is contents. -/
-theorem expectation_single (mulF : α → α → α) (f_val p_val : α) :
-    mul mulF (contents f_val) (contents p_val) = contents (mulF f_val p_val) := rfl
-
 /-- Expectation of two outcomes: f₁·P₁ + f₂·P₂ is contents. -/
 theorem expectation_two (mulF addF : α → α → α) (f₁ p₁ f₂ p₂ : α) :
     add addF (mul mulF (contents f₁) (contents p₁))
@@ -80,10 +76,6 @@ theorem bayes_is_contents (mulF : α → α → α) (invF : α → α) (pBA pA p
 -- ============================================================================
 -- Independence
 -- ============================================================================
-
-/-- P(A∩B) = P(A)·P(B): independence is a contents-level property. -/
-theorem independence_is_contents (mulF : α → α → α) (pA pB : α) :
-    mul mulF (contents pA) (contents pB) = contents (mulF pA pB) := rfl
 
 -- ============================================================================
 -- Martingale
@@ -127,11 +119,6 @@ variable {α : Type u}
 structure ChainComplex (α : Type u) where
   differential : Int → α → α
 
-/-- Differentials map contents to contents. -/
-theorem differential_contents (C : ChainComplex α) (n : Int) (a : α) :
-    valMap (C.differential n) (contents a) = contents (C.differential n a) := rfl
-
-
 -- ============================================================================
 -- d² = 0: The Boundary of a Boundary Is Zero
 -- ============================================================================
@@ -152,11 +139,6 @@ def inKernel (d : α → α) (zero : α) (a : α) : Prop := d a = zero
 
 /-- Image: elements a where a = d(b) for some b. -/
 def inImage (d : α → α) (a : α) : Prop := ∃ b, d b = a
-
-/-- Homology class: quotient map sends contents to contents. -/
-theorem homology_class_contents (proj : α → α) (a : α) :
-    quotientMap proj (contents a) = contents (proj a) := rfl
-
 
 -- ============================================================================
 -- Exact Sequences
@@ -183,18 +165,9 @@ theorem exact_preimage_contents (d_next d_curr : α → α) (zero : α)
 -- Ext and Tor
 -- ============================================================================
 
-/-- Tor: tensor of contents with contents is contents (multiplication). -/
-theorem tor_contents (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
-
-
 -- ============================================================================
 -- Long Exact Sequence
 -- ============================================================================
-
-/-- The connecting homomorphism δ maps contents to contents. -/
-theorem connecting_homomorphism_contents (delta : α → α) (a : α) :
-    valMap delta (contents a) = contents (delta a) := rfl
 
 -- ============================================================================
 -- INFORMATION THEORY
@@ -204,33 +177,6 @@ theorem connecting_homomorphism_contents (delta : α → α) (a : α) :
 -- Entropy
 -- ============================================================================
 
-/-- Shannon entropy term: -p · log(p). Both factors contents. -/
-theorem entropy_term_contents (mulF : α → α → α) (negF : α → α) (logF : α → α)
-    (p : α) :
-    mul mulF (contents (negF p)) (contents (logF p)) = contents (mulF (negF p) (logF p)) := rfl
-
-/-- Entropy sum: accumulating entropy terms stays in contents. -/
-theorem entropy_sum_contents (addF : α → α → α) (h₁ h₂ : α) :
-    add addF (contents h₁) (contents h₂) = contents (addF h₁ h₂) := rfl
-
--- ============================================================================
--- KL Divergence
--- ============================================================================
-
-/-- KL divergence term: p · log(p/q). Scaling guards dissolve. -/
-theorem kl_term_contents (mulF : α → α → α) (logF : α → α) (invF : α → α) (p q : α) :
-    mul mulF (contents p) (contents (logF (mulF p (invF q)))) =
-    contents (mulF p (logF (mulF p (invF q)))) := rfl
-
--- ============================================================================
--- Mutual Information
--- ============================================================================
-
-/-- Mutual information: I(X;Y) = H(X) + H(Y) - H(X,Y). Contents arithmetic. -/
-theorem mutual_info_contents (addF : α → α → α) (negF : α → α) (hx hy hxy : α) :
-    add addF (add addF (contents hx) (contents hy)) (contents (negF hxy)) =
-    contents (addF (addF hx hy) (negF hxy)) := rfl
-
 -- ============================================================================
 -- Hamming Distance
 -- ============================================================================
@@ -238,18 +184,9 @@ theorem mutual_info_contents (addF : α → α → α) (negF : α → α) (hx hy
 /-- Hamming distance: count of differing positions. A valMap. -/
 abbrev hammingNorm (hamF : α → α) : Val α → Val α := valMap hamF
 
-/-- Hamming norm of contents is contents. -/
-theorem hammingNorm_contents (hamF : α → α) (a : α) :
-    hammingNorm hamF (contents a) = contents (hamF a) := rfl
-
 -- ============================================================================
 -- Kraft Inequality
 -- ============================================================================
-
-/-- Kraft sum: Σ 2^(-lᵢ). Accumulates in contents. -/
-theorem kraft_sum_contents (addF : α → α → α) (powF : α → α) (l₁ l₂ : α) :
-    add addF (contents (powF l₁)) (contents (powF l₂)) =
-    contents (addF (powF l₁) (powF l₂)) := rfl
 
 /-- Kraft inequality check: sum ≤ 1 is a contents-level property. -/
 theorem kraft_le_contents (leF : α → α → Prop) (kraftSum one : α) (h : leF kraftSum one) :
@@ -273,27 +210,12 @@ def ordinalZero (zero : α) : Val α := contents zero
 /-- Ordinal successor. -/
 abbrev ordSucc (succF : α → α) : Val α → Val α := valMap succF
 
-/-- Successor of contents is contents. -/
-theorem ordSucc_contents (succF : α → α) (a : α) :
-    ordSucc succF (contents a) = contents (succF a) := rfl
-
 -- ============================================================================
 -- Ordinal Arithmetic
 -- ============================================================================
 
-/-- Ordinal addition: contents + contents = contents. -/
-theorem ordAdd_contents (addF : α → α → α) (a b : α) :
-    add addF (contents a) (contents b) = contents (addF a b) := rfl
-
-/-- Ordinal multiplication: contents · contents = contents. -/
-theorem ordMul_contents (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
-
 /-- Ordinal exponentiation via valMap. -/
 abbrev ordExp (expF : α → α) : Val α → Val α := valMap expF
-
-theorem ordExp_contents (expF : α → α) (a : α) :
-    ordExp expF (contents a) = contents (expF a) := rfl
 
 -- ============================================================================
 -- Cardinals
@@ -314,27 +236,12 @@ theorem card_le_contents (leF : α → α → Prop) (a b : Cardinal α) (h : leF
 -- Cardinal Arithmetic
 -- ============================================================================
 
-/-- Cardinal addition. -/
-theorem cardAdd_contents (addF : α → α → α) (a b : Cardinal α) :
-    add addF (cardVal a) (cardVal b) = contents (addF a.card b.card) := rfl
-
-/-- Cardinal multiplication. -/
-theorem cardMul_contents (mulF : α → α → α) (a b : Cardinal α) :
-    mul mulF (cardVal a) (cardVal b) = contents (mulF a.card b.card) := rfl
-
-/-- Cardinal exponentiation. -/
-theorem cardExp_contents (expF : α → α) (a : Cardinal α) :
-    valMap expF (cardVal a) = contents (expF a.card) := rfl
-
 -- ============================================================================
 -- Cofinality
 -- ============================================================================
 
 /-- Cofinality: smallest cardinality of a cofinal subset. -/
 abbrev cofinality (cofF : α → α) : Val α → Val α := valMap cofF
-
-theorem cofinality_contents (cofF : α → α) (a : α) :
-    cofinality cofF (contents a) = contents (cofF a) := rfl
 
 -- ============================================================================
 -- Cantor's Theorem
@@ -347,50 +254,6 @@ theorem cantor_strict (ltF : α → α → Prop) (card_a card_pa : α) (h : ltF 
 -- ============================================================================
 -- ZFC Axioms as Properties
 -- ============================================================================
-
-/-- Empty set: contents(∅), not origin. The sort distinguishes them. -/
-theorem empty_set_is_contents (empty : α) :
-    (contents empty : Val α) ≠ origin := by intro h; cases h
-
-/-- Pairing: {a, b} is contents. -/
-theorem pairing_contents (pairF : α → α → α) (a b : α) :
-    mul pairF (contents a) (contents b) = contents (pairF a b) := rfl
-
-/-- Union: ∪S is contents when S is contents. -/
-theorem union_contents (unionF : α → α) (a : α) :
-    valMap unionF (contents a) = contents (unionF a) := rfl
-
-/-- Power set: P(S) is contents when S is contents. -/
-theorem powerset_contents (powerF : α → α) (a : α) :
-    valMap powerF (contents a) = contents (powerF a) := rfl
-
-/-- Separation: {x ∈ S | φ(x)} is contents when S is contents. -/
-theorem separation_contents (filterF : α → α) (a : α) :
-    valMap filterF (contents a) = contents (filterF a) := rfl
-
-/-- Replacement: {F(x) | x ∈ S} is contents when S is contents. -/
-theorem replacement_contents (replF : α → α) (a : α) :
-    valMap replF (contents a) = contents (replF a) := rfl
-
-/-- Infinity: ω is contents. -/
-theorem infinity_contents (omega : α) :
-    (contents omega : Val α) ≠ origin := by intro h; cases h
-
--- ============================================================================
--- Set Operations
--- ============================================================================
-
-/-- Intersection: A ∩ B is contents. -/
-theorem inter_contents (interF : α → α → α) (a b : α) :
-    mul interF (contents a) (contents b) = contents (interF a b) := rfl
-
-/-- Set difference: A \ B is contents. -/
-theorem sdiff_contents (sdiffF : α → α → α) (a b : α) :
-    mul sdiffF (contents a) (contents b) = contents (sdiffF a b) := rfl
-
-/-- Symmetric difference. -/
-theorem symm_diff_contents (symmF : α → α → α) (a b : α) :
-    mul symmF (contents a) (contents b) = contents (symmF a b) := rfl
 
 /-- Membership test: a ∈ S is a contents-level predicate. -/
 def setMem (memF : α → α → Prop) (a s : α) : Prop := memF a s
@@ -427,10 +290,6 @@ theorem diverges_is_origin :
 
 /-- Evaluation is a valMap: applying a step function preserves sort. -/
 abbrev compEval (stepF : α → α) : Val α → Val α := valMap stepF
-
-/-- Evaluation of contents is contents. -/
-theorem compEval_contents (stepF : α → α) (a : α) :
-    compEval stepF (contents a) = contents (stepF a) := rfl
 
 /-- Multi-step evaluation: n steps of a function. -/
 def multiStep (stepF : α → α) : Nat → Val α → Val α
@@ -623,10 +482,6 @@ structure Interpretation (α : Type u) where
   funcInterp : α → List domain → domain
   relInterp : α → List domain → Prop
 
-/-- Interpretation maps are valMaps: they preserve sort. -/
-theorem interp_contents (f : α → α) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
-
 -- ============================================================================
 -- Logical Consequence
 -- ============================================================================
@@ -670,10 +525,6 @@ def isCompact (sat : List α → Prop) (allFormulas : List α) : Prop :=
 def hasModelOfSize (leF : α → α → Prop) (_theory : α) (size langSize : α) : Prop :=
   leF langSize size
 
-/-- Model existence lifts to Val: the model size is contents. -/
-theorem model_size_contents (size : α) :
-    (contents size : Val α) ≠ origin := by intro h; cases h
-
 -- ============================================================================
 -- COMBINATORICS
 -- ============================================================================
@@ -691,19 +542,12 @@ structure Graph (α : Type u) where
 /-- Graph as Val: contents wraps the vertex set. -/
 def graphVal (G : Graph α) : Val α := contents G.vertices
 
-/-- Empty graph vs origin: contents(∅) ≠ origin. -/
-theorem empty_graph_ne_origin (emptyVerts : α) :
-    (contents emptyVerts : Val α) ≠ origin := by intro h; cases h
-
 -- ============================================================================
 -- Graph Properties
 -- ============================================================================
 
 /-- Degree of a vertex: a valMap. -/
 abbrev degree (degF : α → α) : Val α → Val α := valMap degF
-
-theorem degree_contents (degF : α → α) (v : α) :
-    degree degF (contents v) = contents (degF v) := rfl
 
 /-- Number of edges: a valMap. -/
 abbrev edgeCount (countF : α → α) : Val α → Val α := valMap countF
@@ -715,10 +559,6 @@ abbrev edgeCount (countF : α → α) : Val α → Val α := valMap countF
 /-- A path: sequence of vertices. Encoded as contents. -/
 def pathVal (path : List α) (encode : List α → α) : Val α :=
   contents (encode path)
-
-/-- Path existence: a contents-level property. -/
-theorem path_is_contents (path : List α) (encode : List α → α) :
-    ∃ r, pathVal path encode = contents r := ⟨encode path, rfl⟩
 
 /-- Connectivity: whether a path exists between two vertices. -/
 def isConnected (connected : α → α → Prop) (u v : α) : Prop := connected u v
@@ -738,27 +578,12 @@ def partitionVal (p : Partition α) : Val α := contents p.total
 /-- Partition count: number of partitions of n. A valMap. -/
 abbrev partitionCount (countF : α → α) : Val α → Val α := valMap countF
 
-theorem partitionCount_contents (countF : α → α) (n : α) :
-    partitionCount countF (contents n) = contents (countF n) := rfl
-
 -- ============================================================================
 -- Binomial Coefficients
 -- ============================================================================
 
 /-- Binomial coefficient C(n,k). A binary operation on contents. -/
 def binomial (chooseF : α → α → α) (n k : Val α) : Val α := mul chooseF n k
-
-/-- Binomial of contents is contents. -/
-theorem binomial_contents (chooseF : α → α → α) (n k : α) :
-    binomial chooseF (contents n) (contents k) = contents (chooseF n k) := rfl
-
-/-- Pascal's rule: C(n+1,k+1) = C(n,k) + C(n,k+1). Contents arithmetic. -/
-theorem pascal_contents (addF _chooseF : α → α → α) (nk nk1 : α) :
-    add addF (contents nk) (contents nk1) = contents (addF nk nk1) := rfl
-
-/-- Vandermonde identity: sum form. Contents addition. -/
-theorem vandermonde_sum (addF : α → α → α) (term₁ term₂ : α) :
-    add addF (contents term₁) (contents term₂) = contents (addF term₁ term₂) := rfl
 
 -- ============================================================================
 -- Generating Functions
@@ -771,10 +596,6 @@ def genFuncCoeff (coeffs : Nat → α) (n : Nat) : Val α := contents (coeffs n)
 theorem genFuncCoeff_contents (coeffs : Nat → α) (n : Nat) :
     genFuncCoeff coeffs n = contents (coeffs n) := rfl
 
-/-- Product of generating functions: Cauchy product (convolution). -/
-theorem cauchy_product_contents (mulF _addF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
-
 /-- Coefficient extraction via valMap. -/
 abbrev extractCoeff (extractF : α → α) : Val α → Val α := valMap extractF
 
@@ -784,9 +605,6 @@ abbrev extractCoeff (extractF : α → α) : Val α → Val α := valMap extract
 
 /-- Factorial via valMap. -/
 abbrev factorial (factF : α → α) : Val α → Val α := valMap factF
-
-theorem factorial_contents (factF : α → α) (n : α) :
-    factorial factF (contents n) = contents (factF n) := rfl
 
 /-- Falling factorial via valMap. -/
 abbrev fallingFactorial (fallF : α → α) : Val α → Val α := valMap fallF
@@ -806,9 +624,6 @@ def youngVal (Y : YoungDiagram α) (encode : List α → α) : Val α :=
 /-- Standard Young tableau count: a valMap on the shape. -/
 abbrev tableauCount (countF : α → α) : Val α → Val α := valMap countF
 
-theorem tableauCount_contents (countF : α → α) (shape : α) :
-    tableauCount countF (contents shape) = contents (countF shape) := rfl
-
 -- ============================================================================
 -- Matroids
 -- ============================================================================
@@ -820,9 +635,6 @@ structure Matroid (α : Type u) where
 
 /-- Matroid rank: a valMap. -/
 abbrev matroidRank (rankF : α → α) : Val α → Val α := valMap rankF
-
-theorem matroidRank_contents (rankF : α → α) (a : α) :
-    matroidRank rankF (contents a) = contents (rankF a) := rfl
 
 /-- Matroid ground set as Val. -/
 def matroidVal (M : Matroid α) : Val α := contents M.ground
@@ -859,35 +671,12 @@ theorem ramsey_bound (leF : α → α → Prop) (addF : α → α → α)
 /-- Chromatic number: minimum colors for proper coloring. A valMap. -/
 abbrev chromaticNumber (chiF : α → α) : Val α → Val α := valMap chiF
 
-theorem chromatic_contents (chiF : α → α) (g : α) :
-    chromaticNumber chiF (contents g) = contents (chiF g) := rfl
-
-/-- Chromatic polynomial: number of proper k-colorings. -/
-theorem chromatic_poly_contents (polyF : α → α → α) (g k : α) :
-    mul polyF (contents g) (contents k) = contents (polyF g k) := rfl
-
 -- ============================================================================
 -- Catalan Numbers
 -- ============================================================================
 
 /-- Catalan number: C_n. A valMap. -/
 abbrev catalanNumber (catF : α → α) : Val α → Val α := valMap catF
-
-theorem catalan_contents (catF : α → α) (n : α) :
-    catalanNumber catF (contents n) = contents (catF n) := rfl
-
-/-- Catalan recurrence: C_{n+1} = Σ C_i · C_{n-i}. Contents accumulation. -/
-theorem catalan_recurrence (_addF mulF : α → α → α) (ci cnmi : α) :
-    mul mulF (contents ci) (contents cnmi) = contents (mulF ci cnmi) := rfl
-
--- ============================================================================
--- Inclusion-Exclusion
--- ============================================================================
-
-/-- Inclusion-exclusion: alternating sum stays in contents. -/
-theorem inclusion_exclusion_step (addF : α → α → α) (negF : α → α) (pos neg_term : α) :
-    add addF (contents pos) (contents (negF neg_term)) =
-    contents (addF pos (negF neg_term)) := rfl
 
 -- ============================================================================
 -- Pigeonhole
@@ -906,9 +695,6 @@ theorem pigeonhole_contents (items boxes : α) (ltF : α → α → Prop)
 /-- Stirling number of the second kind: S(n,k). A valMap. -/
 abbrev stirling2 (stirF : α → α → α) (n k : Val α) : Val α := mul stirF n k
 
-theorem stirling2_contents (stirF : α → α → α) (n k : α) :
-    stirling2 stirF (contents n) (contents k) = contents (stirF n k) := rfl
-
 -- ============================================================================
 -- Euler's Formula for Planar Graphs
 -- ============================================================================
@@ -926,13 +712,6 @@ theorem euler_formula_contents (addF : α → α → α) (negF : α → α)
 /-- Fibonacci via valMap. -/
 abbrev fibonacci (fibF : α → α) : Val α → Val α := valMap fibF
 
-theorem fibonacci_contents (fibF : α → α) (n : α) :
-    fibonacci fibF (contents n) = contents (fibF n) := rfl
-
-/-- Fibonacci recurrence: F(n+2) = F(n+1) + F(n). Contents arithmetic. -/
-theorem fib_recurrence (addF : α → α → α) (fn fn1 : α) :
-    add addF (contents fn1) (contents fn) = contents (addF fn1 fn) := rfl
-
 -- ============================================================================
 -- Bell Numbers
 -- ============================================================================
@@ -940,18 +719,12 @@ theorem fib_recurrence (addF : α → α → α) (fn fn1 : α) :
 /-- Bell number: B_n = Σ S(n,k). A valMap. -/
 abbrev bellNumber (bellF : α → α) : Val α → Val α := valMap bellF
 
-theorem bell_contents (bellF : α → α) (n : α) :
-    bellNumber bellF (contents n) = contents (bellF n) := rfl
-
 -- ============================================================================
 -- Derangements
 -- ============================================================================
 
 /-- Derangement count: D(n). A valMap. -/
 abbrev derangement (derF : α → α) : Val α → Val α := valMap derF
-
-theorem derangement_contents (derF : α → α) (n : α) :
-    derangement derF (contents n) = contents (derF n) := rfl
 
 /-- Derangement recurrence: D(n) = (n-1)(D(n-1) + D(n-2)). Contents arithmetic. -/
 theorem derangement_recurrence (mulF addF : α → α → α) (n_minus_1 dn1 dn2 : α) :
@@ -961,14 +734,6 @@ theorem derangement_recurrence (mulF addF : α → α → α) (n_minus_1 dn1 dn2
 -- ============================================================================
 -- Graph: Trees
 -- ============================================================================
-
-/-- Cayley's formula: number of labeled trees on n vertices = n^(n-2). -/
-theorem cayley_contents (powF : α → α → α) (n n_minus_2 : α) :
-    mul powF (contents n) (contents n_minus_2) = contents (powF n n_minus_2) := rfl
-
-/-- Tree: a connected acyclic graph. Edge count = vertices - 1. -/
-theorem tree_edges (addF : α → α → α) (negF : α → α) (v one : α) :
-    add addF (contents v) (contents (negF one)) = contents (addF v (negF one)) := rfl
 
 -- ============================================================================
 -- Graph: Bipartite
@@ -991,18 +756,12 @@ def bipartiteVal (G : BipartiteGraph α) (pairF : α → α → α) : Val α :=
 /-- Matching size: a valMap. -/
 abbrev matchingSize (matchF : α → α) : Val α → Val α := valMap matchF
 
-theorem matchingSize_contents (matchF : α → α) (g : α) :
-    matchingSize matchF (contents g) = contents (matchF g) := rfl
-
 -- ============================================================================
 -- Graph: Spanning Trees
 -- ============================================================================
 
 /-- Kirchhoff's theorem: number of spanning trees via matrix tree theorem. -/
 abbrev spanTreeCount (detF : α → α) : Val α → Val α := valMap detF
-
-theorem spanTreeCount_contents (detF : α → α) (laplacian : α) :
-    spanTreeCount detF (contents laplacian) = contents (detF laplacian) := rfl
 
 -- ============================================================================
 -- Graph: Flows and Cuts
@@ -1016,19 +775,12 @@ theorem max_flow_min_cut (flow cut : α) (h : flow = cut) :
 -- Lattice Paths
 -- ============================================================================
 
-/-- Lattice path count: paths from (0,0) to (m,n). -/
-theorem lattice_path_contents (pathCountF : α → α → α) (m n : α) :
-    mul pathCountF (contents m) (contents n) = contents (pathCountF m n) := rfl
-
 -- ============================================================================
 -- Multinomial Coefficients
 -- ============================================================================
 
 /-- Multinomial coefficient: n! / (k₁! · k₂! · ... · kₘ!). A valMap. -/
 abbrev multinomial (multiF : α → α) : Val α → Val α := valMap multiF
-
-theorem multinomial_contents (multiF : α → α) (args : α) :
-    multinomial multiF (contents args) = contents (multiF args) := rfl
 
 -- ============================================================================
 -- Möbius Function
@@ -1037,10 +789,6 @@ theorem multinomial_contents (multiF : α → α) (args : α) :
 /-- Möbius function on a poset: μ(x,y). -/
 def mobiusVal (mobiusF : α → α → α) (x y : α) : Val α :=
   contents (mobiusF x y)
-
-/-- Möbius inversion: f(x) = Σ g(y)·μ(y,x). Contents arithmetic. -/
-theorem mobius_inversion_step (mulF : α → α → α) (gy myx : α) :
-    mul mulF (contents gy) (contents myx) = contents (mulF gy myx) := rfl
 
 -- ============================================================================
 -- Polynomial Method
@@ -1099,10 +847,5 @@ theorem kruskal_katona_bound (leF : α → α → Prop) (shadow bound : α) (h :
 /-- Lovász Local Lemma: if dependencies are bounded, probability is positive. -/
 theorem lll_positive (ltF : α → α → Prop) (zero prob : α) (h : ltF zero prob) :
     valLT ltF (contents zero) (contents prob) := h
-
-/-- Second moment method: variance bound implies existence. -/
-theorem second_moment_contents (mulF : α → α → α) (invF : α → α) (eX2 eX : α) :
-    mul mulF (contents eX2) (inv invF (contents eX)) =
-    contents (mulF eX2 (invF eX)) := rfl
 
 end Val

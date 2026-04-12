@@ -82,11 +82,6 @@ theorem quotient_mul (proj : α → α) (mulF mulQ : α → α → α)
 -- § Core: Localization — No s ≠ 0 Hypothesis
 -- ============================================================================
 
-/-- a/s = contents(a · s⁻¹). No hypothesis that s ≠ 0. -/
-theorem localization_contents (mulF : α → α → α) (invF : α → α) (a s : α) :
-    mul mulF (contents a) (inv invF (contents s)) =
-    contents (mulF a (invF s)) := rfl
-
 /-- Localization preserves multiplication within contents. -/
 theorem localization_mul (mulF : α → α → α) (invF : α → α) (a b s t : α) :
     mul mulF
@@ -108,11 +103,6 @@ theorem prime_ideal_contents (P : α → Prop) (mulF : α → α → α)
 -- ============================================================================
 -- § Core: Integral Domains — NoZeroDivisors Is Structural
 -- ============================================================================
-
-/-- Contents × contents is always contents. Never origin.
-    NoZeroDivisors as a typeclass is unnecessary — the sort carries the invariant. -/
-theorem no_zero_divisors_structural (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) ≠ origin := by simp
 
 /-- If α has no zero divisors, Val α contents inherit that. -/
 theorem integral_domain_contents (mulF : α → α → α) (zero : α)
@@ -197,13 +187,6 @@ theorem two_sided_right (mulF : α → α → α) (I : α → Prop)
 def fractionalElem (mulF : α → α → α) (invF : α → α) (a s : α) : Val α :=
   mul mulF (contents a) (inv invF (contents s))
 
-theorem fractionalElem_is_contents (mulF : α → α → α) (invF : α → α) (a s : α) :
-    fractionalElem mulF invF a s = contents (mulF a (invF s)) := rfl
-
-theorem fractionalElem_mul (mulF : α → α → α) (invF : α → α) (a b s t : α) :
-    mul mulF (fractionalElem mulF invF a s) (fractionalElem mulF invF b t) =
-    contents (mulF (mulF a (invF s)) (mulF b (invF t))) := rfl
-
 -- ============================================================================
 -- § Ideals: Ideal Quotient and Annihilator
 -- ============================================================================
@@ -280,9 +263,6 @@ theorem locFrac_self (mulF : α → α → α) (invF : α → α) (s : α) :
 def oreFrac (mulF : α → α → α) (invF : α → α) (a s : α) : Val α :=
   mul mulF (contents a) (inv invF (contents s))
 
-theorem oreFrac_is_contents (mulF : α → α → α) (invF : α → α) (a s : α) :
-    oreFrac mulF invF a s = contents (mulF a (invF s)) := rfl
-
 -- ============================================================================
 -- § Localization: Local Rings
 -- ============================================================================
@@ -296,11 +276,6 @@ theorem local_ring_non_unit (M : α → Prop) (isNonUnit : α → Prop)
 /-- The unique maximal ideal excludes origin. -/
 theorem local_ring_maximal_excludes_origin (M : α → Prop) :
     ¬ inIdeal M (origin : Val α) := id
-
-/-- Units: contents(a) * contents(a⁻¹) = contents(a · a⁻¹). -/
-theorem local_ring_unit_inv (mulF : α → α → α) (invF : α → α) (a : α) :
-    mul mulF (contents a) (inv invF (contents a)) =
-    contents (mulF a (invF a)) := rfl
 
 -- ============================================================================
 -- § Localization: Local Properties
@@ -440,10 +415,6 @@ theorem origin_not_in_jacobson (maxIdeals : List (α → Prop)) :
 -- § Structure: UFD — Unique Factorization Domain
 -- ============================================================================
 
-/-- Product of two irreducibles is contents. -/
-theorem irreducible_product_contents (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
-
 -- ============================================================================
 -- § Structure: Simple Rings
 -- ============================================================================
@@ -477,10 +448,6 @@ theorem dedekind_prime_maximal (P : α → Prop) (mulF : α → α → α)
 -- ============================================================================
 -- § Dedekind: Ideal Factorization
 -- ============================================================================
-
-/-- Factored ideal element stays in contents. -/
-theorem factored_in_contents (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
 
 -- ============================================================================
 -- § Dedekind: Discrete Valuation Rings
@@ -602,10 +569,6 @@ theorem witt_contents_component (f : Nat → α) (n : Nat) :
 theorem witt_origin_component (n : Nat) :
     wittComponent n (fun _ => (origin : Val α)) = origin := rfl
 
-/-- Witt addition: componentwise (simplified). -/
-theorem witt_add (addF : α → α → α) (f g : Nat → α) (n : Nat) :
-    add addF (contents (f n)) (contents (g n)) = contents (addF (f n) (g n)) := rfl
-
 -- ============================================================================
 -- § Tensor: Tensor Products — Sort-Level
 -- ============================================================================
@@ -621,10 +584,6 @@ def tensorPair (mulF : α → α → α) (m n : Val α) : Val α :=
 -- ============================================================================
 -- § Tensor: Flat Modules
 -- ============================================================================
-
-/-- Flatness: tensoring with contents preserves contents. -/
-theorem flat_preserves_contents (mulF : α → α → α) (m a : α) :
-    tensorPair mulF (contents m) (contents a) = contents (mulF m a) := rfl
 
 /-- Torsion-free at sort level: if m ⊗ v = origin then v = origin. -/
 theorem torsion_free_sort (mulF : α → α → α) (a : α) (v : Val α)
@@ -782,10 +741,6 @@ theorem leadCoeff_contents_val (a : α) : leadCoeff [contents a] = contents a :=
 -- § Polynomial: Division — The ≠ 0 Dissolution
 -- ============================================================================
 
-/-- Division step: a / b within contents. No leading coeff ≠ 0 guard. -/
-theorem poly_div_step (mulF : α → α → α) (invF : α → α) (a b : α) :
-    mul mulF (contents a) (inv invF (contents b)) = contents (mulF a (invF b)) := rfl
-
 -- ============================================================================
 -- § Polynomial: Multivariate Monomials
 -- ============================================================================
@@ -880,10 +835,6 @@ theorem basicOpen_inter (mulF : α → α → α) (f g : α) (P : α → Prop)
   | inl hPf => exact hf hPf
   | inr hPg => exact hg hPg
 
-/-- Structure sheaf section: a/f on D(f). Always contents. -/
-theorem sheaf_section_contents (mulF : α → α → α) (invF : α → α) (a f : α) :
-    mul mulF (contents a) (inv invF (contents f)) = contents (mulF a (invF f)) := rfl
-
 -- ============================================================================
 -- § Schemes: Ring Homomorphisms
 -- ============================================================================
@@ -916,10 +867,6 @@ theorem unramified_zero_diff (zero : α) (d : α → α)
     (hd : ∀ a, d a = zero) (a : α) :
     (contents (d a) : Val α) = contents zero := by
   rw [hd]
-
-/-- Etale map preserves contents sort. -/
-theorem etale_preserves_contents (f : α → α) (a : α) :
-    ringHom f (contents a) = contents (f a) := rfl
 
 -- ============================================================================
 -- § Schemes: Coalgebra and Bialgebra
@@ -1002,14 +949,6 @@ abbrev gcd (gcdF : α → α → α) : Val α → Val α → Val α := mul gcdF
 /-- LCM as explicit function. Sort-preserving. -/
 abbrev lcm (lcmF : α → α → α) : Val α → Val α → Val α := mul lcmF
 
-/-- GCD of contents stays in contents. -/
-theorem gcd_contents (gcdF : α → α → α) (a b : α) :
-    gcd gcdF (contents a) (contents b) = contents (gcdF a b) := rfl
-
-/-- LCM of contents stays in contents. -/
-theorem lcm_contents (lcmF : α → α → α) (a b : α) :
-    lcm lcmF (contents a) (contents b) = contents (lcmF a b) := rfl
-
 /-- GCD divides both arguments. -/
 theorem gcd_divides_left (mulF gcdF : α → α → α)
     (h : ∀ a b, isDivisible mulF (gcdF a b) a) (a b : α) :
@@ -1063,10 +1002,6 @@ theorem prime_contents_structural (mulF : α → α → α) (p : α) (hp : isPri
 def isIrreducible (mulF : α → α → α) (isUnit : α → Prop) (a : α) : Prop :=
   ∀ b c, a = mulF b c → isUnit b ∨ isUnit c
 
-/-- Irreducible element: product of contents stays contents. -/
-theorem irreducible_product (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
-
 -- ============================================================================
 -- § Number Theory: Fundamental Theorem of Arithmetic
 -- ============================================================================
@@ -1079,10 +1014,6 @@ def isFactorization (mulF : α → α → α) (one : α) (primes : List α) (n :
 theorem factorization_contents (mulF : α → α → α) (one : α) (primes : List α) :
     ∃ r, (primes.foldl mulF one) = r :=
   ⟨_, rfl⟩
-
-/-- Factorization in Val: each prime factor is contents. -/
-theorem factorization_val_contents (mulF : α → α → α) (p q : α) :
-    mul mulF (contents p) (contents q) = contents (mulF p q) := rfl
 
 /-- Uniqueness of factorization: two factorizations of the same element agree. -/
 theorem factorization_unique (mulF : α → α → α) (one : α) (ps qs : List α) (n : α)
@@ -1098,10 +1029,6 @@ theorem factorization_unique (mulF : α → α → α) (one : α) (ps qs : List 
 
 /-- Modular reduction as valMap. Sort-preserving. No n ≠ 0 guard. -/
 abbrev modReduce (modF : α → α) : Val α → Val α := valMap modF
-
-/-- Modular reduction of contents gives contents. -/
-theorem modReduce_contents (modF : α → α) (a : α) :
-    modReduce modF (contents a) = contents (modF a) := rfl
 
 /-- Modular addition: reduce after add. -/
 theorem mod_add (addF : α → α → α) (modF : α → α)
@@ -1165,10 +1092,6 @@ theorem crt_unique (modF : α → α) (x y : α)
 /-- Legendre symbol as explicit function. Sort-preserving. -/
 abbrev legendreSymbol (legF : α → α) : Val α → Val α := valMap legF
 
-/-- Legendre symbol of contents is contents. -/
-theorem legendre_contents (legF : α → α) (a : α) :
-    legendreSymbol legF (contents a) = contents (legF a) := rfl
-
 /-- Quadratic reciprocity: (p/q)(q/p) = (-1)^((p-1)(q-1)/4). -/
 theorem quadratic_reciprocity (mulF : α → α → α) (legPQ legQP sign : α)
     (h : mulF legPQ legQP = sign) :
@@ -1182,10 +1105,6 @@ theorem quadratic_reciprocity (mulF : α → α → α) (legPQ legQP sign : α)
 /-- Euler's totient function. Sort-preserving. -/
 abbrev eulerTotient (phi : α → α) : Val α → Val α := valMap phi
 
-/-- Totient of contents is contents. -/
-theorem totient_contents (phi : α → α) (n : α) :
-    eulerTotient phi (contents n) = contents (phi n) := rfl
-
 /-- Totient is multiplicative for coprime arguments. -/
 theorem totient_multiplicative (mulF : α → α → α) (phi : α → α)
     (h : ∀ a b, phi (mulF a b) = mulF (phi a) (phi b)) (a b : α) :
@@ -1196,16 +1115,8 @@ theorem totient_multiplicative (mulF : α → α → α) (phi : α → α)
 /-- Möbius function. Sort-preserving. -/
 abbrev moebiusMu (mu : α → α) : Val α → Val α := valMap mu
 
-/-- Möbius of contents is contents. -/
-theorem moebius_contents (mu : α → α) (n : α) :
-    moebiusMu mu (contents n) = contents (mu n) := rfl
-
 /-- Divisor sum function σₖ. Sort-preserving. -/
 abbrev divisorSum (sigma : α → α) : Val α → Val α := valMap sigma
-
-/-- Divisor sum of contents is contents. -/
-theorem divisorSum_contents (sigma : α → α) (n : α) :
-    divisorSum sigma (contents n) = contents (sigma n) := rfl
 
 /-- Multiplicativity of arithmetic functions (general). -/
 theorem arithFunc_multiplicative (mulF : α → α → α) (f : α → α)
@@ -1260,10 +1171,6 @@ theorem pell_contents (addF mulF : α → α → α) (negF : α → α) (one : �
 /-- p-adic valuation: vₚ(n) = exponent of p in factorization of n. -/
 abbrev padicVal (vp : α → α) : Val α → Val α := valMap vp
 
-/-- p-adic valuation of contents is contents. -/
-theorem padicVal_contents (vp : α → α) (n : α) :
-    padicVal vp (contents n) = contents (vp n) := rfl
-
 /-- p-adic valuation is additive: vₚ(ab) = vₚ(a) + vₚ(b). -/
 theorem padicVal_mul (mulF addF : α → α → α) (vp : α → α)
     (h : ∀ a b, vp (mulF a b) = addF (vp a) (vp b)) (a b : α) :
@@ -1273,10 +1180,6 @@ theorem padicVal_mul (mulF addF : α → α → α) (vp : α → α)
 
 /-- p-adic absolute value: |n|ₚ = p^(-vₚ(n)). -/
 abbrev padicNorm (normP : α → α) : Val α → Val α := valMap normP
-
-/-- p-adic norm of contents is contents. -/
-theorem padicNorm_contents (normP : α → α) (n : α) :
-    padicNorm normP (contents n) = contents (normP n) := rfl
 
 /-- Ultrametric inequality: |a + b|ₚ ≤ max(|a|ₚ, |b|ₚ). -/
 theorem padic_ultrametric (addF : α → α → α) (normP : α → α) (maxF : α → α → α)
@@ -1372,10 +1275,6 @@ theorem hensel_lift (modF : α → α) (f : α → α) (a lifted : α)
 /-- Cyclotomic polynomial evaluation. Sort-preserving. -/
 abbrev cyclotomicEval (cyc : α → α) : Val α → Val α := valMap cyc
 
-/-- Cyclotomic of contents is contents. -/
-theorem cyclotomic_contents (cyc : α → α) (a : α) :
-    cyclotomicEval cyc (contents a) = contents (cyc a) := rfl
-
 /-- Roots of unity are contents (from cyclotomic root). -/
 theorem cyclotomic_root (cyc : α → α) (modF : α → α) (zero a : α)
     (h : modF (cyc a) = modF zero) :
@@ -1457,14 +1356,6 @@ abbrev jacobiSymbol (jacF : α → α) : Val α → Val α := valMap jacF
 /-- Kronecker symbol as valMap. -/
 abbrev kroneckerSymbol (kroF : α → α) : Val α → Val α := valMap kroF
 
-/-- Jacobi symbol of contents is contents. -/
-theorem jacobi_contents (jacF : α → α) (a : α) :
-    jacobiSymbol jacF (contents a) = contents (jacF a) := rfl
-
-/-- Kronecker symbol of contents is contents. -/
-theorem kronecker_contents (kroF : α → α) (a : α) :
-    kroneckerSymbol kroF (contents a) = contents (kroF a) := rfl
-
 /-- Jacobi multiplicativity: (ab/n) = (a/n)(b/n). -/
 theorem jacobi_multiplicative (mulF : α → α → α) (jacF : α → α)
     (h : ∀ a b, jacF (mulF a b) = mulF (jacF a) (jacF b)) (a b : α) :
@@ -1499,10 +1390,6 @@ theorem gaussSum_norm (normSq : α → α) (p : α)
 /-- Discriminant as valMap. Sort-preserving. -/
 abbrev discriminant (discF : α → α) : Val α → Val α := valMap discF
 
-/-- Discriminant of contents is contents. -/
-theorem discriminant_contents (discF : α → α) (a : α) :
-    discriminant discF (contents a) = contents (discF a) := rfl
-
 /-- Discriminant multiplicativity for towers. -/
 theorem discriminant_tower (mulF : α → α → α) (discF : α → α)
     (powF : α → α → α) (d_base d_ext deg : α)
@@ -1516,14 +1403,6 @@ theorem discriminant_tower (mulF : α → α → α) (discF : α → α)
 
 /-- Class number: size of the ideal class group. -/
 def classNumber (clsF : α → α) : Val α → Val α := valMap clsF
-
-/-- Class number of contents is contents. -/
-theorem classNumber_contents (clsF : α → α) (n : α) :
-    classNumber clsF (contents n) = contents (clsF n) := rfl
-
-/-- Two ideals in the same class: I · J⁻¹ is principal. -/
-theorem sameClass_principal (mulF : α → α → α) (invF : α → α) (I J : α) :
-    mul mulF (contents I) (inv invF (contents J)) = contents (mulF I (invF J)) := rfl
 
 -- ============================================================================
 -- § Number Theory: Minkowski Bound

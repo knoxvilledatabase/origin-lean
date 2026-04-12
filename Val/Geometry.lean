@@ -48,20 +48,9 @@ theorem spec_point_excludes_container (p : SpecPoint α) (c : α) :
 -- Affine Schemes
 -- ============================================================================
 
-/-- Ring operations on global sections stay in contents. -/
-theorem global_sections_mul (mulF : α → α → α) (r s : α) :
-    mul mulF (contents r) (contents s) = contents (mulF r s) := rfl
-
-theorem global_sections_add (addF : α → α → α) (r s : α) :
-    add addF (contents r) (contents s) = contents (addF r s) := rfl
-
 -- ============================================================================
 -- Scheme Morphisms
 -- ============================================================================
-
-/-- Scheme morphisms send contents to contents via valMap. -/
-theorem scheme_morphism_contents (f : α → α) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
 
 /-- Composition of scheme morphisms. -/
 theorem scheme_morphism_comp (f g : α → α) :
@@ -87,17 +76,9 @@ theorem local_ring_add (mulF addF : α → α → α) (invF : α → α) (a b s 
 -- Stalks
 -- ============================================================================
 
-/-- Stalk operations: multiplication stays in contents. -/
-theorem stalk_mul (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
-
 -- ============================================================================
 -- Residue Field
 -- ============================================================================
-
-/-- Residue field element: quotient map sends contents to contents. -/
-theorem residue_field_contents (proj : α → α) (a : α) :
-    quotientMap proj (contents a) = contents (proj a) := rfl
 
 -- ============================================================================
 -- Separatedness
@@ -116,14 +97,6 @@ theorem separated_diagonal (a b : α) (h : a ≠ b) :
 -- Tangent Vectors
 -- ============================================================================
 
-/-- Addition of tangent vectors stays in contents. -/
-theorem tangent_add (addF : α → α → α) (v w : α) :
-    add addF (contents v) (contents w) = contents (addF v w) := rfl
-
-/-- Scalar multiplication of tangent vectors stays in contents. -/
-theorem tangent_scalar_mul (mulF : α → α → α) (c v : α) :
-    mul mulF (contents c) (contents v) = contents (mulF c v) := rfl
-
 -- ============================================================================
 -- Derivatives
 -- ============================================================================
@@ -141,10 +114,6 @@ theorem quotient_rule_contents (mulF addF : α → α → α) (invF negF : α �
 -- ============================================================================
 -- Smooth Maps
 -- ============================================================================
-
-/-- Smooth maps preserve sort via valMap. -/
-theorem smooth_map_contents (f : α → α) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
 
 /-- Composition of smooth maps preserves sort. -/
 theorem smooth_comp (f g : α → α) :
@@ -174,14 +143,6 @@ theorem transition_map_contents (φ ψ : Chart α) (a : α) :
 -- Vector Fields
 -- ============================================================================
 
-/-- Addition of vector fields: pointwise, stays in contents. -/
-theorem vectorField_add (addF : α → α → α) (X Y : α → α) (p : α) :
-    add addF (contents (X p)) (contents (Y p)) = contents (addF (X p) (Y p)) := rfl
-
-/-- Lie bracket: [X, Y](f) = X(Y(f)) - Y(X(f)). Both terms contents. -/
-theorem lie_bracket_contents (addF : α → α → α) (negF : α → α) (XYf YXf : α) :
-    add addF (contents XYf) (contents (negF YXf)) = contents (addF XYf (negF YXf)) := rfl
-
 -- ============================================================================
 -- Connections
 -- ============================================================================
@@ -190,14 +151,6 @@ theorem lie_bracket_contents (addF : α → α → α) (negF : α → α) (XYf Y
 -- ============================================================================
 -- Differential Forms
 -- ============================================================================
-
-/-- Wedge product of forms: contents × contents = contents. -/
-theorem wedge_product_contents (mulF : α → α → α) (ω₁ ω₂ : α) :
-    mul mulF (contents ω₁) (contents ω₂) = contents (mulF ω₁ ω₂) := rfl
-
-/-- Exterior derivative: d(ω) is contents when ω is contents. -/
-theorem exterior_derivative_contents (dω : α → α) (a : α) :
-    valMap dω (contents a) = contents (dω a) := rfl
 
 /-- Stokes' theorem: ∫_M dω = ∫_∂M ω. Both sides contents. -/
 theorem stokes_contents (lhs rhs : α) (h : lhs = rhs) :

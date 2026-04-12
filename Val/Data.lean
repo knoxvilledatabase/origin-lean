@@ -66,14 +66,6 @@ abbrev natDiv (divF : α → α → α) : Val α → Val α → Val α := mul di
 theorem natDiv_origin_right (divF : α → α → α) (n : Val α) :
     natDiv divF n origin = origin := by simp [natDiv]
 
-/-- Division within contents stays in contents. -/
-theorem natDiv_contents (divF : α → α → α) (a b : α) :
-    natDiv divF (contents a) (contents b) = contents (divF a b) := rfl
-
-/-- Division within contents never produces origin. -/
-theorem natDiv_contents_ne_origin (divF : α → α → α) (a b : α) :
-    natDiv divF (contents a) (contents b) ≠ origin := by simp [natDiv]
-
 -- ============================================================================
 -- Modulo: Same Dissolution
 -- ============================================================================
@@ -82,9 +74,6 @@ abbrev natMod (modF : α → α → α) : Val α → Val α → Val α := mul mo
 
 theorem natMod_origin_right (modF : α → α → α) (n : Val α) :
     natMod modF n origin = origin := by simp [natMod]
-
-theorem natMod_contents (modF : α → α → α) (a b : α) :
-    natMod modF (contents a) (contents b) = contents (modF a b) := rfl
 
 -- ============================================================================
 -- Factorial / Fibonacci
@@ -201,9 +190,6 @@ abbrev intMod (modF : α → α → α) : Val α → Val α → Val α := mul mo
 theorem intDiv_origin_right (divF : α → α → α) (n : Val α) :
     intDiv divF n origin = origin := by simp [intDiv]
 
-theorem intDiv_contents_ne_origin (divF : α → α → α) (a b : α) :
-    intDiv divF (contents a) (contents b) ≠ origin := by simp [intDiv]
-
 -- ============================================================================
 -- Integer arithmetic laws
 -- ============================================================================
@@ -305,9 +291,6 @@ def valCons (a : α) : Val (List α) → Val (List α)
 
 abbrev valAppend : Val (List α) → Val (List α) → Val (List α) :=
   mul (· ++ ·)
-
-theorem valAppend_contents (xs ys : List α) :
-    valAppend (contents xs) (contents ys) = contents (xs ++ ys) := rfl
 
 -- ============================================================================
 -- Length

@@ -249,11 +249,6 @@ theorem tensorBraid_involution (x : Val (α × β)) :
 -- valContramap is structurally identical to valMap. Reuse it.
 def valContramap (f : α → β) : Val α → Val β := valMap f
 
-theorem valContramap_id : valContramap (id : α → α) = (id : Val α → Val α) := valMap_id
-
-theorem valContramap_comp (f : α → β) (g : β → γ) :
-    valContramap (g ∘ f) = valContramap g ∘ valContramap f := valMap_comp f g
-
 -- ============================================================================
 -- Bifunctor
 -- ============================================================================
@@ -371,10 +366,6 @@ theorem equalizer_agreement (f g : α → β) (a : α) (h : f a = g a) :
 -- Coequalizer
 -- ============================================================================
 
-/-- Coequalizer in Val α: the quotient map sends contents to contents. -/
-theorem coequalizer_contents (proj : β → γ) (b : β) :
-    valMap proj (contents b) = contents (proj b) := rfl
-
 -- ============================================================================
 -- Pullback
 -- ============================================================================
@@ -460,10 +451,6 @@ theorem forgetful_on_contents (a : α) :
 
 theorem forgetful_on_origin :
     project (origin : Val α) = none := rfl
-
-/-- The free functor preserves composition. -/
-theorem free_preserves_comp (f : α → β) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
 
 -- ============================================================================
 -- Galois Connection
@@ -706,10 +693,6 @@ theorem short_exact_surjective (g : β → γ) (c : γ) (hg : ∃ b, g b = c) :
 theorem zero_sequence_kernel :
     ∀ y : Val β, valKernel (fun _ : Val β => (origin : Val γ)) y := fun _ => rfl
 
-/-- Snake lemma: the connecting morphism maps contents to contents. -/
-theorem snake_contents (δ_map : α → β) (a : α) :
-    valMap δ_map (contents a) = contents (δ_map a) := rfl
-
 -- ============================================================================
 -- § Linear: Additive/Linear Categories, Exact/Derived Functors
 -- ============================================================================
@@ -791,14 +774,6 @@ theorem exact_functor_image (f : α → β) (b : β) (hf : ∃ a, f a = b) :
 -- ============================================================================
 -- Derived Functor (Sort-Level)
 -- ============================================================================
-
-/-- Derived functors: contents maps to contents. -/
-theorem derived_functor_contents (F : α → β) (a : α) :
-    valMap F (contents a) = contents (F a) := rfl
-
-/-- Derived functors: origin maps to origin. -/
-theorem derived_functor_origin (F : α → β) :
-    valMap F (origin : Val α) = (origin : Val β) := rfl
 
 -- ============================================================================
 -- § Enriched: Val-Enriched Categories, 2-Categories
@@ -983,13 +958,6 @@ theorem enriched_functor_hom (rel : α → α → Bool) (f : α → β) (relB : 
 /-- A presheaf on Val α: a contravariant functor, i.e. valMap on restriction maps. -/
 abbrev presheafMap (f : α → β) : Val α → Val β := valMap f
 
-/-- Presheaf functoriality: identity. -/
-theorem presheafMap_id : presheafMap (id : α → α) = (id : Val α → Val α) := valMap_id
-
-/-- Presheaf functoriality: composition. -/
-theorem presheafMap_comp (f : α → β) (g : β → γ) :
-    presheafMap (g ∘ f) = presheafMap g ∘ presheafMap f := valMap_comp f g
-
 -- ============================================================================
 -- Sheaf Condition
 -- ============================================================================
@@ -1058,14 +1026,6 @@ def isCondensedMod (restrict : β → α) (addB : β → β → β) (addA : α �
 -- ============================================================================
 -- Free Condensed Module (Yoneda Embedding)
 -- ============================================================================
-
-/-- The Yoneda embedding: compact Hausdorff → condensed set is valMap. -/
-theorem yoneda_embedding_contents (f : α → β) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
-
-/-- The Yoneda embedding preserves origin. -/
-theorem yoneda_embedding_origin (f : α → β) :
-    valMap f (origin : Val α) = (origin : Val β) := rfl
 
 -- ============================================================================
 -- § Model Theory: First-Order Languages, Structures, Definability

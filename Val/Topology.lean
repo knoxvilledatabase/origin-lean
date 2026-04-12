@@ -460,13 +460,6 @@ def uniformCont (dist : α → α → α) (ltF : α → α → Prop) (zero : α)
   ∀ ε, ltF zero ε → ∃ δ, ltF zero δ ∧
     ∀ x y, ltF (dist x y) δ → ltF (dist (f x) (f y)) ε
 
-/-- Uniformly continuous maps lift to Val α: contents in, contents out. -/
-theorem uniform_continuous_val (f : α → α) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
-
-/-- Composition of uniformly continuous maps preserves contents. -/
-theorem uniform_continuous_comp (f g : α → α) (a : α) :
-    valMap (f ∘ g) (contents a) = contents (f (g a)) := rfl
 
 -- ============================================================================
 -- Completion
@@ -584,13 +577,6 @@ def isLipschitz (dist : α → α → α) (leF : α → α → Prop) (mulF : α 
     (K : α) (f : α → α) : Prop :=
   ∀ x y, leF (dist (f x) (f y)) (mulF K (dist x y))
 
-/-- Lipschitz maps preserve contents: f applied to contents gives contents. -/
-theorem lipschitz_preserves_contents (f : α → α) (a : α) :
-    valMap f (contents a) = contents (f a) := rfl
-
-/-- Composition of Lipschitz maps: sort-preserving. -/
-theorem lipschitz_comp_contents (f g : α → α) (a : α) :
-    valMap (f ∘ g) (contents a) = contents (f (g a)) := rfl
 
 -- ============================================================================
 -- Dense Sets
@@ -692,13 +678,6 @@ def isContractible (pt : α) (H : Nat → α → α) : Prop :=
 -- Covering Spaces (Sort-Level)
 -- ============================================================================
 
-/-- A covering map: a sort-preserving surjection. Lifts through valMap. -/
-theorem covering_preserves_contents (p : α → α) (a : α) :
-    valMap p (contents a) = contents (p a) := rfl
-
-/-- Covering maps send origin to origin. -/
-theorem covering_preserves_origin (p : α → α) :
-    valMap p (origin : Val α) = (origin : Val α) := rfl
 
 -- ============================================================================
 -- SECTION 9: Sheaf — Presheaves, Stalks (uses Category content)
@@ -951,9 +930,6 @@ def isSeparated (T : α → α) (dist : α → α → α) (ltF : α → α → P
 /-- A flow step: mul encodes composition of time evolution. -/
 abbrev flowStep (mulF : α → α → α) (v : α) (x : α) : α := mulF v x
 
-/-- Flow preserves contents sort. -/
-theorem flow_contents (mulF : α → α → α) (v a : α) :
-    mul mulF (contents v) (contents a) = contents (mulF v a) := rfl
 
 -- ============================================================================
 -- THE RESULT

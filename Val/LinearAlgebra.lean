@@ -179,28 +179,6 @@ def moduleElement (v : α) : Val α := contents v
 -- Module Operations
 -- ============================================================================
 
-/-- Module addition: contents + contents = contents. -/
-theorem module_add (addF : α → α → α) (v w : α) :
-    add addF (contents v) (contents w) = contents (addF v w) := rfl
-
-/-- Scalar multiplication: contents · contents = contents. -/
-theorem module_smul (f : α → α → α) (c v : α) :
-    smul f (contents c) (contents v) = contents (f c v) := rfl
-
-/-- Module negation: -contents = contents. -/
-theorem module_neg (negF : α → α) (v : α) :
-    neg negF (contents v) = contents (negF v) := rfl
-
--- ============================================================================
--- Submodule
--- ============================================================================
-
-/-- Submodule addition stays in contents. -/
-theorem submodule_add_contents (addF : α → α → α) (S : α → Prop)
-    (_ : ∀ a b, S a → S b → S (addF a b))
-    (v w : α) (_ : S v) (_ : S w) :
-    add addF (contents v) (contents w) = contents (addF v w) := rfl
-
 -- ============================================================================
 -- Quotient Module
 -- ============================================================================
@@ -229,10 +207,6 @@ theorem direct_sum_proj2 (v w : α) :
 -- ============================================================================
 -- Module Homomorphism
 -- ============================================================================
-
-/-- A module homomorphism: a sort-preserving map. -/
-theorem module_hom_contents (f : α → α) (v : α) :
-    valMap f (contents v) = contents (f v) := rfl
 
 /-- Module homomorphisms preserve origin. -/
 theorem module_hom_origin (f : α → α) :
@@ -284,20 +258,6 @@ theorem rank_plus_nullity (addF : α → α → α) (rank nullity dim : α)
 -- Dual Space
 -- ============================================================================
 
-/-- A linear functional: a map V → α. In Val α, the result is contents. -/
-theorem linear_functional_contents (f : α → α) (v : α) :
-    valMap f (contents v) = contents (f v) := rfl
-
--- ============================================================================
--- Annihilator
--- ============================================================================
-
-/-- The annihilator: functionals that vanish on a subspace.
-    In Val α, annihilator elements are contents. -/
-theorem annihilator_contents [Zero α] (f : α → α) (v : α) (h : f v = 0) :
-    valMap f (contents v) = contents (0 : α) := by
-  show contents (f v) = contents 0; rw [h]
-
 -- ============================================================================
 -- Section 5: Matrix Theory (Deep)
 -- ============================================================================
@@ -320,12 +280,6 @@ def matRank (rankF : (Fin n → Fin n → α) → α) (A : Fin n → Fin n → �
 -- ============================================================================
 -- Rank-Nullity Theorem (Sort-Level)
 -- ============================================================================
-
-/-- Rank + nullity = n. Both are contents values. -/
-theorem rank_nullity (addF : α → α → α) (rank nullity n_val : α)
-    (h : addF rank nullity = n_val) :
-    add addF (contents rank) (contents nullity) = contents n_val := by
-  show contents (addF rank nullity) = contents n_val; rw [h]
 
 -- ============================================================================
 -- Determinant Properties (Sort-Level)
@@ -395,10 +349,6 @@ theorem projective_retraction (p : α → α) (s : α → α) (h : isProjective 
     valMap s (valMap p (contents a)) = contents a := by
   show contents (s (p a)) = contents a; rw [h]
 
-/-- Projective modules: embedding preserves contents. -/
-theorem projective_embedding (p : α → α) (a : α) :
-    valMap p (contents a) = contents (p a) := rfl
-
 -- ============================================================================
 -- Lifting Property
 -- ============================================================================
@@ -412,10 +362,6 @@ theorem projective_lift (f : α → α) (g : α → α) (lift : α → α)
 -- ============================================================================
 -- Flat Module (Sort-Level)
 -- ============================================================================
-
-/-- Flatness: multiplication of contents is contents. -/
-theorem flat_mul (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
 
 -- ============================================================================
 -- Section 7: Tensor Products, Exterior Algebra, Clifford Algebra
@@ -435,15 +381,6 @@ variable {β : Type u}
 
 /-- Tensor product of two Val values: contents ⊗ contents = contents. -/
 abbrev valTensor : Val α → Val β → Val (α × β) := valPair
-
-/-- Tensor with origin gives origin (left). -/
-theorem tensor_origin_left (y : Val β) :
-    valTensor (origin : Val α) y = (origin : Val (α × β)) := by cases y <;> rfl
-
-/-- Tensor with origin gives origin (right). -/
-theorem tensor_origin_right (x : Val α) :
-    valTensor x (origin : Val β) = (origin : Val (α × β)) := by
-  cases x with | origin => rfl | container _ => rfl | contents _ => rfl
 
 -- ============================================================================
 -- Exterior Product (Wedge Product)
@@ -471,10 +408,6 @@ theorem clifford_contents (addF mulF : α → α → α) (B : α → α → α) 
 -- ============================================================================
 -- Tensor Algebra
 -- ============================================================================
-
-/-- Tensor algebra multiplication: concatenation of tensors. Contents × contents = contents. -/
-theorem tensor_algebra_mul (mulF : α → α → α) (a b : α) :
-    mul mulF (contents a) (contents b) = contents (mulF a b) := rfl
 
 -- ============================================================================
 -- THE RESULT

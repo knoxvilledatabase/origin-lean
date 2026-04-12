@@ -84,11 +84,6 @@ theorem radon_nikodym_contents (mulF : α → α → α) (invF : α → α)
 -- § Core: Integration Within Contents
 -- ============================================================================
 
-/-- Simple integral step: value × measure = contents. -/
-theorem simple_integral_step (mulF : α → α → α) (value measure_val : α) :
-    mul mulF (contents value) (contents measure_val) =
-    contents (mulF value measure_val) := rfl
-
 /-- Integration accumulation stays in contents at every step. -/
 theorem integral_accumulate (addF mulF : α → α → α)
     (running value measure_val : α) :
@@ -127,10 +122,6 @@ theorem integral_origin_absorbs (mulF : α → α → α) (a : α) :
 
 variable {T : Type u}
 
-/-- Product measure: μ × ν. On contents measures, gives contents. -/
-theorem product_measure (mulF : α → α → α) (μ_val ν_val : α) :
-    mul mulF (contents μ_val) (contents ν_val) = contents (mulF μ_val ν_val) := rfl
-
 -- ============================================================================
 -- § Construct: Pushforward Measure
 -- ============================================================================
@@ -139,11 +130,6 @@ theorem product_measure (mulF : α → α → α) (μ_val ν_val : α) :
     In Val α: pushforward of contents measure is contents. -/
 def pushforwardMeasure (f : S → T) (μ : S → Val α) (preimage : T → S) : T → Val α :=
   fun t => μ (preimage t)
-
-/-- Pushforward preserves contents. -/
-theorem pushforward_contents (f : S → T) (μ : S → Val α) (preimage : T → S) (t : T)
-    (h : ∃ r, μ (preimage t) = contents r) :
-    ∃ r, pushforwardMeasure f μ preimage t = contents r := h
 
 -- ============================================================================
 -- § Construct: Fubini-Tonelli
@@ -168,30 +154,13 @@ theorem fubini_deep (mulF : α → α → α)
 -- § Construct: Image Measure
 -- ============================================================================
 
-/-- Image measure: μ ∘ f⁻¹. The image of a contents measure is contents. -/
-theorem image_measure_contents (mulF : α → α → α) (μ_val jacobian : α) :
-    mul mulF (contents μ_val) (contents jacobian) = contents (mulF μ_val jacobian) := rfl
-
 -- ============================================================================
 -- § Decomposition: Lebesgue Decomposition
 -- ============================================================================
 
-/-- Lebesgue decomposition: μ = μ_ac + μ_s where μ_ac ≪ ν and μ_s ⊥ ν.
-    Both parts are contents-valued measures. -/
-theorem lebesgue_decomposition_contents (addF : α → α → α) (μ_ac μ_s : α) :
-    add addF (contents μ_ac) (contents μ_s) = contents (addF μ_ac μ_s) := rfl
-
 -- ============================================================================
 -- § Decomposition: Radon-Nikodym Derivative (Deep)
 -- ============================================================================
-
-/-- The Radon-Nikodym derivative dμ/dν: μ(A) = ∫_A (dμ/dν) dν. -/
-theorem radon_nikodym_density (mulF : α → α → α) (density ν_val : α) :
-    mul mulF (contents density) (contents ν_val) = contents (mulF density ν_val) := rfl
-
-/-- Chain rule: d(μ ∘ g)/dν = (dμ/dν) · |g'|. Contents throughout. -/
-theorem radon_nikodym_chain (mulF : α → α → α) (dμdν g_prime : α) :
-    mul mulF (contents dμdν) (contents g_prime) = contents (mulF dμdν g_prime) := rfl
 
 /-- Radon-Nikodym uniqueness: two equal densities give equal contents. -/
 theorem radon_nikodym_unique (f g : α) (h : f = g) :
@@ -227,10 +196,6 @@ theorem cond_exp_linear (addF mulF : α → α → α) (a b eXF eYF : α) :
 -- ============================================================================
 -- § Decomposition: Disintegration
 -- ============================================================================
-
-/-- Disintegration: μ = ∫ μ_x dν(x). Each conditional measure μ_x is contents. -/
-theorem disintegration_contents (mulF : α → α → α) (μ_x ν_val : α) :
-    mul mulF (contents μ_x) (contents ν_val) = contents (mulF μ_x ν_val) := rfl
 
 -- ============================================================================
 -- § Decomposition: Density Functions
@@ -271,10 +236,6 @@ theorem simple_func_contents (vals : List α) (assign : S → Fin vals.length) (
 -- § Function: Integral of Simple Functions
 -- ============================================================================
 
-/-- Integral of a simple function: Σ cᵢ · μ(Aᵢ). Each term is contents. -/
-theorem simple_integral_contents (mulF : α → α → α) (c μ : α) :
-    mul mulF (contents c) (contents μ) = contents (mulF c μ) := rfl
-
 -- ============================================================================
 -- § Function: Indicator Functions
 -- ============================================================================
@@ -309,10 +270,6 @@ theorem integral_linear (addF mulF : α → α → α) (a b intF intG : α) :
 -- § Integral: Bochner Integral
 -- ============================================================================
 
-/-- Bochner integral: integral of vector-valued functions. The integral is contents. -/
-theorem bochner_integral_contents (mulF : α → α → α) (f_val μ_val : α) :
-    mul mulF (contents f_val) (contents μ_val) = contents (mulF f_val μ_val) := rfl
-
 -- ============================================================================
 -- § Integral: Change of Variables
 -- ============================================================================
@@ -336,10 +293,6 @@ theorem minkowski_sort (addF : α → α → α) (leF : α → α → Prop)
 -- ============================================================================
 -- § Integral: Convergence Theorems (Sort-Level Summary)
 -- ============================================================================
-
-/-- Fatou's lemma (sort): lim inf of contents integrals is contents. -/
-theorem fatou_sort (mulF : α → α → α) (fn_val μ_val : α) :
-    mul mulF (contents fn_val) (contents μ_val) = contents (mulF fn_val μ_val) := rfl
 
 -- ============================================================================
 -- § Measure: Outer Measure
@@ -374,27 +327,13 @@ theorem monotone_contents (leF : α → α → Prop) (μA μB : α) (h : leF μA
 -- § Measure: Jordan Decomposition
 -- ============================================================================
 
-/-- Jordan decomposition: μ = μ⁺ - μ⁻ where μ⁺, μ⁻ are positive measures.
-    In Val α: both are contents. -/
-theorem jordan_contents (addF negF : α → α) (addG : α → α → α) (μ_pos μ_neg : α) :
-    add addG (contents μ_pos) (contents (negF μ_neg)) =
-    contents (addG μ_pos (negF μ_neg)) := rfl
-
 -- ============================================================================
 -- § Measure: Signed Measure
 -- ============================================================================
 
-/-- Total variation of a signed measure: |μ| = μ⁺ + μ⁻. Contents. -/
-theorem total_variation_contents (addF : α → α → α) (μ_pos μ_neg : α) :
-    add addF (contents μ_pos) (contents μ_neg) = contents (addF μ_pos μ_neg) := rfl
-
 -- ============================================================================
 -- § Measure: Caratheodory Construction
 -- ============================================================================
-
-/-- Caratheodory measurability: additive splitting. Both sides are contents. -/
-theorem caratheodory_contents (addF : α → α → α) (μTA μTAc : α) :
-    add addF (contents μTA) (contents μTAc) = contents (addF μTA μTAc) := rfl
 
 -- ============================================================================
 -- § Specific: Dirac Measure
@@ -457,13 +396,5 @@ theorem lebesgue_translation (subF addF : α → α → α) (a b c : α)
     (h : subF (addF b c) (addF a c) = subF b a) :
     (contents (subF (addF b c) (addF a c)) : Val α) = contents (subF b a) := by
   show contents (subF (addF b c) (addF a c)) = contents (subF b a); rw [h]
-
--- ============================================================================
--- § Specific: Gaussian Measure
--- ============================================================================
-
-/-- Gaussian integral: ∫ exp(-x²/2) dx = √(2π). Contents. -/
-theorem gaussian_integral (mulF : α → α → α) (density μ_val : α) :
-    mul mulF (contents density) (contents μ_val) = contents (mulF density μ_val) := rfl
 
 end Val
