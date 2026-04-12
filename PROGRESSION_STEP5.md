@@ -104,98 +104,141 @@ The 97 patches in the original-arithmetic README are the same boundary check wri
 
 origin-lean writes it once: `origin`. Three constructors. Four rules. The DRY principle applied to the AI water consumption problem.
 
-## The Stair Steps
+## The Convergence Hypothesis
 
-### Priority order: AI inference impact
+Every cycle of write → audit → strengthen base → measure has contracted the codebase:
 
-Not all 56,815 B3 theorems contribute equally to AI performance. The domains most used in AI inference are:
+| Cycle | Action | Before | After | Contraction |
+|---|---|---|---|---|
+| 1 | Deduplication | 10,615 | 8,683 | 18% |
+| 2 | Consolidation | 8,683 | 7,476 | 14% |
+| 3 | Add stairs + audit | 10,885 | 9,931 | 9% |
+| 4 | Base strengthening | 9,931 | 10,050 | (base grew, domains will shrink) |
 
-1. **Analysis** (8,057 B3) — neural network math, optimization, convergence
-2. **Algebra** (9,152 B3) — symbolic reasoning, algebraic manipulation
-3. **Data** (4,222 B3) — data structures, lists, sets, natural numbers
-4. **Topology + Order** (8,011 B3) — continuity, lattice theory, convergence
-5. **LinearAlgebra** (~2,888 B3) — matrix operations, eigenvalues, linear systems
-6. **MeasureTheory + Probability** (4,077 B3) — probabilistic reasoning, integration
-7. **RingTheory** (~3,304 B3) — polynomial arithmetic, ideal theory
-8. **CategoryTheory** (~3,087 B3) — compositional reasoning, functorial patterns
-9. **NumberTheory** (3,117 B3) — modular arithmetic, primality
-10. **Combinatorics** (2,749 B3) — graph theory, counting
-11. **Geometry + AlgebraicGeometry** (3,496 B3) — geometric reasoning
-12. **FieldTheory** (970 B3) — field extensions, Galois theory
-13. **GroupTheory** (1,199 B3) — symmetry, permutations
-14. **Computability** (649 B3) — decidability, recursion
-15. **AlgebraicTopology** (~443 B3) — homological algebra
-16. **SetTheory** (416 B3) — ordinals, cardinals
-17. **RepresentationTheory** (399 B3) — group representations
-18. **ModelTheory** (282 B3) — first-order logic, structures
-19. **Dynamics** (203 B3) — ergodic theory, flows
-20. **Condensed** (54 B3) — condensed mathematics
-21. **InformationTheory** (41 B3) — entropy, divergence
+The pattern: the base gets stronger, the domains get thinner, the next domain is cheaper. This compounds.
 
-### The execution cycle
+If the lines-per-B3-theorem decreases with each stair because the base absorbs more patterns:
 
-For each domain, in priority order:
+| Lines/theorem | Total B3 lines | + Foundation | Grand total | Reduction |
+|---|---|---|---|---|
+| 2.5 (current estimate) | 142,038 | 10,050 | 152,088 | 93.0% |
+| 2.0 (after 5 stairs) | 113,630 | 10,050 | 123,680 | 94.3% |
+| 1.5 (after 10 stairs) | 85,223 | 10,050 | 95,273 | 95.6% |
+| 1.0 (convergence limit?) | 56,815 | 10,050 | 66,865 | 96.9% |
 
-**1. Strengthen the base**
-- Scan the domain's B3 theorems for patterns that repeat 5+ times
-- If a pattern appears across multiple domains, add it to Foundation or Algebra
-- Build and audit
+And if B3 theorems reclassify to B1 as the base strengthens (we've already seen ~1,160 reclassify from one scan):
 
-**2. Write the B3 theorems**
-- For each B3 theorem from the exhaustive mapping:
-  - Translate to Val-style (explicit parameters, no typeclasses)
-  - Prove: `by simp`, one-liner calling base, or short proof
-  - Add as a section in the appropriate file
-- No new files. Sections in existing files.
-- No duplication. Every theorem checked against the base.
+| B3 remaining | Lines/thm | Total lines | Reduction |
+|---|---|---|---|
+| 56,815 (current) | 2.5 | 152,088 | 93.0% |
+| 50,000 (after reclassification) | 2.0 | 110,050 | 94.9% |
+| 45,000 | 1.5 | 77,550 | 96.4% |
+| 40,000 | 1.2 | 58,050 | 97.3% |
+| 35,000 (aggressive reclassification) | 1.0 | 45,050 | 97.9% |
 
-**3. Audit**
-- `./scripts/audit.sh`
-- If duplicates found, delete them
-- `lake build`
+**The convergence limit may approach 97-98% reduction.** Each stair tells us where the curve levels off.
 
-**4. Measure**
-- Lines added vs B3 theorems covered
-- Average lines per theorem (target: 2.5)
-- Running total toward 56,815
+## The Stair Steps: Smallest First, Measure the Contraction
 
-**5. Next domain**
+The order is smallest B3 count first. Each stair teaches the base something. The base strengthening compounds. By the time we reach the big domains, the base is so strong they collapse.
+
+### The cycle (for every stair)
+
+1. **Strengthen the base** — scan this domain's B3 for patterns that repeat 5+ times across domains. Add to Foundation or Algebra. Build. Audit.
+2. **Write the B3 theorems** — translate each B3 theorem to Val-style. Add as section in existing file. No new files. No duplication.
+3. **Audit** — `./scripts/audit.sh`. Delete anything caught. `lake build`.
+4. **Measure** — record three numbers:
+   - Lines added for this domain
+   - Lines removed (audit + reclassification)
+   - **Net lines per B3 theorem** — the efficiency metric
+5. **Plot** — the net lines/theorem should decrease. The curve predicts the final total.
+
+### The stairs
+
+| Stair | Domain | B3 | Cumulative B3 | Status |
+|---|---|---|---|---|
+| 1 | InformationTheory | 41 | 41 | not started |
+| 2 | Condensed | 54 | 95 | not started |
+| 3 | Dynamics | 203 | 298 | not started |
+| 4 | ModelTheory | 282 | 580 | not started |
+| 5 | RepresentationTheory | 399 | 979 | not started |
+| 6 | SetTheory | 416 | 1,395 | not started |
+| 7 | Computability | 649 | 2,044 | not started |
+| 8 | FieldTheory | 970 | 3,014 | not started |
+| 9 | GroupTheory | 1,199 | 4,213 | not started |
+| 10 | Combinatorics | 2,749 | 6,962 | not started |
+| 11 | NumberTheory | 3,117 | 10,079 | not started |
+| 12 | RingTheory + LinearAlgebra | 6,191 | 16,270 | not started |
+| 13 | CategoryTheory + AlgTop | 3,530 | 19,800 | not started |
+| 14 | Geometry + AlgGeom | 3,496 | 23,296 | not started |
+| 15 | MeasureTheory + Probability | 4,077 | 27,373 | not started |
+| 16 | Data | 4,222 | 31,595 | not started |
+| 17 | Topology + Order | 8,011 | 39,606 | not started |
+| 18 | Analysis | 8,057 | 47,663 | not started |
+| 19 | Algebra | 9,152 | 56,815 | not started |
+
+### The measurement table (filled in as we go)
+
+| Stair | Domain | B3 written | Lines added | Lines removed | Net lines | Lines/thm | Cumulative total |
+|---|---|---|---|---|---|---|---|
+| 1 | InformationTheory | | | | | | |
+| 2 | Condensed | | | | | | |
+| 3 | Dynamics | | | | | | |
+| ... | ... | | | | | | |
+| 19 | Algebra | | | | | | |
+
+The lines/thm column tells the story. If it trends downward, the convergence hypothesis holds. The final total is wherever the curve levels off.
 
 ### Milestone checkpoints
 
-| Milestone | B3 covered | Est. total lines | Domains |
+| Milestone | Stair | B3 covered | When to assess |
 |---|---|---|---|
-| MVP (testable) | ~12,000 | ~40,000 | Analysis + Algebra + Data |
-| Core AI domains | ~25,000 | ~72,000 | + Topology + LinAlg + MeasureTheory |
-| Extended coverage | ~40,000 | ~110,000 | + RingTheory + CategoryTheory + NumberTheory |
-| Complete | 56,815 | ~150,000 | All domains |
+| **Pattern established** | 3 | 298 | Is lines/thm decreasing? If yes, continue. If no, diagnose. |
+| **Convergence visible** | 8 | 3,014 | Plot the curve. Predict the final total. |
+| **Half coverage** | 14 | 23,296 | Prediction should be stable. Is it below 100K? Below 80K? |
+| **MVP for energy testing** | 18 | 47,663 | Analysis + Algebra + most domains. Test the hypothesis. |
+| **Complete** | 19 | 56,815 | The final number. The honest answer. |
 
-The MVP milestone (~12,000 B3 theorems, ~40,000 lines) is enough to test the hypothesis: **train a model on origin-lean's Analysis + Algebra + Data vs Mathlib's equivalent, and measure energy consumption.**
+### Why biggest domains go last
 
-### The deliverable
+Writing Algebra (9,152 B3) first at 2.5 lines/theorem = ~23,000 lines.
+Writing Algebra last at 1.5 lines/theorem = ~14,000 lines.
+Writing Algebra last at 1.0 lines/theorem = ~9,000 lines.
 
-When complete:
-- **~12 files, ~150,000 lines** covering all of mathematics
-- **Zero duplication** (verified by audit script)
-- **Zero `≠ 0` hypotheses** (dissolved by origin/contents)
-- **Zero typeclass infrastructure** (explicit parameters)
-- **Every theorem justified** against the base
-- **67.3% fewer theorems** than Mathlib for the same coverage
-- **93% fewer lines** than Mathlib
-- **Testable hypothesis**: does training on this corpus reduce AI energy consumption?
+That's 14,000 lines saved just by ordering correctly. The base learns from 18 domains before touching Algebra. Every pattern has been absorbed. Every duplication has been caught. The biggest domain gets the strongest base.
 
 ## The Kill Switch
 
-If any domain's B3 theorems require more lines than the Mathlib equivalent, the base is missing something. Step down. Strengthen the base. Step back up.
+If the lines/theorem metric **increases** over three consecutive stairs, the convergence hypothesis is wrong. The base isn't getting stronger. Stop and diagnose.
 
-If the total exceeds 200,000 lines, the 93% prediction is wrong. Update the numbers honestly.
+If the total exceeds 200,000 lines, the prediction is wrong. Update honestly.
 
-If an AI trained on origin-lean performs worse than one trained on Mathlib, the hypothesis is falsified. Report it honestly.
+If the lines/theorem plateaus above 2.0, the final total will be ~120,000-150,000 (93-94% reduction). Still extraordinary. But not 99%.
 
-The numbers say what they say. The honest answer is the only answer.
+If it plateaus below 1.5, the final total will be ~75,000-95,000 (95-96% reduction). Getting close.
 
-## The Principle
+If it keeps dropping below 1.0, the convergence limit might reach 97-98%. The curve tells us. We don't assume. We measure.
 
-Code is a liability, not an asset. Every line you write is a line that costs energy. The behavior the code produces is the asset. The code itself is the heat.
+## The Deliverable
+
+When complete:
+- **~12 files** covering all of mathematics
+- **Zero duplication** (verified by audit script at every stair)
+- **Zero `≠ 0` hypotheses** (dissolved by origin/contents)
+- **Zero typeclass infrastructure** (explicit parameters)
+- **Every theorem justified** against the base
+- **Measured contraction rate** at every stair
+- **Plotted convergence curve** showing the trend
+- **The final number** — the honest answer to "how many lines does it take?"
+
+## The Purpose
+
+This is not about code elegance. This is not about proving mathematicians wrong. This is not about competing with Mathlib.
+
+This is about a dad who wondered why AI drinks so much water.
+
+The 97 patches in the README are 97 branches on silicon. The 26,674 B2 theorems are 26,674 of those branches in mathematics alone. The 90,161 B1 theorems are the plumbing cost of not having the DRY principle at the foundation.
+
+origin-lean is the DRY principle applied to mathematics, built by AI, for AI, so the next generation of models can learn math with less energy, less heat, less water.
 
 Strip until it hurts. Then count the water you saved.
