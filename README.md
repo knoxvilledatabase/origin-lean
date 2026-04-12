@@ -152,19 +152,19 @@ ValClass/
   Field.lean                94  — Level 3: ValField, identity/inverse
   OrderedField.lean         79  — Level 4: ordering
   Module.lean               79  — Level 5: scalar action
-  Algebra.lean             599  — polynomial, homology, Lie, star, GCD
-  Analysis.lean            835  — limits through distributions
-  CategoryTheory.lean    1,073  — limits through simplicial sets
+  Algebra.lean             595  — polynomial, homology, Lie, star, GCD
+  Analysis.lean            832  — limits through distributions
+  CategoryTheory.lean    1,069  — limits through simplicial sets
   Combinatorics.lean     1,349  — graphs, matroids, Ramsey, enumerative
   Data.lean              1,121  — Nat through Complex
   FieldTheory.lean         831  — Galois theory, splitting fields
-  Geometry.lean            328  — manifolds, schemes, elliptic curves
+  Geometry.lean            324  — manifolds, schemes, elliptic curves
   GroupTheory.lean       1,140  — actions, permutations, Sylow
   InformationTheory.lean   283  — Hamming, KL divergence, Kraft
   LinearAlgebra.lean       451  — determinants, eigenvalues, tensor
   MeasureTheory.lean       377  — measures, integration, probability
-  NumberTheory.lean        670  — p-adic, L-series, modular forms
-  RingTheory.lean          486  — ideals, localization, Dedekind
+  NumberTheory.lean        667  — p-adic, L-series, modular forms
+  RingTheory.lean          479  — ideals, localization, Dedekind
   Topology.lean            525  — compactness through order theory
 ```
 
@@ -186,8 +186,8 @@ The same three sorts are consistent across the stack:
 
 ## How this was built
 
-This is a Human-AI collaboration. The human held the concept, identified the architecture, and enforced minimalist extremism — strip until it hurts, then only add back what's necessary. Claude Code built the foundation, exhaustively mapped 173,646 Mathlib theorems, deduplicated three times, consolidated from 79 files to 11 to 29 to 20, tested the class-based architecture on the hardest domain (FieldTheory, 970 theorems, zero typeclass issues), and extended across every mathematical domain. Claude Web stress-tested every design decision. Gemini and Grok tried to pull the kill switch.
+This is a Human-AI collaboration. The human held the architecture and enforced the DRY principle at every level. AI systems built the implementation, exhaustively mapped 173,646 theorems, and stress-tested every design decision through an adversarial loop — each claim challenged, each number verified, each architectural choice tested before commitment.
 
-The journey: standalone (509 theorems) → Mathlib (learned the abstract base model architecture) → standalone again → deduplication (18% removed) → exhaustive mapping (173,646 theorems, 67.3% collapse) → class-based refactor (5 levels, single inheritance) → complete coverage (56,815 genuinely new theorems in 10,781 lines). The full circle is documented in [PROGRESSION.md](PROGRESSION.md) through [PROGRESSION_STEP5.md](PROGRESSION_STEP5.md).
+The journey: standalone (509 theorems) → Mathlib (learned the abstract base model architecture) → standalone again → deduplication (18% removed) → exhaustive mapping (173,646 theorems, 67.3% collapse) → class-based refactor (5 levels, single inheritance) → complete coverage (56,815 genuinely new theorems in 10,756 lines).
 
 This work exists because of the timing. The concept is 2,500 years old. The formal verification tools, the AI that can implement across domains, and the adversarial loop that stress-tests every claim. A project like this was not possible before now.

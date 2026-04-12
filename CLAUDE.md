@@ -8,7 +8,7 @@
 
 A standalone Lean 4 library that restates mathematics through three constructors (origin, container, contents) and five inheritance levels instead of Mathlib's 17 zero-management typeclasses. Zero Mathlib dependency. Builds in under 1 second.
 
-**20 files. 10,781 lines. Every domain in Mathlib. 99.5% reduction.**
+**20 files. 10,756 lines. Every domain in Mathlib. 99.5% reduction.**
 
 ## How to Build
 
