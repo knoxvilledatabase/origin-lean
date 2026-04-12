@@ -620,6 +620,65 @@ The B2 concentration reveals exactly where Val's sort dispatch matters most:
 - **ZMod** (39% B2): every theorem carries `[NeZero n]`
 - **PNat** (30% B2): the entire type exists to avoid zero
 
+## THE COMPLETE MAPPING: ALL OF MATHLIB
+
+173,646 theorems exhaustively mapped across every Mathlib domain.
+
+| Bucket | Count | % |
+|---|---|---|
+| **B1: Structural plumbing** | 90,161 | **51.9%** |
+| **B2: Zero-management** | 26,674 | **15.4%** |
+| **B3: Genuinely new math** | 56,815 | **32.7%** |
+| **Collapse (B1 + B2)** | **116,835** | **67.3%** |
+
+**Two-thirds of all Mathlib theorems are infrastructure.** One-third is irreducible mathematics.
+
+### All domains
+
+| Domain | Theorems | B1 | B2 | B3 | Collapse |
+|---|---|---|---|---|---|
+| Logic | 1,538 | 99.2% | 0.8% | 0% | 100% |
+| SetTheory | 2,501 | 75.8% | 7.6% | 16.6% | 83.4% |
+| Data | 17,901 | 66.5% | 9.9% | 23.6% | 76.4% |
+| Topology+Order | 31,789 | 64.4% | 10.4% | 25.2% | 74.8% |
+| CategoryTheory+AlgTop | 13,091 | 65.9% | 7.1% | 27.0% | 73.0% |
+| RingTheory+LinAlg | 20,485 | 33.0% | 36.8% | 30.2% | 69.8% |
+| Dynamics | 673 | 62.1% | 7.7% | 30.2% | 69.8% |
+| ModelTheory | 883 | 67.9% | 0.1% | 31.9% | 68.1% |
+| GroupTheory | 3,686 | 60.2% | 7.2% | 32.5% | 67.5% |
+| InformationTheory | 118 | 44.9% | 20.3% | 34.7% | 65.3% |
+| MeasureTheory+Prob | 11,455 | 38.3% | 26.1% | 35.6% | 64.4% |
+| Algebra | 24,489 | 48.1% | 14.6% | 37.4% | 62.6% |
+| Analysis | 21,719 | 47.0% | 15.8% | 37.1% | 62.9% |
+| Geometry+AlgGeom | 8,710 | 44.5% | 15.3% | 40.1% | 59.8% |
+| FieldTheory | 2,163 | 43.4% | 11.8% | 44.8% | 55.2% |
+| Combinatorics | 5,311 | 44.8% | 3.4% | 51.8% | 48.2% |
+| RepresentationTheory | 747 | 46.2% | 0.4% | 53.4% | 46.6% |
+| NumberTheory | 5,253 | 25.5% | 15.2% | 59.3% | 40.7% |
+| Computability | 1,060 | 37.4% | 1.4% | 61.2% | 38.8% |
+| Condensed | 74 | 27.0% | 0% | 73.0% | 27.0% |
+
+### What this means for origin-lean
+
+The 56,815 genuinely new theorems (B3) are the irreducible content of mathematics. These need to be stated and proved. But in origin-lean, each B3 theorem is:
+- Stated with explicit parameters (no typeclass overhead)
+- Proved without `≠ 0` hypotheses (origin handles the boundary)
+- Shorter because the simp set handles all sort dispatch
+
+The question "how many lines does it take?" has its answer: **the minimum lines needed to state and prove 56,815 theorems with the strongest possible foundation.** The foundation eliminates 116,835 theorems entirely. The remaining 56,815 are shorter.
+
+### Zero-management hotspots (where Val's sort dispatch matters most)
+
+| Domain | B2 % | Key patterns |
+|---|---|---|
+| RingTheory+LinAlg | 36.8% | NonZeroDivisors, IsUnit, det ≠ 0, IsDomain |
+| MeasureTheory+Prob | 26.1% | ae (almost everywhere), null sets, NeZero measures |
+| InformationTheory | 20.3% | KL divergence singularity, Hamming norm |
+| Analysis | 15.8% | derivative at ≠ 0, power function, L'Hopital |
+| NumberTheory | 15.2% | p-adic valuations, cyclotomic NeZero, ramification |
+| Geometry+AlgGeom | 15.3% | Euclidean angle vectors ≠ 0, elliptic curve coordinates |
+| Algebra | 14.6% | GroupWithZero, polynomial degree, field division |
+
 ## Domain Priority (revised with actuals)
 
 | Domain | Theorems | Predicted collapse | Actual collapse |
