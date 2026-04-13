@@ -6,7 +6,7 @@ A minimal algebraic skeleton of mathematics. Every theorem in Mathlib mapped and
 
 Mathlib is the largest formal mathematics library ever built. 2,160,000 lines. 88,494 theorems. 8,200 files. An extraordinary achievement by a community of rigorous thinkers.
 
-We exhaustively mapped all 173,646 theorems. We found:
+We mapped all 173,646 theorems — 13 domains theorem-by-theorem, 12 by statistical calibration of representative files. We found:
 
 - **90,161 (51.9%)** are structural plumbing — simp lemmas, coercion wrappers, typeclass instances
 - **26,674 (15.4%)** are zero-management — `≠ 0` guards, `NeZero` instances, `WithBot`/`WithTop`
@@ -176,7 +176,7 @@ theorem universal_hom_mul [ValRing α] (f : α → α)
     mul (valMap f (contents a)) (valMap f (contents b)) := by simp [mul, valMap, hf]
 ```
 
-The 6 Mathlib theorems are instances of this one. They were never needed — not compressed, never written.
+At the level of the underlying function, the 6 Mathlib theorems are instances of this one. Mathlib distinguishes them because its bundled morphism types (`MonoidHom`, `RingHom`, `AlgHom`, etc.) are separate structures. Our foundation works with the unbundled function and its preservation proof directly.
 
 The zero-management hotspots:
 
