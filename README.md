@@ -200,7 +200,13 @@ An independent reviewer chose the 5 hardest theorems across all of mathematics a
 | **Gödel incompleteness** (first theorem) | [Godel.lean](Val/Demo/Godel.lean) | 350 | Both directions proved. Gödel numbering = valMap (sort-preserving encoding) | Formal system structure, diagonal lemma |
 | **Mordell-Weil** (finite generation of E(Q)) | [MordellWeil.lean](Val/Demo/MordellWeil.lean) | 570 | Descent argument: weak MW + heights → finite generation | Weak MW (Galois cohomology — years of infrastructure) |
 
-**The honest boundary:** The foundation handles the algebra — inner product laws, eigenvalue equations, group operations, Gödel encoding, elliptic curve arithmetic. It doesn't replace analysis or number theory. Topological arguments (completeness, compactness, convergence), combinatorial arguments (finite set enumeration), and deep arithmetic arguments (Galois cohomology) are carried as hypotheses. The hard parts are still hard. The foundation makes them shorter to state and easier to structure — but it doesn't make them disappear.
+**The honest boundary:** The demos prove the algebraic structure — the relationships between mathematical objects, verified by Lean's kernel. The analytic infrastructure (completeness, compactness, convergence), combinatorial infrastructure (finite set enumeration), and deep arithmetic infrastructure (Galois cohomology) are carried as explicit hypotheses.
+
+These hypotheses are not trivial. They are the load-bearing content that Mathlib's 2.16M lines actually build — `CompleteSpace`, `IsCompact`, `Filter.Tendsto`, `Finset`. The reason Mathlib is large is that it constructs this analytic engine from scratch. Our foundation eliminates the *algebraic* infrastructure (the 67.3% that is plumbing and zero-management). It does not eliminate the *analytic* engine. That remains work to be done.
+
+The demos have zero `sorry` — but hypothesis parameters serve a similar structural role. The difference: a hypothesis says "I need this and I know I need it." A `sorry` says "I'll prove this later." Both defer work. Ours is honest about what's deferred.
+
+**What the foundation makes trivial:** algebraic identities, sort dispatch, ring/field laws, eigenvalue equations, group operations, Gödel encoding, elliptic curve arithmetic. **What remains hard:** completeness, compactness, convergence, finite enumeration, Galois cohomology. The foundation makes the algebra disappear. The analysis remains the next frontier.
 
 `Val/Demo/Compute.lean` shows the foundation working on concrete values: `2+3=5`, `contents(0)≠origin`, ring laws computing on Int, Bool, and String. One instance per type, every theorem follows.
 
