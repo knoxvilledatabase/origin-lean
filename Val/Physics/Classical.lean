@@ -25,7 +25,7 @@ variable {α : Type u}
 -- ============================================================================
 
 -- Dimensional: force = mass × acceleration.
--- Existence: if mass or acceleration is origin, force is origin.
+-- Existence: if mass or acceleration is not in the counting domain, neither is force.
 
 def newtonForce [ValArith α]
     (mass : Val (Quantity Dim.M α))
@@ -33,13 +33,13 @@ def newtonForce [ValArith α]
     Val (Quantity Dim.force α) :=
   mulQ mass accel
 
-/-- Mass at singularity: force is origin. No hypothesis. -/
+/-- Mass not in counting domain: neither is force. No hypothesis. -/
 theorem newton_mass_origin [ValArith α]
     (accel : Val (Quantity Dim.acceleration α)) :
     newtonForce (origin : Val (Quantity Dim.M α)) accel = origin := by
   simp [newtonForce]
 
-/-- Acceleration at singularity: force is origin. No hypothesis. -/
+/-- Acceleration not in counting domain: neither is force. No hypothesis. -/
 theorem newton_accel_origin [ValArith α]
     (mass : Val (Quantity Dim.M α)) :
     newtonForce mass (origin : Val (Quantity Dim.acceleration α)) = origin := by
@@ -124,7 +124,7 @@ def gravPotential [ValArith α]
     Val (Quantity Dim.energy α) :=
   neg (divQ coeff r)
 
-/-- At the singularity: potential is origin. Not infinity. Not undefined. Origin. -/
+/-- Singularity: potential was never in the counting domain. Not infinity. Not undefined. -/
 theorem gravPotential_r_origin [ValArith α]
     (coeff : Val (Quantity Dim.potentialCoeff α)) :
     gravPotential coeff (origin : Val (Quantity Dim.L α)) = origin := by

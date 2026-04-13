@@ -43,7 +43,7 @@ def coulombForce [ValArith α]
     Val (Quantity Dim.force α) :=
   divQ coeff (mulQ r r)
 
-/-- At the singularity (r = origin): force is origin. No h : r ≠ 0. -/
+/-- Singularity: force concept doesn't apply here. No h : r ≠ 0. -/
 theorem coulomb_r_origin [ValArith α]
     (coeff : Val (Quantity Dim.potentialCoeff α)) :
     coulombForce coeff (origin : Val (Quantity Dim.L α)) = origin := by
@@ -151,19 +151,19 @@ def emEnergyDensity [ValArith α]
     Val (Quantity Dim.energyDensity α) :=
   add (electricEnergyDensity eps e) (magneticEnergyDensity invMu b)
 
-/-- E at singularity: electric energy density origin. -/
+/-- E not in counting domain: neither is electric energy density. -/
 theorem eEnergy_e_origin [ValArith α]
     (eps : Val (Quantity Dim.permittivity α)) :
     electricEnergyDensity eps (origin : Val (Quantity Dim.electricField α)) = origin := by
   cases eps <;> simp [electricEnergyDensity, mulQ, liftBin₂]
 
-/-- B at singularity: magnetic energy density origin. -/
+/-- B not in counting domain: neither is magnetic energy density. -/
 theorem bEnergy_b_origin [ValArith α]
     (invMu : Val (Quantity Dim.invPermeability α)) :
     magneticEnergyDensity invMu (origin : Val (Quantity Dim.magneticField α)) = origin := by
   cases invMu <;> simp [magneticEnergyDensity, mulQ, liftBin₂]
 
-/-- E at singularity: total energy density origin (E contribution absorbs). -/
+/-- E not in counting domain: total energy density not in counting domain. -/
 theorem emEnergy_e_origin [ValArith α]
     (eps : Val (Quantity Dim.permittivity α))
     (invMu : Val (Quantity Dim.invPermeability α))
@@ -171,7 +171,7 @@ theorem emEnergy_e_origin [ValArith α]
     emEnergyDensity eps invMu origin b = origin := by
   simp [emEnergyDensity, electricEnergyDensity, eEnergy_e_origin, add]
 
-/-- B at singularity: total energy density origin (B contribution absorbs). -/
+/-- B not in counting domain: total energy density not in counting domain. -/
 theorem emEnergy_b_origin [ValArith α]
     (eps : Val (Quantity Dim.permittivity α))
     (invMu : Val (Quantity Dim.invPermeability α))
@@ -241,7 +241,7 @@ def electricPotential [ValArith α]
     Val (Quantity Dim.energy α) :=
   divQ coeff r
 
-/-- At singularity: potential is origin. -/
+/-- Singularity: potential concept doesn't apply. -/
 theorem potential_r_origin [ValArith α]
     (coeff : Val (Quantity Dim.potentialCoeff α)) :
     electricPotential coeff (origin : Val (Quantity Dim.L α)) = origin := by

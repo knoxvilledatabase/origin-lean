@@ -61,8 +61,8 @@ def metricComponent [ValArith α]
   valMap (fun r₀ => ValArith.addF (ValArith.mulF r₀ r₀)
     (ValArith.negF (ValArith.mulF rs r₀))) r
 
-/-- At the physical singularity: metric is origin. Not infinite. Not undefined.
-    Origin — the quantity doesn't exist. -/
+/-- At the physical singularity, the metric was never in the counting domain.
+    Not infinite. Not undefined. The concept doesn't apply here. -/
 theorem metric_at_singularity [ValArith α] (rs : α) :
     metricComponent rs (origin : Val α) = origin := rfl
 
@@ -99,15 +99,15 @@ def kruskalAtHorizon [ValArith α]
     (kruskalValue : α) : Val α :=
   contents kruskalValue  -- non-degenerate in Kruskal coords
 
-/-- Physical singularity: origin in ALL coordinate systems.
-    No coordinate transformation changes the sort. -/
+/-- Physical singularity: not in the counting domain in ANY coordinate system.
+    No coordinate transformation brings it into the counting domain. -/
 def physicalSingularity [ValArith α] : Val α := origin
 
 /-- The event horizon is contents — NOT origin. It's crossable. -/
 theorem horizon_is_contents [ValArith α] (v : α) :
     schwarzschildAtHorizon v ≠ (origin : Val α) := by simp [schwarzschildAtHorizon]
 
-/-- The singularity is origin. In every coordinate system. -/
+/-- The singularity was never in the counting domain. In any coordinate system. -/
 theorem singularity_is_origin [ValArith α] :
     (physicalSingularity : Val α) = origin := rfl
 
@@ -213,8 +213,8 @@ theorem binary_r2_origin [ValArith α] (k₁ k₂ : α) (r₁ : Val α) :
 -- The quantity at the singularity isn't just undefined — both theories
 -- that might describe it break down.
 --
--- Val: the singularity is origin. Not because we chose it to be.
--- Because the quantity genuinely doesn't exist in any theory we have.
+-- Val: the singularity was never in the counting domain. Not because
+-- we chose it that way. Because no theory we have puts it there.
 --
 -- This is the deepest honest boundary. The other files defer analytic
 -- infrastructure (completeness, convergence). This file defers an

@@ -104,8 +104,8 @@ def runningCoupling [ValArith α]
     (atLandauPole : Bool) (value : α) : Val α :=
   if atLandauPole then origin else contents value
 
-/-- At the Landau pole: coupling is origin. Not infinity — origin.
-    The theory doesn't produce an answer at this energy. -/
+/-- At the Landau pole: the coupling concept doesn't apply. Not infinity —
+    the theory doesn't produce a counting-domain answer at this energy. -/
 theorem coupling_at_landau [ValArith α] (value : α) :
     runningCoupling true value = (origin : Val α) := rfl
 
@@ -130,8 +130,9 @@ theorem perturb_landau [ValArith α] (matrixElement : Val α) :
 -- ============================================================================
 
 -- A loop integral in QFT. Before regularization: the integral diverges.
--- The divergent integral is origin — not a large number, not infinity,
--- origin. The quantity doesn't exist until regularization + renormalization.
+-- The divergent integral was never in the counting domain — not a large
+-- number, not infinity. The quantity doesn't enter counting until
+-- regularization + renormalization.
 
 /-- A loop integral: origin if divergent, contents if regulated. -/
 def loopIntegral [ValArith α]

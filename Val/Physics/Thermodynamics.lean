@@ -98,7 +98,7 @@ def entropyChange [ValArith α]
     Val (Quantity Dim.entropy α) :=
   divQ dQ temp
 
-/-- Entropy at absolute zero boundary: origin. Not zero entropy — no entropy. -/
+/-- Absolute zero: entropy concept doesn't apply. Not zero entropy — no entropy to speak of. -/
 theorem entropy_at_origin [ValArith α]
     (dQ : Val (Quantity Dim.energy α)) :
     entropyChange dQ (origin : Val (Quantity Dim.temperature α)) = origin := by
@@ -293,7 +293,7 @@ def heatCapacity [ValArith α]
     Val (Quantity Dim.entropy α) :=
   divQ dQ dT
 
-/-- At absolute zero boundary: heat capacity origin. -/
+/-- Absolute zero: heat capacity concept doesn't apply. -/
 theorem heatCap_temp_origin [ValArith α]
     (dQ : Val (Quantity Dim.energy α)) :
     heatCapacity dQ (origin : Val (Quantity Dim.temperature α)) = origin := by

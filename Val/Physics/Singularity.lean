@@ -19,7 +19,7 @@ patterns and provides the tools domain files need.
 The key addition: cross-type binary lift. Math operations are
 Val α → Val α → Val α (same type). Physics operations cross types:
 mass × acceleration = force. Different dimensions in, different out.
-The existence boundary (origin absorption) works the same way.
+The ground (origin) works the same way across types.
 -/
 
 namespace Val
@@ -34,7 +34,7 @@ variable {α : Type u}
 -- Math's mul and add: Val α → Val α → Val α (same type in and out).
 -- Physics needs: Val α → Val β → Val γ (different types).
 -- Example: Val (mass) × Val (accel) → Val (force).
--- Origin absorption works identically across types.
+-- When either input is not in the counting domain, neither is the output.
 
 def liftBin₂ {β γ : Type u} (f : α → β → γ) : Val α → Val β → Val γ
   | origin, _                => origin
@@ -79,7 +79,7 @@ theorem add_eq_liftBin₂ [ValArith α] :
 -- ============================================================================
 
 -- Coulomb (kq/r²), gravity (GM/r²), and more.
--- At the singularity (r = origin): absorption. At contents: computes.
+-- When r is not in the counting domain, neither is the result. At contents: computes.
 
 def invSquare [ValArith α] (k : α) (r : Val α) : Val α :=
   valMap (fun r₀ => ValArith.mulF k (ValArith.invF (ValArith.mulF r₀ r₀))) r

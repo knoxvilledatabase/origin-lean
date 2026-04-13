@@ -11,7 +11,8 @@ dissolve physical singularity hypotheses, or does it just rename them?
 
 Coulomb's law: E = kq/r²
 At r = 0: standard physics says "undefined" and carries h : r ≠ 0 everywhere.
-In Val: if r = origin, then E = origin (absorption). No hypothesis needed.
+In Val: when the position is origin, the field concept doesn't apply —
+the question "what is E?" was never a contents question. No hypothesis needed.
 
 The question this file answers: does this dissolution do real work in formal
 proofs about electric fields, or is it cosmetic?
@@ -34,7 +35,8 @@ def coulombField [ValField α] (k q : α) (r : Val α) : Val α :=
   | container r₀ => container (ValArith.mulF k (ValArith.mulF q (ValArith.invF (ValArith.mulF r₀ r₀))))
   | contents r₀ => contents (ValArith.mulF k (ValArith.mulF q (ValArith.invF (ValArith.mulF r₀ r₀))))
 
-/-- At origin: the field is origin. Not infinity. Not undefined. Origin. -/
+/-- When the position is origin, the field was never in the counting domain.
+    Not infinity. Not undefined. The concept doesn't apply here. -/
 theorem coulomb_at_origin [ValField α] (k q : α) :
     coulombField k q origin = (origin : Val α) := rfl
 
@@ -56,7 +58,7 @@ theorem coulomb_contents_ne_origin [ValField α] (k q r₀ : α) :
 
 /-- Superposition: E_total(r) = E₁(r) + E₂(r).
     Standard: requires r ≠ 0 for both fields to be defined.
-    Val: if r = origin, both fields are origin, sum is origin. No guard. -/
+    Val: when r is origin, neither field is in the counting domain. No guard. -/
 theorem superposition [ValField α] (k q₁ q₂ : α) (r : Val α) :
     add (coulombField k q₁ r) (coulombField k q₂ r) =
     match r with
@@ -69,7 +71,7 @@ theorem superposition [ValField α] (k q₁ q₂ : α) (r : Val α) :
         (ValArith.mulF k (ValArith.mulF q₂ (ValArith.invF (ValArith.mulF r₀ r₀))))) := by
   cases r <;> simp [coulombField, add]
 
-/-- Superposition at origin: both fields absorb, sum absorbs. Zero hypotheses. -/
+/-- Superposition when position is origin: neither field in counting domain. Zero hypotheses. -/
 theorem superposition_at_origin [ValField α] (k q₁ q₂ : α) :
     add (coulombField k q₁ origin) (coulombField k q₂ origin) = (origin : Val α) := by
   simp [coulombField, add]
@@ -88,7 +90,7 @@ theorem coulomb_scale [ValField α] (k q c : α) (r : Val α) :
 -- ============================================================================
 
 /-- Potential energy: V(r) = kq/r.
-    Same pattern as Coulomb. Origin at r = 0. -/
+    Same pattern as Coulomb. The potential concept doesn't apply at the source. -/
 def potential [ValField α] (k q : α) (r : Val α) : Val α :=
   match r with
   | origin => origin
@@ -96,8 +98,8 @@ def potential [ValField α] (k q : α) (r : Val α) : Val α :=
   | contents r₀ => contents (ValArith.mulF k (ValArith.mulF q (ValArith.invF r₀)))
 
 /-- Work done moving from r₁ to r₂: W = V(r₁) - V(r₂).
-    If either endpoint is origin (at the singularity), work is origin.
-    No hypothesis needed. The sort propagates. -/
+    If either endpoint is not in the counting domain, work is not in the
+    counting domain. No hypothesis needed. The sort carries it. -/
 def work [ValField α] (k q : α) (r₁ r₂ : Val α) : Val α :=
   add (potential k q r₁) (neg (potential k q r₂))
 
@@ -124,8 +126,8 @@ theorem work_contents [ValField α] (k q r₁ r₂ : α) :
 -- ============================================================================
 
 /-- Newton's gravitational field: g = GM/r².
-    Identical structure to Coulomb. Origin at r = 0.
-    The singularity is the same sort of thing regardless of the physics. -/
+    Identical structure to Coulomb. The field concept doesn't apply at the source.
+    The same structural fact regardless of which physics produced it. -/
 def gravitationalField [ValField α] (g_const mass : α) (r : Val α) : Val α :=
   coulombField g_const mass r
 
@@ -157,8 +159,8 @@ theorem gravity_at_origin [ValField α] (g_const mass : α) :
 --   theorem superposition (k q₁ q₂ : α) (r : Val α) :
 --       add (coulombField k q₁ r) (coulombField k q₂ r) = ... := by cases r <;> simp
 --
--- No hypothesis. The sort dispatch handles it. At origin: absorption.
--- At contents: computation. The proof is `cases r <;> simp`.
+-- No hypothesis. The sort dispatch handles it. When origin: the question
+-- doesn't apply. When contents: the physics computes. `cases r <;> simp`.
 
 -- ============================================================================
 -- Part 6: Multiple Singularities — The Real Test
@@ -195,14 +197,16 @@ theorem twoCharge_away [ValField α] (k q₁ q₂ r₁ r₂ : α) :
 -- Part 7: The Verdict
 -- ============================================================================
 
--- DOES ORIGIN HANDLE PHYSICAL SINGULARITIES?
+-- DOES THE SORT CARRY SINGULARITY INFORMATION?
 --
 -- Yes. Every theorem in this file has zero h : r ≠ 0 hypotheses.
--- The sort dispatch (origin/container/contents) handles singularities
--- the same way it handles zero-management in mathematics:
+-- The sort dispatch (origin/container/contents) carries what the
+-- hypotheses used to guard:
 --
---   origin  = the singularity. Nothing to retrieve. Absorbs everything.
---   contents = safe territory. The physics computes here.
+--   origin   = the field concept doesn't apply here. The question was
+--              never in the counting domain. Not a value the field
+--              "became" — the ground the field stands on.
+--   contents = the counting domain. The physics computes here.
 --
 -- The dissolution is NOT cosmetic. Count the hypotheses:
 --
@@ -218,8 +222,8 @@ theorem twoCharge_away [ValField α] (k q₁ q₂ r₁ r₂ : α) :
 -- singularity guards, that's thousands of hypotheses dissolved.
 --
 -- The answer to the test question:
---   "Does origin handle physical singularities the way it handles
---    mathematical zero-boundary conditions?"
+--   "Does the sort carry singularity information the way it carries
+--    zero-management information in mathematics?"
 --
 -- Yes. The mechanism is identical. The sort dispatch asks once.
 -- The answer is in the constructor. The hypothesis doesn't exist.

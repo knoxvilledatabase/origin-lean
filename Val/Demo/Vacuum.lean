@@ -45,8 +45,8 @@ def numberOp [ValArith α] (state : Val α) : Val α :=
   | contents n => contents n    -- occupied: the count
 
 /-- Field expectation value: ⟨state|φ̂|state⟩.
-    In vacuum: the field has no excitation. Origin.
-    At contents: the amplitude computes.
+    In vacuum: particle counting doesn't apply. The question has no contents answer.
+    In contents: the amplitude computes.
     Standard: requires h : state ≠ vacuum for non-trivial result. -/
 def fieldExpectation [ValArith α] (coupling : α) (state : Val α) : Val α :=
   match state with
@@ -127,12 +127,12 @@ theorem number_after_annihilate_vacuum [ValArith α] (one : α) :
 def twoModeExpectation [ValArith α] (g₁ g₂ : α) (mode₁ mode₂ : Val α) : Val α :=
   add (fieldExpectation g₁ mode₁) (fieldExpectation g₂ mode₂)
 
-/-- First mode vacuum: absorption. -/
+/-- First mode vacuum: counting doesn't apply. -/
 theorem twoMode_first_vacuum [ValArith α] (g₁ g₂ : α) (mode₂ : Val α) :
     twoModeExpectation g₁ g₂ origin mode₂ = origin := by
   simp [twoModeExpectation, fieldExpectation, add]
 
-/-- Second mode vacuum: absorption. -/
+/-- Second mode vacuum: counting doesn't apply. -/
 theorem twoMode_second_vacuum [ValArith α] (g₁ g₂ : α) (mode₁ : Val α) :
     twoModeExpectation g₁ g₂ mode₁ origin = origin := by
   cases mode₁ <;> simp [twoModeExpectation, fieldExpectation, add]
@@ -198,12 +198,12 @@ def transitionExpectation [ValArith α]
     (coupling : α) (amplitude : Val α) (state : Val α) : Val α :=
   mul amplitude (fieldExpectation coupling state)
 
-/-- Vacuum state in transition: origin propagates. -/
+/-- Vacuum state in transition: counting doesn't apply. -/
 theorem transition_vacuum_state [ValArith α] (coupling : α) (amplitude : Val α) :
     transitionExpectation coupling amplitude origin = origin := by
   cases amplitude <;> simp [transitionExpectation, fieldExpectation, mul]
 
-/-- Zero amplitude (origin) in transition: origin propagates. -/
+/-- No amplitude (origin) in transition: the question doesn't apply. -/
 theorem transition_vacuum_amplitude [ValArith α] (coupling : α) (state : Val α) :
     transitionExpectation coupling origin state = origin := by
   simp [transitionExpectation, mul]
@@ -243,8 +243,8 @@ theorem transition_occupied [ValArith α] (coupling a n : α) :
 --   theorem twoMode_both_occupied (g₁ g₂ n₁ n₂ : α) :
 --       twoModeExpectation g₁ g₂ (contents n₁) (contents n₂) = ... := by simp
 --
--- No hypothesis. The sort dispatch handles it. At origin: absorption.
--- At contents: computation. The proof is `cases <;> simp`.
+-- No hypothesis. The sort dispatch handles it. When origin: the question
+-- doesn't apply. When contents: the physics computes. `cases <;> simp`.
 
 -- ============================================================================
 -- Part 7: The Verdict
@@ -290,9 +290,10 @@ theorem transition_occupied [ValArith α] (coupling a n : α) :
 -- constructor handles both.
 --
 -- What this confirms: origin isn't just "the singularity handler."
--- Origin is the existence boundary. The ground the counting stands on.
--- Singularities and vacua are both places where quantities don't exist.
--- The constructor captures the concept, not just the application.
+-- Origin is the ground the counting stands on. Singularities and vacua
+-- are both places where the counting concept doesn't apply — not places
+-- that quantities "go to." The constructor captures what the ground is,
+-- not what arrives at the ground.
 --
 -- Two confirmed existence boundaries. The physics layer is on solid ground.
 
