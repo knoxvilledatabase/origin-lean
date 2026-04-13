@@ -259,7 +259,7 @@ The same three sorts are consistent across the stack:
 
 ## How this was built
 
-This is a Human-AI collaboration. The human held the architecture and enforced the DRY principle at every level. AI systems built the implementation, exhaustively mapped 173,646 theorems, and stress-tested every design decision through an adversarial loop — each claim challenged, each number verified, each architectural choice tested before commitment.
+This is a Human-AI collaboration. The human held the architecture and enforced the DRY principle at every level. AI systems built the implementation, mapped 173,646 theorems, and stress-tested every design decision through an adversarial loop — each claim challenged, each number verified, each architectural choice tested before commitment.
 
 The journey: standalone (509 theorems) → Mathlib (learned the abstract base model architecture) → standalone again → deduplication (18% removed) → exhaustive mapping (173,646 theorems, 67.3% collapse) → class-based refactor (5 levels, single inheritance) → complete coverage (56,815 genuinely new theorems in 10,756 lines).
 
