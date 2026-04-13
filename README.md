@@ -208,6 +208,11 @@ The demos have zero `sorry` — but hypothesis parameters serve a similar struct
 
 **What the foundation makes trivial:** algebraic identities, sort dispatch, ring/field laws, eigenvalue equations, group operations, Gödel encoding, elliptic curve arithmetic. **What remains hard:** completeness, compactness, convergence, finite enumeration, Galois cohomology. The foundation makes the algebra disappear. The analysis remains the next frontier.
 
+**What "covered" means varies by domain:**
+- **Algebraic domains** (GroupTheory, FieldTheory, RingTheory, Combinatorics): the foundation genuinely handles these. The proofs are structural — group laws, Galois correspondence, graph adjacency all flow from the class hierarchy. The hypotheses are light.
+- **Analytic domains** (Analysis, MeasureTheory, Topology): the algebraic skeleton is real, but the analytic engine — convergence, completeness, compactness, the filter library, the Bochner integral — lives in hypotheses. These domains have statements and algebraic consequences, not complete proofs from axioms.
+- **The 99.5% line count reflects both categories.** The algebraic domains are genuinely reduced. The analytic domains carry significant deferred work in their hypotheses. An honest accounting: the algebraic 67.3% elimination is real. The remaining 32.7% ranges from "genuinely proved" (algebra) to "algebraic skeleton with analytic hypotheses" (analysis/measure theory).
+
 `Val/Demo/Compute.lean` shows the foundation working on concrete values: `2+3=5`, `contents(0)≠origin`, ring laws computing on Int, Bool, and String. One instance per type, every theorem follows.
 
 ## The file structure
