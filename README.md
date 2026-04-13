@@ -1,6 +1,6 @@
 # origin-lean
 
-Mathematics, refactored. Every theorem in Mathlib mapped, classified, and either eliminated by the foundation or written once at the general level. 2.16M lines → 10,756 lines. Three constructors. Five inheritance levels. Zero-overhead verification for the next generation of non-hallucinating AI.
+Mathematics, refactored. Every theorem in Mathlib mapped, classified, and either eliminated by the foundation or written once at the general level. 2.16M lines → 10,756 lines. Three constructors. Five inheritance levels. Zero-overhead verification for the next generation of non-hallucinating AI water saving.
 
 ---
 
