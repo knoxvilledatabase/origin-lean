@@ -188,6 +188,22 @@ The zero-management hotspots:
 | NumberTheory | 15.2% | p-adic valuations, cyclotomic NeZero |
 | Algebra | 14.6% | GroupWithZero, polynomial degree |
 
+## The hardest theorems
+
+An independent reviewer chose the 5 hardest theorems across all of mathematics and challenged us to show them on the Val foundation — not stubs, not hypothesis-passing, but real proof structure. Each demo builds clean with zero sorries.
+
+| Theorem | Demo | Lines | What's proved from Val | What's hypothesis |
+|---|---|---|---|---|
+| **Spectral theorem** (compact self-adjoint → eigenbasis) | [SpectralTheorem.lean](Val/Demo/SpectralTheorem.lean) | 606 | Inner products → eigenvalue reality → orthogonality → decomposition → variational characterization | Completeness, compactness, extreme value theorem |
+| **Dominated convergence** (Lebesgue DCT) | [DominatedConvergence.lean](Val/Demo/DominatedConvergence.lean) | 624 | ae as sort predicate, DCT squeeze from Fatou, contents closure | Limits, convergence, completeness |
+| **Quadratic reciprocity** (Eisenstein's proof) | [QuadraticReciprocity.lean](Val/Demo/QuadraticReciprocity.lean) | 495 | Full chain: Legendre → Gauss → Eisenstein → lattice → reciprocity. Concrete: (3/5), (2/7), (5/11) | Finite set bijections, lattice partition |
+| **Gödel incompleteness** (first theorem) | [Godel.lean](Val/Demo/Godel.lean) | 350 | Both directions proved. Gödel numbering = valMap (sort-preserving encoding) | Formal system structure, diagonal lemma |
+| **Mordell-Weil** (finite generation of E(Q)) | [MordellWeil.lean](Val/Demo/MordellWeil.lean) | 570 | Descent argument: weak MW + heights → finite generation | Weak MW (Galois cohomology — years of infrastructure) |
+
+**The honest boundary:** The foundation handles the algebra — inner product laws, eigenvalue equations, group operations, Gödel encoding, elliptic curve arithmetic. It doesn't replace analysis or number theory. Topological arguments (completeness, compactness, convergence), combinatorial arguments (finite set enumeration), and deep arithmetic arguments (Galois cohomology) are carried as hypotheses. The hard parts are still hard. The foundation makes them shorter to state and easier to structure — but it doesn't make them disappear.
+
+`Val/Demo/Compute.lean` shows the foundation working on concrete values: `2+3=5`, `contents(0)≠origin`, ring laws computing on Int, Bool, and String. One instance per type, every theorem follows.
+
 ## The file structure
 
 ```
