@@ -1,6 +1,6 @@
 # origin-lean
 
-Mathematics, refactored. Every theorem in Mathlib mapped, classified, and either eliminated by the foundation or written once at the general level. 2.16M lines → 10,756 lines. Three constructors. Five inheritance levels. Zero-overhead verification for the next generation of non-hallucinating, water saving AI.
+A minimal algebraic skeleton of mathematics. Every theorem in Mathlib mapped and classified. The algebraic infrastructure eliminated. The analytic machinery made explicit as hypotheses. 2.16M lines → 10,756 lines. Three constructors. Five inheritance levels. We carry the hard parts as hypotheses. The dishonest version would claim equivalence. We don't.
 
 ---
 
@@ -24,7 +24,7 @@ When GroupTheory has 176 declarations covering 1,199 genuinely new results, that
 
 The claim isn't "we picked the important results and skipped the rest." The claim is: **we wrote each of the 1,199 genuinely new results once at the general level, producing 176 declarations, and the other 2,487 theorems in Mathlib's GroupTheory don't need to exist because the foundation handles them.**
 
-This holds across every domain. **99.5% line reduction. Every theorem accounted for. Nothing compressed — nothing was repeated in the first place.**
+This holds across every domain. **99.5% line reduction. Every theorem mapped and classified.** For algebraic domains (GroupTheory, FieldTheory, RingTheory, Combinatorics), the generalization is genuine — the proofs are structural and the hypotheses are light. For analytic domains (Analysis, MeasureTheory, Topology), the algebraic skeleton is real but the analytic engine — convergence, completeness, compactness — lives in the hypotheses. Nothing repeated. The hard parts honestly deferred.
 
 We asked: what if we eliminated the infrastructure at arithmetic?
 
