@@ -1,6 +1,6 @@
 # origin-lean
 
-A minimal algebraic skeleton of mathematics. Every theorem in Mathlib mapped and classified. The algebraic infrastructure eliminated. The analytic machinery made explicit as hypotheses. 2.16M lines → 10,756 lines. Three constructors. Five inheritance levels. We carry the hard parts as hypotheses. The dishonest version would claim equivalence. We don't.
+A minimal algebraic skeleton of mathematics. 173,646 Mathlib theorems mapped and classified — 13 domains theorem-by-theorem, 12 by statistical calibration (exhaustive classification in progress). The algebraic infrastructure eliminated. The analytic machinery made explicit as hypotheses. Three constructors. Five inheritance levels. We carry the hard parts as hypotheses. The dishonest version would claim equivalence. We don't.
 
 ---
 
@@ -12,19 +12,19 @@ We mapped all 173,646 theorems — 13 domains theorem-by-theorem, 12 by statisti
 - **26,674 (15.4%)** are zero-management — `≠ 0` guards, `NeZero` instances, `WithBot`/`WithTop`
 - **56,815 (32.7%)** are genuinely new mathematics — the irreducible content
 
-Every one of Mathlib's 173,646 theorems was classified into a bucket:
+The theorems fall into three buckets:
 
 - **Bucket 1 (90,161):** `by simp` closes it — no new code needed
 - **Bucket 2 (26,674):** `≠ 0` hypothesis dissolves — no new code needed
 - **Bucket 3 (56,815):** genuinely new mathematics — new code needed
 
-The 56,815 bucket 3 theorems ARE the ones that need new code. We wrote code covering all 56,815. We didn't compress them — we **wrote each pattern once at the most general level**, and it covers every specific case. The DRY principle. Don't Repeat Yourself.
+The 56,815 bucket 3 theorems ARE the ones that need new code. We wrote general patterns intended to cover them — **each pattern once at the most general level**, covering every specific case. The DRY principle. Don't Repeat Yourself. Whether each B3 theorem is truly an instance of a general pattern has not been exhaustively verified.
 
 When GroupTheory has 176 declarations covering 1,199 genuinely new results, that's not 176 out of 1,199 with 1,023 missing. It's 176 general theorems that each cover 3-7 specific results. Mathlib writes "homomorphism preserves multiplication" separately for every homomorphism. We write `universal_hom_mul` once. The other 6 were never needed — not compressed, never written.
 
 The claim isn't "we picked the important results and skipped the rest." The claim is: **we wrote each of the 1,199 genuinely new results once at the general level, producing 176 declarations, and the other 2,487 theorems in Mathlib's GroupTheory don't need to exist because the foundation handles them.**
 
-This holds across every domain. **99.5% line reduction. Every theorem mapped and classified.** For algebraic domains (GroupTheory, FieldTheory, RingTheory, Combinatorics), the generalization is genuine — the proofs are structural and the hypotheses are light. For analytic domains (Analysis, MeasureTheory, Topology), the algebraic skeleton is real but the analytic engine — convergence, completeness, compactness — lives in the hypotheses. Nothing repeated. The hard parts honestly deferred.
+This holds across every domain we've tested. For algebraic domains (GroupTheory, FieldTheory, RingTheory, Combinatorics), the generalization is genuine — the proofs are structural and the hypotheses are light. For analytic domains (Analysis, MeasureTheory, Topology), the algebraic skeleton is real but the analytic engine — convergence, completeness, compactness — lives in the hypotheses. Nothing repeated. The hard parts honestly deferred.
 
 We asked: what if we eliminated the infrastructure at arithmetic?
 
@@ -133,27 +133,26 @@ Two layers. The class says "α has associative multiplication." The simp set say
 
 | | Mathlib | origin-lean |
 |---|---|---|
-| Lines | 2,160,000 | 10,756 |
-| Files | 8,200 | 20 |
-| Zero-management typeclasses | 17 | 0 |
-| Inheritance levels | 17+ (diamonds) | 5 (single chain) |
-| `≠ 0` hypotheses | 9,682 | 0 |
+| Foundation typeclasses | 17 (zero-management, diamonds) | 5 (single inheritance) |
+| `≠ 0` hypotheses | ~9,700 (grep count) | 0 |
+| Foundation lines | ~2,160,000 | 10,756 |
 | Mathlib dependency | is Mathlib | 0 |
 | Build time | minutes | <12 seconds (clean) |
-| Reduction | — | **99.5%** |
+
+origin-lean restates the **foundation and general patterns**, not all 56,815 B3 theorems individually. The line count comparison reflects the foundation layer — the type, operations, algebraic laws, and domain-level patterns. It is not a claim that 10,756 lines do everything 2,160,000 lines do.
 
 ## The theorem mapping
 
-Every one of Mathlib's 173,646 theorems was mapped and classified:
+173,646 Mathlib theorems mapped and classified — 13 domains theorem-by-theorem, 12 by statistical calibration:
 
 | Bucket | Count | % | What happens in Val |
 |---|---|---|---|
-| **B1: Structural plumbing** | 90,161 | 51.9% | Absorbed by simp set + constructor dispatch |
-| **B2: Zero-management** | 26,674 | 15.4% | Dissolved by origin/contents distinction |
+| **B1: Structural plumbing** | 90,161 | 51.9% | Should be absorbed by simp set + constructor dispatch |
+| **B2: Zero-management** | 26,674 | 15.4% | Should dissolve via origin/contents distinction |
 | **B3: Genuinely new** | 56,815 | 32.7% | Written once at the general level |
-| **Total** | **173,646** | **100%** | **Every theorem accounted for** |
+| **Total** | **173,646** | **100%** | |
 
-**Methodology:** Each theorem classified by reading the declaration, checking if `by simp` closes its Val translation (B1), if a `≠ 0` / `NeZero` hypothesis dissolves when origin replaces zero (B2), or neither (B3). Calibrated by compiling representative files across each domain. Full domain-by-domain mapping: [THEOREM_MAP.md](THEOREM_MAP.md).
+**Methodology:** 13 domains classified theorem-by-theorem (41,908 theorems). 12 domains classified by statistical calibration of representative files (131,738 theorems). Exhaustive classification of all 25 domains is in progress — see [PROGRESSION_STEP4.md](PROGRESSION_STEP4.md). Full domain-by-domain mapping: [THEOREM_MAP.md](THEOREM_MAP.md).
 
 **Concrete example — what generalization looks like:**
 
@@ -190,7 +189,7 @@ The zero-management hotspots:
 
 ## The hardest theorems
 
-An independent reviewer chose the 5 hardest theorems across all of mathematics and challenged us to show them on the Val foundation — not stubs, not hypothesis-passing, but real proof structure. Each demo builds clean with zero sorries.
+We chose 5 hard theorems across mathematics and built them on the Val foundation — not stubs, not hypothesis-passing, but real proof structure. Each demo builds clean with zero sorries.
 
 | Theorem | Demo | Lines | What's proved from Val | What's hypothesis |
 |---|---|---|---|---|
@@ -211,7 +210,7 @@ The demos have zero `sorry` — but hypothesis parameters serve a similar struct
 **What "covered" means varies by domain:**
 - **Algebraic domains** (GroupTheory, FieldTheory, RingTheory, Combinatorics): the foundation genuinely handles these. The proofs are structural — group laws, Galois correspondence, graph adjacency all flow from the class hierarchy. The hypotheses are light.
 - **Analytic domains** (Analysis, MeasureTheory, Topology): the algebraic skeleton is real, but the analytic engine — convergence, completeness, compactness, the filter library, the Bochner integral — lives in hypotheses. These domains have statements and algebraic consequences, not complete proofs from axioms.
-- **The 99.5% line count reflects both categories.** The algebraic domains are genuinely reduced. The analytic domains carry significant deferred work in their hypotheses. An honest accounting: the algebraic 67.3% elimination is real. The remaining 32.7% ranges from "genuinely proved" (algebra) to "algebraic skeleton with analytic hypotheses" (analysis/measure theory).
+- **The line count comparison reflects the foundation layer.** The algebraic domains are genuinely reduced. The analytic domains carry significant deferred work in their hypotheses. An honest accounting: the algebraic 67.3% elimination is the prediction. The remaining 32.7% ranges from "genuinely proved" (algebra) to "algebraic skeleton with analytic hypotheses" (analysis/measure theory). These predictions are being tested through exhaustive classification.
 
 `Val/Demo/Compute.lean` shows the foundation working on concrete values: `2+3=5`, `contents(0)≠origin`, ring laws computing on Int, Bool, and String. One instance per type, every theorem follows.
 
@@ -261,6 +260,6 @@ The same three sorts are consistent across the stack:
 
 This is a Human-AI collaboration. The human held the architecture and enforced the DRY principle at every level. AI systems built the implementation, mapped 173,646 theorems, and stress-tested every design decision through an adversarial loop — each claim challenged, each number verified, each architectural choice tested before commitment.
 
-The journey: standalone (509 theorems) → Mathlib (learned the abstract base model architecture) → standalone again → deduplication (18% removed) → theorem mapping (173,646 theorems, 67.3% collapse) → class-based refactor (5 levels, single inheritance) → complete coverage (56,815 genuinely new theorems in 10,756 lines).
+The journey: standalone (509 theorems) → Mathlib (learned the abstract base model architecture) → standalone again → deduplication (18% removed) → theorem mapping (173,646 theorems, 67.3% predicted collapse) ��� class-based refactor (5 levels, single inheritance) → general patterns for all 25 domains (10,756 lines). Exhaustive verification in progress.
 
 This work exists because of the timing. The formal verification tools, the AI that can implement across domains, and the adversarial loop that stress-tests every claim — these didn't exist together until now.

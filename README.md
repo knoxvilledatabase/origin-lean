@@ -1,12 +1,12 @@
 # origin-lean
 
-Three constructors. Four rules. Every domain of mathematics, seven domains of physics, and the structural logic of self-reference. 34 files. 14,474 lines. Zero errors. Zero sorries.
+A proof of concept for the unification of undefined and indeterminate behaviors across mathematics, logic, physics and computation. 
 
 ---
 
 ## What this is
 
-A formal proof library built on one observation: the symbol 0 carries two meanings that were never separated.
+This proof of concept built on one observation: the symbol 0 carries two meanings that were never separated.
 
 **contents(0)** — we counted and found nothing. A measurement result. A quantity. Zero apples in the hand.
 
@@ -29,17 +29,17 @@ The sort dispatch asks once. The answer is in the constructor. The hypothesis do
 
 ### [Mathematics](MATHEMATICS_README.md)
 
-Every theorem in Mathlib mapped and classified. 173,646 theorems across 14 domains. The algebraic infrastructure eliminated. The analytic machinery carried as hypotheses.
+173,646 Mathlib theorems classified by structure: 51.9% structural plumbing, 15.4% zero-management, 32.7% domain-specific mathematics. The classification was done by representative sampling and structural reasoning, not theorem-by-theorem. Exhaustive classification is in progress (see [PROGRESSION_STEP4.md](PROGRESSION_STEP4.md)).
 
 | | Mathlib | origin-lean |
 |---|---|---|
-| Lines | 2,160,000 | 10,756 |
-| Files | 8,200 | 20 |
-| Zero-management typeclasses | 17 | 0 |
-| `≠ 0` hypotheses | 9,682 | 0 |
-| Reduction | — | 99.5% |
+| Foundation typeclasses | 17 (zero-management) | 5 (single inheritance) |
+| `≠ 0` hypotheses | ~9,700 (grep count) | 0 |
+| Foundation lines | ~2,160,000 | 10,756 |
 
-The claim: **the sort carries what the 17 typeclasses guarded.** The algebraic infrastructure — simp lemmas, coercion wrappers, typeclass instances — is absorbed by the sort dispatch. The analytic engine — convergence, completeness, compactness — stays as hypotheses. Algebra handled. Analysis honestly deferred.
+origin-lean restates the **foundation** — the type, the operations, the algebraic laws, and the domain-level patterns. It does not restate all 56,815 genuinely-new (B3) theorems. Those are each written once at the general level; the specific cases are instances. The domain-specific mathematics has not yet been fully restated on the Val foundation.
+
+The claim: **the sort carries what the 17 typeclasses guarded.** The algebraic infrastructure — simp lemmas, coercion wrappers, typeclass instances — should be absorbed by the sort dispatch. The analytic engine — convergence, completeness, compactness — stays as hypotheses. This is being tested domain-by-domain through exhaustive classification.
 
 ### [Physics](PHYSICS_README.md)
 
@@ -80,7 +80,7 @@ Origin satisfies these equations vacuously — but origin is not a truth value. 
 
 | Domain | What dissolves | Count |
 |---|---|---|
-| Mathematics | `≠ 0` hypotheses, 17 typeclasses | 9,682 |
+| Mathematics | `≠ 0` hypotheses, 17 typeclasses | ~9,700 |
 | Physics | Existence hypotheses (8 boundary types) | 86 |
 | Logic | Well-formedness hypotheses, paradox structure | 12 |
 
@@ -102,7 +102,7 @@ The shepherd never confused these. He never tried to hold the ground. He knew ho
 
 When Brahmagupta formalized zero in 628 CE, the ground and the empty hand and the absent apple entered mathematics as one symbol. The ground became a quantity. The quantity became the ground. Every formal system built on that arithmetic inherited the confusion — and built its own patch independently.
 
-Mathlib's 17 typeclasses. Physics' `h : r ≠ 0`. Tarski's hierarchy. Renormalization. NaN. `Option<T>`. 97 patches across five domains. Each one a different community discovering that they tried to hold the ground and it didn't work.
+Mathlib's 17 typeclasses. Physics' `h : r ≠ 0`. Tarski's hierarchy. Renormalization. NaN. `Option<T>`. 97 patches across four fields. Each one a different community discovering that they tried to hold the ground and it didn't work.
 
 The sort system doesn't make holding the ground possible. It makes the impossibility visible at the type level — so you stop trying.
 
@@ -156,7 +156,7 @@ lake build Val.Demo.Compute           # math demos
 
 The kill switch is live at every level. See [FALSIFICATION.md](https://github.com/knoxvilledatabase/original-arithmetic/blob/main/FALSIFICATION.md).
 
-Or: find a theorem in any domain that requires one of the 17 typeclasses and cannot be restated with Val α. Find a physics existence boundary that origin doesn't handle. Find a contents value that is a fixed point of negation on Bool. One example kills the claim.
+Or: find a theorem that requires one of the 17 typeclasses and cannot be restated with Val α. The mathematics domains tested so far are the 13 exhaustively classified in [THEOREM_MAP.md](THEOREM_MAP.md) plus Order (in progress). Find a physics existence boundary that origin doesn't handle. Find a contents value that is a fixed point of negation on Bool. One example kills the claim.
 
 If it breaks, we want to know. If it breaks, that's information.
 
