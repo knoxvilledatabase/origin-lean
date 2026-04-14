@@ -27,6 +27,26 @@ This step finishes the 12 covered domains. Every theorem in every file, individu
 - **Do NOT re-implement the Val stack.** The 79 files in origin-lean are the reference for what B3 looks like when restated. Don't re-do that work.
 - **Do NOT sample.** Every theorem. Every file. No skipping.
 
+## Already Done (13 domains, exhaustive, do NOT redo)
+
+| Domain | Theorems | B1 | B2 | B3 |
+|---|---|---|---|---|
+| Logic | 1,538 | 1,525 | 13 | 0 |
+| SetTheory | 2,501 | 1,896 | 189 | 416 |
+| Data | 17,901 | 10,698 | 2,981 | 4,222 |
+| Dynamics | 673 | 384 | 86 | 203 |
+| ModelTheory | 883 | 516 | 85 | 282 |
+| GroupTheory | 3,686 | 1,930 | 557 | 1,199 |
+| InformationTheory | 118 | 67 | 10 | 41 |
+| FieldTheory | 2,163 | 899 | 294 | 970 |
+| Combinatorics | 5,311 | 2,050 | 512 | 2,749 |
+| RepresentationTheory | 747 | 282 | 66 | 399 |
+| NumberTheory | 5,253 | 1,562 | 574 | 3,117 |
+| Computability | 1,060 | 361 | 50 | 649 |
+| Condensed | 74 | 12 | 8 | 54 |
+
+These are in THEOREM_MAP.md. Classified theorem-by-theorem. Do not redo.
+
 ## The 12 Domains to Classify
 
 In order from smallest to largest (lowest hanging fruit first):
