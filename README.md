@@ -6,13 +6,13 @@ A proof of concept for the unification of undefined and indeterminate behaviors 
 
 ## What this is
 
-This proof of concept built on one observation: the symbol 0 carries two meanings that were never separated.
+This proof of concept built on one observation: the symbol 0 carries two meanings that were never separated. 
 
-**contents(0)** — we counted and found nothing. A measurement result. A quantity. Zero apples in the hand.
+**contents(0)** — a measurement result. A quantity.
 
-**origin** — the ground the counting stands on. Not a quantity. Not a measurement. The precondition for counting to exist. The ground the hand rests on.
+**origin** — the ground the counting stands on. Not a quantity. Not a measurement. The precondition for counting to exist.
 
-Every formal system that represents both as `0 : α` must rebuild the distinction from scratch — using hypotheses, typeclasses, conventions, or restrictions. Mathlib uses 17 typeclasses and 9,682 `≠ 0` hypotheses. Physics carries `h : r ≠ 0` and `h : T > 0` and `h : ψ ∈ domain(A)`. Logic carries `h : φ is well-formed` and restricts self-reference through hierarchies.
+Every formal system that represents both as `0 : α` must rebuild the distinction from scratch, using hypotheses, typeclasses, conventions, or restrictions. Mathlib uses 17 typeclasses and 9,682 `≠ 0` hypotheses. Physics carries `h : r ≠ 0` and `h : T > 0` and `h : ψ ∈ domain(A)`. Logic carries `h : φ is well-formed` and restricts self-reference through hierarchies.
 
 Three constructors separate what was conflated:
 
@@ -39,11 +39,11 @@ The sort dispatch asks once. The answer is in the constructor. The hypothesis do
 
 origin-lean restates the **foundation** — the type, the operations, the algebraic laws, and the domain-level patterns. It does not restate all 56,815 genuinely-new (B3) theorems. Those are each written once at the general level; the specific cases are instances. The domain-specific mathematics has not yet been fully restated on the Val foundation.
 
-The claim: **the sort carries what the 17 typeclasses guarded.** The algebraic infrastructure — simp lemmas, coercion wrappers, typeclass instances — should be absorbed by the sort dispatch. The analytic engine — convergence, completeness, compactness — stays as hypotheses. This is being tested domain-by-domain through exhaustive classification.
+The claim: **the sort carries what the 17 typeclasses guarded.** The algebraic infrastructure, simp lemmas, coercion wrappers, typeclass instances, should be absorbed by the sort dispatch. The analytic engine, convergence, completeness, compactness, stays as hypotheses. This is being tested domain-by-domain through exhaustive classification.
 
 ### [Physics](PHYSICS_README.md)
 
-86 existence hypotheses dissolved across every major domain of physics. Eight physically distinct kinds of existence boundary — spanning four centuries of physics — dissolve through the same constructor.
+86 existence hypotheses dissolved across every major domain of physics. Eight physically distinct kinds of existence boundary, spanning four centuries of physics, dissolve through the same constructor.
 
 | Boundary | Domain | What Val replaces |
 |---|---|---|
@@ -72,7 +72,7 @@ theorem no_contents_fixed_point
 
 If a function has no fixed point on α, then no contents value is a fixed point of `valMap f` on `Val α`. The Liar asks for `v = ¬v`. Russell asks for `R ∈ R ↔ R ∉ R`. Curry asks for `C = (C → False)`. All three are the same impossibility: a formal system trying to hold its own ground.
 
-Origin satisfies these equations vacuously — but origin is not a truth value. It's the ground truth values stand on. The paradoxes don't "evaluate to origin." They ask for contents answers that can't exist. The sort makes visible why.
+Origin satisfies these equations vacuously, but origin is not a truth value. It's the ground truth values stand on. The paradoxes don't "evaluate to origin." They ask for contents answers that can't exist. The sort makes visible why.
 
 **The honest boundary:** Val names why the paradoxes arise. It does not resolve them. Gödel's incompleteness, the halting problem, and proof theory remain as they are. The contribution is structural: the sort makes certain confusions visible as type-level impossibilities rather than semantic paradoxes.
 
@@ -86,7 +86,7 @@ Origin satisfies these equations vacuously — but origin is not a truth value. 
 
 The numbers differ in scale because mathematics refactored 2.1 million existing lines, physics built 3,000 lines from scratch, and logic built 718 lines proving structural results. The comparison is mechanism, not magnitude: all three dissolve their domain's hypotheses through the same constructor and the same proof pattern.
 
-**Same constructor. Same sort dispatch. Same proof pattern.** The sort carries what the hypotheses guarded — in every domain.
+**Same constructor. Same sort dispatch. Same proof pattern.** The sort carries what the hypotheses guarded, in every domain.
 
 ## The shepherd
 
@@ -100,11 +100,11 @@ The shepherd knew three things without naming them:
 
 The shepherd never confused these. He never tried to hold the ground. He knew holding was something that happens *on* the ground.
 
-When Brahmagupta formalized zero in 628 CE, the ground and the empty hand and the absent apple entered mathematics as one symbol. The ground became a quantity. The quantity became the ground. Every formal system built on that arithmetic inherited the confusion — and built its own patch independently.
+When Brahmagupta formalized zero in 628 CE, the ground and the empty hand and the absent apple entered mathematics as one symbol. The ground became a quantity. The quantity became the ground. Every formal system built on that arithmetic inherited the confusion, and built its own patch independently.
 
 Mathlib's 17 typeclasses. Physics' `h : r ≠ 0`. Tarski's hierarchy. Renormalization. NaN. `Option<T>`. 97 patches across four fields. Each one a different community discovering that they tried to hold the ground and it didn't work.
 
-The sort system doesn't make holding the ground possible. It makes the impossibility visible at the type level — so you stop trying.
+The sort system doesn't make holding the ground possible. It makes the impossibility visible at the type level, so you stop trying.
 
 The shepherd always knew. Now there's a type that says why.
 
@@ -119,7 +119,7 @@ Val/
   OrderedField.lean        — Level 4: ordering
   Module.lean              — Level 5: scalar action
 
-  [14 mathematics domain files — see MATHEMATICS_README.md]
+  [14 mathematics domain files, see MATHEMATICS_README.md]
 
   Physics/
     Singularity.lean       — Core patterns: liftBin₂, inverse-square law
@@ -164,7 +164,3 @@ If it breaks, we want to know. If it breaks, that's information.
 
 The three constructors and four rules are formally verified in [original-arithmetic](https://github.com/knoxvilledatabase/original-arithmetic) (509 Lean 4 theorems). The philosophy, the formal argument, and the 97-patch table are there.
 
-This repository is the scaled proof: every domain of mathematics, every domain of physics, and the structural logic of self-reference. Built from the same seed. Three constructors. Four rules.
-
-*509 theorems. Zero errors. Zero sorries.*
-*— Lean 4, 2026 CE*
