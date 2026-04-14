@@ -54,6 +54,53 @@ In order from smallest to largest (lowest hanging fruit first):
 | # | Domain | Theorems | Files | Mathlib path |
 |---|---|---|---|---|
 | 1 | Order | ~9,500 | 304 | Mathlib/Order/ |
+
+### Order Subdirectory Breakdown
+
+Order is the first domain. 304 files, ~1,980+ declarations in the small subdirs alone. Each subdirectory is its own step.
+
+#### Small subdirectories (one step each, sorted by size)
+
+| Step | Subdirectory | Decls | Files | Character |
+|---|---|---|---|---|
+| 1a-01 | Atoms/ | 11 | 1 | Finite atoms/coatoms |
+| 1a-02 | Circular/ | 7 | 1 | Circular order on ZMod |
+| 1a-03 | Lattice/ | 3 | 1 | Lattice congruences |
+| 1a-04 | Prod/ | 1 | 1 | Lex product homs |
+| 1a-05 | Rel/ | 5 | 1 | Galois connection from relations |
+| 1a-06 | Extension/ | 11 | 2 | Szpilrajn, well-order extension |
+| 1a-07 | ScottContinuity/ | 7 | 2 | Scott continuous functions |
+| 1a-08 | Types/ | 43 | 2 | OrderType, notable B2 (zero = empty) |
+| 1a-09 | CompactlyGenerated/ | 55 | 2 | Compact elements, real math (B3) |
+| 1a-10 | ConditionallyCompletePartialOrder/ | 64 | 3 | cSup/cInf for partial orders |
+| 1a-11 | Fin/ | 77 | 5 | Fin ordering, some B2 |
+| 1a-12 | BoundedOrder/ | 80 | 3 | Top/bot API, mostly B1 |
+| 1a-13 | GaloisConnection/ | 96 | 2 | GC/GI/GCI API, mostly B1 |
+| 1a-14 | Preorder/ | 105 | 3 | Chains, finite preorders |
+| 1a-15 | Partition/ | 107 | 3 | Finpartitions, more B3 |
+| 1a-16 | Defs/ | 119 | 3 | Pure order definitions, all B1 |
+| 1a-17 | RelIso/ | 121 | 2 | Relation iso/embedding API, almost all B1 |
+| 1a-18 | Bounds/ | 203 | 5 | Upper/lower bounds, almost all B1 |
+| 1a-19 | BooleanAlgebra/ | 257 | 3 | sdiff/complement identities |
+| 1a-20 | ConditionallyCompleteLattice/ | 272 | 5 | cSup/cInf API, B2 hotspot (74 markers in Basic) |
+| 1a-21 | Heyting/ | 337 | 4 | Heyting algebra theory, mixed B1/B3 |
+
+#### Medium and large subdirectories
+
+| Step | Subdirectory | Files | Notes |
+|---|---|---|---|
+| 1b | Monotone/ | 7 | |
+| 1c | CompleteLattice/ | 9 | |
+| 1d | UpperLower/ | 9 | |
+| 1e | Hom/ | 10 | |
+| 1f | SuccPred/ | 10 | |
+| 1g | Category/ | 19 | |
+| 1h | Interval/ | 37 | |
+| 1i | Filter/ | 57 | May need sub-breakdown |
+| 1j | Top-level files | 92 | May need sub-grouping |
+
+Filter/ and the top-level files are large enough that they may need further splitting once we see the actual theorem counts. That decision happens when we get there — not before.
+
 | 2 | LinearAlgebra | ~10,200 | 353 | Mathlib/LinearAlgebra/ |
 | 3 | MeasureTheory | ~11,300 | 302 | Mathlib/MeasureTheory/ |
 | 4 | Probability | ~4,000 | 128 | Mathlib/Probability/ |
