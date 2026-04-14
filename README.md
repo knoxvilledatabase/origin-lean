@@ -10,7 +10,7 @@ This proof of concept built on one observation: the symbol 0 carries two meaning
 
 **contents(0)** — a measurement result. A quantity.
 
-**origin** — the ground the counting stands on. Not a quantity. Not a measurement. The precondition for counting to exist.
+**origin** — not a quantity. Not a measurement. The precondition for counting to exist.
 
 Every formal system that represents both as `0 : α` must rebuild the distinction from scratch, using hypotheses, typeclasses, conventions, or restrictions. Mathlib uses 17 typeclasses and 9,682 `≠ 0` hypotheses. Physics carries `h : r ≠ 0` and `h : T > 0` and `h : ψ ∈ domain(A)`. Logic carries `h : φ is well-formed` and restricts self-reference through hierarchies.
 
