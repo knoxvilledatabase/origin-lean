@@ -198,6 +198,26 @@ lake build Origin.Logic             # logic — 155 lines
 
 Zero sorries. Zero Mathlib. Builds in under a second.
 
+## Things the Next Session Must Know
+
+**Mathlib source is local.** The origin-mathlib repo was reset to
+Mathlib's latest (2026-04-14) at:
+`/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib/`
+The remote is archived (read-only). Don't try to push. Just read from it.
+
+**Old Origin files are superseded.** `Origin/Ring.lean`, `Origin/Field.lean`,
+`Origin/OrderedField.lean`, `Origin/Module.lean`, `Origin/Foundation.lean`,
+and the domain files WITHOUT "2" suffix (e.g., `Origin/InformationTheory.lean`
+vs `Origin/InformationTheory2.lean`) — these were written before Core.lean
+existed. The Core-based versions (with "2" suffix or newly created against Core)
+are the current ones. The old files should be cleaned up eventually.
+
+**The user holds the architecture. You build.** The user is a programmer,
+not a mathematician. They think in DRY. They push back hard when things
+aren't lean enough — and they're always right when they do. When they
+say "do it" or "go" — build fast. When they say "let's discuss first" —
+discuss. They see things you won't see. Listen.
+
 ## Progression: Go Straight to Mathlib
 
 Mathlib is the demo. Origin is production. The sketches are done.
