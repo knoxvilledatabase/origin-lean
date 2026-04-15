@@ -96,18 +96,20 @@ class Classifier:
     TRIVIAL_RE = re.compile(
         r":=\s*(rfl|h\b|by\s+simp\s*$|by\s+rfl|by\s+exact\s+\w+\s*$|Iff\.rfl)")
 
-    # Ring-assumption patterns: theorems that assume ground = zero
-    # These conflate the additive identity with the multiplicative absorber.
-    # In Origin, none (absorber) ≠ some 0 (cancellation result).
-    # These theorems need rewriting, not just filtering.
+    # Ring-conflation patterns: theorems that DEFINE or ENCODE the
+    # assumption that ground = zero. NOT theorems that merely USE
+    # Ring as a hypothesis — those are genuine math on `some 0`.
+    #
+    # The origin theorem proves n * zero = zero for any zero satisfying
+    # cancellation. In Option α, that zero is some 0, not none. Theorems
+    # with [Ring α] work on some 0. That's algebra, not conflation.
+    #
+    # The conflation is narrow: theorems that specifically state or
+    # require the additive identity to be the multiplicative absorber.
     RING_CONFLATION = re.compile(
-        r"mul_zero|zero_mul|"                      # 0 * a = 0 (assumes identity = absorber)
-        r"mul_self_sub_mul_self|"                   # a² - b² patterns through zero
-        r"Ring\b|CommRing\b|Semiring\b|"            # Ring typeclass constraints
-        r"RingHom\b|RingEquiv\b|"                   # Ring morphisms
-        r"SubringClass\b|Subring\b|"                # Ring substructures
-        r"zero_ne_one|one_ne_zero|"                 # 0 ≠ 1 (assumes 0 is in the domain)
-        r"nontrivial|Nontrivial"                    # ∃ a b, a ≠ b (often via 0 ≠ 1)
+        r"MulZeroClass\b|mulZeroClass\b|"           # the typeclass that encodes the conflation
+        r"zero_ne_one|one_ne_zero|"                  # assumes 0 is in the domain as distinct from 1
+        r"nontrivial|Nontrivial"                     # often via 0 ≠ 1
     )
 
     # Files that are ENTIRELY about zero infrastructure

@@ -193,13 +193,26 @@ additive group axiom fails because cancellation returns to `some 0`,
 not to the additive identity (`none`). Cancellation stays inside the
 counting domain. It doesn't exit to the ground.
 
-**Look at step 4 of the derivation again:** `nb - nb = origin`. Not
-`some 0`. Not the additive identity of a ring. Origin itself. The
-derivation works because `b - b` returns to origin by definition —
-the cancellation escapes the structure, returning to the ground.
+**But the `origin` theorem never touches `none`.** It proves
+`n * zero = zero` for any `zero` satisfying cancellation. In
+`Option α`, that `zero` is `some 0` — a value inside the counting
+domain. The theorem operates on `some 0`, not on `none`.
 
-Rings assume cancellation stays inside. Origin's entire claim is that
-cancellation exits — it returns to the ground, not to a measurement.
+Two different things, never in conflict:
+- `none` — the ground, the absorber, outside the counting domain
+- `some 0` — the zero measurement, where cancellation lands, inside
+
+The `origin` theorem applies to `some 0`. The instances give `none`
+its absorbing behavior. These are separate mechanisms.
+
+**Theorems with `[Ring α]` are genuine math.** They work on `some 0`.
+Cancellation holds at `some 0`. Distribution holds at `some 0`. The
+algebra is real. Don't classify Ring-using theorems as conflation.
+
+**The conflation is narrow.** Only theorems that specifically DEFINE
+or REQUIRE the additive identity to be the multiplicative absorber
+conflate: `MulZeroClass`, `zero_ne_one`, `Nontrivial`. These are
+1,037 declarations in Mathlib, not the 5,887 we initially counted.
 
 The Ring axioms smuggle in an assumption — that the ground and the
 zero measurement are the same thing. Origin's type system makes that
