@@ -64,6 +64,66 @@ Origin needs stripping. Current result: 30,947 genuine, 0 waste.
 
 ---
 
+## Before You Build: Walk Through Core.lean
+
+Open `Origin/Core.lean`. 166 lines. Read it and answer these questions.
+Don't proceed until you can answer all of them.
+
+**The theorem (lines 1-40):**
+
+```lean
+theorem origin ... (n : α) : n * zero = zero :=
+  calc n * zero
+      _ = n * (n + (-n))           := by rw [cancel]
+      _ = n * n + n * (-n)         := by rw [distrib]
+      _ = n * n + -(n * n)         := by rw [mul_neg]
+      _ = zero                     := by rw [cancel]
+```
+
+- What is this proving? (That multiplying by zero gives zero.)
+- Is this an axiom or a derived result? (Derived — from three premises.)
+- What are the three premises? (Cancellation, distribution, mul over negation.)
+- Why does this matter? (It means absorption is a CONSEQUENCE, not a primitive.)
+
+**The instances (lines 42-70):**
+
+```lean
+instance [Mul α] : Mul (Option α) where
+  mul a b := match a, b with
+    | none, _ => none
+    | _, none => none
+    | some a, some b => some (a * b)
+```
+
+- What does `none * some 5` give? (none.)
+- What does `some 3 * some 5` give? (some 15.)
+- What does `some 0 * some 5` give? (some 0 — NOT none.)
+- Why is `some 0` different from `none`? (some 0 is a measurement. none is the ground.)
+- What standard notation does this instance give you? (`*` on Option.)
+
+**The simp set (lines 72-90):**
+
+- What does `@[simp] theorem mul_none_left` do? (Tells simp that `none * b = none`.)
+- Why is this needed? (So `cases <;> simp` closes proofs automatically.)
+
+**liftBin₂ (lines 92-110):**
+
+- What is `liftBin₂`? (Cross-type binary lift: `Option α → Option β → Option γ`.)
+- When is it needed? (Physics — mass × acceleration = force. Different types.)
+- Why can't `*` do this? (The Mul instance requires same type in and out.)
+
+**no_some_fixed_point (lines 112-120):**
+
+- What does this prove? (If f has no fixed point on α, no some value is a fixed point of Option.map f.)
+- What is this used for? (The Liar paradox. Russell's paradox. Curry's paradox.)
+- Why does origin satisfy the equation vacuously? (Option.map f none = none = none. Always.)
+- Is origin a truth value? (No. It's the ground. Not True, not False.)
+
+**If you can answer every question above, you understand the foundation.**
+**If you can't, re-read Core.lean until you can.**
+
+---
+
 ## What This Project Discovered
 
 Before anything else, understand what was found. This changes how you write, how you build, and how you frame every result.

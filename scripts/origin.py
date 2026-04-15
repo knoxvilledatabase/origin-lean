@@ -2,17 +2,37 @@
 """
 Origin: Mathlib → Origin conversion tool.
 
+Before you modify this script, answer these questions:
+
+1. Read Origin/Core.lean (166 lines). What does the `origin` theorem prove?
+   What three things do the instances give Option α?
+
+2. What is the difference between `none` and `some 0`?
+   (Hint: one is the ground. One is a measurement that happened to be zero.)
+
+3. Why does Algebra/GroupWithZero/Units/Basic.lean dissolve entirely?
+   (Hint: what are those 112 declarations managing?)
+
+4. What makes a declaration "genuine" vs "infrastructure"?
+   Run: python3 scripts/origin.py classify Dynamics
+   Look at the GENUINE column. What's in it? What's not?
+
+5. Why do extracted files keep Mathlib imports?
+   (Hint: where do ℕ, padicValRat, harmonic come from?)
+
+6. Run: python3 scripts/origin.py --self classify --all
+   What does 0 in the DISS column tell you?
+
+If you can answer all six, you understand the project.
+If you can't, read CLAUDE.md first. Then read Core.lean.
+
 Usage:
     python3 scripts/origin.py classify NumberTheory
     python3 scripts/origin.py classify --all
+    python3 scripts/origin.py --self classify --all    (audit Origin itself)
     python3 scripts/origin.py extract NumberTheory/Harmonic/Int.lean
     python3 scripts/origin.py extract --domain NumberTheory
     python3 scripts/origin.py fruit --all 10
-
-Smart extraction: preserves namespaces, variables, and open statements.
-Strips zero-management by name AND by signature. Skips files that are
-entirely infrastructure. Generates drafts that are as close to building
-as a script can get. Claude fixes only what lake build says is broken.
 """
 
 import os
