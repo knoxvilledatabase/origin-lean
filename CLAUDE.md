@@ -9,34 +9,40 @@
    Say what you understand the current state to be and what the next
    step is. Wait for their confirmation.
 
-3. **Run the classify script** to see what needs writing:
+3. **Run origin.py** — one tool does everything:
    ```bash
    cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
-   ./scripts/classify.sh NumberTheory   # one domain
-   ./scripts/classify.sh --all          # all domains (takes minutes)
-   ```
-   This classifies every declaration in every file:
-   - GENUINE — real content to write in Origin
-   - DISSOLVE — ≠ 0 / NeZero hypotheses (vanish with none)
-   - INSTANCE — typeclass infrastructure (free from Core)
-   - SIMP — @[simp] lemmas (free from Core)
-   - TRIVIAL — rfl / by simp / exact h (nothing to write)
 
-   **The GENUINE count is what to write.** Everything else is free or dissolves.
+   # Classify: what needs writing?
+   python3 scripts/origin.py classify NumberTheory
+   python3 scripts/origin.py classify --all
 
-4. **Pick files with highest GENUINE count.** Open from Mathlib source at:
-   `/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib/`
+   # Fruit: where is the highest-density dissolution?
+   python3 scripts/origin.py fruit --all 10
 
-5. **Write only the GENUINE declarations.** Import Origin.Core. Standard
-   notation. Build. Verify. Show the user. Confirm before moving on.
+   # Extract: generate Origin draft from a Mathlib file
+   python3 scripts/origin.py extract NumberTheory/Harmonic/Int.lean
 
-6. **Other scripts available:**
-   ```bash
-   ./scripts/triage.sh NumberTheory    # Type A/B breakdown per file
-   ./scripts/fruit.sh --all 10        # top 10 by dissolution density
+   # Extract entire domain: generate drafts for all files with genuine content
+   python3 scripts/origin.py extract --domain NumberTheory
    ```
 
-7. **Repeat.** Pick the next file. Confirm with the user between each file.
+   **classify** — counts GENUINE/DISSOLVE/INSTANCE/SIMP/TRIVIAL per file.
+   The GENUINE count is what to write. Everything else is free or dissolves.
+
+   **fruit** — ranks files by dissolution density (hits/lines).
+   High density = the collapse is concentrated there.
+
+   **extract** — generates Origin draft .lean files from Mathlib source.
+   Strips dissolved declarations. Keeps genuine content. Drafts may not
+   build — `lake build` validates, you fix what breaks.
+
+4. **Pick files with highest GENUINE count.** Or use extract to generate
+   drafts, then build and fix.
+
+5. **Confirm with the user between each file.**
+
+6. **Repeat.** The script finds the targets. You do the conversion.
 
 **Always confirm between steps. The user holds the architecture.**
 
