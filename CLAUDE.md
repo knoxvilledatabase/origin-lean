@@ -326,6 +326,45 @@ Step 2: Read. Triage. Ask for each declaration:
 
 Step 3: Write. Build. Next file.
 
+### The collapse affects domains unevenly
+
+Scanning all Mathlib domains for zero-management density:
+
+```
+Domain             % of files affected    Dissolved hypotheses
+─────────────────────────────────────────────────────────────
+NumberTheory       83% (193/231 files)    2,330
+FieldTheory        70% (55/78 files)      696
+Geometry           66% (86/129 files)     683
+Analysis           51% (406/782 files)    (large)
+MeasureTheory      50% (152/302 files)    (large)
+RingTheory         47% (312/663 files)    (large)
+Dynamics           41% (13/31 files)      58
+Algebra            35% (466/1300 files)   (large)
+GroupTheory        30% (48/160 files)     (moderate)
+Topology           16% (105/639 files)    (low)
+Computability      20% (7/34 files)       (low)
+```
+
+NumberTheory is 83% affected — almost every file carries ≠ 0.
+Topology is 16% affected — most of it is pure structure.
+
+**The highest-value work is in the most-affected domains.**
+NumberTheory alone has 2,330 hypotheses that dissolve.
+
+Demonstrated on Dynamics (31 files, 6,514 lines):
+- 16 files are Type A (pure math, 0 zero-management)
+- 15 files are Type B (collapse involved)
+- Conservative.lean: 20 hits (most affected)
+- PeriodicPts/Defs.lean: 15 hits
+- CoverEntropy.lean: 14 hits
+- Minimal.lean: 12 hits
+
+The work: start with the most-affected domains (NumberTheory,
+FieldTheory, Geometry). That's where Origin removes the most
+hypotheses. The least-affected domains (Topology, Computability)
+are mostly Type A — pure math that transfers verbatim.
+
 ### The order
 
 Smallest Mathlib domain first. Same discipline as always.
