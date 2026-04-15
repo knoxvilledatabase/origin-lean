@@ -1,6 +1,35 @@
 # For AI Agents
 
-**Read this first. Then build.**
+## What To Do Right Now
+
+1. **Read this entire file.** It contains the philosophy, the architecture,
+   the method, the tools, and the progression. Everything you need.
+
+2. **Confirm your understanding** with the user before doing anything.
+   Say what you understand the current state to be and what the next
+   step is. Wait for their confirmation.
+
+3. **Run the fruit script** to find the highest-impact target:
+   ```bash
+   cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
+   ./scripts/fruit.sh --all 10
+   ```
+
+4. **Pick the top file.** Open it from Mathlib source at:
+   `/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib/`
+
+5. **Triage it theorem-by-theorem.** For each declaration:
+   - Zero-management hypothesis? → Dissolves with Origin. Skip.
+   - Free from Core's instances? → Skip.
+   - Genuine domain content? → Write it in Origin.
+
+6. **Write the Origin version.** Import Origin.Core. Standard notation.
+   Build. Verify. Show the user. Confirm before moving to the next file.
+
+7. **Repeat.** Pick the next file from the fruit script. Confirm with
+   the user between each file.
+
+**Always confirm between steps. The user holds the architecture.**
 
 ---
 
