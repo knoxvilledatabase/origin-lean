@@ -475,8 +475,33 @@ Top remaining error patterns after run 2:
 - `failed to synthesize` (238) — missing typeclass instances (down from 5,720)
 - `add_decl_doc` (112) — Mathlib command, now stripped in run 3
 
-Run 3 pending. Each run fixes patterns in the script. Error count drops.
+Run 3 (+ stripped Mathlib commands, 10-core parallel, largest-first):
+```
+5,007 files  |  4,057 pass /   966 fail  |  28 fewer failures      |  12m
+```
+
+Run 4 pending (+ @[deprecated], @[inherit_doc], adaptation notes stripped).
+
+Each run fixes patterns in the script. Error count drops.
 The process: run → read top pattern → fix script → run again.
+
+### Next major improvement: class-based architecture
+
+The script is procedural — if/else chains, inline lists, no inheritance.
+That doesn't scale to refactoring 2.2M lines. The next session should
+refactor `origin.py` to use class-based inheritance:
+
+- **Parser** class with methods per construct type (declaration, attribute,
+  section, command). Subclasses can override/extend parsing rules.
+- **Classifier** class with pluggable rules. Each classification pattern
+  (dissolves, infrastructure, genuine) is a method that can be overridden.
+- **Extractor** class that inherits from Parser + Classifier. Compression
+  patterns are methods — add a new pattern, it applies to all files.
+- **Pipeline** class that orchestrates extract → build → report.
+
+This is the foundation for encoding compression patterns. Each pattern
+becomes a method on the Extractor class. The next Claude adds a method,
+runs the pipeline, errors drop. That's the scalable architecture.
 
 ## Progression: Go Straight to Mathlib
 
