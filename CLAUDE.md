@@ -360,10 +360,48 @@ Demonstrated on Dynamics (31 files, 6,514 lines):
 - CoverEntropy.lean: 14 hits
 - Minimal.lean: 12 hits
 
-The work: start with the most-affected domains (NumberTheory,
-FieldTheory, Geometry). That's where Origin removes the most
-hypotheses. The least-affected domains (Topology, Computability)
-are mostly Type A — pure math that transfers verbatim.
+### The cost of the collapse is 5x larger than the signatures
+
+Previous count: 9,682 `≠ 0` hypotheses (signatures only).
+
+**Actual finding:** for every `≠ 0` in a signature, there are ~3.2
+additional lines INSIDE proofs threading that hypothesis through
+intermediate steps (`.ne'`, `inv_ne_zero`, `cast_ne_zero`, etc.).
+
+```
+                       Signatures  Threading  Total Surface
+Algebra                       840       1570          2,410
+Analysis                      604       1958          2,562
+RingTheory                    415       1674          2,089
+NumberTheory                  283       1345          1,628
+Data                          365        839          1,204
+MeasureTheory                 285        741          1,026
+LinearAlgebra                 113        525            638
+FieldTheory                   104        496            600
+Geometry                      153        394            547
+Topology                      130        276            406
+GroupTheory                    27        240            267
+Combinatorics                  40        189            229
+Probability                    44        132            176
+Dynamics                        1         34             35
+────────────────────────────────────────────────────────────
+TOTAL                       3,512     11,190         14,702
+```
+
+The actual cost of the collapse across Mathlib: **14,702 lines**
+touching zero-management. Origin dissolves both — the hypotheses
+AND the threading inside proofs.
+
+Demonstrated on `NumberTheory/Harmonic/Int.lean` (56 lines):
+- `harmonic_pos` carries `(Hn : n ≠ 0)` in signature → dissolves
+- `padicValRat_two_harmonic` threads `.ne'` and `inv_ne_zero`
+  INSIDE the proof 4 times → all simplify
+- `padicNorm_two_harmonic` carries `(hn : n ≠ 0)` → dissolves
+- `harmonic_not_int` is genuine content → keep
+
+The highest-value work is in the most-affected domains. Start
+with Algebra (2,410), Analysis (2,562), RingTheory (2,089),
+NumberTheory (1,628). That's where Origin removes the most code.
 
 ### The order
 
