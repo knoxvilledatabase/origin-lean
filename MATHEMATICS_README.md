@@ -1,6 +1,8 @@
-# origin-lean
+# Mathematics Layer
 
-A minimal algebraic skeleton of mathematics. 173,646 Mathlib theorems mapped and classified — 13 domains theorem-by-theorem, 12 by statistical calibration (exhaustive classification in progress). The algebraic infrastructure eliminated. The analytic machinery made explicit as hypotheses. Three constructors. Five inheritance levels. We carry the hard parts as hypotheses. The dishonest version would claim equivalence. We don't.
+> **Note:** This documents the Val layer — the scaffolding that proved the concept at scale (10,756 lines). The [Origin layer](Origin/Core.lean) subsequently showed that 83% of Val was boilerplate managing the ground being inside the counting domain. The same 14 domains live in Origin in 1,721 lines. Val stays as the published evidence. Origin is the building.
+
+A minimal algebraic skeleton of mathematics. 173,646 Mathlib theorems mapped and classified — 13 domains theorem-by-theorem, 12 by statistical calibration. The algebraic infrastructure eliminated. The analytic machinery made explicit as hypotheses. Three constructors. Five inheritance levels. We carry the hard parts as hypotheses. The dishonest version would claim equivalence. We don't.
 
 ---
 

@@ -1,5 +1,7 @@
 # Logic Layer
 
+> **Note:** This documents the Val logic layer (718 lines, 3 files). The [Origin layer](Origin/Logic.lean) demonstrates the same results in 155 lines using `Option α` and `no_some_fixed_point`. Val stays as the comprehensive evidence. Origin is the foundation.
+
 12 well-formedness hypotheses dissolved. The Liar, Russell, and Curry paradoxes unified under one theorem. 3 files. 718 lines. Zero errors. Zero sorries.
 
 ---

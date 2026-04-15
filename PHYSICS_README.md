@@ -1,5 +1,7 @@
 # Physics Layer
 
+> **Note:** This documents the Val physics layer (3,000 lines, 11 files). The [Origin layer](Origin/Physics.lean) demonstrates the same dissolution in 247 lines using `Option α`. Val stays as the comprehensive evidence. Origin is the foundation.
+
 86 existence hypotheses dissolved across every major domain of physics. Same constructor. Same sort dispatch. Same proof pattern. 11 files. 3,000 lines. Zero errors. Zero sorries.
 
 ---
