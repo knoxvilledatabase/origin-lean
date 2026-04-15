@@ -198,10 +198,11 @@ lake build Origin.Logic             # logic — 155 lines
 
 Zero sorries. Zero Mathlib. Builds in under a second.
 
-## Progression: Sketches → Production
+## Progression: Go Straight to Mathlib
 
-The Origin domain files are sketches. Definitions and a few demonstrations.
-Mathlib is the demo. Origin is production. Production needs complete coverage.
+Mathlib is the demo. Origin is production. The sketches are done.
+The foundation is done. The next step: go straight to Mathlib,
+file by file, domain by domain, and write only what's genuinely new.
 
 ### What's done
 
@@ -211,52 +212,63 @@ Mathlib is the demo. Origin is production. Production needs complete coverage.
 4. ✅ **Logic.** Liar, Russell, Curry unified. `no_some_fixed_point`.
 5. ✅ **Val evidence.** 14,474 lines. The proof it works at scale.
 
-### What's next: full domain coverage
+### What's next: Mathlib → Origin, file by file
 
-Each Origin domain file needs to grow from sketch to production.
-The Val files had coverage but buried it in boilerplate. The Origin
-sketches stripped the boilerplate but also stripped too much content.
-Production needs: all the content, none of the boilerplate.
+The old approach: classify every Mathlib theorem into B1/B2/B3 buckets
+against Val's three-constructor model. That was the right step at the
+time. The `classifications/` directory documents that journey.
 
-The target: every B3 theorem from the Mathlib mapping, expressed
-cleanly on Option. Not hypothesis passing. Not wrappers. The actual
-mathematical content — definitions, structures, real proofs.
+**That approach is obsolete.** Origin changes the question. The buckets
+were drawn against Val's infrastructure. Origin has no infrastructure —
+just `Option` with instances. The question is no longer "which bucket?"
+The question is:
 
-| Domain | Mathlib B3 | Origin sketch | Status |
-|---|---|---|---|
-| InformationTheory | 283 | 81 lines | sketch |
-| Geometry | 3,496 | 152 lines | sketch |
-| MeasureTheory | 4,077 | 98 lines | sketch |
-| LinearAlgebra | 2,887 | 122 lines | sketch |
-| RingTheory | 3,304 | 147 lines | sketch |
-| Topology | 3,601 | 139 lines | sketch |
-| Algebra | 5,244 | 129 lines | sketch |
-| NumberTheory | 2,814 | 113 lines | sketch |
-| FieldTheory | 1,199 | 95 lines | sketch |
-| Analysis | 3,752 | 144 lines | sketch |
-| Data | 7,261 | 182 lines | sketch |
-| GroupTheory | 1,199 | 121 lines | sketch |
-| CategoryTheory | 3,891 | 93 lines | sketch |
-| Combinatorics | 4,180 | 105 lines | sketch |
+**Does this theorem need to exist on Option, or does it already
+follow from the instances?**
 
-### The rules for production files
+If it follows from the instances: skip it. It's free.
+If it's genuine domain content: write it in Origin.
 
-1. **Import Origin.Core.** Use standard notation. No wrappers.
-2. **Write each B3 pattern once at the most general level.** Same DRY
-   principle as Val — one general theorem covers 3-7 specific Mathlib results.
-3. **No hypothesis passing.** If the theorem just returns `h`, delete it.
-4. **Real proofs only.** `cases <;> simp`, `by simp [h]`, or actual derivations.
-   If `by simp` closes it without any domain-specific work, it doesn't exist.
-5. **Structures and predicates are content.** PrimeIdeal, SigmaAlgebra,
-   Chart, SimpleGraph, Matroid — these are the domain. Keep them.
-6. **Track the B3 coverage.** For each domain file, note how many B3
-   patterns are covered by each general theorem. The numbers matter.
-7. **Smallest domain first.** Same discipline as always.
+### The method
+
+For each Mathlib domain, for each Mathlib file:
+
+1. **Open the Mathlib file.** Read each theorem.
+2. **Ask: does this already work on `Option α` via Core's instances?**
+   - Typeclass instances, coercion wrappers, simp lemmas → free. Skip.
+   - `≠ 0` guards, NeZero instances, WithBot/WithTop → dissolved. Skip.
+   - Genuinely new mathematics → write it in Origin.
+3. **Write the Origin theorem at the most general level.** One theorem
+   covering 3-7 specific Mathlib results. Standard `*` `+` `-` notation.
+4. **No hypothesis passing.** No wrappers. No reproved simp lemmas.
+5. **Build. Verify. Move to the next file.**
+
+### The order
+
+Smallest Mathlib domain first. Same discipline as always.
+
+Within each domain: start with the foundational files that other files
+depend on. Work outward. Each file builds on the previous.
+
+### What the classifications/ directory is
+
+Historical documentation of the Val-era mapping. It shows the journey
+from Mathlib through Val's three-bucket model. The numbers in it
+(51.9% B1, 15.4% B2, 32.7% B3) describe Val, not Origin.
+
+For Origin, B2 doesn't exist (no `≠ 0` hypotheses to dissolve — `none`
+handles it structurally). Much of what was B1 in Val is handled by
+Lean's standard instances on Option. The boundary between "free" and
+"needs writing" is different and simpler.
+
+Don't reclassify. Just go straight to Mathlib and write what's new.
 
 ### The goal
 
-When complete, Origin is the production library: every B3 theorem from
-Mathlib expressed on Option α via Core.lean. No custom type. No custom
-typeclasses. Standard notation. Complete mathematical coverage.
+When complete, Origin is the production library: every genuinely new
+theorem from Mathlib expressed on `Option α` via Core.lean. No custom
+type. No custom typeclasses. Standard notation. Complete mathematical
+coverage. The actual content of mathematics — without the infrastructure
+that managed the whole being inside.
 
 Mathlib is the demo. Origin is production.
