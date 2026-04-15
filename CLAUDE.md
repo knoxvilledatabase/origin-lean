@@ -2,11 +2,11 @@
 
 ## Your Job
 
-You improve `scripts/origin.py`. That's it.
+You improve `scripts/origin2.py`. That's it.
 
 ```bash
 cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
-python3 scripts/origin.py run
+python3 scripts/origin2.py run
 ```
 
 The process:
@@ -39,7 +39,7 @@ You are disposable labor that makes the script smarter.
    instances, simp set. Read every line. If you don't understand why
    `none * some 5 = none` and `some 0 * some 5 = some 0`, stop and
    re-read until you do.
-3. **`scripts/origin.py`** — the tool you're improving. Read the
+3. **`scripts/origin2.py`** — the tool you're improving. Read the
    parser, the classifier, the extractor, the `run` pipeline. This
    is where your work goes.
 
@@ -73,7 +73,7 @@ types) plus `import Origin.Core`. The lakefile pins Mathlib v4.14.0.
 Run `lake update` once, then `lake build` validates. First build compiles
 Mathlib (slow). Subsequent builds cached.
 
-**Self-audit:** `python3 scripts/origin.py --self classify --all` audits
+**Self-audit:** `python3 scripts/origin2.py --self classify --all` audits
 Origin itself. If it finds dissolved/infrastructure/trivial declarations,
 Origin needs stripping. Current result: 30,947 genuine, 0 waste.
 
@@ -425,7 +425,7 @@ Zero sorries. Zero Mathlib. Builds in under a second.
 
 ## Things the Next Session Must Know
 
-**Start by running the pipeline.** `python3 scripts/origin.py run`.
+**Start by running the pipeline.** `python3 scripts/origin2.py run`.
 Read the report. Fix what's broken in the script. Run again. That's
 the job. Do not do manual work.
 
@@ -538,23 +538,41 @@ Run 4 pending (+ @[deprecated], @[inherit_doc], adaptation notes stripped).
 Each run fixes patterns in the script. Error count drops.
 The process: run → read top pattern → fix script → run again.
 
-### Next major improvement: class-based architecture
+### Class-based architecture (DONE)
 
-The script is procedural — if/else chains, inline lists, no inheritance.
-That doesn't scale to refactoring 2.2M lines. The next session should
-refactor `origin.py` to use class-based inheritance:
+`origin2.py` is the class-based rewrite. `origin.py` is the original
+(kept as reference). Use `origin2.py` for all work.
 
-- **Parser** class with methods per construct type (declaration, attribute,
-  section, command). Subclasses can override/extend parsing rules.
-- **Classifier** class with pluggable rules. Each classification pattern
-  (dissolves, infrastructure, genuine) is a method that can be overridden.
-- **Extractor** class that inherits from Parser + Classifier. Compression
-  patterns are methods — add a new pattern, it applies to all files.
-- **Pipeline** class that orchestrates extract → build → report.
+- **Config** — all paths in one place
+- **Classifier** — override `classify()` to add rules. Three categories:
+  genuine, dissolves, conflates
+- **Parser** — each construct is a `_try_*` method. Override to handle
+  new syntax
+- **Extractor** — override `_emit_block()` to add compression patterns.
+  This is where the next work goes
+- **Pipeline** — `phase_extract()` and `phase_build()`. Override to
+  customize
+- **UI** — all terminal output in one class
 
-This is the foundation for encoding compression patterns. Each pattern
-becomes a method on the Extractor class. The next Claude adds a method,
-runs the pipeline, errors drop. That's the scalable architecture.
+### Next major improvement: compression patterns
+
+The filter is at 83% pass rate (4,149 / 4,998 files). The remaining
+849 failures are proofs that reference dissolved content. Top patterns:
+
+```
+630 files  tactic 'rewrite' failed  — proof references dissolved declaration
+264 files  failed to synthesize     — missing typeclass instance
+ 90 files  rewrite variant          — same root cause
+```
+
+To get to zero errors, add compression methods to `Extractor._emit_block()`:
+- Dependency analysis: if a genuine proof references a dissolved decl,
+  either keep the decl or rewrite the proof
+- Typeclass resolution: if a `failed to synthesize` comes from a stripped
+  instance, keep the instance
+- Proof simplification: if `by simp` closes after removing ≠ 0, collapse
+
+Each pattern is a method. Add it, run the pipeline, errors drop.
 
 ## Progression: Go Straight to Mathlib
 
@@ -564,16 +582,21 @@ file by file, domain by domain, and write only what's genuinely new.
 
 ### What's done
 
-1. ✅ **The foundation.** Core.lean. 166 lines. Theorem + instances + simp set.
-2. ✅ **The sketches.** 14 domain files. Definitions + key demonstrations. 1,721 lines.
+1. ✅ **The foundation.** Core.lean. 124 lines. Theorem + instances + simp set.
+2. ✅ **The sketches.** 14 domain files. Definitions + key demonstrations.
 3. ✅ **Physics.** 6 domains demonstrated. 86 hypotheses dissolved.
 4. ✅ **Logic.** Liar, Russell, Curry unified. `no_some_fixed_point`.
 5. ✅ **Val evidence.** 14,474 lines. The proof it works at scale.
+6. ✅ **Pipeline.** `origin2.py run` — extract, build, report. Production UI.
+7. ✅ **Class-based script.** Parser, Classifier, Extractor, Pipeline, UI.
+8. ✅ **Three classifications.** Genuine (138K), dissolves (6K), conflates (1K).
+9. ✅ **Ring finding.** Option α is not a Ring. Lean verified. Load-bearing.
+10. ✅ **83% pass rate.** 4,149 / 4,998 files build clean. 849 remaining.
 
 ### What's next: run the pipeline
 
 ```bash
-python3 scripts/origin.py run
+python3 scripts/origin2.py run
 ```
 
 The script encodes all classification, extraction, and build logic.
@@ -589,7 +612,7 @@ One command. Run it. Everything either builds or it tells you
 exactly what to fix in the script.
 
 ```bash
-python3 scripts/origin.py run
+python3 scripts/origin2.py run
 ```
 
 What it does:
