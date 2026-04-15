@@ -25,6 +25,11 @@ from typing import Optional
 MATHLIB_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib")
 ORIGIN_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean/Origin")
 
+# --self flag: audit Origin instead of Mathlib
+SELF_MODE = False
+def get_source_dir():
+    return ORIGIN_DIR if SELF_MODE else MATHLIB_DIR
+
 # ---------------------------------------------------------------------------
 # Zero-management patterns
 # ---------------------------------------------------------------------------
@@ -334,11 +339,15 @@ Genuine: {genuine_count} of {total_count} | Dissolved: {dissolved} | Infrastruct
 
 def cmd_classify(domain: str):
     """Classify every declaration in a domain."""
-    src = MATHLIB_DIR / domain
+    src = get_source_dir() / domain if not SELF_MODE else get_source_dir()
+    if SELF_MODE and domain != "--all":
+        # In self mode, domain is a subdirectory of Origin/
+        src = get_source_dir() / domain
     if not src.is_dir():
         print(f"ERROR: {src} not found", file=sys.stderr)
         return
 
+    mode = "ORIGIN (self-audit)" if SELF_MODE else "MATHLIB"
     files = sorted(src.rglob("*.lean"))
     rows = []
 
@@ -359,7 +368,7 @@ def cmd_classify(domain: str):
 
     rows.sort(reverse=True)
 
-    print(f"=== {domain}: Declaration-Level Classification ===\n")
+    print(f"=== {domain} [{mode}]: Declaration-Level Classification ===\n")
     print(f"{'GEN':>4} | {'DISS':>4} | {'INST':>4} | {'TRIV':>4} | {'TOT':>4} | {'LINES':>5} | PATH")
     print(f"{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'-----':>5}-+-----")
 
@@ -388,12 +397,14 @@ def cmd_classify(domain: str):
 
 def cmd_classify_all():
     """Summary across all domains."""
-    print("=== ALL DOMAINS ===\n")
+    base = get_source_dir()
+    mode = "ORIGIN (self-audit)" if SELF_MODE else "MATHLIB"
+    print(f"=== ALL DOMAINS [{mode}] ===\n")
     print(f"{'DOMAIN':<22} | {'GEN':>6} | {'DISS':>5} | {'INFRA':>5} | {'TOTAL':>5} | {'FILES':>5}")
     print(f"{'':-<22}-+-{'':-<6}-+-{'':-<5}-+-{'':-<5}-+-{'':-<5}-+-{'':-<5}")
 
     rows = []
-    for d in sorted(MATHLIB_DIR.iterdir()):
+    for d in sorted(base.iterdir()):
         if not d.is_dir():
             continue
         files = list(d.rglob("*.lean"))
@@ -526,6 +537,12 @@ def main():
     if len(sys.argv) < 2:
         print(__doc__)
         return
+
+    # Check for --self flag
+    global SELF_MODE
+    if "--self" in sys.argv:
+        SELF_MODE = True
+        sys.argv.remove("--self")
 
     cmd = sys.argv[1]
 
