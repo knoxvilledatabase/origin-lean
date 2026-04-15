@@ -20,7 +20,7 @@ Never reached, approached, or hit. It is what the formal system stands on. The s
 
 ### Absorption is a theorem, not an axiom.
 
-Cancellation returns to the ground. The distributive law propagates it through multiplication. The four-step derivation (`Origin/Foundation.lean`):
+Cancellation returns to the ground. The distributive law propagates it through multiplication. The four-step derivation (`Origin/Core.lean`):
 
 ```
 0 = n + (-n)                          (cancellation)
@@ -50,7 +50,7 @@ Put it outside. They vanish. Not reduced. Not consolidated. Gone. Because the pr
 
 Two layers in one repository:
 
-**Origin/** — the foundation. Option α. The absorption derivation. Physics on Option. Logic on Option. Ring and field laws lifted through two cases instead of three.
+**Origin/** — the foundation. `Origin/Core.lean` is the single file that provides everything: the `origin` theorem, instances for `*` `+` `-` on Option, the simp set, `liftBin₂`, and `no_some_fixed_point`. Domain files import Core and use standard notation.
 
 **Val/** — the evidence. The full Mathlib comparison. 14 math domains, 7 physics domains, logic paradoxes. 10,756 + 3,000 + 718 lines. Every theorem verified.
 
@@ -58,43 +58,33 @@ Two layers in one repository:
 
 ```bash
 cd origin-lean
-lake build Origin.Foundation   # the derivation
-lake build Origin.Ring         # ring laws on Option
-lake build Origin.Physics      # physics on Option
-lake build Origin.Logic        # logic on Option
+lake build Origin.Core         # the entire foundation — one file
 lake build Val.Demo.Compute    # Val evidence (math)
 lake build Val.Physics.Classical  # Val evidence (physics)
 ```
 
 ## How to Understand the Codebase
 
-Read in this order:
+Read ONE file:
 
-1. **[Origin/Foundation.lean](Origin/Foundation.lean)** — the derivation. Absorption from cancellation + distributive law. One theorem. This is WHY.
+1. **[Origin/Core.lean](Origin/Core.lean)** — the `origin` theorem, instances, simp set, `liftBin₂`, `no_some_fixed_point`. 166 lines. This is the entire foundation. Everything else imports this.
 
-2. **[Origin/Test.lean](Origin/Test.lean)** — instantiation on Int. Option operations. Concrete computation. This is the proof it works.
+Then, for evidence:
 
-3. **[Origin/Ring.lean](Origin/Ring.lean)** — ring laws lifted through Option. Two cases instead of three. 128 lines vs Val's 461.
-
-4. **[Origin/Physics.lean](Origin/Physics.lean)** — six physics domains on Option. Same 86 hypotheses dissolved. No custom infrastructure.
-
-5. **[Origin/Logic.lean](Origin/Logic.lean)** — `no_some_fixed_point`. Liar, Russell, Curry. Same results, one file.
-
-6. **[Val/Foundation.lean](Val/Foundation.lean)** — the original Val type. Three constructors. The scaffolding. Read this to understand the evidence, not to build new things.
-
-7. **[README.md](README.md)** — the big picture across all domains.
+2. **[Val/Foundation.lean](Val/Foundation.lean)** — the original Val type. Three constructors. The scaffolding that proved the concept.
+3. **[README.md](README.md)** — the big picture across all domains.
 
 ## The Architecture
 
 **Origin (the foundation):**
 ```
 Origin/
-  Foundation.lean    — the derivation (absorption theorem)
-  Test.lean          — instantiation on Int, Option operations
-  Ring.lean          — ring laws on Option α
-  Field.lean         — field laws on Option α
-  Physics.lean       — physics on Option α
-  Logic.lean         — paradoxes on Option α
+  Core.lean              — THE file. Theorem + instances + simp set. 166 lines.
+  Foundation.lean        — historical: the derivation before Core existed
+  Test.lean              — instantiation on Int
+  Physics.lean           — physics domains on Option
+  Logic.lean             — paradoxes on Option
+  [domain files]         — domain content importing Core
 ```
 
 **Val (the evidence):**
@@ -113,123 +103,64 @@ Val/
 
 Before writing any comment, ask: "Does this sentence describe origin as something a quantity arrives at, becomes, or hits?" If yes, rewrite. The field was never at the singularity. Temperature was never at absolute zero. The Liar doesn't evaluate to origin. The question doesn't apply there.
 
-### The class carries the algebra. The simp set carries the dispatch.
+### Leverage Lean — use instances, not wrappers
 
-For Val:
+**Wrong (old pattern):**
 ```lean
-theorem val_mul_assoc [ValRing α] (a b c : Val α) :
-    mul (mul a b) c = mul a (mul b c) := by
-  cases a <;> cases b <;> cases c <;> simp [mul, ValRing.mul_assoc]
+def oMul [Mul α] : Option α → Option α → Option α := ...
+abbrev charPoly (f : α → α) : Option α → Option α := Option.map f
+abbrev localize (f : α → α) : Option α → Option α := Option.map f
 ```
 
-For Origin:
+**Right (new pattern):**
 ```lean
-theorem oMul_assoc [Mul α]
-    (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) :
-    oMul (oMul a b) c = oMul a (oMul b c) := by
-  cases a <;> cases b <;> cases c <;> simp [oMul, h]
+-- Core.lean defines: instance [Mul α] : Mul (Option α)
+-- Now just use standard notation:
+some a * some b    -- = some (a * b)
+none * x           -- = none
+x.map f            -- Option.map, already in std lib
 ```
 
-Same pattern. Fewer cases. No custom type.
+Do NOT create named wrappers for `Option.map`. Do NOT define `oMul` — use `*`. Do NOT redefine what the standard library already provides. Lean's instance system does the work. Use it.
+
+### The proof pattern
+
+```lean
+theorem option_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
+    (a b c : Option α) : a * b * c = a * (b * c) := by
+  cases a <;> cases b <;> cases c <;> simp [h]
+```
+
+`cases <;> simp`. Two cases per variable. Standard `*` notation. The law on `α` lifts through the instance.
 
 ### Never duplicate
 
-Every line must produce behavior no other line already produces. If `by simp` closes it, the theorem doesn't exist.
+Every line must produce behavior no other line already produces. If `by simp` closes it, the theorem doesn't exist. If `Option.map` already does it, don't wrap it.
 
 ### Strip until it hurts
 
-If your solution feels robust and "properly engineered" — you haven't stripped enough. The discomfort of "too simple" is the signal you're on the right path. Origin is simpler than Val. That's the point.
+If your solution feels robust and "properly engineered" — you haven't stripped enough. Core.lean is 166 lines. That should feel uncomfortable. Good.
 
 ## How to Add Work
 
-New work goes in **Origin/**, not Val/:
+New work goes in **Origin/**, importing `Origin.Core`:
 
 ```lean
-import Origin.Ring  -- or Origin.Field
+import Origin.Core
 
--- Use Option directly. None is the ground. Some is a value.
+-- Use standard notation. none is the ground. some is a value.
+-- * + - work on Option via instances from Core.
 -- liftBin₂ for cross-type operations.
+-- x.map f for sort-preserving maps.
 -- cases <;> simp for proofs.
 ```
 
-Val/ is evidence. Don't add to it. Add to Origin/.
+Domain files should contain ONLY domain-specific content. No lifting boilerplate. No wrapper functions. No reproved simp lemmas. Core provides everything.
 
 ## Build and Verify
 
 ```bash
-lake build Origin.Foundation Origin.Test Origin.Ring Origin.Field Origin.Physics Origin.Logic
+lake build Origin.Core    # the foundation — one file, 166 lines
 ```
 
-Zero sorries. Zero Mathlib. Builds in seconds.
-
-## Progression: Converting Val/ to Origin/
-
-Val was the scaffolding. Origin is the building. The conversion demonstrates
-the reduction: same results, less code, no custom type.
-
-### What's Done
-
-| Val file(s) | Lines | Origin file | Lines | Reduction |
-|---|---|---|---|---|
-| Foundation + Arith + Ring | 461 | Origin/Ring.lean | 128 | 72% |
-| Field | 94 | Origin/Field.lean | 142 | (field + free additive identity) |
-| Physics (11 files) | 3,000 | Origin/Physics.lean | ~200 | 93% |
-| Logic (3 files) | 718 | Origin/Logic.lean | ~140 | 80% |
-| — | — | Origin/Foundation.lean | ~70 | (the derivation, new) |
-| — | — | Origin/Test.lean | ~120 | (Int instantiation, new) |
-
-### What's Next (in order)
-
-**1. Infrastructure (finish the class hierarchy replacement):**
-
-| Val file | Lines | Origin target | Notes |
-|---|---|---|---|
-| OrderedField.lean | 79 | Origin/OrderedField.lean | Ordering on Option. `none` has no order — outside the domain. |
-| Module.lean | 79 | Origin/Module.lean | Scalar action on Option. `none` absorbs. |
-
-**2. Math domain files (smallest first):**
-
-| Val file | Lines | Priority | Notes |
-|---|---|---|---|
-| InformationTheory.lean | 283 | 1st | Smallest. Good first test. |
-| Geometry.lean | 324 | 2nd | Small, uses Field level. |
-| MeasureTheory.lean | 377 | 3rd | |
-| LinearAlgebra.lean | 451 | 4th | |
-| RingTheory.lean | 479 | 5th | |
-| Topology.lean | 525 | 6th | |
-| Algebra.lean | 595 | 7th | |
-| NumberTheory.lean | 667 | 8th | |
-| FieldTheory.lean | 831 | 9th | |
-| Analysis.lean | 832 | 10th | |
-| Data.lean | 1,121 | 11th | |
-| GroupTheory.lean | 1,140 | 12th | |
-| CategoryTheory.lean | 1,069 | 13th | |
-| Combinatorics.lean | 1,349 | 14th | Largest. Last. |
-
-**3. Remaining physics domains (extend Origin/Physics.lean):**
-
-Origin/Physics.lean demonstrates 6 domains. The remaining 3 from Val
-(StatMech, Relativity, FieldTheory) can be added to the same file or
-split into Origin/Physics2.lean if the file gets too long.
-
-### The Rules for Conversion
-
-1. **Import Origin/Ring.lean or Origin/Field.lean** — not Val.
-2. **Use Option directly.** `none` is ground. `some` is a value. No custom type.
-3. **Use `liftBin₂` for cross-type operations.** Already defined in Origin/Physics.lean.
-4. **Pass laws as explicit hypotheses** — `(h : ∀ a b, a * b = b * a)` — not typeclasses.
-5. **Proof pattern:** `cases <;> simp`. Two cases, not three.
-6. **Track the line count.** The reduction IS the evidence.
-7. **Don't duplicate Val.** Origin replaces, it doesn't copy. If a Val theorem's only purpose was managing the ground being inside, it doesn't get converted — it vanishes.
-
-### The Comparison Table (update as you go)
-
-```
-Val total:     10,756 (math) + 3,000 (physics) + 718 (logic) = 14,474 lines
-Origin total:  [update this as files are converted]
-Reduction:     [update this]
-```
-
-The final number tells the story: how much of Val was the ground being
-inside, and how much was genuine content.
+Zero sorries. Zero Mathlib. Builds in under a second.
