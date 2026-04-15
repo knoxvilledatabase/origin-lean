@@ -323,7 +323,10 @@ class Parser:
                 # Consume the stripped command and any attached doc comment.
                 # Pattern: library_note "..."/-- ... multi-line ... -/
                 # Also handles doc comment on the next line after strip.
-                has_doc = "/--" in lines[i]
+                cur_line = lines[i]
+                # If /-- and -/ are both on the same line, doc is self-contained
+                doc_self_contained = "/--" in cur_line and "-/" in cur_line and cur_line.index("-/") > cur_line.index("/--")
+                has_doc = "/--" in cur_line and not doc_self_contained
                 i += 1
                 # Skip indented continuation lines
                 while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
@@ -333,7 +336,7 @@ class Parser:
                 # Check if next non-blank line starts a doc comment
                 if not has_doc and i < len(lines) and lines[i].strip().startswith("/--"):
                     has_doc = True
-                # Consume until -/ if a doc comment was opened
+                # Consume until -/ if a multi-line doc comment was opened
                 if has_doc:
                     while i < len(lines) and "-/" not in lines[i]:
                         i += 1
@@ -463,6 +466,11 @@ class Extractor:
                     {"total": 0, "genuine": 0, "dissolved": 0, "conflates": 0, "infra": 0, "skipped_file": True})
 
         blocks = self.parser.parse(text)
+
+        # Dependency analysis: un-dissolve declarations referenced by genuine code.
+        # If a genuine proof uses a dissolved name, that name is load-bearing — keep it.
+        self._resolve_dependencies(blocks)
+
         stats = {"total": 0, "genuine": 0, "dissolved": 0, "conflates": 0, "infra": 0, "skipped_file": False}
 
         decls = [b for b in blocks if b.kind == "decl"]
@@ -503,6 +511,34 @@ class Extractor:
                   f"-/\n{import_block}")
         body = "\n\n".join(p for p in parts if p.strip())
         return (header + "\n" + body + "\n", stats)
+
+    def _resolve_dependencies(self, blocks: list[Block]):
+        """Un-dissolve declarations that genuine code depends on.
+
+        If a genuine declaration references a dissolved declaration's name,
+        the dissolved declaration is load-bearing and must be kept.
+        Iterates until stable (transitive dependencies).
+        """
+        dissolved = {b.name: b for b in blocks
+                     if b.kind == "decl" and b.classification in ("dissolves", "infra_name") and b.name}
+        if not dissolved:
+            return
+
+        changed = True
+        while changed:
+            changed = False
+            # Collect all text from non-dissolved blocks
+            live_text = "\n".join(
+                b.text for b in blocks
+                if b.kind == "decl" and b.classification not in ("dissolves", "infra_name")
+            )
+            for name, b in list(dissolved.items()):
+                # Check if this dissolved name appears in live code
+                # Use word boundary to avoid false positives
+                if re.search(r'\b' + re.escape(name) + r'\b', live_text):
+                    b.classification = "genuine"
+                    del dissolved[name]
+                    changed = True
 
     def _emit_block(self, b: Block) -> str | None:
         """Emit a block. Override to add compression patterns."""
