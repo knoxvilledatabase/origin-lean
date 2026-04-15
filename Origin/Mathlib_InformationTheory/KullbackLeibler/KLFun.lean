@@ -3,6 +3,9 @@ Extracted from InformationTheory/KullbackLeibler/KLFun.lean
 Genuine: 6 of 7 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
+import Mathlib.MeasureTheory.Measure.Decomposition.IntegralRNDeriv
+import Mathlib.MeasureTheory.Measure.LogLikelihoodRatio
 
 /-!
 # The real function `fun x ↦ x * log x + 1 - x`

@@ -3,6 +3,8 @@ Extracted from InformationTheory/KullbackLeibler/Basic.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.InformationTheory.KullbackLeibler.KLFun
+import Mathlib.MeasureTheory.Measure.Decomposition.IntegralRNDeriv
 
 /-!
 # Kullback-Leibler divergence

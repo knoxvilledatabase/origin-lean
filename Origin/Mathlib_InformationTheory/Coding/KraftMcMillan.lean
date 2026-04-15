@@ -3,6 +3,14 @@ Extracted from InformationTheory/Coding/KraftMcMillan.lean
 Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.List.Basic
+import Mathlib.Data.Finset.Basic
+import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.BigOperators.Pi
+import Mathlib.Data.Fintype.Card
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.InformationTheory.Coding.UniquelyDecodable
+import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!
 # Kraft-McMillan Inequality

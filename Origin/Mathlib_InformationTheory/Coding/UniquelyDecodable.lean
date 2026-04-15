@@ -3,6 +3,7 @@ Extracted from InformationTheory/Coding/UniquelyDecodable.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Basic
 
 /-!
 # Uniquely Decodable Codes

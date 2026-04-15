@@ -3,6 +3,7 @@ Extracted from InformationTheory/Hamming.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Group.Basic
 
 /-!
 # Hamming spaces
