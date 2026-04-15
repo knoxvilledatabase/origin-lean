@@ -3,6 +3,8 @@ Extracted from Dynamics/BirkhoffSum/Average.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Dynamics.BirkhoffSum.Basic
+import Mathlib.Algebra.Module.Basic
 
 /-!
 # Birkhoff average

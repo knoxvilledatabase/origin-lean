@@ -1,8 +1,10 @@
 /-
 Extracted from Dynamics/Flow.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.Algebra.Group.Basic
+import Mathlib.Logic.Function.Iterate
 
 /-!
 # Flows and invariant sets
@@ -19,9 +21,9 @@ if `ϕₜ s ⊆ s` for all `t`. In many cases `ϕ` will be a flow on
 commutative) monoid, we additionally define forward invariance, where
 `t` ranges over those elements which are nonnegative.
 
-Additionally, we define such constructions as the (forward) orbit, a
-semiconjugacy between flows, a factor of a flow, the restriction of a
-flow onto an invariant subset, and the time-reversal of a flow by a group.
+Additionally, we define such constructions as the restriction of a
+flow onto an invariant subset, and the time-reversal of a flow by a
+group.
 -/
 
 open Set Function Filter
@@ -40,7 +42,41 @@ def IsInvariant (ϕ : τ → α → α) (s : Set α) : Prop :=
 variable (ϕ : τ → α → α) (s : Set α)
 
 theorem isInvariant_iff_image : IsInvariant ϕ s ↔ ∀ t, ϕ t '' s ⊆ s := by
-  simp_rw [IsInvariant, mapsTo_iff_image_subset]
+  simp_rw [IsInvariant, mapsTo']
 
-def IsForwardInvariant [Preorder τ] [Zero τ] (ϕ : τ → α → α) (s : Set α) : Prop :=
+def IsFwInvariant [Preorder τ] [Zero τ] (ϕ : τ → α → α) (s : Set α) : Prop :=
   ∀ ⦃t⦄, 0 ≤ t → MapsTo (ϕ t) s s
+
+theorem IsInvariant.isFwInvariant [Preorder τ] [Zero τ] {ϕ : τ → α → α} {s : Set α}
+    (h : IsInvariant ϕ s) : IsFwInvariant ϕ s := fun t _ht => h t
+
+theorem IsFwInvariant.isInvariant [CanonicallyOrderedAddCommMonoid τ] {ϕ : τ → α → α} {s : Set α}
+    (h : IsFwInvariant ϕ s) : IsInvariant ϕ s := fun t => h (zero_le t)
+
+theorem isFwInvariant_iff_isInvariant [CanonicallyOrderedAddCommMonoid τ] {ϕ : τ → α → α}
+    {s : Set α} :
+    IsFwInvariant ϕ s ↔ IsInvariant ϕ s :=
+  ⟨IsFwInvariant.isInvariant, IsInvariant.isFwInvariant⟩
+
+end Invariant
+
+/-!
+### Flows
+-/
+
+structure Flow (τ : Type*) [TopologicalSpace τ] [AddMonoid τ] [ContinuousAdd τ] (α : Type*)
+  [TopologicalSpace α] where
+  /-- The map `τ → α → α` underlying a flow of `τ` on `α`. -/
+  toFun : τ → α → α
+  cont' : Continuous (uncurry toFun)
+  map_add' : ∀ t₁ t₂ x, toFun (t₁ + t₂) x = toFun t₁ (toFun t₂ x)
+  map_zero' : ∀ x, toFun 0 x = x
+
+namespace Flow
+
+variable {τ : Type*} [AddMonoid τ] [TopologicalSpace τ] [ContinuousAdd τ]
+  {α : Type*} [TopologicalSpace α] (ϕ : Flow τ α)
+
+-- INSTANCE (free from Core): :
+
+-- INSTANCE (free from Core): :

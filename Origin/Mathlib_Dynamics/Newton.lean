@@ -3,6 +3,11 @@ Extracted from Dynamics/Newton.lean
 Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.AlgebraMap
+import Mathlib.Algebra.Polynomial.Identities
+import Mathlib.RingTheory.Nilpotent.Lemmas
+import Mathlib.RingTheory.Polynomial.Nilpotent
+import Mathlib.RingTheory.Polynomial.Tower
 
 /-!
 # Newton-Raphson method
@@ -10,19 +15,19 @@ import Origin.Core
 Given a single-variable polynomial `P` with derivative `P'`, Newton's method concerns iteration of
 the rational map: `x ↦ x - P(x) / P'(x)`.
 
-Over a field, it can serve as a root-finding algorithm. It is also useful in proving results such
-as Hensel's lemma and the Jordan-Chevalley decomposition.
+Over a field it can serve as a root-finding algorithm. It is also useful tool in certain proofs
+such as Hensel's lemma and Jordan-Chevalley decomposition.
 
 ## Main definitions / results:
 
-* `Polynomial.newtonMap`: the map `x ↦ x - P(x) / P'(x)`, where `P'` is the derivative of the
-  polynomial `P`.
-* `Polynomial.isFixedPt_newtonMap_of_isUnit_iff`: `x` is a fixed point for Newton iteration iff
-  it is a root of `P` (provided `P'(x)` is a unit).
-* `Polynomial.existsUnique_nilpotent_sub_and_aeval_eq_zero`: if `x` is almost a root of `P` in the
-  sense that `P(x)` is nilpotent (and `P'(x)` is a unit) then we may write `x` as a sum
-  `x = n + r` where `n` is nilpotent and `r` is a root of `P`. This can be used to prove the
-  Jordan-Chevalley decomposition of linear endomorphisms.
+ * `Polynomial.newtonMap`: the map `x ↦ x - P(x) / P'(x)`, where `P'` is the derivative of the
+   polynomial `P`.
+ * `Polynomial.isFixedPt_newtonMap_of_isUnit_iff`: `x` is a fixed point for Newton iteration iff
+   it is a root of `P` (provided `P'(x)` is a unit).
+ * `Polynomial.exists_unique_nilpotent_sub_and_aeval_eq_zero`: if `x` is almost a root of `P` in the
+   sense that `P(x)` is nilpotent (and `P'(x)` is a unit) then we may write `x` as a sum
+   `x = n + r` where `n` is nilpotent and `r` is a root of `P`. This can be used to prove the
+   Jordan-Chevalley decomposition of linear endomorphims.
 
 -/
 
@@ -53,7 +58,7 @@ theorem isNilpotent_iterate_newtonMap_sub_of_isNilpotent (h : IsNilpotent <| aev
   | zero => simp
   | succ n ih =>
     rw [iterate_succ', comp_apply, newtonMap_apply, sub_right_comm]
-    refine (Commute.all _ _).isNilpotent_sub ih <| (Commute.all _ _).isNilpotent_mul_left ?_
+    refine (Commute.all _ _).isNilpotent_sub ih <| (Commute.all _ _).isNilpotent_mul_right ?_
     simpa using Commute.isNilpotent_add (Commute.all _ _)
       (isNilpotent_aeval_sub_of_isNilpotent_sub P ih) h
 
@@ -85,15 +90,15 @@ theorem aeval_pow_two_pow_dvd_aeval_iterate_newtonMap
     · rw [neg_mul, even_two.neg_pow, mul_pow, pow_succ, pow_mul]
       exact dvd_mul_of_dvd_right (pow_dvd_pow_of_dvd ih 2) _
 
-theorem existsUnique_nilpotent_sub_and_aeval_eq_zero
+theorem exists_unique_nilpotent_sub_and_aeval_eq_zero
     (h : IsNilpotent (aeval x P)) (h' : IsUnit (aeval x <| derivative P)) :
     ∃! r, IsNilpotent (x - r) ∧ aeval r P = 0 := by
   simp_rw [(neg_sub _ x).symm, isNilpotent_neg_iff]
-  refine existsUnique_of_exists_of_unique ?_ fun r₁ r₂ ⟨hr₁, hr₁'⟩ ⟨hr₂, hr₂'⟩ ↦ ?_
+  refine exists_unique_of_exists_of_unique ?_ fun r₁ r₂ ⟨hr₁, hr₁'⟩ ⟨hr₂, hr₂'⟩ ↦ ?_
   · -- Existence
     obtain ⟨n, hn⟩ := id h
     refine ⟨P.newtonMap^[n] x, isNilpotent_iterate_newtonMap_sub_of_isNilpotent h n, ?_⟩
-    rw [← zero_dvd_iff, ← pow_eq_zero_of_le (n.lt_two_pow_self).le hn]
+    rw [← zero_dvd_iff, ← pow_eq_zero_of_le n.lt_two_pow.le hn]
     exact aeval_pow_two_pow_dvd_aeval_iterate_newtonMap h h' n
   · -- Uniqueness
     have ⟨u, hu⟩ := binomExpansion (P.map (algebraMap R S)) r₁ (r₂ - r₁)
@@ -105,6 +110,6 @@ theorem existsUnique_nilpotent_sub_and_aeval_eq_zero
       isUnit_aeval_of_isUnit_aeval_of_isNilpotent_sub h' hr₁
     rw [← sub_sub_sub_cancel_right r₂ r₁ x]
     refine IsNilpotent.isUnit_add_left_of_commute ?_ this (Commute.all _ _)
-    exact (Commute.all _ _).isNilpotent_mul_left <| (Commute.all _ _).isNilpotent_sub hr₂ hr₁
+    exact (Commute.all _ _).isNilpotent_mul_right <| (Commute.all _ _).isNilpotent_sub hr₂ hr₁
 
 end Polynomial

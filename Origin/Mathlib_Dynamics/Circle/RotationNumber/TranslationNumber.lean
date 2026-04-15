@@ -3,6 +3,11 @@ Extracted from Dynamics/Circle/RotationNumber/TranslationNumber.lean
 Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.GroupPower.IterateHom
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Order.Iterate
+import Mathlib.Order.SemiconjSup
+import Mathlib.Topology.Order.MonotoneContinuity
 
 /-!
 # Translation number of a monotone real map that commutes with `x ↦ x + 1`
@@ -19,8 +24,8 @@ translation number of `f : CircleDeg1Lift`, prove some estimates relating `f^n(x
 case of a continuous map `f` we also prove that `f` admits a point `x` such that `f^n(x)=x+m` if and
 only if `τ(f)=m/n`.
 
-Maps of this type naturally appear as lifts of orientation-preserving circle homeomorphisms. More
-precisely, let `f` be an orientation-preserving homeomorphism of the circle $S^1=ℝ/ℤ$, and
+Maps of this type naturally appear as lifts of orientation preserving circle homeomorphisms. More
+precisely, let `f` be an orientation preserving homeomorphism of the circle $S^1=ℝ/ℤ$, and
 consider a real number `a` such that
 `⟦a⟧ = f 0`, where `⟦⟧` means the natural projection `ℝ → ℝ/ℤ`. Then there exists a unique
 continuous function `F : ℝ → ℝ` such that `F 0 = a` and `⟦F x⟧ = f ⟦x⟧` for all `x` (this fact is
@@ -65,7 +70,7 @@ We prove the following properties of `CircleDeg1Lift.translationNumber`.
   homomorphisms from `G →* CircleDeg1Lift`). If the translation numbers of `f₁ g` and `f₂ g` are
   equal to each other for all `g : G`, then these two actions are semiconjugate by some
   `F : CircleDeg1Lift`. This is a version of Proposition 5.4 from [Étienne Ghys, Groupes
-  d'homéomorphismes du cercle et cohomologie bornée][ghys87:groupes].
+  d'homeomorphismes du cercle et cohomologie bornee][ghys87:groupes].
 
 ## Notation
 
@@ -87,7 +92,7 @@ preserving circle homeomorphisms for two reasons:
 
 ## References
 
-* [Étienne Ghys, Groupes d'homéomorphismes du cercle et cohomologie bornée][ghys87:groupes]
+* [Étienne Ghys, Groupes d'homeomorphismes du cercle et cohomologie bornee][ghys87:groupes]
 
 ## TODO
 
@@ -118,7 +123,7 @@ open Function hiding Commute
 ### Definition and monoid structure
 -/
 
-structure CircleDeg1Lift : Type extends ℝ →o ℝ where
+structure CircleDeg1Lift extends ℝ →o ℝ : Type where
   map_add_one' : ∀ x, toFun (x + 1) = toFun x + 1
 
 namespace CircleDeg1Lift

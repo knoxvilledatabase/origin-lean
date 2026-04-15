@@ -1,13 +1,15 @@
 /-
 Extracted from Dynamics/Ergodic/MeasurePreserving.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.AEMeasurable
+import Mathlib.Order.Filter.EventuallyConst
 
 /-!
-# Measure-preserving maps
+# Measure preserving maps
 
-We say that `f : α → β` is a measure-preserving map w.r.t. measures `μ : Measure α` and
+We say that `f : α → β` is a measure preserving map w.r.t. measures `μ : Measure α` and
 `ν : Measure β` if `f` is measurable and `map f μ = ν`. In this file we define the predicate
 `MeasureTheory.MeasurePreserving` and prove its basic properties.
 
@@ -21,7 +23,7 @@ Isabelle formalization.
 
 ## Tags
 
-measure-preserving map, measure
+measure preserving map, measure
 -/
 
 open MeasureTheory.Measure Function Set
@@ -51,9 +53,3 @@ protected theorem id (μ : Measure α) : MeasurePreserving id μ μ :=
 
 protected theorem aemeasurable {f : α → β} (hf : MeasurePreserving f μa μb) : AEMeasurable f μa :=
   hf.1.aemeasurable
-
-protected theorem congr {f f' : α → β} (hf : MeasurePreserving f μa μb) (hf' : Measurable f')
-    (h : f =ᵐ[μa] f') : MeasurePreserving f' μa μb := by
-  refine ⟨hf', ?_⟩
-  rw [Measure.map_congr h.symm]
-  exact hf.map_eq

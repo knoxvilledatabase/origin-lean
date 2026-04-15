@@ -3,6 +3,8 @@ Extracted from Dynamics/BirkhoffSum/Basic.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Dynamics.FixedPoints.Basic
 
 /-!
 # Birkhoff sums

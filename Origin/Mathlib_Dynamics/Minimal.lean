@@ -3,6 +3,7 @@ Extracted from Dynamics/Minimal.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Algebra.ConstMulAction
 
 /-!
 # Minimal action of a group

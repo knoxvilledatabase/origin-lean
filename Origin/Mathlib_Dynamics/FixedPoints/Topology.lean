@@ -3,6 +3,8 @@ Extracted from Dynamics/FixedPoints/Topology.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Dynamics.FixedPoints.Basic
+import Mathlib.Topology.Separation.Basic
 
 /-!
 # Topological properties of fixed points

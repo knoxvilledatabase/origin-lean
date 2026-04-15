@@ -3,8 +3,8 @@ Extracted from Dynamics/OmegaLimit.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
-
-public meta import Mathlib.Tactic.ToAdditive
+import Mathlib.Dynamics.Flow
+import Mathlib.Tactic.Monotonicity
 
 /-!
 # ω-limits
@@ -22,9 +22,9 @@ recover the usual definition of the ω-limit set as the set of all `y`
 such that there exist sequences `(tₙ)`, `(xₙ)` such that `ϕ tₙ xₙ ⟶ y`
 as `n ⟶ ∞`.
 
-## Notation
+## Notations
 
-The `omegaLimit` scope provides the localised notation `ω` for
+The `omegaLimit` locale provides the localised notation `ω` for
 `omegaLimit`, as well as `ω⁺` and `ω⁻` for `omegaLimit atTop` and
 `omegaLimit atBot` respectively for when the acting monoid is
 endowed with an order.

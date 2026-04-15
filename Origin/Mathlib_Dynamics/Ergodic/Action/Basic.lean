@@ -3,6 +3,8 @@ Extracted from Dynamics/Ergodic/Action/Basic.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Group.AEStabilizer
+import Mathlib.Dynamics.Ergodic.Ergodic
 
 /-!
 # Ergodic group actions
@@ -17,7 +19,7 @@ open Set Filter MeasureTheory MulAction
 
 open scoped Pointwise
 
-class ErgodicVAdd (G α : Type*) [VAdd G α] {_ : MeasurableSpace α} (μ : Measure α) : Prop
-    extends VAddInvariantMeasure G α μ where
+class ErgodicVAdd (G α : Type*) [VAdd G α] {_ : MeasurableSpace α} (μ : Measure α)
+    extends VAddInvariantMeasure G α μ : Prop where
   aeconst_of_forall_preimage_vadd_ae_eq {s : Set α} : MeasurableSet s →
     (∀ g : G, (g +ᵥ ·) ⁻¹' s =ᵐ[μ] s) → EventuallyConst s (ae μ)

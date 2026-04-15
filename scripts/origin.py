@@ -42,7 +42,12 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional
 
-MATHLIB_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib")
+# Use lake's Mathlib — same version that builds
+LAKE_MATHLIB = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean/.lake/packages/mathlib/Mathlib")
+ORIGIN_MATHLIB = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib")
+
+# Default: use lake's Mathlib (guaranteed version match)
+MATHLIB_DIR = LAKE_MATHLIB if LAKE_MATHLIB.exists() else ORIGIN_MATHLIB
 ORIGIN_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean/Origin")
 
 # --self flag: audit Origin instead of Mathlib

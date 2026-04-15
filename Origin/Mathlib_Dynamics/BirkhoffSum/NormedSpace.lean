@@ -3,6 +3,8 @@ Extracted from Dynamics/BirkhoffSum/NormedSpace.lean
 Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.RCLike.Basic
+import Mathlib.Dynamics.BirkhoffSum.Average
 
 /-!
 # Birkhoff average in a normed space
@@ -27,7 +29,7 @@ theorem Function.IsFixedPt.tendsto_birkhoffAverage
     {f : α → α} {x : α} (h : f.IsFixedPt x) (g : α → E) :
     Tendsto (birkhoffAverage R f g · x) atTop (𝓝 (g x)) :=
   tendsto_const_nhds.congr' <| (eventually_ne_atTop 0).mono fun _n hn ↦
-    (h.birkhoffAverage_eq R g (Nat.cast_ne_zero.mpr hn)).symm
+    (h.birkhoffAverage_eq R g hn).symm
 
 variable [NormedAddCommGroup E]
 
@@ -40,7 +42,7 @@ theorem dist_birkhoffSum_birkhoffSum_le (f : α → α) (g : α → E) (n : ℕ)
       ∑ k ∈ Finset.range n, dist (g (f^[k] x)) (g (f^[k] y)) :=
   dist_sum_sum_le _ _ _
 
-variable (𝕜 : Type*) [RCLike 𝕜] [NormedSpace 𝕜 E]
+variable (𝕜 : Type*) [RCLike 𝕜] [Module 𝕜 E] [BoundedSMul 𝕜 E]
 
 theorem dist_birkhoffAverage_birkhoffAverage (f : α → α) (g : α → E) (n : ℕ) (x y : α) :
     dist (birkhoffAverage 𝕜 f g n x) (birkhoffAverage 𝕜 f g n y) =
@@ -96,7 +98,7 @@ theorem uniformEquicontinuous_birkhoffAverage (hf : LipschitzWith 1 f) (hg : Uni
       simpa using (hf.iterate _).edist_le_mul_of_le h.le
     _ = n * ε / n := by simp
     _ ≤ ε := by
-      rcases eq_or_ne n 0 with hn | hn <;> simp [hn, hε.le, mul_div_cancel_left₀]
+      rcases eq_or_ne n 0 with hn | hn <;> field_simp [hn, hε.le, mul_div_cancel_left₀]
 
 theorem isClosed_setOf_tendsto_birkhoffAverage
     (hf : LipschitzWith 1 f) (hg : UniformContinuous g) (hl : Continuous l) :

@@ -1,8 +1,11 @@
 /-
 Extracted from Dynamics/TopologicalEntropy/CoverEntropy.lean
-Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
+import Mathlib.Data.Real.ENatENNReal
+import Mathlib.Dynamics.TopologicalEntropy.DynamicalEntourage
 
 /-!
 # Topological entropy via covers
@@ -27,10 +30,10 @@ reals `[-∞, +∞]`. The consequence is that we use `ℕ∞`, `ℝ≥0∞` and 
 - `IsDynCoverOf`: property that dynamical balls centered on a subset `s` cover a subset `F`.
 - `coverMincard`: minimal cardinality of a dynamical cover. Takes values in `ℕ∞`.
 - `coverEntropyInfEntourage`/`coverEntropyEntourage`: exponential growth of `coverMincard`.
-  The former is defined with a `liminf`, the later with a `limsup`. Take values in `EReal`.
+The former is defined with a `liminf`, the later with a `limsup`. Take values in `EReal`.
 - `coverEntropyInf`/`coverEntropy`: supremum of `coverEntropyInfEntourage`/`coverEntropyEntourage`
-  over all entourages (or limit as the entourages go to the diagonal). These are Bowen-Dinaburg's
-  versions of the topological entropy with covers. Take values in `EReal`.
+over all entourages (or limit as the entourages go to the diagonal). These are Bowen-Dinaburg's
+versions of the topological entropy with covers. Take values in `EReal`.
 
 ## Implementation notes
 There are two competing definitions of topological entropy in this file: one uses a `liminf`,
@@ -42,28 +45,45 @@ using only `coverEntropy`.
 
 ## Main results
 - `IsDynCoverOf.iterate_le_pow`: given a dynamical cover at time `n`, creates dynamical covers
-  at all iterates `n * m` with controlled cardinality.
+at all iterates `n * m` with controlled cardinality.
 - `IsDynCoverOf.coverEntropyEntourage_le_log_card_div`: upper bound on `coverEntropyEntourage`
-  given any dynamical cover.
+given any dynamical cover.
 - `coverEntropyInf_eq_coverEntropy`: equality between the notions of topological entropy defined
-  with a `liminf` and a `limsup`.
+with a `liminf` and a `limsup`.
 
 ## Tags
 cover, entropy
 
 ## TODO
+The most painful part of many manipulations involving topological entropy is going from
+`coverMincard` to `coverEntropyInfEntourage`/`coverEntropyEntourage`. It involves a logarithm,
+a division, a `liminf`/`limsup`, and multiple coercions. The best thing to do would be to write
+a file on "exponential growth" to make a clean pathway from estimates on `coverMincard`
+to estimates on `coverEntropyInf`/`coverEntropy`. It would also be useful
+in other similar contexts, including the definition of entropy using nets.
+
 Get versions of the topological entropy on (pseudo-e)metric spaces.
 -/
 
-open Set SetRel Uniformity UniformSpace
-
-open scoped Finset
-
 namespace Dynamics
 
-variable {X : Type*} {T : X → X} {U V : SetRel X X} {n : ℕ} {F s : Set X} {m n : ℕ}
+open Set Uniformity UniformSpace
+
+variable {X : Type*}
 
 /-! ### Dynamical covers -/
 
-def IsDynCoverOf (T : X → X) (F : Set X) (U : SetRel X X) (n : ℕ) (s : Set X) : Prop :=
-  IsCover (dynEntourage T U n) F s
+def IsDynCoverOf (T : X → X) (F : Set X) (U : Set (X × X)) (n : ℕ) (s : Set X) : Prop :=
+  F ⊆ ⋃ x ∈ s, ball x (dynEntourage T U n)
+
+lemma IsDynCoverOf.of_le {T : X → X} {F : Set X} {U : Set (X × X)} {m n : ℕ} (m_n : m ≤ n)
+    {s : Set X} (h : IsDynCoverOf T F U n s) :
+    IsDynCoverOf T F U m s := by
+  exact Subset.trans (c := ⋃ x ∈ s, ball x (dynEntourage T U m)) h
+    (iUnion₂_mono fun x _ ↦ ball_mono (dynEntourage_antitone T U m_n) x)
+
+lemma IsDynCoverOf.of_entourage_subset {T : X → X} {F : Set X} {U V : Set (X × X)} (U_V : U ⊆ V)
+    {n : ℕ} {s : Set X} (h : IsDynCoverOf T F U n s) :
+    IsDynCoverOf T F V n s := by
+  exact Subset.trans (c := ⋃ x ∈ s, ball x (dynEntourage T V n)) h
+    (iUnion₂_mono fun x _ ↦ ball_mono (dynEntourage_monotone T n U_V) x)
