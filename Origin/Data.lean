@@ -1,0 +1,182 @@
+/-
+Released under MIT license.
+-/
+import Origin.Core
+
+/-!
+# Data on Option α (Core-based)
+
+Val/Data.lean: 1121 lines. Number tower, lists, multisets, sets, finsets,
+matrix, complex, extended number types, fin/fintype, finsupp.
+
+This version keeps only domain-specific definitions and proofs that
+actually use Option.
+-/
+
+universe u
+variable {α : Type u}
+
+-- ============================================================================
+-- 1. DIVISION: none absorbs, some computes
+-- ============================================================================
+
+theorem div_none_right [Mul α] [Neg α] (n : Option α) :
+    n * (none : Option α) = none := by simp
+
+-- ============================================================================
+-- 2. GCD
+-- ============================================================================
+
+def optGcd (gcdF : α → α → α) : Option α → Option α → Option α
+  | some a, some b => some (gcdF a b)
+  | _, _ => none
+
+@[simp] theorem optGcd_none_left (gcdF : α → α → α) (b : Option α) :
+    optGcd gcdF none b = none := by cases b <;> rfl
+
+@[simp] theorem optGcd_none_right (gcdF : α → α → α) (a : Option α) :
+    optGcd gcdF a none = none := by cases a <;> rfl
+
+@[simp] theorem optGcd_some (gcdF : α → α → α) (a b : α) :
+    optGcd gcdF (some a) (some b) = some (gcdF a b) := rfl
+
+theorem optGcd_comm (gcdF : α → α → α)
+    (h : ∀ a b : α, gcdF a b = gcdF b a) (a b : Option α) :
+    optGcd gcdF a b = optGcd gcdF b a := by
+  cases a <;> cases b <;> simp [optGcd, h]
+
+-- ============================================================================
+-- 3. PRIMALITY
+-- ============================================================================
+
+def optIsPrime (primeP : α → Prop) : Option α → Prop
+  | some a => primeP a
+  | none => False
+
+@[simp] theorem optIsPrime_none (primeP : α → Prop) :
+    optIsPrime primeP (none : Option α) = False := rfl
+
+-- ============================================================================
+-- 4. CONGRUENCE
+-- ============================================================================
+
+def optCong (modF : α → α → α) (a b n : α) : Prop := modF a n = modF b n
+
+theorem optCong_refl (modF : α → α → α) (a n : α) : optCong modF a a n := rfl
+
+theorem optCong_symm (modF : α → α → α) (a b n : α)
+    (h : optCong modF a b n) : optCong modF b a n := h.symm
+
+theorem optCong_trans (modF : α → α → α) (a b c n : α)
+    (hab : optCong modF a b n) (hbc : optCong modF b c n) :
+    optCong modF a c n := hab.trans hbc
+
+-- ============================================================================
+-- 5. LISTS
+-- ============================================================================
+
+variable {β : Type u}
+
+def optCons (a : α) : Option (List α) → Option (List α)
+  | some xs => some (a :: xs)
+  | none => none
+
+@[simp] theorem optCons_none (a : α) :
+    optCons a (none : Option (List α)) = none := rfl
+
+@[simp] theorem optCons_some (a : α) (xs : List α) :
+    optCons a (some xs) = some (a :: xs) := rfl
+
+def optAppend : Option (List α) → Option (List α) → Option (List α)
+  | some xs, some ys => some (xs ++ ys)
+  | _, _ => none
+
+@[simp] theorem optAppend_none_left (ys : Option (List α)) :
+    optAppend none ys = none := by cases ys <;> rfl
+
+@[simp] theorem optAppend_none_right (xs : Option (List α)) :
+    optAppend xs none = none := by cases xs <;> rfl
+
+@[simp] theorem optAppend_some (xs ys : List α) :
+    optAppend (some xs) (some ys) = some (xs ++ ys) := rfl
+
+theorem optAppend_assoc (xs ys zs : List α) :
+    optAppend (optAppend (some xs) (some ys)) (some zs) =
+    optAppend (some xs) (optAppend (some ys) (some zs)) := by
+  simp [List.append_assoc]
+
+def optLength : Option (List α) → Option Nat
+  | some xs => some xs.length
+  | none => none
+
+@[simp] theorem optLength_none :
+    optLength (none : Option (List α)) = none := rfl
+
+@[simp] theorem optLength_some (xs : List α) :
+    optLength (some xs) = some xs.length := rfl
+
+def optReverse : Option (List α) → Option (List α)
+  | some xs => some xs.reverse
+  | none => none
+
+theorem optReverse_optReverse (xs : List α) :
+    optReverse (optReverse (some xs)) = some xs := by
+  simp [optReverse, List.reverse_reverse]
+
+def optListMap (f : α → β) : Option (List α) → Option (List β)
+  | some xs => some (xs.map f)
+  | none => none
+
+@[simp] theorem optListMap_none (f : α → β) :
+    optListMap f (none : Option (List α)) = none := rfl
+
+theorem optListMap_append (f : α → β) (xs ys : List α) :
+    optListMap f (optAppend (some xs) (some ys)) =
+    optAppend (optListMap f (some xs)) (optListMap f (some ys)) := by
+  simp [optListMap, optAppend, List.map_append]
+
+-- ============================================================================
+-- 6. SETS: predicates
+-- ============================================================================
+
+def optInjective (f : α → α) : Prop := ∀ a b, f a = f b → a = b
+def optSurjective (f : α → α) : Prop := ∀ b, ∃ a, f a = b
+def optBijective (f : α → α) : Prop := optInjective f ∧ optSurjective f
+
+theorem bijective_comp (f g : α → α)
+    (hf : optBijective f) (hg : optBijective g) :
+    optBijective (f ∘ g) := by
+  constructor
+  · intro a b h; exact hg.1 _ _ (hf.1 _ _ h)
+  · intro c; obtain ⟨b, hb⟩ := hf.2 c; obtain ⟨a, ha⟩ := hg.2 b
+    exact ⟨a, by simp [Function.comp, ha, hb]⟩
+
+-- ============================================================================
+-- 7. COMPLEX
+-- ============================================================================
+
+theorem complexConj_involutive (conjF : α → α)
+    (h : ∀ z, conjF (conjF z) = z) (v : Option α) :
+    Option.map conjF (Option.map conjF v) = v := by
+  cases v <;> simp [h]
+
+-- ============================================================================
+-- 8. EXTENDED NUMBER TYPES
+-- ============================================================================
+
+def optIsTop (topP : α → Prop) : Option α → Prop
+  | some a => topP a
+  | none => False
+
+def optIsBot (botP : α → Prop) : Option α → Prop
+  | some a => botP a
+  | none => False
+
+-- ============================================================================
+-- 9. PERMUTATION SIGN
+-- ============================================================================
+
+def optPermSign (signF : α → α) : Option α → Option α := Option.map signF
+
+@[simp] theorem optPermSign_none (signF : α → α) :
+    optPermSign signF (none : Option α) = none := rfl
