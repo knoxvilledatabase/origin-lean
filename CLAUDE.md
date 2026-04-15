@@ -360,6 +360,50 @@ Demonstrated on Dynamics (31 files, 6,514 lines):
 - CoverEntropy.lean: 14 hits
 - Minimal.lean: 12 hits
 
+### How to measure the cost of the collapse
+
+The previous count (9,682) only counted `≠ 0` in theorem signatures.
+That misses the threading — the `.ne'`, `inv_ne_zero`, `cast_ne_zero`
+calls INSIDE proofs that pass the hypothesis through intermediate steps.
+
+**The commands that found the real number:**
+
+```bash
+# Step 1: Count ≠ 0 in signatures (the hypotheses themselves)
+grep -rn "(\(h\w*\s*:\s*\S*\s*≠\s*0\)" \
+  Mathlib/NumberTheory/ --include="*.lean" | wc -l
+
+# Step 2: Count ≠ 0 threading inside proofs
+grep -rn "\.ne'\|ne_zero\|cast_ne_zero\|succ_ne_zero\|inv_ne_zero\|pos_of_ne_zero" \
+  Mathlib/NumberTheory/ --include="*.lean" | wc -l
+
+# Step 3: Total surface area = signatures + threading
+
+# Step 4: Run across ALL domains to get the full picture
+for domain in NumberTheory FieldTheory Geometry Analysis ...; do
+  sigs=$(grep -rn ... | wc -l)
+  thread=$(grep -rn ... | wc -l)
+  echo "$domain: $sigs signatures, $thread threading, $((sigs+thread)) total"
+done | sort by total
+```
+
+**Why threading matters:** In `Harmonic/Int.lean`, `harmonic_pos`
+carries `(Hn : n ≠ 0)` in the signature. But `padicValRat_two_harmonic`
+doesn't have `≠ 0` in its signature — it threads it INTERNALLY:
+
+```lean
+-- Line 40: threads ≠ 0 through harmonic_pos → .ne'
+(harmonic_pos n.succ_ne_zero).ne'
+-- Line 41: threads ≠ 0 through harmonic_pos → .ne'
+(harmonic_pos hn).ne'
+-- Line 41: threads ≠ 0 through cast → inv
+inv_ne_zero (Nat.cast_ne_zero.mpr n.succ_ne_zero)
+```
+
+Each `.ne'` is a line of code that exists solely to convert a `≠ 0`
+hypothesis into a form the next function needs. In Origin, none of
+these lines exist. `none` absorbs structurally. No conversion needed.
+
 ### The cost of the collapse is 5x larger than the signatures
 
 Previous count: 9,682 `≠ 0` hypotheses (signatures only).
