@@ -76,18 +76,30 @@ Then, for evidence:
 
 ## The Architecture
 
-**Origin (the foundation):**
+**Origin (the foundation) — ~2,440 lines total:**
 ```
 Origin/
   Core.lean              — THE file. Theorem + instances + simp set. 166 lines.
-  Foundation.lean        — historical: the derivation before Core existed
-  Test.lean              — instantiation on Int
-  Physics.lean           — physics domains on Option
-  Logic.lean             — paradoxes on Option
-  [domain files]         — domain content importing Core
+  Test.lean              — instantiation on Int. Concrete computation.
+  Physics.lean           — 6 physics domains on Option
+  Logic.lean             — Liar, Russell, Curry on Option
+  InformationTheory2.lean — 81 lines  (Val: 283)
+  Geometry2.lean          — 152 lines (Val: 324)
+  MeasureTheory2.lean     — 98 lines  (Val: 377)
+  LinearAlgebra2.lean     — 122 lines (Val: 451)
+  RingTheory2.lean        — 147 lines (Val: 479)
+  Topology.lean           — 139 lines (Val: 525)
+  Algebra.lean            — 129 lines (Val: 595)
+  NumberTheory.lean       — 113 lines (Val: 667)
+  FieldTheory.lean        — 95 lines  (Val: 831)
+  Analysis.lean           — 144 lines (Val: 832)
+  Data.lean               — 182 lines (Val: 1,121)
+  GroupTheory.lean         — 121 lines (Val: 1,140)
+  CategoryTheory.lean      — 93 lines  (Val: 1,069)
+  Combinatorics.lean       — 105 lines (Val: 1,349)
 ```
 
-**Val (the evidence):**
+**Val (the evidence) — 14,474 lines:**
 ```
 Val/
   Foundation.lean through Module.lean  — 5-level class hierarchy
@@ -96,6 +108,24 @@ Val/
   Logic/                               — paradox infrastructure
   Demo/                                — tests and challenge theorems
 ```
+
+## The Numbers
+
+```
+Mathlib:    2,160,000 lines  — the math, with the ground inside
+Val:           14,474 lines  — the proof it works (scaffolding)
+Origin:         2,440 lines  — the building (83% less than the scaffolding)
+```
+
+The bigger the Val file, the more was boilerplate:
+- Combinatorics: 1,349 → 105 (92% was infrastructure)
+- CategoryTheory: 1,069 → 93 (91%)
+- GroupTheory: 1,140 → 121 (89%)
+- FieldTheory: 831 → 95 (89%)
+
+What was removed: every hypothesis-passing theorem, every `Option.map` wrapper,
+every simp lemma reproved from Core. What remains: domain definitions,
+predicates, structures, and proofs that demonstrate Option behavior.
 
 ## Key Rules
 
@@ -160,7 +190,13 @@ Domain files should contain ONLY domain-specific content. No lifting boilerplate
 ## Build and Verify
 
 ```bash
-lake build Origin.Core    # the foundation — one file, 166 lines
+lake build Origin.Core              # the foundation — 166 lines
+lake build Origin.Combinatorics     # largest domain file — 105 lines
+lake build Origin.Physics           # physics — 247 lines
+lake build Origin.Logic             # logic — 155 lines
 ```
 
 Zero sorries. Zero Mathlib. Builds in under a second.
+
+The conversion is complete. All 14 math domains, physics, and logic
+are on Origin/Core.lean. Val/ stays as the published evidence at scale.
