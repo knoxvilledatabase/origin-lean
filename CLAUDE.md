@@ -229,26 +229,70 @@ follow from the instances?**
 If it follows from the instances: skip it. It's free.
 If it's genuine domain content: write it in Origin.
 
-### The method
+### The method (demonstrated on InformationTheory)
 
-For each Mathlib domain, for each Mathlib file:
+Mathlib lives at: `origin-mathlib/Mathlib/`
 
-1. **Open the Mathlib file.** Read each theorem.
-2. **Ask: does this already work on `Option α` via Core's instances?**
-   - Typeclass instances, coercion wrappers, simp lemmas → free. Skip.
-   - `≠ 0` guards, NeZero instances, WithBot/WithTop → dissolved. Skip.
-   - Genuinely new mathematics → write it in Origin.
-3. **Write the Origin theorem at the most general level.** One theorem
-   covering 3-7 specific Mathlib results. Standard `*` `+` `-` notation.
-4. **No hypothesis passing.** No wrappers. No reproved simp lemmas.
-5. **Build. Verify. Move to the next file.**
+For each Mathlib file, three steps:
+
+**Step 1: Grep for zero-management.**
+
+```bash
+grep -n "NeZero\|≠ 0\|ne_zero\|NoZero\|WithBot\|WithTop\|GroupWithZero" \
+  Mathlib/InformationTheory/KullbackLeibler/KLFun.lean
+```
+
+Every hit is a theorem or hypothesis that dissolves with Origin.
+These don't need to exist. `none` handles them structurally.
+
+**Step 2: Triage the rest.**
+
+For each remaining declaration, ask:
+- **Typeclass instance, simp lemma, coercion wrapper?** → Free from
+  Core's instances. Skip.
+- **Pure domain math (no zero management, no Val/Option)?** → Write
+  it in Origin as-is. It was never affected by the collapse.
+- **Analytic infrastructure (continuity, convexity, measurability)?** →
+  Stays as hypotheses. Honest boundary. The algebra is handled.
+  The analysis is deferred.
+- **Genuine new mathematics with real proof?** → Write it in Origin.
+
+**Step 3: Write the Origin file.**
+
+Import Core. Write only what survived triage. Standard notation.
+Build. Verify. Move to the next file.
+
+### Demonstrated results on InformationTheory (6 Mathlib files, 1,457 lines)
+
+```
+UniquelyDecodable.lean (57 lines):
+  0 zero-management. 3 declarations. All pure domain math.
+  Copy as-is. None of this was affected by the collapse.
+
+KLFun.lean (194 lines):
+  1 ≠ 0 hypothesis (hasDerivAt_klFun). Dissolves.
+  Rest: convexity, continuity, measurability → analysis (hypotheses).
+  klFun definition → genuine content, write it.
+
+Hamming.lean (410 lines):
+  6 ≠ 0 occurrences. hammingDist_ne_zero, hammingNorm_ne_zero_iff,
+  hammingNorm_pos_iff → all dissolve.
+  Distance, triangle inequality, metric → genuine content.
+
+KL/Basic.lean (394 lines): triage TBD
+KL/ChainRule.lean (237 lines): triage TBD
+KraftMcMillan.lean (165 lines): triage TBD
+```
+
+The pattern: grep for zero-management. Count what dissolves.
+Write what's genuinely new. Skip what's free. Defer what's analysis.
 
 ### The order
 
 Smallest Mathlib domain first. Same discipline as always.
 
-Within each domain: start with the foundational files that other files
-depend on. Work outward. Each file builds on the previous.
+Within each domain: start with the files that have no imports from
+the same domain. Work outward. Each file builds on the previous.
 
 ### What the classifications/ directory is
 
@@ -261,7 +305,7 @@ handles it structurally). Much of what was B1 in Val is handled by
 Lean's standard instances on Option. The boundary between "free" and
 "needs writing" is different and simpler.
 
-Don't reclassify. Just go straight to Mathlib and write what's new.
+Don't reclassify. Just go straight to Mathlib and triage.
 
 ### The goal
 
