@@ -3,13 +3,16 @@
 Origin: Mathlib → Origin conversion tool.
 
 Usage:
-    python scripts/origin.py classify NumberTheory          # classify one domain
-    python scripts/origin.py classify --all                 # classify all domains
-    python scripts/origin.py extract Mathlib/Path/File.lean # extract one file
-    python scripts/origin.py extract --domain NumberTheory  # extract whole domain
-    python scripts/origin.py fruit --all 10                 # top 10 by density
+    python3 scripts/origin.py classify NumberTheory
+    python3 scripts/origin.py classify --all
+    python3 scripts/origin.py extract NumberTheory/Harmonic/Int.lean
+    python3 scripts/origin.py extract --domain NumberTheory
+    python3 scripts/origin.py fruit --all 10
 
-One tool. Replaces triage.sh, fruit.sh, classify.sh, and does extraction.
+Smart extraction: preserves namespaces, variables, and open statements.
+Strips zero-management by name AND by signature. Skips files that are
+entirely infrastructure. Generates drafts that are as close to building
+as a script can get. Claude fixes only what lake build says is broken.
 """
 
 import os
@@ -22,193 +25,297 @@ from typing import Optional
 MATHLIB_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib")
 ORIGIN_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean/Origin")
 
-ZERO_PATTERNS = [
-    r"≠\s*0",
-    r"NeZero",
-    r"ne_zero",
-    r"GroupWithZero",
-    r"\.ne'",
-    r"inv_ne_zero",
-    r"cast_ne_zero",
-    r"succ_ne_zero",
-    r"pos_of_ne_zero",
-]
-ZERO_RE = re.compile("|".join(ZERO_PATTERNS))
+# ---------------------------------------------------------------------------
+# Zero-management patterns
+# ---------------------------------------------------------------------------
 
-TRIVIAL_PROOF = re.compile(
-    r":=\s*(rfl|h\b|by\s+simp\s*$|by\s+rfl|by\s+exact\s+\w+\s*$|Iff\.rfl|\(rfl\s*:\))",
+# Signature patterns: hypotheses that dissolve
+ZERO_SIG = re.compile(r"≠\s*0|NeZero|ne_zero|GroupWithZero")
+
+# Threading patterns: internal proof lines that simplify
+ZERO_THREAD = re.compile(r"\.ne'|inv_ne_zero|cast_ne_zero|succ_ne_zero|pos_of_ne_zero")
+
+# All zero-management
+ZERO_ALL = re.compile(r"≠\s*0|NeZero|ne_zero|GroupWithZero|\.ne'|inv_ne_zero|cast_ne_zero|succ_ne_zero|pos_of_ne_zero")
+
+# Declaration names that ARE zero-management infrastructure
+INFRA_NAMES = re.compile(
+    r"ne_zero|NeZero|neZero|ne_one|"
+    r"GroupWithZero|groupWithZero|"
+    r"NoZeroDivisors|noZeroDivisors|"
+    r"NoZeroSMulDivisors|"
+    r"MulZeroClass|mulZeroClass|"
+    r"IsUnit.*zero|isUnit.*zero|"
+    r"not_isUnit_zero|"
+    r"zero_mul|mul_zero|zero_div|div_zero|"
+    r"inv_zero|zero_inv|"
+    r"WithZero|withZero|WithBot|withBot|WithTop|withTop|"
+    r"ZeroHom|zeroHom|"
+    r"CharZero|charZero"
 )
 
+# Trivial proof patterns
+TRIVIAL_RE = re.compile(r":=\s*(rfl|h\b|by\s+simp\s*$|by\s+rfl|by\s+exact\s+\w+\s*$|Iff\.rfl)")
+
+# File-level: files that are ENTIRELY about zero infrastructure
+INFRA_FILE_PATTERNS = [
+    "GroupWithZero", "NeZero", "NoZeroDivisors", "NoZeroSMul",
+    "MulZeroClass", "WithZero", "WithBot", "WithTop",
+    "ZeroHom", "CharZero", "IsUnit",
+]
+
 # ---------------------------------------------------------------------------
-# Declaration parser
+# Smart parser
 # ---------------------------------------------------------------------------
 
 @dataclass
-class Decl:
-    kind: str          # "theorem", "lemma", "def", "structure", "class", "instance", "abbrev", "inductive"
+class Block:
+    """A block of text: could be a declaration, namespace, comment, etc."""
+    kind: str  # "decl", "namespace", "variable", "open", "comment", "import", "other"
     name: str
-    signature: str     # full signature (may be multi-line)
-    body: str          # proof/definition body
-    start_line: int
-    end_line: int
-    is_simp: bool = False
-    has_zero_mgmt: bool = False
-    is_trivial: bool = False
-    is_instance: bool = False
-    classification: str = ""  # "genuine", "dissolves", "instance", "simp", "trivial"
-
-    @property
-    def is_genuine(self):
-        return self.classification == "genuine"
+    text: str
+    classification: str = ""  # "genuine", "dissolves", "instance", "infra_name", "simp_trivial", "skip"
 
 
-def parse_declarations(text: str) -> list[Decl]:
-    """Parse a Lean file into declarations."""
+def is_infra_file(filepath: Path) -> bool:
+    """Is this file entirely about zero-management infrastructure?"""
+    name = filepath.stem
+    for pat in INFRA_FILE_PATTERNS:
+        if pat in str(filepath):
+            return True
+    return False
+
+
+def classify_decl_name(name: str) -> bool:
+    """Is this declaration name itself zero-management infrastructure?"""
+    return bool(INFRA_NAMES.search(name))
+
+
+def parse_file_smart(text: str) -> list[Block]:
+    """Parse a Lean file into blocks, preserving structure."""
     lines = text.split("\n")
-    decls = []
+    blocks = []
     i = 0
-
-    # Track @[simp] on previous non-blank line
-    pending_simp = False
 
     while i < len(lines):
         line = lines[i]
         stripped = line.strip()
 
-        # Track @[simp]
-        if stripped.startswith("@[simp"):
-            pending_simp = True
+        # Empty lines
+        if not stripped:
             i += 1
             continue
 
-        # Detect declaration start
+        # Comments (block)
+        if stripped.startswith("/-"):
+            comment_lines = [line]
+            if "-/" not in stripped[2:]:
+                i += 1
+                while i < len(lines) and "-/" not in lines[i]:
+                    comment_lines.append(lines[i])
+                    i += 1
+                if i < len(lines):
+                    comment_lines.append(lines[i])
+            blocks.append(Block("comment", "", "\n".join(comment_lines)))
+            i += 1
+            continue
+
+        # Line comments
+        if stripped.startswith("--"):
+            i += 1
+            continue
+
+        # Imports
+        if stripped.startswith("import ") or stripped.startswith("public import "):
+            blocks.append(Block("import", "", line))
+            i += 1
+            continue
+
+        # Module/section markers
+        if stripped.startswith("module") or stripped.startswith("@[expose]") or stripped.startswith("deprecated_module"):
+            i += 1
+            continue
+
+        if stripped.startswith("public section") or stripped == "section":
+            i += 1
+            continue
+
+        # Namespace
+        if stripped.startswith("namespace "):
+            ns = stripped.split("namespace ", 1)[1].strip()
+            blocks.append(Block("namespace", ns, line))
+            i += 1
+            continue
+
+        if stripped.startswith("end "):
+            ns = stripped.split("end ", 1)[1].strip()
+            blocks.append(Block("end_namespace", ns, f"end {ns}"))
+            i += 1
+            continue
+
+        # Open
+        if stripped.startswith("open "):
+            blocks.append(Block("open", "", line))
+            i += 1
+            continue
+
+        # Variable
+        if stripped.startswith("variable"):
+            var_lines = [line]
+            i += 1
+            # Multi-line variable
+            while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                var_lines.append(lines[i])
+                i += 1
+            blocks.append(Block("variable", "", "\n".join(var_lines)))
+            continue
+
+        # Attribute line (collect and attach to next decl)
+        if stripped.startswith("@["):
+            attr_line = line
+            i += 1
+            # The next non-empty line should be the declaration
+            while i < len(lines) and not lines[i].strip():
+                i += 1
+            if i < len(lines):
+                # Prepend attribute to declaration line
+                lines[i] = attr_line + "\n" + lines[i]
+            continue
+
+        # Declaration
         decl_match = re.match(
-            r"^(protected\s+)?(noncomputable\s+)?"
+            r"^(.*?)?(protected\s+)?(noncomputable\s+)?"
             r"(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)",
             stripped
         )
-        if not decl_match:
-            if stripped and not stripped.startswith("--") and not stripped.startswith("/-"):
-                pending_simp = False
+        if decl_match:
+            kind = decl_match.group(4)
+            name = decl_match.group(5)
+
+            # Collect full declaration
+            decl_lines = [line]
             i += 1
-            continue
-
-        kind = decl_match.group(3)
-        name = decl_match.group(4)
-        start_line = i + 1
-
-        # Collect full declaration (signature + body)
-        decl_lines = [line]
-        i += 1
-
-        # For structures/classes/inductives: collect until unindented line or end
-        if kind in ("structure", "class", "inductive"):
-            while i < len(lines):
-                if lines[i].strip() and not lines[i][0].isspace() and not lines[i].strip().startswith("|"):
-                    break
-                decl_lines.append(lines[i])
-                i += 1
-        else:
-            # For theorems/defs: collect indented continuation + proof body
-            # Look for := or where, then collect proof body
-            in_body = ":=" in line or line.strip().endswith("where")
             while i < len(lines):
                 cur = lines[i]
                 cur_stripped = cur.strip()
 
-                # Blank line after unindented content = end
                 if not cur_stripped:
                     decl_lines.append(cur)
                     i += 1
-                    # Check if next line is still indented (continuation)
                     if i < len(lines) and lines[i] and lines[i][0].isspace():
                         continue
                     break
 
-                # New declaration = end
-                if not cur[0].isspace() and cur_stripped and not cur_stripped.startswith("|"):
+                if not cur[0].isspace() and cur_stripped and not cur_stripped.startswith("|") and not cur_stripped.startswith("where"):
                     break
 
                 decl_lines.append(cur)
                 i += 1
 
-        full_text = "\n".join(decl_lines)
-        # Split into signature and body at :=
-        if ":=" in full_text:
-            sig_end = full_text.index(":=")
-            signature = full_text[:sig_end].strip()
-            body = full_text[sig_end:].strip()
-        else:
-            signature = full_text.strip()
-            body = ""
+            full_text = "\n".join(decl_lines).rstrip()
+            sig_part = full_text.split(":=")[0] if ":=" in full_text else full_text
 
-        decl = Decl(
-            kind=kind,
-            name=name,
-            signature=signature,
-            body=body,
-            start_line=start_line,
-            end_line=i,
-            is_simp=pending_simp,
-            has_zero_mgmt=bool(ZERO_RE.search(signature)),
-            is_trivial=bool(TRIVIAL_PROOF.search(full_text)),
-            is_instance=(kind == "instance"),
-        )
+            # Classify
+            if kind == "instance":
+                cls = "instance"
+            elif classify_decl_name(name):
+                cls = "infra_name"
+            elif ZERO_SIG.search(sig_part):
+                cls = "dissolves"
+            elif TRIVIAL_RE.search(full_text) and kind in ("theorem", "lemma"):
+                is_simp = "@[simp]" in full_text
+                cls = "simp_trivial" if is_simp else "trivial"
+            else:
+                cls = "genuine"
 
-        # Classify
-        if decl.is_instance:
-            decl.classification = "instance"
-        elif decl.has_zero_mgmt:
-            decl.classification = "dissolves"
-        elif decl.is_simp and decl.is_trivial:
-            decl.classification = "simp"
-        elif decl.is_trivial and kind in ("theorem", "lemma"):
-            decl.classification = "trivial"
-        else:
-            decl.classification = "genuine"
+            blocks.append(Block("decl", name, full_text, cls))
+            continue
 
-        decls.append(decl)
-        pending_simp = False
+        # Anything else
+        blocks.append(Block("other", "", line))
+        i += 1
 
-    return decls
+    return blocks
 
 
 # ---------------------------------------------------------------------------
-# File analysis
+# Smart extraction
 # ---------------------------------------------------------------------------
 
-@dataclass
-class FileAnalysis:
-    path: str
-    lines: int
-    decls: list[Decl] = field(default_factory=list)
-    zero_hits: int = 0
-
-    @property
-    def genuine(self): return sum(1 for d in self.decls if d.classification == "genuine")
-    @property
-    def dissolves(self): return sum(1 for d in self.decls if d.classification == "dissolves")
-    @property
-    def instances(self): return sum(1 for d in self.decls if d.classification == "instance")
-    @property
-    def simps(self): return sum(1 for d in self.decls if d.classification == "simp")
-    @property
-    def trivial(self): return sum(1 for d in self.decls if d.classification == "trivial")
-    @property
-    def total(self): return len(self.decls)
-    @property
-    def density(self): return self.zero_hits / max(self.lines, 1)
-
-
-def analyze_file(filepath: Path, domain: str = "") -> FileAnalysis:
+def extract_smart(filepath: Path) -> tuple[str, dict]:
+    """Extract genuine content, preserving file structure."""
     text = filepath.read_text(errors="replace")
-    lines = text.count("\n") + 1
-    relpath = str(filepath).split(f"Mathlib/{domain}/")[-1] if domain else str(filepath)
+    relpath = str(filepath).split("Mathlib/")[-1] if "Mathlib/" in str(filepath) else str(filepath)
 
-    decls = parse_declarations(text)
-    zero_hits = len(ZERO_RE.findall(text))
+    # Check if entire file is infrastructure
+    if is_infra_file(filepath):
+        stats = {"total": 0, "genuine": 0, "dissolved": 0, "infra": 0, "skipped_file": True}
+        return f"-- {relpath}: entire file is zero-management infrastructure. Dissolves completely.\n", stats
 
-    return FileAnalysis(path=relpath, lines=lines, decls=decls, zero_hits=zero_hits)
+    blocks = parse_file_smart(text)
+
+    stats = {"total": 0, "genuine": 0, "dissolved": 0, "infra": 0, "skipped_file": False}
+    output_parts = []
+
+    # Header
+    genuine_count = sum(1 for b in blocks if b.kind == "decl" and b.classification == "genuine")
+    total_count = sum(1 for b in blocks if b.kind == "decl")
+    dissolved = sum(1 for b in blocks if b.kind == "decl" and b.classification in ("dissolves", "infra_name"))
+    infra = sum(1 for b in blocks if b.kind == "decl" and b.classification in ("instance", "simp_trivial", "trivial"))
+
+    stats["total"] = total_count
+    stats["genuine"] = genuine_count
+    stats["dissolved"] = dissolved
+    stats["infra"] = infra
+
+    if genuine_count == 0:
+        return f"-- {relpath}: 0 genuine declarations. {dissolved} dissolved, {infra} infrastructure.\n", stats
+
+    # Build output preserving structure
+    for b in blocks:
+        if b.kind == "comment":
+            # Keep the module docstring
+            if "/-!" in b.text:
+                output_parts.append(b.text)
+            continue
+
+        if b.kind == "import":
+            continue  # We'll add our own
+
+        if b.kind in ("namespace", "end_namespace"):
+            output_parts.append(b.text)
+            continue
+
+        if b.kind == "open":
+            output_parts.append(b.text)
+            continue
+
+        if b.kind == "variable":
+            output_parts.append(b.text)
+            continue
+
+        if b.kind == "decl":
+            if b.classification == "genuine":
+                output_parts.append(b.text)
+            elif b.classification in ("dissolves", "infra_name"):
+                output_parts.append(f"-- DISSOLVED: {b.name}")
+            elif b.classification == "instance":
+                output_parts.append(f"-- INSTANCE (free from Core): {b.name}")
+            # simp_trivial and trivial: skip silently
+
+        if b.kind == "other":
+            output_parts.append(b.text)
+
+    # Assemble
+    header = f"""/-
+Extracted from {relpath}
+Genuine: {genuine_count} of {total_count} | Dissolved: {dissolved} | Infrastructure: {infra}
+-/
+import Origin.Core
+"""
+
+    body = "\n\n".join(p for p in output_parts if p.strip())
+    return header + "\n" + body + "\n", stats
 
 
 # ---------------------------------------------------------------------------
@@ -223,55 +330,57 @@ def cmd_classify(domain: str):
         return
 
     files = sorted(src.rglob("*.lean"))
-    analyses = [analyze_file(f, domain) for f in files]
+    rows = []
 
-    # Sort by genuine count descending
-    analyses.sort(key=lambda a: a.genuine, reverse=True)
+    for f in files:
+        text = f.read_text(errors="replace")
+        blocks = parse_file_smart(text)
+        decls = [b for b in blocks if b.kind == "decl"]
 
-    print(f"=== {domain}: Declaration-Level Classification ===")
-    print()
-    print(f"{'GENUINE':>7} | {'DISSOLVE':>8} | {'INST':>4} | {'SIMP':>4} | {'TRIV':>4} | {'TOTAL':>5} | {'LINES':>5} | PATH")
-    print(f"{'-------':>7}-+-{'--------':>8}-+-{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'-----':>5}-+-{'-----':>5}-+------")
+        genuine = sum(1 for d in decls if d.classification == "genuine")
+        dissolved = sum(1 for d in decls if d.classification in ("dissolves", "infra_name"))
+        instances = sum(1 for d in decls if d.classification == "instance")
+        trivial = sum(1 for d in decls if d.classification in ("simp_trivial", "trivial"))
+        total = len(decls)
+        lines = text.count("\n") + 1
+        relpath = str(f).split(f"Mathlib/{domain}/")[-1]
 
-    t = FileAnalysis(path="TOTAL", lines=0)
-    f_genuine = f_dissolves_fully = f_empty = 0
+        rows.append((genuine, dissolved, instances, trivial, total, lines, relpath))
 
-    for a in analyses:
-        print(f"{a.genuine:>7} | {a.dissolves:>8} | {a.instances:>4} | {a.simps:>4} | {a.trivial:>4} | {a.total:>5} | {a.lines:>5} | {a.path}")
-        t.lines += a.lines
-        t.zero_hits += a.zero_hits
-        if a.total == 0:
-            f_empty += 1
-        elif a.genuine == 0:
-            f_dissolves_fully += 1
-        else:
-            f_genuine += 1
+    rows.sort(reverse=True)
 
-    total_decls = sum(a.total for a in analyses)
-    total_genuine = sum(a.genuine for a in analyses)
-    total_dissolves = sum(a.dissolves for a in analyses)
-    total_instances = sum(a.instances for a in analyses)
-    total_simps = sum(a.simps for a in analyses)
-    total_trivial = sum(a.trivial for a in analyses)
+    print(f"=== {domain}: Declaration-Level Classification ===\n")
+    print(f"{'GEN':>4} | {'DISS':>4} | {'INST':>4} | {'TRIV':>4} | {'TOT':>4} | {'LINES':>5} | PATH")
+    print(f"{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'----':>4}-+-{'-----':>5}-+-----")
 
-    print()
-    print(f"--- SUMMARY: {domain} ---")
-    print(f"Files:        {len(files)} total, {f_empty} empty, {f_dissolves_fully} dissolve fully, {f_genuine} have genuine content")
-    print(f"Declarations: {total_decls} total")
-    print(f"  Dissolves:  {total_dissolves} (≠ 0 / NeZero in signature)")
-    print(f"  Instances:  {total_instances} (typeclass infrastructure)")
-    print(f"  Simp:       {total_simps} (@[simp] + trivial)")
-    print(f"  Trivial:    {total_trivial} (rfl / by simp / exact h)")
-    print(f"  GENUINE:    {total_genuine} ← THIS IS WHAT TO WRITE IN ORIGIN")
-    print(f"Lines:        {t.lines}")
+    for g, d, inst, t, tot, lines, path in rows:
+        print(f"{g:>4} | {d:>4} | {inst:>4} | {t:>4} | {tot:>4} | {lines:>5} | {path}")
+
+    t_gen = sum(r[0] for r in rows)
+    t_dis = sum(r[1] for r in rows)
+    t_inst = sum(r[2] for r in rows)
+    t_triv = sum(r[3] for r in rows)
+    t_tot = sum(r[4] for r in rows)
+    t_lines = sum(r[5] for r in rows)
+    f_genuine = sum(1 for r in rows if r[0] > 0)
+    f_empty = sum(1 for r in rows if r[4] == 0)
+    f_dissolves = sum(1 for r in rows if r[0] == 0 and r[4] > 0)
+
+    print(f"\n--- SUMMARY: {domain} ---")
+    print(f"Files:        {len(rows)} total, {f_empty} empty, {f_dissolves} dissolve fully, {f_genuine} have genuine content")
+    print(f"Declarations: {t_tot} total")
+    print(f"  Genuine:    {t_gen}  ← WHAT TO WRITE")
+    print(f"  Dissolved:  {t_dis}  (≠ 0 / NeZero / infra names)")
+    print(f"  Instances:  {t_inst}")
+    print(f"  Trivial:    {t_triv}")
+    print(f"Lines:        {t_lines}")
 
 
 def cmd_classify_all():
     """Summary across all domains."""
-    print("=== ALL DOMAINS: Genuine Content ===")
-    print()
-    print(f"{'DOMAIN':<22} | {'GENUINE':>7} | {'DISSOLVE':>8} | {'INFRA':>5} | {'TOTAL':>5} | {'FILES':>5}")
-    print(f"{'':-<22}-+-{'':-<7}-+-{'':-<8}-+-{'':-<5}-+-{'':-<5}-+-{'':-<5}")
+    print("=== ALL DOMAINS ===\n")
+    print(f"{'DOMAIN':<22} | {'GEN':>6} | {'DISS':>5} | {'INFRA':>5} | {'TOTAL':>5} | {'FILES':>5}")
+    print(f"{'':-<22}-+-{'':-<6}-+-{'':-<5}-+-{'':-<5}-+-{'':-<5}-+-{'':-<5}")
 
     rows = []
     for d in sorted(MATHLIB_DIR.iterdir()):
@@ -281,43 +390,45 @@ def cmd_classify_all():
         if len(files) < 3:
             continue
 
-        total_genuine = 0
-        total_dissolves = 0
-        total_decls = 0
-
+        t_gen = t_dis = t_tot = 0
         for f in files:
-            a = analyze_file(f, d.name)
-            total_genuine += a.genuine
-            total_dissolves += a.dissolves
-            total_decls += a.total
+            try:
+                text = f.read_text(errors="replace")
+            except:
+                continue
+            blocks = parse_file_smart(text)
+            decls = [b for b in blocks if b.kind == "decl"]
+            t_gen += sum(1 for dd in decls if dd.classification == "genuine")
+            t_dis += sum(1 for dd in decls if dd.classification in ("dissolves", "infra_name"))
+            t_tot += len(decls)
 
-        infra = total_decls - total_genuine
-        rows.append((d.name, total_genuine, total_dissolves, infra, total_decls, len(files)))
+        infra = t_tot - t_gen
+        rows.append((d.name, t_gen, t_dis, infra, t_tot, len(files)))
 
     rows.sort(key=lambda r: r[1], reverse=True)
-    for name, genuine, dissolves, infra, total, files in rows:
-        print(f"{name:<22} | {genuine:>7} | {dissolves:>8} | {infra:>5} | {total:>5} | {files:>5}")
+    for name, gen, dis, infra, total, files in rows:
+        print(f"{name:<22} | {gen:>6} | {dis:>5} | {infra:>5} | {total:>5} | {files:>5}")
 
-    print()
-    print(f"Grand total GENUINE: {sum(r[1] for r in rows)}")
-    print(f"Grand total declarations: {sum(r[4] for r in rows)}")
+    print(f"\nGrand total GENUINE: {sum(r[1] for r in rows)}")
 
 
 def cmd_fruit(domain: Optional[str], top_n: int):
     """Rank files by dissolution density."""
     if domain:
-        src = MATHLIB_DIR / domain
-        files = sorted(src.rglob("*.lean"))
+        files = sorted((MATHLIB_DIR / domain).rglob("*.lean"))
     else:
         files = sorted(MATHLIB_DIR.rglob("*.lean"))
 
     results = []
     for f in files:
-        text = f.read_text(errors="replace")
+        try:
+            text = f.read_text(errors="replace")
+        except:
+            continue
         lines = text.count("\n") + 1
         if lines < 30:
             continue
-        hits = len(ZERO_RE.findall(text))
+        hits = len(ZERO_ALL.findall(text))
         if hits == 0:
             continue
         thms = len(re.findall(r"^(protected\s+)?(theorem|lemma|def)\s+", text, re.MULTILINE))
@@ -328,10 +439,8 @@ def cmd_fruit(domain: Optional[str], top_n: int):
         results.append((density, hits, lines, thms, relpath))
 
     results.sort(reverse=True)
-
-    title = domain or "ALL DOMAINS"
-    print(f"=== {title}: Top {top_n} by dissolution density ===")
-    print()
+    title = domain or "ALL"
+    print(f"=== {title}: Top {top_n} by density ===\n")
     print(f"{'DENSITY':>8} | {'HITS':>4} | {'LINES':>5} | {'THMS':>4} | PATH")
     print(f"{'--------':>8}-+-{'----':>4}-+-{'-----':>5}-+-{'----':>4}-+-----")
 
@@ -340,44 +449,14 @@ def cmd_fruit(domain: Optional[str], top_n: int):
 
 
 def cmd_extract(filepath: Path):
-    """Extract genuine content from a Mathlib file."""
+    """Extract one file."""
     if not filepath.exists():
-        # Try prepending MATHLIB_DIR
         filepath = MATHLIB_DIR / filepath
     if not filepath.exists():
         print(f"ERROR: {filepath} not found", file=sys.stderr)
         return
-
-    text = filepath.read_text(errors="replace")
-    relpath = str(filepath).split("Mathlib/")[-1]
-    domain = relpath.rsplit("/", 1)[0].replace("/", ".")
-
-    decls = parse_declarations(text)
-    genuine = [d for d in decls if d.is_genuine]
-
-    print(f"/-")
-    print(f"Generated by origin.py from {relpath}")
-    print(f"Genuine declarations: {len(genuine)} of {len(decls)} total")
-    print(f"Dissolved: {sum(1 for d in decls if d.classification == 'dissolves')}")
-    print(f"Infrastructure skipped: {sum(1 for d in decls if d.classification in ('instance', 'simp', 'trivial'))}")
-    print(f"-/")
-    print(f"import Origin.Core")
-    print()
-    print(f"/-! # {domain} on Option α -/")
-    print()
-    print(f"universe u")
-    print(f"variable {{α : Type u}}")
-    print()
-
-    for d in genuine:
-        # Print the full declaration
-        full = d.signature
-        if d.body:
-            full += " " + d.body
-        # Strip NeZero from signature
-        full = re.sub(r"\[NeZero [^\]]*\]\s*", "", full)
-        print(full)
-        print()
+    content, stats = extract_smart(filepath)
+    print(content)
 
 
 def cmd_extract_domain(domain: str):
@@ -388,34 +467,45 @@ def cmd_extract_domain(domain: str):
         return
 
     out_dir = ORIGIN_DIR / f"Mathlib_{domain}"
+    # Clean previous extraction
+    if out_dir.exists():
+        import shutil
+        shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     files = sorted(src.rglob("*.lean"))
     count = 0
+    total_genuine = 0
+    total_dissolved = 0
+    total_infra = 0
+    skipped_files = 0
 
     for f in files:
-        a = analyze_file(f, domain)
-        if a.genuine == 0:
+        content, stats = extract_smart(f)
+
+        if stats.get("skipped_file") or stats["genuine"] == 0:
+            skipped_files += 1
+            total_dissolved += stats.get("dissolved", 0)
+            total_infra += stats.get("infra", 0)
             continue
 
-        # Create output path
         relpath = str(f).split(f"Mathlib/{domain}/")[-1]
         outfile = out_dir / relpath
         outfile.parent.mkdir(parents=True, exist_ok=True)
-
-        # Redirect stdout to file
-        import io
-        old_stdout = sys.stdout
-        sys.stdout = io.StringIO()
-        cmd_extract(f)
-        content = sys.stdout.getvalue()
-        sys.stdout = old_stdout
-
         outfile.write_text(content)
-        count += 1
 
-    print(f"Extracted {count} files to {out_dir}/")
-    print(f"Next: lake build and fix what breaks.")
+        count += 1
+        total_genuine += stats["genuine"]
+        total_dissolved += stats["dissolved"]
+        total_infra += stats["infra"]
+
+    print(f"=== {domain} extraction ===")
+    print(f"Extracted:   {count} files to {out_dir}/")
+    print(f"Skipped:     {skipped_files} files (all infrastructure or empty)")
+    print(f"Genuine:     {total_genuine} declarations")
+    print(f"Dissolved:   {total_dissolved} declarations")
+    print(f"Infra:       {total_infra} declarations")
+    print(f"\nNext: lake build and fix what breaks.")
 
 
 # ---------------------------------------------------------------------------
@@ -451,7 +541,10 @@ def main():
 
     elif cmd == "extract":
         if len(sys.argv) > 2 and sys.argv[2] == "--domain":
-            cmd_extract_domain(sys.argv[3])
+            if len(sys.argv) > 3:
+                cmd_extract_domain(sys.argv[3])
+            else:
+                print("Usage: origin.py extract --domain <DOMAIN>")
         elif len(sys.argv) > 2:
             cmd_extract(Path(sys.argv[2]))
         else:
