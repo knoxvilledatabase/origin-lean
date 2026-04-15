@@ -584,11 +584,40 @@ keeps notation lines, orphaned body suppression, library_note stripped):
 4,998 files  |  4,177 pass /   821 fail  |  2,741 error patterns  |  9m
 ```
 
-Top remaining error patterns after run 5:
-- `expected token` (379 files) — parser still cutting declarations
-- `tactic 'rewrite' failed` — proofs referencing dissolved content
-- `unsolved goals` — broken proofs
-- `failed to synthesize` — missing typeclass instances
+Run 6 (+ classifier fix: bare ≠ 0 only dissolves if name is infrastructure):
+```
+4,998 files  |  4,437 pass /   575 fail  |  1,538 error patterns  |  12m
+```
+3,500 declarations reclassified from dissolved to genuine. +260 files passing.
+
+Run 7 (+ library_note doc comment consumption, @[inherit_doc] notation passthrough):
+```
+4,998 files  |  4,460 pass /   552 fail  |  1,398 error patterns  |  7m
+```
+
+Run 8 (+ notation/macro/syntax/elab/infixl/infixr/prefix/postfix passthrough):
+```
+4,998 files  |  4,467 pass /   544 fail  |  1,384 error patterns  |  7m
+```
+
+Run 9 (+ dependency resolver: un-dissolve declarations referenced by genuine code):
+```
+4,998 files  |  4,755 pass /   256 fail  |    630 error patterns  |  7m
+```
+762 declarations un-dissolved. +288 files passing. The biggest single improvement.
+
+Run 12 (+ set_option/scoped 'in' attaches to next command, #adaptation_note fix):
+```
+4,998 files  |  4,755 pass /   252 fail  |    569 error patterns  |  9m
+```
+`expected token`: 824 → 2. Parser is essentially done.
+
+Top remaining error patterns after run 12:
+- `unsolved goals` (66 files) — proofs broken by missing dissolved content
+- `failed to synthesize` (41) — missing typeclass instances
+- `simp made no progress` (27) — dissolved simp lemmas
+- `unexpected identifier` (18) — parser edge cases
+- `noncomputable` (15) — defs needing noncomputable marker
 
 Each run fixes patterns in the script. Error count drops.
 The process: run → read top pattern → fix script → run again.
@@ -660,10 +689,14 @@ file by file, domain by domain, and write only what's genuinely new.
 7. ✅ **Class-based script.** Parser, Classifier, Extractor, Pipeline, UI.
 8. ✅ **Three classifications.** Genuine (138K), dissolves (6K), conflates (1K).
 9. ✅ **Ring finding.** Option α is not a Ring. Lean verified. Load-bearing.
-10. ✅ **84% pass rate.** 4,177 / 4,998 files build clean. 821 remaining.
-11. ✅ **Classifier insight.** Not all `≠ 0` dissolves. Ground guards
-    dissolve. Measurement constraints are genuine. Script needs to
-    distinguish them.
+10. ✅ **95% pass rate.** 4,755 / 4,998 files build clean. 252 remaining.
+11. ✅ **Classifier fix.** Bare `≠ 0` only dissolves if the declaration
+    name is also infrastructure. 3,500 declarations correctly reclassified.
+12. ✅ **Dependency resolver.** Genuine code referencing dissolved declarations
+    un-dissolves them. 762 declarations rescued. Iterates to stability.
+13. ✅ **Parser essentially done.** `expected token` from 824 → 2. All major
+    Lean syntax constructs handled: alias, notation, macro, syntax, elab,
+    infixl/r, prefix, postfix, library_note, set_option ... in.
 
 ### What's next: run the pipeline
 

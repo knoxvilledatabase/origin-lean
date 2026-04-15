@@ -520,6 +520,7 @@ class Extractor:
         for imp in imports:
             clean = imp.strip().replace("public import ", "import ")
             import_block += clean + "\n"
+        import_block += "\nnoncomputable section\n"
 
         header = (f"/-\nExtracted from {relpath}\n"
                   f"Genuine: {genuine_count} | Conflates: {conflates} | "
