@@ -192,6 +192,8 @@ class Parser:
         "set_option ", "attribute ", "alias ", "include ",
         "omit ", "universe ", "local ", "scoped ",
         "example ", "example",
+        "notation ", "infixl ", "infixr ", "prefix ", "postfix ",
+        "macro_rules", "macro ", "syntax ", "elab ",
     )
 
     # Declaration keyword regex
@@ -307,7 +309,8 @@ class Parser:
 
     # Keywords that make an @[inherit_doc] line load-bearing (don't strip)
     INHERIT_DOC_KEEP = re.compile(
-        r"\b(notation|scoped|instance|def|theorem|lemma|abbrev|alias|inductive|structure|class)\b")
+        r"\b(notation|scoped|instance|def|theorem|lemma|abbrev|alias|inductive|structure|class|"
+        r"infixl|infixr|prefix|postfix|macro|syntax|elab)\b")
 
     def _try_strip(self, lines, i, stripped) -> tuple[int, list] | None:
         for cmd in self.STRIP_COMMANDS:
