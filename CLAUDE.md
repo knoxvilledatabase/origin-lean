@@ -46,10 +46,21 @@
 
 **Always confirm between steps. The user holds the architecture.**
 
+**CRITICAL: Improve the script, not do manual work.** If you find yourself
+manually reading files, manually classifying declarations, or manually
+writing Origin versions — STOP. Ask: can `scripts/origin.py` do this?
+If yes, improve the script. If no, explain why to the user and get
+their input before doing manual work. The script is the tool. You
+improve the tool. The tool does the work.
+
 **Build note:** Extracted files keep Mathlib imports (they need Mathlib's
-types) plus `import Origin.Core`. To build, origin-lean needs Mathlib as
-a dependency in the lakefile. The extracted files are Mathlib theorems
-with infrastructure stripped — they live alongside Mathlib, not standalone.
+types) plus `import Origin.Core`. The lakefile pins Mathlib v4.14.0.
+Run `lake update` once, then `lake build` validates. First build compiles
+Mathlib (slow). Subsequent builds cached.
+
+**Self-audit:** `python3 scripts/origin.py --self classify --all` audits
+Origin itself. If it finds dissolved/infrastructure/trivial declarations,
+Origin needs stripping. Current result: 30,947 genuine, 0 waste.
 
 ---
 
