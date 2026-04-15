@@ -262,30 +262,69 @@ For each remaining declaration, ask:
 Import Core. Write only what survived triage. Standard notation.
 Build. Verify. Move to the next file.
 
-### Demonstrated results on InformationTheory (6 Mathlib files, 1,457 lines)
+### Demonstrated: two kinds of Mathlib files
 
+**Type A: Pure domain math (no collapse involvement)**
+
+Example: `Dynamics/FixedPoints/Basic.lean` (178 lines)
 ```
-UniquelyDecodable.lean (57 lines):
-  0 zero-management. 3 declarations. All pure domain math.
-  Copy as-is. None of this was affected by the collapse.
-
-KLFun.lean (194 lines):
-  1 ≠ 0 hypothesis (hasDerivAt_klFun). Dissolves.
-  Rest: convexity, continuity, measurability → analysis (hypotheses).
-  klFun definition → genuine content, write it.
-
-Hamming.lean (410 lines):
-  6 ≠ 0 occurrences. hammingDist_ne_zero, hammingNorm_ne_zero_iff,
-  hammingNorm_pos_iff → all dissolve.
-  Distance, triangle inequality, metric → genuine content.
-
-KL/Basic.lean (394 lines): triage TBD
-KL/ChainRule.lean (237 lines): triage TBD
-KraftMcMillan.lean (165 lines): triage TBD
+Step 1: grep for zero-management → 0 hits
+Step 2: triage → 22 genuine theorems, 3 infrastructure (decidable instances)
+Verdict: entire file is pure mathematics. The collapse never touched it.
+         Transfer verbatim. Option adds nothing.
 ```
 
-The pattern: grep for zero-management. Count what dissolves.
-Write what's genuinely new. Skip what's free. Defer what's analysis.
+Many Mathlib files are Type A. The collapse only affects files that
+deal with zero, division, boundaries, or ≠ 0 guards. Files about
+fixed points, topology, category theory morphisms, group actions —
+much of this is pure domain math that was never affected.
+
+**For Type A files: copy the content. Don't wrap in Option. It's math.**
+
+**Type B: Zero-management involved (the collapse matters)**
+
+Example: `Dynamics/PeriodicPts/Defs.lean` (500+ lines)
+```
+Step 1: grep for zero-management → 15 hits
+Step 2: the hits are:
+  - minimalPeriod_pos_of_mem_periodicPts (0 < minimalPeriod)
+  - not_isPeriodicPt_of_pos_of_lt_minimalPeriod (n ≠ 0)
+  - minimalPeriod_iterate_eq_div_gcd (h : n ≠ 0)
+  These carry ≠ 0 or pos hypotheses that dissolve with none.
+Verdict: 15 hypotheses dissolve. The rest is genuine periodic point
+         theory. Write the content. The hypotheses vanish.
+```
+
+Example: `InformationTheory/KullbackLeibler/KLFun.lean` (194 lines)
+```
+Step 1: grep → 1 hit (hasDerivAt_klFun carries x ≠ 0)
+Step 2: the rest is convexity, continuity, measurability → analysis
+Verdict: 1 hypothesis dissolves. klFun definition is content.
+         Analysis stays as hypotheses (honest boundary).
+```
+
+**For Type B files: the zero-management dissolves. Write the content
+that remains. The hypotheses that guarded against the ground vanish
+because the ground is outside (none).**
+
+### The exercise per file
+
+```bash
+# Step 1: How much zero-management?
+grep -c "NeZero\|≠ 0\|ne_zero\|NoZero\|WithBot\|WithTop\|GroupWithZero" \
+  Mathlib/Domain/File.lean
+
+# 0 hits → Type A. Pure math. Transfer content.
+# >0 hits → Type B. Zero-management dissolves. Write what remains.
+```
+
+Step 2: Read. Triage. Ask for each declaration:
+- Free from instances? Skip.
+- Zero-management hypothesis? Dissolves. Skip the hypothesis.
+- Pure domain content? Write it.
+- Analytic infrastructure? Defer as hypothesis.
+
+Step 3: Write. Build. Next file.
 
 ### The order
 
