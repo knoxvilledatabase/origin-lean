@@ -69,8 +69,17 @@ class Block:
 class Classifier:
     """Classifies declarations. Override methods to change classification rules."""
 
-    # Signature patterns: hypotheses that dissolve
-    ZERO_SIG = re.compile(r"≠\s*0|NeZero|ne_zero|GroupWithZero")
+    # Infrastructure typeclasses in signatures — these ARE the ground-management
+    # layer. They dissolve because they exist to manage origin being inside the
+    # counting domain. Once origin is outside (none), they have nothing to manage.
+    INFRA_SIG = re.compile(r"NeZero|ne_zero|GroupWithZero")
+
+    # Bare ≠ 0 in a signature — this is ambiguous. Could be:
+    #   Type 1: genuine measurement constraint ("nonzero denominator") — KEEP
+    #   Type 2: ground guard (only exists because origin leaked in) — DISSOLVE
+    # We only dissolve ≠ 0 when the declaration name is ALSO infrastructure.
+    # Otherwise it's a legitimate mathematical precondition on some 0.
+    BARE_NEZ = re.compile(r"≠\s*0")
 
     # All zero-management (for density counting)
     ZERO_ALL = re.compile(
@@ -129,13 +138,19 @@ class Classifier:
         """Classify a declaration. Override to add new classification rules.
 
         Categories:
-          dissolves    — zero-management (≠ 0, NeZero). Vanishes with none.
+          dissolves    — ground-management infrastructure. Vanishes with none.
           conflates    — assumes ground = zero (Ring axiom). Needs rewriting.
           genuine      — real math. Keeps as-is or compresses.
           instance     — typeclass instance.
           infra_name   — declaration name is zero infrastructure.
           simp_trivial — trivial simp lemma.
           trivial      — trivial proof.
+
+        The key distinction: ≠ 0 in a signature is ambiguous.
+          - NeZero, GroupWithZero in a signature → always dissolves (infrastructure typeclass)
+          - Bare ≠ 0 → only dissolves if the declaration name is also infrastructure.
+            Otherwise it's a genuine measurement constraint ("nonzero denominator").
+            A field theory theorem saying (h : x ≠ 0) is real math about some 0.
         """
         sig_part = full_text.split(":=")[0] if ":=" in full_text else full_text
 
@@ -143,7 +158,11 @@ class Classifier:
             return "instance"
         if self.is_infra_name(name):
             return "infra_name"
-        if self.ZERO_SIG.search(sig_part):
+        # Infrastructure typeclasses in signature → always dissolves
+        if self.INFRA_SIG.search(sig_part):
+            return "dissolves"
+        # Bare ≠ 0 only dissolves if the name is also infrastructure
+        if self.BARE_NEZ.search(sig_part) and self.INFRA_NAMES.search(name):
             return "dissolves"
         if self.RING_CONFLATION.search(sig_part):
             return "conflates"
@@ -163,8 +182,9 @@ class Parser:
     STRIP_COMMANDS = (
         "add_decl_doc ", "assert_not_exists ", "suppress_compilation",
         "#align", "#guard_msgs", "#check", "#print",
-        "@[deprecated", "@[inherit_doc]",
+        "@[deprecated",
         "-- Adaptation note", "-- adaptation_note", "#adaptation_note",
+        "library_note ", "library_note\"",
     )
 
     # Commands to pass through (Lean commands that must be preserved)
@@ -177,11 +197,11 @@ class Parser:
     # Declaration keyword regex
     DECL_RE = re.compile(
         r"^(.*?)?(private\s+|protected\s+)?(noncomputable\s+)?(nonrec\s+)?(unsafe\s+)?"
-        r"(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)")
+        r"(theorem|lemma|def|structure|class|instance|abbrev|inductive|alias)\s+(\S+)")
 
     # Regex to check if a line contains a declaration keyword (for attribute handling)
     DECL_KEYWORD_RE = re.compile(
-        r"\b(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+\S+")
+        r"\b(theorem|lemma|def|structure|class|instance|abbrev|inductive|alias)\s+\S+")
 
     def __init__(self, classifier: Classifier = None):
         self.classifier = classifier or Classifier()
@@ -216,6 +236,7 @@ class Parser:
                 self._try_passthrough(lines, i, stripped, line, blocks) or
                 self._try_variable(lines, i, stripped, line, blocks) or
                 self._try_attribute(lines, i, stripped, line, pending_attrs) or
+                self._try_bare_modifier(lines, i, stripped, line, pending_attrs) or
                 self._try_declaration(lines, i, stripped, line, blocks, pending_attrs) or
                 self._fallback(lines, i, line, blocks)
             )
@@ -284,13 +305,25 @@ class Parser:
         blocks.append(Block("open", "", line))
         return (i + 1, None)
 
+    # Keywords that make an @[inherit_doc] line load-bearing (don't strip)
+    INHERIT_DOC_KEEP = re.compile(
+        r"\b(notation|scoped|instance|def|theorem|lemma|abbrev|alias|inductive|structure|class)\b")
+
     def _try_strip(self, lines, i, stripped) -> tuple[int, list] | None:
         for cmd in self.STRIP_COMMANDS:
             if stripped.startswith(cmd) or stripped == cmd.strip():
+                # @[inherit_doc] attached to a notation/declaration is load-bearing
+                if cmd == "@[deprecated" and stripped.startswith("@[deprecated"):
+                    pass  # always strip deprecated
+                elif "@[inherit_doc]" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
+                    return None  # don't strip — let passthrough/declaration handle it
                 i += 1
                 while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
                     i += 1
                 return (i, None)
+        # Also strip standalone @[inherit_doc] NOT on same line as declaration
+        if stripped == "@[inherit_doc]":
+            return (i + 1, None)
         return None
 
     def _try_passthrough(self, lines, i, stripped, line, blocks) -> tuple[int, list] | None:
@@ -340,6 +373,15 @@ class Parser:
                 continue
             break
         return (i, attr_lines)
+
+    # Bare modifiers that apply to the next declaration
+    BARE_MODIFIER_RE = re.compile(r"^(noncomputable|private|protected|unsafe)\s*$")
+
+    def _try_bare_modifier(self, lines, i, stripped, line, pending_attrs) -> tuple[int, list] | None:
+        """Handle standalone modifiers (e.g. 'noncomputable' on its own line)."""
+        if not self.BARE_MODIFIER_RE.match(stripped):
+            return None
+        return (i + 1, pending_attrs + [line])
 
     def _try_declaration(self, lines, i, stripped, line, blocks, pending_attrs) -> tuple[int, list] | None:
         decl_match = self.DECL_RE.match(stripped)
@@ -416,7 +458,14 @@ class Extractor:
         imports = [b.text for b in blocks if b.kind == "import"]
         parts = []
 
+        last_dissolved = False
         for b in blocks:
+            # Suppress orphaned bodies after dissolved declarations
+            if b.kind == "other" and last_dissolved:
+                s = b.text.strip()
+                if s.startswith("{") or s.startswith("where") or s.startswith("|"):
+                    continue
+            last_dissolved = (b.kind == "decl" and b.classification in ("dissolves", "infra_name"))
             text_out = self._emit_block(b)
             if text_out is not None:
                 parts.append(text_out)

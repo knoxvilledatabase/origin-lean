@@ -52,6 +52,32 @@ Don't read the domain files. The script reads Mathlib for you.
 return to the ground. Not "the number zero." The whole. This
 distinction IS the project. Read the derivation until you feel it.
 
+**You will think origin is nothing.** It's not. It's everything.
+Origin is the whole — *pūrṇa*, not *śūnya*. An empty hand isn't
+holding nothing. It's holding `some 0` apples only if you're
+counting apples — that's a measurement, still in the counting
+domain. But the hand itself is in origin. Not empty. Full. Part of
+everything. Origin is what's there before and after every measurement.
+
+**You will misclassify `≠ 0`.** Not all `≠ 0` hypotheses dissolve.
+There are two completely different reasons a theorem says `≠ 0`:
+
+1. **Guarding against the ground leaking in.** `GroupWithZero`,
+   `NeZero`, `inv_ne_zero` — these exist because traditional math
+   put origin inside the counting domain (as 0). Once origin is
+   outside (`none`), these guards have nothing to guard against.
+   THESE dissolve.
+
+2. **A genuine mathematical constraint on `some 0`.** "For nonzero
+   denominators" is real math. `some 0` in a denominator is a
+   meaningful restriction — you can't divide by the zero measurement.
+   That's not infrastructure. That's a precondition about measurements.
+   THESE are genuine.
+
+The script must distinguish these. Pattern-matching on `≠ 0` alone
+is wrong. The question is: is this `≠ 0` protecting against origin
+(the ground) or constraining `some 0` (a measurement)?
+
 **You will try to understand before acting.** Don't. Run the script.
 Read the report. Fix what's broken. Understanding comes from doing.
 
@@ -199,8 +225,16 @@ counting domain. It doesn't exit to the ground.
 domain. The theorem operates on `some 0`, not on `none`.
 
 Two different things, never in conflict:
-- `none` — the ground, the absorber, outside the counting domain
+- `none` — the ground, the additive identity, the absorber, outside the counting domain
 - `some 0` — the zero measurement, where cancellation lands, inside
+
+`none` is the additive identity: `none + some x = some x`. Adding
+origin means nothing was added. `some 0` is NOT the additive identity.
+`some 0` is a measurement — it tells you "zero of something." You're
+still counting. You're still in the domain.
+
+`1/none = none`. Division by origin gives origin. You can't divide
+by the ground you're standing on.
 
 The `origin` theorem applies to `some 0`. The instances give `none`
 its absorbing behavior. These are separate mechanisms.
@@ -225,7 +259,16 @@ That's the old assumption. Origin separates what rings conflate.
 
 ### The ground is the whole, not nothing.
 
-The symbol 0 named the wrong face. The Sanskrit tradition had both: *śūnya* (emptiness, quantity zero) and *pūrṇa* (fullness, the whole). Brahmagupta formalized *śūnya* in 628 CE and left *pūrṇa* in the philosophy. The ground is *pūrṇa* — wholeness, not emptiness.
+The symbol 0 named the wrong face. The Sanskrit tradition had both:
+*śūnya* (emptiness, quantity zero) and *pūrṇa* (fullness, the whole).
+Brahmagupta formalized *śūnya* in 628 CE and left *pūrṇa* in the
+philosophy. The ground is *pūrṇa* — wholeness, not emptiness.
+
+If you hold an apple and eat it, your empty hand is holding `some 0`
+apples only if you are counting apples. But it is not holding
+absolutely nothing — absolutely everything is in origin. The hand
+is part of the whole. It's not absent. It's just not participating
+in any measurement. Origin is full, not empty.
 
 ### Origin is never a destination.
 
@@ -533,7 +576,19 @@ Run 3 (+ stripped Mathlib commands, 10-core parallel, largest-first):
 5,007 files  |  4,057 pass /   966 fail  |  28 fewer failures      |  12m
 ```
 
-Run 4 pending (+ @[deprecated], @[inherit_doc], adaptation notes stripped).
+Run 4 (+ @[deprecated], @[inherit_doc], adaptation notes stripped).
+
+Run 5 (+ alias in DECL_RE, bare noncomputable handler, @[inherit_doc]
+keeps notation lines, orphaned body suppression, library_note stripped):
+```
+4,998 files  |  4,177 pass /   821 fail  |  2,741 error patterns  |  9m
+```
+
+Top remaining error patterns after run 5:
+- `expected token` (379 files) — parser still cutting declarations
+- `tactic 'rewrite' failed` — proofs referencing dissolved content
+- `unsolved goals` — broken proofs
+- `failed to synthesize` — missing typeclass instances
 
 Each run fixes patterns in the script. Error count drops.
 The process: run → read top pattern → fix script → run again.
@@ -556,8 +611,8 @@ The process: run → read top pattern → fix script → run again.
 
 ### Next major improvement: compression patterns
 
-The filter is at 83% pass rate (4,149 / 4,998 files). The remaining
-849 failures are proofs that reference dissolved content. Top patterns:
+The filter is at 84% pass rate (4,177 / 4,998 files). The remaining
+821 failures are proofs that reference dissolved content. Top patterns:
 
 ```
 630 files  tactic 'rewrite' failed  — proof references dissolved declaration
@@ -565,12 +620,26 @@ The filter is at 83% pass rate (4,149 / 4,998 files). The remaining
  90 files  rewrite variant          — same root cause
 ```
 
-To get to zero errors, add compression methods to `Extractor._emit_block()`:
+To get to zero errors, two tracks:
+
+**Track 1: Classifier (DONE).** Two kinds of `≠ 0`:
+- **Ground guards** (`NeZero`, `GroupWithZero` in signature) — always
+  dissolve. These ARE the infrastructure typeclasses.
+- **Measurement constraints** (bare `≠ 0` in a field theory theorem) —
+  genuine math about `some 0`. Keep unless the declaration name is
+  also infrastructure.
+The classifier now uses `INFRA_SIG` (always dissolves) vs `BARE_NEZ`
+(only dissolves if name is also in `INFRA_NAMES`). This means thousands
+of theorems with legitimate `(h : x ≠ 0)` preconditions are now
+correctly classified as genuine.
+
+**Track 2: Compression patterns in `Extractor._emit_block()`:**
 - Dependency analysis: if a genuine proof references a dissolved decl,
   either keep the decl or rewrite the proof
 - Typeclass resolution: if a `failed to synthesize` comes from a stripped
   instance, keep the instance
-- Proof simplification: if `by simp` closes after removing ≠ 0, collapse
+- Proof simplification: if `by simp` closes after removing a ground
+  guard, collapse
 
 Each pattern is a method. Add it, run the pipeline, errors drop.
 
@@ -591,7 +660,10 @@ file by file, domain by domain, and write only what's genuinely new.
 7. ✅ **Class-based script.** Parser, Classifier, Extractor, Pipeline, UI.
 8. ✅ **Three classifications.** Genuine (138K), dissolves (6K), conflates (1K).
 9. ✅ **Ring finding.** Option α is not a Ring. Lean verified. Load-bearing.
-10. ✅ **83% pass rate.** 4,149 / 4,998 files build clean. 849 remaining.
+10. ✅ **84% pass rate.** 4,177 / 4,998 files build clean. 821 remaining.
+11. ✅ **Classifier insight.** Not all `≠ 0` dissolves. Ground guards
+    dissolve. Measurement constraints are genuine. Script needs to
+    distinguish them.
 
 ### What's next: run the pipeline
 
