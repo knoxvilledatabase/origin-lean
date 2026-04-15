@@ -170,6 +170,46 @@ distributive law propagates it.
 - The 17 typeclasses vanish — BECAUSE they managed the ground being inside the counting domain. Put it outside (`none`), the problem they solved never existed.
 - 14,702 lines of Mathlib zero-management dissolve — BECAUSE `≠ 0` guards were protecting against the ground. `none` is not in the counting domain. No guard needed.
 
+### Why Option α is not a Ring (and why that's the point)
+
+Ring (*Ring* in German, coined by Hilbert ~1897) — from the idea of
+elements cycling back to themselves under the operations. A closed,
+self-returning structure. The key axiom: the additive identity and
+the element that absorbs under multiplication are the same element.
+The ring closes on itself. Zero is both the center of addition and
+the absorber of multiplication. One element, two roles, unified.
+
+Origin separates them. `none` absorbs under multiplication. `some 0`
+is where cancellation lands. Two different elements, two different roles.
+
+```
+some 3 + -(some 3) = some 3 + some (-3) = some 0
+```
+
+But the additive identity is `none`. And `some 0 ≠ none`.
+
+Lean's kernel verified this: `Option α` cannot be a `Ring`. The
+additive group axiom fails because cancellation returns to `some 0`,
+not to the additive identity (`none`). Cancellation stays inside the
+counting domain. It doesn't exit to the ground.
+
+**Look at step 4 of the derivation again:** `nb - nb = origin`. Not
+`some 0`. Not the additive identity of a ring. Origin itself. The
+derivation works because `b - b` returns to origin by definition —
+the cancellation escapes the structure, returning to the ground.
+
+Rings assume cancellation stays inside. Origin's entire claim is that
+cancellation exits — it returns to the ground, not to a measurement.
+
+The Ring axioms smuggle in an assumption — that the ground and the
+zero measurement are the same thing. Origin's type system makes that
+assumption visible by separating them.
+
+**Core.lean is correct precisely because it doesn't have a Ring
+instance.** The manual instances for `Mul`, `Add`, `Neg` on `Option α`
+are the right architecture. Do not try to unify them into a Ring.
+That's the old assumption. Origin separates what rings conflate.
+
 ### The ground is the whole, not nothing.
 
 The symbol 0 named the wrong face. The Sanskrit tradition had both: *śūnya* (emptiness, quantity zero) and *pūrṇa* (fullness, the whole). Brahmagupta formalized *śūnya* in 628 CE and left *pūrṇa* in the philosophy. The ground is *pūrṇa* — wholeness, not emptiness.
