@@ -304,6 +304,9 @@ class Parser:
     def _try_open(self, lines, i, stripped, line, blocks) -> tuple[int, list] | None:
         if not stripped.startswith("open "):
             return None
+        # Single-line open — don't consume continuations (they're separate declarations).
+        # "open ... in" scopes to the next command, but we let the parser handle that
+        # naturally — the next line becomes its own block which is fine.
         blocks.append(Block("open", "", line))
         return (i + 1, None)
 
@@ -356,6 +359,19 @@ class Parser:
                 while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
                     cmd_lines.append(lines[i])
                     i += 1
+                # If the command ends with "in", attach the next non-blank line
+                # (set_option ... in scopes to the next command — blank line breaks it)
+                joined = "\n".join(cmd_lines)
+                if joined.rstrip().endswith(" in"):
+                    while i < len(lines) and not lines[i].strip():
+                        i += 1
+                    if i < len(lines):
+                        cmd_lines.append(lines[i])
+                        i += 1
+                        # Continue collecting indented continuation
+                        while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                            cmd_lines.append(lines[i])
+                            i += 1
                 blocks.append(Block("other", "", "\n".join(cmd_lines)))
                 return (i, None)
         return None
