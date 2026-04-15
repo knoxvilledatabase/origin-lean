@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/DivisionPolynomial/Degree.lean
-Genuine: 24 of 58 | Dissolved: 34 | Infrastructure: 0
+Genuine: 22 | Conflates: 2 | Dissolved: 34 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Basic
@@ -343,12 +343,14 @@ lemma coeff_Φ (n : ℤ) : (W.Φ n).coeff (n.natAbs ^ 2) = 1 := by
 
 -- DISSOLVED: coeff_Φ_ne_zero
 
+-- CONFLATES (assumes ground = zero): natDegree_Φ
 @[simp]
 lemma natDegree_Φ [Nontrivial R] (n : ℤ) : (W.Φ n).natDegree = n.natAbs ^ 2 :=
   natDegree_eq_of_le_of_coeff_ne_zero (W.natDegree_Φ_le n) <| W.coeff_Φ_ne_zero n
 
 -- DISSOLVED: natDegree_Φ_pos
 
+-- CONFLATES (assumes ground = zero): leadingCoeff_Φ
 @[simp]
 lemma leadingCoeff_Φ [Nontrivial R] (n : ℤ) : (W.Φ n).leadingCoeff = 1 := by
   rw [leadingCoeff, natDegree_Φ, coeff_Φ]

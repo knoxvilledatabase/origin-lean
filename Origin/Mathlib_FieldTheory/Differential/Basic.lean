@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Differential/Basic.lean
-Genuine: 8 of 12 | Dissolved: 4 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Field

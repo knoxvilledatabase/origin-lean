@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/PGroup.lean
-Genuine: 42 of 43 | Dissolved: 0 | Infrastructure: 1
+Genuine: 39 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Cycle.Type
@@ -125,6 +125,7 @@ theorem card_eq_or_dvd : Nat.card G = 1 ∨ p ∣ Nat.card G := by
   · rw [Nat.card_eq_zero_of_infinite]
     exact Or.inr ⟨0, rfl⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_card
 theorem nontrivial_iff_card [Finite G] : Nontrivial G ↔ ∃ n > 0, Nat.card G = p ^ n :=
   ⟨fun hGnt =>
     let ⟨k, hk⟩ := iff_card.1 hG
@@ -201,6 +202,7 @@ theorem exists_fixed_point_of_prime_dvd_card_of_fixed_point (hpα : p ∣ Nat.ca
     let ⟨⟨b, hb⟩, hba⟩ := exists_ne (⟨a, ha⟩ : fixedPoints G α)
     ⟨b, hb, fun hab => hba (by simp_rw [hab])⟩
 
+-- CONFLATES (assumes ground = zero): center_nontrivial
 theorem center_nontrivial [Nontrivial G] [Finite G] : Nontrivial (Subgroup.center G) := by
   classical
     have := (hG.of_equiv ConjAct.toConjAct).exists_fixed_point_of_prime_dvd_card_of_fixed_point G
@@ -211,6 +213,7 @@ theorem center_nontrivial [Nontrivial G] [Finite G] : Nontrivial (Subgroup.cente
     obtain ⟨g, hg⟩ := this dvd (Subgroup.center G).one_mem
     exact ⟨⟨1, ⟨g, hg.1⟩, mt Subtype.ext_iff.mp hg.2⟩⟩
 
+-- CONFLATES (assumes ground = zero): bot_lt_center
 theorem bot_lt_center [Nontrivial G] [Finite G] : ⊥ < Subgroup.center G := by
   haveI := center_nontrivial hG
   classical exact

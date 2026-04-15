@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/Pi.lean
-Genuine: 88 of 117 | Dissolved: 0 | Infrastructure: 29
+Genuine: 88 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Measure

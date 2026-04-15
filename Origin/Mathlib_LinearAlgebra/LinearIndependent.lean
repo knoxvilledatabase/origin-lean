@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/LinearIndependent.lean
-Genuine: 104 of 123 | Dissolved: 13 | Infrastructure: 6
+Genuine: 95 | Conflates: 10 | Dissolved: 13 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin
@@ -300,6 +300,7 @@ protected theorem LinearMap.linearIndependent_iff (f : M →ₗ[R] M') (hf_inj :
     LinearIndependent R (f ∘ v) ↔ LinearIndependent R v :=
   ⟨fun h => h.of_comp f, fun h => h.map <| by simp only [hf_inj, disjoint_bot_right]⟩
 
+-- CONFLATES (assumes ground = zero): linearIndependent_of_subsingleton
 @[nontriviality]
 theorem linearIndependent_of_subsingleton [Subsingleton R] : LinearIndependent R v :=
   linearIndependent_iff.2 fun _l _hl => Subsingleton.elim _ _
@@ -467,6 +468,7 @@ variable [Ring R] [AddCommGroup M] [AddCommGroup M']
 
 variable [Module R M] [Module R M']
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.injective
 theorem LinearIndependent.injective [Nontrivial R] (hv : LinearIndependent R v) : Injective v := by
   simpa [Function.comp_def]
     using Function.Injective.comp hv (Finsupp.single_left_injective one_ne_zero)
@@ -541,6 +543,7 @@ def LinearIndependent.Maximal {ι : Type w} {R : Type u} [Ring R] {M : Type v} [
     [Module R M] {v : ι → M} (_i : LinearIndependent R v) : Prop :=
   ∀ (s : Set M) (_i' : LinearIndependent R ((↑) : s → M)) (_h : range v ≤ s), range v = s
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.maximal_iff
 theorem LinearIndependent.maximal_iff {ι : Type w} {R : Type u} [Ring R] [Nontrivial R] {M : Type v}
     [AddCommGroup M] [Module R M] {v : ι → M} (i : LinearIndependent R v) :
     i.Maximal ↔
@@ -578,6 +581,7 @@ theorem LinearIndependent.disjoint_span_image (hv : LinearIndependent R v) {s t 
   have : l₁ = 0 := Submodule.disjoint_def.mp (Finsupp.disjoint_supported_supported hs) _ hl₁ hl₂
   simp [this]
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.not_mem_span_image
 theorem LinearIndependent.not_mem_span_image [Nontrivial R] (hv : LinearIndependent R v) {s : Set ι}
     {x : ι} (h : x ∉ s) : v x ∉ Submodule.span R (v '' s) := by
   have h' : v x ∈ Submodule.span R (v '' {x}) := by
@@ -588,6 +592,7 @@ theorem LinearIndependent.not_mem_span_image [Nontrivial R] (hv : LinearIndepend
   refine disjoint_def.1 (hv.disjoint_span_image ?_) (v x) h' w
   simpa using h
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.linearCombination_ne_of_not_mem_support
 theorem LinearIndependent.linearCombination_ne_of_not_mem_support [Nontrivial R]
     (hv : LinearIndependent R v) {x : ι} (f : ι →₀ R) (h : x ∉ f.support) :
     Finsupp.linearCombination R v f ≠ v x := by
@@ -754,6 +759,7 @@ theorem LinearIndependent.repr_eq_single (i) (x : span R (range v)) (hx : ↑x =
   apply hv.repr_eq
   simp [Finsupp.linearCombination_single, hx]
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.span_repr_eq
 theorem LinearIndependent.span_repr_eq [Nontrivial R] (x) :
     Span.repr R (Set.range v) x =
       (hv.repr x).equivMapDomain (Equiv.ofInjective _ hv.injective) := by
@@ -835,6 +841,7 @@ theorem exists_maximal_independent' (s : ι → M) :
 
 end repr
 
+-- CONFLATES (assumes ground = zero): surjective_of_linearIndependent_of_span
 theorem surjective_of_linearIndependent_of_span [Nontrivial R] (hv : LinearIndependent R v)
     (f : ι' ↪ ι) (hss : range v ⊆ span R (range (v ∘ f))) : Surjective f := by
   intro i
@@ -856,6 +863,7 @@ theorem surjective_of_linearIndependent_of_span [Nontrivial R] (hv : LinearIndep
   use i'
   exact hi'.2
 
+-- CONFLATES (assumes ground = zero): eq_of_linearIndependent_of_span_subtype
 theorem eq_of_linearIndependent_of_span_subtype [Nontrivial R] {s t : Set M}
     (hs : LinearIndependent R (fun x => x : s → M)) (h : t ⊆ s) (hst : s ⊆ span R t) : s = t := by
   let f : t ↪ s :=
@@ -1003,6 +1011,7 @@ lemma linearIndependent_algHom_toLinearMap' (K M L) [CommRing K]
   simp_rw [Algebra.smul_def, mul_one]
   exact NoZeroSMulDivisors.algebraMap_injective K L
 
+-- CONFLATES (assumes ground = zero): le_of_span_le_span
 theorem le_of_span_le_span [Nontrivial R] {s t u : Set M} (hl : LinearIndependent R ((↑) : u → M))
     (hsu : s ⊆ u) (htu : t ⊆ u) (hst : span R s ≤ span R t) : s ⊆ t := by
   have :=
@@ -1010,6 +1019,7 @@ theorem le_of_span_le_span [Nontrivial R] {s t u : Set M} (hl : LinearIndependen
       Set.subset_union_right (Set.union_subset (Set.Subset.trans subset_span hst) subset_span)
   rw [← this]; apply Set.subset_union_left
 
+-- CONFLATES (assumes ground = zero): span_le_span_iff
 theorem span_le_span_iff [Nontrivial R] {s t u : Set M} (hl : LinearIndependent R ((↑) : u → M))
     (hsu : s ⊆ u) (htu : t ⊆ u) : span R s ≤ span R t ↔ s ⊆ t :=
   ⟨le_of_span_le_span hl hsu htu, span_mono⟩

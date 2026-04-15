@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/ProbabilityMassFunction/Monad.lean
-Genuine: 28 of 35 | Dissolved: 1 | Infrastructure: 6
+Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Probability.ProbabilityMassFunction.Basic

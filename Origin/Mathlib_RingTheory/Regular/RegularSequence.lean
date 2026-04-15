@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Regular/RegularSequence.lean
-Genuine: 58 of 58 | Dissolved: 0 | Infrastructure: 0
+Genuine: 49 | Conflates: 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Regular.IsSMulRegular
@@ -366,6 +366,7 @@ namespace IsRegular
 
 variable (R M) in
 
+-- CONFLATES (assumes ground = zero): nil
 lemma nil [Nontrivial M] : IsRegular M ([] : List R) where
   toIsWeaklyRegular := IsWeaklyRegular.nil R M
   top_ne_smul h := by
@@ -381,6 +382,7 @@ lemma cons' {r : R} {rs : List R} (h1 : IsSMulRegular M r)
     IsRegular M (r :: rs) :=
   (isRegular_cons_iff' M r rs).mpr ⟨h1, h2⟩
 
+-- CONFLATES (assumes ground = zero): recIterModByRegular
 @[induction_eliminator]
 def recIterModByRegular
     {motive : (M : Type v) → [AddCommGroup M] → [Module R M] → (rs : List R) →
@@ -400,6 +402,7 @@ def recIterModByRegular
       cons r rs' h5 h6 (h3 h6.top_ne_smul))
     h.top_ne_smul
 
+-- CONFLATES (assumes ground = zero): ndrecIterModByRegular
 def ndrecIterModByRegular
     {motive : (M : Type v) → [AddCommGroup M] → [Module R M] → (rs : List R) → Sort*}
     (nil : (M : Type v) → [AddCommGroup M] → [Module R M] → [Nontrivial M] → motive M [])
@@ -409,6 +412,7 @@ def ndrecIterModByRegular
     {M} [AddCommGroup M] [Module R M] {rs} : IsRegular M rs → motive M rs :=
   recIterModByRegular (motive := fun M _ _ rs _ => motive M rs) nil cons
 
+-- CONFLATES (assumes ground = zero): recIterModByRegularWithRing
 def recIterModByRegularWithRing
     {motive : (R : Type u) → [CommRing R] → (M : Type v) → [AddCommGroup M] →
       [Module R M] → (rs : List R) → IsRegular M rs → Sort*}
@@ -432,6 +436,7 @@ def recIterModByRegularWithRing
       cons r rs' h5 h6 <| h3 h6.top_ne_smul)
     h.top_ne_smul
 
+-- CONFLATES (assumes ground = zero): ndrecIterModByRegularWithRing
 def ndrecIterModByRegularWithRing
     {motive : (R : Type u) → [CommRing R] → (M : Type v) →
       [AddCommGroup M] → [Module R M] → (rs : List R) → Sort*}
@@ -450,17 +455,20 @@ def ndrecIterModByRegularWithRing
   recIterModByRegularWithRing (motive := fun R _ M _ _ rs _ => motive R M rs)
     nil cons
 
+-- CONFLATES (assumes ground = zero): quot_ofList_smul_nontrivial
 lemma quot_ofList_smul_nontrivial {rs : List R} (h : IsRegular M rs)
     (N : Submodule R M) : Nontrivial (M ⧸ Ideal.ofList rs • N) :=
   Submodule.Quotient.nontrivial_of_lt_top _ <|
     lt_of_le_of_lt (smul_mono_right _ le_top) h.top_ne_smul.symm.lt_top
 
+-- CONFLATES (assumes ground = zero): nontrivial
 lemma nontrivial {rs : List R} (h : IsRegular M rs) : Nontrivial M :=
   haveI := quot_ofList_smul_nontrivial h ⊤
   (mkQ_surjective (Ideal.ofList rs • ⊤ : Submodule R M)).nontrivial
 
 end IsRegular
 
+-- CONFLATES (assumes ground = zero): isRegular_iff_isWeaklyRegular_of_subset_jacobson_annihilator
 lemma isRegular_iff_isWeaklyRegular_of_subset_jacobson_annihilator
     [Nontrivial M] [Module.Finite R M] {rs : List R}
     (h : ∀ r ∈ rs, r ∈ Ideal.jacobson (Module.annihilator R M)) :
@@ -468,6 +476,7 @@ lemma isRegular_iff_isWeaklyRegular_of_subset_jacobson_annihilator
   Iff.trans (isRegular_iff M rs) <| and_iff_left <|
     top_ne_ideal_smul_of_le_jacobson_annihilator <| Ideal.span_le.mpr h
 
+-- CONFLATES (assumes ground = zero): _root_.IsLocalRing.isRegular_iff_isWeaklyRegular_of_subset_maximalIdeal
 lemma _root_.IsLocalRing.isRegular_iff_isWeaklyRegular_of_subset_maximalIdeal
     [IsLocalRing R] [Nontrivial M] [Module.Finite R M] {rs : List R}
     (h : ∀ r ∈ rs, r ∈ IsLocalRing.maximalIdeal R) :

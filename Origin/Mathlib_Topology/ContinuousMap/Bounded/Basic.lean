@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/Bounded/Basic.lean
-Genuine: 102 of 223 | Dissolved: 0 | Infrastructure: 121
+Genuine: 102 | Conflates: 0 | Dissolved: 0 | Infrastructure: 121
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.MinimalAxioms

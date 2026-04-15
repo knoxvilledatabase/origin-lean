@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Basic.lean
-Genuine: 166 of 241 | Dissolved: 2 | Infrastructure: 73
+Genuine: 166 | Conflates: 0 | Dissolved: 2 | Infrastructure: 73
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Bilinear

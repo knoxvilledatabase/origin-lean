@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/Ackermann.lean
-Genuine: 39 of 40 | Dissolved: 1 | Infrastructure: 0
+Genuine: 39 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Computability.Primrec

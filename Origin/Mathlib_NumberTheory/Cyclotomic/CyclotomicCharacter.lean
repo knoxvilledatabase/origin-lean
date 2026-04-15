@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Cyclotomic/CyclotomicCharacter.lean
-Genuine: 10 of 19 | Dissolved: 9 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots

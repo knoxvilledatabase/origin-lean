@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Bounds/Basic.lean
-Genuine: 178 of 206 | Dissolved: 0 | Infrastructure: 28
+Genuine: 178 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Order.Bounds.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IsAdjoinRoot.lean
-Genuine: 67 of 81 | Dissolved: 1 | Infrastructure: 13
+Genuine: 64 | Conflates: 3 | Dissolved: 1 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -370,6 +370,7 @@ theorem basis_apply (h : IsAdjoinRootMonic S f) (i) : h.basis i = h.root ^ (i : 
       · rw [X_pow_eq_monomial, toFinsupp_monomial, Finsupp.single_apply_left Fin.val_injective]
       · exact i.is_lt
 
+-- CONFLATES (assumes ground = zero): deg_pos
 theorem deg_pos [Nontrivial S] (h : IsAdjoinRootMonic S f) : 0 < natDegree f := by
   rcases h.basis.index_nonempty with ⟨⟨i, hi⟩⟩
   exact (Nat.zero_le _).trans_lt hi
@@ -444,12 +445,14 @@ theorem coeff_root_pow (h : IsAdjoinRootMonic S f) {n} (hn : n < natDegree f) :
     rintro rfl
     simp [hi] at hn
 
+-- CONFLATES (assumes ground = zero): coeff_one
 theorem coeff_one [Nontrivial S] (h : IsAdjoinRootMonic S f) : h.coeff 1 = Pi.single 0 1 := by
   rw [← h.coeff_root_pow h.deg_pos, pow_zero]
 
 theorem coeff_root (h : IsAdjoinRootMonic S f) (hdeg : 1 < natDegree f) :
     h.coeff h.root = Pi.single 1 1 := by rw [← h.coeff_root_pow hdeg, pow_one]
 
+-- CONFLATES (assumes ground = zero): coeff_algebraMap
 theorem coeff_algebraMap [Nontrivial S] (h : IsAdjoinRootMonic S f) (x : R) :
     h.coeff (algebraMap R S x) = Pi.single 0 x := by
   ext i

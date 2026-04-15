@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/StructureSheaf.lean
-Genuine: 65 of 98 | Dissolved: 0 | Infrastructure: 33
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Ring.Colimits

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/ComputeDegree.lean
-Genuine: 21 of 24 | Dissolved: 2 | Infrastructure: 1
+Genuine: 21 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Lemmas

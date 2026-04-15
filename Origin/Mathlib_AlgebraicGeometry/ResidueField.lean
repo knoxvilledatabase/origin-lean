@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/ResidueField.lean
-Genuine: 32 of 46 | Dissolved: 1 | Infrastructure: 13
+Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Stalk

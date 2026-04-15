@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Fintype/Card.lean
-Genuine: 141 of 187 | Dissolved: 1 | Infrastructure: 45
+Genuine: 138 | Conflates: 3 | Dissolved: 1 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic
@@ -441,6 +441,7 @@ theorem card_le_one_iff : card α ≤ 1 ↔ ∀ a b : α, a = b :=
 theorem card_le_one_iff_subsingleton : card α ≤ 1 ↔ Subsingleton α :=
   card_le_one_iff.trans subsingleton_iff.symm
 
+-- CONFLATES (assumes ground = zero): one_lt_card_iff_nontrivial
 theorem one_lt_card_iff_nontrivial : 1 < card α ↔ Nontrivial α := by
   rw [← not_iff_not, not_lt, not_nontrivial_iff_subsingleton, card_le_one_iff_subsingleton]
 
@@ -462,6 +463,7 @@ theorem exists_unique_iff_card_one {α} [Fintype α] (p : α → Prop) [Decidabl
   simp only [forall_true_left, Subset.antisymm_iff, subset_singleton_iff', singleton_subset_iff,
       true_and, and_comm, mem_univ, mem_filter]
 
+-- CONFLATES (assumes ground = zero): one_lt_card
 theorem one_lt_card [h : Nontrivial α] : 1 < Fintype.card α :=
   Fintype.one_lt_card_iff_nontrivial.mpr h
 
@@ -1005,6 +1007,7 @@ def truncOfCardPos {α} [Fintype α] (h : 0 < Fintype.card α) : Trunc α :=
 
 end Trunc
 
+-- CONFLATES (assumes ground = zero): Fintype.induction_subsingleton_or_nontrivial
 @[elab_as_elim]
 theorem Fintype.induction_subsingleton_or_nontrivial {P : ∀ (α) [Fintype α], Prop} (α : Type*)
     [Fintype α] (hbase : ∀ (α) [Fintype α] [Subsingleton α], P α)

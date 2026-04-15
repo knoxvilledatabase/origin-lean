@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/Finite.lean
-Genuine: 5 of 15 | Dissolved: 0 | Infrastructure: 10
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Integral

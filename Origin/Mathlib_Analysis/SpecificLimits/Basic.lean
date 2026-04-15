@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecificLimits/Basic.lean
-Genuine: 77 of 83 | Dissolved: 6 | Infrastructure: 0
+Genuine: 77 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

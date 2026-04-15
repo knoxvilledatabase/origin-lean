@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Radical.lean
-Genuine: 27 of 30 | Dissolved: 3 | Infrastructure: 0
+Genuine: 27 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Basic

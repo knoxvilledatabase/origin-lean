@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/ZPow.lean
-Genuine: 36 of 40 | Dissolved: 3 | Infrastructure: 1
+Genuine: 36 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Int.Bitwise

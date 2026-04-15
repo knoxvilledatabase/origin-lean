@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Nimber/Field.lean
-Genuine: 13 of 23 | Dissolved: 1 | Infrastructure: 9
+Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Two

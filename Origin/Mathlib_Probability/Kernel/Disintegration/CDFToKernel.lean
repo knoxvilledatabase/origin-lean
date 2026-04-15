@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Disintegration/CDFToKernel.lean
-Genuine: 44 of 47 | Dissolved: 0 | Infrastructure: 3
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.AEEqOfIntegral

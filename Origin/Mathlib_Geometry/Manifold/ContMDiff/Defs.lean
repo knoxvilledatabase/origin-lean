@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/ContMDiff/Defs.lean
-Genuine: 84 of 89 | Dissolved: 0 | Infrastructure: 5
+Genuine: 84 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners

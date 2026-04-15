@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Galois/Prorepresentability.lean
-Genuine: 25 of 41 | Dissolved: 0 | Infrastructure: 16
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Limits

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/FiniteDimension.lean
-Genuine: 27 of 47 | Dissolved: 5 | Infrastructure: 15
+Genuine: 27 | Conflates: 0 | Dissolved: 5 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.BalancedCoreHull

@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/RadonNikodym.lean
-Genuine: 58 of 60 | Dissolved: 0 | Infrastructure: 2
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Disintegration.Density

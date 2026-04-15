@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Combination.lean
-Genuine: 49 of 54 | Dissolved: 5 | Infrastructure: 0
+Genuine: 49 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset

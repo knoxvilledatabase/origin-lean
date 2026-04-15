@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/Shapes/Images.lean
-Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Images

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Positivity/Core.lean
-Genuine: 25 of 31 | Dissolved: 6 | Infrastructure: 0
+Genuine: 24 | Conflates: 1 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Core
@@ -134,6 +134,7 @@ variable {A : Type*} {e : A}
 lemma lt_of_le_of_ne' {a b : A} [PartialOrder A] :
     (a : A) ≤ b → b ≠ a → a < b := fun h₁ h₂ => lt_of_le_of_ne h₁ h₂.symm
 
+-- CONFLATES (assumes ground = zero): pos_of_isNat
 lemma pos_of_isNat {n : ℕ} [OrderedSemiring A] [Nontrivial A]
     (h : NormNum.IsNat e n) (w : Nat.ble 1 n = true) : 0 < (e : A) := by
   rw [NormNum.IsNat.to_eq h rfl]

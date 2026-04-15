@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Hindman.lean
-Genuine: 14 of 15 | Dissolved: 0 | Infrastructure: 1
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

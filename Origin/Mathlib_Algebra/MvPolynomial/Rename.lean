@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Rename.lean
-Genuine: 33 of 35 | Dissolved: 1 | Infrastructure: 1
+Genuine: 33 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic

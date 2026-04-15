@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/WeakDual.lean
-Genuine: 13 of 40 | Dissolved: 0 | Infrastructure: 27
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearMap

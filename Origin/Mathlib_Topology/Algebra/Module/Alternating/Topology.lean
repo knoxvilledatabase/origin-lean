@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/Alternating/Topology.lean
-Genuine: 18 of 32 | Dissolved: 0 | Infrastructure: 14
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.Multilinear.Topology

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/AlgebraCat/Limits.lean
-Genuine: 5 of 19 | Dissolved: 0 | Infrastructure: 14
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.AlgebraCat.Basic

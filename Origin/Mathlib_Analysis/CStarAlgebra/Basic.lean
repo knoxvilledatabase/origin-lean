@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/Basic.lean
-Genuine: 24 of 39 | Dissolved: 2 | Infrastructure: 13
+Genuine: 21 | Conflates: 3 | Dissolved: 2 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Hom
@@ -165,6 +165,7 @@ section Unital
 
 variable [NormedRing E] [StarRing E] [CStarRing E]
 
+-- CONFLATES (assumes ground = zero): norm_one
 @[simp, nolint simpNF]
 theorem norm_one [Nontrivial E] : ‖(1 : E)‖ = 1 := by
   have : 0 < ‖(1 : E)‖ := norm_pos_iff.mpr one_ne_zero
@@ -173,10 +174,12 @@ theorem norm_one [Nontrivial E] : ‖(1 : E)‖ = 1 := by
 instance (priority := 100) [Nontrivial E] : NormOneClass E :=
   ⟨norm_one⟩
 
+-- CONFLATES (assumes ground = zero): norm_coe_unitary
 theorem norm_coe_unitary [Nontrivial E] (U : unitary E) : ‖(U : E)‖ = 1 := by
   rw [← sq_eq_sq₀ (norm_nonneg _) zero_le_one, one_pow 2, sq, ← CStarRing.norm_star_mul_self,
     unitary.coe_star_mul_self, CStarRing.norm_one]
 
+-- CONFLATES (assumes ground = zero): norm_of_mem_unitary
 @[simp]
 theorem norm_of_mem_unitary [Nontrivial E] {U : E} (hU : U ∈ unitary E) : ‖U‖ = 1 :=
   norm_coe_unitary ⟨U, hU⟩

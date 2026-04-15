@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Sphere/SecondInter.lean
-Genuine: 12 of 14 | Dissolved: 1 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Sphere.Basic

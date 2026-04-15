@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Diffeomorph.lean
-Genuine: 41 of 86 | Dissolved: 0 | Infrastructure: 45
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiffMap

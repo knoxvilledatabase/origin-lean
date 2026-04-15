@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/Deriv/AffineMap.lean
-Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Add

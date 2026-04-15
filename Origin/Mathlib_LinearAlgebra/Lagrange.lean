@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Lagrange.lean
-Genuine: 66 of 75 | Dissolved: 6 | Infrastructure: 3
+Genuine: 64 | Conflates: 2 | Dissolved: 6 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -439,6 +439,7 @@ theorem nodal_eq (s : Finset ι) (v : ι → R) : nodal s v = ∏ i ∈ s, (X - 
 theorem nodal_empty : nodal ∅ v = 1 := by
   rfl
 
+-- CONFLATES (assumes ground = zero): natDegree_nodal
 @[simp]
 theorem natDegree_nodal [Nontrivial R] : (nodal s v).natDegree = #s := by
   simp_rw [nodal, natDegree_prod_of_monic (h := fun i _ => monic_X_sub_C (v i)),
@@ -454,6 +455,7 @@ rcases s.eq_empty_or_nonempty with (rfl | h)
 
   simp only [natDegree_nodal, h.card_pos]
 
+-- CONFLATES (assumes ground = zero): degree_nodal
 @[simp]
 theorem degree_nodal [Nontrivial R] : (nodal s v).degree = #s := by
   simp_rw [degree_eq_natDegree nodal_ne_zero, natDegree_nodal]

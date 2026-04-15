@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LinearDisjoint.lean
-Genuine: 48 of 51 | Dissolved: 0 | Infrastructure: 3
+Genuine: 45 | Conflates: 3 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.MulOpposite
@@ -127,6 +127,7 @@ theorem linearDisjoint_iff : A.LinearDisjoint B ↔ (toSubmodule A).LinearDisjoi
 
 variable {A B}
 
+-- CONFLATES (assumes ground = zero): LinearDisjoint.of_subsingleton
 @[nontriviality]
 theorem LinearDisjoint.of_subsingleton [Subsingleton R] : A.LinearDisjoint B :=
   Submodule.LinearDisjoint.of_subsingleton
@@ -430,6 +431,7 @@ theorem of_finrank_sup_of_free [Module.Free R A] [Module.Free R B]
 
 include H in
 
+-- CONFLATES (assumes ground = zero): adjoin_rank_eq_rank_left
 theorem adjoin_rank_eq_rank_left [Module.Free R A] [Module.Flat R B]
     [Nontrivial R] [Nontrivial S] :
     Module.rank B (Algebra.adjoin B (A : Set S)) = Module.rank R A := by
@@ -441,6 +443,7 @@ theorem adjoin_rank_eq_rank_left [Module.Free R A] [Module.Flat R B]
 
 include H in
 
+-- CONFLATES (assumes ground = zero): adjoin_rank_eq_rank_right
 theorem adjoin_rank_eq_rank_right [Module.Free R B] [Module.Flat R A]
     [Nontrivial R] [Nontrivial S] :
     Module.rank A (Algebra.adjoin A (B : Set S)) = Module.rank R B :=

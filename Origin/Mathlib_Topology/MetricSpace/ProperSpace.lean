@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/ProperSpace.lean
-Genuine: 4 of 14 | Dissolved: 0 | Infrastructure: 10
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Support

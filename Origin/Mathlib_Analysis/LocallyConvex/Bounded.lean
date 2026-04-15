@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/LocallyConvex/Bounded.lean
-Genuine: 51 of 54 | Dissolved: 1 | Infrastructure: 2
+Genuine: 48 | Conflates: 4 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.GroupTheory.GroupAction.Pointwise
@@ -89,10 +89,12 @@ theorem isVonNBounded_union {s t : Set E} :
 theorem IsVonNBounded.union {s₁ s₂ : Set E} (hs₁ : IsVonNBounded 𝕜 s₁) (hs₂ : IsVonNBounded 𝕜 s₂) :
     IsVonNBounded 𝕜 (s₁ ∪ s₂) := isVonNBounded_union.2 ⟨hs₁, hs₂⟩
 
+-- CONFLATES (assumes ground = zero): IsVonNBounded.of_boundedSpace
 @[nontriviality]
 theorem IsVonNBounded.of_boundedSpace [BoundedSpace 𝕜] {s : Set E} : IsVonNBounded 𝕜 s := fun _ _ ↦
   .of_boundedSpace
 
+-- CONFLATES (assumes ground = zero): IsVonNBounded.of_subsingleton
 @[nontriviality]
 theorem IsVonNBounded.of_subsingleton [Subsingleton E] {s : Set E} : IsVonNBounded 𝕜 s :=
   fun U hU ↦ .of_forall fun c ↦ calc
@@ -220,6 +222,7 @@ theorem isVonNBounded_iff_smul_tendsto_zero {ε : ι → 𝕜} {l : Filter ι} [
 
 end sequence
 
+-- CONFLATES (assumes ground = zero): IsVonNBounded.extend_scalars
 theorem IsVonNBounded.extend_scalars [NontriviallyNormedField 𝕜]
     {E : Type*} [AddCommGroup E] [Module 𝕜 E]
     (𝕝 : Type*) [NontriviallyNormedField 𝕝] [NormedAlgebra 𝕜 𝕝]
@@ -371,6 +374,7 @@ theorem Filter.Tendsto.isVonNBounded_range [NormedField 𝕜] [AddCommGroup E] [
 
 variable (𝕜) in
 
+-- CONFLATES (assumes ground = zero): Bornology.IsVonNBounded.restrict_scalars_of_nontrivial
 protected theorem Bornology.IsVonNBounded.restrict_scalars_of_nontrivial
     [NormedField 𝕜] [NormedRing 𝕜'] [NormedAlgebra 𝕜 𝕜'] [Nontrivial 𝕜']
     [Zero E] [TopologicalSpace E]

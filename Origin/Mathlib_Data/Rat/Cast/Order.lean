@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Cast/Order.lean
-Genuine: 63 of 63 | Dissolved: 0 | Infrastructure: 0
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Rat

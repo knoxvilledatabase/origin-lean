@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/DMatrix.lean
-Genuine: 12 of 33 | Dissolved: 0 | Infrastructure: 21
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs

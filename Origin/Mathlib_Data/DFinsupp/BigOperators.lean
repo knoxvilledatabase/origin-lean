@@ -1,6 +1,6 @@
 /-
 Extracted from Data/DFinsupp/BigOperators.lean
-Genuine: 28 of 49 | Dissolved: 19 | Infrastructure: 2
+Genuine: 28 | Conflates: 0 | Dissolved: 19 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action

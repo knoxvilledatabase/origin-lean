@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/ExteriorAlgebra/Basic.lean
-Genuine: 52 of 56 | Dissolved: 1 | Infrastructure: 3
+Genuine: 52 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Basic

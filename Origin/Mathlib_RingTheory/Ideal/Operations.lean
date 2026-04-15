@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Operations.lean
-Genuine: 157 of 190 | Dissolved: 12 | Infrastructure: 21
+Genuine: 157 | Conflates: 0 | Dissolved: 12 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Operations

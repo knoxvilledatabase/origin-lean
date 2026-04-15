@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Algebra/Field/IsAlgClosed.lean
-Genuine: 13 of 16 | Dissolved: 0 | Infrastructure: 3
+Genuine: 12 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Nat.PrimeFin
@@ -53,6 +53,7 @@ open Ring FreeCommRing Polynomial Language
 def genericMonicPoly (n : ℕ) : FreeCommRing (Fin (n + 1)) :=
   of (Fin.last _) ^ n + ∑ i : Fin n, of i.castSucc * of (Fin.last _) ^ (i : ℕ)
 
+-- CONFLATES (assumes ground = zero): lift_genericMonicPoly
 theorem lift_genericMonicPoly [CommRing K] [Nontrivial K] {n : ℕ} (v : Fin (n+1) → K) :
     FreeCommRing.lift v (genericMonicPoly n) =
     (((monicEquivDegreeLT n).trans (degreeLTEquiv K n).toEquiv).symm (v ∘ Fin.castSucc)).1.eval

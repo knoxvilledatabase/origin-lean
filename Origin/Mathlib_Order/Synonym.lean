@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Synonym.lean
-Genuine: 7 of 36 | Dissolved: 0 | Infrastructure: 29
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Logic.Equiv.Defs

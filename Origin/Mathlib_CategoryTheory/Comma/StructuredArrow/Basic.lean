@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Comma/StructuredArrow/Basic.lean
-Genuine: 94 of 148 | Dissolved: 0 | Infrastructure: 54
+Genuine: 94 | Conflates: 0 | Dissolved: 0 | Infrastructure: 54
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.Basic

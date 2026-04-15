@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Field/IsField.lean
-Genuine: 5 of 8 | Dissolved: 2 | Infrastructure: 1
+Genuine: 4 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
@@ -29,6 +29,7 @@ theorem Semifield.toIsField (R : Type u) [Semifield R] : IsField R where
 theorem Field.toIsField (R : Type u) [Field R] : IsField R :=
   Semifield.toIsField _
 
+-- CONFLATES (assumes ground = zero): IsField.nontrivial
 @[simp]
 theorem IsField.nontrivial {R : Type u} [Semiring R] (h : IsField R) : Nontrivial R :=
   ⟨h.exists_pair_ne⟩

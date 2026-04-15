@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/LocalExtr/LineDeriv.lean
-Genuine: 11 of 20 | Dissolved: 0 | Infrastructure: 9
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.LocalExtr.Basic

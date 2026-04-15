@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/NonUnitalSubalgebra.lean
-Genuine: 118 of 190 | Dissolved: 0 | Infrastructure: 72
+Genuine: 118 | Conflates: 0 | Dissolved: 0 | Infrastructure: 72
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalSubalgebra

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Valuation/Integers.lean
-Genuine: 16 of 20 | Dissolved: 1 | Infrastructure: 3
+Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Valuation.Basic

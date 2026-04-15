@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Constructions/ZeroObjects.lean
-Genuine: 26 of 36 | Dissolved: 0 | Infrastructure: 10
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms

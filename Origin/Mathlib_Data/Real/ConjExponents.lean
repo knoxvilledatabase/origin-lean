@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/ConjExponents.lean
-Genuine: 57 of 75 | Dissolved: 11 | Infrastructure: 7
+Genuine: 57 | Conflates: 0 | Dissolved: 11 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Real

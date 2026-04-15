@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Factors.lean
-Genuine: 45 of 56 | Dissolved: 0 | Infrastructure: 11
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Multiset

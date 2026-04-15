@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Adjunctions.lean
-Genuine: 25 of 35 | Dissolved: 0 | Infrastructure: 10
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic

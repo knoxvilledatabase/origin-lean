@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/Algebra.lean
-Genuine: 13 of 21 | Dissolved: 4 | Infrastructure: 4
+Genuine: 12 | Conflates: 1 | Dissolved: 4 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Basic
@@ -36,6 +36,7 @@ theorem charP_of_injective_algebraMap {R A : Type*} [CommSemiring R] [Semiring A
     (h : Function.Injective (algebraMap R A)) (p : ℕ) [CharP R p] : CharP A p :=
   charP_of_injective_ringHom h p
 
+-- CONFLATES (assumes ground = zero): charP_of_injective_algebraMap'
 theorem charP_of_injective_algebraMap' (R A : Type*) [Field R] [Semiring A] [Algebra R A]
     [Nontrivial A] (p : ℕ) [CharP R p] : CharP A p :=
   charP_of_injective_algebraMap (algebraMap R A).injective p

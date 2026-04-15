@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/GeneralizeProofs.lean
-Genuine: 19 of 19 | Dissolved: 0 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Elab.Tactic.Config

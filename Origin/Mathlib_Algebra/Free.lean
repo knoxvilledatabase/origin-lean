@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Free.lean
-Genuine: 53 of 103 | Dissolved: 0 | Infrastructure: 50
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic

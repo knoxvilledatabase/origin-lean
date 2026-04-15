@@ -1,6 +1,6 @@
 /-
 Extracted from Order/CompleteLatticeIntervals.lean
-Genuine: 18 of 27 | Dissolved: 0 | Infrastructure: 9
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Basic

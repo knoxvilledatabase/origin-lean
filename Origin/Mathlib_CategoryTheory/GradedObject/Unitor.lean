@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/GradedObject/Unitor.lean
-Genuine: 23 of 27 | Dissolved: 2 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Associator

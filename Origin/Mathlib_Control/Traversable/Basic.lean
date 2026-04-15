@@ -1,6 +1,6 @@
 /-
 Extracted from Control/Traversable/Basic.lean
-Genuine: 17 of 28 | Dissolved: 0 | Infrastructure: 11
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.Option.Defs

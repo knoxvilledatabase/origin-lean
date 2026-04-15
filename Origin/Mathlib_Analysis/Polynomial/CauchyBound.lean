@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Polynomial/CauchyBound.lean
-Genuine: 8 of 10 | Dissolved: 2 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

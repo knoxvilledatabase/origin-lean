@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/Ergodic/Ergodic.lean
-Genuine: 25 of 27 | Dissolved: 0 | Infrastructure: 2
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving

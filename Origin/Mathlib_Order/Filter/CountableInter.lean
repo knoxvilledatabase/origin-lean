@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/CountableInter.lean
-Genuine: 21 of 34 | Dissolved: 0 | Infrastructure: 13
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Curry

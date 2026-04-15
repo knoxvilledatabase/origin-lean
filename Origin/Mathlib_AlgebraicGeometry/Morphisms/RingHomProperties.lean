@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/RingHomProperties.lean
-Genuine: 38 of 40 | Dissolved: 0 | Infrastructure: 2
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Constructors

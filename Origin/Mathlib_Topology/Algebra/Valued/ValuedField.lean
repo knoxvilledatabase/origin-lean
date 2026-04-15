@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Valued/ValuedField.lean
-Genuine: 10 of 15 | Dissolved: 1 | Infrastructure: 4
+Genuine: 10 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Valued.ValuationTopology

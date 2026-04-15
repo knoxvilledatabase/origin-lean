@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/ContinuousMapZero.lean
-Genuine: 17 of 71 | Dissolved: 0 | Infrastructure: 54
+Genuine: 17 | Conflates: 2 | Dissolved: 0 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousMap.Algebra
@@ -144,12 +144,14 @@ instance instAdd [AddZeroClass R] [ContinuousAdd R] : Add C(X, R)₀ where
 instance instMul [MulZeroClass R] [ContinuousMul R] : Mul C(X, R)₀ where
   mul f g := ⟨f * g, by simp⟩
 
+-- CONFLATES (assumes ground = zero): coe_mul
 @[simp] lemma coe_mul [MulZeroClass R] [ContinuousMul R] (f g : C(X, R)₀) : ⇑(f * g) = f * g := rfl
 
 instance instSMul {M : Type*} [Zero R] [SMulZeroClass M R] [ContinuousConstSMul M R] :
     SMul M C(X, R)₀ where
   smul m f := ⟨m • f, by simp⟩
 
+-- CONFLATES (assumes ground = zero): coe_smul
 @[simp] lemma coe_smul {M : Type*} [Zero R] [SMulZeroClass M R] [ContinuousConstSMul M R]
     (m : M) (f : C(X, R)₀) : ⇑(m • f) = m • f := rfl
 

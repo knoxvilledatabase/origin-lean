@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/TopCat/Limits/Basic.lean
-Genuine: 10 of 18 | Dissolved: 0 | Infrastructure: 8
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Topology.Category.TopCat.Basic

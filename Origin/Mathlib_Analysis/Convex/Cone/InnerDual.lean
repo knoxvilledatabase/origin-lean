@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Cone/InnerDual.lean
-Genuine: 15 of 17 | Dissolved: 1 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Cone.Basic

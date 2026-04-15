@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/FGModuleCat/Limits.lean
-Genuine: 1 of 7 | Dissolved: 0 | Infrastructure: 6
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.FGModuleCat.Basic

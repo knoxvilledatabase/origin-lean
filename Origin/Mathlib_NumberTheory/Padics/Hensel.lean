@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Padics/Hensel.lean
-Genuine: 50 of 55 | Dissolved: 4 | Infrastructure: 1
+Genuine: 50 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Identities

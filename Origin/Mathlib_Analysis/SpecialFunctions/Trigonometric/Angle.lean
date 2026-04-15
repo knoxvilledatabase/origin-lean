@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Angle.lean
-Genuine: 138 of 169 | Dissolved: 15 | Infrastructure: 16
+Genuine: 138 | Conflates: 0 | Dissolved: 15 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic

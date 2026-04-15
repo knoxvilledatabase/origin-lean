@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/Exponential.lean
-Genuine: 49 of 75 | Dissolved: 24 | Infrastructure: 2
+Genuine: 49 | Conflates: 0 | Dissolved: 24 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic

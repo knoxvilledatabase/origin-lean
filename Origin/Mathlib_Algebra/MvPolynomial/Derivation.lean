@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Derivation.lean
-Genuine: 15 of 15 | Dissolved: 0 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Supported

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Prime/Lemmas.lean
-Genuine: 22 of 28 | Dissolved: 2 | Infrastructure: 4
+Genuine: 22 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Hom

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Basic.lean
-Genuine: 49 of 55 | Dissolved: 1 | Infrastructure: 5
+Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Content

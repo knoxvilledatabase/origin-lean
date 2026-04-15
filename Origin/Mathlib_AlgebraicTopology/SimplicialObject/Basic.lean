@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicTopology/SimplicialObject/Basic.lean
-Genuine: 87 of 121 | Dissolved: 0 | Infrastructure: 34
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.AlgebraicTopology.SimplexCategory

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/FinEnum.lean
-Genuine: 25 of 51 | Dissolved: 1 | Infrastructure: 25
+Genuine: 25 | Conflates: 0 | Dissolved: 1 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic

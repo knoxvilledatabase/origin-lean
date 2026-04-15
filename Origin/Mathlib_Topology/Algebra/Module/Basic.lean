@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/Basic.lean
-Genuine: 225 of 390 | Dissolved: 3 | Infrastructure: 162
+Genuine: 224 | Conflates: 1 | Dissolved: 3 | Infrastructure: 162
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Opposite
@@ -66,6 +66,7 @@ theorem Submodule.eq_top_of_nonempty_interior' [NeBot (𝓝[{ x : R | IsUnit x }
 
 variable (R M)
 
+-- CONFLATES (assumes ground = zero): Module.punctured_nhds_neBot
 theorem Module.punctured_nhds_neBot [Nontrivial M] [NeBot (𝓝[≠] (0 : R))] [NoZeroSMulDivisors R M]
     (x : M) : NeBot (𝓝[≠] x) := by
   rcases exists_ne (0 : M) with ⟨y, hy⟩

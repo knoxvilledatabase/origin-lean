@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Harmonic/Defs.lean
-Genuine: 3 of 5 | Dissolved: 1 | Infrastructure: 1
+Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals

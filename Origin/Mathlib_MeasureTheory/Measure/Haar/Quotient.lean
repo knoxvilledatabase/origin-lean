@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Quotient.lean
-Genuine: 12 of 14 | Dissolved: 1 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Opposite

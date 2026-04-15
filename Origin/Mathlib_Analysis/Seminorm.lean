@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Seminorm.lean
-Genuine: 126 of 182 | Dissolved: 13 | Infrastructure: 43
+Genuine: 126 | Conflates: 0 | Dissolved: 13 | Infrastructure: 43
 -/
 import Origin.Core
 import Mathlib.Data.Real.Pointwise

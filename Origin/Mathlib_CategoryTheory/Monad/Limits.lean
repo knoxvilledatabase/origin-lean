@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monad/Limits.lean
-Genuine: 48 of 60 | Dissolved: 0 | Infrastructure: 12
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monad.Adjunction

@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/Circle/RotationNumber/TranslationNumber.lean
-Genuine: 113 of 134 | Dissolved: 1 | Infrastructure: 20
+Genuine: 113 | Conflates: 0 | Dissolved: 1 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom

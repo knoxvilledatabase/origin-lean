@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Category/Preorder.lean
-Genuine: 11 of 28 | Dissolved: 0 | Infrastructure: 17
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Equivalence

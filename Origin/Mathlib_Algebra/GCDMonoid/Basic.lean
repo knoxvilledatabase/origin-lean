@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GCDMonoid/Basic.lean
-Genuine: 126 of 155 | Dissolved: 5 | Infrastructure: 24
+Genuine: 126 | Conflates: 0 | Dissolved: 5 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/ContinuousAffineMap.lean
-Genuine: 12 of 49 | Dissolved: 0 | Infrastructure: 37
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineMap

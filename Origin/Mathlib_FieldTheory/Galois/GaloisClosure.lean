@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Galois/GaloisClosure.lean
-Genuine: 8 of 24 | Dissolved: 0 | Infrastructure: 16
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.FieldTheory.NormalClosure

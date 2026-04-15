@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/ContinuousMonoidHom.lean
-Genuine: 31 of 42 | Dissolved: 0 | Infrastructure: 11
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Equicontinuity

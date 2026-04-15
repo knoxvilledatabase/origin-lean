@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/AddChar.lean
-Genuine: 48 of 106 | Dissolved: 5 | Infrastructure: 53
+Genuine: 46 | Conflates: 2 | Dissolved: 5 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Regular
@@ -234,10 +234,12 @@ lemma eq_zero_iff : ψ = 0 ↔ ∀ x, ψ x = 1 := DFunLike.ext_iff
 
 -- DISSOLVED: ne_zero_iff
 
+-- CONFLATES (assumes ground = zero): IsNontrivial
 def IsNontrivial (ψ : AddChar A M) : Prop := ∃ a : A, ψ a ≠ 1
 
 set_option linter.deprecated false in
 
+-- CONFLATES (assumes ground = zero): isNontrivial_iff_ne_trivial
 lemma isNontrivial_iff_ne_trivial (ψ : AddChar A M) : IsNontrivial ψ ↔ ψ ≠ 1 :=
   not_forall.symm.trans (DFunLike.ext_iff (f := ψ) (g := 1)).symm.not
 

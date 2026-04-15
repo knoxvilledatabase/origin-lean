@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Idempotents/FunctorExtension.lean
-Genuine: 14 of 19 | Dissolved: 0 | Infrastructure: 5
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Idempotents.Karoubi

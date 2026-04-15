@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/GoldenRatio.lean
-Genuine: 29 of 31 | Dissolved: 2 | Infrastructure: 0
+Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Basic

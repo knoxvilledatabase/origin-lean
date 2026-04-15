@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Semigrp/Basic.lean
-Genuine: 12 of 38 | Dissolved: 0 | Infrastructure: 26
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Algebra.PEmptyInstances

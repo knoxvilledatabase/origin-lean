@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/Multilinear/Basic.lean
-Genuine: 102 of 124 | Dissolved: 0 | Infrastructure: 22
+Genuine: 101 | Conflates: 2 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
@@ -1148,10 +1148,12 @@ instance normedAddCommGroup' :
 
 variable (𝕜 G)
 
+-- CONFLATES (assumes ground = zero): norm_ofSubsingleton_id
 theorem norm_ofSubsingleton_id [Subsingleton ι] [Nontrivial G] (i : ι) :
     ‖ofSubsingleton 𝕜 G G i (.id _ _)‖ = 1 := by
   simp
 
+-- CONFLATES (assumes ground = zero): nnnorm_ofSubsingleton_id
 theorem nnnorm_ofSubsingleton_id [Subsingleton ι] [Nontrivial G] (i : ι) :
     ‖ofSubsingleton 𝕜 G G i (.id _ _)‖₊ = 1 :=
   NNReal.eq <| norm_ofSubsingleton_id ..

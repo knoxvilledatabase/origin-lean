@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UniformSpace/UniformEmbedding.lean
-Genuine: 59 of 69 | Dissolved: 0 | Infrastructure: 10
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Topology.UniformSpace.Cauchy

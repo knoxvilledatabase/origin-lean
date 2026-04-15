@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/Language.lean
-Genuine: 44 of 67 | Dissolved: 0 | Infrastructure: 23
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Kleene

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Cast/Defs.lean
-Genuine: 27 of 45 | Dissolved: 12 | Infrastructure: 6
+Genuine: 27 | Conflates: 0 | Dissolved: 12 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic

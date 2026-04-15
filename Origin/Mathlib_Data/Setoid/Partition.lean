@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Setoid/Partition.lean
-Genuine: 59 of 67 | Dissolved: 0 | Infrastructure: 8
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Range

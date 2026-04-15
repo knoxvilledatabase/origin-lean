@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/Kan/IsKan.lean
-Genuine: 28 of 32 | Dissolved: 0 | Infrastructure: 4
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Extension

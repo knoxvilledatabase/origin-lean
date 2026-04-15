@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Degree/TrailingDegree.lean
-Genuine: 46 of 79 | Dissolved: 28 | Infrastructure: 5
+Genuine: 46 | Conflates: 0 | Dissolved: 28 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Support

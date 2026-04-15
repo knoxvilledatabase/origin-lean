@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subring/Order.lean
-Genuine: 1 of 10 | Dissolved: 0 | Infrastructure: 9
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Hom.Ring

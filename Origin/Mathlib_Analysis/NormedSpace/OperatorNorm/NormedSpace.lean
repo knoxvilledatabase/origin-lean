@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/NormedSpace.lean
-Genuine: 23 of 28 | Dissolved: 1 | Infrastructure: 4
+Genuine: 13 | Conflates: 10 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Bilinear
@@ -95,12 +95,14 @@ theorem opNorm_zero_iff [RingHomIsometric σ₁₂] : ‖f‖ = 0 ↔ f = 0 :=
       rintro rfl
       exact opNorm_zero)
 
+-- CONFLATES (assumes ground = zero): norm_id
 @[simp]
 theorem norm_id [Nontrivial E] : ‖id 𝕜 E‖ = 1 := by
   refine norm_id_of_nontrivial_seminorm ?_
   obtain ⟨x, hx⟩ := exists_ne (0 : E)
   exact ⟨x, ne_of_gt (norm_pos_iff.2 hx)⟩
 
+-- CONFLATES (assumes ground = zero): nnnorm_id
 @[simp]
 lemma nnnorm_id [Nontrivial E] : ‖id 𝕜 E‖₊ = 1 := NNReal.eq norm_id
 
@@ -115,6 +117,7 @@ instance toNormedRing : NormedRing (E →L[𝕜] E) :=
 
 variable {f}
 
+-- CONFLATES (assumes ground = zero): homothety_norm
 theorem homothety_norm [RingHomIsometric σ₁₂] [Nontrivial E] (f : E →SL[σ₁₂] F) {a : ℝ}
     (hf : ∀ x, ‖f x‖ = a * ‖x‖) : ‖f‖ = a := by
   obtain ⟨x, hx⟩ : ∃ x : E, x ≠ 0 := exists_ne 0
@@ -137,6 +140,7 @@ end ContinuousLinearMap
 
 namespace LinearIsometry
 
+-- CONFLATES (assumes ground = zero): norm_toContinuousLinearMap
 @[simp]
 theorem norm_toContinuousLinearMap [Nontrivial E] [RingHomIsometric σ₁₂] (f : E →ₛₗᵢ[σ₁₂] F) :
     ‖f.toContinuousLinearMap‖ = 1 :=
@@ -189,6 +193,7 @@ theorem opNorm_comp_linearIsometryEquiv (f : F →SL[σ₂₃] G) (g : F' ≃ₛ
 
 alias op_norm_comp_linearIsometryEquiv := opNorm_comp_linearIsometryEquiv
 
+-- CONFLATES (assumes ground = zero): norm_smulRightL
 @[simp]
 theorem norm_smulRightL (c : E →L[𝕜] 𝕜) [Nontrivial Fₗ] : ‖smulRightL 𝕜 E Fₗ c‖ = ‖c‖ :=
   ContinuousLinearMap.homothety_norm _ c.norm_smulRight_apply
@@ -204,6 +209,7 @@ namespace Submodule
 
 variable [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
 
+-- CONFLATES (assumes ground = zero): norm_subtypeL
 theorem norm_subtypeL (K : Submodule 𝕜 E) [Nontrivial K] : ‖K.subtypeL‖ = 1 :=
   K.subtypeₗᵢ.norm_toContinuousLinearMap
 
@@ -223,20 +229,24 @@ protected theorem antilipschitz (e : E ≃SL[σ₁₂] F) :
     AntilipschitzWith ‖(e.symm : F →SL[σ₂₁] E)‖₊ e :=
   e.symm.lipschitz.to_rightInverse e.left_inv
 
+-- CONFLATES (assumes ground = zero): one_le_norm_mul_norm_symm
 theorem one_le_norm_mul_norm_symm [RingHomIsometric σ₁₂] [Nontrivial E] (e : E ≃SL[σ₁₂] F) :
     1 ≤ ‖(e : E →SL[σ₁₂] F)‖ * ‖(e.symm : F →SL[σ₂₁] E)‖ := by
   rw [mul_comm]
   convert (e.symm : F →SL[σ₂₁] E).opNorm_comp_le (e : E →SL[σ₁₂] F)
   rw [e.coe_symm_comp_coe, ContinuousLinearMap.norm_id]
 
+-- CONFLATES (assumes ground = zero): norm_pos
 theorem norm_pos [RingHomIsometric σ₁₂] [Nontrivial E] (e : E ≃SL[σ₁₂] F) :
     0 < ‖(e : E →SL[σ₁₂] F)‖ :=
   pos_of_mul_pos_left (lt_of_lt_of_le zero_lt_one e.one_le_norm_mul_norm_symm) (norm_nonneg _)
 
+-- CONFLATES (assumes ground = zero): norm_symm_pos
 theorem norm_symm_pos [RingHomIsometric σ₁₂] [Nontrivial E] (e : E ≃SL[σ₁₂] F) :
     0 < ‖(e.symm : F →SL[σ₂₁] E)‖ :=
   pos_of_mul_pos_right (zero_lt_one.trans_le e.one_le_norm_mul_norm_symm) (norm_nonneg _)
 
+-- CONFLATES (assumes ground = zero): nnnorm_symm_pos
 theorem nnnorm_symm_pos [RingHomIsometric σ₁₂] [Nontrivial E] (e : E ≃SL[σ₁₂] F) :
     0 < ‖(e.symm : F →SL[σ₂₁] E)‖₊ :=
   e.norm_symm_pos

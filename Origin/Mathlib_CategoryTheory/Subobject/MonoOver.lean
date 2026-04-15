@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Subobject/MonoOver.lean
-Genuine: 31 of 53 | Dissolved: 0 | Infrastructure: 22
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Over

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/ContinuousFunctionalCalculus/PosPart.lean
-Genuine: 33 of 38 | Dissolved: 0 | Infrastructure: 5
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousMap.StarOrdered

@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/SpecificGroups/Cyclic.lean
-Genuine: 56 of 69 | Dissolved: 1 | Infrastructure: 12
+Genuine: 55 | Conflates: 1 | Dissolved: 1 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
@@ -80,6 +80,7 @@ def IsCyclic.commGroup [hg : Group α] [IsCyclic α] : CommGroup α :=
 
 variable [Group α] [Group G] [Group G']
 
+-- CONFLATES (assumes ground = zero): Nontrivial.of_not_isCyclic
 @[to_additive "A non-cyclic additive group is non-trivial."]
 theorem Nontrivial.of_not_isCyclic (nc : ¬IsCyclic α) : Nontrivial α := by
   contrapose! nc

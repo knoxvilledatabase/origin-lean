@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/EssentialImage.lean
-Genuine: 17 of 26 | Dissolved: 0 | Infrastructure: 9
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.NatIso

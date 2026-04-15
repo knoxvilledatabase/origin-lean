@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/PrimesInAP.lean
-Genuine: 25 of 26 | Dissolved: 1 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.DirichletCharacter.Orthogonality

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Subobject/Lattice.lean
-Genuine: 69 of 94 | Dissolved: 0 | Infrastructure: 25
+Genuine: 68 | Conflates: 1 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Currying
@@ -608,6 +608,7 @@ variable [HasZeroMorphisms C] [HasZeroObject C]
 
 open ZeroObject
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_not_isZero
 theorem nontrivial_of_not_isZero {X : C} (h : ¬IsZero X) : Nontrivial (Subobject X) :=
   ⟨⟨mk (0 : 0 ⟶ X), mk (𝟙 X), fun w => h (IsZero.of_iso (isZero_zero C) (isoOfMkEqMk _ _ w).symm)⟩⟩
 

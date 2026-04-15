@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Num/Bitwise.lean
-Genuine: 47 of 77 | Dissolved: 0 | Infrastructure: 30
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Data.Num.Basic

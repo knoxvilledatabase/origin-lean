@@ -1,6 +1,6 @@
 /-
 Extracted from RepresentationTheory/Action/Monoidal.lean
-Genuine: 5 of 43 | Dissolved: 0 | Infrastructure: 38
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Linear

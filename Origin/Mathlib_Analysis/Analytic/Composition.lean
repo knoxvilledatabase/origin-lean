@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/Composition.lean
-Genuine: 59 of 65 | Dissolved: 0 | Infrastructure: 6
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Basic

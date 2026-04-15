@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Multiset.lean
-Genuine: 63 of 63 | Dissolved: 0 | Infrastructure: 0
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Finset.Basic

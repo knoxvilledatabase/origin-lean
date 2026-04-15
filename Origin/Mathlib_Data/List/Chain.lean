@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Chain.lean
-Genuine: 67 of 74 | Dissolved: 0 | Infrastructure: 7
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Logic.Relation

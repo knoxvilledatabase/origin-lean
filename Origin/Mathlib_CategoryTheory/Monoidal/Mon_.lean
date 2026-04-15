@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Mon_.lean
-Genuine: 36 of 74 | Dissolved: 0 | Infrastructure: 38
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic

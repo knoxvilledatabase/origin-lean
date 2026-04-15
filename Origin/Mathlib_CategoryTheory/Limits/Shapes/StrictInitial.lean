@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/StrictInitial.lean
-Genuine: 23 of 28 | Dissolved: 0 | Infrastructure: 5
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal

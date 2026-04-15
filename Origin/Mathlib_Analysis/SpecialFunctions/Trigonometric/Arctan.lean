@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Arctan.lean
-Genuine: 50 of 54 | Dissolved: 2 | Infrastructure: 2
+Genuine: 50 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Complex

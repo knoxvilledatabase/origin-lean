@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Sym.lean
-Genuine: 25 of 27 | Dissolved: 0 | Infrastructure: 2
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic

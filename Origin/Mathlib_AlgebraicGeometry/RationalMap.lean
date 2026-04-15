@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/RationalMap.lean
-Genuine: 57 of 70 | Dissolved: 0 | Infrastructure: 13
+Genuine: 57 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.SpreadingOut

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/ToLin.lean
-Genuine: 118 of 138 | Dissolved: 0 | Infrastructure: 20
+Genuine: 118 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Tower

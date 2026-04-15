@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Process/Filtration.lean
-Genuine: 18 of 35 | Dissolved: 0 | Infrastructure: 17
+Genuine: 17 | Conflates: 1 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Cylinders
@@ -245,6 +245,7 @@ section
 
 open MeasurableSpace
 
+-- CONFLATES (assumes ground = zero): filtrationOfSet_eq_natural
 theorem filtrationOfSet_eq_natural [MulZeroOneClass β] [Nontrivial β] {s : ι → Set Ω}
     (hsm : ∀ i, MeasurableSet[m] (s i)) :
     filtrationOfSet hsm = natural (fun i => (s i).indicator (fun _ => 1 : Ω → β)) fun i =>

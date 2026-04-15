@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/Archimedean.lean
-Genuine: 46 of 54 | Dissolved: 0 | Infrastructure: 8
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Archimedean.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/BallAction.lean
-Genuine: 1 of 29 | Dissolved: 1 | Infrastructure: 27
+Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.UnitBall

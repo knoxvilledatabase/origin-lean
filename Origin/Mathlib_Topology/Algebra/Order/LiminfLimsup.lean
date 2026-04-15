@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Order/LiminfLimsup.lean
-Genuine: 47 of 64 | Dissolved: 0 | Infrastructure: 17
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals

@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Matching.lean
-Genuine: 28 of 33 | Dissolved: 0 | Infrastructure: 5
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.DegreeSum

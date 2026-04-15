@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/PartialHomeomorph.lean
-Genuine: 168 of 219 | Dissolved: 0 | Infrastructure: 51
+Genuine: 168 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Logic.Equiv.PartialEquiv

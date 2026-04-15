@@ -1,6 +1,6 @@
 /-
 Extracted from Control/Applicative.lean
-Genuine: 9 of 17 | Dissolved: 0 | Infrastructure: 8
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs

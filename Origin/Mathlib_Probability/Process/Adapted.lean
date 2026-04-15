@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Process/Adapted.lean
-Genuine: 21 of 24 | Dissolved: 0 | Infrastructure: 3
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Probability.Process.Filtration

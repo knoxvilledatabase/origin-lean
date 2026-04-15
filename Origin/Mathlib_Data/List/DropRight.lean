@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/DropRight.lean
-Genuine: 35 of 37 | Dissolved: 0 | Infrastructure: 2
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.List.Basic

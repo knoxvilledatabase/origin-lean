@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/FreeGroup/Basic.lean
-Genuine: 95 of 119 | Dissolved: 0 | Infrastructure: 24
+Genuine: 95 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List

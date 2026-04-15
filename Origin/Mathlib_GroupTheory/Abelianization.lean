@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Abelianization.lean
-Genuine: 26 of 44 | Dissolved: 0 | Infrastructure: 18
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Card

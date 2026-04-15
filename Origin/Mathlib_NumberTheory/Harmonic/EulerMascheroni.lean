@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Harmonic/EulerMascheroni.lean
-Genuine: 18 of 18 | Dissolved: 0 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Complex.ExponentialBounds

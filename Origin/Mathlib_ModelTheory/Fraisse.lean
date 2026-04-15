@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Fraisse.lean
-Genuine: 28 of 30 | Dissolved: 0 | Infrastructure: 2
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.ModelTheory.FinitelyGenerated

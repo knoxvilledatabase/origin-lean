@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Bornology/Constructions.lean
-Genuine: 20 of 34 | Dissolved: 0 | Infrastructure: 14
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Topology.Bornology.Basic

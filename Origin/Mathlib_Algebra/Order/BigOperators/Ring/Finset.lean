@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/BigOperators/Ring/Finset.lean
-Genuine: 21 of 21 | Dissolved: 0 | Infrastructure: 0
+Genuine: 18 | Conflates: 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
@@ -139,6 +139,7 @@ section CanonicallyOrderedCommSemiring
 
 variable [CanonicallyOrderedCommSemiring R] {f g h : ι → R} {s : Finset ι} {i : ι}
 
+-- CONFLATES (assumes ground = zero): _root_.CanonicallyOrderedCommSemiring.prod_pos
 @[simp] lemma _root_.CanonicallyOrderedCommSemiring.prod_pos [Nontrivial R] :
     0 < ∏ i ∈ s, f i ↔ (∀ i ∈ s, (0 : R) < f i) :=
   CanonicallyOrderedCommSemiring.multiset_prod_pos.trans Multiset.forall_mem_map_iff
@@ -212,11 +213,13 @@ lemma IsAbsoluteValue.abv_sum [Semiring R] [OrderedSemiring S] (abv : R → S) [
     (f : ι → R) (s : Finset ι) : abv (∑ i ∈ s, f i) ≤ ∑ i ∈ s, abv (f i) :=
   (IsAbsoluteValue.toAbsoluteValue abv).sum_le _ _
 
+-- CONFLATES (assumes ground = zero): AbsoluteValue.map_prod
 nonrec lemma AbsoluteValue.map_prod [CommSemiring R] [Nontrivial R] [LinearOrderedCommRing S]
     (abv : AbsoluteValue R S) (f : ι → R) (s : Finset ι) :
     abv (∏ i ∈ s, f i) = ∏ i ∈ s, abv (f i) :=
   map_prod abv f s
 
+-- CONFLATES (assumes ground = zero): IsAbsoluteValue.map_prod
 lemma IsAbsoluteValue.map_prod [CommSemiring R] [Nontrivial R] [LinearOrderedCommRing S]
     (abv : R → S) [IsAbsoluteValue abv] (f : ι → R) (s : Finset ι) :
     abv (∏ i ∈ s, f i) = ∏ i ∈ s, abv (f i) :=

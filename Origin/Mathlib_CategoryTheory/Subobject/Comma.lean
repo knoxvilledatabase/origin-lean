@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Subobject/Comma.lean
-Genuine: 12 of 16 | Dissolved: 0 | Infrastructure: 4
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Subobject.WellPowered

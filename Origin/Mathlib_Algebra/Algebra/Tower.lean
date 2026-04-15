@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Tower.lean
-Genuine: 26 of 38 | Dissolved: 1 | Infrastructure: 11
+Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv

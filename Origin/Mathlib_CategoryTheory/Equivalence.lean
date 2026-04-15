@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Equivalence.lean
-Genuine: 59 of 84 | Dissolved: 0 | Infrastructure: 25
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.FullyFaithful

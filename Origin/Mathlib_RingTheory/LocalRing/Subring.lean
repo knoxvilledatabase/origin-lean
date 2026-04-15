@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LocalRing/Subring.lean
-Genuine: 9 of 16 | Dissolved: 0 | Infrastructure: 7
+Genuine: 7 | Conflates: 2 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Tactic.FieldSimp
@@ -48,10 +48,12 @@ lemma toSubring_injective : Function.Injective (toSubring (R := R)) := by
 protected def copy (S : LocalSubring R) (s : Set R) (hs : s = ↑S.toSubring) : LocalSubring R :=
   LocalSubring.mk (S.toSubring.copy s hs) (isLocalRing := hs ▸ S.2)
 
+-- CONFLATES (assumes ground = zero): map
 @[simps! toSubring]
 def map [Nontrivial S] (f : R →+* S) (s : LocalSubring R) : LocalSubring S :=
   mk (s.1.map f)
 
+-- CONFLATES (assumes ground = zero): range
 @[simps! toSubring]
 def range [IsLocalRing R] [Nontrivial S] (f : R →+* S) : LocalSubring S :=
   .copy (map f (mk ⊤)) f.range (by ext x; exact congr(x ∈ $(Set.image_univ.symm)))

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subgroup/Order.lean
-Genuine: 8 of 13 | Dissolved: 0 | Infrastructure: 5
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Order.Atoms

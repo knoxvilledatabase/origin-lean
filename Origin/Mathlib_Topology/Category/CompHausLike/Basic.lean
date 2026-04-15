@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/CompHausLike/Basic.lean
-Genuine: 16 of 34 | Dissolved: 0 | Infrastructure: 18
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.ReflectsIso

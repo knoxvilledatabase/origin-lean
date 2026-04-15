@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/SubMulAction/Pointwise.lean
-Genuine: 2 of 12 | Dissolved: 2 | Infrastructure: 8
+Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.GroupTheory.GroupAction.SubMulAction

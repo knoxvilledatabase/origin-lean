@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/RightExactness.lean
-Genuine: 32 of 37 | Dissolved: 0 | Infrastructure: 5
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Exact

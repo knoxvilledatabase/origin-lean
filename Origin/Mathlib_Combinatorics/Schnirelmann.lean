@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Schnirelmann.lean
-Genuine: 26 of 28 | Dissolved: 2 | Infrastructure: 0
+Genuine: 26 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Abs

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/QPF/Univariate/Basic.lean
-Genuine: 52 of 57 | Dissolved: 0 | Infrastructure: 5
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.PFunctor.Univariate.M

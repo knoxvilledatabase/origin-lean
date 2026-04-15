@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/Alternating/Basic.lean
-Genuine: 49 of 92 | Dissolved: 0 | Infrastructure: 43
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 43
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Alternating.Basic

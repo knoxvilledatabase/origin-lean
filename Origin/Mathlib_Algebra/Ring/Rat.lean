@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Rat.lean
-Genuine: 7 of 15 | Dissolved: 2 | Infrastructure: 6
+Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Units.Basic

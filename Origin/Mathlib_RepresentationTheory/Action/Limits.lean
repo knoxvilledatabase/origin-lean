@@ -1,6 +1,6 @@
 /-
 Extracted from RepresentationTheory/Action/Limits.lean
-Genuine: 10 of 52 | Dissolved: 0 | Infrastructure: 42
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Abelian.FunctorCategory

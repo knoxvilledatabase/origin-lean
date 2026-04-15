@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/DotProduct.lean
-Genuine: 24 of 26 | Dissolved: 2 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Star.Basic

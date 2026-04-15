@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/GaussSum.lean
-Genuine: 14 of 15 | Dissolved: 1 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.AddCharacter

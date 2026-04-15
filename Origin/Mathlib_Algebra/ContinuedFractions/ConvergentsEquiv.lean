@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/ContinuedFractions/ConvergentsEquiv.lean
-Genuine: 13 of 14 | Dissolved: 1 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Defs

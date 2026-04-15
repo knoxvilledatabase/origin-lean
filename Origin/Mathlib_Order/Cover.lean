@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Cover.lean
-Genuine: 113 of 126 | Dissolved: 0 | Infrastructure: 13
+Genuine: 113 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.OrdConnected

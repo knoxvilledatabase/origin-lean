@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/ChineseRemainder.lean
-Genuine: 4 of 11 | Dissolved: 6 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 6 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring.List

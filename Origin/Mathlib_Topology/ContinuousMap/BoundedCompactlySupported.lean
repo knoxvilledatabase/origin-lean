@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/BoundedCompactlySupported.lean
-Genuine: 10 of 11 | Dissolved: 0 | Infrastructure: 1
+Genuine: 9 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.TwoSidedIdeal.Lattice
@@ -65,6 +65,7 @@ theorem compactlySupported_eq_top_of_isCompact (h : IsCompact (Set.univ : Set α
 theorem compactlySupported_eq_top [CompactSpace α] : C_cb(α, γ) = ⊤ :=
   compactlySupported_eq_top_of_isCompact CompactSpace.isCompact_univ
 
+-- CONFLATES (assumes ground = zero): compactlySupported_eq_top_iff
 theorem compactlySupported_eq_top_iff [Nontrivial γ] :
     C_cb(α, γ) = ⊤ ↔ IsCompact (Set.univ : Set α) := by
   refine ⟨fun h ↦ ?_, compactlySupported_eq_top_of_isCompact⟩

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subsemigroup/Defs.lean
-Genuine: 14 of 37 | Dissolved: 0 | Infrastructure: 23
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs

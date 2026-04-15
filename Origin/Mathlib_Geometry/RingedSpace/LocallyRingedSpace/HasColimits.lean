@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/RingedSpace/LocallyRingedSpace/HasColimits.lean
-Genuine: 14 of 22 | Dissolved: 0 | Infrastructure: 8
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace

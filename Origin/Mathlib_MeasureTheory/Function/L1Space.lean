@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/L1Space.lean
-Genuine: 193 of 215 | Dissolved: 5 | Infrastructure: 17
+Genuine: 191 | Conflates: 2 | Dissolved: 5 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.LpOrder
@@ -355,6 +355,7 @@ section NormedSpace
 
 variable {𝕜 : Type*}
 
+-- CONFLATES (assumes ground = zero): HasFiniteIntegral.smul
 theorem HasFiniteIntegral.smul [NormedAddCommGroup 𝕜] [SMulZeroClass 𝕜 β] [BoundedSMul 𝕜 β] (c : 𝕜)
     {f : α → β} : HasFiniteIntegral f μ → HasFiniteIntegral (c • f) μ := by
   simp only [HasFiniteIntegral]; intro hfi
@@ -1041,6 +1042,7 @@ section BoundedSMul
 
 variable {𝕜 : Type*}
 
+-- CONFLATES (assumes ground = zero): Integrable.smul
 theorem Integrable.smul [NormedAddCommGroup 𝕜] [SMulZeroClass 𝕜 β] [BoundedSMul 𝕜 β] (c : 𝕜)
     {f : α → β} (hf : Integrable f μ) : Integrable (c • f) μ :=
   ⟨hf.aestronglyMeasurable.const_smul c, hf.hasFiniteIntegral.smul c⟩

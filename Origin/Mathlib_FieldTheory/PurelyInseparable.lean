@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/PurelyInseparable.lean
-Genuine: 80 of 104 | Dissolved: 0 | Infrastructure: 24
+Genuine: 78 | Conflates: 2 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.ExpChar
@@ -148,6 +148,7 @@ variable {E} in
 theorem IsPurelyInseparable.isIntegral' [IsPurelyInseparable F E] (x : E) : IsIntegral F x :=
   Algebra.IsIntegral.isIntegral _
 
+-- CONFLATES (assumes ground = zero): IsPurelyInseparable.isAlgebraic
 theorem IsPurelyInseparable.isAlgebraic [Nontrivial F] [IsPurelyInseparable F E] :
     Algebra.IsAlgebraic F E := inferInstance
 
@@ -188,6 +189,7 @@ theorem IsPurelyInseparable.surjective_algebraMap_of_isSeparable
     [IsPurelyInseparable F E] [Algebra.IsSeparable F E] : Function.Surjective (algebraMap F E) :=
   fun x ↦ IsPurelyInseparable.inseparable F x (Algebra.IsSeparable.isSeparable F x)
 
+-- CONFLATES (assumes ground = zero): IsPurelyInseparable.bijective_algebraMap_of_isSeparable
 theorem IsPurelyInseparable.bijective_algebraMap_of_isSeparable
     [Nontrivial E] [NoZeroSMulDivisors F E]
     [IsPurelyInseparable F E] [Algebra.IsSeparable F E] : Function.Bijective (algebraMap F E) :=

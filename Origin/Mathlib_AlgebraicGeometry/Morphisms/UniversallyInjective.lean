@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/UniversallyInjective.lean
-Genuine: 6 of 11 | Dissolved: 0 | Infrastructure: 5
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.PullbackCarrier

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Ring/RingNF.lean
-Genuine: 15 of 22 | Dissolved: 0 | Infrastructure: 7
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Tactic.Ring.Basic

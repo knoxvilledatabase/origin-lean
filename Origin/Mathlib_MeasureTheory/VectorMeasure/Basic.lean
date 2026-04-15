@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/VectorMeasure/Basic.lean
-Genuine: 124 of 156 | Dissolved: 0 | Infrastructure: 32
+Genuine: 124 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses

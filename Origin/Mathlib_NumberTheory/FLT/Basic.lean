@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FLT/Basic.lean
-Genuine: 19 of 21 | Dissolved: 1 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Int

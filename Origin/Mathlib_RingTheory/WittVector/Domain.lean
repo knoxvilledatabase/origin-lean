@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/Domain.lean
-Genuine: 3 of 7 | Dissolved: 1 | Infrastructure: 3
+Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Identities

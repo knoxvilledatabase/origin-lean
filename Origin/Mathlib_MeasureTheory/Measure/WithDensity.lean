@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/WithDensity.lean
-Genuine: 53 of 67 | Dissolved: 10 | Infrastructure: 4
+Genuine: 53 | Conflates: 0 | Dissolved: 10 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.Exhaustion

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Algebra/LeftInvariantDerivation.lean
-Genuine: 16 of 46 | Dissolved: 0 | Infrastructure: 30
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.RingTheory.Derivation.Lie

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/RightAngle.lean
-Genuine: 72 of 78 | Dissolved: 6 | Infrastructure: 0
+Genuine: 72 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Angle.Oriented.Affine

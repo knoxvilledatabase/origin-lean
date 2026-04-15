@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/AffineSpace.lean
-Genuine: 34 of 38 | Dissolved: 0 | Infrastructure: 4
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Monad

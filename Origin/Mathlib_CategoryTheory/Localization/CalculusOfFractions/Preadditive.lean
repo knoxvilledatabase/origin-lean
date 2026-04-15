@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/CalculusOfFractions/Preadditive.lean
-Genuine: 28 of 34 | Dissolved: 0 | Infrastructure: 6
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.CalculusOfFractions.Fractions

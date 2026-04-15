@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/FactorSet.lean
-Genuine: 46 of 78 | Dissolved: 25 | Infrastructure: 7
+Genuine: 35 | Conflates: 11 | Dissolved: 25 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Multiset
@@ -76,6 +76,7 @@ theorem prod_mono : ∀ {a b : FactorSet α}, a ≤ b → a.prod ≤ b.prod
   | WithTop.some _, WithTop.some _, h =>
     prod_le_prod <| Multiset.map_le_map <| WithTop.coe_le_coe.1 <| h
 
+-- CONFLATES (assumes ground = zero): FactorSet.prod_eq_zero_iff
 theorem FactorSet.prod_eq_zero_iff [Nontrivial α] (p : FactorSet α) : p.prod = 0 ↔ p = ⊤ := by
   unfold FactorSet at p
   induction p  -- TODO: `induction_eliminator` doesn't work with `abbrev`
@@ -148,6 +149,7 @@ end Mem
 
 variable [UniqueFactorizationMonoid α]
 
+-- CONFLATES (assumes ground = zero): FactorSet.unique
 theorem FactorSet.unique [Nontrivial α] {p q : FactorSet α} (h : p.prod = q.prod) : p = q := by
   -- TODO: `induction_eliminator` doesn't work with `abbrev`
   unfold FactorSet at p q
@@ -207,10 +209,12 @@ theorem factors_prod (a : Associates α) : a.factors.prod = a := by
   · simp [ha, prod_mk, mk_eq_mk_iff_associated, UniqueFactorizationMonoid.factors_prod,
       -Quotient.eq]
 
+-- CONFLATES (assumes ground = zero): prod_factors
 @[simp]
 theorem prod_factors [Nontrivial α] (s : FactorSet α) : s.prod.factors = s :=
   FactorSet.unique <| factors_prod _
 
+-- CONFLATES (assumes ground = zero): factors_subsingleton
 @[nontriviality]
 theorem factors_subsingleton [Subsingleton α] {a : Associates α} : a.factors = ⊤ := by
   have : Subsingleton (Associates α) := inferInstance
@@ -226,6 +230,7 @@ theorem eq_of_factors_eq_factors {a b : Associates α} (h : a.factors = b.factor
   have : a.factors.prod = b.factors.prod := by rw [h]
   rwa [factors_prod, factors_prod] at this
 
+-- CONFLATES (assumes ground = zero): eq_of_prod_eq_prod
 theorem eq_of_prod_eq_prod [Nontrivial α] {a b : FactorSet α} (h : a.prod = b.prod) : a = b := by
   have : a.prod.factors = b.prod.factors := by rw [h]
   rwa [prod_factors, prod_factors] at this
@@ -260,6 +265,7 @@ variable [DecidableEq (Associates α)] [∀ p : Associates α, Decidable (Irredu
 
 end count
 
+-- CONFLATES (assumes ground = zero): prod_le
 theorem prod_le [Nontrivial α] {a b : FactorSet α} : a.prod ≤ b.prod ↔ a ≤ b := by
   refine ⟨fun h ↦ ?_, prod_mono⟩
   have : a.prod.factors ≤ b.prod.factors := factors_mono h
@@ -326,11 +332,13 @@ open Classical in
 
 -- DISSOLVED: coprime_iff_inf_one
 
+-- CONFLATES (assumes ground = zero): factors_self
 theorem factors_self [Nontrivial α] {p : Associates α} (hp : Irreducible p) :
     p.factors = WithTop.some {⟨p, hp⟩} :=
   eq_of_prod_eq_prod
     (by rw [factors_prod, FactorSet.prod.eq_def]; dsimp; rw [prod_singleton])
 
+-- CONFLATES (assumes ground = zero): factors_prime_pow
 theorem factors_prime_pow [Nontrivial α] {p : Associates α} (hp : Irreducible p) (k : ℕ) :
     factors (p ^ k) = WithTop.some (Multiset.replicate k ⟨p, hp⟩) :=
   eq_of_prod_eq_prod
@@ -340,12 +348,14 @@ theorem factors_prime_pow [Nontrivial α] {p : Associates α} (hp : Irreducible 
 
 -- DISSOLVED: prime_pow_le_iff_le_bcount
 
+-- CONFLATES (assumes ground = zero): factors_one
 @[simp]
 theorem factors_one [Nontrivial α] : factors (1 : Associates α) = 0 := by
   apply eq_of_prod_eq_prod
   rw [Associates.factors_prod]
   exact Multiset.prod_zero
 
+-- CONFLATES (assumes ground = zero): pow_factors
 @[simp]
 theorem pow_factors [Nontrivial α] {a : Associates α} {k : ℕ} :
     (a ^ k).factors = k • a.factors := by
@@ -364,6 +374,7 @@ variable [DecidableEq (Associates α)] [∀ p : Associates α, Decidable (Irredu
 
 -- DISSOLVED: count_ne_zero_iff_dvd
 
+-- CONFLATES (assumes ground = zero): count_self
 theorem count_self [Nontrivial α] {p : Associates α}
     (hp : Irreducible p) : p.count p.factors = 1 := by
   simp [factors_self hp, Associates.count_some hp]

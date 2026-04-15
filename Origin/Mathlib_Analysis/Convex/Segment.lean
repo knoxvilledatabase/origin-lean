@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Segment.lean
-Genuine: 69 of 70 | Dissolved: 0 | Infrastructure: 1
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Invertible

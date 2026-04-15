@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UniformSpace/Cauchy.lean
-Genuine: 106 of 119 | Dissolved: 0 | Infrastructure: 13
+Genuine: 106 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Constructions

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Idempotents/Biproducts.lean
-Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Idempotents.Karoubi

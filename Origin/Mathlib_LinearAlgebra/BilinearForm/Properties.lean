@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Properties.lean
-Genuine: 73 of 77 | Dissolved: 1 | Infrastructure: 3
+Genuine: 72 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Hom
@@ -285,6 +285,7 @@ section
 
 variable (R M)
 
+-- CONFLATES (assumes ground = zero): not_nondegenerate_zero
 theorem not_nondegenerate_zero [Nontrivial M] : ¬(0 : BilinForm R M).Nondegenerate :=
   let ⟨m, hm⟩ := exists_ne (0 : M)
   fun h => hm (h m fun _ => rfl)

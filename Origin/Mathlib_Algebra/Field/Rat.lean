@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Field/Rat.lean
-Genuine: 6 of 17 | Dissolved: 2 | Infrastructure: 9
+Genuine: 6 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs

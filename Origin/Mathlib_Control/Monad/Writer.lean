@@ -1,6 +1,6 @@
 /-
 Extracted from Control/Monad/Writer.lean
-Genuine: 11 of 25 | Dissolved: 0 | Infrastructure: 14
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs

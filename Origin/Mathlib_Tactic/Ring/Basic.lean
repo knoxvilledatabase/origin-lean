@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Ring/Basic.lean
-Genuine: 112 of 134 | Dissolved: 4 | Infrastructure: 18
+Genuine: 112 | Conflates: 0 | Dissolved: 4 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Inv

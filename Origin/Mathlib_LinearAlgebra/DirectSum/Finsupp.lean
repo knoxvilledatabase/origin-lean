@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/DirectSum/Finsupp.lean
-Genuine: 41 of 43 | Dissolved: 0 | Infrastructure: 2
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Finsupp

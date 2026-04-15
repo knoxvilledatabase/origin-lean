@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Aleph.lean
-Genuine: 128 of 139 | Dissolved: 1 | Infrastructure: 10
+Genuine: 128 | Conflates: 0 | Dissolved: 1 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Order.Bounded

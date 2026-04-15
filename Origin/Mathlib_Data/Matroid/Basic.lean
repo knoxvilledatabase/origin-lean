@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matroid/Basic.lean
-Genuine: 155 of 164 | Dissolved: 0 | Infrastructure: 9
+Genuine: 155 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Prod

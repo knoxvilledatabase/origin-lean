@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/SimpleFunc.lean
-Genuine: 129 of 211 | Dissolved: 7 | Infrastructure: 75
+Genuine: 129 | Conflates: 0 | Dissolved: 7 | Infrastructure: 75
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order

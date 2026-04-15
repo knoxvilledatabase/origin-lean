@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Spectral/Hom.lean
-Genuine: 17 of 31 | Dissolved: 0 | Infrastructure: 14
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Tactic.StacksAttribute

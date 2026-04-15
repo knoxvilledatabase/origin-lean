@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Valuation/LocalSubring.lean
-Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.LocalRing.Subring

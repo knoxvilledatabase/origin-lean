@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/FunProp/StateList.lean
-Genuine: 19 of 26 | Dissolved: 0 | Infrastructure: 7
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Init

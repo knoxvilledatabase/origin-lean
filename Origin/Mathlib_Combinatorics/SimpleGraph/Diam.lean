@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Diam.lean
-Genuine: 27 of 33 | Dissolved: 5 | Infrastructure: 1
+Genuine: 22 | Conflates: 5 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Metric
@@ -95,10 +95,12 @@ lemma exists_edist_eq_ediam_of_finite [Nonempty α] [Finite α] :
 lemma ediam_anti (h : G ≤ G') : G'.ediam ≤ G.ediam :=
   iSup₂_mono fun _ _ ↦ edist_anti h
 
+-- CONFLATES (assumes ground = zero): ediam_bot
 @[simp]
 lemma ediam_bot [Nontrivial α] : (⊥ : SimpleGraph α).ediam = ⊤ :=
   ediam_eq_top_of_not_connected bot_not_connected
 
+-- CONFLATES (assumes ground = zero): ediam_top
 @[simp]
 lemma ediam_top [Nontrivial α] : (⊤ : SimpleGraph α).ediam = 1 := by
   apply le_antisymm ?_ <| Order.one_le_iff_pos.mpr <| pos_iff_ne_zero.mpr ediam_ne_zero
@@ -108,6 +110,7 @@ lemma ediam_top [Nontrivial α] : (⊤ : SimpleGraph α).ediam = 1 := by
   · apply le_of_eq <| edist_eq_one_iff_adj.mpr h
   · simp_all
 
+-- CONFLATES (assumes ground = zero): ediam_eq_one
 @[simp]
 lemma ediam_eq_one [Nontrivial α] : G.ediam = 1 ↔ G = ⊤ := by
   refine ⟨fun h₁ ↦ ?_, fun h ↦ h ▸ ediam_top⟩
@@ -162,6 +165,7 @@ lemma diam_bot : (⊥ : SimpleGraph α).diam = 0 := by
   · exact Or.inl ediam_eq_zero_of_subsingleton
   · exact Or.inr ediam_bot
 
+-- CONFLATES (assumes ground = zero): diam_top
 @[simp]
 lemma diam_top [Nontrivial α] : (⊤ : SimpleGraph α).diam = 1 := by
   rw [diam, ediam_top, ENat.toNat_one]
@@ -170,6 +174,7 @@ lemma diam_top [Nontrivial α] : (⊤ : SimpleGraph α).diam = 1 := by
 lemma diam_eq_zero : G.diam = 0 ↔ G.ediam = ⊤ ∨ Subsingleton α := by
   rw [diam, ENat.toNat_eq_zero, or_comm, ediam_eq_zero_iff_subsingleton]
 
+-- CONFLATES (assumes ground = zero): diam_eq_one
 @[simp]
 lemma diam_eq_one [Nontrivial α] : G.diam = 1 ↔ G = ⊤ := by
   rw [diam, ENat.toNat_eq_iff one_ne_zero, Nat.cast_one, ediam_eq_one]

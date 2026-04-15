@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Unbundled/Basic.lean
-Genuine: 95 of 106 | Dissolved: 11 | Infrastructure: 0
+Genuine: 95 | Conflates: 0 | Dissolved: 11 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic

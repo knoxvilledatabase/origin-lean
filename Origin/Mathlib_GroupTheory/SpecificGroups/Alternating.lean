@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/SpecificGroups/Alternating.lean
-Genuine: 15 of 21 | Dissolved: 0 | Infrastructure: 6
+Genuine: 13 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Fin
@@ -80,6 +80,7 @@ theorem finRotate_bit1_mem_alternatingGroup {n : ℕ} :
 
 end Equiv.Perm
 
+-- CONFLATES (assumes ground = zero): two_mul_card_alternatingGroup
 theorem two_mul_card_alternatingGroup [Nontrivial α] :
     2 * card (alternatingGroup α) = card (Perm α) := by
   let this := (QuotientGroup.quotientKerEquivOfSurjective _ (sign_surjective α)).toEquiv
@@ -191,6 +192,7 @@ namespace alternatingGroup
 
 open Equiv.Perm
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_three_le_card
 theorem nontrivial_of_three_le_card (h3 : 3 ≤ card α) : Nontrivial (alternatingGroup α) := by
   haveI := Fintype.one_lt_card_iff_nontrivial.1 (lt_trans (by decide) h3)
   rw [← Fintype.one_lt_card_iff_nontrivial]

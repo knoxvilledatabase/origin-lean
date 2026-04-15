@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/LocallyConstant/Basic.lean
-Genuine: 74 of 92 | Dissolved: 0 | Infrastructure: 18
+Genuine: 73 | Conflates: 1 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Indicator
@@ -54,6 +54,7 @@ protected theorem tfae (f : X → Y) :
     exact ⟨U, fun x' hx' => mem_preimage.2 <| (eq x' hx').symm ▸ hx, hU, hxU⟩
   tfae_finish
 
+-- CONFLATES (assumes ground = zero): of_discrete
 @[nontriviality]
 theorem of_discrete [DiscreteTopology X] (f : X → Y) : IsLocallyConstant f := fun _ =>
   isOpen_discrete _

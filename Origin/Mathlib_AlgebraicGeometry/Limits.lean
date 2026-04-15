@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Limits.lean
-Genuine: 39 of 74 | Dissolved: 0 | Infrastructure: 35
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Pullbacks

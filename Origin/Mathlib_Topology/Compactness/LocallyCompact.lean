@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactness/LocallyCompact.lean
-Genuine: 18 of 28 | Dissolved: 0 | Infrastructure: 10
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Topology.Compactness.Compact

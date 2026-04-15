@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/TwoSidedIdeal/Lattice.lean
-Genuine: 9 of 26 | Dissolved: 0 | Infrastructure: 17
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.RingTheory.TwoSidedIdeal.Basic

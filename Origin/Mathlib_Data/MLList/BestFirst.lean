@@ -1,6 +1,6 @@
 /-
 Extracted from Data/MLList/BestFirst.lean
-Genuine: 14 of 15 | Dissolved: 0 | Infrastructure: 1
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Batteries.Data.MLList.Basic

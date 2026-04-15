@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Strict.lean
-Genuine: 47 of 50 | Dissolved: 3 | Infrastructure: 0
+Genuine: 46 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Basic
@@ -285,6 +285,7 @@ section AddCommGroup
 
 variable [AddCommGroup E] [AddCommGroup F] [Module 𝕜 E] [Module 𝕜 F] {s t : Set E} {x y : E}
 
+-- CONFLATES (assumes ground = zero): StrictConvex.eq_of_openSegment_subset_frontier
 theorem StrictConvex.eq_of_openSegment_subset_frontier [Nontrivial 𝕜] [DenselyOrdered 𝕜]
     (hs : StrictConvex 𝕜 s) (hx : x ∈ s) (hy : y ∈ s) (h : openSegment 𝕜 x y ⊆ frontier s) :
     x = y := by

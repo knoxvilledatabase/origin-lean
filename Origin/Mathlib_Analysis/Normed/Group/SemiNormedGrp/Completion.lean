@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/SemiNormedGrp/Completion.lean
-Genuine: 9 of 12 | Dissolved: 0 | Infrastructure: 3
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.SemiNormedGrp

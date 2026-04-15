@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Metric.lean
-Genuine: 42 of 47 | Dissolved: 3 | Infrastructure: 2
+Genuine: 42 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Path

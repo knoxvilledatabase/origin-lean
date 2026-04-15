@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/DenseSubsite/Basic.lean
-Genuine: 43 of 51 | Dissolved: 0 | Infrastructure: 8
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf

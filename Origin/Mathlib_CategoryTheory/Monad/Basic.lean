@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monad/Basic.lean
-Genuine: 22 of 40 | Dissolved: 0 | Infrastructure: 18
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Category

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Closed/FunctorCategory/Complete.lean
-Genuine: 3 of 7 | Dissolved: 0 | Infrastructure: 4
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Lifting.Right

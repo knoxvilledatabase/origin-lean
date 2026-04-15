@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/l2Space.lean
-Genuine: 44 of 50 | Dissolved: 0 | Infrastructure: 6
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection

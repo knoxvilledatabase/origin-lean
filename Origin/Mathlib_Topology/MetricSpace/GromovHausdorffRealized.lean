@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/GromovHausdorffRealized.lean
-Genuine: 44 of 48 | Dissolved: 0 | Infrastructure: 4
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Gluing

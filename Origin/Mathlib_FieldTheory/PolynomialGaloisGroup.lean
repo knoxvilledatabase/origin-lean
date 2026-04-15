@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/PolynomialGaloisGroup.lean
-Genuine: 19 of 42 | Dissolved: 5 | Infrastructure: 18
+Genuine: 19 | Conflates: 0 | Dissolved: 5 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Galois.Basic

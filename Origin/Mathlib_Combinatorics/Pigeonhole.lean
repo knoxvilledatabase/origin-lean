@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Pigeonhole.lean
-Genuine: 29 of 29 | Dissolved: 0 | Infrastructure: 0
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators

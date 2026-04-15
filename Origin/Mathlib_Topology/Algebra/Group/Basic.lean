@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Group/Basic.lean
-Genuine: 176 of 227 | Dissolved: 1 | Infrastructure: 50
+Genuine: 176 | Conflates: 0 | Dissolved: 1 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise

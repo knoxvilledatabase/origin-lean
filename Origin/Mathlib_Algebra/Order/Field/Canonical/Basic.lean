@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Field/Canonical/Basic.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Canonical.Defs

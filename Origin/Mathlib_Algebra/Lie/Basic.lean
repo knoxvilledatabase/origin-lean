@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Basic.lean
-Genuine: 85 of 182 | Dissolved: 0 | Infrastructure: 97
+Genuine: 85 | Conflates: 0 | Dissolved: 0 | Infrastructure: 97
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Equiv

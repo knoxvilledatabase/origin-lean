@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dual.lean
-Genuine: 175 of 236 | Dissolved: 8 | Infrastructure: 53
+Genuine: 174 | Conflates: 1 | Dissolved: 8 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional
@@ -511,6 +511,7 @@ theorem subsingleton_dual_iff :
   intros f
   simp [Subsingleton.elim f 0]
 
+-- CONFLATES (assumes ground = zero): nontrivial_dual_iff
 @[simp]
 theorem nontrivial_dual_iff :
     Nontrivial (Dual K V) ↔ Nontrivial V := by

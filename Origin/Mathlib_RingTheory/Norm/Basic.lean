@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Norm/Basic.lean
-Genuine: 18 of 21 | Dissolved: 2 | Infrastructure: 1
+Genuine: 17 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Norm.Defs
@@ -83,6 +83,7 @@ section EqZeroIff
 
 variable [Finite ι]
 
+-- CONFLATES (assumes ground = zero): norm_zero
 @[simp]
 theorem norm_zero [Nontrivial S] [Module.Free R S] [Module.Finite R S] : norm R (0 : S) = 0 := by
   nontriviality

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Mul.lean
-Genuine: 22 of 28 | Dissolved: 0 | Infrastructure: 6
+Genuine: 21 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
@@ -207,6 +207,7 @@ theorem opNNNorm_mul : ‖mul 𝕜 𝕜'‖₊ = 1 :=
 
 end
 
+-- CONFLATES (assumes ground = zero): opNorm_lsmul
 @[simp]
 theorem opNorm_lsmul [NormedField 𝕜'] [NormedAlgebra 𝕜 𝕜'] [NormedSpace 𝕜' E]
     [IsScalarTower 𝕜 𝕜' E] [Nontrivial E] : ‖(lsmul 𝕜 𝕜' : 𝕜' →L[𝕜] E →L[𝕜] E)‖ = 1 := by

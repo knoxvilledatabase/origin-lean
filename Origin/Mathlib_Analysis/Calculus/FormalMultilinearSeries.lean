@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FormalMultilinearSeries.lean
-Genuine: 28 of 50 | Dissolved: 8 | Infrastructure: 14
+Genuine: 26 | Conflates: 2 | Dissolved: 8 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Multilinear.Curry
@@ -272,6 +272,7 @@ end FormalMultilinearSeries
 
 section Const
 
+-- CONFLATES (assumes ground = zero): constFormalMultilinearSeries
 def constFormalMultilinearSeries (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type*)
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] [ContinuousConstSMul 𝕜 E] [TopologicalAddGroup E]
     {F : Type*} [NormedAddCommGroup F] [TopologicalAddGroup F] [NormedSpace 𝕜 F]
@@ -281,6 +282,7 @@ def constFormalMultilinearSeries (𝕜 : Type*) [NontriviallyNormedField 𝕜] (
 
 -- DISSOLVED: constFormalMultilinearSeries_apply
 
+-- CONFLATES (assumes ground = zero): constFormalMultilinearSeries_zero
 @[simp]
 lemma constFormalMultilinearSeries_zero [NontriviallyNormedField 𝕜] [NormedAddCommGroup E ]
     [NormedAddCommGroup F] [NormedSpace 𝕜 E] [NormedSpace 𝕜 F] :

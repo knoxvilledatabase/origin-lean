@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UniformSpace/UniformConvergenceTopology.lean
-Genuine: 82 of 102 | Dissolved: 0 | Infrastructure: 20
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Topology.UniformSpace.UniformConvergence

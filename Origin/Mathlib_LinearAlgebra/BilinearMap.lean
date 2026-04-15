@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/BilinearMap.lean
-Genuine: 37 of 56 | Dissolved: 2 | Infrastructure: 17
+Genuine: 37 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Equiv

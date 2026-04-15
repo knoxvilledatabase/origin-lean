@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Nontrivial/Basic.lean
-Genuine: 10 of 15 | Dissolved: 0 | Infrastructure: 5
+Genuine: 1 | Conflates: 9 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Prod.Basic
@@ -18,22 +18,27 @@ Results about `Nontrivial`.
 
 variable {α : Type*} {β : Type*}
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_lt
 theorem nontrivial_of_lt [Preorder α] (x y : α) (h : x < y) : Nontrivial α :=
   ⟨⟨x, y, ne_of_lt h⟩⟩
 
+-- CONFLATES (assumes ground = zero): exists_pair_lt
 theorem exists_pair_lt (α : Type*) [Nontrivial α] [LinearOrder α] : ∃ x y : α, x < y := by
   rcases exists_pair_ne α with ⟨x, y, hxy⟩
   cases lt_or_gt_of_ne hxy <;> exact ⟨_, _, ‹_›⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_lt
 theorem nontrivial_iff_lt [LinearOrder α] : Nontrivial α ↔ ∃ x y : α, x < y :=
   ⟨fun h ↦ @exists_pair_lt α h _, fun ⟨x, y, h⟩ ↦ nontrivial_of_lt x y h⟩
 
+-- CONFLATES (assumes ground = zero): Subtype.nontrivial_iff_exists_ne
 theorem Subtype.nontrivial_iff_exists_ne (p : α → Prop) (x : Subtype p) :
     Nontrivial (Subtype p) ↔ ∃ (y : α) (_ : p y), y ≠ x := by
   simp only [_root_.nontrivial_iff_exists_ne x, Subtype.exists, Ne, Subtype.ext_iff]
 
 open Classical in
 
+-- CONFLATES (assumes ground = zero): nontrivialPSumUnique
 noncomputable def nontrivialPSumUnique (α : Type*) [Inhabited α] :
     Nontrivial α ⊕' Unique α :=
   if h : Nontrivial α then PSum.inl h
@@ -48,11 +53,13 @@ instance Option.nontrivial [Nonempty α] : Nontrivial (Option α) := by
   inhabit α
   exact ⟨none, some default, nofun⟩
 
+-- CONFLATES (assumes ground = zero): Function.Injective.nontrivial
 protected theorem Function.Injective.nontrivial [Nontrivial α] {f : α → β}
     (hf : Function.Injective f) : Nontrivial β :=
   let ⟨x, y, h⟩ := exists_pair_ne α
   ⟨⟨f x, f y, hf.ne h⟩⟩
 
+-- CONFLATES (assumes ground = zero): Function.Injective.exists_ne
 protected theorem Function.Injective.exists_ne [Nontrivial α] {f : α → β}
     (hf : Function.Injective f) (y : β) : ∃ x, f x ≠ y := by
   rcases exists_pair_ne α with ⟨x₁, x₂, hx⟩
@@ -72,6 +79,7 @@ variable {I : Type*} {f : I → Type*}
 
 open Classical in
 
+-- CONFLATES (assumes ground = zero): nontrivial_at
 theorem nontrivial_at (i' : I) [inst : ∀ i, Nonempty (f i)] [Nontrivial (f i')] :
     Nontrivial (∀ i : I, f i) := by
   letI := Classical.decEq (∀ i : I, f i)
@@ -86,6 +94,7 @@ end Pi
 instance Function.nontrivial [h : Nonempty α] [Nontrivial β] : Nontrivial (α → β) :=
   h.elim fun a ↦ Pi.nontrivial_at a
 
+-- CONFLATES (assumes ground = zero): Subsingleton.le
 @[nontriviality]
 protected theorem Subsingleton.le [Preorder α] [Subsingleton α] (x y : α) : x ≤ y :=
   le_of_eq (Subsingleton.elim x y)

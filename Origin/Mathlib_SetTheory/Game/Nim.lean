@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Game/Nim.lean
-Genuine: 47 of 61 | Dissolved: 1 | Infrastructure: 13
+Genuine: 47 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.SetTheory.Game.Birthday

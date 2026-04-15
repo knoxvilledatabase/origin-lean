@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/FiberedCategory/HomLift.lean
-Genuine: 27 of 42 | Dissolved: 0 | Infrastructure: 15
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Category

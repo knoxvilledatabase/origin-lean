@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Pseudo/Pi.lean
-Genuine: 19 of 23 | Dissolved: 0 | Infrastructure: 4
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Lemmas

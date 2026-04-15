@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order.lean
-Genuine: 148 of 177 | Dissolved: 0 | Infrastructure: 29
+Genuine: 147 | Conflates: 1 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Topology.Defs.Induced
@@ -244,6 +244,7 @@ theorem isOpen_discrete (s : Set α) : IsOpen s := (@DiscreteTopology.eq_bot α 
 theorem denseRange_discrete {ι : Type*} {f : ι → α} : DenseRange f ↔ Surjective f := by
   rw [DenseRange, dense_discrete, range_eq_univ]
 
+-- CONFLATES (assumes ground = zero): continuous_of_discreteTopology
 @[nontriviality, continuity, fun_prop]
 theorem continuous_of_discreteTopology [TopologicalSpace β] {f : α → β} : Continuous f :=
   continuous_def.2 fun _ _ => isOpen_discrete _

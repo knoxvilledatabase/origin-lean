@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Affine/AddTorsor.lean
-Genuine: 40 of 43 | Dissolved: 3 | Infrastructure: 0
+Genuine: 40 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Invertible

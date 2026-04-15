@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Laurent.lean
-Genuine: 54 of 75 | Dissolved: 4 | Infrastructure: 17
+Genuine: 53 | Conflates: 1 | Dissolved: 4 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -390,6 +390,7 @@ theorem degree_C_mul_T_ite [DecidableEq R] (n : ℤ) (a : R) :
     simp only [h, map_zero, zero_mul, degree_zero, degree_C_mul_T, Ne,
       not_false_iff]
 
+-- CONFLATES (assumes ground = zero): degree_T
 @[simp]
 theorem degree_T [Nontrivial R] (n : ℤ) : (T n : R[T;T⁻¹]).degree = n := by
   rw [← one_mul (T n), ← map_one C]

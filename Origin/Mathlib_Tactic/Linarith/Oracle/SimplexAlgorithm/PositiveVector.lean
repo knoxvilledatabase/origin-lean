@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Linarith/Oracle/SimplexAlgorithm/PositiveVector.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Meta.Basic

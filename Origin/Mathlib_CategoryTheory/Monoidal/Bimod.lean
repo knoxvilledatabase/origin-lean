@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Bimod.lean
-Genuine: 61 of 66 | Dissolved: 0 | Infrastructure: 5
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/DiscreteCategory.lean
-Genuine: 23 of 37 | Dissolved: 0 | Infrastructure: 14
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EqToHom

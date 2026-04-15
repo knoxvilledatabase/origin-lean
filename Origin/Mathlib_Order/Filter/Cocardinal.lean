@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Cocardinal.lean
-Genuine: 13 of 16 | Dissolved: 0 | Infrastructure: 3
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Cofinite

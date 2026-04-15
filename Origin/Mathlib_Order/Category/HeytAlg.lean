@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/HeytAlg.lean
-Genuine: 3 of 13 | Dissolved: 0 | Infrastructure: 10
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Order.Category.BddDistLat

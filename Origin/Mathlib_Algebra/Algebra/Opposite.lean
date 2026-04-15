@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Opposite.lean
-Genuine: 10 of 25 | Dissolved: 0 | Infrastructure: 15
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv

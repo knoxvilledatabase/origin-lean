@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Support.lean
-Genuine: 39 of 46 | Dissolved: 2 | Infrastructure: 5
+Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Prod

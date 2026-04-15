@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/Mat.lean
-Genuine: 29 of 62 | Dissolved: 0 | Infrastructure: 33
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DiscreteValuationRing/Basic.lean
-Genuine: 31 of 36 | Dissolved: 3 | Infrastructure: 2
+Genuine: 31 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.AdicCompletion.Basic

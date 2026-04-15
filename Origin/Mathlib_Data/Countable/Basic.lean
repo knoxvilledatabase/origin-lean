@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Countable/Basic.lean
-Genuine: 9 of 30 | Dissolved: 0 | Infrastructure: 21
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Defs

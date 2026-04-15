@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Floor/Div.lean
-Genuine: 23 of 43 | Dissolved: 0 | Infrastructure: 20
+Genuine: 21 | Conflates: 2 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Pi
@@ -138,6 +138,7 @@ section FloorDiv
 
 variable [FloorDiv α β] {a : α}
 
+-- CONFLATES (assumes ground = zero): floorDiv_one
 @[simp] lemma floorDiv_one [Nontrivial α] (b : β) : b ⌊/⌋ (1 : α) = b :=
   eq_of_forall_le_iff <| fun c ↦ by simp [zero_lt_one' α]
 
@@ -151,6 +152,7 @@ section CeilDiv
 
 variable [CeilDiv α β] {a : α}
 
+-- CONFLATES (assumes ground = zero): ceilDiv_one
 @[simp] lemma ceilDiv_one [Nontrivial α] (b : β) : b ⌈/⌉ (1 : α) = b :=
   eq_of_forall_ge_iff <| fun c ↦ by simp [zero_lt_one' α]
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Action/Sum.lean
-Genuine: 1 of 11 | Dissolved: 0 | Infrastructure: 10
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful

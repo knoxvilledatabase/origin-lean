@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/ProjectiveSpectrum/Topology.lean
-Genuine: 62 of 69 | Dissolved: 0 | Infrastructure: 7
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal

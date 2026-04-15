@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Ultra.lean
-Genuine: 33 of 36 | Dissolved: 1 | Infrastructure: 2
+Genuine: 33 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Uniform

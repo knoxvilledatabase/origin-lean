@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/ConcreteCategory.lean
-Genuine: 29 of 31 | Dissolved: 0 | Infrastructure: 2
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts

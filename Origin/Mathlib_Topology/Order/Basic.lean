@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/Basic.lean
-Genuine: 79 of 94 | Dissolved: 0 | Infrastructure: 15
+Genuine: 74 | Conflates: 7 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Interval
@@ -272,21 +272,25 @@ theorem nhds_top_order [TopologicalSpace α] [Preorder α] [OrderTop α] [OrderT
 theorem nhds_bot_order [TopologicalSpace α] [Preorder α] [OrderBot α] [OrderTopology α] :
     𝓝 (⊥ : α) = ⨅ (l) (_ : ⊥ < l), 𝓟 (Iio l) := by simp [nhds_eq_order (⊥ : α)]
 
+-- CONFLATES (assumes ground = zero): nhds_top_basis
 theorem nhds_top_basis [TopologicalSpace α] [LinearOrder α] [OrderTop α] [OrderTopology α]
     [Nontrivial α] : (𝓝 ⊤).HasBasis (fun a : α => a < ⊤) fun a : α => Ioi a := by
   have : ∃ x : α, x < ⊤ := (exists_ne ⊤).imp fun x hx => hx.lt_top
   simpa only [Iic_top, nhdsWithin_univ, Ioc_top] using nhdsWithin_Iic_basis' this
 
+-- CONFLATES (assumes ground = zero): nhds_bot_basis
 theorem nhds_bot_basis [TopologicalSpace α] [LinearOrder α] [OrderBot α] [OrderTopology α]
     [Nontrivial α] : (𝓝 ⊥).HasBasis (fun a : α => ⊥ < a) fun a : α => Iio a :=
   nhds_top_basis (α := αᵒᵈ)
 
+-- CONFLATES (assumes ground = zero): nhds_top_basis_Ici
 theorem nhds_top_basis_Ici [TopologicalSpace α] [LinearOrder α] [OrderTop α] [OrderTopology α]
     [Nontrivial α] [DenselyOrdered α] : (𝓝 ⊤).HasBasis (fun a : α => a < ⊤) Ici :=
   nhds_top_basis.to_hasBasis
     (fun _a ha => let ⟨b, hab, hb⟩ := exists_between ha; ⟨b, hb, Ici_subset_Ioi.mpr hab⟩)
     fun a ha => ⟨a, ha, Ioi_subset_Ici_self⟩
 
+-- CONFLATES (assumes ground = zero): nhds_bot_basis_Iic
 theorem nhds_bot_basis_Iic [TopologicalSpace α] [LinearOrder α] [OrderBot α] [OrderTopology α]
     [Nontrivial α] [DenselyOrdered α] : (𝓝 ⊥).HasBasis (fun a : α => ⊥ < a) Iic :=
   nhds_top_basis_Ici (α := αᵒᵈ)
@@ -375,6 +379,7 @@ theorem exists_Icc_mem_subset_of_mem_nhds [OrderTopology α] {a : α} {s : Set �
   rw [← Icc_union_Icc_eq_Icc hba hac, ← nhds_left_sup_nhds_right]
   exact ⟨union_mem_sup hb_nhds hc_nhds, union_subset hbs hcs⟩
 
+-- CONFLATES (assumes ground = zero): IsOpen.exists_Ioo_subset
 theorem IsOpen.exists_Ioo_subset [OrderTopology α] [Nontrivial α] {s : Set α} (hs : IsOpen s)
     (h : s.Nonempty) : ∃ a b, a < b ∧ Ioo a b ⊆ s := by
   obtain ⟨x, hx⟩ : ∃ x, x ∈ s := h
@@ -388,6 +393,7 @@ theorem IsOpen.exists_Ioo_subset [OrderTopology α] [Nontrivial α] {s : Set α}
       exists_Ioc_subset_of_mem_nhds (hs.mem_nhds hx) ⟨y, H⟩
     exact ⟨l, x, lx, Ioo_subset_Ioc_self.trans hl⟩
 
+-- CONFLATES (assumes ground = zero): dense_of_exists_between
 theorem dense_of_exists_between [OrderTopology α] [Nontrivial α] {s : Set α}
     (h : ∀ ⦃a b⦄, a < b → ∃ c ∈ s, a < c ∧ c < b) : Dense s := by
   refine dense_iff_inter_open.2 fun U U_open U_nonempty => ?_
@@ -395,6 +401,7 @@ theorem dense_of_exists_between [OrderTopology α] [Nontrivial α] {s : Set α}
   obtain ⟨x, xs, hx⟩ : ∃ x ∈ s, a < x ∧ x < b := h hab
   exact ⟨x, ⟨H hx, xs⟩⟩
 
+-- CONFLATES (assumes ground = zero): dense_iff_exists_between
 theorem dense_iff_exists_between [OrderTopology α] [DenselyOrdered α] [Nontrivial α] {s : Set α} :
     Dense s ↔ ∀ a b, a < b → ∃ c ∈ s, a < c ∧ c < b :=
   ⟨fun h _ _ hab => h.exists_between hab, dense_of_exists_between⟩

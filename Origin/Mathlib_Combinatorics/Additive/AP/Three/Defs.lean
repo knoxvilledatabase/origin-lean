@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Additive/AP/Three/Defs.lean
-Genuine: 40 of 45 | Dissolved: 2 | Infrastructure: 3
+Genuine: 40 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Interval.Finset

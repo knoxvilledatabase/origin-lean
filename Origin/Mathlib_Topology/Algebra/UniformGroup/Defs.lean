@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/UniformGroup/Defs.lean
-Genuine: 45 of 49 | Dissolved: 0 | Infrastructure: 4
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Group.Basic

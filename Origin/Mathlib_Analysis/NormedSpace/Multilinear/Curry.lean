@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/Multilinear/Curry.lean
-Genuine: 35 of 60 | Dissolved: 0 | Infrastructure: 25
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Multilinear.Basic

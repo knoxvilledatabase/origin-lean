@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/DirichletContinuation.lean
-Genuine: 21 of 31 | Dissolved: 10 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.ZMod

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/PartENat.lean
-Genuine: 71 of 149 | Dissolved: 34 | Infrastructure: 44
+Genuine: 71 | Conflates: 0 | Dissolved: 34 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic

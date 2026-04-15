@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Graded/Internal.lean
-Genuine: 24 of 42 | Dissolved: 2 | Infrastructure: 16
+Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Graded.External

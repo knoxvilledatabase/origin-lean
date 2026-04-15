@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subring/MulOpposite.lean
-Genuine: 32 of 40 | Dissolved: 0 | Infrastructure: 8
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Subsemiring.MulOpposite

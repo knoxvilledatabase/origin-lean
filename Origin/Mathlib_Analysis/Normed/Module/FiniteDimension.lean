@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/FiniteDimension.lean
-Genuine: 42 of 53 | Dissolved: 0 | Infrastructure: 11
+Genuine: 39 | Conflates: 3 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent
@@ -454,6 +454,7 @@ theorem HasCompactMulSupport.eq_one_or_finiteDimensional {X : Type*} [Topologica
   have : T1Space (Additive X) := ‹_›
   HasCompactSupport.eq_zero_or_finiteDimensional (X := Additive X) 𝕜 hf h'f
 
+-- CONFLATES (assumes ground = zero): ProperSpace.of_locallyCompactSpace
 lemma ProperSpace.of_locallyCompactSpace (𝕜 : Type*) [NontriviallyNormedField 𝕜]
     {E : Type*} [SeminormedAddCommGroup E] [NormedSpace 𝕜 E] [LocallyCompactSpace E] :
     ProperSpace E := by
@@ -468,6 +469,7 @@ lemma ProperSpace.of_locallyCompactSpace (𝕜 : Type*) [NontriviallyNormedField
 
 variable (E)
 
+-- CONFLATES (assumes ground = zero): ProperSpace.of_locallyCompact_module
 lemma ProperSpace.of_locallyCompact_module [Nontrivial E] [LocallyCompactSpace E] :
     ProperSpace 𝕜 :=
   have : LocallyCompactSpace 𝕜 := by
@@ -554,6 +556,7 @@ theorem exists_mem_frontier_infDist_compl_eq_dist {E : Type*} [NormedAddCommGrou
     Metric.mem_closedBall.2 <| ge_of_eq ?_, hys⟩, hyd⟩
   rwa [dist_comm]
 
+-- CONFLATES (assumes ground = zero): IsCompact.exists_mem_frontier_infDist_compl_eq_dist
 nonrec theorem IsCompact.exists_mem_frontier_infDist_compl_eq_dist {E : Type*}
     [NormedAddCommGroup E] [NormedSpace ℝ E] [Nontrivial E] {x : E} {K : Set E} (hK : IsCompact K)
     (hx : x ∈ K) :

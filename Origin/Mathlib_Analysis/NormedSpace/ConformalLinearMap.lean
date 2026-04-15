@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/ConformalLinearMap.lean
-Genuine: 6 of 9 | Dissolved: 3 | Infrastructure: 0
+Genuine: 5 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
@@ -60,6 +60,7 @@ protected theorem LinearIsometry.isConformalMap (f' : M →ₗᵢ[R] N) :
     IsConformalMap f'.toContinuousLinearMap :=
   ⟨1, one_ne_zero, f', (one_smul _ _).symm⟩
 
+-- CONFLATES (assumes ground = zero): isConformalMap_of_subsingleton
 @[nontriviality]
 theorem isConformalMap_of_subsingleton [Subsingleton M] (f' : M →L[R] N) : IsConformalMap f' :=
   ⟨1, one_ne_zero, ⟨0, fun x => by simp [Subsingleton.elim x 0]⟩, Subsingleton.elim _ _⟩

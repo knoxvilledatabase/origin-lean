@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/OfScalars.lean
-Genuine: 25 of 31 | Dissolved: 5 | Infrastructure: 1
+Genuine: 21 | Conflates: 4 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Basic
@@ -32,6 +32,7 @@ variable {𝕜 : Type*} (E : Type*) [Field 𝕜] [Ring E] [Algebra 𝕜 E] [Topo
 def ofScalars (c : ℕ → 𝕜) : FormalMultilinearSeries 𝕜 E E :=
   fun n ↦ c n • ContinuousMultilinearMap.mkPiAlgebraFin 𝕜 n E
 
+-- CONFLATES (assumes ground = zero): ofScalars_eq_zero
 @[simp]
 theorem ofScalars_eq_zero [Nontrivial E] (n : ℕ) : ofScalars E c n = 0 ↔ c n = 0 := by
   rw [ofScalars, smul_eq_zero (c := c n) (x := ContinuousMultilinearMap.mkPiAlgebraFin 𝕜 n E)]
@@ -43,6 +44,7 @@ theorem ofScalars_eq_zero [Nontrivial E] (n : ℕ) : ofScalars E c n = 0 ↔ c n
 theorem ofScalars_eq_zero_of_scalar_zero {n : ℕ} (hc : c n = 0) : ofScalars E c n = 0 := by
   rw [ofScalars, hc, zero_smul 𝕜 (ContinuousMultilinearMap.mkPiAlgebraFin 𝕜 n E)]
 
+-- CONFLATES (assumes ground = zero): ofScalars_series_eq_zero
 @[simp]
 theorem ofScalars_series_eq_zero [Nontrivial E] : ofScalars E c = 0 ↔ c = 0 := by
   simp [FormalMultilinearSeries.ext_iff, funext_iff]
@@ -60,6 +62,7 @@ theorem ofScalars_series_of_subsingleton [Subsingleton E] : ofScalars E c = 0 :=
 
 variable (𝕜) in
 
+-- CONFLATES (assumes ground = zero): ofScalars_series_injective
 theorem ofScalars_series_injective [Nontrivial E] : Function.Injective (ofScalars E (𝕜 := 𝕜)) := by
   intro _ _
   refine Function.mtr fun h ↦ ?_
@@ -73,6 +76,7 @@ theorem ofScalars_series_injective [Nontrivial E] : Function.Injective (ofScalar
 
 variable (c)
 
+-- CONFLATES (assumes ground = zero): ofScalars_series_eq_iff
 @[simp]
 theorem ofScalars_series_eq_iff [Nontrivial E] (c' : ℕ → 𝕜) :
     ofScalars E c = ofScalars E c' ↔ c = c' :=

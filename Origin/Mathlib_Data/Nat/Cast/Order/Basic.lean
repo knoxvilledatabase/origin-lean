@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Cast/Order/Basic.lean
-Genuine: 27 of 29 | Dissolved: 1 | Infrastructure: 1
+Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Cast.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Tower.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 1 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Noetherian.Basic
@@ -34,6 +34,7 @@ variable [Ring F] [Ring K] [Module F K]
   [AddCommGroup A] [Module K A] [NoZeroSMulDivisors K A]
   [Module F A] [IsNoetherian F A] [IsScalarTower F K A] in
 
+-- CONFLATES (assumes ground = zero): left
 theorem left [Nontrivial A] : Module.Finite F K :=
   let ⟨x, hx⟩ := exists_ne (0 : A)
   Module.Finite.of_injective

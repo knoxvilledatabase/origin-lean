@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/PartitionOfUnity.lean
-Genuine: 66 of 79 | Dissolved: 3 | Infrastructure: 10
+Genuine: 66 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.Structures

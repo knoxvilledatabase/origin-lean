@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ENNReal/Basic.lean
-Genuine: 119 of 180 | Dissolved: 8 | Infrastructure: 53
+Genuine: 119 | Conflates: 0 | Dissolved: 8 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.WithTop

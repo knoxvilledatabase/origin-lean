@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/CauSeq/BigOperators.lean
-Genuine: 7 of 8 | Dissolved: 0 | Infrastructure: 1
+Genuine: 6 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum
@@ -176,6 +176,7 @@ lemma of_mono_bounded (f : ℕ → α) {a : α} {m : ℕ} (ham : ∀ n ≥ m, |f
     (hnm : ∀ n ≥ m, f n ≤ f n.succ) : IsCauSeq abs f :=
   (of_decreasing_bounded (-f) (a := a) (m := m) (by simpa using ham) <| by simpa using hnm).of_neg
 
+-- CONFLATES (assumes ground = zero): geo_series
 lemma geo_series [Nontrivial β] (x : β) (hx1 : abv x < 1) :
     IsCauSeq abv fun n ↦ ∑ m ∈ range n, x ^ m := by
   have hx1' : abv x ≠ 1 := fun h ↦ by simp [h, lt_irrefl] at hx1

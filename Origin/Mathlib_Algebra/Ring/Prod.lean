@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Prod.lean
-Genuine: 21 of 54 | Dissolved: 0 | Infrastructure: 33
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Data.Int.Cast.Prod
@@ -307,6 +307,7 @@ def zeroRingProd : R ≃+* S × R where
 
 end RingEquiv
 
+-- CONFLATES (assumes ground = zero): false_of_nontrivial_of_product_domain
 theorem false_of_nontrivial_of_product_domain (R S : Type*) [Ring R] [Ring S] [IsDomain (R × S)]
     [Nontrivial R] [Nontrivial S] : False := by
   have :=

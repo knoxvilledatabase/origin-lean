@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/RingedSpace/SheafedSpace.lean
-Genuine: 13 of 37 | Dissolved: 0 | Infrastructure: 24
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.PresheafedSpace.HasColimits

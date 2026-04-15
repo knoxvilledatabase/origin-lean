@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/IsomorphismClasses.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Cat

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Heyting/Hom.lean
-Genuine: 38 of 84 | Dissolved: 0 | Infrastructure: 46
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 46
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Lattice

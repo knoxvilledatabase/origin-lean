@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Nilpotent.lean
-Genuine: 61 of 82 | Dissolved: 0 | Infrastructure: 21
+Genuine: 60 | Conflates: 1 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Solvable
@@ -555,6 +555,7 @@ theorem nilpotencyClass_quotient_center [hH : IsNilpotent G] :
         _ ≤ Group.nilpotencyClass (G ⧸ center G) + 1 :=
           nilpotencyClass_le_of_ker_le_center _ (le_of_eq (ker_mk' _)) _
 
+-- CONFLATES (assumes ground = zero): nilpotencyClass_eq_quotient_center_plus_one
 theorem nilpotencyClass_eq_quotient_center_plus_one [hH : IsNilpotent G] [Nontrivial G] :
     Group.nilpotencyClass G = Group.nilpotencyClass (G ⧸ center G) + 1 := by
   rw [nilpotencyClass_quotient_center]

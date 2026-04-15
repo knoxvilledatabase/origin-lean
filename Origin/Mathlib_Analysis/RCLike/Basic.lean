@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/RCLike/Basic.lean
-Genuine: 194 of 228 | Dissolved: 4 | Infrastructure: 30
+Genuine: 194 | Conflates: 0 | Dissolved: 4 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Field

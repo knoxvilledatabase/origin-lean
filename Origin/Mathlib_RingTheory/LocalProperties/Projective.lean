@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LocalProperties/Projective.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.FinitePresentation
@@ -39,6 +39,7 @@ theorem Module.free_of_isLocalizedModule {Rₛ Mₛ} [AddCommGroup Mₛ] [Module
 
 universe uR' uM' in
 
+-- CONFLATES (assumes ground = zero): Module.lift_rank_of_isLocalizedModule_of_free
 theorem Module.lift_rank_of_isLocalizedModule_of_free
     (Rₛ : Type uR') {Mₛ : Type uM'} [AddCommGroup Mₛ] [Module R Mₛ]
     [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ] (S : Submonoid R)
@@ -53,6 +54,7 @@ theorem Module.lift_rank_of_isLocalizedModule_of_free
   convert this
   exact Cardinal.lift_umax
 
+-- CONFLATES (assumes ground = zero): Module.finrank_of_isLocalizedModule_of_free
 theorem Module.finrank_of_isLocalizedModule_of_free
     (Rₛ : Type*) {Mₛ : Type*} [AddCommGroup Mₛ] [Module R Mₛ]
     [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ] (S : Submonoid R)

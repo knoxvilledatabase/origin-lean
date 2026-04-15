@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Units.lean
-Genuine: 11 of 13 | Dissolved: 1 | Infrastructure: 1
+Genuine: 9 | Conflates: 2 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Domain
@@ -31,10 +31,12 @@ lemma natDegree_eq_zero_of_isUnit (h : IsUnit p) : natDegree p = 0 := by
   rw [hq, natDegree_one, eq_comm, add_eq_zero] at this
   exact this.1
 
+-- CONFLATES (assumes ground = zero): degree_eq_zero_of_isUnit
 lemma degree_eq_zero_of_isUnit [Nontrivial R] (h : IsUnit p) : degree p = 0 :=
   (natDegree_eq_zero_iff_degree_le_zero.mp <| natDegree_eq_zero_of_isUnit h).antisymm
     (zero_le_degree_iff.mpr h.ne_zero)
 
+-- CONFLATES (assumes ground = zero): degree_coe_units
 @[simp]
 lemma degree_coe_units [Nontrivial R] (u : R[X]ˣ) : degree (u : R[X]) = 0 :=
   degree_eq_zero_of_isUnit ⟨u, rfl⟩

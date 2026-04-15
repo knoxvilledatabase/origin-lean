@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Int/Parity.lean
-Genuine: 34 of 37 | Dissolved: 1 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Parity

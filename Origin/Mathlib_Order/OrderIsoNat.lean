@@ -1,6 +1,6 @@
 /-
 Extracted from Order/OrderIsoNat.lean
-Genuine: 18 of 24 | Dissolved: 0 | Infrastructure: 6
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Lattice

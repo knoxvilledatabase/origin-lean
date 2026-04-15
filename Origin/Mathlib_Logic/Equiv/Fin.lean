@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Equiv/Fin.lean
-Genuine: 55 of 70 | Dissolved: 2 | Infrastructure: 13
+Genuine: 55 | Conflates: 0 | Dissolved: 2 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Data.Int.Defs

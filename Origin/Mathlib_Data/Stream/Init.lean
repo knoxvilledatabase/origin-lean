@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Stream/Init.lean
-Genuine: 79 of 131 | Dissolved: 0 | Infrastructure: 52
+Genuine: 79 | Conflates: 0 | Dissolved: 0 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.Data.Stream.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sym/Sym2.lean
-Genuine: 92 of 120 | Dissolved: 0 | Infrastructure: 28
+Genuine: 92 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Prod

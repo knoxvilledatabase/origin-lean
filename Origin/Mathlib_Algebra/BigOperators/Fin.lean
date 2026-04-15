@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Fin.lean
-Genuine: 36 of 44 | Dissolved: 2 | Infrastructure: 6
+Genuine: 36 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring

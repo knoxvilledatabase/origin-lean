@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupExtension/Defs.lean
-Genuine: 13 of 18 | Dissolved: 0 | Infrastructure: 5
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.GroupTheory.GroupAction.ConjAct

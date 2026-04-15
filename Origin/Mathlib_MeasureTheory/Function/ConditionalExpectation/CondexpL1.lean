@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/ConditionalExpectation/CondexpL1.lean
-Genuine: 54 of 55 | Dissolved: 0 | Infrastructure: 1
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.CondexpL2

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UniformSpace/Basic.lean
-Genuine: 223 of 277 | Dissolved: 0 | Infrastructure: 54
+Genuine: 223 | Conflates: 0 | Dissolved: 0 | Infrastructure: 54
 -/
 import Origin.Core
 import Mathlib.Order.Filter.SmallSets

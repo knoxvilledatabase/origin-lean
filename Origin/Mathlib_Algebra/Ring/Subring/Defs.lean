@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subring/Defs.lean
-Genuine: 30 of 61 | Dissolved: 0 | Infrastructure: 31
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Subsemiring.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/ZeroMorphisms.lean
-Genuine: 68 of 87 | Dissolved: 1 | Infrastructure: 18
+Genuine: 68 | Conflates: 0 | Dissolved: 1 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic

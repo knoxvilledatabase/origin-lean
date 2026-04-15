@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/Compact.lean
-Genuine: 35 of 68 | Dissolved: 0 | Infrastructure: 33
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousMap.Bounded.Star

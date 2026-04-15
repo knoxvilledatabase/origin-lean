@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Henselian.lean
-Genuine: 2 of 7 | Dissolved: 1 | Infrastructure: 4
+Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Taylor

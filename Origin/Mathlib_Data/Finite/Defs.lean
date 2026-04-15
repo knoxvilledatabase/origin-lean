@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finite/Defs.lean
-Genuine: 22 of 31 | Dissolved: 0 | Infrastructure: 9
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.Set.Operations

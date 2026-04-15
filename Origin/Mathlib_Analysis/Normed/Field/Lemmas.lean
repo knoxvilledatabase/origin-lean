@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Field/Lemmas.lean
-Genuine: 12 of 49 | Dissolved: 15 | Infrastructure: 22
+Genuine: 11 | Conflates: 1 | Dissolved: 15 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.AddChar
@@ -271,6 +271,7 @@ end NormedDivisionRing
 
 namespace NormedField
 
+-- CONFLATES (assumes ground = zero): discreteTopology_or_nontriviallyNormedField
 lemma discreteTopology_or_nontriviallyNormedField (𝕜 : Type*) [h : NormedField 𝕜] :
     DiscreteTopology 𝕜 ∨ Nonempty ({h' : NontriviallyNormedField 𝕜 // h'.toNormedField = h}) := by
   by_cases H : ∃ x : 𝕜, x ≠ 0 ∧ ‖x‖ ≠ 1

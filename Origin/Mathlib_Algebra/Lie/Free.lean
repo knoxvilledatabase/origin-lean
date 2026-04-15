@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Free.lean
-Genuine: 21 of 35 | Dissolved: 0 | Infrastructure: 14
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeNonUnitalNonAssocAlgebra

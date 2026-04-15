@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MonoidAlgebra/Defs.lean
-Genuine: 112 of 195 | Dissolved: 1 | Infrastructure: 82
+Genuine: 110 | Conflates: 2 | Dissolved: 1 | Infrastructure: 82
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finsupp
@@ -493,6 +493,7 @@ theorem smul_single' (c : k) (a : G) (b : k) : c • single a b = single a (c * 
 theorem smul_of [MulOneClass G] (g : G) (r : k) : r • of k G g = single g r := by
   simp
 
+-- CONFLATES (assumes ground = zero): of_injective
 theorem of_injective [MulOneClass G] [Nontrivial k] :
     Function.Injective (of k G) := fun a b h => by
   simpa using (single_eq_single_iff _ _ _ _).mp h
@@ -1191,6 +1192,7 @@ theorem of'_apply (a : G) : of' k G a = single a 1 :=
 
 theorem of'_eq_of [AddZeroClass G] (a : G) : of' k G a = of k G (.ofAdd a) := rfl
 
+-- CONFLATES (assumes ground = zero): of_injective
 theorem of_injective [Nontrivial k] [AddZeroClass G] : Function.Injective (of k G) :=
   MonoidAlgebra.of_injective
 

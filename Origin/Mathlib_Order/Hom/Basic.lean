@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Hom/Basic.lean
-Genuine: 138 of 223 | Dissolved: 14 | Infrastructure: 71
+Genuine: 138 | Conflates: 0 | Dissolved: 14 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Logic.Equiv.Option

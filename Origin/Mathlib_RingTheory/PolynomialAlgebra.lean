@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PolynomialAlgebra.lean
-Genuine: 29 of 31 | Dissolved: 0 | Infrastructure: 2
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap

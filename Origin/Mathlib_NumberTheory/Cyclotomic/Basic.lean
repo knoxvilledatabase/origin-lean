@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Cyclotomic/Basic.lean
-Genuine: 34 of 59 | Dissolved: 3 | Infrastructure: 22
+Genuine: 33 | Conflates: 1 | Dissolved: 3 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -135,6 +135,7 @@ theorem trans (C : Type w) [CommRing C] [Algebra A C] [Algebra B C] [IsScalarTow
     obtain ⟨b₁, ⟨⟨n, hn⟩, h₁⟩⟩ := hy
     exact ⟨n, ⟨mem_union_left T hn.1, by rw [← h₁, ← map_pow, hn.2, map_one]⟩⟩
 
+-- CONFLATES (assumes ground = zero): subsingleton_iff
 @[nontriviality]
 theorem subsingleton_iff [Subsingleton B] : IsCyclotomicExtension S A B ↔ S = { } ∨ S = {1} := by
   have : Subsingleton (Subalgebra A B) := inferInstance

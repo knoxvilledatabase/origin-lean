@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Factorization/Basic.lean
-Genuine: 35 of 70 | Dissolved: 32 | Infrastructure: 3
+Genuine: 35 | Conflates: 0 | Dissolved: 32 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Nat.PrimeFin

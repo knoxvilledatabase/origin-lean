@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/NullMeasurable.lean
-Genuine: 65 of 77 | Dissolved: 0 | Infrastructure: 12
+Genuine: 64 | Conflates: 1 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.EventuallyMeasurable
@@ -112,6 +112,7 @@ theorem of_compl (h : NullMeasurableSet sᶜ μ) : NullMeasurableSet s μ :=
 theorem compl_iff : NullMeasurableSet sᶜ μ ↔ NullMeasurableSet s μ :=
   MeasurableSet.compl_iff
 
+-- CONFLATES (assumes ground = zero): of_subsingleton
 @[nontriviality]
 theorem of_subsingleton [Subsingleton α] : NullMeasurableSet s μ :=
   Subsingleton.measurableSet

@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicTopology/FundamentalGroupoid/Product.lean
-Genuine: 10 of 16 | Dissolved: 0 | Infrastructure: 6
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Groupoid

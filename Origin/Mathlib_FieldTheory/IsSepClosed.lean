@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsSepClosed.lean
-Genuine: 13 of 28 | Dissolved: 7 | Infrastructure: 8
+Genuine: 13 | Conflates: 0 | Dissolved: 7 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Galois.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/UpperLower.lean
-Genuine: 27 of 48 | Dissolved: 0 | Infrastructure: 21
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Instances

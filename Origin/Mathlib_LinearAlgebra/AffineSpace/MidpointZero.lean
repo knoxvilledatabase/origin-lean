@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/MidpointZero.lean
-Genuine: 2 of 6 | Dissolved: 0 | Infrastructure: 4
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Invertible

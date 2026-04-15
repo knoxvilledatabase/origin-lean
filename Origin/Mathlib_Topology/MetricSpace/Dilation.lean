@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Dilation.lean
-Genuine: 50 of 76 | Dissolved: 9 | Infrastructure: 17
+Genuine: 48 | Conflates: 2 | Dissolved: 9 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Antilipschitz
@@ -122,6 +122,7 @@ theorem ratio_of_trivial [DilationClass F α β] (f : F)
     (h : ∀ x y : α, edist x y = 0 ∨ edist x y = ∞) : ratio f = 1 :=
   if_pos h
 
+-- CONFLATES (assumes ground = zero): ratio_of_subsingleton
 @[nontriviality]
 theorem ratio_of_subsingleton [Subsingleton α] [DilationClass F α β] (f : F) : ratio f = 1 :=
   if_pos fun x y ↦ by simp [Subsingleton.elim x y]
@@ -374,6 +375,7 @@ lemma isClosedEmbedding [CompleteSpace α] [EMetricSpace β] [DilationClass F α
 
 end EmetricDilation
 
+-- CONFLATES (assumes ground = zero): ratio_comp
 @[simp]
 theorem ratio_comp [MetricSpace α] [Nontrivial α] [PseudoEMetricSpace β]
     [PseudoEMetricSpace γ] {g : β →ᵈ γ} {f : α →ᵈ β} : ratio (g.comp f) = ratio g * ratio f :=

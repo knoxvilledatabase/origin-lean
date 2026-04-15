@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Lists.lean
-Genuine: 36 of 50 | Dissolved: 0 | Infrastructure: 14
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Data.Sigma.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/FreeModule/Basic.lean
-Genuine: 12 of 28 | Dissolved: 0 | Infrastructure: 16
+Genuine: 11 | Conflates: 1 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Fintype
@@ -83,6 +83,7 @@ instance (priority := 100) noZeroSMulDivisors [NoZeroDivisors R] : NoZeroSMulDiv
 instance [Nontrivial M] : Nonempty (Module.Free.ChooseBasisIndex R M) :=
   (Module.Free.chooseBasis R M).index_nonempty
 
+-- CONFLATES (assumes ground = zero): infinite
 theorem infinite [Infinite R] [Nontrivial M] : Infinite M :=
   (Equiv.infinite_iff (chooseBasis R M).repr.toEquiv).mpr Finsupp.infinite_of_right
 

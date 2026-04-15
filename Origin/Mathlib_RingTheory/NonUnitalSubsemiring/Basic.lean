@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/NonUnitalSubsemiring/Basic.lean
-Genuine: 93 of 119 | Dissolved: 0 | Infrastructure: 26
+Genuine: 93 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.End

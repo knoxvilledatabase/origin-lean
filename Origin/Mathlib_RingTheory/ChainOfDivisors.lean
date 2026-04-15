@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/ChainOfDivisors.lean
-Genuine: 6 of 20 | Dissolved: 14 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 14 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Basic

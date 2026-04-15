@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Quaternion.lean
-Genuine: 22 of 41 | Dissolved: 0 | Infrastructure: 19
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Quaternion

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/MulChar/Basic.lean
-Genuine: 54 of 73 | Dissolved: 5 | Infrastructure: 14
+Genuine: 46 | Conflates: 8 | Dissolved: 5 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Basic
@@ -198,11 +198,13 @@ The multiplicative characters `R → R'` form a commutative group.
 protected theorem map_one (χ : MulChar R R') : χ (1 : R) = 1 :=
   χ.map_one'
 
+-- CONFLATES (assumes ground = zero): map_zero
 protected theorem map_zero {R : Type*} [CommMonoidWithZero R] [Nontrivial R] (χ : MulChar R R') :
     χ (0 : R) = 0 := by rw [map_nonunit χ not_isUnit_zero]
 
 -- DISSOLVED: toMonoidWithZeroHom
 
+-- CONFLATES (assumes ground = zero): map_ringChar
 theorem map_ringChar {R : Type*} [CommRing R] [Nontrivial R] (χ : MulChar R R') :
     χ (ringChar R) = 0 := by rw [ringChar.Nat.cast_ringChar, χ.map_zero]
 
@@ -339,11 +341,13 @@ lemma eq_one_iff {χ : MulChar R R'} : χ = 1 ↔ ∀ a : Rˣ, χ a = 1 := by
 
 -- DISSOLVED: ne_one_iff
 
+-- CONFLATES (assumes ground = zero): IsNontrivial
 def IsNontrivial (χ : MulChar R R') : Prop :=
   ∃ a : Rˣ, χ a ≠ 1
 
 set_option linter.deprecated false in
 
+-- CONFLATES (assumes ground = zero): isNontrivial_iff
 theorem isNontrivial_iff (χ : MulChar R R') : χ.IsNontrivial ↔ χ ≠ 1 := by
   simp only [IsNontrivial, Ne, MulChar.ext_iff, not_forall, one_apply_coe]
 
@@ -356,6 +360,7 @@ variable {R : Type*} [CommMonoid R] {R' : Type*} [CommRing R'] {R'' : Type*} [Co
 def IsQuadratic (χ : MulChar R R') : Prop :=
   ∀ a, χ a = 0 ∨ χ a = 1 ∨ χ a = -1
 
+-- CONFLATES (assumes ground = zero): IsQuadratic.eq_of_eq_coe
 theorem IsQuadratic.eq_of_eq_coe {χ : MulChar R ℤ} (hχ : IsQuadratic χ) {χ' : MulChar R' ℤ}
     (hχ' : IsQuadratic χ') [Nontrivial R''] (hR'' : ringChar R'' ≠ 2) {a : R} {a' : R'}
     (h : (χ a : R'') = χ' a') : χ a = χ' a' :=
@@ -403,6 +408,7 @@ lemma ringHomComp_eq_one_iff {f : R' →+* R''} (hf : Function.Injective f) {χ 
 
 set_option linter.deprecated false in
 
+-- CONFLATES (assumes ground = zero): IsNontrivial.comp
 theorem IsNontrivial.comp {χ : MulChar R R'} (hχ : χ.IsNontrivial) {f : R' →+* R''}
     (hf : Function.Injective f) : (χ.ringHomComp f).IsNontrivial := by
   obtain ⟨a, ha⟩ := hχ
@@ -448,6 +454,7 @@ theorem IsQuadratic.pow_odd {χ : MulChar R R'} (hχ : χ.IsQuadratic) {n : ℕ}
   obtain ⟨n, rfl⟩ := hn
   rw [pow_add, pow_one, hχ.pow_even (even_two_mul _), one_mul]
 
+-- CONFLATES (assumes ground = zero): isQuadratic_iff_sq_eq_one
 lemma isQuadratic_iff_sq_eq_one {M R : Type*} [CommMonoid M] [CommRing R] [NoZeroDivisors R]
     [Nontrivial R] {χ : MulChar M R} :
     IsQuadratic χ ↔ χ ^ 2 = 1:= by
@@ -496,6 +503,7 @@ variable {R : Type*} [CommMonoid R] [Fintype R] {R' : Type*} [CommRing R']
 
 set_option linter.deprecated false in
 
+-- CONFLATES (assumes ground = zero): IsNontrivial.sum_eq_zero
 lemma IsNontrivial.sum_eq_zero [IsDomain R'] {χ : MulChar R R'} (hχ : χ.IsNontrivial) :
     ∑ a, χ a = 0 :=
   sum_eq_zero_of_ne_one ((isNontrivial_iff _).mp hχ)

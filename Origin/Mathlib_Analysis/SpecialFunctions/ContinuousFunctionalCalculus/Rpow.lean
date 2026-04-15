@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow.lean
-Genuine: 46 of 63 | Dissolved: 6 | Infrastructure: 11
+Genuine: 46 | Conflates: 0 | Dissolved: 6 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real

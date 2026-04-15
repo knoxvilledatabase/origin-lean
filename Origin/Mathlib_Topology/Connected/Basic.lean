@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Connected/Basic.lean
-Genuine: 86 of 98 | Dissolved: 0 | Infrastructure: 12
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Data.Set.SymmDiff

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/UpperHalfPlane/Metric.lean
-Genuine: 39 of 46 | Dissolved: 0 | Infrastructure: 7
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.UpperHalfPlane.Topology

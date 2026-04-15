@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ZMod/Units.lean
-Genuine: 6 of 8 | Dissolved: 1 | Infrastructure: 1
+Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Associated

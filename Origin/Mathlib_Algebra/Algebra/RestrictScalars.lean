@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/RestrictScalars.lean
-Genuine: 6 of 24 | Dissolved: 0 | Infrastructure: 18
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower

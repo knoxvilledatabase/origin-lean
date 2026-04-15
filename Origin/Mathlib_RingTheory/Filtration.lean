@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Filtration.lean
-Genuine: 27 of 46 | Dissolved: 0 | Infrastructure: 19
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Module.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Algebra/Monoid.lean
-Genuine: 45 of 55 | Dissolved: 0 | Infrastructure: 10
+Genuine: 43 | Conflates: 2 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiffMap
@@ -50,12 +50,14 @@ we formulate the definitions and lemmas for any model.
 
 `[ContinuousMul G]` as an assumption (worse) or use `haveI` in the proof (better). -/
 
+-- CONFLATES (assumes ground = zero): SmoothAdd
 class SmoothAdd {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H]
     {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] (I : ModelWithCorners 𝕜 E H) (G : Type*)
     [Add G] [TopologicalSpace G] [ChartedSpace H G] extends SmoothManifoldWithCorners I G :
     Prop where
   smooth_add : ContMDiff (I.prod I) I ⊤ fun p : G × G => p.1 + p.2
 
+-- CONFLATES (assumes ground = zero): SmoothMul
 @[to_additive]
 class SmoothMul {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H]
     {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] (I : ModelWithCorners 𝕜 E H) (G : Type*)

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/ENNReal.lean
-Genuine: 207 of 237 | Dissolved: 21 | Infrastructure: 9
+Genuine: 207 | Conflates: 0 | Dissolved: 21 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Topology.Order.MonotoneContinuity

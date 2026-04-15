@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Integrals.lean
-Genuine: 71 of 79 | Dissolved: 5 | Infrastructure: 3
+Genuine: 71 | Conflates: 0 | Dissolved: 5 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.FundThmCalculus

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Prod.lean
-Genuine: 90 of 121 | Dissolved: 9 | Infrastructure: 22
+Genuine: 90 | Conflates: 0 | Dissolved: 9 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving

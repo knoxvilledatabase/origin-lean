@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Weights/RootSystem.lean
-Genuine: 33 of 38 | Dissolved: 0 | Infrastructure: 5
+Genuine: 29 | Conflates: 4 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Weights.Killing
@@ -175,6 +175,7 @@ lemma chainLength_neg :
   rw [← chainBotCoeff_add_chainTopCoeff, ← chainBotCoeff_add_chainTopCoeff, add_comm,
     Weight.coe_neg, chainTopCoeff_neg, chainBotCoeff_neg]
 
+-- CONFLATES (assumes ground = zero): chainLength_zero
 @[simp]
 lemma chainLength_zero [Nontrivial L] : chainLength 0 β = 0 := by
   simp [← chainBotCoeff_add_chainTopCoeff]
@@ -244,6 +245,7 @@ lemma chainLength_of_eq_zsmul_add (β' : Weight K H L) (n : ℤ) (hβ' : (β' : 
       chainBotCoeff_of_eq_zsmul_add α β hα β' n hβ', sub_eq_add_neg, add_add_add_comm,
       neg_add_cancel, add_zero]
 
+-- CONFLATES (assumes ground = zero): chainTopCoeff_zero_right
 lemma chainTopCoeff_zero_right [Nontrivial L] (hα : α.IsNonZero) :
     chainTopCoeff α (0 : Weight K H L) = 1 := by
   symm
@@ -275,10 +277,12 @@ lemma chainTopCoeff_zero_right [Nontrivial L] (hα : α.IsNonZero) :
     Nat.cast_inj] at this
   rwa [this, Nat.succ_le, two_mul, add_lt_add_iff_left]
 
+-- CONFLATES (assumes ground = zero): chainBotCoeff_zero_right
 lemma chainBotCoeff_zero_right [Nontrivial L] (hα : α.IsNonZero) :
     chainBotCoeff α (0 : Weight K H L) = 1 :=
   chainTopCoeff_zero_right (-α) hα.neg
 
+-- CONFLATES (assumes ground = zero): chainLength_zero_right
 lemma chainLength_zero_right [Nontrivial L] (hα : α.IsNonZero) : chainLength α 0 = 2 := by
   rw [← chainBotCoeff_add_chainTopCoeff, chainTopCoeff_zero_right α hα,
     chainBotCoeff_zero_right α hα]

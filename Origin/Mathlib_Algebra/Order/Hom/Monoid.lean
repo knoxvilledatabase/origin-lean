@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Hom/Monoid.lean
-Genuine: 51 of 129 | Dissolved: 7 | Infrastructure: 71
+Genuine: 51 | Conflates: 0 | Dissolved: 7 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Hom

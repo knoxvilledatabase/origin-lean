@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Hermitian.lean
-Genuine: 37 of 41 | Dissolved: 0 | Infrastructure: 4
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Prime.lean
-Genuine: 46 of 55 | Dissolved: 1 | Infrastructure: 8
+Genuine: 46 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Prime.Defs

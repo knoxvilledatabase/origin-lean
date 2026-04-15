@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Unital.lean
-Genuine: 114 of 124 | Dissolved: 5 | Infrastructure: 5
+Genuine: 106 | Conflates: 8 | Dissolved: 5 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Quasispectrum
@@ -143,6 +143,7 @@ open Topology
 
 section Basic
 
+-- CONFLATES (assumes ground = zero): ContinuousFunctionalCalculus
 class ContinuousFunctionalCalculus (R : Type*) {A : Type*} (p : outParam (A → Prop))
     [CommSemiring R] [StarRing R] [MetricSpace R] [TopologicalSemiring R] [ContinuousStar R]
     [Ring A] [StarRing A] [TopologicalSpace A] [Algebra R A] : Prop where
@@ -460,6 +461,7 @@ lemma cfc_sum_univ {ι : Type*} [Fintype ι] (f : ι → R → R) (a : A)
     cfc (∑ i, f i) a = ∑ i, cfc (f i) a :=
   cfc_sum f a _ fun i _ ↦ hf i
 
+-- CONFLATES (assumes ground = zero): cfc_smul
 lemma cfc_smul {S : Type*} [SMul S R] [ContinuousConstSMul S R]
     [SMulZeroClass S A] [IsScalarTower S R A] [IsScalarTower S R (R → R)]
     (s : S) (f : R → R) (a : A) (hf : ContinuousOn f (spectrum R a) := by cfc_cont_tac) :
@@ -489,6 +491,7 @@ lemma cfc_star (f : R → R) (a : A) : cfc (fun x ↦ star (f x)) a = star (cfc 
 lemma cfc_pow_id (a : A) (n : ℕ) (ha : p a := by cfc_tac) : cfc (· ^ n : R → R) a = a ^ n := by
   rw [cfc_pow .., cfc_id' ..]
 
+-- CONFLATES (assumes ground = zero): cfc_smul_id
 lemma cfc_smul_id {S : Type*} [SMul S R] [ContinuousConstSMul S R]
     [SMulZeroClass S A] [IsScalarTower S R A] [IsScalarTower S R (R → R)]
     (s : S) (a : A) (ha : p a := by cfc_tac) : cfc (s • · : R → R) a = s • a := by
@@ -561,6 +564,7 @@ lemma cfc_comp_pow (f : R → R) (n : ℕ) (a : A)
     cfc (f <| · ^ n) a = cfc f (a ^ n) := by
   rw [cfc_comp' .., cfc_pow_id ..]
 
+-- CONFLATES (assumes ground = zero): cfc_comp_smul
 lemma cfc_comp_smul {S : Type*} [SMul S R] [ContinuousConstSMul S R] [SMulZeroClass S A]
     [IsScalarTower S R A] [IsScalarTower S R (R → R)] (s : S) (f : R → R) (a : A)
     (hf : ContinuousOn f ((s • ·) '' (spectrum R a)) := by cfc_cont_tac) (ha : p a := by cfc_tac) :
@@ -609,6 +613,7 @@ lemma CFC.spectrum_algebraMap_subset (r : R) : spectrum R (algebraMap R A r) ⊆
 
 include instCFC in
 
+-- CONFLATES (assumes ground = zero): CFC.spectrum_algebraMap_eq
 lemma CFC.spectrum_algebraMap_eq [Nontrivial A] (r : R) :
     spectrum R (algebraMap R A r) = {r} := by
   have hp : p 0 := cfc_predicate_zero R
@@ -617,6 +622,7 @@ lemma CFC.spectrum_algebraMap_eq [Nontrivial A] (r : R) :
 
 include instCFC in
 
+-- CONFLATES (assumes ground = zero): CFC.spectrum_zero_eq
 lemma CFC.spectrum_zero_eq [Nontrivial A] :
     spectrum R (0 : A) = {0} := by
   have : (0 : A) = algebraMap R A 0 := Eq.symm (RingHom.map_zero (algebraMap R A))
@@ -624,6 +630,7 @@ lemma CFC.spectrum_zero_eq [Nontrivial A] :
 
 include instCFC in
 
+-- CONFLATES (assumes ground = zero): CFC.spectrum_one_eq
 lemma CFC.spectrum_one_eq [Nontrivial A] :
     spectrum R (1 : A) = {1} := by
   have : (1 : A) = algebraMap R A 1 := Eq.symm (RingHom.map_one (algebraMap R A))
@@ -668,6 +675,7 @@ lemma cfc_nonneg_of_predicate [PartialOrder A]
 
 variable (R) in
 
+-- CONFLATES (assumes ground = zero): CFC.spectrum_nonempty
 lemma CFC.spectrum_nonempty [Nontrivial A] (a : A) (ha : p a := by cfc_tac) :
     (spectrum R a).Nonempty := by
   by_contra! h

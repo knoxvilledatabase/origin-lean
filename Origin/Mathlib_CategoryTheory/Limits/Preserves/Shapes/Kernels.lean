@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/Shapes/Kernels.lean
-Genuine: 24 of 32 | Dissolved: 0 | Infrastructure: 8
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels

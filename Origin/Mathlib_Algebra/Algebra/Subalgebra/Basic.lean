@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Subalgebra/Basic.lean
-Genuine: 139 of 236 | Dissolved: 0 | Infrastructure: 97
+Genuine: 136 | Conflates: 3 | Dissolved: 0 | Infrastructure: 97
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Basic
@@ -535,6 +535,7 @@ theorem ofInjective_apply (f : A →ₐ[R] B) (hf : Function.Injective f) (x : A
     ↑(ofInjective f hf x) = f x :=
   rfl
 
+-- CONFLATES (assumes ground = zero): ofInjectiveField
 noncomputable def ofInjectiveField {E F : Type*} [DivisionRing E] [Semiring F] [Nontrivial F]
     [Algebra R E] [Algebra R F] (f : E →ₐ[R] F) : E ≃ₐ[R] f.range :=
   ofInjective f f.toRingHom.injective
@@ -761,6 +762,7 @@ theorem surjective_algebraMap_iff :
       hx ▸ Subalgebra.algebraMap_mem _ _,
     fun h y => Algebra.mem_bot.1 <| eq_bot_iff.1 h (Algebra.mem_top : y ∈ _)⟩
 
+-- CONFLATES (assumes ground = zero): bijective_algebraMap_iff
 theorem bijective_algebraMap_iff {R A : Type*} [Field R] [Semiring A] [Nontrivial A]
     [Algebra R A] : Function.Bijective (algebraMap R A) ↔ (⊤ : Subalgebra R A) = ⊥ :=
   ⟨fun h => surjective_algebraMap_iff.1 h.2, fun h =>
@@ -772,6 +774,7 @@ noncomputable def botEquivOfInjective (h : Function.Injective (algebraMap R A)) 
     AlgEquiv.ofBijective (Algebra.ofId R _)
       ⟨fun _x _y hxy => h (congr_arg Subtype.val hxy : _), fun ⟨_y, x, hx⟩ => ⟨x, Subtype.eq hx⟩⟩
 
+-- CONFLATES (assumes ground = zero): botEquiv
 @[simps! symm_apply]
 noncomputable def botEquiv (F R : Type*) [Field F] [Semiring R] [Nontrivial R] [Algebra F R] :
     (⊥ : Subalgebra F R) ≃ₐ[F] F :=

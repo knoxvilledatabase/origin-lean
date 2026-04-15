@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Pseudo/Constructions.lean
-Genuine: 27 of 44 | Dissolved: 0 | Infrastructure: 17
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Topology.Bornology.Constructions

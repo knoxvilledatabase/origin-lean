@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Extension.lean
-Genuine: 29 of 33 | Dissolved: 0 | Infrastructure: 4
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Order

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/Embedding/Extend.lean
-Genuine: 30 of 32 | Dissolved: 0 | Infrastructure: 2
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.Embedding.Basic

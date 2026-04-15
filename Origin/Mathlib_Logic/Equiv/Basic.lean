@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Equiv/Basic.lean
-Genuine: 188 of 264 | Dissolved: 0 | Infrastructure: 76
+Genuine: 188 | Conflates: 0 | Dissolved: 0 | Infrastructure: 76
 -/
 import Origin.Core
 import Mathlib.Data.Bool.Basic

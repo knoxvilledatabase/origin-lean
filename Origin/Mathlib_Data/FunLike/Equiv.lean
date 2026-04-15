@@ -1,6 +1,6 @@
 /-
 Extracted from Data/FunLike/Equiv.lean
-Genuine: 25 of 31 | Dissolved: 0 | Infrastructure: 6
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.FunLike.Embedding

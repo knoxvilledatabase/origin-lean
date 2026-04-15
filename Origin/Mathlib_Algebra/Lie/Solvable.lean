@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Solvable.lean
-Genuine: 40 of 48 | Dissolved: 0 | Infrastructure: 8
+Genuine: 39 | Conflates: 1 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Abelian
@@ -197,6 +197,7 @@ instance isSolvableAdd {I J : LieIdeal R L} [hI : IsSolvable R I] [hJ : IsSolvab
   obtain ⟨k, hk⟩ := id hI; obtain ⟨l, hl⟩ := id hJ
   exact ⟨⟨k + l, LieIdeal.derivedSeries_add_eq_bot hk hl⟩⟩
 
+-- CONFLATES (assumes ground = zero): derivedSeries_lt_top_of_solvable
 theorem derivedSeries_lt_top_of_solvable [IsSolvable R L] [Nontrivial L] :
     derivedSeries R L 1 < ⊤ := by
   obtain ⟨n, hn⟩ := IsSolvable.solvable (R := R) (L := L)

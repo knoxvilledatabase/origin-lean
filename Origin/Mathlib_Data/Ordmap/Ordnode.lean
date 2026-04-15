@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Ordmap/Ordnode.lean
-Genuine: 89 of 105 | Dissolved: 0 | Infrastructure: 16
+Genuine: 89 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Order.Compare

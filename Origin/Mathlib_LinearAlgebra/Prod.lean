@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Prod.lean
-Genuine: 106 of 142 | Dissolved: 0 | Infrastructure: 36
+Genuine: 106 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Prod

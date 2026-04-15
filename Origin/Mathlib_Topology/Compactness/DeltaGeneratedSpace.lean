@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactness/DeltaGeneratedSpace.lean
-Genuine: 19 of 28 | Dissolved: 0 | Infrastructure: 9
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed

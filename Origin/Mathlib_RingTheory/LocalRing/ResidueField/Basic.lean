@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LocalRing/ResidueField/Basic.lean
-Genuine: 16 of 31 | Dissolved: 1 | Infrastructure: 14
+Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/AdjoinRoot.lean
-Genuine: 57 of 102 | Dissolved: 14 | Infrastructure: 31
+Genuine: 57 | Conflates: 0 | Dissolved: 14 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

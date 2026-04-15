@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/Measure.lean
-Genuine: 52 of 88 | Dissolved: 6 | Infrastructure: 30
+Genuine: 52 | Conflates: 0 | Dissolved: 6 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Action

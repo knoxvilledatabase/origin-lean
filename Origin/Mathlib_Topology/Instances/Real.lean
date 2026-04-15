@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/Real.lean
-Genuine: 12 of 25 | Dissolved: 3 | Infrastructure: 10
+Genuine: 12 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Periodic

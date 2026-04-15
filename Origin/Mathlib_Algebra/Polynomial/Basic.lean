@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Basic.lean
-Genuine: 161 of 229 | Dissolved: 15 | Infrastructure: 53
+Genuine: 156 | Conflates: 7 | Dissolved: 15 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Divisibility
@@ -162,6 +162,7 @@ theorem ofFinsupp_nsmul (a : ℕ) (b) :
     (⟨a • b⟩ : R[X]) = (a • ⟨b⟩ : R[X]) :=
   rfl
 
+-- CONFLATES (assumes ground = zero): ofFinsupp_smul
 @[simp]
 theorem ofFinsupp_smul {S : Type*} [SMulZeroClass S R] (a : S) (b) :
     (⟨a • b⟩ : R[X]) = (a • ⟨b⟩ : R[X]) :=
@@ -210,6 +211,7 @@ theorem toFinsupp_nsmul (a : ℕ) (b : R[X]) :
     (a • b).toFinsupp = a • b.toFinsupp :=
   rfl
 
+-- CONFLATES (assumes ground = zero): toFinsupp_smul
 @[simp]
 theorem toFinsupp_smul {S : Type*} [SMulZeroClass S R] (a : S) (b : R[X]) :
     (a • b).toFinsupp = a • b.toFinsupp :=
@@ -399,6 +401,7 @@ theorem monomial_pow (n : ℕ) (r : R) (k : ℕ) : monomial n r ^ k = monomial (
   | zero => simp [pow_zero, monomial_zero_one]
   | succ k ih => simp [pow_succ, ih, monomial_mul_monomial, mul_add, add_comm]
 
+-- CONFLATES (assumes ground = zero): smul_monomial
 theorem smul_monomial {S} [SMulZeroClass S R] (a : S) (n : ℕ) (b : R) :
     a • monomial n b = monomial n (a • b) :=
   toFinsupp_injective <| by simp; rw [smul_single]
@@ -442,6 +445,7 @@ theorem C_mul : C (a * b) = C a * C b :=
 theorem C_add : C (a + b) = C a + C b :=
   C.map_add a b
 
+-- CONFLATES (assumes ground = zero): smul_C
 @[simp]
 theorem smul_C {S} [SMulZeroClass S R] (s : S) (r : R) : s • C r = C (s • r) :=
   smul_monomial _ _ r
@@ -476,6 +480,7 @@ theorem monomial_one_right_eq_X_pow (n : ℕ) : monomial n (1 : R) = X ^ n := by
 theorem toFinsupp_X : X.toFinsupp = Finsupp.single 1 (1 : R) :=
   rfl
 
+-- CONFLATES (assumes ground = zero): X_ne_C
 theorem X_ne_C [Nontrivial R] (a : R) : X ≠ C a := by
   intro he
   simpa using monomial_eq_monomial_iff.1 he
@@ -656,6 +661,7 @@ theorem subsingleton_iff_subsingleton : Subsingleton R[X] ↔ Subsingleton R :=
     intro
     infer_instance⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.of_polynomial_ne
 theorem Nontrivial.of_polynomial_ne (h : p ≠ q) : Nontrivial R :=
   (subsingleton_or_nontrivial R).resolve_left fun _hI => h <| Subsingleton.elim _ _
 
@@ -1075,6 +1081,7 @@ theorem qsmul_eq_C_mul (a : ℚ) (f : R[X]) : a • f = Polynomial.C (a : R) * f
 
 end DivisionRing
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff
 @[simp]
 theorem nontrivial_iff [Semiring R] : Nontrivial R[X] ↔ Nontrivial R :=
   ⟨fun h =>

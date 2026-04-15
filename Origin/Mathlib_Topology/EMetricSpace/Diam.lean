@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/EMetricSpace/Diam.lean
-Genuine: 23 of 24 | Dissolved: 0 | Infrastructure: 1
+Genuine: 22 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.EMetricSpace.Pi
@@ -127,6 +127,7 @@ variable [EMetricSpace β] {s : Set β}
 theorem diam_eq_zero_iff : diam s = 0 ↔ s.Subsingleton :=
   ⟨fun h _x hx _y hy => edist_le_zero.1 <| h ▸ edist_le_diam_of_mem hx hy, diam_subsingleton⟩
 
+-- CONFLATES (assumes ground = zero): diam_pos_iff
 theorem diam_pos_iff : 0 < diam s ↔ s.Nontrivial := by
   simp only [pos_iff_ne_zero, Ne, diam_eq_zero_iff, Set.not_subsingleton_iff]
 

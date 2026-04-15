@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Normal.lean
-Genuine: 37 of 45 | Dissolved: 0 | Infrastructure: 8
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Extension

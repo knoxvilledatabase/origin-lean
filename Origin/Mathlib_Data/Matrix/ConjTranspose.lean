@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/ConjTranspose.lean
-Genuine: 52 of 64 | Dissolved: 0 | Infrastructure: 12
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action

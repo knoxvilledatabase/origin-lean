@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PEquiv.lean
-Genuine: 43 of 65 | Dissolved: 0 | Infrastructure: 22
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Data.Option.Basic

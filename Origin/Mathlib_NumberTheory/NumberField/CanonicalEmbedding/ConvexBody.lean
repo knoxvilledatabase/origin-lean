@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/CanonicalEmbedding/ConvexBody.lean
-Genuine: 38 of 49 | Dissolved: 10 | Infrastructure: 1
+Genuine: 38 | Conflates: 0 | Dissolved: 10 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.GeometryOfNumbers

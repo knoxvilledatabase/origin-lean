@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Comma/OverClass.lean
-Genuine: 11 of 23 | Dissolved: 0 | Infrastructure: 12
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Reassoc

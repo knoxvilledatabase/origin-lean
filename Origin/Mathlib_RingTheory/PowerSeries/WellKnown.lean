@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PowerSeries/WellKnown.lean
-Genuine: 28 of 29 | Dissolved: 0 | Infrastructure: 1
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Rat

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/ChangeOfRings.lean
-Genuine: 38 of 68 | Dissolved: 0 | Infrastructure: 30
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.EpiMono

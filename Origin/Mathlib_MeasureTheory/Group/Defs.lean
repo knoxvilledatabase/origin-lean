@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/Defs.lean
-Genuine: 6 of 9 | Dissolved: 0 | Infrastructure: 3
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace

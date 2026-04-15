@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/IsConnected.lean
-Genuine: 53 of 60 | Dissolved: 0 | Infrastructure: 7
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.List.Chain

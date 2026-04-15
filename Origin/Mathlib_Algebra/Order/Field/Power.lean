@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Field/Power.lean
-Genuine: 24 of 28 | Dissolved: 4 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas

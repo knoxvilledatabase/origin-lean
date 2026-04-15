@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Binomial.lean
-Genuine: 45 of 51 | Dissolved: 2 | Infrastructure: 4
+Genuine: 45 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Smeval

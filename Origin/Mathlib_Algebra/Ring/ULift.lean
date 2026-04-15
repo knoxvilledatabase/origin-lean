@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/ULift.lean
-Genuine: 1 of 15 | Dissolved: 0 | Infrastructure: 14
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.ULift

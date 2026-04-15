@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/AkraBazzi/GrowsPolynomially.lean
-Genuine: 31 of 32 | Dissolved: 0 | Infrastructure: 1
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent

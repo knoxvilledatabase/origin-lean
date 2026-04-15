@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Reflexive.lean
-Genuine: 51 of 77 | Dissolved: 0 | Infrastructure: 26
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Final

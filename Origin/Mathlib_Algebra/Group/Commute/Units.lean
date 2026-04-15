@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Commute/Units.lean
-Genuine: 18 of 20 | Dissolved: 2 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs

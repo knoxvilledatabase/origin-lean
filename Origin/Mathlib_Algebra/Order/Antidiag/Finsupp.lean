@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Antidiag/Finsupp.lean
-Genuine: 10 of 11 | Dissolved: 1 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Antidiag.Pi

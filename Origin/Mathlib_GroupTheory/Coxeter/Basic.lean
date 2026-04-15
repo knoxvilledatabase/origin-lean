@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Coxeter/Basic.lean
-Genuine: 46 of 55 | Dissolved: 0 | Infrastructure: 9
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Multiplicity.lean
-Genuine: 16 of 21 | Dissolved: 5 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals

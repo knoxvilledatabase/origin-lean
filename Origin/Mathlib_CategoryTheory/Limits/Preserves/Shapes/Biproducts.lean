@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/Shapes/Biproducts.lean
-Genuine: 38 of 50 | Dissolved: 0 | Infrastructure: 12
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Biproducts

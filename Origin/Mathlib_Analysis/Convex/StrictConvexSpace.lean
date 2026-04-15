@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/StrictConvexSpace.lean
-Genuine: 19 of 20 | Dissolved: 1 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed

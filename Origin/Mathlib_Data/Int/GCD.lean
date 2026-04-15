@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/GCD.lean
-Genuine: 59 of 72 | Dissolved: 8 | Infrastructure: 5
+Genuine: 59 | Conflates: 0 | Dissolved: 8 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Int

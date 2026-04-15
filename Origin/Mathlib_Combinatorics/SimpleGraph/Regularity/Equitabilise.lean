@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Equitabilise.lean
-Genuine: 5 of 9 | Dissolved: 3 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Partition.Equipartition

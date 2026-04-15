@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/GradedObject/Trifunctor.lean
-Genuine: 37 of 38 | Dissolved: 0 | Infrastructure: 1
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Bifunctor

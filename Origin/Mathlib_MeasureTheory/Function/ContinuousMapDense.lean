@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/ContinuousMapDense.lean
-Genuine: 8 of 13 | Dissolved: 5 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Regular

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/PiLex.lean
-Genuine: 12 of 24 | Dissolved: 0 | Infrastructure: 12
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Order.WellFounded

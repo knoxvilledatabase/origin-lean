@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Grp/EpiMono.lean
-Genuine: 35 of 48 | Dissolved: 0 | Infrastructure: 13
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.EquivalenceGroupAddGroup

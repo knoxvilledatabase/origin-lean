@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Basic.lean
-Genuine: 105 of 115 | Dissolved: 3 | Infrastructure: 7
+Genuine: 102 | Conflates: 3 | Dissolved: 3 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Attach
@@ -102,9 +102,11 @@ variable [DecidableEq α] {s t u v : Finset α} {a b : α}
 theorem erase_empty (a : α) : erase ∅ a = ∅ :=
   rfl
 
+-- CONFLATES (assumes ground = zero): Nontrivial.erase_nonempty
 protected lemma Nontrivial.erase_nonempty (hs : s.Nontrivial) : (s.erase a).Nonempty :=
   (hs.exists_ne a).imp <| by aesop
 
+-- CONFLATES (assumes ground = zero): erase_nonempty
 @[simp] lemma erase_nonempty (ha : a ∈ s) : (s.erase a).Nonempty ↔ s.Nontrivial := by
   simp only [Finset.Nonempty, mem_erase, and_comm (b := _ ∈ _)]
   refine ⟨?_, fun hs ↦ hs.exists_ne a⟩
@@ -187,6 +189,7 @@ theorem erase_injOn' (a : α) : { s : Finset α | a ∈ s }.InjOn fun s => erase
 
 end Erase
 
+-- CONFLATES (assumes ground = zero): Nontrivial.exists_cons_eq
 lemma Nontrivial.exists_cons_eq {s : Finset α} (hs : s.Nontrivial) :
     ∃ t a ha b hb hab, (cons b t hb).cons a (mem_cons.not.2 <| not_or_intro hab ha) = s := by
   classical

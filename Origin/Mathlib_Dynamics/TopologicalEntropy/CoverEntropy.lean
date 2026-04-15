@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/TopologicalEntropy/CoverEntropy.lean
-Genuine: 57 of 58 | Dissolved: 0 | Infrastructure: 1
+Genuine: 57 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog

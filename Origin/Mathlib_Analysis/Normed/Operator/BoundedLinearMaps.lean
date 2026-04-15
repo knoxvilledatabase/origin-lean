@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Operator/BoundedLinearMaps.lean
-Genuine: 54 of 61 | Dissolved: 0 | Infrastructure: 7
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Multilinear.Basic

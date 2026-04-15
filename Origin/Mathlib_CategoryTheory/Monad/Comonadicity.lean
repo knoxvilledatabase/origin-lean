@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monad/Comonadicity.lean
-Genuine: 21 of 33 | Dissolved: 0 | Infrastructure: 12
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Equalizers

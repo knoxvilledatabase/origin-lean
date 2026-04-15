@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Relrank.lean
-Genuine: 108 of 110 | Dissolved: 0 | Infrastructure: 2
+Genuine: 108 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Adjoin

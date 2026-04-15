@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Linear/LinearFunctor.lean
-Genuine: 4 of 13 | Dissolved: 0 | Infrastructure: 9
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor

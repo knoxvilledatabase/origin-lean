@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/UniformIntegrable.lean
-Genuine: 43 of 50 | Dissolved: 2 | Infrastructure: 5
+Genuine: 43 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.ConvergenceInMeasure

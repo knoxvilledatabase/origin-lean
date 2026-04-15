@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Part.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Part

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/MeasurableSpace/Defs.lean
-Genuine: 85 of 97 | Dissolved: 0 | Infrastructure: 12
+Genuine: 84 | Conflates: 1 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Data.Set.Countable
@@ -91,6 +91,7 @@ theorem MeasurableSet.compl_iff : MeasurableSet sᶜ ↔ MeasurableSet s :=
 protected theorem MeasurableSet.univ : MeasurableSet (univ : Set α) :=
   .of_compl <| by simp
 
+-- CONFLATES (assumes ground = zero): Subsingleton.measurableSet
 @[nontriviality, measurability]
 theorem Subsingleton.measurableSet [Subsingleton α] {s : Set α} : MeasurableSet s :=
   Subsingleton.set_cases MeasurableSet.empty MeasurableSet.univ s

@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Small/Basic.lean
-Genuine: 2 of 9 | Dissolved: 0 | Infrastructure: 7
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Logic.Small.Defs

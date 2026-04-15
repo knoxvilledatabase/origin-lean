@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Basic.lean
-Genuine: 64 of 118 | Dissolved: 5 | Infrastructure: 49
+Genuine: 63 | Conflates: 1 | Dissolved: 5 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic
@@ -443,6 +443,7 @@ theorem smul_eq_C_mul (f : MvPowerSeries σ R) (a : R) : a • f = C σ R a * f 
   ext
   simp
 
+-- CONFLATES (assumes ground = zero): X_inj
 theorem X_inj [Nontrivial R] {s t : σ} : (X s : MvPowerSeries σ R) = X t ↔ s = t :=
   ⟨by
     classical

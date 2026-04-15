@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Functor/KanExtension/Adjunction.lean
-Genuine: 31 of 46 | Dissolved: 0 | Infrastructure: 15
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.KanExtension.Pointwise

@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Free.lean
-Genuine: 10 of 16 | Dissolved: 0 | Infrastructure: 6
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Fintype

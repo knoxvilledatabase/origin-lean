@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/MeasurableSpace/Basic.lean
-Genuine: 191 of 251 | Dissolved: 1 | Infrastructure: 59
+Genuine: 189 | Conflates: 2 | Dissolved: 1 | Infrastructure: 59
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Update
@@ -220,10 +220,12 @@ section TypeclassMeasurableSpace
 
 variable [MeasurableSpace α] [MeasurableSpace β]
 
+-- CONFLATES (assumes ground = zero): Subsingleton.measurable
 @[nontriviality, measurability]
 theorem Subsingleton.measurable [Subsingleton α] : Measurable f := fun _ _ =>
   @Subsingleton.measurableSet α _ _ _
 
+-- CONFLATES (assumes ground = zero): measurable_of_subsingleton_codomain
 @[nontriviality, measurability]
 theorem measurable_of_subsingleton_codomain [Subsingleton β] (f : α → β) : Measurable f :=
   fun s _ => Subsingleton.set_cases MeasurableSet.empty MeasurableSet.univ s

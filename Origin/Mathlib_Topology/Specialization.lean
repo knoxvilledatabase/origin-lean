@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Specialization.lean
-Genuine: 11 of 22 | Dissolved: 0 | Infrastructure: 11
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Order.Category.Preord

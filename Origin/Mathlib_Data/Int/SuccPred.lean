@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/SuccPred.lean
-Genuine: 9 of 15 | Dissolved: 0 | Infrastructure: 6
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Int

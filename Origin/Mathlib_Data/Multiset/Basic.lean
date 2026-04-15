@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Multiset/Basic.lean
-Genuine: 442 of 545 | Dissolved: 11 | Infrastructure: 92
+Genuine: 442 | Conflates: 0 | Dissolved: 11 | Infrastructure: 92
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs

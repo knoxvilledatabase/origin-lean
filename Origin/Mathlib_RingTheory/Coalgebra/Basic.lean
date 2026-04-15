@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Coalgebra/Basic.lean
-Genuine: 31 of 43 | Dissolved: 0 | Infrastructure: 12
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Bilinear

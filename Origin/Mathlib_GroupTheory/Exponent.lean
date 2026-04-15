@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Exponent.lean
-Genuine: 53 of 64 | Dissolved: 5 | Infrastructure: 6
+Genuine: 51 | Conflates: 2 | Dissolved: 5 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.GroupTheory.OrderOfElement
@@ -246,6 +246,7 @@ theorem _root_.Commute.exists_orderOf_eq_lcm {x y : G} (h : Commute x y) :
   · exact ⟨_, mul_mem (pow_mem (subset_closure (by simp)) _) (pow_mem (subset_closure (by simp)) _),
       h.orderOf_mul_pow_eq_lcm hx hy⟩
 
+-- CONFLATES (assumes ground = zero): exponent_eq_prime_iff
 @[to_additive]
 lemma exponent_eq_prime_iff {G : Type*} [Monoid G] [Nontrivial G] {p : ℕ} (hp : p.Prime) :
     Monoid.exponent G = p ↔ ∀ g : G, g ≠ 1 → orderOf g = p := by
@@ -328,6 +329,7 @@ theorem ExponentExists.of_finite : ExponentExists G := by
 
 -- DISSOLVED: exponent_ne_zero_of_finite
 
+-- CONFLATES (assumes ground = zero): one_lt_exponent
 @[to_additive AddMonoid.one_lt_exponent]
 lemma one_lt_exponent [Nontrivial G] : 1 < Monoid.exponent G := by
   rw [Nat.one_lt_iff_ne_zero_and_ne_one]

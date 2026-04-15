@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Hadamard.lean
-Genuine: 24 of 24 | Dissolved: 0 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv

@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Stalk.lean
-Genuine: 31 of 40 | Dissolved: 0 | Infrastructure: 9
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.AffineScheme

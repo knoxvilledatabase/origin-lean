@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/Preord.lean
-Genuine: 6 of 15 | Dissolved: 0 | Infrastructure: 9
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Cat

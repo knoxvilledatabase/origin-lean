@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/BinaryRec.lean
-Genuine: 14 of 19 | Dissolved: 1 | Infrastructure: 4
+Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Batteries.Tactic.Alias

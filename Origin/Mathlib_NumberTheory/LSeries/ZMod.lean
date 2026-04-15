@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/ZMod.lean
-Genuine: 29 of 33 | Dissolved: 4 | Infrastructure: 0
+Genuine: 29 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Fourier.ZMod

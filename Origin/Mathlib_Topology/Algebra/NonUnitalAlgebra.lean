@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/NonUnitalAlgebra.lean
-Genuine: 10 of 17 | Dissolved: 0 | Infrastructure: 7
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalSubalgebra

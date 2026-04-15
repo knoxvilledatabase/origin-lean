@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Image.lean
-Genuine: 126 of 137 | Dissolved: 0 | Infrastructure: 11
+Genuine: 125 | Conflates: 1 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Embedding
@@ -231,6 +231,7 @@ theorem map_nonempty : (s.map f).Nonempty ↔ s.Nonempty :=
 
 protected alias ⟨_, Nonempty.map⟩ := map_nonempty
 
+-- CONFLATES (assumes ground = zero): map_nontrivial
 @[simp]
 theorem map_nontrivial : (s.map f).Nontrivial ↔ s.Nontrivial :=
   mod_cast Set.image_nontrivial f.injective (s := s)

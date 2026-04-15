@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/ModEq.lean
-Genuine: 48 of 56 | Dissolved: 5 | Infrastructure: 3
+Genuine: 48 | Conflates: 0 | Dissolved: 5 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic

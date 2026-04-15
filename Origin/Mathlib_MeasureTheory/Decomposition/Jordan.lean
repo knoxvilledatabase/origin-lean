@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Decomposition/Jordan.lean
-Genuine: 40 of 53 | Dissolved: 0 | Infrastructure: 13
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.SignedHahn

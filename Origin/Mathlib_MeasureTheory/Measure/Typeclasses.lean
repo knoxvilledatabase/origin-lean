@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Typeclasses.lean
-Genuine: 170 of 233 | Dissolved: 6 | Infrastructure: 57
+Genuine: 170 | Conflates: 0 | Dissolved: 6 | Infrastructure: 57
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Restrict

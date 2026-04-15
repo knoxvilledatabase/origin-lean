@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Charpoly/Univ.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Equiv
@@ -66,6 +66,7 @@ variable (R)
 
 lemma univ_monic : (univ R n).Monic := charpoly_monic (mvPolynomialX n n R)
 
+-- CONFLATES (assumes ground = zero): univ_natDegree
 lemma univ_natDegree [Nontrivial R] : (univ R n).natDegree = Fintype.card n :=
   charpoly_natDegree_eq_dim (mvPolynomialX n n R)
 

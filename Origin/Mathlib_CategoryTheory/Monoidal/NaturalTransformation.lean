@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/NaturalTransformation.lean
-Genuine: 6 of 21 | Dissolved: 0 | Infrastructure: 15
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful

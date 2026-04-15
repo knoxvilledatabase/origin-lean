@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/Completion.lean
-Genuine: 3 of 10 | Dissolved: 0 | Infrastructure: 7
+Genuine: 2 | Conflates: 1 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Completion
@@ -55,6 +55,7 @@ def toComplL : E →L[𝕜] Completion E :=
 theorem coe_toComplL : ⇑(toComplL : E →L[𝕜] Completion E) = ((↑) : E → Completion E) :=
   rfl
 
+-- CONFLATES (assumes ground = zero): norm_toComplL
 @[simp]
 theorem norm_toComplL {𝕜 E : Type*} [NontriviallyNormedField 𝕜] [NormedAddCommGroup E]
     [NormedSpace 𝕜 E] [Nontrivial E] : ‖(toComplL : E →L[𝕜] Completion E)‖ = 1 :=

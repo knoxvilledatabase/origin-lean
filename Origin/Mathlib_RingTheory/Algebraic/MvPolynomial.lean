@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Algebraic/MvPolynomial.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Supported
@@ -71,6 +71,7 @@ theorem transcendental_polynomial_aeval_X_iff (i : σ) {f : R[X]} :
   simp_rw [Transcendental, not_imp_not]
   exact fun h ↦ h.algHom _
 
+-- CONFLATES (assumes ground = zero): transcendental_supported_polynomial_aeval_X_iff
 theorem transcendental_supported_polynomial_aeval_X_iff
     [Nontrivial R] {i : σ} {s : Set σ} {f : R[X]} :
     Transcendental (supported R s) (Polynomial.aeval (X i : MvPolynomial σ R) f) ↔
@@ -93,6 +94,7 @@ theorem transcendental_supported_X {i : σ} {s : Set σ} (h : i ∉ s) :
 theorem transcendental_X (i : σ) : Transcendental R (X i : MvPolynomial σ R) := by
   simpa using transcendental_polynomial_aeval_X R i (Polynomial.transcendental_X R)
 
+-- CONFLATES (assumes ground = zero): transcendental_supported_X_iff
 theorem transcendental_supported_X_iff [Nontrivial R] {i : σ} {s : Set σ} :
     Transcendental (supported R s) (X i : MvPolynomial σ R) ↔ i ∉ s := by
   simpa [Polynomial.transcendental_X] using

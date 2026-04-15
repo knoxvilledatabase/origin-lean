@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Covering.lean
-Genuine: 24 of 26 | Dissolved: 0 | Infrastructure: 2
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.IsLocalHomeomorph

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/LocalExtr.lean
-Genuine: 99 of 108 | Dissolved: 0 | Infrastructure: 9
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs

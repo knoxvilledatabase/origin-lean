@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Comma/Presheaf/Basic.lean
-Genuine: 75 of 82 | Dissolved: 0 | Infrastructure: 7
+Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.HomCongr

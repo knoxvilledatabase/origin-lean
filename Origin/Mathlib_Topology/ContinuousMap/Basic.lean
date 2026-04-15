@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/Basic.lean
-Genuine: 45 of 63 | Dissolved: 0 | Infrastructure: 18
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Data.Set.UnionLift

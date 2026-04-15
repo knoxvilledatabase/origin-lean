@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CC/Datatypes.lean
-Genuine: 64 of 68 | Dissolved: 0 | Infrastructure: 4
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Lean.Meta.CongrTheorems

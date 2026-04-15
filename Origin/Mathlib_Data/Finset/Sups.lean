@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Sups.lean
-Genuine: 174 of 178 | Dissolved: 0 | Infrastructure: 4
+Genuine: 174 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Finset.NAry

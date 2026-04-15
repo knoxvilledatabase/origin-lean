@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Fin/Tuple/Basic.lean
-Genuine: 138 of 144 | Dissolved: 0 | Infrastructure: 6
+Genuine: 138 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Fin.Basic

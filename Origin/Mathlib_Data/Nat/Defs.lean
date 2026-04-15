@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Defs.lean
-Genuine: 210 of 276 | Dissolved: 38 | Infrastructure: 28
+Genuine: 210 | Conflates: 0 | Dissolved: 38 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Basic

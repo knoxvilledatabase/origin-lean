@@ -1,6 +1,6 @@
 /-
 Extracted from Order/KrullDimension.lean
-Genuine: 87 of 100 | Dissolved: 6 | Infrastructure: 7
+Genuine: 87 | Conflates: 0 | Dissolved: 6 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Int

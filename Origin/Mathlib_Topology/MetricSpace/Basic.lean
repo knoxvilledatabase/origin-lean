@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Basic.lean
-Genuine: 11 of 27 | Dissolved: 0 | Infrastructure: 16
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Pseudo.Basic

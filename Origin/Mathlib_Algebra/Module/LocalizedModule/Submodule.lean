@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/LocalizedModule/Submodule.lean
-Genuine: 19 of 28 | Dissolved: 0 | Infrastructure: 9
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Basic

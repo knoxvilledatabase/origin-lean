@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Rank.lean
-Genuine: 21 of 27 | Dissolved: 6 | Infrastructure: 0
+Genuine: 11 | Conflates: 10 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.EngelSubalgebra
@@ -62,6 +62,7 @@ def rank : ℕ := nilRank φ
 
 -- DISSOLVED: polyCharpoly_coeff_rank_ne_zero
 
+-- CONFLATES (assumes ground = zero): rank_eq_natTrailingDegree
 lemma rank_eq_natTrailingDegree [Nontrivial R] [DecidableEq ι] :
     rank R L M = (polyCharpoly φ b).natTrailingDegree := by
   apply nilRank_eq_polyCharpoly_natTrailingDegree
@@ -70,16 +71,19 @@ open Module
 
 include bₘ in
 
+-- CONFLATES (assumes ground = zero): rank_le_card
 lemma rank_le_card [Nontrivial R] : rank R L M ≤ Fintype.card ιₘ :=
   nilRank_le_card _ bₘ
 
 open Module
 
+-- CONFLATES (assumes ground = zero): rank_le_finrank
 lemma rank_le_finrank [Nontrivial R] : rank R L M ≤ finrank R M :=
   nilRank_le_finrank _
 
 variable {L}
 
+-- CONFLATES (assumes ground = zero): rank_le_natTrailingDegree_charpoly_ad
 lemma rank_le_natTrailingDegree_charpoly_ad [Nontrivial R] :
     rank R L M ≤ (toEnd R L M x).charpoly.natTrailingDegree :=
   nilRank_le_natTrailingDegree_charpoly _ _
@@ -90,6 +94,7 @@ def IsRegular (x : L) : Prop := LinearMap.IsNilRegular φ x
 
 -- DISSOLVED: isRegular_iff_coeff_polyCharpoly_rank_ne_zero
 
+-- CONFLATES (assumes ground = zero): isRegular_iff_natTrailingDegree_charpoly_eq_rank
 lemma isRegular_iff_natTrailingDegree_charpoly_eq_rank [Nontrivial R] :
     IsRegular R M x ↔ (toEnd R L M x).charpoly.natTrailingDegree = rank R L M :=
   LinearMap.isNilRegular_iff_natTrailingDegree_charpoly_eq_nilRank _ _
@@ -125,6 +130,7 @@ abbrev rank : ℕ := LieModule.rank R L L
 
 -- DISSOLVED: polyCharpoly_coeff_rank_ne_zero
 
+-- CONFLATES (assumes ground = zero): rank_eq_natTrailingDegree
 lemma rank_eq_natTrailingDegree [Nontrivial R] [DecidableEq ι] :
     rank R L = (polyCharpoly (ad R L).toLinearMap b).natTrailingDegree := by
   apply nilRank_eq_polyCharpoly_natTrailingDegree
@@ -133,14 +139,17 @@ open Module
 
 include b in
 
+-- CONFLATES (assumes ground = zero): rank_le_card
 lemma rank_le_card [Nontrivial R] : rank R L ≤ Fintype.card ι :=
   nilRank_le_card _ b
 
+-- CONFLATES (assumes ground = zero): rank_le_finrank
 lemma rank_le_finrank [Nontrivial R] : rank R L ≤ finrank R L :=
   nilRank_le_finrank _
 
 variable {L}
 
+-- CONFLATES (assumes ground = zero): rank_le_natTrailingDegree_charpoly_ad
 lemma rank_le_natTrailingDegree_charpoly_ad [Nontrivial R] :
     rank R L ≤ (ad R L x).charpoly.natTrailingDegree :=
   nilRank_le_natTrailingDegree_charpoly _ _
@@ -151,6 +160,7 @@ abbrev IsRegular (x : L) : Prop := LieModule.IsRegular R L x
 
 -- DISSOLVED: isRegular_iff_coeff_polyCharpoly_rank_ne_zero
 
+-- CONFLATES (assumes ground = zero): isRegular_iff_natTrailingDegree_charpoly_eq_rank
 lemma isRegular_iff_natTrailingDegree_charpoly_eq_rank [Nontrivial R] :
     IsRegular R x ↔ (ad R L x).charpoly.natTrailingDegree = rank R L :=
   LinearMap.isNilRegular_iff_natTrailingDegree_charpoly_eq_nilRank _ _

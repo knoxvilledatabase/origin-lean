@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/StrongLaw.lean
-Genuine: 28 of 32 | Dissolved: 2 | Infrastructure: 2
+Genuine: 28 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Probability.IdentDistrib

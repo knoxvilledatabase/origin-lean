@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Pointwise.lean
-Genuine: 137 of 187 | Dissolved: 6 | Infrastructure: 44
+Genuine: 137 | Conflates: 0 | Dissolved: 6 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs

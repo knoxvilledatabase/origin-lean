@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/DilationEquiv.lean
-Genuine: 27 of 49 | Dissolved: 1 | Infrastructure: 21
+Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Dilation

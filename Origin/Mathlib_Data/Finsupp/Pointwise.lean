@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Pointwise.lean
-Genuine: 2 of 16 | Dissolved: 0 | Infrastructure: 14
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Defs

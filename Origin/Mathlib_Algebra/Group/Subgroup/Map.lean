@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subgroup/Map.lean
-Genuine: 58 of 78 | Dissolved: 0 | Infrastructure: 20
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Lattice

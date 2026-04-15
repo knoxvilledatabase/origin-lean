@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Log/NegMulLog.lean
-Genuine: 23 of 29 | Dissolved: 5 | Infrastructure: 1
+Genuine: 23 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv

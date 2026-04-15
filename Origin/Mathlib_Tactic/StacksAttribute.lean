@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/StacksAttribute.lean
-Genuine: 14 of 14 | Dissolved: 0 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Elab.Command

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/Subsemiring.lean
-Genuine: 8 of 19 | Dissolved: 0 | Infrastructure: 11
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Star.NonUnitalSubsemiring

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Derivation/Basic.lean
-Genuine: 37 of 80 | Dissolved: 0 | Infrastructure: 43
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 43
 -/
 import Origin.Core
 import Mathlib.RingTheory.Adjoin.Basic

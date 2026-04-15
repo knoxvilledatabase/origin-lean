@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Category/Pointed.lean
-Genuine: 8 of 16 | Dissolved: 0 | Infrastructure: 8
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.Basic

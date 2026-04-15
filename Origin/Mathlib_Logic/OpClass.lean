@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/OpClass.lean
-Genuine: 4 of 9 | Dissolved: 0 | Infrastructure: 5
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Init

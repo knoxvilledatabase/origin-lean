@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/FreeModule/IdealQuotient.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
@@ -102,6 +102,7 @@ noncomputable def quotientEquivDirectSum :
   exact ((I.quotientEquivPiSpan b _).restrictScalars F).trans
     (DirectSum.linearEquivFunOnFintype _ _ _).symm
 
+-- CONFLATES (assumes ground = zero): finrank_quotient_eq_sum
 theorem finrank_quotient_eq_sum {ι} [Fintype ι] (b : Basis ι R S) [Nontrivial F]
     [∀ i, Module.Free F (R ⧸ span ({I.smithCoeffs b hI i} : Set R))]
     [∀ i, Module.Finite F (R ⧸ span ({I.smithCoeffs b hI i} : Set R))] :

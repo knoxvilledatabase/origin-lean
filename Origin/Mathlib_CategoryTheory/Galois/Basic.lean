@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Galois/Basic.lean
-Genuine: 30 of 50 | Dissolved: 1 | Infrastructure: 19
+Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers

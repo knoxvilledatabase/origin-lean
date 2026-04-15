@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/DirectSum/Internal.lean
-Genuine: 23 of 42 | Dissolved: 2 | Infrastructure: 17
+Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Operations

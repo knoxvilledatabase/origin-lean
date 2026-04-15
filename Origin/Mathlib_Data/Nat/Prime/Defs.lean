@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Prime/Defs.lean
-Genuine: 52 of 67 | Dissolved: 4 | Infrastructure: 11
+Genuine: 52 | Conflates: 0 | Dissolved: 4 | Infrastructure: 11
 -/
 import Origin.Core
 import Batteries.Data.Nat.Gcd

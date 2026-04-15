@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Complex/Module.lean
-Genuine: 45 of 69 | Dissolved: 0 | Infrastructure: 24
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.RestrictScalars

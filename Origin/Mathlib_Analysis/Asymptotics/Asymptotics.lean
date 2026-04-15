@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Asymptotics/Asymptotics.lean
-Genuine: 257 of 350 | Dissolved: 42 | Infrastructure: 51
+Genuine: 255 | Conflates: 2 | Dissolved: 42 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Bounded
@@ -241,10 +241,12 @@ theorem isLittleO_iff_nat_mul_le' : f' =o[l] g ↔ ∀ n : ℕ, ∀ᶠ x in l, �
 
 /-! ### Subsingleton -/
 
+-- CONFLATES (assumes ground = zero): isLittleO_of_subsingleton
 @[nontriviality]
 theorem isLittleO_of_subsingleton [Subsingleton E'] : f' =o[l] g' :=
   IsLittleO.of_bound fun c hc => by simp [Subsingleton.elim (f' _) 0, mul_nonneg hc.le]
 
+-- CONFLATES (assumes ground = zero): isBigO_of_subsingleton
 @[nontriviality]
 theorem isBigO_of_subsingleton [Subsingleton E'] : f' =O[l] g' :=
   isLittleO_of_subsingleton.isBigO

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Coherent/Equivalence.lean
-Genuine: 8 of 12 | Dissolved: 0 | Infrastructure: 4
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Coherent.SheafComparison

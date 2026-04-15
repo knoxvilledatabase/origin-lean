@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Finiteness/Basic.lean
-Genuine: 33 of 47 | Dissolved: 0 | Infrastructure: 14
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UnitInterval.lean
-Genuine: 54 of 74 | Dissolved: 4 | Infrastructure: 16
+Genuine: 54 | Conflates: 0 | Dissolved: 4 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Interval.Set.Instances

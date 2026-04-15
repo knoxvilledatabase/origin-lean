@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/IntegerCompl.lean
-Genuine: 3 of 8 | Dissolved: 3 | Infrastructure: 2
+Genuine: 3 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic

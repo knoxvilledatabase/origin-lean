@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/BoolAlg.lean
-Genuine: 7 of 17 | Dissolved: 0 | Infrastructure: 10
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Order.Category.HeytAlg

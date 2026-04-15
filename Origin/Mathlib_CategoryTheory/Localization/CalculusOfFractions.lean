@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/CalculusOfFractions.lean
-Genuine: 78 of 98 | Dissolved: 0 | Infrastructure: 20
+Genuine: 78 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Opposite

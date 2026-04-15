@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Countable.lean
-Genuine: 51 of 52 | Dissolved: 0 | Infrastructure: 1
+Genuine: 50 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Basic
@@ -222,6 +222,7 @@ protected theorem Countable.insert {s : Set α} (a : α) (h : s.Countable) : (in
 theorem Finite.countable {s : Set α} (hs : s.Finite) : s.Countable :=
   have := hs.to_subtype; s.to_countable
 
+-- CONFLATES (assumes ground = zero): Countable.of_subsingleton
 @[nontriviality]
 theorem Countable.of_subsingleton [Subsingleton α] (s : Set α) : s.Countable :=
   (Finite.of_subsingleton s).countable

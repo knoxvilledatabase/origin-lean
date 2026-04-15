@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Multiset/Powerset.lean
-Genuine: 41 of 47 | Dissolved: 0 | Infrastructure: 6
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.List.Sublists

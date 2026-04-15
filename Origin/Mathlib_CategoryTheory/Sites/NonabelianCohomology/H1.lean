@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/NonabelianCohomology/H1.lean
-Genuine: 15 of 29 | Dissolved: 0 | Infrastructure: 14
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic

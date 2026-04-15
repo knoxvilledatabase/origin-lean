@@ -1,6 +1,6 @@
 /-
 Extracted from Order/MinMax.lean
-Genuine: 57 of 65 | Dissolved: 0 | Infrastructure: 8
+Genuine: 57 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Logic.OpClass

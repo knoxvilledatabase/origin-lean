@@ -1,6 +1,6 @@
 /-
 Extracted from Order/RelSeries.lean
-Genuine: 87 of 116 | Dissolved: 6 | Infrastructure: 23
+Genuine: 85 | Conflates: 2 | Dissolved: 6 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
@@ -162,11 +162,13 @@ theorem subsingleton_of_length_eq_zero (hs : s.length = 0) : {x | x ∈ s}.Subsi
 
 -- DISSOLVED: length_ne_zero_of_nontrivial
 
+-- CONFLATES (assumes ground = zero): length_pos_of_nontrivial
 theorem length_pos_of_nontrivial (h : {x | x ∈ s}.Nontrivial) : 0 < s.length :=
   Nat.pos_iff_ne_zero.mpr <| length_ne_zero_of_nontrivial h
 
 -- DISSOLVED: length_ne_zero
 
+-- CONFLATES (assumes ground = zero): length_pos
 theorem length_pos (irrefl : Irreflexive r) : 0 < s.length ↔ {x | x ∈ s}.Nontrivial :=
   Nat.pos_iff_ne_zero.trans <| length_ne_zero irrefl
 

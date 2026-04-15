@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/ConeCategory.lean
-Genuine: 38 of 46 | Dissolved: 0 | Infrastructure: 8
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Comma

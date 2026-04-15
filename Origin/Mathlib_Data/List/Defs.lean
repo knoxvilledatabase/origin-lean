@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Defs.lean
-Genuine: 46 of 52 | Dissolved: 0 | Infrastructure: 6
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Notation

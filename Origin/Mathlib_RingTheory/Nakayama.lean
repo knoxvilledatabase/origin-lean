@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Nakayama.lean
-Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
+Genuine: 9 | Conflates: 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Finiteness.Nakayama
@@ -77,6 +77,7 @@ lemma eq_bot_of_set_smul_eq_of_subset_jacobson_annihilator {s : Set R}
   eq_bot_of_eq_ideal_smul_of_le_jacobson_annihilator hN
     (Eq.trans hsN (span_smul_eq s N).symm) (span_le.mpr hsJac)
 
+-- CONFLATES (assumes ground = zero): top_ne_ideal_smul_of_le_jacobson_annihilator
 lemma top_ne_ideal_smul_of_le_jacobson_annihilator [Nontrivial M]
     [Module.Finite R M] {I} (h : I ≤ (Module.annihilator R M).jacobson) :
     (⊤ : Submodule R M) ≠ I • ⊤ := fun H => top_ne_bot <|
@@ -85,6 +86,7 @@ lemma top_ne_ideal_smul_of_le_jacobson_annihilator [Nontrivial M]
 
 open Pointwise in
 
+-- CONFLATES (assumes ground = zero): top_ne_set_smul_of_subset_jacobson_annihilator
 lemma top_ne_set_smul_of_subset_jacobson_annihilator [Nontrivial M]
     [Module.Finite R M] {s : Set R}
     (h : s ⊆ (Module.annihilator R M).jacobson) :
@@ -94,6 +96,7 @@ lemma top_ne_set_smul_of_subset_jacobson_annihilator [Nontrivial M]
 
 open Pointwise in
 
+-- CONFLATES (assumes ground = zero): top_ne_pointwise_smul_of_mem_jacobson_annihilator
 lemma top_ne_pointwise_smul_of_mem_jacobson_annihilator [Nontrivial M]
     [Module.Finite R M] {r} (h : r ∈ (Module.annihilator R M).jacobson) :
     (⊤ : Submodule R M) ≠ r • ⊤ :=

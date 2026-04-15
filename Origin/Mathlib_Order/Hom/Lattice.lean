@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Hom/Lattice.lean
-Genuine: 87 of 326 | Dissolved: 34 | Infrastructure: 205
+Genuine: 87 | Conflates: 0 | Dissolved: 34 | Infrastructure: 205
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Bounded

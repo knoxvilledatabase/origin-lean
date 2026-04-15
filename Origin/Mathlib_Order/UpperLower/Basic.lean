@@ -1,6 +1,6 @@
 /-
 Extracted from Order/UpperLower/Basic.lean
-Genuine: 307 of 399 | Dissolved: 0 | Infrastructure: 92
+Genuine: 307 | Conflates: 0 | Dissolved: 0 | Infrastructure: 92
 -/
 import Origin.Core
 import Mathlib.Data.SetLike.Basic

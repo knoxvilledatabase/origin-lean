@@ -1,6 +1,6 @@
 /-
 Extracted from Data/FP/Basic.lean
-Genuine: 29 of 34 | Dissolved: 0 | Infrastructure: 5
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Semiquot

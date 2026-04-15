@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Canonical.lean
-Genuine: 14 of 18 | Dissolved: 0 | Infrastructure: 4
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Canonical.Defs
@@ -37,6 +37,7 @@ section CanonicallyOrderedCommSemiring
 
 variable [CanonicallyOrderedCommSemiring α] {a b c d : α}
 
+-- CONFLATES (assumes ground = zero): Odd.pos
 lemma Odd.pos [Nontrivial α] : Odd a → 0 < a := by rintro ⟨k, rfl⟩; simp [pos_iff_ne_zero]
 
 namespace CanonicallyOrderedCommSemiring

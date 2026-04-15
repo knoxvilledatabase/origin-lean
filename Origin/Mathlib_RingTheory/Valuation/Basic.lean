@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Valuation/Basic.lean
-Genuine: 94 of 130 | Dissolved: 20 | Infrastructure: 16
+Genuine: 92 | Conflates: 2 | Dissolved: 20 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Basic
@@ -179,6 +179,7 @@ theorem map_pow : ∀ (x) (n : ℕ), v (x ^ n) = v x ^ n :=
 def toPreorder : Preorder R :=
   Preorder.lift v
 
+-- CONFLATES (assumes ground = zero): zero_iff
 theorem zero_iff [Nontrivial Γ₀] (v : Valuation K Γ₀) {x : K} : v x = 0 ↔ x = 0 :=
   map_eq_zero v
 
@@ -555,6 +556,7 @@ theorem ext {v₁ v₂ : AddValuation R Γ₀} (h : ∀ r, v₁ r = v₂ r) : v�
 def toPreorder : Preorder R :=
   Preorder.lift v
 
+-- CONFLATES (assumes ground = zero): top_iff
 @[simp]
 theorem top_iff [Nontrivial Γ₀] (v : AddValuation K Γ₀) {x : K} : v x = (⊤ : Γ₀) ↔ x = 0 :=
   v.zero_iff

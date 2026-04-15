@@ -1,6 +1,6 @@
 /-
 Extracted from Control/ULift.lean
-Genuine: 8 of 24 | Dissolved: 0 | Infrastructure: 16
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Init

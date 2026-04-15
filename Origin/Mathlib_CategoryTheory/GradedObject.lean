@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/GradedObject.lean
-Genuine: 50 of 63 | Dissolved: 0 | Infrastructure: 13
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Int

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Function.lean
-Genuine: 317 of 355 | Dissolved: 0 | Infrastructure: 38
+Genuine: 317 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Data.Set.Prod

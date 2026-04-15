@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Opposites.lean
-Genuine: 133 of 166 | Dissolved: 0 | Infrastructure: 33
+Genuine: 133 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Filtered

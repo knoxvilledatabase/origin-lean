@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Sieves.lean
-Genuine: 106 of 127 | Dissolved: 0 | Infrastructure: 21
+Genuine: 106 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice

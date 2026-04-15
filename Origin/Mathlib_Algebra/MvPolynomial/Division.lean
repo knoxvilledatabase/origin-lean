@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Division.lean
-Genuine: 28 of 32 | Dissolved: 2 | Infrastructure: 2
+Genuine: 26 | Conflates: 2 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Division
@@ -195,12 +195,14 @@ theorem monomial_dvd_monomial {r s : R} {i j : σ →₀ ℕ} :
     · refine ⟨monomial (j - i) d, ?_⟩
       rw [monomial_mul, add_tsub_cancel_of_le hij]
 
+-- CONFLATES (assumes ground = zero): monomial_one_dvd_monomial_one
 @[simp]
 theorem monomial_one_dvd_monomial_one [Nontrivial R] {i j : σ →₀ ℕ} :
     monomial i (1 : R) ∣ monomial j 1 ↔ i ≤ j := by
   rw [monomial_dvd_monomial]
   simp_rw [one_ne_zero, false_or, dvd_rfl, and_true]
 
+-- CONFLATES (assumes ground = zero): X_dvd_X
 @[simp]
 theorem X_dvd_X [Nontrivial R] {i j : σ} :
     (X i : MvPolynomial σ R) ∣ (X j : MvPolynomial σ R) ↔ i = j := by

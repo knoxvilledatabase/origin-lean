@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Basic.lean
-Genuine: 102 of 115 | Dissolved: 6 | Infrastructure: 7
+Genuine: 102 | Conflates: 0 | Dissolved: 6 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Spectrum

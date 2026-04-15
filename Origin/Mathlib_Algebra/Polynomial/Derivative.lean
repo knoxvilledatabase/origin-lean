@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Derivative.lean
-Genuine: 82 of 88 | Dissolved: 3 | Infrastructure: 3
+Genuine: 82 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom

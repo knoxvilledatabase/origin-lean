@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Shift/ShiftSequence.lean
-Genuine: 25 of 28 | Dissolved: 1 | Infrastructure: 2
+Genuine: 25 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Shift.Basic

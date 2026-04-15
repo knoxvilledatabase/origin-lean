@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/ContextFreeGrammar.lean
-Genuine: 50 of 51 | Dissolved: 0 | Infrastructure: 1
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Computability.Language

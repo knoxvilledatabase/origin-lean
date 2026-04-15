@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Contracting.lean
-Genuine: 40 of 41 | Dissolved: 1 | Infrastructure: 0
+Genuine: 40 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecificLimits.Basic

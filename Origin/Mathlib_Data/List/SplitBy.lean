@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/SplitBy.lean
-Genuine: 9 of 11 | Dissolved: 0 | Infrastructure: 2
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.List.Chain

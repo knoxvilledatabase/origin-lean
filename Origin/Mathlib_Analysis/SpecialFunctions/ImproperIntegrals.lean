@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/ImproperIntegrals.lean
-Genuine: 17 of 19 | Dissolved: 0 | Infrastructure: 2
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.JapaneseBracket

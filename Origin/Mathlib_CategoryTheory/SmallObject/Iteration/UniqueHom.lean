@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/SmallObject/Iteration/UniqueHom.lean
-Genuine: 14 of 16 | Dissolved: 0 | Infrastructure: 2
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.SmallObject.Iteration.Basic

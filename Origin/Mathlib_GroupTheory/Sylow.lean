@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Sylow.lean
-Genuine: 63 of 86 | Dissolved: 2 | Infrastructure: 21
+Genuine: 63 | Conflates: 0 | Dissolved: 2 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Data.SetLike.Fintype

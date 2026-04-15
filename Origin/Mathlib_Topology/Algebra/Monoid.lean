@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Monoid.lean
-Genuine: 87 of 110 | Dissolved: 0 | Infrastructure: 23
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finprod

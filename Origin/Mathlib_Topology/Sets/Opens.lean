@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sets/Opens.lean
-Genuine: 46 of 81 | Dissolved: 0 | Infrastructure: 35
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Order.Hom.CompleteLattice

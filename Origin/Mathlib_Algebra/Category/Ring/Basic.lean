@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Ring/Basic.lean
-Genuine: 40 of 140 | Dissolved: 0 | Infrastructure: 100
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 100
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic

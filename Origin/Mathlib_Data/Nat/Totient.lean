@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Totient.lean
-Genuine: 30 of 36 | Dissolved: 2 | Infrastructure: 4
+Genuine: 30 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Two

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Ring.lean
-Genuine: 4 of 9 | Dissolved: 0 | Infrastructure: 5
+Genuine: 3 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Germ.OrderedMonoid
@@ -18,6 +18,7 @@ universe u v
 
 variable {α : Type u} {β : Type v}
 
+-- CONFLATES (assumes ground = zero): EventuallyLE.mul_le_mul
 theorem EventuallyLE.mul_le_mul [MulZeroClass β] [PartialOrder β] [PosMulMono β] [MulPosMono β]
     {l : Filter α} {f₁ f₂ g₁ g₂ : α → β} (hf : f₁ ≤ᶠ[l] f₂) (hg : g₁ ≤ᶠ[l] g₂) (hg₀ : 0 ≤ᶠ[l] g₁)
     (hf₀ : 0 ≤ᶠ[l] f₂) : f₁ * g₁ ≤ᶠ[l] f₂ * g₂ := by

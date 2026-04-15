@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Young/SemistandardTableau.lean
-Genuine: 10 of 15 | Dissolved: 0 | Infrastructure: 5
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Young.YoungDiagram

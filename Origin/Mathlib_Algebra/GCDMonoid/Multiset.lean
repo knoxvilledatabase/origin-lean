@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GCDMonoid/Multiset.lean
-Genuine: 30 of 31 | Dissolved: 1 | Infrastructure: 0
+Genuine: 29 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Basic
@@ -65,6 +65,7 @@ theorem lcm_mono {s₁ s₂ : Multiset α} (h : s₁ ⊆ s₂) : s₁.lcm ∣ s�
 theorem normalize_lcm (s : Multiset α) : normalize s.lcm = s.lcm :=
   Multiset.induction_on s (by simp) fun a s _ ↦ by simp
 
+-- CONFLATES (assumes ground = zero): lcm_eq_zero_iff
 @[simp]
 nonrec theorem lcm_eq_zero_iff [Nontrivial α] (s : Multiset α) : s.lcm = 0 ↔ (0 : α) ∈ s := by
   induction s using Multiset.induction_on with

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Modular.lean
-Genuine: 32 of 35 | Dissolved: 0 | Infrastructure: 3
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic

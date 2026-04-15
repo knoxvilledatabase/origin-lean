@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/UniversallyClosed.lean
-Genuine: 7 of 18 | Dissolved: 0 | Infrastructure: 11
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion

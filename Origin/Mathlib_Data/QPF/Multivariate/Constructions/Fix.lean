@@ -1,6 +1,6 @@
 /-
 Extracted from Data/QPF/Multivariate/Constructions/Fix.lean
-Genuine: 27 of 29 | Dissolved: 0 | Infrastructure: 2
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.PFunctor.Multivariate.W

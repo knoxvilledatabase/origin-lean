@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/BoolRing.lean
-Genuine: 4 of 15 | Dissolved: 0 | Infrastructure: 11
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Ring.Basic

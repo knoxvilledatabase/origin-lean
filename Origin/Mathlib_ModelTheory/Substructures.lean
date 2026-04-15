@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Substructures.lean
-Genuine: 128 of 164 | Dissolved: 0 | Infrastructure: 36
+Genuine: 128 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Order

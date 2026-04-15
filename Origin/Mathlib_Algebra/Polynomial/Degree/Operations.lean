@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Operations.lean
-Genuine: 92 of 123 | Dissolved: 29 | Infrastructure: 2
+Genuine: 87 | Conflates: 5 | Dissolved: 29 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Coeff
@@ -40,14 +40,17 @@ theorem degree_lt_wf : WellFounded fun p q : R[X] => degree p < degree q :=
 instance : WellFoundedRelation R[X] :=
   ⟨_, degree_lt_wf⟩
 
+-- CONFLATES (assumes ground = zero): monic_of_subsingleton
 @[nontriviality]
 theorem monic_of_subsingleton [Subsingleton R] (p : R[X]) : Monic p :=
   Subsingleton.elim _ _
 
+-- CONFLATES (assumes ground = zero): degree_of_subsingleton
 @[nontriviality]
 theorem degree_of_subsingleton [Subsingleton R] : degree p = ⊥ := by
   rw [Subsingleton.elim p 0, degree_zero]
 
+-- CONFLATES (assumes ground = zero): natDegree_of_subsingleton
 @[nontriviality]
 theorem natDegree_of_subsingleton [Subsingleton R] : natDegree p = 0 := by
   rw [Subsingleton.elim p 0, natDegree_zero]
@@ -544,11 +547,13 @@ lemma degree_mul : degree (p * q) = degree p + degree q :=
     if hq0 : q = 0 then by simp only [hq0, degree_zero, mul_zero, WithBot.add_bot]
     else degree_mul' <| mul_ne_zero (mt leadingCoeff_eq_zero.1 hp0) (mt leadingCoeff_eq_zero.1 hq0)
 
+-- CONFLATES (assumes ground = zero): degreeMonoidHom
 def degreeMonoidHom [Nontrivial R] : R[X] →* Multiplicative (WithBot ℕ) where
   toFun := degree
   map_one' := degree_one
   map_mul' _ _ := degree_mul
 
+-- CONFLATES (assumes ground = zero): degree_pow
 @[simp]
 lemma degree_pow [Nontrivial R] (p : R[X]) (n : ℕ) : degree (p ^ n) = n • degree p :=
   map_pow (@degreeMonoidHom R _ _ _) _ _

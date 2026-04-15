@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Multiplicity.lean
-Genuine: 2 of 8 | Dissolved: 6 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Multiplicity

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/AlgebraTower.lean
-Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
+Genuine: 15 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -165,6 +165,7 @@ variable {R S}
 
 variable [CommRing R] [Ring S] [Algebra R S]
 
+-- CONFLATES (assumes ground = zero): Basis.algebraMap_injective
 theorem Basis.algebraMap_injective {ι : Type*} [NoZeroDivisors R] [Nontrivial S]
     (b : @Basis ι R S _ _ Algebra.toModule) : Function.Injective (algebraMap R S) :=
   have : NoZeroSMulDivisors R S := b.noZeroSMulDivisors

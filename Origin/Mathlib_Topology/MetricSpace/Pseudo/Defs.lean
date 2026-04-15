@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Pseudo/Defs.lean
-Genuine: 191 of 217 | Dissolved: 2 | Infrastructure: 24
+Genuine: 191 | Conflates: 0 | Dissolved: 2 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Real

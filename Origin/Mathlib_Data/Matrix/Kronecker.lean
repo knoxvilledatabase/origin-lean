@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Kronecker.lean
-Genuine: 65 of 69 | Dissolved: 1 | Infrastructure: 3
+Genuine: 60 | Conflates: 5 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basic
@@ -237,9 +237,11 @@ def kroneckerBilinear [CommSemiring R] [Semiring α] [Algebra R α] :
 /-! What follows is a copy, in order, of every `Matrix.kroneckerMap` lemma above that has
 hypotheses which can be filled by properties of `*`. -/
 
+-- CONFLATES (assumes ground = zero): zero_kronecker
 theorem zero_kronecker [MulZeroClass α] (B : Matrix n p α) : (0 : Matrix l m α) ⊗ₖ B = 0 :=
   kroneckerMap_zero_left _ zero_mul B
 
+-- CONFLATES (assumes ground = zero): kronecker_zero
 theorem kronecker_zero [MulZeroClass α] (A : Matrix l m α) : A ⊗ₖ (0 : Matrix n p α) = 0 :=
   kroneckerMap_zero_right _ mul_zero A
 
@@ -259,14 +261,17 @@ theorem kronecker_smul [Monoid R] [Monoid α] [MulAction R α] [SMulCommClass R 
     (A : Matrix l m α) (B : Matrix n p α) : A ⊗ₖ (r • B) = r • A ⊗ₖ B :=
   kroneckerMap_smul_right _ _ (fun _ _ => mul_smul_comm _ _ _) _ _
 
+-- CONFLATES (assumes ground = zero): diagonal_kronecker_diagonal
 theorem diagonal_kronecker_diagonal [MulZeroClass α] [DecidableEq m] [DecidableEq n] (a : m → α)
     (b : n → α) : diagonal a ⊗ₖ diagonal b = diagonal fun mn => a mn.1 * b mn.2 :=
   kroneckerMap_diagonal_diagonal _ zero_mul mul_zero _ _
 
+-- CONFLATES (assumes ground = zero): kronecker_diagonal
 theorem kronecker_diagonal [MulZeroClass α] [DecidableEq n] (A : Matrix l m α) (b : n → α) :
     A ⊗ₖ diagonal b = blockDiagonal fun i => A <• b i :=
   kroneckerMap_diagonal_right _ mul_zero _ _
 
+-- CONFLATES (assumes ground = zero): diagonal_kronecker
 theorem diagonal_kronecker [MulZeroClass α] [DecidableEq l] (a : l → α) (B : Matrix m n α) :
     diagonal a ⊗ₖ B =
       Matrix.reindex (Equiv.prodComm _ _) (Equiv.prodComm _ _) (blockDiagonal fun i => a i • B) :=

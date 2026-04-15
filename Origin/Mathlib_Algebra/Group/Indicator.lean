@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Indicator.lean
-Genuine: 63 of 65 | Dissolved: 2 | Infrastructure: 0
+Genuine: 63 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Lemmas

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Prod/Lex.lean
-Genuine: 4 of 26 | Dissolved: 0 | Infrastructure: 22
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Data.Prod.Basic

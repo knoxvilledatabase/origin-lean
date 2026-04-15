@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Tietze.lean
-Genuine: 4 of 9 | Dissolved: 0 | Infrastructure: 5
+Genuine: 3 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Basic
@@ -24,6 +24,7 @@ There are two main results here:
 
 universe u u₁ v w
 
+-- CONFLATES (assumes ground = zero): TietzeExtension.of_tvs
 theorem TietzeExtension.of_tvs (𝕜 : Type v) [NontriviallyNormedField 𝕜] {E : Type w}
     [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E] [TopologicalAddGroup E] [ContinuousSMul 𝕜 E]
     [T2Space E] [FiniteDimensional 𝕜 E] [CompleteSpace 𝕜] [TietzeExtension.{u, v} 𝕜] :

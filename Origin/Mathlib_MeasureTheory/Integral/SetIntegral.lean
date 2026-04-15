@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/SetIntegral.lean
-Genuine: 135 of 145 | Dissolved: 2 | Infrastructure: 8
+Genuine: 135 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntegrableOn

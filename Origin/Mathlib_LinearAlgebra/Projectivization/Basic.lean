@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Basic.lean
-Genuine: 15 of 30 | Dissolved: 13 | Infrastructure: 2
+Genuine: 15 | Conflates: 0 | Dissolved: 13 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition

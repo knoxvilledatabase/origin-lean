@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Basic.lean
-Genuine: 96 of 146 | Dissolved: 0 | Infrastructure: 50
+Genuine: 96 | Conflates: 0 | Dissolved: 0 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Init

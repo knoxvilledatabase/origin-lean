@@ -1,6 +1,6 @@
 /-
 Extracted from RepresentationTheory/Rep.lean
-Genuine: 46 of 80 | Dissolved: 0 | Infrastructure: 34
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Adjunctions

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ENat/Basic.lean
-Genuine: 53 of 96 | Dissolved: 10 | Infrastructure: 33
+Genuine: 53 | Conflates: 0 | Dissolved: 10 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas

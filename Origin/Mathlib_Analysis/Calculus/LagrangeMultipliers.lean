@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/LagrangeMultipliers.lean
-Genuine: 2 of 5 | Dissolved: 3 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Prod

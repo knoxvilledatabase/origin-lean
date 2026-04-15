@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/ChosenFiniteProducts.lean
-Genuine: 61 of 76 | Dissolved: 0 | Infrastructure: 15
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.OfChosenFiniteProducts.Symmetric

@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Equiv/Defs.lean
-Genuine: 146 of 194 | Dissolved: 0 | Infrastructure: 48
+Genuine: 146 | Conflates: 0 | Dissolved: 0 | Infrastructure: 48
 -/
 import Origin.Core
 import Mathlib.Data.FunLike.Equiv

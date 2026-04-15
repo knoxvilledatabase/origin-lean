@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/HomCompletion.lean
-Genuine: 20 of 24 | Dissolved: 0 | Infrastructure: 4
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Hom

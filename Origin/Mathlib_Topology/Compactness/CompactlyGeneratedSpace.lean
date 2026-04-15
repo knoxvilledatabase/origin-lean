@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactness/CompactlyGeneratedSpace.lean
-Genuine: 24 of 31 | Dissolved: 0 | Infrastructure: 7
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Topology.Category.CompHaus.Basic

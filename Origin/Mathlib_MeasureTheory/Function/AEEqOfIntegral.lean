@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/AEEqOfIntegral.lean
-Genuine: 29 of 32 | Dissolved: 2 | Infrastructure: 1
+Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic

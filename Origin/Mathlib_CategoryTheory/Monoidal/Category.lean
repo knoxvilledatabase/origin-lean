@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Category.lean
-Genuine: 102 of 138 | Dissolved: 0 | Infrastructure: 36
+Genuine: 102 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EqToHom

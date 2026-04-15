@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/InitTail.lean
-Genuine: 17 of 18 | Dissolved: 0 | Infrastructure: 1
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Roots.lean
-Genuine: 78 of 116 | Dissolved: 36 | Infrastructure: 2
+Genuine: 78 | Conflates: 0 | Dissolved: 36 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.BigOperators

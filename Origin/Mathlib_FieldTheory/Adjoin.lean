@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Adjoin.lean
-Genuine: 195 of 244 | Dissolved: 9 | Infrastructure: 40
+Genuine: 195 | Conflates: 0 | Dissolved: 9 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Directed

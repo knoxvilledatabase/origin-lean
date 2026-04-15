@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/NumDen.lean
-Genuine: 13 of 18 | Dissolved: 4 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.FractionRing

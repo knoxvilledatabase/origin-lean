@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Process/Stopping.lean
-Genuine: 98 of 106 | Dissolved: 0 | Infrastructure: 8
+Genuine: 98 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Probability.Process.Adapted

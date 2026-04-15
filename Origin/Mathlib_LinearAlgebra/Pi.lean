@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Pi.lean
-Genuine: 53 of 78 | Dissolved: 0 | Infrastructure: 25
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Fin.Tuple

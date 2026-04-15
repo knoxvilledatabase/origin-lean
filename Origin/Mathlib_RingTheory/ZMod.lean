@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/ZMod.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Squarefree.Basic

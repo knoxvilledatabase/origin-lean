@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/AbsoluteValue.lean
-Genuine: 40 of 61 | Dissolved: 7 | Infrastructure: 14
+Genuine: 37 | Conflates: 3 | Dissolved: 7 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
@@ -310,12 +310,15 @@ variable {R : Type*} [Semiring R] (abv : R → S) [IsAbsoluteValue abv]
 
 variable [IsDomain S]
 
+-- CONFLATES (assumes ground = zero): abv_one
 theorem abv_one [Nontrivial R] : abv 1 = 1 :=
   (toAbsoluteValue abv).map_one
 
+-- CONFLATES (assumes ground = zero): abvHom
 def abvHom [Nontrivial R] : R →*₀ S :=
   (toAbsoluteValue abv).toMonoidWithZeroHom
 
+-- CONFLATES (assumes ground = zero): abv_pow
 theorem abv_pow [Nontrivial R] (abv : R → S) [IsAbsoluteValue abv] (a : R) (n : ℕ) :
     abv (a ^ n) = abv a ^ n :=
   (toAbsoluteValue abv).map_pow a n

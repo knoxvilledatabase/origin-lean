@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Unbundled/Rat.lean
-Genuine: 19 of 31 | Dissolved: 0 | Infrastructure: 12
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Abs

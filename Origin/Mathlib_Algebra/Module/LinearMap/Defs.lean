@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/LinearMap/Defs.lean
-Genuine: 69 of 138 | Dissolved: 0 | Infrastructure: 69
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 69
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Instances

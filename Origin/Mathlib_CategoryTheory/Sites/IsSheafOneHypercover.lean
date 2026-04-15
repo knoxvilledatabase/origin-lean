@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/IsSheafOneHypercover.lean
-Genuine: 11 of 12 | Dissolved: 0 | Infrastructure: 1
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.OneHypercover

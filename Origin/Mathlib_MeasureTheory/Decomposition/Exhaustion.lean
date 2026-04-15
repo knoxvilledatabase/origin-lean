@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Decomposition/Exhaustion.lean
-Genuine: 21 of 27 | Dissolved: 3 | Infrastructure: 3
+Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses

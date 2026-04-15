@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/IsTerminal.lean
-Genuine: 54 of 54 | Dissolved: 0 | Infrastructure: 0
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.PEmpty

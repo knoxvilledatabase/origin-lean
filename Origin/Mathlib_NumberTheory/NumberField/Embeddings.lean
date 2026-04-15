@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Embeddings.lean
-Genuine: 116 of 148 | Dissolved: 5 | Infrastructure: 27
+Genuine: 116 | Conflates: 0 | Dissolved: 5 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Hom.Rat

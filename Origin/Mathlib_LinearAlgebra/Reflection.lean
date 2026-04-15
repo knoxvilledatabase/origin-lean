@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Reflection.lean
-Genuine: 15 of 18 | Dissolved: 2 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LinearMap.Basic

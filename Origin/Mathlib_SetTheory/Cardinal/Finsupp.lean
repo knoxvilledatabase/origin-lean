@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Finsupp.lean
-Genuine: 6 of 11 | Dissolved: 0 | Infrastructure: 5
+Genuine: 5 | Conflates: 2 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Arithmetic
@@ -21,6 +21,7 @@ theorem mk_finsupp_lift_of_fintype (α : Type u) (β : Type v) [Fintype α] [Zer
 theorem mk_finsupp_of_fintype (α β : Type u) [Fintype α] [Zero β] :
     #(α →₀ β) = #β ^ Fintype.card α := by simp
 
+-- CONFLATES (assumes ground = zero): mk_finsupp_lift_of_infinite
 @[simp]
 theorem mk_finsupp_lift_of_infinite (α : Type u) (β : Type v) [Infinite α] [Zero β] [Nontrivial β] :
     #(α →₀ β) = max (lift.{v} #α) (lift.{u} #β) := by
@@ -37,6 +38,7 @@ theorem mk_finsupp_lift_of_infinite (α : Type u) (β : Type v) [Infinite α] [Z
     · inhabit α
       exact lift_mk_le.{u}.2 ⟨⟨_, Finsupp.single_injective default⟩⟩
 
+-- CONFLATES (assumes ground = zero): mk_finsupp_of_infinite
 theorem mk_finsupp_of_infinite (α β : Type u) [Infinite α] [Zero β] [Nontrivial β] :
     #(α →₀ β) = max #α #β := by simp
 

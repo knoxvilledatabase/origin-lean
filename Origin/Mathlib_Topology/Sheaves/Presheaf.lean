@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sheaves/Presheaf.lean
-Genuine: 22 of 32 | Dissolved: 0 | Infrastructure: 10
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Topology.Category.TopCat.Opens

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/BddDistLat.lean
-Genuine: 6 of 17 | Dissolved: 0 | Infrastructure: 11
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Order.Category.BddLat

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/VanKampen.lean
-Genuine: 37 of 39 | Dissolved: 0 | Infrastructure: 2
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful

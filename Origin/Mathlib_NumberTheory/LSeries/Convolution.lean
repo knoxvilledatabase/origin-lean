@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/Convolution.lean
-Genuine: 16 of 18 | Dissolved: 2 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic

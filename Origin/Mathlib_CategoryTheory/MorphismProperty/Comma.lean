@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/MorphismProperty/Comma.lean
-Genuine: 34 of 55 | Dissolved: 0 | Infrastructure: 21
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.Over

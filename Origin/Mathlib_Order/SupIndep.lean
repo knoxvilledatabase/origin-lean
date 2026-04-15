@@ -1,6 +1,6 @@
 /-
 Extracted from Order/SupIndep.lean
-Genuine: 51 of 54 | Dissolved: 0 | Infrastructure: 3
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Sigma

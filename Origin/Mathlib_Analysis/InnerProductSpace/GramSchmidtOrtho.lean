@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/GramSchmidtOrtho.lean
-Genuine: 30 of 36 | Dissolved: 6 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2

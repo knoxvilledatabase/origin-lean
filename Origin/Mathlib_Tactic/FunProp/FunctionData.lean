@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/FunProp/FunctionData.lean
-Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
+Genuine: 15 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Qq
@@ -180,6 +180,7 @@ def FunctionData.peeloffArgDecomposition (fData : FunctionData) : MetaM (Option 
     let f' := Expr.lam `f (← inferType gBody') (.app (.bvar 0) (yₙ.expr)) default
     return (f',g')
 
+-- CONFLATES (assumes ground = zero): FunctionData.nontrivialDecomposition
 def FunctionData.nontrivialDecomposition (fData : FunctionData) : MetaM (Option (Expr × Expr)) := do
 
     let mut lctx := fData.lctx

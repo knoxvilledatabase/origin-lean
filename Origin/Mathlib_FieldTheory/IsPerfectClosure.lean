@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsPerfectClosure.lean
-Genuine: 62 of 71 | Dissolved: 0 | Infrastructure: 9
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.FieldTheory.PurelyInseparable

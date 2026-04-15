@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Hermite/Basic.lean
-Genuine: 16 of 17 | Dissolved: 0 | Infrastructure: 1
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Derivative

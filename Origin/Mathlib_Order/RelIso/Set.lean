@@ -1,6 +1,6 @@
 /-
 Extracted from Order/RelIso/Set.lean
-Genuine: 9 of 19 | Dissolved: 0 | Infrastructure: 10
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Order.RelIso.Basic

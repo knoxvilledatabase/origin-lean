@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Martingale/Basic.lean
-Genuine: 64 of 64 | Dissolved: 0 | Infrastructure: 0
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Probability.Notation

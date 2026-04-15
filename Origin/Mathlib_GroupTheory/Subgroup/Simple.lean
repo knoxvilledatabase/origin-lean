@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Subgroup/Simple.lean
-Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
+Genuine: 1 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Atoms
@@ -29,10 +29,12 @@ section
 
 variable (G) (A)
 
+-- CONFLATES (assumes ground = zero): IsSimpleGroup
 class IsSimpleGroup extends Nontrivial G : Prop where
   /-- Any normal subgroup is either `⊥` or `⊤` -/
   eq_bot_or_eq_top_of_normal : ∀ H : Subgroup G, H.Normal → H = ⊥ ∨ H = ⊤
 
+-- CONFLATES (assumes ground = zero): IsSimpleAddGroup
 class IsSimpleAddGroup extends Nontrivial A : Prop where
   /-- Any normal additive subgroup is either `⊥` or `⊤` -/
   eq_bot_or_eq_top_of_normal : ∀ H : AddSubgroup A, H.Normal → H = ⊥ ∨ H = ⊤
@@ -54,6 +56,7 @@ instance {C : Type*} [CommGroup C] [IsSimpleGroup C] : IsSimpleOrder (Subgroup C
 
 open Subgroup
 
+-- CONFLATES (assumes ground = zero): isSimpleGroup_of_surjective
 @[to_additive]
 theorem isSimpleGroup_of_surjective {H : Type*} [Group H] [IsSimpleGroup G] [Nontrivial H]
     (f : G →* H) (hf : Function.Surjective f) : IsSimpleGroup H :=

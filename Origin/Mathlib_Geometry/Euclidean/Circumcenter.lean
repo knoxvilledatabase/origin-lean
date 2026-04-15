@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Circumcenter.lean
-Genuine: 60 of 67 | Dissolved: 0 | Infrastructure: 7
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Sphere.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subring/Basic.lean
-Genuine: 112 of 163 | Dissolved: 0 | Infrastructure: 51
+Genuine: 112 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs

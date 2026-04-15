@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gaussian/FourierTransform.lean
-Genuine: 24 of 25 | Dissolved: 1 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral

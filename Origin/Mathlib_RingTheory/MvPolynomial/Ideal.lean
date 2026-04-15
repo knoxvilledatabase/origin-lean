@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/Ideal.lean
-Genuine: 2 of 3 | Dissolved: 1 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Ideal

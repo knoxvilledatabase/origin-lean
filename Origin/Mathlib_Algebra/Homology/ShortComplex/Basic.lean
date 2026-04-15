@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ShortComplex/Basic.lean
-Genuine: 27 of 47 | Dissolved: 0 | Infrastructure: 20
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero

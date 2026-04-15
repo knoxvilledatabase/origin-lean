@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Dirac.lean
-Genuine: 27 of 32 | Dissolved: 1 | Infrastructure: 4
+Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses

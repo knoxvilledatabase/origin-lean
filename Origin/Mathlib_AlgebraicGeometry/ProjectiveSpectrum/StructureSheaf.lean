@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/ProjectiveSpectrum/StructureSheaf.lean
-Genuine: 27 of 36 | Dissolved: 0 | Infrastructure: 9
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Topology

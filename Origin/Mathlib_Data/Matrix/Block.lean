@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Block.lean
-Genuine: 94 of 121 | Dissolved: 0 | Infrastructure: 27
+Genuine: 94 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.ConjTranspose

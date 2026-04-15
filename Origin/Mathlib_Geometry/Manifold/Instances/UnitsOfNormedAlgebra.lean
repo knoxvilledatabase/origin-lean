@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Instances/UnitsOfNormedAlgebra.lean
-Genuine: 1 of 6 | Dissolved: 0 | Infrastructure: 5
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.LieGroup

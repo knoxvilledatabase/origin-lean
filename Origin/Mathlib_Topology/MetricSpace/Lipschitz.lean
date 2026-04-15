@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Lipschitz.lean
-Genuine: 48 of 52 | Dissolved: 2 | Infrastructure: 2
+Genuine: 48 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.ProjIcc

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/LocalCohomology.lean
-Genuine: 17 of 22 | Dissolved: 0 | Infrastructure: 5
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Colimits

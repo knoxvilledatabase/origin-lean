@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Galois/Topology.lean
-Genuine: 8 of 20 | Dissolved: 0 | Infrastructure: 12
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Galois.Prorepresentability

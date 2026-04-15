@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/PrimeSpectrum/Basic.lean
-Genuine: 111 of 125 | Dissolved: 0 | Infrastructure: 14
+Genuine: 111 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.RingTheory.Finiteness.Ideal

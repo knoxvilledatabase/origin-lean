@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subgroup/Lattice.lean
-Genuine: 56 of 78 | Dissolved: 4 | Infrastructure: 18
+Genuine: 54 | Conflates: 2 | Dissolved: 4 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations
@@ -157,11 +157,13 @@ theorem coe_eq_singleton {H : Subgroup G} : (∃ g : G, (H : Set G) = {g}) ↔ H
 
 -- DISSOLVED: exists_ne_one_of_nontrivial
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_ne_bot
 @[to_additive]
 theorem nontrivial_iff_ne_bot (H : Subgroup G) : Nontrivial H ↔ H ≠ ⊥ := by
   rw [nontrivial_iff_exists_ne_one, ne_eq, eq_bot_iff_forall]
   simp only [ne_eq, not_forall, exists_prop]
 
+-- CONFLATES (assumes ground = zero): bot_or_nontrivial
 @[to_additive "A subgroup is either the trivial subgroup or nontrivial."]
 theorem bot_or_nontrivial (H : Subgroup G) : H = ⊥ ∨ Nontrivial H := by
   have := nontrivial_iff_ne_bot H

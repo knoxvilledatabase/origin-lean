@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Lebesgue/EqHaar.lean
-Genuine: 36 of 57 | Dissolved: 17 | Infrastructure: 4
+Genuine: 32 | Conflates: 4 | Dissolved: 17 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional
@@ -326,6 +326,7 @@ theorem addHaar_ball_of_pos (x : E) {r : ℝ} (hr : 0 < r) :
     μ (ball x r) = ENNReal.ofReal (r ^ finrank ℝ E) * μ (ball 0 1) := by
   rw [← addHaar_ball_mul_of_pos μ x hr, mul_one]
 
+-- CONFLATES (assumes ground = zero): addHaar_ball_mul
 theorem addHaar_ball_mul [Nontrivial E] (x : E) {r : ℝ} (hr : 0 ≤ r) (s : ℝ) :
     μ (ball x (r * s)) = ENNReal.ofReal (r ^ finrank ℝ E) * μ (ball 0 s) := by
   rcases hr.eq_or_lt with (rfl | h)
@@ -333,6 +334,7 @@ theorem addHaar_ball_mul [Nontrivial E] (x : E) {r : ℝ} (hr : 0 ≤ r) (s : �
       ENNReal.ofReal_zero, ball_zero]
   · exact addHaar_ball_mul_of_pos μ x h s
 
+-- CONFLATES (assumes ground = zero): addHaar_ball
 theorem addHaar_ball [Nontrivial E] (x : E) {r : ℝ} (hr : 0 ≤ r) :
     μ (ball x r) = ENNReal.ofReal (r ^ finrank ℝ E) * μ (ball 0 1) := by
   rw [← addHaar_ball_mul μ x hr, mul_one]
@@ -372,6 +374,7 @@ theorem addHaar_closedBall (x : E) {r : ℝ} (hr : 0 ≤ r) :
     μ (closedBall x r) = ENNReal.ofReal (r ^ finrank ℝ E) * μ (ball 0 1) := by
   rw [addHaar_closedBall' μ x hr, addHaar_closed_unit_ball_eq_addHaar_unit_ball]
 
+-- CONFLATES (assumes ground = zero): addHaar_closedBall_eq_addHaar_ball
 theorem addHaar_closedBall_eq_addHaar_ball [Nontrivial E] (x : E) (r : ℝ) :
     μ (closedBall x r) = μ (ball x r) := by
   by_cases h : r < 0
@@ -381,6 +384,7 @@ theorem addHaar_closedBall_eq_addHaar_ball [Nontrivial E] (x : E) (r : ℝ) :
 
 -- DISSOLVED: addHaar_sphere_of_ne_zero
 
+-- CONFLATES (assumes ground = zero): addHaar_sphere
 theorem addHaar_sphere [Nontrivial E] (x : E) (r : ℝ) : μ (sphere x r) = 0 := by
   rcases eq_or_ne r 0 with (rfl | h)
   · rw [sphere_zero, measure_singleton]

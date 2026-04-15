@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/Basic.lean
-Genuine: 37 of 41 | Dissolved: 4 | Infrastructure: 0
+Genuine: 37 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Basic

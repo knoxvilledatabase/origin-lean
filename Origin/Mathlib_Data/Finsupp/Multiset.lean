@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Multiset.lean
-Genuine: 32 of 42 | Dissolved: 0 | Infrastructure: 10
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Basic

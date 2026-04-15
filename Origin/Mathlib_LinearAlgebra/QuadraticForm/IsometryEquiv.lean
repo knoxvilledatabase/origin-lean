@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/QuadraticForm/IsometryEquiv.lean
-Genuine: 13 of 19 | Dissolved: 0 | Infrastructure: 6
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.QuadraticForm.Basic

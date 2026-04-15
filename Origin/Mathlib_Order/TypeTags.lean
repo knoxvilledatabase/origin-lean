@@ -1,6 +1,6 @@
 /-
 Extracted from Order/TypeTags.lean
-Genuine: 4 of 18 | Dissolved: 2 | Infrastructure: 12
+Genuine: 4 | Conflates: 0 | Dissolved: 2 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Order.Notation

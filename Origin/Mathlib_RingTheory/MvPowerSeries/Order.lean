@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Order.lean
-Genuine: 31 of 44 | Dissolved: 12 | Infrastructure: 1
+Genuine: 31 | Conflates: 0 | Dissolved: 12 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.ENat.Basic

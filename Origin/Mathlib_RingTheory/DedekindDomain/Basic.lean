@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/Basic.lean
-Genuine: 9 of 13 | Dissolved: 0 | Infrastructure: 4
+Genuine: 8 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Over
@@ -63,6 +63,7 @@ instance DimensionLEOne.principal_ideal_ring [IsDomain A] [IsPrincipalIdealRing 
   maximalOfPrime := fun nonzero _ =>
     IsPrime.to_maximal_ideal nonzero
 
+-- CONFLATES (assumes ground = zero): DimensionLEOne.isIntegralClosure
 theorem DimensionLEOne.isIntegralClosure (B : Type*) [CommRing B] [IsDomain B] [Nontrivial R]
     [Algebra R A] [Algebra R B] [Algebra B A] [IsScalarTower R B A] [IsIntegralClosure B R A]
     [DimensionLEOne R] : DimensionLEOne B where

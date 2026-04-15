@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Fourier/AddCircle.lean
-Genuine: 42 of 51 | Dissolved: 5 | Infrastructure: 4
+Genuine: 42 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv

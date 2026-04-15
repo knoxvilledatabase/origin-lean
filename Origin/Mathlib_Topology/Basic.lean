@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Basic.lean
-Genuine: 320 of 341 | Dissolved: 0 | Infrastructure: 21
+Genuine: 320 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Lift

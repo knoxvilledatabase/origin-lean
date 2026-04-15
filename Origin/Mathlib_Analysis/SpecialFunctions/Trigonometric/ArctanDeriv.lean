@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/ArctanDeriv.lean
-Genuine: 30 of 35 | Dissolved: 5 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/DifferentialObject.lean
-Genuine: 13 of 27 | Dissolved: 0 | Infrastructure: 14
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic

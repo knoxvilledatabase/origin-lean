@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Quot.lean
-Genuine: 86 of 133 | Dissolved: 0 | Infrastructure: 47
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 47
 -/
 import Origin.Core
 import Mathlib.Logic.Relation

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/SetLike/Basic.lean
-Genuine: 24 of 34 | Dissolved: 0 | Infrastructure: 10
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Tactic.Monotonicity.Attr

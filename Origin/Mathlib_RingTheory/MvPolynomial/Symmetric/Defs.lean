@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/Symmetric/Defs.lean
-Genuine: 55 of 57 | Dissolved: 1 | Infrastructure: 1
+Genuine: 51 | Conflates: 4 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
@@ -222,6 +222,7 @@ theorem esymm_isSymmetric (n : ℕ) : IsSymmetric (esymm σ R n) := by
   intro
   rw [rename_esymm]
 
+-- CONFLATES (assumes ground = zero): support_esymm''
 theorem support_esymm'' [DecidableEq σ] [Nontrivial R] (n : ℕ) :
     (esymm σ R n).support =
       (powersetCard n (univ : Finset σ)).biUnion fun t =>
@@ -246,6 +247,7 @@ theorem support_esymm'' [DecidableEq σ] [Nontrivial R] (n : ℕ) :
       exact absurd this hst.symm
   all_goals intro x y; simp [Finsupp.support_single_disjoint]
 
+-- CONFLATES (assumes ground = zero): support_esymm'
 theorem support_esymm' [DecidableEq σ] [Nontrivial R] (n : ℕ) : (esymm σ R n).support =
     (powersetCard n (univ : Finset σ)).biUnion fun t => {∑ i ∈ t, Finsupp.single i 1} := by
   rw [support_esymm'']
@@ -253,11 +255,13 @@ theorem support_esymm' [DecidableEq σ] [Nontrivial R] (n : ℕ) : (esymm σ R n
   funext
   exact Finsupp.support_single_ne_zero _ one_ne_zero
 
+-- CONFLATES (assumes ground = zero): support_esymm
 theorem support_esymm [DecidableEq σ] [Nontrivial R] (n : ℕ) : (esymm σ R n).support =
     (powersetCard n (univ : Finset σ)).image fun t => ∑ i ∈ t, Finsupp.single i 1 := by
   rw [support_esymm']
   exact biUnion_singleton
 
+-- CONFLATES (assumes ground = zero): degrees_esymm
 theorem degrees_esymm [Nontrivial R] {n : ℕ} (hpos : 0 < n) (hn : n ≤ Fintype.card σ) :
     (esymm σ R n).degrees = (univ : Finset σ).val := by
   classical

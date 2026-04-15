@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/ContinuousFunctionalCalculus/ExpLog.lean
-Genuine: 14 of 14 | Dissolved: 0 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Algebra.Spectrum

@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Group.lean
-Genuine: 43 of 57 | Dissolved: 4 | Infrastructure: 10
+Genuine: 43 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.Jacobian

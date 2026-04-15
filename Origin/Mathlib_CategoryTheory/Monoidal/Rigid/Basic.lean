@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Rigid/Basic.lean
-Genuine: 51 of 58 | Dissolved: 0 | Infrastructure: 7
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Monoidal.Basic

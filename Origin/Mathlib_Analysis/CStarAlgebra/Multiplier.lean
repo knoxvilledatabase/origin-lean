@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/Multiplier.lean
-Genuine: 18 of 86 | Dissolved: 0 | Infrastructure: 68
+Genuine: 16 | Conflates: 2 | Dissolved: 0 | Infrastructure: 68
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Completeness
@@ -57,6 +57,7 @@ open NNReal ENNReal ContinuousLinearMap MulOpposite
 
 universe u v
 
+-- CONFLATES (assumes ground = zero): DoubleCentralizer
 structure DoubleCentralizer (𝕜 : Type u) (A : Type v) [NontriviallyNormedField 𝕜]
     [NonUnitalNormedRing A] [NormedSpace 𝕜 A] [SMulCommClass 𝕜 A A] [IsScalarTower 𝕜 A A] extends
     (A →L[𝕜] A) × (A →L[𝕜] A) where
@@ -67,6 +68,7 @@ scoped[MultiplierAlgebra] notation "𝓜(" 𝕜 ", " A ")" => DoubleCentralizer 
 
 open MultiplierAlgebra
 
+-- CONFLATES (assumes ground = zero): DoubleCentralizer.ext
 @[ext]
 lemma DoubleCentralizer.ext (𝕜 : Type u) (A : Type v) [NontriviallyNormedField 𝕜]
     [NonUnitalNormedRing A] [NormedSpace 𝕜 A] [SMulCommClass 𝕜 A A] [IsScalarTower 𝕜 A A]

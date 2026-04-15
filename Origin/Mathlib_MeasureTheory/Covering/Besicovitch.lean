@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Covering/Besicovitch.lean
-Genuine: 27 of 31 | Dissolved: 1 | Infrastructure: 3
+Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Covering.Differentiation

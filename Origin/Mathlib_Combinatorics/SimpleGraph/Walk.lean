@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Walk.lean
-Genuine: 180 of 215 | Dissolved: 1 | Infrastructure: 34
+Genuine: 180 | Conflates: 0 | Dissolved: 1 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Maps

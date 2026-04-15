@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/PiTensorProduct/InjectiveSeminorm.lean
-Genuine: 32 of 34 | Dissolved: 0 | Infrastructure: 2
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.PiTensorProduct.ProjectiveSeminorm

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Bound.lean
-Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
+Genuine: 10 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Aesop
@@ -107,6 +107,7 @@ lemma mul_lt_mul_right_of_pos_of_lt {α : Type} {a b c : α} [Mul α] [Zero α] 
     [MulPosStrictMono α] [MulPosReflectLT α] (c0 : 0 < c) : a < b → a * c < b * c :=
   (mul_lt_mul_right c0).mpr
 
+-- CONFLATES (assumes ground = zero): Nat.cast_pos_of_pos
 lemma Nat.cast_pos_of_pos {R : Type} [OrderedSemiring R] [Nontrivial R] {n : ℕ} :
     0 < n → 0 < (n : R) :=
   Nat.cast_pos.mpr

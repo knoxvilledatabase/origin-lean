@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/GeneralLinearGroup/Defs.lean
-Genuine: 24 of 44 | Dissolved: 2 | Infrastructure: 18
+Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse

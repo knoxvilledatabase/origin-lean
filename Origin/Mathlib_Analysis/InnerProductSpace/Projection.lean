@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Projection.lean
-Genuine: 97 of 110 | Dissolved: 1 | Infrastructure: 12
+Genuine: 97 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Basic

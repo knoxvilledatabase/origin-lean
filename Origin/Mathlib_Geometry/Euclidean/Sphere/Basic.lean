@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Sphere/Basic.lean
-Genuine: 31 of 44 | Dissolved: 0 | Infrastructure: 13
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.StrictConvexBetween

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/SpecialLinearGroup.lean
-Genuine: 33 of 64 | Dissolved: 3 | Infrastructure: 28
+Genuine: 33 | Conflates: 0 | Dissolved: 3 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Adjugate

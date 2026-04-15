@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Operations.lean
-Genuine: 83 of 102 | Dissolved: 2 | Infrastructure: 17
+Genuine: 83 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Bilinear

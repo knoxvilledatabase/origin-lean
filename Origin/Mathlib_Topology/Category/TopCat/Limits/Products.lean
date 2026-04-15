@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/TopCat/Limits/Products.lean
-Genuine: 33 of 33 | Dissolved: 0 | Infrastructure: 0
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.Category.TopCat.EpiMono

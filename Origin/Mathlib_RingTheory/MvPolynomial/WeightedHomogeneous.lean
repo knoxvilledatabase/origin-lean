@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/WeightedHomogeneous.lean
-Genuine: 52 of 59 | Dissolved: 5 | Infrastructure: 2
+Genuine: 52 | Conflates: 0 | Dissolved: 5 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finprod

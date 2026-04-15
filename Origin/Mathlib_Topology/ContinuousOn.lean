@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousOn.lean
-Genuine: 240 of 265 | Dissolved: 0 | Infrastructure: 25
+Genuine: 240 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Indicator

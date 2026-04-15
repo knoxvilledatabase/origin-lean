@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/Matrix.lean
-Genuine: 55 of 66 | Dissolved: 0 | Infrastructure: 11
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Basic

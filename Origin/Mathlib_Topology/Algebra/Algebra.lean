@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Algebra.lean
-Genuine: 58 of 107 | Dissolved: 0 | Infrastructure: 49
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic

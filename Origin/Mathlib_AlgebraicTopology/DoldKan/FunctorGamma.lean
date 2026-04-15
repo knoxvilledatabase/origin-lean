@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicTopology/DoldKan/FunctorGamma.lean
-Genuine: 27 of 27 | Dissolved: 0 | Infrastructure: 0
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.AlgebraicTopology.SplitSimplicialObject

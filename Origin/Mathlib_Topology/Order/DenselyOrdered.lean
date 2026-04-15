@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/DenselyOrdered.lean
-Genuine: 64 of 67 | Dissolved: 0 | Infrastructure: 3
+Genuine: 62 | Conflates: 2 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.Order.IsLUB
@@ -325,6 +325,7 @@ instance (x : α) [Nontrivial α] : NeBot (𝓝[≠] x) := by
   obtain ⟨z, hz⟩ : ∃ z, a < z ∧ z < x := exists_between hy.1
   exact ⟨z, us ⟨hab ⟨hz.1, hz.2.trans hy.2⟩, hz.2.ne⟩⟩
 
+-- CONFLATES (assumes ground = zero): Dense.exists_countable_dense_subset_no_bot_top
 theorem Dense.exists_countable_dense_subset_no_bot_top [Nontrivial α] {s : Set α} [SeparableSpace s]
     (hs : Dense s) :
     ∃ t, t ⊆ s ∧ t.Countable ∧ Dense t ∧ (∀ x, IsBot x → x ∉ t) ∧ ∀ x, IsTop x → x ∉ t := by
@@ -338,6 +339,7 @@ theorem Dense.exists_countable_dense_subset_no_bot_top [Nontrivial α] {s : Set 
 
 variable (α)
 
+-- CONFLATES (assumes ground = zero): exists_countable_dense_no_bot_top
 theorem exists_countable_dense_no_bot_top [SeparableSpace α] [Nontrivial α] :
     ∃ s : Set α, s.Countable ∧ Dense s ∧ (∀ x, IsBot x → x ∉ s) ∧ ∀ x, IsTop x → x ∉ s := by
   simpa using dense_univ.exists_countable_dense_subset_no_bot_top

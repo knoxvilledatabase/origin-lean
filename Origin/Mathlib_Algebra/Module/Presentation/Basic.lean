@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Presentation/Basic.lean
-Genuine: 61 of 70 | Dissolved: 0 | Infrastructure: 9
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Exact

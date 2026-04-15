@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Digits.lean
-Genuine: 75 of 95 | Dissolved: 14 | Infrastructure: 6
+Genuine: 75 | Conflates: 0 | Dissolved: 14 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals

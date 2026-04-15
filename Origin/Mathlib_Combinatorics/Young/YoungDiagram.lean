@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Young/YoungDiagram.lean
-Genuine: 52 of 66 | Dissolved: 0 | Infrastructure: 14
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Order.UpperLower.Basic

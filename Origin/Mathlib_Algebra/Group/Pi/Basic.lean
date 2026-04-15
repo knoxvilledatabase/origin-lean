@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Pi/Basic.lean
-Genuine: 27 of 80 | Dissolved: 2 | Infrastructure: 51
+Genuine: 27 | Conflates: 0 | Dissolved: 2 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs

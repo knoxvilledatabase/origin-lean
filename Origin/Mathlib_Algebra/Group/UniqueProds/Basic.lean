@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/UniqueProds/Basic.lean
-Genuine: 31 of 57 | Dissolved: 0 | Infrastructure: 26
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeMonoid.Basic

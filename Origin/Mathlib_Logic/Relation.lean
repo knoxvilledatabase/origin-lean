@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Relation.lean
-Genuine: 101 of 112 | Dissolved: 0 | Infrastructure: 11
+Genuine: 101 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Basic

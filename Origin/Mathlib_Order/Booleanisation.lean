@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Booleanisation.lean
-Genuine: 15 of 47 | Dissolved: 0 | Infrastructure: 32
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Lattice

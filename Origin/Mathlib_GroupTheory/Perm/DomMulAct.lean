@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/DomMulAct.lean
-Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Basic

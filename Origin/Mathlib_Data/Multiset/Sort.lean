@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Multiset/Sort.lean
-Genuine: 10 of 12 | Dissolved: 0 | Infrastructure: 2
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.List.Sort

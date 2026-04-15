@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/PeriodicPts.lean
-Genuine: 96 of 104 | Dissolved: 2 | Infrastructure: 6
+Genuine: 96 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom

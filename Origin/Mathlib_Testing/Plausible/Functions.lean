@@ -1,6 +1,6 @@
 /-
 Extracted from Testing/Plausible/Functions.lean
-Genuine: 18 of 27 | Dissolved: 1 | Infrastructure: 8
+Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.ToDFinsupp

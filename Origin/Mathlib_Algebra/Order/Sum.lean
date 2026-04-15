@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Sum.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Basic

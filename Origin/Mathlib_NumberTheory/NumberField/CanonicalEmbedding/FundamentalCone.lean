@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/CanonicalEmbedding/FundamentalCone.lean
-Genuine: 45 of 65 | Dissolved: 8 | Infrastructure: 12
+Genuine: 45 | Conflates: 0 | Dissolved: 8 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.IsPrincipal

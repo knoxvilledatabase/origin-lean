@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/WidePullbacks.lean
-Genuine: 54 of 66 | Dissolved: 0 | Infrastructure: 12
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits

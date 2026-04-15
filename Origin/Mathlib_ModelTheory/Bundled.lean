@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Bundled.lean
-Genuine: 13 of 25 | Dissolved: 0 | Infrastructure: 12
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.ModelTheory.ElementarySubstructures

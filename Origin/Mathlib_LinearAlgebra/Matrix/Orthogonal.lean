@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Orthogonal.lean
-Genuine: 2 of 8 | Dissolved: 0 | Infrastructure: 6
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Mul

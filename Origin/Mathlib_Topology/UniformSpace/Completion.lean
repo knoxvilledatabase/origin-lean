@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UniformSpace/Completion.lean
-Genuine: 67 of 82 | Dissolved: 0 | Infrastructure: 15
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Topology.UniformSpace.AbstractCompletion

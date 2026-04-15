@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Seq/WSeq.lean
-Genuine: 191 of 208 | Dissolved: 0 | Infrastructure: 17
+Genuine: 191 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Logic.Relation

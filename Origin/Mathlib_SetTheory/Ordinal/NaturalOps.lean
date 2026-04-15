@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/NaturalOps.lean
-Genuine: 82 of 122 | Dissolved: 1 | Infrastructure: 39
+Genuine: 82 | Conflates: 0 | Dissolved: 1 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic

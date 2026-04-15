@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Orthogonal.lean
-Genuine: 52 of 59 | Dissolved: 0 | Infrastructure: 7
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/EllipticDivisibilitySequence.lean
-Genuine: 46 of 46 | Dissolved: 0 | Infrastructure: 0
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.EvenOddRec

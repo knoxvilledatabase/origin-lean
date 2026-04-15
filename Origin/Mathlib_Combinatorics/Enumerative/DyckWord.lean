@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Enumerative/DyckWord.lean
-Genuine: 50 of 66 | Dissolved: 3 | Infrastructure: 13
+Genuine: 50 | Conflates: 0 | Dissolved: 3 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Enumerative.Catalan

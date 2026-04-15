@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Alternating/Basic.lean
-Genuine: 69 of 125 | Dissolved: 0 | Infrastructure: 56
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 56
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Sign

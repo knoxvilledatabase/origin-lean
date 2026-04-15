@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Trace.lean
-Genuine: 32 of 33 | Dissolved: 0 | Infrastructure: 1
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Contraction

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/ContDiff/Defs.lean
-Genuine: 113 of 141 | Dissolved: 0 | Infrastructure: 28
+Genuine: 113 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Within

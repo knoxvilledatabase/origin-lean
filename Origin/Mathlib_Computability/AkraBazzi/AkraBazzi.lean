@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/AkraBazzi/AkraBazzi.lean
-Genuine: 75 of 89 | Dissolved: 4 | Infrastructure: 10
+Genuine: 75 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Computability.AkraBazzi.GrowsPolynomially

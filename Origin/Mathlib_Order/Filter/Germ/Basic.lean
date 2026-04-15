@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Germ/Basic.lean
-Genuine: 39 of 151 | Dissolved: 0 | Infrastructure: 112
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 112
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Pi

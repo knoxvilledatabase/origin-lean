@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/SpecificGroups/Dihedral.lean
-Genuine: 15 of 27 | Dissolved: 2 | Infrastructure: 10
+Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Basic

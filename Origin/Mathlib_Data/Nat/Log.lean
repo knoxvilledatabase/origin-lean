@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Log.lean
-Genuine: 47 of 56 | Dissolved: 9 | Infrastructure: 0
+Genuine: 47 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subgroup/Basic.lean
-Genuine: 92 of 110 | Dissolved: 0 | Infrastructure: 18
+Genuine: 92 | Conflates: 1 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Conj
@@ -849,6 +849,7 @@ namespace ConjClasses
 def noncenter (G : Type*) [Monoid G] : Set (ConjClasses G) :=
   {x | x.carrier.Nontrivial}
 
+-- CONFLATES (assumes ground = zero): mem_noncenter
 @[simp] lemma mem_noncenter {G} [Monoid G] (g : ConjClasses G) :
   g ∈ noncenter G ↔ g.carrier.Nontrivial := Iff.rfl
 

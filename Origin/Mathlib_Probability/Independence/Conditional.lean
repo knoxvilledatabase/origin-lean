@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Independence/Conditional.lean
-Genuine: 84 of 84 | Dissolved: 0 | Infrastructure: 0
+Genuine: 83 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Probability.Independence.Kernel
@@ -662,6 +662,7 @@ section iCondIndepFun
 
 variable {β : ι → Type*} {m : ∀ i, MeasurableSpace (β i)} {f : ∀ i, Ω → β i}
 
+-- CONFLATES (assumes ground = zero): iCondIndepFun.of_subsingleton
 @[nontriviality]
 lemma iCondIndepFun.of_subsingleton [Subsingleton ι] : iCondIndepFun m' hm' m f μ :=
   Kernel.iIndepFun.of_subsingleton

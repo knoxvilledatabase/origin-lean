@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Fintype.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Units
@@ -52,6 +52,7 @@ lemma Finset.univ_of_card_le_three (h : Fintype.card R ≤ 3) :
 
 open scoped Classical
 
+-- CONFLATES (assumes ground = zero): card_units_lt
 theorem card_units_lt (M₀ : Type*) [MonoidWithZero M₀] [Nontrivial M₀] [Fintype M₀] :
     Fintype.card M₀ˣ < Fintype.card M₀ :=
   Fintype.card_lt_of_injective_of_not_mem Units.val Units.ext not_isUnit_zero

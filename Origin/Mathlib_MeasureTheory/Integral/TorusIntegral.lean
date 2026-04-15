@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/TorusIntegral.lean
-Genuine: 22 of 23 | Dissolved: 1 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.CircleIntegral

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Group/Multiset.lean
-Genuine: 44 of 52 | Dissolved: 4 | Infrastructure: 4
+Genuine: 44 | Conflates: 0 | Dissolved: 4 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List

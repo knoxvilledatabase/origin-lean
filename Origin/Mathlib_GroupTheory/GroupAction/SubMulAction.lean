@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/SubMulAction.lean
-Genuine: 26 of 62 | Dissolved: 1 | Infrastructure: 35
+Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Defs

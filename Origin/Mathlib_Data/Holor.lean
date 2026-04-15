@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Holor.lean
-Genuine: 37 of 52 | Dissolved: 2 | Infrastructure: 13
+Genuine: 37 | Conflates: 0 | Dissolved: 2 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

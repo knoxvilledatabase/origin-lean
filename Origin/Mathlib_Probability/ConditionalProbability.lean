@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/ConditionalProbability.lean
-Genuine: 19 of 25 | Dissolved: 5 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Algebraic/Basic.lean
-Genuine: 63 of 75 | Dissolved: 9 | Infrastructure: 3
+Genuine: 54 | Conflates: 9 | Dissolved: 9 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Expand
@@ -25,6 +25,7 @@ section
 
 variable (R : Type u) {A : Type v} [CommRing R] [Ring A] [Algebra R A]
 
+-- CONFLATES (assumes ground = zero): is_transcendental_of_subsingleton
 @[nontriviality]
 theorem is_transcendental_of_subsingleton [Subsingleton R] (x : A) : Transcendental R x :=
   fun ⟨p, h, _⟩ => h <| Subsingleton.elim p 0
@@ -81,20 +82,25 @@ variable [CommRing S] [Ring A] [Algebra R A] [Algebra R S] [Algebra S A]
 
 variable [IsScalarTower R S A]
 
+-- CONFLATES (assumes ground = zero): isAlgebraic_zero
 theorem isAlgebraic_zero [Nontrivial R] : IsAlgebraic R (0 : A) :=
   ⟨_, X_ne_zero, aeval_X 0⟩
 
+-- CONFLATES (assumes ground = zero): isAlgebraic_algebraMap
 theorem isAlgebraic_algebraMap [Nontrivial R] (x : R) : IsAlgebraic R (algebraMap R A x) :=
   ⟨_, X_sub_C_ne_zero x, by rw [map_sub, aeval_X, aeval_C, sub_self]⟩
 
+-- CONFLATES (assumes ground = zero): isAlgebraic_one
 theorem isAlgebraic_one [Nontrivial R] : IsAlgebraic R (1 : A) := by
   rw [← map_one (algebraMap R A)]
   exact isAlgebraic_algebraMap 1
 
+-- CONFLATES (assumes ground = zero): isAlgebraic_nat
 theorem isAlgebraic_nat [Nontrivial R] (n : ℕ) : IsAlgebraic R (n : A) := by
   rw [← map_natCast (_ : R →+* A) n]
   exact isAlgebraic_algebraMap (Nat.cast n)
 
+-- CONFLATES (assumes ground = zero): isAlgebraic_int
 theorem isAlgebraic_int [Nontrivial R] (n : ℤ) : IsAlgebraic R (n : A) := by
   rw [← map_intCast (algebraMap R A)]
   exact isAlgebraic_algebraMap (Int.cast n)
@@ -400,6 +406,7 @@ theorem Algebra.IsAlgebraic.tower_top [Algebra.IsAlgebraic K A] : Algebra.IsAlge
 
 variable (K) (A)
 
+-- CONFLATES (assumes ground = zero): Algebra.IsAlgebraic.tower_bot
 theorem Algebra.IsAlgebraic.tower_bot (K L A : Type*) [CommRing K] [Field L] [Ring A]
     [Algebra K L] [Algebra L A] [Algebra K A] [IsScalarTower K L A]
     [Nontrivial A] [Algebra.IsAlgebraic K A] :
@@ -522,10 +529,12 @@ end Field
 
 section Infinite
 
+-- CONFLATES (assumes ground = zero): Transcendental.infinite
 theorem Transcendental.infinite {R A : Type*} [CommRing R] [Ring A] [Algebra R A]
     [Nontrivial R] {x : A} (hx : Transcendental R x) : Infinite A :=
   .of_injective _ (transcendental_iff_injective.mp hx)
 
+-- CONFLATES (assumes ground = zero): Algebra.Transcendental.infinite
 theorem Algebra.Transcendental.infinite (R A : Type*) [CommRing R] [Ring A] [Algebra R A]
     [Nontrivial R] [Algebra.Transcendental R A] : Infinite A :=
   have ⟨x, hx⟩ := ‹Algebra.Transcendental R A›

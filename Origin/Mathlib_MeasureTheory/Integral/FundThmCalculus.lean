@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/FundThmCalculus.lean
-Genuine: 82 of 90 | Dissolved: 0 | Infrastructure: 8
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Measurable

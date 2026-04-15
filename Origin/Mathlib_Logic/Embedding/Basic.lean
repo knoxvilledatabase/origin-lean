@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Embedding/Basic.lean
-Genuine: 50 of 73 | Dissolved: 0 | Infrastructure: 23
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Data.Option.Basic

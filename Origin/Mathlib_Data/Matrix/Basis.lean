@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Basis.lean
-Genuine: 29 of 29 | Dissolved: 0 | Infrastructure: 0
+Genuine: 28 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basic
@@ -33,6 +33,7 @@ theorem stdBasisMatrix_eq_of_single_single (i : m) (j : n) (a : α) :
   unfold stdBasisMatrix
   by_cases hi : i = a <;> by_cases hj : j = b <;> simp [*]
 
+-- CONFLATES (assumes ground = zero): smul_stdBasisMatrix
 @[simp]
 theorem smul_stdBasisMatrix [SMulZeroClass R α] (r : R) (i : m) (j : n) (a : α) :
     r • stdBasisMatrix i j a = stdBasisMatrix i j (r • a) := by

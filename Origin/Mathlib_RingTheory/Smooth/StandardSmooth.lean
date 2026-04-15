@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Smooth/StandardSmooth.lean
-Genuine: 39 of 46 | Dissolved: 0 | Infrastructure: 7
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.PDeriv

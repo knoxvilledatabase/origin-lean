@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/ModelsWithJ.lean
-Genuine: 18 of 26 | Dissolved: 3 | Infrastructure: 5
+Genuine: 18 | Conflates: 0 | Dissolved: 3 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass

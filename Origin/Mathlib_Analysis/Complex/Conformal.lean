@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Conformal.lean
-Genuine: 2 of 7 | Dissolved: 5 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Conformal.NormedSpace

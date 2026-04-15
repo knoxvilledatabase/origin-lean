@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/EffectiveEpi/Preserves.lean
-Genuine: 10 of 22 | Dissolved: 0 | Infrastructure: 12
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EffectiveEpi.Comp

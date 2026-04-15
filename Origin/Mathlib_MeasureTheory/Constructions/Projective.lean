@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/Projective.lean
-Genuine: 12 of 13 | Dissolved: 0 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Cylinders

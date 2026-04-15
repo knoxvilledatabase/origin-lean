@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Basic.lean
-Genuine: 20 of 34 | Dissolved: 12 | Infrastructure: 2
+Genuine: 19 | Conflates: 1 | Dissolved: 12 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Associated
@@ -209,6 +209,7 @@ theorem unique' {p q : Multiset (Associates α)} :
   have eq' : (Quot.mk Setoid.r : α → Associates α) = Associates.mk := funext quot_mk_eq_mk
   rwa [eq', prod_mk, prod_mk, mk_eq_mk_iff_associated] at eq
 
+-- CONFLATES (assumes ground = zero): prod_le_prod_iff_le
 theorem prod_le_prod_iff_le [Nontrivial α] {p q : Multiset (Associates α)}
     (hp : ∀ a ∈ p, Irreducible a) (hq : ∀ a ∈ q, Irreducible a) : p.prod ≤ q.prod ↔ p ≤ q := by
   refine ⟨?_, prod_le_prod⟩

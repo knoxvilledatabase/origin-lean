@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/EMetricSpace/Lipschitz.lean
-Genuine: 69 of 72 | Dissolved: 2 | Infrastructure: 1
+Genuine: 69 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Iterate

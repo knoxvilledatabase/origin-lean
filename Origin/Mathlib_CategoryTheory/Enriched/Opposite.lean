@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Enriched/Opposite.lean
-Genuine: 4 of 7 | Dissolved: 0 | Infrastructure: 3
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Enriched.Ordinary

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Basic.lean
-Genuine: 45 of 89 | Dissolved: 0 | Infrastructure: 44
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Opposite

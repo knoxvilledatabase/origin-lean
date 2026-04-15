@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomologicalBicomplex.lean
-Genuine: 15 of 21 | Dissolved: 0 | Infrastructure: 6
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplex

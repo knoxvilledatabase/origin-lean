@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/EulerProduct/DirichletLSeries.lean
-Genuine: 9 of 16 | Dissolved: 7 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.EulerProduct.ExpLog

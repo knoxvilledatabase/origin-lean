@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Associated/Basic.lean
-Genuine: 91 of 147 | Dissolved: 7 | Infrastructure: 49
+Genuine: 91 | Conflates: 1 | Dissolved: 7 | Infrastructure: 48
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Even
@@ -714,6 +714,7 @@ end Associates
 
 section CommMonoidWithZero
 
+-- CONFLATES (assumes ground = zero): dvdNotUnit_of_dvdNotUnit_associated
 theorem dvdNotUnit_of_dvdNotUnit_associated [CommMonoidWithZero M] [Nontrivial M] {p q r : M}
     (h : DvdNotUnit p q) (h' : Associated q r) : DvdNotUnit p r := by
   obtain ⟨u, rfl⟩ := Associated.symm h'

@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Cycle/Basic.lean
-Genuine: 108 of 118 | Dissolved: 1 | Infrastructure: 9
+Genuine: 105 | Conflates: 3 | Dissolved: 1 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators
@@ -707,6 +707,7 @@ theorem isCycleOn_swap [DecidableEq α] (hab : a ≠ b) : (swap a b).IsCycleOn {
     · exact ⟨1, by rw [zpow_one, swap_apply_right]⟩
     · exact ⟨0, by rw [zpow_zero, coe_one, id]⟩⟩
 
+-- CONFLATES (assumes ground = zero): IsCycleOn.apply_ne
 protected theorem IsCycleOn.apply_ne (hf : f.IsCycleOn s) (hs : s.Nontrivial) (ha : a ∈ s) :
     f a ≠ a := by
   obtain ⟨b, hb, hba⟩ := hs.exists_ne a
@@ -716,6 +717,7 @@ protected theorem IsCycleOn.apply_ne (hf : f.IsCycleOn s) (hs : s.Nontrivial) (h
 protected theorem IsCycle.isCycleOn (hf : f.IsCycle) : f.IsCycleOn { x | f x ≠ x } :=
   ⟨f.bijOn fun _ => f.apply_eq_iff_eq.not, fun _ ha _ => hf.sameCycle ha⟩
 
+-- CONFLATES (assumes ground = zero): isCycle_iff_exists_isCycleOn
 theorem isCycle_iff_exists_isCycleOn :
     f.IsCycle ↔ ∃ s : Set α, s.Nontrivial ∧ f.IsCycleOn s ∧ ∀ ⦃x⦄, ¬IsFixedPt f x → x ∈ s := by
   refine ⟨fun hf => ⟨{ x | f x ≠ x }, ?_, hf.isCycleOn, fun _ => id⟩, ?_⟩
@@ -730,6 +732,7 @@ theorem IsCycleOn.apply_mem_iff (hf : f.IsCycleOn s) : f x ∈ s ↔ x ∈ s :=
     convert hf.1.perm_inv.1 hx
     rw [inv_apply_self], fun hx => hf.1.mapsTo hx⟩
 
+-- CONFLATES (assumes ground = zero): IsCycleOn.isCycle_subtypePerm
 theorem IsCycleOn.isCycle_subtypePerm (hf : f.IsCycleOn s) (hs : s.Nontrivial) :
     (f.subtypePerm fun _ => hf.apply_mem_iff.symm : Perm s).IsCycle := by
   obtain ⟨a, ha⟩ := hs.nonempty

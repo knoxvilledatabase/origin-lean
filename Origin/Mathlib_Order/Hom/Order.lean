@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Hom/Order.lean
-Genuine: 4 of 21 | Dissolved: 0 | Infrastructure: 17
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Iterate

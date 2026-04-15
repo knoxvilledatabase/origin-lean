@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/TopCat/Opens.lean
-Genuine: 39 of 63 | Dissolved: 0 | Infrastructure: 24
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.GaloisConnection

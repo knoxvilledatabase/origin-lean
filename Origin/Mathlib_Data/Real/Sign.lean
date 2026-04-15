@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/Sign.lean
-Genuine: 12 of 14 | Dissolved: 2 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Real.Basic

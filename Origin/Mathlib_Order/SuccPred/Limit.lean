@@ -1,6 +1,6 @@
 /-
 Extracted from Order/SuccPred/Limit.lean
-Genuine: 115 of 136 | Dissolved: 0 | Infrastructure: 21
+Genuine: 115 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Order.SuccPred.Archimedean

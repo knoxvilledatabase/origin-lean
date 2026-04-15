@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Algebra/Spectrum.lean
-Genuine: 67 of 78 | Dissolved: 0 | Infrastructure: 11
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Quasispectrum

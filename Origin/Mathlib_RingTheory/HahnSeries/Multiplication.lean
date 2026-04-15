@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/HahnSeries/Multiplication.lean
-Genuine: 48 of 92 | Dissolved: 4 | Infrastructure: 40
+Genuine: 40 | Conflates: 10 | Dissolved: 4 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
@@ -57,10 +57,12 @@ theorem one_coeff [Zero R] [One R] {a : Γ} :
 theorem single_zero_one [Zero R] [One R] : single (0 : Γ) (1 : R) = 1 :=
   rfl
 
+-- CONFLATES (assumes ground = zero): support_one
 @[simp]
 theorem support_one [MulZeroOneClass R] [Nontrivial R] : support (1 : HahnSeries Γ R) = {0} :=
   support_single_of_ne one_ne_zero
 
+-- CONFLATES (assumes ground = zero): orderTop_one
 @[simp]
 theorem orderTop_one [MulZeroOneClass R] [Nontrivial R] : orderTop (1 : HahnSeries Γ R) = 0 := by
   rw [← single_zero_one, orderTop_single one_ne_zero, WithTop.coe_eq_zero]
@@ -163,9 +165,11 @@ instance instBaseSMulZeroClass [SMulZeroClass R V] :
     SMulZeroClass R (HahnModule Γ R V) :=
   inferInstanceAs <| SMulZeroClass R (HahnSeries Γ V)
 
+-- CONFLATES (assumes ground = zero): of_smul
 @[simp] theorem of_smul [SMulZeroClass R V] (r : R) (x : HahnSeries Γ V) :
   (of R) (r • x) = r • (of R) x := rfl
 
+-- CONFLATES (assumes ground = zero): of_symm_smul
 @[simp] theorem of_symm_smul [SMulZeroClass R V] (r : R) (x : HahnModule Γ R V) :
   (of R).symm (r • x) = r • (of R).symm x := rfl
 
@@ -177,6 +181,7 @@ instance instSMulZeroClass [SMulZeroClass R V] :
     ext
     simp [smul_coeff]
 
+-- CONFLATES (assumes ground = zero): smul_coeff_right
 theorem smul_coeff_right [SMulZeroClass R V] {x : HahnSeries Γ R} {y : HahnModule Γ' R V} {a : Γ'}
     {s : Set Γ'} (hs : s.IsPWO) (hys : ((of R).symm y).support ⊆ s) :
     ((of R).symm <| x • y).coeff a =
@@ -245,6 +250,7 @@ theorem add_smul [AddCommMonoid R] [SMulWithZero R V] {x y : HahnSeries Γ R}
     intro h
     rw [h.1, h.2, add_zero]
 
+-- CONFLATES (assumes ground = zero): single_smul_coeff_add
 theorem single_smul_coeff_add [MulZeroClass R] [SMulWithZero R V] {r : R} {x : HahnModule Γ' R V}
     {a : Γ'} {b : Γ} :
     ((of R).symm (HahnSeries.single b r • x)).coeff (b +ᵥ a) = r • ((of R).symm x).coeff a := by
@@ -275,6 +281,7 @@ theorem single_smul_coeff_add [MulZeroClass R] [SMulWithZero R V] {r : R} {x : H
       exact ⟨rfl, by exact hx, rfl⟩
   · simp
 
+-- CONFLATES (assumes ground = zero): single_zero_smul_coeff
 theorem single_zero_smul_coeff {Γ} [OrderedAddCommMonoid Γ] [AddAction Γ Γ']
     [IsOrderedCancelVAdd Γ Γ'] [MulZeroClass R] [SMulWithZero R V] {r : R}
     {x : HahnModule Γ' R V} {a : Γ'} :
@@ -283,6 +290,7 @@ theorem single_zero_smul_coeff {Γ} [OrderedAddCommMonoid Γ] [AddAction Γ Γ']
   nth_rw 1 [← zero_vadd Γ a]
   exact single_smul_coeff_add
 
+-- CONFLATES (assumes ground = zero): single_zero_smul_eq_smul
 @[simp]
 theorem single_zero_smul_eq_smul (Γ) [OrderedAddCommMonoid Γ] [AddAction Γ Γ']
     [IsOrderedCancelVAdd Γ Γ'] [MulZeroClass R] [SMulWithZero R V] {r : R}
@@ -304,6 +312,7 @@ theorem one_smul' {Γ} [OrderedAddCommMonoid Γ] [AddAction Γ Γ'] [IsOrderedCa
   ext g
   exact single_zero_smul_coeff.trans (one_smul R (x.coeff g))
 
+-- CONFLATES (assumes ground = zero): support_smul_subset_vadd_support'
 theorem support_smul_subset_vadd_support' [MulZeroClass R] [SMulWithZero R V] {x : HahnSeries Γ R}
     {y : HahnModule Γ' R V} :
     ((of R).symm (x • y)).support ⊆ x.support +ᵥ ((of R).symm y).support := by
@@ -315,6 +324,7 @@ theorem support_smul_subset_vadd_support' [MulZeroClass R] [SMulWithZero R V] {x
   simp only [Set.mem_setOf_eq, not_nonempty_iff_eq_empty] at hx
   simp [hx, smul_coeff]
 
+-- CONFLATES (assumes ground = zero): support_smul_subset_vadd_support
 theorem support_smul_subset_vadd_support [MulZeroClass R] [SMulWithZero R V] {x : HahnSeries Γ R}
     {y : HahnModule Γ' R V} :
     ((of R).symm (x • y)).support ⊆ x.support +ᵥ ((of R).symm y).support := by

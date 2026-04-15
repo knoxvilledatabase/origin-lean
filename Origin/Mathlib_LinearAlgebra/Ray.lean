@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Ray.lean
-Genuine: 49 of 92 | Dissolved: 25 | Infrastructure: 18
+Genuine: 47 | Conflates: 2 | Dissolved: 25 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Module.Algebra
@@ -51,11 +51,13 @@ theorem zero_left (y : M) : SameRay R 0 y :=
 theorem zero_right (x : M) : SameRay R x 0 :=
   Or.inr <| Or.inl rfl
 
+-- CONFLATES (assumes ground = zero): of_subsingleton
 @[nontriviality]
 theorem of_subsingleton [Subsingleton M] (x y : M) : SameRay R x y := by
   rw [Subsingleton.elim x 0]
   exact zero_left _
 
+-- CONFLATES (assumes ground = zero): of_subsingleton'
 @[nontriviality]
 theorem of_subsingleton' [Subsingleton R] (x y : M) : SameRay R x y :=
   haveI := Module.subsingleton R M

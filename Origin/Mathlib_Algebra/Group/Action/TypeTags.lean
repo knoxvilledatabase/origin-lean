@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Action/TypeTags.lean
-Genuine: 2 of 13 | Dissolved: 0 | Infrastructure: 11
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.End

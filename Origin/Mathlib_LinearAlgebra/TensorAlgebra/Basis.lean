@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorAlgebra/Basis.lean
-Genuine: 5 of 8 | Dissolved: 0 | Infrastructure: 3
+Genuine: 4 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
@@ -78,6 +78,7 @@ attribute [pp_with_univ] Cardinal.lift
 
 open Cardinal in
 
+-- CONFLATES (assumes ground = zero): rank_eq
 lemma rank_eq [Nontrivial R] [Module.Free R M] :
     Module.rank R (TensorAlgebra R M) = Cardinal.lift.{uR} (sum fun n ↦ Module.rank R M ^ n) := by
   let ⟨⟨κ, b⟩⟩ := Module.Free.exists_basis (R := R) (M := M)

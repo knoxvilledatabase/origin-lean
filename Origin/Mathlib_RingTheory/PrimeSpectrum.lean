@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PrimeSpectrum.lean
-Genuine: 61 of 74 | Dissolved: 1 | Infrastructure: 12
+Genuine: 61 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.SumProd

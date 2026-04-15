@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/TMComputable.lean
-Genuine: 25 of 38 | Dissolved: 0 | Infrastructure: 13
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Eval.Defs

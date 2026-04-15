@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Weights/Basic.lean
-Genuine: 64 of 86 | Dissolved: 2 | Infrastructure: 20
+Genuine: 63 | Conflates: 4 | Dissolved: 2 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Divisibility.Lemmas
@@ -224,9 +224,11 @@ instance [Subsingleton M] : IsEmpty (Weight R L M) :=
 instance [Nontrivial (genWeightSpace M (0 : L → R))] : Zero (Weight R L M) :=
   ⟨0, fun e ↦ not_nontrivial (⊥ : LieSubmodule R L M) (e ▸ ‹_›)⟩
 
+-- CONFLATES (assumes ground = zero): coe_zero
 @[simp]
 lemma coe_zero [Nontrivial (genWeightSpace M (0 : L → R))] : ((0 : Weight R L M) : L → R) = 0 := rfl
 
+-- CONFLATES (assumes ground = zero): zero_apply
 lemma zero_apply [Nontrivial (genWeightSpace M (0 : L → R))] (x) : (0 : Weight R L M) x = 0 := rfl
 
 def IsZero (χ : Weight R L M) := (χ : L → R) = 0
@@ -235,9 +237,11 @@ def IsZero (χ : Weight R L M) := (χ : L → R) = 0
 
 @[simp] lemma coe_eq_zero_iff (χ : Weight R L M) : (χ : L → R) = 0 ↔ χ.IsZero := Iff.rfl
 
+-- CONFLATES (assumes ground = zero): isZero_iff_eq_zero
 lemma isZero_iff_eq_zero [Nontrivial (genWeightSpace M (0 : L → R))] {χ : Weight R L M} :
     χ.IsZero ↔ χ = 0 := Weight.ext_iff' (χ₂ := 0)
 
+-- CONFLATES (assumes ground = zero): isZero_zero
 lemma isZero_zero [Nontrivial (genWeightSpace M (0 : L → R))] : IsZero (0 : Weight R L M) := rfl
 
 abbrev IsNonZero (χ : Weight R L M) := ¬ IsZero (χ : Weight R L M)

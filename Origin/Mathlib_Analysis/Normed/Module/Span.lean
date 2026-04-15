@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/Span.lean
-Genuine: 2 of 10 | Dissolved: 7 | Infrastructure: 1
+Genuine: 2 | Conflates: 0 | Dissolved: 7 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Operator.LinearIsometry

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CC/Lemmas.lean
-Genuine: 10 of 31 | Dissolved: 0 | Infrastructure: 21
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Init

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IntegralClosure/Algebra/Basic.lean
-Genuine: 25 of 28 | Dissolved: 0 | Infrastructure: 3
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.IntegralClosure.Algebra.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/SesquilinearForm.lean
-Genuine: 66 of 77 | Dissolved: 4 | Infrastructure: 7
+Genuine: 66 | Conflates: 0 | Dissolved: 4 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Opposite

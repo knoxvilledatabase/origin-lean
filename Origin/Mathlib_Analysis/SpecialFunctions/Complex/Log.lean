@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Complex/Log.lean
-Genuine: 40 of 48 | Dissolved: 8 | Infrastructure: 0
+Genuine: 40 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Arg

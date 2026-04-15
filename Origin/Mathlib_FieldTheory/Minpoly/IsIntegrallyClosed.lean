@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Minpoly/IsIntegrallyClosed.lean
-Genuine: 14 of 20 | Dissolved: 1 | Infrastructure: 5
+Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.RingTheory.AdjoinRoot

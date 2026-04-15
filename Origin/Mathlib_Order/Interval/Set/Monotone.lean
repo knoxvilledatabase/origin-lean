@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Monotone.lean
-Genuine: 43 of 43 | Dissolved: 0 | Infrastructure: 0
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Disjoint

@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Minpoly/MinpolyDiv.lean
-Genuine: 18 of 19 | Dissolved: 1 | Infrastructure: 0
+Genuine: 16 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
@@ -109,12 +109,14 @@ lemma minpolyDiv_monic : Monic (minpolyDiv R x) := by
   · simpa using this
   · simpa using minpolyDiv_ne_zero hx
 
+-- CONFLATES (assumes ground = zero): natDegree_minpolyDiv_succ
 lemma natDegree_minpolyDiv_succ [Nontrivial S] :
     natDegree (minpolyDiv R x) + 1 = natDegree (minpoly R x) := by
   rw [← (minpoly.monic hx).natDegree_map (algebraMap R S), ← minpolyDiv_spec, natDegree_mul']
   · simp
   · simpa using minpolyDiv_ne_zero hx
 
+-- CONFLATES (assumes ground = zero): natDegree_minpolyDiv_lt
 lemma natDegree_minpolyDiv_lt [Nontrivial S] :
     natDegree (minpolyDiv R x) < natDegree (minpoly R x) := by
   rw [← natDegree_minpolyDiv_succ hx]

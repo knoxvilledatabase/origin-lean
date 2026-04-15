@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Basic.lean
-Genuine: 31 of 73 | Dissolved: 1 | Infrastructure: 41
+Genuine: 31 | Conflates: 0 | Dissolved: 1 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Rat

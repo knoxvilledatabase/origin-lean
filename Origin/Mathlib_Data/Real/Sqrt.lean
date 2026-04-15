@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/Sqrt.lean
-Genuine: 90 of 96 | Dissolved: 2 | Infrastructure: 4
+Genuine: 90 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Instances.NNReal

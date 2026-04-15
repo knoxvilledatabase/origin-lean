@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Grp/Limits.lean
-Genuine: 13 of 45 | Dissolved: 0 | Infrastructure: 32
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.MonCat.Limits

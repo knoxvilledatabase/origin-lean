@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Piecewise.lean
-Genuine: 31 of 31 | Dissolved: 0 | Infrastructure: 0
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic

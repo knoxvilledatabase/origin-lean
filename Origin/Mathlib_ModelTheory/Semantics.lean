@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Semantics.lean
-Genuine: 99 of 124 | Dissolved: 0 | Infrastructure: 25
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Basic

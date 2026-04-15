@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GCDMonoid/Finset.lean
-Genuine: 34 of 40 | Dissolved: 4 | Infrastructure: 2
+Genuine: 33 | Conflates: 1 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Fold
@@ -99,6 +99,7 @@ theorem lcm_image [DecidableEq β] {g : γ → β} (s : Finset γ) :
 theorem lcm_eq_lcm_image [DecidableEq α] : s.lcm f = (s.image f).lcm id :=
   Eq.symm <| lcm_image _
 
+-- CONFLATES (assumes ground = zero): lcm_eq_zero_iff
 theorem lcm_eq_zero_iff [Nontrivial α] : s.lcm f = 0 ↔ 0 ∈ f '' s := by
   simp only [Multiset.mem_map, lcm_def, Multiset.lcm_eq_zero_iff, Set.mem_image, mem_coe, ←
     Finset.mem_def]

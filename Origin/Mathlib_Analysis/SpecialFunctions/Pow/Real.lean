@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Pow/Real.lean
-Genuine: 156 of 201 | Dissolved: 41 | Infrastructure: 4
+Genuine: 156 | Conflates: 0 | Dissolved: 41 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex

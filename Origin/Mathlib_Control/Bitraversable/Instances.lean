@@ -1,6 +1,6 @@
 /-
 Extracted from Control/Bitraversable/Instances.lean
-Genuine: 6 of 20 | Dissolved: 0 | Infrastructure: 14
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Control.Bitraversable.Lemmas

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Hom/Basic.lean
-Genuine: 23 of 33 | Dissolved: 2 | Infrastructure: 8
+Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Logic.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Types.lean
-Genuine: 75 of 90 | Dissolved: 0 | Infrastructure: 15
+Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Data.TypeMax

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Isometric.lean
-Genuine: 44 of 52 | Dissolved: 0 | Infrastructure: 8
+Genuine: 40 | Conflates: 4 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
@@ -62,6 +62,7 @@ lemma nnnorm_cfcHom (a : A) (f : C(σ 𝕜 a, 𝕜)) (ha : p a := by cfc_tac) :
     ‖cfcHom (show p a from ha) f‖₊ = ‖f‖₊ :=
   Subtype.ext <| norm_cfcHom a f ha
 
+-- CONFLATES (assumes ground = zero): IsGreatest.norm_cfc
 lemma IsGreatest.norm_cfc [Nontrivial A] (f : 𝕜 → 𝕜) (a : A)
     (hf : ContinuousOn f (σ 𝕜 a) := by cfc_cont_tac) (ha : p a := by cfc_tac) :
     IsGreatest ((fun x ↦ ‖f x‖) '' spectrum 𝕜 a) ‖cfc f a‖ := by
@@ -77,6 +78,7 @@ lemma IsGreatest.norm_cfc [Nontrivial A] (f : 𝕜 → 𝕜) (a : A)
     exact hx.2 ⟨y, hy, rfl⟩
   · exact le_trans (by simp) <| ContinuousMap.norm_coe_le_norm _ (⟨x, hx'⟩ : σ 𝕜 a)
 
+-- CONFLATES (assumes ground = zero): IsGreatest.nnnorm_cfc
 lemma IsGreatest.nnnorm_cfc [Nontrivial A] (f : 𝕜 → 𝕜) (a : A)
     (hf : ContinuousOn f (σ 𝕜 a) := by cfc_cont_tac) (ha : p a := by cfc_tac) :
     IsGreatest ((fun x ↦ ‖f x‖₊) '' σ 𝕜 a) ‖cfc f a‖₊ := by
@@ -195,6 +197,7 @@ end Unital
 
 section NonUnital
 
+-- CONFLATES (assumes ground = zero): NonUnitalIsometricContinuousFunctionalCalculus
 class NonUnitalIsometricContinuousFunctionalCalculus (R A : Type*) (p : outParam (A → Prop))
     [CommSemiring R] [Nontrivial R] [StarRing R] [MetricSpace R] [TopologicalSemiring R]
     [ContinuousStar R] [NonUnitalRing A] [StarRing A] [MetricSpace A] [Module R A]
@@ -485,6 +488,7 @@ variable [StarOrderedRing A] [IsometricContinuousFunctionalCalculus ℝ A IsSelf
 
 variable [NonnegSpectrumClass ℝ A] [UniqueContinuousFunctionalCalculus ℝ A]
 
+-- CONFLATES (assumes ground = zero): IsGreatest.nnnorm_cfc_nnreal
 lemma IsGreatest.nnnorm_cfc_nnreal [Nontrivial A] (f : ℝ≥0 → ℝ≥0) (a : A)
     (hf : ContinuousOn f (σ ℝ≥0 a) := by cfc_cont_tac) (ha : 0 ≤ a := by cfc_tac) :
     IsGreatest (f '' σ ℝ≥0 a) ‖cfc f a‖₊ := by

@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Basic.lean
-Genuine: 36 of 58 | Dissolved: 1 | Infrastructure: 21
+Genuine: 36 | Conflates: 0 | Dissolved: 1 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/NNRat/Defs.lean
-Genuine: 65 of 113 | Dissolved: 8 | Infrastructure: 40
+Genuine: 65 | Conflates: 0 | Dissolved: 8 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Int

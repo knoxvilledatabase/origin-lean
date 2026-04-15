@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Pow/Deriv.lean
-Genuine: 43 of 90 | Dissolved: 47 | Infrastructure: 0
+Genuine: 43 | Conflates: 0 | Dissolved: 47 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity

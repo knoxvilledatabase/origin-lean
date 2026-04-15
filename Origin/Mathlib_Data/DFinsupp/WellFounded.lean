@@ -1,6 +1,6 @@
 /-
 Extracted from Data/DFinsupp/WellFounded.lean
-Genuine: 9 of 19 | Dissolved: 2 | Infrastructure: 8
+Genuine: 9 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.DFinsupp.Lex

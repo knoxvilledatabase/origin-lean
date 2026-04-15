@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomotopyCategory/HomComplexShift.lean
-Genuine: 62 of 62 | Dissolved: 0 | Infrastructure: 0
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.HomComplex

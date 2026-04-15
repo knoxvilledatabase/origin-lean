@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/Hyperreal.lean
-Genuine: 146 of 173 | Dissolved: 12 | Infrastructure: 15
+Genuine: 146 | Conflates: 0 | Dissolved: 12 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Order.Filter.FilterProduct

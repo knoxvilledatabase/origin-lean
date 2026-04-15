@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Aut.lean
-Genuine: 11 of 41 | Dissolved: 0 | Infrastructure: 30
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/RingedSpace/OpenImmersion.lean
-Genuine: 70 of 137 | Dissolved: 0 | Infrastructure: 67
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Topology.Category.TopCat.Limits.Pullbacks

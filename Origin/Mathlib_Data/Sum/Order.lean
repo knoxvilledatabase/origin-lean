@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sum/Order.lean
-Genuine: 42 of 111 | Dissolved: 0 | Infrastructure: 69
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 69
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Basic

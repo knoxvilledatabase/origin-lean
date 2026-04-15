@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/Finite.lean
-Genuine: 52 of 63 | Dissolved: 9 | Infrastructure: 2
+Genuine: 41 | Conflates: 11 | Dissolved: 9 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Torsion
@@ -58,9 +58,11 @@ theorem rank_zero_iff : Module.rank R M = 0 ↔ Subsingleton M :=
 
 -- DISSOLVED: rank_pos_iff_exists_ne_zero
 
+-- CONFLATES (assumes ground = zero): rank_pos_iff_nontrivial
 theorem rank_pos_iff_nontrivial : 0 < Module.rank R M ↔ Nontrivial M :=
   rank_pos_iff_exists_ne_zero.trans (nontrivial_iff_exists_ne 0).symm
 
+-- CONFLATES (assumes ground = zero): rank_pos
 theorem rank_pos [Nontrivial M] : 0 < Module.rank R M :=
   rank_pos_iff_nontrivial.mpr ‹_›
 
@@ -191,11 +193,13 @@ lemma exists_linearIndependent_of_le_rank {n : ℕ} (hn : n ≤ Module.rank R M)
   have ⟨_, hs, hs'⟩ := exists_finset_linearIndependent_of_le_rank hn
   ⟨_, (linearIndependent_equiv (Finset.equivFinOfCardEq hs).symm).mpr hs'⟩
 
+-- CONFLATES (assumes ground = zero): natCast_le_rank_iff
 lemma natCast_le_rank_iff [Nontrivial R] {n : ℕ} :
     n ≤ Module.rank R M ↔ ∃ f : Fin n → M, LinearIndependent R f :=
   ⟨exists_linearIndependent_of_le_rank,
     fun H ↦ by simpa using H.choose_spec.cardinal_lift_le_rank⟩
 
+-- CONFLATES (assumes ground = zero): natCast_le_rank_iff_finset
 lemma natCast_le_rank_iff_finset [Nontrivial R] {n : ℕ} :
     n ≤ Module.rank R M ↔ ∃ s : Finset M, s.card = n ∧ LinearIndependent R ((↑) : s → M) :=
   ⟨exists_finset_linearIndependent_of_le_rank,
@@ -223,6 +227,7 @@ section
 
 variable [NoZeroSMulDivisors R M]
 
+-- CONFLATES (assumes ground = zero): iSupIndep.subtype_ne_bot_le_rank
 theorem iSupIndep.subtype_ne_bot_le_rank [Nontrivial R]
     {V : ι → Submodule R M} (hV : iSupIndep V) :
     Cardinal.lift.{v} #{ i : ι // V i ≠ ⊥ } ≤ Cardinal.lift.{w} (Module.rank R M) := by
@@ -285,6 +290,7 @@ section
 
 variable [Nontrivial R]
 
+-- CONFLATES (assumes ground = zero): Module.finrank_zero_of_subsingleton
 @[nontriviality]
 theorem Module.finrank_zero_of_subsingleton [Subsingleton M] :
     finrank R M = 0 := by
@@ -297,9 +303,11 @@ section
 
 variable [NoZeroSMulDivisors R M]
 
+-- CONFLATES (assumes ground = zero): Module.nontrivial_of_finrank_pos
 theorem Module.nontrivial_of_finrank_pos (h : 0 < finrank R M) : Nontrivial M :=
   rank_pos_iff_nontrivial.mp (lt_rank_of_lt_finrank h)
 
+-- CONFLATES (assumes ground = zero): Module.nontrivial_of_finrank_eq_succ
 theorem Module.nontrivial_of_finrank_eq_succ {n : ℕ}
     (hn : finrank R M = n.succ) : Nontrivial M :=
   nontrivial_of_finrank_pos (R := R) (by rw [hn]; exact n.succ_pos)
@@ -320,11 +328,13 @@ variable [StrongRankCondition R] [Module.Finite R M]
 
 -- DISSOLVED: Module.finrank_pos_iff_exists_ne_zero
 
+-- CONFLATES (assumes ground = zero): Module.finrank_pos_iff
 theorem Module.finrank_pos_iff [NoZeroSMulDivisors R M] :
     0 < finrank R M ↔ Nontrivial M := by
   rw [← rank_pos_iff_nontrivial (R := R), ← finrank_eq_rank]
   norm_cast
 
+-- CONFLATES (assumes ground = zero): Module.finrank_pos
 theorem Module.finrank_pos [NoZeroSMulDivisors R M] [h : Nontrivial M] :
     0 < finrank R M :=
   finrank_pos_iff.mpr h
@@ -362,6 +372,7 @@ theorem Submodule.bot_eq_top_of_rank_eq_zero [NoZeroSMulDivisors R M] (h : Modul
   rw [rank_zero_iff] at h
   subsingleton
 
+-- CONFLATES (assumes ground = zero): Submodule.rank_eq_zero
 @[simp]
 theorem Submodule.rank_eq_zero [Nontrivial R] [NoZeroSMulDivisors R M] {S : Submodule R M} :
     Module.rank R S = 0 ↔ S = ⊥ :=

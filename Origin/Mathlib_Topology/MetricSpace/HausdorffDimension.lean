@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/HausdorffDimension.lean
-Genuine: 50 of 57 | Dissolved: 2 | Infrastructure: 5
+Genuine: 50 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.RCLike

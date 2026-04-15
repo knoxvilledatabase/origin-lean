@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Connected/PathConnected.lean
-Genuine: 141 of 182 | Dissolved: 1 | Infrastructure: 40
+Genuine: 141 | Conflates: 0 | Dissolved: 1 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Topology.Order.ProjIcc

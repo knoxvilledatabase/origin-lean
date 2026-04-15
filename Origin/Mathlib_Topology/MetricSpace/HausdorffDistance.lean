@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/HausdorffDistance.lean
-Genuine: 102 of 107 | Dissolved: 0 | Infrastructure: 5
+Genuine: 102 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecificLimits.Basic

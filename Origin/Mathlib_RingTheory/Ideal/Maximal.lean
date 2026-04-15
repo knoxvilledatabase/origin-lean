@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Maximal.lean
-Genuine: 18 of 22 | Dissolved: 1 | Infrastructure: 3
+Genuine: 17 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Prime
@@ -79,6 +79,7 @@ theorem exists_le_maximal (I : Ideal α) (hI : I ≠ ⊤) : ∃ M : Ideal α, M.
 
 variable (α)
 
+-- CONFLATES (assumes ground = zero): exists_maximal
 theorem exists_maximal [Nontrivial α] : ∃ M : Ideal α, M.IsMaximal :=
   let ⟨I, ⟨hI, _⟩⟩ := exists_le_maximal (⊥ : Ideal α) bot_ne_top
   ⟨I, hI⟩

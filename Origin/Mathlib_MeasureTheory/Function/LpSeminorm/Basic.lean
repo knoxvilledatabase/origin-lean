@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/LpSeminorm/Basic.lean
-Genuine: 134 of 163 | Dissolved: 24 | Infrastructure: 5
+Genuine: 134 | Conflates: 0 | Dissolved: 24 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.IndicatorFunction

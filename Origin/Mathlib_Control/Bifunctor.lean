@@ -1,6 +1,6 @@
 /-
 Extracted from Control/Bifunctor.lean
-Genuine: 10 of 24 | Dissolved: 0 | Infrastructure: 14
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Control.Functor

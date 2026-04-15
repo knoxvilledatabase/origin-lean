@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Adjunction/Unique.lean
-Genuine: 18 of 20 | Dissolved: 0 | Infrastructure: 2
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Mates

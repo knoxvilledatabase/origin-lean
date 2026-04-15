@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/LinearMap/End.lean
-Genuine: 25 of 57 | Dissolved: 2 | Infrastructure: 30
+Genuine: 25 | Conflates: 0 | Dissolved: 2 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom

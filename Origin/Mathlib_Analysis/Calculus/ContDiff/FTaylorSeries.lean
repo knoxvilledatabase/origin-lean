@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/ContDiff/FTaylorSeries.lean
-Genuine: 67 of 80 | Dissolved: 0 | Infrastructure: 13
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Equiv

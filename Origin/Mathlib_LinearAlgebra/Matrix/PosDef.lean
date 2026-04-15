@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/PosDef.lean
-Genuine: 62 of 65 | Dissolved: 2 | Infrastructure: 1
+Genuine: 59 | Conflates: 4 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Spectrum
@@ -120,6 +120,7 @@ protected theorem intCast [StarOrderedRing R] [DecidableEq n] (d : ℤ) (hd : 0 
     rw [Int.cast_smul_eq_zsmul]
     refine zsmul_nonneg (dotProduct_star_self_nonneg _) hd⟩
 
+-- CONFLATES (assumes ground = zero): _root_.Matrix.posSemidef_intCast_iff
 @[simp]
 protected theorem _root_.Matrix.posSemidef_intCast_iff
     [StarOrderedRing R] [DecidableEq n] [Nonempty n] [Nontrivial R] (d : ℤ) :
@@ -349,6 +350,7 @@ protected theorem diagonal [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R
       exact ⟨fun i => conjugate_nonneg (h i).le _,
         i, conjugate_pos (h _) (isRegular_of_ne_zero hi)⟩⟩
 
+-- CONFLATES (assumes ground = zero): _root_.Matrix.posDef_diagonal_iff
 @[simp]
 theorem _root_.Matrix.posDef_diagonal_iff
     [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R] [Nontrivial R] {d : n → R} :
@@ -365,6 +367,7 @@ protected theorem one [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R] :
 
 -- DISSOLVED: natCast
 
+-- CONFLATES (assumes ground = zero): _root_.Matrix.posDef_natCast_iff
 @[simp]
 theorem _root_.Matrix.posDef_natCast_iff [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R]
     [Nonempty n] [Nontrivial R] {d : ℕ} :
@@ -384,6 +387,7 @@ protected theorem intCast [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R]
     rw [Int.cast_smul_eq_zsmul]
     refine zsmul_pos (dotProduct_star_self_pos_iff.mpr hx) hd⟩
 
+-- CONFLATES (assumes ground = zero): _root_.Matrix.posDef_intCast_iff
 @[simp]
 theorem _root_.Matrix.posDef_intCast_iff [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R]
     [Nonempty n] [Nontrivial R] {d : ℤ} :

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/UniformMulAction.lean
-Genuine: 12 of 27 | Dissolved: 0 | Infrastructure: 15
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Opposite

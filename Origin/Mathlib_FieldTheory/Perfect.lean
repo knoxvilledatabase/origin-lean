@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Perfect.lean
-Genuine: 47 of 62 | Dissolved: 0 | Infrastructure: 15
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Separable

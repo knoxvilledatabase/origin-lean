@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/ContDiff/Basic.lean
-Genuine: 241 of 259 | Dissolved: 13 | Infrastructure: 5
+Genuine: 237 | Conflates: 4 | Dissolved: 13 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Defs
@@ -85,18 +85,22 @@ theorem contDiffAt_const {c : F} : ContDiffAt 𝕜 n (fun _ : E => c) x :=
 theorem contDiffWithinAt_const {c : F} : ContDiffWithinAt 𝕜 n (fun _ : E => c) s x :=
   contDiffAt_const.contDiffWithinAt
 
+-- CONFLATES (assumes ground = zero): contDiff_of_subsingleton
 @[nontriviality]
 theorem contDiff_of_subsingleton [Subsingleton F] : ContDiff 𝕜 n f := by
   rw [Subsingleton.elim f fun _ => 0]; exact contDiff_const
 
+-- CONFLATES (assumes ground = zero): contDiffAt_of_subsingleton
 @[nontriviality]
 theorem contDiffAt_of_subsingleton [Subsingleton F] : ContDiffAt 𝕜 n f x := by
   rw [Subsingleton.elim f fun _ => 0]; exact contDiffAt_const
 
+-- CONFLATES (assumes ground = zero): contDiffWithinAt_of_subsingleton
 @[nontriviality]
 theorem contDiffWithinAt_of_subsingleton [Subsingleton F] : ContDiffWithinAt 𝕜 n f s x := by
   rw [Subsingleton.elim f fun _ => 0]; exact contDiffWithinAt_const
 
+-- CONFLATES (assumes ground = zero): contDiffOn_of_subsingleton
 @[nontriviality]
 theorem contDiffOn_of_subsingleton [Subsingleton F] : ContDiffOn 𝕜 n f s := by
   rw [Subsingleton.elim f fun _ => 0]; exact contDiffOn_const

@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/OpenImmersion.lean
-Genuine: 66 of 100 | Dissolved: 0 | Infrastructure: 34
+Genuine: 66 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.OpenImmersion

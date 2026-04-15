@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/BigOperators/Group/Finset.lean
-Genuine: 68 of 70 | Dissolved: 2 | Infrastructure: 0
+Genuine: 68 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

@@ -1,6 +1,6 @@
 /-
 Extracted from Control/ULiftable.lean
-Genuine: 14 of 26 | Dissolved: 0 | Infrastructure: 12
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Control.Monad.Basic

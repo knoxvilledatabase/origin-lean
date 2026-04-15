@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/FrobeniusFractionField.lean
-Genuine: 4 of 17 | Dissolved: 13 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 13 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Cast.WithTop

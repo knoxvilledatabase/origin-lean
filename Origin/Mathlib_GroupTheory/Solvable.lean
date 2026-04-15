@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Solvable.lean
-Genuine: 15 of 24 | Dissolved: 0 | Infrastructure: 9
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Abelianization

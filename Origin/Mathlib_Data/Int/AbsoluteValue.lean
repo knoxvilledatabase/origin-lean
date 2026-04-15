@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/AbsoluteValue.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Units
@@ -26,6 +26,7 @@ variable {R S : Type*} [Ring R] [LinearOrderedCommRing S]
 theorem AbsoluteValue.map_units_int (abv : AbsoluteValue ℤ S) (x : ℤˣ) : abv x = 1 := by
   rcases Int.units_eq_one_or x with (rfl | rfl) <;> simp
 
+-- CONFLATES (assumes ground = zero): AbsoluteValue.map_units_intCast
 @[simp]
 theorem AbsoluteValue.map_units_intCast [Nontrivial R] (abv : AbsoluteValue R S) (x : ℤˣ) :
     abv ((x : ℤ) : R) = 1 := by rcases Int.units_eq_one_or x with (rfl | rfl) <;> simp

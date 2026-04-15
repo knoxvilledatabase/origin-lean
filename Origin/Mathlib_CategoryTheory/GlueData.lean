@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/GlueData.lean
-Genuine: 29 of 50 | Dissolved: 0 | Infrastructure: 21
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Elementwise

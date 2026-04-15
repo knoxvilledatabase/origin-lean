@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Zsqrtd/Basic.lean
-Genuine: 78 of 147 | Dissolved: 2 | Infrastructure: 67
+Genuine: 78 | Conflates: 0 | Dissolved: 2 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/Basic.lean
-Genuine: 7 of 19 | Dissolved: 4 | Infrastructure: 8
+Genuine: 2 | Conflates: 5 | Dissolved: 4 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Basic
@@ -52,6 +52,7 @@ end AddGroupWithOne
 
 end CharP
 
+-- CONFLATES (assumes ground = zero): RingHom.charP_iff_charP
 lemma RingHom.charP_iff_charP {K L : Type*} [DivisionRing K] [Semiring L] [Nontrivial L]
     (f : K →+* L) (p : ℕ) : CharP K p ↔ CharP L p := by
   simp only [charP_iff, ← f.injective.eq_iff, map_natCast f, map_zero f]
@@ -66,10 +67,12 @@ variable (R) in
 
 -- DISSOLVED: cast_ne_zero_of_ne_of_prime
 
+-- CONFLATES (assumes ground = zero): ringChar_of_prime_eq_zero
 lemma ringChar_of_prime_eq_zero [Nontrivial R] {p : ℕ} (hprime : Nat.Prime p)
     (hp0 : (p : R) = 0) : ringChar R = p :=
   Or.resolve_left ((Nat.dvd_prime hprime).1 (ringChar.dvd hp0)) ringChar_ne_one
 
+-- CONFLATES (assumes ground = zero): charP_iff_prime_eq_zero
 lemma charP_iff_prime_eq_zero [Nontrivial R] {p : ℕ} (hp : p.Prime) :
     CharP R p ↔ (p : R) = 0 :=
   ⟨fun _ => cast_eq_zero R p,
@@ -85,6 +88,7 @@ section
 
 -- DISSOLVED: Ring.neg_one_ne_one_of_char_ne_two
 
+-- CONFLATES (assumes ground = zero): Ring.eq_self_iff_eq_zero_of_char_ne_two
 lemma Ring.eq_self_iff_eq_zero_of_char_ne_two {R : Type*} [NonAssocRing R] [Nontrivial R]
     [NoZeroDivisors R] (hR : ringChar R ≠ 2) {a : R} : -a = a ↔ a = 0 :=
   ⟨fun h =>
@@ -121,6 +125,7 @@ instance MulOpposite.charP [AddMonoidWithOne R] (p : ℕ) [CharP R p] : CharP R�
 
 section
 
+-- CONFLATES (assumes ground = zero): Int.cast_injOn_of_ringChar_ne_two
 lemma Int.cast_injOn_of_ringChar_ne_two {R : Type*} [NonAssocRing R] [Nontrivial R]
     (hR : ringChar R ≠ 2) : ({0, 1, -1} : Set ℤ).InjOn ((↑) : ℤ → R) := by
   rintro _ (rfl | rfl | rfl) _ (rfl | rfl | rfl) h <;>

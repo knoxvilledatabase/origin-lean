@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Differentials/Presheaf.lean
-Genuine: 15 of 19 | Dissolved: 0 | Infrastructure: 4
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf

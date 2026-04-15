@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Kleene.lean
-Genuine: 28 of 48 | Dissolved: 1 | Infrastructure: 19
+Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Canonical.Defs

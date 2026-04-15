@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Equiv.lean
-Genuine: 50 of 55 | Dissolved: 3 | Infrastructure: 2
+Genuine: 50 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin

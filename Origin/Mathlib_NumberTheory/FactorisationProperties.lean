@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FactorisationProperties.lean
-Genuine: 22 of 25 | Dissolved: 1 | Infrastructure: 2
+Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

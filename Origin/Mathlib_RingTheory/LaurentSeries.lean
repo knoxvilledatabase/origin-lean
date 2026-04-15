@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LaurentSeries.lean
-Genuine: 90 of 114 | Dissolved: 2 | Infrastructure: 22
+Genuine: 90 | Conflates: 0 | Dissolved: 2 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Data.Int.Interval

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/ThickenedIndicator.lean
-Genuine: 27 of 28 | Dissolved: 0 | Infrastructure: 1
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Lemmas

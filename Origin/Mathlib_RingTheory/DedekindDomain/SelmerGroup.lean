@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/SelmerGroup.lean
-Genuine: 8 of 15 | Dissolved: 7 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sums/Basic.lean
-Genuine: 12 of 26 | Dissolved: 0 | Infrastructure: 14
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Equivalence

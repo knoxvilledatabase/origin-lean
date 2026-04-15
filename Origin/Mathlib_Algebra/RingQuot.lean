@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/RingQuot.lean
-Genuine: 50 of 72 | Dissolved: 0 | Infrastructure: 22
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Hom

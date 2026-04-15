@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Weights/Chain.lean
-Genuine: 33 of 38 | Dissolved: 1 | Infrastructure: 4
+Genuine: 33 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.LinearMap

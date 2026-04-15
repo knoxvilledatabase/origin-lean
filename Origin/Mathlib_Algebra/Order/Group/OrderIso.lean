@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/OrderIso.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Units.Equiv

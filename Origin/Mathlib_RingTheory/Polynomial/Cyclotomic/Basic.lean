@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Cyclotomic/Basic.lean
-Genuine: 51 of 55 | Dissolved: 3 | Infrastructure: 1
+Genuine: 48 | Conflates: 3 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Splits
@@ -256,6 +256,7 @@ theorem cyclotomic.isPrimitive (n : ℕ) (R : Type*) [CommRing R] : (cyclotomic 
 
 -- DISSOLVED: cyclotomic_ne_zero
 
+-- CONFLATES (assumes ground = zero): degree_cyclotomic
 theorem degree_cyclotomic (n : ℕ) (R : Type*) [Ring R] [Nontrivial R] :
     (cyclotomic n R).degree = Nat.totient n := by
   rw [← map_cyclotomic_int]
@@ -267,10 +268,12 @@ theorem degree_cyclotomic (n : ℕ) (R : Type*) [Ring R] [Nontrivial R] :
   simp only [(int_cyclotomic_spec n).right.right, eq_intCast, Monic.leadingCoeff, Int.cast_one,
     Ne, not_false_iff, one_ne_zero]
 
+-- CONFLATES (assumes ground = zero): natDegree_cyclotomic
 theorem natDegree_cyclotomic (n : ℕ) (R : Type*) [Ring R] [Nontrivial R] :
     (cyclotomic n R).natDegree = Nat.totient n := by
   rw [natDegree, degree_cyclotomic]; norm_cast
 
+-- CONFLATES (assumes ground = zero): degree_cyclotomic_pos
 theorem degree_cyclotomic_pos (n : ℕ) (R : Type*) (hpos : 0 < n) [Ring R] [Nontrivial R] :
     0 < (cyclotomic n R).degree := by
   rwa [degree_cyclotomic n R, Nat.cast_pos, Nat.totient_pos]

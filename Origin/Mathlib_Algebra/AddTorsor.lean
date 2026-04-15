@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/AddTorsor.lean
-Genuine: 47 of 64 | Dissolved: 1 | Infrastructure: 16
+Genuine: 47 | Conflates: 0 | Dissolved: 1 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Basic

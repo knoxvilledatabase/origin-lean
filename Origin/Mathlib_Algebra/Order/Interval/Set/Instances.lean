@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Interval/Set/Instances.lean
-Genuine: 26 of 68 | Dissolved: 4 | Infrastructure: 38
+Genuine: 24 | Conflates: 4 | Dissolved: 4 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.InjSurj
@@ -150,14 +150,17 @@ namespace Set.Ico
 
 instance zero [Nontrivial α] : Zero (Ico (0 : α) 1) where zero := ⟨0, left_mem_Ico.2 zero_lt_one⟩
 
+-- CONFLATES (assumes ground = zero): coe_zero
 @[simp, norm_cast]
 theorem coe_zero [Nontrivial α] : ↑(0 : Ico (0 : α) 1) = (0 : α) :=
   rfl
 
+-- CONFLATES (assumes ground = zero): mk_zero
 @[simp]
 theorem mk_zero [Nontrivial α] (h : (0 : α) ∈ Ico (0 : α) 1) : (⟨0, h⟩ : Ico (0 : α) 1) = 0 :=
   rfl
 
+-- CONFLATES (assumes ground = zero): coe_eq_zero
 @[simp, norm_cast]
 theorem coe_eq_zero [Nontrivial α] {x : Ico (0 : α) 1} : (x : α) = 0 ↔ x = 0 := by
   symm
@@ -171,6 +174,7 @@ theorem coe_nonneg (x : Ico (0 : α) 1) : 0 ≤ (x : α) :=
 theorem coe_lt_one (x : Ico (0 : α) 1) : (x : α) < 1 :=
   x.2.2
 
+-- CONFLATES (assumes ground = zero): nonneg
 theorem nonneg [Nontrivial α] {t : Ico (0 : α) 1} : 0 ≤ t :=
   t.2.1
 

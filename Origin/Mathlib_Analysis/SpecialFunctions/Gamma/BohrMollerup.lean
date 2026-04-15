@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/BohrMollerup.lean
-Genuine: 21 of 25 | Dissolved: 4 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gamma.Deriv

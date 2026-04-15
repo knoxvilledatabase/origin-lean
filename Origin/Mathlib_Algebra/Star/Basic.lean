@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/Basic.lean
-Genuine: 56 of 89 | Dissolved: 4 | Infrastructure: 29
+Genuine: 56 | Conflates: 0 | Dissolved: 4 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Invertible.Defs

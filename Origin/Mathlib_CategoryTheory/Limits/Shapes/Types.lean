@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Types.lean
-Genuine: 95 of 114 | Dissolved: 0 | Infrastructure: 19
+Genuine: 95 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Types

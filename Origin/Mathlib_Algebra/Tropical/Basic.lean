@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Tropical/Basic.lean
-Genuine: 30 of 102 | Dissolved: 1 | Infrastructure: 71
+Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow

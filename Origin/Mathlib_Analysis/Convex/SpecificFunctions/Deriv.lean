@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/SpecificFunctions/Deriv.lean
-Genuine: 9 of 13 | Dissolved: 3 | Infrastructure: 1
+Genuine: 9 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.ZPow

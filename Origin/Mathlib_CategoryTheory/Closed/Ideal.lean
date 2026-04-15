@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Closed/Ideal.lean
-Genuine: 13 of 16 | Dissolved: 0 | Infrastructure: 3
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/LocalInvariantProperties.lean
-Genuine: 75 of 76 | Dissolved: 0 | Infrastructure: 1
+Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.ChartedSpace

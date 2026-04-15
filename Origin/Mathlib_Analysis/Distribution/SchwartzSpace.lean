@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Distribution/SchwartzSpace.lean
-Genuine: 74 of 124 | Dissolved: 0 | Infrastructure: 50
+Genuine: 74 | Conflates: 0 | Dissolved: 0 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Bounds

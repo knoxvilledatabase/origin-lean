@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Expect.lean
-Genuine: 61 of 62 | Dissolved: 1 | Infrastructure: 0
+Genuine: 61 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Rat

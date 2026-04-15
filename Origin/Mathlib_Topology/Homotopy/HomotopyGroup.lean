@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Homotopy/HomotopyGroup.lean
-Genuine: 48 of 64 | Dissolved: 0 | Infrastructure: 16
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.FundamentalGroup

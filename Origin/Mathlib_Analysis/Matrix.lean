@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Matrix.lean
-Genuine: 74 of 80 | Dissolved: 0 | Infrastructure: 6
+Genuine: 74 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Lp.PiLp

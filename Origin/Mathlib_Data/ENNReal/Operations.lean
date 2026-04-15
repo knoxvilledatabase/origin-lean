@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ENNReal/Operations.lean
-Genuine: 92 of 129 | Dissolved: 27 | Infrastructure: 10
+Genuine: 92 | Conflates: 0 | Dissolved: 27 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.WithTop

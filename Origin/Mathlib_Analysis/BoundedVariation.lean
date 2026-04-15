@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoundedVariation.lean
-Genuine: 63 of 66 | Dissolved: 0 | Infrastructure: 3
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Add

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Algebra/LieGroup.lean
-Genuine: 14 of 28 | Dissolved: 10 | Infrastructure: 4
+Genuine: 12 | Conflates: 2 | Dissolved: 10 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.Monoid
@@ -51,12 +51,14 @@ noncomputable section
 
 open scoped Manifold
 
+-- CONFLATES (assumes ground = zero): LieAddGroup
 class LieAddGroup {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H]
     {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] (I : ModelWithCorners 𝕜 E H) (G : Type*)
     [AddGroup G] [TopologicalSpace G] [ChartedSpace H G] extends SmoothAdd I G : Prop where
   /-- Negation is smooth in an additive Lie group. -/
   smooth_neg : ContMDiff I I ⊤ fun a : G => -a
 
+-- CONFLATES (assumes ground = zero): LieGroup
 @[to_additive]
 class LieGroup {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H]
     {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] (I : ModelWithCorners 𝕜 E H) (G : Type*)

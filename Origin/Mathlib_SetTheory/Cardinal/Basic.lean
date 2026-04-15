@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Basic.lean
-Genuine: 338 of 417 | Dissolved: 20 | Infrastructure: 59
+Genuine: 337 | Conflates: 1 | Dissolved: 20 | Infrastructure: 59
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
@@ -624,6 +624,7 @@ instance : NoMaxOrder Cardinal.{u} where exists_gt a := ⟨_, cantor a⟩
 
 instance : DistribLattice Cardinal.{u} := inferInstance
 
+-- CONFLATES (assumes ground = zero): one_lt_iff_nontrivial
 theorem one_lt_iff_nontrivial {α : Type u} : 1 < #α ↔ Nontrivial α := by
   rw [← not_le, le_one_iff_subsingleton, ← not_nontrivial_iff_subsingleton, Classical.not_not]
 

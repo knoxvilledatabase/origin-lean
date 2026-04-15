@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/Semilat.lean
-Genuine: 9 of 27 | Dissolved: 0 | Infrastructure: 18
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Order.Category.PartOrd

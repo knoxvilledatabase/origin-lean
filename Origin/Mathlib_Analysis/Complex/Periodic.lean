@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Periodic.lean
-Genuine: 14 of 20 | Dissolved: 6 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.RemovableSingularity

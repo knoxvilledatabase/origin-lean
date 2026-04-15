@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/RCLike.lean
-Genuine: 4 of 7 | Dissolved: 2 | Infrastructure: 1
+Genuine: 3 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.RCLike.Basic
@@ -81,6 +81,7 @@ variable (𝕜)
 
 include 𝕜 in
 
+-- CONFLATES (assumes ground = zero): NormedSpace.sphere_nonempty_rclike
 theorem NormedSpace.sphere_nonempty_rclike [Nontrivial E] {r : ℝ} (hr : 0 ≤ r) :
     Nonempty (sphere (0 : E) r) :=
   letI : NormedSpace ℝ E := NormedSpace.restrictScalars ℝ 𝕜 E

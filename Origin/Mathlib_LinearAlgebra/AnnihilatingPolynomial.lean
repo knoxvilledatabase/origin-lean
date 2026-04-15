@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AnnihilatingPolynomial.lean
-Genuine: 11 of 14 | Dissolved: 2 | Infrastructure: 1
+Genuine: 11 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Field

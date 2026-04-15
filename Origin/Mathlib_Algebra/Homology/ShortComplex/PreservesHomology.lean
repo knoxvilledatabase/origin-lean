@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ShortComplex/PreservesHomology.lean
-Genuine: 68 of 85 | Dissolved: 0 | Infrastructure: 17
+Genuine: 68 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.QuasiIso

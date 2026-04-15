@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Noetherian/Basic.lean
-Genuine: 22 of 37 | Dissolved: 0 | Infrastructure: 15
+Genuine: 20 | Conflates: 2 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Quotient.Basic
@@ -227,6 +227,7 @@ lemma Submodule.finite_ne_bot_of_iSupIndep {ι : Type*} {N : ι → Submodule R 
 
 alias Submodule.finite_ne_bot_of_independent := Submodule.finite_ne_bot_of_iSupIndep
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.finite_of_isNoetherian
 theorem LinearIndependent.finite_of_isNoetherian [Nontrivial R] {ι} {v : ι → M}
     (hv : LinearIndependent R v) : Finite ι := by
   refine WellFoundedGT.finite_of_iSupIndep
@@ -236,6 +237,7 @@ theorem LinearIndependent.finite_of_isNoetherian [Nontrivial R] {ι} {v : ι →
   have : v i ∈ R ∙ v i := Submodule.mem_span_singleton_self (v i)
   rwa [contra, Submodule.mem_bot] at this
 
+-- CONFLATES (assumes ground = zero): LinearIndependent.set_finite_of_isNoetherian
 theorem LinearIndependent.set_finite_of_isNoetherian [Nontrivial R] {s : Set M}
     (hi : LinearIndependent R ((↑) : s → M)) : s.Finite :=
   @Set.toFinite _ _ hi.finite_of_isNoetherian

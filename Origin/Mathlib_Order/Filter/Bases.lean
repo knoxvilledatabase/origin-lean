@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Bases.lean
-Genuine: 145 of 168 | Dissolved: 0 | Infrastructure: 23
+Genuine: 145 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Data.Prod.PProd

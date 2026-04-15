@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/EuclideanDomain.lean
-Genuine: 4 of 10 | Dissolved: 6 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Basic

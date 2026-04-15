@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/OpenMapping.lean
-Genuine: 1 of 4 | Dissolved: 0 | Infrastructure: 3
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.IsolatedZeros

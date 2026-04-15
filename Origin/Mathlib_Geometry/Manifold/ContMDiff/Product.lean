@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/ContMDiff/Product.lean
-Genuine: 41 of 41 | Dissolved: 0 | Infrastructure: 0
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.Basic

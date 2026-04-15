@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/DerivationBundle.lean
-Genuine: 7 of 22 | Dissolved: 0 | Infrastructure: 15
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.SmoothFunctions

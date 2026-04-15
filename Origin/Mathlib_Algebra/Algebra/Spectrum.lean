@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Spectrum.lean
-Genuine: 49 of 54 | Dissolved: 2 | Infrastructure: 3
+Genuine: 44 | Conflates: 5 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Star.Subalgebra
@@ -317,6 +317,7 @@ local notation "σ" => spectrum 𝕜
 
 local notation "↑ₐ" => algebraMap 𝕜 A
 
+-- CONFLATES (assumes ground = zero): zero_eq
 @[simp]
 theorem zero_eq [Nontrivial A] : σ (0 : A) = {0} := by
   refine Set.Subset.antisymm ?_ (by simp [Algebra.algebraMap_eq_smul_one, mem_iff])
@@ -326,16 +327,19 @@ theorem zero_eq [Nontrivial A] : σ (0 : A) = {0} := by
   have : IsUnit (Units.mk0 k hk • (1 : A)) := IsUnit.smul (Units.mk0 k hk) isUnit_one
   simpa [mem_resolventSet_iff, Algebra.algebraMap_eq_smul_one]
 
+-- CONFLATES (assumes ground = zero): scalar_eq
 @[simp]
 theorem scalar_eq [Nontrivial A] (k : 𝕜) : σ (↑ₐ k) = {k} := by
   rw [← add_zero (↑ₐ k), ← singleton_add_eq, zero_eq, Set.singleton_add_singleton, add_zero]
 
+-- CONFLATES (assumes ground = zero): one_eq
 @[simp]
 theorem one_eq [Nontrivial A] : σ (1 : A) = {1} :=
   calc
     σ (1 : A) = σ (↑ₐ 1) := by rw [Algebra.algebraMap_eq_smul_one, one_smul]
     _ = {1} := scalar_eq 1
 
+-- CONFLATES (assumes ground = zero): smul_eq_smul
 theorem smul_eq_smul [Nontrivial A] (k : 𝕜) (a : A) (ha : (σ a).Nonempty) :
     σ (k • a) = k • σ a := by
   rcases eq_or_ne k 0 with (rfl | h)
@@ -389,6 +393,7 @@ local notation "σ" => spectrum R
 
 local notation "↑ₐ" => algebraMap R A
 
+-- CONFLATES (assumes ground = zero): apply_mem_spectrum
 theorem apply_mem_spectrum [Nontrivial R] (φ : F) (a : A) : φ a ∈ σ a := by
   have h : ↑ₐ (φ a) - a ∈ RingHom.ker (φ : A →+* R) := by
     simp only [RingHom.mem_ker, map_sub, RingHom.coe_coe, AlgHomClass.commutes,

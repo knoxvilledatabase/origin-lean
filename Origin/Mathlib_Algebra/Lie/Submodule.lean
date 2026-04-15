@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Submodule.lean
-Genuine: 151 of 251 | Dissolved: 0 | Infrastructure: 100
+Genuine: 149 | Conflates: 2 | Dissolved: 0 | Infrastructure: 100
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Subalgebra
@@ -574,6 +574,7 @@ theorem subsingleton_iff : Subsingleton (LieSubmodule R L M) ↔ Subsingleton M 
       top_coeSubmodule, bot_coeSubmodule]
   h.trans <| Submodule.subsingleton_iff R
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff
 @[simp]
 theorem nontrivial_iff : Nontrivial (LieSubmodule R L M) ↔ Nontrivial M :=
   not_iff_not.mp
@@ -583,6 +584,7 @@ theorem nontrivial_iff : Nontrivial (LieSubmodule R L M) ↔ Nontrivial M :=
 instance [Nontrivial M] : Nontrivial (LieSubmodule R L M) :=
   (nontrivial_iff R L M).mpr ‹_›
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_ne_bot
 theorem nontrivial_iff_ne_bot {N : LieSubmodule R L M} : Nontrivial N ↔ N ≠ ⊥ := by
   constructor <;> contrapose!
   · rintro rfl

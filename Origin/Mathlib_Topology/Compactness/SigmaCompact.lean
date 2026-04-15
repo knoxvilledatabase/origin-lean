@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactness/SigmaCompact.lean
-Genuine: 52 of 63 | Dissolved: 0 | Infrastructure: 11
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Topology.Compactness.LocallyCompact

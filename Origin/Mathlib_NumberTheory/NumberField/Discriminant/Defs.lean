@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Discriminant/Defs.lean
-Genuine: 6 of 7 | Dissolved: 1 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Init.Data.ULift

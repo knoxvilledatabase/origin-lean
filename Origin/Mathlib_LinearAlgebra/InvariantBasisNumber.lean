@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/InvariantBasisNumber.lean
-Genuine: 14 of 20 | Dissolved: 0 | Infrastructure: 6
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Quotient.Basic
@@ -215,6 +215,7 @@ theorem card_eq_of_linearEquiv {α β : Type*} [Fintype α] [Fintype β] (f : (�
     ((LinearEquiv.funCongrLeft R R (Fintype.equivFin α)).trans f ≪≫ₗ
       (LinearEquiv.funCongrLeft R R (Fintype.equivFin β)).symm)
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_invariantBasisNumber
 theorem nontrivial_of_invariantBasisNumber : Nontrivial R := by
   by_contra h
   refine zero_ne_one (eq_of_fin_equiv R ?_)

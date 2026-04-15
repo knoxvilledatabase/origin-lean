@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/Hom.lean
-Genuine: 64 of 94 | Dissolved: 0 | Infrastructure: 30
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Defs

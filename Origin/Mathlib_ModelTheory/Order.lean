@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Order.lean
-Genuine: 45 of 70 | Dissolved: 0 | Infrastructure: 25
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Infinite

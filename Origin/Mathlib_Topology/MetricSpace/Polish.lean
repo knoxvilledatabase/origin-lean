@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Polish.lean
-Genuine: 21 of 37 | Dissolved: 0 | Infrastructure: 16
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Star.lean
-Genuine: 2 of 6 | Dissolved: 2 | Infrastructure: 2
+Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Commute

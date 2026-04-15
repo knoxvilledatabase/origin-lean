@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Discriminant/Basic.lean
-Genuine: 14 of 16 | Dissolved: 2 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ZLattice.Covolume

@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Game/State.lean
-Genuine: 13 of 21 | Dissolved: 4 | Infrastructure: 4
+Genuine: 13 | Conflates: 0 | Dissolved: 4 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.SetTheory.Game.Short

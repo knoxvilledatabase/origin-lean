@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/AE.lean
-Genuine: 32 of 46 | Dissolved: 4 | Infrastructure: 10
+Genuine: 32 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Basic

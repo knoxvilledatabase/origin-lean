@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Expand.lean
-Genuine: 32 of 41 | Dissolved: 7 | Infrastructure: 2
+Genuine: 32 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Lemmas

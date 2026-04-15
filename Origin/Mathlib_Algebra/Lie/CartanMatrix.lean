@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/CartanMatrix.lean
-Genuine: 20 of 26 | Dissolved: 0 | Infrastructure: 6
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Free

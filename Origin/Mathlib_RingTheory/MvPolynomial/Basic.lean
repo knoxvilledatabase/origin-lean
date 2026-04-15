@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/Basic.lean
-Genuine: 16 of 24 | Dissolved: 0 | Infrastructure: 8
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs

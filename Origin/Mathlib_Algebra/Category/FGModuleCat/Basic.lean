@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/FGModuleCat/Basic.lean
-Genuine: 14 of 49 | Dissolved: 0 | Infrastructure: 35
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Closed

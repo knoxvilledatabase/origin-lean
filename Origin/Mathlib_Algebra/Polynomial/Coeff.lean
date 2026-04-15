@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Coeff.lean
-Genuine: 49 of 59 | Dissolved: 6 | Infrastructure: 4
+Genuine: 47 | Conflates: 2 | Dissolved: 6 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Support
@@ -39,6 +39,7 @@ theorem coeff_add (p q : R[X]) (n : ℕ) : coeff (p + q) n = coeff p n + coeff q
   simp_rw [← ofFinsupp_add, coeff]
   exact Finsupp.add_apply _ _ _
 
+-- CONFLATES (assumes ground = zero): coeff_smul
 @[simp]
 theorem coeff_smul [SMulZeroClass S R] (r : S) (p : R[X]) (n : ℕ) :
     coeff (r • p) n = r • coeff p n := by
@@ -46,6 +47,7 @@ theorem coeff_smul [SMulZeroClass S R] (r : S) (p : R[X]) (n : ℕ) :
   simp_rw [← ofFinsupp_smul, coeff]
   exact Finsupp.smul_apply _ _ _
 
+-- CONFLATES (assumes ground = zero): support_smul
 theorem support_smul [SMulZeroClass S R] (r : S) (p : R[X]) :
     support (r • p) ⊆ support p := by
   intro i hi

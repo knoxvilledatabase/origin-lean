@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/LocallyConvex/AbsConvex.lean
-Genuine: 49 of 51 | Dissolved: 0 | Infrastructure: 2
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.BalancedCoreHull

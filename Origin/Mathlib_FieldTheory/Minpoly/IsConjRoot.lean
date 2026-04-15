@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Minpoly/IsConjRoot.lean
-Genuine: 32 of 37 | Dissolved: 2 | Infrastructure: 3
+Genuine: 27 | Conflates: 5 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Basic
@@ -87,6 +87,7 @@ theorem isConjRoot_algHom_iff_of_injective {x y : A} {f : A →ₐ[R] B}
     (hf : Function.Injective f) : IsConjRoot R (f x) (f y) ↔ IsConjRoot R x y := by
   rw [isConjRoot_def, isConjRoot_def, algHom_eq f hf, algHom_eq f hf]
 
+-- CONFLATES (assumes ground = zero): isConjRoot_algHom_iff
 theorem isConjRoot_algHom_iff {A} [DivisionRing A] [Algebra R A]
     [Nontrivial B] {x y : A} (f : A →ₐ[R] B) : IsConjRoot R (f x) (f y) ↔ IsConjRoot R x y :=
   isConjRoot_algHom_iff_of_injective f.injective
@@ -147,6 +148,7 @@ theorem isIntegral {x y : A} (hx : IsIntegral R x) (h : IsConjRoot R x y) :
     IsIntegral R y :=
   ⟨minpoly R x, minpoly.monic hx, h ▸ minpoly.aeval R y⟩
 
+-- CONFLATES (assumes ground = zero): eq_algebraMap_of_injective
 theorem eq_algebraMap_of_injective [Nontrivial R] [NoZeroSMulDivisors R S] {r : R} {x : S}
     (h : IsConjRoot R (algebraMap R S r) x) (hf : Function.Injective (algebraMap R S)) :
     x = algebraMap R S r := by
@@ -160,6 +162,7 @@ theorem eq_algebraMap {r : K} {x : S} (h : IsConjRoot K (algebraMap K S r) x) :
     x = algebraMap K S r :=
   eq_algebraMap_of_injective h (algebraMap K S).injective
 
+-- CONFLATES (assumes ground = zero): eq_zero_of_injective
 theorem eq_zero_of_injective [Nontrivial R] [NoZeroSMulDivisors R S] {x : S} (h : IsConjRoot R 0 x)
     (hf : Function.Injective (algebraMap R S)) : x = 0 :=
   (algebraMap R S).map_zero ▸ (eq_algebraMap_of_injective ((algebraMap R S).map_zero ▸ h) hf)
@@ -169,6 +172,7 @@ theorem eq_zero {x : S} (h : IsConjRoot K 0 x) : x = 0 :=
 
 end IsConjRoot
 
+-- CONFLATES (assumes ground = zero): isConjRoot_iff_eq_algebraMap_of_injective
 theorem isConjRoot_iff_eq_algebraMap_of_injective [Nontrivial R] [NoZeroSMulDivisors R S] {r : R}
     {x : S} (hf : Function.Injective (algebraMap R S)) :
     IsConjRoot R (algebraMap R S r) x ↔ x = algebraMap R S r :=
@@ -184,6 +188,7 @@ theorem isConjRoot_iff_eq_algebraMap' {r : K} {x : S} :
     IsConjRoot K x (algebraMap K S r) ↔ x = algebraMap K S r :=
   eq_comm.trans <| isConjRoot_iff_eq_algebraMap_of_injective (algebraMap K S).injective
 
+-- CONFLATES (assumes ground = zero): isConjRoot_zero_iff_eq_zero_of_injective
 theorem isConjRoot_zero_iff_eq_zero_of_injective [Nontrivial R] {x : S} [NoZeroSMulDivisors R S]
     (hf : Function.Injective (algebraMap R S)) : IsConjRoot R 0 x ↔ x = 0 :=
   ⟨fun h => eq_zero_of_injective h hf, fun h => h.symm ▸ rfl⟩

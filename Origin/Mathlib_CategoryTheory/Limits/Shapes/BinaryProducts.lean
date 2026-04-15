@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/BinaryProducts.lean
-Genuine: 126 of 179 | Dissolved: 0 | Infrastructure: 53
+Genuine: 126 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.Over

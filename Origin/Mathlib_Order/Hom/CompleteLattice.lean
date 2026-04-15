@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Hom/CompleteLattice.lean
-Genuine: 62 of 152 | Dissolved: 0 | Infrastructure: 90
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 90
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice

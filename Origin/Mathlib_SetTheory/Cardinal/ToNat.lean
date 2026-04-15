@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/ToNat.lean
-Genuine: 33 of 39 | Dissolved: 3 | Infrastructure: 3
+Genuine: 33 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.ENat

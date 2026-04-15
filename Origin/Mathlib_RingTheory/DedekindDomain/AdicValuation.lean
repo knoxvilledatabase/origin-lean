@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/AdicValuation.lean
-Genuine: 30 of 57 | Dissolved: 6 | Infrastructure: 21
+Genuine: 30 | Conflates: 0 | Dissolved: 6 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Ideal

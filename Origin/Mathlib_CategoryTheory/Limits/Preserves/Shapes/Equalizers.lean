@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/Shapes/Equalizers.lean
-Genuine: 17 of 24 | Dissolved: 0 | Infrastructure: 7
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.SplitCoequalizer

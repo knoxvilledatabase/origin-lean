@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Defs.lean
-Genuine: 15 of 19 | Dissolved: 0 | Infrastructure: 4
+Genuine: 14 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.End
@@ -140,6 +140,7 @@ protected theorem Module.subsingleton (R M : Type*) [Semiring R] [Subsingleton R
     [Module R M] : Subsingleton M :=
   MulActionWithZero.subsingleton R M
 
+-- CONFLATES (assumes ground = zero): Module.nontrivial
 protected theorem Module.nontrivial (R M : Type*) [Semiring R] [Nontrivial M] [AddCommMonoid M]
     [Module R M] : Nontrivial R :=
   MulActionWithZero.nontrivial R M

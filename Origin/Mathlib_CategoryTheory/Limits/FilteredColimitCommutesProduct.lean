@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/FilteredColimitCommutesProduct.lean
-Genuine: 8 of 10 | Dissolved: 0 | Infrastructure: 2
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Filtered

@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Basic.lean
-Genuine: 208 of 232 | Dissolved: 0 | Infrastructure: 24
+Genuine: 208 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Tactic.Attr.Register

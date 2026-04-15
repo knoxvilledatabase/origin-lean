@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Subobject/Limits.lean
-Genuine: 55 of 60 | Dissolved: 0 | Infrastructure: 5
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Lattice

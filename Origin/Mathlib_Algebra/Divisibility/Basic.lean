@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Divisibility/Basic.lean
-Genuine: 24 of 33 | Dissolved: 2 | Infrastructure: 7
+Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic

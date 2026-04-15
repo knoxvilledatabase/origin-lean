@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CubicDiscriminant.lean
-Genuine: 58 of 97 | Dissolved: 37 | Infrastructure: 2
+Genuine: 58 | Conflates: 0 | Dissolved: 37 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Splits

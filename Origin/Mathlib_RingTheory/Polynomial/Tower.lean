@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Tower.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -56,6 +56,7 @@ theorem aeval_algebraMap_apply (x : A) (p : R[X]) :
     aeval (algebraMap A B x) p = algebraMap A B (aeval x p) := by
   rw [aeval_def, aeval_def, hom_eval₂, ← IsScalarTower.algebraMap_eq]
 
+-- CONFLATES (assumes ground = zero): aeval_algebraMap_eq_zero_iff
 @[simp]
 theorem aeval_algebraMap_eq_zero_iff [NoZeroSMulDivisors A B] [Nontrivial B] (x : A) (p : R[X]) :
     aeval (algebraMap A B x) p = 0 ↔ aeval x p = 0 := by

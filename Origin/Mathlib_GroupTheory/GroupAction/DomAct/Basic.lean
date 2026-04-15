@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/DomAct/Basic.lean
-Genuine: 2 of 41 | Dissolved: 0 | Infrastructure: 39
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Opposite

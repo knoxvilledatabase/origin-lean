@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Finite/Basic.lean
-Genuine: 137 of 174 | Dissolved: 0 | Infrastructure: 37
+Genuine: 135 | Conflates: 2 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Defs
@@ -417,6 +417,7 @@ after possibly setting up some `Fintype` and classical `Decidable` instances.
 
 section SetFiniteConstructors
 
+-- CONFLATES (assumes ground = zero): Finite.of_subsingleton
 @[nontriviality]
 theorem Finite.of_subsingleton [Subsingleton α] (s : Set α) : s.Finite :=
   s.toFinite
@@ -554,6 +555,7 @@ theorem finite_mem_finset (s : Finset α) : { a | a ∈ s }.Finite :=
 theorem Subsingleton.finite {s : Set α} (h : s.Subsingleton) : s.Finite :=
   h.induction_on finite_empty finite_singleton
 
+-- CONFLATES (assumes ground = zero): Infinite.nontrivial
 theorem Infinite.nontrivial {s : Set α} (hs : s.Infinite) : s.Nontrivial :=
   not_subsingleton_iff.1 <| mt Subsingleton.finite hs
 

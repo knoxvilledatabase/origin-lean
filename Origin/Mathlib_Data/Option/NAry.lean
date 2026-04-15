@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Option/NAry.lean
-Genuine: 28 of 32 | Dissolved: 0 | Infrastructure: 4
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Batteries.Tactic.Init

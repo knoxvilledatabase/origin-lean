@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Closed/Cartesian.lean
-Genuine: 44 of 51 | Dissolved: 0 | Infrastructure: 7
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EpiMono

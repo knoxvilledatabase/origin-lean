@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Basic.lean
-Genuine: 169 of 210 | Dissolved: 5 | Infrastructure: 36
+Genuine: 169 | Conflates: 0 | Dissolved: 5 | Infrastructure: 36
 -/
 import Origin.Core
 import Aesop

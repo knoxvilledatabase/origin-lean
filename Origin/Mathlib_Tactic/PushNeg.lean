@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/PushNeg.lean
-Genuine: 22 of 22 | Dissolved: 0 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Elab.Tactic.Location

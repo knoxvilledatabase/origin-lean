@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/PosPart.lean
-Genuine: 41 of 50 | Dissolved: 0 | Infrastructure: 9
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Abs

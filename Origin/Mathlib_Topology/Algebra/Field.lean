@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Field.lean
-Genuine: 11 of 16 | Dissolved: 5 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Subfield.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/RootsOfUnity/Complex.lean
-Genuine: 1 of 13 | Dissolved: 12 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 12 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Log

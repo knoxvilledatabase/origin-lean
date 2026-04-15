@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Homotopy/Path.lean
-Genuine: 34 of 39 | Dissolved: 0 | Infrastructure: 5
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Topology.Homotopy.Basic

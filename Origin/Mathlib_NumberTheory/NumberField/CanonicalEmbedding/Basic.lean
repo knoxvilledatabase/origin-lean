@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/CanonicalEmbedding/Basic.lean
-Genuine: 93 of 122 | Dissolved: 3 | Infrastructure: 26
+Genuine: 93 | Conflates: 0 | Dissolved: 3 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ZLattice.Basic

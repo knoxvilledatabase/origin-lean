@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Sat/FromLRAT.lean
-Genuine: 51 of 52 | Dissolved: 0 | Infrastructure: 1
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Basic

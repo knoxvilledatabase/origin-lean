@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Lp/lpSpace.lean
-Genuine: 73 of 133 | Dissolved: 6 | Infrastructure: 54
+Genuine: 73 | Conflates: 0 | Dissolved: 6 | Infrastructure: 54
 -/
 import Origin.Core
 import Mathlib.Analysis.MeanInequalities

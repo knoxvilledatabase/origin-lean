@@ -1,6 +1,6 @@
 /-
 Extracted from Order/CompactlyGenerated/Basic.lean
-Genuine: 44 of 49 | Dissolved: 0 | Infrastructure: 5
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Order.Atoms

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Bounded.lean
-Genuine: 67 of 79 | Dissolved: 0 | Infrastructure: 12
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Order.RelClasses

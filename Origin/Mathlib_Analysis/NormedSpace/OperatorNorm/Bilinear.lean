@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Bilinear.lean
-Genuine: 33 of 49 | Dissolved: 0 | Infrastructure: 16
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic

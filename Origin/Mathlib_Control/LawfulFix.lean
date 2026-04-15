@@ -1,6 +1,6 @@
 /-
 Extracted from Control/LawfulFix.lean
-Genuine: 26 of 30 | Dissolved: 0 | Infrastructure: 4
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Stream.Init

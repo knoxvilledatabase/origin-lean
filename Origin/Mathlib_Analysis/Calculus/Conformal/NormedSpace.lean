@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/Conformal/NormedSpace.lean
-Genuine: 10 of 16 | Dissolved: 4 | Infrastructure: 2
+Genuine: 9 | Conflates: 1 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.ConformalLinearMap
@@ -56,6 +56,7 @@ theorem conformalAt_id (x : X) : ConformalAt _root_.id x :=
 
 -- DISSOLVED: conformalAt_const_smul
 
+-- CONFLATES (assumes ground = zero): Subsingleton.conformalAt
 @[nontriviality]
 theorem Subsingleton.conformalAt [Subsingleton X] (f : X → Y) (x : X) : ConformalAt f x :=
   ⟨0, hasFDerivAt_of_subsingleton _ _, isConformalMap_of_subsingleton _⟩

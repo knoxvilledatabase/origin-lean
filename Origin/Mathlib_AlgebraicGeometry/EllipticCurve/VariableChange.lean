@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/VariableChange.lean
-Genuine: 31 of 36 | Dissolved: 0 | Infrastructure: 5
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass

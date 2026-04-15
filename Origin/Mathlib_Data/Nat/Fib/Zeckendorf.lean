@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Fib/Zeckendorf.lean
-Genuine: 21 of 23 | Dissolved: 2 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Fib.Basic

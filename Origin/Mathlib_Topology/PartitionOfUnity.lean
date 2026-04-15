@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/PartitionOfUnity.lean
-Genuine: 61 of 71 | Dissolved: 3 | Infrastructure: 7
+Genuine: 61 | Conflates: 0 | Dissolved: 3 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finprod

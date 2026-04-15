@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Coloring.lean
-Genuine: 55 of 65 | Dissolved: 0 | Infrastructure: 10
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Clique

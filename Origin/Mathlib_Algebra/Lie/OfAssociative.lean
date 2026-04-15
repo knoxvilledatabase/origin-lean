@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/OfAssociative.lean
-Genuine: 24 of 47 | Dissolved: 0 | Infrastructure: 23
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Basic

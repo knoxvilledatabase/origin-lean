@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/Module/Defs.lean
-Genuine: 28 of 32 | Dissolved: 1 | Infrastructure: 3
+Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order

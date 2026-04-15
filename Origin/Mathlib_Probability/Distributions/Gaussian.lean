@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Distributions/Gaussian.lean
-Genuine: 22 of 39 | Dissolved: 14 | Infrastructure: 3
+Genuine: 22 | Conflates: 0 | Dissolved: 14 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral

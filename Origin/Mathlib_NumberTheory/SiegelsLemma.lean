@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/SiegelsLemma.lean
-Genuine: 4 of 8 | Dissolved: 3 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Matrix

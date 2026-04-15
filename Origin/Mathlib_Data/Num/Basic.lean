@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Num/Basic.lean
-Genuine: 67 of 107 | Dissolved: 0 | Infrastructure: 40
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Lean.Linter.Deprecated

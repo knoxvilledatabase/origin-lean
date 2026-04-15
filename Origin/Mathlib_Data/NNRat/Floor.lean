@@ -1,6 +1,6 @@
 /-
 Extracted from Data/NNRat/Floor.lean
-Genuine: 8 of 11 | Dissolved: 0 | Infrastructure: 3
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Rat.Floor

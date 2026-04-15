@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicTopology/SplitSimplicialObject.lean
-Genuine: 38 of 48 | Dissolved: 0 | Infrastructure: 10
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.AlgebraicTopology.SimplicialObject.Basic

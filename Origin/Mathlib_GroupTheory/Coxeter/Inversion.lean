@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Coxeter/Inversion.lean
-Genuine: 47 of 50 | Dissolved: 0 | Infrastructure: 3
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Coxeter.Length

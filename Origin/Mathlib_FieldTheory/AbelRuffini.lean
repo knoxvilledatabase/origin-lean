@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/AbelRuffini.lean
-Genuine: 20 of 24 | Dissolved: 4 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Solvable

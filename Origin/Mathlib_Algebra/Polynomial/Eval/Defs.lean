@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Eval/Defs.lean
-Genuine: 136 of 145 | Dissolved: 1 | Infrastructure: 8
+Genuine: 136 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Quasispectrum.lean
-Genuine: 52 of 67 | Dissolved: 0 | Infrastructure: 15
+Genuine: 49 | Conflates: 4 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Unitization
@@ -237,10 +237,12 @@ variable {R} in
 lemma quasispectrum.not_isUnit_mem (a : A) {r : R} (hr : ¬ IsUnit r) : r ∈ quasispectrum R a :=
   fun hr' ↦ (hr hr').elim
 
+-- CONFLATES (assumes ground = zero): quasispectrum.zero_mem
 @[simp]
 lemma quasispectrum.zero_mem [Nontrivial R] (a : A) : 0 ∈ quasispectrum R a :=
   quasispectrum.not_isUnit_mem a <| by simp
 
+-- CONFLATES (assumes ground = zero): quasispectrum.nonempty
 theorem quasispectrum.nonempty [Nontrivial R] (a : A) : (quasispectrum R a).Nonempty :=
   Set.nonempty_of_mem <| quasispectrum.zero_mem R a
 
@@ -267,6 +269,7 @@ lemma NonUnitalAlgHom.quasispectrum_apply_subset {F R A B : Type*}
     quasispectrum R (φ a) ⊆ quasispectrum R a :=
   NonUnitalAlgHom.quasispectrum_apply_subset' R φ a
 
+-- CONFLATES (assumes ground = zero): quasispectrum.coe_zero
 @[simp]
 lemma quasispectrum.coe_zero [Nontrivial R] (a : A) : (0 : quasispectrum R a) = (0 : R) := rfl
 
@@ -310,6 +313,7 @@ lemma isQuasiregular_inr_iff (a : A) :
   lift y to A using by simpa using congr(fstHom R A $(hy₁))
   refine ⟨y, ?_, ?_⟩ <;> exact inr_injective (R := R) <| by simpa
 
+-- CONFLATES (assumes ground = zero): zero_mem_spectrum_inr
 lemma zero_mem_spectrum_inr (R S : Type*) {A : Type*} [CommSemiring R]
     [CommRing S] [Nontrivial S] [NonUnitalRing A] [Algebra R S] [Module S A] [IsScalarTower S A A]
     [SMulCommClass S A A] [Module R A] [IsScalarTower R S A] (a : A) :

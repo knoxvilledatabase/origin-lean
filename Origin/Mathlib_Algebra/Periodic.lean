@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Periodic.lean
-Genuine: 99 of 117 | Dissolved: 10 | Infrastructure: 8
+Genuine: 99 | Conflates: 0 | Dissolved: 10 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Opposite

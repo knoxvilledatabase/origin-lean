@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Calculus.lean
-Genuine: 58 of 68 | Dissolved: 9 | Infrastructure: 1
+Genuine: 58 | Conflates: 0 | Dissolved: 9 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2

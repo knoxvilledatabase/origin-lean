@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/IsSheafFor.lean
-Genuine: 63 of 70 | Dissolved: 0 | Infrastructure: 7
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sieves

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Defs.lean
-Genuine: 122 of 187 | Dissolved: 29 | Infrastructure: 36
+Genuine: 122 | Conflates: 0 | Dissolved: 29 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Indicator

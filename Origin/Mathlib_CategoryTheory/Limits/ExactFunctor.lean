@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/ExactFunctor.lean
-Genuine: 17 of 50 | Dissolved: 0 | Infrastructure: 33
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Finite

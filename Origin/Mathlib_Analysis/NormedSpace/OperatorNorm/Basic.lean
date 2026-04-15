@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Basic.lean
-Genuine: 41 of 55 | Dissolved: 3 | Infrastructure: 11
+Genuine: 40 | Conflates: 1 | Dissolved: 3 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -276,6 +276,7 @@ end
 
 variable [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F)
 
+-- CONFLATES (assumes ground = zero): opNorm_subsingleton
 @[simp, nontriviality]
 theorem opNorm_subsingleton [Subsingleton E] : ‖f‖ = 0 := by
   refine le_antisymm ?_ (norm_nonneg _)

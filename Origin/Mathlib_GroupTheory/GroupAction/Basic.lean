@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/Basic.lean
-Genuine: 19 of 23 | Dissolved: 1 | Infrastructure: 3
+Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Map

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/ProjIcc.lean
-Genuine: 66 of 72 | Dissolved: 0 | Infrastructure: 6
+Genuine: 66 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Set.Function

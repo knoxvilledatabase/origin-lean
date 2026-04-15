@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Basis/Defs.lean
-Genuine: 93 of 115 | Dissolved: 0 | Infrastructure: 22
+Genuine: 90 | Conflates: 3 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
@@ -106,6 +106,7 @@ instance instFunLike : FunLike (Basis ι R M) ι M where
 theorem coe_ofRepr (e : M ≃ₗ[R] ι →₀ R) : ⇑(ofRepr e) = fun i => e.symm (Finsupp.single i 1) :=
   rfl
 
+-- CONFLATES (assumes ground = zero): injective
 protected theorem injective [Nontrivial R] : Injective b :=
   b.repr.symm.injective.comp fun _ _ => (Finsupp.single_left_inj (one_ne_zero : (1 : R) ≠ 0)).mp
 
@@ -163,6 +164,7 @@ theorem mem_span_image {m : M} {s : Set ι} : m ∈ span R (b '' s) ↔ ↑(b.re
   ⟨repr_support_subset_of_mem_span _ _, fun h ↦
     span_mono (image_subset _ h) (mem_span_repr_support b _)⟩
 
+-- CONFLATES (assumes ground = zero): self_mem_span_image
 @[simp]
 theorem self_mem_span_image [Nontrivial R] {i : ι} {s : Set ι} :
     b i ∈ span R (b '' s) ↔ i ∈ s := by
@@ -494,6 +496,7 @@ protected theorem mem_span (x : M) : x ∈ span R (range b) :=
 protected theorem span_eq : span R (range b) = ⊤ :=
   eq_top_iff.mpr fun x _ => b.mem_span x
 
+-- CONFLATES (assumes ground = zero): index_nonempty
 theorem index_nonempty (b : Basis ι R M) [Nontrivial M] : Nonempty ι := by
   obtain ⟨x, y, ne⟩ : ∃ x y : M, x ≠ y := Nontrivial.exists_pair_ne
   obtain ⟨i, _⟩ := not_forall.mp (mt b.ext_elem_iff.2 ne)

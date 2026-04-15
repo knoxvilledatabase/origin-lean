@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Products.lean
-Genuine: 96 of 111 | Dissolved: 0 | Infrastructure: 15
+Genuine: 96 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits

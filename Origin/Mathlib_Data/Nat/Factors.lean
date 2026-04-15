@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Factors.lean
-Genuine: 22 of 38 | Dissolved: 16 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 16 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring.List

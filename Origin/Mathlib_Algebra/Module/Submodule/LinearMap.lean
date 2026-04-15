@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/LinearMap.lean
-Genuine: 19 of 36 | Dissolved: 0 | Infrastructure: 17
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

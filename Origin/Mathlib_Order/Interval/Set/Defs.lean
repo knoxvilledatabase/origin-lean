@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Defs.lean
-Genuine: 9 of 25 | Dissolved: 0 | Infrastructure: 16
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Data.Set.Defs

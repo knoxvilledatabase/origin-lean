@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/Factorization.lean
-Genuine: 18 of 40 | Dissolved: 22 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 22 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Cofinite

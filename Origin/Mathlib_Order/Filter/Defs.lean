@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Defs.lean
-Genuine: 39 of 60 | Dissolved: 0 | Infrastructure: 21
+Genuine: 38 | Conflates: 1 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Order.SetNotation
@@ -213,6 +213,7 @@ instance instInf : Min (Filter α) :=
 instance instSup : Max (Filter α) where
   max f g := .copy (sSup {f, g}) {s | s ∈ f ∧ s ∈ g} <| by simp
 
+-- CONFLATES (assumes ground = zero): NeBot
 class NeBot (f : Filter α) : Prop where
   /-- The filter is nontrivial: `f ≠ ⊥` or equivalently, `∅ ∉ f`. -/
   ne' : f ≠ ⊥

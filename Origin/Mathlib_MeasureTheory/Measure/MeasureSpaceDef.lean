@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/MeasureSpaceDef.lean
-Genuine: 52 of 59 | Dissolved: 2 | Infrastructure: 5
+Genuine: 52 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Induced

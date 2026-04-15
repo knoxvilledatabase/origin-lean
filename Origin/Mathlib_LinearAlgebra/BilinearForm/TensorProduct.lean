@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/TensorProduct.lean
-Genuine: 11 of 16 | Dissolved: 0 | Infrastructure: 5
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Hom

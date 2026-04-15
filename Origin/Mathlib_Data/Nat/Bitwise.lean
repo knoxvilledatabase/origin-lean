@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Bitwise.lean
-Genuine: 38 of 49 | Dissolved: 6 | Infrastructure: 5
+Genuine: 38 | Conflates: 0 | Dissolved: 6 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Even

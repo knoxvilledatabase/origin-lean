@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/SmallObject/Iteration/Basic.lean
-Genuine: 16 of 25 | Dissolved: 0 | Infrastructure: 9
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Preorder

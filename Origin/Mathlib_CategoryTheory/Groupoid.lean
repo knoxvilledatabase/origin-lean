@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Groupoid.lean
-Genuine: 9 of 16 | Dissolved: 0 | Infrastructure: 7
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.FullSubcategory

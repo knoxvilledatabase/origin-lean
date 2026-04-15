@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Finset/Defs.lean
-Genuine: 104 of 174 | Dissolved: 0 | Infrastructure: 70
+Genuine: 104 | Conflates: 0 | Dissolved: 0 | Infrastructure: 70
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Preimage

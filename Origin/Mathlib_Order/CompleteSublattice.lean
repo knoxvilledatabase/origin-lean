@@ -1,6 +1,6 @@
 /-
 Extracted from Order/CompleteSublattice.lean
-Genuine: 17 of 37 | Dissolved: 0 | Infrastructure: 20
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Data.Set.Functor

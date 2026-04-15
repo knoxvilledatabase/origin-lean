@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subgroup/Ker.lean
-Genuine: 64 of 84 | Dissolved: 0 | Infrastructure: 20
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Map

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Finiteness/TensorProduct.lean
-Genuine: 3 of 6 | Dissolved: 0 | Infrastructure: 3
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Bilinear

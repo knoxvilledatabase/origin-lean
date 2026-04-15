@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Finsupp.lean
-Genuine: 69 of 78 | Dissolved: 4 | Infrastructure: 5
+Genuine: 69 | Conflates: 0 | Dissolved: 4 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Pi

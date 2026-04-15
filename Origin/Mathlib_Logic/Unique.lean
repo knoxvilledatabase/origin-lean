@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Unique.lean
-Genuine: 24 of 40 | Dissolved: 0 | Infrastructure: 16
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Logic.IsEmpty

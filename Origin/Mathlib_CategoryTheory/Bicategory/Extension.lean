@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/Extension.lean
-Genuine: 42 of 50 | Dissolved: 0 | Infrastructure: 8
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Basic

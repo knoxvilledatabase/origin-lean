@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Finset/Box.lean
-Genuine: 11 of 13 | Dissolved: 1 | Infrastructure: 1
+Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Prod

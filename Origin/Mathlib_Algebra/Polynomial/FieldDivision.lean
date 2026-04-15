@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/FieldDivision.lean
-Genuine: 49 of 87 | Dissolved: 32 | Infrastructure: 6
+Genuine: 44 | Conflates: 5 | Dissolved: 32 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Derivative
@@ -168,6 +168,7 @@ variable [DivisionRing R] {p q : R[X]}
 
 -- DISSOLVED: degree_pos_of_ne_zero_of_nonunit
 
+-- CONFLATES (assumes ground = zero): map_eq_zero
 @[simp]
 theorem map_eq_zero [Semiring S] [Nontrivial S] (f : R →+* S) : p.map f = 0 ↔ p = 0 := by
   simp only [Polynomial.ext_iff]
@@ -176,21 +177,25 @@ theorem map_eq_zero [Semiring S] [Nontrivial S] (f : R →+* S) : p.map f = 0 �
 
 -- DISSOLVED: map_ne_zero
 
+-- CONFLATES (assumes ground = zero): degree_map
 @[simp]
 theorem degree_map [Semiring S] [Nontrivial S] (p : R[X]) (f : R →+* S) :
     degree (p.map f) = degree p :=
   p.degree_map_eq_of_injective f.injective
 
+-- CONFLATES (assumes ground = zero): natDegree_map
 @[simp]
 theorem natDegree_map [Semiring S] [Nontrivial S] (f : R →+* S) :
     natDegree (p.map f) = natDegree p :=
   natDegree_eq_of_degree_eq (degree_map _ f)
 
+-- CONFLATES (assumes ground = zero): leadingCoeff_map
 @[simp]
 theorem leadingCoeff_map [Semiring S] [Nontrivial S] (f : R →+* S) :
     leadingCoeff (p.map f) = f (leadingCoeff p) := by
   simp only [← coeff_natDegree, coeff_map f, natDegree_map]
 
+-- CONFLATES (assumes ground = zero): monic_map_iff
 theorem monic_map_iff [Semiring S] [Nontrivial S] {f : R →+* S} {p : R[X]} :
     (p.map f).Monic ↔ p.Monic := by
   rw [Monic, leadingCoeff_map, ← f.map_one, Function.Injective.eq_iff f.injective, Monic]

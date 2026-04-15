@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Opposites.lean
-Genuine: 44 of 82 | Dissolved: 0 | Infrastructure: 38
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Equivalence

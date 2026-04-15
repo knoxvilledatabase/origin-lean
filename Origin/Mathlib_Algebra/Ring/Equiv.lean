@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Equiv.lean
-Genuine: 72 of 134 | Dissolved: 3 | Infrastructure: 59
+Genuine: 72 | Conflates: 0 | Dissolved: 3 | Infrastructure: 59
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Prod

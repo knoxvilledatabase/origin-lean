@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Separation/Basic.lean
-Genuine: 299 of 376 | Dissolved: 0 | Infrastructure: 77
+Genuine: 296 | Conflates: 3 | Dissolved: 0 | Infrastructure: 77
 -/
 import Origin.Core
 import Mathlib.Topology.Compactness.Lindelof
@@ -861,12 +861,14 @@ theorem PreconnectedSpace.trivial_of_discrete [PreconnectedSpace X] [DiscreteTop
   rw [Ne, ‚Üê mem_singleton_iff, (isClopen_discrete _).eq_univ <| singleton_nonempty y] at hxy
   exact hxy (mem_univ x)
 
+-- CONFLATES (assumes ground = zero): IsPreconnected.infinite_of_nontrivial
 theorem IsPreconnected.infinite_of_nontrivial [T1Space X] {s : Set X} (h : IsPreconnected s)
     (hs : s.Nontrivial) : s.Infinite := by
   refine mt (fun hf => (subsingleton_coe s).mp ?_) (not_subsingleton_iff.mpr hs)
   haveI := @Finite.instDiscreteTopology s _ _ hf.to_subtype
   exact @PreconnectedSpace.trivial_of_discrete _ _ (Subtype.preconnectedSpace h) _
 
+-- CONFLATES (assumes ground = zero): ConnectedSpace.infinite
 theorem ConnectedSpace.infinite [ConnectedSpace X] [Nontrivial X] [T1Space X] : Infinite X :=
   infinite_univ_iff.mp <| isPreconnected_univ.infinite_of_nontrivial nontrivial_univ
 
@@ -1706,6 +1708,7 @@ theorem isIrreducible_iff_singleton [T2Space X] {S : Set X} : IsIrreducible S ‚Ü
   rw [IsIrreducible, isPreirreducible_iff_subsingleton,
     exists_eq_singleton_iff_nonempty_subsingleton]
 
+-- CONFLATES (assumes ground = zero): not_preirreducible_nontrivial_t2
 theorem not_preirreducible_nontrivial_t2 (X) [TopologicalSpace X] [PreirreducibleSpace X]
     [Nontrivial X] [T2Space X] : False :=
   (PreirreducibleSpace.isPreirreducible_univ (X := X)).subsingleton.not_nontrivial nontrivial_univ

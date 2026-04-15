@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/HahnSeries/PowerSeries.lean
-Genuine: 11 of 20 | Dissolved: 0 | Infrastructure: 9
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.RingTheory.HahnSeries.Multiplication

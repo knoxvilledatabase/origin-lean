@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Minpoly/Field.lean
-Genuine: 27 of 31 | Dissolved: 3 | Infrastructure: 1
+Genuine: 23 | Conflates: 4 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.FieldDivision
@@ -95,6 +95,7 @@ lemma ker_aeval_eq_span_minpoly :
 
 variable {A x}
 
+-- CONFLATES (assumes ground = zero): eq_of_irreducible_of_monic
 theorem eq_of_irreducible_of_monic [Nontrivial B] {p : A[X]} (hp1 : Irreducible p)
     (hp2 : Polynomial.aeval x p = 0) (hp3 : p.Monic) : p = minpoly A x :=
   let ⟨_, hq⟩ := dvd A x hp2
@@ -102,15 +103,18 @@ theorem eq_of_irreducible_of_monic [Nontrivial B] {p : A[X]} (hp1 : Irreducible 
     mul_one (minpoly A x) ▸ hq.symm ▸ Associated.mul_left _
       (associated_one_iff_isUnit.2 <| (hp1.isUnit_or_isUnit hq).resolve_left <| not_isUnit A x)
 
+-- CONFLATES (assumes ground = zero): eq_iff_aeval_eq_zero
 theorem eq_iff_aeval_eq_zero [Nontrivial B] {p : A[X]} (irr: Irreducible p) (monic: p.Monic) :
     p = minpoly A x ↔ Polynomial.aeval x p = 0 :=
   ⟨(· ▸ aeval A x), (eq_of_irreducible_of_monic irr · monic)⟩
 
+-- CONFLATES (assumes ground = zero): eq_iff_aeval_minpoly_eq_zero
 theorem eq_iff_aeval_minpoly_eq_zero [IsDomain B] {C} [Ring C] [Algebra A C] [Nontrivial C]
     {b : B} (h : IsIntegral A b) {c : C} :
     minpoly A b = minpoly A c ↔ Polynomial.aeval c (minpoly A b) = 0 :=
   eq_iff_aeval_eq_zero (irreducible h) (monic h)
 
+-- CONFLATES (assumes ground = zero): eq_of_irreducible
 theorem eq_of_irreducible [Nontrivial B] {p : A[X]} (hp1 : Irreducible p)
     (hp2 : Polynomial.aeval x p = 0) : p * C p.leadingCoeff⁻¹ = minpoly A x := by
   have : p.leadingCoeff ≠ 0 := leadingCoeff_ne_zero.mpr hp1.ne_zero

@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/RatFunc/AsPolynomial.lean
-Genuine: 16 of 28 | Dissolved: 6 | Infrastructure: 6
+Genuine: 16 | Conflates: 0 | Dissolved: 6 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.FieldTheory.RatFunc.Basic

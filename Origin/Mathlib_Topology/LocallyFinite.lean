@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/LocallyFinite.lean
-Genuine: 30 of 30 | Dissolved: 0 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousOn

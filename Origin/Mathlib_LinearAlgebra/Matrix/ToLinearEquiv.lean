@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/ToLinearEquiv.lean
-Genuine: 4 of 13 | Dissolved: 7 | Infrastructure: 2
+Genuine: 4 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs

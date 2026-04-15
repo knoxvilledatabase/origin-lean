@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/Bitwise.lean
-Genuine: 53 of 62 | Dissolved: 0 | Infrastructure: 9
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Int.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/Basic.lean
-Genuine: 39 of 39 | Dissolved: 0 | Infrastructure: 0
+Genuine: 38 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.LinearIndependent
@@ -295,6 +295,7 @@ theorem LinearMap.rank_le_of_surjective (f : M →ₗ[R] M₁) (h : Surjective f
   rw [← rank_range_of_surjective f h]
   apply rank_range_le
 
+-- CONFLATES (assumes ground = zero): rank_subsingleton
 @[nontriviality, simp]
 theorem rank_subsingleton [Subsingleton R] : Module.rank R M = 1 := by
   haveI := Module.subsingleton R M

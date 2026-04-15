@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/Basic.lean
-Genuine: 23 of 41 | Dissolved: 11 | Infrastructure: 7
+Genuine: 23 | Conflates: 0 | Dissolved: 11 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.PSeries

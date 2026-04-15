@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Complement.lean
-Genuine: 86 of 102 | Dissolved: 0 | Infrastructure: 16
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Quotient

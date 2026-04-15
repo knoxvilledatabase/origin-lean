@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Basic.lean
-Genuine: 424 of 545 | Dissolved: 0 | Infrastructure: 121
+Genuine: 423 | Conflates: 1 | Dissolved: 0 | Infrastructure: 121
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.ZeroOne
@@ -1311,6 +1311,7 @@ theorem compl_ne_univ : sᶜ ≠ univ ↔ s.Nonempty :=
 theorem nonempty_compl : sᶜ.Nonempty ↔ s ≠ univ :=
   (ne_univ_iff_exists_not_mem s).symm
 
+-- CONFLATES (assumes ground = zero): nonempty_compl_of_nontrivial
 @[simp] lemma nonempty_compl_of_nontrivial [Nontrivial α] (x : α) : Set.Nonempty {x}ᶜ := by
   obtain ⟨y, hy⟩ := exists_ne x
   exact ⟨y, by simp [hy]⟩

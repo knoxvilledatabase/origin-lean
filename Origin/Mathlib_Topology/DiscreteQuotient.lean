@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/DiscreteQuotient.lean
-Genuine: 49 of 69 | Dissolved: 0 | Infrastructure: 20
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Data.Setoid.Partition

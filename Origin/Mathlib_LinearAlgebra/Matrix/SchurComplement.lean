@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/SchurComplement.lean
-Genuine: 37 of 40 | Dissolved: 2 | Infrastructure: 1
+Genuine: 37 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Invertible

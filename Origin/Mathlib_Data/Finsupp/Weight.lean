@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Weight.lean
-Genuine: 9 of 17 | Dissolved: 6 | Infrastructure: 2
+Genuine: 9 | Conflates: 0 | Dissolved: 6 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset

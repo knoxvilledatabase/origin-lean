@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/RootsOfUnity/PrimitiveRoots.lean
-Genuine: 51 of 83 | Dissolved: 25 | Infrastructure: 7
+Genuine: 48 | Conflates: 3 | Dissolved: 25 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.RingTheory.RootsOfUnity.Basic
@@ -96,6 +96,7 @@ section CommMonoid
 
 variable {ζ : M} {f : F}
 
+-- CONFLATES (assumes ground = zero): of_subsingleton
 @[nontriviality]
 theorem of_subsingleton [Subsingleton M] (x : M) : IsPrimitiveRoot x 1 :=
   ⟨Subsingleton.elim _ _, fun _ _ ↦ one_dvd _⟩
@@ -257,6 +258,7 @@ section CommMonoidWithZero
 
 variable {M₀ : Type*} [CommMonoidWithZero M₀]
 
+-- CONFLATES (assumes ground = zero): zero
 theorem zero [Nontrivial M₀] : IsPrimitiveRoot (0 : M₀) 0 :=
   ⟨pow_zero 0, fun l hl ↦ by simpa [zero_pow_eq] using hl⟩
 
@@ -345,6 +347,7 @@ variable [CommRing R] {ζ : Rˣ} (h : IsPrimitiveRoot ζ k)
 theorem eq_neg_one_of_two_right [NoZeroDivisors R] {ζ : R} (h : IsPrimitiveRoot ζ 2) : ζ = -1 :=
   (sq_eq_one_iff.mp h.pow_eq_one).resolve_left <| ne_one h one_lt_two
 
+-- CONFLATES (assumes ground = zero): neg_one
 theorem neg_one (p : ℕ) [Nontrivial R] [h : CharP R p] (hp : p ≠ 2) :
     IsPrimitiveRoot (-1 : R) 2 := by
   convert IsPrimitiveRoot.orderOf (-1 : R)

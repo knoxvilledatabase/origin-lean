@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Adjunction/Basic.lean
-Genuine: 62 of 73 | Dissolved: 0 | Infrastructure: 11
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Equivalence

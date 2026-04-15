@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Wronskian.lean
-Genuine: 13 of 16 | Dissolved: 2 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap

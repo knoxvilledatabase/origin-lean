@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Lemmas.lean
-Genuine: 38 of 47 | Dissolved: 5 | Infrastructure: 4
+Genuine: 38 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Divisibility

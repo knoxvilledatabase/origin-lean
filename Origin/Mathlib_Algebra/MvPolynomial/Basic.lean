@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Basic.lean
-Genuine: 221 of 274 | Dissolved: 15 | Infrastructure: 38
+Genuine: 212 | Conflates: 10 | Dissolved: 15 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -247,13 +247,16 @@ theorem smul_eq_C_mul (p : MvPolynomial σ R) (a : R) : a • p = C a * p :=
 theorem C_eq_smul_one : (C a : MvPolynomial σ R) = a • (1 : MvPolynomial σ R) := by
   rw [← C_mul', mul_one]
 
+-- CONFLATES (assumes ground = zero): smul_monomial
 theorem smul_monomial {S₁ : Type*} [SMulZeroClass S₁ R] (r : S₁) :
     r • monomial s a = monomial s (r • a) :=
   Finsupp.smul_single _ _ _
 
+-- CONFLATES (assumes ground = zero): X_injective
 theorem X_injective [Nontrivial R] : Function.Injective (X : σ → MvPolynomial σ R) :=
   (monomial_left_injective one_ne_zero).comp (Finsupp.single_left_injective one_ne_zero)
 
+-- CONFLATES (assumes ground = zero): X_inj
 @[simp]
 theorem X_inj [Nontrivial R] (m n : σ) : X m = (X n : MvPolynomial σ R) ↔ m = n :=
   X_injective.eq_iff
@@ -449,9 +452,11 @@ theorem support_monomial_subset : (monomial s a).support ⊆ {s} :=
 theorem support_add [DecidableEq σ] : (p + q).support ⊆ p.support ∪ q.support :=
   Finsupp.support_add
 
+-- CONFLATES (assumes ground = zero): support_X
 theorem support_X [Nontrivial R] : (X n : MvPolynomial σ R).support = {Finsupp.single n 1} := by
   classical rw [X, support_monomial, if_neg]; exact one_ne_zero
 
+-- CONFLATES (assumes ground = zero): support_X_pow
 theorem support_X_pow [Nontrivial R] (s : σ) (n : ℕ) :
     (X s ^ n : MvPolynomial σ R).support = {Finsupp.single s n} := by
   classical
@@ -461,6 +466,7 @@ theorem support_X_pow [Nontrivial R] (s : σ) (n : ℕ) :
 theorem support_zero : (0 : MvPolynomial σ R).support = ∅ :=
   rfl
 
+-- CONFLATES (assumes ground = zero): support_smul
 theorem support_smul {S₁ : Type*} [SMulZeroClass S₁ R] {a : S₁} {f : MvPolynomial σ R} :
     (a • f).support ⊆ f.support :=
   Finsupp.support_smul
@@ -496,6 +502,7 @@ theorem ext (p q : MvPolynomial σ R) : (∀ m, coeff m p = coeff m q) → p = q
 theorem coeff_add (m : σ →₀ ℕ) (p q : MvPolynomial σ R) : coeff m (p + q) = coeff m p + coeff m q :=
   add_apply p q m
 
+-- CONFLATES (assumes ground = zero): coeff_smul
 @[simp]
 theorem coeff_smul {S₁ : Type*} [SMulZeroClass S₁ R] (m : σ →₀ ℕ) (C : S₁) (p : MvPolynomial σ R) :
     coeff m (C • p) = C • coeff m p :=
@@ -733,10 +740,12 @@ lemma coeffs_one : coeffs (1 : MvPolynomial σ R) ⊆ {1} := by
     rw [coeffs, Finset.image_subset_iff]
     simp_all [coeff_one]
 
+-- CONFLATES (assumes ground = zero): coeffs_eq_empty_of_subsingleton
 @[nontriviality]
 lemma coeffs_eq_empty_of_subsingleton [Subsingleton R] (p : MvPolynomial σ R) : p.coeffs = ∅ := by
   simpa [coeffs] using Subsingleton.eq_zero p
 
+-- CONFLATES (assumes ground = zero): coeffs_one_of_nontrivial
 @[simp]
 lemma coeffs_one_of_nontrivial [Nontrivial R] : coeffs (1 : MvPolynomial σ R) = {1} := by
   apply Finset.Subset.antisymm coeffs_one
@@ -784,6 +793,7 @@ theorem constantCoeff_X (i : σ) : constantCoeff (X i : MvPolynomial σ R) = 0 :
 
 variable {R}
 
+-- CONFLATES (assumes ground = zero): constantCoeff_smul
 @[simp]
 theorem constantCoeff_smul {R : Type*} [SMulZeroClass R S₁] (a : R) (f : MvPolynomial σ S₁) :
     constantCoeff (a • f) = a • constantCoeff f :=

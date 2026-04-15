@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PrincipalIdealDomain.lean
-Genuine: 49 of 67 | Dissolved: 5 | Infrastructure: 13
+Genuine: 49 | Conflates: 0 | Dissolved: 5 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Field

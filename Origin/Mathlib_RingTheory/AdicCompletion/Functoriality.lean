@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/AdicCompletion/Functoriality.lean
-Genuine: 28 of 41 | Dissolved: 0 | Infrastructure: 13
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.RingTheory.AdicCompletion.Basic

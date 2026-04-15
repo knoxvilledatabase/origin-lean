@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/LpSeminorm/TriangleInequality.lean
-Genuine: 18 of 19 | Dissolved: 1 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.LpSeminorm.Basic

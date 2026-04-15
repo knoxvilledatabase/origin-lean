@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FLT/Four.lean
-Genuine: 14 of 17 | Dissolved: 3 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Factors

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/ConditionalExpectation/CondexpL2.lean
-Genuine: 36 of 37 | Dissolved: 0 | Infrastructure: 1
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sheaves/SheafCondition/Sites.lean
-Genuine: 21 of 25 | Dissolved: 0 | Infrastructure: 4
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Spaces

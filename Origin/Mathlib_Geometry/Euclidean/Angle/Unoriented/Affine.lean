@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Unoriented/Affine.lean
-Genuine: 51 of 62 | Dissolved: 4 | Infrastructure: 7
+Genuine: 51 | Conflates: 0 | Dissolved: 4 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Between

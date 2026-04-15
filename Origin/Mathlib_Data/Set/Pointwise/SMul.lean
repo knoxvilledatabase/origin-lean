@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Pointwise/SMul.lean
-Genuine: 65 of 93 | Dissolved: 17 | Infrastructure: 11
+Genuine: 64 | Conflates: 1 | Dissolved: 17 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
@@ -501,6 +501,7 @@ theorem smul_univ₀ {s : Set α} (hs : ¬s ⊆ 0) : s • (univ : Set β) = uni
   let ⟨a, ha, ha₀⟩ := not_subset.1 hs
   eq_univ_of_forall fun b ↦ ⟨a, ha, a⁻¹ • b, trivial, smul_inv_smul₀ ha₀ _⟩
 
+-- CONFLATES (assumes ground = zero): smul_univ₀'
 theorem smul_univ₀' {s : Set α} (hs : s.Nontrivial) : s • (univ : Set β) = univ :=
   smul_univ₀ hs.not_subset_singleton
 

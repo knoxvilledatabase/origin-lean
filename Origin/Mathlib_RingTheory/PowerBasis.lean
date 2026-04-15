@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PowerBasis.lean
-Genuine: 45 of 51 | Dissolved: 4 | Infrastructure: 2
+Genuine: 38 | Conflates: 7 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Field
@@ -86,9 +86,11 @@ theorem mem_span_pow' {x y : S} {d : ℕ} :
 
 -- DISSOLVED: dim_ne_zero
 
+-- CONFLATES (assumes ground = zero): dim_pos
 theorem dim_pos [Nontrivial S] (pb : PowerBasis R S) : 0 < pb.dim :=
   Nat.pos_of_ne_zero pb.dim_ne_zero
 
+-- CONFLATES (assumes ground = zero): exists_eq_aeval
 theorem exists_eq_aeval [Nontrivial S] (pb : PowerBasis R S) (y : S) :
     ∃ f : R[X], f.natDegree < pb.dim ∧ y = aeval pb.gen f :=
   (mem_span_pow pb.dim_ne_zero).mp (by simpa using pb.basis.mem_span y)
@@ -152,12 +154,14 @@ theorem minpolyGen_monic (pb : PowerBasis A S) : Monic (minpolyGen pb) := by
 
 -- DISSOLVED: dim_le_degree_of_root
 
+-- CONFLATES (assumes ground = zero): degree_minpolyGen
 theorem degree_minpolyGen [Nontrivial A] (pb : PowerBasis A S) :
     degree (minpolyGen pb) = pb.dim := by
   unfold minpolyGen
   rw [degree_sub_eq_left_of_degree_lt] <;> rw [degree_X_pow]
   apply degree_sum_fin_lt
 
+-- CONFLATES (assumes ground = zero): natDegree_minpolyGen
 theorem natDegree_minpolyGen [Nontrivial A] (pb : PowerBasis A S) :
     natDegree (minpolyGen pb) = pb.dim :=
   natDegree_eq_of_degree_eq_some pb.degree_minpolyGen
@@ -172,10 +176,12 @@ theorem minpolyGen_eq (pb : PowerBasis A S) : pb.minpolyGen = minpoly A pb.gen :
 theorem isIntegral_gen (pb : PowerBasis A S) : IsIntegral A pb.gen :=
   ⟨minpolyGen pb, minpolyGen_monic pb, aeval_minpolyGen pb⟩
 
+-- CONFLATES (assumes ground = zero): degree_minpoly
 @[simp]
 theorem degree_minpoly [Nontrivial A] (pb : PowerBasis A S) :
     degree (minpoly A pb.gen) = pb.dim := by rw [← minpolyGen_eq, degree_minpolyGen]
 
+-- CONFLATES (assumes ground = zero): natDegree_minpoly
 @[simp]
 theorem natDegree_minpoly [Nontrivial A] (pb : PowerBasis A S) :
     (minpoly A pb.gen).natDegree = pb.dim := by rw [← minpolyGen_eq, natDegree_minpolyGen]
@@ -352,6 +358,7 @@ theorem linearIndependent_pow [Algebra K S] (x : S) :
     simp_rw [map_sum, lcoeff_apply, coeff_monomial, Fin.val_eq_val, Finset.sum_ite_eq'] at h0
     exact (if_pos <| Finset.mem_univ _).symm.trans h0
 
+-- CONFLATES (assumes ground = zero): IsIntegral.mem_span_pow
 theorem IsIntegral.mem_span_pow [Nontrivial R] {x y : S} (hx : IsIntegral R x)
     (hy : ∃ f : R[X], y = aeval x f) :
     y ∈ Submodule.span R (Set.range fun i : Fin (minpoly R x).natDegree => x ^ (i : ℕ)) := by

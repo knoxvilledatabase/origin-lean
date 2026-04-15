@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Idempotents.lean
-Genuine: 40 of 42 | Dissolved: 0 | Infrastructure: 2
+Genuine: 39 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum
@@ -263,6 +263,7 @@ lemma CompleteOrthogonalIdempotents.option (he : OrthogonalIdempotents e) :
     rw [Fintype.sum_option]
     exact sub_add_cancel _ _
 
+-- CONFLATES (assumes ground = zero): CompleteOrthogonalIdempotents.of_subsingleton
 @[nontriviality]
 lemma CompleteOrthogonalIdempotents.of_subsingleton [Subsingleton R] :
     CompleteOrthogonalIdempotents e :=

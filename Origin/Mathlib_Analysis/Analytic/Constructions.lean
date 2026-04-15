@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/Constructions.lean
-Genuine: 111 of 124 | Dissolved: 11 | Infrastructure: 2
+Genuine: 104 | Conflates: 8 | Dissolved: 11 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Composition
@@ -683,6 +683,7 @@ lemma formalMultilinearSeries_geometric_apply_norm [NormOneClass A] (n : ℕ) :
 
 end Geometric
 
+-- CONFLATES (assumes ground = zero): one_le_formalMultilinearSeries_geometric_radius
 lemma one_le_formalMultilinearSeries_geometric_radius (𝕜 : Type*) [NontriviallyNormedField 𝕜]
     (A : Type*) [NormedRing A] [NormedAlgebra 𝕜 A] :
     1 ≤ (formalMultilinearSeries_geometric 𝕜 A).radius := by
@@ -690,12 +691,14 @@ lemma one_le_formalMultilinearSeries_geometric_radius (𝕜 : Type*) [Nontrivial
     FormalMultilinearSeries.ofScalars_radius_ge_inv_of_tendsto A _ one_ne_zero (by simp) |>.le
   simp
 
+-- CONFLATES (assumes ground = zero): formalMultilinearSeries_geometric_radius
 lemma formalMultilinearSeries_geometric_radius (𝕜 : Type*) [NontriviallyNormedField 𝕜]
     (A : Type*) [NormedRing A] [NormOneClass A] [NormedAlgebra 𝕜 A] :
     (formalMultilinearSeries_geometric 𝕜 A).radius = 1 := by
   exact (formalMultilinearSeries_geometric_eq_ofScalars 𝕜 A ▸
     FormalMultilinearSeries.ofScalars_radius_eq_of_tendsto A _ one_ne_zero (by simp))
 
+-- CONFLATES (assumes ground = zero): hasFPowerSeriesOnBall_inverse_one_sub
 lemma hasFPowerSeriesOnBall_inverse_one_sub
     (𝕜 : Type*) [NontriviallyNormedField 𝕜]
     (A : Type*) [NormedRing A] [NormedAlgebra 𝕜 A] [HasSummableGeomSeries A] :
@@ -711,11 +714,13 @@ lemma hasFPowerSeriesOnBall_inverse_one_sub
       List.ofFn_const, List.prod_replicate]
     exact (summable_geometric_of_norm_lt_one hy).hasSum
 
+-- CONFLATES (assumes ground = zero): analyticAt_inverse_one_sub
 lemma analyticAt_inverse_one_sub (𝕜 : Type*) [NontriviallyNormedField 𝕜]
     (A : Type*) [NormedRing A] [NormedAlgebra 𝕜 A] [HasSummableGeomSeries A] :
     AnalyticAt 𝕜 (fun x : A ↦ Ring.inverse (1 - x)) 0 :=
   ⟨_, ⟨_, hasFPowerSeriesOnBall_inverse_one_sub 𝕜 A⟩⟩
 
+-- CONFLATES (assumes ground = zero): analyticAt_inverse
 lemma analyticAt_inverse {𝕜 : Type*} [NontriviallyNormedField 𝕜]
     {A : Type*} [NormedRing A] [NormedAlgebra 𝕜 A] [HasSummableGeomSeries A] (z : Aˣ) :
     AnalyticAt 𝕜 Ring.inverse (z : A) := by
@@ -744,17 +749,20 @@ lemma analyticAt_inverse {𝕜 : Type*} [NontriviallyNormedField 𝕜]
       exact analyticAt_inverse_one_sub 𝕜 A
     · exact analyticAt_const.sub (analyticAt_const.mul analyticAt_id)
 
+-- CONFLATES (assumes ground = zero): analyticOnNhd_inverse
 lemma analyticOnNhd_inverse {𝕜 : Type*} [NontriviallyNormedField 𝕜]
     {A : Type*} [NormedRing A] [NormedAlgebra 𝕜 A] [HasSummableGeomSeries A] :
     AnalyticOnNhd 𝕜 Ring.inverse {x : A | IsUnit x} :=
   fun _ hx ↦ analyticAt_inverse (IsUnit.unit hx)
 
+-- CONFLATES (assumes ground = zero): hasFPowerSeriesOnBall_inv_one_sub
 lemma hasFPowerSeriesOnBall_inv_one_sub
     (𝕜 𝕝 : Type*) [NontriviallyNormedField 𝕜] [NontriviallyNormedField 𝕝] [NormedAlgebra 𝕜 𝕝] :
     HasFPowerSeriesOnBall (fun x : 𝕝 ↦ (1 - x)⁻¹) (formalMultilinearSeries_geometric 𝕜 𝕝) 0 1 := by
   convert hasFPowerSeriesOnBall_inverse_one_sub 𝕜 𝕝
   exact Ring.inverse_eq_inv'.symm
 
+-- CONFLATES (assumes ground = zero): analyticAt_inv_one_sub
 lemma analyticAt_inv_one_sub (𝕝 : Type*) [NontriviallyNormedField 𝕝] [NormedAlgebra 𝕜 𝕝] :
     AnalyticAt 𝕜 (fun x : 𝕝 ↦ (1 - x)⁻¹) 0 :=
   ⟨_, ⟨_, hasFPowerSeriesOnBall_inv_one_sub 𝕜 𝕝⟩⟩

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/BumpFunction/Normed.lean
-Genuine: 19 of 21 | Dissolved: 0 | Infrastructure: 2
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.BumpFunction.Basic

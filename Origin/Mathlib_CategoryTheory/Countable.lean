@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Countable.lean
-Genuine: 5 of 20 | Dissolved: 0 | Infrastructure: 15
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Small

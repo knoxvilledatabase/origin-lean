@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/HahnBanach/Extension.lean
-Genuine: 5 of 8 | Dissolved: 2 | Infrastructure: 1
+Genuine: 4 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Cone.Extension
@@ -135,6 +135,7 @@ open ContinuousLinearEquiv Submodule
 
 -- DISSOLVED: exists_dual_vector
 
+-- CONFLATES (assumes ground = zero): exists_dual_vector'
 theorem exists_dual_vector' [Nontrivial E] (x : E) : ∃ g : E →L[𝕜] 𝕜, ‖g‖ = 1 ∧ g x = ‖x‖ := by
   by_cases hx : x = 0
   · obtain ⟨y, hy⟩ := exists_ne (0 : E)

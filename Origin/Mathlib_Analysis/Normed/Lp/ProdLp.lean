@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Lp/ProdLp.lean
-Genuine: 49 of 82 | Dissolved: 0 | Infrastructure: 33
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Analysis.MeanInequalities

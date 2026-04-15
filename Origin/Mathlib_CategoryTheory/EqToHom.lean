@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/EqToHom.lean
-Genuine: 45 of 50 | Dissolved: 0 | Infrastructure: 5
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Opposites

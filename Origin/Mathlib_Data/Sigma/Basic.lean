@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sigma/Basic.lean
-Genuine: 29 of 42 | Dissolved: 0 | Infrastructure: 13
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Defs

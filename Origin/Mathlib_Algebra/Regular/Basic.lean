@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Regular/Basic.lean
-Genuine: 40 of 46 | Dissolved: 5 | Infrastructure: 1
+Genuine: 35 | Conflates: 5 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
@@ -166,6 +166,7 @@ theorem IsRegular.subsingleton (h : IsRegular (0 : R)) : Subsingleton R :=
 theorem isLeftRegular_zero_iff_subsingleton : IsLeftRegular (0 : R) ↔ Subsingleton R :=
   ⟨fun h => h.subsingleton, fun H a b _ => @Subsingleton.elim _ H a b⟩
 
+-- CONFLATES (assumes ground = zero): not_isLeftRegular_zero_iff
 theorem not_isLeftRegular_zero_iff : ¬IsLeftRegular (0 : R) ↔ Nontrivial R := by
   rw [nontrivial_iff, not_iff_comm, isLeftRegular_zero_iff_subsingleton, subsingleton_iff]
   push_neg
@@ -174,6 +175,7 @@ theorem not_isLeftRegular_zero_iff : ¬IsLeftRegular (0 : R) ↔ Nontrivial R :=
 theorem isRightRegular_zero_iff_subsingleton : IsRightRegular (0 : R) ↔ Subsingleton R :=
   ⟨fun h => h.subsingleton, fun H a b _ => @Subsingleton.elim _ H a b⟩
 
+-- CONFLATES (assumes ground = zero): not_isRightRegular_zero_iff
 theorem not_isRightRegular_zero_iff : ¬IsRightRegular (0 : R) ↔ Nontrivial R := by
   rw [nontrivial_iff, not_iff_comm, isRightRegular_zero_iff_subsingleton, subsingleton_iff]
   push_neg
@@ -189,12 +191,15 @@ theorem isRegular_iff_subsingleton : IsRegular (0 : R) ↔ Subsingleton R :=
 
 -- DISSOLVED: IsRegular.ne_zero
 
+-- CONFLATES (assumes ground = zero): not_isLeftRegular_zero
 theorem not_isLeftRegular_zero [nR : Nontrivial R] : ¬IsLeftRegular (0 : R) :=
   not_isLeftRegular_zero_iff.mpr nR
 
+-- CONFLATES (assumes ground = zero): not_isRightRegular_zero
 theorem not_isRightRegular_zero [nR : Nontrivial R] : ¬IsRightRegular (0 : R) :=
   not_isRightRegular_zero_iff.mpr nR
 
+-- CONFLATES (assumes ground = zero): not_isRegular_zero
 theorem not_isRegular_zero [Nontrivial R] : ¬IsRegular (0 : R) := fun h => IsRegular.ne_zero h rfl
 
 @[simp] lemma IsLeftRegular.mul_left_eq_zero_iff (hb : IsLeftRegular b) : b * a = 0 ↔ a = 0 := by

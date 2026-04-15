@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Defs.lean
-Genuine: 32 of 65 | Dissolved: 0 | Infrastructure: 33
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs

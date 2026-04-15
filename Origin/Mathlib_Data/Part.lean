@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Part.lean
-Genuine: 123 of 165 | Dissolved: 0 | Infrastructure: 42
+Genuine: 123 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Data.Set.Subsingleton

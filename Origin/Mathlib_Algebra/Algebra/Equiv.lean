@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Equiv.lean
-Genuine: 65 of 133 | Dissolved: 0 | Infrastructure: 68
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 68
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Hom

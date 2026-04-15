@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Degrees.lean
-Genuine: 64 of 69 | Dissolved: 5 | Infrastructure: 0
+Genuine: 60 | Conflates: 4 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Degree
@@ -88,6 +88,7 @@ theorem degrees_C (a : R) : degrees (C a : MvPolynomial σ R) = 0 :=
 theorem degrees_X' (n : σ) : degrees (X n : MvPolynomial σ R) ≤ {n} :=
   le_trans (degrees_monomial _ _) <| le_of_eq <| toMultiset_single _ _
 
+-- CONFLATES (assumes ground = zero): degrees_X
 @[simp]
 theorem degrees_X [Nontrivial R] (n : σ) : degrees (X n : MvPolynomial σ R) = {n} :=
   (degrees_monomial_eq _ (1 : R) one_ne_zero).trans (toMultiset_single _ _)
@@ -223,6 +224,7 @@ theorem degreeOf_zero (n : σ) : degreeOf n (0 : MvPolynomial σ R) = 0 := by
 theorem degreeOf_C (a : R) (x : σ) : degreeOf x (C a : MvPolynomial σ R) = 0 := by
   classical simp [degreeOf_def, degrees_C]
 
+-- CONFLATES (assumes ground = zero): degreeOf_X
 theorem degreeOf_X [DecidableEq σ] (i j : σ) [Nontrivial R] :
     degreeOf i (X j : MvPolynomial σ R) = if i = j then 1 else 0 := by
   classical
@@ -341,6 +343,7 @@ theorem totalDegree_zero : (0 : MvPolynomial σ R).totalDegree = 0 := by
 theorem totalDegree_one : (1 : MvPolynomial σ R).totalDegree = 0 :=
   totalDegree_C (1 : R)
 
+-- CONFLATES (assumes ground = zero): totalDegree_X
 @[simp]
 theorem totalDegree_X {R} [CommSemiring R] [Nontrivial R] (s : σ) :
     (X s : MvPolynomial σ R).totalDegree = 1 := by
@@ -400,6 +403,7 @@ theorem totalDegree_monomial_le (s : σ →₀ ℕ) (c : R) :
   else
     rw [totalDegree_monomial _ hc, Function.id_def]
 
+-- CONFLATES (assumes ground = zero): totalDegree_X_pow
 @[simp]
 theorem totalDegree_X_pow [Nontrivial R] (s : σ) (n : ℕ) :
     (X s ^ n : MvPolynomial σ R).totalDegree = n := by simp [X_pow_eq_monomial, one_ne_zero]

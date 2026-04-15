@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Final.lean
-Genuine: 82 of 105 | Dissolved: 0 | Infrastructure: 23
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic

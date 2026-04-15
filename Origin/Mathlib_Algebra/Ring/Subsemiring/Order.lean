@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subsemiring/Order.lean
-Genuine: 1 of 13 | Dissolved: 0 | Infrastructure: 12
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.InjSurj

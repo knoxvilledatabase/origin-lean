@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Equiv/Option.lean
-Genuine: 19 of 30 | Dissolved: 0 | Infrastructure: 11
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Control.EquivFunctor

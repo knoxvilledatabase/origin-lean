@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Adjunction/FullyFaithful.lean
-Genuine: 16 of 40 | Dissolved: 0 | Infrastructure: 24
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Basic

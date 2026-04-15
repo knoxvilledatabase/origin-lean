@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Regular/SMul.lean
-Genuine: 25 of 31 | Dissolved: 0 | Infrastructure: 6
+Genuine: 22 | Conflates: 3 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Regular.Basic
@@ -154,6 +154,7 @@ protected theorem subsingleton (h : IsSMulRegular M (0 : R)) : Subsingleton M :=
 theorem zero_iff_subsingleton : IsSMulRegular M (0 : R) ↔ Subsingleton M :=
   ⟨fun h => h.subsingleton, fun H a b _ => @Subsingleton.elim _ H a b⟩
 
+-- CONFLATES (assumes ground = zero): not_zero_iff
 theorem not_zero_iff : ¬IsSMulRegular M (0 : R) ↔ Nontrivial M := by
   rw [nontrivial_iff, not_iff_comm, zero_iff_subsingleton, subsingleton_iff]
   push_neg
@@ -162,6 +163,7 @@ theorem not_zero_iff : ¬IsSMulRegular M (0 : R) ↔ Nontrivial M := by
 theorem zero [sM : Subsingleton M] : IsSMulRegular M (0 : R) :=
   zero_iff_subsingleton.mpr sM
 
+-- CONFLATES (assumes ground = zero): not_zero
 theorem not_zero [nM : Nontrivial M] : ¬IsSMulRegular M (0 : R) :=
   not_zero_iff.mpr nM
 
@@ -208,6 +210,7 @@ variable {M}
 
 protected
 
+-- CONFLATES (assumes ground = zero): IsSMulRegular.eq_zero_of_smul_eq_zero
 lemma IsSMulRegular.eq_zero_of_smul_eq_zero [Zero M] [SMulZeroClass R M]
     {r : R} {x : M} (h1 : IsSMulRegular M r) (h2 : r • x = 0) : x = 0 :=
   h1 (h2.trans (smul_zero r).symm)

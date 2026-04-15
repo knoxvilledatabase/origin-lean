@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/ConditionalExpectation/Unique.lean
-Genuine: 3 of 6 | Dissolved: 3 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.AEEqOfIntegral

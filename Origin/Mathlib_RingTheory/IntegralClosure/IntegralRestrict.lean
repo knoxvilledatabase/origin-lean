@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IntegralClosure/IntegralRestrict.lean
-Genuine: 24 of 28 | Dissolved: 1 | Infrastructure: 3
+Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.IntegralClosure

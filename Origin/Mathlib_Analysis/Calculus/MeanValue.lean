@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/MeanValue.lean
-Genuine: 82 of 83 | Dissolved: 0 | Infrastructure: 1
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.AffineMap

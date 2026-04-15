@@ -1,6 +1,6 @@
 /-
 Extracted from Order/CompleteBooleanAlgebra.lean
-Genuine: 83 of 114 | Dissolved: 0 | Infrastructure: 31
+Genuine: 83 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Order.CompleteLattice

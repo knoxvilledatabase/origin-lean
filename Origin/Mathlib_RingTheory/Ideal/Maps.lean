@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Maps.lean
-Genuine: 137 of 152 | Dissolved: 0 | Infrastructure: 15
+Genuine: 134 | Conflates: 3 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Operations
@@ -576,10 +576,12 @@ theorem ker_eq_comap_bot (f : F) : ker f = Ideal.comap f ⊥ :=
 theorem comap_ker (f : S →+* R) (g : T →+* S) : f.ker.comap g = ker (f.comp g) := by
   rw [RingHom.ker_eq_comap_bot, Ideal.comap_comap, RingHom.ker_eq_comap_bot]
 
+-- CONFLATES (assumes ground = zero): not_one_mem_ker
 theorem not_one_mem_ker [Nontrivial S] (f : F) : (1 : R) ∉ ker f := by
   rw [mem_ker, map_one]
   exact one_ne_zero
 
+-- CONFLATES (assumes ground = zero): ker_ne_top
 theorem ker_ne_top [Nontrivial S] (f : F) : ker f ≠ ⊤ :=
   (Ideal.ne_top_iff_one _).mpr <| not_one_mem_ker f
 
@@ -952,6 +954,7 @@ theorem of_ker_algebraMap_eq_bot (R A : Type*) [CommRing R] [Semiring A] [Algebr
     [NoZeroDivisors A] (h : RingHom.ker (algebraMap R A) = ⊥) : NoZeroSMulDivisors R A :=
   of_algebraMap_injective ((RingHom.injective_iff_ker_eq_bot _).mpr h)
 
+-- CONFLATES (assumes ground = zero): ker_algebraMap_eq_bot
 theorem ker_algebraMap_eq_bot (R A : Type*) [CommRing R] [Ring A] [Nontrivial A] [Algebra R A]
     [NoZeroSMulDivisors R A] : RingHom.ker (algebraMap R A) = ⊥ :=
   (RingHom.injective_iff_ker_eq_bot _).mp (algebraMap_injective R A)

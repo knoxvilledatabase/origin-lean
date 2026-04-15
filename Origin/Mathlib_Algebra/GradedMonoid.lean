@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GradedMonoid.lean
-Genuine: 37 of 85 | Dissolved: 0 | Infrastructure: 48
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 48
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List

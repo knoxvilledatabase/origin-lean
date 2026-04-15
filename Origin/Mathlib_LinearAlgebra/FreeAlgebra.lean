@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/FreeAlgebra.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeAlgebra
@@ -36,6 +36,7 @@ instance : Module.Free R (FreeAlgebra R X) :=
 
 end
 
+-- CONFLATES (assumes ground = zero): rank_eq
 theorem rank_eq [CommRing R] [Nontrivial R] :
     Module.rank R (FreeAlgebra R X) = Cardinal.lift.{u} (Cardinal.mk (List X)) := by
   rw [← (Basis.mk_eq_rank'.{_,_,_,u} (basisFreeMonoid R X)).trans (Cardinal.lift_id _),

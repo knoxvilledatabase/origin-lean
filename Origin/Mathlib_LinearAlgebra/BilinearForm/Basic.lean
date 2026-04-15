@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Basic.lean
-Genuine: 23 of 32 | Dissolved: 0 | Infrastructure: 9
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/EraseLead.lean
-Genuine: 32 of 52 | Dissolved: 19 | Infrastructure: 1
+Genuine: 32 | Conflates: 0 | Dissolved: 19 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin

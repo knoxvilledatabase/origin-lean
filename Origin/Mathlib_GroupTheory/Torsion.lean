@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Torsion.lean
-Genuine: 34 of 40 | Dissolved: 0 | Infrastructure: 6
+Genuine: 32 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.GroupTheory.PGroup
@@ -300,12 +300,14 @@ section Group
 
 variable [Group G]
 
+-- CONFLATES (assumes ground = zero): IsTorsion.not_torsion_free
 @[to_additive "A nontrivial additive torsion group is not torsion-free."]
 theorem IsTorsion.not_torsion_free [hN : Nontrivial G] : IsTorsion G → ¬IsTorsionFree G := fun tG =>
   not_isTorsionFree_iff.mpr <| by
     obtain ⟨x, hx⟩ := (nontrivial_iff_exists_ne (1 : G)).mp hN
     exact ⟨x, hx, tG x⟩
 
+-- CONFLATES (assumes ground = zero): IsTorsionFree.not_torsion
 @[to_additive "A nontrivial torsion-free additive group is not torsion."]
 theorem IsTorsionFree.not_torsion [hN : Nontrivial G] : IsTorsionFree G → ¬IsTorsion G := fun tfG =>
   (not_isTorsion_iff _).mpr <| by

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/StdBasis.lean
-Genuine: 29 of 32 | Dissolved: 0 | Infrastructure: 3
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Basis.Defs

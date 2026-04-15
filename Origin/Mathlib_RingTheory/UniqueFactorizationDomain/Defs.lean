@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Defs.lean
-Genuine: 9 of 21 | Dissolved: 9 | Infrastructure: 3
+Genuine: 9 | Conflates: 0 | Dissolved: 9 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Category/Cat.lean
-Genuine: 6 of 32 | Dissolved: 0 | Infrastructure: 26
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.Bundled

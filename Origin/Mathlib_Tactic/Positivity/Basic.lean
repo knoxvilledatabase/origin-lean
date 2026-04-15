@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Positivity/Basic.lean
-Genuine: 40 of 46 | Dissolved: 6 | Infrastructure: 0
+Genuine: 39 | Conflates: 1 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.PosPart
@@ -235,6 +235,7 @@ private lemma int_div_nonneg_of_pos_of_pos {a b : ℤ} (ha : 0 < a) (hb : 0 < b)
     | _, _ => pure .none
   | _, _, _ => throwError "not /"
 
+-- CONFLATES (assumes ground = zero): pow_zero_pos
 private theorem pow_zero_pos [OrderedSemiring α] [Nontrivial α] (a : α) : 0 < a ^ 0 :=
   zero_lt_one.trans_le (pow_zero a).ge
 

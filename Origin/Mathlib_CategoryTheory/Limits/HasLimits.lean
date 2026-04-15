@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/HasLimits.lean
-Genuine: 133 of 164 | Dissolved: 0 | Infrastructure: 31
+Genuine: 133 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.IsLimit

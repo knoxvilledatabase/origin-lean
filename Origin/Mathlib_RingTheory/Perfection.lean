@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Perfection.lean
-Genuine: 45 of 72 | Dissolved: 9 | Infrastructure: 18
+Genuine: 45 | Conflates: 0 | Dissolved: 9 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.ExpChar

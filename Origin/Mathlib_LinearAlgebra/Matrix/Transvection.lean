@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Transvection.lean
-Genuine: 46 of 55 | Dissolved: 7 | Infrastructure: 2
+Genuine: 46 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basis

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/PrimeFin.lean
-Genuine: 15 of 26 | Dissolved: 8 | Infrastructure: 3
+Genuine: 15 | Conflates: 0 | Dissolved: 8 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Defs

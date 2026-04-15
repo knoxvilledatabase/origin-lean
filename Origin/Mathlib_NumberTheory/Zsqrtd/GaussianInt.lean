@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Zsqrtd/GaussianInt.lean
-Genuine: 31 of 44 | Dissolved: 4 | Infrastructure: 9
+Genuine: 31 | Conflates: 0 | Dissolved: 4 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Zsqrtd.Basic

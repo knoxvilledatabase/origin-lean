@@ -1,6 +1,6 @@
 /-
 Extracted from Order/LatticeIntervals.lean
-Genuine: 6 of 36 | Dissolved: 0 | Infrastructure: 30
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Order.Bounds.Basic

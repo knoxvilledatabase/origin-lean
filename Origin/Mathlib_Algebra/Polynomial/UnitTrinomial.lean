@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/UnitTrinomial.lean
-Genuine: 17 of 27 | Dissolved: 7 | Infrastructure: 3
+Genuine: 17 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Mirror

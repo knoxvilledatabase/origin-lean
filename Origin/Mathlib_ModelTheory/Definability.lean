@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Definability.lean
-Genuine: 25 of 50 | Dissolved: 0 | Infrastructure: 25
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Data.SetLike.Basic

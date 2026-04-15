@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/FiniteAdeleRing.lean
-Genuine: 18 of 48 | Dissolved: 0 | Infrastructure: 30
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.AdicValuation

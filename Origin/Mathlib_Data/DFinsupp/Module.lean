@@ -1,6 +1,6 @@
 /-
 Extracted from Data/DFinsupp/Module.lean
-Genuine: 9 of 19 | Dissolved: 1 | Infrastructure: 9
+Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Prod

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Noetherian/Defs.lean
-Genuine: 12 of 16 | Dissolved: 0 | Infrastructure: 4
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.RingTheory.Finiteness.Basic

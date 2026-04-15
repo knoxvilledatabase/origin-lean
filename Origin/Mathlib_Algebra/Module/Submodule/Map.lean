@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Map.lean
-Genuine: 75 of 97 | Dissolved: 4 | Infrastructure: 18
+Genuine: 75 | Conflates: 0 | Dissolved: 4 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Map

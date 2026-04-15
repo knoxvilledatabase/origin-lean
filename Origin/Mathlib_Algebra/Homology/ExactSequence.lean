@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ExactSequence.lean
-Genuine: 32 of 32 | Dissolved: 0 | Infrastructure: 0
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Exact

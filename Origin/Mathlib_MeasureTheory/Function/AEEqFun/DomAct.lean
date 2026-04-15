@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/AEEqFun/DomAct.lean
-Genuine: 1 of 12 | Dissolved: 0 | Infrastructure: 11
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.AEEqFun

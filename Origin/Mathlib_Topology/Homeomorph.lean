@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Homeomorph.lean
-Genuine: 115 of 186 | Dissolved: 0 | Infrastructure: 71
+Genuine: 115 | Conflates: 0 | Dissolved: 0 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Logic.Equiv.Fin

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/Shapes/Pullbacks.lean
-Genuine: 30 of 34 | Dissolved: 0 | Infrastructure: 4
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback

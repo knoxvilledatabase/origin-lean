@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Subsingleton.lean
-Genuine: 66 of 69 | Dissolved: 0 | Infrastructure: 3
+Genuine: 30 | Conflates: 38 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Set.Basic
@@ -114,133 +114,167 @@ section Nontrivial
 
 variable {α : Type u} {a : α} {s t : Set α}
 
+-- CONFLATES (assumes ground = zero): Nontrivial
 protected def Nontrivial (s : Set α) : Prop :=
   ∃ x ∈ s, ∃ y ∈ s, x ≠ y
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_mem_mem_ne
 theorem nontrivial_of_mem_mem_ne {x y} (hx : x ∈ s) (hy : y ∈ s) (hxy : x ≠ y) : s.Nontrivial :=
   ⟨x, hx, y, hy, hxy⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.choose
 protected noncomputable def Nontrivial.choose (hs : s.Nontrivial) : α × α :=
   (Exists.choose hs, hs.choose_spec.right.choose)
 
+-- CONFLATES (assumes ground = zero): Nontrivial.choose_fst_mem
 protected theorem Nontrivial.choose_fst_mem (hs : s.Nontrivial) : hs.choose.fst ∈ s :=
   hs.choose_spec.left
 
+-- CONFLATES (assumes ground = zero): Nontrivial.choose_snd_mem
 protected theorem Nontrivial.choose_snd_mem (hs : s.Nontrivial) : hs.choose.snd ∈ s :=
   hs.choose_spec.right.choose_spec.left
 
+-- CONFLATES (assumes ground = zero): Nontrivial.choose_fst_ne_choose_snd
 protected theorem Nontrivial.choose_fst_ne_choose_snd (hs : s.Nontrivial) :
     hs.choose.fst ≠ hs.choose.snd :=
   hs.choose_spec.right.choose_spec.right
 
+-- CONFLATES (assumes ground = zero): Nontrivial.mono
 theorem Nontrivial.mono (hs : s.Nontrivial) (hst : s ⊆ t) : t.Nontrivial :=
   let ⟨x, hx, y, hy, hxy⟩ := hs
   ⟨x, hst hx, y, hst hy, hxy⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_pair
 theorem nontrivial_pair {x y} (hxy : x ≠ y) : ({x, y} : Set α).Nontrivial :=
   ⟨x, mem_insert _ _, y, mem_insert_of_mem _ (mem_singleton _), hxy⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_pair_subset
 theorem nontrivial_of_pair_subset {x y} (hxy : x ≠ y) (h : {x, y} ⊆ s) : s.Nontrivial :=
   (nontrivial_pair hxy).mono h
 
+-- CONFLATES (assumes ground = zero): Nontrivial.pair_subset
 theorem Nontrivial.pair_subset (hs : s.Nontrivial) : ∃ x y, x ≠ y ∧ {x, y} ⊆ s :=
   let ⟨x, hx, y, hy, hxy⟩ := hs
   ⟨x, y, hxy, insert_subset hx <| singleton_subset_iff.2 hy⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_pair_subset
 theorem nontrivial_iff_pair_subset : s.Nontrivial ↔ ∃ x y, x ≠ y ∧ {x, y} ⊆ s :=
   ⟨Nontrivial.pair_subset, fun H =>
     let ⟨_, _, hxy, h⟩ := H
     nontrivial_of_pair_subset hxy h⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_exists_ne
 theorem nontrivial_of_exists_ne {x} (hx : x ∈ s) (h : ∃ y ∈ s, y ≠ x) : s.Nontrivial :=
   let ⟨y, hy, hyx⟩ := h
   ⟨y, hy, x, hx, hyx⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.exists_ne
 theorem Nontrivial.exists_ne (hs : s.Nontrivial) (z) : ∃ x ∈ s, x ≠ z := by
   by_contra! H
   rcases hs with ⟨x, hx, y, hy, hxy⟩
   rw [H x hx, H y hy] at hxy
   exact hxy rfl
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_exists_ne
 theorem nontrivial_iff_exists_ne {x} (hx : x ∈ s) : s.Nontrivial ↔ ∃ y ∈ s, y ≠ x :=
   ⟨fun H => H.exists_ne _, nontrivial_of_exists_ne hx⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_lt
 theorem nontrivial_of_lt [Preorder α] {x y} (hx : x ∈ s) (hy : y ∈ s) (hxy : x < y) :
     s.Nontrivial :=
   ⟨x, hx, y, hy, ne_of_lt hxy⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_exists_lt
 theorem nontrivial_of_exists_lt [Preorder α]
     (H : ∃ᵉ (x ∈ s) (y ∈ s), x < y) : s.Nontrivial :=
   let ⟨_, hx, _, hy, hxy⟩ := H
   nontrivial_of_lt hx hy hxy
 
+-- CONFLATES (assumes ground = zero): Nontrivial.exists_lt
 theorem Nontrivial.exists_lt [LinearOrder α] (hs : s.Nontrivial) : ∃ᵉ (x ∈ s) (y ∈ s), x < y :=
   let ⟨x, hx, y, hy, hxy⟩ := hs
   Or.elim (lt_or_gt_of_ne hxy) (fun H => ⟨x, hx, y, hy, H⟩) fun H => ⟨y, hy, x, hx, H⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_exists_lt
 theorem nontrivial_iff_exists_lt [LinearOrder α] :
     s.Nontrivial ↔ ∃ᵉ (x ∈ s) (y ∈ s), x < y :=
   ⟨Nontrivial.exists_lt, nontrivial_of_exists_lt⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.nonempty
 protected theorem Nontrivial.nonempty (hs : s.Nontrivial) : s.Nonempty :=
   let ⟨x, hx, _⟩ := hs
   ⟨x, hx⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.ne_empty
 protected theorem Nontrivial.ne_empty (hs : s.Nontrivial) : s ≠ ∅ :=
   hs.nonempty.ne_empty
 
+-- CONFLATES (assumes ground = zero): Nontrivial.not_subset_empty
 theorem Nontrivial.not_subset_empty (hs : s.Nontrivial) : ¬s ⊆ ∅ :=
   hs.nonempty.not_subset_empty
 
+-- CONFLATES (assumes ground = zero): not_nontrivial_empty
 @[simp]
 theorem not_nontrivial_empty : ¬(∅ : Set α).Nontrivial := fun h => h.ne_empty rfl
 
+-- CONFLATES (assumes ground = zero): not_nontrivial_singleton
 @[simp]
 theorem not_nontrivial_singleton {x} : ¬({x} : Set α).Nontrivial := fun H => by
   rw [nontrivial_iff_exists_ne (mem_singleton x)] at H
   let ⟨y, hy, hya⟩ := H
   exact hya (mem_singleton_iff.1 hy)
 
+-- CONFLATES (assumes ground = zero): Nontrivial.ne_singleton
 theorem Nontrivial.ne_singleton {x} (hs : s.Nontrivial) : s ≠ {x} := fun H => by
   rw [H] at hs
   exact not_nontrivial_singleton hs
 
+-- CONFLATES (assumes ground = zero): Nontrivial.not_subset_singleton
 theorem Nontrivial.not_subset_singleton {x} (hs : s.Nontrivial) : ¬s ⊆ {x} :=
   (not_congr subset_singleton_iff_eq).2 (not_or_intro hs.ne_empty hs.ne_singleton)
 
+-- CONFLATES (assumes ground = zero): nontrivial_univ
 theorem nontrivial_univ [Nontrivial α] : (univ : Set α).Nontrivial :=
   let ⟨x, y, hxy⟩ := exists_pair_ne α
   ⟨x, mem_univ _, y, mem_univ _, hxy⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_univ_nontrivial
 theorem nontrivial_of_univ_nontrivial (h : (univ : Set α).Nontrivial) : Nontrivial α :=
   let ⟨x, _, y, _, hxy⟩ := h
   ⟨⟨x, y, hxy⟩⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_univ_iff
 @[simp]
 theorem nontrivial_univ_iff : (univ : Set α).Nontrivial ↔ Nontrivial α :=
   ⟨nontrivial_of_univ_nontrivial, fun h => @nontrivial_univ _ h⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_nontrivial
 theorem nontrivial_of_nontrivial (hs : s.Nontrivial) : Nontrivial α :=
   let ⟨x, _, y, _, hxy⟩ := hs
   ⟨⟨x, y, hxy⟩⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_coe_sort
 @[simp, norm_cast]
 theorem nontrivial_coe_sort {s : Set α} : Nontrivial s ↔ s.Nontrivial := by
   simp [← nontrivial_univ_iff, Set.Nontrivial]
 
 alias ⟨_, Nontrivial.coe_sort⟩ := nontrivial_coe_sort
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_nontrivial_coe
 theorem nontrivial_of_nontrivial_coe (hs : Nontrivial s) : Nontrivial α :=
   nontrivial_of_nontrivial <| nontrivial_coe_sort.1 hs
 
+-- CONFLATES (assumes ground = zero): nontrivial_mono
 theorem nontrivial_mono {α : Type*} {s t : Set α} (hst : s ⊆ t) (hs : Nontrivial s) :
     Nontrivial t :=
   Nontrivial.coe_sort <| (nontrivial_coe_sort.1 hs).mono hst
 
+-- CONFLATES (assumes ground = zero): not_subsingleton_iff
 @[simp]
 theorem not_subsingleton_iff : ¬s.Subsingleton ↔ s.Nontrivial := by
   simp_rw [Set.Subsingleton, Set.Nontrivial, not_forall, exists_prop]
 
+-- CONFLATES (assumes ground = zero): not_nontrivial_iff
 @[simp]
 theorem not_nontrivial_iff : ¬s.Nontrivial ↔ s.Subsingleton :=
   Iff.not_left not_subsingleton_iff.symm
@@ -249,15 +283,19 @@ alias ⟨_, Subsingleton.not_nontrivial⟩ := not_nontrivial_iff
 
 alias ⟨_, Nontrivial.not_subsingleton⟩ := not_subsingleton_iff
 
+-- CONFLATES (assumes ground = zero): subsingleton_or_nontrivial
 protected lemma subsingleton_or_nontrivial (s : Set α) : s.Subsingleton ∨ s.Nontrivial := by
   simp [or_iff_not_imp_right]
 
+-- CONFLATES (assumes ground = zero): eq_singleton_or_nontrivial
 lemma eq_singleton_or_nontrivial (ha : a ∈ s) : s = {a} ∨ s.Nontrivial := by
   rw [← subsingleton_iff_singleton ha]; exact s.subsingleton_or_nontrivial
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_ne_singleton
 lemma nontrivial_iff_ne_singleton (ha : a ∈ s) : s.Nontrivial ↔ s ≠ {a} :=
   ⟨Nontrivial.ne_singleton, (eq_singleton_or_nontrivial ha).resolve_left⟩
 
+-- CONFLATES (assumes ground = zero): Nonempty.exists_eq_singleton_or_nontrivial
 lemma Nonempty.exists_eq_singleton_or_nontrivial : s.Nonempty → (∃ a, s = {a}) ∨ s.Nontrivial :=
   fun ⟨a, ha⟩ ↦ (eq_singleton_or_nontrivial ha).imp_left <| Exists.intro a
 

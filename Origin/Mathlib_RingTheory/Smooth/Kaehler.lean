@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Smooth/Kaehler.lean
-Genuine: 23 of 25 | Dissolved: 0 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.Kaehler.CotangentComplex

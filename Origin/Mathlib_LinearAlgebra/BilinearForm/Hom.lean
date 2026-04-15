@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Hom.lean
-Genuine: 28 of 53 | Dissolved: 0 | Infrastructure: 25
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearMap

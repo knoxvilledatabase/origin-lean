@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/NormalForms.lean
-Genuine: 54 of 111 | Dissolved: 42 | Infrastructure: 15
+Genuine: 54 | Conflates: 0 | Dissolved: 42 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.VariableChange

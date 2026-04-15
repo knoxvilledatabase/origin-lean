@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IntermediateField/Basic.lean
-Genuine: 77 of 151 | Dissolved: 0 | Infrastructure: 74
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 74
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.IsField

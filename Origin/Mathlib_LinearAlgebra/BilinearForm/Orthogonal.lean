@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Orthogonal.lean
-Genuine: 33 of 40 | Dissolved: 3 | Infrastructure: 4
+Genuine: 31 | Conflates: 2 | Dissolved: 3 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
@@ -179,6 +179,7 @@ theorem nondegenerate_restrict_of_disjoint_orthogonal (B : BilinForm R₁ M₁) 
 
 alias nondegenerateRestrictOfDisjointOrthogonal := nondegenerate_restrict_of_disjoint_orthogonal
 
+-- CONFLATES (assumes ground = zero): iIsOrtho.not_isOrtho_basis_self_of_nondegenerate
 theorem iIsOrtho.not_isOrtho_basis_self_of_nondegenerate {n : Type w} [Nontrivial R]
     {B : BilinForm R M} {v : Basis n R M} (h : B.iIsOrtho v) (hB : B.Nondegenerate) (i : n) :
     ¬B.IsOrtho (v i) (v i) := by
@@ -194,6 +195,7 @@ theorem iIsOrtho.not_isOrtho_basis_self_of_nondegenerate {n : Type w} [Nontrivia
   · exact ho
   · exact h hij
 
+-- CONFLATES (assumes ground = zero): iIsOrtho.nondegenerate_iff_not_isOrtho_basis_self
 theorem iIsOrtho.nondegenerate_iff_not_isOrtho_basis_self {n : Type w} [Nontrivial R]
     [NoZeroDivisors R] (B : BilinForm R M) (v : Basis n R M) (hO : B.iIsOrtho v) :
     B.Nondegenerate ↔ ∀ i, ¬B.IsOrtho (v i) (v i) := by

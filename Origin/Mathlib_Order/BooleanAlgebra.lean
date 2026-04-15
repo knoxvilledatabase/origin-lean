@@ -1,6 +1,6 @@
 /-
 Extracted from Order/BooleanAlgebra.lean
-Genuine: 104 of 121 | Dissolved: 0 | Infrastructure: 17
+Genuine: 103 | Conflates: 1 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Order.Heyting.Basic
@@ -596,6 +596,7 @@ theorem compl_le_iff_compl_le : xᶜ ≤ y ↔ yᶜ ≤ x :=
 
 @[simp] theorem compl_le_self : xᶜ ≤ x ↔ x = ⊤ := by simpa using le_compl_self (a := xᶜ)
 
+-- CONFLATES (assumes ground = zero): compl_lt_self
 @[simp] theorem compl_lt_self [Nontrivial α] : xᶜ < x ↔ x = ⊤ := by
   simpa using lt_compl_self (a := xᶜ)
 

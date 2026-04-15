@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Order/Min.lean
-Genuine: 7 of 8 | Dissolved: 1 | Infrastructure: 0
+Genuine: 6 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Torsion
@@ -27,6 +27,7 @@ section Monoid
 
 variable (α) [Monoid α]
 
+-- CONFLATES (assumes ground = zero): minOrder
 @[to_additive "The minimum order of a non-identity element. Also the minimum size of a nontrivial
 subgroup, see `AddMonoid.le_minOrder_iff_forall_addSubgroup`. Returns `∞` if the monoid is
 torsion-free."]

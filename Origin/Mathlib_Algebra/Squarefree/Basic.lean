@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Squarefree/Basic.lean
-Genuine: 25 of 35 | Dissolved: 9 | Infrastructure: 1
+Genuine: 24 | Conflates: 1 | Dissolved: 9 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Nilpotent.Basic
@@ -43,6 +43,7 @@ theorem IsUnit.squarefree [CommMonoid R] {x : R} (h : IsUnit x) : Squarefree x :
 theorem squarefree_one [CommMonoid R] : Squarefree (1 : R) :=
   isUnit_one.squarefree
 
+-- CONFLATES (assumes ground = zero): not_squarefree_zero
 @[simp]
 theorem not_squarefree_zero [MonoidWithZero R] [Nontrivial R] : ¬Squarefree (0 : R) := by
   erw [not_forall]

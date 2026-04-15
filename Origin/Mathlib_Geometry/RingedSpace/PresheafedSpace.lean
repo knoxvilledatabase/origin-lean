@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/RingedSpace/PresheafedSpace.lean
-Genuine: 24 of 46 | Dissolved: 0 | Infrastructure: 22
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Topology.Sheaves.Presheaf

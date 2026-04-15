@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Eisenstein/IsIntegral.lean
-Genuine: 5 of 6 | Dissolved: 1 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Dvd

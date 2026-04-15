@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Valuation/ValExtension.lean
-Genuine: 9 of 16 | Dissolved: 1 | Infrastructure: 6
+Genuine: 8 | Conflates: 1 | Dissolved: 1 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Basic
@@ -129,6 +129,7 @@ instance instNoZeroSMulDivisorsInteger [NoZeroSMulDivisors R A] :
   have : (x : R) • (y : A) = 0 := by simpa [Subtype.ext_iff, Algebra.smul_def] using e
   simpa only [Subtype.ext_iff, smul_eq_zero] using this
 
+-- CONFLATES (assumes ground = zero): algebraMap_injective
 theorem algebraMap_injective [IsValExtension vK vA] [Nontrivial A] :
     Function.Injective (algebraMap vK.integer vA.integer) := by
   intro x y h

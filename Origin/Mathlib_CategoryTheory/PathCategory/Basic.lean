@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/PathCategory/Basic.lean
-Genuine: 21 of 28 | Dissolved: 0 | Infrastructure: 7
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EqToHom

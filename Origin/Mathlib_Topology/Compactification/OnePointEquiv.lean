@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactification/OnePointEquiv.lean
-Genuine: 1 of 4 | Dissolved: 1 | Infrastructure: 2
+Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Projectivization.Basic

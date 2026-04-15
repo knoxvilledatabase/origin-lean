@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Determinant/Basic.lean
-Genuine: 78 of 79 | Dissolved: 0 | Infrastructure: 1
+Genuine: 78 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/Ideal.lean
-Genuine: 81 of 131 | Dissolved: 32 | Infrastructure: 18
+Genuine: 81 | Conflates: 0 | Dissolved: 32 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Pointwise

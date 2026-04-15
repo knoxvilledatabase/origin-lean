@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/FreeAbelianGroup.lean
-Genuine: 45 of 71 | Dissolved: 1 | Infrastructure: 25
+Genuine: 45 | Conflates: 0 | Dissolved: 1 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.NatInt

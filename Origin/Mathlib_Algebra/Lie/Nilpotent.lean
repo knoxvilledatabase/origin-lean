@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Nilpotent.lean
-Genuine: 78 of 89 | Dissolved: 0 | Infrastructure: 11
+Genuine: 74 | Conflates: 4 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.BaseChange
@@ -325,6 +325,7 @@ theorem nilpotencyLength_eq_succ_iff (k : ℕ) :
     exact eq_bot_iff.mpr (h₁ ▸ antitone_lowerCentralSeries R L M h₁₂)
   exact Nat.sInf_upward_closed_eq_succ_iff hs k
 
+-- CONFLATES (assumes ground = zero): nilpotencyLength_eq_one_iff
 @[simp]
 theorem nilpotencyLength_eq_one_iff [Nontrivial M] :
     nilpotencyLength R L M = 1 ↔ IsTrivial L M := by
@@ -352,6 +353,7 @@ theorem lowerCentralSeriesLast_le_max_triv [LieModule R L M] :
     rw [nilpotencyLength_eq_succ_iff, lowerCentralSeries_succ] at h
     exact h.1
 
+-- CONFLATES (assumes ground = zero): nontrivial_lowerCentralSeriesLast
 theorem nontrivial_lowerCentralSeriesLast [Nontrivial M] [IsNilpotent R L M] :
     Nontrivial (lowerCentralSeriesLast R L M) := by
   rw [LieSubmodule.nontrivial_iff_ne_bot, lowerCentralSeriesLast]
@@ -387,6 +389,7 @@ lemma disjoint_lowerCentralSeries_maxTrivSubmodule_iff [IsNilpotent R L M] :
   rw [h.eq_bot, le_bot_iff] at this
   exact this ▸ not_nontrivial _
 
+-- CONFLATES (assumes ground = zero): nontrivial_max_triv_of_isNilpotent
 theorem nontrivial_max_triv_of_isNilpotent [Nontrivial M] [IsNilpotent R L M] :
     Nontrivial (maxTrivSubmodule R L M) :=
   Set.nontrivial_mono (lowerCentralSeriesLast_le_max_triv R L M)
@@ -631,6 +634,7 @@ theorem LieAlgebra.nilpotent_of_nilpotent_quotient {I : LieIdeal R L} (h₁ : I 
   use k
   simp [← LieSubmodule.coe_toSubmodule_eq_iff, coe_lowerCentralSeries_ideal_quot_eq, hk]
 
+-- CONFLATES (assumes ground = zero): LieAlgebra.non_trivial_center_of_isNilpotent
 theorem LieAlgebra.non_trivial_center_of_isNilpotent [Nontrivial L] [IsNilpotent R L] :
     Nontrivial <| center R L :=
   LieModule.nontrivial_max_triv_of_isNilpotent R L L

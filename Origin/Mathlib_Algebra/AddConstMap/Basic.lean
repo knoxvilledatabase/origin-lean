@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/AddConstMap/Basic.lean
-Genuine: 47 of 75 | Dissolved: 0 | Infrastructure: 28
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Pi

@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/SeparableClosure.lean
-Genuine: 44 of 56 | Dissolved: 0 | Infrastructure: 12
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.FieldTheory.SeparableDegree

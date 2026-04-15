@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Powerset.lean
-Genuine: 39 of 44 | Dissolved: 0 | Infrastructure: 5
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold

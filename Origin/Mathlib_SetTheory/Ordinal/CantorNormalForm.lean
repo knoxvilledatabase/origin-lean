@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/CantorNormalForm.lean
-Genuine: 8 of 16 | Dissolved: 8 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic

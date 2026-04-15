@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/InverseFunctionTheorem/ApproximatesLinearOn.lean
-Genuine: 23 of 26 | Dissolved: 0 | Infrastructure: 3
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Operator.Banach

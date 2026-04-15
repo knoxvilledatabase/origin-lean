@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/Profinite/Basic.lean
-Genuine: 16 of 33 | Dissolved: 0 | Infrastructure: 17
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.FintypeCat

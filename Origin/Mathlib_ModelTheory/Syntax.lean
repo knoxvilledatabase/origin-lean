@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Syntax.lean
-Genuine: 98 of 116 | Dissolved: 0 | Infrastructure: 18
+Genuine: 98 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Data.Set.Prod

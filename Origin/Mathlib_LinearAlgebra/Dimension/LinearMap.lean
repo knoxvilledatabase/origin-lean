@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/LinearMap.lean
-Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
+Genuine: 12 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Projective
@@ -39,6 +39,7 @@ theorem rank_le_range (f : V →ₗ[K] V') : rank f ≤ Module.rank K V' :=
 theorem rank_le_domain (f : V →ₗ[K] V₁) : rank f ≤ Module.rank K V :=
   rank_range_le _
 
+-- CONFLATES (assumes ground = zero): rank_zero
 @[simp]
 theorem rank_zero [Nontrivial K] : rank (0 : V →ₗ[K] V') = 0 := by
   rw [rank, LinearMap.range_zero, rank_bot]

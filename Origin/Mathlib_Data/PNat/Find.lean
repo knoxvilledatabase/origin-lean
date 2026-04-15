@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Find.lean
-Genuine: 15 of 16 | Dissolved: 0 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Find

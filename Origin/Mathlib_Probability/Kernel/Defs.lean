@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Defs.lean
-Genuine: 30 of 62 | Dissolved: 0 | Infrastructure: 32
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.GiryMonad

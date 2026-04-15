@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/Functor/Oplax.lean
-Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Functor.Prelax

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Submonoid/Pointwise.lean
-Genuine: 87 of 106 | Dissolved: 12 | Infrastructure: 7
+Genuine: 87 | Conflates: 0 | Dissolved: 12 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.End

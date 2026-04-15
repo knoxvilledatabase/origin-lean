@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/DiffContOnCl.lean
-Genuine: 22 of 25 | Dissolved: 1 | Infrastructure: 2
+Genuine: 20 | Conflates: 2 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Real
@@ -97,11 +97,13 @@ theorem const_smul {R : Type*} [Semiring R] [Module R F] [SMulCommClass 𝕜 R F
     [ContinuousConstSMul R F] (hf : DiffContOnCl 𝕜 f s) (c : R) : DiffContOnCl 𝕜 (c • f) s :=
   ⟨hf.1.const_smul c, hf.2.const_smul c⟩
 
+-- CONFLATES (assumes ground = zero): smul
 theorem smul {𝕜' : Type*} [NontriviallyNormedField 𝕜'] [NormedAlgebra 𝕜 𝕜'] [NormedSpace 𝕜' F]
     [IsScalarTower 𝕜 𝕜' F] {c : E → 𝕜'} {f : E → F} {s : Set E} (hc : DiffContOnCl 𝕜 c s)
     (hf : DiffContOnCl 𝕜 f s) : DiffContOnCl 𝕜 (fun x => c x • f x) s :=
   ⟨hc.1.smul hf.1, hc.2.smul hf.2⟩
 
+-- CONFLATES (assumes ground = zero): smul_const
 theorem smul_const {𝕜' : Type*} [NontriviallyNormedField 𝕜'] [NormedAlgebra 𝕜 𝕜']
     [NormedSpace 𝕜' F] [IsScalarTower 𝕜 𝕜' F] {c : E → 𝕜'} {s : Set E} (hc : DiffContOnCl 𝕜 c s)
     (y : F) : DiffContOnCl 𝕜 (fun x => c x • y) s :=

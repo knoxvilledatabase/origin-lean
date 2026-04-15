@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Enumerative/Bell.lean
-Genuine: 10 of 14 | Dissolved: 3 | Infrastructure: 1
+Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Multinomial

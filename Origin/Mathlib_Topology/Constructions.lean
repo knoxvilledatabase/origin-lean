@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Constructions.lean
-Genuine: 286 of 324 | Dissolved: 0 | Infrastructure: 38
+Genuine: 286 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Piecewise

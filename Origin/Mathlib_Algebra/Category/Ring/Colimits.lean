@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Ring/Colimits.lean
-Genuine: 28 of 56 | Dissolved: 0 | Infrastructure: 28
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Ring.Basic

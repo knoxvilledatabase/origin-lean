@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Log/Deriv.lean
-Genuine: 9 of 34 | Dissolved: 24 | Infrastructure: 1
+Genuine: 9 | Conflates: 0 | Dissolved: 24 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Pow

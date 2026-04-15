@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Cycle/Concrete.lean
-Genuine: 39 of 45 | Dissolved: 0 | Infrastructure: 6
+Genuine: 32 | Conflates: 7 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.List.Cycle
@@ -140,11 +140,13 @@ theorem formPerm_subsingleton (s : Cycle α) (h : Subsingleton s) : formPerm s h
   · simp only [length_eq_zero, add_le_iff_nonpos_left, List.length, nonpos_iff_eq_zero] at h
     simp [h]
 
+-- CONFLATES (assumes ground = zero): isCycle_formPerm
 theorem isCycle_formPerm (s : Cycle α) (h : Nodup s) (hn : Nontrivial s) :
     IsCycle (formPerm s h) := by
   induction s using Quot.inductionOn
   exact List.isCycle_formPerm h (length_nontrivial hn)
 
+-- CONFLATES (assumes ground = zero): support_formPerm
 theorem support_formPerm [Fintype α] (s : Cycle α) (h : Nodup s) (hn : Nontrivial s) :
     support (formPerm s h) = s.toFinset := by
   induction' s using Quot.inductionOn with s
@@ -298,6 +300,7 @@ theorem toList_formPerm_nil (x : α) : toList (formPerm ([] : List α)) x = [] :
 
 theorem toList_formPerm_singleton (x y : α) : toList (formPerm [x]) y = [] := by simp
 
+-- CONFLATES (assumes ground = zero): toList_formPerm_nontrivial
 theorem toList_formPerm_nontrivial (l : List α) (hl : 2 ≤ l.length) (hn : Nodup l) :
     toList (formPerm l) (l.get ⟨0, (zero_lt_two.trans_le hl)⟩) = l := by
   have hc : l.formPerm.IsCycle := List.isCycle_formPerm hn hl
@@ -357,10 +360,12 @@ theorem nodup_toCycle (f : Perm α) (hf : IsCycle f) : (toCycle f hf).Nodup := b
   obtain ⟨x, hx, -⟩ := id hf
   simpa [toCycle_eq_toList f hf x hx] using nodup_toList _ _
 
+-- CONFLATES (assumes ground = zero): nontrivial_toCycle
 theorem nontrivial_toCycle (f : Perm α) (hf : IsCycle f) : (toCycle f hf).Nontrivial := by
   obtain ⟨x, hx, -⟩ := id hf
   simp [toCycle_eq_toList f hf x hx, hx, Cycle.nontrivial_coe_nodup_iff (nodup_toList _ _)]
 
+-- CONFLATES (assumes ground = zero): isoCycle
 def isoCycle : { f : Perm α // IsCycle f } ≃ { s : Cycle α // s.Nodup ∧ s.Nontrivial } where
   toFun f := ⟨toCycle (f : Perm α) f.prop, nodup_toCycle (f : Perm α) f.prop,
     nontrivial_toCycle _ f.prop⟩
@@ -415,6 +420,7 @@ theorem IsCycle.existsUnique_cycle_subtype {f : Perm α} (hf : IsCycle f) :
   rintro ⟨t, ht⟩ ht'
   simpa using hs' _ ⟨ht, ht'⟩
 
+-- CONFLATES (assumes ground = zero): IsCycle.existsUnique_cycle_nontrivial_subtype
 theorem IsCycle.existsUnique_cycle_nontrivial_subtype {f : Perm α} (hf : IsCycle f) :
     ∃! s : { s : Cycle α // s.Nodup ∧ s.Nontrivial }, (s : Cycle α).formPerm s.prop.left = f := by
   obtain ⟨⟨s, hn⟩, hs, hs'⟩ := hf.existsUnique_cycle_subtype
@@ -432,6 +438,7 @@ end Finite
 
 variable [Fintype α] [DecidableEq α]
 
+-- CONFLATES (assumes ground = zero): isoCycle'
 def isoCycle' : { f : Perm α // IsCycle f } ≃ { s : Cycle α // s.Nodup ∧ s.Nontrivial } :=
   let f : { s : Cycle α // s.Nodup ∧ s.Nontrivial } → { f : Perm α // IsCycle f } :=
     fun s => ⟨(s : Cycle α).formPerm s.prop.left, (s : Cycle α).isCycle_formPerm _ s.prop.right⟩

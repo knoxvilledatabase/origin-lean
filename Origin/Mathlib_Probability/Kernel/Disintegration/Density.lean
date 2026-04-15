@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Disintegration/Density.lean
-Genuine: 56 of 57 | Dissolved: 0 | Infrastructure: 1
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Composition

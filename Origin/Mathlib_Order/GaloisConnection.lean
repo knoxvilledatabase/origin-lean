@@ -1,6 +1,6 @@
 /-
 Extracted from Order/GaloisConnection.lean
-Genuine: 133 of 134 | Dissolved: 1 | Infrastructure: 0
+Genuine: 133 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.CompleteLattice

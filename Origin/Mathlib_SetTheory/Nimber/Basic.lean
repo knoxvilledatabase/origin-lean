@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Nimber/Basic.lean
-Genuine: 27 of 69 | Dissolved: 3 | Infrastructure: 39
+Genuine: 27 | Conflates: 0 | Dissolved: 3 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Bitwise

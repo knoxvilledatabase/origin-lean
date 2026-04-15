@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/SkewMonoidAlgebra/Basic.lean
-Genuine: 18 of 28 | Dissolved: 0 | Infrastructure: 10
+Genuine: 15 | Conflates: 3 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Basic
@@ -51,6 +51,7 @@ private def add :
     SkewMonoidAlgebra k G → SkewMonoidAlgebra k G → SkewMonoidAlgebra k G
   | ⟨a⟩, ⟨b⟩ => ⟨a + b⟩
 
+-- CONFLATES (assumes ground = zero): smul
 private def smul {S : Type*} [SMulZeroClass S k] :
     S → SkewMonoidAlgebra k G → SkewMonoidAlgebra k G
   | s, ⟨b⟩ => ⟨s • b⟩
@@ -71,6 +72,7 @@ theorem ofFinsupp_zero : (⟨0⟩ : SkewMonoidAlgebra k G) = 0 := rfl
 theorem ofFinsupp_add {a b} : (⟨a + b⟩ : SkewMonoidAlgebra k G) = ⟨a⟩ + ⟨b⟩ :=
   show _ = add _ _ by rw [add]
 
+-- CONFLATES (assumes ground = zero): ofFinsupp_smul
 @[simp]
 theorem ofFinsupp_smul {S : Type*} [SMulZeroClass S k] (a : S) (b : G →₀ k) :
     (⟨a • b⟩ : SkewMonoidAlgebra k G) = (a • ⟨b⟩ : SkewMonoidAlgebra k G) :=
@@ -86,6 +88,7 @@ theorem toFinsupp_add (a b : SkewMonoidAlgebra k G) :
   cases b
   rw [← ofFinsupp_add]
 
+-- CONFLATES (assumes ground = zero): toFinsupp_smul
 @[simp]
 theorem toFinsupp_smul {S : Type*} [SMulZeroClass S k] (a : S) (b : SkewMonoidAlgebra k G) :
     (a • b).toFinsupp = a • b.toFinsupp := by

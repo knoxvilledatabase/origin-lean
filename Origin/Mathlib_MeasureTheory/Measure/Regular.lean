@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Regular.lean
-Genuine: 53 of 91 | Dissolved: 15 | Infrastructure: 23
+Genuine: 53 | Conflates: 0 | Dissolved: 15 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.HausdorffDistance

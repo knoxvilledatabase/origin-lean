@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/SmoothManifoldWithCorners.lean
-Genuine: 190 of 222 | Dissolved: 0 | Infrastructure: 32
+Genuine: 176 | Conflates: 14 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed
@@ -137,6 +137,7 @@ open scoped Manifold Filter Topology ContDiff
 
 /-! ### Models with corners. -/
 
+-- CONFLATES (assumes ground = zero): ModelWithCorners
 @[ext] -- Porting note (https://github.com/leanprover-community/mathlib4/issues/5171): was nolint has_nonempty_instance
 structure ModelWithCorners (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type*)
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] (H : Type*) [TopologicalSpace H] extends
@@ -149,6 +150,7 @@ structure ModelWithCorners (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Ty
 
 attribute [simp, mfld_simps] ModelWithCorners.source_eq
 
+-- CONFLATES (assumes ground = zero): modelWithCornersSelf
 def modelWithCornersSelf (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type*)
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] : ModelWithCorners 𝕜 E E where
   toPartialEquiv := PartialEquiv.refl E
@@ -174,10 +176,12 @@ instance : CoeFun (ModelWithCorners 𝕜 E H) fun _ => H → E := ⟨toFun'⟩
 protected def symm : PartialEquiv E H :=
   I.toPartialEquiv.symm
 
+-- CONFLATES (assumes ground = zero): Simps.apply
 def Simps.apply (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type*) [NormedAddCommGroup E]
     [NormedSpace 𝕜 E] (H : Type*) [TopologicalSpace H] (I : ModelWithCorners 𝕜 E H) : H → E :=
   I
 
+-- CONFLATES (assumes ground = zero): Simps.symm_apply
 def Simps.symm_apply (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type*) [NormedAddCommGroup E]
     [NormedSpace 𝕜 E] (H : Type*) [TopologicalSpace H] (I : ModelWithCorners 𝕜 E H) : E → H :=
   I.symm
@@ -385,6 +389,7 @@ def ModelWithCorners.prod {𝕜 : Type u} [NontriviallyNormedField 𝕜] {E : Ty
     continuous_toFun := I.continuous_toFun.prodMap I'.continuous_toFun
     continuous_invFun := I.continuous_invFun.prodMap I'.continuous_invFun }
 
+-- CONFLATES (assumes ground = zero): ModelWithCorners.pi
 def ModelWithCorners.pi {𝕜 : Type u} [NontriviallyNormedField 𝕜] {ι : Type v} [Fintype ι]
     {E : ι → Type w} [∀ i, NormedAddCommGroup (E i)] [∀ i, NormedSpace 𝕜 (E i)] {H : ι → Type u'}
     [∀ i, TopologicalSpace (H i)] (I : ∀ i, ModelWithCorners 𝕜 (E i) (H i)) :
@@ -398,6 +403,7 @@ def ModelWithCorners.pi {𝕜 : Type u} [NontriviallyNormedField 𝕜] {ι : Typ
   continuous_toFun := continuous_pi fun i => (I i).continuous.comp (continuous_apply i)
   continuous_invFun := continuous_pi fun i => (I i).continuous_symm.comp (continuous_apply i)
 
+-- CONFLATES (assumes ground = zero): ModelWithCorners.tangent
 abbrev ModelWithCorners.tangent {𝕜 : Type u} [NontriviallyNormedField 𝕜] {E : Type v}
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type w} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) : ModelWithCorners 𝕜 (E × E) (ModelProd H E) :=
@@ -435,11 +441,13 @@ end ModelWithCornersProd
 
 section Boundaryless
 
+-- CONFLATES (assumes ground = zero): ModelWithCorners.Boundaryless
 class ModelWithCorners.Boundaryless {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*}
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type*} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) : Prop where
   range_eq_univ : range I = univ
 
+-- CONFLATES (assumes ground = zero): ModelWithCorners.range_eq_univ
 theorem ModelWithCorners.range_eq_univ {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*}
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type*} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) [I.Boundaryless] :
@@ -587,17 +595,20 @@ section SmoothManifoldWithCorners
 
 /-! ### Smooth manifolds with corners -/
 
+-- CONFLATES (assumes ground = zero): SmoothManifoldWithCorners
 class SmoothManifoldWithCorners {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*}
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type*} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) (M : Type*) [TopologicalSpace M] [ChartedSpace H M] extends
     HasGroupoid M (contDiffGroupoid ∞ I) : Prop
 
+-- CONFLATES (assumes ground = zero): SmoothManifoldWithCorners.mk'
 theorem SmoothManifoldWithCorners.mk' {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*}
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type*} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) (M : Type*) [TopologicalSpace M] [ChartedSpace H M]
     [gr : HasGroupoid M (contDiffGroupoid ∞ I)] : SmoothManifoldWithCorners I M :=
   { gr with }
 
+-- CONFLATES (assumes ground = zero): smoothManifoldWithCorners_of_contDiffOn
 theorem smoothManifoldWithCorners_of_contDiffOn {𝕜 : Type*} [NontriviallyNormedField 𝕜]
     {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type*} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) (M : Type*) [TopologicalSpace M] [ChartedSpace H M]
@@ -669,6 +680,7 @@ instance prod {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedA
 
 end SmoothManifoldWithCorners
 
+-- CONFLATES (assumes ground = zero): PartialHomeomorph.singleton_smoothManifoldWithCorners
 theorem PartialHomeomorph.singleton_smoothManifoldWithCorners
     {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
     {H : Type*} [TopologicalSpace H] {I : ModelWithCorners 𝕜 E H}
@@ -677,6 +689,7 @@ theorem PartialHomeomorph.singleton_smoothManifoldWithCorners
   @SmoothManifoldWithCorners.mk' _ _ _ _ _ _ _ _ _ _ (id _) <|
     e.singleton_hasGroupoid h (contDiffGroupoid ∞ I)
 
+-- CONFLATES (assumes ground = zero): Topology.IsOpenEmbedding.singleton_smoothManifoldWithCorners
 theorem Topology.IsOpenEmbedding.singleton_smoothManifoldWithCorners {𝕜 E H : Type*}
     [NontriviallyNormedField 𝕜] [NormedAddCommGroup E] [NormedSpace 𝕜 E] [TopologicalSpace H]
     {I : ModelWithCorners 𝕜 E H} {M : Type*} [TopologicalSpace M] [Nonempty M] {f : M → H}
@@ -1444,6 +1457,7 @@ section TangentSpace
 
 set_option linter.unusedVariables false in
 
+-- CONFLATES (assumes ground = zero): TangentSpace
 @[nolint unusedArguments]
 def TangentSpace {𝕜 : Type*} [NontriviallyNormedField 𝕜]
     {E : Type u} [NormedAddCommGroup E] [NormedSpace 𝕜 E]

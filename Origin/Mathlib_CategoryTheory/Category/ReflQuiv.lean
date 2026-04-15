@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Category/ReflQuiv.lean
-Genuine: 20 of 32 | Dissolved: 0 | Infrastructure: 12
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Quiver.ReflQuiver

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPowerSeries/LexOrder.lean
-Genuine: 9 of 13 | Dissolved: 4 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.MvPowerSeries.Basic

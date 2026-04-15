@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Central/Basic.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Central.Defs
@@ -36,6 +36,7 @@ lemma mem_center_iff {x : D} : x ∈ Subalgebra.center K D ↔ ∃ (a : K), x = 
 instance self : IsCentral K K where
   out x := by simp [Algebra.mem_bot]
 
+-- CONFLATES (assumes ground = zero): baseField_essentially_unique
 lemma baseField_essentially_unique
     (k K D : Type*) [Field k] [Field K] [Ring D] [Nontrivial D]
     [Algebra k K] [Algebra K D] [Algebra k D] [IsScalarTower k K D]

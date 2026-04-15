@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/OrderOfElement.lean
-Genuine: 137 of 157 | Dissolved: 11 | Infrastructure: 9
+Genuine: 137 | Conflates: 0 | Dissolved: 11 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs

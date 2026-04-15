@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Prod.lean
-Genuine: 45 of 116 | Dissolved: 1 | Infrastructure: 70
+Genuine: 45 | Conflates: 0 | Dissolved: 1 | Infrastructure: 70
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Opposite

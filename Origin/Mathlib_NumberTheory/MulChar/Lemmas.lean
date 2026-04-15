@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/MulChar/Lemmas.lean
-Genuine: 12 of 18 | Dissolved: 4 | Infrastructure: 2
+Genuine: 12 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.NumberTheory.MulChar.Basic

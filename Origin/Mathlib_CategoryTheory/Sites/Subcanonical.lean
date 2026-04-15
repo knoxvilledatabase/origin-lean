@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Subcanonical.lean
-Genuine: 21 of 27 | Dissolved: 0 | Infrastructure: 6
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Ulift

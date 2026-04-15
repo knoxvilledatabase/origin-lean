@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Filtered/Small.lean
-Genuine: 22 of 36 | Dissolved: 0 | Infrastructure: 14
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EssentiallySmall

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Basic.lean
-Genuine: 101 of 105 | Dissolved: 0 | Infrastructure: 4
+Genuine: 99 | Conflates: 2 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
@@ -582,9 +582,11 @@ theorem convex_stdSimplex : Convex 𝕜 (stdSimplex 𝕜 ι) := by
       smul_eq_mul, mul_one, mul_one]
     exact hab
 
+-- CONFLATES (assumes ground = zero): stdSimplex_of_subsingleton
 @[nontriviality] lemma stdSimplex_of_subsingleton [Subsingleton 𝕜] : stdSimplex 𝕜 ι = univ :=
   eq_univ_of_forall fun _ ↦ ⟨fun _ ↦ (Subsingleton.elim _ _).le, Subsingleton.elim _ _⟩
 
+-- CONFLATES (assumes ground = zero): stdSimplex_of_isEmpty_index
 lemma stdSimplex_of_isEmpty_index [IsEmpty ι] [Nontrivial 𝕜] : stdSimplex 𝕜 ι = ∅ :=
   eq_empty_of_forall_not_mem <| by rintro f ⟨-, hf⟩; simp at hf
 

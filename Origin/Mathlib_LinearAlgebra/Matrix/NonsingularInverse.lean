@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/NonsingularInverse.lean
-Genuine: 107 of 117 | Dissolved: 3 | Infrastructure: 7
+Genuine: 107 | Conflates: 0 | Dissolved: 3 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Invertible

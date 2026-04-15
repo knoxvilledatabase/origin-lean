@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Sublattice.lean
-Genuine: 71 of 113 | Dissolved: 0 | Infrastructure: 42
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Order.SupClosed

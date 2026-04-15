@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Congruence/Defs.lean
-Genuine: 49 of 85 | Dissolved: 0 | Infrastructure: 36
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.InjSurj

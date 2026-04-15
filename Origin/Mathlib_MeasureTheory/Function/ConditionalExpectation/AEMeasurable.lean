@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/ConditionalExpectation/AEMeasurable.lean
-Genuine: 54 of 59 | Dissolved: 1 | Infrastructure: 4
+Genuine: 54 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Lp

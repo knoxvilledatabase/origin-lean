@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/EMetricSpace/Defs.lean
-Genuine: 82 of 116 | Dissolved: 0 | Infrastructure: 34
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Inv

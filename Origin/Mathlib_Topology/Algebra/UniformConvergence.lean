@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/UniformConvergence.lean
-Genuine: 4 of 56 | Dissolved: 0 | Infrastructure: 52
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.UniformMulAction

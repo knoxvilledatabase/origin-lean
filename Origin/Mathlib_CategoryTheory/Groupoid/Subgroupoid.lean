@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Groupoid/Subgroupoid.lean
-Genuine: 86 of 100 | Dissolved: 0 | Infrastructure: 14
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs

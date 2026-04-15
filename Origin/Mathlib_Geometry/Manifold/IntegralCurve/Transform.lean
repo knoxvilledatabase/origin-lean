@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/IntegralCurve/Transform.lean
-Genuine: 12 of 16 | Dissolved: 4 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.IntegralCurve.Basic

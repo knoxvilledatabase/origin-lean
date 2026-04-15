@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/BorelSpace/ContinuousLinearMap.lean
-Genuine: 7 of 11 | Dissolved: 2 | Infrastructure: 2
+Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic

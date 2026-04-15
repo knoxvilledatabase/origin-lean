@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sheaves/CommRingCat.lean
-Genuine: 17 of 25 | Dissolved: 0 | Infrastructure: 8
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Ring.Colimits

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/DirectSum/Basic.lean
-Genuine: 41 of 56 | Dissolved: 4 | Infrastructure: 11
+Genuine: 41 | Conflates: 0 | Dissolved: 4 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Adjunction.lean
-Genuine: 5 of 8 | Dissolved: 0 | Infrastructure: 3
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Restrict

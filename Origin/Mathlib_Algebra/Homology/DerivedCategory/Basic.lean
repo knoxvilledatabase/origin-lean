@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/Basic.lean
-Genuine: 17 of 39 | Dissolved: 0 | Infrastructure: 22
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.HomologicalFunctor

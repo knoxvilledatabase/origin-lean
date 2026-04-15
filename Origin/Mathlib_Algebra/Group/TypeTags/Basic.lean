@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/TypeTags/Basic.lean
-Genuine: 10 of 106 | Dissolved: 0 | Infrastructure: 96
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 96
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic

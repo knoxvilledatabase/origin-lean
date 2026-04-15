@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/EReal.lean
-Genuine: 57 of 65 | Dissolved: 2 | Infrastructure: 6
+Genuine: 57 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Rat.Encodable

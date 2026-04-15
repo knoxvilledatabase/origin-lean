@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Hom/End.lean
-Genuine: 7 of 15 | Dissolved: 0 | Infrastructure: 8
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs

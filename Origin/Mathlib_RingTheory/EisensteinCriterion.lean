@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/EisensteinCriterion.lean
-Genuine: 3 of 5 | Dissolved: 2 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Cast.WithTop

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Prod.lean
-Genuine: 91 of 94 | Dissolved: 0 | Infrastructure: 3
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Tendsto

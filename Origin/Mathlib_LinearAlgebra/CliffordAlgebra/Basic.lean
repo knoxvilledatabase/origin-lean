@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/CliffordAlgebra/Basic.lean
-Genuine: 34 of 42 | Dissolved: 0 | Infrastructure: 8
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.RingQuot

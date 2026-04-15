@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Pow/Asymptotics.lean
-Genuine: 35 of 37 | Dissolved: 1 | Infrastructure: 1
+Genuine: 35 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal

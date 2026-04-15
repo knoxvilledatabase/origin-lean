@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/Lattice.lean
-Genuine: 65 of 69 | Dissolved: 0 | Infrastructure: 4
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Constructions

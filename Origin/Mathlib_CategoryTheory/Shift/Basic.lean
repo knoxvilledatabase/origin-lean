@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Shift/Basic.lean
-Genuine: 66 of 77 | Dissolved: 5 | Infrastructure: 6
+Genuine: 66 | Conflates: 0 | Dissolved: 5 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic

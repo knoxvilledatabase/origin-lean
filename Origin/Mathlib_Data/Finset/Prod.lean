@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Prod.lean
-Genuine: 60 of 67 | Dissolved: 0 | Infrastructure: 7
+Genuine: 59 | Conflates: 1 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Card
@@ -118,6 +118,7 @@ theorem product_biUnion [DecidableEq γ] (s : Finset α) (t : Finset β) (f : α
 theorem card_product (s : Finset α) (t : Finset β) : card (s ×ˢ t) = card s * card t :=
   Multiset.card_product _ _
 
+-- CONFLATES (assumes ground = zero): nontrivial_prod_iff
 lemma nontrivial_prod_iff : (s ×ˢ t).Nontrivial ↔
     s.Nonempty ∧ t.Nonempty ∧ (s.Nontrivial ∨ t.Nontrivial) := by
   simp_rw [← card_pos, ← one_lt_card_iff_nontrivial, card_product]; apply Nat.one_lt_mul_iff

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Opposite.lean
-Genuine: 12 of 19 | Dissolved: 0 | Infrastructure: 7
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Logic.Equiv.Defs

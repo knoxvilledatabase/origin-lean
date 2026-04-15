@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/MeasurableSpace/Embedding.lean
-Genuine: 90 of 104 | Dissolved: 0 | Infrastructure: 14
+Genuine: 90 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Basic

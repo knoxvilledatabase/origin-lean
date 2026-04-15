@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/DirichletCharacter/Basic.lean
-Genuine: 44 of 65 | Dissolved: 11 | Infrastructure: 10
+Genuine: 44 | Conflates: 0 | Dissolved: 11 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.EvenFunction

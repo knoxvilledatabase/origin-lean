@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/LocallyConvex/WithSeminorms.lean
-Genuine: 68 of 74 | Dissolved: 4 | Infrastructure: 2
+Genuine: 68 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Bounded

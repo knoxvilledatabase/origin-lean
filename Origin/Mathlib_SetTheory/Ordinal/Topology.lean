@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/Topology.lean
-Genuine: 25 of 34 | Dissolved: 6 | Infrastructure: 3
+Genuine: 25 | Conflates: 0 | Dissolved: 6 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Enum

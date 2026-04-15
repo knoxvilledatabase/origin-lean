@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Triangulated/Basic.lean
-Genuine: 32 of 44 | Dissolved: 0 | Infrastructure: 12
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Limits

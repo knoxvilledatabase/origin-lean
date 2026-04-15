@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Group/List.lean
-Genuine: 88 of 101 | Dissolved: 3 | Infrastructure: 10
+Genuine: 88 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Opposite.lean
-Genuine: 8 of 37 | Dissolved: 0 | Infrastructure: 29
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Opposite

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Basic.lean
-Genuine: 41 of 46 | Dissolved: 2 | Infrastructure: 3
+Genuine: 41 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection

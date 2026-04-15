@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Notation.lean
-Genuine: 49 of 63 | Dissolved: 0 | Infrastructure: 14
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Fin.Tuple

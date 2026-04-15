@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/HNNExtension.lean
-Genuine: 53 of 71 | Dissolved: 0 | Infrastructure: 18
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Coprod.Basic

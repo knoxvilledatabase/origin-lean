@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Away/AdjoinRoot.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.AdjoinRoot

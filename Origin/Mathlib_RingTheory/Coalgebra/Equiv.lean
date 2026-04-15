@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Coalgebra/Equiv.lean
-Genuine: 19 of 40 | Dissolved: 0 | Infrastructure: 21
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.RingTheory.Coalgebra.Hom

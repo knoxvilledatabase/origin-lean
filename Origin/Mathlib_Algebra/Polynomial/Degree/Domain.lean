@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Domain.lean
-Genuine: 3 of 11 | Dissolved: 6 | Infrastructure: 2
+Genuine: 3 | Conflates: 0 | Dissolved: 6 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Operations

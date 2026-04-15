@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Martingale/BorelCantelli.lean
-Genuine: 25 of 26 | Dissolved: 0 | Infrastructure: 1
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Probability.Martingale.Convergence

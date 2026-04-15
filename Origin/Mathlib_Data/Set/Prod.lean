@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Prod.lean
-Genuine: 158 of 172 | Dissolved: 0 | Infrastructure: 14
+Genuine: 157 | Conflates: 1 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Data.Set.Image
@@ -525,6 +525,7 @@ variable {α : Type*} {s t : Set α} {a : α}
 theorem offDiag_mono : Monotone (offDiag : Set α → Set (α × α)) := fun _ _ h _ =>
   And.imp (@h _) <| And.imp_left <| @h _
 
+-- CONFLATES (assumes ground = zero): offDiag_nonempty
 @[simp]
 theorem offDiag_nonempty : s.offDiag.Nonempty ↔ s.Nontrivial := by
   simp [offDiag, Set.Nonempty, Set.Nontrivial]

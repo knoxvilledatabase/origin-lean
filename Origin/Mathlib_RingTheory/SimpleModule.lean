@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/SimpleModule.lean
-Genuine: 38 of 59 | Dissolved: 8 | Infrastructure: 13
+Genuine: 36 | Conflates: 2 | Dissolved: 8 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional
@@ -57,6 +57,7 @@ abbrev IsSemisimpleRing := IsSemisimpleModule R R
 theorem RingEquiv.isSemisimpleRing (e : R ≃+* S) [IsSemisimpleRing R] : IsSemisimpleRing S :=
   (Submodule.orderIsoMapComap e.toSemilinearEquiv).complementedLattice
 
+-- CONFLATES (assumes ground = zero): IsSimpleModule.nontrivial
 theorem IsSimpleModule.nontrivial [IsSimpleModule R M] : Nontrivial M :=
   ⟨⟨0, by
       have h : (⊥ : Submodule R M) ≠ ⊤ := bot_ne_top
@@ -163,6 +164,7 @@ theorem sSup_simples_le (N : Submodule R M) :
 
 variable (R M)
 
+-- CONFLATES (assumes ground = zero): exists_simple_submodule
 theorem exists_simple_submodule [Nontrivial M] : ∃ m : Submodule R M, IsSimpleModule R m := by
   simpa only [isSimpleModule_iff_isAtom] using IsAtomic.exists_atom _
 

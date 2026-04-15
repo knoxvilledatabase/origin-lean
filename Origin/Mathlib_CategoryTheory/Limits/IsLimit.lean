@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/IsLimit.lean
-Genuine: 99 of 120 | Dissolved: 0 | Infrastructure: 21
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Basic

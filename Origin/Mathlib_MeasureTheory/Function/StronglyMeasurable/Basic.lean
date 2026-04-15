@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/StronglyMeasurable/Basic.lean
-Genuine: 203 of 209 | Dissolved: 2 | Infrastructure: 4
+Genuine: 202 | Conflates: 1 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
@@ -113,6 +113,7 @@ theorem SimpleFunc.stronglyMeasurable {α β} {_ : MeasurableSpace α} [Topologi
     (f : α →ₛ β) : StronglyMeasurable f :=
   ⟨fun _ => f, fun _ => tendsto_const_nhds⟩
 
+-- CONFLATES (assumes ground = zero): StronglyMeasurable.of_finite
 @[nontriviality]
 theorem StronglyMeasurable.of_finite [Finite α] {_ : MeasurableSpace α}
     [MeasurableSingletonClass α] [TopologicalSpace β]

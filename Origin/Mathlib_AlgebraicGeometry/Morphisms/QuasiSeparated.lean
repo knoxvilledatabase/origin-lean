@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/QuasiSeparated.lean
-Genuine: 19 of 27 | Dissolved: 0 | Infrastructure: 8
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Constructors

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/BooleanRing.lean
-Genuine: 35 of 86 | Dissolved: 0 | Infrastructure: 51
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Algebra.PUnitInstances.Algebra

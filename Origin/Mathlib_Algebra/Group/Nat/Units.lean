@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Nat/Units.lean
-Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Basic

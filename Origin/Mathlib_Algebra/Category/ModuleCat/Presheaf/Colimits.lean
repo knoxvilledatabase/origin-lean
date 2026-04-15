@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Presheaf/Colimits.lean
-Genuine: 4 of 14 | Dissolved: 0 | Infrastructure: 10
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf

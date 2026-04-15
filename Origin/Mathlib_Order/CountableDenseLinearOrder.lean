@@ -1,6 +1,6 @@
 /-
 Extracted from Order/CountableDenseLinearOrder.lean
-Genuine: 11 of 13 | Dissolved: 0 | Infrastructure: 2
+Genuine: 10 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Order.Ideal
@@ -196,6 +196,7 @@ end PartialIso
 
 open PartialIso
 
+-- CONFLATES (assumes ground = zero): embedding_from_countable_to_dense
 theorem embedding_from_countable_to_dense [Countable α] [DenselyOrdered β] [Nontrivial β] :
     Nonempty (α ↪o β) := by
   cases nonempty_encodable α

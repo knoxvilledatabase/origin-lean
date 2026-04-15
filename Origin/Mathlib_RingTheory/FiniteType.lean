@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/FiniteType.lean
-Genuine: 49 of 60 | Dissolved: 0 | Infrastructure: 11
+Genuine: 39 | Conflates: 10 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeAlgebra
@@ -357,6 +357,7 @@ theorem exists_finset_adjoin_eq_top [h : FiniteType R R[M]] :
   rw [this]
   exact support_gen_of_gen' hS
 
+-- CONFLATES (assumes ground = zero): of'_mem_span
 theorem of'_mem_span [Nontrivial R] {m : M} {S : Set M} :
     of' R M m ∈ span R (of' R M '' S) ↔ m ∈ S := by
   refine ⟨fun h => ?_, fun h => Submodule.subset_span <| Set.mem_image_of_mem (of R M) h⟩
@@ -364,6 +365,7 @@ theorem of'_mem_span [Nontrivial R] {m : M} {S : Set M} :
     Finsupp.support_single_ne_zero _ (one_ne_zero' R)] at h
   simpa using h
 
+-- CONFLATES (assumes ground = zero): mem_closure_of_mem_span_closure
 theorem mem_closure_of_mem_span_closure [Nontrivial R] {m : M} {S : Set M}
     (h : of' R M m ∈ span R (Submonoid.closure (of' R M '' S) : Set R[M])) :
     m ∈ closure S := by
@@ -434,6 +436,7 @@ instance finiteType_of_fg [CommRing R] [h : AddMonoid.FG M] :
 
 variable {R M}
 
+-- CONFLATES (assumes ground = zero): finiteType_iff_fg
 theorem finiteType_iff_fg [CommRing R] [Nontrivial R] :
     FiniteType R R[M] ↔ AddMonoid.FG M := by
   refine ⟨fun h => ?_, fun h => @AddMonoidAlgebra.finiteType_of_fg _ _ _ _ h⟩
@@ -444,10 +447,12 @@ theorem finiteType_iff_fg [CommRing R] [Nontrivial R] :
   rw [adjoin_eq_span] at hm
   exact mem_closure_of_mem_span_closure hm
 
+-- CONFLATES (assumes ground = zero): fg_of_finiteType
 theorem fg_of_finiteType [CommRing R] [Nontrivial R] [h : FiniteType R R[M]] :
     AddMonoid.FG M :=
   finiteType_iff_fg.1 h
 
+-- CONFLATES (assumes ground = zero): finiteType_iff_group_fg
 theorem finiteType_iff_group_fg {G : Type*} [AddCommGroup G] [CommRing R] [Nontrivial R] :
     FiniteType R R[G] ↔ AddGroup.FG G := by
   simpa [AddGroup.fg_iff_addMonoid_fg] using finiteType_iff_fg
@@ -507,6 +512,7 @@ theorem exists_finset_adjoin_eq_top [h : FiniteType R (MonoidAlgebra R M)] :
   rw [this]
   exact support_gen_of_gen' hS
 
+-- CONFLATES (assumes ground = zero): of_mem_span_of_iff
 theorem of_mem_span_of_iff [Nontrivial R] {m : M} {S : Set M} :
     of R M m ∈ span R (of R M '' S) ↔ m ∈ S := by
   refine ⟨fun h => ?_, fun h => Submodule.subset_span <| Set.mem_image_of_mem (of R M) h⟩
@@ -514,6 +520,7 @@ theorem of_mem_span_of_iff [Nontrivial R] {m : M} {S : Set M} :
     Finsupp.support_single_ne_zero _ (one_ne_zero' R)] at h
   simpa using h
 
+-- CONFLATES (assumes ground = zero): mem_closure_of_mem_span_closure
 theorem mem_closure_of_mem_span_closure [Nontrivial R] {m : M} {S : Set M}
     (h : of R M m ∈ span R (Submonoid.closure (of R M '' S) : Set (MonoidAlgebra R M))) :
     m ∈ closure S := by
@@ -568,6 +575,7 @@ theorem freeAlgebra_lift_of_surjective_of_closure [CommSemiring R] {S : Set M}
 instance finiteType_of_fg [CommRing R] [Monoid.FG M] : FiniteType R (MonoidAlgebra R M) :=
   (AddMonoidAlgebra.finiteType_of_fg R (Additive M)).equiv (toAdditiveAlgEquiv R M).symm
 
+-- CONFLATES (assumes ground = zero): finiteType_iff_fg
 theorem finiteType_iff_fg [CommRing R] [Nontrivial R] :
     FiniteType R (MonoidAlgebra R M) ↔ Monoid.FG M :=
   ⟨fun h =>
@@ -575,10 +583,12 @@ theorem finiteType_iff_fg [CommRing R] [Nontrivial R] :
       AddMonoidAlgebra.finiteType_iff_fg.1 <| h.equiv <| toAdditiveAlgEquiv R M,
     fun h => @MonoidAlgebra.finiteType_of_fg _ _ _ _ h⟩
 
+-- CONFLATES (assumes ground = zero): fg_of_finiteType
 theorem fg_of_finiteType [CommRing R] [Nontrivial R] [h : FiniteType R (MonoidAlgebra R M)] :
     Monoid.FG M :=
   finiteType_iff_fg.1 h
 
+-- CONFLATES (assumes ground = zero): finiteType_iff_group_fg
 theorem finiteType_iff_group_fg {G : Type*} [Group G] [CommRing R] [Nontrivial R] :
     FiniteType R (MonoidAlgebra R G) ↔ Group.FG G := by
   simpa [Group.fg_iff_monoid_fg] using finiteType_iff_fg

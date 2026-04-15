@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/Bochner.lean
-Genuine: 187 of 199 | Dissolved: 6 | Infrastructure: 6
+Genuine: 187 | Conflates: 0 | Dissolved: 6 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntegrableOn

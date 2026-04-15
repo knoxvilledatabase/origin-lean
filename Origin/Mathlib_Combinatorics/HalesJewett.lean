@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/HalesJewett.lean
-Genuine: 39 of 50 | Dissolved: 0 | Infrastructure: 11
+Genuine: 35 | Conflates: 4 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -74,6 +74,7 @@ variable {η α ι κ : Type*}
 
 namespace Combinatorics
 
+-- CONFLATES (assumes ground = zero): Subspace
 @[ext]
 structure Subspace (η α ι : Type*) where
   /-- The word representing a combinatorial subspace. `l.idxfun i = Sum.inr e` means that
@@ -95,6 +96,7 @@ instance instCoeFun : CoeFun (Subspace η α ι) (fun _ ↦ (η → α) → ι �
 
 lemma coe_apply (l : Subspace η α ι) (x : η → α) (i : ι) : l x i = (l.idxFun i).elim id x := rfl
 
+-- CONFLATES (assumes ground = zero): coe_injective
 lemma coe_injective [Nontrivial α] : Injective ((⇑) : Subspace η α ι → (η → α) → ι → α) := by
   rintro l m hlm
   ext i
@@ -144,6 +146,7 @@ protected lemma IsMono.reindex {eη : η ≃ η'} {eα : α ≃ α'} {eι : ι �
 
 end Subspace
 
+-- CONFLATES (assumes ground = zero): Line
 @[ext]
 structure Line (α ι : Type*) where
   /-- The word representing a combinatorial line. `l.idxfun i = none` means that
@@ -164,6 +167,7 @@ instance instCoeFun : CoeFun (Line α ι) fun _ => α → ι → α :=
 
 lemma coe_apply (l : Line α ι) (x : α) (i : ι) : l x i = (l.idxFun i).getD x := rfl
 
+-- CONFLATES (assumes ground = zero): coe_injective
 lemma coe_injective [Nontrivial α] : Injective ((⇑) : Line α ι → α → ι → α) := by
   rintro l m hlm
   ext i a

@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Divisibility.lean
-Genuine: 7 of 10 | Dissolved: 2 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.IsPrimePow

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/EqLocus.lean
-Genuine: 6 of 9 | Dissolved: 0 | Infrastructure: 3
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Ker

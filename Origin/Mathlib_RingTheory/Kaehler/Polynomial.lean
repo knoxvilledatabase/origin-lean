@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Kaehler/Polynomial.lean
-Genuine: 12 of 14 | Dissolved: 0 | Infrastructure: 2
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.Kaehler.Basic

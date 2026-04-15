@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Diagonal.lean
-Genuine: 40 of 65 | Dissolved: 0 | Infrastructure: 25
+Genuine: 39 | Conflates: 1 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Data.Int.Cast.Lemmas
@@ -76,6 +76,7 @@ theorem diagonal_add [AddZeroClass α] (d₁ d₂ : n → α) :
   by_cases h : i = j <;>
   simp [h]
 
+-- CONFLATES (assumes ground = zero): diagonal_smul
 @[simp]
 theorem diagonal_smul [Zero α] [SMulZeroClass R α] (r : R) (d : n → α) :
     diagonal (r • d) = r • diagonal d := by

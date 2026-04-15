@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Cycle/Factors.lean
-Genuine: 72 of 76 | Dissolved: 1 | Infrastructure: 3
+Genuine: 72 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators

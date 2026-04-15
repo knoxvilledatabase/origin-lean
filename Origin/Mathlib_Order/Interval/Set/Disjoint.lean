@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Disjoint.lean
-Genuine: 43 of 45 | Dissolved: 0 | Infrastructure: 2
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice

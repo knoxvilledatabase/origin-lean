@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ContinuousFunctionalCalculus/NonUnital.lean
-Genuine: 71 of 78 | Dissolved: 0 | Infrastructure: 7
+Genuine: 67 | Conflates: 4 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Quasispectrum
@@ -52,6 +52,7 @@ open Topology
 
 open scoped ContinuousMapZero
 
+-- CONFLATES (assumes ground = zero): NonUnitalContinuousFunctionalCalculus
 class NonUnitalContinuousFunctionalCalculus (R : Type*) {A : Type*} (p : outParam (A → Prop))
     [CommSemiring R] [Nontrivial R] [StarRing R] [MetricSpace R] [TopologicalSemiring R]
     [ContinuousStar R] [NonUnitalRing A] [StarRing A] [TopologicalSpace A] [Module R A]
@@ -355,6 +356,7 @@ lemma cfcₙ_sum_univ {ι : Type*} [Fintype ι] (f : ι → R → R) (a : A)
     cfcₙ (∑ i, f i) a = ∑ i, cfcₙ (f i) a :=
   cfcₙ_sum f a _ (fun i _ ↦ hf i) (fun i _ ↦ hf0 i)
 
+-- CONFLATES (assumes ground = zero): cfcₙ_smul
 lemma cfcₙ_smul {S : Type*} [SMulZeroClass S R] [ContinuousConstSMul S R]
     [SMulZeroClass S A] [IsScalarTower S R A] [IsScalarTower S R (R → R)]
     (s : S) (f : R → R) (a : A) (hf : ContinuousOn f (σₙ R a) := by cfc_cont_tac)
@@ -385,6 +387,7 @@ lemma cfcₙ_star : cfcₙ (fun x ↦ star (f x)) a = star (cfcₙ f a) := by
     · rw [cfcₙ_apply_of_not_map_zero a h0, cfcₙ_apply_of_not_map_zero, star_zero]
       exact fun hf0 ↦ h0 <| by simpa using congr(star $(hf0))
 
+-- CONFLATES (assumes ground = zero): cfcₙ_smul_id
 lemma cfcₙ_smul_id {S : Type*} [SMulZeroClass S R] [ContinuousConstSMul S R]
     [SMulZeroClass S A] [IsScalarTower S R A] [IsScalarTower S R (R → R)]
     (s : S) (a : A) (ha : p a := by cfc_tac) : cfcₙ (s • · : R → R) a = s • a := by
@@ -428,6 +431,7 @@ lemma cfcₙ_comp' (g f : R → R) (a : A)
     cfcₙ (g <| f ·) a = cfcₙ g (cfcₙ f a) :=
   cfcₙ_comp g f a
 
+-- CONFLATES (assumes ground = zero): cfcₙ_comp_smul
 lemma cfcₙ_comp_smul {S : Type*} [SMulZeroClass S R] [ContinuousConstSMul S R]
     [SMulZeroClass S A] [IsScalarTower S R A] [IsScalarTower S R (R → R)]
     (s : S) (f : R → R) (a : A) (hf : ContinuousOn f ((s • ·) '' (σₙ R a)) := by cfc_cont_tac)

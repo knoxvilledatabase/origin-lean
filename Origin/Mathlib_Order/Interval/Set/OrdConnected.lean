@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/OrdConnected.lean
-Genuine: 49 of 54 | Dissolved: 0 | Infrastructure: 5
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.OrderEmbedding

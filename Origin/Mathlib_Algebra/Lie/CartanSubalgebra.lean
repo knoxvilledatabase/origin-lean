@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/CartanSubalgebra.lean
-Genuine: 7 of 10 | Dissolved: 0 | Infrastructure: 3
+Genuine: 6 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Nilpotent
@@ -79,6 +79,7 @@ theorem isCartanSubalgebra_iff_isUcsLimit : H.IsCartanSubalgebra ↔ H.toLieSubm
           rw [← LieSubalgebra.coe_to_submodule_eq_iff, ← LieSubalgebra.coe_normalizer_eq_normalizer,
             hk', LieSubalgebra.coe_toLieSubmodule] }
 
+-- CONFLATES (assumes ground = zero): ne_bot_of_isCartanSubalgebra
 lemma ne_bot_of_isCartanSubalgebra [Nontrivial L] (H : LieSubalgebra R L) [H.IsCartanSubalgebra] :
     H ≠ ⊥ := by
   intro e

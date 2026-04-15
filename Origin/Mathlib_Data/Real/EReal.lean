@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/EReal.lean
-Genuine: 240 of 322 | Dissolved: 15 | Infrastructure: 67
+Genuine: 240 | Conflates: 0 | Dissolved: 15 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Data.Real.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Ring/WithAbs.lean
-Genuine: 14 of 32 | Dissolved: 0 | Infrastructure: 18
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic

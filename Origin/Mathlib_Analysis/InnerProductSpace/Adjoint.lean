@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Adjoint.lean
-Genuine: 56 of 78 | Dissolved: 0 | Infrastructure: 22
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Dual

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/MvPolynomial.lean
-Genuine: 4 of 6 | Dissolved: 1 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic

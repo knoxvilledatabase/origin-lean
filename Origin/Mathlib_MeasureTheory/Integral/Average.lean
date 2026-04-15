@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/Average.lean
-Genuine: 58 of 91 | Dissolved: 30 | Infrastructure: 3
+Genuine: 58 | Conflates: 0 | Dissolved: 30 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.SetIntegral

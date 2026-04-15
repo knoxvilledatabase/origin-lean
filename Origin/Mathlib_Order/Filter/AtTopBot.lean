@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/AtTopBot.lean
-Genuine: 228 of 239 | Dissolved: 1 | Infrastructure: 10
+Genuine: 224 | Conflates: 4 | Dissolved: 1 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Preimage
@@ -84,6 +84,7 @@ theorem not_tendsto_const_atBot [Preorder α] [NoMinOrder α] (x : α) (l : Filt
     ¬Tendsto (fun _ => x) l atBot :=
   tendsto_const_pure.not_tendsto (disjoint_pure_atBot x)
 
+-- CONFLATES (assumes ground = zero): disjoint_atBot_atTop
 theorem disjoint_atBot_atTop [PartialOrder α] [Nontrivial α] :
     Disjoint (atBot : Filter α) atTop := by
   rcases exists_pair_ne α with ⟨x, y, hne⟩
@@ -93,6 +94,7 @@ theorem disjoint_atBot_atTop [PartialOrder α] [Nontrivial α] :
   · refine disjoint_of_disjoint_of_mem ?_ (Iic_mem_atBot y) (Ici_mem_atTop x)
     exact Iic_disjoint_Ici.2 hle
 
+-- CONFLATES (assumes ground = zero): disjoint_atTop_atBot
 theorem disjoint_atTop_atBot [PartialOrder α] [Nontrivial α] : Disjoint (atTop : Filter α) atBot :=
   disjoint_atBot_atTop.symm
 
@@ -190,12 +192,14 @@ theorem OrderTop.atTop_eq (α) [PartialOrder α] [OrderTop α] : (atTop : Filter
 theorem OrderBot.atBot_eq (α) [PartialOrder α] [OrderBot α] : (atBot : Filter α) = pure ⊥ :=
   @OrderTop.atTop_eq αᵒᵈ _ _
 
+-- CONFLATES (assumes ground = zero): Subsingleton.atTop_eq
 @[nontriviality]
 theorem Subsingleton.atTop_eq (α) [Subsingleton α] [Preorder α] : (atTop : Filter α) = ⊤ := by
   refine top_unique fun s hs x => ?_
   rw [atTop, ciInf_subsingleton x, mem_principal] at hs
   exact hs left_mem_Ici
 
+-- CONFLATES (assumes ground = zero): Subsingleton.atBot_eq
 @[nontriviality]
 theorem Subsingleton.atBot_eq (α) [Subsingleton α] [Preorder α] : (atBot : Filter α) = ⊤ :=
   @Subsingleton.atTop_eq αᵒᵈ _ _

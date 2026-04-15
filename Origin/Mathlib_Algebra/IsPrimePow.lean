@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/IsPrimePow.lean
-Genuine: 13 of 20 | Dissolved: 3 | Infrastructure: 4
+Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Defs.lean
-Genuine: 41 of 64 | Dissolved: 2 | Infrastructure: 21
+Genuine: 39 | Conflates: 2 | Dissolved: 2 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
@@ -102,6 +102,7 @@ that `Semiring -> NonAssocSemiring` is tried before `NonAssocRing -> NonAssocSem
 TODO: clean this once https://github.com/leanprover/lean4/issues/2115 is fixed
 -/
 
+-- CONFLATES (assumes ground = zero): NonUnitalNonAssocSemiring
 class NonUnitalNonAssocSemiring (α : Type u) extends AddCommMonoid α, Distrib α, MulZeroClass α
 
 class NonUnitalSemiring (α : Type u) extends NonUnitalNonAssocSemiring α, SemigroupWithZero α
@@ -335,5 +336,6 @@ instance (priority := 100) CommRing.toAddCommGroupWithOne [s : CommRing α] :
     AddCommGroupWithOne α :=
   { s with }
 
+-- CONFLATES (assumes ground = zero): IsDomain
 @[stacks 09FE]
 class IsDomain (α : Type u) [Semiring α] extends IsCancelMulZero α, Nontrivial α : Prop

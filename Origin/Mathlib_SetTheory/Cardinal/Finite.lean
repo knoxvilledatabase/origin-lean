@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Finite.lean
-Genuine: 81 of 86 | Dissolved: 3 | Infrastructure: 2
+Genuine: 79 | Conflates: 2 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.ULift
@@ -305,6 +305,7 @@ theorem card_le_one_iff_subsingleton (α : Type*) : card α ≤ 1 ↔ Subsinglet
   rw [← le_one_iff_subsingleton]
   simp [card]
 
+-- CONFLATES (assumes ground = zero): one_lt_card_iff_nontrivial
 theorem one_lt_card_iff_nontrivial (α : Type*) : 1 < card α ↔ Nontrivial α := by
   rw [← Cardinal.one_lt_iff_nontrivial]
   conv_rhs => rw [← Nat.cast_one]
@@ -393,6 +394,7 @@ theorem card_le_one_iff_subsingleton (α : Type*) : card α ≤ 1 ↔ Subsinglet
   rw [← Cardinal.toPartENat_le_natCast_iff]
   simp only [PartENat.card, Nat.cast_one]
 
+-- CONFLATES (assumes ground = zero): one_lt_card_iff_nontrivial
 theorem one_lt_card_iff_nontrivial (α : Type*) : 1 < card α ↔ Nontrivial α := by
   rw [← Cardinal.one_lt_iff_nontrivial]
   conv_rhs => rw [← Nat.cast_one]

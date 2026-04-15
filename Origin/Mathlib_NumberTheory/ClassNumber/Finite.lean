@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ClassNumber/Finite.lean
-Genuine: 16 of 19 | Dissolved: 3 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real

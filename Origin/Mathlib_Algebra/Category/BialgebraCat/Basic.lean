@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/BialgebraCat/Basic.lean
-Genuine: 8 of 29 | Dissolved: 0 | Infrastructure: 21
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.CoalgebraCat.Basic

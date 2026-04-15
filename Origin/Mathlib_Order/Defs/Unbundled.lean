@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Defs/Unbundled.lean
-Genuine: 46 of 65 | Dissolved: 0 | Infrastructure: 19
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Data.Set.Defs

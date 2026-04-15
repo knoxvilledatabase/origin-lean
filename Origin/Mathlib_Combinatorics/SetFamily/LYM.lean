@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SetFamily/LYM.lean
-Genuine: 11 of 12 | Dissolved: 1 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring

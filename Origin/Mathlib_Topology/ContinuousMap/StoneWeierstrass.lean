@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/StoneWeierstrass.lean
-Genuine: 33 of 34 | Dissolved: 0 | Infrastructure: 1
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Unitization

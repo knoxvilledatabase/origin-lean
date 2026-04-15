@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/AffineEquiv.lean
-Genuine: 60 of 97 | Dissolved: 0 | Infrastructure: 37
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineMap

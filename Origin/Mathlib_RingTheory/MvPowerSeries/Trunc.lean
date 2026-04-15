@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Trunc.lean
-Genuine: 4 of 6 | Dissolved: 2 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.MvPowerSeries.Basic

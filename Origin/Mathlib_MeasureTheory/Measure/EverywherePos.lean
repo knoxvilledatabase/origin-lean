@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/EverywherePos.lean
-Genuine: 16 of 19 | Dissolved: 2 | Infrastructure: 1
+Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Measure

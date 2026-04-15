@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/MeanInequalitiesPow.lean
-Genuine: 22 of 22 | Dissolved: 0 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Jensen

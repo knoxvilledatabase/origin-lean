@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/NoetherianSpace.lean
-Genuine: 20 of 25 | Dissolved: 0 | Infrastructure: 5
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Topology.Sets.Closeds

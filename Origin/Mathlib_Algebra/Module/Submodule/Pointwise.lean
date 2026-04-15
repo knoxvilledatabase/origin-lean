@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Pointwise.lean
-Genuine: 44 of 62 | Dissolved: 1 | Infrastructure: 17
+Genuine: 44 | Conflates: 0 | Dissolved: 1 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators

@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Surreal/Basic.lean
-Genuine: 51 of 70 | Dissolved: 0 | Infrastructure: 19
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Hom.Monoid

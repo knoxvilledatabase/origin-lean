@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subsemiring/Basic.lean
-Genuine: 112 of 154 | Dissolved: 0 | Infrastructure: 42
+Genuine: 112 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Membership

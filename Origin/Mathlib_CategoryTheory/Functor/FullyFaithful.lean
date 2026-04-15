@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Functor/FullyFaithful.lean
-Genuine: 39 of 47 | Dissolved: 0 | Infrastructure: 8
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.NatIso

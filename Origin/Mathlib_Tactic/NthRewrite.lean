@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/NthRewrite.lean
-Genuine: 1 of 5 | Dissolved: 0 | Infrastructure: 4
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Init

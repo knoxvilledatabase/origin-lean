@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/ScaleRoots.lean
-Genuine: 25 of 30 | Dissolved: 4 | Infrastructure: 1
+Genuine: 25 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors

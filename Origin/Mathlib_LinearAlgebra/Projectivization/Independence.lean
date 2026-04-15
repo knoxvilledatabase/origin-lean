@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Independence.lean
-Genuine: 7 of 9 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Projectivization.Basic

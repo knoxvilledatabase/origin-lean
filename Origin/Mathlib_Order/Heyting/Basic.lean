@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Heyting/Basic.lean
-Genuine: 168 of 233 | Dissolved: 0 | Infrastructure: 65
+Genuine: 165 | Conflates: 3 | Dissolved: 0 | Infrastructure: 65
 -/
 import Origin.Core
 import Mathlib.Order.PropInstances
@@ -640,14 +640,17 @@ theorem compl_bot : (⊥ : α)ᶜ = ⊤ := by rw [← himp_bot, himp_self]
 @[simp] theorem le_compl_self : a ≤ aᶜ ↔ a = ⊥ := by
   rw [le_compl_iff_disjoint_left, disjoint_self]
 
+-- CONFLATES (assumes ground = zero): ne_compl_self
 @[simp] theorem ne_compl_self [Nontrivial α] : a ≠ aᶜ := by
   intro h
   cases le_compl_self.1 (le_of_eq h)
   simp at h
 
+-- CONFLATES (assumes ground = zero): compl_ne_self
 @[simp] theorem compl_ne_self [Nontrivial α] : aᶜ ≠ a :=
   ne_comm.1 ne_compl_self
 
+-- CONFLATES (assumes ground = zero): lt_compl_self
 @[simp] theorem lt_compl_self [Nontrivial α] : a < aᶜ ↔ a = ⊥ := by
   rw [lt_iff_le_and_ne]; simp
 

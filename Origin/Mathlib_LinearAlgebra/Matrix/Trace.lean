@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Trace.lean
-Genuine: 34 of 36 | Dissolved: 0 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basis

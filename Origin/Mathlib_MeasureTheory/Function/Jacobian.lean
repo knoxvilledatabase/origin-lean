@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/Jacobian.lean
-Genuine: 32 of 35 | Dissolved: 2 | Infrastructure: 1
+Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic

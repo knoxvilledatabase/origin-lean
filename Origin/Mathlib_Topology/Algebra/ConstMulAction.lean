@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/ConstMulAction.lean
-Genuine: 45 of 75 | Dissolved: 18 | Infrastructure: 12
+Genuine: 45 | Conflates: 0 | Dissolved: 18 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ULift

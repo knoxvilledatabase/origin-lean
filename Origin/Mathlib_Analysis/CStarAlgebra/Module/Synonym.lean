@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/Module/Synonym.lean
-Genuine: 5 of 50 | Dissolved: 0 | Infrastructure: 45
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.RingTheory.Finiteness.Defs

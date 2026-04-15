@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/PEquiv.lean
-Genuine: 14 of 16 | Dissolved: 0 | Infrastructure: 2
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Mul
@@ -105,6 +105,7 @@ theorem toMatrix_bot [DecidableEq n] [Zero α] [One α] :
     ((⊥ : PEquiv m n).toMatrix : Matrix m n α) = 0 :=
   rfl
 
+-- CONFLATES (assumes ground = zero): toMatrix_injective
 theorem toMatrix_injective [DecidableEq n] [MonoidWithZero α] [Nontrivial α] :
     Function.Injective (@toMatrix m n α _ _ _) := by
   classical

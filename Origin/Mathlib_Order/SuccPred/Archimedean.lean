@@ -1,6 +1,6 @@
 /-
 Extracted from Order/SuccPred/Archimedean.lean
-Genuine: 50 of 57 | Dissolved: 0 | Infrastructure: 7
+Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Order.SuccPred.Basic
@@ -272,6 +272,7 @@ theorem Pred.rec_top (p : α → Prop) (htop : p ⊤) (hpred : ∀ a, p a → p 
 
 end OrderTop
 
+-- CONFLATES (assumes ground = zero): SuccOrder.forall_ne_bot_iff
 lemma SuccOrder.forall_ne_bot_iff
     [Nontrivial α] [PartialOrder α] [OrderBot α] [SuccOrder α] [IsSuccArchimedean α]
     (P : α → Prop) :

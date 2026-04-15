@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoxIntegral/UnitPartition.lean
-Genuine: 27 of 34 | Dissolved: 5 | Infrastructure: 2
+Genuine: 27 | Conflates: 0 | Dissolved: 5 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Measure

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IntegralClosure/IsIntegralClosure/Basic.lean
-Genuine: 68 of 82 | Dissolved: 1 | Infrastructure: 13
+Genuine: 67 | Conflates: 2 | Dissolved: 1 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Roots
@@ -503,6 +503,7 @@ nonrec theorem RingHom.IsIntegral.tower_bot (hg : Function.Injective g)
 
 variable (T) in
 
+-- CONFLATES (assumes ground = zero): Algebra.IsIntegral.tower_bot
 theorem Algebra.IsIntegral.tower_bot [Algebra R S] [Algebra R T] [Algebra S T]
     [NoZeroSMulDivisors S T] [Nontrivial T] [IsScalarTower R S T]
     [h : Algebra.IsIntegral R T] : Algebra.IsIntegral R S where
@@ -512,6 +513,7 @@ theorem Algebra.IsIntegral.tower_bot [Algebra R S] [Algebra R T] [Algebra S T]
     rw [← IsScalarTower.algebraMap_eq R S T]
     exact h.isIntegral
 
+-- CONFLATES (assumes ground = zero): IsIntegral.tower_bot_of_field
 theorem IsIntegral.tower_bot_of_field {R A B : Type*} [CommRing R] [Field A]
     [CommRing B] [Nontrivial B] [Algebra R A] [Algebra A B] [Algebra R B] [IsScalarTower R A B]
     {x : A} (h : IsIntegral R (algebraMap A B x)) : IsIntegral R x :=

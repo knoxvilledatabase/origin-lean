@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Inversion/ImageHyperplane.lean
-Genuine: 1 of 9 | Dissolved: 8 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Inversion.Basic

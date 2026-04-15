@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/BorelSpace/Order.lean
-Genuine: 86 of 102 | Dissolved: 0 | Infrastructure: 16
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Topology.Semicontinuous

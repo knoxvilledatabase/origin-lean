@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Equalizers.lean
-Genuine: 133 of 175 | Dissolved: 0 | Infrastructure: 42
+Genuine: 133 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EpiMono

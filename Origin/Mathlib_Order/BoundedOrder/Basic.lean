@@ -1,6 +1,6 @@
 /-
 Extracted from Order/BoundedOrder/Basic.lean
-Genuine: 71 of 116 | Dissolved: 0 | Infrastructure: 45
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Order.Max

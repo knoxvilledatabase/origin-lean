@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Kuratowski.lean
-Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Lp.lpSpace

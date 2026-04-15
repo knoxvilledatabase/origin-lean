@@ -1,6 +1,6 @@
 /-
 Extracted from Condensed/Explicit.lean
-Genuine: 14 of 17 | Dissolved: 0 | Infrastructure: 3
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Condensed.Module

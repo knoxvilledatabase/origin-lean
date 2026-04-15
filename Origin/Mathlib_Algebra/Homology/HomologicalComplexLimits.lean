@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomologicalComplexLimits.lean
-Genuine: 8 of 26 | Dissolved: 0 | Infrastructure: 18
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.Single

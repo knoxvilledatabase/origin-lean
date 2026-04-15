@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/Lat.lean
-Genuine: 5 of 14 | Dissolved: 0 | Infrastructure: 9
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Order.Category.PartOrd

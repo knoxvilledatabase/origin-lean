@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/AddCharacter.lean
-Genuine: 16 of 25 | Dissolved: 9 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots

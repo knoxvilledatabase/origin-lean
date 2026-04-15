@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Join.lean
-Genuine: 30 of 32 | Dissolved: 0 | Infrastructure: 2
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Hull

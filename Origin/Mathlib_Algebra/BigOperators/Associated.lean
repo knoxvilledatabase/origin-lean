@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Associated.lean
-Genuine: 18 of 20 | Dissolved: 1 | Infrastructure: 1
+Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

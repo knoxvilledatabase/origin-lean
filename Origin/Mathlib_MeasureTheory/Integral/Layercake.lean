@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/Layercake.lean
-Genuine: 10 of 11 | Dissolved: 0 | Infrastructure: 1
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral

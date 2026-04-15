@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ModularForms/QExpansion.lean
-Genuine: 5 of 11 | Dissolved: 6 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Periodic

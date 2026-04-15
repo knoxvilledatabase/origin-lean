@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicTopology/SimplexCategory.lean
-Genuine: 84 of 116 | Dissolved: 0 | Infrastructure: 32
+Genuine: 84 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Tactic.FinCases

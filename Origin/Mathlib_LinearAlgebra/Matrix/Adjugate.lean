@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Adjugate.lean
-Genuine: 51 of 53 | Dissolved: 0 | Infrastructure: 2
+Genuine: 48 | Conflates: 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Regular.Basic
@@ -116,6 +116,7 @@ theorem cramer_smul (r : α) (A : Matrix n n α) :
 theorem cramer_subsingleton_apply [Subsingleton n] (A : Matrix n n α) (b : n → α) (i : n) :
     cramer A b i = b i := by rw [cramer_apply, det_eq_elem_of_subsingleton _ i, updateColumn_self]
 
+-- CONFLATES (assumes ground = zero): cramer_zero
 theorem cramer_zero [Nontrivial n] : cramer (0 : Matrix n n α) = 0 := by
   ext i j
   obtain ⟨j', hj'⟩ : ∃ j', j' ≠ j := exists_ne j
@@ -262,6 +263,7 @@ theorem adjugate_eq_one_of_card_eq_one {A : Matrix n n α} (h : Fintype.card n =
   haveI : Subsingleton n := Fintype.card_le_one_iff_subsingleton.mp h.le
   adjugate_subsingleton _
 
+-- CONFLATES (assumes ground = zero): adjugate_zero
 @[simp]
 theorem adjugate_zero [Nontrivial n] : adjugate (0 : Matrix n n α) = 0 := by
   ext i j
@@ -472,6 +474,7 @@ theorem adjugate_adjugate (A : Matrix n n α) (h : Fintype.card n ≠ 1) :
   simp only
   rw [smul_smul, ← pow_succ', h_card', det_smul_adjugate_adjugate]
 
+-- CONFLATES (assumes ground = zero): adjugate_adjugate'
 theorem adjugate_adjugate' (A : Matrix n n α) [Nontrivial n] :
     adjugate (adjugate A) = det A ^ (Fintype.card n - 2) • A :=
   adjugate_adjugate _ <| Fintype.one_lt_card.ne'

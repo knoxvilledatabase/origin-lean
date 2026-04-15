@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/UnderlyingMap.lean
-Genuine: 15 of 39 | Dissolved: 0 | Infrastructure: 24
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Topology.LocalAtTarget

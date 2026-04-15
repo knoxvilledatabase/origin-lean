@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Enumerative/Partition.lean
-Genuine: 16 of 23 | Dissolved: 2 | Infrastructure: 5
+Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Enumerative.Composition

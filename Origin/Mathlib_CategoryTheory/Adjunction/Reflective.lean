@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Adjunction/Reflective.lean
-Genuine: 20 of 28 | Dissolved: 0 | Infrastructure: 8
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful

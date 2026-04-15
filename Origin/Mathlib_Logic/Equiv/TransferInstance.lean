@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Equiv/TransferInstance.lean
-Genuine: 48 of 102 | Dissolved: 2 | Infrastructure: 52
+Genuine: 47 | Conflates: 1 | Dissolved: 2 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv
@@ -417,6 +417,7 @@ noncomputable instance [Small.{v} α] [CommRing α] : CommRing (Shrink.{v} α) :
 
 include e in
 
+-- CONFLATES (assumes ground = zero): nontrivial
 protected theorem nontrivial [Nontrivial β] : Nontrivial α :=
   e.surjective.nontrivial
 

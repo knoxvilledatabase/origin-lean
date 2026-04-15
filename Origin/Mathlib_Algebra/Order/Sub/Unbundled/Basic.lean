@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Sub/Unbundled/Basic.lean
-Genuine: 55 of 55 | Dissolved: 0 | Infrastructure: 0
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Sub.Defs

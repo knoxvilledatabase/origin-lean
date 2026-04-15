@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/Basic.lean
-Genuine: 32 of 47 | Dissolved: 6 | Infrastructure: 9
+Genuine: 31 | Conflates: 1 | Dissolved: 6 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Normal
@@ -307,6 +307,7 @@ variable [Algebra K J] [Algebra J L] [IsAlgClosure J L] [Algebra K L] [IsScalarT
 theorem ofAlgebraic [hKJ : Algebra.IsAlgebraic K J] : IsAlgClosure K L :=
   ⟨IsAlgClosure.isAlgClosed J, hKJ.trans⟩
 
+-- CONFLATES (assumes ground = zero): equivOfAlgebraic'
 noncomputable def equivOfAlgebraic' [Nontrivial S] [NoZeroSMulDivisors R S]
     [Algebra.IsAlgebraic R L] : L ≃ₐ[R] M := by
   letI : NoZeroSMulDivisors R L := NoZeroSMulDivisors.of_algebraMap_injective <| by

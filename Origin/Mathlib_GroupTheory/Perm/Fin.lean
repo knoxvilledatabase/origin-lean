@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Fin.lean
-Genuine: 34 of 36 | Dissolved: 2 | Infrastructure: 0
+Genuine: 34 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Cycle.Type

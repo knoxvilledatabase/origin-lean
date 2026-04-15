@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Away/Basic.lean
-Genuine: 49 of 57 | Dissolved: 1 | Infrastructure: 7
+Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.GroupTheory.MonoidLocalization.Away

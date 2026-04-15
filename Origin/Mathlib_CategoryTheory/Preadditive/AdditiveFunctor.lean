@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/AdditiveFunctor.lean
-Genuine: 20 of 50 | Dissolved: 0 | Infrastructure: 30
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.ExactFunctor

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Fintype/Basic.lean
-Genuine: 153 of 220 | Dissolved: 0 | Infrastructure: 67
+Genuine: 151 | Conflates: 2 | Dissolved: 0 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Image
@@ -91,10 +91,12 @@ theorem univ_nonempty [Nonempty α] : (univ : Finset α).Nonempty :=
 theorem univ_eq_empty_iff : (univ : Finset α) = ∅ ↔ IsEmpty α := by
   rw [← not_nonempty_iff, ← univ_nonempty_iff, not_nonempty_iff_eq_empty]
 
+-- CONFLATES (assumes ground = zero): univ_nontrivial_iff
 theorem univ_nontrivial_iff :
     (Finset.univ : Finset α).Nontrivial ↔ Nontrivial α := by
   rw [Finset.Nontrivial, Finset.coe_univ, Set.nontrivial_univ_iff]
 
+-- CONFLATES (assumes ground = zero): univ_nontrivial
 theorem univ_nontrivial [h : Nontrivial α] :
     (Finset.univ : Finset α).Nontrivial :=
   univ_nontrivial_iff.mpr h

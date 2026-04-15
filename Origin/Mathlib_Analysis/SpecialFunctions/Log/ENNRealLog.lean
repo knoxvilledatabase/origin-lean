@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Log/ENNRealLog.lean
-Genuine: 27 of 30 | Dissolved: 2 | Infrastructure: 1
+Genuine: 27 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Real.EReal

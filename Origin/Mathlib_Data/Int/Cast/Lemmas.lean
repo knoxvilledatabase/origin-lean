@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/Cast/Lemmas.lean
-Genuine: 46 of 63 | Dissolved: 2 | Infrastructure: 15
+Genuine: 46 | Conflates: 0 | Dissolved: 2 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Hom.Basic

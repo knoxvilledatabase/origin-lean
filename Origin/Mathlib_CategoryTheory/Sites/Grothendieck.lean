@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Grothendieck.lean
-Genuine: 62 of 81 | Dissolved: 0 | Infrastructure: 19
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sieves

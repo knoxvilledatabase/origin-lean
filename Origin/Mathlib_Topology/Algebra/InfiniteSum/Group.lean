@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Group.lean
-Genuine: 44 of 45 | Dissolved: 0 | Infrastructure: 1
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Finite

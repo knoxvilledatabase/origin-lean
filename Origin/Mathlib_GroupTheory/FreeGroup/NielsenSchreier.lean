@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/FreeGroup/NielsenSchreier.lean
-Genuine: 14 of 18 | Dissolved: 0 | Infrastructure: 4
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Action

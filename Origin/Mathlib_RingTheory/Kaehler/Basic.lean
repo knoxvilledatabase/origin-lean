@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Kaehler/Basic.lean
-Genuine: 54 of 71 | Dissolved: 0 | Infrastructure: 17
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.RingTheory.Derivation.ToSquareZero

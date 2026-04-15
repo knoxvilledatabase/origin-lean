@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Sort.lean
-Genuine: 37 of 42 | Dissolved: 0 | Infrastructure: 5
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Order.RelIso.Set

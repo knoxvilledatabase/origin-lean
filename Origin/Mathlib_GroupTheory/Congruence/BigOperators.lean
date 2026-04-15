@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Congruence/BigOperators.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

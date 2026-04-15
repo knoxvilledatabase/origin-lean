@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Filtered/Basic.lean
-Genuine: 63 of 99 | Dissolved: 0 | Infrastructure: 36
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits

@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/FinitelyGenerated.lean
-Genuine: 43 of 52 | Dissolved: 0 | Infrastructure: 9
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Lemmas

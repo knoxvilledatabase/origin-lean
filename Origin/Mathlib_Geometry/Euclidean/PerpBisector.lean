@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/PerpBisector.lean
-Genuine: 20 of 21 | Dissolved: 0 | Infrastructure: 1
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Orthogonal

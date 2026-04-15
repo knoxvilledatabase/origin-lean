@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Basic.lean
-Genuine: 31 of 41 | Dissolved: 0 | Infrastructure: 10
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sum/Lattice.lean
-Genuine: 2 of 10 | Dissolved: 0 | Infrastructure: 8
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Sum.Order

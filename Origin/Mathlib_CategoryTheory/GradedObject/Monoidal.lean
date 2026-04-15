@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/GradedObject/Monoidal.lean
-Genuine: 48 of 58 | Dissolved: 1 | Infrastructure: 9
+Genuine: 48 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Unitor

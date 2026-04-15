@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Turan.lean
-Genuine: 15 of 25 | Dissolved: 0 | Infrastructure: 10
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Clique

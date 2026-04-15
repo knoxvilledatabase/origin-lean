@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/AlgebraicIndependent.lean
-Genuine: 75 of 86 | Dissolved: 1 | Infrastructure: 10
+Genuine: 66 | Conflates: 9 | Dissolved: 1 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Monad
@@ -138,6 +138,7 @@ theorem linearIndependent : LinearIndependent R x := by
   rw [← linearIndependent_iff_injective_linearCombination]
   exact linearIndependent_X _ _
 
+-- CONFLATES (assumes ground = zero): injective
 protected theorem injective [Nontrivial R] : Injective x :=
   hx.linearIndependent.injective
 
@@ -205,6 +206,7 @@ theorem AlgHom.algebraicIndependent_iff (f : A →ₐ[R] A') (hf : Injective f) 
     AlgebraicIndependent R (f ∘ x) ↔ AlgebraicIndependent R x :=
   ⟨fun h => h.of_comp f, fun h => h.map hf.injOn⟩
 
+-- CONFLATES (assumes ground = zero): algebraicIndependent_of_subsingleton
 @[nontriviality]
 theorem algebraicIndependent_of_subsingleton [Subsingleton R] : AlgebraicIndependent R x :=
   algebraicIndependent_iff.2 fun _ _ => Subsingleton.elim _ _
@@ -623,6 +625,7 @@ theorem exists_isTranscendenceBasis' (R : Type u) {A : Type v} [CommRing R] [Com
 
 variable {R}
 
+-- CONFLATES (assumes ground = zero): AlgebraicIndependent.isTranscendenceBasis_iff
 theorem AlgebraicIndependent.isTranscendenceBasis_iff {ι : Type w} {R : Type u} [CommRing R]
     [Nontrivial R] {A : Type v} [CommRing A] [Algebra R A] {x : ι → A}
     (i : AlgebraicIndependent R x) :
@@ -643,6 +646,7 @@ theorem AlgebraicIndependent.isTranscendenceBasis_iff {ι : Type w} {R : Type u}
     rw [← image_univ, image_image] at q
     simpa using q
 
+-- CONFLATES (assumes ground = zero): IsTranscendenceBasis.isAlgebraic
 theorem IsTranscendenceBasis.isAlgebraic [Nontrivial R] (hx : IsTranscendenceBasis R x) :
     Algebra.IsAlgebraic (adjoin R (range x)) A := by
   constructor
@@ -663,6 +667,7 @@ theorem IsTranscendenceBasis.isAlgebraic [Nontrivial R] (hx : IsTranscendenceBas
   exact h₂ (hx.2 (Set.range fun o : Option ι => o.elim a x)
     ((algebraicIndependent_subtype_range ai.injective).2 ai) h₁)
 
+-- CONFLATES (assumes ground = zero): IsTranscendenceBasis.isEmpty_iff_isAlgebraic
 theorem IsTranscendenceBasis.isEmpty_iff_isAlgebraic [Nontrivial R]
     (hx : IsTranscendenceBasis R x) :
     IsEmpty ι ↔ Algebra.IsAlgebraic R A := by
@@ -671,6 +676,7 @@ theorem IsTranscendenceBasis.isEmpty_iff_isAlgebraic [Nontrivial R]
   rw [Set.range_eq_empty x, adjoin_empty] at this
   exact algebra_isAlgebraic_of_algebra_isAlgebraic_bot_left R A
 
+-- CONFLATES (assumes ground = zero): IsTranscendenceBasis.nonempty_iff_transcendental
 theorem IsTranscendenceBasis.nonempty_iff_transcendental [Nontrivial R]
     (hx : IsTranscendenceBasis R x) :
     Nonempty ι ↔ Algebra.Transcendental R A := by
@@ -691,10 +697,12 @@ section Field
 
 variable [Field K] [Algebra K A]
 
+-- CONFLATES (assumes ground = zero): algebraicIndependent_empty_type
 theorem algebraicIndependent_empty_type [IsEmpty ι] [Nontrivial A] : AlgebraicIndependent K x := by
   rw [algebraicIndependent_empty_type_iff]
   exact RingHom.injective _
 
+-- CONFLATES (assumes ground = zero): algebraicIndependent_empty
 theorem algebraicIndependent_empty [Nontrivial A] :
     AlgebraicIndependent K ((↑) : (∅ : Set A) → A) :=
   algebraicIndependent_empty_type
@@ -705,6 +713,7 @@ section RankAndCardinality
 
 open Cardinal
 
+-- CONFLATES (assumes ground = zero): IsTranscendenceBasis.lift_cardinalMk_eq_max_lift
 theorem IsTranscendenceBasis.lift_cardinalMk_eq_max_lift
     {F : Type u} {E : Type v} [CommRing F] [Nontrivial F] [CommRing E] [IsDomain E] [Algebra F E]
     {ι : Type w} {x : ι → E} [Nonempty ι] (hx : IsTranscendenceBasis F x) :

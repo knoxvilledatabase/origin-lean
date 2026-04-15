@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Basic.lean
-Genuine: 47 of 69 | Dissolved: 6 | Infrastructure: 16
+Genuine: 47 | Conflates: 0 | Dissolved: 6 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Data.PNat.Equiv

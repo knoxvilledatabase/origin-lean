@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/Unbundled/Int.lean
-Genuine: 18 of 22 | Dissolved: 4 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Int

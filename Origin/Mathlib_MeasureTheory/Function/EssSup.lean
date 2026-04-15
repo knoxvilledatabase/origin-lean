@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/EssSup.lean
-Genuine: 45 of 54 | Dissolved: 9 | Infrastructure: 0
+Genuine: 45 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order

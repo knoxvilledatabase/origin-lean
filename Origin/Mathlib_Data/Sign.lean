@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sign.lean
-Genuine: 59 of 82 | Dissolved: 3 | Infrastructure: 20
+Genuine: 58 | Conflates: 1 | Dissolved: 3 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
@@ -360,6 +360,7 @@ end OrderedSemiring
 
 section OrderedRing
 
+-- CONFLATES (assumes ground = zero): sign_intCast
 @[simp]
 lemma sign_intCast {α : Type*} [OrderedRing α] [Nontrivial α]
     [DecidableRel ((· < ·) : α → α → Prop)] (n : ℤ) :

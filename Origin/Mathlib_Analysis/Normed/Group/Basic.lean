@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Basic.lean
-Genuine: 203 of 237 | Dissolved: 6 | Infrastructure: 28
+Genuine: 203 | Conflates: 0 | Dissolved: 6 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs

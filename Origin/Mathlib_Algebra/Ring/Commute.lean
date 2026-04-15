@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Commute.lean
-Genuine: 38 of 41 | Dissolved: 1 | Infrastructure: 2
+Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Semiconj

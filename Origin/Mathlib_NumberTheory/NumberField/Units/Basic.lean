@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Units/Basic.lean
-Genuine: 11 of 20 | Dissolved: 1 | Infrastructure: 8
+Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.NumberTheory.NumberField.Embeddings

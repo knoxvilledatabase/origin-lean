@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Pochhammer.lean
-Genuine: 40 of 46 | Dissolved: 2 | Infrastructure: 4
+Genuine: 36 | Conflates: 4 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Basic
@@ -56,6 +56,7 @@ theorem ascPochhammer_succ_left (n : ℕ) :
     ascPochhammer S (n + 1) = X * (ascPochhammer S n).comp (X + 1) := by
   rw [ascPochhammer]
 
+-- CONFLATES (assumes ground = zero): monic_ascPochhammer
 theorem monic_ascPochhammer (n : ℕ) [Nontrivial S] [NoZeroDivisors S] :
     Monic <| ascPochhammer S n := by
   induction' n with n hn
@@ -151,6 +152,7 @@ theorem ascPochhammer_nat_eq_descFactorial (a b : ℕ) :
     (ascPochhammer ℕ b).eval a = (a + b - 1).descFactorial b := by
   rw [ascPochhammer_nat_eq_ascFactorial, Nat.add_descFactorial_eq_ascFactorial']
 
+-- CONFLATES (assumes ground = zero): ascPochhammer_natDegree
 @[simp]
 theorem ascPochhammer_natDegree (n : ℕ) [NoZeroDivisors S] [Nontrivial S] :
     (ascPochhammer S n).natDegree = n := by
@@ -230,6 +232,7 @@ theorem descPochhammer_succ_left (n : ℕ) :
     descPochhammer R (n + 1) = X * (descPochhammer R n).comp (X - 1) := by
   rw [descPochhammer]
 
+-- CONFLATES (assumes ground = zero): monic_descPochhammer
 theorem monic_descPochhammer (n : ℕ) [Nontrivial R] [NoZeroDivisors R] :
     Monic <| descPochhammer R n := by
   induction' n with n hn
@@ -282,6 +285,7 @@ theorem descPochhammer_succ_right (n : ℕ) :
           X_comp, natCast_comp]
     rw [Nat.cast_add, Nat.cast_one, sub_add_eq_sub_sub_swap]
 
+-- CONFLATES (assumes ground = zero): descPochhammer_natDegree
 @[simp]
 theorem descPochhammer_natDegree (n : ℕ) [NoZeroDivisors R] [Nontrivial R] :
     (descPochhammer R n).natDegree = n := by

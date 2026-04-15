@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/ZeroAtInfty.lean
-Genuine: 22 of 91 | Dissolved: 0 | Infrastructure: 69
+Genuine: 21 | Conflates: 3 | Dissolved: 0 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousMap.Bounded.Star
@@ -157,10 +157,12 @@ instance instMul [MulZeroClass β] [ContinuousMul β] : Mul C₀(α, β) :=
   ⟨fun f g =>
     ⟨f * g, by simpa only [mul_zero] using (zero_at_infty f).mul (zero_at_infty g)⟩⟩
 
+-- CONFLATES (assumes ground = zero): coe_mul
 @[simp]
 theorem coe_mul [MulZeroClass β] [ContinuousMul β] (f g : C₀(α, β)) : ⇑(f * g) = f * g :=
   rfl
 
+-- CONFLATES (assumes ground = zero): mul_apply
 theorem mul_apply [MulZeroClass β] [ContinuousMul β] (f g : C₀(α, β)) : (f * g) x = f x * g x :=
   rfl
 
@@ -576,6 +578,7 @@ def compAddMonoidHom [AddMonoid δ] [ContinuousAdd δ] (g : β →co γ) : C₀(
   map_zero' := zero_comp g
   map_add' _ _ := rfl
 
+-- CONFLATES (assumes ground = zero): compMulHom
 def compMulHom [MulZeroClass δ] [ContinuousMul δ] (g : β →co γ) : C₀(γ, δ) →ₙ* C₀(β, δ) where
   toFun f := f.comp g
   map_mul' _ _ := rfl

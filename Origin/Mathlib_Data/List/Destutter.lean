@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Destutter.lean
-Genuine: 17 of 23 | Dissolved: 0 | Infrastructure: 6
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.List.Chain

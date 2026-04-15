@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Finsupp/LSum.lean
-Genuine: 26 of 42 | Dissolved: 1 | Infrastructure: 15
+Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Charpoly/Coeff.lean
-Genuine: 31 of 31 | Dissolved: 0 | Infrastructure: 0
+Genuine: 28 | Conflates: 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Expand
@@ -45,6 +45,7 @@ variable {M : Matrix n n R}
 
 namespace Matrix
 
+-- CONFLATES (assumes ground = zero): charmatrix_apply_natDegree
 theorem charmatrix_apply_natDegree [Nontrivial R] (i j : n) :
     (charmatrix M i j).natDegree = ite (i = j) 1 0 := by
   by_cases h : i = j <;> simp [h, ← degree_eq_iff_natDegree_eq_of_pos (Nat.succ_pos 0)]
@@ -87,6 +88,7 @@ theorem det_of_card_zero (h : Fintype.card n = 0) (M : Matrix n n R) : M.det = 1
   ext i
   exact h.elim i
 
+-- CONFLATES (assumes ground = zero): charpoly_degree_eq_dim
 theorem charpoly_degree_eq_dim [Nontrivial R] (M : Matrix n n R) :
     M.charpoly.degree = Fintype.card n := by
   by_cases h : Fintype.card n = 0
@@ -112,6 +114,7 @@ theorem charpoly_degree_eq_dim [Nontrivial R] (M : Matrix n n R) :
   apply Nat.pred_lt
   apply h
 
+-- CONFLATES (assumes ground = zero): charpoly_natDegree_eq_dim
 @[simp] theorem charpoly_natDegree_eq_dim [Nontrivial R] (M : Matrix n n R) :
     M.charpoly.natDegree = Fintype.card n :=
   natDegree_eq_of_degree_eq_some (charpoly_degree_eq_dim M)

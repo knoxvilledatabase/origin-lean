@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Moments.lean
-Genuine: 38 of 42 | Dissolved: 4 | Infrastructure: 0
+Genuine: 38 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Probability.Variance

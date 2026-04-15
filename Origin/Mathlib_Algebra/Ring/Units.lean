@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Units.lean
-Genuine: 17 of 21 | Dissolved: 0 | Infrastructure: 4
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.InjSurj

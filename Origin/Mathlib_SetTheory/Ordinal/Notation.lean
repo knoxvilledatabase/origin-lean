@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/Notation.lean
-Genuine: 96 of 154 | Dissolved: 3 | Infrastructure: 55
+Genuine: 96 | Conflates: 0 | Dissolved: 3 | Infrastructure: 55
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Divisibility.Basic

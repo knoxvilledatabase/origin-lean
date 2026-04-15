@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Symmetrized.lean
-Genuine: 16 of 63 | Dissolved: 2 | Infrastructure: 45
+Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Algebra.Jordan.Basic

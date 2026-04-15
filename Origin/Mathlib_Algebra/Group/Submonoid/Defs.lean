@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Submonoid/Defs.lean
-Genuine: 24 of 64 | Dissolved: 0 | Infrastructure: 40
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs

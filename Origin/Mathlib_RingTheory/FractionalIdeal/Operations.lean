@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/FractionalIdeal/Operations.lean
-Genuine: 81 of 109 | Dissolved: 18 | Infrastructure: 10
+Genuine: 79 | Conflates: 2 | Dissolved: 18 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Basic
@@ -274,6 +274,7 @@ variable {I J : FractionalIdeal R⁰ K} (h : K →ₐ[R] K')
 
 -- DISSOLVED: map_ne_zero
 
+-- CONFLATES (assumes ground = zero): map_eq_zero_iff
 @[simp]
 theorem map_eq_zero_iff [Nontrivial R] : I.map h = 0 ↔ I = 0 :=
   ⟨not_imp_not.mp (map_ne_zero _), fun hI => hI.symm ▸ map_zero h⟩
@@ -297,6 +298,7 @@ theorem coeIdeal_eq_one {I : Ideal R} : (I : FractionalIdeal R⁰ K) = 1 ↔ I =
 
 -- DISSOLVED: coeIdeal_ne_one
 
+-- CONFLATES (assumes ground = zero): num_eq_zero_iff
 theorem num_eq_zero_iff [Nontrivial R] {I : FractionalIdeal R⁰ K} : I.num = 0 ↔ I = 0 :=
    ⟨fun h ↦ zero_of_num_eq_bot zero_not_mem_nonZeroDivisors h,
      fun h ↦ h ▸ num_zero_eq (IsFractionRing.injective R K)⟩

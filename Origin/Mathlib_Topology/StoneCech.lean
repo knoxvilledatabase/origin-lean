@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/StoneCech.lean
-Genuine: 35 of 46 | Dissolved: 0 | Infrastructure: 11
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Topology.Bases

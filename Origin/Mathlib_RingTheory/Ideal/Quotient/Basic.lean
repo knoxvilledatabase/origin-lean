@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Quotient/Basic.lean
-Genuine: 13 of 23 | Dissolved: 3 | Infrastructure: 7
+Genuine: 12 | Conflates: 1 | Dissolved: 3 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.GroupTheory.QuotientGroup.Finite
@@ -62,6 +62,7 @@ theorem zero_eq_one_iff {I : Ideal R} : (0 : R ⧸ I) = 1 ↔ I = ⊤ :=
 
 -- DISSOLVED: zero_ne_one_iff
 
+-- CONFLATES (assumes ground = zero): nontrivial
 protected theorem nontrivial {I : Ideal R} (hI : I ≠ ⊤) : Nontrivial (R ⧸ I) :=
   ⟨⟨0, 1, zero_ne_one_iff.2 hI⟩⟩
 

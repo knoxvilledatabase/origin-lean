@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/EulerProduct/Basic.lean
-Genuine: 23 of 23 | Dissolved: 0 | Infrastructure: 0
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.InfiniteSum

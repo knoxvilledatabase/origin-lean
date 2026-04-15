@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/LpSpace.lean
-Genuine: 175 of 229 | Dissolved: 17 | Infrastructure: 37
+Genuine: 173 | Conflates: 2 | Dissolved: 17 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Hom
@@ -808,6 +808,7 @@ protected def Lp.constL (𝕜 : Type*) [NormedField 𝕜] [NormedSpace 𝕜 E] [
   (Lp.constₗ p μ 𝕜).mkContinuous ((μ Set.univ).toReal ^ (1 / p.toReal)) fun _ ↦
     (Lp.norm_const_le _ _ _).trans_eq (mul_comm _ _)
 
+-- CONFLATES (assumes ground = zero): Lp.norm_constL_le
 theorem Lp.norm_constL_le (𝕜 : Type*) [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
     [Fact (1 ≤ p)] :
     ‖(Lp.constL p μ 𝕜 : E →L[𝕜] Lp E p μ)‖ ≤ (μ Set.univ).toReal ^ (1 / p.toReal) :=
@@ -1636,6 +1637,7 @@ theorem range_toLp [NormedField 𝕜] [NormedSpace 𝕜 E] :
 
 variable {p}
 
+-- CONFLATES (assumes ground = zero): toLp_norm_le
 theorem toLp_norm_le [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E] :
     ‖(toLp p μ 𝕜 : (α →ᵇ E) →L[𝕜] Lp E p μ)‖ ≤ measureUnivNNReal μ ^ p.toReal⁻¹ :=
   LinearMap.mkContinuous_norm_le _ (measureUnivNNReal μ ^ p.toReal⁻¹).coe_nonneg _

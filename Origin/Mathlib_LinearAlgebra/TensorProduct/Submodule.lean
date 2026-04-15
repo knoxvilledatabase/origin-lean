@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Submodule.lean
-Genuine: 28 of 33 | Dissolved: 1 | Infrastructure: 4
+Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.DirectSum.Finsupp

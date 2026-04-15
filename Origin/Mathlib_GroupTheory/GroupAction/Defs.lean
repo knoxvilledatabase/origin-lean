@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/Defs.lean
-Genuine: 53 of 73 | Dissolved: 0 | Infrastructure: 20
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic

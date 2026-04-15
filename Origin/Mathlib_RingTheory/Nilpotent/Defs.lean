@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Nilpotent/Defs.lean
-Genuine: 26 of 39 | Dissolved: 8 | Infrastructure: 5
+Genuine: 22 | Conflates: 4 | Dissolved: 8 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Hom
@@ -42,6 +42,7 @@ theorem IsNilpotent.mk [Zero R] [Pow R ℕ] (x : R) (n : ℕ) (e : x ^ n = 0) : 
 @[simp] theorem IsNilpotent.zero [MonoidWithZero R] : IsNilpotent (0 : R) :=
   ⟨1, pow_one 0⟩
 
+-- CONFLATES (assumes ground = zero): not_isNilpotent_one
 theorem not_isNilpotent_one [MonoidWithZero R] [Nontrivial R] :
     ¬ IsNilpotent (1 : R) := fun ⟨_, H⟩ ↦ zero_ne_one (H.symm.trans (one_pow _))
 
@@ -117,10 +118,12 @@ variable [MonoidWithZero R]
 
 -- DISSOLVED: nilpotencyClass_eq_succ_iff
 
+-- CONFLATES (assumes ground = zero): nilpotencyClass_zero
 @[simp] lemma nilpotencyClass_zero [Nontrivial R] :
     nilpotencyClass (0 : R) = 1 :=
   nilpotencyClass_eq_succ_iff.mpr <| by constructor <;> simp
 
+-- CONFLATES (assumes ground = zero): pos_nilpotencyClass_iff
 @[simp] lemma pos_nilpotencyClass_iff [Nontrivial R] :
     0 < nilpotencyClass x ↔ IsNilpotent x := by
   refine ⟨isNilpotent_of_pos_nilpotencyClass, fun hx ↦ Nat.pos_of_ne_zero fun hx' ↦ ?_⟩
@@ -135,6 +138,7 @@ lemma eq_zero_of_nilpotencyClass_eq_one (hx : nilpotencyClass x = 1) :
   have : IsNilpotent x := isNilpotent_of_pos_nilpotencyClass (hx ▸ Nat.one_pos)
   rw [← pow_nilpotencyClass this, hx, pow_one]
 
+-- CONFLATES (assumes ground = zero): nilpotencyClass_eq_one
 @[simp] lemma nilpotencyClass_eq_one [Nontrivial R] :
     nilpotencyClass x = 1 ↔ x = 0 :=
   ⟨eq_zero_of_nilpotencyClass_eq_one, fun hx ↦ hx ▸ nilpotencyClass_zero⟩

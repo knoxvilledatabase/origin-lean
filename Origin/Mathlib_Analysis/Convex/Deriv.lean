@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Deriv.lean
-Genuine: 82 of 84 | Dissolved: 2 | Infrastructure: 0
+Genuine: 82 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.MeanValue

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Pullback/CommSq.lean
-Genuine: 141 of 155 | Dissolved: 0 | Infrastructure: 14
+Genuine: 141 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Constructions.ZeroObjects

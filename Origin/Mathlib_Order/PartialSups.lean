@@ -1,6 +1,6 @@
 /-
 Extracted from Order/PartialSups.lean
-Genuine: 26 of 28 | Dissolved: 0 | Infrastructure: 2
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold

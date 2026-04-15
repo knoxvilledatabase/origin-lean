@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/LeftRightNhds.lean
-Genuine: 45 of 48 | Dissolved: 0 | Infrastructure: 3
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Pointwise.Set

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Antichain.lean
-Genuine: 67 of 68 | Dissolved: 0 | Infrastructure: 1
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Set.Pairwise.Basic

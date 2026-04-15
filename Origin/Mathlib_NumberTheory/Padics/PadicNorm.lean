@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Padics/PadicNorm.lean
-Genuine: 30 of 34 | Dissolved: 3 | Infrastructure: 1
+Genuine: 30 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Padics.PadicVal.Basic

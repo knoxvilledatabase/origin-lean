@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/Basic.lean
-Genuine: 16 of 19 | Dissolved: 3 | Infrastructure: 0
+Genuine: 15 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
@@ -97,6 +97,7 @@ lemma zpow_lt_zpow_iff_left (hn : 0 < n) : a ^ n < b ^ n ↔ a < b :=
 
 variable (α) in
 
+-- CONFLATES (assumes ground = zero): not_isCyclic_of_denselyOrdered
 @[to_additive
   "A nontrivial densely linear ordered additive commutative group can't be a cyclic group."]
 theorem not_isCyclic_of_denselyOrdered [DenselyOrdered α] [Nontrivial α] : ¬IsCyclic α := by

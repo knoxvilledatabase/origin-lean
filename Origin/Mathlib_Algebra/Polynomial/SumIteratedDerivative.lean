@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/SumIteratedDerivative.lean
-Genuine: 15 of 15 | Dissolved: 0 | Infrastructure: 0
+Genuine: 14 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -177,6 +177,7 @@ theorem aeval_sumIDeriv (p : R[X]) (q : ℕ) :
   intro r p' hp
   rw [sumIDeriv_apply, map_sum]; simp_rw [hc _ r hp, map_sum, smul_sum]
 
+-- CONFLATES (assumes ground = zero): aeval_sumIDeriv_of_pos
 theorem aeval_sumIDeriv_of_pos [Nontrivial A] [NoZeroDivisors A] (p : R[X]) {q : ℕ} (hq : 0 < q)
     (inj_amap : Function.Injective (algebraMap R A)) :
     ∃ gp : R[X], gp.natDegree ≤ p.natDegree - q ∧

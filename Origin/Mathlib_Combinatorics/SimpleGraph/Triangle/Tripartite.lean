@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Triangle/Tripartite.lean
-Genuine: 33 of 35 | Dissolved: 0 | Infrastructure: 2
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Basic

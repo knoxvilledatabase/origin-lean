@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Div.lean
-Genuine: 66 of 85 | Dissolved: 17 | Infrastructure: 2
+Genuine: 63 | Conflates: 3 | Dissolved: 17 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Inductions
@@ -85,6 +85,7 @@ infixl:70 " /ₘ " => divByMonic
 
 infixl:70 " %ₘ " => modByMonic
 
+-- CONFLATES (assumes ground = zero): degree_modByMonic_lt
 theorem degree_modByMonic_lt [Nontrivial R] :
     ∀ (p : R[X]) {q : R[X]} (_hq : Monic q), degree (p %ₘ q) < degree q
   | p, q, hq =>
@@ -156,6 +157,7 @@ theorem divByMonic_eq_of_not_monic (p : R[X]) (hq : ¬Monic q) : p /ₘ q = 0 :=
 theorem modByMonic_eq_of_not_monic (p : R[X]) (hq : ¬Monic q) : p %ₘ q = p :=
   dif_neg hq
 
+-- CONFLATES (assumes ground = zero): modByMonic_eq_self_iff
 theorem modByMonic_eq_self_iff [Nontrivial R] (hq : Monic q) : p %ₘ q = p ↔ degree p < degree q :=
   ⟨fun h => h ▸ degree_modByMonic_lt _ hq, fun h => by
     classical
@@ -197,6 +199,7 @@ theorem modByMonic_eq_sub_mul_div :
 theorem modByMonic_add_div (p : R[X]) {q : R[X]} (hq : Monic q) : p %ₘ q + q * (p /ₘ q) = p :=
   eq_sub_iff_add_eq.1 (modByMonic_eq_sub_mul_div p hq)
 
+-- CONFLATES (assumes ground = zero): divByMonic_eq_zero_iff
 theorem divByMonic_eq_zero_iff [Nontrivial R] (hq : Monic q) : p /ₘ q = 0 ↔ degree p < degree q :=
   ⟨fun h => by
     have := modByMonic_add_div p hq

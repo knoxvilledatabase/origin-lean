@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/Rotation.lean
-Genuine: 36 of 51 | Dissolved: 11 | Infrastructure: 4
+Genuine: 36 | Conflates: 0 | Dissolved: 11 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle

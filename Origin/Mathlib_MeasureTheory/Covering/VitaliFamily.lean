@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Covering/VitaliFamily.lean
-Genuine: 24 of 30 | Dissolved: 0 | Infrastructure: 6
+Genuine: 23 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace
@@ -51,6 +51,7 @@ open scoped Topology
 
 variable {X : Type*} [PseudoMetricSpace X]
 
+-- CONFLATES (assumes ground = zero): VitaliFamily
 structure VitaliFamily {m : MeasurableSpace X} (μ : Measure X) where
   /-- Sets of the family "centered" at a given point. -/
   setsAt :  X → Set (Set X)

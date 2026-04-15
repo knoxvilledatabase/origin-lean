@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Spectrum.lean
-Genuine: 21 of 23 | Dissolved: 0 | Infrastructure: 2
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Rayleigh

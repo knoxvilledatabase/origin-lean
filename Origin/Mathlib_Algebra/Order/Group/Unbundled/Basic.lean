@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/Unbundled/Basic.lean
-Genuine: 103 of 104 | Dissolved: 0 | Infrastructure: 1
+Genuine: 103 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic

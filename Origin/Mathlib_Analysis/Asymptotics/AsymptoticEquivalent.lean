@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Asymptotics/AsymptoticEquivalent.lean
-Genuine: 39 of 53 | Dissolved: 2 | Infrastructure: 12
+Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.Asymptotics

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sum/Interval.lean
-Genuine: 22 of 52 | Dissolved: 0 | Infrastructure: 30
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Sum

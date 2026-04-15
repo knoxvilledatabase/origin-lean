@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/Reduce.lean
-Genuine: 69 of 76 | Dissolved: 0 | Infrastructure: 7
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Computability.Halting

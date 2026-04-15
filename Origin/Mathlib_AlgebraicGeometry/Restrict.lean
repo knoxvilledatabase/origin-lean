@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Restrict.lean
-Genuine: 81 of 102 | Dissolved: 0 | Infrastructure: 21
+Genuine: 81 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Cover.Open

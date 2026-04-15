@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/HurwitzZetaEven.lean
-Genuine: 65 of 73 | Dissolved: 7 | Infrastructure: 1
+Genuine: 65 | Conflates: 0 | Dissolved: 7 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.AbstractFuncEq

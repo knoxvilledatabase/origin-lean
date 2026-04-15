@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Sym/Basic.lean
-Genuine: 73 of 116 | Dissolved: 4 | Infrastructure: 39
+Genuine: 73 | Conflates: 0 | Dissolved: 4 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Data.Multiset.Basic

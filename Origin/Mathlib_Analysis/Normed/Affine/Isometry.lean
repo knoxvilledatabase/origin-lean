@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Affine/Isometry.lean
-Genuine: 94 of 147 | Dissolved: 0 | Infrastructure: 53
+Genuine: 94 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Invertible

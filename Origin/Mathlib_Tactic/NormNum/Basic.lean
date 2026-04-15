@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/NormNum/Basic.lean
-Genuine: 59 of 62 | Dissolved: 1 | Infrastructure: 2
+Genuine: 59 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Invertible

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Infsep.lean
-Genuine: 82 of 82 | Dissolved: 0 | Infrastructure: 0
+Genuine: 58 | Conflates: 24 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Basic
@@ -69,10 +69,12 @@ theorem einfsep_lt_iff {d} :
     s.einfsep < d ↔ ∃ x ∈ s, ∃ y ∈ s, x ≠ y ∧ edist x y < d := by
   simp_rw [einfsep, iInf_lt_iff, exists_prop]
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_einfsep_lt_top
 theorem nontrivial_of_einfsep_lt_top (hs : s.einfsep < ∞) : s.Nontrivial := by
   rcases einfsep_lt_top.1 hs with ⟨_, hx, _, hy, hxy, _⟩
   exact ⟨_, hx, _, hy, hxy⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_einfsep_ne_top
 theorem nontrivial_of_einfsep_ne_top (hs : s.einfsep ≠ ∞) : s.Nontrivial :=
   nontrivial_of_einfsep_lt_top (lt_top_iff_ne_top.mpr hs)
 
@@ -151,6 +153,7 @@ theorem Finset.coe_einfsep [DecidableEq α] {s : Finset α} :
     (s : Set α).einfsep = s.offDiag.inf (uncurry edist) := by
   simp_rw [einfsep_of_fintype, ← Finset.coe_offDiag, Finset.toFinset_coe]
 
+-- CONFLATES (assumes ground = zero): Nontrivial.einfsep_exists_of_finite
 theorem Nontrivial.einfsep_exists_of_finite [Finite s] (hs : s.Nontrivial) :
     ∃ x ∈ s, ∃ y ∈ s, x ≠ y ∧ s.einfsep = edist x y := by
   classical
@@ -160,6 +163,7 @@ theorem Nontrivial.einfsep_exists_of_finite [Finite s] (hs : s.Nontrivial) :
     simp_rw [mem_toFinset] at hxy
     exact ⟨w.fst, hxy.1, w.snd, hxy.2.1, hxy.2.2, hed⟩
 
+-- CONFLATES (assumes ground = zero): Finite.einfsep_exists_of_nontrivial
 theorem Finite.einfsep_exists_of_nontrivial (hsf : s.Finite) (hs : s.Nontrivial) :
     ∃ x ∈ s, ∃ y ∈ s, x ≠ y ∧ s.einfsep = edist x y :=
   letI := hsf.fintype
@@ -213,18 +217,22 @@ theorem subsingleton_of_einfsep_eq_top (hs : s.einfsep = ∞) : s.Subsingleton :
 theorem einfsep_eq_top_iff : s.einfsep = ∞ ↔ s.Subsingleton :=
   ⟨subsingleton_of_einfsep_eq_top, Subsingleton.einfsep⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.einfsep_ne_top
 theorem Nontrivial.einfsep_ne_top (hs : s.Nontrivial) : s.einfsep ≠ ∞ := by
   contrapose! hs
   rw [not_nontrivial_iff]
   exact subsingleton_of_einfsep_eq_top hs
 
+-- CONFLATES (assumes ground = zero): Nontrivial.einfsep_lt_top
 theorem Nontrivial.einfsep_lt_top (hs : s.Nontrivial) : s.einfsep < ∞ := by
   rw [lt_top_iff_ne_top]
   exact hs.einfsep_ne_top
 
+-- CONFLATES (assumes ground = zero): einfsep_lt_top_iff
 theorem einfsep_lt_top_iff : s.einfsep < ∞ ↔ s.Nontrivial :=
   ⟨nontrivial_of_einfsep_lt_top, Nontrivial.einfsep_lt_top⟩
 
+-- CONFLATES (assumes ground = zero): einfsep_ne_top_iff
 theorem einfsep_ne_top_iff : s.einfsep ≠ ∞ ↔ s.Nontrivial :=
   ⟨nontrivial_of_einfsep_ne_top, Nontrivial.einfsep_ne_top⟩
 
@@ -289,6 +297,7 @@ theorem infsep_pos : 0 < s.infsep ↔ 0 < s.einfsep ∧ s.einfsep < ∞ := by
 theorem Subsingleton.infsep_zero (hs : s.Subsingleton) : s.infsep = 0 :=
   Set.infsep_zero.mpr <| Or.inr hs.einfsep
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_infsep_pos
 theorem nontrivial_of_infsep_pos (hs : 0 < s.infsep) : s.Nontrivial := by
   contrapose hs
   rw [not_nontrivial_iff] at hs
@@ -323,17 +332,20 @@ section PseudoMetricSpace
 
 variable [PseudoMetricSpace α] {x y z : α} {s t : Set α}
 
+-- CONFLATES (assumes ground = zero): Nontrivial.le_infsep_iff
 theorem Nontrivial.le_infsep_iff {d} (hs : s.Nontrivial) :
     d ≤ s.infsep ↔ ∀ x ∈ s, ∀ y ∈ s, x ≠ y → d ≤ dist x y := by
   simp_rw [infsep, ← ENNReal.ofReal_le_iff_le_toReal hs.einfsep_ne_top, le_einfsep_iff, edist_dist,
     ENNReal.ofReal_le_ofReal_iff dist_nonneg]
 
+-- CONFLATES (assumes ground = zero): Nontrivial.infsep_lt_iff
 theorem Nontrivial.infsep_lt_iff {d} (hs : s.Nontrivial) :
     s.infsep < d ↔ ∃ x ∈ s, ∃ y ∈ s, x ≠ y ∧ dist x y < d := by
   rw [← not_iff_not]
   push_neg
   exact hs.le_infsep_iff
 
+-- CONFLATES (assumes ground = zero): Nontrivial.le_infsep
 theorem Nontrivial.le_infsep {d} (hs : s.Nontrivial)
     (h : ∀ x ∈ s, ∀ y ∈ s, x ≠ y → d ≤ dist x y) : d ≤ s.infsep :=
   hs.le_infsep_iff.2 h
@@ -363,9 +375,11 @@ theorem infsep_triple (hxy : x ≠ y) (hyz : y ≠ z) (hxz : x ≠ z) :
     edist_ne_top x z, edist_ne_top y z, dist_edist, Ne, inf_eq_top_iff, and_self_iff,
     not_false_iff]
 
+-- CONFLATES (assumes ground = zero): Nontrivial.infsep_anti
 theorem Nontrivial.infsep_anti (hs : s.Nontrivial) (hst : s ⊆ t) : t.infsep ≤ s.infsep :=
   ENNReal.toReal_mono hs.einfsep_ne_top (einfsep_anti hst)
 
+-- CONFLATES (assumes ground = zero): infsep_eq_iInf
 theorem infsep_eq_iInf [Decidable s.Nontrivial] :
     s.infsep = if s.Nontrivial then ⨅ d : s.offDiag, (uncurry dist) (d : α × α) else 0 := by
   split_ifs with hs
@@ -379,10 +393,12 @@ theorem infsep_eq_iInf [Decidable s.Nontrivial] :
       mem_offDiag, Prod.forall, uncurry_apply_pair, and_imp]
   · exact (not_nontrivial_iff.mp hs).infsep_zero
 
+-- CONFLATES (assumes ground = zero): Nontrivial.infsep_eq_iInf
 theorem Nontrivial.infsep_eq_iInf (hs : s.Nontrivial) :
     s.infsep = ⨅ d : s.offDiag, (uncurry dist) (d : α × α) := by
   classical rw [Set.infsep_eq_iInf, if_pos hs]
 
+-- CONFLATES (assumes ground = zero): infsep_of_fintype
 theorem infsep_of_fintype [Decidable s.Nontrivial] [DecidableEq α] [Fintype s] : s.infsep =
     if hs : s.Nontrivial then s.offDiag.toFinset.inf' (by simpa) (uncurry dist) else 0 := by
   split_ifs with hs
@@ -392,10 +408,12 @@ theorem infsep_of_fintype [Decidable s.Nontrivial] [DecidableEq α] [Fintype s] 
   · rw [not_nontrivial_iff] at hs
     exact hs.infsep_zero
 
+-- CONFLATES (assumes ground = zero): Nontrivial.infsep_of_fintype
 theorem Nontrivial.infsep_of_fintype [DecidableEq α] [Fintype s] (hs : s.Nontrivial) :
     s.infsep = s.offDiag.toFinset.inf' (by simpa) (uncurry dist) := by
   classical rw [Set.infsep_of_fintype, dif_pos hs]
 
+-- CONFLATES (assumes ground = zero): Finite.infsep
 theorem Finite.infsep [Decidable s.Nontrivial] (hsf : s.Finite) :
     s.infsep =
       if hs : s.Nontrivial then hsf.offDiag.toFinset.inf' (by simpa) (uncurry dist) else 0 := by
@@ -406,6 +424,7 @@ theorem Finite.infsep [Decidable s.Nontrivial] (hsf : s.Finite) :
   · rw [not_nontrivial_iff] at hs
     exact hs.infsep_zero
 
+-- CONFLATES (assumes ground = zero): Finite.infsep_of_nontrivial
 theorem Finite.infsep_of_nontrivial (hsf : s.Finite) (hs : s.Nontrivial) :
     s.infsep = hsf.offDiag.toFinset.inf' (by simpa) (uncurry dist) := by
   classical simp_rw [hsf.infsep, dif_pos hs]
@@ -427,6 +446,7 @@ theorem _root_.Finset.coe_infsep_of_offDiag_empty
   rw [← Finset.not_nonempty_iff_eq_empty] at hs
   rw [Finset.coe_infsep, dif_neg hs]
 
+-- CONFLATES (assumes ground = zero): Nontrivial.infsep_exists_of_finite
 theorem Nontrivial.infsep_exists_of_finite [Finite s] (hs : s.Nontrivial) :
     ∃ x ∈ s, ∃ y ∈ s, x ≠ y ∧ s.infsep = dist x y := by
   classical
@@ -437,6 +457,7 @@ theorem Nontrivial.infsep_exists_of_finite [Finite s] (hs : s.Nontrivial) :
     simp_rw [mem_toFinset] at hxy
     exact ⟨w.fst, hxy.1, w.snd, hxy.2.1, hxy.2.2, hed⟩
 
+-- CONFLATES (assumes ground = zero): Finite.infsep_exists_of_nontrivial
 theorem Finite.infsep_exists_of_nontrivial (hsf : s.Finite) (hs : s.Nontrivial) :
     ∃ x ∈ s, ∃ y ∈ s, x ≠ y ∧ s.infsep = dist x y :=
   letI := hsf.fintype
@@ -452,6 +473,7 @@ theorem infsep_zero_iff_subsingleton_of_finite [Finite s] : s.infsep = 0 ↔ s.S
   rw [infsep_zero, einfsep_eq_top_iff, or_iff_right_iff_imp]
   exact fun H => (einfsep_pos_of_finite.ne' H).elim
 
+-- CONFLATES (assumes ground = zero): infsep_pos_iff_nontrivial_of_finite
 theorem infsep_pos_iff_nontrivial_of_finite [Finite s] : 0 < s.infsep ↔ s.Nontrivial := by
   rw [infsep_pos, einfsep_lt_top_iff, and_iff_right_iff_imp]
   exact fun _ => einfsep_pos_of_finite
@@ -460,6 +482,7 @@ theorem Finite.infsep_zero_iff_subsingleton (hs : s.Finite) : s.infsep = 0 ↔ s
   letI := hs.fintype
   infsep_zero_iff_subsingleton_of_finite
 
+-- CONFLATES (assumes ground = zero): Finite.infsep_pos_iff_nontrivial
 theorem Finite.infsep_pos_iff_nontrivial (hs : s.Finite) : 0 < s.infsep ↔ s.Nontrivial :=
   letI := hs.fintype
   infsep_pos_iff_nontrivial_of_finite
@@ -468,6 +491,7 @@ theorem _root_.Finset.infsep_zero_iff_subsingleton (s : Finset α) :
     (s : Set α).infsep = 0 ↔ (s : Set α).Subsingleton :=
   infsep_zero_iff_subsingleton_of_finite
 
+-- CONFLATES (assumes ground = zero): _root_.Finset.infsep_pos_iff_nontrivial
 theorem _root_.Finset.infsep_pos_iff_nontrivial (s : Finset α) :
     0 < (s : Set α).infsep ↔ (s : Set α).Nontrivial :=
   infsep_pos_iff_nontrivial_of_finite

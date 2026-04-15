@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MonoidAlgebra/ToDirectSum.lean
-Genuine: 13 of 16 | Dissolved: 3 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Algebra

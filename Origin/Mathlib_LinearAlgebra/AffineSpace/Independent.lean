@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Independent.lean
-Genuine: 53 of 68 | Dissolved: 1 | Infrastructure: 14
+Genuine: 48 | Conflates: 5 | Dissolved: 1 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Sort
@@ -246,6 +246,7 @@ theorem AffineIndependent.indicator_eq_of_affineCombination_eq {p : ι → P}
     Set.indicator (↑s₁) w₁ = Set.indicator (↑s₂) w₂ :=
   (affineIndependent_iff_indicator_eq_of_affineCombination_eq k p).1 ha s₁ s₂ w₁ w₂ hw₁ hw₂ h
 
+-- CONFLATES (assumes ground = zero): AffineIndependent.injective
 protected theorem AffineIndependent.injective [Nontrivial k] {p : ι → P}
     (ha : AffineIndependent k p) : Function.Injective p := by
   intro i j hij
@@ -352,6 +353,7 @@ theorem AffineEquiv.affineIndependent_set_of_eq_iff {s : Set P} (e : P ≃ᵃ[k]
 
 end Composition
 
+-- CONFLATES (assumes ground = zero): AffineIndependent.exists_mem_inter_of_exists_mem_inter_affineSpan
 theorem AffineIndependent.exists_mem_inter_of_exists_mem_inter_affineSpan [Nontrivial k] {p : ι → P}
     (ha : AffineIndependent k p) {s1 s2 : Set ι} {p0 : P} (hp0s1 : p0 ∈ affineSpan k (p '' s1))
     (hp0s2 : p0 ∈ affineSpan k (p '' s2)) : ∃ i : ι, i ∈ s1 ∩ s2 := by
@@ -368,6 +370,7 @@ theorem AffineIndependent.exists_mem_inter_of_exists_mem_inter_affineSpan [Nontr
   use i, hfs1 hifs1
   exact hfs2 (Set.mem_of_indicator_ne_zero hinz)
 
+-- CONFLATES (assumes ground = zero): AffineIndependent.affineSpan_disjoint_of_disjoint
 theorem AffineIndependent.affineSpan_disjoint_of_disjoint [Nontrivial k] {p : ι → P}
     (ha : AffineIndependent k p) {s1 s2 : Set ι} (hd : Disjoint s1 s2) :
     Disjoint (affineSpan k (p '' s1) : Set P) (affineSpan k (p '' s2)) := by
@@ -375,6 +378,7 @@ theorem AffineIndependent.affineSpan_disjoint_of_disjoint [Nontrivial k] {p : ι
   cases' ha.exists_mem_inter_of_exists_mem_inter_affineSpan hp0s1 hp0s2 with i hi
   exact Set.disjoint_iff.1 hd hi
 
+-- CONFLATES (assumes ground = zero): AffineIndependent.mem_affineSpan_iff
 @[simp]
 protected theorem AffineIndependent.mem_affineSpan_iff [Nontrivial k] {p : ι → P}
     (ha : AffineIndependent k p) (i : ι) (s : Set ι) : p i ∈ affineSpan k (p '' s) ↔ i ∈ s := by
@@ -386,6 +390,7 @@ protected theorem AffineIndependent.mem_affineSpan_iff [Nontrivial k] {p : ι �
     rwa [← Set.nonempty_def, Set.inter_singleton_nonempty] at h
   · exact fun h => mem_affineSpan k (Set.mem_image_of_mem p h)
 
+-- CONFLATES (assumes ground = zero): AffineIndependent.not_mem_affineSpan_diff
 theorem AffineIndependent.not_mem_affineSpan_diff [Nontrivial k] {p : ι → P}
     (ha : AffineIndependent k p) (i : ι) (s : Set ι) : p i ∉ affineSpan k (p '' (s \ {i})) := by
   simp [ha]

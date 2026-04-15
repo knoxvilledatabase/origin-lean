@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Shift/SingleFunctors.lean
-Genuine: 21 of 26 | Dissolved: 1 | Infrastructure: 4
+Genuine: 21 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Shift.CommShift

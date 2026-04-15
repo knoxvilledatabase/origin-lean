@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/Basic.lean
-Genuine: 38 of 44 | Dissolved: 0 | Infrastructure: 6
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Counit

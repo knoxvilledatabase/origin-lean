@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Hom/Defs.lean
-Genuine: 48 of 107 | Dissolved: 6 | Infrastructure: 53
+Genuine: 47 | Conflates: 1 | Dissolved: 6 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic
@@ -416,6 +416,7 @@ theorem codomain_trivial_iff_range_trivial : (0 : β) = 1 ↔ ∀ x, f x = 0 :=
 
 include f in
 
+-- CONFLATES (assumes ground = zero): domain_nontrivial
 theorem domain_nontrivial [Nontrivial β] : Nontrivial α :=
   ⟨⟨1, 0, mt (fun h => show f 1 = 0 by rw [h, map_zero]) f.map_one_ne_zero⟩⟩
 

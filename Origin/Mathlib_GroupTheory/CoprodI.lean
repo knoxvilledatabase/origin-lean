@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/CoprodI.lean
-Genuine: 81 of 105 | Dissolved: 0 | Infrastructure: 24
+Genuine: 77 | Conflates: 4 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Membership
@@ -798,6 +798,7 @@ theorem lift_word_ping_pong {i j k} (w : NeWord H i j) (hk : j ≠ k) :
 
 include hXnonempty hXdisj
 
+-- CONFLATES (assumes ground = zero): lift_word_prod_nontrivial_of_other_i
 theorem lift_word_prod_nontrivial_of_other_i {i j k} (w : NeWord H i j) (hhead : k ≠ i)
     (hlast : k ≠ j) : lift f w.prod ≠ 1 := by
   intro heq1
@@ -807,11 +808,13 @@ theorem lift_word_prod_nontrivial_of_other_i {i j k} (w : NeWord H i j) (hhead :
 
 variable [Nontrivial ι]
 
+-- CONFLATES (assumes ground = zero): lift_word_prod_nontrivial_of_head_eq_last
 theorem lift_word_prod_nontrivial_of_head_eq_last {i} (w : NeWord H i i) :
     lift f w.prod ≠ 1 := by
   obtain ⟨k, hk⟩ := exists_ne i
   exact lift_word_prod_nontrivial_of_other_i f X hXnonempty hXdisj hpp w hk hk
 
+-- CONFLATES (assumes ground = zero): lift_word_prod_nontrivial_of_head_card
 theorem lift_word_prod_nontrivial_of_head_card {i j} (w : NeWord H i j)
     (hcard : 3 ≤ #(H i)) (hheadtail : i ≠ j) : lift f w.prod ≠ 1 := by
   obtain ⟨h, hn1, hnh⟩ := Cardinal.three_le hcard 1 w.head⁻¹
@@ -829,6 +832,7 @@ theorem lift_word_prod_nontrivial_of_head_card {i j} (w : NeWord H i j)
 
 include hcard in
 
+-- CONFLATES (assumes ground = zero): lift_word_prod_nontrivial_of_not_empty
 theorem lift_word_prod_nontrivial_of_not_empty {i j} (w : NeWord H i j) :
     lift f w.prod ≠ 1 := by
   classical

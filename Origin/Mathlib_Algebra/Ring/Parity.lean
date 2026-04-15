@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Parity.lean
-Genuine: 87 of 93 | Dissolved: 1 | Infrastructure: 5
+Genuine: 86 | Conflates: 1 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Even
@@ -54,6 +54,7 @@ lemma Even.neg_one_zpow (h : Even n) : (-1 : α) ^ n = 1 := by rw [h.neg_zpow, o
 
 end DivisionMonoid
 
+-- CONFLATES (assumes ground = zero): isSquare_zero
 @[simp] lemma isSquare_zero [MulZeroClass α] : IsSquare (0 : α) := ⟨0, (mul_zero _).symm⟩
 
 section Semiring

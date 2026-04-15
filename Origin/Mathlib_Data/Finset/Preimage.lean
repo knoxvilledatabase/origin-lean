@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Preimage.lean
-Genuine: 23 of 23 | Dissolved: 0 | Infrastructure: 0
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Sigma

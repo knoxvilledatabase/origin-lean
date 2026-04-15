@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Card.lean
-Genuine: 164 of 179 | Dissolved: 6 | Infrastructure: 9
+Genuine: 164 | Conflates: 0 | Dissolved: 6 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Finite

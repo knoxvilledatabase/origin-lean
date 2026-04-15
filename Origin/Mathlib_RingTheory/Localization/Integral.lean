@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Integral.lean
-Genuine: 23 of 26 | Dissolved: 1 | Infrastructure: 2
+Genuine: 22 | Conflates: 1 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
@@ -409,6 +409,7 @@ theorem ideal_span_singleton_map_subset {L : Type*} [IsDomain R] [IsDomain S] [F
 
 end IsFractionRing
 
+-- CONFLATES (assumes ground = zero): isAlgebraic_of_isLocalization
 lemma isAlgebraic_of_isLocalization {R} [CommRing R] (M : Submonoid R) (S) [CommRing S]
     [Nontrivial R] [Algebra R S] [IsLocalization M S] : Algebra.IsAlgebraic R S := by
   constructor

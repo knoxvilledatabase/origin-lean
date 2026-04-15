@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Weights/Killing.lean
-Genuine: 39 of 46 | Dissolved: 2 | Infrastructure: 5
+Genuine: 38 | Conflates: 1 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Derivation.Killing
@@ -353,6 +353,7 @@ lemma root_apply_coroot {α : Weight K H L} (hα : α.IsNonZero) :
     simpa [hα, ← α.coe_coe, map_zero] using root_apply_coroot contra
   · simp [coroot, Weight.coe_toLinear_eq_zero_iff.mpr hα]
 
+-- CONFLATES (assumes ground = zero): coroot_zero
 @[simp]
 lemma coroot_zero [Nontrivial L] : coroot (0 : Weight K H L) = 0 := by simp [Weight.isZero_zero]
 

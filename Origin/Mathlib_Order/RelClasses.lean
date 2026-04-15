@@ -1,6 +1,6 @@
 /-
 Extracted from Order/RelClasses.lean
-Genuine: 119 of 180 | Dissolved: 0 | Infrastructure: 61
+Genuine: 119 | Conflates: 0 | Dissolved: 0 | Infrastructure: 61
 -/
 import Origin.Core
 import Mathlib.Logic.IsEmpty

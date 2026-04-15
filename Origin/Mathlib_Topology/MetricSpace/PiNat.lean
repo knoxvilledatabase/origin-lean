@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/PiNat.lean
-Genuine: 56 of 62 | Dissolved: 0 | Infrastructure: 6
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.HausdorffDistance

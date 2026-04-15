@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Free/Basic.lean
-Genuine: 10 of 26 | Dissolved: 0 | Infrastructure: 16
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Functor

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/EGauge.lean
-Genuine: 21 of 25 | Dissolved: 3 | Infrastructure: 1
+Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Seminorm

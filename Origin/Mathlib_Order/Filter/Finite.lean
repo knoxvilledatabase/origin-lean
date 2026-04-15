@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Finite.lean
-Genuine: 38 of 39 | Dissolved: 0 | Infrastructure: 1
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Lattice

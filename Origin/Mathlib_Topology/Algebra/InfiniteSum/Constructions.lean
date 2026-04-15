@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Constructions.lean
-Genuine: 40 of 41 | Dissolved: 0 | Infrastructure: 1
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Group

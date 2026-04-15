@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/Kan/HasKan.lean
-Genuine: 36 of 52 | Dissolved: 0 | Infrastructure: 16
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal

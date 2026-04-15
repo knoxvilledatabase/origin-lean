@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/Meromorphic.lean
-Genuine: 38 of 40 | Dissolved: 1 | Infrastructure: 1
+Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.IsolatedZeros

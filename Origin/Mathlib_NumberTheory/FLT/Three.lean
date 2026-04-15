@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FLT/Three.lean
-Genuine: 70 of 80 | Dissolved: 6 | Infrastructure: 4
+Genuine: 70 | Conflates: 0 | Dissolved: 6 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.NumberTheory.FLT.Basic

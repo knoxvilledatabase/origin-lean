@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/MonCat/Basic.lean
-Genuine: 21 of 58 | Dissolved: 0 | Infrastructure: 37
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom

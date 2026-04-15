@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/OrderClosed.lean
-Genuine: 156 of 173 | Dissolved: 0 | Infrastructure: 17
+Genuine: 156 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Topology.Separation.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Basic.lean
-Genuine: 35 of 45 | Dissolved: 10 | Infrastructure: 0
+Genuine: 34 | Conflates: 1 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Units
@@ -49,6 +49,7 @@ lemma pow_add_pow_le' (ha : 0 ≤ a) (hb : 0 ≤ b) : a ^ n + b ^ n ≤ 2 * (a +
 
 end OrderedSemiring
 
+-- CONFLATES (assumes ground = zero): OrderedRing.toStrictOrderedRing
 abbrev OrderedRing.toStrictOrderedRing (α : Type*)
     [OrderedRing α] [NoZeroDivisors α] [Nontrivial α] : StrictOrderedRing α where
   __ := ‹OrderedRing α›

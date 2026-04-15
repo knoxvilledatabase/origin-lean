@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/QuadraticForm/Basic.lean
-Genuine: 118 of 169 | Dissolved: 4 | Infrastructure: 47
+Genuine: 118 | Conflates: 0 | Dissolved: 4 | Infrastructure: 47
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional

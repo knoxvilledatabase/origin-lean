@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/EpsilonNFA.lean
-Genuine: 20 of 35 | Dissolved: 0 | Infrastructure: 15
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Computability.NFA

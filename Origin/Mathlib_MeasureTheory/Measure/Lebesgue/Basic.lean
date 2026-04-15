@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Lebesgue/Basic.lean
-Genuine: 47 of 62 | Dissolved: 9 | Infrastructure: 6
+Genuine: 47 | Conflates: 0 | Dissolved: 9 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving

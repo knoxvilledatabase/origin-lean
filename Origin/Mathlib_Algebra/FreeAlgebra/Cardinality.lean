@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/FreeAlgebra/Cardinality.lean
-Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
+Genuine: 5 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeAlgebra
@@ -23,6 +23,7 @@ namespace FreeAlgebra
 
 variable (X : Type v)
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_max_lift
 @[simp]
 theorem cardinalMk_eq_max_lift [Nonempty X] [Nontrivial R] :
     #(FreeAlgebra R X) = Cardinal.lift.{v} #R ⊔ Cardinal.lift.{u} #X ⊔ ℵ₀ := by
@@ -37,6 +38,7 @@ theorem cardinalMk_eq_lift [IsEmpty X] : #(FreeAlgebra R X) = Cardinal.lift.{v} 
   rw [lift_id'.{u, v}, lift_umax] at this
   rwa [equivMonoidAlgebraFreeMonoid.toEquiv.cardinal_eq, MonoidAlgebra]
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_one
 @[nontriviality]
 theorem cardinalMk_eq_one [Subsingleton R] : #(FreeAlgebra R X) = 1 := by
   rw [equivMonoidAlgebraFreeMonoid.toEquiv.cardinal_eq, MonoidAlgebra, mk_eq_one]
@@ -51,6 +53,7 @@ theorem cardinalMk_le_max_lift :
 
 variable (X : Type u)
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_max
 theorem cardinalMk_eq_max [Nonempty X] [Nontrivial R] : #(FreeAlgebra R X) = #R ⊔ #X ⊔ ℵ₀ := by
   simp
 

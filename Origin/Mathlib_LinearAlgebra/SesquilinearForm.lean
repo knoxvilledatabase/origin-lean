@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/SesquilinearForm.lean
-Genuine: 75 of 85 | Dissolved: 3 | Infrastructure: 7
+Genuine: 70 | Conflates: 5 | Dissolved: 3 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearMap
@@ -561,6 +561,7 @@ def SeparatingLeft (B : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M) : Prop :=
 
 variable (M₁ M₂ I₁ I₂)
 
+-- CONFLATES (assumes ground = zero): not_separatingLeft_zero
 theorem not_separatingLeft_zero [Nontrivial M₁] : ¬(0 : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M).SeparatingLeft :=
   let ⟨m, hm⟩ := exists_ne (0 : M₁)
   fun h ↦ hm (h m fun _n ↦ rfl)
@@ -617,6 +618,7 @@ theorem flip_separatingLeft {B : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M} :
 theorem flip_nondegenerate {B : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M} : B.flip.Nondegenerate ↔ B.Nondegenerate :=
   Iff.trans and_comm (and_congr flip_separatingRight flip_separatingLeft)
 
+-- CONFLATES (assumes ground = zero): separatingLeft_iff_linear_nontrivial
 theorem separatingLeft_iff_linear_nontrivial {B : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M} :
     B.SeparatingLeft ↔ ∀ x : M₁, B x = 0 → x = 0 := by
   constructor <;> intro h x hB
@@ -627,6 +629,7 @@ theorem separatingLeft_iff_linear_nontrivial {B : M₁ →ₛₗ[I₁] M₂ →�
     exact hB _
   exact h x h'
 
+-- CONFLATES (assumes ground = zero): separatingRight_iff_linear_flip_nontrivial
 theorem separatingRight_iff_linear_flip_nontrivial {B : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M} :
     B.SeparatingRight ↔ ∀ y : M₂, B.flip y = 0 → y = 0 := by
   rw [← flip_separatingLeft, separatingLeft_iff_linear_nontrivial]
@@ -669,6 +672,7 @@ theorem nondegenerate_restrict_of_disjoint_orthogonal {B : M →ₗ[R] M →ₗ[
   rw [hB.ortho_comm]
   exact b₁
 
+-- CONFLATES (assumes ground = zero): IsOrthoᵢ.not_isOrtho_basis_self_of_separatingLeft
 theorem IsOrthoᵢ.not_isOrtho_basis_self_of_separatingLeft [Nontrivial R]
     {B : M →ₛₗ[I] M →ₛₗ[I'] M₁} {v : Basis n R M} (h : B.IsOrthoᵢ v) (hB : B.SeparatingLeft)
     (i : n) : ¬B.IsOrtho (v i) (v i) := by
@@ -684,6 +688,7 @@ theorem IsOrthoᵢ.not_isOrtho_basis_self_of_separatingLeft [Nontrivial R]
   · exact ho
   · exact h hij
 
+-- CONFLATES (assumes ground = zero): IsOrthoᵢ.not_isOrtho_basis_self_of_separatingRight
 theorem IsOrthoᵢ.not_isOrtho_basis_self_of_separatingRight [Nontrivial R]
     {B : M →ₛₗ[I] M →ₛₗ[I'] M₁} {v : Basis n R M} (h : B.IsOrthoᵢ v) (hB : B.SeparatingRight)
     (i : n) : ¬B.IsOrtho (v i) (v i) := by

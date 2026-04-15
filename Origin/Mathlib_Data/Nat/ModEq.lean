@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/ModEq.lean
-Genuine: 63 of 77 | Dissolved: 6 | Infrastructure: 8
+Genuine: 63 | Conflates: 0 | Dissolved: 6 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Int

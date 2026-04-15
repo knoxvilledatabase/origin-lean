@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/Lebesgue.lean
-Genuine: 183 of 199 | Dissolved: 13 | Infrastructure: 3
+Genuine: 183 | Conflates: 0 | Dissolved: 13 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Basic

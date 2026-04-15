@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/CartanExists.lean
-Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.CartanSubalgebra
@@ -83,6 +83,7 @@ def lieCharpoly : Polynomial R[X] :=
 lemma lieCharpoly_monic : (lieCharpoly R M x y).Monic :=
   (polyCharpoly_monic _ _).map _
 
+-- CONFLATES (assumes ground = zero): lieCharpoly_natDegree
 lemma lieCharpoly_natDegree [Nontrivial R] : (lieCharpoly R M x y).natDegree = finrank R M := by
   rw [lieCharpoly, (polyCharpoly_monic _ _).natDegree_map, polyCharpoly_natDegree]
 
@@ -98,6 +99,7 @@ lemma lieCharpoly_map_eval (r : R) :
     map_add, map_mul, aeval_C, Algebra.id.map_eq_id, RingHom.id_apply, aeval_X, aux,
     MvPolynomial.coe_aeval_eq_eval, polyCharpoly_map_eq_charpoly, LieHom.coe_toLinearMap]
 
+-- CONFLATES (assumes ground = zero): lieCharpoly_coeff_natDegree
 lemma lieCharpoly_coeff_natDegree [Nontrivial R] (i j : ℕ) (hij : i + j = finrank R M) :
     ((lieCharpoly R M x y).coeff i).natDegree ≤ j := by
   classical

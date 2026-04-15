@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matroid/Closure.lean
-Genuine: 124 of 127 | Dissolved: 0 | Infrastructure: 3
+Genuine: 124 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Matroid.Restrict

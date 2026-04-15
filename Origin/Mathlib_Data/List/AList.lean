@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/AList.lean
-Genuine: 60 of 78 | Dissolved: 0 | Infrastructure: 18
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Data.List.Sigma

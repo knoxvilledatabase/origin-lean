@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Grothendieck.lean
-Genuine: 26 of 36 | Dissolved: 0 | Infrastructure: 10
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Cat.AsSmall

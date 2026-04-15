@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Closed/FunctorCategory/Groupoid.lean
-Genuine: 3 of 8 | Dissolved: 0 | Infrastructure: 5
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Closed.Monoidal

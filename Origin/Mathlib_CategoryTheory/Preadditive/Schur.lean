@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/Schur.lean
-Genuine: 7 of 13 | Dissolved: 4 | Infrastructure: 2
+Genuine: 7 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Ext

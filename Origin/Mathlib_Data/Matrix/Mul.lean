@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Mul.lean
-Genuine: 125 of 145 | Dissolved: 3 | Infrastructure: 17
+Genuine: 125 | Conflates: 0 | Dissolved: 3 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action

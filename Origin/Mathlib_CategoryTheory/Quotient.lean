@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Quotient.lean
-Genuine: 26 of 39 | Dissolved: 0 | Infrastructure: 13
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.NatIso

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Indization/IndObject.lean
-Genuine: 18 of 22 | Dissolved: 0 | Infrastructure: 4
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.FinallySmall

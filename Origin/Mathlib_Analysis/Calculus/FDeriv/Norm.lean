@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Norm.lean
-Genuine: 12 of 17 | Dissolved: 5 | Infrastructure: 0
+Genuine: 10 | Conflates: 2 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Abs
@@ -43,6 +43,7 @@ variable {n : WithTop ℕ∞} {f : E →L[ℝ] ℝ} {x : E} {t : ℝ}
 
 variable (E) in
 
+-- CONFLATES (assumes ground = zero): not_differentiableAt_norm_zero
 theorem not_differentiableAt_norm_zero [Nontrivial E] :
     ¬DifferentiableAt ℝ (‖·‖) (0 : E) := by
   obtain ⟨x, hx⟩ := NormedSpace.exists_lt_norm ℝ E 0
@@ -149,6 +150,7 @@ theorem fderiv_norm_smul_neg (ht : t < 0) :
     fderiv ℝ (‖·‖) (t • x) = -fderiv ℝ (‖·‖) x := by
   simp [fderiv_norm_smul, ht]
 
+-- CONFLATES (assumes ground = zero): norm_fderiv_norm
 theorem norm_fderiv_norm [Nontrivial E] (h : DifferentiableAt ℝ (‖·‖) x) :
     ‖fderiv ℝ (‖·‖) x‖ = 1 := by
   have : x ≠ 0 := fun hx ↦ not_differentiableAt_norm_zero E (hx ▸ h)

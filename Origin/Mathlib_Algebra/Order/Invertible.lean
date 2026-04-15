@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Invertible.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Defs
@@ -33,6 +33,7 @@ theorem invOf_lt_zero [Invertible a] : ⅟ a < 0 ↔ a < 0 := by simp only [← 
 theorem invOf_le_one [Invertible a] (h : 1 ≤ a) : ⅟ a ≤ 1 :=
   mul_invOf_self a ▸ le_mul_of_one_le_left (invOf_nonneg.2 <| zero_le_one.trans h) h
 
+-- CONFLATES (assumes ground = zero): pos_invOf_of_invertible_cast
 theorem pos_invOf_of_invertible_cast [Nontrivial α] (n : ℕ)
     [Invertible (n : α)] : 0 < ⅟(n : α) :=
   invOf_pos.2 <| Nat.cast_pos.2 <| pos_of_invertible_cast (α := α) n

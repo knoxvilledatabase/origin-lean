@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/StrongTopology.lean
-Genuine: 40 of 70 | Dissolved: 0 | Infrastructure: 30
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.UniformConvergence

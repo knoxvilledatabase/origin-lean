@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ClopenBox.lean
-Genuine: 4 of 6 | Dissolved: 0 | Infrastructure: 2
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.CompactOpen

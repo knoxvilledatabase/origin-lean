@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Basic.lean
-Genuine: 243 of 298 | Dissolved: 19 | Infrastructure: 36
+Genuine: 243 | Conflates: 0 | Dissolved: 19 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Module

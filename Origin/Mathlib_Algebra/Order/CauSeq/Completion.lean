@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/CauSeq/Completion.lean
-Genuine: 31 of 71 | Dissolved: 5 | Infrastructure: 35
+Genuine: 31 | Conflates: 0 | Dissolved: 5 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.CauSeq.Basic

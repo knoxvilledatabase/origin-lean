@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/AffineMap.lean
-Genuine: 71 of 134 | Dissolved: 0 | Infrastructure: 63
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 63
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Pointwise.Interval

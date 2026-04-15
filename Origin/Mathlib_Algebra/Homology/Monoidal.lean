@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/Monoidal.lean
-Genuine: 20 of 29 | Dissolved: 0 | Infrastructure: 9
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.BifunctorAssociator

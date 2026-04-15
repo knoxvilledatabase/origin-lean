@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Antidiag/Pi.lean
-Genuine: 12 of 18 | Dissolved: 6 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic

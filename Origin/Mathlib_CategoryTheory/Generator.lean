@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Generator.lean
-Genuine: 104 of 116 | Dissolved: 0 | Infrastructure: 12
+Genuine: 104 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.EssentiallySmall

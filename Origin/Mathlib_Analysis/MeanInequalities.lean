@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/MeanInequalities.lean
-Genuine: 51 of 54 | Dissolved: 3 | Infrastructure: 0
+Genuine: 51 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Expect

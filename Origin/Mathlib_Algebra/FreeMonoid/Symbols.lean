@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/FreeMonoid/Symbols.lean
-Genuine: 3 of 5 | Dissolved: 0 | Infrastructure: 2
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeMonoid.Basic

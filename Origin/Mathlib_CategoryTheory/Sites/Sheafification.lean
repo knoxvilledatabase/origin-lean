@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Sheafification.lean
-Genuine: 24 of 37 | Dissolved: 0 | Infrastructure: 13
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Unique

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/FinitePresentation.lean
-Genuine: 26 of 32 | Dissolved: 0 | Infrastructure: 6
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Sum

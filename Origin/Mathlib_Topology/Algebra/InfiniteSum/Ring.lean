@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Ring.lean
-Genuine: 22 of 31 | Dissolved: 8 | Infrastructure: 1
+Genuine: 22 | Conflates: 0 | Dissolved: 8 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.NatAntidiagonal

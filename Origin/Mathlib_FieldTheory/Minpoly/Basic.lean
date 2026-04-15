@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Minpoly/Basic.lean
-Genuine: 20 of 26 | Dissolved: 6 | Infrastructure: 0
+Genuine: 15 | Conflates: 5 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
@@ -81,6 +81,7 @@ theorem aeval_algHom (f : B →ₐ[A] B') (x : B) : (Polynomial.aeval (f x)) (mi
 
 -- DISSOLVED: map_ne_one
 
+-- CONFLATES (assumes ground = zero): not_isUnit
 theorem not_isUnit [Nontrivial B] : ¬IsUnit (minpoly A x) := by
   haveI : Nontrivial A := (algebraMap A B).domain_nontrivial
   by_cases hx : IsIntegral A x
@@ -107,6 +108,7 @@ theorem min {p : A[X]} (pmonic : p.Monic) (hp : Polynomial.aeval x p = 0) :
 
 -- DISSOLVED: unique'
 
+-- CONFLATES (assumes ground = zero): subsingleton
 @[nontriviality]
 theorem subsingleton [Subsingleton B] : minpoly A x = 1 := by
   nontriviality A
@@ -129,6 +131,7 @@ variable [Ring B] [Algebra A B]
 
 variable {x : B}
 
+-- CONFLATES (assumes ground = zero): natDegree_pos
 theorem natDegree_pos [Nontrivial B] (hx : IsIntegral A x) : 0 < natDegree (minpoly A x) := by
   rw [pos_iff_ne_zero]
   intro ndeg_eq_zero
@@ -138,6 +141,7 @@ theorem natDegree_pos [Nontrivial B] (hx : IsIntegral A x) : 0 < natDegree (minp
     simpa only [ndeg_eq_zero.symm] using (monic hx).leadingCoeff
   simpa only [eq_one, map_one, one_ne_zero] using aeval A x
 
+-- CONFLATES (assumes ground = zero): degree_pos
 theorem degree_pos [Nontrivial B] (hx : IsIntegral A x) : 0 < degree (minpoly A x) :=
   natDegree_pos_iff_degree_pos.mp (natDegree_pos hx)
 
@@ -164,6 +168,7 @@ theorem two_le_natDegree_iff (int : IsIntegral A x) :
   rw [iff_not_comm, ← natDegree_eq_one_iff, not_le]
   exact ⟨fun h ↦ h.trans_lt one_lt_two, fun h ↦ by linarith only [minpoly.natDegree_pos int, h]⟩
 
+-- CONFLATES (assumes ground = zero): two_le_natDegree_subalgebra
 theorem two_le_natDegree_subalgebra {B} [CommRing B] [Algebra A B] [Nontrivial B]
     {S : Subalgebra A B} {x : B} (int : IsIntegral S x) : 2 ≤ (minpoly S x).natDegree ↔ x ∉ S := by
   rw [two_le_natDegree_iff int, Iff.not]

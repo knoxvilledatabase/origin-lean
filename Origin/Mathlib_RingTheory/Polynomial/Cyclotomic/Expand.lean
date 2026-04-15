@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Cyclotomic/Expand.lean
-Genuine: 6 of 8 | Dissolved: 2 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod

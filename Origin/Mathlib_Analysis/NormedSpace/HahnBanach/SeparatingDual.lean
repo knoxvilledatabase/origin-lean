@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/HahnBanach/SeparatingDual.lean
-Genuine: 7 of 16 | Dissolved: 7 | Infrastructure: 2
+Genuine: 7 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.HahnBanach.Extension

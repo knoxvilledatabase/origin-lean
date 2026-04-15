@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Antilipschitz.lean
-Genuine: 35 of 35 | Dissolved: 0 | Infrastructure: 0
+Genuine: 34 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.UniformSpace.CompleteSeparated
@@ -168,6 +168,7 @@ alias closedEmbedding := isClosedEmbedding
 theorem subtype_coe (s : Set α) : AntilipschitzWith 1 ((↑) : s → α) :=
   AntilipschitzWith.id.restrict s
 
+-- CONFLATES (assumes ground = zero): of_subsingleton
 @[nontriviality] -- Porting note: added `nontriviality`
 theorem of_subsingleton [Subsingleton α] {K : ℝ≥0} : AntilipschitzWith K f := fun x y => by
   simp only [Subsingleton.elim x y, edist_self, zero_le]

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Regular/IsSMulRegular.lean
-Genuine: 22 of 23 | Dissolved: 0 | Infrastructure: 1
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Torsion

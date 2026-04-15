@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/CompactOpen.lean
-Genuine: 46 of 62 | Dissolved: 0 | Infrastructure: 16
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Topology.Hom.ContinuousEval

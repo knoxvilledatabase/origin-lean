@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Ring/Limits.lean
-Genuine: 18 of 68 | Dissolved: 0 | Infrastructure: 50
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Pi

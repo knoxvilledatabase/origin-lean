@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Pseudo/Real.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Pointwise.Interval

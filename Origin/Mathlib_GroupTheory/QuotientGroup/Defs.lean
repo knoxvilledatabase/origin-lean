@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/QuotientGroup/Defs.lean
-Genuine: 21 of 40 | Dissolved: 0 | Infrastructure: 19
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Ker

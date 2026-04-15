@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subsemiring/Pointwise.lean
-Genuine: 12 of 23 | Dissolved: 6 | Infrastructure: 5
+Genuine: 12 | Conflates: 0 | Dissolved: 6 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Pointwise

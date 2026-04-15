@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Defs.lean
-Genuine: 49 of 106 | Dissolved: 22 | Infrastructure: 35
+Genuine: 49 | Conflates: 0 | Dissolved: 22 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs

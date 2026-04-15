@@ -1,6 +1,6 @@
 /-
 Extracted from Order/LiminfLimsup.lean
-Genuine: 265 of 279 | Dissolved: 0 | Infrastructure: 14
+Genuine: 265 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Constructions.lean
-Genuine: 11 of 17 | Dissolved: 6 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.CrossProduct

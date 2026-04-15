@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Filtered/Final.lean
-Genuine: 18 of 40 | Dissolved: 0 | Infrastructure: 22
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Filtered.Connected

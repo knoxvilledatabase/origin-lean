@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Partition/Finpartition.lean
-Genuine: 51 of 67 | Dissolved: 0 | Infrastructure: 16
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/Triangulated.lean
-Genuine: 10 of 18 | Dissolved: 0 | Infrastructure: 8
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.CalculusOfFractions.ComposableArrows

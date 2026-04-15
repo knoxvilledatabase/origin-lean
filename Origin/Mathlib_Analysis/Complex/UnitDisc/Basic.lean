@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/UnitDisc/Basic.lean
-Genuine: 14 of 48 | Dissolved: 3 | Infrastructure: 31
+Genuine: 14 | Conflates: 0 | Dissolved: 3 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Circle

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/Subalgebra.lean
-Genuine: 91 of 131 | Dissolved: 0 | Infrastructure: 40
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Star.Center

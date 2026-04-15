@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/IntegrableOn.lean
-Genuine: 89 of 105 | Dissolved: 1 | Infrastructure: 15
+Genuine: 88 | Conflates: 1 | Dissolved: 1 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.L1Space
@@ -364,6 +364,7 @@ protected theorem IntegrableAtFilter.sub {f g : α → E}
   rw [sub_eq_add_neg]
   exact hf.add hg.neg
 
+-- CONFLATES (assumes ground = zero): IntegrableAtFilter.smul
 protected theorem IntegrableAtFilter.smul {𝕜 : Type*} [NormedAddCommGroup 𝕜] [SMulZeroClass 𝕜 E]
     [BoundedSMul 𝕜 E] {f : α → E} (hf : IntegrableAtFilter f l μ) (c : 𝕜) :
     IntegrableAtFilter (c • f) l μ := by

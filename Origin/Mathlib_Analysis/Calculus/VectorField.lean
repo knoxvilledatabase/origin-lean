@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/VectorField.lean
-Genuine: 58 of 63 | Dissolved: 0 | Infrastructure: 5
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric

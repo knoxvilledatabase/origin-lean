@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Algebra/Ultra.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Ultra

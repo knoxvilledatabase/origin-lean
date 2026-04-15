@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/EuclideanDomain/Basic.lean
-Genuine: 33 of 42 | Dissolved: 6 | Infrastructure: 3
+Genuine: 33 | Conflates: 0 | Dissolved: 6 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Factorization/Induction.lean
-Genuine: 7 of 8 | Dissolved: 1 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Factorization.Defs

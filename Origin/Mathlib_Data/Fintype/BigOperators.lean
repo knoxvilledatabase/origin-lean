@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Fintype/BigOperators.lean
-Genuine: 28 of 31 | Dissolved: 0 | Infrastructure: 3
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Option

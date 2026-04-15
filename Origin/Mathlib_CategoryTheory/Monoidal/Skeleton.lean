@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Skeleton.lean
-Genuine: 3 of 9 | Dissolved: 0 | Infrastructure: 6
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic

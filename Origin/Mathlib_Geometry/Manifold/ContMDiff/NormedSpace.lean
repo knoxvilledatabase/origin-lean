@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/ContMDiff/NormedSpace.lean
-Genuine: 43 of 43 | Dissolved: 0 | Infrastructure: 0
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.Product

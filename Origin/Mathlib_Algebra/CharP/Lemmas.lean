@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/Lemmas.lean
-Genuine: 64 of 70 | Dissolved: 2 | Infrastructure: 4
+Genuine: 64 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs

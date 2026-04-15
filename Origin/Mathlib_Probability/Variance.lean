@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Variance.lean
-Genuine: 24 of 26 | Dissolved: 1 | Infrastructure: 1
+Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Probability.Notation

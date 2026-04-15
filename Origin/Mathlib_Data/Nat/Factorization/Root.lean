@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Factorization/Root.lean
-Genuine: 14 of 24 | Dissolved: 8 | Infrastructure: 2
+Genuine: 14 | Conflates: 0 | Dissolved: 8 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Floor.Div

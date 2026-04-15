@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Function/Iterate.lean
-Genuine: 35 of 40 | Dissolved: 0 | Infrastructure: 5
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Conjugate

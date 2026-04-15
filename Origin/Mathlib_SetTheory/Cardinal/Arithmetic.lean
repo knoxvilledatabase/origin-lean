@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Arithmetic.lean
-Genuine: 101 of 112 | Dissolved: 10 | Infrastructure: 1
+Genuine: 101 | Conflates: 0 | Dissolved: 10 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Aleph

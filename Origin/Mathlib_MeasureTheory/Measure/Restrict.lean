@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Restrict.lean
-Genuine: 146 of 156 | Dissolved: 2 | Infrastructure: 8
+Genuine: 146 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Comap

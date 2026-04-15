@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Satisfiability.lean
-Genuine: 42 of 47 | Dissolved: 0 | Infrastructure: 5
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.ModelTheory.Ultraproducts

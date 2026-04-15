@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Yoneda.lean
-Genuine: 87 of 109 | Dissolved: 0 | Infrastructure: 22
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Hom

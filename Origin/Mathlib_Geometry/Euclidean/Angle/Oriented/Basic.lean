@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/Basic.lean
-Genuine: 80 of 119 | Dissolved: 38 | Infrastructure: 1
+Genuine: 80 | Conflates: 0 | Dissolved: 38 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.TwoDim

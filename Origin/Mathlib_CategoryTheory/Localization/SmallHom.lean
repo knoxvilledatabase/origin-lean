@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/SmallHom.lean
-Genuine: 24 of 25 | Dissolved: 0 | Infrastructure: 1
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.HomEquiv

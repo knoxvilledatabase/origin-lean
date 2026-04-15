@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Idempotents/Karoubi.lean
-Genuine: 22 of 44 | Dissolved: 0 | Infrastructure: 22
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Idempotents.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/TrivSqZeroExt.lean
-Genuine: 18 of 34 | Dissolved: 0 | Infrastructure: 16
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.TrivSqZeroExt

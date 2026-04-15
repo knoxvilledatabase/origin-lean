@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/ProbabilityMeasure.lean
-Genuine: 35 of 65 | Dissolved: 10 | Infrastructure: 20
+Genuine: 35 | Conflates: 0 | Dissolved: 10 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.FiniteMeasure

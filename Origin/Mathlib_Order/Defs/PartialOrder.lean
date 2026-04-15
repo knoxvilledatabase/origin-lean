@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Defs/PartialOrder.lean
-Genuine: 36 of 46 | Dissolved: 0 | Infrastructure: 10
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Batteries.Tactic.Trans

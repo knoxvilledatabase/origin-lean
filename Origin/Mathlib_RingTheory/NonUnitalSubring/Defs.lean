@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/NonUnitalSubring/Defs.lean
-Genuine: 26 of 53 | Dissolved: 0 | Infrastructure: 27
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/Ideals.lean
-Genuine: 23 of 27 | Dissolved: 2 | Infrastructure: 2
+Genuine: 22 | Conflates: 1 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Algebra
@@ -120,6 +120,7 @@ theorem setOfIdeal_open [T2Space R] (I : Ideal C(X, R)) : IsOpen (setOfIdeal I) 
 def opensOfIdeal [T2Space R] (I : Ideal C(X, R)) : Opens X :=
   ⟨setOfIdeal I, setOfIdeal_open I⟩
 
+-- CONFLATES (assumes ground = zero): setOfTop_eq_univ
 @[simp]
 theorem setOfTop_eq_univ [Nontrivial R] : setOfIdeal (⊤ : Ideal C(X, R)) = Set.univ :=
   Set.univ_subset_iff.mp fun _ _ => mem_setOfIdeal.mpr ⟨1, Submodule.mem_top, one_ne_zero⟩

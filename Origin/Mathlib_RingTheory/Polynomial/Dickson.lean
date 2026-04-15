@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Dickson.lean
-Genuine: 8 of 17 | Dissolved: 7 | Infrastructure: 2
+Genuine: 8 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Invertible

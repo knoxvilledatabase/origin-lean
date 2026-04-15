@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/SeparableDegree.lean
-Genuine: 66 of 82 | Dissolved: 11 | Infrastructure: 5
+Genuine: 66 | Conflates: 0 | Dissolved: 11 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.FieldTheory.SplittingField.Construction

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomotopyCategory/Triangulated.lean
-Genuine: 13 of 14 | Dissolved: 0 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.Pretriangulated

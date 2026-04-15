@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/RatFunc/Basic.lean
-Genuine: 76 of 122 | Dissolved: 24 | Infrastructure: 22
+Genuine: 75 | Conflates: 1 | Dissolved: 24 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.FieldTheory.RatFunc.Defs
@@ -410,6 +410,7 @@ theorem liftRingHom_apply_ofFractionRing_mk (φ : R[X] →+* L) (hφ : R[X]⁰ �
     (d : R[X]⁰) : liftRingHom φ hφ (ofFractionRing (Localization.mk n d)) = φ n / φ d :=
   liftMonoidWithZeroHom_apply_ofFractionRing_mk _ hφ _ _
 
+-- CONFLATES (assumes ground = zero): liftRingHom_injective
 theorem liftRingHom_injective [Nontrivial R] (φ : R[X] →+* L) (hφ : Function.Injective φ)
     (hφ' : R[X]⁰ ≤ L⁰.comap φ := nonZeroDivisors_le_comap_nonZeroDivisors_of_injective _ hφ) :
     Function.Injective (liftRingHom φ hφ') :=

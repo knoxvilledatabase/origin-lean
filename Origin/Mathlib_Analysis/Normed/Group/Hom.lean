@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Hom.lean
-Genuine: 89 of 136 | Dissolved: 1 | Infrastructure: 46
+Genuine: 88 | Conflates: 1 | Dissolved: 1 | Infrastructure: 46
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Int
@@ -318,6 +318,7 @@ theorem norm_id_le : ‖(id V : NormedAddGroupHom V V)‖ ≤ 1 :=
 
 -- DISSOLVED: norm_id_of_nontrivial_seminorm
 
+-- CONFLATES (assumes ground = zero): norm_id
 theorem norm_id {V : Type*} [NormedAddCommGroup V] [Nontrivial V] : ‖id V‖ = 1 := by
   refine norm_id_of_nontrivial_seminorm V ?_
   obtain ⟨x, hx⟩ := exists_ne (0 : V)

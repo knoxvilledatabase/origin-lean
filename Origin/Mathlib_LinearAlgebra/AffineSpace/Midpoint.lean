@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Midpoint.lean
-Genuine: 39 of 40 | Dissolved: 0 | Infrastructure: 1
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/ZMod.lean
-Genuine: 8 of 14 | Dissolved: 1 | Infrastructure: 5
+Genuine: 8 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Lattice

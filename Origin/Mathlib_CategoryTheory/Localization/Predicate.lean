@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/Predicate.lean
-Genuine: 42 of 62 | Dissolved: 0 | Infrastructure: 20
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Construction

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LucasLehmer.lean
-Genuine: 51 of 87 | Dissolved: 4 | Infrastructure: 32
+Genuine: 51 | Conflates: 0 | Dissolved: 4 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.RingTheory.Fintype

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/ZLattice/Basic.lean
-Genuine: 58 of 72 | Dissolved: 1 | Infrastructure: 13
+Genuine: 58 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Countable

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Size.lean
-Genuine: 12 of 17 | Dissolved: 5 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic

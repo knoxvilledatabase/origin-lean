@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/JacobiSum/Basic.lean
-Genuine: 13 of 18 | Dissolved: 5 | Infrastructure: 0
+Genuine: 10 | Conflates: 3 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.GaussSum
@@ -109,6 +109,7 @@ theorem jacobiSum_trivial_trivial :
 
 variable [IsDomain R] -- needed for `MulChar.sum_eq_zero_of_ne_one`
 
+-- CONFLATES (assumes ground = zero): jacobiSum_one_nontrivial
 theorem jacobiSum_one_nontrivial {χ : MulChar F R} (hχ : χ ≠ 1) : jacobiSum 1 χ = -1 := by
   classical
   have : ∑ x ∈ univ \ {0, 1}, ((1 : MulChar F R) x - 1) * (χ (1 - x) - 1) = 0 := by
@@ -120,6 +121,7 @@ theorem jacobiSum_one_nontrivial {χ : MulChar F R} (hχ : χ ≠ 1) : jacobiSum
     add_zero, Fintype.card_eq_card_units_add_one (α := F), Nat.cast_add, Nat.cast_one,
     sub_add_cancel_left, this]
 
+-- CONFLATES (assumes ground = zero): jacobiSum_nontrivial_inv
 theorem jacobiSum_nontrivial_inv {χ : MulChar F R} (hχ : χ ≠ 1) : jacobiSum χ χ⁻¹ = -χ (-1) := by
   classical
   rw [jacobiSum]
@@ -144,6 +146,7 @@ theorem jacobiSum_nontrivial_inv {χ : MulChar F R} (hχ : χ ≠ 1) : jacobiSum
   rw [this, ← add_eq_zero_iff_eq_neg, ← sum_eq_sum_diff_singleton_add (mem_univ (-1 : F))]
   exact MulChar.sum_eq_zero_of_ne_one hχ
 
+-- CONFLATES (assumes ground = zero): jacobiSum_mul_nontrivial
 theorem jacobiSum_mul_nontrivial {χ φ : MulChar F R} (h : χ * φ ≠ 1) (ψ : AddChar F R) :
     gaussSum (χ * φ) ψ * jacobiSum χ φ = gaussSum χ ψ * gaussSum φ ψ := by
   classical

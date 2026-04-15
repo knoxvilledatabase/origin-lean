@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/ChosenFiniteProducts/Cat.lean
-Genuine: 4 of 20 | Dissolved: 0 | Infrastructure: 16
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ChosenFiniteProducts

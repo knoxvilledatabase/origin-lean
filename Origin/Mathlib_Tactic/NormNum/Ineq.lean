@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/NormNum/Ineq.lean
-Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 | Conflates: 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Eq
@@ -53,6 +53,7 @@ theorem isRat_le_true [LinearOrderedRing α] : {a b : α} → {na nb : ℤ} → 
     rw [← mul_assoc, Int.commute_cast] at h
     simp at h; rwa [Int.commute_cast] at h
 
+-- CONFLATES (assumes ground = zero): isRat_lt_true
 theorem isRat_lt_true [LinearOrderedRing α] [Nontrivial α] : {a b : α} → {na nb : ℤ} → {da db : ℕ} →
     IsRat a na da → IsRat b nb db → decide (na * db < nb * da) → a < b
   | _, _, _, _, da, db, ⟨_, rfl⟩, ⟨_, rfl⟩, h => by
@@ -64,6 +65,7 @@ theorem isRat_lt_true [LinearOrderedRing α] [Nontrivial α] : {a b : α} → {n
     simp? at h says simp only [Int.cast_mul, Int.cast_natCast, mul_invOf_cancel_right'] at h
     rwa [Int.commute_cast] at h
 
+-- CONFLATES (assumes ground = zero): isRat_le_false
 theorem isRat_le_false [LinearOrderedRing α] [Nontrivial α] {a b : α} {na nb : ℤ} {da db : ℕ}
     (ha : IsRat a na da) (hb : IsRat b nb db) (h : decide (nb * da < na * db)) : ¬a ≤ b :=
   not_le_of_lt (isRat_lt_true hb ha h)
@@ -87,10 +89,12 @@ theorem isInt_le_true [OrderedRing α] : {a b : α} → {a' b' : ℤ} →
     IsInt a a' → IsInt b b' → decide (a' ≤ b') → a ≤ b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => Int.cast_mono <| of_decide_eq_true h
 
+-- CONFLATES (assumes ground = zero): isInt_lt_true
 theorem isInt_lt_true [OrderedRing α] [Nontrivial α] : {a b : α} → {a' b' : ℤ} →
     IsInt a a' → IsInt b b' → decide (a' < b') → a < b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, h => Int.cast_lt.2 <| of_decide_eq_true h
 
+-- CONFLATES (assumes ground = zero): isInt_le_false
 theorem isInt_le_false [OrderedRing α] [Nontrivial α] {a b : α} {a' b' : ℤ}
     (ha : IsInt a a') (hb : IsInt b b') (h : decide (b' < a')) : ¬a ≤ b :=
   not_le_of_lt (isInt_lt_true hb ha h)

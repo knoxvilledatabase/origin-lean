@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/BorelSpace/Real.lean
-Genuine: 65 of 70 | Dissolved: 0 | Infrastructure: 5
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/CliffordAlgebra/Conjugation.lean
-Genuine: 41 of 44 | Dissolved: 0 | Infrastructure: 3
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Grading

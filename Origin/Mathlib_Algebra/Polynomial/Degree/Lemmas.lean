@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Lemmas.lean
-Genuine: 30 of 53 | Dissolved: 23 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 23 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Eval.Degree

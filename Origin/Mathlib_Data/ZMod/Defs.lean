@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ZMod/Defs.lean
-Genuine: 3 of 14 | Dissolved: 0 | Infrastructure: 11
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Fin.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Sign.lean
-Genuine: 55 of 57 | Dissolved: 0 | Infrastructure: 2
+Genuine: 54 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Conj
@@ -404,6 +404,7 @@ theorem sign_abs (f : Perm α) :
 
 variable (α)
 
+-- CONFLATES (assumes ground = zero): sign_surjective
 theorem sign_surjective [Nontrivial α] : Function.Surjective (sign : Perm α → ℤˣ) := fun a =>
   (Int.units_eq_one_or a).elim (fun h => ⟨1, by simp [h]⟩) fun h =>
     let ⟨x, y, hxy⟩ := exists_pair_ne α

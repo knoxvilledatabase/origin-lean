@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Complex/Exponential.lean
-Genuine: 277 of 297 | Dissolved: 10 | Infrastructure: 10
+Genuine: 277 | Conflates: 0 | Dissolved: 10 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.CauSeq.BigOperators

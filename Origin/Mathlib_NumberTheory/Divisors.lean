@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Divisors.lean
-Genuine: 57 of 74 | Dissolved: 17 | Infrastructure: 0
+Genuine: 57 | Conflates: 0 | Dissolved: 17 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sets/Compacts.lean
-Genuine: 44 of 118 | Dissolved: 0 | Infrastructure: 74
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 74
 -/
 import Origin.Core
 import Mathlib.Topology.Sets.Closeds

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Determinant.lean
-Genuine: 64 of 71 | Dissolved: 4 | Infrastructure: 3
+Genuine: 62 | Conflates: 2 | Dissolved: 4 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.GeneralLinearGroup
@@ -58,6 +58,7 @@ variable {A : Type*} [CommRing A]
 
 variable {m n : Type*}
 
+-- CONFLATES (assumes ground = zero): equivOfPiLEquivPi
 def equivOfPiLEquivPi {R : Type*} [Finite m] [Finite n] [CommRing R] [Nontrivial R]
     (e : (m → R) ≃ₗ[R] n → R) : m ≃ n :=
   Basis.indexEquiv (Basis.ofEquivFun e.symm) (Pi.basisFun _ _)
@@ -66,6 +67,7 @@ namespace Matrix
 
 variable [Fintype m] [Fintype n]
 
+-- CONFLATES (assumes ground = zero): indexEquivOfInv
 def indexEquivOfInv [Nontrivial A] [DecidableEq m] [DecidableEq n] {M : Matrix m n A}
     {M' : Matrix n m A} (hMM' : M * M' = 1) (hM'M : M' * M = 1) : m ≃ n :=
   equivOfPiLEquivPi (toLin'OfInv hMM' hM'M)

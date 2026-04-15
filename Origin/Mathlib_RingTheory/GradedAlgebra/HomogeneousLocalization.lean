@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/GradedAlgebra/HomogeneousLocalization.lean
-Genuine: 48 of 106 | Dissolved: 0 | Infrastructure: 58
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 58
 -/
 import Origin.Core
 import Mathlib.Order.Filter.AtTopBot

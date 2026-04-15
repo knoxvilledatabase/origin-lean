@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Inverse.lean
-Genuine: 18 of 28 | Dissolved: 7 | Infrastructure: 3
+Genuine: 18 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Units.Basic

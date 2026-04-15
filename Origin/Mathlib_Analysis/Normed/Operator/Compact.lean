@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Operator/Compact.lean
-Genuine: 33 of 35 | Dissolved: 0 | Infrastructure: 2
+Genuine: 30 | Conflates: 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Bounded
@@ -331,6 +331,7 @@ theorem ContinuousLinearMap.mkOfIsCompactOperator_mem_compactOperator {f : M₁ 
 
 end Continuous
 
+-- CONFLATES (assumes ground = zero): isClosed_setOf_isCompactOperator
 theorem isClosed_setOf_isCompactOperator {𝕜₁ 𝕜₂ : Type*} [NontriviallyNormedField 𝕜₁]
     [NormedField 𝕜₂] {σ₁₂ : 𝕜₁ →+* 𝕜₂} {M₁ M₂ : Type*} [SeminormedAddCommGroup M₁]
     [AddCommGroup M₂] [NormedSpace 𝕜₁ M₁] [Module 𝕜₂ M₂] [UniformSpace M₂] [UniformAddGroup M₂]
@@ -367,6 +368,7 @@ theorem isClosed_setOf_isCompactOperator {𝕜₁ 𝕜₂ : Type*} [Nontrivially
   rw [ContinuousLinearMap.sub_apply]
   abel
 
+-- CONFLATES (assumes ground = zero): compactOperator_topologicalClosure
 theorem compactOperator_topologicalClosure {𝕜₁ 𝕜₂ : Type*} [NontriviallyNormedField 𝕜₁]
     [NormedField 𝕜₂] {σ₁₂ : 𝕜₁ →+* 𝕜₂} {M₁ M₂ : Type*} [SeminormedAddCommGroup M₁]
     [AddCommGroup M₂] [NormedSpace 𝕜₁ M₁] [Module 𝕜₂ M₂] [UniformSpace M₂] [UniformAddGroup M₂]
@@ -374,6 +376,7 @@ theorem compactOperator_topologicalClosure {𝕜₁ 𝕜₂ : Type*} [Nontrivial
     (compactOperator σ₁₂ M₁ M₂).topologicalClosure = compactOperator σ₁₂ M₁ M₂ :=
   SetLike.ext' isClosed_setOf_isCompactOperator.closure_eq
 
+-- CONFLATES (assumes ground = zero): isCompactOperator_of_tendsto
 theorem isCompactOperator_of_tendsto {ι 𝕜₁ 𝕜₂ : Type*} [NontriviallyNormedField 𝕜₁]
     [NormedField 𝕜₂] {σ₁₂ : 𝕜₁ →+* 𝕜₂} {M₁ M₂ : Type*} [SeminormedAddCommGroup M₁]
     [AddCommGroup M₂] [NormedSpace 𝕜₁ M₁] [Module 𝕜₂ M₂] [UniformSpace M₂] [UniformAddGroup M₂]

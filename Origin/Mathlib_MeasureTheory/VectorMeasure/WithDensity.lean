@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/VectorMeasure/WithDensity.lean
-Genuine: 21 of 21 | Dissolved: 0 | Infrastructure: 0
+Genuine: 19 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.VectorMeasure.Basic
@@ -97,6 +97,7 @@ theorem withDensityᵥ_sub' (hf : Integrable f μ) (hg : Integrable g μ) :
     (μ.withDensityᵥ fun x => f x - g x) = μ.withDensityᵥ f - μ.withDensityᵥ g :=
   withDensityᵥ_sub hf hg
 
+-- CONFLATES (assumes ground = zero): withDensityᵥ_smul
 @[simp]
 theorem withDensityᵥ_smul {𝕜 : Type*} [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
     [SMulCommClass ℝ 𝕜 E] (f : α → E) (r : 𝕜) : μ.withDensityᵥ (r • f) = r • μ.withDensityᵥ f := by
@@ -110,6 +111,7 @@ theorem withDensityᵥ_smul {𝕜 : Type*} [NontriviallyNormedField 𝕜] [Norme
     · rw [withDensityᵥ, withDensityᵥ, dif_neg hf, dif_neg, smul_zero]
       rwa [integrable_smul_iff hr f]
 
+-- CONFLATES (assumes ground = zero): withDensityᵥ_smul'
 theorem withDensityᵥ_smul' {𝕜 : Type*} [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
     [SMulCommClass ℝ 𝕜 E] (f : α → E) (r : 𝕜) :
     (μ.withDensityᵥ fun x => r • f x) = r • μ.withDensityᵥ f :=

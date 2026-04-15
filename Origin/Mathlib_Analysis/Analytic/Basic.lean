@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/Basic.lean
-Genuine: 148 of 152 | Dissolved: 1 | Infrastructure: 3
+Genuine: 147 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Star.Basic
@@ -269,6 +269,7 @@ theorem le_mul_pow_of_radius_pos (p : FormalMultilinearSeries 𝕜 E F) (h : 0 <
   rw [inv_pow, ← div_eq_mul_inv]
   exact hCp n
 
+-- CONFLATES (assumes ground = zero): radius_le_of_le
 lemma radius_le_of_le {𝕜' E' F' : Type*}
     [NontriviallyNormedField 𝕜'] [NormedAddCommGroup E'] [NormedSpace 𝕜' E']
     [NormedAddCommGroup F'] [NormedSpace 𝕜' F']

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Valued/ValuationTopology.lean
-Genuine: 10 of 13 | Dissolved: 2 | Infrastructure: 1
+Genuine: 10 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Nonarchimedean.Bases

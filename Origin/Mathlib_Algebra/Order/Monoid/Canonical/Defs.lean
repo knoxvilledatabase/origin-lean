@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Monoid/Canonical/Defs.lean
-Genuine: 30 of 37 | Dissolved: 3 | Infrastructure: 4
+Genuine: 30 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Units.Basic

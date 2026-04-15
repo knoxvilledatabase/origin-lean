@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoxIntegral/Partition/Basic.lean
-Genuine: 86 of 112 | Dissolved: 7 | Infrastructure: 19
+Genuine: 86 | Conflates: 0 | Dissolved: 7 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Option

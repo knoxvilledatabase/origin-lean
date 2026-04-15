@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/CommutingProbability.lean
-Genuine: 20 of 25 | Dissolved: 3 | Infrastructure: 2
+Genuine: 20 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Abelianization

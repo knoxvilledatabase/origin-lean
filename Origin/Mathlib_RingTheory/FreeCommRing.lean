@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/FreeCommRing.lean
-Genuine: 45 of 53 | Dissolved: 2 | Infrastructure: 6
+Genuine: 45 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Equiv

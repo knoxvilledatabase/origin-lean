@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Jacobian.lean
-Genuine: 174 of 268 | Dissolved: 77 | Infrastructure: 17
+Genuine: 170 | Conflates: 7 | Dissolved: 77 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.CommRing
@@ -342,6 +342,7 @@ lemma nonsingular_of_equiv {P Q : Fin 3 → R} (h : P ≈ Q) : W'.Nonsingular P 
 
 -- DISSOLVED: nonsingular_of_Z_eq_zero
 
+-- CONFLATES (assumes ground = zero): nonsingular_zero
 lemma nonsingular_zero [Nontrivial R] : W'.Nonsingular ![1, 1, 0] := by
   simp only [nonsingular_of_Z_eq_zero, equation_zero, true_and, fin3_def_ext, ← not_and_or]
   exact fun h => one_ne_zero <| by linear_combination (norm := ring1) h.1 - h.2.1
@@ -394,6 +395,7 @@ def NonsingularLift (P : PointClass R) : Prop :=
 lemma nonsingularLift_iff (P : Fin 3 → R) : W'.NonsingularLift ⟦P⟧ ↔ W'.Nonsingular P :=
   Iff.rfl
 
+-- CONFLATES (assumes ground = zero): nonsingularLift_zero
 lemma nonsingularLift_zero [Nontrivial R] : W'.NonsingularLift ⟦![1, 1, 0]⟧ :=
   nonsingular_zero
 
@@ -1046,18 +1048,22 @@ lemma mk_point {P : PointClass R} (h : W'.NonsingularLift P) : (mk h).point = P 
 instance instZeroPoint [Nontrivial R] : Zero W'.Point :=
   ⟨⟨nonsingularLift_zero⟩⟩
 
+-- CONFLATES (assumes ground = zero): zero_def
 lemma zero_def [Nontrivial R] : (0 : W'.Point) = ⟨nonsingularLift_zero⟩ :=
   rfl
 
+-- CONFLATES (assumes ground = zero): zero_point
 lemma zero_point [Nontrivial R] : (0 : W'.Point).point = ⟦![1, 1, 0]⟧ :=
   rfl
 
+-- CONFLATES (assumes ground = zero): fromAffine
 def fromAffine [Nontrivial R] : W'.toAffine.Point → W'.Point
   | 0 => 0
   | .some h => ⟨(nonsingularLift_some ..).mpr h⟩
 
 -- DISSOLVED: fromAffine_zero
 
+-- CONFLATES (assumes ground = zero): fromAffine_some
 lemma fromAffine_some [Nontrivial R] {X Y : R} (h : W'.toAffine.Nonsingular X Y) :
     fromAffine (.some h) = ⟨(nonsingularLift_some ..).mpr h⟩ :=
   rfl
@@ -1281,6 +1287,7 @@ end Map
 
 end WeierstrassCurve.Jacobian
 
+-- CONFLATES (assumes ground = zero): WeierstrassCurve.Affine.Point.toJacobian
 abbrev WeierstrassCurve.Affine.Point.toJacobian {R : Type u} [CommRing R]
     [Nontrivial R] {W : Affine R} (P : W.Point) : W.toJacobian.Point :=
   Jacobian.Point.fromAffine P

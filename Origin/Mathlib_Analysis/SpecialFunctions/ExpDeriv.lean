@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/ExpDeriv.lean
-Genuine: 65 of 65 | Dissolved: 0 | Infrastructure: 0
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.RCLike

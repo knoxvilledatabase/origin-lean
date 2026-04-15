@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Disjoint.lean
-Genuine: 112 of 152 | Dissolved: 0 | Infrastructure: 40
+Genuine: 112 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Aesop

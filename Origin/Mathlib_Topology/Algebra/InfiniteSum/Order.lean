@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Order.lean
-Genuine: 41 of 42 | Dissolved: 1 | Infrastructure: 0
+Genuine: 41 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Archimedean.Basic

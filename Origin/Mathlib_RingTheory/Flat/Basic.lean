@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Flat/Basic.lean
-Genuine: 28 of 37 | Dissolved: 0 | Infrastructure: 9
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Finsupp

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Semisimple.lean
-Genuine: 28 of 30 | Dissolved: 1 | Infrastructure: 1
+Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Perfect

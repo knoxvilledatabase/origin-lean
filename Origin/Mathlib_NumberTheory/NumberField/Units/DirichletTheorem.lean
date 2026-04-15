@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Units/DirichletTheorem.lean
-Genuine: 27 of 39 | Dissolved: 3 | Infrastructure: 9
+Genuine: 27 | Conflates: 0 | Dissolved: 3 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Gershgorin

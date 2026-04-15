@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/ConcreteSheafification.lean
-Genuine: 41 of 55 | Dissolved: 0 | Infrastructure: 14
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Plus

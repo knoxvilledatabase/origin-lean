@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monad/Equalizer.lean
-Genuine: 9 of 12 | Dissolved: 0 | Infrastructure: 3
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Reflexive

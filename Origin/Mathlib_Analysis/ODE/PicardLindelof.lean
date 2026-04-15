@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/ODE/PicardLindelof.lean
-Genuine: 42 of 49 | Dissolved: 0 | Infrastructure: 7
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Integrals

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sequences.lean
-Genuine: 35 of 42 | Dissolved: 0 | Infrastructure: 7
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Topology.Defs.Sequences

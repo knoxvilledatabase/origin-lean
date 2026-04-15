@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Quotient.lean
-Genuine: 40 of 54 | Dissolved: 0 | Infrastructure: 14
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic

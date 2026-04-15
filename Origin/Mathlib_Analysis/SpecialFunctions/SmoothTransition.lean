@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/SmoothTransition.lean
-Genuine: 27 of 28 | Dissolved: 1 | Infrastructure: 0
+Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Inv

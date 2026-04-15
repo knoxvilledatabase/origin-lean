@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Affine/AddTorsorBases.lean
-Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
+Genuine: 9 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.FiniteDimension
@@ -28,6 +28,7 @@ variable [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
 variable [MetricSpace P] [NormedAddTorsor E P]
 
+-- CONFLATES (assumes ground = zero): isOpenMap_barycentric_coord
 theorem isOpenMap_barycentric_coord [Nontrivial ι] (b : AffineBasis ι 𝕜 P) (i : ι) :
     IsOpenMap (b.coord i) :=
   AffineMap.isOpenMap_linear_iff.mp <|

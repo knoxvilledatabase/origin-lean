@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/IsPrincipal.lean
-Genuine: 12 of 17 | Dissolved: 0 | Infrastructure: 5
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.RingTheory.PrincipalIdealDomain

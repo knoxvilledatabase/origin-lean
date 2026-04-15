@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/LinearMap/Polynomial.lean
-Genuine: 51 of 56 | Dissolved: 5 | Infrastructure: 0
+Genuine: 46 | Conflates: 5 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Monad
@@ -367,12 +367,14 @@ lemma polyCharpoly_monic : (polyCharpoly φ b).Monic :=
 
 -- DISSOLVED: polyCharpoly_ne_zero
 
+-- CONFLATES (assumes ground = zero): polyCharpoly_natDegree
 @[simp]
 lemma polyCharpoly_natDegree [Nontrivial R] :
     (polyCharpoly φ b).natDegree = finrank R M := by
   rw [polyCharpoly, polyCharpolyAux, (charpoly.univ_monic _ _).natDegree_map,
     charpoly.univ_natDegree, finrank_eq_card_chooseBasisIndex]
 
+-- CONFLATES (assumes ground = zero): polyCharpoly_coeff_isHomogeneous
 lemma polyCharpoly_coeff_isHomogeneous (i j : ℕ) (hij : i + j = finrank R M) [Nontrivial R] :
     ((polyCharpoly φ b).coeff i).IsHomogeneous j := by
   rw [finrank_eq_card_chooseBasisIndex] at hij
@@ -424,12 +426,14 @@ def nilRankAux (φ : L →ₗ[R] Module.End R M) (b : Basis ι R L) : ℕ :=
 
 -- DISSOLVED: polyCharpoly_coeff_nilRankAux_ne_zero
 
+-- CONFLATES (assumes ground = zero): nilRankAux_le
 lemma nilRankAux_le [Nontrivial R] (b : Basis ι R L) (b' : Basis ι' R L) :
     nilRankAux φ b ≤ nilRankAux φ b' := by
   apply Polynomial.natTrailingDegree_le_of_ne_zero
   rw [Ne, (polyCharpoly_coeff_eq_zero_iff_of_basis φ b b' _).not]
   apply polyCharpoly_coeff_nilRankAux_ne_zero
 
+-- CONFLATES (assumes ground = zero): nilRankAux_basis_indep
 lemma nilRankAux_basis_indep [Nontrivial R] (b : Basis ι R L) (b' : Basis ι' R L) :
     nilRankAux φ b = (polyCharpoly φ b').natTrailingDegree := by
   apply le_antisymm <;> apply nilRankAux_le
@@ -484,6 +488,7 @@ variable (x : L)
 
 -- DISSOLVED: isNilRegular_iff_coeff_polyCharpoly_nilRank_ne_zero
 
+-- CONFLATES (assumes ground = zero): isNilRegular_iff_natTrailingDegree_charpoly_eq_nilRank
 lemma isNilRegular_iff_natTrailingDegree_charpoly_eq_nilRank [Nontrivial R] :
     IsNilRegular φ x ↔ (φ x).charpoly.natTrailingDegree = nilRank φ := by
   rw [isNilRegular_def]

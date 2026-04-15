@@ -1,6 +1,6 @@
 /-
 Extracted from Order/WellFoundedSet.lean
-Genuine: 107 of 115 | Dissolved: 0 | Infrastructure: 8
+Genuine: 106 | Conflates: 1 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Prod.Lex
@@ -292,6 +292,7 @@ theorem _root_.IsAntichain.partiallyWellOrderedOn_iff (hs : IsAntichain r s) :
 theorem partiallyWellOrderedOn_singleton (a : α) : PartiallyWellOrderedOn {a} r :=
   (finite_singleton a).partiallyWellOrderedOn
 
+-- CONFLATES (assumes ground = zero): Subsingleton.partiallyWellOrderedOn
 @[nontriviality]
 theorem Subsingleton.partiallyWellOrderedOn (hs : s.Subsingleton) : PartiallyWellOrderedOn s r :=
   hs.finite.partiallyWellOrderedOn

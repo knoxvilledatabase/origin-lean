@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Basic.lean
-Genuine: 98 of 120 | Dissolved: 0 | Infrastructure: 22
+Genuine: 98 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Prod

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomotopyCategory/MappingCone.lean
-Genuine: 70 of 74 | Dissolved: 0 | Infrastructure: 4
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.HomComplex

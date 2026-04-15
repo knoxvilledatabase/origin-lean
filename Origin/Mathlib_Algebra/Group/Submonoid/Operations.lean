@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Submonoid/Operations.lean
-Genuine: 127 of 158 | Dissolved: 2 | Infrastructure: 29
+Genuine: 126 | Conflates: 1 | Dissolved: 2 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful
@@ -867,6 +867,7 @@ theorem eq_bot_of_subsingleton [Subsingleton S] : S = ⊥ := by
 
 -- DISSOLVED: nontrivial_iff_exists_ne_one
 
+-- CONFLATES (assumes ground = zero): bot_or_nontrivial
 @[to_additive "An additive submonoid is either the trivial additive submonoid or nontrivial."]
 theorem bot_or_nontrivial (S : Submonoid M) : S = ⊥ ∨ Nontrivial S := by
   simp only [eq_bot_iff_forall, nontrivial_iff_exists_ne_one, ← not_forall, ← Classical.not_imp,

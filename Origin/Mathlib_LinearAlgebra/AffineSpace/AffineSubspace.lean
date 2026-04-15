@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/AffineSubspace.lean
-Genuine: 182 of 217 | Dissolved: 0 | Infrastructure: 35
+Genuine: 181 | Conflates: 1 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineEquiv
@@ -625,6 +625,7 @@ theorem affineSpan_eq_top_iff_vectorSpan_eq_top_of_nonempty {s : Set P} (hs : s.
   obtain ⟨x, hx⟩ := hs
   exact ⟨⟨x, mem_affineSpan k hx⟩⟩
 
+-- CONFLATES (assumes ground = zero): affineSpan_eq_top_iff_vectorSpan_eq_top_of_nontrivial
 theorem affineSpan_eq_top_iff_vectorSpan_eq_top_of_nontrivial {s : Set P} [Nontrivial P] :
     affineSpan k s = ⊤ ↔ vectorSpan k s = ⊤ := by
   rcases s.eq_empty_or_nonempty with hs | hs

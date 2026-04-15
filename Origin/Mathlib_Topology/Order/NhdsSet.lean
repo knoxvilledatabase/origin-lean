@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/NhdsSet.lean
-Genuine: 42 of 42 | Dissolved: 0 | Infrastructure: 0
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.Order.Basic

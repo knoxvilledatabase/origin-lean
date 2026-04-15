@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Pairwise/Basic.lean
-Genuine: 67 of 70 | Dissolved: 0 | Infrastructure: 3
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Set.Function

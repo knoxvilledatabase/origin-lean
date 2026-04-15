@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Int.lean
-Genuine: 33 of 52 | Dissolved: 5 | Infrastructure: 14
+Genuine: 33 | Conflates: 0 | Dissolved: 5 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Even

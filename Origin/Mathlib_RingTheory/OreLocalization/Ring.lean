@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/OreLocalization/Ring.lean
-Genuine: 15 of 32 | Dissolved: 5 | Infrastructure: 12
+Genuine: 13 | Conflates: 2 | Dissolved: 5 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
@@ -205,10 +205,12 @@ theorem subsingleton_iff :
     OreLocalization.zero_def, oreDiv_eq_iff]
   simp
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff
 theorem nontrivial_iff :
     Nontrivial R[S⁻¹] ↔ 0 ∉ S := by
   rw [← not_subsingleton_iff_nontrivial, subsingleton_iff]
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_nonZeroDivisors
 theorem nontrivial_of_nonZeroDivisors [Nontrivial R] (hS : S ≤ R⁰) :
     Nontrivial R[S⁻¹] :=
   nontrivial_iff.mpr (fun e ↦ one_ne_zero <| hS e 1 (mul_zero _))

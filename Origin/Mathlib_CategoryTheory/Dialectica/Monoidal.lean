@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Dialectica/Monoidal.lean
-Genuine: 19 of 22 | Dissolved: 0 | Infrastructure: 3
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Lattice

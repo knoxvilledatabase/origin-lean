@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/RingedSpace/Basic.lean
-Genuine: 20 of 22 | Dissolved: 0 | Infrastructure: 2
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Ring.Colimits

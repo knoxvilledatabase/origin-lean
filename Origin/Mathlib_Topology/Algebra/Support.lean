@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Support.lean
-Genuine: 46 of 49 | Dissolved: 0 | Infrastructure: 3
+Genuine: 43 | Conflates: 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Indicator
@@ -68,10 +68,12 @@ theorem range_eq_image_mulTSupport_or (f : X → α) :
     range f = f '' mulTSupport f ∨ range f = insert 1 (f '' mulTSupport f) :=
   (wcovBy_insert _ _).eq_or_eq (image_subset_range _ _) (range_subset_insert_image_mulTSupport f)
 
+-- CONFLATES (assumes ground = zero): tsupport_mul_subset_left
 theorem tsupport_mul_subset_left {α : Type*} [MulZeroClass α] {f g : X → α} :
     (tsupport fun x => f x * g x) ⊆ tsupport f :=
   closure_mono (support_mul_subset_left _ _)
 
+-- CONFLATES (assumes ground = zero): tsupport_mul_subset_right
 theorem tsupport_mul_subset_right {α : Type*} [MulZeroClass α] {f g : X → α} :
     (tsupport fun x => f x * g x) ⊆ tsupport g :=
   closure_mono (support_mul_subset_right _ _)
@@ -82,6 +84,7 @@ theorem tsupport_smul_subset_left {M α} [TopologicalSpace X] [Zero M] [Zero α]
     (f : X → M) (g : X → α) : (tsupport fun x => f x • g x) ⊆ tsupport f :=
   closure_mono <| support_smul_subset_left f g
 
+-- CONFLATES (assumes ground = zero): tsupport_smul_subset_right
 theorem tsupport_smul_subset_right {M α} [TopologicalSpace X] [Zero α] [SMulZeroClass M α]
     (f : X → M) (g : X → α) : (tsupport fun x => f x • g x) ⊆ tsupport g :=
   closure_mono <| support_smul_subset_right f g
@@ -424,6 +427,7 @@ theorem LocallyFinite.smul_left [Zero R] [Zero M] [SMulWithZero R M]
     LocallyFinite fun i ↦ support <| s i • f i :=
   h.subset fun i x ↦ mt <| fun h ↦ by rw [Pi.smul_apply', h, zero_smul]
 
+-- CONFLATES (assumes ground = zero): LocallyFinite.smul_right
 theorem LocallyFinite.smul_right [Zero M] [SMulZeroClass R M]
     {f : ι → X → M} (h : LocallyFinite fun i ↦ support <| f i) (s : ι → X → R) :
     LocallyFinite fun i ↦ support <| s i • f i :=

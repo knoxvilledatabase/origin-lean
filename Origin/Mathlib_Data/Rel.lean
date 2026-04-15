@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rel.lean
-Genuine: 69 of 78 | Dissolved: 0 | Infrastructure: 9
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Order.CompleteLattice

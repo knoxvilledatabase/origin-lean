@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/NatInt.lean
-Genuine: 40 of 46 | Dissolved: 3 | Infrastructure: 3
+Genuine: 40 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Group

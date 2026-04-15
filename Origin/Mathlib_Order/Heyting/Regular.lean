@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Heyting/Regular.lean
-Genuine: 20 of 42 | Dissolved: 0 | Infrastructure: 22
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Order.GaloisConnection

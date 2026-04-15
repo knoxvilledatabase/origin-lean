@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Star/Basic.lean
-Genuine: 38 of 47 | Dissolved: 0 | Infrastructure: 9
+Genuine: 36 | Conflates: 2 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations
@@ -239,10 +239,12 @@ theorem conjugate_pos {a : R} (ha : 0 < a) {c : R} (hc : IsRegular c) : 0 < star
 theorem conjugate_pos' {a : R} (ha : 0 < a) {c : R} (hc : IsRegular c) : 0 < c * a * star c := by
   simpa only [star_star] using conjugate_pos ha hc.star
 
+-- CONFLATES (assumes ground = zero): star_mul_self_pos
 theorem star_mul_self_pos [Nontrivial R] {x : R} (hx : IsRegular x) : 0 < star x * x := by
   rw [(star_mul_self_nonneg _).lt_iff_ne, ← mul_zero (star x), hx.star.left.ne_iff]
   exact hx.ne_zero.symm
 
+-- CONFLATES (assumes ground = zero): mul_star_self_pos
 theorem mul_star_self_pos [Nontrivial R] {x : R} (hx : IsRegular x) : 0 < x * star x := by
   simpa using star_mul_self_pos hx.star
 

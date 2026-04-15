@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/SimpleFuncDenseLp.lean
-Genuine: 66 of 89 | Dissolved: 13 | Infrastructure: 10
+Genuine: 66 | Conflates: 0 | Dissolved: 13 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.L1Space

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Basic.lean
-Genuine: 111 of 129 | Dissolved: 3 | Infrastructure: 15
+Genuine: 111 | Conflates: 0 | Dissolved: 3 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Basic

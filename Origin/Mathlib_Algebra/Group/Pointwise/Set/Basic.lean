@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Pointwise/Set/Basic.lean
-Genuine: 268 of 305 | Dissolved: 5 | Infrastructure: 32
+Genuine: 265 | Conflates: 3 | Dissolved: 5 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic
@@ -1137,11 +1137,13 @@ section IsLeftCancelMul
 
 variable [Mul α] [IsLeftCancelMul α] {s t : Set α}
 
+-- CONFLATES (assumes ground = zero): Nontrivial.mul_left
 @[to_additive]
 lemma Nontrivial.mul_left : t.Nontrivial → s.Nonempty → (s * t).Nontrivial := by
   rintro ⟨a, ha, b, hb, hab⟩ ⟨c, hc⟩
   exact ⟨c * a, mul_mem_mul hc ha, c * b, mul_mem_mul hc hb, by simpa⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.mul
 @[to_additive]
 lemma Nontrivial.mul (hs : s.Nontrivial) (ht : t.Nontrivial) : (s * t).Nontrivial :=
   ht.mul_left hs.nonempty
@@ -1152,6 +1154,7 @@ section IsRightCancelMul
 
 variable [Mul α] [IsRightCancelMul α] {s t : Set α}
 
+-- CONFLATES (assumes ground = zero): Nontrivial.mul_right
 @[to_additive]
 lemma Nontrivial.mul_right : s.Nontrivial → t.Nonempty → (s * t).Nontrivial := by
   rintro ⟨a, ha, b, hb, hab⟩ ⟨c, hc⟩

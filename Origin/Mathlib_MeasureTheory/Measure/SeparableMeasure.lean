@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/SeparableMeasure.lean
-Genuine: 11 of 14 | Dissolved: 0 | Infrastructure: 3
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp

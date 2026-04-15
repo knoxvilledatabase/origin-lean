@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Free.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 1 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.FinitePresentation
@@ -66,6 +66,7 @@ lemma Module.FinitePresentation.exists_basis_localizedModule_powers
 
 include f in
 
+-- CONFLATES (assumes ground = zero): Module.FinitePresentation.exists_free_localizedModule_powers
 lemma Module.FinitePresentation.exists_free_localizedModule_powers
     (Rₛ) [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ M'] [IsScalarTower R Rₛ M'] [Nontrivial Rₛ]
     [IsLocalization S Rₛ] [Module.FinitePresentation R M] [Module.Free Rₛ M'] :

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/IntegralEqImproper.lean
-Genuine: 106 of 113 | Dissolved: 3 | Infrastructure: 4
+Genuine: 106 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Support

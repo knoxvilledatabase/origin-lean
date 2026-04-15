@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ModularForms/Basic.lean
-Genuine: 14 of 72 | Dissolved: 0 | Infrastructure: 58
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 58
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Algebra

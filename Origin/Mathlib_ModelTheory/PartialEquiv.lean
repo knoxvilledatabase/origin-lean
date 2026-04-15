@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/PartialEquiv.lean
-Genuine: 43 of 60 | Dissolved: 0 | Infrastructure: 17
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.ModelTheory.DirectLimit

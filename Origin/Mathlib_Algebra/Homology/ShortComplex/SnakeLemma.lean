@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ShortComplex/SnakeLemma.lean
-Genuine: 63 of 83 | Dissolved: 0 | Infrastructure: 20
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ExactSequence

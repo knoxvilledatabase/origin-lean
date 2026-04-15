@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/Sign.lean
-Genuine: 2 of 5 | Dissolved: 1 | Infrastructure: 2
+Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Sign

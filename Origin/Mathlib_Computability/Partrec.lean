@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/Partrec.lean
-Genuine: 109 of 114 | Dissolved: 0 | Infrastructure: 5
+Genuine: 109 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Computability.Primrec

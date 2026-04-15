@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Category/ProfiniteGrp/Basic.lean
-Genuine: 14 of 30 | Dissolved: 0 | Infrastructure: 16
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.FiniteGrp

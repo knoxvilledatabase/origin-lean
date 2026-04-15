@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Image.lean
-Genuine: 96 of 120 | Dissolved: 0 | Infrastructure: 24
+Genuine: 96 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Basic

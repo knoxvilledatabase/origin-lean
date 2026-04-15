@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Iso.lean
-Genuine: 76 of 96 | Dissolved: 0 | Infrastructure: 20
+Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Reassoc

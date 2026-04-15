@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Cardinal.lean
-Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
+Genuine: 3 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Equiv
@@ -25,6 +25,7 @@ section TwoUniverses
 
 variable {σ : Type u} {R : Type v} [CommSemiring R]
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_max_lift
 @[simp]
 theorem cardinalMk_eq_max_lift [Nonempty σ] [Nontrivial R] :
     #(MvPolynomial σ R) = max (max (Cardinal.lift.{u} #R) <| Cardinal.lift.{v} #σ) ℵ₀ :=
@@ -35,6 +36,7 @@ theorem cardinalMk_eq_max_lift [Nonempty σ] [Nontrivial R] :
 theorem cardinalMk_eq_lift [IsEmpty σ] : #(MvPolynomial σ R) = Cardinal.lift.{u} #R :=
   ((isEmptyRingEquiv R σ).toEquiv.trans Equiv.ulift.{u}.symm).cardinal_eq
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_one
 @[nontriviality]
 theorem cardinalMk_eq_one [Subsingleton R] : #(MvPolynomial σ R) = 1 := mk_eq_one _
 
@@ -50,6 +52,7 @@ end TwoUniverses
 
 variable {σ R : Type u} [CommSemiring R]
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_max
 theorem cardinalMk_eq_max [Nonempty σ] [Nontrivial R] :
     #(MvPolynomial σ R) = max (max #R #σ) ℵ₀ := by simp
 

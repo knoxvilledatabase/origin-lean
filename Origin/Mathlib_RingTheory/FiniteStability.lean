@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/FiniteStability.lean
-Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness

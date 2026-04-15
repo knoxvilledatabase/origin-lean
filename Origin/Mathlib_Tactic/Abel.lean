@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Abel.lean
-Genuine: 54 of 60 | Dissolved: 0 | Infrastructure: 6
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Subset.lean
-Genuine: 25 of 25 | Dissolved: 0 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Set.Function

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ShortComplex/Homology.lean
-Genuine: 131 of 157 | Dissolved: 0 | Infrastructure: 26
+Genuine: 131 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.RightHomology

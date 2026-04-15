@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/FunProp/RefinedDiscrTree.lean
-Genuine: 71 of 81 | Dissolved: 0 | Infrastructure: 10
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Tactic.FunProp.StateList

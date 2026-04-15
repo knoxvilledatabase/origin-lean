@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Monic.lean
-Genuine: 62 of 74 | Dissolved: 11 | Infrastructure: 1
+Genuine: 57 | Conflates: 5 | Dissolved: 11 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
@@ -185,6 +185,7 @@ theorem nextCoeff_pow (hp : p.Monic) (n : ℕ) : (p ^ n).nextCoeff = n • p.nex
   | zero => rw [pow_zero, zero_smul, ← map_one (f := C), nextCoeff_C_eq_zero]
   | succ n ih => rw [pow_succ, (hp.pow n).nextCoeff_mul hp, ih, succ_nsmul]
 
+-- CONFLATES (assumes ground = zero): eq_one_of_map_eq_one
 theorem eq_one_of_map_eq_one {S : Type*} [Semiring S] [Nontrivial S] (f : R →+* S) (hp : p.Monic)
     (map_eq : p.map f = 1) : p = 1 := by
   nontriviality R
@@ -204,6 +205,7 @@ theorem natDegree_pow (hp : p.Monic) (n : ℕ) : (p ^ n).natDegree = n * p.natDe
 
 end Monic
 
+-- CONFLATES (assumes ground = zero): natDegree_pow_X_add_C
 @[simp]
 theorem natDegree_pow_X_add_C [Nontrivial R] (n : ℕ) (r : R) : ((X + C r) ^ n).natDegree = n := by
   rw [(monic_X_add_C r).natDegree_pow, natDegree_X_add_C, mul_one]
@@ -332,6 +334,7 @@ section Semiring
 
 variable [Semiring R]
 
+-- CONFLATES (assumes ground = zero): Monic.natDegree_map
 @[simp]
 theorem Monic.natDegree_map [Semiring S] [Nontrivial S] {P : R[X]} (hmo : P.Monic) (f : R →+* S) :
     (P.map f).natDegree = P.natDegree := by
@@ -339,6 +342,7 @@ theorem Monic.natDegree_map [Semiring S] [Nontrivial S] {P : R[X]} (hmo : P.Moni
   rw [coeff_map, Monic.coeff_natDegree hmo, RingHom.map_one]
   exact one_ne_zero
 
+-- CONFLATES (assumes ground = zero): Monic.degree_map
 @[simp]
 theorem Monic.degree_map [Semiring S] [Nontrivial S] {P : R[X]} (hmo : P.Monic) (f : R →+* S) :
     (P.map f).degree = P.degree := by
@@ -406,6 +410,7 @@ theorem monic_X_pow_sub {n : ℕ} (H : degree p < n) : Monic (X ^ n - p) := by
 
 -- DISSOLVED: monic_X_pow_sub_C
 
+-- CONFLATES (assumes ground = zero): not_isUnit_X_pow_sub_one
 theorem not_isUnit_X_pow_sub_one (R : Type*) [CommRing R] [Nontrivial R] (n : ℕ) :
     ¬IsUnit (X ^ n - 1 : R[X]) := by
   intro h

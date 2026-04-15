@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Cofinality.lean
-Genuine: 148 of 155 | Dissolved: 3 | Infrastructure: 4
+Genuine: 148 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Arithmetic

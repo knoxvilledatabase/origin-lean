@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Prod.lean
-Genuine: 12 of 13 | Dissolved: 0 | Infrastructure: 1
+Genuine: 10 | Conflates: 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Bilinear
@@ -135,6 +135,7 @@ section FirstSecond
 
 variable (𝕜 E F)
 
+-- CONFLATES (assumes ground = zero): norm_fst
 @[simp] lemma norm_fst [NormedAddCommGroup E] [NormedSpace 𝕜 E]
     [SeminormedAddCommGroup F] [NormedSpace 𝕜 F] [Nontrivial E] :
     ‖fst 𝕜 E F‖ = 1 := by
@@ -144,6 +145,7 @@ variable (𝕜 E F)
   rw [norm_zero, max_eq_left (norm_nonneg e)] at this
   rwa [← mul_le_mul_iff_of_pos_right (norm_pos_iff.mpr he), one_mul]
 
+-- CONFLATES (assumes ground = zero): norm_snd
 @[simp] lemma norm_snd [SeminormedAddCommGroup E] [NormedSpace 𝕜 E]
     [NormedAddCommGroup F] [NormedSpace 𝕜 F] [Nontrivial F]  :
     ‖snd 𝕜 E F‖ = 1 := by

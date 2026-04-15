@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/OrdinaryHypergeometric.lean
-Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.OfScalars

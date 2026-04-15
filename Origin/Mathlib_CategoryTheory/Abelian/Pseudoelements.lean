@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Abelian/Pseudoelements.lean
-Genuine: 33 of 41 | Dissolved: 0 | Infrastructure: 8
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Abelian.Exact

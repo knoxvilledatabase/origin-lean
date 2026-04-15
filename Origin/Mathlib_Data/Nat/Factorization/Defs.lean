@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Factorization/Defs.lean
-Genuine: 20 of 31 | Dissolved: 9 | Infrastructure: 2
+Genuine: 20 | Conflates: 0 | Dissolved: 9 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Multiset

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Ordering/Basic.lean
-Genuine: 3 of 7 | Dissolved: 0 | Infrastructure: 4
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Batteries.Tactic.Alias

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/RegularMono.lean
-Genuine: 15 of 27 | Dissolved: 0 | Infrastructure: 12
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback

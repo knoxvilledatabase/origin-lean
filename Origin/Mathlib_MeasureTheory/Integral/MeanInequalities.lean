@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/MeanInequalities.lean
-Genuine: 15 of 21 | Dissolved: 5 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.Lebesgue

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/NNNorm.lean
-Genuine: 21 of 22 | Dissolved: 1 | Infrastructure: 0
+Genuine: 15 | Conflates: 6 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
@@ -112,6 +112,7 @@ theorem exists_mul_lt_of_lt_opNorm (f : E →SL[σ₁₂] F) {r : ℝ} (hr₀ : 
 
 alias exists_mul_lt_of_lt_op_norm := exists_mul_lt_of_lt_opNorm
 
+-- CONFLATES (assumes ground = zero): exists_lt_apply_of_lt_opNNNorm
 theorem exists_lt_apply_of_lt_opNNNorm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup E]
     [SeminormedAddCommGroup F] [DenselyNormedField 𝕜] [NontriviallyNormedField 𝕜₂] {σ₁₂ : 𝕜 →+* 𝕜₂}
     [NormedSpace 𝕜 E] [NormedSpace 𝕜₂ F] [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F) {r : ℝ≥0}
@@ -130,6 +131,7 @@ theorem exists_lt_apply_of_lt_opNNNorm {𝕜 𝕜₂ E F : Type*} [NormedAddComm
 
 alias exists_lt_apply_of_lt_op_nnnorm := exists_lt_apply_of_lt_opNNNorm
 
+-- CONFLATES (assumes ground = zero): exists_lt_apply_of_lt_opNorm
 theorem exists_lt_apply_of_lt_opNorm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup E]
     [SeminormedAddCommGroup F] [DenselyNormedField 𝕜] [NontriviallyNormedField 𝕜₂] {σ₁₂ : 𝕜 →+* 𝕜₂}
     [NormedSpace 𝕜 E] [NormedSpace 𝕜₂ F] [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F) {r : ℝ}
@@ -141,6 +143,7 @@ theorem exists_lt_apply_of_lt_opNorm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGr
 
 alias exists_lt_apply_of_lt_op_norm := exists_lt_apply_of_lt_opNorm
 
+-- CONFLATES (assumes ground = zero): sSup_unit_ball_eq_nnnorm
 theorem sSup_unit_ball_eq_nnnorm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup E]
     [SeminormedAddCommGroup F] [DenselyNormedField 𝕜] [NontriviallyNormedField 𝕜₂] {σ₁₂ : 𝕜 →+* 𝕜₂}
     [NormedSpace 𝕜 E] [NormedSpace 𝕜₂ F] [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F) :
@@ -152,12 +155,14 @@ theorem sSup_unit_ball_eq_nnnorm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup 
   · obtain ⟨x, hx, hxf⟩ := f.exists_lt_apply_of_lt_opNNNorm hub
     exact ⟨_, ⟨x, mem_ball_zero_iff.2 hx, rfl⟩, hxf⟩
 
+-- CONFLATES (assumes ground = zero): sSup_unit_ball_eq_norm
 theorem sSup_unit_ball_eq_norm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup E] [SeminormedAddCommGroup F]
     [DenselyNormedField 𝕜] [NontriviallyNormedField 𝕜₂] {σ₁₂ : 𝕜 →+* 𝕜₂} [NormedSpace 𝕜 E]
     [NormedSpace 𝕜₂ F] [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F) :
     sSup ((fun x => ‖f x‖) '' ball 0 1) = ‖f‖ := by
   simpa only [NNReal.coe_sSup, Set.image_image] using NNReal.coe_inj.2 f.sSup_unit_ball_eq_nnnorm
 
+-- CONFLATES (assumes ground = zero): sSup_closed_unit_ball_eq_nnnorm
 theorem sSup_closed_unit_ball_eq_nnnorm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup E]
     [SeminormedAddCommGroup F] [DenselyNormedField 𝕜] [NontriviallyNormedField 𝕜₂] {σ₁₂ : 𝕜 →+* 𝕜₂}
     [NormedSpace 𝕜 E] [NormedSpace 𝕜₂ F] [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F) :
@@ -170,6 +175,7 @@ theorem sSup_closed_unit_ball_eq_nnnorm {𝕜 𝕜₂ E F : Type*} [NormedAddCom
   exact csSup_le_csSup ⟨‖f‖₊, hbdd⟩ ((nonempty_ball.2 zero_lt_one).image _)
     (Set.image_subset _ ball_subset_closedBall)
 
+-- CONFLATES (assumes ground = zero): sSup_closed_unit_ball_eq_norm
 theorem sSup_closed_unit_ball_eq_norm {𝕜 𝕜₂ E F : Type*} [NormedAddCommGroup E]
     [SeminormedAddCommGroup F] [DenselyNormedField 𝕜] [NontriviallyNormedField 𝕜₂] {σ₁₂ : 𝕜 →+* 𝕜₂}
     [NormedSpace 𝕜 E] [NormedSpace 𝕜₂ F] [RingHomIsometric σ₁₂] (f : E →SL[σ₁₂] F) :

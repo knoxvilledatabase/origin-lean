@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/PreservesSheafification.lean
-Genuine: 16 of 22 | Dissolved: 0 | Infrastructure: 6
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Localization

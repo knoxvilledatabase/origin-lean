@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/Identities.lean
-Genuine: 17 of 19 | Dissolved: 2 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Frobenius

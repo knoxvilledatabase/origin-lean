@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ZMod/IntUnitsPower.lean
-Genuine: 12 of 18 | Dissolved: 0 | Infrastructure: 6
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Divisibility

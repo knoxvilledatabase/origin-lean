@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Conv.lean
-Genuine: 1 of 6 | Dissolved: 0 | Infrastructure: 5
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Comon_

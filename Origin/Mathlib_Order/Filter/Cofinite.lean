@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Cofinite.lean
-Genuine: 38 of 41 | Dissolved: 0 | Infrastructure: 3
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Prod

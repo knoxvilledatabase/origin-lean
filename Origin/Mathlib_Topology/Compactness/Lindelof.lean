@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactness/Lindelof.lean
-Genuine: 94 of 109 | Dissolved: 0 | Infrastructure: 15
+Genuine: 94 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Topology.Bases

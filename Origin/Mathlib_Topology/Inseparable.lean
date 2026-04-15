@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Inseparable.lean
-Genuine: 134 of 153 | Dissolved: 0 | Infrastructure: 19
+Genuine: 134 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Tactic.TFAE

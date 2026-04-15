@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LocalProperties/Reduced.lean
-Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.LocalProperties.Basic

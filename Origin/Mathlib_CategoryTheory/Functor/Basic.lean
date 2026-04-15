@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Functor/Basic.lean
-Genuine: 7 of 12 | Dissolved: 0 | Infrastructure: 5
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/VectorBundle/Basic.lean
-Genuine: 43 of 52 | Dissolved: 0 | Infrastructure: 9
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.Atlas

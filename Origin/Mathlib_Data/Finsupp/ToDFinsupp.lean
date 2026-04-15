@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/ToDFinsupp.lean
-Genuine: 21 of 34 | Dissolved: 9 | Infrastructure: 4
+Genuine: 21 | Conflates: 0 | Dissolved: 9 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Equiv.Defs

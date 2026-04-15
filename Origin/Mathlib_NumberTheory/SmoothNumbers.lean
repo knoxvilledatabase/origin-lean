@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/SmoothNumbers.lean
-Genuine: 45 of 64 | Dissolved: 12 | Infrastructure: 7
+Genuine: 45 | Conflates: 0 | Dissolved: 12 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Factorization.Defs

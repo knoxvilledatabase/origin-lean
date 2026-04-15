@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Support.lean
-Genuine: 80 of 93 | Dissolved: 4 | Infrastructure: 9
+Genuine: 80 | Conflates: 0 | Dissolved: 4 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Basic

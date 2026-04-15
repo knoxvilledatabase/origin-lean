@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Multiset/Fintype.lean
-Genuine: 25 of 30 | Dissolved: 0 | Infrastructure: 5
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

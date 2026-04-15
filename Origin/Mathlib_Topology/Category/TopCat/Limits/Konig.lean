@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/TopCat/Limits/Konig.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Filtered.Basic

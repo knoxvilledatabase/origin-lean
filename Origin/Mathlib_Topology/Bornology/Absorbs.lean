@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Bornology/Absorbs.lean
-Genuine: 35 of 38 | Dissolved: 0 | Infrastructure: 3
+Genuine: 34 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Set.Pointwise.SMul
@@ -118,6 +118,7 @@ protected lemma add [AddZeroClass E] [DistribSMul M E]
     (h₁ : Absorbs M s₁ t₁) (h₂ : Absorbs M s₂ t₂) : Absorbs M (s₁ + s₂) (t₁ + t₂) :=
   h₂.mp <| h₁.eventually.mono fun x hx₁ hx₂ ↦ by rw [smul_add]; exact add_subset_add hx₁ hx₂
 
+-- CONFLATES (assumes ground = zero): zero
 protected lemma zero [Zero E] [SMulZeroClass M E] {s : Set E} (hs : 0 ∈ s) : Absorbs M s 0 :=
   Eventually.of_forall fun _ ↦ zero_subset.2 <| zero_mem_smul_set hs
 

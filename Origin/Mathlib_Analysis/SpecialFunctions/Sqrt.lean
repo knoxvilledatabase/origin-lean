@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Sqrt.lean
-Genuine: 1 of 23 | Dissolved: 22 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 22 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Basic

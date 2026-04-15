@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Continuous.lean
-Genuine: 19 of 20 | Dissolved: 0 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed

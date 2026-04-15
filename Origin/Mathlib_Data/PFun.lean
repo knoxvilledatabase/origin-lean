@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PFun.lean
-Genuine: 78 of 106 | Dissolved: 0 | Infrastructure: 28
+Genuine: 78 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Data.Part

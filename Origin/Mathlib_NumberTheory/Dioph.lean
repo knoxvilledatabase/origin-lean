@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Dioph.lean
-Genuine: 58 of 84 | Dissolved: 0 | Infrastructure: 26
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Data.Fin.Fin2

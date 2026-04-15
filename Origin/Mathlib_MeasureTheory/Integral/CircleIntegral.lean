@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/CircleIntegral.lean
-Genuine: 59 of 64 | Dissolved: 4 | Infrastructure: 1
+Genuine: 59 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoxIntegral/Partition/Filter.lean
-Genuine: 40 of 49 | Dissolved: 0 | Infrastructure: 9
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.SubboxInduction

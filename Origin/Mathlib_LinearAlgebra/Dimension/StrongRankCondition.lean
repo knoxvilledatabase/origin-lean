@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/StrongRankCondition.lean
-Genuine: 40 of 41 | Dissolved: 0 | Infrastructure: 1
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Basis.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Quaternion.lean
-Genuine: 134 of 323 | Dissolved: 1 | Infrastructure: 188
+Genuine: 130 | Conflates: 4 | Dissolved: 1 | Infrastructure: 188
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv
@@ -337,6 +337,7 @@ instance [SMulCommClass S T R] : SMulCommClass S T ℍ[R,c₁,c₂] where
 
 @[simp] theorem smul_imK : (s • a).imK = s • a.imK := rfl
 
+-- CONFLATES (assumes ground = zero): smul_im
 @[simp] theorem smul_im {S} [CommRing R] [SMulZeroClass S R] (s : S) : (s • a).im = s • a.im :=
   QuaternionAlgebra.ext (smul_zero s).symm rfl rfl rfl
 
@@ -347,6 +348,7 @@ theorem smul_mk (re im_i im_j im_k : R) :
 
 end SMul
 
+-- CONFLATES (assumes ground = zero): coe_smul
 @[simp, norm_cast]
 theorem coe_smul [Zero R] [SMulZeroClass S R] (s : S) (r : R) :
     (↑(s • r) : ℍ[R,c₁,c₂]) = s • (r : ℍ[R,c₁,c₂]) :=
@@ -940,10 +942,12 @@ theorem smul_re [SMul S R] (s : S) : (s • a).re = s • a.re :=
 
 @[simp] theorem smul_imK [SMul S R] (s : S) : (s • a).imK = s • a.imK := rfl
 
+-- CONFLATES (assumes ground = zero): smul_im
 @[simp]
 nonrec theorem smul_im [SMulZeroClass S R] (s : S) : (s • a).im = s • a.im :=
   a.smul_im s
 
+-- CONFLATES (assumes ground = zero): coe_smul
 @[simp, norm_cast]
 theorem coe_smul [SMulZeroClass S R] (s : S) (r : R) : (↑(s • r) : ℍ[R]) = s • (r : ℍ[R]) :=
   QuaternionAlgebra.coe_smul _ _

@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Basic.lean
-Genuine: 84 of 141 | Dissolved: 0 | Infrastructure: 57
+Genuine: 84 | Conflates: 0 | Dissolved: 0 | Infrastructure: 57
 -/
 import Origin.Core
 import Mathlib.Data.Fin.VecNotation

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/BorelSpace/Basic.lean
-Genuine: 46 of 102 | Dissolved: 0 | Infrastructure: 56
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 56
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Arithmetic

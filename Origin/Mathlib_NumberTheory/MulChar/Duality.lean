@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/MulChar/Duality.lean
-Genuine: 2 of 5 | Dissolved: 2 | Infrastructure: 1
+Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.GroupTheory.FiniteAbelian.Duality

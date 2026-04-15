@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Subring/Pointwise.lean
-Genuine: 12 of 24 | Dissolved: 6 | Infrastructure: 6
+Genuine: 12 | Conflates: 0 | Dissolved: 6 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise

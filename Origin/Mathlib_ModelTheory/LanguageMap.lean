@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/LanguageMap.lean
-Genuine: 50 of 77 | Dissolved: 0 | Infrastructure: 27
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.ModelTheory.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from RepresentationTheory/GroupCohomology/LowDegree.lean
-Genuine: 105 of 121 | Dissolved: 0 | Infrastructure: 16
+Genuine: 105 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat

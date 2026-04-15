@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Liouville.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.CauchyIntegral
@@ -106,6 +106,7 @@ theorem exists_eq_const_of_bounded {f : E → F} (hf : Differentiable ℂ f)
     (hb : IsBounded (range f)) : ∃ c, f = const E c :=
   (hf.exists_const_forall_eq_of_bounded hb).imp fun _ => funext
 
+-- CONFLATES (assumes ground = zero): eq_const_of_tendsto_cocompact
 theorem eq_const_of_tendsto_cocompact [Nontrivial E] {f : E → F} (hf : Differentiable ℂ f) {c : F}
     (hb : Tendsto f (cocompact E) (𝓝 c)) : f = Function.const E c := by
   have h_bdd : Bornology.IsBounded (Set.range f) := by
@@ -119,6 +120,7 @@ theorem eq_const_of_tendsto_cocompact [Nontrivial E] {f : E → F} (hf : Differe
   convert hc'
   exact tendsto_nhds_unique hb (by simpa [hc'] using tendsto_const_nhds)
 
+-- CONFLATES (assumes ground = zero): apply_eq_of_tendsto_cocompact
 theorem apply_eq_of_tendsto_cocompact [Nontrivial E] {f : E → F} (hf : Differentiable ℂ f) {c : F}
     (x : E) (hb : Tendsto f (cocompact E) (𝓝 c)) : f x = c :=
   congr($(hf.eq_const_of_tendsto_cocompact hb) x)

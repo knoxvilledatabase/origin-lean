@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Basis/Flag.lean
-Genuine: 17 of 18 | Dissolved: 0 | Infrastructure: 1
+Genuine: 14 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Basis.Cardinality
@@ -47,6 +47,7 @@ theorem self_mem_flag (b : Basis (Fin n) R M) {i : Fin n} {k : Fin (n + 1)} (h :
     b i ∈ b.flag k :=
   subset_span <| mem_image_of_mem _ h
 
+-- CONFLATES (assumes ground = zero): self_mem_flag_iff
 @[simp]
 theorem self_mem_flag_iff [Nontrivial R] (b : Basis (Fin n) R M) {i : Fin n} {k : Fin (n + 1)} :
     b i ∈ b.flag k ↔ i.castSucc < k :=
@@ -59,6 +60,7 @@ theorem flag_mono (b : Basis (Fin n) R M) : Monotone b.flag :=
 theorem isChain_range_flag (b : Basis (Fin n) R M) : IsChain (· ≤ ·) (range b.flag) :=
   b.flag_mono.isChain_range
 
+-- CONFLATES (assumes ground = zero): flag_strictMono
 @[mono]
 theorem flag_strictMono [Nontrivial R] (b : Basis (Fin n) R M) : StrictMono b.flag :=
   Fin.strictMono_iff_lt_succ.2 fun _ ↦ by simp [flag_succ]
@@ -69,6 +71,7 @@ section CommRing
 
 variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] {n : ℕ}
 
+-- CONFLATES (assumes ground = zero): flag_le_ker_coord_iff
 @[simp]
 theorem flag_le_ker_coord_iff [Nontrivial R] (b : Basis (Fin n) R M) {k : Fin (n + 1)} {l : Fin n} :
     b.flag k ≤ LinearMap.ker (b.coord l) ↔ k ≤ l.castSucc := by

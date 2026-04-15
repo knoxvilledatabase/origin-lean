@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/NegOnePow.lean
-Genuine: 18 of 21 | Dissolved: 0 | Infrastructure: 3
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Int.Parity

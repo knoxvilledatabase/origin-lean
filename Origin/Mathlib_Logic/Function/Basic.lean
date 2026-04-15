@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Function/Basic.lean
-Genuine: 170 of 198 | Dissolved: 0 | Infrastructure: 28
+Genuine: 169 | Conflates: 1 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Data.Set.Defs
@@ -470,6 +470,7 @@ theorem update_apply {β : Sort*} (f : α → β) (a' : α) (b : β) (a : α) :
     update f a' b a = if a = a' then b else f a := by
   rcases Decidable.eq_or_ne a a' with rfl | hne <;> simp [*]
 
+-- CONFLATES (assumes ground = zero): update_eq_const_of_subsingleton
 @[nontriviality]
 theorem update_eq_const_of_subsingleton [Subsingleton α] (a : α) (v : α') (f : α → α') :
     update f a v = const α v :=

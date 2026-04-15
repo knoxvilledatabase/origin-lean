@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/CharacterModule.lean
-Genuine: 17 of 25 | Dissolved: 1 | Infrastructure: 7
+Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Basic

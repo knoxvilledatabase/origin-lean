@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Triangularizable.lean
-Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
+Genuine: 6 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Eigenspace.Basic
@@ -45,6 +45,7 @@ variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
 namespace Module.End
 
+-- CONFLATES (assumes ground = zero): exists_hasEigenvalue_of_genEigenspace_eq_top
 theorem exists_hasEigenvalue_of_genEigenspace_eq_top [Nontrivial M] {f : End R M} (k : ℕ∞)
     (hf : ⨆ μ, f.genEigenspace μ k = ⊤) :
     ∃ μ, f.HasEigenvalue μ := by
@@ -53,12 +54,14 @@ theorem exists_hasEigenvalue_of_genEigenspace_eq_top [Nontrivial M] {f : End R M
     exact HasUnifEigenvalue.lt zero_lt_one hμ
   simp [HasUnifEigenvalue, ← not_forall, ← iSup_eq_bot, hf]
 
+-- CONFLATES (assumes ground = zero): exists_hasEigenvalue_of_iSup_genEigenspace_eq_top
 theorem exists_hasEigenvalue_of_iSup_genEigenspace_eq_top [Nontrivial M] {f : End R M}
     (hf : ⨆ μ, ⨆ k : ℕ, f.genEigenspace μ k = ⊤) :
     ∃ μ, f.HasEigenvalue μ := by
   simp_rw [iSup_genEigenspace_eq] at hf
   apply exists_hasEigenvalue_of_genEigenspace_eq_top _ hf
 
+-- CONFLATES (assumes ground = zero): exists_eigenvalue
 theorem exists_eigenvalue [IsAlgClosed K] [FiniteDimensional K V] [Nontrivial V] (f : End K V) :
     ∃ c : K, f.HasEigenvalue c := by
   simp_rw [hasEigenvalue_iff_mem_spectrum]

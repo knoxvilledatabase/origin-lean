@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/FreeMonoid/Basic.lean
-Genuine: 44 of 80 | Dissolved: 1 | Infrastructure: 35
+Genuine: 44 | Conflates: 0 | Dissolved: 1 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List

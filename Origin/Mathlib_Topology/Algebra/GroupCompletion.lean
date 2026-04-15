@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/GroupCompletion.lean
-Genuine: 14 of 27 | Dissolved: 0 | Infrastructure: 13
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.UniformMulAction

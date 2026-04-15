@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/FixedPointApproximants.lean
-Genuine: 25 of 26 | Dissolved: 0 | Infrastructure: 1
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic

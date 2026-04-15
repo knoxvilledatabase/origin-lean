@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ArithmeticFunction.lean
-Genuine: 101 of 163 | Dissolved: 20 | Infrastructure: 42
+Genuine: 100 | Conflates: 2 | Dissolved: 20 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
@@ -426,9 +426,11 @@ open ArithmeticFunction
 
 section Pmul
 
+-- CONFLATES (assumes ground = zero): pmul
 def pmul [MulZeroClass R] (f g : ArithmeticFunction R) : ArithmeticFunction R :=
   ⟨fun x => f x * g x, by simp⟩
 
+-- CONFLATES (assumes ground = zero): pmul_apply
 @[simp]
 theorem pmul_apply [MulZeroClass R] {f g : ArithmeticFunction R} {x : ℕ} : f.pmul g x = f x * g x :=
   rfl

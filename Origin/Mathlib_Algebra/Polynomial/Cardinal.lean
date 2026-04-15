@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Cardinal.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 1 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic
@@ -21,6 +21,7 @@ open Cardinal
 
 namespace Polynomial
 
+-- CONFLATES (assumes ground = zero): cardinalMk_eq_max
 @[simp]
 theorem cardinalMk_eq_max {R : Type u} [Semiring R] [Nontrivial R] : #(R[X]) = max #R ℵ₀ :=
   (toFinsuppIso R).toEquiv.cardinal_eq.trans <| by

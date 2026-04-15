@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GradedMulAction.lean
-Genuine: 4 of 12 | Dissolved: 0 | Infrastructure: 8
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.GradedMonoid

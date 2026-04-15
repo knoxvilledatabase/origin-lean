@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Pi.lean
-Genuine: 47 of 47 | Dissolved: 0 | Infrastructure: 0
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic

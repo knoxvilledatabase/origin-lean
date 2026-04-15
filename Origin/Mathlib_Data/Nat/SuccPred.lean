@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/SuccPred.lean
-Genuine: 7 of 14 | Dissolved: 1 | Infrastructure: 6
+Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat

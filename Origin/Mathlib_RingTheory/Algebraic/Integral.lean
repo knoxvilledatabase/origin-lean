@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Algebraic/Integral.lean
-Genuine: 10 of 13 | Dissolved: 0 | Infrastructure: 3
+Genuine: 9 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Algebraic.Basic
@@ -34,6 +34,7 @@ variable [CommRing S] [Ring A] [Algebra R A] [Algebra R S] [Algebra S A]
 
 variable [IsScalarTower R S A]
 
+-- CONFLATES (assumes ground = zero): IsIntegral.isAlgebraic
 theorem IsIntegral.isAlgebraic [Nontrivial R] {x : A} : IsIntegral R x → IsAlgebraic R x :=
   fun ⟨p, hp, hpx⟩ => ⟨p, hp.ne_zero, hpx⟩
 

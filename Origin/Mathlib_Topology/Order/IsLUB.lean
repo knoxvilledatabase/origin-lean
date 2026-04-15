@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/IsLUB.lean
-Genuine: 35 of 35 | Dissolved: 0 | Infrastructure: 0
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.Order.LeftRightNhds

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Field/Basic.lean
-Genuine: 96 of 173 | Dissolved: 6 | Infrastructure: 71
+Genuine: 90 | Conflates: 6 | Dissolved: 6 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalSubalgebra
@@ -129,6 +129,7 @@ attribute [simp] norm_one
 theorem nnnorm_one [SeminormedAddCommGroup α] [One α] [NormOneClass α] : ‖(1 : α)‖₊ = 1 :=
   NNReal.eq norm_one
 
+-- CONFLATES (assumes ground = zero): NormOneClass.nontrivial
 theorem NormOneClass.nontrivial (α : Type*) [SeminormedAddCommGroup α] [One α] [NormOneClass α] :
     Nontrivial α :=
   nontrivial_of_ne 0 1 <| ne_of_apply_ne norm <| by simp
@@ -187,10 +188,12 @@ lemma norm_mul₃_le : ‖a * b * c‖ ≤ ‖a‖ * ‖b‖ * ‖c‖ := norm_m
 lemma nnnorm_mul₃_le : ‖a * b * c‖₊ ≤ ‖a‖₊ * ‖b‖₊ * ‖c‖₊ :=
   nnnorm_mul_le_of_le (norm_mul_le ..) le_rfl
 
+-- CONFLATES (assumes ground = zero): one_le_norm_one
 theorem one_le_norm_one (β) [NormedRing β] [Nontrivial β] : 1 ≤ ‖(1 : β)‖ :=
   (le_mul_iff_one_le_left <| norm_pos_iff.mpr (one_ne_zero : (1 : β) ≠ 0)).mp
     (by simpa only [mul_one] using norm_mul_le (1 : β) 1)
 
+-- CONFLATES (assumes ground = zero): one_le_nnnorm_one
 theorem one_le_nnnorm_one (β) [NormedRing β] [Nontrivial β] : 1 ≤ ‖(1 : β)‖₊ :=
   one_le_norm_one β
 
@@ -414,9 +417,11 @@ section NormedRing
 
 variable [NormedRing α]
 
+-- CONFLATES (assumes ground = zero): Units.norm_pos
 theorem Units.norm_pos [Nontrivial α] (x : αˣ) : 0 < ‖(x : α)‖ :=
   norm_pos_iff.mpr (Units.ne_zero x)
 
+-- CONFLATES (assumes ground = zero): Units.nnnorm_pos
 theorem Units.nnnorm_pos [Nontrivial α] (x : αˣ) : 0 < ‖(x : α)‖₊ :=
   x.norm_pos
 
@@ -634,6 +639,7 @@ class NormedField (α : Type*) extends Norm α, Field α, MetricSpace α where
   /-- The norm is multiplicative. -/
   norm_mul' : ∀ a b, norm (a * b) = norm a * norm b
 
+-- CONFLATES (assumes ground = zero): NontriviallyNormedField
 class NontriviallyNormedField (α : Type*) extends NormedField α where
   /-- The norm attains a value exceeding 1. -/
   non_trivial : ∃ x : α, 1 < ‖x‖

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Floor.lean
-Genuine: 275 of 299 | Dissolved: 10 | Infrastructure: 14
+Genuine: 275 | Conflates: 0 | Dissolved: 10 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas

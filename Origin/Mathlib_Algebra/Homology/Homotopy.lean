@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/Homotopy.lean
-Genuine: 70 of 77 | Dissolved: 0 | Infrastructure: 7
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.Linear

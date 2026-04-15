@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Instances.lean
-Genuine: 37 of 48 | Dissolved: 0 | Infrastructure: 11
+Genuine: 35 | Conflates: 2 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Restrict
@@ -260,6 +260,7 @@ instance IsSelfAdjoint.instContinuousFunctionalCalculus :
     Complex.isometry_ofReal.isUniformEmbedding (.zero _)
     (fun _ ↦ isSelfAdjoint_iff_isStarNormal_and_spectrumRestricts)
 
+-- CONFLATES (assumes ground = zero): IsSelfAdjoint.spectrum_nonempty
 lemma IsSelfAdjoint.spectrum_nonempty {A : Type*} [Ring A] [StarRing A]
     [TopologicalSpace A] [Algebra ℝ A] [ContinuousFunctionalCalculus ℝ (IsSelfAdjoint : A → Prop)]
     [Nontrivial A] {a : A} (ha : IsSelfAdjoint a) : (σ ℝ a).Nonempty :=
@@ -315,6 +316,7 @@ instance Nonneg.instNonUnitalContinuousFunctionalCalculus :
 
 open NNReal in
 
+-- CONFLATES (assumes ground = zero): NNReal.spectrum_nonempty
 lemma NNReal.spectrum_nonempty {A : Type*} [Ring A] [StarRing A] [PartialOrder A]
     [TopologicalSpace A] [Algebra ℝ≥0 A] [ContinuousFunctionalCalculus ℝ≥0 (fun x : A ↦ 0 ≤ x)]
     [Nontrivial A] {a : A} (ha : 0 ≤ a) : (spectrum ℝ≥0 a).Nonempty :=

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Matrix.lean
-Genuine: 9 of 12 | Dissolved: 0 | Infrastructure: 3
+Genuine: 8 | Conflates: 2 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.Basis
@@ -63,6 +63,7 @@ theorem affineIndependent_of_toMatrix_right_inv [Fintype ι] [Finite ι'] [Decid
   replace hweq' := congr_arg (fun w => w ᵥ* A) hweq'
   simpa only [Matrix.vecMul_vecMul, hA, Matrix.vecMul_one] using hweq'
 
+-- CONFLATES (assumes ground = zero): affineSpan_eq_top_of_toMatrix_left_inv
 theorem affineSpan_eq_top_of_toMatrix_left_inv [Finite ι] [Fintype ι'] [DecidableEq ι]
     [Nontrivial k] (p : ι' → P) {A : Matrix ι ι' k} (hA : A * b.toMatrix p = 1) :
     affineSpan k (range p) = ⊤ := by
@@ -112,6 +113,7 @@ theorem isUnit_toMatrix : IsUnit (b.toMatrix b₂) :=
       val_inv := b.toMatrix_mul_toMatrix b₂
       inv_val := b₂.toMatrix_mul_toMatrix b }, rfl⟩
 
+-- CONFLATES (assumes ground = zero): isUnit_toMatrix_iff
 theorem isUnit_toMatrix_iff [Nontrivial k] (p : ι → P) :
     IsUnit (b.toMatrix p) ↔ AffineIndependent k p ∧ affineSpan k (range p) = ⊤ := by
   constructor

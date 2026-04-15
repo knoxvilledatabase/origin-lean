@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Asymptotics/Theta.lean
-Genuine: 45 of 65 | Dissolved: 6 | Infrastructure: 14
+Genuine: 45 | Conflates: 0 | Dissolved: 6 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.Asymptotics

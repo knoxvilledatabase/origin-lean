@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/SpecificGroups/Quaternion.lean
-Genuine: 13 of 25 | Dissolved: 3 | Infrastructure: 9
+Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Height.lean
-Genuine: 29 of 32 | Dissolved: 0 | Infrastructure: 3
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.ENat.Lattice

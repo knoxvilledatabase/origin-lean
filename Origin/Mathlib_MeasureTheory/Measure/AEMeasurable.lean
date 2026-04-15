@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/AEMeasurable.lean
-Genuine: 46 of 52 | Dissolved: 3 | Infrastructure: 3
+Genuine: 44 | Conflates: 2 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Trim
@@ -21,10 +21,12 @@ variable {ι α β γ δ R : Type*} {m0 : MeasurableSpace α} [MeasurableSpace �
 
 section
 
+-- CONFLATES (assumes ground = zero): Subsingleton.aemeasurable
 @[nontriviality, measurability]
 theorem Subsingleton.aemeasurable [Subsingleton α] : AEMeasurable f μ :=
   Subsingleton.measurable.aemeasurable
 
+-- CONFLATES (assumes ground = zero): aemeasurable_of_subsingleton_codomain
 @[nontriviality, measurability]
 theorem aemeasurable_of_subsingleton_codomain [Subsingleton β] : AEMeasurable f μ :=
   (measurable_of_subsingleton_codomain f).aemeasurable

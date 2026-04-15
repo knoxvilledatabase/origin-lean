@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Equiv/Basic.lean
-Genuine: 36 of 59 | Dissolved: 1 | Infrastructure: 22
+Genuine: 36 | Conflates: 0 | Dissolved: 1 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Basic

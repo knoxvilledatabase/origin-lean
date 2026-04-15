@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Norm/AbsNorm.lean
-Genuine: 32 of 39 | Dissolved: 4 | Infrastructure: 3
+Genuine: 31 | Conflates: 1 | Dissolved: 4 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Quotient
@@ -176,6 +176,7 @@ theorem cardQuot_mul [IsDedekindDomain S] [Module.Free ℤ S] (I J : Ideal S) :
         (Ideal.isUnit_iff.mp
           (hIJ (Ideal.dvd_iff_le.mpr le_sup_left) (Ideal.dvd_iff_le.mpr le_sup_right)))
 
+-- CONFLATES (assumes ground = zero): Ideal.absNorm
 noncomputable def Ideal.absNorm [Nontrivial S] [IsDedekindDomain S] [Module.Free ℤ S] :
     Ideal S →*₀ ℕ where
   toFun := Submodule.cardQuot

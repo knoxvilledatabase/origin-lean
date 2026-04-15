@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Fin/Basic.lean
-Genuine: 195 of 313 | Dissolved: 74 | Infrastructure: 44
+Genuine: 194 | Conflates: 1 | Dissolved: 74 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.Algebra.NeZero
@@ -332,6 +332,7 @@ theorem val_one'' {n : ℕ} : ((1 : Fin (n + 1)) : ℕ) = 1 % (n + 1) :=
 instance nontrivial {n : ℕ} : Nontrivial (Fin (n + 2)) where
   exists_pair_ne := ⟨0, 1, (ne_iff_vne 0 1).mpr (by simp [val_one, val_zero])⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_two_le
 theorem nontrivial_iff_two_le : Nontrivial (Fin n) ↔ 2 ≤ n := by
   rcases n with (_ | _ | n) <;>
   simp [Fin.nontrivial, not_nontrivial, Nat.succ_le_iff]

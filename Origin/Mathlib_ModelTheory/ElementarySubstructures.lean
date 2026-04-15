@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/ElementarySubstructures.lean
-Genuine: 10 of 19 | Dissolved: 0 | Infrastructure: 9
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.ModelTheory.ElementaryMaps

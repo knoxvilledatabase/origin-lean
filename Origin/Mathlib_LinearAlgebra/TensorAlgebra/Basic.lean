@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorAlgebra/Basic.lean
-Genuine: 27 of 36 | Dissolved: 1 | Infrastructure: 8
+Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeAlgebra

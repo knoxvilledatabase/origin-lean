@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/SpecificFunctions/Basic.lean
-Genuine: 9 of 11 | Dissolved: 2 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Slope

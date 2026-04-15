@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Pi.lean
-Genuine: 10 of 27 | Dissolved: 0 | Infrastructure: 17
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Lemmas

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Nilpotent/Basic.lean
-Genuine: 22 of 26 | Dissolved: 2 | Infrastructure: 2
+Genuine: 20 | Conflates: 2 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
@@ -82,11 +82,13 @@ theorem IsNilpotent.isUnit_add_right_of_commute [Ring R] {r u : R}
     IsUnit (r + u) :=
   add_comm r u ▸ hnil.isUnit_add_left_of_commute hu h_comm
 
+-- CONFLATES (assumes ground = zero): IsUnit.not_isNilpotent
 lemma IsUnit.not_isNilpotent [Ring R] [Nontrivial R] {x : R} (hx : IsUnit x) :
     ¬ IsNilpotent x := by
   intro H
   simpa using H.isUnit_add_right_of_commute hx.neg (by simp)
 
+-- CONFLATES (assumes ground = zero): IsNilpotent.not_isUnit
 lemma IsNilpotent.not_isUnit [Ring R] [Nontrivial R] {x : R} (hx : IsNilpotent x) :
     ¬ IsUnit x :=
   mt IsUnit.not_isNilpotent (by simpa only [not_not] using hx)

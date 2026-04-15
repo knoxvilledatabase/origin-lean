@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Subsingleton.lean
-Genuine: 12 of 13 | Dissolved: 0 | Infrastructure: 1
+Genuine: 11 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Ultrafilter
@@ -27,6 +27,7 @@ theorem HasBasis.subsingleton_iff {ι : Sort*} {p : ι → Prop} {s : ι → Set
 theorem Subsingleton.anti {l'} (hl : l.Subsingleton) (hl' : l' ≤ l) : l'.Subsingleton :=
   let ⟨s, hsl, hs⟩ := hl; ⟨s, hl' hsl, hs⟩
 
+-- CONFLATES (assumes ground = zero): Subsingleton.of_subsingleton
 @[nontriviality]
 theorem Subsingleton.of_subsingleton [Subsingleton α] : l.Subsingleton :=
   ⟨univ, univ_mem, subsingleton_univ⟩

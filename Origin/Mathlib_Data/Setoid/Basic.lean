@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Setoid/Basic.lean
-Genuine: 50 of 68 | Dissolved: 0 | Infrastructure: 18
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Logic.Relation

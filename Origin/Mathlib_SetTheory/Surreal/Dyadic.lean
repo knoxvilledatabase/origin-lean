@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Surreal/Dyadic.lean
-Genuine: 24 of 32 | Dissolved: 0 | Infrastructure: 8
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

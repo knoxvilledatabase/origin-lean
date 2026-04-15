@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Functor/EpiMono.lean
-Genuine: 29 of 41 | Dissolved: 0 | Infrastructure: 12
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.EpiMono

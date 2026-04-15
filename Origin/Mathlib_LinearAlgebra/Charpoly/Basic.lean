@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Charpoly/Basic.lean
-Genuine: 8 of 10 | Dissolved: 1 | Infrastructure: 1
+Genuine: 7 | Conflates: 1 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
@@ -52,6 +52,7 @@ theorem charpoly_monic : f.charpoly.Monic :=
 
 open Module in
 
+-- CONFLATES (assumes ground = zero): charpoly_natDegree
 lemma charpoly_natDegree [Nontrivial R] [StrongRankCondition R] :
     natDegree (charpoly f) = finrank R M := by
   rw [charpoly, Matrix.charpoly_natDegree_eq_dim, finrank_eq_card_chooseBasisIndex]

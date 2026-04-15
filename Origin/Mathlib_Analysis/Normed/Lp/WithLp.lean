@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Lp/WithLp.lean
-Genuine: 3 of 20 | Dissolved: 0 | Infrastructure: 17
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Basic

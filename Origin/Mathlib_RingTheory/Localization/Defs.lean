@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Defs.lean
-Genuine: 109 of 127 | Dissolved: 6 | Infrastructure: 12
+Genuine: 109 | Conflates: 0 | Dissolved: 6 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Prod

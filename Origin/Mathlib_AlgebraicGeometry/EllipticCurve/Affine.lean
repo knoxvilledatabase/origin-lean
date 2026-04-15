@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Affine.lean
-Genuine: 107 of 127 | Dissolved: 7 | Infrastructure: 13
+Genuine: 104 | Conflates: 3 | Dissolved: 7 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Bivariate
@@ -130,11 +130,13 @@ lemma polynomial_eq : W.polynomial =
 
 -- DISSOLVED: polynomial_ne_zero
 
+-- CONFLATES (assumes ground = zero): degree_polynomial
 @[simp]
 lemma degree_polynomial [Nontrivial R] : W.polynomial.degree = 2 := by
   rw [polynomial_eq]
   exact Cubic.degree_of_b_ne_zero' one_ne_zero
 
+-- CONFLATES (assumes ground = zero): natDegree_polynomial
 @[simp]
 lemma natDegree_polynomial [Nontrivial R] : W.polynomial.natDegree = 2 := by
   rw [polynomial_eq]
@@ -823,6 +825,7 @@ section EllipticCurve
 
 variable {R : Type u} [CommRing R] (E : WeierstrassCurve R) [E.IsElliptic]
 
+-- CONFLATES (assumes ground = zero): nonsingular
 lemma nonsingular [Nontrivial R] {x y : R} (h : E.toAffine.Equation x y) :
     E.toAffine.Nonsingular x y :=
   E.toAffine.nonsingular_of_Δ_ne_zero h <| E.coe_Δ' ▸ E.Δ'.ne_zero

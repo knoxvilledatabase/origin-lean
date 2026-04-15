@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IntegralDomain.lean
-Genuine: 9 of 15 | Dissolved: 3 | Infrastructure: 3
+Genuine: 9 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

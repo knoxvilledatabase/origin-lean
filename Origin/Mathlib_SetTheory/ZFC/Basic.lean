@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/ZFC/Basic.lean
-Genuine: 243 of 317 | Dissolved: 0 | Infrastructure: 74
+Genuine: 243 | Conflates: 0 | Dissolved: 0 | Infrastructure: 74
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice

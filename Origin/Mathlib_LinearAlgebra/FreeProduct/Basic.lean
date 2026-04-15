@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/FreeProduct/Basic.lean
-Genuine: 24 of 27 | Dissolved: 0 | Infrastructure: 3
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Basic

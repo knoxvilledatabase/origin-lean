@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Whiskering.lean
-Genuine: 7 of 16 | Dissolved: 0 | Infrastructure: 9
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf

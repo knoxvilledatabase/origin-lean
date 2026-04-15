@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Clique.lean
-Genuine: 82 of 92 | Dissolved: 1 | Infrastructure: 9
+Genuine: 81 | Conflates: 2 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Path
@@ -97,6 +97,7 @@ protected theorem IsClique.map (h : G.IsClique s) {f : α ↪ β} : (G.map f).Is
   rintro _ ⟨a, ha, rfl⟩ _ ⟨b, hb, rfl⟩ hab
   exact ⟨a, b, h ha hb <| ne_of_apply_ne _ hab, rfl, rfl⟩
 
+-- CONFLATES (assumes ground = zero): isClique_map_iff_of_nontrivial
 theorem isClique_map_iff_of_nontrivial {f : α ↪ β} {t : Set β} (ht : t.Nontrivial) :
     (G.map f).IsClique t ↔ ∃ (s : Set α), G.IsClique s ∧ f '' s = t := by
   refine ⟨fun h ↦ ⟨f ⁻¹' t, ?_, ?_⟩, by rintro ⟨x, hs, rfl⟩; exact hs.map⟩
@@ -125,6 +126,7 @@ theorem isClique_map_iff {f : α ↪ β} {t : Set β} :
 
 variable {f : α ↪ β} {t : Finset β}
 
+-- CONFLATES (assumes ground = zero): isClique_map_finset_iff_of_nontrivial
 theorem isClique_map_finset_iff_of_nontrivial (ht : t.Nontrivial) :
     (G.map f).IsClique t ↔ ∃ (s : Finset α), G.IsClique s ∧ s.map f = t := by
   constructor

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/Stonean/Basic.lean
-Genuine: 19 of 29 | Dissolved: 0 | Infrastructure: 10
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Topology.ExtremallyDisconnected

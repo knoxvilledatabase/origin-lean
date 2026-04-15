@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Basic.lean
-Genuine: 23 of 58 | Dissolved: 0 | Infrastructure: 35
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Preadditive

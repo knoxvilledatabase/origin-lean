@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Extension.lean
-Genuine: 28 of 48 | Dissolved: 0 | Infrastructure: 20
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness

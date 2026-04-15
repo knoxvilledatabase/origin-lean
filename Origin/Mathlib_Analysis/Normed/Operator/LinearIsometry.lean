@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Operator/LinearIsometry.lean
-Genuine: 140 of 207 | Dissolved: 0 | Infrastructure: 67
+Genuine: 140 | Conflates: 0 | Dissolved: 0 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Algebra.Star.Basic

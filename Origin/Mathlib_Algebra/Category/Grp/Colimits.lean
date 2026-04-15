@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Grp/Colimits.lean
-Genuine: 18 of 33 | Dissolved: 0 | Infrastructure: 15
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Preadditive

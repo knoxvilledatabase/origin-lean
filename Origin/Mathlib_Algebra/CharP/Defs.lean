@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/Defs.lean
-Genuine: 42 of 63 | Dissolved: 13 | Infrastructure: 8
+Genuine: 40 | Conflates: 2 | Dissolved: 13 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Int.ModEq
@@ -228,6 +228,7 @@ lemma char_is_prime_or_zero (p : ℕ) [hc : CharP R p] : Nat.Prime p ∨ p = 0 :
 
 -- DISSOLVED: char_prime_of_ne_zero
 
+-- CONFLATES (assumes ground = zero): exists'
 lemma exists' (R : Type*) [NonAssocRing R] [NoZeroDivisors R] [Nontrivial R] :
     CharZero R ∨ ∃ p : ℕ, Fact p.Prime ∧ CharP R p := by
   obtain ⟨p, hchar⟩ := CharP.exists R
@@ -256,6 +257,7 @@ lemma CharOne.subsingleton [CharP R 1] : Subsingleton R :=
       _ = 0 * r := by rw [CharP.cast_eq_zero]
       _ = 0 := by rw [zero_mul]
 
+-- CONFLATES (assumes ground = zero): false_of_nontrivial_of_char_one
 lemma false_of_nontrivial_of_char_one [Nontrivial R] [CharP R 1] : False := by
   have : Subsingleton R := CharOne.subsingleton
   exact false_of_nontrivial_of_subsingleton R

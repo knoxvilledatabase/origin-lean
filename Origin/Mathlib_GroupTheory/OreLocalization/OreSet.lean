@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/OreLocalization/OreSet.lean
-Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Defs/LinearOrder.lean
-Genuine: 60 of 64 | Dissolved: 0 | Infrastructure: 4
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Batteries.Classes.Order

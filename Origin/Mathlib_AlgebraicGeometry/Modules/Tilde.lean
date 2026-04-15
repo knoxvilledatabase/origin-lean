@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Modules/Tilde.lean
-Genuine: 23 of 35 | Dissolved: 1 | Infrastructure: 11
+Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Basic

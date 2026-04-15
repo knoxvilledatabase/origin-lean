@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/FreeAndStrongRankCondition.lean
-Genuine: 20 of 25 | Dissolved: 3 | Infrastructure: 2
+Genuine: 16 | Conflates: 4 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.Finite
@@ -220,6 +220,7 @@ theorem eq_bot_of_finrank_one (h : finrank F S = 1) [Module.Free F S] : S = ⊥ 
   rw [finrank, toNat_eq_one] at h
   rw [h]
 
+-- CONFLATES (assumes ground = zero): rank_eq_one_iff
 @[simp]
 theorem rank_eq_one_iff [Nontrivial E] [Module.Free F S] : Module.rank F S = 1 ↔ S = ⊥ := by
   refine ⟨fun h ↦ Subalgebra.eq_bot_of_rank_le_one h.le, ?_⟩
@@ -235,17 +236,20 @@ theorem rank_eq_one_iff [Nontrivial E] [Module.Free F S] : Module.rank F S = 1 �
     haveI := b.repr.toEquiv.subsingleton
     exact one_ne_zero congr((⊥ : Subalgebra F E).val $(Subsingleton.elim 1 0))
 
+-- CONFLATES (assumes ground = zero): finrank_eq_one_iff
 @[simp]
 theorem finrank_eq_one_iff [Nontrivial E] [Module.Free F S] : finrank F S = 1 ↔ S = ⊥ := by
   rw [← Subalgebra.rank_eq_one_iff]
   exact toNat_eq_iff one_ne_zero
 
+-- CONFLATES (assumes ground = zero): bot_eq_top_iff_rank_eq_one
 theorem bot_eq_top_iff_rank_eq_one [Nontrivial E] [Module.Free F E] :
     (⊥ : Subalgebra F E) = ⊤ ↔ Module.rank F E = 1 := by
   haveI := Module.Free.of_equiv (Subalgebra.topEquiv (R := F) (A := E)).toLinearEquiv.symm
   -- Porting note: removed `subalgebra_top_rank_eq_submodule_top_rank`
   rw [← rank_top, Subalgebra.rank_eq_one_iff, eq_comm]
 
+-- CONFLATES (assumes ground = zero): bot_eq_top_iff_finrank_eq_one
 theorem bot_eq_top_iff_finrank_eq_one [Nontrivial E] [Module.Free F E] :
     (⊥ : Subalgebra F E) = ⊤ ↔ finrank F E = 1 := by
   haveI := Module.Free.of_equiv (Subalgebra.topEquiv (R := F) (A := E)).toLinearEquiv.symm

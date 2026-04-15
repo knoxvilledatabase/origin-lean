@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/AEEqFun.lean
-Genuine: 88 of 140 | Dissolved: 1 | Infrastructure: 51
+Genuine: 88 | Conflates: 0 | Dissolved: 1 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.Lebesgue

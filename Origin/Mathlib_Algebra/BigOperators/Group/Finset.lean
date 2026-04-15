@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Group/Finset.lean
-Genuine: 253 of 275 | Dissolved: 4 | Infrastructure: 18
+Genuine: 253 | Conflates: 0 | Dissolved: 4 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Indicator

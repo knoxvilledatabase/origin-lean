@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Density.lean
-Genuine: 35 of 38 | Dissolved: 2 | Infrastructure: 1
+Genuine: 35 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Rat

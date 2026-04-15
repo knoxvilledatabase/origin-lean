@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CC/Addition.lean
-Genuine: 118 of 118 | Dissolved: 0 | Infrastructure: 0
+Genuine: 118 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Logic.Basic

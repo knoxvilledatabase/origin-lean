@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/Nonvanishing.lean
-Genuine: 17 of 27 | Dissolved: 10 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Finiteness/Cardinality.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Basis.Cardinality
@@ -61,6 +61,7 @@ lemma _root_.Set.Finite.submoduleSpan [Finite R] {s : Set M} (hs : s.Finite) :
   dsimp
   infer_instance
 
+-- CONFLATES (assumes ground = zero): finite_basis
 lemma finite_basis [Nontrivial R] {ι} [Module.Finite R M]
     (b : Basis ι R M) :
     _root_.Finite ι :=

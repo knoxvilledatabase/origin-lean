@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/ContinuedFractions/Computation/Translations.lean
-Genuine: 16 of 24 | Dissolved: 5 | Infrastructure: 3
+Genuine: 16 | Conflates: 0 | Dissolved: 5 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Computation.Basic

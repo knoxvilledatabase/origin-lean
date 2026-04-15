@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Hausdorff.lean
-Genuine: 66 of 78 | Dissolved: 7 | Infrastructure: 5
+Genuine: 66 | Conflates: 0 | Dissolved: 7 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Between

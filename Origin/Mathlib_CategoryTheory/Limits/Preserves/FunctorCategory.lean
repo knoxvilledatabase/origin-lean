@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/FunctorCategory.lean
-Genuine: 10 of 20 | Dissolved: 0 | Infrastructure: 10
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic

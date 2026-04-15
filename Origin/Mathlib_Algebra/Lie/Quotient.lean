@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Quotient.lean
-Genuine: 12 of 28 | Dissolved: 0 | Infrastructure: 16
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Submodule

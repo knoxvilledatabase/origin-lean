@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/IsometricSMul.lean
-Genuine: 56 of 75 | Dissolved: 0 | Infrastructure: 19
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Data.Set.Pointwise.SMul

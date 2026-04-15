@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PowerSeries/Basic.lean
-Genuine: 91 of 140 | Dissolved: 4 | Infrastructure: 45
+Genuine: 91 | Conflates: 0 | Dissolved: 4 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs

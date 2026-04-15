@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/Compact.lean
-Genuine: 58 of 65 | Dissolved: 0 | Infrastructure: 7
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Support

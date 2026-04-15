@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/EventuallyConst.lean
-Genuine: 26 of 32 | Dissolved: 0 | Infrastructure: 6
+Genuine: 24 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Indicator
@@ -92,12 +92,14 @@ protected lemma const (c : β) : EventuallyConst (fun _ ↦ c) l :=
 protected lemma congr {g} (h : EventuallyConst f l) (hg : f =ᶠ[l] g) : EventuallyConst g l :=
   hg.eventuallyConst_iff.1 h
 
+-- CONFLATES (assumes ground = zero): of_subsingleton_right
 @[nontriviality]
 lemma of_subsingleton_right [Subsingleton β] : EventuallyConst f l := .of_subsingleton
 
 nonrec lemma anti {l'} (h : EventuallyConst f l) (hl' : l' ≤ l) : EventuallyConst f l' :=
   h.anti (map_mono hl')
 
+-- CONFLATES (assumes ground = zero): of_subsingleton_left
 @[nontriviality]
 lemma of_subsingleton_left [Subsingleton α] : EventuallyConst f l :=
   .map .of_subsingleton f

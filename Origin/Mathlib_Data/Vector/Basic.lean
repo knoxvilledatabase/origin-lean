@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Vector/Basic.lean
-Genuine: 79 of 104 | Dissolved: 1 | Infrastructure: 24
+Genuine: 79 | Conflates: 0 | Dissolved: 1 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List

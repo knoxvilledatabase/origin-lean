@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/FinRange.lean
-Genuine: 16 of 18 | Dissolved: 0 | Infrastructure: 2
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.List.OfFn

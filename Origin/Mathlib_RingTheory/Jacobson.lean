@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Jacobson.lean
-Genuine: 35 of 41 | Dissolved: 1 | Infrastructure: 5
+Genuine: 33 | Conflates: 2 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.Away.Basic
@@ -380,6 +380,7 @@ variable {R : Type*} [CommRing R]
 
 variable (P : Ideal R[X]) [hP : P.IsMaximal]
 
+-- CONFLATES (assumes ground = zero): isMaximal_comap_C_of_isMaximal
 theorem isMaximal_comap_C_of_isMaximal [IsJacobsonRing R] [Nontrivial R]
     (hP' : ∀ x : R, C x ∈ P → x = 0) :
     IsMaximal (comap (C : R →+* R[X]) P : Ideal R) := by
@@ -425,6 +426,7 @@ theorem isMaximal_comap_C_of_isMaximal [IsJacobsonRing R] [Nontrivial R]
   apply IsField.localization_map_bijective hM'
   rwa [← Quotient.maximal_ideal_iff_isField_quotient, ← bot_quotient_isMaximal_iff]
 
+-- CONFLATES (assumes ground = zero): quotient_mk_comp_C_isIntegral_of_jacobson'
 private theorem quotient_mk_comp_C_isIntegral_of_jacobson' [Nontrivial R] (hR : IsJacobsonRing R)
     (hP' : ∀ x : R, C x ∈ P → x = 0) :
     ((Ideal.Quotient.mk P).comp C : R →+* R[X] ⧸ P).IsIntegral := by

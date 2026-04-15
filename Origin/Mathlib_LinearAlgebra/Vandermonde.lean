@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Vandermonde.lean
-Genuine: 14 of 16 | Dissolved: 1 | Infrastructure: 1
+Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin

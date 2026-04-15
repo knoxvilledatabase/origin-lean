@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/FundamentalDomain.lean
-Genuine: 65 of 83 | Dissolved: 3 | Infrastructure: 15
+Genuine: 64 | Conflates: 1 | Dissolved: 3 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Action
@@ -431,6 +431,7 @@ section MeasurableSpace
 
 variable (G) [Group G] [MulAction G α] (s : Set α) {x : α}
 
+-- CONFLATES (assumes ground = zero): fundamentalFrontier
 @[to_additive MeasureTheory.addFundamentalFrontier "The boundary of a fundamental domain, those
   points of the domain that also lie in a nontrivial translate."]
 def fundamentalFrontier : Set α :=

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Ideal.lean
-Genuine: 51 of 75 | Dissolved: 0 | Infrastructure: 24
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Logic.Encodable.Basic

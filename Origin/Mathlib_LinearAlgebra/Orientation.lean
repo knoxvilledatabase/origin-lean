@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Orientation.lean
-Genuine: 32 of 40 | Dissolved: 2 | Infrastructure: 6
+Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Ray

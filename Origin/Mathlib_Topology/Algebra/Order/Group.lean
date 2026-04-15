@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Order/Group.lean
-Genuine: 10 of 11 | Dissolved: 0 | Infrastructure: 1
+Genuine: 9 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Group.Basic
@@ -115,6 +115,7 @@ theorem denseRange_zsmul_iff_surjective {a : G} :
     simp only [mem_Ioo, add_smul, sub_smul, one_smul, add_lt_add_iff_right] at hlt ⊢
     exact ⟨sub_lt_iff_lt_add.1 hlt, hm⟩
 
+-- CONFLATES (assumes ground = zero): not_denseRange_zsmul
 theorem not_denseRange_zsmul [Nontrivial G] [DenselyOrdered G] {a : G} :
     ¬DenseRange (· • a : ℤ → G) :=
   denseRange_zsmul_iff_surjective.not.mpr fun h ↦

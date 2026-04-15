@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/BigOperators.lean
-Genuine: 30 of 36 | Dissolved: 6 | Infrastructure: 0
+Genuine: 25 | Conflates: 5 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Monic
@@ -143,6 +143,7 @@ theorem natDegree_multiset_prod_of_monic (h : ∀ f ∈ t, Monic f) :
     assumption
   · simp
 
+-- CONFLATES (assumes ground = zero): degree_multiset_prod_of_monic
 theorem degree_multiset_prod_of_monic [Nontrivial R] (h : ∀ f ∈ t, Monic f) :
     t.prod.degree = (t.map degree).sum := by
   have : t.prod ≠ 0 := Monic.ne_zero <| by simpa using monic_multiset_prod_of_monic _ _ h
@@ -154,6 +155,7 @@ theorem natDegree_prod_of_monic (h : ∀ i ∈ s, (f i).Monic) :
     (∏ i ∈ s, f i).natDegree = ∑ i ∈ s, (f i).natDegree := by
   simpa using natDegree_multiset_prod_of_monic (s.1.map f) (by simpa using h)
 
+-- CONFLATES (assumes ground = zero): degree_prod_of_monic
 theorem degree_prod_of_monic [Nontrivial R] (h : ∀ i ∈ s, (f i).Monic) :
     (∏ i ∈ s, f i).degree = ∑ i ∈ s, (f i).degree := by
   simpa using degree_multiset_prod_of_monic (s.1.map f) (by simpa using h)
@@ -234,6 +236,7 @@ section Semiring
 
 variable [Semiring R] [NoZeroDivisors R]
 
+-- CONFLATES (assumes ground = zero): degree_list_prod
 theorem degree_list_prod [Nontrivial R] (l : List R[X]) : l.prod.degree = (l.map degree).sum :=
   map_list_prod (@degreeMonoidHom R _ _ _) l
 
@@ -253,9 +256,11 @@ theorem natDegree_multiset_prod (h : (0 : R[X]) ∉ t) :
   rintro ⟨_, h, rfl⟩
   contradiction
 
+-- CONFLATES (assumes ground = zero): degree_multiset_prod
 theorem degree_multiset_prod [Nontrivial R] : t.prod.degree = (t.map fun f => degree f).sum :=
   map_multiset_prod (@degreeMonoidHom R _ _ _) _
 
+-- CONFLATES (assumes ground = zero): degree_prod
 theorem degree_prod [Nontrivial R] : (∏ i ∈ s, f i).degree = ∑ i ∈ s, (f i).degree :=
   map_prod (@degreeMonoidHom R _ _ _) _ _
 

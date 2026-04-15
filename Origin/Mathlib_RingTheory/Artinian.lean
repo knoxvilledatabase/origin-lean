@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Artinian.lean
-Genuine: 44 of 63 | Dissolved: 0 | Infrastructure: 19
+Genuine: 43 | Conflates: 1 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Prod
@@ -167,6 +167,7 @@ section Ring
 
 variable {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
 
+-- CONFLATES (assumes ground = zero): IsArtinian.finite_of_linearIndependent
 theorem IsArtinian.finite_of_linearIndependent [Nontrivial R] [h : IsArtinian R M] {s : Set M}
     (hs : LinearIndependent R ((↑) : s → M)) : s.Finite := by
   refine by_contradiction fun hf => (RelEmbedding.wellFounded_iff_no_descending_seq.1 h.wf).elim' ?_

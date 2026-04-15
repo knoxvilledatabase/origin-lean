@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LocalRing/Basic.lean
-Genuine: 10 of 12 | Dissolved: 0 | Infrastructure: 2
+Genuine: 6 | Conflates: 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.LocalRing.Defs
@@ -22,10 +22,12 @@ variable [CommSemiring R]
 
 namespace IsLocalRing
 
+-- CONFLATES (assumes ground = zero): of_isUnit_or_isUnit_of_isUnit_add
 theorem of_isUnit_or_isUnit_of_isUnit_add [Nontrivial R]
     (h : ∀ a b : R, IsUnit (a + b) → IsUnit a ∨ IsUnit b) : IsLocalRing R :=
   ⟨fun {a b} hab => h a b <| hab.symm ▸ isUnit_one⟩
 
+-- CONFLATES (assumes ground = zero): of_nonunits_add
 theorem of_nonunits_add [Nontrivial R]
     (h : ∀ a b : R, a ∈ nonunits R → b ∈ nonunits R → a + b ∈ nonunits R) : IsLocalRing R :=
   ⟨fun {a b} hab => or_iff_not_and_not.2 fun H => h a b H.1 H.2 <| hab.symm ▸ isUnit_one⟩
@@ -83,6 +85,7 @@ namespace IsLocalRing
 
 variable [CommRing R]
 
+-- CONFLATES (assumes ground = zero): of_isUnit_or_isUnit_one_sub_self
 theorem of_isUnit_or_isUnit_one_sub_self [Nontrivial R] (h : ∀ a : R, IsUnit a ∨ IsUnit (1 - a)) :
     IsLocalRing R :=
   ⟨fun {a b} hab => add_sub_cancel_left a b ▸ hab.symm ▸ h a⟩
@@ -98,6 +101,7 @@ theorem isUnit_of_mem_nonunits_one_sub_self (a : R) (h : 1 - a ∈ nonunits R) :
 theorem isUnit_one_sub_self_of_mem_nonunits (a : R) (h : a ∈ nonunits R) : IsUnit (1 - a) :=
   or_iff_not_imp_left.1 (isUnit_or_isUnit_one_sub_self a) h
 
+-- CONFLATES (assumes ground = zero): of_surjective'
 theorem of_surjective' [CommRing S] [Nontrivial S] (f : R →+* S) (hf : Function.Surjective f) :
     IsLocalRing S :=
   of_isUnit_or_isUnit_one_sub_self (by

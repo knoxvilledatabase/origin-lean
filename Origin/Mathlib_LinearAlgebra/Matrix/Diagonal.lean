@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Diagonal.lean
-Genuine: 5 of 7 | Dissolved: 2 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.LinearMap

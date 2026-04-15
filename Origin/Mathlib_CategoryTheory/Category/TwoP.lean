@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Category/TwoP.lean
-Genuine: 9 of 22 | Dissolved: 0 | Infrastructure: 13
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Bipointed

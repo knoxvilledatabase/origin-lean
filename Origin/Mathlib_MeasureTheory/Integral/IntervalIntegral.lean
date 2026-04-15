@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/IntervalIntegral.lean
-Genuine: 143 of 163 | Dissolved: 14 | Infrastructure: 6
+Genuine: 142 | Conflates: 1 | Dissolved: 14 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Disjoint
@@ -507,6 +507,7 @@ theorem integral_sub (hf : IntervalIntegrable f μ a b) (hg : IntervalIntegrable
     ∫ x in a..b, f x - g x ∂μ = (∫ x in a..b, f x ∂μ) - ∫ x in a..b, g x ∂μ := by
   simpa only [sub_eq_add_neg] using (integral_add hf hg.neg).trans (congr_arg _ integral_neg)
 
+-- CONFLATES (assumes ground = zero): integral_smul
 @[simp]
 nonrec theorem integral_smul {𝕜 : Type*} [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
     [SMulCommClass ℝ 𝕜 E] (r : 𝕜) (f : ℝ → E) :

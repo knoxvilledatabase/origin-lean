@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/AtTopBot/Field.lean
-Genuine: 42 of 46 | Dissolved: 4 | Infrastructure: 0
+Genuine: 42 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Defs

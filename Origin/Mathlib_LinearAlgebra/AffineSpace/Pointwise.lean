@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Pointwise.lean
-Genuine: 15 of 21 | Dissolved: 2 | Infrastructure: 4
+Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/TrivSqZeroExt.lean
-Genuine: 81 of 164 | Dissolved: 4 | Infrastructure: 79
+Genuine: 81 | Conflates: 0 | Dissolved: 4 | Infrastructure: 79
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

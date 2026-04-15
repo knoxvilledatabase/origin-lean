@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Integral.lean
-Genuine: 9 of 22 | Dissolved: 13 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 13 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Function

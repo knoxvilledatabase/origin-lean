@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Span/Defs.lean
-Genuine: 74 of 78 | Dissolved: 2 | Infrastructure: 2
+Genuine: 74 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Lattice

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/TangentCone.lean
-Genuine: 49 of 51 | Dissolved: 1 | Infrastructure: 1
+Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Topology

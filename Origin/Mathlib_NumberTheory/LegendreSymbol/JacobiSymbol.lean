@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/JacobiSymbol.lean
-Genuine: 47 of 55 | Dissolved: 7 | Infrastructure: 1
+Genuine: 47 | Conflates: 0 | Dissolved: 7 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticReciprocity

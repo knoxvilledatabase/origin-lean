@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Seminorm.lean
-Genuine: 26 of 123 | Dissolved: 1 | Infrastructure: 96
+Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 96
 -/
 import Origin.Core
 import Mathlib.Data.NNReal.Defs

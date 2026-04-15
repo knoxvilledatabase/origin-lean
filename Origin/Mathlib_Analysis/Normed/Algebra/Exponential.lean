@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Algebra/Exponential.lean
-Genuine: 84 of 86 | Dissolved: 2 | Infrastructure: 0
+Genuine: 84 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.ChangeOrigin

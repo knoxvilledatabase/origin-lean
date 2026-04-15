@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Dedup.lean
-Genuine: 23 of 25 | Dissolved: 1 | Infrastructure: 1
+Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.List.Nodup

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Defs.lean
-Genuine: 131 of 150 | Dissolved: 2 | Infrastructure: 17
+Genuine: 131 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Data.Int.Notation

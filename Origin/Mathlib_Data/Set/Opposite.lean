@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Opposite.lean
-Genuine: 8 of 14 | Dissolved: 0 | Infrastructure: 6
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Opposite

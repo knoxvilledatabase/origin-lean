@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/FreeAbelianGroupFinsupp.lean
-Genuine: 21 of 24 | Dissolved: 3 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags

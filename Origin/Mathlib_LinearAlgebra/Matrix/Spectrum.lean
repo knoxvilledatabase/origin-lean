@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Spectrum.lean
-Genuine: 14 of 18 | Dissolved: 2 | Infrastructure: 2
+Genuine: 14 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Spectrum

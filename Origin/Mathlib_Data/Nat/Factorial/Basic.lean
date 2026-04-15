@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Factorial/Basic.lean
-Genuine: 52 of 65 | Dissolved: 3 | Infrastructure: 10
+Genuine: 52 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Defs

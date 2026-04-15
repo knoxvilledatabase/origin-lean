@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Inductions.lean
-Genuine: 15 of 20 | Dissolved: 4 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Division

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoxIntegral/Box/Basic.lean
-Genuine: 51 of 75 | Dissolved: 4 | Infrastructure: 20
+Genuine: 51 | Conflates: 0 | Dissolved: 4 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Order.Fin.Tuple

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/Resolution.lean
-Genuine: 29 of 35 | Dissolved: 0 | Infrastructure: 6
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.LocalizerMorphism

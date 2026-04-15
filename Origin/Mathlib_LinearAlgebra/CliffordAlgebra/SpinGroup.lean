@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/CliffordAlgebra/SpinGroup.lean
-Genuine: 42 of 58 | Dissolved: 0 | Infrastructure: 16
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.GroupTheory.GroupAction.ConjAct

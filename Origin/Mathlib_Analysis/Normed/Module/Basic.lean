@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/Basic.lean
-Genuine: 38 of 79 | Dissolved: 0 | Infrastructure: 41
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Pi

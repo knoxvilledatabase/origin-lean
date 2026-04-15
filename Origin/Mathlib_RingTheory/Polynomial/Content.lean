@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Content.lean
-Genuine: 38 of 49 | Dissolved: 9 | Infrastructure: 2
+Genuine: 38 | Conflates: 0 | Dissolved: 9 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Finset

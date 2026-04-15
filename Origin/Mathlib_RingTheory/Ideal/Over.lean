@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Over.lean
-Genuine: 47 of 77 | Dissolved: 8 | Infrastructure: 22
+Genuine: 40 | Conflates: 7 | Dissolved: 8 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Pointwise
@@ -161,6 +161,7 @@ variable [Algebra R S]
 
 -- DISSOLVED: comap_ne_bot_of_integral_mem
 
+-- CONFLATES (assumes ground = zero): eq_bot_of_comap_eq_bot
 theorem eq_bot_of_comap_eq_bot [Nontrivial R] [IsDomain S] [Algebra.IsIntegral R S]
     (hI : I.comap (algebraMap R S) = ⊥) : I = ⊥ := by
   refine eq_bot_iff.2 fun x hx => ?_
@@ -201,11 +202,13 @@ theorem IsIntegralClosure.isMaximal_of_isMaximal_comap (I : Ideal A) [I.IsPrime]
 
 variable [IsDomain A]
 
+-- CONFLATES (assumes ground = zero): IsIntegralClosure.comap_ne_bot
 theorem IsIntegralClosure.comap_ne_bot [Nontrivial R] {I : Ideal A} (I_ne_bot : I ≠ ⊥) :
     I.comap (algebraMap R A) ≠ ⊥ :=
   let ⟨x, x_mem, x_ne_zero⟩ := I.ne_bot_iff.mp I_ne_bot
   comap_ne_bot_of_integral_mem x_ne_zero x_mem (IsIntegralClosure.isIntegral R S x)
 
+-- CONFLATES (assumes ground = zero): IsIntegralClosure.eq_bot_of_comap_eq_bot
 theorem IsIntegralClosure.eq_bot_of_comap_eq_bot [Nontrivial R] {I : Ideal A} :
     I.comap (algebraMap R A) = ⊥ → I = ⊥ := by
   -- Porting note: `imp_of_not_imp_not` seems not existing
@@ -226,10 +229,12 @@ section
 
 variable [IsDomain S]
 
+-- CONFLATES (assumes ground = zero): IntegralClosure.comap_ne_bot
 theorem IntegralClosure.comap_ne_bot [Nontrivial R] {I : Ideal (integralClosure R S)}
     (I_ne_bot : I ≠ ⊥) : I.comap (algebraMap R (integralClosure R S)) ≠ ⊥ :=
   IsIntegralClosure.comap_ne_bot S I_ne_bot
 
+-- CONFLATES (assumes ground = zero): IntegralClosure.eq_bot_of_comap_eq_bot
 theorem IntegralClosure.eq_bot_of_comap_eq_bot [Nontrivial R] {I : Ideal (integralClosure R S)} :
     I.comap (algebraMap R (integralClosure R S)) = ⊥ → I = ⊥ :=
   IsIntegralClosure.eq_bot_of_comap_eq_bot S
@@ -460,9 +465,11 @@ instance [P.IsPrime] : NoZeroSMulDivisors (A ⧸ p) (B ⧸ P) :=
 
 variable {p} in
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_liesOver_of_ne_top
 theorem nontrivial_of_liesOver_of_ne_top (hp : p ≠ ⊤) : Nontrivial (B ⧸ P) :=
   Quotient.nontrivial ((eq_top_iff_of_liesOver P p).mp.mt hp)
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_liesOver_of_isPrime
 theorem nontrivial_of_liesOver_of_isPrime [hp : p.IsPrime] : Nontrivial (B ⧸ P) :=
   nontrivial_of_liesOver_of_ne_top P hp.ne_top
 

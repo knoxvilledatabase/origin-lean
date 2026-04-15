@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Congruence/Basic.lean
-Genuine: 26 of 34 | Dissolved: 0 | Infrastructure: 8
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic

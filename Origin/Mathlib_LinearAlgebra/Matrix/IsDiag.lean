@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/IsDiag.lean
-Genuine: 24 of 26 | Dissolved: 0 | Infrastructure: 2
+Genuine: 23 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Symmetric
@@ -111,6 +111,7 @@ theorem isDiag_conjTranspose_iff [Semiring α] [StarRing α] {A : Matrix n n α}
 theorem IsDiag.submatrix [Zero α] {A : Matrix n n α} (ha : A.IsDiag) {f : m → n}
     (hf : Injective f) : (A.submatrix f f).IsDiag := fun _ _ h => ha (hf.ne h)
 
+-- CONFLATES (assumes ground = zero): IsDiag.kronecker
 theorem IsDiag.kronecker [MulZeroClass α] {A : Matrix m m α} {B : Matrix n n α} (hA : A.IsDiag)
     (hB : B.IsDiag) : (A ⊗ₖ B).IsDiag := by
   rintro ⟨a, b⟩ ⟨c, d⟩ h

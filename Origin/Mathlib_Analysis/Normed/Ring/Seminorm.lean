@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Ring/Seminorm.lean
-Genuine: 24 of 54 | Dissolved: 4 | Infrastructure: 26
+Genuine: 24 | Conflates: 0 | Dissolved: 4 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Lemmas

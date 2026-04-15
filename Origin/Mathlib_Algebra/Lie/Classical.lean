@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Classical.lean
-Genuine: 30 of 34 | Dissolved: 0 | Infrastructure: 4
+Genuine: 29 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basis
@@ -109,6 +109,7 @@ theorem eb_val (h : j ≠ i) : (Eb R i j h).val = Matrix.stdBasisMatrix i j 1 :=
 
 end ElementaryBasis
 
+-- CONFLATES (assumes ground = zero): sl_non_abelian
 theorem sl_non_abelian [Fintype n] [Nontrivial R] (h : 1 < Fintype.card n) :
     ¬IsLieAbelian (sl n R) := by
   rcases Fintype.exists_pair_of_one_lt_card h with ⟨j, i, hij⟩

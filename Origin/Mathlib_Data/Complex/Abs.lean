@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Complex/Abs.lean
-Genuine: 54 of 62 | Dissolved: 4 | Infrastructure: 4
+Genuine: 54 | Conflates: 0 | Dissolved: 4 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Complex.Basic

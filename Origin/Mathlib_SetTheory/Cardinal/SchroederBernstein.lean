@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/SchroederBernstein.lean
-Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.FixedPoints

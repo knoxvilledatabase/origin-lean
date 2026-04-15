@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/Augment.lean
-Genuine: 15 of 34 | Dissolved: 1 | Infrastructure: 18
+Genuine: 15 | Conflates: 0 | Dissolved: 1 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.Single

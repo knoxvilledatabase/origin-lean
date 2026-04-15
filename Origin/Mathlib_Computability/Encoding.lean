@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/Encoding.lean
-Genuine: 32 of 38 | Dissolved: 0 | Infrastructure: 6
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic

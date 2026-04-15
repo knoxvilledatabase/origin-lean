@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Subgroup/Pointwise.lean
-Genuine: 59 of 83 | Dissolved: 12 | Infrastructure: 12
+Genuine: 59 | Conflates: 0 | Dissolved: 12 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.MulOppositeLemmas

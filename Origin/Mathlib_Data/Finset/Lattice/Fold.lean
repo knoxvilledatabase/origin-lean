@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Lattice/Fold.lean
-Genuine: 197 of 214 | Dissolved: 0 | Infrastructure: 17
+Genuine: 195 | Conflates: 2 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Fold
@@ -592,6 +592,7 @@ protected theorem le_sup_iff (ha : ⊥ < a) : a ≤ s.sup f ↔ ∃ b ∈ s, a �
       | Or.inr h => let ⟨b, hb, hle⟩ := ih h; ⟨b, mem_cons.2 (Or.inr hb), hle⟩
   · exact fun ⟨b, hb, hle⟩ => le_trans hle (le_sup hb)
 
+-- CONFLATES (assumes ground = zero): sup_eq_top_iff
 protected theorem sup_eq_top_iff {α : Type*} [LinearOrder α] [BoundedOrder α] [Nontrivial α]
     {s : Finset ι} {f : ι → α} : s.sup f = ⊤ ↔ ∃ b ∈ s, f b = ⊤ := by
   simp only [← top_le_iff]
@@ -635,6 +636,7 @@ theorem comp_inf_eq_inf_comp_of_is_total [SemilatticeInf β] [OrderTop β] (g : 
 protected theorem inf_le_iff (ha : a < ⊤) : s.inf f ≤ a ↔ ∃ b ∈ s, f b ≤ a :=
   @Finset.le_sup_iff αᵒᵈ _ _ _ _ _ _ ha
 
+-- CONFLATES (assumes ground = zero): inf_eq_bot_iff
 protected theorem inf_eq_bot_iff {α : Type*} [LinearOrder α] [BoundedOrder α] [Nontrivial α]
     {s : Finset ι} {f : ι → α} : s.inf f = ⊥ ↔ ∃ b ∈ s, f b = ⊥ :=
   Finset.sup_eq_top_iff (α := αᵒᵈ)

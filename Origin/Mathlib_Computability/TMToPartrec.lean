@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/TMToPartrec.lean
-Genuine: 124 of 149 | Dissolved: 0 | Infrastructure: 25
+Genuine: 124 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Computability.Halting

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/MeasureSpace.lean
-Genuine: 238 of 299 | Dissolved: 10 | Infrastructure: 51
+Genuine: 237 | Conflates: 1 | Dissolved: 10 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.NullMeasurable
@@ -678,6 +678,7 @@ theorem coe_zero {_m : MeasurableSpace α} : ⇑(0 : Measure α) = 0 :=
   mp hμ := by ext s; exact le_bot_iff.1 <| (le_toMeasure_apply _ _ _).trans_eq congr($hμ s)
   mpr := by rintro rfl; simp
 
+-- CONFLATES (assumes ground = zero): apply_eq_zero_of_isEmpty
 @[nontriviality]
 lemma apply_eq_zero_of_isEmpty [IsEmpty α] {_ : MeasurableSpace α} (μ : Measure α) (s : Set α) :
     μ s = 0 := by

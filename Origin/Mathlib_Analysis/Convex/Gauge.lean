@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Gauge.lean
-Genuine: 64 of 66 | Dissolved: 1 | Infrastructure: 1
+Genuine: 64 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Topology

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/SDiff.lean
-Genuine: 50 of 55 | Dissolved: 0 | Infrastructure: 5
+Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Lemmas
@@ -191,6 +191,7 @@ theorem sdiff_union_distrib (s t₁ t₂ : Finset α) : s \ (t₁ ∪ t₂) = s 
 theorem union_sdiff_self (s t : Finset α) : (s ∪ t) \ t = s \ t :=
   sup_sdiff_right_self
 
+-- CONFLATES (assumes ground = zero): Nontrivial.sdiff_singleton_nonempty
 theorem Nontrivial.sdiff_singleton_nonempty {c : α} {s : Finset α} (hS : s.Nontrivial) :
     (s \ {c}).Nonempty := by
   rw [Finset.sdiff_nonempty, Finset.subset_singleton_iff]

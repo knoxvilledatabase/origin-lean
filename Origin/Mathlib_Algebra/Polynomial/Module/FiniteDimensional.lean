@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Module/FiniteDimensional.lean
-Genuine: 1 of 2 | Dissolved: 1 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Field

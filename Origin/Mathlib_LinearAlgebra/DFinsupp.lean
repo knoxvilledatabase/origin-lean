@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/DFinsupp.lean
-Genuine: 35 of 51 | Dissolved: 7 | Infrastructure: 9
+Genuine: 35 | Conflates: 0 | Dissolved: 7 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.DFinsupp.Submonoid

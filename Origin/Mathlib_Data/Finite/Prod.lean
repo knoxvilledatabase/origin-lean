@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finite/Prod.lean
-Genuine: 18 of 32 | Dissolved: 0 | Infrastructure: 14
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Unbundled/Nonneg.lean
-Genuine: 13 of 50 | Dissolved: 0 | Infrastructure: 37
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.GroupWithZero.Unbundled

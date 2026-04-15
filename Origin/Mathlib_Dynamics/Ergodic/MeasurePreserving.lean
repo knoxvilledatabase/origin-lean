@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/Ergodic/MeasurePreserving.lean
-Genuine: 26 of 28 | Dissolved: 1 | Infrastructure: 1
+Genuine: 25 | Conflates: 1 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.AEMeasurable
@@ -54,6 +54,7 @@ protected theorem id (μ : Measure α) : MeasurePreserving id μ μ :=
 protected theorem aemeasurable {f : α → β} (hf : MeasurePreserving f μa μb) : AEMeasurable f μa :=
   hf.1.aemeasurable
 
+-- CONFLATES (assumes ground = zero): of_isEmpty
 @[nontriviality]
 theorem of_isEmpty [IsEmpty β] (f : α → β) (μa : Measure α) (μb : Measure β) :
     MeasurePreserving f μa μb :=

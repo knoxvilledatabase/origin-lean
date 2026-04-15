@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Multiplicity.lean
-Genuine: 106 of 121 | Dissolved: 9 | Infrastructure: 6
+Genuine: 106 | Conflates: 0 | Dissolved: 9 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

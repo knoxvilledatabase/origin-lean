@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/AlgebraicCard.lean
-Genuine: 7 of 10 | Dissolved: 3 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Cardinal

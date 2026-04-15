@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/OreLocalization/Basic.lean
-Genuine: 58 of 77 | Dissolved: 0 | Infrastructure: 19
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations

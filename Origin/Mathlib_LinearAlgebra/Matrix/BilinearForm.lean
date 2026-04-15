@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/BilinearForm.lean
-Genuine: 58 of 65 | Dissolved: 4 | Infrastructure: 3
+Genuine: 58 | Conflates: 0 | Dissolved: 4 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Properties

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/DirectSum/Ring.lean
-Genuine: 26 of 59 | Dissolved: 3 | Infrastructure: 30
+Genuine: 26 | Conflates: 0 | Dissolved: 3 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.GradedMonoid

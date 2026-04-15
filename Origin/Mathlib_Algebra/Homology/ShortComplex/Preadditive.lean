@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ShortComplex/Preadditive.lean
-Genuine: 68 of 90 | Dissolved: 0 | Infrastructure: 22
+Genuine: 68 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Homology

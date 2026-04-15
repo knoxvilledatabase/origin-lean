@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/TotalComplex.lean
-Genuine: 48 of 50 | Dissolved: 0 | Infrastructure: 2
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Linear.Basic

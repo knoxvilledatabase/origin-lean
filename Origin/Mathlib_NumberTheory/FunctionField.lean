@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FunctionField.lean
-Genuine: 15 of 30 | Dissolved: 3 | Infrastructure: 12
+Genuine: 15 | Conflates: 0 | Dissolved: 3 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.TypeTags

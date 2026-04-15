@@ -1,6 +1,6 @@
 /-
 Extracted from Condensed/Discrete/LocallyConstant.lean
-Genuine: 26 of 38 | Dissolved: 0 | Infrastructure: 12
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Condensed.Discrete.Basic

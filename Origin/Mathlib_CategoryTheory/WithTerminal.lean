@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/WithTerminal.lean
-Genuine: 46 of 60 | Dissolved: 0 | Infrastructure: 14
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.IsTerminal

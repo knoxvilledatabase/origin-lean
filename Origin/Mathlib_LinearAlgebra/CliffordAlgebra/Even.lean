@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/CliffordAlgebra/Even.lean
-Genuine: 15 of 20 | Dissolved: 0 | Infrastructure: 5
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Fold

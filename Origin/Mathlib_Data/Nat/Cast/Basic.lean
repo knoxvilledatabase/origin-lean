@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Cast/Basic.lean
-Genuine: 27 of 46 | Dissolved: 2 | Infrastructure: 17
+Genuine: 27 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Hom

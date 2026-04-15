@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/Hom/Esakia.lean
-Genuine: 23 of 56 | Dissolved: 0 | Infrastructure: 33
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Bounded

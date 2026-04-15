@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/IntermediateValue.lean
-Genuine: 78 of 80 | Dissolved: 0 | Infrastructure: 2
+Genuine: 78 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Image

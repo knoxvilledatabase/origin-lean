@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/QuadraticForm/QuadraticModuleCat/Monoidal.lean
-Genuine: 2 of 7 | Dissolved: 0 | Infrastructure: 5
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Transport

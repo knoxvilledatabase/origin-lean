@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/Dual.lean
-Genuine: 29 of 34 | Dissolved: 0 | Infrastructure: 5
+Genuine: 28 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Polar
@@ -136,6 +136,7 @@ section PolarSets
 
 open Metric Set NormedSpace
 
+-- CONFLATES (assumes ground = zero): polar
 def polar (𝕜 : Type*) [NontriviallyNormedField 𝕜] {E : Type*} [SeminormedAddCommGroup E]
     [NormedSpace 𝕜 E] : Set E → Set (Dual 𝕜 E) :=
   (dualPairing 𝕜 E).flip.polar

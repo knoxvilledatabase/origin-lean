@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/SimpleRing/Basic.lean
-Genuine: 4 of 10 | Dissolved: 1 | Infrastructure: 5
+Genuine: 1 | Conflates: 4 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Defs
@@ -39,6 +39,7 @@ lemma one_mem_of_ne_bot {A : Type*} [NonAssocRing A] [IsSimpleRing A] (I : TwoSi
 
 -- DISSOLVED: one_mem_of_ne_zero_mem
 
+-- CONFLATES (assumes ground = zero): of_eq_bot_or_eq_top
 lemma of_eq_bot_or_eq_top [Nontrivial R] (h : ∀ I : TwoSidedIdeal R, I = ⊥ ∨ I = ⊤) :
     IsSimpleRing R where
   simple := { eq_bot_or_eq_top := h }
@@ -58,6 +59,7 @@ lemma injective_ringHom_or_subsingleton_codomain
       have mem : 1 ∈ TwoSidedIdeal.ker f := h.symm ▸ TwoSidedIdeal.mem_top _
       rwa [TwoSidedIdeal.mem_ker, map_one, eq_comm] at mem)
 
+-- CONFLATES (assumes ground = zero): _root_.RingHom.injective
 protected theorem _root_.RingHom.injective
     {R S : Type*} [NonAssocRing R] [IsSimpleRing R] [NonAssocSemiring S] [Nontrivial S]
     (f : R →+* S) : Function.Injective f :=
@@ -65,6 +67,7 @@ protected theorem _root_.RingHom.injective
 
 universe u in
 
+-- CONFLATES (assumes ground = zero): iff_injective_ringHom_or_subsingleton_codomain
 lemma iff_injective_ringHom_or_subsingleton_codomain (R : Type u) [NonAssocRing R] [Nontrivial R] :
     IsSimpleRing R ↔
     ∀ {S : Type u} [NonAssocSemiring S] (f : R →+* S), Function.Injective f ∨ Subsingleton S where
@@ -76,6 +79,7 @@ lemma iff_injective_ringHom_or_subsingleton_codomain (R : Type u) [NonAssocRing 
 
 universe u in
 
+-- CONFLATES (assumes ground = zero): iff_injective_ringHom
 lemma iff_injective_ringHom (R : Type u) [NonAssocRing R] [Nontrivial R] :
     IsSimpleRing R ↔
     ∀ {S : Type u} [NonAssocSemiring S] [Nontrivial S] (f : R →+* S), Function.Injective f :=

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/Spectrum.lean
-Genuine: 22 of 24 | Dissolved: 0 | Infrastructure: 2
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.Unitization

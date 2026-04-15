@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/HahnSeries/Summable.lean
-Genuine: 36 of 64 | Dissolved: 3 | Infrastructure: 25
+Genuine: 36 | Conflates: 0 | Dissolved: 3 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.RingTheory.HahnSeries.Multiplication

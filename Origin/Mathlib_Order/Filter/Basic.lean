@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Basic.lean
-Genuine: 351 of 442 | Dissolved: 0 | Infrastructure: 91
+Genuine: 350 | Conflates: 1 | Dissolved: 0 | Infrastructure: 91
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
@@ -380,6 +380,7 @@ instance instNontrivialFilter [Nonempty α] : Nontrivial (Filter α) :=
   ⟨⟨⊤, ⊥, NeBot.ne <| forall_mem_nonempty_iff_neBot.1
     fun s hs => by rwa [mem_top.1 hs, ← nonempty_iff_univ_nonempty]⟩⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_nonempty
 theorem nontrivial_iff_nonempty : Nontrivial (Filter α) ↔ Nonempty α :=
   ⟨fun _ =>
     by_contra fun h' =>

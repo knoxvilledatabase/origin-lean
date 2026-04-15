@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Finsubgraph.lean
-Genuine: 11 of 33 | Dissolved: 0 | Infrastructure: 22
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.CofilteredSystem

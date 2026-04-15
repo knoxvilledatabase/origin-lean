@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/AlgebraicClosure.lean
-Genuine: 19 of 24 | Dissolved: 0 | Infrastructure: 5
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.FieldTheory.NormalClosure

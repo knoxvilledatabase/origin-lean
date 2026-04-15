@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/ScottTopology.lean
-Genuine: 48 of 65 | Dissolved: 0 | Infrastructure: 17
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Order.ScottContinuity

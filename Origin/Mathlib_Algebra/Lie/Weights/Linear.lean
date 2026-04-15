@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Weights/Linear.lean
-Genuine: 11 of 22 | Dissolved: 2 | Infrastructure: 9
+Genuine: 10 | Conflates: 1 | Dissolved: 2 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Weights.Basic
@@ -153,6 +153,7 @@ def shiftedGenWeightSpace := genWeightSpace M χ
 
 namespace shiftedGenWeightSpace
 
+-- CONFLATES (assumes ground = zero): aux
 private lemma aux [h : Nontrivial (shiftedGenWeightSpace R L M χ)] : genWeightSpace M χ ≠ ⊥ :=
   (LieSubmodule.nontrivial_iff_ne_bot _ _ _).mp h
 

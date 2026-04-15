@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Definitions.lean
-Genuine: 88 of 115 | Dissolved: 21 | Infrastructure: 6
+Genuine: 88 | Conflates: 0 | Dissolved: 21 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Degree

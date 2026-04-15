@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/InteriorBoundary.lean
-Genuine: 21 of 26 | Dissolved: 0 | Infrastructure: 5
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
@@ -106,6 +106,7 @@ lemma _root_.range_mem_nhds_isInteriorPoint {x : M} (h : I.IsInteriorPoint x) :
   rw [mem_nhds_iff]
   exact ⟨interior (range I), interior_subset, isOpen_interior, h⟩
 
+-- CONFLATES (assumes ground = zero): _root_.BoundarylessManifold
 class _root_.BoundarylessManifold {𝕜 : Type*} [NontriviallyNormedField 𝕜]
     {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
     {H : Type*} [TopologicalSpace H] (I : ModelWithCorners 𝕜 E H)

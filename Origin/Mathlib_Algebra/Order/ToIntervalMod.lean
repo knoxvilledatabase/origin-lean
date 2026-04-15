@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/ToIntervalMod.lean
-Genuine: 157 of 167 | Dissolved: 0 | Infrastructure: 10
+Genuine: 157 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.ModEq

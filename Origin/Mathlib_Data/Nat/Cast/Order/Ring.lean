@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Cast/Order/Ring.lean
-Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
+Genuine: 10 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
@@ -43,6 +43,7 @@ section Nontrivial
 
 variable [NeZero (1 : α)]
 
+-- CONFLATES (assumes ground = zero): cast_pos
 @[simp]
 theorem cast_pos {α} [OrderedSemiring α] [Nontrivial α] {n : ℕ} : (0 : α) < n ↔ 0 < n := cast_pos'
 
@@ -50,6 +51,7 @@ theorem cast_pos {α} [OrderedSemiring α] [Nontrivial α] {n : ℕ} : (0 : α) 
 theorem ofNat_pos' {n : ℕ} [n.AtLeastTwo] : 0 < (no_index (OfNat.ofNat n : α)) :=
   cast_pos'.mpr (NeZero.pos n)
 
+-- CONFLATES (assumes ground = zero): ofNat_pos
 @[simp]
 theorem ofNat_pos {α} [OrderedSemiring α] [Nontrivial α] {n : ℕ} [n.AtLeastTwo] :
     0 < (no_index (OfNat.ofNat n : α)) :=

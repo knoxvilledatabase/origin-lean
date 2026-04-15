@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/NormNum/Result.lean
-Genuine: 54 of 59 | Dissolved: 2 | Infrastructure: 3
+Genuine: 54 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs

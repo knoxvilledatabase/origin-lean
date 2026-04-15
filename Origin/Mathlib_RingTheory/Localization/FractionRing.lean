@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/FractionRing.lean
-Genuine: 41 of 59 | Dissolved: 3 | Infrastructure: 15
+Genuine: 39 | Conflates: 2 | Dissolved: 3 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Equiv
@@ -375,6 +375,7 @@ theorem isFractionRing_iff_of_base_ringEquiv (h : R ≃+* P) :
     apply hx
     rw [← h.symm.map_mul, hz, h.symm.map_zero]
 
+-- CONFLATES (assumes ground = zero): nontrivial
 protected theorem nontrivial (R S : Type*) [CommRing R] [Nontrivial R] [CommRing S] [Algebra R S]
     [IsFractionRing R S] : Nontrivial S := by
   apply nontrivial_of_ne
@@ -388,6 +389,7 @@ end IsFractionRing
 
 section algebraMap_injective
 
+-- CONFLATES (assumes ground = zero): algebraMap_injective_of_field_isFractionRing
 theorem algebraMap_injective_of_field_isFractionRing (K L : Type*) [Field K] [Semiring L]
     [Nontrivial L] [Algebra R K] [IsFractionRing R K] [Algebra S L] [Algebra K L] [Algebra R L]
     [IsScalarTower R S L] [IsScalarTower R K L] : Function.Injective (algebraMap R S) := by

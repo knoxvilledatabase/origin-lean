@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/SelfAdjoint.lean
-Genuine: 50 of 96 | Dissolved: 0 | Infrastructure: 46
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 46
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs

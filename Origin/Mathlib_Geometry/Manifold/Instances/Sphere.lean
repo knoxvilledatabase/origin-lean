@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Instances/Sphere.lean
-Genuine: 30 of 43 | Dissolved: 0 | Infrastructure: 13
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Inv

@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Density.lean
-Genuine: 32 of 37 | Dissolved: 2 | Infrastructure: 3
+Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.RadonNikodym

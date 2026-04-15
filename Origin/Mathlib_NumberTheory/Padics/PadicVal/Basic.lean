@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Padics/PadicVal/Basic.lean
-Genuine: 51 of 79 | Dissolved: 24 | Infrastructure: 4
+Genuine: 51 | Conflates: 0 | Dissolved: 24 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Divisors

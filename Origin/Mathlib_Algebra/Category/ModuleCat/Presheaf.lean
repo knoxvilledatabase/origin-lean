@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Presheaf.lean
-Genuine: 27 of 54 | Dissolved: 0 | Infrastructure: 27
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings

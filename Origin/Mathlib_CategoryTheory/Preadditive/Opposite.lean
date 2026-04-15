@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/Opposite.lean
-Genuine: 4 of 16 | Dissolved: 0 | Infrastructure: 12
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor

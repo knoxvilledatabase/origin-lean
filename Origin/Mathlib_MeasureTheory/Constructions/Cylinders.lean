@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/Cylinders.lean
-Genuine: 50 of 50 | Dissolved: 0 | Infrastructure: 0
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.PiSystem

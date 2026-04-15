@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Cycle.lean
-Genuine: 94 of 130 | Dissolved: 0 | Infrastructure: 36
+Genuine: 89 | Conflates: 6 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.List
@@ -493,9 +493,11 @@ theorem Subsingleton.congr {s : Cycle α} (h : Subsingleton s) :
     length_eq_zero, length_eq_one, Nat.not_lt_zero, false_or] at h
   rcases h with (rfl | ⟨z, rfl⟩) <;> simp
 
+-- CONFLATES (assumes ground = zero): Nontrivial
 def Nontrivial (s : Cycle α) : Prop :=
   ∃ x y : α, x ≠ y ∧ x ∈ s ∧ y ∈ s
 
+-- CONFLATES (assumes ground = zero): nontrivial_coe_nodup_iff
 @[simp]
 theorem nontrivial_coe_nodup_iff {l : List α} (hl : l.Nodup) :
     Nontrivial (l : Cycle α) ↔ 2 ≤ l.length := by
@@ -509,10 +511,12 @@ theorem nontrivial_coe_nodup_iff {l : List α} (hl : l.Nodup) :
     simp only [not_or, mem_cons, nodup_cons] at hl
     exact hl.left.left
 
+-- CONFLATES (assumes ground = zero): nontrivial_reverse_iff
 @[simp]
 theorem nontrivial_reverse_iff {s : Cycle α} : s.reverse.Nontrivial ↔ s.Nontrivial := by
   simp [Nontrivial]
 
+-- CONFLATES (assumes ground = zero): length_nontrivial
 theorem length_nontrivial {s : Cycle α} (h : Nontrivial s) : 2 ≤ length s := by
   obtain ⟨x, y, hxy, hx, hy⟩ := h
   induction' s using Quot.inductionOn with l
@@ -544,6 +548,7 @@ theorem Subsingleton.nodup {s : Cycle α} (h : Subsingleton s) : Nodup s := by
   · have : tl = [] := by simpa [Subsingleton, length_eq_zero, Nat.succ_le_succ_iff] using h
     simp [this]
 
+-- CONFLATES (assumes ground = zero): Nodup.nontrivial_iff
 theorem Nodup.nontrivial_iff {s : Cycle α} (h : Nodup s) : Nontrivial s ↔ ¬Subsingleton s := by
   rw [length_subsingleton_iff]
   induction s using Quotient.inductionOn'
@@ -611,6 +616,7 @@ section Decidable
 
 variable [DecidableEq α]
 
+-- CONFLATES (assumes ground = zero): decidableNontrivialCoe
 def decidableNontrivialCoe : ∀ l : List α, Decidable (Nontrivial (l : Cycle α))
   | [] => isFalse (by simp [Nontrivial])
   | [x] => isFalse (by simp [Nontrivial])

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Monomial.lean
-Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
+Genuine: 3 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic
@@ -21,6 +21,7 @@ variable {R : Type u} {a b : R} {m n : ℕ}
 
 variable [Semiring R] {p q r : R[X]}
 
+-- CONFLATES (assumes ground = zero): monomial_one_eq_iff
 theorem monomial_one_eq_iff [Nontrivial R] {i j : ℕ} :
     (monomial i 1 : R[X]) = monomial j 1 ↔ i = j := by
   -- Porting note: `ofFinsupp.injEq` is required.

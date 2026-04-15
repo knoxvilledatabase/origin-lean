@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Hom.lean
-Genuine: 2 of 21 | Dissolved: 0 | Infrastructure: 19
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Instances

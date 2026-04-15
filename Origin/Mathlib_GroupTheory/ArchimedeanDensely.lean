@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/ArchimedeanDensely.lean
-Genuine: 11 of 18 | Dissolved: 5 | Infrastructure: 2
+Genuine: 8 | Conflates: 4 | Dissolved: 5 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags
@@ -226,6 +226,7 @@ open WithZero in
 
 section WellFounded
 
+-- CONFLATES (assumes ground = zero): LinearOrderedAddCommGroup.wellFoundedOn_setOf_le_lt_iff_nonempty_discrete
 lemma LinearOrderedAddCommGroup.wellFoundedOn_setOf_le_lt_iff_nonempty_discrete
     {G : Type*} [LinearOrderedAddCommGroup G] [Nontrivial G] {g : G} :
     Set.WellFoundedOn {x : G | g ≤ x} (· < ·) ↔ Nonempty (G ≃+o ℤ) := by
@@ -262,6 +263,7 @@ lemma LinearOrderedAddCommGroup.wellFoundedOn_setOf_le_lt_iff_nonempty_discrete
     have : LocallyFiniteOrder G := LocallyFiniteOrder.ofOrderIsoClass f
     exact BddBelow.wellFoundedOn_lt ⟨0, by simp [mem_lowerBounds]⟩
 
+-- CONFLATES (assumes ground = zero): LinearOrderedAddCommGroup.wellFoundedOn_setOf_ge_gt_iff_nonempty_discrete
 lemma LinearOrderedAddCommGroup.wellFoundedOn_setOf_ge_gt_iff_nonempty_discrete
     {G : Type*} [LinearOrderedAddCommGroup G] [Nontrivial G] (g : G) :
     Set.WellFoundedOn {x : G | x ≤ g} (· > ·) ↔ Nonempty (G ≃+o ℤ) := by
@@ -270,6 +272,7 @@ lemma LinearOrderedAddCommGroup.wellFoundedOn_setOf_ge_gt_iff_nonempty_discrete
   · intro
     simp [Function.onFun, neg_le]
 
+-- CONFLATES (assumes ground = zero): LinearOrderedCommGroup.wellFoundedOn_setOf_le_lt_iff_nonempty_discrete
 @[to_additive existing]
 lemma LinearOrderedCommGroup.wellFoundedOn_setOf_le_lt_iff_nonempty_discrete
     {G : Type*} [LinearOrderedCommGroup G] [Nontrivial G] {g : G} :
@@ -284,6 +287,7 @@ lemma LinearOrderedCommGroup.wellFoundedOn_setOf_le_lt_iff_nonempty_discrete
     fun h ↦ (h.mapsTo e fun _ ↦ ?_).mono' ?_⟩ <;>
   simp [Function.onFun]
 
+-- CONFLATES (assumes ground = zero): LinearOrderedCommGroup.wellFoundedOn_setOf_ge_gt_iff_nonempty_discrete
 @[to_additive existing]
 lemma LinearOrderedCommGroup.wellFoundedOn_setOf_ge_gt_iff_nonempty_discrete
     {G : Type*} [LinearOrderedCommGroup G] [Nontrivial G] (g : G) :

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Supported.lean
-Genuine: 15 of 16 | Dissolved: 0 | Infrastructure: 1
+Genuine: 12 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Variables
@@ -93,10 +93,12 @@ variable {s}
 theorem supported_mono (st : s ⊆ t) : supported R s ≤ supported R t :=
   Algebra.adjoin_mono (Set.image_subset _ st)
 
+-- CONFLATES (assumes ground = zero): X_mem_supported
 @[simp]
 theorem X_mem_supported [Nontrivial R] {i : σ} : X i ∈ supported R s ↔ i ∈ s := by
   simp [mem_supported]
 
+-- CONFLATES (assumes ground = zero): supported_le_supported_iff
 @[simp]
 theorem supported_le_supported_iff [Nontrivial R] : supported R s ≤ supported R t ↔ s ⊆ t := by
   constructor
@@ -104,6 +106,7 @@ theorem supported_le_supported_iff [Nontrivial R] : supported R s ≤ supported 
     simpa using @h (X i)
   · exact supported_mono
 
+-- CONFLATES (assumes ground = zero): supported_strictMono
 theorem supported_strictMono [Nontrivial R] :
     StrictMono (supported R : Set σ → Subalgebra R (MvPolynomial σ R)) :=
   strictMono_of_le_iff_le fun _ _ ↦ supported_le_supported_iff.symm

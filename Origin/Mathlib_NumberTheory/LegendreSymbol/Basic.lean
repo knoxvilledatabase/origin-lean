@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/Basic.lean
-Genuine: 17 of 29 | Dissolved: 12 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 12 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic

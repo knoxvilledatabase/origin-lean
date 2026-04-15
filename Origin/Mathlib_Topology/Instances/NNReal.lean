@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/NNReal.lean
-Genuine: 39 of 52 | Dissolved: 2 | Infrastructure: 11
+Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.NNReal.Star

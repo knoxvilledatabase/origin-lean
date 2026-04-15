@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/UniformOn.lean
-Genuine: 19 of 22 | Dissolved: 1 | Infrastructure: 2
+Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Probability.ConditionalProbability

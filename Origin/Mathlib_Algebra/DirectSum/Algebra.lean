@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/DirectSum/Algebra.lean
-Genuine: 5 of 11 | Dissolved: 0 | Infrastructure: 6
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

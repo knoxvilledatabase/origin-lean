@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/DirichletCharacter/Orthogonality.lean
-Genuine: 5 of 7 | Dissolved: 1 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Finite.Basic

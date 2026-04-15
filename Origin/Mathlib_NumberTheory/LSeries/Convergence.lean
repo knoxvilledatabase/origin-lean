@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/Convergence.lean
-Genuine: 10 of 13 | Dissolved: 3 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.Basic

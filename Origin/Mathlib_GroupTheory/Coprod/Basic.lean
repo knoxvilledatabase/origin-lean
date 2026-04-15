@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Coprod/Basic.lean
-Genuine: 77 of 119 | Dissolved: 0 | Infrastructure: 42
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Ker

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Basis.lean
-Genuine: 28 of 30 | Dissolved: 0 | Infrastructure: 2
+Genuine: 27 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Reindex
@@ -144,6 +144,7 @@ def toMatrixEquiv [Fintype ι] (e : Basis ι R M) : (ι → M) ≃ₗ[R] Matrix 
 
 variable (R₂) in
 
+-- CONFLATES (assumes ground = zero): restrictScalars_toMatrix
 theorem restrictScalars_toMatrix [Fintype ι] [DecidableEq ι] {S : Type*} [CommRing S] [Nontrivial S]
     [Algebra R₂ S] [Module S M₂] [IsScalarTower R₂ S M₂] [NoZeroSMulDivisors R₂ S]
     (b : Basis ι S M₂) (v : ι → span R₂ (Set.range b)) :

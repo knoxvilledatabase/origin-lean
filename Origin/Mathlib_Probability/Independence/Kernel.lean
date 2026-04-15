@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Independence/Kernel.lean
-Genuine: 104 of 112 | Dissolved: 1 | Infrastructure: 7
+Genuine: 103 | Conflates: 1 | Dissolved: 1 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Pi
@@ -936,6 +936,7 @@ section iIndepFun
 
 variable {β : ι → Type*} {m : ∀ i, MeasurableSpace (β i)} {f : ∀ i, Ω → β i}
 
+-- CONFLATES (assumes ground = zero): iIndepFun.of_subsingleton
 @[nontriviality]
 lemma iIndepFun.of_subsingleton [IsMarkovKernel κ] [Subsingleton ι] : iIndepFun m f κ μ := by
   refine (iIndepFun_iff_measure_inter_preimage_eq_mul ..).2 fun s f' hf' ↦ ?_

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Basic.lean
-Genuine: 21 of 22 | Dissolved: 1 | Infrastructure: 0
+Genuine: 19 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic
@@ -96,6 +96,7 @@ lemma support_smul_subset_left [Zero R] [Zero M] [SMulWithZero R M] (f : α → 
     support (f • g) ⊆ support f := fun x hfg hf ↦
   hfg <| by rw [Pi.smul_apply', hf, zero_smul]
 
+-- CONFLATES (assumes ground = zero): support_smul_subset_right
 lemma support_smul_subset_right [Zero M] [SMulZeroClass R M] (f : α → R) (g : α → M) :
     support (f • g) ⊆ support g :=
   fun x hbf hf ↦ hbf <| by rw [Pi.smul_apply', hf, smul_zero]
@@ -106,6 +107,7 @@ lemma support_smul [Zero R] [Zero M] [SMulWithZero R M] [NoZeroSMulDivisors R M]
     (g : α → M) : support (f • g) = support f ∩ support g :=
   ext fun _ => smul_ne_zero_iff
 
+-- CONFLATES (assumes ground = zero): support_const_smul_subset
 lemma support_const_smul_subset [Zero M] [SMulZeroClass R M] (a : R) (f : α → M) :
     support (a • f) ⊆ support f := support_smul_subset_right (fun _ ↦ a) f
 

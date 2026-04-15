@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/CPolynomial.lean
-Genuine: 88 of 89 | Dissolved: 0 | Infrastructure: 1
+Genuine: 88 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.ChangeOrigin

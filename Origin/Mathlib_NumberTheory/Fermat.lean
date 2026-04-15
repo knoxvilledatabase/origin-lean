@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Fermat.lean
-Genuine: 20 of 25 | Dissolved: 2 | Infrastructure: 3
+Genuine: 20 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticReciprocity

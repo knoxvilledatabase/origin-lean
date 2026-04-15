@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/Constructions.lean
-Genuine: 56 of 66 | Dissolved: 0 | Infrastructure: 10
+Genuine: 52 | Conflates: 4 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
@@ -63,6 +63,7 @@ theorem LinearIndependent.union_of_quotient
     (of_comp M'.subtype (by simpa using hs')) Subtype.val ht).to_subtype_range' ?_
   simp only [embeddingOfSubset_apply_coe, Sum.elim_range, Subtype.range_val]
 
+-- CONFLATES (assumes ground = zero): rank_quotient_add_rank_le
 theorem rank_quotient_add_rank_le [Nontrivial R] (M' : Submodule R M) :
     Module.rank R (M ⧸ M') + Module.rank R M' ≤ Module.rank R M := by
   conv_lhs => simp only [Module.rank_def]
@@ -99,6 +100,7 @@ variable [Module R M₁] [Module R M']
 
 open LinearMap in
 
+-- CONFLATES (assumes ground = zero): lift_rank_add_lift_rank_le_rank_prod
 theorem lift_rank_add_lift_rank_le_rank_prod [Nontrivial R] :
     lift.{v'} (Module.rank R M) + lift.{v} (Module.rank R M') ≤ Module.rank R (M × M') := by
   convert rank_quotient_add_rank_le (ker <| LinearMap.fst R M M')
@@ -109,6 +111,7 @@ theorem lift_rank_add_lift_rank_le_rank_prod [Nontrivial R] :
     rw [ker_fst, ← (LinearEquiv.ofInjective _ <| inr_injective (M := M) (M₂ := M')).lift_rank_eq,
         lift_umax.{v', v}]
 
+-- CONFLATES (assumes ground = zero): rank_add_rank_le_rank_prod
 theorem rank_add_rank_le_rank_prod [Nontrivial R] :
     Module.rank R M + Module.rank R M₁ ≤ Module.rank R (M × M₁) := by
   convert ← lift_rank_add_lift_rank_le_rank_prod R M M₁ <;> apply lift_id
@@ -412,6 +415,7 @@ theorem finrank_range_le_card {ι : Type*} [Fintype ι] (b : ι → M) :
   rw [Set.toFinset_range]
   exact Finset.card_image_le
 
+-- CONFLATES (assumes ground = zero): finrank_span_eq_card
 theorem finrank_span_eq_card [Nontrivial R] {ι : Type*} [Fintype ι] {b : ι → M}
     (hb : LinearIndependent R b) :
     finrank R (span R (Set.range b)) = Fintype.card ι :=

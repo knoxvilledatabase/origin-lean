@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Monotone/Monovary.lean
-Genuine: 88 of 92 | Dissolved: 0 | Infrastructure: 4
+Genuine: 88 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Set.Operations

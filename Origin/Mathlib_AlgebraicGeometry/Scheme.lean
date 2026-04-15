@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Scheme.lean
-Genuine: 95 of 147 | Dissolved: 0 | Infrastructure: 52
+Genuine: 95 | Conflates: 0 | Dissolved: 0 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Spec

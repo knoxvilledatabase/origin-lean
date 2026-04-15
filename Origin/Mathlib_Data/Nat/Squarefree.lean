@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Squarefree.lean
-Genuine: 40 of 50 | Dissolved: 8 | Infrastructure: 2
+Genuine: 40 | Conflates: 0 | Dissolved: 8 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Squarefree.Basic

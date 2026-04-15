@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Quotient/Operations.lean
-Genuine: 90 of 135 | Dissolved: 0 | Infrastructure: 45
+Genuine: 90 | Conflates: 0 | Dissolved: 0 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Operations

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Lattice.lean
-Genuine: 41 of 68 | Dissolved: 2 | Infrastructure: 25
+Genuine: 39 | Conflates: 2 | Dissolved: 2 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Lattice
@@ -113,6 +113,7 @@ theorem subsingleton_iff_eq_bot : Subsingleton p ↔ p = ⊥ := by
 theorem eq_bot_of_subsingleton [Subsingleton p] : p = ⊥ :=
   subsingleton_iff_eq_bot.mp inferInstance
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_ne_bot
 theorem nontrivial_iff_ne_bot : Nontrivial p ↔ p ≠ ⊥ := by
   rw [iff_not_comm, not_nontrivial_iff_subsingleton, subsingleton_iff_eq_bot]
 
@@ -308,6 +309,7 @@ theorem subsingleton_iff : Subsingleton (Submodule R M) ↔ Subsingleton M :=
       bot_toAddSubmonoid, top_toAddSubmonoid]
   h.trans AddSubmonoid.subsingleton_iff
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff
 @[simp]
 theorem nontrivial_iff : Nontrivial (Submodule R M) ↔ Nontrivial M :=
   not_iff_not.mp

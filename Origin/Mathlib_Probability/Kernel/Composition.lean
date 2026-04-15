@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Composition.lean
-Genuine: 126 of 187 | Dissolved: 0 | Infrastructure: 61
+Genuine: 126 | Conflates: 0 | Dissolved: 0 | Infrastructure: 61
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.MeasurableIntegral

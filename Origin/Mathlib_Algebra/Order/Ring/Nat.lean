@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Nat.lean
-Genuine: 1 of 9 | Dissolved: 0 | Infrastructure: 8
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Nat

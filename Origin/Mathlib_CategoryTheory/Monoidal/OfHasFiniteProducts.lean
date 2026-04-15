@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/OfHasFiniteProducts.lean
-Genuine: 12 of 39 | Dissolved: 0 | Infrastructure: 27
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic

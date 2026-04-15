@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SetFamily/AhlswedeZhang.lean
-Genuine: 47 of 49 | Dissolved: 0 | Infrastructure: 2
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Functor/KanExtension/Basic.lean
-Genuine: 74 of 80 | Dissolved: 0 | Infrastructure: 6
+Genuine: 74 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/Defs.lean
-Genuine: 46 of 62 | Dissolved: 1 | Infrastructure: 15
+Genuine: 46 | Conflates: 0 | Dissolved: 1 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.StructurePolynomial

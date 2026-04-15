@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Basis/Basic.lean
-Genuine: 42 of 49 | Dissolved: 2 | Infrastructure: 5
+Genuine: 41 | Conflates: 1 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finprod
@@ -166,6 +166,7 @@ theorem Basis.eq_bot_of_rank_eq_zero [NoZeroDivisors R] (b : Basis ι R M) (N : 
 
 namespace Basis
 
+-- CONFLATES (assumes ground = zero): maximal
 theorem maximal [Nontrivial R] (b : Basis ι R M) : b.linearIndependent.Maximal := fun w hi h => by
   -- If `w` is strictly bigger than `range b`,
   apply le_antisymm h

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/BddLat.lean
-Genuine: 8 of 30 | Dissolved: 0 | Infrastructure: 22
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Unique

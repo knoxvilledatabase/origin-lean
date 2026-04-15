@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Vector/MapLemmas.lean
-Genuine: 36 of 36 | Dissolved: 0 | Infrastructure: 0
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Vector.Basic

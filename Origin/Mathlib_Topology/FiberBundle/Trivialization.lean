@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/FiberBundle/Trivialization.lean
-Genuine: 109 of 121 | Dissolved: 0 | Infrastructure: 12
+Genuine: 109 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Data.Bundle

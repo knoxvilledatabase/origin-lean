@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Exp.lean
-Genuine: 63 of 69 | Dissolved: 0 | Infrastructure: 6
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Asymptotics

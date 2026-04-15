@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/TopCat/Basic.lean
-Genuine: 17 of 34 | Dissolved: 0 | Infrastructure: 17
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom

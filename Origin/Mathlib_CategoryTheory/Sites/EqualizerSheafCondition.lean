@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/EqualizerSheafCondition.lean
-Genuine: 27 of 31 | Dissolved: 0 | Infrastructure: 4
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.IsSheafFor

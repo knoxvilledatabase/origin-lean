@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/KummerExtension.lean
-Genuine: 30 of 48 | Dissolved: 18 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 18 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots

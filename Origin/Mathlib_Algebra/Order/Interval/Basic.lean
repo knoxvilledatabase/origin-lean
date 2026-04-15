@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Interval/Basic.lean
-Genuine: 32 of 83 | Dissolved: 2 | Infrastructure: 49
+Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic

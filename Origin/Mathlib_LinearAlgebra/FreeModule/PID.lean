@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/FreeModule/PID.lean
-Genuine: 29 of 34 | Dissolved: 1 | Infrastructure: 4
+Genuine: 29 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition

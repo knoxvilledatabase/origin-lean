@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Ring/SeminormFromConst.lean
-Genuine: 18 of 22 | Dissolved: 2 | Infrastructure: 2
+Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Ring.Seminorm

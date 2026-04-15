@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomotopyCofiber.lean
-Genuine: 62 of 63 | Dissolved: 0 | Infrastructure: 1
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplexBiprod

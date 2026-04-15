@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/EulerSineProd.lean
-Genuine: 6 of 12 | Dissolved: 6 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Integrals

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/SymmDiff.lean
-Genuine: 138 of 159 | Dissolved: 0 | Infrastructure: 21
+Genuine: 138 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Order.BooleanAlgebra

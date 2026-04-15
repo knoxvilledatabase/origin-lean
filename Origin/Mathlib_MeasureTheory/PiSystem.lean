@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/PiSystem.lean
-Genuine: 68 of 76 | Dissolved: 0 | Infrastructure: 8
+Genuine: 68 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Logic.Encodable.Lattice

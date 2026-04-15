@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Dual.lean
-Genuine: 11 of 13 | Dissolved: 0 | Infrastructure: 2
+Genuine: 10 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection
@@ -87,6 +87,7 @@ local notation "⟪" x ", " y "⟫" => @inner 𝕜 E _ x y
 
 local postfix:90 "†" => starRingEnd _
 
+-- CONFLATES (assumes ground = zero): innerSL_norm
 theorem innerSL_norm [Nontrivial E] : ‖(innerSL 𝕜 : E →L⋆[𝕜] E →L[𝕜] 𝕜)‖ = 1 :=
   show ‖(toDualMap 𝕜 E).toContinuousLinearMap‖ = 1 from LinearIsometry.norm_toContinuousLinearMap _
 

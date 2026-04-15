@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/Biproducts.lean
-Genuine: 85 of 90 | Dissolved: 2 | Infrastructure: 3
+Genuine: 85 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Ext

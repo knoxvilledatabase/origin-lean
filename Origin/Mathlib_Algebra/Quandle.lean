@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Quandle.lean
-Genuine: 52 of 74 | Dissolved: 0 | Infrastructure: 22
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic

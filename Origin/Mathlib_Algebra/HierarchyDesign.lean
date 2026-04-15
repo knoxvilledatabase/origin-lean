@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/HierarchyDesign.lean
-Genuine: 16 of 26 | Dissolved: 0 | Infrastructure: 10
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Init

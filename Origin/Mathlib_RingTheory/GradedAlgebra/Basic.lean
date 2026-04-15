@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/GradedAlgebra/Basic.lean
-Genuine: 31 of 38 | Dissolved: 2 | Infrastructure: 5
+Genuine: 31 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Algebra

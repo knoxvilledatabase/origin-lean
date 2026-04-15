@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Lifts.lean
-Genuine: 21 of 22 | Dissolved: 0 | Infrastructure: 1
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -138,6 +138,7 @@ end LiftDeg
 
 section Monic
 
+-- CONFLATES (assumes ground = zero): lifts_and_degree_eq_and_monic
 theorem lifts_and_degree_eq_and_monic [Nontrivial S] {p : S[X]} (hlifts : p ∈ lifts f)
     (hp : p.Monic) : ∃ q : R[X], map f q = p ∧ q.degree = p.degree ∧ q.Monic := by
   rw [lifts_iff_coeff_lifts] at hlifts

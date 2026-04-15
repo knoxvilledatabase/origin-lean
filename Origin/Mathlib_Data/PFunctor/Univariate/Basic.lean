@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PFunctor/Univariate/Basic.lean
-Genuine: 23 of 31 | Dissolved: 0 | Infrastructure: 8
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.W.Basic

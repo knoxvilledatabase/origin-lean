@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/LocallyDiscrete.lean
-Genuine: 7 of 21 | Dissolved: 0 | Infrastructure: 14
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.DiscreteCategory

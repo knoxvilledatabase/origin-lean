@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/MorphismProperty/Limits.lean
-Genuine: 28 of 46 | Dissolved: 0 | Infrastructure: 18
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq

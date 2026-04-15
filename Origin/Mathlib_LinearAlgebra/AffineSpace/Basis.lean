@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Basis.lean
-Genuine: 31 of 46 | Dissolved: 0 | Infrastructure: 15
+Genuine: 30 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.Independent
@@ -214,6 +214,7 @@ theorem coe_coord_of_subsingleton_eq_one [Subsingleton ι] (i : ι) : (b.coord i
     simp [eq_iff_true_of_subsingleton]
   rw [Pi.one_apply, hq, b.coord_apply_combination_of_mem hi hw, Function.const_apply]
 
+-- CONFLATES (assumes ground = zero): surjective_coord
 theorem surjective_coord [Nontrivial ι] (i : ι) : Function.Surjective <| b.coord i := by
   classical
     intro x

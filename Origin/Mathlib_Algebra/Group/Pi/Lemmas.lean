@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Pi/Lemmas.lean
-Genuine: 46 of 56 | Dissolved: 1 | Infrastructure: 9
+Genuine: 46 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs

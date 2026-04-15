@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Comma/Basic.lean
-Genuine: 43 of 74 | Dissolved: 0 | Infrastructure: 31
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Iso

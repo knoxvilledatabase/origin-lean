@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Ultrafilter.lean
-Genuine: 75 of 93 | Dissolved: 0 | Infrastructure: 18
+Genuine: 74 | Conflates: 1 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Cofinite
@@ -30,6 +30,7 @@ instance : IsAtomic (Filter α) :=
     ⟨sInf c, (sInf_neBot_of_directed' hne (show IsChain (· ≥ ·) c from hc.symm).directedOn hb).ne,
       fun _ hx => sInf_le hx⟩
 
+-- CONFLATES (assumes ground = zero): Ultrafilter
 structure Ultrafilter (α : Type*) extends Filter α where
   /-- An ultrafilter is nontrivial. -/
   protected neBot' : NeBot toFilter

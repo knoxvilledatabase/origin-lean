@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CategoryTheory/Coherence/Normalize.lean
-Genuine: 48 of 48 | Dissolved: 0 | Infrastructure: 0
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Meta.AppBuilder

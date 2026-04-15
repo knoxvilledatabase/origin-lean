@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Index.lean
-Genuine: 65 of 95 | Dissolved: 17 | Infrastructure: 13
+Genuine: 65 | Conflates: 0 | Dissolved: 17 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Finset

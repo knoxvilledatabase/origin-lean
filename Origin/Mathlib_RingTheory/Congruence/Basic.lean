@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Congruence/Basic.lean
-Genuine: 13 of 30 | Dissolved: 0 | Infrastructure: 17
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Action.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/Profinite/Nobeling.lean
-Genuine: 149 of 166 | Dissolved: 0 | Infrastructure: 17
+Genuine: 149 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Free

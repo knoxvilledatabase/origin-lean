@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Basic.lean
-Genuine: 29 of 63 | Dissolved: 3 | Infrastructure: 31
+Genuine: 26 | Conflates: 3 | Dissolved: 3 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
@@ -262,15 +262,18 @@ theorem of_algebraMap_injective [CommSemiring R] [Semiring A] [Algebra R A] [NoZ
 
 variable (R A)
 
+-- CONFLATES (assumes ground = zero): algebraMap_injective
 theorem algebraMap_injective [CommRing R] [Ring A] [Nontrivial A] [Algebra R A]
     [NoZeroSMulDivisors R A] : Function.Injective (algebraMap R A) := by
   simpa only [algebraMap_eq_smul_one'] using smul_left_injective R one_ne_zero
 
+-- CONFLATES (assumes ground = zero): algebraMap_eq_zero_iff
 @[simp]
 lemma algebraMap_eq_zero_iff [CommRing R] [Ring A] [Nontrivial A] [Algebra R A]
     [NoZeroSMulDivisors R A] {r : R} : algebraMap R A r = 0 ↔ r = 0 :=
   map_eq_zero_iff _ <| algebraMap_injective R A
 
+-- CONFLATES (assumes ground = zero): algebraMap_eq_one_iff
 @[simp]
 lemma algebraMap_eq_one_iff [CommRing R] [Ring A] [Nontrivial A] [Algebra R A]
     [NoZeroSMulDivisors R A] {r : R} : algebraMap R A r = 1 ↔ r = 1 :=

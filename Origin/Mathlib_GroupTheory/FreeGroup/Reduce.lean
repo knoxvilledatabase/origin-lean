@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/FreeGroup/Reduce.lean
-Genuine: 38 of 51 | Dissolved: 1 | Infrastructure: 12
+Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.GroupTheory.FreeGroup.Basic

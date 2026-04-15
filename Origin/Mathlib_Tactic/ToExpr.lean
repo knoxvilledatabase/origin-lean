@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/ToExpr.lean
-Genuine: 1 of 21 | Dissolved: 0 | Infrastructure: 20
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Tactic.DeriveToExpr

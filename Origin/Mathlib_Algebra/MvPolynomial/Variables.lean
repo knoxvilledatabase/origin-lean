@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Variables.lean
-Genuine: 29 of 32 | Dissolved: 3 | Infrastructure: 0
+Genuine: 28 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Lex
@@ -77,6 +77,7 @@ theorem vars_0 : (0 : MvPolynomial σ R).vars = ∅ := by
 theorem vars_C : (C r : MvPolynomial σ R).vars = ∅ := by
   classical rw [vars_def, degrees_C, Multiset.toFinset_zero]
 
+-- CONFLATES (assumes ground = zero): vars_X
 @[simp]
 theorem vars_X [Nontrivial R] : (X n : MvPolynomial σ R).vars = {n} := by
   rw [X, vars_monomial (one_ne_zero' R), Finsupp.support_single_ne_zero _ (one_ne_zero' ℕ)]

@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Disintegration/StandardBorel.lean
-Genuine: 23 of 39 | Dissolved: 2 | Infrastructure: 14
+Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.MeasureCompProd

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Bernstein.lean
-Genuine: 18 of 23 | Dissolved: 2 | Infrastructure: 3
+Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.PDeriv

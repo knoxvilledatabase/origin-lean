@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/AtPrime.lean
-Genuine: 24 of 26 | Dissolved: 0 | Infrastructure: 2
+Genuine: 23 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.Ideal
@@ -58,6 +58,7 @@ protected abbrev Localization.AtPrime :=
 
 namespace IsLocalization
 
+-- CONFLATES (assumes ground = zero): AtPrime.Nontrivial
 theorem AtPrime.Nontrivial [IsLocalization.AtPrime S P] : Nontrivial S :=
   nontrivial_of_ne (0 : S) 1 fun hze => by
     rw [← (algebraMap R S).map_one, ← (algebraMap R S).map_zero] at hze

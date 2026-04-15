@@ -1,6 +1,6 @@
 /-
 Extracted from Order/OmegaCompletePartialOrder.lean
-Genuine: 110 of 139 | Dissolved: 0 | Infrastructure: 29
+Genuine: 110 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Control.Monad.Basic

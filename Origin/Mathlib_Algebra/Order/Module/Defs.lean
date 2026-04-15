@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Module/Defs.lean
-Genuine: 131 of 172 | Dissolved: 2 | Infrastructure: 39
+Genuine: 131 | Conflates: 0 | Dissolved: 2 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Algebra.NoZeroSMulDivisors.Basic

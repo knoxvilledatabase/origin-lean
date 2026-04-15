@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/AdicCompletion/Basic.lean
-Genuine: 42 of 89 | Dissolved: 0 | Infrastructure: 47
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 47
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

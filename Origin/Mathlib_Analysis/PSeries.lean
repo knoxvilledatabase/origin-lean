@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/PSeries.lean
-Genuine: 30 of 36 | Dissolved: 4 | Infrastructure: 2
+Genuine: 30 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal

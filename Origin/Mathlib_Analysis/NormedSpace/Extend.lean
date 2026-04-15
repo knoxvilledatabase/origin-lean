@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/Extend.lean
-Genuine: 9 of 14 | Dissolved: 0 | Infrastructure: 5
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.RestrictScalars

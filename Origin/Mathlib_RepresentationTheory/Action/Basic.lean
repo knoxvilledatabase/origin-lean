@@ -1,6 +1,6 @@
 /-
 Extracted from RepresentationTheory/Action/Basic.lean
-Genuine: 24 of 41 | Dissolved: 0 | Infrastructure: 17
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic

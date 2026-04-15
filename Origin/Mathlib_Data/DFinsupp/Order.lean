@@ -1,6 +1,6 @@
 /-
 Extracted from Data/DFinsupp/Order.lean
-Genuine: 22 of 51 | Dissolved: 0 | Infrastructure: 29
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Module.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Isometry.lean
-Genuine: 80 of 116 | Dissolved: 0 | Infrastructure: 36
+Genuine: 79 | Conflates: 1 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Antilipschitz
@@ -65,6 +65,7 @@ theorem lipschitz (h : Isometry f) : LipschitzWith 1 f :=
 theorem antilipschitz (h : Isometry f) : AntilipschitzWith 1 f := fun x y => by
   simp only [h x y, ENNReal.coe_one, one_mul, le_refl]
 
+-- CONFLATES (assumes ground = zero): _root_.isometry_subsingleton
 @[nontriviality]
 theorem _root_.isometry_subsingleton [Subsingleton α] : Isometry f := fun x y => by
   rw [Subsingleton.elim x y]; simp

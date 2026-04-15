@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/UpperLowerSetTopology.lean
-Genuine: 45 of 83 | Dissolved: 0 | Infrastructure: 38
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Topology.AlexandrovDiscrete

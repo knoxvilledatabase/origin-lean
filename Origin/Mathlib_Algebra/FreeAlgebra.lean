@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/FreeAlgebra.lean
-Genuine: 35 of 56 | Dissolved: 2 | Infrastructure: 19
+Genuine: 32 | Conflates: 3 | Dissolved: 2 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
@@ -439,6 +439,7 @@ theorem algebraMap_eq_zero_iff (x : R) : algebraMap R (FreeAlgebra R X) x = 0 �
 theorem algebraMap_eq_one_iff (x : R) : algebraMap R (FreeAlgebra R X) x = 1 ↔ x = 1 :=
   map_eq_one_iff (algebraMap _ _) algebraMap_leftInverse.injective
 
+-- CONFLATES (assumes ground = zero): ι_injective
 theorem ι_injective [Nontrivial R] : Function.Injective (ι R : X → FreeAlgebra R X) :=
   fun x y hoxy ↦
   by_contradiction <| by
@@ -449,10 +450,12 @@ theorem ι_injective [Nontrivial R] : Function.Injective (ι R : X → FreeAlgeb
         have hfy0 : f (ι R y) = 0 := (lift_ι_apply _ _).trans <| if_neg hxy
         one_ne_zero <| hfy1.symm.trans hfy0
 
+-- CONFLATES (assumes ground = zero): ι_inj
 @[simp]
 theorem ι_inj [Nontrivial R] (x y : X) : ι R x = ι R y ↔ x = y :=
   ι_injective.eq_iff
 
+-- CONFLATES (assumes ground = zero): ι_ne_algebraMap
 @[simp]
 theorem ι_ne_algebraMap [Nontrivial R] (x : X) (r : R) : ι R x ≠ algebraMap R _ r := fun h ↦ by
   let f0 : FreeAlgebra R X →ₐ[R] R := lift R 0

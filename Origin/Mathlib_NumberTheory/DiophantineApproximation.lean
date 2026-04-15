@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/DiophantineApproximation.lean
-Genuine: 18 of 23 | Dissolved: 0 | Infrastructure: 5
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Computation.ApproximationCorollaries

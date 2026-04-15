@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/Grp/Basic.lean
-Genuine: 31 of 78 | Dissolved: 0 | Infrastructure: 47
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 47
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.MonCat.Basic

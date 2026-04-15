@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Basic.lean
-Genuine: 178 of 227 | Dissolved: 10 | Infrastructure: 39
+Genuine: 175 | Conflates: 5 | Dissolved: 10 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finsupp
@@ -1194,14 +1194,17 @@ Throughout this section, some `Monoid` and `Semiring` arguments are specified wi
 `[]`. See note [implicit instance arguments].
 -/
 
+-- CONFLATES (assumes ground = zero): coe_smul
 @[simp, norm_cast]
 theorem coe_smul [Zero M] [SMulZeroClass R M] (b : R) (v : α →₀ M) : ⇑(b • v) = b • ⇑v :=
   rfl
 
+-- CONFLATES (assumes ground = zero): smul_apply
 theorem smul_apply [Zero M] [SMulZeroClass R M] (b : R) (v : α →₀ M) (a : α) :
     (b • v) a = b • v a :=
   rfl
 
+-- CONFLATES (assumes ground = zero): _root_.IsSMulRegular.finsupp
 theorem _root_.IsSMulRegular.finsupp [Zero M] [SMulZeroClass R M] {k : R}
     (hk : IsSMulRegular M k) : IsSMulRegular (α →₀ M) k :=
   fun _ _ h => ext fun i => hk (DFunLike.congr_fun h i)
@@ -1247,6 +1250,7 @@ instance module [Semiring R] [AddCommMonoid M] [Module R M] : Module R (α →�
 
 variable {α M}
 
+-- CONFLATES (assumes ground = zero): support_smul
 theorem support_smul [AddMonoid M] [SMulZeroClass R M] {b : R} {g : α →₀ M} :
     (b • g).support ⊆ g.support := fun a => by
   simp only [smul_apply, mem_support_iff, Ne]
@@ -1271,6 +1275,7 @@ theorem mapDomain_smul {_ : Monoid R} [AddCommMonoid M] [DistribMulAction R M] {
     (v : α →₀ M) : mapDomain f (b • v) = b • mapDomain f v :=
   mapDomain_mapRange _ _ _ _ (smul_add b)
 
+-- CONFLATES (assumes ground = zero): smul_single
 @[simp]
 theorem smul_single [Zero M] [SMulZeroClass R M] (c : R) (a : α) (b : M) :
     c • Finsupp.single a b = Finsupp.single a (c • b) :=

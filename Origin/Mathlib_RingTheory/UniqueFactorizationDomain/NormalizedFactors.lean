@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/NormalizedFactors.lean
-Genuine: 20 of 30 | Dissolved: 10 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Max.lean
-Genuine: 90 of 101 | Dissolved: 2 | Infrastructure: 9
+Genuine: 90 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold

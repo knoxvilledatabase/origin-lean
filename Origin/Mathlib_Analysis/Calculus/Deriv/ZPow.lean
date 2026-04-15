@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/Deriv/ZPow.lean
-Genuine: 9 of 19 | Dissolved: 10 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Pow

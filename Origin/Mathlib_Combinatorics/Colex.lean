@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Colex.lean
-Genuine: 56 of 80 | Dissolved: 0 | Infrastructure: 24
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

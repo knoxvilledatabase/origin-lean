@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/Homogeneous.lean
-Genuine: 52 of 59 | Dissolved: 4 | Infrastructure: 3
+Genuine: 52 | Conflates: 0 | Dissolved: 4 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Internal

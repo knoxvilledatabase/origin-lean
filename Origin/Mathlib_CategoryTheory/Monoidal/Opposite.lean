@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Opposite.lean
-Genuine: 23 of 96 | Dissolved: 0 | Infrastructure: 73
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 73
 -/
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Monoidal.PureCoherence

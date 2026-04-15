@@ -1,6 +1,6 @@
 /-
 Extracted from Data/TwoPointing.lean
-Genuine: 10 of 25 | Dissolved: 0 | Infrastructure: 15
+Genuine: 8 | Conflates: 2 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Logic.Nontrivial.Defs
@@ -54,6 +54,7 @@ theorem swap_swap : p.swap.swap = p := rfl
 
 include p in
 
+-- CONFLATES (assumes ground = zero): to_nontrivial
 theorem to_nontrivial : Nontrivial α :=
   ⟨⟨p.fst, p.snd, p.fst_ne_snd⟩⟩
 
@@ -61,6 +62,7 @@ instance [Nontrivial α] : Nonempty (TwoPointing α) :=
   let ⟨a, b, h⟩ := exists_pair_ne α
   ⟨⟨(a, b), h⟩⟩
 
+-- CONFLATES (assumes ground = zero): nonempty_two_pointing_iff
 @[simp]
 theorem nonempty_two_pointing_iff : Nonempty (TwoPointing α) ↔ Nontrivial α :=
   ⟨fun ⟨p⟩ ↦ p.to_nontrivial, fun _ => inferInstance⟩

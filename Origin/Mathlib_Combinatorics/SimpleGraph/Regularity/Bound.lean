@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Bound.lean
-Genuine: 30 of 31 | Dissolved: 1 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Chebyshev

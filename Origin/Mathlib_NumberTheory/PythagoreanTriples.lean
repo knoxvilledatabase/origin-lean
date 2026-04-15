@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/PythagoreanTriples.lean
-Genuine: 28 of 37 | Dissolved: 5 | Infrastructure: 4
+Genuine: 28 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic

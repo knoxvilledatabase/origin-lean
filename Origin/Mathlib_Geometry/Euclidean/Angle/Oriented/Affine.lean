@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/Affine.lean
-Genuine: 82 of 99 | Dissolved: 7 | Infrastructure: 10
+Genuine: 82 | Conflates: 0 | Dissolved: 7 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Side

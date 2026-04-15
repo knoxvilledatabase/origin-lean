@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Constructions/Polish/Basic.lean
-Genuine: 51 of 60 | Dissolved: 0 | Infrastructure: 9
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Metric

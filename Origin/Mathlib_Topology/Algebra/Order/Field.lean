@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Order/Field.lean
-Genuine: 25 of 32 | Dissolved: 4 | Infrastructure: 3
+Genuine: 25 | Conflates: 0 | Dissolved: 4 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Pointwise.Interval

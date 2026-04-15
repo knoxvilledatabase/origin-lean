@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Hom/Ring.lean
-Genuine: 27 of 74 | Dissolved: 5 | Infrastructure: 42
+Genuine: 27 | Conflates: 0 | Dissolved: 5 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Hom.Monoid

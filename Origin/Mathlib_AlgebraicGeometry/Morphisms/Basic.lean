@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/Basic.lean
-Genuine: 48 of 57 | Dissolved: 0 | Infrastructure: 9
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.AffineScheme

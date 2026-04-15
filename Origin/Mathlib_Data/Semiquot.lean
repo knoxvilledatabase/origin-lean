@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Semiquot.lean
-Genuine: 37 of 48 | Dissolved: 0 | Infrastructure: 11
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice

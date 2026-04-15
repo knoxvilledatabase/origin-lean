@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Intervals.lean
-Genuine: 30 of 31 | Dissolved: 0 | Infrastructure: 1
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.List.Lattice

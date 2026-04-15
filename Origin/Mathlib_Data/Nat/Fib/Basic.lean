@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Fib/Basic.lean
-Genuine: 30 of 34 | Dissolved: 1 | Infrastructure: 3
+Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

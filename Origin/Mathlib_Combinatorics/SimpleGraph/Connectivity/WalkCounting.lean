@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Connectivity/WalkCounting.lean
-Genuine: 16 of 30 | Dissolved: 0 | Infrastructure: 14
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring.Nat

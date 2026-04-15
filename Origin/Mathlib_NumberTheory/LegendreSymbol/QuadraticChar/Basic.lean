@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/QuadraticChar/Basic.lean
-Genuine: 18 of 28 | Dissolved: 10 | Infrastructure: 0
+Genuine: 17 | Conflates: 1 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Parity
@@ -159,6 +159,7 @@ variable {F}
 
 set_option linter.deprecated false in
 
+-- CONFLATES (assumes ground = zero): quadraticChar_isNontrivial
 theorem quadraticChar_isNontrivial (hF : ringChar F ≠ 2) : (quadraticChar F).IsNontrivial :=
   (isNontrivial_iff _).mpr <| quadraticChar_ne_one hF
 

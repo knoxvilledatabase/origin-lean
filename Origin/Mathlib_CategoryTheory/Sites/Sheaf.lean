@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Sheaf.lean
-Genuine: 48 of 67 | Dissolved: 0 | Infrastructure: 19
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Equalizers

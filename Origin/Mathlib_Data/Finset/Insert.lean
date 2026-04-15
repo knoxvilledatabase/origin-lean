@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Insert.lean
-Genuine: 109 of 130 | Dissolved: 2 | Infrastructure: 19
+Genuine: 100 | Conflates: 9 | Dissolved: 2 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Attr
@@ -162,27 +162,36 @@ theorem ssubset_singleton_iff {s : Finset α} {a : α} : s ⊂ {a} ↔ s = ∅ :
 theorem eq_empty_of_ssubset_singleton {s : Finset α} {x : α} (hs : s ⊂ {x}) : s = ∅ :=
   ssubset_singleton_iff.1 hs
 
+-- CONFLATES (assumes ground = zero): Nontrivial
 protected abbrev Nontrivial (s : Finset α) : Prop := (s : Set α).Nontrivial
 
+-- CONFLATES (assumes ground = zero): Nontrivial.nonempty
 nonrec lemma Nontrivial.nonempty (hs : s.Nontrivial) : s.Nonempty := hs.nonempty
 
+-- CONFLATES (assumes ground = zero): not_nontrivial_empty
 @[simp]
 theorem not_nontrivial_empty : ¬ (∅ : Finset α).Nontrivial := by simp [Finset.Nontrivial]
 
+-- CONFLATES (assumes ground = zero): not_nontrivial_singleton
 @[simp]
 theorem not_nontrivial_singleton : ¬ ({a} : Finset α).Nontrivial := by simp [Finset.Nontrivial]
 
+-- CONFLATES (assumes ground = zero): Nontrivial.ne_singleton
 theorem Nontrivial.ne_singleton (hs : s.Nontrivial) : s ≠ {a} := by
   rintro rfl; exact not_nontrivial_singleton hs
 
+-- CONFLATES (assumes ground = zero): Nontrivial.exists_ne
 nonrec lemma Nontrivial.exists_ne (hs : s.Nontrivial) (a : α) : ∃ b ∈ s, b ≠ a := hs.exists_ne _
 
+-- CONFLATES (assumes ground = zero): eq_singleton_or_nontrivial
 theorem eq_singleton_or_nontrivial (ha : a ∈ s) : s = {a} ∨ s.Nontrivial := by
   rw [← coe_eq_singleton]; exact Set.eq_singleton_or_nontrivial ha
 
+-- CONFLATES (assumes ground = zero): nontrivial_iff_ne_singleton
 theorem nontrivial_iff_ne_singleton (ha : a ∈ s) : s.Nontrivial ↔ s ≠ {a} :=
   ⟨Nontrivial.ne_singleton, (eq_singleton_or_nontrivial ha).resolve_left⟩
 
+-- CONFLATES (assumes ground = zero): Nonempty.exists_eq_singleton_or_nontrivial
 theorem Nonempty.exists_eq_singleton_or_nontrivial : s.Nonempty → (∃ a, s = {a}) ∨ s.Nontrivial :=
   fun ⟨a, ha⟩ => (eq_singleton_or_nontrivial ha).imp_left <| Exists.intro a
 

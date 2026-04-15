@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/FiniteDimensional/Defs.lean
-Genuine: 49 of 81 | Dissolved: 11 | Infrastructure: 21
+Genuine: 49 | Conflates: 0 | Dissolved: 11 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Projective

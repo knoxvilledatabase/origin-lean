@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/TwoDim.lean
-Genuine: 60 of 70 | Dissolved: 4 | Infrastructure: 6
+Genuine: 60 | Conflates: 0 | Dissolved: 4 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Dual

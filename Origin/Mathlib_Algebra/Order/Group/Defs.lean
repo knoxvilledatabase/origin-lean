@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/Defs.lean
-Genuine: 17 of 23 | Dissolved: 0 | Infrastructure: 6
+Genuine: 16 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Basic
@@ -102,6 +102,7 @@ theorem eq_one_of_inv_eq' (h : a⁻¹ = a) : a = 1 :=
     have : a < 1 := h ▸ inv_lt_one'.mpr h₁
     absurd h₁ this.asymm
 
+-- CONFLATES (assumes ground = zero): exists_one_lt'
 @[to_additive exists_zero_lt]
 theorem exists_one_lt' [Nontrivial α] : ∃ a : α, 1 < a := by
   obtain ⟨y, hy⟩ := Decidable.exists_ne (1 : α)

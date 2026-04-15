@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Bicones.lean
-Genuine: 3 of 12 | Dissolved: 0 | Infrastructure: 9
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Cones

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/EuclideanDist.lean
-Genuine: 16 of 19 | Dissolved: 1 | Infrastructure: 2
+Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Calculus

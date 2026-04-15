@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Multiequalizer.lean
-Genuine: 73 of 106 | Dissolved: 0 | Infrastructure: 33
+Genuine: 73 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Products

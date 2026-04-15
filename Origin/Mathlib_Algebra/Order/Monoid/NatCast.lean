@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Monoid/NatCast.lean
-Genuine: 12 of 17 | Dissolved: 2 | Infrastructure: 3
+Genuine: 12 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/PontryaginDual.lean
-Genuine: 6 of 16 | Dissolved: 0 | Infrastructure: 10
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle

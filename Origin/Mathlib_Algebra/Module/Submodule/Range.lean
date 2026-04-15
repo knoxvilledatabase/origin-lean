@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Range.lean
-Genuine: 48 of 59 | Dissolved: 2 | Infrastructure: 9
+Genuine: 48 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Ker

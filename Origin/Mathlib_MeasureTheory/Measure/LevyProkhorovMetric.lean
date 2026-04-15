@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/LevyProkhorovMetric.lean
-Genuine: 33 of 40 | Dissolved: 0 | Infrastructure: 7
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Portmanteau

@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Path.lean
-Genuine: 158 of 176 | Dissolved: 0 | Infrastructure: 18
+Genuine: 156 | Conflates: 2 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Walk
@@ -719,6 +719,7 @@ lemma bot_preconnected_iff_subsingleton : (⊥ : SimpleGraph V).Preconnected ↔
 lemma bot_preconnected [Subsingleton V] : (⊥ : SimpleGraph V).Preconnected :=
   bot_preconnected_iff_subsingleton.mpr ‹_›
 
+-- CONFLATES (assumes ground = zero): bot_not_preconnected
 lemma bot_not_preconnected [Nontrivial V] : ¬(⊥ : SimpleGraph V).Preconnected :=
   bot_preconnected_iff_subsingleton.not.mpr <| not_subsingleton_iff_nontrivial.mpr ‹_›
 
@@ -756,6 +757,7 @@ protected lemma Connected.mono {G G' : SimpleGraph V} (h : G ≤ G')
   preconnected := hG.preconnected.mono h
   nonempty := hG.nonempty
 
+-- CONFLATES (assumes ground = zero): bot_not_connected
 lemma bot_not_connected [Nontrivial V] : ¬(⊥ : SimpleGraph V).Connected := by
   simp [bot_not_preconnected, connected_iff, ‹_›]
 

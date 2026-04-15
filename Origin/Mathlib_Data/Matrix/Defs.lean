@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Defs.lean
-Genuine: 43 of 94 | Dissolved: 0 | Infrastructure: 51
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Pi

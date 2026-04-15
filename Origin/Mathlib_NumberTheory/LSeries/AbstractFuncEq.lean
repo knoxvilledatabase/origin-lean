@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/AbstractFuncEq.lean
-Genuine: 29 of 33 | Dissolved: 2 | Infrastructure: 2
+Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.MellinTransform

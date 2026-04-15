@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Finiteness.lean
-Genuine: 40 of 56 | Dissolved: 0 | Infrastructure: 16
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Finite

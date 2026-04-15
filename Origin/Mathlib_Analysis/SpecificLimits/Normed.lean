@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecificLimits/Normed.lean
-Genuine: 73 of 78 | Dissolved: 3 | Infrastructure: 2
+Genuine: 73 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Module

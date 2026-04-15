@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Gluing.lean
-Genuine: 34 of 46 | Dissolved: 0 | Infrastructure: 12
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.PresheafedSpace.Gluing

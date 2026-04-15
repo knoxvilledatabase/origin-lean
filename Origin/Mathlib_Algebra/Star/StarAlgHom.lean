@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/StarAlgHom.lean
-Genuine: 63 of 132 | Dissolved: 0 | Infrastructure: 69
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 69
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv

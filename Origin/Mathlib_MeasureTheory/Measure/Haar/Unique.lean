@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Unique.lean
-Genuine: 21 of 32 | Dissolved: 4 | Infrastructure: 7
+Genuine: 21 | Conflates: 0 | Dissolved: 4 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.LocallyIntegrable

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/RootSystem/Finite/Nondegenerate.lean
-Genuine: 9 of 12 | Dissolved: 1 | Infrastructure: 2
+Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Basic

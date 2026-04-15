@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ENat/Lattice.lean
-Genuine: 37 of 40 | Dissolved: 0 | Infrastructure: 3
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Lattice

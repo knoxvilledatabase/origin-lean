@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/Ray.lean
-Genuine: 9 of 12 | Dissolved: 3 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Ray

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Gluing.lean
-Genuine: 46 of 53 | Dissolved: 0 | Infrastructure: 7
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Isometry

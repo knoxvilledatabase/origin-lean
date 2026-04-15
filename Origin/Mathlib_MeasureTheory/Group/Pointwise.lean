@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/Pointwise.lean
-Genuine: 1 of 3 | Dissolved: 2 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Arithmetic

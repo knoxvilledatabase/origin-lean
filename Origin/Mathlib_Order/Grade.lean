@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Grade.lean
-Genuine: 33 of 44 | Dissolved: 0 | Infrastructure: 11
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.Int.SuccPred

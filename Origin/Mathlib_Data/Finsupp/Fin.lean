@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Fin.lean
-Genuine: 8 of 13 | Dissolved: 3 | Infrastructure: 2
+Genuine: 8 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/NNReal/Defs.lean
-Genuine: 107 of 193 | Dissolved: 28 | Infrastructure: 58
+Genuine: 105 | Conflates: 2 | Dissolved: 28 | Infrastructure: 58
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
@@ -865,6 +865,7 @@ open NNReal
 
 variable {Γ₀ : Type*} [LinearOrderedCommGroupWithZero Γ₀]
 
+-- CONFLATES (assumes ground = zero): NNReal.exists_lt_of_strictMono
 theorem NNReal.exists_lt_of_strictMono [h : Nontrivial Γ₀ˣ] {f : Γ₀ →*₀ ℝ≥0} (hf : StrictMono f)
     {r : ℝ≥0} (hr : 0 < r) : ∃ d : Γ₀ˣ, f d < r := by
   obtain ⟨g, hg1⟩ := (nontrivial_iff_exists_ne (1 : Γ₀ˣ)).mp h
@@ -882,6 +883,7 @@ theorem NNReal.exists_lt_of_strictMono [h : Nontrivial Γ₀ˣ] {f : Γ₀ →*�
   use u ^ n
   rwa [Units.val_pow_eq_pow_val, map_pow]
 
+-- CONFLATES (assumes ground = zero): Real.exists_lt_of_strictMono
 theorem Real.exists_lt_of_strictMono [h : Nontrivial Γ₀ˣ] {f : Γ₀ →*₀ ℝ≥0} (hf : StrictMono f)
     {r : ℝ} (hr : 0 < r) : ∃ d : Γ₀ˣ, (f d : ℝ) < r := by
   set s : NNReal := ⟨r, le_of_lt hr⟩

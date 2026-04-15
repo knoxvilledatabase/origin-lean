@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/UrysohnsLemma.lean
-Genuine: 31 of 34 | Dissolved: 3 | Infrastructure: 0
+Genuine: 31 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Affine.AddTorsor

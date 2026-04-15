@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finmap.lean
-Genuine: 88 of 111 | Dissolved: 0 | Infrastructure: 23
+Genuine: 88 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Data.List.AList

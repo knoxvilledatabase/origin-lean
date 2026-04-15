@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactness/Compact.lean
-Genuine: 140 of 157 | Dissolved: 0 | Infrastructure: 17
+Genuine: 140 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Order.Filter.Tendsto

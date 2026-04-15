@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Bases.lean
-Genuine: 99 of 123 | Dissolved: 0 | Infrastructure: 24
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Data.Set.Constructions

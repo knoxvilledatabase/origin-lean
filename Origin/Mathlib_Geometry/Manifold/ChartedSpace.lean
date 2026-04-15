@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/ChartedSpace.lean
-Genuine: 77 of 115 | Dissolved: 0 | Infrastructure: 38
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Topology.PartialHomeomorph

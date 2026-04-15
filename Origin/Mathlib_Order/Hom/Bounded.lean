@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Hom/Bounded.lean
-Genuine: 43 of 125 | Dissolved: 0 | Infrastructure: 82
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 82
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Basic

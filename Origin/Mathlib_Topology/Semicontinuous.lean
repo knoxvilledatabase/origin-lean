@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Semicontinuous.lean
-Genuine: 148 of 154 | Dissolved: 0 | Infrastructure: 6
+Genuine: 148 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Indicator

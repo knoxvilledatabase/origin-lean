@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/FiberBundle/IsHomeomorphicTrivialBundle.lean
-Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Homeomorph

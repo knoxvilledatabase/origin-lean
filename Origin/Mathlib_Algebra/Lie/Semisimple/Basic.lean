@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Semisimple/Basic.lean
-Genuine: 15 of 22 | Dissolved: 0 | Infrastructure: 7
+Genuine: 14 | Conflates: 1 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Semisimple.Defs
@@ -33,6 +33,7 @@ section Irreducible
 
 variable (R L M : Type*) [CommRing R] [LieRing L] [AddCommGroup M] [Module R M] [LieRingModule L M]
 
+-- CONFLATES (assumes ground = zero): LieModule.nontrivial_of_isIrreducible
 lemma LieModule.nontrivial_of_isIrreducible [LieModule.IsIrreducible R L M] : Nontrivial M where
   exists_pair_ne := by
     have aux : (⊥ : LieSubmodule R L M) ≠ ⊤ := bot_ne_top

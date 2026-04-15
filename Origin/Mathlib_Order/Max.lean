@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Max.lean
-Genuine: 58 of 88 | Dissolved: 0 | Infrastructure: 30
+Genuine: 54 | Conflates: 4 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Order.Synonym
@@ -324,17 +324,21 @@ protected theorem IsBot.lt_of_ne (ha : IsBot a) (h : a ≠ b) : a < b :=
 protected theorem IsTop.lt_of_ne (ha : IsTop a) (h : b ≠ a) : b < a :=
   (ha b).lt_of_ne h
 
+-- CONFLATES (assumes ground = zero): IsBot.not_isMax
 protected theorem IsBot.not_isMax [Nontrivial α] (ha : IsBot a) : ¬ IsMax a := by
   intro ha'
   obtain ⟨b, hb⟩ := exists_ne a
   exact hb <| ha'.eq_of_ge (ha.lt_of_ne hb.symm).le
 
+-- CONFLATES (assumes ground = zero): IsTop.not_isMin
 protected theorem IsTop.not_isMin [Nontrivial α] (ha : IsTop a) : ¬ IsMin a :=
   ha.toDual.not_isMax
 
+-- CONFLATES (assumes ground = zero): IsBot.not_isTop
 protected theorem IsBot.not_isTop [Nontrivial α] (ha : IsBot a) : ¬ IsTop a :=
   mt IsTop.isMax ha.not_isMax
 
+-- CONFLATES (assumes ground = zero): IsTop.not_isBot
 protected theorem IsTop.not_isBot [Nontrivial α] (ha : IsTop a) : ¬ IsBot a :=
   ha.toDual.not_isTop
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Semiconj/Units.lean
-Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Semiconj.Defs

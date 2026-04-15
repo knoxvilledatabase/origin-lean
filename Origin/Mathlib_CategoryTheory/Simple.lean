@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Simple.lean
-Genuine: 10 of 22 | Dissolved: 8 | Infrastructure: 4
+Genuine: 10 | Conflates: 0 | Dissolved: 8 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms

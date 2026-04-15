@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/RankNullity.lean
-Genuine: 18 of 22 | Dissolved: 4 | Infrastructure: 0
+Genuine: 17 | Conflates: 1 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.Constructions
@@ -54,6 +54,7 @@ lemma exists_set_linearIndependent :
 
 variable (R) in
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_hasRankNullity
 theorem nontrivial_of_hasRankNullity : Nontrivial R := by
   refine (subsingleton_or_nontrivial R).resolve_left fun H ↦ ?_
   have := rank_quotient_add_rank (R := R) (M := PUnit) ⊥

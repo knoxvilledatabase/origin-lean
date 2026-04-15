@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Cyclotomic/Rat.lean
-Genuine: 49 of 52 | Dissolved: 0 | Infrastructure: 3
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Cyclotomic.Discriminant

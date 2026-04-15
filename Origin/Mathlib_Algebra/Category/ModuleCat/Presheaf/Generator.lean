@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Presheaf/Generator.lean
-Genuine: 21 of 25 | Dissolved: 0 | Infrastructure: 4
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Abelian

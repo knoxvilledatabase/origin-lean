@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Pullback/Cospan.lean
-Genuine: 44 of 76 | Dissolved: 0 | Infrastructure: 32
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.WidePullbacks

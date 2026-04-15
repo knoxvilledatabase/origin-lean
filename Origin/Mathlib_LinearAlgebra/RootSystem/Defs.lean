@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/RootSystem/Defs.lean
-Genuine: 61 of 77 | Dissolved: 2 | Infrastructure: 14
+Genuine: 61 | Conflates: 0 | Dissolved: 2 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.PerfectPairing

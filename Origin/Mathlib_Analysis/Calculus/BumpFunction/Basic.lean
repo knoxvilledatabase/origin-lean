@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/BumpFunction/Basic.lean
-Genuine: 27 of 30 | Dissolved: 0 | Infrastructure: 3
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Basic

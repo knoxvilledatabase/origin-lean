@@ -1,6 +1,6 @@
 /-
 Extracted from Order/ConditionallyCompleteLattice/Finset.lean
-Genuine: 32 of 35 | Dissolved: 1 | Infrastructure: 2
+Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Max

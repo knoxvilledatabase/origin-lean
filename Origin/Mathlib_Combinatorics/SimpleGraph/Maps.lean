@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Maps.lean
-Genuine: 79 of 107 | Dissolved: 0 | Infrastructure: 28
+Genuine: 79 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Dart

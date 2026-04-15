@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Separable.lean
-Genuine: 59 of 84 | Dissolved: 13 | Infrastructure: 12
+Genuine: 52 | Conflates: 7 | Dissolved: 13 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Expand
@@ -48,6 +48,7 @@ theorem separable_def (f : R[X]) : f.Separable ↔ IsCoprime f (derivative f) :=
 theorem separable_def' (f : R[X]) : f.Separable ↔ ∃ a b : R[X], a * f + b * (derivative f) = 1 :=
   Iff.rfl
 
+-- CONFLATES (assumes ground = zero): not_separable_zero
 theorem not_separable_zero [Nontrivial R] : ¬Separable (0 : R[X]) := by
   rintro ⟨x, y, h⟩
   simp only [derivative_zero, mul_zero, add_zero, zero_ne_one] at h
@@ -58,6 +59,7 @@ theorem not_separable_zero [Nontrivial R] : ¬Separable (0 : R[X]) := by
 theorem separable_one : (1 : R[X]).Separable :=
   isCoprime_one_left
 
+-- CONFLATES (assumes ground = zero): separable_of_subsingleton
 @[nontriviality]
 theorem separable_of_subsingleton [Subsingleton R] (f : R[X]) : f.Separable := by
   simp [Separable, IsCoprime, eq_iff_true_of_subsingleton]
@@ -198,6 +200,7 @@ theorem separable_prod {ι : Sort _} [Fintype ι] {f : ι → R[X]} (h1 : Pairwi
     (h2 : ∀ x, (f x).Separable) : (∏ x, f x).Separable :=
   separable_prod' (fun _x _hx _y _hy hxy => h1 hxy) fun x _hx => h2 x
 
+-- CONFLATES (assumes ground = zero): Separable.inj_of_prod_X_sub_C
 theorem Separable.inj_of_prod_X_sub_C [Nontrivial R] {ι : Sort _} {f : ι → R} {s : Finset ι}
     (hfs : (∏ i ∈ s, (X - C (f i))).Separable) {x y : ι} (hx : x ∈ s) (hy : y ∈ s)
     (hfxy : f x = f y) : x = y := by
@@ -208,10 +211,12 @@ theorem Separable.inj_of_prod_X_sub_C [Nontrivial R] {ι : Sort _} {f : ι → R
     mul_assoc, hfxy, ← sq] at hfs
   cases (hfs.of_mul_left.of_pow (not_isUnit_X_sub_C _) two_ne_zero).2
 
+-- CONFLATES (assumes ground = zero): Separable.injective_of_prod_X_sub_C
 theorem Separable.injective_of_prod_X_sub_C [Nontrivial R] {ι : Sort _} [Fintype ι] {f : ι → R}
     (hfs : (∏ i, (X - C (f i))).Separable) : Function.Injective f := fun _x _y hfxy =>
   hfs.inj_of_prod_X_sub_C (mem_univ _) (mem_univ _) hfxy
 
+-- CONFLATES (assumes ground = zero): nodup_of_separable_prod
 theorem nodup_of_separable_prod [Nontrivial R] {s : Multiset R}
     (hs : Separable (Multiset.map (fun a => X - C a) s).prod) : s.Nodup := by
   rw [Multiset.nodup_iff_ne_cons_cons]
@@ -254,6 +259,7 @@ theorem separable_C_mul_X_pow_add_C_mul_X_add_C'
     (C a * X ^ n + C b * X + C c).Separable :=
   separable_C_mul_X_pow_add_C_mul_X_add_C a b c ((CharP.cast_eq_zero_iff R p n).2 hn) hb
 
+-- CONFLATES (assumes ground = zero): rootMultiplicity_le_one_of_separable
 theorem rootMultiplicity_le_one_of_separable [Nontrivial R] {p : R[X]} (hsep : Separable p)
     (x : R) : rootMultiplicity x p ≤ 1 := by
   classical
@@ -288,6 +294,7 @@ variable {F : Type u} [Field F] {K : Type v} [Field K]
 
 attribute [local instance] Ideal.Quotient.field in
 
+-- CONFLATES (assumes ground = zero): separable_map
 theorem separable_map {S} [CommRing S] [Nontrivial S] (f : F →+* S) {p : F[X]} :
     (p.map f).Separable ↔ p.Separable := by
   refine ⟨fun H ↦ ?_, fun H ↦ H.map⟩

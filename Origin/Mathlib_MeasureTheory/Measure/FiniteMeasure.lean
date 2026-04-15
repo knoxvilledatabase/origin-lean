@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/FiniteMeasure.lean
-Genuine: 62 of 90 | Dissolved: 2 | Infrastructure: 26
+Genuine: 62 | Conflates: 0 | Dissolved: 2 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.WeakDual

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/CompleteField.lean
-Genuine: 27 of 36 | Dissolved: 0 | Infrastructure: 9
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Archimedean.Hom

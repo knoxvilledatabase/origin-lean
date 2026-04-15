@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Additive/AP/Three/Behrend.lean
-Genuine: 49 of 50 | Dissolved: 1 | Infrastructure: 0
+Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2

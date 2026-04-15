@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/GaussLemma.lean
-Genuine: 13 of 15 | Dissolved: 1 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.SplittingField.Construction

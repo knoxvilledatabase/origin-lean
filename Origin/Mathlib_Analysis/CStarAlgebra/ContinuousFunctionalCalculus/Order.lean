@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ContinuousFunctionalCalculus/Order.lean
-Genuine: 50 of 54 | Dissolved: 0 | Infrastructure: 4
+Genuine: 46 | Conflates: 4 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
@@ -124,6 +124,7 @@ lemma cfc_nnreal_le_iff {A : Type*} [TopologicalSpace A] [Ring A] [StarRing A] [
 
 open ContinuousFunctionalCalculus in
 
+-- CONFLATES (assumes ground = zero): CFC.exists_pos_algebraMap_le_iff
 lemma CFC.exists_pos_algebraMap_le_iff {A : Type*} [TopologicalSpace A] [Ring A] [StarRing A]
     [PartialOrder A] [StarOrderedRing A] [Algebra ℝ A] [NonnegSpectrumClass ℝ A] [Nontrivial A]
     [ContinuousFunctionalCalculus ℝ (IsSelfAdjoint : A → Prop)]
@@ -179,6 +180,7 @@ lemma IsSelfAdjoint.toReal_spectralRadius_eq_norm {a : A} (ha : IsSelfAdjoint a)
 
 namespace CStarAlgebra
 
+-- CONFLATES (assumes ground = zero): norm_or_neg_norm_mem_spectrum
 lemma norm_or_neg_norm_mem_spectrum [Nontrivial A] {a : A}
     (ha : IsSelfAdjoint a := by cfc_tac) : ‖a‖ ∈ spectrum ℝ a ∨ -‖a‖ ∈ spectrum ℝ a := by
   have ha' : SpectrumRestricts a Complex.reCLM := ha.spectrumRestricts
@@ -187,6 +189,7 @@ lemma norm_or_neg_norm_mem_spectrum [Nontrivial A] {a : A}
 
 variable [PartialOrder A] [StarOrderedRing A]
 
+-- CONFLATES (assumes ground = zero): nnnorm_mem_spectrum_of_nonneg
 lemma nnnorm_mem_spectrum_of_nonneg [Nontrivial A] {a : A} (ha : 0 ≤ a := by cfc_tac) :
     ‖a‖₊ ∈ spectrum ℝ≥0 a := by
   have : IsSelfAdjoint a := .of_nonneg ha
@@ -194,6 +197,7 @@ lemma nnnorm_mem_spectrum_of_nonneg [Nontrivial A] {a : A} (ha : 0 ≤ a := by c
   · simp [this.spectrumRestricts.spectralRadius_eq, this.spectralRadius_eq_nnnorm]
   · exact this.spectrumRestricts.image ▸ (spectrum.nonempty a).image _
 
+-- CONFLATES (assumes ground = zero): norm_mem_spectrum_of_nonneg
 lemma norm_mem_spectrum_of_nonneg [Nontrivial A] {a : A} (ha : 0 ≤ a := by cfc_tac) :
     ‖a‖ ∈ spectrum ℝ a := by
   simpa using spectrum.algebraMap_mem ℝ <| nnnorm_mem_spectrum_of_nonneg ha

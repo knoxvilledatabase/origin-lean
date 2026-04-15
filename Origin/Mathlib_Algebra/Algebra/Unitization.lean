@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Unitization.lean
-Genuine: 50 of 118 | Dissolved: 0 | Infrastructure: 68
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 68
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

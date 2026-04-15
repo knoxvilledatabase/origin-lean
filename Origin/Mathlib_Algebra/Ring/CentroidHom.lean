@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/CentroidHom.lean
-Genuine: 22 of 95 | Dissolved: 0 | Infrastructure: 73
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 73
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

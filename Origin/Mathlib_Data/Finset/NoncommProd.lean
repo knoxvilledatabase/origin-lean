@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/NoncommProd.lean
-Genuine: 42 of 46 | Dissolved: 0 | Infrastructure: 4
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

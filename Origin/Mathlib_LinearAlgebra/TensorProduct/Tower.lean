@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Tower.lean
-Genuine: 43 of 68 | Dissolved: 0 | Infrastructure: 25
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/SuccPred/Basic.lean
-Genuine: 187 of 210 | Dissolved: 0 | Infrastructure: 23
+Genuine: 185 | Conflates: 2 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
@@ -413,6 +413,7 @@ theorem le_succ_iff_eq_or_le : a ≤ succ b ↔ a = succ b ∨ a ≤ b := by
 theorem lt_succ_iff_eq_or_lt_of_not_isMax (hb : ¬IsMax b) : a < succ b ↔ a = b ∨ a < b :=
   (lt_succ_iff_of_not_isMax hb).trans le_iff_eq_or_lt
 
+-- CONFLATES (assumes ground = zero): not_isMin_succ
 theorem not_isMin_succ [Nontrivial α] (a : α) : ¬ IsMin (succ a) := by
   obtain ha | ha := (le_succ a).eq_or_lt
   · exact (ha ▸ succ_eq_iff_isMax.1 ha.symm).not_isMin
@@ -788,6 +789,7 @@ theorem pred_le_iff_eq_or_le : pred a ≤ b ↔ b = pred a ∨ a ≤ b := by
 theorem pred_lt_iff_eq_or_lt_of_not_isMin (ha : ¬IsMin a) : pred a < b ↔ a = b ∨ a < b :=
   (pred_lt_iff_of_not_isMin ha).trans le_iff_eq_or_lt
 
+-- CONFLATES (assumes ground = zero): not_isMax_pred
 theorem not_isMax_pred [Nontrivial α] (a : α) : ¬ IsMax (pred a) :=
   not_isMin_succ (α := αᵒᵈ) a
 

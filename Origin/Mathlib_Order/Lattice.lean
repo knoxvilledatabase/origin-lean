@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Lattice.lean
-Genuine: 153 of 229 | Dissolved: 0 | Infrastructure: 76
+Genuine: 153 | Conflates: 0 | Dissolved: 0 | Infrastructure: 76
 -/
 import Origin.Core
 import Mathlib.Data.Bool.Basic

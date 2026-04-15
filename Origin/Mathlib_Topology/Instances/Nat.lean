@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/Nat.lean
-Genuine: 4 of 13 | Dissolved: 0 | Infrastructure: 9
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Topology.Instances.Int

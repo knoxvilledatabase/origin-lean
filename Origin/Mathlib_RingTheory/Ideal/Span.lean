@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Span.lean
-Genuine: 39 of 43 | Dissolved: 2 | Infrastructure: 2
+Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

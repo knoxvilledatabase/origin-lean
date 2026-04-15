@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matroid/Map.lean
-Genuine: 59 of 100 | Dissolved: 0 | Infrastructure: 41
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Data.Matroid.Constructions

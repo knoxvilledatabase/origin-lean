@@ -1,6 +1,6 @@
 /-
 Extracted from Computability/TuringMachine.lean
-Genuine: 229 of 261 | Dissolved: 0 | Infrastructure: 32
+Genuine: 229 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Option

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Sheaf/Limits.lean
-Genuine: 1 of 16 | Dissolved: 0 | Infrastructure: 15
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Limits

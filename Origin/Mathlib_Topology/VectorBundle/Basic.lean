@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/VectorBundle/Basic.lean
-Genuine: 91 of 114 | Dissolved: 0 | Infrastructure: 23
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps

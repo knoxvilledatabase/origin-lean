@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MonoidAlgebra/Degree.lean
-Genuine: 48 of 64 | Dissolved: 15 | Infrastructure: 1
+Genuine: 47 | Conflates: 1 | Dissolved: 15 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subsemigroup.Operations
@@ -484,6 +484,7 @@ lemma Monic.pow
   | zero => rw [pow_zero]; exact monic_one hD
   | succ n ih => rw [pow_succ']; exact hp.mul hD hadd ih
 
+-- CONFLATES (assumes ground = zero): Monic.supDegree_pow
 lemma Monic.supDegree_pow
     (hzero : D 0 = 0) (hadd : ∀ a1 a2, D (a1 + a2) = D a1 + D a2) (hD : D.Injective)
     [Nontrivial R] (hp : p.Monic D) :

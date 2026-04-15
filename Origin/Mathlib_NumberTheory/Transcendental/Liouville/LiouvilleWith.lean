@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Transcendental/Liouville/LiouvilleWith.lean
-Genuine: 34 of 48 | Dissolved: 12 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 12 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics

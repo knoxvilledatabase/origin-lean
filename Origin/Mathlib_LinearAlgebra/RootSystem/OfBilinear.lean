@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/RootSystem/OfBilinear.lean
-Genuine: 8 of 9 | Dissolved: 1 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.RootSystem.Defs

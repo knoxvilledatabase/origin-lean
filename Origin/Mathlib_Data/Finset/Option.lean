@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Option.lean
-Genuine: 23 of 27 | Dissolved: 0 | Infrastructure: 4
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Card

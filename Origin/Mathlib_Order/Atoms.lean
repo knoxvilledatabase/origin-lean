@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Atoms.lean
-Genuine: 113 of 155 | Dissolved: 0 | Infrastructure: 42
+Genuine: 110 | Conflates: 3 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice
@@ -239,11 +239,13 @@ export IsAtomic (eq_bot_or_exists_atom_le)
 
 export IsCoatomic (eq_top_or_exists_le_coatom)
 
+-- CONFLATES (assumes ground = zero): IsAtomic.exists_atom
 lemma IsAtomic.exists_atom [OrderBot α] [Nontrivial α] [IsAtomic α] : ∃ a : α, IsAtom a :=
   have ⟨b, hb⟩ := exists_ne (⊥ : α)
   have ⟨a, ha⟩ := (eq_bot_or_exists_atom_le b).resolve_left hb
   ⟨a, ha.1⟩
 
+-- CONFLATES (assumes ground = zero): IsCoatomic.exists_coatom
 lemma IsCoatomic.exists_coatom [OrderTop α] [Nontrivial α] [IsCoatomic α] : ∃ a : α, IsCoatom a :=
   have ⟨b, hb⟩ := exists_ne (⊤ : α)
   have ⟨a, ha⟩ := (eq_top_or_exists_le_coatom b).resolve_left hb
@@ -551,6 +553,7 @@ end CompleteAtomicBooleanAlgebra
 
 end Atomistic
 
+-- CONFLATES (assumes ground = zero): IsSimpleOrder
 class IsSimpleOrder (α : Type*) [LE α] [BoundedOrder α] extends Nontrivial α : Prop where
   /-- Every element is either `⊥` or `⊤` -/
   eq_bot_or_eq_top : ∀ a : α, a = ⊥ ∨ a = ⊤

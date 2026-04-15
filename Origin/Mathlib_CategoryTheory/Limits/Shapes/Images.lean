@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Images.lean
-Genuine: 76 of 109 | Dissolved: 0 | Infrastructure: 33
+Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers

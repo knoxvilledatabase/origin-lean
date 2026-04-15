@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Ordmap/Ordset.lean
-Genuine: 196 of 217 | Dissolved: 0 | Infrastructure: 21
+Genuine: 196 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Defs

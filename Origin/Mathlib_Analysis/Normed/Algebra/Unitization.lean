@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Algebra/Unitization.lean
-Genuine: 19 of 29 | Dissolved: 0 | Infrastructure: 10
+Genuine: 19 | Conflates: 1 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Unitization
@@ -184,6 +184,7 @@ def uniformEquivProd : (Unitization 𝕜 A) ≃ᵤ (𝕜 × A) :=
 instance instBornology : Bornology (Unitization 𝕜 A) :=
   Bornology.induced <| addEquiv 𝕜 A
 
+-- CONFLATES (assumes ground = zero): isUniformEmbedding_addEquiv
 theorem isUniformEmbedding_addEquiv {𝕜} [NontriviallyNormedField 𝕜] :
     IsUniformEmbedding (addEquiv 𝕜 A) where
   comap_uniformity := rfl

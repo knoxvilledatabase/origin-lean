@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Bounded.lean
-Genuine: 91 of 93 | Dissolved: 0 | Infrastructure: 2
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.Order.Compact

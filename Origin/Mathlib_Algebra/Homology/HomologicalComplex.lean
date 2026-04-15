@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/HomologicalComplex.lean
-Genuine: 96 of 134 | Dissolved: 8 | Infrastructure: 30
+Genuine: 96 | Conflates: 0 | Dissolved: 8 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ComplexShape

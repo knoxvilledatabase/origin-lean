@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Order/Hom/Basic.lean
-Genuine: 13 of 28 | Dissolved: 0 | Infrastructure: 15
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Basic

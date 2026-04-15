@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Sheaves/SheafCondition/EqualizerProducts.lean
-Genuine: 25 of 29 | Dissolved: 0 | Infrastructure: 4
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Basic.lean
-Genuine: 14 of 17 | Dissolved: 0 | Infrastructure: 3
+Genuine: 10 | Conflates: 4 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
@@ -187,6 +187,7 @@ namespace Ring
 
 variable {R : Type*} [CommSemiring R]
 
+-- CONFLATES (assumes ground = zero): exists_not_isUnit_of_not_isField
 theorem exists_not_isUnit_of_not_isField [Nontrivial R] (hf : ¬IsField R) :
     ∃ (x : R) (_hx : x ≠ (0 : R)), ¬IsUnit x := by
   have : ¬_ := fun h => hf ⟨exists_pair_ne R, mul_comm, h⟩
@@ -195,6 +196,7 @@ theorem exists_not_isUnit_of_not_isField [Nontrivial R] (hf : ¬IsField R) :
   obtain ⟨x, hx, not_unit⟩ := this
   exact ⟨x, hx, not_unit⟩
 
+-- CONFLATES (assumes ground = zero): not_isField_iff_exists_ideal_bot_lt_and_lt_top
 theorem not_isField_iff_exists_ideal_bot_lt_and_lt_top [Nontrivial R] :
     ¬IsField R ↔ ∃ I : Ideal R, ⊥ < I ∧ I < ⊤ := by
   constructor
@@ -210,6 +212,7 @@ theorem not_isField_iff_exists_ideal_bot_lt_and_lt_top [Nontrivial R] :
     rw [lt_top_iff_ne_top, Ne, Ideal.eq_top_iff_one, ← hy] at lt_top
     exact lt_top (I.mul_mem_right _ mem)
 
+-- CONFLATES (assumes ground = zero): not_isField_iff_exists_prime
 theorem not_isField_iff_exists_prime [Nontrivial R] :
     ¬IsField R ↔ ∃ p : Ideal R, p ≠ ⊥ ∧ p.IsPrime :=
   not_isField_iff_exists_ideal_bot_lt_and_lt_top.trans
@@ -228,6 +231,7 @@ theorem isField_iff_isSimpleOrder_ideal : IsField R ↔ IsSimpleOrder (Ideal R) 
   simp_rw [lt_top_iff_ne_top, bot_lt_iff_ne_bot, ← or_iff_not_imp_left, not_ne_iff]
   exact ⟨fun h => ⟨h⟩, fun h => h.2⟩
 
+-- CONFLATES (assumes ground = zero): ne_bot_of_isMaximal_of_not_isField
 theorem ne_bot_of_isMaximal_of_not_isField [Nontrivial R] {M : Ideal R} (max : M.IsMaximal)
     (not_field : ¬IsField R) : M ≠ ⊥ := by
   rintro h

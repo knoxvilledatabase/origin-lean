@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/CharAndCard.lean
-Genuine: 4 of 5 | Dissolved: 1 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Basic

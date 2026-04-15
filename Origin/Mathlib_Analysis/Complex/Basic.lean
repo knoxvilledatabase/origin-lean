@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Basic.lean
-Genuine: 118 of 154 | Dissolved: 6 | Infrastructure: 30
+Genuine: 118 | Conflates: 0 | Dissolved: 6 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Data.Complex.Module

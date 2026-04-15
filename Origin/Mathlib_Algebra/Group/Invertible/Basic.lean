@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Invertible/Basic.lean
-Genuine: 18 of 21 | Dissolved: 1 | Infrastructure: 2
+Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Units

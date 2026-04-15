@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/LocallyBijective.lean
-Genuine: 10 of 14 | Dissolved: 0 | Infrastructure: 4
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.LocallySurjective

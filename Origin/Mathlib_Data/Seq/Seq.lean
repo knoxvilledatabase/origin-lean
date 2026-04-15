@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Seq/Seq.lean
-Genuine: 126 of 159 | Dissolved: 0 | Infrastructure: 33
+Genuine: 126 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Data.Option.NAry

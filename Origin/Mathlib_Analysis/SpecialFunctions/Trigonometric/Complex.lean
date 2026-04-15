@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Complex.lean
-Genuine: 27 of 36 | Dissolved: 9 | Infrastructure: 0
+Genuine: 27 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.QuadraticDiscriminant

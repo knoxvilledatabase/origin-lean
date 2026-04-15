@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/DirectLimit.lean
-Genuine: 61 of 79 | Dissolved: 5 | Infrastructure: 13
+Genuine: 60 | Conflates: 1 | Dissolved: 5 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Module
@@ -845,6 +845,7 @@ noncomputable def inv (p : Ring.DirectLimit G f) : Ring.DirectLimit G f :=
 
 -- DISSOLVED: inv_mul_cancel
 
+-- CONFLATES (assumes ground = zero): field
 protected noncomputable abbrev field [DirectedSystem G fun i j h => f' i j h] :
     Field (Ring.DirectLimit G fun i j h => f' i j h) where
   -- This used to include the parent CommRing and Nontrivial instances,

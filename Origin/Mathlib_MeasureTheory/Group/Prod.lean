@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/Prod.lean
-Genuine: 34 of 40 | Dissolved: 6 | Infrastructure: 0
+Genuine: 34 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Measure

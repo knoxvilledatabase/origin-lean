@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Pi.lean
-Genuine: 1 of 8 | Dissolved: 0 | Infrastructure: 7
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Pi

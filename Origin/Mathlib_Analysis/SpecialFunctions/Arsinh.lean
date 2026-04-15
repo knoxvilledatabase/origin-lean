@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Arsinh.lean
-Genuine: 46 of 48 | Dissolved: 0 | Infrastructure: 2
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv

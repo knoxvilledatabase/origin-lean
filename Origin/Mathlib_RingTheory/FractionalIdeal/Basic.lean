@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/FractionalIdeal/Basic.lean
-Genuine: 65 of 105 | Dissolved: 4 | Infrastructure: 36
+Genuine: 65 | Conflates: 0 | Dissolved: 4 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.Integer

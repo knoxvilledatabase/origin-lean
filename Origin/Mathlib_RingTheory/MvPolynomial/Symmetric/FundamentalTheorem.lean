@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/Symmetric/FundamentalTheorem.lean
-Genuine: 24 of 27 | Dissolved: 1 | Infrastructure: 2
+Genuine: 22 | Conflates: 2 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.MvPolynomial.Symmetric.Defs
@@ -165,6 +165,7 @@ lemma esymmAlgHomMonomial_add {t s : Fin n →₀ ℕ} :
 lemma esymmAlgHom_zero : esymmAlgHomMonomial σ (0 : Fin n →₀ ℕ) r = C r := by
   rw [esymmAlgHomMonomial, monomial_zero', esymmAlgHom_apply, aeval_C, algebraMap_eq]
 
+-- CONFLATES (assumes ground = zero): supDegree_monic_esymm
 private lemma supDegree_monic_esymm [Nontrivial R] {i : ℕ} (him : i < m) :
     supDegree toLex (esymm (Fin m) R (i + 1)) =
       toLex (Finsupp.indicator (Iic ⟨i, him⟩) fun _ _ ↦ 1) ∧
@@ -190,6 +191,7 @@ private lemma supDegree_monic_esymm [Nontrivial R] {i : ℕ} (him : i < m) :
     exact lt_irrefl k <| ((lt_min'_iff _ _).1 hk) _ <| mem_sdiff.2 ⟨hki, h⟩
   · rw [dif_neg hkm.2, dif_pos hkm.1]; exact Nat.zero_lt_one
 
+-- CONFLATES (assumes ground = zero): supDegree_esymm
 lemma supDegree_esymm [Nontrivial R] (him : i < m) :
     ofLex (supDegree toLex <| esymm (Fin m) R (i + 1)) = accumulate n m (Finsupp.single i 1) := by
   rw [(supDegree_monic_esymm him).1, ofLex_toLex]

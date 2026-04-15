@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Function/Defs.lean
-Genuine: 25 of 32 | Dissolved: 0 | Infrastructure: 7
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Tactic.AdaptationNote

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Homotopy/Basic.lean
-Genuine: 77 of 90 | Dissolved: 0 | Infrastructure: 13
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Topology.Order.ProjIcc

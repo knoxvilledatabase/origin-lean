@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Image.lean
-Genuine: 248 of 280 | Dissolved: 2 | Infrastructure: 30
+Genuine: 241 | Conflates: 7 | Dissolved: 2 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Data.Set.Subsingleton
@@ -976,35 +976,42 @@ theorem subsingleton_of_preimage (hf : Function.Surjective f) (s : Set β)
 theorem subsingleton_range {α : Sort*} [Subsingleton α] (f : α → β) : (range f).Subsingleton :=
   forall_mem_range.2 fun x => forall_mem_range.2 fun y => congr_arg f (Subsingleton.elim x y)
 
+-- CONFLATES (assumes ground = zero): Nontrivial.preimage
 theorem Nontrivial.preimage {s : Set β} (hs : s.Nontrivial)
     (hf : Function.Surjective f) : (f ⁻¹' s).Nontrivial := by
   rcases hs with ⟨fx, hx, fy, hy, hxy⟩
   rcases hf fx, hf fy with ⟨⟨x, rfl⟩, ⟨y, rfl⟩⟩
   exact ⟨x, hx, y, hy, mt (congr_arg f) hxy⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.image
 theorem Nontrivial.image (hs : s.Nontrivial) (hf : Function.Injective f) :
     (f '' s).Nontrivial :=
   let ⟨x, hx, y, hy, hxy⟩ := hs
   ⟨f x, mem_image_of_mem f hx, f y, mem_image_of_mem f hy, hf.ne hxy⟩
 
+-- CONFLATES (assumes ground = zero): Nontrivial.image_of_injOn
 theorem Nontrivial.image_of_injOn (hs : s.Nontrivial) (hf : s.InjOn f) :
     (f '' s).Nontrivial := by
   obtain ⟨x, hx, y, hy, hxy⟩ := hs
   exact ⟨f x, mem_image_of_mem _ hx, f y, mem_image_of_mem _ hy, (hxy <| hf hx hy ·)⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_image
 theorem nontrivial_of_image (f : α → β) (s : Set α) (hs : (f '' s).Nontrivial) : s.Nontrivial :=
   let ⟨_, ⟨x, hx, rfl⟩, _, ⟨y, hy, rfl⟩, hxy⟩ := hs
   ⟨x, hx, y, hy, mt (congr_arg f) hxy⟩
 
+-- CONFLATES (assumes ground = zero): image_nontrivial
 @[simp]
 theorem image_nontrivial (hf : f.Injective) : (f '' s).Nontrivial ↔ s.Nontrivial :=
   ⟨nontrivial_of_image f s, fun h ↦ h.image hf⟩
 
+-- CONFLATES (assumes ground = zero): InjOn.image_nontrivial_iff
 @[simp]
 theorem InjOn.image_nontrivial_iff (hf : s.InjOn f) :
     (f '' s).Nontrivial ↔ s.Nontrivial :=
   ⟨nontrivial_of_image f s, fun h ↦ h.image_of_injOn hf⟩
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_preimage
 theorem nontrivial_of_preimage (hf : Function.Injective f) (s : Set β)
     (hs : (f ⁻¹' s).Nontrivial) : s.Nontrivial :=
   (hs.image hf).mono <| image_preimage_subset _ _

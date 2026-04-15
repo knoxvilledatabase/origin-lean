@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Finset/Basic.lean
-Genuine: 196 of 197 | Dissolved: 0 | Infrastructure: 1
+Genuine: 196 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Cover

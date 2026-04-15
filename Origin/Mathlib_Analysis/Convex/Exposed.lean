@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Exposed.lean
-Genuine: 22 of 24 | Dissolved: 0 | Infrastructure: 2
+Genuine: 21 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Extreme
@@ -101,6 +101,7 @@ theorem eq_inter_halfSpace' {A B : Set E} (hAB : IsExposed 𝕜 A B) (hB : B.Non
   exact ⟨l, l w, Subset.antisymm (fun x hx => ⟨hx.1, hx.2 w hw.1⟩) fun x hx =>
     ⟨hx.1, fun y hy => (hw.2 y hy).trans hx.2⟩⟩
 
+-- CONFLATES (assumes ground = zero): eq_inter_halfSpace
 theorem eq_inter_halfSpace [Nontrivial 𝕜] {A B : Set E} (hAB : IsExposed 𝕜 A B) :
     ∃ l : E →L[𝕜] 𝕜, ∃ a, B = { x ∈ A | a ≤ l x } := by
   obtain rfl | hB := B.eq_empty_or_nonempty

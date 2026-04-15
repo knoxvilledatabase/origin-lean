@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/AffineScheme.lean
-Genuine: 97 of 132 | Dissolved: 0 | Infrastructure: 35
+Genuine: 97 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Cover.Open

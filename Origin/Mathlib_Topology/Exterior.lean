@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Exterior.lean
-Genuine: 26 of 26 | Dissolved: 0 | Infrastructure: 0
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.NhdsSet

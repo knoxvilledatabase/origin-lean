@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/AlgebraicClosure.lean
-Genuine: 32 of 62 | Dissolved: 1 | Infrastructure: 29
+Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectLimit

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Category/UniformSpace.lean
-Genuine: 11 of 35 | Dissolved: 0 | Infrastructure: 24
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Reflective

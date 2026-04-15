@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Defs.lean
-Genuine: 20 of 44 | Dissolved: 0 | Infrastructure: 24
+Genuine: 18 | Conflates: 2 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Unbundled.Basic
@@ -135,6 +135,7 @@ class OrderedRing (α : Type u) extends Ring α, OrderedAddCommGroup α where
 
 class OrderedCommRing (α : Type u) extends OrderedRing α, CommRing α
 
+-- CONFLATES (assumes ground = zero): StrictOrderedSemiring
 class StrictOrderedSemiring (α : Type u) extends Semiring α, OrderedCancelAddCommMonoid α,
     Nontrivial α where
   /-- In a strict ordered semiring, `0 ≤ 1`. -/
@@ -146,6 +147,7 @@ class StrictOrderedSemiring (α : Type u) extends Semiring α, OrderedCancelAddC
 
 class StrictOrderedCommSemiring (α : Type u) extends StrictOrderedSemiring α, CommSemiring α
 
+-- CONFLATES (assumes ground = zero): StrictOrderedRing
 class StrictOrderedRing (α : Type u) extends Ring α, OrderedAddCommGroup α, Nontrivial α where
   /-- In a strict ordered ring, `0 ≤ 1`. -/
   protected zero_le_one : 0 ≤ (1 : α)

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Finite/Monad.lean
-Genuine: 4 of 10 | Dissolved: 0 | Infrastructure: 6
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Prod

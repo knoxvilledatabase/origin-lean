@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/GradedAlgebra/HomogeneousIdeal.lean
-Genuine: 55 of 82 | Dissolved: 0 | Infrastructure: 27
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.SumProd

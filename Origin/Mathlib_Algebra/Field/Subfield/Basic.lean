@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Field/Subfield/Basic.lean
-Genuine: 71 of 101 | Dissolved: 0 | Infrastructure: 30
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

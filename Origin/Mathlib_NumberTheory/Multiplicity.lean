@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Multiplicity.lean
-Genuine: 22 of 24 | Dissolved: 2 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum

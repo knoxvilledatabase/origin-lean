@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/QuadraticDiscriminant.lean
-Genuine: 4 of 12 | Dissolved: 7 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 7 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Filter.AtTopBot.Field

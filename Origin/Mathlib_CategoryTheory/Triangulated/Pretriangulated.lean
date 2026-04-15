@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Triangulated/Pretriangulated.lean
-Genuine: 62 of 68 | Dissolved: 0 | Infrastructure: 6
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Basic

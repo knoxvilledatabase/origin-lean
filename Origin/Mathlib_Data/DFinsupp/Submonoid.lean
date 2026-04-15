@@ -1,6 +1,6 @@
 /-
 Extracted from Data/DFinsupp/Submonoid.lean
-Genuine: 4 of 7 | Dissolved: 3 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Membership

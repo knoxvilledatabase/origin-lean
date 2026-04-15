@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/WithDensityFinite.lean
-Genuine: 17 of 21 | Dissolved: 0 | Infrastructure: 4
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.RadonNikodym

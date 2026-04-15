@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/HurwitzZetaValues.lean
-Genuine: 4 of 14 | Dissolved: 10 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.ZetaValues

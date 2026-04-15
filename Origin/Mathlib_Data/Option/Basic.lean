@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Option/Basic.lean
-Genuine: 53 of 68 | Dissolved: 0 | Infrastructure: 15
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Control.Combinators

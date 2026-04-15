@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MonoidAlgebra/Basic.lean
-Genuine: 49 of 70 | Dissolved: 0 | Infrastructure: 21
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/EditDistance/Defs.lean
-Genuine: 22 of 27 | Dissolved: 0 | Infrastructure: 5
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs

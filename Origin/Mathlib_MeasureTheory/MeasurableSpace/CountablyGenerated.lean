@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/MeasurableSpace/CountablyGenerated.lean
-Genuine: 60 of 76 | Dissolved: 0 | Infrastructure: 16
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding

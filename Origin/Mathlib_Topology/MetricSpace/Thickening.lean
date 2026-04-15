@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Thickening.lean
-Genuine: 82 of 88 | Dissolved: 0 | Infrastructure: 6
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.HausdorffDistance

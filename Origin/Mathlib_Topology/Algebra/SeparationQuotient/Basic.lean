@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/SeparationQuotient/Basic.lean
-Genuine: 5 of 75 | Dissolved: 0 | Infrastructure: 70
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 70
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.Basic

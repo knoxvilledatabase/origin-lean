@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/SetToL1.lean
-Genuine: 163 of 170 | Dissolved: 3 | Infrastructure: 4
+Genuine: 162 | Conflates: 1 | Dissolved: 3 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp
@@ -1228,6 +1228,7 @@ theorem setToFun_sub (hT : DominatedFinMeasAdditive μ T C) (hf : Integrable f �
     (hg : Integrable g μ) : setToFun μ T hT (f - g) = setToFun μ T hT f - setToFun μ T hT g := by
   rw [sub_eq_add_neg, sub_eq_add_neg, setToFun_add hT hf hg.neg, setToFun_neg hT g]
 
+-- CONFLATES (assumes ground = zero): setToFun_smul
 theorem setToFun_smul [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E] [NormedSpace 𝕜 F]
     (hT : DominatedFinMeasAdditive μ T C) (h_smul : ∀ c : 𝕜, ∀ s x, T s (c • x) = c • T s x) (c : 𝕜)
     (f : α → E) : setToFun μ T hT (c • f) = c • setToFun μ T hT f := by

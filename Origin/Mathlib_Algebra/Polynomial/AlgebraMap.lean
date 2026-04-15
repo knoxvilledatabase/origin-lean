@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/AlgebraMap.lean
-Genuine: 85 of 103 | Dissolved: 2 | Infrastructure: 16
+Genuine: 84 | Conflates: 1 | Dissolved: 2 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Pi
@@ -529,6 +529,7 @@ theorem eval_mul_X_sub_C {p : R[X]} (r : R) : (p * (X - C r)).eval r = 0 := by
   rw [sum_range_sub']
   simp [coeff_monomial]
 
+-- CONFLATES (assumes ground = zero): not_isUnit_X_sub_C
 theorem not_isUnit_X_sub_C [Nontrivial R] (r : R) : ¬IsUnit (X - C r) :=
   fun ⟨⟨_, g, _hfg, hgf⟩, rfl⟩ => zero_ne_one' R <| by rw [← eval_mul_X_sub_C, hgf, eval_one]
 

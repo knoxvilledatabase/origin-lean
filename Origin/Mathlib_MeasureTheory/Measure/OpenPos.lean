@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/OpenPos.lean
-Genuine: 32 of 39 | Dissolved: 5 | Infrastructure: 2
+Genuine: 32 | Conflates: 0 | Dissolved: 5 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace

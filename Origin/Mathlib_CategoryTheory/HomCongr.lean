@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/HomCongr.lean
-Genuine: 5 of 10 | Dissolved: 0 | Infrastructure: 5
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Iso

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/NonUnitalSubalgebra.lean
-Genuine: 118 of 191 | Dissolved: 0 | Infrastructure: 73
+Genuine: 118 | Conflates: 0 | Dissolved: 0 | Infrastructure: 73
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalHom

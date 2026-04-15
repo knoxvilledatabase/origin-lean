@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Coprime/Basic.lean
-Genuine: 90 of 99 | Dissolved: 3 | Infrastructure: 6
+Genuine: 89 | Conflates: 1 | Dissolved: 3 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Units
@@ -57,6 +57,7 @@ theorem isCoprime_zero_left : IsCoprime 0 x ↔ IsUnit x :=
 theorem isCoprime_zero_right : IsCoprime x 0 ↔ IsUnit x :=
   isCoprime_comm.trans isCoprime_zero_left
 
+-- CONFLATES (assumes ground = zero): not_isCoprime_zero_zero
 theorem not_isCoprime_zero_zero [Nontrivial R] : ¬IsCoprime (0 : R) 0 :=
   mt isCoprime_zero_right.mp not_isUnit_zero
 

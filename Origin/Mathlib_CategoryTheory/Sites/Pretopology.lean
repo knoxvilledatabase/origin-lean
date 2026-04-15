@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Sites/Pretopology.lean
-Genuine: 9 of 21 | Dissolved: 0 | Infrastructure: 12
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Grothendieck

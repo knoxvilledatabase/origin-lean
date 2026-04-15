@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Ring/Basic.lean
-Genuine: 37 of 64 | Dissolved: 0 | Infrastructure: 27
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.AbsoluteValue

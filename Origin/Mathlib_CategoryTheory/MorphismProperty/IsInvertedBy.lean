@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/MorphismProperty/IsInvertedBy.lean
-Genuine: 12 of 20 | Dissolved: 0 | Infrastructure: 8
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.ReflectsIso

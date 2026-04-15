@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Union.lean
-Genuine: 33 of 37 | Dissolved: 0 | Infrastructure: 4
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Basic

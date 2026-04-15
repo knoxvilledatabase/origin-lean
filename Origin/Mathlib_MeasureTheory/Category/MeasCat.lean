@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Category/MeasCat.lean
-Genuine: 6 of 14 | Dissolved: 0 | Infrastructure: 8
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.GiryMonad

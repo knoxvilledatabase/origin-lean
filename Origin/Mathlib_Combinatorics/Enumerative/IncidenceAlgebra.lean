@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Enumerative/IncidenceAlgebra.lean
-Genuine: 41 of 84 | Dissolved: 1 | Infrastructure: 42
+Genuine: 41 | Conflates: 0 | Dissolved: 1 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs

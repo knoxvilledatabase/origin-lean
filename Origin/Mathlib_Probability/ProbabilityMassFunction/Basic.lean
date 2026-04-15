@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/ProbabilityMassFunction/Basic.lean
-Genuine: 49 of 54 | Dissolved: 2 | Infrastructure: 3
+Genuine: 49 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.Instances.ENNReal

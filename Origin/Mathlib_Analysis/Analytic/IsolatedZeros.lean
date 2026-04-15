@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/IsolatedZeros.lean
-Genuine: 17 of 25 | Dissolved: 8 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Constructions

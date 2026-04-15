@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Sublists.lean
-Genuine: 50 of 55 | Dissolved: 0 | Infrastructure: 5
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic

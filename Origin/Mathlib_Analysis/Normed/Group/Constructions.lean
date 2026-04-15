@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Constructions.lean
-Genuine: 19 of 83 | Dissolved: 0 | Infrastructure: 64
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 64
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.ULift

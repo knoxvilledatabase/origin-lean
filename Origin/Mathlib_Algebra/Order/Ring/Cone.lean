@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Cone.lean
-Genuine: 5 of 12 | Dissolved: 0 | Infrastructure: 7
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Cone

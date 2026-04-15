@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/Arithmetic.lean
-Genuine: 82 of 126 | Dissolved: 4 | Infrastructure: 40
+Genuine: 82 | Conflates: 0 | Dissolved: 4 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.AEMeasurable

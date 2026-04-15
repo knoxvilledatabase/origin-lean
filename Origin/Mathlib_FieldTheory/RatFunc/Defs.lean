@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/RatFunc/Defs.lean
-Genuine: 12 of 20 | Dissolved: 8 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Domain

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Trace/Basic.lean
-Genuine: 29 of 35 | Dissolved: 3 | Infrastructure: 3
+Genuine: 27 | Conflates: 2 | Dissolved: 3 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Galois.Basic
@@ -73,6 +73,7 @@ variable {F : Type*} [Field F]
 
 variable [Algebra K S] [Algebra K F]
 
+-- CONFLATES (assumes ground = zero): PowerBasis.trace_gen_eq_nextCoeff_minpoly
 theorem PowerBasis.trace_gen_eq_nextCoeff_minpoly [Nontrivial S] (pb : PowerBasis K S) :
     Algebra.trace K S pb.gen = -(minpoly K pb.gen).nextCoeff := by
   have d_pos : 0 < pb.dim := PowerBasis.dim_pos pb
@@ -81,6 +82,7 @@ theorem PowerBasis.trace_gen_eq_nextCoeff_minpoly [Nontrivial S] (pb : PowerBasi
   rw [trace_eq_matrix_trace pb.basis, trace_eq_neg_charpoly_coeff, charpoly_leftMulMatrix, ←
     pb.natDegree_minpoly, Fintype.card_fin, ← nextCoeff_of_natDegree_pos d_pos']
 
+-- CONFLATES (assumes ground = zero): PowerBasis.trace_gen_eq_sum_roots
 theorem PowerBasis.trace_gen_eq_sum_roots [Nontrivial S] (pb : PowerBasis K S)
     (hf : (minpoly K pb.gen).Splits (algebraMap K F)) :
     algebraMap K F (trace K S pb.gen) = ((minpoly K pb.gen).aroots F).sum := by

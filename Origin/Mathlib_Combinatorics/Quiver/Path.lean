@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Quiver/Path.lean
-Genuine: 25 of 36 | Dissolved: 0 | Infrastructure: 11
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Quiver.Prefunctor

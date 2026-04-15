@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LocalRing/RingHom/Basic.lean
-Genuine: 11 of 13 | Dissolved: 0 | Infrastructure: 2
+Genuine: 9 | Conflates: 2 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Units.Hom
@@ -93,6 +93,7 @@ theorem local_hom_TFAE (f : R →+* S) :
 
 end
 
+-- CONFLATES (assumes ground = zero): of_surjective
 theorem of_surjective [CommSemiring R] [IsLocalRing R] [CommSemiring S] [Nontrivial S] (f : R →+* S)
     [IsLocalHom f] (hf : Function.Surjective f) : IsLocalRing S :=
   of_isUnit_or_isUnit_of_isUnit_add (by
@@ -104,6 +105,7 @@ theorem of_surjective [CommSemiring R] [IsLocalRing R] [CommSemiring S] [Nontriv
       (isUnit_or_isUnit_of_isUnit_add <| IsLocalHom.map_nonunit _ hab).imp f.isUnit_map
         f.isUnit_map)
 
+-- CONFLATES (assumes ground = zero): _root_.IsLocalHom.of_surjective
 lemma _root_.IsLocalHom.of_surjective [CommRing R] [CommRing S] [Nontrivial S] [IsLocalRing R]
     (f : R →+* S) (hf : Function.Surjective f) :
     IsLocalHom f := by

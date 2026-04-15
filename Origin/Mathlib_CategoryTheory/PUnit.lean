@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/PUnit.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Const

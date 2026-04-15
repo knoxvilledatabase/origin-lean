@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/Different.lean
-Genuine: 35 of 47 | Dissolved: 11 | Infrastructure: 1
+Genuine: 35 | Conflates: 0 | Dissolved: 11 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Ideal

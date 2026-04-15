@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/CondDistrib.lean
-Genuine: 29 of 31 | Dissolved: 1 | Infrastructure: 1
+Genuine: 29 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Disintegration.Unique

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/ModularLattice.lean
-Genuine: 35 of 49 | Dissolved: 0 | Infrastructure: 14
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Order.Cover

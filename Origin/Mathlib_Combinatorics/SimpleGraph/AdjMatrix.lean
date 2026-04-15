@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/AdjMatrix.lean
-Genuine: 27 of 33 | Dissolved: 2 | Infrastructure: 4
+Genuine: 23 | Conflates: 4 | Dissolved: 2 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Basic
@@ -52,6 +52,7 @@ namespace IsAdjMatrix
 
 variable {A : Matrix V V α}
 
+-- CONFLATES (assumes ground = zero): apply_diag_ne
 @[simp]
 theorem apply_diag_ne [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) (i : V) :
     ¬A i i = 1 := by simp [h.apply_diag i]
@@ -60,6 +61,7 @@ theorem apply_diag_ne [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) (
 
 -- DISSOLVED: apply_ne_zero_iff
 
+-- CONFLATES (assumes ground = zero): toGraph
 @[simps]
 def toGraph [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) : SimpleGraph V where
   Adj i j := A i j = 1
@@ -105,6 +107,7 @@ variable {A}
 theorem compl [Zero α] [One α] (h : IsAdjMatrix A) : IsAdjMatrix A.compl :=
   isAdjMatrix_compl A h.symm
 
+-- CONFLATES (assumes ground = zero): toGraph_compl_eq
 theorem toGraph_compl_eq [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) :
     h.compl.toGraph = h.toGraphᶜ := by
   ext v w
@@ -149,6 +152,7 @@ variable (α)
 theorem isAdjMatrix_adjMatrix [Zero α] [One α] : (G.adjMatrix α).IsAdjMatrix :=
   { zero_or_one := fun i j => by by_cases h : G.Adj i j <;> simp [h] }
 
+-- CONFLATES (assumes ground = zero): toGraph_adjMatrix_eq
 theorem toGraph_adjMatrix_eq [MulZeroOneClass α] [Nontrivial α] :
     (G.isAdjMatrix_adjMatrix α).toGraph = G := by
   ext

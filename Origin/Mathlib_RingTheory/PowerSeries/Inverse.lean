@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PowerSeries/Inverse.lean
-Genuine: 28 of 51 | Dissolved: 15 | Infrastructure: 8
+Genuine: 28 | Conflates: 0 | Dissolved: 15 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.FieldDivision

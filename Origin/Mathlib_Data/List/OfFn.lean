@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/OfFn.lean
-Genuine: 34 of 38 | Dissolved: 2 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
 import Batteries.Data.List.OfFn

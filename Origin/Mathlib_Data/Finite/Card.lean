@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finite/Card.lean
-Genuine: 33 of 33 | Dissolved: 0 | Infrastructure: 0
+Genuine: 31 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Finite
@@ -67,10 +67,12 @@ theorem card_le_one_iff_subsingleton [Finite α] : Nat.card α ≤ 1 ↔ Subsing
   haveI := Fintype.ofFinite α
   simp only [Nat.card_eq_fintype_card, Fintype.card_le_one_iff_subsingleton]
 
+-- CONFLATES (assumes ground = zero): one_lt_card_iff_nontrivial
 theorem one_lt_card_iff_nontrivial [Finite α] : 1 < Nat.card α ↔ Nontrivial α := by
   haveI := Fintype.ofFinite α
   simp only [Nat.card_eq_fintype_card, Fintype.one_lt_card_iff_nontrivial]
 
+-- CONFLATES (assumes ground = zero): one_lt_card
 theorem one_lt_card [Finite α] [h : Nontrivial α] : 1 < Nat.card α :=
   one_lt_card_iff_nontrivial.mpr h
 

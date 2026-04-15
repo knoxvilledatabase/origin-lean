@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/ZeroAndBoundedAtFilter.lean
-Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Basic

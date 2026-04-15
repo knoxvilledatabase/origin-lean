@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/ComposableArrows.lean
-Genuine: 80 of 113 | Dissolved: 1 | Infrastructure: 32
+Genuine: 80 | Conflates: 0 | Dissolved: 1 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Preorder

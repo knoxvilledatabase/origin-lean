@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Quiver/Covering.lean
-Genuine: 27 of 35 | Dissolved: 0 | Infrastructure: 8
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Quiver.Cast

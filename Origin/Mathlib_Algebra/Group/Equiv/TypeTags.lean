@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Equiv/TypeTags.lean
-Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic

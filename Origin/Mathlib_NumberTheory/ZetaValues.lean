@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ZetaValues.lean
-Genuine: 15 of 25 | Dissolved: 10 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.BernoulliPolynomials

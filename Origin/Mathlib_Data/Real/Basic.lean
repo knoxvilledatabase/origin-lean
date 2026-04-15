@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/Basic.lean
-Genuine: 59 of 133 | Dissolved: 0 | Infrastructure: 74
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 74
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.CauSeq.Completion

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/RamificationInertia/Basic.lean
-Genuine: 42 of 60 | Dissolved: 8 | Infrastructure: 10
+Genuine: 41 | Conflates: 1 | Dissolved: 8 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.DivisionRing
@@ -326,6 +326,7 @@ variable (K)
 
 variable [hRK : IsFractionRing R K]
 
+-- CONFLATES (assumes ground = zero): FinrankQuotientMap.linearIndependent_of_nontrivial
 theorem FinrankQuotientMap.linearIndependent_of_nontrivial [IsDedekindDomain R]
     (hRS : RingHom.ker (algebraMap R S) ≠ ⊤) (f : V'' →ₗ[R] V) (hf : Function.Injective f)
     (f' : V'' →ₗ[R] V') {ι : Type*} {b : ι → V''} (hb' : LinearIndependent S (f' ∘ b)) :

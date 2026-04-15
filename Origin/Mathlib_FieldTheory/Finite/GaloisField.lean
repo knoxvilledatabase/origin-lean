@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Finite/GaloisField.lean
-Genuine: 11 of 23 | Dissolved: 2 | Infrastructure: 10
+Genuine: 11 | Conflates: 0 | Dissolved: 2 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod

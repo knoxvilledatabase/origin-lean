@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GeomSum.lean
-Genuine: 65 of 75 | Dissolved: 7 | Infrastructure: 3
+Genuine: 65 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals

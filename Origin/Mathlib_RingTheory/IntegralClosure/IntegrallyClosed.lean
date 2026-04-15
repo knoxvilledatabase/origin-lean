@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IntegralClosure/IntegrallyClosed.lean
-Genuine: 24 of 28 | Dissolved: 1 | Infrastructure: 3
+Genuine: 23 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.Integral
@@ -148,6 +148,7 @@ theorem integralClosure_eq_bot_iff (hRA : Function.Injective (algebraMap R A)) :
 
 variable (R)
 
+-- CONFLATES (assumes ground = zero): integralClosure_eq_bot
 @[simp]
 theorem integralClosure_eq_bot [IsIntegrallyClosedIn R A] [NoZeroSMulDivisors R A] [Nontrivial A] :
     integralClosure R A = ⊥ :=

@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/Blocks.lean
-Genuine: 53 of 54 | Dissolved: 0 | Infrastructure: 1
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Pointwise.Stabilizer

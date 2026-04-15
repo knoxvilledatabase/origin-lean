@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Compactification/OnePoint.lean
-Genuine: 80 of 103 | Dissolved: 0 | Infrastructure: 23
+Genuine: 80 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Option

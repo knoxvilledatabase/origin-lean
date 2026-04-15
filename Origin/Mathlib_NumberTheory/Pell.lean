@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Pell.lean
-Genuine: 41 of 63 | Dissolved: 5 | Infrastructure: 17
+Genuine: 40 | Conflates: 1 | Dissolved: 5 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Tactic.Qify
@@ -276,6 +276,7 @@ open Set Real
 
 namespace Solution₁
 
+-- CONFLATES (assumes ground = zero): exists_nontrivial_of_not_isSquare
 theorem exists_nontrivial_of_not_isSquare (h₀ : 0 < d) (hd : ¬IsSquare d) :
     ∃ a : Solution₁ d, a ≠ 1 ∧ a ≠ -1 := by
   obtain ⟨x, y, prop, hy⟩ := exists_of_not_isSquare h₀ hd

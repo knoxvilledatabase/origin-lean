@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/OreLocalization/OreSet.lean
-Genuine: 1 of 4 | Dissolved: 3 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Defs

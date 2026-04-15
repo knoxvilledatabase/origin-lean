@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Unoriented/RightAngle.lean
-Genuine: 32 of 50 | Dissolved: 18 | Infrastructure: 0
+Genuine: 32 | Conflates: 0 | Dissolved: 18 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan

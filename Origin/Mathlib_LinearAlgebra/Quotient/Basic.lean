@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Quotient/Basic.lean
-Genuine: 38 of 53 | Dissolved: 0 | Infrastructure: 15
+Genuine: 37 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Equiv.Basic
@@ -62,6 +62,7 @@ theorem restrictScalarsEquiv_symm_mk [Ring S] [SMul S R] [Module S M] [IsScalarT
 
 end Module
 
+-- CONFLATES (assumes ground = zero): nontrivial_of_lt_top
 theorem nontrivial_of_lt_top (h : p < ⊤) : Nontrivial (M ⧸ p) := by
   obtain ⟨x, _, not_mem_s⟩ := SetLike.exists_of_lt h
   refine ⟨⟨mk x, 0, ?_⟩⟩

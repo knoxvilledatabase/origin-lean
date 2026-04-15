@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/Principal.lean
-Genuine: 48 of 49 | Dissolved: 1 | Infrastructure: 0
+Genuine: 48 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.FixedPoint

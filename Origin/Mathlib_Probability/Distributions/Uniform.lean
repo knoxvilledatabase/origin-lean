@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Distributions/Uniform.lean
-Genuine: 28 of 38 | Dissolved: 5 | Infrastructure: 5
+Genuine: 28 | Conflates: 0 | Dissolved: 5 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Probability.Notation

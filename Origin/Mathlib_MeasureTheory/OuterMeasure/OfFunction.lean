@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/OfFunction.lean
-Genuine: 44 of 46 | Dissolved: 0 | Infrastructure: 2
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Operations

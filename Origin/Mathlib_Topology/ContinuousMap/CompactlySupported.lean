@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/CompactlySupported.lean
-Genuine: 18 of 77 | Dissolved: 0 | Infrastructure: 59
+Genuine: 17 | Conflates: 7 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Support
@@ -140,10 +140,12 @@ theorem zero_apply [Zero β] : (0 : C_c(α, β)) x = 0 :=
 instance [MulZeroClass β] [ContinuousMul β] : Mul C_c(α, β) :=
   ⟨fun f g => ⟨f * g, HasCompactSupport.mul_left g.2⟩⟩
 
+-- CONFLATES (assumes ground = zero): coe_mul
 @[simp]
 theorem coe_mul [MulZeroClass β] [ContinuousMul β] (f g : C_c(α, β)) : ⇑(f * g) = f * g :=
   rfl
 
+-- CONFLATES (assumes ground = zero): mul_apply
 theorem mul_apply [MulZeroClass β] [ContinuousMul β] (f g : C_c(α, β)) : (f * g) x = f x * g x :=
   rfl
 
@@ -152,12 +154,14 @@ instance [Zero β] [TopologicalSpace γ] [SMulZeroClass γ β] [ContinuousSMul �
   smul f g :=
     ⟨⟨fun x ↦ f x • g x, (map_continuous f).smul (map_continuous g)⟩, g.hasCompactSupport.smul_left⟩
 
+-- CONFLATES (assumes ground = zero): coe_smulc
 @[simp]
 theorem coe_smulc [Zero β] [TopologicalSpace γ] [SMulZeroClass γ β] [ContinuousSMul γ β]
     {F : Type*} [FunLike F α γ] [ContinuousMapClass F α γ] (f : F) (g : C_c(α, β)) :
     ⇑(f • g) = fun x => f x • g x :=
   rfl
 
+-- CONFLATES (assumes ground = zero): smulc_apply
 theorem smulc_apply [Zero β] [TopologicalSpace γ] [SMulZeroClass γ β] [ContinuousSMul γ β]
     {F : Type*} [FunLike F α γ] [ContinuousMapClass F α γ] (f : F) (g : C_c(α, β)) (x : α) :
     (f • g) x = f x • g x :=
@@ -192,11 +196,13 @@ instance [Zero β] {R : Type*} [SMulZeroClass R β] [ContinuousConstSMul R β] :
     SMul R C_c(α, β) :=
   ⟨fun r f => ⟨⟨r • ⇑f, (map_continuous f).const_smul r⟩, HasCompactSupport.smul_left f.2⟩⟩
 
+-- CONFLATES (assumes ground = zero): coe_smul
 @[simp, norm_cast]
 theorem coe_smul [Zero β] {R : Type*} [SMulZeroClass R β] [ContinuousConstSMul R β] (r : R)
     (f : C_c(α, β)) : ⇑(r • f) = r • ⇑f :=
   rfl
 
+-- CONFLATES (assumes ground = zero): smul_apply
 theorem smul_apply [Zero β] {R : Type*} [SMulZeroClass R β] [ContinuousConstSMul R β] (r : R)
     (f : C_c(α, β)) (x : α) : (r • f) x = r • f x :=
   rfl
@@ -430,6 +436,7 @@ def compAddMonoidHom [AddMonoid δ] [ContinuousAdd δ] (g : β →co γ) : C_c(�
   map_zero' := zero_comp g
   map_add' _ _ := rfl
 
+-- CONFLATES (assumes ground = zero): compMulHom
 def compMulHom [MulZeroClass δ] [ContinuousMul δ] (g : β →co γ) : C_c(γ, δ) →ₙ* C_c(β, δ) where
   toFun f := f.comp g
   map_mul' _ _ := rfl

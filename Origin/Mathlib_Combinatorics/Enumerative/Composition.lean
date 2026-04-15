@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Enumerative/Composition.lean
-Genuine: 102 of 117 | Dissolved: 1 | Infrastructure: 14
+Genuine: 102 | Conflates: 0 | Dissolved: 1 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin

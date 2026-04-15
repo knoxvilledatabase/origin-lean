@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Commutator/Basic.lean
-Genuine: 29 of 36 | Dissolved: 0 | Infrastructure: 7
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Subgroup.Centralizer

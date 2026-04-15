@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/Induced.lean
-Genuine: 49 of 51 | Dissolved: 2 | Infrastructure: 0
+Genuine: 49 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Caratheodory

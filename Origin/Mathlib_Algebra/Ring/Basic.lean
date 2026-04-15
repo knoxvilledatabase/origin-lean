@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Basic.lean
-Genuine: 10 of 24 | Dissolved: 6 | Infrastructure: 8
+Genuine: 7 | Conflates: 3 | Dissolved: 6 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
@@ -106,9 +106,11 @@ theorem vieta_formula_quadratic {b c x : α} (h : x * x - b * x + c = 0) :
 
 end NonUnitalCommRing
 
+-- CONFLATES (assumes ground = zero): succ_ne_self
 theorem succ_ne_self {α : Type*} [NonAssocRing α] [Nontrivial α] (a : α) : a + 1 ≠ a := fun h =>
   one_ne_zero ((add_right_inj a).mp (by simp [h]))
 
+-- CONFLATES (assumes ground = zero): pred_ne_self
 theorem pred_ne_self {α : Type*} [NonAssocRing α] [Nontrivial α] (a : α) : a - 1 ≠ a := fun h ↦
   one_ne_zero (neg_injective ((add_right_inj a).mp (by simp [← sub_eq_add_neg, h])))
 
@@ -145,6 +147,7 @@ instance Subsingleton.to_isCancelMulZero [Mul α] [Zero α] [Subsingleton α] : 
 instance Subsingleton.to_noZeroDivisors [Mul α] [Zero α] [Subsingleton α] : NoZeroDivisors α where
   eq_zero_or_eq_zero_of_mul_eq_zero _ := .inl (Subsingleton.eq_zero _)
 
+-- CONFLATES (assumes ground = zero): isDomain_iff_cancelMulZero_and_nontrivial
 lemma isDomain_iff_cancelMulZero_and_nontrivial [Semiring α] :
     IsDomain α ↔ IsCancelMulZero α ∧ Nontrivial α :=
   ⟨fun _ => ⟨inferInstance, inferInstance⟩, fun ⟨_, _⟩ => {}⟩

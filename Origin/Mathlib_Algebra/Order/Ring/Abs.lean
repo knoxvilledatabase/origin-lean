@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Abs.lean
-Genuine: 49 of 53 | Dissolved: 4 | Infrastructure: 0
+Genuine: 49 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Abs

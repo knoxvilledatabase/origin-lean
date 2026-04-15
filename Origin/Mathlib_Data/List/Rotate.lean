@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Rotate.lean
-Genuine: 86 of 99 | Dissolved: 0 | Infrastructure: 13
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Data.List.Nodup

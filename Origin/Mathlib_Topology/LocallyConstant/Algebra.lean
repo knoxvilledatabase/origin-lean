@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/LocallyConstant/Algebra.lean
-Genuine: 31 of 79 | Dissolved: 0 | Infrastructure: 48
+Genuine: 28 | Conflates: 3 | Dissolved: 0 | Infrastructure: 48
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Pi
@@ -85,12 +85,15 @@ noncomputable def charFn (hU : IsClopen U) : LocallyConstant X Y :=
 theorem coe_charFn (hU : IsClopen U) : (charFn Y hU : X → Y) = Set.indicator U 1 :=
   rfl
 
+-- CONFLATES (assumes ground = zero): charFn_eq_one
 theorem charFn_eq_one [Nontrivial Y] (x : X) (hU : IsClopen U) : charFn Y hU x = (1 : Y) ↔ x ∈ U :=
   Set.indicator_eq_one_iff_mem _
 
+-- CONFLATES (assumes ground = zero): charFn_eq_zero
 theorem charFn_eq_zero [Nontrivial Y] (x : X) (hU : IsClopen U) : charFn Y hU x = (0 : Y) ↔ x ∉ U :=
   Set.indicator_eq_zero_iff_not_mem _
 
+-- CONFLATES (assumes ground = zero): charFn_inj
 theorem charFn_inj [Nontrivial Y] (hU : IsClopen U) (hV : IsClopen V)
     (h : charFn Y hU = charFn Y hV) : U = V :=
   Set.indicator_one_inj Y <| coe_inj.mpr h

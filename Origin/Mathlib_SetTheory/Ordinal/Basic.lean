@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/Basic.lean
-Genuine: 186 of 260 | Dissolved: 8 | Infrastructure: 66
+Genuine: 186 | Conflates: 0 | Dissolved: 8 | Infrastructure: 66
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.SuccPred

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Analytic.lean
-Genuine: 60 of 70 | Dissolved: 0 | Infrastructure: 10
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.CPolynomial

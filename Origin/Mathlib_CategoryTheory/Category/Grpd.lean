@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Category/Grpd.lean
-Genuine: 8 of 18 | Dissolved: 0 | Infrastructure: 10
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.SingleObj

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Category/NonemptyFinLinOrd.lean
-Genuine: 10 of 30 | Dissolved: 0 | Infrastructure: 20
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Module/WeakDual.lean
-Genuine: 16 of 20 | Dissolved: 0 | Infrastructure: 4
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Dual

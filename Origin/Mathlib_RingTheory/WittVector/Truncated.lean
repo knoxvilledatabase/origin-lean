@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/Truncated.lean
-Genuine: 43 of 62 | Dissolved: 0 | Infrastructure: 19
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.InitTail

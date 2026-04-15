@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Basic.lean
-Genuine: 160 of 191 | Dissolved: 0 | Infrastructure: 31
+Genuine: 160 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.TangentCone

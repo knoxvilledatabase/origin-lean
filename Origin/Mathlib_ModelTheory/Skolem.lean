@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Skolem.lean
-Genuine: 7 of 10 | Dissolved: 0 | Infrastructure: 3
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.ModelTheory.ElementarySubstructures

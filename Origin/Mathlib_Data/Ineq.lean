@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Ineq.lean
-Genuine: 6 of 8 | Dissolved: 0 | Infrastructure: 2
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Lean.Expr.Basic

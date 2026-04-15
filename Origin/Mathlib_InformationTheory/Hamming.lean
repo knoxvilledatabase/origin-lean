@@ -1,6 +1,6 @@
 /-
 Extracted from InformationTheory/Hamming.lean
-Genuine: 33 of 77 | Dissolved: 3 | Infrastructure: 41
+Genuine: 33 | Conflates: 0 | Dissolved: 3 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Basic

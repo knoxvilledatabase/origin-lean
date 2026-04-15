@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/RingDivision.lean
-Genuine: 22 of 30 | Dissolved: 7 | Infrastructure: 1
+Genuine: 19 | Conflates: 3 | Dissolved: 7 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -128,15 +128,18 @@ end nonZeroDivisors
 
 -- DISSOLVED: rootMultiplicity_mul_X_sub_C_pow
 
+-- CONFLATES (assumes ground = zero): rootMultiplicity_X_sub_C_pow
 theorem rootMultiplicity_X_sub_C_pow [Nontrivial R] (a : R) (n : ℕ) :
     rootMultiplicity a ((X - C a) ^ n) = n := by
   have := rootMultiplicity_mul_X_sub_C_pow (a := a) (n := n) C.map_one_ne_zero
   rwa [rootMultiplicity_C, map_one, one_mul, zero_add] at this
 
+-- CONFLATES (assumes ground = zero): rootMultiplicity_X_sub_C_self
 theorem rootMultiplicity_X_sub_C_self [Nontrivial R] {x : R} :
     rootMultiplicity x (X - C x) = 1 :=
   pow_one (X - C x) ▸ rootMultiplicity_X_sub_C_pow x 1
 
+-- CONFLATES (assumes ground = zero): rootMultiplicity_X_sub_C
 theorem rootMultiplicity_X_sub_C [Nontrivial R] [DecidableEq R] {x y : R} :
     rootMultiplicity x (X - C y) = if x = y then 1 else 0 := by
   split_ifs with hxy

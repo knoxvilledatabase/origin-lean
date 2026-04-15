@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Divisible.lean
-Genuine: 3 of 15 | Dissolved: 7 | Infrastructure: 5
+Genuine: 3 | Conflates: 0 | Dissolved: 7 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.ULift

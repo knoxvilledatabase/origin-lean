@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Game/Ordinal.lean
-Genuine: 39 of 45 | Dissolved: 0 | Infrastructure: 6
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.SetTheory.Game.Basic

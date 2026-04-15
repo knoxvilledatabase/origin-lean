@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/Uniqueness.lean
-Genuine: 9 of 12 | Dissolved: 0 | Infrastructure: 3
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Linear

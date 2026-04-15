@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Decomposition/Lebesgue.lean
-Genuine: 69 of 93 | Dissolved: 5 | Infrastructure: 19
+Genuine: 69 | Conflates: 0 | Dissolved: 5 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Sub

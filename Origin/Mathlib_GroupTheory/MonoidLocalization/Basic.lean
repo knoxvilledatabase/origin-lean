@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/MonoidLocalization/Basic.lean
-Genuine: 137 of 156 | Dissolved: 0 | Infrastructure: 19
+Genuine: 137 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Defs

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/RingedSpace/LocallyRingedSpace/ResidueField.lean
-Genuine: 14 of 17 | Dissolved: 2 | Infrastructure: 1
+Genuine: 14 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace

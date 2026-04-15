@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DividedPowers/Basic.lean
-Genuine: 17 of 26 | Dissolved: 4 | Infrastructure: 5
+Genuine: 17 | Conflates: 0 | Dissolved: 4 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.RingTheory.PowerSeries.Basic

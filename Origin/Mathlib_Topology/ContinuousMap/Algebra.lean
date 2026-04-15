@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/Algebra.lean
-Genuine: 26 of 112 | Dissolved: 0 | Infrastructure: 86
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 86
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Pi

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ENNReal/Real.lean
-Genuine: 102 of 111 | Dissolved: 5 | Infrastructure: 4
+Genuine: 102 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Inv

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ClassNumber/AdmissibleAbs.lean
-Genuine: 1 of 3 | Dissolved: 1 | Infrastructure: 1
+Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Basic

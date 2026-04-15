@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Coalgebra/TensorProduct.lean
-Genuine: 6 of 18 | Dissolved: 0 | Infrastructure: 12
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.CoalgebraCat.ComonEquivalence

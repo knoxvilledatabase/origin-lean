@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/Extr.lean
-Genuine: 7 of 8 | Dissolved: 0 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Ray

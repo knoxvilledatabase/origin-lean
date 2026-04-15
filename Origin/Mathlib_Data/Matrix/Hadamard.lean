@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Hadamard.lean
-Genuine: 13 of 15 | Dissolved: 0 | Infrastructure: 2
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Trace

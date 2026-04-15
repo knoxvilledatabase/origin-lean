@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/Deligne.lean
-Genuine: 12 of 17 | Dissolved: 3 | Infrastructure: 2
+Genuine: 12 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gamma.Beta

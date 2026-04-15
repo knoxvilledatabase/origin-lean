@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/QuotientGroup/Basic.lean
-Genuine: 36 of 40 | Dissolved: 0 | Infrastructure: 4
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/AssociatedPrime.lean
-Genuine: 9 of 16 | Dissolved: 2 | Infrastructure: 5
+Genuine: 8 | Conflates: 1 | Dissolved: 2 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Span.Basic
@@ -88,6 +88,7 @@ theorem associatedPrimes.eq_empty_of_subsingleton [Subsingleton M] : associatedP
 
 variable (R M)
 
+-- CONFLATES (assumes ground = zero): associatedPrimes.nonempty
 theorem associatedPrimes.nonempty [IsNoetherianRing R] [Nontrivial M] :
     (associatedPrimes R M).Nonempty := by
   obtain ⟨x, hx⟩ := exists_ne (0 : M)

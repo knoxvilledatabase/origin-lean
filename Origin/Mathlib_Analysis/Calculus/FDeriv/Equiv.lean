@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Equiv.lean
-Genuine: 66 of 69 | Dissolved: 0 | Infrastructure: 3
+Genuine: 66 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent

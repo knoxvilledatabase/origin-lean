@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Finsupp/Supported.lean
-Genuine: 21 of 24 | Dissolved: 0 | Infrastructure: 3
+Genuine: 21 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Range
@@ -159,6 +159,7 @@ theorem disjoint_supported_supported {s t : Set α} (h : Disjoint s t) :
     Disjoint (supported M R s) (supported M R t) :=
   disjoint_iff.2 <| by rw [← supported_inter, disjoint_iff_inter_eq_empty.1 h, supported_empty]
 
+-- CONFLATES (assumes ground = zero): disjoint_supported_supported_iff
 theorem disjoint_supported_supported_iff [Nontrivial M] {s t : Set α} :
     Disjoint (supported M R s) (supported M R t) ↔ Disjoint s t := by
   refine ⟨fun h => Set.disjoint_left.mpr fun x hx1 hx2 => ?_, disjoint_supported_supported⟩

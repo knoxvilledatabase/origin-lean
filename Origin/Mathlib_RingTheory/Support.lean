@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Support.lean
-Genuine: 18 of 20 | Dissolved: 1 | Infrastructure: 1
+Genuine: 17 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.PrimeSpectrum
@@ -37,6 +37,7 @@ variable (R M) in
 def Module.support : Set (PrimeSpectrum R) :=
   { p | Nontrivial (LocalizedModule p.asIdeal.primeCompl M) }
 
+-- CONFLATES (assumes ground = zero): Module.mem_support_iff
 lemma Module.mem_support_iff :
     p ∈ Module.support R M ↔ Nontrivial (LocalizedModule p.asIdeal.primeCompl M) := Iff.rfl
 
@@ -114,6 +115,7 @@ lemma Module.support_of_algebra {A : Type*} [Ring A] [Algebra R A] :
   · simpa [Algebra.smul_def, (show _ = _ from hx)] using hm _ hx'
   · exact hr (H ((Algebra.algebraMap_eq_smul_one _).trans e))
 
+-- CONFLATES (assumes ground = zero): Module.support_of_noZeroSMulDivisors
 lemma Module.support_of_noZeroSMulDivisors [NoZeroSMulDivisors R M] [Nontrivial M] :
     Module.support R M = Set.univ := by
   simp only [Set.eq_univ_iff_forall, mem_support_iff', ne_eq, smul_eq_zero, not_or]

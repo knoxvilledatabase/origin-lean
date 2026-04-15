@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/BumpFunction/FiniteDimension.lean
-Genuine: 29 of 30 | Dissolved: 0 | Infrastructure: 1
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.SmoothSeries

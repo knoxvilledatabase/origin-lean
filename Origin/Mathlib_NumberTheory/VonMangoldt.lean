@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/VonMangoldt.lean
-Genuine: 13 of 18 | Dissolved: 3 | Infrastructure: 2
+Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.IsPrimePow

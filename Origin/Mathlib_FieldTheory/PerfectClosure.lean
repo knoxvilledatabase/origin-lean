@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/PerfectClosure.lean
-Genuine: 23 of 48 | Dissolved: 0 | Infrastructure: 25
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.ExpChar

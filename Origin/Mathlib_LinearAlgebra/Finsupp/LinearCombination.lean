@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Finsupp/LinearCombination.lean
-Genuine: 43 of 47 | Dissolved: 1 | Infrastructure: 3
+Genuine: 43 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Equiv

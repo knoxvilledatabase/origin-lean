@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/TensorProduct/Basic.lean
-Genuine: 81 of 149 | Dissolved: 0 | Infrastructure: 68
+Genuine: 81 | Conflates: 0 | Dissolved: 0 | Infrastructure: 68
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.RestrictScalars

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/Free.lean
-Genuine: 10 of 29 | Dissolved: 0 | Infrastructure: 19
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Functor.Pseudofunctor

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/LinearPMap.lean
-Genuine: 75 of 130 | Dissolved: 2 | Infrastructure: 53
+Genuine: 75 | Conflates: 0 | Dissolved: 2 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Prod

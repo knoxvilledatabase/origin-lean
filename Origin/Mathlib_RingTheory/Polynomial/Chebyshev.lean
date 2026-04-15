@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Chebyshev.lean
-Genuine: 35 of 39 | Dissolved: 0 | Infrastructure: 4
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Derivative

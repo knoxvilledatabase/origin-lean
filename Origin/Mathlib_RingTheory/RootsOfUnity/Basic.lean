@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/RootsOfUnity/Basic.lean
-Genuine: 18 of 29 | Dissolved: 2 | Infrastructure: 9
+Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Reduced

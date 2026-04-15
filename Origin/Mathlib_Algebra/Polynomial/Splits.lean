@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Splits.lean
-Genuine: 55 of 74 | Dissolved: 17 | Infrastructure: 2
+Genuine: 55 | Conflates: 0 | Dissolved: 17 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.FieldDivision

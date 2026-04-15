@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Deriv.lean
-Genuine: 223 of 225 | Dissolved: 2 | Infrastructure: 0
+Genuine: 223 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Monotone.Odd

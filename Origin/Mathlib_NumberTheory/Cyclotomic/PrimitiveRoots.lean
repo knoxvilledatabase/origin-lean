@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Cyclotomic/PrimitiveRoots.lean
-Genuine: 30 of 35 | Dissolved: 4 | Infrastructure: 1
+Genuine: 30 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.PNat.Prime

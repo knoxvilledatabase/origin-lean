@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/HolderNorm.lean
-Genuine: 30 of 33 | Dissolved: 0 | Infrastructure: 3
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Holder

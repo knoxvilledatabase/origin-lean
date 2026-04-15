@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/CauSeq/Basic.lean
-Genuine: 90 of 151 | Dissolved: 1 | Infrastructure: 60
+Genuine: 90 | Conflates: 0 | Dissolved: 1 | Infrastructure: 60
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Pi

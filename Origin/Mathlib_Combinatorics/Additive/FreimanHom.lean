@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Additive/FreimanHom.lean
-Genuine: 34 of 38 | Dissolved: 3 | Infrastructure: 1
+Genuine: 34 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring

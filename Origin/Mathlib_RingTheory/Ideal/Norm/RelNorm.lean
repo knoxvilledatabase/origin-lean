@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Norm/RelNorm.lean
-Genuine: 21 of 23 | Dissolved: 0 | Infrastructure: 2
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FreeModule.PID
@@ -39,6 +39,7 @@ variable (R : Type*) [CommRing R] {S : Type*} [CommRing S] [Algebra R S]
 def spanNorm (I : Ideal S) : Ideal R :=
   Ideal.span (Algebra.norm R '' (I : Set S))
 
+-- CONFLATES (assumes ground = zero): spanNorm_bot
 @[simp]
 theorem spanNorm_bot [Nontrivial S] [Module.Free R S] [Module.Finite R S] :
     spanNorm R (⊥ : Ideal S) = ⊥ := span_eq_bot.mpr fun x hx => by simpa using hx

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/AddCircle.lean
-Genuine: 54 of 73 | Dissolved: 6 | Infrastructure: 13
+Genuine: 54 | Conflates: 0 | Dissolved: 6 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.ToIntervalMod

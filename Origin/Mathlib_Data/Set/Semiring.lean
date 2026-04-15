@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Semiring.lean
-Genuine: 4 of 44 | Dissolved: 0 | Infrastructure: 40
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic

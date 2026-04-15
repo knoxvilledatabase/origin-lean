@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/LinearDisjoint.lean
-Genuine: 41 of 47 | Dissolved: 0 | Infrastructure: 6
+Genuine: 40 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Tower
@@ -153,6 +153,7 @@ protected def LinearDisjoint.mulMap (H : M.LinearDisjoint N) : M ⊗[R] N ≃ₗ
 theorem LinearDisjoint.val_mulMap_tmul (H : M.LinearDisjoint N) (m : M) (n : N) :
     (H.mulMap (m ⊗ₜ[R] n) : S) = m.1 * n.1 := rfl
 
+-- CONFLATES (assumes ground = zero): LinearDisjoint.of_subsingleton
 @[nontriviality]
 theorem LinearDisjoint.of_subsingleton [Subsingleton R] : M.LinearDisjoint N := by
   haveI : Subsingleton S := Module.subsingleton R S

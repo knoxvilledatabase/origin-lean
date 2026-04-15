@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/MinMax.lean
-Genuine: 75 of 83 | Dissolved: 0 | Infrastructure: 8
+Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.List.Basic

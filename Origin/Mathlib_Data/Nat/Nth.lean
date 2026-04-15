@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Nth.lean
-Genuine: 66 of 70 | Dissolved: 3 | Infrastructure: 1
+Genuine: 66 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.List.GetD

@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Weierstrass.lean
-Genuine: 64 of 73 | Dissolved: 2 | Infrastructure: 7
+Genuine: 64 | Conflates: 0 | Dissolved: 2 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs

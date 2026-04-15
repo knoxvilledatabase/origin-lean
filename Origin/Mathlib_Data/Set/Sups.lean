@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Sups.lean
-Genuine: 81 of 82 | Dissolved: 0 | Infrastructure: 1
+Genuine: 81 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Set.NAry

@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/Inversion/Basic.lean
-Genuine: 19 of 29 | Dissolved: 7 | Infrastructure: 3
+Genuine: 19 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.AddTorsor

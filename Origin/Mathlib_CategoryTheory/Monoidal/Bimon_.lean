@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Monoidal/Bimon_.lean
-Genuine: 25 of 33 | Dissolved: 0 | Infrastructure: 8
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Comon_

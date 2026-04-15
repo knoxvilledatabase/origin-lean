@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Perfect.lean
-Genuine: 14 of 16 | Dissolved: 0 | Infrastructure: 2
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.Separation.Basic
@@ -148,6 +148,7 @@ theorem Perfect.splitting [T25Space α] (hC : Perfect C) (hnonempty : C.Nonempty
     exact inter_subset_right
   apply Disjoint.mono _ _ hUV <;> apply closure_mono <;> exact inter_subset_left
 
+-- CONFLATES (assumes ground = zero): IsPreconnected.preperfect_of_nontrivial
 lemma IsPreconnected.preperfect_of_nontrivial [T1Space α] {U : Set α} (hu : U.Nontrivial)
     (h : IsPreconnected U) : Preperfect U := by
   intro x hx

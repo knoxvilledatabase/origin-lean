@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/Spectrum.lean
-Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Spectrum
@@ -128,6 +128,7 @@ theorem map_pow_of_nonempty [IsAlgClosed 𝕜] {a : A} (ha : (σ a).Nonempty) (n
 
 variable (𝕜)
 
+-- CONFLATES (assumes ground = zero): nonempty_of_isAlgClosed_of_finiteDimensional
 theorem nonempty_of_isAlgClosed_of_finiteDimensional [IsAlgClosed 𝕜] [Nontrivial A]
     [I : FiniteDimensional 𝕜 A] (a : A) : (σ a).Nonempty := by
   obtain ⟨p, ⟨h_mon, h_eval_p⟩⟩ := isIntegral_of_noetherian (IsNoetherian.iff_fg.2 I) a

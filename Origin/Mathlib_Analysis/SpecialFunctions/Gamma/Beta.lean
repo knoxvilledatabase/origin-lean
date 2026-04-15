@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/Beta.lean
-Genuine: 22 of 27 | Dissolved: 5 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convolution

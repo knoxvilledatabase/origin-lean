@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/KrullDimension/Basic.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.CommRing
@@ -23,11 +23,13 @@ noncomputable def ringKrullDim (R : Type*) [CommRing R] : WithBot (WithTop ℕ) 
 
 variable {R S : Type*} [CommRing R] [CommRing S]
 
+-- CONFLATES (assumes ground = zero): ringKrullDim_eq_bot_of_subsingleton
 @[nontriviality]
 lemma ringKrullDim_eq_bot_of_subsingleton [Subsingleton R] :
     ringKrullDim R = ⊥ :=
   krullDim_eq_bot_of_isEmpty
 
+-- CONFLATES (assumes ground = zero): ringKrullDim_nonneg_of_nontrivial
 lemma ringKrullDim_nonneg_of_nontrivial [Nontrivial R] :
     0 ≤ ringKrullDim R :=
   krullDim_nonneg_of_nonempty

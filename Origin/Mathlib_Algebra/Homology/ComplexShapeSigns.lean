@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/ComplexShapeSigns.lean
-Genuine: 38 of 45 | Dissolved: 0 | Infrastructure: 7
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ComplexShape

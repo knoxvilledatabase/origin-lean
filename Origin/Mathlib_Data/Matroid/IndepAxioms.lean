@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matroid/IndepAxioms.lean
-Genuine: 14 of 31 | Dissolved: 0 | Infrastructure: 17
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Data.Matroid.Basic

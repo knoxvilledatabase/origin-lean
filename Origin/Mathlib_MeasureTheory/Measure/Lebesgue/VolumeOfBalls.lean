@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Lebesgue/VolumeOfBalls.lean
-Genuine: 13 of 15 | Dissolved: 0 | Infrastructure: 2
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gamma.BohrMollerup
@@ -117,6 +117,7 @@ theorem MeasureTheory.measure_lt_one_eq_integral_div_gamma {p : ℝ} (hp : 0 < p
     rw [← this.integral_comp']
     rfl
 
+-- CONFLATES (assumes ground = zero): MeasureTheory.measure_le_eq_lt
 theorem MeasureTheory.measure_le_eq_lt [Nontrivial E] (r : ℝ) :
     μ {x : E | g x ≤ r} = μ {x : E | g x < r} := by
   -- We copy `E` to a new type `F` on which we will put the norm defined by `g`

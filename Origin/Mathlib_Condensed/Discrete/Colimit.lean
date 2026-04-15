@@ -1,6 +1,6 @@
 /-
 Extracted from Condensed/Discrete/Colimit.lean
-Genuine: 47 of 54 | Dissolved: 0 | Infrastructure: 7
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Condensed.Discrete.LocallyConstant

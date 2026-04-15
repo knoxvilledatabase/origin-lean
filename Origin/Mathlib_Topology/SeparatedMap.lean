@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/SeparatedMap.lean
-Genuine: 27 of 29 | Dissolved: 0 | Infrastructure: 2
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.Connected.Basic

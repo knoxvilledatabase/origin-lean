@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Cone/Basic.lean
-Genuine: 50 of 88 | Dissolved: 0 | Infrastructure: 38
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Hull

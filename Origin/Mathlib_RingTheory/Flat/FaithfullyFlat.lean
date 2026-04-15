@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Flat/FaithfullyFlat.lean
-Genuine: 21 of 27 | Dissolved: 0 | Infrastructure: 6
+Genuine: 19 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Quotient
@@ -127,6 +127,7 @@ lemma lTensor_reflects_triviality
 
 attribute [-simp] Ideal.Quotient.mk_eq_mk in
 
+-- CONFLATES (assumes ground = zero): iff_flat_and_rTensor_faithful
 lemma iff_flat_and_rTensor_faithful :
     FaithfullyFlat R M ↔
     (Flat R M ∧
@@ -153,6 +154,7 @@ lemma iff_flat_and_rTensor_reflects_triviality :
     forall_congr fun N => forall_congr fun _ => forall_congr fun _ => iff_iff_eq.1 <| by
       simp only [← not_subsingleton_iff_nontrivial]; tauto
 
+-- CONFLATES (assumes ground = zero): iff_flat_and_lTensor_faithful
 lemma iff_flat_and_lTensor_faithful :
     FaithfullyFlat R M ↔
     (Flat R M ∧

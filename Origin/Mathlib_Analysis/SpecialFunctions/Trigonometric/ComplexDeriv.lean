@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/ComplexDeriv.lean
-Genuine: 3 of 8 | Dissolved: 5 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Complex

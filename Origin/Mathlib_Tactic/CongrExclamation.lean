@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CongrExclamation.lean
-Genuine: 28 of 28 | Dissolved: 0 | Infrastructure: 0
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Elab.Tactic.Config

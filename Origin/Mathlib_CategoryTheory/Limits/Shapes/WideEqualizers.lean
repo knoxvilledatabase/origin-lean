@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/WideEqualizers.lean
-Genuine: 64 of 88 | Dissolved: 0 | Infrastructure: 24
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits

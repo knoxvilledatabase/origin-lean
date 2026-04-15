@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Valued/NormedValued.lean
-Genuine: 15 of 19 | Dissolved: 0 | Infrastructure: 4
+Genuine: 14 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Basic
@@ -186,6 +186,7 @@ theorem one_lt_norm_iff : 1 < ‖x‖ ↔ 1 < val.v x := by
 
 end toNormedField
 
+-- CONFLATES (assumes ground = zero): toNontriviallyNormedField:
 def toNontriviallyNormedField: NontriviallyNormedField L := {
   val.toNormedField with
   non_trivial := by

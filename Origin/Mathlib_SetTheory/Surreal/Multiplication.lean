@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Surreal/Multiplication.lean
-Genuine: 64 of 65 | Dissolved: 0 | Infrastructure: 1
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Logic.Hydra

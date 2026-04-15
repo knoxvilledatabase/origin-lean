@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/GaugeRescale.lean
-Genuine: 17 of 19 | Dissolved: 1 | Infrastructure: 1
+Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Gauge

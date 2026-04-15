@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Indization/Category.lean
-Genuine: 10 of 21 | Dissolved: 0 | Infrastructure: 11
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Flat

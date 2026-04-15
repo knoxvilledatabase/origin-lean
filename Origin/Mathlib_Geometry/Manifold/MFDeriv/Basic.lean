@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/MFDeriv/Basic.lean
-Genuine: 157 of 169 | Dissolved: 0 | Infrastructure: 12
+Genuine: 157 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.MFDeriv.Defs

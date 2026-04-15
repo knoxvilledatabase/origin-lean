@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/NAry.lean
-Genuine: 92 of 96 | Dissolved: 0 | Infrastructure: 4
+Genuine: 92 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold

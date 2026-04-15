@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/Classification.lean
-Genuine: 6 of 7 | Dissolved: 1 | Infrastructure: 0
+Genuine: 5 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod
@@ -88,6 +88,7 @@ theorem cardinal_le_max_transcendence_basis (hv : IsTranscendenceBasis R v) :
     _ ≤ max (max (max #R #ι) ℵ₀) ℵ₀ := max_le_max MvPolynomial.cardinalMk_le_max le_rfl
     _ = _ := by simp [max_assoc]
 
+-- CONFLATES (assumes ground = zero): cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt
 theorem cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt [Nontrivial R]
     (hv : IsTranscendenceBasis R v) (hR : #R ≤ ℵ₀) (hK : ℵ₀ < #K) : #K = #ι :=
   have : ℵ₀ ≤ #ι := le_of_not_lt fun h => not_le_of_gt hK <|

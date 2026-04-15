@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Types.lean
-Genuine: 17 of 20 | Dissolved: 0 | Infrastructure: 3
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.ModelTheory.Satisfiability

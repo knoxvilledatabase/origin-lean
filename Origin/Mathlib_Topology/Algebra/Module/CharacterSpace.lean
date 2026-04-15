@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/CharacterSpace.lean
-Genuine: 12 of 21 | Dissolved: 0 | Infrastructure: 9
+Genuine: 9 | Conflates: 3 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.WeakDual
@@ -137,6 +137,7 @@ def toAlgHom (φ : characterSpace 𝕜 A) : A →ₐ[𝕜] 𝕜 :=
     map_one' := map_one φ
     commutes' := AlgHomClass.commutes φ }
 
+-- CONFLATES (assumes ground = zero): eq_set_map_one_map_mul
 theorem eq_set_map_one_map_mul [Nontrivial 𝕜] :
     characterSpace 𝕜 A = {φ : WeakDual 𝕜 A | φ 1 = 1 ∧ ∀ x y : A, φ (x * y) = φ x * φ y} := by
   ext φ
@@ -149,6 +150,7 @@ theorem eq_set_map_one_map_mul [Nontrivial 𝕜] :
     rintro rfl
     exact zero_ne_one hφ₁
 
+-- CONFLATES (assumes ground = zero): isClosed
 protected theorem isClosed [Nontrivial 𝕜] [T2Space 𝕜] [ContinuousMul 𝕜] :
     IsClosed (characterSpace 𝕜 A) := by
   rw [eq_set_map_one_map_mul, Set.setOf_and]
@@ -162,6 +164,7 @@ section Ring
 variable [CommRing 𝕜] [NoZeroDivisors 𝕜] [TopologicalSpace 𝕜] [ContinuousAdd 𝕜]
   [ContinuousConstSMul 𝕜 𝕜] [TopologicalSpace A] [Ring A] [Algebra 𝕜 A]
 
+-- CONFLATES (assumes ground = zero): apply_mem_spectrum
 theorem apply_mem_spectrum [Nontrivial 𝕜] (φ : characterSpace 𝕜 A) (a : A) : φ a ∈ spectrum 𝕜 a :=
   AlgHom.apply_mem_spectrum φ a
 

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Abelian/LeftDerived.lean
-Genuine: 26 of 33 | Dissolved: 0 | Infrastructure: 7
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.Additive

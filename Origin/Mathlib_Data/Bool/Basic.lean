@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Bool/Basic.lean
-Genuine: 53 of 66 | Dissolved: 2 | Infrastructure: 11
+Genuine: 53 | Conflates: 0 | Dissolved: 2 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Logic.Basic

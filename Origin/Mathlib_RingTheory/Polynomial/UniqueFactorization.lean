@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/UniqueFactorization.lean
-Genuine: 4 of 9 | Dissolved: 2 | Infrastructure: 3
+Genuine: 4 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Polynomial.Basic

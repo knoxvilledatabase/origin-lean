@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Galois/Basic.lean
-Genuine: 32 of 45 | Dissolved: 0 | Infrastructure: 13
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Fixed

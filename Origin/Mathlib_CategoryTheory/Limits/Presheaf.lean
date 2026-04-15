@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Presheaf.lean
-Genuine: 30 of 38 | Dissolved: 0 | Infrastructure: 8
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.Presheaf.Basic

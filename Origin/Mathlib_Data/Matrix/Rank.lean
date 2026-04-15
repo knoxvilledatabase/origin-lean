@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Rank.lean
-Genuine: 29 of 31 | Dissolved: 1 | Infrastructure: 1
+Genuine: 28 | Conflates: 1 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Determinant
@@ -41,6 +41,7 @@ theorem rank_one [StrongRankCondition R] [DecidableEq n] :
     rank (1 : Matrix n n R) = Fintype.card n := by
   rw [rank, mulVecLin_one, LinearMap.range_id, finrank_top, finrank_pi]
 
+-- CONFLATES (assumes ground = zero): rank_zero
 @[simp]
 theorem rank_zero [Nontrivial R] : rank (0 : Matrix m n R) = 0 := by
   rw [rank, mulVecLin_zero, LinearMap.range_zero, finrank_bot]

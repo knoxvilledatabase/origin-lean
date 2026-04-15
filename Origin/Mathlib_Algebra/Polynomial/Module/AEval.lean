@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Module/AEval.lean
-Genuine: 17 of 29 | Dissolved: 0 | Infrastructure: 12
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Invariant

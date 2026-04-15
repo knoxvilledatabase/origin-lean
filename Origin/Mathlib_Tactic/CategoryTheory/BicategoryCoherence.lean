@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CategoryTheory/BicategoryCoherence.lean
-Genuine: 7 of 20 | Dissolved: 0 | Infrastructure: 13
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Coherence

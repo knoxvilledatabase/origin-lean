@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Infinite.lean
-Genuine: 12 of 18 | Dissolved: 0 | Infrastructure: 6
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Basic

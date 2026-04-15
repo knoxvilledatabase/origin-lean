@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Xgcd.lean
-Genuine: 58 of 71 | Dissolved: 3 | Infrastructure: 10
+Genuine: 58 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Tactic.Ring

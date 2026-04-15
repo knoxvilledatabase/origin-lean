@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/VectorBundle/Tangent.lean
-Genuine: 23 of 43 | Dissolved: 0 | Infrastructure: 20
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.VectorBundle.Basic

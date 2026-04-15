@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/Pointwise.lean
-Genuine: 43 of 49 | Dissolved: 6 | Infrastructure: 0
+Genuine: 41 | Conflates: 2 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Pointwise
@@ -331,6 +331,7 @@ theorem smul_closedUnitBall_of_nonneg {r : ℝ} (hr : 0 ≤ r) :
     r • closedBall (0 : E) 1 = closedBall (0 : E) r := by
   rw [smul_closedUnitBall, Real.norm_of_nonneg hr]
 
+-- CONFLATES (assumes ground = zero): NormedSpace.sphere_nonempty
 @[simp]
 theorem NormedSpace.sphere_nonempty [Nontrivial E] {x : E} {r : ℝ} :
     (sphere x r).Nonempty ↔ 0 ≤ r := by
@@ -343,6 +344,7 @@ theorem NormedSpace.sphere_nonempty [Nontrivial E] {x : E} {r : ℝ} :
   simp only [abs_norm, ne_eq, norm_eq_zero]
   rw [inv_mul_cancel₀ this, mul_one, abs_eq_self.mpr hr]
 
+-- CONFLATES (assumes ground = zero): smul_sphere
 theorem smul_sphere [Nontrivial E] (c : 𝕜) (x : E) {r : ℝ} (hr : 0 ≤ r) :
     c • sphere x r = sphere (c • x) (‖c‖ * r) := by
   rcases eq_or_ne c 0 with (rfl | hc)

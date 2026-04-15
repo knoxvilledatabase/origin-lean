@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Bounds/Image.lean
-Genuine: 86 of 86 | Dissolved: 0 | Infrastructure: 0
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Set.NAry

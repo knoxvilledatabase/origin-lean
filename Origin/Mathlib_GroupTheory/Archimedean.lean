@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Archimedean.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Order
@@ -54,6 +54,7 @@ theorem Subgroup.cyclic_of_min {H : Subgroup G} {a : G}
     contradiction
   simp [div_eq_one.mp h_zero, mem_closure_singleton]
 
+-- CONFLATES (assumes ground = zero): Subgroup.exists_isLeast_one_lt
 @[to_additive "If a nontrivial additive subgroup of a linear ordered additive commutative group is
 disjoint with the interval `Set.Ioo 0 a` for some positive `a`, then the set of positive elements of
 this group admits the least element."]

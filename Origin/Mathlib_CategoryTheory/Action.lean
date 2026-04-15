@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Action.lean
-Genuine: 14 of 28 | Dissolved: 0 | Infrastructure: 14
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Elements

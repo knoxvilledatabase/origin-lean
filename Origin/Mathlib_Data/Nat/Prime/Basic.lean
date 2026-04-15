@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Prime/Basic.lean
-Genuine: 42 of 44 | Dissolved: 1 | Infrastructure: 1
+Genuine: 42 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic

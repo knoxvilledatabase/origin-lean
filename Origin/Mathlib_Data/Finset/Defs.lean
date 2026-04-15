@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Defs.lean
-Genuine: 36 of 87 | Dissolved: 0 | Infrastructure: 51
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Data.Multiset.Nodup

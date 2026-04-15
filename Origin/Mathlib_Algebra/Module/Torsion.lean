@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Torsion.lean
-Genuine: 77 of 109 | Dissolved: 5 | Infrastructure: 27
+Genuine: 77 | Conflates: 0 | Dissolved: 5 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Module

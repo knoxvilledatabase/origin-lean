@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Chunk.lean
-Genuine: 23 of 24 | Dissolved: 1 | Infrastructure: 0
+Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Regularity.Bound

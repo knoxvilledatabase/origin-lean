@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Card.lean
-Genuine: 123 of 134 | Dissolved: 4 | Infrastructure: 7
+Genuine: 121 | Conflates: 2 | Dissolved: 4 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Image
@@ -601,6 +601,7 @@ theorem one_lt_card_iff : 1 < #s ↔ ∃ a b, a ∈ s ∧ b ∈ s ∧ a ≠ b :=
   rw [one_lt_card]
   simp only [exists_prop, exists_and_left]
 
+-- CONFLATES (assumes ground = zero): one_lt_card_iff_nontrivial
 theorem one_lt_card_iff_nontrivial : 1 < #s ↔ s.Nontrivial := by
   rw [← not_iff_not, not_lt, Finset.Nontrivial, ← Set.nontrivial_coe_sort,
     not_nontrivial_iff_subsingleton, card_le_one_iff_subsingleton_coe, coe_sort_coe]
@@ -707,6 +708,7 @@ theorem case_strong_induction_on [DecidableEq α] {p : Finset α → Prop} (s : 
     Finset.induction_on s (fun _ => h₀) fun a s n _ ih =>
       (h₁ a s n) fun t ss => ih _ (lt_of_le_of_lt ss (ssubset_insert n) : t < _)
 
+-- CONFLATES (assumes ground = zero): Nonempty.strong_induction
 @[elab_as_elim]
 protected lemma Nonempty.strong_induction {p : ∀ s, s.Nonempty → Prop}
     (h₀ : ∀ a, p {a} (singleton_nonempty _))

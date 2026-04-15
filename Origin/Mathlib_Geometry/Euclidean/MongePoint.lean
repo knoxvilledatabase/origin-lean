@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Euclidean/MongePoint.lean
-Genuine: 41 of 46 | Dissolved: 0 | Infrastructure: 5
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Circumcenter

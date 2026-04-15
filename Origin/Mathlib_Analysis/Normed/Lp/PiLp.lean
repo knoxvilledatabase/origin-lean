@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Lp/PiLp.lean
-Genuine: 61 of 98 | Dissolved: 3 | Infrastructure: 34
+Genuine: 61 | Conflates: 0 | Dissolved: 3 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Analysis.MeanInequalities

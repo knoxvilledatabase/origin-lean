@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Game/PGame.lean
-Genuine: 276 of 366 | Dissolved: 0 | Infrastructure: 90
+Genuine: 276 | Conflates: 0 | Dissolved: 0 | Infrastructure: 90
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.ZeroLEOne

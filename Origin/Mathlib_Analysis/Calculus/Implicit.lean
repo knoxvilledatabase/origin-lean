@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/Implicit.lean
-Genuine: 35 of 41 | Dissolved: 0 | Infrastructure: 6
+Genuine: 34 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.InverseFunctionTheorem.FDeriv
@@ -86,6 +86,7 @@ This version of the theorem is used to prove the other versions and can be used 
 needs to have a complete control over the choice of the implicit function.
 -/
 
+-- CONFLATES (assumes ground = zero): ImplicitFunctionData
 structure ImplicitFunctionData (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type*)
     [NormedAddCommGroup E] [NormedSpace 𝕜 E] [CompleteSpace E] (F : Type*) [NormedAddCommGroup F]
     [NormedSpace 𝕜 F] [CompleteSpace F] (G : Type*) [NormedAddCommGroup G] [NormedSpace 𝕜 G]

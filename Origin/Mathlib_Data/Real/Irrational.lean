@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/Irrational.lean
-Genuine: 65 of 118 | Dissolved: 28 | Infrastructure: 25
+Genuine: 65 | Conflates: 0 | Dissolved: 28 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Rat

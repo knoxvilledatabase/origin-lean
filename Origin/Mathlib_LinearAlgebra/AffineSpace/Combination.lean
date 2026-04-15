@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Combination.lean
-Genuine: 106 of 122 | Dissolved: 8 | Infrastructure: 8
+Genuine: 103 | Conflates: 4 | Dissolved: 8 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators
@@ -703,6 +703,7 @@ theorem weightedVSub_mem_vectorSpan {s : Finset ι} {w : ι → k} (h : ∑ i �
         simp [w', Set.indicator_apply, if_pos hi]
       · exact fun _ => zero_smul k _
 
+-- CONFLATES (assumes ground = zero): affineCombination_mem_affineSpan
 theorem affineCombination_mem_affineSpan [Nontrivial k] {s : Finset ι} {w : ι → k}
     (h : ∑ i ∈ s, w i = 1) (p : ι → P) :
     s.affineCombination k p w ∈ affineSpan k (Set.range p) := by
@@ -811,6 +812,7 @@ theorem eq_affineCombination_of_mem_affineSpan_of_fintype [Fintype ι] {p1 : P} 
 
 variable (k V)
 
+-- CONFLATES (assumes ground = zero): mem_affineSpan_iff_eq_affineCombination
 theorem mem_affineSpan_iff_eq_affineCombination [Nontrivial k] {p1 : P} {p : ι → P} :
     p1 ∈ affineSpan k (Set.range p) ↔
       ∃ (s : Finset ι) (w : ι → k), ∑ i ∈ s, w i = 1 ∧ p1 = s.affineCombination k p w := by
@@ -819,6 +821,7 @@ theorem mem_affineSpan_iff_eq_affineCombination [Nontrivial k] {p1 : P} {p : ι 
   · rintro ⟨s, w, hw, rfl⟩
     exact affineCombination_mem_affineSpan hw p
 
+-- CONFLATES (assumes ground = zero): mem_affineSpan_iff_eq_weightedVSubOfPoint_vadd
 theorem mem_affineSpan_iff_eq_weightedVSubOfPoint_vadd [Nontrivial k] (p : ι → P) (j : ι) (q : P) :
     q ∈ affineSpan k (Set.range p) ↔
       ∃ (s : Finset ι) (w : ι → k), q = s.weightedVSubOfPoint p (p j) w +ᵥ p j := by
@@ -843,6 +846,7 @@ theorem mem_affineSpan_iff_eq_weightedVSubOfPoint_vadd [Nontrivial k] (p : ι �
 
 variable {k V}
 
+-- CONFLATES (assumes ground = zero): affineSpan_eq_affineSpan_lineMap_units
 theorem affineSpan_eq_affineSpan_lineMap_units [Nontrivial k] {s : Set P} {p : P} (hp : p ∈ s)
     (w : s → Units k) :
     affineSpan k (Set.range fun q : s => AffineMap.lineMap p ↑q (w q : k)) = affineSpan k s := by

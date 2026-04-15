@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Algebra/Field/Basic.lean
-Genuine: 7 of 9 | Dissolved: 1 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.ModelTheory.Syntax

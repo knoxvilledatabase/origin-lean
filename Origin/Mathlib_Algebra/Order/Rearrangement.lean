@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Rearrangement.lean
-Genuine: 47 of 48 | Dissolved: 0 | Infrastructure: 1
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset

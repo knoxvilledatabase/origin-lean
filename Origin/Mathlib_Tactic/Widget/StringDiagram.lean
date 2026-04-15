@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Widget/StringDiagram.lean
-Genuine: 38 of 39 | Dissolved: 0 | Infrastructure: 1
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import ProofWidgets.Component.PenroseDiagram

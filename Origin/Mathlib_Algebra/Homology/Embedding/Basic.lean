@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Homology/Embedding/Basic.lean
-Genuine: 17 of 27 | Dissolved: 0 | Infrastructure: 10
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ComplexShape

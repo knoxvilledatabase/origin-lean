@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/NormedSpace.lean
-Genuine: 12 of 22 | Dissolved: 9 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 9 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/FunctorCategory/Basic.lean
-Genuine: 44 of 60 | Dissolved: 0 | Infrastructure: 16
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Currying

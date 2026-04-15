@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Kaehler/CotangentComplex.lean
-Genuine: 37 of 44 | Dissolved: 0 | Infrastructure: 7
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.RingTheory.Kaehler.Polynomial

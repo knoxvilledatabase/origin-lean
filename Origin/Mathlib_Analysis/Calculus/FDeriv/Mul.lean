@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Mul.lean
-Genuine: 124 of 135 | Dissolved: 11 | Infrastructure: 0
+Genuine: 124 | Conflates: 0 | Dissolved: 11 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Constructions

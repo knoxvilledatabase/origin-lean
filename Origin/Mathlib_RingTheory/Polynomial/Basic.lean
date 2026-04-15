@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Basic.lean
-Genuine: 84 of 99 | Dissolved: 7 | Infrastructure: 8
+Genuine: 82 | Conflates: 2 | Dissolved: 7 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
@@ -166,6 +166,7 @@ theorem degreeLT_succ_eq_degreeLE {n : ℕ} : degreeLT R (n + 1) = degreeLE R n 
   · rw [mem_degreeLT, mem_degreeLE, ← natDegree_lt_iff_degree_lt (by rwa [ne_eq]),
       ← natDegree_le_iff_degree_le, Nat.lt_succ]
 
+-- CONFLATES (assumes ground = zero): monicEquivDegreeLT
 def monicEquivDegreeLT [Nontrivial R] (n : ℕ) :
     { p : R[X] // p.Monic ∧ p.natDegree = n } ≃ degreeLT R n where
   toFun p := ⟨p.1.eraseLead, by
@@ -230,6 +231,7 @@ theorem span_of_finite_le_degreeLT {s : Set R[X]} (s_fin : s.Finite) :
   rcases span_le_degreeLE_of_finite s_fin with ⟨n, _⟩
   exact ⟨n + 1, by rwa [degreeLT_succ_eq_degreeLE]⟩
 
+-- CONFLATES (assumes ground = zero): not_finite
 theorem not_finite [Nontrivial R] : ¬ Module.Finite R R[X] := by
   rw [Module.finite_def, Submodule.fg_def]
   push_neg

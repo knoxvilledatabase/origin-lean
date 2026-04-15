@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Lattice/Basic.lean
-Genuine: 74 of 85 | Dissolved: 0 | Infrastructure: 11
+Genuine: 74 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Defs

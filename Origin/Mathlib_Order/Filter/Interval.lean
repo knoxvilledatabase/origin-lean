@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Interval.lean
-Genuine: 10 of 40 | Dissolved: 0 | Infrastructure: 30
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.OrdConnected

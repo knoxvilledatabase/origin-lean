@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/IntegralNormalization.lean
-Genuine: 15 of 18 | Dissolved: 3 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Monic

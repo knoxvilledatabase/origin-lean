@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/LocalExtr/Basic.lean
-Genuine: 24 of 28 | Dissolved: 0 | Infrastructure: 4
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Add

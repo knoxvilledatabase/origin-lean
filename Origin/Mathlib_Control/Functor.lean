@@ -1,6 +1,6 @@
 /-
 Extracted from Control/Functor.lean
-Genuine: 28 of 44 | Dissolved: 0 | Infrastructure: 16
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Tactic.Attr.Register

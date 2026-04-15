@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Bicategory/Basic.lean
-Genuine: 37 of 60 | Dissolved: 0 | Infrastructure: 23
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.NatIso

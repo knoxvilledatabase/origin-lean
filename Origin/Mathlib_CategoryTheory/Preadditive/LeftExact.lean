@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/LeftExact.lean
-Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts

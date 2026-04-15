@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/PullbackCarrier.lean
-Genuine: 36 of 42 | Dissolved: 0 | Infrastructure: 6
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.Ring.LinearAlgebra

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/Prod.lean
-Genuine: 46 of 46 | Dissolved: 0 | Infrastructure: 0
+Genuine: 45 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
@@ -260,6 +260,7 @@ theorem Integrable.integral_norm_prod_right [SFinite μ] ⦃f : α × β → E�
     (hf : Integrable f (μ.prod ν)) : Integrable (fun y => ∫ x, ‖f (x, y)‖ ∂μ) ν :=
   hf.swap.integral_norm_prod_left
 
+-- CONFLATES (assumes ground = zero): Integrable.prod_smul
 theorem Integrable.prod_smul {𝕜 : Type*} [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
     {f : α → 𝕜} {g : β → E} (hf : Integrable f μ) (hg : Integrable g ν) :
     Integrable (fun z : α × β => f z.1 • g z.2) (μ.prod ν) := by

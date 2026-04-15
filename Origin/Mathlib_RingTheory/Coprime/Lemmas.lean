@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Coprime/Lemmas.lean
-Genuine: 35 of 36 | Dissolved: 1 | Infrastructure: 0
+Genuine: 35 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
