@@ -198,5 +198,65 @@ lake build Origin.Logic             # logic — 155 lines
 
 Zero sorries. Zero Mathlib. Builds in under a second.
 
-The conversion is complete. All 14 math domains, physics, and logic
-are on Origin/Core.lean. Val/ stays as the published evidence at scale.
+## Progression: Sketches → Production
+
+The Origin domain files are sketches. Definitions and a few demonstrations.
+Mathlib is the demo. Origin is production. Production needs complete coverage.
+
+### What's done
+
+1. ✅ **The foundation.** Core.lean. 166 lines. Theorem + instances + simp set.
+2. ✅ **The sketches.** 14 domain files. Definitions + key demonstrations. 1,721 lines.
+3. ✅ **Physics.** 6 domains demonstrated. 86 hypotheses dissolved.
+4. ✅ **Logic.** Liar, Russell, Curry unified. `no_some_fixed_point`.
+5. ✅ **Val evidence.** 14,474 lines. The proof it works at scale.
+
+### What's next: full domain coverage
+
+Each Origin domain file needs to grow from sketch to production.
+The Val files had coverage but buried it in boilerplate. The Origin
+sketches stripped the boilerplate but also stripped too much content.
+Production needs: all the content, none of the boilerplate.
+
+The target: every B3 theorem from the Mathlib mapping, expressed
+cleanly on Option. Not hypothesis passing. Not wrappers. The actual
+mathematical content — definitions, structures, real proofs.
+
+| Domain | Mathlib B3 | Origin sketch | Status |
+|---|---|---|---|
+| InformationTheory | 283 | 81 lines | sketch |
+| Geometry | 3,496 | 152 lines | sketch |
+| MeasureTheory | 4,077 | 98 lines | sketch |
+| LinearAlgebra | 2,887 | 122 lines | sketch |
+| RingTheory | 3,304 | 147 lines | sketch |
+| Topology | 3,601 | 139 lines | sketch |
+| Algebra | 5,244 | 129 lines | sketch |
+| NumberTheory | 2,814 | 113 lines | sketch |
+| FieldTheory | 1,199 | 95 lines | sketch |
+| Analysis | 3,752 | 144 lines | sketch |
+| Data | 7,261 | 182 lines | sketch |
+| GroupTheory | 1,199 | 121 lines | sketch |
+| CategoryTheory | 3,891 | 93 lines | sketch |
+| Combinatorics | 4,180 | 105 lines | sketch |
+
+### The rules for production files
+
+1. **Import Origin.Core.** Use standard notation. No wrappers.
+2. **Write each B3 pattern once at the most general level.** Same DRY
+   principle as Val — one general theorem covers 3-7 specific Mathlib results.
+3. **No hypothesis passing.** If the theorem just returns `h`, delete it.
+4. **Real proofs only.** `cases <;> simp`, `by simp [h]`, or actual derivations.
+   If `by simp` closes it without any domain-specific work, it doesn't exist.
+5. **Structures and predicates are content.** PrimeIdeal, SigmaAlgebra,
+   Chart, SimpleGraph, Matroid — these are the domain. Keep them.
+6. **Track the B3 coverage.** For each domain file, note how many B3
+   patterns are covered by each general theorem. The numbers matter.
+7. **Smallest domain first.** Same discipline as always.
+
+### The goal
+
+When complete, Origin is the production library: every B3 theorem from
+Mathlib expressed on Option α via Core.lean. No custom type. No custom
+typeclasses. Standard notation. Complete mathematical coverage.
+
+Mathlib is the demo. Origin is production.
