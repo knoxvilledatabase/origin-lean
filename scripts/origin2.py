@@ -72,7 +72,8 @@ class Classifier:
     # Infrastructure typeclasses in signatures — these ARE the ground-management
     # layer. They dissolve because they exist to manage origin being inside the
     # counting domain. Once origin is outside (none), they have nothing to manage.
-    INFRA_SIG = re.compile(r"NeZero|ne_zero|GroupWithZero")
+    # Uses \b word boundaries to prevent matching inside parameter names (hp_ne_zero).
+    INFRA_SIG = re.compile(r"\bNeZero\b|\bGroupWithZero\b")
 
     # Bare ≠ 0 in a signature — this is ambiguous. Could be:
     #   Type 1: genuine measurement constraint ("nonzero denominator") — KEEP
