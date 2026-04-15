@@ -162,3 +162,74 @@ lake build Origin.Foundation Origin.Test Origin.Ring Origin.Field Origin.Physics
 ```
 
 Zero sorries. Zero Mathlib. Builds in seconds.
+
+## Progression: Converting Val/ to Origin/
+
+Val was the scaffolding. Origin is the building. The conversion demonstrates
+the reduction: same results, less code, no custom type.
+
+### What's Done
+
+| Val file(s) | Lines | Origin file | Lines | Reduction |
+|---|---|---|---|---|
+| Foundation + Arith + Ring | 461 | Origin/Ring.lean | 128 | 72% |
+| Field | 94 | Origin/Field.lean | 142 | (field + free additive identity) |
+| Physics (11 files) | 3,000 | Origin/Physics.lean | ~200 | 93% |
+| Logic (3 files) | 718 | Origin/Logic.lean | ~140 | 80% |
+| — | — | Origin/Foundation.lean | ~70 | (the derivation, new) |
+| — | — | Origin/Test.lean | ~120 | (Int instantiation, new) |
+
+### What's Next (in order)
+
+**1. Infrastructure (finish the class hierarchy replacement):**
+
+| Val file | Lines | Origin target | Notes |
+|---|---|---|---|
+| OrderedField.lean | 79 | Origin/OrderedField.lean | Ordering on Option. `none` has no order — outside the domain. |
+| Module.lean | 79 | Origin/Module.lean | Scalar action on Option. `none` absorbs. |
+
+**2. Math domain files (smallest first):**
+
+| Val file | Lines | Priority | Notes |
+|---|---|---|---|
+| InformationTheory.lean | 283 | 1st | Smallest. Good first test. |
+| Geometry.lean | 324 | 2nd | Small, uses Field level. |
+| MeasureTheory.lean | 377 | 3rd | |
+| LinearAlgebra.lean | 451 | 4th | |
+| RingTheory.lean | 479 | 5th | |
+| Topology.lean | 525 | 6th | |
+| Algebra.lean | 595 | 7th | |
+| NumberTheory.lean | 667 | 8th | |
+| FieldTheory.lean | 831 | 9th | |
+| Analysis.lean | 832 | 10th | |
+| Data.lean | 1,121 | 11th | |
+| GroupTheory.lean | 1,140 | 12th | |
+| CategoryTheory.lean | 1,069 | 13th | |
+| Combinatorics.lean | 1,349 | 14th | Largest. Last. |
+
+**3. Remaining physics domains (extend Origin/Physics.lean):**
+
+Origin/Physics.lean demonstrates 6 domains. The remaining 3 from Val
+(StatMech, Relativity, FieldTheory) can be added to the same file or
+split into Origin/Physics2.lean if the file gets too long.
+
+### The Rules for Conversion
+
+1. **Import Origin/Ring.lean or Origin/Field.lean** — not Val.
+2. **Use Option directly.** `none` is ground. `some` is a value. No custom type.
+3. **Use `liftBin₂` for cross-type operations.** Already defined in Origin/Physics.lean.
+4. **Pass laws as explicit hypotheses** — `(h : ∀ a b, a * b = b * a)` — not typeclasses.
+5. **Proof pattern:** `cases <;> simp`. Two cases, not three.
+6. **Track the line count.** The reduction IS the evidence.
+7. **Don't duplicate Val.** Origin replaces, it doesn't copy. If a Val theorem's only purpose was managing the ground being inside, it doesn't get converted — it vanishes.
+
+### The Comparison Table (update as you go)
+
+```
+Val total:     10,756 (math) + 3,000 (physics) + 718 (logic) = 14,474 lines
+Origin total:  [update this as files are converted]
+Reduction:     [update this]
+```
+
+The final number tells the story: how much of Val was the ground being
+inside, and how much was genuine content.
