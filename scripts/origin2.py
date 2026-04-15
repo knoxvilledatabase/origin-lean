@@ -317,9 +317,25 @@ class Parser:
                     pass  # always strip deprecated
                 elif "@[inherit_doc]" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
                     return None  # don't strip — let passthrough/declaration handle it
+                # Consume the stripped command and any attached doc comment.
+                # Pattern: library_note "..."/-- ... multi-line ... -/
+                # Also handles doc comment on the next line after strip.
+                has_doc = "/--" in lines[i]
                 i += 1
+                # Skip indented continuation lines
                 while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                    if "/--" in lines[i]:
+                        has_doc = True
                     i += 1
+                # Check if next non-blank line starts a doc comment
+                if not has_doc and i < len(lines) and lines[i].strip().startswith("/--"):
+                    has_doc = True
+                # Consume until -/ if a doc comment was opened
+                if has_doc:
+                    while i < len(lines) and "-/" not in lines[i]:
+                        i += 1
+                    if i < len(lines):
+                        i += 1  # skip the -/ line
                 return (i, None)
         # Also strip standalone @[inherit_doc] NOT on same line as declaration
         if stripped == "@[inherit_doc]":
@@ -354,6 +370,9 @@ class Parser:
             return None
         if self.DECL_KEYWORD_RE.search(stripped):
             return None  # Let declaration handler take it
+        # @[inherit_doc] scoped[...] notation — pass through as-is
+        if "@[inherit_doc]" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
+            return None  # Let passthrough handler take it
 
         attr_lines = [line]
         i += 1
