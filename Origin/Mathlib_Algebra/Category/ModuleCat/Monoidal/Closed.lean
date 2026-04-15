@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Monoidal/Closed.lean
-Genuine: 1 of 4 | Dissolved: 0 | Infrastructure: 3
+Genuine: 2 of 8 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Closed.Monoidal
+import Mathlib.CategoryTheory.Linear.Yoneda
+import Mathlib.Algebra.Category.ModuleCat.Monoidal.Symmetric
 
 /-!
 # The monoidal closed structure on `Module R`.
@@ -19,13 +22,60 @@ variable {R : Type u} [CommRing R]
 def monoidalClosedHomEquiv (M N P : ModuleCat.{u} R) :
     ((MonoidalCategory.tensorLeft M).obj N ⟶ P) ≃
       (N ⟶ ((linearCoyoneda R (ModuleCat R)).obj (op M)).obj P) where
-  toFun f := ofHom₂ <| LinearMap.compr₂ (TensorProduct.mk R N M) ((β_ N M).hom ≫ f).hom
-  invFun f := (β_ M N).hom ≫ ofHom (TensorProduct.lift f.hom₂)
+  toFun f := LinearMap.compr₂ (TensorProduct.mk R N M) ((β_ N M).hom ≫ f)
+  invFun f := (β_ M N).hom ≫ TensorProduct.lift f
   left_inv f := by
-    ext : 1
     apply TensorProduct.ext'
-    solve_by_elim
+    intro m n
+    -- This used to be `rw`, but we need `erw` after https://github.com/leanprover/lean4/pull/2644
+    erw [coe_comp]
+    rw [Function.comp_apply]
+    -- This used to be `rw` and was longer (?), but we need `erw` after https://github.com/leanprover/lean4/pull/2644
+    erw [MonoidalCategory.braiding_hom_apply, TensorProduct.lift.tmul]
+  right_inv _ := rfl
 
--- INSTANCE (free from Core): :
+instance : MonoidalClosed (ModuleCat.{u} R) where
+  closed M :=
+    { rightAdj := (linearCoyoneda R (ModuleCat.{u} R)).obj (op M)
+      adj := Adjunction.mkOfHomEquiv
+            { homEquiv := fun N P => monoidalClosedHomEquiv M N P
+              -- Porting note: this proof was automatic in mathlib3
+              homEquiv_naturality_left_symm := by
+                intros
+                apply TensorProduct.ext'
+                intro m n
+                rfl } }
+
+theorem ihom_map_apply {M N P : ModuleCat.{u} R} (f : N ⟶ P) (g : ModuleCat.of R (M ⟶ N)) :
+    (ihom M).map f g = g ≫ f :=
+  rfl
 
 open MonoidalCategory
+
+theorem monoidalClosed_curry {M N P : ModuleCat.{u} R} (f : M ⊗ N ⟶ P) (x : M) (y : N) :
+    @DFunLike.coe _ _ _ LinearMap.instFunLike
+      ((MonoidalClosed.curry f : N →ₗ[R] M →ₗ[R] P) y) x = f (x ⊗ₜ[R] y) :=
+  rfl
+
+@[simp]
+theorem monoidalClosed_uncurry
+    {M N P : ModuleCat.{u} R} (f : N ⟶ M ⟶[ModuleCat.{u} R] P) (x : M) (y : N) :
+    MonoidalClosed.uncurry f (x ⊗ₜ[R] y) =
+      @DFunLike.coe _ _ _ LinearMap.instFunLike (f y) x :=
+  rfl
+
+theorem ihom_ev_app (M N : ModuleCat.{u} R) :
+    (ihom.ev M).app N = TensorProduct.uncurry _ _ _ _ LinearMap.id.flip := by
+  rw [← MonoidalClosed.uncurry_id_eq_ev]
+  apply TensorProduct.ext'
+  apply monoidalClosed_uncurry
+
+theorem ihom_coev_app (M N : ModuleCat.{u} R) :
+    (ihom.coev M).app N = (TensorProduct.mk _ _ _).flip :=
+  rfl
+
+theorem monoidalClosed_pre_app {M N : ModuleCat.{u} R} (P : ModuleCat.{u} R) (f : N ⟶ M) :
+    (MonoidalClosed.pre f).app P = LinearMap.lcomp R _ f :=
+  rfl
+
+end ModuleCat

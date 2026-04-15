@@ -1,11 +1,13 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Sphere.lean
-Genuine: 36 of 36 | Dissolved: 0 | Infrastructure: 0
+Genuine: 27 of 27 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Euclidean.Angle.Oriented.RightAngle
+import Mathlib.Geometry.Euclidean.Circumcenter
 
 /-!
-# Angles in circles and spheres
+# Angles in circles and sphere.
 
 This file proves results about angles in circles and spheres.
 
@@ -56,86 +58,6 @@ theorem two_zsmul_oangle_sub_eq_two_zsmul_oangle_sub_of_norm_eq {x₁ x₂ y z :
 end Orientation
 
 namespace EuclideanGeometry
-
-variable {V : Type*} {P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricSpace P]
-  [NormedAddTorsor V P]
-
-namespace Sphere
-
-open Real InnerProductSpace InnerProductGeometry
-
-theorem angle_eq_pi_div_two_iff_mem_sphere_of_isDiameter {p₁ p₂ p₃ : P} {s : Sphere P}
-    (hd : s.IsDiameter p₁ p₃) :
-    ∠ p₁ p₂ p₃ = π / 2 ↔ p₂ ∈ s := by
-  rw [mem_sphere', EuclideanGeometry.angle,
-    ← InnerProductGeometry.inner_eq_zero_iff_angle_eq_pi_div_two]
-  let o := s.center
-  have h_center : o = midpoint ℝ p₁ p₃ := hd.midpoint_eq_center.symm
-  rw [← vsub_add_vsub_cancel p₁ o p₂, ← vsub_add_vsub_cancel p₃ o p₂,
-    inner_add_left, inner_add_right, inner_add_right]
-  have h_opp : p₁ -ᵥ o = -(p₃ -ᵥ o) := by
-    rw [h_center, left_vsub_midpoint, right_vsub_midpoint, ← smul_neg, neg_vsub_eq_vsub_rev]
-  rw [h_opp, inner_neg_left, inner_neg_left, real_inner_comm (p₃ -ᵥ o) (o -ᵥ p₂)]
-  ring_nf
-  rw [neg_add_eq_zero, real_inner_self_eq_norm_sq, ← dist_eq_norm_vsub,
-    real_inner_self_eq_norm_sq, ← dist_eq_norm_vsub, sq_eq_sq₀ dist_nonneg dist_nonneg,
-    mem_sphere.mp hd.right_mem]
-  exact eq_comm
-
-theorem angle_eq_pi_div_two_iff_mem_sphere_ofDiameter {p₁ p₂ p₃ : P} :
-    ∠ p₁ p₂ p₃ = π / 2 ↔ p₂ ∈ Sphere.ofDiameter p₁ p₃ :=
-  angle_eq_pi_div_two_iff_mem_sphere_of_isDiameter (Sphere.isDiameter_ofDiameter p₁ p₃)
-
-alias thales_theorem := angle_eq_pi_div_two_iff_mem_sphere_of_isDiameter
-
-theorem isDiameter_of_angle_eq_pi_div_two {p₁ p₂ p₃ : P} {s : Sphere P}
-    [Fact (finrank ℝ V = 2)]
-    (hp₁ : p₁ ∈ s) (hp₂ : p₂ ∈ s) (hp₃ : p₃ ∈ s)
-    (hne₁₂ : p₁ ≠ p₂) (hne₂₃ : p₂ ≠ p₃)
-    (hangle : ∠ p₁ p₂ p₃ = π / 2) :
-    s.IsDiameter p₁ p₃ := by
-  haveI : FiniteDimensional ℝ V := .of_finrank_eq_succ (Fact.out : finrank ℝ V = 2)
-  have hne₁₃ : p₁ ≠ p₃ := fun h ↦ by
-    rw [h, angle_self_of_ne hne₂₃.symm] at hangle; linarith [Real.pi_pos]
-  have hd := Sphere.isDiameter_ofDiameter p₁ p₃
-  have h_eq : s = Sphere.ofDiameter p₁ p₃ := by
-    by_contra hne
-    have := eq_of_mem_sphere_of_mem_sphere_of_finrank_eq_two
-      (Fact.out : finrank ℝ V = 2) hne hne₁₃ hp₁ hp₃ hp₂
-      hd.left_mem hd.right_mem (angle_eq_pi_div_two_iff_mem_sphere_ofDiameter.mp hangle)
-    exact this.elim hne₁₂.symm hne₂₃
-  exact h_eq ▸ hd
-
-theorem IsTangentAt.angle_eq_pi_div_two {s : Sphere P} {p q : P} {as : AffineSubspace ℝ P}
-    (h : s.IsTangentAt p as) (hq_mem : q ∈ as) :
-    ∠ q p s.center = π / 2 := by
-  have h1 := IsTangentAt.inner_left_eq_zero_of_mem h hq_mem
-  rw [inner_eq_zero_iff_angle_eq_pi_div_two] at h1
-  rw [angle, ← neg_vsub_eq_vsub_rev _ s.center, angle_neg_right, h1]
-  linarith
-
-theorem IsTangentAt_of_angle_eq_pi_div_two {s : Sphere P} {p q : P} (h : ∠ q p s.center = π / 2)
-    (hp : p ∈ s) :
-    s.IsTangentAt p line[ℝ, p, q] := by
-  have hp_mem := left_mem_affineSpan_pair ℝ p q
-  refine ⟨hp, hp_mem, ?_⟩
-  have h_ortho : ⟪q -ᵥ p, p -ᵥ s.center⟫ = 0 := by
-    rwa [angle, ← inner_eq_zero_iff_angle_eq_pi_div_two, ← neg_vsub_eq_vsub_rev p s.center,
-      inner_neg_right, neg_eq_zero] at h
-  have hq : q ∈ s.orthRadius p := by
-    simp [Sphere.mem_orthRadius_iff_inner_left, h_ortho]
-  rw [affineSpan_le]
-  have hp : p ∈ s.orthRadius p := by
-    simp [Sphere.self_mem_orthRadius]
-  simp_rw [Set.insert_subset_iff, Set.singleton_subset_iff]
-  exact ⟨hp, hq⟩
-
-theorem IsTangentAt_iff_angle_eq_pi_div_two {s : Sphere P} {p q : P} (hp : p ∈ s) :
-    s.IsTangentAt p line[ℝ, p, q] ↔ ∠ q p s.center = π / 2 := by
-  exact ⟨fun h ↦ IsTangentAt.angle_eq_pi_div_two h (right_mem_affineSpan_pair ℝ p q),
-    fun h ↦ IsTangentAt_of_angle_eq_pi_div_two h hp⟩
-
-end Sphere
 
 variable {V : Type*} {P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricSpace P]
   [NormedAddTorsor V P] [hd2 : Fact (finrank ℝ V = 2)] [Module.Oriented ℝ V (Fin 2)]
@@ -231,10 +153,12 @@ theorem dist_div_cos_oangle_center_div_two_eq_radius {s : Sphere P} {p₁ p₂ :
     vadd_vsub_assoc, add_comm, o.oangle_add_right_smul_rotation_pi_div_two, Real.Angle.cos_coe,
     Real.cos_arctan]
   · norm_cast
-    rw [one_div, div_inv_eq_mul, ← mul_self_inj (by positivity) (by positivity),
-      norm_add_sq_eq_norm_sq_add_norm_sq_real (o.inner_smul_rotation_pi_div_two_right _ _),
-      ← mul_assoc, mul_comm, mul_comm _ (√_), ← mul_assoc, ← mul_assoc,
-      Real.mul_self_sqrt (by positivity), norm_smul, LinearIsometryEquiv.norm_map]
+    rw [one_div, div_inv_eq_mul, ←
+      mul_self_inj (mul_nonneg (norm_nonneg _) (Real.sqrt_nonneg _)) (norm_nonneg _),
+      norm_add_sq_eq_norm_sq_add_norm_sq_real (o.inner_smul_rotation_pi_div_two_right _ _), ←
+      mul_assoc, mul_comm, mul_comm _ (√_), ← mul_assoc, ← mul_assoc,
+      Real.mul_self_sqrt (add_nonneg zero_le_one (sq_nonneg _)), norm_smul,
+      LinearIsometryEquiv.norm_map]
     conv_rhs =>
       rw [← mul_assoc, mul_comm _ ‖Real.Angle.tan _‖, ← mul_assoc, Real.norm_eq_abs,
         abs_mul_abs_self]
@@ -252,7 +176,7 @@ theorem dist_div_sin_oangle_div_two_eq_radius {s : Sphere P} {p₁ p₂ p₃ : P
   convert dist_div_cos_oangle_center_div_two_eq_radius hp₁ hp₃ hp₁p₃
   rw [← Real.Angle.abs_cos_eq_abs_sin_of_two_zsmul_add_two_zsmul_eq_pi
     (two_zsmul_oangle_center_add_two_zsmul_oangle_eq_pi hp₁ hp₂ hp₃ hp₁p₂.symm hp₂p₃ hp₁p₃),
-    abs_of_nonneg (Real.Angle.cos_nonneg_iff_abs_toReal_le_pi_div_two.2 _)]
+    _root_.abs_of_nonneg (Real.Angle.cos_nonneg_iff_abs_toReal_le_pi_div_two.2 _)]
   exact (abs_oangle_center_right_toReal_lt_pi_div_two hp₁ hp₃).le
 
 theorem dist_div_sin_oangle_eq_two_mul_radius {s : Sphere P} {p₁ p₂ p₃ : P} (hp₁ : p₁ ∈ s)
@@ -272,11 +196,7 @@ namespace Triangle
 open EuclideanGeometry
 
 variable {V : Type*} {P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricSpace P]
-  [NormedAddTorsor V P]
-
-section Oriented
-
-variable [hd2 : Fact (finrank ℝ V = 2)] [Module.Oriented ℝ V (Fin 2)]
+  [NormedAddTorsor V P] [hd2 : Fact (finrank ℝ V = 2)] [Module.Oriented ℝ V (Fin 2)]
 
 local notation "o" => Module.Oriented.positiveOrientation
 
@@ -321,6 +241,7 @@ theorem circumsphere_eq_circumsphere_of_eq_of_eq_of_two_zsmul_oangle_eq {t₁ t�
     t₁.circumsphere = t₂.circumsphere := by
   rw [t₁.circumsphere_eq_of_dist_of_oangle h₁₂ h₁₃ h₂₃,
     t₂.circumsphere_eq_of_dist_of_oangle h₁₂ h₁₃ h₂₃,
+    -- Porting note: was `congrm ⟨((_ : ℝ)⁻¹ / 2) • _ +ᵥ _, _ / _ / 2⟩` and five more lines
     Real.Angle.tan_eq_of_two_zsmul_eq h₂, Real.Angle.abs_sin_eq_of_two_zsmul_eq h₂, h₁, h₃]
 
 theorem mem_circumsphere_of_two_zsmul_oangle_eq {t : Triangle ℝ P} {p : P} {i₁ i₂ i₃ : Fin 3}
@@ -345,33 +266,6 @@ theorem mem_circumsphere_of_two_zsmul_oangle_eq {t : Triangle ℝ P} {p : P} {i�
   rw [← circumsphere_eq_circumsphere_of_eq_of_eq_of_two_zsmul_oangle_eq h₁₂ h₁₃ h₂₃ h₁' h₃' h', ←
     h₂']
   exact Simplex.mem_circumsphere _ _
-
-end Oriented
-
-theorem dist_div_sin_angle_div_two_eq_circumradius (t : Triangle ℝ P) {i₁ i₂ i₃ : Fin 3}
-    (h₁₂ : i₁ ≠ i₂) (h₁₃ : i₁ ≠ i₃) (h₂₃ : i₂ ≠ i₃) :
-    dist (t.points i₁) (t.points i₃) / Real.sin (∠ (t.points i₁) (t.points i₂) (t.points i₃)) / 2 =
-      t.circumradius := by
-  set S : AffineSubspace ℝ P := affineSpan ℝ (Set.range t.points) with hS
-  let t' : Triangle ℝ S := t.restrict S le_rfl
-  have hf2 : Fact (finrank ℝ S.direction = 2) := ⟨by
-    rw [hS, direction_affineSpan, t.independent.finrank_vectorSpan]
-    simp⟩
-  have : Module.Oriented ℝ S.direction (Fin 2) :=
-    ⟨Basis.orientation (finBasisOfFinrankEq _ _ hf2.out)⟩
-  convert t'.dist_div_sin_oangle_div_two_eq_circumradius h₁₂ h₁₃ h₂₃ using 3
-  · rw [← Real.Angle.sin_toReal,
-      Real.abs_sin_eq_sin_abs_of_abs_le_pi (Real.Angle.abs_toReal_le_pi _),
-      ← angle_eq_abs_oangle_toReal (t'.independent.injective.ne h₁₂)
-        (t'.independent.injective.ne h₂₃.symm)]
-    congr
-  · simp [t']
-
-theorem dist_div_sin_angle_eq_two_mul_circumradius (t : Triangle ℝ P) {i₁ i₂ i₃ : Fin 3}
-    (h₁₂ : i₁ ≠ i₂) (h₁₃ : i₁ ≠ i₃) (h₂₃ : i₂ ≠ i₃) : dist (t.points i₁) (t.points i₃) /
-      Real.sin (∠ (t.points i₁) (t.points i₂) (t.points i₃)) = 2 * t.circumradius := by
-  rw [← t.dist_div_sin_angle_div_two_eq_circumradius h₁₂ h₁₃ h₂₃]
-  ring
 
 end Triangle
 

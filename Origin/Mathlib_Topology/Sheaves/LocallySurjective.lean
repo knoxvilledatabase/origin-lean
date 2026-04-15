@@ -1,8 +1,12 @@
 /-
 Extracted from Topology/Sheaves/LocallySurjective.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Sheaves.Presheaf
+import Mathlib.Topology.Sheaves.Stalks
+import Mathlib.CategoryTheory.Limits.Preserves.Filtered
+import Mathlib.CategoryTheory.Sites.LocallySurjective
 
 /-!
 
@@ -24,6 +28,8 @@ We prove that these are equivalent.
 
 universe v u
 
+attribute [local instance] CategoryTheory.ConcreteCategory.instFunLike
+
 noncomputable section
 
 open CategoryTheory
@@ -38,20 +44,21 @@ section LocallySurjective
 
 open scoped AlgebraicGeometry
 
-variable {C : Type u} [Category.{v} C] {FC : C → C → Type*} {CC : C → Type v}
-
-variable [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory C FC] {X : TopCat.{v}}
+variable {C : Type u} [Category.{v} C] [ConcreteCategory.{v} C] {X : TopCat.{v}}
 
 variable {ℱ 𝒢 : X.Presheaf C}
 
 def IsLocallySurjective (T : ℱ ⟶ 𝒢) :=
   CategoryTheory.Presheaf.IsLocallySurjective (Opens.grothendieckTopology X) T
 
+theorem isLocallySurjective_iff (T : ℱ ⟶ 𝒢) :
+    IsLocallySurjective T ↔
+      ∀ (U t), ∀ x ∈ U, ∃ (V : _) (ι : V ⟶ U), (∃ s, T.app _ s = t |_ₕ ι) ∧ x ∈ V :=
+  ⟨fun h _ => h.imageSieve_mem, fun h => ⟨h _⟩⟩
+
 section SurjectiveOnStalks
 
 variable [Limits.HasColimits C] [Limits.PreservesFilteredColimits (forget C)]
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem locally_surjective_iff_surjective_on_stalks (T : ℱ ⟶ 𝒢) :
     IsLocallySurjective T ↔ ∀ x : X, Function.Surjective ((stalkFunctor C x).map T) := by
@@ -70,7 +77,10 @@ theorem locally_surjective_iff_surjective_on_stalks (T : ℱ ⟶ 𝒢) :
     rcases hT.imageSieve_mem t x hxU with ⟨V, ι, ⟨s, h_eq⟩, hxV⟩
     -- Then the germ of s maps to g.
     use ℱ.germ _ x hxV s
-    simp [h_eq, germ_res_apply]
+    -- Porting note: `convert` went too deep and swapped LHS and RHS of the remaining goal relative
+    -- to lean 3.
+    convert stalkFunctor_map_germ_apply V x hxV T s using 1
+    simpa [h_eq] using (germ_res_apply 𝒢 ι x hxV t).symm
   · /- human proof:
         Let U be an open set, t ∈ Γ ℱ U a section, x ∈ U a point.
         By surjectivity on stalks, the germ of t is the image of
@@ -90,21 +100,10 @@ theorem locally_surjective_iff_surjective_on_stalks (T : ℱ ⟶ 𝒢) :
     obtain ⟨W, hxW, hWV, hWU, h_eq⟩ := key_W
     refine ⟨W, hWU, ⟨ℱ.map hWV.op s, ?_⟩, hxW⟩
     convert h_eq using 1
-    simp only [← ConcreteCategory.comp_apply, T.naturality]
+    simp only [← comp_apply, T.naturality]
 
 end SurjectiveOnStalks
 
 end LocallySurjective
 
 end TopCat.Presheaf
-
-theorem TopCat.Sheaf.isLocallySurjective_iff_epi {X : TopCat.{v}} {C : Type u} [Category.{v} C]
-    {FC : C → C → Type*} {CC : C → Type v} [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)]
-    [ConcreteCategory C FC] [Balanced (CategoryTheory.Sheaf (Opens.grothendieckTopology X) C)]
-    [(Opens.grothendieckTopology X).HasSheafCompose (CategoryTheory.forget C)]
-    [HasSheafify (Opens.grothendieckTopology X) C]
-    [(Opens.grothendieckTopology X).WEqualsLocallyBijective C]
-    [ConcreteCategory.HasFunctorialSurjectiveInjectiveFactorization C]
-    {F G : Sheaf C X} (φ : F ⟶ G) :
-    TopCat.Presheaf.IsLocallySurjective φ.hom ↔ Epi φ :=
-  CategoryTheory.Sheaf.isLocallySurjective_iff_epi' ..

@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Fintype/Sigma.lean
-Genuine: 4 of 6 | Dissolved: 0 | Infrastructure: 2
+Genuine: 4 of 7 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Finset.Sigma
 
 /-!
 # fintype instances for sigma types
@@ -16,7 +18,7 @@ universe u v
 
 variable {ι α : Type*} {κ : ι → Type*} [Π i, Fintype (κ i)]
 
-open Finset
+open Finset Function
 
 lemma Set.biUnion_finsetSigma_univ (s : Finset ι) (f : Sigma κ → Set α) :
     ⋃ ij ∈ s.sigma fun _ ↦ Finset.univ, f ij = ⋃ i ∈ s, ⋃ j, f ⟨i, j⟩ := by aesop
@@ -34,6 +36,8 @@ lemma Set.biInter_finsetSigma_univ' (s : Finset ι) (f : Π i, κ i → Set α) 
 
 variable [Fintype ι]
 
--- INSTANCE (free from Core): Sigma.instFintype
+instance Sigma.instFintype : Fintype (Σ i, κ i) := ⟨univ.sigma fun _ ↦ univ, by simp⟩
 
--- INSTANCE (free from Core): PSigma.instFintype
+instance PSigma.instFintype : Fintype (Σ' i, κ i) := .ofEquiv _ (Equiv.psigmaEquivSigma _).symm
+
+@[simp] lemma Finset.univ_sigma_univ : univ.sigma (fun _ ↦ univ) = (univ : Finset (Σ i, κ i)) := rfl

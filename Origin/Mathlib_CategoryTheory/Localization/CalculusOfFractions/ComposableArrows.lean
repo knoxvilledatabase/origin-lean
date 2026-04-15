@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Localization/CalculusOfFractions/ComposableArrows.
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.ComposableArrows
+import Mathlib.CategoryTheory.Localization.CalculusOfFractions
 
 /-! # Essential surjectivity of the functor induced on composable arrows
 
@@ -17,12 +19,10 @@ namespace CategoryTheory
 
 namespace Localization
 
-variable {C D : Type*} [Category* C] [Category* D] (L : C ⥤ D) (W : MorphismProperty C)
+variable {C D : Type*} [Category C] [Category D] (L : C ⥤ D) (W : MorphismProperty C)
   [L.IsLocalization W]
 
 open ComposableArrows
-
-set_option backward.isDefEq.respectTransparency false in
 
 lemma essSurj_mapComposableArrows_of_hasRightCalculusOfFractions
     [W.HasRightCalculusOfFractions] (n : ℕ) :

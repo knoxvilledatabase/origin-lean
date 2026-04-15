@@ -3,6 +3,8 @@ Extracted from Topology/Maps/Proper/CompactlyGenerated.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Compactness.CompactlyGeneratedSpace
+import Mathlib.Topology.Maps.Proper.Basic
 
 /-!
 # A map is proper iff preimage of compact sets are compact
@@ -15,7 +17,7 @@ open Set Filter
 
 variable {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
 
-variable [T2Space Y] [CompactlyCoherentSpace Y]
+variable [T2Space Y] [CompactlyGeneratedSpace Y]
 
 variable {f : X → Y}
 
@@ -23,9 +25,9 @@ theorem isProperMap_iff_isCompact_preimage :
     IsProperMap f ↔ Continuous f ∧ ∀ ⦃K⦄, IsCompact K → IsCompact (f ⁻¹' K) where
   mp hf := ⟨hf.continuous, fun _ ↦ hf.isCompact_preimage⟩
   mpr := fun ⟨hf, h⟩ ↦ isProperMap_iff_isClosedMap_and_compact_fibers.2
-    ⟨hf, fun s hs ↦ (CompactlyCoherentSpace.isClosed_iff _).mpr fun K hK ↦ by
-        convert (((h hK).inter_left hs).image hf).isClosed.preimage continuous_subtype_val using 1
-        aesop, fun _ ↦ h isCompact_singleton⟩
+    ⟨hf, fun _ hs ↦ CompactlyGeneratedSpace.isClosed
+      fun _ hK ↦ image_inter_preimage .. ▸ (((h hK).inter_left hs).image hf).isClosed,
+      fun _ ↦ h isCompact_singleton⟩
 
 lemma isProperMap_iff_tendsto_cocompact :
     IsProperMap f ↔ Continuous f ∧ Tendsto f (cocompact X) (cocompact Y) := by

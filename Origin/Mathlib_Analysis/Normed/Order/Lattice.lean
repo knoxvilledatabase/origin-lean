@@ -1,8 +1,12 @@
 /-
 Extracted from Analysis/Normed/Order/Lattice.lean
-Genuine: 15 of 22 | Dissolved: 0 | Infrastructure: 7
+Genuine: 20 of 31 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Group.Constructions
+import Mathlib.Analysis.Normed.Group.Rat
+import Mathlib.Analysis.Normed.Group.Uniform
+import Mathlib.Topology.Order.Lattice
 
 /-!
 # Normed lattice ordered groups
@@ -44,15 +48,32 @@ theorem LatticeOrderedAddCommGroup.isSolid_ball (r : ℝ) :
     LatticeOrderedAddCommGroup.IsSolid (Metric.ball (0 : α) r) := fun _ hx _ hxy =>
   mem_ball_zero_iff.mpr ((HasSolidNorm.solid hxy).trans_lt (mem_ball_zero_iff.mp hx))
 
--- INSTANCE (free from Core): :
+instance : HasSolidNorm ℝ := ⟨fun _ _ => id⟩
 
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): Int.hasSolidNorm
+instance : HasSolidNorm ℚ := ⟨fun _ _ _ => by simpa only [norm, ← Rat.cast_abs, Rat.cast_le]⟩
 
 end SolidNorm
 
-variable {α : Type*} [NormedAddCommGroup α] [Lattice α] [HasSolidNorm α] [IsOrderedAddMonoid α]
+class NormedLatticeAddCommGroup (α : Type*) extends
+    NormedAddCommGroup α, Lattice α, HasSolidNorm α where
+  add_le_add_left : ∀ a b : α, a ≤ b → ∀ c : α, c + a ≤ c + b
+
+instance Int.normedLatticeAddCommGroup : NormedLatticeAddCommGroup ℤ where
+  solid x y h := by simpa [← Int.norm_cast_real, ← Int.cast_abs] using h
+  add_le_add_left _ _ := add_le_add_left
+
+instance Rat.normedLatticeAddCommGroup : NormedLatticeAddCommGroup ℚ where
+  solid x y h := by simpa [← Rat.norm_cast_real, ← Rat.cast_abs] using h
+  add_le_add_left _ _ := add_le_add_left
+
+instance Real.normedLatticeAddCommGroup : NormedLatticeAddCommGroup ℝ where
+  add_le_add_left _ _ h _ := add_le_add le_rfl h
+
+instance (priority := 100) NormedLatticeAddCommGroup.toOrderedAddCommGroup {α : Type*}
+    [h : NormedLatticeAddCommGroup α] : OrderedAddCommGroup α :=
+  { h with }
+
+variable {α : Type*} [NormedLatticeAddCommGroup α]
 
 open HasSolidNorm
 
@@ -65,7 +86,10 @@ theorem dual_solid (a b : α) (h : b ⊓ -b ≤ a ⊓ -a) : ‖a‖ ≤ ‖b‖ 
   nth_rw 1 [← neg_neg b]
   rwa [← neg_inf, neg_le_neg_iff, inf_comm _ b, inf_comm _ a]
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) OrderDual.instNormedLatticeAddCommGroup :
+    NormedLatticeAddCommGroup αᵒᵈ :=
+  { OrderDual.orderedAddCommGroup, OrderDual.normedAddCommGroup, OrderDual.instLattice α with
+    solid := dual_solid (α := α) }
 
 theorem norm_abs_eq_norm (a : α) : ‖|a|‖ = ‖a‖ :=
   (solid (abs_abs a).le).antisymm (solid (abs_abs a).symm.le)
@@ -78,7 +102,7 @@ theorem norm_inf_sub_inf_le_add_norm (a b c d : α) : ‖a ⊓ b - c ⊓ d‖ �
     |a ⊓ b - c ⊓ d| = |a ⊓ b - c ⊓ b + (c ⊓ b - c ⊓ d)| := by rw [sub_add_sub_cancel]
     _ ≤ |a ⊓ b - c ⊓ b| + |c ⊓ b - c ⊓ d| := abs_add_le _ _
     _ ≤ |a - c| + |b - d| := by
-      gcongr ?_ + ?_
+      apply add_le_add
       · exact abs_inf_sub_inf_le_abs _ _ _
       · rw [inf_comm c, inf_comm c]
         exact abs_inf_sub_inf_le_abs _ _ _
@@ -91,7 +115,7 @@ theorem norm_sup_sub_sup_le_add_norm (a b c d : α) : ‖a ⊔ b - c ⊔ d‖ �
     |a ⊔ b - c ⊔ d| = |a ⊔ b - c ⊔ b + (c ⊔ b - c ⊔ d)| := by rw [sub_add_sub_cancel]
     _ ≤ |a ⊔ b - c ⊔ b| + |c ⊔ b - c ⊔ d| := abs_add_le _ _
     _ ≤ |a - c| + |b - d| := by
-      gcongr ?_ + ?_
+      apply add_le_add
       · exact abs_sup_sub_sup_le_abs _ _ _
       · rw [sup_comm c, sup_comm c]
         exact abs_sup_sub_sup_le_abs _ _ _
@@ -104,13 +128,21 @@ theorem norm_sup_le_add (x y : α) : ‖x ⊔ y‖ ≤ ‖x‖ + ‖y‖ := by
   have h : ‖x ⊔ y - 0 ⊔ 0‖ ≤ ‖x - 0‖ + ‖y - 0‖ := norm_sup_sub_sup_le_add_norm x y 0 0
   simpa only [sup_idem, sub_zero] using h
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) NormedLatticeAddCommGroup.continuousInf : ContinuousInf α := by
+  refine ⟨continuous_iff_continuousAt.2 fun q => tendsto_iff_norm_sub_tendsto_zero.2 <| ?_⟩
+  have : ∀ p : α × α, ‖p.1 ⊓ p.2 - q.1 ⊓ q.2‖ ≤ ‖p.1 - q.1‖ + ‖p.2 - q.2‖ := fun _ =>
+    norm_inf_sub_inf_le_add_norm _ _ _ _
+  refine squeeze_zero (fun e => norm_nonneg _) this ?_
+  convert ((continuous_fst.tendsto q).sub <| tendsto_const_nhds).norm.add
+    ((continuous_snd.tendsto q).sub <| tendsto_const_nhds).norm
+  simp
 
-set_option backward.isDefEq.respectTransparency false in
+instance (priority := 100) NormedLatticeAddCommGroup.continuousSup {α : Type*}
+    [NormedLatticeAddCommGroup α] : ContinuousSup α :=
+  OrderDual.continuousSup αᵒᵈ
 
--- INSTANCE (free from Core): (priority
-
--- INSTANCE (free from Core): (priority
+instance (priority := 100) NormedLatticeAddCommGroup.toTopologicalLattice : TopologicalLattice α :=
+  TopologicalLattice.mk
 
 theorem norm_abs_sub_abs (a b : α) : ‖|a| - |b|‖ ≤ ‖a - b‖ := solid (abs_abs_sub_abs_le _ _)
 
@@ -130,3 +162,26 @@ lemma lipschitzWith_posPart : LipschitzWith 1 (posPart : α → α) :=
 
 lemma lipschitzWith_negPart : LipschitzWith 1 (negPart : α → α) := by
   simpa [Function.comp] using lipschitzWith_posPart.comp LipschitzWith.id.neg
+
+@[fun_prop]
+lemma continuous_posPart : Continuous (posPart : α → α) := lipschitzWith_posPart.continuous
+
+@[fun_prop]
+lemma continuous_negPart : Continuous (negPart : α → α) := lipschitzWith_negPart.continuous
+
+lemma isClosed_nonneg : IsClosed {x : α | 0 ≤ x} := by
+  have : {x : α | 0 ≤ x} = negPart ⁻¹' {0} := by ext; simp [negPart_eq_zero]
+  rw [this]
+  exact isClosed_singleton.preimage continuous_negPart
+
+theorem isClosed_le_of_isClosed_nonneg {G} [OrderedAddCommGroup G] [TopologicalSpace G]
+    [ContinuousSub G] (h : IsClosed { x : G | 0 ≤ x }) :
+    IsClosed { p : G × G | p.fst ≤ p.snd } := by
+  have : { p : G × G | p.fst ≤ p.snd } = (fun p : G × G => p.snd - p.fst) ⁻¹' { x : G | 0 ≤ x } :=
+    by ext1 p; simp only [sub_nonneg, Set.preimage_setOf_eq]
+  rw [this]
+  exact IsClosed.preimage (continuous_snd.sub continuous_fst) h
+
+instance (priority := 100) NormedLatticeAddCommGroup.orderClosedTopology {E}
+    [NormedLatticeAddCommGroup E] : OrderClosedTopology E :=
+  ⟨isClosed_le_of_isClosed_nonneg isClosed_nonneg⟩

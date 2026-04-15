@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/Group/EvenFunction.lean
-Genuine: 24 of 24 | Dissolved: 0 | Infrastructure: 0
+Genuine: 23 of 23 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Algebra.Group.Action.Pi
+import Mathlib.Algebra.NoZeroSMulDivisors.Basic
 
 /-!
 # Even and odd functions
@@ -14,8 +17,6 @@ These definitions are `Function.Even` and `Function.Odd`; and they are `protecte
 conflicting with the root-level definitions `Even` and `Odd` (which, for functions, mean that the
 function takes even resp. odd _values_, a wholly different concept).
 -/
-
-assert_not_exists Module.IsTorsionFree NoZeroSMulDivisors
 
 namespace Function
 
@@ -116,21 +117,18 @@ end mul
 
 section torsionfree
 
-variable {α β : Type*} [AddCommGroup β] [IsAddTorsionFree β] {f : α → β}
+variable {α β : Type*} [AddCommGroup β] [NoZeroSMulDivisors ℕ β] {f : α → β}
 
 lemma zero_of_even_and_odd [Neg α] (he : f.Even) (ho : f.Odd) : f = 0 := by
   ext r
-  rw [Pi.zero_apply, ← neg_eq_self, ← ho, he]
+  rw [Pi.zero_apply, ← neg_eq_self ℕ, ← ho, he]
 
-lemma Odd.finset_sum_eq_zero [InvolutiveNeg α] {f : α → β} (hf : f.Odd) {s : Finset α}
-    (hs : Finset.map (Equiv.neg α).toEmbedding s = s) :
-    s.sum f = 0 := by
-  simpa [neg_eq_self, funext hf, hs] using (Finset.sum_map s (Equiv.neg α).toEmbedding f).symm
+lemma Odd.sum_eq_zero [Fintype α] [InvolutiveNeg α] {f : α → β} (hf : f.Odd) : ∑ a, f a = 0 := by
+  simpa only [neg_eq_self ℕ, Finset.sum_neg_distrib, funext hf, Equiv.neg_apply] using
+    Equiv.sum_comp (.neg α) f
 
-lemma Odd.sum_eq_zero [Fintype α] [InvolutiveNeg α] {f : α → β} (hf : f.Odd) : ∑ a, f a = 0 :=
-  hf.finset_sum_eq_zero <| Finset.map_univ_equiv (Equiv.neg α)
-
-lemma Odd.map_zero [NegZeroClass α] (hf : f.Odd) : f 0 = 0 := by simp [← neg_eq_self, ← hf 0]
+lemma Odd.map_zero [NegZeroClass α] (hf : f.Odd) : f 0 = 0 := by
+  simp only [← neg_eq_self ℕ, ← hf 0, neg_zero]
 
 end torsionfree
 

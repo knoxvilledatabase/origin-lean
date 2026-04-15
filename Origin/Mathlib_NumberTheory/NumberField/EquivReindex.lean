@@ -1,8 +1,9 @@
 /-
 Extracted from NumberTheory/NumberField/EquivReindex.lean
-Genuine: 6 of 8 | Dissolved: 1 | Infrastructure: 1
+Genuine: 4 of 6 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
 
 /-!
 
@@ -23,28 +24,17 @@ noncomputable section
 
 open Module.Free Module canonicalEmbedding Matrix Finset
 
-abbrev equivReindex : (K →+* ℂ) ≃ ChooseBasisIndex ℤ (𝓞 K) :=
-  Fintype.equivOfCardEq <| by
-    rw [Embeddings.card, ← finrank_eq_card_chooseBasisIndex, RingOfIntegers.rank]
+abbrev equivReindex : (K →+* ℂ) ≃ (ChooseBasisIndex ℤ (𝓞 K)) :=
+    Fintype.equivOfCardEq <|
+  by rw [Embeddings.card, ← finrank_eq_card_chooseBasisIndex, RingOfIntegers.rank]
 
 abbrev basisMatrix : Matrix (K →+* ℂ) (K →+* ℂ) ℂ :=
   (Matrix.of fun i ↦ latticeBasis K (equivReindex K i))
 
-theorem basisMatrix_eq_embeddingsMatrixReindex :
-    basisMatrix K = Algebra.embeddingsMatrixReindex ℚ ℂ
-      (integralBasis K ∘ (equivReindex K)) RingHom.equivRatAlgHom := by
-  ext; simp [Algebra.embeddingsMatrixReindex]
-
-open ComplexConjugate in
-
-theorem conj_basisMatrix :
-    (basisMatrix K).map conj = (basisMatrix K).reindex (Equiv.refl _)
-      (ComplexEmbedding.involutive_conjugate K).toPerm := by
-  ext; simp
-
 -- DISSOLVED: det_of_basisMatrix_non_zero
 
--- INSTANCE (free from Core): [DecidableEq
+instance [DecidableEq (K →+* ℂ)] : Invertible (basisMatrix K) := invertibleOfIsUnitDet _
+    (Ne.isUnit (det_of_basisMatrix_non_zero K))
 
 variable {K}
 

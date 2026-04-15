@@ -1,8 +1,11 @@
 /-
 Extracted from Analysis/Calculus/LineDeriv/QuadraticMap.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.LineDeriv.Basic
+import Mathlib.Analysis.Calculus.Deriv.Mul
+import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
 /-!
 # Quadratic forms are line (Gateaux) differentiable
@@ -10,7 +13,7 @@ import Origin.Core
 In this file we prove that a quadratic form is line differentiable,
 with the line derivative given by the polar bilinear form.
 Note that this statement does not need topology on the domain.
-In particular, it applies to discontinuous quadratic forms on infinite-dimensional spaces.
+In particular, it applies to discontinuous quadratic forms on infinite dimensional spaces.
 -/
 
 variable {𝕜 E F : Type*} [NontriviallyNormedField 𝕜] [AddCommGroup E] [Module 𝕜 E]
@@ -27,3 +30,10 @@ theorem hasLineDerivAt (f : QuadraticMap 𝕜 E F) (a b : E) :
 
 theorem lineDifferentiableAt (f : QuadraticMap 𝕜 E F) (a b : E) : LineDifferentiableAt 𝕜 f a b :=
   (f.hasLineDerivAt a b).lineDifferentiableAt
+
+@[simp]
+protected theorem lineDeriv (f : QuadraticMap 𝕜 E F) : lineDeriv 𝕜 f = polar f := by
+  ext a b
+  exact (f.hasLineDerivAt a b).lineDeriv
+
+end QuadraticMap

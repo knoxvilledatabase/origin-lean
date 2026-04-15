@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Sites/Coherent/ReflectsPreregular.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.EffectiveEpi.Enough
+import Mathlib.CategoryTheory.EffectiveEpi.Preserves
+import Mathlib.CategoryTheory.Sites.Coherent.RegularTopology
 
 /-!
 
@@ -15,12 +18,10 @@ category `C` is `Preregular`.
 
 namespace CategoryTheory
 
-variable {C D : Type*} [Category* C] [Category* D] (F : C ⥤ D)
+variable {C D : Type*} [Category C] [Category D] (F : C ⥤ D)
   [F.PreservesEffectiveEpis] [F.ReflectsEffectiveEpis]
   [F.EffectivelyEnough]
   [Preregular D] [F.Full] [F.Faithful]
-
-set_option backward.isDefEq.respectTransparency false in
 
 include F in
 

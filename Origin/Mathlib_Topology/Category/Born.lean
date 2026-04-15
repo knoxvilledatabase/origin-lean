@@ -1,8 +1,10 @@
 /-
 Extracted from Topology/Category/Born.lean
-Genuine: 1 of 5 | Dissolved: 0 | Infrastructure: 4
+Genuine: 2 of 8 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
+import Mathlib.Topology.Bornology.Hom
 
 /-!
 # The category of bornologies
@@ -14,23 +16,32 @@ universe u
 
 open CategoryTheory
 
-structure Born where
-  /-- Construct a bundled `Born` from a `Bornology`. -/
-  of ::
-  /-- The underlying bornology. -/
-  carrier : Type*
-  [str : Bornology carrier]
-
-attribute [instance] Born.str
+def Born :=
+  Bundled Bornology
 
 namespace Born
 
--- INSTANCE (free from Core): :
+instance : CoeSort Born Type* :=
+  Bundled.coeSort
 
--- INSTANCE (free from Core): :
+instance (X : Born) : Bornology X :=
+  X.str
 
--- INSTANCE (free from Core): :
+def of (α : Type*) [Bornology α] : Born :=
+  Bundled.of α
 
--- INSTANCE (free from Core): :
+instance : Inhabited Born :=
+  ⟨of PUnit⟩
+
+instance : BundledHom @LocallyBoundedMap where
+  id := @LocallyBoundedMap.id
+  comp := @LocallyBoundedMap.comp
+  hom_ext _ _ := DFunLike.coe_injective
+
+instance : LargeCategory.{u} Born :=
+  BundledHom.category LocallyBoundedMap
+
+instance : ConcreteCategory Born :=
+  BundledHom.concreteCategory LocallyBoundedMap
 
 end Born

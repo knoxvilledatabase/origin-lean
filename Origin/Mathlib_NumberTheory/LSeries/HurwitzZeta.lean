@@ -3,6 +3,9 @@ Extracted from NumberTheory/LSeries/HurwitzZeta.lean
 Genuine: 15 of 18 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
+import Mathlib.NumberTheory.LSeries.HurwitzZetaOdd
+import Mathlib.Analysis.SpecialFunctions.Gamma.Beta
 
 /-!
 # The Hurwitz zeta function
@@ -78,13 +81,13 @@ lemma differentiableAt_hurwitzZeta_sub_one_div (a : UnitAddCircle) :
 lemma tendsto_hurwitzZeta_sub_one_div_nhds_one (a : UnitAddCircle) :
     Tendsto (fun s ↦ hurwitzZeta a s - 1 / (s - 1) / Gammaℝ s) (𝓝 1) (𝓝 (hurwitzZeta a 1)) := by
   simp only [hurwitzZeta, add_sub_right_comm]
-  refine (tendsto_hurwitzZetaEven_sub_one_div_nhds_one a).add
-    (differentiable_hurwitzZetaOdd a 1).continuousAt.tendsto
+  refine (tendsto_hurwitzZetaEven_sub_one_div_nhds_one a).add ?_
+  exact (differentiable_hurwitzZetaOdd a 1).continuousAt.tendsto
 
 lemma differentiable_hurwitzZeta_sub_hurwitzZeta (a b : UnitAddCircle) :
     Differentiable ℂ (fun s ↦ hurwitzZeta a s - hurwitzZeta b s) := by
   simp only [hurwitzZeta, add_sub_add_comm]
-  refine (differentiable_hurwitzZetaEven_sub_hurwitzZetaEven a b).add (.sub ?_ ?_)
+  refine (differentiable_hurwitzZetaEven_sub_hurwitzZetaEven a b).add (Differentiable.sub ?_ ?_)
   all_goals apply differentiable_hurwitzZetaOdd
 
 /-!
@@ -102,7 +105,8 @@ lemma cosZeta_eq (a : UnitAddCircle) (s : ℂ) :
 lemma sinZeta_eq (a : UnitAddCircle) (s : ℂ) :
     sinZeta a s = (expZeta a s - expZeta (-a) s) / (2 * I) := by
   rw [expZeta, expZeta, cosZeta_neg, sinZeta_neg]
-  field
+  field_simp
+  ring_nf
 
 lemma hasSum_expZeta_of_one_lt_re (a : ℝ) {s : ℂ} (hs : 1 < re s) :
     HasSum (fun n : ℕ ↦ cexp (2 * π * I * a * n) / n ^ s) (expZeta a s) := by

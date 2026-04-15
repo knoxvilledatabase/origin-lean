@@ -1,8 +1,14 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/Classification.lean
-Genuine: 7 of 9 | Dissolved: 1 | Infrastructure: 1
+Genuine: 6 of 7 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.ZMod
+import Mathlib.Algebra.MvPolynomial.Cardinal
+import Mathlib.Algebra.Polynomial.Cardinal
+import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.RingTheory.Algebraic.Cardinality
+import Mathlib.RingTheory.AlgebraicIndependent
 
 /-!
 # Classification of Algebraically closed fields
@@ -17,7 +23,7 @@ This file contains results related to classifying algebraically closed fields.
   are isomorphic if they have the same characteristic and the same cardinality.
 -/
 
-universe u v w
+universe u
 
 open scoped Cardinal Polynomial
 
@@ -68,75 +74,66 @@ end Classification
 
 section Cardinal
 
-variable {R : Type u} {K : Type v} [CommRing R] [Field K] [Algebra R K] [IsAlgClosed K]
+variable {R K : Type u} [CommRing R] [Field K] [Algebra R K] [IsAlgClosed K]
 
-variable {ι : Type w} (v : ι → K)
+variable {ι : Type u} (v : ι → K)
 
-variable {K' : Type u} [Field K'] [Algebra R K'] [IsAlgClosed K']
-
-variable {ι' : Type u} (v' : ι' → K')
-
-theorem cardinal_le_max_transcendence_basis' (hv : IsTranscendenceBasis R v') :
-    #K' ≤ max (max #R #ι') ℵ₀ := by
-  simpa using cardinal_le_max_transcendence_basis v' hv
+theorem cardinal_le_max_transcendence_basis (hv : IsTranscendenceBasis R v) :
+    #K ≤ max (max #R #ι) ℵ₀ :=
+  calc
+    #K ≤ max #(Algebra.adjoin R (Set.range v)) ℵ₀ :=
+      letI := isAlgClosure_of_transcendence_basis v hv
+      Algebra.IsAlgebraic.cardinalMk_le_max _ _
+    _ = max #(MvPolynomial ι R) ℵ₀ := by rw [Cardinal.eq.2 ⟨hv.1.aevalEquiv.toEquiv⟩]
+    _ ≤ max (max (max #R #ι) ℵ₀) ℵ₀ := max_le_max MvPolynomial.cardinalMk_le_max le_rfl
+    _ = _ := by simp [max_assoc]
 
 theorem cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt [Nontrivial R]
-    (hv : IsTranscendenceBasis R v) (hR : #R ≤ ℵ₀) (hK : ℵ₀ < #K) :
-    Cardinal.lift.{w} #K = Cardinal.lift.{v} #ι :=
-  have : ℵ₀ ≤ Cardinal.lift.{max u v} #ι := le_of_not_gt fun h => not_le_of_gt
-    (show ℵ₀ < Cardinal.lift.{max u w} #K by simpa) <|
+    (hv : IsTranscendenceBasis R v) (hR : #R ≤ ℵ₀) (hK : ℵ₀ < #K) : #K = #ι :=
+  have : ℵ₀ ≤ #ι := le_of_not_lt fun h => not_le_of_gt hK <|
     calc
-      Cardinal.lift.{max u w, v} #K ≤ max (max (Cardinal.lift.{max v w, u} #R)
-        (Cardinal.lift.{max u v, w} #ι)) ℵ₀ := cardinal_le_max_transcendence_basis v hv
-      _ ≤ _ := max_le (max_le (by simpa) (by simpa using le_of_lt h)) le_rfl
-  suffices Cardinal.lift.{max u w} #K = Cardinal.lift.{max u v} #ι
-    from Cardinal.lift_injective.{u, max v w} (by simpa)
+      #K ≤ max (max #R #ι) ℵ₀ := cardinal_le_max_transcendence_basis v hv
+      _ ≤ _ := max_le (max_le hR (le_of_lt h)) le_rfl
   le_antisymm
     (calc
-      Cardinal.lift.{max u w} #K ≤ max (max
-        (Cardinal.lift.{max v w} #R) (Cardinal.lift.{max u v} #ι)) ℵ₀ :=
-        cardinal_le_max_transcendence_basis v hv
-      _ = Cardinal.lift #ι := by
+      #K ≤ max (max #R #ι) ℵ₀ := cardinal_le_max_transcendence_basis v hv
+      _ = #ι := by
         rw [max_eq_left, max_eq_right]
-        · exact le_trans (by simpa using hR) this
+        · exact le_trans hR this
         · exact le_max_of_le_right this)
-    (lift_mk_le.2 ⟨⟨v, hv.1.injective⟩⟩)
-
-theorem cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt' [Nontrivial R]
-    (hv : IsTranscendenceBasis R v') (hR : #R ≤ ℵ₀) (hK : ℵ₀ < #K') : #K' = #ι' := by
-  simpa using cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt v' hv hR hK
+    (mk_le_of_injective (show Function.Injective v from hv.1.injective))
 
 end Cardinal
 
-variable {K : Type u} {L : Type v} [Field K] [Field L] [IsAlgClosed K] [IsAlgClosed L]
+variable {K L : Type} [Field K] [Field L] [IsAlgClosed K] [IsAlgClosed L]
 
--- DISSOLVED: ringEquiv_of_equiv_of_charZero
+-- DISSOLVED: ringEquivOfCardinalEqOfCharZero
 
-private theorem ringEquiv_of_Cardinal_eq_of_charP (p : ℕ) [Fact p.Prime] [CharP K p] [CharP L p]
-    (hK : ℵ₀ < #K) (hKL : Nonempty (K ≃ L)) : Nonempty (K ≃+* L) := by
+private theorem ringEquivOfCardinalEqOfCharP (p : ℕ) [Fact p.Prime] [CharP K p] [CharP L p]
+    (hK : ℵ₀ < #K) (hKL : #K = #L) : Nonempty (K ≃+* L) := by
   letI : Algebra (ZMod p) K := ZMod.algebra _ _
   letI : Algebra (ZMod p) L := ZMod.algebra _ _
-  obtain ⟨s, hs⟩ := exists_isTranscendenceBasis (ZMod p) K
-  obtain ⟨t, ht⟩ := exists_isTranscendenceBasis (ZMod p) L
-  have hL : ℵ₀ < #L := by
-    rwa [← aleph0_lt_lift.{v, u}, ← lift_mk_eq'.2 hKL, aleph0_lt_lift]
-  have : Cardinal.lift.{v} #s = Cardinal.lift.{u} #t := by
-    rw [← lift_injective (cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt _
-        hs (le_of_lt (lt_aleph0_of_finite _)) hK),
-      ← lift_injective (cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt _
-        ht (le_of_lt (lt_aleph0_of_finite _)) hL)]
-    exact Cardinal.lift_mk_eq'.2 hKL
-  obtain ⟨e⟩ := Cardinal.lift_mk_eq'.1 this
+  cases' exists_isTranscendenceBasis (ZMod p)
+    (show Function.Injective (algebraMap (ZMod p) K) from RingHom.injective _) with s hs
+  cases' exists_isTranscendenceBasis (ZMod p)
+    (show Function.Injective (algebraMap (ZMod p) L) from RingHom.injective _) with t ht
+  have : #s = #t := by
+    rw [← cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt _ hs
+      (lt_aleph0_of_finite (ZMod p)).le hK,
+      ← cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt _ ht
+        (lt_aleph0_of_finite (ZMod p)).le, hKL]
+    rwa [← hKL]
+  cases' Cardinal.eq.1 this with e
   exact ⟨equivOfTranscendenceBasis _ _ e hs ht⟩
 
-theorem ringEquiv_of_equiv_of_char_eq (p : ℕ) [CharP K p] [CharP L p] (hK : ℵ₀ < #K)
-    (hKL : Nonempty (K ≃ L)) : Nonempty (K ≃+* L) := by
+theorem ringEquivOfCardinalEqOfCharEq (p : ℕ) [CharP K p] [CharP L p] (hK : ℵ₀ < #K)
+    (hKL : #K = #L) : Nonempty (K ≃+* L) := by
   rcases CharP.char_is_prime_or_zero K p with (hp | hp)
   · haveI : Fact p.Prime := ⟨hp⟩
-    exact ringEquiv_of_Cardinal_eq_of_charP p hK hKL
+    exact ringEquivOfCardinalEqOfCharP p hK hKL
   · simp only [hp] at *
     letI : CharZero K := CharP.charP_to_charZero K
     letI : CharZero L := CharP.charP_to_charZero L
-    exact ringEquiv_of_equiv_of_charZero hK hKL
+    exact ringEquivOfCardinalEqOfCharZero hK hKL
 
 end IsAlgClosed

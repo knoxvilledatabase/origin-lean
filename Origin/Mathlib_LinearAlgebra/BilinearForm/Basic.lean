@@ -1,8 +1,10 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Basic.lean
-Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
+Genuine: 23 of 32 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Tower
+import Mathlib.LinearAlgebra.BilinearMap
 
 /-!
 # Bilinear form
@@ -21,15 +23,15 @@ The result that there exists an orthogonal basis with respect to a symmetric,
 nondegenerate bilinear form can be found in `QuadraticForm.lean` with
 `exists_orthogonal_basis`.
 
-## Notation
+## Notations
 
 Given any term `B` of type `BilinForm`, due to a coercion, can use
-the notation `B x y` to refer to the function field, i.e. `B x y = B.bilin x y`.
+the notation `B x y` to refer to the function field, ie. `B x y = B.bilin x y`.
 
 In this file we use the following type variables:
-- `M`, `M'`, ... are modules over the commutative semiring `R`,
-- `M₁`, `M₁'`, ... are modules over the commutative ring `R₁`,
-- `V`, ... is a vector space over the field `K`.
+ - `M`, `M'`, ... are modules over the commutative semiring `R`,
+ - `M₁`, `M₁'`, ... are modules over the commutative ring `R₁`,
+ - `V`, ... is a vector space over the field `K`.
 
 ## References
 
@@ -59,6 +61,9 @@ variable {B : BilinForm R M} {B₁ : BilinForm R₁ M₁}
 namespace LinearMap
 
 namespace BilinForm
+
+theorem coeFn_congr : ∀ {x x' y y' : M}, x = x' → y = y' → B x y = B x' y'
+  | _, _, _, _, rfl, rfl => rfl
 
 theorem add_left (x y z : M) : B (x + y) z = B x z + B y z := map_add₂ _ _ _ _
 
@@ -92,3 +97,87 @@ theorem coe_injective : Function.Injective ((fun B x y => B x y) : BilinForm R M
   fun B D h => by
     ext x y
     apply congrFun₂ h
+
+@[ext]
+theorem ext (H : ∀ x y : M, B x y = D x y) : B = D := ext₂ H
+
+theorem congr_fun (h : B = D) (x y : M) : B x y = D x y := congr_fun₂ h _ _
+
+theorem coe_zero : ⇑(0 : BilinForm R M) = 0 :=
+  rfl
+
+@[simp]
+theorem zero_apply (x y : M) : (0 : BilinForm R M) x y = 0 :=
+  rfl
+
+variable (B D B₁ D₁)
+
+theorem coe_add : ⇑(B + D) = B + D :=
+  rfl
+
+@[simp]
+theorem add_apply (x y : M) : (B + D) x y = B x y + D x y :=
+  rfl
+
+theorem coe_neg : ⇑(-B₁) = -B₁ :=
+  rfl
+
+@[simp]
+theorem neg_apply (x y : M₁) : (-B₁) x y = -B₁ x y :=
+  rfl
+
+theorem coe_sub : ⇑(B₁ - D₁) = B₁ - D₁ :=
+  rfl
+
+@[simp]
+theorem sub_apply (x y : M₁) : (B₁ - D₁) x y = B₁ x y - D₁ x y :=
+  rfl
+
+def coeFnAddMonoidHom : BilinForm R M →+ M → M → R where
+  toFun := fun B x y => B x y
+  map_zero' := rfl
+  map_add' _ _ := rfl
+
+section flip
+
+def flipHomAux : (BilinForm R M) →ₗ[R] (BilinForm R M) where
+  toFun A := A.flip
+  map_add' A₁ A₂ := by
+    ext
+    simp only [LinearMap.flip_apply, LinearMap.add_apply]
+  map_smul' c A := by
+    ext
+    simp only [LinearMap.flip_apply, LinearMap.smul_apply, RingHom.id_apply]
+
+theorem flip_flip_aux (A : BilinForm R M) :
+    flipHomAux (M := M) (flipHomAux (M := M) A) = A := by
+  ext A
+  simp [flipHomAux]
+
+def flipHom : BilinForm R M ≃ₗ[R] BilinForm R M :=
+  { flipHomAux with
+    invFun := flipHomAux (M := M)
+    left_inv := flip_flip_aux
+    right_inv := flip_flip_aux }
+
+@[simp]
+theorem flip_apply (A : BilinForm R M) (x y : M) : flipHom A x y = A y x :=
+  rfl
+
+theorem flip_flip :
+    flipHom.trans flipHom = LinearEquiv.refl R (BilinForm R M) := by
+  ext A
+  simp
+
+abbrev flip (B : BilinForm R M) :=
+  flipHom B
+
+end flip
+
+@[simps! apply]
+def restrict (B : BilinForm R M) (W : Submodule R M) : BilinForm R W :=
+  LinearMap.domRestrict₁₂ B W W
+
+end BilinForm
+
+end LinearMap

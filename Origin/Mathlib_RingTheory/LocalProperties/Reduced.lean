@@ -3,6 +3,7 @@ Extracted from RingTheory/LocalProperties/Reduced.lean
 Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.LocalProperties.Basic
 
 /-!
 # `IsReduced` is a local property
@@ -26,7 +27,7 @@ theorem isReduced_localizationPreserves : LocalizationPreserves fun R _ => IsRed
   obtain ⟨⟨y, m⟩, hx⟩ := IsLocalization.surj M x
   dsimp only at hx
   let hx' := congr_arg (· ^ n.succ) hx
-  simp only [mul_pow, e, zero_mul, ← map_pow] at hx'
+  simp only [mul_pow, e, zero_mul, ← RingHom.map_pow] at hx'
   rw [← (algebraMap R S).map_zero] at hx'
   obtain ⟨m', hm'⟩ := (IsLocalization.eq_iff_exists M S).mp hx'
   apply_fun (· * (m' : R) ^ n) at hm'
@@ -37,7 +38,8 @@ theorem isReduced_localizationPreserves : LocalizationPreserves fun R _ => IsRed
     IsLocalization.map_eq_zero_iff M]
   exact ⟨m', by rw [← hm', mul_comm]⟩
 
--- INSTANCE (free from Core): {R
+instance {R : Type*} [CommRing R] (M : Submonoid R) [IsReduced R] : IsReduced (Localization M) :=
+  isReduced_localizationPreserves M _ inferInstance
 
 theorem isReduced_ofLocalizationMaximal : OfLocalizationMaximal fun R _ => IsReduced R := by
   introv R h

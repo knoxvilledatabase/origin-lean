@@ -1,8 +1,14 @@
 /-
 Extracted from Logic/Nontrivial/Basic.lean
-Genuine: 6 of 11 | Dissolved: 0 | Infrastructure: 5
+Genuine: 10 of 15 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Data.Prod.Basic
+import Mathlib.Logic.Function.Basic
+import Mathlib.Logic.Nontrivial.Defs
+import Mathlib.Logic.Unique
+import Mathlib.Order.Defs.LinearOrder
+import Mathlib.Tactic.Attr.Register
 
 /-!
 # Nontrivial types
@@ -38,11 +44,27 @@ noncomputable def nontrivialPSumUnique (α : Type*) [Inhabited α] :
           by_contra H
           exact h ⟨_, _, H⟩ }
 
--- INSTANCE (free from Core): Option.nontrivial
+instance Option.nontrivial [Nonempty α] : Nontrivial (Option α) := by
+  inhabit α
+  exact ⟨none, some default, nofun⟩
 
--- INSTANCE (free from Core): nontrivial_prod_right
+protected theorem Function.Injective.nontrivial [Nontrivial α] {f : α → β}
+    (hf : Function.Injective f) : Nontrivial β :=
+  let ⟨x, y, h⟩ := exists_pair_ne α
+  ⟨⟨f x, f y, hf.ne h⟩⟩
 
--- INSTANCE (free from Core): nontrivial_prod_left
+protected theorem Function.Injective.exists_ne [Nontrivial α] {f : α → β}
+    (hf : Function.Injective f) (y : β) : ∃ x, f x ≠ y := by
+  rcases exists_pair_ne α with ⟨x₁, x₂, hx⟩
+  by_cases h : f x₂ = y
+  · exact ⟨x₁, (hf.ne_iff' h).2 hx⟩
+  · exact ⟨x₂, h⟩
+
+instance nontrivial_prod_right [Nonempty α] [Nontrivial β] : Nontrivial (α × β) :=
+  Prod.snd_surjective.nontrivial
+
+instance nontrivial_prod_left [Nontrivial α] [Nonempty β] : Nontrivial (α × β) :=
+  Prod.fst_surjective.nontrivial
 
 namespace Pi
 
@@ -55,8 +77,19 @@ theorem nontrivial_at (i' : I) [inst : ∀ i, Nonempty (f i)] [Nontrivial (f i')
   letI := Classical.decEq (∀ i : I, f i)
   exact (Function.update_injective (fun i ↦ Classical.choice (inst i)) i').nontrivial
 
--- INSTANCE (free from Core): nontrivial
+instance nontrivial [Inhabited I] [∀ i, Nonempty (f i)] [Nontrivial (f default)] :
+    Nontrivial (∀ i : I, f i) :=
+  nontrivial_at default
 
 end Pi
 
--- INSTANCE (free from Core): Function.nontrivial
+instance Function.nontrivial [h : Nonempty α] [Nontrivial β] : Nontrivial (α → β) :=
+  h.elim fun a ↦ Pi.nontrivial_at a
+
+@[nontriviality]
+protected theorem Subsingleton.le [Preorder α] [Subsingleton α] (x y : α) : x ≤ y :=
+  le_of_eq (Subsingleton.elim x y)
+
+@[to_additive]
+theorem Subsingleton.eq_one [One α] [Subsingleton α] (a : α) : a = 1 :=
+  Subsingleton.elim _ _

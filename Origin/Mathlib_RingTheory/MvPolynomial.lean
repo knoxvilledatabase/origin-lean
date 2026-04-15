@@ -1,8 +1,13 @@
 /-
 Extracted from RingTheory/MvPolynomial.lean
-Genuine: 5 of 6 | Dissolved: 0 | Infrastructure: 1
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.MvPolynomial.CommRing
+import Mathlib.LinearAlgebra.Dimension.Finite
+import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
+import Mathlib.RingTheory.MvPolynomial.Basic
 
 /-!
 # Multivariate polynomials over fields
@@ -35,12 +40,10 @@ variable {σ K} [CommRing K] [Nontrivial K]
 open Cardinal
 
 theorem rank_eq_lift : Module.rank K (MvPolynomial σ K) = lift.{v} #(σ →₀ ℕ) := by
-  rw [← Cardinal.lift_inj, ← (basisMonomials σ K).mk_eq_rank, lift_lift, lift_umax.{u, v}]
+  rw [← Cardinal.lift_inj, ← (basisMonomials σ K).mk_eq_rank, lift_lift, lift_umax.{u,v}]
 
 theorem rank_eq {σ : Type v} : Module.rank K (MvPolynomial σ K) = #(σ →₀ ℕ) := by
   rw [← Cardinal.lift_inj, ← (basisMonomials σ K).mk_eq_rank]
-
--- INSTANCE (free from Core): :
 
 theorem finrank_eq_zero [Nonempty σ] : Module.finrank K (MvPolynomial σ K) = 0 :=
   (basisMonomials σ K).linearIndependent.finrank_eq_zero_of_infinite

@@ -1,18 +1,19 @@
 /-
 Extracted from RingTheory/Adjoin/Tower.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Adjoin.FG
 
 /-!
 # Adjoining elements and being finitely generated in an algebra tower
 
 ## Main results
 
-* `Algebra.fg_trans'`: if `S` is finitely generated as `R`-algebra and `A` as `S`-algebra,
-  then `A` is finitely generated as `R`-algebra
-* `fg_of_fg_of_fg`: **Artin--Tate lemma**: if C/B/A is a tower of rings, and A is Noetherian, and
-  C is algebra-finite over A, and C is module-finite over B, then B is algebra-finite over A.
+ * `Algebra.fg_trans'`: if `S` is finitely generated as `R`-algebra and `A` as `S`-algebra,
+   then `A` is finitely generated as `R`-algebra
+ * `fg_of_fg_of_fg`: **Artin--Tate lemma**: if C/B/A is a tower of rings, and A is noetherian, and
+   C is algebra-finite over A, and C is module-finite over B, then B is algebra-finite over A.
 -/
 
 open Pointwise
@@ -34,7 +35,12 @@ theorem adjoin_restrictScalars (C D E : Type*) [CommSemiring C] [CommSemiring D]
     ext x
     change x ∈ Subsemiring.closure (_ ∪ S) ↔ x ∈ Subsemiring.closure (_ ∪ S)
     rw [this]
-  simp
+  ext x
+  constructor
+  · rintro ⟨y, hy⟩
+    exact ⟨⟨algebraMap D E y, ⟨y, ⟨Algebra.mem_top, rfl⟩⟩⟩, hy⟩
+  · rintro ⟨⟨y, ⟨z, ⟨h0, h1⟩⟩⟩, h2⟩
+    exact ⟨z, Eq.trans h1 h2⟩
 
 theorem adjoin_res_eq_adjoin_res (C D E F : Type*) [CommSemiring C] [CommSemiring D]
     [CommSemiring E] [CommSemiring F] [Algebra C D] [Algebra C E] [Algebra C F] [Algebra D F]
@@ -49,19 +55,18 @@ theorem adjoin_res_eq_adjoin_res (C D E F : Type*) [CommSemiring C] [CommSemirin
 
 end Algebra
 
+section
+
+open scoped Classical
+
 theorem Algebra.fg_trans' {R S A : Type*} [CommSemiring R] [CommSemiring S] [Semiring A]
     [Algebra R S] [Algebra S A] [Algebra R A] [IsScalarTower R S A] (hRS : (⊤ : Subalgebra R S).FG)
-    (hSA : (⊤ : Subalgebra S A).FG) : (⊤ : Subalgebra R A).FG := by
-  classical
-  rcases hRS with ⟨s, hs⟩
-  rcases hSA with ⟨t, ht⟩
-  exact ⟨s.image (algebraMap S A) ∪ t, by
-    rw [Finset.coe_union, Finset.coe_image,
-        Algebra.adjoin_algebraMap_image_union_eq_adjoin_adjoin,
-        hs, Algebra.adjoin_top, ht, Subalgebra.restrictScalars_top,
-        Subalgebra.restrictScalars_top
-       ]
-    ⟩
+    (hSA : (⊤ : Subalgebra S A).FG) : (⊤ : Subalgebra R A).FG :=
+  let ⟨s, hs⟩ := hRS
+  let ⟨t, ht⟩ := hSA
+  ⟨s.image (algebraMap S A) ∪ t, by
+    rw [Finset.coe_union, Finset.coe_image, Algebra.adjoin_algebraMap_image_union_eq_adjoin_adjoin,
+      hs, Algebra.adjoin_top, ht, Subalgebra.restrictScalars_top, Subalgebra.restrictScalars_top]⟩
 
 end
 
@@ -77,14 +82,15 @@ variable [Algebra A B] [Algebra B C] [Algebra A C] [IsScalarTower A B C]
 
 open Finset Submodule
 
+open scoped Classical
+
 theorem exists_subalgebra_of_fg (hAC : (⊤ : Subalgebra A C).FG) (hBC : (⊤ : Submodule B C).FG) :
     ∃ B₀ : Subalgebra A B, B₀.FG ∧ (⊤ : Submodule B₀ C).FG := by
-  obtain ⟨x, hx⟩ := hAC
-  obtain ⟨y, hy⟩ := hBC
+  cases' hAC with x hx
+  cases' hBC with y hy
   have := hy
   simp_rw [eq_top_iff', mem_span_finset] at this
-  choose f _ hf using this
-  classical
+  choose f hf using this
   let s : Finset B := Finset.image₂ f (x ∪ y * y) y
   have hxy :
     ∀ xi ∈ x, xi ∈ span (Algebra.adjoin A (↑s : Set B)) (↑(insert 1 y : Finset C) : Set C) :=
@@ -130,3 +136,17 @@ section Ring
 variable [CommRing A] [CommRing B] [CommRing C]
 
 variable [Algebra A B] [Algebra B C] [Algebra A C] [IsScalarTower A B C]
+
+theorem fg_of_fg_of_fg [IsNoetherianRing A] (hAC : (⊤ : Subalgebra A C).FG)
+    (hBC : (⊤ : Submodule B C).FG) (hBCi : Function.Injective (algebraMap B C)) :
+    (⊤ : Subalgebra A B).FG :=
+  let ⟨B₀, hAB₀, hB₀C⟩ := exists_subalgebra_of_fg A B C hAC hBC
+  Algebra.fg_trans' (B₀.fg_top.2 hAB₀) <|
+    Subalgebra.fg_of_submodule_fg <|
+      have : IsNoetherianRing B₀ := isNoetherianRing_of_fg hAB₀
+      have : Module.Finite B₀ C := ⟨hB₀C⟩
+      fg_of_injective (IsScalarTower.toAlgHom B₀ B C).toLinearMap hBCi
+
+end Ring
+
+end ArtinTate

@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Limits/Constructions/EpiMono.lean
 Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Mono
+import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Pullbacks
 
 /-!
 # Relating monomorphisms and epimorphisms to limits and colimits
@@ -29,7 +32,9 @@ theorem preserves_mono_of_preservesLimit {X Y : C} (f : X ⟶ Y) [PreservesLimit
   simp_rw [F.map_id] at this
   apply PullbackCone.mono_of_isLimitMkIdId _ this
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) preservesMonomorphisms_of_preservesLimitsOfShape
+    [PreservesLimitsOfShape WalkingCospan F] : F.PreservesMonomorphisms where
+  preserves f _ := preserves_mono_of_preservesLimit F f
 
 theorem reflects_mono_of_reflectsLimit {X Y : C} (f : X ⟶ Y) [ReflectsLimit (cospan f f) F]
     [Mono (F.map f)] : Mono f := by
@@ -37,7 +42,9 @@ theorem reflects_mono_of_reflectsLimit {X Y : C} (f : X ⟶ Y) [ReflectsLimit (c
   simp_rw [← F.map_id] at this
   apply PullbackCone.mono_of_isLimitMkIdId _ (isLimitOfIsLimitPullbackConeMap F _ this)
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) reflectsMonomorphisms_of_reflectsLimitsOfShape
+    [ReflectsLimitsOfShape WalkingCospan F] : F.ReflectsMonomorphisms where
+  reflects f _ := reflects_mono_of_reflectsLimit F f
 
 theorem preserves_epi_of_preservesColimit {X Y : C} (f : X ⟶ Y) [PreservesColimit (span f f) F]
     [Epi f] : Epi (F.map f) := by
@@ -45,7 +52,9 @@ theorem preserves_epi_of_preservesColimit {X Y : C} (f : X ⟶ Y) [PreservesColi
   simp_rw [F.map_id] at this
   apply PushoutCocone.epi_of_isColimitMkIdId _ this
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) preservesEpimorphisms_of_preservesColimitsOfShape
+    [PreservesColimitsOfShape WalkingSpan F] : F.PreservesEpimorphisms where
+  preserves f _ := preserves_epi_of_preservesColimit F f
 
 theorem reflects_epi_of_reflectsColimit {X Y : C} (f : X ⟶ Y) [ReflectsColimit (span f f) F]
     [Epi (F.map f)] : Epi f := by
@@ -55,6 +64,8 @@ theorem reflects_epi_of_reflectsColimit {X Y : C} (f : X ⟶ Y) [ReflectsColimit
     PushoutCocone.epi_of_isColimitMkIdId _
       (isColimitOfIsColimitPushoutCoconeMap F _ this)
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) reflectsEpimorphisms_of_reflectsColimitsOfShape
+    [ReflectsColimitsOfShape WalkingSpan F] : F.ReflectsEpimorphisms where
+  reflects f _ := reflects_epi_of_reflectsColimit F f
 
 end CategoryTheory

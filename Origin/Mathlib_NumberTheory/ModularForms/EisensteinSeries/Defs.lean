@@ -1,8 +1,10 @@
 /-
 Extracted from NumberTheory/ModularForms/EisensteinSeries/Defs.lean
-Genuine: 12 of 15 | Dissolved: 3 | Infrastructure: 0
+Genuine: 11 of 12 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.NumberTheory.ModularForms.SlashInvariantForms
+import Mathlib.NumberTheory.ModularForms.CongruenceSubgroups
 
 /-!
 # Eisenstein Series
@@ -23,66 +25,94 @@ import Origin.Core
 
 noncomputable section
 
-open ModularForm UpperHalfPlane Complex Matrix CongruenceSubgroup Set
+open ModularForm UpperHalfPlane Complex Matrix CongruenceSubgroup
 
 open scoped MatrixGroups
 
 namespace EisensteinSeries
 
-variable (N r : ℕ) (a : Fin 2 → ZMod N)
+variable (N : ℕ) (a : Fin 2 → ZMod N)
 
 section gammaSet_def
 
-def gammaSet := {v : Fin 2 → ℤ | (↑) ∘ v = a ∧ (v 0).gcd (v 1) = r}
+def gammaSet := {v : Fin 2 → ℤ | (↑) ∘ v = a ∧ IsCoprime (v 0) (v 1)}
 
-open scoped Function in -- required for scoped `on` notation
-
-lemma pairwise_disjoint_gammaSet : Pairwise (Disjoint on gammaSet N r) := by
+lemma pairwise_disjoint_gammaSet : Pairwise (Disjoint on gammaSet N) := by
   refine fun u v huv ↦ ?_
-  contrapose huv
+  contrapose! huv
   obtain ⟨f, hf⟩ := Set.not_disjoint_iff.mp huv
   exact hf.1.1.symm.trans hf.2.1
 
-lemma gammaSet_one_const (a a' : Fin 2 → ZMod 1) : gammaSet 1 r a = gammaSet 1 r a' :=
+lemma gammaSet_one_eq (a a' : Fin 2 → ZMod 1) : gammaSet 1 a = gammaSet 1 a' :=
   congr_arg _ (Subsingleton.elim _ _)
 
-lemma gammaSet_one_eq (a : Fin 2 → ZMod 1) :
-    gammaSet 1 r a = {v : Fin 2 → ℤ | (v 0).gcd (v 1) = r} := by
-  simp [gammaSet, Subsingleton.eq_zero]
+def gammaSet_one_equiv (a a' : Fin 2 → ZMod 1) : gammaSet 1 a ≃ gammaSet 1 a' :=
+  Equiv.Set.ofEq (gammaSet_one_eq a a')
 
-lemma gammaSet_one_mem_iff (v : Fin 2 → ℤ) : v ∈ gammaSet 1 r 0 ↔ (v 0).gcd (v 1) = r := by
-  simp [gammaSet, Subsingleton.eq_zero]
+end gammaSet_def
 
-def gammaSet_one_equiv (a a' : Fin 2 → ZMod 1) : gammaSet 1 r a ≃ gammaSet 1 r a' :=
-  Equiv.setCongr (gammaSet_one_const r a a')
+variable {N a}
 
-abbrev finGcdMap (v : Fin 2 → ℤ) : ℕ := (v 0).gcd (v 1)
+section gamma_action
 
--- DISSOLVED: finGcdMap_div
+lemma vecMul_SL2_mem_gammaSet {v : Fin 2 → ℤ} (hv : v ∈ gammaSet N a) (γ : SL(2, ℤ)) :
+    v ᵥ* γ ∈ gammaSet N (a ᵥ* γ) := by
+  refine ⟨?_, hv.2.vecMulSL γ⟩
+  have := RingHom.map_vecMul (m := Fin 2) (n := Fin 2) (Int.castRingHom (ZMod N)) γ v
+  simp only [eq_intCast, Int.coe_castRingHom] at this
+  simp_rw [Function.comp_def, this, hv.1]
+  simp
 
-lemma finGcdMap_smul {r : ℕ} (a : ℤ) {v : Fin 2 → ℤ} (hv : finGcdMap v = r) :
-    finGcdMap (a • v) = a.natAbs * r := by
-  simp [finGcdMap, Int.gcd_mul_left, hv]
+variable (a) in
 
-abbrev divIntMap (r : ℤ) {m : ℕ} (v : Fin m → ℤ) : Fin m → ℤ := v / r
+def gammaSetEquiv (γ : SL(2, ℤ)) : gammaSet N a ≃ gammaSet N (a ᵥ* γ) where
+  toFun v := ⟨v.1 ᵥ* γ, vecMul_SL2_mem_gammaSet v.2 γ⟩
+  invFun v := ⟨v.1 ᵥ* ↑(γ⁻¹), by
+      have := vecMul_SL2_mem_gammaSet v.2 γ⁻¹
+      rw [vecMul_vecMul, ← SpecialLinearGroup.coe_mul] at this
+      simpa only [SpecialLinearGroup.map_apply_coe, RingHom.mapMatrix_apply, Int.coe_castRingHom,
+        map_inv, mul_inv_cancel, SpecialLinearGroup.coe_one, vecMul_one]⟩
+  left_inv v := by simp_rw [vecMul_vecMul, ← SpecialLinearGroup.coe_mul, mul_inv_cancel,
+    SpecialLinearGroup.coe_one, vecMul_one]
+  right_inv v := by simp_rw [vecMul_vecMul, ← SpecialLinearGroup.coe_mul, inv_mul_cancel,
+    SpecialLinearGroup.coe_one, vecMul_one]
 
-lemma mem_gammaSet_one (v : Fin 2 → ℤ) : v ∈ gammaSet 1 1 0 ↔ IsCoprime (v 0) (v 1) := by
-  rw [gammaSet_one_mem_iff, Int.isCoprime_iff_gcd_eq_one]
+end gamma_action
 
-lemma gammaSet_div_gcd {r : ℕ} {v : Fin 2 → ℤ} (hv : v ∈ (gammaSet 1 r 0)) (i : Fin 2) :
-   (r : ℤ) ∣ v i := by
-  fin_cases i <;> simp [← hv.2, Int.gcd_dvd_left, Int.gcd_dvd_right]
+section eisSummand
 
--- DISSOLVED: gammaSet_div_gcd_to_gammaSet10_bijection
+def eisSummand (k : ℤ) (v : Fin 2 → ℤ) (z : ℍ) : ℂ := (v 0 * z.1 + v 1) ^ (-k)
 
-lemma gammaSet_eq_gcd_mul_divIntMap {r : ℕ} {v : Fin 2 → ℤ} (hv : v ∈ gammaSet 1 r 0) :
-    v = r • (divIntMap r v) := by
-  by_cases hr : r = 0
-  · have hv := hv.2
-    simp only [hr, Fin.isValue, Int.gcd_eq_zero_iff, CharP.cast_eq_zero, zero_smul] at *
-    ext i
-    fin_cases i <;> simp [hv]
-  · ext i
-    simp_all [Pi.smul_apply, divIntMap, ← Int.mul_ediv_assoc _ (gammaSet_div_gcd hv i)]
+theorem eisSummand_SL2_apply (k : ℤ) (i : (Fin 2 → ℤ)) (A : SL(2, ℤ)) (z : ℍ) :
+    eisSummand k i (A • z) = (z.denom A) ^ k * eisSummand k (i ᵥ* A) z := by
+  simp only [eisSummand, vecMul, vec2_dotProduct]
+  push_cast
+  have h (a b c d u v : ℂ) (hc : c * z + d ≠ 0) : (u * ((a * z + b) / (c * z + d)) + v) ^ (-k) =
+      (c * z + d) ^ k * ((u * a + v * c) * z + (u * b + v * d)) ^ (-k) := by
+    field_simp [hc]
+    ring_nf
+  apply h (hc := z.denom_ne_zero A)
 
--- DISSOLVED: gammaSetDivGcdEquiv
+end eisSummand
+
+variable (a)
+
+def _root_.eisensteinSeries (k : ℤ) (z : ℍ) : ℂ := ∑' x : gammaSet N a, eisSummand k x z
+
+lemma eisensteinSeries_slash_apply (k : ℤ) (γ : SL(2, ℤ)) :
+    eisensteinSeries a k ∣[k] γ = eisensteinSeries (a ᵥ* γ) k := by
+  ext1 z
+  simp_rw [SL_slash, slash_def, slash, ModularGroup.det_coe, ofReal_one, one_zpow, mul_one,
+    zpow_neg, mul_inv_eq_iff_eq_mul₀ (zpow_ne_zero _ <| z.denom_ne_zero _), mul_comm,
+    eisensteinSeries, ← ModularGroup.sl_moeb, eisSummand_SL2_apply, tsum_mul_left]
+  exact congr_arg (_ * ·) <| (gammaSetEquiv a γ).tsum_eq (eisSummand k · z)
+
+def eisensteinSeries_SIF (k : ℤ) : SlashInvariantForm (Gamma N) k where
+  toFun := eisensteinSeries a k
+  slash_action_eq' A hA := by simp only [eisensteinSeries_slash_apply, Gamma_mem'.mp hA,
+    SpecialLinearGroup.coe_one, vecMul_one]
+
+lemma eisensteinSeries_SIF_apply (k : ℤ) (z : ℍ) :
+    eisensteinSeries_SIF a k z = eisensteinSeries a k z := rfl
+
+end EisensteinSeries

@@ -3,6 +3,9 @@ Extracted from Order/Atoms/Finite.lean
 Genuine: 4 of 11 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
+import Mathlib.Data.Set.Finite.Lattice
+import Mathlib.Order.Interval.Finset.Defs
+import Mathlib.Order.Atoms
 
 /-!
 # Atoms, Coatoms, Simple Lattices, and Finiteness
@@ -10,8 +13,8 @@ import Origin.Core
 This module contains some results on atoms and simple lattices in the finite context.
 
 ## Main results
-* `Finite.to_isAtomic`, `Finite.to_isCoatomic`: Finite partial orders with bottom resp. top
-  are atomic resp. coatomic.
+  * `Finite.to_isAtomic`, `Finite.to_isCoatomic`: Finite partial orders with bottom resp. top
+    are atomic resp. coatomic.
 
 -/
 
@@ -23,11 +26,12 @@ variable [LE α] [BoundedOrder α] [IsSimpleOrder α]
 
 section DecidableEq
 
--- INSTANCE (free from Core): (priority
+instance (priority := 200) [DecidableEq α] : Fintype α :=
+  Fintype.ofEquiv Bool equivBool.symm
 
 end DecidableEq
 
--- INSTANCE (free from Core): (priority
+instance (priority := 200) : Finite α := by classical infer_instance
 
 end IsSimpleOrder
 
@@ -35,13 +39,13 @@ namespace Fintype
 
 namespace IsSimpleOrder
 
-open scoped _root_.IsSimpleOrder
-
 variable [LE α] [BoundedOrder α] [IsSimpleOrder α] [DecidableEq α]
 
 theorem univ : (Finset.univ : Finset α) = {⊤, ⊥} := by
-  ext
-  simpa using (eq_bot_or_eq_top _).symm
+  change Finset.map _ (Finset.univ : Finset Bool) = _
+  rw [Fintype.univ_bool]
+  simp only [Finset.map_insert, Function.Embedding.coeFn_mk, Finset.map_singleton]
+  rfl
 
 theorem card : Fintype.card α = 2 :=
   (Fintype.ofEquiv_card _).trans Fintype.card_bool
@@ -52,7 +56,11 @@ end Fintype
 
 namespace Bool
 
--- INSTANCE (free from Core): :
+instance : IsSimpleOrder Bool :=
+  ⟨fun a => by
+    rw [← Finset.mem_singleton, Or.comm, ← Finset.mem_insert, top_eq_true, bot_eq_false, ←
+      Fintype.univ_bool]
+    apply Finset.mem_univ⟩
 
 end Bool
 
@@ -60,9 +68,19 @@ section Fintype
 
 open Finset
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) Finite.to_isCoatomic [PartialOrder α] [OrderTop α] [Finite α] :
+    IsCoatomic α := by
+  refine IsCoatomic.mk fun b => or_iff_not_imp_left.2 fun ht => ?_
+  obtain ⟨c, hc, hmax⟩ :=
+    Set.Finite.exists_maximal_wrt id { x : α | b ≤ x ∧ x ≠ ⊤ } (Set.toFinite _) ⟨b, le_rfl, ht⟩
+  refine ⟨c, ⟨hc.2, fun y hcy => ?_⟩, hc.1⟩
+  by_contra hyt
+  obtain rfl : c = y := hmax y ⟨hc.1.trans hcy.le, hyt⟩ hcy.le
+  exact (lt_self_iff_false _).mp hcy
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) Finite.to_isAtomic [PartialOrder α] [OrderBot α] [Finite α] :
+    IsAtomic α :=
+  isCoatomic_dual_iff_isAtomic.mp Finite.to_isCoatomic
 
 end Fintype
 
@@ -70,9 +88,15 @@ section LocallyFinite
 
 variable [Preorder α] [LocallyFiniteOrder α]
 
--- INSTANCE (free from Core): :
+instance : IsStronglyAtomic α where
+  exists_covBy_le_of_lt a b hab := by
+    obtain ⟨x, hxmem, hx⟩ := (LocallyFiniteOrder.finsetIoc a b).exists_minimal
+      ⟨b, by simpa [LocallyFiniteOrder.finset_mem_Ioc]⟩
+    simp only [LocallyFiniteOrder.finset_mem_Ioc, and_imp] at hxmem hx
+    exact ⟨x, ⟨hxmem.1, fun c hac hcx ↦ hx _ hac (hcx.le.trans hxmem.2) hcx⟩, hxmem.2⟩
 
--- INSTANCE (free from Core): :
+instance : IsStronglyCoatomic α := by
+  rw [← isStronglyAtomic_dual_iff_is_stronglyCoatomic]; infer_instance
 
 end LocallyFinite
 

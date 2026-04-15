@@ -1,8 +1,11 @@
 /-
 Extracted from CategoryTheory/Sites/Limits.lean
-Genuine: 4 of 12 | Dissolved: 0 | Infrastructure: 8
+Genuine: 5 of 16 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Creates
+import Mathlib.CategoryTheory.Sites.Sheafification
+import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 
 /-!
 
@@ -44,6 +47,8 @@ section Limits
 
 noncomputable section
 
+section
+
 def multiforkEvaluationCone (F : K ⥤ Sheaf J D) (E : Cone (F ⋙ sheafToPresheaf J D)) (X : C)
     (W : J.Cover X) (S : Multifork (W.index E.pt)) :
     Cone (F ⋙ sheafToPresheaf J D ⋙ (evaluation Cᵒᵖ D).obj (op X)) where
@@ -65,14 +70,13 @@ def multiforkEvaluationCone (F : K ⥤ Sheaf J D) (E : Cone (F ⋙ sheafToPreshe
         rw [Category.id_comp]
         apply Presheaf.IsSheaf.hom_ext (F.obj j).2 W
         intro ii
-        rw [Presheaf.IsSheaf.amalgamate_map, Category.assoc, ← (F.map f).hom.naturality, ←
+        rw [Presheaf.IsSheaf.amalgamate_map, Category.assoc, ← (F.map f).val.naturality, ←
           Category.assoc, Presheaf.IsSheaf.amalgamate_map]
+        dsimp [Multifork.ofι]
         erw [Category.assoc, ← E.w f]
-        cat_disch }
+        aesop_cat }
 
 variable [HasLimitsOfShape K D]
-
-set_option backward.isDefEq.respectTransparency false in
 
 def isLimitMultiforkOfIsLimit (F : K ⥤ Sheaf J D) (E : Cone (F ⋙ sheafToPresheaf J D))
     (hE : IsLimit E) (X : C) (W : J.Cover X) : IsLimit (W.multifork E.pt) :=
@@ -90,7 +94,8 @@ def isLimitMultiforkOfIsLimit (F : K ⥤ Sheaf J D) (E : Cone (F ⋙ sheafToPres
       erw [(isLimitOfPreserves ((evaluation Cᵒᵖ D).obj (op X)) hE).fac
         (multiforkEvaluationCone F E X W S)]
       dsimp [multiforkEvaluationCone, Presheaf.isLimitOfIsSheaf]
-      rw [Presheaf.IsSheaf.amalgamate_map])
+      rw [Presheaf.IsSheaf.amalgamate_map]
+      rfl)
     (by
       intro S m hm
       apply (isLimitOfPreserves ((evaluation Cᵒᵖ D).obj (op X)) hE).hom_ext
@@ -100,7 +105,7 @@ def isLimitMultiforkOfIsLimit (F : K ⥤ Sheaf J D) (E : Cone (F ⋙ sheafToPres
       apply Presheaf.IsSheaf.hom_ext (F.obj k).2 W
       intro i
       dsimp only [multiforkEvaluationCone, Presheaf.isLimitOfIsSheaf]
-      rw [(F.obj k).property.amalgamate_map]
+      rw [(F.obj k).cond.amalgamate_map]
       dsimp [Multifork.ofι]
       change _ = S.ι i ≫ _
       erw [← hm, Category.assoc, ← (E.π.app k).naturality, Category.assoc]
@@ -112,27 +117,46 @@ theorem isSheaf_of_isLimit (F : K ⥤ Sheaf J D) (E : Cone (F ⋙ sheafToPreshea
   intro X S
   exact ⟨isLimitMultiforkOfIsLimit _ _ hE _ _⟩
 
--- INSTANCE (free from Core): :
+instance (F : K ⥤ Sheaf J D) : CreatesLimit F (sheafToPresheaf J D) :=
+  createsLimitOfReflectsIso fun E hE =>
+    { liftedCone := ⟨⟨E.pt, isSheaf_of_isLimit _ _ hE⟩,
+        ⟨fun _ => ⟨E.π.app _⟩, fun _ _ _ => Sheaf.Hom.ext <| E.π.naturality _⟩⟩
+      validLift := Cones.ext (eqToIso rfl) fun j => by
+        dsimp
+        simp
+      makesLimit :=
+        { lift := fun S => ⟨hE.lift ((sheafToPresheaf J D).mapCone S)⟩
+          fac := fun S j => by
+            ext1
+            apply hE.fac ((sheafToPresheaf J D).mapCone S) j
+          uniq := fun S m hm => by
+            ext1
+            exact hE.uniq ((sheafToPresheaf J D).mapCone S) m.val fun j =>
+              congr_arg Hom.val (hm j) } }
 
--- INSTANCE (free from Core): createsLimitsOfShape
+instance createsLimitsOfShape : CreatesLimitsOfShape K (sheafToPresheaf J D) where
 
--- INSTANCE (free from Core): :
+instance : HasLimitsOfShape K (Sheaf J D) :=
+  hasLimitsOfShape_of_hasLimitsOfShape_createsLimitsOfShape (sheafToPresheaf J D)
 
--- INSTANCE (free from Core): [HasFiniteProducts
+instance [HasFiniteProducts D] : HasFiniteProducts (Sheaf J D) :=
+  ⟨inferInstance⟩
 
--- INSTANCE (free from Core): [HasFiniteLimits
+instance [HasFiniteLimits D] : HasFiniteLimits (Sheaf J D) :=
+  ⟨fun _ ↦ inferInstance⟩
 
 end
 
--- INSTANCE (free from Core): createsLimits
+instance createsLimits [HasLimitsOfSize.{u₁, u₂} D] :
+    CreatesLimitsOfSize.{u₁, u₂} (sheafToPresheaf J D) :=
+  ⟨createsLimitsOfShape⟩
 
--- INSTANCE (free from Core): hasLimitsOfSize
+instance hasLimitsOfSize [HasLimitsOfSize.{u₁, u₂} D] : HasLimitsOfSize.{u₁, u₂} (Sheaf J D) :=
+  hasLimits_of_hasLimits_createsLimits (sheafToPresheaf J D)
 
--- INSTANCE (free from Core): [HasFiniteLimits
+variable {D : Type w} [Category.{max v u} D]
 
-example {D : Type w} [Category.{max v u} D] [HasLimits D] :
-
-    HasLimits (Sheaf J D) := inferInstance
+example [HasLimits D] : HasLimits (Sheaf J D) := inferInstance
 
 end
 
@@ -144,8 +168,34 @@ variable [HasWeakSheafify J D]
 
 noncomputable def sheafifyCocone {F : K ⥤ Sheaf J D}
     (E : Cocone (F ⋙ sheafToPresheaf J D)) : Cocone F :=
-  (Cocone.precompose
-    (Functor.isoWhiskerLeft F (asIso (sheafificationAdjunction J D).counit).symm).hom).obj
+  (Cocones.precompose
+    (isoWhiskerLeft F (asIso (sheafificationAdjunction J D).counit).symm).hom).obj
     ((presheafToSheaf J D).mapCocone E)
 
-set_option backward.isDefEq.respectTransparency false in
+noncomputable def isColimitSheafifyCocone {F : K ⥤ Sheaf J D}
+    (E : Cocone (F ⋙ sheafToPresheaf J D)) (hE : IsColimit E) : IsColimit (sheafifyCocone E) :=
+  (IsColimit.precomposeHomEquiv _ ((presheafToSheaf J D).mapCocone E)).symm
+    (isColimitOfPreserves _ hE)
+
+instance [HasColimitsOfShape K D] : HasColimitsOfShape K (Sheaf J D) :=
+  ⟨fun _ => HasColimit.mk
+    ⟨sheafifyCocone (colimit.cocone _), isColimitSheafifyCocone _ (colimit.isColimit _)⟩⟩
+
+instance [HasFiniteCoproducts D] : HasFiniteCoproducts (Sheaf J D) :=
+  ⟨inferInstance⟩
+
+instance [HasFiniteColimits D] : HasFiniteColimits (Sheaf J D) :=
+  ⟨fun _ ↦ inferInstance⟩
+
+instance [HasColimitsOfSize.{u₁, u₂} D] : HasColimitsOfSize.{u₁, u₂} (Sheaf J D) :=
+  ⟨inferInstance⟩
+
+variable {D : Type w} [Category.{max v u} D]
+
+example [HasLimits D] : HasLimits (Sheaf J D) := inferInstance
+
+end Colimits
+
+end Sheaf
+
+end CategoryTheory

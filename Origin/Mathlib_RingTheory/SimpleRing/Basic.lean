@@ -3,6 +3,8 @@ Extracted from RingTheory/SimpleRing/Basic.lean
 Genuine: 4 of 10 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.RingTheory.SimpleRing.Defs
+import Mathlib.RingTheory.TwoSidedIdeal.Kernel
 
 /-! # Basic Properties of Simple rings
 
@@ -11,14 +13,12 @@ A ring `R` is **simple** if it has only two two-sided ideals, namely `⊥` and `
 ## Main results
 
 - `IsSimpleRing.nontrivial`: simple rings are non-trivial.
-- `DivisionRing.isSimpleRing`: division rings are simple.
+- `DivisionRing.IsSimpleRing`: division rings are simple.
 - `RingHom.injective`: every ring homomorphism from a simple ring to a nontrivial ring is injective.
 - `IsSimpleRing.iff_injective_ringHom`: a ring is simple iff every ring homomorphism to a nontrivial
   ring is injective.
 
 -/
-
-assert_not_exists Finset
 
 variable (R : Type*) [NonUnitalNonAssocRing R]
 
@@ -26,7 +26,12 @@ namespace IsSimpleRing
 
 variable {R}
 
--- INSTANCE (free from Core): [IsSimpleRing
+instance [IsSimpleRing R] : IsSimpleOrder (TwoSidedIdeal R) := IsSimpleRing.simple
+
+instance [simple : IsSimpleRing R] : Nontrivial R := by
+  obtain ⟨x, hx⟩ := SetLike.exists_of_lt (bot_lt_top : (⊥ : TwoSidedIdeal R) < ⊤)
+  have h (hx : x = 0) : False := by simp_all [TwoSidedIdeal.zero_mem]
+  use x, 0, h
 
 lemma one_mem_of_ne_bot {A : Type*} [NonAssocRing A] [IsSimpleRing A] (I : TwoSidedIdeal A)
     (hI : I ≠ ⊥) : (1 : A) ∈ I :=
@@ -34,7 +39,24 @@ lemma one_mem_of_ne_bot {A : Type*} [NonAssocRing A] [IsSimpleRing A] (I : TwoSi
 
 -- DISSOLVED: one_mem_of_ne_zero_mem
 
--- INSTANCE (free from Core): _root_.DivisionRing.isSimpleRing
+lemma of_eq_bot_or_eq_top [Nontrivial R] (h : ∀ I : TwoSidedIdeal R, I = ⊥ ∨ I = ⊤) :
+    IsSimpleRing R where
+  simple := { eq_bot_or_eq_top := h }
+
+instance _root_.DivisionRing.isSimpleRing (A : Type*) [DivisionRing A] : IsSimpleRing A :=
+  .of_eq_bot_or_eq_top <| fun I ↦ by
+    rw [or_iff_not_imp_left, ← I.one_mem_iff]
+    intro H
+    obtain ⟨x, hx1, hx2 : x ≠ 0⟩ := SetLike.exists_of_lt (bot_lt_iff_ne_bot.mpr H : ⊥ < I)
+    simpa [inv_mul_cancel₀ hx2] using I.mul_mem_left x⁻¹ _ hx1
+
+lemma injective_ringHom_or_subsingleton_codomain
+    {R S : Type*} [NonAssocRing R] [IsSimpleRing R] [NonAssocSemiring S]
+    (f : R →+* S) : Function.Injective f ∨ Subsingleton S :=
+  simple.eq_bot_or_eq_top (TwoSidedIdeal.ker f) |>.imp (TwoSidedIdeal.ker_eq_bot _ |>.1)
+    (fun h => subsingleton_iff_zero_eq_one.1 <| by
+      have mem : 1 ∈ TwoSidedIdeal.ker f := h.symm ▸ TwoSidedIdeal.mem_top _
+      rwa [TwoSidedIdeal.mem_ker, map_one, eq_comm] at mem)
 
 protected theorem _root_.RingHom.injective
     {R S : Type*} [NonAssocRing R] [IsSimpleRing R] [NonAssocSemiring S] [Nontrivial S]
@@ -60,7 +82,5 @@ lemma iff_injective_ringHom (R : Type u) [NonAssocRing R] [Nontrivial R] :
   iff_injective_ringHom_or_subsingleton_codomain R |>.trans <|
     ⟨fun H _ _ _ f => H f |>.resolve_right (by simpa [not_subsingleton_iff_nontrivial]),
       fun H S _ f => subsingleton_or_nontrivial S |>.recOn Or.inr fun _ => Or.inl <| H f⟩
-
--- INSTANCE (free from Core): [IsSimpleRing
 
 end IsSimpleRing

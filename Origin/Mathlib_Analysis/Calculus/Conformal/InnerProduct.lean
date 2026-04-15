@@ -3,6 +3,8 @@ Extracted from Analysis/Calculus/Conformal/InnerProduct.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Conformal.NormedSpace
+import Mathlib.Analysis.InnerProductSpace.ConformalLinearMap
 
 /-!
 # Conformal maps between inner product spaces

@@ -1,8 +1,9 @@
 /-
 Extracted from Algebra/Module/Submodule/EqLocus.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 of 9 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Submodule.Ker
 
 /-!
 # The submodule of elements `x : M` such that `f x = g x`
@@ -36,6 +37,8 @@ open Submodule
 
 variable {τ₁₂ : R →+* R₂}
 
+section
+
 variable {F : Type*} [FunLike F M M₂] [SemilinearMapClass F τ₁₂ M M₂]
 
 def eqLocus (f g : F) : Submodule R M :=
@@ -44,3 +47,56 @@ def eqLocus (f g : F) : Submodule R M :=
     smul_mem' := fun {r} {x} (hx : _ = _) => show _ = _ by
       -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 changed `map_smulₛₗ` into `map_smulₛₗ _`
       simpa only [map_smulₛₗ _] using congr_arg (τ₁₂ r • ·) hx }
+
+@[simp]
+theorem mem_eqLocus {x : M} {f g : F} : x ∈ eqLocus f g ↔ f x = g x :=
+  Iff.rfl
+
+theorem eqLocus_toAddSubmonoid (f g : F) :
+    (eqLocus f g).toAddSubmonoid = (f : M →+ M₂).eqLocusM g :=
+  rfl
+
+@[simp]
+theorem eqLocus_eq_top {f g : F} : eqLocus f g = ⊤ ↔ f = g := by
+  simp [SetLike.ext_iff, DFunLike.ext_iff]
+
+@[simp]
+theorem eqLocus_same (f : F) : eqLocus f f = ⊤ := eqLocus_eq_top.2 rfl
+
+theorem le_eqLocus {f g : F} {S : Submodule R M} : S ≤ eqLocus f g ↔ Set.EqOn f g S := Iff.rfl
+
+include τ₁₂ in
+
+theorem eqOn_sup {f g : F} {S T : Submodule R M} (hS : Set.EqOn f g S) (hT : Set.EqOn f g T) :
+    Set.EqOn f g ↑(S ⊔ T) := by
+  rw [← le_eqLocus] at hS hT ⊢
+  exact sup_le hS hT
+
+include τ₁₂ in
+
+theorem ext_on_codisjoint {f g : F} {S T : Submodule R M} (hST : Codisjoint S T)
+    (hS : Set.EqOn f g S) (hT : Set.EqOn f g T) : f = g :=
+  DFunLike.ext _ _ fun _ ↦ eqOn_sup hS hT <| hST.eq_top.symm ▸ trivial
+
+end
+
+end AddCommMonoid
+
+section Ring
+
+variable [Ring R] [Ring R₂]
+
+variable [AddCommGroup M] [AddCommGroup M₂]
+
+variable [Module R M] [Module R₂ M₂]
+
+variable {τ₁₂ : R →+* R₂}
+
+open Submodule
+
+theorem eqLocus_eq_ker_sub (f g : M →ₛₗ[τ₁₂] M₂) : eqLocus f g = ker (f - g) :=
+  SetLike.ext fun _ => sub_eq_zero.symm
+
+end Ring
+
+end LinearMap

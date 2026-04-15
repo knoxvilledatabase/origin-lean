@@ -3,6 +3,10 @@ Extracted from Logic/Lemmas.lean
 Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Logic.Basic
+import Mathlib.Tactic.Convert
+import Mathlib.Tactic.SplitIfs
+import Mathlib.Tactic.Tauto
 
 /-!
 # More basic logic properties

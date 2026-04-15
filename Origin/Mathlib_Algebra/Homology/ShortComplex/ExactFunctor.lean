@@ -1,8 +1,13 @@
 /-
 Extracted from Algebra/Homology/ShortComplex/ExactFunctor.lean
-Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
+Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.ShortComplex.PreservesHomology
+import Mathlib.Algebra.Homology.ShortComplex.ShortExact
+import Mathlib.Algebra.Homology.ShortComplex.Abelian
+import Mathlib.CategoryTheory.Preadditive.LeftExact
+import Mathlib.CategoryTheory.Abelian.Exact
 
 /-!
 # Exact functors
@@ -23,23 +28,23 @@ If we further assume that `C` and `D` are abelian categories, then we have:
 
 - `Functor.preservesFiniteLimits_tfae`: the following are equivalent:
   1. for every short exact sequence `0 ⟶ A ⟶ B ⟶ C ⟶ 0`,
-     `0 ⟶ F(A) ⟶ F(B) ⟶ F(C) ⟶ 0` is exact.
+    `0 ⟶ F(A) ⟶ F(B) ⟶ F(C) ⟶ 0` is exact.
   2. for every exact sequence `A ⟶ B ⟶ C` where `A ⟶ B` is mono,
-     `F(A) ⟶ F(B) ⟶ F(C)` is exact and `F(A) ⟶ F(B)` is mono.
+    `F(A) ⟶ F(B) ⟶ F(C)` is exact and `F(A) ⟶ F(B)` is mono.
   3. `F` preserves kernels.
   4. `F` preserves finite limits.
 
 - `Functor.preservesFiniteColimits_tfae`: the following are equivalent:
   1. for every short exact sequence `0 ⟶ A ⟶ B ⟶ C ⟶ 0`,
-     `F(A) ⟶ F(B) ⟶ F(C) ⟶ 0` is exact.
+    `F(A) ⟶ F(B) ⟶ F(C) ⟶ 0` is exact.
   2. for every exact sequence `A ⟶ B ⟶ C` where `B ⟶ C` is epi,
-     `F(A) ⟶ F(B) ⟶ F(C)` is exact and `F(B) ⟶ F(C)` is epi.
+    `F(A) ⟶ F(B) ⟶ F(C)` is exact and `F(B) ⟶ F(C)` is epi.
   3. `F` preserves cokernels.
   4. `F` preserves finite colimits.
 
 - `Functor.exact_tfae`: the following are equivalent:
   1. for every short exact sequence `0 ⟶ A ⟶ B ⟶ C ⟶ 0`,
-     `0 ⟶ F(A) ⟶ F(B) ⟶ F(C) ⟶ 0` is exact.
+    `0 ⟶ F(A) ⟶ F(B) ⟶ F(C) ⟶ 0` is exact.
   2. for every exact sequence `A ⟶ B ⟶ C`, `F(A) ⟶ F(B) ⟶ F(C)` is exact.
   3. `F` preserves homology.
   4. `F` preserves both finite limits and finite colimits.
@@ -52,7 +57,9 @@ open Limits ZeroObject ShortComplex
 
 namespace Functor
 
-variable {C D : Type*} [Category* C] [Category* D] [Preadditive C] [Preadditive D]
+section
+
+variable {C D : Type*} [Category C] [Category D] [Preadditive C] [Preadditive D]
   (F : C ⥤ D) [F.Additive] [F.PreservesHomology] [HasZeroObject C]
 
 lemma preservesFiniteLimits_of_preservesHomology
@@ -75,11 +82,16 @@ lemma preservesFiniteColimits_of_preservesHomology
 
 end
 
-variable {C D : Type*} [Category* C] [Category* D] [Abelian C] [Abelian D]
+section
+
+variable {C D : Type*} [Category C] [Category D] [Abelian C] [Abelian D]
 
 variable (F : C ⥤ D) [F.Additive]
 
-set_option backward.isDefEq.respectTransparency false in
+lemma preservesMonomorphisms_of_preserves_shortExact_left
+    (h : ∀ (S : ShortComplex C), S.ShortExact → (S.map F).Exact ∧ Mono (F.map S.f)) :
+    F.PreservesMonomorphisms where
+  preserves f := h _ { exact := exact_cokernel f } |>.2
 
 lemma preservesFiniteLimits_tfae : List.TFAE
     [
@@ -100,6 +112,7 @@ lemma preservesFiniteLimits_tfae : List.TFAE
         comm₂₃ := show 𝟙 _ ≫ F.map _ = F.map (cokernel.π _) ≫ _ by
           rw [Category.id_comp, ← F.map_comp, cokernel.π_desc] }
     exact (exact_iff_of_epi_of_isIso_of_mono φ).1 (hF T ⟨(S.exact_iff_exact_coimage_π).1 hS⟩).1
+
   tfae_have 2 → 3
   | hF, X, Y, f => by
     refine preservesLimit_of_preserves_limit_cone (kernelIsKernel f) ?_
@@ -108,20 +121,21 @@ lemma preservesFiniteLimits_tfae : List.TFAE
     let hS := hF S ⟨exact_kernel f, inferInstance⟩
     have : Mono (S.map F).f := hS.2
     exact hS.1.fIsKernel
+
   tfae_have 3 → 4
   | hF => by
     exact preservesFiniteLimits_of_preservesKernels F
+
   tfae_have 4 → 1
   | ⟨_⟩, S, hS =>
     (S.map F).exact_and_mono_f_iff_f_is_kernel |>.2 ⟨KernelFork.mapIsLimit _ hS.fIsKernel F⟩
+
   tfae_finish
 
-lemma preservesFiniteLimits_iff_forall_exact_map_and_mono :
-    PreservesFiniteLimits F ↔
-      ∀ (S : ShortComplex C), S.ShortExact → (S.map F).Exact ∧ Mono (F.map S.f) :=
-  (Functor.preservesFiniteLimits_tfae F).out 3 0
-
-set_option backward.isDefEq.respectTransparency false in
+lemma preservesEpimorphisms_of_preserves_shortExact_right
+    (h : ∀ (S : ShortComplex C), S.ShortExact → (S.map F).Exact ∧ Epi (F.map S.g)) :
+    F.PreservesEpimorphisms where
+  preserves f := h _ { exact := exact_kernel f } |>.2
 
 lemma preservesFiniteColimits_tfae : List.TFAE
     [
@@ -142,6 +156,7 @@ lemma preservesFiniteColimits_tfae : List.TFAE
         comm₁₂ := show _ ≫ F.map (kernel.ι _) = F.map _ ≫ 𝟙 _ by
           rw [← F.map_comp, Abelian.image.fac, Category.comp_id] }
     exact (exact_iff_of_epi_of_isIso_of_mono φ).2 (hF T ⟨(S.exact_iff_exact_image_ι).1 hS⟩).1
+
   tfae_have 2 → 3
   | hF, X, Y, f => by
     refine preservesColimit_of_preserves_colimit_cocone (cokernelIsCokernel f) ?_
@@ -150,15 +165,16 @@ lemma preservesFiniteColimits_tfae : List.TFAE
     let hS := hF S ⟨exact_cokernel f, inferInstance⟩
     have : Epi (S.map F).g := hS.2
     exact hS.1.gIsCokernel
+
   tfae_have 3 → 4
   | hF => by
     exact preservesFiniteColimits_of_preservesCokernels F
+
   tfae_have 4 → 1
   | ⟨_⟩, S, hS => (S.map F).exact_and_epi_g_iff_g_is_cokernel |>.2
     ⟨CokernelCofork.mapIsColimit _ hS.gIsCokernel F⟩
-  tfae_finish
 
-set_option backward.isDefEq.respectTransparency false in
+  tfae_finish
 
 lemma exact_tfae : List.TFAE
     [
@@ -176,6 +192,7 @@ lemma exact_tfae : List.TFAE
     · have h := (preservesFiniteColimits_tfae F |>.out 0 2 |>.1 fun S hS ↦
         And.intro (hF S hS).exact (hF S hS).epi_g)
       exact h f
+
   tfae_have 2 → 1
   | hF, S, hS => by
     have : Mono (S.map F).f := exact_iff_mono _ (by simp) |>.1 <|
@@ -183,17 +200,15 @@ lemma exact_tfae : List.TFAE
     have : Epi (S.map F).g := exact_iff_epi _ (by simp) |>.1 <|
       hF (.mk S.g (0 : S.X₃ ⟶ 0) <| by simp) (exact_iff_epi _ (by simp) |>.2 hS.epi_g)
     exact ⟨hF S hS.exact⟩
+
   tfae_have 3 → 4
   | h => ⟨preservesFiniteLimits_of_preservesHomology F,
       preservesFiniteColimits_of_preservesHomology F⟩
+
   tfae_have 4 → 2
   | ⟨h1, h2⟩, _, h => h.map F
-  tfae_finish
 
-lemma preservesFiniteColimits_iff_forall_exact_map_and_epi :
-    PreservesFiniteColimits F ↔
-      ∀ (S : ShortComplex C), S.ShortExact → (S.map F).Exact ∧ Epi (F.map S.g) :=
-  (Functor.preservesFiniteColimits_tfae F).out 3 0
+  tfae_finish
 
 end
 

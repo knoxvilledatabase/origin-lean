@@ -1,8 +1,11 @@
 /-
 Extracted from Logic/Hydra.lean
-Genuine: 20 of 21 | Dissolved: 0 | Infrastructure: 1
+Genuine: 18 of 18 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Finsupp.Lex
+import Mathlib.Data.Finsupp.Multiset
+import Mathlib.Order.GameAdd
 
 /-!
 # Termination of a hydra game
@@ -38,7 +41,7 @@ def CutExpand (r : α → α → Prop) (s' s : Multiset α) : Prop :=
 
 variable {r : α → α → Prop}
 
-theorem cutExpand_le_invImage_lex [DecidableEq α] [Std.Irrefl r] :
+theorem cutExpand_le_invImage_lex [DecidableEq α] [IsIrrefl α r] :
     CutExpand r ≤ InvImage (Finsupp.Lex (rᶜ ⊓ (· ≠ ·)) (· < ·)) toFinsupp := by
   rintro s t ⟨u, a, hr, he⟩
   replace hr := fun a' ↦ mt (hr a')
@@ -64,15 +67,7 @@ theorem cutExpand_add_left {t u} (s) : CutExpand r (s + t) (s + u) ↔ CutExpand
 lemma cutExpand_add_right {s' s} (t) : CutExpand r (s' + t) (s + t) ↔ CutExpand r s' s := by
   convert cutExpand_add_left t using 2 <;> apply add_comm
 
-theorem cutExpand_add_single {a' a : α} (s : Multiset α) (h : r a' a) :
-    CutExpand r (s + {a'}) (s + {a}) :=
-  (cutExpand_add_left s).2 <| cutExpand_singleton_singleton h
-
-theorem cutExpand_single_add {a' a : α} (h : r a' a) (s : Multiset α) :
-    CutExpand r ({a'} + s) ({a} + s) :=
-  (cutExpand_add_right s).2 <| cutExpand_singleton_singleton h
-
-theorem cutExpand_iff [DecidableEq α] [Std.Irrefl r] {s' s : Multiset α} :
+theorem cutExpand_iff [DecidableEq α] [IsIrrefl α r] {s' s : Multiset α} :
     CutExpand r s' s ↔
       ∃ (t : Multiset α) (a : α), (∀ a' ∈ t, r a' a) ∧ a ∈ s ∧ s' = s.erase a + t := by
   simp_rw [CutExpand, add_singleton_eq_iff]
@@ -83,7 +78,7 @@ theorem cutExpand_iff [DecidableEq α] [Std.Irrefl r] {s' s : Multiset α} :
   · rintro ⟨ht, h, rfl⟩
     exact ⟨ht, mem_add.2 (Or.inl h), (erase_add_left_pos t h).symm⟩
 
-theorem not_cutExpand_zero [Std.Irrefl r] (s) : ¬CutExpand r s 0 := by
+theorem not_cutExpand_zero [IsIrrefl α r] (s) : ¬CutExpand r s 0 := by
   classical
   rw [cutExpand_iff]
   rintro ⟨_, _, _, ⟨⟩, _⟩
@@ -104,13 +99,14 @@ theorem cutExpand_fibration (r : α → α → Prop) :
     · rw [add_comm, singleton_add, cons_erase h]
     · rw [add_assoc, erase_add_right_pos _ h]
 
-lemma cutExpand_closed [Std.Irrefl r] (p : α → Prop)
-    (h : ∀ {a' a}, r a' a → p a → p a') {s' s : Multiset α} :
-    CutExpand r s' s → (∀ a ∈ s, p a) → ∀ a ∈ s', p a := by
+lemma cutExpand_closed [IsIrrefl α r] (p : α → Prop)
+    (h : ∀ {a' a}, r a' a → p a → p a') :
+    ∀ {s' s}, CutExpand r s' s → (∀ a ∈ s, p a) → ∀ a ∈ s', p a := by
+  intros s' s
   classical
   rw [cutExpand_iff]
   rintro ⟨t, a, hr, ha, rfl⟩ hsp a' h'
-  obtain (h' | h') := mem_add.1 h'
+  obtain (h'|h') := mem_add.1 h'
   exacts [hsp a' (mem_of_mem_erase h'), h (hr a' h') (hsp a ha)]
 
 lemma cutExpand_double {a a₁ a₂} (h₁ : r a₁ a) (h₂ : r a₂ a) : CutExpand r {a₁, a₂} {a} :=
@@ -128,7 +124,7 @@ lemma cutExpand_double_left {a a₁ a₂ b} (h₁ : r a₁ a) (h₂ : r a₂ a) 
     CutExpand r {a₁, a₂, b} {a, b} :=
   (cutExpand_add_right {b}).2 (cutExpand_double h₁ h₂)
 
-theorem acc_of_singleton [Std.Irrefl r] {s : Multiset α} (hs : ∀ a ∈ s, Acc (CutExpand r) {a}) :
+theorem acc_of_singleton [IsIrrefl α r] {s : Multiset α} (hs : ∀ a ∈ s, Acc (CutExpand r) {a}) :
     Acc (CutExpand r) s := by
   induction s using Multiset.induction with
   | empty => exact Acc.intro 0 fun s h ↦ (not_cutExpand_zero s h).elim
@@ -137,8 +133,8 @@ theorem acc_of_singleton [Std.Irrefl r] {s : Multiset α} (hs : ∀ a ∈ s, Acc
     rw [forall_mem_cons] at hs
     exact (hs.1.prod_gameAdd <| ihs fun a ha ↦ hs.2 a ha).of_fibration _ (cutExpand_fibration r)
 
-theorem _root_.Acc.cutExpand [Std.Irrefl r] {a : α} (hacc : Acc r a) : Acc (CutExpand r) {a} := by
-  induction hacc with | _ a h ih
+theorem _root_.Acc.cutExpand [IsIrrefl α r] {a : α} (hacc : Acc r a) : Acc (CutExpand r) {a} := by
+  induction' hacc with a h ih
   refine Acc.intro _ fun s ↦ ?_
   classical
   simp only [cutExpand_iff, mem_singleton]
@@ -148,8 +144,6 @@ theorem _root_.Acc.cutExpand [Std.Irrefl r] {a : α} (hacc : Acc r a) : Acc (Cut
   exact ih a' ∘ hr a'
 
 theorem _root_.WellFounded.cutExpand (hr : WellFounded r) : WellFounded (CutExpand r) :=
-  ⟨have := hr.irrefl; fun _ ↦ acc_of_singleton fun a _ ↦ (hr.apply a).cutExpand⟩
-
--- INSTANCE (free from Core): [h
+  ⟨have := hr.isIrrefl; fun _ ↦ acc_of_singleton fun a _ ↦ (hr.apply a).cutExpand⟩
 
 end Relation

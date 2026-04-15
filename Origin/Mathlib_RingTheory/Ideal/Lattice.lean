@@ -1,8 +1,11 @@
 /-
 Extracted from RingTheory/Ideal/Lattice.lean
-Genuine: 11 of 16 | Dissolved: 0 | Infrastructure: 5
+Genuine: 11 of 13 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Submodule.Lattice
+import Mathlib.RingTheory.Ideal.Defs
+import Mathlib.Tactic.Ring
 
 /-!
 # The lattice of ideals in a ring
@@ -28,18 +31,16 @@ namespace Ideal
 
 variable [Semiring α] (I : Ideal α) {a b : α}
 
--- INSTANCE (free from Core): (priority
-
--- INSTANCE (free from Core): (priority
-
--- INSTANCE (free from Core): (priority
-
 theorem eq_top_of_unit_mem (x y : α) (hx : x ∈ I) (h : y * x = 1) : I = ⊤ :=
   eq_top_iff.2 fun z _ =>
     calc
       z * y * x ∈ I := I.mul_mem_left _ hx
       _ = z * (y * x) := mul_assoc z y x
       _ = z := by rw [h, mul_one]
+
+theorem eq_top_of_isUnit_mem {x} (hx : x ∈ I) (h : IsUnit x) : I = ⊤ :=
+  let ⟨y, hy⟩ := h.exists_left_inv
+  eq_top_of_unit_mem I x y hx hy
 
 theorem eq_top_iff_one : I = ⊤ ↔ (1 : α) ∈ I :=
   ⟨by rintro rfl; trivial, fun h => eq_top_of_unit_mem _ _ 1 h (by simp)⟩
@@ -67,9 +68,15 @@ theorem mem_sSup_of_mem {S : Set (Ideal R)} {s : Ideal R} (hs : s ∈ S) :
 theorem mem_sInf {s : Set (Ideal R)} {x : R} : x ∈ sInf s ↔ ∀ ⦃I⦄, I ∈ s → x ∈ I :=
   ⟨fun hx I his => hx I ⟨I, iInf_pos his⟩, fun H _I ⟨_J, hij⟩ => hij ▸ fun _S ⟨hj, hS⟩ => hS ▸ H hj⟩
 
+@[simp 1001] -- Porting note: increased priority to appease `simpNF`
+theorem mem_inf {I J : Ideal R} {x : R} : x ∈ I ⊓ J ↔ x ∈ I ∧ x ∈ J :=
+  Iff.rfl
+
+@[simp 1001] -- Porting note: increased priority to appease `simpNF`
 theorem mem_iInf {ι : Sort*} {I : ι → Ideal R} {x : R} : x ∈ iInf I ↔ ∀ i, x ∈ I i :=
   Submodule.mem_iInf _
 
+@[simp 1001] -- Porting note: increased priority to appease `simpNF`
 theorem mem_bot {x : R} : x ∈ (⊥ : Ideal R) ↔ x = 0 :=
   Submodule.mem_bot _
 

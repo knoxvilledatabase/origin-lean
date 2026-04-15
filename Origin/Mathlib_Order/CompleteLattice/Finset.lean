@@ -1,19 +1,18 @@
 /-
 Extracted from Order/CompleteLattice/Finset.lean
-Genuine: 24 of 31 | Dissolved: 0 | Infrastructure: 7
+Genuine: 37 of 44 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Option
+import Mathlib.Data.Set.Lattice
 
 /-!
 # Lattice operations on finsets
 
 This file is concerned with how big lattice or set operations behave when indexed by a finset.
 
-See also `Mathlib/Data/Finset/Lattice/Fold.lean`, which is concerned with folding binary lattice
-operations over a finset.
+See also Lattice.lean, which is concerned with folding binary lattice operations over a finset.
 -/
-
-assert_not_exists IsOrderedMonoid MonoidWithZero
 
 open Function Multiset OrderDual
 
@@ -60,13 +59,6 @@ theorem iInter_eq_iInter_finset' (s : ι' → Set α) :
     ⋂ i, s i = ⋂ t : Finset (PLift ι'), ⋂ i ∈ t, s (PLift.down i) :=
   iInf_eq_iInf_finset' s
 
-theorem iUnion_finset_eq_set (s : Set ι) :
-    ⋃ s' : Finset s, Subtype.val '' (s' : Set s) = s := by
-  ext x
-  simp only [Set.mem_iUnion, Set.mem_image, SetLike.mem_coe, Subtype.exists,
-    exists_and_right, exists_eq_right]
-  exact ⟨fun ⟨_, hx, _⟩ ↦ hx, fun hx ↦ ⟨{⟨x, hx⟩}, hx, by simp⟩⟩
-
 end Set
 
 namespace Finset
@@ -93,7 +85,20 @@ end minimal
 
 section Lattice
 
+theorem iSup_coe [SupSet β] (f : α → β) (s : Finset α) : ⨆ x ∈ (↑s : Set α), f x = ⨆ x ∈ s, f x :=
+  rfl
+
+theorem iInf_coe [InfSet β] (f : α → β) (s : Finset α) : ⨅ x ∈ (↑s : Set α), f x = ⨅ x ∈ s, f x :=
+  rfl
+
 variable [CompleteLattice β]
+
+theorem iSup_singleton (a : α) (s : α → β) : ⨆ x ∈ ({a} : Finset α), s x = s a := by simp
+
+theorem iInf_singleton (a : α) (s : α → β) : ⨅ x ∈ ({a} : Finset α), s x = s a := by simp
+
+theorem iSup_option_toFinset (o : Option α) (f : α → β) : ⨆ x ∈ o.toFinset, f x = ⨆ x ∈ o, f x := by
+  simp
 
 theorem iInf_option_toFinset (o : Option α) (f : α → β) : ⨅ x ∈ o.toFinset, f x = ⨅ x ∈ o, f x :=
   @iSup_option_toFinset _ βᵒᵈ _ _ _
@@ -124,8 +129,8 @@ theorem iInf_finset_image {f : γ → α} {g : α → β} {s : Finset γ} :
 
 theorem iSup_insert_update {x : α} {t : Finset α} (f : α → β) {s : β} (hx : x ∉ t) :
     ⨆ i ∈ insert x t, Function.update f x s i = s ⊔ ⨆ i ∈ t, f i := by
-  simp only [Finset.iSup_insert, update_self]
-  rcongr (i hi); apply update_of_ne; rintro rfl; exact hx hi
+  simp only [Finset.iSup_insert, update_same]
+  rcongr (i hi); apply update_noteq; rintro rfl; exact hx hi
 
 theorem iInf_insert_update {x : α} {t : Finset α} (f : α → β) {s : β} (hx : x ∉ t) :
     ⨅ i ∈ insert x t, update f x s i = s ⊓ ⨅ i ∈ t, f i :=
@@ -140,8 +145,75 @@ theorem iInf_biUnion (s : Finset γ) (t : γ → Finset α) (f : α → β) :
 
 end Lattice
 
+theorem set_biUnion_coe (s : Finset α) (t : α → Set β) : ⋃ x ∈ (↑s : Set α), t x = ⋃ x ∈ s, t x :=
+  rfl
+
+theorem set_biInter_coe (s : Finset α) (t : α → Set β) : ⋂ x ∈ (↑s : Set α), t x = ⋂ x ∈ s, t x :=
+  rfl
+
 theorem set_biUnion_singleton (a : α) (s : α → Set β) : ⋃ x ∈ ({a} : Finset α), s x = s a :=
   iSup_singleton a s
 
 theorem set_biInter_singleton (a : α) (s : α → Set β) : ⋂ x ∈ ({a} : Finset α), s x = s a :=
   iInf_singleton a s
+
+@[simp]
+theorem set_biUnion_preimage_singleton (f : α → β) (s : Finset β) :
+    ⋃ y ∈ s, f ⁻¹' {y} = f ⁻¹' s :=
+  Set.biUnion_preimage_singleton f s
+
+theorem set_biUnion_option_toFinset (o : Option α) (f : α → Set β) :
+    ⋃ x ∈ o.toFinset, f x = ⋃ x ∈ o, f x :=
+  iSup_option_toFinset o f
+
+theorem set_biInter_option_toFinset (o : Option α) (f : α → Set β) :
+    ⋂ x ∈ o.toFinset, f x = ⋂ x ∈ o, f x :=
+  iInf_option_toFinset o f
+
+theorem subset_set_biUnion_of_mem {s : Finset α} {f : α → Set β} {x : α} (h : x ∈ s) :
+    f x ⊆ ⋃ y ∈ s, f y :=
+  show f x ≤ ⨆ y ∈ s, f y from le_iSup_of_le x <| by simp only [h, iSup_pos, le_refl]
+
+variable [DecidableEq α]
+
+theorem set_biUnion_union (s t : Finset α) (u : α → Set β) :
+    ⋃ x ∈ s ∪ t, u x = (⋃ x ∈ s, u x) ∪ ⋃ x ∈ t, u x :=
+  iSup_union
+
+theorem set_biInter_inter (s t : Finset α) (u : α → Set β) :
+    ⋂ x ∈ s ∪ t, u x = (⋂ x ∈ s, u x) ∩ ⋂ x ∈ t, u x :=
+  iInf_union
+
+theorem set_biUnion_insert (a : α) (s : Finset α) (t : α → Set β) :
+    ⋃ x ∈ insert a s, t x = t a ∪ ⋃ x ∈ s, t x :=
+  iSup_insert a s t
+
+theorem set_biInter_insert (a : α) (s : Finset α) (t : α → Set β) :
+    ⋂ x ∈ insert a s, t x = t a ∩ ⋂ x ∈ s, t x :=
+  iInf_insert a s t
+
+theorem set_biUnion_finset_image {f : γ → α} {g : α → Set β} {s : Finset γ} :
+    ⋃ x ∈ s.image f, g x = ⋃ y ∈ s, g (f y) :=
+  iSup_finset_image
+
+theorem set_biInter_finset_image {f : γ → α} {g : α → Set β} {s : Finset γ} :
+    ⋂ x ∈ s.image f, g x = ⋂ y ∈ s, g (f y) :=
+  iInf_finset_image
+
+theorem set_biUnion_insert_update {x : α} {t : Finset α} (f : α → Set β) {s : Set β} (hx : x ∉ t) :
+    ⋃ i ∈ insert x t, @update _ _ _ f x s i = s ∪ ⋃ i ∈ t, f i :=
+  iSup_insert_update f hx
+
+theorem set_biInter_insert_update {x : α} {t : Finset α} (f : α → Set β) {s : Set β} (hx : x ∉ t) :
+    ⋂ i ∈ insert x t, @update _ _ _ f x s i = s ∩ ⋂ i ∈ t, f i :=
+  iInf_insert_update f hx
+
+theorem set_biUnion_biUnion (s : Finset γ) (t : γ → Finset α) (f : α → Set β) :
+    ⋃ y ∈ s.biUnion t, f y = ⋃ (x ∈ s) (y ∈ t x), f y :=
+  iSup_biUnion s t f
+
+theorem set_biInter_biUnion (s : Finset γ) (t : γ → Finset α) (f : α → Set β) :
+    ⋂ y ∈ s.biUnion t, f y = ⋂ (x ∈ s) (y ∈ t x), f y :=
+  iInf_biUnion s t f
+
+end Finset

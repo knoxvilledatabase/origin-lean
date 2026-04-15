@@ -1,8 +1,11 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Triangularizable.lean
-Genuine: 6 of 7 | Dissolved: 0 | Infrastructure: 1
+Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.FieldTheory.IsAlgClosed.Spectrum
+import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 
 /-!
 # Triangularizable linear endomorphisms
@@ -11,17 +14,17 @@ This file contains basic results relevant to the triangularizability of linear e
 
 ## Main definitions / results
 
-* `Module.End.exists_eigenvalue`: in finite dimensions, over an algebraically closed field, every
-  linear endomorphism has an eigenvalue.
-* `Module.End.iSup_genEigenspace_eq_top`: in finite dimensions, over an algebraically
-  closed field, the generalized eigenspaces of any linear endomorphism span the whole space.
-* `Module.End.iSup_genEigenspace_restrict_eq_top`: in finite dimensions, if the
-  generalized eigenspaces of a linear endomorphism span the whole space then the same is true of
-  its restriction to any invariant submodule.
+ * `Module.End.exists_eigenvalue`: in finite dimensions, over an algebraically closed field, every
+   linear endomorphism has an eigenvalue.
+ * `Module.End.iSup_genEigenspace_eq_top`: in finite dimensions, over an algebraically
+   closed field, the generalized eigenspaces of any linear endomorphism span the whole space.
+ * `Module.End.iSup_genEigenspace_restrict_eq_top`: in finite dimensions, if the
+   generalized eigenspaces of a linear endomorphism span the whole space then the same is true of
+   its restriction to any invariant submodule.
 
 ## References
 
-* [Sheldon Axler, *Linear Algebra Done Right*][axler2024]
+* [Sheldon Axler, *Linear Algebra Done Right*][axler2015]
 * https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
 
 ## TODO
@@ -38,7 +41,7 @@ eigenspace, eigenvector, eigenvalue, eigen
 open Set Function Module Module
 
 variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-  {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+   {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
 
 namespace Module.End
 
@@ -50,20 +53,26 @@ theorem exists_hasEigenvalue_of_genEigenspace_eq_top [Nontrivial M] {f : End R M
     exact HasUnifEigenvalue.lt zero_lt_one hμ
   simp [HasUnifEigenvalue, ← not_forall, ← iSup_eq_bot, hf]
 
+theorem exists_hasEigenvalue_of_iSup_genEigenspace_eq_top [Nontrivial M] {f : End R M}
+    (hf : ⨆ μ, ⨆ k : ℕ, f.genEigenspace μ k = ⊤) :
+    ∃ μ, f.HasEigenvalue μ := by
+  simp_rw [iSup_genEigenspace_eq] at hf
+  apply exists_hasEigenvalue_of_genEigenspace_eq_top _ hf
+
 theorem exists_eigenvalue [IsAlgClosed K] [FiniteDimensional K V] [Nontrivial V] (f : End K V) :
     ∃ c : K, f.HasEigenvalue c := by
   simp_rw [hasEigenvalue_iff_mem_spectrum]
   exact spectrum.nonempty_of_isAlgClosed_of_finiteDimensional K f
 
--- INSTANCE (free from Core): [IsAlgClosed
+noncomputable instance [IsAlgClosed K] [FiniteDimensional K V] [Nontrivial V] (f : End K V) :
+    Inhabited f.Eigenvalues :=
+  ⟨⟨f.exists_eigenvalue.choose, f.exists_eigenvalue.choose_spec⟩⟩
 
 theorem iSup_maxGenEigenspace_eq_top [IsAlgClosed K] [FiniteDimensional K V] (f : End K V) :
     ⨆ (μ : K), f.maxGenEigenspace μ = ⊤ := by
   -- We prove the claim by strong induction on the dimension of the vector space.
-  suffices ∀ n, finrank K V = n → ⨆ (μ : K), f.maxGenEigenspace μ = ⊤ by exact this _ rfl
-  intro n h_dim
-  induction n using Nat.strong_induction_on generalizing V with | h n ih =>
-  rcases n with - | n
+  induction' h_dim : finrank K V using Nat.strong_induction_on with n ih generalizing V
+  cases' n with n
   -- If the vector space is 0-dimensional, the result is trivial.
   · rw [← top_le_iff]
     simp only [Submodule.finrank_eq_zero.1 (Eq.trans (finrank_top _ _) h_dim), bot_le]
@@ -82,16 +91,16 @@ theorem iSup_maxGenEigenspace_eq_top [IsAlgClosed K] [FiniteDimensional K V] (f 
     let f' : End K ER := f.restrict h_f_ER
     -- The dimension of `ES` is positive
     have h_dim_ES_pos : 0 < finrank K ES := by
-      dsimp +instances only [ES]
+      dsimp only [ES]
       rw [h_dim]
       apply pos_finrank_genEigenspace_of_hasEigenvalue hμ₀ (Nat.zero_lt_succ n)
     -- and the dimensions of `ES` and `ER` add up to `finrank K V`.
     have h_dim_add : finrank K ER + finrank K ES = finrank K V := by
-      dsimp +instances only [ER, ES]
+      dsimp only [ER, ES]
       rw [Module.End.genEigenspace_nat, Module.End.genEigenrange_nat]
       apply LinearMap.finrank_range_add_finrank_ker
     -- Therefore the dimension `ER` mus be smaller than `finrank K V`.
-    have h_dim_ER : finrank K ER < n.succ := by lia
+    have h_dim_ER : finrank K ER < n.succ := by linarith
     -- This allows us to apply the induction hypothesis on `ER`:
     have ih_ER : ⨆ (μ : K), f'.maxGenEigenspace μ = ⊤ :=
       ih (finrank K ER) h_dim_ER f' rfl
@@ -117,9 +126,14 @@ theorem iSup_maxGenEigenspace_eq_top [IsAlgClosed K] [FiniteDimensional K V] (f 
     have h_disjoint : Disjoint ER ES := generalized_eigenvec_disjoint_range_ker f μ₀
     -- Since the dimensions of `ER` and `ES` add up to the dimension of `V`, it follows that the
     -- span of all generalized eigenvectors is all of `V`.
-    change ⨆ (μ : K), f.maxGenEigenspace μ = ⊤
-    rw [← top_le_iff, ← Submodule.eq_top_of_disjoint ER ES h_dim_add.ge h_disjoint]
+    show ⨆ (μ : K), f.maxGenEigenspace μ = ⊤
+    rw [← top_le_iff, ← Submodule.eq_top_of_disjoint ER ES h_dim_add h_disjoint]
     apply sup_le hER hES
+
+theorem iSup_genEigenspace_eq_top [IsAlgClosed K] [FiniteDimensional K V] (f : End K V) :
+    ⨆ (μ : K) (k : ℕ), f.genEigenspace μ k = ⊤ := by
+  simp_rw [iSup_genEigenspace_eq]
+  apply iSup_maxGenEigenspace_eq_top
 
 end Module.End
 
@@ -138,7 +152,7 @@ theorem inf_iSup_genEigenspace [FiniteDimensional K V] (h : ∀ x ∈ p, f x ∈
     exact (mem_iSup_iff_exists_finsupp _ _).mpr ⟨m, fun μ ↦ mem_inf.mp ⟨this μ, hm₂ μ⟩, rfl⟩
   intro μ
   by_cases hμ : μ ∈ m.support; swap
-  · simp only [Finsupp.notMem_support_iff.mp hμ, p.zero_mem]
+  · simp only [Finsupp.not_mem_support_iff.mp hμ, p.zero_mem]
   have hm₂_aux := hm₂
   simp_rw [Module.End.mem_genEigenspace] at hm₂_aux
   choose l hlk hl using hm₂_aux
@@ -153,7 +167,7 @@ theorem inf_iSup_genEigenspace [FiniteDimensional K V] (h : ∀ x ∈ p, f x ∈
     (Commute.sub_right rfl <| Algebra.commute_algebraMap_right _ _).pow_right _
   have hg₀ : g (m.sum fun _μ mμ ↦ mμ) = g (m μ) := by
     suffices ∀ μ' ∈ m.support, g (m μ') = if μ' = μ then g (m μ) else 0 by
-      rw [map_finsuppSum, Finsupp.sum_congr (g2 := fun μ' _ ↦ if μ' = μ then g (m μ) else 0) this,
+      rw [map_finsupp_sum, Finsupp.sum_congr (g2 := fun μ' _ ↦ if μ' = μ then g (m μ) else 0) this,
         Finsupp.sum_ite_eq', if_pos hμ]
     rintro μ' hμ'
     split_ifs with hμμ'
@@ -165,25 +179,27 @@ theorem inf_iSup_genEigenspace [FiniteDimensional K V] (h : ∀ x ∈ p, f x ∈
       simpa only [Nat.cast_le] using Finset.le_sup hμ'
     have : _ = g := (m.support.erase μ).noncommProd_erase_mul (Finset.mem_erase.mpr ⟨hμμ', hμ'⟩)
       (fun μ ↦ (f - algebraMap K (End K V) μ) ^ l₀) (fun μ₁ _ μ₂ _ _ ↦ h_comm μ₁ μ₂)
-    rw [← this, Module.End.mul_apply, hl₀, _root_.map_zero]
+    rw [← this, LinearMap.mul_apply, hl₀, _root_.map_zero]
   have hg₁ : MapsTo g p p := Finset.noncommProd_induction _ _ _ (fun g' : End K V ↦ MapsTo g' p p)
       (fun f₁ f₂ ↦ MapsTo.comp) (mapsTo_id _) fun μ' _ ↦ by
     suffices MapsTo (f - algebraMap K (End K V) μ') p p by
-      simp only [Module.End.coe_pow, this.iterate l₀]
+      simp only [LinearMap.coe_pow]; exact this.iterate l₀
     intro x hx
     rw [LinearMap.sub_apply, algebraMap_end_apply]
     exact p.sub_mem (h _ hx) (smul_mem p μ' hx)
   have hg₂ : MapsTo g ↑(f.genEigenspace μ k) ↑(f.genEigenspace μ k) :=
     f.mapsTo_genEigenspace_of_comm hfg μ k
   have hg₃ : InjOn g ↑(f.genEigenspace μ k) := by
-    apply LinearMap.injOn_of_disjoint_ker subset_rfl
+    apply LinearMap.injOn_of_disjoint_ker (subset_refl _)
     have this := f.independent_genEigenspace k
     have aux (μ') (_hμ' : μ' ∈ m.support.erase μ) :
         (f.genEigenspace μ') ↑l₀ ≤ (f.genEigenspace μ') k := by
       apply (f.genEigenspace μ').mono
-      obtain _ | k := k
-      · exact le_top
-      · exact Nat.cast_le.2 <| Finset.sup_le fun i _ ↦ Nat.cast_le.1 <| hlk i
+      rintro k rfl
+      simp only [ENat.some_eq_coe, Nat.cast_inj, exists_eq_left']
+      apply Finset.sup_le
+      intro i _hi
+      simpa using hlk i
     rw [LinearMap.ker_noncommProd_eq_of_supIndep_ker, ← Finset.sup_eq_iSup]
     · have := Finset.supIndep_iff_disjoint_erase.mp (this.supIndep' m.support) μ hμ
       apply this.mono_right
@@ -192,7 +208,7 @@ theorem inf_iSup_genEigenspace [FiniteDimensional K V] (h : ∀ x ∈ p, f x ∈
       rw [Algebra.algebraMap_eq_smul_one, ← End.genEigenspace_nat]
       apply aux μ' hμ'
     · have := this.supIndep' (m.support.erase μ)
-      apply this.antitone_fun
+      apply Finset.supIndep_antimono_fun _ this
       intro μ' hμ'
       rw [Algebra.algebraMap_eq_smul_one, ← End.genEigenspace_nat]
       apply aux μ' hμ'
@@ -224,3 +240,10 @@ theorem Module.End.genEigenspace_restrict_eq_top
   simp_rw [Submodule.inf_genEigenspace f p h, Submodule.comap_subtype_self,
     ← Submodule.map_iSup, Submodule.comap_map_eq_of_injective h_inj] at this
   exact this.symm
+
+theorem Module.End.iSup_genEigenspace_restrict_eq_top
+    {p : Submodule K V} {f : Module.End K V} [FiniteDimensional K V]
+    (h : ∀ x ∈ p, f x ∈ p) (h' : ⨆ μ, ⨆ k : ℕ, f.genEigenspace μ k = ⊤) :
+    ⨆ μ, ⨆ k : ℕ, Module.End.genEigenspace (LinearMap.restrict f h) μ k = ⊤ := by
+  simp_rw [iSup_genEigenspace_eq] at h' ⊢
+  apply Module.End.genEigenspace_restrict_eq_top h h'

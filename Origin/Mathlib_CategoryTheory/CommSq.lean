@@ -1,19 +1,19 @@
 /-
 Extracted from CategoryTheory/CommSq.lean
-Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
+Genuine: 25 of 27 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Comma.Arrow
 
 /-!
 # Commutative squares
 
-This file provides an API for commutative squares in categories.
+This file provide an API for commutative squares in categories.
 If `top`, `left`, `right` and `bottom` are four morphisms which are the edges
 of a square, `CommSq top left right bottom` is the predicate that this
 square is commutative.
 
-The structure `CommSq` is extended in
-`Mathlib/CategoryTheory/Limits/Shapes/Pullback/IsPullback/Defs.lean`
+The structure `CommSq` is extended in `CategoryTheory/Shapes/Limits/CommSq.lean`
 as `IsPullback` and `IsPushout` in order to define pullback and pushout squares.
 
 ## Future work
@@ -24,15 +24,13 @@ Refactor `LiftStruct` from `Arrow.lean` and lifting properties using `CommSq.lea
 
 namespace CategoryTheory
 
-variable {C : Type*} [Category* C]
+variable {C : Type*} [Category C]
 
 structure CommSq {W X Y Z : C} (f : W ⟶ X) (g : W ⟶ Y) (h : X ⟶ Z) (i : Y ⟶ Z) : Prop where
   /-- The square commutes. -/
-  w : f ≫ h = g ≫ i := by cat_disch
+  w : f ≫ h = g ≫ i
 
 attribute [reassoc] CommSq.w
-
-attribute [simp] CommSq.mk
 
 namespace CommSq
 
@@ -69,6 +67,8 @@ lemma vert_comp {W X Y Y' Z Z' : C} {f : W ⟶ X} {g : W ⟶ Y} {g' : Y ⟶ Y'} 
     CommSq f (g ≫ g') (h ≫ h') i' :=
   flip (horiz_comp (flip hsq₁) (flip hsq₂))
 
+section
+
 variable {W X Y : C}
 
 theorem eq_of_mono {f : W ⟶ X} {g : W ⟶ X} {i : X ⟶ Y} [Mono i] (sq : CommSq f g i i) : f = g :=
@@ -83,7 +83,7 @@ end CommSq
 
 namespace Functor
 
-variable {D : Type*} [Category* D]
+variable {D : Type*} [Category D]
 
 variable (F : C ⥤ D) {W X Y Z : C} {f : W ⟶ X} {g : W ⟶ Y} {h : X ⟶ Z} {i : Y ⟶ Z}
 
@@ -97,3 +97,102 @@ alias CommSq.map := Functor.map_commSq
 namespace CommSq
 
 variable {A B X Y : C} {f : A ⟶ X} {i : A ⟶ B} {p : X ⟶ Y} {g : B ⟶ Y}
+
+@[ext]
+structure LiftStruct (sq : CommSq f i p g) where
+  /-- The lift. -/
+  l : B ⟶ X
+  /-- The upper left triangle commutes. -/
+  fac_left : i ≫ l = f
+  /-- The lower right triangle commutes. -/
+  fac_right : l ≫ p = g
+
+namespace LiftStruct
+
+@[simps]
+def op {sq : CommSq f i p g} (l : LiftStruct sq) : LiftStruct sq.op where
+  l := l.l.op
+  fac_left := by rw [← op_comp, l.fac_right]
+  fac_right := by rw [← op_comp, l.fac_left]
+
+@[simps]
+def unop {A B X Y : Cᵒᵖ} {f : A ⟶ X} {i : A ⟶ B} {p : X ⟶ Y} {g : B ⟶ Y} {sq : CommSq f i p g}
+    (l : LiftStruct sq) : LiftStruct sq.unop where
+  l := l.l.unop
+  fac_left := by rw [← unop_comp, l.fac_right]
+  fac_right := by rw [← unop_comp, l.fac_left]
+
+@[simps]
+def opEquiv (sq : CommSq f i p g) : LiftStruct sq ≃ LiftStruct sq.op where
+  toFun := op
+  invFun := unop
+  left_inv := by aesop_cat
+  right_inv := by aesop_cat
+
+def unopEquiv {A B X Y : Cᵒᵖ} {f : A ⟶ X} {i : A ⟶ B} {p : X ⟶ Y} {g : B ⟶ Y}
+    (sq : CommSq f i p g) : LiftStruct sq ≃ LiftStruct sq.unop where
+  toFun := unop
+  invFun := op
+  left_inv := by aesop_cat
+  right_inv := by aesop_cat
+
+end LiftStruct
+
+instance subsingleton_liftStruct_of_epi (sq : CommSq f i p g) [Epi i] :
+    Subsingleton (LiftStruct sq) :=
+  ⟨fun l₁ l₂ => by
+    ext
+    rw [← cancel_epi i]
+    simp only [LiftStruct.fac_left]⟩
+
+instance subsingleton_liftStruct_of_mono (sq : CommSq f i p g) [Mono p] :
+    Subsingleton (LiftStruct sq) :=
+  ⟨fun l₁ l₂ => by
+    ext
+    rw [← cancel_mono p]
+    simp only [LiftStruct.fac_right]⟩
+
+variable (sq : CommSq f i p g)
+
+class HasLift : Prop where
+  /-- Square has a `LiftStruct`. -/
+  exists_lift : Nonempty sq.LiftStruct
+
+namespace HasLift
+
+variable {sq}
+
+theorem mk' (l : sq.LiftStruct) : HasLift sq :=
+  ⟨Nonempty.intro l⟩
+
+variable (sq)
+
+theorem iff : HasLift sq ↔ Nonempty sq.LiftStruct := by
+  constructor
+  exacts [fun h => h.exists_lift, fun h => mk h]
+
+theorem iff_op : HasLift sq ↔ HasLift sq.op := by
+  rw [iff, iff]
+  exact Nonempty.congr (LiftStruct.opEquiv sq).toFun (LiftStruct.opEquiv sq).invFun
+
+theorem iff_unop {A B X Y : Cᵒᵖ} {f : A ⟶ X} {i : A ⟶ B} {p : X ⟶ Y} {g : B ⟶ Y}
+    (sq : CommSq f i p g) : HasLift sq ↔ HasLift sq.unop := by
+  rw [iff, iff]
+  exact Nonempty.congr (LiftStruct.unopEquiv sq).toFun (LiftStruct.unopEquiv sq).invFun
+
+end HasLift
+
+noncomputable def lift [hsq : HasLift sq] : B ⟶ X :=
+  hsq.exists_lift.some.l
+
+@[reassoc (attr := simp)]
+theorem fac_left [hsq : HasLift sq] : i ≫ sq.lift = f :=
+  hsq.exists_lift.some.fac_left
+
+@[reassoc (attr := simp)]
+theorem fac_right [hsq : HasLift sq] : sq.lift ≫ p = g :=
+  hsq.exists_lift.some.fac_right
+
+end CommSq
+
+end CategoryTheory

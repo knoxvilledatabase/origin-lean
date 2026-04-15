@@ -3,6 +3,8 @@ Extracted from Order/Radical.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Order.CompleteLattice
+import Mathlib.Order.Atoms
 
 /-!
 # The radical of a lattice
@@ -11,7 +13,7 @@ This file contains results on the order radical of a lattice: the infimum of the
 -/
 
 def Order.radical (α : Type*) [Preorder α] [OrderTop α] [InfSet α] : α :=
-  ⨅ a ∈ {H | IsCoatom H}, a
+   ⨅ a ∈ {H | IsCoatom H}, a
 
 variable {α : Type*} [CompleteLattice α]
 

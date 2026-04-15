@@ -3,6 +3,8 @@ Extracted from Geometry/Manifold/Sheaf/Basic.lean
 Genuine: 3 of 6 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.LocalInvariantProperties
+import Mathlib.Topology.Sheaves.LocalPredicate
 
 /-! # Generic construction of a sheaf from a `LocalInvariantProp` on a manifold
 
@@ -37,9 +39,11 @@ variable {H : Type*} [TopologicalSpace H] {H' : Type*} [TopologicalSpace H']
   (M : Type u) [TopologicalSpace M] [ChartedSpace H M] (M' : Type u) [TopologicalSpace M']
   [ChartedSpace H' M']
 
--- INSTANCE (free from Core): TopCat.of.chartedSpace
+instance TopCat.of.chartedSpace : ChartedSpace H (TopCat.of M) :=
+  (inferInstance : ChartedSpace H M)
 
--- INSTANCE (free from Core): TopCat.of.hasGroupoid
+instance TopCat.of.hasGroupoid [HasGroupoid M G] : HasGroupoid (TopCat.of M) G :=
+  (inferInstance : HasGroupoid M G)
 
 def StructureGroupoid.LocalInvariantProp.localPredicate (hG : LocalInvariantProp G G' P) :
     TopCat.LocalPredicate fun _ : TopCat.of M => M' where
@@ -47,12 +51,12 @@ def StructureGroupoid.LocalInvariantProp.localPredicate (hG : LocalInvariantProp
   res := by
     intro U V i f h x
     have hUV : U ≤ V := CategoryTheory.leOfHom i
-    change ChartedSpace.LiftPropAt P (f ∘ Opens.inclusion hUV) x
+    show ChartedSpace.LiftPropAt P (f ∘ Opens.inclusion hUV) x
     rw [← hG.liftPropAt_iff_comp_inclusion hUV]
     apply h
   locality := by
     intro V f h x
-    obtain ⟨U, hxU, i, hU : ChartedSpace.LiftProp P (f ∘ _)⟩ := h x
+    obtain ⟨U, hxU, i, hU : ChartedSpace.LiftProp P (f ∘ i)⟩ := h x
     let x' : U := ⟨x, hxU⟩
     have hUV : U ≤ V := CategoryTheory.leOfHom i
     have : ChartedSpace.LiftPropAt P f (Opens.inclusion hUV x') := by
@@ -64,8 +68,10 @@ def StructureGroupoid.LocalInvariantProp.sheaf (hG : LocalInvariantProp G G' P) 
     TopCat.Sheaf (Type u) (TopCat.of M) :=
   TopCat.subsheafToTypes (hG.localPredicate M M')
 
--- INSTANCE (free from Core): StructureGroupoid.LocalInvariantProp.sheafHasCoeToFun
+instance StructureGroupoid.LocalInvariantProp.sheafHasCoeToFun (hG : LocalInvariantProp G G' P)
+    (U : (Opens (TopCat.of M))ᵒᵖ) : CoeFun ((hG.sheaf M M').val.obj U) fun _ => ↑(unop U) → M' where
+  coe a := a.1
 
 theorem StructureGroupoid.LocalInvariantProp.section_spec (hG : LocalInvariantProp G G' P)
-    (U : (Opens (TopCat.of M))ᵒᵖ) (f : (hG.sheaf M M').obj.obj U) : ChartedSpace.LiftProp P f :=
+    (U : (Opens (TopCat.of M))ᵒᵖ) (f : (hG.sheaf M M').val.obj U) : ChartedSpace.LiftProp P f :=
   f.2

@@ -1,14 +1,17 @@
 /-
 Extracted from Order/Fin/Tuple.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 29 of 30 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.Logic.Equiv.Fin
+import Mathlib.Order.Fin.Basic
+import Mathlib.Order.PiLex
+import Mathlib.Order.Interval.Set.Defs
 
 /-!
 # Order properties on tuples
 -/
-
-assert_not_exists Monoid
 
 open Function Set
 
@@ -37,18 +40,16 @@ lemma preimage_insertNth_Icc_of_mem {i : Fin (n + 1)} {x : α i} {q₁ q₂ : �
     i.insertNth x ⁻¹' Icc q₁ q₂ = Icc (fun j ↦ q₁ (i.succAbove j)) fun j ↦ q₂ (i.succAbove j) :=
   Set.ext fun p ↦ by simp only [mem_preimage, insertNth_mem_Icc, hx, true_and]
 
-lemma preimage_insertNth_Icc_of_notMem {i : Fin (n + 1)} {x : α i} {q₁ q₂ : ∀ j, α j}
+lemma preimage_insertNth_Icc_of_not_mem {i : Fin (n + 1)} {x : α i} {q₁ q₂ : ∀ j, α j}
     (hx : x ∉ Icc (q₁ i) (q₂ i)) : i.insertNth x ⁻¹' Icc q₁ q₂ = ∅ :=
   Set.ext fun p ↦ by
     simp only [mem_preimage, insertNth_mem_Icc, hx, false_and, mem_empty_iff_false]
 
 end Fin
 
-open Fin Matrix
+open Set Fin Matrix Function
 
 variable {α : Type*}
-
-open scoped Relator in
 
 lemma liftFun_vecCons {n : ℕ} (r : α → α → Prop) [IsTrans α r] {f : Fin (n + 1) → α} {a : α} :
     ((· < ·) ⇒ r) (vecCons a f) (vecCons a f) ↔ r a (f 0) ∧ ((· < ·) ⇒ r) f f := by
@@ -56,3 +57,111 @@ lemma liftFun_vecCons {n : ℕ} (r : α → α → Prop) [IsTrans α r] {f : Fin
     castSucc_zero]
 
 variable [Preorder α] {n : ℕ} {f : Fin (n + 1) → α} {a : α}
+
+@[simp] lemma strictMono_vecCons : StrictMono (vecCons a f) ↔ a < f 0 ∧ StrictMono f :=
+  liftFun_vecCons (· < ·)
+
+@[simp]
+lemma monotone_vecCons : Monotone (vecCons a f) ↔ a ≤ f 0 ∧ Monotone f := by
+  simpa only [monotone_iff_forall_lt] using @liftFun_vecCons α n (· ≤ ·) _ f a
+
+@[simp] lemma monotone_vecEmpty : Monotone ![a]
+  | ⟨0, _⟩, ⟨0, _⟩, _ => le_refl _
+
+@[simp] lemma strictMono_vecEmpty : StrictMono ![a]
+  | ⟨0, _⟩, ⟨0, _⟩, h => (irrefl _ h).elim
+
+@[simp] lemma strictAnti_vecCons : StrictAnti (vecCons a f) ↔ f 0 < a ∧ StrictAnti f :=
+  liftFun_vecCons (· > ·)
+
+@[simp] lemma antitone_vecCons : Antitone (vecCons a f) ↔ f 0 ≤ a ∧ Antitone f :=
+  monotone_vecCons (α := αᵒᵈ)
+
+@[simp] lemma antitone_vecEmpty : Antitone (vecCons a vecEmpty)
+  | ⟨0, _⟩, ⟨0, _⟩, _ => le_rfl
+
+@[simp] lemma strictAnti_vecEmpty : StrictAnti (vecCons a vecEmpty)
+  | ⟨0, _⟩, ⟨0, _⟩, h => (irrefl _ h).elim
+
+lemma StrictMono.vecCons (hf : StrictMono f) (ha : a < f 0) : StrictMono (vecCons a f) :=
+  strictMono_vecCons.2 ⟨ha, hf⟩
+
+lemma StrictAnti.vecCons (hf : StrictAnti f) (ha : f 0 < a) : StrictAnti (vecCons a f) :=
+  strictAnti_vecCons.2 ⟨ha, hf⟩
+
+lemma Monotone.vecCons (hf : Monotone f) (ha : a ≤ f 0) : Monotone (vecCons a f) :=
+  monotone_vecCons.2 ⟨ha, hf⟩
+
+lemma Antitone.vecCons (hf : Antitone f) (ha : f 0 ≤ a) : Antitone (vecCons a f) :=
+  antitone_vecCons.2 ⟨ha, hf⟩
+
+example : Monotone ![1, 2, 2, 3] := by decide
+
+variable {n : ℕ}
+
+def OrderIso.piFinTwoIso (α : Fin 2 → Type*) [∀ i, Preorder (α i)] : (∀ i, α i) ≃o α 0 × α 1 where
+  toEquiv := piFinTwoEquiv α
+  map_rel_iff' := Iff.symm Fin.forall_fin_two
+
+def OrderIso.finTwoArrowIso (α : Type*) [Preorder α] : (Fin 2 → α) ≃o α × α :=
+  { OrderIso.piFinTwoIso fun _ => α with toEquiv := finTwoArrowEquiv α }
+
+namespace Fin
+
+@[simps!, simps toEquiv]
+def consOrderIso (α : Fin (n + 1) → Type*) [∀ i, LE (α i)] :
+    α 0 × (∀ i, α (succ i)) ≃o ∀ i, α i where
+  toEquiv := consEquiv α
+  map_rel_iff' := forall_iff_succ
+
+@[simps!, simps toEquiv]
+def snocOrderIso (α : Fin (n + 1) → Type*) [∀ i, LE (α i)] :
+    α (last n) × (∀ i, α (castSucc i)) ≃o ∀ i, α i where
+  toEquiv := snocEquiv α
+  map_rel_iff' := by simp [Pi.le_def, Prod.le_def, forall_iff_castSucc]
+
+@[simps!, simps toEquiv]
+def insertNthOrderIso (α : Fin (n + 1) → Type*) [∀ i, LE (α i)] (p : Fin (n + 1)) :
+    α p × (∀ i, α (p.succAbove i)) ≃o ∀ i, α i where
+  toEquiv := insertNthEquiv α p
+  map_rel_iff' := by simp [Pi.le_def, Prod.le_def, p.forall_iff_succAbove]
+
+@[simp] lemma insertNthOrderIso_zero (α : Fin (n + 1) → Type*) [∀ i, LE (α i)] :
+    insertNthOrderIso α 0 = consOrderIso α := by ext; simp [insertNthOrderIso]
+
+@[simp] lemma insertNthOrderIso_last (n : ℕ) (α : Type*) [LE α] :
+    insertNthOrderIso (fun _ ↦ α) (last n) = snocOrderIso (fun _ ↦ α) := by ext; simp
+
+end Fin
+
+def OrderIso.piFinSuccAboveIso (α : Fin (n + 1) → Type*) [∀ i, LE (α i)]
+    (i : Fin (n + 1)) : (∀ j, α j) ≃o α i × ∀ j, α (i.succAbove j) where
+  toEquiv := (Fin.insertNthEquiv α i).symm
+  map_rel_iff' := Iff.symm i.forall_iff_succAbove
+
+def finSuccAboveOrderIso (p : Fin (n + 1)) : Fin n ≃o { x : Fin (n + 1) // x ≠ p } where
+  __ := finSuccAboveEquiv p
+  map_rel_iff' := p.succAboveOrderEmb.map_rel_iff'
+
+lemma finSuccAboveOrderIso_apply (p : Fin (n + 1)) (i : Fin n) :
+    finSuccAboveOrderIso p i = ⟨p.succAbove i, p.succAbove_ne i⟩ := rfl
+
+lemma finSuccAboveOrderIso_symm_apply_last (x : { x : Fin (n + 1) // x ≠ Fin.last n }) :
+    (finSuccAboveOrderIso (Fin.last n)).symm x = Fin.castLT x.1 (Fin.val_lt_last x.2) := by
+  rw [← Option.some_inj]
+  simpa [finSuccAboveOrderIso, finSuccAboveEquiv, OrderIso.symm]
+    using finSuccEquiv'_last_apply x.property
+
+lemma finSuccAboveOrderIso_symm_apply_ne_last {p : Fin (n + 1)} (h : p ≠ Fin.last n)
+    (x : { x : Fin (n + 1) // x ≠ p }) :
+    (finSuccAboveEquiv p).symm x = (p.castLT (Fin.val_lt_last h)).predAbove x := by
+  rw [← Option.some_inj]
+  simpa [finSuccAboveEquiv, OrderIso.symm] using finSuccEquiv'_ne_last_apply h x.property
+
+@[simps apply symm_apply]
+def Fin.castLEOrderIso {n m : ℕ} (h : n ≤ m) : Fin n ≃o { i : Fin m // (i : ℕ) < n } where
+  toFun i := ⟨Fin.castLE h i, by simp⟩
+  invFun i := ⟨i, i.prop⟩
+  left_inv _ := by simp
+  right_inv _ := by simp
+  map_rel_iff' := by simp [(strictMono_castLE h).le_iff_le]

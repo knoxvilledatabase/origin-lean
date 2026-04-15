@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Limits/Shapes/Equivalence.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Adjunction.Limits
+import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
 /-!
 # Transporting existence of specific limits across equivalences

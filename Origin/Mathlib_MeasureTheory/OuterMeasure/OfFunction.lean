@@ -1,8 +1,10 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/OfFunction.lean
-Genuine: 18 of 19 | Dissolved: 0 | Infrastructure: 1
+Genuine: 44 of 46 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.OuterMeasure.Operations
+import Mathlib.Analysis.SpecificLimits.Basic
 
 /-!
 # Outer measures from functions
@@ -32,8 +34,6 @@ outer measure, Carathéodory-measurable, Carathéodory's criterion
 
 -/
 
-assert_not_exists Module.Basis
-
 noncomputable section
 
 open Set Function Filter
@@ -60,7 +60,7 @@ protected def ofFunction (m : Set α → ℝ≥0∞) (m_empty : m ∅ = 0) : Out
       ENNReal.le_of_forall_pos_le_add <| by
         intro ε hε (hb : (∑' i, μ (s i)) < ∞)
         rcases ENNReal.exists_pos_sum_of_countable (ENNReal.coe_pos.2 hε).ne' ℕ with ⟨ε', hε', hl⟩
-        grw [← hl]
+        refine le_trans ?_ (add_le_add_left (le_of_lt hl) _)
         rw [← ENNReal.tsum_add]
         choose f hf using
           show ∀ i, ∃ f : ℕ → Set α, (s i ⊆ ⋃ i, f i) ∧ (∑' i, m (f i)) < μ (s i) + ε' i by
@@ -86,6 +86,10 @@ protected def ofFunction (m : Set α → ℝ≥0∞) (m_empty : m ∅ = 0) : Out
 
 variable (m : Set α → ℝ≥0∞) (m_empty : m ∅ = 0)
 
+theorem ofFunction_apply (s : Set α) :
+    OuterMeasure.ofFunction m m_empty s = ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, m (t n) :=
+  rfl
+
 theorem ofFunction_eq_iInf_mem {P : Set α → Prop} (m_top : ∀ s, ¬ P s → m s = ∞) (s : Set α) :
     OuterMeasure.ofFunction m m_empty s =
       ⨅ (t : ℕ → Set α) (_ : ∀ i, P (t i)) (_ : s ⊆ ⋃ i, t i), ∑' i, m (t i) := by
@@ -97,9 +101,9 @@ theorem ofFunction_eq_iInf_mem {P : Set α → Prop} (m_top : ∀ s, ¬ P s → 
     by_cases ht : ∀ i, P (t i)
     · exact iInf_le_of_le ht (iInf_le_of_le ht_subset le_rfl)
     · simp only [ht, not_false_eq_true, iInf_neg, top_le_iff]
-      push Not at ht
-      obtain ⟨i, hti_notMem⟩ := ht
-      have hfi_top : m (t i) = ∞ := m_top _ hti_notMem
+      push_neg at ht
+      obtain ⟨i, hti_not_mem⟩ := ht
+      have hfi_top : m (t i) = ∞ := m_top _ hti_not_mem
       exact ENNReal.tsum_eq_top_of_eq_top ⟨i, hfi_top⟩
 
 variable {m m_empty}
@@ -111,7 +115,7 @@ theorem ofFunction_le (s : Set α) : OuterMeasure.ofFunction m m_empty s ≤ m s
       le_of_eq <| tsum_eq_single 0 <| by
         rintro (_ | i)
         · simp
-        · simp [f, m_empty]
+        · simp [m_empty]
 
 theorem ofFunction_eq (s : Set α) (m_mono : ∀ ⦃t : Set α⦄, s ⊆ t → m s ≤ m t)
     (m_subadd : ∀ s : ℕ → Set α, m (⋃ i, s i) ≤ ∑' i, m (s i)) :
@@ -144,6 +148,7 @@ theorem ofFunction_union_of_top_of_nonempty_inter {s t : Set α}
       μ s + μ t ≤ ∞ := le_top
       _ = m (f i) := (h (f i) hs ht).symm
       _ ≤ ∑' i, m (f i) := ENNReal.le_tsum i
+
   set I := fun s => { i : ℕ | (s ∩ f i).Nonempty }
   have hd : Disjoint (I s) (I t) := disjoint_iff_inf_le.mpr fun i hi => he ⟨i, hi⟩
   have hI : ∀ u ⊆ s ∪ t, μ u ≤ ∑' i : I u, μ (f i) := fun u hu =>
@@ -153,14 +158,15 @@ theorem ofFunction_union_of_top_of_nonempty_inter {s t : Set α}
           let ⟨i, hi⟩ := mem_iUnion.1 (hf (hu hx))
           mem_iUnion.2 ⟨⟨i, ⟨x, hx, hi⟩⟩, hi⟩
       _ ≤ ∑' i : I u, μ (f i) := measure_iUnion_le _
+
   calc
     μ s + μ t ≤ (∑' i : I s, μ (f i)) + ∑' i : I t, μ (f i) :=
       add_le_add (hI _ subset_union_left) (hI _ subset_union_right)
     _ = ∑' i : ↑(I s ∪ I t), μ (f i) :=
-      (ENNReal.summable.tsum_union_disjoint (f := fun i => μ (f i)) hd ENNReal.summable).symm
+      (tsum_union_disjoint (f := fun i => μ (f i)) hd ENNReal.summable ENNReal.summable).symm
     _ ≤ ∑' i, μ (f i) :=
-      (ENNReal.summable.tsum_le_tsum_of_inj (↑) Subtype.coe_injective (fun _ _ => zero_le _)
-        (fun _ => le_rfl) ENNReal.summable)
+      (tsum_le_tsum_of_inj (↑) Subtype.coe_injective (fun _ _ => zero_le _) (fun _ => le_rfl)
+        ENNReal.summable ENNReal.summable)
     _ ≤ ∑' i, m (f i) := ENNReal.tsum_le_tsum fun i => ofFunction_le _
 
 theorem comap_ofFunction {β} (f : β → α) (h : Monotone m ∨ Surjective f) :
@@ -174,7 +180,7 @@ theorem comap_ofFunction {β} (f : β → α) (h : Monotone m ∨ Surjective f) 
     refine iInf_mono' fun ht => ?_
     rw [Set.image_subset_iff, preimage_iUnion] at ht
     refine ⟨ht, ENNReal.tsum_le_tsum fun n => ?_⟩
-    rcases h with hl | hr
+    cases' h with hl hr
     exacts [hl (image_preimage_subset _ _), (congr_arg m (hr.image_preimage (t n))).le]
 
 theorem map_ofFunction_le {β} (f : α → β) :
@@ -192,7 +198,7 @@ theorem map_ofFunction {β} {f : α → β} (hf : Injective f) :
   intro t ht
   refine iInf_le_of_le (fun n => (range f)ᶜ ∪ f '' t n) (iInf_le_of_le ?_ ?_)
   · rw [← union_iUnion, ← inter_subset, ← image_preimage_eq_inter_range, ← image_iUnion]
-    exact image_mono ht
+    exact image_subset _ ht
   · refine ENNReal.tsum_le_tsum fun n => le_of_eq ?_
     simp [hf.preimage_image]
 
@@ -241,3 +247,172 @@ theorem boundedBy_apply (s : Set α) :
 theorem boundedBy_eq (s : Set α) (m_empty : m ∅ = 0) (m_mono : ∀ ⦃t : Set α⦄, s ⊆ t → m s ≤ m t)
     (m_subadd : ∀ s : ℕ → Set α, m (⋃ i, s i) ≤ ∑' i, m (s i)) : boundedBy m s = m s := by
   rw [boundedBy_eq_ofFunction m_empty, ofFunction_eq s m_mono m_subadd]
+
+@[simp]
+theorem boundedBy_eq_self (m : OuterMeasure α) : boundedBy m = m :=
+  ext fun _ => boundedBy_eq _ measure_empty (fun _ ht => measure_mono ht) measure_iUnion_le
+
+theorem le_boundedBy {μ : OuterMeasure α} : μ ≤ boundedBy m ↔ ∀ s, μ s ≤ m s := by
+  rw [boundedBy , le_ofFunction, forall_congr']; intro s
+  rcases s.eq_empty_or_nonempty with h | h <;> simp [h, Set.not_nonempty_empty]
+
+theorem le_boundedBy' {μ : OuterMeasure α} :
+    μ ≤ boundedBy m ↔ ∀ s : Set α, s.Nonempty → μ s ≤ m s := by
+  rw [le_boundedBy, forall_congr']
+  intro s
+  rcases s.eq_empty_or_nonempty with h | h <;> simp [h]
+
+@[simp]
+theorem boundedBy_top : boundedBy (⊤ : Set α → ℝ≥0∞) = ⊤ := by
+  rw [eq_top_iff, le_boundedBy']
+  intro s hs
+  rw [top_apply hs]
+  exact le_rfl
+
+@[simp]
+theorem boundedBy_zero : boundedBy (0 : Set α → ℝ≥0∞) = 0 := by
+  rw [← coe_bot, eq_bot_iff]
+  apply boundedBy_le
+
+theorem smul_boundedBy {c : ℝ≥0∞} (hc : c ≠ ∞) : c • boundedBy m = boundedBy (c • m) := by
+  simp only [boundedBy , smul_ofFunction hc]
+  congr 1 with s : 1
+  rcases s.eq_empty_or_nonempty with (rfl | hs) <;> simp [*]
+
+theorem comap_boundedBy {β} (f : β → α)
+    (h : (Monotone fun s : { s : Set α // s.Nonempty } => m s) ∨ Surjective f) :
+    comap f (boundedBy m) = boundedBy fun s => m (f '' s) := by
+  refine (comap_ofFunction _ ?_).trans ?_
+  · refine h.imp (fun H s t hst => iSup_le fun hs => ?_) id
+    have ht : t.Nonempty := hs.mono hst
+    exact (@H ⟨s, hs⟩ ⟨t, ht⟩ hst).trans (le_iSup (fun _ : t.Nonempty => m t) ht)
+  · dsimp only [boundedBy]
+    congr with s : 1
+    rw [image_nonempty]
+
+theorem boundedBy_union_of_top_of_nonempty_inter {s t : Set α}
+    (h : ∀ u, (s ∩ u).Nonempty → (t ∩ u).Nonempty → m u = ∞) :
+    boundedBy m (s ∪ t) = boundedBy m s + boundedBy m t :=
+  ofFunction_union_of_top_of_nonempty_inter fun u hs ht =>
+    top_unique <| (h u hs ht).ge.trans <| le_iSup (fun _ => m u) (hs.mono inter_subset_right)
+
+end BoundedBy
+
+section sInfGen
+
+variable {α : Type*}
+
+def sInfGen (m : Set (OuterMeasure α)) (s : Set α) : ℝ≥0∞ :=
+  ⨅ (μ : OuterMeasure α) (_ : μ ∈ m), μ s
+
+theorem sInfGen_def (m : Set (OuterMeasure α)) (t : Set α) :
+    sInfGen m t = ⨅ (μ : OuterMeasure α) (_ : μ ∈ m), μ t :=
+  rfl
+
+theorem sInf_eq_boundedBy_sInfGen (m : Set (OuterMeasure α)) :
+    sInf m = OuterMeasure.boundedBy (sInfGen m) := by
+  refine le_antisymm ?_ ?_
+  · refine le_boundedBy.2 fun s => le_iInf₂ fun μ hμ => ?_
+    apply sInf_le hμ
+  · refine le_sInf ?_
+    intro μ hμ t
+    exact le_trans (boundedBy_le t) (iInf₂_le μ hμ)
+
+theorem iSup_sInfGen_nonempty {m : Set (OuterMeasure α)} (h : m.Nonempty) (t : Set α) :
+    ⨆ _ : t.Nonempty, sInfGen m t = ⨅ (μ : OuterMeasure α) (_ : μ ∈ m), μ t := by
+  rcases t.eq_empty_or_nonempty with (rfl | ht)
+  · simp [biInf_const h]
+  · simp [ht, sInfGen_def]
+
+theorem sInf_apply {m : Set (OuterMeasure α)} {s : Set α} (h : m.Nonempty) :
+    sInf m s =
+      ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, ⨅ (μ : OuterMeasure α) (_ : μ ∈ m), μ (t n) := by
+  simp_rw [sInf_eq_boundedBy_sInfGen, boundedBy_apply, iSup_sInfGen_nonempty h]
+
+theorem sInf_apply' {m : Set (OuterMeasure α)} {s : Set α} (h : s.Nonempty) :
+    sInf m s =
+      ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, ⨅ (μ : OuterMeasure α) (_ : μ ∈ m), μ (t n) :=
+  m.eq_empty_or_nonempty.elim (fun hm => by simp [hm, h]) sInf_apply
+
+theorem iInf_apply {ι} [Nonempty ι] (m : ι → OuterMeasure α) (s : Set α) :
+    (⨅ i, m i) s = ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, ⨅ i, m i (t n) := by
+  rw [iInf, sInf_apply (range_nonempty m)]
+  simp only [iInf_range]
+
+theorem iInf_apply' {ι} (m : ι → OuterMeasure α) {s : Set α} (hs : s.Nonempty) :
+    (⨅ i, m i) s = ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, ⨅ i, m i (t n) := by
+  rw [iInf, sInf_apply' hs]
+  simp only [iInf_range]
+
+theorem biInf_apply {ι} {I : Set ι} (hI : I.Nonempty) (m : ι → OuterMeasure α) (s : Set α) :
+    (⨅ i ∈ I, m i) s = ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, ⨅ i ∈ I, m i (t n) := by
+  haveI := hI.to_subtype
+  simp only [← iInf_subtype'', iInf_apply]
+
+theorem biInf_apply' {ι} (I : Set ι) (m : ι → OuterMeasure α) {s : Set α} (hs : s.Nonempty) :
+    (⨅ i ∈ I, m i) s = ⨅ (t : ℕ → Set α) (_ : s ⊆ iUnion t), ∑' n, ⨅ i ∈ I, m i (t n) := by
+  simp only [← iInf_subtype'', iInf_apply' _ hs]
+
+theorem map_iInf_le {ι β} (f : α → β) (m : ι → OuterMeasure α) :
+    map f (⨅ i, m i) ≤ ⨅ i, map f (m i) :=
+  (map_mono f).map_iInf_le
+
+theorem comap_iInf {ι β} (f : α → β) (m : ι → OuterMeasure β) :
+    comap f (⨅ i, m i) = ⨅ i, comap f (m i) := by
+  refine ext_nonempty fun s hs => ?_
+  refine ((comap_mono f).map_iInf_le s).antisymm ?_
+  simp only [comap_apply, iInf_apply' _ hs, iInf_apply' _ (hs.image _), le_iInf_iff,
+    Set.image_subset_iff, preimage_iUnion]
+  refine fun t ht => iInf_le_of_le _ (iInf_le_of_le ht <| ENNReal.tsum_le_tsum fun k => ?_)
+  exact iInf_mono fun i => (m i).mono (image_preimage_subset _ _)
+
+theorem map_iInf {ι β} {f : α → β} (hf : Injective f) (m : ι → OuterMeasure α) :
+    map f (⨅ i, m i) = restrict (range f) (⨅ i, map f (m i)) := by
+  refine Eq.trans ?_ (map_comap _ _)
+  simp only [comap_iInf, comap_map hf]
+
+theorem map_iInf_comap {ι β} [Nonempty ι] {f : α → β} (m : ι → OuterMeasure β) :
+    map f (⨅ i, comap f (m i)) = ⨅ i, map f (comap f (m i)) := by
+  refine (map_iInf_le _ _).antisymm fun s => ?_
+  simp only [map_apply, comap_apply, iInf_apply, le_iInf_iff]
+  refine fun t ht => iInf_le_of_le (fun n => f '' t n ∪ (range f)ᶜ) (iInf_le_of_le ?_ ?_)
+  · rw [← iUnion_union, Set.union_comm, ← inter_subset, ← image_iUnion, ←
+      image_preimage_eq_inter_range]
+    exact image_subset _ ht
+  · refine ENNReal.tsum_le_tsum fun n => iInf_mono fun i => (m i).mono ?_
+    simp only [preimage_union, preimage_compl, preimage_range, compl_univ, union_empty,
+      image_subset_iff]
+    exact subset_refl _
+
+theorem map_biInf_comap {ι β} {I : Set ι} (hI : I.Nonempty) {f : α → β} (m : ι → OuterMeasure β) :
+    map f (⨅ i ∈ I, comap f (m i)) = ⨅ i ∈ I, map f (comap f (m i)) := by
+  haveI := hI.to_subtype
+  rw [← iInf_subtype'', ← iInf_subtype'']
+  exact map_iInf_comap _
+
+theorem restrict_iInf_restrict {ι} (s : Set α) (m : ι → OuterMeasure α) :
+    restrict s (⨅ i, restrict s (m i)) = restrict s (⨅ i, m i) :=
+  calc restrict s (⨅ i, restrict s (m i))
+    _ = restrict (range ((↑) : s → α)) (⨅ i, restrict s (m i)) := by rw [Subtype.range_coe]
+    _ = map ((↑) : s → α) (⨅ i, comap (↑) (m i)) := (map_iInf Subtype.coe_injective _).symm
+    _ = restrict s (⨅ i, m i) := congr_arg (map ((↑) : s → α)) (comap_iInf _ _).symm
+
+theorem restrict_iInf {ι} [Nonempty ι] (s : Set α) (m : ι → OuterMeasure α) :
+    restrict s (⨅ i, m i) = ⨅ i, restrict s (m i) :=
+  (congr_arg (map ((↑) : s → α)) (comap_iInf _ _)).trans (map_iInf_comap _)
+
+theorem restrict_biInf {ι} {I : Set ι} (hI : I.Nonempty) (s : Set α) (m : ι → OuterMeasure α) :
+    restrict s (⨅ i ∈ I, m i) = ⨅ i ∈ I, restrict s (m i) := by
+  haveI := hI.to_subtype
+  rw [← iInf_subtype'', ← iInf_subtype'']
+  exact restrict_iInf _ _
+
+theorem restrict_sInf_eq_sInf_restrict (m : Set (OuterMeasure α)) {s : Set α} (hm : m.Nonempty) :
+    restrict s (sInf m) = sInf (restrict s '' m) := by
+  simp only [sInf_eq_iInf, restrict_biInf, hm, iInf_image]
+
+end sInfGen
+
+end OuterMeasure
+
+end MeasureTheory

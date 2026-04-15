@@ -1,8 +1,11 @@
 /-
 Extracted from Order/ConditionallyCompleteLattice/Finset.lean
-Genuine: 33 of 35 | Dissolved: 1 | Infrastructure: 1
+Genuine: 32 of 35 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Max
+import Mathlib.Data.Set.Finite.Lattice
+import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 
 /-!
 # Conditionally complete lattices and finite sets.
@@ -56,7 +59,8 @@ theorem Finset.ciSup_eq_max'_image {s : Finset ι} (h : ∃ x ∈ s, sSup ∅ �
     intro i
     split_ifs
     · exact ⟨_, by assumption, le_rfl⟩
-    · assumption
+    · obtain ⟨a, ha, ha'⟩ := h
+      exact ⟨a, ha, ha'⟩
   · simp only [Set.mem_image, mem_coe, ciSup_eq_ite, dite_eq_ite, Set.mem_range,
       exists_exists_eq_and, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂]
     intro i hi
@@ -68,7 +72,7 @@ theorem Finset.ciInf_eq_min'_image {s : Finset ι} (h : ∃ x ∈ s, f x ≤ sIn
     ⨅ i ∈ s, f i = (s.image f).min' h' := by
   classical
   rw [← OrderDual.toDual_inj, toDual_min', toDual_iInf]
-  simp only [toDual_iInf]
+  simp only [Function.comp_apply, toDual_iInf]
   rw [ciSup_eq_max'_image _ h]
   simp only [image_image]
   congr
@@ -106,12 +110,19 @@ theorem Set.Finite.ciSup_lt_iff {s : Set ι} {f : ι → α} (hs : s.Finite)
       intro
       simp only [ciSup_eq_ite, dite_eq_ite, mem_range, union_singleton, mem_insert_iff, mem_image,
         forall_exists_index]
-      grind
+      intro x hx
+      split_ifs at hx
+      · exact Or.inr ⟨_, by assumption, hx⟩
+      · simp_all
     · simp only [mem_range]
       refine ⟨x, ?_⟩
       simp [hx]
-  · have := hs.ciSup_mem_image _ h
-    grind
+  · intro H
+    have := hs.ciSup_mem_image _ h
+    simp only [mem_image] at this
+    obtain ⟨_, hmem, hx⟩ := this
+    rw [← hx]
+    exact H _ hmem
 
 theorem Set.Finite.lt_ciInf_iff {s : Set ι} {f : ι → α} (hs : s.Finite)
     (h : ∃ x ∈ s, f x ≤ sInf ∅) :
@@ -124,7 +135,10 @@ theorem Set.Finite.lt_ciInf_iff {s : Set ι} {f : ι → α} (hs : s.Finite)
       intro
       simp only [ciInf_eq_ite, dite_eq_ite, mem_range, union_singleton, mem_insert_iff, mem_image,
         forall_exists_index]
-      grind
+      intro x hx
+      split_ifs at hx
+      · exact Or.inr ⟨_, by assumption, hx⟩
+      · simp_all
     · simp only [mem_range]
       refine ⟨x, ?_⟩
       simp [hx]
@@ -225,6 +239,11 @@ end Finset
 section ConditionallyCompleteLinearOrderBot
 
 variable [ConditionallyCompleteLinearOrderBot α] (f : ι → α)
+
+theorem Finset.Nonempty.ciSup_eq_max'_image {s : Finset ι} (h : s.Nonempty)
+    (h' : (s.image f).Nonempty := h.image f) :
+    ⨆ i ∈ s, f i = (s.image f).max' h' :=
+  s.ciSup_eq_max'_image _ (h.imp (by simp)) _
 
 theorem Finset.Nonempty.ciSup_mem_image {s : Finset ι} (h : s.Nonempty) :
     ⨆ i ∈ s, f i ∈ s.image f :=

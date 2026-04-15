@@ -3,6 +3,9 @@ Extracted from Algebra/Order/CauSeq/BigOperators.lean
 Genuine: 7 of 8 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.GeomSum
+import Mathlib.Algebra.Order.Archimedean.Basic
+import Mathlib.Algebra.Order.CauSeq.Basic
 
 /-!
 # Cauchy sequences and big operators
@@ -14,14 +17,13 @@ open Finset IsAbsoluteValue
 
 namespace IsCauSeq
 
-variable {α β : Type*} [Field α] [LinearOrder α] [IsStrictOrderedRing α] [Ring β]
-  {abv : β → α} [IsAbsoluteValue abv]
+variable {α β : Type*} [LinearOrderedField α] [Ring β] {abv : β → α} [IsAbsoluteValue abv]
   {f g : ℕ → β} {a : ℕ → α}
 
 lemma of_abv_le (n : ℕ) (hm : ∀ m, n ≤ m → abv (f m) ≤ a m) :
     IsCauSeq abs (fun n ↦ ∑ i ∈ range n, a i) → IsCauSeq abv fun n ↦ ∑ i ∈ range n, f i := by
   intro hg ε ε0
-  obtain ⟨i, hi⟩ := hg (ε / 2) (div_pos ε0 (by simp))
+  cases' hg (ε / 2) (div_pos ε0 (by norm_num)) with i hi
   exists max n i
   intro j ji
   have hi₁ := hi j (le_trans (le_max_right n i) ji)
@@ -37,13 +39,13 @@ lemma of_abv_le (n : ℕ) (hm : ∀ m, n ≤ m → abv (f m) ≤ a m) :
   rw [hk]
   dsimp only
   clear hk ji j
-  induction k with
-  | zero => simp [abv_zero abv]
-  | succ k hi =>
-    simp only [Nat.succ_add, Nat.succ_eq_add_one, Finset.sum_range_succ_comm]
-    simp only [add_assoc, sub_eq_add_neg]
-    simp only [sub_eq_add_neg] at hi
-    grw [abv_add abv, hm _ (by omega), hi]
+  induction' k with k' hi
+  · simp [abv_zero abv]
+  simp only [Nat.succ_add, Nat.succ_eq_add_one, Finset.sum_range_succ_comm]
+  simp only [add_assoc, sub_eq_add_neg]
+  refine le_trans (abv_add _ _ _) ?_
+  simp only [sub_eq_add_neg] at hi
+  exact add_le_add (hm _ (le_add_of_nonneg_of_le (Nat.zero_le _) (le_max_left _ _))) hi
 
 lemma of_abv (hf : IsCauSeq abs fun m ↦ ∑ n ∈ range m, abv (f n)) :
     IsCauSeq abv fun m ↦ ∑ n ∈ range m, f n :=
@@ -57,10 +59,10 @@ theorem _root_.cauchy_product (ha : IsCauSeq abs fun m ↦ ∑ n ∈ range m, ab
   let ⟨P, hP⟩ := ha.bounded
   let ⟨Q, hQ⟩ := hb.bounded
   have hP0 : 0 < P := lt_of_le_of_lt (abs_nonneg _) (hP 0)
-  have hPε0 : 0 < ε / (2 * P) := div_pos ε0 (mul_pos (show (2 : α) > 0 by simp) hP0)
+  have hPε0 : 0 < ε / (2 * P) := div_pos ε0 (mul_pos (show (2 : α) > 0 by norm_num) hP0)
   let ⟨N, hN⟩ := hb.cauchy₂ hPε0
   have hQε0 : 0 < ε / (4 * Q) :=
-    div_pos ε0 (mul_pos (show (0 : α) < 4 by simp) (lt_of_le_of_lt (abv_nonneg _ _) (hQ 0)))
+    div_pos ε0 (mul_pos (show (0 : α) < 4 by norm_num) (lt_of_le_of_lt (abv_nonneg _ _) (hQ 0)))
   let ⟨M, hM⟩ := ha.cauchy₂ hQε0
   refine ⟨2 * (max N M + 1), fun K hK ↦ ?_⟩
   have h₁ :
@@ -76,7 +78,7 @@ theorem _root_.cauchy_product (ha : IsCauSeq abs fun m ↦ ∑ n ∈ range m, ab
         ∑ i ∈ range K, f i * ∑ k ∈ range K, g k := by
     rw [← sum_add_distrib]; simp [(mul_add _ _ _).symm]
   have two_mul_two : (4 : α) = 2 * 2 := by norm_num
-  have hQ0 : Q ≠ 0 := fun h ↦ by simp [h] at hQε0
+  have hQ0 : Q ≠ 0 := fun h ↦ by simp [h, lt_irrefl] at hQε0
   have h2Q0 : 2 * Q ≠ 0 := mul_ne_zero two_ne_zero hQ0
   have hε : ε / (2 * P) * P + ε / (4 * Q) * (2 * Q) = ε := by
     rw [← div_div, div_mul_cancel₀ _ (Ne.symm (ne_of_lt hP0)), two_mul_two, mul_assoc, ← div_div,
@@ -103,6 +105,7 @@ theorem _root_.cauchy_product (ha : IsCauSeq abs fun m ↦ ∑ n ∈ range m, ab
       (∑ n ∈ range (max N M + 1), abv (f n)) = |∑ n ∈ range (max N M + 1), abv (f n)| :=
         Eq.symm (abs_of_nonneg (sum_nonneg fun x _ ↦ abv_nonneg abv (f x)))
       _ < P := hP (max N M + 1)
+
   rw [h₁, h₂, h₃, sum_mul, ← sub_sub, sub_right_comm, sub_self, zero_sub, abv_neg abv]
   refine lt_of_le_of_lt (IsAbsoluteValue.abv_sum _ _ _) ?_
   suffices
@@ -124,7 +127,7 @@ theorem _root_.cauchy_product (ha : IsCauSeq abs fun m ↦ ∑ n ∈ range m, ab
         ∑ i ∈ range K with max N M + 1 ≤ i, abv (f i) * (2 * Q) := by
         gcongr
         rw [sub_eq_add_neg]
-        grw [abv_add abv]
+        refine le_trans (abv_add _ _ _) ?_
         rw [two_mul, abv_neg abv]
         gcongr <;> exact le_of_lt (hQ _)
     _ < ε / (4 * Q) * (2 * Q) := by
@@ -154,7 +157,7 @@ lemma of_decreasing_bounded (f : ℕ → α) {a : α} {m : ℕ} (ham : ∀ n ≥
   have hl0 : l ≠ 0 := fun hl0 ↦
     not_lt_of_ge (ham m le_rfl)
       (lt_of_lt_of_le (by have := hl m (le_refl m); simpa [hl0] using this) (le_abs_self (f m)))
-  obtain ⟨i, hi⟩ := not_forall.1 (Nat.find_min h (Nat.pred_lt hl0))
+  cases' not_forall.1 (Nat.find_min h (Nat.pred_lt hl0)) with i hi
   rw [Classical.not_imp, not_lt] at hi
   exists i
   intro j hj
@@ -167,7 +170,7 @@ lemma of_decreasing_bounded (f : ℕ → α) {a : α} {m : ℕ} (ham : ∀ n ≥
         rhs
         rw [← Nat.succ_pred_eq_of_pos (Nat.pos_of_ne_zero hl0), succ_nsmul, sub_add,
           add_sub_cancel_right]
-    _ < f j + ε := by gcongr; exact hl _ <| hi.1.trans hj
+    _ < f j + ε := add_lt_add_right (hl j (le_trans hi.1 hj)) _
 
 lemma of_mono_bounded (f : ℕ → α) {a : α} {m : ℕ} (ham : ∀ n ≥ m, |f n| ≤ a)
     (hnm : ∀ n ≥ m, f n ≤ f n.succ) : IsCauSeq abs f :=
@@ -175,12 +178,12 @@ lemma of_mono_bounded (f : ℕ → α) {a : α} {m : ℕ} (ham : ∀ n ≥ m, |f
 
 lemma geo_series [Nontrivial β] (x : β) (hx1 : abv x < 1) :
     IsCauSeq abv fun n ↦ ∑ m ∈ range n, x ^ m := by
-  have hx1' : abv x ≠ 1 := fun h ↦ by simp [h] at hx1
+  have hx1' : abv x ≠ 1 := fun h ↦ by simp [h, lt_irrefl] at hx1
   refine of_abv ?_
   simp only [abv_pow abv, geom_sum_eq hx1']
   conv in _ / _ => rw [← neg_div_neg_eq, neg_sub, neg_sub]
   have : 0 < 1 - abv x := sub_pos.2 hx1
-  refine of_mono_bounded _ (a := (1 : α) / (1 - abv x)) (m := 0) ?_ ?_
+  refine @of_mono_bounded _ _ _ _ ((1 : α) / (1 - abv x)) 0 ?_ ?_
   · intro n _
     rw [abs_of_nonneg]
     · gcongr
@@ -194,5 +197,27 @@ lemma geo_series [Nontrivial β] (x : β) (hx1 : abv x < 1) :
 lemma geo_series_const (a : α) {x : α} (hx1 : |x| < 1) :
     IsCauSeq abs fun m ↦ ∑ n ∈ range m, (a * x ^ n) := by
   simpa [mul_sum, Pi.mul_def] using (const a).mul (geo_series x hx1)
+
+lemma series_ratio_test {f : ℕ → β} (n : ℕ) (r : α) (hr0 : 0 ≤ r) (hr1 : r < 1)
+    (h : ∀ m, n ≤ m → abv (f m.succ) ≤ r * abv (f m)) :
+    IsCauSeq abv fun m ↦ ∑ n ∈ range m, f n := by
+  have har1 : |r| < 1 := by rwa [abs_of_nonneg hr0]
+  refine (geo_series_const (abv (f n.succ) * r⁻¹ ^ n.succ) har1).of_abv_le n.succ fun m hmn ↦ ?_
+  obtain rfl | hr := hr0.eq_or_lt
+  · have m_pos := lt_of_lt_of_le (Nat.succ_pos n) hmn
+    have := h m.pred (Nat.le_of_succ_le_succ (by rwa [Nat.succ_pred_eq_of_pos m_pos]))
+    simpa [Nat.sub_add_cancel m_pos, pow_succ] using this
+  generalize hk : m - n.succ = k
+  replace hk : m = k + n.succ := (tsub_eq_iff_eq_add_of_le hmn).1 hk
+  induction' k with k ih generalizing m n
+  · rw [hk, Nat.zero_add, mul_right_comm, inv_pow _ _, ← div_eq_mul_inv, mul_div_cancel_right₀]
+    positivity
+  · have kn : k + n.succ ≥ n.succ := by
+      rw [← zero_add n.succ]; exact add_le_add (Nat.zero_le _) (by simp)
+    rw [hk, Nat.succ_add, pow_succ r, ← mul_assoc]
+    refine
+      le_trans (by rw [mul_comm] <;> exact h _ (Nat.le_of_succ_le kn))
+        (mul_le_mul_of_nonneg_right ?_ hr0)
+    exact ih _ h _ (by simp) rfl
 
 end IsCauSeq

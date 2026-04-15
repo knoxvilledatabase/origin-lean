@@ -1,8 +1,12 @@
 /-
 Extracted from Order/Filter/Extr.lean
-Genuine: 123 of 133 | Dissolved: 0 | Infrastructure: 10
+Genuine: 100 of 110 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
+import Mathlib.Order.Filter.Tendsto
+import Mathlib.Order.ConditionallyCompleteLattice.Indexed
+import Mathlib.Algebra.Order.Group.Defs
+import Mathlib.Data.Finset.Lattice.Fold
 
 /-!
 # Minimum and maximum w.r.t. a filter and on a set
@@ -74,7 +78,9 @@ universe u v w x
 
 variable {α : Type u} {β : Type v} {γ : Type w} {δ : Type x}
 
-open Set Filter Relator
+open Set Filter
+
+open Filter
 
 section Preorder
 
@@ -107,30 +113,17 @@ variable {f s a l} {t : Set α} {l' : Filter α}
 theorem IsExtrOn.elim {p : Prop} : IsExtrOn f s a → (IsMinOn f s a → p) → (IsMaxOn f s a → p) → p :=
   Or.elim
 
+theorem isMinOn_iff : IsMinOn f s a ↔ ∀ x ∈ s, f a ≤ f x :=
+  Iff.rfl
+
+theorem isMaxOn_iff : IsMaxOn f s a ↔ ∀ x ∈ s, f x ≤ f a :=
+  Iff.rfl
+
 theorem isMinOn_univ_iff : IsMinOn f univ a ↔ ∀ x, f a ≤ f x :=
   univ_subset_iff.trans eq_univ_iff_forall
 
 theorem isMaxOn_univ_iff : IsMaxOn f univ a ↔ ∀ x, f x ≤ f a :=
   univ_subset_iff.trans eq_univ_iff_forall
-
-theorem IsMinOn.bddBelow (h : IsMinOn f s a) :
-    BddBelow (f '' s) :=
-  ⟨f a, by simpa [mem_lowerBounds] using h⟩
-
-theorem IsMinOn.isGLB (ha : a ∈ s) (hfsa : IsMinOn f s a) :
-    IsGLB {f x | x ∈ s} (f a) := by
-  rw [isGLB_iff_le_iff]
-  intro b
-  simp only [mem_lowerBounds, mem_setOf_eq, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂]
-  exact ⟨fun hba x hx ↦ le_trans hba (hfsa hx), fun hb ↦ hb a ha⟩
-
-theorem IsMaxOn.isLUB (ha : a ∈ s) (hfsa : IsMaxOn f s a) :
-    IsLUB {f x | x ∈ s} (f a) :=
-  IsMinOn.isGLB (α := αᵒᵈ) (β := βᵒᵈ) ha hfsa
-
-theorem IsMaxOn.bddAbove (h : IsMaxOn f s a) :
-    BddAbove (f '' s) :=
-  ⟨f a, by simpa [mem_upperBounds] using h⟩
 
 theorem IsMinFilter.tendsto_principal_Ici (h : IsMinFilter f l a) : Tendsto f l (𝓟 <| Ici (f a)) :=
   tendsto_principal.2 h
@@ -172,13 +165,15 @@ theorem isMaxOn_const {b : β} : IsMaxOn (fun _ => b) s a :=
 theorem isExtrOn_const {b : β} : IsExtrOn (fun _ => b) s a :=
   isExtrFilter_const
 
-lemma eventuallyEq_of_isMinFilter_of_isMaxFilter {β : Type*} [PartialOrder β] {f : α → β}
-    (h₁ : IsMinFilter f l a) (h₂ : IsMaxFilter f l a) : f =ᶠ[l] (fun _ ↦ f a) := by
-  filter_upwards [h₁, h₂] using by grind
-
 /-! ### Order dual -/
 
 open OrderDual (toDual)
+
+theorem isMinFilter_dual_iff : IsMinFilter (toDual ∘ f) l a ↔ IsMaxFilter f l a :=
+  Iff.rfl
+
+theorem isMaxFilter_dual_iff : IsMaxFilter (toDual ∘ f) l a ↔ IsMinFilter f l a :=
+  Iff.rfl
 
 theorem isExtrFilter_dual_iff : IsExtrFilter (toDual ∘ f) l a ↔ IsExtrFilter f l a :=
   or_comm
@@ -188,6 +183,12 @@ alias ⟨IsMinFilter.undual, IsMaxFilter.dual⟩ := isMinFilter_dual_iff
 alias ⟨IsMaxFilter.undual, IsMinFilter.dual⟩ := isMaxFilter_dual_iff
 
 alias ⟨IsExtrFilter.undual, IsExtrFilter.dual⟩ := isExtrFilter_dual_iff
+
+theorem isMinOn_dual_iff : IsMinOn (toDual ∘ f) s a ↔ IsMaxOn f s a :=
+  Iff.rfl
+
+theorem isMaxOn_dual_iff : IsMaxOn (toDual ∘ f) s a ↔ IsMinOn f s a :=
+  Iff.rfl
 
 theorem isExtrOn_dual_iff : IsExtrOn (toDual ∘ f) s a ↔ IsExtrOn f s a :=
   or_comm
@@ -205,6 +206,18 @@ theorem IsMinFilter.filter_mono (h : IsMinFilter f l a) (hl : l' ≤ l) : IsMinF
 
 theorem IsMaxFilter.filter_mono (h : IsMaxFilter f l a) (hl : l' ≤ l) : IsMaxFilter f l' a :=
   hl h
+
+theorem IsExtrFilter.filter_mono (h : IsExtrFilter f l a) (hl : l' ≤ l) : IsExtrFilter f l' a :=
+  h.elim (fun h => (h.filter_mono hl).isExtr) fun h => (h.filter_mono hl).isExtr
+
+theorem IsMinFilter.filter_inf (h : IsMinFilter f l a) (l') : IsMinFilter f (l ⊓ l') a :=
+  h.filter_mono inf_le_left
+
+theorem IsMaxFilter.filter_inf (h : IsMaxFilter f l a) (l') : IsMaxFilter f (l ⊓ l') a :=
+  h.filter_mono inf_le_left
+
+theorem IsExtrFilter.filter_inf (h : IsExtrFilter f l a) (l') : IsExtrFilter f (l ⊓ l') a :=
+  h.filter_mono inf_le_left
 
 theorem IsMinOn.on_subset (hf : IsMinOn f t a) (h : s ⊆ t) : IsMinOn f s a :=
   hf.filter_mono <| principal_mono.2 h
@@ -338,8 +351,7 @@ end Preorder
 
 section OrderedAddCommMonoid
 
-variable [AddCommMonoid β] [PartialOrder β] [IsOrderedAddMonoid β]
-  {f g : α → β} {a : α} {s : Set α} {l : Filter α}
+variable [OrderedAddCommMonoid β] {f g : α → β} {a : α} {s : Set α} {l : Filter α}
 
 theorem IsMinFilter.add (hf : IsMinFilter f l a) (hg : IsMinFilter g l a) :
     IsMinFilter (fun x => f x + g x) l a :=
@@ -363,8 +375,7 @@ end OrderedAddCommMonoid
 
 section OrderedAddCommGroup
 
-variable [AddCommGroup β] [PartialOrder β] [IsOrderedAddMonoid β]
-  {f g : α → β} {a : α} {s : Set α} {l : Filter α}
+variable [OrderedAddCommGroup β] {f g : α → β} {a : α} {s : Set α} {l : Filter α}
 
 theorem IsMinFilter.neg (hf : IsMinFilter f l a) : IsMaxFilter (fun x => -f x) l a :=
   hf.comp_antitone fun _x _y hx => neg_le_neg hx
@@ -487,106 +498,6 @@ theorem IsMinOn.max (hf : IsMinOn f s a) (hg : IsMinOn g s a) :
 theorem IsMaxOn.max (hf : IsMaxOn f s a) (hg : IsMaxOn g s a) :
     IsMaxOn (fun x => max (f x) (g x)) s a :=
   IsMaxFilter.max hf hg
-
-/-! ### Extrema from monotonicity and antitonicity -/
-
-variable {β : Type*} [LinearOrder α] [Preorder β] {a b c : α} {f : α → β}
-
-lemma isMaxOn_Ioo_of_mono_anti (h₀ : MonotoneOn f (Ioc a b)) (h₁ : AntitoneOn f (Ico b c)) :
-    IsMaxOn f (Ioo a c) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ ⟨hx.1, g₀⟩ (right_mem_Ioc.2 (g₀.trans_lt' hx.1)) g₀
-  · refine h₁ (left_mem_Ico.2 (g₀.trans hx.2)) ⟨g₀.le, hx.2⟩ g₀.le
-
-lemma isMinOn_Ioo_of_anti_mono (h₀ : AntitoneOn f (Ioc a b)) (h₁ : MonotoneOn f (Ico b c)) :
-    IsMinOn f (Ioo a c) b :=
-  isMaxOn_Ioo_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Ico_of_mono_anti (h₀ : MonotoneOn f (Icc a b)) (h₁ : AntitoneOn f (Ico b c)) :
-    IsMaxOn f (Ico a c) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ ⟨hx.1, g₀⟩ (right_mem_Icc.2 (hx.1.trans g₀)) g₀
-  · exact h₁ (left_mem_Ico.2 (g₀.trans hx.2)) ⟨g₀.le, hx.2⟩ g₀.le
-
-lemma isMinOn_Ico_of_anti_mono (h₀ : AntitoneOn f (Icc a b)) (h₁ : MonotoneOn f (Ico b c)) :
-    IsMinOn f (Ico a c) b :=
-  isMaxOn_Ico_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Ioc_of_mono_anti (h₀ : MonotoneOn f (Ioc a b)) (h₁ : AntitoneOn f (Icc b c)) :
-    IsMaxOn f (Ioc a c) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ ⟨hx.1, g₀⟩ (right_mem_Ioc.2 (g₀.trans_lt' hx.1)) g₀
-  · exact h₁ (left_mem_Icc.2 (g₀.le.trans hx.2)) ⟨g₀.le, hx.2⟩ g₀.le
-
-lemma isMinOn_Ioc_of_anti_mono (h₀ : AntitoneOn f (Ioc a b)) (h₁ : MonotoneOn f (Icc b c)) :
-    IsMinOn f (Ioc a c) b :=
-  isMaxOn_Ioc_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Icc_of_mono_anti (h₀ : MonotoneOn f (Icc a b)) (h₁ : AntitoneOn f (Icc b c)) :
-    IsMaxOn f (Icc a c) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ ⟨hx.1, g₀⟩ (right_mem_Icc.2 (hx.1.trans g₀)) g₀
-  · exact h₁ (left_mem_Icc.2 (g₀.le.trans hx.2)) ⟨g₀.le, hx.2⟩ g₀.le
-
-lemma isMinOn_Icc_of_anti_mono (h₀ : AntitoneOn f (Icc a b)) (h₁ : MonotoneOn f (Icc b c)) :
-    IsMinOn f (Icc a c) b :=
-  isMaxOn_Icc_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Ioi_of_mono_anti (h₀ : MonotoneOn f (Ioc a b)) (h₁ : AntitoneOn f (Ici b)) :
-    IsMaxOn f (Ioi a) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ ⟨hx, g₀⟩ (right_mem_Ioc.2 (g₀.trans_lt' hx)) g₀
-  · exact h₁ self_mem_Ici g₀.le g₀.le
-
-lemma isMinOn_Ioi_of_anti_mono (h₀ : AntitoneOn f (Ioc a b)) (h₁ : MonotoneOn f (Ici b)) :
-    IsMinOn f (Ioi a) b :=
-  isMaxOn_Ioi_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Ici_of_mono_anti (h₀ : MonotoneOn f (Icc a b)) (h₁ : AntitoneOn f (Ici b)) :
-    IsMaxOn f (Ici a) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ ⟨hx, g₀⟩ (right_mem_Icc.2 (hx.trans g₀)) g₀
-  · exact h₁ self_mem_Ici g₀.le g₀.le
-
-lemma isMinOn_Ici_of_anti_mono (h₀ : AntitoneOn f (Icc a b)) (h₁ : MonotoneOn f (Ici b)) :
-    IsMinOn f (Ici a) b :=
-  isMaxOn_Ici_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Iio_of_mono_anti (h₀ : MonotoneOn f (Iic b)) (h₁ : AntitoneOn f (Ico b a)) :
-    IsMaxOn f (Iio a) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ g₀ self_mem_Iic g₀
-  · exact h₁ (left_mem_Ico.2 (g₀.trans hx)) ⟨g₀.le, hx⟩ g₀.le
-
-lemma isMinOn_Iio_of_anti_mono (h₀ : AntitoneOn f (Iic b)) (h₁ : MonotoneOn f (Ico b a)) :
-    IsMinOn f (Iio a) b :=
-  isMaxOn_Iio_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_Iic_of_mono_anti (h₀ : MonotoneOn f (Iic b)) (h₁ : AntitoneOn f (Icc b a)) :
-    IsMaxOn f (Iic a) b := by
-  intro x hx
-  by_cases! g₀ : x ≤ b
-  · exact h₀ g₀ self_mem_Iic g₀
-  · exact h₁ (left_mem_Icc.2 (g₀.le.trans hx)) ⟨g₀.le, hx⟩ g₀.le
-
-lemma isMinOn_Iic_of_anti_mono (h₀ : AntitoneOn f (Iic b)) (h₁ : MonotoneOn f (Icc b a)) :
-    IsMinOn f (Iic a) b :=
-  isMaxOn_Iic_of_mono_anti (β := βᵒᵈ) h₀ h₁
-
-lemma isMaxOn_univ_of_mono_anti (h₀ : MonotoneOn f (Iic b)) (h₁ : AntitoneOn f (Ici b)) :
-    IsMaxOn f univ b :=
-  fun x _ => by rcases le_total x b <;> aesop
-
-lemma isMinOn_univ_of_anti_mono (h₀ : AntitoneOn f (Iic b)) (h₁ : MonotoneOn f (Ici b)) :
-    IsMinOn f univ b :=
-  isMaxOn_univ_of_mono_anti (β := βᵒᵈ) h₀ h₁
 
 end LinearOrder
 

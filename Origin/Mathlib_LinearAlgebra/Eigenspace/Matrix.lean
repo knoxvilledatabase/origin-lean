@@ -1,8 +1,9 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Matrix.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
 
@@ -20,7 +21,7 @@ section SpectrumDiagonal
 
 variable {R n M : Type*} [DecidableEq n] [Fintype n]
 
-open Matrix Module End
+open Matrix Module.End
 
 section NontrivialCommRing
 
@@ -31,10 +32,10 @@ lemma hasEigenvector_toLin_diagonal (d : n → R) (i : n) (b : Basis n R M) :
   ⟨mem_eigenspace_iff.mpr <| by simp [diagonal], Basis.ne_zero b i⟩
 
 lemma hasEigenvector_toLin'_diagonal (d : n → R) (i : n) :
-    HasEigenvector (toLin' (diagonal d)) (d i) (Pi.basisFun R n i) :=
+    HasEigenvector (toLin' (diagonal d)) (d i) (Pi.basisFun R n i)  :=
   hasEigenvector_toLin_diagonal _ _ (Pi.basisFun R n)
 
-lemma hasEigenvalue_toLin_diagonal_iff (d : n → R) {μ : R} [IsDomain R] [IsTorsionFree R M]
+lemma hasEigenvalue_toLin_diagonal_iff (d : n → R) {μ : R} [NoZeroSMulDivisors R M]
     (b : Basis n R M) : HasEigenvalue (toLin b b (diagonal d)) μ ↔ ∃ i, d i = μ := by
   have (i : n) : HasEigenvalue (toLin b b (diagonal d)) (d i) :=
     hasEigenvalue_of_hasEigenvector <| hasEigenvector_toLin_diagonal d i b
@@ -49,19 +50,23 @@ lemma hasEigenvalue_toLin_diagonal_iff (d : n → R) {μ : R} [IsDomain R] [IsTo
       apply Submodule.mem_iSup_of_mem ⟨i, rfl⟩
       rw [mem_eigenspace_iff]
       exact (hasEigenvector_toLin_diagonal d i b).apply_eq_smul
-    have hμ_notMem : μ ∉ Set.range d := by simpa using fun i ↦ (hμ i)
-    have := eigenspaces_iSupIndep (toLin b b (diagonal d)) |>.disjoint_biSup hμ_notMem
+    have hμ_not_mem : μ ∉ Set.range d := by simpa using fun i ↦ (hμ i)
+    have := eigenspaces_iSupIndep (toLin b b (diagonal d)) |>.disjoint_biSup hμ_not_mem
     rw [h_iSup, disjoint_top] at this
     exact h_eig this
   · rintro ⟨i, rfl⟩
     exact this i
 
-lemma hasEigenvalue_toLin'_diagonal_iff [IsDomain R] (d : n → R) {μ : R} :
+lemma hasEigenvalue_toLin'_diagonal_iff [NoZeroDivisors R] (d : n → R) {μ : R} :
     HasEigenvalue (toLin' (diagonal d)) μ ↔ (∃ i, d i = μ) :=
   hasEigenvalue_toLin_diagonal_iff _ <| Pi.basisFun R n
 
 end NontrivialCommRing
 
-namespace Matrix
+lemma spectrum_diagonal [Field R] (d : n → R) :
+    spectrum R (diagonal d) = Set.range d := by
+  ext μ
+  rw [← AlgEquiv.spectrum_eq (toLinAlgEquiv <| Pi.basisFun R n), ← hasEigenvalue_iff_mem_spectrum]
+  exact hasEigenvalue_toLin'_diagonal_iff d
 
-variable [CommRing R] [AddCommGroup M] [Module R M] (d : n → R) {μ : R} (b : Basis n R M)
+end SpectrumDiagonal

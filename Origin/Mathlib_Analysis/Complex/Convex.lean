@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/Complex/Convex.lean
-Genuine: 16 of 17 | Dissolved: 0 | Infrastructure: 1
+Genuine: 14 of 14 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Topology
+import Mathlib.Analysis.Complex.ReImTopology
 
 /-!
 # Theorems about convexity on the complex plane
@@ -64,30 +66,12 @@ theorem convex_halfSpace_im_gt : Convex ℝ { c : ℂ | r < c.im } :=
 theorem convex_halfSpace_im_ge : Convex ℝ { c : ℂ | r ≤ c.im } :=
   convex_halfSpace_ge (.mk add_im smul_im) _
 
-namespace Complex
-
-lemma isConnected_of_upperHalfPlane {r} {s : Set ℂ} (hs₁ : {z | r < z.im} ⊆ s)
+lemma Complex.isConnected_of_upperHalfPlane {r} {s : Set ℂ} (hs₁ : {z | r < z.im} ⊆ s)
     (hs₂ : s ⊆ {z | r ≤ z.im}) : IsConnected s := by
   refine .subset_closure ?_ hs₁ (by simpa only [closure_setOf_lt_im] using hs₂)
   exact (convex_halfSpace_im_gt r).isConnected ⟨(r + 1) * I, by simp⟩
 
-lemma isConnected_of_lowerHalfPlane {r} {s : Set ℂ} (hs₁ : {z | z.im < r} ⊆ s)
+lemma Complex.isConnected_of_lowerHalfPlane {r} {s : Set ℂ} (hs₁ : {z | z.im < r} ⊆ s)
     (hs₂ : s ⊆ {z | z.im ≤ r}) : IsConnected s := by
   refine .subset_closure ?_ hs₁ (by simpa only [closure_setOf_im_lt] using hs₂)
   exact (convex_halfSpace_im_lt r).isConnected ⟨(r - 1) * I, by simp⟩
-
-lemma rectangle_eq_convexHull (z w : ℂ) :
-    Rectangle z w = convexHull ℝ {z, z.re + w.im * I, w.re + z.im * I, w} := by
-  simp_rw [Rectangle, ← segment_eq_uIcc, ← convexHull_pair, ← convexHull_reProdIm,
-    ← preimage_equivRealProd_prod, insert_prod, singleton_prod, image_pair, insert_union,
-    ← insert_eq, ← Equiv.image_symm_eq_preimage, image_insert_eq, image_singleton,
-    equivRealProd_symm_apply, re_add_im]
-
-lemma Convex.rectangle_subset {U : Set ℂ} (U_convex : Convex ℝ U) {z w : ℂ} (hz : z ∈ U)
-    (hw : w ∈ U) (hzw : (z.re + w.im * I) ∈ U) (hwz : (w.re + z.im * I) ∈ U) :
-    Rectangle z w ⊆ U := by
-  simpa only [rectangle_eq_convexHull] using convexHull_min (by grind) U_convex
-
--- INSTANCE (free from Core): :
-
-end Complex

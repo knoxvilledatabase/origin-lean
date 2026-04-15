@@ -3,6 +3,10 @@ Extracted from Data/Real/Pointwise.lean
 Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Module.OrderedSMul
+import Mathlib.Algebra.Order.Module.Pointwise
+import Mathlib.Data.Real.Archimedean
+import Mathlib.Data.Set.Pointwise.SMul
 
 /-!
 # Pointwise operations on sets of reals
@@ -18,17 +22,15 @@ This is true more generally for conditionally complete linear order whose defaul
 don't have those yet.
 -/
 
-assert_not_exists Finset
-
 open Set
 
 open Pointwise
 
-variable {ι : Sort*} {α : Type*} [Field α] [LinearOrder α] [IsStrictOrderedRing α]
+variable {ι : Sort*} {α : Type*} [LinearOrderedField α]
 
 section MulActionWithZero
 
-variable [MulActionWithZero α ℝ] [IsOrderedModule α ℝ] {a : α}
+variable [MulActionWithZero α ℝ] [OrderedSMul α ℝ] {a : α}
 
 theorem Real.sInf_smul_of_nonneg (ha : 0 ≤ a) (s : Set ℝ) : sInf (a • s) = a • sInf s := by
   obtain rfl | hs := s.eq_empty_or_nonempty
@@ -62,7 +64,7 @@ end MulActionWithZero
 
 section Module
 
-variable [Module α ℝ] [IsOrderedModule α ℝ] {a : α}
+variable [Module α ℝ] [OrderedSMul α ℝ] {a : α}
 
 theorem Real.sInf_smul_of_nonpos (ha : a ≤ 0) (s : Set ℝ) : sInf (a • s) = a • sSup s := by
   obtain rfl | hs := s.eq_empty_or_nonempty

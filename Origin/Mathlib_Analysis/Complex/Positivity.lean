@@ -3,6 +3,7 @@ Extracted from Analysis/Complex/Positivity.lean
 Genuine: 2 of 4 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.TaylorSeries
 
 /-!
 # Nonnegativity of values of holomorphic functions
@@ -11,7 +12,7 @@ We show that if `f` is holomorphic on an open disk `B(c,r)` and all iterated der
 at `c` are nonnegative real, then `f z ≥ 0` for all `z ≥ c` in the disk; see
 `DifferentiableOn.nonneg_of_iteratedDeriv_nonneg`. We also provide a
 variant `Differentiable.nonneg_of_iteratedDeriv_nonneg` for entire functions and versions
-showing `f z ≥ f c` when all iterated derivatives except `f` itself are nonnegative.
+showing `f z ≥ f c` when all iterated derivatives except `f` itseld are nonnegative.
 -/
 
 open Complex
@@ -22,7 +23,7 @@ namespace DifferentiableOn
 
 theorem nonneg_of_iteratedDeriv_nonneg {f : ℂ → ℂ} {c : ℂ} {r : ℝ}
     (hf : DifferentiableOn ℂ f (Metric.ball c r)) (h : ∀ n, 0 ≤ iteratedDeriv n f c) ⦃z : ℂ⦄
-    (hz₁ : c ≤ z) (hz₂ : z ∈ Metric.ball c r) :
+    (hz₁ : c ≤ z) (hz₂ : z ∈ Metric.ball c r):
     0 ≤ f z := by
   have H := taylorSeries_eq_on_ball' hz₂ hf
   rw [← sub_nonneg] at hz₁
@@ -32,7 +33,8 @@ theorem nonneg_of_iteratedDeriv_nonneg {f : ℂ → ℂ} {c : ℂ} {r : ℝ}
   rw [← ofReal_natCast, ← ofReal_pow, ← ofReal_inv, eq_re_of_ofReal_le (h n), ← ofReal_mul,
     ← ofReal_mul]
   norm_cast at hz₁ ⊢
-  positivity [zero_re ▸ (Complex.le_def.mp (h n)).1]
+  have := zero_re ▸ (Complex.le_def.mp (h n)).1
+  positivity
 
 end DifferentiableOn
 
@@ -44,7 +46,7 @@ theorem nonneg_of_iteratedDeriv_nonneg {f : ℂ → ℂ} (hf : Differentiable �
   refine hf.differentiableOn.nonneg_of_iteratedDeriv_nonneg (r := (z - c).re + 1) h hz ?_
   rw [← sub_nonneg] at hz
   rw [Metric.mem_ball, dist_eq, eq_re_of_ofReal_le hz]
-  simpa only [Complex.norm_of_nonneg (nonneg_iff.mp hz).1] using lt_add_one _
+  simpa only [Complex.abs_of_nonneg (nonneg_iff.mp hz).1] using lt_add_one _
 
 -- DISSOLVED: apply_le_of_iteratedDeriv_nonneg
 

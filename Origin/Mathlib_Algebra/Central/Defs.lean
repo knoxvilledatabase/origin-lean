@@ -3,6 +3,7 @@ Extracted from Algebra/Central/Defs.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Subalgebra.Basic
 
 /-!
 # Central Algebras
@@ -45,7 +46,7 @@ variable (k D : Type*) [Field k] [Ring D] [Algebra k D]
 variable [Algebra.IsCentral k D] [IsSimpleRing D]
 variable [FiniteDimensional k D]
 ```
-where `FiniteDimensional k D` is almost always assumed in most references, but some results do not
+where `FiniteDimensional k D` is almost always assumed in most references, but some results does not
 need this assumption.
 
 ## Tags

@@ -3,6 +3,9 @@ Extracted from Topology/Instances/Irrational.lean
 Genuine: 6 of 10 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Data.Real.Irrational
+import Mathlib.Data.Rat.Encodable
+import Mathlib.Topology.Separation.GDelta
 
 /-!
 # Topology of irrational numbers
@@ -46,13 +49,21 @@ namespace Irrational
 
 variable {x : ℝ}
 
--- INSTANCE (free from Core): :
+instance : OrderTopology { x // Irrational x } :=
+  induced_orderTopology _ Iff.rfl <| @fun _ _ hlt =>
+    let ⟨z, hz, hxz, hzy⟩ := exists_irrational_btwn hlt
+    ⟨⟨z, hz⟩, hxz, hzy⟩
 
--- INSTANCE (free from Core): :
+instance : NoMaxOrder { x // Irrational x } :=
+  ⟨fun ⟨x, hx⟩ => ⟨⟨x + (1 : ℕ), hx.add_nat 1⟩, by simp⟩⟩
 
--- INSTANCE (free from Core): :
+instance : NoMinOrder { x // Irrational x } :=
+  ⟨fun ⟨x, hx⟩ => ⟨⟨x - (1 : ℕ), hx.sub_nat 1⟩, by simp⟩⟩
 
--- INSTANCE (free from Core): :
+instance : DenselyOrdered { x // Irrational x } :=
+  ⟨fun _ _ hlt =>
+    let ⟨z, hz, hxz, hzy⟩ := exists_irrational_btwn hlt
+    ⟨⟨z, hz⟩, hxz, hzy⟩⟩
 
 theorem eventually_forall_le_dist_cast_div (hx : Irrational x) (n : ℕ) :
     ∀ᶠ ε : ℝ in 𝓝 0, ∀ m : ℤ, ε ≤ dist x (m / n) := by

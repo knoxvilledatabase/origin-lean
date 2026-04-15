@@ -3,13 +3,15 @@ Extracted from Topology/Category/CompHaus/Limits.lean
 Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.Category.CompHaus.Basic
+import Mathlib.Topology.Category.CompHausLike.Limits
 
 /-!
 
 # Explicit limits and colimits
 
 This file applies the general API for explicit limits and colimits in `CompHausLike P` (see
-the file `Mathlib/Topology/Category/CompHausLike/Limits.lean`) to the special case of `CompHaus`.
+the file `Mathlib.Topology.Category.CompHausLike.Limits`) to the special case of `CompHaus`.
 -/
 
 namespace CompHaus
@@ -18,9 +20,11 @@ universe u w
 
 open CategoryTheory Limits CompHausLike
 
--- INSTANCE (free from Core): :
+instance : HasExplicitPullbacks (fun _ ↦ True) where
+  hasProp _ _ := inferInstance
 
--- INSTANCE (free from Core): :
+instance : HasExplicitFiniteCoproducts.{w, u} (fun _ ↦ True) where
+  hasProp _ := inferInstance
 
 example : FinitaryExtensive CompHaus.{u} := inferInstance
 

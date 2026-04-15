@@ -1,8 +1,12 @@
 /-
 Extracted from Algebra/CharP/CharAndCard.lean
-Genuine: 5 of 6 | Dissolved: 1 | Infrastructure: 0
+Genuine: 4 of 5 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.CharP.Basic
+import Mathlib.Algebra.CharP.Lemmas
+import Mathlib.GroupTheory.Perm.Cycle.Type
+import Mathlib.RingTheory.Coprime.Lemmas
 
 /-!
 # Characteristic and cardinality
@@ -37,19 +41,12 @@ theorem prime_dvd_char_iff_dvd_card {R : Type*} [CommRing R] [Fintype R] (p : �
   rw [mul_zero, ← mul_assoc, hu, one_mul] at hr₁
   exact mt AddMonoid.addOrderOf_eq_one_iff.mpr (ne_of_eq_of_ne hr (Nat.Prime.ne_one Fact.out)) hr₁
 
-theorem not_isUnit_prime_of_dvd_card {R : Type*} [CommRing R] [Fintype R] {p : ℕ} [Fact p.Prime]
+theorem not_isUnit_prime_of_dvd_card {R : Type*} [CommRing R] [Fintype R] (p : ℕ) [Fact p.Prime]
     (hp : p ∣ Fintype.card R) : ¬IsUnit (p : R) :=
   mt (isUnit_iff_not_dvd_char R p).mp
     (Classical.not_not.mpr ((prime_dvd_char_iff_dvd_card p).mpr hp))
 
-lemma charP_of_card_eq_prime {R : Type*} [NonAssocRing R] [Fintype R] {p : ℕ} [hp : Fact p.Prime]
+lemma charP_of_card_eq_prime {R : Type*} [NonAssocRing R] [Fintype R] (p : ℕ) [hp : Fact p.Prime]
     (hR : Fintype.card R = p) : CharP R p :=
   have := Fintype.one_lt_card_iff_nontrivial.1 (hR ▸ hp.1.one_lt)
   (CharP.charP_iff_prime_eq_zero hp.1).2 (hR ▸ Nat.cast_card_eq_zero R)
-
-lemma charP_of_card_eq_prime_pow {R : Type*} [CommRing R] [IsDomain R] [Fintype R] {p f : ℕ}
-    [hp : Fact p.Prime] (hR : Fintype.card R = p ^ f) : CharP R p :=
-  have hf : f ≠ 0 := fun h0 ↦ not_subsingleton R <|
-    Fintype.card_le_one_iff_subsingleton.mp <| by simpa [h0] using hR.le
-  (CharP.charP_iff_prime_eq_zero hp.out).mpr
-    (by simpa [hf, hR] using Nat.cast_card_eq_zero R)

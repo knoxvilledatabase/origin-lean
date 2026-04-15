@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Multiplicity.lean
-Genuine: 2 of 11 | Dissolved: 9 | Infrastructure: 0
+Genuine: 2 of 8 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Multiplicity
+import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
 
 /-!
 # Unique factorization and multiplicity
@@ -14,8 +16,6 @@ import Origin.Core
   occurs in the `normalizedFactors`.
 -/
 
-assert_not_exists Field
-
 variable {α : Type*}
 
 local infixl:50 " ~ᵤ " => Associated
@@ -24,13 +24,11 @@ local infixl:50 " ~ᵤ " => Associated
 
 -- DISSOLVED: WfDvdMonoid.max_power_factor
 
--- DISSOLVED: FiniteMultiplicity.of_not_isUnit
-
--- DISSOLVED: FiniteMultiplicity.of_prime_left
+-- DISSOLVED: multiplicity.finite_of_not_isUnit
 
 namespace UniqueFactorizationMonoid
 
-variable {R : Type*} [CommMonoidWithZero R] [UniqueFactorizationMonoid R]
+variable {R : Type*} [CancelCommMonoidWithZero R] [UniqueFactorizationMonoid R]
 
 section multiplicity
 
@@ -38,17 +36,17 @@ variable [NormalizationMonoid R]
 
 open Multiset
 
--- DISSOLVED: le_emultiplicity_iff_replicate_le_normalizedFactors
+section
 
-variable [DecidableEq R]
+-- DISSOLVED: le_emultiplicity_iff_replicate_le_normalizedFactors
 
 -- DISSOLVED: emultiplicity_eq_count_normalizedFactors
 
--- DISSOLVED: multiplicity_eq_count_normalizedFactors
+end
 
-theorem count_normalizedFactors_eq {p x : R} (hp : Irreducible p) (hnorm : normalize p = p) {n : ℕ}
-    (hle : p ^ n ∣ x) (hlt : ¬p ^ (n + 1) ∣ x) :
-    (normalizedFactors x).count p = n := by
+theorem count_normalizedFactors_eq [DecidableEq R] {p x : R} (hp : Irreducible p)
+    (hnorm : normalize p = p) {n : ℕ} (hle : p ^ n ∣ x) (hlt : ¬p ^ (n + 1) ∣ x) :
+    (normalizedFactors x).count p = n := by classical
   by_cases hx0 : x = 0
   · simp [hx0] at hlt
   apply Nat.cast_injective (R := ℕ∞)
@@ -56,20 +54,18 @@ theorem count_normalizedFactors_eq {p x : R} (hp : Irreducible p) (hnorm : norma
   · exact hnorm.symm
   exact (emultiplicity_eq_coe.mpr ⟨hle, hlt⟩).symm
 
-theorem count_normalizedFactors_eq' {p x : R} (hp : p = 0 ∨ Irreducible p) (hnorm : normalize p = p)
-    {n : ℕ} (hle : p ^ n ∣ x) (hlt : ¬p ^ (n + 1) ∣ x) :
+theorem count_normalizedFactors_eq' [DecidableEq R] {p x : R} (hp : p = 0 ∨ Irreducible p)
+    (hnorm : normalize p = p) {n : ℕ} (hle : p ^ n ∣ x) (hlt : ¬p ^ (n + 1) ∣ x) :
     (normalizedFactors x).count p = n := by
   rcases hp with (rfl | hp)
   · cases n
-    · exact count_eq_zero.2 (zero_notMem_normalizedFactors _)
+    · exact count_eq_zero.2 (zero_not_mem_normalizedFactors _)
     · rw [zero_pow (Nat.succ_ne_zero _)] at hle hlt
       exact absurd hle hlt
   · exact count_normalizedFactors_eq hp hnorm hle hlt
 
--- DISSOLVED: associated_finprod_pow_count
-
--- DISSOLVED: finprod_pow_count_eq_of_subsingleton_units
-
 end multiplicity
+
+-- DISSOLVED: max_power_factor
 
 end UniqueFactorizationMonoid

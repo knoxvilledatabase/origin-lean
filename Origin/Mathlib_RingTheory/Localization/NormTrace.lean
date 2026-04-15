@@ -3,6 +3,9 @@ Extracted from RingTheory/Localization/NormTrace.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Localization.Module
+import Mathlib.RingTheory.Norm.Basic
+import Mathlib.RingTheory.Discriminant
 
 /-!
 
@@ -13,16 +16,16 @@ This file contains results on the combination of `IsLocalization` and `Algebra.n
 
 ## Main results
 
-* `Algebra.norm_localization`: let `S` be an extension of `R` and `Rₘ Sₘ` be localizations at `M`
+ * `Algebra.norm_localization`: let `S` be an extension of `R` and `Rₘ Sₘ` be localizations at `M`
   of `R S` respectively. Then the norm of `a : Sₘ` over `Rₘ` is the norm of `a : S` over `R`
   if `S` is free as `R`-module.
 
-* `Algebra.trace_localization`: let `S` be an extension of `R` and `Rₘ Sₘ` be localizations at `M`
+ * `Algebra.trace_localization`: let `S` be an extension of `R` and `Rₘ Sₘ` be localizations at `M`
   of `R S` respectively. Then the trace of `a : Sₘ` over `Rₘ` is the trace of `a : S` over `R`
   if `S` is free as `R`-module.
 
 * `Algebra.discr_localizationLocalization`: let `S` be an extension of `R` and `Rₘ Sₘ` be
-  localizations at `M` of `R S` respectively. Let `b` be an `R`-basis of `S`. Then discriminant of
+  localizations at `M` of `R S` respectively. Let `b` be a `R`-basis of `S`. Then discriminant of
   the `Rₘ`-basis of `Sₘ` induced by `b` is the discriminant of `b`.
 
 ## Tags
@@ -30,8 +33,6 @@ This file contains results on the combination of `IsLocalization` and `Algebra.n
 field norm, algebra norm, localization
 
 -/
-
-open Module
 
 open scoped nonZeroDivisors
 

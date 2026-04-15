@@ -3,6 +3,7 @@ Extracted from Data/Ineq.lean
 Genuine: 6 of 8 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Lean.Expr.Basic
 
 /-!
 # `Ineq` datatype
@@ -12,7 +13,7 @@ involving it. The type `Ineq` is one of the fundamental objects manipulated by t
 `linear_combination` tactics.
 -/
 
-open Lean Meta
+open Lean Elab Tactic Meta
 
 namespace Mathlib
 
@@ -45,9 +46,9 @@ def toString : Ineq → String
   | le => "≤"
   | lt => "<"
 
--- INSTANCE (free from Core): :
+instance : ToString Ineq := ⟨toString⟩
 
--- INSTANCE (free from Core): :
+instance : ToFormat Ineq := ⟨fun i => Ineq.toString i⟩
 
 end Mathlib.Ineq
 

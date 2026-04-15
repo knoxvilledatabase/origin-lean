@@ -1,8 +1,10 @@
 /-
 Extracted from Topology/Defs/Sequences.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Defs.Filter
+import Mathlib.Order.Filter.AtTopBot
 
 /-!
 # Sequences in topological spaces
@@ -57,3 +59,21 @@ def IsSeqCompact (s : Set X) :=
   ∀ ⦃x : ℕ → X⦄, (∀ n, x n ∈ s) → ∃ a ∈ s, ∃ φ : ℕ → ℕ, StrictMono φ ∧ Tendsto (x ∘ φ) atTop (𝓝 a)
 
 variable (X)
+
+@[mk_iff]
+class SeqCompactSpace : Prop where
+  isSeqCompact_univ : IsSeqCompact (univ : Set X)
+
+export SeqCompactSpace (isSeqCompact_univ)
+
+class FrechetUrysohnSpace : Prop where
+  closure_subset_seqClosure : ∀ s : Set X, closure s ⊆ seqClosure s
+
+class SequentialSpace : Prop where
+  isClosed_of_seq : ∀ s : Set X, IsSeqClosed s → IsClosed s
+
+variable {X}
+
+protected theorem IsSeqClosed.isClosed [SequentialSpace X] {s : Set X} (hs : IsSeqClosed s) :
+    IsClosed s :=
+  SequentialSpace.isClosed_of_seq s hs

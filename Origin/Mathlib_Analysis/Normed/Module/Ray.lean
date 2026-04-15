@@ -3,6 +3,8 @@ Extracted from Analysis/Normed/Module/Ray.lean
 Genuine: 9 of 12 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Ray
+import Mathlib.Analysis.NormedSpace.Real
 
 /-!
 # Rays in a real normed vector space
@@ -32,7 +34,7 @@ theorem norm_sub (h : SameRay ℝ x y) : ‖x - y‖ = |‖x‖ - ‖y‖| := by
   wlog hab : b ≤ a generalizing a b with H
   · rw [SameRay.sameRay_comm] at h
     rw [norm_sub_rev, abs_sub_comm]
-    exact H b a hb ha h (le_of_not_ge hab)
+    exact H b a hb ha h (le_of_not_le hab)
   rw [← sub_nonneg] at hab
   rw [← sub_smul, norm_smul_of_nonneg hab, norm_smul_of_nonneg ha, norm_smul_of_nonneg hb, ←
     sub_mul, abs_of_nonneg (mul_nonneg hab (norm_nonneg _))]

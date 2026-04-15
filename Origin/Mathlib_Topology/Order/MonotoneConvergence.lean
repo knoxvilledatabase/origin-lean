@@ -1,8 +1,9 @@
 /-
 Extracted from Topology/Order/MonotoneConvergence.lean
-Genuine: 15 of 25 | Dissolved: 0 | Infrastructure: 10
+Genuine: 32 of 42 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
+import Mathlib.Topology.Order.Basic
 
 /-!
 # Bounded monotone sequences converge
@@ -33,20 +34,34 @@ variable {α β : Type*}
 class SupConvergenceClass (α : Type*) [Preorder α] [TopologicalSpace α] : Prop where
   /-- proof that a monotone function tends to `𝓝 a` as `x → ∞` -/
   tendsto_coe_atTop_isLUB :
-    ∀ (a : α) (s : Set α), IsLUB s a → Tendsto ((↑) : s → α) atTop (𝓝 a)
+    ∀ (a : α) (s : Set α), IsLUB s a → Tendsto (CoeTC.coe : s → α) atTop (𝓝 a)
 
 class InfConvergenceClass (α : Type*) [Preorder α] [TopologicalSpace α] : Prop where
-  /-- proof that a monotone function tends to `𝓝 a` as `x → -∞` -/
+  /-- proof that a monotone function tends to `𝓝 a` as `x → -∞`-/
   tendsto_coe_atBot_isGLB :
-    ∀ (a : α) (s : Set α), IsGLB s a → Tendsto ((↑) : s → α) atBot (𝓝 a)
+    ∀ (a : α) (s : Set α), IsGLB s a → Tendsto (CoeTC.coe : s → α) atBot (𝓝 a)
 
--- INSTANCE (free from Core): OrderDual.supConvergenceClass
+instance OrderDual.supConvergenceClass [Preorder α] [TopologicalSpace α] [InfConvergenceClass α] :
+    SupConvergenceClass αᵒᵈ :=
+  ⟨‹InfConvergenceClass α›.1⟩
 
--- INSTANCE (free from Core): OrderDual.infConvergenceClass
+instance OrderDual.infConvergenceClass [Preorder α] [TopologicalSpace α] [SupConvergenceClass α] :
+    InfConvergenceClass αᵒᵈ :=
+  ⟨‹SupConvergenceClass α›.1⟩
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) LinearOrder.supConvergenceClass [TopologicalSpace α] [LinearOrder α]
+    [OrderTopology α] : SupConvergenceClass α := by
+  refine ⟨fun a s ha => tendsto_order.2 ⟨fun b hb => ?_, fun b hb => ?_⟩⟩
+  · rcases ha.exists_between hb with ⟨c, hcs, bc, bca⟩
+    lift c to s using hcs
+    exact (eventually_ge_atTop c).mono fun x hx => bc.trans_le hx
+  · exact Eventually.of_forall fun x => (ha.1 x.2).trans_lt hb
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) LinearOrder.infConvergenceClass [TopologicalSpace α] [LinearOrder α]
+    [OrderTopology α] : InfConvergenceClass α :=
+  show InfConvergenceClass αᵒᵈᵒᵈ from OrderDual.infConvergenceClass
+
+section
 
 variable {ι : Type*} [Preorder ι] [TopologicalSpace α]
 
@@ -79,15 +94,12 @@ end IsGLB
 
 section CiSup
 
-variable [ConditionallyCompletePartialOrderSup α] [SupConvergenceClass α] {f : ι → α}
+variable [ConditionallyCompleteLattice α] [SupConvergenceClass α] {f : ι → α}
 
 theorem tendsto_atTop_ciSup (h_mono : Monotone f) (hbdd : BddAbove <| range f) :
     Tendsto f atTop (𝓝 (⨆ i, f i)) := by
-  obtain (h | h) := eq_or_ne atTop (⊥ : Filter ι)
-  · simp [h]
-  · obtain ⟨h₁, h₂⟩ := Filter.atTop_neBot_iff.mp ⟨h⟩
-    exact tendsto_atTop_isLUB h_mono <|
-      h_mono.directed_le.directedOn_range.isLUB_csSup (Set.range_nonempty f) hbdd
+  cases isEmpty_or_nonempty ι
+  exacts [tendsto_of_isEmpty, tendsto_atTop_isLUB h_mono (isLUB_ciSup hbdd)]
 
 theorem tendsto_atBot_ciSup (h_anti : Antitone f) (hbdd : BddAbove <| range f) :
     Tendsto f atBot (𝓝 (⨆ i, f i)) := by convert tendsto_atTop_ciSup h_anti.dual hbdd.dual using 1
@@ -96,7 +108,7 @@ end CiSup
 
 section CiInf
 
-variable [ConditionallyCompletePartialOrderInf α] [InfConvergenceClass α] {f : ι → α}
+variable [ConditionallyCompleteLattice α] [InfConvergenceClass α] {f : ι → α}
 
 theorem tendsto_atBot_ciInf (h_mono : Monotone f) (hbdd : BddBelow <| range f) :
     Tendsto f atBot (𝓝 (⨅ i, f i)) := by convert tendsto_atTop_ciSup h_mono.dual hbdd.dual using 1
@@ -132,21 +144,157 @@ end iInf
 
 end
 
--- INSTANCE (free from Core): Prod.supConvergenceClass
+instance Prod.supConvergenceClass
+    [Preorder α] [Preorder β] [TopologicalSpace α] [TopologicalSpace β]
+    [SupConvergenceClass α] [SupConvergenceClass β] : SupConvergenceClass (α × β) := by
+  constructor
+  rintro ⟨a, b⟩ s h
+  rw [isLUB_prod, ← range_restrict, ← range_restrict] at h
+  have A : Tendsto (fun x : s => (x : α × β).1) atTop (𝓝 a) :=
+    tendsto_atTop_isLUB (monotone_fst.restrict s) h.1
+  have B : Tendsto (fun x : s => (x : α × β).2) atTop (𝓝 b) :=
+    tendsto_atTop_isLUB (monotone_snd.restrict s) h.2
+  convert A.prod_mk_nhds B
+  -- Porting note: previously required below to close
+  -- ext1 ⟨⟨x, y⟩, h⟩
+  -- rfl
 
--- INSTANCE (free from Core): [Preorder
+instance [Preorder α] [Preorder β] [TopologicalSpace α] [TopologicalSpace β] [InfConvergenceClass α]
+    [InfConvergenceClass β] : InfConvergenceClass (α × β) :=
+  show InfConvergenceClass (αᵒᵈ × βᵒᵈ)ᵒᵈ from OrderDual.infConvergenceClass
 
--- INSTANCE (free from Core): Pi.supConvergenceClass
+instance Pi.supConvergenceClass
+    {ι : Type*} {α : ι → Type*} [∀ i, Preorder (α i)] [∀ i, TopologicalSpace (α i)]
+    [∀ i, SupConvergenceClass (α i)] : SupConvergenceClass (∀ i, α i) := by
+  refine ⟨fun f s h => ?_⟩
+  simp only [isLUB_pi, ← range_restrict] at h
+  exact tendsto_pi_nhds.2 fun i => tendsto_atTop_isLUB ((monotone_eval _).restrict _) (h i)
 
--- INSTANCE (free from Core): Pi.infConvergenceClass
+instance Pi.infConvergenceClass
+    {ι : Type*} {α : ι → Type*} [∀ i, Preorder (α i)] [∀ i, TopologicalSpace (α i)]
+    [∀ i, InfConvergenceClass (α i)] : InfConvergenceClass (∀ i, α i) :=
+  show InfConvergenceClass (∀ i, (α i)ᵒᵈ)ᵒᵈ from OrderDual.infConvergenceClass
 
--- INSTANCE (free from Core): Pi.supConvergenceClass'
+instance Pi.supConvergenceClass' {ι : Type*} [Preorder α] [TopologicalSpace α]
+    [SupConvergenceClass α] : SupConvergenceClass (ι → α) :=
+  supConvergenceClass
 
--- INSTANCE (free from Core): Pi.infConvergenceClass'
+instance Pi.infConvergenceClass' {ι : Type*} [Preorder α] [TopologicalSpace α]
+    [InfConvergenceClass α] : InfConvergenceClass (ι → α) :=
+  Pi.infConvergenceClass
 
-theorem tendsto_atTop_of_monotone {ι α : Type*} [Preorder ι] [TopologicalSpace α]
+theorem tendsto_of_monotone {ι α : Type*} [Preorder ι] [TopologicalSpace α]
     [ConditionallyCompleteLinearOrder α] [OrderTopology α] {f : ι → α} (h_mono : Monotone f) :
     Tendsto f atTop atTop ∨ ∃ l, Tendsto f atTop (𝓝 l) := by
   classical
   exact if H : BddAbove (range f) then Or.inr ⟨_, tendsto_atTop_ciSup h_mono H⟩
   else Or.inl <| tendsto_atTop_atTop_of_monotone' h_mono H
+
+theorem tendsto_of_antitone {ι α : Type*} [Preorder ι] [TopologicalSpace α]
+    [ConditionallyCompleteLinearOrder α] [OrderTopology α] {f : ι → α} (h_mono : Antitone f) :
+    Tendsto f atTop atBot ∨ ∃ l, Tendsto f atTop (𝓝 l) :=
+  @tendsto_of_monotone ι αᵒᵈ _ _ _ _ _ h_mono
+
+theorem tendsto_iff_tendsto_subseq_of_monotone {ι₁ ι₂ α : Type*} [SemilatticeSup ι₁] [Preorder ι₂]
+    [Nonempty ι₁] [TopologicalSpace α] [ConditionallyCompleteLinearOrder α] [OrderTopology α]
+    [NoMaxOrder α] {f : ι₂ → α} {φ : ι₁ → ι₂} {l : α} (hf : Monotone f)
+    (hg : Tendsto φ atTop atTop) : Tendsto f atTop (𝓝 l) ↔ Tendsto (f ∘ φ) atTop (𝓝 l) := by
+  constructor <;> intro h
+  · exact h.comp hg
+  · rcases tendsto_of_monotone hf with (h' | ⟨l', hl'⟩)
+    · exact (not_tendsto_atTop_of_tendsto_nhds h (h'.comp hg)).elim
+    · rwa [tendsto_nhds_unique h (hl'.comp hg)]
+
+theorem tendsto_iff_tendsto_subseq_of_antitone {ι₁ ι₂ α : Type*} [SemilatticeSup ι₁] [Preorder ι₂]
+    [Nonempty ι₁] [TopologicalSpace α] [ConditionallyCompleteLinearOrder α] [OrderTopology α]
+    [NoMinOrder α] {f : ι₂ → α} {φ : ι₁ → ι₂} {l : α} (hf : Antitone f)
+    (hg : Tendsto φ atTop atTop) : Tendsto f atTop (𝓝 l) ↔ Tendsto (f ∘ φ) atTop (𝓝 l) :=
+  tendsto_iff_tendsto_subseq_of_monotone (α := αᵒᵈ) hf hg
+
+/-! The next family of results, such as `isLUB_of_tendsto_atTop` and `iSup_eq_of_tendsto`, are
+converses to the standard fact that bounded monotone functions converge. They state, that if a
+monotone function `f` tends to `a` along `Filter.atTop`, then that value `a` is a least upper bound
+for the range of `f`.
+
+Related theorems above (`IsLUB.isLUB_of_tendsto`, `IsGLB.isGLB_of_tendsto` etc) cover the case
+when `f x` tends to `a` as `x` tends to some point `b` in the domain. -/
+
+theorem Monotone.ge_of_tendsto [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [SemilatticeSup β] {f : β → α} {a : α} (hf : Monotone f) (ha : Tendsto f atTop (𝓝 a)) (b : β) :
+    f b ≤ a :=
+  haveI : Nonempty β := Nonempty.intro b
+  _root_.ge_of_tendsto ha ((eventually_ge_atTop b).mono fun _ hxy => hf hxy)
+
+theorem Monotone.le_of_tendsto [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [SemilatticeInf β] {f : β → α} {a : α} (hf : Monotone f) (ha : Tendsto f atBot (𝓝 a)) (b : β) :
+    a ≤ f b :=
+  hf.dual.ge_of_tendsto ha b
+
+theorem Antitone.le_of_tendsto [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [SemilatticeSup β] {f : β → α} {a : α} (hf : Antitone f) (ha : Tendsto f atTop (𝓝 a)) (b : β) :
+    a ≤ f b :=
+  hf.dual_right.ge_of_tendsto ha b
+
+theorem Antitone.ge_of_tendsto [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [SemilatticeInf β] {f : β → α} {a : α} (hf : Antitone f) (ha : Tendsto f atBot (𝓝 a)) (b : β) :
+    f b ≤ a :=
+  hf.dual_right.le_of_tendsto ha b
+
+theorem isLUB_of_tendsto_atTop [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [Nonempty β] [SemilatticeSup β] {f : β → α} {a : α} (hf : Monotone f)
+    (ha : Tendsto f atTop (𝓝 a)) : IsLUB (Set.range f) a := by
+  constructor
+  · rintro _ ⟨b, rfl⟩
+    exact hf.ge_of_tendsto ha b
+  · exact fun _ hb => le_of_tendsto' ha fun x => hb (Set.mem_range_self x)
+
+theorem isGLB_of_tendsto_atBot [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [Nonempty β] [SemilatticeInf β] {f : β → α} {a : α} (hf : Monotone f)
+    (ha : Tendsto f atBot (𝓝 a)) : IsGLB (Set.range f) a :=
+  @isLUB_of_tendsto_atTop αᵒᵈ βᵒᵈ _ _ _ _ _ _ _ hf.dual ha
+
+theorem isLUB_of_tendsto_atBot [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [Nonempty β] [SemilatticeInf β] {f : β → α} {a : α} (hf : Antitone f)
+    (ha : Tendsto f atBot (𝓝 a)) : IsLUB (Set.range f) a :=
+  @isLUB_of_tendsto_atTop α βᵒᵈ _ _ _ _ _ _ _ hf.dual_left ha
+
+theorem isGLB_of_tendsto_atTop [TopologicalSpace α] [Preorder α] [OrderClosedTopology α]
+    [Nonempty β] [SemilatticeSup β] {f : β → α} {a : α} (hf : Antitone f)
+    (ha : Tendsto f atTop (𝓝 a)) : IsGLB (Set.range f) a :=
+  @isGLB_of_tendsto_atBot α βᵒᵈ _ _ _ _ _ _ _ hf.dual_left ha
+
+theorem iSup_eq_of_tendsto {α β} [TopologicalSpace α] [CompleteLinearOrder α] [OrderTopology α]
+    [Nonempty β] [SemilatticeSup β] {f : β → α} {a : α} (hf : Monotone f) :
+    Tendsto f atTop (𝓝 a) → iSup f = a :=
+  tendsto_nhds_unique (tendsto_atTop_iSup hf)
+
+theorem iInf_eq_of_tendsto {α} [TopologicalSpace α] [CompleteLinearOrder α] [OrderTopology α]
+    [Nonempty β] [SemilatticeSup β] {f : β → α} {a : α} (hf : Antitone f) :
+    Tendsto f atTop (𝓝 a) → iInf f = a :=
+  tendsto_nhds_unique (tendsto_atTop_iInf hf)
+
+theorem iSup_eq_iSup_subseq_of_monotone {ι₁ ι₂ α : Type*} [Preorder ι₂] [CompleteLattice α]
+    {l : Filter ι₁} [l.NeBot] {f : ι₂ → α} {φ : ι₁ → ι₂} (hf : Monotone f)
+    (hφ : Tendsto φ l atTop) : ⨆ i, f i = ⨆ i, f (φ i) :=
+  le_antisymm
+    (iSup_mono' fun i =>
+      Exists.imp (fun j (hj : i ≤ φ j) => hf hj) (hφ.eventually <| eventually_ge_atTop i).exists)
+    (iSup_mono' fun i => ⟨φ i, le_rfl⟩)
+
+theorem iSup_eq_iSup_subseq_of_antitone {ι₁ ι₂ α : Type*} [Preorder ι₂] [CompleteLattice α]
+    {l : Filter ι₁} [l.NeBot] {f : ι₂ → α} {φ : ι₁ → ι₂} (hf : Antitone f)
+    (hφ : Tendsto φ l atBot) : ⨆ i, f i = ⨆ i, f (φ i) :=
+  le_antisymm
+    (iSup_mono' fun i =>
+      Exists.imp (fun j (hj : φ j ≤ i) => hf hj) (hφ.eventually <| eventually_le_atBot i).exists)
+    (iSup_mono' fun i => ⟨φ i, le_rfl⟩)
+
+theorem iInf_eq_iInf_subseq_of_monotone {ι₁ ι₂ α : Type*} [Preorder ι₂] [CompleteLattice α]
+    {l : Filter ι₁} [l.NeBot] {f : ι₂ → α} {φ : ι₁ → ι₂} (hf : Monotone f)
+    (hφ : Tendsto φ l atBot) : ⨅ i, f i = ⨅ i, f (φ i) :=
+  iSup_eq_iSup_subseq_of_monotone hf.dual hφ
+
+theorem iInf_eq_iInf_subseq_of_antitone {ι₁ ι₂ α : Type*} [Preorder ι₂] [CompleteLattice α]
+    {l : Filter ι₁} [l.NeBot] {f : ι₂ → α} {φ : ι₁ → ι₂} (hf : Antitone f)
+    (hφ : Tendsto φ l atTop) : ⨅ i, f i = ⨅ i, f (φ i) :=
+  iSup_eq_iSup_subseq_of_antitone hf.dual hφ

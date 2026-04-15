@@ -3,6 +3,8 @@ Extracted from RingTheory/Algebraic/MvPolynomial.lean
 Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.MvPolynomial.Supported
+import Mathlib.RingTheory.Algebraic.Basic
 
 /-!
 # Transcendental elements in `MvPolynomial`
@@ -50,14 +52,14 @@ theorem transcendental_supported_polynomial_aeval_X {i : σ} {s : Set σ} (h : i
     simp only [u, v, g]
     ext1
     · ext1
-      simp [Set.subtypeInsertEquivOption, Subalgebra.algebraMap_eq, optionEquivLeft_symm_apply]
-    · simp [Set.subtypeInsertEquivOption, h1, optionEquivLeft_symm_apply]
+      simp [Set.subtypeInsertEquivOption, Subalgebra.algebraMap_eq]
+    · simp [Set.subtypeInsertEquivOption, h1]
   simpa only [h2, v, AlgEquiv.toAlgHom_eq_coe, AlgHom.coe_comp, AlgHom.coe_coe,
     EquivLike.injective_comp, AlgHom.coe_restrictScalars'] using hf
 
 theorem transcendental_polynomial_aeval_X (i : σ) {f : R[X]} (hf : Transcendental R f) :
     Transcendental R (Polynomial.aeval (X i : MvPolynomial σ R) f) := by
-  have := transcendental_supported_polynomial_aeval_X R (Set.notMem_empty i) hf
+  have := transcendental_supported_polynomial_aeval_X R (Set.not_mem_empty i) hf
   let g := (Algebra.botEquivOfInjective (MvPolynomial.C_injective σ R)).symm.trans
     (Subalgebra.equivOfEq _ _ supported_empty).symm
   rwa [Transcendental, ← isAlgebraic_ringHom_iff_of_comp_eq g (RingHom.id (MvPolynomial σ R))
@@ -75,7 +77,7 @@ theorem transcendental_supported_polynomial_aeval_X_iff
     i ∉ s ∧ Transcendental R f := by
   refine ⟨fun h ↦ ⟨?_, ?_⟩, fun ⟨h, hf⟩ ↦ transcendental_supported_polynomial_aeval_X R h hf⟩
   · rw [Transcendental] at h
-    contrapose h
+    contrapose! h
     refine isAlgebraic_algebraMap (⟨Polynomial.aeval (X i) f, ?_⟩ : supported R s)
     exact Algebra.adjoin_mono (Set.singleton_subset_iff.2 (Set.mem_image_of_mem _ h))
       (Polynomial.aeval_mem_adjoin_singleton _ _)

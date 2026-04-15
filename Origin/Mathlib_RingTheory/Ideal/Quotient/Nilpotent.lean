@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Ideal/Quotient/Nilpotent.lean
-Genuine: 3 of 5 | Dissolved: 2 | Infrastructure: 0
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Ideal.Quotient.Operations
+import Mathlib.RingTheory.Nilpotent.Lemmas
 
 /-!
 # Nilpotent elements in quotient rings
@@ -11,7 +13,7 @@ import Origin.Core
 theorem Ideal.isRadical_iff_quotient_reduced {R : Type*} [CommRing R] (I : Ideal R) :
     I.IsRadical ↔ IsReduced (R ⧸ I) := by
   conv_lhs => rw [← @Ideal.mk_ker R _ I]
-  exact RingHom.ker_isRadical_iff_reduced_of_surjective Quotient.mk_surjective
+  exact RingHom.ker_isRadical_iff_reduced_of_surjective (@Ideal.Quotient.mk_surjective R _ I)
 
 variable {S : Type*} [CommRing S] (I : Ideal S)
 
@@ -22,22 +24,22 @@ theorem Ideal.IsNilpotent.induction_on (hI : IsNilpotent I)
       P (J.map (Ideal.Quotient.mk I)) → P J) :
     P I := by
   obtain ⟨n, hI : I ^ n = ⊥⟩ := hI
-  induction n using Nat.strong_induction_on generalizing S with | _ n H
+  induction' n using Nat.strong_induction_on with n H generalizing S
   by_cases hI' : I = ⊥
   · subst hI'
     apply h₁
     rw [← Ideal.zero_eq_bot, zero_pow two_ne_zero]
-  rcases n with - | n
+  cases' n with n
   · rw [pow_zero, Ideal.one_eq_top] at hI
     haveI := subsingleton_of_bot_eq_top hI.symm
     exact (hI' (Subsingleton.elim _ _)).elim
-  rcases n with - | n
+  cases' n with n
   · rw [pow_one] at hI
     exact (hI' hI).elim
   apply h₂ (I ^ 2) _ (Ideal.pow_le_self two_ne_zero)
   · apply H n.succ _ (I ^ 2)
     · rw [← pow_mul, eq_bot_iff, ← hI, Nat.succ_eq_add_one]
-      apply Ideal.pow_le_pow_right (by lia)
+      apply Ideal.pow_le_pow_right (by omega)
     · exact n.succ.lt_succ_self
   · apply h₁
     rw [← Ideal.map_pow, Ideal.map_quotient_self]
@@ -58,7 +60,7 @@ theorem IsNilpotent.isUnit_quotient_mk_iff {R : Type*} [CommRing R] {I : Ideal R
   · introv e H
     obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (↑H.unit⁻¹ : S ⧸ I)
     have : Ideal.Quotient.mk I (x * y) = Ideal.Quotient.mk I 1 := by
-      rw [map_one, map_mul, hy, IsUnit.mul_val_inv]
+      rw [map_one, _root_.map_mul, hy, IsUnit.mul_val_inv]
     rw [Ideal.Quotient.eq] at this
     have : (x * y - 1) ^ 2 = 0 := by
       rw [← Ideal.mem_bot, ← e]
@@ -66,8 +68,4 @@ theorem IsNilpotent.isUnit_quotient_mk_iff {R : Type*} [CommRing R] {I : Ideal R
     have : x * (y * (2 - x * y)) = 1 := by
       rw [eq_comm, ← sub_eq_zero, ← this]
       ring
-    exact .of_mul_eq_one _ this
-
--- DISSOLVED: Ideal.Quotient.isUnit_mk_pow_iff_isUnit_mk
-
--- DISSOLVED: Ideal.Quotient.isUnit_mk_pow_iff_notMem
+    exact isUnit_of_mul_eq_one _ _ this

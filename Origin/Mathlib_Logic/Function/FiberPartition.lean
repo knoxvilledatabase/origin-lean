@@ -3,6 +3,7 @@ Extracted from Logic/Function/FiberPartition.lean
 Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Basic
 
 /-!
 
@@ -15,8 +16,6 @@ set, and the forgetful functor from the category of condensed sets to the catego
 (see PR https://github.com/leanprover-community/mathlib4/pull/14027).
 -/
 
-assert_not_exists RelIso
-
 variable {X Y Z : Type*}
 
 namespace Function
@@ -27,7 +26,7 @@ namespace Fiber
 
 noncomputable def image (f : Y → Z) (a : Fiber f) : Z := a.2.choose.1
 
-lemma eq_fiber_image (f : Y → Z) (a : Fiber f) : a.1 = f ⁻¹' {a.image} := a.2.choose_spec.symm
+lemma eq_fiber_image  (f : Y → Z) (a : Fiber f) : a.1 = f ⁻¹' {a.image} := a.2.choose_spec.symm
 
 def mk (f : Y → Z) (y : Y) : Fiber f := ⟨f ⁻¹' {f y}, by simp⟩
 

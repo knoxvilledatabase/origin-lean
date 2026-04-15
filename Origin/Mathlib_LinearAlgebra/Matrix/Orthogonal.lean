@@ -1,8 +1,9 @@
 /-
 Extracted from LinearAlgebra/Matrix/Orthogonal.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 8 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.Data.Matrix.Mul
 
 /-!
 # Orthogonal
@@ -21,8 +22,6 @@ This file contains definitions and properties concerning orthogonality of rows a
 orthogonal
 -/
 
-assert_not_exists Field
-
 namespace Matrix
 
 variable {α n m : Type*}
@@ -34,7 +33,37 @@ variable (A : Matrix m n α)
 open Matrix
 
 def HasOrthogonalRows [Fintype n] : Prop :=
-  ∀ ⦃i₁ i₂⦄, i₁ ≠ i₂ → A i₁ ⬝ᵥ A i₂ = 0
+  ∀ ⦃i₁ i₂⦄, i₁ ≠ i₂ → dotProduct (A i₁) (A i₂) = 0
 
 def HasOrthogonalCols [Fintype m] : Prop :=
   HasOrthogonalRows Aᵀ
+
+@[simp]
+theorem transpose_hasOrthogonalRows_iff_hasOrthogonalCols [Fintype m] :
+    Aᵀ.HasOrthogonalRows ↔ A.HasOrthogonalCols :=
+  Iff.rfl
+
+@[simp]
+theorem transpose_hasOrthogonalCols_iff_hasOrthogonalRows [Fintype n] :
+    Aᵀ.HasOrthogonalCols ↔ A.HasOrthogonalRows :=
+  Iff.rfl
+
+variable {A}
+
+theorem HasOrthogonalRows.hasOrthogonalCols [Fintype m] (h : Aᵀ.HasOrthogonalRows) :
+    A.HasOrthogonalCols :=
+  h
+
+theorem HasOrthogonalCols.transpose_hasOrthogonalRows [Fintype m] (h : A.HasOrthogonalCols) :
+    Aᵀ.HasOrthogonalRows :=
+  h
+
+theorem HasOrthogonalCols.hasOrthogonalRows [Fintype n] (h : Aᵀ.HasOrthogonalCols) :
+    A.HasOrthogonalRows :=
+  h
+
+theorem HasOrthogonalRows.transpose_hasOrthogonalCols [Fintype n] (h : A.HasOrthogonalRows) :
+    Aᵀ.HasOrthogonalCols :=
+  h
+
+end Matrix

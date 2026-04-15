@@ -3,6 +3,9 @@ Extracted from RingTheory/SimpleRing/Field.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.SimpleRing.Basic
+import Mathlib.Algebra.Ring.Subring.Basic
+import Mathlib.Algebra.Field.Equiv
 
 /-!
 # Simple ring and fields
@@ -14,8 +17,6 @@ import Origin.Core
 -/
 
 namespace IsSimpleRing
-
-set_option backward.isDefEq.respectTransparency false in
 
 open TwoSidedIdeal in
 
@@ -46,3 +47,8 @@ lemma isField_center (A : Type*) [Ring A] [IsSimpleRing A] : IsField (Subring.ce
       _ = y * a := by rw [hy, mul_one]
 
 end IsSimpleRing
+
+lemma isSimpleRing_iff_isField (A : Type*) [CommRing A] : IsSimpleRing A ↔ IsField A :=
+  ⟨fun _ ↦ Subring.topEquiv.symm.toMulEquiv.isField _ <| by
+    rw [← Subring.center_eq_top A]; exact IsSimpleRing.isField_center A,
+    fun h ↦ letI := h.toField; inferInstance⟩

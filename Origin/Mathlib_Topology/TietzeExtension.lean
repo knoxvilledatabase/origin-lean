@@ -3,6 +3,10 @@ Extracted from Topology/TietzeExtension.lean
 Genuine: 17 of 23 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Order.Interval.Set.IsoIoo
+import Mathlib.Topology.Order.MonotoneContinuity
+import Mathlib.Topology.UrysohnsBounded
 
 /-!
 # Tietze extension theorem
@@ -60,7 +64,7 @@ theorem ContinuousMap.exists_restrict_eq (hs : IsClosed s) (f : C(s, Y)) :
 
 theorem ContinuousMap.exists_extension (he : IsClosedEmbedding e) (f : C(X₁, Y)) :
     ∃ (g : C(X, Y)), g.comp ⟨e, he.continuous⟩ = f := by
-  let e' : X₁ ≃ₜ Set.range e := he.isEmbedding.toHomeomorph
+  let e' : X₁ ≃ₜ Set.range e := Homeomorph.ofIsEmbedding _ he.isEmbedding
   obtain ⟨g, hg⟩ := (f.comp e'.symm).exists_restrict_eq he.isClosed_range
   exact ⟨g, by ext x; simpa using congr($(hg) ⟨e' x, x, rfl⟩)⟩
 
@@ -73,20 +77,33 @@ theorem ContinuousMap.exists_forall_mem_restrict_eq (hs : IsClosed s)
     {t : Set Y} (hf : ∀ x, f x ∈ t) [ht : TietzeExtension.{u, v} t] :
     ∃ (g : C(X, Y)), (∀ x, g x ∈ t) ∧ g.restrict s = f := by
   obtain ⟨g, hg⟩ := mk _ (map_continuous f |>.codRestrict hf) |>.exists_restrict_eq hs
-  exact ⟨comp ⟨Subtype.val, by fun_prop⟩ g, by simp, by ext x; congrm(($(hg) x : Y))⟩
+  exact ⟨comp ⟨Subtype.val, by continuity⟩ g, by simp, by ext x; congrm(($(hg) x : Y))⟩
 
 theorem ContinuousMap.exists_extension_forall_mem (he : IsClosedEmbedding e)
     {Y : Type v} [TopologicalSpace Y] (f : C(X₁, Y))
     {t : Set Y} (hf : ∀ x, f x ∈ t) [ht : TietzeExtension.{u, v} t] :
     ∃ (g : C(X, Y)), (∀ x, g x ∈ t) ∧ g.comp ⟨e, he.continuous⟩ = f := by
   obtain ⟨g, hg⟩ := mk _ (map_continuous f |>.codRestrict hf) |>.exists_extension he
-  exact ⟨comp ⟨Subtype.val, by fun_prop⟩ g, by simp, by ext x; congrm(($(hg) x : Y))⟩
+  exact ⟨comp ⟨Subtype.val, by continuity⟩ g, by simp, by ext x; congrm(($(hg) x : Y))⟩
 
--- INSTANCE (free from Core): Pi.instTietzeExtension
+instance Pi.instTietzeExtension {ι : Type*} {Y : ι → Type v} [∀ i, TopologicalSpace (Y i)]
+    [∀ i, TietzeExtension.{u} (Y i)] : TietzeExtension.{u} (∀ i, Y i) where
+  exists_restrict_eq' s hs f := by
+    obtain ⟨g', hg'⟩ := Classical.skolem.mp <| fun i ↦
+      ContinuousMap.exists_restrict_eq hs (ContinuousMap.piEquiv _ _ |>.symm f i)
+    exact ⟨ContinuousMap.piEquiv _ _ g', by ext x i; congrm($(hg' i) x)⟩
 
--- INSTANCE (free from Core): Prod.instTietzeExtension
+instance Prod.instTietzeExtension {Y : Type v} {Z : Type w} [TopologicalSpace Y]
+    [TietzeExtension.{u, v} Y] [TopologicalSpace Z] [TietzeExtension.{u, w} Z] :
+    TietzeExtension.{u, max w v} (Y × Z) where
+  exists_restrict_eq' s hs f := by
+    obtain ⟨g₁, hg₁⟩ := (ContinuousMap.fst.comp f).exists_restrict_eq hs
+    obtain ⟨g₂, hg₂⟩ := (ContinuousMap.snd.comp f).exists_restrict_eq hs
+    exact ⟨g₁.prodMk g₂, by ext1 x; congrm(($(hg₁) x), $(hg₂) x)⟩
 
--- INSTANCE (free from Core): Unique.instTietzeExtension
+instance Unique.instTietzeExtension {Y : Type v} [TopologicalSpace Y]
+    [Nonempty Y] [Subsingleton Y] : TietzeExtension.{u, v} Y where
+  exists_restrict_eq' _ _ f := ‹Nonempty Y›.elim fun y ↦ ⟨.const _ y, by ext; subsingleton⟩
 
 theorem TietzeExtension.of_retract {Y : Type v} {Z : Type w} [TopologicalSpace Y]
     [TopologicalSpace Z] [TietzeExtension.{u, w} Z] (ι : C(Y, Z)) (r : C(Z, Y))
@@ -124,7 +141,8 @@ theorem tietze_extension_step (f : X →ᵇ ℝ) (e : C(X, Y)) (he : IsClosedEmb
   have h23 : 0 < (2 / 3 : ℝ) := by norm_num1
   -- In the trivial case `f = 0`, we take `g = 0`
   rcases eq_or_ne f 0 with (rfl | hf)
-  · simp
+  · use 0
+    simp
   replace hf : 0 < ‖f‖ := norm_pos_iff.2 hf
   /- Otherwise, the closed sets `e '' (f ⁻¹' (Iic (-‖f‖ / 3)))` and `e '' (f ⁻¹' (Ici (‖f‖ / 3)))`
     are disjoint, hence by Urysohn's lemma there exists a function `g` that is equal to `-‖f‖ / 3`
@@ -163,10 +181,59 @@ theorem tietze_extension_step (f : X →ᵇ ℝ) (e : C(X, Y)) (he : IsClosedEmb
               abs_of_nonneg (sub_nonneg.2 hle₂)]
           _ ≤ 2 / 3 * ‖f‖ := by linarith
 
+theorem exists_extension_norm_eq_of_isClosedEmbedding' (f : X →ᵇ ℝ) (e : C(X, Y))
+    (he : IsClosedEmbedding e) : ∃ g : Y →ᵇ ℝ, ‖g‖ = ‖f‖ ∧ g.compContinuous e = f := by
+  /- For the proof, we iterate `tietze_extension_step`. Each time we apply it to the difference
+    between the previous approximation and `f`. -/
+  choose F hF_norm hF_dist using fun f : X →ᵇ ℝ => tietze_extension_step f e he
+  set g : ℕ → Y →ᵇ ℝ := fun n => (fun g => g + F (f - g.compContinuous e))^[n] 0
+  have g0 : g 0 = 0 := rfl
+  have g_succ : ∀ n, g (n + 1) = g n + F (f - (g n).compContinuous e) := fun n =>
+    Function.iterate_succ_apply' _ _ _
+  have hgf : ∀ n, dist ((g n).compContinuous e) f ≤ (2 / 3) ^ n * ‖f‖ := by
+    intro n
+    induction n with
+    | zero => simp [g0]
+    | succ n ihn =>
+      rw [g_succ n, add_compContinuous, ← dist_sub_right, add_sub_cancel_left, pow_succ', mul_assoc]
+      refine (hF_dist _).trans (mul_le_mul_of_nonneg_left ?_ (by norm_num1))
+      rwa [← dist_eq_norm']
+  have hg_dist : ∀ n, dist (g n) (g (n + 1)) ≤ 1 / 3 * ‖f‖ * (2 / 3) ^ n := by
+    intro n
+    calc
+      dist (g n) (g (n + 1)) = ‖F (f - (g n).compContinuous e)‖ := by
+        rw [g_succ, dist_eq_norm', add_sub_cancel_left]
+      _ ≤ ‖f - (g n).compContinuous e‖ / 3 := hF_norm _
+      _ = 1 / 3 * dist ((g n).compContinuous e) f := by rw [dist_eq_norm', one_div, div_eq_inv_mul]
+      _ ≤ 1 / 3 * ((2 / 3) ^ n * ‖f‖) := mul_le_mul_of_nonneg_left (hgf n) (by norm_num1)
+      _ = 1 / 3 * ‖f‖ * (2 / 3) ^ n := by ac_rfl
+  have hg_cau : CauchySeq g := cauchySeq_of_le_geometric _ _ (by norm_num1) hg_dist
+  have :
+    Tendsto (fun n => (g n).compContinuous e) atTop
+      (𝓝 <| (limUnder atTop g).compContinuous e) :=
+    ((continuous_compContinuous e).tendsto _).comp hg_cau.tendsto_limUnder
+  have hge : (limUnder atTop g).compContinuous e = f := by
+    refine tendsto_nhds_unique this (tendsto_iff_dist_tendsto_zero.2 ?_)
+    refine squeeze_zero (fun _ => dist_nonneg) hgf ?_
+    rw [← zero_mul ‖f‖]
+    refine (tendsto_pow_atTop_nhds_zero_of_lt_one ?_ ?_).mul tendsto_const_nhds <;> norm_num1
+  refine ⟨limUnder atTop g, le_antisymm ?_ ?_, hge⟩
+  · rw [← dist_zero_left, ← g0]
+    refine
+      (dist_le_of_le_geometric_of_tendsto₀ _ _ (by norm_num1)
+        hg_dist hg_cau.tendsto_limUnder).trans_eq ?_
+    field_simp [show (3 - 2 : ℝ) = 1 by norm_num1]
+  · rw [← hge]
+    exact norm_compContinuous_le _ _
+
+alias exists_extension_norm_eq_of_closedEmbedding' := exists_extension_norm_eq_of_isClosedEmbedding'
+
 theorem exists_extension_norm_eq_of_isClosedEmbedding (f : X →ᵇ ℝ) {e : X → Y}
     (he : IsClosedEmbedding e) : ∃ g : Y →ᵇ ℝ, ‖g‖ = ‖f‖ ∧ g ∘ e = f := by
   rcases exists_extension_norm_eq_of_isClosedEmbedding' f ⟨e, he.continuous⟩ he with ⟨g, hg, rfl⟩
   exact ⟨g, hg, rfl⟩
+
+alias exists_extension_norm_eq_of_closedEmbedding := exists_extension_norm_eq_of_isClosedEmbedding
 
 theorem exists_norm_eq_restrict_eq_of_closed {s : Set Y} (f : s →ᵇ ℝ) (hs : IsClosed s) :
     ∃ g : Y →ᵇ ℝ, ‖g‖ = ‖f‖ ∧ g.restrict s = f :=
@@ -188,6 +255,9 @@ theorem exists_extension_forall_mem_Icc_of_isClosedEmbedding (f : X →ᵇ ℝ) 
     have : g (e x) = f x - (a + b) / 2 := congr_fun hge x
     simp [this]
 
+alias exists_extension_forall_mem_Icc_of_closedEmbedding :=
+  exists_extension_forall_mem_Icc_of_isClosedEmbedding
+
 theorem exists_extension_forall_exists_le_ge_of_isClosedEmbedding [Nonempty X] (f : X →ᵇ ℝ)
     {e : X → Y} (he : IsClosedEmbedding e) :
     ∃ g : Y →ᵇ ℝ, (∀ y, ∃ x₁ x₂, g y ∈ Icc (f x₁) (f x₂)) ∧ g ∘ e = f := by
@@ -208,7 +278,7 @@ theorem exists_extension_forall_exists_le_ge_of_isClosedEmbedding [Nonempty X] (
   have hac : a < c := left_lt_add_div_two.2 hlt
   have hcb : c < b := add_div_two_lt_right.2 hlt
   have hsub : c - a = b - c := by
-    simp [c]
+    field_simp [c]
     ring
   /- Due to `exists_extension_forall_mem_Icc_of_isClosedEmbedding`, there exists an extension `g`
     such that `g y ∈ [a, b]` for all `y`. However, if `a` and/or `b` do not belong to the range of
@@ -227,7 +297,7 @@ theorem exists_extension_forall_exists_le_ge_of_isClosedEmbedding [Nonempty X] (
       · rw [Set.disjoint_left]
         rintro _ ⟨x, rfl⟩ (rfl : g (e x) = a)
         exact ha' ⟨x, (congr_fun hgf x).symm⟩
-      · exact Set.disjoint_singleton_right.2 hac.not_ge
+      · exact Set.disjoint_singleton_right.2 hac.not_le
     rcases exists_bounded_mem_Icc_of_closed_of_le
         (he.isClosed_range.union <| isClosed_Ici.preimage g.continuous)
         (isClosed_singleton.preimage g.continuous) hd (sub_nonneg.2 hac.le) with
@@ -260,7 +330,7 @@ theorem exists_extension_forall_exists_le_ge_of_isClosedEmbedding [Nonempty X] (
     · rw [Set.disjoint_left]
       rintro _ ⟨x, rfl⟩ (rfl : g (e x) = b)
       exact hb' ⟨x, (congr_fun hgf x).symm⟩
-    · exact Set.disjoint_singleton_right.2 hcb.not_ge
+    · exact Set.disjoint_singleton_right.2 hcb.not_le
   rcases exists_bounded_mem_Icc_of_closed_of_le
       (he.isClosed_range.union <| isClosed_Iic.preimage g.continuous)
       (isClosed_singleton.preimage g.continuous) hd (sub_nonneg.2 hcb.le) with
@@ -277,7 +347,7 @@ theorem exists_extension_forall_exists_le_ge_of_isClosedEmbedding [Nonempty X] (
         _ = dg y := (dgb rfl).symm
     · exact ((sub_le_self_iff _).2 (dgmem _).1).trans_lt hlt
   rcases hb.exists_between hyb with ⟨_, ⟨xu, rfl⟩, hyxu, _⟩
-  rcases lt_or_ge c (g y) with hc | hc
+  cases' lt_or_le c (g y) with hc hc
   · rcases em (a ∈ range f) with (⟨x, rfl⟩ | _)
     · refine ⟨x, xu, ?_, hyxu.le⟩
       calc
@@ -293,6 +363,9 @@ theorem exists_extension_forall_exists_le_ge_of_isClosedEmbedding [Nonempty X] (
   · refine ⟨xl y, xu, ?_, hyxu.le⟩
     simp [dg0 (Or.inr hc), hxl]
 
+alias exists_extension_forall_exists_le_ge_of_closedEmbedding :=
+  exists_extension_forall_exists_le_ge_of_isClosedEmbedding
+
 theorem exists_extension_forall_mem_of_isClosedEmbedding (f : X →ᵇ ℝ) {t : Set ℝ} {e : X → Y}
     [hs : OrdConnected t] (hf : ∀ x, f x ∈ t) (hne : t.Nonempty) (he : IsClosedEmbedding e) :
     ∃ g : Y →ᵇ ℝ, (∀ y, g y ∈ t) ∧ g ∘ e = f := by
@@ -303,6 +376,9 @@ theorem exists_extension_forall_mem_of_isClosedEmbedding (f : X →ᵇ ℝ) {t :
   refine ⟨g, fun y => ?_, hgf⟩
   rcases hg y with ⟨xl, xu, h⟩
   exact hs.out (hf _) (hf _) h
+
+alias exists_extension_forall_mem_of_closedEmbedding :=
+  exists_extension_forall_mem_of_isClosedEmbedding
 
 theorem exists_forall_mem_restrict_eq_of_closed {s : Set Y} (f : s →ᵇ ℝ) (hs : IsClosed s)
     {t : Set ℝ} [OrdConnected t] (hf : ∀ x, f x ∈ t) (hne : t.Nonempty) :
@@ -321,7 +397,7 @@ theorem exists_extension_forall_mem_of_isClosedEmbedding (f : C(X, ℝ)) {t : Se
   have h : ℝ ≃o Ioo (-1 : ℝ) 1 := orderIsoIooNegOneOne ℝ
   let F : X →ᵇ ℝ :=
     { toFun := (↑) ∘ h ∘ f
-      continuous_toFun := by fun_prop
+      continuous_toFun := continuous_subtype_val.comp (h.continuous.comp f.continuous)
       map_bounded' := isBounded_range_iff.1
         ((isBounded_Ioo (-1 : ℝ) 1).subset <| range_subset_iff.2 fun x => (h (f x)).2) }
   let t' : Set ℝ := (↑) ∘ h '' t
@@ -348,6 +424,11 @@ theorem exists_extension_forall_mem_of_isClosedEmbedding (f : C(X, ℝ)) {t : Se
   · ext x
     exact hgG.2 (congr_fun hGF _)
 
+alias exists_extension_forall_mem_of_closedEmbedding :=
+  exists_extension_forall_mem_of_isClosedEmbedding
+
+alias exists_extension_of_closedEmbedding := exists_extension'
+
 theorem exists_restrict_eq_forall_mem_of_closed {s : Set Y} (f : C(s, ℝ)) {t : Set ℝ}
     [OrdConnected t] (ht : ∀ x, f x ∈ t) (hne : t.Nonempty) (hs : IsClosed s) :
     ∃ g : C(Y, ℝ), (∀ y, g y ∈ t) ∧ g.restrict s = f :=
@@ -357,8 +438,13 @@ theorem exists_restrict_eq_forall_mem_of_closed {s : Set Y} (f : C(s, ℝ)) {t :
 
 end ContinuousMap
 
--- INSTANCE (free from Core): Real.instTietzeExtension
+instance Real.instTietzeExtension : TietzeExtension ℝ where
+  exists_restrict_eq' _s hs f :=
+    f.exists_restrict_eq_forall_mem_of_closed (fun _ => mem_univ _) univ_nonempty hs |>.imp
+      fun _ ↦ (And.right ·)
 
 open NNReal in
 
--- INSTANCE (free from Core): NNReal.instTietzeExtension
+instance NNReal.instTietzeExtension : TietzeExtension ℝ≥0 :=
+  .of_retract ⟨((↑) : ℝ≥0 → ℝ), by continuity⟩ ⟨Real.toNNReal, continuous_real_toNNReal⟩ <| by
+    ext; simp

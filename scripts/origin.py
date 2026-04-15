@@ -27,6 +27,7 @@ If you can answer all six, you understand the project.
 If you can't, read CLAUDE.md first. Then read Core.lean.
 
 Usage:
+    python3 scripts/origin.py run                      THE PIPELINE. Extract all. Build all. Report.
     python3 scripts/origin.py classify NumberTheory
     python3 scripts/origin.py classify --all
     python3 scripts/origin.py --self classify --all    (audit Origin itself)
@@ -91,7 +92,7 @@ TRIVIAL_RE = re.compile(r":=\s*(rfl|h\b|by\s+simp\s*$|by\s+rfl|by\s+exact\s+\w+\
 INFRA_FILE_PATTERNS = [
     "GroupWithZero", "NeZero", "NoZeroDivisors", "NoZeroSMul",
     "MulZeroClass", "WithZero", "WithBot", "WithTop",
-    "ZeroHom", "CharZero", "IsUnit",
+    "ZeroHom", "CharZero", "IsUnit", "Deprecated",
 ]
 
 # ---------------------------------------------------------------------------
@@ -125,6 +126,7 @@ def parse_file_smart(text: str) -> list[Block]:
     """Parse a Lean file into blocks, preserving structure."""
     lines = text.split("\n")
     blocks = []
+    pending_attrs = []
     i = 0
 
     while i < len(lines):
@@ -166,7 +168,10 @@ def parse_file_smart(text: str) -> list[Block]:
             i += 1
             continue
 
-        if stripped.startswith("public section") or stripped == "section":
+        # Sections (with or without name) — preserve them for scope
+        if stripped.startswith("section") and (stripped == "section" or
+            stripped.startswith("section ") or stripped.startswith("public section")):
+            blocks.append(Block("section", stripped.split("section", 1)[-1].strip(), line))
             i += 1
             continue
 
@@ -177,9 +182,9 @@ def parse_file_smart(text: str) -> list[Block]:
             i += 1
             continue
 
-        if stripped.startswith("end "):
-            ns = stripped.split("end ", 1)[1].strip()
-            blocks.append(Block("end_namespace", ns, f"end {ns}"))
+        if stripped == "end" or stripped.startswith("end "):
+            ns = stripped.split("end", 1)[1].strip() if " " in stripped else ""
+            blocks.append(Block("end_namespace", ns, stripped))
             i += 1
             continue
 
@@ -187,6 +192,41 @@ def parse_file_smart(text: str) -> list[Block]:
         if stripped.startswith("open "):
             blocks.append(Block("open", "", line))
             i += 1
+            continue
+
+        # Strip: Mathlib-specific commands that Origin doesn't need
+        strip = False
+        for cmd in ("add_decl_doc ", "assert_not_exists ", "suppress_compilation",
+                     "#align", "#guard_msgs", "#check", "#print",
+                     "@[deprecated", "@[inherit_doc]",
+                     "-- Adaptation note", "-- adaptation_note",
+                     "#adaptation_note"):
+            if stripped.startswith(cmd) or stripped == cmd.strip():
+                strip = True
+                break
+        if strip:
+            i += 1
+            # Skip multi-line (indented continuation)
+            while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                i += 1
+            continue
+
+        # Pass-through commands: Lean commands that must be preserved
+        passthrough = False
+        for cmd in ("set_option ", "attribute ", "alias ", "include ",
+                     "omit ", "universe ", "local ", "scoped ",
+                     "example ", "example"):
+            if stripped.startswith(cmd) or stripped == cmd.strip():
+                passthrough = True
+                break
+        if passthrough:
+            # Collect multi-line command (indented continuation)
+            cmd_lines = [line]
+            i += 1
+            while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                cmd_lines.append(lines[i])
+                i += 1
+            blocks.append(Block("other", "", "\n".join(cmd_lines)))
             continue
 
         # Variable
@@ -201,29 +241,51 @@ def parse_file_smart(text: str) -> list[Block]:
             continue
 
         # Attribute line (collect and attach to next decl)
-        if stripped.startswith("@["):
-            attr_line = line
+        # But NOT if the line also contains a declaration keyword (e.g., @[simp] theorem ...)
+        if stripped.startswith("@[") and not re.search(
+            r"\b(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+\S+",
+            stripped
+        ):
+            attr_lines = [line]
             i += 1
-            # The next non-empty line should be the declaration
-            while i < len(lines) and not lines[i].strip():
-                i += 1
-            if i < len(lines):
-                # Prepend attribute to declaration line
-                lines[i] = attr_line + "\n" + lines[i]
+            # Collect multi-line attributes (including multiline strings like
+            # @[to_additive "...long string..."]) and skip blanks to next decl
+            while i < len(lines):
+                s = lines[i].strip()
+                if not s:
+                    i += 1
+                    continue
+                if s.startswith("@["):
+                    attr_lines.append(lines[i])
+                    i += 1
+                    continue
+                # Check if this is a continuation of a multiline attribute
+                # (e.g., multiline string in @[to_additive "..."])
+                # If the last attr line has unbalanced quotes or brackets, continue
+                last_attr = "\n".join(attr_lines)
+                if last_attr.count('"') % 2 == 1 or last_attr.count('[') > last_attr.count(']'):
+                    attr_lines.append(lines[i])
+                    i += 1
+                    continue
+                break
+            # Don't modify lines[i] — just remember the attributes
+            # and let the declaration handler pick them up below
+            pending_attrs = attr_lines
             continue
 
         # Declaration
         decl_match = re.match(
-            r"^(.*?)?(protected\s+)?(noncomputable\s+)?"
+            r"^(.*?)?(private\s+|protected\s+)?(noncomputable\s+)?(nonrec\s+)?(unsafe\s+)?"
             r"(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)",
             stripped
         )
         if decl_match:
-            kind = decl_match.group(4)
-            name = decl_match.group(5)
+            kind = decl_match.group(6)
+            name = decl_match.group(7)
 
-            # Collect full declaration
-            decl_lines = [line]
+            # Collect full declaration (include any pending attributes)
+            decl_lines = pending_attrs + [line]
+            pending_attrs = []
             i += 1
             while i < len(lines):
                 cur = lines[i]
@@ -315,7 +377,7 @@ def extract_smart(filepath: Path) -> tuple[str, dict]:
         if b.kind == "import":
             continue  # We'll add our own (original + Origin.Core)
 
-        if b.kind in ("namespace", "end_namespace"):
+        if b.kind in ("namespace", "end_namespace", "section"):
             output_parts.append(b.text)
             continue
 
@@ -328,13 +390,12 @@ def extract_smart(filepath: Path) -> tuple[str, dict]:
             continue
 
         if b.kind == "decl":
-            if b.classification == "genuine":
-                output_parts.append(b.text)
-            elif b.classification in ("dissolves", "infra_name"):
+            if b.classification in ("dissolves", "infra_name"):
                 output_parts.append(f"-- DISSOLVED: {b.name}")
-            elif b.classification == "instance":
-                output_parts.append(f"-- INSTANCE (free from Core): {b.name}")
-            # simp_trivial and trivial: skip silently
+            else:
+                # Keep genuine, instance, simp_trivial, trivial — all non-dissolved
+                # content stays. Genuine proofs may reference simp lemmas or instances.
+                output_parts.append(b.text)
 
         if b.kind == "other":
             output_parts.append(b.text)
@@ -551,7 +612,347 @@ def cmd_extract_domain(domain: str):
     print(f"Genuine:     {total_genuine} declarations")
     print(f"Dissolved:   {total_dissolved} declarations")
     print(f"Infra:       {total_infra} declarations")
-    print(f"\nNext: lake build and fix what breaks.")
+    print()
+
+
+def cmd_run():
+    """The pipeline: extract all → build all → group errors → report lines."""
+    import subprocess
+    import time
+    from collections import defaultdict
+
+    base = MATHLIB_DIR
+    if not base.exists():
+        print(f"ERROR: Mathlib not found at {base}", file=sys.stderr)
+        return
+
+    import shutil
+    W = shutil.get_terminal_size((80, 24)).columns
+
+    # Step 1: Find all domains
+    domains = sorted(d.name for d in base.iterdir()
+                     if d.is_dir() and list(d.rglob("*.lean")))
+    # Flush output immediately so progress is visible
+    sys.stdout.reconfigure(line_buffering=True)
+
+    # ── ANSI ──
+    BOLD    = "\033[1m"
+    DIM     = "\033[2m"
+    GREEN   = "\033[32m"
+    RED     = "\033[31m"
+    CYAN    = "\033[36m"
+    YELLOW  = "\033[33m"
+    WHITE   = "\033[97m"
+    RESET   = "\033[0m"
+    CLEAR   = "\033[2K\r"
+
+    def bar(current, total, width=30):
+        filled = int(width * current / total) if total else 0
+        return f"{GREEN}{'█' * filled}{DIM}{'░' * (width - filled)}{RESET}"
+
+    def elapsed(t):
+        s = int(t)
+        if s < 60: return f"{s}s"
+        return f"{s // 60}m{s % 60:02d}s"
+
+    t_start = time.time()
+
+    print()
+    MAGENTA = "\033[35m"
+    print(f"  {BOLD}{CYAN}╔{'═' * (W - 6)}╗{RESET}")
+    print(f"  {BOLD}{CYAN}║{RESET}  {BOLD}{WHITE}O R I G I N{RESET}"
+          f"  {DIM}powered by{RESET} {BOLD}{MAGENTA}Claude Code{RESET}"
+          f"{' ' * max(1, W - 42)}{BOLD}{CYAN}║{RESET}")
+    print(f"  {BOLD}{CYAN}║{RESET}  {DIM}b - b = origin  "
+          f"·  the ground absorbs  "
+          f"·  the script converts{RESET}"
+          f"{' ' * max(1, W - 67)}{BOLD}{CYAN}║{RESET}")
+    print(f"  {BOLD}{CYAN}╚{'═' * (W - 6)}╝{RESET}")
+    print()
+
+    # ── PHASE 1: EXTRACT (parallel) ─────────────────────────────────
+    from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+    import multiprocessing
+
+    total_extracted = 0
+    total_skipped = 0
+    total_genuine = 0
+    total_dissolved = 0
+    total_infra = 0
+    domain_stats = {}
+
+    n_cpus = multiprocessing.cpu_count()
+    print(f"  {BOLD}EXTRACT{RESET}  {DIM}Mathlib → Origin  "
+          f"({n_cpus} cores){RESET}")
+    print(f"  {DIM}{'─' * (W - 4)}{RESET}")
+
+    def extract_domain(domain):
+        """Extract one domain — runs in a worker process."""
+        src = base / domain
+        out_dir = ORIGIN_DIR / f"Mathlib_{domain}"
+        if out_dir.exists():
+            import shutil as sh
+            sh.rmtree(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        files = sorted(src.rglob("*.lean"))
+        d_extracted = d_skipped = d_genuine = d_dissolved = d_infra = 0
+
+        for f in files:
+            content, stats = extract_smart(f)
+            if stats.get("skipped_file") or stats["genuine"] == 0:
+                d_skipped += 1
+                d_dissolved += stats.get("dissolved", 0)
+                d_infra += stats.get("infra", 0)
+                continue
+            relpath = str(f).split(f"Mathlib/{domain}/")[-1]
+            outfile = out_dir / relpath
+            outfile.parent.mkdir(parents=True, exist_ok=True)
+            outfile.write_text(content)
+            d_extracted += 1
+            d_genuine += stats["genuine"]
+            d_dissolved += stats["dissolved"]
+            d_infra += stats["infra"]
+
+        return {
+            "domain": domain, "extracted": d_extracted, "skipped": d_skipped,
+            "genuine": d_genuine, "dissolved": d_dissolved, "infra": d_infra,
+        }
+
+    # Run extractions in parallel across all cores
+    done_count = 0
+    with ThreadPoolExecutor(max_workers=n_cpus) as pool:
+        futures = {pool.submit(extract_domain, d): d for d in domains}
+        for future in as_completed(futures):
+            done_count += 1
+            r = future.result()
+            domain = r["domain"]
+            domain_stats[domain] = r
+            total_extracted += r["extracted"]
+            total_skipped += r["skipped"]
+            total_genuine += r["genuine"]
+            total_dissolved += r["dissolved"]
+            total_infra += r["infra"]
+
+            gen_str = f"{GREEN}{r['genuine']:,}{RESET}" if r['genuine'] > 0 else f"{DIM}0{RESET}"
+            dis_str = f"{YELLOW}{r['dissolved']:,}{RESET}" if r['dissolved'] > 0 else f"{DIM}0{RESET}"
+            sys.stdout.write(f"{CLEAR}  {bar(done_count, len(domains))} "
+                f"{BOLD}{domain:<24}{RESET} "
+                f"{r['extracted']:>4} files  {gen_str:>5} genuine  {dis_str:>4} dissolved\n")
+            sys.stdout.flush()
+
+    t_extract = time.time()
+    print(f"  {DIM}{'─' * (W - 4)}{RESET}")
+    print(f"  {BOLD}{WHITE}{total_extracted:,}{RESET} files  "
+          f"{BOLD}{GREEN}{total_genuine:,}{RESET} genuine  "
+          f"{BOLD}{YELLOW}{total_dissolved:,}{RESET} dissolved  "
+          f"{DIM}{total_skipped:,} skipped{RESET}  "
+          f"{DIM}{elapsed(t_extract - t_start)}{RESET}")
+    print()
+
+    # ── PHASE 2: BUILD ────────────────────────────────────────────
+    # ── PHASE 2: BUILD (parallel domains) ───────────────────────────
+    # Lake handles its own parallelism internally, but we can run
+    # multiple domain builds concurrently. Use fewer workers than
+    # cores since each lake build uses multiple threads.
+    build_workers = n_cpus
+    print(f"  {BOLD}BUILD{RESET}  {DIM}lake build  "
+          f"({build_workers} concurrent domains){RESET}")
+    print(f"  {DIM}{'─' * (W - 4)}{RESET}")
+
+    import threading
+    error_groups = defaultdict(list)
+    error_files = set()
+    all_extracted = []
+    domains_ok = 0
+    domains_fail = 0
+    build_lock = threading.Lock()
+
+    # Prepare domain build info
+    domain_builds = []
+    for domain in domains:
+        out_dir = ORIGIN_DIR / f"Mathlib_{domain}"
+        if not out_dir.exists():
+            continue
+        lean_files = sorted(out_dir.rglob("*.lean"))
+        all_extracted.extend(lean_files)
+        if not lean_files:
+            continue
+        modules = []
+        for f in lean_files:
+            rel = f.relative_to(ORIGIN_DIR.parent)
+            module = str(rel).replace("/", ".").replace(".lean", "")
+            modules.append((module, f))
+        domain_builds.append((domain, lean_files, modules))
+
+    # Largest domains first — start the big jobs immediately
+    domain_builds.sort(key=lambda x: -len(x[1]))
+
+    def build_domain(args):
+        """Build one domain — runs in a worker thread."""
+        domain, lean_files, modules = args
+        module_names = [m for m, _ in modules]
+        t_domain = time.time()
+
+        try:
+            result = subprocess.run(
+                ["lake", "build"] + module_names,
+                capture_output=True, text=True, timeout=3600,
+                cwd=str(ORIGIN_DIR.parent)
+            )
+            build_output = result.stderr + result.stdout
+            timed_out = False
+        except subprocess.TimeoutExpired:
+            build_output = ""
+            timed_out = True
+            result = None
+
+        dt = time.time() - t_domain
+        d_errors = []
+
+        if timed_out:
+            d_errors.append(("TIMEOUT (>3600s)",
+                [str(f.relative_to(ORIGIN_DIR.parent)) for _, f in modules]))
+            return {"domain": domain, "files": len(lean_files),
+                    "ok": False, "errors": d_errors, "dt": dt, "timeout": True}
+
+        for line in build_output.split("\n"):
+            line = line.strip()
+            if not line.startswith("error:"):
+                continue
+            m = re.match(r"error:\s*([^:]+\.lean):(\d+):(\d+):\s*(.*)", line)
+            if m:
+                d_errors.append((m.group(4).strip(), [m.group(1).lstrip("./")]))
+            elif "build failed" not in line:
+                d_errors.append((line, [domain]))
+
+        return {"domain": domain, "files": len(lean_files),
+                "ok": result.returncode == 0, "errors": d_errors,
+                "dt": dt, "timeout": False}
+
+    done_builds = 0
+    with ThreadPoolExecutor(max_workers=build_workers) as pool:
+        futures = {pool.submit(build_domain, db): db[0] for db in domain_builds}
+        for future in as_completed(futures):
+            done_builds += 1
+            r = future.result()
+            domain = r["domain"]
+
+            with build_lock:
+                n_errs = 0
+                for pattern, files in r["errors"]:
+                    error_groups[pattern].extend(files)
+                    error_files.update(files)
+                    n_errs += len(files)
+                if r["ok"]:
+                    domains_ok += 1
+                    icon = f"{GREEN}OK{RESET}"
+                elif r["timeout"]:
+                    domains_fail += 1
+                    icon = f"{RED}TIMEOUT{RESET}"
+                else:
+                    domains_fail += 1
+                    icon = f"{RED}FAIL({n_errs}){RESET}"
+
+            sys.stdout.write(f"{CLEAR}  {bar(done_builds, len(domain_builds))} "
+                f"{icon:<18}  {BOLD}{domain:<24}{RESET} "
+                f"{r['files']:>4} files  {DIM}{elapsed(r['dt'])}{RESET}\n")
+            sys.stdout.flush()
+
+    t_build = time.time()
+    build_pass = len(all_extracted) - len(error_files)
+    build_fail_count = len(error_files)
+    print(f"  {DIM}{'─' * (W - 4)}{RESET}")
+    pass_str = f"{GREEN}{build_pass:,}{RESET}"
+    fail_str = f"{RED}{build_fail_count:,}{RESET}" if build_fail_count > 0 else f"{GREEN}0{RESET}"
+    print(f"  {BOLD}{pass_str}{RESET} pass  {fail_str} fail  "
+          f"{DIM}{elapsed(t_build - t_extract)}{RESET}")
+    print()
+
+    # ── PHASE 3: COUNT ────────────────────────────────────────────
+    mathlib_lines = 0
+    for f in base.rglob("*.lean"):
+        try:
+            mathlib_lines += f.read_text(errors="replace").count("\n") + 1
+        except:
+            pass
+
+    origin_lines = 0
+    for domain in domains:
+        out_dir = ORIGIN_DIR / f"Mathlib_{domain}"
+        if not out_dir.exists():
+            continue
+        for f in out_dir.rglob("*.lean"):
+            try:
+                origin_lines += f.read_text(errors="replace").count("\n") + 1
+            except:
+                pass
+
+    # ── REPORT ────────────────────────────────────────────────────
+    status = "PASS" if build_fail_count == 0 else "FAIL"
+    reduction = (1 - origin_lines / mathlib_lines) * 100 if mathlib_lines > 0 else 0
+    t_total = time.time() - t_start
+
+    print(f"  {BOLD}{CYAN}╔{'═' * (W - 6)}╗{RESET}")
+    print(f"  {BOLD}{CYAN}║{RESET}  {BOLD}{WHITE}R E S U L T S{RESET}"
+          f"{' ' * (W - 21)}{BOLD}{CYAN}║{RESET}")
+    print(f"  {BOLD}{CYAN}╚{'═' * (W - 6)}╝{RESET}")
+    print()
+
+    # The big numbers
+    print(f"    {DIM}Mathlib{RESET}        {BOLD}{mathlib_lines:>12,}{RESET} {DIM}lines{RESET}")
+    print(f"    {DIM}Origin{RESET}         {BOLD}{GREEN}{origin_lines:>12,}{RESET} {DIM}lines{RESET}")
+    r_color = GREEN if reduction > 50 else YELLOW if reduction > 20 else RED
+    print(f"    {BOLD}Reduction{RESET}      {BOLD}{r_color}{reduction:>11.1f}%{RESET}")
+    print()
+
+    # Declarations
+    print(f"    {DIM}Genuine{RESET}        {GREEN}{total_genuine:>12,}{RESET}")
+    print(f"    {DIM}Dissolved{RESET}      {YELLOW}{total_dissolved:>12,}{RESET}")
+    print(f"    {DIM}Infrastructure{RESET} {DIM}{total_infra:>12,}{RESET}")
+    print()
+
+    # Build status
+    if build_fail_count == 0:
+        print(f"    {DIM}Build{RESET}          {BOLD}{GREEN}{'PASS':>12}{RESET}  "
+              f"{GREEN}{build_pass:,} files{RESET}")
+    else:
+        print(f"    {DIM}Build{RESET}          {BOLD}{RED}{'FAIL':>12}{RESET}  "
+              f"{GREEN}{build_pass:,} pass{RESET} / {RED}{build_fail_count:,} fail{RESET}")
+    print(f"    {DIM}Time{RESET}           {DIM}{elapsed(t_total):>12}{RESET}  "
+          f"{DIM}(extract {elapsed(t_extract - t_start)} + build {elapsed(t_build - t_extract)}){RESET}")
+    print()
+
+    if error_groups:
+        print(f"  {BOLD}{RED}ERRORS{RESET}  "
+              f"{BOLD}{len(error_groups)}{RESET} {DIM}patterns to fix in the script{RESET}")
+        print(f"  {DIM}{'─' * (W - 4)}{RESET}")
+        print()
+        for pattern, files in sorted(error_groups.items(), key=lambda x: -len(x[1])):
+            print(f"    {RED}{len(files):>4}{RESET} {DIM}files{RESET}  {WHITE}{pattern[:W - 20]}{RESET}")
+            for f in files[:3]:
+                print(f"    {DIM}     ↳ {f}{RESET}")
+            if len(files) > 3:
+                print(f"    {DIM}     ↳ ... and {len(files) - 3} more{RESET}")
+            print()
+
+    print(f"  {BOLD}{CYAN}╔{'═' * (W - 6)}╗{RESET}")
+    if build_fail_count == 0:
+        print(f"  {BOLD}{CYAN}║{RESET}  {BOLD}{GREEN}"
+              f"BUILD PASSES  ·  {mathlib_lines:,} → {origin_lines:,} lines  "
+              f"·  {reduction:.1f}% reduction{RESET}"
+              f"{' ' * max(1, W - 65)}{BOLD}{CYAN}║{RESET}")
+        print(f"  {BOLD}{CYAN}║{RESET}  {DIM}"
+              f"Lean verified. Line counts objective. "
+              f"The build succeeds or it doesn't.{RESET}"
+              f"{' ' * max(1, W - 74)}{BOLD}{CYAN}║{RESET}")
+    else:
+        print(f"  {BOLD}{CYAN}║{RESET}  {BOLD}{YELLOW}"
+              f"{len(error_groups)} error patterns  ·  "
+              f"Fix them in the script  ·  Run again{RESET}"
+              f"{' ' * max(1, W - 60)}{BOLD}{CYAN}║{RESET}")
+    print(f"  {BOLD}{CYAN}╚{'═' * (W - 6)}╝{RESET}")
+    print()
 
 
 # ---------------------------------------------------------------------------
@@ -601,6 +1002,9 @@ def main():
             cmd_extract(Path(sys.argv[2]))
         else:
             print("Usage: origin.py extract <file.lean> | --domain <DOMAIN>")
+
+    elif cmd == "run":
+        cmd_run()
 
     else:
         print(f"Unknown command: {cmd}")

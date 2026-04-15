@@ -3,6 +3,9 @@ Extracted from LinearAlgebra/TensorProduct/Matrix.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Matrix.Kronecker
+import Mathlib.LinearAlgebra.Matrix.ToLin
+import Mathlib.LinearAlgebra.TensorProduct.Basis
 
 /-!
 # Connections between `TensorProduct` and `Matrix`
@@ -13,10 +16,6 @@ where the correspondence is induced by `Basis.tensorProduct`
 Notably, `TensorProduct.toMatrix_map` shows that taking the tensor product of linear maps is
 equivalent to taking the Kronecker product of their matrix representations.
 -/
-
-open Matrix Module LinearMap
-
-open scoped Kronecker
 
 variable {R : Type*} {M N P M' N' : Type*} {ι κ τ ι' κ' : Type*}
 
@@ -35,6 +34,10 @@ variable [Module R M] [Module R N] [Module R P] [Module R M'] [Module R N']
 variable (bM : Basis ι R M) (bN : Basis κ R N) (bP : Basis τ R P)
 
 variable (bM' : Basis ι' R M') (bN' : Basis κ' R N')
+
+open Kronecker
+
+open Matrix LinearMap
 
 theorem TensorProduct.toMatrix_map (f : M →ₗ[R] M') (g : N →ₗ[R] N') :
     toMatrix (bM.tensorProduct bN) (bM'.tensorProduct bN') (TensorProduct.map f g) =

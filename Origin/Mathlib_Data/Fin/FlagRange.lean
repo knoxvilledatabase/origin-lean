@@ -1,8 +1,12 @@
 /-
 Extracted from Data/Fin/FlagRange.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Fin.Basic
+import Mathlib.Order.Chain
+import Mathlib.Order.Cover
+import Mathlib.Order.Fin.Basic
 
 /-!
 # Range of `f : Fin (n + 1) → α` as a `Flag`
@@ -33,3 +37,14 @@ theorem IsMaxChain.range_fin_of_covBy (h0 : f 0 = ⊥) (hlast : f (.last n) = �
   | succ k ihk =>
     rw [range_subset_iff] at hbt
     exact (htc.lt_of_le (hbt k.succ) hx (h _)).resolve_right ((hcovBy k).2 ihk)
+
+@[simps]
+def Flag.rangeFin (f : Fin (n + 1) → α) (h0 : f 0 = ⊥) (hlast : f (.last n) = ⊤)
+    (hcovBy : ∀ k : Fin n, f k.castSucc ⩿ f k.succ) : Flag α where
+  carrier := range f
+  Chain' := (IsMaxChain.range_fin_of_covBy h0 hlast hcovBy).1
+  max_chain' := (IsMaxChain.range_fin_of_covBy h0 hlast hcovBy).2
+
+@[simp] theorem Flag.mem_rangeFin {x h0 hlast hcovBy} :
+    x ∈ rangeFin f h0 hlast hcovBy ↔ ∃ k, f k = x :=
+  Iff.rfl

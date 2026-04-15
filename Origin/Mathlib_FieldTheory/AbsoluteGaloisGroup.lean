@@ -1,8 +1,11 @@
 /-
 Extracted from FieldTheory/AbsoluteGaloisGroup.lean
-Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.FieldTheory.KrullTopology
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
+import Mathlib.Topology.Algebra.Group.TopologicalAbelianization
 
 /-!
 # The topological abelianization of the absolute Galois group.
@@ -33,15 +36,17 @@ variable (K : Type*) [Field K]
 
 def absoluteGaloisGroup := AlgebraicClosure K ≃ₐ[K] AlgebraicClosure K
 
-deriving Group, TopologicalSpace, IsTopologicalGroup
-
-add_decl_doc instTopologicalSpaceAbsoluteGaloisGroup
-
 local notation "G_K" => absoluteGaloisGroup
+
+noncomputable instance : Group (G_K K) := AlgEquiv.aut
+
+noncomputable instance : TopologicalSpace (G_K K) := krullTopology K (AlgebraicClosure K)
 
 /-! ### The topological abelianization of the absolute Galois group -/
 
--- INSTANCE (free from Core): absoluteGaloisGroup.commutator_closure_isNormal
+instance absoluteGaloisGroup.commutator_closure_isNormal :
+    (commutator (G_K K)).topologicalClosure.Normal :=
+  Subgroup.is_normal_topologicalClosure (commutator (G_K K))
 
 abbrev absoluteGaloisGroupAbelianization := TopologicalAbelianization (G_K K)
 

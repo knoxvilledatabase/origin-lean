@@ -3,6 +3,8 @@ Extracted from Algebra/Ring/Int/Units.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Ring.Int.Defs
+import Mathlib.Algebra.Ring.Units
 
 /-!
 # Basic lemmas for `ℤˣ`.
@@ -11,12 +13,10 @@ This file contains lemmas on the units of `ℤ`.
 
 ## Main results
 
-* `Int.units_eq_one_or`: the invertible integers are 1 and -1.
+ * `Int.units_eq_one_or`: the invertible integers are 1 and -1.
 
 See note [foundational algebra order theory].
 -/
-
-assert_not_exists DenselyOrdered Set.Subsingleton
 
 namespace Int
 

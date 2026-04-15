@@ -3,6 +3,7 @@ Extracted from Order/Extension/Linear.lean
 Genuine: 3 of 5 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Order.Zorn
 
 /-!
 # Extend a partial order to a linear order
@@ -32,13 +33,13 @@ theorem extend_partialOrder {α : Type u} (r : α → α → Prop) [IsPartialOrd
     · rintro x y z ⟨s₁, h₁s₁, h₂s₁⟩ ⟨s₂, h₁s₂, h₂s₂⟩
       haveI : IsPartialOrder _ _ := hc₁ h₁s₁
       haveI : IsPartialOrder _ _ := hc₁ h₁s₂
-      rcases hc₂.total h₁s₁ h₁s₂ with h | h
+      cases' hc₂.total h₁s₁ h₁s₂ with h h
       · exact ⟨s₂, h₁s₂, _root_.trans (h _ _ h₂s₁) h₂s₂⟩
       · exact ⟨s₁, h₁s₁, _root_.trans h₂s₁ (h _ _ h₂s₂)⟩
     · rintro x y ⟨s₁, h₁s₁, h₂s₁⟩ ⟨s₂, h₁s₂, h₂s₂⟩
       haveI : IsPartialOrder _ _ := hc₁ h₁s₁
       haveI : IsPartialOrder _ _ := hc₁ h₁s₂
-      rcases hc₂.total h₁s₁ h₁s₂ with h | h
+      cases' hc₂.total h₁s₁ h₁s₂ with h h
       · exact antisymm (h _ _ h₂s₁) h₂s₂
       · apply antisymm h₂s₁ (h _ _ h₂s₂)
   obtain ⟨s, hrs, hs⟩ := zorn_le_nonempty₀ S hS r ‹_›
@@ -68,10 +69,17 @@ theorem extend_partialOrder {α : Type u} (r : α → α → Prop) [IsPartialOrd
 def LinearExtension (α : Type u) : Type u :=
   α
 
--- INSTANCE (free from Core): {α
+noncomputable instance {α : Type u} [PartialOrder α] : LinearOrder (LinearExtension α) where
+  le := (extend_partialOrder ((· ≤ ·) : α → α → Prop)).choose
+  le_refl := (extend_partialOrder ((· ≤ ·) : α → α → Prop)).choose_spec.1.1.1.1.1
+  le_trans := (extend_partialOrder ((· ≤ ·) : α → α → Prop)).choose_spec.1.1.1.2.1
+  le_antisymm := (extend_partialOrder ((· ≤ ·) : α → α → Prop)).choose_spec.1.1.2.1
+  le_total := (extend_partialOrder ((· ≤ ·) : α → α → Prop)).choose_spec.1.2.1
+  decidableLE := Classical.decRel _
 
-noncomputable def toLinearExtension {α : Type u} [PartialOrder α] : α →o LinearExtension α where
+def toLinearExtension {α : Type u} [PartialOrder α] : α →o LinearExtension α where
   toFun x := x
   monotone' := (extend_partialOrder ((· ≤ ·) : α → α → Prop)).choose_spec.2
 
--- INSTANCE (free from Core): {α
+instance {α : Type u} [Inhabited α] : Inhabited (LinearExtension α) :=
+  ⟨(default : α)⟩

@@ -1,8 +1,11 @@
 /-
 Extracted from Analysis/Normed/Algebra/Basic.lean
-Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
+Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.Algebra.Module.CharacterSpace
+import Mathlib.Analysis.Normed.Module.WeakDual
+import Mathlib.Analysis.Normed.Algebra.Spectrum
 
 /-!
 # Normed algebras
@@ -23,14 +26,6 @@ normed algebra, character space, continuous functional calculus
 
 -/
 
-namespace IntermediateField
-
-variable {K L : Type*} [NontriviallyNormedField K] [NormedField L] [NormedAlgebra K L]
-
--- INSTANCE (free from Core): (F
-
-end IntermediateField
-
 variable {𝕜 : Type*} {A : Type*}
 
 namespace WeakDual
@@ -39,11 +34,17 @@ namespace CharacterSpace
 
 variable [NontriviallyNormedField 𝕜] [NormedRing A] [NormedAlgebra 𝕜 A] [CompleteSpace A]
 
-theorem norm_le_norm_one (φ : characterSpace 𝕜 A) : ‖toStrongDual (φ : WeakDual 𝕜 A)‖ ≤ ‖(1 : A)‖ :=
+theorem norm_le_norm_one (φ : characterSpace 𝕜 A) : ‖toNormedDual (φ : WeakDual 𝕜 A)‖ ≤ ‖(1 : A)‖ :=
   ContinuousLinearMap.opNorm_le_bound _ (norm_nonneg (1 : A)) fun a =>
     mul_comm ‖a‖ ‖(1 : A)‖ ▸ spectrum.norm_le_norm_mul_of_mem (apply_mem_spectrum φ a)
 
--- INSTANCE (free from Core): [ProperSpace
+instance [ProperSpace 𝕜] : CompactSpace (characterSpace 𝕜 A) := by
+  rw [← isCompact_iff_compactSpace]
+  have h : characterSpace 𝕜 A ⊆ toNormedDual ⁻¹' Metric.closedBall 0 ‖(1 : A)‖ := by
+    intro φ hφ
+    rw [Set.mem_preimage, mem_closedBall_zero_iff]
+    exact (norm_le_norm_one ⟨φ, ⟨hφ.1, hφ.2⟩⟩ : _)
+  exact (isCompact_closedBall 𝕜 0 _).of_isClosed_subset CharacterSpace.isClosed h
 
 end CharacterSpace
 

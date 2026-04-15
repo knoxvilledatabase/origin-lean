@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Sites/EpiMono.lean
 Genuine: 4 of 9 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.MorphismProperty.Concrete
+import Mathlib.CategoryTheory.Sites.LocallyBijective
 
 /-!
 # Morphisms of sheaves factor as a locally surjective followed by a locally injective morphism
@@ -21,27 +23,30 @@ universe w v' u' v u
 
 namespace CategoryTheory
 
-open Category ConcreteCategory Functor
+open Category ConcreteCategory
 
 variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  (A : Type u') [Category.{v'} A] {FA : A → A → Type*} {CA : A → Type w}
-  [∀ X Y, FunLike (FA X Y) (CA X) (CA Y)] [ConcreteCategory.{w} A FA]
+  (A : Type u') [Category.{v'} A] [ConcreteCategory.{w} A]
   [HasFunctorialSurjectiveInjectiveFactorization A]
   [J.WEqualsLocallyBijective A]
+
+namespace Presheaf
+
+end Presheaf
 
 namespace Sheaf
 
 def locallyInjective : MorphismProperty (Sheaf J A) :=
-  fun _ _ f => IsLocallyInjective f
+  fun _ _  f => IsLocallyInjective f
 
 def locallySurjective : MorphismProperty (Sheaf J A) :=
-  fun _ _ f => IsLocallySurjective f
+  fun _ _  f => IsLocallySurjective f
+
+section
 
 variable {A}
 
 variable (data : FunctorialSurjectiveInjectiveFactorizationData A) [HasWeakSheafify J A]
-
-set_option backward.isDefEq.respectTransparency false in
 
 noncomputable def functorialLocallySurjectiveInjectiveFactorization :
     (locallySurjective J A).FunctorialFactorizationData (locallyInjective J A) where
@@ -74,23 +79,36 @@ noncomputable def functorialLocallySurjectiveInjectiveFactorization :
     apply Presheaf.isLocallyInjective_of_injective
     apply (data.functorCategory Cᵒᵖ).hp
 
+section
+
 variable (f : Arrow (Sheaf J A))
 
--- INSTANCE (free from Core): :
+instance : IsLocallySurjective
+            ((functorialLocallySurjectiveInjectiveFactorization J data).i.app f) := by
+  apply (functorialLocallySurjectiveInjectiveFactorization J data).hi
 
--- INSTANCE (free from Core): :
+instance : IsLocallyInjective
+            ((functorialLocallySurjectiveInjectiveFactorization J data).p.app f) := by
+  apply (functorialLocallySurjectiveInjectiveFactorization J data).hp
 
 variable [J.HasSheafCompose (forget A)]
 
--- INSTANCE (free from Core): :
+instance : Epi ((functorialLocallySurjectiveInjectiveFactorization J data).i.app f) := by
+  apply epi_of_isLocallySurjective
 
--- INSTANCE (free from Core): :
+instance : Mono ((functorialLocallySurjectiveInjectiveFactorization J data).p.app f) := by
+  apply mono_of_isLocallyInjective
+
+end
+
+instance : (locallySurjective J A).HasFunctorialFactorization (locallyInjective J A) where
+  nonempty_functorialFactorizationData :=
+    ⟨functorialLocallySurjectiveInjectiveFactorization J
+      (MorphismProperty.functorialFactorizationData _ _)⟩
 
 end
 
--- INSTANCE (free from Core): :
-
-end
+section
 
 variable {J}
 

@@ -3,6 +3,9 @@ Extracted from Topology/Algebra/Module/UniformConvergence.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.LocallyConvex.Bounded
+import Mathlib.Topology.Algebra.FilterBasis
+import Mathlib.Topology.Algebra.UniformConvergence
 
 /-!
 # Algebraic facts about the topology of uniform convergence
@@ -20,7 +23,7 @@ space of continuous linear maps between two topological vector spaces.
 
 ## Implementation notes
 
-Like in `Mathlib/Topology/UniformSpace/UniformConvergenceTopology.lean`, we use the type aliases
+Like in `Mathlib.Topology.UniformSpace.UniformConvergenceTopology`, we use the type aliases
 `UniformFun` (denoted `α →ᵤ β`) and `UniformOnFun` (denoted `α →ᵤ[𝔖] β`) for functions from `α`
 to `β` endowed with the structures of uniform convergence and `𝔖`-convergence.
 
@@ -42,14 +45,14 @@ open scoped Pointwise UniformConvergence Uniformity
 section Module
 
 variable (𝕜 α E H : Type*) {hom : Type*} [NormedField 𝕜] [AddCommGroup H] [Module 𝕜 H]
-  [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace H] [UniformSpace E] [IsUniformAddGroup E]
+  [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace H] [UniformSpace E] [UniformAddGroup E]
   [ContinuousSMul 𝕜 E] {𝔖 : Set <| Set α}
   [FunLike hom H (α → E)] [LinearMapClass hom 𝕜 H (α → E)]
 
 lemma UniformFun.continuousSMul_induced_of_range_bounded (φ : hom)
     (hφ : IsInducing (ofFun ∘ φ)) (h : ∀ u : H, Bornology.IsVonNBounded 𝕜 (Set.range (φ u))) :
     ContinuousSMul 𝕜 H := by
-  have : IsTopologicalAddGroup H :=
+  have : TopologicalAddGroup H :=
     let ofFun' : (α → E) →+ (α →ᵤ E) := AddMonoidHom.id _
     IsInducing.topologicalAddGroup (ofFun'.comp (φ : H →+ (α → E))) hφ
   have hb : (𝓝 (0 : H)).HasBasis (· ∈ 𝓝 (0 : E)) fun V ↦ {u | ∀ x, φ u x ∈ V} := by
@@ -77,7 +80,7 @@ lemma UniformOnFun.continuousSMul_induced_of_image_bounded (φ : hom) (hφ : IsI
     (h : ∀ u : H, ∀ s ∈ 𝔖, Bornology.IsVonNBounded 𝕜 ((φ u : α → E) '' s)) :
     ContinuousSMul 𝕜 H := by
   obtain rfl := hφ.eq_induced; clear hφ
-  simp +instances only [induced_iInf, UniformOnFun.topologicalSpace_eq, induced_compose]
+  simp only [induced_iInf, UniformOnFun.topologicalSpace_eq, induced_compose]
   refine continuousSMul_iInf fun s ↦ continuousSMul_iInf fun hs ↦ ?_
   letI : TopologicalSpace H :=
     .induced (UniformFun.ofFun ∘ s.restrict ∘ φ) (UniformFun.topologicalSpace s E)

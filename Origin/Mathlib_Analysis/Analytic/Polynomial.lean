@@ -3,6 +3,10 @@ Extracted from Analysis/Analytic/Polynomial.lean
 Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.AlgebraMap
+import Mathlib.Algebra.MvPolynomial.Basic
+import Mathlib.Analysis.Analytic.Constructions
+import Mathlib.Topology.Algebra.Module.FiniteDimension
 
 /-!
 # Polynomials are analytic
@@ -64,13 +68,19 @@ theorem AnalyticOnNhd.aeval_mvPolynomial
     (hf : ∀ i, AnalyticOnNhd 𝕜 (f · i) s) (p : MvPolynomial σ A) :
     AnalyticOnNhd 𝕜 (fun x ↦ aeval (f x) p) s := fun x hx ↦ .aeval_mvPolynomial (hf · x hx) p
 
+alias AnalyticOn.aeval_mvPolynomial := AnalyticOnNhd.aeval_mvPolynomial
+
 theorem AnalyticOnNhd.eval_continuousLinearMap (f : E →L[𝕜] σ → B) (p : MvPolynomial σ B) :
     AnalyticOnNhd 𝕜 (fun x ↦ eval (f x) p) Set.univ :=
   fun x _ ↦ .aeval_mvPolynomial (fun i ↦ ((ContinuousLinearMap.proj i).comp f).analyticAt x) p
 
+alias AnalyticOn.eval_continuousLinearMap := AnalyticOnNhd.eval_continuousLinearMap
+
 theorem AnalyticOnNhd.eval_continuousLinearMap' (f : σ → E →L[𝕜] B) (p : MvPolynomial σ B) :
     AnalyticOnNhd 𝕜 (fun x ↦ eval (f · x) p) Set.univ :=
   fun x _ ↦ .aeval_mvPolynomial (fun i ↦ (f i).analyticAt x) p
+
+alias AnalyticOn.eval_continuousLinearMap' := AnalyticOnNhd.eval_continuousLinearMap'
 
 variable [CompleteSpace 𝕜] [T2Space E] [FiniteDimensional 𝕜 E]
 
@@ -78,11 +88,17 @@ theorem AnalyticOnNhd.eval_linearMap (f : E →ₗ[𝕜] σ → B) (p : MvPolyno
     AnalyticOnNhd 𝕜 (fun x ↦ eval (f x) p) Set.univ :=
   AnalyticOnNhd.eval_continuousLinearMap { f with cont := f.continuous_of_finiteDimensional } p
 
+alias AnalyticOn.eval_linearMap := AnalyticOnNhd.eval_linearMap
+
 theorem AnalyticOnNhd.eval_linearMap' (f : σ → E →ₗ[𝕜] B) (p : MvPolynomial σ B) :
     AnalyticOnNhd 𝕜 (fun x ↦ eval (f · x) p) Set.univ := AnalyticOnNhd.eval_linearMap (.pi f) p
+
+alias AnalyticOn.eval_linearMap' := AnalyticOnNhd.eval_linearMap'
 
 theorem AnalyticOnNhd.eval_mvPolynomial [Fintype σ] (p : MvPolynomial σ 𝕜) :
     AnalyticOnNhd 𝕜 (eval · p) Set.univ :=
   AnalyticOnNhd.eval_linearMap (.id (R := 𝕜) (M := σ → 𝕜)) p
+
+alias AnalyticOn.eval_mvPolynomial := AnalyticOnNhd.eval_mvPolynomial
 
 end MvPolynomial

@@ -3,12 +3,12 @@ Extracted from LinearAlgebra/Basis/Bilinear.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.BilinearMap
+import Mathlib.LinearAlgebra.Basis.Defs
 
 /-!
 # Lemmas about bilinear maps with a basis over each argument
 -/
-
-open Module
 
 namespace LinearMap
 
@@ -44,13 +44,15 @@ theorem sum_repr_mul_repr_mulₛₗ {B : M →ₛₗ[ρ₁₂] N →ₛₗ[σ₁
     ((b₁.repr x).sum fun i xi => (b₂.repr y).sum fun j yj => ρ₁₂ xi • σ₁₂ yj • B (b₁ i) (b₂ j)) =
       B x y := by
   conv_rhs => rw [← b₁.linearCombination_repr x, ← b₂.linearCombination_repr y]
-  simp_rw [Finsupp.linearCombination_apply, Finsupp.sum, map_sum₂, map_sum, map_smulₛₗ₂, map_smulₛₗ]
+  simp_rw [Finsupp.linearCombination_apply, Finsupp.sum, map_sum₂, map_sum, LinearMap.map_smulₛₗ₂,
+    LinearMap.map_smulₛₗ]
 
 theorem sum_repr_mul_repr_mul {B : Mₗ →ₗ[Rₗ] Nₗ →ₗ[Rₗ] Pₗ} (x y) :
     ((b₁'.repr x).sum fun i xi => (b₂'.repr y).sum fun j yj => xi • yj • B (b₁' i) (b₂' j)) =
       B x y := by
   conv_rhs => rw [← b₁'.linearCombination_repr x, ← b₂'.linearCombination_repr y]
-  simp_rw [Finsupp.linearCombination_apply, Finsupp.sum, map_sum₂, map_sum, map_smul₂, map_smul]
+  simp_rw [Finsupp.linearCombination_apply, Finsupp.sum, map_sum₂, map_sum, LinearMap.map_smul₂,
+    LinearMap.map_smul]
 
 end AddCommMonoid
 

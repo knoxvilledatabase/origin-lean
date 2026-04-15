@@ -1,8 +1,10 @@
 /-
 Extracted from LinearAlgebra/FreeModule/Finite/Matrix.lean
-Genuine: 6 of 9 | Dissolved: 0 | Infrastructure: 3
+Genuine: 8 of 13 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Dimension.LinearMap
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
 /-!
 # Finite and free modules using matrices
@@ -35,9 +37,11 @@ private noncomputable def linearMapEquivFun : (M →ₗ[R] N) ≃ₗ[S] ChooseBa
   (chooseBasis R M).repr.congrLeft N S ≪≫ₗ (Finsupp.lsum S).symm ≪≫ₗ
     LinearEquiv.piCongrRight fun _ ↦ LinearMap.ringLmapEquivSelf R S N
 
--- INSTANCE (free from Core): Module.Free.linearMap
+instance Module.Free.linearMap [Module.Free S N] : Module.Free S (M →ₗ[R] N) :=
+  Module.Free.of_equiv (linearMapEquivFun R S M N).symm
 
--- INSTANCE (free from Core): Module.Finite.linearMap
+instance Module.Finite.linearMap [Module.Finite S N] : Module.Finite S (M →ₗ[R] N) :=
+  Module.Finite.equiv (linearMapEquivFun R S M N).symm
 
 variable [StrongRankCondition R] [StrongRankCondition S] [Module.Free S N]
 
@@ -68,7 +72,8 @@ section AlgHom
 variable (K M : Type*) (L : Type v) [CommRing K] [Ring M] [Algebra K M]
   [Module.Free K M] [Module.Finite K M] [CommRing L] [IsDomain L] [Algebra K L]
 
--- INSTANCE (free from Core): Finite.algHom
+instance Finite.algHom : Finite (M →ₐ[K] L) :=
+  (linearIndependent_algHom_toLinearMap K M L).finite
 
 open Cardinal
 
@@ -77,3 +82,32 @@ theorem cardinalMk_algHom_le_rank : #(M →ₐ[K] L) ≤ lift.{v} (Module.rank K
   · rw [lift_id]
   · have := Module.nontrivial K L
     rw [lift_id, Module.rank_linearMap_self]
+
+@[stacks 09HS]
+theorem card_algHom_le_finrank : Nat.card (M →ₐ[K] L) ≤ finrank K M := by
+  convert toNat_le_toNat (cardinalMk_algHom_le_rank K M L) ?_
+  · rw [toNat_lift, finrank]
+  · rw [lift_lt_aleph0]; have := Module.nontrivial K L; apply Module.rank_lt_aleph0
+
+end AlgHom
+
+section Integer
+
+variable [AddCommGroup M] [Module.Finite ℤ M] [Module.Free ℤ M] [AddCommGroup N]
+
+instance Module.Finite.addMonoidHom [Module.Finite ℤ N] : Module.Finite ℤ (M →+ N) :=
+  Module.Finite.equiv (addMonoidHomLequivInt ℤ).symm
+
+instance Module.Free.addMonoidHom [Module.Free ℤ N] : Module.Free ℤ (M →+ N) :=
+  letI : Module.Free ℤ (M →ₗ[ℤ] N) := Module.Free.linearMap _ _ _ _
+  Module.Free.of_equiv (addMonoidHomLequivInt ℤ).symm
+
+end Integer
+
+theorem Matrix.rank_vecMulVec {K m n : Type u} [CommRing K] [Fintype n]
+    [DecidableEq n] (w : m → K) (v : n → K) : (Matrix.vecMulVec w v).toLin'.rank ≤ 1 := by
+  nontriviality K
+  rw [Matrix.vecMulVec_eq (Fin 1), Matrix.toLin'_mul]
+  refine le_trans (LinearMap.rank_comp_le_left _ _) ?_
+  refine (LinearMap.rank_le_domain _).trans_eq ?_
+  rw [rank_fun', Fintype.card_ofSubsingleton, Nat.cast_one]

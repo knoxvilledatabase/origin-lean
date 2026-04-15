@@ -3,6 +3,7 @@ Extracted from Algebra/MvPolynomial/Polynomial.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.MvPolynomial.Equiv
 
 /-!
 # Some lemmas relating polynomials and multivariable polynomials.

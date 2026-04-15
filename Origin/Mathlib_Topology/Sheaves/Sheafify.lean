@@ -1,13 +1,15 @@
 /-
 Extracted from Topology/Sheaves/Sheafify.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Sheaves.LocalPredicate
+import Mathlib.Topology.Sheaves.Stalks
 
 /-!
-# Sheafification of `Type`-valued presheaves
+# Sheafification of `Type` valued presheaves
 
-We construct the sheafification of a `Type`-valued presheaf,
+We construct the sheafification of a `Type` valued presheaf,
 as the subsheaf of dependent functions into the stalks
 consisting of functions which are locally germs.
 
@@ -25,9 +27,7 @@ and that it is the left adjoint of the forgetful functor,
 following <https://stacks.math.columbia.edu/tag/007X>.
 -/
 
-assert_not_exists CommRingCat
-
-universe v u
+universe v
 
 noncomputable section
 
@@ -52,11 +52,10 @@ def sheafify : Sheaf (Type v) X :=
   subsheafToTypes (Sheafify.isLocallyGerm F)
 
 def toSheafify : F ⟶ F.sheafify.1 where
-  app U := TypeCat.ofHom fun f ↦ ⟨fun x => F.germ _ x x.2 f, PrelocalPredicate.sheafifyOf
-    ⟨f, fun x => rfl⟩⟩
+  app U f := ⟨fun x => F.germ _ x x.2 f, PrelocalPredicate.sheafifyOf ⟨f, fun x => rfl⟩⟩
   naturality U U' f := by
     ext x
-    apply Subtype.ext -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11041): Added `apply`
+    apply Subtype.ext -- Porting note: Added `apply`
     ext ⟨u, m⟩
     exact germ_res_apply F f.unop u m x
 
@@ -84,31 +83,18 @@ theorem stalkToFiber_injective (x : X) : Function.Injective (F.stalkToFiber x) :
   rcases F.germ_eq x mU mV gU gV e with ⟨W, mW, iU', iV', (e' : F.map iU'.op gU = F.map iV'.op gV)⟩
   use ⟨W ⊓ (U' ⊓ V'), ⟨mW, mU, mV⟩⟩
   refine ⟨?_, ?_, ?_⟩
-  · change W ⊓ (U' ⊓ V') ⟶ U.val
+  · change W ⊓ (U' ⊓ V') ⟶ U.obj
     exact Opens.infLERight _ _ ≫ Opens.infLELeft _ _ ≫ iU
-  · change W ⊓ (U' ⊓ V') ⟶ V.val
+  · change W ⊓ (U' ⊓ V') ⟶ V.obj
     exact Opens.infLERight _ _ ≫ Opens.infLERight _ _ ≫ iV
   · intro w
     specialize wU ⟨w.1, w.2.2.1⟩
     specialize wV ⟨w.1, w.2.2.2⟩
-    refine wU.trans <| .trans ?_ wV.symm
-    rw [← F.germ_res iU' w w.2.1, ← F.germ_res iV' w w.2.1,
+    dsimp at wU wV ⊢
+    rw [wU, ← F.germ_res iU' w w.2.1, wV, ← F.germ_res iV' w w.2.1,
       CategoryTheory.types_comp_apply, CategoryTheory.types_comp_apply, e']
 
 def sheafifyStalkIso (x : X) : F.sheafify.presheaf.stalk x ≅ F.stalk x :=
   (Equiv.ofBijective _ ⟨stalkToFiber_injective _ _, stalkToFiber_surjective _ _⟩).toIso
-
-end TopCat.Presheaf
-
-namespace TopCat.Presheaf
-
-variable (p₀ : X) (C : Type u) [Category.{v} C] [Limits.HasColimits C]
-  [Limits.HasTerminal C] (𝓕 : Presheaf C X) [HasWeakSheafify (Opens.grothendieckTopology X) C]
-
-theorem stalkFunctor_map_unit_toSheafify_isIso : IsIso ((Presheaf.stalkFunctor C p₀).map
-    (CategoryTheory.toSheafify (Opens.grothendieckTopology X) 𝓕)) := by
-  classical
-  exact Adjunction.isIso_map_unit_of_isLeftAdjoint_comp (sheafificationAdjunction _ C)
-    (skyscraperSheafForgetAdjunction p₀)
 
 end TopCat.Presheaf

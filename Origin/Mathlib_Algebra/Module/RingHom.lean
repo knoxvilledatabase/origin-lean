@@ -1,23 +1,24 @@
 /-
 Extracted from Algebra/Module/RingHom.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.GroupWithZero.Action.End
+import Mathlib.Algebra.Module.Defs
+import Mathlib.Algebra.Ring.Hom.Defs
 
 /-!
 # Composing modules with a ring hom
 
 ## Main definitions
 
-* `Module.compHom`: compose a `Module` with a `RingHom`, with action `f s • m`.
-* `RingHom.toModule`: a `RingHom` defines a module structure by `r • x = f r * x`.
+ * `Module.compHom`: compose a `Module` with a `RingHom`, with action `f s • m`.
+ * `RingHom.toModule`: a `RingHom` defines a module structure by `r • x = f r * x`.
 
 ## Tags
 
 semimodule, module, vector space
 -/
-
-assert_not_exists Field Invertible Multiset Pi.single_smul₀ Set.indicator
 
 open Function Set
 
@@ -46,10 +47,24 @@ abbrev Module.compHom [Semiring S] (f : S →+* R) : Module S M :=
     -- Somehow, now that `SMul` is heterogeneous, it can't unfold earlier fields of a definition for
     -- use in later fields.  See
     -- https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/Heterogeneous.20scalar.20multiplication
-    -- TODO(jmc): there should be a rw-lemma `smul_comp` close to `SMulZeroClass.compFun`
     add_smul := fun r s x => show f (r + s) • x = f r • x + f s • x by simp [add_smul] }
+
+variable {M}
 
 end AddCommMonoid
 
-abbrev RingHom.toModule [Semiring R] [Semiring S] (f : R →+* S) : Module R S :=
+def RingHom.toModule [Semiring R] [Semiring S] (f : R →+* S) : Module R S :=
   Module.compHom S f
+
+@[simps!] def RingHom.smulOneHom
+    [Semiring R] [NonAssocSemiring S] [Module R S] [IsScalarTower R S S] : R →+* S where
+  __ := MonoidHom.smulOneHom
+  map_zero' := zero_smul R 1
+  map_add' := (add_smul · · 1)
+
+def ringHomEquivModuleIsScalarTower [Semiring R] [Semiring S] :
+    (R →+* S) ≃ {_inst : Module R S // IsScalarTower R S S} where
+  toFun f := ⟨Module.compHom S f, SMul.comp.isScalarTower _⟩
+  invFun := fun ⟨_, _⟩ ↦ RingHom.smulOneHom
+  left_inv f := RingHom.ext fun r ↦ mul_one (f r)
+  right_inv := fun ⟨_, _⟩ ↦ Subtype.ext <| Module.ext <| funext₂ <| smul_one_smul S

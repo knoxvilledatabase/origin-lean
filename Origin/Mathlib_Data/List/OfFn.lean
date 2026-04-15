@@ -1,8 +1,10 @@
 /-
 Extracted from Data/List/OfFn.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 34 of 38 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
+import Batteries.Data.List.OfFn
+import Mathlib.Data.Fin.Tuple.Basic
 
 /-!
 # Lists from functions
@@ -19,8 +21,6 @@ The main statements pertain to lists generated using `List.ofFn`
   via `List.ofFn`.
 -/
 
-assert_not_exists Monoid
-
 universe u
 
 variable {α : Type u}
@@ -32,6 +32,220 @@ namespace List
 theorem get_ofFn {n} (f : Fin n → α) (i) : get (ofFn f) i = f (Fin.cast (by simp) i) := by
   simp; congr
 
-theorem ofFn_comp' {β : Type*} {n : ℕ} (f : Fin n → α) (g : α → β) :
-    ofFn (fun i => g (f i)) = map g (ofFn f) :=
-  map_ofFn.symm
+theorem get?_ofFn {n} (f : Fin n → α) (i) : get? (ofFn f) i = ofFnNthVal f i := by
+  simp
+
+@[simp]
+theorem map_ofFn {β : Type*} {n : ℕ} (f : Fin n → α) (g : α → β) :
+    map g (ofFn f) = ofFn (g ∘ f) :=
+  ext_get (by simp) fun i h h' => by simp
+
+@[congr]
+theorem ofFn_congr {m n : ℕ} (h : m = n) (f : Fin m → α) :
+    ofFn f = ofFn fun i : Fin n => f (Fin.cast h.symm i) := by
+  subst h
+  simp_rw [Fin.cast_refl, id]
+
+@[simp]
+theorem ofFn_zero (f : Fin 0 → α) : ofFn f = [] :=
+  ext_get (by simp) (fun i hi₁ hi₂ => by contradiction)
+
+@[simp]
+theorem ofFn_succ {n} (f : Fin (succ n) → α) : ofFn f = f 0 :: ofFn fun i => f i.succ :=
+  ext_get (by simp) (fun i hi₁ hi₂ => by
+    cases i
+    · simp
+    · simp)
+
+theorem ofFn_succ' {n} (f : Fin (succ n) → α) :
+    ofFn f = (ofFn fun i => f (Fin.castSucc i)).concat (f (Fin.last _)) := by
+  induction' n with n IH
+  · rw [ofFn_zero, concat_nil, ofFn_succ, ofFn_zero]
+    rfl
+  · rw [ofFn_succ, IH, ofFn_succ, concat_cons, Fin.castSucc_zero]
+    congr
+
+@[simp]
+theorem ofFn_eq_nil_iff {n : ℕ} {f : Fin n → α} : ofFn f = [] ↔ n = 0 := by
+  cases n <;> simp only [ofFn_zero, ofFn_succ, eq_self_iff_true, Nat.succ_ne_zero, reduceCtorEq]
+
+theorem ofFn_add {m n} (f : Fin (m + n) → α) :
+    List.ofFn f =
+      (List.ofFn fun i => f (Fin.castAdd n i)) ++ List.ofFn fun j => f (Fin.natAdd m j) := by
+  induction' n with n IH
+  · rw [ofFn_zero, append_nil, Fin.castAdd_zero, Fin.cast_refl]
+    rfl
+  · rw [ofFn_succ', ofFn_succ', IH, append_concat]
+    rfl
+
+@[simp]
+theorem ofFn_fin_append {m n} (a : Fin m → α) (b : Fin n → α) :
+    List.ofFn (Fin.append a b) = List.ofFn a ++ List.ofFn b := by
+  simp_rw [ofFn_add, Fin.append_left, Fin.append_right]
+
+theorem ofFn_mul {m n} (f : Fin (m * n) → α) :
+    List.ofFn f = List.flatten (List.ofFn fun i : Fin m => List.ofFn fun j : Fin n => f ⟨i * n + j,
+    calc
+      ↑i * n + j < (i + 1) * n :=
+        (Nat.add_lt_add_left j.prop _).trans_eq (by rw [Nat.add_mul, Nat.one_mul])
+      _ ≤ _ := Nat.mul_le_mul_right _ i.prop⟩) := by
+  induction' m with m IH
+  · simp [ofFn_zero, Nat.zero_mul, ofFn_zero, flatten]
+  · simp_rw [ofFn_succ', succ_mul]
+    simp [flatten_concat, ofFn_add, IH]
+    rfl
+
+theorem ofFn_mul' {m n} (f : Fin (m * n) → α) :
+    List.ofFn f = List.flatten (List.ofFn fun i : Fin n => List.ofFn fun j : Fin m => f ⟨m * i + j,
+    calc
+      m * i + j < m * (i + 1) :=
+        (Nat.add_lt_add_left j.prop _).trans_eq (by rw [Nat.mul_add, Nat.mul_one])
+      _ ≤ _ := Nat.mul_le_mul_left _ i.prop⟩) := by simp_rw [m.mul_comm, ofFn_mul, Fin.cast_mk]
+
+@[simp]
+theorem ofFn_get : ∀ l : List α, (ofFn (get l)) = l
+  | [] => by rw [ofFn_zero]
+  | a :: l => by
+    rw [ofFn_succ]
+    congr
+    exact ofFn_get l
+
+@[simp]
+theorem ofFn_getElem : ∀ l : List α, (ofFn (fun i : Fin l.length => l[(i : Nat)])) = l
+  | [] => by rw [ofFn_zero]
+  | a :: l => by
+    rw [ofFn_succ]
+    congr
+    exact ofFn_get l
+
+@[simp]
+theorem ofFn_getElem_eq_map {β : Type*} (l : List α) (f : α → β) :
+    ofFn (fun i : Fin l.length => f <| l[(i : Nat)]) = l.map f := by
+  rw [← Function.comp_def, ← map_ofFn, ofFn_getElem]
+
+theorem ofFn_get_eq_map {β : Type*} (l : List α) (f : α → β) : ofFn (f <| l.get ·) = l.map f := by
+  simp
+
+theorem mem_ofFn {n} (f : Fin n → α) (a : α) : a ∈ ofFn f ↔ a ∈ Set.range f := by
+  simp only [mem_iff_get, Set.mem_range, get_ofFn]
+  exact ⟨fun ⟨i, hi⟩ => ⟨Fin.cast (by simp) i, hi⟩, fun ⟨i, hi⟩ => ⟨Fin.cast (by simp) i, hi⟩⟩
+
+@[simp]
+theorem forall_mem_ofFn_iff {n : ℕ} {f : Fin n → α} {P : α → Prop} :
+    (∀ i ∈ ofFn f, P i) ↔ ∀ j : Fin n, P (f j) := by simp only [mem_ofFn, Set.forall_mem_range]
+
+@[simp]
+theorem ofFn_const : ∀ (n : ℕ) (c : α), (ofFn fun _ : Fin n => c) = replicate n c
+  | 0, c => by rw [ofFn_zero, replicate_zero]
+  | n+1, c => by rw [replicate, ← ofFn_const n]; simp
+
+@[simp]
+theorem ofFn_fin_repeat {m} (a : Fin m → α) (n : ℕ) :
+    List.ofFn (Fin.repeat n a) = (List.replicate n (List.ofFn a)).flatten := by
+  simp_rw [ofFn_mul, ← ofFn_const, Fin.repeat, Fin.modNat, Nat.add_comm,
+    Nat.add_mul_mod_self_right, Nat.mod_eq_of_lt (Fin.is_lt _)]
+
+@[simp]
+theorem pairwise_ofFn {R : α → α → Prop} {n} {f : Fin n → α} :
+    (ofFn f).Pairwise R ↔ ∀ ⦃i j⦄, i < j → R (f i) (f j) := by
+  simp only [pairwise_iff_getElem, length_ofFn, List.getElem_ofFn,
+    (Fin.rightInverse_cast (length_ofFn f)).surjective.forall, Fin.forall_iff, Fin.cast_mk,
+    Fin.mk_lt_mk, forall_comm (α := (_ : Prop)) (β := ℕ)]
+
+-- DISSOLVED: head_ofFn
+
+lemma getLast_ofFn {n} (f : Fin n → α) (h : ofFn f ≠ []) :
+    (ofFn f).getLast h = f ⟨n - 1, Nat.sub_one_lt (mt ofFn_eq_nil_iff.2 h)⟩ := by
+  simp [getLast_eq_getElem]
+
+-- DISSOLVED: getLast_ofFn_succ
+
+theorem last_ofFn {n : ℕ} (f : Fin n → α) (h : ofFn f ≠ [])
+    (hn : n - 1 < n := Nat.pred_lt <| ofFn_eq_nil_iff.not.mp h) :
+    getLast (ofFn f) h = f ⟨n - 1, hn⟩ := by simp [getLast_eq_getElem]
+
+theorem last_ofFn_succ {n : ℕ} (f : Fin n.succ → α)
+    (h : ofFn f ≠ [] := mt ofFn_eq_nil_iff.mp (Nat.succ_ne_zero _)) :
+    getLast (ofFn f) h = f (Fin.last _) :=
+  getLast_ofFn_succ _
+
+lemma ofFn_cons {n} (a : α) (f : Fin n → α) : ofFn (Fin.cons a f) = a :: ofFn f := by
+  rw [ofFn_succ]
+  rfl
+
+theorem find?_eq_some_iff_getElem {xs : List α} {p : α → Bool} {b : α} :
+    xs.find? p = some b ↔ p b ∧ ∃ i h, xs[i] = b ∧ ∀ j : Nat, (hj : j < i) → !p xs[j] := by
+  rw [find?_eq_some]
+  simp only [Bool.not_eq_eq_eq_not, Bool.not_true, exists_and_right, and_congr_right_iff]
+  intro w
+  constructor
+  · rintro ⟨as, ⟨bs, rfl⟩, h⟩
+    refine ⟨as.length, ⟨?_, ?_, ?_⟩⟩
+    · simp only [length_append, length_cons]
+      refine Nat.lt_add_of_pos_right (zero_lt_succ bs.length)
+    · rw [getElem_append_right (Nat.le_refl as.length)]
+      simp
+    · intro j h'
+      rw [getElem_append_left h']
+      exact h _ (getElem_mem h')
+  · rintro ⟨i, h, rfl, h'⟩
+    refine ⟨xs.take i, ⟨xs.drop (i+1), ?_⟩, ?_⟩
+    · rw [getElem_cons_drop, take_append_drop]
+    · intro a m
+      rw [mem_take_iff_getElem] at m
+      obtain ⟨j, h, rfl⟩ := m
+      apply h'
+      omega
+
+lemma find?_ofFn_eq_some {n} {f : Fin n → α} {p : α → Bool} {b : α} :
+    (ofFn f).find? p = some b ↔ p b = true ∧ ∃ i, f i = b ∧ ∀ j < i, ¬(p (f j) = true) := by
+  rw [find?_eq_some_iff_getElem]
+  exact ⟨fun ⟨hpb, i, hi, hfb, h⟩ ↦
+      ⟨hpb, ⟨⟨i, (length_ofFn f) ▸ hi⟩, by simpa using hfb, fun j hj ↦ by simpa using h j hj⟩⟩,
+    fun ⟨hpb, i, hfb, h⟩ ↦
+      ⟨hpb, ⟨i, (length_ofFn f).symm ▸ i.isLt, by simpa using hfb,
+        fun j hj ↦ by simpa using h ⟨j, by omega⟩ (by simpa using hj)⟩⟩⟩
+
+lemma find?_ofFn_eq_some_of_injective {n} {f : Fin n → α} {p : α → Bool} {i : Fin n}
+    (h : Function.Injective f) :
+    (ofFn f).find? p = some (f i) ↔ p (f i) = true ∧ ∀ j < i, ¬(p (f j) = true) := by
+  simp only [find?_ofFn_eq_some, h.eq_iff, Bool.not_eq_true, exists_eq_left]
+
+@[simps]
+def equivSigmaTuple : List α ≃ Σn, Fin n → α where
+  toFun l := ⟨l.length, l.get⟩
+  invFun f := List.ofFn f.2
+  left_inv := List.ofFn_get
+  right_inv := fun ⟨_, f⟩ =>
+    Fin.sigma_eq_of_eq_comp_cast (length_ofFn _) <| funext fun i => get_ofFn f i
+
+@[elab_as_elim]
+def ofFnRec {C : List α → Sort*} (h : ∀ (n) (f : Fin n → α), C (List.ofFn f)) (l : List α) : C l :=
+  cast (congr_arg C l.ofFn_get) <|
+    h l.length l.get
+
+@[simp]
+theorem ofFnRec_ofFn {C : List α → Sort*} (h : ∀ (n) (f : Fin n → α), C (List.ofFn f)) {n : ℕ}
+    (f : Fin n → α) : @ofFnRec _ C h (List.ofFn f) = h _ f :=
+  equivSigmaTuple.rightInverse_symm.cast_eq (fun s => h s.1 s.2) ⟨n, f⟩
+
+theorem exists_iff_exists_tuple {P : List α → Prop} :
+    (∃ l : List α, P l) ↔ ∃ (n : _) (f : Fin n → α), P (List.ofFn f) :=
+  equivSigmaTuple.symm.surjective.exists.trans Sigma.exists
+
+theorem forall_iff_forall_tuple {P : List α → Prop} :
+    (∀ l : List α, P l) ↔ ∀ (n) (f : Fin n → α), P (List.ofFn f) :=
+  equivSigmaTuple.symm.surjective.forall.trans Sigma.forall
+
+theorem ofFn_inj' {m n : ℕ} {f : Fin m → α} {g : Fin n → α} :
+    ofFn f = ofFn g ↔ (⟨m, f⟩ : Σn, Fin n → α) = ⟨n, g⟩ :=
+  Iff.symm <| equivSigmaTuple.symm.injective.eq_iff.symm
+
+theorem ofFn_injective {n : ℕ} : Function.Injective (ofFn : (Fin n → α) → List α) := fun f g h =>
+  eq_of_heq <| by rw [ofFn_inj'] at h; cases h; rfl
+
+@[simp]
+theorem ofFn_inj {n : ℕ} {f g : Fin n → α} : ofFn f = ofFn g ↔ f = g :=
+  ofFn_injective.eq_iff
+
+end List

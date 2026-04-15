@@ -3,6 +3,8 @@ Extracted from Topology/UrysohnsBounded.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.UrysohnsLemma
+import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
 /-!
 # Urysohn's lemma for bounded continuous functions

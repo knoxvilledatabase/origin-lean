@@ -3,14 +3,16 @@ Extracted from Data/Rat/Cardinal.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.CharZero.Infinite
+import Mathlib.Algebra.Ring.Rat
+import Mathlib.Data.Rat.Encodable
+import Mathlib.SetTheory.Cardinal.Basic
 
 /-!
 # Cardinality of ℚ
 
 This file proves that the Cardinality of ℚ is ℵ₀
 -/
-
-assert_not_exists Module Field
 
 open Cardinal
 

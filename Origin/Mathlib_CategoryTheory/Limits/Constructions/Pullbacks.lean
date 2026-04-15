@@ -3,12 +3,15 @@ Extracted from CategoryTheory/Limits/Constructions/Pullbacks.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
+import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
 /-!
 # Constructing pullbacks from binary products and equalizers
 
-If a category has binary products and equalizers, then it has pullbacks.
-Also, if a category has binary coproducts and coequalizers, then it has pushouts.
+If a category as binary products and equalizers, then it has pullbacks.
+Also, if a category has binary coproducts and coequalizers, then it has pushouts
 -/
 
 universe v u
@@ -16,8 +19,6 @@ universe v u
 open CategoryTheory
 
 namespace CategoryTheory.Limits
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem hasLimit_cospan_of_hasLimit_pair_of_hasLimit_parallelPair {C : Type u} [𝒞 : Category.{v} C]
     {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) [HasLimit (pair X Y)]
@@ -27,9 +28,7 @@ theorem hasLimit_cospan_of_hasLimit_pair_of_hasLimit_parallelPair {C : Type u} [
   let e := equalizer.ι (π₁ ≫ f) (π₂ ≫ g)
   HasLimit.mk
     { cone :=
-        PullbackCone.mk (e ≫ π₁) (e ≫ π₂) <| by
-          rw [Category.assoc, equalizer.condition]
-          simp [e]
+        PullbackCone.mk (e ≫ π₁) (e ≫ π₂) <| by rw [Category.assoc, equalizer.condition]; simp
       isLimit :=
         PullbackCone.IsLimit.mk _ (fun s => equalizer.lift
           (prod.lift (s.π.app WalkingCospan.left) (s.π.app WalkingCospan.right)) <| by
@@ -40,15 +39,15 @@ theorem hasLimit_cospan_of_hasLimit_pair_of_hasLimit_parallelPair {C : Type u} [
           · dsimp; simpa using h₁
           · simpa using h₂ }
 
+section
+
 attribute [local instance] hasLimit_cospan_of_hasLimit_pair_of_hasLimit_parallelPair
 
 theorem hasPullbacks_of_hasBinaryProducts_of_hasEqualizers (C : Type u) [Category.{v} C]
     [HasBinaryProducts C] [HasEqualizers C] : HasPullbacks C :=
-  { has_limit := fun F => hasLimit_of_iso (diagramIsoCospan F).symm }
+  { has_limit := fun F => hasLimitOfIso (diagramIsoCospan F).symm }
 
 end
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem hasColimit_span_of_hasColimit_pair_of_hasColimit_parallelPair {C : Type u}
     [𝒞 : Category.{v} C] {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) [HasColimit (pair Y Z)]
@@ -70,6 +69,8 @@ theorem hasColimit_span_of_hasColimit_pair_of_hasColimit_parallelPair {C : Type 
           ext
           · simpa using h₁
           · simpa using h₂ }
+
+section
 
 attribute [local instance] hasColimit_span_of_hasColimit_pair_of_hasColimit_parallelPair
 

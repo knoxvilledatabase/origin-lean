@@ -3,6 +3,10 @@ Extracted from Algebra/Homology/ShortComplex/Limits.lean
 Genuine: 12 of 42 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.ShortComplex.Basic
+import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
+import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
+import Mathlib.CategoryTheory.Limits.Preserves.Finite
 
 /-!
 # Limits and colimits in the category of short complexes
@@ -14,9 +18,9 @@ of a certain shape `J`, then it is also the case of the category `ShortComplex C
 
 namespace CategoryTheory
 
-open Category Limits Functor
+open Category Limits
 
-variable {J C : Type*} [Category* J] [Category* C] [HasZeroMorphisms C]
+variable {J C : Type*} [Category J] [Category C] [HasZeroMorphisms C]
   {F : J ⥤ ShortComplex C}
 
 namespace ShortComplex
@@ -49,80 +53,97 @@ def isLimitOfIsLimitπ (c : Cone F)
     · exact h₂.uniq (π₂.mapCone s) _ (fun j => π₂.congr_map (hm j))
     · exact h₃.uniq (π₃.mapCone s) _ (fun j => π₃.congr_map (hm j))
 
+section
+
 variable (F)
 
 variable [HasLimit (F ⋙ π₁)] [HasLimit (F ⋙ π₂)] [HasLimit (F ⋙ π₃)]
 
-set_option backward.isDefEq.respectTransparency false in
-
 noncomputable def limitCone : Cone F :=
   Cone.mk (ShortComplex.mk (limMap (whiskerLeft F π₁Toπ₂)) (limMap (whiskerLeft F π₂Toπ₃))
-      (by cat_disch))
+      (by aesop_cat))
     { app := fun j => Hom.mk (limit.π _ _) (limit.π _ _) (limit.π _ _)
-        (by simp) (by simp)
+        (by aesop_cat) (by aesop_cat)
       naturality := fun _ _ f => by
-        ext <;> simp [← limit.w _ f] }
-
-set_option backward.isDefEq.respectTransparency false in
+        ext
+        all_goals
+          dsimp
+          erw [id_comp, limit.w] }
 
 noncomputable def isLimitπ₁MapConeLimitCone : IsLimit (π₁.mapCone (limitCone F)) :=
-  (IsLimit.ofIsoLimit (limit.isLimit _) (Cone.ext (Iso.refl _) (by cat_disch)))
-
-set_option backward.isDefEq.respectTransparency false in
+  (IsLimit.ofIsoLimit (limit.isLimit _) (Cones.ext (Iso.refl _) (by aesop_cat)))
 
 noncomputable def isLimitπ₂MapConeLimitCone : IsLimit (π₂.mapCone (limitCone F)) :=
-  (IsLimit.ofIsoLimit (limit.isLimit _) (Cone.ext (Iso.refl _) (by cat_disch)))
-
-set_option backward.isDefEq.respectTransparency false in
+  (IsLimit.ofIsoLimit (limit.isLimit _) (Cones.ext (Iso.refl _) (by aesop_cat)))
 
 noncomputable def isLimitπ₃MapConeLimitCone : IsLimit (π₃.mapCone (limitCone F)) :=
-  (IsLimit.ofIsoLimit (limit.isLimit _) (Cone.ext (Iso.refl _) (by cat_disch)))
+  (IsLimit.ofIsoLimit (limit.isLimit _) (Cones.ext (Iso.refl _) (by aesop_cat)))
 
 noncomputable def isLimitLimitCone : IsLimit (limitCone F) :=
   isLimitOfIsLimitπ _ (isLimitπ₁MapConeLimitCone F)
     (isLimitπ₂MapConeLimitCone F) (isLimitπ₃MapConeLimitCone F)
 
--- INSTANCE (free from Core): hasLimit_of_hasLimitπ
+instance hasLimit_of_hasLimitπ : HasLimit F := ⟨⟨⟨_, isLimitLimitCone _⟩⟩⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesLimit F π₁ :=
+  preservesLimit_of_preserves_limit_cone (isLimitLimitCone F) (isLimitπ₁MapConeLimitCone F)
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesLimit F π₂ :=
+  preservesLimit_of_preserves_limit_cone (isLimitLimitCone F) (isLimitπ₂MapConeLimitCone F)
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesLimit F π₃ :=
+  preservesLimit_of_preserves_limit_cone (isLimitLimitCone F) (isLimitπ₃MapConeLimitCone F)
 
 end
+
+section
 
 variable [HasLimitsOfShape J C]
 
--- INSTANCE (free from Core): hasLimitsOfShape
+instance hasLimitsOfShape :
+    HasLimitsOfShape J (ShortComplex C) where
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesLimitsOfShape J (π₁ : _ ⥤ C) where
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesLimitsOfShape J (π₂ : _ ⥤ C) where
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesLimitsOfShape J (π₃ : _ ⥤ C) where
 
 end
+
+section
 
 variable [HasFiniteLimits C]
 
--- INSTANCE (free from Core): hasFiniteLimits
+instance hasFiniteLimits : HasFiniteLimits (ShortComplex C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteLimits (π₁ : _ ⥤ C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteLimits (π₂ : _ ⥤ C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteLimits (π₃ : _ ⥤ C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
 end
 
+section
+
 variable [HasLimitsOfShape WalkingCospan C]
 
--- INSTANCE (free from Core): preservesMonomorphisms_π₁
+instance preservesMonomorphisms_π₁ :
+    Functor.PreservesMonomorphisms (π₁ : _ ⥤ C) :=
+  CategoryTheory.preservesMonomorphisms_of_preservesLimitsOfShape _
 
--- INSTANCE (free from Core): preservesMonomorphisms_π₂
+instance preservesMonomorphisms_π₂ :
+    Functor.PreservesMonomorphisms (π₂ : _ ⥤ C) :=
+  CategoryTheory.preservesMonomorphisms_of_preservesLimitsOfShape _
 
--- INSTANCE (free from Core): preservesMonomorphisms_π₃
+instance preservesMonomorphisms_π₃ :
+    Functor.PreservesMonomorphisms (π₃ : _ ⥤ C) :=
+  CategoryTheory.preservesMonomorphisms_of_preservesLimitsOfShape _
 
 end
 
@@ -158,86 +179,103 @@ def isColimitOfIsColimitπ (c : Cocone F)
     · exact h₂.uniq (π₂.mapCocone s) _ (fun j => π₂.congr_map (hm j))
     · exact h₃.uniq (π₃.mapCocone s) _ (fun j => π₃.congr_map (hm j))
 
+section
+
 variable (F)
 
 variable [HasColimit (F ⋙ π₁)] [HasColimit (F ⋙ π₂)] [HasColimit (F ⋙ π₃)]
 
-set_option backward.isDefEq.respectTransparency false in
-
 noncomputable def colimitCocone : Cocone F :=
   Cocone.mk (ShortComplex.mk (colimMap (whiskerLeft F π₁Toπ₂)) (colimMap (whiskerLeft F π₂Toπ₃))
-      (by cat_disch))
+      (by aesop_cat))
     { app := fun j => Hom.mk (colimit.ι (F ⋙ π₁) _) (colimit.ι (F ⋙ π₂) _)
-        (colimit.ι (F ⋙ π₃) _) (by simp) (by simp)
+        (colimit.ι (F ⋙ π₃) _) (by aesop_cat) (by aesop_cat)
       naturality := fun _ _ f => by
         ext
-        · simp [← colimit.w (F ⋙ π₁) f]
-        · simp [← colimit.w (F ⋙ π₂) f]
-        · simp [← colimit.w (F ⋙ π₃) f] }
-
-set_option backward.isDefEq.respectTransparency false in
+        · dsimp; erw [comp_id, colimit.w (F ⋙ π₁)]
+        · dsimp; erw [comp_id, colimit.w (F ⋙ π₂)]
+        · dsimp; erw [comp_id, colimit.w (F ⋙ π₃)] }
 
 noncomputable def isColimitπ₁MapCoconeColimitCocone :
     IsColimit (π₁.mapCocone (colimitCocone F)) :=
-  (IsColimit.ofIsoColimit (colimit.isColimit _) (Cocone.ext (Iso.refl _) (by cat_disch)))
-
-set_option backward.isDefEq.respectTransparency false in
+  (IsColimit.ofIsoColimit (colimit.isColimit _) (Cocones.ext (Iso.refl _) (by aesop_cat)))
 
 noncomputable def isColimitπ₂MapCoconeColimitCocone :
     IsColimit (π₂.mapCocone (colimitCocone F)) :=
-  (IsColimit.ofIsoColimit (colimit.isColimit _) (Cocone.ext (Iso.refl _) (by cat_disch)))
-
-set_option backward.isDefEq.respectTransparency false in
+  (IsColimit.ofIsoColimit (colimit.isColimit _) (Cocones.ext (Iso.refl _) (by aesop_cat)))
 
 noncomputable def isColimitπ₃MapCoconeColimitCocone :
     IsColimit (π₃.mapCocone (colimitCocone F)) :=
-  (IsColimit.ofIsoColimit (colimit.isColimit _) (Cocone.ext (Iso.refl _) (by cat_disch)))
+  (IsColimit.ofIsoColimit (colimit.isColimit _) (Cocones.ext (Iso.refl _) (by aesop_cat)))
 
 noncomputable def isColimitColimitCocone : IsColimit (colimitCocone F) :=
   isColimitOfIsColimitπ _ (isColimitπ₁MapCoconeColimitCocone F)
     (isColimitπ₂MapCoconeColimitCocone F) (isColimitπ₃MapCoconeColimitCocone F)
 
--- INSTANCE (free from Core): hasColimit_of_hasColimitπ
+instance hasColimit_of_hasColimitπ : HasColimit F := ⟨⟨⟨_, isColimitColimitCocone _⟩⟩⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesColimit F π₁ :=
+  preservesColimit_of_preserves_colimit_cocone (isColimitColimitCocone F)
+    (isColimitπ₁MapCoconeColimitCocone F)
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesColimit F π₂ :=
+  preservesColimit_of_preserves_colimit_cocone (isColimitColimitCocone F)
+    (isColimitπ₂MapCoconeColimitCocone F)
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesColimit F π₃ :=
+  preservesColimit_of_preserves_colimit_cocone (isColimitColimitCocone F)
+    (isColimitπ₃MapCoconeColimitCocone F)
 
 end
+
+section
 
 variable [HasColimitsOfShape J C]
 
--- INSTANCE (free from Core): hasColimitsOfShape
+instance hasColimitsOfShape :
+    HasColimitsOfShape J (ShortComplex C) where
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesColimitsOfShape J (π₁ : _ ⥤ C) where
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesColimitsOfShape J (π₂ : _ ⥤ C) where
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesColimitsOfShape J (π₃ : _ ⥤ C) where
 
 end
+
+section
 
 variable [HasFiniteColimits C]
 
--- INSTANCE (free from Core): hasFiniteColimits
+instance hasFiniteColimits : HasFiniteColimits (ShortComplex C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteColimits (π₁ : _ ⥤ C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteColimits (π₂ : _ ⥤ C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteColimits (π₃ : _ ⥤ C) :=
+  ⟨fun _ _ _ => inferInstance⟩
 
 end
 
+section
+
 variable [HasColimitsOfShape WalkingSpan C]
 
--- INSTANCE (free from Core): preservesEpimorphisms_π₁
+instance preservesEpimorphisms_π₁ :
+    Functor.PreservesEpimorphisms (π₁ : _ ⥤ C) :=
+  CategoryTheory.preservesEpimorphisms_of_preservesColimitsOfShape _
 
--- INSTANCE (free from Core): preservesEpimorphisms_π₂
+instance preservesEpimorphisms_π₂ :
+    Functor.PreservesEpimorphisms (π₂ : _ ⥤ C) :=
+  CategoryTheory.preservesEpimorphisms_of_preservesColimitsOfShape _
 
--- INSTANCE (free from Core): preservesEpimorphisms_π₃
+instance preservesEpimorphisms_π₃ :
+    Functor.PreservesEpimorphisms (π₃ : _ ⥤ C) :=
+  CategoryTheory.preservesEpimorphisms_of_preservesColimitsOfShape _
 
 end
 

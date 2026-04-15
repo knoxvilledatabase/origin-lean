@@ -3,6 +3,9 @@ Extracted from NumberTheory/DirichletCharacter/Orthogonality.lean
 Genuine: 5 of 7 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.NumberTheory.DirichletCharacter.Basic
+import Mathlib.NumberTheory.MulChar.Duality
 
 /-!
 # Orthogonality relations for Dirichlet characters
@@ -16,7 +19,8 @@ enough roots of unity (e.g., `R` could be an algebraically closed field of chara
 
 namespace DirichletCharacter
 
--- INSTANCE (free from Core): fintype
+noncomputable instance fintype {R : Type*} [CommRing R] [IsDomain R] {n : ℕ} :
+    Fintype (DirichletCharacter R n) := .ofFinite _
 
 variable (R : Type*) [CommRing R] (n : ℕ) [NeZero n]
   [HasEnoughRootsOfUnity R (Monoid.exponent (ZMod n)ˣ)]

@@ -3,6 +3,9 @@ Extracted from Algebra/Ring/MinimalAxioms.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Ring.Defs
+import Mathlib.Algebra.Group.Basic
+import Mathlib.Algebra.Group.MinimalAxioms
 
 /-!
 # Minimal Axioms for a Ring
@@ -45,12 +48,12 @@ abbrev Ring.ofMinimalAxioms {R : Type u}
     have : 0 * a = 0 * a + 0 * a :=
       calc 0 * a = (0 + 0) * a := by rw [zero_add]
       _ = 0 * a + 0 * a := by rw [right_distrib]
-    rwa [left_eq_add] at this
+    rwa [self_eq_add_right] at this
   haveI mul_zero : ∀ a, a * (0 : R) = 0 := fun a => by
     have : a * 0 = a * 0 + a * 0 :=
       calc a * 0 = a * (0 + 0) := by rw [zero_add]
       _ = a * 0 + a * 0 := by rw [left_distrib]
-    rwa [left_eq_add] at this
+    rwa [self_eq_add_right] at this
   { add_comm := add_comm
     left_distrib := left_distrib
     right_distrib := right_distrib

@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Nat/BinaryRec.lean
-Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
+Genuine: 14 of 19 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
+import Batteries.Tactic.Alias
+import Mathlib.Init
 
 /-!
 # Binary recursion on `Nat`
@@ -20,5 +22,111 @@ universe u
 
 namespace Nat
 
-def bit (b : Bool) (n : Nat) : Nat :=
-  cond b (2 * n + 1) (2 * n)
+def bit (b : Bool) : Nat → Nat := cond b (2 * · + 1) (2 * ·)
+
+theorem shiftRight_one (n) : n >>> 1 = n / 2 := rfl
+
+@[simp]
+theorem bit_decide_mod_two_eq_one_shiftRight_one (n : Nat) : bit (n % 2 = 1) (n >>> 1) = n := by
+  simp only [bit, shiftRight_one]
+  cases mod_two_eq_zero_or_one n with | _ h => simpa [h] using Nat.div_add_mod n 2
+
+theorem bit_testBit_zero_shiftRight_one (n : Nat) : bit (n.testBit 0) (n >>> 1) = n := by
+  simp
+
+@[simp]
+theorem bit_eq_zero_iff {n : Nat} {b : Bool} : bit b n = 0 ↔ n = 0 ∧ b = false := by
+  cases n <;> cases b <;> simp [bit, Nat.shiftLeft_succ, Nat.two_mul, ← Nat.add_assoc]
+
+@[inline]
+def bitCasesOn {motive : Nat → Sort u} (n) (h : ∀ b n, motive (bit b n)) : motive n :=
+  -- `1 &&& n != 0` is faster than `n.testBit 0`. This may change when we have faster `testBit`.
+  let x := h (1 &&& n != 0) (n >>> 1)
+  -- `congrArg motive _ ▸ x` is defeq to `x` in non-dependent case
+  congrArg motive n.bit_testBit_zero_shiftRight_one ▸ x
+
+@[elab_as_elim, specialize]
+def binaryRec {motive : Nat → Sort u} (z : motive 0) (f : ∀ b n, motive n → motive (bit b n))
+    (n : Nat) : motive n :=
+  if n0 : n = 0 then congrArg motive n0 ▸ z
+  else
+    let x := f (1 &&& n != 0) (n >>> 1) (binaryRec z f (n >>> 1))
+    congrArg motive n.bit_testBit_zero_shiftRight_one ▸ x
+
+decreasing_by exact bitwise_rec_lemma n0
+
+@[elab_as_elim, specialize]
+def binaryRec' {motive : Nat → Sort u} (z : motive 0)
+    (f : ∀ b n, (n = 0 → b = true) → motive n → motive (bit b n)) :
+    ∀ n, motive n :=
+  binaryRec z fun b n ih =>
+    if h : n = 0 → b = true then f b n h ih
+    else
+      have : bit b n = 0 := by
+        rw [bit_eq_zero_iff]
+        cases n <;> cases b <;> simp at h ⊢
+      congrArg motive this ▸ z
+
+-- DISSOLVED: binaryRecFromOne
+
+theorem bit_val (b n) : bit b n = 2 * n + b.toNat := by
+  cases b <;> rfl
+
+@[simp]
+theorem bit_div_two (b n) : bit b n / 2 = n := by
+  rw [bit_val, Nat.add_comm, add_mul_div_left, div_eq_of_lt, Nat.zero_add]
+  · cases b <;> decide
+  · decide
+
+@[simp]
+theorem bit_mod_two (b n) : bit b n % 2 = b.toNat := by
+  cases b <;> simp [bit_val, mul_add_mod]
+
+@[simp]
+theorem bit_shiftRight_one (b n) : bit b n >>> 1 = n :=
+  bit_div_two b n
+
+theorem testBit_bit_zero (b n) : (bit b n).testBit 0 = b := by
+  simp
+
+variable {motive : Nat → Sort u}
+
+@[simp]
+theorem bitCasesOn_bit (h : ∀ b n, motive (bit b n)) (b : Bool) (n : Nat) :
+    bitCasesOn (bit b n) h = h b n := by
+  change congrArg motive (bit b n).bit_testBit_zero_shiftRight_one ▸ h _ _ = h b n
+  generalize congrArg motive (bit b n).bit_testBit_zero_shiftRight_one = e; revert e
+  rw [testBit_bit_zero, bit_shiftRight_one]
+  intros; rfl
+
+unseal binaryRec in
+
+@[simp]
+theorem binaryRec_zero (z : motive 0) (f : ∀ b n, motive n → motive (bit b n)) :
+    binaryRec z f 0 = z :=
+  rfl
+
+@[simp]
+theorem binaryRec_one (z : motive 0) (f : ∀ b n, motive n → motive (bit b n)) :
+    binaryRec (motive := motive) z f 1 = f true 0 z := by
+  rw [binaryRec]
+  simp only [add_one_ne_zero, ↓reduceDIte, Nat.reduceShiftRight, binaryRec_zero]
+  rfl
+
+theorem binaryRec_eq {z : motive 0} {f : ∀ b n, motive n → motive (bit b n)}
+    (b n) (h : f false 0 z = z ∨ (n = 0 → b = true)) :
+    binaryRec z f (bit b n) = f b n (binaryRec z f n) := by
+  by_cases h' : bit b n = 0
+  case pos =>
+    obtain ⟨rfl, rfl⟩ := bit_eq_zero_iff.mp h'
+    simp only [Bool.false_eq_true, imp_false, not_true_eq_false, or_false] at h
+    unfold binaryRec
+    exact h.symm
+  case neg =>
+    rw [binaryRec, dif_neg h']
+    change congrArg motive (bit b n).bit_testBit_zero_shiftRight_one ▸ f _ _ _ = _
+    generalize congrArg motive (bit b n).bit_testBit_zero_shiftRight_one = e; revert e
+    rw [testBit_bit_zero, bit_shiftRight_one]
+    intros; rfl
+
+end Nat

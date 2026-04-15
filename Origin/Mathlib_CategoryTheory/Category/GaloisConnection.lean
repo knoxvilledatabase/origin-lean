@@ -3,16 +3,21 @@ Extracted from CategoryTheory/Category/GaloisConnection.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Category.Preorder
+import Mathlib.CategoryTheory.Adjunction.Basic
+import Mathlib.Order.GaloisConnection
 
 /-!
 
 # Galois connections between preorders are adjunctions.
 
-* `GaloisConnection.adjunction` is the adjunction associated to a Galois connection.
+* `GaloisConnection.adjunction` is the adjunction associated to a galois connection.
 
 -/
 
 universe u v
+
+section
 
 variable {X : Type u} {Y : Type v} [Preorder X] [Preorder Y]
 
@@ -22,8 +27,8 @@ def GaloisConnection.adjunction {l : X → Y} {u : Y → X} (gc : GaloisConnecti
     { homEquiv := fun X Y =>
         { toFun := fun f => CategoryTheory.homOfLE (gc.le_u f.le)
           invFun := fun f => CategoryTheory.homOfLE (gc.l_le f.le)
-          left_inv := by cat_disch
-          right_inv := by cat_disch } }
+          left_inv := by aesop_cat
+          right_inv := by aesop_cat } }
 
 end
 

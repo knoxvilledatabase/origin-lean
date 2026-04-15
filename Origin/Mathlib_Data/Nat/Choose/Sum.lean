@@ -1,8 +1,14 @@
 /-
 Extracted from Data/Nat/Choose/Sum.lean
-Genuine: 16 of 18 | Dissolved: 1 | Infrastructure: 1
+Genuine: 18 of 20 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Intervals
+import Mathlib.Algebra.BigOperators.NatAntidiagonal
+import Mathlib.Algebra.BigOperators.Ring
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
 
 /-!
 # Sums of binomial coefficients
@@ -25,7 +31,7 @@ theorem add_pow (h : Commute x y) (n : ℕ) :
   let t : ℕ → ℕ → R := fun n m ↦ x ^ m * y ^ (n - m) * n.choose m
   change (x + y) ^ n = ∑ m ∈ range (n + 1), t n m
   have h_first : ∀ n, t n 0 = y ^ n := fun n ↦ by
-    simp only [t, choose_zero_right, pow_zero, cast_one, mul_one, one_mul, Nat.sub_zero]
+    simp only [t, choose_zero_right, pow_zero, cast_one, mul_one, one_mul, tsub_zero]
   have h_last : ∀ n, t n n.succ = 0 := fun n ↦ by
     simp only [t, choose_succ_self, cast_zero, mul_zero]
   have h_middle :
@@ -69,7 +75,7 @@ theorem sub_pow [CommRing R] (x y : R) (n : ℕ) :
   congr! 1 with m hm
   have : (-1 : R) ^ (n - m) = (-1) ^ (n + m) := by
     rw [mem_range] at hm
-    simp [show n + m = n - m + 2 * m by lia, pow_add]
+    simp [show n + m = n - m + 2 * m by omega, pow_add]
   rw [neg_pow, this]
   ring
 
@@ -90,77 +96,55 @@ theorem sum_range_choose_halfway (m : ℕ) : (∑ i ∈ range (m + 1), (2 * m + 
             ∑ i ∈ range (m + 1), (2 * m + 1).choose (2 * m + 1 - i) := by rw [two_mul, this]
       _ = (∑ i ∈ range (m + 1), (2 * m + 1).choose i) +
             ∑ i ∈ Ico (m + 1) (2 * m + 2), (2 * m + 1).choose i := by
-        rw [range_eq_Ico, sum_Ico_reflect _ _ (by lia)]
+        rw [range_eq_Ico, sum_Ico_reflect _ _ (by omega)]
         congr
-        lia
-      _ = ∑ i ∈ range (2 * m + 2), (2 * m + 1).choose i := sum_range_add_sum_Ico _ (by lia)
+        have A : m + 1 ≤ 2 * m + 1 := by omega
+        rw [add_comm, add_tsub_assoc_of_le A, ← add_comm]
+        congr
+        rw [tsub_eq_iff_eq_add_of_le A]
+        ring
+      _ = ∑ i ∈ range (2 * m + 2), (2 * m + 1).choose i := sum_range_add_sum_Ico _ (by omega)
       _ = 2 ^ (2 * m + 1) := sum_range_choose (2 * m + 1)
       _ = 2 * 4 ^ m := by rw [pow_succ, pow_mul, mul_comm]; rfl
 
 theorem choose_middle_le_pow (n : ℕ) : (2 * n + 1).choose n ≤ 4 ^ n := by
   have t : (2 * n + 1).choose n ≤ ∑ i ∈ range (n + 1), (2 * n + 1).choose i :=
-    single_le_sum (fun x _ ↦ by lia) (self_mem_range_succ n)
+    single_le_sum (fun x _ ↦ by omega) (self_mem_range_succ n)
   simpa [sum_range_choose_halfway n] using t
 
+theorem four_pow_le_two_mul_add_one_mul_central_binom (n : ℕ) :
+    4 ^ n ≤ (2 * n + 1) * (2 * n).choose n :=
+  calc
+    4 ^ n = (1 + 1) ^ (2 * n) := by norm_num [pow_mul]
+    _ = ∑ m ∈ range (2 * n + 1), (2 * n).choose m := by set_option simprocs false in simp [add_pow]
+    _ ≤ ∑ _ ∈ range (2 * n + 1), (2 * n).choose (2 * n / 2) := by gcongr; apply choose_le_middle
+    _ = (2 * n + 1) * choose (2 * n) n := by simp
+
 theorem sum_Icc_choose (n k : ℕ) : ∑ m ∈ Icc k n, m.choose k = (n + 1).choose (k + 1) := by
-  rcases lt_or_ge n k with h | h
-  · rw [choose_eq_zero_of_lt (by lia), Icc_eq_empty_of_lt h, sum_empty]
+  rcases lt_or_le n k with h | h
+  · rw [choose_eq_zero_of_lt (by omega), Icc_eq_empty_of_lt h, sum_empty]
   · induction n, h using le_induction with
     | base => simp
     | succ n _ ih =>
-      rw [← Ico_insert_right (by lia), sum_insert (by simp), Ico_add_one_right_eq_Icc, ih,
-        choose_succ_succ' (n + 1)]
+      rw [← Ico_insert_right (by omega), sum_insert (by simp),
+        show Ico k (n + 1) = Icc k n by rfl, ih, choose_succ_succ' (n + 1)]
 
 lemma sum_range_add_choose (n k : ℕ) :
     ∑ i ∈ Finset.range (n + 1), (i + k).choose k = (n + k + 1).choose (k + 1) := by
   rw [← sum_Icc_choose, range_eq_Ico]
   convert (sum_map _ (addRightEmbedding k) (·.choose k)).symm using 2
-  rw [map_add_right_Ico, zero_add, add_right_comm, Ico_add_one_right_eq_Icc]
-
-theorem sum_range_mul_choose (n : ℕ) :
-    ∑ i ∈ Finset.range (n + 1), i * (n.choose i) = n * 2 ^ (n - 1) := by
-  by_cases h : n = 0
-  · simp [h]
-  apply (mul_right_inj' two_ne_zero).1
-  calc
-    2 * ∑ i ∈ Finset.range (n + 1), i * n.choose i
-      = ∑ i ∈ Finset.range (n + 1), (n - i) * n.choose (n - i)
-        + ∑ i ∈ Finset.range (n + 1), i * n.choose i := by
-      rw [two_mul, ← sum_flip]
-    _ = ∑ i ∈ Finset.range (n + 1), (n - i) * n.choose i
-        + ∑ i ∈ Finset.range (n + 1), i * n.choose i := by
-      congr! 2 with _ h'
-      rw [choose_symm (mem_range_succ_iff.mp h')]
-    _ = ∑ i ∈ Finset.range (n + 1), n * n.choose i := by
-      rw [← sum_add_distrib]
-      congr! 1 with _ h'
-      rw [← add_mul, Nat.sub_add_cancel (mem_range_succ_iff.mp h')]
-    _ = n * 2 ^ n := by
-      rw [← mul_sum, Nat.sum_range_choose]
-    _ = 2 * (n * 2 ^ (n - 1)) := by
-      rw [← mul_assoc, mul_comm 2 n, mul_assoc, mul_pow_sub_one h]
-
-lemma sum_range_multichoose (n k : ℕ) :
-    ∑ i ∈ Finset.range (n + 1), k.multichoose i = (n + k).choose k := by
-  cases k with
-  | zero => simp [Finset.sum_range_succ']
-  | succ k => grind [multichoose_eq, choose_symm_of_eq_add, sum_range_add_choose]
+  rw [map_add_right_Ico, zero_add, add_right_comm, Nat.Ico_succ_right]
 
 end Nat
-
-theorem Int.alternating_sum_range_choose_eq_choose {n m : ℕ} :
-    (∑ k ∈ range (m + 1), ((-1) ^ k * (n + 1).choose k : ℤ)) = (-1) ^ m * n.choose m := by
-  induction m with
-  | zero => simp
-  | succ m hm =>
-    rw [sum_range_succ, hm, choose_succ_succ]
-    grind
 
 theorem Int.alternating_sum_range_choose {n : ℕ} :
     (∑ m ∈ range (n + 1), ((-1) ^ m * n.choose m : ℤ)) = if n = 0 then 1 else 0 := by
   cases n with
   | zero => simp
-  | succ n => simp [Int.alternating_sum_range_choose_eq_choose]
+  | succ n =>
+    have h := add_pow (-1 : ℤ) 1 n.succ
+    simp only [one_pow, mul_one, neg_add_cancel] at h
+    rw [← h, zero_pow n.succ_ne_zero, if_neg n.succ_ne_zero]
 
 -- DISSOLVED: Int.alternating_sum_range_choose_of_ne
 
@@ -191,3 +175,47 @@ theorem sum_powerset_neg_one_pow_card_of_nonempty {α : Type*} {x : Finset α} (
   exact if_neg (nonempty_iff_ne_empty.mp h0)
 
 variable [NonAssocSemiring R]
+
+@[to_additive sum_choose_succ_nsmul]
+theorem prod_pow_choose_succ {M : Type*} [CommMonoid M] (f : ℕ → ℕ → M) (n : ℕ) :
+    (∏ i ∈ range (n + 2), f i (n + 1 - i) ^ (n + 1).choose i) =
+      (∏ i ∈ range (n + 1), f i (n + 1 - i) ^ n.choose i) *
+        ∏ i ∈ range (n + 1), f (i + 1) (n - i) ^ n.choose i := by
+  have A : (∏ i ∈ range (n + 1), f (i + 1) (n - i) ^ (n.choose (i + 1))) * f 0 (n + 1) =
+      ∏ i ∈ range (n + 1), f i (n + 1 - i) ^ (n.choose i) := by
+    rw [prod_range_succ, prod_range_succ']; simp
+  rw [prod_range_succ']
+  simpa [choose_succ_succ, pow_add, prod_mul_distrib, A, mul_assoc] using mul_comm _ _
+
+@[to_additive sum_antidiagonal_choose_succ_nsmul]
+theorem prod_antidiagonal_pow_choose_succ {M : Type*} [CommMonoid M] (f : ℕ → ℕ → M) (n : ℕ) :
+    (∏ ij ∈ antidiagonal (n + 1), f ij.1 ij.2 ^ (n + 1).choose ij.1) =
+      (∏ ij ∈ antidiagonal n, f ij.1 (ij.2 + 1) ^ n.choose ij.1) *
+        ∏ ij ∈ antidiagonal n, f (ij.1 + 1) ij.2 ^ n.choose ij.2 := by
+  simp only [Nat.prod_antidiagonal_eq_prod_range_succ_mk, prod_pow_choose_succ]
+  have : ∀ i ∈ range (n + 1), i ≤ n := fun i hi ↦ by simpa [Nat.lt_succ_iff] using hi
+  congr 1
+  · refine prod_congr rfl fun i hi ↦ ?_
+    rw [tsub_add_eq_add_tsub (this _ hi)]
+  · refine prod_congr rfl fun i hi ↦ ?_
+    rw [choose_symm (this _ hi)]
+
+theorem sum_choose_succ_mul (f : ℕ → ℕ → R) (n : ℕ) :
+    (∑ i ∈ range (n + 2), ((n + 1).choose i : R) * f i (n + 1 - i)) =
+      (∑ i ∈ range (n + 1), (n.choose i : R) * f i (n + 1 - i)) +
+        ∑ i ∈ range (n + 1), (n.choose i : R) * f (i + 1) (n - i) := by
+  simpa only [nsmul_eq_mul] using sum_choose_succ_nsmul f n
+
+theorem sum_antidiagonal_choose_succ_mul (f : ℕ → ℕ → R) (n : ℕ) :
+    (∑ ij ∈ antidiagonal (n + 1), ((n + 1).choose ij.1 : R) * f ij.1 ij.2) =
+      (∑ ij ∈ antidiagonal n, (n.choose ij.1 : R) * f ij.1 (ij.2 + 1)) +
+        ∑ ij ∈ antidiagonal n, (n.choose ij.2 : R) * f (ij.1 + 1) ij.2 := by
+  simpa only [nsmul_eq_mul] using sum_antidiagonal_choose_succ_nsmul f n
+
+theorem sum_antidiagonal_choose_add (d n : ℕ) :
+    (∑ ij ∈ antidiagonal n, (d + ij.2).choose d) = (d + n).choose d + (d + n).choose (d + 1) := by
+  induction n with
+  | zero => simp
+  | succ n hn => simpa [Nat.sum_antidiagonal_succ] using hn
+
+end Finset

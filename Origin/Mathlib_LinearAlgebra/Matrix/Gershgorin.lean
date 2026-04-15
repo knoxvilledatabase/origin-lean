@@ -3,6 +3,9 @@ Extracted from LinearAlgebra/Matrix/Gershgorin.lean
 Genuine: 1 of 3 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Field.Basic
+import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.LinearAlgebra.Determinant
 
 /-!
 # Gershgorin's circle theorem
@@ -25,7 +28,7 @@ theorem eigenvalue_mem_ball {μ : K} (hμ : Module.End.HasEigenvalue (Matrix.toL
   · obtain ⟨v, h_eg, h_nz⟩ := hμ.exists_hasEigenvector
     obtain ⟨i, -, h_i⟩ := Finset.exists_mem_eq_sup' Finset.univ_nonempty (fun i => ‖v i‖)
     have h_nz : v i ≠ 0 := by
-      contrapose h_nz
+      contrapose! h_nz
       ext j
       rw [Pi.zero_apply, ← norm_le_zero_iff]
       refine (h_i ▸ Finset.le_sup' (fun i => ‖v i‖) (Finset.mem_univ j)).trans ?_
@@ -36,10 +39,10 @@ theorem eigenvalue_mem_ball {μ : K} (hμ : Module.End.HasEigenvalue (Matrix.toL
     simp_rw [mem_closedBall_iff_norm']
     refine ⟨i, ?_⟩
     calc
-      _ = ‖(A i i * v i - μ * v i) * (v i)⁻¹‖ := by congr; field
+      _ = ‖(A i i * v i - μ * v i) * (v i)⁻¹‖ := by congr; field_simp [h_nz]; ring
       _ = ‖(A i i * v i - ∑ j, A i j * v j) * (v i)⁻¹‖ := by
                 rw [show μ * v i = ∑ x : n, A i x * v x by
-                  rw [← dotProduct, ← Matrix.mulVec]
+                  rw [← Matrix.dotProduct, ← Matrix.mulVec]
                   exact (congrFun (Module.End.mem_eigenspace_iff.mp h_eg) i).symm]
       _ = ‖(∑ j ∈ Finset.univ.erase i, A i j * v j) * (v i)⁻¹‖ := by
                 rw [Finset.sum_erase_eq_sub (Finset.mem_univ i), ← neg_sub, neg_mul, norm_neg]

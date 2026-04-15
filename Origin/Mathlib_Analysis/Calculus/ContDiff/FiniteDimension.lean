@@ -3,6 +3,8 @@ Extracted from Analysis/Calculus/ContDiff/FiniteDimension.lean
 Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.ContDiff.Basic
+import Mathlib.Analysis.Normed.Module.FiniteDimension
 
 /-!
 # Higher differentiability in finite dimensions.
@@ -19,7 +21,7 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {F : Type uF} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
   {n : WithTop ℕ∞} {f : D → E} {s : Set D}
 
-/-! ### Finite-dimensional results -/
+/-! ### Finite dimensional results -/
 
 section FiniteDimensional
 

@@ -3,6 +3,8 @@ Extracted from Data/Fin/Tuple/Finset.lean
 Genuine: 15 of 15 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Prod
+import Mathlib.Data.Fintype.Pi
 
 /-!
 # Fin-indexed tuples of finsets
@@ -13,6 +15,8 @@ open Fin Fintype
 namespace Fin
 
 variable {n : ℕ} {α : Fin (n + 1) → Type*} {f : ∀ i, α i} {s : ∀ i, Finset (α i)} {p : Fin (n + 1)}
+
+open Fintype
 
 lemma mem_piFinset_iff_zero_tail :
     f ∈ Fintype.piFinset s ↔ f 0 ∈ s 0 ∧ tail f ∈ piFinset (tail s) := by

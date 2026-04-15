@@ -3,6 +3,7 @@ Extracted from Order/Monotone/Extension.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
 /-!
 # Extension of a monotone function from a set to the whole space
@@ -22,12 +23,12 @@ theorem MonotoneOn.exists_monotone_extension (h : MonotoneOn f s) (hl : BddBelow
       of `f` to the left of `x` for `x ≥ a`. -/
     rcases hl with ⟨a, ha⟩
     have hu' : ∀ x, BddAbove (f '' (Iic x ∩ s)) := fun x =>
-      hu.mono (image_mono inter_subset_right)
+      hu.mono (image_subset _ inter_subset_right)
     let g : α → β := fun x => if Disjoint (Iic x) s then a else sSup (f '' (Iic x ∩ s))
     have hgs : EqOn f g s := by
       intro x hx
       simp only [g]
-      have : IsGreatest (Iic x ∩ s) x := ⟨⟨self_mem_Iic, hx⟩, fun y hy => hy.1⟩
+      have : IsGreatest (Iic x ∩ s) x := ⟨⟨right_mem_Iic, hx⟩, fun y hy => hy.1⟩
       rw [if_neg this.nonempty.not_disjoint,
         ((h.mono inter_subset_right).map_isGreatest this).csSup_eq]
     refine ⟨g, fun x y hxy => ?_, hgs⟩
@@ -36,5 +37,10 @@ theorem MonotoneOn.exists_monotone_extension (h : MonotoneOn f s) (hl : BddBelow
     · rcases not_disjoint_iff_nonempty_inter.1 hy with ⟨z, hz⟩
       exact le_csSup_of_le (hu' _) (mem_image_of_mem _ hz) (ha <| mem_image_of_mem _ hz.2)
     · exact (hx <| hy.mono_left <| Iic_subset_Iic.2 hxy).elim
-    · rw [not_disjoint_iff_nonempty_inter] at hx
-      gcongr; exacts [hu' _, hx.image _]
+    · rw [not_disjoint_iff_nonempty_inter] at hx hy
+      refine csSup_le_csSup (hu' _) (hx.image _) (image_subset _ ?_)
+      exact inter_subset_inter_left _ (Iic_subset_Iic.2 hxy)
+
+theorem AntitoneOn.exists_antitone_extension (h : AntitoneOn f s) (hl : BddBelow (f '' s))
+    (hu : BddAbove (f '' s)) : ∃ g : α → β, Antitone g ∧ EqOn f g s :=
+  h.dual_right.exists_monotone_extension hu hl

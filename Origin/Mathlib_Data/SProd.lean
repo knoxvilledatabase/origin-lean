@@ -3,6 +3,7 @@ Extracted from Data/SProd.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Tactic.FBinop
 
 /-!
 # Set Product Notation
@@ -22,5 +23,7 @@ notation is desirable but this notation is defined in core for `Prod` so replaci
 universe u v w
 
 class SProd (α : Type u) (β : Type v) (γ : outParam (Type w)) where
-  /-- The Cartesian product `s ×ˢ t` is the set of `(a, b)` such that `a ∈ s` and `b ∈ t`. -/
+  /-- The cartesian product `s ×ˢ t` is the set of `(a, b)` such that `a ∈ s` and `b ∈ t`. -/
   sprod : α → β → γ
+
+macro_rules | `($x ×ˢ $y)   => `(fbinop% SProd.sprod $x $y)

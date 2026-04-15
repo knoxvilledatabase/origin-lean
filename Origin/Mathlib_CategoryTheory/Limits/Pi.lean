@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Limits/Pi.lean
 Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Pi.Basic
+import Mathlib.CategoryTheory.Limits.HasLimits
 
 /-!
 # Limits in the category of indexed families of objects.
@@ -76,6 +78,8 @@ def coconeOfCoconeEvalIsColimit {c : ∀ i, Cocone (F ⋙ Pi.eval C i)} (P : ∀
     funext i
     exact (P i).uniq (coconeCompEval s i) (m i) fun j => congr_fun (w j) i
 
+section
+
 variable [∀ i, HasLimit (F ⋙ Pi.eval C i)]
 
 theorem hasLimit_of_hasLimit_comp_eval : HasLimit F :=
@@ -84,6 +88,8 @@ theorem hasLimit_of_hasLimit_comp_eval : HasLimit F :=
       isLimit := coneOfConeEvalIsLimit fun _ => limit.isLimit _ }
 
 end
+
+section
 
 variable [∀ i, HasColimit (F ⋙ Pi.eval C i)]
 
@@ -99,7 +105,7 @@ As an example, we can use this to construct particular shapes of limits
 in a category of indexed families.
 
 With the addition of
-`import CategoryTheory.Limits.Types.Products`
+`import CategoryTheory.Limits.Shapes.Types`
 we can use:
 ```
 attribute [local instance] hasLimit_of_hasLimit_comp_eval

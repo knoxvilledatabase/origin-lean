@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Abelian/Refinements.lean
-Genuine: 10 of 13 | Dissolved: 0 | Infrastructure: 3
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.ShortComplex.Exact
 
 /-!
 # Refinements
@@ -13,7 +14,7 @@ Some of these can be carried out in more general abelian categories:
 for example, a morphism `X ⟶ Y` in an abelian category `C` is a
 monomorphism if and only if for all `A : C`, the induced map
 `(A ⟶ X) → (A ⟶ Y)` of abelian groups is a monomorphism, i.e. injective.
-Alternatively, the Yoneda presheaf functor which sends `X` to the
+Alternatively, the yoneda presheaf functor which sends `X` to the
 presheaf of maps `A ⟶ X` for all `A : C` preserves and reflects
 monomorphisms.
 
@@ -22,10 +23,10 @@ However, if `p : X ⟶ Y` is an epimorphism in `C` and `A : C`,
 epimorphism).
 
 In this file, the basic result is `epi_iff_surjective_up_to_refinements`
-which states that if `f : X ⟶ Y` is a morphism in an abelian category,
+which states that `f : X ⟶ Y` is a morphism in an abelian category,
 then it is an epimorphism if and only if for all `y : A ⟶ Y`,
 there exists an epimorphism `π : A' ⟶ A` and `x : A' ⟶ X` such
-that `π ≫ y = x ≫ f`. In other words, if we allow a precomposition
+that `π ≫ y = x ≫ f`. In order words, if we allow a precomposition
 with an epimorphism, we may lift a morphism to `Y` to a morphism to `X`.
 Following unpublished notes by George Bergman, we shall say that the
 precomposition by an epimorphism `π ≫ y` is a refinement of `y`. Then,
@@ -36,24 +37,24 @@ locally. Then, arguing "up to refinements" is very similar to
 arguing locally for a Grothendieck topology (TODO: indeed,
 show that it corresponds to the "refinements" topology on an
 abelian category `C` that is defined by saying that
-a sieve is covering if it contains an epimorphism)).
+a sieve is covering if it contains an epimorphism).
 
 Similarly, it is possible to show that a short complex in an abelian
 category is exact if and only if it is exact up to refinements
 (see `ShortComplex.exact_iff_exact_up_to_refinements`).
 
 As it is outlined in the documentation of the file
-`Mathlib/CategoryTheory/Abelian/Pseudoelements.lean`, the Freyd-Mitchell
+`CategoryTheory.Abelian.Pseudoelements`, the Freyd-Mitchell
 embedding theorem implies the existence of a faithful and exact functor `ι`
 from an abelian category `C` to the category of abelian groups. If we
 define a pseudo-element of `X : C` to be an element in `ι.obj X`, one
 may do diagram chases in any abelian category using these pseudo-elements.
 However, using this approach would require proving this embedding theorem!
 Currently, mathlib contains a weaker notion of pseudo-elements
-`Mathlib/CategoryTheory/Abelian/Pseudoelements.lean`. Some theorems can be obtained
+`CategoryTheory.Abelian.Pseudoelements`. Some theorems can be obtained
 using this notion, but there is the issue that for this notion
 of pseudo-elements a morphism `X ⟶ Y` in `C` is not determined by
-its action on pseudo-elements (see also `Counterexamples/Pseudoelement.lean`).
+its action on pseudo-elements (see also `Counterexamples/Pseudoelement`).
 On the contrary, the approach consisting of working up to refinements
 does not require the introduction of other types: we only need to work
 with morphisms `A ⟶ X` in `C` which we may consider as being
@@ -62,16 +63,16 @@ these morphisms and sometimes introducing an auxiliary epimorphism `A' ⟶ A`.
 
 ## References
 * George Bergman, A note on abelian categories – translating element-chasing proofs,
-  and exact embedding in abelian groups (1974)
-  http://math.berkeley.edu/~gbergman/papers/unpub/elem-chase.pdf
+and exact embedding in abelian groups (1974)
+http://math.berkeley.edu/~gbergman/papers/unpub/elem-chase.pdf
 
 -/
 
 namespace CategoryTheory
 
-open Category Limits Preadditive
+open Category Limits
 
-variable {C : Type*} [Category* C] [Abelian C] {X Y : C} (S : ShortComplex C)
+variable {C : Type _} [Category C] [Abelian C] {X Y : C} (S : ShortComplex C)
   {S₁ S₂ : ShortComplex C}
 
 lemma epi_iff_surjective_up_to_refinements (f : X ⟶ Y) :
@@ -117,57 +118,5 @@ lemma ShortComplex.eq_liftCycles_homologyπ_up_to_refinements {A : C} (γ : A �
   rw [hz]
   congr 1
   rw [← cancel_mono S.iCycles, liftCycles_i]
-
-set_option backward.isDefEq.respectTransparency false in
-
-lemma ShortComplex.liftCycles_comp_homologyπ_eq_zero_iff_up_to_refinements
-    {A : C} (x₂ : A ⟶ S.X₂) (hx₂ : x₂ ≫ S.g = 0) :
-    S.liftCycles x₂ hx₂ ≫ S.homologyπ = 0 ↔
-      ∃ (A' : C) (π : A' ⟶ A) (_ : Epi π) (x₁ : A' ⟶ S.X₁), π ≫ x₂ = x₁ ≫ S.f := by
-  have := CokernelCofork.IsColimit.comp_π_eq_zero_iff_up_to_refinements
-        S.homologyIsCokernel (S.liftCycles x₂ hx₂)
-  dsimp at this
-  simp [this, ← cancel_mono S.iCycles]
-
-lemma ShortComplex.liftCycles_comp_homologyπ_eq_iff_up_to_refinements
-    {A : C} (x₂ x₂' : A ⟶ S.X₂) (hx₂ : x₂ ≫ S.g = 0) (hx₂' : x₂' ≫ S.g = 0) :
-    S.liftCycles x₂ hx₂ ≫ S.homologyπ = S.liftCycles x₂' hx₂' ≫ S.homologyπ ↔
-      ∃ (A' : C) (π : A' ⟶ A) (_ : Epi π) (x₁ : A' ⟶ S.X₁), π ≫ x₂ = π ≫ x₂' + x₁ ≫ S.f := by
-  suffices S.liftCycles x₂ hx₂ ≫ S.homologyπ = S.liftCycles x₂' hx₂' ≫ S.homologyπ ↔
-      S.liftCycles (x₂ - x₂') (by simp [hx₂, hx₂']) ≫ S.homologyπ = 0 by
-    simp [this, S.liftCycles_comp_homologyπ_eq_zero_iff_up_to_refinements,
-      sub_eq_iff_eq_add']
-  rw [← sub_eq_zero, ← sub_comp, sub_liftCycles]
-
-lemma ShortComplex.comp_homologyπ_eq_zero_iff_up_to_refinements
-    {A : C} (z₂ : A ⟶ S.cycles) :
-    z₂ ≫ S.homologyπ = 0 ↔
-      ∃ (A' : C) (π : A' ⟶ A) (_ : Epi π) (x₁ : A' ⟶ S.X₁), π ≫ z₂ = x₁ ≫ S.toCycles := by
-  obtain ⟨x₂, hx₂, rfl⟩ : ∃ (x₂ : A ⟶ S.X₂) (hx₂ : x₂ ≫ S.g = 0), z₂ = S.liftCycles x₂ hx₂ :=
-    ⟨z₂ ≫ S.iCycles, by simp, by simp [← cancel_mono S.iCycles, liftCycles_i]⟩
-  simp [liftCycles_comp_homologyπ_eq_zero_iff_up_to_refinements, ← cancel_mono S.iCycles]
-
-lemma ShortComplex.comp_homologyπ_eq_iff_up_to_refinements
-    {A : C} (z₂ z₂' : A ⟶ S.cycles) :
-    z₂ ≫ S.homologyπ = z₂' ≫ S.homologyπ ↔
-      ∃ (A' : C) (π : A' ⟶ A) (_ : Epi π) (x₁ : A' ⟶ S.X₁),
-        π ≫ z₂ = π ≫ z₂' + x₁ ≫ S.toCycles := by
-  obtain ⟨x₂, hx₂, rfl⟩ : ∃ (x₂ : A ⟶ S.X₂) (hx₂ : x₂ ≫ S.g = 0), z₂ = S.liftCycles x₂ hx₂ :=
-    ⟨z₂ ≫ S.iCycles, by simp, by simp [← cancel_mono S.iCycles]⟩
-  obtain ⟨x₂', hx₂', rfl⟩ : ∃ (x₂' : A ⟶ S.X₂) (hx₂' : x₂' ≫ S.g = 0), z₂' =
-    S.liftCycles x₂' hx₂' := ⟨z₂' ≫ S.iCycles, by simp,
-      by simp [← cancel_mono S.iCycles]⟩
-  simp [liftCycles_comp_homologyπ_eq_iff_up_to_refinements, ← cancel_mono S.iCycles]
-
-lemma ShortComplex.comp_pOpcycles_eq_zero_iff_up_to_refinements
-    {A : C} (x₂ : A ⟶ S.X₂) :
-    x₂ ≫ S.pOpcycles = 0 ↔
-      ∃ (A' : C) (π : A' ⟶ A) (_ : Epi π) (x₁ : A' ⟶ S.X₁), π ≫ x₂ = x₁ ≫ S.f :=
-  CokernelCofork.IsColimit.comp_π_eq_zero_iff_up_to_refinements
-    S.opcyclesIsCokernel x₂
-
-variable {K L} in
-
-variable {K L} in
 
 end CategoryTheory

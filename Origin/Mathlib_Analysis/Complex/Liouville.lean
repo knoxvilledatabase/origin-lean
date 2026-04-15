@@ -3,6 +3,9 @@ Extracted from Analysis/Complex/Liouville.lean
 Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.CauchyIntegral
+import Mathlib.Analysis.Calculus.FDeriv.Analytic
+import Mathlib.Analysis.Normed.Module.Completion
 
 /-!
 # Liouville's theorem
@@ -30,32 +33,26 @@ local postfix:100 "̂" => UniformSpace.Completion
 
 namespace Complex
 
-theorem norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le [CompleteSpace F] {c : ℂ} {R C : ℝ}
-    {f : ℂ → F} (n : ℕ) (hR : 0 < R) (hf : DiffContOnCl ℂ f (ball c R))
-    (hC : ∀ z ∈ sphere c R, ‖f z‖ ≤ C) :
-    ‖iteratedDeriv n f c‖ ≤ n.factorial * C / R ^ n := by
-  have hp (z) (hz : z ∈ sphere c R) : ‖(z - c)⁻¹ ^ (n + 1) • f z‖ ≤ C / (R ^ n * R) := by
-    simpa [norm_smul, norm_pow, norm_inv, ← div_eq_inv_mul, mem_sphere_iff_norm.1 hz] using
-      (div_le_div_iff_of_pos_right (mul_pos (pow_pos hR n) hR)).2 (hC z hz)
-  have hq : iteratedDeriv n f c = n.factorial • (2 * π * I)⁻¹ •
-    ∮ z in C(c, R), (z - c)⁻¹ ^ (n + 1) • f z := by
-    have : (2 * π * I / n.factorial) ≠ 0 := by simp [Nat.factorial_ne_zero]
-    rw [← inv_smul_smul₀ this (iteratedDeriv n f c), inv_div, div_eq_inv_mul, mul_comm,
-      ← nsmul_eq_mul, smul_assoc]
-    simp [← DiffContOnCl.circleIntegral_one_div_sub_center_pow_smul hR n hf]
-  calc
-    ‖iteratedDeriv n f c‖ = ‖n.factorial • (2 * π * I)⁻¹ •
-      ∮ z in C(c, R), (z - c)⁻¹ ^ (n + 1) • f z‖ := by rw [hq]
-    _ ≤ n.factorial * (R * (C / (R ^ (n + 1)))) := by
-      rw [RCLike.norm_nsmul (K := ℂ), nsmul_eq_mul, mul_le_mul_iff_right₀ (by positivity)]
-      exact circleIntegral.norm_two_pi_i_inv_smul_integral_le_of_norm_le_const hR.le hp
-    _ = n.factorial * C / R ^ n := by
-      grind
+theorem deriv_eq_smul_circleIntegral [CompleteSpace F] {R : ℝ} {c : ℂ} {f : ℂ → F} (hR : 0 < R)
+    (hf : DiffContOnCl ℂ f (ball c R)) :
+    deriv f c = (2 * π * I : ℂ)⁻¹ • ∮ z in C(c, R), (z - c) ^ (-2 : ℤ) • f z := by
+  lift R to ℝ≥0 using hR.le
+  refine (hf.hasFPowerSeriesOnBall hR).hasFPowerSeriesAt.deriv.trans ?_
+  simp only [cauchyPowerSeries_apply, one_div, zpow_neg, pow_one, smul_smul, zpow_two, mul_inv]
 
-private theorem norm_deriv_le_aux [CompleteSpace F] {c : ℂ} {R C : ℝ} {f : ℂ → F} (hR : 0 < R)
+theorem norm_deriv_le_aux [CompleteSpace F] {c : ℂ} {R C : ℝ} {f : ℂ → F} (hR : 0 < R)
     (hf : DiffContOnCl ℂ f (ball c R)) (hC : ∀ z ∈ sphere c R, ‖f z‖ ≤ C) :
     ‖deriv f c‖ ≤ C / R := by
-  simpa using norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le 1 hR hf hC
+  have : ∀ z ∈ sphere c R, ‖(z - c) ^ (-2 : ℤ) • f z‖ ≤ C / (R * R) :=
+    fun z (hz : abs (z - c) = R) => by
+    simpa [-mul_inv_rev, norm_smul, hz, zpow_two, ← div_eq_inv_mul] using
+      (div_le_div_iff_of_pos_right (mul_pos hR hR)).2 (hC z hz)
+  calc
+    ‖deriv f c‖ = ‖(2 * π * I : ℂ)⁻¹ • ∮ z in C(c, R), (z - c) ^ (-2 : ℤ) • f z‖ :=
+      congr_arg norm (deriv_eq_smul_circleIntegral hR hf)
+    _ ≤ R * (C / (R * R)) :=
+      (circleIntegral.norm_two_pi_i_inv_smul_integral_le_of_norm_le_const hR.le this)
+    _ = C / R := by rw [mul_div_left_comm, div_self_mul_self', div_eq_mul_inv]
 
 theorem norm_deriv_le_of_forall_mem_sphere_norm_le {c : ℂ} {R C : ℝ} {f : ℂ → F} (hR : 0 < R)
     (hd : DiffContOnCl ℂ f (ball c R)) (hC : ∀ z ∈ sphere c R, ‖f z‖ ≤ C) :
@@ -81,7 +78,7 @@ theorem liouville_theorem_aux {f : ℂ → F} (hf : Differentiable ℂ f) (hb : 
     exact
       ⟨max C 1, lt_max_iff.2 (Or.inr zero_lt_one), fun z =>
         (hC (f z) (mem_range_self _)).trans (le_max_left _ _)⟩
-  refine norm_le_zero_iff.1 (le_of_forall_gt_imp_ge_of_dense fun ε ε₀ => ?_)
+  refine norm_le_zero_iff.1 (le_of_forall_le_of_dense fun ε ε₀ => ?_)
   calc
     ‖deriv f c‖ ≤ C / (C / ε) :=
       norm_deriv_le_of_forall_mem_sphere_norm_le (div_pos C₀ ε₀) hf.diffContOnCl fun z _ => hC z
@@ -109,15 +106,13 @@ theorem exists_eq_const_of_bounded {f : E → F} (hf : Differentiable ℂ f)
     (hb : IsBounded (range f)) : ∃ c, f = const E c :=
   (hf.exists_const_forall_eq_of_bounded hb).imp fun _ => funext
 
-set_option linter.style.whitespace false in -- manual alignment is not recognised
-
 theorem eq_const_of_tendsto_cocompact [Nontrivial E] {f : E → F} (hf : Differentiable ℂ f) {c : F}
     (hb : Tendsto f (cocompact E) (𝓝 c)) : f = Function.const E c := by
   have h_bdd : Bornology.IsBounded (Set.range f) := by
     obtain ⟨s, hs, hs_bdd⟩ := Metric.exists_isBounded_image_of_tendsto hb
     obtain ⟨t, ht, hts⟩ := mem_cocompact.mp hs
     apply ht.image hf.continuous |>.isBounded.union hs_bdd |>.subset
-    simpa [Set.image_union, Set.image_univ] using Set.image_mono <| calc
+    simpa [Set.image_union, Set.image_univ] using Set.image_subset _ <| calc
       Set.univ = t ∪ tᶜ := t.union_compl_self.symm
       _        ⊆ t ∪ s  := by gcongr
   obtain ⟨c', hc'⟩ := hf.exists_eq_const_of_bounded h_bdd

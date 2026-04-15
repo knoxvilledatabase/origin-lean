@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Finiteness/Finsupp.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+import Mathlib.RingTheory.Finiteness.Basic
 
 /-!
 # Finiteness of (sub)modules and finitely supported functions
@@ -15,19 +17,25 @@ open Finsupp
 
 namespace Submodule
 
-variable {R M N P : Type*} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup N]
-  [Module R N] [AddCommGroup P] [Module R P]
+variable {R : Type*} {M : Type*} [Semiring R] [AddCommMonoid M] [Module R M]
 
 open Set
 
-theorem fg_of_fg_map_of_fg_inf_ker (f : M →ₗ[R] P) {s : Submodule R M}
+variable {P : Type*} [AddCommMonoid P] [Module R P]
+
+variable (f : M →ₗ[R] P)
+
+variable {f}
+
+theorem fg_of_fg_map_of_fg_inf_ker {R M P : Type*} [Ring R] [AddCommGroup M] [Module R M]
+    [AddCommGroup P] [Module R P] (f : M →ₗ[R] P) {s : Submodule R M}
     (hs1 : (s.map f).FG)
     (hs2 : (s ⊓ LinearMap.ker f).FG) : s.FG := by
   haveI := Classical.decEq R
   haveI := Classical.decEq M
   haveI := Classical.decEq P
-  obtain ⟨t1, ht1⟩ := hs1
-  obtain ⟨t2, ht2⟩ := hs2
+  cases' hs1 with t1 ht1
+  cases' hs2 with t2 ht2
   have : ∀ y ∈ t1, ∃ x ∈ s, f x = y := by
     intro y hy
     have : y ∈ s.map f := by
@@ -44,7 +52,7 @@ theorem fg_of_fg_map_of_fg_inf_ker (f : M →ₗ[R] P) {s : Submodule R M}
       apply hg1
     · simp only [dif_pos H]
       apply hg2
-  obtain ⟨g, hg⟩ := this
+  cases' this with g hg
   clear this
   exists t1.image g ∪ t2
   rw [Finset.coe_union, span_union, Finset.coe_image]
@@ -92,11 +100,24 @@ theorem fg_of_fg_map_of_fg_inf_ker (f : M →ₗ[R] P) {s : Submodule R M}
     · exact zero_smul _
     · exact fun _ _ _ => add_smul _ _ _
 
-theorem fg_ker_comp (f : M →ₗ[R] N) (g : N →ₗ[R] P)
+theorem fg_ker_comp {R M N P : Type*} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup N]
+    [Module R N] [AddCommGroup P] [Module R P] (f : M →ₗ[R] N) (g : N →ₗ[R] P)
     (hf1 : (LinearMap.ker f).FG) (hf2 : (LinearMap.ker g).FG)
-    (hsur : Function.Surjective f) : (LinearMap.ker (g.comp f)).FG := by
+    (hsur : Function.Surjective f) : (g.comp f).ker.FG := by
   rw [LinearMap.ker_comp]
   apply fg_of_fg_map_of_fg_inf_ker f
   · rwa [Submodule.map_comap_eq, LinearMap.range_eq_top.2 hsur, top_inf_eq]
   · rwa [inf_of_le_right (show (LinearMap.ker f) ≤
       (LinearMap.ker g).comap f from comap_mono bot_le)]
+
+end Submodule
+
+section
+
+variable {R V} [Ring R] [AddCommGroup V] [Module R V]
+
+instance Module.Finite.finsupp {ι : Type*} [_root_.Finite ι] [Module.Finite R V] :
+    Module.Finite R (ι →₀ V) :=
+  Module.Finite.equiv (Finsupp.linearEquivFunOnFinite R V ι).symm
+
+end

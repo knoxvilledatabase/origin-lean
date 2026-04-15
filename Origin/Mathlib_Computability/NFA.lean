@@ -1,39 +1,20 @@
 /-
 Extracted from Computability/NFA.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 15 of 21 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.Computability.DFA
+import Mathlib.Data.Fintype.Powerset
 
 /-!
 # Nondeterministic Finite Automata
-
-A Nondeterministic Finite Automaton (NFA) is a state machine which
-decides membership in a particular `Language`, by following every
-possible path that describes an input string.
-
-We show that DFAs and NFAs can decide the same languages, by constructing
-an equivalent DFA for every NFA, and vice versa.
-
-As constructing a DFA from an NFA uses an exponential number of states,
-we re-prove the pumping lemma instead of lifting `DFA.pumping_lemma`,
-in order to obtain the optimal bound on the minimal length of the string.
-
-Like `DFA`, this definition allows for automata with infinite states;
-a `Fintype` instance must be supplied for true NFAs.
-
-## Main definitions
-
-* `NFA α σ`: automaton over alphabet `α` and set of states `σ`
-* `NFA.evalFrom M S x`: set of possible ending states for an input word `x`
-  and set of initial states `S`
-* `NFA.accepts M`: the language accepted by the NFA `M`
-* `NFA.Path M s t x`: a specific path from `s` to `t` for an input word `x`
-* `NFA.Path.supp p`: set of states visited by the path `p`
-
-## Main theorems
-
-* `NFA.pumping_lemma`: every sufficiently long string accepted by the NFA has a substring that can
-  be repeated arbitrarily many times (and have the overall string still be accepted)
+This file contains the definition of a Nondeterministic Finite Automaton (NFA), a state machine
+which determines whether a string (implemented as a list over an arbitrary alphabet) is in a regular
+set by evaluating the string over every possible path.
+We show that DFA's are equivalent to NFA's however the construction from NFA to DFA uses an
+exponential number of states.
+Note that this definition allows for Automaton with infinite states; a `Fintype` instance must be
+supplied for true NFA's.
 -/
 
 open Set
@@ -43,25 +24,107 @@ open Computability
 universe u v
 
 structure NFA (α : Type u) (σ : Type v) where
-  /-- The NFA's transition function -/
   step : σ → α → Set σ
-  /-- Set of starting states -/
   start : Set σ
-  /-- Set of accepting states -/
   accept : Set σ
 
-variable {α : Type u} {σ : Type v} {M : NFA α σ}
+variable {α : Type u} {σ σ' : Type v} (M : NFA α σ)
 
 namespace NFA
 
--- INSTANCE (free from Core): :
-
-variable (M) in
+instance : Inhabited (NFA α σ) :=
+  ⟨NFA.mk (fun _ _ => ∅) ∅ ∅⟩
 
 def stepSet (S : Set σ) (a : α) : Set σ :=
   ⋃ s ∈ S, M.step s a
 
-theorem mem_stepSet {s : σ} {S : Set σ} {a : α} : s ∈ M.stepSet S a ↔ ∃ t ∈ S, s ∈ M.step t a := by
+theorem mem_stepSet (s : σ) (S : Set σ) (a : α) : s ∈ M.stepSet S a ↔ ∃ t ∈ S, s ∈ M.step t a := by
   simp [stepSet]
 
-variable (M) in
+@[simp]
+theorem stepSet_empty (a : α) : M.stepSet ∅ a = ∅ := by simp [stepSet]
+
+def evalFrom (start : Set σ) : List α → Set σ :=
+  List.foldl M.stepSet start
+
+@[simp]
+theorem evalFrom_nil (S : Set σ) : M.evalFrom S [] = S :=
+  rfl
+
+@[simp]
+theorem evalFrom_singleton (S : Set σ) (a : α) : M.evalFrom S [a] = M.stepSet S a :=
+  rfl
+
+@[simp]
+theorem evalFrom_append_singleton (S : Set σ) (x : List α) (a : α) :
+    M.evalFrom S (x ++ [a]) = M.stepSet (M.evalFrom S x) a := by
+  simp only [evalFrom, List.foldl_append, List.foldl_cons, List.foldl_nil]
+
+def eval : List α → Set σ :=
+  M.evalFrom M.start
+
+@[simp]
+theorem eval_nil : M.eval [] = M.start :=
+  rfl
+
+@[simp]
+theorem eval_singleton (a : α) : M.eval [a] = M.stepSet M.start a :=
+  rfl
+
+@[simp]
+theorem eval_append_singleton (x : List α) (a : α) : M.eval (x ++ [a]) = M.stepSet (M.eval x) a :=
+  evalFrom_append_singleton _ _ _ _
+
+def accepts : Language α := {x | ∃ S ∈ M.accept, S ∈ M.eval x}
+
+theorem mem_accepts {x : List α} : x ∈ M.accepts ↔ ∃ S ∈ M.accept, S ∈ M.evalFrom M.start x := by
+  rfl
+
+def toDFA : DFA α (Set σ) where
+  step := M.stepSet
+  start := M.start
+  accept := { S | ∃ s ∈ S, s ∈ M.accept }
+
+@[simp]
+theorem toDFA_correct : M.toDFA.accepts = M.accepts := by
+  ext x
+  rw [mem_accepts, DFA.mem_accepts]
+  constructor <;> · exact fun ⟨w, h2, h3⟩ => ⟨w, h3, h2⟩
+
+theorem pumping_lemma [Fintype σ] {x : List α} (hx : x ∈ M.accepts)
+    (hlen : Fintype.card (Set σ) ≤ List.length x) :
+    ∃ a b c,
+      x = a ++ b ++ c ∧
+        a.length + b.length ≤ Fintype.card (Set σ) ∧ b ≠ [] ∧ {a} * {b}∗ * {c} ≤ M.accepts := by
+  rw [← toDFA_correct] at hx ⊢
+  exact M.toDFA.pumping_lemma hx hlen
+
+end NFA
+
+namespace DFA
+
+@[simps] def toNFA (M : DFA α σ') : NFA α σ' where
+  step s a := {M.step s a}
+  start := {M.start}
+  accept := M.accept
+
+@[simp]
+theorem toNFA_evalFrom_match (M : DFA α σ) (start : σ) (s : List α) :
+    M.toNFA.evalFrom {start} s = {M.evalFrom start s} := by
+  change List.foldl M.toNFA.stepSet {start} s = {List.foldl M.step start s}
+  induction' s with a s ih generalizing start
+  · tauto
+  · rw [List.foldl, List.foldl,
+      show M.toNFA.stepSet {start} a = {M.step start a} by simp [NFA.stepSet] ]
+    tauto
+
+@[simp]
+theorem toNFA_correct (M : DFA α σ) : M.toNFA.accepts = M.accepts := by
+  ext x
+  rw [NFA.mem_accepts, toNFA_start, toNFA_evalFrom_match]
+  constructor
+  · rintro ⟨S, hS₁, hS₂⟩
+    rwa [Set.mem_singleton_iff.mp hS₂] at hS₁
+  · exact fun h => ⟨M.eval x, h, rfl⟩
+
+end DFA

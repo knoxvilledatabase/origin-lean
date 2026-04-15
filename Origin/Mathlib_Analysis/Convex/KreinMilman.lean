@@ -3,6 +3,9 @@ Extracted from Analysis/Convex/KreinMilman.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Exposed
+import Mathlib.Analysis.NormedSpace.HahnBanach.Separation
+import Mathlib.Topology.Algebra.ContinuousAffineMap
 
 /-!
 # The Krein-Milman theorem
@@ -49,15 +52,17 @@ See chapter 8 of [Barry Simon, *Convexity*][simon2011]
 
 open Set
 
+open scoped Classical
+
 variable {E F : Type*} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [T2Space E]
-  [IsTopologicalAddGroup E] [ContinuousSMul ℝ E] [LocallyConvexSpace ℝ E] {s : Set E}
+  [TopologicalAddGroup E] [ContinuousSMul ℝ E] [LocallyConvexSpace ℝ E] {s : Set E}
   [AddCommGroup F] [Module ℝ F] [TopologicalSpace F] [T1Space F]
 
 theorem IsCompact.extremePoints_nonempty (hscomp : IsCompact s) (hsnemp : s.Nonempty) :
     (s.extremePoints ℝ).Nonempty := by
   let S : Set (Set E) := { t | t.Nonempty ∧ IsClosed t ∧ IsExtreme ℝ s t }
   rsuffices ⟨t, ht⟩ : ∃ t, Minimal (· ∈ S) t
-  · obtain ⟨⟨x, hxt⟩, htclos, hst⟩ := ht.prop
+  · obtain ⟨⟨x,hxt⟩, htclos, hst⟩ := ht.prop
     refine ⟨x, IsExtreme.mem_extremePoints ?_⟩
     rwa [← eq_singleton_iff_unique_mem.2 ⟨hxt, fun y hyB => ?_⟩]
     by_contra hyx
@@ -66,9 +71,9 @@ theorem IsCompact.extremePoints_nonempty (hscomp : IsCompact s) (hsnemp : s.None
       (hscomp.of_isClosed_subset htclos hst.1).exists_isMaxOn ⟨x, hxt⟩
         l.continuous.continuousOn
     have h : IsExposed ℝ t ({ z ∈ t | ∀ w ∈ t, l w ≤ l z }) := fun _ => ⟨l, rfl⟩
-    rw [ht.eq_of_ge (y := ({ z ∈ t | ∀ w ∈ t, l w ≤ l z }))
+    rw [ ht.eq_of_ge (y := ({ z ∈ t | ∀ w ∈ t, l w ≤ l z }))
       ⟨⟨z, hzt, hz⟩, h.isClosed htclos, hst.trans h.isExtreme⟩ (t.sep_subset _)] at hyB
-    exact hl.not_ge (hyB.2 x hxt)
+    exact hl.not_le (hyB.2 x hxt)
   refine zorn_superset _ fun F hFS hF => ?_
   obtain rfl | hFnemp := F.eq_empty_or_nonempty
   · exact ⟨s, ⟨hsnemp, hscomp.isClosed, IsExtreme.rfl⟩, fun _ => False.elim⟩
@@ -108,7 +113,6 @@ lemma surjOn_extremePoints_image (f : E →ᴬ[ℝ] F) (hs : IsCompact s) :
   -- `f x = w` and `x` is an extreme point of `s`, so we're done
   refine mem_image_of_mem _ ⟨hx, fun y hy z hz hxyz ↦ ?_⟩
   have := by simpa using image_openSegment _ f.toAffineMap y z
-  rw [mem_extremePoints] at hw
-  have := hw.2 _ (mem_image_of_mem _ hy) _ (mem_image_of_mem _ hz) <| by
+  have := hw.2 (mem_image_of_mem _ hy) (mem_image_of_mem _ hz) <| by
     rw [← this]; exact mem_image_of_mem _ hxyz
   exact hyt ⟨hy, this.1⟩ ⟨hz, this.2⟩ hxyz

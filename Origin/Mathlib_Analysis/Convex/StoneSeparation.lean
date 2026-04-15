@@ -3,6 +3,8 @@ Extracted from Analysis/Convex/StoneSeparation.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Combination
+import Mathlib.Analysis.Convex.Join
 
 /-!
 # Stone's separation theorem
@@ -17,8 +19,7 @@ complement is convex.
 
 open Set
 
-variable {𝕜 E : Type*} [Field 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜]
-  [AddCommGroup E] [Module 𝕜 E] {s t : Set E}
+variable {𝕜 E : Type*} [LinearOrderedField 𝕜] [AddCommGroup E] [Module 𝕜 E] {s t : Set E}
 
 theorem not_disjoint_segment_convexHull_triple {p q u v x y z : E} (hz : z ∈ segment 𝕜 x y)
     (hu : u ∈ segment 𝕜 x p) (hv : v ∈ segment 𝕜 y q) :
@@ -52,7 +53,7 @@ theorem not_disjoint_segment_convexHull_triple {p q u v x y z : E} (hz : z ∈ s
       · exact mul_nonneg hau hav
     have hw : ∑ i, w i = az * av + bz * au := by
       trans az * av * bu + (bz * au * bv + au * av)
-      · simp [w, Fin.sum_univ_succ]
+      · simp [w, Fin.sum_univ_succ, Fin.sum_univ_zero]
       linear_combination (au * bv - 1 * au) * habz + (-(1 * az * au) + au) * habv + az * av * habu
     have hz : ∀ i, z i ∈ ({p, q, az • x + bz • y} : Set E) := fun i => by fin_cases i <;> simp [z]
     convert (Finset.centerMass_mem_convexHull (Finset.univ : Finset (Fin 3)) (fun i _ => hw₀ i)
@@ -62,4 +63,36 @@ theorem not_disjoint_segment_convexHull_triple {p q u v x y z : E} (hz : z ∈ s
       ((az * av * bu) • p + ((bz * au * bv) • q + (au * av) • (az • x + bz • y)))
     · module
     congr 3
-    simp [w, z]
+    simp only [smul_add, List.foldr, Fin.reduceFinMk, id_eq, Fin.isValue, Matrix.cons_val_two,
+      Nat.succ_eq_add_one, Nat.reduceAdd, Matrix.tail_cons, Matrix.head_cons, add_zero, w, z]
+
+theorem exists_convex_convex_compl_subset (hs : Convex 𝕜 s) (ht : Convex 𝕜 t) (hst : Disjoint s t) :
+    ∃ C : Set E, Convex 𝕜 C ∧ Convex 𝕜 Cᶜ ∧ s ⊆ C ∧ t ⊆ Cᶜ := by
+  let S : Set (Set E) := { C | Convex 𝕜 C ∧ Disjoint C t }
+  obtain ⟨C, hsC, hmax⟩ :=
+    zorn_subset_nonempty S
+      (fun c hcS hc ⟨_, _⟩ =>
+        ⟨⋃₀ c,
+          ⟨hc.directedOn.convex_sUnion fun s hs => (hcS hs).1,
+            disjoint_sUnion_left.2 fun c hc => (hcS hc).2⟩,
+          fun s => subset_sUnion_of_mem⟩)
+      s ⟨hs, hst⟩
+  obtain hC : _ ∧ _ := hmax.prop
+  refine
+    ⟨C, hC.1, convex_iff_segment_subset.2 fun x hx y hy z hz hzC => ?_, hsC, hC.2.subset_compl_left⟩
+  suffices h : ∀ c ∈ Cᶜ, ∃ a ∈ C, (segment 𝕜 c a ∩ t).Nonempty by
+    obtain ⟨p, hp, u, hu, hut⟩ := h x hx
+    obtain ⟨q, hq, v, hv, hvt⟩ := h y hy
+    refine
+      not_disjoint_segment_convexHull_triple hz hu hv
+        (hC.2.symm.mono (ht.segment_subset hut hvt) <| convexHull_min ?_ hC.1)
+    simp [insert_subset_iff, hp, hq, singleton_subset_iff.2 hzC]
+  rintro c hc
+  by_contra! h
+  suffices h : Disjoint (convexHull 𝕜 (insert c C)) t by
+    rw [hmax.eq_of_subset ⟨convex_convexHull _ _, h⟩ <|
+      (subset_insert ..).trans <| subset_convexHull ..] at hc
+    exact hc (subset_convexHull _ _ <| mem_insert _ _)
+  rw [convexHull_insert ⟨z, hzC⟩, convexJoin_singleton_left]
+  refine disjoint_iUnion₂_left.2 fun a ha => disjoint_iff_inter_eq_empty.2 (h a ?_)
+  rwa [← hC.1.convexHull_eq]

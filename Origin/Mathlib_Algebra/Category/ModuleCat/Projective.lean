@@ -1,36 +1,65 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Projective.lean
-Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
+Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Category.ModuleCat.EpiMono
+import Mathlib.Algebra.Module.Projective
+import Mathlib.CategoryTheory.Preadditive.Projective
+import Mathlib.Data.Finsupp.Basic
+import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 
 /-!
 # The category of `R`-modules has enough projectives.
 -/
 
-universe v u w
+universe v u u'
 
-open CategoryTheory Module ModuleCat
+open CategoryTheory
 
-variable {R : Type u} [Ring R] (P : ModuleCat.{v} R)
+open CategoryTheory.Limits
 
--- INSTANCE (free from Core): ModuleCat.projective_of_categoryTheory_projective
+open LinearMap
 
--- INSTANCE (free from Core): ModuleCat.projective_of_module_projective
+open ModuleCat
 
-theorem IsProjective.iff_projective [Small.{v} R] (P : Type v) [AddCommGroup P] [Module R P] :
-    Module.Projective R P ↔ Projective (of R P) :=
-  ⟨fun _ => (of R P).projective_of_categoryTheory_projective,
-    fun _ => (of R P).projective_of_module_projective⟩
+open scoped Module
+
+theorem IsProjective.iff_projective {R : Type u} [Ring R] {P : Type max u v} [AddCommGroup P]
+    [Module R P] : Module.Projective R P ↔ Projective (ModuleCat.of R P) := by
+  refine ⟨fun h => ?_, fun h => ?_⟩
+  · letI : Module.Projective R (ModuleCat.of R P) := h
+    exact ⟨fun E X epi => Module.projective_lifting_property _ _
+      ((ModuleCat.epi_iff_surjective _).mp epi)⟩
+  · refine Module.Projective.of_lifting_property.{u,v} ?_
+    intro E X mE mX sE sX f g s
+    haveI : Epi (↟f) := (ModuleCat.epi_iff_surjective (↟f)).mpr s
+    letI : Projective (ModuleCat.of R P) := h
+    exact ⟨Projective.factorThru (↟g) (↟f), Projective.factorThru_comp (↟g) (↟f)⟩
 
 namespace ModuleCat
 
-variable {M : ModuleCat.{v} R}
+variable {R : Type u} [Ring R] {M : ModuleCat.{max u v} R}
 
-theorem projective_of_free {ι : Type w} (b : Basis ι R M) : Projective M :=
-  have : Module.Projective R M := Module.Projective.of_basis b
-  M.projective_of_categoryTheory_projective
+theorem projective_of_free {ι : Type u'} (b : Basis ι R M) : Projective M :=
+  Projective.of_iso (ModuleCat.ofSelfIso M)
+    (IsProjective.iff_projective.{v,u}.mp (Module.Projective.of_basis b))
 
--- INSTANCE (free from Core): enoughProjectives
+instance moduleCat_enoughProjectives : EnoughProjectives (ModuleCat.{max u v} R) where
+  presentation M :=
+    ⟨{  p := ModuleCat.of R (M →₀ R)
+        projective :=
+          projective_of_free.{v,u} (ι := M) (M := ModuleCat.of R (M →₀ R)) <|
+            Finsupp.basisSingleOne
+        f := Finsupp.basisSingleOne.constr ℕ _root_.id
+        epi := (epi_iff_range_eq_top _).mpr
+            (range_eq_top.2 fun m => ⟨Finsupp.single m (1 : R), by
+              -- Porting note: simp [Finsupp.linearCombination_single] fails but rw succeeds
+              dsimp [Basis.constr]
+              simp only [Finsupp.lmapDomain_id, comp_id]
+              -- This used to be `rw`, but we need `erw` after https://github.com/leanprover/lean4/pull/2644
+              erw [Finsupp.linearCombination_single]
+              rw [one_smul]
+              rfl ⟩) }⟩
 
 end ModuleCat

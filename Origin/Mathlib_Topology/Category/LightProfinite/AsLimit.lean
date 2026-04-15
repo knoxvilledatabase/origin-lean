@@ -3,6 +3,7 @@ Extracted from Topology/Category/LightProfinite/AsLimit.lean
 Genuine: 20 of 20 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Category.LightProfinite.Basic
 
 /-!
 # Light profinite sets as limits of finite sets.
@@ -19,6 +20,8 @@ We also prove that the projection and transition maps in this limit are surjecti
 noncomputable section
 
 open CategoryTheory Limits CompHausLike
+
+attribute [local instance] ConcreteCategory.instFunLike
 
 namespace LightProfinite
 
@@ -49,14 +52,12 @@ def asLimitCone : Cone S.diagram where
   pt := S
   π := {
     app := fun n ↦ (lightToProfiniteFullyFaithful.preimageIso <|
-      (Cone.forget _).mapIso S.isoMapCone).inv ≫ S.asLimitConeAux.π.app n
+      (Cones.forget _).mapIso S.isoMapCone).inv ≫ S.asLimitConeAux.π.app n
     naturality := fun _ _ _ ↦ by simp only [Category.assoc, S.asLimitConeAux.w]; rfl }
 
-set_option backward.isDefEq.respectTransparency false in
-
 def asLimit : IsLimit S.asLimitCone := S.asLimitAux.ofIsoLimit <|
-  Cone.ext (lightToProfiniteFullyFaithful.preimageIso <|
-    (Cone.forget _).mapIso S.isoMapCone) (fun _ ↦ by rw [← @Iso.inv_comp_eq]; rfl)
+  Cones.ext (lightToProfiniteFullyFaithful.preimageIso <|
+    (Cones.forget _).mapIso S.isoMapCone) (fun _ ↦ by rw [← @Iso.inv_comp_eq]; rfl)
 
 def lim : Limits.LimitCone S.diagram := ⟨S.asLimitCone, S.asLimit⟩
 
@@ -64,7 +65,7 @@ abbrev proj (n : ℕ) : S ⟶ S.diagram.obj ⟨n⟩ := S.asLimitCone.π.app ⟨n
 
 lemma lightToProfinite_map_proj_eq (n : ℕ) : lightToProfinite.map (S.proj n) =
     (lightToProfinite.obj S).asLimitCone.π.app _ := by
-  simp only [Functor.comp_obj, toCompHausLike_map]
+  simp only [toCompHausLike_obj, Functor.comp_obj, toCompHausLike_map, coe_of]
   let c : Cone (S.diagram ⋙ lightToProfinite) := S.toLightDiagram.cone
   let hc : IsLimit c := S.toLightDiagram.isLimit
   exact liftedLimitMapsToOriginal_inv_map_π hc _
@@ -76,7 +77,7 @@ lemma proj_surjective (n : ℕ) : Function.Surjective (S.proj n) := by
 
 abbrev component (n : ℕ) : LightProfinite := S.diagram.obj ⟨n⟩
 
-abbrev transitionMap (n : ℕ) : S.component (n + 1) ⟶ S.component n :=
+abbrev transitionMap (n : ℕ) :  S.component (n+1) ⟶ S.component n :=
   S.diagram.map ⟨homOfLE (Nat.le_succ _)⟩
 
 abbrev transitionMapLE {n m : ℕ} (h : n ≤ m) : S.component m ⟶ S.component n :=
@@ -95,7 +96,7 @@ lemma proj_comp_transitionMapLE {n m : ℕ} (h : n ≤ m) :
   S.asLimitCone.w (homOfLE h).op
 
 lemma proj_comp_transitionMapLE' {n m : ℕ} (h : n ≤ m) :
-    S.transitionMapLE h ∘ S.proj m = S.proj n := by
+    S.transitionMapLE h ∘ S.proj m  = S.proj n := by
   rw [← S.proj_comp_transitionMapLE h]
   rfl
 

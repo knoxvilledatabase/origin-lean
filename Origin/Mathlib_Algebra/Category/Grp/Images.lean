@@ -3,12 +3,14 @@ Extracted from Algebra/Category/Grp/Images.lean
 Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Category.Grp.Abelian
+import Mathlib.CategoryTheory.Limits.Shapes.Images
 
 /-!
 # The category of commutative additive groups has images.
 
 Note that we don't need to register any of the constructions here as instances, because we get them
-from the fact that `AddCommGrpCat` is an abelian category.
+from the fact that `AddCommGrp` is an abelian category.
 -/
 
 open CategoryTheory
@@ -17,22 +19,25 @@ open CategoryTheory.Limits
 
 universe u
 
-namespace AddCommGrpCat
+namespace AddCommGrp
 
-variable {G H : AddCommGrpCat.{0}} (f : G ⟶ H)
+variable {G H : AddCommGrp.{0}} (f : G ⟶ H)
 
-attribute [local ext] Subtype.ext
+attribute [local ext] Subtype.ext_val
 
-def image : AddCommGrpCat :=
-  AddCommGrpCat.of (AddMonoidHom.range f.hom)
+section
+
+def image : AddCommGrp :=
+  AddCommGrp.of (AddMonoidHom.range f)
 
 def image.ι : image f ⟶ H :=
-  ofHom f.hom.range.subtype
+  f.range.subtype
 
--- INSTANCE (free from Core): :
+instance : Mono (image.ι f) :=
+  ConcreteCategory.mono_of_injective (image.ι f) Subtype.val_injective
 
 def factorThruImage : G ⟶ image f :=
-  ofHom f.hom.rangeRestrict
+  f.rangeRestrict
 
 theorem image.fac : factorThruImage f ≫ image.ι f = f := by
   ext
@@ -42,26 +47,25 @@ attribute [local simp] image.fac
 
 variable {f}
 
-noncomputable def image.lift (F' : MonoFactorisation f) : image f ⟶ F'.I :=
-  ofHom
-  { toFun := (fun x => F'.e (Classical.indefiniteDescription _ x.2).1 : image f → F'.I)
-    map_zero' := by
-      haveI := F'.m_mono
-      apply injective_of_mono F'.m
-      change (F'.e ≫ F'.m) _ = _
-      rw [F'.fac, map_zero]
-      exact (Classical.indefiniteDescription (fun y => f y = 0) _).2
-    map_add' := by
-      intro x y
-      haveI := F'.m_mono
-      apply injective_of_mono F'.m
-      rw [map_add]
-      change (F'.e ≫ F'.m) _ = (F'.e ≫ F'.m) _ + (F'.e ≫ F'.m) _
-      rw [F'.fac]
-      rw [(Classical.indefiniteDescription (fun z => f z = _) _).2]
-      rw [(Classical.indefiniteDescription (fun z => f z = _) _).2]
-      rw [(Classical.indefiniteDescription (fun z => f z = _) _).2]
-      rfl }
+noncomputable def image.lift (F' : MonoFactorisation f) : image f ⟶ F'.I where
+  toFun := (fun x => F'.e (Classical.indefiniteDescription _ x.2).1 : image f → F'.I)
+  map_zero' := by
+    haveI := F'.m_mono
+    apply injective_of_mono F'.m
+    change (F'.e ≫ F'.m) _ = _
+    rw [F'.fac, AddMonoidHom.map_zero]
+    exact (Classical.indefiniteDescription (fun y => f y = 0) _).2
+  map_add' := by
+    intro x y
+    haveI := F'.m_mono
+    apply injective_of_mono F'.m
+    rw [AddMonoidHom.map_add]
+    change (F'.e ≫ F'.m) _ = (F'.e ≫ F'.m) _ + (F'.e ≫ F'.m) _
+    rw [F'.fac]
+    rw [(Classical.indefiniteDescription (fun z => f z = _) _).2]
+    rw [(Classical.indefiniteDescription (fun z => f z = _) _).2]
+    rw [(Classical.indefiniteDescription (fun z => f z = _) _).2]
+    rfl
 
 theorem image.lift_fac (F' : MonoFactorisation f) : image.lift F' ≫ F'.m = image.ι f := by
   ext x
@@ -80,8 +84,8 @@ noncomputable def isImage : IsImage (monoFactorisation f) where
   lift := image.lift
   lift_fac := image.lift_fac
 
-noncomputable def imageIsoRange {G H : AddCommGrpCat.{0}} (f : G ⟶ H) :
-    Limits.image f ≅ AddCommGrpCat.of f.hom.range :=
+noncomputable def imageIsoRange {G H : AddCommGrp.{0}} (f : G ⟶ H) :
+    Limits.image f ≅ AddCommGrp.of f.range :=
   IsImage.isoExt (Image.isImage f) (isImage f)
 
-end AddCommGrpCat
+end AddCommGrp

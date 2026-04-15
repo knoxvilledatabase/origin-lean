@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/GradedObject/Single.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.GradedObject
 
 /-!
 # The graded object in a single degree
@@ -19,7 +20,7 @@ open Limits
 
 namespace GradedObject
 
-variable {J : Type*} {C : Type*} [Category* C] [HasInitial C] [DecidableEq J]
+variable {J : Type*} {C : Type*} [Category C] [HasInitial C] [DecidableEq J]
 
 noncomputable def single (j : J) : C ⥤ GradedObject J C where
   obj X i := if i = j then X else ⊥_ C
@@ -54,3 +55,23 @@ lemma single_map_singleObjApplyIsoOfEq_hom (j : J) {X Y : C} (f : X ⟶ Y) (i : 
       (singleObjApplyIsoOfEq j X i h).hom ≫ f := by
   subst h
   simp [singleObjApplyIsoOfEq, single]
+
+@[reassoc (attr := simp)]
+lemma singleObjApplyIso_inv_single_map (j : J) {X Y : C} (f : X ⟶ Y) :
+    (singleObjApplyIso j X).inv ≫ (single j).map f j = f ≫ (singleObjApplyIso j Y).inv := by
+  apply singleObjApplyIsoOfEq_inv_single_map
+
+@[reassoc (attr := simp)]
+lemma single_map_singleObjApplyIso_hom (j : J) {X Y : C} (f : X ⟶ Y) :
+    (single j).map f j ≫ (singleObjApplyIso j Y).hom = (singleObjApplyIso j X).hom ≫ f := by
+  apply single_map_singleObjApplyIsoOfEq_hom
+
+variable (C) in
+
+@[simps!]
+noncomputable def singleCompEval (j : J) : single j ⋙ eval j ≅ 𝟭 C :=
+  NatIso.ofComponents (singleObjApplyIso j) (by aesop_cat)
+
+end GradedObject
+
+end CategoryTheory

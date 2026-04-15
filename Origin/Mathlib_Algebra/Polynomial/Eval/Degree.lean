@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/Polynomial/Eval/Degree.lean
-Genuine: 5 of 6 | Dissolved: 1 | Infrastructure: 0
+Genuine: 14 of 21 | Dissolved: 7 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.Degree.Support
+import Mathlib.Algebra.Polynomial.Degree.Units
+import Mathlib.Algebra.Polynomial.Eval.Coeff
 
 /-!
 # Evaluation of polynomials and degrees
@@ -28,6 +31,8 @@ section Semiring
 variable [Semiring R] {p q r : R[X]}
 
 section Eval₂
+
+section
 
 variable [Semiring S] (f : R →+* S) (x : S)
 
@@ -63,11 +68,19 @@ theorem eval_monomial_one_add_sub [CommRing S] (d : ℕ) (y : S) :
       ∑ x_1 ∈ range (d + 1), ↑((d + 1).choose x_1) * (↑x_1 * y ^ (x_1 - 1)) := by
   have cast_succ : (d + 1 : S) = ((d.succ : ℕ) : S) := by simp only [Nat.cast_succ]
   rw [cast_succ, eval_monomial, eval_monomial, add_comm, add_pow]
-  simp only [one_pow, mul_one, mul_comm (y ^ _) (d.choose _)]
+  -- Porting note: `apply_congr` hadn't been ported yet, so `congr` & `ext` is used.
+  conv_lhs =>
+    congr
+    · congr
+      · skip
+      · congr
+        · skip
+        · ext
+          rw [one_pow, mul_one, mul_comm]
   rw [sum_range_succ, mul_add, Nat.choose_self, Nat.cast_one, one_mul, add_sub_cancel_right,
     mul_sum, sum_range_succ', Nat.cast_zero, zero_mul, mul_zero, add_zero]
   refine sum_congr rfl fun y _hy => ?_
-  rw [← mul_assoc, ← mul_assoc, ← Nat.cast_mul, Nat.add_one_mul_choose_eq, Nat.cast_mul,
+  rw [← mul_assoc, ← mul_assoc, ← Nat.cast_mul, Nat.succ_mul_choose_eq, Nat.cast_mul,
     Nat.add_sub_cancel]
 
 end Eval
@@ -75,3 +88,114 @@ end Eval
 section Comp
 
 -- DISSOLVED: coeff_comp_degree_mul_degree
+
+end Comp
+
+section Map
+
+variable [Semiring S] {f : R →+* S} {p : R[X]}
+
+variable (f) in
+
+@[simps!]
+def mapEquiv (e : R ≃+* S) : R[X] ≃+* S[X] :=
+  RingEquiv.ofHomInv (mapRingHom (e : R →+* S)) (mapRingHom (e.symm : S →+* R)) (by ext; simp)
+    (by ext; simp)
+
+theorem map_monic_eq_zero_iff (hp : p.Monic) : p.map f = 0 ↔ ∀ x, f x = 0 :=
+  ⟨fun hfp x =>
+    calc
+      f x = f x * f p.leadingCoeff := by simp only [mul_one, hp.leadingCoeff, f.map_one]
+      _ = f x * (p.map f).coeff p.natDegree := congr_arg _ (coeff_map _ _).symm
+      _ = 0 := by simp only [hfp, mul_zero, coeff_zero]
+      ,
+    fun h => ext fun n => by simp only [h, coeff_map, coeff_zero]⟩
+
+-- DISSOLVED: map_monic_ne_zero
+
+lemma degree_map_le : degree (p.map f) ≤ degree p := by
+  refine (degree_le_iff_coeff_zero _ _).2 fun m hm => ?_
+  rw [degree_lt_iff_coeff_zero] at hm
+  simp [hm m le_rfl]
+
+lemma natDegree_map_le : natDegree (p.map f) ≤ natDegree p := natDegree_le_natDegree degree_map_le
+
+-- DISSOLVED: degree_map_lt
+
+-- DISSOLVED: natDegree_map_lt
+
+lemma natDegree_map_lt' (hp : f p.leadingCoeff = 0) (hp₀ : 0 < natDegree p) :
+    (p.map f).natDegree < p.natDegree := by
+  by_cases H : map f p = 0
+  · rwa [H, natDegree_zero]
+  · exact natDegree_map_lt hp H
+
+-- DISSOLVED: degree_map_eq_of_leadingCoeff_ne_zero
+
+-- DISSOLVED: natDegree_map_of_leadingCoeff_ne_zero
+
+-- DISSOLVED: leadingCoeff_map_of_leadingCoeff_ne_zero
+
+end Map
+
+end Semiring
+
+section CommSemiring
+
+section Eval
+
+section
+
+variable [Semiring R] {p q : R[X]} {x : R} [CommSemiring S] (f : R →+* S)
+
+theorem eval₂_comp {x : S} : eval₂ f x (p.comp q) = eval₂ f (eval₂ f x q) p := by
+  rw [comp, p.as_sum_range]; simp [eval₂_finset_sum, eval₂_pow]
+
+@[simp]
+theorem iterate_comp_eval₂ (k : ℕ) (t : S) :
+    eval₂ f t (p.comp^[k] q) = (fun x => eval₂ f x p)^[k] (eval₂ f t q) := by
+  induction k with
+  | zero => simp
+  | succ k IH => rw [Function.iterate_succ_apply', Function.iterate_succ_apply', eval₂_comp, IH]
+
+end
+
+section
+
+variable [CommSemiring R] {p q : R[X]} {x : R} [CommSemiring S] (f : R →+* S)
+
+@[simp]
+theorem iterate_comp_eval :
+    ∀ (k : ℕ) (t : R), (p.comp^[k] q).eval t = (fun x => p.eval x)^[k] (q.eval t) :=
+  iterate_comp_eval₂ _
+
+end
+
+end Eval
+
+end CommSemiring
+
+section
+
+variable [Semiring R] [CommRing S] [IsDomain S] (φ : R →+* S) {f : R[X]}
+
+lemma isUnit_of_isUnit_leadingCoeff_of_isUnit_map (hf : IsUnit f.leadingCoeff)
+    (H : IsUnit (map φ f)) : IsUnit f := by
+  have dz := degree_eq_zero_of_isUnit H
+  rw [degree_map_eq_of_leadingCoeff_ne_zero] at dz
+  · rw [eq_C_of_degree_eq_zero dz]
+    refine IsUnit.map C ?_
+    convert hf
+    change coeff f 0 = coeff f (natDegree f)
+    rw [(degree_eq_iff_natDegree_eq _).1 dz]
+    · rfl
+    rintro rfl
+    simp at H
+  · intro h
+    have u : IsUnit (φ f.leadingCoeff) := IsUnit.map φ hf
+    rw [h] at u
+    simp at u
+
+end
+
+end Polynomial

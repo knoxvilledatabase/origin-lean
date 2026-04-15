@@ -3,6 +3,8 @@ Extracted from RingTheory/Congruence/BigOperators.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.GroupTheory.Congruence.BigOperators
+import Mathlib.RingTheory.Congruence.Defs
 
 /-!
 # Interactions between `∑, ∏` and `RingCon`

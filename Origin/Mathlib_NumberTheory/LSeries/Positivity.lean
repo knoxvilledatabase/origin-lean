@@ -3,6 +3,10 @@ Extracted from NumberTheory/LSeries/Positivity.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.TaylorSeries
+import Mathlib.Analysis.Complex.Positivity
+import Mathlib.NumberTheory.ArithmeticFunction
+import Mathlib.NumberTheory.LSeries.Deriv
 
 /-!
 # Positivity of values of L-series
@@ -13,7 +17,7 @@ The main results of this file are as follows.
   when `x : ℝ` is in the open half-plane of absolute convergence; see
   `LSeries.positive` and `ArithmeticFunction.LSeries_positive`.
 
-* If in addition the L-series of `a` agrees on some open right half-plane where it
+* If in addition the L_series of `a` agrees on some open right half-plane where it
   converges with an entire function `f`, then `f` is positive on the real axis;
   see `LSeries.positive_of_eq_differentiable` and
   `ArithmeticFunction.LSeries_positive_of_eq_differentiable`.
@@ -45,7 +49,7 @@ lemma iteratedDeriv_alternating {a : ℕ → ℂ} (hn : 0 ≤ a) {x : ℝ}
 lemma positive {a : ℕ → ℂ} (ha₀ : 0 ≤ a) (ha₁ : 0 < a 1) {x : ℝ} (hx : abscissaOfAbsConv a < x) :
     0 < LSeries a x := by
   rw [LSeries]
-  refine Summable.tsum_pos ?_ (fun n ↦ term_nonneg (ha₀ n) x) 1 <| term_pos one_ne_zero ha₁ x
+  refine tsum_pos ?_ (fun n ↦ term_nonneg (ha₀ n) x) 1 <| term_pos one_ne_zero ha₁ x
   exact LSeriesSummable_of_abscissaOfAbsConv_lt_re <| by simpa only [ofReal_re] using hx
 
 lemma positive_of_differentiable_of_eqOn {a : ℕ → ℂ} (ha₀ : 0 ≤ a) (ha₁ : 0 < a 1) {f : ℂ → ℂ}

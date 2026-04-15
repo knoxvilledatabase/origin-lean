@@ -1,8 +1,10 @@
 /-
 Extracted from Data/PFunctor/Multivariate/M.lean
-Genuine: 22 of 27 | Dissolved: 0 | Infrastructure: 5
+Genuine: 23 of 27 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Data.PFunctor.Multivariate.Basic
+import Mathlib.Data.PFunctor.Univariate.M
 
 /-!
 # The M construction as a multivariate polynomial functor.
@@ -12,23 +14,23 @@ as the greatest fixpoint of a polynomial functor.
 
 ## Main definitions
 
-* `M.mk`     - constructor
-* `M.dest`   - destructor
-* `M.corec`  - corecursor: useful for formulating infinite, productive computations
-* `M.bisim`  - bisimulation: proof technique to show the equality of infinite objects
+ * `M.mk`     - constructor
+ * `M.dest`   - destructor
+ * `M.corec`  - corecursor: useful for formulating infinite, productive computations
+ * `M.bisim`  - bisimulation: proof technique to show the equality of infinite objects
 
 ## Implementation notes
 
 Dual view of M-types:
 
-* `mp`: polynomial functor
-* `M`: greatest fixed point of a polynomial functor
+ * `mp`: polynomial functor
+ * `M`: greatest fixed point of a polynomial functor
 
 Specifically, we define the polynomial functor `mp` as:
 
-* A := a possibly infinite tree-like structure without information in the nodes
-* B := given the tree-like structure `t`, `B t` is a valid path
-  from the root of `t` to any given node.
+ * A := a possibly infinite tree-like structure without information in the nodes
+ * B := given the tree-like structure `t`, `B t` is a valid path
+   from the root of `t` to any given node.
 
 As a result `mp α` is made of a dataless tree and a function from
 its valid paths to values of `α`
@@ -38,11 +40,11 @@ that `A` is a possibly infinite tree.
 
 ## Reference
 
-* Jeremy Avigad, Mario M. Carneiro and Simon Hudon.
-  [*Data Types as Quotients of Polynomial Functors*][avigad-carneiro-hudon2019]
+ * Jeremy Avigad, Mario M. Carneiro and Simon Hudon.
+   [*Data Types as Quotients of Polynomial Functors*][avigad-carneiro-hudon2019]
 -/
 
-universe u v
+universe u
 
 open MvFunctor
 
@@ -67,7 +69,16 @@ inductive M.Path : P.last.M → Fin2 n → Type u
           (i : Fin2 n)
           (c : M.Path (f j) i) : M.Path x i
 
--- INSTANCE (free from Core): M.Path.inhabited
+instance M.Path.inhabited (x : P.last.M) {i} [Inhabited (P.drop.B x.head i)] :
+    Inhabited (M.Path P x i) :=
+  let a := PFunctor.M.head x
+  let f := PFunctor.M.children x
+  ⟨M.Path.root _ a f
+      (PFunctor.M.casesOn' x
+        (r := fun _ => PFunctor.M.dest x = ⟨a, f⟩)
+        <| by
+        intros; simp [a, PFunctor.M.dest_mk, PFunctor.M.children_mk]; rfl)
+      _ default⟩
 
 def mp : MvPFunctor n where
   A := P.last.M
@@ -76,11 +87,13 @@ def mp : MvPFunctor n where
 def M (α : TypeVec n) : Type _ :=
   P.mp α
 
--- INSTANCE (free from Core): mvfunctorM
+instance mvfunctorM : MvFunctor P.M := by delta M; infer_instance
 
--- INSTANCE (free from Core): inhabitedM
+instance inhabitedM {α : TypeVec _} [I : Inhabited P.A] [∀ i : Fin2 n, Inhabited (α i)] :
+    Inhabited (P.M α) :=
+  @Obj.inhabited _ (mp P) _ (@PFunctor.M.inhabited P.last I) _
 
-def M.corecShape {β : Type v} (g₀ : β → P.A) (g₂ : ∀ b : β, P.last.B (g₀ b) → β) :
+def M.corecShape {β : Type u} (g₀ : β → P.A) (g₂ : ∀ b : β, P.last.B (g₀ b) → β) :
     β → P.last.M :=
   PFunctor.M.corec fun b => ⟨g₀ b, g₂ b⟩
 
@@ -89,7 +102,7 @@ def castDropB {a a' : P.A} (h : a = a') : P.drop.B a ⟹ P.drop.B a' := fun _i b
 def castLastB {a a' : P.A} (h : a = a') : P.last.B a → P.last.B a' := fun b => Eq.recOn h b
 
 def M.corecContents {α : TypeVec.{u} n}
-    {β : Type v}
+    {β : Type u}
     (g₀ : β → P.A)
     (g₁ : ∀ b : β, P.drop.B (g₀ b) ⟹ α)
     (g₂ : ∀ b : β, P.last.B (g₀ b) → β)
@@ -114,7 +127,7 @@ def M.corecContents {α : TypeVec.{u} n}
       rfl
     M.corecContents g₀ g₁ g₂ (f j) (g₂ b (P.castLastB h₀ j)) h₁ i c
 
-def M.corec' {α : TypeVec n} {β : Type v} (g₀ : β → P.A) (g₁ : ∀ b : β, P.drop.B (g₀ b) ⟹ α)
+def M.corec' {α : TypeVec n} {β : Type u} (g₀ : β → P.A) (g₁ : ∀ b : β, P.drop.B (g₀ b) ⟹ α)
     (g₂ : ∀ b : β, P.last.B (g₀ b) → β) : β → P.M α := fun b =>
   ⟨M.corecShape P g₀ g₂ b, M.corecContents P g₀ g₁ g₂ _ _ rfl⟩
 
@@ -149,11 +162,16 @@ theorem M.dest_eq_dest' {α : TypeVec n} {x : P.last.M} {a : P.A}
     M.dest P ⟨x, f'⟩ = M.dest' P h f' :=
   M.dest'_eq_dest' _ _ _ _
 
+theorem M.dest_corec' {α : TypeVec.{u} n} {β : Type u} (g₀ : β → P.A)
+    (g₁ : ∀ b : β, P.drop.B (g₀ b) ⟹ α) (g₂ : ∀ b : β, P.last.B (g₀ b) → β) (x : β) :
+    M.dest P (M.corec' P g₀ g₁ g₂ x) = ⟨g₀ x, splitFun (g₁ x) (M.corec' P g₀ g₁ g₂ ∘ g₂ x)⟩ :=
+  rfl
+
 theorem M.dest_corec {α : TypeVec n} {β : Type u} (g : β → P (α.append1 β)) (x : β) :
     M.dest P (M.corec P g x) = appendFun id (M.corec P g) <$$> g x := by
   trans
   · apply M.dest_corec'
-  obtain ⟨a, f⟩ := g x; dsimp
+  cases' g x with a f; dsimp
   rw [MvPFunctor.map_eq]; congr
   conv_rhs => rw [← split_dropFun_lastFun f, appendFun_comp_splitFun]
   rfl
@@ -161,7 +179,7 @@ theorem M.dest_corec {α : TypeVec n} {β : Type u} (g : β → P (α.append1 β
 theorem M.bisim_lemma {α : TypeVec n} {a₁ : (mp P).A} {f₁ : (mp P).B a₁ ⟹ α} {a' : P.A}
     {f' : (P.B a').drop ⟹ α} {f₁' : (P.B a').last → M P α}
     (e₁ : M.dest P ⟨a₁, f₁⟩ = ⟨a', splitFun f' f₁'⟩) :
-    ∃ (g₁' : _) (e₁' : PFunctor.M.dest a₁ = ⟨a', g₁'⟩),
+    ∃ (g₁' : _)(e₁' : PFunctor.M.dest a₁ = ⟨a', g₁'⟩),
       f' = M.pathDestLeft P e₁' f₁ ∧
         f₁' = fun x : (last P).B a' => ⟨g₁' x, M.pathDestRight P e₁' f₁ x⟩ := by
   generalize ef : @splitFun n _ (append1 α (M P α)) f' f₁' = ff at e₁
@@ -169,6 +187,39 @@ theorem M.bisim_lemma {α : TypeVec n} {a₁ : (mp P).A} {f₁ : (mp P).B a₁ �
   rcases e₁' : he₁' with ⟨a₁', g₁'⟩
   rw [M.dest_eq_dest' _ e₁'] at e₁
   cases e₁; exact ⟨_, e₁', splitFun_inj ef⟩
+
+theorem M.bisim {α : TypeVec n} (R : P.M α → P.M α → Prop)
+    (h :
+      ∀ x y,
+        R x y →
+          ∃ a f f₁ f₂,
+            M.dest P x = ⟨a, splitFun f f₁⟩ ∧
+              M.dest P y = ⟨a, splitFun f f₂⟩ ∧ ∀ i, R (f₁ i) (f₂ i))
+    (x y) (r : R x y) : x = y := by
+  cases' x with a₁ f₁
+  cases' y with a₂ f₂
+  dsimp [mp] at *
+  have : a₁ = a₂ := by
+    refine
+      PFunctor.M.bisim (fun a₁ a₂ => ∃ x y, R x y ∧ x.1 = a₁ ∧ y.1 = a₂) ?_ _ _
+        ⟨⟨a₁, f₁⟩, ⟨a₂, f₂⟩, r, rfl, rfl⟩
+    rintro _ _ ⟨⟨a₁, f₁⟩, ⟨a₂, f₂⟩, r, rfl, rfl⟩
+    rcases h _ _ r with ⟨a', f', f₁', f₂', e₁, e₂, h'⟩
+    rcases M.bisim_lemma P e₁ with ⟨g₁', e₁', rfl, rfl⟩
+    rcases M.bisim_lemma P e₂ with ⟨g₂', e₂', _, rfl⟩
+    rw [e₁', e₂']
+    exact ⟨_, _, _, rfl, rfl, fun b => ⟨_, _, h' b, rfl, rfl⟩⟩
+  subst this
+  congr with (i p)
+  induction' p with x a f h' i c x a f h' i c p IH <;>
+    try
+      rcases h _ _ r with ⟨a', f', f₁', f₂', e₁, e₂, h''⟩
+      rcases M.bisim_lemma P e₁ with ⟨g₁', e₁', rfl, rfl⟩
+      rcases M.bisim_lemma P e₂ with ⟨g₂', e₂', e₃, rfl⟩
+      cases h'.symm.trans e₁'
+      cases h'.symm.trans e₂'
+  · exact (congr_fun (congr_fun e₃ i) c : _)
+  · exact IH _ _ (h'' _)
 
 theorem M.bisim₀ {α : TypeVec n} (R : P.M α → P.M α → Prop) (h₀ : Equivalence R)
     (h : ∀ x y, R x y → (id ::: Quot.mk R) <$$> M.dest _ x = (id ::: Quot.mk R) <$$> M.dest _ y)
@@ -178,14 +229,16 @@ theorem M.bisim₀ {α : TypeVec n} (R : P.M α → P.M α → Prop) (h₀ : Equ
   introv Hr
   specialize h _ _ Hr
   clear Hr
+
   revert h
   rcases M.dest P x with ⟨ax, fx⟩
   rcases M.dest P y with ⟨ay, fy⟩
   intro h
+
   rw [map_eq, map_eq] at h
   injection h with h₀ h₁
   subst ay
-  simp only [heq_eq_eq] at h₁
+  simp? at h₁ says simp only [heq_eq_eq] at h₁
   have Hdrop : dropFun fx = dropFun fy := by
     replace h₁ := congr_arg dropFun h₁
     simpa using h₁
@@ -211,20 +264,16 @@ theorem M.bisim' {α : TypeVec n} (R : P.M α → P.M α → Prop)
     induction Hr
     · rw [← Quot.factor_mk_eq R (Relation.EqvGen R) this]
       rwa [appendFun_comp_id, ← MvFunctor.map_map, ← MvFunctor.map_map, h]
-    all_goals simp_all
-
-set_option backward.isDefEq.respectTransparency false in
+    all_goals aesop
 
 theorem M.dest_map {α β : TypeVec n} (g : α ⟹ β) (x : P.M α) :
     M.dest P (g <$$> x) = (appendFun g fun x => g <$$> x) <$$> M.dest P x := by
-  obtain ⟨a, f⟩ := x
+  cases' x with a f
   rw [map_eq]
   conv =>
     rhs
     rw [M.dest, M.dest', map_eq, appendFun_comp_splitFun]
   rfl
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem M.map_dest {α β : TypeVec n} (g : (α ::: P.M α) ⟹ (β ::: P.M β)) (x : P.M α)
     (h : ∀ x : P.M α, lastFun g x = (dropFun g <$$> x : P.M β)) :

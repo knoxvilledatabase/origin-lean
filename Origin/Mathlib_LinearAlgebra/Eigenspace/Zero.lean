@@ -1,8 +1,13 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Zero.lean
-Genuine: 7 of 11 | Dissolved: 3 | Infrastructure: 1
+Genuine: 4 of 8 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Charpoly.ToMatrix
+import Mathlib.LinearAlgebra.Determinant
+import Mathlib.LinearAlgebra.Eigenspace.Minpoly
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
+import Mathlib.RingTheory.Artinian
 
 /-!
 # Results on the eigenvalue 0
@@ -49,6 +54,31 @@ lemma isNilpotent_iff_charpoly (φ : End R M) :
 
 open Module.Free in
 
+lemma charpoly_nilpotent_tfae [IsNoetherian R M] (φ : Module.End R M) :
+    List.TFAE [
+      IsNilpotent φ,
+      φ.charpoly = X ^ finrank R M,
+      ∀ m : M, ∃ (n : ℕ), (φ ^ n) m = 0,
+      natTrailingDegree φ.charpoly = finrank R M ] := by
+  tfae_have 1 → 2 := IsNilpotent.charpoly_eq_X_pow_finrank
+  tfae_have 2 → 3
+  | h, m => by
+    use finrank R M
+    suffices φ ^ finrank R M = 0 by simp only [this, LinearMap.zero_apply]
+    simpa only [h, map_pow, aeval_X] using φ.aeval_self_charpoly
+  tfae_have 3 → 1
+  | h => by
+    obtain ⟨n, hn⟩ := Filter.eventually_atTop.mp <| φ.eventually_iSup_ker_pow_eq
+    use n
+    ext x
+    rw [zero_apply, ← mem_ker, ← hn n le_rfl]
+    obtain ⟨k, hk⟩ := h x
+    rw [← mem_ker] at hk
+    exact Submodule.mem_iSup_of_mem _ hk
+  tfae_have 2 ↔ 4 := by
+    rw [← φ.charpoly_natDegree, φ.charpoly_monic.eq_X_pow_iff_natTrailingDegree_eq_natDegree]
+  tfae_finish
+
 lemma charpoly_eq_X_pow_iff [IsNoetherian R M] (φ : Module.End R M) :
     φ.charpoly = X ^ finrank R M ↔ ∀ m : M, ∃ (n : ℕ), (φ ^ n) m = 0 :=
   (charpoly_nilpotent_tfae φ).out 1 2
@@ -65,7 +95,7 @@ open Module.Free in
 
 open Module.Free in
 
-lemma finrank_maxGenEigenspace_zero_eq (φ : Module.End K M) :
+lemma finrank_maxGenEigenspace (φ : Module.End K M) :
     finrank K (φ.maxGenEigenspace 0) = natTrailingDegree (φ.charpoly) := by
   set V := φ.maxGenEigenspace 0
   have hV : V = ⨆ (n : ℕ), ker (φ ^ n) := by
@@ -79,13 +109,13 @@ lemma finrank_maxGenEigenspace_zero_eq (φ : Module.End K M) :
       forall_exists_index]
     intro x n hx
     use n
-    rw [← Module.End.mul_apply, ← pow_succ, pow_succ', Module.End.mul_apply, hx, map_zero]
+    rw [← LinearMap.mul_apply, ← pow_succ, pow_succ', LinearMap.mul_apply, hx, map_zero]
   have hφW : ∀ x ∈ W, φ x ∈ W := by
     simp only [W, Submodule.mem_iInf, mem_range]
     intro x H n
     obtain ⟨y, rfl⟩ := H n
     use φ y
-    rw [← Module.End.mul_apply, ← pow_succ, pow_succ', Module.End.mul_apply]
+    rw [← LinearMap.mul_apply, ← pow_succ, pow_succ', LinearMap.mul_apply]
   let F := φ.restrict hφV
   let G := φ.restrict hφW
   let ψ := F.prodMap G
@@ -124,19 +154,8 @@ lemma finrank_maxGenEigenspace_zero_eq (φ : Module.End K M) :
   refine .trans ?_ hx
   generalize_proofs h'
   clear hx
-  induction n <;> simp [pow_succ', *]
-
-lemma finrank_maxGenEigenspace_eq (φ : Module.End K M) (μ : K) :
-    finrank K (φ.maxGenEigenspace μ) = φ.charpoly.rootMultiplicity μ := by
-  rw [φ.maxGenEigenspace_eq_maxGenEigenspace_zero, finrank_maxGenEigenspace_zero_eq,
-    Polynomial.rootMultiplicity_eq_natTrailingDegree, LinearMap.charpoly_sub_smul]
-
-lemma finrank_genEigenspace_le (φ : Module.End K M) (μ : K) (k : ℕ) :
-    finrank K (φ.genEigenspace μ k) ≤ φ.charpoly.rootMultiplicity μ := by
-  grw [Submodule.finrank_mono (φ.genEigenspace_le_maximal μ k), finrank_maxGenEigenspace_eq]
-
-lemma finrank_eigenspace_le (φ : Module.End K M) (μ : K) :
-    finrank K (φ.eigenspace μ) ≤ φ.charpoly.rootMultiplicity μ :=
-  finrank_genEigenspace_le ..
+  induction n with
+  | zero => simp only [pow_zero, one_apply]
+  | succ n ih => simp only [pow_succ', LinearMap.mul_apply, ih, restrict_apply]
 
 end LinearMap

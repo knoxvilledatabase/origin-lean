@@ -3,18 +3,22 @@ Extracted from Geometry/Manifold/IntegralCurve/ExistUnique.lean
 Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.ODE.Gronwall
+import Mathlib.Analysis.ODE.PicardLindelof
+import Mathlib.Geometry.Manifold.IntegralCurve.Transform
+import Mathlib.Geometry.Manifold.InteriorBoundary
 
 /-!
 # Existence and uniqueness of integral curves
 
 ## Main results
 
-* `exists_isMIntegralCurveAt_of_contMDiffAt_boundaryless`: Existence of local integral curves for a
-  $C^1$ vector field. This follows from the existence theorem for solutions to ODEs
-  (`exists_forall_hasDerivAt_Ioo_eq_of_contDiffAt`).
-* `isMIntegralCurveOn_Ioo_eqOn_of_contMDiff_boundaryless`: Uniqueness of local integral curves for a
-  $C^1$ vector field. This follows from the uniqueness theorem for solutions to ODEs
-  (`ODE_solution_unique_of_mem_set_Ioo`). This requires the manifold to be Hausdorff (`T2Space`).
+* `exists_isIntegralCurveAt_of_contMDiffAt_boundaryless`: Existence of local integral curves for a
+$C^1$ vector field. This follows from the existence theorem for solutions to ODEs
+(`exists_forall_hasDerivAt_Ioo_eq_of_contDiffAt`).
+* `isIntegralCurveOn_Ioo_eqOn_of_contMDiff_boundaryless`: Uniqueness of local integral curves for a
+$C^1$ vector field. This follows from the uniqueness theorem for solutions to ODEs
+(`ODE_solution_unique_of_mem_set_Ioo`). This requires the manifold to be Hausdorff (`T2Space`).
 
 ## Implementation notes
 
@@ -27,7 +31,7 @@ We state simpler versions of the theorem for boundaryless manifolds as corollari
 ## TODO
 
 * The case where the integral curve may venture to the boundary of the manifold. See Theorem 9.34,
-  Lee. May require submanifolds.
+Lee. May require submanifolds.
 
 ## Reference
 
@@ -40,24 +44,24 @@ integral curve, vector field, local existence, uniqueness
 
 open scoped Topology
 
-open Function Manifold Set
+open Function Set
 
 variable
   {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
   {H : Type*} [TopologicalSpace H] {I : ModelWithCorners ℝ E H}
-  {M : Type*} [TopologicalSpace M] [ChartedSpace H M] [IsManifold I 1 M]
+  {M : Type*} [TopologicalSpace M] [ChartedSpace H M] [SmoothManifoldWithCorners I M]
   {γ γ' : ℝ → M} {v : (x : M) → TangentSpace I x} {s s' : Set ℝ} (t₀ : ℝ) {x₀ : M}
 
-theorem exists_isMIntegralCurveAt_of_contMDiffAt [CompleteSpace E]
-    (hv : CMDiffAt 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) x₀)
+theorem exists_isIntegralCurveAt_of_contMDiffAt [CompleteSpace E]
+    (hv : ContMDiffAt I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) x₀)
     (hx : I.IsInteriorPoint x₀) :
-    ∃ γ : ℝ → M, γ t₀ = x₀ ∧ IsMIntegralCurveAt γ v t₀ := by
+    ∃ γ : ℝ → M, γ t₀ = x₀ ∧ IsIntegralCurveAt γ v t₀ := by
   -- express the differentiability of the vector field `v` in the local chart
   rw [contMDiffAt_iff] at hv
   obtain ⟨_, hv⟩ := hv
   -- use Picard-Lindelöf theorem to extract a solution to the ODE in the local chart
-  obtain ⟨f, hf1, hf2⟩ := hv.contDiffAt (range_mem_nhds_isInteriorPoint hx)
-    |>.snd.exists_forall_mem_closedBall_exists_eq_forall_mem_Ioo_hasDerivAt₀ t₀
+  obtain ⟨f, hf1, hf2⟩ := exists_forall_hasDerivAt_Ioo_eq_of_contDiffAt t₀
+    (hv.contDiffAt (range_mem_nhds_isInteriorPoint hx)).snd
   simp_rw [← Real.ball_eq_Ioo, ← Metric.eventually_nhds_iff_ball] at hf2
   -- use continuity of `f` so that `f t` remains inside `interior (extChartAt I x₀).target`
   have ⟨a, ha, hf2'⟩ := Metric.eventually_nhds_iff_ball.mp hf2
@@ -71,8 +75,8 @@ theorem exists_isMIntegralCurveAt_of_contMDiffAt [CompleteSpace E]
   -- prove that `γ := (extChartAt I x₀).symm ∘ f` is a desired integral curve
   refine ⟨(extChartAt I x₀).symm ∘ f,
     Eq.symm (by rw [Function.comp_apply, hf1, PartialEquiv.left_inv _ (mem_extChartAt_source ..)]),
-    isMIntegralCurveAt_iff.mpr ⟨s, hs, ?_⟩⟩
-  intro t ht
+    isIntegralCurveAt_iff.mpr ⟨s, hs, ?_⟩⟩
+  intros t ht
   -- collect useful terms in convenient forms
   let xₜ : M := (extChartAt I x₀).symm (f t) -- `xₜ := γ t`
   have h : HasDerivAt f (x := t) <| fderivWithin ℝ (extChartAt I x₀ ∘ (extChartAt I xₜ).symm)
@@ -84,11 +88,10 @@ theorem exists_isMIntegralCurveAt_of_contMDiffAt [CompleteSpace E]
     mem_of_mem_of_subset hf3' (extChartAt I x₀).target_subset_preimage_source
   have hft2 := mem_extChartAt_source (I := I) xₜ
   -- express the derivative of the integral curve in the local chart
-  apply HasMFDerivAt.hasMFDerivWithinAt
   refine ⟨(continuousAt_extChartAt_symm'' hf3').comp h.continuousAt,
     HasDerivWithinAt.hasFDerivWithinAt ?_⟩
   simp only [mfld_simps, hasDerivWithinAt_univ]
-  change HasDerivAt ((extChartAt I xₜ ∘ (extChartAt I x₀).symm) ∘ f) (v xₜ) t
+  show HasDerivAt ((extChartAt I xₜ ∘ (extChartAt I x₀).symm) ∘ f) (v xₜ) t
   -- express `v (γ t)` as `D⁻¹ D (v (γ t))`, where `D` is a change of coordinates, so we can use
   -- `HasFDerivAt.comp_hasDerivAt` on `h`
   rw [← tangentCoordChange_self (I := I) (x := xₜ) (z := xₜ) (v := v xₜ) hft2,
@@ -101,17 +104,17 @@ theorem exists_isMIntegralCurveAt_of_contMDiffAt [CompleteSpace E]
   rw [← (extChartAt I x₀).right_inv hf3']
   exact hasFDerivWithinAt_tangentCoordChange ⟨hft1, hft2⟩
 
-lemma exists_isMIntegralCurveAt_of_contMDiffAt_boundaryless
+lemma exists_isIntegralCurveAt_of_contMDiffAt_boundaryless
     [CompleteSpace E] [BoundarylessManifold I M]
-    (hv : CMDiffAt 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) x₀) :
-    ∃ γ : ℝ → M, γ t₀ = x₀ ∧ IsMIntegralCurveAt γ v t₀ :=
-  exists_isMIntegralCurveAt_of_contMDiffAt t₀ hv BoundarylessManifold.isInteriorPoint
+    (hv : ContMDiffAt I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) x₀) :
+    ∃ γ : ℝ → M, γ t₀ = x₀ ∧ IsIntegralCurveAt γ v t₀ :=
+  exists_isIntegralCurveAt_of_contMDiffAt t₀ hv BoundarylessManifold.isInteriorPoint
 
 variable {t₀}
 
-theorem isMIntegralCurveAt_eventuallyEq_of_contMDiffAt (hγt₀ : I.IsInteriorPoint (γ t₀))
-    (hv : CMDiffAt 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) (γ t₀))
-    (hγ : IsMIntegralCurveAt γ v t₀) (hγ' : IsMIntegralCurveAt γ' v t₀) (h : γ t₀ = γ' t₀) :
+theorem isIntegralCurveAt_eventuallyEq_of_contMDiffAt (hγt₀ : I.IsInteriorPoint (γ t₀))
+    (hv : ContMDiffAt I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) (γ t₀))
+    (hγ : IsIntegralCurveAt γ v t₀) (hγ' : IsIntegralCurveAt γ' v t₀) (h : γ t₀ = γ' t₀) :
     γ =ᶠ[𝓝 t₀] γ' := by
   -- first define `v'` as the vector field expressed in the local chart around `γ t₀`
   -- this is basically what the function looks like when `hv` is unfolded
@@ -125,12 +128,12 @@ theorem isMIntegralCurveAt_eventuallyEq_of_contMDiffAt (hγt₀ : I.IsInteriorPo
     (hv.contDiffAt (range_mem_nhds_isInteriorPoint hγt₀)).snd.exists_lipschitzOnWith
   have hlip (t : ℝ) : LipschitzOnWith K ((fun _ ↦ v') t) ((fun _ ↦ s) t) := hlip
   -- internal lemmas to reduce code duplication
-  have hsrc {g} (hg : IsMIntegralCurveAt g v t₀) :
+  have hsrc {g} (hg : IsIntegralCurveAt g v t₀) :
     ∀ᶠ t in 𝓝 t₀, g ⁻¹' (extChartAt I (g t₀)).source ∈ 𝓝 t := eventually_mem_nhds_iff.mpr <|
       continuousAt_def.mp hg.continuousAt _ <| extChartAt_source_mem_nhds (g t₀)
   have hmem {g : ℝ → M} {t} (ht : g ⁻¹' (extChartAt I (g t₀)).source ∈ 𝓝 t) :
     g t ∈ (extChartAt I (g t₀)).source := mem_preimage.mp <| mem_of_mem_nhds ht
-  have hdrv {g} (hg : IsMIntegralCurveAt g v t₀) (h' : γ t₀ = g t₀) : ∀ᶠ t in 𝓝 t₀,
+  have hdrv {g} (hg : IsIntegralCurveAt g v t₀) (h' : γ t₀ = g t₀) : ∀ᶠ t in 𝓝 t₀,
       HasDerivAt ((extChartAt I (g t₀)) ∘ g) ((fun _ ↦ v') t (((extChartAt I (g t₀)) ∘ g) t)) t ∧
       ((extChartAt I (g t₀)) ∘ g) t ∈ (fun _ ↦ s) t := by
     apply Filter.Eventually.and
@@ -143,29 +146,29 @@ theorem isMIntegralCurveAt_eventuallyEq_of_contMDiffAt (hγt₀ : I.IsInteriorPo
     · apply ((continuousAt_extChartAt (g t₀)).comp hg.continuousAt).preimage_mem_nhds
       rw [Function.comp_apply, ← h']
       exact hs
-  have heq {g} (hg : IsMIntegralCurveAt g v t₀) :
+  have heq {g} (hg : IsIntegralCurveAt g v t₀) :
     g =ᶠ[𝓝 t₀] (extChartAt I (g t₀)).symm ∘ ↑(extChartAt I (g t₀)) ∘ g := by
     apply (hsrc hg).mono
-    intro t ht
+    intros t ht
     rw [Function.comp_apply, Function.comp_apply, PartialEquiv.left_inv _ (hmem ht)]
   -- main proof
   suffices (extChartAt I (γ t₀)) ∘ γ =ᶠ[𝓝 t₀] (extChartAt I (γ' t₀)) ∘ γ' from
     (heq hγ).trans <| (this.fun_comp (extChartAt I (γ t₀)).symm).trans (h ▸ (heq hγ').symm)
-  exact ODE_solution_unique_of_eventually (.of_forall hlip)
+  exact ODE_solution_unique_of_eventually hlip
     (hdrv hγ rfl) (hdrv hγ' h) (by rw [Function.comp_apply, Function.comp_apply, h])
 
-theorem isMIntegralCurveAt_eventuallyEq_of_contMDiffAt_boundaryless [BoundarylessManifold I M]
-    (hv : CMDiffAt 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) (γ t₀))
-    (hγ : IsMIntegralCurveAt γ v t₀) (hγ' : IsMIntegralCurveAt γ' v t₀) (h : γ t₀ = γ' t₀) :
+theorem isIntegralCurveAt_eventuallyEq_of_contMDiffAt_boundaryless [BoundarylessManifold I M]
+    (hv : ContMDiffAt I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)) (γ t₀))
+    (hγ : IsIntegralCurveAt γ v t₀) (hγ' : IsIntegralCurveAt γ' v t₀) (h : γ t₀ = γ' t₀) :
     γ =ᶠ[𝓝 t₀] γ' :=
-  isMIntegralCurveAt_eventuallyEq_of_contMDiffAt BoundarylessManifold.isInteriorPoint hv hγ hγ' h
+  isIntegralCurveAt_eventuallyEq_of_contMDiffAt BoundarylessManifold.isInteriorPoint hv hγ hγ' h
 
 variable [T2Space M] {a b : ℝ}
 
-theorem isMIntegralCurveOn_Ioo_eqOn_of_contMDiff (ht₀ : t₀ ∈ Ioo a b)
+theorem isIntegralCurveOn_Ioo_eqOn_of_contMDiff (ht₀ : t₀ ∈ Ioo a b)
     (hγt : ∀ t ∈ Ioo a b, I.IsInteriorPoint (γ t))
-    (hv : CMDiff 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
-    (hγ : IsMIntegralCurveOn γ v (Ioo a b)) (hγ' : IsMIntegralCurveOn γ' v (Ioo a b))
+    (hv : ContMDiff I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
+    (hγ : IsIntegralCurveOn γ v (Ioo a b)) (hγ' : IsIntegralCurveOn γ' v (Ioo a b))
     (h : γ t₀ = γ' t₀) : EqOn γ γ' (Ioo a b) := by
   set s := {t | γ t = γ' t} ∩ Ioo a b with hs
   -- since `Ioo a b` is connected, we get `s = Ioo a b` by showing that `s` is clopen in `Ioo a b`
@@ -178,7 +181,7 @@ theorem isMIntegralCurveOn_Ioo_eqOn_of_contMDiff (ht₀ : t₀ ∈ Ioo a b)
     -- TODO: shorten this when better API around subtype topology exists
     rw [hs, inter_comm, ← Subtype.image_preimage_val, inter_comm, ← Subtype.image_preimage_val,
       image_subset_image_iff Subtype.val_injective, preimage_setOf_eq]
-    intro t ht
+    intros t ht
     rw [mem_preimage, ← closure_subtype] at ht
     revert ht t
     apply IsClosed.closure_subset (isClosed_eq _ _)
@@ -186,31 +189,31 @@ theorem isMIntegralCurveOn_Ioo_eqOn_of_contMDiff (ht₀ : t₀ ∈ Ioo a b)
       rintro ⟨_, ht⟩
       apply ContinuousAt.comp _ continuousAt_subtype_val
       rw [Subtype.coe_mk]
-      exact hγ.continuousWithinAt ht |>.continuousAt (Ioo_mem_nhds ht.1 ht.2)
+      exact hγ.continuousAt ht
     · rw [continuous_iff_continuousAt]
       rintro ⟨_, ht⟩
       apply ContinuousAt.comp _ continuousAt_subtype_val
       rw [Subtype.coe_mk]
-      exact hγ'.continuousWithinAt ht |>.continuousAt (Ioo_mem_nhds ht.1 ht.2)
+      exact hγ'.continuousAt ht
   · rw [isOpen_iff_mem_nhds]
     intro t₁ ht₁
     have hmem := Ioo_mem_nhds ht₁.2.1 ht₁.2.2
-    have heq : γ =ᶠ[𝓝 t₁] γ' := isMIntegralCurveAt_eventuallyEq_of_contMDiffAt
-      (hγt _ ht₁.2) hv.contMDiffAt (hγ.isMIntegralCurveAt hmem) (hγ'.isMIntegralCurveAt hmem) ht₁.1
+    have heq : γ =ᶠ[𝓝 t₁] γ' := isIntegralCurveAt_eventuallyEq_of_contMDiffAt
+      (hγt _ ht₁.2) hv.contMDiffAt (hγ.isIntegralCurveAt hmem) (hγ'.isIntegralCurveAt hmem) ht₁.1
     apply (heq.and hmem).mono
     exact fun _ ht ↦ ht
 
-theorem isMIntegralCurveOn_Ioo_eqOn_of_contMDiff_boundaryless [BoundarylessManifold I M]
+theorem isIntegralCurveOn_Ioo_eqOn_of_contMDiff_boundaryless [BoundarylessManifold I M]
     (ht₀ : t₀ ∈ Ioo a b)
-    (hv : CMDiff 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
-    (hγ : IsMIntegralCurveOn γ v (Ioo a b)) (hγ' : IsMIntegralCurveOn γ' v (Ioo a b))
+    (hv : ContMDiff I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
+    (hγ : IsIntegralCurveOn γ v (Ioo a b)) (hγ' : IsIntegralCurveOn γ' v (Ioo a b))
     (h : γ t₀ = γ' t₀) : EqOn γ γ' (Ioo a b) :=
-  isMIntegralCurveOn_Ioo_eqOn_of_contMDiff
+  isIntegralCurveOn_Ioo_eqOn_of_contMDiff
     ht₀ (fun _ _ ↦ BoundarylessManifold.isInteriorPoint) hv hγ hγ' h
 
-theorem isMIntegralCurve_eq_of_contMDiff (hγt : ∀ t, I.IsInteriorPoint (γ t))
-    (hv : CMDiff 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
-    (hγ : IsMIntegralCurve γ v) (hγ' : IsMIntegralCurve γ' v) (h : γ t₀ = γ' t₀) : γ = γ' := by
+theorem isIntegralCurve_eq_of_contMDiff (hγt : ∀ t, I.IsInteriorPoint (γ t))
+    (hv : ContMDiff I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
+    (hγ : IsIntegralCurve γ v) (hγ' : IsIntegralCurve γ' v) (h : γ t₀ = γ' t₀) : γ = γ' := by
   ext t
   obtain ⟨T, ht₀, ht⟩ : ∃ T, t ∈ Ioo (-T) T ∧ t₀ ∈ Ioo (-T) T := by
     obtain ⟨T, hT₁, hT₂⟩ := exists_abs_lt t
@@ -218,19 +221,40 @@ theorem isMIntegralCurve_eq_of_contMDiff (hγt : ∀ t, I.IsInteriorPoint (γ t)
     obtain ⟨S, hS₁, hS₂⟩ := exists_abs_lt t₀
     obtain ⟨hS₂, hS₃⟩ := abs_lt.mp hS₂
     exact ⟨T + S, by constructor <;> constructor <;> linarith⟩
-  exact isMIntegralCurveOn_Ioo_eqOn_of_contMDiff ht (fun t _ ↦ hγt t) hv
-    ((hγ.isMIntegralCurveOn _).mono (subset_univ _))
-    ((hγ'.isMIntegralCurveOn _).mono (subset_univ _)) h ht₀
+  exact isIntegralCurveOn_Ioo_eqOn_of_contMDiff ht (fun t _ ↦ hγt t) hv
+    ((hγ.isIntegralCurveOn _).mono (subset_univ _))
+    ((hγ'.isIntegralCurveOn _).mono (subset_univ _)) h ht₀
 
-theorem isMIntegralCurve_Ioo_eq_of_contMDiff_boundaryless [BoundarylessManifold I M]
-    (hv : CMDiff 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
-    (hγ : IsMIntegralCurve γ v) (hγ' : IsMIntegralCurve γ' v) (h : γ t₀ = γ' t₀) : γ = γ' :=
-  isMIntegralCurve_eq_of_contMDiff (fun _ ↦ BoundarylessManifold.isInteriorPoint) hv hγ hγ' h
+theorem isIntegralCurve_Ioo_eq_of_contMDiff_boundaryless [BoundarylessManifold I M]
+    (hv : ContMDiff I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
+    (hγ : IsIntegralCurve γ v) (hγ' : IsIntegralCurve γ' v) (h : γ t₀ = γ' t₀) : γ = γ' :=
+  isIntegralCurve_eq_of_contMDiff (fun _ ↦ BoundarylessManifold.isInteriorPoint) hv hγ hγ' h
 
-lemma IsMIntegralCurve.periodic_of_eq [BoundarylessManifold I M]
-    (hγ : IsMIntegralCurve γ v)
-    (hv : CMDiff 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
+lemma IsIntegralCurve.periodic_of_eq [BoundarylessManifold I M]
+    (hγ : IsIntegralCurve γ v)
+    (hv : ContMDiff I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M)))
     (heq : γ a = γ b) : Periodic γ (a - b) := by
+  intro t
   apply congrFun <|
-    isMIntegralCurve_Ioo_eq_of_contMDiff_boundaryless (t₀ := b) hv (hγ.comp_add _) hγ _
+    isIntegralCurve_Ioo_eq_of_contMDiff_boundaryless (t₀ := b) hv (hγ.comp_add _) hγ _
   rw [comp_apply, add_sub_cancel, heq]
+
+lemma IsIntegralCurve.periodic_xor_injective [BoundarylessManifold I M]
+    (hγ : IsIntegralCurve γ v)
+    (hv : ContMDiff I I.tangent 1 (fun x ↦ (⟨x, v x⟩ : TangentBundle I M))) :
+    Xor' (∃ T > 0, Periodic γ T) (Injective γ) := by
+  rw [xor_iff_iff_not]
+  refine ⟨fun ⟨T, hT, hf⟩ ↦ hf.not_injective (ne_of_gt hT), ?_⟩
+  intro h
+  rw [Injective] at h
+  push_neg at h
+  obtain ⟨a, b, heq, hne⟩ := h
+  refine ⟨|a - b|, ?_, ?_⟩
+  · rw [gt_iff_lt, abs_pos, sub_ne_zero]
+    exact hne
+  · by_cases hab : a - b < 0
+    · rw [abs_of_neg hab, neg_sub]
+      exact hγ.periodic_of_eq hv heq.symm
+    · rw [not_lt] at hab
+      rw [abs_of_nonneg hab]
+      exact hγ.periodic_of_eq hv heq

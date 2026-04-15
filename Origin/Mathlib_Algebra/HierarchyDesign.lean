@@ -1,8 +1,10 @@
 /-
 Extracted from Algebra/HierarchyDesign.lean
-Genuine: 22 of 41 | Dissolved: 0 | Infrastructure: 19
+Genuine: 16 of 26 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
+import Mathlib.Init
+import Batteries.Util.LibraryNote
 
 /-!
 # Documentation of the algebraic hierarchy
@@ -15,7 +17,7 @@ TODO: Add sections about interactions with topological typeclasses, and order ty
 
 -/
 
-library_note «the algebraic hierarchy» /-- # The algebraic hierarchy
+library_note "the algebraic hierarchy"/-- # The algebraic hierarchy
 
 In any theorem proving environment,
 
@@ -23,7 +25,7 @@ there are difficult decisions surrounding the design of the "algebraic hierarchy
 
 There is a danger of exponential explosion in the number of gadgets,
 
-especially once interactions between algebraic and order/topological/etc. structures are considered.
+especially once interactions between algebraic and order/topological/etc structures are considered.
 
 In mathlib, we try to avoid this by only introducing new algebraic typeclasses either
 
@@ -79,35 +81,39 @@ when applicable:
 
 * Instances transferred elementwise to products, like `Prod.Monoid`.
 
-  See `Mathlib/Algebra/Group/Prod.lean` for more examples.
+  See `Mathlib.Algebra.Group.Prod` for more examples.
 
   ```
 
--- INSTANCE (free from Core): Prod.Z
+  instance Prod.Z [Z M] [Z N] : Z (M × N) := ...
+  ```
 
 * Instances transferred elementwise to pi types, like `Pi.Monoid`.
 
-  See `Mathlib/Algebra/Group/Pi/Basic.lean` for more examples.
+  See `Mathlib.Algebra.Group.Pi` for more examples.
 
   ```
 
--- INSTANCE (free from Core): Pi.Z
+  instance Pi.Z [∀ i, Z <| f i] : Z (Π i : I, f i) := ...
+  ```
 
 * Instances transferred to `MulOpposite M`, like `MulOpposite.Monoid`.
 
-  See `Mathlib/Algebra/Opposites.lean` for more examples.
+  See `Mathlib.Algebra.Opposites` for more examples.
 
   ```
 
--- INSTANCE (free from Core): MulOpposite.Z
+  instance MulOpposite.Z [Z M] : Z (MulOpposite M) := ...
+  ```
 
 * Instances transferred to `ULift M`, like `ULift.Monoid`.
 
-  See `Mathlib/Algebra/Group/ULift.lean` for more examples.
+  See `Mathlib.Algebra.Group.ULift` for more examples.
 
   ```
 
--- INSTANCE (free from Core): ULift.Z
+  instance ULift.Z [Z M] : Z (ULift M) := ...
+  ```
 
 * Definitions for transferring the proof fields of instances along
 
@@ -117,7 +123,7 @@ when applicable:
 
   We make these definitions `abbrev`, see note [reducible non-instances].
 
-  See `Mathlib/Algebra/Group/InjSurj.lean` for more examples.
+  See `Mathlib.Algebra.Group.InjSurj` for more examples.
 
   ```
 
@@ -130,23 +136,24 @@ when applicable:
 
 * Instances transferred elementwise to `Finsupp`s, like `Finsupp.semigroup`.
 
-  See `Mathlib/Data/Finsupp/Pointwise.lean` for more examples.
+  See `Mathlib.Data.Finsupp.Pointwise` for more examples.
 
   ```
 
--- INSTANCE (free from Core): Finsupp.Z
+  instance FinSupp.Z [Z β] : Z (α →₀ β) := ...
+  ```
 
 * Instances transferred elementwise to `Set`s, like `Set.monoid`.
 
-  See `Mathlib/Algebra/Group/Pointwise/Set/Basic.lean` for more examples.
+  See `Mathlib.Algebra.Pointwise` for more examples.
 
   ```
 
--- INSTANCE (free from Core): Set.Z
+  instance Set.Z [Z α] : Z (Set α) := ...
+  ```
 
 * Definitions for transferring the entire structure across an equivalence, like `Equiv.monoid`.
-  See `Mathlib/Algebra/Group/TransferInstance.lean` for more examples. See also the `transport`
-  tactic.
+  See `Mathlib.Data.Equiv.TransferInstance` for more examples. See also the `transport` tactic.
   ```
   def Equiv.Z (e : α ≃ β) [Z β] : Z α := ...
   /-- When there is a new notion of `Z`-equiv: -/
@@ -179,7 +186,8 @@ Typically this is done using the `Function.Injective.Z` definition mentioned abo
 
 ```
 
--- INSTANCE (free from Core): SubY.toZ
+instance SubY.toZ [Z α] : Z (SubY α) :=
+  coe_injective.Z coe ...
 
 ```
 
@@ -193,9 +201,9 @@ etc., we also define "bundled" versions, which carry `category` instances.
 
 These bundled versions are usually named by appending `Cat`,
 
-so for example we have `AddCommGrpCat` as a bundled `AddCommGroup`, and `TopCommRingCat`
+so for example we have `AddCommGrp` as a bundled `AddCommGroup`, and `TopCommRingCat`
 
-(which bundles together `CommRing`, `TopologicalSpace`, and `IsTopologicalRing`).
+(which bundles together `CommRing`, `TopologicalSpace`, and `TopologicalRing`).
 
 These bundled versions have many appealing features:
 
@@ -207,11 +215,11 @@ These bundled versions have many appealing features:
 
 * interoperability with unbundled structures, via coercions to `Type`
 
-  (so if `G : AddCommGrpCat`, you can treat `G` as a type,
+  (so if `G : AddCommGrp`, you can treat `G` as a type,
 
   and it automatically has an `AddCommGroup` instance)
 
-  and lifting maps `AddCommGrpCat.of G`, when `G` is a type with an `AddCommGroup` instance.
+  and lifting maps `AddCommGrp.of G`, when `G` is a type with an `AddCommGroup` instance.
 
 If, for example you do the work of proving that a typeclass `Z` has a good notion of tensor product,
 
@@ -263,7 +271,7 @@ Another alternative to a TODO list in the doc-strings is adding Github issues.
 
 -/
 
-library_note «reducible non-instances» /--
+library_note "reducible non-instances"/--
 
 Some definitions that define objects of a class cannot be instances, because they have an
 
@@ -291,17 +299,15 @@ Therefore, `Preorder.lift` and `PartialOrder.lift` are marked `@[reducible]`.
 
 -/
 
--- INSTANCE (free from Core): arguments»
+library_note "implicit instance arguments"/--
 
 There are places where typeclass arguments are specified with implicit `{}` brackets instead of
 
 the usual `[]` brackets. This is done when the instances can be inferred because they are implicit
 
-arguments to the type of one of the other arguments. There are several reasons for doing so.
+arguments to the type of one of the other arguments. When they can be inferred from these other
 
-When they can be inferred from these other arguments,
-
-it is faster to use this method than to use type class inference.
+arguments, it is faster to use this method than to use type class inference.
 
 For example, when writing lemmas about `(f : α →+* β)`, it is faster to specify the fact that `α`
 
@@ -309,23 +315,9 @@ and `β` are `Semiring`s as `{rα : Semiring α} {rβ : Semiring β}` rather tha
 
 `[Semiring α] [Semiring β]`.
 
-When handling non-canonical instances, it is necessary that the relevant declarations take these
-
--- INSTANCE (free from Core): arguments
-
-For example, in measure theory a space `X` will often come equipped with a canonical base
-
-sigma-algebra `MeasurableSpace X` along with many sub-sigma algebras, also of type
-
-`MeasurableSpace X`. In homological algebra, `ModuleCat ℤ` appears regularly as the category of
-
-abelian groups, but terms `A : ModuleCat ℤ` come with two (propeq) `Module ℤ A` instances:
-
-one from being `ℤ`-modules, and one from being abelian groups.
-
 -/
 
--- INSTANCE (free from Core): priority»
+library_note "lower instance priority"/--
 
 Certain instances always apply during type-class resolution. For example, the instance
 
@@ -349,116 +341,8 @@ always have higher priority than the instances of the first type (that always ap
 
 See also [mathlib#1561](https://github.com/leanprover-community/mathlib/issues/1561).
 
--- INSTANCE (free from Core): that
+Therefore, if we create an instance that always applies, we set the priority of these instances to
 
 100 (or something similar, which is below the default value of 1000).
-
--/
-
--- INSTANCE (free from Core): argument
-
-When type class inference applies an instance, it attempts to solve the sub-goals from left to
-
-right (it used to be from right to left in lean 3). For example in
-
-```
-
--- INSTANCE (free from Core): {p
-
-```
-
-we make sure to write `[∀ x, IsEmpty (p x)]` on the left of `[Nonempty α]` to avoid an expensive
-
--- INSTANCE (free from Core): for
-
-This helps to speed up failing type class searches, for example those triggered by `simp` lemmas.
-
-In some situations, we can't reorder type class assumptions because one depends on the other,
-
-for example in
-
-```
-
--- INSTANCE (free from Core): {G
-
-```
-
--- INSTANCE (free from Core): appears
-
-type class synthesis order in this situation.
-
--/
-
-library_note «commutative subobjects» /--
-
-The algebraic hierarchy is designed so that commutativity (e.g., of multiplication) is bundled
-
-into the type class, so that we have, for example `Group` and `CommGroup`, `Ring` and `CommRing`,
-
-etc.
-
-It is often the case that one may desire to work with a commutative subobject inside an
-
-ambient noncommutative type. In cases like `Subgroup.center` or `Subring.center`, the subobject is
-
-*always* commutative, and in these cases one should simply imbue those subobjects (coerced to
-
-`Type`) with the appropriate `Comm*` instance. However, in other cases, the commutativity of the
-
-subobject may be conditional on commutativity of some other object. For example,
-
-`Subgroup.closure s` is not always commutative, but it is when `s` is a commutative subset.
-
-Likewise, if `S : Subgroup G` is a commutative subgroup, then `S.topologicalClosure` is also
-
-commutative.
-
-For such scenarios, users should prefer to use the unbundled `IsMulCommutative` typeclass, and to
-
-provide theorems such as:
-
-```
-
-theorem isMulCommutative_closure {G : Type*} [Group G] {k : Set G}
-    (hcomm : ∀ x ∈ k, ∀ y ∈ k, x * y = y * x) :
-    IsMulCommutative (closure k)
-
-```
-
-or even *instances* such as
-
-```
-
--- INSTANCE (free from Core): Subgroup.instIsMulCommutative_closure
-
-```
-
-and
-
-```
-
--- INSTANCE (free from Core): Subgroup.isMulCommutative_topologicalClosure
-
-```
-
-Note that we prefer to name these instances manually because they are occasionally useful as
-
--- INSTANCE (free from Core): for
-
-immediately from the one for monoids via: `s.toSubmonoid.isMulCommutative_topologicalClosure`.
-
-In practice, we wish to be able to use the library of theorems about (bundled) commutativity for
-
-subobjects as well, and so we also provide instances which take as input the unbundled
-
-`Group G` and `IsMulCommutative G` and produce the bundled `CommGroup G`. However, to avoid
-
-deleterious effects to type class synthesis for bundled commutativity (by forcing Lean to search
-
-the entirery of both the bundled and unbundled hierarchies), these instances are only
-
-available inside the `IsMulCommutative` scope and are simultaneously given the very low priority
-
-`50`.
 
 -/

@@ -1,8 +1,11 @@
 /-
 Extracted from CategoryTheory/Shift/Quotient.lean
-Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
+Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Shift.CommShift
+import Mathlib.CategoryTheory.Shift.Induced
+import Mathlib.CategoryTheory.Quotient
 
 /-!
 # The shift on a quotient category
@@ -35,15 +38,16 @@ end HomRel
 
 namespace CategoryTheory
 
--- INSTANCE (free from Core): HasShift.quotient
+noncomputable instance HasShift.quotient [r.IsCompatibleWithShift A] :
+    HasShift (Quotient r) A :=
+  HasShift.induced (Quotient.functor r) A
+    (fun a => Quotient.lift r (shiftFunctor C a ⋙ Quotient.functor r)
+      (fun _ _ _ _ hfg => Quotient.sound r (HomRel.IsCompatibleWithShift.condition _ _ _ hfg)))
+    (fun _ => Quotient.lift.isLift _ _ _)
 
--- INSTANCE (free from Core): Quotient.functor_commShift
-
-#adaptation_note /-- After https://github.com/leanprover/lean4/pull/12247
-
-doing so requires `allowUnsafeReducibility`. -/
-
-set_option allowUnsafeReducibility true in
+noncomputable instance Quotient.functor_commShift [r.IsCompatibleWithShift A] :
+    (Quotient.functor r).CommShift A :=
+  Functor.CommShift.ofInduced _ _ _ _
 
 attribute [irreducible] HasShift.quotient Quotient.functor_commShift
 
@@ -59,8 +63,77 @@ variable {A}
 noncomputable def iso (a : A) :
     shiftFunctor (Quotient r) a ⋙ lift r F hF ≅ lift r F hF ⋙ shiftFunctor D a :=
   natIsoLift r ((Functor.associator _ _ _).symm ≪≫
-    Functor.isoWhiskerRight ((functor r).commShiftIso a).symm _ ≪≫
-    Functor.associator _ _ _ ≪≫ Functor.isoWhiskerLeft _ (lift.isLift r F hF) ≪≫ F.commShiftIso a ≪≫
-    Functor.isoWhiskerRight (lift.isLift r F hF).symm _ ≪≫ Functor.associator _ _ _)
+    isoWhiskerRight ((functor r).commShiftIso a).symm _ ≪≫
+    Functor.associator _ _ _ ≪≫ isoWhiskerLeft _ (lift.isLift r F hF) ≪≫ F.commShiftIso a ≪≫
+    isoWhiskerRight (lift.isLift r F hF).symm _ ≪≫ Functor.associator _ _ _)
 
-set_option backward.isDefEq.respectTransparency false in
+@[simp]
+lemma iso_hom_app (a : A) (X : C) :
+    (iso F r hF a).hom.app ((functor r).obj X) =
+      (lift r F hF).map (((functor r).commShiftIso a).inv.app X) ≫
+      (F.commShiftIso a).hom.app X := by
+  dsimp only [iso, natIsoLift]
+  rw [natTransLift_app]
+  dsimp
+  erw [comp_id, id_comp, id_comp, id_comp, Functor.map_id, comp_id]
+
+@[simp]
+lemma iso_inv_app (a : A) (X : C) :
+    (iso F r hF a).inv.app ((functor r).obj X) =
+      (F.commShiftIso a).inv.app X ≫
+      (lift r F hF).map (((functor r).commShiftIso a).hom.app X) := by
+  dsimp only [iso, natIsoLift]
+  rw [natTransLift_app]
+  dsimp
+  erw [id_comp, comp_id, comp_id, comp_id, Functor.map_id, id_comp]
+
+attribute [irreducible] iso
+
+end LiftCommShift
+
+noncomputable instance liftCommShift :
+    (Quotient.lift r F hF).CommShift A where
+  iso := LiftCommShift.iso F r hF
+  zero := by
+    ext1
+    apply natTrans_ext
+    ext X
+    dsimp
+    rw [LiftCommShift.iso_hom_app, (functor r).commShiftIso_zero,
+      Functor.CommShift.isoZero_hom_app, Functor.CommShift.isoZero_inv_app,
+      Functor.map_comp, assoc, F.commShiftIso_zero, Functor.CommShift.isoZero_hom_app,
+      lift_map_functor_map, ← F.map_comp_assoc, Iso.inv_hom_id_app]
+    dsimp [lift_obj_functor_obj]
+    rw [F.map_id, id_comp]
+  add a b := by
+    ext1
+    apply natTrans_ext
+    ext X
+    dsimp
+    rw [LiftCommShift.iso_hom_app, (functor r).commShiftIso_add, F.commShiftIso_add,
+      Functor.CommShift.isoAdd_hom_app, Functor.CommShift.isoAdd_hom_app,
+      Functor.CommShift.isoAdd_inv_app, Functor.map_comp, Functor.map_comp,
+      Functor.map_comp, assoc, assoc, assoc, LiftCommShift.iso_hom_app, lift_map_functor_map]
+    congr 1
+    rw [← cancel_epi ((shiftFunctor (Quotient r) b ⋙ lift r F hF).map
+      (NatTrans.app (Functor.commShiftIso (functor r) a).hom X))]
+    erw [(LiftCommShift.iso F r hF b).hom.naturality_assoc
+      (((functor r).commShiftIso a).hom.app X), LiftCommShift.iso_hom_app,
+      ← Functor.map_comp_assoc, Iso.hom_inv_id_app]
+    dsimp
+    simp only [Functor.comp_obj, assoc, ← Functor.map_comp_assoc, Iso.inv_hom_id_app,
+      Functor.map_id, id_comp, Iso.hom_inv_id_app, lift_obj_functor_obj]
+
+instance liftCommShift_compatibility :
+    NatTrans.CommShift (Quotient.lift.isLift r F hF).hom A where
+  comm' a := by
+    ext X
+    dsimp
+    erw [Functor.map_id, id_comp, comp_id]
+    rw [Functor.commShiftIso_comp_hom_app]
+    erw [LiftCommShift.iso_hom_app]
+    rw [← Functor.map_comp_assoc, Iso.hom_inv_id_app, Functor.map_id, id_comp]
+
+end Quotient
+
+end CategoryTheory

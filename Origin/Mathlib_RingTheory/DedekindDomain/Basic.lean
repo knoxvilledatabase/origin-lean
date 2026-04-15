@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/DedekindDomain/Basic.lean
-Genuine: 11 of 16 | Dissolved: 0 | Infrastructure: 5
+Genuine: 9 of 13 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.RingTheory.Ideal.Over
+import Mathlib.RingTheory.Polynomial.RationalRoot
 
 /-!
 # Dedekind rings and domains
@@ -12,10 +14,10 @@ as a Noetherian integrally closed commutative ring (domain) of Krull dimension a
 
 ## Main definitions
 
-- `IsDedekindRing` defines a Dedekind ring as a commutative ring that is
-  Noetherian, integrally closed in its field of fractions and has Krull dimension at most one.
-  `isDedekindRing_iff` shows that this does not depend on the choice of field of fractions.
-- `IsDedekindDomain` defines a Dedekind domain as a Dedekind ring that is a domain.
+ - `IsDedekindRing` defines a Dedekind ring as a commutative ring that is
+   Noetherian, integrally closed in its field of fractions and has Krull dimension at most one.
+   `isDedekindRing_iff` shows that this does not depend on the choice of field of fractions.
+ - `IsDedekindDomain` defines a Dedekind domain as a Dedekind ring that is a domain.
 
 ## Implementation notes
 
@@ -33,7 +35,7 @@ to add a `(h : ¬ IsField A)` assumption whenever this is explicitly needed.
 ## References
 
 * [D. Marcus, *Number Fields*][marcus1977number]
-* [J.W.S. Cassels, A. Fröhlich, *Algebraic Number Theory*][cassels1967algebraic]
+* [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
 * [J. Neukirch, *Algebraic Number Theory*][Neukirch1992]
 
 ## Tags
@@ -54,42 +56,38 @@ theorem Ideal.IsPrime.isMaximal {R : Type*} [CommRing R] [DimensionLEOne R]
     {p : Ideal R} (h : p.IsPrime) (hp : p ≠ ⊥) : p.IsMaximal :=
   DimensionLEOne.maximalOfPrime hp h
 
-namespace Ring.DimensionLEOne
+namespace Ring
 
--- INSTANCE (free from Core): principal_ideal_ring
+instance DimensionLEOne.principal_ideal_ring [IsDomain A] [IsPrincipalIdealRing A] :
+    DimensionLEOne A where
+  maximalOfPrime := fun nonzero _ =>
+    IsPrime.to_maximal_ideal nonzero
 
-theorem isIntegralClosure (B : Type*) [CommRing B] [IsDomain B] [Nontrivial R] [Algebra R A]
-    [Algebra R B] [Algebra B A] [IsScalarTower R B A] [IsIntegralClosure B R A] [DimensionLEOne R] :
-    DimensionLEOne B where
+theorem DimensionLEOne.isIntegralClosure (B : Type*) [CommRing B] [IsDomain B] [Nontrivial R]
+    [Algebra R A] [Algebra R B] [Algebra B A] [IsScalarTower R B A] [IsIntegralClosure B R A]
+    [DimensionLEOne R] : DimensionLEOne B where
   maximalOfPrime := fun {p} ne_bot _ =>
     IsIntegralClosure.isMaximal_of_isMaximal_comap (R := R) A p
       (Ideal.IsPrime.isMaximal inferInstance (IsIntegralClosure.comap_ne_bot A ne_bot))
 
--- INSTANCE (free from Core): integralClosure
+nonrec instance DimensionLEOne.integralClosure [Nontrivial R] [IsDomain A] [Algebra R A]
+    [DimensionLEOne R] : DimensionLEOne (integralClosure R A) :=
+  DimensionLEOne.isIntegralClosure R A (integralClosure R A)
 
 variable {R}
 
-theorem not_lt_lt [Ring.DimensionLEOne R] (p₀ p₁ p₂ : Ideal R) [hp₁ : p₁.IsPrime]
+theorem DimensionLEOne.not_lt_lt [Ring.DimensionLEOne R] (p₀ p₁ p₂ : Ideal R) [hp₁ : p₁.IsPrime]
     [hp₂ : p₂.IsPrime] : ¬(p₀ < p₁ ∧ p₁ < p₂)
   | ⟨h01, h12⟩ => h12.ne ((hp₁.isMaximal (bot_le.trans_lt h01).ne').eq_of_le hp₂.ne_top h12.le)
 
-theorem eq_bot_of_lt [Ring.DimensionLEOne R] (p P : Ideal R) [p.IsPrime] [P.IsPrime] (hpP : p < P) :
-    p = ⊥ :=
+theorem DimensionLEOne.eq_bot_of_lt [Ring.DimensionLEOne R] (p P : Ideal R) [p.IsPrime]
+    [P.IsPrime] (hpP : p < P) : p = ⊥ :=
   by_contra fun hp0 => not_lt_lt ⊥ p P ⟨Ne.bot_lt hp0, hpP⟩
 
-variable {A} in
+end Ring
 
-theorem of_ringEquiv [hA : Ring.DimensionLEOne A] (e : R ≃+* A) : Ring.DimensionLEOne R where
-  maximalOfPrime {P} hP_ne hP_prime := by
-    rw [← Ideal.map_comap_eq_self_of_equiv e.symm P,
-      Ideal.isMaximal_map_iff_of_bijective _ e.symm.bijective]
-    apply Ring.DimensionLEOne.maximalOfPrime ?_ (P.comap_isPrime e.symm)
-    simp [Ideal.map_eq_bot_iff_of_injective e.injective, hP_ne]
-
-end Ring.DimensionLEOne
-
-class IsDedekindRing : Prop
-  extends IsNoetherian A A, DimensionLEOne A, IsIntegralClosure A A (FractionRing A)
+class IsDedekindRing
+  extends IsNoetherian A A, DimensionLEOne A, IsIntegralClosure A A (FractionRing A) : Prop
 
 theorem isDedekindRing_iff (K : Type*) [CommRing K] [Algebra A K] [IsFractionRing A K] :
     IsDedekindRing A ↔
@@ -99,14 +97,14 @@ theorem isDedekindRing_iff (K : Type*) [CommRing K] [Algebra A K] [IsFractionRin
              fun {_} => (isIntegrallyClosed_iff K).mp inferInstance⟩,
    fun ⟨hr, hd, hi⟩ => { hr, hd, (isIntegrallyClosed_iff K).mpr @hi with }⟩
 
-class IsDedekindDomain : Prop
-  extends IsDomain A, IsDedekindRing A
+class IsDedekindDomain
+  extends IsDomain A, IsDedekindRing A : Prop
 
--- INSTANCE (free from Core): 90]
+attribute [instance 90] IsDedekindDomain.toIsDomain
 
--- INSTANCE (free from Core): [IsDomain
+instance [IsDomain A] [IsDedekindRing A] : IsDedekindDomain A where
 
-theorem isDedekindDomain_iff (K : Type*) [CommRing K] [Algebra A K] [IsFractionRing A K] :
+theorem isDedekindDomain_iff (K : Type*) [Field K] [Algebra A K] [IsFractionRing A K] :
     IsDedekindDomain A ↔
       IsDomain A ∧ IsNoetherianRing A ∧ DimensionLEOne A ∧
         ∀ {x : K}, IsIntegral A x → ∃ y, algebraMap A K y = x :=
@@ -114,15 +112,8 @@ theorem isDedekindDomain_iff (K : Type*) [CommRing K] [Algebra A K] [IsFractionR
              fun {_} => (isIntegrallyClosed_iff K).mp inferInstance⟩,
    fun ⟨hid, hr, hd, hi⟩ => { hid, hr, hd, (isIntegrallyClosed_iff K).mpr @hi with }⟩
 
--- INSTANCE (free from Core): (priority
-
-variable {R} in
-
-theorem IsLocalRing.primesOver_eq [IsLocalRing A] [IsDedekindDomain A] [Algebra R A]
-    [FaithfulSMul R A] [Module.Finite R A] {p : Ideal R} [p.IsMaximal] (hp0 : p ≠ ⊥) :
-    Ideal.primesOver p A = {IsLocalRing.maximalIdeal A} := by
-  have : IsDomain R := .of_faithfulSMul R A
-  refine Set.eq_singleton_iff_nonempty_unique_mem.mpr ⟨?_, fun P hP ↦ ?_⟩
-  · obtain ⟨w', hmax, hover⟩ := exists_maximal_ideal_liesOver_of_isIntegral (S := A) p
-    exact ⟨w', hmax.isPrime, hover⟩
-  · exact IsLocalRing.eq_maximalIdeal <| hP.1.isMaximal (Ideal.ne_bot_of_mem_primesOver hp0 hP)
+instance (priority := 100) IsPrincipalIdealRing.isDedekindDomain
+    [IsDomain A] [IsPrincipalIdealRing A] :
+    IsDedekindDomain A :=
+  { PrincipalIdealRing.isNoetherianRing, Ring.DimensionLEOne.principal_ideal_ring A,
+    UniqueFactorizationMonoid.instIsIntegrallyClosed with }

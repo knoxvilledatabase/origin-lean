@@ -1,15 +1,19 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Quotient.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 of 21 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.TensorProduct.Basic
+import Mathlib.LinearAlgebra.Quotient.Basic
+import Mathlib.LinearAlgebra.Prod
+import Mathlib.RingTheory.Ideal.Operations
+import Mathlib.RingTheory.Ideal.Quotient.Defs
 
 /-!
 
 # Interaction between Quotients and Tensor Products
 
-This file contains constructions that relate quotients and tensor products. This file is also a home
-for results whose proof depends on both tensor products and linear algebraic quotients.
+This file contains constructions that relate quotients and tensor products.
 Let `M, N` be `R`-modules, `m ≤ M` and `n ≤ N` be an `R`-submodules and `I ≤ R` an ideal. We prove
 the following isomorphisms:
 
@@ -30,8 +34,6 @@ the following isomorphisms:
 Quotient, Tensor Product
 
 -/
-
-assert_not_exists Cardinal
 
 namespace TensorProduct
 
@@ -70,3 +72,145 @@ noncomputable def quotientTensorQuotientEquiv (m : Submodule R M) (n : Submodule
         · simp [g, Submodule.Quotient.mk_eq_zero _ |>.2 y.2]
       exact congr($eq (a, b)))
     (by ext; simp) (by ext; simp)
+
+@[simp]
+lemma quotientTensorQuotientEquiv_apply_tmul_mk_tmul_mk
+    (m : Submodule R M) (n : Submodule R N) (x : M) (y : N) :
+    quotientTensorQuotientEquiv m n
+      (Submodule.Quotient.mk x ⊗ₜ[R] Submodule.Quotient.mk y) =
+      Submodule.Quotient.mk (x ⊗ₜ y) := rfl
+
+@[simp]
+lemma quotientTensorQuotientEquiv_symm_apply_mk_tmul
+    (m : Submodule R M) (n : Submodule R N) (x : M) (y : N) :
+    (quotientTensorQuotientEquiv m n).symm (Submodule.Quotient.mk (x ⊗ₜ y)) =
+      Submodule.Quotient.mk x ⊗ₜ[R] Submodule.Quotient.mk y := rfl
+
+variable (N) in
+
+noncomputable def quotientTensorEquiv (m : Submodule R M) :
+    (M ⧸ (m : Submodule R M)) ⊗[R] N ≃ₗ[R]
+    (M ⊗[R] N) ⧸ (LinearMap.range (map m.subtype (LinearMap.id : N →ₗ[R] N))) :=
+  congr (LinearEquiv.refl _ _) ((Submodule.quotEquivOfEqBot _ rfl).symm) ≪≫ₗ
+  quotientTensorQuotientEquiv (N := N) m ⊥ ≪≫ₗ
+  Submodule.Quotient.equiv _ _ (LinearEquiv.refl _ _) (by
+    simp only [Submodule.map_sup]
+    erw [Submodule.map_id, Submodule.map_id]
+    simp only [sup_eq_left]
+    rw [map_range_eq_span_tmul, map_range_eq_span_tmul]
+    aesop)
+
+@[simp]
+lemma quotientTensorEquiv_apply_tmul_mk (m : Submodule R M) (x : M) (y : N) :
+    quotientTensorEquiv N m (Submodule.Quotient.mk x ⊗ₜ[R] y) =
+    Submodule.Quotient.mk (x ⊗ₜ y) :=
+  rfl
+
+@[simp]
+lemma quotientTensorEquiv_symm_apply_mk_tmul (m : Submodule R M) (x : M) (y : N) :
+    (quotientTensorEquiv N m).symm (Submodule.Quotient.mk (x ⊗ₜ y)) =
+    Submodule.Quotient.mk x ⊗ₜ[R] y :=
+  rfl
+
+variable (M) in
+
+noncomputable def tensorQuotientEquiv (n : Submodule R N) :
+    M ⊗[R] (N ⧸ (n : Submodule R N)) ≃ₗ[R]
+    (M ⊗[R] N) ⧸ (LinearMap.range (map (LinearMap.id : M →ₗ[R] M) n.subtype)) :=
+  congr ((Submodule.quotEquivOfEqBot _ rfl).symm) (LinearEquiv.refl _ _)  ≪≫ₗ
+  quotientTensorQuotientEquiv (⊥ : Submodule R M) n ≪≫ₗ
+  Submodule.Quotient.equiv _ _ (LinearEquiv.refl _ _) (by
+    simp only [Submodule.map_sup]
+    erw [Submodule.map_id, Submodule.map_id]
+    simp only [sup_eq_right]
+    rw [map_range_eq_span_tmul, map_range_eq_span_tmul]
+    aesop)
+
+@[simp]
+lemma tensorQuotientEquiv_apply_mk_tmul (n : Submodule R N) (x : M) (y : N) :
+    tensorQuotientEquiv M n (x ⊗ₜ[R] Submodule.Quotient.mk y) =
+    Submodule.Quotient.mk (x ⊗ₜ y) :=
+  rfl
+
+@[simp]
+lemma tensorQuotientEquiv_symm_apply_tmul_mk (n : Submodule R N) (x : M) (y : N) :
+    (tensorQuotientEquiv M n).symm (Submodule.Quotient.mk (x ⊗ₜ y)) =
+    x ⊗ₜ[R] Submodule.Quotient.mk y :=
+  rfl
+
+variable (M) in
+
+noncomputable def quotTensorEquivQuotSMul (I : Ideal R) :
+    ((R ⧸ I) ⊗[R] M) ≃ₗ[R] M ⧸ (I • (⊤ : Submodule R M)) :=
+  quotientTensorEquiv M I ≪≫ₗ
+  (Submodule.Quotient.equiv _ _ (TensorProduct.lid R M) <| by
+    erw [← LinearMap.range_comp, ← (Submodule.topEquiv.lTensor I).range_comp,
+      Submodule.smul_eq_map₂, map₂_eq_range_lift_comp_mapIncl]
+    exact congr_arg _ (TensorProduct.ext' fun _ _ ↦  rfl))
+
+variable (M) in
+
+noncomputable def tensorQuotEquivQuotSMul (I : Ideal R) :
+    (M ⊗[R] (R ⧸ I)) ≃ₗ[R] M ⧸ (I • (⊤ : Submodule R M)) :=
+  TensorProduct.comm _ _ _ ≪≫ₗ quotTensorEquivQuotSMul M I
+
+@[simp]
+lemma quotTensorEquivQuotSMul_mk_tmul (I : Ideal R) (r : R) (x : M) :
+    quotTensorEquivQuotSMul M I (Ideal.Quotient.mk I r ⊗ₜ[R] x) =
+      Submodule.Quotient.mk (r • x) :=
+  (quotTensorEquivQuotSMul M I).eq_symm_apply.mp <|
+    Eq.trans (congrArg (· ⊗ₜ[R] x) <|
+        Eq.trans (congrArg (Ideal.Quotient.mk I)
+                    (Eq.trans (smul_eq_mul R) (mul_one r))).symm <|
+          Submodule.Quotient.mk_smul I r 1) <|
+      smul_tmul r _ x
+
+lemma quotTensorEquivQuotSMul_comp_mkQ_rTensor (I : Ideal R) :
+    quotTensorEquivQuotSMul M I ∘ₗ I.mkQ.rTensor M =
+      (I • ⊤ : Submodule R M).mkQ ∘ₗ TensorProduct.lid R M :=
+  TensorProduct.ext' (quotTensorEquivQuotSMul_mk_tmul I)
+
+@[simp]
+lemma quotTensorEquivQuotSMul_symm_mk (I : Ideal R) (x : M) :
+    (quotTensorEquivQuotSMul M I).symm (Submodule.Quotient.mk x) = 1 ⊗ₜ[R] x :=
+  rfl
+
+lemma quotTensorEquivQuotSMul_symm_comp_mkQ (I : Ideal R) :
+    (quotTensorEquivQuotSMul M I).symm ∘ₗ (I • ⊤ : Submodule R M).mkQ =
+      TensorProduct.mk R (R ⧸ I) M 1 :=
+  LinearMap.ext (quotTensorEquivQuotSMul_symm_mk I)
+
+lemma quotTensorEquivQuotSMul_comp_mk (I : Ideal R) :
+    quotTensorEquivQuotSMul M I ∘ₗ TensorProduct.mk R (R ⧸ I) M 1 =
+      Submodule.mkQ (I • ⊤) :=
+  Eq.symm <| (LinearEquiv.toLinearMap_symm_comp_eq _ _).mp <|
+    quotTensorEquivQuotSMul_symm_comp_mkQ I
+
+@[simp]
+lemma tensorQuotEquivQuotSMul_tmul_mk (I : Ideal R) (x : M) (r : R) :
+    tensorQuotEquivQuotSMul M I (x ⊗ₜ[R] Ideal.Quotient.mk I r) =
+      Submodule.Quotient.mk (r • x) :=
+  quotTensorEquivQuotSMul_mk_tmul I r x
+
+lemma tensorQuotEquivQuotSMul_comp_mkQ_lTensor (I : Ideal R) :
+    tensorQuotEquivQuotSMul M I ∘ₗ I.mkQ.lTensor M =
+      (I • ⊤ : Submodule R M).mkQ ∘ₗ TensorProduct.rid R M :=
+  TensorProduct.ext' (tensorQuotEquivQuotSMul_tmul_mk I)
+
+@[simp]
+lemma tensorQuotEquivQuotSMul_symm_mk (I : Ideal R) (x : M) :
+    (tensorQuotEquivQuotSMul M I).symm (Submodule.Quotient.mk x) = x ⊗ₜ[R] 1 :=
+  rfl
+
+lemma tensorQuotEquivQuotSMul_symm_comp_mkQ (I : Ideal R) :
+    (tensorQuotEquivQuotSMul M I).symm ∘ₗ (I • ⊤ : Submodule R M).mkQ =
+      (TensorProduct.mk R M (R ⧸ I)).flip 1 :=
+  LinearMap.ext (tensorQuotEquivQuotSMul_symm_mk I)
+
+lemma tensorQuotEquivQuotSMul_comp_mk (I : Ideal R) :
+    tensorQuotEquivQuotSMul M I ∘ₗ (TensorProduct.mk R M (R ⧸ I)).flip 1 =
+      Submodule.mkQ (I • ⊤) :=
+  Eq.symm <| (LinearEquiv.toLinearMap_symm_comp_eq _ _).mp <|
+    tensorQuotEquivQuotSMul_symm_comp_mkQ I
+
+end TensorProduct

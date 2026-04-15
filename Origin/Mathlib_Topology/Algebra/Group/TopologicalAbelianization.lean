@@ -3,6 +3,8 @@ Extracted from Topology/Algebra/Group/TopologicalAbelianization.lean
 Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.GroupTheory.Abelianization
+import Mathlib.Topology.Algebra.Group.Basic
 
 /-!
 # The topological abelianization of a group.
@@ -23,11 +25,10 @@ group, topological abelianization
 
 -/
 
-open scoped commutatorElement
+variable (G : Type*) [Group G] [TopologicalSpace G] [TopologicalGroup G]
 
-variable (G : Type*) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-
--- INSTANCE (free from Core): instNormalCommutatorClosure
+instance instNormalCommutatorClosure : (commutator G).topologicalClosure.Normal :=
+  Subgroup.is_normal_topologicalClosure (commutator G)
 
 abbrev TopologicalAbelianization := G ⧸ Subgroup.topologicalClosure (commutator G)
 
@@ -35,6 +36,15 @@ local notation "G_ab" => TopologicalAbelianization
 
 namespace TopologicalAbelianization
 
--- INSTANCE (free from Core): commGroup
+instance commGroup : CommGroup (G_ab G) where
+  mul_comm := fun x y =>
+    Quotient.inductionOn₂' x y fun a b =>
+      Quotient.sound' <|
+        QuotientGroup.leftRel_apply.mpr <| by
+          have h : (a * b)⁻¹ * (b * a) = ⁅b⁻¹, a⁻¹⁆ := by group
+          rw [h]
+          exact Subgroup.le_topologicalClosure _ (Subgroup.commutator_mem_commutator
+            (Subgroup.mem_top b⁻¹) (Subgroup.mem_top a⁻¹))
+  __ : Group (G_ab G) := inferInstance
 
 end TopologicalAbelianization

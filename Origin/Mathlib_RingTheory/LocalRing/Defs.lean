@@ -3,6 +3,8 @@ Extracted from RingTheory/LocalRing/Defs.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Group.Units.Defs
+import Mathlib.Algebra.Ring.Defs
 
 /-!
 
@@ -19,8 +21,8 @@ Define local rings as commutative rings having a unique maximal ideal.
 
 -/
 
-class IsLocalRing (R : Type*) [Semiring R] : Prop extends Nontrivial R where
+class IsLocalRing (R : Type*) [Semiring R] extends Nontrivial R : Prop where
   of_is_unit_or_is_unit_of_add_one ::
   /-- in a local ring `R`, if `a + b = 1`, then either `a` is a unit or `b` is a unit. In another
-  word, for every `a : R`, either `a` is a unit or `1 - a` is a unit. -/
+    word, for every `a : R`, either `a` is a unit or `1 - a` is a unit. -/
   isUnit_or_isUnit_of_add_one {a b : R} (h : a + b = 1) : IsUnit a ∨ IsUnit b

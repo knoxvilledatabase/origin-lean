@@ -1,8 +1,12 @@
 /-
 Extracted from Algebra/Module/Rat.lean
-Genuine: 10 of 18 | Dissolved: 0 | Infrastructure: 8
+Genuine: 6 of 16 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Basic
+import Mathlib.Algebra.NoZeroSMulDivisors.Basic
+import Mathlib.Algebra.Field.Rat
+import Mathlib.Algebra.Order.Field.Rat
 
 /-!
 # Basic results about modules over the rationals.
@@ -26,6 +30,8 @@ theorem map_ratCast_smul [AddCommGroup M] [AddCommGroup M₂] {F : Type*} [FunLi
   rw [Rat.cast_def, Rat.cast_def, div_eq_mul_inv, div_eq_mul_inv, mul_smul, mul_smul,
     map_intCast_smul f R S, map_inv_natCast_smul f R S]
 
+alias map_rat_cast_smul := map_ratCast_smul
+
 theorem map_nnrat_smul [AddCommMonoid M] [AddCommMonoid M₂]
     [_instM : Module ℚ≥0 M] [_instM₂ : Module ℚ≥0 M₂]
     {F : Type*} [FunLike F M M₂] [AddMonoidHomClass F M M₂]
@@ -38,9 +44,13 @@ theorem map_rat_smul [AddCommGroup M] [AddCommGroup M₂]
     (f : F) (c : ℚ) (x : M) : f (c • x) = c • f x :=
   map_ratCast_smul f ℚ ℚ c x
 
--- INSTANCE (free from Core): subsingleton_nnrat_module
+instance subsingleton_nnrat_module (E : Type*) [AddCommMonoid E] : Subsingleton (Module ℚ≥0 E) :=
+  ⟨fun P Q => (Module.ext' P Q) fun r x =>
+    map_nnrat_smul (_instM := P) (_instM₂ := Q) (AddMonoidHom.id E) r x⟩
 
--- INSTANCE (free from Core): subsingleton_rat_module
+instance subsingleton_rat_module (E : Type*) [AddCommGroup E] : Subsingleton (Module ℚ E) :=
+  ⟨fun P Q => (Module.ext' P Q) fun r x =>
+    map_rat_smul (_instM := P) (_instM₂ := Q) (AddMonoidHom.id E) r x⟩
 
 theorem nnratCast_smul_eq {E : Type*} (R S : Type*) [AddCommMonoid E] [DivisionSemiring R]
     [DivisionSemiring S] [Module R E] [Module S E] (r : ℚ≥0) (x : E) : (r : R) • x = (r : S) • x :=
@@ -50,40 +60,42 @@ theorem ratCast_smul_eq {E : Type*} (R S : Type*) [AddCommGroup E] [DivisionRing
     [DivisionRing S] [Module R E] [Module S E] (r : ℚ) (x : E) : (r : R) • x = (r : S) • x :=
   map_ratCast_smul (AddMonoidHom.id E) R S r x
 
--- INSTANCE (free from Core): IsScalarTower.nnrat
+alias rat_cast_smul_eq := ratCast_smul_eq
 
--- INSTANCE (free from Core): IsScalarTower.rat
+instance IsScalarTower.nnrat {R : Type u} {M : Type v} [Semiring R] [AddCommMonoid M] [Module R M]
+    [Module ℚ≥0 R] [Module ℚ≥0 M] : IsScalarTower ℚ≥0 R M where
+  smul_assoc r x y := map_nnrat_smul ((smulAddHom R M).flip y) r x
 
-lemma NNRat.cast_smul_eq_nnqsmul (R : Type*) [DivisionSemiring R]
-    [MulAction R M] [MulAction ℚ≥0 M] [IsScalarTower ℚ≥0 R M]
-    (q : ℚ≥0) (x : M) : (q : R) • x = q • x := by
-  rw [← one_smul R x, ← smul_assoc, ← smul_assoc]; simp
+instance IsScalarTower.rat {R : Type u} {M : Type v} [Ring R] [AddCommGroup M] [Module R M]
+    [Module ℚ R] [Module ℚ M] : IsScalarTower ℚ R M where
+  smul_assoc r x y := map_rat_smul ((smulAddHom R M).flip y) r x
 
-lemma Rat.cast_smul_eq_qsmul (R : Type*) [DivisionRing R]
-    [MulAction R M] [MulAction ℚ M] [IsScalarTower ℚ R M]
-    (q : ℚ) (x : M) : (q : R) • x = q • x := by
-  rw [← one_smul R x, ← smul_assoc, ← smul_assoc]; simp
+section
 
 variable {α : Type u} {M : Type v}
 
--- INSTANCE (free from Core): SMulCommClass.nnrat
+instance SMulCommClass.nnrat [Monoid α] [AddCommMonoid M] [DistribMulAction α M] [Module ℚ≥0 M] :
+    SMulCommClass ℚ≥0 α M where
+  smul_comm r x y := (map_nnrat_smul (DistribMulAction.toAddMonoidHom M x) r y).symm
 
--- INSTANCE (free from Core): SMulCommClass.rat
+instance SMulCommClass.rat [Monoid α] [AddCommGroup M] [DistribMulAction α M] [Module ℚ M] :
+    SMulCommClass ℚ α M where
+  smul_comm r x y := (map_rat_smul (DistribMulAction.toAddMonoidHom M x) r y).symm
 
--- INSTANCE (free from Core): SMulCommClass.nnrat'
+instance SMulCommClass.nnrat' [Monoid α] [AddCommMonoid M] [DistribMulAction α M] [Module ℚ≥0 M] :
+    SMulCommClass α ℚ≥0 M :=
+  SMulCommClass.symm _ _ _
 
--- INSTANCE (free from Core): SMulCommClass.rat'
+instance SMulCommClass.rat' [Monoid α] [AddCommGroup M] [DistribMulAction α M] [Module ℚ M] :
+    SMulCommClass α ℚ M :=
+  SMulCommClass.symm _ _ _
 
 end
 
-variable (M) in
+instance (priority := 100) NNRatModule.noZeroSMulDivisors [AddCommMonoid M] [Module ℚ≥0 M] :
+    NoZeroSMulDivisors ℕ M :=
+  ⟨fun {k} {x : M} h => by simpa [← Nat.cast_smul_eq_nsmul ℚ≥0 k x] using h⟩
 
-lemma IsAddTorsionFree.of_module_nnrat [AddCommMonoid M] [Module ℚ≥0 M] : IsAddTorsionFree M where
-  nsmul_right_injective n hn x y hxy := by
-    simpa [← Nat.cast_smul_eq_nsmul ℚ≥0 n, *] using congr((n⁻¹ : ℚ≥0) • $hxy)
-
-variable (M) in
-
-lemma IsAddTorsionFree.of_module_rat [AddCommGroup M] [Module ℚ M] : IsAddTorsionFree M where
-  nsmul_right_injective n hn x y hxy := by
-    simpa [← Nat.cast_smul_eq_nsmul ℚ n, *] using congr((n⁻¹ : ℚ) • $hxy)
+instance (priority := 100) RatModule.noZeroSMulDivisors [AddCommGroup M] [Module ℚ M] :
+    NoZeroSMulDivisors ℤ M :=
+  ⟨fun {k} {x : M} h => by simpa [← Int.cast_smul_eq_zsmul ℚ k x] using h⟩

@@ -3,6 +3,8 @@ Extracted from Analysis/ConstantSpeed.lean
 Genuine: 16 of 17 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Function
+import Mathlib.Analysis.BoundedVariation
 
 /-!
 # Constant speed
@@ -37,7 +39,7 @@ arc-length, parameterization
 
 open scoped NNReal ENNReal
 
-open Set
+open Set MeasureTheory
 
 variable {α : Type*} [LinearOrder α] {E : Type*} [PseudoEMetricSpace E]
 
@@ -144,16 +146,19 @@ theorem hasConstantSpeedOnWith_zero_iff :
   dsimp [HasConstantSpeedOnWith]
   simp only [zero_mul, ENNReal.ofReal_zero, ← eVariationOn.eq_zero_iff]
   constructor
-  · by_contra! ⟨h, hfs⟩
+  · by_contra!
+    obtain ⟨h, hfs⟩ := this
     simp_rw [ne_eq, eVariationOn.eq_zero_iff] at hfs h
-    push Not at hfs
+    push_neg at hfs
     obtain ⟨x, xs, y, ys, hxy⟩ := hfs
     rcases le_total x y with (xy | yx)
     · exact hxy (h xs ys x ⟨xs, le_rfl, xy⟩ y ⟨ys, xy, le_rfl⟩)
     · rw [edist_comm] at hxy
       exact hxy (h ys xs y ⟨ys, le_rfl, yx⟩ x ⟨xs, yx, le_rfl⟩)
   · rintro h x _ y _
-    simpa [h] using eVariationOn.mono (s := s) f inter_subset_left
+    refine le_antisymm ?_ zero_le'
+    rw [← h]
+    exact eVariationOn.mono f inter_subset_left
 
 -- DISSOLVED: HasConstantSpeedOnWith.ratio
 
@@ -173,7 +178,7 @@ theorem unique_unit_speed {φ : ℝ → ℝ} (φm : MonotoneOn φ s) (hfφ : Has
     (hf : HasUnitSpeedOn f (φ '' s)) ⦃x : ℝ⦄ (xs : x ∈ s) : EqOn φ (fun y => y - x + φ x) s := by
   dsimp only [HasUnitSpeedOn] at hf hfφ
   convert HasConstantSpeedOnWith.ratio one_ne_zero φm hfφ hf xs using 3
-  simp
+  norm_num
 
 theorem unique_unit_speed_on_Icc_zero {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) {φ : ℝ → ℝ}
     (φm : MonotoneOn φ <| Icc 0 s) (φst : φ '' Icc 0 s = Icc 0 t)

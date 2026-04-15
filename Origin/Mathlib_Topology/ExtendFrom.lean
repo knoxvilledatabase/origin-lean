@@ -3,6 +3,7 @@ Extracted from Topology/ExtendFrom.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Separation.Basic
 
 /-!
 # Extending a function from a subset
@@ -67,5 +68,5 @@ theorem continuousOn_extendFrom [RegularSpace Y] {f : X → Y} {A B : Set X} (hB
 
 theorem continuous_extendFrom [RegularSpace Y] {f : X → Y} {A : Set X} (hA : Dense A)
     (hf : ∀ x, ∃ y, Tendsto f (𝓝[A] x) (𝓝 y)) : Continuous (extendFrom A f) := by
-  rw [← continuousOn_univ]
+  rw [continuous_iff_continuousOn_univ]
   exact continuousOn_extendFrom (fun x _ ↦ hA x) (by simpa using hf)

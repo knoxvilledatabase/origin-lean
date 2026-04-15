@@ -3,6 +3,9 @@ Extracted from Order/UpperLower/LocallyFinite.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Finite.Lattice
+import Mathlib.Order.Interval.Finset.Defs
+import Mathlib.Order.UpperLower.Basic
 
 /-!
 # Upper and lower sets in a locally finite order

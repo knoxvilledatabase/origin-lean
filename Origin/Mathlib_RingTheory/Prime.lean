@@ -3,6 +3,11 @@ Extracted from RingTheory/Prime.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Algebra.Ring.Divisibility.Basic
+import Mathlib.Algebra.Order.Group.Unbundled.Abs
+import Mathlib.Algebra.Prime.Defs
+import Mathlib.Algebra.Ring.Units
 
 /-!
 # Prime elements in rings
@@ -11,7 +16,7 @@ This file contains lemmas about prime elements of commutative rings.
 
 section CancelCommMonoidWithZero
 
-variable {R : Type*} [CommMonoidWithZero R] [IsCancelMulZero R]
+variable {R : Type*} [CancelCommMonoidWithZero R]
 
 open Finset
 
@@ -19,10 +24,9 @@ theorem mul_eq_mul_prime_prod {α : Type*} [DecidableEq α] {x y a : R} {s : Fin
     (hp : ∀ i ∈ s, Prime (p i)) (hx : x * y = a * ∏ i ∈ s, p i) :
     ∃ (t u : Finset α) (b c : R),
       t ∪ u = s ∧ Disjoint t u ∧ a = b * c ∧ (x = b * ∏ i ∈ t, p i) ∧ y = c * ∏ i ∈ u, p i := by
-  induction s using Finset.induction generalizing x y a with
-  | empty => exact ⟨∅, ∅, x, y, by simp [hx]⟩
-  | insert i s his ih =>
-    rw [prod_insert his, ← mul_assoc] at hx
+  induction' s using Finset.induction with i s his ih generalizing x y a
+  · exact ⟨∅, ∅, x, y, by simp [hx]⟩
+  · rw [prod_insert his, ← mul_assoc] at hx
     have hpi : Prime (p i) := hp i (mem_insert_self _ _)
     rcases ih (fun i hi ↦ hp i (mem_insert_of_mem hi)) hx with
       ⟨t, u, b, c, htus, htu, hbc, rfl, rfl⟩
@@ -31,10 +35,10 @@ theorem mul_eq_mul_prime_prod {α : Type*} [DecidableEq α] {x y a : R} {s : Fin
     obtain ⟨d, rfl⟩ | ⟨d, rfl⟩ : p i ∣ b ∨ p i ∣ c := hpi.dvd_or_dvd ⟨a, by rw [← hbc, mul_comm]⟩
     · rw [mul_assoc, mul_comm a, mul_right_inj' hpi.ne_zero] at hbc
       exact ⟨insert i t, u, d, c, by rw [insert_union, htus], disjoint_insert_left.2 ⟨hiu, htu⟩, by
-          simp [hbc, prod_insert hit, mul_comm, mul_left_comm]⟩
+          simp [hbc, prod_insert hit, mul_assoc, mul_comm, mul_left_comm]⟩
     · rw [← mul_assoc, mul_right_comm b, mul_left_inj' hpi.ne_zero] at hbc
       exact ⟨t, insert i u, b, d, by rw [union_insert, htus], disjoint_insert_right.2 ⟨hit, htu⟩, by
-          simp [← hbc, prod_insert hiu, mul_comm, mul_left_comm]⟩
+          simp [← hbc, prod_insert hiu, mul_assoc, mul_comm, mul_left_comm]⟩
 
 theorem mul_eq_mul_prime_pow {x y a p : R} {n : ℕ} (hp : Prime p) (hx : x * y = a * p ^ n) :
     ∃ (i j : ℕ) (b c : R), i + j = n ∧ a = b * c ∧ x = b * p ^ i ∧ y = c * p ^ j := by

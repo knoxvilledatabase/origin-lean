@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Abelian/Images.lean
-Genuine: 8 of 10 | Dissolved: 0 | Infrastructure: 2
+Genuine: 12 of 14 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 
 /-!
 # The abelian image and coimage.
@@ -30,13 +31,11 @@ open CategoryTheory.Limits
 
 namespace CategoryTheory.Abelian
 
-variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C]
+variable {C : Type u} [Category.{v} C] [HasZeroMorphisms C] [HasKernels C] [HasCokernels C]
 
 variable {P Q : C} (f : P ⟶ Q)
 
 section Image
-
-variable [HasCokernel f] [HasKernel (cokernel.π f)]
 
 protected abbrev image : C :=
   kernel (cokernel.π f)
@@ -50,13 +49,12 @@ protected abbrev factorThruImage : P ⟶ Abelian.image f :=
 protected theorem image.fac : Abelian.factorThruImage f ≫ image.ι f = f :=
   kernel.lift_ι _ _ _
 
--- INSTANCE (free from Core): mono_factorThruImage
+instance mono_factorThruImage [Mono f] : Mono (Abelian.factorThruImage f) :=
+  mono_of_mono_fac <| image.fac f
 
 end Image
 
 section Coimage
-
-variable [HasKernel f] [HasCokernel (kernel.ι f)]
 
 protected abbrev coimage : C :=
   cokernel (kernel.ι f)
@@ -70,10 +68,24 @@ protected abbrev factorThruCoimage : Abelian.coimage f ⟶ Q :=
 protected theorem coimage.fac : coimage.π f ≫ Abelian.factorThruCoimage f = f :=
   cokernel.π_desc _ _ _
 
--- INSTANCE (free from Core): epi_factorThruCoimage
+instance epi_factorThruCoimage [Epi f] : Epi (Abelian.factorThruCoimage f) :=
+  epi_of_epi_fac <| coimage.fac f
 
 end Coimage
 
-section Comparison
+def coimageImageComparison : Abelian.coimage f ⟶ Abelian.image f :=
+  cokernel.desc (kernel.ι f) (kernel.lift (cokernel.π f) f (by simp)) (by ext; simp)
 
-variable [HasCokernel f] [HasKernel f] [HasKernel (cokernel.π f)] [HasCokernel (kernel.ι f)]
+def coimageImageComparison' : Abelian.coimage f ⟶ Abelian.image f :=
+  kernel.lift (cokernel.π f) (cokernel.desc (kernel.ι f) f (by simp)) (by ext; simp)
+
+theorem coimageImageComparison_eq_coimageImageComparison' :
+    coimageImageComparison f = coimageImageComparison' f := by
+  ext
+  simp [coimageImageComparison, coimageImageComparison']
+
+@[reassoc (attr := simp)]
+theorem coimage_image_factorisation : coimage.π f ≫ coimageImageComparison f ≫ image.ι f = f := by
+  simp [coimageImageComparison]
+
+end CategoryTheory.Abelian

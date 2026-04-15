@@ -1,8 +1,10 @@
 /-
 Extracted from MeasureTheory/Measure/OpenPos.lean
-Genuine: 30 of 35 | Dissolved: 3 | Infrastructure: 2
+Genuine: 32 of 39 | Dissolved: 5 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
 /-!
 # Measures positive on nonempty opens
@@ -36,7 +38,8 @@ variable [IsOpenPosMeasure μ] {s U F : Set X} {x : X}
 theorem _root_.IsOpen.measure_pos (hU : IsOpen U) (hne : U.Nonempty) : 0 < μ U :=
   (hU.measure_ne_zero μ hne).bot_lt
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) [Nonempty X] : NeZero μ :=
+  ⟨measure_univ_pos.mp <| isOpen_univ.measure_pos μ univ_nonempty⟩
 
 theorem _root_.IsOpen.measure_pos_iff (hU : IsOpen U) : 0 < μ U ↔ U.Nonempty :=
   ⟨fun h => nonempty_iff_ne_empty.2 fun he => h.ne' <| he.symm ▸ measure_empty, hU.measure_pos μ⟩
@@ -57,6 +60,9 @@ variable {μ ν}
 
 protected theorem AbsolutelyContinuous.isOpenPosMeasure (h : μ ≪ ν) : IsOpenPosMeasure ν :=
   ⟨fun _U ho hne h₀ => ho.measure_ne_zero μ hne (h h₀)⟩
+
+theorem _root_.LE.le.isOpenPosMeasure (h : μ ≤ ν) : IsOpenPosMeasure ν :=
+  h.absolutelyContinuous.isOpenPosMeasure
 
 theorem _root_.IsOpen.measure_zero_iff_eq_empty (hU : IsOpen U) :
     μ U = 0 ↔ U = ∅ :=
@@ -94,12 +100,12 @@ theorem dense_of_ae {p : X → Prop} (hp : ∀ᵐ x ∂μ, p x) : Dense {x | p x
 theorem eqOn_open_of_ae_eq {f g : X → Y} (h : f =ᵐ[μ.restrict U] g) (hU : IsOpen U)
     (hf : ContinuousOn f U) (hg : ContinuousOn g U) : EqOn f g U := by
   replace h := ae_imp_of_ae_restrict h
-  simp only [ae_iff, Classical.not_imp] at h
+  simp only [EventuallyEq, ae_iff, Classical.not_imp] at h
   have : IsOpen (U ∩ { a | f a ≠ g a }) := by
     refine isOpen_iff_mem_nhds.mpr fun a ha => inter_mem (hU.mem_nhds ha.1) ?_
     rcases ha with ⟨ha : a ∈ U, ha' : (f a, g a) ∈ (diagonal Y)ᶜ⟩
     exact
-      (hf.continuousAt (hU.mem_nhds ha)).prodMk_nhds (hg.continuousAt (hU.mem_nhds ha))
+      (hf.continuousAt (hU.mem_nhds ha)).prod_mk_nhds (hg.continuousAt (hU.mem_nhds ha))
         (isClosed_diagonal.isOpen_compl.mem_nhds ha')
   replace := (this.eq_empty_of_measure_zero h).le
   exact fun x hx => Classical.not_not.1 fun h => this ⟨hx, h⟩
@@ -115,11 +121,13 @@ theorem eqOn_of_ae_eq {f g : X → Y} (h : f =ᵐ[μ.restrict s] g) (hf : Contin
         (hg.mono this)).of_subset_closure
     hf hg this hU
 
-variable (μ) in
+variable (μ)
 
 theorem _root_.Continuous.ae_eq_iff_eq {f g : X → Y} (hf : Continuous f) (hg : Continuous g) :
     f =ᵐ[μ] g ↔ f = g :=
   ⟨fun h => eq_of_ae_eq h hf hg, fun h => h ▸ EventuallyEq.rfl⟩
+
+variable {μ}
 
 theorem _root_.Continuous.isOpenPosMeasure_map [OpensMeasurableSpace X]
     {Z : Type*} [TopologicalSpace Z] [MeasurableSpace Z] [BorelSpace Z]
@@ -128,14 +136,6 @@ theorem _root_.Continuous.isOpenPosMeasure_map [OpensMeasurableSpace X]
   refine ⟨fun U hUo hUne => ?_⟩
   rw [Measure.map_apply hf.measurable hUo.measurableSet]
   exact (hUo.preimage hf).measure_ne_zero μ (hf_surj.nonempty_preimage.mpr hUne)
-
-protected theorem IsOpenPosMeasure.comap [BorelSpace X]
-    {Z : Type*} [TopologicalSpace Z] {mZ : MeasurableSpace Z} [BorelSpace Z]
-    (μ : Measure Z) [IsOpenPosMeasure μ] {f : X → Z} (hf : IsOpenEmbedding f) :
-    (μ.comap f).IsOpenPosMeasure where
-  open_pos U hU Une := by
-    rw [hf.measurableEmbedding.comap_apply]
-    exact IsOpenPosMeasure.open_pos _ (hf.isOpen_iff_image_isOpen.mp hU) (Une.image f)
 
 end Basic
 
@@ -193,3 +193,56 @@ theorem measure_ball_pos (x : X) {r : ℝ} (hr : 0 < r) : 0 < μ (ball x r) :=
 
 theorem measure_closedBall_pos (x : X) {r : ℝ} (hr : 0 < r) : 0 < μ (closedBall x r) :=
   (measure_ball_pos μ x hr).trans_le (measure_mono ball_subset_closedBall)
+
+@[simp] lemma measure_closedBall_pos_iff {X : Type*} [MetricSpace X] {m : MeasurableSpace X}
+    (μ : Measure X) [IsOpenPosMeasure μ] [NoAtoms μ] {x : X} {r : ℝ} :
+    0 < μ (closedBall x r) ↔ 0 < r := by
+  refine ⟨fun h ↦ ?_, measure_closedBall_pos μ x⟩
+  contrapose! h
+  rw [(subsingleton_closedBall x h).measure_zero μ]
+
+end Metric
+
+namespace EMetric
+
+variable {X : Type*} [PseudoEMetricSpace X] {m : MeasurableSpace X} (μ : Measure X)
+  [IsOpenPosMeasure μ]
+
+-- DISSOLVED: measure_ball_pos
+
+-- DISSOLVED: measure_closedBall_pos
+
+end EMetric
+
+section MeasureZero
+
+/-! ## Meagre sets and measure zero
+In general, neither of meagre and measure zero implies the other.
+- The set of Liouville numbers is a Lebesgue measure zero subset of ℝ, but is not meagre.
+(In fact, its complement is meagre. See `Real.disjoint_residual_ae`.)
+
+- The complement of the set of Liouville numbers in $[0,1]$ is meagre and has measure 1.
+For another counterexample, for all $α ∈ (0,1)$, there is a generalised Cantor set $C ⊆ [0,1]$
+of measure `α`. Cantor sets are nowhere dense (hence meagre). Taking a countable union of
+fat Cantor sets whose measure approaches 1 even yields a meagre set of measure 1.
+
+However, with respect to a measure which is positive on non-empty open sets, *closed* measure
+zero sets are nowhere dense and σ-compact measure zero sets in a Hausdorff space are meagre.
+-/
+
+variable {X : Type*} [TopologicalSpace X] [MeasurableSpace X] {s : Set X}
+  {μ : Measure X} [IsOpenPosMeasure μ]
+
+lemma IsNowhereDense.of_isClosed_null (h₁s : IsClosed s) (h₂s : μ s = 0) :
+    IsNowhereDense s := h₁s.isNowhereDense_iff.mpr (interior_eq_empty_of_null h₂s)
+
+lemma IsMeagre.of_isSigmaCompact_null [T2Space X] (h₁s : IsSigmaCompact s) (h₂s : μ s = 0) :
+    IsMeagre s := by
+  rcases h₁s with ⟨K, hcompact, hcover⟩
+  have h (n : ℕ) : IsNowhereDense (K n) := by
+    have : μ (K n) = 0 := measure_mono_null (hcover ▸ subset_iUnion K n) h₂s
+    exact .of_isClosed_null (hcompact n).isClosed this
+  rw [isMeagre_iff_countable_union_isNowhereDense]
+  exact ⟨range K, fun t ⟨n, hn⟩ ↦ hn ▸ h n, countable_range K, hcover.symm.subset⟩
+
+end MeasureZero

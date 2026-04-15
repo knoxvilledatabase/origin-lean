@@ -3,6 +3,8 @@ Extracted from Analysis/SpecialFunctions/Trigonometric/EulerSineProd.lean
 Genuine: 6 of 12 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Integrals
+import Mathlib.MeasureTheory.Integral.PeakFunction
 
 /-! # Euler's infinite product for the sine function
 
@@ -35,11 +37,7 @@ variable {z : ℂ} {n : ℕ}
 
 -- DISSOLVED: antideriv_sin_comp_const_mul
 
-set_option backward.isDefEq.respectTransparency false in
-
 -- DISSOLVED: integral_cos_mul_cos_pow_aux
-
-set_option backward.isDefEq.respectTransparency false in
 
 -- DISSOLVED: integral_sin_mul_sin_mul_cos_pow_eq
 
@@ -76,16 +74,15 @@ theorem sin_pi_mul_eq (z : ℂ) (n : ℕ) :
         (∫ x in (0 : ℝ)..π / 2, cos x ^ (2 * n) : ℝ) := by
   rcases eq_or_ne z 0 with (rfl | hz)
   · simp
-  induction n with
-  | zero =>
-    simp_rw [mul_zero, pow_zero, mul_one, Finset.prod_range_zero, mul_one,
+  induction' n with n hn
+  · simp_rw [mul_zero, pow_zero, mul_one, Finset.prod_range_zero, mul_one,
       integral_one, sub_zero]
     rw [integral_cos_mul_complex (mul_ne_zero two_ne_zero hz), Complex.ofReal_zero,
       mul_zero, Complex.sin_zero, zero_div, sub_zero,
-      (by push_cast; ring : 2 * z * ↑(π / 2) = π * z)]
-    simp [field]
-  | succ n hn =>
-    rw [hn, Finset.prod_range_succ]
+      (by push_cast; field_simp; ring : 2 * z * ↑(π / 2) = π * z)]
+    field_simp [Complex.ofReal_ne_zero.mpr pi_pos.ne']
+    ring
+  · rw [hn, Finset.prod_range_succ]
     set A := ∏ j ∈ Finset.range n, ((1 : ℂ) - z ^ 2 / ((j : ℂ) + 1) ^ 2)
     set B := ∫ x in (0 : ℝ)..π / 2, Complex.cos (2 * z * x) * (cos x : ℂ) ^ (2 * n)
     set C := ∫ x in (0 : ℝ)..π / 2, cos x ^ (2 * n)
@@ -95,7 +92,7 @@ theorem sin_pi_mul_eq (z : ℂ) (n : ℕ) :
       dsimp only [C]
       rw [integral_cos_pow_eq, aux', integral_sin_pow, sin_zero, sin_pi, pow_succ',
         zero_mul, zero_mul, zero_mul, sub_zero, zero_div,
-        zero_add, ← mul_assoc, ← mul_assoc, mul_comm (1 / 2 : ℝ) _, Nat.cast_mul, Nat.cast_ofNat]
+        zero_add, ← mul_assoc, ← mul_assoc, mul_comm (1 / 2 : ℝ) _, Nat.cast_mul, Nat.cast_eq_ofNat]
     rw [this]
     change
       π * z * A * B / C =
@@ -108,7 +105,9 @@ theorem sin_pi_mul_eq (z : ℂ) (n : ℕ) :
         π * z * A *
           (((1 : ℂ) - z ^ 2 / (n.succ : ℂ) ^ 2) *
             ∫ x in (0 : ℝ)..π / 2, Complex.cos (2 * z * x) * (cos x : ℂ) ^ (2 * n.succ)) := by
-      grind
+      nth_rw 2 [Nat.succ_eq_add_one]
+      rw [Nat.cast_add_one]
+      ring
     rw [this]
     suffices
       (((1 : ℂ) - z ^ 2 / (n.succ : ℂ) ^ 2) *
@@ -119,8 +118,10 @@ theorem sin_pi_mul_eq (z : ℂ) (n : ℕ) :
       have : 2 * (n : ℂ) + 1 ≠ 0 := by
         convert (Nat.cast_add_one_ne_zero (2 * n) : (↑(2 * n) + 1 : ℂ) ≠ 0)
         simp
-      have : (n : ℂ) + 1 ≠ 0 := Nat.cast_add_one_ne_zero n
-      simp [field]
+      have : 2 * (n : ℂ) + 2 ≠ 0 := by
+        convert (Nat.cast_add_one_ne_zero (2 * n + 1) : (↑(2 * n + 1) + 1 : ℂ) ≠ 0) using 1
+        push_cast; ring
+      field_simp; ring
     convert integral_cos_mul_cos_pow_even n hz
     rw [Nat.cast_succ]
 
@@ -171,7 +172,8 @@ theorem _root_.Complex.tendsto_euler_sin_prod (z : ℂ) :
         (∫ x in (0 : ℝ)..π / 2, Complex.cos (2 * z * x) * (cos x : ℂ) ^ n) /
           (∫ x in (0 : ℝ)..π / 2, cos x ^ n : ℝ)) atTop (𝓝 1) from
     this.comp (tendsto_id.const_mul_atTop' zero_lt_two)
-  have : ContinuousOn (fun x : ℝ ↦ Complex.cos (2 * z * x)) (Icc 0 (π / 2)) := by fun_prop
+  have : ContinuousOn (fun x : ℝ => Complex.cos (2 * z * x)) (Icc 0 (π / 2)) :=
+    (Complex.continuous_cos.comp (continuous_const.mul Complex.continuous_ofReal)).continuousOn
   convert tendsto_integral_cos_pow_mul_div this using 1
   · ext1 n; congr 2 with x : 1; rw [mul_comm]
   · rw [Complex.ofReal_zero, mul_zero, Complex.cos_zero]
@@ -186,7 +188,9 @@ theorem _root_.Real.tendsto_euler_sin_prod (x : ℝ) :
       (∏ j ∈ Finset.range n, (1 - x ^ 2 / (j + 1) ^ 2) : ℂ) =
         (∏ j ∈ Finset.range n, (1 - x ^ 2 / (j + 1) ^ 2) : ℝ) by
       rw [this, Complex.ofReal_re]
-    simp
+    rw [Complex.ofReal_prod]
+    refine Finset.prod_congr (by rfl) fun n _ => ?_
+    norm_cast
   · rw [← Complex.ofReal_mul, ← Complex.ofReal_sin, Complex.ofReal_re]
 
 end EulerSine

@@ -3,13 +3,17 @@ Extracted from Analysis/Convex/TotallyBounded.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.UniformSpace.Cauchy
+import Mathlib.Analysis.Convex.Hull
+import Mathlib.Topology.Algebra.UniformGroup.Basic
+import Mathlib.Topology.Algebra.Module.LocallyConvex
 
 /-!
 # Totally Bounded sets and Convex Hulls
 
 ## Main statements
 
-- `totallyBounded_convexHull`: The convex hull of a totally bounded set is totally bounded.
+- `totallyBounded_convexHull` The convex hull of a totally bounded set is totally bounded.
 
 ## References
 
@@ -26,7 +30,7 @@ variable (E : Type*) {s : Set E}
 
 variable [AddCommGroup E] [Module ℝ E]
 
-variable [UniformSpace E] [IsUniformAddGroup E] [lcs : LocallyConvexSpace ℝ E] [ContinuousSMul ℝ E]
+variable [UniformSpace E] [UniformAddGroup E] [lcs : LocallyConvexSpace ℝ E] [ContinuousSMul ℝ E]
 
 theorem totallyBounded_convexHull (hs : TotallyBounded s) :
     TotallyBounded (convexHull ℝ s) := by
@@ -36,7 +40,7 @@ theorem totallyBounded_convexHull (hs : TotallyBounded s) :
   obtain ⟨V, ⟨hV₁, hV₂, hV₃⟩⟩ := (locallyConvexSpace_iff_exists_convex_subset_zero ℝ E).mp lcs W hW₁
   obtain ⟨t, ⟨htf, hts⟩⟩ := (totallyBounded_iff_subset_finite_iUnion_nhds_zero.mp hs) _ hV₁
   obtain ⟨t', ⟨htf', hts'⟩⟩ := (totallyBounded_iff_subset_finite_iUnion_nhds_zero.mp
-    (IsCompact.totallyBounded (Finite.isCompact_convexHull ℝ htf)) _ hV₁)
+    (IsCompact.totallyBounded (Finite.isCompact_convexHull htf)) _ hV₁)
   use t', htf'
   simp only [iUnion_vadd_set, vadd_eq_add] at hts hts' ⊢
   calc convexHull ℝ s

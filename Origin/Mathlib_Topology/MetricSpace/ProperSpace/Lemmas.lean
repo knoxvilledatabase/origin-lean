@@ -3,6 +3,10 @@ Extracted from Topology/MetricSpace/ProperSpace/Lemmas.lean
 Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.Order.Compact
+import Mathlib.Topology.MetricSpace.ProperSpace
+import Mathlib.Topology.Order.IntermediateValue
+import Mathlib.Topology.Order.LocalExtr
 
 /-!
 # Proper spaces
@@ -20,8 +24,20 @@ open Set Metric
 
 variable {α : Type*} {β : Type*} [PseudoMetricSpace α] [ProperSpace α] {x : α} {r : ℝ} {s : Set α}
 
+theorem exists_pos_lt_subset_ball (hr : 0 < r) (hs : IsClosed s) (h : s ⊆ ball x r) :
+    ∃ r' ∈ Ioo 0 r, s ⊆ ball x r' := by
+  rcases eq_empty_or_nonempty s with (rfl | hne)
+  · exact ⟨r / 2, ⟨half_pos hr, half_lt_self hr⟩, empty_subset _⟩
+  have : IsCompact s :=
+    (isCompact_closedBall x r).of_isClosed_subset hs (h.trans ball_subset_closedBall)
+  obtain ⟨y, hys, hy⟩ : ∃ y ∈ s, s ⊆ closedBall x (dist y x) :=
+    this.exists_isMaxOn (β := α) (α := ℝ) hne (continuous_id.dist continuous_const).continuousOn
+  have hyr : dist y x < r := h hys
+  rcases exists_between hyr with ⟨r', hyr', hrr'⟩
+  exact ⟨r', ⟨dist_nonneg.trans_lt hyr', hrr'⟩, hy.trans <| closedBall_subset_ball hyr'⟩
+
 theorem exists_lt_subset_ball (hs : IsClosed s) (h : s ⊆ ball x r) : ∃ r' < r, s ⊆ ball x r' := by
-  rcases le_or_gt r 0 with hr | hr
+  rcases le_or_lt r 0 with hr | hr
   · rw [ball_eq_empty.2 hr, subset_empty_iff] at h
     subst s
     exact (exists_lt r).imp fun r' hr' => ⟨hr', empty_subset _⟩

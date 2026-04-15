@@ -1,18 +1,12 @@
 /-
 Extracted from Algebra/Ring/Action/Invariant.lean
-Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.GroupTheory.GroupAction.Hom
+import Mathlib.Algebra.Ring.Subring.Defs
 
-/-! # Subrings invariant under an action
-
-If a monoid acts on a ring via a `MulSemiringAction`, then `IsInvariantSubring` is
-a predicate on subrings asserting that the subring is fixed elementwise by the
-action.
-
--/
-
-assert_not_exists RelIso
+/-! # Subrings invariant under an action -/
 
 section Ring
 
@@ -27,9 +21,19 @@ variable {R}
 class IsInvariantSubring : Prop where
   smul_mem : ∀ (m : M) {x : R}, x ∈ S → m • x ∈ S
 
--- INSTANCE (free from Core): IsInvariantSubring.toMulSemiringAction
+instance IsInvariantSubring.toMulSemiringAction [IsInvariantSubring M S] :
+    MulSemiringAction M S where
+  smul m x := ⟨m • ↑x, IsInvariantSubring.smul_mem m x.2⟩
+  one_smul s := Subtype.eq <| one_smul M (s : R)
+  mul_smul m₁ m₂ s := Subtype.eq <| mul_smul m₁ m₂ (s : R)
+  smul_add m s₁ s₂ := Subtype.eq <| smul_add m (s₁ : R) (s₂ : R)
+  smul_zero m := Subtype.eq <| smul_zero m
+  smul_one m := Subtype.eq <| smul_one m
+  smul_mul m s₁ s₂ := Subtype.eq <| smul_mul' m (s₁ : R) (s₂ : R)
 
 end Ring
+
+section
 
 variable (M : Type*) [Monoid M]
 
@@ -39,3 +43,13 @@ variable (U : Subring R') [IsInvariantSubring M U]
 
 def IsInvariantSubring.subtypeHom : U →+*[M] R' :=
   { U.subtype with map_smul' := fun _ _ ↦ rfl }
+
+@[simp]
+theorem IsInvariantSubring.coe_subtypeHom :
+    (IsInvariantSubring.subtypeHom M U : U → R') = Subtype.val := rfl
+
+@[simp]
+theorem IsInvariantSubring.coe_subtypeHom' :
+    ((IsInvariantSubring.subtypeHom M U).toRingHom : U →+* R') = U.subtype := rfl
+
+end

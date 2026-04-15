@@ -1,8 +1,10 @@
 /-
 Extracted from CategoryTheory/Monoidal/Rigid/Braided.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 9 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Monoidal.Rigid.Basic
+import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 
 /-!
 # Deriving `RigidCategory` instance for braided and left/right rigid categories.
@@ -10,11 +12,9 @@ import Origin.Core
 
 open CategoryTheory Category BraidedCategory MonoidalCategory
 
-variable {C : Type*} [Category* C] [MonoidalCategory C] [BraidedCategory C] {X Y : C}
+variable {C : Type*} [Category C] [MonoidalCategory C] [BraidedCategory C] {X Y : C}
 
 namespace CategoryTheory.BraidedCategory
-
-set_option backward.privateInPublic true in
 
 private theorem coevaluation_evaluation_braided' [inst : ExactPairing X Y] :
     X ◁ (η_ X Y ≫ (β_ Y X).inv) ≫ (α_ X Y X).inv ≫ ((β_ X Y).hom ≫ ε_ X Y) ▷ X
@@ -36,12 +36,10 @@ private theorem coevaluation_evaluation_braided' [inst : ExactPairing X Y] :
       iterate 5 rw [← IsIso.comp_inv_eq]
       simpa using yang_baxter X Y X
     _ = 𝟙 X ⊗≫ (X ◁ η_ X Y ≫ (β_ X (X ⊗ Y)).hom) ⊗≫ ((β_ (Y ⊗ X) X).inv ≫ ε_ X Y ▷ X) ⊗≫ 𝟙 X := by
-      simp [monoidalComp, braiding_tensor_right_hom, braiding_tensor_left_inv]
+      simp [monoidalComp, braiding_tensor_right, braiding_inv_tensor_left]
     _ = _ := by
       rw [braiding_naturality_right, ← braiding_inv_naturality_right]
       simp [monoidalComp]
-
-set_option backward.privateInPublic true in
 
 private theorem evaluation_coevaluation_braided' [inst : ExactPairing X Y] :
     (η_ X Y ≫ (β_ Y X).inv) ▷ Y ≫ (α_ Y X Y).hom ≫ Y ◁ ((β_ X Y).hom ≫ ε_ X Y) =
@@ -53,20 +51,43 @@ private theorem evaluation_coevaluation_braided' [inst : ExactPairing X Y] :
     _ = 𝟙 Y ⊗≫ η_ X Y ▷ Y ⊗≫ (𝟙 ((X ⊗ Y) ⊗ Y) ⊗≫ X ◁ (β_ Y Y).hom ⊗≫ (β_ X Y).hom ▷ Y
         ⊗≫ Y ◁ (β_ Y X).inv ⊗≫ (β_ Y Y).inv ▷ X ⊗≫ 𝟙 (Y ⊗ Y ⊗ X)) ⊗≫ Y ◁ ε_ X Y ⊗≫ 𝟙 Y := by
       congr 3
-      on_goal 2 => simp [monoidalComp]
-      simp only [monoidalComp, MonoidalCoherence.assoc_iso, MonoidalCoherence.whiskerRight_iso,
-        MonoidalCoherence.refl_iso, whiskerRightIso_refl, Iso.trans_refl,
-        MonoidalCoherence.assoc'_iso, Iso.refl_trans, Iso.symm_hom, comp_id, id_comp]
+      all_goals simp [monoidalComp]
       iterate 2 rw [← IsIso.eq_inv_comp]
       repeat rw [← assoc]
       iterate 4 rw [← IsIso.comp_inv_eq]
       simpa using (yang_baxter Y X Y).symm
     _ = 𝟙 Y ⊗≫ (η_ X Y ▷ Y ≫ (β_ (X ⊗ Y) Y).hom) ⊗≫ ((β_ Y (Y ⊗ X)).inv ≫ Y ◁ ε_ X Y) ⊗≫ 𝟙 Y := by
-      simp [monoidalComp, braiding_tensor_left_hom, braiding_tensor_right_inv]
+      simp [monoidalComp, braiding_tensor_left, braiding_inv_tensor_right]
     _ = _ := by
       rw [braiding_naturality_left, ← braiding_inv_naturality_left]
       simp [monoidalComp]
 
-set_option backward.privateInPublic true in
+def exactPairing_swap (X Y : C) [ExactPairing X Y] : ExactPairing Y X where
+  coevaluation' := η_ X Y ≫ (β_ Y X).inv
+  evaluation' := (β_ X Y).hom ≫ ε_ X Y
+  coevaluation_evaluation' := coevaluation_evaluation_braided'
+  evaluation_coevaluation' := evaluation_coevaluation_braided'
 
-set_option backward.privateInPublic.warn false in
+def hasLeftDualOfHasRightDual [HasRightDual X] : HasLeftDual X where
+  leftDual := Xᘁ
+  exact := exactPairing_swap X Xᘁ
+
+def hasRightDualOfHasLeftDual [HasLeftDual X] : HasRightDual X where
+  rightDual := ᘁX
+  exact := exactPairing_swap ᘁX X
+
+instance leftRigidCategoryOfRightRigidCategory [RightRigidCategory C] : LeftRigidCategory C where
+  leftDual X := hasLeftDualOfHasRightDual (X := X)
+
+instance rightRigidCategoryOfLeftRigidCategory [LeftRigidCategory C] : RightRigidCategory C where
+  rightDual X := hasRightDualOfHasLeftDual (X := X)
+
+instance rigidCategoryOfRightRigidCategory [RightRigidCategory C] : RigidCategory C where
+  rightDual := inferInstance
+  leftDual := inferInstance
+
+instance rigidCategoryOfLeftRigidCategory [LeftRigidCategory C] : RigidCategory C where
+  rightDual := inferInstance
+  leftDual := inferInstance
+
+end CategoryTheory.BraidedCategory

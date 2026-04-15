@@ -3,6 +3,7 @@ Extracted from Data/Sigma/Lex.lean
 Genuine: 4 of 19 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
+import Mathlib.Order.RelClasses
 
 /-!
 # Lexicographic order on a sigma type
@@ -40,32 +41,90 @@ theorem lex_iff : Lex r s a b ↔ r a.1 b.1 ∨ ∃ h : a.1 = b.1, s b.1 (h.rec 
     · exact Or.inl hij
     · exact Or.inr ⟨rfl, hab⟩
   · obtain ⟨i, a⟩ := a
+    obtain ⟨j, b⟩ := b
     dsimp only
     rintro (h | ⟨rfl, h⟩)
     · exact Lex.left _ _ h
     · exact Lex.right _ _ h
 
--- INSTANCE (free from Core): Lex.decidable
+instance Lex.decidable (r : ι → ι → Prop) (s : ∀ i, α i → α i → Prop) [DecidableEq ι]
+    [DecidableRel r] [∀ i, DecidableRel (s i)] : DecidableRel (Lex r s) := fun _ _ =>
+  decidable_of_decidable_of_iff lex_iff.symm
+
+theorem Lex.mono (hr : ∀ a b, r₁ a b → r₂ a b) (hs : ∀ i a b, s₁ i a b → s₂ i a b) {a b : Σ i, α i}
+    (h : Lex r₁ s₁ a b) : Lex r₂ s₂ a b := by
+  obtain ⟨a, b, hij⟩ | ⟨a, b, hab⟩ := h
+  · exact Lex.left _ _ (hr _ _ hij)
+  · exact Lex.right _ _ (hs _ _ _ hab)
+
+theorem Lex.mono_left (hr : ∀ a b, r₁ a b → r₂ a b) {a b : Σ i, α i} (h : Lex r₁ s a b) :
+    Lex r₂ s a b :=
+  h.mono hr fun _ _ _ => id
+
+theorem Lex.mono_right (hs : ∀ i a b, s₁ i a b → s₂ i a b) {a b : Σ i, α i} (h : Lex r s₁ a b) :
+    Lex r s₂ a b :=
+  h.mono (fun _ _ => id) hs
 
 theorem lex_swap : Lex (Function.swap r) s a b ↔ Lex r (fun i => Function.swap (s i)) b a := by
   constructor <;>
     · rintro (⟨a, b, h⟩ | ⟨a, b, h⟩)
-      · exact Lex.left _ _ h
-      · exact Lex.right _ _ h
+      exacts [Lex.left _ _ h, Lex.right _ _ h]
 
--- INSTANCE (free from Core): [∀
+instance [∀ i, IsRefl (α i) (s i)] : IsRefl _ (Lex r s) :=
+  ⟨fun ⟨_, _⟩ => Lex.right _ _ <| refl _⟩
 
--- INSTANCE (free from Core): [Std.Irrefl
+instance [IsIrrefl ι r] [∀ i, IsIrrefl (α i) (s i)] : IsIrrefl _ (Lex r s) :=
+  ⟨by
+    rintro _ (⟨a, b, hi⟩ | ⟨a, b, ha⟩)
+    · exact irrefl _ hi
+    · exact irrefl _ ha
+      ⟩
 
--- INSTANCE (free from Core): [IsTrans
+instance [IsTrans ι r] [∀ i, IsTrans (α i) (s i)] : IsTrans _ (Lex r s) :=
+  ⟨by
+    rintro _ _ _ (⟨a, b, hij⟩ | ⟨a, b, hab⟩) (⟨_, c, hk⟩ | ⟨_, c, hc⟩)
+    · exact Lex.left _ _ (_root_.trans hij hk)
+    · exact Lex.left _ _ hij
+    · exact Lex.left _ _ hk
+    · exact Lex.right _ _ (_root_.trans hab hc)⟩
 
--- INSTANCE (free from Core): [Std.Symm
+instance [IsSymm ι r] [∀ i, IsSymm (α i) (s i)] : IsSymm _ (Lex r s) :=
+  ⟨by
+    rintro _ _ (⟨a, b, hij⟩ | ⟨a, b, hab⟩)
+    · exact Lex.left _ _ (symm hij)
+    · exact Lex.right _ _ (symm hab)
+      ⟩
 
--- INSTANCE (free from Core): [Std.Asymm
+attribute [local instance] IsAsymm.isIrrefl
 
--- INSTANCE (free from Core): [Std.Trichotomous
+instance [IsAsymm ι r] [∀ i, IsAntisymm (α i) (s i)] : IsAntisymm _ (Lex r s) :=
+  ⟨by
+    rintro _ _ (⟨a, b, hij⟩ | ⟨a, b, hab⟩) (⟨_, _, hji⟩ | ⟨_, _, hba⟩)
+    · exact (asymm hij hji).elim
+    · exact (irrefl _ hij).elim
+    · exact (irrefl _ hji).elim
+    · exact congr_arg (Sigma.mk _ ·) <| antisymm hab hba⟩
 
--- INSTANCE (free from Core): [Std.Trichotomous
+instance [IsTrichotomous ι r] [∀ i, IsTotal (α i) (s i)] : IsTotal _ (Lex r s) :=
+  ⟨by
+    rintro ⟨i, a⟩ ⟨j, b⟩
+    obtain hij | rfl | hji := trichotomous_of r i j
+    · exact Or.inl (Lex.left _ _ hij)
+    · obtain hab | hba := total_of (s i) a b
+      · exact Or.inl (Lex.right _ _ hab)
+      · exact Or.inr (Lex.right _ _ hba)
+    · exact Or.inr (Lex.left _ _ hji)⟩
+
+instance [IsTrichotomous ι r] [∀ i, IsTrichotomous (α i) (s i)] : IsTrichotomous _ (Lex r s) :=
+  ⟨by
+    rintro ⟨i, a⟩ ⟨j, b⟩
+    obtain hij | rfl | hji := trichotomous_of r i j
+    · exact Or.inl (Lex.left _ _ hij)
+    · obtain hab | rfl | hba := trichotomous_of (s i) a b
+      · exact Or.inl (Lex.right _ _ hab)
+      · exact Or.inr (Or.inl rfl)
+      · exact Or.inr (Or.inr <| Lex.right _ _ hba)
+    · exact Or.inr (Or.inr <| Lex.left _ _ hji)⟩
 
 end Sigma
 
@@ -82,11 +141,29 @@ theorem lex_iff {a b : Σ' i, α i} :
     · exact Or.inl hij
     · exact Or.inr ⟨rfl, hab⟩
   · obtain ⟨i, a⟩ := a
+    obtain ⟨j, b⟩ := b
     dsimp only
     rintro (h | ⟨rfl, h⟩)
     · exact Lex.left _ _ h
     · exact Lex.right _ h
 
--- INSTANCE (free from Core): Lex.decidable
+instance Lex.decidable (r : ι → ι → Prop) (s : ∀ i, α i → α i → Prop) [DecidableEq ι]
+    [DecidableRel r] [∀ i, DecidableRel (s i)] : DecidableRel (Lex r s) := fun _ _ =>
+  decidable_of_decidable_of_iff lex_iff.symm
+
+theorem Lex.mono {r₁ r₂ : ι → ι → Prop} {s₁ s₂ : ∀ i, α i → α i → Prop}
+    (hr : ∀ a b, r₁ a b → r₂ a b) (hs : ∀ i a b, s₁ i a b → s₂ i a b) {a b : Σ' i, α i}
+    (h : Lex r₁ s₁ a b) : Lex r₂ s₂ a b := by
+  obtain ⟨a, b, hij⟩ | ⟨i, hab⟩ := h
+  · exact Lex.left _ _ (hr _ _ hij)
+  · exact Lex.right _ (hs _ _ _ hab)
+
+theorem Lex.mono_left {r₁ r₂ : ι → ι → Prop} {s : ∀ i, α i → α i → Prop}
+    (hr : ∀ a b, r₁ a b → r₂ a b) {a b : Σ' i, α i} (h : Lex r₁ s a b) : Lex r₂ s a b :=
+  h.mono hr fun _ _ _ => id
+
+theorem Lex.mono_right {r : ι → ι → Prop} {s₁ s₂ : ∀ i, α i → α i → Prop}
+    (hs : ∀ i a b, s₁ i a b → s₂ i a b) {a b : Σ' i, α i} (h : Lex r s₁ a b) : Lex r s₂ a b :=
+  h.mono (fun _ _ => id) hs
 
 end PSigma

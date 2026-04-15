@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Limits/Preserves/Yoneda.lean
 Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Preserves.Ulift
+import Mathlib.CategoryTheory.Limits.FunctorToTypes
 
 /-!
 # Yoneda preserves certain colimits
@@ -21,7 +23,7 @@ pointwise.
 ## See also
 
 There is also a relative version of this statement where `F : J ⥤ Over A` for some presheaf
-`A`, see `Mathlib/CategoryTheory/Comma/Presheaf/Colimit.lean`.
+`A`, see `CategoryTheory.Comma.Presheaf.Colimit`.
 
 -/
 
@@ -29,7 +31,7 @@ universe v₁ v₂ v₃ u₁ u₂ u₃
 
 namespace CategoryTheory
 
-open CategoryTheory.Limits Opposite Functor
+open CategoryTheory.Limits Opposite
 
 variable {C : Type u₁} [Category.{v₁} C]
 
@@ -49,29 +51,28 @@ noncomputable def yonedaYonedaColimit :
   _ ≅ yoneda.op ⋙ colimit (F ⋙ yoneda) :=
         isoWhiskerLeft yoneda.op (colimitIsoFlipCompColim (F ⋙ yoneda)).symm
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem yonedaYonedaColimit_app_inv {X : C} : ((yonedaYonedaColimit F).app (op X)).inv =
     (colimitObjIsoColimitCompEvaluation _ _).hom ≫
       (colimit.post F (coyoneda.obj (op (yoneda.obj X)))) := by
   dsimp [yonedaYonedaColimit]
-  simp only [Iso.cancel_iso_hom_left]
+  simp only [Category.id_comp, Iso.cancel_iso_hom_left]
   apply colimit.hom_ext
   intro j
   rw [colimit.ι_post, ι_colimMap_assoc]
   simp only [← CategoryTheory.Functor.assoc, comp_evaluation]
-  rw [ι_preservesColimitIso_inv_assoc]
-  simp only [← comp_evaluation, comp_obj, evaluation_obj_obj, yoneda_obj_obj, uliftFunctor_obj,
-    whiskerLeft_app, uliftFunctor_map, Functor.comp_map, evaluation_obj_map, yoneda_map_app]
+  rw [ι_preservesColimitIso_inv_assoc, ← Functor.map_comp_assoc]
+  simp only [← comp_evaluation]
+  rw [colimitObjIsoColimitCompEvaluation_ι_inv, whiskerLeft_app]
   ext η Y f
-  dsimp [largeCurriedYonedaLemma, yonedaOpCompYonedaObj, yonedaEquiv]
-  simp only [← comp_apply, Category.assoc, colimitObjIsoColimitCompEvaluation_ι_inv,
-    ← NatTrans.naturality, ← NatTrans.naturality_assoc, yoneda_obj_obj, yoneda_obj_map,
-    Quiver.Hom.unop_op]
-  simp
+  simp [largeCurriedYonedaLemma, yonedaOpCompYonedaObj, FunctorToTypes.colimit.map_ι_apply,
+    map_yonedaEquiv]
 
-set_option backward.isDefEq.respectTransparency false in
-
--- INSTANCE (free from Core): {X
+noncomputable instance {X : C} : PreservesColimit F (coyoneda.obj (op (yoneda.obj X))) := by
+  suffices IsIso (colimit.post F (coyoneda.obj (op (yoneda.obj X)))) from
+    preservesColimit_of_isIso_post _ _
+  suffices colimit.post F (coyoneda.obj (op (yoneda.obj X))) =
+      (colimitObjIsoColimitCompEvaluation _ _).inv ≫ ((yonedaYonedaColimit F).app (op X)).inv from
+    this ▸ inferInstance
+  rw [yonedaYonedaColimit_app_inv, Iso.inv_hom_id_assoc]
 
 end CategoryTheory

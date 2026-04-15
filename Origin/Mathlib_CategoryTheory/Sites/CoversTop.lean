@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Sites/CoversTop.lean
-Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Sites.Sheaf
 
 /-! Objects which cover the terminal object
 
@@ -13,9 +14,9 @@ When there is a terminal object `X : C`, then `J.CoversTop Y`
 holds iff `Sieve.ofObjects Y X` is covering for `J`.
 
 We introduce a notion of compatible family of elements on objects `Y`
-and obtain `Presheaf.FamilyOfElementsOnObjects.IsCompatible.existsUnique_section`
+and obtain `Presheaf.FamilyOfElementsOnObjects.IsCompatible.exists_unique_section`
 which asserts that if a presheaf of types is a sheaf, then any compatible
-family of elements on objects `Y` which cover the final object extends to
+family of elements on objects `Y` which cover the final object extends as
 a section of this presheaf.
 
 -/
@@ -62,11 +63,12 @@ lemma ext (F : Sheaf J A) {c : Cone F.1} (hc : IsLimit c) {X : A} {f g : X ⟶ c
   rintro ⟨W, a, ⟨i, ⟨b⟩⟩⟩
   simpa using h i =≫ F.1.map b.op
 
-lemma sections_ext (F : Sheaf J Type*) {x y : F.1.sections}
+lemma sections_ext (F : Sheaf J (Type _)) {x y : F.1.sections}
     (h : ∀ (i : I), x.1 (Opposite.op (Y i)) = y.1 (Opposite.op (Y i))) :
     x = y := by
   ext W
-  apply (((isSheaf_iff_isSheaf_of_type _ _).1 F.2).isSeparated _ (hY W.unop)).ext
+  apply (Presieve.isSeparated_of_isSheaf J F.1
+    ((isSheaf_iff_isSheaf_of_type _ _).1 F.2) _ (hY W.unop)).ext
   rintro T a ⟨i, ⟨b⟩⟩
   simpa using congr_arg (F.1.map b.op) (h i)
 
@@ -110,10 +112,10 @@ lemma familyOfElements_isCompatible (hx : x.IsCompatible) (X : C) :
 
 variable {J}
 
-lemma existsUnique_section (hx : x.IsCompatible) (hY : J.CoversTop Y) (hF : IsSheaf J F) :
+lemma exists_unique_section (hx : x.IsCompatible) (hY : J.CoversTop Y) (hF : IsSheaf J F) :
     ∃! (s : F.sections), ∀ (i : I), s.1 (Opposite.op (Y i)) = x i := by
   have H := (isSheaf_iff_isSheaf_of_type _ _).1 hF
-  apply existsUnique_of_exists_of_unique
+  apply exists_unique_of_exists_of_unique
   · let s := fun (X : C) => (H _ (hY X)).amalgamate _
       (hx.familyOfElements_isCompatible X)
     have hs : ∀ {X : C} (i : I) (f : X ⟶ Y i), s X = F.map f.op (x i) := fun {X} i f => by
@@ -129,7 +131,7 @@ lemma existsUnique_section (hx : x.IsCompatible) (hY : J.CoversTop Y) (hF : IsSh
     refine ⟨⟨fun X => s X.unop, ?_⟩, fun i => (hs i (𝟙 (Y i))).trans (by simp)⟩
     rintro ⟨Y₁⟩ ⟨Y₂⟩ ⟨f : Y₂ ⟶ Y₁⟩
     change F.map f.op (s Y₁) = s Y₂
-    apply (H.isSeparated _ (hY Y₂)).ext
+    apply (Presieve.isSeparated_of_isSheaf J F H _ (hY Y₂)).ext
     rintro Z φ ⟨i, ⟨g⟩⟩
     rw [hs' φ i g, ← hs' (φ ≫ f) i g, op_comp, F.map_comp]
     rfl
@@ -138,4 +140,16 @@ lemma existsUnique_section (hx : x.IsCompatible) (hY : J.CoversTop Y) (hF : IsSh
 
 variable (hx : x.IsCompatible) (hY : J.CoversTop Y) (hF : IsSheaf J F)
 
-noncomputable def section_ : F.sections := (hx.existsUnique_section hY hF).choose
+noncomputable def section_ : F.sections := (hx.exists_unique_section hY hF).choose
+
+@[simp]
+lemma section_apply (i : I) : (hx.section_ hY hF).1 (Opposite.op (Y i)) = x i :=
+  (hx.exists_unique_section hY hF).choose_spec.1 i
+
+end IsCompatible
+
+end FamilyOfElementsOnObjects
+
+end Presheaf
+
+end CategoryTheory

@@ -3,6 +3,10 @@ Extracted from Data/Multiset/Interval.lean
 Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.DFinsupp.Interval
+import Mathlib.Data.DFinsupp.Multiset
+import Mathlib.Order.Interval.Finset.Nat
+import Mathlib.Data.Nat.Lattice
 
 /-!
 # Finite intervals of multisets
@@ -29,7 +33,16 @@ namespace Multiset
 
 variable [DecidableEq α] (s t : Multiset α)
 
--- INSTANCE (free from Core): instLocallyFiniteOrder
+instance instLocallyFiniteOrder : LocallyFiniteOrder (Multiset α) :=
+  LocallyFiniteOrder.ofIcc (Multiset α)
+    (fun s t => (Finset.Icc (toDFinsupp s) (toDFinsupp t)).map
+      Multiset.equivDFinsupp.toEquiv.symm.toEmbedding)
+    fun s t x => by simp
+
+theorem Icc_eq :
+    Finset.Icc s t = (Finset.Icc (toDFinsupp s) (toDFinsupp t)).map
+      Multiset.equivDFinsupp.toEquiv.symm.toEmbedding :=
+  rfl
 
 theorem uIcc_eq :
     uIcc s t =

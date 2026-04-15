@@ -3,6 +3,8 @@ Extracted from Data/QPF/Multivariate/Constructions/Prj.lean
 Genuine: 5 of 8 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Control.Functor.Multivariate
+import Mathlib.Data.QPF.Multivariate.Basic
 
 /-!
 Projection functors are QPFs. The `n`-ary projection functors on `i` is an `n`-ary
@@ -19,11 +21,12 @@ variable {n : ℕ} (i : Fin2 n)
 
 def Prj (v : TypeVec.{u} n) : Type u := v i
 
--- INSTANCE (free from Core): Prj.inhabited
+instance Prj.inhabited {v : TypeVec.{u} n} [Inhabited (v i)] : Inhabited (Prj i v) :=
+  ⟨(default : v i)⟩
 
 def Prj.map ⦃α β : TypeVec n⦄ (f : α ⟹ β) : Prj i α → Prj i β := f _
 
--- INSTANCE (free from Core): Prj.mvfunctor
+instance Prj.mvfunctor : MvFunctor (Prj i) where map := @Prj.map _ i
 
 def Prj.P : MvPFunctor.{u} n where
   A := PUnit
@@ -35,6 +38,11 @@ def Prj.abs ⦃α : TypeVec n⦄ : Prj.P i α → Prj i α
 def Prj.repr ⦃α : TypeVec n⦄ : Prj i α → Prj.P i α := fun x : α i =>
   ⟨⟨⟩, fun j ⟨⟨h⟩⟩ => (h.rec x : α j)⟩
 
--- INSTANCE (free from Core): Prj.mvqpf
+instance Prj.mvqpf : MvQPF (Prj i) where
+  P := Prj.P i
+  abs := @Prj.abs _ i
+  repr := @Prj.repr _ i
+  abs_repr := by intros; rfl
+  abs_map := by intros α β f P; cases P; rfl
 
 end MvQPF

@@ -1,8 +1,12 @@
 /-
 Extracted from Topology/Algebra/Star.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 11 of 15 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Algebra.Star.Pi
+import Mathlib.Algebra.Star.Prod
+import Mathlib.Topology.Algebra.Constructions
+import Mathlib.Topology.ContinuousMap.Defs
 
 /-!
 # Continuity of `star`
@@ -40,3 +44,46 @@ theorem Filter.Tendsto.star {f : α → R} {l : Filter α} {y : R} (h : Tendsto 
   (continuous_star.tendsto y).comp h
 
 variable [TopologicalSpace α] {f : α → R} {s : Set α} {x : α}
+
+@[continuity, fun_prop]
+theorem Continuous.star (hf : Continuous f) : Continuous fun x => star (f x) :=
+  continuous_star.comp hf
+
+@[fun_prop]
+theorem ContinuousAt.star (hf : ContinuousAt f x) : ContinuousAt (fun x => star (f x)) x :=
+  continuousAt_star.comp hf
+
+@[fun_prop]
+theorem ContinuousOn.star (hf : ContinuousOn f s) : ContinuousOn (fun x => star (f x)) s :=
+  continuous_star.comp_continuousOn hf
+
+theorem ContinuousWithinAt.star (hf : ContinuousWithinAt f s x) :
+    ContinuousWithinAt (fun x => star (f x)) s x :=
+  Filter.Tendsto.star hf
+
+@[simps]
+def starContinuousMap : C(R, R) :=
+  ⟨star, continuous_star⟩
+
+end Continuity
+
+section Instances
+
+variable {R S ι : Type*}
+
+instance [Star R] [Star S] [TopologicalSpace R] [TopologicalSpace S] [ContinuousStar R]
+    [ContinuousStar S] : ContinuousStar (R × S) :=
+  ⟨(continuous_star.comp continuous_fst).prod_mk (continuous_star.comp continuous_snd)⟩
+
+instance {C : ι → Type*} [∀ i, TopologicalSpace (C i)] [∀ i, Star (C i)]
+    [∀ i, ContinuousStar (C i)] : ContinuousStar (∀ i, C i) where
+  continuous_star := continuous_pi fun i => Continuous.star (continuous_apply i)
+
+instance [Star R] [TopologicalSpace R] [ContinuousStar R] : ContinuousStar Rᵐᵒᵖ :=
+  ⟨MulOpposite.continuous_op.comp <| MulOpposite.continuous_unop.star⟩
+
+instance [Monoid R] [StarMul R] [TopologicalSpace R] [ContinuousStar R] :
+    ContinuousStar Rˣ :=
+  ⟨continuous_induced_rng.2 Units.continuous_embedProduct.star⟩
+
+end Instances

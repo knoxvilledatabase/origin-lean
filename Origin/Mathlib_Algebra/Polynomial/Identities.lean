@@ -3,6 +3,9 @@ Extracted from Algebra/Polynomial/Identities.lean
 Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.Derivative
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Ring
 
 /-!
 # Theory of univariate polynomials
@@ -26,7 +29,7 @@ def powAddExpansion {R : Type*} [CommSemiring R] (x y : R) :
   | 0 => ⟨0, by simp⟩
   | 1 => ⟨0, by simp⟩
   | n + 2 => by
-    obtain ⟨z, hz⟩ := (powAddExpansion x y (n + 1))
+    cases' (powAddExpansion x y (n + 1)) with z hz
     exists x * z + (n + 1) * x ^ n + z * y
     calc
       (x + y) ^ (n + 2) = (x + y) * (x + y) ^ (n + 1) := by ring
@@ -36,8 +39,6 @@ def powAddExpansion {R : Type*} [CommSemiring R] (x y : R) :
         ring!
 
 variable [CommRing R]
-
-set_option backward.privateInPublic true in
 
 private def polyBinomAux1 (x y : R) (e : ℕ) (a : R) :
     { k : R // a * (x + y) ^ e = a * (x ^ e + e * x ^ (e - 1) * y + k * y ^ 2) } := by
@@ -51,18 +52,12 @@ private theorem poly_binom_aux2 (f : R[X]) (x y : R) :
   unfold eval; rw [eval₂_eq_sum]; congr with (n z)
   apply (polyBinomAux1 x y _ _).property
 
-set_option backward.privateInPublic true in
-
 private theorem poly_binom_aux3 (f : R[X]) (x y : R) :
     f.eval (x + y) =
       ((f.sum fun e a => a * x ^ e) + f.sum fun e a => a * e * x ^ (e - 1) * y) +
         f.sum fun e a => a * (polyBinomAux1 x y e a).val * y ^ 2 := by
   rw [poly_binom_aux2]
   simp [left_distrib, sum_add, mul_assoc]
-
-set_option backward.privateInPublic true in
-
-set_option backward.privateInPublic.warn false in
 
 def binomExpansion (f : R[X]) (x y : R) :
     { k : R // f.eval (x + y) = f.eval x + f.derivative.eval x * y + k * y ^ 2 } := by
@@ -78,7 +73,7 @@ def powSubPowFactor (x y : R) : ∀ i : ℕ, { z : R // x ^ i - y ^ i = z * (x -
   | 0 => ⟨0, by simp⟩
   | 1 => ⟨1, by simp⟩
   | k + 2 => by
-    obtain ⟨z, hz⟩ := @powSubPowFactor x y (k + 1)
+    cases' @powSubPowFactor x y (k + 1) with z hz
     exists z * x + y ^ (k + 1)
     linear_combination (norm := ring) x * hz
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/Ergodic/Ergodic.lean
-Genuine: 13 of 15 | Dissolved: 0 | Infrastructure: 2
+Genuine: 25 of 27 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
@@ -70,6 +70,9 @@ theorem smul_measure {R : Type*} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞
     (hf : PreErgodic f μ) (c : R) : PreErgodic f (c • μ) where
   aeconst_set _s hs hfs := (hf.aeconst_set hs hfs).anti <| ae_smul_measure_le _
 
+theorem zero_measure (f : α → α) : @PreErgodic α m f 0 where
+  aeconst_set _ _ _ := by simp
+
 end PreErgodic
 
 namespace MeasureTheory.MeasurePreserving
@@ -90,6 +93,14 @@ theorem preErgodic_conjugate_iff {e : α ≃ᵐ β} (h : MeasurePreserving e μ 
   · simp [Semiconj]
   · simp [Semiconj]
 
+theorem ergodic_conjugate_iff {e : α ≃ᵐ β} (h : MeasurePreserving e μ μ') :
+    Ergodic (e ∘ f ∘ e.symm) μ' ↔ Ergodic f μ := by
+  have : MeasurePreserving (e ∘ f ∘ e.symm) μ' μ' ↔ MeasurePreserving f μ μ := by
+    rw [h.comp_left_iff, (MeasurePreserving.symm e h).comp_right_iff]
+  replace h : PreErgodic (e ∘ f ∘ e.symm) μ' ↔ PreErgodic f μ := h.preErgodic_conjugate_iff
+  exact ⟨fun hf => { this.mp hf.toMeasurePreserving, h.mp hf.toPreErgodic with },
+    fun hf => { this.mpr hf.toMeasurePreserving, h.mpr hf.toPreErgodic with }⟩
+
 end MeasureTheory.MeasurePreserving
 
 namespace QuasiErgodic
@@ -103,3 +114,72 @@ theorem ae_empty_or_univ₀ (hf : QuasiErgodic f μ) (hsm : NullMeasurableSet s 
     (hs : f ⁻¹' s =ᵐ[μ] s) :
     s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ :=
   eventuallyConst_set'.mp <| hf.aeconst_set₀ hsm hs
+
+theorem ae_mem_or_ae_nmem₀ (hf : QuasiErgodic f μ) (hsm : NullMeasurableSet s μ)
+    (hs : f ⁻¹' s =ᵐ[μ] s) :
+    (∀ᵐ x ∂μ, x ∈ s) ∨ ∀ᵐ x ∂μ, x ∉ s :=
+  eventuallyConst_set.mp <| hf.aeconst_set₀ hsm hs
+
+theorem smul_measure {R : Type*} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
+    (hf : QuasiErgodic f μ) (c : R) : QuasiErgodic f (c • μ) :=
+  ⟨hf.1.smul_measure _, hf.2.smul_measure _⟩
+
+theorem zero_measure {f : α → α} (hf : Measurable f) : @QuasiErgodic α m f 0 where
+  measurable := hf
+  absolutelyContinuous := by simp
+  toPreErgodic := .zero_measure f
+
+end QuasiErgodic
+
+namespace Ergodic
+
+theorem quasiErgodic (hf : Ergodic f μ) : QuasiErgodic f μ :=
+  { hf.toPreErgodic, hf.toMeasurePreserving.quasiMeasurePreserving with }
+
+theorem ae_empty_or_univ_of_preimage_ae_le' (hf : Ergodic f μ) (hs : NullMeasurableSet s μ)
+    (hs' : f ⁻¹' s ≤ᵐ[μ] s) (h_fin : μ s ≠ ∞) : s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ := by
+  refine hf.quasiErgodic.ae_empty_or_univ₀ hs ?_
+  refine ae_eq_of_ae_subset_of_measure_ge hs' (hf.measure_preimage hs).ge ?_ h_fin
+  exact hs.preimage hf.quasiMeasurePreserving
+
+theorem ae_empty_or_univ_of_ae_le_preimage' (hf : Ergodic f μ) (hs : NullMeasurableSet s μ)
+    (hs' : s ≤ᵐ[μ] f ⁻¹' s) (h_fin : μ s ≠ ∞) : s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ := by
+  replace h_fin : μ (f ⁻¹' s) ≠ ∞ := by rwa [hf.measure_preimage hs]
+  refine hf.quasiErgodic.ae_empty_or_univ₀ hs ?_
+  exact (ae_eq_of_ae_subset_of_measure_ge hs' (hf.measure_preimage hs).le hs h_fin).symm
+
+theorem ae_empty_or_univ_of_image_ae_le' (hf : Ergodic f μ) (hs : NullMeasurableSet s μ)
+    (hs' : f '' s ≤ᵐ[μ] s) (h_fin : μ s ≠ ∞) : s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ := by
+  replace hs' : s ≤ᵐ[μ] f ⁻¹' s :=
+    (HasSubset.Subset.eventuallyLE (subset_preimage_image f s)).trans
+      (hf.quasiMeasurePreserving.preimage_mono_ae hs')
+  exact ae_empty_or_univ_of_ae_le_preimage' hf hs hs' h_fin
+
+theorem smul_measure {R : Type*} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
+    (hf : Ergodic f μ) (c : R) : Ergodic f (c • μ) :=
+  ⟨hf.1.smul_measure _, hf.2.smul_measure _⟩
+
+theorem zero_measure {f : α → α} (hf : Measurable f) : @Ergodic α m f 0 where
+  measurable := hf
+  map_eq := by simp
+  toPreErgodic := .zero_measure f
+
+section IsFiniteMeasure
+
+variable [IsFiniteMeasure μ]
+
+theorem ae_empty_or_univ_of_preimage_ae_le (hf : Ergodic f μ) (hs : NullMeasurableSet s μ)
+    (hs' : f ⁻¹' s ≤ᵐ[μ] s) : s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ :=
+  ae_empty_or_univ_of_preimage_ae_le' hf hs hs' <| measure_ne_top μ s
+
+theorem ae_empty_or_univ_of_ae_le_preimage (hf : Ergodic f μ) (hs : NullMeasurableSet s μ)
+    (hs' : s ≤ᵐ[μ] f ⁻¹' s) : s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ :=
+  ae_empty_or_univ_of_ae_le_preimage' hf hs hs' <| measure_ne_top μ s
+
+theorem ae_empty_or_univ_of_image_ae_le (hf : Ergodic f μ) (hs : NullMeasurableSet s μ)
+    (hs' : f '' s ≤ᵐ[μ] s) : s =ᵐ[μ] (∅ : Set α) ∨ s =ᵐ[μ] univ :=
+  ae_empty_or_univ_of_image_ae_le' hf hs hs' <| measure_ne_top μ s
+
+end IsFiniteMeasure
+
+end Ergodic

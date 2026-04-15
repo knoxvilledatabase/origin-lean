@@ -3,6 +3,9 @@ Extracted from Topology/Algebra/Localization.lean
 Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.GroupTheory.MonoidLocalization.Basic
+import Mathlib.RingTheory.OreLocalization.Ring
+import Mathlib.Topology.Algebra.Ring.Basic
 
 /-!
 
@@ -24,6 +27,8 @@ variable {R : Type*} [CommRing R] [TopologicalSpace R] {M : Submonoid R}
 def Localization.ringTopology : RingTopology (Localization M) :=
   RingTopology.coinduced (Localization.monoidOf M).toFun
 
--- INSTANCE (free from Core): :
+instance : TopologicalSpace (Localization M) :=
+  Localization.ringTopology.toTopologicalSpace
 
--- INSTANCE (free from Core): :
+instance : TopologicalRing (Localization M) :=
+  Localization.ringTopology.toTopologicalRing

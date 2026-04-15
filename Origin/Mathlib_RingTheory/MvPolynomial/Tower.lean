@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/MvPolynomial/Tower.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Tower
+import Mathlib.Algebra.MvPolynomial.Basic
 
 /-!
 # Algebra towers for multivariate polynomial
@@ -47,4 +49,36 @@ variable {R A}
 theorem aeval_algebraMap_apply (x : σ → A) (p : MvPolynomial σ R) :
     aeval (algebraMap A B ∘ x) p = algebraMap A B (MvPolynomial.aeval x p) := by
   rw [aeval_def, aeval_def, ← coe_eval₂Hom, ← coe_eval₂Hom, map_eval₂Hom, ←
-    IsScalarTower.algebraMap_eq, Function.comp_def]
+    IsScalarTower.algebraMap_eq]
+  -- Porting note: added
+  simp only [Function.comp_def]
+
+theorem aeval_algebraMap_eq_zero_iff [NoZeroSMulDivisors A B] [Nontrivial B] (x : σ → A)
+    (p : MvPolynomial σ R) : aeval (algebraMap A B ∘ x) p = 0 ↔ aeval x p = 0 := by
+  rw [aeval_algebraMap_apply, Algebra.algebraMap_eq_smul_one, smul_eq_zero,
+    iff_false_intro (one_ne_zero' B), or_false]
+
+theorem aeval_algebraMap_eq_zero_iff_of_injective {x : σ → A} {p : MvPolynomial σ R}
+    (h : Function.Injective (algebraMap A B)) :
+    aeval (algebraMap A B ∘ x) p = 0 ↔ aeval x p = 0 := by
+  rw [aeval_algebraMap_apply, ← (algebraMap A B).map_zero, h.eq_iff]
+
+end CommSemiring
+
+end MvPolynomial
+
+namespace Subalgebra
+
+open MvPolynomial
+
+section CommSemiring
+
+variable {R A} [CommSemiring R] [CommSemiring A] [Algebra R A]
+
+@[simp]
+theorem mvPolynomial_aeval_coe (S : Subalgebra R A) (x : σ → S) (p : MvPolynomial σ R) :
+    aeval (fun i => (x i : A)) p = aeval x p := by convert aeval_algebraMap_apply A x p
+
+end CommSemiring
+
+end Subalgebra

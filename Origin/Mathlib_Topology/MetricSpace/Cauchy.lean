@@ -3,6 +3,8 @@ Extracted from Topology/MetricSpace/Cauchy.lean
 Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
+import Mathlib.Topology.EMetricSpace.Basic
 
 /-!
 ## Cauchy sequences in (pseudo-)metric spaces
@@ -10,13 +12,13 @@ import Origin.Core
 Various results on Cauchy sequences in (pseudo-)metric spaces, including
 
 * `Metric.complete_of_cauchySeq_tendsto` A pseudo-metric space is complete iff each Cauchy sequences
-  converges to some limit point.
+converges to some limit point.
 * `cauchySeq_bdd`: a Cauchy sequence on the natural numbers is bounded
 * various characterisation of Cauchy and uniformly Cauchy sequences
 
 ## Tags
 
-metric, pseudometric space, Cauchy sequence
+metric, pseudo_metric, Cauchy sequence
 -/
 
 open Filter
@@ -73,6 +75,13 @@ theorem Metric.uniformCauchySeqOn_iff {γ : Type*} {F : β → γ → α} {s : S
     rcases hb with ⟨hbl, hbr⟩
     exact hab (hN b.fst hbl.ge b.snd hbr.ge x hx)
 
+theorem cauchySeq_of_le_tendsto_0' {s : β → α} (b : β → ℝ)
+    (h : ∀ n m : β, n ≤ m → dist (s n) (s m) ≤ b n) (h₀ : Tendsto b atTop (𝓝 0)) : CauchySeq s :=
+  Metric.cauchySeq_iff'.2 fun ε ε0 => (h₀.eventually (gt_mem_nhds ε0)).exists.imp fun N hN n hn =>
+    calc dist (s n) (s N) = dist (s N) (s n) := dist_comm _ _
+    _ ≤ b N := h _ _ hn
+    _ < ε := hN
+
 theorem cauchySeq_of_le_tendsto_0 {s : β → α} (b : β → ℝ)
     (h : ∀ n m N : β, N ≤ n → N ≤ m → dist (s n) (s m) ≤ b N) (h₀ : Tendsto b atTop (𝓝 0)) :
     CauchySeq s :=
@@ -85,7 +94,7 @@ theorem cauchySeq_bdd {u : ℕ → α} (hu : CauchySeq u) : ∃ R > 0, ∀ m n, 
       lt_of_le_of_lt (dist_triangle_right _ _ _) (add_lt_add (H m) (H n))⟩
   let R := Finset.sup (Finset.range N) fun n => nndist (u n) (u N)
   refine ⟨↑R + 1, add_pos_of_nonneg_of_pos R.2 zero_lt_one, fun n => ?_⟩
-  rcases le_or_gt N n with h | h
+  rcases le_or_lt N n with h | h
   · exact lt_of_lt_of_le (hN _ h) (le_add_of_nonneg_left R.2)
   · have : _ ≤ R := Finset.le_sup (Finset.mem_range.2 h)
     exact lt_of_le_of_lt this (lt_add_of_pos_right _ zero_lt_one)

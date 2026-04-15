@@ -1,8 +1,10 @@
 /-
 Extracted from Algebra/Module/NatInt.lean
-Genuine: 1 of 9 | Dissolved: 0 | Infrastructure: 8
+Genuine: 9 of 12 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Defs
+import Mathlib.Data.Int.Cast.Lemmas
 
 /-!
 # Modules over `ℕ` and `ℤ`
@@ -11,19 +13,18 @@ This file concerns modules where the scalars are the natural numbers or the inte
 
 ## Main definitions
 
-* `AddCommMonoid.toNatModule`: any `AddCommMonoid` is (uniquely) a module over the naturals.
+* `AddCommGroup.toNatModule`: any `AddCommMonoid` is (uniquely) a module over the naturals.
+  TODO: this name is not right!
 * `AddCommGroup.toIntModule`: any `AddCommGroup` is a module over the integers.
 
 ## Main results
 
-* `AddCommMonoid.uniqueNatModule`: there is a unique `AddCommMonoid ℕ M` structure for any `M`
+ * `AddCommMonoid.uniqueNatModule`: there is an unique `AddCommMonoid ℕ M` structure for any `M`
 
 ## Tags
 
 semimodule, module, vector space
 -/
-
-assert_not_exists RelIso Field Invertible Multiset Pi.single_smul₀ Set.indicator
 
 open Function Set
 
@@ -31,31 +32,35 @@ universe u v
 
 variable {R S M M₂ : Type*}
 
--- INSTANCE (free from Core): [AddMonoid
-
--- INSTANCE (free from Core): [AddMonoid
-
--- INSTANCE (free from Core): [SubtractionMonoid
-
--- INSTANCE (free from Core): [SubtractionMonoid
-
 section AddCommMonoid
 
-variable [AddCommMonoid M]
+variable [Semiring R] [AddCommMonoid M] [Module R M] (r s : R) (x : M)
 
--- INSTANCE (free from Core): AddCommMonoid.toNatModule
+instance AddCommGroup.toNatModule : Module ℕ M where
+  one_smul := one_nsmul
+  mul_smul m n a := mul_nsmul' a m n
+  smul_add n a b := nsmul_add a b n
+  smul_zero := nsmul_zero
+  zero_smul := zero_nsmul
+  add_smul r s x := add_nsmul x r s
 
 end AddCommMonoid
 
 section AddCommGroup
 
-variable (M) [AddCommGroup M]
+variable (R M) [Semiring R] [AddCommGroup M]
 
--- INSTANCE (free from Core): AddCommGroup.toIntModule
+instance AddCommGroup.toIntModule : Module ℤ M where
+  one_smul := one_zsmul
+  mul_smul m n a := mul_zsmul a m n
+  smul_add n a b := zsmul_add a b n
+  smul_zero := zsmul_zero
+  zero_smul := zero_zsmul
+  add_smul r s x := add_zsmul x r s
 
 end AddCommGroup
 
-variable (R) in
+variable (R)
 
 abbrev Module.addCommMonoidToAddCommGroup
     [Ring R] [AddCommMonoid M] [Module R M] : AddCommGroup M :=
@@ -68,10 +73,52 @@ abbrev Module.addCommMonoidToAddCommGroup
     zsmul := fun z a => (z : R) • a
     zsmul_zero' := fun a => by simpa only [Int.cast_zero] using zero_smul R a
     zsmul_succ' := fun z a => by simp [add_comm, add_smul]
-    zsmul_neg' := fun z a => by simp [← smul_assoc] }
+    zsmul_neg' := fun z a => by simp [← smul_assoc, neg_one_smul] }
+
+variable {R}
 
 section AddCommMonoid
 
 variable [Semiring R] [AddCommMonoid M] [Module R M]
 
+section
+
 variable (R)
+
+lemma Nat.cast_smul_eq_nsmul (n : ℕ) (b : M) : (n : R) • b = n • b := by
+  induction n with
+  | zero => rw [Nat.cast_zero, zero_smul, zero_smul]
+  | succ n ih => rw [Nat.cast_succ, add_smul, add_smul, one_smul, ih, one_smul]
+
+lemma ofNat_smul_eq_nsmul (n : ℕ) [n.AtLeastTwo] (b : M) :
+    (no_index (OfNat.ofNat n) : R) • b = OfNat.ofNat n • b := Nat.cast_smul_eq_nsmul ..
+
+lemma nsmul_eq_smul_cast (n : ℕ) (b : M) : n • b = (n : R) • b := (Nat.cast_smul_eq_nsmul ..).symm
+
+end
+
+theorem nat_smul_eq_nsmul (h : Module ℕ M) (n : ℕ) (x : M) : @SMul.smul ℕ M h.toSMul n x = n • x :=
+  Nat.cast_smul_eq_nsmul ..
+
+def AddCommMonoid.uniqueNatModule : Unique (Module ℕ M) where
+  default := by infer_instance
+  uniq P := (Module.ext' P _) fun n => by convert nat_smul_eq_nsmul P n
+
+instance AddCommMonoid.nat_isScalarTower : IsScalarTower ℕ R M where
+  smul_assoc n x y := by
+    induction n with
+    | zero => simp only [zero_smul]
+    | succ n ih => simp only [add_smul, one_smul, ih]
+
+end AddCommMonoid
+
+theorem map_natCast_smul [AddCommMonoid M] [AddCommMonoid M₂] {F : Type*} [FunLike F M M₂]
+    [AddMonoidHomClass F M M₂] (f : F) (R S : Type*) [Semiring R] [Semiring S] [Module R M]
+    [Module S M₂] (x : ℕ) (a : M) : f ((x : R) • a) = (x : S) • f a := by
+  simp only [Nat.cast_smul_eq_nsmul, AddMonoidHom.map_nsmul, map_nsmul]
+
+theorem Nat.smul_one_eq_cast {R : Type*} [NonAssocSemiring R] (m : ℕ) : m • (1 : R) = ↑m := by
+  rw [nsmul_eq_mul, mul_one]
+
+theorem Int.smul_one_eq_cast {R : Type*} [NonAssocRing R] (m : ℤ) : m • (1 : R) = ↑m := by
+  rw [zsmul_eq_mul, mul_one]

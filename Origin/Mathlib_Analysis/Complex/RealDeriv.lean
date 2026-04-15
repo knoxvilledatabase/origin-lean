@@ -3,6 +3,9 @@ Extracted from Analysis/Complex/RealDeriv.lean
 Genuine: 9 of 12 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.ContDiff.Basic
+import Mathlib.Analysis.Calculus.Deriv.Linear
+import Mathlib.Analysis.Complex.Basic
 
 /-! # Real differentiability of complex-differentiable functions
 
@@ -10,8 +13,6 @@ import Origin.Core
 then its restriction to `ℝ` is differentiable over `ℝ`, with derivative the real part of the
 complex derivative.
 -/
-
-assert_not_exists IsConformalMap Conformal
 
 section RealDerivOfComplex
 
@@ -21,11 +22,42 @@ open Complex
 
 variable {e : ℂ → ℂ} {e' : ℂ} {z : ℝ}
 
-set_option backward.isDefEq.respectTransparency false in
+theorem HasStrictDerivAt.real_of_complex (h : HasStrictDerivAt e e' z) :
+    HasStrictDerivAt (fun x : ℝ => (e x).re) e'.re z := by
+  have A : HasStrictFDerivAt ((↑) : ℝ → ℂ) ofRealCLM z := ofRealCLM.hasStrictFDerivAt
+  have B :
+    HasStrictFDerivAt e ((ContinuousLinearMap.smulRight 1 e' : ℂ →L[ℂ] ℂ).restrictScalars ℝ)
+      (ofRealCLM z) :=
+    h.hasStrictFDerivAt.restrictScalars ℝ
+  have C : HasStrictFDerivAt re reCLM (e (ofRealCLM z)) := reCLM.hasStrictFDerivAt
+  -- Porting note: this should be by:
+  -- simpa using (C.comp z (B.comp z A)).hasStrictDerivAt
+  -- but for some reason simp can not use `ContinuousLinearMap.comp_apply`
+  convert (C.comp z (B.comp z A)).hasStrictDerivAt
+  rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.comp_apply]
+  simp
 
-set_option backward.isDefEq.respectTransparency false in
+theorem HasDerivAt.real_of_complex (h : HasDerivAt e e' z) :
+    HasDerivAt (fun x : ℝ => (e x).re) e'.re z := by
+  have A : HasFDerivAt ((↑) : ℝ → ℂ) ofRealCLM z := ofRealCLM.hasFDerivAt
+  have B :
+    HasFDerivAt e ((ContinuousLinearMap.smulRight 1 e' : ℂ →L[ℂ] ℂ).restrictScalars ℝ)
+      (ofRealCLM z) :=
+    h.hasFDerivAt.restrictScalars ℝ
+  have C : HasFDerivAt re reCLM (e (ofRealCLM z)) := reCLM.hasFDerivAt
+  -- Porting note: this should be by:
+  -- simpa using (C.comp z (B.comp z A)).hasStrictDerivAt
+  -- but for some reason simp can not use `ContinuousLinearMap.comp_apply`
+  convert (C.comp z (B.comp z A)).hasDerivAt
+  rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.comp_apply]
+  simp
 
-set_option backward.isDefEq.respectTransparency false in
+theorem ContDiffAt.real_of_complex {n : WithTop ℕ∞} (h : ContDiffAt ℂ n e z) :
+    ContDiffAt ℝ n (fun x : ℝ => (e x).re) z := by
+  have A : ContDiffAt ℝ n ((↑) : ℝ → ℂ) z := ofRealCLM.contDiff.contDiffAt
+  have B : ContDiffAt ℝ n e z := h.restrict_scalars ℝ
+  have C : ContDiffAt ℝ n re (e z) := reCLM.contDiff.contDiffAt
+  exact C.comp z (B.comp z A)
 
 theorem ContDiff.real_of_complex {n : WithTop ℕ∞} (h : ContDiff ℂ n e) :
     ContDiff ℝ n fun x : ℝ => (e x).re :=
@@ -33,48 +65,36 @@ theorem ContDiff.real_of_complex {n : WithTop ℕ∞} (h : ContDiff ℂ n e) :
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem HasStrictDerivAt.complexToReal_fderiv' {f : ℂ → E} {x : ℂ} {f' : E}
     (h : HasStrictDerivAt f f' x) :
     HasStrictFDerivAt f (reCLM.smulRight f' + I • imCLM.smulRight f') x := by
-  simpa only [Complex.restrictScalars_toSpanSingleton'] using h.hasStrictFDerivAt.restrictScalars ℝ
-
-set_option backward.isDefEq.respectTransparency false in
+  simpa only [Complex.restrictScalars_one_smulRight'] using
+    h.hasStrictFDerivAt.restrictScalars ℝ
 
 theorem HasDerivAt.complexToReal_fderiv' {f : ℂ → E} {x : ℂ} {f' : E} (h : HasDerivAt f f' x) :
     HasFDerivAt f (reCLM.smulRight f' + I • imCLM.smulRight f') x := by
-  simpa only [Complex.restrictScalars_toSpanSingleton'] using h.hasFDerivAt.restrictScalars ℝ
-
-set_option backward.isDefEq.respectTransparency false in
+  simpa only [Complex.restrictScalars_one_smulRight'] using h.hasFDerivAt.restrictScalars ℝ
 
 theorem HasDerivWithinAt.complexToReal_fderiv' {f : ℂ → E} {s : Set ℂ} {x : ℂ} {f' : E}
     (h : HasDerivWithinAt f f' s x) :
     HasFDerivWithinAt f (reCLM.smulRight f' + I • imCLM.smulRight f') s x := by
-  simpa only [Complex.restrictScalars_toSpanSingleton'] using h.hasFDerivWithinAt.restrictScalars ℝ
-
-set_option backward.isDefEq.respectTransparency false in
+  simpa only [Complex.restrictScalars_one_smulRight'] using
+    h.hasFDerivWithinAt.restrictScalars ℝ
 
 theorem HasStrictDerivAt.complexToReal_fderiv {f : ℂ → ℂ} {f' x : ℂ} (h : HasStrictDerivAt f f' x) :
     HasStrictFDerivAt f (f' • (1 : ℂ →L[ℝ] ℂ)) x := by
-  simpa only [Complex.restrictScalars_toSpanSingleton] using h.hasStrictFDerivAt.restrictScalars ℝ
-
-set_option backward.isDefEq.respectTransparency false in
+  simpa only [Complex.restrictScalars_one_smulRight] using h.hasStrictFDerivAt.restrictScalars ℝ
 
 theorem HasDerivAt.complexToReal_fderiv {f : ℂ → ℂ} {f' x : ℂ} (h : HasDerivAt f f' x) :
     HasFDerivAt f (f' • (1 : ℂ →L[ℝ] ℂ)) x := by
-  simpa only [Complex.restrictScalars_toSpanSingleton] using h.hasFDerivAt.restrictScalars ℝ
-
-set_option backward.isDefEq.respectTransparency false in
+  simpa only [Complex.restrictScalars_one_smulRight] using h.hasFDerivAt.restrictScalars ℝ
 
 theorem HasDerivWithinAt.complexToReal_fderiv {f : ℂ → ℂ} {s : Set ℂ} {f' x : ℂ}
     (h : HasDerivWithinAt f f' s x) : HasFDerivWithinAt f (f' • (1 : ℂ →L[ℝ] ℂ)) s x := by
-  simpa only [Complex.restrictScalars_toSpanSingleton] using h.hasFDerivWithinAt.restrictScalars ℝ
+  simpa only [Complex.restrictScalars_one_smulRight] using h.hasFDerivWithinAt.restrictScalars ℝ
 
 theorem HasDerivAt.comp_ofReal (hf : HasDerivAt e e' ↑z) : HasDerivAt (fun y : ℝ => e ↑y) e' z := by
   simpa only [ofRealCLM_apply, ofReal_one, mul_one] using hf.comp z ofRealCLM.hasDerivAt
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem HasDerivAt.ofReal_comp {f : ℝ → ℝ} {u : ℝ} (hf : HasDerivAt f u z) :
     HasDerivAt (fun y : ℝ => ↑(f y) : ℝ → ℂ) u z := by

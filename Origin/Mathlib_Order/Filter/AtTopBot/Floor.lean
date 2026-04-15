@@ -3,6 +3,8 @@ Extracted from Order/Filter/AtTopBot/Floor.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Floor
+import Mathlib.Order.Filter.AtTopBot
 
 /-!
 # `a * c ^ n < (n - d)!` holds true for sufficiently large `n`.
@@ -12,7 +14,7 @@ open Filter
 
 open scoped Nat
 
-variable {K : Type*} [Ring K] [LinearOrder K] [IsStrictOrderedRing K] [FloorSemiring K]
+variable {K : Type*} [LinearOrderedRing K] [FloorSemiring K]
 
 theorem FloorSemiring.eventually_mul_pow_lt_factorial_sub (a c : K) (d : ℕ) :
     ∀ᶠ n in atTop, a * c ^ n < (n - d)! := by

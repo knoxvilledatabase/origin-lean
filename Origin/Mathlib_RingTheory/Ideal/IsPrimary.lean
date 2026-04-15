@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Ideal/IsPrimary.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.IsPrimary
+import Mathlib.RingTheory.Ideal.Operations
 
 /-!
 # Primary ideals
@@ -21,7 +23,7 @@ Uses a specialized phrasing of `Submodule.IsPrimary` to have better API-piercing
 
 namespace Ideal
 
-variable {R S : Type*} [CommSemiring R] [CommSemiring S]
+variable {R : Type*} [CommSemiring R]
 
 abbrev IsPrimary (I : Ideal R) : Prop :=
   Submodule.IsPrimary I
@@ -29,7 +31,7 @@ abbrev IsPrimary (I : Ideal R) : Prop :=
 lemma isPrimary_iff {I : Ideal R} :
     I.IsPrimary ↔ I ≠ ⊤ ∧ ∀ {x y : R}, x * y ∈ I → x ∈ I ∨ y ∈ radical I := by
   rw [IsPrimary, Submodule.IsPrimary, forall_comm]
-  simp only [mul_comm, mem_radical_iff,
+  simp only [mul_comm, mem_radical_iff, and_congr_right_iff,
     ← Submodule.ideal_span_singleton_smul, smul_eq_mul, mul_top, span_singleton_le_iff_mem]
 
 theorem IsPrime.isPrimary {I : Ideal R} (hi : IsPrime I) : I.IsPrimary :=
@@ -37,29 +39,45 @@ theorem IsPrime.isPrimary {I : Ideal R} (hi : IsPrime I) : I.IsPrimary :=
   ⟨hi.1, fun {_ _} hxy => (hi.mem_or_mem hxy).imp id fun hyi => le_radical hyi⟩
 
 theorem isPrime_radical {I : Ideal R} (hi : I.IsPrimary) : IsPrime (radical I) :=
-  I.colon_univ ▸ hi.isPrime_radical_colon
+  ⟨mt radical_eq_top.1 hi.1,
+   fun {x y} ⟨m, hxy⟩ => by
+    rw [mul_pow] at hxy; cases' (isPrimary_iff.mp hi).2 hxy with h h
+    · exact Or.inl ⟨m, h⟩
+    · exact Or.inr (mem_radical_of_pow_mem h)⟩
 
-theorem isPrimary_of_isMaximal_radical {I : Ideal R} (hi : IsMaximal (radical I)) :
-    I.IsPrimary := by
-  rw [isPrimary_iff]
-  constructor
-  · rintro rfl
-    exact (radical_top R ▸ hi).ne_top rfl
-  · intro x y hxy
-    by_cases h : I + span {y} = ⊤
-    · rw [← span_singleton_le_iff_mem, ← mul_top (span {x}), ← h, mul_add,
-        span_singleton_mul_span_singleton, add_le_iff, span_singleton_le_iff_mem]
-      exact Or.inl ⟨mul_le_left, hxy⟩
-    · obtain ⟨m, hm, hy⟩ := exists_le_maximal (I + span {y}) h
-      rw [add_le_iff, span_singleton_le_iff_mem, ← hm.isPrime.radical_le_iff] at hy
-      exact Or.inr (hi.eq_of_le hm.ne_top hy.1 ▸ hy.2)
-
-theorem IsPrimary.inf {I J : Ideal R} (hi : I.IsPrimary) (hj : J.IsPrimary)
+theorem isPrimary_inf {I J : Ideal R} (hi : I.IsPrimary) (hj : J.IsPrimary)
     (hij : radical I = radical J) : (I ⊓ J).IsPrimary :=
-  Submodule.IsPrimary.inf hi hj (by simpa)
+  isPrimary_iff.mpr
+  ⟨ne_of_lt <| lt_of_le_of_lt inf_le_left (lt_top_iff_ne_top.2 hi.1),
+   fun {x y} ⟨hxyi, hxyj⟩ => by
+    rw [radical_inf, hij, inf_idem]
+    cases' (isPrimary_iff.mp hi).2 hxyi with hxi hyi
+    · cases' (isPrimary_iff.mp hj).2 hxyj with hxj hyj
+      · exact Or.inl ⟨hxi, hxj⟩
+      · exact Or.inr hyj
+    · rw [hij] at hyi
+      exact Or.inr hyi⟩
 
-lemma isPrimary_finsetInf {ι} {s : Finset ι} {f : ι → Ideal R} {i : ι} (hi : i ∈ s)
+open Finset in
+
+lemma isPrimary_finset_inf {ι} {s : Finset ι} {f : ι → Ideal R} {i : ι} (hi : i ∈ s)
     (hs : ∀ ⦃y⦄, y ∈ s → (f y).IsPrimary)
     (hs' : ∀ ⦃y⦄, y ∈ s → (f y).radical = (f i).radical) :
-    IsPrimary (s.inf f) :=
-  Submodule.isPrimary_finsetInf hi hs (by simpa)
+    IsPrimary (s.inf f) := by
+  classical
+  induction s using Finset.induction_on generalizing i with
+  | empty => simp at hi
+  | @insert a s ha IH =>
+    rcases s.eq_empty_or_nonempty with rfl|⟨y, hy⟩
+    · simp only [insert_emptyc_eq, mem_singleton] at hi
+      simpa [hi] using hs
+    simp only [inf_insert]
+    have H : ∀ ⦃x : ι⦄, x ∈ s → (f x).radical = (f y).radical := by
+      intro x hx
+      rw [hs' (mem_insert_of_mem hx), hs' (mem_insert_of_mem hy)]
+    refine isPrimary_inf (hs (by simp)) (IH hy ?_ H) ?_
+    · intro x hx
+      exact hs (by simp [hx])
+    · rw [radical_finset_inf hy H, hs' (mem_insert_self _ _), hs' (mem_insert_of_mem hy)]
+
+end Ideal

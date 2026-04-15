@@ -1,8 +1,12 @@
 /-
 Extracted from CategoryTheory/FinCategory/Basic.lean
-Genuine: 1 of 8 | Dissolved: 0 | Infrastructure: 7
+Genuine: 1 of 6 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Data.Fintype.Basic
+import Mathlib.CategoryTheory.DiscreteCategory
+import Mathlib.CategoryTheory.Opposites
+import Mathlib.CategoryTheory.Category.ULift
 
 /-!
 # Finite categories
@@ -18,32 +22,35 @@ having to supply instances or delay with non-defeq conflicts between instances.
 
 universe w v u
 
+open scoped Classical
+
 noncomputable section
 
 namespace CategoryTheory
 
--- INSTANCE (free from Core): discreteFintype
+instance discreteFintype {α : Type*} [Fintype α] : Fintype (Discrete α) :=
+  Fintype.ofEquiv α discreteEquiv.symm
 
--- INSTANCE (free from Core): {α
-
--- INSTANCE (free from Core): discreteHomFintype
+instance discreteHomFintype {α : Type*} (X Y : Discrete α) : Fintype (X ⟶ Y) := by
+  apply ULift.fintype
 
 class FinCategory (J : Type v) [SmallCategory J] where
   fintypeObj : Fintype J := by infer_instance
   fintypeHom : ∀ j j' : J, Fintype (j ⟶ j') := by infer_instance
 
-attribute [instance_reducible, instance] FinCategory.fintypeObj FinCategory.fintypeHom
+attribute [instance] FinCategory.fintypeObj FinCategory.fintypeHom
 
--- INSTANCE (free from Core): finCategoryDiscreteOfFintype
-
--- INSTANCE (free from Core): {J
+instance finCategoryDiscreteOfFintype (J : Type v) [Fintype J] : FinCategory (Discrete J) where
 
 open Opposite
 
--- INSTANCE (free from Core): finCategoryOpposite
+instance finCategoryOpposite {J : Type v} [SmallCategory J] [FinCategory J] : FinCategory Jᵒᵖ where
+  fintypeObj := Fintype.ofEquiv _ equivToOpposite
+  fintypeHom j j' := Fintype.ofEquiv _ (opEquiv j j').symm
 
-attribute [local instance] uliftCategory in
-
--- INSTANCE (free from Core): finCategoryUlift
+instance finCategoryUlift {J : Type v} [SmallCategory J] [FinCategory J] :
+    FinCategory.{max w v} (ULiftHom.{w, max w v} (ULift.{w, v} J)) where
+  fintypeObj := ULift.fintype J
+  fintypeHom := fun _ _ => ULift.fintype _
 
 end CategoryTheory

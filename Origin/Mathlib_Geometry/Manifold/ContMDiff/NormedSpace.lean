@@ -3,6 +3,8 @@ Extracted from Geometry/Manifold/ContMDiff/NormedSpace.lean
 Genuine: 43 of 43 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.ContMDiff.Product
+import Mathlib.Analysis.NormedSpace.OperatorNorm.Prod
 
 /-! ## Equivalence of smoothness with the basic definition for functions between vector spaces
 
@@ -30,7 +32,7 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   [NormedSpace 𝕜 F₂] {F₃ : Type*} [NormedAddCommGroup F₃] [NormedSpace 𝕜 F₃] {F₄ : Type*}
   [NormedAddCommGroup F₄] [NormedSpace 𝕜 F₄]
   -- declare functions, sets, points and smoothness indices
-  {s : Set M} {x : M} {n : WithTop ℕ∞}
+  {s : Set M} {x : M} {n : ℕ∞}
 
 section Module
 
@@ -41,7 +43,6 @@ theorem contMDiffWithinAt_iff_contDiffWithinAt {f : E → E'} {s : Set E} {x : E
   exact ContDiffWithinAt.continuousWithinAt
 
 alias ⟨ContMDiffWithinAt.contDiffWithinAt, ContDiffWithinAt.contMDiffWithinAt⟩ :=
-
   contMDiffWithinAt_iff_contDiffWithinAt
 
 theorem contMDiffAt_iff_contDiffAt {f : E → E'} {x : E} :
@@ -105,6 +106,8 @@ theorem ContinuousLinearMap.contMDiffWithinAt (L : E →L[𝕜] F) {s x} :
 theorem ContinuousLinearMap.contMDiffOn (L : E →L[𝕜] F) {s} : ContMDiffOn 𝓘(𝕜, E) 𝓘(𝕜, F) n L s :=
   L.contMDiff.contMDiffOn
 
+alias ContinuousLinearMap.smooth := ContinuousLinearMap.contMDiff
+
 theorem ContMDiffWithinAt.clm_precomp {f : M → F₁ →L[𝕜] F₂} {s : Set M} {x : M}
     (hf : ContMDiffWithinAt I 𝓘(𝕜, F₁ →L[𝕜] F₂) n f s x) :
     ContMDiffWithinAt I 𝓘(𝕜, (F₂ →L[𝕜] F₃) →L[𝕜] (F₁ →L[𝕜] F₃)) n
@@ -158,7 +161,7 @@ theorem ContMDiffWithinAt.clm_comp {g : M → F₁ →L[𝕜] F₃} {f : M → F
     (hf : ContMDiffWithinAt I 𝓘(𝕜, F₂ →L[𝕜] F₁) n f s x) :
     ContMDiffWithinAt I 𝓘(𝕜, F₂ →L[𝕜] F₃) n (fun x => (g x).comp (f x)) s x :=
   ContDiff.comp_contMDiffWithinAt (g := fun x : (F₁ →L[𝕜] F₃) × (F₂ →L[𝕜] F₁) => x.1.comp x.2)
-    (f := fun x => (g x, f x)) (contDiff_fst.clm_comp contDiff_snd) (hg.prodMk_space hf)
+    (f := fun x => (g x, f x)) (contDiff_fst.clm_comp contDiff_snd) (hg.prod_mk_space hf)
 
 theorem ContMDiffAt.clm_comp {g : M → F₁ →L[𝕜] F₃} {f : M → F₂ →L[𝕜] F₁} {x : M}
     (hg : ContMDiffAt I 𝓘(𝕜, F₁ →L[𝕜] F₃) n g x) (hf : ContMDiffAt I 𝓘(𝕜, F₂ →L[𝕜] F₁) n f x) :
@@ -180,7 +183,7 @@ theorem ContMDiffWithinAt.clm_apply {g : M → F₁ →L[𝕜] F₂} {f : M → 
     ContMDiffWithinAt I 𝓘(𝕜, F₂) n (fun x => g x (f x)) s x :=
   ContDiffWithinAt.comp_contMDiffWithinAt (t := univ)
     (g := fun x : (F₁ →L[𝕜] F₂) × F₁ => x.1 x.2)
-    (by apply ContDiff.contDiffAt; exact contDiff_fst.clm_apply contDiff_snd) (hg.prodMk_space hf)
+    (by apply ContDiff.contDiffAt; exact contDiff_fst.clm_apply contDiff_snd) (hg.prod_mk_space hf)
     (by simp_rw [preimage_univ, subset_univ])
 
 nonrec theorem ContMDiffAt.clm_apply {g : M → F₁ →L[𝕜] F₂} {f : M → F₁} {x : M}
@@ -233,7 +236,7 @@ theorem ContMDiffWithinAt.clm_prodMap {g : M → F₁ →L[𝕜] F₃} {f : M �
     ContMDiffWithinAt I 𝓘(𝕜, F₁ × F₂ →L[𝕜] F₃ × F₄) n (fun x => (g x).prodMap (f x)) s x :=
   ContDiff.comp_contMDiffWithinAt (g := fun x : (F₁ →L[𝕜] F₃) × (F₂ →L[𝕜] F₄) => x.1.prodMap x.2)
     (f := fun x => (g x, f x)) (ContinuousLinearMap.prodMapL 𝕜 F₁ F₃ F₂ F₄).contDiff
-    (hg.prodMk_space hf)
+    (hg.prod_mk_space hf)
 
 nonrec theorem ContMDiffAt.clm_prodMap {g : M → F₁ →L[𝕜] F₃} {f : M → F₂ →L[𝕜] F₄} {x : M}
     (hg : ContMDiffAt I 𝓘(𝕜, F₁ →L[𝕜] F₃) n g x) (hf : ContMDiffAt I 𝓘(𝕜, F₂ →L[𝕜] F₄) n f x) :
@@ -260,7 +263,7 @@ theorem contMDiff_smul : ContMDiff (𝓘(𝕜).prod 𝓘(𝕜, V)) 𝓘(𝕜, V)
 theorem ContMDiffWithinAt.smul {f : M → 𝕜} {g : M → V} (hf : ContMDiffWithinAt I 𝓘(𝕜) n f s x)
     (hg : ContMDiffWithinAt I 𝓘(𝕜, V) n g s x) :
     ContMDiffWithinAt I 𝓘(𝕜, V) n (fun p => f p • g p) s x :=
-  (contMDiff_smul.of_le le_top).contMDiffAt.comp_contMDiffWithinAt x (hf.prodMk hg)
+  (contMDiff_smul.of_le le_top).contMDiffAt.comp_contMDiffWithinAt x (hf.prod_mk hg)
 
 nonrec theorem ContMDiffAt.smul {f : M → 𝕜} {g : M → V} (hf : ContMDiffAt I 𝓘(𝕜) n f x)
     (hg : ContMDiffAt I 𝓘(𝕜, V) n g x) : ContMDiffAt I 𝓘(𝕜, V) n (fun p => f p • g p) x :=

@@ -3,6 +3,9 @@ Extracted from NumberTheory/ClassNumber/FunctionField.lean
 Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.NumberTheory.ClassNumber.AdmissibleCardPowDegree
+import Mathlib.NumberTheory.ClassNumber.Finite
+import Mathlib.NumberTheory.FunctionField
 
 /-!
 # Class numbers of function fields
@@ -13,7 +16,7 @@ on the class number.
 
 ## Main definitions
 - `FunctionField.classNumber`: the class number of a function field is the (finite)
-  cardinality of the class group of its ring of integers
+cardinality of the class group of its ring of integers
 -/
 
 namespace FunctionField
@@ -28,13 +31,16 @@ variable [IsScalarTower Fq[X] (RatFunc Fq) F]
 
 variable [FunctionField Fq F] [Algebra.IsSeparable (RatFunc Fq) F]
 
+open scoped Classical
+
 namespace RingOfIntegers
 
 open FunctionField
 
-open scoped Classical in
-
--- INSTANCE (free from Core): :
+noncomputable instance : Fintype (ClassGroup (ringOfIntegers Fq F)) :=
+  ClassGroup.fintypeOfAdmissibleOfFinite (RatFunc Fq) F
+    (Polynomial.cardPowDegreeIsAdmissible :
+      AbsoluteValue.IsAdmissible (Polynomial.cardPowDegree : AbsoluteValue Fq[X] ℤ))
 
 end RingOfIntegers
 

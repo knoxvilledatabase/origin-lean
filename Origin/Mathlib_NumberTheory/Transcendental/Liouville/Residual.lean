@@ -3,6 +3,10 @@ Extracted from NumberTheory/Transcendental/Liouville/Residual.lean
 Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.NumberTheory.Transcendental.Liouville.Basic
+import Mathlib.Topology.Baire.Lemmas
+import Mathlib.Topology.Baire.LocallyCompactRegular
+import Mathlib.Topology.Instances.Irrational
 
 /-!
 # Density of Liouville numbers
@@ -51,14 +55,9 @@ theorem eventually_residual_liouville : ∀ᶠ x in residual ℝ, Liouville x :=
   · rintro _ ⟨r, rfl⟩
     simp only [mem_iInter, mem_iUnion]
     refine fun n => ⟨r.num * 2, r.den * 2, ?_, ?_⟩
-    · have := r.pos; lia
+    · have := Int.ofNat_le.2 r.pos; rw [Int.ofNat_one] at this; omega
     · convert @mem_ball_self ℝ _ (r : ℝ) _ _
-      · push_cast
-        -- Workaround for https://github.com/leanprover/lean4/pull/6438; this eliminates an
-        -- `Expr.mdata` that would cause `norm_cast` to skip a numeral.
-        rw [Eq.refl (2 : ℝ)]
-        norm_cast
-        simp [Rat.divInt_mul_right (two_ne_zero)]
+      · push_cast; norm_cast; simp [Rat.divInt_mul_right (two_ne_zero), Rat.mkRat_self]
       · refine one_div_pos.2 (pow_pos (Int.cast_pos.2 ?_) _)
         exact mul_pos (Int.natCast_pos.2 r.pos) zero_lt_two
 

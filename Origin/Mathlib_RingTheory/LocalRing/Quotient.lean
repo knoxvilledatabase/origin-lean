@@ -1,8 +1,13 @@
 /-
 Extracted from RingTheory/LocalRing/Quotient.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Dimension.DivisionRing
+import Mathlib.LinearAlgebra.FreeModule.PID
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
+import Mathlib.RingTheory.Ideal.Over
+import Mathlib.RingTheory.Nakayama
 
 /-!
 
@@ -23,9 +28,9 @@ local notation "pS" => Ideal.map (algebraMap R S) p
 theorem quotient_span_eq_top_iff_span_eq_top (s : Set S) :
     span (R ⧸ p) ((Ideal.Quotient.mk (I := pS)) '' s) = ⊤ ↔ span R s = ⊤ := by
   have H : (span (R ⧸ p) ((Ideal.Quotient.mk (I := pS)) '' s)).restrictScalars R =
-      (span R s).map (IsScalarTower.toAlgHom R S (S ⧸ pS) : S →ₗ[R] S ⧸ pS) := by
+      (span R s).map (IsScalarTower.toAlgHom R S (S ⧸ pS)) := by
     rw [map_span, ← restrictScalars_span R (R ⧸ p) Ideal.Quotient.mk_surjective,
-      LinearMap.coe_coe, IsScalarTower.coe_toAlgHom', Ideal.Quotient.algebraMap_eq]
+      IsScalarTower.coe_toAlgHom', Ideal.Quotient.algebraMap_eq]
   constructor
   · intro hs
     rw [← top_le_iff]
@@ -34,15 +39,15 @@ theorem quotient_span_eq_top_iff_span_eq_top (s : Set S) :
     · exact (jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge
     · rw [Ideal.smul_top_eq_map]
       rintro x -
-      have : LinearMap.ker (IsScalarTower.toAlgHom R S (S ⧸ pS) : S →ₗ[R] S ⧸ pS) =
-          Submodule.restrictScalars R pS := by
+      have : LinearMap.ker (IsScalarTower.toAlgHom R S (S ⧸ pS)) =
+          restrictScalars R pS := by
         ext; simp [Ideal.Quotient.eq_zero_iff_mem]
       rw [← this, ← comap_map_eq, mem_comap, ← H, hs, restrictScalars_top]
       exact mem_top
   · intro hs
     rwa [hs, Submodule.map_top, LinearMap.range_eq_top.mpr,
       restrictScalars_eq_top_iff] at H
-    rw [LinearMap.coe_coe, IsScalarTower.coe_toAlgHom', Ideal.Quotient.algebraMap_eq]
+    rw [IsScalarTower.coe_toAlgHom', Ideal.Quotient.algebraMap_eq]
     exact Ideal.Quotient.mk_surjective
 
 attribute [local instance] Ideal.Quotient.field
@@ -52,6 +57,8 @@ variable [Module.Free R S] {ι : Type*}
 theorem finrank_quotient_map :
     finrank (R ⧸ p) (S ⧸ pS) = finrank R S := by
   classical
+  have : Module.Finite R (S ⧸ pS) := Module.Finite.of_surjective
+    (IsScalarTower.toAlgHom R S (S ⧸ pS)).toLinearMap (Ideal.Quotient.mk_surjective (I := pS))
   have : Module.Finite (R ⧸ p) (S ⧸ pS) := Module.Finite.of_restrictScalars_finite R _ _
   apply le_antisymm
   · let b := Module.Free.chooseBasis R S
@@ -89,24 +96,21 @@ lemma basisQuotient_repr {ι} [Fintype ι] (b : Basis ι R S) (x) (i) :
   apply (basisQuotient b).repr.symm.injective
   simp only [Finsupp.linearEquivFunOnFinite_symm_coe, LinearEquiv.symm_apply_apply,
     Basis.repr_symm_apply]
-  rw [Finsupp.linearCombination_eq_fintype_linearCombination_apply (R ⧸ p),
+  rw [Finsupp.linearCombination_eq_fintype_linearCombination_apply _ (R ⧸ p),
     Fintype.linearCombination_apply]
   simp only [Function.comp_apply, basisQuotient_apply,
     Ideal.Quotient.mk_smul_mk_quotient_map_quotient, ← Algebra.smul_def]
   rw [← map_sum, Basis.sum_repr b x]
 
-lemma exists_maximalIdeal_pow_le_of_isArtinianRing_quotient
-    (I : Ideal R) [IsArtinianRing (R ⧸ I)] : ∃ n, maximalIdeal R ^ n ≤ I := by
-  by_cases hI : I = ⊤
-  · simp [hI]
-  have : Nontrivial (R ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr hI
-  have := IsLocalRing.of_surjective' (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
-  have := IsLocalHom.of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
-  obtain ⟨n, hn⟩ := IsArtinianRing.isNilpotent_jacobson_bot (R := R ⧸ I)
-  have : (maximalIdeal R).map (Ideal.Quotient.mk I) = maximalIdeal (R ⧸ I) := by
-    ext x
-    obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-    simp [sup_eq_left.mpr (le_maximalIdeal hI)]
-  rw [jacobson_eq_maximalIdeal _ bot_ne_top, ← this, ← Ideal.map_pow, Ideal.zero_eq_bot,
-    Ideal.map_eq_bot_iff_le_ker, Ideal.mk_ker] at hn
-  exact ⟨n, hn⟩
+end IsLocalRing
+
+alias LocalRing.quotient_span_eq_top_iff_span_eq_top :=
+  IsLocalRing.quotient_span_eq_top_iff_span_eq_top
+
+alias LocalRing.finrank_quotient_map := IsLocalRing.finrank_quotient_map
+
+alias LocalRing.basisQuotient := IsLocalRing.basisQuotient
+
+alias LocalRing.basisQuotient_apply := IsLocalRing.basisQuotient_apply
+
+alias LocalRing.basisQuotient_repr := IsLocalRing.basisQuotient_repr

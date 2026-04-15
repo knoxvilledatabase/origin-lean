@@ -1,8 +1,10 @@
 /-
 Extracted from Topology/Algebra/Module/LinearPMap.lean
-Genuine: 19 of 21 | Dissolved: 0 | Infrastructure: 2
+Genuine: 19 of 20 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.LinearPMap
+import Mathlib.Topology.Algebra.Module.Basic
 
 /-!
 # Partially defined linear operators over topological vector spaces
@@ -24,9 +26,9 @@ underlying spaces are normed.
 
 ## Main statements
 
-* `LinearPMap.isClosable_iff_exists_closed_extension`: an unbounded operator is closable iff it has
-  a closed extension.
-* `LinearPMap.IsClosable.existsUnique`: there exists a unique closure
+* `LinearPMap.closable_iff_exists_closed_extension`: an unbounded operator is closable iff it has a
+  closed extension.
+* `LinearPMap.closable.exists_unique`: there exists a unique closure
 * `LinearPMap.closureHasCore`: the domain of `f` is a core of its closure
 
 ## References
@@ -52,8 +54,6 @@ namespace LinearPMap
 
 /-! ### Closed and closable operators -/
 
-section Basic
-
 def IsClosed (f : E →ₗ.[R] F) : Prop :=
   _root_.IsClosed (f.graph : Set (E × F))
 
@@ -62,14 +62,14 @@ variable [ContinuousAdd E] [ContinuousAdd F]
 variable [TopologicalSpace R] [ContinuousSMul R E] [ContinuousSMul R F]
 
 def IsClosable (f : E →ₗ.[R] F) : Prop :=
-  ∃ f' : E →ₗ.[R] F, f.graph.topologicalClosure = f'.graph
+  ∃ f' : LinearPMap R E F, f.graph.topologicalClosure = f'.graph
 
 theorem IsClosed.isClosable {f : E →ₗ.[R] F} (hf : f.IsClosed) : f.IsClosable :=
   ⟨f, hf.submodule_topologicalClosure_eq⟩
 
 theorem IsClosable.leIsClosable {f g : E →ₗ.[R] F} (hf : f.IsClosable) (hfg : g ≤ f) :
     g.IsClosable := by
-  obtain ⟨f', hf⟩ := hf
+  cases' hf with f' hf
   have : g.graph.topologicalClosure ≤ f'.graph := by
     rw [← hf]
     exact Submodule.topologicalClosure_mono (le_graph_of_le hfg)
@@ -79,7 +79,7 @@ theorem IsClosable.leIsClosable {f g : E →ₗ.[R] F} (hf : f.IsClosable) (hfg 
 
 theorem IsClosable.existsUnique {f : E →ₗ.[R] F} (hf : f.IsClosable) :
     ∃! f' : E →ₗ.[R] F, f.graph.topologicalClosure = f'.graph := by
-  refine existsUnique_of_exists_of_unique hf fun _ _ hy₁ hy₂ => eq_of_eq_graph ?_
+  refine exists_unique_of_exists_of_unique hf fun _ _ hy₁ hy₂ => eq_of_eq_graph ?_
   rw [← hy₁, ← hy₂]
 
 open Classical in
@@ -129,7 +129,21 @@ structure HasCore (f : E →ₗ.[R] F) (S : Submodule R E) : Prop where
   le_domain : S ≤ f.domain
   closure_eq : (f.domRestrict S).closure = f
 
-end Basic
+theorem hasCore_def {f : E →ₗ.[R] F} {S : Submodule R E} (h : f.HasCore S) :
+    (f.domRestrict S).closure = f :=
+  h.2
+
+theorem closureHasCore (f : E →ₗ.[R] F) : f.closure.HasCore f.domain := by
+  refine ⟨f.le_closure.1, ?_⟩
+  congr
+  ext x y hxy
+  · simp only [domRestrict_domain, Submodule.mem_inf, and_iff_left_iff_imp]
+    intro hx
+    exact f.le_closure.1 hx
+  let z : f.closure.domain := ⟨y.1, f.le_closure.1 y.2⟩
+  have hyz : (y : E) = z := by simp
+  rw [f.le_closure.2 hyz]
+  exact domRestrict_apply (hxy.trans hyz)
 
 /-! ### Topological properties of the inverse -/
 
@@ -137,25 +151,18 @@ section Inverse
 
 variable {f : E →ₗ.[R] F}
 
-theorem inverse_closed_iff (hf : LinearMap.ker f.toFun = ⊥) : f.inverse.IsClosed ↔ f.IsClosed := by
-  rw [IsClosed, inverse_graph hf]
-  exact (ContinuousLinearEquiv.prodComm R E F).isClosed_image
-
-variable [ContinuousAdd E] [ContinuousAdd F]
-
-variable [TopologicalSpace R] [ContinuousSMul R E] [ContinuousSMul R F]
-
 theorem closure_inverse_graph (hf : LinearMap.ker f.toFun = ⊥) (hf' : f.IsClosable)
     (hcf : LinearMap.ker f.closure.toFun = ⊥) :
     f.closure.inverse.graph = f.inverse.graph.topologicalClosure := by
   rw [inverse_graph hf, inverse_graph hcf, ← hf'.graph_closure_eq_closure_graph]
   apply SetLike.ext'
-  simp only [Submodule.topologicalClosure_coe, Submodule.map_coe, LinearEquiv.coe_coe,
-    LinearEquiv.prodComm_apply]
+  simp only [Submodule.topologicalClosure_coe, Submodule.map_coe, LinearEquiv.prodComm_apply]
   apply (image_closure_subset_closure_image continuous_swap).antisymm
-  have h1 := (LinearEquiv.prodComm R E F).toEquiv.image_eq_preimage_symm f.graph
-  have h2 := (LinearEquiv.prodComm R E F).toEquiv.image_eq_preimage_symm (_root_.closure f.graph)
-  simp only [LinearEquiv.coe_toEquiv, LinearEquiv.prodComm_apply] at h1 h2
+  have h1 := Set.image_equiv_eq_preimage_symm f.graph (LinearEquiv.prodComm R E F).toEquiv
+  have h2 := Set.image_equiv_eq_preimage_symm (_root_.closure f.graph)
+    (LinearEquiv.prodComm R E F).toEquiv
+  simp only [LinearEquiv.coe_toEquiv, LinearEquiv.prodComm_apply,
+    LinearEquiv.coe_toEquiv_symm] at h1 h2
   rw [h1, h2]
   apply continuous_swap.closure_preimage_subset
 

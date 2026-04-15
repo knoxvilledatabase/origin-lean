@@ -3,6 +3,10 @@ Extracted from Analysis/Convex/Extrema.lean
 Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Function
+import Mathlib.Topology.Algebra.Affine
+import Mathlib.Topology.Order.LocalExtr
+import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 
 /-!
 # Minima and maxima of convex functions
@@ -11,23 +15,26 @@ We show that if a function `f : E → β` is convex, then a local minimum is als
 a global minimum, and likewise for concave functions.
 -/
 
-variable {E β : Type*} [AddCommGroup E] [TopologicalSpace E] [Module ℝ E] [IsTopologicalAddGroup E]
-  [ContinuousSMul ℝ E] [AddCommGroup β] [PartialOrder β] [IsOrderedAddMonoid β]
-  [Module ℝ β] [IsOrderedModule ℝ β] [PosSMulReflectLE ℝ β] {s : Set E}
+variable {E β : Type*} [AddCommGroup E] [TopologicalSpace E] [Module ℝ E] [TopologicalAddGroup E]
+  [ContinuousSMul ℝ E] [OrderedAddCommGroup β] [Module ℝ β] [OrderedSMul ℝ β] {s : Set E}
 
-open Set Filter Function Topology
+open Set Filter Function
+
+open scoped Classical
+
+open Topology
 
 theorem IsMinOn.of_isLocalMinOn_of_convexOn_Icc {f : ℝ → β} {a b : ℝ} (a_lt_b : a < b)
     (h_local_min : IsLocalMinOn f (Icc a b) a) (h_conv : ConvexOn ℝ (Icc a b) f) :
     IsMinOn f (Icc a b) a := by
   rintro c hc
   dsimp only [mem_setOf_eq]
-  rw [IsLocalMinOn, nhdsWithin_Icc_eq_nhdsGE a_lt_b] at h_local_min
+  rw [IsLocalMinOn, nhdsWithin_Icc_eq_nhdsWithin_Ici a_lt_b] at h_local_min
   rcases hc.1.eq_or_lt with (rfl | a_lt_c)
   · exact le_rfl
   have H₁ : ∀ᶠ y in 𝓝[>] a, f a ≤ f y :=
     h_local_min.filter_mono (nhdsWithin_mono _ Ioi_subset_Ici_self)
-  have H₂ : ∀ᶠ y in 𝓝[>] a, y ∈ Ioc a c := Ioc_mem_nhdsGT a_lt_c
+  have H₂ : ∀ᶠ y in 𝓝[>] a, y ∈ Ioc a c := Ioc_mem_nhdsWithin_Ioi (left_mem_Ico.2 a_lt_c)
   rcases (H₁.and H₂).exists with ⟨y, hfy, hy_ac⟩
   rcases (Convex.mem_Ioc a_lt_c).mp hy_ac with ⟨ya, yc, ya₀, yc₀, yac, rfl⟩
   suffices ya • f a + yc • f a ≤ ya • f a + yc • f c from
@@ -45,8 +52,7 @@ theorem IsMinOn.of_isLocalMinOn_of_convexOn {f : E → β} {a : E} (a_in_s : a �
   have hg1 : g 1 = x := AffineMap.lineMap_apply_one a x
   have hgc : Continuous g := AffineMap.lineMap_continuous
   have h_maps : MapsTo g (Icc 0 1) s := by
-    simpa only [g, mapsTo_iff_image_subset, ← segment_eq_image_lineMap]
-      using h_conv.1.segment_subset a_in_s x_in_s
+    simpa only [g, mapsTo', ← segment_eq_image_lineMap] using h_conv.1.segment_subset a_in_s x_in_s
   have fg_local_min_on : IsLocalMinOn (f ∘ g) (Icc 0 1) 0 := by
     rw [← hg0] at h_localmin
     exact h_localmin.comp_continuousOn h_maps hgc.continuousOn (left_mem_Icc.2 zero_le_one)

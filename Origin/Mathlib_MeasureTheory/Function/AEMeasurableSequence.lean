@@ -3,6 +3,8 @@ Extracted from MeasureTheory/Function/AEMeasurableSequence.lean
 Genuine: 15 of 15 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.MeasurableSpace.Basic
+import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 
 /-!
 # Sequence of measurable functions associated to a sequence of a.e.-measurable functions
@@ -101,7 +103,7 @@ theorem aeSeq_n_eq_fun_n_ae [Countable ι] (hf : ∀ i, AEMeasurable (f i) μ)
     (hp : ∀ᵐ x ∂μ, p x fun n => f n x) (n : ι) : aeSeq hf p n =ᵐ[μ] f n :=
   ae_all_iff.mp (aeSeq_eq_fun_ae hf hp) n
 
-theorem iSup [SupSet β] [Countable ι] (hf : ∀ i, AEMeasurable (f i) μ)
+theorem iSup [CompleteLattice β] [Countable ι] (hf : ∀ i, AEMeasurable (f i) μ)
     (hp : ∀ᵐ x ∂μ, p x fun n => f n x) : ⨆ n, aeSeq hf p n =ᵐ[μ] ⨆ n, f n := by
   simp_rw [Filter.EventuallyEq, ae_iff, iSup_apply]
   have h_ss : aeSeqSet hf p ⊆ { a : α | ⨆ i : ι, aeSeq hf p i a = ⨆ i : ι, f i a } := by
@@ -110,7 +112,7 @@ theorem iSup [SupSet β] [Countable ι] (hf : ∀ i, AEMeasurable (f i) μ)
     exact funext fun i => aeSeq_eq_fun_of_mem_aeSeqSet hf hx i
   exact measure_mono_null (Set.compl_subset_compl.mpr h_ss) (measure_compl_aeSeqSet_eq_zero hf hp)
 
-theorem iInf [InfSet β] [Countable ι] (hf : ∀ i, AEMeasurable (f i) μ)
+theorem iInf [CompleteLattice β] [Countable ι] (hf : ∀ i, AEMeasurable (f i) μ)
     (hp : ∀ᵐ x ∂μ, p x fun n ↦ f n x) : ⨅ n, aeSeq hf p n =ᵐ[μ] ⨅ n, f n :=
   iSup (β := βᵒᵈ) hf hp
 

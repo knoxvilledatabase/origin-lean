@@ -1,8 +1,11 @@
 /-
 Extracted from NumberTheory/NumberField/House.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 21 of 25 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.NumberTheory.SiegelsLemma
+import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
+import Mathlib.NumberTheory.NumberField.EquivReindex
 
 /-!
 
@@ -14,7 +17,7 @@ the largest of the modulus of its conjugates.
 * [D. Marcus, *Number Fields*][marcus1977number]
 * [Hua, L.-K., *Introduction to number theory*][hua1982house]
 
-## Tags
+## Tagshouse
 number field, algebraic number, house
 -/
 
@@ -41,18 +44,221 @@ theorem house_sum_le_sum_house {ι : Type*} (s : Finset ι) (α : ι → K) :
 theorem house_nonneg (α : K) : 0 ≤ house α := norm_nonneg _
 
 theorem house_mul_le (α β : K) : house (α * β) ≤ house α * house β := by
-  simp only [house, map_mul]; apply norm_mul_le
+  simp only [house, _root_.map_mul]; apply norm_mul_le
 
-lemma house_prod_le (s : Finset K) : house (∏ x ∈ s, x) ≤ ∏ x ∈ s, house x := by
-  simpa [house, map_prod] using Finset.norm_prod_le _ _
+@[simp] theorem house_intCast (x : ℤ) : house (x : K) = |x| := by
+  simp only [house, map_intCast, Pi.intCast_def, pi_norm_const, Complex.norm_eq_abs,
+    Complex.abs_intCast, Int.cast_abs]
 
-theorem house_add_le (α β : K) : house (α + β) ≤ house α + house β := by
-  simp only [house, map_add]; apply norm_add_le
+end
 
-theorem house_pow_le (α : K) (i : ℕ) : house (α ^ i) ≤ house α ^ i := by
-  simpa only [house, map_pow] using norm_pow_le ((canonicalEmbedding K) α) i
+end NumberField
 
-theorem house_nat_mul (α : K) (c : ℕ) : house (c * α) = c * house α := by
-  rw [house_eq_sup', house_eq_sup', Finset.sup'_eq_sup, Finset.sup'_eq_sup]
-  norm_cast
-  simp [NNReal.mul_finset_sup]
+namespace NumberField.house
+
+noncomputable section
+
+variable (K)
+
+open Module.Free Module canonicalEmbedding Matrix Finset
+
+attribute [local instance] Matrix.seminormedAddCommGroup
+
+section DecidableEq
+
+variable [DecidableEq (K →+* ℂ)]
+
+private def c := (finrank ℚ K) * ‖((basisMatrix K).transpose)⁻¹‖
+
+private theorem c_nonneg : 0 ≤ c K := by
+  rw [c, mul_nonneg_iff]; left
+  exact ⟨by simp only [Nat.cast_nonneg], norm_nonneg ((basisMatrix K).transpose)⁻¹⟩
+
+theorem basis_repr_abs_le_const_mul_house (α : 𝓞 K) (i : K →+* ℂ) :
+    Complex.abs (((integralBasis K).reindex (equivReindex K).symm).repr α i) ≤
+      (c K) * house (algebraMap (𝓞 K) K α) := by
+  let σ := canonicalEmbedding K
+  calc
+    _ ≤ ∑ j, ‖((basisMatrix K).transpose)⁻¹‖ * Complex.abs (σ (algebraMap (𝓞 K) K α) j) := ?_
+    _ ≤ ∑ _ : K →+* ℂ, ‖fun i j => ((basisMatrix K).transpose)⁻¹ i j‖
+        * house (algebraMap (𝓞 K) K α) := ?_
+    _ = ↑(finrank ℚ K) * ‖((basisMatrix K).transpose)⁻¹‖ * house (algebraMap (𝓞 K) K α) := ?_
+
+  · rw [← inverse_basisMatrix_mulVec_eq_repr]
+    apply le_trans
+    · apply le_trans (AbsoluteValue.sum_le Complex.abs _ _)
+      · exact sum_le_sum (fun _ _ => (AbsoluteValue.map_mul Complex.abs _ _).le)
+    · apply sum_le_sum (fun _ _ => mul_le_mul_of_nonneg_right ?_
+        (AbsoluteValue.nonneg Complex.abs _))
+      · exact norm_entry_le_entrywise_sup_norm ((basisMatrix K).transpose)⁻¹
+  · apply sum_le_sum; intros j _
+    apply mul_le_mul_of_nonneg_left _ (norm_nonneg fun i j ↦ ((basisMatrix K).transpose)⁻¹ i j)
+    · exact norm_le_pi_norm (σ ((algebraMap (𝓞 K) K) α)) j
+  · rw [sum_const, card_univ, nsmul_eq_mul, Embeddings.card, mul_assoc]
+
+private def newBasis := (RingOfIntegers.basis K).reindex (equivReindex K).symm
+
+private def supOfBasis : ℝ := univ.sup' univ_nonempty
+  fun r ↦ house (algebraMap (𝓞 K) K (newBasis K r))
+
+end DecidableEq
+
+private theorem supOfBasis_nonneg : 0 ≤ supOfBasis K := by
+  simp only [supOfBasis, le_sup'_iff, mem_univ, and_self,
+    exists_const, house_nonneg]
+
+variable {α : Type*} {β : Type*} (a : Matrix α β (𝓞 K))
+
+private def a' : α → β → (K →+* ℂ) → (K →+* ℂ) → ℤ := fun k l r =>
+  (newBasis K).repr (a k l * (newBasis K) r)
+
+private def asiegel : Matrix (α × (K →+* ℂ)) (β × (K →+* ℂ)) ℤ := fun k l => a' K a k.1 l.1 l.2 k.2
+
+variable (ha : a ≠ 0)
+
+include ha in
+
+-- DISSOLVED: asiegel_ne_0
+
+variable {p q : ℕ} (h0p : 0 < p) (hpq : p < q) (x : β × (K →+* ℂ) → ℤ) (hxl : x ≠ 0)
+
+private def ξ : β → 𝓞 K := fun l => ∑ r : K →+* ℂ, x (l, r) * (newBasis K r)
+
+include hxl in
+
+-- DISSOLVED: ξ_ne_0
+
+private theorem lin_1 (l k r) : a k l * (newBasis K) r =
+    ∑ u, (a' K a k l r u) * (newBasis K) u := by
+  simp only [Basis.sum_repr (newBasis K) (a k l * (newBasis K) r), a', ← zsmul_eq_mul]
+
+variable [Fintype β] (cardβ : Fintype.card β = q) (hmulvec0 : asiegel K a *ᵥ x = 0)
+
+include hxl hmulvec0 in
+
+private theorem ξ_mulVec_eq_0 : a *ᵥ ξ K x = 0 := by
+  funext k; simp only [Pi.zero_apply]; rw [eq_comm]
+
+  have lin_0 : ∀ u, ∑ r, ∑ l, (a' K a k l r u * x (l, r) : 𝓞 K) = 0 := by
+    intros u
+    have hξ := ξ_ne_0 K x hxl
+    rw [Ne, funext_iff, not_forall] at hξ
+    rcases hξ with ⟨l, hξ⟩
+    rw [funext_iff] at hmulvec0
+    specialize hmulvec0 ⟨k, u⟩
+    simp only [Fintype.sum_prod_type, mulVec, dotProduct, asiegel] at hmulvec0
+    rw [sum_comm] at hmulvec0
+    exact mod_cast hmulvec0
+
+  have : 0 = ∑ u, (∑ r, ∑ l, a' K a k l r u * x (l, r) : 𝓞 K) * (newBasis K) u := by
+    simp only [lin_0, zero_mul, sum_const_zero]
+
+  have : 0 = ∑ r, ∑ l, x (l, r) * ∑ u, a' K a k l r u * (newBasis K) u := by
+    conv at this => enter [2, 2, u]; rw [sum_mul]
+    rw [sum_comm] at this
+    rw [this]; congr 1; ext1 r
+    conv => enter [1, 2, l]; rw [sum_mul]
+    rw [sum_comm]; congr 1; ext1 r
+    rw [mul_sum]; congr 1; ext1 r
+    ring
+  rw [sum_comm] at this
+  rw [this]; congr 1; ext1 l
+  rw [ξ, mul_sum]; congr 1; ext1 l
+  rw [← lin_1]; ring
+
+variable {A : ℝ} (habs : ∀ k l, (house ((algebraMap (𝓞 K) K) (a k l))) ≤ A)
+
+variable [DecidableEq (K →+* ℂ)]
+
+private abbrev c₂ := max 1 (c K) * (supOfBasis K)
+
+private theorem c₂_nonneg : 0 ≤ c₂ K :=
+  mul_nonneg (le_trans zero_le_one (le_max_left ..)) (supOfBasis_nonneg _)
+
+variable [Fintype α] (cardα : Fintype.card α = p) (Apos : 0 ≤ A)
+  (hxbound : ‖x‖ ≤ (q * finrank ℚ K * ‖asiegel K a‖) ^ ((p : ℝ) / (q - p)))
+
+include habs Apos in
+
+private theorem asiegel_remark : ‖asiegel K a‖ ≤ c₂ K * A := by
+  rw [Matrix.norm_le_iff]
+  · intro kr lu
+    calc
+      ‖asiegel K a kr lu‖ = |asiegel K a kr lu| := ?_
+      _ ≤ (c K) *
+        house ((algebraMap (𝓞 K) K) (a kr.1 lu.1 * ((newBasis K) lu.2))) := ?_
+      _ ≤ (c K) * house ((algebraMap (𝓞 K) K) (a kr.1 lu.1)) *
+        house ((algebraMap (𝓞 K) K) ((newBasis K) lu.2)) := ?_
+      _ ≤ (c K) * A * house ((algebraMap (𝓞 K) K) ((newBasis K) lu.2)) := ?_
+      _ ≤ (c K) * A * (supOfBasis K) := ?_
+      _ ≤ (c₂ K) * A := ?_
+    · simp only [Int.cast_abs, ← Real.norm_eq_abs (asiegel K a kr lu)]; rfl
+    · have remark := basis_repr_abs_le_const_mul_house K
+      simp only [Basis.repr_reindex, Finsupp.mapDomain_equiv_apply,
+        integralBasis_repr_apply, eq_intCast, Rat.cast_intCast,
+          Complex.abs_intCast] at remark
+      exact mod_cast remark ((a kr.1 lu.1 * ((newBasis K) lu.2))) kr.2
+    · simp only [house, _root_.map_mul, mul_assoc]
+      exact mul_le_mul_of_nonneg_left (norm_mul_le _ _) (c_nonneg K)
+    · rw [mul_assoc, mul_assoc]
+      apply mul_le_mul_of_nonneg_left ?_ (c_nonneg K)
+      · apply mul_le_mul_of_nonneg_right (habs kr.1 lu.1) ?_
+        · exact norm_nonneg ((canonicalEmbedding K) ((algebraMap (𝓞 K) K)
+            ((newBasis K) lu.2)))
+    ·  apply mul_le_mul_of_nonneg_left ?_ (mul_nonneg (c_nonneg K) Apos)
+       · simp only [supOfBasis, le_sup'_iff, mem_univ]; use lu.2
+    · rw [mul_right_comm]
+      exact mul_le_mul_of_nonneg_right
+        (mul_le_mul_of_nonneg_right (le_max_right ..) (supOfBasis_nonneg K)) Apos
+  · rw [mul_nonneg_iff]; left; exact ⟨c₂_nonneg K, Apos⟩
+
+private def c₁ := finrank ℚ K * c₂ K
+
+include habs Apos hxbound hpq in
+
+private theorem house_le_bound : ∀ l, house (ξ K x l).1 ≤ (c₁ K) *
+    ((c₁ K * q * A)^((p : ℝ) / (q - p))) := by
+  let h := finrank ℚ K
+  intros l
+  calc _ = house (algebraMap (𝓞 K) K (∑ r, (x (l, r)) * ((newBasis K) r))) := rfl
+       _ ≤ ∑ r, house (((algebraMap (𝓞 K) K) (x (l, r))) *
+        ((algebraMap (𝓞 K) K) ((newBasis K) r))) := ?_
+       _ ≤ ∑ r, ‖x (l,r)‖ * house ((algebraMap (𝓞 K) K) ((newBasis K) r)) := ?_
+       _ ≤ ∑ r, ‖x (l, r)‖ * (supOfBasis K) := ?_
+       _ ≤ ∑ _r : K →+* ℂ, ((↑q * h * ‖asiegel K a‖) ^ ((p : ℝ) / (q - p))) * supOfBasis K := ?_
+       _ ≤ h * (c₂ K) * ((q * c₁ K * A) ^ ((p : ℝ) / (q - p))) := ?_
+       _ ≤ c₁ K * ((c₁ K * ↑q * A) ^ ((p : ℝ) / (q - p))) := ?_
+  · simp_rw [← _root_.map_mul, map_sum]; apply house_sum_le_sum_house
+  · apply sum_le_sum; intros r _; convert house_mul_le ..
+    simp only [map_intCast, house_intCast, Int.cast_abs, Int.norm_eq_abs]
+  · apply sum_le_sum; intros r _; unfold supOfBasis
+    apply mul_le_mul_of_nonneg_left ?_ (norm_nonneg (x (l,r)))
+    · simp only [le_sup'_iff, mem_univ, true_and]; use r
+  · apply sum_le_sum; intros r _
+    apply mul_le_mul_of_nonneg_right ?_ (supOfBasis_nonneg K)
+    exact le_trans (norm_le_pi_norm x ⟨l, r⟩) hxbound
+  · simp only [Nat.cast_mul, sum_const, card_univ, nsmul_eq_mul]
+    rw [Embeddings.card, mul_comm _ (supOfBasis K), c₂, c₁, ← mul_assoc]
+    apply mul_le_mul
+    · apply mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg' _)
+      · exact le_mul_of_one_le_left (supOfBasis_nonneg K) (le_max_left ..)
+    · apply Real.rpow_le_rpow (mul_nonneg (mul_nonneg (Nat.cast_nonneg' _) (Nat.cast_nonneg' _))
+        (norm_nonneg _))
+      · rw [← mul_assoc, mul_assoc (_*_)]
+        apply mul_le_mul_of_nonneg_left (asiegel_remark K a habs Apos)
+          (mul_nonneg (Nat.cast_nonneg' _) (Nat.cast_nonneg _))
+      · exact div_nonneg (Nat.cast_nonneg' _) (sub_nonneg.2 (mod_cast hpq.le))
+    · apply Real.rpow_nonneg
+      exact mul_nonneg (mul_nonneg (Nat.cast_nonneg' _) (Nat.cast_nonneg' _))
+        (norm_nonneg _)
+    · exact mul_nonneg (Nat.cast_nonneg' _) (mul_nonneg (le_trans zero_le_one (le_max_left ..))
+        (supOfBasis_nonneg _))
+  · rw [mul_comm (q : ℝ) (c₁ K)]; rfl
+
+include hpq h0p cardα cardβ ha habs in
+
+-- DISSOLVED: exists_ne_zero_int_vec_house_le
+
+end
+
+end NumberField.house

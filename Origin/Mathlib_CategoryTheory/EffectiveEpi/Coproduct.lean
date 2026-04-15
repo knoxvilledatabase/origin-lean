@@ -1,8 +1,11 @@
 /-
 Extracted from CategoryTheory/EffectiveEpi/Coproduct.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.EffectiveEpi.Basic
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
+import Mathlib.Tactic.ApplyFun
 
 /-!
 
@@ -17,9 +20,7 @@ namespace CategoryTheory
 
 open Limits
 
-variable {C : Type*} [Category* C]
-
-set_option backward.isDefEq.respectTransparency false in
+variable {C : Type*} [Category C]
 
 noncomputable
 
@@ -33,13 +34,20 @@ def effectiveEpiStructIsColimitDescOfEffectiveEpiFamily {B : C} {α : Type*} (X 
   uniq e _ m hm := EffectiveEpiFamily.uniq X π (fun a ↦ c.ι.app ⟨a⟩ ≫ e)
       (fun _ _ _ _ hg ↦ (by simp [← hm, reassoc_of% hg])) m (fun _ ↦ (by simp [← hm]))
 
--- INSTANCE (free from Core): {B
+noncomputable
+
+def effectiveEpiStructDescOfEffectiveEpiFamily {B : C} {α : Type*} (X : α → C)
+    (π : (a : α) → (X a ⟶ B)) [HasCoproduct X] [EffectiveEpiFamily X π] :
+    EffectiveEpiStruct (Sigma.desc π) := by
+  simpa [coproductIsCoproduct] using
+    effectiveEpiStructIsColimitDescOfEffectiveEpiFamily X _ (coproductIsCoproduct _) π
+
+instance {B : C} {α : Type*} (X : α → C) (π : (a : α) → (X a ⟶ B)) [HasCoproduct X]
+    [EffectiveEpiFamily X π] : EffectiveEpi (Sigma.desc π) :=
+  ⟨⟨effectiveEpiStructDescOfEffectiveEpiFamily X π⟩⟩
 
 example {B : C} {α : Type*} (X : α → C) (π : (a : α) → (X a ⟶ B)) [EffectiveEpiFamily X π]
-
     [HasCoproduct X] : Epi (Sigma.desc π) := inferInstance
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem effectiveEpiFamilyStructOfEffectiveEpiDesc_aux {B : C} {α : Type*} {X : α → C}
     {π : (a : α) → X a ⟶ B} [HasCoproduct X]
@@ -74,8 +82,6 @@ theorem effectiveEpiFamilyStructOfEffectiveEpiDesc_aux {B : C} {α : Type*} {X :
   simp only [← Category.assoc] at hg
   rw [(Category.assoc _ _ g₂), pullback.condition] at hg
   simpa using hg
-
-set_option backward.isDefEq.respectTransparency false in
 
 noncomputable
 

@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Algebraic/Integral.lean
-Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
+Genuine: 10 of 13 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.RingTheory.Algebraic.Basic
+import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
 
 /-!
 # Algebraic elements and integral elements
@@ -17,19 +19,8 @@ is algebraic and that every algebraic element over a field is integral.
   over a field.
 * `IsAlgebraic.of_finite`, `Algebra.IsAlgebraic.of_finite`: finite-dimensional (as module) implies
   algebraic.
-* `IsAlgebraic.exists_integral_multiple`: an algebraic element has a multiple which is integral
-* `IsAlgebraic.iff_exists_smul_integral`: If `R` is reduced and `S` is an `R`-algebra with
-  injective `algebraMap`, then an element of `S` is algebraic over `R` iff some `R`-multiple
-  is integral over `R`.
-* `Algebra.IsAlgebraic.trans`: If `A/S/R` is a tower of algebras and both `A/S` and `S/R` are
-  algebraic, then `A/R` is also algebraic, provided that `S` has no zero divisors.
-* `Subalgebra.algebraicClosure`: If `R` is a domain and `S` is an arbitrary `R`-algebra,
-  then the elements of `S` that are algebraic over `R` form a subalgebra.
-* `Transcendental.extendScalars`: an element of an `R`-algebra that is transcendental over `R`
-  remains transcendental over any algebraic `R`-subalgebra that has no zero divisors.
+* `exists_integral_multiple`: an algebraic element has a multiple which is integral
 -/
-
-assert_not_exists IsLocalRing
 
 universe u v w
 
@@ -46,7 +37,8 @@ variable [IsScalarTower R S A]
 theorem IsIntegral.isAlgebraic [Nontrivial R] {x : A} : IsIntegral R x → IsAlgebraic R x :=
   fun ⟨p, hp, hpx⟩ => ⟨p, hp.ne_zero, hpx⟩
 
--- INSTANCE (free from Core): Algebra.IsIntegral.isAlgebraic
+instance Algebra.IsIntegral.isAlgebraic [Nontrivial R] [Algebra.IsIntegral R A] :
+    Algebra.IsAlgebraic R A := ⟨fun a ↦ (Algebra.IsIntegral.isIntegral a).isAlgebraic⟩
 
 end zero_ne_one
 
@@ -67,23 +59,95 @@ protected theorem Algebra.isAlgebraic_iff_isIntegral :
 
 alias ⟨IsAlgebraic.isIntegral, _⟩ := isAlgebraic_iff_isIntegral
 
--- INSTANCE (free from Core): Algebra.IsAlgebraic.isIntegral
+protected instance Algebra.IsAlgebraic.isIntegral [Algebra.IsAlgebraic K A] :
+    Algebra.IsIntegral K A := Algebra.isAlgebraic_iff_isIntegral.mp ‹_›
 
-theorem Algebra.IsAlgebraic.of_isIntegralClosure (R B C : Type*) [CommRing R] [Nontrivial R]
-    [CommRing B] [CommRing C] [Algebra R B] [Algebra R C] [Algebra B C]
-    [IsScalarTower R B C] [IsIntegralClosure B R C] : Algebra.IsAlgebraic R B :=
-  have := IsIntegralClosure.isIntegral_algebra R (A := B) C
-  inferInstance
+variable (K) in
+
+theorem Algebra.IsAlgebraic.of_isIntegralClosure (B C : Type*)
+    [CommRing B] [CommRing C] [Algebra K B] [Algebra K C] [Algebra B C]
+    [IsScalarTower K B C] [IsIntegralClosure B K C] : Algebra.IsAlgebraic K B :=
+  Algebra.isAlgebraic_iff_isIntegral.mpr (IsIntegralClosure.isIntegral_algebra K C)
 
 end Field
 
-variable (K L R : Type*) {A : Type*}
+section
+
+variable (K L : Type*) {R S A : Type*}
 
 section Ring
 
-variable [CommRing R] [Nontrivial R] [Ring A] [Algebra R A]
+section Field
 
-theorem IsAlgebraic.of_finite (e : A) [Module.Finite R A] : IsAlgebraic R e :=
-  (IsIntegral.of_finite R e).isAlgebraic
+variable [Field K] [Field L] [Ring A]
+
+variable [Algebra K L] [Algebra L A] [Algebra K A] [IsScalarTower K L A]
+
+theorem IsAlgebraic.of_finite (e : A) [FiniteDimensional K A] : IsAlgebraic K e :=
+  (IsIntegral.of_finite K e).isAlgebraic
 
 variable (A)
+
+@[stacks 09GG "first part"]
+instance Algebra.IsAlgebraic.of_finite [FiniteDimensional K A] : Algebra.IsAlgebraic K A :=
+  (IsIntegral.of_finite K A).isAlgebraic
+
+end Field
+
+end Ring
+
+section CommRing
+
+variable {K L} [Field K] [Field L] [Ring A]
+
+variable [Algebra K L] [Algebra L A] [Algebra K A] [IsScalarTower K L A]
+
+@[stacks 09GJ]
+protected theorem Algebra.IsAlgebraic.trans
+    [L_alg : Algebra.IsAlgebraic K L] [A_alg : Algebra.IsAlgebraic L A] :
+    Algebra.IsAlgebraic K A := by
+  rw [Algebra.isAlgebraic_iff_isIntegral] at L_alg A_alg ⊢
+  exact Algebra.IsIntegral.trans L
+
+end CommRing
+
+section Field
+
+variable {K L} [Field K] [Ring A] [Algebra K A]
+
+@[simp]
+theorem transcendental_aeval_iff {r : A} {f : K[X]} :
+    Transcendental K (Polynomial.aeval r f) ↔ Transcendental K r ∧ Transcendental K f := by
+  refine ⟨fun h ↦ ⟨?_, h.of_aeval⟩, fun ⟨h1, h2⟩ ↦ h1.aeval_of_transcendental h2⟩
+  rw [Transcendental] at h ⊢
+  contrapose! h
+  rw [isAlgebraic_iff_isIntegral] at h ⊢
+  exact .of_mem_of_fg _ h.fg_adjoin_singleton _ (aeval_mem_adjoin_singleton _ _)
+
+variable [Field L] [Algebra K L]
+
+theorem AlgHom.bijective [FiniteDimensional K L] (ϕ : L →ₐ[K] L) : Function.Bijective ϕ :=
+  (Algebra.IsAlgebraic.of_finite K L).algHom_bijective ϕ
+
+variable (K L) in
+
+noncomputable abbrev algEquivEquivAlgHom [FiniteDimensional K L] :
+    (L ≃ₐ[K] L) ≃* (L →ₐ[K] L) :=
+  Algebra.IsAlgebraic.algEquivEquivAlgHom K L
+
+end Field
+
+end
+
+variable {R S : Type*} [CommRing R] [CommRing S]
+
+theorem exists_integral_multiple [Algebra R S] {z : S} (hz : IsAlgebraic R z)
+    (inj : ∀ x, algebraMap R S x = 0 → x = 0) :
+    ∃ᵉ (x : integralClosure R S) (y ≠ (0 : R)), algebraMap R S y * z = x := by
+  rcases hz with ⟨p, p_ne_zero, px⟩
+  set a := p.leadingCoeff
+  have a_ne_zero : a ≠ 0 := mt Polynomial.leadingCoeff_eq_zero.mp p_ne_zero
+  have x_integral : IsIntegral R (algebraMap R S a * z) :=
+    ⟨p.integralNormalization, monic_integralNormalization p_ne_zero,
+      integralNormalization_aeval_eq_zero px inj⟩
+  exact ⟨⟨_, x_integral⟩, a, a_ne_zero, rfl⟩

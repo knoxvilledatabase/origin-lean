@@ -3,6 +3,10 @@ Extracted from Geometry/Manifold/Complex.lean
 Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.AbsMax
+import Mathlib.Analysis.LocallyConvex.WithSeminorms
+import Mathlib.Geometry.Manifold.MFDeriv.Basic
+import Mathlib.Topology.LocallyConstant.Basic
 
 /-! # Holomorphic functions on complex manifolds
 
@@ -43,10 +47,10 @@ variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F]
 variable {H : Type*} [TopologicalSpace H] {I : ModelWithCorners ℂ E H} [I.Boundaryless]
 
 variable {M : Type*} [TopologicalSpace M] [ChartedSpace H M]
-  [IsManifold I 1 M]
+  [SmoothManifoldWithCorners I M]
 
 theorem Complex.norm_eventually_eq_of_mdifferentiableAt_of_isLocalMax {f : M → F} {c : M}
-    (hd : ∀ᶠ z in 𝓝 c, MDiffAt f z) (hc : IsLocalMax (norm ∘ f) c) :
+    (hd : ∀ᶠ z in 𝓝 c, MDifferentiableAt I 𝓘(ℂ, F) f z) (hc : IsLocalMax (norm ∘ f) c) :
     ∀ᶠ y in 𝓝 c, ‖f y‖ = ‖f c‖ := by
   set e := extChartAt I c
   have hI : range I = univ := ModelWithCorners.Boundaryless.range_eq_univ
@@ -75,7 +79,7 @@ theorem Complex.norm_eventually_eq_of_mdifferentiableAt_of_isLocalMax {f : M →
 namespace MDifferentiableOn
 
 theorem norm_eqOn_of_isPreconnected_of_isMaxOn {f : M → F} {U : Set M} {c : M}
-    (hd : MDiff[U] f) (hc : IsPreconnected U) (ho : IsOpen U)
+    (hd : MDifferentiableOn I 𝓘(ℂ, F) f U) (hc : IsPreconnected U) (ho : IsOpen U)
     (hcU : c ∈ U) (hm : IsMaxOn (norm ∘ f) U c) : EqOn (norm ∘ f) (const M ‖f c‖) U := by
   set V := {z ∈ U | ‖f z‖ = ‖f c‖}
   suffices U ⊆ V from fun x hx ↦ (this hx).2
@@ -83,7 +87,7 @@ theorem norm_eqOn_of_isPreconnected_of_isMaxOn {f : M → F} {U : Set M} {c : M}
     refine isOpen_iff_mem_nhds.2 fun x hx ↦ inter_mem (ho.mem_nhds hx.1) ?_
     replace hm : IsLocalMax (‖f ·‖) x :=
       mem_of_superset (ho.mem_nhds hx.1) fun z hz ↦ (hm hz).out.trans_eq hx.2.symm
-    replace hd : ∀ᶠ y in 𝓝 x, MDiffAt f y :=
+    replace hd : ∀ᶠ y in 𝓝 x, MDifferentiableAt I 𝓘(ℂ, F) f y :=
       (eventually_mem_nhds_iff.2 (ho.mem_nhds hx.1)).mono fun z ↦ hd.mdifferentiableAt
     exact (Complex.norm_eventually_eq_of_mdifferentiableAt_of_isLocalMax hd hm).mono fun _ ↦
       (Eq.trans · hx.2)
@@ -95,22 +99,23 @@ theorem norm_eqOn_of_isPreconnected_of_isMaxOn {f : M → F} {U : Set M} {c : M}
   exact hc.subset_left_of_subset_union hVo hWo hdVW hUVW hVne
 
 theorem eqOn_of_isPreconnected_of_isMaxOn_norm [StrictConvexSpace ℝ F] {f : M → F} {U : Set M}
-    {c : M} (hd : MDiff[U] f) (hc : IsPreconnected U) (ho : IsOpen U)
+    {c : M} (hd : MDifferentiableOn I 𝓘(ℂ, F) f U) (hc : IsPreconnected U) (ho : IsOpen U)
     (hcU : c ∈ U) (hm : IsMaxOn (norm ∘ f) U c) : EqOn f (const M (f c)) U := fun x hx =>
   have H₁ : ‖f x‖ = ‖f c‖ := hd.norm_eqOn_of_isPreconnected_of_isMaxOn hc ho hcU hm hx
-  have hd' : MDiff[U] (f · + f c) := hd.add mdifferentiableOn_const
+  -- TODO: Add `MDifferentiableOn.add` etc; does it mean importing `Manifold.Algebra.Monoid`?
+  have hd' : MDifferentiableOn I 𝓘(ℂ, F) (f · + f c) U := fun x hx ↦
+    ⟨(hd x hx).1.add continuousWithinAt_const, (hd x hx).2.add_const _⟩
   have H₂ : ‖f x + f c‖ = ‖f c + f c‖ :=
     hd'.norm_eqOn_of_isPreconnected_of_isMaxOn hc ho hcU hm.norm_add_self hx
   eq_of_norm_eq_of_norm_add_eq H₁ <| by simp only [H₂, SameRay.rfl.norm_add, H₁, Function.const]
 
 theorem apply_eq_of_isPreconnected_isCompact_isOpen {f : M → F} {U : Set M} {a b : M}
-    (hd : MDiff[U] f) (hpc : IsPreconnected U) (hc : IsCompact U)
+    (hd : MDifferentiableOn I 𝓘(ℂ, F) f U) (hpc : IsPreconnected U) (hc : IsCompact U)
     (ho : IsOpen U) (ha : a ∈ U) (hb : b ∈ U) : f a = f b := by
   refine ?_
   -- Subtract `f b` to avoid the assumption `[StrictConvexSpace ℝ F]`
   wlog hb₀ : f b = 0 generalizing f
-  -- TODO: Add `MDifferentiableOn.sub` etc
-  · have hd' : MDiff[U] (f · - f b) := fun x hx ↦
+  · have hd' : MDifferentiableOn I 𝓘(ℂ, F) (f · - f b) U := fun x hx ↦
       ⟨(hd x hx).1.sub continuousWithinAt_const, (hd x hx).2.sub_const _⟩
     simpa [sub_eq_zero] using this hd' (sub_self _)
   rcases hc.exists_isMaxOn ⟨a, ha⟩ hd.continuousOn.norm with ⟨c, hcU, hc⟩
@@ -123,7 +128,7 @@ end MDifferentiableOn
 /-!
 ### Functions holomorphic on the whole manifold
 
-Lemmas in this section were generalized from `𝓘(ℂ, E)` to an unspecified boundaryless
+Porting note: lemmas in this section were generalized from `𝓘(ℂ, E)` to an unspecified boundaryless
 model so that it works, e.g., on a product of two manifolds without a boundary. This can break
 `apply MDifferentiable.apply_eq_of_compactSpace`, use
 `apply MDifferentiable.apply_eq_of_compactSpace (I := I)` instead or dot notation on an existing
@@ -134,7 +139,7 @@ namespace MDifferentiable
 
 variable [CompactSpace M]
 
-protected theorem isLocallyConstant {f : M → F} (hf : MDiff f) :
+protected theorem isLocallyConstant {f : M → F} (hf : MDifferentiable I 𝓘(ℂ, F) f) :
     IsLocallyConstant f :=
   haveI : LocallyConnectedSpace H := I.toHomeomorph.locallyConnectedSpace
   haveI : LocallyConnectedSpace M := ChartedSpace.locallyConnectedSpace H M
@@ -143,11 +148,11 @@ protected theorem isLocallyConstant {f : M → F} (hf : MDiff f) :
       hclo.isClosed.isCompact hclo.isOpen hb ha
 
 theorem apply_eq_of_compactSpace [PreconnectedSpace M] {f : M → F}
-    (hf : MDiff f) (a b : M) : f a = f b :=
+    (hf : MDifferentiable I 𝓘(ℂ, F) f) (a b : M) : f a = f b :=
   hf.isLocallyConstant.apply_eq_of_preconnectedSpace _ _
 
-theorem exists_eq_const_of_compactSpace [PreconnectedSpace M] {f : M → F} (hf : MDiff f) :
-    ∃ v : F, f = Function.const M v :=
+theorem exists_eq_const_of_compactSpace [PreconnectedSpace M] {f : M → F}
+    (hf : MDifferentiable I 𝓘(ℂ, F) f) : ∃ v : F, f = Function.const M v :=
   hf.isLocallyConstant.exists_eq_const
 
 end MDifferentiable

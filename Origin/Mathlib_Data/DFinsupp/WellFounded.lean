@@ -1,8 +1,13 @@
 /-
 Extracted from Data/DFinsupp/WellFounded.lean
-Genuine: 9 of 22 | Dissolved: 2 | Infrastructure: 11
+Genuine: 9 of 19 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
+import Mathlib.Data.DFinsupp.Lex
+import Mathlib.Order.GameAdd
+import Mathlib.Order.Antisymmetrization
+import Mathlib.Tactic.AdaptationNote
+import Mathlib.SetTheory.Cardinal.Basic
 
 /-!
 # Well-foundedness of the lexicographic and product orders on `DFinsupp` and `Pi`
@@ -99,7 +104,7 @@ theorem Lex.acc_zero (hbot : ∀ ⦃i a⦄, ¬s i a 0) : Acc (DFinsupp.Lex r s) 
 theorem Lex.acc_single (hbot : ∀ ⦃i a⦄, ¬s i a 0) (hs : ∀ i, WellFounded (s i))
     [DecidableEq ι] {i : ι} (hi : Acc (rᶜ ⊓ (· ≠ ·)) i) :
     ∀ a, Acc (DFinsupp.Lex r s) (single i a) := by
-  induction hi with | _ i _ ih
+  induction' hi with i _ ih
   refine fun a => WellFounded.induction (hs i)
     (C := fun x ↦ Acc (DFinsupp.Lex r s) (single i x)) a fun a ha ↦ ?_
   refine Acc.intro _ fun x ↦ ?_
@@ -111,12 +116,12 @@ theorem Lex.acc_single (hbot : ∀ ⦃i a⦄, ¬s i a 0) (hs : ∀ i, WellFounde
   subst hik
   classical
     refine Lex.acc_of_single hbot x fun j hj ↦ ?_
-    obtain rfl | hij := eq_or_ne j i
+    obtain rfl | hij := eq_or_ne i j
     · exact ha _ hs
     by_cases h : r j i
     · rw [hr j h, single_eq_of_ne hij, single_zero]
       exact Lex.acc_zero hbot
-    · exact ih _ ⟨h, hij⟩ _
+    · exact ih _ ⟨h, hij.symm⟩ _
 
 -- DISSOLVED: Lex.acc
 
@@ -125,15 +130,17 @@ theorem Lex.wellFounded (hbot : ∀ ⦃i a⦄, ¬s i a 0) (hs : ∀ i, WellFound
   ⟨fun x => by classical exact Lex.acc hbot hs x fun i _ => hr.apply i⟩
 
 theorem Lex.wellFounded' (hbot : ∀ ⦃i a⦄, ¬s i a 0) (hs : ∀ i, WellFounded (s i))
-    [Std.Trichotomous r] (hr : WellFounded (Function.swap r)) : WellFounded (DFinsupp.Lex r s) :=
+    [IsTrichotomous ι r] (hr : WellFounded (Function.swap r)) :
+    WellFounded (DFinsupp.Lex r s) :=
   Lex.wellFounded hbot hs <| Subrelation.wf
-    (fun {i j} h ↦ Not.imp_symm (@Std.Trichotomous.trichotomous ι r _ i j h.left) h.right) hr
+   (fun {i j} h => ((@IsTrichotomous.trichotomous ι r _ i j).resolve_left h.1).resolve_left h.2) hr
 
 end Zero
 
--- INSTANCE (free from Core): Lex.wellFoundedLT
-
--- INSTANCE (free from Core): Colex.wellFoundedLT
+instance Lex.wellFoundedLT [LT ι] [IsTrichotomous ι (· < ·)] [hι : WellFoundedGT ι]
+    [∀ i, CanonicallyOrderedAddCommMonoid (α i)] [hα : ∀ i, WellFoundedLT (α i)] :
+    WellFoundedLT (Lex (Π₀ i, α i)) :=
+  ⟨Lex.wellFounded' (fun _ a => (zero_le a).not_lt) (fun i => (hα i).wf) hι.wf⟩
 
 end DFinsupp
 
@@ -146,24 +153,26 @@ theorem Pi.Lex.wellFounded [IsStrictTotalOrder ι r] [Finite ι] (hs : ∀ i, We
   obtain h | ⟨⟨x⟩⟩ := isEmpty_or_nonempty (∀ i, α i)
   · convert emptyWf.wf
   letI : ∀ i, Zero (α i) := fun i => ⟨(hs i).min ⊤ ⟨x i, trivial⟩⟩
-  haveI := IsTrans.swap r; haveI := Std.Irrefl.swap r; haveI := Fintype.ofFinite ι
+  haveI := IsTrans.swap r; haveI := IsIrrefl.swap r; haveI := Fintype.ofFinite ι
   refine InvImage.wf equivFunOnFintype.symm (Lex.wellFounded' (fun i a => ?_) hs ?_)
-  exacts [(hs i).not_lt_min ⊤ trivial, Finite.wellFounded_of_trans_of_irrefl (Function.swap r)]
+  exacts [(hs i).not_lt_min ⊤ _ trivial, Finite.wellFounded_of_trans_of_irrefl (Function.swap r)]
 
--- INSTANCE (free from Core): Pi.Lex.wellFoundedLT
+instance Pi.Lex.wellFoundedLT [LinearOrder ι] [Finite ι] [∀ i, LT (α i)]
+    [hwf : ∀ i, WellFoundedLT (α i)] : WellFoundedLT (Lex (∀ i, α i)) :=
+  ⟨Pi.Lex.wellFounded (· < ·) fun i => (hwf i).1⟩
 
--- INSTANCE (free from Core): Pi.Colex.wellFoundedLT
-
--- INSTANCE (free from Core): Function.Lex.wellFoundedLT
+instance Function.Lex.wellFoundedLT {α} [LinearOrder ι] [Finite ι] [LT α] [WellFoundedLT α] :
+    WellFoundedLT (Lex (ι → α)) :=
+  Pi.Lex.wellFoundedLT
 
 theorem DFinsupp.Lex.wellFounded_of_finite [IsStrictTotalOrder ι r] [Finite ι] [∀ i, Zero (α i)]
     (hs : ∀ i, WellFounded (s i)) : WellFounded (DFinsupp.Lex r s) :=
   have := Fintype.ofFinite ι
   InvImage.wf equivFunOnFintype (Pi.Lex.wellFounded r hs)
 
--- INSTANCE (free from Core): DFinsupp.Lex.wellFoundedLT_of_finite
-
--- INSTANCE (free from Core): DFinsupp.Colex.wellFoundedLT_of_finite
+instance DFinsupp.Lex.wellFoundedLT_of_finite [LinearOrder ι] [Finite ι] [∀ i, Zero (α i)]
+    [∀ i, LT (α i)] [hwf : ∀ i, WellFoundedLT (α i)] : WellFoundedLT (Lex (Π₀ i, α i)) :=
+  ⟨DFinsupp.Lex.wellFounded_of_finite (· < ·) fun i => (hwf i).1⟩
 
 protected theorem DFinsupp.wellFoundedLT [∀ i, Zero (α i)] [∀ i, Preorder (α i)]
     [∀ i, WellFoundedLT (α i)] (hbot : ∀ ⦃i⦄ ⦃a : α i⦄, ¬a < 0) : WellFoundedLT (Π₀ i, α i) :=
@@ -173,21 +182,38 @@ protected theorem DFinsupp.wellFoundedLT [∀ i, Zero (α i)] [∀ i, Preorder (
     let _ : ∀ i, Zero (β i) := fun i ↦ ⟨e i 0⟩
     have : WellFounded (DFinsupp.Lex (Function.swap <| @WellOrderingRel ι)
         (fun _ ↦ (· < ·) : (i : ι) → β i → β i → Prop)) := by
-      have := Std.Trichotomous.swap (@WellOrderingRel ι)
+      have := IsTrichotomous.swap (@WellOrderingRel ι)
       refine Lex.wellFounded' ?_ (fun i ↦ IsWellFounded.wf) ?_
       · rintro i ⟨a⟩
         apply hbot
-      · simp +unfoldPartialApp only [Function.swap]
+      · #adaptation_note /-- nightly-2024-03-16: simp was
+        simp (config := { unfoldPartialApp := true }) only [Function.swap] -/
+        simp only [Function.swap_def]
         exact IsWellFounded.wf
     refine Subrelation.wf (fun h => ?_) <| InvImage.wf (mapRange e fun _ ↦ rfl) this
     have := IsStrictOrder.swap (@WellOrderingRel ι)
     obtain ⟨i, he, hl⟩ := lex_lt_of_lt_of_preorder (Function.swap WellOrderingRel) h
     exact ⟨i, fun j hj ↦ Quot.sound (he j hj), hl⟩⟩
 
--- INSTANCE (free from Core): DFinsupp.wellFoundedLT'
+instance DFinsupp.wellFoundedLT' [∀ i, CanonicallyOrderedAddCommMonoid (α i)]
+    [∀ i, WellFoundedLT (α i)] : WellFoundedLT (Π₀ i, α i) :=
+  DFinsupp.wellFoundedLT fun _i a => (zero_le a).not_lt
 
--- INSTANCE (free from Core): Pi.wellFoundedLT
+instance Pi.wellFoundedLT [Finite ι] [∀ i, Preorder (α i)] [hw : ∀ i, WellFoundedLT (α i)] :
+    WellFoundedLT (∀ i, α i) :=
+  ⟨by
+    obtain h | ⟨⟨x⟩⟩ := isEmpty_or_nonempty (∀ i, α i)
+    · convert emptyWf.wf
+    letI : ∀ i, Zero (α i) := fun i => ⟨(hw i).wf.min ⊤ ⟨x i, trivial⟩⟩
+    haveI := Fintype.ofFinite ι
+    refine InvImage.wf equivFunOnFintype.symm (DFinsupp.wellFoundedLT fun i a => ?_).wf
+    exact (hw i).wf.not_lt_min ⊤ _ trivial⟩
 
--- INSTANCE (free from Core): Function.wellFoundedLT
+instance Function.wellFoundedLT {α} [Finite ι] [Preorder α] [WellFoundedLT α] :
+    WellFoundedLT (ι → α) :=
+  Pi.wellFoundedLT
 
--- INSTANCE (free from Core): DFinsupp.wellFoundedLT_of_finite
+instance DFinsupp.wellFoundedLT_of_finite [Finite ι] [∀ i, Zero (α i)] [∀ i, Preorder (α i)]
+    [∀ i, WellFoundedLT (α i)] : WellFoundedLT (Π₀ i, α i) :=
+  have := Fintype.ofFinite ι
+  ⟨InvImage.wf equivFunOnFintype Pi.wellFoundedLT.wf⟩

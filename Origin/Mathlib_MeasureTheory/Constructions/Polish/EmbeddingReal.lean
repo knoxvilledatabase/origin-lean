@@ -1,8 +1,10 @@
 /-
 Extracted from MeasureTheory/Constructions/Polish/EmbeddingReal.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Real.Cardinality
+import Mathlib.MeasureTheory.Constructions.Polish.Basic
 
 /-!
 # A Polish Borel space is measurably equivalent to a set of reals
@@ -59,3 +61,10 @@ def embeddingReal (Ω : Type*) [MeasurableSpace Ω] [StandardBorelSpace Ω] : Ω
 lemma measurableEmbedding_embeddingReal (Ω : Type*) [MeasurableSpace Ω] [StandardBorelSpace Ω] :
     MeasurableEmbedding (embeddingReal Ω) :=
   (exists_measurableEmbedding_real Ω).choose_spec
+
+@[fun_prop]
+lemma measurable_embeddingReal (Ω : Type*) [MeasurableSpace Ω] [StandardBorelSpace Ω] :
+    Measurable (embeddingReal Ω) :=
+  (measurableEmbedding_embeddingReal Ω).measurable
+
+end MeasureTheory

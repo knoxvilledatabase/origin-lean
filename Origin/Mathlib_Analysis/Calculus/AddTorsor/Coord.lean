@@ -3,6 +3,8 @@ Extracted from Analysis/Calculus/AddTorsor/Coord.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.AddTorsor.AffineMap
+import Mathlib.Analysis.Normed.Affine.AddTorsorBases
 
 /-!
 # Barycentric coordinates are smooth

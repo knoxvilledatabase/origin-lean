@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Pullback/Pasting.lean
-Genuine: 19 of 20 | Dissolved: 0 | Infrastructure: 1
+Genuine: 42 of 46 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
 /-!
 # Pasting lemma
@@ -206,7 +207,7 @@ def rightSquareIsPushout (H : IsColimit t₁) (H' : IsColimit (t₁.pasteHoriz t
     (by rw [reassoc_of% t₁.condition, ← hi₂, s.condition, Category.assoc])
   refine ⟨l, ?_, hl', ?_⟩
   -- To check that `l` is compatible with the projections, we use the universal property of `t₁`
-  · simp only [PushoutCocone.mk_pt, PushoutCocone.mk_ι_app, Category.assoc] at hl hl'
+  · simp at hl hl'
     apply PushoutCocone.IsColimit.hom_ext H hl
     rw [← Category.assoc, ← hi₂, t₂.condition, s.condition, Category.assoc, hl']
   -- Uniqueness of the lift follows from the universal property of the big square
@@ -276,14 +277,209 @@ end PastePushoutVert
 
 end PasteLemma
 
+section
+
 variable {W X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) (f' : W ⟶ X)
 
 variable [HasPullback f g] [HasPullback f' (pullback.fst f g)]
 
--- INSTANCE (free from Core): hasPullbackHorizPaste
+instance hasPullbackHorizPaste : HasPullback (f' ≫ f) g :=
+  HasLimit.mk {
+    cone := (pullback.cone f g).pasteHoriz (pullback.cone f' (pullback.fst f g)) rfl
+    isLimit := pasteHorizIsPullback rfl (pullback.isLimit f g)
+      (pullback.isLimit f' (pullback.fst f g))
+  }
 
 noncomputable def pullbackRightPullbackFstIso :
     pullback f' (pullback.fst f g) ≅ pullback (f' ≫ f) g :=
   IsLimit.conePointUniqueUpToIso
     (pasteHorizIsPullback rfl (pullback.isLimit f g) (pullback.isLimit f' (pullback.fst f g)))
     (pullback.isLimit (f' ≫ f) g)
+
+@[reassoc (attr := simp)]
+theorem pullbackRightPullbackFstIso_hom_fst :
+    (pullbackRightPullbackFstIso f g f').hom ≫ pullback.fst (f' ≫ f) g =
+      pullback.fst f' (pullback.fst f g) :=
+  IsLimit.conePointUniqueUpToIso_hom_comp _ _ WalkingCospan.left
+
+@[reassoc (attr := simp)]
+theorem pullbackRightPullbackFstIso_hom_snd :
+    (pullbackRightPullbackFstIso f g f').hom ≫ pullback.snd _ _ =
+      pullback.snd f' (pullback.fst f g) ≫ pullback.snd f g :=
+  IsLimit.conePointUniqueUpToIso_hom_comp _ _ WalkingCospan.right
+
+@[reassoc (attr := simp)]
+theorem pullbackRightPullbackFstIso_inv_fst :
+    (pullbackRightPullbackFstIso f g f').inv ≫ pullback.fst f' (pullback.fst f g) =
+      pullback.fst (f' ≫ f) g :=
+  IsLimit.conePointUniqueUpToIso_inv_comp _ _ WalkingCospan.left
+
+@[reassoc (attr := simp)]
+theorem pullbackRightPullbackFstIso_inv_snd_snd :
+    (pullbackRightPullbackFstIso f g f').inv ≫ pullback.snd _ _ ≫ pullback.snd _ _ =
+      pullback.snd _ _ :=
+  IsLimit.conePointUniqueUpToIso_inv_comp _ _ WalkingCospan.right
+
+@[reassoc (attr := simp)]
+theorem pullbackRightPullbackFstIso_inv_snd_fst :
+    (pullbackRightPullbackFstIso f g f').inv ≫ pullback.snd _ _ ≫ pullback.fst _ _ =
+      pullback.fst _ _ ≫ f' := by
+  rw [← pullback.condition]
+  exact pullbackRightPullbackFstIso_inv_fst_assoc f g f' _
+
+end
+
+section
+
+variable {W X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) (g' : W ⟶ Y)
+
+variable [HasPullback f g] [HasPullback (pullback.snd f g) g']
+
+instance hasPullbackVertPaste : HasPullback f (g' ≫ g) :=
+  HasLimit.mk {
+    cone := (pullback.cone f g).pasteVert (pullback.cone (pullback.snd f g) g') rfl
+    isLimit := pasteVertIsPullback rfl (pullback.isLimit f g)
+      (pullback.isLimit (pullback.snd f g) g')
+  }
+
+def pullbackLeftPullbackSndIso :
+    pullback (pullback.snd f g) g' ≅ pullback f (g' ≫ g) :=
+  IsLimit.conePointUniqueUpToIso
+      (pasteVertIsPullback rfl (pullback.isLimit f g) (pullback.isLimit (pullback.snd f g) g'))
+      (pullback.isLimit f (g' ≫ g))
+
+@[reassoc (attr := simp)]
+theorem pullbackLeftPullbackSndIso_hom_fst :
+    (pullbackLeftPullbackSndIso f g g').hom ≫ pullback.fst _ _ =
+      pullback.fst _ _ ≫ pullback.fst _ _ :=
+  IsLimit.conePointUniqueUpToIso_hom_comp _ _ WalkingCospan.left
+
+@[reassoc (attr := simp)]
+theorem pullbackLeftPullbackSndIso_hom_snd :
+    (pullbackLeftPullbackSndIso f g g').hom ≫ pullback.snd _ _ = pullback.snd _ _ :=
+  IsLimit.conePointUniqueUpToIso_hom_comp _ _ WalkingCospan.right
+
+@[reassoc (attr := simp)]
+theorem pullbackLeftPullbackSndIso_inv_fst :
+    (pullbackLeftPullbackSndIso f g g').inv ≫ pullback.fst _ _ ≫ pullback.fst _ _ =
+      pullback.fst _ _ :=
+  IsLimit.conePointUniqueUpToIso_inv_comp _ _ WalkingCospan.left
+
+@[reassoc (attr := simp)]
+theorem pullbackLeftPullbackSndIso_inv_snd_snd :
+    (pullbackLeftPullbackSndIso f g g').inv ≫ pullback.snd _ _ = pullback.snd _ _ :=
+  IsLimit.conePointUniqueUpToIso_inv_comp _ _ WalkingCospan.right
+
+@[reassoc (attr := simp)]
+theorem pullbackLeftPullbackSndIso_inv_fst_snd :
+    (pullbackLeftPullbackSndIso f g g').inv ≫ pullback.fst _ _ ≫ pullback.snd _ _ =
+      pullback.snd _ _ ≫ g' := by
+  rw [pullback.condition]
+  exact pullbackLeftPullbackSndIso_inv_snd_snd_assoc f g g' g'
+
+end
+
+section
+
+variable {W X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) (g' : Z ⟶ W)
+
+variable [HasPushout f g] [HasPushout (pushout.inr f g) g']
+
+instance : HasPushout f (g ≫ g') :=
+  HasColimit.mk {
+    cocone := (pushout.cocone f g).pasteHoriz (pushout.cocone (pushout.inr f g) g') rfl
+    isColimit := pasteHorizIsPushout rfl (pushout.isColimit f g)
+      (pushout.isColimit (pushout.inr f g) g')
+  }
+
+noncomputable def pushoutLeftPushoutInrIso :
+    pushout (pushout.inr f g) g' ≅ pushout f (g ≫ g') :=
+  IsColimit.coconePointUniqueUpToIso
+    (pasteHorizIsPushout rfl (pushout.isColimit f g) (pushout.isColimit (pushout.inr f g) g'))
+    (pushout.isColimit f (g ≫ g'))
+
+@[reassoc (attr := simp)]
+theorem inl_pushoutLeftPushoutInrIso_inv :
+    (pushout.inl f (g ≫ g')) ≫ (pushoutLeftPushoutInrIso f g g').inv =
+      (pushout.inl f g) ≫ (pushout.inl (pushout.inr f g) g') :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv _ _ WalkingSpan.left
+
+@[reassoc (attr := simp)]
+theorem inr_pushoutLeftPushoutInrIso_hom :
+    (pushout.inr (pushout.inr f g) g') ≫ (pushoutLeftPushoutInrIso f g g').hom =
+      (pushout.inr f (g ≫ g')) :=
+  IsColimit.comp_coconePointUniqueUpToIso_hom (pasteHorizIsPushout _ _ _) _ WalkingSpan.right
+
+@[reassoc (attr := simp)]
+theorem inr_pushoutLeftPushoutInrIso_inv :
+    (pushout.inr f (g ≫ g')) ≫ (pushoutLeftPushoutInrIso f g g').inv =
+      (pushout.inr (pushout.inr f g) g') :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv _ _ WalkingSpan.right
+
+@[reassoc (attr := simp)]
+theorem inl_inl_pushoutLeftPushoutInrIso_hom :
+    (pushout.inl f g) ≫ (pushout.inl (pushout.inr f g) g') ≫
+      (pushoutLeftPushoutInrIso f g g').hom = (pushout.inl f (g ≫ g')) := by
+  rw [← Category.assoc]
+  apply IsColimit.comp_coconePointUniqueUpToIso_hom (pasteHorizIsPushout _ _ _) _ WalkingSpan.left
+
+@[reassoc (attr := simp)]
+theorem inr_inl_pushoutLeftPushoutInrIso_hom :
+    pushout.inr f g ≫ pushout.inl (pushout.inr f g) g' ≫ (pushoutLeftPushoutInrIso f g g').hom =
+      g' ≫ pushout.inr f (g ≫ g') := by
+  rw [← Category.assoc, ← Iso.eq_comp_inv, Category.assoc, inr_pushoutLeftPushoutInrIso_inv,
+    pushout.condition]
+
+end
+
+section
+
+variable {W X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) (f' : Y ⟶ W)
+
+variable [HasPushout f g] [HasPushout f' (pushout.inl f g)]
+
+instance hasPushoutVertPaste : HasPushout (f ≫ f') g :=
+  HasColimit.mk {
+    cocone := (pushout.cocone f g).pasteVert (pushout.cocone f' (pushout.inl f g)) rfl
+    isColimit := pasteVertIsPushout rfl (pushout.isColimit f g)
+      (pushout.isColimit f' (pushout.inl f g))
+  }
+
+noncomputable def pushoutRightPushoutInlIso :
+    pushout f' (pushout.inl f g) ≅ pushout (f ≫ f') g :=
+  IsColimit.coconePointUniqueUpToIso
+    (pasteVertIsPushout rfl (pushout.isColimit f g) (pushout.isColimit f' (pushout.inl f g)))
+    (pushout.isColimit (f ≫ f') g)
+
+@[reassoc (attr := simp)]
+theorem inl_pushoutRightPushoutInlIso_inv :
+    pushout.inl _ _ ≫ (pushoutRightPushoutInlIso f g f').inv = pushout.inl _ _ :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv _ _ WalkingSpan.left
+
+@[reassoc (attr := simp)]
+theorem inr_inr_pushoutRightPushoutInlIso_hom :
+    pushout.inr _ _ ≫ pushout.inr _ _ ≫ (pushoutRightPushoutInlIso f g f').hom =
+      pushout.inr _ _ := by
+  rw [← Category.assoc]
+  apply IsColimit.comp_coconePointUniqueUpToIso_hom (pasteVertIsPushout rfl _ _) _ WalkingSpan.right
+
+@[reassoc (attr := simp)]
+theorem inr_pushoutRightPushoutInlIso_inv :
+    pushout.inr _ _ ≫ (pushoutRightPushoutInlIso f g f').inv =
+      pushout.inr _ _ ≫ pushout.inr _ _ :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv _ _ WalkingSpan.right
+
+@[reassoc (attr := simp)]
+theorem inl_pushoutRightPushoutInlIso_hom :
+    pushout.inl _ _ ≫ (pushoutRightPushoutInlIso f g f').hom = pushout.inl _ _ :=
+  IsColimit.comp_coconePointUniqueUpToIso_hom (pasteVertIsPushout rfl _ _) _ WalkingSpan.left
+
+@[reassoc (attr := simp)]
+theorem inr_inl_pushoutRightPushoutInlIso_hom :
+    pushout.inl _ _ ≫ pushout.inr _ _ ≫ (pushoutRightPushoutInlIso f g f').hom =
+      f' ≫ pushout.inl _ _ := by
+  rw [← Category.assoc, ← pushout.condition, Category.assoc, inl_pushoutRightPushoutInlIso_hom]
+
+end
+
+end CategoryTheory.Limits

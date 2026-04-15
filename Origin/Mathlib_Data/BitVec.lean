@@ -1,8 +1,10 @@
 /-
 Extracted from Data/BitVec.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 15 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
+import Mathlib.Algebra.Ring.InjSurj
+import Mathlib.Data.ZMod.Defs
 
 /-!
 # Basic Theorems About Bitvectors
@@ -18,19 +20,76 @@ namespace BitVec
 
 variable {w : Nat}
 
-open Fin.CommRing in
+/-!
+## Injectivity
+-/
 
-theorem ofFin_intCast (z : ℤ) : ofFin (z : Fin (2 ^ w)) = ↑z := by
+theorem toNat_injective {n : Nat} : Function.Injective (BitVec.toNat : BitVec n → _)
+  | ⟨_, _⟩, ⟨_, _⟩, rfl => rfl
+
+theorem toFin_injective {n : Nat} : Function.Injective (toFin : BitVec n → _)
+  | ⟨_, _⟩, ⟨_, _⟩, rfl => rfl
+
+/-!
+## Scalar Multiplication and Powers
+Having instance of `SMul ℕ`, `SMul ℤ` and `Pow` are prerequisites for a `CommRing` instance
+-/
+
+instance : SMul ℕ (BitVec w) := ⟨fun x y => ofFin <| x • y.toFin⟩
+
+instance : SMul ℤ (BitVec w) := ⟨fun x y => ofFin <| x • y.toFin⟩
+
+instance : Pow (BitVec w) ℕ  := ⟨fun x n => ofFin <| x.toFin ^ n⟩
+
+lemma toFin_nsmul (n : ℕ) (x : BitVec w)  : toFin (n • x) = n • x.toFin := rfl
+
+lemma toFin_zsmul (z : ℤ) (x : BitVec w)  : toFin (z • x) = z • x.toFin := rfl
+
+lemma toFin_pow (x : BitVec w) (n : ℕ)    : toFin (x ^ n) = x.toFin ^ n := rfl
+
+/-!
+## Ring
+-/
+
+instance : CommSemiring (BitVec w) :=
+  toFin_injective.commSemiring _
+    rfl /- toFin_zero -/
+    rfl /- toFin_one -/
+    toFin_add
+    toFin_mul
+    toFin_nsmul
+    toFin_pow
+    (fun _ => rfl) /- toFin_natCast -/
+
+@[simp] lemma ofFin_neg {x : Fin (2 ^ w)} : ofFin (-x) = -(ofFin x) := by
+  rfl
+
+@[simp] lemma ofFin_natCast (n : ℕ) : ofFin (n : Fin (2^w)) = n := by
+  rfl
+
+lemma toFin_natCast (n : ℕ) : toFin (n : BitVec w) = n := by
+  rfl
+
+theorem ofFin_intCast (z : ℤ) : ofFin (z : Fin (2^w)) = ↑z := by
   cases w
   case zero =>
     simp only [eq_nil]
   case succ w =>
-    apply BitVec.eq_of_toInt_eq
-    rw [toInt_ofFin, Fin.val_intCast, Int.natCast_pow, Nat.cast_ofNat, Int.ofNat_toNat,
-      toInt_intCast]
-    rw [Int.max_eq_left]
-    · have h : (2 ^ (w + 1) : Int) = (2 ^ (w + 1) : Nat) := by simp
-      rw [h, Int.emod_bmod]
-    · omega
+    simp only [Int.cast, IntCast.intCast]
+    unfold Int.castDef
+    cases' z with z z
+    · rfl
+    · rw [ofInt_negSucc_eq_not_ofNat]
+      simp only [Nat.cast_add, Nat.cast_one, neg_add_rev]
+      rw [← add_ofFin, ofFin_neg, ofFin_ofNat, ofNat_eq_ofNat, ofFin_neg, ofFin_natCast,
+        natCast_eq_ofNat, negOne_eq_allOnes, ← sub_toAdd, allOnes_sub_eq_not]
 
-open Fin.CommRing in
+theorem toFin_intCast (z : ℤ) : toFin (z : BitVec w) = z := by
+  apply toFin_inj.mpr <| (ofFin_intCast z).symm
+
+instance : CommRing (BitVec w) :=
+  toFin_injective.commRing _
+    toFin_zero toFin_one toFin_add toFin_mul toFin_neg toFin_sub
+    toFin_nsmul toFin_zsmul toFin_pow toFin_natCast toFin_intCast
+
+end BitVec

@@ -3,6 +3,7 @@ Extracted from CategoryTheory/Localization/CalculusOfFractions/Fractions.lean
 Genuine: 18 of 21 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Localization.CalculusOfFractions
 
 /-!
 # Lemmas on fractions
@@ -31,7 +32,7 @@ Many definitions have been made reducible so as to ease rewrites when this API i
 
 namespace CategoryTheory
 
-variable {C D : Type*} [Category* C] [Category* D] (L : C ⥤ D) (W : MorphismProperty C)
+variable {C D : Type*} [Category C] [Category D] (L : C ⥤ D) (W : MorphismProperty C)
   [L.IsLocalization W]
 
 namespace MorphismProperty
@@ -154,6 +155,14 @@ namespace LeftFraction₂Rel
 
 variable {X Y : C} {z₁ z₂ : W.LeftFraction₂ X Y}
 
+lemma fst (h : LeftFraction₂Rel z₁ z₂) : LeftFractionRel z₁.fst z₂.fst := by
+  obtain ⟨Z, t₁, t₂, hst, hft, _, ht⟩ := h
+  exact ⟨Z, t₁, t₂, hst, hft, ht⟩
+
+lemma snd (h : LeftFraction₂Rel z₁ z₂) : LeftFractionRel z₁.snd z₂.snd := by
+  obtain ⟨Z, t₁, t₂, hst, _, hft', ht⟩ := h
+  exact ⟨Z, t₁, t₂, hst, hft', ht⟩
+
 end LeftFraction₂Rel
 
 namespace LeftFraction₂
@@ -161,6 +170,32 @@ namespace LeftFraction₂
 variable (W)
 
 variable [W.HasLeftCalculusOfFractions]
+
+lemma map_eq_iff {X Y : C} (φ ψ : W.LeftFraction₂ X Y) :
+    (φ.fst.map L (Localization.inverts _ _) = ψ.fst.map L (Localization.inverts _ _) ∧
+    φ.snd.map L (Localization.inverts _ _) = ψ.snd.map L (Localization.inverts _ _)) ↔
+      LeftFraction₂Rel φ ψ := by
+  simp only [LeftFraction.map_eq_iff L W]
+  constructor
+  · intro ⟨h, h'⟩
+    obtain ⟨Z, t₁, t₂, hst, hft, ht⟩ := h
+    obtain ⟨Z', t₁', t₂', hst', hft', ht'⟩ := h'
+    dsimp at t₁ t₂ t₁' t₂' hst hft hst' hft' ht ht'
+    have ⟨α, hα⟩ := (RightFraction.mk _ ht (φ.s ≫ t₁')).exists_leftFraction
+    simp only [Category.assoc] at hα
+    obtain ⟨Z'', u, hu, fac⟩ := HasLeftCalculusOfFractions.ext _ _ _ φ.hs hα
+    have hα' : ψ.s ≫ t₂ ≫ α.f ≫ u = ψ.s ≫ t₂' ≫ α.s ≫ u := by
+      rw [← reassoc_of% hst, ← reassoc_of% hα, ← reassoc_of% hst']
+    obtain ⟨Z''', u', hu', fac'⟩ := HasLeftCalculusOfFractions.ext _ _ _ ψ.hs hα'
+    simp only [Category.assoc] at fac fac'
+    refine ⟨Z''', t₁' ≫ α.s ≫ u ≫ u', t₂' ≫ α.s ≫ u ≫ u', ?_, ?_, ?_, ?_⟩
+    · rw [reassoc_of% hst']
+    · rw [reassoc_of% fac, reassoc_of% hft, fac']
+    · rw [reassoc_of% hft']
+    · rw [← Category.assoc]
+      exact W.comp_mem _ _ ht' (W.comp_mem _ _ α.hs (W.comp_mem _ _ hu hu'))
+  · intro h
+    exact ⟨h.fst, h.snd⟩
 
 end LeftFraction₂
 

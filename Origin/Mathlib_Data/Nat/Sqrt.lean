@@ -1,16 +1,16 @@
 /-
 Extracted from Data/Nat/Sqrt.lean
-Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
+Genuine: 36 of 38 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Nat.Defs
+import Batteries.Data.Nat.Basic
 
 /-!
 # Properties of the natural number square root function.
 -/
 
 namespace Nat
-
-assert_not_exists Monoid
 
 variable {m n a : ℕ}
 
@@ -29,7 +29,7 @@ private lemma iter_fp_bound (n k : ℕ) :
   if h : (k + n / k) / 2 < k then
     simpa [if_pos h] using iter_fp_bound _ _
   else
-    grind
+    simpa [if_neg h] using Nat.le_of_not_lt h
 
 private lemma AM_GM : {a b : ℕ} → (4 * a * b ≤ (a + b) * (a + b))
   | 0, _ => by rw [Nat.mul_zero, Nat.zero_mul]; exact zero_le _
@@ -43,10 +43,14 @@ lemma sqrt.iter_sq_le (n guess : ℕ) : sqrt.iter n guess * sqrt.iter n guess �
   unfold sqrt.iter
   let next := (guess + n / guess) / 2
   if h : next < guess then
-    simpa only [next, dif_pos h] using sqrt.iter_sq_le n next
+    simpa only [dif_pos h] using sqrt.iter_sq_le n next
   else
+    simp only [dif_neg h]
     apply Nat.mul_le_of_le_div
-    grind
+    apply Nat.le_of_add_le_add_left (a := guess)
+    rw [← Nat.mul_two, ← le_div_iff_mul_le]
+    · exact Nat.le_of_not_lt h
+    · exact Nat.zero_lt_two
 
 lemma sqrt.lt_iter_succ_sq (n guess : ℕ) (hn : n < (guess + 1) * (guess + 1)) :
     n < (sqrt.iter n guess + 1) * (sqrt.iter n guess + 1) := by
@@ -64,11 +68,11 @@ lemma sqrt.lt_iter_succ_sq (n guess : ℕ) (hn : n < (guess + 1) * (guess + 1)) 
     refine Nat.mul_self_lt_mul_self (?_ : _ < _ * ((_ / 2) + 1))
     rw [← add_div_right _ (by decide), Nat.mul_comm 2, Nat.mul_assoc,
       show guess + n / guess + 2 = (guess + n / guess + 1) + 1 from rfl]
-    have aux_lemma {a : ℕ} : a ≤ 2 * ((a + 1) / 2) := by lia
+    have aux_lemma {a : ℕ} : a ≤ 2 * ((a + 1) / 2) := by omega
     refine lt_of_lt_of_le ?_ (Nat.mul_le_mul_left _ aux_lemma)
     rw [Nat.add_assoc, Nat.mul_add]
     exact Nat.add_lt_add_left (lt_mul_div_succ _ (lt_of_le_of_lt (Nat.zero_le m) h)) _
-  · exact hn
+  · simpa only [dif_neg h] using hn
 
 private def IsSqrt (n q : ℕ) : Prop :=
   q * q ≤ n ∧ n < (q + 1) * (q + 1)
@@ -84,11 +88,11 @@ private lemma sqrt_isSqrt (n : ℕ) : IsSqrt n (sqrt n) := by
     simp only [Nat.mul_add, Nat.add_mul, Nat.one_mul, Nat.mul_one, ← Nat.add_assoc]
     rw [Nat.lt_add_one_iff, Nat.add_assoc, ← Nat.mul_two]
     refine le_trans (Nat.le_of_eq (div_add_mod' (n + 2) 2).symm) ?_
-    rw [show (n + 2) / 2 * 2 + (n + 2) % 2 = n + 2 by grind]
-    simp only [shiftLeft_eq, Nat.one_mul]
-    refine Nat.le_of_lt (Nat.le_trans lt_log2_self (le_add_right_of_le ?_))
-    rw [← Nat.pow_add]
-    grind
+    rw [Nat.add_comm, Nat.add_le_add_iff_right, add_mod_right]
+    simp only [Nat.zero_lt_two, add_div_right, succ_mul_succ]
+    refine le_trans (b := 1) ?_ ?_
+    · exact (lt_succ.1 <| mod_lt n Nat.zero_lt_two)
+    · exact Nat.le_add_left _ _
 
 lemma sqrt_le (n : ℕ) : sqrt n * sqrt n ≤ n := (sqrt_isSqrt n).left
 
@@ -112,3 +116,79 @@ lemma sqrt_lt : sqrt m < n ↔ m < n * n := by simp only [← not_le, le_sqrt]
 lemma sqrt_lt' : sqrt m < n ↔ m < n ^ 2 := by simp only [← not_le, le_sqrt']
 
 lemma sqrt_le_self (n : ℕ) : sqrt n ≤ n := le_trans (le_mul_self _) (sqrt_le n)
+
+lemma sqrt_le_sqrt (h : m ≤ n) : sqrt m ≤ sqrt n := le_sqrt.2 (le_trans (sqrt_le _) h)
+
+@[simp] lemma sqrt_zero : sqrt 0 = 0 := rfl
+
+@[simp] lemma sqrt_one : sqrt 1 = 1 := rfl
+
+lemma sqrt_eq_zero : sqrt n = 0 ↔ n = 0 :=
+  ⟨fun h ↦
+      Nat.eq_zero_of_le_zero <| le_of_lt_succ <| (@sqrt_lt n 1).1 <| by rw [h]; decide,
+    by rintro rfl; simp⟩
+
+lemma eq_sqrt : a = sqrt n ↔ a * a ≤ n ∧ n < (a + 1) * (a + 1) :=
+  ⟨fun e ↦ e.symm ▸ sqrt_isSqrt n,
+   fun ⟨h₁, h₂⟩ ↦ le_antisymm (le_sqrt.2 h₁) (le_of_lt_succ <| sqrt_lt.2 h₂)⟩
+
+lemma eq_sqrt' : a = sqrt n ↔ a ^ 2 ≤ n ∧ n < (a + 1) ^ 2 := by
+  simpa only [Nat.pow_two] using eq_sqrt
+
+lemma le_three_of_sqrt_eq_one (h : sqrt n = 1) : n ≤ 3 :=
+  le_of_lt_succ <| (@sqrt_lt n 2).1 <| by rw [h]; decide
+
+lemma sqrt_lt_self (h : 1 < n) : sqrt n < n :=
+  sqrt_lt.2 <| by have := Nat.mul_lt_mul_of_pos_left h (lt_of_succ_lt h); rwa [Nat.mul_one] at this
+
+lemma sqrt_pos : 0 < sqrt n ↔ 0 < n :=
+  le_sqrt
+
+lemma sqrt_add_eq (n : ℕ) (h : a ≤ n + n) : sqrt (n * n + a) = n :=
+  le_antisymm
+    (le_of_lt_succ <|
+      sqrt_lt.2 <| by
+        rw [succ_mul, mul_succ, add_succ, Nat.add_assoc]
+        exact lt_succ_of_le (Nat.add_le_add_left h _))
+    (le_sqrt.2 <| Nat.le_add_right _ _)
+
+lemma sqrt_add_eq' (n : ℕ) (h : a ≤ n + n) : sqrt (n ^ 2 + a) = n := by
+  simpa [Nat.pow_two] using sqrt_add_eq n h
+
+lemma sqrt_eq (n : ℕ) : sqrt (n * n) = n := sqrt_add_eq n (zero_le _)
+
+lemma sqrt_eq' (n : ℕ) : sqrt (n ^ 2) = n := sqrt_add_eq' n (zero_le _)
+
+lemma sqrt_succ_le_succ_sqrt (n : ℕ) : sqrt n.succ ≤ n.sqrt.succ :=
+  le_of_lt_succ <| sqrt_lt.2 <| lt_succ_of_le <|
+  succ_le_succ <| le_trans (sqrt_le_add n) <| Nat.add_le_add_right
+    (by refine add_le_add (Nat.mul_le_mul_right _ ?_) ?_ <;> exact Nat.le_add_right _ 2) _
+
+lemma exists_mul_self (x : ℕ) : (∃ n, n * n = x) ↔ sqrt x * sqrt x = x :=
+  ⟨fun ⟨n, hn⟩ ↦ by rw [← hn, sqrt_eq], fun h ↦ ⟨sqrt x, h⟩⟩
+
+lemma exists_mul_self' (x : ℕ) : (∃ n, n ^ 2 = x) ↔ sqrt x ^ 2 = x := by
+  simpa only [Nat.pow_two] using exists_mul_self x
+
+lemma sqrt_mul_sqrt_lt_succ (n : ℕ) : sqrt n * sqrt n < n + 1 :=
+  Nat.lt_succ_iff.mpr (sqrt_le _)
+
+lemma sqrt_mul_sqrt_lt_succ' (n : ℕ) : sqrt n ^ 2 < n + 1 :=
+  Nat.lt_succ_iff.mpr (sqrt_le' _)
+
+lemma succ_le_succ_sqrt (n : ℕ) : n + 1 ≤ (sqrt n + 1) * (sqrt n + 1) :=
+  le_of_pred_lt (lt_succ_sqrt _)
+
+lemma succ_le_succ_sqrt' (n : ℕ) : n + 1 ≤ (sqrt n + 1) ^ 2 :=
+  le_of_pred_lt (lt_succ_sqrt' _)
+
+lemma not_exists_sq (hl : m * m < n) (hr : n < (m + 1) * (m + 1)) : ¬∃ t, t * t = n := by
+  rintro ⟨t, rfl⟩
+  have h1 : m < t := Nat.mul_self_lt_mul_self_iff.1 hl
+  have h2 : t < m + 1 := Nat.mul_self_lt_mul_self_iff.1 hr
+  exact (not_lt_of_ge <| le_of_lt_succ h2) h1
+
+lemma not_exists_sq' : m ^ 2 < n → n < (m + 1) ^ 2 → ¬∃ t, t ^ 2 = n := by
+  simpa only [Nat.pow_two] using not_exists_sq
+
+end Nat

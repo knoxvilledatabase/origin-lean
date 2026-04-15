@@ -1,8 +1,12 @@
 /-
 Extracted from Analysis/Complex/Polynomial/Basic.lean
-Genuine: 8 of 11 | Dissolved: 2 | Infrastructure: 1
+Genuine: 7 of 10 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.Liouville
+import Mathlib.Analysis.Calculus.Deriv.Polynomial
+import Mathlib.FieldTheory.PolynomialGaloisGroup
+import Mathlib.Topology.Algebra.Polynomial
 
 /-!
 # The fundamental theorem of algebra
@@ -36,20 +40,17 @@ theorem exists_root {f : ℂ[X]} (hf : 0 < degree f) : ∃ z : ℂ, IsRoot f z :
   obtain rfl : f = C 0 := Polynomial.funext fun z ↦ inv_injective <| by simp [this]
   simp at hf
 
--- INSTANCE (free from Core): isAlgClosed
+instance isAlgClosed : IsAlgClosed ℂ :=
+  IsAlgClosed.of_exists_root _ fun _p _ hp => Complex.exists_root <| degree_pos_of_irreducible hp
 
 end Complex
-
-theorem Real.nonempty_algEquiv_or (F : Type*) [Field F] [Algebra ℝ F] [Algebra.IsAlgebraic ℝ F] :
-    Nonempty (F ≃ₐ[ℝ] ℝ) ∨ Nonempty (F ≃ₐ[ℝ] ℂ) :=
-  IsAlgClosed.nonempty_algEquiv_or_of_finrank_eq_two F Complex.finrank_real_complex
 
 namespace Polynomial.Gal
 
 section Rationals
 
-theorem splits_ℚ_ℂ {p : ℚ[X]} : Fact ((p.map (algebraMap ℚ ℂ)).Splits) :=
-  ⟨IsAlgClosed.splits _⟩
+theorem splits_ℚ_ℂ {p : ℚ[X]} : Fact (p.Splits (algebraMap ℚ ℂ)) :=
+  ⟨IsAlgClosed.splits_codomain p⟩
 
 attribute [local instance] splits_ℚ_ℂ
 
@@ -70,7 +71,9 @@ theorem card_complex_roots_eq_card_real_add_card_not_gal_inv (p : ℚ[X]) :
   let a : Finset ℂ := ?_
   on_goal 1 => let b : Finset ℂ := ?_
   on_goal 1 => let c : Finset ℂ := ?_
-  change a.card = b.card + c.card
+  -- Porting note: was
+  --   change a.card = b.card + c.card
+  suffices a.card = b.card + c.card by exact this
   have ha : ∀ z : ℂ, z ∈ a ↔ aeval z p = 0 := by
     intro z; rw [Set.mem_toFinset, mem_rootSet_of_ne hp]
   have hb : ∀ z : ℂ, z ∈ b ↔ aeval z p = 0 ∧ z.im = 0 := by
@@ -115,8 +118,8 @@ theorem galActionHom_bijective_of_prime_degree {p : ℚ[X]} (p_irr : Irreducible
   classical
   have h1 : Fintype.card (p.rootSet ℂ) = p.natDegree := by
     simp_rw [rootSet_def, Finset.coe_sort_coe, Fintype.card_coe]
-    rw [Multiset.toFinset_card_of_nodup, ← Splits.natDegree_eq_card_roots, natDegree_map]
-    · exact IsAlgClosed.splits _
+    rw [Multiset.toFinset_card_of_nodup, ← natDegree_eq_card_roots]
+    · exact IsAlgClosed.splits_codomain p
     · exact nodup_roots ((separable_map (algebraMap ℚ ℂ)).mpr p_irr.separable)
   let conj' := restrict p ℂ (Complex.conjAe.restrictScalars ℚ)
   refine
@@ -145,13 +148,21 @@ theorem galActionHom_bijective_of_prime_degree' {p : ℚ[X]} (p_irr : Irreducibl
   have hn : 2 ∣ n :=
     Equiv.Perm.two_dvd_card_support
       (by
-         rw [← map_pow, ← map_pow,
+         rw [← MonoidHom.map_pow, ← MonoidHom.map_pow,
           show AlgEquiv.restrictScalars ℚ Complex.conjAe ^ 2 = 1 from
             AlgEquiv.ext Complex.conj_conj,
-          map_one, map_one])
+          MonoidHom.map_one, MonoidHom.map_one])
   have key := card_complex_roots_eq_card_real_add_card_not_gal_inv p
   simp_rw [Set.toFinset_card] at key
-  lia
+  rw [key, add_le_add_iff_left] at p_roots1 p_roots2
+  rw [key, add_right_inj]
+  suffices ∀ m : ℕ, 2 ∣ m → 1 ≤ m → m ≤ 3 → m = 2 by exact this n hn p_roots1 p_roots2
+  rintro m ⟨k, rfl⟩ h2 h3
+  exact le_antisymm
+      (Nat.lt_succ_iff.mp
+        (lt_of_le_of_ne h3 (show 2 * k ≠ 2 * 1 + 1 from Nat.two_mul_ne_two_mul_add_one)))
+      (Nat.succ_le_iff.mpr
+        (lt_of_le_of_ne h2 (show 2 * 0 + 1 ≠ 2 * k from Nat.two_mul_ne_two_mul_add_one.symm)))
 
 end Rationals
 
@@ -161,14 +172,26 @@ end Polynomial.Gal
 
 -- DISSOLVED: Polynomial.quadratic_dvd_of_aeval_eq_zero_im_ne_zero
 
-lemma Irreducible.natDegree_le_two {p : ℝ[X]} (hp : Irreducible p) : natDegree p ≤ 2 := by
+lemma Irreducible.degree_le_two {p : ℝ[X]} (hp : Irreducible p) : degree p ≤ 2 := by
   obtain ⟨z, hz⟩ : ∃ z : ℂ, aeval z p = 0 :=
     IsAlgClosed.exists_aeval_eq_zero _ p (degree_pos_of_irreducible hp).ne'
-  rw [← finrank_real_complex]
-  convert minpoly.natDegree_le z using 1
-  · rw [← minpoly.eq_of_irreducible hp hz, natDegree_mul hp.ne_zero (by simpa using hp.ne_zero),
-      natDegree_C, add_zero]
-  infer_instance
+  cases eq_or_ne z.im 0 with
+  | inl hz0 =>
+    lift z to ℝ using hz0
+    erw [aeval_ofReal, RCLike.ofReal_eq_zero] at hz
+    exact (degree_eq_one_of_irreducible_of_root hp hz).trans_le one_le_two
+  | inr hz0 =>
+    obtain ⟨q, rfl⟩ := p.quadratic_dvd_of_aeval_eq_zero_im_ne_zero hz hz0
+    have hd : degree (X ^ 2 - C (2 * z.re) * X + C (‖z‖ ^ 2)) = 2 := by
+      compute_degree!
+    have hq : IsUnit q := by
+      refine (of_irreducible_mul hp).resolve_left (mt isUnit_iff_degree_eq_zero.1 ?_)
+      rw [hd]
+      exact two_ne_zero
+    refine (degree_mul_le _ _).trans_eq ?_
+    rwa [isUnit_iff_degree_eq_zero.1 hq, add_zero]
 
-lemma Irreducible.degree_le_two {p : ℝ[X]} (hp : Irreducible p) : degree p ≤ 2 :=
-  natDegree_le_iff_degree_le.1 hp.natDegree_le_two
+lemma Irreducible.natDegree_le_two {p : ℝ[X]} (hp : Irreducible p) : natDegree p ≤ 2 :=
+  natDegree_le_iff_degree_le.2 hp.degree_le_two
+
+alias Irreducible.nat_degree_le_two := Irreducible.natDegree_le_two

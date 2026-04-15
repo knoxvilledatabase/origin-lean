@@ -3,6 +3,8 @@ Extracted from NumberTheory/MaricaSchoenheim.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Combinatorics.SetFamily.FourFunctions
+import Mathlib.Data.Nat.Squarefree
 
 /-!
 # The Marica-Schönheim special case of Graham's conjecture
@@ -41,13 +43,13 @@ lemma grahamConjecture_of_squarefree {n : ℕ} (f : ℕ → ℕ) (hf' : ∀ k < 
     _ < n := tsub_lt_self hn.bot_lt zero_lt_one
   · rw [Finset.card_image_of_injOn, card_Iio]
     simpa using prod_primeFactors_invOn_squarefree.2.injOn.comp hf.injOn hf'
-  · simp only [𝒜, forall_mem_diffs, forall_mem_image, mem_Ioo, mem_Iio, Set.MapsTo, mem_coe]
+  · simp only [forall_mem_diffs, forall_image, mem_Ioo, mem_Iio]
     rintro i hi j hj
     rw [← primeFactors_div_gcd (hf' _ hi) (hf' _ hj).ne_zero,
       prod_primeFactors_of_squarefree <| hf'' _ hi _]
     exact ⟨Nat.div_pos (gcd_le_left _ (hf' _ hi).ne_zero.bot_lt) <|
       Nat.gcd_pos_of_pos_left _ (hf' _ hi).ne_zero.bot_lt, Nat.div_lt_of_lt_mul <| this _ hi _ hj⟩
-  · simp only [𝒜, Set.InjOn, mem_coe, forall_mem_diffs, forall_mem_image, mem_Iio]
+  · simp only [Set.InjOn, mem_coe, forall_mem_diffs, forall_image, mem_Ioo, mem_Iio]
     rintro a ha b hb c hc d hd
     rw [← primeFactors_div_gcd (hf' _ ha) (hf' _ hb).ne_zero, ← primeFactors_div_gcd
       (hf' _ hc) (hf' _ hd).ne_zero, prod_primeFactors_of_squarefree (hf'' _ ha _),

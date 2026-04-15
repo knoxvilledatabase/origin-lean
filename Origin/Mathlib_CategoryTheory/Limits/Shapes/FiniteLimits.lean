@@ -1,8 +1,14 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/FiniteLimits.lean
-Genuine: 6 of 29 | Dissolved: 0 | Infrastructure: 23
+Genuine: 6 of 28 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.FinCategory.AsType
+import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
+import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
+import Mathlib.CategoryTheory.Limits.Shapes.WidePullbacks
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
+import Mathlib.Data.Fintype.Option
 
 /-!
 # Categories with finite limits.
@@ -25,7 +31,10 @@ class HasFiniteLimits : Prop where
   and which has `FinType` objects and morphisms -/
   out (J : Type) [𝒥 : SmallCategory J] [@FinCategory J 𝒥] : @HasLimitsOfShape J 𝒥 C _
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) hasLimitsOfShape_of_hasFiniteLimits (J : Type w) [SmallCategory J]
+    [FinCategory J] [HasFiniteLimits C] : HasLimitsOfShape J C := by
+  apply @hasLimitsOfShape_of_equivalence _ _ _ _ _ _ (FinCategory.equivAsType J) ?_
+  apply HasFiniteLimits.out
 
 lemma hasFiniteLimits_of_hasLimitsOfSize [HasLimitsOfSize.{v', u'} C] :
     HasFiniteLimits C where
@@ -35,18 +44,38 @@ lemma hasFiniteLimits_of_hasLimitsOfSize [HasLimitsOfSize.{v', u'} C] :
     @hasLimitsOfShape_of_equivalence (@FinCategory.AsType J (@FinCategory.fintypeObj J hJ hJ'))
     (@FinCategory.categoryAsType J (@FinCategory.fintypeObj J hJ hJ') hJ hJ') _ _ J hJ F _
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) hasFiniteLimits_of_hasLimits [HasLimits C] : HasFiniteLimits C :=
+  hasFiniteLimits_of_hasLimitsOfSize C
 
--- INSTANCE (free from Core): (priority
+instance (priority := 90) hasFiniteLimits_of_hasLimitsOfSize₀ [HasLimitsOfSize.{0, 0} C] :
+    HasFiniteLimits C :=
+  hasFiniteLimits_of_hasLimitsOfSize C
 
--- INSTANCE (free from Core): (J
+theorem hasFiniteLimits_of_hasFiniteLimits_of_size
+    (h : ∀ (J : Type w) {𝒥 : SmallCategory J} (_ : @FinCategory J 𝒥), HasLimitsOfShape J C) :
+    HasFiniteLimits C where
+  out := fun J hJ hhJ => by
+    haveI := h (ULiftHom.{w} (ULift.{w} J)) <| @CategoryTheory.finCategoryUlift J hJ hhJ
+    have l : @Equivalence J (ULiftHom (ULift J)) hJ
+                          (@ULiftHom.category (ULift J) (@uliftCategory J hJ)) :=
+      @ULiftHomULiftCategory.equiv J hJ
+    apply @hasLimitsOfShape_of_equivalence (ULiftHom (ULift J))
+      (@ULiftHom.category (ULift J) (@uliftCategory J hJ)) C _ J hJ
+      (@Equivalence.symm J hJ (ULiftHom (ULift J))
+      (@ULiftHom.category (ULift J) (@uliftCategory J hJ)) l) _
+    /- Porting note: tried to factor out (@instCategoryULiftHom (ULift J) (@uliftCategory J hJ)
+    but when doing that would then find the instance and say it was not definitionally equal to
+    the provided one (the same thing factored out) -/
 
 class HasFiniteColimits : Prop where
   /-- `C` has all colimits over any type `J` whose objects and morphisms lie in the same universe
   and which has `Fintype` objects and morphisms -/
   out (J : Type) [𝒥 : SmallCategory J] [@FinCategory J 𝒥] : @HasColimitsOfShape J 𝒥 C _
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) hasColimitsOfShape_of_hasFiniteColimits (J : Type w) [SmallCategory J]
+    [FinCategory J] [HasFiniteColimits C] : HasColimitsOfShape J C := by
+  refine @hasColimitsOfShape_of_equivalence _ _ _ _ _ _ (FinCategory.equivAsType J) ?_
+  apply HasFiniteColimits.out
 
 lemma hasFiniteColimits_of_hasColimitsOfSize [HasColimitsOfSize.{v', u'} C] :
     HasFiniteColimits C where
@@ -56,21 +85,50 @@ lemma hasFiniteColimits_of_hasColimitsOfSize [HasColimitsOfSize.{v', u'} C] :
     @hasColimitsOfShape_of_equivalence (@FinCategory.AsType J (@FinCategory.fintypeObj J hJ hJ'))
     (@FinCategory.categoryAsType J (@FinCategory.fintypeObj J hJ hJ') hJ hJ') _ _ J hJ F _
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) hasFiniteColimits_of_hasColimits [HasColimits C] : HasFiniteColimits C :=
+  hasFiniteColimits_of_hasColimitsOfSize C
 
--- INSTANCE (free from Core): (priority
+instance (priority := 90) hasFiniteColimits_of_hasColimitsOfSize₀ [HasColimitsOfSize.{0, 0} C] :
+    HasFiniteColimits C :=
+  hasFiniteColimits_of_hasColimitsOfSize C
+
+theorem hasFiniteColimits_of_hasFiniteColimits_of_size
+    (h : ∀ (J : Type w) {𝒥 : SmallCategory J} (_ : @FinCategory J 𝒥), HasColimitsOfShape J C) :
+    HasFiniteColimits C where
+  out := fun J hJ hhJ => by
+    haveI := h (ULiftHom.{w} (ULift.{w} J)) <| @CategoryTheory.finCategoryUlift J hJ hhJ
+    have l : @Equivalence J (ULiftHom (ULift J)) hJ
+                           (@ULiftHom.category (ULift J) (@uliftCategory J hJ)) :=
+      @ULiftHomULiftCategory.equiv J hJ
+    apply @hasColimitsOfShape_of_equivalence (ULiftHom (ULift J))
+      (@ULiftHom.category (ULift J) (@uliftCategory J hJ)) C _ J hJ
+      (@Equivalence.symm J hJ (ULiftHom (ULift J))
+      (@ULiftHom.category (ULift J) (@uliftCategory J hJ)) l) _
+
+section
 
 open WalkingParallelPair WalkingParallelPairHom
 
--- INSTANCE (free from Core): fintypeWalkingParallelPair
+instance fintypeWalkingParallelPair : Fintype WalkingParallelPair where
+  elems := [WalkingParallelPair.zero, WalkingParallelPair.one].toFinset
+  complete x := by cases x <;> simp
 
-attribute [local aesop safe cases] WalkingParallelPair WalkingParallelPairHom
-
--- INSTANCE (free from Core): instFintypeWalkingParallelPairHom
+instance instFintypeWalkingParallelPairHom (j j' : WalkingParallelPair) :
+    Fintype (WalkingParallelPairHom j j') where
+  elems :=
+    WalkingParallelPair.recOn j
+      (WalkingParallelPair.recOn j' [WalkingParallelPairHom.id zero].toFinset
+        [left, right].toFinset)
+      (WalkingParallelPair.recOn j' ∅ [WalkingParallelPairHom.id one].toFinset)
+  complete := by
+    rintro (_|_) <;> simp
+    cases j <;> simp
 
 end
 
--- INSTANCE (free from Core): :
+instance : FinCategory WalkingParallelPair where
+  fintypeObj := fintypeWalkingParallelPair
+  fintypeHom := instFintypeWalkingParallelPairHom -- Porting note: could not be inferred
 
 example [HasFiniteLimits C] : HasEqualizers C := by infer_instance
 
@@ -80,41 +138,83 @@ variable {J : Type v}
 
 namespace WidePullbackShape
 
--- INSTANCE (free from Core): fintypeObj
+instance fintypeObj [Fintype J] : Fintype (WidePullbackShape J) :=
+  inferInstanceAs <| Fintype (Option _)
 
--- INSTANCE (free from Core): fintypeHom
+instance fintypeHom (j j' : WidePullbackShape J) : Fintype (j ⟶ j') where
+  elems := by
+    cases' j' with j'
+    · cases' j with j
+      · exact {Hom.id none}
+      · exact {Hom.term j}
+    · by_cases h : some j' = j
+      · rw [h]
+        exact {Hom.id j}
+      · exact ∅
+  complete := by
+    rintro (_|_)
+    · cases j <;> simp
+    · simp
 
 end WidePullbackShape
 
 namespace WidePushoutShape
 
--- INSTANCE (free from Core): fintypeObj
+instance fintypeObj [Fintype J] : Fintype (WidePushoutShape J) := by
+  rw [WidePushoutShape]; infer_instance
 
--- INSTANCE (free from Core): fintypeHom
+instance fintypeHom (j j' : WidePushoutShape J) : Fintype (j ⟶ j') where
+  elems := by
+    cases' j with j
+    · cases' j' with j'
+      · exact {Hom.id none}
+      · exact {Hom.init j'}
+    · by_cases h : some j = j'
+      · rw [h]
+        exact {Hom.id j'}
+      · exact ∅
+  complete := by
+    rintro (_|_)
+    · cases j <;> simp
+    · simp
 
 end WidePushoutShape
 
--- INSTANCE (free from Core): finCategoryWidePullback
+instance finCategoryWidePullback [Fintype J] : FinCategory (WidePullbackShape J) where
+  fintypeHom := WidePullbackShape.fintypeHom
 
--- INSTANCE (free from Core): finCategoryWidePushout
+instance finCategoryWidePushout [Fintype J] : FinCategory (WidePushoutShape J) where
+  fintypeHom := WidePushoutShape.fintypeHom
 
 class HasFiniteWidePullbacks : Prop where
-  /-- `C` has all wide pullbacks for any Finite `J` -/
+  /-- `C` has all wide pullbacks any Fintype `J`-/
   out (J : Type) [Finite J] : HasLimitsOfShape (WidePullbackShape J) C
 
--- INSTANCE (free from Core): hasLimitsOfShape_widePullbackShape
+instance hasLimitsOfShape_widePullbackShape (J : Type) [Finite J] [HasFiniteWidePullbacks C] :
+    HasLimitsOfShape (WidePullbackShape J) C := by
+  haveI := @HasFiniteWidePullbacks.out C _ _ J
+  infer_instance
 
 class HasFiniteWidePushouts : Prop where
-  /-- `C` has all wide pushouts for any Finite `J` -/
+  /-- `C` has all wide pushouts any Fintype `J`-/
   out (J : Type) [Finite J] : HasColimitsOfShape (WidePushoutShape J) C
 
--- INSTANCE (free from Core): hasColimitsOfShape_widePushoutShape
+instance hasColimitsOfShape_widePushoutShape (J : Type) [Finite J] [HasFiniteWidePushouts C] :
+    HasColimitsOfShape (WidePushoutShape J) C := by
+  haveI := @HasFiniteWidePushouts.out C _ _ J
+  infer_instance
 
--- INSTANCE (free from Core): (priority
+instance (priority := 900) hasFiniteWidePullbacks_of_hasFiniteLimits [HasFiniteLimits C] :
+    HasFiniteWidePullbacks C :=
+  ⟨fun J _ => by cases nonempty_fintype J; exact HasFiniteLimits.out _⟩
 
--- INSTANCE (free from Core): (priority
+instance (priority := 900) hasFiniteWidePushouts_of_has_finite_limits [HasFiniteColimits C] :
+    HasFiniteWidePushouts C :=
+  ⟨fun J _ => by cases nonempty_fintype J; exact HasFiniteColimits.out _⟩
 
--- INSTANCE (free from Core): fintypeWalkingPair
+instance fintypeWalkingPair : Fintype WalkingPair where
+  elems := {WalkingPair.left, WalkingPair.right}
+  complete x := by cases x <;> simp
 
 example [HasFiniteWidePullbacks C] : HasPullbacks C := by infer_instance
 

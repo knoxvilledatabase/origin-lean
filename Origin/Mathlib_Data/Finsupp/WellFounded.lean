@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Finsupp/WellFounded.lean
-Genuine: 7 of 11 | Dissolved: 0 | Infrastructure: 4
+Genuine: 6 of 9 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Data.DFinsupp.WellFounded
+import Mathlib.Data.Finsupp.Lex
 
 /-!
 # Well-foundedness of the lexicographic and product orders on `Finsupp`
@@ -39,13 +41,13 @@ theorem Lex.wellFounded (hbot : ∀ ⦃n⦄, ¬s n 0) (hs : WellFounded s)
   ⟨fun x => Lex.acc hbot hs x fun a _ => hr.apply a⟩
 
 theorem Lex.wellFounded' (hbot : ∀ ⦃n⦄, ¬s n 0) (hs : WellFounded s)
-    [Std.Trichotomous r] (hr : WellFounded (Function.swap r)) : WellFounded (Finsupp.Lex r s) :=
+    [IsTrichotomous α r] (hr : WellFounded (Function.swap r)) : WellFounded (Finsupp.Lex r s) :=
   (lex_eq_invImage_dfinsupp_lex r s).symm ▸
     InvImage.wf _ (DFinsupp.Lex.wellFounded' (fun _ => hbot) (fun _ => hs) hr)
 
--- INSTANCE (free from Core): Lex.wellFoundedLT
-
--- INSTANCE (free from Core): Colex.wellFoundedLT
+instance Lex.wellFoundedLT {α N} [LT α] [IsTrichotomous α (· < ·)] [hα : WellFoundedGT α]
+    [CanonicallyOrderedAddCommMonoid N] [hN : WellFoundedLT N] : WellFoundedLT (Lex (α →₀ N)) :=
+  ⟨Lex.wellFounded' (fun n => (zero_le n).not_lt) hN.wf hα.wf⟩
 
 variable (r)
 
@@ -57,16 +59,16 @@ theorem Lex.wellFoundedLT_of_finite [LinearOrder α] [Finite α] [LT N]
     [hwf : WellFoundedLT N] : WellFoundedLT (Lex (α →₀ N)) :=
   ⟨Finsupp.Lex.wellFounded_of_finite (· < ·) hwf.1⟩
 
-theorem Colex.wellFoundedLT_of_finite [LinearOrder α] [Finite α] [LT N]
-    [WellFoundedLT N] : WellFoundedLT (Colex (α →₀ N)) :=
-  Lex.wellFoundedLT_of_finite (α := αᵒᵈ)
-
 protected theorem wellFoundedLT [Preorder N] [WellFoundedLT N] (hbot : ∀ n : N, ¬n < 0) :
     WellFoundedLT (α →₀ N) :=
   ⟨InvImage.wf toDFinsupp (DFinsupp.wellFoundedLT fun _ a => hbot a).wf⟩
 
--- INSTANCE (free from Core): wellFoundedLT'
+instance wellFoundedLT' {N} [CanonicallyOrderedAddCommMonoid N] [WellFoundedLT N] :
+    WellFoundedLT (α →₀ N) :=
+  Finsupp.wellFoundedLT fun a => (zero_le a).not_lt
 
--- INSTANCE (free from Core): wellFoundedLT_of_finite
+instance wellFoundedLT_of_finite [Finite α] [Preorder N] [WellFoundedLT N] :
+    WellFoundedLT (α →₀ N) :=
+  ⟨InvImage.wf equivFunOnFinite Function.wellFoundedLT.wf⟩
 
 end Finsupp

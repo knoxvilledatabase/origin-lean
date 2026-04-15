@@ -3,6 +3,8 @@ Extracted from Topology/MetricSpace/Kuratowski.lean
 Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Lp.lpSpace
+import Mathlib.Topology.Sets.Compacts
 
 /-!
 # The Kuratowski embedding
@@ -26,18 +28,20 @@ namespace KuratowskiEmbedding
 
 variable {n : ℕ} [MetricSpace α] (x : ℕ → α) (a : α)
 
-def embeddingOfSubset : ℓ^∞(ℕ, ℝ) :=
+def embeddingOfSubset : ℓ^∞(ℕ) :=
   ⟨fun n => dist a (x n) - dist (x 0) (x n), by
     apply memℓp_infty
     use dist a (x 0)
     rintro - ⟨n, rfl⟩
     exact abs_dist_sub_le _ _ _⟩
 
+theorem embeddingOfSubset_coe : embeddingOfSubset x a n = dist a (x n) - dist (x 0) (x n) :=
+  rfl
+
 theorem embeddingOfSubset_dist_le (a b : α) :
     dist (embeddingOfSubset x a) (embeddingOfSubset x b) ≤ dist a b := by
-  rw [dist_eq_norm]
   refine lp.norm_le_of_forall_le dist_nonneg fun n => ?_
-  simp only [lp.coeFn_sub, Pi.sub_apply, embeddingOfSubset_coe]
+  simp only [lp.coeFn_sub, Pi.sub_apply, embeddingOfSubset_coe, Real.dist_eq]
   convert abs_dist_sub_le a b (x n) using 2
   ring
 
@@ -53,7 +57,8 @@ theorem embeddingOfSubset_isometry (H : DenseRange x) : Isometry (embeddingOfSub
     calc
       dist a b ≤ dist a (x n) + dist (x n) b := dist_triangle _ _ _
       _ = 2 * dist a (x n) + (dist b (x n) - dist a (x n)) := by simp [dist_comm]; ring
-      _ ≤ 2 * dist a (x n) + |dist b (x n) - dist a (x n)| := by grw [← le_abs_self]
+      _ ≤ 2 * dist a (x n) + |dist b (x n) - dist a (x n)| := by
+        apply_rules [add_le_add_left, le_abs_self]
       _ ≤ 2 * (e / 2) + |embeddingOfSubset x b n - embeddingOfSubset x a n| := by
         rw [C]
         gcongr
@@ -66,7 +71,7 @@ theorem embeddingOfSubset_isometry (H : DenseRange x) : Isometry (embeddingOfSub
   simpa [dist_comm] using this
 
 theorem exists_isometric_embedding (α : Type u) [MetricSpace α] [SeparableSpace α] :
-    ∃ f : α → ℓ^∞(ℕ, ℝ), Isometry f := by
+    ∃ f : α → ℓ^∞(ℕ), Isometry f := by
   rcases (univ : Set α).eq_empty_or_nonempty with h | h
   · use fun _ => 0; intro x; exact absurd h (Nonempty.ne_empty ⟨x, mem_univ x⟩)
   · -- We construct a map x : ℕ → α with dense image
@@ -80,9 +85,9 @@ theorem exists_isometric_embedding (α : Type u) [MetricSpace α] [SeparableSpac
 
 end KuratowskiEmbedding
 
-open KuratowskiEmbedding
+open TopologicalSpace KuratowskiEmbedding
 
-def kuratowskiEmbedding (α : Type u) [MetricSpace α] [SeparableSpace α] : α → ℓ^∞(ℕ, ℝ) :=
+def kuratowskiEmbedding (α : Type u) [MetricSpace α] [SeparableSpace α] : α → ℓ^∞(ℕ) :=
   Classical.choose (KuratowskiEmbedding.exists_isometric_embedding α)
 
 protected theorem kuratowskiEmbedding.isometry (α : Type u) [MetricSpace α] [SeparableSpace α] :
@@ -90,14 +95,14 @@ protected theorem kuratowskiEmbedding.isometry (α : Type u) [MetricSpace α] [S
   Classical.choose_spec (exists_isometric_embedding α)
 
 nonrec def NonemptyCompacts.kuratowskiEmbedding (α : Type u) [MetricSpace α] [CompactSpace α]
-    [Nonempty α] : NonemptyCompacts ℓ^∞(ℕ, ℝ) where
+    [Nonempty α] : NonemptyCompacts ℓ^∞(ℕ) where
   carrier := range (kuratowskiEmbedding α)
   isCompact' := isCompact_range (kuratowskiEmbedding.isometry α).continuous
   nonempty' := range_nonempty _
 
 theorem LipschitzOnWith.extend_lp_infty [PseudoMetricSpace α] {s : Set α} {ι : Type*}
-    {f : α → ℓ^∞(ι, ℝ)} {K : ℝ≥0} (hfl : LipschitzOnWith K f s) :
-    ∃ g : α → ℓ^∞(ι, ℝ), LipschitzWith K g ∧ EqOn f g s := by
+    {f : α → ℓ^∞(ι)} {K : ℝ≥0} (hfl : LipschitzOnWith K f s) :
+    ∃ g : α → ℓ^∞(ι), LipschitzWith K g ∧ EqOn f g s := by
   -- Construct the coordinate-wise extensions
   rw [LipschitzOnWith.coordinate] at hfl
   have (i : ι) : ∃ g : α → ℝ, LipschitzWith K g ∧ EqOn (fun x => f x i) g s :=
@@ -113,7 +118,7 @@ theorem LipschitzOnWith.extend_lp_infty [PseudoMetricSpace α] {s : Set α} {ι 
       simp_rw [← hgeq i ha₀_in_s]
       exact lp.norm_apply_le_norm top_ne_zero (f a₀) i
     -- Construct witness by bundling the function with its certificate of membership in ℓ^∞
-    let f_ext' : α → ℓ^∞(ι, ℝ) := fun i ↦ ⟨swap g i, hf_extb i⟩
+    let f_ext' : α → ℓ^∞(ι) := fun i ↦ ⟨swap g i, hf_extb i⟩
     refine ⟨f_ext', ?_, ?_⟩
     · rw [LipschitzWith.coordinate]
       exact hgl

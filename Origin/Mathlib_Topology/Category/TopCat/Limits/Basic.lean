@@ -1,8 +1,11 @@
 /-
 Extracted from Topology/Category/TopCat/Limits/Basic.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 10 of 18 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
+import Mathlib.Topology.Category.TopCat.Basic
+import Mathlib.CategoryTheory.Limits.Types
+import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
 /-!
 # The category of topological spaces has all limits and colimits
@@ -13,50 +16,160 @@ underlying types are just the limits in the category of types.
 
 open TopologicalSpace CategoryTheory CategoryTheory.Limits Opposite
 
-universe v u u' w
+universe v u w
 
 noncomputable section
 
-local notation "forget" => forget TopCat
-
 namespace TopCat
 
-section Limits
+variable {J : Type v} [SmallCategory J]
 
-variable {J : Type v} [Category.{w} J]
-
-attribute [local fun_prop] continuous_subtype_val
+local notation "forget" => forget TopCat
 
 def limitCone (F : J ⥤ TopCat.{max v u}) : Cone F where
   pt := TopCat.of { u : ∀ j : J, F.obj j | ∀ {i j : J} (f : i ⟶ j), F.map f (u i) = u j }
   π :=
-    { app := fun j => ofHom
+    { app := fun j =>
         { toFun := fun u => u.val j
           -- Porting note: `continuity` from the original mathlib3 proof failed here.
           continuous_toFun := Continuous.comp (continuous_apply _) (continuous_subtype_val) }
       naturality := fun X Y f => by
-        ext a
+        -- Automation fails in various ways in this proof. Why?!
+        dsimp
+        rw [Category.id_comp]
+        apply ContinuousMap.ext
+        intro a
         exact (a.2 f).symm }
 
-def limitConeIsLimit (F : J ⥤ TopCat.{max v u}) : IsLimit (limitCone.{v, u} F) where
-  lift S := ofHom
+def limitConeInfi (F : J ⥤ TopCat.{max v u}) : Cone F where
+  pt :=
+    ⟨(Types.limitCone.{v,u} (F ⋙ forget)).pt,
+      ⨅ j, (F.obj j).str.induced ((Types.limitCone.{v,u} (F ⋙ forget)).π.app j)⟩
+  π :=
+    { app := fun j =>
+        ⟨(Types.limitCone.{v,u} (F ⋙ forget)).π.app j, continuous_iff_le_induced.mpr (iInf_le _ _)⟩
+      naturality := fun _ _ f =>
+        ContinuousMap.coe_injective ((Types.limitCone.{v,u} (F ⋙ forget)).π.naturality f) }
+
+def limitConeIsLimit (F : J ⥤ TopCat.{max v u}) : IsLimit (limitCone.{v,u} F) where
+  lift S :=
     { toFun := fun x =>
         ⟨fun _ => S.π.app _ x, fun f => by
           dsimp
           rw [← S.w f]
           rfl⟩
       continuous_toFun :=
-        Continuous.subtype_mk (continuous_pi fun j => (S.π.app j).hom.2) fun x i j f => by
+        Continuous.subtype_mk (continuous_pi fun j => (S.π.app j).2) fun x i j f => by
           dsimp
           rw [← S.w f]
           rfl }
   uniq S m h := by
-    ext a
-    simp [← h]
+    apply ContinuousMap.ext; intros a; apply Subtype.ext; funext j
+    dsimp
+    rw [← h]
     rfl
 
-variable {F : J ⥤ TopCat.{u}} (c : Cone (F ⋙ forget))
+def limitConeInfiIsLimit (F : J ⥤ TopCat.{max v u}) : IsLimit (limitConeInfi.{v,u} F) := by
+  refine IsLimit.ofFaithful forget (Types.limitConeIsLimit.{v,u} (F ⋙ forget))
+    -- Porting note: previously could infer all ?_ except continuity
+    (fun s => ⟨fun v => ⟨fun j => (Functor.mapCone forget s).π.app j v, ?_⟩, ?_⟩) fun s => ?_
+  · dsimp [Functor.sections]
+    intro _ _ _
+    rw [← comp_apply', forget_map_eq_coe, ← s.π.naturality, forget_map_eq_coe]
+    dsimp
+    rw [Category.id_comp]
+  · exact
+    continuous_iff_coinduced_le.mpr
+      (le_iInf fun j =>
+        coinduced_le_iff_le_induced.mp <|
+          (continuous_iff_coinduced_le.mp (s.π.app j).continuous : _))
+  · rfl
 
-def conePtOfConeForget : Type _ := c.pt
+instance topCat_hasLimitsOfSize : HasLimitsOfSize.{v, v} TopCat.{max v u} where
+  has_limits_of_shape _ :=
+    { has_limit := fun F =>
+        HasLimit.mk
+          { cone := limitCone.{v,u} F
+            isLimit := limitConeIsLimit F } }
 
--- INSTANCE (free from Core): topologicalSpaceConePtOfConeForget
+instance topCat_hasLimits : HasLimits TopCat.{u} :=
+  TopCat.topCat_hasLimitsOfSize.{u, u}
+
+instance forget_preservesLimitsOfSize :
+    PreservesLimitsOfSize.{v, v} (forget : TopCat.{max v u} ⥤ _) where
+  preservesLimitsOfShape {_} :=
+    { preservesLimit := fun {F} =>
+      preservesLimit_of_preserves_limit_cone (limitConeIsLimit.{v,u} F)
+          (Types.limitConeIsLimit.{v,u} (F ⋙ forget)) }
+
+instance forget_preservesLimits : PreservesLimits (forget : TopCat.{u} ⥤ _) :=
+  TopCat.forget_preservesLimitsOfSize.{u, u}
+
+def colimitCocone (F : J ⥤ TopCat.{max v u}) : Cocone F where
+  pt :=
+    ⟨(Types.TypeMax.colimitCocone.{v,u} (F ⋙ forget)).pt,
+      ⨆ j, (F.obj j).str.coinduced ((Types.TypeMax.colimitCocone (F ⋙ forget)).ι.app j)⟩
+  ι :=
+    { app := fun j =>
+        ⟨(Types.TypeMax.colimitCocone (F ⋙ forget)).ι.app j, continuous_iff_coinduced_le.mpr <|
+          -- Porting note: didn't need function before
+          le_iSup (fun j =>
+            coinduced ((Types.TypeMax.colimitCocone (F ⋙ forget)).ι.app j) (F.obj j).str) j⟩
+      naturality := fun _ _ f =>
+        ContinuousMap.coe_injective ((Types.TypeMax.colimitCocone (F ⋙ forget)).ι.naturality f) }
+
+def colimitCoconeIsColimit (F : J ⥤ TopCat.{max v u}) : IsColimit (colimitCocone F) := by
+  refine
+    IsColimit.ofFaithful forget (Types.TypeMax.colimitCoconeIsColimit.{v, u} _) (fun s =>
+    -- Porting note: it appears notation for forget breaks dot notation (also above)
+    -- Porting note: previously function was inferred
+      ⟨Quot.lift (fun p => (Functor.mapCocone forget s).ι.app p.fst p.snd) ?_, ?_⟩) fun s => ?_
+  · intro _ _ ⟨_, h⟩
+    dsimp
+    rw [h, Functor.comp_map, ← comp_apply', s.ι.naturality]
+    dsimp
+    rw [Category.comp_id]
+  · exact
+    continuous_iff_le_induced.mpr
+      (iSup_le fun j =>
+        coinduced_le_iff_le_induced.mp <|
+          (continuous_iff_coinduced_le.mp (s.ι.app j).continuous : _))
+  · rfl
+
+instance topCat_hasColimitsOfSize : HasColimitsOfSize.{v,v} TopCat.{max v u} where
+  has_colimits_of_shape _ :=
+    { has_colimit := fun F =>
+        HasColimit.mk
+          { cocone := colimitCocone F
+            isColimit := colimitCoconeIsColimit F } }
+
+instance topCat_hasColimits : HasColimits TopCat.{u} :=
+  TopCat.topCat_hasColimitsOfSize.{u, u}
+
+instance forget_preservesColimitsOfSize :
+    PreservesColimitsOfSize.{v, v} (forget : TopCat.{max u v} ⥤ _) where
+  preservesColimitsOfShape :=
+    { preservesColimit := fun {F} =>
+        preservesColimit_of_preserves_colimit_cocone (colimitCoconeIsColimit F)
+          (Types.TypeMax.colimitCoconeIsColimit (F ⋙ forget)) }
+
+instance forget_preservesColimits : PreservesColimits (forget : TopCat.{u} ⥤ Type u) :=
+  TopCat.forget_preservesColimitsOfSize.{u, u}
+
+def isTerminalPUnit : IsTerminal (TopCat.of PUnit.{u + 1}) :=
+  haveI : ∀ X, Unique (X ⟶ TopCat.of PUnit.{u + 1}) := fun X =>
+    ⟨⟨⟨fun _ => PUnit.unit, continuous_const⟩⟩, fun f => by ext; aesop⟩
+  Limits.IsTerminal.ofUnique _
+
+def terminalIsoPUnit : ⊤_ TopCat.{u} ≅ TopCat.of PUnit :=
+  terminalIsTerminal.uniqueUpToIso isTerminalPUnit
+
+def isInitialPEmpty : IsInitial (TopCat.of PEmpty.{u + 1}) :=
+  haveI : ∀ X, Unique (TopCat.of PEmpty.{u + 1} ⟶ X) := fun X =>
+    ⟨⟨⟨fun x => x.elim, by continuity⟩⟩, fun f => by ext ⟨⟩⟩
+  Limits.IsInitial.ofUnique _
+
+def initialIsoPEmpty : ⊥_ TopCat.{u} ≅ TopCat.of PEmpty :=
+  initialIsInitial.uniqueUpToIso isInitialPEmpty
+
+end TopCat

@@ -1,8 +1,9 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Restrict.lean
-Genuine: 5 of 8 | Dissolved: 0 | Infrastructure: 3
+Genuine: 6 of 8 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
 
 /-!
 # Affine map restrictions
@@ -25,7 +26,12 @@ This file defines restrictions of affine maps.
 variable {k V₁ P₁ V₂ P₂ : Type*} [Ring k] [AddCommGroup V₁] [AddCommGroup V₂] [Module k V₁]
   [Module k V₂] [AddTorsor V₁ P₁] [AddTorsor V₂ P₂]
 
--- INSTANCE (free from Core): AffineSubspace.nonempty_map
+theorem AffineSubspace.nonempty_map {E : AffineSubspace k P₁} [Ene : Nonempty E] {φ : P₁ →ᵃ[k] P₂} :
+    Nonempty (E.map φ) := by
+  obtain ⟨x, hx⟩ := id Ene
+  exact ⟨⟨φ x, AffineSubspace.mem_map.mpr ⟨x, hx, rfl⟩⟩⟩
+
+attribute [local instance] AffineSubspace.nonempty_map AffineSubspace.toAddTorsor
 
 def AffineMap.restrict (φ : P₁ →ᵃ[k] P₂) {E : AffineSubspace k P₁} {F : AffineSubspace k P₂}
     [Nonempty E] [Nonempty F] (hEF : E.map φ ≤ F) : E →ᵃ[k] F := by
@@ -35,19 +41,29 @@ def AffineMap.restrict (φ : P₁ →ᵃ[k] P₂) {E : AffineSubspace k P₁} {F
     rw [← Submodule.map_le_iff_le_comap, ← AffineSubspace.map_direction]
     exact AffineSubspace.direction_le hEF
   · intro p v
-    simp only [Subtype.ext_iff, AffineSubspace.coe_vadd]
+    simp only [Subtype.ext_iff, Subtype.coe_mk, AffineSubspace.coe_vadd]
     apply AffineMap.map_vadd
+
+theorem AffineMap.restrict.coe_apply (φ : P₁ →ᵃ[k] P₂) {E : AffineSubspace k P₁}
+    {F : AffineSubspace k P₂} [Nonempty E] [Nonempty F] (hEF : E.map φ ≤ F) (x : E) :
+    ↑(φ.restrict hEF x) = φ x :=
+  rfl
 
 theorem AffineMap.restrict.linear_aux {φ : P₁ →ᵃ[k] P₂} {E : AffineSubspace k P₁}
     {F : AffineSubspace k P₂} (hEF : E.map φ ≤ F) : E.direction ≤ F.direction.comap φ.linear := by
   rw [← Submodule.map_le_iff_le_comap, ← AffineSubspace.map_direction]
   exact AffineSubspace.direction_le hEF
 
+theorem AffineMap.restrict.linear (φ : P₁ →ᵃ[k] P₂) {E : AffineSubspace k P₁}
+    {F : AffineSubspace k P₂} [Nonempty E] [Nonempty F] (hEF : E.map φ ≤ F) :
+    (φ.restrict hEF).linear = φ.linear.restrict (AffineMap.restrict.linear_aux hEF) :=
+  rfl
+
 theorem AffineMap.restrict.injective {φ : P₁ →ᵃ[k] P₂} (hφ : Function.Injective φ)
     {E : AffineSubspace k P₁} {F : AffineSubspace k P₂} [Nonempty E] [Nonempty F]
     (hEF : E.map φ ≤ F) : Function.Injective (AffineMap.restrict φ hEF) := by
   intro x y h
-  simp only [Subtype.ext_iff, AffineMap.restrict.coe_apply] at h ⊢
+  simp only [Subtype.ext_iff, Subtype.coe_mk, AffineMap.restrict.coe_apply] at h ⊢
   exact hφ h
 
 theorem AffineMap.restrict.surjective (φ : P₁ →ᵃ[k] P₂) {E : AffineSubspace k P₁}

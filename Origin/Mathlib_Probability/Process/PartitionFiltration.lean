@@ -3,6 +3,8 @@ Extracted from Probability/Process/PartitionFiltration.lean
 Genuine: 15 of 15 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.MeasurableSpace.CountablyGenerated
+import Mathlib.Probability.Process.Filtration
 
 /-!
 # Filtration built from the finite partitions of a countably generated measurable space

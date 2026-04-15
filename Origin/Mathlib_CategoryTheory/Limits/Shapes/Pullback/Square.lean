@@ -3,13 +3,16 @@ Extracted from CategoryTheory/Limits/Shapes/Pullback/Square.lean
 Genuine: 22 of 24 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.MorphismProperty.Limits
+import Mathlib.CategoryTheory.Square
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 
 /-!
 # Commutative squares that are pushout or pullback squares
 
 In this file, we translate the `IsPushout` and `IsPullback`
 API for the objects of the category `Square C` of commutative
-squares in a category `C`. We also obtain lemmas which state
+squares in a category `C`. We also obtain lemmas which states
 in this language that a pullback of a monomorphism is
 a monomorphism (and similarly for pushouts of epimorphisms).
 
@@ -39,6 +42,14 @@ protected def IsPullback : Prop :=
 protected def IsPushout : Prop :=
   IsPushout sq.f₁₂ sq.f₁₃ sq.f₂₄ sq.f₃₄
 
+lemma isPullback_iff :
+    sq.IsPullback ↔ Nonempty (IsLimit sq.pullbackCone) :=
+  ⟨fun h ↦ ⟨h.isLimit⟩, fun h ↦ { w := sq.fac, isLimit' := h }⟩
+
+lemma isPushout_iff :
+    sq.IsPushout ↔ Nonempty (IsColimit sq.pushoutCocone) :=
+  ⟨fun h ↦ ⟨h.isColimit⟩, fun h ↦ { w := sq.fac, isColimit' := h }⟩
+
 lemma IsPullback.mk (h : IsLimit sq.pullbackCone) : sq.IsPullback :=
   sq.isPullback_iff.2 ⟨h⟩
 
@@ -60,7 +71,7 @@ lemma IsPullback.of_iso {sq₁ sq₂ : Square C} (h : sq₁.IsPullback)
   refine CategoryTheory.IsPullback.of_iso h
     (evaluation₁.mapIso e) (evaluation₂.mapIso e)
     (evaluation₃.mapIso e) (evaluation₄.mapIso e) ?_ ?_ ?_ ?_
-  all_goals simp
+  all_goals aesop_cat
 
 lemma IsPullback.iff_of_iso {sq₁ sq₂ : Square C} (e : sq₁ ≅ sq₂) :
     sq₁.IsPullback ↔ sq₂.IsPullback :=
@@ -71,7 +82,7 @@ lemma IsPushout.of_iso {sq₁ sq₂ : Square C} (h : sq₁.IsPushout)
   refine CategoryTheory.IsPushout.of_iso h
     (evaluation₁.mapIso e) (evaluation₂.mapIso e)
     (evaluation₃.mapIso e) (evaluation₄.mapIso e) ?_ ?_ ?_ ?_
-  all_goals simp
+  all_goals aesop_cat
 
 lemma IsPushout.iff_of_iso {sq₁ sq₂ : Square C} (e : sq₁ ≅ sq₂) :
     sq₁.IsPushout ↔ sq₂.IsPushout :=

@@ -22,8 +22,8 @@ variable {α : Type u}
 -- ============================================================================
 
 theorem comp_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) :=
-  option_mul_assoc h a b c
+    (a b c : Option α) : a * b * c = a * (b * c) := by
+  cases a <;> cases b <;> cases c <;> simp [h]
 
 -- ============================================================================
 -- 2. FUNCTORS
@@ -69,7 +69,8 @@ def IsAbelian (kernelF cokernelF : α → α) : Prop :=
 
 theorem monoidal_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
     (a b c : Option α) :
-    a * b * c = a * (b * c) := option_mul_assoc h a b c
+    a * b * c = a * (b * c) := by
+  cases a <;> cases b <;> cases c <;> simp [h]
 
 -- ============================================================================
 -- 7. YONEDA

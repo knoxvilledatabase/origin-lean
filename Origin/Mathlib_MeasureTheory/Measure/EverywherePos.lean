@@ -1,8 +1,10 @@
 /-
 Extracted from MeasureTheory/Measure/EverywherePos.lean
-Genuine: 15 of 17 | Dissolved: 2 | Infrastructure: 0
+Genuine: 16 of 19 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Group.Measure
+import Mathlib.Topology.UrysohnsLemma
 
 /-!
 # Everywhere positive sets in measure spaces
@@ -52,7 +54,7 @@ lemma everywherePosSubset_subset (μ : Measure α) (s : Set α) : μ.everywhereP
 
 lemma exists_isOpen_everywherePosSubset_eq_diff (μ : Measure α) (s : Set α) :
     ∃ u, IsOpen u ∧ μ.everywherePosSubset s = s \ u := by
-  refine ⟨{x | ∃ n ∈ 𝓝[s] x, μ n = 0}, ?_, by ext x; simp [everywherePosSubset, pos_iff_ne_zero]⟩
+  refine ⟨{x | ∃ n ∈ 𝓝[s] x, μ n = 0}, ?_, by ext x; simp [everywherePosSubset, zero_lt_iff]⟩
   rw [isOpen_iff_mem_nhds]
   intro x ⟨n, ns, hx⟩
   rcases mem_nhdsWithin_iff_exists_mem_nhds_inter.1 ns with ⟨v, vx, hv⟩
@@ -149,7 +151,7 @@ lemma IsEverywherePos.of_forall_exists_nhds_eq (hs : IsEverywherePos μ s)
     (h : ∀ x ∈ s, ∃ t ∈ 𝓝 x, ∀ u ⊆ t, ν u = μ u) : IsEverywherePos ν s := by
   intro x hx n hn
   rcases h x hx with ⟨t, t_mem, ht⟩
-  grw [← inter_subset_left (s := n)]
+  refine lt_of_lt_of_le ?_ (measure_mono (inter_subset_left (t := t)))
   rw [ht (n ∩ t) inter_subset_right]
   exact hs x hx _ (inter_mem hn (mem_nhdsWithin_of_mem_nhds t_mem))
 
@@ -166,10 +168,101 @@ lemma _root_.IsOpen.isEverywherePos [IsOpenPosMeasure μ] (hs : IsOpen s) : IsEv
   apply lt_of_lt_of_le _ (measure_mono hu)
   exact (u_open.inter hs).measure_pos μ ⟨x, ⟨xu, xs⟩⟩
 
-section IsTopologicalGroup
+section TopologicalGroup
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable {G : Type*} [Group G] [TopologicalSpace G] [TopologicalGroup G]
   [LocallyCompactSpace G] [MeasurableSpace G] [BorelSpace G] {μ : Measure G}
   [IsMulLeftInvariant μ] [IsFiniteMeasureOnCompacts μ] [InnerRegularCompactLTTop μ]
 
 open Pointwise
+
+@[to_additive]
+lemma IsEverywherePos.IsGdelta_of_isMulLeftInvariant
+    {k : Set G} (h : μ.IsEverywherePos k) (hk : IsCompact k) (h'k : IsClosed k) :
+    IsGδ k := by
+  /- Consider a decreasing sequence of open neighborhoods `Vₙ` of the identity, such that `g k \ k`
+  has small measure for all `g ∈ Vₙ`. We claim that `k = ⋂ Vₙ k`, which proves
+  the lemma as the sets on the right are open. The inclusion `⊆` is trivial.
+  Let us show the converse. Take `x` in the intersection. For each `n`, write `x = vₙ yₙ` with
+  `vₙ ∈ Vₙ` and `yₙ ∈ k`. Let `z ∈ k` be a cluster value of `yₙ`, by compactness. As multiplication
+  by `vₙ = x yₙ⁻¹ ∈ Vₙ` changes the measure of `k` by very little, passing to the limit we get
+  `μ (x z⁻¹ k \ k) = 0`. By invariance of the measure under `z x ⁻¹`, we get `μ (k \ z x⁻¹ k) = 0`.
+  Assume `x ∉ k`. Then `z ∈ k \ z x⁻¹ k`. Even more, this set is a neighborhood of `z` within `k`
+  (as `z x⁻¹ k` is closed), and it has zero measure. This contradicts the fact that `k` has
+  positive measure around the point `z`. -/
+  obtain ⟨u, -, u_mem, u_lim⟩ : ∃ u, StrictAnti u ∧ (∀ (n : ℕ), u n ∈ Ioo 0 1)
+    ∧ Tendsto u atTop (𝓝 0) := exists_seq_strictAnti_tendsto' (zero_lt_one : (0 : ℝ≥0∞) < 1)
+  have : ∀ n, ∃ (W : Set G), IsOpen W ∧ 1 ∈ W ∧ ∀ g ∈ W * W, μ ((g • k) \ k) < u n :=
+    fun n ↦ exists_open_nhds_one_mul_subset
+      (eventually_nhds_one_measure_smul_diff_lt hk h'k (u_mem n).1.ne')
+  choose W W_open mem_W hW using this
+  let V n := ⋂ i ∈ Finset.range n, W i
+  suffices ⋂ n, V n * k ⊆ k by
+    replace : k = ⋂ n, V n * k := by
+      apply Subset.antisymm (subset_iInter_iff.2 (fun n ↦ ?_)) this
+      exact subset_mul_right k (by simp [V, mem_W])
+    rw [this]
+    refine .iInter_of_isOpen fun n ↦ ?_
+    exact .mul_right (isOpen_biInter_finset (fun i _hi ↦ W_open i))
+  intro x hx
+  choose v hv y hy hvy using mem_iInter.1 hx
+  obtain ⟨z, zk, hz⟩ : ∃ z ∈ k, MapClusterPt z atTop y := hk.exists_mapClusterPt (by simp [hy])
+  have A n : μ (((x * z ⁻¹) • k) \ k) ≤ u n := by
+    apply le_of_lt (hW _ _ ?_)
+    have : W n * {z} ∈ 𝓝 z := (IsOpen.mul_right (W_open n)).mem_nhds (by simp [mem_W])
+    obtain ⟨i, hi, ni⟩ : ∃ i, y i ∈ W n * {z} ∧ n < i :=
+      ((mapClusterPt_iff.1 hz _ this).and_eventually (eventually_gt_atTop n)).exists
+    refine ⟨x * (y i) ⁻¹, ?_, y i * z⁻¹, by simpa using hi, by group⟩
+    have I : V i ⊆ W n := iInter₂_subset n (by simp [ni])
+    have J : x * (y i) ⁻¹ ∈ V i := by simpa [← hvy i] using hv i
+    exact I J
+  have B : μ (((x * z ⁻¹) • k) \ k) = 0 :=
+    le_antisymm (ge_of_tendsto u_lim (Eventually.of_forall A)) bot_le
+  have C : μ (k \ (z * x⁻¹) • k) = 0 := by
+    have : μ ((z * x⁻¹) • (((x * z ⁻¹) • k) \ k)) = 0 := by rwa [measure_smul]
+    rw [← this, smul_set_sdiff, smul_smul]
+    group
+    simp
+  by_contra H
+  have : k ∩ ((z * x⁻¹) • k)ᶜ ∈ 𝓝[k] z := by
+    apply inter_mem_nhdsWithin k
+    apply IsOpen.mem_nhds (by simpa using h'k.smul _)
+    simp only [mem_compl_iff]
+    contrapose! H
+    simpa [mem_smul_set_iff_inv_smul_mem] using H
+  have : 0 < μ (k \ ((z * x⁻¹) • k)) := h z zk _ this
+  exact lt_irrefl _ (C.le.trans_lt this)
+
+@[to_additive innerRegularWRT_preimage_one_hasCompactSupport_measure_ne_top_of_addGroup]
+theorem innerRegularWRT_preimage_one_hasCompactSupport_measure_ne_top_of_group :
+    InnerRegularWRT μ (fun s ↦ ∃ (f : G → ℝ), Continuous f ∧ HasCompactSupport f ∧ s = f ⁻¹' {1})
+    (fun s ↦ MeasurableSet s ∧ μ s ≠ ∞) := by
+  /- First, approximate a measurable set from inside by a compact closed set `K`. Then notice that
+  the everywhere positive subset of `K` is a Gδ,
+  by Lemma `IsEverywherePos.IsGdelta_of_isMulLeftInvariant`, and therefore the level set of a
+  continuous compactly supported function. Moreover, it has the same measure as `K`. -/
+  apply InnerRegularWRT.trans _ innerRegularWRT_isCompact_isClosed_measure_ne_top_of_group
+  intro K ⟨K_comp, K_closed⟩ r hr
+  let L := μ.everywherePosSubset K
+  have L_comp : IsCompact L := K_comp.everywherePosSubset
+  have L_closed : IsClosed L := K_closed.everywherePosSubset
+  refine ⟨L, everywherePosSubset_subset μ K, ?_, ?_⟩
+  · have : μ.IsEverywherePos L :=
+      isEverywherePos_everywherePosSubset_of_measure_ne_top K_closed.measurableSet
+      K_comp.measure_lt_top.ne
+    have L_Gδ : IsGδ L := this.IsGdelta_of_isMulLeftInvariant L_comp L_closed
+    obtain ⟨⟨f, f_cont⟩, Lf, -, f_comp, -⟩ : ∃ f : C(G, ℝ), L = f ⁻¹' {1} ∧ EqOn f 0 ∅
+        ∧ HasCompactSupport f ∧ ∀ x, f x ∈ Icc (0 : ℝ) 1 :=
+      exists_continuous_one_zero_of_isCompact_of_isGδ L_comp L_Gδ isClosed_empty
+        (disjoint_empty L)
+    exact ⟨f, f_cont, f_comp, Lf⟩
+  · convert hr using 1
+    apply measure_congr
+    exact everywherePosSubset_ae_eq_of_measure_ne_top K_closed.measurableSet
+      K_comp.measure_lt_top.ne
+
+end TopologicalGroup
+
+end Measure
+
+end MeasureTheory

@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Limits/Indization/Products.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.FilteredColimitCommutesProduct
+import Mathlib.CategoryTheory.Limits.Indization.FilteredColimits
 
 /-!
 # Ind-objects are closed under products

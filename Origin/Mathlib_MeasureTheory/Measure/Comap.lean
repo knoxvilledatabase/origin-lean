@@ -1,8 +1,9 @@
 /-
 Extracted from MeasureTheory/Measure/Comap.lean
-Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.MeasureSpace
 
 /-!
 # Pullback of a measure
@@ -26,7 +27,7 @@ namespace MeasureTheory
 
 namespace Measure
 
-variable {α β γ : Type*} {s : Set α}
+variable {α β : Type*} {s : Set α}
 
 open Classical in
 
@@ -53,18 +54,13 @@ def comap [MeasurableSpace α] [MeasurableSpace β] (f : α → β) (μ : Measur
       exact (measure_inter_add_diff₀ _ (hf.2 s hs)).symm
   else 0
 
-variable {mα : MeasurableSpace α} {mβ : MeasurableSpace β} {mγ : MeasurableSpace γ}
-  {f : α → β} {g : β → γ}
+variable {ma : MeasurableSpace α} {mb : MeasurableSpace β}
 
 theorem comap_apply₀ (f : α → β) (μ : Measure β) (hfi : Injective f)
     (hf : ∀ s, MeasurableSet s → NullMeasurableSet (f '' s) μ)
     (hs : NullMeasurableSet s (comap f μ)) : comap f μ s = μ (f '' s) := by
   rw [comap, dif_pos (And.intro hfi hf)] at hs ⊢
   rw [toMeasure_apply₀ _ _ hs, OuterMeasure.comap_apply, coe_toOuterMeasure]
-
-lemma comap_undef {μ : Measure β}
-    (h : ¬ (Injective f ∧ ∀ s, MeasurableSet s → NullMeasurableSet (f '' s) μ)) :
-    comap f μ = 0 := dif_neg h
 
 theorem le_comap_apply (f : α → β) (μ : Measure β) (hfi : Injective f)
     (hf : ∀ s, MeasurableSet s → NullMeasurableSet (f '' s) μ) (s : Set α) :
@@ -76,12 +72,6 @@ theorem comap_apply (f : α → β) (hfi : Injective f)
     (hf : ∀ s, MeasurableSet s → MeasurableSet (f '' s)) (μ : Measure β) (hs : MeasurableSet s) :
     comap f μ s = μ (f '' s) :=
   comap_apply₀ f μ hfi (fun s hs => (hf s hs).nullMeasurableSet) hs.nullMeasurableSet
-
-theorem comap_apply_le (f : α → β) (μ : Measure β) (hs : NullMeasurableSet s (μ.comap f)) :
-    μ.comap f s ≤ μ (f '' s) := by
-  by_cases hf : Injective f ∧ ∀ t, MeasurableSet t → NullMeasurableSet (f '' t) μ
-  · rw [comap_apply₀ _ _ hf.1 hf.2 hs]
-  · simp [comap_undef hf]
 
 theorem comapₗ_eq_comap (f : α → β) (hfi : Injective f)
     (hf : ∀ s, MeasurableSet s → MeasurableSet (f '' s)) (μ : Measure β) (hs : MeasurableSet s) :
@@ -125,3 +115,37 @@ theorem comap_preimage (f : α → β) (μ : Measure β) (hf : Injective f) (hf'
     (h : ∀ t, MeasurableSet t → NullMeasurableSet (f '' t) μ) {s : Set β} (hs : MeasurableSet s) :
     μ.comap f (f ⁻¹' s) = μ (s ∩ range f) := by
   rw [comap_apply₀ _ _ hf h (hf' hs).nullMeasurableSet, image_preimage_eq_inter_range]
+
+@[simp] lemma comap_zero (f : α → β) : (0 : Measure β).comap f = 0 := by
+  by_cases hf : Injective f ∧ ∀ s, MeasurableSet s → NullMeasurableSet (f '' s) (0 : Measure β)
+  · simp [comap, hf]
+  · simp [comap, hf]
+
+end Measure
+
+end MeasureTheory
+
+open MeasureTheory Measure
+
+variable {α β : Type*} {ma : MeasurableSpace α} {mb : MeasurableSpace β}
+
+lemma MeasurableEmbedding.comap_add {f : α → β} (hf : MeasurableEmbedding f) (μ ν : Measure β) :
+    (μ + ν).comap f = μ.comap f + ν.comap f := by
+  ext s hs
+  simp only [← comapₗ_eq_comap _ hf.injective (fun _ ↦ hf.measurableSet_image.mpr) _ hs,
+    _root_.map_add, add_apply]
+
+namespace MeasurableEquiv
+
+lemma comap_symm {μ : Measure α} (e : α ≃ᵐ β) : μ.comap e.symm = μ.map e := by
+  ext s hs
+  rw [e.map_apply, Measure.comap_apply _ e.symm.injective _ _ hs, image_symm]
+  exact fun t ht ↦ e.symm.measurableSet_image.mpr ht
+
+lemma map_symm {μ : Measure α} (e : β ≃ᵐ α) : μ.map e.symm = μ.comap e := by
+  rw [← comap_symm, symm_symm]
+
+end MeasurableEquiv
+
+lemma comap_swap (μ : Measure (α × β)) : μ.comap Prod.swap = μ.map Prod.swap :=
+  (MeasurableEquiv.prodComm ..).comap_symm

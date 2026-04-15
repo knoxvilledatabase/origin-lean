@@ -3,6 +3,7 @@ Extracted from Logic/Function/CompTypeclasses.lean
 Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Logic.Function.Defs
 
 /-!
 # Propositional typeclasses on several maps
@@ -32,11 +33,21 @@ namespace CompTriple
 class IsId {M : Type*} (σ : M → M) : Prop where
   eq_id : σ = id
 
--- INSTANCE (free from Core): {M
+instance {M : Type*} : IsId (@id M) where
+  eq_id := rfl
 
--- INSTANCE (free from Core): instComp_id
+instance instComp_id {N P : Type*} {φ : N → N} [IsId φ] {ψ : N → P} :
+    CompTriple φ ψ ψ where
+  comp_eq := by simp only [IsId.eq_id, Function.comp_id]
 
--- INSTANCE (free from Core): instId_comp
+instance instId_comp {M N : Type*} {φ : M → N} {ψ : N → N} [IsId ψ] :
+    CompTriple φ ψ φ where
+  comp_eq := by simp only [IsId.eq_id, Function.id_comp]
+
+theorem comp {M N P : Type*}
+    {φ : M → N} {ψ : N → P} :
+    CompTriple φ ψ  (ψ.comp φ) where
+  comp_eq := rfl
 
 lemma comp_inv {M N : Type*} {φ : M → N} {ψ : N → M}
     (h : Function.RightInverse φ ψ) {χ : M → M} [IsId χ] :

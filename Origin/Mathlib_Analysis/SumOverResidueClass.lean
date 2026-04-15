@@ -3,6 +3,9 @@ Extracted from Analysis/SumOverResidueClass.lean
 Genuine: 1 of 7 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Field.Basic
+import Mathlib.Data.ZMod.Basic
+import Mathlib.Topology.Instances.ENNReal
 
 /-!
 # Sums over residue classes

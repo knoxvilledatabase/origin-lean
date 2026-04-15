@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/SpecialFunctions/Complex/CircleAddChar.lean
-Genuine: 10 of 13 | Dissolved: 2 | Infrastructure: 1
+Genuine: 9 of 11 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
 
 /-!
 # Additive characters valued in the unit circle
@@ -54,13 +56,6 @@ lemma toCircle_apply (j : ZMod N) :
     toCircle j = exp (2 * π * I * j.val / N) := by
   rw [← toCircle_natCast, natCast_zmod_val]
 
-lemma toCircle_eq_circleExp (j : ZMod N) :
-    toCircle j = Circle.exp (2 * π * (j.val / N)) := by
-  ext
-  rw [toCircle_apply, Circle.coe_exp]
-  push_cast
-  congr; ring
-
 lemma injective_toCircle : Injective (toCircle : ZMod N → Circle) :=
   (AddCircle.injective_toCircle one_ne_zero).comp (toAddCircle_injective N)
 
@@ -69,9 +64,11 @@ noncomputable def stdAddChar : AddChar (ZMod N) ℂ := Circle.coeHom.compAddChar
 lemma stdAddChar_coe (j : ℤ) :
     stdAddChar (j : ZMod N) = exp (2 * π * I * j / N) := by simp [stdAddChar, toCircle_intCast]
 
+lemma stdAddChar_apply (j : ZMod N) : stdAddChar j = ↑(toCircle j) := rfl
+
 lemma injective_stdAddChar : Injective (stdAddChar : AddChar (ZMod N) ℂ) :=
   Subtype.coe_injective.comp injective_toCircle
 
 -- DISSOLVED: isPrimitive_stdAddChar
 
--- DISSOLVED: rootsOfUnityAddChar
+end ZMod

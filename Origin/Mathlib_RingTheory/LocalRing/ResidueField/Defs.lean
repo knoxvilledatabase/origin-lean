@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/LocalRing/ResidueField/Defs.lean
-Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.RingTheory.Ideal.Quotient.Basic
+import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 
 /-!
 
@@ -21,9 +23,14 @@ variable (R : Type*) [CommRing R] [IsLocalRing R]
 def ResidueField :=
   R ⧸ maximalIdeal R
 
-deriving CommRing, Inhabited
+instance ResidueFieldCommRing : CommRing (ResidueField R) :=
+  show CommRing (R ⧸ maximalIdeal R) from inferInstance
 
--- INSTANCE (free from Core): ResidueField.field
+instance ResidueFieldInhabited : Inhabited (ResidueField R) :=
+  show Inhabited (R ⧸ maximalIdeal R) from inferInstance
+
+noncomputable instance ResidueField.field : Field (ResidueField R) :=
+  Ideal.Quotient.field (maximalIdeal R)
 
 def residue : R →+* ResidueField R :=
   Ideal.Quotient.mk _

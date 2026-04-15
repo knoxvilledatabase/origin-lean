@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Sites/Coherent/CoherentSheaves.lean
 Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Sites.Canonical
+import Mathlib.CategoryTheory.Sites.Coherent.Basic
+import Mathlib.CategoryTheory.Sites.EffectiveEpimorphic
 
 /-!
 
@@ -12,14 +15,14 @@ This file characterises sheaves for the coherent topology
 
 ## Main result
 
-* `isSheaf_coherent`: a presheaf of types is a sheaf for the coherent topology if and only
+* `isSheaf_coherent`: a presheaf of types for the is a sheaf for the coherent topology if and only
   if it satisfies the sheaf condition with respect to every presieve consisting of a finite
   effective epimorphic family.
 -/
 
 namespace CategoryTheory
 
-variable {C : Type*} [Category* C] [Precoherent C]
+variable {C : Type*} [Category C] [Precoherent C]
 
 universe w in
 
@@ -57,7 +60,8 @@ theorem isSheaf_yoneda_obj (W : C) : Presieve.IsSheaf (coherentTopology C) (yone
 
 variable (C) in
 
--- INSTANCE (free from Core): subcanonical
+instance subcanonical : (coherentTopology C).Subcanonical :=
+  GrothendieckTopology.Subcanonical.of_isSheaf_yoneda_obj _ isSheaf_yoneda_obj
 
 end coherentTopology
 

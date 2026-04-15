@@ -1,8 +1,9 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Partition.lean
-Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
+Genuine: 12 of 13 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Combinatorics.SimpleGraph.Coloring
 
 /-!
 # Graph partitions
@@ -40,8 +41,6 @@ graph colorings and back is the identity.
   `n`-colorability are equivalent.
 
 -/
-
-assert_not_exists Field
 
 universe u v
 
@@ -101,3 +100,30 @@ theorem colorable [Fintype P.parts] : G.Colorable (Fintype.card P.parts) :=
 end Partition
 
 variable {G}
+
+@[simps]
+def Coloring.toPartition {α : Type v} (C : G.Coloring α) : G.Partition where
+  parts := C.colorClasses
+  isPartition := C.colorClasses_isPartition
+  independent := by
+    rintro s ⟨c, rfl⟩
+    apply C.color_classes_independent
+
+@[simps]
+instance : Inhabited (Partition G) := ⟨G.selfColoring.toPartition⟩
+
+theorem partitionable_iff_colorable {n : ℕ} : G.Partitionable n ↔ G.Colorable n := by
+  constructor
+  · rintro ⟨P, hf, hc⟩
+    have : Fintype P.parts := hf.fintype
+    rw [Set.Finite.card_toFinset hf] at hc
+    apply P.colorable.mono hc
+  · rintro ⟨C⟩
+    refine ⟨C.toPartition, C.colorClasses_finite, le_trans ?_ (Fintype.card_fin n).le⟩
+    generalize_proofs h
+    change Set.Finite (Coloring.colorClasses C) at h
+    have : Fintype C.colorClasses := C.colorClasses_finite.fintype
+    rw [h.card_toFinset]
+    exact C.card_colorClasses_le
+
+end SimpleGraph

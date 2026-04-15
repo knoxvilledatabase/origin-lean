@@ -3,6 +3,9 @@ Extracted from Data/Tree/Get.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Num.Basic
+import Mathlib.Data.Ordering.Basic
+import Mathlib.Data.Tree.Basic
 
 /-!
 # Binary tree get operation

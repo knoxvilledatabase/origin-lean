@@ -3,6 +3,8 @@ Extracted from Order/Interval/Set/Infinite.lean
 Genuine: 12 of 18 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.Data.Set.Finite.Basic
+import Mathlib.Order.Interval.Set.Basic
 
 /-!
 # Infinitude of intervals
@@ -14,9 +16,12 @@ preorder is an infinite type.
 
 variable {α : Type*} [Preorder α]
 
--- INSTANCE (free from Core): NoMaxOrder.infinite
+instance NoMaxOrder.infinite [Nonempty α] [NoMaxOrder α] : Infinite α :=
+  let ⟨f, hf⟩ := Nat.exists_strictMono α
+  Infinite.of_injective f hf.injective
 
--- INSTANCE (free from Core): NoMinOrder.infinite
+instance NoMinOrder.infinite [Nonempty α] [NoMinOrder α] : Infinite α :=
+  @NoMaxOrder.infinite αᵒᵈ _ _ _
 
 namespace Set
 
@@ -52,22 +57,26 @@ theorem Icc.infinite : Infinite (Icc a b) :=
 
 end DenselyOrdered
 
--- INSTANCE (free from Core): [NoMinOrder
+instance [NoMinOrder α] {a : α} : Infinite (Iio a) :=
+  NoMinOrder.infinite
 
 theorem Iio_infinite [NoMinOrder α] (a : α) : (Iio a).Infinite :=
   infinite_coe_iff.1 inferInstance
 
--- INSTANCE (free from Core): [NoMinOrder
+instance [NoMinOrder α] {a : α} : Infinite (Iic a) :=
+  NoMinOrder.infinite
 
 theorem Iic_infinite [NoMinOrder α] (a : α) : (Iic a).Infinite :=
   infinite_coe_iff.1 inferInstance
 
--- INSTANCE (free from Core): [NoMaxOrder
+instance [NoMaxOrder α] {a : α} : Infinite (Ioi a) :=
+  NoMaxOrder.infinite
 
 theorem Ioi_infinite [NoMaxOrder α] (a : α) : (Ioi a).Infinite :=
   infinite_coe_iff.1 inferInstance
 
--- INSTANCE (free from Core): [NoMaxOrder
+instance [NoMaxOrder α] {a : α} : Infinite (Ici a) :=
+  NoMaxOrder.infinite
 
 theorem Ici_infinite [NoMaxOrder α] (a : α) : (Ici a).Infinite :=
   infinite_coe_iff.1 inferInstance

@@ -1,8 +1,17 @@
 /-
 Extracted from Analysis/CStarAlgebra/GelfandDuality.lean
-Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
+Genuine: 12 of 15 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Analysis.CStarAlgebra.Spectrum
+import Mathlib.Analysis.CStarAlgebra.ContinuousMap
+import Mathlib.Analysis.Normed.Group.Quotient
+import Mathlib.Analysis.Normed.Algebra.Basic
+import Mathlib.Topology.ContinuousMap.Units
+import Mathlib.Topology.ContinuousMap.Compact
+import Mathlib.Topology.Algebra.Algebra
+import Mathlib.Topology.ContinuousMap.Ideals
+import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
 /-!
 # Gelfand Duality
@@ -100,7 +109,9 @@ theorem spectrum.gelfandTransform_eq (a : A) :
   rw [ContinuousMap.spectrum_eq_range, WeakDual.CharacterSpace.mem_spectrum_iff_exists]
   exact Iff.rfl
 
--- INSTANCE (free from Core): [Nontrivial
+instance [Nontrivial A] : Nonempty (characterSpace ℂ A) :=
+  ⟨Classical.choose <|
+      WeakDual.CharacterSpace.exists_apply_eq_zero <| zero_mem_nonunits.2 zero_ne_one⟩
 
 end ComplexBanachAlgebra
 
@@ -115,6 +126,7 @@ theorem gelfandTransform_map_star (a : A) :
 variable (A)
 
 theorem gelfandTransform_isometry : Isometry (gelfandTransform ℂ A) := by
+  nontriviality A
   refine AddMonoidHomClass.isometry_of_norm (gelfandTransform ℂ A) fun a => ?_
   /- By `spectrum.gelfandTransform_eq`, the spectra of `star a * a` and its
     `gelfandTransform` coincide. Therefore, so do their spectral radii, and since they are
@@ -157,3 +169,68 @@ theorem gelfandTransform_bijective : Function.Bijective (gelfandTransform ℂ A)
   contrapose!
   exact fun h => Subtype.ext (ContinuousLinearMap.ext fun a =>
     h (gelfandTransform ℂ A a) ⟨gelfandTransform ℂ A a, ⟨a, rfl⟩, rfl⟩)
+
+@[simps!]
+noncomputable def gelfandStarTransform : A ≃⋆ₐ[ℂ] C(characterSpace ℂ A, ℂ) :=
+  StarAlgEquiv.ofBijective
+    (show A →⋆ₐ[ℂ] C(characterSpace ℂ A, ℂ) from
+      { gelfandTransform ℂ A with map_star' := fun x => gelfandTransform_map_star x })
+    (gelfandTransform_bijective A)
+
+end ComplexCStarAlgebra
+
+section Functoriality
+
+namespace WeakDual
+
+namespace CharacterSpace
+
+variable {A B C 𝕜 : Type*} [NontriviallyNormedField 𝕜]
+
+variable [NormedRing A] [NormedAlgebra 𝕜 A] [CompleteSpace A] [StarRing A]
+
+variable [NormedRing B] [NormedAlgebra 𝕜 B] [CompleteSpace B] [StarRing B]
+
+variable [NormedRing C] [NormedAlgebra 𝕜 C] [CompleteSpace C] [StarRing C]
+
+@[simps]
+noncomputable def compContinuousMap (ψ : A →⋆ₐ[𝕜] B) :
+    C(characterSpace 𝕜 B, characterSpace 𝕜 A) where
+  toFun φ := equivAlgHom.symm ((equivAlgHom φ).comp ψ.toAlgHom)
+  continuous_toFun :=
+    Continuous.subtype_mk
+      (continuous_of_continuous_eval fun a => map_continuous <| gelfandTransform 𝕜 B (ψ a)) _
+
+variable (A)
+
+@[simp]
+theorem compContinuousMap_id :
+    compContinuousMap (StarAlgHom.id 𝕜 A) = ContinuousMap.id (characterSpace 𝕜 A) :=
+  ContinuousMap.ext fun _a => ext fun _x => rfl
+
+variable {A}
+
+@[simp]
+theorem compContinuousMap_comp (ψ₂ : B →⋆ₐ[𝕜] C) (ψ₁ : A →⋆ₐ[𝕜] B) :
+    compContinuousMap (ψ₂.comp ψ₁) = (compContinuousMap ψ₁).comp (compContinuousMap ψ₂) :=
+  ContinuousMap.ext fun _a => ext fun _x => rfl
+
+end CharacterSpace
+
+end WeakDual
+
+end Functoriality
+
+open CharacterSpace in
+
+theorem gelfandStarTransform_naturality {A B : Type*} [CommCStarAlgebra A] [CommCStarAlgebra B]
+    (φ : A →⋆ₐ[ℂ] B) :
+    (gelfandStarTransform B : _ →⋆ₐ[ℂ] _).comp φ =
+      (compContinuousMap φ |>.compStarAlgHom' ℂ ℂ).comp (gelfandStarTransform A : _ →⋆ₐ[ℂ] _) := by
+  rfl
+
+lemma WeakDual.CharacterSpace.homeoEval_naturality {X Y 𝕜 : Type*} [RCLike 𝕜] [TopologicalSpace X]
+    [CompactSpace X] [T2Space X] [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] (f : C(X, Y)) :
+    (homeoEval Y 𝕜 : C(_, _)).comp f =
+      (f.compStarAlgHom' 𝕜 𝕜 |> compContinuousMap).comp (homeoEval X 𝕜 : C(_, _)) :=
+  rfl

@@ -1,8 +1,10 @@
 /-
 Extracted from Data/List/ToFinsupp.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 15 | Dissolved: 9 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Finsupp.Defs
+import Mathlib.Data.List.GetD
 
 /-!
 
@@ -35,8 +37,45 @@ variable {M : Type*} [Zero M] (l : List M) [DecidablePred (getD l · 0 ≠ 0)] (
 
 def toFinsupp : ℕ →₀ M where
   toFun i := getD l i 0
-  support := {i ∈ Finset.range l.length | getD l i 0 ≠ 0}
+  support := (Finset.range l.length).filter fun i => getD l i 0 ≠ 0
   mem_support_toFun n := by
     simp only [Ne, Finset.mem_filter, Finset.mem_range, and_iff_right_iff_imp]
     contrapose!
     exact getD_eq_default _ _
+
+@[norm_cast]
+theorem coe_toFinsupp : (l.toFinsupp : ℕ → M) = (l.getD · 0) :=
+  rfl
+
+@[simp, norm_cast]
+theorem toFinsupp_apply (i : ℕ) : (l.toFinsupp : ℕ → M) i = l.getD i 0 :=
+  rfl
+
+-- DISSOLVED: toFinsupp_support
+
+theorem toFinsupp_apply_lt (hn : n < l.length) : l.toFinsupp n = l[n] :=
+  getD_eq_getElem _ _ hn
+
+theorem toFinsupp_apply_fin (n : Fin l.length) : l.toFinsupp n = l[n] :=
+  getD_eq_getElem _ _ n.isLt
+
+theorem toFinsupp_apply_le (hn : l.length ≤ n) : l.toFinsupp n = 0 :=
+  getD_eq_default _ _ hn
+
+-- DISSOLVED: toFinsupp_nil
+
+-- DISSOLVED: toFinsupp_singleton
+
+-- DISSOLVED: toFinsupp_cons_apply_zero
+
+-- DISSOLVED: toFinsupp_cons_apply_succ
+
+-- DISSOLVED: toFinsupp_append
+
+-- DISSOLVED: toFinsupp_cons_eq_single_add_embDomain
+
+-- DISSOLVED: toFinsupp_concat_eq_toFinsupp_add_single
+
+-- DISSOLVED: toFinsupp_eq_sum_map_enum_single
+
+end List

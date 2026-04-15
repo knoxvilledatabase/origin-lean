@@ -3,6 +3,8 @@ Extracted from Topology/Order/PartialSups.lean
 Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Order.Lattice
+import Mathlib.Order.PartialSups
 
 /-!
 # Continuity of `partialSups`
@@ -29,7 +31,7 @@ protected lemma partialSups (hf : ∀ k ≤ n, Tendsto (f k) l (𝓝 (g k))) :
 
 protected lemma partialSups_apply (hf : ∀ k ≤ n, Tendsto (f k) l (𝓝 (g k))) :
     Tendsto (fun a ↦ partialSups (f · a) n) l (𝓝 (partialSups g n)) := by
-  simpa only [← Pi.partialSups_apply] using Tendsto.partialSups hf
+  simpa only [← partialSups_apply] using Tendsto.partialSups hf
 
 end Filter.Tendsto
 
@@ -41,7 +43,7 @@ protected lemma ContinuousAt.partialSups_apply (hf : ∀ k ≤ n, ContinuousAt (
 
 protected lemma ContinuousAt.partialSups (hf : ∀ k ≤ n, ContinuousAt (f k) x) :
     ContinuousAt (partialSups f n) x := by
-  simpa only [← Pi.partialSups_apply] using ContinuousAt.partialSups_apply hf
+  simpa only [← partialSups_apply] using ContinuousAt.partialSups_apply hf
 
 protected lemma ContinuousWithinAt.partialSups_apply (hf : ∀ k ≤ n, ContinuousWithinAt (f k) s x) :
     ContinuousWithinAt (fun a ↦ partialSups (f · a) n) s x :=
@@ -49,7 +51,7 @@ protected lemma ContinuousWithinAt.partialSups_apply (hf : ∀ k ≤ n, Continuo
 
 protected lemma ContinuousWithinAt.partialSups (hf : ∀ k ≤ n, ContinuousWithinAt (f k) s x) :
     ContinuousWithinAt (partialSups f n) s x := by
-  simpa only [← Pi.partialSups_apply] using ContinuousWithinAt.partialSups_apply hf
+  simpa only [← partialSups_apply] using ContinuousWithinAt.partialSups_apply hf
 
 protected lemma ContinuousOn.partialSups_apply (hf : ∀ k ≤ n, ContinuousOn (f k) s) :
     ContinuousOn (fun a ↦ partialSups (f · a) n) s := fun x hx ↦

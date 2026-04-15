@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Abelian/EpiWithInjectiveKernel.lean
 Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.ShortComplex.ShortExact
+import Mathlib.CategoryTheory.MorphismProperty.Composition
 
 /-!
 # Epimorphisms with an injective kernel
@@ -10,7 +12,7 @@ import Origin.Core
 In this file, we define the class of morphisms `epiWithInjectiveKernel` in an
 abelian category. We show that this property of morphisms is multiplicative.
 
-This shall be used in the file `Mathlib/Algebra/Homology/Factorizations/Basic.lean` in
+This shall be used in the file `Mathlib.Algebra.Homology.Factorizations.Basic` in
 order to define morphisms of cochain complexes which satisfy this property
 degreewise.
 
@@ -20,7 +22,7 @@ namespace CategoryTheory
 
 open Category Limits ZeroObject Preadditive
 
-variable {C : Type*} [Category* C] [Abelian C]
+variable {C : Type*} [Category C] [Abelian C]
 
 namespace Abelian
 
@@ -36,8 +38,8 @@ lemma epiWithInjectiveKernel_iff {X Y : C} (g : X ⟶ Y) :
     exact ⟨_, inferInstance, _, S.zero,
       ⟨ShortComplex.Splitting.ofExactOfRetraction S
         (S.exact_of_f_is_kernel (kernelIsKernel g)) (Injective.factorThru (𝟙 _) (kernel.ι g))
-        (by simp [S]) inferInstance⟩⟩
-  · rintro ⟨I, _, f, w, ⟨σ⟩⟩
+        (by simp) inferInstance⟩⟩
+  · rintro ⟨I, _,  f, w, ⟨σ⟩⟩
     have : IsSplitEpi g := ⟨σ.s, σ.s_g⟩
     let e : I ≅ kernel g :=
       IsLimit.conePointUniqueUpToIso σ.shortExact.fIsKernel (limit.isLimit _)
@@ -47,9 +49,37 @@ lemma epiWithInjectiveKernel_of_iso {X Y : C} (f : X ⟶ Y) [IsIso f] :
     epiWithInjectiveKernel f := by
   rw [epiWithInjectiveKernel_iff]
   exact ⟨0, inferInstance, 0, by simp,
-    ⟨ShortComplex.Splitting.ofIsZeroOfIsIso _ (isZero_zero C) (by assumption)⟩⟩
+    ⟨ShortComplex.Splitting.ofIsZeroOfIsIso _ (isZero_zero C) (by dsimp; infer_instance)⟩⟩
 
--- INSTANCE (free from Core): :
+instance : (epiWithInjectiveKernel : MorphismProperty C).IsMultiplicative where
+  id_mem _ := epiWithInjectiveKernel_of_iso _
+  comp_mem {X Y Z} g₁ g₂ hg₁ hg₂ := by
+    rw [epiWithInjectiveKernel_iff] at hg₁ hg₂ ⊢
+    obtain ⟨I₁, _, f₁, w₁, ⟨σ₁⟩⟩ := hg₁
+    obtain ⟨I₂, _, f₂, w₂, ⟨σ₂⟩⟩ := hg₂
+    refine ⟨I₁ ⊞ I₂, inferInstance, biprod.fst ≫ f₁ + biprod.snd ≫ f₂ ≫ σ₁.s, ?_, ⟨?_⟩⟩
+    · ext
+      · simp [reassoc_of% w₁]
+      · simp [reassoc_of% σ₁.s_g, w₂]
+    · exact
+        { r := σ₁.r ≫ biprod.inl + g₁ ≫ σ₂.r ≫ biprod.inr
+          s := σ₂.s ≫ σ₁.s
+          f_r := by
+            ext
+            · simp [σ₁.f_r]
+            · simp [reassoc_of% w₁]
+            · simp
+            · simp [reassoc_of% σ₁.s_g, σ₂.f_r]
+          s_g := by simp [reassoc_of% σ₁.s_g, σ₂.s_g]
+          id := by
+            dsimp
+            have h := g₁ ≫= σ₂.id =≫ σ₁.s
+            simp only [add_comp, assoc, comp_add, id_comp] at h
+            rw [← σ₁.id, ← h]
+            simp only [comp_add, add_comp, assoc, BinaryBicone.inl_fst_assoc,
+              BinaryBicone.inr_fst_assoc, zero_comp, comp_zero, add_zero,
+              BinaryBicone.inl_snd_assoc, BinaryBicone.inr_snd_assoc, zero_add]
+            abel }
 
 end Abelian
 

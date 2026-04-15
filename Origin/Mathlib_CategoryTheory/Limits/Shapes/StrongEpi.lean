@@ -1,15 +1,17 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/StrongEpi.lean
-Genuine: 16 of 26 | Dissolved: 0 | Infrastructure: 10
+Genuine: 18 of 24 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Balanced
+import Mathlib.CategoryTheory.LiftingProperties.Basic
 
 /-!
 # Strong epimorphisms
 
 In this file, we define strong epimorphisms. A strong epimorphism is an epimorphism `f`
 which has the (unique) left lifting property with respect to monomorphisms. Similarly,
-a strong monomorphism is a monomorphism which has the (unique) right lifting property
+a strong monomorphisms in a monomorphism which has the (unique) right lifting property
 with respect to epimorphisms.
 
 ## Main results
@@ -42,7 +44,7 @@ variable {P Q : C}
 class StrongEpi (f : P ⟶ Q) : Prop where
   /-- The epimorphism condition on `f` -/
   epi : Epi f
-  /-- The left lifting property with respect to all monomorphisms -/
+  /-- The left lifting property with respect to all monomorphism -/
   llp : ∀ ⦃X Y : C⦄ (z : X ⟶ Y) [Mono z], HasLiftingProperty f z
 
 theorem StrongEpi.mk' {f : P ⟶ Q} [Epi f]
@@ -64,19 +66,31 @@ theorem StrongMono.mk' {f : P ⟶ Q} [Mono f]
   mono := inferInstance
   rlp := fun {X Y} z hz => ⟨fun {u v} sq => hf X Y z hz u v sq⟩
 
--- INSTANCE (free from Core): 100]
+attribute [instance 100] StrongEpi.llp
 
--- INSTANCE (free from Core): 100]
+attribute [instance 100] StrongMono.rlp
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) epi_of_strongEpi (f : P ⟶ Q) [StrongEpi f] : Epi f :=
+  StrongEpi.epi
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) mono_of_strongMono (f : P ⟶ Q) [StrongMono f] : Mono f :=
+  StrongMono.mono
+
+section
 
 variable {R : C} (f : P ⟶ Q) (g : Q ⟶ R)
 
--- INSTANCE (free from Core): strongEpi_comp
+theorem strongEpi_comp [StrongEpi f] [StrongEpi g] : StrongEpi (f ≫ g) :=
+  { epi := epi_comp _ _
+    llp := by
+      intros
+      infer_instance }
 
--- INSTANCE (free from Core): strongMono_comp
+theorem strongMono_comp [StrongMono f] [StrongMono g] : StrongMono (f ≫ g) :=
+  { mono := mono_comp _ _
+    rlp := by
+      intros
+      infer_instance }
 
 theorem strongEpi_of_strongEpi [StrongEpi (f ≫ g)] : StrongEpi g :=
   { epi := epi_of_epi f g
@@ -99,11 +113,13 @@ theorem strongMono_of_strongMono [StrongMono (f ≫ g)] : StrongMono f :=
         rw [← Category.assoc, eq_whisker sq.w, Category.assoc]
       exact CommSq.HasLift.mk' ⟨(CommSq.mk h₀).lift, by simp, by simp [← cancel_epi z, sq.w]⟩ }
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) strongEpi_of_isIso [IsIso f] : StrongEpi f where
+  epi := by infer_instance
+  llp {_ _} _ := HasLiftingProperty.of_left_iso _ _
 
--- INSTANCE (free from Core): (priority
-
-set_option backward.isDefEq.respectTransparency false in
+instance (priority := 100) strongMono_of_isIso [IsIso f] : StrongMono f where
+  mono := by infer_instance
+  rlp {_ _} _ := HasLiftingProperty.of_right_iso _ _
 
 theorem StrongEpi.of_arrow_iso {A B A' B' : C} {f : A ⟶ B} {g : A' ⟶ B'}
     (e : Arrow.mk f ≅ Arrow.mk g) [h : StrongEpi f] : StrongEpi g :=
@@ -113,8 +129,6 @@ theorem StrongEpi.of_arrow_iso {A B A' B' : C} {f : A ⟶ B} {g : A' ⟶ B'}
     llp := fun {X Y} z => by
       intro
       apply HasLiftingProperty.of_arrow_iso_left e z }
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem StrongMono.of_arrow_iso {A B A' B' : C} {f : A ⟶ B} {g : A' ⟶ B'}
     (e : Arrow.mk f ≅ Arrow.mk g) [h : StrongMono f] : StrongMono g :=
@@ -138,10 +152,12 @@ theorem StrongMono.iff_of_arrow_iso {A B A' B' : C} {f : A ⟶ B} {g : A' ⟶ B'
 end
 
 theorem isIso_of_mono_of_strongEpi (f : P ⟶ Q) [Mono f] [StrongEpi f] : IsIso f :=
-  ⟨⟨(CommSq.mk (show 𝟙 P ≫ f = f ≫ 𝟙 Q by simp)).lift, by simp⟩⟩
+  ⟨⟨(CommSq.mk (show 𝟙 P ≫ f = f ≫ 𝟙 Q by simp)).lift, by aesop_cat⟩⟩
 
 theorem isIso_of_epi_of_strongMono (f : P ⟶ Q) [Epi f] [StrongMono f] : IsIso f :=
-  ⟨⟨(CommSq.mk (show 𝟙 P ≫ f = f ≫ 𝟙 Q by simp)).lift, by simp⟩⟩
+  ⟨⟨(CommSq.mk (show 𝟙 P ≫ f = f ≫ 𝟙 Q by simp)).lift, by aesop_cat⟩⟩
+
+section
 
 variable (C)
 
@@ -161,15 +177,21 @@ theorem strongEpi_of_epi [StrongEpiCategory C] (f : P ⟶ Q) [Epi f] : StrongEpi
 theorem strongMono_of_mono [StrongMonoCategory C] (f : P ⟶ Q) [Mono f] : StrongMono f :=
   StrongMonoCategory.strongMono_of_mono _
 
+section
+
 attribute [local instance] strongEpi_of_epi
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) balanced_of_strongEpiCategory [StrongEpiCategory C] : Balanced C where
+  isIso_of_mono_of_epi _ _ _ := isIso_of_mono_of_strongEpi _
 
 end
 
+section
+
 attribute [local instance] strongMono_of_mono
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) balanced_of_strongMonoCategory [StrongMonoCategory C] : Balanced C where
+  isIso_of_mono_of_epi _ _ _ := isIso_of_epi_of_strongMono _
 
 end
 

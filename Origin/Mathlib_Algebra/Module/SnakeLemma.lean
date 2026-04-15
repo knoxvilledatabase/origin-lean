@@ -3,16 +3,17 @@ Extracted from Algebra/Module/SnakeLemma.lean
 Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Exact
 
 /-!
 
 # The snake lemma in terms of modules
 
-The snake lemma is proven in `Mathlib/Algebra/Homology/ShortComplex/SnakeLemma.lean` for all abelian
+The snake lemma is proven in `Algebra/Homology/ShortComplex/SnakeLemma.lean` for all abelian
 categories, but for definitional equality and universe issues we reprove them here for modules.
 
 ## Main results
-- `SnakeLemma.δ`: The connecting homomorphism guaranteed by the snake lemma.
+- `SnakeLemma.δ`: The connecting homomorphism guranteed by the snake lemma.
 - `SnakeLemma.exact_δ_left`: The connecting homomorphism is exact on the right.
 - `SnakeLemma.exact_δ_right`: The connecting homomorphism is exact on the left.
 
@@ -44,7 +45,7 @@ such that `f₂` is surjective with a (set-theoretic) section `σ`, `g₁` is in
 (set-theoretic) retraction `ρ`, and that `ι₃` is injective and `π₁` is surjective.
 -/
 
-variable {R : Type*} [CommRing R] {M₁ M₂ M₃ N₁ N₂ N₃ : Type*}
+variable {R} [CommRing R] {M₁ M₂ M₃ N₁ N₂ N₃}
   [AddCommGroup M₁] [Module R M₁] [AddCommGroup M₂] [Module R M₂] [AddCommGroup M₃] [Module R M₃]
   [AddCommGroup N₁] [Module R N₁] [AddCommGroup N₂] [Module R N₂] [AddCommGroup N₃] [Module R N₃]
   (i₁ : M₁ →ₗ[R] N₁) (i₂ : M₂ →ₗ[R] N₂) (i₃ : M₃ →ₗ[R] N₃)
@@ -52,7 +53,7 @@ variable {R : Type*} [CommRing R] {M₁ M₂ M₃ N₁ N₂ N₃ : Type*}
   (g₁ : N₁ →ₗ[R] N₂) (g₂ : N₂ →ₗ[R] N₃) (hg : Exact g₁ g₂)
   (h₁ : g₁.comp i₁ = i₂.comp f₁) (h₂ : g₂.comp i₂ = i₃.comp f₂)
   (σ : M₃ → M₂) (hσ : f₂ ∘ σ = id) (ρ : N₂ → N₁) (hρ : ρ ∘ g₁ = id)
-  {K₂ K₃ C₁ C₂ : Type*} [AddCommGroup K₂] [Module R K₂] [AddCommGroup K₃] [Module R K₃]
+  {K₂ K₃ C₁ C₂} [AddCommGroup K₂] [Module R K₂] [AddCommGroup K₃] [Module R K₃]
   [AddCommGroup C₁] [Module R C₁] [AddCommGroup C₂] [Module R C₂]
   (ι₂ : K₂ →ₗ[R] M₂) (hι₂ : Exact ι₂ i₂) (ι₃ : K₃ →ₗ[R] M₃) (hι₃ : Exact ι₃ i₃)
   (π₁ : N₁ →ₗ[R] C₁) (hπ₁ : Exact i₁ π₁) (π₂ : N₂ →ₗ[R] C₂) (hπ₂ : Exact i₂ π₂)
@@ -118,6 +119,22 @@ lemma SnakeLemma.exact_δ_right (F : K₂ →ₗ[R] K₃) (hF : f₂.comp ι₂ 
       _ (by rw [map_zero, hι₂.apply_apply_eq_zero])).trans π₁.map_zero
 
 include hπ₂ in
+
+lemma SnakeLemma.exact_δ_left (G : C₁ →ₗ[R] C₂) (hF : G.comp π₁ = π₂.comp g₁) (h : Surjective π₁) :
+    Exact (δ i₁ i₂ i₃ f₁ f₂ hf g₁ g₂ hg h₁ h₂ σ hσ ρ hρ ι₃ hι₃ π₁ hπ₁) G := by
+  haveI H₁ : ∀ x, f₂ (σ x) = x := congr_fun hσ
+  haveI H₂ := δ_aux i₂ i₃ f₂ g₁ g₂ hg h₂ σ hσ ρ hρ ι₃ hι₃
+  intro x
+  constructor
+  · intro H
+    obtain ⟨x, rfl⟩ := h x
+    obtain ⟨y, hy⟩ := (hπ₂ (g₁ x)).mp (by simpa only [← LinearMap.comp_apply, hF] using H)
+    obtain ⟨z, hz⟩ : f₂ y ∈ range ι₃ := (hι₃ (f₂ y)).mp (by rw [← i₃.comp_apply, ← h₂,
+      g₂.comp_apply, hy, hg.apply_apply_eq_zero])
+    exact ⟨z, δ_eq i₁ i₂ i₃ f₁ f₂ hf g₁ g₂ hg h₁ h₂ σ hσ ρ hρ ι₃ hι₃ π₁ hπ₁ _ _ hz.symm _ hy.symm⟩
+  · rintro ⟨x, rfl⟩
+    simp only [δ, id_eq, coe_mk, AddHom.coe_mk]
+    rw [← G.comp_apply, hF, π₂.comp_apply, H₂, hπ₂.apply_apply_eq_zero]
 
 noncomputable def SnakeLemma.δ' (hf₂ : Surjective f₂) (hg₁ : Injective g₁) : K₃ →ₗ[R] C₁ :=
   δ i₁ i₂ i₃ f₁ f₂ hf g₁ g₂ hg h₁ h₂ _ (funext (surjInv_eq hf₂)) _ (invFun_comp hg₁) ι₃ hι₃ π₁ hπ₁

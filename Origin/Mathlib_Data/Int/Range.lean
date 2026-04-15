@@ -3,6 +3,7 @@ Extracted from Data/Int/Range.lean
 Genuine: 2 of 6 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Ring.Int
 
 /-!
 # Intervals in ℤ
@@ -25,12 +26,30 @@ theorem mem_range_iff {m n r : ℤ} : r ∈ range m n ↔ m ≤ r ∧ r < n := b
   exact ⟨fun ⟨a, ha⟩ => ha.2 ▸ ⟨le_add_of_nonneg_right (Int.natCast_nonneg _), ha.1⟩,
     fun h => ⟨toNat (r - m), by simp [toNat_of_nonneg (sub_nonneg.2 h.1), h.2] ⟩⟩
 
--- INSTANCE (free from Core): decidableLELT
+instance decidableLELT (P : Int → Prop) [DecidablePred P] (m n : ℤ) :
+    Decidable (∀ r, m ≤ r → r < n → P r) :=
+  decidable_of_iff (∀ r ∈ range m n, P r) <| by simp only [mem_range_iff, and_imp]
 
--- INSTANCE (free from Core): decidableLELE
+instance decidableLELE (P : Int → Prop) [DecidablePred P] (m n : ℤ) :
+    Decidable (∀ r, m ≤ r → r ≤ n → P r) := by
+  -- Porting note: The previous code was:
+  -- decidable_of_iff (∀ r ∈ range m (n + 1), P r) <| by
+  --   simp only [mem_range_iff, and_imp, lt_add_one_iff]
+  --
+  -- This fails to synthesize an instance
+  -- `Decidable (∀ (r : ℤ), r ∈ range m (n + 1) → P r)`
+    apply decidable_of_iff (∀ r ∈ range m (n + 1), P r)
+    apply Iff.intro <;> intros h _ _
+    · intro _; apply h
+      simp_all only [mem_range_iff, and_imp, and_self, lt_add_one_iff]
+    · simp_all only [mem_range_iff, and_imp, lt_add_one_iff]
 
--- INSTANCE (free from Core): decidableLTLT
+instance decidableLTLT (P : Int → Prop) [DecidablePred P] (m n : ℤ) :
+    Decidable (∀ r, m < r → r < n → P r) :=
+  Int.decidableLELT P _ _
 
--- INSTANCE (free from Core): decidableLTLE
+instance decidableLTLE (P : Int → Prop) [DecidablePred P] (m n : ℤ) :
+    Decidable (∀ r, m < r → r ≤ n → P r) :=
+  Int.decidableLELE P _ _
 
 end Int

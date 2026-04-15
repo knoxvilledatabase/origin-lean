@@ -3,6 +3,8 @@ Extracted from Algebra/Order/Algebra.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Defs
+import Mathlib.Algebra.Order.Module.OrderedSMul
 
 /-!
 # Ordered algebras
@@ -18,28 +20,22 @@ i.e. `A ≤ B` iff `B - A = star R * R` for some `R`.
 ## Implementation
 
 Because the axioms for an ordered algebra are exactly the same as those for the underlying
-module being ordered, we don't actually introduce a new class, but just use the `IsOrderedModule`
-and `IsStrictOrderedModule` mixins.
+module being ordered, we don't actually introduce a new class, but just use the `OrderedSMul`
+mixin.
 
 ## Tags
 
 ordered algebra
-
-## TODO
-
-`positivity` extension for `algebraMap`
 -/
 
-variable {α β : Type*} [CommSemiring α] [PartialOrder α] [Semiring β] [PartialOrder β] [Algebra α β]
+section OrderedAlgebra
 
-theorem IsOrderedModule.of_algebraMap_mono [PosMulMono β] [MulPosMono β]
-    (h : Monotone (algebraMap α β)) : IsOrderedModule α β :=
-  .of_smul_one_mono (by simpa [Algebra.smul_def] using h)
+variable {R A : Type*} [OrderedCommRing R] [OrderedRing A] [Algebra R A] [OrderedSMul R A]
 
-section ZeroLEOneClass
+theorem algebraMap_monotone : Monotone (algebraMap R A) := fun a b h => by
+  rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, ← sub_nonneg, ← sub_smul]
+  trans (b - a) • (0 : A)
+  · simp
+  · exact smul_le_smul_of_nonneg_left zero_le_one (sub_nonneg.mpr h)
 
-variable [ZeroLEOneClass β]
-
-section SMulPosMono
-
-variable (β) [SMulPosMono α β]
+end OrderedAlgebra

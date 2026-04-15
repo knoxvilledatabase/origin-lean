@@ -3,6 +3,11 @@ Extracted from Order/SemiconjSup.lean
 Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Group.Units.Equiv
+import Mathlib.Logic.Function.Conjugate
+import Mathlib.Order.Bounds.OrderIso
+import Mathlib.Order.OrdContinuous
+import Mathlib.Order.RelIso.Group
 
 /-!
 # Semiconjugate by `sSup`
@@ -25,8 +30,6 @@ homeomorphisms of the circle, so in order to apply results from this file one ha
 homeomorphisms to the real line first.
 -/
 
-assert_not_exists Finset
-
 variable {α β γ : Type*}
 
 open Set
@@ -34,7 +37,7 @@ open Set
 def IsOrderRightAdjoint [Preorder α] [Preorder β] (f : α → β) (g : β → α) :=
   ∀ y, IsLUB { x | f x ≤ y } (g y)
 
-theorem isOrderRightAdjoint_sSup [CompleteSemilatticeSup α] [Preorder β] (f : α → β) :
+theorem isOrderRightAdjoint_sSup [CompleteLattice α] [Preorder β] (f : α → β) :
     IsOrderRightAdjoint f fun y => sSup { x | f x ≤ y } := fun _ => isLUB_sSup _
 
 theorem isOrderRightAdjoint_csSup [ConditionallyCompleteLattice α] [Preorder β] (f : α → β)

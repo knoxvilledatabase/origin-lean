@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Bicategory/Kan/Adjunction.lean
 Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Bicategory.Kan.HasKan
+import Mathlib.CategoryTheory.Bicategory.Adjunction
+import Mathlib.Tactic.TFAE
 
 /-!
 # Adjunctions as Kan extensions
@@ -181,8 +184,6 @@ end LeftLift
 
 namespace LeftExtension
 
-set_option backward.isDefEq.respectTransparency false in
-
 def isKanOfWhiskerLeftAdjoint
     {f : a ⟶ b} {g : a ⟶ c} {t : LeftExtension f g} (H : LeftExtension.IsKan t)
       {x : B} {h : c ⟶ x} {u : x ⟶ c} (adj : h ⊣ u) :
@@ -216,7 +217,7 @@ def isKanOfWhiskerLeftAdjoint
           bicategory) <| by
     intro s' τ₀'
     let τ' : t.extension ≫ h ⟶ s'.extension := τ₀'.right
-    have Hτ' : t.unit ▷ h ⊗≫ f ◁ τ' = s'.unit := by simpa [bicategoricalComp] using τ₀'.w
+    have Hτ' : t.unit ▷ h ⊗≫ f ◁ τ' = s'.unit := by simpa [bicategoricalComp] using τ₀'.w.symm
     ext
     apply (H' _).hom_ext
     dsimp only [StructuredArrow.homMk_right]
@@ -238,7 +239,9 @@ def isKanOfWhiskerLeftAdjoint
       _ = _ := by
         bicategory
 
--- INSTANCE (free from Core): {f
+instance {f : a ⟶ b} {g : a ⟶ c} {x : B} {h : c ⟶ x} [IsLeftAdjoint h] [HasLeftKanExtension f g] :
+    Lan.CommuteWith f g h :=
+  ⟨⟨isKanOfWhiskerLeftAdjoint (lanIsKan f g) (Adjunction.ofIsLeftAdjoint h)⟩⟩
 
 end LeftExtension
 

@@ -1,11 +1,10 @@
 /-
 Extracted from NumberTheory/Harmonic/Int.lean
-Genuine: 2 of 4 | Dissolved: 2 | Infrastructure: 0
+Genuine: 2 of 3 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Harmonic.Defs
 import Mathlib.NumberTheory.Padics.PadicNumbers
-import Mathlib.Tactic.Positivity
 
 /-!
 
@@ -17,13 +16,10 @@ https://kconrad.math.uconn.edu/blurbs/gradnumthy/padicharmonicsum.pdf
 
 -/
 
--- DISSOLVED: harmonic_pos
-
 theorem padicValRat_two_harmonic (n : ℕ) : padicValRat 2 (harmonic n) = -Nat.log 2 n := by
-  induction n with
-  | zero => simp
-  | succ n ih =>
-    rcases eq_or_ne n 0 with rfl | hn
+  induction' n with n ih
+  · simp
+  · rcases eq_or_ne n 0 with rfl | hn
     · simp
     rw [harmonic_succ]
     have key : padicValRat 2 (harmonic n) ≠ padicValRat 2 (↑(n + 1))⁻¹ := by
@@ -41,4 +37,3 @@ theorem harmonic_not_int {n : ℕ} (h : 2 ≤ n) : ¬ (harmonic n).isInt := by
   rw [padicNorm.eq_zpow_of_nonzero (harmonic_pos (ne_zero_of_lt h)).ne',
       padicValRat_two_harmonic, neg_neg, zpow_natCast]
   exact one_lt_pow₀ one_lt_two (Nat.log_pos one_lt_two h).ne'
-

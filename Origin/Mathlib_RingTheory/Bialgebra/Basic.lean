@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Bialgebra/Basic.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 12 of 13 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.Coalgebra.Basic
+import Mathlib.RingTheory.TensorProduct.Basic
 
 /-!
 # Bialgebras
@@ -28,10 +30,6 @@ are surprising to mathematicians -- see for example its definition of a group.
 Note that this design decision is also compatible with that of `Coalgebra`. The lengthy
 docstring for these convoluted fields attempts to explain what is going on.
 
-The constructor `Bialgebra.ofAlgHom` is dual to the default constructor: For `R` is a commutative
-semiring and `A` an `R`-algebra, it consumes the counit and comultiplication as algebra
-homomorphisms that satisfy the coalgebra axioms to define a bialgebra structure on `A`.
-
 ## References
 
 * <https://en.wikipedia.org/wiki/Bialgebra>
@@ -41,9 +39,7 @@ homomorphisms that satisfy the coalgebra axioms to define a bialgebra structure 
 bialgebra
 -/
 
-universe u v w
-
-open Function
+universe u v
 
 open scoped TensorProduct
 
@@ -91,3 +87,63 @@ lemma comul_mul (a b : A) : comul (R := R) (a * b) = comul a * comul b :=
   DFunLike.congr_fun (DFunLike.congr_fun mul_compr₂_comul a) b
 
 attribute [simp] counit_one comul_one counit_mul comul_mul
+
+def mk' (R : Type u) (A : Type v) [CommSemiring R] [Semiring A]
+    [Algebra R A] [C : Coalgebra R A] (counit_one : C.counit 1 = 1)
+    (counit_mul : ∀ {a b}, C.counit (a * b) = C.counit a * C.counit b)
+    (comul_one : C.comul 1 = 1)
+    (comul_mul : ∀ {a b}, C.comul (a * b) = C.comul a * C.comul b) :
+    Bialgebra R A where
+  counit_one := counit_one
+  mul_compr₂_counit := by ext; exact counit_mul
+  comul_one := comul_one
+  mul_compr₂_comul := by ext; exact comul_mul
+
+variable (R A)
+
+@[simps!]
+def counitAlgHom : A →ₐ[R] R :=
+  .ofLinearMap counit counit_one counit_mul
+
+@[simps!]
+def comulAlgHom : A →ₐ[R] A ⊗[R] A :=
+  .ofLinearMap comul comul_one comul_mul
+
+variable {R A}
+
+@[simp] lemma counit_algebraMap (r : R) : counit (R := R) (algebraMap R A r) = r :=
+  (counitAlgHom R A).commutes r
+
+@[simp] lemma comul_algebraMap (r : R) :
+    comul (R := R) (algebraMap R A r) = algebraMap R (A ⊗[R] A) r :=
+  (comulAlgHom R A).commutes r
+
+@[simp] lemma counit_natCast (n : ℕ) : counit (R := R) (n : A) = n :=
+  map_natCast (counitAlgHom R A) _
+
+@[simp] lemma comul_natCast (n : ℕ) : comul (R := R) (n : A) = n :=
+  map_natCast (comulAlgHom R A) _
+
+@[simp] lemma counit_pow (a : A) (n : ℕ) : counit (R := R) (a ^ n) = counit a ^ n :=
+  map_pow (counitAlgHom R A) a n
+
+@[simp] lemma comul_pow (a : A) (n : ℕ) : comul (R := R) (a ^ n) = comul a ^ n :=
+  map_pow (comulAlgHom R A) a n
+
+end Bialgebra
+
+namespace CommSemiring
+
+variable (R : Type u) [CommSemiring R]
+
+open Bialgebra
+
+noncomputable
+
+instance toBialgebra : Bialgebra R R where
+  mul_compr₂_counit := by ext; simp
+  counit_one := rfl
+  mul_compr₂_comul := by ext; simp
+  comul_one := rfl
+
+end CommSemiring

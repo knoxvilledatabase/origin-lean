@@ -1,8 +1,9 @@
 /-
 Extracted from MeasureTheory/Measure/LogLikelihoodRatio.lean
-Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
+Genuine: 15 of 18 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.Tilted
 
 /-!
 # Log-likelihood Ratio
@@ -30,15 +31,14 @@ variable {α : Type*} {mα : MeasurableSpace α} {μ ν : Measure α} {f : α �
 
 noncomputable def llr (μ ν : Measure α) (x : α) : ℝ := log (μ.rnDeriv ν x).toReal
 
-lemma llr_self (μ : Measure α) [SigmaFinite μ] : llr μ μ =ᵐ[μ] 0 := by
-  filter_upwards [μ.rnDeriv_self] with a ha using by simp [llr, ha]
+lemma llr_def (μ ν : Measure α) : llr μ ν = fun x ↦ log (μ.rnDeriv ν x).toReal := rfl
 
 lemma exp_llr (μ ν : Measure α) [SigmaFinite μ] :
     (fun x ↦ exp (llr μ ν x))
       =ᵐ[ν] fun x ↦ if μ.rnDeriv ν x = 0 then 1 else (μ.rnDeriv ν x).toReal := by
   filter_upwards [Measure.rnDeriv_lt_top μ ν] with x hx
   by_cases h_zero : μ.rnDeriv ν x = 0
-  · simp only [llr, h_zero, ENNReal.toReal_zero, log_zero, exp_zero, ite_true]
+  · simp only [llr, h_zero, ENNReal.zero_toReal, log_zero, exp_zero, ite_true]
   · rw [llr, exp_log, if_neg h_zero]
     exact ENNReal.toReal_pos h_zero hx.ne
 
@@ -54,19 +54,113 @@ lemma exp_llr_of_ac' (μ ν : Measure α) [SigmaFinite μ] [SigmaFinite ν] (hμ
   rwa [if_neg hx_pos.ne'] at hx
 
 lemma neg_llr [SigmaFinite μ] [SigmaFinite ν] (hμν : μ ≪ ν) :
-    -llr μ ν =ᵐ[μ] llr ν μ := by
+    - llr μ ν =ᵐ[μ] llr ν μ := by
   filter_upwards [Measure.inv_rnDeriv hμν] with x hx
   rw [Pi.neg_apply, llr, llr, ← log_inv, ← ENNReal.toReal_inv]
   congr
 
 lemma exp_neg_llr [SigmaFinite μ] [SigmaFinite ν] (hμν : μ ≪ ν) :
-    (fun x ↦ exp (-llr μ ν x)) =ᵐ[μ] fun x ↦ (ν.rnDeriv μ x).toReal := by
+    (fun x ↦ exp (- llr μ ν x)) =ᵐ[μ] fun x ↦ (ν.rnDeriv μ x).toReal := by
   filter_upwards [neg_llr hμν, exp_llr_of_ac' ν μ hμν] with x hx hx_exp_log
   rw [Pi.neg_apply] at hx
   rw [hx, hx_exp_log]
 
 lemma exp_neg_llr' [SigmaFinite μ] [SigmaFinite ν] (hμν : ν ≪ μ) :
-    (fun x ↦ exp (-llr μ ν x)) =ᵐ[ν] fun x ↦ (ν.rnDeriv μ x).toReal := by
+    (fun x ↦ exp (- llr μ ν x)) =ᵐ[ν] fun x ↦ (ν.rnDeriv μ x).toReal := by
   filter_upwards [neg_llr hμν, exp_llr_of_ac ν μ hμν] with x hx hx_exp_log
   rw [Pi.neg_apply, neg_eq_iff_eq_neg] at hx
   rw [← hx, hx_exp_log]
+
+@[measurability]
+lemma measurable_llr (μ ν : Measure α) : Measurable (llr μ ν) :=
+  (Measure.measurable_rnDeriv μ ν).ennreal_toReal.log
+
+@[measurability]
+lemma stronglyMeasurable_llr (μ ν : Measure α) : StronglyMeasurable (llr μ ν) :=
+  (measurable_llr μ ν).stronglyMeasurable
+
+-- DISSOLVED: llr_smul_left
+
+-- DISSOLVED: llr_smul_right
+
+section llr_tilted
+
+lemma llr_tilted_left [SigmaFinite μ] [SigmaFinite ν] (hμν : μ ≪ ν)
+    (hf : Integrable (fun x ↦ exp (f x)) μ) (hfν : AEMeasurable f ν) :
+    (llr (μ.tilted f) ν) =ᵐ[μ] fun x ↦ f x - log (∫ z, exp (f z) ∂μ) + llr μ ν x := by
+  cases eq_zero_or_neZero μ with
+  | inl hμ =>
+    simp only [hμ, ae_zero, Filter.EventuallyEq]; exact Filter.eventually_bot
+  | inr h0 =>
+    filter_upwards [hμν.ae_le (toReal_rnDeriv_tilted_left μ hfν), Measure.rnDeriv_pos hμν,
+      hμν.ae_le (Measure.rnDeriv_lt_top μ ν)] with x hx hx_pos hx_lt_top
+    rw [llr, hx, log_mul, div_eq_mul_inv, log_mul (exp_pos _).ne', log_exp, log_inv, llr,
+      ← sub_eq_add_neg]
+    · simp only [ne_eq, inv_eq_zero]
+      exact (integral_exp_pos hf).ne'
+    · simp only [ne_eq, div_eq_zero_iff]
+      push_neg
+      exact ⟨(exp_pos _).ne', (integral_exp_pos hf).ne'⟩
+    · simp [ENNReal.toReal_eq_zero_iff, hx_lt_top.ne, hx_pos.ne']
+
+lemma integrable_llr_tilted_left [IsFiniteMeasure μ] [SigmaFinite ν]
+    (hμν : μ ≪ ν) (hf : Integrable f μ) (h_int : Integrable (llr μ ν) μ)
+    (hfμ : Integrable (fun x ↦ exp (f x)) μ) (hfν : AEMeasurable f ν) :
+    Integrable (llr (μ.tilted f) ν) μ := by
+  rw [integrable_congr (llr_tilted_left hμν hfμ hfν)]
+  exact Integrable.add (hf.sub (integrable_const _)) h_int
+
+lemma integral_llr_tilted_left [IsProbabilityMeasure μ] [SigmaFinite ν]
+    (hμν : μ ≪ ν) (hf : Integrable f μ) (h_int : Integrable (llr μ ν) μ)
+    (hfμ : Integrable (fun x ↦ exp (f x)) μ) (hfν : AEMeasurable f ν) :
+    ∫ x, llr (μ.tilted f) ν x ∂μ = ∫ x, llr μ ν x ∂μ + ∫ x, f x ∂μ - log (∫ x, exp (f x) ∂μ) := by
+  calc ∫ x, llr (μ.tilted f) ν x ∂μ
+    = ∫ x, f x - log (∫ x, exp (f x) ∂μ) + llr μ ν x ∂μ :=
+        integral_congr_ae (llr_tilted_left hμν hfμ hfν)
+  _ = ∫ x, f x ∂μ - log (∫ x, exp (f x) ∂μ) + ∫ x, llr μ ν x ∂μ := by
+        rw [integral_add ?_ h_int]
+        swap; · exact hf.sub (integrable_const _)
+        rw [integral_sub hf (integrable_const _)]
+        simp only [integral_const, measure_univ, ENNReal.one_toReal, smul_eq_mul, one_mul]
+  _ = ∫ x, llr μ ν x ∂μ + ∫ x, f x ∂μ - log (∫ x, exp (f x) ∂μ) := by abel
+
+lemma llr_tilted_right [SigmaFinite μ] [SigmaFinite ν]
+    (hμν : μ ≪ ν) (hf : Integrable (fun x ↦ exp (f x)) ν) :
+    (llr μ (ν.tilted f)) =ᵐ[μ] fun x ↦ - f x + log (∫ z, exp (f z) ∂ν) + llr μ ν x := by
+  cases eq_zero_or_neZero ν with
+  | inl h =>
+    have hμ : μ = 0 := by ext s _; exact hμν (by simp [h])
+    simp only [hμ, ae_zero, Filter.EventuallyEq]; exact Filter.eventually_bot
+  | inr h0 =>
+    filter_upwards [hμν.ae_le (toReal_rnDeriv_tilted_right μ ν hf), Measure.rnDeriv_pos hμν,
+      hμν.ae_le (Measure.rnDeriv_lt_top μ ν)] with x hx hx_pos hx_lt_top
+    rw [llr, hx, log_mul, log_mul (exp_pos _).ne', log_exp, llr]
+    · exact (integral_exp_pos hf).ne'
+    · refine (mul_pos (exp_pos _) (integral_exp_pos hf)).ne'
+    · simp [ENNReal.toReal_eq_zero_iff, hx_lt_top.ne, hx_pos.ne']
+
+lemma integrable_llr_tilted_right [IsFiniteMeasure μ] [SigmaFinite ν]
+    (hμν : μ ≪ ν) (hfμ : Integrable f μ)
+    (h_int : Integrable (llr μ ν) μ) (hfν : Integrable (fun x ↦ exp (f x)) ν) :
+    Integrable (llr μ (ν.tilted f)) μ := by
+  rw [integrable_congr (llr_tilted_right hμν hfν)]
+  exact Integrable.add (hfμ.neg.add (integrable_const _)) h_int
+
+lemma integral_llr_tilted_right [IsProbabilityMeasure μ] [SigmaFinite ν]
+    (hμν : μ ≪ ν) (hfμ : Integrable f μ) (hfν : Integrable (fun x ↦ exp (f x)) ν)
+    (h_int : Integrable (llr μ ν) μ) :
+    ∫ x, llr μ (ν.tilted f) x ∂μ = ∫ x, llr μ ν x ∂μ - ∫ x, f x ∂μ + log (∫ x, exp (f x) ∂ν) := by
+  calc ∫ x, llr μ (ν.tilted f) x ∂μ
+    = ∫ x, - f x + log (∫ x, exp (f x) ∂ν) + llr μ ν x ∂μ :=
+        integral_congr_ae (llr_tilted_right hμν hfν)
+  _ = - ∫ x, f x ∂μ + log (∫ x, exp (f x) ∂ν) + ∫ x, llr μ ν x ∂μ := by
+        rw [← integral_neg, integral_add ?_ h_int]
+        swap; · exact hfμ.neg.add (integrable_const _)
+        rw [integral_add ?_ (integrable_const _)]
+        swap; · exact hfμ.neg
+        simp only [integral_const, measure_univ, ENNReal.one_toReal, smul_eq_mul, one_mul]
+  _ = ∫ x, llr μ ν x ∂μ - ∫ x, f x ∂μ + log (∫ x, exp (f x) ∂ν) := by abel
+
+end llr_tilted
+
+end MeasureTheory

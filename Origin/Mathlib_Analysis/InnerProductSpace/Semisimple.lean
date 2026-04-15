@@ -3,6 +3,8 @@ Extracted from Analysis/InnerProductSpace/Semisimple.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.InnerProductSpace.Projection
+import Mathlib.LinearAlgebra.Semisimple
 
 /-!
 # Semisimple operators on inner product spaces
@@ -32,6 +34,6 @@ theorem isFinitelySemisimple :
   · simp [disjoint_iff, ← inf_assoc, Submodule.inf_orthogonal_eq_bot q]
   · suffices q ⊔ qᗮ = ⊤ by rw [← sup_inf_assoc_of_le _ hq₂, this, top_inf_eq p]
     replace hp₂ : Module.Finite 𝕜 q := Submodule.finiteDimensional_of_le hq₂
-    exact Submodule.sup_orthogonal_of_hasOrthogonalProjection
+    exact Submodule.sup_orthogonal_of_completeSpace
 
 end LinearMap.IsSymmetric

@@ -3,6 +3,8 @@ Extracted from RingTheory/Noetherian/Filter.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Order.Filter.EventuallyConst
+import Mathlib.RingTheory.Noetherian.Defs
 
 /-!
 # Noetherian modules and finiteness of chains
@@ -17,7 +19,7 @@ Let `R` be a ring and let `M` be an `R`-module.
 ## References
 
 * [M. F. Atiyah and I. G. Macdonald, *Introduction to commutative algebra*][atiyah-macdonald]
-* [P. Samuel, *Algebraic Theory of Numbers*][samuel1967]
+* [samuel1967]
 
 ## Tags
 

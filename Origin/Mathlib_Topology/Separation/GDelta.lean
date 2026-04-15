@@ -1,8 +1,14 @@
 /-
 Extracted from Topology/Separation/GDelta.lean
-Genuine: 11 of 14 | Dissolved: 0 | Infrastructure: 3
+Genuine: 10 of 12 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.Compactness.Lindelof
+import Mathlib.Topology.Compactness.SigmaCompact
+import Mathlib.Topology.Connected.TotallyDisconnected
+import Mathlib.Topology.Inseparable
+import Mathlib.Topology.Separation.Basic
+import Mathlib.Topology.GDelta.Basic
 
 /-!
 # Separation properties of topological spaces.
@@ -11,7 +17,7 @@ import Origin.Core
 
 * `PerfectlyNormalSpace`: A perfectly normal space is a normal space such that
   closed sets are Gδ.
-* `T6Space`: A T₆ space is a perfectly normal T₀ space. T₆ implies T₅.
+* `T6Space`: A T₆ space is a Perfectly normal T₁ space. T₆ implies T₅.
 
 Note that `mathlib` adopts the modern convention that `m ≤ n` if and only if `T_m → T_n`, but
 occasionally the literature swaps definitions for e.g. T₃ and regular.
@@ -50,11 +56,11 @@ protected theorem IsGδ.singleton [FirstCountableTopology X] [T1Space X] (x : X)
 
 theorem Set.Finite.isGδ [FirstCountableTopology X] {s : Set X} [T1Space X] (hs : s.Finite) :
     IsGδ s :=
-  Finite.induction_on _ hs .empty fun _ _ ↦ .union (.singleton _)
+  Finite.induction_on hs .empty fun _ _ ↦ .union (.singleton _)
 
 section PerfectlyNormal
 
-class PerfectlyNormalSpace (X : Type u) [TopologicalSpace X] : Prop extends NormalSpace X where
+class PerfectlyNormalSpace (X : Type u) [TopologicalSpace X] extends NormalSpace X : Prop where
     closed_gdelta : ∀ ⦃h : Set X⦄, IsClosed h → IsGδ h
 
 theorem Disjoint.hasSeparatingCover_closed_gdelta_right {s t : Set X} [NormalSpace X]
@@ -85,16 +91,19 @@ theorem Disjoint.hasSeparatingCover_closed_gdelta_right {s t : Set X} [NormalSpa
     rw [← closure_eq_iff_isClosed.mpr t_cl] at clt_sub_g'
     exact subset_closure.trans <| (clt_sub_g' n).trans <| (g'_open n).subset_interior_closure
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) PerfectlyNormalSpace.toCompletelyNormalSpace
+    [PerfectlyNormalSpace X] : CompletelyNormalSpace X where
+  completely_normal _ _ hd₁ hd₂ := separatedNhds_iff_disjoint.mp <|
+    hasSeparatingCovers_iff_separatedNhds.mp
+      ⟨(hd₂.hasSeparatingCover_closed_gdelta_right isClosed_closure <|
+         closed_gdelta isClosed_closure).mono (fun ⦃_⦄ a ↦ a) subset_closure,
+       ((Disjoint.symm hd₁).hasSeparatingCover_closed_gdelta_right isClosed_closure <|
+         closed_gdelta isClosed_closure).mono (fun ⦃_⦄ a ↦ a) subset_closure⟩
 
-theorem IsClosed.isGδ [PerfectlyNormalSpace X] {s : Set X} (hs : IsClosed s) : IsGδ s :=
-  PerfectlyNormalSpace.closed_gdelta hs
+class T6Space (X : Type u) [TopologicalSpace X] extends T1Space X, PerfectlyNormalSpace X : Prop
 
--- INSTANCE (free from Core): (priority
-
-class T6Space (X : Type u) [TopologicalSpace X] : Prop extends T0Space X, PerfectlyNormalSpace X
-
--- INSTANCE (free from Core): (priority
+instance (priority := 100) T6Space.toT5Space [T6Space X] : T5Space X where
+  -- follows from type-class inference
 
 end PerfectlyNormal
 

@@ -1,8 +1,11 @@
 /-
 Extracted from Order/SuccPred/IntervalSucc.lean
-Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Pairwise.Basic
+import Mathlib.Data.Set.Lattice
+import Mathlib.Order.SuccPred.Archimedean
 
 /-!
 # Intervals `Ixx (f x) (f (Order.succ x))`
@@ -24,37 +27,6 @@ open Set Order
 
 variable {α β : Type*} [LinearOrder α]
 
-theorem biUnion_Ici_Ico_map_succ [SuccOrder α] [IsSuccArchimedean α] [LinearOrder β] {f : α → β}
-    {a : α} (hf : ∀ i ∈ Ici a, f a ≤ f i) (h2f : ¬BddAbove (f '' Ici a)) :
-    ⋃ i ∈ Ici a, Ico (f i) (f (succ i)) = Ici (f a) := by
-  apply subset_antisymm <|
-    iUnion₂_subset fun i hi ↦ Ico_subset_Ico_left (hf i hi) |>.trans Ico_subset_Ici_self
-  intro b hb
-  contrapose h2f
-  use b
-  simp only [upperBounds, mem_image, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂]
-  exact Succ.rec (P := fun i _ ↦ f i ≤ b) hb (by simp_all)
-
-theorem biUnion_Ici_Ioc_map_succ [SuccOrder α] [IsSuccArchimedean α] [LinearOrder β] {f : α → β}
-    {a : α} (hf : ∀ i ∈ Ici a, f a ≤ f i) (h2f : ¬BddAbove (f '' Ici a)) :
-    ⋃ i ∈ Ici a, Ioc (f i) (f (succ i)) = Ioi (f a) := by
-  apply subset_antisymm <|
-    iUnion₂_subset fun i hi ↦ Ioc_subset_Ioc_left (hf i hi) |>.trans Ioc_subset_Ioi_self
-  intro b hb
-  contrapose h2f
-  suffices ∀ i, a ≤ i → f i < b from ⟨b, by aesop (add simp [upperBounds, le_of_lt])⟩
-  exact Succ.rec (P := fun i _ ↦ f i < b) hb (by simp_all)
-
-theorem iUnion_Ico_map_succ_eq_Ici [OrderBot α] [SuccOrder α] [IsSuccArchimedean α] [LinearOrder β]
-    {f : α → β} (hf : ∀ a, f ⊥ ≤ f a) (h2f : ¬BddAbove (range f)) :
-    (⋃ a : α, Ico (f a) (f (succ a))) = Ici (f ⊥) := by
-  simpa using biUnion_Ici_Ico_map_succ (f := f) (a := ⊥) (by simpa) (by simpa)
-
-theorem iUnion_Ioc_map_succ_eq_Ioi [OrderBot α] [SuccOrder α] [IsSuccArchimedean α] [LinearOrder β]
-    {f : α → β} (hf : ∀ a, f ⊥ ≤ f a) (h2f : ¬BddAbove (range f)) :
-    (⋃ a : α, Ioc (f a) (f (succ a))) = Ioi (f ⊥) := by
-  simpa using biUnion_Ici_Ioc_map_succ (f := f) (a := ⊥) (by simpa) (by simpa)
-
 namespace Monotone
 
 theorem biUnion_Ico_Ioc_map_succ [SuccOrder α] [IsSuccArchimedean α] [LinearOrder β] {f : α → β}
@@ -69,19 +41,17 @@ theorem biUnion_Ico_Ioc_map_succ [SuccOrder α] [IsSuccArchimedean α] [LinearOr
       · rw [hk.succ_eq, Ioc_self, empty_union]
       · rw [Ico_succ_right_eq_insert_of_not_isMax hmk hk, biUnion_insert]
 
-open scoped Function -- required for scoped `on` notation
-
 theorem pairwise_disjoint_on_Ioc_succ [SuccOrder α] [Preorder β] {f : α → β} (hf : Monotone f) :
     Pairwise (Disjoint on fun n => Ioc (f n) (f (succ n))) :=
   (pairwise_disjoint_on _).2 fun _ _ hmn =>
     disjoint_iff_inf_le.mpr fun _ ⟨⟨_, h₁⟩, ⟨h₂, _⟩⟩ =>
-      h₂.not_ge <| h₁.trans <| hf <| succ_le_of_lt hmn
+      h₂.not_le <| h₁.trans <| hf <| succ_le_of_lt hmn
 
 theorem pairwise_disjoint_on_Ico_succ [SuccOrder α] [Preorder β] {f : α → β} (hf : Monotone f) :
     Pairwise (Disjoint on fun n => Ico (f n) (f (succ n))) :=
   (pairwise_disjoint_on _).2 fun _ _ hmn =>
     disjoint_iff_inf_le.mpr fun _ ⟨⟨_, h₁⟩, ⟨h₂, _⟩⟩ =>
-      h₁.not_ge <| (hf <| succ_le_of_lt hmn).trans h₂
+      h₁.not_le <| (hf <| succ_le_of_lt hmn).trans h₂
 
 theorem pairwise_disjoint_on_Ioo_succ [SuccOrder α] [Preorder β] {f : α → β} (hf : Monotone f) :
     Pairwise (Disjoint on fun n => Ioo (f n) (f (succ n))) :=
@@ -89,21 +59,19 @@ theorem pairwise_disjoint_on_Ioo_succ [SuccOrder α] [Preorder β] {f : α → �
 
 theorem pairwise_disjoint_on_Ioc_pred [PredOrder α] [Preorder β] {f : α → β} (hf : Monotone f) :
     Pairwise (Disjoint on fun n => Ioc (f (pred n)) (f n)) := by
-  simpa using hf.dual.pairwise_disjoint_on_Ico_succ
+  simpa only [(· ∘ ·), dual_Ico] using hf.dual.pairwise_disjoint_on_Ico_succ
 
 theorem pairwise_disjoint_on_Ico_pred [PredOrder α] [Preorder β] {f : α → β} (hf : Monotone f) :
     Pairwise (Disjoint on fun n => Ico (f (pred n)) (f n)) := by
-  simpa using hf.dual.pairwise_disjoint_on_Ioc_succ
+  simpa only [(· ∘ ·), dual_Ioc] using hf.dual.pairwise_disjoint_on_Ioc_succ
 
 theorem pairwise_disjoint_on_Ioo_pred [PredOrder α] [Preorder β] {f : α → β} (hf : Monotone f) :
     Pairwise (Disjoint on fun n => Ioo (f (pred n)) (f n)) := by
-  simpa using hf.dual.pairwise_disjoint_on_Ioo_succ
+  simpa only [(· ∘ ·), dual_Ioo] using hf.dual.pairwise_disjoint_on_Ioo_succ
 
 end Monotone
 
 namespace Antitone
-
-open scoped Function -- required for scoped `on` notation
 
 theorem pairwise_disjoint_on_Ioc_succ [SuccOrder α] [Preorder β] {f : α → β} (hf : Antitone f) :
     Pairwise (Disjoint on fun n => Ioc (f (succ n)) (f n)) :=

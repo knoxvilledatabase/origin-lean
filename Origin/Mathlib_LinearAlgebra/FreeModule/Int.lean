@@ -3,6 +3,9 @@ Extracted from LinearAlgebra/FreeModule/Int.lean
 Genuine: 2 of 6 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.ZMod.Quotient
+import Mathlib.GroupTheory.Index
+import Mathlib.LinearAlgebra.FreeModule.PID
 
 /-! # Index of submodules of free ℤ-modules (considered as an `AddSubgroup`).
 
@@ -13,7 +16,7 @@ index.
 
 variable {ι R M : Type*} {n : ℕ} [CommRing R] [AddCommGroup M]
 
-namespace Module.Basis.SmithNormalForm
+namespace Basis.SmithNormalForm
 
 variable [Fintype ι]
 
@@ -24,7 +27,7 @@ lemma toAddSubgroup_index_eq_pow_mul_prod [Module R M] {N : Submodule R M}
   classical
   rcases snf with ⟨bM, bN, f, a, snf⟩
   dsimp only
-  set N' : Submodule R (ι → R) := N.map bM.equivFun.toLinearMap with hN'
+  set N' : Submodule R (ι → R) := N.map bM.equivFun with hN'
   let bN' : Basis (Fin n) R N' := bN.map (bM.equivFun.submoduleMap N)
   have snf' : ∀ i, (bN' i : ι → R) = Pi.single (f i) (a i) := by
     intro i
@@ -71,11 +74,11 @@ lemma toAddSubgroup_index_eq_pow_mul_prod [Module R M] {N : Submodule R M}
       simp only [EmbeddingLike.apply_eq_iff_eq, exists_eq, ↓reduceDIte, Classical.choose_eq,
         Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_ite, smul_zero]
       rw [eq_comm]
-      by_cases! hj : ∃ j, f j = i
+      by_cases hj : ∃ j, f j = i
       · calc ∑ x : Fin n, _ =
             if i = f hj.choose then (h (f hj.choose)).choose * a hj.choose else 0 := by
-              convert Finset.sum_eq_single (M := R) hj.choose ?_ ?_
-              · simp
+              convert Finset.sum_eq_single (β := R) hj.choose ?_ ?_
+              · simp [hj]
               · rintro j - h
                 have hinj := f.injective.ne h
                 rw [hj.choose_spec] at hinj
@@ -91,8 +94,9 @@ lemma toAddSubgroup_index_eq_pow_mul_prod [Module R M] {N : Submodule R M}
               · exact hj.choose_spec.symm
               · simp [hj]
       · convert Finset.sum_const_zero with x
-        · specialize hj x
-          rw [ne_comm] at hj
+        · rw [not_exists] at hj
+          specialize hj x
+          rw [eq_comm] at hj
           simp [hj]
         · rw [← zero_dvd_iff]
           convert h i
@@ -143,7 +147,7 @@ lemma toAddSubgroup_index_eq_ite [Infinite R] [Module R M] {N : Submodule R M}
 
 -- DISSOLVED: toAddSubgroup_index_ne_zero_iff
 
-end Module.Basis.SmithNormalForm
+end Basis.SmithNormalForm
 
 namespace Int
 
@@ -152,8 +156,6 @@ variable [Finite ι]
 -- DISSOLVED: submodule_toAddSubgroup_index_ne_zero_iff
 
 -- DISSOLVED: addSubgroup_index_ne_zero_iff
-
-set_option backward.isDefEq.respectTransparency false in
 
 -- DISSOLVED: subgroup_index_ne_zero_iff
 

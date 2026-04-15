@@ -1,8 +1,12 @@
 /-
 Extracted from RingTheory/WittVector/DiscreteValuationRing.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 9 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.WittVector.Domain
+import Mathlib.RingTheory.WittVector.MulCoeff
+import Mathlib.RingTheory.DiscreteValuationRing.Basic
+import Mathlib.Tactic.LinearCombination
 
 /-!
 
@@ -17,7 +21,7 @@ When `k` is also a field, this `b` can be chosen to be a unit of `𝕎 k`.
 
 * `WittVector.exists_eq_pow_p_mul`: the existence of this element `b` over a perfect ring
 * `WittVector.exists_eq_pow_p_mul'`: the existence of this unit `b` over a perfect field
-* `WittVector.isDiscreteValuationRing`: `𝕎 k` is a discrete valuation ring if `k` is a perfect field
+* `WittVector.discreteValuationRing`: `𝕎 k` is a discrete valuation ring if `k` is a perfect field
 
 -/
 
@@ -44,9 +48,8 @@ noncomputable def inverseCoeff (a : Units k) (A : 𝕎 k) : ℕ → k
 def mkUnit {a : Units k} {A : 𝕎 k} (hA : A.coeff 0 = a) : Units (𝕎 k) :=
   Units.mkOfMulEqOne A (@WittVector.mk' p _ (inverseCoeff a A)) (by
     ext n
-    induction n with
-    | zero => simp [WittVector.mul_coeff_zero, inverseCoeff, hA]
-    | succ n => ?_
+    induction' n with n _
+    · simp [WittVector.mul_coeff_zero, inverseCoeff, hA]
     let H_coeff := A.coeff (n + 1) * ↑(a⁻¹ ^ p ^ (n + 1)) +
       nthRemainder p n (truncateFun (n + 1) A) fun i : Fin (n + 1) => inverseCoeff a A i
     have H := Units.mul_inv (a ^ p ^ (n + 1))
@@ -56,3 +59,61 @@ def mkUnit {a : Units k} {A : 𝕎 k} (hA : A.coeff 0 = a) : Units (𝕎 k) :=
     simp only [nthRemainder_spec, inverseCoeff, succNthValUnits, hA,
       one_coeff_eq_of_pos, Nat.succ_pos', ha_inv, ha, inv_pow]
     ring!)
+
+@[simp]
+theorem coe_mkUnit {a : Units k} {A : 𝕎 k} (hA : A.coeff 0 = a) : (mkUnit hA : 𝕎 k) = A :=
+  rfl
+
+end CommRing
+
+section Field
+
+variable {k : Type*} [Field k] [CharP k p]
+
+-- DISSOLVED: isUnit_of_coeff_zero_ne_zero
+
+variable (p)
+
+theorem irreducible : Irreducible (p : 𝕎 k) := by
+  have hp : ¬IsUnit (p : 𝕎 k) := by
+    intro hp
+    simpa only [constantCoeff_apply, coeff_p_zero, not_isUnit_zero] using
+      (constantCoeff : WittVector p k →+* _).isUnit_map hp
+  refine ⟨hp, fun a b hab => ?_⟩
+  obtain ⟨ha0, hb0⟩ : a ≠ 0 ∧ b ≠ 0 := by
+    rw [← mul_ne_zero_iff]; intro h; rw [h] at hab; exact p_nonzero p k hab
+  obtain ⟨m, a, ha, rfl⟩ := verschiebung_nonzero ha0
+  obtain ⟨n, b, hb, rfl⟩ := verschiebung_nonzero hb0
+  cases m; · exact Or.inl (isUnit_of_coeff_zero_ne_zero a ha)
+  cases' n with n; · exact Or.inr (isUnit_of_coeff_zero_ne_zero b hb)
+  rw [iterate_verschiebung_mul] at hab
+  apply_fun fun x => coeff x 1 at hab
+  simp only [coeff_p_one, Nat.add_succ, add_comm _ n, Function.iterate_succ', Function.comp_apply,
+    verschiebung_coeff_add_one, verschiebung_coeff_zero] at hab
+  exact (one_ne_zero hab).elim
+
+end Field
+
+section PerfectRing
+
+variable {k : Type*} [CommRing k] [CharP k p] [PerfectRing k p]
+
+-- DISSOLVED: exists_eq_pow_p_mul
+
+end PerfectRing
+
+section PerfectField
+
+variable {k : Type*} [Field k] [CharP k p] [PerfectRing k p]
+
+-- DISSOLVED: exists_eq_pow_p_mul'
+
+theorem discreteValuationRing : DiscreteValuationRing (𝕎 k) :=
+  DiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization (by
+    refine ⟨p, irreducible p, fun {x} hx => ?_⟩
+    obtain ⟨n, b, hb⟩ := exists_eq_pow_p_mul' x hx
+    exact ⟨n, b, hb.symm⟩)
+
+end PerfectField
+
+end WittVector

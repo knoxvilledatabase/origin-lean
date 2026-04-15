@@ -1,14 +1,14 @@
 /-
 Extracted from Algebra/Module/ZMod.lean
-Genuine: 6 of 7 | Dissolved: 1 | Infrastructure: 0
+Genuine: 8 of 14 | Dissolved: 1 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Submodule.Lattice
+import Mathlib.Data.ZMod.Basic
 
 /-!
 # The `ZMod n`-module structure on Abelian groups whose elements have order dividing `n`
 -/
-
-assert_not_exists TwoSidedIdeal
 
 variable {n : ℕ} {M M₁ : Type*}
 
@@ -48,3 +48,38 @@ def toZModLinearMap (f : M →+ M₁) : M →ₗ[ZMod n] M₁ := { f with map_sm
 
 theorem toZModLinearMap_injective : Function.Injective <| toZModLinearMap n (M := M) (M₁ := M₁) :=
   fun _ _ h ↦ ext fun x ↦ congr($h x)
+
+@[simp]
+theorem coe_toZModLinearMap (f : M →+ M₁) : ⇑(f.toZModLinearMap n) = f := rfl
+
+end AddMonoidHom
+
+namespace AddSubgroup
+
+def toZModSubmodule : AddSubgroup M ≃o Submodule (ZMod n) M where
+  toFun S := { S with smul_mem' := fun c _ h ↦ ZMod.smul_mem (K := S) h c }
+  invFun := Submodule.toAddSubgroup
+  left_inv _ := rfl
+  right_inv _ := rfl
+  map_rel_iff' := Iff.rfl
+
+@[simp]
+theorem toZModSubmodule_symm :
+    ⇑((toZModSubmodule n).symm : _ ≃o AddSubgroup M) = Submodule.toAddSubgroup :=
+  rfl
+
+@[simp] lemma coe_toZModSubmodule (S : AddSubgroup M) : (toZModSubmodule n S : Set M) = S := rfl
+
+@[simp] lemma mem_toZModSubmodule {S : AddSubgroup M} : x ∈ toZModSubmodule n S ↔ x ∈ S := .rfl
+
+@[simp]
+theorem toZModSubmodule_toAddSubgroup (S : AddSubgroup M) :
+    (toZModSubmodule n S).toAddSubgroup = S :=
+  rfl
+
+@[simp]
+theorem _root_.Submodule.toAddSubgroup_toZModSubmodule (S : Submodule (ZMod n) M) :
+    toZModSubmodule n S.toAddSubgroup = S :=
+  rfl
+
+end AddSubgroup

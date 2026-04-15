@@ -1,8 +1,13 @@
 /-
 Extracted from CategoryTheory/Limits/Over.lean
-Genuine: 4 of 12 | Dissolved: 0 | Infrastructure: 8
+Genuine: 8 of 20 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Comma.Over
+import Mathlib.CategoryTheory.Limits.Comma
+import Mathlib.CategoryTheory.Limits.ConeCategory
+import Mathlib.CategoryTheory.Limits.Creates
+import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
 /-!
 # Limits and colimits in the over and under categories
@@ -29,27 +34,23 @@ variable {X : C}
 
 namespace CategoryTheory.Over
 
--- INSTANCE (free from Core): hasColimit_of_hasColimit_comp_forget
+instance hasColimit_of_hasColimit_comp_forget (F : J ⥤ Over X) [i : HasColimit (F ⋙ forget X)] :
+    HasColimit F :=
+  CostructuredArrow.hasColimit (i₁ := i)
 
--- INSTANCE (free from Core): [HasColimitsOfShape
+instance [HasColimitsOfShape J C] : HasColimitsOfShape J (Over X) where
 
--- INSTANCE (free from Core): [HasFiniteColimits
+instance [HasColimits C] : HasColimits (Over X) :=
+  ⟨inferInstance⟩
 
--- INSTANCE (free from Core): [HasColimits
-
--- INSTANCE (free from Core): [HasFiniteCoproducts
-
--- INSTANCE (free from Core): createsColimitsOfSize
+instance createsColimitsOfSize : CreatesColimitsOfSize.{w, w'} (forget X) :=
+  CostructuredArrow.createsColimitsOfSize
 
 example [HasColimits C] : PreservesColimits (forget X) :=
-
   inferInstance
 
 example : ReflectsColimits (forget X) :=
-
   inferInstance
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem epi_left_of_epi [HasPushouts C] {f g : Over X} (h : f ⟶ g) [Epi h] : Epi h.left :=
   CostructuredArrow.epi_left_of_epi _
@@ -57,9 +58,13 @@ theorem epi_left_of_epi [HasPushouts C] {f g : Over X} (h : f ⟶ g) [Epi h] : E
 theorem epi_iff_epi_left [HasPushouts C] {f g : Over X} (h : f ⟶ g) : Epi h ↔ Epi h.left :=
   CostructuredArrow.epi_iff_epi_left _
 
--- INSTANCE (free from Core): createsColimitsOfSizeMapCompForget
+instance createsColimitsOfSizeMapCompForget {Y : C} (f : X ⟶ Y) :
+    CreatesColimitsOfSize.{w, w'} (map f ⋙ forget Y) :=
+  show CreatesColimitsOfSize.{w, w'} (forget X) from inferInstance
 
--- INSTANCE (free from Core): preservesColimitsOfSize_map
+instance preservesColimitsOfSize_map [HasColimitsOfSize.{w, w'} C] {Y : C} (f : X ⟶ Y) :
+    PreservesColimitsOfSize.{w, w'} (map f) :=
+  preservesColimits_of_reflects_of_preserves (map f) (forget Y)
 
 def isColimitToOver {F : J ⥤ C} {c : Cocone F} (hc : IsColimit c) : IsColimit c.toOver :=
   isColimitOfReflects (forget c.pt) <| IsColimit.equivIsoColimit c.mapCoconeToOver.symm hc
@@ -67,3 +72,48 @@ def isColimitToOver {F : J ⥤ C} {c : Cocone F} (hc : IsColimit c) : IsColimit 
 def _root_.CategoryTheory.Limits.colimit.isColimitToOver (F : J ⥤ C) [HasColimit F] :
     IsColimit (colimit.toOver F) :=
   Over.isColimitToOver (colimit.isColimit F)
+
+end CategoryTheory.Over
+
+namespace CategoryTheory.Under
+
+instance hasLimit_of_hasLimit_comp_forget (F : J ⥤ Under X) [i : HasLimit (F ⋙ forget X)] :
+    HasLimit F :=
+  StructuredArrow.hasLimit (i₁ := i)
+
+instance [HasLimitsOfShape J C] : HasLimitsOfShape J (Under X) where
+
+instance [HasLimits C] : HasLimits (Under X) :=
+  ⟨inferInstance⟩
+
+theorem mono_right_of_mono [HasPullbacks C] {f g : Under X} (h : f ⟶ g) [Mono h] : Mono h.right :=
+  StructuredArrow.mono_right_of_mono _
+
+theorem mono_iff_mono_right [HasPullbacks C] {f g : Under X} (h : f ⟶ g) : Mono h ↔ Mono h.right :=
+  StructuredArrow.mono_iff_mono_right _
+
+instance createsLimitsOfSize : CreatesLimitsOfSize.{w, w'} (forget X) :=
+  StructuredArrow.createsLimitsOfSize
+
+example [HasLimits C] : PreservesLimits (forget X) :=
+  inferInstance
+
+example : ReflectsLimits (forget X) :=
+  inferInstance
+
+instance createLimitsOfSizeMapCompForget {Y : C} (f : X ⟶ Y) :
+    CreatesLimitsOfSize.{w, w'} (map f ⋙ forget X) :=
+  show CreatesLimitsOfSize.{w, w'} (forget Y) from inferInstance
+
+instance preservesLimitsOfSize_map [HasLimitsOfSize.{w, w'} C] {Y : C} (f : X ⟶ Y) :
+    PreservesLimitsOfSize.{w, w'} (map f) :=
+  preservesLimits_of_reflects_of_preserves (map f) (forget X)
+
+def isLimitToUnder {F : J ⥤ C} {c : Cone F} (hc : IsLimit c) : IsLimit c.toUnder :=
+  isLimitOfReflects (forget c.pt) (IsLimit.equivIsoLimit c.mapConeToUnder.symm hc)
+
+def _root_.CategoryTheory.Limits.limit.isLimitToOver (F : J ⥤ C) [HasLimit F] :
+    IsLimit (limit.toUnder F) :=
+  Under.isLimitToUnder (limit.isLimit F)
+
+end CategoryTheory.Under

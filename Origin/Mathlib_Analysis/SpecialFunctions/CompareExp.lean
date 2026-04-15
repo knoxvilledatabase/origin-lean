@@ -3,6 +3,9 @@ Extracted from Analysis/SpecialFunctions/CompareExp.lean
 Genuine: 17 of 18 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
+import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent
+import Mathlib.Analysis.Asymptotics.SpecificAsymptotics
 
 /-!
 # Growth estimates on `x ^ y` for complex `x`, `y`
@@ -74,13 +77,11 @@ theorem of_boundedUnder_im (hre : Tendsto re l atTop) (him_le : IsBoundedUnder (
 theorem tendsto_abs_re (hl : IsExpCmpFilter l) : Tendsto (fun z : ℂ => |z.re|) l atTop :=
   tendsto_abs_atTop_atTop.comp hl.tendsto_re
 
-theorem tendsto_norm (hl : IsExpCmpFilter l) : Tendsto norm l atTop :=
-  tendsto_atTop_mono abs_re_le_norm hl.tendsto_abs_re
+theorem tendsto_abs (hl : IsExpCmpFilter l) : Tendsto abs l atTop :=
+  tendsto_atTop_mono abs_re_le_abs hl.tendsto_abs_re
 
 theorem isLittleO_log_re_re (hl : IsExpCmpFilter l) : (fun z => Real.log z.re) =o[l] re :=
   Real.isLittleO_log_id_atTop.comp_tendsto hl.tendsto_re
-
-set_option linter.style.whitespace false in -- manual alignment is not recognised
 
 theorem isLittleO_im_pow_exp_re (hl : IsExpCmpFilter l) (n : ℕ) :
     (fun z : ℂ => z.im ^ n) =o[l] fun z => Real.exp z.re :=
@@ -97,17 +98,18 @@ theorem abs_im_pow_eventuallyLE_exp_re (hl : IsExpCmpFilter l) (n : ℕ) :
     (fun z : ℂ => |z.im| ^ n) ≤ᶠ[l] fun z => Real.exp z.re := by
   simpa using (hl.isLittleO_im_pow_exp_re n).bound zero_lt_one
 
-theorem isLittleO_log_norm_re (hl : IsExpCmpFilter l) : (fun z => Real.log ‖z‖) =o[l] re :=
+theorem isLittleO_log_abs_re (hl : IsExpCmpFilter l) : (fun z => Real.log (abs z)) =o[l] re :=
   calc
-    (fun z => Real.log ‖z‖) =O[l] fun z => Real.log (√2) + Real.log (max z.re |z.im|) :=
-      .of_norm_eventuallyLE <|
+    (fun z => Real.log (abs z)) =O[l] fun z => Real.log (√2) + Real.log (max z.re |z.im|) :=
+      IsBigO.of_bound 1 <|
         (hl.tendsto_re.eventually_ge_atTop 1).mono fun z hz => by
           have h2 : 0 < √2 := by simp
-          have hz' : 1 ≤ ‖z‖ := hz.trans (re_le_norm z)
+          have hz' : 1 ≤ abs z := hz.trans (re_le_abs z)
           have hm₀ : 0 < max z.re |z.im| := lt_max_iff.2 (Or.inl <| one_pos.trans_le hz)
-          simp only [Real.norm_of_nonneg (Real.log_nonneg hz')]
-          rw [← Real.log_mul, Real.log_le_log_iff, ← abs_of_nonneg (le_trans zero_le_one hz)]
-          exacts [norm_le_sqrt_two_mul_max z, one_pos.trans_le hz', mul_pos h2 hm₀, h2.ne', hm₀.ne']
+          rw [one_mul, Real.norm_eq_abs, _root_.abs_of_nonneg (Real.log_nonneg hz')]
+          refine le_trans ?_ (le_abs_self _)
+          rw [← Real.log_mul, Real.log_le_log_iff, ← _root_.abs_of_nonneg (le_trans zero_le_one hz)]
+          exacts [abs_le_sqrt_two_mul_max z, one_pos.trans_le hz', mul_pos h2 hm₀, h2.ne', hm₀.ne']
     _ =o[l] re :=
       IsLittleO.add (isLittleO_const_left.2 <| Or.inr <| hl.tendsto_abs_re) <|
         isLittleO_iff_nat_mul_le.2 fun n => by
@@ -127,25 +129,24 @@ theorem isLittleO_log_norm_re (hl : IsExpCmpFilter l) : (fun z => Real.log ‖z�
 -/
 
 lemma isTheta_cpow_exp_re_mul_log (hl : IsExpCmpFilter l) (a : ℂ) :
-    (· ^ a) =Θ[l] fun z ↦ Real.exp (re a * Real.log ‖z‖) :=
+    (· ^ a) =Θ[l] fun z ↦ Real.exp (re a * Real.log (abs z)) :=
   calc
-    (fun z => z ^ a) =Θ[l] (fun z : ℂ => ‖z‖ ^ re a) :=
+    (fun z => z ^ a) =Θ[l] (fun z : ℂ => (abs z ^ re a)) :=
       isTheta_cpow_const_rpow fun _ _ => hl.eventually_ne
-    _ =ᶠ[l] fun z => Real.exp (re a * Real.log ‖z‖) :=
-      (hl.eventually_ne.mono fun z hz => by simp
-        [Real.rpow_def_of_pos, norm_pos_iff.mpr hz, mul_comm])
+    _ =ᶠ[l] fun z => Real.exp (re a * Real.log (abs z)) :=
+      (hl.eventually_ne.mono fun z hz => by simp only [Real.rpow_def_of_pos, abs.pos hz, mul_comm])
 
 theorem isLittleO_cpow_exp (hl : IsExpCmpFilter l) (a : ℂ) {b : ℝ} (hb : 0 < b) :
     (fun z => z ^ a) =o[l] fun z => exp (b * z) :=
   calc
-    (fun z => z ^ a) =Θ[l] fun z => Real.exp (re a * Real.log ‖z‖) :=
+    (fun z => z ^ a) =Θ[l] fun z => Real.exp (re a * Real.log (abs z)) :=
       hl.isTheta_cpow_exp_re_mul_log a
     _ =o[l] fun z => exp (b * z) :=
       IsLittleO.of_norm_right <| by
-        simp only [norm_exp, re_ofReal_mul, Real.isLittleO_exp_comp_exp_comp]
+        simp only [norm_eq_abs, abs_exp, re_ofReal_mul, Real.isLittleO_exp_comp_exp_comp]
         refine (IsEquivalent.refl.sub_isLittleO ?_).symm.tendsto_atTop
           (hl.tendsto_re.const_mul_atTop hb)
-        exact (hl.isLittleO_log_norm_re.const_mul_left _).const_mul_right hb.ne'
+        exact (hl.isLittleO_log_abs_re.const_mul_left _).const_mul_right hb.ne'
 
 theorem isLittleO_cpow_mul_exp {b₁ b₂ : ℝ} (hl : IsExpCmpFilter l) (hb : b₁ < b₂) (a₁ a₂ : ℂ) :
     (fun z => z ^ a₁ * exp (b₁ * z)) =o[l] fun z => z ^ a₂ * exp (b₂ * z) :=

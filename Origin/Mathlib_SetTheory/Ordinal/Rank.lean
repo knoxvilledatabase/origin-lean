@@ -1,8 +1,9 @@
 /-
 Extracted from SetTheory/Ordinal/Rank.lean
-Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.SetTheory.Ordinal.Arithmetic
 
 /-!
 # Rank in a well-founded relation
@@ -78,3 +79,34 @@ theorem WellFoundedLT.rank_strictMono [Preorder α] [WellFoundedLT α] :
 theorem WellFoundedGT.rank_strictAnti [Preorder α] [WellFoundedGT α] :
     StrictAnti (IsWellFounded.rank (α := α) (· > ·)) :=
   fun _ _ a => IsWellFounded.rank_lt_of_rel a
+
+@[simp]
+theorem IsWellFounded.rank_eq_typein (r) [IsWellOrder α r] : rank r = Ordinal.typein r := by
+  classical
+  letI := linearOrderOfSTO r
+  ext a
+  exact InitialSeg.eq (⟨(OrderEmbedding.ofStrictMono _ WellFoundedLT.rank_strictMono).ltEmbedding,
+    fun a b h ↦ mem_range_rank_of_le h.le⟩) (Ordinal.typein r) a
+
+namespace WellFounded
+
+set_option linter.deprecated false
+
+variable {r : α → α → Prop} (hwf : WellFounded r)
+
+noncomputable def rank (a : α) : Ordinal.{u} :=
+  (hwf.apply a).rank
+
+theorem rank_eq : hwf.rank a = ⨆ b : { b // r b a }, Order.succ (hwf.rank b) :=
+  (hwf.apply a).rank_eq
+
+theorem rank_lt_of_rel (h : r a b) : hwf.rank a < hwf.rank b :=
+  Acc.rank_lt_of_rel _ h
+
+theorem rank_strictMono [Preorder α] [WellFoundedLT α] :
+    StrictMono (rank <| @wellFounded_lt α _ _) := fun _ _ => rank_lt_of_rel _
+
+theorem rank_strictAnti [Preorder α] [WellFoundedGT α] :
+    StrictAnti (rank <| @wellFounded_gt α _ _) := fun _ _ => rank_lt_of_rel wellFounded_gt
+
+end WellFounded

@@ -3,6 +3,8 @@ Extracted from Geometry/Manifold/ConformalGroupoid.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Conformal.NormedSpace
+import Mathlib.Geometry.Manifold.ChartedSpace
 
 /-!
 # Conformal Groupoid
@@ -11,7 +13,7 @@ In this file we define the groupoid of conformal maps on normed spaces.
 
 ## Main definitions
 
-* `conformalGroupoid`: the groupoid of conformal open partial homeomorphisms.
+* `conformalGroupoid`: the groupoid of conformal partial homeomorphisms.
 
 ## Tags
 

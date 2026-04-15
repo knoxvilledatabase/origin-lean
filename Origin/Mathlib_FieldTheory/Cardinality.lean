@@ -3,6 +3,13 @@ Extracted from FieldTheory/Cardinality.lean
 Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Field.ULift
+import Mathlib.Algebra.MvPolynomial.Cardinal
+import Mathlib.Data.Nat.Factorization.PrimePow
+import Mathlib.Data.Rat.Encodable
+import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.RingTheory.Localization.Cardinality
+import Mathlib.SetTheory.Cardinal.Divisibility
 
 /-!
 # Cardinality of Fields
@@ -25,9 +32,16 @@ open scoped Cardinal nonZeroDivisors
 
 universe u
 
-theorem Fintype.isPrimePow_card_of_field {α} [Fintype α] [Field α] : IsPrimePow ‖α‖ :=
+theorem Fintype.isPrimePow_card_of_field {α} [Fintype α] [Field α] : IsPrimePow ‖α‖ := by
   -- TODO: `Algebra` version of `CharP.exists`, of type `∀ p, Algebra (ZMod p) α`
-  FiniteField.isPrimePow_card α
+  cases' CharP.exists α with p _
+  haveI hp := Fact.mk (CharP.char_is_prime α p)
+  letI : Algebra (ZMod p) α := ZMod.algebra _ _
+  let b := IsNoetherian.finsetBasis (ZMod p) α
+  rw [Module.card_fintype b, ZMod.card, isPrimePow_pow_iff]
+  · exact hp.1.isPrimePow
+  rw [← Module.finrank_eq_card_basis b]
+  exact Module.finrank_pos.ne'
 
 theorem Fintype.nonempty_field_iff {α} [Fintype α] : Nonempty (Field α) ↔ IsPrimePow ‖α‖ := by
   refine ⟨fun ⟨h⟩ => Fintype.isPrimePow_card_of_field, ?_⟩
@@ -48,7 +62,7 @@ theorem Infinite.nonempty_field {α : Type u} [Infinite α] : Nonempty (Field α
 
 theorem Field.nonempty_iff {α : Type u} : Nonempty (Field α) ↔ IsPrimePow #α := by
   rw [Cardinal.isPrimePow_iff]
-  obtain h | h := fintypeOrInfinite α
+  cases' fintypeOrInfinite α with h h
   · simpa only [Cardinal.mk_fintype, Nat.cast_inj, exists_eq_left',
-      Cardinal.natCast_lt_aleph0.not_ge, false_or] using Fintype.nonempty_field_iff
+      (Cardinal.nat_lt_aleph0 _).not_le, false_or] using Fintype.nonempty_field_iff
   · simpa only [← Cardinal.infinite_iff, h, true_or, iff_true] using Infinite.nonempty_field

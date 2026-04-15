@@ -3,6 +3,7 @@ Extracted from Analysis/SpecialFunctions/PolynomialExp.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Exp
 
 /-!
 # Limits of `P(x) / e ^ x` for a polynomial `P`
@@ -24,8 +25,8 @@ namespace Polynomial
 
 theorem tendsto_div_exp_atTop (p : ℝ[X]) : Tendsto (fun x ↦ p.eval x / exp x) atTop (𝓝 0) := by
   induction p using Polynomial.induction_on' with
-  | monomial n c => simpa [exp_neg, div_eq_mul_inv, mul_assoc]
+  | h_monomial n c => simpa [exp_neg, div_eq_mul_inv, mul_assoc]
     using tendsto_const_nhds.mul (tendsto_pow_mul_exp_neg_atTop_nhds_zero n)
-  | add p q hp hq => simpa [add_div] using hp.add hq
+  | h_add p q hp hq => simpa [add_div] using hp.add hq
 
 end Polynomial

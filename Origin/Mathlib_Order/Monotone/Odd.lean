@@ -3,6 +3,8 @@ Extracted from Order/Monotone/Odd.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Order.Monotone.Union
+import Mathlib.Algebra.Order.Group.Instances
 
 /-!
 # Monotonicity of odd functions
@@ -14,8 +16,7 @@ prove versions of this lemma for `Antitone`, `StrictMono`, and `StrictAnti`.
 
 open Set
 
-variable {G H : Type*} [AddCommGroup G] [LinearOrder G] [IsOrderedAddMonoid G]
-  [AddCommGroup H] [PartialOrder H] [IsOrderedAddMonoid H]
+variable {G H : Type*} [LinearOrderedAddCommGroup G] [OrderedAddCommGroup H]
 
 theorem strictMono_of_odd_strictMonoOn_nonneg {f : G → H} (h₁ : ∀ x, f (-x) = -f x)
     (h₂ : StrictMonoOn f (Ici 0)) : StrictMono f := by
@@ -25,7 +26,7 @@ theorem strictMono_of_odd_strictMonoOn_nonneg {f : G → H} (h₁ : ∀ x, f (-x
 
 theorem strictAnti_of_odd_strictAntiOn_nonneg {f : G → H} (h₁ : ∀ x, f (-x) = -f x)
     (h₂ : StrictAntiOn f (Ici 0)) : StrictAnti f :=
-  strictMono_of_odd_strictMonoOn_nonneg (H := Hᵒᵈ) h₁ h₂
+  @strictMono_of_odd_strictMonoOn_nonneg G Hᵒᵈ _ _ _ h₁ h₂
 
 theorem monotone_of_odd_of_monotoneOn_nonneg {f : G → H} (h₁ : ∀ x, f (-x) = -f x)
     (h₂ : MonotoneOn f (Ici 0)) : Monotone f := by
@@ -35,4 +36,4 @@ theorem monotone_of_odd_of_monotoneOn_nonneg {f : G → H} (h₁ : ∀ x, f (-x)
 
 theorem antitone_of_odd_of_monotoneOn_nonneg {f : G → H} (h₁ : ∀ x, f (-x) = -f x)
     (h₂ : AntitoneOn f (Ici 0)) : Antitone f :=
-  monotone_of_odd_of_monotoneOn_nonneg (H := Hᵒᵈ) h₁ h₂
+  @monotone_of_odd_of_monotoneOn_nonneg G Hᵒᵈ _ _ _ h₁ h₂

@@ -1,15 +1,18 @@
 /-
 Extracted from RingTheory/Localization/Integer.lean
-Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
+Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Group.Pointwise.Set.Basic
+import Mathlib.Algebra.Ring.Subsemiring.Basic
+import Mathlib.RingTheory.Localization.Defs
 
 /-!
 # Integer elements of a localization
 
 ## Main definitions
 
-* `IsLocalization.IsInteger` is a predicate stating that `x : S` is in the image of `R`
+ * `IsLocalization.IsInteger` is a predicate stating that `x : S` is in the image of `R`
 
 ## Implementation notes
 
@@ -27,6 +30,8 @@ variable [Algebra R S] {P : Type*} [CommSemiring P]
 open Function
 
 namespace IsLocalization
+
+section
 
 variable (R)
 
@@ -69,12 +74,12 @@ theorem exist_integer_multiples {ι : Type*} (s : Finset ι) (f : ι → S) :
   haveI := Classical.propDecidable
   refine ⟨∏ i ∈ s, (sec M (f i)).2, fun i hi => ⟨?_, ?_⟩⟩
   · exact (∏ j ∈ s.erase i, (sec M (f j)).2) * (sec M (f i)).1
-  rw [map_mul, sec_spec', ← mul_assoc, ← (algebraMap R S).map_mul, ← Algebra.smul_def]
+  rw [RingHom.map_mul, sec_spec', ← mul_assoc, ← (algebraMap R S).map_mul, ← Algebra.smul_def]
   congr 2
   refine _root_.trans ?_ (map_prod (Submonoid.subtype M) _ _).symm
-  rw [mul_comm, Submonoid.coe_finset_prod,
+  rw [mul_comm,Submonoid.coe_finset_prod,
     -- Porting note: explicitly supplied `f`
-    ← Finset.prod_insert (f := fun i => ((sec M (f i)).snd : R)) (s.notMem_erase i),
+    ← Finset.prod_insert (f := fun i => ((sec M (f i)).snd : R)) (s.not_mem_erase i),
     Finset.insert_erase hi]
   rfl
 
@@ -93,3 +98,30 @@ noncomputable def commonDenom {ι : Type*} (s : Finset ι) (f : ι → S) : M :=
 
 noncomputable def integerMultiple {ι : Type*} (s : Finset ι) (f : ι → S) (i : s) : R :=
   ((exist_integer_multiples M s f).choose_spec i i.prop).choose
+
+@[simp]
+theorem map_integerMultiple {ι : Type*} (s : Finset ι) (f : ι → S) (i : s) :
+    algebraMap R S (integerMultiple M s f i) = commonDenom M s f • f i :=
+  ((exist_integer_multiples M s f).choose_spec _ i.prop).choose_spec
+
+noncomputable def commonDenomOfFinset (s : Finset S) : M :=
+  commonDenom M s id
+
+noncomputable def finsetIntegerMultiple [DecidableEq R] (s : Finset S) : Finset R :=
+  s.attach.image fun t => integerMultiple M s id t
+
+open Pointwise
+
+theorem finsetIntegerMultiple_image [DecidableEq R] (s : Finset S) :
+    algebraMap R S '' finsetIntegerMultiple M s = commonDenomOfFinset M s • (s : Set S) := by
+  delta finsetIntegerMultiple commonDenom
+  rw [Finset.coe_image]
+  ext
+  constructor
+  · rintro ⟨_, ⟨x, -, rfl⟩, rfl⟩
+    rw [map_integerMultiple]
+    exact Set.mem_image_of_mem _ x.prop
+  · rintro ⟨x, hx, rfl⟩
+    exact ⟨_, ⟨⟨x, hx⟩, s.mem_attach _, rfl⟩, map_integerMultiple M s id _⟩
+
+end IsLocalization

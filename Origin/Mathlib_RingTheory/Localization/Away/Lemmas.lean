@@ -3,6 +3,8 @@ Extracted from RingTheory/Localization/Away/Lemmas.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Localization.Away.Basic
+import Mathlib.RingTheory.Localization.Submodule
 
 /-!
 # More lemmas on localization away
@@ -49,7 +51,7 @@ lemma span_range_mulNumerator_eq_top {s : Set R}
   obtain ⟨y, hy, ⟨-, m, rfl⟩, hyz⟩ := h₂
   rw [IsLocalization.eq] at hyz
   obtain ⟨⟨-, n, rfl⟩, hc⟩ := hyz
-  simp only [OneMemClass.coe_one, one_mul, mul_one] at hc
+  simp only [← mul_assoc, OneMemClass.coe_one, one_mul, mul_one] at hc
   use n + m
   simpa [pow_add, hc] using Ideal.mul_mem_left _ _ hy
 

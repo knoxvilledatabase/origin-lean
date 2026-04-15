@@ -3,6 +3,7 @@ Extracted from CategoryTheory/Limits/Final/ParallelPair.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Final
 
 /-!
 
@@ -18,7 +19,7 @@ parallel morphisms out of `X` factor through the parallel pair `f`, `g`
 
 namespace CategoryTheory.Limits
 
-variable {C : Type*} [Category* C]
+variable {C : Type*} [Category C]
 
 open WalkingParallelPair WalkingParallelPairHom CostructuredArrow
 
@@ -33,7 +34,7 @@ lemma parallelPair_initial_mk' {X Y : C} (f g : X ⟶ Y)
       ⟨mk (Y := zero) (h₁ Z).some⟩
     have : ∀ (x : CostructuredArrow (parallelPair f g) Z), Zigzag x
       (mk (Y := zero) (h₁ Z).some) := by
-        rintro ⟨(_ | _), ⟨⟩, φ⟩
+        rintro ⟨(_|_), ⟨⟩, φ⟩
         · apply h₂
         · refine Zigzag.trans ?_ (h₂ (f ≫ φ) _)
           exact Zigzag.of_inv (homMk left)

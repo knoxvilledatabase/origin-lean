@@ -3,6 +3,8 @@ Extracted from Analysis/LocallyConvex/StrongTopology.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.Algebra.Module.StrongTopology
+import Mathlib.Topology.Algebra.Module.LocallyConvex
 
 /-!
 # Local convexity of the strong topology
@@ -28,7 +30,7 @@ open Topology UniformConvergence
 variable {R 𝕜₁ 𝕜₂ E F : Type*}
 
 variable [AddCommGroup E] [TopologicalSpace E] [AddCommGroup F] [TopologicalSpace F]
-  [IsTopologicalAddGroup F]
+  [TopologicalAddGroup F]
 
 section General
 
@@ -36,7 +38,7 @@ namespace UniformConvergenceCLM
 
 variable (R)
 
-variable [Semiring R] [PartialOrder R]
+variable [OrderedSemiring R]
 
 variable [NormedField 𝕜₁] [NormedField 𝕜₂] [Module 𝕜₁ E] [Module 𝕜₂ F] {σ : 𝕜₁ →+* 𝕜₂}
 
@@ -59,13 +61,15 @@ section BoundedSets
 
 namespace ContinuousLinearMap
 
-variable [Semiring R] [PartialOrder R]
+variable [OrderedSemiring R]
 
 variable [NormedField 𝕜₁] [NormedField 𝕜₂] [Module 𝕜₁ E] [Module 𝕜₂ F] {σ : 𝕜₁ →+* 𝕜₂}
 
 variable [Module R F] [ContinuousConstSMul R F] [LocallyConvexSpace R F] [SMulCommClass 𝕜₂ R F]
 
--- INSTANCE (free from Core): instLocallyConvexSpace
+instance instLocallyConvexSpace : LocallyConvexSpace R (E →SL[σ] F) :=
+  UniformConvergenceCLM.locallyConvexSpace R _ ⟨∅, Bornology.isVonNBounded_empty 𝕜₁ E⟩
+    (directedOn_of_sup_mem fun _ _ => Bornology.IsVonNBounded.union)
 
 end ContinuousLinearMap
 

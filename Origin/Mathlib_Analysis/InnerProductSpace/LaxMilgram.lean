@@ -1,8 +1,9 @@
 /-
 Extracted from Analysis/InnerProductSpace/LaxMilgram.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.InnerProductSpace.Dual
 
 /-!
 # The Lax-Milgram Theorem
@@ -50,7 +51,7 @@ theorem bounded_below (coercive : IsCoercive B) : ∃ C, 0 < C ∧ ∀ v, C * �
   refine ⟨C, C_ge_0, ?_⟩
   intro v
   by_cases h : 0 < ‖v‖
-  · refine (mul_le_mul_iff_left₀ h).mp ?_
+  · refine (mul_le_mul_right h).mp ?_
     calc
       C * ‖v‖ * ‖v‖ ≤ B v v := coercivity v
       _ = ⟪B♯ v, v⟫_ℝ := (continuousLinearMapOfBilin_apply B v v).symm
@@ -66,18 +67,18 @@ theorem antilipschitz (coercive : IsCoercive B) : ∃ C : ℝ≥0, 0 < C ∧ Ant
     inv_mul_le_iff₀ (inv_pos.mpr C_pos)]
   simpa using below_bound
 
-theorem ker_eq_bot (coercive : IsCoercive B) : B♯.ker = ⊥ := by
-  rw [LinearMap.ker_eq_bot]
+theorem ker_eq_bot (coercive : IsCoercive B) : ker B♯ = ⊥ := by
+  rw [LinearMapClass.ker_eq_bot]
   rcases coercive.antilipschitz with ⟨_, _, antilipschitz⟩
   exact antilipschitz.injective
 
-theorem isClosed_range (coercive : IsCoercive B) : IsClosed (B♯.range : Set V) := by
+theorem isClosed_range (coercive : IsCoercive B) : IsClosed (range B♯ : Set V) := by
   rcases coercive.antilipschitz with ⟨_, _, antilipschitz⟩
   exact antilipschitz.isClosed_range B♯.uniformContinuous
 
-theorem range_eq_top (coercive : IsCoercive B) : B♯.range = ⊤ := by
+theorem range_eq_top (coercive : IsCoercive B) : range B♯ = ⊤ := by
   haveI := coercive.isClosed_range.completeSpace_coe
-  rw [← B♯.range.orthogonal_orthogonal]
+  rw [← (range B♯).orthogonal_orthogonal]
   rw [Submodule.eq_top_iff']
   intro v w mem_w_orthogonal
   rcases coercive with ⟨C, C_pos, coercivity⟩
@@ -94,3 +95,14 @@ theorem range_eq_top (coercive : IsCoercive B) : B♯.range = ⊤ := by
 
 def continuousLinearEquivOfBilin (coercive : IsCoercive B) : V ≃L[ℝ] V :=
   ContinuousLinearEquiv.ofBijective B♯ coercive.ker_eq_bot coercive.range_eq_top
+
+@[simp]
+theorem continuousLinearEquivOfBilin_apply (coercive : IsCoercive B) (v w : V) :
+    ⟪coercive.continuousLinearEquivOfBilin v, w⟫_ℝ = B v w :=
+  continuousLinearMapOfBilin_apply B v w
+
+theorem unique_continuousLinearEquivOfBilin (coercive : IsCoercive B) {v f : V}
+    (is_lax_milgram : ∀ w, ⟪f, w⟫_ℝ = B v w) : f = coercive.continuousLinearEquivOfBilin v :=
+  unique_continuousLinearMapOfBilin B is_lax_milgram
+
+end IsCoercive

@@ -1,8 +1,12 @@
 /-
 Extracted from Topology/MetricSpace/Basic.lean
-Genuine: 10 of 13 | Dissolved: 0 | Infrastructure: 3
+Genuine: 11 of 27 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
+import Mathlib.Topology.MetricSpace.Pseudo.Basic
+import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
+import Mathlib.Topology.MetricSpace.Pseudo.Pi
+import Mathlib.Topology.MetricSpace.Defs
 
 /-!
 # Basic properties of metric spaces, and instances.
@@ -25,20 +29,24 @@ namespace Metric
 
 variable {x : γ} {s : Set γ}
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) _root_.MetricSpace.instT0Space : T0Space γ where
+  t0 _ _ h := eq_of_dist_eq_zero <| Metric.inseparable_iff.1 h
 
-theorem isUniformEmbedding_iff' [PseudoMetricSpace β] {f : γ → β} :
+theorem isUniformEmbedding_iff' [MetricSpace β] {f : γ → β} :
     IsUniformEmbedding f ↔
       (∀ ε > 0, ∃ δ > 0, ∀ {a b : γ}, dist a b < δ → dist (f a) (f b) < ε) ∧
         ∀ δ > 0, ∃ ε > 0, ∀ {a b : γ}, dist (f a) (f b) < ε → dist a b < δ := by
   rw [isUniformEmbedding_iff_isUniformInducing, isUniformInducing_iff, uniformContinuous_iff]
+
+alias uniformEmbedding_iff' := isUniformEmbedding_iff'
 
 abbrev _root_.MetricSpace.ofT0PseudoMetricSpace (α : Type*) [PseudoMetricSpace α] [T0Space α] :
     MetricSpace α where
   toPseudoMetricSpace := ‹_›
   eq_of_dist_eq_zero hdist := (Metric.inseparable_iff.2 hdist).eq
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) _root_.MetricSpace.toEMetricSpace : EMetricSpace γ :=
+  .ofT0PseudoEMetricSpace γ
 
 theorem isClosed_of_pairwise_le_dist {s : Set γ} {ε : ℝ} (hε : 0 < ε)
     (hs : s.Pairwise fun x y => ε ≤ dist x y) : IsClosed s :=
@@ -49,22 +57,26 @@ theorem isClosedEmbedding_of_pairwise_le_dist {α : Type*} [TopologicalSpace α]
     IsClosedEmbedding f :=
   isClosedEmbedding_of_spaced_out (dist_mem_uniformity hε) <| by simpa using hf
 
+alias closedEmbedding_of_pairwise_le_dist := isClosedEmbedding_of_pairwise_le_dist
+
 theorem isUniformEmbedding_bot_of_pairwise_le_dist {β : Type*} {ε : ℝ} (hε : 0 < ε) {f : β → α}
     (hf : Pairwise fun x y => ε ≤ dist (f x) (f y)) :
     @IsUniformEmbedding _ _ ⊥ (by infer_instance) f :=
   isUniformEmbedding_of_spaced_out (dist_mem_uniformity hε) <| by simpa using hf
 
+alias uniformEmbedding_bot_of_pairwise_le_dist := isUniformEmbedding_bot_of_pairwise_le_dist
+
 end Metric
 
 abbrev EMetricSpace.toMetricSpaceOfDist {α : Type u} [EMetricSpace α] (dist : α → α → ℝ)
-    (dist_nonneg : ∀ x y, 0 ≤ dist x y) (h : ∀ x y, edist x y = .ofReal (dist x y)) :
+    (edist_ne_top : ∀ x y : α, edist x y ≠ ⊤) (h : ∀ x y, dist x y = ENNReal.toReal (edist x y)) :
     MetricSpace α :=
-  letI := PseudoEMetricSpace.toPseudoMetricSpaceOfDist dist dist_nonneg h
-  MetricSpace.ofT0PseudoMetricSpace _
+  @MetricSpace.ofT0PseudoMetricSpace _
+    (PseudoEMetricSpace.toPseudoMetricSpaceOfDist dist edist_ne_top h) _
 
-abbrev EMetricSpace.toMetricSpace {α : Type u} [EMetricSpace α] (h : ∀ x y : α, edist x y ≠ ⊤) :
+def EMetricSpace.toMetricSpace {α : Type u} [EMetricSpace α] (h : ∀ x y : α, edist x y ≠ ⊤) :
     MetricSpace α :=
-  EMetricSpace.toMetricSpaceOfDist (ENNReal.toReal <| edist · ·) (by simp) (by simp [h])
+  EMetricSpace.toMetricSpaceOfDist (fun x y => ENNReal.toReal (edist x y)) h fun _ _ => rfl
 
 abbrev MetricSpace.induced {γ β} (f : γ → β) (hf : Function.Injective f) (m : MetricSpace β) :
     MetricSpace γ :=
@@ -75,8 +87,116 @@ abbrev IsUniformEmbedding.comapMetricSpace {α β} [UniformSpace α] [m : Metric
     (h : IsUniformEmbedding f) : MetricSpace α :=
   .replaceUniformity (.induced f h.injective m) h.comap_uniformity.symm
 
+alias UniformEmbedding.comapMetricSpace := IsUniformEmbedding.comapMetricSpace
+
 abbrev Topology.IsEmbedding.comapMetricSpace {α β} [TopologicalSpace α] [m : MetricSpace β]
     (f : α → β) (h : IsEmbedding f) : MetricSpace α :=
   .replaceTopology (.induced f h.injective m) h.eq_induced
 
--- INSTANCE (free from Core): Subtype.metricSpace
+alias Embedding.comapMetricSpace := IsEmbedding.comapMetricSpace
+
+instance Subtype.metricSpace {α : Type*} {p : α → Prop} [MetricSpace α] :
+    MetricSpace (Subtype p) :=
+  .induced Subtype.val Subtype.coe_injective ‹_›
+
+@[to_additive]
+instance {α : Type*} [MetricSpace α] : MetricSpace αᵐᵒᵖ :=
+  MetricSpace.induced MulOpposite.unop MulOpposite.unop_injective ‹_›
+
+section Real
+
+instance Real.metricSpace : MetricSpace ℝ := .ofT0PseudoMetricSpace ℝ
+
+end Real
+
+section NNReal
+
+instance : MetricSpace ℝ≥0 :=
+  Subtype.metricSpace
+
+end NNReal
+
+instance [MetricSpace β] : MetricSpace (ULift β) :=
+  MetricSpace.induced ULift.down ULift.down_injective ‹_›
+
+section Prod
+
+instance Prod.metricSpaceMax [MetricSpace β] : MetricSpace (γ × β) :=
+  .ofT0PseudoMetricSpace _
+
+end Prod
+
+section Pi
+
+open Finset
+
+variable {π : β → Type*} [Fintype β] [∀ b, MetricSpace (π b)]
+
+instance metricSpacePi : MetricSpace (∀ b, π b) := .ofT0PseudoMetricSpace _
+
+end Pi
+
+namespace Metric
+
+section SecondCountable
+
+open TopologicalSpace
+
+theorem secondCountable_of_countable_discretization {α : Type u} [MetricSpace α]
+    (H : ∀ ε > (0 : ℝ), ∃ (β : Type*) (_ : Encodable β) (F : α → β),
+      ∀ x y, F x = F y → dist x y ≤ ε) :
+    SecondCountableTopology α := by
+  refine secondCountable_of_almost_dense_set fun ε ε0 => ?_
+  rcases H ε ε0 with ⟨β, fβ, F, hF⟩
+  let Finv := rangeSplitting F
+  refine ⟨range Finv, ⟨countable_range _, fun x => ?_⟩⟩
+  let x' := Finv ⟨F x, mem_range_self _⟩
+  have : F x' = F x := apply_rangeSplitting F _
+  exact ⟨x', mem_range_self _, hF _ _ this.symm⟩
+
+end SecondCountable
+
+end Metric
+
+section EqRel
+
+instance SeparationQuotient.instDist {α : Type u} [PseudoMetricSpace α] :
+    Dist (SeparationQuotient α) where
+  dist := lift₂ dist fun x y x' y' hx hy ↦ by rw [dist_edist, dist_edist, ← edist_mk x,
+    ← edist_mk x', mk_eq_mk.2 hx, mk_eq_mk.2 hy]
+
+theorem SeparationQuotient.dist_mk {α : Type u} [PseudoMetricSpace α] (p q : α) :
+    dist (mk p) (mk q) = dist p q :=
+  rfl
+
+instance SeparationQuotient.instMetricSpace {α : Type u} [PseudoMetricSpace α] :
+    MetricSpace (SeparationQuotient α) :=
+  EMetricSpace.toMetricSpaceOfDist dist (surjective_mk.forall₂.2 edist_ne_top) <|
+    surjective_mk.forall₂.2 dist_edist
+
+end EqRel
+
+/-!
+### `Additive`, `Multiplicative`
+
+The distance on those type synonyms is inherited without change.
+-/
+
+open Additive Multiplicative
+
+instance [MetricSpace X] : MetricSpace (Additive X) := ‹MetricSpace X›
+
+instance [MetricSpace X] : MetricSpace (Multiplicative X) := ‹MetricSpace X›
+
+instance MulOpposite.instMetricSpace [MetricSpace X] : MetricSpace Xᵐᵒᵖ :=
+  MetricSpace.induced unop unop_injective ‹_›
+
+/-!
+### Order dual
+
+The distance on this type synonym is inherited without change.
+-/
+
+open OrderDual
+
+instance [MetricSpace X] : MetricSpace Xᵒᵈ := ‹MetricSpace X›

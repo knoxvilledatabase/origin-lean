@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Finsupp.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 of 8 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Finsupp.Multiset
+import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
 
 /-!
 # Factors as finsupp
@@ -17,7 +19,7 @@ local infixl:50 " ~ᵤ " => Associated
 
 section Finsupp
 
-variable [CommMonoidWithZero α] [UniqueFactorizationMonoid α]
+variable [CancelCommMonoidWithZero α] [UniqueFactorizationMonoid α]
 
 variable [NormalizationMonoid α] [DecidableEq α]
 
@@ -28,3 +30,24 @@ noncomputable def factorization (n : α) : α →₀ ℕ :=
 
 theorem factorization_eq_count {n p : α} :
     factorization n p = Multiset.count p (normalizedFactors n) := by simp [factorization]
+
+@[simp]
+theorem factorization_zero : factorization (0 : α) = 0 := by simp [factorization]
+
+@[simp]
+theorem factorization_one : factorization (1 : α) = 0 := by simp [factorization]
+
+@[simp]
+theorem support_factorization {n : α} :
+    (factorization n).support = (normalizedFactors n).toFinset := by
+  simp [factorization, Multiset.toFinsupp_support]
+
+-- DISSOLVED: factorization_mul
+
+theorem factorization_pow {x : α} {n : ℕ} : factorization (x ^ n) = n • factorization x := by
+  ext
+  simp [factorization]
+
+-- DISSOLVED: associated_of_factorization_eq
+
+end Finsupp

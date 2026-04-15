@@ -42,6 +42,10 @@ variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] (P : R[X]) {x : S
 def newtonMap (x : S) : S :=
   x - (Ring.inverse <| aeval x (derivative P)) * aeval x P
 
+theorem newtonMap_apply :
+    P.newtonMap x = x - (Ring.inverse <| aeval x (derivative P)) * (aeval x P) :=
+  rfl
+
 variable {P}
 
 theorem newtonMap_apply_of_isUnit (h : IsUnit <| aeval x (derivative P)) :

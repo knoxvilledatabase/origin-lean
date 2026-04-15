@@ -1,8 +1,10 @@
 /-
 Extracted from Order/Filter/AtTopBot/Field.lean
-Genuine: 43 of 47 | Dissolved: 4 | Infrastructure: 0
+Genuine: 42 of 46 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Field.Defs
+import Mathlib.Order.Filter.AtTopBot.Ring
 
 /-!
 # Convergence to ±infinity in linear ordered (semi)fields
@@ -14,8 +16,7 @@ variable {α β : Type*}
 
 section LinearOrderedSemifield
 
-variable [Semifield α] [LinearOrder α] [IsStrictOrderedRing α]
-  {l : Filter β} {f : β → α} {r c : α} {n : ℕ}
+variable [LinearOrderedSemifield α] {l : Filter β} {f : β → α} {r c : α} {n : ℕ}
 
 /-!
 ### Multiplication by constant: iff lemmas
@@ -23,8 +24,8 @@ variable [Semifield α] [LinearOrder α] [IsStrictOrderedRing α]
 
 theorem tendsto_const_mul_atTop_of_pos (hr : 0 < r) :
     Tendsto (fun x => r * f x) l atTop ↔ Tendsto f l atTop :=
-  ⟨fun h => h.atTop_of_const_mul₀ hr, fun h =>
-    Tendsto.atTop_of_const_mul₀ (inv_pos.2 hr) <| by simpa only [inv_mul_cancel_left₀ hr.ne'] ⟩
+  ⟨fun h => h.atTop_of_const_mul hr, fun h =>
+    Tendsto.atTop_of_const_mul (inv_pos.2 hr) <| by simpa only [inv_mul_cancel_left₀ hr.ne'] ⟩
 
 theorem tendsto_mul_const_atTop_of_pos (hr : 0 < r) :
     Tendsto (fun x => f x * r) l atTop ↔ Tendsto f l atTop := by
@@ -38,7 +39,7 @@ theorem tendsto_const_mul_atTop_iff_pos [NeBot l] (h : Tendsto f l atTop) :
     Tendsto (fun x => r * f x) l atTop ↔ 0 < r := by
   refine ⟨fun hrf => not_le.mp fun hr => ?_, fun hr => (tendsto_const_mul_atTop_of_pos hr).mpr h⟩
   rcases ((h.eventually_ge_atTop 0).and (hrf.eventually_gt_atTop 0)).exists with ⟨x, hx, hrx⟩
-  exact (mul_nonpos_of_nonpos_of_nonneg hr hx).not_gt hrx
+  exact (mul_nonpos_of_nonpos_of_nonneg hr hx).not_lt hrx
 
 theorem tendsto_mul_const_atTop_iff_pos [NeBot l] (h : Tendsto f l atTop) :
     Tendsto (fun x => f x * r) l atTop ↔ 0 < r := by
@@ -65,19 +66,13 @@ theorem Tendsto.atTop_div_const (hr : 0 < r) (hf : Tendsto f l atTop) :
 -- DISSOLVED: tendsto_const_mul_pow_atTop_iff
 
 lemma tendsto_zpow_atTop_atTop {n : ℤ} (hn : 0 < n) : Tendsto (fun x : α ↦ x ^ n) atTop atTop := by
-  lift n to ℕ using hn.le; simp [(Int.natCast_pos.mp hn).ne']
-
-theorem map_div_atTop_eq (k : α) (hk : 0 < k) : map (fun a => a / k) atTop = atTop :=
-  map_atTop_eq_of_gc (fun b => k * b) 1 (fun _ _ h => div_le_div_of_nonneg_right h (le_of_lt hk))
-    (fun a b _ => (by rw [div_le_iff₀' hk]))
-    fun b _ => (by rw [mul_div_assoc, mul_div_cancel₀]; exact ne_of_gt hk)
+  lift n to ℕ+ using hn; simp
 
 end LinearOrderedSemifield
 
 section LinearOrderedField
 
-variable [Field α] [LinearOrder α] [IsStrictOrderedRing α]
-  {l : Filter β} {f : β → α} {r : α}
+variable [LinearOrderedField α] {l : Filter β} {f : β → α} {r : α}
 
 theorem tendsto_const_mul_atBot_of_pos (hr : 0 < r) :
     Tendsto (fun x => r * f x) l atBot ↔ Tendsto f l atBot := by
@@ -118,9 +113,9 @@ lemma tendsto_div_const_atBot_of_neg (hr : r < 0) :
 theorem tendsto_const_mul_atTop_iff [NeBot l] :
     Tendsto (fun x => r * f x) l atTop ↔ 0 < r ∧ Tendsto f l atTop ∨ r < 0 ∧ Tendsto f l atBot := by
   rcases lt_trichotomy r 0 with (hr | rfl | hr)
-  · simp [hr, hr.not_gt, tendsto_const_mul_atTop_of_neg]
+  · simp [hr, hr.not_lt, tendsto_const_mul_atTop_of_neg]
   · simp [not_tendsto_const_atTop]
-  · simp [hr, hr.not_gt, tendsto_const_mul_atTop_of_pos]
+  · simp [hr, hr.not_lt, tendsto_const_mul_atTop_of_pos]
 
 theorem tendsto_mul_const_atTop_iff [NeBot l] :
     Tendsto (fun x => f x * r) l atTop ↔ 0 < r ∧ Tendsto f l atTop ∨ r < 0 ∧ Tendsto f l atBot := by
@@ -211,6 +206,14 @@ theorem Tendsto.atBot_mul_const_of_neg (hr : r < 0) (hf : Tendsto f l atBot) :
 -- DISSOLVED: tendsto_neg_const_mul_pow_atTop
 
 -- DISSOLVED: tendsto_const_mul_pow_atBot_iff
+
+alias Tendsto.neg_const_mul_atTop := Tendsto.const_mul_atTop_of_neg
+
+alias Tendsto.atTop_mul_neg_const := Tendsto.atTop_mul_const_of_neg
+
+alias Tendsto.neg_const_mul_atBot := Tendsto.const_mul_atBot_of_neg
+
+alias Tendsto.atBot_mul_neg_const := Tendsto.atBot_mul_const_of_neg
 
 end LinearOrderedField
 

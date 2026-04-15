@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Localization/Opposite.lean
-Genuine: 1 of 4 | Dissolved: 0 | Infrastructure: 3
+Genuine: 3 of 5 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Localization.Predicate
 
 /-!
 
@@ -19,11 +20,11 @@ open CategoryTheory CategoryTheory.Category
 
 namespace CategoryTheory
 
-variable {C D : Type*} [Category* C] [Category* D] {L : C ⥤ D} {W : MorphismProperty C}
+variable {C D : Type*} [Category C] [Category D] {L : C ⥤ D} {W : MorphismProperty C}
 
 namespace Localization
 
-def StrictUniversalPropertyFixedTarget.op {E : Type*} [Category* E]
+def StrictUniversalPropertyFixedTarget.op {E : Type*} [Category E]
     (h : StrictUniversalPropertyFixedTarget L W Eᵒᵖ) :
     StrictUniversalPropertyFixedTarget L.op W.op E where
   inverts := h.inverts.op
@@ -36,7 +37,9 @@ def StrictUniversalPropertyFixedTarget.op {E : Type*} [Category* E]
     have eq' := congr_arg Functor.rightOp eq
     exact h.uniq _ _ eq'
 
--- INSTANCE (free from Core): isLocalization_op
+instance isLocalization_op : W.Q.op.IsLocalization W.op :=
+  Functor.IsLocalization.mk' W.Q.op W.op (strictUniversalPropertyFixedTargetQ W _).op
+    (strictUniversalPropertyFixedTargetQ W _).op
 
 end Localization
 
@@ -46,6 +49,21 @@ variable [L.IsLocalization W]
 
 namespace Functor
 
--- INSTANCE (free from Core): IsLocalization.op
+instance IsLocalization.op : L.op.IsLocalization W.op :=
+  IsLocalization.of_equivalence_target W.Q.op W.op L.op (Localization.equivalenceFromModel L W).op
+    (NatIso.op (Localization.qCompEquivalenceFromModelFunctorIso L W).symm)
 
--- INSTANCE (free from Core): IsLocalization.unop
+end Functor
+
+namespace Localization
+
+lemma isoOfHom_unop  {X Y : Cᵒᵖ} (w : X ⟶ Y) (hw : W.op w) :
+    (isoOfHom L.op W.op w hw).unop = (isoOfHom L W w.unop hw) := by ext; rfl
+
+lemma isoOfHom_op_inv {X Y : Cᵒᵖ} (w : X ⟶ Y) (hw : W.op w) :
+    (isoOfHom L.op W.op w hw).inv = (isoOfHom L W w.unop hw).inv.op :=
+  congr_arg Quiver.Hom.op (congr_arg Iso.inv (isoOfHom_unop L W w hw))
+
+end Localization
+
+end CategoryTheory

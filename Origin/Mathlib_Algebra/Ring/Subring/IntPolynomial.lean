@@ -1,23 +1,27 @@
 /-
 Extracted from Algebra/Ring/Subring/IntPolynomial.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 6 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.AlgebraMap
 
 /-!
 # Polynomials over subrings.
 
 Given a field `K` with a subring `R`, in this file we construct a map from polynomials in `K[X]`
 with coefficients in `R` to `R[X]`. We provide several lemmas to deal with
-coefficients, degree, and evaluation of `Polynomial.int`.
+coefficients, degree, and evaluation of `intPolynomial`.
 This is useful when dealing with integral elements in an extension of fields.
 
-## Main Definitions
-* `Polynomial.int` : given a polynomial `P` in `K[X]` whose coefficients all belong to a subring `R`
-  of the field `K`, `P.int R` is the corresponding polynomial in `R[X]`.
+# Main Definitions
+* `Polynomial.int` : given a polynomial `P`. in `K[X]` with coefficients in a field `K` with a
+  subring `R` such that all coefficients belong to `R`, `P.int R` is the corresponding polynomial
+  in `R[X]`.
 -/
 
 variable {K : Type*} [Field K] (R : Subring K)
+
+open Polynomial
 
 open scoped Polynomial
 
@@ -31,3 +35,26 @@ def Polynomial.int (P : K[X]) (hP : ∀ n : ℕ, P.coeff n ∈ R) : R[X] where
 namespace Polynomial
 
 variable (P : K[X]) (hP : ∀ n : ℕ, P.coeff n ∈ R)
+
+@[simp]
+theorem int_coeff_eq  (n : ℕ) : ↑((P.int R hP).coeff n) = P.coeff n := rfl
+
+@[simp]
+theorem int_leadingCoeff_eq : ↑(P.int R hP).leadingCoeff = P.leadingCoeff := rfl
+
+@[simp]
+theorem int_monic_iff : (P.int R hP).Monic ↔ P.Monic := by
+  rw [Monic, Monic, ← int_leadingCoeff_eq, OneMemClass.coe_eq_one]
+
+@[simp]
+theorem int_natDegree : (P.int R hP).natDegree = P.natDegree := rfl
+
+variable {L : Type*} [Field L] [Algebra K L]
+
+@[simp]
+theorem int_eval₂_eq (x : L) :
+    eval₂ (algebraMap R L) x (P.int R hP) = aeval x P := by
+  rw [aeval_eq_sum_range, eval₂_eq_sum_range]
+  exact Finset.sum_congr rfl (fun n _ => by rw [Algebra.smul_def]; rfl)
+
+end Polynomial

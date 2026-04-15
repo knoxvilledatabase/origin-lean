@@ -3,11 +3,14 @@ Extracted from Analysis/Convex/Measure.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Topology
+import Mathlib.Analysis.Normed.Affine.AddTorsorBases
+import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
 /-!
 # Convex sets are null-measurable
 
-Let `E` be a finite-dimensional real vector space, let `μ` be a Haar measure on `E`, let `s` be a
+Let `E` be a finite dimensional real vector space, let `μ` be a Haar measure on `E`, let `s` be a
 convex set in `E`. Then the frontier of `s` has measure zero (see `Convex.addHaar_frontier`), hence
 `s` is a `NullMeasurableSet` (see `Convex.nullMeasurableSet`).
 -/
@@ -26,7 +29,7 @@ namespace Convex
 theorem addHaar_frontier (hs : Convex ℝ s) : μ (frontier s) = 0 := by
   /- If `s` is included in a hyperplane, then `frontier s ⊆ closure s` is included in the same
     hyperplane, hence it has measure zero. -/
-  rcases ne_or_eq (affineSpan ℝ s) ⊤ with hspan | hspan
+  cases' ne_or_eq (affineSpan ℝ s) ⊤ with hspan hspan
   · refine measure_mono_null ?_ (addHaar_affineSubspace _ _ hspan)
     exact frontier_subset_closure.trans
       (closure_minimal (subset_affineSpan _ _) (affineSpan ℝ s).closed_of_finiteDimensional)

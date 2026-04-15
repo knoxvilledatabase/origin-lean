@@ -1,8 +1,12 @@
 /-
 Extracted from Algebra/Order/Sub/Unbundled/Hom.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Sub.Defs
+import Mathlib.Algebra.Group.Equiv.Basic
+import Mathlib.Algebra.Ring.Basic
+import Mathlib.Order.Hom.Basic
 
 /-!
 # Lemmas about subtraction in unbundled canonically ordered monoids
@@ -23,18 +27,11 @@ theorem le_mul_tsub {R : Type*} [Distrib R] [Preorder R] [Sub R] [OrderedSub R]
     [MulLeftMono R] {a b c : R} : a * b - a * c ≤ a * (b - c) :=
   (AddHom.mulLeft a).le_map_tsub (monotone_id.const_mul' a) _ _
 
-theorem le_tsub_mul {R : Type*} [NonUnitalCommSemiring R] [Preorder R] [Sub R] [OrderedSub R]
+theorem le_tsub_mul {R : Type*} [CommSemiring R] [Preorder R] [Sub R] [OrderedSub R]
     [MulLeftMono R] {a b c : R} : a * c - b * c ≤ (a - b) * c := by
   simpa only [mul_comm _ c] using le_mul_tsub
 
 end Add
-
-theorem map_tsub_of_le {F : Type*} [PartialOrder α] [AddCommSemigroup α] [ExistsAddOfLE α]
-    [AddLeftMono α] [Sub α] [OrderedSub α] [PartialOrder β] [AddCommSemigroup β] [Sub β]
-    [OrderedSub β] [AddLeftReflectLE β] [FunLike F α β] [AddHomClass F α β]
-    (f : F) (a b : α) (h : b ≤ a) : f a - f b = f (a - b) := by
-  conv => lhs; rw [← tsub_add_cancel_of_le h]
-  rw [map_add, add_tsub_cancel_right]
 
 theorem OrderIso.map_tsub {M N : Type*} [Preorder M] [Add M] [Sub M] [OrderedSub M]
     [PartialOrder N] [Add N] [Sub N] [OrderedSub N] (e : M ≃o N)
@@ -52,7 +49,7 @@ variable [Preorder α]
 
 variable [AddCommMonoid α] [Sub α] [OrderedSub α]
 
-theorem AddMonoidHom.le_map_tsub [Preorder β] [AddZeroClass β] [Sub β] [OrderedSub β] (f : α →+ β)
+theorem AddMonoidHom.le_map_tsub [Preorder β] [AddCommMonoid β] [Sub β] [OrderedSub β] (f : α →+ β)
     (hf : Monotone f) (a b : α) : f a - f b ≤ f (a - b) :=
   f.toAddHom.le_map_tsub hf a b
 

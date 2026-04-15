@@ -3,6 +3,9 @@ Extracted from Algebra/Module/BigOperators.lean
 Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.GroupWithZero.Action
+import Mathlib.Algebra.Module.Defs
+import Mathlib.Data.Fintype.BigOperators
 
 /-!
 # Finite sums over modules over a ring
@@ -22,9 +25,9 @@ theorem Multiset.sum_smul {l : Multiset R} {x : M} : l.sum • x = (l.map fun r 
 
 theorem Multiset.sum_smul_sum {s : Multiset R} {t : Multiset M} :
     s.sum • t.sum = ((s ×ˢ t).map fun p : R × M ↦ p.fst • p.snd).sum := by
-  induction s using Multiset.induction with
-  | empty => simp
-  | cons a s ih => simp [add_smul, ih, ← Multiset.smul_sum]
+  induction' s using Multiset.induction with a s ih
+  · simp
+  · simp [add_smul, ih, ← Multiset.smul_sum]
 
 theorem Finset.sum_smul {f : ι → R} {s : Finset ι} {x : M} :
     (∑ i ∈ s, f i) • x = ∑ i ∈ s, f i • x := map_sum ((smulAddHom R M).flip x) f s
@@ -40,7 +43,7 @@ end AddCommMonoid
 
 open Finset
 
-theorem Finset.cast_card [NonAssocSemiring R] (s : Finset α) : (#s : R) = ∑ _ ∈ s, 1 := by
+theorem Finset.cast_card [CommSemiring R] (s : Finset α) : (#s : R) = ∑ _ ∈ s, 1 := by
   rw [Finset.sum_const, Nat.smul_one_eq_cast]
 
 namespace Fintype
@@ -53,3 +56,5 @@ lemma sum_piFinset_apply (f : κ → α) (s : Finset κ) (i : ι) :
   rw [Finset.sum_comp]
   simp only [eval_image_piFinset_const, card_filter_piFinset_const s, ite_smul, zero_smul, smul_sum,
     Finset.sum_ite_mem, inter_self]
+
+end Fintype

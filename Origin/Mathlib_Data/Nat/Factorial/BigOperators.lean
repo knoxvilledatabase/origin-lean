@@ -3,6 +3,8 @@ Extracted from Data/Nat/Factorial/BigOperators.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Nat.Factorial.Basic
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 /-!
 # Factorial with big operators
@@ -22,15 +24,16 @@ lemma monotone_factorial : Monotone factorial := fun _ _ => factorial_le
 
 variable {α : Type*} (s : Finset α) (f : α → ℕ)
 
-theorem prod_factorial_pos : 0 < ∏ i ∈ s, (f i)! := prod_pos fun _ _ ↦ factorial_pos _
+theorem prod_factorial_pos : 0 < ∏ i ∈ s, (f i)! := by positivity
 
 theorem prod_factorial_dvd_factorial_sum : (∏ i ∈ s, (f i)!) ∣ (∑ i ∈ s, f i)! := by
-  induction s using Finset.cons_induction_on with
-  | empty => simp
-  | cons a s has ih =>
-    rw [prod_cons, Finset.sum_cons]
+  induction' s using Finset.cons_induction_on with a s has ih
+  · simp
+  · rw [prod_cons, Finset.sum_cons]
     exact (mul_dvd_mul_left _ ih).trans (Nat.factorial_mul_factorial_dvd_factorial_add _ _)
 
-theorem factorial_eq_prod_range_add_one : ∀ n, (n)! = ∏ i ∈ range n, (i + 1)
+theorem descFactorial_eq_prod_range (n : ℕ) : ∀ k, n.descFactorial k = ∏ i ∈ range k, (n - i)
   | 0 => rfl
-  | n + 1 => by rw [factorial, prod_range_succ_comm, factorial_eq_prod_range_add_one n]
+  | k + 1 => by rw [descFactorial, prod_range_succ, mul_comm, descFactorial_eq_prod_range n k]
+
+end Nat

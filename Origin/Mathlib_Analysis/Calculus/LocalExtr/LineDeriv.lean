@@ -3,6 +3,8 @@ Extracted from Analysis/Calculus/LocalExtr/LineDeriv.lean
 Genuine: 11 of 20 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.LocalExtr.Basic
+import Mathlib.Analysis.Calculus.LineDeriv.Basic
 
 /-!
 # Local extremum and line derivatives
@@ -39,6 +41,26 @@ theorem IsExtrOn.lineDeriv_eq_zero (h : IsExtrOn f s a) (h' : ∀ᶠ t : ℝ in 
     lineDeriv ℝ f a b = 0 :=
   IsExtrFilter.lineDeriv_eq_zero h <| tendsto_principal.2 h'
 
+theorem IsMinOn.hasLineDerivAt_eq_zero (h : IsMinOn f s a) (hd : HasLineDerivAt ℝ f f' a b)
+    (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : f' = 0 :=
+  h.isExtr.hasLineDerivAt_eq_zero hd h'
+
+theorem IsMinOn.lineDeriv_eq_zero (h : IsMinOn f s a) (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) :
+    lineDeriv ℝ f a b = 0 :=
+  h.isExtr.lineDeriv_eq_zero h'
+
+theorem IsMaxOn.hasLineDerivAt_eq_zero (h : IsMaxOn f s a) (hd : HasLineDerivAt ℝ f f' a b)
+    (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : f' = 0 :=
+  h.isExtr.hasLineDerivAt_eq_zero hd h'
+
+theorem IsMaxOn.lineDeriv_eq_zero (h : IsMaxOn f s a) (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) :
+    lineDeriv ℝ f a b = 0 :=
+  h.isExtr.lineDeriv_eq_zero h'
+
+theorem IsExtrOn.hasLineDerivWithinAt_eq_zero (h : IsExtrOn f s a)
+    (hd : HasLineDerivWithinAt ℝ f f' s a b) (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : f' = 0 :=
+  h.hasLineDerivAt_eq_zero (hd.hasLineDerivAt' h') h'
+
 theorem IsExtrOn.lineDerivWithin_eq_zero (h : IsExtrOn f s a)
     (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : lineDerivWithin ℝ f s a b = 0 := by
   classical
@@ -46,6 +68,22 @@ theorem IsExtrOn.lineDerivWithin_eq_zero (h : IsExtrOn f s a)
     h.hasLineDerivWithinAt_eq_zero hd.hasLineDerivWithinAt h'
   else
     lineDerivWithin_zero_of_not_lineDifferentiableWithinAt hd
+
+theorem IsMinOn.hasLineDerivWithinAt_eq_zero (h : IsMinOn f s a)
+    (hd : HasLineDerivWithinAt ℝ f f' s a b) (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : f' = 0 :=
+  h.isExtr.hasLineDerivWithinAt_eq_zero hd h'
+
+theorem IsMinOn.lineDerivWithin_eq_zero (h : IsMinOn f s a)
+    (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : lineDerivWithin ℝ f s a b = 0 :=
+  h.isExtr.lineDerivWithin_eq_zero h'
+
+theorem IsMaxOn.hasLineDerivWithinAt_eq_zero (h : IsMaxOn f s a)
+    (hd : HasLineDerivWithinAt ℝ f f' s a b) (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : f' = 0 :=
+  h.isExtr.hasLineDerivWithinAt_eq_zero hd h'
+
+theorem IsMaxOn.lineDerivWithin_eq_zero (h : IsMaxOn f s a)
+    (h' : ∀ᶠ t : ℝ in 𝓝 0, a + t • b ∈ s) : lineDerivWithin ℝ f s a b = 0 :=
+  h.isExtr.lineDerivWithin_eq_zero h'
 
 end Module
 

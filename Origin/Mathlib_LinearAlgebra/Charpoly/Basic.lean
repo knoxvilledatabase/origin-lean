@@ -1,8 +1,11 @@
 /-
 Extracted from LinearAlgebra/Charpoly/Basic.lean
-Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
+Genuine: 8 of 10 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
+import Mathlib.FieldTheory.Minpoly.Field
 
 /-!
 
@@ -37,7 +40,49 @@ section Basic
 def charpoly : R[X] :=
   (toMatrix (chooseBasis R M) (chooseBasis R M) f).charpoly
 
-theorem eval_charpoly (t : R) :
-    f.charpoly.eval t = (algebraMap _ _ t - f).det := by
-  rw [charpoly, Matrix.eval_charpoly, ← LinearMap.det_toMatrix (chooseBasis R M), map_sub,
-    scalar_apply, toMatrix_algebraMap, scalar_apply]
+theorem charpoly_def : f.charpoly = (toMatrix (chooseBasis R M) (chooseBasis R M) f).charpoly :=
+  rfl
+
+end Basic
+
+section Coeff
+
+theorem charpoly_monic : f.charpoly.Monic :=
+  Matrix.charpoly_monic _
+
+open Module in
+
+lemma charpoly_natDegree [Nontrivial R] [StrongRankCondition R] :
+    natDegree (charpoly f) = finrank R M := by
+  rw [charpoly, Matrix.charpoly_natDegree_eq_dim, finrank_eq_card_chooseBasisIndex]
+
+end Coeff
+
+section CayleyHamilton
+
+theorem aeval_self_charpoly : aeval f f.charpoly = 0 := by
+  apply (LinearEquiv.map_eq_zero_iff (algEquivMatrix (chooseBasis R M)).toLinearEquiv).1
+  rw [AlgEquiv.toLinearEquiv_apply, ← AlgEquiv.coe_algHom, ← Polynomial.aeval_algHom_apply _ _ _,
+    charpoly_def]
+  exact Matrix.aeval_self_charpoly _
+
+theorem isIntegral : IsIntegral R f :=
+  ⟨f.charpoly, ⟨charpoly_monic f, aeval_self_charpoly f⟩⟩
+
+theorem minpoly_dvd_charpoly {K : Type u} {M : Type v} [Field K] [AddCommGroup M] [Module K M]
+    [FiniteDimensional K M] (f : M →ₗ[K] M) : minpoly K f ∣ f.charpoly :=
+  minpoly.dvd _ _ (aeval_self_charpoly f)
+
+theorem aeval_eq_aeval_mod_charpoly (p : R[X]) : aeval f p = aeval f (p %ₘ f.charpoly) :=
+  (aeval_modByMonic_eq_self_of_root f.charpoly_monic f.aeval_self_charpoly).symm
+
+theorem pow_eq_aeval_mod_charpoly (k : ℕ) : f ^ k = aeval f (X ^ k %ₘ f.charpoly) := by
+  rw [← aeval_eq_aeval_mod_charpoly, map_pow, aeval_X]
+
+variable {f}
+
+-- DISSOLVED: minpoly_coeff_zero_of_injective
+
+end CayleyHamilton
+
+end LinearMap

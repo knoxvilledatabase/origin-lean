@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Localization/Prod.lean
 Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Functor.Currying
+import Mathlib.CategoryTheory.Localization.Predicate
+import Mathlib.CategoryTheory.MorphismProperty.Composition
 
 /-!
 # Localization of product categories
@@ -25,8 +28,6 @@ case follows by transporting this result through equivalences of categories.
 universe v₁ v₂ v₃ v₄ v₅ u₁ u₂ u₃ u₄ u₅
 
 namespace CategoryTheory
-
-open Functor
 
 variable {C₁ : Type u₁} {C₂ : Type u₂} {D₁ : Type u₃} {D₂ : Type u₄}
   [Category.{v₁} C₁] [Category.{v₂} C₂] [Category.{v₃} D₁] [Category.{v₄} D₂]
@@ -122,7 +123,12 @@ variable (W₁ W₂)
 
 variable [W₁.ContainsIdentities] [W₂.ContainsIdentities]
 
--- INSTANCE (free from Core): prod
+instance prod [L₁.IsLocalization W₁] [L₂.IsLocalization W₂] :
+    (L₁.prod L₂).IsLocalization (W₁.prod W₂) := by
+  haveI := Construction.prodIsLocalization W₁ W₂
+  exact of_equivalence_target (W₁.Q.prod W₂.Q) (W₁.prod W₂) (L₁.prod L₂)
+    ((uniq W₁.Q L₁ W₁).prod (uniq W₂.Q L₂ W₂))
+    (NatIso.prod (compUniqFunctor W₁.Q L₁ W₁) (compUniqFunctor W₂.Q L₂ W₂))
 
 end IsLocalization
 

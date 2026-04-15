@@ -3,6 +3,9 @@ Extracted from Analysis/Calculus/DiffContOnCl.lean
 Genuine: 22 of 25 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.NormedSpace.Real
+import Mathlib.Analysis.Calculus.FDeriv.Add
+import Mathlib.Analysis.Calculus.FDeriv.Mul
 
 /-!
 # Functions differentiable on a domain and continuous on its closure
@@ -58,6 +61,13 @@ theorem continuousOn_ball [NormedSpace ℝ E] {x : E} {r : ℝ} (h : DiffContOnC
 theorem mk_ball {x : E} {r : ℝ} (hd : DifferentiableOn 𝕜 f (ball x r))
     (hc : ContinuousOn f (closedBall x r)) : DiffContOnCl 𝕜 f (ball x r) :=
   ⟨hd, hc.mono <| closure_ball_subset_closedBall⟩
+
+protected theorem differentiableAt (h : DiffContOnCl 𝕜 f s) (hs : IsOpen s) (hx : x ∈ s) :
+    DifferentiableAt 𝕜 f x :=
+  h.differentiableOn.differentiableAt <| hs.mem_nhds hx
+
+theorem differentiableAt' (h : DiffContOnCl 𝕜 f s) (hx : s ∈ 𝓝 x) : DifferentiableAt 𝕜 f x :=
+  h.differentiableOn.differentiableAt hx
 
 protected theorem mono (h : DiffContOnCl 𝕜 f s) (ht : t ⊆ s) : DiffContOnCl 𝕜 f t :=
   ⟨h.differentiableOn.mono ht, h.continuousOn.mono (closure_mono ht)⟩

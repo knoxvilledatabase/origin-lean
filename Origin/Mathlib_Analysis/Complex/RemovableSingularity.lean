@@ -3,6 +3,9 @@ Extracted from Analysis/Complex/RemovableSingularity.lean
 Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.FDeriv.Analytic
+import Mathlib.Analysis.Asymptotics.SpecificAsymptotics
+import Mathlib.Analysis.Complex.CauchyIntegral
 
 /-!
 # Removable singularity theorem
@@ -51,7 +54,7 @@ theorem differentiableOn_dslope {f : ℂ → E} {s : Set ℂ} {c : ℂ} (hc : s 
     DifferentiableOn ℂ (dslope f c) s ↔ DifferentiableOn ℂ f s :=
   ⟨fun h => h.of_dslope, fun h =>
     (differentiableOn_compl_singleton_and_continuousAt_iff hc).mp <|
-      ⟨Iff.mpr (differentiableOn_dslope_of_notMem fun h => h.2 rfl) (h.mono diff_subset),
+      ⟨Iff.mpr (differentiableOn_dslope_of_nmem fun h => h.2 rfl) (h.mono diff_subset),
         continuousAt_dslope_same.2 <| h.differentiableAt hc⟩⟩
 
 theorem differentiableOn_update_limUnder_of_isLittleO {f : ℂ → E} {s : Set ℂ} {c : ℂ} (hc : s ∈ 𝓝 c)
@@ -128,6 +131,6 @@ theorem two_pi_I_inv_smul_circleIntegral_sub_sq_inv_smul_of_differentiable {U : 
       zero_smul, sub_zero]
   · refine circleIntegral.integral_congr (pos_of_mem_ball hw₀).le fun z hz => ?_
     simp only [dslope_of_ne, Metric.sphere_disjoint_ball.ne_of_mem hz hw₀, slope, ← smul_assoc, sq,
-      mul_inv, Ne, not_false_iff, vsub_eq_sub, smul_eq_mul]
+      mul_inv, Ne, not_false_iff, vsub_eq_sub, Algebra.id.smul_eq_mul]
 
 end Complex

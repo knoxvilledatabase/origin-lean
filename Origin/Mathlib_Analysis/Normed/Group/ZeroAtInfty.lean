@@ -3,6 +3,7 @@ Extracted from Analysis/Normed/Group/ZeroAtInfty.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 
 /-!
 # ZeroAtInftyContinuousMapClass in normed additive groups
@@ -29,9 +30,9 @@ theorem ZeroAtInftyContinuousMapClass.norm_le (f : 𝓕) (ε : ℝ) (hε : 0 < �
   rcases Metric.closedBall_compl_subset_of_mem_cocompact h 0 with ⟨r, hr⟩
   use r
   intro x hr'
-  suffices x ∈ (fun x ↦ ‖f x‖) ⁻¹' Metric.ball 0 ε by simp_all
+  suffices x ∈ (fun x ↦ ‖f x‖) ⁻¹' Metric.ball 0 ε by aesop
   apply hr
-  simp_all
+  aesop
 
 variable [ProperSpace E]
 

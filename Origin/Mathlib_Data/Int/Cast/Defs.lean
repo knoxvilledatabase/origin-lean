@@ -3,6 +3,7 @@ Extracted from Data/Int/Cast/Defs.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Nat.Cast.Defs
 
 /-!
 # Cast of integers
@@ -35,7 +36,7 @@ class AddGroupWithOne (R : Type u) extends IntCast R, AddMonoidWithOne R, AddGro
   intCast_ofNat : ∀ n : ℕ, intCast (n : ℕ) = Nat.cast n := by intros; rfl
   /-- The canonical homomorphism `ℤ → R` for negative values is just the negation of the values
   of the canonical homomorphism `ℕ → R`. -/
-  intCast_negSucc : ∀ n : ℕ, intCast (Int.negSucc n) = -Nat.cast (n + 1) := by intros; rfl
+  intCast_negSucc : ∀ n : ℕ, intCast (Int.negSucc n) = - Nat.cast (n + 1) := by intros; rfl
 
 class AddCommGroupWithOne (R : Type u)
   extends AddCommGroup R, AddGroupWithOne R, AddCommMonoidWithOne R

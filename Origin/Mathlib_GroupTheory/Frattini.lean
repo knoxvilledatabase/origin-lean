@@ -3,6 +3,8 @@ Extracted from GroupTheory/Frattini.lean
 Genuine: 5 of 6 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.GroupTheory.Nilpotent
+import Mathlib.Order.Radical
 
 /-!
 # The Frattini subgroup
@@ -10,7 +12,7 @@ import Origin.Core
 We give the definition of the Frattini subgroup of a group, and three elementary results:
 * The Frattini subgroup is characteristic.
 * If every subgroup of a group is contained in a maximal subgroup, then
-  the Frattini subgroup consists of the non-generating elements of the group.
+the Frattini subgroup consists of the non-generating elements of the group.
 * The Frattini subgroup of a finite group is nilpotent.
 -/
 
@@ -31,7 +33,10 @@ lemma frattini_le_comap_frattini_of_surjective (hφ : Function.Surjective φ) :
   apply biInf_le
   exact isCoatom_comap_of_surjective hφ hM
 
--- INSTANCE (free from Core): frattini_characteristic
+instance frattini_characteristic : (frattini G).Characteristic := by
+  rw [characteristic_iff_comap_eq]
+  intro φ
+  apply φ.comapSubgroup.map_radical
 
 theorem frattini_nongenerating [IsCoatomic (Subgroup G)] {K : Subgroup G}
     (h : K ⊔ frattini G = ⊤) : K = ⊤ :=
@@ -50,6 +55,6 @@ theorem frattini_nilpotent [Finite G] : Group.IsNilpotent (frattini G) := by
   -- the normalizer of `P` in `G` is `G`.
   have normalizer_P := frattini_nongenerating frattini_argument
   -- This means that `P` is normal as a subgroup of `G`
-  have P_normal_in_G : (map (frattini G).subtype P).Normal := normalizer_eq_top_iff.mp normalizer_P
+  have P_normal_in_G : (map (frattini G).subtype ↑P).Normal := normalizer_eq_top.mp normalizer_P
   -- and hence also as a subgroup of `frattini G`, which was the remaining goal.
   exact P_normal_in_G.of_map_subtype

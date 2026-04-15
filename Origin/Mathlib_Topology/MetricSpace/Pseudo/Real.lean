@@ -3,6 +3,8 @@ Extracted from Topology/MetricSpace/Pseudo/Real.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Group.Pointwise.Interval
+import Mathlib.Topology.MetricSpace.Pseudo.Pi
 
 /-!
 # Lemmas about distances between points in intervals in `ℝ`.

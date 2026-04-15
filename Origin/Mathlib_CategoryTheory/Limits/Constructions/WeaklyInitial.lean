@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Limits/Constructions/WeaklyInitial.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.WideEqualizers
+import Mathlib.CategoryTheory.Limits.Shapes.Products
+import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
 /-!
 # Constructions related to weakly initial objects

@@ -3,6 +3,10 @@ Extracted from Data/QPF/Multivariate/Constructions/Cofix.lean
 Genuine: 31 of 35 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Control.Functor.Multivariate
+import Mathlib.Data.PFunctor.Multivariate.Basic
+import Mathlib.Data.PFunctor.Multivariate.M
+import Mathlib.Data.QPF.Multivariate.Basic
 
 /-!
 # The final co-algebra of a multivariate qpf is again a qpf.
@@ -14,10 +18,10 @@ and take a fixed point again.
 
 ## Main definitions
 
-* `Cofix.mk`     - constructor
-* `Cofix.dest`   - destructor
-* `Cofix.corec`  - corecursor: useful for formulating infinite, productive computations
-* `Cofix.bisim`  - bisimulation: proof technique to show the equality of possibly infinite values
+ * `Cofix.mk`     - constructor
+ * `Cofix.dest`   - destructor
+ * `Cofix.corec`  - corecursor: useful for formulating infinite, productive computations
+ * `Cofix.bisim`  - bisimulation: proof technique to show the equality of possibly infinite values
                     of `Cofix F α`
 
 ## Implementation notes
@@ -30,8 +34,8 @@ We define the relation `Mcongr` and take its quotient as the definition of `Cofi
 
 ## Reference
 
-* Jeremy Avigad, Mario M. Carneiro and Simon Hudon.
-  [*Data Types as Quotients of Polynomial Functors*][avigad-carneiro-hudon2019]
+ * Jeremy Avigad, Mario M. Carneiro and Simon Hudon.
+   [*Data Types as Quotients of Polynomial Functors*][avigad-carneiro-hudon2019]
 -/
 
 universe u
@@ -65,7 +69,9 @@ def Mcongr {α : TypeVec n} (x y : q.P.M α) : Prop :=
 def Cofix (F : TypeVec (n + 1) → Type u) [MvQPF F] (α : TypeVec n) :=
   Quot (@Mcongr _ F _ α)
 
--- INSTANCE (free from Core): {α
+instance {α : TypeVec n} [Inhabited q.P.A] [∀ i : Fin2 n, Inhabited (α i)] :
+    Inhabited (Cofix F α) :=
+  ⟨Quot.mk _ default⟩
 
 def mRepr {α : TypeVec n} : q.P.M α → q.P.M α :=
   corecF (abs ∘ M.dest q.P)
@@ -92,12 +98,10 @@ def Cofix.map {α β : TypeVec n} (g : α ⟹ β) : Cofix F α → Cofix F β :=
         rw [q.P.comp_map, q.P.comp_map, abs_map, pr ra₁a₂, ← abs_map]
       show r' (g <$$> aa₁) (g <$$> aa₂); exact ⟨aa₁, aa₂, ra₁a₂, rfl, rfl⟩)
 
--- INSTANCE (free from Core): Cofix.mvfunctor
+instance Cofix.mvfunctor : MvFunctor (Cofix F) where map := @Cofix.map _ _ _
 
 def Cofix.corec {α : TypeVec n} {β : Type u} (g : β → F (α.append1 β)) : β → Cofix F α := fun x =>
   Quot.mk _ (corecF g x)
-
-set_option backward.isDefEq.respectTransparency false in
 
 def Cofix.dest {α : TypeVec n} : Cofix F α → F (α.append1 (Cofix F α)) :=
   Quot.lift (fun x => appendFun id (Quot.mk Mcongr) <$$> abs (M.dest q.P x))
@@ -152,11 +156,54 @@ specific values of type `Cofix F α`.
 
 A bisimulation relation `R` for values `x y : Cofix F α`:
 
-* holds for `x y`: `R x y`
-* for any values `x y` that satisfy `R`, their root has the same shape
-  and their children can be paired in such a way that they satisfy `R`.
+ * holds for `x y`: `R x y`
+ * for any values `x y` that satisfy `R`, their root has the same shape
+   and their children can be paired in such a way that they satisfy `R`.
 
 -/
+
+private theorem Cofix.bisim_aux {α : TypeVec n} (r : Cofix F α → Cofix F α → Prop) (h' : ∀ x, r x x)
+    (h : ∀ x y, r x y →
+      appendFun id (Quot.mk r) <$$> Cofix.dest x = appendFun id (Quot.mk r) <$$> Cofix.dest y) :
+    ∀ x y, r x y → x = y := by
+  intro x
+  rcases x; clear x; rename M (P F) α => x
+  intro y
+  rcases y; clear y; rename M (P F) α => y
+  intro rxy
+  apply Quot.sound
+  let r' := fun x y => r (Quot.mk _ x) (Quot.mk _ y)
+  have hr' : r' = fun x y => r (Quot.mk _ x) (Quot.mk _ y) := rfl
+  have : IsPrecongr r' := by
+    intro a b r'ab
+    have h₀ :
+      appendFun id (Quot.mk r ∘ Quot.mk Mcongr) <$$> MvQPF.abs (M.dest q.P a) =
+        appendFun id (Quot.mk r ∘ Quot.mk Mcongr) <$$> MvQPF.abs (M.dest q.P b) := by
+      rw [appendFun_comp_id, comp_map, comp_map]; exact h _ _ r'ab
+    have h₁ : ∀ u v : q.P.M α, Mcongr u v → Quot.mk r' u = Quot.mk r' v := by
+      intro u v cuv
+      apply Quot.sound
+      dsimp [r', hr']
+      rw [Quot.sound cuv]
+      apply h'
+    let f : Quot r → Quot r' :=
+      Quot.lift (Quot.lift (Quot.mk r') h₁)
+        (by
+          intro c
+          apply Quot.inductionOn
+            (motive := fun c =>
+              ∀b, r c b → Quot.lift (Quot.mk r') h₁ c = Quot.lift (Quot.mk r') h₁ b) c
+          clear c
+          intro c d
+          apply Quot.inductionOn
+            (motive := fun d => r (Quot.mk Mcongr c) d →
+              Quot.lift (Quot.mk r') h₁ (Quot.mk Mcongr c) = Quot.lift (Quot.mk r') h₁ d) d
+          clear d
+          intro d rcd; apply Quot.sound; apply rcd)
+    have : f ∘ Quot.mk r ∘ Quot.mk Mcongr = Quot.mk r' := rfl
+    rw [← this, appendFun_comp_id, q.P.comp_map, q.P.comp_map, abs_map, abs_map, abs_map, abs_map,
+      h₀]
+  exact ⟨r', this, rxy⟩
 
 theorem Cofix.bisim_rel {α : TypeVec n} (r : Cofix F α → Cofix F α → Prop)
     (h : ∀ x y, r x y →
@@ -182,24 +229,24 @@ theorem Cofix.bisim_rel {α : TypeVec n} (r : Cofix F α → Cofix F α → Prop
       rw [h _ _ r'xy]
   right; exact rxy
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem Cofix.bisim {α : TypeVec n} (r : Cofix F α → Cofix F α → Prop)
-    (h : ∀ x y, r x y → LiftR (RelLast α r) (Cofix.dest x) (Cofix.dest y)) :
+    (h : ∀ x y, r x y → LiftR (RelLast α r (i := _)) (Cofix.dest x) (Cofix.dest y)) :
     ∀ x y, r x y → x = y := by
   apply Cofix.bisim_rel
   intro x y rxy
-  rcases (liftR_iff (fun a b => RelLast α r b) (dest x) (dest y)).mp (h x y rxy)
+  rcases (liftR_iff (fun a b => RelLast α r a b) (dest x) (dest y)).mp (h x y rxy)
     with ⟨a, f₀, f₁, dxeq, dyeq, h'⟩
   rw [dxeq, dyeq, ← abs_map, ← abs_map, MvPFunctor.map_eq, MvPFunctor.map_eq]
   rw [← split_dropFun_lastFun f₀, ← split_dropFun_lastFun f₁]
   rw [appendFun_comp_splitFun, appendFun_comp_splitFun]
   rw [id_comp, id_comp]
-  congr 2 with (i j); rcases i with - | i
+  congr 2 with (i j); cases' i with _ i
   · apply Quot.sound
     apply h' _ j
   · change f₀ _ j = f₁ _ j
     apply h' _ j
+
+open MvFunctor
 
 theorem Cofix.bisim₂ {α : TypeVec n} (r : Cofix F α → Cofix F α → Prop)
     (h : ∀ x y, r x y → LiftR' (RelLast' α r) (Cofix.dest x) (Cofix.dest y)) :
@@ -239,7 +286,7 @@ theorem Cofix.mk_dest {α : TypeVec n} (x : Cofix F α) : Cofix.mk (Cofix.dest x
     rw [Cofix.dest_corec]
   rw [← comp_map, ← appendFun_comp, id_comp]
   rw [← comp_map, ← appendFun_comp, id_comp, ← Cofix.mk]
-  congr 1
+  congr
   apply congrArg
   funext x
   apply Quot.sound
@@ -275,8 +322,6 @@ theorem liftR_map {α β : TypeVec n} {F' : TypeVec n → Type u} [MvFunctor F']
 
 open Function
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem liftR_map_last [lawful : LawfulMvFunctor F]
     {α : TypeVec n} {ι ι'} (R : ι' → ι' → Prop)
     (x : F (α ::: ι)) (f g : ι → ι') (hh : ∀ x : ι, R (f x) (g x)) :
@@ -293,7 +338,8 @@ theorem liftR_map_last [lawful : LawfulMvFunctor F]
     dsimp [b]
     apply eq_of_drop_last_eq
     · dsimp
-      simp only [prod_map_id, TypeVec.id_comp]
+      simp only [prod_map_id, dropFun_prod, dropFun_appendFun, dropFun_diag, TypeVec.id_comp,
+        dropFun_toSubtype]
       erw [toSubtype_of_subtype_assoc, TypeVec.id_comp]
       clear liftR_map_last q lawful F x R f g hh h b c
       ext (i x) : 2
@@ -431,9 +477,9 @@ elab_rules : tactic
 
           liftMetaTactic fun g => return [← g.clear f.fvarId!]
 
-    for h : n in [6 : ids.size] do
+    for n in [6 : ids.size] do
 
-      let name := ids[n]
+      let name := ids[n]!
 
       logWarningAt name m!"unused name: {name}"
 
@@ -469,7 +515,7 @@ theorem Cofix.dest_corec' {α : TypeVec.{u} n} {β : Type u}
     dsimp [Function.comp_def]
     intros
     exact ⟨_, rfl, rfl⟩
-  · congr 1 with y
+  · congr with y
     erw [appendFun_id_id]
     simp [MvFunctor.id_map, Sum.elim]
 
@@ -480,8 +526,11 @@ theorem Cofix.dest_corec₁ {α : TypeVec n} {β : Type u}
     Cofix.dest (Cofix.corec₁ (@g) x) = g id (Cofix.corec₁ @g) x := by
   rw [Cofix.corec₁, Cofix.dest_corec', ← h]; rfl
 
-set_option linter.style.whitespace false in -- manual alignment is not recognised
-
--- INSTANCE (free from Core): mvqpfCofix
+instance mvqpfCofix : MvQPF (Cofix F) where
+  P         := q.P.mp
+  abs       := Quot.mk Mcongr
+  repr      := Cofix.repr
+  abs_repr  := Cofix.abs_repr
+  abs_map   := by intros; rfl
 
 end MvQPF

@@ -3,6 +3,7 @@ Extracted from RingTheory/RootsOfUnity/Lemmas.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.FieldTheory.KummerExtension
 
 /-!
 # More results on primitive roots of unity
@@ -40,14 +41,14 @@ lemma prod_pow_sub_one_eq_order {n : ℕ} {μ : R} (hμ : IsPrimitiveRoot μ (n 
 open Algebra in
 
 lemma self_sub_one_pow_dvd_order {k n : ℕ} (hn : k < n) {μ : R} (hμ : IsPrimitiveRoot μ n) :
-    ∃ z ∈ ℤ[μ], n = z * (μ - 1) ^ k := by
+    ∃ z ∈ adjoin ℤ {μ}, n = z * (μ - 1) ^ k := by
   let n' + 1 := n
   obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le' (Nat.le_of_lt_succ hn)
-  have hdvd k : ∃ z ∈ ℤ[μ], μ ^ k - 1 = z * (μ - 1) := by
+  have hdvd k : ∃ z ∈ adjoin ℤ {μ}, μ ^ k - 1 = z * (μ - 1) := by
     refine ⟨(Finset.range k).sum (μ ^ ·), ?_, (geom_sum_mul μ k).symm⟩
     exact Subalgebra.sum_mem _ fun m _ ↦ Subalgebra.pow_mem _ (self_mem_adjoin_singleton _ μ) _
   let Z k := Classical.choose <| hdvd k
-  have Zdef k : Z k ∈ ℤ[μ] ∧ μ ^ k - 1 = Z k * (μ - 1) :=
+  have Zdef k : Z k ∈ adjoin ℤ {μ} ∧ μ ^ k - 1 = Z k * (μ - 1) :=
     Classical.choose_spec <| hdvd k
   refine ⟨(-1) ^ (m + k) * (∏ j ∈ range k, Z (j + 1)) * ∏ j ∈ Ico k (m + k), (μ ^ (j + 1) - 1),
     ?_, ?_⟩

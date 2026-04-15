@@ -1,57 +1,72 @@
 # For AI Agents
 
-## What To Do Right Now
+## Your Job
 
-1. **Read this entire file.** It contains the philosophy, the architecture,
-   the method, the tools, and the progression. Everything you need.
+You improve `scripts/origin.py`. That's it.
 
-2. **Confirm your understanding** with the user before doing anything.
-   Say what you understand the current state to be and what the next
-   step is. Wait for their confirmation.
+```bash
+cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
+python3 scripts/origin.py run
+```
 
-3. **Run origin.py** — one tool does everything:
-   ```bash
-   cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
+The process:
 
-   # Classify: what needs writing?
-   python3 scripts/origin.py classify NumberTheory
-   python3 scripts/origin.py classify --all
+1. Run the script.
+2. Build based on what we know.
+3. Are we leveraging Lean in the absolute most DRY way possible
+   considering the richest features of Lean?
+4. Improve the script.
+5. Rinse and repeat.
 
-   # Fruit: where is the highest-density dissolution?
-   python3 scripts/origin.py fruit --all 10
+That's it. If the build fails, fix the script. If lines are too
+high, add compression patterns to the script. If you're about to
+do manual work, STOP — improve the script to do it instead. Every
+fix must apply to all files, forever.
 
-   # Extract: generate Origin draft from a Mathlib file
-   python3 scripts/origin.py extract NumberTheory/Harmonic/Int.lean
+The script is the only thing that survives between sessions. You
+don't. Encode everything you learn into `origin.py` before your
+context window closes.
 
-   # Extract entire domain: generate drafts for all files with genuine content
-   python3 scripts/origin.py extract --domain NumberTheory
-   ```
+The user holds the philosophy. The script holds the execution.
+You are disposable labor that makes the script smarter.
 
-   **classify** — counts GENUINE/DISSOLVE/INSTANCE/SIMP/TRIVIAL per file.
-   The GENUINE count is what to write. Everything else is free or dissolves.
+**Always confirm with the user between steps. They hold the architecture.**
 
-   **fruit** — ranks files by dissolution density (hits/lines).
-   High density = the collapse is concentrated there.
+### Read these files before doing anything
 
-   **extract** — generates Origin draft .lean files from Mathlib source.
-   Strips dissolved declarations. Keeps genuine content. Drafts may not
-   build — `lake build` validates, you fix what breaks.
+1. **This file** (`CLAUDE.md`) — your orders.
+2. **`Origin/Core.lean`** (124 lines) — the foundation. The theorem,
+   instances, simp set. Read every line. If you don't understand why
+   `none * some 5 = none` and `some 0 * some 5 = some 0`, stop and
+   re-read until you do.
+3. **`scripts/origin.py`** — the tool you're improving. Read the
+   parser, the classifier, the extractor, the `run` pipeline. This
+   is where your work goes.
 
-4. **Pick files with highest GENUINE count.** Or use extract to generate
-   drafts, then build and fix.
+Everything else is output. Don't read Mathlib. Don't read Val.
+Don't read the domain files. The script reads Mathlib for you.
 
-5. **Confirm with the user between each file.**
+### Mistakes every new Claude makes
 
-6. **Repeat.** The script finds the targets. You do the conversion.
+**You will think `b - b` is zero.** It's not. It's origin — the
+return to the ground. Not "the number zero." The whole. This
+distinction IS the project. Read the derivation until you feel it.
 
-**Always confirm between steps. The user holds the architecture.**
+**You will try to understand before acting.** Don't. Run the script.
+Read the report. Fix what's broken. Understanding comes from doing.
 
-**CRITICAL: Improve the script, not do manual work.** If you find yourself
-manually reading files, manually classifying declarations, or manually
-writing Origin versions — STOP. Ask: can `scripts/origin.py` do this?
-If yes, improve the script. If no, explain why to the user and get
-their input before doing manual work. The script is the tool. You
-improve the tool. The tool does the work.
+**You will think the process is complex.** It's not. Run script →
+build → leverage Lean's DRY → improve script → repeat. Every prompt
+the user gives you is one of: check alignment, go, correct your
+understanding, did you document that. That's it.
+
+**You will want to add code.** Resist. Audit what exists first. We
+removed 37 lines of dead code from Core.lean (the foundation itself)
+this session. No sacred cows. Every line must earn its weight in gold.
+
+**The user teaches through questions.** "What is b - b?" means you're
+about to learn something. Think before answering. If they ask "should
+you be doing X?" the answer is almost certainly no.
 
 **Build note:** Extracted files keep Mathlib imports (they need Mathlib's
 types) plus `import Origin.Core`. The lakefile pins Mathlib v4.14.0.
@@ -124,9 +139,36 @@ instance [Mul α] : Mul (Option α) where
 
 ---
 
-## What This Project Discovered
+## The Derivation: Everything Flows From This
 
-Before anything else, understand what was found. This changes how you write, how you build, and how you frame every result.
+Before anything else, understand the four steps. This IS the project.
+Everything else is consequence.
+
+```
+Step 1: Write zero as origin.
+        origin = b - b
+
+Step 2: Multiply both sides by n.
+        n × origin = n × (b - b)
+
+Step 3: Apply the distributive property to the right side.
+        n × (b - b) = nb - nb
+
+Step 4: A number minus itself cancels.
+        nb - nb = origin
+
+Therefore: n × origin = origin
+```
+
+Absorption is not a rule. It is a consequence of cancellation and
+distribution. Three premises. One derivation. The ground absorbs under
+multiplication BECAUSE cancellation returns to the ground and the
+distributive law propagates it.
+
+**Everything downstream is consequence:**
+- Two constructors are sufficient (`Option α`: `none` is origin, `some` is a value) — BECAUSE the derivation only needs cancellation and distribution, which `Option` with instances provides.
+- The 17 typeclasses vanish — BECAUSE they managed the ground being inside the counting domain. Put it outside (`none`), the problem they solved never existed.
+- 14,702 lines of Mathlib zero-management dissolve — BECAUSE `≠ 0` guards were protecting against the ground. `none` is not in the counting domain. No guard needed.
 
 ### The ground is the whole, not nothing.
 
@@ -138,28 +180,6 @@ Never reached, approached, or hit. It is what the formal system stands on. The s
 
 **Every sentence you write must respect this.** Do not say "the field is origin at the singularity." Say "the field concept doesn't apply here — it was never in the counting domain." Do not say "the Liar evaluates to origin." Say "the Liar asks for a contents answer that can't exist."
 
-### Absorption is a theorem, not an axiom.
-
-Cancellation returns to the ground. The distributive law propagates it through multiplication. The four-step derivation (`Origin/Core.lean`):
-
-```
-0 = n + (-n)                          (cancellation)
-n × 0 = n × (n + (-n))               (substitution)
-      = n×n + n×(-n)                  (distributive law)
-      = n×n + -(n×n)                  (mul over negation)
-      = 0                             (cancellation)
-```
-
-The ground absorbs under multiplication BECAUSE cancellation returns to the ground and the distributive law propagates it. I1 and I2 are consequences, not primitives.
-
-### Two constructors are sufficient.
-
-Ground and value. `Option α`. `None` is the ground. `Some` is a value. Val (three constructors) was the scaffolding that proved it works. Origin (two constructors) is the building. ML had `Option` in 1973. The derivation above is WHY two constructors are sufficient.
-
-### The 17 typeclasses managed the whole being inside the counting domain.
-
-Put it outside. They vanish. Not reduced. Not consolidated. Gone. Because the problem they solved was never a real problem — it was a consequence of putting the whole where it doesn't belong.
-
 ### Val/ is evidence. Origin/ is the foundation.
 
 `Val/` proved the claim at scale: 10,756 lines of math, 3,000 lines of physics, 718 lines of logic. Those numbers are the evidence. `Origin/` explains WHY it works: the derivation, Option, two constructors. New work goes in Origin. Val stays as the published proof.
@@ -167,6 +187,38 @@ Put it outside. They vanish. Not reduced. Not consolidated. Gone. Because the pr
 ---
 
 ## What This Project Is
+
+**We are standing on the shoulders of giants of mathematics.**
+
+Without Mathlib, we would not know if this is possible. Mathlib is
+2.2 million lines of mechanically verified mathematics — an
+extraordinary achievement built by hundreds of people over decades,
+standing on centuries of mathematical work from Brahmagupta to the
+present. Every theorem in Origin exists because someone wrote it in
+Mathlib first. Every insight about what dissolves exists because
+Mathlib showed us what the infrastructure looks like at scale.
+
+Origin isn't smarter than Mathlib. It's later. It has the luxury
+of hindsight — seeing the whole structure from outside, noticing
+what was load-bearing and what was scaffolding, because the
+scaffolding already did its job. Origin is a distillation. What
+remains when the work that needed doing has been done.
+
+**Mathlib is the proof it works. Origin is the production expression.**
+
+Origin is the production system that distills Mathlib: every theorem,
+expressed in the absolute minimum lines of code, leveraging 100% of
+Lean's richest functionality. Exhaustively. Buildably. The exhaustive
+conversion IS the proof that the infrastructure was never mathematics
+— it was the cost of a foundational choice.
+
+The script (`origin.py`) is how we get there. It reads Mathlib,
+strips what dissolves, compresses what remains, and outputs production
+Lean files. The script is the institutional knowledge — every
+compression pattern, every Lean trick, every classification rule
+gets encoded into the script. Claude is disposable labor that improves
+the script before the context window closes. The human holds the
+philosophy. The script holds the execution.
 
 Two layers in one repository:
 
@@ -320,23 +372,111 @@ Zero sorries. Zero Mathlib. Builds in under a second.
 
 ## Things the Next Session Must Know
 
-**Mathlib source is local.** The origin-mathlib repo was reset to
-Mathlib's latest (2026-04-14) at:
-`/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib/`
-The remote is archived (read-only). Don't try to push. Just read from it.
+**Start by running the pipeline.** `python3 scripts/origin.py run`.
+Read the report. Fix what's broken in the script. Run again. That's
+the job. Do not do manual work.
 
-**Old Origin files are superseded.** `Origin/Ring.lean`, `Origin/Field.lean`,
-`Origin/OrderedField.lean`, `Origin/Module.lean`, `Origin/Foundation.lean`,
-and the domain files WITHOUT "2" suffix (e.g., `Origin/InformationTheory.lean`
-vs `Origin/InformationTheory2.lean`) — these were written before Core.lean
-existed. The Core-based versions (with "2" suffix or newly created against Core)
-are the current ones. The old files should be cleaned up eventually.
+**The script is the institutional knowledge.** Every insight goes
+into `origin.py`, not into conversation. The script survives between
+sessions. You don't. If you learn something, encode it in the script
+before your window closes.
 
 **The user holds the architecture. You build.** The user is a programmer,
 not a mathematician. They think in DRY. They push back hard when things
 aren't lean enough — and they're always right when they do. When they
 say "do it" or "go" — build fast. When they say "let's discuss first" —
 discuss. They see things you won't see. Listen.
+
+**Mathlib source is local.** Lake's Mathlib at
+`.lake/packages/mathlib/Mathlib/` is the source (pinned v4.14.0).
+Also mirrored at `origin-mathlib/Mathlib/` (read-only archive).
+
+**Old Origin files are superseded.** `Origin/Ring.lean`, `Origin/Field.lean`,
+`Origin/OrderedField.lean`, `Origin/Module.lean`, `Origin/Foundation.lean`,
+and the domain files WITHOUT "2" suffix — written before Core.lean.
+The Core-based versions are current. The old files should be cleaned up.
+
+**Origin replaces the infrastructure layer. It borrows the mathematical
+content.** Mathlib has two things: mathematical content (`ℕ`, `Nat.gcd`,
+`List`, group definitions — real math) and infrastructure (`NeZero`,
+`GroupWithZero`, `≠ 0` hypotheses — guards managing the ground being
+inside). Origin borrows the content and dissolves the infrastructure.
+The script reads Mathlib during extraction. The output is
+self-contained. Definitions, types, theorems — everything Origin
+needs gets extracted and internalized. The only imports are Lean's
+standard library (`ℕ`, `List`, `Option`) and `Origin.Core`. No
+`import Mathlib.*` in committed code.
+
+**The extraction is a filter, not a compiler (yet).** The current
+pipeline copies genuine Mathlib declarations verbatim and marks what
+dissolves. It does NOT compress proofs, lift to Option, or rewrite
+to minimal Lean. That's where the 99%+ reduction will come from.
+The 10.7% reduction from filtering alone is just the starting point.
+The next step is encoding compression patterns into the script:
+- If `by simp` closes after removing `≠ 0`, collapse the proof
+- If the theorem lifts a law through Option, use `cases <;> simp [h]`
+- If a declaration wraps `Option.map`, delete it
+- If a hypothesis dissolves, remove it from the signature
+Each pattern is mechanical once identified. Each goes in the script.
+Each applies to hundreds of files.
+
+**The script has two modes.** Work mode: new theorems in Mathlib
+that Origin hasn't committed yet — extract, build, report. Demo
+mode: everything's already committed — show the full stats, the
+line counts, the reduction. The script output IS the proof. No
+separate demo directory needed.
+
+### Parser bugs fixed in this session (2026-04-15)
+
+Three bugs were found and fixed in `parse_file_smart`:
+
+1. **`@[simp]` attribute handler hijacked declarations.** When `@[`
+   appeared at the start of a line, the parser entered the attribute
+   handler — even if the same line contained `theorem`, `def`, etc.
+   Fix: check if the line also contains a declaration keyword before
+   treating it as a standalone attribute.
+
+2. **Multiline attributes dropped declarations.** The `@[` handler
+   prepended attribute text to the next line with `\n`, creating a
+   multiline string. Python's `re.match` doesn't match `.` across
+   `\n`, so the declaration regex failed. 82% of Mathlib declarations
+   were invisible. Fix: store pending attributes separately, include
+   in Block text when declaration is found.
+
+3. **Multiline attribute strings (`@[to_additive "..."]`).** Attributes
+   with multiline string arguments (common in Mathlib) weren't collected
+   properly. Fix: check for unbalanced quotes/brackets in attribute lines
+   and continue collecting.
+
+4. **Silently dropped infrastructure.** `simp_trivial`, `trivial`, and
+   `instance` declarations were dropped from extractions, but genuine
+   proofs reference them. Fix: only strip dissolved declarations, keep
+   everything else.
+
+Grand total genuine declarations went from 24,542 → 138,141 after
+these fixes.
+
+### Pipeline run results (2026-04-15)
+
+Run 1 (parser attribute fix only):
+```
+5,023 files  |  3,285 pass / 1,738 fail  |  11,036 error patterns  |  27m
+```
+
+Run 2 (+ section/end, pass-through commands, declaration modifiers):
+```
+5,021 files  |  4,027 pass /   994 fail  |  744 fewer failures     |  20m
+```
+
+Top remaining error patterns after run 2:
+- `tactic 'rewrite' failed` (590 files) — proofs referencing dissolved content
+- `expected token` (453) — parser still cutting declarations mid-syntax
+- `unsolved goals` (367) — proofs broken by missing pieces
+- `failed to synthesize` (238) — missing typeclass instances (down from 5,720)
+- `add_decl_doc` (112) — Mathlib command, now stripped in run 3
+
+Run 3 pending. Each run fixes patterns in the script. Error count drops.
+The process: run → read top pattern → fix script → run again.
 
 ## Progression: Go Straight to Mathlib
 
@@ -352,267 +492,87 @@ file by file, domain by domain, and write only what's genuinely new.
 4. ✅ **Logic.** Liar, Russell, Curry unified. `no_some_fixed_point`.
 5. ✅ **Val evidence.** 14,474 lines. The proof it works at scale.
 
-### What's next: Mathlib → Origin, file by file
-
-The old approach: classify every Mathlib theorem into B1/B2/B3 buckets
-against Val's three-constructor model. That was the right step at the
-time. The `classifications/` directory documents that journey.
-
-**That approach is obsolete.** Origin changes the question. The buckets
-were drawn against Val's infrastructure. Origin has no infrastructure —
-just `Option` with instances. The question is no longer "which bucket?"
-The question is:
-
-**Does this theorem need to exist on Option, or does it already
-follow from the instances?**
-
-If it follows from the instances: skip it. It's free.
-If it's genuine domain content: write it in Origin.
-
-### The method (demonstrated on InformationTheory)
-
-Mathlib lives at: `origin-mathlib/Mathlib/`
-
-For each Mathlib file, three steps:
-
-**Step 1: Grep for zero-management.**
+### What's next: run the pipeline
 
 ```bash
-grep -n "NeZero\|≠ 0\|ne_zero\|NoZero\|WithBot\|WithTop\|GroupWithZero" \
-  Mathlib/InformationTheory/KullbackLeibler/KLFun.lean
+python3 scripts/origin.py run
 ```
 
-Every hit is a theorem or hypothesis that dissolves with Origin.
-These don't need to exist. `none` handles them structurally.
+The script encodes all classification, extraction, and build logic.
+Read the script to understand how it works. Improve the script to
+fix what's broken. Do not do manual work.
 
-**Step 2: Triage the rest.**
+The `classifications/` directory is historical documentation of the
+Val-era mapping. It describes Val, not Origin. Ignore it.
 
-For each remaining declaration, ask:
-- **Typeclass instance, simp lemma, coercion wrapper?** → Free from
-  Core's instances. Skip.
-- **Pure domain math (no zero management, no Val/Option)?** → Write
-  it in Origin as-is. It was never affected by the collapse.
-- **Analytic infrastructure (continuity, convexity, measurability)?** →
-  Stays as hypotheses. Honest boundary. The algebra is handled.
-  The analysis is deferred.
-- **Genuine new mathematics with real proof?** → Write it in Origin.
+### The pipeline: `origin.py run`
 
-**Step 3: Write the Origin file.**
-
-Import Core. Write only what survived triage. Standard notation.
-Build. Verify. Move to the next file.
-
-### Demonstrated: two kinds of Mathlib files
-
-**Type A: Pure domain math (no collapse involvement)**
-
-Example: `Dynamics/FixedPoints/Basic.lean` (178 lines)
-```
-Step 1: grep for zero-management → 0 hits
-Step 2: triage → 22 genuine theorems, 3 infrastructure (decidable instances)
-Verdict: entire file is pure mathematics. The collapse never touched it.
-         Transfer verbatim. Option adds nothing.
-```
-
-Many Mathlib files are Type A. The collapse only affects files that
-deal with zero, division, boundaries, or ≠ 0 guards. Files about
-fixed points, topology, category theory morphisms, group actions —
-much of this is pure domain math that was never affected.
-
-**For Type A files: copy the content. Don't wrap in Option. It's math.**
-
-**Type B: Zero-management involved (the collapse matters)**
-
-Example: `Dynamics/PeriodicPts/Defs.lean` (500+ lines)
-```
-Step 1: grep for zero-management → 15 hits
-Step 2: the hits are:
-  - minimalPeriod_pos_of_mem_periodicPts (0 < minimalPeriod)
-  - not_isPeriodicPt_of_pos_of_lt_minimalPeriod (n ≠ 0)
-  - minimalPeriod_iterate_eq_div_gcd (h : n ≠ 0)
-  These carry ≠ 0 or pos hypotheses that dissolve with none.
-Verdict: 15 hypotheses dissolve. The rest is genuine periodic point
-         theory. Write the content. The hypotheses vanish.
-```
-
-Example: `InformationTheory/KullbackLeibler/KLFun.lean` (194 lines)
-```
-Step 1: grep → 1 hit (hasDerivAt_klFun carries x ≠ 0)
-Step 2: the rest is convexity, continuity, measurability → analysis
-Verdict: 1 hypothesis dissolves. klFun definition is content.
-         Analysis stays as hypotheses (honest boundary).
-```
-
-**For Type B files: the zero-management dissolves. Write the content
-that remains. The hypotheses that guarded against the ground vanish
-because the ground is outside (none).**
-
-### The exercise per file
+One command. Run it. Everything either builds or it tells you
+exactly what to fix in the script.
 
 ```bash
-# Step 1: How much zero-management?
-grep -c "NeZero\|≠ 0\|ne_zero\|NoZero\|WithBot\|WithTop\|GroupWithZero" \
-  Mathlib/Domain/File.lean
-
-# 0 hits → Type A. Pure math. Transfer content.
-# >0 hits → Type B. Zero-management dissolves. Write what remains.
+python3 scripts/origin.py run
 ```
 
-Step 2: Read. Triage. Ask for each declaration:
-- Free from instances? Skip.
-- Zero-management hypothesis? Dissolves. Skip the hypothesis.
-- Pure domain content? Write it.
-- Analytic infrastructure? Defer as hypothesis.
+What it does:
 
-Step 3: Write. Build. Next file.
+1. **Extract every Mathlib domain.** Runs `extract --domain` for
+   each domain in Mathlib. Outputs to `Origin/Mathlib_<domain>/`.
 
-### The collapse affects domains unevenly
+2. **Build every extracted file.** Runs `lake build` on each.
+   Collects pass/fail per file.
 
-Scanning all Mathlib domains for zero-management density:
+3. **Group errors by pattern.** If 200 files fail because the parser
+   doesn't handle `@[to_additive]`, that's one script fix, not 200
+   manual fixes. The report says: "142 files fail with
+   `unknown constant AddAction.period` — root cause: multiline
+   attribute parsing."
 
-```
-Domain             % of files affected    Dissolved hypotheses
-─────────────────────────────────────────────────────────────
-NumberTheory       83% (193/231 files)    2,330
-FieldTheory        70% (55/78 files)      696
-Geometry           66% (86/129 files)     683
-Analysis           51% (406/782 files)    (large)
-MeasureTheory      50% (152/302 files)    (large)
-RingTheory         47% (312/663 files)    (large)
-Dynamics           41% (13/31 files)      58
-Algebra            35% (466/1300 files)   (large)
-GroupTheory        30% (48/160 files)     (moderate)
-Topology           16% (105/639 files)    (low)
-Computability      20% (7/34 files)       (low)
-```
+4. **Report.** What built, what failed, why. Grouped by root cause.
 
-NumberTheory is 83% affected — almost every file carries ≠ 0.
-Topology is 16% affected — most of it is pure structure.
+5. **Count lines.** Mathlib total lines vs Origin total lines.
+   This is the proof.
 
-**The highest-value work is in the most-affected domains.**
-NumberTheory alone has 2,330 hypotheses that dissolve.
-
-Demonstrated on Dynamics (31 files, 6,514 lines):
-- 16 files are Type A (pure math, 0 zero-management)
-- 15 files are Type B (collapse involved)
-- Conservative.lean: 20 hits (most affected)
-- PeriodicPts/Defs.lean: 15 hits
-- CoverEntropy.lean: 14 hits
-- Minimal.lean: 12 hits
-
-### How to measure the cost of the collapse
-
-The previous count (9,682) only counted `≠ 0` in theorem signatures.
-That misses the threading — the `.ne'`, `inv_ne_zero`, `cast_ne_zero`
-calls INSIDE proofs that pass the hypothesis through intermediate steps.
-
-**The commands that found the real number:**
-
-```bash
-# Step 1: Count ≠ 0 in signatures (the hypotheses themselves)
-grep -rn "(\(h\w*\s*:\s*\S*\s*≠\s*0\)" \
-  Mathlib/NumberTheory/ --include="*.lean" | wc -l
-
-# Step 2: Count ≠ 0 threading inside proofs
-grep -rn "\.ne'\|ne_zero\|cast_ne_zero\|succ_ne_zero\|inv_ne_zero\|pos_of_ne_zero" \
-  Mathlib/NumberTheory/ --include="*.lean" | wc -l
-
-# Step 3: Total surface area = signatures + threading
-
-# Step 4: Run across ALL domains to get the full picture
-for domain in NumberTheory FieldTheory Geometry Analysis ...; do
-  sigs=$(grep -rn ... | wc -l)
-  thread=$(grep -rn ... | wc -l)
-  echo "$domain: $sigs signatures, $thread threading, $((sigs+thread)) total"
-done | sort by total
-```
-
-**Why threading matters:** In `Harmonic/Int.lean`, `harmonic_pos`
-carries `(Hn : n ≠ 0)` in the signature. But `padicValRat_two_harmonic`
-doesn't have `≠ 0` in its signature — it threads it INTERNALLY:
-
-```lean
--- Line 40: threads ≠ 0 through harmonic_pos → .ne'
-(harmonic_pos n.succ_ne_zero).ne'
--- Line 41: threads ≠ 0 through harmonic_pos → .ne'
-(harmonic_pos hn).ne'
--- Line 41: threads ≠ 0 through cast → inv
-inv_ne_zero (Nat.cast_ne_zero.mpr n.succ_ne_zero)
-```
-
-Each `.ne'` is a line of code that exists solely to convert a `≠ 0`
-hypothesis into a form the next function needs. In Origin, none of
-these lines exist. `none` absorbs structurally. No conversion needed.
-
-### The cost of the collapse is 5x larger than the signatures
-
-Previous count: 9,682 `≠ 0` hypotheses (signatures only).
-
-**Actual finding:** for every `≠ 0` in a signature, there are ~3.2
-additional lines INSIDE proofs threading that hypothesis through
-intermediate steps (`.ne'`, `inv_ne_zero`, `cast_ne_zero`, etc.).
+The workflow:
 
 ```
-                       Signatures  Threading  Total Surface
-Algebra                       840       1570          2,410
-Analysis                      604       1958          2,562
-RingTheory                    415       1674          2,089
-NumberTheory                  283       1345          1,628
-Data                          365        839          1,204
-MeasureTheory                 285        741          1,026
-LinearAlgebra                 113        525            638
-FieldTheory                   104        496            600
-Geometry                      153        394            547
-Topology                      130        276            406
-GroupTheory                    27        240            267
-Combinatorics                  40        189            229
-Probability                    44        132            176
-Dynamics                        1         34             35
-────────────────────────────────────────────────────────────
-TOTAL                       3,512     11,190         14,702
+run → read report → fix script → run again
 ```
 
-The actual cost of the collapse across Mathlib: **14,702 lines**
-touching zero-management. Origin dissolves both — the hypotheses
-AND the threading inside proofs.
+Repeat until zero failures. Then the line count is the proof.
 
-Demonstrated on `NumberTheory/Harmonic/Int.lean` (56 lines):
-- `harmonic_pos` carries `(Hn : n ≠ 0)` in signature → dissolves
-- `padicValRat_two_harmonic` threads `.ne'` and `inv_ne_zero`
-  INSIDE the proof 4 times → all simplify
-- `padicNorm_two_harmonic` carries `(hn : n ≠ 0)` → dissolves
-- `harmonic_not_int` is genuine content → keep
+**Error grouping is the key.** Each unique error pattern maps to one
+script improvement. Fix the script, not the output. Re-run. The
+fixed pattern should produce zero errors. If 200 files had the same
+error and your fix resolves it, 200 files now build clean.
 
-The highest-value work is in the most-affected domains. Start
-with Algebra (2,410), Analysis (2,562), RingTheory (2,089),
-NumberTheory (1,628). That's where Origin removes the most code.
+**The final output:**
 
-### The order
+```
+Mathlib:    2,200,000 lines
+Origin:         X,XXX lines
+Reduction:       XX.X%
+Build:        PASS (0 errors)
+```
 
-Smallest Mathlib domain first. Same discipline as always.
-
-Within each domain: start with the files that have no imports from
-the same domain. Work outward. Each file builds on the previous.
-
-### What the classifications/ directory is
-
-Historical documentation of the Val-era mapping. It shows the journey
-from Mathlib through Val's three-bucket model. The numbers in it
-(51.9% B1, 15.4% B2, 32.7% B3) describe Val, not Origin.
-
-For Origin, B2 doesn't exist (no `≠ 0` hypotheses to dissolve — `none`
-handles it structurally). Much of what was B1 in Val is handled by
-Lean's standard instances on Option. The boundary between "free" and
-"needs writing" is different and simpler.
-
-Don't reclassify. Just go straight to Mathlib and triage.
+That's the proof. Lean's kernel verified every line. The line counts
+are objective. The build succeeds or it doesn't.
 
 ### The goal
 
-When complete, Origin is the production library: every genuinely new
-theorem from Mathlib expressed on `Option α` via Core.lean. No custom
-type. No custom typeclasses. Standard notation. Complete mathematical
-coverage. The actual content of mathematics — without the infrastructure
-that managed the whole being inside.
+Take a 2.2 million line library and express the same mathematics in
+99%+ less code. Every theorem. Exhaustively. Building clean. In the
+absolute minimum lines that Lean's richest functionality allows.
+
+Origin is the 40-year veteran who takes what the new contributors
+produce (Mathlib) and compresses it to the minimum expression. The
+script is the veteran's expertise encoded as automation. Mathlib
+grows. Origin consolidates. The script is the bridge.
+
+The exhaustive conversion IS the proof. Cherry-picking easy theorems
+proves nothing. Going through every theorem in Mathlib and showing
+it builds on Origin in fewer lines — that's the evidence no one can
+argue with. Lean's kernel verifies it. The line counts are objective.
+The build succeeds or it doesn't.
 
 Mathlib is the demo. Origin is production.

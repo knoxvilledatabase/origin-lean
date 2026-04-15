@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Limits/Unit.lean
 Genuine: 4 of 6 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.PUnit
+import Mathlib.CategoryTheory.Limits.HasLimits
 
 /-!
 # `Discrete PUnit` has limits and colimits
@@ -32,8 +34,10 @@ def punitConeIsLimit {c : Cone F} : IsLimit c where
 def punitCoconeIsColimit {c : Cocone F} : IsColimit c where
   desc := fun s => eqToHom (by simp [eq_iff_true_of_subsingleton])
 
--- INSTANCE (free from Core): :
+instance : HasLimitsOfSize.{v', v} (Discrete PUnit) :=
+  ⟨fun _ _ => ⟨fun _ => ⟨punitCone, punitConeIsLimit⟩⟩⟩
 
--- INSTANCE (free from Core): :
+instance : HasColimitsOfSize.{v', v} (Discrete PUnit) :=
+  ⟨fun _ _ => ⟨fun _ => ⟨punitCocone, punitCoconeIsColimit⟩⟩⟩
 
 end CategoryTheory.Limits

@@ -3,6 +3,12 @@ Extracted from Topology/Instances/Complex.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Data.Complex.FiniteDimensional
+import Mathlib.LinearAlgebra.FiniteDimensional
+import Mathlib.Topology.Algebra.Field
+import Mathlib.Topology.Algebra.UniformRing
+import Mathlib.FieldTheory.IntermediateField.Basic
 
 /-!
 # Some results about the topology of ℂ
@@ -35,13 +41,11 @@ theorem Complex.subfield_eq_of_closed {K : Subfield ℂ} (hc : IsClosed (K : Set
   simp only [image_univ]
   rfl
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem Complex.uniformContinuous_ringHom_eq_id_or_conj (K : Subfield ℂ) {ψ : K →+* ℂ}
     (hc : UniformContinuous ψ) : ψ.toFun = K.subtype ∨ ψ.toFun = conj ∘ K.subtype := by
-  letI : IsTopologicalDivisionRing ℂ := IsTopologicalDivisionRing.mk
-  letI : IsTopologicalRing K.topologicalClosure :=
-    Subring.instIsTopologicalRing K.topologicalClosure.toSubring
+  letI : TopologicalDivisionRing ℂ := TopologicalDivisionRing.mk
+  letI : TopologicalRing K.topologicalClosure :=
+    Subring.instTopologicalRing K.topologicalClosure.toSubring
   set ι : K → K.topologicalClosure := ⇑(Subfield.inclusion K.le_topologicalClosure)
   have ui : IsUniformInducing ι :=
     ⟨by
@@ -51,7 +55,7 @@ theorem Complex.uniformContinuous_ringHom_eq_id_or_conj (K : Subfield ℂ) {ψ :
   · -- extψ : closure(K) →+* ℂ is the extension of ψ : K →+* ℂ
     let extψ := IsDenseInducing.extendRingHom ui di.dense hc
     haveI hψ := (uniformContinuous_uniformly_extend ui di.dense hc).continuous
-    rcases Complex.subfield_eq_of_closed (Subfield.isClosed_topologicalClosure K) with h | h
+    cases' Complex.subfield_eq_of_closed (Subfield.isClosed_topologicalClosure K) with h h
     · left
       let j := RingEquiv.subfieldCongr h
       -- ψ₁ is the continuous ring hom `ℝ →+* ℂ` constructed from `j : closure (K) ≃+* ℝ`
@@ -64,12 +68,8 @@ theorem Complex.uniformContinuous_ringHom_eq_id_or_conj (K : Subfield ℂ) {ψ :
       rsuffices ⟨r, hr⟩ : ∃ r : ℝ, ofRealHom.rangeRestrict r = j (ι x)
       · have :=
           RingHom.congr_fun (ringHom_eq_ofReal_of_continuous hψ₁) r
-        rw [RingHom.comp_apply, RingHom.comp_apply] at this
-        -- In `this`, the `DFunLike.coe` thinks it is applying a `(ℝ →+* ↥ofRealHom.fieldRange)`,
-        -- while in `hr`, we have a `(ℝ →+* ↥ofRealHom.range)`.
-        -- We could add a `@[simp]` lemma fixing this, but it breaks later steps of the proof.
-        erw [hr] at this
-        rw [RingEquiv.toRingHom_eq_coe] at this
+        -- This used to be `rw`, but we need `erw` after https://github.com/leanprover/lean4/pull/2644
+        erw [RingHom.comp_apply, RingHom.comp_apply, hr, RingEquiv.toRingHom_eq_coe] at this
         convert this using 1
         · exact (IsDenseInducing.extend_eq di hc.continuous _).symm
         · rw [← ofRealHom.coe_rangeRestrict, hr]
@@ -85,7 +85,7 @@ theorem Complex.uniformContinuous_ringHom_eq_id_or_conj (K : Subfield ℂ) {ψ :
       -- Porting note: was `by continuity!` and was used inline
       have hψ₁ : Continuous ψ₁ := by
         simpa only [RingHom.coe_comp] using hψ.comp (continuous_id.subtype_mk _)
-      rcases ringHom_eq_id_or_conj_of_continuous hψ₁ with h | h
+      cases' ringHom_eq_id_or_conj_of_continuous hψ₁ with h h
       · left
         ext1 z
         convert RingHom.congr_fun h z using 1
@@ -94,14 +94,14 @@ theorem Complex.uniformContinuous_ringHom_eq_id_or_conj (K : Subfield ℂ) {ψ :
         ext1 z
         convert RingHom.congr_fun h z using 1
         exact (IsDenseInducing.extend_eq di hc.continuous z).symm
-  · let j : { x // x ∈ closure (id '' K) } → (K.topologicalClosure : Set ℂ) :=
+  · let j : { x // x ∈ closure (id '' { x | (K : Set ℂ) x }) } → (K.topologicalClosure : Set ℂ) :=
       fun x =>
       ⟨x, by
         convert x.prop
         simp only [id, Set.image_id']
         rfl ⟩
     convert DenseRange.comp (Function.Surjective.denseRange _)
-      (IsDenseEmbedding.id.subtype (· ∈ K)).dense (by fun_prop : Continuous j)
+      (IsDenseEmbedding.id.subtype (K : Set ℂ)).dense (by continuity : Continuous j)
     rintro ⟨y, hy⟩
     use
       ⟨y, by

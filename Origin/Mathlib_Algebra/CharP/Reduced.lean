@@ -1,14 +1,18 @@
 /-
 Extracted from Algebra/CharP/Reduced.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.CharP.Lemmas
+import Mathlib.RingTheory.Nilpotent.Defs
 
 /-!
 # Results about characteristic p reduced rings
 -/
 
 open Finset
+
+section
 
 variable (R : Type*) [CommRing R] [IsReduced R] (p n : ℕ) [ExpChar R p]
 
@@ -30,3 +34,12 @@ theorem isSquare_of_charTwo' {R : Type*} [Finite R] [CommRing R] [IsReduced R] [
       (((Fintype.bijective_iff_injective_and_card _).mpr ⟨frobenius_inj R 2, rfl⟩).surjective a)
 
 variable {R : Type*} [CommRing R] [IsReduced R]
+
+@[simp]
+theorem ExpChar.pow_prime_pow_mul_eq_one_iff (p k m : ℕ) [ExpChar R p] (x : R) :
+    x ^ (p ^ k * m) = 1 ↔ x ^ m = 1 := by
+  rw [pow_mul']
+  convert ← (iterateFrobenius_inj R p k).eq_iff
+  apply map_one
+
+alias CharP.pow_prime_pow_mul_eq_one_iff := ExpChar.pow_prime_pow_mul_eq_one_iff

@@ -3,6 +3,8 @@ Extracted from MeasureTheory/Function/LpSpace/ContinuousCompMeasurePreserving.le
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp
+import Mathlib.MeasureTheory.Measure.ContinuousPreimage
 
 /-!
 # Continuity of `MeasureTheory.Lp.compMeasurePreserving`
@@ -45,8 +47,8 @@ theorem compMeasurePreserving_continuous (hp : p ≠ ∞) :
   intro f hf
   lift f to Lp.simpleFunc E p ν using hf
   induction f using Lp.simpleFunc.induction hp₀ hp with
-  | add hfp hgp _ ihf ihg => exact ihf.add ihg
-  | @indicatorConst c s hs hνs =>
+  | h_add hfp hgp _ ihf ihg => exact ihf.add ihg
+  | @h_ind c s hs hνs =>
     dsimp only [Lp.simpleFunc.coe_indicatorConst, Lp.indicatorConstLp_compMeasurePreserving]
     refine continuous_indicatorConstLp_set hp fun f ↦ ?_
     apply tendsto_measure_symmDiff_preimage_nhds_zero continuousAt_subtype_val _ f.2
@@ -69,7 +71,7 @@ theorem Filter.Tendsto.compMeasurePreservingLp {α : Type*} {l : Filter α}
   replace hg : Tendsto (fun a ↦ ⟨g a, hgm a⟩ : α → {g : C(X, Y) // MeasurePreserving g μ ν})
       l (𝓝 ⟨g₀, hgm₀⟩) :=
     tendsto_subtype_rng.2 hg
-  convert this.comp (hf.prodMk_nhds hg)
+  convert this.comp (hf.prod_mk_nhds hg)
 
 variable {Z : Type*} [TopologicalSpace Z] {f : Z → Lp E p ν} {g : Z → C(X, Y)} {s : Set Z} {z : Z}
 

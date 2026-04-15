@@ -1,8 +1,10 @@
 /-
 Extracted from Algebra/AlgebraicCard.lean
-Genuine: 2 of 4 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 of 10 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.Cardinal
+import Mathlib.RingTheory.Algebraic.Basic
 
 /-!
 ### Cardinality of algebraic numbers
@@ -26,10 +28,12 @@ namespace Algebraic
 
 -- DISSOLVED: aleph0_le_cardinalMk_of_charZero
 
+alias aleph0_le_cardinal_mk_of_charZero := aleph0_le_cardinalMk_of_charZero
+
 section lift
 
-variable (R : Type u) (A : Type v) [CommRing R] [IsDomain R] [CommRing A] [IsDomain A] [Algebra R A]
-  [Module.IsTorsionFree R A]
+variable (R : Type u) (A : Type v) [CommRing R] [CommRing A] [IsDomain A] [Algebra R A]
+  [NoZeroSMulDivisors R A]
 
 theorem cardinalMk_lift_le_mul :
     Cardinal.lift.{u} #{ x : A // IsAlgebraic R x } ≤ Cardinal.lift.{v} #R[X] * ℵ₀ := by
@@ -44,4 +48,50 @@ theorem cardinalMk_lift_le_mul :
 
 theorem cardinalMk_lift_le_max :
     Cardinal.lift.{u} #{ x : A // IsAlgebraic R x } ≤ max (Cardinal.lift.{v} #R) ℵ₀ :=
-  (cardinalMk_lift_le_mul R A).trans <| by grw [lift_le.2 cardinalMk_le_max]; simp
+  (cardinalMk_lift_le_mul R A).trans <|
+    (mul_le_mul_right' (lift_le.2 cardinalMk_le_max) _).trans <| by simp
+
+@[simp]
+theorem cardinalMk_lift_of_infinite [Infinite R] :
+    Cardinal.lift.{u} #{ x : A // IsAlgebraic R x } = Cardinal.lift.{v} #R :=
+  ((cardinalMk_lift_le_max R A).trans_eq (max_eq_left <| aleph0_le_mk _)).antisymm <|
+    lift_mk_le'.2 ⟨⟨fun x => ⟨algebraMap R A x, isAlgebraic_algebraMap _⟩, fun _ _ h =>
+      NoZeroSMulDivisors.algebraMap_injective R A (Subtype.ext_iff.1 h)⟩⟩
+
+alias cardinal_mk_lift_of_infinite := cardinalMk_lift_of_infinite
+
+variable [Countable R]
+
+@[simp]
+protected theorem countable : Set.Countable { x : A | IsAlgebraic R x } := by
+  rw [← le_aleph0_iff_set_countable, ← lift_le_aleph0]
+  apply (cardinalMk_lift_le_max R A).trans
+  simp
+
+-- DISSOLVED: cardinalMk_of_countable_of_charZero
+
+alias cardinal_mk_of_countable_of_charZero := cardinalMk_of_countable_of_charZero
+
+end lift
+
+section NonLift
+
+variable (R A : Type u) [CommRing R] [CommRing A] [IsDomain A] [Algebra R A]
+  [NoZeroSMulDivisors R A]
+
+theorem cardinalMk_le_mul : #{ x : A // IsAlgebraic R x } ≤ #R[X] * ℵ₀ := by
+  rw [← lift_id #_, ← lift_id #R[X]]
+  exact cardinalMk_lift_le_mul R A
+
+@[stacks 09GK]
+theorem cardinalMk_le_max : #{ x : A // IsAlgebraic R x } ≤ max #R ℵ₀ := by
+  rw [← lift_id #_, ← lift_id #R]
+  exact cardinalMk_lift_le_max R A
+
+@[simp]
+theorem cardinalMk_of_infinite [Infinite R] : #{ x : A // IsAlgebraic R x } = #R :=
+  lift_inj.1 <| cardinalMk_lift_of_infinite R A
+
+end NonLift
+
+end Algebraic

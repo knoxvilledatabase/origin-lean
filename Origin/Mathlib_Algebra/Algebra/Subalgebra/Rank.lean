@@ -3,6 +3,9 @@ Extracted from Algebra/Algebra/Subalgebra/Rank.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Dimension.Free
+import Mathlib.LinearAlgebra.Dimension.Finite
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
 /-!
 
@@ -11,7 +14,7 @@ import Origin.Core
 This file contains some results on the ranks of subalgebras,
 which are corollaries of `rank_mul_rank`.
 Since their proof essentially depends on the fact that a non-trivial commutative ring
-satisfies the strong rank condition, we put them into a separate file.
+satisfies strong rank condition, we put them into a separate file.
 
 -/
 
@@ -21,6 +24,8 @@ namespace Subalgebra
 
 variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
   (A B : Subalgebra R S)
+
+section
 
 variable [Module.Free R A] [Module.Free A (Algebra.adjoin A (B : Set S))]
 
@@ -45,6 +50,8 @@ theorem finrank_left_dvd_finrank_sup_of_free :
     finrank R A ∣ finrank R ↥(A ⊔ B) := ⟨_, finrank_sup_eq_finrank_left_mul_finrank_of_free A B⟩
 
 end
+
+section
 
 variable [Module.Free R B] [Module.Free B (Algebra.adjoin B (A : Set S))]
 

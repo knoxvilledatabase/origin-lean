@@ -1,18 +1,55 @@
 /-
 Extracted from Algebra/Regular/Pow.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Algebra.GroupPower.IterateHom
+import Mathlib.Algebra.Regular.Basic
 
 /-!
-# Product of regular elements
+# Regular elements
 
-## TODO
+## Implementation details
 
-Move to `Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean`?
+Group powers and other definitions import a lot of the algebra hierarchy.
+Lemmas about them are kept separate to be able to provide `IsRegular` early in the
+algebra hierarchy.
+
 -/
 
 variable {R : Type*} {a b : R}
+
+section Monoid
+
+variable [Monoid R]
+
+theorem IsLeftRegular.pow (n : ℕ) (rla : IsLeftRegular a) : IsLeftRegular (a ^ n) := by
+  simp only [IsLeftRegular, ← mul_left_iterate, rla.iterate n]
+
+theorem IsRightRegular.pow (n : ℕ) (rra : IsRightRegular a) : IsRightRegular (a ^ n) := by
+  rw [IsRightRegular, ← mul_right_iterate]
+  exact rra.iterate n
+
+theorem IsRegular.pow (n : ℕ) (ra : IsRegular a) : IsRegular (a ^ n) :=
+  ⟨IsLeftRegular.pow n ra.left, IsRightRegular.pow n ra.right⟩
+
+theorem IsLeftRegular.pow_iff {n : ℕ} (n0 : 0 < n) : IsLeftRegular (a ^ n) ↔ IsLeftRegular a := by
+  refine ⟨?_, IsLeftRegular.pow n⟩
+  rw [← Nat.succ_pred_eq_of_pos n0, pow_succ]
+  exact IsLeftRegular.of_mul
+
+theorem IsRightRegular.pow_iff {n : ℕ} (n0 : 0 < n) :
+    IsRightRegular (a ^ n) ↔ IsRightRegular a := by
+  refine ⟨?_, IsRightRegular.pow n⟩
+  rw [← Nat.succ_pred_eq_of_pos n0, pow_succ']
+  exact IsRightRegular.of_mul
+
+theorem IsRegular.pow_iff {n : ℕ} (n0 : 0 < n) : IsRegular (a ^ n) ↔ IsRegular a :=
+  ⟨fun h => ⟨(IsLeftRegular.pow_iff n0).mp h.left, (IsRightRegular.pow_iff n0).mp h.right⟩, fun h =>
+    ⟨IsLeftRegular.pow n h.left, IsRightRegular.pow n h.right⟩⟩
+
+end Monoid
 
 section CommMonoid
 

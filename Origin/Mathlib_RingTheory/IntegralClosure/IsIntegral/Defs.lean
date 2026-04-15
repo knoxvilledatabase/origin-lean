@@ -1,8 +1,11 @@
 /-
 Extracted from RingTheory/IntegralClosure/IsIntegral/Defs.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.Degree.Definitions
+import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Tactic.Algebraize
 
 /-!
 # Integral closure of a subring.
@@ -30,3 +33,14 @@ variable [CommRing R] [Ring A] [Ring S] (f : R →+* S)
 
 def RingHom.IsIntegralElem (f : R →+* A) (x : A) :=
   ∃ p : R[X], Monic p ∧ eval₂ f x p = 0
+
+@[algebraize Algebra.IsIntegral.mk]
+def RingHom.IsIntegral (f : R →+* A) :=
+  ∀ x : A, f.IsIntegralElem x
+
+variable [Algebra R A] (R)
+
+def IsIntegral (x : A) : Prop :=
+  (algebraMap R A).IsIntegralElem x
+
+end Ring

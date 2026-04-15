@@ -1,8 +1,10 @@
 /-
 Extracted from CategoryTheory/Limits/Preserves/Shapes/BinaryProducts.lean
-Genuine: 6 of 7 | Dissolved: 0 | Infrastructure: 1
+Genuine: 14 of 18 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
+import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
 /-!
 # Preserving binary products
@@ -28,13 +30,15 @@ variable (G : C ⥤ D)
 
 namespace CategoryTheory.Limits
 
+section
+
 variable {P X Y Z : C} (f : P ⟶ X) (g : P ⟶ Y)
 
 def isLimitMapConeBinaryFanEquiv :
     IsLimit (G.mapCone (BinaryFan.mk f g)) ≃ IsLimit (BinaryFan.mk (G.map f) (G.map g)) :=
   (IsLimit.postcomposeHomEquiv (diagramIsoPair _) _).symm.trans
     (IsLimit.equivIsoLimit
-      (Cone.ext (Iso.refl _)
+      (Cones.ext (Iso.refl _)
         (by rintro (_ | _) <;> simp)))
 
 def mapIsLimitOfPreservesOfIsLimit [PreservesLimit (pair X Y) G] (l : IsLimit (BinaryFan.mk f g)) :
@@ -53,8 +57,6 @@ def isLimitOfHasBinaryProductOfPreservesLimit [PreservesLimit (pair X Y) G] :
     IsLimit (BinaryFan.mk (G.map (Limits.prod.fst : X ⨯ Y ⟶ X)) (G.map Limits.prod.snd)) :=
   mapIsLimitOfPreservesOfIsLimit G _ _ (prodIsProd X Y)
 
--- INSTANCE (free from Core): [PreservesLimit
-
 variable [HasBinaryProduct (G.obj X) (G.obj Y)]
 
 lemma PreservesLimitPair.of_iso_prod_comparison [i : IsIso (prodComparison G X Y)] :
@@ -68,3 +70,80 @@ variable [PreservesLimit (pair X Y) G]
 
 def PreservesLimitPair.iso : G.obj (X ⨯ Y) ≅ G.obj X ⨯ G.obj Y :=
   IsLimit.conePointUniqueUpToIso (isLimitOfHasBinaryProductOfPreservesLimit G X Y) (limit.isLimit _)
+
+@[simp]
+theorem PreservesLimitPair.iso_hom : (PreservesLimitPair.iso G X Y).hom = prodComparison G X Y :=
+  rfl
+
+@[simp, reassoc]
+theorem PreservesLimitPair.iso_inv_fst :
+    (PreservesLimitPair.iso G X Y).inv ≫ G.map prod.fst = prod.fst := by
+  rw [← Iso.cancel_iso_hom_left (PreservesLimitPair.iso G X Y), ← Category.assoc, Iso.hom_inv_id]
+  simp
+
+@[simp, reassoc]
+theorem PreservesLimitPair.iso_inv_snd :
+    (PreservesLimitPair.iso G X Y).inv ≫ G.map prod.snd = prod.snd := by
+  rw [← Iso.cancel_iso_hom_left (PreservesLimitPair.iso G X Y), ← Category.assoc, Iso.hom_inv_id]
+  simp
+
+instance : IsIso (prodComparison G X Y) := by
+  rw [← PreservesLimitPair.iso_hom]
+  infer_instance
+
+end
+
+section
+
+variable {P X Y Z : C} (f : X ⟶ P) (g : Y ⟶ P)
+
+def isColimitMapCoconeBinaryCofanEquiv :
+    IsColimit (Functor.mapCocone G (BinaryCofan.mk f g))
+    ≃ IsColimit (BinaryCofan.mk (G.map f) (G.map g)) :=
+  (IsColimit.precomposeHomEquiv (diagramIsoPair _).symm _).symm.trans
+    (IsColimit.equivIsoColimit
+      (Cocones.ext (Iso.refl _)
+        (by rintro (_ | _) <;> simp)))
+
+def mapIsColimitOfPreservesOfIsColimit [PreservesColimit (pair X Y) G]
+    (l : IsColimit (BinaryCofan.mk f g)) : IsColimit (BinaryCofan.mk (G.map f) (G.map g)) :=
+  isColimitMapCoconeBinaryCofanEquiv G f g (isColimitOfPreserves G l)
+
+def isColimitOfReflectsOfMapIsColimit [ReflectsColimit (pair X Y) G]
+    (l : IsColimit (BinaryCofan.mk (G.map f) (G.map g))) : IsColimit (BinaryCofan.mk f g) :=
+  isColimitOfReflects G ((isColimitMapCoconeBinaryCofanEquiv G f g).symm l)
+
+variable (X Y)
+
+variable [HasBinaryCoproduct X Y]
+
+def isColimitOfHasBinaryCoproductOfPreservesColimit [PreservesColimit (pair X Y) G] :
+    IsColimit (BinaryCofan.mk (G.map (Limits.coprod.inl : X ⟶ X ⨿ Y)) (G.map Limits.coprod.inr)) :=
+  mapIsColimitOfPreservesOfIsColimit G _ _ (coprodIsCoprod X Y)
+
+variable [HasBinaryCoproduct (G.obj X) (G.obj Y)]
+
+lemma PreservesColimitPair.of_iso_coprod_comparison [i : IsIso (coprodComparison G X Y)] :
+    PreservesColimit (pair X Y) G := by
+  apply preservesColimit_of_preserves_colimit_cocone (coprodIsCoprod X Y)
+  apply (isColimitMapCoconeBinaryCofanEquiv _ _ _).symm _
+  refine @IsColimit.ofPointIso _ _ _ _ _ _ _ (colimit.isColimit (pair (G.obj X) (G.obj Y))) ?_
+  apply i
+
+variable [PreservesColimit (pair X Y) G]
+
+def PreservesColimitPair.iso : G.obj X ⨿ G.obj Y ≅ G.obj (X ⨿ Y) :=
+  IsColimit.coconePointUniqueUpToIso (colimit.isColimit _)
+    (isColimitOfHasBinaryCoproductOfPreservesColimit G X Y)
+
+@[simp]
+theorem PreservesColimitPair.iso_hom :
+    (PreservesColimitPair.iso G X Y).hom = coprodComparison G X Y := rfl
+
+instance : IsIso (coprodComparison G X Y) := by
+  rw [← PreservesColimitPair.iso_hom]
+  infer_instance
+
+end
+
+end CategoryTheory.Limits

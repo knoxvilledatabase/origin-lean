@@ -3,6 +3,7 @@ Extracted from Order/Filter/CountableSeparatingOn.lean
 Genuine: 17 of 19 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Order.Filter.CountableInter
 
 /-!
 # Filters with countable intersections and countable separating families
@@ -75,6 +76,12 @@ class HasCountableSeparatingOn (α : Type*) (p : Set α → Prop) (t : Set α) :
   exists_countable_separating : ∃ S : Set (Set α), S.Countable ∧ (∀ s ∈ S, p s) ∧
     ∀ x ∈ t, ∀ y ∈ t, (∀ s ∈ S, x ∈ s ↔ y ∈ s) → x = y
 
+theorem exists_countable_separating (α : Type*) (p : Set α → Prop) (t : Set α)
+    [h : HasCountableSeparatingOn α p t] :
+    ∃ S : Set (Set α), S.Countable ∧ (∀ s ∈ S, p s) ∧
+      ∀ x ∈ t, ∀ y ∈ t, (∀ s ∈ S, x ∈ s ↔ y ∈ s) → x = y :=
+  h.1
+
 theorem exists_nonempty_countable_separating (α : Type*) {p : Set α → Prop} {s₀} (hp : p s₀)
     (t : Set α) [HasCountableSeparatingOn α p t] :
     ∃ S : Set (Set α), S.Nonempty ∧ S.Countable ∧ (∀ s ∈ S, p s) ∧
@@ -90,6 +97,13 @@ theorem exists_seq_separating (α : Type*) {p : Set α → Prop} {s₀} (hp : p 
   rcases hSc.exists_eq_range hSne with ⟨S, rfl⟩
   use S
   simpa only [forall_mem_range] using hS
+
+theorem HasCountableSeparatingOn.mono {α} {p₁ p₂ : Set α → Prop} {t₁ t₂ : Set α}
+    [h : HasCountableSeparatingOn α p₁ t₁] (hp : ∀ s, p₁ s → p₂ s) (ht : t₂ ⊆ t₁) :
+    HasCountableSeparatingOn α p₂ t₂ where
+  exists_countable_separating :=
+    let ⟨S, hSc, hSp, hSt⟩ := h.1
+    ⟨S, hSc, fun s hs ↦ hp s (hSp s hs), fun x hx y hy ↦ hSt x (ht hx) y (ht hy)⟩
 
 theorem HasCountableSeparatingOn.of_subtype {α : Type*} {p : Set α → Prop} {t : Set α}
     {q : Set t → Prop} [h : HasCountableSeparatingOn t q univ]

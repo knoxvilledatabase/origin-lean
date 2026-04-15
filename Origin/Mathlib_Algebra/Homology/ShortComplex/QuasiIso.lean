@@ -3,6 +3,7 @@ Extracted from Algebra/Homology/ShortComplex/QuasiIso.lean
 Genuine: 19 of 22 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.ShortComplex.Homology
 
 /-!
 # Quasi-isomorphisms of short complexes
@@ -19,7 +20,7 @@ open Category Limits
 
 namespace ShortComplex
 
-variable {C : Type _} [Category* C] [HasZeroMorphisms C]
+variable {C : Type _} [Category C] [HasZeroMorphisms C]
   {S₁ S₂ S₃ S₄ : ShortComplex C}
   [S₁.HasHomology] [S₂.HasHomology] [S₃.HasHomology] [S₄.HasHomology]
 
@@ -27,7 +28,7 @@ class QuasiIso (φ : S₁ ⟶ S₂) : Prop where
   /-- the homology map is an isomorphism -/
   isIso' : IsIso (homologyMap φ)
 
--- INSTANCE (free from Core): QuasiIso.isIso
+instance QuasiIso.isIso (φ : S₁ ⟶ S₂) [QuasiIso φ] : IsIso (homologyMap φ) := QuasiIso.isIso'
 
 lemma quasiIso_iff (φ : S₁ ⟶ S₂) :
     QuasiIso φ ↔ IsIso (homologyMap φ) := by
@@ -37,9 +38,14 @@ lemma quasiIso_iff (φ : S₁ ⟶ S₂) :
   · intro h
     exact ⟨h⟩
 
--- INSTANCE (free from Core): quasiIso_of_isIso
+instance quasiIso_of_isIso (φ : S₁ ⟶ S₂) [IsIso φ] : QuasiIso φ :=
+  ⟨(homologyMapIso (asIso φ)).isIso_hom⟩
 
--- INSTANCE (free from Core): quasiIso_comp
+instance quasiIso_comp (φ : S₁ ⟶ S₂) (φ' : S₂ ⟶ S₃) [hφ : QuasiIso φ] [hφ' : QuasiIso φ'] :
+    QuasiIso (φ ≫ φ') := by
+  rw [quasiIso_iff] at hφ hφ' ⊢
+  rw [homologyMap_comp]
+  infer_instance
 
 lemma quasiIso_of_comp_left (φ : S₁ ⟶ S₂) (φ' : S₂ ⟶ S₃)
     [hφ : QuasiIso φ] [hφφ' : QuasiIso (φ ≫ φ')] :
@@ -70,8 +76,6 @@ lemma quasiIso_iff_comp_right (φ : S₁ ⟶ S₂) (φ' : S₂ ⟶ S₃) [hφ' :
     exact quasiIso_of_comp_right φ φ'
   · intro
     exact quasiIso_comp φ φ'
-
-set_option backward.isDefEq.respectTransparency false in
 
 lemma quasiIso_of_arrow_mk_iso (φ : S₁ ⟶ S₂) (φ' : S₃ ⟶ S₄) (e : Arrow.mk φ ≅ Arrow.mk φ')
     [hφ : QuasiIso φ] : QuasiIso φ' := by
@@ -157,8 +161,6 @@ lemma quasiIso_unopMap {S₁ S₂ : ShortComplex Cᵒᵖ} [S₁.HasHomology] [S�
   change QuasiIso φ
   infer_instance
 
-set_option backward.isDefEq.respectTransparency false in
-
 lemma quasiIso_iff_isIso_liftCycles (φ : S₁ ⟶ S₂)
     (hf₁ : S₁.f = 0) (hg₁ : S₁.g = 0) (hf₂ : S₂.f = 0) :
     QuasiIso φ ↔ IsIso (S₂.liftCycles φ.τ₂ (by rw [φ.comm₂₃, hg₁, zero_comp])) := by
@@ -167,8 +169,6 @@ lemma quasiIso_iff_isIso_liftCycles (φ : S₁ ⟶ S₂)
     { φK := S₂.liftCycles φ.τ₂ (by rw [φ.comm₂₃, hg₁, zero_comp])
       φH := S₂.liftCycles φ.τ₂ (by rw [φ.comm₂₃, hg₁, zero_comp]) }
   exact H.quasiIso_iff
-
-set_option backward.isDefEq.respectTransparency false in
 
 lemma quasiIso_iff_isIso_descOpcycles (φ : S₁ ⟶ S₂)
     (hg₁ : S₁.g = 0) (hf₂ : S₂.f = 0) (hg₂ : S₂.g = 0) :

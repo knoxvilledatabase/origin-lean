@@ -1,8 +1,9 @@
 /-
 Extracted from Analysis/Calculus/LocalExtr/Basic.lean
-Genuine: 23 of 27 | Dissolved: 0 | Infrastructure: 4
+Genuine: 24 of 28 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Add
 
 /-!
 # Local extrema of differentiable functions
@@ -56,37 +57,51 @@ universe u v
 
 open Filter Set
 
-open scoped Topology Convex NNReal
+open scoped Topology Convex
 
 section Module
 
 variable {E : Type u} [NormedAddCommGroup E] [NormedSpace ℝ E]
-  {f : E → ℝ} {f' : StrongDual ℝ E} {s : Set E} {a x y : E}
+  {f : E → ℝ} {f' : E →L[ℝ] ℝ} {s : Set E} {a x y : E}
 
 /-!
 ### Positive tangent cone
 -/
 
+def posTangentConeAt (s : Set E) (x : E) : Set E :=
+  { y : E | ∃ (c : ℕ → ℝ) (d : ℕ → E), (∀ᶠ n in atTop, x + d n ∈ s) ∧
+    Tendsto c atTop atTop ∧ Tendsto (fun n => c n • d n) atTop (𝓝 y) }
+
 theorem posTangentConeAt_mono : Monotone fun s => posTangentConeAt s a := by
-  intro s t hst
-  exact tangentConeAt_mono hst
+  rintro s t hst y ⟨c, d, hd, hc, hcd⟩
+  exact ⟨c, d, mem_of_superset hd fun h hn => hst hn, hc, hcd⟩
 
 theorem mem_posTangentConeAt_of_frequently_mem (h : ∃ᶠ t : ℝ in 𝓝[>] 0, x + t • y ∈ s) :
     y ∈ posTangentConeAt s x := by
-  rw [← NNReal.coe_zero, ← NNReal.map_coe_nhdsGT, frequently_map, frequently_iff_neBot] at h
-  apply mem_tangentConeAt_of_add_smul_mem (l := 𝓝[>] (0 : ℝ≥0) ⊓ 𝓟 {t | x + (t : ℝ) • y ∈ s})
-  · exact tendsto_id'.mpr <| inf_le_left.trans <| nhdsGT_le_nhdsNE _
-  · simp [eventually_inf_principal, NNReal.smul_def]
-
-theorem sub_mem_posTangentConeAt_of_segment_subset (h : segment ℝ x y ⊆ s) :
-    y - x ∈ posTangentConeAt s x :=
-  sub_mem_posTangentConeAt_of_openSegment_subset <| (openSegment_subset_segment ..).trans h
+  obtain ⟨a, ha, has⟩ := Filter.exists_seq_forall_of_frequently h
+  refine ⟨a⁻¹, (a · • y), Eventually.of_forall has, tendsto_inv_zero_atTop.comp ha, ?_⟩
+  refine tendsto_const_nhds.congr' ?_
+  filter_upwards [(tendsto_nhdsWithin_iff.1 ha).2] with n (hn : 0 < a n)
+  simp [ne_of_gt hn]
 
 theorem mem_posTangentConeAt_of_segment_subset (h : [x -[ℝ] x + y] ⊆ s) :
     y ∈ posTangentConeAt s x := by
-  simpa using sub_mem_posTangentConeAt_of_segment_subset h
+  refine mem_posTangentConeAt_of_frequently_mem (Eventually.frequently ?_)
+  rw [eventually_nhdsWithin_iff]
+  filter_upwards [ge_mem_nhds one_pos] with t ht₁ ht₀
+  apply h
+  rw [segment_eq_image', add_sub_cancel_left]
+  exact mem_image_of_mem _ ⟨le_of_lt ht₀, ht₁⟩
 
-theorem posTangentConeAt_univ : posTangentConeAt univ a = univ := tangentConeAt_univ
+alias mem_posTangentConeAt_of_segment_subset' := mem_posTangentConeAt_of_segment_subset
+
+theorem sub_mem_posTangentConeAt_of_segment_subset (h : segment ℝ x y ⊆ s) :
+    y - x ∈ posTangentConeAt s x :=
+  mem_posTangentConeAt_of_segment_subset <| by rwa [add_sub_cancel]
+
+@[simp]
+theorem posTangentConeAt_univ : posTangentConeAt univ a = univ :=
+  eq_univ_of_forall fun _ => mem_posTangentConeAt_of_segment_subset (subset_univ _)
 
 /-!
 ### Fermat's Theorem (vector space)
@@ -94,14 +109,15 @@ theorem posTangentConeAt_univ : posTangentConeAt univ a = univ := tangentConeAt_
 
 theorem IsLocalMaxOn.hasFDerivWithinAt_nonpos (h : IsLocalMaxOn f s a)
     (hf : HasFDerivWithinAt f f' s a) (hy : y ∈ posTangentConeAt s a) : f' y ≤ 0 := by
-  rcases exists_fun_of_mem_tangentConeAt hy with ⟨ι, l, hl, c, d, hd₀, hd, hcd⟩
-  suffices ∀ᶠ n in l, c n • (f (a + d n) - f a) ≤ 0 from
-    le_of_tendsto (hf.lim hd₀ hd hcd) this
-  replace hd : Tendsto (fun n => a + d n) l (𝓝[s] (a + 0)) :=
-    tendsto_nhdsWithin_iff.2 ⟨tendsto_const_nhds.add hd₀, hd⟩
+  rcases hy with ⟨c, d, hd, hc, hcd⟩
+  have hc' : Tendsto (‖c ·‖) atTop atTop := tendsto_abs_atTop_atTop.comp hc
+  suffices ∀ᶠ n in atTop, c n • (f (a + d n) - f a) ≤ 0 from
+    le_of_tendsto (hf.lim atTop hd hc' hcd) this
+  replace hd : Tendsto (fun n => a + d n) atTop (𝓝[s] (a + 0)) :=
+    tendsto_nhdsWithin_iff.2 ⟨tendsto_const_nhds.add (tangentConeAt.lim_zero _ hc' hcd), hd⟩
   rw [add_zero] at hd
-  refine hd.eventually h |>.mono fun n hn ↦ ?_
-  exact mul_nonpos_of_nonneg_of_nonpos (c n).coe_nonneg (sub_nonpos.2 hn)
+  filter_upwards [hd.eventually h, hc.eventually_ge_atTop 0] with n hfn hcn
+  exact mul_nonpos_of_nonneg_of_nonpos hcn (sub_nonpos.2 hfn)
 
 theorem IsLocalMaxOn.fderivWithin_nonpos (h : IsLocalMaxOn f s a)
     (hy : y ∈ posTangentConeAt s a) : (fderivWithin ℝ f s a : E → ℝ) y ≤ 0 := by
@@ -166,6 +182,12 @@ theorem IsLocalMax.fderiv_eq_zero (h : IsLocalMax f a) : fderiv ℝ f a = 0 := b
   exact if hf : DifferentiableAt ℝ f a then h.hasFDerivAt_eq_zero hf.hasFDerivAt
   else fderiv_zero_of_not_differentiableAt hf
 
+theorem IsLocalExtr.hasFDerivAt_eq_zero (h : IsLocalExtr f a) : HasFDerivAt f f' a → f' = 0 :=
+  h.elim IsLocalMin.hasFDerivAt_eq_zero IsLocalMax.hasFDerivAt_eq_zero
+
+theorem IsLocalExtr.fderiv_eq_zero (h : IsLocalExtr f a) : fderiv ℝ f a = 0 :=
+  h.elim IsLocalMin.fderiv_eq_zero IsLocalMax.fderiv_eq_zero
+
 end Module
 
 /-!
@@ -179,14 +201,14 @@ variable {f : ℝ → ℝ} {f' : ℝ} {s : Set ℝ} {a b : ℝ}
 lemma one_mem_posTangentConeAt_iff_mem_closure :
     1 ∈ posTangentConeAt s a ↔ a ∈ closure (Ioi a ∩ s) := by
   constructor
-  · intro h
-    rcases exists_fun_of_mem_tangentConeAt h with ⟨ι, l, hl, c, d, hd₀, hd, hcd⟩
-    have : Tendsto (a + d ·) l (𝓝 a) := by
-      simpa only [add_zero] using tendsto_const_nhds.add hd₀
+  · rintro ⟨c, d, hs, hc, hcd⟩
+    have : Tendsto (a + d ·) atTop (𝓝 a) := by
+      simpa only [add_zero] using tendsto_const_nhds.add
+        (tangentConeAt.lim_zero _ (tendsto_abs_atTop_atTop.comp hc) hcd)
     apply mem_closure_of_tendsto this
-    filter_upwards [hcd.eventually_const_lt one_pos, hd] with n hcdn hdn
-    refine ⟨?_, hdn⟩
-    simpa using pos_of_mul_pos_right hcdn
+    filter_upwards [hc.eventually_gt_atTop 0, hcd.eventually (lt_mem_nhds one_pos), hs]
+      with n hcn hcdn hdn
+    simp_all
   · intro h
     apply mem_posTangentConeAt_of_frequently_mem
     rw [mem_closure_iff_frequently, ← map_add_left_nhds_zero, frequently_map] at h
@@ -213,5 +235,11 @@ theorem IsLocalMax.deriv_eq_zero (h : IsLocalMax f a) : deriv f a = 0 := by
   classical
   exact if hf : DifferentiableAt ℝ f a then h.hasDerivAt_eq_zero hf.hasDerivAt
   else deriv_zero_of_not_differentiableAt hf
+
+theorem IsLocalExtr.hasDerivAt_eq_zero (h : IsLocalExtr f a) : HasDerivAt f f' a → f' = 0 :=
+  h.elim IsLocalMin.hasDerivAt_eq_zero IsLocalMax.hasDerivAt_eq_zero
+
+theorem IsLocalExtr.deriv_eq_zero (h : IsLocalExtr f a) : deriv f a = 0 :=
+  h.elim IsLocalMin.deriv_eq_zero IsLocalMax.deriv_eq_zero
 
 end Real

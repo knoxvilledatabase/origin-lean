@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/Category/BoolRing.lean
-Genuine: 1 of 4 | Dissolved: 0 | Infrastructure: 3
+Genuine: 4 of 15 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
+import Mathlib.Algebra.Category.Ring.Basic
+import Mathlib.Algebra.Ring.BooleanRing
+import Mathlib.Order.Category.BoolAlg
 
 /-!
 # The category of Boolean rings
@@ -18,25 +21,71 @@ universe u
 
 open CategoryTheory Order
 
-structure BoolRing where
-  /-- Construct a bundled `BoolRing` from a `BooleanRing`. -/
-  of ::
-  /-- The underlying type. -/
-  carrier : Type u
-  [booleanRing : BooleanRing carrier]
+def BoolRing :=
+  Bundled BooleanRing
 
 namespace BoolRing
 
-initialize_simps_projections BoolRing (-booleanRing)
+instance : CoeSort BoolRing Type* :=
+  Bundled.coeSort
 
--- INSTANCE (free from Core): :
+instance (X : BoolRing) : BooleanRing X :=
+  X.str
 
-attribute [coe] carrier
+def of (α : Type*) [BooleanRing α] : BoolRing :=
+  Bundled.of α
 
-attribute [instance] booleanRing
+@[simp]
+theorem coe_of (α : Type*) [BooleanRing α] : ↥(of α) = α :=
+  rfl
 
--- INSTANCE (free from Core): :
+instance : Inhabited BoolRing :=
+  ⟨of PUnit⟩
 
-variable {R} in
+instance : BundledHom.ParentProjection @BooleanRing.toCommRing :=
+  ⟨⟩
 
-set_option backward.privateInPublic true in
+deriving instance LargeCategory for BoolRing
+
+instance : ConcreteCategory BoolRing := by
+  dsimp [BoolRing]
+  infer_instance
+
+instance hasForgetToCommRing : HasForget₂ BoolRing CommRingCat :=
+  BundledHom.forget₂ _ _
+
+@[simps]
+def Iso.mk {α β : BoolRing.{u}} (e : α ≃+* β) : α ≅ β where
+  hom := (e : RingHom _ _)
+  inv := (e.symm : RingHom _ _)
+  hom_inv_id := by ext; exact e.symm_apply_apply _
+  inv_hom_id := by ext; exact e.apply_symm_apply _
+
+end BoolRing
+
+/-! ### Equivalence between `BoolAlg` and `BoolRing` -/
+
+@[simps]
+instance BoolRing.hasForgetToBoolAlg : HasForget₂ BoolRing BoolAlg where
+  forget₂ :=
+    { obj := fun X => BoolAlg.of (AsBoolAlg X)
+      map := fun {_ _} => RingHom.asBoolAlg }
+
+instance {X : BoolAlg} :
+    BooleanAlgebra ↑(BddDistLat.toBddLat (X.toBddDistLat)).toLat :=
+  BoolAlg.instBooleanAlgebra _
+
+@[simps]
+instance BoolAlg.hasForgetToBoolRing : HasForget₂ BoolAlg BoolRing where
+  forget₂ :=
+    { obj := fun X => BoolRing.of (AsBoolRing X)
+      map := fun {_ _} => BoundedLatticeHom.asBoolRing }
+
+@[simps functor inverse]
+def boolRingCatEquivBoolAlg : BoolRing ≌ BoolAlg where
+  functor := forget₂ BoolRing BoolAlg
+  inverse := forget₂ BoolAlg BoolRing
+  unitIso := NatIso.ofComponents (fun X => BoolRing.Iso.mk <|
+    (RingEquiv.asBoolRingAsBoolAlg X).symm) fun {_ _} _ => rfl
+  counitIso := NatIso.ofComponents (fun X => BoolAlg.Iso.mk <|
+    OrderIso.asBoolAlgAsBoolRing X) fun {_ _} _ => rfl

@@ -1,8 +1,12 @@
 /-
 Extracted from RingTheory/Finiteness/Cardinality.lean
-Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Basis.Cardinality
+import Mathlib.LinearAlgebra.DFinsupp
+import Mathlib.LinearAlgebra.StdBasis
+import Mathlib.RingTheory.Finiteness.Basic
 
 /-!
 # Finite modules and types with finitely many elements
@@ -17,53 +21,33 @@ open Finsupp
 
 section ModuleAndAlgebra
 
-variable (R M : Type*) [Semiring R] [AddCommMonoid M] [Module R M]
-
-open Module in
-
-theorem Submodule.fg_iff_exists_fin_linearMap {N : Submodule R M} :
-    N.FG ↔ ∃ (n : ℕ) (f : (Fin n → R) →ₗ[R] M), LinearMap.range f = N := by
-  simp_rw [fg_iff_exists_fin_generating_family, ← ((Pi.basisFun R _).constr ℕ).exists_congr_right]
-  simp [Basis.constr_range]
-
-theorem AddSubmonoid.fg_iff_exists_fin_addMonoidHom {M : Type*} [AddCommMonoid M]
-    {S : AddSubmonoid M} : S.FG ↔ ∃ (n : ℕ) (f : (Fin n → ℕ) →+ M), AddMonoidHom.mrange f = S := by
-  rw [← S.toNatSubmodule_toAddSubmonoid, ← Submodule.fg_iff_addSubmonoid_fg,
-    Submodule.fg_iff_exists_fin_linearMap]
-  exact exists_congr fun n => ⟨fun ⟨f, hf⟩ => ⟨f, hf ▸ LinearMap.range_toAddSubmonoid _⟩,
-    fun ⟨f, hf⟩ => ⟨f.toNatLinearMap, Submodule.toAddSubmonoid_inj.mp <|
-      hf ▸ LinearMap.range_toAddSubmonoid _⟩⟩
-
-theorem AddSubgroup.fg_iff_exists_fin_addMonoidHom {M : Type*} [AddCommGroup M]
-    {H : AddSubgroup M} : H.FG ↔ ∃ (n : ℕ) (f : (Fin n → ℤ) →+ M), AddMonoidHom.range f = H := by
-  rw [← H.toIntSubmodule_toAddSubgroup, ← Submodule.fg_iff_addSubgroup_fg,
-    Submodule.fg_iff_exists_fin_linearMap]
-  refine exists_congr fun n => ⟨fun ⟨f, hf⟩ => ⟨f, hf ▸ LinearMap.range_toAddSubgroup _⟩,
-    fun ⟨f, hf⟩ => ⟨f.toIntLinearMap, Submodule.toAddSubmonoid_inj.mp ?_⟩⟩
-  simp [hf]
+variable (R A B M N : Type*)
 
 namespace Module
+
+variable [Semiring R] [AddCommMonoid M] [Module R M] [AddCommMonoid N] [Module R N]
 
 namespace Finite
 
 open Submodule Set
 
-lemma exists_fin' [Module.Finite R M] : ∃ (n : ℕ) (f : (Fin n → R) →ₗ[R] M), Surjective f :=
-  have ⟨n, f, hf⟩ := (Submodule.fg_iff_exists_fin_linearMap R M).mp fg_top
-  ⟨n, f, by rw [← LinearMap.range_eq_top, hf]⟩
+variable {R M N}
 
-theorem exists_fin_quot_equiv (R M : Type*) [Ring R] [AddCommGroup M] [Module R M]
-      [Module.Finite R M] :
-    ∃ (n : ℕ) (S : Submodule R (Fin n → R)), Nonempty ((_ ⧸ S) ≃ₗ[R] M) :=
-  let ⟨n, f, hf⟩ := Module.Finite.exists_fin' R M
-  ⟨n, LinearMap.ker f, ⟨f.quotKerEquivOfSurjective hf⟩⟩
+variable (R M) in
 
-variable {M}
+lemma exists_fin' [Module.Finite R M] : ∃ (n : ℕ) (f : (Fin n → R) →ₗ[R] M), Surjective f := by
+  have ⟨n, s, hs⟩ := exists_fin (R := R) (M := M)
+  refine ⟨n, Basis.constr (Pi.basisFun R _) ℕ s, ?_⟩
+  rw [← LinearMap.range_eq_top, Basis.constr_range, hs]
+
+variable (R) in
 
 lemma _root_.Module.finite_of_finite [Finite R] [Module.Finite R M] : Finite M := by
   obtain ⟨n, f, hf⟩ := exists_fin' R M; exact .of_surjective f hf
 
-variable {R}
+alias _root_.FiniteDimensional.finite_of_finite := finite_of_finite
+
+alias _root_.FiniteDimensional.fintypeOfFintype := finite_of_finite
 
 lemma _root_.Module.finite_iff_finite [Finite R] : Module.Finite R M ↔ Finite M :=
   ⟨fun _ ↦ finite_of_finite R, fun _ ↦ .of_finite⟩
@@ -81,51 +65,10 @@ lemma finite_basis [Nontrivial R] {ι} [Module.Finite R M]
     (b : Basis ι R M) :
     _root_.Finite ι :=
   let ⟨s, hs⟩ := ‹Module.Finite R M›
-  basis_finite_of_finite_spans s.finite_toSet hs b
+  basis_finite_of_finite_spans (↑s) s.finite_toSet hs b
 
 end Finite
-
-variable {R M}
-
-lemma not_finite_of_infinite_basis [Nontrivial R] {ι} [Infinite ι] (b : Basis ι R M) :
-    ¬ Module.Finite R M :=
-  fun _ ↦ (Finite.finite_basis b).not_infinite ‹_›
 
 end Module
 
 end ModuleAndAlgebra
-
-namespace Module.Finite
-
-universe u
-
-variable (R : Type u) (M : Type*)
-
-section Ring
-
-variable [Ring R] [AddCommGroup M] [Module R M] [Module.Finite R M]
-
-noncomputable def kerRepr := LinearMap.ker (Finite.exists_fin' R M).choose_spec.choose
-
-protected abbrev repr : Type u := _ ⧸ kerRepr R M
-
-noncomputable def reprEquiv : Finite.repr R M ≃ₗ[R] M :=
-  LinearMap.quotKerEquivOfSurjective _ (Finite.exists_fin' R M).choose_spec.choose_spec
-
-end Ring
-
-section Semiring
-
-variable [Semiring R] [AddCommMonoid M] [Module R M] [Module.Finite R M]
-
-noncomputable def kerReprₛ :=
-  ModuleCon.ker (Finite.exists_fin' R M).choose_spec.choose.toDistribMulActionHom
-
-protected abbrev reprₛ : Type u := (kerReprₛ R M).Quotient
-
-noncomputable def reprEquivₛ : Finite.reprₛ R M ≃ₗ[R] M :=
-  ModuleCon.quotientKerEquivOfSurjective _ (Finite.exists_fin' R M).choose_spec.choose_spec
-
-end Semiring
-
-end Module.Finite

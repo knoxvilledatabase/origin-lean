@@ -3,6 +3,8 @@ Extracted from RingTheory/Finiteness/Projective.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Projective
+import Mathlib.RingTheory.Finiteness.Cardinality
 
 /-!
 # Finite and projective modules

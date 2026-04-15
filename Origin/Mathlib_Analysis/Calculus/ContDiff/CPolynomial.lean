@@ -3,6 +3,8 @@ Extracted from Analysis/Calculus/ContDiff/CPolynomial.lean
 Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.FDeriv.Analytic
+import Mathlib.Analysis.Calculus.ContDiff.Defs
 
 /-!
 # Higher smoothness of continuously polynomial functions
@@ -34,10 +36,15 @@ theorem CPolynomialOn.contDiffOn (h : CPolynomialOn 𝕜 f s) {n : WithTop ℕ�
   let t := { x | CPolynomialAt 𝕜 f x }
   suffices ContDiffOn 𝕜 n f t from this.mono h
   suffices AnalyticOnNhd 𝕜 f t by
-    have t_open : IsOpen t := isOpen_cpolynomialAt 𝕜 f
+    have t_open : IsOpen t := isOpen_cPolynomialAt 𝕜 f
     exact AnalyticOnNhd.contDiffOn this t_open.uniqueDiffOn
   have H : CPolynomialOn 𝕜 f t := fun _x hx ↦ hx
   exact H.analyticOnNhd
+
+theorem CPolynomialAt.contDiffAt (h : CPolynomialAt 𝕜 f x) {n : WithTop ℕ∞} :
+    ContDiffAt 𝕜 n f x :=
+  let ⟨_, hs, hf⟩ := h.exists_mem_nhds_cPolynomialOn
+  hf.contDiffOn.contDiffAt hs
 
 end fderiv
 

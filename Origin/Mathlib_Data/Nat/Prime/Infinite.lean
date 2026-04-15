@@ -3,6 +3,9 @@ Extracted from Data/Nat/Prime/Infinite.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Nat.Factorial.Basic
+import Mathlib.Data.Nat.Prime.Defs
+import Mathlib.Order.Bounds.Basic
 
 /-!
 ## Notable Theorems

@@ -1,8 +1,9 @@
 /-
 Extracted from Geometry/Manifold/MFDeriv/Atlas.lean
-Genuine: 46 of 46 | Dissolved: 0 | Infrastructure: 0
+Genuine: 40 of 40 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.MFDeriv.SpecificFunctions
 
 /-!
 # Differentiability of models with corners and (extended) charts
@@ -13,10 +14,10 @@ We show that
 * charts are differentiable on their source
 * `mdifferentiableOn_extChartAt`: `extChartAt` is differentiable on its source
 
-Suppose an open partial homeomorphism `e` is differentiable. This file shows
-* `OpenPartialHomeomorph.MDifferentiable.mfderiv`: its derivative is a continuous linear equivalence
-* `OpenPartialHomeomorph.MDifferentiable.mfderiv_bijective`: its derivative is bijective;
-  there are also spellings with trivial kernel and full range
+Suppose a partial homeomorphism `e` is differentiable. This file shows
+* `PartialHomeomorph.MDifferentiable.mfderiv`: its derivative is a continuous linear equivalence
+* `PartialHomeomorph.MDifferentiable.mfderiv_bijective`: its derivative is bijective;
+  there are also spelling with trivial kernel and full range
 
 In particular, (extended) charts have bijective differential.
 
@@ -53,27 +54,27 @@ protected theorem hasMFDerivWithinAt {s x} :
     HasMFDerivWithinAt I 𝓘(𝕜, E) I s x (ContinuousLinearMap.id _ _) :=
   I.hasMFDerivAt.hasMFDerivWithinAt
 
-protected theorem mdifferentiableWithinAt {s x} : MDiffAt[s] I x :=
+protected theorem mdifferentiableWithinAt {s x} : MDifferentiableWithinAt I 𝓘(𝕜, E) I s x :=
   I.hasMFDerivWithinAt.mdifferentiableWithinAt
 
-protected theorem mdifferentiableAt {x} : MDiffAt I x :=
+protected theorem mdifferentiableAt {x} : MDifferentiableAt I 𝓘(𝕜, E) I x :=
   I.hasMFDerivAt.mdifferentiableAt
 
-protected theorem mdifferentiableOn {s} : MDiff[s] I := fun _ _ =>
+protected theorem mdifferentiableOn {s} : MDifferentiableOn I 𝓘(𝕜, E) I s := fun _ _ =>
   I.mdifferentiableWithinAt
 
-protected theorem mdifferentiable : MDiff I := fun _ => I.mdifferentiableAt
+protected theorem mdifferentiable : MDifferentiable I 𝓘(𝕜, E) I := fun _ => I.mdifferentiableAt
 
 theorem hasMFDerivWithinAt_symm {x} (hx : x ∈ range I) :
     HasMFDerivWithinAt 𝓘(𝕜, E) I I.symm (range I) x (ContinuousLinearMap.id _ _) :=
   ⟨I.continuousWithinAt_symm,
     (hasFDerivWithinAt_id _ _).congr' (fun _y hy => I.rightInvOn hy.1) ⟨hx, mem_range_self _⟩⟩
 
-theorem mdifferentiableOn_symm : MDiff[range I] I.symm := fun _x hx =>
+theorem mdifferentiableOn_symm : MDifferentiableOn 𝓘(𝕜, E) I I.symm (range I) := fun _x hx =>
   (I.hasMFDerivWithinAt_symm hx).mdifferentiableWithinAt
 
 theorem mdifferentiableWithinAt_symm {z : E} (hz : z ∈ range I) :
-    MDiffAt[range I] I.symm z :=
+    MDifferentiableWithinAt 𝓘(𝕜, E) I I.symm (range I) z :=
   I.mdifferentiableOn_symm z hz
 
 end ModelWithCorners
@@ -82,49 +83,50 @@ end ModelWithCorners
 
 section Charts
 
-variable [IsManifold I 1 M] [IsManifold I' 1 M']
-  [IsManifold I'' 1 M''] {e : OpenPartialHomeomorph M H}
+variable [SmoothManifoldWithCorners I M] [SmoothManifoldWithCorners I' M']
+  [SmoothManifoldWithCorners I'' M''] {e : PartialHomeomorph M H}
 
-theorem mdifferentiableAt_atlas (h : e ∈ atlas H M) {x : M} (hx : x ∈ e.source) : MDiffAt e x := by
+theorem mdifferentiableAt_atlas (h : e ∈ atlas H M) {x : M} (hx : x ∈ e.source) :
+    MDifferentiableAt I I e x := by
   rw [mdifferentiableAt_iff]
   refine ⟨(e.continuousOn x hx).continuousAt (e.open_source.mem_nhds hx), ?_⟩
   have mem :
     I ((chartAt H x : M → H) x) ∈ I.symm ⁻¹' ((chartAt H x).symm ≫ₕ e).source ∩ range I := by
     simp only [hx, mfld_simps]
-  have : (chartAt H x).symm.trans e ∈ contDiffGroupoid 1 I :=
+  have : (chartAt H x).symm.trans e ∈ contDiffGroupoid ∞ I :=
     HasGroupoid.compatible (chart_mem_atlas H x) h
   have A :
-    ContDiffOn 𝕜 1 (I ∘ (chartAt H x).symm.trans e ∘ I.symm)
+    ContDiffOn 𝕜 ∞ (I ∘ (chartAt H x).symm.trans e ∘ I.symm)
       (I.symm ⁻¹' ((chartAt H x).symm.trans e).source ∩ range I) :=
     this.1
-  have B := A.differentiableOn one_ne_zero (I ((chartAt H x : M → H) x)) mem
+  have B := A.differentiableOn (mod_cast le_top) (I ((chartAt H x : M → H) x)) mem
   simp only [mfld_simps] at B
   rw [inter_comm, differentiableWithinAt_inter] at B
   · simpa only [mfld_simps]
-  · apply IsOpen.mem_nhds ((OpenPartialHomeomorph.open_source _).preimage I.continuous_symm) mem.1
+  · apply IsOpen.mem_nhds ((PartialHomeomorph.open_source _).preimage I.continuous_symm) mem.1
 
-theorem mdifferentiableOn_atlas (h : e ∈ atlas H M) : MDiff[e.source] e :=
+theorem mdifferentiableOn_atlas (h : e ∈ atlas H M) : MDifferentiableOn I I e e.source :=
   fun _x hx => (mdifferentiableAt_atlas h hx).mdifferentiableWithinAt
 
 theorem mdifferentiableAt_atlas_symm (h : e ∈ atlas H M) {x : H} (hx : x ∈ e.target) :
-    MDiffAt e.symm x := by
+    MDifferentiableAt I I e.symm x := by
   rw [mdifferentiableAt_iff]
   refine ⟨(e.continuousOn_symm x hx).continuousAt (e.open_target.mem_nhds hx), ?_⟩
   have mem : I x ∈ I.symm ⁻¹' (e.symm ≫ₕ chartAt H (e.symm x)).source ∩ range I := by
     simp only [hx, mfld_simps]
-  have : e.symm.trans (chartAt H (e.symm x)) ∈ contDiffGroupoid 1 I :=
+  have : e.symm.trans (chartAt H (e.symm x)) ∈ contDiffGroupoid ∞ I :=
     HasGroupoid.compatible h (chart_mem_atlas H _)
   have A :
-    ContDiffOn 𝕜 1 (I ∘ e.symm.trans (chartAt H (e.symm x)) ∘ I.symm)
+    ContDiffOn 𝕜 ∞ (I ∘ e.symm.trans (chartAt H (e.symm x)) ∘ I.symm)
       (I.symm ⁻¹' (e.symm.trans (chartAt H (e.symm x))).source ∩ range I) :=
     this.1
-  have B := A.differentiableOn one_ne_zero (I x) mem
+  have B := A.differentiableOn (mod_cast le_top) (I x) mem
   simp only [mfld_simps] at B
   rw [inter_comm, differentiableWithinAt_inter] at B
   · simpa only [mfld_simps]
-  · apply IsOpen.mem_nhds ((OpenPartialHomeomorph.open_source _).preimage I.continuous_symm) mem.1
+  · apply IsOpen.mem_nhds ((PartialHomeomorph.open_source _).preimage I.continuous_symm) mem.1
 
-theorem mdifferentiableOn_atlas_symm (h : e ∈ atlas H M) : MDiff[e.target] e.symm :=
+theorem mdifferentiableOn_atlas_symm (h : e ∈ atlas H M) : MDifferentiableOn I I e.symm e.target :=
   fun _x hx => (mdifferentiableAt_atlas_symm h hx).mdifferentiableWithinAt
 
 theorem mdifferentiable_of_mem_atlas (h : e ∈ atlas H M) : e.MDifferentiable I I :=
@@ -135,46 +137,45 @@ theorem mdifferentiable_chart (x : M) : (chartAt H x).MDifferentiable I I :=
 
 end Charts
 
-/-! ### Differentiable open partial homeomorphisms -/
+/-! ### Differentiable partial homeomorphisms -/
 
-namespace OpenPartialHomeomorph.MDifferentiable
+namespace PartialHomeomorph.MDifferentiable
 
-variable {e : OpenPartialHomeomorph M M'} (he : e.MDifferentiable I I')
-  {e' : OpenPartialHomeomorph M' M''}
+variable {e : PartialHomeomorph M M'} (he : e.MDifferentiable I I') {e' : PartialHomeomorph M' M''}
 
 include he
 
 nonrec theorem symm : e.symm.MDifferentiable I' I := he.symm
 
-protected theorem mdifferentiableAt {x : M} (hx : x ∈ e.source) : MDiffAt e x :=
+protected theorem mdifferentiableAt {x : M} (hx : x ∈ e.source) : MDifferentiableAt I I' e x :=
   (he.1 x hx).mdifferentiableAt (e.open_source.mem_nhds hx)
 
-theorem mdifferentiableAt_symm {x : M'} (hx : x ∈ e.target) : MDiffAt e.symm x :=
+theorem mdifferentiableAt_symm {x : M'} (hx : x ∈ e.target) : MDifferentiableAt I' I e.symm x :=
   (he.2 x hx).mdifferentiableAt (e.open_target.mem_nhds hx)
 
 theorem symm_comp_deriv {x : M} (hx : x ∈ e.source) :
-    (mfderiv% e.symm (e x)).comp (mfderiv% e x) =
+    (mfderiv I' I e.symm (e x)).comp (mfderiv I I' e x) =
       ContinuousLinearMap.id 𝕜 (TangentSpace I x) := by
-  have : mfderiv% (e.symm ∘ e) x = (mfderiv% e.symm (e x)).comp (mfderiv% e x) :=
+  have : mfderiv I I (e.symm ∘ e) x = (mfderiv I' I e.symm (e x)).comp (mfderiv I I' e x) :=
     mfderiv_comp x (he.mdifferentiableAt_symm (e.map_source hx)) (he.mdifferentiableAt hx)
   rw [← this]
-  have : mfderiv% (_root_.id : M → M) x = ContinuousLinearMap.id _ _ := mfderiv_id
+  have : mfderiv I I (_root_.id : M → M) x = ContinuousLinearMap.id _ _ := mfderiv_id
   rw [← this]
   apply Filter.EventuallyEq.mfderiv_eq
   have : e.source ∈ 𝓝 x := e.open_source.mem_nhds hx
   exact Filter.mem_of_superset this (by mfld_set_tac)
 
 theorem comp_symm_deriv {x : M'} (hx : x ∈ e.target) :
-    (mfderiv% e (e.symm x)).comp (mfderiv% e.symm x) =
+    (mfderiv I I' e (e.symm x)).comp (mfderiv I' I e.symm x) =
       ContinuousLinearMap.id 𝕜 (TangentSpace I' x) :=
   he.symm.symm_comp_deriv hx
 
 protected def mfderiv (he : e.MDifferentiable I I') {x : M} (hx : x ∈ e.source) :
     TangentSpace I x ≃L[𝕜] TangentSpace I' (e x) :=
-  { mfderiv% e x with
-    invFun := mfderiv% e.symm (e x)
-    continuous_toFun := (mfderiv% e x).cont
-    continuous_invFun := (mfderiv% e.symm (e x)).cont
+  { mfderiv I I' e x with
+    invFun := mfderiv I' I e.symm (e x)
+    continuous_toFun := (mfderiv I I' e x).cont
+    continuous_invFun := (mfderiv I' I e.symm (e x)).cont
     left_inv := fun y => by
       have : (ContinuousLinearMap.id _ _ : TangentSpace I x →L[𝕜] TangentSpace I x) y = y := rfl
       conv_rhs => rw [← this, ← he.symm_comp_deriv hx]
@@ -187,22 +188,22 @@ protected def mfderiv (he : e.MDifferentiable I I') {x : M} (hx : x ∈ e.source
       rw [e.left_inv hx]
       rfl }
 
-theorem mfderiv_bijective {x : M} (hx : x ∈ e.source) : Function.Bijective (mfderiv% e x) :=
+theorem mfderiv_bijective {x : M} (hx : x ∈ e.source) : Function.Bijective (mfderiv I I' e x) :=
   (he.mfderiv hx).bijective
 
-theorem mfderiv_injective {x : M} (hx : x ∈ e.source) : Function.Injective (mfderiv% e x) :=
+theorem mfderiv_injective {x : M} (hx : x ∈ e.source) : Function.Injective (mfderiv I I' e x) :=
   (he.mfderiv hx).injective
 
-theorem mfderiv_surjective {x : M} (hx : x ∈ e.source) : Function.Surjective (mfderiv% e x) :=
+theorem mfderiv_surjective {x : M} (hx : x ∈ e.source) : Function.Surjective (mfderiv I I' e x) :=
   (he.mfderiv hx).surjective
 
-theorem ker_mfderiv_eq_bot {x : M} (hx : x ∈ e.source) : (mfderiv% e x).ker = ⊥ :=
+theorem ker_mfderiv_eq_bot {x : M} (hx : x ∈ e.source) : LinearMap.ker (mfderiv I I' e x) = ⊥ :=
   (he.mfderiv hx).toLinearEquiv.ker
 
-theorem range_mfderiv_eq_top {x : M} (hx : x ∈ e.source) : (mfderiv% e x).range = ⊤ :=
+theorem range_mfderiv_eq_top {x : M} (hx : x ∈ e.source) : LinearMap.range (mfderiv I I' e x) = ⊤ :=
   (he.mfderiv hx).toLinearEquiv.range
 
-theorem range_mfderiv_eq_univ {x : M} (hx : x ∈ e.source) : range (mfderiv% e x) = univ :=
+theorem range_mfderiv_eq_univ {x : M} (hx : x ∈ e.source) : range (mfderiv I I' e x) = univ :=
   (he.mfderiv_surjective hx).range_eq
 
 theorem trans (he' : e'.MDifferentiable I' I'') : (e.trans e').MDifferentiable I I'' := by
@@ -217,48 +218,49 @@ theorem trans (he' : e'.MDifferentiable I' I'') : (e.trans e').MDifferentiable I
       ((he.symm.mdifferentiableAt hx.2).comp _
           (he'.symm.mdifferentiableAt hx.1)).mdifferentiableWithinAt
 
-end OpenPartialHomeomorph.MDifferentiable
+end PartialHomeomorph.MDifferentiable
 
 /-! ### Differentiability of `extChartAt` -/
 
 section extChartAt
 
-variable [IsManifold I 1 M] {s : Set M} {x y : M} {z : E}
+variable [SmoothManifoldWithCorners I M] {s : Set M} {x y : M} {z : E}
 
 theorem hasMFDerivAt_extChartAt (h : y ∈ (chartAt H x).source) :
-    HasMFDerivAt% (extChartAt I x) y (mfderiv% (chartAt H x) y :) :=
+    HasMFDerivAt I 𝓘(𝕜, E) (extChartAt I x) y (mfderiv I I (chartAt H x) y : _) :=
   I.hasMFDerivAt.comp y ((mdifferentiable_chart x).mdifferentiableAt h).hasMFDerivAt
 
 theorem hasMFDerivWithinAt_extChartAt (h : y ∈ (chartAt H x).source) :
-    HasMFDerivAt[s] (extChartAt I x) y (mfderiv% (chartAt H x) y :) :=
+    HasMFDerivWithinAt I 𝓘(𝕜, E) (extChartAt I x) s y (mfderiv I I (chartAt H x) y : _) :=
   (hasMFDerivAt_extChartAt h).hasMFDerivWithinAt
 
 theorem mdifferentiableAt_extChartAt (h : y ∈ (chartAt H x).source) :
-    MDiffAt (extChartAt I x) y :=
+    MDifferentiableAt I 𝓘(𝕜, E) (extChartAt I x) y :=
   (hasMFDerivAt_extChartAt h).mdifferentiableAt
 
-theorem mdifferentiableOn_extChartAt : MDiff[(chartAt H x).source] (extChartAt I x) :=
-  fun _y hy ↦ (hasMFDerivWithinAt_extChartAt hy).mdifferentiableWithinAt
+theorem mdifferentiableOn_extChartAt :
+    MDifferentiableOn I 𝓘(𝕜, E) (extChartAt I x) (chartAt H x).source := fun _y hy =>
+  (hasMFDerivWithinAt_extChartAt hy).mdifferentiableWithinAt
 
 theorem mdifferentiableWithinAt_extChartAt_symm (h : z ∈ (extChartAt I x).target) :
-    MDiffAt[range I] (extChartAt I x).symm z := by
+    MDifferentiableWithinAt 𝓘(𝕜, E) I (extChartAt I x).symm (range I) z := by
   have Z := I.mdifferentiableWithinAt_symm (extChartAt_target_subset_range x h)
   apply MDifferentiableAt.comp_mdifferentiableWithinAt (I' := I) _ _ Z
   apply mdifferentiableAt_atlas_symm (ChartedSpace.chart_mem_atlas x)
-  simp only [extChartAt, OpenPartialHomeomorph.extend, PartialEquiv.trans_target,
+  simp only [extChartAt, PartialHomeomorph.extend, PartialEquiv.trans_target,
     ModelWithCorners.target_eq, ModelWithCorners.toPartialEquiv_coe_symm, mem_inter_iff, mem_range,
     mem_preimage] at h
   exact h.2
 
 theorem mdifferentiableOn_extChartAt_symm :
-    MDiff[(extChartAt I x).target] (extChartAt I x).symm := by
+    MDifferentiableOn 𝓘(𝕜, E) I (extChartAt I x).symm (extChartAt I x).target := by
   intro y hy
   exact (mdifferentiableWithinAt_extChartAt_symm hy).mono (extChartAt_target_subset_range x)
 
 lemma mfderiv_extChartAt_comp_mfderivWithin_extChartAt_symm {x : M}
     {y : E} (hy : y ∈ (extChartAt I x).target) :
-    (mfderiv% (extChartAt I x) ((extChartAt I x).symm y)) ∘L
-      (mfderiv[range I] (extChartAt I x).symm y) = ContinuousLinearMap.id _ _ := by
+    (mfderiv I 𝓘(𝕜, E) (extChartAt I x) ((extChartAt I x).symm y)) ∘L
+      (mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) y) = ContinuousLinearMap.id _ _ := by
   have U : UniqueMDiffWithinAt 𝓘(𝕜, E) (range ↑I) y := by
     apply I.uniqueMDiffOn
     exact extChartAt_target_subset_range x hy
@@ -270,30 +272,32 @@ lemma mfderiv_extChartAt_comp_mfderivWithin_extChartAt_symm {x : M}
   · exact mdifferentiableWithinAt_extChartAt_symm hy
   · exact U
   rw [← mfderivWithin_id U]
-  apply Filter.EventuallyEq.mfderivWithin_eq
+  apply Filter.EventuallyEq.mfderivWithin_eq U
   · filter_upwards [extChartAt_target_mem_nhdsWithin_of_mem hy] with z hz
     simp only [Function.comp_def, PartialEquiv.right_inv (extChartAt I x) hz, id_eq]
   · simp only [Function.comp_def, PartialEquiv.right_inv (extChartAt I x) hy, id_eq]
 
 lemma mfderiv_extChartAt_comp_mfderivWithin_extChartAt_symm' {x : M}
     {y : M} (hy : y ∈ (extChartAt I x).source) :
-    (mfderiv% (extChartAt I x) y) ∘L (mfderiv[range I] (extChartAt I x).symm (extChartAt I x y))
+    (mfderiv I 𝓘(𝕜, E) (extChartAt I x) y) ∘L
+      (mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) (extChartAt I x y))
     = ContinuousLinearMap.id _ _ := by
   have : y = (extChartAt I x).symm (extChartAt I x y) := ((extChartAt I x).left_inv hy).symm
   convert mfderiv_extChartAt_comp_mfderivWithin_extChartAt_symm ((extChartAt I x).map_source hy)
 
 lemma mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt
     {y : E} (hy : y ∈ (extChartAt I x).target) :
-    (mfderiv[range I] (extChartAt I x).symm y) ∘L
-      (mfderiv% (extChartAt I x) ((extChartAt I x).symm y))
+    (mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) y) ∘L
+      (mfderiv I 𝓘(𝕜, E) (extChartAt I x) ((extChartAt I x).symm y))
       = ContinuousLinearMap.id _ _ := by
   have h'y : (extChartAt I x).symm y ∈ (extChartAt I x).source := (extChartAt I x).map_target hy
   have h''y : (extChartAt I x).symm y ∈ (chartAt H x).source := by
     rwa [← extChartAt_source (I := I)]
   have U' : UniqueMDiffWithinAt I (extChartAt I x).source ((extChartAt I x).symm y) :=
     (isOpen_extChartAt_source x).uniqueMDiffWithinAt h'y
-  have : mfderiv% (extChartAt I x) ((extChartAt I x).symm y)
-      = mfderiv[(extChartAt I x).source] (extChartAt I x) ((extChartAt I x).symm y) := by
+  have : mfderiv I 𝓘(𝕜, E) (extChartAt I x) ((extChartAt I x).symm y)
+      = mfderivWithin I 𝓘(𝕜, E) (extChartAt I x) (extChartAt I x).source
+      ((extChartAt I x).symm y) := by
     rw [mfderivWithin_eq_mfderiv U']
     exact mdifferentiableAt_extChartAt h''y
   rw [this, ← mfderivWithin_comp_of_eq]; rotate_left
@@ -305,90 +309,32 @@ lemma mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt
   · exact U'
   · exact PartialEquiv.right_inv (extChartAt I x) hy
   rw [← mfderivWithin_id U']
-  apply Filter.EventuallyEq.mfderivWithin_eq
+  apply Filter.EventuallyEq.mfderivWithin_eq U'
   · filter_upwards [extChartAt_source_mem_nhdsWithin' h'y] with z hz
     simp only [Function.comp_def, PartialEquiv.left_inv (extChartAt I x) hz, id_eq]
   · simp only [Function.comp_def, PartialEquiv.right_inv (extChartAt I x) hy, id_eq]
 
-set_option backward.isDefEq.respectTransparency false in
-
 lemma mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt'
     {y : M} (hy : y ∈ (extChartAt I x).source) :
-    (mfderiv[range I] (extChartAt I x).symm (extChartAt I x y)) ∘L (mfderiv% (extChartAt I x) y)
+    (mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) (extChartAt I x y)) ∘L
+      (mfderiv I 𝓘(𝕜, E) (extChartAt I x) y)
       = ContinuousLinearMap.id _ _ := by
   have : y = (extChartAt I x).symm (extChartAt I x y) := ((extChartAt I x).left_inv hy).symm
   convert mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt ((extChartAt I x).map_source hy)
 
 lemma isInvertible_mfderivWithin_extChartAt_symm {y : E} (hy : y ∈ (extChartAt I x).target) :
-    (mfderiv[range I] (extChartAt I x).symm y).IsInvertible :=
+    (mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) y).IsInvertible :=
   ContinuousLinearMap.IsInvertible.of_inverse
     (mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt hy)
     (mfderiv_extChartAt_comp_mfderivWithin_extChartAt_symm hy)
 
 lemma isInvertible_mfderiv_extChartAt {y : M} (hy : y ∈ (extChartAt I x).source) :
-    (mfderiv% (extChartAt I x) y).IsInvertible := by
+    (mfderiv I 𝓘(𝕜, E) (extChartAt I x) y).IsInvertible := by
   have h'y : extChartAt I x y ∈ (extChartAt I x).target := (extChartAt I x).map_source hy
   have Z := ContinuousLinearMap.IsInvertible.of_inverse
     (mfderiv_extChartAt_comp_mfderivWithin_extChartAt_symm h'y)
     (mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt h'y)
   have : (extChartAt I x).symm ((extChartAt I x) y) = y := (extChartAt I x).left_inv hy
   rwa [this] at Z
-
-set_option backward.isDefEq.respectTransparency false in
-
-theorem TangentBundle.continuousLinearMapAt_trivializationAt
-    {x₀ x : M} (hx : x ∈ (chartAt H x₀).source) :
-    (trivializationAt E (TangentSpace I) x₀).continuousLinearMapAt 𝕜 x =
-      mfderiv% (extChartAt I x₀) x := by
-  have : MDiffAt (extChartAt I x₀) x := mdifferentiableAt_extChartAt hx
-  simp only [extChartAt, OpenPartialHomeomorph.extend, PartialEquiv.coe_trans,
-    ModelWithCorners.toPartialEquiv_coe, OpenPartialHomeomorph.toFun_eq_coe] at this
-  simp [hx, mfderiv, this]
-
-set_option backward.isDefEq.respectTransparency false in
-
-theorem TangentBundle.symmL_trivializationAt
-    {x₀ x : M} (hx : x ∈ (chartAt H x₀).source) :
-    (trivializationAt E (TangentSpace I) x₀).symmL 𝕜 x =
-      mfderiv[range I] (extChartAt I x₀).symm (extChartAt I x₀ x) := by
-  have : MDiffAt[range I] ((chartAt H x₀).symm ∘ I.symm) (I (chartAt H x₀ x)) := by
-    simpa using mdifferentiableWithinAt_extChartAt_symm (by simp [hx])
-  simp [hx, mfderivWithin, this]
-
-omit [IsManifold I 1 M] in
-
-lemma fderivWithin_extChartAt_comp_extChartAt_symm_range :
-    fderivWithin 𝕜 ((extChartAt I x) ∘ (extChartAt I x).symm) (range I) (extChartAt I x x) =
-      ContinuousLinearMap.id 𝕜 _ := by
-  set φ := extChartAt I x
-  have eq_nhd : ((extChartAt I x) ∘ (extChartAt I x).symm) =ᶠ[𝓝[range I] (extChartAt I x x)] id :=
-    Filter.eventuallyEq_of_mem (extChartAt_target_mem_nhdsWithin x)
-      (fun _ ↦ (extChartAt I x).right_inv)
-  rw [eq_nhd.fderivWithin_eq (by simp)]
-  exact fderivWithin_id <| I.uniqueDiffOn.uniqueDiffWithinAt (mem_range_self _)
-
-lemma mfderiv_extChartAt_self :
-    mfderiv I 𝓘(𝕜, E) (extChartAt I x) x = ContinuousLinearMap.id 𝕜 _ := by
-  rw [← TangentBundle.continuousLinearMapAt_trivializationAt (by simp),
-    TangentBundle.continuousLinearMapAt_trivializationAt_eq_core (by simp)]
-  ext v
-  simpa using (tangentBundleCore I M).coordChange_self (achart H x) x (mem_chart_source H x) v
-
-set_option backward.isDefEq.respectTransparency false in
-
-lemma mfderivWithin_range_extChartAt_symm :
-    mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) (extChartAt I x x) =
-      ContinuousLinearMap.id 𝕜 _ := by
-  have hcomp := mfderivWithin_extChartAt_symm_comp_mfderiv_extChartAt' (I := I)
-    (mem_extChartAt_source x)
-  rw [mfderiv_extChartAt_self, ContinuousLinearMap.comp_id] at hcomp
-  simpa using hcomp
-
-set_option backward.isDefEq.respectTransparency false in
-
-lemma mfderivWithin_extChartAt_symm_inverse_apply (v : TangentSpace I x) :
-    (mfderivWithin 𝓘(𝕜, E) I (extChartAt I x).symm (range I) (extChartAt I x x)).inverse v = v := by
-  rw [mfderivWithin_range_extChartAt_symm, ContinuousLinearMap.inverse_id]
-  exact ContinuousLinearMap.id_apply ..
 
 end extChartAt

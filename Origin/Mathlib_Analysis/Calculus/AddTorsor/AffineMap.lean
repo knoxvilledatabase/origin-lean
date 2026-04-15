@@ -3,6 +3,8 @@ Extracted from Analysis/Calculus/AddTorsor/AffineMap.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Affine.ContinuousAffineMap
+import Mathlib.Analysis.Calculus.ContDiff.Basic
 
 /-!
 # Smooth affine maps
@@ -11,7 +13,7 @@ This file contains results about smoothness of affine maps.
 
 ## Main definitions:
 
-* `ContinuousAffineMap.contDiff`: a continuous affine map is smooth
+ * `ContinuousAffineMap.contDiff`: a continuous affine map is smooth
 
 -/
 

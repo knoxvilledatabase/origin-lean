@@ -3,6 +3,9 @@ Extracted from RingTheory/LocalProperties/Submodule.lean
 Genuine: 20 of 22 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.LocalizedModule.Submodule
+import Mathlib.RingTheory.Localization.AtPrime
+import Mathlib.RingTheory.Localization.Away.Basic
 
 /-!
 # Local properties of modules and submodules
@@ -34,6 +37,18 @@ variable
   [∀ (P : Ideal R) [P.IsMaximal], Module R (M₁ₚ P)]
   (f₁ : ∀ (P : Ideal R) [P.IsMaximal], M₁ →ₗ[R] M₁ₚ P)
   [∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f₁ P)]
+
+theorem Submodule.mem_of_localization_maximal (m : M) (N : Submodule R M)
+    (h : ∀ (P : Ideal R) [P.IsMaximal], f P m ∈ N.localized₀ P.primeCompl (f P)) :
+    m ∈ N := by
+  let I : Ideal R := N.comap (LinearMap.toSpanSingleton R M m)
+  suffices I = ⊤ by simpa [I] using I.eq_top_iff_one.mp this
+  refine Not.imp_symm I.exists_le_maximal fun ⟨P, hP, le⟩ ↦ ?_
+  obtain ⟨a, ha, s, e⟩ := h P
+  rw [← IsLocalizedModule.mk'_one P.primeCompl, IsLocalizedModule.mk'_eq_mk'_iff] at e
+  obtain ⟨t, ht⟩ := e
+  simp_rw [smul_smul] at ht
+  exact (t * s).2 (le <| by apply ht ▸ smul_mem _ _ ha)
 
 theorem Submodule.le_of_localization_maximal {N₁ N₂ : Submodule R M}
     (h : ∀ (P : Ideal R) [P.IsMaximal],
@@ -138,6 +153,19 @@ theorem Module.eq_of_isLocalized_span (x y : M) (h : ∀ r : s, f r x = f r y) :
 
 theorem Module.eq_zero_of_isLocalized_span (x : M) (h : ∀ r : s, f r x = 0) : x = 0 :=
   eq_of_isLocalized_span s span_eq _ f x 0 <| by simpa only [map_zero] using h
+
+theorem Submodule.mem_of_isLocalized_span {m : M} {N : Submodule R M}
+    (h : ∀ r : s, f r m ∈ N.localized₀ (.powers r.1) (f r)) : m ∈ N := by
+  let I : Ideal R := N.comap (LinearMap.toSpanSingleton R M m)
+  suffices I = ⊤ by simpa [I] using I.eq_top_iff_one.mp this
+  by_contra! ne
+  have ⟨r, hrs, disj⟩ := exists_disjoint_powers_of_span_eq_top s span_eq _ ne
+  let r : s := ⟨r, hrs⟩
+  obtain ⟨a, ha, t, e⟩ := h r
+  rw [← IsLocalizedModule.mk'_one (.powers r.1), IsLocalizedModule.mk'_eq_mk'_iff] at e
+  have ⟨u, hu⟩ := e
+  simp_rw [smul_smul] at hu
+  exact Set.disjoint_right.mp disj (u * t).2 (by apply hu ▸ smul_mem _ _ ha)
 
 theorem Submodule.le_of_isLocalized_span {N P : Submodule R M}
     (h : ∀ r : s, N.localized₀ (.powers r.1) (f r) ≤ P.localized₀ (.powers r.1) (f r)) : N ≤ P :=

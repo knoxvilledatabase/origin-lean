@@ -1,8 +1,9 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Independence.lean
-Genuine: 5 of 7 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 of 9 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Projectivization.Basic
 
 /-!
 # Independence in Projective Space
@@ -20,7 +21,7 @@ ambient vector space. Similarly for the definition of dependence.
 - A family of elements is dependent if and only if it is not independent.
 - Two elements are dependent if and only if they are equal.
 
-## Future Work
+# Future Work
 
 - Define collinearity in projective space.
 - Prove the axioms of a projective geometry are satisfied by the dependence relation.
@@ -57,12 +58,14 @@ theorem independent_iff_iSupIndep : Independent f ↔ iSupIndep fun i => (f i).s
     · simpa only [Function.comp_apply, submodule_eq] using Submodule.mem_span_singleton_self _
     · exact rep_nonzero (f i)
 
+alias independent_iff_completeLattice_independent := independent_iff_iSupIndep
+
 -- DISSOLVED: Dependent
 
 theorem dependent_iff : Dependent f ↔ ¬LinearIndependent K (Projectivization.rep ∘ f) := by
   refine ⟨?_, fun h => ?_⟩
   · rintro ⟨ff, hff, hh1⟩
-    contrapose hh1
+    contrapose! hh1
     choose a ha using fun i : ι => exists_smul_eq_mk_rep K (ff i) (hff i)
     convert hh1.units_smul a⁻¹
     ext i
@@ -76,3 +79,17 @@ theorem dependent_iff_not_independent : Dependent f ↔ ¬Independent f := by
 
 theorem independent_iff_not_dependent : Independent f ↔ ¬Dependent f := by
   rw [dependent_iff_not_independent, Classical.not_not]
+
+@[simp]
+theorem dependent_pair_iff_eq (u v : ℙ K V) : Dependent ![u, v] ↔ u = v := by
+  rw [dependent_iff_not_independent, independent_iff, linearIndependent_fin2,
+    Function.comp_apply, Matrix.cons_val_one, Matrix.head_cons, Ne]
+  simp only [Matrix.cons_val_zero, not_and, not_forall, Classical.not_not, Function.comp_apply,
+    ← mk_eq_mk_iff' K _ _ (rep_nonzero u) (rep_nonzero v), mk_rep, Classical.imp_iff_right_iff]
+  exact Or.inl (rep_nonzero v)
+
+@[simp]
+theorem independent_pair_iff_neq (u v : ℙ K V) : Independent ![u, v] ↔ u ≠ v := by
+  rw [independent_iff_not_dependent, dependent_pair_iff_eq u v]
+
+end Projectivization

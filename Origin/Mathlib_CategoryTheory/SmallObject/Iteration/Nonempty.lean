@@ -3,13 +3,18 @@ Extracted from CategoryTheory/SmallObject/Iteration/Nonempty.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.SmallObject.Iteration.ExtendToSucc
 
 /-!
-# Existence of the iteration of a successor structure
+# Existence of objects in the category of iterations of functors
 
-Given `Φ : SuccStruct C`, we show by transfinite induction
-that for any element `j` in a well-ordered set `J`,
-the type `Φ.Iteration j` is nonempty.
+Given a functor `Φ : C ⥤ C` and a natural transformation `ε : 𝟭 C ⟶ Φ`,
+we shall show in this file that for any well ordered set `J`,
+and `j : J`, the category `Functor.Iteration ε j` is nonempty.
+As we already know from the main result in `SmallObject.Iteration.UniqueHom`
+that such objects, if they exist, are unique up to a unique isomorphism,
+we shall show the existence of a term in `Functor.Iteration ε j` by
+transfinite induction.
 
 -/
 
@@ -17,56 +22,74 @@ universe u
 
 namespace CategoryTheory
 
-namespace SmallObject
-
-namespace SuccStruct
-
 open Category Limits
 
-variable {C : Type*} [Category* C] (Φ : SuccStruct C)
-  {J : Type u} [LinearOrder J] [OrderBot J] [SuccOrder J] [WellFoundedLT J]
-  [HasIterationOfShape J C]
+variable {C : Type*} [Category C] {Φ : C ⥤ C} {ε : 𝟭 C ⟶ Φ}
+  {J : Type u} [LinearOrder J] [OrderBot J] [SuccOrder J]
+
+namespace Functor
 
 namespace Iteration
 
-variable (J) in
+variable (ε J) in
 
-def mkOfBot : Φ.Iteration (⊥ : J) where
-  F := (Functor.const _).obj Φ.X₀
-  obj_bot := rfl
-  arrowSucc_eq _ h := by simp at h
-  arrowMap_limit _ h₁ h₂ := (h₁.not_isMin (by simpa using h₂)).elim
+def mkOfBot : Iteration ε (⊥ : J) where
+  F := (Functor.const _).obj (𝟭 C)
+  isoZero := Iso.refl _
+  isoSucc _ h := by simp at h
+  mapSucc'_eq _ h := by simp at h
+  isColimit x hx h := by
+    exfalso
+    refine hx.not_isMin (by simpa using h)
 
-variable {Φ}
-
-set_option backward.isDefEq.respectTransparency false in
-
-open Functor in
-
-noncomputable def mkOfSucc {j : J} (hj : ¬IsMax j) (iter : Φ.Iteration j) :
-    Φ.Iteration (Order.succ j) where
-  F := extendToSucc hj iter.F (Φ.toSucc _)
-  obj_bot := by rw [extendToSucc_obj_eq _ _ _ _ bot_le, obj_bot]
-  arrowSucc_eq i hi₁ := by
-    rw [Order.lt_succ_iff_of_not_isMax hj] at hi₁
-    obtain hi₁ | rfl := hi₁.lt_or_eq
-    · rw [arrowSucc_def, arrowMap_extendToSucc _ _ _ _ _ _ (Order.succ_le_of_lt hi₁),
-        ← arrowSucc_def _ _ hi₁, iter.arrowSucc_eq i hi₁,
-        extendToSucc_obj_eq hj iter.F (Φ.toSucc _) i hi₁.le]
-    · rw [arrowSucc_extendToSucc, toSuccArrow,
-        extendToSucc_obj_eq hj iter.F (Φ.toSucc _) i]
-  arrowMap_limit i hi hij k hk := by
-    have hij' := (Order.IsSuccLimit.le_succ_iff hi).1 hij
-    rw [arrowMap_extendToSucc _ _ _ _ _ _ hij', arrowMap_limit _ _ hi _ _ hk]
-    congr 1
-    apply Arrow.functor_ext
-    rintro ⟨k₁, h₁⟩ ⟨k₂, h₂⟩ f
+noncomputable def mkOfSucc {j : J} (hj : ¬IsMax j) (iter : Iteration ε j) :
+    Iteration ε (Order.succ j) where
+  F := extendToSucc hj iter.F (whiskerLeft _ ε)
+  isoZero := (extendToSuccObjIso hj iter.F (whiskerLeft _ ε) ⟨⊥, by simp⟩).trans iter.isoZero
+  isoSucc i hi :=
+    if hij : i < j then
+      extendToSuccObjIso _ _ _ ⟨Order.succ i, Order.succ_le_of_lt hij⟩ ≪≫
+        iter.isoSucc i hij ≪≫ (isoWhiskerRight (extendToSuccObjIso _ _ _ ⟨i, hij.le⟩).symm _)
+    else
+      have hij' : i = j := le_antisymm
+        (by simpa only [Order.lt_succ_iff_of_not_isMax hj] using hi) (by simpa using hij)
+      eqToIso (by subst hij'; rfl) ≪≫ extendToSuccObjSuccIso hj iter.F (whiskerLeft _ ε) ≪≫
+        isoWhiskerRight ((extendToSuccObjIso hj iter.F (whiskerLeft _ ε) ⟨j, by simp⟩).symm.trans
+            (eqToIso (by subst hij'; rfl))) _
+  mapSucc'_eq i hi := by
+    obtain hi' | rfl := ((Order.lt_succ_iff_of_not_isMax hj).mp hi).lt_or_eq
+    · ext X
+      have := iter.mapSucc_eq i hi'
+      dsimp [mapSucc, mapSucc'] at this ⊢
+      rw [extentToSucc_map _ _ _ _ _ _ (Order.succ_le_of_lt hi'), this, dif_pos hi']
+      dsimp
+      rw [assoc, assoc]
+      erw [ε.naturality_assoc]
+    · ext X
+      dsimp [mapSucc']
+      rw [dif_neg (gt_irrefl i), extendToSucc_map_le_succ]
+      dsimp
+      rw [id_comp, comp_id]
+      erw [ε.naturality_assoc]
+  isColimit i hi hij := by
+    have hij' : i ≤ j := by
+      obtain hij | rfl := hij.lt_or_eq
+      · exact (Order.lt_succ_iff_of_not_isMax hj).1 hij
+      · exfalso
+        exact Order.not_isSuccLimit_succ_of_not_isMax hj hi
+    refine (IsColimit.precomposeHomEquiv
+      (isoWhiskerLeft (monotone_inclusion_lt_le_of_le hij').functor
+        (extendToSuccRestrictionLEIso hj iter.F (whiskerLeft _ ε))).symm _).1
+      (IsColimit.ofIsoColimit (iter.isColimit i hi hij')
+      (Iso.symm (Cocones.ext (extendToSuccObjIso hj iter.F (whiskerLeft _ ε) ⟨i, hij'⟩)
+      (fun ⟨k, hk⟩ ↦ ?_))))
     dsimp
-    rw [← arrowMap, ← arrowMap, arrowMap_extendToSucc]
-    rfl
+    rw [assoc, extendToSuccObjIso_hom_naturality hj iter.F (whiskerLeft _ ε)]
+    dsimp
+    rw [Iso.inv_hom_id_assoc]
 
-namespace mkOfLimit
+end Iteration
 
-open Functor
+end Functor
 
-variable {j : J} (hj : Order.IsSuccLimit j) (iter : ∀ (i : J), i < j → Φ.Iteration i)
+end CategoryTheory

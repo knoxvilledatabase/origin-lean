@@ -3,6 +3,7 @@ Extracted from CategoryTheory/PEmpty.lean
 Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.DiscreteCategory
 
 /-!
 # The empty category
@@ -16,7 +17,7 @@ namespace CategoryTheory
 
 variable (C : Type u) [Category.{v} C] (D : Type u') [Category.{v'} D]
 
--- INSTANCE (free from Core): (α
+instance (α : Type*) [IsEmpty α] : IsEmpty (Discrete α) := Function.isEmpty Discrete.as
 
 def functorOfIsEmpty [IsEmpty C] : C ⥤ D where
   obj := isEmptyElim

@@ -3,6 +3,9 @@ Extracted from MeasureTheory/Group/AddCircle.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Integral.Periodic
+import Mathlib.Data.ZMod.Quotient
+import Mathlib.MeasureTheory.Group.AEStabilizer
 
 /-!
 # Measure-theoretic results about the additive circle
@@ -11,23 +14,23 @@ The file is a place to collect measure-theoretic results about the additive circ
 
 ## Main definitions:
 
-* `AddCircle.closedBall_ae_eq_ball`: open and closed balls in the additive circle are almost
-  equal
-* `AddCircle.isAddFundamentalDomain_of_ae_ball`: a ball is a fundamental domain for rational
-  angle rotation in the additive circle
+ * `AddCircle.closedBall_ae_eq_ball`: open and closed balls in the additive circle are almost
+   equal
+ * `AddCircle.isAddFundamentalDomain_of_ae_ball`: a ball is a fundamental domain for rational
+   angle rotation in the additive circle
 
 -/
 
 open Set Function Filter MeasureTheory MeasureTheory.Measure Metric
 
-open scoped Finset MeasureTheory Pointwise Topology ENNReal
+open scoped MeasureTheory Pointwise Topology ENNReal
 
 namespace AddCircle
 
 variable {T : ℝ} [hT : Fact (0 < T)]
 
 theorem closedBall_ae_eq_ball {x : AddCircle T} {ε : ℝ} : closedBall x ε =ᵐ[volume] ball x ε := by
-  rcases le_or_gt ε 0 with hε | hε
+  rcases le_or_lt ε 0 with hε | hε
   · rw [ball_eq_empty.mpr hε, ae_eq_empty, volume_closedBall,
       min_eq_right (by linarith [hT.out] : 2 * ε ≤ T), ENNReal.ofReal_eq_zero]
     exact mul_nonpos_of_nonneg_of_nonpos zero_le_two hε
@@ -37,8 +40,9 @@ theorem closedBall_ae_eq_ball {x : AddCircle T} {ε : ℝ} : closedBall x ε =�
     have : Tendsto (fun δ => volume (closedBall x δ)) (𝓝[<] ε) (𝓝 <| volume (closedBall x ε)) := by
       simp_rw [volume_closedBall]
       refine ENNReal.tendsto_ofReal (Tendsto.min tendsto_const_nhds <| Tendsto.const_mul _ ?_)
-      exact nhdsWithin_le_nhds
-    refine le_of_tendsto this <| mem_of_superset (Ioo_mem_nhdsLT hε) fun r hr ↦ ?_
+      convert (@monotone_id ℝ _).tendsto_nhdsWithin_Iio ε
+      simp
+    refine le_of_tendsto this (mem_nhdsWithin_Iio_iff_exists_Ioo_subset.mpr ⟨0, hε, fun r hr => ?_⟩)
     exact measure_mono (closedBall_subset_ball hr.2)
 
 theorem isAddFundamentalDomain_of_ae_ball (I : Set <| AddCircle T) (u x : AddCircle T)
@@ -71,8 +75,8 @@ theorem isAddFundamentalDomain_of_ae_ball (I : Set <| AddCircle T) (u x : AddCir
   · -- `volume univ ≤ ∑' (g : G), volume (g +ᵥ I)`
     replace hI := hI.trans closedBall_ae_eq_ball.symm
     haveI : Fintype G := @Fintype.ofFinite _ hu.finite_zmultiples.to_subtype
-    have hG_card : #(Finset.univ : Finset G) = n := by
-      change _ = addOrderOf u
+    have hG_card : (Finset.univ : Finset G).card = n := by
+      show _ = addOrderOf u
       rw [← Nat.card_zmultiples, Nat.card_eq_fintype_card]; rfl
     simp_rw [measure_vadd]
     rw [AddCircle.measure_univ, tsum_fintype, Finset.sum_const, measure_congr hI,
@@ -88,7 +92,7 @@ theorem volume_of_add_preimage_eq (s I : Set <| AddCircle T) (u x : AddCircle T)
   let G := AddSubgroup.zmultiples u
   haveI : Fintype G := @Fintype.ofFinite _ hu.finite_zmultiples.to_subtype
   have hsG : ∀ g : G, (g +ᵥ s : Set <| AddCircle T) =ᵐ[volume] s := by
-    rintro ⟨y, hy⟩; exact (vadd_ae_eq_self_of_mem_zmultiples hs hy :)
+    rintro ⟨y, hy⟩; exact (vadd_ae_eq_self_of_mem_zmultiples hs hy : _)
   rw [(isAddFundamentalDomain_of_ae_ball I u x hu hI).measure_eq_card_smul_of_vadd_ae_eq_self s hsG,
     ← Nat.card_zmultiples u]
 

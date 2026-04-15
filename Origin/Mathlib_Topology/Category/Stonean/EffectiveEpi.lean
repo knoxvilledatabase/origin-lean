@@ -3,6 +3,9 @@ Extracted from Topology/Category/Stonean/EffectiveEpi.lean
 Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Sites.Coherent.ReflectsPreregular
+import Mathlib.Topology.Category.CompHaus.EffectiveEpi
+import Mathlib.Topology.Category.Stonean.Limits
 
 /-!
 
@@ -10,7 +13,7 @@ import Origin.Core
 
 This file proves that `EffectiveEpi`, `Epi` and `Surjective` are all equivalent in `Stonean`.
 As a consequence we deduce from the material in
-`Mathlib/Topology/Category/CompHausLike/EffectiveEpi.lean` that `Stonean` is `Preregular`
+`Mathlib.Topology.Category.CompHausLike.EffectiveEpi` that `Stonean` is `Preregular`
 and `Precoherent`.
 
 We also prove that for a finite family of morphisms in `Stonean` with fixed
@@ -21,6 +24,8 @@ equivalent.
 universe u
 
 open CategoryTheory Limits CompHausLike
+
+attribute [local instance] ConcreteCategory.instFunLike
 
 namespace Stonean
 
@@ -38,9 +43,15 @@ theorem effectiveEpi_tfae
   tfae_have 3 → 1 := fun hπ ↦ ⟨⟨effectiveEpiStruct π hπ⟩⟩
   tfae_finish
 
--- INSTANCE (free from Core): :
+instance : Stonean.toCompHaus.PreservesEffectiveEpis where
+  preserves f h :=
+    ((CompHaus.effectiveEpi_tfae (Stonean.toCompHaus.map f)).out 0 2).mpr
+      (((Stonean.effectiveEpi_tfae f).out 0 2).mp h)
 
--- INSTANCE (free from Core): :
+instance : Stonean.toCompHaus.ReflectsEffectiveEpis where
+  reflects f h :=
+    ((Stonean.effectiveEpi_tfae f).out 0 2).mpr
+      (((CompHaus.effectiveEpi_tfae (Stonean.toCompHaus.map f)).out 0 2).mp h)
 
 noncomputable def stoneanToCompHausEffectivePresentation (X : CompHaus) :
     Stonean.toCompHaus.EffectivePresentation X where
@@ -48,9 +59,10 @@ noncomputable def stoneanToCompHausEffectivePresentation (X : CompHaus) :
   f := CompHaus.presentation.π X
   effectiveEpi := ((CompHaus.effectiveEpi_tfae _).out 0 1).mpr (inferInstance : Epi _)
 
--- INSTANCE (free from Core): :
+instance : Stonean.toCompHaus.EffectivelyEnough where
+  presentation X := ⟨stoneanToCompHausEffectivePresentation X⟩
 
--- INSTANCE (free from Core): :
+instance : Preregular Stonean := Stonean.toCompHaus.reflects_preregular
 
 example : Precoherent Stonean.{u} := inferInstance
 
@@ -70,7 +82,7 @@ theorem effectiveEpiFamily_tfae
   tfae_have 1 → 2 := fun _ ↦ inferInstance
   tfae_have 3 ↔ 1 := by
     erw [((CompHaus.effectiveEpiFamily_tfae
-      (fun a ↦ Stonean.toCompHaus.obj (X a)) (fun a ↦ Stonean.toCompHaus.map (π a))).out 2 0 :)]
+      (fun a ↦ Stonean.toCompHaus.obj (X a)) (fun a ↦ Stonean.toCompHaus.map (π a))).out 2 0 : )]
     exact ⟨fun h ↦ Stonean.toCompHaus.finite_effectiveEpiFamily_of_map _ _ h,
       fun _ ↦ inferInstance⟩
   tfae_finish

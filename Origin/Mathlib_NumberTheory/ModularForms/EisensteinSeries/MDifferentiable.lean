@@ -3,6 +3,10 @@ Extracted from NumberTheory/ModularForms/EisensteinSeries/MDifferentiable.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.NumberTheory.ModularForms.EisensteinSeries.UniformConvergence
+import Mathlib.Analysis.Complex.UpperHalfPlane.Manifold
+import Mathlib.Analysis.Complex.LocallyUniformLimit
+import Mathlib.Geometry.Manifold.MFDeriv.FDeriv
 
 /-!
 # Holomorphicity of Eisenstein series
@@ -24,9 +28,9 @@ lemma div_linear_zpow_differentiableOn (k : ℤ) (a : Fin 2 → ℤ) :
   · apply DifferentiableOn.zpow
     · fun_prop
     · left
-      exact fun z hz ↦ linear_ne_zero ⟨z, hz⟩
+      exact fun z hz ↦ linear_ne_zero _ ⟨z, hz⟩
         ((comp_ne_zero_iff _ Int.cast_injective Int.cast_zero).mpr ha)
-  · simp only [Pi.zero_apply, Int.cast_zero, zero_mul, add_zero]
+  · simp only [Fin.isValue, Pi.zero_apply, Int.cast_zero, zero_mul, add_zero, one_div]
     apply differentiableOn_const
 
 lemma eisSummand_extension_differentiableOn (k : ℤ) (a : Fin 2 → ℤ) :
@@ -36,13 +40,17 @@ lemma eisSummand_extension_differentiableOn (k : ℤ) (a : Fin 2 → ℤ) :
   lift z to ℍ using hz
   apply comp_ofComplex
 
-theorem eisensteinSeriesSIF_mdifferentiable {k : ℤ} {N : ℕ} (hk : 3 ≤ k) (a : Fin 2 → ZMod N) :
-    MDiff (eisensteinSeriesSIF a k) := by
+theorem eisensteinSeries_SIF_MDifferentiable {k : ℤ} {N : ℕ} (hk : 3 ≤ k) (a : Fin 2 → ZMod N) :
+    MDifferentiable 𝓘(ℂ) 𝓘(ℂ) (eisensteinSeries_SIF a k) := by
   intro τ
-  suffices DifferentiableAt ℂ (↑ₕeisensteinSeriesSIF a k) τ.1 by
+  suffices DifferentiableAt ℂ (↑ₕeisensteinSeries_SIF a k) τ.1 by
     convert MDifferentiableAt.comp τ (DifferentiableAt.mdifferentiableAt this) τ.mdifferentiable_coe
-    exact funext fun z ↦ (comp_ofComplex (eisensteinSeriesSIF a k) z).symm
-  refine DifferentiableOn.differentiableAt ?_ (isOpen_upperHalfPlaneSet.mem_nhds τ.2)
+    exact funext fun z ↦ (comp_ofComplex (eisensteinSeries_SIF a k) z).symm
+  refine DifferentiableOn.differentiableAt ?_
+    ((isOpen_lt continuous_const Complex.continuous_im).mem_nhds τ.2)
   exact (eisensteinSeries_tendstoLocallyUniformlyOn hk a).differentiableOn
-    (Eventually.of_forall fun s ↦ DifferentiableOn.fun_sum
-    fun _ _ ↦ eisSummand_extension_differentiableOn _ _) isOpen_upperHalfPlaneSet
+    (Eventually.of_forall fun s ↦ DifferentiableOn.sum
+      fun _ _ ↦ eisSummand_extension_differentiableOn _ _)
+        (isOpen_lt continuous_const continuous_im)
+
+end EisensteinSeries

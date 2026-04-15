@@ -3,6 +3,8 @@ Extracted from Algebra/Module/LocalizedModule/Exact.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Exact
+import Mathlib.Algebra.Module.LocalizedModule.Basic
 
 /-!
 # Localization of modules is an exact functor
@@ -13,6 +15,8 @@ import Origin.Core
 - `IsLocalizedModule.map_exact`: A variant expressed in terms of `IsLocalizedModule`.
 
 -/
+
+section
 
 open IsLocalizedModule Function Submonoid
 
@@ -38,7 +42,7 @@ lemma LocalizedModule.map_exact (g : M₀ →ₗ[R] M₁) (h : M₁ →ₗ[R] M�
       (fun m s hy ↦ by
         rw [map_LocalizedModules, ← zero_mk 1, mk_eq, one_smul, smul_zero] at hy
         obtain ⟨a, aS, ha⟩ := Subtype.exists.1 hy
-        rw [smul_zero, mk_smul, ← map_smul, ex (a • m)] at ha
+        rw [smul_zero, mk_smul, ← LinearMap.map_smul, ex (a • m)] at ha
         rcases ha with ⟨x, hx⟩
         use mk x (⟨a, aS⟩ * s)
         rw [map_LocalizedModules, hx, ← mk_cancel_common_left ⟨a, aS⟩ s m, mk_smul])

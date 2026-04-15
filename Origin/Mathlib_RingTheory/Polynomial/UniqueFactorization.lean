@@ -1,8 +1,13 @@
 /-
 Extracted from RingTheory/Polynomial/UniqueFactorization.lean
-Genuine: 2 of 5 | Dissolved: 1 | Infrastructure: 2
+Genuine: 4 of 9 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.RingTheory.Polynomial.Basic
+import Mathlib.RingTheory.Polynomial.Content
+import Mathlib.RingTheory.UniqueFactorizationDomain.Basic
+import Mathlib.RingTheory.UniqueFactorizationDomain.Finite
+import Mathlib.RingTheory.UniqueFactorizationDomain.GCDMonoid
 
 /-!
 # Unique factorization for univariate and multivariate polynomials
@@ -23,15 +28,42 @@ universe u v
 
 namespace Polynomial
 
-variable {R : Type*} [CommSemiring R] [NoZeroDivisors R] [WfDvdMonoid R] {f : R[X]}
+variable {R : Type*} [CommRing R] [IsDomain R] [WfDvdMonoid R] {f : R[X]}
 
--- INSTANCE (free from Core): (priority
-
-variable [Nontrivial R]
+instance (priority := 100) wfDvdMonoid : WfDvdMonoid R[X] where
+  wf := by
+    classical
+      refine
+        RelHomClass.wellFounded
+          (⟨fun p : R[X] =>
+              ((if p = 0 then ⊤ else ↑p.degree : WithTop (WithBot ℕ)), p.leadingCoeff), ?_⟩ :
+            DvdNotUnit →r Prod.Lex (· < ·) DvdNotUnit)
+          (wellFounded_lt.prod_lex ‹WfDvdMonoid R›.wf)
+      rintro a b ⟨ane0, ⟨c, ⟨not_unit_c, rfl⟩⟩⟩
+      dsimp
+      rw [Polynomial.degree_mul, if_neg ane0]
+      split_ifs with hac
+      · rw [hac, Polynomial.leadingCoeff_zero]
+        apply Prod.Lex.left
+        exact WithTop.coe_lt_top _
+      have cne0 : c ≠ 0 := right_ne_zero_of_mul hac
+      simp only [cne0, ane0, Polynomial.leadingCoeff_mul]
+      by_cases hdeg : c.degree = (0 : ℕ)
+      · simp only [hdeg, Nat.cast_zero, add_zero]
+        refine Prod.Lex.right _ ⟨?_, ⟨c.leadingCoeff, fun unit_c => not_unit_c ?_, rfl⟩⟩
+        · rwa [Ne, Polynomial.leadingCoeff_eq_zero]
+        rw [Polynomial.isUnit_iff, Polynomial.eq_C_of_degree_eq_zero hdeg]
+        use c.leadingCoeff, unit_c
+        rw [Polynomial.leadingCoeff, Polynomial.natDegree_eq_of_degree_eq_some hdeg]
+      · apply Prod.Lex.left
+        rw [Polynomial.degree_eq_natDegree cne0] at *
+        simp only [Nat.cast_inj] at hdeg
+        rw [WithTop.coe_lt_coe, Polynomial.degree_eq_natDegree ane0, ← Nat.cast_add, Nat.cast_lt]
+        exact lt_add_of_pos_right _ (Nat.pos_of_ne_zero hdeg)
 
 theorem exists_irreducible_of_degree_pos (hf : 0 < f.degree) : ∃ g, Irreducible g ∧ g ∣ f :=
   WfDvdMonoid.exists_irreducible_factor (fun huf => ne_of_gt hf <| degree_eq_zero_of_isUnit huf)
-    fun hf0 => not_lt_of_gt hf <| hf0.symm ▸ (@degree_zero R _).symm ▸ WithBot.bot_lt_coe _
+    fun hf0 => not_lt_of_lt hf <| hf0.symm ▸ (@degree_zero R _).symm ▸ WithBot.bot_lt_coe _
 
 theorem exists_irreducible_of_natDegree_pos (hf : 0 < f.natDegree) : ∃ g, Irreducible g ∧ g ∣ f :=
   exists_irreducible_of_degree_pos <| by
@@ -44,10 +76,56 @@ end Polynomial
 
 section UniqueFactorizationDomain
 
-variable (σ : Type v) {D : Type u} [CommRing D] [UniqueFactorizationMonoid D]
+variable (σ : Type v) {D : Type u} [CommRing D] [IsDomain D] [UniqueFactorizationMonoid D]
 
 open UniqueFactorizationMonoid
 
 namespace Polynomial
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) uniqueFactorizationMonoid : UniqueFactorizationMonoid D[X] := by
+  letI := Classical.arbitrary (NormalizedGCDMonoid D)
+  exact ufm_of_decomposition_of_wfDvdMonoid
+
+-- DISSOLVED: fintypeSubtypeMonicDvd
+
+end Polynomial
+
+namespace MvPolynomial
+
+variable (d : ℕ)
+
+private theorem uniqueFactorizationMonoid_of_fintype [Fintype σ] :
+    UniqueFactorizationMonoid (MvPolynomial σ D) :=
+  (renameEquiv D (Fintype.equivFin σ)).toMulEquiv.symm.uniqueFactorizationMonoid <| by
+    induction' Fintype.card σ with d hd
+    · apply (isEmptyAlgEquiv D (Fin 0)).toMulEquiv.symm.uniqueFactorizationMonoid
+      infer_instance
+    · apply (finSuccEquiv D d).toMulEquiv.symm.uniqueFactorizationMonoid
+      exact Polynomial.uniqueFactorizationMonoid
+
+instance (priority := 100) uniqueFactorizationMonoid :
+    UniqueFactorizationMonoid (MvPolynomial σ D) := by
+  rw [iff_exists_prime_factors]
+  intro a ha; obtain ⟨s, a', rfl⟩ := exists_finset_rename a
+  obtain ⟨w, h, u, hw⟩ :=
+    iff_exists_prime_factors.1 (uniqueFactorizationMonoid_of_fintype s) a' fun h =>
+      ha <| by simp [h]
+  exact
+    ⟨w.map (rename (↑)), fun b hb =>
+      let ⟨b', hb', he⟩ := Multiset.mem_map.1 hb
+      he ▸ (prime_rename_iff ↑s).2 (h b' hb'),
+      Units.map (@rename s σ D _ (↑)).toRingHom.toMonoidHom u, by
+      erw [Multiset.prod_hom, ← map_mul, hw]⟩
+
+end MvPolynomial
+
+end UniqueFactorizationDomain
+
+theorem Polynomial.exists_monic_irreducible_factor {F : Type*} [Field F] (f : F[X])
+    (hu : ¬IsUnit f) : ∃ g : F[X], g.Monic ∧ Irreducible g ∧ g ∣ f := by
+  by_cases hf : f = 0
+  · exact ⟨X, monic_X, irreducible_X, hf ▸ dvd_zero X⟩
+  obtain ⟨g, hi, hf⟩ := WfDvdMonoid.exists_irreducible_factor hu hf
+  have ha : Associated g (g * C g.leadingCoeff⁻¹) := associated_mul_unit_right _ _ <|
+    isUnit_C.2 (leadingCoeff_ne_zero.2 hi.ne_zero).isUnit.inv
+  exact ⟨_, monic_mul_leadingCoeff_inv hi.ne_zero, ha.irreducible hi, ha.dvd_iff_dvd_left.1 hf⟩

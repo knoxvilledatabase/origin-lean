@@ -3,6 +3,7 @@ Extracted from RingTheory/Bezout.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.PrincipalIdealDomain
 
 /-!
 
@@ -13,7 +14,7 @@ Notable examples include principal ideal rings, valuation rings, and the ring of
 
 ## Main results
 - `IsBezout.iff_span_pair_isPrincipal`: It suffices to verify every `span {x, y}` is principal.
-- `IsBezout.TFAE`: For a Bézout domain, Noetherian ↔ PID ↔ UFD ↔ ACCP
+- `IsBezout.TFAE`: For a Bézout domain, noetherian ↔ PID ↔ UFD ↔ ACCP
 
 -/
 
@@ -32,9 +33,7 @@ theorem iff_span_pair_isPrincipal :
       constructor
       apply Submodule.fg_induction
       · exact fun _ => ⟨⟨_, rfl⟩⟩
-      · rintro _ _ _ _ ⟨⟨x, rfl⟩⟩ ⟨⟨y, rfl⟩⟩
-        rw [← Submodule.span_insert]
-        exact H _ _
+      · rintro _ _ ⟨⟨x, rfl⟩⟩ ⟨⟨y, rfl⟩⟩; rw [← Submodule.span_insert]; exact H _ _
 
 theorem _root_.Function.Surjective.isBezout {S : Type v} [CommRing S] (f : R →+* S)
     (hf : Function.Surjective f) [IsBezout R] : IsBezout S := by

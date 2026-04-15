@@ -3,6 +3,9 @@ Extracted from MeasureTheory/Integral/ExpDecay.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Integral.Asymptotics
+import Mathlib.MeasureTheory.Integral.IntervalIntegral
+import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
 /-!
 # Integrals with exponential decay at ∞
@@ -31,6 +34,6 @@ theorem exp_neg_integrableOn_Ioi (a : ℝ) {b : ℝ} (h : 0 < b) :
 theorem integrable_of_isBigO_exp_neg {f : ℝ → ℝ} {a b : ℝ} (h0 : 0 < b)
     (hf : ContinuousOn f (Ici a)) (ho : f =O[atTop] fun x => exp (-b * x)) :
     IntegrableOn f (Ioi a) :=
-  integrableOn_Ici_iff_integrableOn_Ioi (by finiteness) |>.mp <|
+  integrableOn_Ici_iff_integrableOn_Ioi.mp <|
     (hf.locallyIntegrableOn measurableSet_Ici).integrableOn_of_isBigO_atTop
     ho ⟨Ioi b, Ioi_mem_atTop b, exp_neg_integrableOn_Ioi b h0⟩

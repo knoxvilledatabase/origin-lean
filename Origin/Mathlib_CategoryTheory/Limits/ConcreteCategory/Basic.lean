@@ -1,87 +1,67 @@
 /-
 Extracted from CategoryTheory/Limits/ConcreteCategory/Basic.lean
-Genuine: 13 of 21 | Dissolved: 0 | Infrastructure: 8
+Genuine: 13 of 14 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.ConcreteCategory.Basic
+import Mathlib.CategoryTheory.Limits.Preserves.Basic
+import Mathlib.CategoryTheory.Limits.TypesFiltered
+import Mathlib.CategoryTheory.Limits.Yoneda
 
 /-!
 # Facts about (co)limits of functors into concrete categories
 -/
 
-universe s t w v u r
+universe t w v u r
 
 open CategoryTheory
 
-namespace CategoryTheory.Types
-
-open Limits
-
-/-! The forgetful functor on `Type u` is the identity; copy the instances on `𝟭 (Type u)`
-over to `forget Type u`.
-
-Since instance synthesis only looks through reducible definitions, we need to help it out by copying
-over the instances that wouldn't be found otherwise.
--/
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
-
-end CategoryTheory.Types
-
 namespace CategoryTheory.Limits.Concrete
+
+attribute [local instance] ConcreteCategory.instFunLike ConcreteCategory.hasCoeToSort
 
 section Limits
 
 lemma small_sections_of_hasLimit
-    {C : Type u} [Category.{v} C] {FC : outParam <| C → C → Type*} {CC : outParam <| C → Type v}
-    [outParam <| ∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory.{v} C FC]
+    {C : Type u} [Category.{v} C] [ConcreteCategory.{v} C]
     [(forget C).IsCorepresentable] {J : Type w} [Category.{t} J] (G : J ⥤ C) [HasLimit G] :
     Small.{v} (G ⋙ forget C).sections := by
   rw [← Types.hasLimit_iff_small_sections]
   infer_instance
 
-variable {C : Type u} [Category.{v} C] {FC : C → C → Type*} {CC : C → Type r}
+variable {C : Type u} [Category.{v} C] [ConcreteCategory.{max w v} C] {J : Type w} [Category.{t} J]
+  (F : J ⥤ C) [PreservesLimit F (forget C)]
 
-variable [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory.{r} C FC]
-
-variable {J : Type w} [Category.{t} J] (F : J ⥤ C) [PreservesLimit F (forget C)]
-
-theorem to_product_injective_of_isLimit
-    {D : Cone F} (hD : IsLimit D) :
-    Function.Injective fun (x : ToType D.pt) (j : J) => D.π.app j x := by
+theorem to_product_injective_of_isLimit {D : Cone F} (hD : IsLimit D) :
+    Function.Injective fun (x : D.pt) (j : J) => D.π.app j x := by
   let E := (forget C).mapCone D
-  intro (x : E.pt) y H
-  apply (Types.isLimitEquivSections (isLimitOfPreserves _ hD)).injective
-  ext j
-  exact funext_iff.mp H j
+  let hE : IsLimit E := isLimitOfPreserves _ hD
+  let G := Types.limitCone.{w, v} (F ⋙ forget C)
+  let hG := Types.limitConeIsLimit.{w, v} (F ⋙ forget C)
+  let T : E.pt ≅ G.pt := hE.conePointUniqueUpToIso hG
+  change Function.Injective (T.hom ≫ fun x j => G.π.app j x)
+  have h : Function.Injective T.hom := by
+    intro a b h
+    suffices T.inv (T.hom a) = T.inv (T.hom b) by simpa
+    rw [h]
+  suffices Function.Injective fun (x : G.pt) j => G.π.app j x by exact this.comp h
+  apply Subtype.ext
 
-theorem isLimit_ext {D : Cone F} (hD : IsLimit D) (x y : ToType D.pt) :
+theorem isLimit_ext {D : Cone F} (hD : IsLimit D) (x y : D.pt) :
     (∀ j, D.π.app j x = D.π.app j y) → x = y := fun h =>
   Concrete.to_product_injective_of_isLimit _ hD (funext h)
 
-theorem limit_ext [HasLimit F] (x y : ToType (limit F)) :
+theorem limit_ext [HasLimit F] (x y : ↑(limit F)) :
     (∀ j, limit.π F j x = limit.π F j y) → x = y :=
   Concrete.isLimit_ext F (limit.isLimit _) _ _
 
 section Surjective
 
-lemma surjective_π_app_zero_of_surjective_map {C : Type u} [Category.{v} C] {FC : C → C → Type*}
-    {CC : C → Type v} [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory.{v} C FC]
+lemma surjective_π_app_zero_of_surjective_map {C : Type u} [Category.{v} C] [ConcreteCategory.{v} C]
     [PreservesLimitsOfShape ℕᵒᵖ (forget C)] {F : ℕᵒᵖ ⥤ C} {c : Cone F}
     (hc : IsLimit c) (hF : ∀ n, Function.Surjective (F.map (homOfLE (Nat.le_succ n)).op)) :
     Function.Surjective (c.π.app ⟨0⟩) :=
-  Types.surjective_π_app_zero_of_surjective_map (isLimitOfPreserves (forget C) hc) hF
+  Types.surjective_π_app_zero_of_surjective_map (isLimitOfPreserves _ hc) hF
 
 end Surjective
 
@@ -89,16 +69,17 @@ end Limits
 
 section Colimits
 
-variable {C : Type u} [Category.{v} C] {FC : C → C → Type*} {CC : C → Type t}
+section
 
-variable [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory.{t} C FC]
+variable {C : Type u} [Category.{v} C] [ConcreteCategory.{t} C] {J : Type w} [Category.{r} J]
+  (F : J ⥤ C)
 
-variable {J : Type w} [Category.{r} J] (F : J ⥤ C)
+section
 
 variable [PreservesColimit F (forget C)]
 
 theorem from_union_surjective_of_isColimit {D : Cocone F} (hD : IsColimit D) :
-    let ff : (Σ j : J, ToType (F.obj j)) → ToType D.pt := fun a => D.ι.app a.1 a.2
+    let ff : (Σj : J, F.obj j) → D.pt := fun a => D.ι.app a.1 a.2
     Function.Surjective ff := by
   intro ff x
   let E : Cocone (F ⋙ forget C) := (forget C).mapCocone D
@@ -106,21 +87,29 @@ theorem from_union_surjective_of_isColimit {D : Cocone F} (hD : IsColimit D) :
   obtain ⟨j, y, hy⟩ := Types.jointly_surjective_of_isColimit hE x
   exact ⟨⟨j, y⟩, hy⟩
 
-theorem isColimit_exists_rep {D : Cocone F} (hD : IsColimit D) (x : ToType D.pt) :
-    ∃ (j : J) (y : ToType (F.obj j)), D.ι.app j y = x := by
+theorem isColimit_exists_rep {D : Cocone F} (hD : IsColimit D) (x : D.pt) :
+    ∃ (j : J) (y : F.obj j), D.ι.app j y = x := by
   obtain ⟨a, rfl⟩ := Concrete.from_union_surjective_of_isColimit F hD x
   exact ⟨a.1, a.2, rfl⟩
 
-theorem colimit_exists_rep [HasColimit F] (x : ToType (colimit F)) :
-    ∃ (j : J) (y : ToType (F.obj j)), colimit.ι F j y = x :=
+theorem colimit_exists_rep [HasColimit F] (x : ↑(colimit F)) :
+    ∃ (j : J) (y : F.obj j), colimit.ι F j y = x :=
   Concrete.isColimit_exists_rep F (colimit.isColimit _) x
 
 end
 
-set_option backward.isDefEq.respectTransparency false in
+theorem isColimit_rep_eq_of_exists {D : Cocone F} {i j : J} (x : F.obj i) (y : F.obj j)
+    (h : ∃ (k : _) (f : i ⟶ k) (g : j ⟶ k), F.map f x = F.map g y) :
+    D.ι.app i x = D.ι.app j y := by
+  let E := (forget C).mapCocone D
+  obtain ⟨k, f, g, (hfg : (F ⋙ forget C).map f x = F.map g y)⟩ := h
+  let h1 : (F ⋙ forget C).map f ≫ E.ι.app k = E.ι.app i := E.ι.naturality f
+  let h2 : (F ⋙ forget C).map g ≫ E.ι.app k = E.ι.app j := E.ι.naturality g
+  show E.ι.app i x = E.ι.app j y
+  rw [← h1, types_comp_apply, hfg]
+  exact congrFun h2 y
 
-theorem colimit_rep_eq_of_exists [HasColimit F] {i j : J} (x : ToType (F.obj i))
-    (y : ToType (F.obj j))
+theorem colimit_rep_eq_of_exists [HasColimit F] {i j : J} (x : F.obj i) (y : F.obj j)
     (h : ∃ (k : _) (f : i ⟶ k) (g : j ⟶ k), F.map f x = F.map g y) :
     colimit.ι F i x = colimit.ι F j y :=
   Concrete.isColimit_rep_eq_of_exists F x y h
@@ -129,34 +118,30 @@ end
 
 section FilteredColimits
 
-variable {C : Type u} [Category.{v} C] {FC : C → C → Type*} {CC : C → Type s}
-
-variable [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory C FC]
-
-variable {J : Type w} [Category.{r} J] (F : J ⥤ C) [PreservesColimit F (forget C)] [IsFiltered J]
+variable {C : Type u} [Category.{v} C] [ConcreteCategory.{max t w} C] {J : Type w} [Category.{r} J]
+  (F : J ⥤ C) [PreservesColimit F (forget C)] [IsFiltered J]
 
 theorem isColimit_exists_of_rep_eq {D : Cocone F} {i j : J} (hD : IsColimit D)
-    (x : ToType (F.obj i)) (y : ToType (F.obj j)) (h : D.ι.app _ x = D.ι.app _ y) :
+    (x : F.obj i) (y : F.obj j) (h : D.ι.app _ x = D.ι.app _ y) :
     ∃ (k : _) (f : i ⟶ k) (g : j ⟶ k), F.map f x = F.map g y := by
   let E := (forget C).mapCocone D
   let hE : IsColimit E := isColimitOfPreserves _ hD
   exact (Types.FilteredColimit.isColimit_eq_iff (F ⋙ forget C) hE).mp h
 
 theorem isColimit_rep_eq_iff_exists {D : Cocone F} {i j : J} (hD : IsColimit D)
-    (x : ToType (F.obj i)) (y : ToType (F.obj j)) :
+    (x : F.obj i) (y : F.obj j) :
     D.ι.app i x = D.ι.app j y ↔ ∃ (k : _) (f : i ⟶ k) (g : j ⟶ k), F.map f x = F.map g y :=
-  ⟨Concrete.isColimit_exists_of_rep_eq.{s} _ hD _ _,
+  ⟨Concrete.isColimit_exists_of_rep_eq.{t} _ hD _ _,
    Concrete.isColimit_rep_eq_of_exists _ _ _⟩
 
-theorem colimit_exists_of_rep_eq [HasColimit F] {i j : J} (x : ToType (F.obj i))
-    (y : ToType (F.obj j)) (h : colimit.ι F _ x = colimit.ι F _ y) :
+theorem colimit_exists_of_rep_eq [HasColimit F] {i j : J} (x : F.obj i) (y : F.obj j)
+    (h : colimit.ι F _ x = colimit.ι F _ y) :
     ∃ (k : _) (f : i ⟶ k) (g : j ⟶ k), F.map f x = F.map g y :=
-  Concrete.isColimit_exists_of_rep_eq.{s} F (colimit.isColimit _) x y h
+  Concrete.isColimit_exists_of_rep_eq.{t} F (colimit.isColimit _) x y h
 
-theorem colimit_rep_eq_iff_exists [HasColimit F] {i j : J} (x : ToType (F.obj i))
-    (y : ToType (F.obj j)) :
+theorem colimit_rep_eq_iff_exists [HasColimit F] {i j : J} (x : F.obj i) (y : F.obj j) :
     colimit.ι F i x = colimit.ι F j y ↔ ∃ (k : _) (f : i ⟶ k) (g : j ⟶ k), F.map f x = F.map g y :=
-  ⟨Concrete.colimit_exists_of_rep_eq.{s} _ _ _, Concrete.colimit_rep_eq_of_exists _ _ _⟩
+  ⟨Concrete.colimit_exists_of_rep_eq.{t} _ _ _, Concrete.colimit_rep_eq_of_exists _ _ _⟩
 
 end FilteredColimits
 

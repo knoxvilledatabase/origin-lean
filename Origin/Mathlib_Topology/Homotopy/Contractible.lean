@@ -1,8 +1,10 @@
 /-
 Extracted from Topology/Homotopy/Contractible.lean
-Genuine: 13 of 16 | Dissolved: 0 | Infrastructure: 3
+Genuine: 13 of 15 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.Homotopy.Path
+import Mathlib.Topology.Homotopy.Equiv
 
 /-!
 # Contractible spaces
@@ -24,15 +26,15 @@ theorem nullhomotopic_of_constant (y : Y) : Nullhomotopic (ContinuousMap.const X
 
 theorem Nullhomotopic.comp_right {f : C(X, Y)} (hf : f.Nullhomotopic) (g : C(Y, Z)) :
     (g.comp f).Nullhomotopic := by
-  obtain ⟨y, hy⟩ := hf
+  cases' hf with y hy
   use g y
-  exact .comp (.refl g) hy
+  exact Homotopic.hcomp hy (Homotopic.refl g)
 
 theorem Nullhomotopic.comp_left {f : C(Y, Z)} (hf : f.Nullhomotopic) (g : C(X, Y)) :
     (f.comp g).Nullhomotopic := by
-  obtain ⟨y, hy⟩ := hf
+  cases' hf with y hy
   use y
-  exact .comp hy (.refl g)
+  exact Homotopic.hcomp (Homotopic.refl g) hy
 
 end ContinuousMap
 
@@ -86,7 +88,9 @@ protected theorem Homeomorph.contractibleSpace_iff (e : X ≃ₜ Y) :
 
 namespace ContractibleSpace
 
--- INSTANCE (free from Core): [Nonempty
+instance [Nonempty Y] [Subsingleton Y] : ContractibleSpace Y :=
+  let ⟨_⟩ := nonempty_unique Y
+  ⟨⟨(Homeomorph.homeomorphOfUnique Y Unit).toHomotopyEquiv⟩⟩
 
 variable (X Y) in
 
@@ -96,8 +100,9 @@ theorem hequiv [ContractibleSpace X] [ContractibleSpace Y] :
   rcases ContractibleSpace.hequiv_unit' (X := Y) with ⟨h'⟩
   exact ⟨h.trans h'.symm⟩
 
--- INSTANCE (free from Core): (priority
-
--- INSTANCE (free from Core): [ContractibleSpace
+instance (priority := 100) [ContractibleSpace X] : PathConnectedSpace X := by
+  obtain ⟨p, ⟨h⟩⟩ := id_nullhomotopic X
+  have : ∀ x, Joined p x := fun x => ⟨(h.evalAt x).symm⟩
+  rw [pathConnectedSpace_iff_eq]; use p; ext; tauto
 
 end ContractibleSpace

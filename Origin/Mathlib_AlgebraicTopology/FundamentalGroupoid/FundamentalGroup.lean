@@ -3,6 +3,11 @@ Extracted from AlgebraicTopology/FundamentalGroupoid/FundamentalGroup.lean
 Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Groupoid
+import Mathlib.Topology.Category.TopCat.Basic
+import Mathlib.Topology.Connected.PathConnected
+import Mathlib.Topology.Homotopy.Path
+import Mathlib.AlgebraicTopology.FundamentalGroupoid.Basic
 
 /-!
 # Fundamental group of a space
@@ -11,7 +16,9 @@ Given a topological space `X` and a basepoint `x`, the fundamental group is the 
 of `x` i.e. the group with elements being loops based at `x` (quotiented by homotopy equivalence).
 -/
 
-variable {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y]
+universe u
+
+variable {X : Type u} [TopologicalSpace X]
 
 variable {x₀ x₁ : X}
 
@@ -19,22 +26,24 @@ noncomputable section
 
 open CategoryTheory
 
-variable (X)
+def FundamentalGroup (X : Type u) [TopologicalSpace X] (x : X) :=
+  @Aut (FundamentalGroupoid X) _ ⟨x⟩
 
-def FundamentalGroup (x : X) :=
-  End (FundamentalGroupoid.mk x)
+instance (X : Type u) [TopologicalSpace X] (x : X) : Group (FundamentalGroup X x) := by
+  dsimp only [FundamentalGroup]
+  infer_instance
 
--- INSTANCE (free from Core): (x
-
--- INSTANCE (free from Core): (x
-
-variable {X}
+instance (X : Type u) [TopologicalSpace X] (x : X) : Inhabited (FundamentalGroup X x) := by
+  dsimp only [FundamentalGroup]
+  infer_instance
 
 namespace FundamentalGroup
 
+attribute [local instance] Path.Homotopic.setoid
+
 def fundamentalGroupMulEquivOfPath (p : Path x₀ x₁) :
     FundamentalGroup X x₀ ≃* FundamentalGroup X x₁ :=
-  ((Groupoid.isoEquivHom ..).symm ⟦p⟧).conj
+  Aut.autMulEquivOfIso (asIso ⟦p⟧)
 
 variable (x₀ x₁)
 
@@ -42,17 +51,20 @@ def fundamentalGroupMulEquivOfPathConnected [PathConnectedSpace X] :
     FundamentalGroup X x₀ ≃* FundamentalGroup X x₁ :=
   fundamentalGroupMulEquivOfPath (PathConnectedSpace.somePath x₀ x₁)
 
-abbrev toArrow {x : X} (p : FundamentalGroup X x) :
+abbrev toArrow {X : TopCat} {x : X} (p : FundamentalGroup X x) :
     FundamentalGroupoid.mk x ⟶ FundamentalGroupoid.mk x :=
-  p
+  p.hom
 
-abbrev toPath {x : X} (p : FundamentalGroup X x) : Path.Homotopic.Quotient x x :=
+abbrev toPath {X : TopCat} {x : X} (p : FundamentalGroup X x) : Path.Homotopic.Quotient x x :=
   toArrow p
 
-abbrev fromArrow {x : X}
+abbrev fromArrow {X : TopCat} {x : X}
     (p : FundamentalGroupoid.mk x ⟶ FundamentalGroupoid.mk x) :
-    FundamentalGroup X x :=
-  p
+    FundamentalGroup X x where
+  hom := p
+  inv := CategoryTheory.Groupoid.inv p
 
-abbrev fromPath {x : X} (p : Path.Homotopic.Quotient x x) : FundamentalGroup X x :=
+abbrev fromPath {X : TopCat} {x : X} (p : Path.Homotopic.Quotient x x) : FundamentalGroup X x :=
   fromArrow p
+
+end FundamentalGroup

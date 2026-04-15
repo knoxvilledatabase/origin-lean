@@ -3,6 +3,11 @@ Extracted from NumberTheory/Transcendental/Liouville/Basic.lean
 Genuine: 4 of 5 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.DenomsClearable
+import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.Analysis.Calculus.Deriv.Polynomial
+import Mathlib.Data.Real.Irrational
+import Mathlib.Topology.Algebra.Polynomial
 
 /-!
 
@@ -85,11 +90,8 @@ theorem exists_one_le_pow_mul_dist {Z N R : Type*} [PseudoMetricSpace R] {d : N 
     -- use the "separation from `1`" (assumption `L`) for numerators,
     refine (L this).trans ?_
     -- remove a common factor and use the Lipschitz assumption `B`
-    gcongr
-    · exact zero_le_one.trans (d0 a)
-    · refine (B this).trans ?_
-      gcongr
-      apply le_max_right
+    refine mul_le_mul_of_nonneg_left ((B this).trans ?_) (zero_le_one.trans (d0 a))
+    exact mul_le_mul_of_nonneg_left (le_max_right _ M) dist_nonneg
 
 -- DISSOLVED: exists_pos_real_of_irrational_root
 
@@ -99,7 +101,7 @@ protected theorem transcendental {x : ℝ} (lx : Liouville x) : Transcendental �
   rintro ⟨f : ℤ[X], f0, ef0⟩
   -- Change `aeval x f = 0` to `eval (map _ f) = 0`, who knew.
   replace ef0 : (f.map (algebraMap ℤ ℝ)).eval x = 0 := by
-    rwa [← eval_map_algebraMap] at ef0
+    rwa [aeval_def, ← eval_map] at ef0
   -- There is a "large" real number `A` such that `(b + 1) ^ (deg f) * |f (x - a / (b + 1))| * A`
   -- is at least one.  This is obtained from lemma `exists_pos_real_of_irrational_root`.
   obtain ⟨A, hA, h⟩ : ∃ A : ℝ, 0 < A ∧ ∀ (a : ℤ) (b : ℕ),
@@ -126,7 +128,7 @@ protected theorem transcendental {x : ℝ} (lx : Liouville x) : Transcendental �
     refine hn.le.trans ?_
     rw [one_add_one_eq_two]
     gcongr
-    norm_cast
+    exact Int.cast_two.symm.le.trans (Int.cast_le.mpr (Int.add_one_le_iff.mpr b1))
   -- this branch of the proof exploits the "integrality" of evaluations of polynomials
   -- at ratios of integers.
   · lift b to ℕ using zero_le_one.trans b1.le

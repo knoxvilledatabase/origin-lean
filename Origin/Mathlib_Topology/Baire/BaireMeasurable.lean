@@ -1,8 +1,12 @@
 /-
 Extracted from Topology/Baire/BaireMeasurable.lean
-Genuine: 26 of 26 | Dissolved: 0 | Infrastructure: 0
+Genuine: 24 of 24 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.GDelta.UniformSpace
+import Mathlib.Topology.LocallyClosed
+import Mathlib.MeasureTheory.Constructions.EventuallyMeasurable
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
 /-!
 # Baire category and Baire measurable sets
@@ -28,23 +32,14 @@ open Topology
 
 scoped[Topology] notation:50 f " =ᵇ " g:50 => Filter.EventuallyEq (residual _) f g
 
-scoped[Topology] notation3 "∀ᵇ " (...) ", " r:(scoped p => Filter.Eventually p <| residual _) => r
+scoped[Topology] notation3 "∀ᵇ "(...)", "r:(scoped p => Filter.Eventually p <| residual _) => r
 
-scoped[Topology] notation3 "∃ᵇ " (...) ", " r:(scoped p => Filter.Frequently p <| residual _) => r
+scoped[Topology] notation3 "∃ᵇ "(...)", "r:(scoped p => Filter.Frequently p <| residual _) => r
 
 variable {α}
 
-theorem coborder_mem_residual {s : Set α} (hs : IsLocallyClosed s) : coborder s ∈ residual α :=
-  residual_of_dense_open hs.isOpen_coborder dense_coborder
-
-theorem closure_residualEq {s : Set α} (hs : IsLocallyClosed s) : closure s =ᵇ s := by
-  rw [Filter.eventuallyEq_set]
-  filter_upwards [coborder_mem_residual hs] with x hx
-  nth_rewrite 2 [← closure_inter_coborder (s := s)]
-  simp [hx]
-
 def BaireMeasurableSet (s : Set α) : Prop :=
-  @MeasurableSet _ (eventuallyMeasurableSpace (borel _) (residual _)) s
+  @MeasurableSet _ (EventuallyMeasurableSpace (borel _) (residual _)) s
 
 variable {s t : Set α}
 
@@ -73,7 +68,7 @@ theorem iUnion {ι : Sort*} [Countable ι] {s : ι → Set α}
     (h : ∀ i, BaireMeasurableSet (s i)) : BaireMeasurableSet (⋃ i, s i) :=
   MeasurableSet.iUnion h
 
-theorem biUnion {ι : Type*} {s : ι → Set α} {t : Set ι} (ht : t.Countable)
+theorem biUnion {ι : Type*}  {s : ι → Set α} {t : Set ι} (ht : t.Countable)
     (h : ∀ i ∈ t, BaireMeasurableSet (s i)) : BaireMeasurableSet (⋃ i ∈ t, s i) :=
   MeasurableSet.biUnion ht h
 
@@ -85,7 +80,7 @@ theorem iInter {ι : Sort*} [Countable ι] {s : ι → Set α}
     (h : ∀ i, BaireMeasurableSet (s i)) : BaireMeasurableSet (⋂ i, s i) :=
   MeasurableSet.iInter h
 
-theorem biInter {ι : Type*} {s : ι → Set α} {t : Set ι} (ht : t.Countable)
+theorem biInter {ι : Type*}  {s : ι → Set α} {t : Set ι} (ht : t.Countable)
     (h : ∀ i ∈ t, BaireMeasurableSet (s i)) : BaireMeasurableSet (⋂ i ∈ t, s i) :=
   MeasurableSet.biInter ht h
 
@@ -113,16 +108,21 @@ end BaireMeasurableSet
 open Filter
 
 theorem MeasurableSet.residualEq_isOpen [MeasurableSpace α] [BorelSpace α] (h : MeasurableSet s) :
-    ∃ u : Set α, IsOpen u ∧ s =ᵇ u := by
-  induction s, h using MeasurableSet.induction_on_open with
-  | isOpen U hU => exact ⟨U, hU, .rfl⟩
-  | compl s _ ihs =>
-    obtain ⟨U, Uo, hsU⟩ := ihs
-    use (closure U)ᶜ, isClosed_closure.isOpen_compl
-    exact .compl <| hsU.trans <| .symm <| closure_residualEq Uo.isLocallyClosed
-  | iUnion f _ _ ihf =>
-    choose u uo su using ihf
-    exact ⟨⋃ i, u i, isOpen_iUnion uo, .countable_iUnion su⟩
+    ∃ u : Set α, (IsOpen u) ∧ s =ᵇ u := by
+  apply h.induction_on_open (fun s hs => ⟨s, hs, EventuallyEq.rfl⟩)
+  · rintro s - ⟨u, uo, su⟩
+    refine ⟨(closure u)ᶜ, isClosed_closure.isOpen_compl,
+      EventuallyEq.compl (su.trans <| EventuallyLE.antisymm subset_closure.eventuallyLE ?_)⟩
+    have : (coborder u) ∈ residual _ :=
+      residual_of_dense_open uo.isLocallyClosed.isOpen_coborder dense_coborder
+    rw [coborder_eq_union_closure_compl] at this
+    rw [EventuallyLE]
+    convert this
+    simp only [le_Prop_eq, imp_iff_or_not]
+    rfl --terrible
+  rintro s - - hs
+  choose u uo su using hs
+  exact ⟨⋃ i, u i, isOpen_iUnion uo, EventuallyEq.countable_iUnion su⟩
 
 theorem BaireMeasurableSet.residualEq_isOpen (h : BaireMeasurableSet s) :
     ∃ u : Set α, (IsOpen u) ∧ s =ᵇ u := by
@@ -133,7 +133,7 @@ theorem BaireMeasurableSet.residualEq_isOpen (h : BaireMeasurableSet s) :
 
 theorem BaireMeasurableSet.iff_residualEq_isOpen :
     BaireMeasurableSet s ↔ ∃ u : Set α, (IsOpen u) ∧ s =ᵇ u :=
-  ⟨fun h => h.residualEq_isOpen, fun ⟨_, uo, ueq⟩ => uo.baireMeasurableSet.congr ueq.symm⟩
+  ⟨fun h => h.residualEq_isOpen , fun ⟨_, uo, ueq⟩ => uo.baireMeasurableSet.congr ueq.symm⟩
 
 section Map
 
@@ -152,7 +152,7 @@ theorem IsMeagre.preimage_of_isOpenMap (hc : Continuous f) (ho : IsOpenMap f)
   tendsto_residual_of_isOpenMap hc ho h
 
 theorem BaireMeasurableSet.preimage (hc : Continuous f) (ho : IsOpenMap f)
-    {s : Set β} (h : BaireMeasurableSet s) : BaireMeasurableSet (f ⁻¹' s) := by
+    {s : Set β} (h : BaireMeasurableSet s) : BaireMeasurableSet (f⁻¹' s) := by
   rcases h with ⟨u, hu, hsu⟩
   refine ⟨f ⁻¹' u, ?_, hsu.filter_mono <| tendsto_residual_of_isOpenMap hc ho⟩
   borelize α β

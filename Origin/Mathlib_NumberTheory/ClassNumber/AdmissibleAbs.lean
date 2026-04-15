@@ -3,6 +3,9 @@ Extracted from NumberTheory/ClassNumber/AdmissibleAbs.lean
 Genuine: 1 of 3 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Basic
+import Mathlib.NumberTheory.ClassNumber.AdmissibleAbsoluteValue
+import Mathlib.Data.Real.Archimedean
 
 /-!
 # Admissible absolute value on the integers
@@ -12,8 +15,8 @@ is finite.
 
 ## Main results
 
-* `AbsoluteValue.absIsAdmissible` shows the "standard" absolute value on `ℤ`,
-  mapping negative `x` to `-x`, is admissible.
+ * `AbsoluteValue.absIsAdmissible` shows the "standard" absolute value on `ℤ`,
+   mapping negative `x` to `-x`, is admissible.
 -/
 
 namespace AbsoluteValue
@@ -27,6 +30,7 @@ noncomputable def absIsAdmissible : IsAdmissible AbsoluteValue.abs :=
     card := fun ε ↦ ⌈1 / ε⌉₊
     exists_partition' := fun n _ hε _ hb ↦ exists_partition_int n hε hb }
 
--- INSTANCE (free from Core): :
+noncomputable instance : Inhabited (IsAdmissible AbsoluteValue.abs) :=
+  ⟨absIsAdmissible⟩
 
 end AbsoluteValue

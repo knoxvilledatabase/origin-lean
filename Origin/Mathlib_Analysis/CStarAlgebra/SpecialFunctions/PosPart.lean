@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/CStarAlgebra/SpecialFunctions/PosPart.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
 
 /-! # C⋆-algebraic facts about `a⁺` and `a⁻`. -/
 
@@ -45,28 +47,5 @@ lemma span_nonneg_inter_unitBall :
   span_nonneg_inter_ball zero_lt_one
 
 end SpanNonneg
-
-open Complex in
-
-lemma exists_sum_four_nonneg {A : Type*} [NonUnitalCStarAlgebra A] [PartialOrder A]
-    [StarOrderedRing A] (a : A) :
-    ∃ x : Fin 4 → A, (∀ i, 0 ≤ x i) ∧ (∀ i, ‖x i‖ ≤ ‖a‖) ∧ a = ∑ i : Fin 4, I ^ (i : ℕ) • x i := by
-  use ![(realPart a)⁺, (imaginaryPart a)⁺, (realPart a)⁻, (imaginaryPart a)⁻]
-  rw [← and_assoc, ← forall_and]
-  constructor
-  · intro i
-    fin_cases i
-    all_goals
-      constructor
-      · simp
-        cfc_tac
-    · exact CStarAlgebra.norm_posPart_le _ |>.trans <| realPart.norm_le a
-    · exact CStarAlgebra.norm_posPart_le _ |>.trans <| imaginaryPart.norm_le a
-    · exact CStarAlgebra.norm_negPart_le _ |>.trans <| realPart.norm_le a
-    · exact CStarAlgebra.norm_negPart_le _ |>.trans <| imaginaryPart.norm_le a
-  · nth_rw 1 [← CStarAlgebra.linear_combination_nonneg a]
-    simp only [Fin.sum_univ_four, Fin.coe_ofNat_eq_mod, Matrix.cons_val, Nat.reduceMod, I_sq,
-      I_pow_three]
-    module
 
 end CStarAlgebra

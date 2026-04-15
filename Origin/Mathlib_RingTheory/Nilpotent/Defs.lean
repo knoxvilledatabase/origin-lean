@@ -1,27 +1,65 @@
 /-
 Extracted from RingTheory/Nilpotent/Defs.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 26 of 39 | Dissolved: 8 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Algebra.GroupWithZero.Hom
+import Mathlib.Algebra.GroupWithZero.Units.Basic
+import Mathlib.Algebra.Ring.Defs
+import Mathlib.Data.Nat.Lattice
 
 /-!
 # Definition of nilpotent elements
 
-This file proves basic facts about nilpotent elements.
-For results that require further theory, see `Mathlib/RingTheory/Nilpotent/Basic.lean`
-and `Mathlib/RingTheory/Nilpotent/Lemmas.lean`.
+This file defines the notion of a nilpotent element and proves the immediate consequences.
+For results that require further theory, see `Mathlib.RingTheory.Nilpotent.Basic`
+and `Mathlib.RingTheory.Nilpotent.Lemmas`.
 
 ## Main definitions
 
+  * `IsNilpotent`
   * `Commute.isNilpotent_mul_left`
   * `Commute.isNilpotent_mul_right`
   * `nilpotencyClass`
 
 -/
 
-open Set
+universe u v
+
+open Function Set
 
 variable {R S : Type*} {x y : R}
+
+def IsNilpotent [Zero R] [Pow R ℕ] (x : R) : Prop :=
+  ∃ n : ℕ, x ^ n = 0
+
+theorem IsNilpotent.mk [Zero R] [Pow R ℕ] (x : R) (n : ℕ) (e : x ^ n = 0) : IsNilpotent x :=
+  ⟨n, e⟩
+
+@[simp] lemma isNilpotent_of_subsingleton [Zero R] [Pow R ℕ] [Subsingleton R] : IsNilpotent x :=
+  ⟨0, Subsingleton.elim _ _⟩
+
+@[simp] theorem IsNilpotent.zero [MonoidWithZero R] : IsNilpotent (0 : R) :=
+  ⟨1, pow_one 0⟩
+
+theorem not_isNilpotent_one [MonoidWithZero R] [Nontrivial R] :
+    ¬ IsNilpotent (1 : R) := fun ⟨_, H⟩ ↦ zero_ne_one (H.symm.trans (one_pow _))
+
+lemma IsNilpotent.pow_succ (n : ℕ) {S : Type*} [MonoidWithZero S] {x : S}
+    (hx : IsNilpotent x) : IsNilpotent (x ^ n.succ) := by
+  obtain ⟨N,hN⟩ := hx
+  use N
+  rw [← pow_mul, Nat.succ_mul, pow_add, hN, mul_zero]
+
+theorem  IsNilpotent.of_pow [MonoidWithZero R] {x : R} {m : ℕ}
+    (h : IsNilpotent (x ^ m)) : IsNilpotent x := by
+  obtain ⟨n, h⟩ := h
+  use m*n
+  rw [← h, pow_mul x m n]
+
+-- DISSOLVED: IsNilpotent.pow_of_pos
+
+-- DISSOLVED: IsNilpotent.pow_iff_pos
 
 theorem IsNilpotent.map [MonoidWithZero R] [MonoidWithZero S] {r : R} {F : Type*}
     [FunLike F R S] [MonoidWithZeroHomClass F R S] (hr : IsNilpotent r) (f : F) :
@@ -53,3 +91,129 @@ variable [Zero R] [Pow R ℕ]
 variable (x) in
 
 noncomputable def nilpotencyClass : ℕ := sInf {k | x ^ k = 0}
+
+@[simp] lemma nilpotencyClass_eq_zero_of_subsingleton [Subsingleton R] :
+    nilpotencyClass x = 0 := by
+  let s : Set ℕ := {k | x ^ k = 0}
+  suffices s = univ by change sInf _ = 0; simp [s] at this; simp [this]
+  exact eq_univ_iff_forall.mpr fun k ↦ Subsingleton.elim _ _
+
+lemma isNilpotent_of_pos_nilpotencyClass (hx : 0 < nilpotencyClass x) :
+    IsNilpotent x := by
+  let s : Set ℕ := {k | x ^ k = 0}
+  change s.Nonempty
+  change 0 < sInf s at hx
+  by_contra contra
+  simp [not_nonempty_iff_eq_empty.mp contra] at hx
+
+lemma pow_nilpotencyClass (hx : IsNilpotent x) : x ^ (nilpotencyClass x) = 0 :=
+  Nat.sInf_mem hx
+
+end ZeroPow
+
+section MonoidWithZero
+
+variable [MonoidWithZero R]
+
+-- DISSOLVED: nilpotencyClass_eq_succ_iff
+
+@[simp] lemma nilpotencyClass_zero [Nontrivial R] :
+    nilpotencyClass (0 : R) = 1 :=
+  nilpotencyClass_eq_succ_iff.mpr <| by constructor <;> simp
+
+@[simp] lemma pos_nilpotencyClass_iff [Nontrivial R] :
+    0 < nilpotencyClass x ↔ IsNilpotent x := by
+  refine ⟨isNilpotent_of_pos_nilpotencyClass, fun hx ↦ Nat.pos_of_ne_zero fun hx' ↦ ?_⟩
+  replace hx := pow_nilpotencyClass hx
+  rw [hx', pow_zero] at hx
+  exact one_ne_zero hx
+
+-- DISSOLVED: pow_pred_nilpotencyClass
+
+lemma eq_zero_of_nilpotencyClass_eq_one (hx : nilpotencyClass x = 1) :
+    x = 0 := by
+  have : IsNilpotent x := isNilpotent_of_pos_nilpotencyClass (hx ▸ Nat.one_pos)
+  rw [← pow_nilpotencyClass this, hx, pow_one]
+
+@[simp] lemma nilpotencyClass_eq_one [Nontrivial R] :
+    nilpotencyClass x = 1 ↔ x = 0 :=
+  ⟨eq_zero_of_nilpotencyClass_eq_one, fun hx ↦ hx ▸ nilpotencyClass_zero⟩
+
+end MonoidWithZero
+
+end NilpotencyClass
+
+@[mk_iff]
+class IsReduced (R : Type*) [Zero R] [Pow R ℕ] : Prop where
+  /-- A reduced structure has no nonzero nilpotent elements. -/
+  eq_zero : ∀ x : R, IsNilpotent x → x = 0
+
+namespace IsReduced
+
+theorem pow_eq_zero [Zero R] [Pow R ℕ] [IsReduced R] {n : ℕ} (h : x ^ n = 0) :
+    x = 0 := IsReduced.eq_zero x ⟨n, h⟩
+
+-- DISSOLVED: pow_eq_zero_iff
+
+-- DISSOLVED: pow_ne_zero_iff
+
+-- DISSOLVED: pow_ne_zero
+
+-- DISSOLVED: pow_eq_zero_iff'
+
+end IsReduced
+
+instance (priority := 900) isReduced_of_noZeroDivisors [MonoidWithZero R] [NoZeroDivisors R] :
+    IsReduced R :=
+  ⟨fun _ ⟨_, hn⟩ => pow_eq_zero hn⟩
+
+instance (priority := 900) isReduced_of_subsingleton [Zero R] [Pow R ℕ] [Subsingleton R] :
+    IsReduced R :=
+  ⟨fun _ _ => Subsingleton.elim _ _⟩
+
+theorem IsNilpotent.eq_zero [Zero R] [Pow R ℕ] [IsReduced R] (h : IsNilpotent x) : x = 0 :=
+  IsReduced.eq_zero x h
+
+@[simp]
+theorem isNilpotent_iff_eq_zero [MonoidWithZero R] [IsReduced R] : IsNilpotent x ↔ x = 0 :=
+  ⟨fun h => h.eq_zero, fun h => h.symm ▸ IsNilpotent.zero⟩
+
+theorem isReduced_of_injective [MonoidWithZero R] [MonoidWithZero S] {F : Type*}
+    [FunLike F R S] [MonoidWithZeroHomClass F R S]
+    (f : F) (hf : Function.Injective f) [IsReduced S] :
+    IsReduced R := by
+  constructor
+  intro x hx
+  apply hf
+  rw [map_zero]
+  exact (hx.map f).eq_zero
+
+instance (ι) (R : ι → Type*) [∀ i, Zero (R i)] [∀ i, Pow (R i) ℕ]
+    [∀ i, IsReduced (R i)] : IsReduced (∀ i, R i) where
+  eq_zero _ := fun ⟨n, hn⟩ ↦ funext fun i ↦ IsReduced.eq_zero _ ⟨n, congr_fun hn i⟩
+
+def IsRadical [Dvd R] [Pow R ℕ] (y : R) : Prop :=
+  ∀ (n : ℕ) (x), y ∣ x ^ n → y ∣ x
+
+theorem isRadical_iff_pow_one_lt [MonoidWithZero R] (k : ℕ) (hk : 1 < k) :
+    IsRadical y ↔ ∀ x, y ∣ x ^ k → y ∣ x :=
+  ⟨(· k), k.pow_imp_self_of_one_lt hk _ fun _ _ h ↦ .inl (dvd_mul_of_dvd_left h _)⟩
+
+namespace Commute
+
+section Semiring
+
+variable [Semiring R]
+
+theorem isNilpotent_mul_left (h_comm : Commute x y) (h : IsNilpotent x) : IsNilpotent (x * y) := by
+  obtain ⟨n, hn⟩ := h
+  use n
+  rw [h_comm.mul_pow, hn, zero_mul]
+
+theorem isNilpotent_mul_right (h_comm : Commute x y) (h : IsNilpotent y) : IsNilpotent (x * y) := by
+  rw [h_comm.eq]
+  exact h_comm.symm.isNilpotent_mul_left h
+
+end Semiring
+
+end Commute

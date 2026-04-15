@@ -3,6 +3,10 @@ Extracted from Algebra/Lie/Rank.lean
 Genuine: 21 of 27 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Lie.EngelSubalgebra
+import Mathlib.Algebra.Lie.OfAssociative
+import Mathlib.Algebra.Module.LinearMap.Polynomial
+import Mathlib.LinearAlgebra.Eigenspace.Zero
 
 /-!
 # Rank of a Lie algebra and regular elements
@@ -25,8 +29,6 @@ if the `n`-th coefficient of the characteristic polynomial of `ad R L x` is non-
 * [barnes1967]: "On Cartan subalgebras of Lie algebras" by D.W. Barnes.
 
 -/
-
-open Module
 
 variable {R A L M ι ιₘ : Type*}
 
@@ -180,7 +182,7 @@ open Module LieSubalgebra
 
 lemma finrank_engel (x : L) :
     finrank K (engel K x) = (ad K L x).charpoly.natTrailingDegree :=
-  (ad K L x).finrank_maxGenEigenspace_zero_eq
+  (ad K L x).finrank_maxGenEigenspace
 
 lemma rank_le_finrank_engel (x : L) :
     rank K L ≤ finrank K (engel K x) :=

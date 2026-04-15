@@ -3,12 +3,14 @@ Extracted from Analysis/Calculus/Deriv/Abs.lean
 Genuine: 25 of 45 | Dissolved: 20 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.InnerProductSpace.Calculus
 
 /-!
 # Derivative of the absolute value
 
-This file compiles basic derivability properties of the absolute value, and is largely inspired from
-`Mathlib/Analysis/InnerProductSpace/Calculus.lean`, which is the analogous file for norms derived
+This file compiles basic derivability properties of the absolute value, and is largely inspired
+from `Mathlib.Analysis.InnerProductSpace.Calculus`, which is the analogous file for norms derived
 from an inner product space.
 
 ## Tags
@@ -20,7 +22,7 @@ open Filter Real Set
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
-variable {n : ℕ∞} {f : E → ℝ} {f' : StrongDual ℝ E} {s : Set E} {x : E}
+variable {n : ℕ∞} {f : E → ℝ} {f' : E →L[ℝ] ℝ} {s : Set E} {x : E}
 
 -- DISSOLVED: contDiffAt_abs
 
@@ -147,11 +149,11 @@ theorem DifferentiableWithinAt.abs_of_pos (hf : DifferentiableWithinAt ℝ f s x
 theorem not_differentiableAt_abs_zero : ¬ DifferentiableAt ℝ (abs : ℝ → ℝ) 0 := by
   intro h
   have h₁ : deriv abs (0 : ℝ) = 1 :=
-    (uniqueDiffOn_Ici _ _ Set.self_mem_Ici).eq_deriv _ h.hasDerivAt.hasDerivWithinAt <|
-      (hasDerivWithinAt_id _ _).congr_of_mem (fun _ h ↦ abs_of_nonneg h) Set.self_mem_Ici
+    (uniqueDiffOn_Ici _ _ Set.left_mem_Ici).eq_deriv _ h.hasDerivAt.hasDerivWithinAt <|
+      (hasDerivWithinAt_id _ _).congr_of_mem (fun _ h ↦ abs_of_nonneg h) Set.left_mem_Ici
   have h₂ : deriv abs (0 : ℝ) = -1 :=
-    (uniqueDiffOn_Iic _ _ Set.self_mem_Iic).eq_deriv _ h.hasDerivAt.hasDerivWithinAt <|
-      (hasDerivWithinAt_neg _ _).congr_of_mem (fun _ h ↦ abs_of_nonpos h) Set.self_mem_Iic
+    (uniqueDiffOn_Iic _ _ Set.right_mem_Iic).eq_deriv _ h.hasDerivAt.hasDerivWithinAt <|
+      (hasDerivWithinAt_neg _ _).congr_of_mem (fun _ h ↦ abs_of_nonpos h) Set.right_mem_Iic
   linarith
 
 theorem deriv_abs_neg {x : ℝ} (hx : x < 0) : deriv (|·|) x = -1 := (hasDerivAt_abs_neg hx).deriv

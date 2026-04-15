@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/ZeroObjects.lean
-Genuine: 22 of 25 | Dissolved: 0 | Infrastructure: 3
+Genuine: 37 of 46 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
 /-!
 # Zero objects
@@ -72,9 +73,6 @@ def iso (hX : IsZero X) (hY : IsZero Y) : X ≅ Y where
   hom_inv_id := hX.eq_of_src _ _
   inv_hom_id := hY.eq_of_src _ _
 
-lemma isIso (hX : IsZero X) (hY : IsZero Y) (f : X ⟶ Y) : IsIso f :=
-  ⟨hY.to_ _, hX.eq_of_src _ _, hY.eq_of_src _ _⟩
-
 protected def isInitial (hX : IsZero X) : IsInitial X :=
   @IsInitial.ofUnique _ _ X fun Y => (hX.unique_to Y).some
 
@@ -102,13 +100,6 @@ theorem op (h : IsZero X) : IsZero (Opposite.op X) :=
 theorem unop {X : Cᵒᵖ} (h : IsZero X) : IsZero (Opposite.unop X) :=
   ⟨fun Y => ⟨⟨⟨(h.from_ (Opposite.op Y)).unop⟩, fun _ => Quiver.Hom.op_inj (h.eq_of_tgt _ _)⟩⟩,
     fun Y => ⟨⟨⟨(h.to_ (Opposite.op Y)).unop⟩, fun _ => Quiver.Hom.op_inj (h.eq_of_src _ _)⟩⟩⟩
-
-variable (Y) in
-
-def retract (h : IsZero X) : Retract X Y where
-  i := h.to_ Y
-  r := h.from_ Y
-  retract := h.isInitial.hom_ext _ _
 
 end IsZero
 
@@ -146,6 +137,120 @@ class HasZeroObject : Prop where
   /-- there exists a zero object -/
   zero : ∃ X : C, IsZero X
 
--- INSTANCE (free from Core): hasZeroObject_pUnit
+instance hasZeroObject_pUnit : HasZeroObject (Discrete PUnit) where zero :=
+  ⟨⟨⟨⟩⟩,
+    { unique_to := fun ⟨⟨⟩⟩ =>
+      ⟨{ default := 𝟙 _,
+          uniq := by subsingleton }⟩
+      unique_from := fun ⟨⟨⟩⟩ =>
+      ⟨{ default := 𝟙 _,
+          uniq := by subsingleton }⟩}⟩
+
+section
 
 variable [HasZeroObject C]
+
+protected def HasZeroObject.zero' : Zero C where zero := HasZeroObject.zero.choose
+
+scoped[ZeroObject] attribute [instance] CategoryTheory.Limits.HasZeroObject.zero'
+
+open ZeroObject
+
+theorem isZero_zero : IsZero (0 : C) :=
+  HasZeroObject.zero.choose_spec
+
+instance hasZeroObject_op : HasZeroObject Cᵒᵖ :=
+  ⟨⟨Opposite.op 0, IsZero.op (isZero_zero C)⟩⟩
+
+end
+
+open ZeroObject
+
+theorem hasZeroObject_unop [HasZeroObject Cᵒᵖ] : HasZeroObject C :=
+  ⟨⟨Opposite.unop 0, IsZero.unop (isZero_zero Cᵒᵖ)⟩⟩
+
+variable {C}
+
+theorem IsZero.hasZeroObject {X : C} (hX : IsZero X) : HasZeroObject C :=
+  ⟨⟨X, hX⟩⟩
+
+def IsZero.isoZero [HasZeroObject C] {X : C} (hX : IsZero X) : X ≅ 0 :=
+  hX.iso (isZero_zero C)
+
+theorem IsZero.obj [HasZeroObject D] {F : C ⥤ D} (hF : IsZero F) (X : C) : IsZero (F.obj X) := by
+  let G : C ⥤ D := (CategoryTheory.Functor.const C).obj 0
+  have hG : IsZero G := Functor.isZero _ fun _ => isZero_zero _
+  let e : F ≅ G := hF.iso hG
+  exact (isZero_zero _).of_iso (e.app X)
+
+namespace HasZeroObject
+
+variable [HasZeroObject C]
+
+protected def uniqueTo (X : C) : Unique (0 ⟶ X) :=
+  ((isZero_zero C).unique_to X).some
+
+protected def uniqueFrom (X : C) : Unique (X ⟶ 0) :=
+  ((isZero_zero C).unique_from X).some
+
+scoped[ZeroObject] attribute [instance] CategoryTheory.Limits.HasZeroObject.uniqueTo
+
+scoped[ZeroObject] attribute [instance] CategoryTheory.Limits.HasZeroObject.uniqueFrom
+
+@[ext]
+theorem to_zero_ext {X : C} (f g : X ⟶ 0) : f = g :=
+  (isZero_zero C).eq_of_tgt _ _
+
+@[ext]
+theorem from_zero_ext {X : C} (f g : 0 ⟶ X) : f = g :=
+  (isZero_zero C).eq_of_src _ _
+
+instance (X : C) : Subsingleton (X ≅ 0) := ⟨fun f g => by ext⟩
+
+instance {X : C} (f : 0 ⟶ X) : Mono f where right_cancellation g h _ := by ext
+
+instance {X : C} (f : X ⟶ 0) : Epi f where left_cancellation g h _ := by ext
+
+instance zero_to_zero_isIso (f : (0 : C) ⟶ 0) : IsIso f := by
+  convert show IsIso (𝟙 (0 : C)) by infer_instance
+  subsingleton
+
+def zeroIsInitial : IsInitial (0 : C) :=
+  (isZero_zero C).isInitial
+
+def zeroIsTerminal : IsTerminal (0 : C) :=
+  (isZero_zero C).isTerminal
+
+instance (priority := 10) hasInitial : HasInitial C :=
+  hasInitial_of_unique 0
+
+instance (priority := 10) hasTerminal : HasTerminal C :=
+  hasTerminal_of_unique 0
+
+def zeroIsoIsInitial {X : C} (t : IsInitial X) : 0 ≅ X :=
+  zeroIsInitial.uniqueUpToIso t
+
+def zeroIsoIsTerminal {X : C} (t : IsTerminal X) : 0 ≅ X :=
+  zeroIsTerminal.uniqueUpToIso t
+
+def zeroIsoInitial [HasInitial C] : 0 ≅ ⊥_ C :=
+  zeroIsInitial.uniqueUpToIso initialIsInitial
+
+def zeroIsoTerminal [HasTerminal C] : 0 ≅ ⊤_ C :=
+  zeroIsTerminal.uniqueUpToIso terminalIsTerminal
+
+instance (priority := 100) initialMonoClass : InitialMonoClass C :=
+  InitialMonoClass.of_isInitial zeroIsInitial fun X => by infer_instance
+
+end HasZeroObject
+
+end Limits
+
+open CategoryTheory.Limits
+
+open ZeroObject
+
+theorem Functor.isZero_iff [HasZeroObject D] (F : C ⥤ D) : IsZero F ↔ ∀ X, IsZero (F.obj X) :=
+  ⟨fun hF X => hF.obj X, Functor.isZero _⟩
+
+end CategoryTheory

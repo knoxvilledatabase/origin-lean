@@ -1,8 +1,12 @@
 /-
 Extracted from RingTheory/Adjoin/FG.lean
-Genuine: 15 of 17 | Dissolved: 0 | Infrastructure: 2
+Genuine: 14 of 16 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.EuclideanDomain.Int
+import Mathlib.Algebra.MvPolynomial.Basic
+import Mathlib.RingTheory.Polynomial.Basic
+import Mathlib.RingTheory.PrincipalIdealDomain
 
 /-!
 # Adjoining elements to form subalgebras
@@ -12,7 +16,7 @@ This file develops the basic theory of finitely-generated subalgebras.
 ## Definitions
 
 * `FG (S : Subalgebra R A)` : A predicate saying that the subalgebra is finitely-generated
-  as an A-algebra
+as an A-algebra
 
 ## Tags
 
@@ -105,6 +109,12 @@ theorem fg_of_fg_toSubmodule {S : Subalgebra R A} : S.toSubmodule.FG → S.FG :=
 theorem fg_of_noetherian [IsNoetherian R A] (S : Subalgebra R A) : S.FG :=
   fg_of_fg_toSubmodule (IsNoetherian.noetherian (Subalgebra.toSubmodule S))
 
+theorem fg_of_submodule_fg (h : (⊤ : Submodule R A).FG) : (⊤ : Subalgebra R A).FG :=
+  let ⟨s, hs⟩ := h
+  ⟨s, toSubmodule.injective <| by
+    rw [Algebra.top_toSubmodule, eq_top_iff, ← hs, span_le]
+    exact Algebra.subset_adjoin⟩
+
 theorem FG.prod {S : Subalgebra R A} {T : Subalgebra R B} (hS : S.FG) (hT : T.FG) :
     (S.prod T).FG := by
   obtain ⟨s, hs⟩ := fg_def.1 hS
@@ -115,10 +125,13 @@ theorem FG.prod {S : Subalgebra R A} {T : Subalgebra R B} (hS : S.FG) (hT : T.FG
       (Set.Finite.image _ (Set.Finite.union ht.1 (Set.finite_singleton _))),
     Algebra.adjoin_inl_union_inr_eq_prod R s t⟩
 
-theorem FG.map {S : Subalgebra R A} (f : A →ₐ[R] B) (hs : S.FG) : (S.map f).FG := by
+section
+
+open scoped Classical
+
+theorem FG.map {S : Subalgebra R A} (f : A →ₐ[R] B) (hs : S.FG) : (S.map f).FG :=
   let ⟨s, hs⟩ := hs
-  classical
-  exact ⟨s.image f, by rw [Finset.coe_image, Algebra.adjoin_image, hs]⟩
+  ⟨s.image f, by rw [Finset.coe_image, Algebra.adjoin_image, hs]⟩
 
 end
 
@@ -150,13 +163,6 @@ theorem induction_on_adjoin [IsNoetherian R A] (P : Subalgebra R A → Prop) (ba
   rw [Finset.coe_insert]
   simpa only [Algebra.adjoin_insert_adjoin] using ih _ x h
 
-theorem FG.sup {S S' : Subalgebra R A} (hS : Subalgebra.FG S) (hS' : Subalgebra.FG S') :
-    Subalgebra.FG (S ⊔ S') :=
-  let ⟨s, hs⟩ := Subalgebra.fg_def.1 hS
-  let ⟨s', hs'⟩ := Subalgebra.fg_def.1 hS'
-  fg_def.mpr ⟨s ∪ s', Set.Finite.union hs.1 hs'.1,
-    (by rw [Algebra.adjoin_union, hs.2, hs'.2])⟩
-
 end Subalgebra
 
 section Semiring
@@ -165,7 +171,9 @@ variable {R : Type u} {A : Type v} {B : Type w}
 
 variable [CommSemiring R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
 
--- INSTANCE (free from Core): AlgHom.isNoetherianRing_range
+instance AlgHom.isNoetherianRing_range (f : A →ₐ[R] B) [IsNoetherianRing A] :
+    IsNoetherianRing f.range :=
+  _root_.isNoetherianRing_range f.toRingHom
 
 end Semiring
 

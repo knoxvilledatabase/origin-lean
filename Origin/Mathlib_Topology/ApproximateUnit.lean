@@ -3,6 +3,7 @@ Extracted from Topology/ApproximateUnit.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Algebra.Monoid
 
 /-! # Approximate units
 
@@ -36,9 +37,11 @@ variable {α : Type*} [TopologicalSpace α] [MulOneClass α]
 
 variable (α) in
 
-lemma pure_one : IsApproximateUnit (pure (1 : α)) where
+lemma pure_one : IsApproximateUnit (pure (1 : α))  where
   tendsto_mul_left m := by simpa using tendsto_pure_nhds (m * ·) (1 : α)
   tendsto_mul_right m := by simpa using tendsto_pure_nhds (· * m) (1 : α)
+
+set_option linter.unusedVariables false in
 
 lemma mono {l l' : Filter α} (hl : l.IsApproximateUnit) (hle : l' ≤ l) [hl' : l'.NeBot] :
     l'.IsApproximateUnit where
@@ -47,16 +50,16 @@ lemma mono {l l' : Filter α} (hl : l.IsApproximateUnit) (hle : l' ≤ l) [hl' :
 
 variable (α) in
 
-lemma nhds_one [SeparatelyContinuousMul α] : IsApproximateUnit (𝓝 (1 : α)) where
+lemma nhds_one [ContinuousMul α] : IsApproximateUnit (𝓝 (1 : α)) where
   tendsto_mul_left m := by simpa using tendsto_id (x := 𝓝 1) |>.const_mul m
   tendsto_mul_right m := by simpa using tendsto_id (x := 𝓝 1) |>.mul_const m
 
-lemma iff_neBot_and_le_nhds_one [SeparatelyContinuousMul α] {l : Filter α} :
+lemma iff_neBot_and_le_nhds_one [ContinuousMul α] {l : Filter α} :
     IsApproximateUnit l ↔ l.NeBot ∧ l ≤ 𝓝 1 :=
   ⟨fun hl ↦ ⟨hl.neBot, by simpa using hl.tendsto_mul_left 1⟩,
     And.elim fun _ hl ↦ nhds_one α |>.mono hl⟩
 
-lemma iff_le_nhds_one [SeparatelyContinuousMul α] {l : Filter α} [l.NeBot] :
+lemma iff_le_nhds_one [ContinuousMul α] {l : Filter α} [l.NeBot] :
     IsApproximateUnit l ↔ l ≤ 𝓝 1 := by
   simpa [iff_neBot_and_le_nhds_one] using fun _ ↦ ‹_›
 

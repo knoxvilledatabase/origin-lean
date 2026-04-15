@@ -1,8 +1,9 @@
 /-
 Extracted from Algebra/Quotient.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Tactic.Common
 
 /-!
 # Algebraic quotients
@@ -11,11 +12,11 @@ This file defines notation for algebraic quotients, e.g. quotient groups `G ⧸ 
 quotient modules `M ⧸ N` and ideal quotients `R ⧸ I`.
 
 The actual quotient structures are defined in the following files:
-* Quotient Group: `Mathlib/GroupTheory/QuotientGroup/Defs.lean`
-* Quotient Module: `Mathlib/LinearAlgebra/Quotient/Defs.lean`
-* Quotient Ring: `Mathlib/RingTheory/Ideal/Quotient/Defs.lean`
+ * quotient group: `Mathlib/GroupTheory/QuotientGroup.lean`
+ * quotient module: `Mathlib/LinearAlgebra/Quotient.lean`
+ * quotient ring: `Mathlib/RingTheory/Ideal/Quotient.lean`
 
-## Notation
+## Notations
 
 The following notation is introduced:
 
@@ -34,5 +35,11 @@ ideal quotient, quotient ring
 universe u v
 
 class HasQuotient (A : outParam <| Type u) (B : Type v) where
-  /-- `HasQuotient.Quotient A b` (denoted as `A ⧸ b`) is the quotient of the type `A` by `b`. -/
-  Quotient (A) : B → Type max u v
+  /-- auxiliary quotient function, the one used will have `A` explicit -/
+  quotient' : B → Type max u v
+
+abbrev HasQuotient.Quotient (A : outParam <| Type u) {B : Type v}
+    [HasQuotient A B] (b : B) : Type max u v :=
+  HasQuotient.quotient' b
+
+notation:35 G " ⧸ " H:34 => HasQuotient.Quotient G H

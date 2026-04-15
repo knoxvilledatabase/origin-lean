@@ -3,8 +3,10 @@ Extracted from LinearAlgebra/Multilinear/FiniteDimensional.lean
 Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Multilinear.Basic
+import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 
-/-! # Multilinear maps over finite-dimensional spaces
+/-! # Multilinear maps over finite dimensional spaces
 
 The main results are that multilinear maps over finitely-generated, free modules are
 finitely-generated and free.
@@ -29,14 +31,12 @@ variable [Module.Finite R M₂] [Module.Free R M₂]
 private theorem free_and_finite_fin (n : ℕ) (N : Fin n → Type*) [∀ i, AddCommGroup (N i)]
     [∀ i, Module R (N i)] [∀ i, Module.Finite R (N i)] [∀ i, Module.Free R (N i)] :
     Module.Free R (MultilinearMap R N M₂) ∧ Module.Finite R (MultilinearMap R N M₂) := by
-  induction n with
-  | zero =>
-    haveI : IsEmpty (Fin Nat.zero) := inferInstanceAs (IsEmpty (Fin 0))
+  induction' n with n ih
+  · haveI : IsEmpty (Fin Nat.zero) := inferInstanceAs (IsEmpty (Fin 0))
     exact
       ⟨Module.Free.of_equiv (constLinearEquivOfIsEmpty R R N M₂),
         Module.Finite.equiv (constLinearEquivOfIsEmpty R R N M₂)⟩
-  | succ n ih =>
-    suffices
+  · suffices
       Module.Free R (N 0 →ₗ[R] MultilinearMap R (fun i : Fin n => N i.succ) M₂) ∧
         Module.Finite R (N 0 →ₗ[R] MultilinearMap R (fun i : Fin n => N i.succ) M₂) by
       cases this
@@ -55,12 +55,14 @@ private theorem free_and_finite :
   cases nonempty_fintype ι
   have := @free_and_finite_fin R M₂ _ _ _ _ _ (Fintype.card ι)
     (fun x => M₁ ((Fintype.equivFin ι).symm x))
-  obtain ⟨l, r⟩ := this
+  cases' this with l r
   have e := domDomCongrLinearEquiv' R R M₁ M₂ (Fintype.equivFin ι)
   exact ⟨Module.Free.of_equiv e.symm, Module.Finite.equiv e.symm⟩
 
--- INSTANCE (free from Core): _root_.Module.Finite.multilinearMap
+instance _root_.Module.Finite.multilinearMap : Module.Finite R (MultilinearMap R M₁ M₂) :=
+  free_and_finite.2
 
--- INSTANCE (free from Core): _root_.Module.Free.multilinearMap
+instance _root_.Module.Free.multilinearMap : Module.Free R (MultilinearMap R M₁ M₂) :=
+  free_and_finite.1
 
 end MultilinearMap

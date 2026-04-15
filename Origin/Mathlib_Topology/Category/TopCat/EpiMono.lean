@@ -3,6 +3,8 @@ Extracted from Topology/Category/TopCat/EpiMono.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Category.TopCat.Adjunctions
+import Mathlib.CategoryTheory.Functor.EpiMono
 
 /-!
 # Epi- and monomorphisms in `Top`
@@ -22,10 +24,11 @@ namespace TopCat
 
 theorem epi_iff_surjective {X Y : TopCat.{u}} (f : X ⟶ Y) : Epi f ↔ Function.Surjective f := by
   suffices Epi f ↔ Epi ((forget TopCat).map f) by
-    rw [this, CategoryTheory.ofHom_epi_iff_surjective]
+    rw [this, CategoryTheory.epi_iff_surjective]
+    rfl
   constructor
   · intro
-    apply Functor.map_epi -- was `infer_instance`
+    infer_instance
   · apply Functor.epi_of_epi_map
 
 theorem mono_iff_injective {X Y : TopCat.{u}} (f : X ⟶ Y) : Mono f ↔ Function.Injective f := by
@@ -34,7 +37,7 @@ theorem mono_iff_injective {X Y : TopCat.{u}} (f : X ⟶ Y) : Mono f ↔ Functio
     rfl
   constructor
   · intro
-    apply Functor.map_mono -- was `infer_instance`
+    infer_instance
   · apply Functor.mono_of_mono_map
 
 end TopCat

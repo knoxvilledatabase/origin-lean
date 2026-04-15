@@ -3,6 +3,8 @@ Extracted from NumberTheory/Padics/ProperSpace.lean
 Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Field.ProperSpace
+import Mathlib.NumberTheory.Padics.RingHoms
 
 /-!
 # Properness of the p-adic numbers
@@ -18,7 +20,7 @@ and that `ℚ_[p]` is proper.
 
 ## Notation
 
-- `p` : Is a natural prime.
+ - `p` : Is a natural prime.
 
 ## References
 
@@ -26,15 +28,11 @@ Gouvêa, F. Q. (2020) p-adic Numbers An Introduction. 3rd edition.
   Cham, Springer International Publishing
 -/
 
-assert_not_exists FiniteDimensional
-
 open Metric Topology
 
 variable (p : ℕ) [Fact (Nat.Prime p)]
 
 namespace PadicInt
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem totallyBounded_univ : TotallyBounded (Set.univ : Set ℤ_[p]) := by
   refine Metric.totallyBounded_iff.mpr (fun ε hε ↦ ?_)
@@ -45,12 +43,19 @@ theorem totallyBounded_univ : TotallyBounded (Set.univ : Set ℤ_[p]) := by
   · simpa only [Finset.mem_coe, Finset.mem_range] using z.appr_lt k
   · exact (((z - z.appr k).norm_le_pow_iff_mem_span_pow k).mpr (z.appr_spec k)).trans_lt hk
 
--- INSTANCE (free from Core): compactSpace
+instance compactSpace : CompactSpace ℤ_[p] := by
+  rw [← isCompact_univ_iff, isCompact_iff_totallyBounded_isComplete]
+  exact ⟨totallyBounded_univ p, complete_univ⟩
 
 end PadicInt
 
 namespace Padic
 
--- INSTANCE (free from Core): :
+instance : ProperSpace ℚ_[p] := by
+  suffices LocallyCompactSpace ℚ_[p] from .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace _
+  have : closedBall 0 1 ∈ 𝓝 (0 : ℚ_[p]) := closedBall_mem_nhds _ zero_lt_one
+  simp only [closedBall, dist_eq_norm_sub, sub_zero] at this
+  refine IsCompact.locallyCompactSpace_of_mem_nhds_of_addGroup ?_ this
+  simpa only [isCompact_iff_compactSpace] using PadicInt.compactSpace p
 
 end Padic

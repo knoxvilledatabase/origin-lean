@@ -3,6 +3,7 @@ Extracted from Data/Finite/Set.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Fintype.Card
 
 /-!
 # Lemmas about `Finite` and `Set`s

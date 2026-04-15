@@ -3,6 +3,9 @@ Extracted from Data/ZMod/Factorial.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Intervals
+import Mathlib.Data.Nat.Factorial.BigOperators
+import Mathlib.Data.ZMod.Basic
 
 /-!
 # Facts about factorials in ZMod
@@ -17,11 +20,9 @@ We collect facts about factorials in context of modular arithmetic.
 ## See also
 
 For the prime case and involving `factorial` rather than `descFactorial`, see Wilson's theorem:
-* `Nat.prime_iff_fac_equiv_neg_one`
+* Nat.prime_iff_fac_equiv_neg_one
 
 -/
-
-assert_not_exists TwoSidedIdeal
 
 open Finset Nat
 
@@ -29,7 +30,7 @@ namespace ZMod
 
 theorem cast_descFactorial {n p : ℕ} (h : n ≤ p) :
     (descFactorial (p - 1) n : ZMod p) = (-1) ^ n * n ! := by
-  rw [descFactorial_eq_prod_range, factorial_eq_prod_range_add_one]
+  rw [descFactorial_eq_prod_range, ← prod_range_add_one_eq_factorial]
   simp only [cast_prod]
   nth_rw 2 [← card_range n]
   rw [pow_card_mul_prod]

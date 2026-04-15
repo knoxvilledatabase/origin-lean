@@ -3,6 +3,9 @@ Extracted from Analysis/Calculus/Darboux.lean
 Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.Calculus.Deriv.Mul
+import Mathlib.Analysis.Calculus.LocalExtr.Basic
 
 /-!
 # Darboux's theorem
@@ -14,7 +17,7 @@ intermediate values. The proof is based on the
 
 open Filter Set
 
-open scoped Topology
+open scoped Topology Classical
 
 variable {a b : ℝ} {f f' : ℝ → ℝ}
 
@@ -33,15 +36,15 @@ theorem exists_hasDerivWithinAt_eq_of_gt_of_lt (hab : a ≤ b)
     rcases cmem.1.eq_or_lt with (rfl | hac)
     -- Show that `c` can't be equal to `a`
     · refine absurd (sub_nonneg.1 <| nonneg_of_mul_nonneg_right ?_ (sub_pos.2 hab'))
-        (not_le_of_gt hma)
+        (not_le_of_lt hma)
       have : b - a ∈ posTangentConeAt (Icc a b) a :=
         sub_mem_posTangentConeAt_of_segment_subset (segment_eq_Icc hab ▸ Subset.rfl)
       simpa only [ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply]
         using hc.localize.hasFDerivWithinAt_nonneg (hg a (left_mem_Icc.2 hab)) this
-    rcases cmem.2.eq_or_lt' with (rfl | hcb)
+    rcases cmem.2.eq_or_gt with (rfl | hcb)
     -- Show that `c` can't be equal to `b`
     · refine absurd (sub_nonpos.1 <| nonpos_of_mul_nonneg_right ?_ (sub_lt_zero.2 hab'))
-        (not_le_of_gt hmb)
+        (not_le_of_lt hmb)
       have : a - b ∈ posTangentConeAt (Icc a b) b :=
         sub_mem_posTangentConeAt_of_segment_subset (by rw [segment_symm, segment_eq_Icc hab])
       simpa only [ContinuousLinearMap.smulRight_apply, ContinuousLinearMap.one_apply]

@@ -1,8 +1,11 @@
 /-
 Extracted from CategoryTheory/Limits/Indization/LocallySmall.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Preserves.Ulift
+import Mathlib.CategoryTheory.Limits.IndYoneda
+import Mathlib.CategoryTheory.Limits.Indization.IndObject
 
 /-!
 # There are only `v`-many natural transformations between Ind-objects
@@ -24,6 +27,8 @@ variable {C : Type u} [Category.{v} C]
 
 namespace CategoryTheory
 
+section
+
 variable {I : Type u₁} [Category.{v₁} I] [HasColimitsOfShape I (Type v)]
   [HasLimitsOfShape Iᵒᵖ (Type v)]
 
@@ -32,8 +37,7 @@ variable {J : Type u₂} [Category.{v₂} J]
 
 variable (F : I ⥤ C) (G : Cᵒᵖ ⥤ Type v)
 
-noncomputable def colimitYonedaHomEquiv :
-    (colimit (F ⋙ yoneda) ⟶ G) ≃ (limit (F.op ⋙ G)) :=
+noncomputable def colimitYonedaHomEquiv : (colimit (F ⋙ yoneda) ⟶ G) ≃ limit (F.op ⋙ G) :=
   Equiv.symm <| Equiv.ulift.symm.trans <| Equiv.symm <| Iso.toEquiv <| calc
   (colimit (F ⋙ yoneda) ⟶ G) ≅ limit (F.op ⋙ G ⋙ uliftFunctor.{u}) :=
         colimitYonedaHomIsoLimitOp _ _
@@ -42,8 +46,33 @@ noncomputable def colimitYonedaHomEquiv :
   _ ≅ uliftFunctor.{u}.obj (limit (F.op ⋙ G)) :=
         (preservesLimitIso _ _).symm
 
-attribute [elementwise] HasLimit.isoOfNatIso_hom_π
+@[simp]
+theorem colimitYonedaHomEquiv_π_apply (η : colimit (F ⋙ yoneda) ⟶ G) (i : Iᵒᵖ) :
+    limit.π (F.op ⋙ G) i (colimitYonedaHomEquiv F G η) =
+      η.app (op (F.obj i.unop)) ((colimit.ι (F ⋙ yoneda) i.unop).app _ (𝟙 _)) := by
+  simp only [Functor.comp_obj, Functor.op_obj, colimitYonedaHomEquiv, uliftFunctor_obj,
+    Iso.instTransIso_trans, Iso.trans_assoc, Iso.toEquiv_comp, Equiv.symm_trans_apply,
+    Equiv.symm_symm, Equiv.trans_apply, Iso.toEquiv_fun, Iso.symm_hom, Equiv.ulift_apply]
+  have (a) := congrArg ULift.down
+    (congrFun (preservesLimitIso_inv_π uliftFunctor.{u, v} (F.op ⋙ G) i) a)
+  dsimp at this
+  rw [this, ← types_comp_apply (HasLimit.isoOfNatIso _).hom (limit.π _ _),
+    HasLimit.isoOfNatIso_hom_π]
+  simp
 
-unif_hint {C D : Type*} [Category* C] [Category* D] (F : C ⥤ D) (G : D ⥤ Type*) (X X' : C)
+instance : Small.{v} (colimit (F ⋙ yoneda) ⟶ G) where
+  equiv_small := ⟨_, ⟨colimitYonedaHomEquiv F G⟩⟩
 
-  where X ≟ X'⊢ (F ⋙ G).obj X ≟ (G.obj (F.obj X)) in
+end
+
+instance : LocallySmall.{v} (FullSubcategory (IsIndObject (C := C))) where
+  hom_small X Y := by
+    obtain ⟨⟨P⟩⟩ := X.2
+    obtain ⟨⟨Q⟩⟩ := Y.2
+    let e₁ := IsColimit.coconePointUniqueUpToIso (P.isColimit) (colimit.isColimit _)
+    let e₂ := IsColimit.coconePointUniqueUpToIso (Q.isColimit) (colimit.isColimit _)
+    let e₃ := Iso.homCongr e₁ e₂
+    dsimp only [colimit.cocone_x] at e₃
+    exact small_map e₃
+
+end CategoryTheory

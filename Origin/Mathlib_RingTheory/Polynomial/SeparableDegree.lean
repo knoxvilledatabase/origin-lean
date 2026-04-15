@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Polynomial/SeparableDegree.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 11 of 12 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Defs
+import Mathlib.FieldTheory.Separable
 
 /-!
 
@@ -13,7 +15,7 @@ This file contains basics about the separable degree of a polynomial.
 ## Main results
 
 - `IsSeparableContraction`: is the condition that, for `g` a separable polynomial, we have that
-  `g(x^(q^m)) = f(x)` for some `m : ℕ`.
+   `g(x^(q^m)) = f(x)` for some `m : ℕ`.
 - `HasSeparableContraction`: the condition of having a separable contraction
 - `HasSeparableContraction.degree`: the separable degree, defined as the degree of some
   separable contraction
@@ -34,6 +36,8 @@ separable degree, degree, polynomial
 noncomputable section
 
 namespace Polynomial
+
+open scoped Classical
 
 open Polynomial
 
@@ -83,3 +87,30 @@ section Field
 variable {F : Type*} [Field F]
 
 variable (q : ℕ) {f : F[X]} (hf : HasSeparableContraction q f)
+
+@[stacks 09H0]
+theorem _root_.Irreducible.hasSeparableContraction (q : ℕ) [hF : ExpChar F q] {f : F[X]}
+    (irred : Irreducible f) : HasSeparableContraction q f := by
+  cases hF
+  · exact ⟨f, irred.separable, ⟨0, by rw [pow_zero, expand_one]⟩⟩
+  · rcases exists_separable_of_irreducible q irred ‹q.Prime›.ne_zero with ⟨n, g, hgs, hge⟩
+    exact ⟨g, hgs, n, hge⟩
+
+-- DISSOLVED: contraction_degree_eq_or_insep
+
+theorem IsSeparableContraction.degree_eq [hF : ExpChar F q] (g : F[X])
+    (hg : IsSeparableContraction q f g) : g.natDegree = hf.degree := by
+  cases hF
+  · rcases hg with ⟨_, m, hm⟩
+    rw [one_pow, expand_one] at hm
+    rw [hf.eq_degree, hm]
+  · rcases hg with ⟨hg, m, hm⟩
+    let g' := Classical.choose hf
+    obtain ⟨hg', m', hm'⟩ := Classical.choose_spec hf
+    haveI : Fact q.Prime := ⟨by assumption⟩
+    refine contraction_degree_eq_or_insep q g g' m m' ?_ hg hg'
+    rw [hm, hm']
+
+end Field
+
+end Polynomial

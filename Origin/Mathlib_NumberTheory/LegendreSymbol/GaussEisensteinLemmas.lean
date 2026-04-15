@@ -3,6 +3,9 @@ Extracted from NumberTheory/LegendreSymbol/GaussEisensteinLemmas.lean
 Genuine: 2 of 10 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Field.Lemmas
+import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.NumberTheory.LegendreSymbol.Basic
 
 /-!
 # Lemmas of Gauss and Eisenstein
@@ -38,12 +41,12 @@ theorem div_eq_filter_card {a b c : ℕ} (hb0 : 0 < b) (hc : a / b ≤ c) :
     _ = #{x ∈ Ico 1 c.succ | x * b ≤ a} :=
       congr_arg _ <| Finset.ext fun x => by
         have : x * b ≤ a → x ≤ c := fun h => le_trans (by rwa [le_div_iff_mul_le hb0]) hc
-        simp [le_div_iff_mul_le hb0]; tauto
+        simp [Nat.lt_succ_iff, le_div_iff_mul_le hb0]; tauto
 
 private theorem sum_Ico_eq_card_lt {p q : ℕ} :
     ∑ a ∈ Ico 1 (p / 2).succ, a * q / p =
       #{x ∈ Ico 1 (p / 2).succ ×ˢ Ico 1 (q / 2).succ | x.2 * p ≤ x.1 * q} :=
-  if hp0 : p = 0 then by simp [hp0]
+  if hp0 : p = 0 then by simp [hp0, Finset.ext_iff]
   else
     calc
       ∑ a ∈ Ico 1 (p / 2).succ, a * q / p =
@@ -52,7 +55,13 @@ private theorem sum_Ico_eq_card_lt {p q : ℕ} :
           calc
             x * q / p ≤ p / 2 * q / p := by have := le_of_lt_succ (mem_Ico.mp hx).2; gcongr
             _ ≤ _ := Nat.div_mul_div_le_div _ _ _
-      _ = _ := by simp only [card_eq_sum_ones, sum_filter, sum_product]
+      _ = _ := by
+        rw [← card_sigma]
+        exact card_nbij' (fun a ↦ ⟨a.1, a.2⟩) (fun a ↦ ⟨a.1, a.2⟩)
+          (by simp +contextual only [mem_filter, mem_sigma, and_self_iff,
+            forall_true_iff, mem_product])
+          (by simp +contextual only [mem_filter, mem_sigma, and_self_iff,
+            forall_true_iff, mem_product]) (fun _ _ ↦ rfl) (fun _ _ ↦ rfl)
 
 -- DISSOLVED: sum_mul_div_add_sum_mul_div_eq_mul
 

@@ -1,8 +1,14 @@
 /-
 Extracted from RingTheory/ChainOfDivisors.lean
-Genuine: 5 of 17 | Dissolved: 12 | Infrastructure: 0
+Genuine: 6 of 20 | Dissolved: 14 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.GCDMonoid.Basic
+import Mathlib.Algebra.IsPrimePow
+import Mathlib.Algebra.Squarefree.Basic
+import Mathlib.Data.ZMod.Defs
+import Mathlib.Order.Atoms
+import Mathlib.Order.Hom.Bounded
 
 /-!
 
@@ -31,13 +37,11 @@ and the set of factors of `a`.
 
 -/
 
-assert_not_exists Field
-
-variable {M : Type*} [CommMonoidWithZero M] [IsCancelMulZero M]
+variable {M : Type*} [CancelCommMonoidWithZero M]
 
 -- DISSOLVED: Associates.isAtom_iff
 
-open UniqueFactorizationMonoid Irreducible Associates
+open UniqueFactorizationMonoid multiplicity Irreducible Associates
 
 namespace DivisorChain
 
@@ -54,8 +58,6 @@ theorem first_of_chain_isUnit {q : Associates M} {n : ℕ} {c : Fin (n + 1) → 
 -- DISSOLVED: second_of_chain_is_irreducible
 
 -- DISSOLVED: eq_second_of_chain_of_prime_dvd
-
-omit [IsCancelMulZero M]
 
 theorem card_subset_divisors_le_length_of_chain {q : Associates M} {n : ℕ}
     {c : Fin (n + 1) → Associates M} (h₂ : ∀ {r}, r ≤ q ↔ ∃ i, r = c i) {m : Finset (Associates M)}
@@ -78,9 +80,9 @@ variable [UniqueFactorizationMonoid M]
 
 end DivisorChain
 
-variable {N : Type*} [CommMonoidWithZero N]
+variable {N : Type*} [CancelCommMonoidWithZero N]
 
-theorem factor_orderIso_map_one_eq_bot [IsCancelMulZero N] {m : Associates M} {n : Associates N}
+theorem factor_orderIso_map_one_eq_bot {m : Associates M} {n : Associates N}
     (d : { l : Associates M // l ≤ m } ≃o { l : Associates N // l ≤ n }) :
     (d ⟨1, one_dvd m⟩ : Associates N) = 1 := by
   letI : OrderBot { l : Associates M // l ≤ m } := Subtype.orderBot bot_le
@@ -89,10 +91,7 @@ theorem factor_orderIso_map_one_eq_bot [IsCancelMulZero N] {m : Associates M} {n
   letI : BotHomClass ({ l // l ≤ m } ≃o { l // l ≤ n }) _ _ := OrderIsoClass.toBotHomClass
   exact map_bot d
 
-set_option backward.isDefEq.respectTransparency false in
-
-theorem coe_factor_orderIso_map_eq_one_iff [IsCancelMulZero N]
-    {m u : Associates M} {n : Associates N} (hu' : u ≤ m)
+theorem coe_factor_orderIso_map_eq_one_iff {m u : Associates M} {n : Associates N} (hu' : u ≤ m)
     (d : Set.Iic m ≃o Set.Iic n) : (d ⟨u, hu'⟩ : Associates N) = 1 ↔ u = 1 :=
   ⟨fun hu => by
     rw [show u = (d.symm ⟨d ⟨u, hu'⟩, (d ⟨u, hu'⟩).prop⟩) by
@@ -103,13 +102,13 @@ theorem coe_factor_orderIso_map_eq_one_iff [IsCancelMulZero N]
     conv_rhs => rw [← factor_orderIso_map_one_eq_bot d]
     rfl⟩
 
+section
+
 variable [UniqueFactorizationMonoid N] [UniqueFactorizationMonoid M]
 
 open DivisorChain
 
 -- DISSOLVED: pow_image_of_prime_by_factor_orderIso_dvd
-
-set_option backward.isDefEq.respectTransparency false in
 
 -- DISSOLVED: map_prime_of_factor_orderIso
 
@@ -122,8 +121,8 @@ theorem emultiplicity_prime_le_emultiplicity_image_by_factor_orderIso {m p : Ass
   · simp [hn]
   by_cases hm : m = 0
   · simp [hm] at hp
-  rw [FiniteMultiplicity.of_prime_left (prime_of_normalized_factor p hp) hm
-    |>.emultiplicity_eq_multiplicity, ← pow_dvd_iff_le_emultiplicity]
+  rw [(finite_prime_left (prime_of_normalized_factor p hp) hm).emultiplicity_eq_multiplicity,
+    ← pow_dvd_iff_le_emultiplicity]
   apply pow_image_of_prime_by_factor_orderIso_dvd hn hp d (pow_multiplicity_dvd ..)
 
 -- DISSOLVED: emultiplicity_prime_eq_emultiplicity_image_by_factor_orderIso
@@ -131,3 +130,40 @@ theorem emultiplicity_prime_le_emultiplicity_image_by_factor_orderIso {m p : Ass
 end
 
 variable [Subsingleton Mˣ] [Subsingleton Nˣ]
+
+@[simps]
+def mkFactorOrderIsoOfFactorDvdEquiv {m : M} {n : N} {d : { l : M // l ∣ m } ≃ { l : N // l ∣ n }}
+    (hd : ∀ l l', (d l : N) ∣ d l' ↔ (l : M) ∣ (l' : M)) :
+    Set.Iic (Associates.mk m) ≃o Set.Iic (Associates.mk n) where
+  toFun l :=
+    ⟨Associates.mk
+        (d
+          ⟨associatesEquivOfUniqueUnits ↑l, by
+            obtain ⟨x, hx⟩ := l
+            rw [Subtype.coe_mk, associatesEquivOfUniqueUnits_apply, out_dvd_iff]
+            exact hx⟩),
+      mk_le_mk_iff_dvd.mpr (Subtype.prop (d ⟨associatesEquivOfUniqueUnits ↑l, _⟩))⟩
+  invFun l :=
+    ⟨Associates.mk
+        (d.symm
+          ⟨associatesEquivOfUniqueUnits ↑l, by
+            obtain ⟨x, hx⟩ := l
+            rw [Subtype.coe_mk, associatesEquivOfUniqueUnits_apply, out_dvd_iff]
+            exact hx⟩),
+      mk_le_mk_iff_dvd.mpr (Subtype.prop (d.symm ⟨associatesEquivOfUniqueUnits ↑l, _⟩))⟩
+  left_inv := fun ⟨l, hl⟩ => by
+    simp only [Subtype.coe_eta, Equiv.symm_apply_apply, Subtype.coe_mk,
+      associatesEquivOfUniqueUnits_apply, mk_out, out_mk, normalize_eq]
+  right_inv := fun ⟨l, hl⟩ => by
+    simp only [Subtype.coe_eta, Equiv.apply_symm_apply, Subtype.coe_mk,
+      associatesEquivOfUniqueUnits_apply, out_mk, normalize_eq, mk_out]
+  map_rel_iff' := by
+    rintro ⟨a, ha⟩ ⟨b, hb⟩
+    simp only [Equiv.coe_fn_mk, Subtype.mk_le_mk, Associates.mk_le_mk_iff_dvd, hd,
+        Subtype.coe_mk, associatesEquivOfUniqueUnits_apply, out_dvd_iff, mk_out]
+
+variable [UniqueFactorizationMonoid M] [UniqueFactorizationMonoid N]
+
+-- DISSOLVED: mem_normalizedFactors_factor_dvd_iso_of_mem_normalizedFactors
+
+-- DISSOLVED: emultiplicity_factor_dvd_iso_eq_emultiplicity_of_mem_normalizedFactors

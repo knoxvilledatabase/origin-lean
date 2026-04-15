@@ -3,6 +3,10 @@ Extracted from MeasureTheory/Function/ContinuousMapDense.lean
 Genuine: 8 of 13 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.Regular
+import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp
+import Mathlib.Topology.UrysohnsLemma
+import Mathlib.MeasureTheory.Integral.Bochner
 
 /-!
 # Approximation in Lᵖ by continuous functions
@@ -16,13 +20,13 @@ The result is presented in several versions. First concrete versions giving an a
 up to `ε` in these various contexts, and then abstract versions stating that the topological
 closure of the relevant subgroups of `Lp` are the whole space.
 
-* `MeasureTheory.MemLp.exists_hasCompactSupport_eLpNorm_sub_le` states that, in a locally compact
+* `MeasureTheory.Memℒp.exists_hasCompactSupport_eLpNorm_sub_le` states that, in a locally compact
   space, an `ℒp` function can be approximated by continuous functions with compact support,
   in the sense that `eLpNorm (f - g) p μ` is small.
-* `MeasureTheory.MemLp.exists_hasCompactSupport_integral_rpow_sub_le`: same result, but expressed in
+* `MeasureTheory.Memℒp.exists_hasCompactSupport_integral_rpow_sub_le`: same result, but expressed in
   terms of `∫ ‖f - g‖^p`.
 
-Versions with `Integrable` instead of `MemLp` are specialized to the case `p = 1`.
+Versions with `Integrable` instead of `Memℒp` are specialized to the case `p = 1`.
 Versions with `boundedContinuous` instead of `HasCompactSupport` drop the locally
 compact assumption and give only approximation by a bounded continuous function.
 
@@ -47,9 +51,9 @@ continuous function interpolating between these two sets.
 ## Related results
 
 Are you looking for a result on "directional" approximation (above or below with respect to an
-order) of functions whose codomain is `ℝ≥0∞` or `ℝ`, by semicontinuous functions?
-See the Vitali-Carathéodory theorem,
-in the file `Mathlib/MeasureTheory/Integral/Bochner/VitaliCaratheodory.lean`.
+order) of functions whose codomain is `ℝ≥0∞` or `ℝ`, by semicontinuous functions?  See the
+Vitali-Carathéodory theorem, in the file `Mathlib/MeasureTheory/Integral/VitaliCaratheodory.lean`.
+
 -/
 
 open scoped ENNReal NNReal Topology BoundedContinuousFunction
@@ -67,14 +71,18 @@ variable [NormedSpace ℝ E]
 
 -- DISSOLVED: exists_continuous_eLpNorm_sub_le_of_closed
 
--- DISSOLVED: MemLp.exists_hasCompactSupport_eLpNorm_sub_le
+alias exists_continuous_snorm_sub_le_of_closed := exists_continuous_eLpNorm_sub_le_of_closed
 
-theorem MemLp.exists_hasCompactSupport_integral_rpow_sub_le
+-- DISSOLVED: Memℒp.exists_hasCompactSupport_eLpNorm_sub_le
+
+alias Memℒp.exists_hasCompactSupport_snorm_sub_le := Memℒp.exists_hasCompactSupport_eLpNorm_sub_le
+
+theorem Memℒp.exists_hasCompactSupport_integral_rpow_sub_le
     [R1Space α] [WeaklyLocallyCompactSpace α] [μ.Regular]
-    {p : ℝ} (hp : 0 < p) {f : α → E} (hf : MemLp f (ENNReal.ofReal p) μ) {ε : ℝ} (hε : 0 < ε) :
+    {p : ℝ} (hp : 0 < p) {f : α → E} (hf : Memℒp f (ENNReal.ofReal p) μ) {ε : ℝ} (hε : 0 < ε) :
     ∃ g : α → E,
       HasCompactSupport g ∧
-        (∫ x, ‖f x - g x‖ ^ p ∂μ) ≤ ε ∧ Continuous g ∧ MemLp g (ENNReal.ofReal p) μ := by
+        (∫ x, ‖f x - g x‖ ^ p ∂μ) ≤ ε ∧ Continuous g ∧ Memℒp g (ENNReal.ofReal p) μ := by
   have I : 0 < ε ^ (1 / p) := Real.rpow_pos_of_pos hε _
   have A : ENNReal.ofReal (ε ^ (1 / p)) ≠ 0 := by
     simp only [Ne, ENNReal.ofReal_eq_zero, not_le, I]
@@ -95,15 +103,17 @@ theorem Integrable.exists_hasCompactSupport_integral_sub_le
     {f : α → E} (hf : Integrable f μ) {ε : ℝ} (hε : 0 < ε) :
     ∃ g : α → E, HasCompactSupport g ∧ (∫ x, ‖f x - g x‖ ∂μ) ≤ ε ∧
       Continuous g ∧ Integrable g μ := by
-  simp only [← memLp_one_iff_integrable, ← ENNReal.ofReal_one]
+  simp only [← memℒp_one_iff_integrable, ← eLpNorm_one_eq_lintegral_nnnorm, ← ENNReal.ofReal_one]
     at hf ⊢
   simpa using hf.exists_hasCompactSupport_integral_rpow_sub_le zero_lt_one hε
 
--- DISSOLVED: MemLp.exists_boundedContinuous_eLpNorm_sub_le
+-- DISSOLVED: Memℒp.exists_boundedContinuous_eLpNorm_sub_le
 
-theorem MemLp.exists_boundedContinuous_integral_rpow_sub_le [μ.WeaklyRegular] {p : ℝ} (hp : 0 < p)
-    {f : α → E} (hf : MemLp f (ENNReal.ofReal p) μ) {ε : ℝ} (hε : 0 < ε) :
-    ∃ g : α →ᵇ E, (∫ x, ‖f x - g x‖ ^ p ∂μ) ≤ ε ∧ MemLp g (ENNReal.ofReal p) μ := by
+alias Memℒp.exists_boundedContinuous_snorm_sub_le := Memℒp.exists_boundedContinuous_eLpNorm_sub_le
+
+theorem Memℒp.exists_boundedContinuous_integral_rpow_sub_le [μ.WeaklyRegular] {p : ℝ} (hp : 0 < p)
+    {f : α → E} (hf : Memℒp f (ENNReal.ofReal p) μ) {ε : ℝ} (hε : 0 < ε) :
+    ∃ g : α →ᵇ E, (∫ x, ‖f x - g x‖ ^ p ∂μ) ≤ ε ∧ Memℒp g (ENNReal.ofReal p) μ := by
   have I : 0 < ε ^ (1 / p) := Real.rpow_pos_of_pos hε _
   have A : ENNReal.ofReal (ε ^ (1 / p)) ≠ 0 := by
     simp only [Ne, ENNReal.ofReal_eq_zero, not_le, I]
@@ -121,7 +131,7 @@ theorem MemLp.exists_boundedContinuous_integral_rpow_sub_le [μ.WeaklyRegular] {
 theorem Integrable.exists_boundedContinuous_integral_sub_le [μ.WeaklyRegular] {f : α → E}
     (hf : Integrable f μ) {ε : ℝ} (hε : 0 < ε) :
     ∃ g : α →ᵇ E, (∫ x, ‖f x - g x‖ ∂μ) ≤ ε ∧ Integrable g μ := by
-  simp only [← memLp_one_iff_integrable, ← ENNReal.ofReal_one]
+  simp only [← memℒp_one_iff_integrable, ← eLpNorm_one_eq_lintegral_nnnorm, ← ENNReal.ofReal_one]
     at hf ⊢
   simpa using hf.exists_boundedContinuous_integral_rpow_sub_le zero_lt_one hε
 
@@ -133,12 +143,12 @@ theorem boundedContinuousFunction_dense [SecondCountableTopologyEither α E] [Fa
     (hp : p ≠ ∞) [μ.WeaklyRegular] :
     Dense (boundedContinuousFunction E p μ : Set (Lp E p μ)) := by
   intro f
-  refine (mem_closure_iff_nhds_basis Metric.nhds_basis_closedEBall).2 fun ε hε ↦ ?_
+  refine (mem_closure_iff_nhds_basis EMetric.nhds_basis_closed_eball).2 fun ε hε ↦ ?_
   obtain ⟨g, hg, g_mem⟩ :
-      ∃ g : α →ᵇ E, eLpNorm ((f : α → E) - (g : α → E)) p μ ≤ ε ∧ MemLp g p μ :=
-    (Lp.memLp f).exists_boundedContinuous_eLpNorm_sub_le hp hε.ne'
+      ∃ g : α →ᵇ E, eLpNorm ((f : α → E) - (g : α → E)) p μ ≤ ε ∧ Memℒp g p μ :=
+    (Lp.memℒp f).exists_boundedContinuous_eLpNorm_sub_le hp hε.ne'
   refine ⟨g_mem.toLp _, ⟨g, rfl⟩, ?_⟩
-  rwa [Metric.mem_closedEBall', ← Lp.toLp_coeFn f (Lp.memLp f), Lp.edist_toLp_toLp]
+  rwa [EMetric.mem_closedBall', ← Lp.toLp_coeFn f (Lp.memℒp f), Lp.edist_toLp_toLp]
 
 theorem boundedContinuousFunction_topologicalClosure [SecondCountableTopologyEither α E]
     [Fact (1 ≤ p)] (hp : p ≠ ∞) [μ.WeaklyRegular] :
@@ -151,7 +161,7 @@ end MeasureTheory
 
 variable [SecondCountableTopologyEither α E] [_i : Fact (1 ≤ p)]
 
-variable (𝕜 : Type*) [NormedRing 𝕜] [Module 𝕜 E] [IsBoundedSMul 𝕜 E] [NormedSpace ℝ E]
+variable (𝕜 : Type*) [NormedField 𝕜] [NormedAlgebra ℝ 𝕜] [NormedSpace 𝕜 E]
 
 variable (E) (μ)
 
@@ -159,6 +169,7 @@ namespace BoundedContinuousFunction
 
 theorem toLp_denseRange [μ.WeaklyRegular] [IsFiniteMeasure μ] (hp : p ≠ ∞) :
     DenseRange (toLp p μ 𝕜 : (α →ᵇ E) →L[𝕜] Lp E p μ) := by
+  haveI : NormedSpace ℝ E := RestrictScalars.normedSpace ℝ 𝕜 E
   simpa only [← range_toLp p μ (𝕜 := 𝕜)]
     using MeasureTheory.Lp.boundedContinuousFunction_dense E μ hp
 

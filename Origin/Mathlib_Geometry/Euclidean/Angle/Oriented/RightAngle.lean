@@ -1,13 +1,15 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/RightAngle.lean
-Genuine: 75 of 81 | Dissolved: 6 | Infrastructure: 0
+Genuine: 72 of 78 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Euclidean.Angle.Oriented.Affine
+import Mathlib.Geometry.Euclidean.Angle.Unoriented.RightAngle
 
 /-!
 # Oriented angles in right-angled triangles.
 
-This file proves basic geometric results about distances and oriented angles in (possibly
+This file proves basic geometrical results about distances and oriented angles in (possibly
 degenerate) right-angled triangles in real inner product spaces and Euclidean affine spaces.
 
 -/
@@ -423,30 +425,6 @@ theorem oangle_left_eq_arctan_of_oangle_eq_pi_div_two {p₁ p₂ p₃ : P} (h : 
   rw [oangle_eq_angle_of_sign_eq_one hs, angle_comm,
     angle_eq_arctan_of_angle_eq_pi_div_two (angle_rev_eq_pi_div_two_of_oangle_eq_pi_div_two h)
       (left_ne_of_oangle_eq_pi_div_two h)]
-
-lemma abs_oangle_toReal_lt_pi_div_two_of_angle_eq_pi_div_two {p₁ p₂ p₃ : P}
-    (h : ∠ p₁ p₂ p₃ = π / 2) : |(∡ p₂ p₃ p₁).toReal| < π / 2 := by
-  by_cases hp₂ : p₂ = p₃
-  · simp [hp₂, Real.pi_pos]
-  by_cases hp₁ : p₁ = p₃
-  · simp [hp₁, Real.pi_pos]
-  rw [← angle_eq_abs_oangle_toReal hp₂ hp₁]
-  exact angle_lt_pi_div_two_of_angle_eq_pi_div_two h (Ne.symm hp₂)
-
-lemma oangle_eq_oangle_of_two_zsmul_eq_of_angle_eq_pi_div_two {p₁ p₂ p₃ p₄ p₅ p₆ : P}
-    (h : (2 : ℤ) • ∡ p₂ p₃ p₁ = (2 : ℤ) • ∡ p₅ p₆ p₄) (h₁₂₃ : ∠ p₁ p₂ p₃ = π / 2)
-    (h₄₅₆ : ∠ p₄ p₅ p₆ = π / 2) : ∡ p₂ p₃ p₁ = ∡ p₅ p₆ p₄ := by
-  rwa [Real.Angle.two_zsmul_eq_iff_eq_of_abs_toReal_lt_pi_div_two
-    (abs_oangle_toReal_lt_pi_div_two_of_angle_eq_pi_div_two h₁₂₃)
-    (abs_oangle_toReal_lt_pi_div_two_of_angle_eq_pi_div_two h₄₅₆)] at h
-
-lemma oangle_eq_oangle_rev_of_two_zsmul_eq_of_angle_eq_pi_div_two {p₁ p₂ p₃ p₄ p₅ p₆ : P}
-    (h : (2 : ℤ) • ∡ p₂ p₃ p₁ = (2 : ℤ) • ∡ p₄ p₆ p₅) (h₁₂₃ : ∠ p₁ p₂ p₃ = π / 2)
-    (h₄₅₆ : ∠ p₄ p₅ p₆ = π / 2) : ∡ p₂ p₃ p₁ = ∡ p₄ p₆ p₅ := by
-  refine (Real.Angle.two_zsmul_eq_iff_eq_of_abs_toReal_lt_pi_div_two
-    (abs_oangle_toReal_lt_pi_div_two_of_angle_eq_pi_div_two h₁₂₃) ?_).1 h
-  rw [oangle_rev, Real.Angle.abs_toReal_neg]
-  exact abs_oangle_toReal_lt_pi_div_two_of_angle_eq_pi_div_two h₄₅₆
 
 theorem cos_oangle_right_of_oangle_eq_pi_div_two {p₁ p₂ p₃ : P} (h : ∡ p₁ p₂ p₃ = ↑(π / 2)) :
     Real.Angle.cos (∡ p₂ p₃ p₁) = dist p₃ p₂ / dist p₁ p₃ := by

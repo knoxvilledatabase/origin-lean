@@ -1,8 +1,10 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Opposite.lean
-Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
+Genuine: 1 of 5 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.RingTheory.TensorProduct.Basic
+import Mathlib.Algebra.Algebra.Opposite
 
 /-! # `MulOpposite` distributes over `⊗`
 
@@ -37,3 +39,26 @@ def opAlgEquiv : Aᵐᵒᵖ ⊗[R] Bᵐᵒᵖ ≃ₐ[S] (A ⊗[R] B)ᵐᵒᵖ :=
     (AlgHom.opComm <| algHomOfLinearMapTensorProduct e₂.toLinearMap
       (fun a₁ a₂ b₁ b₂ => unop_injective (by with_unfolding_all rfl)) (unop_injective rfl))
     (AlgHom.op.symm.injective <| by ext <;> rfl) (by ext <;> rfl)
+
+theorem opAlgEquiv_apply (x : Aᵐᵒᵖ ⊗[R] Bᵐᵒᵖ) :
+    opAlgEquiv R S A B x =
+      op (_root_.TensorProduct.map
+        (opLinearEquiv R).symm.toLinearMap (opLinearEquiv R).symm.toLinearMap x) :=
+  rfl
+
+theorem opAlgEquiv_symm_apply (x : (A ⊗[R] B)ᵐᵒᵖ) :
+    (opAlgEquiv R S A B).symm x =
+      _root_.TensorProduct.map (opLinearEquiv R).toLinearMap (opLinearEquiv R).toLinearMap x.unop :=
+  rfl
+
+@[simp]
+theorem opAlgEquiv_tmul (a : Aᵐᵒᵖ) (b : Bᵐᵒᵖ) :
+    opAlgEquiv R S A B (a ⊗ₜ[R] b) = op (a.unop ⊗ₜ b.unop) :=
+  rfl
+
+@[simp]
+theorem opAlgEquiv_symm_tmul (a : A) (b : B) :
+    (opAlgEquiv R S A B).symm (op <| a ⊗ₜ[R] b) = op a ⊗ₜ op b :=
+  rfl
+
+end Algebra.TensorProduct

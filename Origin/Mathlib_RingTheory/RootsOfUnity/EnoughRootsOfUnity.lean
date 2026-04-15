@@ -1,8 +1,9 @@
 /-
 Extracted from RingTheory/RootsOfUnity/EnoughRootsOfUnity.lean
-Genuine: 3 of 11 | Dissolved: 4 | Infrastructure: 4
+Genuine: 3 of 7 | Dissolved: 2 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 
 /-!
 # Commutative monoids with enough roots of unity
@@ -24,19 +25,27 @@ lemma exists_primitiveRoot (M : Type*) [CommMonoid M] (n : ℕ) [HasEnoughRootsO
     ∃ ζ : M, IsPrimitiveRoot ζ n :=
   HasEnoughRootsOfUnity.prim
 
--- INSTANCE (free from Core): rootsOfUnity_isCyclic
+instance rootsOfUnity_isCyclic (M : Type*) [CommMonoid M] (n : ℕ) [HasEnoughRootsOfUnity M n] :
+    IsCyclic (rootsOfUnity n M) :=
+  HasEnoughRootsOfUnity.cyc
 
 -- DISSOLVED: of_dvd
 
--- INSTANCE (free from Core): finite_rootsOfUnity
+instance finite_rootsOfUnity (M : Type*) [CommMonoid M] (n : ℕ) [NeZero n]
+    [HasEnoughRootsOfUnity M n] :
+    Finite <| rootsOfUnity n M := by
+  have := rootsOfUnity_isCyclic M n
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := rootsOfUnity n M)
+  have hg' : g ^ n = 1 := OneMemClass.coe_eq_one.mp g.prop
+  let f (j : ZMod n) : rootsOfUnity n M := g ^ (j.val : ℤ)
+  refine Finite.of_surjective f fun x ↦ ?_
+  obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp <| hg x
+  refine ⟨k, ?_⟩
+  simpa only [ZMod.natCast_val, ← hk, f, ZMod.coe_intCast] using (zpow_eq_zpow_emod' k hg').symm
 
 -- DISSOLVED: natCard_rootsOfUnity
 
--- DISSOLVED: of_card_le
-
 end HasEnoughRootsOfUnity
-
--- DISSOLVED: MulEquiv.hasEnoughRootsOfUnity
 
 section cyclic
 
@@ -49,7 +58,3 @@ lemma IsCyclic.monoidHom_equiv_self (G M : Type*) [CommGroup G] [Finite G]
   exact ⟨e.trans (rootsOfUnityUnitsMulEquiv M (Nat.card G)) |>.trans (mulEquivOfCyclicCardEq hord)⟩
 
 end cyclic
-
--- INSTANCE (free from Core): {M
-
--- INSTANCE (free from Core): {G

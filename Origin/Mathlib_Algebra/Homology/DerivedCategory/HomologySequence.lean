@@ -1,8 +1,9 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/HomologySequence.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 of 15 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.DerivedCategory.Basic
 
 /-!
 # The homology sequence
@@ -13,8 +14,6 @@ the long exact homology sequences associated to distinguished triangles in the
 derived category.
 
 -/
-
-assert_not_exists TwoSidedIdeal
 
 universe w v u
 
@@ -31,6 +30,67 @@ noncomputable def homologyFunctorFactors (n : ℤ) : Q ⋙ homologyFunctor C n �
     HomologicalComplex.homologyFunctor _ _ n :=
   HomologicalComplexUpToQuasiIso.homologyFunctorFactors C (ComplexShape.up ℤ) n
 
-set_option backward.isDefEq.respectTransparency false in
+noncomputable def homologyFunctorFactorsh (n : ℤ) : Qh ⋙ homologyFunctor C n ≅
+    HomotopyCategory.homologyFunctor _ _ n :=
+  HomologicalComplexUpToQuasiIso.homologyFunctorFactorsh C (ComplexShape.up ℤ) n
 
-variable {C} in
+instance (n : ℤ) : (homologyFunctor C n).IsHomological :=
+  Functor.isHomological_of_localization Qh
+    (homologyFunctor C n) _ (homologyFunctorFactorsh C n)
+
+noncomputable instance : (homologyFunctor C 0).ShiftSequence ℤ :=
+  Functor.ShiftSequence.induced (homologyFunctorFactorsh C 0) ℤ
+    (homologyFunctor C) (homologyFunctorFactorsh C)
+
+variable {C}
+
+namespace HomologySequence
+
+noncomputable def δ (T : Triangle (DerivedCategory C))
+    (n₀ n₁ : ℤ) (h : n₀ + 1 = n₁) :
+    (homologyFunctor C n₀).obj T.obj₃ ⟶ (homologyFunctor C n₁).obj T.obj₁ :=
+  (homologyFunctor C 0).shiftMap T.mor₃ n₀ n₁ (by rw [add_comm 1, h])
+
+variable (T : Triangle (DerivedCategory C)) (hT : T ∈ distTriang _) (n₀ n₁ : ℤ) (h : n₀ + 1 = n₁)
+
+include hT
+
+@[reassoc (attr := simp)]
+lemma comp_δ : (homologyFunctor C n₀).map T.mor₂ ≫ δ T n₀ n₁ h = 0 :=
+  (homologyFunctor C 0).comp_homologySequenceδ _ hT _ _ h
+
+@[reassoc (attr := simp)]
+lemma δ_comp : δ T n₀ n₁ h ≫ (homologyFunctor C n₁).map T.mor₁ = 0 :=
+  (homologyFunctor C 0).homologySequenceδ_comp _ hT _ _ h
+
+lemma exact₂ :
+    (ShortComplex.mk ((homologyFunctor C n₀).map T.mor₁) ((homologyFunctor C n₀).map T.mor₂)
+      (by simp only [← Functor.map_comp, comp_distTriang_mor_zero₁₂ _ hT,
+        Functor.map_zero])).Exact :=
+  (homologyFunctor C 0).homologySequence_exact₂ _ hT _
+
+lemma exact₃ : (ShortComplex.mk _ _ (comp_δ T hT n₀ n₁ h)).Exact :=
+  (homologyFunctor C 0).homologySequence_exact₃ _ hT _ _ h
+
+lemma exact₁ : (ShortComplex.mk _ _ (δ_comp T hT n₀ n₁ h)).Exact :=
+  (homologyFunctor C 0).homologySequence_exact₁ _ hT _ _ h
+
+lemma epi_homologyMap_mor₁_iff :
+    Epi ((homologyFunctor C n₀).map T.mor₁) ↔ (homologyFunctor C n₀).map T.mor₂ = 0 :=
+  (homologyFunctor C 0).homologySequence_epi_shift_map_mor₁_iff _ hT _
+
+lemma mono_homologyMap_mor₁_iff :
+    Mono ((homologyFunctor C n₁).map T.mor₁) ↔ δ T n₀ n₁ h = 0 :=
+  (homologyFunctor C 0).homologySequence_mono_shift_map_mor₁_iff _ hT _ _ h
+
+lemma epi_homologyMap_mor₂_iff :
+    Epi ((homologyFunctor C n₀).map T.mor₂) ↔ δ T n₀ n₁ h = 0 :=
+  (homologyFunctor C 0).homologySequence_epi_shift_map_mor₂_iff _ hT _ _ h
+
+lemma mono_homologyMap_mor₂_iff :
+    Mono ((homologyFunctor C n₀).map T.mor₂) ↔ (homologyFunctor C n₀).map T.mor₁ = 0 :=
+  (homologyFunctor C 0).homologySequence_mono_shift_map_mor₂_iff _ hT n₀
+
+end HomologySequence
+
+end DerivedCategory

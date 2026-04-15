@@ -3,13 +3,16 @@ Extracted from CategoryTheory/Limits/Preserves/Shapes/Square.lean
 Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Square
+import Mathlib.CategoryTheory.Limits.Yoneda
+import Mathlib.CategoryTheory.Limits.Preserves.Ulift
 
 /-!
-# Preservation of pullback/pushout squares
+# Preservations of pullback/pushout squares
 
 If a functor `F : C ⥤ D` preserves suitable cospans (resp. spans),
 and `sq : Square C` is a pullback square (resp. a pushout square)
-then so is the square `sq.map F`.
+then so is the square`sq.map F`.
 
 The lemma `Square.isPullback_iff_map_coyoneda_isPullback` also
 shows that a square is a pullback square iff it is so after the
@@ -74,6 +77,8 @@ lemma isPushout_iff_op_map_yoneda_isPullback :
   ⟨fun h _ ↦ h.op.map _, fun h ↦ IsPushout.mk _
     ((sq.pushoutCocone.isColimitYonedaEquiv).symm
       (fun X ↦ IsLimit.ofIsoLimit (h X).isLimit (PullbackCone.ext (Iso.refl _))))⟩
+
+section
 
 variable {sq₁ : Square (Type v)} {sq₂ : Square (Type u)}
   (e₁ : sq₁.X₁ ≃ sq₂.X₁) (e₂ : sq₁.X₂ ≃ sq₂.X₂)

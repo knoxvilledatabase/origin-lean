@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/SpecialFunctions/Sqrt.lean
-Genuine: 1 of 3 | Dissolved: 2 | Infrastructure: 0
+Genuine: 1 of 23 | Dissolved: 22 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.ContDiff.Basic
+import Mathlib.Analysis.Calculus.Deriv.Pow
 
 /-!
 # Smoothness of `Real.sqrt`
@@ -21,7 +23,7 @@ open scoped Topology
 
 namespace Real
 
-noncomputable def sqPartialHomeomorph : OpenPartialHomeomorph ℝ ℝ where
+noncomputable def sqPartialHomeomorph : PartialHomeomorph ℝ ℝ where
   toFun x := x ^ 2
   invFun := (√·)
   source := Ioi 0
@@ -38,3 +40,60 @@ noncomputable def sqPartialHomeomorph : OpenPartialHomeomorph ℝ ℝ where
 -- DISSOLVED: deriv_sqrt_aux
 
 -- DISSOLVED: hasStrictDerivAt_sqrt
+
+-- DISSOLVED: contDiffAt_sqrt
+
+-- DISSOLVED: hasDerivAt_sqrt
+
+end Real
+
+open Real
+
+section deriv
+
+variable {f : ℝ → ℝ} {s : Set ℝ} {f' x : ℝ}
+
+-- DISSOLVED: HasDerivWithinAt.sqrt
+
+-- DISSOLVED: HasDerivAt.sqrt
+
+-- DISSOLVED: HasStrictDerivAt.sqrt
+
+-- DISSOLVED: derivWithin_sqrt
+
+-- DISSOLVED: deriv_sqrt
+
+end deriv
+
+section fderiv
+
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {f : E → ℝ} {n : WithTop ℕ∞}
+  {s : Set E} {x : E} {f' : E →L[ℝ] ℝ}
+
+-- DISSOLVED: HasFDerivAt.sqrt
+
+-- DISSOLVED: HasStrictFDerivAt.sqrt
+
+-- DISSOLVED: HasFDerivWithinAt.sqrt
+
+-- DISSOLVED: DifferentiableWithinAt.sqrt
+
+-- DISSOLVED: DifferentiableAt.sqrt
+
+-- DISSOLVED: DifferentiableOn.sqrt
+
+-- DISSOLVED: Differentiable.sqrt
+
+-- DISSOLVED: fderivWithin_sqrt
+
+-- DISSOLVED: fderiv_sqrt
+
+-- DISSOLVED: ContDiffAt.sqrt
+
+-- DISSOLVED: ContDiffWithinAt.sqrt
+
+-- DISSOLVED: ContDiffOn.sqrt
+
+-- DISSOLVED: ContDiff.sqrt
+
+end fderiv

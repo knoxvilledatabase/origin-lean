@@ -3,6 +3,7 @@ Extracted from Data/List/Palindrome.lean
 Genuine: 6 of 7 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.List.Basic
 
 /-!
 # Palindromes
@@ -58,7 +59,8 @@ theorem append_reverse (l : List α) : Palindrome (l ++ reverse l) := by
 protected theorem map (f : α → β) (p : Palindrome l) : Palindrome (map f l) :=
   of_reverse_eq <| by rw [← map_reverse, p.reverse_eq]
 
--- INSTANCE (free from Core): [DecidableEq
+instance [DecidableEq α] (l : List α) : Decidable (Palindrome l) :=
+  decidable_of_iff' _ iff_reverse_eq
 
 end Palindrome
 

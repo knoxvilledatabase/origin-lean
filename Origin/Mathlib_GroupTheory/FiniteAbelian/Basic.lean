@@ -1,8 +1,11 @@
 /-
 Extracted from GroupTheory/FiniteAbelian/Basic.lean
-Genuine: 8 of 10 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 of 9 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.PID
+import Mathlib.Algebra.Group.TypeTags.Finite
+import Mathlib.Data.ZMod.Quotient
 
 /-!
 # Structure of finite(ly generated) abelian groups
@@ -10,7 +13,6 @@ import Origin.Core
 * `AddCommGroup.equiv_free_prod_directSum_zmod` : Any finitely generated abelian group is the
   product of a power of `ℤ` and a direct sum of some `ZMod (p i ^ e i)` for some prime powers
   `p i ^ e i`.
-* `CommGroup.equiv_free_prod_prod_multiplicative_zmod` is a version for multiplicative groups.
 * `AddCommGroup.equiv_directSum_zmod_of_finite` : Any finite abelian group is a direct sum of
   some `ZMod (p i ^ e i)` for some prime powers `p i ^ e i`.
 * `CommGroup.equiv_prod_multiplicative_zmod_of_finite` is a version for multiplicative groups.
@@ -66,9 +68,9 @@ theorem equiv_directSum_zmod_of_finite [Finite G] :
       Nonempty <| G ≃+ ⨁ i : ι, ZMod (p i ^ e i) := by
   cases nonempty_fintype G
   obtain ⟨n, ι, fι, p, hp, e, ⟨f⟩⟩ := equiv_free_prod_directSum_zmod G
-  rcases n with - | n
+  cases' n with n
   · have : Unique (Fin Nat.zero →₀ ℤ) :=
-      { uniq := by subsingleton }
+      { uniq := by simp only [eq_iff_true_of_subsingleton]; trivial }
     exact ⟨ι, fι, p, hp, e, ⟨f.trans AddEquiv.uniqueProd⟩⟩
   · haveI := @Fintype.prodLeft _ _ _ (Fintype.ofEquiv G f.toEquiv) _
     exact
@@ -101,18 +103,6 @@ theorem equiv_prod_multiplicative_zmod_of_finite (G : Type*) [CommGroup G] [Fini
        (∀ (i : ι), 1 < n i) ∧ Nonempty (G ≃* ((i : ι) → Multiplicative (ZMod (n i)))) := by
   obtain ⟨ι, inst, n, h₁, h₂⟩ := AddCommGroup.equiv_directSum_zmod_of_finite' (Additive G)
   exact ⟨ι, inst, n, h₁, ⟨MulEquiv.toAdditive.symm <| h₂.some.trans <|
-    (DirectSum.addEquivProd _).trans (MulEquiv.piMultiplicative _).toAdditiveRight⟩⟩
-
-theorem equiv_free_prod_prod_multiplicative_zmod (G : Type*) [CommGroup G] [hG : Group.FG G] :
-    ∃ (ι j : Type) (_ : Fintype ι) (_ : Fintype j) (p : ι → ℕ)
-    (_ : ∀ i, Nat.Prime <| p i) (e : ι → ℕ),
-      Nonempty <| G ≃* (j → Multiplicative ℤ) × ((i : ι) → Multiplicative (ZMod (p i ^ e i))) := by
-  obtain ⟨n, ι, inst, x, p, e, equiv⟩ := AddCommGroup.equiv_free_prod_directSum_zmod (Additive G)
-  exact ⟨ι, Fin n, inst, inferInstance, x, p, e, ⟨MulEquiv.toAdditive.symm <| equiv.some.trans <|
-    ((Finsupp.addEquivFunOnFinite.trans <| ((AddEquiv.piAdditive _).trans <|
-        (AddEquiv.additiveMultiplicative ℤ).arrowCongr (Equiv.refl _)).symm).prodCongr
-          (DirectSum.addEquivProd _ )).trans <| (AddEquiv.prodAdditive _ _).symm⟩⟩
+    (DirectSum.addEquivProd _).trans <| MulEquiv.toAdditive'' <| MulEquiv.piMultiplicative _⟩⟩
 
 end CommGroup
-
-namespace Subgroup

@@ -3,6 +3,7 @@ Extracted from CategoryTheory/Idempotents/Basic.lean
 Genuine: 8 of 12 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Abelian.Basic
 
 /-!
 # Idempotent complete categories
@@ -14,15 +15,15 @@ preadditive categories).
 ## Main definitions
 
 - `IsIdempotentComplete C` expresses that `C` is idempotent complete, i.e.
-  all idempotents in `C` split. Other characterisations of idempotent completeness are given
-  by `isIdempotentComplete_iff_hasEqualizer_of_id_and_idempotent` and
-  `isIdempotentComplete_iff_idempotents_have_kernels`.
+all idempotents in `C` split. Other characterisations of idempotent completeness are given
+by `isIdempotentComplete_iff_hasEqualizer_of_id_and_idempotent` and
+`isIdempotentComplete_iff_idempotents_have_kernels`.
 - `isIdempotentComplete_of_abelian` expresses that abelian categories are
-  idempotent complete.
+idempotent complete.
 - `isIdempotentComplete_iff_ofEquivalence` expresses that if two categories `C` and `D`
-  are equivalent, then `C` is idempotent complete iff `D` is.
+are equivalent, then `C` is idempotent complete iff `D` is.
 - `isIdempotentComplete_iff_opposite` expresses that `Cᵒᵖ` is idempotent complete
-  iff `C` is.
+iff `C` is.
 
 ## References
 * [Stacks: Karoubian categories] https://stacks.math.columbia.edu/tag/09SF
@@ -41,25 +42,72 @@ open Opposite
 
 namespace CategoryTheory
 
-variable (C : Type*) [Category* C]
+variable (C : Type*) [Category C]
 
 class IsIdempotentComplete : Prop where
   /-- A category is idempotent complete iff all idempotent endomorphisms `p`
-  split as a composition `p = e ≫ i` with `i ≫ e = 𝟙 _` -/
+    split as a composition `p = e ≫ i` with `i ≫ e = 𝟙 _` -/
   idempotents_split :
     ∀ (X : C) (p : X ⟶ X), p ≫ p = p → ∃ (Y : C) (i : Y ⟶ X) (e : X ⟶ Y), i ≫ e = 𝟙 Y ∧ e ≫ i = p
 
 namespace Idempotents
 
-set_option backward.isDefEq.respectTransparency false in
+theorem isIdempotentComplete_iff_hasEqualizer_of_id_and_idempotent :
+    IsIdempotentComplete C ↔ ∀ (X : C) (p : X ⟶ X), p ≫ p = p → HasEqualizer (𝟙 X) p := by
+  constructor
+  · intro
+    intro X p hp
+    rcases IsIdempotentComplete.idempotents_split X p hp with ⟨Y, i, e, ⟨h₁, h₂⟩⟩
+    exact
+      ⟨Nonempty.intro
+          { cone := Fork.ofι i (show i ≫ 𝟙 X = i ≫ p by rw [comp_id, ← h₂, ← assoc, h₁, id_comp])
+            isLimit := by
+              apply Fork.IsLimit.mk'
+              intro s
+              refine ⟨s.ι ≫ e, ?_⟩
+              constructor
+              · erw [assoc, h₂, ← Limits.Fork.condition s, comp_id]
+              · intro m hm
+                rw [Fork.ι_ofι] at hm
+                rw [← hm]
+                simp only [← hm, assoc, h₁]
+                exact (comp_id m).symm }⟩
+  · intro h
+    refine ⟨?_⟩
+    intro X p hp
+    haveI : HasEqualizer (𝟙 X) p := h X p hp
+    refine ⟨equalizer (𝟙 X) p, equalizer.ι (𝟙 X) p,
+      equalizer.lift p (show p ≫ 𝟙 X = p ≫ p by rw [hp, comp_id]), ?_, equalizer.lift_ι _ _⟩
+    ext
+    simp only [assoc, limit.lift_π, Eq.ndrec, id_eq, eq_mpr_eq_cast, Fork.ofι_pt,
+      Fork.ofι_π_app, id_comp]
+    rw [← equalizer.condition, comp_id]
 
-variable {C} in
+variable {C}
 
 theorem idem_of_id_sub_idem [Preadditive C] {X : C} (p : X ⟶ X) (hp : p ≫ p = p) :
     (𝟙 _ - p) ≫ (𝟙 _ - p) = 𝟙 _ - p := by
   simp only [comp_sub, sub_comp, id_comp, comp_id, hp, sub_self, sub_zero]
 
--- INSTANCE (free from Core): (priority
+variable (C)
+
+theorem isIdempotentComplete_iff_idempotents_have_kernels [Preadditive C] :
+    IsIdempotentComplete C ↔ ∀ (X : C) (p : X ⟶ X), p ≫ p = p → HasKernel p := by
+  rw [isIdempotentComplete_iff_hasEqualizer_of_id_and_idempotent]
+  constructor
+  · intro h X p hp
+    haveI : HasEqualizer (𝟙 X) (𝟙 X - p) := h X (𝟙 _ - p) (idem_of_id_sub_idem p hp)
+    convert hasKernel_of_hasEqualizer (𝟙 X) (𝟙 X - p)
+    rw [sub_sub_cancel]
+  · intro h X p hp
+    haveI : HasKernel (𝟙 _ - p) := h X (𝟙 _ - p) (idem_of_id_sub_idem p hp)
+    apply Preadditive.hasEqualizer_of_hasKernel
+
+instance (priority := 100) isIdempotentComplete_of_abelian (D : Type*) [Category D] [Abelian D] :
+    IsIdempotentComplete D := by
+  rw [isIdempotentComplete_iff_idempotents_have_kernels]
+  intros
+  infer_instance
 
 variable {C}
 
@@ -69,7 +117,11 @@ theorem split_imp_of_iso {X X' : C} (φ : X ≅ X') (p : X ⟶ X) (p' : X' ⟶ X
     ∃ (Y' : C) (i' : Y' ⟶ X') (e' : X' ⟶ Y'), i' ≫ e' = 𝟙 Y' ∧ e' ≫ i' = p' := by
   rcases h with ⟨Y, i, e, ⟨h₁, h₂⟩⟩
   use Y, i ≫ φ.hom, φ.inv ≫ e
-  grind
+  constructor
+  · slice_lhs 2 3 => rw [φ.hom_inv_id]
+    rw [id_comp, h₁]
+  · slice_lhs 2 3 => rw [h₂]
+    rw [hpp', ← assoc, φ.inv_hom_id, id_comp]
 
 theorem split_iff_of_iso {X X' : C} (φ : X ≅ X') (p : X ⟶ X) (p' : X' ⟶ X')
     (hpp' : p ≫ φ.hom = φ.hom ≫ p') :
@@ -80,11 +132,11 @@ theorem split_iff_of_iso {X X' : C} (φ : X ≅ X') (p : X ⟶ X) (p' : X' ⟶ X
   · apply split_imp_of_iso φ.symm p' p
     rw [← comp_id p, ← φ.hom_inv_id]
     slice_rhs 2 3 => rw [hpp']
-    simp
+    slice_rhs 1 2 => erw [φ.inv_hom_id]
+    simp only [id_comp]
+    rfl
 
-set_option backward.isDefEq.respectTransparency false in
-
-theorem Equivalence.isIdempotentComplete {D : Type*} [Category* D] (ε : C ≌ D)
+theorem Equivalence.isIdempotentComplete {D : Type*} [Category D] (ε : C ≌ D)
     (h : IsIdempotentComplete C) : IsIdempotentComplete D := by
   refine ⟨?_⟩
   intro X' p hp
@@ -102,7 +154,7 @@ theorem Equivalence.isIdempotentComplete {D : Type*} [Category* D] (ε : C ≌ D
   · simp only [← ε.functor.map_comp, h₂, Equivalence.fun_inv_map]
     rfl
 
-theorem isIdempotentComplete_iff_of_equivalence {D : Type*} [Category* D] (ε : C ≌ D) :
+theorem isIdempotentComplete_iff_of_equivalence {D : Type*} [Category D] (ε : C ≌ D) :
     IsIdempotentComplete C ↔ IsIdempotentComplete D := by
   constructor
   · exact Equivalence.isIdempotentComplete ε
@@ -129,7 +181,8 @@ theorem isIdempotentComplete_iff_opposite : IsIdempotentComplete Cᵒᵖ ↔ IsI
     rw [isIdempotentComplete_iff_of_equivalence (opOpEquivalence C)]
     exact h
 
--- INSTANCE (free from Core): [IsIdempotentComplete
+instance [IsIdempotentComplete C] : IsIdempotentComplete Cᵒᵖ := by
+  rwa [isIdempotentComplete_iff_opposite]
 
 end Idempotents
 

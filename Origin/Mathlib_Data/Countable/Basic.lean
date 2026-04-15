@@ -1,8 +1,12 @@
 /-
 Extracted from Data/Countable/Basic.lean
-Genuine: 5 of 16 | Dissolved: 0 | Infrastructure: 11
+Genuine: 9 of 30 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
+import Mathlib.Data.Countable.Defs
+import Mathlib.Data.Fin.Tuple.Basic
+import Mathlib.Data.ENat.Defs
+import Mathlib.Logic.Equiv.Nat
 
 /-!
 # Countable types
@@ -10,13 +14,12 @@ import Origin.Core
 In this file we provide basic instances of the `Countable` typeclass defined elsewhere.
 -/
 
-assert_not_exists Monoid
-
 universe u v w
 
 open Function
 
--- INSTANCE (free from Core): :
+instance : Countable ℤ :=
+  Countable.of_equiv ℕ Equiv.intEquivNat.symm
 
 /-!
 ### Definition in terms of `Function.Embedding`
@@ -51,22 +54,101 @@ section type
 
 variable {α : Type u} {β : Type v} {π : α → Type w}
 
--- INSTANCE (free from Core): [Countable
+instance [Countable α] [Countable β] : Countable (α ⊕ β) := by
+  rcases exists_injective_nat α with ⟨f, hf⟩
+  rcases exists_injective_nat β with ⟨g, hg⟩
+  exact (Equiv.natSumNatEquivNat.injective.comp <| hf.sum_map hg).countable
 
--- INSTANCE (free from Core): Sum.uncountable_inl
+instance Sum.uncountable_inl [Uncountable α] : Uncountable (α ⊕ β) :=
+  inl_injective.uncountable
 
--- INSTANCE (free from Core): Sum.uncountable_inr
+instance Sum.uncountable_inr [Uncountable β] : Uncountable (α ⊕ β) :=
+  inr_injective.uncountable
 
--- INSTANCE (free from Core): Option.instCountable
+instance Option.instCountable [Countable α] : Countable (Option α) :=
+  Countable.of_equiv _ (Equiv.optionEquivSumPUnit.{0, _} α).symm
 
--- INSTANCE (free from Core): WithTop.instCountable
+instance WithTop.instCountable [Countable α] : Countable (WithTop α) := Option.instCountable
 
--- INSTANCE (free from Core): WithBot.instCountable
+instance WithBot.instCountable [Countable α] : Countable (WithBot α) := Option.instCountable
 
--- INSTANCE (free from Core): ENat.instCountable
+instance ENat.instCountable : Countable ℕ∞ := Option.instCountable
 
--- INSTANCE (free from Core): Option.instUncountable
+instance Option.instUncountable [Uncountable α] : Uncountable (Option α) :=
+  Injective.uncountable fun _ _ ↦ Option.some_inj.1
 
--- INSTANCE (free from Core): WithTop.instUncountable
+instance WithTop.instUncountable [Uncountable α] : Uncountable (WithTop α) := Option.instUncountable
 
--- INSTANCE (free from Core): WithBot.instUncountable
+instance WithBot.instUncountable [Uncountable α] : Uncountable (WithBot α) := Option.instUncountable
+
+instance [Countable α] [Countable β] : Countable (α × β) := by
+  rcases exists_injective_nat α with ⟨f, hf⟩
+  rcases exists_injective_nat β with ⟨g, hg⟩
+  exact (Nat.pairEquiv.injective.comp <| hf.prodMap hg).countable
+
+instance [Uncountable α] [Nonempty β] : Uncountable (α × β) := by
+  inhabit β
+  exact (Prod.mk.inj_right default).uncountable
+
+instance [Nonempty α] [Uncountable β] : Uncountable (α × β) := by
+  inhabit α
+  exact (Prod.mk.inj_left default).uncountable
+
+lemma countable_left_of_prod_of_nonempty [Nonempty β] (h : Countable (α × β)) : Countable α := by
+  contrapose h
+  rw [not_countable_iff] at *
+  infer_instance
+
+lemma countable_right_of_prod_of_nonempty [Nonempty α] (h : Countable (α × β)) : Countable β := by
+  contrapose h
+  rw [not_countable_iff] at *
+  infer_instance
+
+lemma countable_prod_swap [Countable (α × β)] : Countable (β × α) :=
+  Countable.of_equiv _ (Equiv.prodComm α β)
+
+instance [Countable α] [∀ a, Countable (π a)] : Countable (Sigma π) := by
+  rcases exists_injective_nat α with ⟨f, hf⟩
+  choose g hg using fun a => exists_injective_nat (π a)
+  exact ((Equiv.sigmaEquivProd ℕ ℕ).injective.comp <| hf.sigma_map hg).countable
+
+lemma Sigma.uncountable (a : α) [Uncountable (π a)] : Uncountable (Sigma π) :=
+  (sigma_mk_injective (i := a)).uncountable
+
+instance [Nonempty α] [∀ a, Uncountable (π a)] : Uncountable (Sigma π) := by
+  inhabit α; exact Sigma.uncountable default
+
+instance (priority := 500) SetCoe.countable [Countable α] (s : Set α) : Countable s :=
+  Subtype.countable
+
+end type
+
+section sort
+
+variable {α : Sort u} {β : Sort v} {π : α → Sort w}
+
+/-!
+### Operations on `Sort*`s
+-/
+
+instance [Countable α] [Countable β] : Countable (α ⊕' β) :=
+  Countable.of_equiv (PLift α ⊕ PLift β) (Equiv.plift.sumPSum Equiv.plift)
+
+instance [Countable α] [Countable β] : Countable (PProd α β) :=
+  Countable.of_equiv (PLift α × PLift β) (Equiv.plift.prodPProd Equiv.plift)
+
+instance [Countable α] [∀ a, Countable (π a)] : Countable (PSigma π) :=
+  Countable.of_equiv (Σa : PLift α, PLift (π a.down)) (Equiv.psigmaEquivSigmaPLift π).symm
+
+instance [Finite α] [∀ a, Countable (π a)] : Countable (∀ a, π a) := by
+  have : ∀ n, Countable (Fin n → ℕ) := by
+    intro n
+    induction' n with n ihn
+    · change Countable (Fin 0 → ℕ); infer_instance
+    · haveI := ihn
+      exact Countable.of_equiv (ℕ × (Fin n → ℕ)) (Fin.consEquiv fun _ ↦ ℕ)
+  rcases Finite.exists_equiv_fin α with ⟨n, ⟨e⟩⟩
+  have f := fun a => (nonempty_embedding_nat (π a)).some
+  exact ((Embedding.piCongrRight f).trans (Equiv.piCongrLeft' _ e).toEmbedding).countable
+
+end sort

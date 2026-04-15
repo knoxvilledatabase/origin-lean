@@ -1,8 +1,13 @@
 /-
 Extracted from Data/Set/Finite/Lemmas.lean
-Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
+Genuine: 7 of 8 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Max
+import Mathlib.Data.Set.Finite.Basic
+import Mathlib.Data.Set.Lattice
+import Mathlib.Data.Finite.Powerset
+import Mathlib.Logic.Embedding.Set
 
 /-!
 # Lemmas on finiteness of sets
@@ -14,8 +19,6 @@ If your proof has as *result* `Set.Finite`, then it should go to a more specific
 
 finite sets
 -/
-
-assert_not_exists IsOrderedRing MonoidWithZero
 
 open Set Function
 
@@ -32,6 +35,11 @@ theorem Finite.fin_embedding {s : Set α} (h : s.Finite) :
   ⟨_, (Fintype.equivFin (h.toFinset : Set α)).symm.asEmbedding, by
     simp only [Finset.coe_sort_coe, Equiv.asEmbedding_range, Finite.coe_toFinset, setOf_mem_eq]⟩
 
+theorem Finite.fin_param {s : Set α} (h : s.Finite) :
+    ∃ (n : ℕ) (f : Fin n → α), Injective f ∧ range f = s :=
+  let ⟨n, f, hf⟩ := h.fin_embedding
+  ⟨n, f, f.injective, hf⟩
+
 theorem Finite.induction_to {C : Set α → Prop} {S : Set α} (h : S.Finite)
     (S0 : Set α) (hS0 : S0 ⊆ S) (H0 : C S0) (H1 : ∀ s ⊂ S, C s → ∃ a ∈ S \ s, C (insert a s)) :
     C S := by
@@ -46,9 +54,6 @@ theorem Finite.induction_to {C : Set α → Prop} {S : Set α} (h : S.Finite)
 theorem Finite.induction_to_univ [Finite α] {C : Set α → Prop} (S0 : Set α)
     (H0 : C S0) (H1 : ∀ S ≠ univ, C S → ∃ a ∉ S, C (insert a S)) : C univ :=
   finite_univ.induction_to S0 (subset_univ S0) H0 (by simpa [ssubset_univ_iff])
-
-theorem sUnion_finite_eq_univ {X : Type*} : ⋃₀ {(s : Set X) | Set.Finite s} = Set.univ :=
-  sUnion_eq_univ_iff.mpr fun x ↦ ⟨{x}, finite_singleton x, rfl⟩
 
 /-! ### Infinite sets -/
 

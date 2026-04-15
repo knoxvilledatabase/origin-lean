@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Finset/SymmDiff.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Finset.SDiff
+import Mathlib.Data.Set.SymmDiff
 
 /-!
 # Symmetric difference of finite sets
@@ -14,8 +16,6 @@ This file concerns the symmetric difference operator `s Δ t` on finite sets.
 finite sets, finset
 
 -/
-
-assert_not_exists List.sublistsLen Multiset.powerset CompleteLattice Monoid
 
 open Multiset Subtype Function
 
@@ -35,3 +35,16 @@ variable [DecidableEq α] {s t : Finset α} {a b : α}
 
 theorem mem_symmDiff : a ∈ s ∆ t ↔ a ∈ s ∧ a ∉ t ∨ a ∈ t ∧ a ∉ s := by
   simp_rw [symmDiff, sup_eq_union, mem_union, mem_sdiff]
+
+@[simp, norm_cast]
+theorem coe_symmDiff : (↑(s ∆ t) : Set α) = (s : Set α) ∆ t :=
+  Set.ext fun x => by simp [mem_symmDiff, Set.mem_symmDiff]
+
+@[simp] lemma symmDiff_eq_empty : s ∆ t = ∅ ↔ s = t := symmDiff_eq_bot
+
+@[simp] lemma symmDiff_nonempty : (s ∆ t).Nonempty ↔ s ≠ t :=
+  nonempty_iff_ne_empty.trans symmDiff_eq_empty.not
+
+end SymmDiff
+
+end Finset

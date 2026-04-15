@@ -3,12 +3,14 @@ Extracted from RingTheory/NormTrace.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Norm.Defs
+import Mathlib.RingTheory.Trace.Defs
 
 /-!
-# Relation between norms and traces
--/
 
-open Module
+# Relation between Norms and Traces
+
+-/
 
 lemma Algebra.norm_one_add_smul {A B} [CommRing A] [CommRing B] [Algebra A B]
     [Module.Free A B] [Module.Finite A B] (a : A) (x : B) :

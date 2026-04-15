@@ -1,8 +1,10 @@
 /-
 Extracted from Algebra/Module/LinearMap/Rat.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Rat
+import Mathlib.Algebra.Module.LinearMap.Defs
 
 /-!
 # Reinterpret an additive homomorphism as a `ℚ`-linear map.
@@ -21,3 +23,8 @@ theorem AddMonoidHom.toRatLinearMap_injective [AddCommGroup M] [Module ℚ M] [A
   intro f g h
   ext x
   exact LinearMap.congr_fun h x
+
+@[simp]
+theorem AddMonoidHom.coe_toRatLinearMap [AddCommGroup M] [Module ℚ M] [AddCommGroup M₂]
+    [Module ℚ M₂] (f : M →+ M₂) : ⇑f.toRatLinearMap = f :=
+  rfl

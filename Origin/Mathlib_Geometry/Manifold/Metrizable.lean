@@ -3,11 +3,14 @@ Extracted from Geometry/Manifold/Metrizable.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
+import Mathlib.Topology.Compactness.Paracompact
+import Mathlib.Topology.Metrizable.Urysohn
 
 /-!
 # Metrizability of a σ-compact manifold
 
-In this file we show that a σ-compact Hausdorff topological manifold over a finite-dimensional real
+In this file we show that a σ-compact Hausdorff topological manifold over a finite dimensional real
 vector space is metrizable.
 -/
 

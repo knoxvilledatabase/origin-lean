@@ -1,37 +1,36 @@
 /-
 Extracted from MeasureTheory/Constructions/UnitInterval.lean
-Genuine: 3 of 7 | Dissolved: 0 | Infrastructure: 4
+Genuine: 1 of 4 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Topology.UnitInterval
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
+import Mathlib.MeasureTheory.Measure.Haar.OfBasis
+import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 
 /-!
 # The canonical measure on the unit interval
 
 This file provides a `MeasureTheory.MeasureSpace` instance on `unitInterval`,
-and shows it is a probability measure with no atoms.
-
-It also contains some basic results on the volume of various interval sets.
+and shows it is a probability measure.
 -/
 
 open scoped unitInterval
 
-open MeasureTheory Measure Set
+open MeasureTheory
 
 namespace unitInterval
 
--- INSTANCE (free from Core): :
+noncomputable instance : MeasureSpace I := Measure.Subtype.measureSpace
 
--- INSTANCE (free from Core): :
+theorem volume_def : (volume : Measure I) = volume.comap Subtype.val := rfl
 
-lemma measurableEmbedding_coe : MeasurableEmbedding ((↑) : I → ℝ) where
-  injective := Subtype.val_injective
-  measurable := measurable_subtype_coe
-  measurableSet_image' _ := measurableSet_Icc.subtype_image
+instance : IsProbabilityMeasure (volume : Measure I) where
+  measure_univ := by
+    rw [Measure.Subtype.volume_univ nullMeasurableSet_Icc, Real.volume_Icc, sub_zero,
+      ENNReal.ofReal_one]
 
-lemma volume_apply {s : Set I} : volume s = volume (Subtype.val '' s) :=
-  measurableEmbedding_coe.comap_apply ..
+@[measurability]
+theorem measurable_symm : Measurable symm := continuous_symm.measurable
 
-lemma measurePreserving_coe : MeasurePreserving ((↑) : I → ℝ) volume (volume.restrict I) :=
-  measurePreserving_subtype_coe measurableSet_Icc
-
--- INSTANCE (free from Core): :
+end unitInterval

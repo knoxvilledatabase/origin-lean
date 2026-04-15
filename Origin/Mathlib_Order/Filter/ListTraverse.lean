@@ -3,6 +3,8 @@ Extracted from Order/Filter/ListTraverse.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Control.Traversable.Instances
+import Mathlib.Order.Filter.Basic
 
 /-!
 # Properties of `Traversable.traverse` on `List`s and `Filter`s

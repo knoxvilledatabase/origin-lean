@@ -1,8 +1,11 @@
 /-
 Extracted from Analysis/Fourier/FiniteAbelian/Orthogonality.lean
-Genuine: 6 of 9 | Dissolved: 2 | Infrastructure: 1
+Genuine: 7 of 10 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Expect
+import Mathlib.Algebra.Group.AddChar
+import Mathlib.Analysis.RCLike.Inner
 
 /-!
 # Orthogonality of characters of a finite abelian group
@@ -45,7 +48,7 @@ section RCLike
 variable [RCLike R] [Fintype G]
 
 lemma wInner_cWeight_self (ψ : AddChar G R) : ⟪(ψ : G → R), ψ⟫ₙ_[R] = 1 := by
-  simp [wInner_cWeight_eq_expect, ψ.norm_apply]
+  simp [wInner_cWeight_eq_expect, ψ.norm_apply, RCLike.conj_mul]
 
 end RCLike
 
@@ -63,7 +66,7 @@ lemma wInner_cWeight_eq_boole [Fintype G] (ψ₁ ψ₂ : AddChar G R) :
     ⟪(ψ₁ : G → R), ψ₂⟫ₙ_[R] = if ψ₁ = ψ₂ then 1 else 0 := by
   split_ifs with h
   · rw [h, wInner_cWeight_self]
-  have : ψ₂ * ψ₁⁻¹ ≠ 1 := by rwa [Ne, mul_inv_eq_one, eq_comm]
+  have : ψ₁⁻¹ * ψ₂ ≠ 1 := by rwa [Ne, inv_mul_eq_one]
   simp_rw [wInner_cWeight_eq_expect, RCLike.inner_apply, ← inv_apply_eq_conj]
   simpa [map_neg_eq_inv] using expect_eq_zero_iff_ne_zero.2 this
 
@@ -80,4 +83,15 @@ protected lemma linearIndependent [Finite G] : LinearIndependent R ((⇑) : AddC
   exact linearIndependent_of_ne_zero_of_wInner_cWeight_eq_zero coe_ne_zero
     fun ψ₁ ψ₂ ↦ wInner_cWeight_eq_zero_iff_ne.2
 
--- INSTANCE (free from Core): instFintype
+noncomputable instance instFintype [Finite G] : Fintype (AddChar G R) :=
+  @Fintype.ofFinite _ (AddChar.linearIndependent G R).finite
+
+@[simp] lemma card_addChar_le [Fintype G] : card (AddChar G R) ≤ card G := by
+  simpa only [Module.finrank_fintype_fun_eq_card] using
+    (AddChar.linearIndependent G R).fintype_card_le_finrank
+
+end RCLike
+
+end AddCommGroup
+
+end AddChar

@@ -1,101 +1,79 @@
 /-
 Extracted from Topology/Algebra/Valued/ValuationTopology.lean
-Genuine: 1 of 3 | Dissolved: 2 | Infrastructure: 0
+Genuine: 10 of 13 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.Algebra.Nonarchimedean.Bases
+import Mathlib.Topology.Algebra.UniformFilterBasis
+import Mathlib.RingTheory.Valuation.ValuationSubring
 
 /-!
 # The topology on a valued ring
 
-In this file, we define the non-Archimedean topology induced by a valuation on a ring.
+In this file, we define the non archimedean topology induced by a valuation on a ring.
 The main definition is a `Valued` type class which equips a ring with a valuation taking
 values in a group with zero. Other instances are then deduced from this.
-
-*NOTE* (2025-07-02):
-The `Valued` class defined in this file will eventually get replaced with `ValuativeRel`
-from `Mathlib.RingTheory.Valuation.ValuativeRel.Basic`. New developments on valued rings/fields
-should take this into consideration.
-
 -/
 
 open scoped Topology uniformity
 
-open MonoidWithZeroHom MonoidWithZeroHom.ValueGroup₀ Set Valuation
+open Set Valuation
 
 noncomputable section
 
 universe v u
 
-variable {R K : Type u} [Ring R] [DivisionRing K] {Γ₀ : Type v} [LinearOrderedCommGroupWithZero Γ₀]
+variable {R : Type u} [Ring R] {Γ₀ : Type v} [LinearOrderedCommGroupWithZero Γ₀]
 
 namespace Valuation
 
 variable (v : Valuation R Γ₀)
 
--- DISSOLVED: map_eq_one_of_forall_lt
-
-set_option backward.isDefEq.respectTransparency false in
-
-theorem subgroups_basis :
-    RingSubgroupsBasis fun γ : (ValueGroup₀ v)ˣ ↦
-      (v.ltAddSubgroup (Units.map (ValueGroup₀.embedding (f := v)) γ) : AddSubgroup R) :=
+theorem subgroups_basis : RingSubgroupsBasis fun γ : Γ₀ˣ => (v.ltAddSubgroup γ : AddSubgroup R) :=
   { inter := by
-      classical
       rintro γ₀ γ₁
       use min γ₀ γ₁
-      have hmin : embedding (min γ₀.1 γ₁.1) = min (embedding γ₀.1) (embedding γ₁.1) :=
-        embedding_strictMono.monotone.map_inf γ₀.1 γ₁.1
-      simp [ltAddSubgroup, hmin]
+      simp only [ltAddSubgroup, Units.min_val, Units.val_le_val, lt_min_iff,
+        AddSubgroup.mk_le_mk, setOf_subset_setOf, le_inf_iff, and_imp, imp_self, implies_true,
+        forall_const, and_true]
       tauto
     mul := by
-      -- Will be fixed by using MonoidWithZeroHom in ValueGroup₀.
-      letI : LinearOrderedCommGroupWithZero (ValueGroup₀ v) := --inferInstance failed
-        MonoidWithZeroHom.ValueGroup₀.instLinearOrderedCommGroupWithZero
       rintro γ
-      obtain ⟨γ₀, h⟩ := exists_square_le γ
+      cases' exists_square_le γ with γ₀ h
       use γ₀
       rintro - ⟨r, r_in, s, s_in, rfl⟩
-      simp only [ltAddSubgroup, Units.coe_map, MonoidHom.coe_coe, AddSubgroup.coe_set_mk,
-        AddSubmonoid.coe_set_mk, AddSubsemigroup.coe_set_mk, mem_setOf_eq] at r_in s_in
-      simp only [coe_ltAddSubgroup, Units.coe_map, MonoidHom.coe_coe, mem_setOf_eq]
-      rw [← restrict_lt_iff_lt_embedding] at *
+      simp only [ltAddSubgroup, AddSubgroup.coe_set_mk, mem_setOf_eq] at r_in s_in
       calc
-        v.restrict (r * s) = v.restrict r * v.restrict s := Valuation.map_mul _ _ _
-        _ < γ₀.1 * γ₀.1 := by gcongr <;> exact zero_le'
+        (v (r * s) : Γ₀) = v r * v s := Valuation.map_mul _ _ _
+        _ < γ₀ * γ₀ := by gcongr <;> exact zero_le'
         _ ≤ γ := mod_cast h
     leftMul := by
       rintro x γ
       rcases GroupWithZero.eq_zero_or_unit (v x) with (Hx | ⟨γx, Hx⟩)
-      · use (1 : (ValueGroup₀ v)ˣ)
+      · use (1 : Γ₀ˣ)
         rintro y _
-        simp only [coe_ltAddSubgroup, preimage_setOf_eq, mem_setOf_eq]
+        change v (x * y) < _
         rw [Valuation.map_mul, Hx, zero_mul]
-        exact Units.zero_lt _
-      · set u : (ValueGroup₀ v)ˣ := Units.mk0 ((restrict₀ v) x)
-          (by simp [restrict₀_apply]; aesop) with hu_def
-        have hu : ValueGroup₀.embedding u⁻¹.1 = γx⁻¹ := by
-          simp [restrict₀_apply, embedding_apply, hu_def, Hx]
-        use u⁻¹ * γ
-        rintro y (vy_lt : v y < ValueGroup₀.embedding (u⁻¹ * γ).1)
-        simp only [coe_ltAddSubgroup, preimage_setOf_eq, mem_setOf_eq]
+        exact Units.zero_lt γ
+      · use γx⁻¹ * γ
+        rintro y (vy_lt : v y < ↑(γx⁻¹ * γ))
+        change (v (x * y) : Γ₀) < γ
         rw [Valuation.map_mul, Hx, mul_comm]
-        rw [Units.val_mul, mul_comm, map_mul, hu] at vy_lt
+        rw [Units.val_mul, mul_comm] at vy_lt
         simpa using mul_inv_lt_of_lt_mul₀ vy_lt
     rightMul := by
       rintro x γ
       rcases GroupWithZero.eq_zero_or_unit (v x) with (Hx | ⟨γx, Hx⟩)
       · use 1
         rintro y _
-        simp only [coe_ltAddSubgroup, preimage_setOf_eq, mem_setOf_eq, Valuation.map_mul, Hx,
-          mul_zero, Units.zero_lt]
-      · set u : (ValueGroup₀ v)ˣ := Units.mk0 ((restrict₀ v) x)
-          (by simp [restrict₀_apply]; aesop) with hu_def
-        have hu : ValueGroup₀.embedding u⁻¹.1 = γx⁻¹ := by simp [restrict₀_apply, embedding_apply,
-          hu_def, Hx]
-        use u⁻¹ * γ
-        rintro y (vy_lt : v y < ValueGroup₀.embedding (u⁻¹ * γ).1)
-        simp only [coe_ltAddSubgroup, preimage_setOf_eq, mem_setOf_eq, Valuation.map_mul, Hx]
-        rw [Units.val_mul, mul_comm, map_mul, hu] at vy_lt
+        change v (y * x) < _
+        rw [Valuation.map_mul, Hx, mul_zero]
+        exact Units.zero_lt γ
+      · use γx⁻¹ * γ
+        rintro y (vy_lt : v y < ↑(γx⁻¹ * γ))
+        change (v (y * x) : Γ₀) < γ
+        rw [Valuation.map_mul, Hx]
+        rw [Units.val_mul, mul_comm] at vy_lt
         simpa using mul_inv_lt_of_lt_mul₀ vy_lt }
 
 end Valuation
@@ -103,3 +81,71 @@ end Valuation
 -- DISSOLVED: Valued
 
 namespace Valued
+
+def mk' (v : Valuation R Γ₀) : Valued R Γ₀ :=
+  { v
+    toUniformSpace := @TopologicalAddGroup.toUniformSpace R _ v.subgroups_basis.topology _
+    toUniformAddGroup := @comm_topologicalAddGroup_is_uniform _ _ v.subgroups_basis.topology _
+    is_topological_valuation := by
+      letI := @TopologicalAddGroup.toUniformSpace R _ v.subgroups_basis.topology _
+      intro s
+      rw [Filter.hasBasis_iff.mp v.subgroups_basis.hasBasis_nhds_zero s]
+      exact exists_congr fun γ => by rw [true_and]; rfl }
+
+variable (R Γ₀)
+
+variable [_i : Valued R Γ₀]
+
+theorem hasBasis_nhds_zero :
+    (𝓝 (0 : R)).HasBasis (fun _ => True) fun γ : Γ₀ˣ => { x | v x < (γ : Γ₀) } := by
+  simp [Filter.hasBasis_iff, is_topological_valuation]
+
+theorem hasBasis_uniformity : (uniformity R).HasBasis (fun _ => True)
+    fun γ : Γ₀ˣ => { p : R × R | v (p.2 - p.1) < (γ : Γ₀) } := by
+  rw [uniformity_eq_comap_nhds_zero]
+  exact (hasBasis_nhds_zero R Γ₀).comap _
+
+theorem toUniformSpace_eq :
+    toUniformSpace = @TopologicalAddGroup.toUniformSpace R _ v.subgroups_basis.topology _ :=
+  UniformSpace.ext
+    ((hasBasis_uniformity R Γ₀).eq_of_same_basis <| v.subgroups_basis.hasBasis_nhds_zero.comap _)
+
+variable {R Γ₀}
+
+theorem mem_nhds {s : Set R} {x : R} : s ∈ 𝓝 x ↔ ∃ γ : Γ₀ˣ, { y | (v (y - x) : Γ₀) < γ } ⊆ s := by
+  simp only [← nhds_translation_add_neg x, ← sub_eq_add_neg, preimage_setOf_eq, true_and,
+    ((hasBasis_nhds_zero R Γ₀).comap fun y => y - x).mem_iff]
+
+theorem mem_nhds_zero {s : Set R} : s ∈ 𝓝 (0 : R) ↔ ∃ γ : Γ₀ˣ, { x | v x < (γ : Γ₀) } ⊆ s := by
+  simp only [mem_nhds, sub_zero]
+
+-- DISSOLVED: loc_const
+
+instance (priority := 100) : TopologicalRing R :=
+  (toUniformSpace_eq R Γ₀).symm ▸ v.subgroups_basis.toRingFilterBasis.isTopologicalRing
+
+theorem cauchy_iff {F : Filter R} : Cauchy F ↔
+    F.NeBot ∧ ∀ γ : Γ₀ˣ, ∃ M ∈ F, ∀ᵉ (x ∈ M) (y ∈ M), (v (y - x) : Γ₀) < γ := by
+  rw [toUniformSpace_eq, AddGroupFilterBasis.cauchy_iff]
+  apply and_congr Iff.rfl
+  simp_rw [Valued.v.subgroups_basis.mem_addGroupFilterBasis_iff]
+  constructor
+  · intro h γ
+    exact h _ (Valued.v.subgroups_basis.mem_addGroupFilterBasis _)
+  · rintro h - ⟨γ, rfl⟩
+    exact h γ
+
+variable (R)
+
+theorem integer_isOpen : IsOpen (_i.v.integer : Set R) := by
+  rw [isOpen_iff_mem_nhds]
+  intro x hx
+  rw [mem_nhds]
+  exact ⟨1,
+    fun y hy => (sub_add_cancel y x).symm ▸ le_trans (map_add _ _ _) (max_le (le_of_lt hy) hx)⟩
+
+theorem valuationSubring_isOpen (K : Type u) [Field K] [hv : Valued K Γ₀] :
+    IsOpen (hv.v.valuationSubring : Set K) :=
+  integer_isOpen K
+
+end Valued

@@ -3,6 +3,8 @@ Extracted from Analysis/Normed/Ring/Ultra.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Field.Basic
+import Mathlib.Analysis.Normed.Group.Ultra
 
 /-!
 # Ultrametric norms on rings where the norm of one is one
@@ -65,8 +67,8 @@ lemma norm_natCast_le_one (n : ℕ) :
 
 lemma nnnorm_intCast_le_one (z : ℤ) :
     ‖(z : R)‖₊ ≤ 1 := by
-  cases z <;>
-  simpa only [Int.ofNat_eq_natCast, Int.cast_natCast, Int.cast_negSucc, Nat.cast_one, nnnorm_neg]
+  induction z <;>
+  simpa only [Int.ofNat_eq_coe, Int.cast_natCast, Int.cast_negSucc, Nat.cast_one, nnnorm_neg]
     using nnnorm_natCast_le_one _ _
 
 lemma norm_intCast_le_one (z : ℤ) :

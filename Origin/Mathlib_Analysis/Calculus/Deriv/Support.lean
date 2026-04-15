@@ -1,8 +1,9 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Support.lean
-Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Basic
 
 /-!
 # Support of the derivative of a function
@@ -22,7 +23,7 @@ variable {𝕜 : Type u} [NontriviallyNormedField 𝕜]
 
 variable {E : Type v} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
-variable {f : 𝕜 → E} {x : 𝕜}
+variable {f : 𝕜 → E}
 
 /-! ### Support of derivatives -/
 
@@ -30,27 +31,12 @@ section Support
 
 open Function
 
-theorem HasStrictDerivAt.of_notMem_tsupport (h : x ∉ tsupport f) : HasStrictDerivAt f 0 x := by
-  rw [notMem_tsupport_iff_eventuallyEq] at h
-  exact (hasStrictDerivAt_const x 0).congr_of_eventuallyEq h.symm
-
-theorem HasDerivAt.of_notMem_tsupport (h : x ∉ tsupport f) : HasDerivAt f 0 x :=
-  (HasStrictDerivAt.of_notMem_tsupport h).hasDerivAt
-
-theorem HasDerivWithinAt.of_notMem_tsupport {s : Set 𝕜} (h : x ∉ tsupport f) :
-    HasDerivWithinAt f 0 s x :=
-  (HasDerivAt.of_notMem_tsupport h).hasDerivWithinAt
-
-theorem deriv_of_notMem_tsupport (h : x ∉ tsupport f) : deriv f x = 0 := by
-  rw [notMem_tsupport_iff_eventuallyEq] at h
-  simp [h.deriv_eq]
-
-theorem support_deriv_subset : support (deriv f) ⊆ tsupport f := fun x ↦ by
-  rw [← not_imp_not, notMem_support]
-  exact deriv_of_notMem_tsupport
-
-theorem tsupport_deriv_subset : tsupport (deriv f) ⊆ tsupport f :=
-  closure_minimal support_deriv_subset isClosed_closure
+theorem support_deriv_subset : support (deriv f) ⊆ tsupport f := by
+  intro x
+  rw [← not_imp_not]
+  intro h2x
+  rw [not_mem_tsupport_iff_eventuallyEq] at h2x
+  exact nmem_support.mpr (h2x.deriv_eq.trans (deriv_const x 0))
 
 protected theorem HasCompactSupport.deriv (hf : HasCompactSupport f) :
     HasCompactSupport (deriv f) :=

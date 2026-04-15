@@ -3,6 +3,9 @@ Extracted from Algebra/Category/ModuleCat/Sheaf/Limits.lean
 Genuine: 1 of 16 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
+import Mathlib.Algebra.Category.ModuleCat.Presheaf.Limits
+import Mathlib.Algebra.Category.ModuleCat.Sheaf
+import Mathlib.CategoryTheory.Sites.Limits
 
 /-! # Limits in categories of sheaves of modules
 
@@ -10,7 +13,8 @@ In this file, it is shown that under suitable assumptions,
 limits exist in the category `SheafOfModules R`.
 
 ## TODO
-* do the same for colimits (which requires constructing the associated sheaf of modules functor)
+* do the same for colimits (which requires constructing
+the associated sheaf of modules functor)
 
 -/
 
@@ -27,11 +31,11 @@ variable {R : Cᵒᵖ ⥤ RingCat.{u}}
   {F : D ⥤ PresheafOfModules.{v} R}
   [∀ X, Small.{v} ((F ⋙ evaluation R X) ⋙ forget _).sections]
   {c : Cone F}
-  [HasLimitsOfShape D AddCommGrpCat.{v}]
+  [HasLimitsOfShape D AddCommGrp.{v}]
 
 lemma isSheaf_of_isLimit (hc : IsLimit c) (hF : ∀ j, Presheaf.IsSheaf J (F.obj j).presheaf) :
     Presheaf.IsSheaf J (c.pt.presheaf) := by
-  let G : D ⥤ Sheaf J AddCommGrpCat.{v} :=
+  let G : D ⥤ Sheaf J AddCommGrp.{v} :=
     { obj := fun j => ⟨(F.obj j).presheaf, hF j⟩
       map := fun φ => ⟨(PresheafOfModules.toPresheaf R).map (F.map φ)⟩ }
   exact Sheaf.isSheaf_of_isLimit G _ (isLimitOfPreserves (toPresheaf R) hc)
@@ -46,15 +50,25 @@ section Limits
 
 variable (F : D ⥤ SheafOfModules.{v} R)
   [∀ X, Small.{v} ((F ⋙ evaluation R X) ⋙ CategoryTheory.forget _).sections]
-  [HasLimitsOfShape D AddCommGrpCat.{v}]
+  [HasLimitsOfShape D AddCommGrp.{v}]
 
--- INSTANCE (free from Core): (X
+instance (X : Cᵒᵖ) : Small.{v} (((F ⋙ forget _) ⋙ PresheafOfModules.evaluation _ X) ⋙
+    CategoryTheory.forget _).sections := by
+  change Small.{v} ((F ⋙ evaluation R X) ⋙ CategoryTheory.forget _).sections
+  infer_instance
 
--- INSTANCE (free from Core): createsLimit
+noncomputable instance createsLimit : CreatesLimit F (forget _) :=
+  createsLimitOfFullyFaithfulOfIso' (limit.isLimit (F ⋙ forget _))
+    (mk (limit (F ⋙ forget _))
+      (PresheafOfModules.isSheaf_of_isLimit (limit.isLimit (F ⋙ forget _))
+        (fun j => (F.obj j).isSheaf))) (Iso.refl _)
 
--- INSTANCE (free from Core): hasLimit
+instance hasLimit : HasLimit F := hasLimit_of_created F (forget _)
 
--- INSTANCE (free from Core): evaluationPreservesLimit
+noncomputable instance evaluationPreservesLimit (X : Cᵒᵖ) :
+    PreservesLimit F (evaluation R X) := by
+  dsimp [evaluation]
+  infer_instance
 
 end Limits
 
@@ -64,32 +78,42 @@ section Small
 
 variable [Small.{v} D]
 
--- INSTANCE (free from Core): hasLimitsOfShape
+instance hasLimitsOfShape : HasLimitsOfShape D (SheafOfModules.{v} R) where
 
--- INSTANCE (free from Core): evaluationPreservesLimitsOfShape
+noncomputable instance evaluationPreservesLimitsOfShape (X : Cᵒᵖ) :
+    PreservesLimitsOfShape D (evaluation R X : SheafOfModules.{v} R ⥤ _) where
 
--- INSTANCE (free from Core): forgetPreservesLimitsOfShape
+noncomputable instance forgetPreservesLimitsOfShape :
+    PreservesLimitsOfShape D (forget.{v} R) where
 
 end Small
 
 namespace Finite
 
--- INSTANCE (free from Core): hasFiniteLimits
+instance hasFiniteLimits : HasFiniteLimits (SheafOfModules.{v} R) :=
+  ⟨fun _ => inferInstance⟩
 
--- INSTANCE (free from Core): evaluationPreservesFiniteLimits
+noncomputable instance evaluationPreservesFiniteLimits (X : Cᵒᵖ) :
+    PreservesFiniteLimits (evaluation.{v} R X) where
 
--- INSTANCE (free from Core): forgetPreservesFiniteLimits
+noncomputable instance forgetPreservesFiniteLimits :
+    PreservesFiniteLimits (forget.{v} R) where
 
 end Finite
 
--- INSTANCE (free from Core): hasLimitsOfSize
+instance hasLimitsOfSize : HasLimitsOfSize.{v₂, v} (SheafOfModules.{v} R) where
 
--- INSTANCE (free from Core): evaluationPreservesLimitsOfSize
+noncomputable instance evaluationPreservesLimitsOfSize (X : Cᵒᵖ) :
+    PreservesLimitsOfSize.{v₂, v} (evaluation R X : SheafOfModules.{v} R ⥤ _) where
 
--- INSTANCE (free from Core): forgetPreservesLimitsOfSize
+noncomputable instance forgetPreservesLimitsOfSize :
+    PreservesLimitsOfSize.{v₂, v} (forget.{v} R) where
 
--- INSTANCE (free from Core): :
+noncomputable instance :
+     PreservesFiniteLimits (SheafOfModules.toSheaf.{v} R ⋙ sheafToPresheaf _ _) :=
+  comp_preservesFiniteLimits (SheafOfModules.forget.{v} R) (PresheafOfModules.toPresheaf R.val)
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteLimits (SheafOfModules.toSheaf.{v} R) :=
+  preservesFiniteLimits_of_reflects_of_preserves _ (sheafToPresheaf _ _)
 
 end SheafOfModules

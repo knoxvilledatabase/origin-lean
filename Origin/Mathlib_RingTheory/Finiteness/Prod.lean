@@ -3,6 +3,8 @@ Extracted from RingTheory/Finiteness/Prod.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Prod
+import Mathlib.RingTheory.Finiteness.Defs
 
 /-!
 # Finitely generated product (sub)modules
@@ -10,6 +12,8 @@ import Origin.Core
 -/
 
 open Function (Surjective)
+
+open Finsupp
 
 namespace Submodule
 
@@ -37,7 +41,10 @@ variable {R M N : Type*}
 
 variable [Semiring R] [AddCommMonoid M] [Module R M] [AddCommMonoid N] [Module R N]
 
--- INSTANCE (free from Core): prod
+instance prod [hM : Module.Finite R M] [hN : Module.Finite R N] : Module.Finite R (M × N) :=
+  ⟨by
+    rw [← Submodule.prod_top]
+    exact hM.1.prod hN.1⟩
 
 end Finite
 

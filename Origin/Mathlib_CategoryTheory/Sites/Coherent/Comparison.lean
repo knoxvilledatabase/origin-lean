@@ -3,6 +3,9 @@ Extracted from CategoryTheory/Sites/Coherent/Comparison.lean
 Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Sites.Coherent.Basic
+import Mathlib.CategoryTheory.EffectiveEpi.Comp
+import Mathlib.CategoryTheory.EffectiveEpi.Extensive
 
 /-!
 
@@ -22,17 +25,34 @@ namespace CategoryTheory
 
 open Limits GrothendieckTopology Sieve
 
-variable (C : Type*) [Category* C]
+variable (C : Type*) [Category C]
 
-set_option backward.isDefEq.respectTransparency false in
+instance [Precoherent C] [HasFiniteCoproducts C] : Preregular C where
+  exists_fac {X Y Z} f g _ := by
+    have hp := Precoherent.pullback f PUnit (fun () ↦ Z) (fun () ↦ g)
+    simp only [exists_const] at hp
+    rw [← effectiveEpi_iff_effectiveEpiFamily g] at hp
+    obtain ⟨β, _, X₂, π₂, h, ι, hι⟩ := hp inferInstance
+    refine ⟨∐ X₂, Sigma.desc π₂, inferInstance, Sigma.desc ι, ?_⟩
+    ext b
+    simpa using hι b
 
--- INSTANCE (free from Core): [Precoherent
-
-set_option backward.isDefEq.respectTransparency false in
-
--- INSTANCE (free from Core): [FinitaryPreExtensive
-
-set_option backward.isDefEq.respectTransparency false in
+instance [FinitaryPreExtensive C] [Preregular C] : Precoherent C where
+  pullback {B₁ B₂} f α _ X₁ π₁ h := by
+    refine ⟨α, inferInstance, ?_⟩
+    obtain ⟨Y, g, _, g', hg⟩ := Preregular.exists_fac f (Sigma.desc π₁)
+    let X₂ := fun a ↦ pullback g' (Sigma.ι X₁ a)
+    let π₂ := fun a ↦ pullback.fst g' (Sigma.ι X₁ a) ≫ g
+    let π' := fun a ↦ pullback.fst g' (Sigma.ι X₁ a)
+    have _ := FinitaryPreExtensive.sigma_desc_iso (fun a ↦ Sigma.ι X₁ a) g' inferInstance
+    refine ⟨X₂, π₂, ?_, ?_⟩
+    · have : (Sigma.desc π' ≫ g) = Sigma.desc π₂ := by ext; simp
+      rw [← effectiveEpi_desc_iff_effectiveEpiFamily, ← this]
+      infer_instance
+    · refine ⟨id, fun b ↦ pullback.snd _ _, fun b ↦ ?_⟩
+      simp only [π₂, id_eq, Category.assoc, ← hg]
+      rw [← Category.assoc, pullback.condition]
+      simp
 
 theorem extensive_regular_generate_coherent [Preregular C] [FinitaryPreExtensive C] :
     ((extensiveCoverage C) ⊔ (regularCoverage C)).toGrothendieck =
@@ -47,7 +67,7 @@ theorem extensive_regular_generate_coherent [Preregular C] [FinitaryPreExtensive
         (fun ⟨α, x, X, π, ⟨h, _⟩⟩ ↦ ⟨α, x, X, π, ⟨h, inferInstance⟩⟩)
         (fun ⟨Z, f, ⟨h, _⟩⟩ ↦ ⟨Unit, inferInstance, fun _ ↦ Z, fun _ ↦ f, ⟨h, inferInstance⟩⟩)
     | top => apply Coverage.Saturate.top
-    | transitive Y T => apply Coverage.Saturate.transitive Y T <;> [assumption; assumption]
+    | transitive Y T => apply Coverage.Saturate.transitive Y T<;> [assumption; assumption]
   · induction h with
     | of Y T hT =>
       obtain ⟨I, _, X, f, rfl, hT⟩ := hT
@@ -58,7 +78,7 @@ theorem extensive_regular_generate_coherent [Preregular C] [FinitaryPreExtensive
           Set.mem_setOf_eq]
         exact Or.inr ⟨_, Sigma.desc f, ⟨rfl, inferInstance⟩⟩
       · rintro R g ⟨W, ψ, σ, ⟨⟩, rfl⟩
-        change _ ∈ ((extensiveCoverage C) ⊔ (regularCoverage C)).toGrothendieck R
+        change _ ∈ ((extensiveCoverage C) ⊔ (regularCoverage C)).toGrothendieck _ R
         rw [Sieve.pullback_comp]
         apply pullback_stable
         have : generate (Presieve.ofArrows X fun (i : I) ↦ Sigma.ι X i) ≤
@@ -71,6 +91,6 @@ theorem extensive_regular_generate_coherent [Preregular C] [FinitaryPreExtensive
         convert IsIso.id _
         aesop
     | top => apply Coverage.Saturate.top
-    | transitive Y T => apply Coverage.Saturate.transitive Y T <;> [assumption; assumption]
+    | transitive Y T => apply Coverage.Saturate.transitive Y T<;> [assumption; assumption]
 
 end CategoryTheory

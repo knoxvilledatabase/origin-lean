@@ -3,6 +3,10 @@ Extracted from Topology/Category/Profinite/EffectiveEpi.lean
 Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Sites.Coherent.ReflectsPreregular
+import Mathlib.Topology.Category.CompHaus.EffectiveEpi
+import Mathlib.Topology.Category.Profinite.Limits
+import Mathlib.Topology.Category.Stonean.Basic
 
 /-!
 
@@ -10,7 +14,7 @@ import Origin.Core
 
 This file proves that `EffectiveEpi`, `Epi` and `Surjective` are all equivalent in `Profinite`.
 As a consequence we deduce from the material in
-`Mathlib/Topology/Category/CompHausLike/EffectiveEpi.lean` that `Profinite` is `Preregular`
+`Mathlib.Topology.Category.CompHausLike.EffectiveEpi` that `Profinite` is `Preregular`
 and `Precoherent`.
 
 We also prove that for a finite family of morphisms in `Profinite` with fixed
@@ -21,6 +25,8 @@ equivalent.
 universe u
 
 open CategoryTheory Limits
+
+attribute [local instance] ConcreteCategory.instFunLike
 
 namespace Profinite
 
@@ -38,11 +44,13 @@ theorem effectiveEpi_tfae
   tfae_have 3 → 1 := fun hπ ↦ ⟨⟨CompHausLike.effectiveEpiStruct π hπ⟩⟩
   tfae_finish
 
--- INSTANCE (free from Core): :
+instance : profiniteToCompHaus.PreservesEffectiveEpis where
+  preserves f h :=
+    ((CompHaus.effectiveEpi_tfae _).out 0 2).mpr (((Profinite.effectiveEpi_tfae _).out 0 2).mp h)
 
--- INSTANCE (free from Core): :
-
-set_option backward.isDefEq.respectTransparency false in
+instance : profiniteToCompHaus.ReflectsEffectiveEpis where
+  reflects f h :=
+    ((Profinite.effectiveEpi_tfae f).out 0 2).mpr (((CompHaus.effectiveEpi_tfae _).out 0 2).mp h)
 
 noncomputable def profiniteToCompHausEffectivePresentation (X : CompHaus) :
     profiniteToCompHaus.EffectivePresentation X where
@@ -50,9 +58,10 @@ noncomputable def profiniteToCompHausEffectivePresentation (X : CompHaus) :
   f := CompHaus.presentation.π X
   effectiveEpi := ((CompHaus.effectiveEpi_tfae _).out 0 1).mpr (inferInstance : Epi _)
 
--- INSTANCE (free from Core): :
+instance : profiniteToCompHaus.EffectivelyEnough where
+  presentation X := ⟨profiniteToCompHausEffectivePresentation X⟩
 
--- INSTANCE (free from Core): :
+instance : Preregular Profinite.{u} := profiniteToCompHaus.reflects_preregular
 
 example : Precoherent Profinite.{u} := inferInstance
 
@@ -72,7 +81,7 @@ theorem effectiveEpiFamily_tfae
   tfae_have 1 → 2 := fun _ ↦ inferInstance
   tfae_have 3 ↔ 1 := by
     erw [((CompHaus.effectiveEpiFamily_tfae
-      (fun a ↦ profiniteToCompHaus.obj (X a)) (fun a ↦ profiniteToCompHaus.map (π a))).out 2 0 :)]
+      (fun a ↦ profiniteToCompHaus.obj (X a)) (fun a ↦ profiniteToCompHaus.map (π a))).out 2 0 : )]
     exact ⟨fun h ↦ profiniteToCompHaus.finite_effectiveEpiFamily_of_map _ _ h,
       fun _ ↦ inferInstance⟩
   tfae_finish

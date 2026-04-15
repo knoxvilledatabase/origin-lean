@@ -1,8 +1,13 @@
 /-
 Extracted from CategoryTheory/Limits/Indization/Category.lean
-Genuine: 15 of 41 | Dissolved: 0 | Infrastructure: 26
+Genuine: 10 of 21 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Functor.Flat
+import Mathlib.CategoryTheory.Limits.Constructions.Filtered
+import Mathlib.CategoryTheory.Limits.FullSubcategory
+import Mathlib.CategoryTheory.Limits.Indization.LocallySmall
+import Mathlib.CategoryTheory.Limits.Indization.FilteredColimits
 
 /-!
 # The category of Ind-objects
@@ -10,32 +15,18 @@ import Origin.Core
 We define the `v`-category of Ind-objects of a category `C`, called `Ind C`, as well as the functors
 `Ind.yoneda : C ⥤ Ind C` and `Ind.inclusion C : Ind C ⥤ Cᵒᵖ ⥤ Type v`.
 
-For a small filtered category `I`, we also define `Ind.lim I : (I ⥤ C) ⥤ Ind C` and show that
-it preserves finite limits and finite colimits.
-
 This file will mainly collect results about ind-objects (stated in terms of `IsIndObject`) and
 reinterpret them in terms of `Ind C`.
 
-Adopting the theorem numbering of [Kashiwara2006], we show the following properties:
-
-Limits:
-* If `C` has products indexed by `α`, then `Ind C` has products indexed by `α`, and the functor
-  `Ind C ⥤ Cᵒᵖ ⥤ Type v` creates such products (6.1.17),
-* if `C` has equalizers, then `Ind C` has equalizers, and the functor `Ind C ⥤ Cᵒᵖ ⥤ Type v`
-  creates them (6.1.17)
-* if `C` has small limits (resp. finite limits), then `Ind C` has small limits (resp. finite limits)
-  and the functor `Ind C ⥤ Cᵒᵖ ⥤ Type v` creates them (6.1.17),
-* the functor `C ⥤ Ind C` preserves small limits (6.1.17).
-
-Colimits:
-* `Ind C` has filtered colimits (6.1.8), and the functor `Ind C ⥤ Cᵒᵖ ⥤ Type v` preserves filtered
-  colimits,
+Adopting the theorem numbering of [Kashiwara2006], we show that
+* `Ind C` has filtered colimits (6.1.8),
+* `Ind C ⥤ Cᵒᵖ ⥤ Type v` creates filtered colimits (6.1.8),
+* `C ⥤ Ind C` preserves finite colimits (6.1.6),
 * if `C` has coproducts indexed by a finite type `α`, then `Ind C` has coproducts indexed by `α`
   (6.1.18(ii)),
-* if `C` has finite coproducts, then `Ind C` has small coproducts (6.1.18(ii)),
-* if `C` has coequalizers, then `Ind C` has coequalizers (6.1.18(i)),
-* if `C` has finite colimits, then `Ind C` has small colimits (6.1.18(iii)).
-* `C ⥤ Ind C` preserves finite colimits (6.1.6),
+* if `C` has finite coproducts, then `Ind C` has small coproducts (6.1.18(ii)).
+
+More limit-colimit properties will follow.
 
 Note that:
 * the functor `Ind C ⥤ Cᵒᵖ ⥤ Type v` does not preserve any kind of colimit in general except for
@@ -46,78 +37,70 @@ Note that:
 * [M. Kashiwara, P. Schapira, *Categories and Sheaves*][Kashiwara2006], Chapter 6
 -/
 
-universe w v u
+universe v u
 
 namespace CategoryTheory
 
-open Limits Functor
+open Limits
 
 variable {C : Type u} [Category.{v} C]
 
 variable (C) in
 
 def Ind : Type (max u (v + 1)) :=
-  ShrinkHoms (ObjectProperty.FullSubcategory (IsIndObject (C := C)))
+  ShrinkHoms (FullSubcategory (IsIndObject (C := C)))
 
--- INSTANCE (free from Core): :
+noncomputable instance : Category.{v} (Ind C) :=
+  inferInstanceAs <| Category.{v} (ShrinkHoms (FullSubcategory (IsIndObject (C := C))))
 
 variable (C) in
 
-noncomputable def Ind.equivalence :
-    Ind C ≌ ObjectProperty.FullSubcategory (IsIndObject (C := C)) :=
+noncomputable def Ind.equivalence : Ind C ≌ FullSubcategory (IsIndObject (C := C)) :=
   (ShrinkHoms.equivalence _).symm
 
 variable (C) in
 
 protected noncomputable def Ind.inclusion : Ind C ⥤ Cᵒᵖ ⥤ Type v :=
-  (Ind.equivalence C).functor ⋙ ObjectProperty.ι _
+  (Ind.equivalence C).functor ⋙ fullSubcategoryInclusion _
 
--- INSTANCE (free from Core): :
+instance : (Ind.inclusion C).Full :=
+  inferInstanceAs <| ((Ind.equivalence C).functor ⋙ fullSubcategoryInclusion _).Full
 
--- INSTANCE (free from Core): :
+instance : (Ind.inclusion C).Faithful :=
+  inferInstanceAs <| ((Ind.equivalence C).functor ⋙ fullSubcategoryInclusion _).Faithful
 
 protected noncomputable def Ind.inclusion.fullyFaithful : (Ind.inclusion C).FullyFaithful :=
   .ofFullyFaithful _
 
 protected noncomputable def Ind.yoneda : C ⥤ Ind C :=
-  ObjectProperty.lift _ CategoryTheory.yoneda isIndObject_yoneda ⋙ (Ind.equivalence C).inverse
+  FullSubcategory.lift _ CategoryTheory.yoneda isIndObject_yoneda ⋙ (Ind.equivalence C).inverse
 
--- INSTANCE (free from Core): :
+instance : (Ind.yoneda (C := C)).Full :=
+  inferInstanceAs <| Functor.Full <|
+    FullSubcategory.lift _ CategoryTheory.yoneda isIndObject_yoneda ⋙ (Ind.equivalence C).inverse
 
--- INSTANCE (free from Core): :
+instance : (Ind.yoneda (C := C)).Faithful :=
+  inferInstanceAs <| Functor.Faithful <|
+    FullSubcategory.lift _ CategoryTheory.yoneda isIndObject_yoneda ⋙ (Ind.equivalence C).inverse
 
 protected noncomputable def Ind.yoneda.fullyFaithful : (Ind.yoneda (C := C)).FullyFaithful :=
   .ofFullyFaithful _
 
 noncomputable def Ind.yonedaCompInclusion : Ind.yoneda ⋙ Ind.inclusion C ≅ CategoryTheory.yoneda :=
-  isoWhiskerLeft (ObjectProperty.lift _ _ _)
-    (isoWhiskerRight (Ind.equivalence C).counitIso (ObjectProperty.ι _))
+  isoWhiskerLeft (FullSubcategory.lift _ _ _)
+    (isoWhiskerRight (Ind.equivalence C).counitIso (fullSubcategoryInclusion _))
 
--- INSTANCE (free from Core): {J
+noncomputable instance {J : Type v} [SmallCategory J] [IsFiltered J] :
+    CreatesColimitsOfShape J (Ind.inclusion C) :=
+  letI _ : CreatesColimitsOfShape J (fullSubcategoryInclusion (IsIndObject (C := C))) :=
+    createsColimitsOfShapeFullSubcategoryInclusion (closedUnderColimitsOfShape_of_colimit
+      (isIndObject_colimit _ _))
+  inferInstanceAs <|
+    CreatesColimitsOfShape J ((Ind.equivalence C).functor ⋙ fullSubcategoryInclusion _)
 
--- INSTANCE (free from Core): {J
-
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): {J
-
--- INSTANCE (free from Core): {J
-
--- INSTANCE (free from Core): {J
-
--- INSTANCE (free from Core): [HasLimitsOfShape
-
--- INSTANCE (free from Core): [HasLimitsOfShape
-
--- INSTANCE (free from Core): [HasFiniteLimits
-
--- INSTANCE (free from Core): [HasFiniteLimits
-
--- INSTANCE (free from Core): [HasLimits
-
--- INSTANCE (free from Core): [HasLimits
-
--- INSTANCE (free from Core): :
+instance : HasFilteredColimits (Ind C) where
+  HasColimitsOfShape _ _ _ :=
+    hasColimitsOfShape_of_hasColimitsOfShape_createsColimitsOfShape (Ind.inclusion C)
 
 theorem Ind.isIndObject_inclusion_obj (X : Ind C) : IsIndObject ((Ind.inclusion C).obj X) :=
   X.2
@@ -135,68 +118,39 @@ noncomputable def Ind.colimitPresentationCompYoneda (X : Ind C) :
     _ ≅ (Ind.inclusion C).obj X :=
           IsColimit.coconePointUniqueUpToIso (colimit.isColimit _) X.presentation.isColimit
 
--- INSTANCE (free from Core): :
+instance : RepresentablyCoflat (Ind.yoneda (C := C)) := by
+  refine ⟨fun X => ?_⟩
+  suffices IsFiltered (CostructuredArrow yoneda ((Ind.inclusion C).obj X)) from
+    IsFiltered.of_equivalence
+      ((CostructuredArrow.post Ind.yoneda (Ind.inclusion C) X).asEquivalence.trans
+      (CostructuredArrow.mapNatIso Ind.yonedaCompInclusion)).symm
+  exact ((isIndObject_iff _).1 (Ind.isIndObject_inclusion_obj X)).1
 
--- INSTANCE (free from Core): :
+noncomputable instance : PreservesFiniteColimits (Ind.yoneda (C := C)) :=
+  preservesFiniteColimits_of_coflat _
 
-protected noncomputable def Ind.lim (I : Type v) [SmallCategory I] [IsFiltered I] :
-    (I ⥤ C) ⥤ Ind C :=
-  (whiskeringRight _ _ _).obj Ind.yoneda ⋙ colim
+instance {α : Type v} [Finite α] [HasColimitsOfShape (Discrete α) C] :
+    HasColimitsOfShape (Discrete α) (Ind C) := by
+  refine ⟨fun F => ?_⟩
+  let I : α → Type v := fun s => (F.obj ⟨s⟩).presentation.I
+  let G : ∀ s, I s ⥤ C := fun s => (F.obj ⟨s⟩).presentation.F
+  let iso : Discrete.functor (fun s => Pi.eval I s ⋙ G s) ⋙
+      (whiskeringRight _ _ _).obj Ind.yoneda ⋙ colim ≅ F := by
+    refine Discrete.natIso (fun s => ?_)
+    refine (Functor.Final.colimitIso (Pi.eval I s.as) (G s.as ⋙ Ind.yoneda)) ≪≫ ?_
+    exact Ind.colimitPresentationCompYoneda _
+  -- The actual proof happens during typeclass resolution in the following line, which deduces
+  -- ```
+  -- HasColimit Discrete.functor (fun s => Pi.eval I s ⋙ G s) ⋙
+  --    (whiskeringRight _ _ _).obj Ind.yoneda ⋙ colim
+  -- ```
+  -- from the fact that finite limits commute with filtered colimits and from the fact that
+  -- `Ind.yoneda` preserves finite colimits.
+  apply hasColimitOfIso iso.symm
 
-noncomputable def Ind.limCompInclusion {I : Type v} [SmallCategory I] [IsFiltered I] :
-    Ind.lim I ⋙ Ind.inclusion C ≅ (whiskeringRight _ _ _).obj yoneda ⋙ colim := calc
-  Ind.lim I ⋙ Ind.inclusion C
-    ≅ (whiskeringRight _ _ _).obj Ind.yoneda ⋙ colim ⋙ Ind.inclusion C := Functor.associator _ _ _
-  _ ≅ (whiskeringRight _ _ _).obj Ind.yoneda ⋙
-      (whiskeringRight _ _ _).obj (Ind.inclusion C) ⋙ colim :=
-    isoWhiskerLeft _ (preservesColimitNatIso _)
-  _ ≅ ((whiskeringRight _ _ _).obj Ind.yoneda ⋙
-      (whiskeringRight _ _ _).obj (Ind.inclusion C)) ⋙ colim := (Functor.associator _ _ _).symm
-  _ ≅ (whiskeringRight _ _ _).obj (Ind.yoneda ⋙ Ind.inclusion C) ⋙ colim :=
-    isoWhiskerRight (whiskeringRightObjCompIso _ _) colim
-  _ ≅ (whiskeringRight _ _ _).obj yoneda ⋙ colim :=
-    isoWhiskerRight ((whiskeringRight _ _ _).mapIso (Ind.yonedaCompInclusion)) colim
-
--- INSTANCE (free from Core): {α
-
--- INSTANCE (free from Core): {α
-
--- INSTANCE (free from Core): {α
-
--- INSTANCE (free from Core): [HasFiniteCoproducts
-
-noncomputable def IndParallelPairPresentation.parallelPairIsoParallelPairCompIndYoneda
-    {A B : Ind C} {f g : A ⟶ B}
-    (P : IndParallelPairPresentation ((Ind.inclusion _).map f) ((Ind.inclusion _).map g)) :
-    parallelPair f g ≅ parallelPair P.φ P.ψ ⋙ Ind.lim P.I :=
-  ((whiskeringRight WalkingParallelPair _ _).obj (Ind.inclusion C)).preimageIso <|
-    diagramIsoParallelPair _ ≪≫
-      P.parallelPairIsoParallelPairCompYoneda ≪≫
-      isoWhiskerLeft (parallelPair _ _) Ind.limCompInclusion.symm
-
--- INSTANCE (free from Core): [HasColimitsOfShape
-
--- INSTANCE (free from Core): [HasFiniteColimits
-
-theorem Ind.exists_nonempty_arrow_mk_iso_ind_lim {A B : Ind C} {f : A ⟶ B} :
-    ∃ (I : Type v) (_ : SmallCategory I) (_ : IsFiltered I) (F G : I ⥤ C) (φ : F ⟶ G),
-      Nonempty (Arrow.mk f ≅ Arrow.mk ((Ind.lim _).map φ)) := by
-  obtain ⟨P⟩ := nonempty_indParallelPairPresentation A.2 B.2
-    (Ind.inclusion _ |>.map f) (Ind.inclusion _ |>.map f)
-  refine ⟨P.I, inferInstance, inferInstance, P.F₁, P.F₂, P.φ, ⟨Arrow.isoMk ?_ ?_ ?_⟩⟩
-  · exact P.parallelPairIsoParallelPairCompIndYoneda.app WalkingParallelPair.zero
-  · exact P.parallelPairIsoParallelPairCompIndYoneda.app WalkingParallelPair.one
-  · simpa using
-      (P.parallelPairIsoParallelPairCompIndYoneda.hom.naturality WalkingParallelPairHom.left).symm
-
-section Small
-
-variable (C : Type u) [SmallCategory C] [HasFiniteColimits C]
-
-noncomputable def Ind.leftExactFunctorEquivalence : Ind C ≌ LeftExactFunctor Cᵒᵖ (Type u) :=
-  (Ind.equivalence _).trans <| ObjectProperty.fullSubcategoryCongr
-    (by ext; apply isIndObject_iff_preservesFiniteLimits)
-
-end Small
+instance [HasFiniteCoproducts C] : HasCoproducts.{v} (Ind C) :=
+  have : HasFiniteCoproducts (Ind C) :=
+    ⟨fun _ => hasColimitsOfShape_of_equivalence (Discrete.equivalence Equiv.ulift)⟩
+  hasCoproducts_of_finite_and_filtered
 
 end CategoryTheory

@@ -1,8 +1,9 @@
 /-
 Extracted from CategoryTheory/Balanced.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.EpiMono
 
 /-!
 # Balanced categories
@@ -21,6 +22,8 @@ namespace CategoryTheory
 
 variable {C : Type u} [Category.{v} C]
 
+section
+
 variable (C)
 
 class Balanced : Prop where
@@ -34,9 +37,14 @@ theorem isIso_of_mono_of_epi [Balanced C] {X Y : C} (f : X ⟶ Y) [Mono f] [Epi 
 theorem isIso_iff_mono_and_epi [Balanced C] {X Y : C} (f : X ⟶ Y) : IsIso f ↔ Mono f ∧ Epi f :=
   ⟨fun _ => ⟨inferInstance, inferInstance⟩, fun ⟨_, _⟩ => isIso_of_mono_of_epi _⟩
 
+section
+
 attribute [local instance] isIso_of_mono_of_epi
 
--- INSTANCE (free from Core): balanced_opposite
+theorem balanced_opposite [Balanced C] : Balanced Cᵒᵖ :=
+  { isIso_of_mono_of_epi := fun f fmono fepi => by
+      rw [← Quiver.Hom.op_unop f]
+      exact isIso_of_op _ }
 
 end
 

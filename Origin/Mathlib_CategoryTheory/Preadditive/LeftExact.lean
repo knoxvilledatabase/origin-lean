@@ -3,15 +3,17 @@ Extracted from CategoryTheory/Preadditive/LeftExact.lean
 Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts
+import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
+import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
+import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 
 /-!
 # Left exactness of functors between preadditive categories
 
 We show that a functor is left exact in the sense that it preserves finite limits, if it
 preserves kernels. The dual result holds for right exact functors and cokernels.
-
 ## Main results
-
 * We first derive preservation of binary product in the lemma
   `preservesBinaryProductsOfPreservesKernels`,
 * then show the preservation of equalizers in `preservesEqualizerOfPreservesKernels`,
@@ -54,14 +56,14 @@ lemma preservesBinaryProduct_of_preservesKernels
   preserves {c} hc :=
     ⟨IsLimit.ofIsoLimit
       (isLimitMapConeBinaryFanOfPreservesKernels F _ _ (IsLimit.ofIsoLimit hc (isoBinaryFanMk c)))
-      ((Cone.functoriality _ F).mapIso (isoBinaryFanMk c).symm)⟩
+      ((Cones.functoriality _ F).mapIso (isoBinaryFanMk c).symm)⟩
 
 attribute [local instance] preservesBinaryProduct_of_preservesKernels
 
 lemma preservesBinaryProducts_of_preservesKernels
     [∀ {X Y} (f : X ⟶ Y), PreservesLimit (parallelPair f 0) F] :
-    PreservesLimitsOfShape (Discrete WalkingPair) F where
-  preservesLimit := preservesLimit_of_iso_diagram F (diagramIsoPair _).symm
+  PreservesLimitsOfShape (Discrete WalkingPair) F where
+    preservesLimit := preservesLimit_of_iso_diagram F (diagramIsoPair _).symm
 
 attribute [local instance] preservesBinaryProducts_of_preservesKernels
 
@@ -77,7 +79,7 @@ lemma preservesEqualizer_of_preservesKernels
   dsimp only [kernelForkOfFork_ofι] at c'
   let iFc := isLimitForkMapOfIsLimit' F _ c'
   constructor
-  apply IsLimit.ofIsoLimit _ ((Cone.functoriality _ F).mapIso (Fork.isoForkOfι c).symm)
+  apply IsLimit.ofIsoLimit _ ((Cones.functoriality _ F).mapIso (Fork.isoForkOfι c).symm)
   apply (isLimitMapConeForkEquiv F (Fork.condition c)).invFun
   let p : parallelPair (F.map (f - g)) 0 ≅ parallelPair (F.map f - F.map g) 0 :=
     parallelPair.eqOfHomEq F.map_sub rfl
@@ -96,12 +98,12 @@ lemma preservesEqualizers_of_preservesKernels
 
 lemma preservesFiniteLimits_of_preservesKernels [HasFiniteProducts C] [HasEqualizers C]
     [HasZeroObject C] [HasZeroObject D] [∀ {X Y} (f : X ⟶ Y), PreservesLimit (parallelPair f 0) F] :
-    PreservesFiniteLimits F :=
-  have := preservesEqualizers_of_preservesKernels F
-  have := preservesTerminalObject_of_preservesZeroMorphisms F
-  have := preservesLimitsOfShape_pempty_of_preservesTerminal F
-  have : PreservesFiniteProducts F := .of_preserves_binary_and_terminal F
-  preservesFiniteLimits_of_preservesEqualizers_and_finiteProducts F
+    PreservesFiniteLimits F := by
+  letI := preservesEqualizers_of_preservesKernels F
+  letI := preservesTerminalObject_of_preservesZeroMorphisms F
+  letI := preservesLimitsOfShape_pempty_of_preservesTerminal F
+  letI : PreservesFiniteProducts F := ⟨preservesFiniteProducts_of_preserves_binary_and_terminal F⟩
+  exact preservesFiniteLimits_of_preservesEqualizers_and_finiteProducts F
 
 end FiniteLimits
 
@@ -125,7 +127,7 @@ lemma preservesCoproduct_of_preservesCokernels
     ⟨IsColimit.ofIsoColimit
       (isColimitMapCoconeBinaryCofanOfPreservesCokernels F _ _
         (IsColimit.ofIsoColimit hc (isoBinaryCofanMk c)))
-      ((Cocone.functoriality _ F).mapIso (isoBinaryCofanMk c).symm)⟩
+      ((Cocones.functoriality _ F).mapIso (isoBinaryCofanMk c).symm)⟩
 
 attribute [local instance] preservesCoproduct_of_preservesCokernels
 
@@ -150,7 +152,7 @@ lemma preservesCoequalizer_of_preservesCokernels
   let iFc := isColimitCoforkMapOfIsColimit' F _ c'
   constructor
   apply
-    IsColimit.ofIsoColimit _ ((Cocone.functoriality _ F).mapIso (Cofork.isoCoforkOfπ c).symm)
+    IsColimit.ofIsoColimit _ ((Cocones.functoriality _ F).mapIso (Cofork.isoCoforkOfπ c).symm)
   apply (isColimitMapCoconeCoforkEquiv F (Cofork.condition c)).invFun
   let p : parallelPair (F.map (f - g)) 0 ≅ parallelPair (F.map f - F.map g) 0 :=
     parallelPair.ext (Iso.refl _) (Iso.refl _) (by simp) (by simp)
@@ -173,8 +175,7 @@ lemma preservesFiniteColimits_of_preservesCokernels [HasFiniteCoproducts C] [Has
   letI := preservesCoequalizers_of_preservesCokernels F
   letI := preservesInitialObject_of_preservesZeroMorphisms F
   letI := preservesColimitsOfShape_pempty_of_preservesInitial F
-  letI : PreservesFiniteCoproducts F :=
-    ⟨fun _ ↦ PreservesFiniteCoproducts.of_preserves_binary_and_initial F _⟩
+  letI : PreservesFiniteCoproducts F := ⟨preservesFiniteCoproductsOfPreservesBinaryAndInitial F⟩
   exact preservesFiniteColimits_of_preservesCoequalizers_and_finiteCoproducts F
 
 end FiniteColimits

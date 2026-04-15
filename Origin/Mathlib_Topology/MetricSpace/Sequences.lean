@@ -1,8 +1,10 @@
 /-
 Extracted from Topology/MetricSpace/Sequences.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Sequences
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Sequential compacts in metric spaces
@@ -15,6 +17,11 @@ open Filter Bornology Metric
 open scoped Topology
 
 variable {X : Type*} [PseudoMetricSpace X]
+
+nonrec theorem SeqCompact.lebesgue_number_lemma_of_metric {ι : Sort*} {c : ι → Set X} {s : Set X}
+    (hs : IsSeqCompact s) (hc₁ : ∀ i, IsOpen (c i)) (hc₂ : s ⊆ ⋃ i, c i) :
+    ∃ δ > 0, ∀ a ∈ s, ∃ i, ball a δ ⊆ c i :=
+  lebesgue_number_lemma_of_metric hs.isCompact hc₁ hc₂
 
 variable [ProperSpace X] {s : Set X}
 

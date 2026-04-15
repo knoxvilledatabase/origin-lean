@@ -1,8 +1,11 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Disintegration.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.Haar.Basic
+import Mathlib.Analysis.Normed.Module.FiniteDimension
+import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
 # Pushing a Haar measure by a linear map
@@ -34,6 +37,10 @@ variable [LocallyCompactSpace E]
 
 variable (L μ ν)
 
+instance (T : Submodule 𝕜 E) : BorelSpace T := Subtype.borelSpace _
+
+instance (T : Submodule 𝕜 E) : OpensMeasurableSpace T := Subtype.opensMeasurableSpace _
+
 theorem LinearMap.exists_map_addHaar_eq_smul_addHaar' (h : Function.Surjective L) :
     ∃ (c : ℝ≥0∞), 0 < c ∧ c < ∞ ∧ μ.map L = (c * addHaar (univ : Set (LinearMap.ker L))) • ν := by
   /- This is true for the second projection in product spaces, as the projection of the Haar
@@ -43,7 +50,7 @@ theorem LinearMap.exists_map_addHaar_eq_smul_addHaar' (h : Function.Surjective L
   projection `P` on a complement `T` to its kernel `S`, together with a linear equivalence. -/
   have : FiniteDimensional 𝕜 E := .of_locallyCompactSpace 𝕜
   have : ProperSpace F := by
-    rcases subsingleton_or_nontrivial E with hE | hE
+    rcases subsingleton_or_nontrivial E with hE|hE
     · have : Subsingleton F := Function.Surjective.subsingleton h
       infer_instance
     · have : ProperSpace 𝕜 := .of_locallyCompact_module 𝕜 E
@@ -110,7 +117,7 @@ lemma ae_comp_linearMap_mem_iff (h : Function.Surjective L) {s : Set F} (hs : Me
   apply (ae_map_iff this hs).symm.trans
   rcases L.exists_map_addHaar_eq_smul_addHaar μ ν h with ⟨c, c_pos, hc⟩
   rw [hc]
-  exact ae_ennreal_smul_measure_iff c_pos.ne'
+  exact ae_smul_measure_iff c_pos.ne'
 
 lemma ae_ae_add_linearMap_mem_iff [LocallyCompactSpace F] {s : Set F} (hs : MeasurableSet s) :
     (∀ᵐ y ∂ν, ∀ᵐ x ∂μ, y + L x ∈ s) ↔ ∀ᵐ y ∂ν, y ∈ s := by

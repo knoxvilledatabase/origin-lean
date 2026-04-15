@@ -1,8 +1,11 @@
 /-
 Extracted from Geometry/Manifold/MFDeriv/Tangent.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.MFDeriv.Atlas
+import Mathlib.Geometry.Manifold.MFDeriv.UniqueDifferential
+import Mathlib.Geometry.Manifold.VectorBundle.Tangent
 
 /-!
 # Derivatives of maps in the tangent bundle
@@ -19,10 +22,10 @@ open scoped Manifold
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] {H : Type*} [TopologicalSpace H]
   {I : ModelWithCorners 𝕜 E H} {M : Type*} [TopologicalSpace M] [ChartedSpace H M]
-  [IsManifold I 1 M]
+  [SmoothManifoldWithCorners I M]
   {E' : Type*} [NormedAddCommGroup E'] [NormedSpace 𝕜 E'] {H' : Type*} [TopologicalSpace H']
   {I' : ModelWithCorners 𝕜 E' H'} {M' : Type*} [TopologicalSpace M'] [ChartedSpace H' M']
-  [IsManifold I' 1 M']
+  [SmoothManifoldWithCorners I' M']
 
 theorem tangentMap_chart {p q : TangentBundle I M} (h : q.1 ∈ (chartAt H p.1).source) :
     tangentMap I I (chartAt H p.1) q =
@@ -39,45 +42,38 @@ theorem tangentMap_chart_symm {p : TangentBundle I M} {q : TangentBundle I H}
       (chartAt (ModelProd H E) p).symm (TotalSpace.toProd H E q) := by
   dsimp only [tangentMap]
   rw [MDifferentiableAt.mfderiv (mdifferentiableAt_atlas_symm (chart_mem_atlas _ _) h)]
-  simp only [TangentBundle.chartAt, tangentBundleCore,
+  simp only [ContinuousLinearMap.coe_coe, TangentBundle.chartAt, h, tangentBundleCore,
     mfld_simps, (· ∘ ·)]
   -- `simp` fails to apply `PartialEquiv.prod_symm` with `ModelProd`
   congr
   exact ((chartAt H (TotalSpace.proj p)).right_inv h).symm
 
 lemma mfderiv_chartAt_eq_tangentCoordChange {x y : M} (hsrc : x ∈ (chartAt H y).source) :
-    mfderiv% (chartAt H y) x = tangentCoordChange I x y x := by
+    mfderiv I I (chartAt H y) x = tangentCoordChange I x y x := by
   have := mdifferentiableAt_atlas (I := I) (ChartedSpace.chart_mem_atlas _) hsrc
   simp [mfderiv, if_pos this, Function.comp_assoc]
 
 theorem UniqueMDiffOn.tangentBundle_proj_preimage {s : Set M} (hs : UniqueMDiffOn I s) :
     UniqueMDiffOn I.tangent (π E (TangentSpace I) ⁻¹' s) :=
-  hs.bundle_preimage _
+  hs.smooth_bundle_preimage _
 
 lemma inTangentCoordinates_eq_mfderiv_comp
     {N : Type*} {f : N → M} {g : N → M'}
     {ϕ : Π x : N, TangentSpace I (f x) →L[𝕜] TangentSpace I' (g x)} {x₀ : N} {x : N}
     (hx : f x ∈ (chartAt H (f x₀)).source) (hy : g x ∈ (chartAt H' (g x₀)).source) :
     inTangentCoordinates I I' f g ϕ x₀ x =
-    (mfderiv% (extChartAt I' (g x₀)) (g x)) ∘L (ϕ x) ∘L
-      (mfderiv[range I] (extChartAt I (f x₀)).symm (extChartAt I (f x₀) (f x))) := by
+    (mfderiv I' 𝓘(𝕜, E') (extChartAt I' (g x₀)) (g x)) ∘L (ϕ x) ∘L
+      (mfderivWithin 𝓘(𝕜, E) I (extChartAt I (f x₀)).symm (range I)
+        (extChartAt I (f x₀) (f x))) := by
   rw [inTangentCoordinates_eq _ _ _ hx hy, tangentBundleCore_coordChange]
   congr
-  · have : MDiffAt (extChartAt I' (g x₀)) (g x) := mdifferentiableAt_extChartAt hy
-    simp_all [mfderiv]
+  · have : MDifferentiableAt I' 𝓘(𝕜, E') (extChartAt I' (g x₀)) (g x) :=
+      mdifferentiableAt_extChartAt hy
+    simp at this
+    simp [mfderiv, this]
   · simp only [mfderivWithin, writtenInExtChartAt, modelWithCornersSelf_coe, range_id, inter_univ]
     rw [if_pos]
-    · simp [Function.comp_def, OpenPartialHomeomorph.left_inv (chartAt H (f x₀)) hx]
+    · simp [Function.comp_def, PartialHomeomorph.left_inv (chartAt H (f x₀)) hx]
     · apply mdifferentiableWithinAt_extChartAt_symm
       apply (extChartAt I (f x₀)).map_source
       simpa using hx
-
-open Bundle
-
-variable (I) in
-
-def tangentBundleModelSpaceDiffeomorph (n : ℕ∞) :
-    TangentBundle I H ≃ₘ^n⟮I.tangent, I.prod 𝓘(𝕜, E)⟯ ModelProd H E where
-  __ := TotalSpace.toProd H E
-  contMDiff_toFun := contMDiff_tangentBundleModelSpaceHomeomorph
-  contMDiff_invFun := contMDiff_tangentBundleModelSpaceHomeomorph_symm

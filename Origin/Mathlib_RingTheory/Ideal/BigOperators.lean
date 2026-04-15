@@ -3,6 +3,8 @@ Extracted from RingTheory/Ideal/BigOperators.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Submodule.Basic
+import Mathlib.RingTheory.Ideal.Defs
 
 /-!
 

@@ -1,13 +1,17 @@
 /-
 Extracted from Topology/Compactness/LocallyCompact.lean
-Genuine: 19 of 29 | Dissolved: 0 | Infrastructure: 10
+Genuine: 18 of 28 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
+import Mathlib.Topology.Compactness.Compact
 
 /-!
 # Locally compact spaces
 
-This file contains basic results about locally compact spaces.
+We define the following classes of topological spaces:
+* `WeaklyLocallyCompactSpace`: every point `x` has a compact neighborhood.
+* `LocallyCompactSpace`: for every point `x`, every open neighborhood of `x` contains a compact
+  neighborhood of `x`. The definition is formulated in terms of the neighborhood filter.
 -/
 
 open Set Filter Topology TopologicalSpace
@@ -16,17 +20,30 @@ variable {X : Type*} {Y : Type*} {ι : Type*}
 
 variable [TopologicalSpace X] [TopologicalSpace Y] {s t : Set X}
 
--- INSTANCE (free from Core): [WeaklyLocallyCompactSpace
+instance [WeaklyLocallyCompactSpace X] [WeaklyLocallyCompactSpace Y] :
+    WeaklyLocallyCompactSpace (X × Y) where
+  exists_compact_mem_nhds x :=
+    let ⟨s₁, hc₁, h₁⟩ := exists_compact_mem_nhds x.1
+    let ⟨s₂, hc₂, h₂⟩ := exists_compact_mem_nhds x.2
+    ⟨s₁ ×ˢ s₂, hc₁.prod hc₂, prod_mem_nhds h₁ h₂⟩
 
--- INSTANCE (free from Core): {ι
+instance {ι : Type*} [Finite ι] {X : ι → Type*} [(i : ι) → TopologicalSpace (X i)]
+    [(i : ι) → WeaklyLocallyCompactSpace (X i)] :
+    WeaklyLocallyCompactSpace ((i : ι) → X i) where
+  exists_compact_mem_nhds f := by
+    choose s hsc hs using fun i ↦ exists_compact_mem_nhds (f i)
+    exact ⟨pi univ s, isCompact_univ_pi hsc, set_pi_mem_nhds univ.toFinite fun i _ ↦ hs i⟩
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) [CompactSpace X] : WeaklyLocallyCompactSpace X where
+  exists_compact_mem_nhds _ := ⟨univ, isCompact_univ, univ_mem⟩
 
 protected theorem Topology.IsClosedEmbedding.weaklyLocallyCompactSpace [WeaklyLocallyCompactSpace Y]
     {f : X → Y} (hf : IsClosedEmbedding f) : WeaklyLocallyCompactSpace X where
   exists_compact_mem_nhds x :=
     let ⟨K, hK, hKx⟩ := exists_compact_mem_nhds (f x)
     ⟨f ⁻¹' K, hf.isCompact_preimage hK, hf.continuous.continuousAt hKx⟩
+
+alias ClosedEmbedding.weaklyLocallyCompactSpace := IsClosedEmbedding.weaklyLocallyCompactSpace
 
 protected theorem IsClosed.weaklyLocallyCompactSpace [WeaklyLocallyCompactSpace X]
     {s : Set X} (hs : IsClosed s) : WeaklyLocallyCompactSpace s :=
@@ -66,25 +83,61 @@ theorem LocallyCompactSpace.of_hasBasis {ι : X → Type*} {p : ∀ x, ι x → 
     let ⟨i, hp, ht⟩ := (h x).mem_iff.1 ht
     ⟨s x i, (h x).mem_of_mem hp, ht, hc x i hp⟩⟩
 
--- INSTANCE (free from Core): Prod.locallyCompactSpace
+instance Prod.locallyCompactSpace (X : Type*) (Y : Type*) [TopologicalSpace X]
+    [TopologicalSpace Y] [LocallyCompactSpace X] [LocallyCompactSpace Y] :
+    LocallyCompactSpace (X × Y) :=
+  have := fun x : X × Y => (compact_basis_nhds x.1).prod_nhds' (compact_basis_nhds x.2)
+ .of_hasBasis this fun _ _ ⟨⟨_, h₁⟩, _, h₂⟩ => h₁.prod h₂
 
 section Pi
 
 variable {X : ι → Type*} [∀ i, TopologicalSpace (X i)] [∀ i, LocallyCompactSpace (X i)]
 
--- INSTANCE (free from Core): Pi.locallyCompactSpace_of_finite
+instance Pi.locallyCompactSpace_of_finite [Finite ι] : LocallyCompactSpace (∀ i, X i) :=
+  ⟨fun t n hn => by
+    rw [nhds_pi, Filter.mem_pi] at hn
+    obtain ⟨s, -, n', hn', hsub⟩ := hn
+    choose n'' hn'' hsub' hc using fun i =>
+      LocallyCompactSpace.local_compact_nhds (t i) (n' i) (hn' i)
+    refine ⟨(Set.univ : Set ι).pi n'', ?_, subset_trans (fun _ h => ?_) hsub, isCompact_univ_pi hc⟩
+    · exact (set_pi_mem_nhds_iff (@Set.finite_univ ι _) _).mpr fun i _ => hn'' i
+    · exact fun i _ => hsub' i (h i trivial)⟩
 
--- INSTANCE (free from Core): Pi.locallyCompactSpace
+instance Pi.locallyCompactSpace [∀ i, CompactSpace (X i)] : LocallyCompactSpace (∀ i, X i) :=
+  ⟨fun t n hn => by
+    rw [nhds_pi, Filter.mem_pi] at hn
+    obtain ⟨s, hs, n', hn', hsub⟩ := hn
+    choose n'' hn'' hsub' hc using fun i =>
+      LocallyCompactSpace.local_compact_nhds (t i) (n' i) (hn' i)
+    refine ⟨s.pi n'', ?_, subset_trans (fun _ => ?_) hsub, ?_⟩
+    · exact (set_pi_mem_nhds_iff hs _).mpr fun i _ => hn'' i
+    · exact forall₂_imp fun i _ hi' => hsub' i hi'
+    · classical
+      rw [← Set.univ_pi_ite]
+      refine isCompact_univ_pi fun i => ?_
+      by_cases h : i ∈ s
+      · rw [if_pos h]
+        exact hc i
+      · rw [if_neg h]
+        exact CompactSpace.isCompact_univ⟩
 
--- INSTANCE (free from Core): Function.locallyCompactSpace_of_finite
+instance Function.locallyCompactSpace_of_finite [Finite ι] [LocallyCompactSpace Y] :
+    LocallyCompactSpace (ι → Y) :=
+  Pi.locallyCompactSpace_of_finite
 
--- INSTANCE (free from Core): Function.locallyCompactSpace
+instance Function.locallyCompactSpace [LocallyCompactSpace Y] [CompactSpace Y] :
+    LocallyCompactSpace (ι → Y) :=
+  Pi.locallyCompactSpace
 
 end Pi
 
--- INSTANCE (free from Core): (priority
+instance (priority := 900) [LocallyCompactSpace X] : LocallyCompactPair X Y where
+  exists_mem_nhds_isCompact_mapsTo hf hs :=
+    let ⟨K, hKx, hKs, hKc⟩ := local_compact_nhds (hf.continuousAt hs); ⟨K, hKx, hKc, hKs⟩
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) [LocallyCompactSpace X] : WeaklyLocallyCompactSpace X where
+  exists_compact_mem_nhds (x : X) :=
+    let ⟨K, hx, _, hKc⟩ := local_compact_nhds (x := x) univ_mem; ⟨K, hKc, hx⟩
 
 theorem exists_compact_subset [LocallyCompactSpace X] {x : X} {U : Set X} (hU : IsOpen U)
     (hx : x ∈ U) : ∃ K : Set X, IsCompact K ∧ x ∈ interior K ∧ K ⊆ U := by
@@ -104,13 +157,6 @@ theorem exists_compact_between [LocallyCompactSpace X] {K U : Set X} (hK : IsCom
     (hU : IsOpen U) (h_KU : K ⊆ U) : ∃ L, IsCompact L ∧ K ⊆ interior L ∧ L ⊆ U :=
   let ⟨L, hKL, hL, hLU⟩ := exists_mem_nhdsSet_isCompact_mapsTo continuous_id hK hU h_KU
   ⟨L, hL, subset_interior_iff_mem_nhdsSet.2 hKL, hLU⟩
-
-theorem IsCompact.nhdsSet_basis_isCompact [LocallyCompactSpace X] {K : Set X} (hK : IsCompact K) :
-    (𝓝ˢ K).HasBasis (fun L ↦ L ∈ 𝓝ˢ K ∧ IsCompact L) id := by
-  rw [hasBasis_self, (hasBasis_nhdsSet _).forall_iff (by grind)]
-  intro U ⟨hU, h_KU⟩
-  obtain ⟨L, hL, hKL, hLU⟩ := exists_compact_between hK hU h_KU
-  exact ⟨L, by rwa [← subset_interior_iff_mem_nhdsSet], hL, hLU⟩
 
 theorem IsOpenQuotientMap.locallyCompactSpace [LocallyCompactSpace X] {f : X → Y}
     (hf : IsOpenQuotientMap f) : LocallyCompactSpace Y where
@@ -132,13 +178,19 @@ theorem Topology.IsInducing.locallyCompactSpace [LocallyCompactSpace Y] {f : X �
   rw [hf.isCompact_preimage_iff]
   exacts [hs.inter_right hZ, hUZ ▸ by gcongr]
 
+alias Inducing.locallyCompactSpace := IsInducing.locallyCompactSpace
+
 protected theorem Topology.IsClosedEmbedding.locallyCompactSpace [LocallyCompactSpace Y] {f : X → Y}
     (hf : IsClosedEmbedding f) : LocallyCompactSpace X :=
   hf.isInducing.locallyCompactSpace hf.isClosed_range.isLocallyClosed
 
+alias ClosedEmbedding.locallyCompactSpace := IsClosedEmbedding.locallyCompactSpace
+
 protected theorem Topology.IsOpenEmbedding.locallyCompactSpace [LocallyCompactSpace Y] {f : X → Y}
     (hf : IsOpenEmbedding f) : LocallyCompactSpace X :=
   hf.isInducing.locallyCompactSpace hf.isOpen_range.isLocallyClosed
+
+alias OpenEmbedding.locallyCompactSpace := IsOpenEmbedding.locallyCompactSpace
 
 protected theorem IsLocallyClosed.locallyCompactSpace [LocallyCompactSpace X] {s : Set X}
     (hs : IsLocallyClosed s) : LocallyCompactSpace s :=

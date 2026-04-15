@@ -1,14 +1,16 @@
 /-
 Extracted from Topology/Sequences.lean
-Genuine: 34 of 41 | Dissolved: 0 | Infrastructure: 7
+Genuine: 35 of 42 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
+import Mathlib.Topology.Defs.Sequences
+import Mathlib.Topology.UniformSpace.Cauchy
 
 /-!
 # Sequences in topological spaces
 
 In this file we prove theorems about relations
-between closure/compactness/continuity etc. and their sequential counterparts.
+between closure/compactness/continuity etc and their sequential counterparts.
 
 ## Main definitions
 
@@ -121,9 +123,13 @@ theorem FrechetUrysohnSpace.of_seq_tendsto_imp_tendsto
     rcases extraction_of_frequently_atTop hus with ⟨φ, φ_mono, hφ⟩
     exact ⟨u ∘ φ, hφ, hux.comp φ_mono.tendsto_atTop⟩
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) FirstCountableTopology.frechetUrysohnSpace
+    [FirstCountableTopology X] : FrechetUrysohnSpace X :=
+  FrechetUrysohnSpace.of_seq_tendsto_imp_tendsto fun _ _ => tendsto_iff_seq_tendsto.2
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) FrechetUrysohnSpace.to_sequentialSpace [FrechetUrysohnSpace X] :
+    SequentialSpace X :=
+  ⟨fun s hs => by rw [← closure_eq_iff_isClosed, ← seqClosure_eq_closure, hs.seqClosure_eq]⟩
 
 theorem Topology.IsInducing.frechetUrysohnSpace [FrechetUrysohnSpace Y] {f : X → Y}
     (hf : IsInducing f) : FrechetUrysohnSpace X := by
@@ -134,7 +140,11 @@ theorem Topology.IsInducing.frechetUrysohnSpace [FrechetUrysohnSpace Y] {f : X �
   refine ⟨v, hv, ?_⟩
   simpa only [hf.tendsto_nhds_iff, Function.comp_def, hvu]
 
--- INSTANCE (free from Core): Subtype.instFrechetUrysohnSpace
+alias Inducing.frechetUrysohnSpace := IsInducing.frechetUrysohnSpace
+
+instance Subtype.instFrechetUrysohnSpace [FrechetUrysohnSpace X] {p : X → Prop} :
+    FrechetUrysohnSpace (Subtype p) :=
+  IsInducing.subtypeVal.frechetUrysohnSpace
 
 theorem isSeqClosed_iff_isClosed [SequentialSpace X] {M : Set X} : IsSeqClosed M ↔ IsClosed M :=
   ⟨IsSeqClosed.isClosed, IsClosed.isSeqClosed⟩
@@ -172,13 +182,21 @@ protected theorem SequentialSpace.sup {X} {t₁ t₂ : TopologicalSpace X}
   exact .iSup <| Bool.forall_bool.2 ⟨h₂, h₁⟩
 
 lemma Topology.IsQuotientMap.sequentialSpace [SequentialSpace X] {f : X → Y}
-    (hf : IsQuotientMap f) : SequentialSpace Y := hf.isCoinducing.eq_coinduced.symm ▸ .coinduced f
+    (hf : IsQuotientMap f) : SequentialSpace Y := hf.2.symm ▸ .coinduced f
 
--- INSTANCE (free from Core): Quotient.instSequentialSpace
+alias QuotientMap.sequentialSpace := IsQuotientMap.sequentialSpace
 
--- INSTANCE (free from Core): Sum.instSequentialSpace
+instance Quotient.instSequentialSpace [SequentialSpace X] {s : Setoid X} :
+    SequentialSpace (Quotient s) :=
+  isQuotientMap_quot_mk.sequentialSpace
 
--- INSTANCE (free from Core): Sigma.instSequentialSpace
+instance Sum.instSequentialSpace [SequentialSpace X] [SequentialSpace Y] :
+    SequentialSpace (X ⊕ Y) :=
+  .sup (.coinduced Sum.inl) (.coinduced Sum.inr)
+
+instance Sigma.instSequentialSpace {ι : Type*} {X : ι → Type*}
+    [∀ i, TopologicalSpace (X i)] [∀ i, SequentialSpace (X i)] : SequentialSpace (Σ i, X i) :=
+  .iSup fun _ ↦ .coinduced _
 
 end TopologicalSpace
 
@@ -209,7 +227,7 @@ open FirstCountableTopology
 protected theorem IsCompact.isSeqCompact {s : Set X} (hs : IsCompact s) : IsSeqCompact s :=
   fun _x x_in =>
   let ⟨a, a_in, ha⟩ := hs (tendsto_principal.mpr (Eventually.of_forall x_in))
-  ⟨a, a_in, MapClusterPt.tendsto_subseq ha⟩
+  ⟨a, a_in, tendsto_subseq ha⟩
 
 theorem IsCompact.tendsto_subseq' {s : Set X} {x : ℕ → X} (hs : IsCompact s)
     (hx : ∃ᶠ n in atTop, x n ∈ s) :
@@ -220,7 +238,9 @@ theorem IsCompact.tendsto_subseq {s : Set X} {x : ℕ → X} (hs : IsCompact s) 
     ∃ a ∈ s, ∃ φ : ℕ → ℕ, StrictMono φ ∧ Tendsto (x ∘ φ) atTop (𝓝 a) :=
   hs.isSeqCompact hx
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) FirstCountableTopology.seq_compact_of_compact [CompactSpace X] :
+    SeqCompactSpace X :=
+  ⟨isCompact_univ.isSeqCompact⟩
 
 theorem CompactSpace.tendsto_subseq [CompactSpace X] (x : ℕ → X) :
     ∃ (a : _) (φ : ℕ → ℕ), StrictMono φ ∧ Tendsto (x ∘ φ) atTop (𝓝 a) :=
@@ -308,16 +328,13 @@ protected theorem IsSeqCompact.isComplete (hs : IsSeqCompact s) : IsComplete s :
   refine mem_of_superset (htl n) fun y hy => hWV N ⟨u n, hn, htW N ?_⟩
   exact ⟨ht_anti hNn (hu n), ht_anti hNn hy⟩
 
-end UniformSpaceSeqCompact
-
-section MetrizableSpaceSeqCompact
-
-variable [TopologicalSpace X] [PseudoMetrizableSpace X] {s : Set X}
-
 protected theorem IsSeqCompact.isCompact (hs : IsSeqCompact s) : IsCompact s :=
-  letI := pseudoMetrizableSpaceUniformity X
-  haveI := pseudoMetrizableSpaceUniformity_countably_generated X
   isCompact_iff_totallyBounded_isComplete.2 ⟨hs.totallyBounded, hs.isComplete⟩
 
-theorem isCompact_iff_isSeqCompact : IsCompact s ↔ IsSeqCompact s :=
+protected theorem UniformSpace.isCompact_iff_isSeqCompact : IsCompact s ↔ IsSeqCompact s :=
   ⟨fun H => H.isSeqCompact, fun H => H.isCompact⟩
+
+theorem UniformSpace.compactSpace_iff_seqCompactSpace : CompactSpace X ↔ SeqCompactSpace X := by
+  simp only [← isCompact_univ_iff, seqCompactSpace_iff, UniformSpace.isCompact_iff_isSeqCompact]
+
+end UniformSpaceSeqCompact

@@ -3,6 +3,10 @@ Extracted from Data/Fin/Tuple/BubbleSortInduction.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Fin.Tuple.Sort
+import Mathlib.Order.WellFounded
+import Mathlib.Order.PiLex
+import Mathlib.Data.Finite.Prod
 
 /-!
 # "Bubble sort" induction

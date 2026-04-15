@@ -1,8 +1,11 @@
 /-
 Extracted from RingTheory/Flat/CategoryTheory.lean
-Genuine: 5 of 6 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Flat.Basic
+import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
+import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 
 /-!
 # Tensoring with a flat module is an exact functor
@@ -46,31 +49,21 @@ lemma rTensor_shortComplex_exact [Flat R M] (C : ShortComplex <| ModuleCat R) (h
 lemma iff_lTensor_preserves_shortComplex_exact :
     Flat R M ↔
     ∀ (C : ShortComplex <| ModuleCat R) (_ : C.Exact), (C.map (tensorLeft M) |>.Exact) :=
-  ⟨fun _ _ ↦ lTensor_shortComplex_exact _ _, fun H ↦ iff_lTensor_exact.2
+  ⟨fun _ _ ↦ lTensor_shortComplex_exact _ _, fun H ↦ iff_lTensor_exact.2 <|
     fun _ _ _ _ _ _ _ _ _ f g h ↦
       moduleCat_exact_iff_function_exact _ |>.1 <|
-      H (.mk (ModuleCat.ofHom f) (ModuleCat.ofHom g)
-        (ModuleCat.hom_ext (DFunLike.ext _ _ h.apply_apply_eq_zero)))
+      H (.mk (ModuleCat.asHom f) (ModuleCat.asHom g)
+        (DFunLike.ext _ _ h.apply_apply_eq_zero))
           (moduleCat_exact_iff_function_exact _ |>.2 h)⟩
 
 lemma iff_rTensor_preserves_shortComplex_exact :
     Flat R M ↔
     ∀ (C : ShortComplex <| ModuleCat R) (_ : C.Exact), (C.map (tensorRight M) |>.Exact) :=
-  ⟨fun _ _ ↦ rTensor_shortComplex_exact _ _, fun H ↦ iff_rTensor_exact.2
+  ⟨fun _ _ ↦ rTensor_shortComplex_exact _ _, fun H ↦ iff_rTensor_exact.2 <|
     fun _ _ _ _ _ _ _ _ _ f g h ↦
       moduleCat_exact_iff_function_exact _ |>.1 <|
-      H (.mk (ModuleCat.ofHom f) (ModuleCat.ofHom g)
-        (ModuleCat.hom_ext (DFunLike.ext _ _ h.apply_apply_eq_zero)))
+      H (.mk (ModuleCat.asHom f) (ModuleCat.asHom g)
+        (DFunLike.ext _ _ h.apply_apply_eq_zero))
           (moduleCat_exact_iff_function_exact _ |>.2 h)⟩
-
-open Limits
-
-lemma iff_preservesFiniteLimits_tensorLeft :
-    Flat R M ↔ PreservesFiniteLimits (tensorLeft M) := by
-  rw [Module.Flat.iff_lTensor_preserves_shortComplex_exact,
-    ((Functor.exact_tfae <| tensorLeft M).out 1 3 :)]
-  simp [show PreservesFiniteColimits (tensorLeft M) from inferInstance]
-
--- INSTANCE (free from Core): [Module.Flat
 
 end Module.Flat

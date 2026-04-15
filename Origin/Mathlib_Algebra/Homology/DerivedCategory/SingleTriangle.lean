@@ -1,8 +1,9 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/SingleTriangle.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.DerivedCategory.ShortExact
 
 /-!
 # The distinguished triangle of a short exact sequence in an abelian category
@@ -13,12 +14,10 @@ the associated distinguished triangle in the derived category:
 
 ## TODO
 * when the canonical t-structure on the derived category is formalized, refactor
-  this definition to make it a particular case of the triangle induced by a short
-  exact sequence in the heart of a t-structure
+this definition to make it a particular case of the triangle induced by a short
+exact sequence in the heart of a t-structure
 
 -/
-
-assert_not_exists TwoSidedIdeal
 
 universe w v u
 
@@ -40,3 +39,31 @@ noncomputable def singleδ : (singleFunctor C 0).obj S.X₃ ⟶
     triangleOfSESδ (hS.map_of_exact (HomologicalComplex.single C (ComplexShape.up ℤ) 0)) ≫
     (((SingleFunctors.evaluation _ _ 0).mapIso
       (singleFunctorsPostcompQIso C)).inv.app S.X₁)⟦(1 : ℤ)⟧'
+
+@[simps!]
+noncomputable def singleTriangle : Triangle (DerivedCategory C) :=
+  Triangle.mk ((singleFunctor C 0).map S.f)
+    ((singleFunctor C 0).map S.g) hS.singleδ
+
+@[simps!]
+noncomputable def singleTriangleIso :
+    hS.singleTriangle ≅
+      triangleOfSES (hS.map_of_exact (HomologicalComplex.single C (ComplexShape.up ℤ) 0)) := by
+  let e := (SingleFunctors.evaluation _ _ 0).mapIso (singleFunctorsPostcompQIso C)
+  refine Triangle.isoMk _ _ (e.app S.X₁) (e.app S.X₂) (e.app S.X₃) ?_ ?_ ?_
+  · aesop_cat
+  · aesop_cat
+  · dsimp [singleδ, e]
+    rw [Category.assoc, Category.assoc, ← Functor.map_comp, SingleFunctors.inv_hom_id_hom_app]
+    erw [Functor.map_id, comp_id]
+
+lemma singleTriangle_distinguished :
+    hS.singleTriangle ∈ distTriang (DerivedCategory C) :=
+  isomorphic_distinguished _ (triangleOfSES_distinguished (hS.map_of_exact
+    (HomologicalComplex.single C (ComplexShape.up ℤ) 0))) _ (singleTriangleIso hS)
+
+end ShortExact
+
+end ShortComplex
+
+end CategoryTheory

@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Groupoid/Basic.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Groupoid
+import Mathlib.Combinatorics.Quiver.Basic
 
 /-!
 This file defines a few basic properties of groupoids.
@@ -15,6 +17,15 @@ namespace Groupoid
 variable (C : Type*) [Groupoid C]
 
 section Thin
+
+theorem isThin_iff : Quiver.IsThin C ↔ ∀ c : C, Subsingleton (c ⟶ c) := by
+  refine ⟨fun h c => h c c, fun h c d => Subsingleton.intro fun f g => ?_⟩
+  haveI := h d
+  calc
+    f = f ≫ inv g ≫ g := by simp only [inv_eq_inv, IsIso.inv_hom_id, Category.comp_id]
+    _ = f ≫ inv f ≫ g := by congr 1
+                            simp only [inv_eq_inv, IsIso.inv_hom_id, eq_iff_true_of_subsingleton]
+    _ = g := by simp only [inv_eq_inv, IsIso.hom_inv_id_assoc]
 
 end Thin
 

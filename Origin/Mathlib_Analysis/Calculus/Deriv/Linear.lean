@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Linear.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Linear
 
 /-!
 # Derivatives of continuous linear maps from the base field
@@ -33,7 +35,7 @@ variable {x : 𝕜}
 
 variable {s : Set 𝕜}
 
-variable {L : Filter (𝕜 × 𝕜)}
+variable {L : Filter 𝕜}
 
 section ContinuousLinearMap
 
@@ -41,14 +43,52 @@ section ContinuousLinearMap
 
 variable (e : 𝕜 →L[𝕜] F)
 
-protected theorem ContinuousLinearMap.hasDerivAtFilter : HasDerivAtFilter e (e 1) L :=
+protected theorem ContinuousLinearMap.hasDerivAtFilter : HasDerivAtFilter e (e 1) x L :=
   e.hasFDerivAtFilter.hasDerivAtFilter
 
 protected theorem ContinuousLinearMap.hasStrictDerivAt : HasStrictDerivAt e (e 1) x :=
-  e.hasDerivAtFilter
+  e.hasStrictFDerivAt.hasStrictDerivAt
 
 protected theorem ContinuousLinearMap.hasDerivAt : HasDerivAt e (e 1) x :=
   e.hasDerivAtFilter
 
 protected theorem ContinuousLinearMap.hasDerivWithinAt : HasDerivWithinAt e (e 1) s x :=
   e.hasDerivAtFilter
+
+@[simp]
+protected theorem ContinuousLinearMap.deriv : deriv e x = e 1 :=
+  e.hasDerivAt.deriv
+
+protected theorem ContinuousLinearMap.derivWithin (hxs : UniqueDiffWithinAt 𝕜 s x) :
+    derivWithin e s x = e 1 :=
+  e.hasDerivWithinAt.derivWithin hxs
+
+end ContinuousLinearMap
+
+section LinearMap
+
+/-! ### Derivative of bundled linear maps -/
+
+variable (e : 𝕜 →ₗ[𝕜] F)
+
+protected theorem LinearMap.hasDerivAtFilter : HasDerivAtFilter e (e 1) x L :=
+  e.toContinuousLinearMap₁.hasDerivAtFilter
+
+protected theorem LinearMap.hasStrictDerivAt : HasStrictDerivAt e (e 1) x :=
+  e.toContinuousLinearMap₁.hasStrictDerivAt
+
+protected theorem LinearMap.hasDerivAt : HasDerivAt e (e 1) x :=
+  e.hasDerivAtFilter
+
+protected theorem LinearMap.hasDerivWithinAt : HasDerivWithinAt e (e 1) s x :=
+  e.hasDerivAtFilter
+
+@[simp]
+protected theorem LinearMap.deriv : deriv e x = e 1 :=
+  e.hasDerivAt.deriv
+
+protected theorem LinearMap.derivWithin (hxs : UniqueDiffWithinAt 𝕜 s x) :
+    derivWithin e s x = e 1 :=
+  e.hasDerivWithinAt.derivWithin hxs
+
+end LinearMap

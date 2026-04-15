@@ -3,6 +3,7 @@ Extracted from Topology/Category/Profinite/Product.lean
 Genuine: 10 of 12 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.Category.Profinite.Basic
 
 /-!
 # Compact subsets of products as limits in `Profinite`
@@ -57,6 +58,8 @@ theorem surjective_π_app :
   obtain ⟨y, hy⟩ := x.prop
   exact ⟨⟨y, hy.1⟩, Subtype.ext hy.2⟩
 
+theorem map_comp_π_app (h : ∀ i, J i → K i) : map C h ∘ π_app C K = π_app C J := rfl
+
 variable {C}
 
 theorem eq_of_forall_π_app_eq (a b : C)
@@ -81,19 +84,50 @@ noncomputable
 def indexFunctor (hC : IsCompact C) : (Finset ι)ᵒᵖ ⥤ Profinite.{u} where
   obj J := @Profinite.of (obj C (· ∈ (unop J))) _
     (by rw [← isCompact_iff_compactSpace]; exact hC.image (Pi.continuous_precomp' _)) _ _
-  map h := ConcreteCategory.ofHom (map C (leOfHom h.unop))
+  map h := map C (leOfHom h.unop)
 
 noncomputable
 
 def indexCone (hC : IsCompact C) : Cone (indexFunctor hC) where
   pt := @Profinite.of C _ (by rwa [← isCompact_iff_compactSpace]) _ _
-  π := { app := fun J ↦ ConcreteCategory.ofHom (π_app C (· ∈ unop J)) }
+  π := { app := fun J ↦ π_app C (· ∈ unop J) }
 
 variable (hC : IsCompact C)
 
--- INSTANCE (free from Core): isIso_indexCone_lift
-
-set_option backward.isDefEq.respectTransparency false in
+instance isIso_indexCone_lift :
+    IsIso ((limitConeIsLimit.{u, u} (indexFunctor hC)).lift (indexCone hC)) :=
+  haveI : CompactSpace C := by rwa [← isCompact_iff_compactSpace]
+  CompHausLike.isIso_of_bijective _
+    (by
+      refine ⟨fun a b h ↦ ?_, fun a ↦ ?_⟩
+      · refine eq_of_forall_π_app_eq a b (fun J ↦ ?_)
+        apply_fun fun f : (limitCone.{u, u} (indexFunctor hC)).pt => f.val (op J) at h
+        exact h
+      · rsuffices ⟨b, hb⟩ : ∃ (x : C), ∀ (J : Finset ι), π_app C (· ∈ J) x = a.val (op J)
+        · use b
+          apply Subtype.ext
+          apply funext
+          intro J
+          exact hb (unop J)
+        have hc : ∀ (J : Finset ι) s, IsClosed ((π_app C (· ∈ J)) ⁻¹' {s}) := by
+          intro J s
+          refine IsClosed.preimage (π_app C (· ∈ J)).continuous ?_
+          exact T1Space.t1 s
+        have H₁ : ∀ (Q₁ Q₂ : Finset ι), Q₁ ≤ Q₂ →
+            π_app C (· ∈ Q₁) ⁻¹' {a.val (op Q₁)} ⊇
+            π_app C (· ∈ Q₂) ⁻¹' {a.val (op Q₂)} := by
+          intro J K h x hx
+          simp only [Set.mem_preimage, Set.mem_singleton_iff] at hx ⊢
+          rw [← map_comp_π_app C h, Function.comp_apply,
+            hx, ← a.prop (homOfLE h).op]
+          rfl
+        obtain ⟨x, hx⟩ :
+            Set.Nonempty (⋂ (J : Finset ι), π_app C (· ∈ J) ⁻¹' {a.val (op J)}) :=
+          IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed
+            (fun J : Finset ι => π_app C (· ∈ J) ⁻¹' {a.val (op J)}) (directed_of_isDirected_le H₁)
+            (fun J => (Set.singleton_nonempty _).preimage (surjective_π_app _))
+            (fun J => (hc J (a.val (op J))).isCompact) fun J => hc J (a.val (op J))
+        exact ⟨x, Set.mem_iInter.1 hx⟩)
 
 noncomputable
 
@@ -105,7 +139,7 @@ def isoindexConeLift :
 noncomputable
 
 def asLimitindexConeIso : indexCone hC ≅ Profinite.limitCone.{u, u} _ :=
-  Limits.Cone.ext (isoindexConeLift hC) fun _ => rfl
+  Limits.Cones.ext (isoindexConeLift hC) fun _ => rfl
 
 noncomputable
 

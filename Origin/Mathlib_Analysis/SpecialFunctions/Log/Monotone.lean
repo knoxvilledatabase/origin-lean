@@ -3,6 +3,7 @@ Extracted from Analysis/SpecialFunctions/Log/Monotone.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!
 # Logarithm Tonality
@@ -55,25 +56,25 @@ theorem log_div_self_rpow_antitoneOn {a : ℝ} (ha : 0 < a) :
   nth_rw 1 [← rpow_one x]
   rw [← div_self (ne_of_lt ha).symm, div_eq_mul_one_div a a, rpow_mul y_pos.le, rpow_mul x_pos.le,
     log_rpow (rpow_pos_of_pos y_pos a), log_rpow (rpow_pos_of_pos x_pos a), mul_div_assoc,
-    mul_div_assoc, mul_le_mul_iff_right₀ (one_div_pos.mpr ha)]
+    mul_div_assoc, mul_le_mul_left (one_div_pos.mpr ha)]
   refine log_div_self_antitoneOn ?_ ?_ ?_
   · simp only [Set.mem_setOf_eq]
     convert rpow_le_rpow _ hex (le_of_lt ha) using 1
     · rw [← exp_mul]
       simp only [Real.exp_eq_exp]
-      field
+      field_simp
     positivity
   · simp only [Set.mem_setOf_eq]
     convert rpow_le_rpow _ (_root_.trans hex hxy) (le_of_lt ha) using 1
     · rw [← exp_mul]
       simp only [Real.exp_eq_exp]
-      field
+      field_simp
     positivity
   gcongr
 
 theorem log_div_sqrt_antitoneOn : AntitoneOn (fun x : ℝ => log x / √x) { x | exp 2 ≤ x } := by
   simp_rw [sqrt_eq_rpow]
-  convert log_div_self_rpow_antitoneOn one_half_pos
+  convert @log_div_self_rpow_antitoneOn (1 / 2) (by norm_num)
   norm_num
 
 end Real

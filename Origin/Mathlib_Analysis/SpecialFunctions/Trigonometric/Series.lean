@@ -3,6 +3,7 @@ Extracted from Analysis/SpecialFunctions/Trigonometric/Series.lean
 Genuine: 21 of 21 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Exponential
 
 /-!
 # Trigonometric functions as sums of infinite series
@@ -28,8 +29,8 @@ section SinCos
 theorem Complex.hasSum_cos' (z : ℂ) :
     HasSum (fun n : ℕ => (z * Complex.I) ^ (2 * n) / ↑(2 * n)!) (Complex.cos z) := by
   rw [Complex.cos, Complex.exp_eq_exp_ℂ]
-  have := ((expSeries_div_hasSum_exp (z * Complex.I)).add
-    (expSeries_div_hasSum_exp (-z * Complex.I))).div_const 2
+  have := ((expSeries_div_hasSum_exp ℂ (z * Complex.I)).add
+    (expSeries_div_hasSum_exp ℂ (-z * Complex.I))).div_const 2
   replace := (Nat.divModEquiv 2).symm.hasSum_iff.mpr this
   dsimp [Function.comp_def] at this
   simp_rw [← mul_comm 2 _] at this
@@ -45,8 +46,8 @@ theorem Complex.hasSum_sin' (z : ℂ) :
     HasSum (fun n : ℕ => (z * Complex.I) ^ (2 * n + 1) / ↑(2 * n + 1)! / Complex.I)
       (Complex.sin z) := by
   rw [Complex.sin, Complex.exp_eq_exp_ℂ]
-  have := (((expSeries_div_hasSum_exp (-z * Complex.I)).sub
-    (expSeries_div_hasSum_exp (z * Complex.I))).mul_right Complex.I).div_const 2
+  have := (((expSeries_div_hasSum_exp ℂ (-z * Complex.I)).sub
+    (expSeries_div_hasSum_exp ℂ (z * Complex.I))).mul_right Complex.I).div_const 2
   replace := (Nat.divModEquiv 2).symm.hasSum_iff.mpr this
   dsimp [Function.comp_def] at this
   simp_rw [← mul_comm 2 _] at this
@@ -124,7 +125,7 @@ end Complex
 
 namespace Real
 
-lemma hasSum_cosh (r : ℝ) : HasSum (fun n ↦ r ^ (2 * n) / ↑(2 * n)!) (cosh r) :=
+lemma hasSum_cosh (r : ℝ) : HasSum (fun n  ↦ r ^ (2 * n) / ↑(2 * n)!) (cosh r) :=
   mod_cast Complex.hasSum_cosh r
 
 lemma hasSum_sinh (r : ℝ) : HasSum (fun n ↦ r ^ (2 * n + 1) / ↑(2 * n + 1)!) (sinh r) :=
@@ -136,8 +137,8 @@ lemma sinh_eq_tsum (r : ℝ) : sinh r = ∑' n, r ^ (2 * n + 1) / ↑(2 * n + 1)
   r.hasSum_sinh.tsum_eq.symm
 
 lemma cosh_le_exp_half_sq (x : ℝ) : cosh x ≤ exp (x ^ 2 / 2) := by
-  rw [cosh_eq_tsum, exp_eq_exp_ℝ, exp_eq_tsum ℝ]
-  refine x.hasSum_cosh.summable.tsum_le_tsum (fun i ↦ ?_) <| expSeries_summable' (x ^ 2 / 2)
+  rw [cosh_eq_tsum, exp_eq_exp_ℝ, exp_eq_tsum]
+  refine tsum_le_tsum (fun i ↦ ?_) x.hasSum_cosh.summable <| expSeries_summable' (x ^ 2 / 2)
   simp only [div_pow, pow_mul, smul_eq_mul, inv_mul_eq_div, div_div]
   gcongr
   norm_cast

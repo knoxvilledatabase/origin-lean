@@ -1,8 +1,10 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/Ext/ExtClass.lean
-Genuine: 3 of 5 | Dissolved: 0 | Infrastructure: 2
+Genuine: 8 of 10 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.DerivedCategory.Ext.Basic
+import Mathlib.Algebra.Homology.DerivedCategory.SingleTriangle
 
 /-!
 # The Ext class of a short exact sequence
@@ -12,8 +14,6 @@ in an abelian category, we construct the associated class in
 `Ext S.X₃ S.X₁ 1`.
 
 -/
-
-assert_not_exists TwoSidedIdeal
 
 universe w' w v u
 
@@ -29,11 +29,15 @@ namespace ShortComplex
 
 variable (S : ShortComplex C)
 
+lemma ext_mk₀_f_comp_ext_mk₀_g : (Ext.mk₀ S.f).comp (Ext.mk₀ S.g) (zero_add 0) = 0 := by simp
+
 namespace ShortExact
 
 variable {S}
 
 variable (hS : S.ShortExact)
+
+section
 
 local notation "W" => HomologicalComplex.quasiIso C (ComplexShape.up ℤ)
 
@@ -49,9 +53,9 @@ local notation "hqis" => CochainComplex.mappingCone.quasiIso_descShortComplex hS
 
 local notation "δ" => Triangle.mor₃ (CochainComplex.mappingCone.triangle (ShortComplex.f S'))
 
--- INSTANCE (free from Core): :
-
-set_option backward.privateInPublic true in
+instance : HasSmallLocalizedShiftedHom.{w} W ℤ (S').X₃ (S').X₁ := by
+  dsimp
+  infer_instance
 
 include hS in
 
@@ -61,8 +65,6 @@ private lemma hasSmallLocalizedHom_S'_X₃_K :
   dsimp
   apply Localization.hasSmallLocalizedHom_of_hasSmallLocalizedShiftedHom₀ (M := ℤ)
 
-set_option backward.privateInPublic true in
-
 include hS in
 
 private lemma hasSmallLocalizedShiftedHom_K_S'_X₁ :
@@ -70,14 +72,56 @@ private lemma hasSmallLocalizedShiftedHom_K_S'_X₁ :
   rw [Localization.hasSmallLocalizedShiftedHom_iff_source.{w} W ℤ qis hqis (S').X₁]
   infer_instance
 
-set_option backward.privateInPublic true in
-
-set_option backward.privateInPublic.warn false in
-
 noncomputable def extClass : Ext.{w} S.X₃ S.X₁ 1 := by
   have := hS.hasSmallLocalizedHom_S'_X₃_K
   have := hS.hasSmallLocalizedShiftedHom_K_S'_X₁
   change SmallHom W (S').X₃ ((S').X₁⟦(1 : ℤ)⟧)
   exact (SmallHom.mkInv qis hqis).comp (SmallHom.mk W δ)
 
-set_option backward.isDefEq.respectTransparency false in
+@[simp]
+lemma extClass_hom [HasDerivedCategory.{w'} C] : hS.extClass.hom = hS.singleδ := by
+  change SmallShiftedHom.equiv W Q hS.extClass = _
+  dsimp [extClass, SmallShiftedHom.equiv]
+  erw [SmallHom.equiv_comp, Iso.homToEquiv_apply]
+  rw [SmallHom.equiv_mkInv, SmallHom.equiv_mk]
+  dsimp [singleδ, triangleOfSESδ]
+  rw [Category.assoc, Category.assoc, Category.assoc,
+    singleFunctorsPostcompQIso_hom_hom, singleFunctorsPostcompQIso_inv_hom]
+  erw [Category.id_comp, Functor.map_id, Category.comp_id]
+  rfl
+
+end
+
+@[simp]
+lemma comp_extClass : (Ext.mk₀ S.g).comp hS.extClass (zero_add 1) = 0 := by
+  letI := HasDerivedCategory.standard C
+  ext
+  simp only [Ext.comp_hom, Ext.mk₀_hom, extClass_hom, Ext.zero_hom,
+    ShiftedHom.mk₀_comp]
+  exact comp_distTriang_mor_zero₂₃ _ hS.singleTriangle_distinguished
+
+@[simp]
+lemma comp_extClass_assoc {Y : C} {n : ℕ} (γ : Ext S.X₁ Y n) {n' : ℕ} (h : 1 + n = n') :
+    (Ext.mk₀ S.g).comp (hS.extClass.comp γ h) (zero_add n') = 0 := by
+  rw [← Ext.comp_assoc (a₁₂ := 1) _ _ _ (by omega) (by omega) (by omega),
+    comp_extClass, Ext.zero_comp]
+
+@[simp]
+lemma extClass_comp : hS.extClass.comp (Ext.mk₀ S.f) (add_zero 1) = 0 := by
+  letI := HasDerivedCategory.standard C
+  ext
+  simp only [Ext.comp_hom, Ext.mk₀_hom, extClass_hom, Ext.zero_hom,
+    ShiftedHom.comp_mk₀]
+  exact comp_distTriang_mor_zero₃₁ _ hS.singleTriangle_distinguished
+
+@[simp]
+lemma extClass_comp_assoc {Y : C} {n : ℕ} (γ : Ext S.X₂ Y n) {n' : ℕ} {h : 1 + n = n'} :
+    hS.extClass.comp ((Ext.mk₀ S.f).comp γ (zero_add n)) h = 0 := by
+  rw [← Ext.comp_assoc (a₁₂ := 1) _ _ _ (by omega) (by omega) (by omega),
+    extClass_comp, Ext.zero_comp]
+
+end ShortExact
+
+end ShortComplex
+
+end CategoryTheory

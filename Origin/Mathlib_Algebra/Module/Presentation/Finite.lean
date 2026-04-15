@@ -3,6 +3,8 @@ Extracted from Algebra/Module/Presentation/Finite.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Presentation.Basic
+import Mathlib.Algebra.Module.FinitePresentation
 
 /-!
 # Characterization of finitely presented modules
@@ -41,7 +43,7 @@ lemma finitePresentation_iff_exists_presentation :
   · intro
     obtain ⟨G : Type w₀, _, var, hG⟩ :=
       Submodule.fg_iff_exists_finite_generating_family.1
-        (finite_def.1 (inferInstance : Module.Finite A M))
+        (finite_def.1 (inferInstanceAs (Module.Finite A M)))
     obtain ⟨R : Type w₁, _, relation, hR⟩ :=
       Submodule.fg_iff_exists_finite_generating_family.1
         (Module.FinitePresentation.fg_ker (Finsupp.linearCombination A var) (by

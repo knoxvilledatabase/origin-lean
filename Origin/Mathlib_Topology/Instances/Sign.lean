@@ -3,23 +3,28 @@ Extracted from Topology/Instances/Sign.lean
 Genuine: 2 of 5 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Sign
+import Mathlib.Topology.Order.Basic
 
 /-!
 # Topology on `SignType`
 
 This file gives `SignType` the discrete topology, and proves continuity results for `SignType.sign`
 in an `OrderTopology`.
+
 -/
 
--- INSTANCE (free from Core): :
+instance : TopologicalSpace SignType :=
+  ⊥
 
--- INSTANCE (free from Core): :
+instance : DiscreteTopology SignType :=
+  ⟨rfl⟩
 
 variable {α : Type*} [Zero α] [TopologicalSpace α]
 
 section PartialOrder
 
-variable [PartialOrder α] [DecidableLT α] [OrderTopology α]
+variable [PartialOrder α] [DecidableRel ((· < ·) : α → α → Prop)] [OrderTopology α]
 
 theorem continuousAt_sign_of_pos {a : α} (h : 0 < a) : ContinuousAt SignType.sign a := by
   refine (continuousAt_const : ContinuousAt (fun _ => (1 : SignType)) a).congr ?_

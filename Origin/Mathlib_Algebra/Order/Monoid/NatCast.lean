@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/Order/Monoid/NatCast.lean
-Genuine: 5 of 7 | Dissolved: 2 | Infrastructure: 0
+Genuine: 12 of 17 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
+import Mathlib.Algebra.Order.ZeroLEOne
+import Mathlib.Data.Nat.Cast.Defs
 
 /-!
 # Order of numerals in an `AddMonoidWithOne`.
@@ -36,15 +39,57 @@ lemma zero_le_four [Preorder α] [ZeroLEOneClass α] [AddLeftMono α] :
 lemma one_le_two [LE α] [ZeroLEOneClass α] [AddLeftMono α] :
     (1 : α) ≤ 2 :=
   calc (1 : α) = 1 + 0 := (add_zero 1).symm
-     _ ≤ 1 + 1 := by gcongr; exact zero_le_one
+     _ ≤ 1 + 1 := add_le_add_left zero_le_one _
      _ = 2 := one_add_one_eq_two
 
 lemma one_le_two' [LE α] [ZeroLEOneClass α] [AddRightMono α] :
     (1 : α) ≤ 2 :=
   calc (1 : α) = 0 + 1 := (zero_add 1).symm
-     _ ≤ 1 + 1 := by gcongr; exact zero_le_one
+     _ ≤ 1 + 1 := add_le_add_right zero_le_one _
      _ = 2 := one_add_one_eq_two
+
+section
 
 variable [PartialOrder α] [ZeroLEOneClass α] [NeZero (1 : α)]
 
+section
+
 variable [AddLeftMono α]
+
+@[simp] lemma zero_lt_two : (0 : α) < 2 := zero_lt_one.trans_le one_le_two
+
+@[simp] lemma zero_lt_three : (0 : α) < 3 := by
+  rw [← two_add_one_eq_three]
+  exact lt_add_of_lt_of_nonneg zero_lt_two zero_le_one
+
+@[simp] lemma zero_lt_four : (0 : α) < 4 := by
+  rw [← three_add_one_eq_four]
+  exact lt_add_of_lt_of_nonneg zero_lt_three zero_le_one
+
+variable (α)
+
+lemma zero_lt_two' : (0 : α) < 2 := zero_lt_two
+
+lemma zero_lt_three' : (0 : α) < 3 := zero_lt_three
+
+lemma zero_lt_four' : (0 : α) < 4 := zero_lt_four
+
+instance ZeroLEOneClass.neZero.two : NeZero (2 : α) := ⟨zero_lt_two.ne'⟩
+
+instance ZeroLEOneClass.neZero.three : NeZero (3 : α) := ⟨zero_lt_three.ne'⟩
+
+instance ZeroLEOneClass.neZero.four : NeZero (4 : α) := ⟨zero_lt_four.ne'⟩
+
+end
+
+lemma one_lt_two [AddLeftStrictMono α] : (1 : α) < 2 := by
+  rw [← one_add_one_eq_two]
+  exact lt_add_one _
+
+end
+
+alias two_pos := zero_lt_two
+
+alias three_pos := zero_lt_three
+
+alias four_pos := zero_lt_four

@@ -3,6 +3,8 @@ Extracted from Data/Pi/Interval.lean
 Genuine: 9 of 14 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Order.Interval.Finset.Basic
+import Mathlib.Data.Fintype.BigOperators
 
 /-!
 # Intervals in a pi type
@@ -25,9 +27,14 @@ section LocallyFiniteOrder
 
 variable [∀ i, LocallyFiniteOrder (α i)]
 
--- INSTANCE (free from Core): instLocallyFiniteOrder
+instance instLocallyFiniteOrder : LocallyFiniteOrder (∀ i, α i) :=
+  LocallyFiniteOrder.ofIcc _ (fun a b => piFinset fun i => Icc (a i) (b i)) fun a b x => by
+    simp_rw [mem_piFinset, mem_Icc, le_def, forall_and]
 
 variable (a b : ∀ i, α i)
+
+theorem Icc_eq : Icc a b = piFinset fun i => Icc (a i) (b i) :=
+  rfl
 
 theorem card_Icc : #(Icc a b) = ∏ i, #(Icc (a i) (b i)) :=
   card_piFinset _
@@ -47,7 +54,9 @@ section LocallyFiniteOrderBot
 
 variable [∀ i, LocallyFiniteOrderBot (α i)] (b : ∀ i, α i)
 
--- INSTANCE (free from Core): instLocallyFiniteOrderBot
+instance instLocallyFiniteOrderBot : LocallyFiniteOrderBot (∀ i, α i) :=
+  .ofIic _ (fun b => piFinset fun i => Iic (b i)) fun b x => by
+    simp_rw [mem_piFinset, mem_Iic, le_def]
 
 lemma card_Iic : #(Iic b) = ∏ i, #(Iic (b i)) := card_piFinset _
 
@@ -59,7 +68,9 @@ section LocallyFiniteOrderTop
 
 variable [∀ i, LocallyFiniteOrderTop (α i)] (a : ∀ i, α i)
 
--- INSTANCE (free from Core): instLocallyFiniteOrderTop
+instance instLocallyFiniteOrderTop : LocallyFiniteOrderTop (∀ i, α i) :=
+  LocallyFiniteOrderTop.ofIci _ (fun a => piFinset fun i => Ici (a i)) fun a x => by
+    simp_rw [mem_piFinset, mem_Ici, le_def]
 
 lemma card_Ici : #(Ici a) = ∏ i, #(Ici (a i)) := card_piFinset _
 
@@ -72,6 +83,8 @@ end PartialOrder
 section Lattice
 
 variable [∀ i, Lattice (α i)] [∀ i, LocallyFiniteOrder (α i)] (a b : ∀ i, α i)
+
+theorem uIcc_eq : uIcc a b = piFinset fun i => uIcc (a i) (b i) := rfl
 
 theorem card_uIcc : #(uIcc a b) = ∏ i, #(uIcc (a i) (b i)) := card_Icc _ _
 

@@ -3,6 +3,9 @@ Extracted from Topology/MetricSpace/Perfect.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Perfect
+import Mathlib.Topology.MetricSpace.Polish
+import Mathlib.Topology.MetricSpace.CantorScheme
 
 /-!
 # Perfect Sets
@@ -22,42 +25,43 @@ including a version of the Cantor-Bendixson Theorem.
 ## Tags
 
 accumulation point, perfect set, cantor-bendixson.
--/
 
-open Set Filter Metric Function
+--/
 
-open scoped ENNReal
+open Set Filter
 
 section CantorInjMetric
+
+open Function ENNReal
 
 variable {α : Type*} [MetricSpace α] {C : Set α} {ε : ℝ≥0∞}
 
 private theorem Perfect.small_diam_aux (hC : Perfect C) (ε_pos : 0 < ε) {x : α} (xC : x ∈ C) :
-    let D := closure (Metric.eball x (ε / 2) ∩ C)
-    Perfect D ∧ D.Nonempty ∧ D ⊆ C ∧ Metric.ediam D ≤ ε := by
-  have : x ∈ Metric.eball x (ε / 2) := by
-    apply Metric.mem_eball_self
+    let D := closure (EMetric.ball x (ε / 2) ∩ C)
+    Perfect D ∧ D.Nonempty ∧ D ⊆ C ∧ EMetric.diam D ≤ ε := by
+  have : x ∈ EMetric.ball x (ε / 2) := by
+    apply EMetric.mem_ball_self
     rw [ENNReal.div_pos_iff]
-    exact ⟨ne_of_gt ε_pos, by simp⟩
-  have := hC.closure_nhds_inter x xC this Metric.isOpen_eball
+    exact ⟨ne_of_gt ε_pos, by norm_num⟩
+  have := hC.closure_nhds_inter x xC this EMetric.isOpen_ball
   refine ⟨this.1, this.2, ?_, ?_⟩
   · rw [IsClosed.closure_subset_iff hC.closed]
     apply inter_subset_right
-  rw [Metric.ediam_closure]
-  apply le_trans (Metric.ediam_mono inter_subset_left)
-  convert Metric.ediam_eball_le (x := x)
+  rw [EMetric.diam_closure]
+  apply le_trans (EMetric.diam_mono inter_subset_left)
+  convert EMetric.diam_ball (x := x)
   rw [mul_comm, ENNReal.div_mul_cancel] <;> norm_num
 
 theorem Perfect.small_diam_splitting (hC : Perfect C) (hnonempty : C.Nonempty) (ε_pos : 0 < ε) :
-    ∃ C₀ C₁ : Set α, (Perfect C₀ ∧ C₀.Nonempty ∧ C₀ ⊆ C ∧ Metric.ediam C₀ ≤ ε) ∧
-    (Perfect C₁ ∧ C₁.Nonempty ∧ C₁ ⊆ C ∧ Metric.ediam C₁ ≤ ε) ∧ Disjoint C₀ C₁ := by
+    ∃ C₀ C₁ : Set α, (Perfect C₀ ∧ C₀.Nonempty ∧ C₀ ⊆ C ∧ EMetric.diam C₀ ≤ ε) ∧
+    (Perfect C₁ ∧ C₁.Nonempty ∧ C₁ ⊆ C ∧ EMetric.diam C₁ ≤ ε) ∧ Disjoint C₀ C₁ := by
   rcases hC.splitting hnonempty with ⟨D₀, D₁, ⟨perf0, non0, sub0⟩, ⟨perf1, non1, sub1⟩, hdisj⟩
-  obtain ⟨x₀, hx₀⟩ := non0
-  obtain ⟨x₁, hx₁⟩ := non1
+  cases' non0 with x₀ hx₀
+  cases' non1 with x₁ hx₁
   rcases perf0.small_diam_aux ε_pos hx₀ with ⟨perf0', non0', sub0', diam0⟩
   rcases perf1.small_diam_aux ε_pos hx₁ with ⟨perf1', non1', sub1', diam1⟩
   refine
-    ⟨closure (Metric.eball x₀ (ε / 2) ∩ D₀), closure (Metric.eball x₁ (ε / 2) ∩ D₁),
+    ⟨closure (EMetric.ball x₀ (ε / 2) ∩ D₀), closure (EMetric.ball x₁ (ε / 2) ∩ D₁),
       ⟨perf0', non0', sub0'.trans sub0, diam0⟩, ⟨perf1', non1', sub1'.trans sub1, diam1⟩, ?_⟩
   apply Disjoint.mono _ _ hdisj <;> assumption
 
@@ -73,14 +77,12 @@ theorem Perfect.exists_nat_bool_injection
     fun {C : Set α} (hC : Perfect C) (hnonempty : C.Nonempty) {ε : ℝ≥0∞} (hε : 0 < ε) =>
     hC.small_diam_splitting hnonempty hε
   let DP : List Bool → P := fun l => by
-    induction l with
-    | nil => exact ⟨C, ⟨hC, hnonempty⟩⟩
-    | cons a l ih =>
-      cases a
-      · use C0 ih.property.1 ih.property.2 (upos (l.length + 1))
-        exact ⟨(h0 _ _ _).1, (h0 _ _ _).2.1⟩
-      use C1 ih.property.1 ih.property.2 (upos (l.length + 1))
-      exact ⟨(h1 _ _ _).1, (h1 _ _ _).2.1⟩
+    induction' l with a l ih; · exact ⟨C, ⟨hC, hnonempty⟩⟩
+    cases a
+    · use C0 ih.property.1 ih.property.2 (upos (l.length + 1))
+      exact ⟨(h0 _ _ _).1, (h0 _ _ _).2.1⟩
+    use C1 ih.property.1 ih.property.2 (upos (l.length + 1))
+    exact ⟨(h1 _ _ _).1, (h1 _ _ _).2.1⟩
   let D : List Bool → Set α := fun l => (DP l).val
   have hanti : ClosureAntitone D := by
     refine Antitone.closureAntitone ?_ fun l => (DP l).property.1.closed
@@ -113,7 +115,7 @@ theorem Perfect.exists_nat_bool_injection
   · rintro y ⟨x, rfl⟩
     exact map_mem ⟨_, hdom⟩ 0
   · apply hdiam.map_continuous.comp
-    fun_prop
+    continuity
   intro x y hxy
   simpa only [← Subtype.val_inj] using hdisj'.map_injective hxy
 
@@ -122,7 +124,7 @@ end CantorInjMetric
 theorem IsClosed.exists_nat_bool_injection_of_not_countable {α : Type*} [TopologicalSpace α]
     [PolishSpace α] {C : Set α} (hC : IsClosed C) (hunc : ¬C.Countable) :
     ∃ f : (ℕ → Bool) → α, range f ⊆ C ∧ Continuous f ∧ Function.Injective f := by
-  letI := TopologicalSpace.upgradeIsCompletelyMetrizable α
+  letI := upgradePolishSpace α
   obtain ⟨D, hD, Dnonempty, hDC⟩ := exists_perfect_nonempty_of_isClosed_of_not_countable hC hunc
   obtain ⟨f, hfD, hf⟩ := hD.exists_nat_bool_injection Dnonempty
   exact ⟨f, hfD.trans hDC, hf⟩

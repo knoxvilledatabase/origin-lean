@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Set/Pairwise/Lattice.lean
-Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 of 13 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Lattice
+import Mathlib.Data.Set.Pairwise.Basic
 
 /-!
 # Relations holding pairwise
@@ -20,7 +22,7 @@ variable {f : ι → α} {s : Set α}
 
 namespace Set
 
-theorem pairwise_iUnion {f : κ → Set α} (hd : Directed (· ⊆ ·) f) :
+theorem pairwise_iUnion {f : κ → Set α} (h : Directed (· ⊆ ·) f) :
     (⋃ n, f n).Pairwise r ↔ ∀ n, (f n).Pairwise r := by
   constructor
   · intro H n
@@ -28,23 +30,12 @@ theorem pairwise_iUnion {f : κ → Set α} (hd : Directed (· ⊆ ·) f) :
   · intro H i hi j hj hij
     rcases mem_iUnion.1 hi with ⟨m, hm⟩
     rcases mem_iUnion.1 hj with ⟨n, hn⟩
-    rcases hd m n with ⟨p, mp, np⟩
+    rcases h m n with ⟨p, mp, np⟩
     exact H p (mp hm) (np hn) hij
 
-theorem pairwise_iUnion₂ {s : Set (Set α)} (hd : DirectedOn (· ⊆ ·) s)
-    (r : α → α → Prop) (h : ∀ a ∈ s, a.Pairwise r) : (⋃ a ∈ s, a).Pairwise r := by
-  simp only [Set.Pairwise, mem_iUnion, exists_prop, forall_exists_index, and_imp]
-  intro x S hS hx y T hT hy hne
-  obtain ⟨U, hU, hSU, hTU⟩ := hd S hS T hT
-  exact h U hU (hSU hx) (hTU hy) hne
-
-theorem pairwise_iUnion₂_iff {s : Set (Set α)} (hd : DirectedOn (· ⊆ ·) s) :
-    (⋃ a ∈ s, a).Pairwise r ↔ ∀ a ∈ s, a.Pairwise r :=
-  ⟨fun h a ha ↦ h.mono <| subset_iUnion₂_of_subset a ha (by rfl), pairwise_iUnion₂ hd _⟩
-
-theorem pairwise_sUnion {r : α → α → Prop} {s : Set (Set α)} (hd : DirectedOn (· ⊆ ·) s) :
+theorem pairwise_sUnion {r : α → α → Prop} {s : Set (Set α)} (h : DirectedOn (· ⊆ ·) s) :
     (⋃₀ s).Pairwise r ↔ ∀ a ∈ s, Set.Pairwise a r := by
-  rw [sUnion_eq_iUnion, pairwise_iUnion hd.directed_val, SetCoe.forall]
+  rw [sUnion_eq_iUnion, pairwise_iUnion h.directed_val, SetCoe.forall]
 
 end Set
 
@@ -79,9 +70,10 @@ theorem PairwiseDisjoint.biUnion {s : Set ι'} {g : ι' → Set ι} {f : ι → 
   obtain ⟨d, hd, hb⟩ := hb
   obtain hcd | hcd := eq_or_ne (g c) (g d)
   · exact hg d hd (hcd ▸ ha) hb hab
+  -- Porting note: the elaborator couldn't figure out `f` here.
   · exact (hs hc hd <| ne_of_apply_ne _ hcd).mono
-      (le_iSup₂ (f := fun i _ => f i) a ha)
-      (le_iSup₂ (f := fun i _ => f i) b hb)
+      (le_iSup₂ (f := fun i (_ : i ∈ g c) => f i) a ha)
+      (le_iSup₂ (f := fun i (_ : i ∈ g d) => f i) b hb)
 
 theorem PairwiseDisjoint.prod_left {f : ι × ι' → α}
     (hs : s.PairwiseDisjoint fun i => ⨆ i' ∈ t, f (i, i'))
@@ -90,7 +82,7 @@ theorem PairwiseDisjoint.prod_left {f : ι × ι' → α}
   rintro ⟨i, i'⟩ hi ⟨j, j'⟩ hj h
   rw [mem_prod] at hi hj
   obtain rfl | hij := eq_or_ne i j
-  · refine (ht hi.2 hj.2 <| (Prod.mk_right_injective _).ne_iff.1 h).mono ?_ ?_
+  · refine (ht hi.2 hj.2 <| (Prod.mk.inj_left _).ne_iff.1 h).mono ?_ ?_
     · convert le_iSup₂ (α := α) i hi.1; rfl
     · convert le_iSup₂ (α := α) i hj.1; rfl
   · refine (hs hi.1 hj.1 hij).mono ?_ ?_
@@ -125,6 +117,39 @@ theorem biUnion_diff_biUnion_eq {s t : Set ι} {f : ι → Set α} (h : (s ∪ t
   exact (h (Or.inl hi.1) (Or.inr hj) (ne_of_mem_of_not_mem hj hi.2).symm).le_bot ⟨ha, haj⟩
 
 noncomputable def biUnionEqSigmaOfDisjoint {s : Set ι} {f : ι → Set α} (h : s.PairwiseDisjoint f) :
-    (⋃ i ∈ s, f i) ≃ Σ i : s, f i :=
+    (⋃ i ∈ s, f i) ≃ Σi : s, f i :=
   (Equiv.setCongr (biUnion_eq_iUnion _ _)).trans <|
-    unionEqSigmaOfDisjoint fun ⟨_i, hi⟩ ⟨_j, hj⟩ ne => h hi hj fun eq => ne <| Subtype.ext eq
+    unionEqSigmaOfDisjoint fun ⟨_i, hi⟩ ⟨_j, hj⟩ ne => h hi hj fun eq => ne <| Subtype.eq eq
+
+end Set
+
+section
+
+variable {f : ι → Set α} {s t : Set ι}
+
+theorem Set.PairwiseDisjoint.subset_of_biUnion_subset_biUnion (h₀ : (s ∪ t).PairwiseDisjoint f)
+    (h₁ : ∀ i ∈ s, (f i).Nonempty) (h : ⋃ i ∈ s, f i ⊆ ⋃ i ∈ t, f i) : s ⊆ t := by
+  rintro i hi
+  obtain ⟨a, hai⟩ := h₁ i hi
+  obtain ⟨j, hj, haj⟩ := mem_iUnion₂.1 (h <| mem_iUnion₂_of_mem hi hai)
+  rwa [h₀.eq (subset_union_left hi) (subset_union_right hj)
+      (not_disjoint_iff.2 ⟨a, hai, haj⟩)]
+
+theorem Pairwise.subset_of_biUnion_subset_biUnion (h₀ : Pairwise (Disjoint on f))
+    (h₁ : ∀ i ∈ s, (f i).Nonempty) (h : ⋃ i ∈ s, f i ⊆ ⋃ i ∈ t, f i) : s ⊆ t :=
+  Set.PairwiseDisjoint.subset_of_biUnion_subset_biUnion (h₀.set_pairwise _) h₁ h
+
+theorem Pairwise.biUnion_injective (h₀ : Pairwise (Disjoint on f)) (h₁ : ∀ i, (f i).Nonempty) :
+    Injective fun s : Set ι => ⋃ i ∈ s, f i := fun _s _t h =>
+  ((h₀.subset_of_biUnion_subset_biUnion fun _ _ => h₁ _) <| h.subset).antisymm <|
+    (h₀.subset_of_biUnion_subset_biUnion fun _ _ => h₁ _) <| h.superset
+
+theorem pairwiseDisjoint_unique {y : α}
+    (h_disjoint : PairwiseDisjoint s f)
+    (hy : y ∈ (⋃ i ∈ s, f i)) : ∃! i, i ∈ s ∧ y ∈ f i := by
+  refine exists_unique_of_exists_of_unique ?ex ?unique
+  · simpa only [mem_iUnion, exists_prop] using hy
+  · rintro i j ⟨his, hi⟩ ⟨hjs, hj⟩
+    exact h_disjoint.elim his hjs <| not_disjoint_iff.mpr ⟨y, ⟨hi, hj⟩⟩
+
+end

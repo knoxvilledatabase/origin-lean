@@ -1,8 +1,12 @@
 /-
 Extracted from Algebra/Order/Antidiag/Pi.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 12 of 18 | Dissolved: 6 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Group.Pointwise.Finset.Basic
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Data.Fin.Tuple.NatAntidiagonal
+import Mathlib.Data.Finset.Sym
 
 /-!
 # Antidiagonal of functions as finsets
@@ -52,8 +56,6 @@ In this section, we define the antidiagonals in `Fin d → μ` by recursion on `
 computationally efficient, although probably not as efficient as `Finset.Nat.antidiagonalTuple`.
 -/
 
-set_option backward.proofsInPublic true in
-
 def finAntidiagonal (d : ℕ) (n : μ) : Finset (Fin d → μ) :=
   aux d n
 where
@@ -76,7 +78,7 @@ where
             simp_rw [Finset.mem_map, Embedding.coeFn_mk] at hti htj
             obtain ⟨ai, hai, hij'⟩ := hti
             obtain ⟨aj, haj, rfl⟩ := htj
-            rw [Fin.cons_inj] at hij'
+            rw [Fin.cons_eq_cons] at hij'
             ext
             · exact hij'.1
             · obtain ⟨-, rfl⟩ := hij'
@@ -89,3 +91,130 @@ where
             simp only [Fin.cons_zero, Fin.cons_succ]
           · intro hf
             exact ⟨_, _, hf, _, rfl, Fin.cons_self_tail f⟩ }
+
+@[simp] lemma mem_finAntidiagonal {d : ℕ} {f : Fin d → μ} :
+    f ∈ finAntidiagonal d n ↔ ∑ i, f i = n := (finAntidiagonal.aux d n).prop f
+
+/-!
+### `ι → μ`
+
+In this section, we transfer the antidiagonals in `Fin s.card → μ` to antidiagonals in `ι → s` by
+choosing an identification `s ≃ Fin s.card` and proving that the end result does not depend on that
+choice.
+-/
+
+def piAntidiag (s : Finset ι) (n : μ) : Finset (ι → μ) := by
+  refine (Fintype.truncEquivFinOfCardEq <| Fintype.card_coe s).lift
+    (fun e ↦ (finAntidiagonal s.card n).map ⟨fun f i ↦ if hi : i ∈ s then f (e ⟨i, hi⟩) else 0, ?_⟩)
+    fun e₁ e₂ ↦ ?_
+  · rintro f g hfg
+    ext i
+    simpa using congr_fun hfg (e.symm i)
+  · ext f
+    simp only [mem_map, mem_finAntidiagonal]
+    refine Equiv.exists_congr ((e₁.symm.trans e₂).arrowCongr <| .refl _) fun g ↦ ?_
+    have := Fintype.sum_equiv (e₂.symm.trans e₁) _ g fun _ ↦ rfl
+    aesop
+
+variable {s : Finset ι} {n : μ} {f : ι → μ}
+
+-- DISSOLVED: mem_piAntidiag
+
+@[simp] lemma piAntidiag_empty_zero : piAntidiag (∅ : Finset ι) (0 : μ) = {0} := by
+  ext; simp [Fintype.sum_eq_zero_iff_of_nonneg, funext_iff, not_imp_comm, ← forall_and]
+
+-- DISSOLVED: piAntidiag_empty_of_ne_zero
+
+lemma piAntidiag_empty (n : μ) : piAntidiag (∅ : Finset ι) n = if n = 0 then {0} else ∅ := by
+  split_ifs with hn <;> simp [*]
+
+lemma finsetCongr_piAntidiag_eq_antidiag (n : μ) :
+    Equiv.finsetCongr (Equiv.boolArrowEquivProd _) (piAntidiag univ n) = antidiagonal n := by
+  ext ⟨x₁, x₂⟩
+  simp_rw [Equiv.finsetCongr_apply, mem_map, Equiv.toEmbedding, Function.Embedding.coeFn_mk,
+    ← Equiv.eq_symm_apply]
+  simp [add_comm]
+
+end AddCommMonoid
+
+section AddCancelCommMonoid
+
+variable [DecidableEq ι] [AddCancelCommMonoid μ] [HasAntidiagonal μ] [DecidableEq μ] {i : ι}
+  {s : Finset ι}
+
+lemma pairwiseDisjoint_piAntidiag_map_addRightEmbedding (hi : i ∉ s) (n : μ) :
+    (antidiagonal n : Set (μ × μ)).PairwiseDisjoint fun p ↦
+      map (addRightEmbedding fun j ↦ if j = i then p.1 else 0) (s.piAntidiag p.2) := by
+  rintro ⟨a, b⟩ hab ⟨c, d⟩ hcd
+  simp only [ne_eq, antidiagonal_congr' hab hcd, disjoint_left, mem_map, mem_piAntidiag,
+    addRightEmbedding_apply, not_exists, not_and, and_imp, forall_exists_index]
+  rintro hfg _ f rfl - rfl g rfl - hgf
+  exact hfg <| by simpa [sum_add_distrib, hi] using congr_arg (∑ j ∈ s, · j) hgf.symm
+
+lemma piAntidiag_cons (hi : i ∉ s) (n : μ) :
+    piAntidiag (cons i s hi) n = (antidiagonal n).disjiUnion (fun p : μ × μ ↦
+      (piAntidiag s p.snd).map (addRightEmbedding fun t ↦ if t = i then p.fst else 0))
+        (pairwiseDisjoint_piAntidiag_map_addRightEmbedding hi _) := by
+  ext f
+  simp only [mem_piAntidiag, sum_cons, ne_eq, mem_cons, mem_disjiUnion, mem_antidiagonal, mem_map,
+    addLeftEmbedding_apply, Prod.exists]
+  constructor
+  · rintro ⟨hn, hf⟩
+    refine ⟨_, _, hn, update f i 0, ⟨sum_update_of_not_mem hi _ _, fun j ↦ ?_⟩, by aesop⟩
+    have := fun h₁ h₂ ↦ (hf j h₁).resolve_left h₂
+    aesop (add simp [update])
+  · rintro ⟨a, _, hn, g, ⟨rfl, hg⟩, rfl⟩
+    have := hg i
+    aesop (add simp [sum_add_distrib])
+
+lemma piAntidiag_insert [DecidableEq (ι → μ)] (hi : i ∉ s) (n : μ) :
+    piAntidiag (insert i s) n = (antidiagonal n).biUnion fun p : μ × μ ↦ (piAntidiag s p.snd).image
+      (fun f j ↦ f j + if j = i then p.fst else 0) := by
+  simpa [map_eq_image, addRightEmbedding] using piAntidiag_cons hi n
+
+end AddCancelCommMonoid
+
+section CanonicallyOrderedAddCommMonoid
+
+variable [DecidableEq ι] [CanonicallyOrderedAddCommMonoid μ] [HasAntidiagonal μ] [DecidableEq μ]
+
+@[simp] lemma piAntidiag_zero (s : Finset ι) : piAntidiag s (0 : μ) = {0} := by
+  ext; simp [Fintype.sum_eq_zero_iff_of_nonneg, funext_iff, not_imp_comm, ← forall_and]
+
+end CanonicallyOrderedAddCommMonoid
+
+section Nat
+
+variable [DecidableEq ι]
+
+local infixr:73 "•ℕ" => @SMul.smul _ _ Finset.smulFinset
+
+lemma piAntidiag_univ_fin_eq_antidiagonalTuple (n k : ℕ) :
+    piAntidiag univ n = Nat.antidiagonalTuple k n := by
+  ext; simp [Nat.mem_antidiagonalTuple]
+
+-- DISSOLVED: nsmul_piAntidiag
+
+-- DISSOLVED: map_nsmul_piAntidiag
+
+-- DISSOLVED: nsmul_piAntidiag_univ
+
+-- DISSOLVED: map_nsmul_piAntidiag_univ
+
+end Nat
+
+lemma map_sym_eq_piAntidiag [DecidableEq ι] (s : Finset ι) (n : ℕ) :
+    (s.sym n).map ⟨fun m a ↦ m.1.count a, Multiset.count_injective.comp Sym.coe_injective⟩ =
+      piAntidiag s n := by
+  ext f
+  simp only [Sym.val_eq_coe, mem_map, mem_sym_iff, Embedding.coeFn_mk, funext_iff, Sym.exists,
+    Sym.mem_mk, Sym.coe_mk, exists_and_left, exists_prop, mem_piAntidiag, ne_eq]
+  constructor
+  · rintro ⟨m, hm, rfl, hf⟩
+    simpa [← hf, Multiset.sum_count_eq_card hm]
+  · rintro ⟨rfl, hf⟩
+    refine ⟨∑ a ∈ s, f a • {a}, ?_, ?_⟩
+    · simp +contextual
+    · simpa [Multiset.count_sum', Multiset.count_singleton, not_imp_comm, eq_comm (a := 0)] using hf
+
+end Finset

@@ -1,15 +1,17 @@
 /-
 Extracted from Order/BooleanGenerators.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Order.CompleteLattice
+import Mathlib.Order.CompactlyGenerated.Basic
 
 /-!
-# Generators for Boolean algebras
+# Generators for boolean algebras
 
-In this file, we provide an alternative constructor for Boolean algebras.
+In this file, we provide an alternative constructor for boolean algebras.
 
-A set of *Boolean generators* in a compactly generated complete lattice is a subset `S` such that
+A set of *boolean generators* in a compactly generated complete lattice is a subset `S` such that
 
 * the elements of `S` are all atoms, and
 * the set `S` satisfies an atomicity condition:
@@ -25,7 +27,7 @@ A set of *Boolean generators* in a compactly generated complete lattice is a sub
 * `IsCompactlyGenerated.BooleanGenerators.distribLattice_of_sSup_eq_top`:
   if `S` generates the entire lattice, then it is distributive.
 * `IsCompactlyGenerated.BooleanGenerators.booleanAlgebra_of_sSup_eq_top`:
-  if `S` generates the entire lattice, then it is a Boolean algebra.
+  if `S` generates the entire lattice, then it is a boolean algebra.
 
 -/
 
@@ -36,9 +38,9 @@ open CompleteLattice
 variable {α : Type*} [CompleteLattice α]
 
 structure BooleanGenerators (S : Set α) : Prop where
-  /-- The elements in a collection of Boolean generators are all atoms. -/
+  /-- The elements in a collection of boolean generators are all atoms. -/
   isAtom : ∀ I ∈ S, IsAtom I
-  /-- The elements in a collection of Boolean generators satisfy an atomicity condition:
+  /-- The elements in a collection of boolean generators satisfy an atomicity condition:
   any compact element below the supremum of a finite subset `s` of generators
   is equal to the supremum of a subset of `s`. -/
   finitelyAtomistic : ∀ (s : Finset α) (a : α),
@@ -58,7 +60,7 @@ lemma atomistic (hS : BooleanGenerators S) (a : α) (ha : a ≤ sSup S) : ∃ T 
   obtain ⟨C, hC, rfl⟩ := IsCompactlyGenerated.exists_sSup_eq a
   have aux : ∀ b : α, IsCompactElement b → b ≤ sSup S → ∃ T ⊆ S, b = sSup T := by
     intro b hb hbS
-    obtain ⟨s, hs₁, hs₂⟩ := (isCompactElement_iff_exists_le_sSup_of_le_sSup α b).1 hb S hbS
+    obtain ⟨s, hs₁, hs₂⟩ := hb S hbS
     obtain ⟨t, ht, rfl⟩ := hS.finitelyAtomistic s b hs₁ hb hs₂
     refine ⟨t, ?_, Finset.sup_id_eq_sSup t⟩
     refine Set.Subset.trans ?_ hs₁
@@ -85,7 +87,7 @@ lemma atomistic (hS : BooleanGenerators S) (a : α) (ha : a ≤ sSup S) : ∃ T 
 
 lemma isAtomistic_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S = ⊤) :
     IsAtomistic α := by
-  refine CompleteLattice.isAtomistic_iff.2 fun a ↦ ?_
+  refine ⟨fun a ↦ ?_⟩
   obtain ⟨s, hs, hs'⟩ := hS.atomistic a (h ▸ le_top)
   exact ⟨s, hs', fun I hI ↦ hS.isAtom I (hs hI)⟩
 
@@ -118,3 +120,48 @@ lemma sSup_inter (hS : BooleanGenerators S) {T₁ T₂ : Set α} (hT₁ : T₁ �
   · apply (hS.mono hT₂).mem_of_isAtom_of_le_sSup_atoms _ _ _
     · exact (hS.mono hX).isAtom I hI
     · exact (_root_.le_sSup hI).trans (hX'.ge.trans inf_le_right)
+
+def distribLattice_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S = ⊤) :
+    DistribLattice α where
+  le_sup_inf a b c := by
+    obtain ⟨Ta, hTa, rfl⟩ := hS.atomistic a (h ▸ le_top)
+    obtain ⟨Tb, hTb, rfl⟩ := hS.atomistic b (h ▸ le_top)
+    obtain ⟨Tc, hTc, rfl⟩ := hS.atomistic c (h ▸ le_top)
+    apply le_of_eq
+    rw [← sSup_union, ← sSup_union, ← hS.sSup_inter hTb hTc, ← hS.sSup_inter, ← sSup_union]
+    on_goal 1 => congr 1; ext
+    all_goals
+      simp only [Set.union_subset_iff, Set.mem_inter_iff, Set.mem_union]
+      tauto
+
+lemma complementedLattice_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S = ⊤) :
+    ComplementedLattice α := by
+  let _i := hS.distribLattice_of_sSup_eq_top h
+  have _i₁ := isAtomistic_of_sSup_eq_top hS h
+  apply complementedLattice_of_isAtomistic
+
+noncomputable
+
+def booleanAlgebra_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S = ⊤) : BooleanAlgebra α :=
+  let _i := hS.distribLattice_of_sSup_eq_top h
+  have := hS.complementedLattice_of_sSup_eq_top h
+  DistribLattice.booleanAlgebraOfComplemented α
+
+lemma sSup_le_sSup_iff_of_atoms (hS : BooleanGenerators S) (X Y : Set α) (hX : X ⊆ S) (hY : Y ⊆ S) :
+    sSup X ≤ sSup Y ↔ X ⊆ Y := by
+  refine ⟨?_, sSup_le_sSup⟩
+  intro h a ha
+  apply (hS.mono hY).mem_of_isAtom_of_le_sSup_atoms _ _ ((le_sSup ha).trans h)
+  exact (hS.mono hX).isAtom a ha
+
+lemma eq_atoms_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S = ⊤) :
+    S = {a : α | IsAtom a} := by
+  apply le_antisymm
+  · exact hS.isAtom
+  intro a ha
+  obtain ⟨T, hT, rfl⟩ := hS.atomistic a (le_top.trans h.ge)
+  exact hS.mem_of_isAtom_of_le_sSup_atoms _ ha (sSup_le_sSup hT)
+
+end BooleanGenerators
+
+end IsCompactlyGenerated

@@ -3,6 +3,7 @@ Extracted from AlgebraicGeometry/EllipticCurve/ModelsWithJ.lean
 Genuine: 18 of 26 | Dissolved: 3 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
 
 /-!
 # Models of elliptic curves with prescribed j-invariant
@@ -13,18 +14,18 @@ It is a modification of [silverman2009], Chapter III, Proposition 1.4 (c).
 
 ## Main definitions
 
-* `WeierstrassCurve.ofJ0`: an elliptic curve whose j-invariant is 0.
-* `WeierstrassCurve.ofJ1728`: an elliptic curve whose j-invariant is 1728.
-* `WeierstrassCurve.ofJNe0Or1728`: an elliptic curve whose j-invariant is neither 0 nor 1728.
-* `WeierstrassCurve.ofJ`: an elliptic curve whose j-invariant equal to j.
+ * `WeierstrassCurve.ofJ0`: an elliptic curve whose j-invariant is 0.
+ * `WeierstrassCurve.ofJ1728`: an elliptic curve whose j-invariant is 1728.
+ * `WeierstrassCurve.ofJNe0Or1728`: an elliptic curve whose j-invariant is neither 0 nor 1728.
+ * `WeierstrassCurve.ofJ`: an elliptic curve whose j-invariant equal to j.
 
 ## Main statements
 
-* `WeierstrassCurve.ofJ_j`: the j-invariant of `WeierstrassCurve.ofJ` is equal to j.
+ * `WeierstrassCurve.ofJ_j`: the j-invariant of `WeierstrassCurve.ofJ` is equal to j.
 
 ## References
 
-* [J Silverman, *The Arithmetic of Elliptic Curves*][silverman2009]
+ * [J Silverman, *The Arithmetic of Elliptic Curves*][silverman2009]
 
 ## Tags
 
@@ -72,13 +73,19 @@ lemma ofJNe0Or1728_Δ : (ofJNe0Or1728 j).Δ = j ^ 2 * (j - 1728) ^ 9 := by
 
 variable (R) [W.IsElliptic]
 
--- INSTANCE (free from Core): [hu
+instance [hu : Fact (IsUnit (3 : R))] : (ofJ0 R).IsElliptic := by
+  rw [isElliptic_iff, ofJ0_Δ]
+  convert (hu.out.pow 3).neg
+  norm_num1
 
 lemma ofJ0_j [Fact (IsUnit (3 : R))] : (ofJ0 R).j = 0 := by
   rw [j, ofJ0_c₄]
   ring1
 
--- INSTANCE (free from Core): [hu
+instance [hu : Fact (IsUnit (2 : R))] : (ofJ1728 R).IsElliptic := by
+  rw [isElliptic_iff, ofJ1728_Δ]
+  convert (hu.out.pow 6).neg
+  norm_num1
 
 lemma ofJ1728_j [Fact (IsUnit (2 : R))] : (ofJ1728 R).j = 1728 := by
   rw [j, Units.inv_mul_eq_iff_eq_mul, ofJ1728_c₄, coe_Δ', ofJ1728_Δ]
@@ -86,7 +93,10 @@ lemma ofJ1728_j [Fact (IsUnit (2 : R))] : (ofJ1728 R).j = 1728 := by
 
 variable {R}
 
--- INSTANCE (free from Core): (j
+instance (j : R) [h1 : Fact (IsUnit j)] [h2 : Fact (IsUnit (j - 1728))] :
+    (ofJNe0Or1728 j).IsElliptic := by
+  rw [isElliptic_iff, ofJNe0Or1728_Δ]
+  exact (h1.out.pow 2).mul (h2.out.pow 9)
 
 lemma ofJNe0Or1728_j (j : R) [Fact (IsUnit j)] [Fact (IsUnit (j - 1728))] :
     (ofJNe0Or1728 j).j = j := by
@@ -118,12 +128,29 @@ lemma ofJ_1728_of_two_eq_zero (h2 : (2 : F) = 0) : ofJ 1728 = ofJ0 F := by
 
 -- DISSOLVED: ofJ_ne_0_ne_1728
 
--- INSTANCE (free from Core): :
+instance : (ofJ j).IsElliptic := by
+  by_cases h0 : j = 0
+  · by_cases h3 : (3 : F) = 0
+    · have := Fact.mk (isUnit_of_mul_eq_one (2 : F) 2 (by linear_combination h3))
+      rw [h0, ofJ_0_of_three_eq_zero h3]
+      infer_instance
+    · have := Fact.mk (Ne.isUnit h3)
+      rw [h0, ofJ_0_of_three_ne_zero h3]
+      infer_instance
+  · by_cases h1728 : j = 1728
+    · have h2 : (2 : F) ≠ 0 := fun h ↦ h0 (by linear_combination h1728 + 864 * h)
+      have := Fact.mk h2.isUnit
+      rw [h1728, ofJ_1728_of_two_ne_zero h2]
+      infer_instance
+    · have := Fact.mk (Ne.isUnit h0)
+      have := Fact.mk (sub_ne_zero.2 h1728).isUnit
+      rw [ofJ_ne_0_ne_1728 j h0 h1728]
+      infer_instance
 
 lemma ofJ_j : (ofJ j).j = j := by
   by_cases h0 : j = 0
   · by_cases h3 : (3 : F) = 0
-    · have : Fact <| IsUnit (2 : F) := ⟨.of_mul_eq_one 2 <| by linear_combination h3⟩
+    · have := Fact.mk (isUnit_of_mul_eq_one (2 : F) 2 (by linear_combination h3))
       simp_rw [h0, ofJ_0_of_three_eq_zero h3, ofJ1728_j]
       linear_combination 576 * h3
     · have := Fact.mk (Ne.isUnit h3)
@@ -136,6 +163,6 @@ lemma ofJ_j : (ofJ j).j = j := by
       have := Fact.mk (sub_ne_zero.2 h1728).isUnit
       simp_rw [ofJ_ne_0_ne_1728 j h0 h1728, ofJNe0Or1728_j]
 
--- INSTANCE (free from Core): :
+instance : Inhabited { W : WeierstrassCurve F // W.IsElliptic } := ⟨⟨ofJ 37, inferInstance⟩⟩
 
 end WeierstrassCurve

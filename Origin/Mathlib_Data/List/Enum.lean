@@ -1,31 +1,71 @@
 /-
 Extracted from Data/List/Enum.lean
-Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 of 12 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Data.List.Basic
 
 /-!
 # Properties of `List.enum`
+
+## Deprecation note
+
+Many lemmas in this file have been replaced by theorems in Lean4,
+in terms of `xs[i]?` and `xs[i]` rather than `get` and `get?`.
+
+The deprecated results here are unused in Mathlib.
+Any downstream users who can not easily adapt may remove the deprecations as needed.
 -/
 
 namespace List
 
 variable {α : Type*}
 
-theorem forall_mem_zipIdx {l : List α} {n : ℕ} {p : α × ℕ → Prop} :
-    (∀ x ∈ l.zipIdx n, p x) ↔ ∀ (i : ℕ) (_ : i < length l), p (l[i], n + i) := by
-  simp only [forall_mem_iff_getElem, getElem_zipIdx, length_zipIdx]
+theorem get?_enumFrom (n) (l : List α) (m) :
+    get? (enumFrom n l) m = (get? l m).map fun a => (n + m, a) := by
+  simp
 
-theorem forall_mem_zipIdx' {l : List α} {p : α × ℕ → Prop} :
-    (∀ x ∈ l.zipIdx, p x) ↔ ∀ (i : ℕ) (_ : i < length l), p (l[i], i) :=
-  forall_mem_zipIdx.trans <| by simp
+theorem get?_enum (l : List α) (n) : get? (enum l) n = (get? l n).map fun a => (n, a) := by
+  simp
 
-theorem exists_mem_zipIdx {l : List α} {n : ℕ} {p : α × ℕ → Prop} :
-    (∃ x ∈ l.zipIdx n, p x) ↔ ∃ (i : ℕ) (_ : i < length l), p (l[i], n + i) := by
-  simp only [exists_mem_iff_getElem, getElem_zipIdx, length_zipIdx]
+theorem get_enumFrom (l : List α) (n) (i : Fin (l.enumFrom n).length) :
+    (l.enumFrom n).get i = (n + i, l.get (i.cast enumFrom_length)) := by
+  simp
 
-theorem exists_mem_zipIdx' {l : List α} {p : α × ℕ → Prop} :
-    (∃ x ∈ l.zipIdx, p x) ↔ ∃ (i : ℕ) (_ : i < length l), p (l[i], i) :=
-  exists_mem_zipIdx.trans <| by simp
+theorem get_enum (l : List α) (i : Fin l.enum.length) :
+    l.enum.get i = (i.1, l.get (i.cast enum_length)) := by
+  simp
+
+theorem mk_add_mem_enumFrom_iff_get? {n i : ℕ} {x : α} {l : List α} :
+    (n + i, x) ∈ enumFrom n l ↔ l.get? i = x := by
+  simp [mem_iff_get?]
+
+theorem mk_mem_enumFrom_iff_le_and_get?_sub {n i : ℕ} {x : α} {l : List α} :
+    (i, x) ∈ enumFrom n l ↔ n ≤ i ∧ l.get? (i - n) = x := by
+  simp [mk_mem_enumFrom_iff_le_and_getElem?_sub]
+
+theorem mk_mem_enum_iff_get? {i : ℕ} {x : α} {l : List α} : (i, x) ∈ enum l ↔ l.get? i = x := by
+  simp [enum, mk_mem_enumFrom_iff_le_and_getElem?_sub]
+
+set_option linter.deprecated false in
+
+theorem mem_enum_iff_get? {x : ℕ × α} {l : List α} : x ∈ enum l ↔ l.get? x.1 = x.2 :=
+  mk_mem_enum_iff_get?
+
+theorem forall_mem_enumFrom {l : List α} {n : ℕ} {p : ℕ × α → Prop} :
+    (∀ x ∈ l.enumFrom n, p x) ↔ ∀ (i : ℕ) (_ : i < length l), p (n + i, l[i]) := by
+  simp only [forall_mem_iff_getElem, getElem_enumFrom, enumFrom_length]
+
+theorem forall_mem_enum {l : List α} {p : ℕ × α → Prop} :
+    (∀ x ∈ l.enum, p x) ↔ ∀ (i : ℕ) (_ : i < length l), p (i, l[i]) :=
+  forall_mem_enumFrom.trans <| by simp
+
+theorem exists_mem_enumFrom {l : List α} {n : ℕ} {p : ℕ × α → Prop} :
+    (∃ x ∈ l.enumFrom n, p x) ↔ ∃ (i : ℕ) (_ : i < length l), p (n + i, l[i]) := by
+  simp only [exists_mem_iff_getElem, getElem_enumFrom, enumFrom_length]
+
+theorem exists_mem_enum {l : List α} {p : ℕ × α → Prop} :
+    (∃ x ∈ l.enum, p x) ↔ ∃ (i : ℕ) (_ : i < length l), p (i, l[i]) :=
+  exists_mem_enumFrom.trans <| by simp
 
 end List

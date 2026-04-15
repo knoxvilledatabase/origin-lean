@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/Homology/HomologicalComplexAbelian.lean
-Genuine: 4 of 13 | Dissolved: 0 | Infrastructure: 9
+Genuine: 4 of 7 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.Additive
+import Mathlib.Algebra.Homology.HomologicalComplexLimits
+import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 
 /-! # THe category of homological complexes is abelian
 
@@ -18,15 +21,19 @@ open CategoryTheory Category Limits
 
 namespace HomologicalComplex
 
-variable {C ι : Type*} {c : ComplexShape ι} [Category* C]
+variable {C ι : Type*} {c : ComplexShape ι} [Category C] [Abelian C]
 
-variable [Abelian C]
+noncomputable instance : NormalEpiCategory (HomologicalComplex C c) := ⟨fun p _ =>
+  NormalEpi.mk _ (kernel.ι p) (kernel.condition _)
+    (isColimitOfEval _ _ (fun _ =>
+      Abelian.isColimitMapCoconeOfCokernelCoforkOfπ _ _))⟩
 
--- INSTANCE (free from Core): :
+noncomputable instance : NormalMonoCategory (HomologicalComplex C c) := ⟨fun p _ =>
+  NormalMono.mk _ (cokernel.π p) (cokernel.condition _)
+    (isLimitOfEval _ _ (fun _ =>
+      Abelian.isLimitMapConeOfKernelForkOfι _ _))⟩
 
--- INSTANCE (free from Core): :
-
--- INSTANCE (free from Core): :
+noncomputable instance : Abelian (HomologicalComplex C c) where
 
 variable (S : ShortComplex (HomologicalComplex C c))
 
@@ -60,34 +67,4 @@ lemma shortExact_iff_degreewise_shortExact :
     exact hS.map (eval C c i)
   · exact shortExact_of_degreewise_shortExact S
 
-end
-
-variable [HasZeroMorphisms C] [HasZeroObject C] [DecidableEq ι]
-
--- INSTANCE (free from Core): (i
-
--- INSTANCE (free from Core): (i
-
-end
-
 end HomologicalComplex
-
-namespace CategoryTheory
-
-open Limits
-
-variable {C : Type*} [Category* C] [HasZeroMorphisms C]
-
-variable {D : Type*} [Category* D] [HasZeroMorphisms D]
-
-variable (F : C ⥤ D) {ι : Type*} (c : ComplexShape ι)
-
--- INSTANCE (free from Core): [F.PreservesZeroMorphisms]
-
--- INSTANCE (free from Core): [F.PreservesZeroMorphisms]
-
--- INSTANCE (free from Core): [HasFiniteLimits
-
--- INSTANCE (free from Core): [HasFiniteColimits
-
-end CategoryTheory

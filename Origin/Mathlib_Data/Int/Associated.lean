@@ -3,6 +3,8 @@ Extracted from Data/Int/Associated.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Associated.Basic
+import Mathlib.Algebra.Ring.Int.Units
 
 /-!
 # Associated elements and the integers
@@ -11,7 +13,7 @@ This file contains some results on equality up to units in the integers.
 
 ## Main results
 
-* `Int.natAbs_eq_iff_associated`: the absolute value is equal iff integers are associated
+ * `Int.natAbs_eq_iff_associated`: the absolute value is equal iff integers are associated
 -/
 
 theorem Int.natAbs_eq_iff_associated {a b : ℤ} : a.natAbs = b.natAbs ↔ Associated a b := by

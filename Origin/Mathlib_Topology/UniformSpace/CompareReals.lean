@@ -3,6 +3,10 @@ Extracted from Topology/UniformSpace/CompareReals.lean
 Genuine: 8 of 10 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.UniformSpace.AbsoluteValue
+import Mathlib.Topology.Instances.Rat
+import Mathlib.Topology.UniformSpace.Completion
+import Mathlib.Topology.Metrizable.Basic
 
 /-!
 # Comparison of Cauchy reals and Bourbaki reals
@@ -53,7 +57,7 @@ theorem Rat.uniformSpace_eq :
   ext s
   rw [(AbsoluteValue.hasBasis_uniformity _).mem_iff, Metric.uniformity_basis_dist_rat.mem_iff]
   simp only [Rat.dist_eq, AbsoluteValue.abs_apply, ← Rat.cast_sub, ← Rat.cast_abs, Rat.cast_lt,
-    _root_.abs_sub_comm]
+    abs_sub_comm]
 
 def rationalCauSeqPkg : @AbstractCompletion ℚ <| (@AbsoluteValue.abs ℚ _).uniformSpace :=
   @AbstractCompletion.mk
@@ -72,12 +76,14 @@ namespace CompareReals
 def Q :=
   ℚ deriving CommRing, Inhabited
 
--- INSTANCE (free from Core): uniformSpace
+instance uniformSpace : UniformSpace Q :=
+  (@AbsoluteValue.abs ℚ _).uniformSpace
 
 def Bourbakiℝ : Type :=
   Completion Q deriving Inhabited
 
--- INSTANCE (free from Core): Bourbaki.uniformSpace
+instance Bourbaki.uniformSpace : UniformSpace Bourbakiℝ :=
+  Completion.uniformSpace Q
 
 def bourbakiPkg : AbstractCompletion Q :=
   Completion.cPkg

@@ -3,6 +3,8 @@ Extracted from MeasureTheory/Integral/LebesgueNormedSpace.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.WithDensity
+import Mathlib.Analysis.Normed.Module.Basic
 
 /-! # A lemma about measurability with density under scalar multiplication in normed spaces -/
 

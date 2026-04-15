@@ -3,6 +3,8 @@ Extracted from Data/Nat/GCD/BigOperators.lean
 Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Batteries.Data.Nat.Gcd
+import Mathlib.Algebra.BigOperators.Group.Finset
 
 /-! # Lemmas about coprimality with big products.
 

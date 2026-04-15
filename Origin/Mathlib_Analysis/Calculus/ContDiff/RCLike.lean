@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/Calculus/ContDiff/RCLike.lean
-Genuine: 7 of 16 | Dissolved: 9 | Infrastructure: 0
+Genuine: 14 of 14 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.ContDiff.Defs
+import Mathlib.Analysis.Calculus.MeanValue
 
 /-!
 # Higher differentiability over `ℝ` or `ℂ`
@@ -25,30 +27,49 @@ section Real
 variable {n : WithTop ℕ∞} {𝕂 : Type*} [RCLike 𝕂] {E' : Type*} [NormedAddCommGroup E']
   [NormedSpace 𝕂 E'] {F' : Type*} [NormedAddCommGroup F'] [NormedSpace 𝕂 F']
 
--- DISSOLVED: HasFTaylorSeriesUpToOn.hasStrictFDerivAt
+theorem HasFTaylorSeriesUpToOn.hasStrictFDerivAt {n : WithTop ℕ∞}
+    {s : Set E'} {f : E' → F'} {x : E'}
+    {p : E' → FormalMultilinearSeries 𝕂 E' F'} (hf : HasFTaylorSeriesUpToOn n f p s) (hn : 1 ≤ n)
+    (hs : s ∈ 𝓝 x) : HasStrictFDerivAt f ((continuousMultilinearCurryFin1 𝕂 E' F') (p x 1)) x :=
+  hasStrictFDerivAt_of_hasFDerivAt_of_continuousAt (hf.eventually_hasFDerivAt hn hs) <|
+    (continuousMultilinearCurryFin1 𝕂 E' F').continuousAt.comp <| (hf.cont 1 hn).continuousAt hs
 
--- DISSOLVED: ContDiffAt.hasStrictFDerivAt'
+theorem ContDiffAt.hasStrictFDerivAt' {f : E' → F'} {f' : E' →L[𝕂] F'} {x : E'}
+    (hf : ContDiffAt 𝕂 n f x) (hf' : HasFDerivAt f f' x) (hn : 1 ≤ n) :
+    HasStrictFDerivAt f f' x := by
+  rcases hf.of_le hn 1 le_rfl with ⟨u, H, p, hp⟩
+  simp only [nhdsWithin_univ, mem_univ, insert_eq_of_mem] at H
+  have := hp.hasStrictFDerivAt le_rfl H
+  rwa [hf'.unique this.hasFDerivAt]
 
--- DISSOLVED: ContDiffAt.hasStrictDerivAt'
+theorem ContDiffAt.hasStrictDerivAt' {f : 𝕂 → F'} {f' : F'} {x : 𝕂} (hf : ContDiffAt 𝕂 n f x)
+    (hf' : HasDerivAt f f' x) (hn : 1 ≤ n) : HasStrictDerivAt f f' x :=
+  hf.hasStrictFDerivAt' hf' hn
 
--- DISSOLVED: ContDiffAt.hasStrictFDerivAt
+theorem ContDiffAt.hasStrictFDerivAt {f : E' → F'} {x : E'} (hf : ContDiffAt 𝕂 n f x) (hn : 1 ≤ n) :
+    HasStrictFDerivAt f (fderiv 𝕂 f x) x :=
+  hf.hasStrictFDerivAt' (hf.differentiableAt hn).hasFDerivAt hn
 
--- DISSOLVED: ContDiffAt.hasStrictDerivAt
+theorem ContDiffAt.hasStrictDerivAt {f : 𝕂 → F'} {x : 𝕂} (hf : ContDiffAt 𝕂 n f x) (hn : 1 ≤ n) :
+    HasStrictDerivAt f (deriv f x) x :=
+  (hf.hasStrictFDerivAt hn).hasStrictDerivAt
 
--- DISSOLVED: ContDiff.hasStrictFDerivAt
+theorem ContDiff.hasStrictFDerivAt {f : E' → F'} {x : E'} (hf : ContDiff 𝕂 n f) (hn : 1 ≤ n) :
+    HasStrictFDerivAt f (fderiv 𝕂 f x) x :=
+  hf.contDiffAt.hasStrictFDerivAt hn
 
--- DISSOLVED: ContDiff.hasStrictDerivAt
+theorem ContDiff.hasStrictDerivAt {f : 𝕂 → F'} {x : 𝕂} (hf : ContDiff 𝕂 n f) (hn : 1 ≤ n) :
+    HasStrictDerivAt f (deriv f x) x :=
+  hf.contDiffAt.hasStrictDerivAt hn
 
-variable {E F : Type*}
+theorem HasFTaylorSeriesUpToOn.exists_lipschitzOnWith_of_nnnorm_lt {E F : Type*}
     [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F] {f : E → F}
     {p : E → FormalMultilinearSeries ℝ E F} {s : Set E} {x : E}
-
-theorem HasFTaylorSeriesUpToOn.exists_lipschitzOnWith_of_nnnorm_lt
     (hf : HasFTaylorSeriesUpToOn 1 f p (insert x s)) (hs : Convex ℝ s) (K : ℝ≥0)
     (hK : ‖p x 1‖₊ < K) : ∃ t ∈ 𝓝[s] x, LipschitzOnWith K f t := by
   set f' := fun y => continuousMultilinearCurryFin1 ℝ E F (p y 1)
   have hder : ∀ y ∈ s, HasFDerivWithinAt f (f' y) s y := fun y hy =>
-    (hf.hasFDerivWithinAt one_ne_zero (subset_insert x s hy)).mono (subset_insert x s)
+    (hf.hasFDerivWithinAt le_rfl (subset_insert x s hy)).mono (subset_insert x s)
   have hcont : ContinuousWithinAt f' s x :=
     (continuousMultilinearCurryFin1 ℝ E F).continuousAt.comp_continuousWithinAt
       ((hf.cont _ le_rfl _ (mem_insert _ _)).mono (subset_insert x s))
@@ -57,12 +78,15 @@ theorem HasFTaylorSeriesUpToOn.exists_lipschitzOnWith_of_nnnorm_lt
     hs.exists_nhdsWithin_lipschitzOnWith_of_hasFDerivWithinAt_of_nnnorm_lt
       (eventually_nhdsWithin_iff.2 <| Eventually.of_forall hder) hcont K hK
 
-theorem HasFTaylorSeriesUpToOn.exists_lipschitzOnWith
+theorem HasFTaylorSeriesUpToOn.exists_lipschitzOnWith {E F : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F] {f : E → F}
+    {p : E → FormalMultilinearSeries ℝ E F} {s : Set E} {x : E}
     (hf : HasFTaylorSeriesUpToOn 1 f p (insert x s)) (hs : Convex ℝ s) :
     ∃ K, ∃ t ∈ 𝓝[s] x, LipschitzOnWith K f t :=
   (exists_gt _).imp <| hf.exists_lipschitzOnWith_of_nnnorm_lt hs
 
-theorem ContDiffWithinAt.exists_lipschitzOnWith
+theorem ContDiffWithinAt.exists_lipschitzOnWith {E F : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F] {f : E → F} {s : Set E} {x : E}
     (hf : ContDiffWithinAt ℝ 1 f s x) (hs : Convex ℝ s) :
     ∃ K : ℝ≥0, ∃ t ∈ 𝓝[s] x, LipschitzOnWith K f t := by
   rcases hf 1 le_rfl with ⟨t, hst, p, hp⟩
@@ -77,25 +101,23 @@ theorem ContDiffWithinAt.exists_lipschitzOnWith
 theorem ContDiffAt.exists_lipschitzOnWith_of_nnnorm_lt {f : E' → F'} {x : E'}
     (hf : ContDiffAt 𝕂 1 f x) (K : ℝ≥0) (hK : ‖fderiv 𝕂 f x‖₊ < K) :
     ∃ t ∈ 𝓝 x, LipschitzOnWith K f t :=
-  (hf.hasStrictFDerivAt one_ne_zero).exists_lipschitzOnWith_of_nnnorm_lt K hK
+  (hf.hasStrictFDerivAt le_rfl).exists_lipschitzOnWith_of_nnnorm_lt K hK
 
 theorem ContDiffAt.exists_lipschitzOnWith {f : E' → F'} {x : E'} (hf : ContDiffAt 𝕂 1 f x) :
     ∃ K, ∃ t ∈ 𝓝 x, LipschitzOnWith K f t :=
-  (hf.hasStrictFDerivAt one_ne_zero).exists_lipschitzOnWith
-
-lemma ContDiffOn.locallyLipschitzOn {f : E → F} {s : Set E} (hs : Convex ℝ s)
-    (hf : ContDiffOn ℝ 1 f s) : LocallyLipschitzOn s f := by
-  intro x hx
-  obtain ⟨K, t, ht, hf⟩ := ContDiffWithinAt.exists_lipschitzOnWith (hf x hx) hs
-  use K, t
+  (hf.hasStrictFDerivAt le_rfl).exists_lipschitzOnWith
 
 lemma ContDiff.locallyLipschitz {f : E' → F'} (hf : ContDiff 𝕂 1 f) : LocallyLipschitz f := by
   intro x
   rcases hf.contDiffAt.exists_lipschitzOnWith with ⟨K, t, ht, hf⟩
   use K, t
 
--- DISSOLVED: ContDiffOn.exists_lipschitzOnWith
-
--- DISSOLVED: ContDiff.lipschitzWith_of_hasCompactSupport
+theorem ContDiff.lipschitzWith_of_hasCompactSupport {f : E' → F'}
+    (hf : HasCompactSupport f) (h'f : ContDiff 𝕂 n f) (hn : 1 ≤ n) :
+    ∃ C, LipschitzWith C f := by
+  obtain ⟨C, hC⟩ := (hf.fderiv 𝕂).exists_bound_of_continuous (h'f.continuous_fderiv hn)
+  refine ⟨⟨max C 0, le_max_right _ _⟩, ?_⟩
+  apply lipschitzWith_of_nnnorm_fderiv_le (h'f.differentiable hn) (fun x ↦ ?_)
+  simp [← NNReal.coe_le_coe, hC x]
 
 end Real

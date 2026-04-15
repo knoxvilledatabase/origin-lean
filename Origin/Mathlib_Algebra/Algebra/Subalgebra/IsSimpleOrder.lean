@@ -3,6 +3,9 @@ Extracted from Algebra/Algebra/Subalgebra/IsSimpleOrder.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
+import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
 /-!
 If `A` is a domain, and a finite-dimensional algebra over a field `F`, with prime dimension,
@@ -23,3 +26,6 @@ theorem Subalgebra.isSimpleOrder_of_finrank_prime (F A) [Field F] [Ring A] [IsDo
       · exact fun h' => Subalgebra.eq_bot_of_finrank_one h'
       · exact
           Algebra.toSubmodule_eq_top.1 (eq_top_of_finrank_eq <| K.finrank_toSubmodule.trans h) }
+
+alias FiniteDimensional.Subalgebra.is_simple_order_of_finrank_prime :=
+  Subalgebra.isSimpleOrder_of_finrank_prime

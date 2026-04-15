@@ -3,6 +3,8 @@ Extracted from Data/QPF/Multivariate/Constructions/Sigma.lean
 Genuine: 8 of 14 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.Data.PFunctor.Multivariate.Basic
+import Mathlib.Data.QPF.Multivariate.Basic
 
 /-!
 # Dependent product and sum of QPFs are QPFs
@@ -24,13 +26,16 @@ def Sigma (v : TypeVec.{u} n) : Type u :=
 def Pi (v : TypeVec.{u} n) : Type u :=
   ∀ α : A, F α v
 
--- INSTANCE (free from Core): Sigma.inhabited
+instance Sigma.inhabited {α} [Inhabited A] [Inhabited (F default α)] : Inhabited (Sigma F α) :=
+  ⟨⟨default, default⟩⟩
 
--- INSTANCE (free from Core): Pi.inhabited
+instance Pi.inhabited {α} [∀ a, Inhabited (F a α)] : Inhabited (Pi F α) :=
+  ⟨fun _a => default⟩
 
 namespace Sigma
 
--- INSTANCE (free from Core): [∀
+instance [∀ α, MvFunctor <| F α] : MvFunctor (Sigma F) where
+  map := fun f ⟨a, x⟩ => ⟨a, f <$$> x⟩
 
 variable [∀ α, MvQPF <| F α]
 
@@ -45,15 +50,19 @@ protected def repr ⦃α⦄ : Sigma F α → Sigma.P F α
     let x := MvQPF.repr f
     ⟨⟨a, x.1⟩, x.2⟩
 
-set_option backward.isDefEq.respectTransparency false in
-
--- INSTANCE (free from Core): :
+instance : MvQPF (Sigma F) where
+  P := Sigma.P F
+  abs {α} := @Sigma.abs _ _ F _ α
+  repr {α} := @Sigma.repr _ _ F _ α
+  abs_repr := by rintro α ⟨x, f⟩; simp only [Sigma.abs, Sigma.repr, Sigma.eta, abs_repr]
+  abs_map := by rintro α β f ⟨x, g⟩; simp only [Sigma.abs, MvPFunctor.map_eq]
+                simp only [(· <$$> ·), ← abs_map, ← MvPFunctor.map_eq]
 
 end Sigma
 
 namespace Pi
 
--- INSTANCE (free from Core): [∀
+instance [∀ α, MvFunctor <| F α] : MvFunctor (Pi F) where map f x a := f <$$> x a
 
 variable [∀ α, MvQPF <| F α]
 
@@ -66,7 +75,12 @@ protected def abs ⦃α⦄ : Pi.P F α → Pi F α
 protected def repr ⦃α⦄ : Pi F α → Pi.P F α
   | f => ⟨fun a => (MvQPF.repr (f a)).1, fun _i a => (MvQPF.repr (f _)).2 _ a.2⟩
 
--- INSTANCE (free from Core): :
+instance : MvQPF (Pi F) where
+  P := Pi.P F
+  abs := @Pi.abs _ _ F _
+  repr := @Pi.repr _ _ F _
+  abs_repr := by rintro α f; simp only [Pi.abs, Pi.repr, Sigma.eta, abs_repr]
+  abs_map := by rintro α β f ⟨x, g⟩; simp only [Pi.abs, (· <$$> ·), ← abs_map]; rfl
 
 end Pi
 

@@ -3,6 +3,9 @@ Extracted from NumberTheory/EulerProduct/ExpLog.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
+import Mathlib.Data.Complex.FiniteDimensional
+import Mathlib.NumberTheory.EulerProduct.Basic
 
 /-!
 # Logarithms of Euler Products
@@ -16,7 +19,7 @@ open Complex
 
 open Topology in
 
-lemma Summable.clog_one_sub {α : Type*} {f : α → ℂ} (hsum : Summable f) :
+lemma Summable.clog_one_sub {α  : Type*} {f : α → ℂ} (hsum : Summable f) :
     Summable fun n ↦ log (1 - f n) := by
   have hg : DifferentiableAt ℂ (fun z ↦ log (1 - z)) 0 := by
     have : 1 - 0 ∈ slitPlane := (sub_zero (1 : ℂ)).symm ▸ one_mem_slitPlane

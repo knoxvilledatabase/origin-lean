@@ -1,8 +1,9 @@
 /-
 Extracted from Topology/ContinuousMap/Sigma.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.CompactOpen
 
 /-!
 # Equivalence between `C(X, Σ i, Y i)` and `Σ i, C(X, Y i)`
@@ -47,9 +48,11 @@ theorem isEmbedding_sigmaMk_comp [Nonempty X] :
       ⟨_, (isOpen_sigma_fst_preimage {i}).preimage (continuous_eval_const x), fun _ ↦ Iff.rfl⟩⟩
   injective := by
     rintro ⟨i, g⟩ ⟨i', g'⟩ h
-    obtain ⟨rfl, hg⟩ : i = i' ∧ ⇑g ≍ ⇑g' :=
+    obtain ⟨rfl, hg⟩ : i = i' ∧ HEq (⇑g) (⇑g') :=
       Function.eq_of_sigmaMk_comp <| congr_arg DFunLike.coe h
     simpa using hg
+
+alias embedding_sigmaMk_comp := isEmbedding_sigmaMk_comp
 
 section ConnectedSpace
 
@@ -60,3 +63,14 @@ theorem exists_lift_sigma (f : C(X, Σ i, Y i)) : ∃ i g, f = (sigmaMk i).comp 
   ⟨i, ⟨g, hg⟩, DFunLike.ext' hfg⟩
 
 variable (X Y)
+
+@[simps! symm_apply]
+def sigmaCodHomeomorph : C(X, Σ i, Y i) ≃ₜ Σ i, C(X, Y i) :=
+  .symm <| Equiv.toHomeomorphOfIsInducing
+    (.ofBijective _ ⟨isEmbedding_sigmaMk_comp.injective, fun f ↦
+      let ⟨i, g, hg⟩ := f.exists_lift_sigma; ⟨⟨i, g⟩, hg.symm⟩⟩)
+    isEmbedding_sigmaMk_comp.isInducing
+
+end ConnectedSpace
+
+end ContinuousMap

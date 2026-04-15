@@ -1,8 +1,9 @@
 /-
 Extracted from Data/Nat/Cast/Order/Field.lean
-Genuine: 9 of 11 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 of 9 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Field.Basic
 
 /-!
 # Cast of naturals into ordered fields
@@ -11,14 +12,12 @@ This file concerns the canonical homomorphism `ℕ → F`, where `F` is a `Linea
 
 ## Main results
 
-* `Nat.cast_div_le`: in all cases, `↑(m / n) ≤ ↑m / ↑ n`
+ * `Nat.cast_div_le`: in all cases, `↑(m / n) ≤ ↑m / ↑ n`
 -/
 
 namespace Nat
 
-section LinearOrderedSemifield
-
-variable {α : Type*} [Semifield α] [LinearOrder α] [IsStrictOrderedRing α]
+variable {α : Type*} [LinearOrderedSemifield α]
 
 lemma cast_inv_le_one : ∀ n : ℕ, (n⁻¹ : α) ≤ 1
   | 0 => by simp
@@ -53,21 +52,5 @@ theorem one_div_lt_one_div {n m : ℕ} (h : n < m) : 1 / ((m : α) + 1) < 1 / ((
 theorem one_div_cast_nonneg (n : ℕ) : 0 ≤ 1 / (n : α) := one_div_nonneg.mpr (cast_nonneg' n)
 
 -- DISSOLVED: one_div_cast_ne_zero
-
-end LinearOrderedSemifield
-
-section LinearOrderedField
-
-variable {α : Type*} [Field α] [LinearOrder α] [IsStrictOrderedRing α]
-
-theorem one_sub_one_div_cast_nonneg [AddRightMono α] (n : ℕ) : 0 ≤ 1 - 1 / (n : α) := by
-  rw [sub_nonneg, one_div]
-  exact cast_inv_le_one n
-
-theorem one_sub_one_div_cast_le_one [AddLeftMono α] (n : ℕ) : 1 - 1 / (n : α) ≤ 1 := by
-  rw [sub_le_self_iff]
-  exact one_div_cast_nonneg n
-
-end LinearOrderedField
 
 end Nat

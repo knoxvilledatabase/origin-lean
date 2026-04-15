@@ -3,13 +3,13 @@ Extracted from Order/BoundedOrder/Monotone.lean
 Genuine: 20 of 20 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Order.BoundedOrder.Basic
+import Mathlib.Order.Monotone.Basic
 
 /-!
 # Monotone functions on bounded orders
 
 -/
-
-assert_not_exists SemilatticeSup
 
 open Function OrderDual
 
@@ -51,7 +51,7 @@ theorem StrictAnti.apply_eq_bot_iff (hf : StrictAnti f) : f a = f ⊥ ↔ a = �
 
 end OrderBot
 
-theorem StrictMono.minimal_preimage_bot [LinearOrder α] [Preorder β] [OrderBot β] {f : α → β}
+theorem StrictMono.minimal_preimage_bot [LinearOrder α] [PartialOrder β] [OrderBot β] {f : α → β}
     (H : StrictMono f) {a} (h_bot : f a = ⊥) (x : α) : a ≤ x :=
   H.minimal_of_minimal_image
     (fun p => by

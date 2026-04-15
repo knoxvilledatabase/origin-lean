@@ -1,8 +1,10 @@
 /-
 Extracted from MeasureTheory/Measure/HasOuterApproxClosed.lean
-Genuine: 16 of 18 | Dissolved: 0 | Infrastructure: 2
+Genuine: 13 of 15 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Integral.Lebesgue
+import Mathlib.Topology.MetricSpace.ThickenedIndicator
 
 /-!
 # Spaces where indicators of closed sets have decreasing approximations by continuous functions
@@ -17,22 +19,22 @@ convergence in distribution for random variables behave somewhat well in spaces 
 
 ## Main definitions
 
-* `HasOuterApproxClosed`: the typeclass for topological spaces in which indicator functions of
-  closed sets have sequences of bounded continuous functions approximating them.
-* `IsClosed.apprSeq`: a (non-constructive) choice of an approximating sequence to the indicator
-  function of a closed set.
+ * `HasOuterApproxClosed`: the typeclass for topological spaces in which indicator functions of
+   closed sets have sequences of bounded continuous functions approximating them.
+ * `IsClosed.apprSeq`: a (non-constructive) choice of an approximating sequence to the indicator
+   function of a closed set.
 
 ## Main results
 
-* `instHasOuterApproxClosed`: Any pseudo-emetrizable space has the property `HasOuterApproxClosed`.
-* `tendsto_lintegral_apprSeq`: The integrals of the approximating functions to the indicator of a
-  closed set tend to the measure of the set.
-* `ext_of_forall_lintegral_eq_of_IsFiniteMeasure`: Two finite measures are equal if the integrals
-  of all bounded continuous functions with respect to both agree.
+ * `instHasOuterApproxClosed`: Any pseudo-emetrizable space has the property `HasOuterApproxClosed`.
+ * `tendsto_lintegral_apprSeq`: The integrals of the approximating functions to the indicator of a
+   closed set tend to the measure of the set.
+ * `ext_of_forall_lintegral_eq_of_IsFiniteMeasure`: Two finite measures are equal if the integrals
+   of all bounded continuous functions with respect to both agree.
 
 -/
 
-open BoundedContinuousFunction MeasureTheory Topology Metric Filter Set ENNReal NNReal
+open MeasureTheory Topology Metric Filter Set ENNReal NNReal
 
 open scoped Topology ENNReal NNReal BoundedContinuousFunction
 
@@ -77,7 +79,7 @@ theorem measure_of_cont_bdd_of_tendsto_indicator
   apply measure_of_cont_bdd_of_tendsto_filter_indicator μ E_mble fs
     (Eventually.of_forall fun n ↦ Eventually.of_forall (fs_bdd n)) (Eventually.of_forall fs_lim')
 
-theorem tendsto_lintegral_thickenedIndicator_of_isClosed {Ω : Type*} {mΩ : MeasurableSpace Ω}
+theorem tendsto_lintegral_thickenedIndicator_of_isClosed {Ω : Type*} [MeasurableSpace Ω]
     [PseudoEMetricSpace Ω] [OpensMeasurableSpace Ω] (μ : Measure Ω) [IsFiniteMeasure μ] {F : Set Ω}
     (F_closed : IsClosed F) {δs : ℕ → ℝ} (δs_pos : ∀ n, 0 < δs n)
     (δs_lim : Tendsto δs atTop (𝓝 0)) :
@@ -87,33 +89,6 @@ theorem tendsto_lintegral_thickenedIndicator_of_isClosed {Ω : Type*} {mΩ : Mea
     (fun n ↦ thickenedIndicator (δs_pos n) F) fun n ω ↦ thickenedIndicator_le_one (δs_pos n) F ω
   have key := thickenedIndicator_tendsto_indicator_closure δs_pos δs_lim F
   rwa [F_closed.closure_eq] at key
-
-lemma integrable_thickenedIndicator {Ω : Type*} {mΩ : MeasurableSpace Ω}
-    [PseudoEMetricSpace Ω] [OpensMeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ] (F : Set Ω)
-    {δ : ℝ} (δ_pos : 0 < δ) :
-    Integrable (fun ω ↦ (thickenedIndicator δ_pos F ω : ℝ)) μ := by
-  refine .of_bound (by fun_prop) 1 (ae_of_all _ fun x ↦ ?_)
-  simpa using thickenedIndicator_le_one δ_pos F x
-
-lemma tendsto_integral_thickenedIndicator_of_isClosed {Ω : Type*} {mΩ : MeasurableSpace Ω}
-    [PseudoEMetricSpace Ω] [OpensMeasurableSpace Ω] (μ : Measure Ω) [IsFiniteMeasure μ] {F : Set Ω}
-    (F_closed : IsClosed F) {δs : ℕ → ℝ} (δs_pos : ∀ (n : ℕ), 0 < δs n)
-    (δs_lim : Tendsto δs atTop (𝓝 0)) :
-    Tendsto (fun n : ℕ ↦ ∫ ω, (thickenedIndicator (δs_pos n) F ω : ℝ) ∂μ) atTop (𝓝 (μ.real F)) := by
-  -- we switch to the `lintegral` formulation and apply the corresponding lemma there
-  let fs : ℕ → Ω → ℝ := fun n ω ↦ thickenedIndicator (δs_pos n) F ω
-  have h := tendsto_lintegral_thickenedIndicator_of_isClosed μ F_closed δs_pos δs_lim
-  have h_eq (n : ℕ) : ∫⁻ ω, thickenedIndicator (δs_pos n) F ω ∂μ
-      = ENNReal.ofReal (∫ ω, fs n ω ∂μ) := by
-    rw [lintegral_coe_eq_integral]
-    exact integrable_thickenedIndicator F (δs_pos _)
-  simp_rw [h_eq] at h
-  rw [Measure.real_def]
-  have h_eq' : (fun n ↦ ∫ ω, fs n ω ∂μ) = fun n ↦ (ENNReal.ofReal (∫ ω, fs n ω ∂μ)).toReal := by
-    ext n
-    rw [ENNReal.toReal_ofReal]
-    exact integral_nonneg fun x ↦ by simp [fs]
-  rwa [h_eq', ENNReal.tendsto_toReal_iff (by simp) (by finiteness)]
 
 end MeasureTheory -- namespace
 
@@ -153,7 +128,7 @@ lemma indicator_le_apprSeq (n : ℕ) :
   intro x
   by_cases hxF : x ∈ F
   · simp only [hxF, indicator_of_mem, apprSeq_apply_eq_one hF n, le_refl]
-  · simp only [hxF, not_false_eq_true, indicator_of_notMem, zero_le]
+  · simp only [hxF, not_false_eq_true, indicator_of_not_mem, zero_le]
 
 theorem measure_le_lintegral [MeasurableSpace X] [OpensMeasurableSpace X] (μ : Measure X) (n : ℕ) :
     μ F ≤ ∫⁻ x, (hF.apprSeq n x : ℝ≥0∞) ∂μ := by
@@ -164,7 +139,7 @@ theorem measure_le_lintegral [MeasurableSpace X] [OpensMeasurableSpace X] (μ : 
     intro x
     by_cases hxF : x ∈ F
     · simp only [hxF, indicator_of_mem, apprSeq_apply_eq_one hF n hxF, ENNReal.coe_one, le_refl]
-    · simp only [hxF, not_false_eq_true, indicator_of_notMem, zero_le]
+    · simp only [hxF, not_false_eq_true, indicator_of_not_mem, zero_le]
 
 lemma tendsto_lintegral_apprSeq [MeasurableSpace X] [OpensMeasurableSpace X]
     (μ : Measure X) [IsFiniteMeasure μ] :
@@ -174,9 +149,39 @@ lemma tendsto_lintegral_apprSeq [MeasurableSpace X] [OpensMeasurableSpace X]
 
 end HasOuterApproxClosed --namespace
 
--- INSTANCE (free from Core): (X
+noncomputable instance (X : Type*) [TopologicalSpace X]
+    [TopologicalSpace.PseudoMetrizableSpace X] : HasOuterApproxClosed X := by
+  letI : PseudoMetricSpace X := TopologicalSpace.pseudoMetrizableSpacePseudoMetric X
+  refine ⟨fun F hF ↦ ?_⟩
+  use fun n ↦ thickenedIndicator (δ := (1 : ℝ) / (n + 1)) Nat.one_div_pos_of_nat F
+  refine ⟨?_, ⟨?_, ?_⟩⟩
+  · exact fun n x ↦ thickenedIndicator_le_one Nat.one_div_pos_of_nat F x
+  · exact fun n x hxF ↦ one_le_thickenedIndicator_apply X Nat.one_div_pos_of_nat hxF
+  · have key := thickenedIndicator_tendsto_indicator_closure
+              (δseq := fun (n : ℕ) ↦ (1 : ℝ) / (n + 1))
+              (fun _ ↦ Nat.one_div_pos_of_nat) tendsto_one_div_add_atTop_nhds_zero_nat F
+    rw [tendsto_pi_nhds] at *
+    intro x
+    nth_rw 2 [← IsClosed.closure_eq hF]
+    exact key x
 
 namespace MeasureTheory
+
+theorem measure_isClosed_eq_of_forall_lintegral_eq_of_isFiniteMeasure {Ω : Type*}
+    [MeasurableSpace Ω] [TopologicalSpace Ω] [HasOuterApproxClosed Ω]
+    [OpensMeasurableSpace Ω] {μ ν : Measure Ω} [IsFiniteMeasure μ]
+    (h : ∀ (f : Ω →ᵇ ℝ≥0), ∫⁻ x, f x ∂μ = ∫⁻ x, f x ∂ν) {F : Set Ω} (F_closed : IsClosed F) :
+    μ F = ν F := by
+  have ν_finite : IsFiniteMeasure ν := by
+    constructor
+    have whole := h 1
+    simp only [BoundedContinuousFunction.coe_one, Pi.one_apply, ENNReal.coe_one, lintegral_const,
+      one_mul] at whole
+    simp [← whole]
+  have obs_μ := HasOuterApproxClosed.tendsto_lintegral_apprSeq F_closed μ
+  have obs_ν := HasOuterApproxClosed.tendsto_lintegral_apprSeq F_closed ν
+  simp_rw [h] at obs_μ
+  exact tendsto_nhds_unique obs_μ obs_ν
 
 theorem ext_of_forall_lintegral_eq_of_IsFiniteMeasure {Ω : Type*}
     [MeasurableSpace Ω] [TopologicalSpace Ω] [HasOuterApproxClosed Ω]
@@ -188,19 +193,6 @@ theorem ext_of_forall_lintegral_eq_of_IsFiniteMeasure {Ω : Type*}
   · exact fun F F_closed ↦ key F_closed
   · exact key isClosed_univ
   · rw [BorelSpace.measurable_eq (α := Ω), borel_eq_generateFrom_isClosed]
-
-theorem ext_of_forall_integral_eq_of_IsFiniteMeasure {Ω : Type*}
-    [MeasurableSpace Ω] [TopologicalSpace Ω] [HasOuterApproxClosed Ω]
-    [BorelSpace Ω] {μ ν : Measure Ω} [IsFiniteMeasure μ] [IsFiniteMeasure ν]
-    (h : ∀ (f : Ω →ᵇ ℝ), ∫ x, f x ∂μ = ∫ x, f x ∂ν) :
-    μ = ν := by
-  apply ext_of_forall_lintegral_eq_of_IsFiniteMeasure
-  intro f
-  apply (ENNReal.toReal_eq_toReal_iff' (lintegral_lt_top_of_nnreal μ f).ne
-      (lintegral_lt_top_of_nnreal ν f).ne).mp
-  rw [toReal_lintegral_coe_eq_integral f μ, toReal_lintegral_coe_eq_integral f ν]
-  exact h ⟨⟨fun x => (f x).toReal, Continuous.comp' NNReal.continuous_coe f.continuous⟩,
-      f.map_bounded'⟩
 
 end MeasureTheory -- namespace
 

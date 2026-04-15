@@ -3,6 +3,10 @@ Extracted from Topology/Metrizable/Urysohn.lean
 Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Topology.UrysohnsLemma
+import Mathlib.Topology.Metrizable.Basic
+import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
 /-!
 # Urysohn's Metrization Theorem
@@ -34,7 +38,7 @@ theorem exists_isInducing_l_infty : ∃ f : X → ℕ →ᵇ ℝ, IsInducing f :
   rcases exists_countable_basis X with ⟨B, hBc, -, hB⟩
   let s : Set (Set X × Set X) := { UV ∈ B ×ˢ B | closure UV.1 ⊆ UV.2 }
   -- `s` is a countable set.
-  haveI : Encodable s := ((hBc.prod hBc).mono (sep_subset _ _)).toEncodable
+  haveI : Encodable s := ((hBc.prod hBc).mono inter_subset_left).toEncodable
   -- We don't have the space of bounded (possibly discontinuous) functions, so we equip `s`
   -- with the discrete topology and deal with `s →ᵇ ℝ` instead.
   letI : TopologicalSpace s := ⊥
@@ -99,7 +103,10 @@ theorem exists_isInducing_l_infty : ∃ f : X → ℕ →ᵇ ℝ, IsInducing f :
     rw [hF, hF, hfε UV hy, hf0 UV hxU, Pi.zero_apply, dist_zero_right]
     exact le_abs_self _
 
--- INSTANCE (free from Core): (priority
+instance (priority := 90) PseudoMetrizableSpace.of_regularSpace_secondCountableTopology :
+    PseudoMetrizableSpace X :=
+  let ⟨_, hf⟩ := exists_isInducing_l_infty X
+  hf.pseudoMetrizableSpace
 
 end RegularSpace
 
@@ -108,6 +115,10 @@ variable (X : Type*) [TopologicalSpace X] [T3Space X] [SecondCountableTopology X
 theorem exists_embedding_l_infty : ∃ f : X → ℕ →ᵇ ℝ, IsEmbedding f :=
   let ⟨f, hf⟩ := exists_isInducing_l_infty X; ⟨f, hf.isEmbedding⟩
 
--- INSTANCE (free from Core): (priority
+instance (priority := 90) metrizableSpace_of_t3_secondCountable : MetrizableSpace X :=
+  let ⟨_, hf⟩ := exists_embedding_l_infty X
+  hf.metrizableSpace
+
+metrizableSpace_of_t3_second_countable := metrizableSpace_of_t3_secondCountable
 
 end TopologicalSpace

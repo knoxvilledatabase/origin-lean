@@ -3,6 +3,9 @@ Extracted from RingTheory/WittVector/FrobeniusFractionField.lean
 Genuine: 4 of 17 | Dissolved: 13 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Nat.Cast.WithTop
+import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.RingTheory.WittVector.DiscreteValuationRing
 
 /-!
 # Solving equations about the Frobenius map on the field of fractions of `𝕎 k`
@@ -123,10 +126,6 @@ variable {k : Type*} [Field k] [CharP k p] [IsAlgClosed k]
 -- DISSOLVED: frobenius_frobeniusRotation
 
 local notation "φ" => IsFractionRing.ringEquivOfRingEquiv (frobeniusEquiv p k)
-
-set_option linter.flexible false in
-
-set_option linter.unusedSimpArgs false in
 
 -- DISSOLVED: exists_frobenius_solution_fractionRing_aux
 

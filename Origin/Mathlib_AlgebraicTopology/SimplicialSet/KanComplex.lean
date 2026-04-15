@@ -1,39 +1,33 @@
 /-
 Extracted from AlgebraicTopology/SimplicialSet/KanComplex.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.AlgebraicTopology.SimplicialSet.Basic
 
 /-!
 # Kan complexes
 
-In this file, the abbreviation `KanComplex` is introduced for
-fibrant objects in the category `SSet` which is equipped with
-Kan fibrations.
-
+In this file we give the definition of Kan complexes.
 In `Mathlib/AlgebraicTopology/Quasicategory/Basic.lean`
 we show that every Kan complex is a quasicategory.
 
 ## TODO
 
 - Show that the singular simplicial set of a topological space is a Kan complex.
+- Generalize the definition to higher universes.
+  Since `Λ[n, i]` is an object of `SSet.{0}`,
+  the current definition of a Kan complex `S`
+  requires `S : SSet.{0}`.
 
 -/
 
-universe u
-
 namespace SSet
 
-open CategoryTheory Simplicial Limits
+open CategoryTheory Simplicial
 
-open modelCategoryQuillen in
-
-abbrev KanComplex (S : SSet.{u}) : Prop := HomotopicalAlgebra.IsFibrant S
-
-lemma KanComplex.hornFilling {S : SSet.{u}} [KanComplex S]
-    {n : ℕ} {i : Fin (n + 2)} (σ₀ : (Λ[n + 1, i] : SSet) ⟶ S) :
-    ∃ σ : Δ[n + 1] ⟶ S, σ₀ = Λ[n + 1, i].ι ≫ σ := by
-  have sq' : CommSq σ₀ Λ[n + 1, i].ι (terminal.from S) (terminal.from _) := ⟨by simp⟩
-  exact ⟨sq'.lift, by simp⟩
+class KanComplex (S : SSet) : Prop where
+  hornFilling : ∀ ⦃n : ℕ⦄ ⦃i : Fin (n+1)⦄ (σ₀ : Λ[n, i] ⟶ S),
+    ∃ σ : Δ[n] ⟶ S, σ₀ = hornInclusion n i ≫ σ
 
 end SSet

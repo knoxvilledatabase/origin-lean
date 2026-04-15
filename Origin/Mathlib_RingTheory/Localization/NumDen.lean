@@ -1,8 +1,11 @@
 /-
 Extracted from RingTheory/Localization/NumDen.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 of 18 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.Localization.FractionRing
+import Mathlib.RingTheory.Localization.Integer
+import Mathlib.RingTheory.UniqueFactorizationDomain.GCDMonoid
 
 /-!
 # Numerator and denominator in a localization
@@ -35,7 +38,7 @@ theorem exists_reduced_fraction (x : K) :
   obtain ⟨_, b'_nonzero⟩ := mul_mem_nonZeroDivisors.mp b_nonzero
   refine ⟨a', ⟨b', b'_nonzero⟩, no_factor, ?_⟩
   refine mul_left_cancel₀ (IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b_nonzero) ?_
-  simp only [map_mul, Algebra.smul_def] at *
+  simp only [Subtype.coe_mk, RingHom.map_mul, Algebra.smul_def] at *
   rw [← hab, mul_assoc, mk'_spec' _ a' ⟨b', b'_nonzero⟩]
 
 noncomputable def num (x : K) : A :=
@@ -49,3 +52,87 @@ theorem num_den_reduced (x : K) : IsRelPrime (num A x) (den A x) :=
 
 theorem mk'_num_den (x : K) : mk' K (num A x) (den A x) = x :=
   (Classical.choose_spec (Classical.choose_spec (exists_reduced_fraction A x))).2
+
+@[simp]
+theorem mk'_num_den' (x : K) : algebraMap A K (num A x) / algebraMap A K (den A x) = x := by
+  rw [← mk'_eq_div]
+  apply mk'_num_den
+
+variable {A}
+
+theorem num_mul_den_eq_num_iff_eq {x y : K} :
+    x * algebraMap A K (den A y) = algebraMap A K (num A y) ↔ x = y :=
+  ⟨fun h => by simpa only [mk'_num_den] using eq_mk'_iff_mul_eq.mpr h, fun h ↦
+    eq_mk'_iff_mul_eq.mp (by rw [h, mk'_num_den])⟩
+
+theorem num_mul_den_eq_num_iff_eq' {x y : K} :
+    y * algebraMap A K (den A x) = algebraMap A K (num A x) ↔ x = y :=
+  ⟨fun h ↦ by simpa only [eq_comm, mk'_num_den] using eq_mk'_iff_mul_eq.mpr h, fun h ↦
+    eq_mk'_iff_mul_eq.mp (by rw [h, mk'_num_den])⟩
+
+theorem num_mul_den_eq_num_mul_den_iff_eq {x y : K} :
+    num A y * den A x = num A x * den A y ↔ x = y :=
+  ⟨fun h ↦ by simpa only [mk'_num_den] using mk'_eq_of_eq' (S := K) h, fun h ↦ by rw [h]⟩
+
+theorem eq_zero_of_num_eq_zero {x : K} (h : num A x = 0) : x = 0 :=
+  (num_mul_den_eq_num_iff_eq' (A := A)).mp (by rw [zero_mul, h, RingHom.map_zero])
+
+@[simp]
+lemma num_zero : IsFractionRing.num A (0 : K) = 0 := by
+  have := mk'_num_den' A (0 : K)
+  simp only [div_eq_zero_iff] at this
+  rcases this with h | h
+  · exact NoZeroSMulDivisors.algebraMap_injective A K (by convert h; simp)
+  · replace h : algebraMap A K (den A (0 : K)) = algebraMap A K 0 := by convert h; simp
+    absurd NoZeroSMulDivisors.algebraMap_injective A K h
+    apply nonZeroDivisors.coe_ne_zero
+
+@[simp]
+lemma num_eq_zero (x : K) : IsFractionRing.num A x = 0 ↔ x = 0 :=
+  ⟨eq_zero_of_num_eq_zero, fun h ↦ h ▸ num_zero⟩
+
+theorem isInteger_of_isUnit_den {x : K} (h : IsUnit (den A x : A)) : IsInteger A x := by
+  cases' h with d hd
+  have d_ne_zero : algebraMap A K (den A x) ≠ 0 :=
+    IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (den A x).2
+  use ↑d⁻¹ * num A x
+  refine _root_.trans ?_ (mk'_num_den A x)
+  rw [map_mul, map_units_inv, hd]
+  apply mul_left_cancel₀ d_ne_zero
+  rw [← mul_assoc, mul_inv_cancel₀ d_ne_zero, one_mul, mk'_spec']
+
+theorem isUnit_den_iff (x : K) : IsUnit (den A x : A) ↔ IsLocalization.IsInteger A x where
+  mp h := by
+    obtain ⟨den, hd⟩ := IsUnit.exists_right_inv h
+    use (num A x) * den
+    conv => rhs; rw [← mk'_num_den' A x]
+    rw [map_mul, div_eq_mul_inv]
+    congr 1
+    apply eq_inv_of_mul_eq_one_right
+    rw [← map_mul]
+    norm_cast
+    simp only [hd, OneMemClass.coe_one, map_one]
+  mpr h := by
+    have ⟨v, h⟩ := h
+    apply IsRelPrime.isUnit_of_dvd (num_den_reduced A x).symm
+    use v
+    apply_fun algebraMap A K
+    · simp only [map_mul, h]
+      rw [mul_comm, ← div_eq_iff]
+      · simp only [mk'_num_den']
+      intro h
+      replace h : algebraMap A K (den A x : A) = algebraMap A K 0 := by convert h; simp
+      exact nonZeroDivisors.coe_ne_zero _ <| NoZeroSMulDivisors.algebraMap_injective A K h
+    exact NoZeroSMulDivisors.algebraMap_injective A K
+
+-- DISSOLVED: isUnit_den_zero
+
+-- DISSOLVED: isUnit_den_of_num_eq_zero
+
+-- DISSOLVED: associated_den_num_inv
+
+-- DISSOLVED: associated_num_den_inv
+
+end NumDen
+
+end IsFractionRing

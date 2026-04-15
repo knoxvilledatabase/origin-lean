@@ -3,6 +3,7 @@ Extracted from Algebra/Ring/Identities.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Tactic.Ring
 
 /-!
 # Identities

@@ -3,6 +3,11 @@ Extracted from Algebra/Order/Chebyshev.lean
 Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Monovary
+import Mathlib.Algebra.Order.Rearrangement
+import Mathlib.GroupTheory.Perm.Cycle.Basic
+import Mathlib.Tactic.GCongr
+import Mathlib.Tactic.Positivity
 
 /-!
 # Chebyshev's sum inequality
@@ -39,9 +44,8 @@ variable {ι α β : Type*}
 
 section SMul
 
-variable [Semiring α] [LinearOrder α] [IsStrictOrderedRing α] [ExistsAddOfLE α]
-  [AddCommMonoid β] [LinearOrder β] [IsOrderedCancelAddMonoid β]
-  [Module α β] [PosSMulMono α β] {s : Finset ι} {σ : Perm ι} {f : ι → α} {g : ι → β}
+variable [LinearOrderedSemiring α] [ExistsAddOfLE α] [LinearOrderedCancelAddCommMonoid β]
+  [Module α β] [OrderedSMul α β] {s : Finset ι} {σ : Perm ι} {f : ι → α} {g : ι → β}
 
 theorem MonovaryOn.sum_smul_sum_le_card_smul_sum (hfg : MonovaryOn f g s) :
     (∑ i ∈ s, f i) • ∑ i ∈ s, g i ≤ #s • ∑ i ∈ s, f i • g i := by
@@ -75,8 +79,7 @@ Special cases of the above when scalar multiplication is actually multiplication
 
 section Mul
 
-variable [Semiring α] [LinearOrder α] [IsStrictOrderedRing α] [ExistsAddOfLE α]
-  {s : Finset ι} {σ : Perm ι} {f g : ι → α}
+variable [LinearOrderedSemiring α] [ExistsAddOfLE α] {s : Finset ι} {σ : Perm ι} {f g : ι → α}
 
 theorem MonovaryOn.sum_mul_sum_le_card_mul_sum (hfg : MonovaryOn f g s) :
     (∑ i ∈ s, f i) * ∑ i ∈ s, g i ≤ #s * ∑ i ∈ s, f i * g i := by
@@ -119,8 +122,7 @@ theorem Antivary.card_mul_sum_le_sum_mul_sum (hfg : Antivary f g) :
 
 end Mul
 
-variable [Semifield α] [LinearOrder α] [IsStrictOrderedRing α] [ExistsAddOfLE α]
-  {s : Finset ι} {f : ι → α}
+variable [LinearOrderedSemifield α] [ExistsAddOfLE α] {s : Finset ι} {f : ι → α}
 
 lemma pow_sum_div_card_le_sum_pow (hf : ∀ i ∈ s, 0 ≤ f i) (n : ℕ) :
     (∑ i ∈ s, f i) ^ (n + 1) / #s ^ n ≤ ∑ i ∈ s, f i ^ (n + 1) := by
@@ -135,5 +137,4 @@ theorem sum_div_card_sq_le_sum_sq_div_card :
   · simp
   rw [div_pow, div_le_div_iff₀ (by positivity) (by positivity), sq (#s : α), mul_left_comm,
     ← mul_assoc]
-  gcongr
-  exact sq_sum_le_card_mul_sum_sq
+  exact mul_le_mul_of_nonneg_right sq_sum_le_card_mul_sum_sq (by positivity)

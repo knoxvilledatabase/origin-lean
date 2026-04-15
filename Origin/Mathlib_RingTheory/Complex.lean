@@ -3,6 +3,9 @@ Extracted from RingTheory/Complex.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Complex.Module
+import Mathlib.RingTheory.Norm.Defs
+import Mathlib.RingTheory.Trace.Defs
 
 /-! # Lemmas about `Algebra.trace` and `Algebra.norm` on `ℂ` -/
 
@@ -13,22 +16,18 @@ theorem Algebra.leftMulMatrix_complex (z : ℂ) :
   ext i j
   rw [Algebra.leftMulMatrix_eq_repr_mul, Complex.coe_basisOneI_repr, Complex.coe_basisOneI, mul_re,
     mul_im, Matrix.of_apply]
-  fin_cases j <;> dsimp only [Fin.zero_eta, Fin.mk_one, Matrix.cons_val]
-  · simp only [one_re, mul_one, one_im, mul_zero,
-      sub_zero, zero_add]
+  fin_cases j
+  · simp only [Fin.zero_eta, id_eq, Matrix.cons_val_zero, one_re, mul_one, one_im, mul_zero,
+      sub_zero, zero_add, Matrix.cons_val_fin_one]
     fin_cases i <;> rfl
-  · simp only [I_re, mul_zero, I_im,
-      mul_one, zero_sub, add_zero]
+  · simp only [Fin.mk_one, id_eq, Matrix.cons_val_one, Matrix.head_cons, I_re, mul_zero, I_im,
+      mul_one, zero_sub, add_zero, Matrix.cons_val_fin_one]
     fin_cases i <;> rfl
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem Algebra.trace_complex_apply (z : ℂ) : Algebra.trace ℝ ℂ z = 2 * z.re := by
   rw [Algebra.trace_eq_matrix_trace Complex.basisOneI, Algebra.leftMulMatrix_complex,
     Matrix.trace_fin_two]
   exact (two_mul _).symm
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem Algebra.norm_complex_apply (z : ℂ) : Algebra.norm ℝ z = Complex.normSq z := by
   rw [Algebra.norm_eq_matrix_det Complex.basisOneI, Algebra.leftMulMatrix_complex,

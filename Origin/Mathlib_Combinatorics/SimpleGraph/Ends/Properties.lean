@@ -3,6 +3,8 @@ Extracted from Combinatorics/SimpleGraph/Ends/Properties.lean
 Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Combinatorics.SimpleGraph.Ends.Defs
+import Mathlib.CategoryTheory.CofilteredSystem
 
 /-!
 # Properties of the ends of graphs
@@ -15,7 +17,13 @@ variable {V : Type} (G : SimpleGraph V)
 
 namespace SimpleGraph
 
--- INSTANCE (free from Core): [Finite
+instance [Finite V] : IsEmpty G.end where
+  false := by
+    rintro ⟨s, _⟩
+    cases nonempty_fintype V
+    obtain ⟨v, h⟩ := (s <| Opposite.op Finset.univ).nonempty
+    exact Set.disjoint_iff.mp (s _).disjoint_right
+        ⟨by simp only [Opposite.unop_op, Finset.coe_univ, Set.mem_univ], h⟩
 
 lemma end_componentCompl_infinite (e : G.end) (K : (Finset V)ᵒᵖ) :
     ((e : (j : (Finset V)ᵒᵖ) → G.componentComplFunctor.obj j) K).supp.Infinite := by
@@ -23,9 +31,11 @@ lemma end_componentCompl_infinite (e : G.end) (K : (Finset V)ᵒᵖ) :
   change Opposite.unop K ⊆ Opposite.unop (Opposite.op L) at h
   exact ⟨e.val (Opposite.op L), (e.prop (CategoryTheory.opHomOfLE h))⟩
 
--- INSTANCE (free from Core): componentComplFunctor_nonempty_of_infinite
+instance compononentComplFunctor_nonempty_of_infinite [Infinite V] (K : (Finset V)ᵒᵖ) :
+    Nonempty (G.componentComplFunctor.obj K) := G.componentCompl_nonempty_of_infinite K.unop
 
--- INSTANCE (free from Core): componentComplFunctor_finite
+instance componentComplFunctor_finite [LocallyFinite G] [Fact G.Preconnected]
+    (K : (Finset V)ᵒᵖ) : Finite (G.componentComplFunctor.obj K) := G.componentCompl_finite K.unop
 
 lemma nonempty_ends_of_infinite [LocallyFinite G] [Fact G.Preconnected] [Infinite V] :
     G.end.Nonempty := by

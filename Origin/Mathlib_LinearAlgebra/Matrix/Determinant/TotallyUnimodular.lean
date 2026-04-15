@@ -1,8 +1,11 @@
 /-
 Extracted from LinearAlgebra/Matrix/Determinant/TotallyUnimodular.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.Data.Matrix.ColumnRowPartitioned
+import Mathlib.Data.Sign
 
 /-!
 # Totally unimodular matrices
@@ -11,14 +14,14 @@ This file defines totally unimodular matrices and provides basic API for them.
 
 ## Main definitions
 
-- `Matrix.IsTotallyUnimodular`: a matrix is totally unimodular iff every square submatrix
-  (not necessarily contiguous) has determinant `0` or `1` or `-1`.
+ - `Matrix.IsTotallyUnimodular`: a matrix is totally unimodular iff every square submatrix
+    (not necessarily contiguous) has determinant `0` or `1` or `-1`.
 
 ## Main results
 
-- `Matrix.isTotallyUnimodular_iff`: a matrix is totally unimodular iff every square submatrix
-  (possibly with repeated rows and/or repeated columns) has determinant `0` or `1` or `-1`.
-- `Matrix.IsTotallyUnimodular.apply`: entry in a totally unimodular matrix is `0` or `1` or `-1`.
+ - `Matrix.isTotallyUnimodular_iff`: a matrix is totally unimodular iff every square submatrix
+    (possibly with repeated rows and/or repeated columns) has determinant `0` or `1` or `-1`.
+ - `Matrix.IsTotallyUnimodular.apply`: entry in a totally unimodular matrix is `0` or `1` or `-1`.
 
 -/
 
@@ -56,10 +59,10 @@ lemma isTotallyUnimodular_iff_fintype.{w} (A : Matrix m n R) : A.IsTotallyUnimod
   constructor
   · intro hA ι _ _ f g
     specialize hA (Fintype.card ι) (f ∘ (Fintype.equivFin ι).symm) (g ∘ (Fintype.equivFin ι).symm)
-    rwa [← submatrix_submatrix, det_submatrix_equiv_self] at hA
+    rwa [←submatrix_submatrix, det_submatrix_equiv_self] at hA
   · intro hA k f g
     specialize hA (ULift (Fin k)) (f ∘ Equiv.ulift) (g ∘ Equiv.ulift)
-    rwa [← submatrix_submatrix, det_submatrix_equiv_self] at hA
+    rwa [←submatrix_submatrix, det_submatrix_equiv_self] at hA
 
 lemma IsTotallyUnimodular.apply {A : Matrix m n R} (hA : A.IsTotallyUnimodular) (i : m) (j : n) :
     A i j ∈ Set.range SignType.cast := by
@@ -92,3 +95,93 @@ lemma reindex_isTotallyUnimodular (A : Matrix m n R) (em : m ≃ m') (en : n ≃
     (A.reindex em en).IsTotallyUnimodular ↔ A.IsTotallyUnimodular :=
   ⟨fun hA => by simpa [Equiv.symm_apply_eq] using hA.reindex em.symm en.symm,
    fun hA => hA.reindex _ _⟩
+
+lemma IsTotallyUnimodular.fromRows_unitlike [DecidableEq n] {A : Matrix m n R} {B : Matrix m' n R}
+    (hA : A.IsTotallyUnimodular)
+    (hB : Nonempty n → ∀ i : m', ∃ j : n, ∃ s : SignType, B i = Pi.single j s.cast) :
+    (fromRows A B).IsTotallyUnimodular := by
+  intro k f g hf hg
+  induction k with
+  | zero => use 1; simp
+  | succ k ih =>
+    specialize hB ⟨g 0⟩
+    -- Either `f` is `inr` somewhere or `inl` everywhere
+    obtain ⟨i, j, hfi⟩ | ⟨f', rfl⟩ : (∃ i j, f i = .inr j) ∨ (∃ f', f = .inl ∘ f') := by
+      simp_rw [← Sum.isRight_iff, or_iff_not_imp_left, not_exists, Bool.not_eq_true,
+        Sum.isRight_eq_false, Sum.isLeft_iff]
+      intro hfr
+      choose f' hf' using hfr
+      exact ⟨f', funext hf'⟩
+    · have hAB := det_succ_row ((fromRows A B).submatrix f g) i
+      simp only [submatrix_apply, hfi, fromRows_apply_inr] at hAB
+      obtain ⟨j', s, hj'⟩ := hB j
+      · simp only [hj', Function.update_apply] at hAB
+        by_cases hj'' : ∃ x, g x = j'
+        · obtain ⟨x, rfl⟩ := hj''
+          rw [Fintype.sum_eq_single x fun y hxy => ?_, Pi.single_eq_same] at hAB
+          · rw [hAB]
+            change _ ∈ MonoidHom.mrange SignType.castHom.toMonoidHom
+            refine mul_mem (mul_mem ?_ (Set.mem_range_self s)) ?_
+            · apply pow_mem
+              exact ⟨-1, by simp⟩
+            · exact ih _ _
+                (hf.comp Fin.succAbove_right_injective)
+                (hg.comp Fin.succAbove_right_injective)
+          · simp [Pi.single_eq_of_ne, hg.ne_iff.mpr hxy]
+        · rw [not_exists] at hj''
+          use 0
+          simpa [hj''] using hAB.symm
+    · rw [isTotallyUnimodular_iff] at hA
+      apply hA
+
+lemma fromRows_isTotallyUnimodular_iff_rows [DecidableEq n] {A : Matrix m n R} {B : Matrix m' n R}
+    (hB : Nonempty n → ∀ i : m', ∃ j : n, ∃ s : SignType, B i = Pi.single j s.cast) :
+    (fromRows A B).IsTotallyUnimodular ↔ A.IsTotallyUnimodular :=
+  ⟨.submatrix Sum.inl id, fun hA => hA.fromRows_unitlike hB⟩
+
+lemma fromRows_one_isTotallyUnimodular_iff [DecidableEq n] (A : Matrix m n R) :
+    (fromRows A (1 : Matrix n n R)).IsTotallyUnimodular ↔ A.IsTotallyUnimodular :=
+  fromRows_isTotallyUnimodular_iff_rows <| fun h i ↦
+    ⟨i, 1, funext fun j ↦ by simp [one_apply, Pi.single_apply, eq_comm]⟩
+
+lemma one_fromRows_isTotallyUnimodular_iff [DecidableEq n] (A : Matrix m n R) :
+    (fromRows (1 : Matrix n n R) A).IsTotallyUnimodular ↔ A.IsTotallyUnimodular := by
+  have hA :
+    fromRows (1 : Matrix n n R) A =
+      (fromRows A (1 : Matrix n n R)).reindex (Equiv.sumComm m n) (Equiv.refl n) := by
+    aesop
+  rw [hA, reindex_isTotallyUnimodular, fromRows_one_isTotallyUnimodular_iff]
+
+lemma fromColumns_one_isTotallyUnimodular_iff [DecidableEq m] (A : Matrix m n R) :
+    (fromColumns A (1 : Matrix m m R)).IsTotallyUnimodular ↔ A.IsTotallyUnimodular := by
+  rw [←transpose_isTotallyUnimodular_iff, transpose_fromColumns, transpose_one,
+    fromRows_one_isTotallyUnimodular_iff, transpose_isTotallyUnimodular_iff]
+
+lemma one_fromColumns_isTotallyUnimodular_iff [DecidableEq m] (A : Matrix m n R) :
+    (fromColumns (1 : Matrix m m R) A).IsTotallyUnimodular ↔ A.IsTotallyUnimodular := by
+  rw [←transpose_isTotallyUnimodular_iff, transpose_fromColumns, transpose_one,
+    one_fromRows_isTotallyUnimodular_iff, transpose_isTotallyUnimodular_iff]
+
+alias ⟨_, IsTotallyUnimodular.fromRows_one⟩ := fromRows_one_isTotallyUnimodular_iff
+
+alias ⟨_, IsTotallyUnimodular.one_fromRows⟩ := one_fromRows_isTotallyUnimodular_iff
+
+alias ⟨_, IsTotallyUnimodular.fromColumns_one⟩ := fromColumns_one_isTotallyUnimodular_iff
+
+alias ⟨_, IsTotallyUnimodular.one_fromColumns⟩ := one_fromColumns_isTotallyUnimodular_iff
+
+lemma fromRows_row0_isTotallyUnimodular_iff (A : Matrix m n R) :
+    (fromRows A (row m' 0)).IsTotallyUnimodular ↔ A.IsTotallyUnimodular := by
+  classical
+  refine fromRows_isTotallyUnimodular_iff_rows <| fun _ _ => ?_
+  inhabit n
+  refine ⟨default, 0, ?_⟩
+  ext x
+  simp [Pi.single_apply]
+
+lemma fromColumns_col0_isTotallyUnimodular_iff (A : Matrix m n R) :
+    (fromColumns A (col n' 0)).IsTotallyUnimodular ↔ A.IsTotallyUnimodular := by
+  rw [← transpose_isTotallyUnimodular_iff, transpose_fromColumns, transpose_col,
+    fromRows_row0_isTotallyUnimodular_iff, transpose_isTotallyUnimodular_iff]
+
+end Matrix

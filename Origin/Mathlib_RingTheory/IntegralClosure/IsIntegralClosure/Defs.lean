@@ -3,6 +3,7 @@ Extracted from RingTheory/IntegralClosure/IsIntegralClosure/Defs.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.IntegralClosure.IsIntegral.Defs
 
 /-!
 # Integral closure as a characteristic predicate
@@ -16,7 +17,13 @@ Let `R` be a `CommRing` and let `A` be an R-algebra.
   (the image of) `A`.
 -/
 
+open Polynomial
+
+section IsIntegralClosure
+
 class IsIntegralClosure (A R B : Type*) [CommRing R] [CommSemiring A] [CommRing B] [Algebra R B]
   [Algebra A B] : Prop where
-  algebraMap_injective (A R B) : Function.Injective (algebraMap A B)
+  algebraMap_injective' : Function.Injective (algebraMap A B)
   isIntegral_iff : ∀ {x : B}, IsIntegral R x ↔ ∃ y, algebraMap A B y = x
+
+end IsIntegralClosure

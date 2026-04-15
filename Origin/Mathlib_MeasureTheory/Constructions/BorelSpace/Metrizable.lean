@@ -3,6 +3,9 @@ Extracted from MeasureTheory/Constructions/BorelSpace/Metrizable.lean
 Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Metric
+import Mathlib.Topology.Metrizable.Basic
+import Mathlib.Topology.IndicatorConstPointwise
 
 /-!
 # Measurable functions in (pseudo-)metrizable Borel spaces
@@ -32,7 +35,7 @@ theorem measurable_of_tendsto_metrizable' {ι} {f : ι → α → β} {g : α �
     exact ((continuous_infNndist_pt s).tendsto (g x)).comp (lim x)
   have h4s : g ⁻¹' s = (fun x => infNndist (g x) s) ⁻¹' {0} := by
     ext x
-    simp [← h1s.mem_iff_infDist_zero h2s, ← NNReal.coe_eq_zero]
+    simp [h1s, ← h1s.mem_iff_infDist_zero h2s, ← NNReal.coe_eq_zero]
   rw [h4s]
   exact this (measurableSet_singleton 0)
 

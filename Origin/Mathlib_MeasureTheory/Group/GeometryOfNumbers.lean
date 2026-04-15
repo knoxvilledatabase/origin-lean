@@ -3,6 +3,9 @@ Extracted from MeasureTheory/Group/GeometryOfNumbers.lean
 Genuine: 1 of 3 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Body
+import Mathlib.Analysis.Convex.Measure
+import Mathlib.MeasureTheory.Group.FundamentalDomain
 
 /-!
 # Geometry of numbers
@@ -38,7 +41,7 @@ open scoped Pointwise NNReal
 
 variable {E L : Type*} [MeasurableSpace E] {μ : Measure E} {F s : Set E}
 
-theorem exists_pair_mem_lattice_not_disjoint_vadd [AddGroup L] [Countable L] [AddAction L E]
+theorem exists_pair_mem_lattice_not_disjoint_vadd [AddCommGroup L] [Countable L] [AddAction L E]
     [MeasurableSpace L] [MeasurableVAdd L E] [VAddInvariantMeasure L E μ]
     (fund : IsAddFundamentalDomain L F μ) (hS : NullMeasurableSet s μ) (h : μ F < μ s) :
     ∃ x y : L, x ≠ y ∧ ¬Disjoint (x +ᵥ s) (y +ᵥ s) := by

@@ -3,6 +3,7 @@ Extracted from CategoryTheory/Localization/Composition.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Localization.LocalizerMorphism
 
 /-!
 # Composition of localization functors
@@ -35,7 +36,7 @@ def StrictUniversalPropertyFixedTarget.comp
     (hW₁₃ : W₁ ≤ W₃) (hW₂₃ : W₂ ≤ W₃.map L₁) :
     StrictUniversalPropertyFixedTarget (L₁ ⋙ L₂) W₃ E where
   inverts := hW₃
-  lift F hF := h₂.lift (h₁.lift F (MorphismProperty.IsInvertedBy.of_le _ _ F hF hW₁₃)) (by
+  lift F hF := h₂.lift (h₁.lift F (MorphismProperty.IsInvertedBy.of_le _ _  F hF hW₁₃)) (by
     refine MorphismProperty.IsInvertedBy.of_le _ _ _ ?_ hW₂₃
     simpa only [MorphismProperty.IsInvertedBy.map_iff, h₁.fac F] using hF)
   fac F hF := by rw [Functor.assoc, h₂.fac, h₁.fac]

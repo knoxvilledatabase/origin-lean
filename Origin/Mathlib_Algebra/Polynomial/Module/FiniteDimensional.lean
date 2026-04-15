@@ -3,6 +3,8 @@ Extracted from Algebra/Polynomial/Module/FiniteDimensional.lean
 Genuine: 1 of 2 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.FieldTheory.Minpoly.Field
+import Mathlib.Algebra.Polynomial.Module.AEval
 
 /-!
 # Polynomial modules in finite dimensions
@@ -11,9 +13,9 @@ This file is a place to collect results about the `R[X]`-module structure induce
 by an `R`-linear endomorphism, which require the concept of finite-dimensionality.
 
 ## Main results:
-* `Module.AEval.isTorsion_of_finiteDimensional`: if a vector space `M` with coefficients in a field
-  `K` carries a natural `K`-linear endomorphism which belongs to a finite-dimensional algebra
-  over `K`, then the induced `K[X]`-module structure on `M` is pure torsion.
+ * `Module.AEval.isTorsion_of_finiteDimensional`: if a vector space `M` with coefficients in a field
+   `K` carries a natural `K`-linear endomorphism which belongs to a finite-dimensional algebra
+   over `K`, then the induced `K[X]`-module structure on `M` is pure torsion.
 
 -/
 

@@ -1,8 +1,12 @@
 /-
 Extracted from Data/Sym/Card.lean
-Genuine: 12 of 12 | Dissolved: 0 | Infrastructure: 0
+Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Data.Finset.Sym
+import Mathlib.Data.Fintype.Sum
+import Mathlib.Data.Fintype.Prod
 
 /-!
 # Stars and bars
@@ -90,7 +94,9 @@ theorem card_sym_fin_eq_multichoose : ∀ n k : ℕ, card (Sym (Fin n) k) = mult
 theorem card_sym_eq_multichoose (α : Type*) (k : ℕ) [Fintype α] [Fintype (Sym α k)] :
     card (Sym α k) = multichoose (card α) k := by
   rw [← card_sym_fin_eq_multichoose]
-  exact card_congr (equivCongr (equivFin α))
+  -- FIXME: Without the `Fintype` namespace, why does it complain about `Finset.card_congr` being
+  -- deprecated?
+  exact Fintype.card_congr (equivCongr (equivFin α))
 
 theorem card_sym_eq_choose {α : Type*} [Fintype α] (k : ℕ) [Fintype (Sym α k)] :
     card (Sym α k) = (card α + k - 1).choose k := by
@@ -104,20 +110,34 @@ namespace Sym2
 
 variable [DecidableEq α]
 
-theorem card_image_diag (s : Finset α) : #(s.diag.image Sym2.mk.uncurry) = #s := by
-  simp [card_image_of_injOn]
+theorem card_image_diag (s : Finset α) : #(s.diag.image Sym2.mk) = #s := by
+  rw [card_image_of_injOn, diag_card]
+  rintro ⟨x₀, x₁⟩ hx _ _ h
+  cases Sym2.eq.1 h
+  · rfl
+  · simp only [mem_coe, mem_diag] at hx
+    rw [hx.2]
 
-lemma two_mul_card_image_offDiag (s : Finset α) :
-    2 * #(s.offDiag.image Sym2.mk.uncurry) = #s.offDiag := by
-  rw [card_eq_sum_card_image (Sym2.mk.uncurry : α × α → _), sum_const_nat (Sym2.ind _), mul_comm]
-  -- FIXME: Would be cool for the final `aesop` call not to require this `a ≠ b ∨ b ≠ a` trick.
-  have (a b : α) (ha : a ∈ s) (hb : b ∈ s) (hab : a ≠ b ∨ b ≠ a) :
-      {z ∈ s.offDiag | Sym2.mk.uncurry z = s(a, b)} = .cons (a, b) {(b, a)}
-        (by simpa [eq_comm] using hab) := by aesop
-  aesop
+lemma two_mul_card_image_offDiag (s : Finset α) : 2 * #(s.offDiag.image Sym2.mk) = #s.offDiag := by
+  rw [card_eq_sum_card_image (Sym2.mk : α × α → _), sum_const_nat (Sym2.ind _), mul_comm]
+  rintro x y hxy
+  simp_rw [mem_image, mem_offDiag] at hxy
+  obtain ⟨a, ⟨ha₁, ha₂, ha⟩, h⟩ := hxy
+  replace h := Sym2.eq.1 h
+  obtain ⟨hx, hy, hxy⟩ : x ∈ s ∧ y ∈ s ∧ x ≠ y := by
+    cases h <;> refine ⟨‹_›, ‹_›, ?_⟩ <;> [exact ha; exact ha.symm]
+  have hxy' : y ≠ x := hxy.symm
+  have : {z ∈ s.offDiag | Sym2.mk z = s(x, y)} = {(x, y), (y, x)} := by
+    ext ⟨x₁, y₁⟩
+    rw [mem_filter, mem_insert, mem_singleton, Sym2.eq_iff, Prod.mk.inj_iff, Prod.mk.inj_iff,
+      and_iff_right_iff_imp]
+    -- `hxy'` is used in `exact`
+    rintro (⟨rfl, rfl⟩ | ⟨rfl, rfl⟩) <;> rw [mem_offDiag] <;> exact ⟨‹_›, ‹_›, ‹_›⟩
+  rw [this, card_insert_of_not_mem, card_singleton]
+  simp only [not_and, Prod.mk.inj_iff, mem_singleton]
+  exact fun _ => hxy'
 
-theorem card_image_offDiag (s : Finset α) :
-    #(s.offDiag.image Sym2.mk.uncurry) = (#s).choose 2 := by
+theorem card_image_offDiag (s : Finset α) : #(s.offDiag.image Sym2.mk) = (#s).choose 2 := by
   rw [Nat.choose_two_right, Nat.mul_sub_left_distrib, mul_one, ← offDiag_card,
     Nat.div_eq_of_eq_mul_right Nat.zero_lt_two (two_mul_card_image_offDiag s).symm]
 
@@ -137,9 +157,6 @@ theorem card_subtype_not_diag [Fintype α] :
   rw [mem_filter, univ_product_univ, mem_image]
   obtain ⟨a, ha⟩ := Quot.exists_rep x
   exact and_iff_right ⟨a, mem_univ _, ha⟩
-
-lemma card_diagSet_compl [Fintype α] : card (diagSetᶜ : Set (Sym2 α)) = (card α).choose 2 :=
-  card_subtype_not_diag
 
 protected theorem card {α} [Fintype α] : card (Sym2 α) = Nat.choose (card α + 1) 2 :=
   Finset.card_sym2 _

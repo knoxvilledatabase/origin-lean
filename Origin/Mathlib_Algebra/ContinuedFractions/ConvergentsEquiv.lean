@@ -3,6 +3,11 @@ Extracted from Algebra/ContinuedFractions/ConvergentsEquiv.lean
 Genuine: 13 of 14 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Field.Defs
+import Mathlib.Algebra.ContinuedFractions.ContinuantsRecurrence
+import Mathlib.Algebra.ContinuedFractions.TerminatedStable
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.Ring
 
 /-!
 # Equivalence of Recursive and Direct Computations of Convergents of Generalized Continued Fractions
@@ -103,6 +108,8 @@ theorem squashSeq_nth_of_lt {m : ℕ} (m_lt_n : m < n) : (squashSeq s n).get? m 
   | some =>
     obtain ⟨gp_n, s_nth_eq⟩ : ∃ gp_n, s.get? n = some gp_n :=
       s.ge_stable n.le_succ s_succ_nth_eq
+    obtain ⟨gp_m, s_mth_eq⟩ : ∃ gp_m, s.get? m = some gp_m :=
+      s.ge_stable (le_of_lt m_lt_n) s_nth_eq
     simp [*, squashSeq, m_lt_n.ne]
 
 theorem squashSeq_succ_n_tail_eq_squashSeq_tail_n :
@@ -165,7 +172,7 @@ theorem squashGCF_eq_self_of_terminated (terminatedAt_n : TerminatedAt g n) :
   cases n with
   | zero =>
     change g.s.get? 0 = none at terminatedAt_n
-    simp only [squashGCF, terminatedAt_n]
+    simp only [convs', squashGCF, convs'Aux, terminatedAt_n]
   | succ =>
     cases g
     simp only [squashGCF, mk.injEq, true_and]
@@ -173,7 +180,7 @@ theorem squashGCF_eq_self_of_terminated (terminatedAt_n : TerminatedAt g n) :
 
 theorem squashGCF_nth_of_lt {m : ℕ} (m_lt_n : m < n) :
     (squashGCF g (n + 1)).s.get? m = g.s.get? m := by
-  simp only [squashGCF, squashSeq_nth_of_lt m_lt_n]
+  simp only [squashGCF, squashSeq_nth_of_lt m_lt_n, Nat.add_eq, add_zero]
 
 theorem succ_nth_conv'_eq_squashGCF_nth_conv' :
     g.convs' (n + 1) = (squashGCF g n).convs' n := by
@@ -213,7 +220,7 @@ end WithDivisionRing
 
 end Squash
 
-theorem convs_eq_convs' [Field K] [LinearOrder K] [IsStrictOrderedRing K]
+theorem convs_eq_convs' [LinearOrderedField K]
     (s_pos : ∀ {gp : Pair K} {m : ℕ}, m < n → g.s.get? m = some gp → 0 < gp.a ∧ 0 < gp.b) :
     g.convs n = g.convs' n := by
   induction n generalizing g with
@@ -227,7 +234,7 @@ theorem convs_eq_convs' [Field K] [LinearOrder K] [IsStrictOrderedRing K]
     · have g'_eq_g : g' = g := squashGCF_eq_self_of_terminated terminatedAt_n
       rw [convs_stable_of_terminated n.le_succ terminatedAt_n, g'_eq_g, IH _]
       intro _ _ m_lt_n s_mth_eq
-      exact s_pos (Nat.lt_succ_of_lt m_lt_n) s_mth_eq
+      exact s_pos (Nat.lt.step m_lt_n) s_mth_eq
     · suffices g.convs (n + 1) = g'.convs n by
         -- invoke the IH for the squashed gcf
         rwa [← IH]
@@ -244,14 +251,16 @@ theorem convs_eq_convs' [Field K] [LinearOrder K] [IsStrictOrderedRing K]
           suffices 0 < gp_m.a ∧ 0 < gp_m.b + gp_succ_m.a / gp_succ_m.b by
             have ot : g'.s.get? m = some ⟨gp_m.a, gp_m.b + gp_succ_m.a / gp_succ_m.b⟩ :=
               squashSeq_nth_of_not_terminated mth_s_eq s_succ_mth_eq
-            grind
+            have : gp' = ⟨gp_m.a, gp_m.b + gp_succ_m.a / gp_succ_m.b⟩ := by
+              simp_all only [Option.some.injEq]
+            rwa [this]
           have m_lt_n : m < m.succ := Nat.lt_succ_self m
-          refine ⟨(s_pos (Nat.lt_succ_of_lt m_lt_n) mth_s_eq).left, ?_⟩
-          refine add_pos (s_pos (Nat.lt_succ_of_lt m_lt_n) mth_s_eq).right ?_
+          refine ⟨(s_pos (Nat.lt.step m_lt_n) mth_s_eq).left, ?_⟩
+          refine add_pos (s_pos (Nat.lt.step m_lt_n) mth_s_eq).right ?_
           have : 0 < gp_succ_m.a ∧ 0 < gp_succ_m.b := s_pos (lt_add_one <| m + 1) s_succ_mth_eq
           exact div_pos this.left this.right
         · -- the easy case: before the squashed position, nothing changes
-          refine s_pos (Nat.lt_succ_of_lt <| Nat.lt_succ_of_lt succ_m_lt_n) ?_
+          refine s_pos (Nat.lt.step <| Nat.lt.step succ_m_lt_n) ?_
           exact Eq.trans (squashGCF_nth_of_lt succ_m_lt_n).symm s_mth_eq'
       -- now the result follows from the fact that the convergents coincide at the squashed position
       -- as established in `succ_nth_conv_eq_squashGCF_nth_conv`.
@@ -268,11 +277,10 @@ open GenContFract
 
 namespace ContFract
 
-theorem convs_eq_convs' [Field K] [LinearOrder K] [IsStrictOrderedRing K]
-    {c : ContFract K} :
+nonrec theorem convs_eq_convs' [LinearOrderedField K] {c : ContFract K} :
     (↑c : GenContFract K).convs = (↑c : GenContFract K).convs' := by
   ext n
-  apply GenContFract.convs_eq_convs'
+  apply convs_eq_convs'
   intro gp m _ s_nth_eq
   exact ⟨zero_lt_one.trans_le ((c : SimpContFract K).property m gp.a
     (partNum_eq_s_a s_nth_eq)).symm.le, c.property m gp.b <| partDen_eq_s_b s_nth_eq⟩

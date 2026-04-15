@@ -3,6 +3,8 @@ Extracted from Algebra/Order/Interval/Multiset.lean
 Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Interval.Finset
+import Mathlib.Order.Interval.Multiset
 
 /-!
 # Algebraic properties of multiset intervals
@@ -14,8 +16,7 @@ variable {α : Type*}
 
 namespace Multiset
 
-variable [AddCommMonoid α] [PartialOrder α] [IsOrderedCancelAddMonoid α]
-  [ExistsAddOfLE α] [LocallyFiniteOrder α]
+variable [OrderedCancelAddCommMonoid α] [ExistsAddOfLE α] [LocallyFiniteOrder α]
 
 lemma map_add_left_Icc (a b c : α) : (Icc a b).map (c + ·) = Icc (c + a) (c + b) := by
   classical rw [Icc, Icc, ← Finset.image_add_left_Icc, Finset.image_val,

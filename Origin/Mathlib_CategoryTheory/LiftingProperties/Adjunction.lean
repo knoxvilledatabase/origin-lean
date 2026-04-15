@@ -3,6 +3,8 @@ Extracted from CategoryTheory/LiftingProperties/Adjunction.lean
 Genuine: 7 of 9 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.LiftingProperties.Basic
+import Mathlib.CategoryTheory.Adjunction.Basic
 
 /-!
 
@@ -20,13 +22,13 @@ namespace CategoryTheory
 
 open Category
 
-variable {C D : Type*} [Category* C] [Category* D] {G : C ⥤ D} {F : D ⥤ C}
+variable {C D : Type*} [Category C] [Category D] {G : C ⥤ D} {F : D ⥤ C}
 
 namespace CommSq
 
-variable {A B : C} {X Y : D} {i : A ⟶ B} {p : X ⟶ Y} {u : G.obj A ⟶ X} {v : G.obj B ⟶ Y}
+section
 
-set_option backward.isDefEq.respectTransparency false in
+variable {A B : C} {X Y : D} {i : A ⟶ B} {p : X ⟶ Y} {u : G.obj A ⟶ X} {v : G.obj B ⟶ Y}
 
 theorem right_adjoint (sq : CommSq u (G.map i) p v) (adj : G ⊣ F) :
     CommSq (adj.homEquiv _ _ u) i (F.map p) (adj.homEquiv _ _ v) :=
@@ -49,20 +51,22 @@ def rightAdjointLiftStructEquiv : sq.LiftStruct ≃ (sq.right_adjoint adj).LiftS
       fac_right := by
         rw [← Adjunction.homEquiv_naturality_right_symm, l.fac_right]
         apply (adj.homEquiv _ _).left_inv }
-  left_inv := by cat_disch
-  right_inv := by cat_disch
+  left_inv := by aesop_cat
+  right_inv := by aesop_cat
 
 theorem right_adjoint_hasLift_iff : HasLift (sq.right_adjoint adj) ↔ HasLift sq := by
   simp only [HasLift.iff]
   exact Equiv.nonempty_congr (sq.rightAdjointLiftStructEquiv adj).symm
 
--- INSTANCE (free from Core): [HasLift
+instance [HasLift sq] : HasLift (sq.right_adjoint adj) := by
+  rw [right_adjoint_hasLift_iff]
+  infer_instance
 
 end
 
-variable {A B : C} {X Y : D} {i : A ⟶ B} {p : X ⟶ Y} {u : A ⟶ F.obj X} {v : B ⟶ F.obj Y}
+section
 
-set_option backward.isDefEq.respectTransparency false in
+variable {A B : C} {X Y : D} {i : A ⟶ B} {p : X ⟶ Y} {u : A ⟶ F.obj X} {v : B ⟶ F.obj Y}
 
 theorem left_adjoint (sq : CommSq u i (F.map p) v) (adj : G ⊣ F) :
     CommSq ((adj.homEquiv _ _).symm u) (G.map i) p ((adj.homEquiv _ _).symm v) :=
@@ -86,14 +90,16 @@ def leftAdjointLiftStructEquiv :
       fac_right := by
         rw [← adj.homEquiv_naturality_right, l.fac_right]
         apply (adj.homEquiv _ _).right_inv }
-  left_inv := by cat_disch
-  right_inv := by cat_disch
+  left_inv := by aesop_cat
+  right_inv := by aesop_cat
 
 theorem left_adjoint_hasLift_iff : HasLift (sq.left_adjoint adj) ↔ HasLift sq := by
   simp only [HasLift.iff]
   exact Equiv.nonempty_congr (sq.leftAdjointLiftStructEquiv adj).symm
 
--- INSTANCE (free from Core): [HasLift
+instance [HasLift sq] : HasLift (sq.left_adjoint adj) := by
+  rw [left_adjoint_hasLift_iff]
+  infer_instance
 
 end
 

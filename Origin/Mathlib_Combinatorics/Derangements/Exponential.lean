@@ -3,6 +3,9 @@ Extracted from Combinatorics/Derangements/Exponential.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.SpecialFunctions.Exponential
+import Mathlib.Combinatorics.Derangements.Finite
+import Mathlib.Order.Filter.Tendsto
 
 /-!
 # Derangement exponential series
@@ -31,7 +34,7 @@ theorem numDerangements_tendsto_inv_e :
     -- there's no specific lemma for ℝ that ∑ x^k/k! sums to exp(x), but it's
     -- true in more general fields, so use that lemma
     rw [Real.exp_eq_exp_ℝ]
-    exact expSeries_div_hasSum_exp (-1 : ℝ)
+    exact expSeries_div_hasSum_exp ℝ (-1 : ℝ)
   intro n
   rw [← Int.cast_natCast, numDerangements_sum]
   push_cast
@@ -42,4 +45,5 @@ theorem numDerangements_tendsto_inv_e :
   have h_le : k ≤ n := Finset.mem_range_succ_iff.mp hk
   rw [Nat.ascFactorial_eq_div, add_tsub_cancel_of_le h_le]
   push_cast [Nat.factorial_dvd_factorial h_le]
-  field
+  field_simp [Nat.factorial_ne_zero]
+  ring

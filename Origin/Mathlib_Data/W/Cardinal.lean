@@ -3,6 +3,8 @@ Extracted from Data/W/Cardinal.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.W.Basic
+import Mathlib.SetTheory.Cardinal.Arithmetic
 
 /-!
 # Cardinality of W-types
@@ -37,11 +39,11 @@ theorem cardinalMk_eq_sum_lift : #(WType β) = sum fun a ↦ #(WType β) ^ lift.
 theorem cardinalMk_le_of_le' {κ : Cardinal.{max u v}}
     (hκ : (sum fun a : α => κ ^ lift.{u} #(β a)) ≤ κ) :
     #(WType β) ≤ κ := by
-  induction κ using Cardinal.inductionOn with | _ γ
+  induction' κ using Cardinal.inductionOn with γ
   simp_rw [← lift_umax.{v, u}] at hκ
   nth_rewrite 1 [← lift_id'.{v, u} #γ] at hκ
   simp_rw [← mk_arrow, ← mk_sigma, le_def] at hκ
-  obtain ⟨hκ⟩ := hκ
+  cases' hκ with hκ
   exact Cardinal.mk_le_of_injective (elim_injective _ hκ.1 hκ.2)
 
 theorem cardinalMk_le_max_aleph0_of_finite' [∀ a, Finite (β a)] :
@@ -56,7 +58,7 @@ theorem cardinalMk_le_max_aleph0_of_finite' [∀ a, Finite (β a)] :
     cardinalMk_le_of_le' <|
       calc
         (Cardinal.sum fun a => m ^ lift.{u} #(β a)) ≤ lift.{v} #α * ⨆ a, m ^ lift.{u} #(β a) :=
-          Cardinal.sum_le_lift_mk_mul_iSup _
+          Cardinal.sum_le_iSup_lift _
         _ ≤ m * ⨆ a, m ^ lift.{u} #(β a) := mul_le_mul' (le_max_left _ _) le_rfl
         _ = m :=
           mul_eq_left (le_max_right _ _)
@@ -72,6 +74,8 @@ theorem cardinalMk_le_max_aleph0_of_finite' [∀ a, Finite (β a)] :
                     power_le_power_left
                       (pos_iff_ne_zero.1 (aleph0_pos.trans_le (le_max_right _ _))) (zero_le _))
 
+alias cardinal_mk_le_max_aleph0_of_finite' := cardinalMk_le_max_aleph0_of_finite'
+
 variable {β : α → Type u}
 
 theorem cardinalMk_eq_sum : #(WType β) = sum (fun a : α => #(WType β) ^ #(β a)) :=
@@ -82,5 +86,7 @@ theorem cardinalMk_le_of_le {κ : Cardinal.{u}} (hκ : (sum fun a : α => κ ^ #
 
 theorem cardinalMk_le_max_aleph0_of_finite [∀ a, Finite (β a)] : #(WType β) ≤ max #α ℵ₀ :=
   cardinalMk_le_max_aleph0_of_finite'.trans_eq <| by rw [lift_id]
+
+alias cardinal_mk_le_max_aleph0_of_finite := cardinalMk_le_max_aleph0_of_finite
 
 end WType

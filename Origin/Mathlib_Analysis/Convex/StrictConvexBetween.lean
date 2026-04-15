@@ -1,8 +1,11 @@
 /-
 Extracted from Analysis/Convex/StrictConvexBetween.lean
-Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 of 10 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Between
+import Mathlib.Analysis.Convex.StrictConvexSpace
+import Mathlib.Analysis.Normed.Affine.Isometry
 
 /-!
 # Betweenness in affine spaces for strictly convex spaces
@@ -57,13 +60,13 @@ theorem Collinear.wbtw_of_dist_eq_of_dist_le {p p₁ p₂ p₃ : P} {r : ℝ}
     have hs : Sbtw ℝ p₂ p₃ p₁ := ⟨hw, hp₃p₂, hp₁p₃.symm⟩
     have hs' := hs.dist_lt_max_dist p
     rw [hp₁, hp₃, lt_max_iff, lt_self_iff_false, or_false] at hs'
-    exact False.elim (hp₂.not_gt hs')
+    exact False.elim (hp₂.not_lt hs')
   · by_cases hp₁p₂ : p₁ = p₂
     · simp [hp₁p₂]
     have hs : Sbtw ℝ p₃ p₁ p₂ := ⟨hw, hp₁p₃, hp₁p₂⟩
     have hs' := hs.dist_lt_max_dist p
     rw [hp₁, hp₃, lt_max_iff, lt_self_iff_false, false_or] at hs'
-    exact False.elim (hp₂.not_gt hs')
+    exact False.elim (hp₂.not_lt hs')
 
 theorem Collinear.sbtw_of_dist_eq_of_dist_lt {p p₁ p₂ p₃ : P} {r : ℝ}
     (h : Collinear ℝ ({p₁, p₂, p₃} : Set P)) (hp₁ : dist p₁ p = r) (hp₂ : dist p₂ p < r)
@@ -90,10 +93,6 @@ lemma dist_add_dist_eq_iff : dist a b + dist b c = dist a c ↔ Wbtw ℝ a b c :
     at this
   rwa [(vsub_left_injective _).mem_set_image] at this
 
-theorem dist_lt_dist_add_dist_iff {a b c : P} :
-    dist a c < dist a b + dist b c ↔ ¬ Wbtw ℝ a b c := by
-  rw [← ne_iff_lt_iff_le.mpr (dist_triangle _ _ _), not_iff_not, eq_comm, dist_add_dist_eq_iff]
-
 end MetricSpace
 
 variable {E F PE PF : Type*} [NormedAddCommGroup E] [NormedAddCommGroup F] [NormedSpace ℝ E]
@@ -103,7 +102,7 @@ variable {E F PE PF : Type*} [NormedAddCommGroup E] [NormedAddCommGroup F] [Norm
 lemma eq_lineMap_of_dist_eq_mul_of_dist_eq_mul (hxy : dist x y = r * dist x z)
     (hyz : dist y z = (1 - r) * dist x z) : y = AffineMap.lineMap x z r := by
   have : y -ᵥ x ∈ [(0 : E) -[ℝ] z -ᵥ x] := by
-    rw [mem_segment_iff_wbtw, ← dist_add_dist_eq_iff, dist_zero, dist_vsub_cancel_right,
+    rw [mem_segment_iff_wbtw, ← dist_add_dist_eq_iff, dist_zero_left, dist_vsub_cancel_right,
       ← dist_eq_norm_vsub', ← dist_eq_norm_vsub', hxy, hyz, ← add_mul, add_sub_cancel,
       one_mul]
   obtain rfl | hne := eq_or_ne x z
@@ -135,3 +134,11 @@ noncomputable def affineIsometryOfStrictConvexSpace (hi : Isometry f) : PF →�
           simp only [dist_midpoint_right, Real.norm_of_nonneg zero_le_two, div_eq_inv_mul])
       hi.continuous with
     norm_map := fun x => by simp [AffineMap.ofMapMidpoint, ← dist_eq_norm_vsub E, hi.dist_eq] }
+
+@[simp] lemma coe_affineIsometryOfStrictConvexSpace (hi : Isometry f) :
+    ⇑hi.affineIsometryOfStrictConvexSpace = f := rfl
+
+@[simp] lemma affineIsometryOfStrictConvexSpace_apply (hi : Isometry f) (p : PF) :
+    hi.affineIsometryOfStrictConvexSpace p = f p := rfl
+
+end Isometry

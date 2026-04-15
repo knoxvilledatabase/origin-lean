@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Inv.lean
-Genuine: 1 of 5 | Dissolved: 4 | Infrastructure: 0
+Genuine: 3 of 25 | Dissolved: 22 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Mul
+import Mathlib.Analysis.Calculus.Deriv.Comp
 
 /-!
 # Derivatives of `x ↦ x⁻¹` and `f x / g x`
@@ -24,7 +26,7 @@ open scoped Topology
 
 open Filter Asymptotics Set
 
-open ContinuousLinearMap (toSpanSingleton)
+open ContinuousLinearMap (smulRight)
 
 variable {𝕜 : Type u} [NontriviallyNormedField 𝕜] {x : 𝕜} {s : Set 𝕜}
 
@@ -42,6 +44,60 @@ section Inverse
 
 theorem deriv_inv : deriv (fun x => x⁻¹) x = -(x ^ 2)⁻¹ := by
   rcases eq_or_ne x 0 with (rfl | hne)
-  · rw [deriv_zero_of_not_differentiableAt (mt differentiableAt_inv_iff.1 (not_not.2 rfl))]
-    simp
+  · simp [deriv_zero_of_not_differentiableAt (mt differentiableAt_inv_iff.1 (not_not.2 rfl))]
   · exact (hasDerivAt_inv hne).deriv
+
+@[simp]
+theorem deriv_inv' : (deriv fun x : 𝕜 => x⁻¹) = fun x => -(x ^ 2)⁻¹ :=
+  funext fun _ => deriv_inv
+
+-- DISSOLVED: derivWithin_inv
+
+-- DISSOLVED: hasFDerivAt_inv
+
+-- DISSOLVED: hasStrictFDerivAt_inv
+
+-- DISSOLVED: hasFDerivWithinAt_inv
+
+theorem fderiv_inv : fderiv 𝕜 (fun x => x⁻¹) x = smulRight (1 : 𝕜 →L[𝕜] 𝕜) (-(x ^ 2)⁻¹) := by
+  rw [← deriv_fderiv, deriv_inv]
+
+-- DISSOLVED: fderivWithin_inv
+
+variable {c : 𝕜 → 𝕜} {c' : 𝕜}
+
+-- DISSOLVED: HasDerivWithinAt.inv
+
+-- DISSOLVED: HasDerivAt.inv
+
+-- DISSOLVED: derivWithin_inv'
+
+-- DISSOLVED: deriv_inv''
+
+end Inverse
+
+section Division
+
+/-! ### Derivative of `x ↦ c x / d x` -/
+
+variable {𝕜' : Type*} [NontriviallyNormedField 𝕜'] [NormedAlgebra 𝕜 𝕜'] {c d : 𝕜 → 𝕜'} {c' d' : 𝕜'}
+
+-- DISSOLVED: HasDerivWithinAt.div
+
+-- DISSOLVED: HasStrictDerivAt.div
+
+-- DISSOLVED: HasDerivAt.div
+
+-- DISSOLVED: DifferentiableWithinAt.div
+
+-- DISSOLVED: DifferentiableAt.div
+
+-- DISSOLVED: DifferentiableOn.div
+
+-- DISSOLVED: Differentiable.div
+
+-- DISSOLVED: derivWithin_div
+
+-- DISSOLVED: deriv_div
+
+end Division

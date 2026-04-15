@@ -1,8 +1,11 @@
 /-
 Extracted from Data/Finset/Interval.lean
-Genuine: 22 of 23 | Dissolved: 0 | Infrastructure: 1
+Genuine: 18 of 23 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Grade
+import Mathlib.Data.Finset.Powerset
+import Mathlib.Order.Interval.Finset.Basic
 
 /-!
 # Intervals of finsets as finsets
@@ -26,28 +29,54 @@ namespace Finset
 
 section Decidable
 
--- INSTANCE (free from Core): instLocallyFiniteOrder
-
 variable [DecidableEq α] (s t : Finset α)
 
-theorem Icc_eq_filter_powerset : Icc s t = {u ∈ t.powerset | s ⊆ u} := by ext; simp [and_comm]
+instance instLocallyFiniteOrder : LocallyFiniteOrder (Finset α) where
+  finsetIcc s t := t.powerset.filter (s ⊆ ·)
+  finsetIco s t := t.ssubsets.filter (s ⊆ ·)
+  finsetIoc s t := t.powerset.filter (s ⊂ ·)
+  finsetIoo s t := t.ssubsets.filter (s ⊂ ·)
+  finset_mem_Icc s t u := by
+    rw [mem_filter, mem_powerset]
+    exact and_comm
+  finset_mem_Ico s t u := by
+    rw [mem_filter, mem_ssubsets]
+    exact and_comm
+  finset_mem_Ioc s t u := by
+    rw [mem_filter, mem_powerset]
+    exact and_comm
+  finset_mem_Ioo s t u := by
+    rw [mem_filter, mem_ssubsets]
+    exact and_comm
 
-theorem Ico_eq_filter_ssubsets : Ico s t = {u ∈ t.ssubsets | s ⊆ u} := by ext; simp [and_comm]
+theorem Icc_eq_filter_powerset : Icc s t = t.powerset.filter (s ⊆ ·) :=
+  rfl
 
-theorem Ioc_eq_filter_powerset : Ioc s t = {u ∈ t.powerset | s ⊂ u} := by ext; simp [and_comm]
+theorem Ico_eq_filter_ssubsets : Ico s t = t.ssubsets.filter (s ⊆ ·) :=
+  rfl
 
-theorem Ioo_eq_filter_ssubsets : Ioo s t = {u ∈ t.ssubsets | s ⊂ u} := by ext; simp [and_comm]
+theorem Ioc_eq_filter_powerset : Ioc s t = t.powerset.filter (s ⊂ ·) :=
+  rfl
 
-theorem Iic_eq_powerset : Iic s = s.powerset := by ext; simp
+theorem Ioo_eq_filter_ssubsets : Ioo s t = t.ssubsets.filter (s ⊂ ·) :=
+  rfl
 
-theorem Iio_eq_ssubsets : Iio s = s.ssubsets := by ext; simp
+theorem Iic_eq_powerset : Iic s = s.powerset :=
+  filter_true_of_mem fun t _ => empty_subset t
+
+theorem Iio_eq_ssubsets : Iio s = s.ssubsets :=
+  filter_true_of_mem fun t _ => empty_subset t
 
 variable {s t}
 
 theorem Icc_eq_image_powerset (h : s ⊆ t) : Icc s t = (t \ s).powerset.image (s ∪ ·) := by
-  unfold Finset.Icc instLocallyFiniteOrder LocallyFiniteOrder.ofIcc
-  ext
-  simp [h, union_comm]
+  ext u
+  simp_rw [mem_Icc, mem_image, mem_powerset]
+  constructor
+  · rintro ⟨hs, ht⟩
+    exact ⟨u \ s, sdiff_le_sdiff_right ht, sup_sdiff_cancel_right hs⟩
+  · rintro ⟨v, hv, rfl⟩
+    exact ⟨le_sup_left, union_subset h <| hv.trans sdiff_subset⟩
 
 theorem Ico_eq_image_ssubsets (h : s ⊆ t) : Ico s t = (t \ s).ssubsets.image (s ∪ ·) := by
   ext u
@@ -59,8 +88,11 @@ theorem Ico_eq_image_ssubsets (h : s ⊆ t) : Ico s t = (t \ s).ssubsets.image (
     exact ⟨le_sup_left, sup_lt_of_lt_sdiff_left hv h⟩
 
 theorem card_Icc_finset (h : s ⊆ t) : (Icc s t).card = 2 ^ (t.card - s.card) := by
-  unfold Finset.Icc instLocallyFiniteOrder LocallyFiniteOrder.ofIcc
-  simp [h, card_sdiff_of_subset]
+  rw [← card_sdiff h, ← card_powerset, Icc_eq_image_powerset h, Finset.card_image_iff]
+  rintro u hu v hv (huv : s ⊔ u = s ⊔ v)
+  rw [mem_coe, mem_powerset] at hu hv
+  rw [← (disjoint_sdiff.mono_right hu : Disjoint s u).sup_sdiff_cancel_left, ←
+    (disjoint_sdiff.mono_right hv : Disjoint s v).sup_sdiff_cancel_left, huv]
 
 theorem card_Ico_finset (h : s ⊆ t) : (Ico s t).card = 2 ^ (t.card - s.card) - 1 := by
   rw [card_Ico_eq_card_Icc_sub_one, card_Icc_finset h]

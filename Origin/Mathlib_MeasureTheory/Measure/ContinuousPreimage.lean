@@ -3,12 +3,15 @@ Extracted from MeasureTheory/Measure/ContinuousPreimage.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.CompactOpen
+import Mathlib.Dynamics.Ergodic.MeasurePreserving
+import Mathlib.MeasureTheory.Measure.Regular
 
 /-!
-# Continuity of the preimage of a set under a measure-preserving continuous function
+# Continuity of the preimage of a set under a measure preserving continuous function
 
 In this file we prove that the preimage of a null measurable set `s : Set Y`
-under a measure-preserving continuous function `f : C(X, Y)` is continuous in `f`
+under a measure preserving continuous function `f : C(X, Y)` is continuous in `f`
 in the sense that `μ ((f a ⁻¹' s) ∆ (g ⁻¹' s))` tends to zero as `f a` tends to `g`.
 
 As a corollary, we show that

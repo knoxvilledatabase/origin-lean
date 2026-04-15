@@ -1,8 +1,10 @@
 /-
 Extracted from NumberTheory/LSeries/RiemannZeta.lean
-Genuine: 28 of 33 | Dissolved: 2 | Infrastructure: 3
+Genuine: 25 of 30 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.NumberTheory.LSeries.HurwitzZeta
+import Mathlib.Analysis.PSeriesComplex
 
 /-!
 # Definition of the Riemann zeta function
@@ -31,20 +33,22 @@ Euler-Mascheroni constant will follow in a subsequent PR.
   functional equation relating values at `s` and `1 - s`
 
 For special-value formulae expressing `ζ (2 * k)` and `ζ (1 - 2 * k)` in terms of Bernoulli numbers
-see `Mathlib/NumberTheory/LSeries/HurwitzZetaValues.lean`. For computation of the constant term as
-`s → 1`, see `Mathlib/NumberTheory/Harmonic/ZetaAsymp.lean`.
+see `Mathlib.NumberTheory.LSeries.HurwitzZetaValues`. For computation of the constant term as
+`s → 1`, see `Mathlib.NumberTheory.Harmonic.ZetaAsymp`.
 
 ## Outline of proofs:
 
 These results are mostly special cases of more general results for even Hurwitz zeta functions
-proved in `Mathlib/NumberTheory/LSeries/HurwitzZetaEven.lean`.
+proved in `Mathlib.NumberTheory.LSeries.HurwitzZetaEven`.
 -/
 
-open CharZero Set Filter HurwitzZeta
+open CharZero MeasureTheory Set Filter Asymptotics TopologicalSpace Real Asymptotics
 
-open Complex hiding exp continuous_exp
+  Classical HurwitzZeta
 
-open scoped Topology Real
+open Complex hiding exp norm_eq_abs abs_of_nonneg abs_two continuous_exp
+
+open scoped Topology Real Nat
 
 noncomputable section
 
@@ -55,6 +59,12 @@ noncomputable section
 def completedRiemannZeta₀ (s : ℂ) : ℂ := completedHurwitzZetaEven₀ 0 s
 
 def completedRiemannZeta (s : ℂ) : ℂ := completedHurwitzZetaEven 0 s
+
+lemma HurwitzZeta.completedHurwitzZetaEven_zero (s : ℂ) :
+    completedHurwitzZetaEven 0 s = completedRiemannZeta s := rfl
+
+lemma HurwitzZeta.completedHurwitzZetaEven₀_zero (s : ℂ) :
+    completedHurwitzZetaEven₀ 0 s = completedRiemannZeta₀ s := rfl
 
 lemma HurwitzZeta.completedCosZeta_zero (s : ℂ) :
     completedCosZeta 0 s = completedRiemannZeta s := by
@@ -92,6 +102,8 @@ lemma completedRiemannZeta_residue_one :
 
 def riemannZeta := hurwitzZetaEven 0
 
+lemma HurwitzZeta.hurwitzZetaEven_zero : hurwitzZetaEven 0 = riemannZeta := rfl
+
 lemma HurwitzZeta.cosZeta_zero : cosZeta 0 = riemannZeta := by
   simp_rw [cosZeta, riemannZeta, hurwitzZetaEven, if_true, completedHurwitzZetaEven_zero,
     completedCosZeta_zero]
@@ -102,22 +114,14 @@ lemma HurwitzZeta.hurwitzZeta_zero : hurwitzZeta 0 = riemannZeta := by
 
 lemma HurwitzZeta.expZeta_zero : expZeta 0 = riemannZeta := by
   ext1 s
-  rw [expZeta, cosZeta_zero, add_eq_left, mul_eq_zero, eq_false_intro I_ne_zero, false_or,
+  rw [expZeta, cosZeta_zero, add_right_eq_self, mul_eq_zero, eq_false_intro I_ne_zero, false_or,
     ← eq_neg_self_iff, ← sinZeta_neg, neg_zero]
 
 theorem differentiableAt_riemannZeta {s : ℂ} (hs' : s ≠ 1) : DifferentiableAt ℂ riemannZeta s :=
   differentiableAt_hurwitzZetaEven _ hs'
 
-lemma differentiableOn_riemannZeta :
-    DifferentiableOn ℂ riemannZeta {1}ᶜ :=
-  fun _ hs ↦ (differentiableAt_riemannZeta hs).differentiableWithinAt
-
-lemma analyticOn_riemannZeta :
-    AnalyticOnNhd ℂ riemannZeta {1}ᶜ :=
-  differentiableOn_riemannZeta.analyticOnNhd isOpen_compl_singleton
-
 theorem riemannZeta_zero : riemannZeta 0 = -1 / 2 := by
-  simp_rw [riemannZeta, hurwitzZetaEven, Function.update_self, if_true]
+  simp_rw [riemannZeta, hurwitzZetaEven, Function.update_same, if_true]
 
 -- DISSOLVED: riemannZeta_def_of_ne_zero
 
@@ -155,7 +159,7 @@ theorem zeta_eq_tsum_one_div_nat_cpow {s : ℂ} (hs : 1 < re s) :
 theorem zeta_eq_tsum_one_div_nat_add_one_cpow {s : ℂ} (hs : 1 < re s) :
     riemannZeta s = ∑' n : ℕ, 1 / (n + 1 : ℂ) ^ s := by
   have := zeta_eq_tsum_one_div_nat_cpow hs
-  rw [Summable.tsum_eq_zero_add] at this
+  rw [tsum_eq_zero_add] at this
   · simpa [zero_cpow (Complex.ne_zero_of_one_lt_re hs)]
   · rwa [Complex.summable_one_div_nat_cpow]
 
@@ -165,25 +169,13 @@ theorem zeta_nat_eq_tsum_of_gt_one {k : ℕ} (hk : 1 < k) :
       (by rwa [← ofReal_natCast, ofReal_re, ← Nat.cast_one, Nat.cast_lt] : 1 < re k),
     cpow_natCast]
 
-lemma two_mul_riemannZeta_eq_tsum_int_inv_pow_of_even {k : ℕ} (hk : 2 ≤ k) (hk2 : Even k) :
-    2 * riemannZeta k = ∑' (n : ℤ), ((n : ℂ) ^ k)⁻¹ := by
-  have hkk : 1 < k := by linarith
-  rw [tsum_int_eq_zero_add_two_mul_tsum_pnat]
-  · have h0 : (0 ^ k : ℂ)⁻¹ = 0 := by simp; lia
-    norm_cast
-    simp [h0, zeta_eq_tsum_one_div_nat_add_one_cpow (s := k) (by simp [hkk]),
-      tsum_pnat_eq_tsum_succ (f := fun n => ((n : ℂ) ^ k)⁻¹)]
-  · intro n
-    simp [Even.neg_pow hk2]
-  · exact (Summable.of_nat_of_neg (by simp [hkk]) (by simp [hkk])).of_norm
-
 lemma riemannZeta_residue_one : Tendsto (fun s ↦ (s - 1) * riemannZeta s) (𝓝[≠] 1) (𝓝 1) := by
   exact hurwitzZetaEven_residue_one 0
 
 theorem tendsto_sub_mul_tsum_nat_cpow :
     Tendsto (fun s : ℂ ↦ (s - 1) * ∑' (n : ℕ), 1 / (n : ℂ) ^ s) (𝓝[{s | 1 < re s}] 1) (𝓝 1) := by
   refine (tendsto_nhdsWithin_mono_left ?_ riemannZeta_residue_one).congr' ?_
-  · simp
+  · simp only [subset_compl_singleton_iff, mem_setOf_eq, one_re, not_lt, le_refl]
   · filter_upwards [eventually_mem_nhdsWithin] with s hs using
       congr_arg _ <| zeta_eq_tsum_one_div_nat_cpow hs
 
@@ -191,7 +183,21 @@ theorem tendsto_sub_mul_tsum_nat_rpow :
     Tendsto (fun s : ℝ ↦ (s - 1) * ∑' (n : ℕ), 1 / (n : ℝ) ^ s) (𝓝[>] 1) (𝓝 1) := by
   rw [← tendsto_ofReal_iff, ofReal_one]
   have : Tendsto (fun s : ℝ ↦ (s : ℂ)) (𝓝[>] 1) (𝓝[{s | 1 < re s}] 1) :=
-    continuous_ofReal.continuousWithinAt.tendsto_nhdsWithin (fun _ _ ↦ by simp_all)
+    continuous_ofReal.continuousWithinAt.tendsto_nhdsWithin (fun _ _ ↦ by aesop)
   apply (tendsto_sub_mul_tsum_nat_cpow.comp this).congr fun s ↦ ?_
   simp only [one_div, Function.comp_apply, ofReal_mul, ofReal_sub, ofReal_one, ofReal_tsum,
     ofReal_inv, ofReal_cpow (Nat.cast_nonneg _), ofReal_natCast]
+
+section aliases
+
+noncomputable alias riemannCompletedZeta₀ := completedRiemannZeta₀
+
+noncomputable alias riemannCompletedZeta := completedRiemannZeta
+
+alias riemannCompletedZeta₀_one_sub := completedRiemannZeta₀_one_sub
+
+alias riemannCompletedZeta_one_sub := completedRiemannZeta_one_sub
+
+alias riemannCompletedZeta_residue_one := completedRiemannZeta_residue_one
+
+end aliases

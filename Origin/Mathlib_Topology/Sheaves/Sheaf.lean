@@ -1,8 +1,11 @@
 /-
 Extracted from Topology/Sheaves/Sheaf.lean
-Genuine: 8 of 13 | Dissolved: 0 | Infrastructure: 5
+Genuine: 7 of 13 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.Topology.Sheaves.Presheaf
+import Mathlib.CategoryTheory.Sites.Sheaf
+import Mathlib.CategoryTheory.Sites.Spaces
 
 /-!
 # Sheaves
@@ -10,7 +13,7 @@ import Origin.Core
 We define sheaves on a topological space, with values in an arbitrary category.
 
 A presheaf on a topological space `X` is a sheaf precisely when it is a sheaf under the
-Grothendieck topology on `opens X`, which expands out to say: For each open cover `{ Uᵢ }` of
+grothendieck topology on `opens X`, which expands out to say: For each open cover `{ Uᵢ }` of
 `U`, and a family of compatible functions `A ⟶ F(Uᵢ)` for an `A : X`, there exists a unique
 gluing `A ⟶ F(U)` compatible with the restriction.
 
@@ -40,7 +43,7 @@ nonrec def IsSheaf (F : Presheaf.{w, v, u} C X) : Prop :=
   Presheaf.IsSheaf (Opens.grothendieckTopology X) F
 
 theorem isSheaf_unit (F : Presheaf (CategoryTheory.Discrete Unit) X) : F.IsSheaf :=
-  fun x U S _ x _ => ⟨eqToHom (Subsingleton.elim _ _), by cat_disch, fun _ => by cat_disch⟩
+  fun x U S _ x _ => ⟨eqToHom (Subsingleton.elim _ _), by aesop_cat, fun _ => by aesop_cat⟩
 
 theorem isSheaf_iso_iff {F G : Presheaf C X} (α : F ≅ G) : F.IsSheaf ↔ G.IsSheaf :=
   Presheaf.isSheaf_of_iso_iff α
@@ -55,7 +58,8 @@ variable (C X)
 nonrec def Sheaf : Type max u v w :=
   Sheaf (Opens.grothendieckTopology X) C
 
-deriving Category
+instance SheafCat : Category (Sheaf C X) :=
+  show Category (CategoryTheory.Sheaf (Opens.grothendieckTopology X) C) from inferInstance
 
 variable {C X}
 
@@ -64,33 +68,27 @@ abbrev Sheaf.presheaf (F : X.Sheaf C) : TopCat.Presheaf C X :=
 
 variable (C X)
 
--- INSTANCE (free from Core): sheafInhabited
+instance sheafInhabited : Inhabited (Sheaf (CategoryTheory.Discrete PUnit) X) :=
+  ⟨⟨Functor.star _, Presheaf.isSheaf_unit _⟩⟩
 
 namespace Sheaf
 
 def forget : TopCat.Sheaf C X ⥤ TopCat.Presheaf C X :=
   sheafToPresheaf _ _
 
--- INSTANCE (free from Core): forget_full
+instance forget_full : (forget C X).Full where
+  map_surjective f := ⟨Sheaf.Hom.mk f, rfl⟩
 
--- INSTANCE (free from Core): forgetFaithful
+instance forgetFaithful : (forget C X).Faithful where
+  map_injective := Sheaf.Hom.ext
+
+theorem id_app (F : Sheaf C X) (t) : (𝟙 F : F ⟶ F).1.app t = 𝟙 _ :=
+  rfl
+
+theorem comp_app {F G H : Sheaf C X} (f : F ⟶ G) (g : G ⟶ H) (t) :
+    (f ≫ g).1.app t = f.1.app t ≫ g.1.app t :=
+  rfl
 
 end Sheaf
-
-lemma Presheaf.IsSheaf.section_ext {X : TopCat.{u}}
-    {A : Type*} [Category.{u} A] {FC : A → A → Type*} {CC : A → Type u}
-    [∀ X Y : A, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory.{u} A FC]
-    [HasLimits A] [PreservesLimits (forget A)] [(forget A).ReflectsIsomorphisms]
-    {F : TopCat.Presheaf A X} (hF : TopCat.Presheaf.IsSheaf F)
-    {U : (Opens X)ᵒᵖ} {s t : ToType (F.obj U)}
-    (hst : ∀ x ∈ U.unop, ∃ V, ∃ hV : V ≤ U.unop, x ∈ V ∧
-      F.map (homOfLE hV).op s = F.map (homOfLE hV).op t) :
-    s = t := by
-  have := (isSheaf_iff_isSheaf_of_type _ _).mp
-    ((Presheaf.isSheaf_iff_isSheaf_forget (C := Opens X) (A' := A) _ F (forget _)).mp hF)
-  choose V hV hxV H using fun x : U.unop ↦ hst x.1 x.2
-  refine (this.isSheafFor (.ofArrows V fun x ↦ homOfLE (hV x)) ?_).isSeparatedFor.ext ?_
-  · exact fun x hx ↦ ⟨V ⟨x, hx⟩, homOfLE (hV _), Sieve.ofArrows_mk _ _ _, hxV _⟩
-  · rintro _ _ ⟨x⟩; exact H x
 
 end TopCat

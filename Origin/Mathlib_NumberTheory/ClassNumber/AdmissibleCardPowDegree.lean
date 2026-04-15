@@ -3,6 +3,10 @@ Extracted from NumberTheory/ClassNumber/AdmissibleCardPowDegree.lean
 Genuine: 4 of 7 | Dissolved: 3 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Polynomial.Degree.CardPowDegree
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.NumberTheory.ClassNumber.AdmissibleAbsoluteValue
+import Mathlib.RingTheory.LocalRing.Basic
 
 /-!
 # Admissible absolute values on polynomials
@@ -37,10 +41,11 @@ theorem exists_eq_polynomial [Semiring Fq] {d : ℕ} {m : ℕ} (hm : Fintype.car
   use i₀, i₁, i_ne
   ext j
   -- The coefficients higher than `deg b` are the same because they are equal to 0.
-  by_cases! hbj : degree b ≤ j
+  by_cases hbj : degree b ≤ j
   · rw [coeff_eq_zero_of_degree_lt (lt_of_lt_of_le (hA _) hbj),
       coeff_eq_zero_of_degree_lt (lt_of_lt_of_le (hA _) hbj)]
   -- So we only need to look for the coefficients between `0` and `deg b`.
+  rw [not_le] at hbj
   apply congr_fun i_eq.symm ⟨j, _⟩
   exact lt_of_lt_of_le (coe_lt_degree.mp hbj) hb
 
@@ -51,7 +56,7 @@ theorem exists_approx_polynomial_aux [Ring Fq] {d : ℕ} {m : ℕ} (hm : Fintype
     rintro rfl
     specialize hA 0
     rw [degree_zero] at hA
-    exact not_lt_of_ge bot_le hA
+    exact not_lt_of_le bot_le hA
   -- Since there are > q^d elements of A, and only q^d choices for the highest `d` coefficients,
   -- there must be two elements of A with the same coefficients at
   -- `degree b - 1`, ... `degree b - d`.
@@ -64,17 +69,18 @@ theorem exists_approx_polynomial_aux [Ring Fq] {d : ℕ} {m : ℕ} (hm : Fintype
   use i₀, i₁, i_ne
   refine (degree_lt_iff_coeff_zero _ _).mpr fun j hj => ?_
   -- The coefficients higher than `deg b` are the same because they are equal to 0.
-  by_cases! hbj : degree b ≤ j
+  by_cases hbj : degree b ≤ j
   · refine coeff_eq_zero_of_degree_lt (lt_of_lt_of_le ?_ hbj)
     exact lt_of_le_of_lt (degree_sub_le _ _) (max_lt (hA _) (hA _))
   -- So we only need to look for the coefficients between `deg b - d` and `deg b`.
   rw [coeff_sub, sub_eq_zero]
-  rw [degree_eq_natDegree hb] at hbj
+  rw [not_le, degree_eq_natDegree hb] at hbj
   have hbj : j < natDegree b := (@WithBot.coe_lt_coe _ _ _).mp hbj
   have hj : natDegree b - j.succ < d := by
-    by_cases! hd : natDegree b < d
+    by_cases hd : natDegree b < d
     · exact lt_of_le_of_lt tsub_le_self hd
-    · have := lt_of_le_of_lt hj (Nat.lt_succ_self j)
+    · rw [not_lt] at hd
+      have := lt_of_le_of_lt hj (Nat.lt_succ_self j)
       rwa [tsub_lt_iff_tsub_lt hd hbj] at this
   have : j = b.natDegree - (natDegree b - j.succ).succ := by
     rw [← Nat.succ_sub hbj, Nat.succ_sub_succ, tsub_tsub_cancel_of_le hbj.le]
@@ -98,7 +104,7 @@ theorem cardPowDegree_anti_archimedean {x y z : Fq[X]} {a : ℤ} (hxy : cardPowD
   rw [cardPowDegree_nonzero _ hxz', cardPowDegree_nonzero _ hxy',
     cardPowDegree_nonzero _ hyz']
   have : (1 : ℤ) ≤ Fintype.card Fq := mod_cast (@Fintype.one_lt_card Fq _ _).le
-  simp only [le_max_iff]
+  simp only [Int.cast_pow, Int.cast_natCast, le_max_iff]
   refine Or.imp (pow_le_pow_right₀ this) (pow_le_pow_right₀ this) ?_
   rw [natDegree_le_iff_degree_le, natDegree_le_iff_degree_le, ← le_max_iff, ←
     degree_eq_natDegree hxy', ← degree_eq_natDegree hyz']

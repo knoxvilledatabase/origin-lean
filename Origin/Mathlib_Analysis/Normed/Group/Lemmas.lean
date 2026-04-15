@@ -3,6 +3,8 @@ Extracted from Analysis/Normed/Group/Lemmas.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Group.Uniform
+import Mathlib.Topology.Instances.NNReal
 
 /-!
 # Further lemmas about normed groups

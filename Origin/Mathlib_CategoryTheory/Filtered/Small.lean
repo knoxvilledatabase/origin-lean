@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Filtered/Small.lean
 Genuine: 22 of 36 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.EssentiallySmall
+import Mathlib.CategoryTheory.Filtered.Basic
 
 /-!
 # A functor from a small category to a filtered category factors through a small filtered category
@@ -21,17 +23,21 @@ variable {C : Type u} [Category.{v} C]
 
 namespace IsFiltered
 
-section filteredClosure
+section FilteredClosure
 
 variable [IsFilteredOrEmpty C] {α : Type w} (f : α → C)
 
-inductive filteredClosure : ObjectProperty C
-  | base : (x : α) → filteredClosure (f x)
-  | max : {j j' : C} → filteredClosure j → filteredClosure j' → filteredClosure (max j j')
-  | coeq : {j j' : C} → filteredClosure j → filteredClosure j' → (f f' : j ⟶ j') →
-      filteredClosure (coeq f f')
+inductive FilteredClosure : C → Prop
+  | base : (x : α) → FilteredClosure (f x)
+  | max : {j j' : C} → FilteredClosure j → FilteredClosure j' → FilteredClosure (max j j')
+  | coeq : {j j' : C} → FilteredClosure j → FilteredClosure j' → (f f' : j ⟶ j') →
+      FilteredClosure (coeq f f')
 
--- INSTANCE (free from Core): :
+instance : IsFilteredOrEmpty (FullSubcategory (FilteredClosure f)) where
+  cocone_objs j j' :=
+    ⟨⟨max j.1 j'.1, FilteredClosure.max j.2 j'.2⟩, leftToMax _ _, rightToMax _ _, trivial⟩
+  cocone_maps {j j'} f f' :=
+    ⟨⟨coeq f f', FilteredClosure.coeq j.2 j'.2 f f'⟩, coeqHom (C := C) f f', coeq_condition _ _⟩
 
 namespace FilteredClosureSmall
 
@@ -39,10 +45,10 @@ namespace FilteredClosureSmall
     family of objects in `C` only depends on the size of `α` and the morphism types of `C`, not on
     the size of the objects of `C`. More precisely, if `α` lives in `Type w`, the objects of `C`
     live in `Type u` and the morphisms of `C` live in `Type v`, then we want
-    `Small.{max v w} (FullSubcategory (filteredClosure f))`.
+    `Small.{max v w} (FullSubcategory (FilteredClosure f))`.
 
     The strategy is to define a type `AbstractFilteredClosure` which should be an inductive type
-    similar to `filteredClosure`, which lives in the correct universe and surjects onto the full
+    similar to `FilteredClosure`, which lives in the correct universe and surjects onto the full
     subcategory. The difficulty with this is that we need to define it at the same time as the map
     `AbstractFilteredClosure → C`, as the coequalizer constructor depends on the actual morphisms
     in `C`. This would require some kind of inductive-recursive definition, which Lean does not
@@ -61,7 +67,7 @@ private noncomputable def inductiveStepRealization (n : ℕ)
   | (InductiveStep.max hk hk' x y) => max ((X _ hk).2 x) ((X _ hk').2 y)
   | (InductiveStep.coeq _ _ _ _ f g) => coeq f g
 
-private noncomputable def bundledAbstractFilteredClosure :
+@[semireducible] private noncomputable def bundledAbstractFilteredClosure :
     ℕ → Σ t : Type (max v w), t → C
   | 0 => ⟨ULift.{v} α, f ∘ ULift.down⟩
   | (n + 1) => ⟨_, inductiveStepRealization (n + 1) (fun m _ => bundledAbstractFilteredClosure m)⟩
@@ -75,72 +81,65 @@ private noncomputable def abstractFilteredClosureRealization : AbstractFilteredC
 end FilteredClosureSmall
 
 theorem small_fullSubcategory_filteredClosure :
-    Small.{max v w} (filteredClosure f).FullSubcategory := by
+    Small.{max v w} (FullSubcategory (FilteredClosure f)) := by
   refine small_of_injective_of_exists (FilteredClosureSmall.abstractFilteredClosureRealization f)
-    (fun _ _ => ObjectProperty.FullSubcategory.ext) ?_
+    (fun _ _ => FullSubcategory.ext) ?_
   rintro ⟨j, h⟩
   induction h with
-  | base x =>
-      refine ⟨⟨0, ?_⟩, ?_⟩
-      · #adaptation_note
-        /-- On nightly-2025-11-04 we need to add `-implicitDefEqProofs` here. -/
-        simp -implicitDefEqProofs only [FilteredClosureSmall.bundledAbstractFilteredClosure]
-        exact ULift.up x
-      · simp only [FilteredClosureSmall.abstractFilteredClosureRealization]
-        rw! [FilteredClosureSmall.bundledAbstractFilteredClosure]
-        rfl
+  | base x => exact ⟨⟨0, ⟨x⟩⟩, rfl⟩
   | max hj₁ hj₂ ih ih' =>
     rcases ih with ⟨⟨n, x⟩, rfl⟩
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
-    refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
-    · simp only [FilteredClosureSmall.bundledAbstractFilteredClosure]
-      refine FilteredClosureSmall.InductiveStep.max ?_ ?_ x y
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
-    · simp only [FilteredClosureSmall.abstractFilteredClosureRealization]
-      rw! [FilteredClosureSmall.bundledAbstractFilteredClosure]
-      rfl
+    refine ⟨⟨(Max.max n m).succ, FilteredClosureSmall.InductiveStep.max ?_ ?_ x y⟩, rfl⟩
+    all_goals apply Nat.lt_succ_of_le
+    exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
   | coeq hj₁ hj₂ g g' ih ih' =>
     rcases ih with ⟨⟨n, x⟩, rfl⟩
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
-    refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
-    · simp only [FilteredClosureSmall.bundledAbstractFilteredClosure]
-      refine FilteredClosureSmall.InductiveStep.coeq ?_ ?_ x y g g'
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
-    · simp only [FilteredClosureSmall.abstractFilteredClosureRealization]
-      rw! [FilteredClosureSmall.bundledAbstractFilteredClosure]
-      rfl
+    refine ⟨⟨(Max.max n m).succ, FilteredClosureSmall.InductiveStep.coeq ?_ ?_ x y g g'⟩, rfl⟩
+    all_goals apply Nat.lt_succ_of_le
+    exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
 
--- INSTANCE (free from Core): :
+instance : EssentiallySmall.{max v w} (FullSubcategory (FilteredClosure f)) :=
+  have : LocallySmall.{max v w} (FullSubcategory (FilteredClosure f)) := locallySmall_max.{w, v, u}
+  have := small_fullSubcategory_filteredClosure f
+  essentiallySmall_of_small_of_locallySmall _
 
-end filteredClosure
+end FilteredClosure
+
+section
 
 variable [IsFilteredOrEmpty C] {D : Type u₁} [Category.{v₁} D] (F : D ⥤ C)
 
 def SmallFilteredIntermediate : Type (max u₁ v) :=
-  SmallModel.{max u₁ v} (filteredClosure F.obj).FullSubcategory
+  SmallModel.{max u₁ v} (FullSubcategory (FilteredClosure F.obj))
 
--- INSTANCE (free from Core): :
+noncomputable instance : SmallCategory (SmallFilteredIntermediate F) :=
+  show SmallCategory (SmallModel (FullSubcategory (FilteredClosure F.obj))) from inferInstance
 
 namespace SmallFilteredIntermediate
 
 noncomputable def factoring : D ⥤ SmallFilteredIntermediate F :=
-  ObjectProperty.lift _ F filteredClosure.base ⋙ (equivSmallModel _).functor
+  FullSubcategory.lift _ F FilteredClosure.base ⋙ (equivSmallModel _).functor
 
 noncomputable def inclusion : SmallFilteredIntermediate F ⥤ C :=
-  (equivSmallModel _).inverse ⋙ ObjectProperty.ι _
+  (equivSmallModel _).inverse ⋙ fullSubcategoryInclusion _
 
--- INSTANCE (free from Core): :
+instance : (inclusion F).Faithful :=
+  show ((equivSmallModel _).inverse ⋙ fullSubcategoryInclusion _).Faithful from inferInstance
 
--- INSTANCE (free from Core): :
+noncomputable instance : (inclusion F).Full :=
+  show ((equivSmallModel _).inverse ⋙ fullSubcategoryInclusion _).Full from inferInstance
 
 noncomputable def factoringCompInclusion : factoring F ⋙ inclusion F ≅ F :=
-  Functor.isoWhiskerLeft _ (Functor.isoWhiskerRight (Equivalence.unitIso _).symm _)
+  isoWhiskerLeft _ (isoWhiskerRight (Equivalence.unitIso _).symm _)
 
--- INSTANCE (free from Core): :
+instance : IsFilteredOrEmpty (SmallFilteredIntermediate F) :=
+  IsFilteredOrEmpty.of_equivalence (equivSmallModel _)
 
--- INSTANCE (free from Core): [Nonempty
+instance [Nonempty D] : IsFiltered (SmallFilteredIntermediate F) :=
+  { (inferInstance : IsFilteredOrEmpty _) with
+    nonempty := Nonempty.map (factoring F).obj inferInstance }
 
 end SmallFilteredIntermediate
 
@@ -150,17 +149,21 @@ end IsFiltered
 
 namespace IsCofiltered
 
-section cofilteredClosure
+section CofilteredClosure
 
 variable [IsCofilteredOrEmpty C] {α : Type w} (f : α → C)
 
-inductive cofilteredClosure : ObjectProperty C
-  | base : (x : α) → cofilteredClosure (f x)
-  | min : {j j' : C} → cofilteredClosure j → cofilteredClosure j' → cofilteredClosure (min j j')
-  | eq : {j j' : C} → cofilteredClosure j → cofilteredClosure j' → (f f' : j ⟶ j') →
-      cofilteredClosure (eq f f')
+inductive CofilteredClosure : C → Prop
+  | base : (x : α) → CofilteredClosure (f x)
+  | min : {j j' : C} → CofilteredClosure j → CofilteredClosure j' → CofilteredClosure (min j j')
+  | eq : {j j' : C} → CofilteredClosure j → CofilteredClosure j' → (f f' : j ⟶ j') →
+      CofilteredClosure (eq f f')
 
--- INSTANCE (free from Core): :
+instance : IsCofilteredOrEmpty (FullSubcategory (CofilteredClosure f)) where
+  cone_objs j j' :=
+    ⟨⟨min j.1 j'.1, CofilteredClosure.min j.2 j'.2⟩, minToLeft _ _, minToRight _ _, trivial⟩
+  cone_maps {j j'} f f' :=
+    ⟨⟨eq f f', CofilteredClosure.eq j.2 j'.2 f f'⟩, eqHom (C := C) f f', eq_condition _ _⟩
 
 namespace CofilteredClosureSmall
 
@@ -175,7 +178,7 @@ private noncomputable def inductiveStepRealization (n : ℕ)
   | (InductiveStep.min hk hk' x y) => min ((X _ hk).2 x) ((X _ hk').2 y)
   | (InductiveStep.eq _ _ _ _ f g) => eq f g
 
-private noncomputable def bundledAbstractCofilteredClosure :
+@[semireducible] private noncomputable def bundledAbstractCofilteredClosure :
     ℕ → Σ t : Type (max v w), t → C
   | 0 => ⟨ULift.{v} α, f ∘ ULift.down⟩
   | (n + 1) => ⟨_, inductiveStepRealization (n + 1) (fun m _ => bundledAbstractCofilteredClosure m)⟩
@@ -189,73 +192,67 @@ private noncomputable def abstractCofilteredClosureRealization : AbstractCofilte
 end CofilteredClosureSmall
 
 theorem small_fullSubcategory_cofilteredClosure :
-    Small.{max v w} (cofilteredClosure f).FullSubcategory := by
+    Small.{max v w} (FullSubcategory (CofilteredClosure f)) := by
   refine small_of_injective_of_exists
     (CofilteredClosureSmall.abstractCofilteredClosureRealization f)
-    (fun _ _ => ObjectProperty.FullSubcategory.ext) ?_
+    (fun _ _ => FullSubcategory.ext) ?_
   rintro ⟨j, h⟩
   induction h with
-  | base x =>
-    refine ⟨⟨0, ?_⟩,?_⟩
-    · #adaptation_note
-      /-- On nightly-2025-11-04 we need to add `-implicitDefEqProofs` here. -/
-      simp -implicitDefEqProofs only [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      exact ULift.up x
-    · simp only [CofilteredClosureSmall.abstractCofilteredClosureRealization]
-      rw! [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      rfl
+  | base x => exact ⟨⟨0, ⟨x⟩⟩, rfl⟩
   | min hj₁ hj₂ ih ih' =>
     rcases ih with ⟨⟨n, x⟩, rfl⟩
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
-    refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
-    · simp only [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      refine CofilteredClosureSmall.InductiveStep.min ?_ ?_ x y
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
-    · simp only [CofilteredClosureSmall.abstractCofilteredClosureRealization]
-      rw! [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      rfl
+    refine ⟨⟨(Max.max n m).succ, CofilteredClosureSmall.InductiveStep.min ?_ ?_ x y⟩, rfl⟩
+    all_goals apply Nat.lt_succ_of_le
+    exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
   | eq hj₁ hj₂ g g' ih ih' =>
     rcases ih with ⟨⟨n, x⟩, rfl⟩
     rcases ih' with ⟨⟨m, y⟩, rfl⟩
-    refine ⟨⟨(Max.max n m).succ, ?_⟩, ?_⟩
-    · simp only [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      refine CofilteredClosureSmall.InductiveStep.eq ?_ ?_ x y g g'
-      all_goals apply Nat.lt_succ_of_le
-      exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
-    · simp only [CofilteredClosureSmall.abstractCofilteredClosureRealization]
-      rw! [CofilteredClosureSmall.bundledAbstractCofilteredClosure]
-      rfl
+    refine ⟨⟨(Max.max n m).succ, CofilteredClosureSmall.InductiveStep.eq ?_ ?_ x y g g'⟩, rfl⟩
+    all_goals apply Nat.lt_succ_of_le
+    exacts [Nat.le_max_left _ _, Nat.le_max_right _ _]
 
--- INSTANCE (free from Core): :
+instance : EssentiallySmall.{max v w} (FullSubcategory (CofilteredClosure f)) :=
+  have : LocallySmall.{max v w} (FullSubcategory (CofilteredClosure f)) :=
+    locallySmall_max.{w, v, u}
+  have := small_fullSubcategory_cofilteredClosure f
+  essentiallySmall_of_small_of_locallySmall _
 
-end cofilteredClosure
+end CofilteredClosure
+
+section
 
 variable [IsCofilteredOrEmpty C] {D : Type u₁} [Category.{v₁} D] (F : D ⥤ C)
 
 def SmallCofilteredIntermediate : Type (max u₁ v) :=
-  SmallModel.{max u₁ v} (cofilteredClosure F.obj).FullSubcategory
+  SmallModel.{max u₁ v} (FullSubcategory (CofilteredClosure F.obj))
 
--- INSTANCE (free from Core): :
+noncomputable instance : SmallCategory (SmallCofilteredIntermediate F) :=
+  show SmallCategory (SmallModel (FullSubcategory (CofilteredClosure F.obj))) from inferInstance
 
 namespace SmallCofilteredIntermediate
 
 noncomputable def factoring : D ⥤ SmallCofilteredIntermediate F :=
-  ObjectProperty.lift _ F cofilteredClosure.base ⋙ (equivSmallModel _).functor
+  FullSubcategory.lift _ F CofilteredClosure.base ⋙ (equivSmallModel _).functor
 
 noncomputable def inclusion : SmallCofilteredIntermediate F ⥤ C :=
-  (equivSmallModel _).inverse ⋙ ObjectProperty.ι _
+  (equivSmallModel _).inverse ⋙ fullSubcategoryInclusion _
 
--- INSTANCE (free from Core): :
+instance : (inclusion F).Faithful :=
+  show ((equivSmallModel _).inverse ⋙ fullSubcategoryInclusion _).Faithful from inferInstance
 
--- INSTANCE (free from Core): :
+noncomputable instance : (inclusion F).Full :=
+  show ((equivSmallModel _).inverse ⋙ fullSubcategoryInclusion _).Full from inferInstance
 
 noncomputable def factoringCompInclusion : factoring F ⋙ inclusion F ≅ F :=
-  Functor.isoWhiskerLeft _ (Functor.isoWhiskerRight (Equivalence.unitIso _).symm _)
+  isoWhiskerLeft _ (isoWhiskerRight (Equivalence.unitIso _).symm _)
 
--- INSTANCE (free from Core): :
+instance : IsCofilteredOrEmpty (SmallCofilteredIntermediate F) :=
+  IsCofilteredOrEmpty.of_equivalence (equivSmallModel _)
 
--- INSTANCE (free from Core): [Nonempty
+instance [Nonempty D] : IsCofiltered (SmallCofilteredIntermediate F) :=
+  { (inferInstance : IsCofilteredOrEmpty _) with
+    nonempty := Nonempty.map (factoring F).obj inferInstance }
 
 end SmallCofilteredIntermediate
 

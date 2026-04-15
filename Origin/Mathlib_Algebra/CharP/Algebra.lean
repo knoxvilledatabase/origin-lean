@@ -1,8 +1,11 @@
 /-
 Extracted from Algebra/CharP/Algebra.lean
-Genuine: 16 of 27 | Dissolved: 5 | Infrastructure: 6
+Genuine: 13 of 21 | Dissolved: 4 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Algebra.CharP.Basic
+import Mathlib.Algebra.FreeAlgebra
+import Mathlib.RingTheory.Localization.FractionRing
 
 /-!
 # Characteristics of algebras
@@ -24,77 +27,52 @@ Instances constructed from this result:
 
 -/
 
-variable {R A : Type*}
-
-theorem CharP.dvd_of_ringHom [NonAssocSemiring R] [NonAssocSemiring A]
-    (f : R →+* A) (p q : ℕ) [CharP R p] [CharP A q] : q ∣ p := by
-  refine (CharP.cast_eq_zero_iff A q p).mp ?_
-  rw [← map_natCast f p, CharP.cast_eq_zero, map_zero]
-
--- DISSOLVED: CharP.of_ringHom_of_ne_zero
-
-theorem charP_of_injective_ringHom [NonAssocSemiring R] [NonAssocSemiring A]
+theorem charP_of_injective_ringHom {R A : Type*} [NonAssocSemiring R] [NonAssocSemiring A]
     {f : R →+* A} (h : Function.Injective f) (p : ℕ) [CharP R p] : CharP A p where
-  cast_eq_zero_iff x := by
+  cast_eq_zero_iff' x := by
     rw [← CharP.cast_eq_zero_iff R p x, ← map_natCast f x, map_eq_zero_iff f h]
 
-theorem charP_of_injective_algebraMap [CommSemiring R] [Semiring A] [Algebra R A]
+theorem charP_of_injective_algebraMap {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A]
     (h : Function.Injective (algebraMap R A)) (p : ℕ) [CharP R p] : CharP A p :=
   charP_of_injective_ringHom h p
 
-theorem charP_of_injective_algebraMap' (R : Type*) [CommRing R] [Semiring A]
-    [Algebra R A] [FaithfulSMul R A] (p : ℕ) [CharP R p] : CharP A p :=
-  charP_of_injective_ringHom (FaithfulSMul.algebraMap_injective R A) p
+theorem charP_of_injective_algebraMap' (R A : Type*) [Field R] [Semiring A] [Algebra R A]
+    [Nontrivial A] (p : ℕ) [CharP R p] : CharP A p :=
+  charP_of_injective_algebraMap (algebraMap R A).injective p
 
 -- DISSOLVED: charZero_of_injective_ringHom
 
 -- DISSOLVED: charZero_of_injective_algebraMap
 
-theorem RingHom.charP [NonAssocSemiring R] [NonAssocSemiring A] (f : R →+* A)
+theorem RingHom.charP {R A : Type*} [NonAssocSemiring R] [NonAssocSemiring A] (f : R →+* A)
     (H : Function.Injective f) (p : ℕ) [CharP A p] : CharP R p := by
   obtain ⟨q, h⟩ := CharP.exists R
   exact CharP.eq _ (charP_of_injective_ringHom H q) ‹CharP A p› ▸ h
 
-protected theorem RingHom.charP_iff [NonAssocSemiring R] [NonAssocSemiring A]
-    (f : R →+* A) (H : Function.Injective f) (p : ℕ) : CharP R p ↔ CharP A p :=
+theorem RingHom.charP_iff {R A : Type*} [NonAssocSemiring R] [NonAssocSemiring A] (f : R →+* A)
+    (H : Function.Injective f) (p : ℕ) : CharP R p ↔ CharP A p :=
   ⟨fun _ ↦ charP_of_injective_ringHom H p, fun _ ↦ f.charP H p⟩
 
-lemma expChar_of_injective_ringHom
-    [NonAssocSemiring R] [NonAssocSemiring A] {f : R →+* A} (h : Function.Injective f)
+lemma expChar_of_injective_ringHom {R A : Type*}
+    [Semiring R] [Semiring A] {f : R →+* A} (h : Function.Injective f)
     (q : ℕ) [hR : ExpChar R q] : ExpChar A q := by
   rcases hR with _ | hprime
   · haveI := charZero_of_injective_ringHom h; exact .zero
   haveI := charP_of_injective_ringHom h q; exact .prime hprime
 
-lemma RingHom.expChar [NonAssocSemiring R] [NonAssocSemiring A] (f : R →+* A)
+lemma RingHom.expChar {R A : Type*} [Semiring R] [Semiring A] (f : R →+* A)
     (H : Function.Injective f) (p : ℕ) [ExpChar A p] : ExpChar R p := by
   cases ‹ExpChar A p› with
   | zero => haveI := f.charZero; exact .zero
   | prime hp => haveI := f.charP H p; exact .prime hp
 
-lemma RingHom.expChar_iff [NonAssocSemiring R] [NonAssocSemiring A] (f : R →+* A)
+lemma RingHom.expChar_iff {R A : Type*} [Semiring R] [Semiring A] (f : R →+* A)
     (H : Function.Injective f) (p : ℕ) : ExpChar R p ↔ ExpChar A p :=
   ⟨fun _ ↦ expChar_of_injective_ringHom H p, fun _ ↦ f.expChar H p⟩
 
-lemma expChar_of_injective_algebraMap [CommSemiring R] [Semiring A] [Algebra R A]
+lemma expChar_of_injective_algebraMap {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A]
     (h : Function.Injective (algebraMap R A)) (q : ℕ) [ExpChar R q] : ExpChar A q :=
   expChar_of_injective_ringHom h q
-
-variable (R) in
-
-theorem ExpChar.of_injective_algebraMap' [CommRing R] [CommRing A]
-    [Algebra R A] [FaithfulSMul R A] (q : ℕ) [ExpChar R q] : ExpChar A q :=
-  expChar_of_injective_ringHom (FaithfulSMul.algebraMap_injective R A) q
-
-namespace Subfield
-
-variable [DivisionRing R] (L : Subfield R) (p : ℕ)
-
--- INSTANCE (free from Core): charP
-
--- INSTANCE (free from Core): expChar
-
-end Subfield
 
 /-!
 As an application, a `ℚ`-algebra has characteristic zero.
@@ -115,13 +93,11 @@ end QAlgebra
 An algebra over a field has the same characteristic as the field.
 -/
 
-lemma RingHom.charP_iff_charP {K L : Type*} [DivisionRing K] [NonAssocSemiring L] [Nontrivial L]
-    (f : K →+* L) (p : ℕ) : CharP K p ↔ CharP L p := by
-  simp only [charP_iff, ← f.injective.eq_iff, map_natCast f, map_zero f]
+section
 
 variable (K L : Type*) [Field K] [CommSemiring L] [Nontrivial L] [Algebra K L]
 
-protected theorem Algebra.charP_iff (p : ℕ) : CharP K p ↔ CharP L p :=
+theorem Algebra.charP_iff (p : ℕ) : CharP K p ↔ CharP L p :=
   (algebraMap K L).charP_iff_charP p
 
 theorem Algebra.ringChar_eq : ringChar K = ringChar L := by
@@ -134,9 +110,11 @@ namespace FreeAlgebra
 
 variable {R X : Type*} [CommSemiring R] (p : ℕ)
 
--- INSTANCE (free from Core): charP
+instance charP [CharP R p] : CharP (FreeAlgebra R X) p :=
+  charP_of_injective_algebraMap FreeAlgebra.algebraMap_leftInverse.injective p
 
--- INSTANCE (free from Core): charZero
+instance charZero [CharZero R] : CharZero (FreeAlgebra R X) :=
+  charZero_of_injective_algebraMap FreeAlgebra.algebraMap_leftInverse.injective
 
 end FreeAlgebra
 
@@ -153,8 +131,10 @@ theorem charP_of_isFractionRing [CharP R p] : CharP K p :=
 
 variable [IsDomain R]
 
--- INSTANCE (free from Core): charP
+instance charP [CharP R p] : CharP (FractionRing R) p :=
+  charP_of_isFractionRing R p
 
--- INSTANCE (free from Core): charZero
+instance charZero [CharZero R] : CharZero (FractionRing R) :=
+  charZero_of_isFractionRing R
 
 end IsFractionRing

@@ -1,8 +1,10 @@
 /-
 Extracted from CategoryTheory/Shift/Opposite.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 of 13 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Shift.Basic
+import Mathlib.CategoryTheory.Preadditive.Opposite
 
 /-!
 # The (naive) shift on the opposite category
@@ -18,41 +20,17 @@ define the shift on `Cᵒᵖ` so that `shiftFunctor Cᵒᵖ n` for `n : ℤ` ide
 of the shift on `Cᵒᵖ` shall combine the shift on `OppositeShift C A` and another
 construction of the "pullback" of a shift by a monoid morphism like `n ↦ -n`.
 
-If `F : C ⥤ D` is a functor between categories equipped with shifts by `A`, we define
-a type synonym `OppositeShift.functor A F` for `F.op`. When `F` has a `CommShift` structure
-by `A`, we define a `CommShift` structure by `A` on `OppositeShift.functor A F`. In this
-way, we can make this an instance and reserve `F.op` for the `CommShift` instance by
-the modified shift in the case of (pre)triangulated categories.
-
-Similarly, if `τ` is a natural transformation between functors `F,G : C ⥤ D`, we define
-a type synonym for `τ.op` called
-`OppositeShift.natTrans A τ : OppositeShift.functor A F ⟶ OppositeShift.functor A G`.
-When `τ` has a `CommShift` structure by `A` (i.e. is compatible with `CommShift` structures
-on `F` and `G`), we define a `CommShift` structure by `A` on `OppositeShift.natTrans A τ`.
-
-Finally, if we have an adjunction `F ⊣ G` (with `G : D ⥤ C`), we define a type synonym
-`OppositeShift.adjunction A adj : OppositeShift.functor A G ⊣ OppositeShift.functor A F`
-for `adj.op`, and we show that, if `adj` compatible with `CommShift` structures
-on `F` and `G`, then `OppositeShift.adjunction A adj` is also compatible with the pulled back
-`CommShift` structures.
-
-Given a `CommShift` structure on a functor `F`, we define a `CommShift` structure on `F.op`
-(and vice versa).
-We also prove that, if an adjunction `F ⊣ G` is compatible with `CommShift` structures on
-`F` and `G`, then the opposite adjunction `G.op ⊣ F.op` is compatible with the opposite
-`CommShift` structures.
-
 -/
 
 namespace CategoryTheory
 
-open Limits Category
+open Limits
 
-variable (C : Type*) [Category* C] (A : Type*) [AddMonoid A] [HasShift C A]
+variable (C : Type*) [Category C] (A : Type*) [AddMonoid A] [HasShift C A]
 
 namespace HasShift
 
-def mkShiftCoreOp : ShiftMkCore Cᵒᵖ A where
+noncomputable def mkShiftCoreOp : ShiftMkCore Cᵒᵖ A where
   F n := (shiftFunctor C n).op
   zero := (NatIso.op (shiftFunctorZero C A)).symm
   add a b := (NatIso.op (shiftFunctorAdd C a b)).symm
@@ -65,3 +43,68 @@ def mkShiftCoreOp : ShiftMkCore Cᵒᵖ A where
     Quiver.Hom.unop_inj ((shiftFunctorAdd_add_zero_inv_app n X.unop).trans (by simp))
 
 end HasShift
+
+@[nolint unusedArguments]
+def OppositeShift (A : Type*) [AddMonoid A] [HasShift C A] := Cᵒᵖ
+
+instance : Category (OppositeShift C A) := by
+  dsimp only [OppositeShift]
+  infer_instance
+
+noncomputable instance : HasShift (OppositeShift C A) A :=
+  hasShiftMk Cᵒᵖ A (HasShift.mkShiftCoreOp C A)
+
+instance [HasZeroObject C] : HasZeroObject (OppositeShift C A) := by
+  dsimp only [OppositeShift]
+  infer_instance
+
+instance [Preadditive C] : Preadditive (OppositeShift C A) := by
+  dsimp only [OppositeShift]
+  infer_instance
+
+instance [Preadditive C] (n : A) [(shiftFunctor C n).Additive] :
+    (shiftFunctor (OppositeShift C A) n).Additive := by
+  change (shiftFunctor C n).op.Additive
+  infer_instance
+
+lemma oppositeShiftFunctorZero_inv_app (X : OppositeShift C A) :
+    (shiftFunctorZero (OppositeShift C A) A).inv.app X =
+      ((shiftFunctorZero C A).hom.app X.unop).op := rfl
+
+lemma oppositeShiftFunctorZero_hom_app (X : OppositeShift C A) :
+    (shiftFunctorZero (OppositeShift C A) A).hom.app X =
+      ((shiftFunctorZero C A).inv.app X.unop).op := by
+  rw [← cancel_mono ((shiftFunctorZero (OppositeShift C A) A).inv.app X),
+    Iso.hom_inv_id_app, oppositeShiftFunctorZero_inv_app, ← op_comp,
+    Iso.hom_inv_id_app, op_id]
+  rfl
+
+variable {C A}
+
+variable (X : OppositeShift C A) (a b c : A) (h : a + b = c)
+
+lemma oppositeShiftFunctorAdd_inv_app :
+    (shiftFunctorAdd (OppositeShift C A) a b).inv.app X =
+      ((shiftFunctorAdd C a b).hom.app X.unop).op := rfl
+
+lemma oppositeShiftFunctorAdd_hom_app :
+    (shiftFunctorAdd (OppositeShift C A) a b).hom.app X =
+      ((shiftFunctorAdd C a b).inv.app X.unop).op := by
+  rw [← cancel_mono ((shiftFunctorAdd (OppositeShift C A) a b).inv.app X),
+    Iso.hom_inv_id_app, oppositeShiftFunctorAdd_inv_app, ← op_comp,
+    Iso.hom_inv_id_app, op_id]
+  rfl
+
+lemma oppositeShiftFunctorAdd'_inv_app :
+    (shiftFunctorAdd' (OppositeShift C A) a b c h).inv.app X =
+      ((shiftFunctorAdd' C a b c h).hom.app X.unop).op := by
+  subst h
+  simp only [shiftFunctorAdd'_eq_shiftFunctorAdd, oppositeShiftFunctorAdd_inv_app]
+
+lemma oppositeShiftFunctorAdd'_hom_app :
+    (shiftFunctorAdd' (OppositeShift C A) a b c h).hom.app X =
+      ((shiftFunctorAdd' C a b c h).inv.app X.unop).op := by
+  subst h
+  simp only [shiftFunctorAdd'_eq_shiftFunctorAdd, oppositeShiftFunctorAdd_hom_app]
+
+end CategoryTheory

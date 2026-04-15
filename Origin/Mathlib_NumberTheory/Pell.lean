@@ -1,8 +1,12 @@
 /-
 Extracted from NumberTheory/Pell.lean
-Genuine: 7 of 11 | Dissolved: 0 | Infrastructure: 4
+Genuine: 41 of 63 | Dissolved: 5 | Infrastructure: 17
 -/
 import Origin.Core
+import Mathlib.Tactic.Qify
+import Mathlib.Data.ZMod.Basic
+import Mathlib.NumberTheory.DiophantineApproximation
+import Mathlib.NumberTheory.Zsqrtd.Basic
 
 /-!
 # Pell's Equation
@@ -34,8 +38,8 @@ if and only if it is fundamental, see `Pell.pos_generator_iff_fundamental`.
 
 ## References
 
-* [K. Ireland, M. Rosen, *A classical introduction to modern number theory* (Section 17.5)]
-  [IrelandRosen1990]
+* [K. Ireland, M. Rosen, *A classical introduction to modern number theory*
+   (Section 17.5)][IrelandRosen1990]
 
 ## Tags
 
@@ -58,7 +62,7 @@ on the set of all solutions to the Pell equation `x^2 - d*y^2 = 1`.
 The type of such solutions is `Pell.Solution₁ d`. It corresponds to a pair of integers `x` and `y`
 and a proof that `(x, y)` is indeed a solution.
 
-The multiplication is given by `(x, y) * (x', y') = (x*x' + d*y*y', x*y' + y*x')`.
+The multiplication is given by `(x, y) * (x', y') = (x*y' + d*y*y', x*y' + y*x')`.
 This is obtained by mapping `(x, y)` to `x + y*√d` and multiplying the results.
 In fact, we define `Pell.Solution₁ d` to be `↥(unitary (ℤ√d))` and transport
 the "commutative group with distributive negation" structure from `↥(unitary (ℤ√d))`.
@@ -79,13 +83,16 @@ namespace Solution₁
 
 variable {d : ℤ}
 
--- INSTANCE (free from Core): instCommGroup
+instance instCommGroup : CommGroup (Solution₁ d) :=
+  inferInstanceAs (CommGroup (unitary (ℤ√d)))
 
--- INSTANCE (free from Core): instHasDistribNeg
+instance instHasDistribNeg : HasDistribNeg (Solution₁ d) :=
+  inferInstanceAs (HasDistribNeg (unitary (ℤ√d)))
 
--- INSTANCE (free from Core): instInhabited
+instance instInhabited : Inhabited (Solution₁ d) :=
+  inferInstanceAs (Inhabited (unitary (ℤ√d)))
 
--- INSTANCE (free from Core): :
+instance : Coe (Solution₁ d) (ℤ√d) where coe := Subtype.val
 
 protected def x (a : Solution₁ d) : ℤ :=
   (a : ℤ√d).re
@@ -99,3 +106,416 @@ theorem prop (a : Solution₁ d) : a.x ^ 2 - d * a.y ^ 2 = 1 :=
 theorem prop_x (a : Solution₁ d) : a.x ^ 2 = 1 + d * a.y ^ 2 := by rw [← a.prop]; ring
 
 theorem prop_y (a : Solution₁ d) : d * a.y ^ 2 = a.x ^ 2 - 1 := by rw [← a.prop]; ring
+
+@[ext]
+theorem ext {a b : Solution₁ d} (hx : a.x = b.x) (hy : a.y = b.y) : a = b :=
+  Subtype.ext <| Zsqrtd.ext hx hy
+
+def mk (x y : ℤ) (prop : x ^ 2 - d * y ^ 2 = 1) : Solution₁ d where
+  val := ⟨x, y⟩
+  property := is_pell_solution_iff_mem_unitary.mp prop
+
+@[simp]
+theorem x_mk (x y : ℤ) (prop : x ^ 2 - d * y ^ 2 = 1) : (mk x y prop).x = x :=
+  rfl
+
+@[simp]
+theorem y_mk (x y : ℤ) (prop : x ^ 2 - d * y ^ 2 = 1) : (mk x y prop).y = y :=
+  rfl
+
+@[simp]
+theorem coe_mk (x y : ℤ) (prop : x ^ 2 - d * y ^ 2 = 1) : (↑(mk x y prop) : ℤ√d) = ⟨x, y⟩ :=
+  Zsqrtd.ext (x_mk x y prop) (y_mk x y prop)
+
+@[simp]
+theorem x_one : (1 : Solution₁ d).x = 1 :=
+  rfl
+
+@[simp]
+theorem y_one : (1 : Solution₁ d).y = 0 :=
+  rfl
+
+@[simp]
+theorem x_mul (a b : Solution₁ d) : (a * b).x = a.x * b.x + d * (a.y * b.y) := by
+  rw [← mul_assoc]
+  rfl
+
+@[simp]
+theorem y_mul (a b : Solution₁ d) : (a * b).y = a.x * b.y + a.y * b.x :=
+  rfl
+
+@[simp]
+theorem x_inv (a : Solution₁ d) : a⁻¹.x = a.x :=
+  rfl
+
+@[simp]
+theorem y_inv (a : Solution₁ d) : a⁻¹.y = -a.y :=
+  rfl
+
+@[simp]
+theorem x_neg (a : Solution₁ d) : (-a).x = -a.x :=
+  rfl
+
+@[simp]
+theorem y_neg (a : Solution₁ d) : (-a).y = -a.y :=
+  rfl
+
+theorem eq_zero_of_d_neg (h₀ : d < 0) (a : Solution₁ d) : a.x = 0 ∨ a.y = 0 := by
+  have h := a.prop
+  contrapose! h
+  have h1 := sq_pos_of_ne_zero h.1
+  have h2 := sq_pos_of_ne_zero h.2
+  nlinarith
+
+-- DISSOLVED: x_ne_zero
+
+-- DISSOLVED: y_ne_zero_of_one_lt_x
+
+theorem d_pos_of_one_lt_x {a : Solution₁ d} (ha : 1 < a.x) : 0 < d := by
+  refine pos_of_mul_pos_left ?_ (sq_nonneg a.y)
+  rw [a.prop_y, sub_pos]
+  exact one_lt_pow₀ ha two_ne_zero
+
+theorem d_nonsquare_of_one_lt_x {a : Solution₁ d} (ha : 1 < a.x) : ¬IsSquare d := by
+  have hp := a.prop
+  rintro ⟨b, rfl⟩
+  simp_rw [← sq, ← mul_pow, sq_sub_sq, Int.mul_eq_one_iff_eq_one_or_neg_one] at hp
+  rcases hp with (⟨hp₁, hp₂⟩ | ⟨hp₁, hp₂⟩) <;> omega
+
+-- DISSOLVED: eq_one_of_x_eq_one
+
+theorem eq_one_or_neg_one_iff_y_eq_zero {a : Solution₁ d} : a = 1 ∨ a = -1 ↔ a.y = 0 := by
+  refine ⟨fun H => H.elim (fun h => by simp [h]) fun h => by simp [h], fun H => ?_⟩
+  have prop := a.prop
+  rw [H, sq (0 : ℤ), mul_zero, mul_zero, sub_zero, sq_eq_one_iff] at prop
+  exact prop.imp (fun h => ext h H) fun h => ext h H
+
+theorem x_mul_pos {a b : Solution₁ d} (ha : 0 < a.x) (hb : 0 < b.x) : 0 < (a * b).x := by
+  simp only [x_mul]
+  refine neg_lt_iff_pos_add'.mp (abs_lt.mp ?_).1
+  rw [← abs_of_pos ha, ← abs_of_pos hb, ← abs_mul, ← sq_lt_sq, mul_pow a.x, a.prop_x, b.prop_x, ←
+    sub_pos]
+  ring_nf
+  rcases le_or_lt 0 d with h | h
+  · positivity
+  · rw [(eq_zero_of_d_neg h a).resolve_left ha.ne', (eq_zero_of_d_neg h b).resolve_left hb.ne']
+    -- Porting note: was
+    -- rw [zero_pow two_ne_zero, zero_add, zero_mul, zero_add]
+    -- exact one_pos
+    -- but this relied on the exact output of `ring_nf`
+    simp
+
+theorem y_mul_pos {a b : Solution₁ d} (hax : 0 < a.x) (hay : 0 < a.y) (hbx : 0 < b.x)
+    (hby : 0 < b.y) : 0 < (a * b).y := by
+  simp only [y_mul]
+  positivity
+
+theorem x_pow_pos {a : Solution₁ d} (hax : 0 < a.x) (n : ℕ) : 0 < (a ^ n).x := by
+  induction' n with n ih
+  · simp only [pow_zero, x_one, zero_lt_one]
+  · rw [pow_succ]
+    exact x_mul_pos ih hax
+
+theorem y_pow_succ_pos {a : Solution₁ d} (hax : 0 < a.x) (hay : 0 < a.y) (n : ℕ) :
+    0 < (a ^ n.succ).y := by
+  induction' n with n ih
+  · simp only [pow_one, hay]
+  · rw [pow_succ']
+    exact y_mul_pos hax hay (x_pow_pos hax _) ih
+
+theorem y_zpow_pos {a : Solution₁ d} (hax : 0 < a.x) (hay : 0 < a.y) {n : ℤ} (hn : 0 < n) :
+    0 < (a ^ n).y := by
+  lift n to ℕ using hn.le
+  norm_cast at hn ⊢
+  rw [← Nat.succ_pred_eq_of_pos hn]
+  exact y_pow_succ_pos hax hay _
+
+theorem x_zpow_pos {a : Solution₁ d} (hax : 0 < a.x) (n : ℤ) : 0 < (a ^ n).x := by
+  cases n with
+  | ofNat n =>
+    rw [Int.ofNat_eq_coe, zpow_natCast]
+    exact x_pow_pos hax n
+  | negSucc n =>
+    rw [zpow_negSucc]
+    exact x_pow_pos hax (n + 1)
+
+theorem sign_y_zpow_eq_sign_of_x_pos_of_y_pos {a : Solution₁ d} (hax : 0 < a.x) (hay : 0 < a.y)
+    (n : ℤ) : (a ^ n).y.sign = n.sign := by
+  rcases n with ((_ | n) | n)
+  · rfl
+  · rw [Int.ofNat_eq_coe, zpow_natCast]
+    exact Int.sign_eq_one_of_pos (y_pow_succ_pos hax hay n)
+  · rw [zpow_negSucc]
+    exact Int.sign_eq_neg_one_of_neg (neg_neg_of_pos (y_pow_succ_pos hax hay n))
+
+theorem exists_pos_variant (h₀ : 0 < d) (a : Solution₁ d) :
+    ∃ b : Solution₁ d, 0 < b.x ∧ 0 ≤ b.y ∧ a ∈ ({b, b⁻¹, -b, -b⁻¹} : Set (Solution₁ d)) := by
+  refine
+        (lt_or_gt_of_ne (a.x_ne_zero h₀.le)).elim
+          ((le_total 0 a.y).elim (fun hy hx => ⟨-a⁻¹, ?_, ?_, ?_⟩) fun hy hx => ⟨-a, ?_, ?_, ?_⟩)
+          ((le_total 0 a.y).elim (fun hy hx => ⟨a, hx, hy, ?_⟩) fun hy hx => ⟨a⁻¹, hx, ?_, ?_⟩) <;>
+      simp only [neg_neg, inv_inv, neg_inv, Set.mem_insert_iff, Set.mem_singleton_iff, true_or,
+        eq_self_iff_true, x_neg, x_inv, y_neg, y_inv, neg_pos, neg_nonneg, or_true] <;>
+    assumption
+
+end Solution₁
+
+section Existence
+
+/-!
+### Existence of nontrivial solutions
+-/
+
+variable {d : ℤ}
+
+open Set Real
+
+-- DISSOLVED: exists_of_not_isSquare
+
+-- DISSOLVED: exists_iff_not_isSquare
+
+namespace Solution₁
+
+theorem exists_nontrivial_of_not_isSquare (h₀ : 0 < d) (hd : ¬IsSquare d) :
+    ∃ a : Solution₁ d, a ≠ 1 ∧ a ≠ -1 := by
+  obtain ⟨x, y, prop, hy⟩ := exists_of_not_isSquare h₀ hd
+  refine ⟨mk x y prop, fun H => ?_, fun H => ?_⟩ <;> apply_fun Solution₁.y at H <;>
+    simp [hy] at H
+
+theorem exists_pos_of_not_isSquare (h₀ : 0 < d) (hd : ¬IsSquare d) :
+    ∃ a : Solution₁ d, 1 < a.x ∧ 0 < a.y := by
+  obtain ⟨x, y, h, hy⟩ := exists_of_not_isSquare h₀ hd
+  refine ⟨mk |x| |y| (by rwa [sq_abs, sq_abs]), ?_, abs_pos.mpr hy⟩
+  rw [x_mk, ← one_lt_sq_iff_one_lt_abs, eq_add_of_sub_eq h, lt_add_iff_pos_right]
+  exact mul_pos h₀ (sq_pos_of_ne_zero hy)
+
+end Solution₁
+
+end Existence
+
+/-! ### Fundamental solutions
+
+We define the notion of a *fundamental solution* of Pell's equation and
+show that it exists and is unique (when `d` is positive and non-square)
+and generates the group of solutions up to sign.
+-/
+
+variable {d : ℤ}
+
+def IsFundamental (a : Solution₁ d) : Prop :=
+  1 < a.x ∧ 0 < a.y ∧ ∀ {b : Solution₁ d}, 1 < b.x → a.x ≤ b.x
+
+namespace IsFundamental
+
+open Solution₁
+
+theorem x_pos {a : Solution₁ d} (h : IsFundamental a) : 0 < a.x :=
+  zero_lt_one.trans h.1
+
+theorem d_pos {a : Solution₁ d} (h : IsFundamental a) : 0 < d :=
+  d_pos_of_one_lt_x h.1
+
+theorem d_nonsquare {a : Solution₁ d} (h : IsFundamental a) : ¬IsSquare d :=
+  d_nonsquare_of_one_lt_x h.1
+
+theorem subsingleton {a b : Solution₁ d} (ha : IsFundamental a) (hb : IsFundamental b) : a = b := by
+  have hx := le_antisymm (ha.2.2 hb.1) (hb.2.2 ha.1)
+  refine Solution₁.ext hx ?_
+  have : d * a.y ^ 2 = d * b.y ^ 2 := by rw [a.prop_y, b.prop_y, hx]
+  exact (sq_eq_sq₀ ha.2.1.le hb.2.1.le).mp (Int.eq_of_mul_eq_mul_left ha.d_pos.ne' this)
+
+theorem exists_of_not_isSquare (h₀ : 0 < d) (hd : ¬IsSquare d) :
+    ∃ a : Solution₁ d, IsFundamental a := by
+  obtain ⟨a, ha₁, ha₂⟩ := exists_pos_of_not_isSquare h₀ hd
+  -- convert to `x : ℕ` to be able to use `Nat.find`
+  have P : ∃ x' : ℕ, 1 < x' ∧ ∃ y' : ℤ, 0 < y' ∧ (x' : ℤ) ^ 2 - d * y' ^ 2 = 1 := by
+    have hax := a.prop
+    lift a.x to ℕ using by positivity with ax
+    norm_cast at ha₁
+    exact ⟨ax, ha₁, a.y, ha₂, hax⟩
+  classical
+  -- to avoid having to show that the predicate is decidable
+  let x₁ := Nat.find P
+  obtain ⟨hx, y₁, hy₀, hy₁⟩ := Nat.find_spec P
+  refine ⟨mk x₁ y₁ hy₁, by rw [x_mk]; exact mod_cast hx, hy₀, fun {b} hb => ?_⟩
+  rw [x_mk]
+  have hb' := (Int.toNat_of_nonneg <| zero_le_one.trans hb.le).symm
+  have hb'' := hb
+  rw [hb'] at hb ⊢
+  norm_cast at hb ⊢
+  refine Nat.find_min' P ⟨hb, |b.y|, abs_pos.mpr <| y_ne_zero_of_one_lt_x hb'', ?_⟩
+  rw [← hb', sq_abs]
+  exact b.prop
+
+theorem y_strictMono {a : Solution₁ d} (h : IsFundamental a) :
+    StrictMono fun n : ℤ => (a ^ n).y := by
+  have H : ∀ n : ℤ, 0 ≤ n → (a ^ n).y < (a ^ (n + 1)).y := by
+    intro n hn
+    rw [← sub_pos, zpow_add, zpow_one, y_mul, add_sub_assoc]
+    rw [show (a ^ n).y * a.x - (a ^ n).y = (a ^ n).y * (a.x - 1) by ring]
+    refine
+      add_pos_of_pos_of_nonneg (mul_pos (x_zpow_pos h.x_pos _) h.2.1)
+        (mul_nonneg ?_ (by rw [sub_nonneg]; exact h.1.le))
+    rcases hn.eq_or_lt with (rfl | hn)
+    · simp only [zpow_zero, y_one, le_refl]
+    · exact (y_zpow_pos h.x_pos h.2.1 hn).le
+  refine strictMono_int_of_lt_succ fun n => ?_
+  rcases le_or_lt 0 n with hn | hn
+  · exact H n hn
+  · let m : ℤ := -n - 1
+    have hm : n = -m - 1 := by simp only [m, neg_sub, sub_neg_eq_add, add_tsub_cancel_left]
+    rw [hm, sub_add_cancel, ← neg_add', zpow_neg, zpow_neg, y_inv, y_inv, neg_lt_neg_iff]
+    exact H _ (by omega)
+
+theorem zpow_y_lt_iff_lt {a : Solution₁ d} (h : IsFundamental a) (m n : ℤ) :
+    (a ^ m).y < (a ^ n).y ↔ m < n := by
+  refine ⟨fun H => ?_, fun H => h.y_strictMono H⟩
+  contrapose! H
+  exact h.y_strictMono.monotone H
+
+theorem zpow_eq_one_iff {a : Solution₁ d} (h : IsFundamental a) (n : ℤ) : a ^ n = 1 ↔ n = 0 := by
+  rw [← zpow_zero a]
+  exact ⟨fun H => h.y_strictMono.injective (congr_arg Solution₁.y H), fun H => H ▸ rfl⟩
+
+theorem zpow_ne_neg_zpow {a : Solution₁ d} (h : IsFundamental a) {n n' : ℤ} : a ^ n ≠ -a ^ n' := by
+  intro hf
+  apply_fun Solution₁.x at hf
+  have H := x_zpow_pos h.x_pos n
+  rw [hf, x_neg, lt_neg, neg_zero] at H
+  exact lt_irrefl _ ((x_zpow_pos h.x_pos n').trans H)
+
+theorem x_le_x {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d} (hax : 1 < a.x) :
+    a₁.x ≤ a.x :=
+  h.2.2 hax
+
+theorem y_le_y {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d} (hax : 1 < a.x)
+    (hay : 0 < a.y) : a₁.y ≤ a.y := by
+  have H : d * (a₁.y ^ 2 - a.y ^ 2) = a₁.x ^ 2 - a.x ^ 2 := by rw [a.prop_x, a₁.prop_x]; ring
+  rw [← abs_of_pos hay, ← abs_of_pos h.2.1, ← sq_le_sq, ← mul_le_mul_left h.d_pos, ← sub_nonpos, ←
+    mul_sub, H, sub_nonpos, sq_le_sq, abs_of_pos (zero_lt_one.trans h.1),
+    abs_of_pos (zero_lt_one.trans hax)]
+  exact h.x_le_x hax
+
+theorem x_mul_y_le_y_mul_x {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d}
+    (hax : 1 < a.x) (hay : 0 < a.y) : a.x * a₁.y ≤ a.y * a₁.x := by
+  rw [← abs_of_pos <| zero_lt_one.trans hax, ← abs_of_pos hay, ← abs_of_pos h.x_pos, ←
+    abs_of_pos h.2.1, ← abs_mul, ← abs_mul, ← sq_le_sq, mul_pow, mul_pow, a.prop_x, a₁.prop_x, ←
+    sub_nonneg]
+  ring_nf
+  rw [sub_nonneg, sq_le_sq, abs_of_pos hay, abs_of_pos h.2.1]
+  exact h.y_le_y hax hay
+
+theorem mul_inv_y_nonneg {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d} (hax : 1 < a.x)
+    (hay : 0 < a.y) : 0 ≤ (a * a₁⁻¹).y := by
+  simpa only [y_inv, mul_neg, y_mul, le_neg_add_iff_add_le, add_zero] using
+    h.x_mul_y_le_y_mul_x hax hay
+
+theorem mul_inv_x_pos {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d} (hax : 1 < a.x)
+    (hay : 0 < a.y) : 0 < (a * a₁⁻¹).x := by
+  simp only [x_mul, x_inv, y_inv, mul_neg, lt_add_neg_iff_add_lt, zero_add]
+  refine (mul_lt_mul_left <| zero_lt_one.trans hax).mp ?_
+  rw [(by ring : a.x * (d * (a.y * a₁.y)) = d * a.y * (a.x * a₁.y))]
+  refine ((mul_le_mul_left <| mul_pos h.d_pos hay).mpr <| x_mul_y_le_y_mul_x h hax hay).trans_lt ?_
+  rw [← mul_assoc, mul_assoc d, ← sq, a.prop_y, ← sub_pos]
+  ring_nf
+  exact zero_lt_one.trans h.1
+
+theorem mul_inv_x_lt_x {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d} (hax : 1 < a.x)
+    (hay : 0 < a.y) : (a * a₁⁻¹).x < a.x := by
+  simp only [x_mul, x_inv, y_inv, mul_neg, add_neg_lt_iff_le_add']
+  refine (mul_lt_mul_left h.2.1).mp ?_
+  rw [(by ring : a₁.y * (a.x * a₁.x) = a.x * a₁.y * a₁.x)]
+  refine
+    ((mul_le_mul_right <| zero_lt_one.trans h.1).mpr <| x_mul_y_le_y_mul_x h hax hay).trans_lt ?_
+  rw [mul_assoc, ← sq, a₁.prop_x, ← sub_neg]
+  -- Porting note: was `ring_nf`
+  suffices a.y - a.x * a₁.y < 0 by convert this using 1; ring
+  rw [sub_neg, ← abs_of_pos hay, ← abs_of_pos h.2.1, ← abs_of_pos <| zero_lt_one.trans hax, ←
+    abs_mul, ← sq_lt_sq, mul_pow, a.prop_x]
+  calc
+    a.y ^ 2 = 1 * a.y ^ 2 := (one_mul _).symm
+    _ ≤ d * a.y ^ 2 := (mul_le_mul_right <| sq_pos_of_pos hay).mpr h.d_pos
+    _ < d * a.y ^ 2 + 1 := lt_add_one _
+    _ = (1 + d * a.y ^ 2) * 1 := by rw [add_comm, mul_one]
+    _ ≤ (1 + d * a.y ^ 2) * a₁.y ^ 2 :=
+      (mul_le_mul_left (by have := h.d_pos; positivity)).mpr (sq_pos_of_pos h.2.1)
+
+theorem eq_pow_of_nonneg {a₁ : Solution₁ d} (h : IsFundamental a₁) {a : Solution₁ d} (hax : 0 < a.x)
+    (hay : 0 ≤ a.y) : ∃ n : ℕ, a = a₁ ^ n := by
+  lift a.x to ℕ using hax.le with ax hax'
+  -- Porting note: added
+  clear hax
+  induction' ax using Nat.strong_induction_on with x ih generalizing a
+  rcases hay.eq_or_lt with hy | hy
+  · -- case 1: `a = 1`
+    refine ⟨0, ?_⟩
+    simp only [pow_zero]
+    ext <;> simp only [x_one, y_one]
+    · have prop := a.prop
+      rw [← hy, sq (0 : ℤ), zero_mul, mul_zero, sub_zero,
+        sq_eq_one_iff] at prop
+      refine prop.resolve_right fun hf => ?_
+      have := (hax.trans_eq hax').le.trans_eq hf
+      norm_num at this
+    · exact hy.symm
+  · -- case 2: `a ≥ a₁`
+    have hx₁ : 1 < a.x := by nlinarith [a.prop, h.d_pos]
+    have hxx₁ := h.mul_inv_x_pos hx₁ hy
+    have hxx₂ := h.mul_inv_x_lt_x hx₁ hy
+    have hyy := h.mul_inv_y_nonneg hx₁ hy
+    lift (a * a₁⁻¹).x to ℕ using hxx₁.le with x' hx'
+    -- Porting note: `ih` has its arguments in a different order compared to lean 3.
+    obtain ⟨n, hn⟩ := ih x' (mod_cast hxx₂.trans_eq hax'.symm) hyy hx' hxx₁
+    exact ⟨n + 1, by rw [pow_succ', ← hn, mul_comm a, ← mul_assoc, mul_inv_cancel, one_mul]⟩
+
+theorem eq_zpow_or_neg_zpow {a₁ : Solution₁ d} (h : IsFundamental a₁) (a : Solution₁ d) :
+    ∃ n : ℤ, a = a₁ ^ n ∨ a = -a₁ ^ n := by
+  obtain ⟨b, hbx, hby, hb⟩ := exists_pos_variant h.d_pos a
+  obtain ⟨n, hn⟩ := h.eq_pow_of_nonneg hbx hby
+  rcases hb with (rfl | rfl | rfl | hb)
+  · exact ⟨n, Or.inl (mod_cast hn)⟩
+  · exact ⟨-n, Or.inl (by simp [hn])⟩
+  · exact ⟨n, Or.inr (by simp [hn])⟩
+  · rw [Set.mem_singleton_iff] at hb
+    rw [hb]
+    exact ⟨-n, Or.inr (by simp [hn])⟩
+
+end IsFundamental
+
+open Solution₁ IsFundamental
+
+theorem existsUnique_pos_generator (h₀ : 0 < d) (hd : ¬IsSquare d) :
+    ∃! a₁ : Solution₁ d,
+      1 < a₁.x ∧ 0 < a₁.y ∧ ∀ a : Solution₁ d, ∃ n : ℤ, a = a₁ ^ n ∨ a = -a₁ ^ n := by
+  obtain ⟨a₁, ha₁⟩ := IsFundamental.exists_of_not_isSquare h₀ hd
+  refine ⟨a₁, ⟨ha₁.1, ha₁.2.1, ha₁.eq_zpow_or_neg_zpow⟩, fun a (H : 1 < _ ∧ _) => ?_⟩
+  obtain ⟨Hx, Hy, H⟩ := H
+  obtain ⟨n₁, hn₁⟩ := H a₁
+  obtain ⟨n₂, hn₂⟩ := ha₁.eq_zpow_or_neg_zpow a
+  rcases hn₂ with (rfl | rfl)
+  · rw [← zpow_mul, eq_comm, @eq_comm _ a₁, ← mul_inv_eq_one, ← @mul_inv_eq_one _ _ _ a₁, ←
+      zpow_neg_one, neg_mul, ← zpow_add, ← sub_eq_add_neg] at hn₁
+    cases' hn₁ with hn₁ hn₁
+    · rcases Int.isUnit_iff.mp
+          (isUnit_of_mul_eq_one _ _ <|
+            sub_eq_zero.mp <| (ha₁.zpow_eq_one_iff (n₂ * n₁ - 1)).mp hn₁) with
+        (rfl | rfl)
+      · rw [zpow_one]
+      · rw [zpow_neg_one, y_inv, lt_neg, neg_zero] at Hy
+        exact False.elim (lt_irrefl _ <| ha₁.2.1.trans Hy)
+    · rw [← zpow_zero a₁, eq_comm] at hn₁
+      exact False.elim (ha₁.zpow_ne_neg_zpow hn₁)
+  · rw [x_neg, lt_neg] at Hx
+    have := (x_zpow_pos (zero_lt_one.trans ha₁.1) n₂).trans Hx
+    norm_num at this
+
+theorem pos_generator_iff_fundamental (a : Solution₁ d) :
+    (1 < a.x ∧ 0 < a.y ∧ ∀ b : Solution₁ d, ∃ n : ℤ, b = a ^ n ∨ b = -a ^ n) ↔ IsFundamental a := by
+  refine ⟨fun h => ?_, fun H => ⟨H.1, H.2.1, H.eq_zpow_or_neg_zpow⟩⟩
+  have h₀ := d_pos_of_one_lt_x h.1
+  have hd := d_nonsquare_of_one_lt_x h.1
+  obtain ⟨a₁, ha₁⟩ := IsFundamental.exists_of_not_isSquare h₀ hd
+  obtain ⟨b, -, hb₂⟩ := existsUnique_pos_generator h₀ hd
+  rwa [hb₂ a h, ← hb₂ a₁ ⟨ha₁.1, ha₁.2.1, ha₁.eq_zpow_or_neg_zpow⟩]
+
+end Pell

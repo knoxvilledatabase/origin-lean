@@ -3,6 +3,9 @@ Extracted from RingTheory/Finiteness/Subalgebra.lean
 Genuine: 5 of 6 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Algebra.Subalgebra.Basic
+import Mathlib.RingTheory.Finiteness.Basic
+import Mathlib.RingTheory.Finiteness.Bilinear
 
 /-!
 # Subalgebras that are finitely generated as submodules
@@ -18,10 +21,11 @@ open Submodule
 
 variable {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A]
 
-theorem fg_bot_toSubmodule : (⊥ : Subalgebra R A).toSubmodule.FG :=
+theorem fg_bot_toSubmodule  : (⊥ : Subalgebra R A).toSubmodule.FG :=
   ⟨{1}, by simp [Algebra.toSubmodule_bot, one_eq_span]⟩
 
--- INSTANCE (free from Core): finite_bot
+instance finite_bot : Module.Finite R (⊥ : Subalgebra R A) :=
+  Module.Finite.range (Algebra.linearMap R A)
 
 end Subalgebra
 
@@ -33,7 +37,8 @@ theorem fg_unit {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A] (I : (
   refine ⟨T, span_eq_of_le _ hT ?_⟩
   rw [← one_mul I, ← mul_one (span R (T : Set A))]
   conv_rhs => rw [← I.inv_mul, ← mul_assoc]
-  grw [← span_le.mpr hT', Units.val_mul, Units.val_one, span_mul_span, one_le.2 one_mem]
+  refine mul_le_mul_left (le_trans ?_ <| mul_le_mul_right <| span_le.mpr hT')
+  rwa [Units.val_one, span_mul_span, one_le]
 
 theorem fg_of_isUnit {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A] {I : Submodule R A}
     (hI : IsUnit I) : I.FG :=

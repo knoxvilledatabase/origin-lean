@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Nat/Cast/Commute.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 14 of 14 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.GroupWithZero.Commute
+import Mathlib.Algebra.Ring.Commute
 
 /-!
 # Cast of natural numbers: lemmas about `Commute`
@@ -41,3 +43,44 @@ end Nat
 namespace SemiconjBy
 
 variable [Semiring α] {a x y : α}
+
+@[simp]
+lemma natCast_mul_right (h : SemiconjBy a x y) (n : ℕ) : SemiconjBy a (n * x) (n * y) :=
+  SemiconjBy.mul_right (Nat.commute_cast _ _) h
+
+@[simp]
+lemma natCast_mul_left (h : SemiconjBy a x y) (n : ℕ) : SemiconjBy (n * a) x y :=
+  SemiconjBy.mul_left (Nat.cast_commute _ _) h
+
+@[simp]
+lemma natCast_mul_natCast_mul (h : SemiconjBy a x y) (m n : ℕ) :
+    SemiconjBy (m * a) (n * x) (n * y) :=
+  (h.natCast_mul_left m).natCast_mul_right n
+
+end SemiconjBy
+
+namespace Commute
+
+variable [Semiring α] {a b : α}
+
+@[simp] lemma natCast_mul_right (h : Commute a b) (n : ℕ) : Commute a (n * b) :=
+  SemiconjBy.natCast_mul_right h n
+
+@[simp] lemma natCast_mul_left (h : Commute a b) (n : ℕ) : Commute (n * a) b :=
+  SemiconjBy.natCast_mul_left h n
+
+@[simp] lemma natCast_mul_natCast_mul (h : Commute a b) (m n : ℕ) : Commute (m * a) (n * b) :=
+  SemiconjBy.natCast_mul_natCast_mul h m n
+
+variable (a) (m n : ℕ)
+
+lemma self_natCast_mul : Commute a (n * a) := (Commute.refl a).natCast_mul_right n
+
+lemma natCast_mul_self : Commute (n * a) a := (Commute.refl a).natCast_mul_left n
+
+lemma self_natCast_mul_natCast_mul : Commute (m * a) (n * a) :=
+  (Commute.refl a).natCast_mul_natCast_mul m n
+
+alias self_cast_nat_mul_cast_nat_mul := self_natCast_mul_natCast_mul
+
+end Commute

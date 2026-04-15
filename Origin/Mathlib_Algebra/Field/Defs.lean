@@ -1,8 +1,10 @@
 /-
 Extracted from Algebra/Field/Defs.lean
-Genuine: 2 of 6 | Dissolved: 3 | Infrastructure: 1
+Genuine: 10 of 18 | Dissolved: 3 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Algebra.Ring.Defs
+import Mathlib.Data.Rat.Init
 
 /-!
 # Division (semi)rings and (semi)fields
@@ -45,9 +47,7 @@ assert_not_imported Mathlib.Tactic.Common
 
 assert_not_imported Mathlib.Algebra.NeZero
 
-assert_not_exists MonoidHom Set
-
-open Function
+open Function Set
 
 universe u
 
@@ -61,6 +61,51 @@ def Rat.castRec [NatCast K] [IntCast K] [Div K] (q : ℚ) : K := q.num / q.den
 
 -- DISSOLVED: DivisionRing
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) DivisionRing.toDivisionSemiring [DivisionRing K] : DivisionSemiring K :=
+  { ‹DivisionRing K› with }
 
 -- DISSOLVED: Semifield
+
+@[stacks 09FD "first part"]
+class Field (K : Type u) extends CommRing K, DivisionRing K
+
+instance (priority := 100) Field.toSemifield [Field K] : Semifield K := { ‹Field K› with }
+
+namespace NNRat
+
+variable [DivisionSemiring K]
+
+instance (priority := 100) smulDivisionSemiring : SMul ℚ≥0 K := ⟨DivisionSemiring.nnqsmul⟩
+
+lemma cast_def (q : ℚ≥0) : (q : K) = q.num / q.den := DivisionSemiring.nnratCast_def _
+
+lemma smul_def (q : ℚ≥0) (a : K) : q • a = q * a := DivisionSemiring.nnqsmul_def q a
+
+variable (K)
+
+@[simp] lemma smul_one_eq_cast (q : ℚ≥0) : q • (1 : K) = q := by rw [NNRat.smul_def, mul_one]
+
+end NNRat
+
+namespace Rat
+
+variable [DivisionRing K]
+
+lemma cast_def (q : ℚ) : (q : K) = q.num / q.den := DivisionRing.ratCast_def _
+
+lemma cast_mk' (a b h1 h2) : ((⟨a, b, h1, h2⟩ : ℚ) : K) = a / b := cast_def _
+
+instance (priority := 100) smulDivisionRing : SMul ℚ K :=
+  ⟨DivisionRing.qsmul⟩
+
+theorem smul_def (a : ℚ) (x : K) : a • x = ↑a * x := DivisionRing.qsmul_def a x
+
+@[simp]
+theorem smul_one_eq_cast (A : Type*) [DivisionRing A] (m : ℚ) : m • (1 : A) = ↑m := by
+  rw [Rat.smul_def, mul_one]
+
+end Rat
+
+@[simp]
+theorem Rat.ofScientific_eq_ofScientific (m : ℕ) (s : Bool) (e : ℕ) :
+    Rat.ofScientific (OfNat.ofNat m) s (OfNat.ofNat e) = OfScientific.ofScientific m s e := rfl

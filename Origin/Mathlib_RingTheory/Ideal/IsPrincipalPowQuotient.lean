@@ -3,6 +3,9 @@ Extracted from RingTheory/Ideal/IsPrincipalPowQuotient.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Isomorphisms
+import Mathlib.RingTheory.Ideal.Operations
+import Mathlib.RingTheory.Ideal.Quotient.Defs
 
 /-!
 # Quotients of powers of principal ideals
@@ -31,15 +34,15 @@ variable {R : Type*} [CommRing R] [IsDomain R] {I : Ideal R}
 
 noncomputable
 
-def quotEquivPowQuotPowSucc (h : I.IsPrincipal) (h' : I ≠ ⊥) (n : ℕ) :
+def quotEquivPowQuotPowSucc (h : I.IsPrincipal) (h': I ≠ ⊥) (n : ℕ) :
     (R ⧸ I) ≃ₗ[R] (I ^ n : Ideal R) ⧸ (I • ⊤ : Submodule R (I ^ n : Ideal R)) := by
   let f : (I ^ n : Ideal R) →ₗ[R] (I ^ n : Ideal R) ⧸ (I • ⊤ : Submodule R (I ^ n : Ideal R)) :=
     Submodule.mkQ _
-  let ϖ := h.principal.choose
-  have hI : I = Ideal.span {ϖ} := h.principal.choose_spec
+  let ϖ := h.principal'.choose
+  have hI : I = Ideal.span {ϖ} := h.principal'.choose_spec
   have hϖ : ϖ ^ n ∈ I ^ n := hI ▸ (Ideal.pow_mem_pow (Ideal.mem_span_singleton_self _) n)
-  let g : R →ₗ[R] (I ^ n : Ideal R) := (LinearMap.mulRight R ϖ ^ n).codRestrict _ fun x ↦ by
-    simp only [LinearMap.pow_mulRight, LinearMap.mulRight_apply]
+  let g : R →ₗ[R] (I ^ n : Ideal R) := (LinearMap.mulRight R ϖ^n).codRestrict _ fun x ↦ by
+    simp only [LinearMap.pow_mulRight, LinearMap.mulRight_apply, Ideal.submodule_span_eq]
     -- TODO: change argument of Ideal.pow_mem_of_mem
     exact Ideal.mul_mem_left _ _ hϖ
   have : I = LinearMap.ker (f.comp g) := by
@@ -55,7 +58,7 @@ def quotEquivPowQuotPowSucc (h : I.IsPrincipal) (h' : I ≠ ⊥) (n : ℕ) :
       rw [mul_comm, pow_succ, mul_assoc, mul_right_inj' (pow_ne_zero _ _)] at hy
       · rw [hI, Ideal.mem_span_singleton]
         exact ⟨y, hy⟩
-      · contrapose h'
+      · contrapose! h'
         rw [hI, h', Ideal.span_singleton_eq_bot]
   let e : (R ⧸ I) ≃ₗ[R] R ⧸ (LinearMap.ker (f.comp g)) :=
     Submodule.quotEquivOfEq I (LinearMap.ker (f ∘ₗ g)) this
@@ -68,7 +71,7 @@ def quotEquivPowQuotPowSucc (h : I.IsPrincipal) (h' : I ≠ ⊥) (n : ℕ) :
 
 noncomputable
 
-def quotEquivPowQuotPowSuccEquiv (h : I.IsPrincipal) (h' : I ≠ ⊥) (n : ℕ) :
+def quotEquivPowQuotPowSuccEquiv (h : I.IsPrincipal) (h': I ≠ ⊥) (n : ℕ) :
     (R ⧸ I) ≃ (I ^ n : Ideal R) ⧸ (I • ⊤ : Submodule R (I ^ n : Ideal R)) :=
   quotEquivPowQuotPowSucc h h' n
 

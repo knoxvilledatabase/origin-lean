@@ -3,6 +3,8 @@ Extracted from Data/Set/Pointwise/Support.lean
 Genuine: 2 of 4 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Group.Support
+import Mathlib.Data.Set.Pointwise.SMul
 
 /-!
 # Support of a function composed with a scalar action
@@ -28,6 +30,8 @@ theorem support_comp_inv_smul [Zero γ] (c : α) (f : β → γ) :
   ext x
   simp only [mem_smul_set_iff_inv_smul_mem, mem_support]
 
+attribute [to_additive existing support_comp_inv_smul] mulSupport_comp_inv_smul
+
 end Group
 
 section GroupWithZero
@@ -37,5 +41,7 @@ variable {α β γ : Type*} [GroupWithZero α] [MulAction α β]
 -- DISSOLVED: mulSupport_comp_inv_smul₀
 
 -- DISSOLVED: support_comp_inv_smul₀
+
+attribute [to_additive existing support_comp_inv_smul₀] mulSupport_comp_inv_smul₀
 
 end GroupWithZero

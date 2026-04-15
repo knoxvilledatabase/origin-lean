@@ -3,6 +3,8 @@ Extracted from Analysis/Complex/IsIntegral.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 
 /-!
 # Integral elements of ℂ

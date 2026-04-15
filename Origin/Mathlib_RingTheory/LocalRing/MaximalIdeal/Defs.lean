@@ -3,17 +3,18 @@ Extracted from RingTheory/LocalRing/MaximalIdeal/Defs.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.LocalRing.Basic
 
 /-!
 
 # Maximal ideal of local rings
 
-We define the maximal ideal of a local ring as the ideal of all nonunits.
+We define the maximal ideal of a local ring as the ideal of all non units.
 
 ## Main definitions
 
 * `IsLocalRing.maximalIdeal`: The unique maximal ideal for a local rings. Its carrier set is the
-  set of nonunits.
+  set of non units.
 
 -/
 

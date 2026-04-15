@@ -1,28 +1,28 @@
 /-
 Extracted from Algebra/SkewMonoidAlgebra/Basic.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 18 of 28 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
+import Mathlib.Data.Finsupp.Basic
 
 /-!
-# Skew Monoid Algebras
+# Skew monoid algebras
 
-Given a monoid `G` acting on a ring `k`, the skew monoid algebra of `G` over `k` is the set
-of finitely supported functions `f : G → k` for which addition is defined pointwise and
-multiplication of two elements `f` and `g` is given by the finitely supported function whose
-value at `a` is the sum of `f x * (x • g y)` over all pairs `x, y` such that `x * y = a`,
-where `•` denotes the action of `G` on `k`. When this action is trivial, this product is
-the usual convolution product.
+This file presents a skewed version of `Mathlib.Algebra.MonoidAlgebra.Basic` with an
+irreducible definition.
 
-In fact the construction of the skew monoid algebra makes sense when `G` is not even a monoid, but
-merely a magma, i.e., when `G` carries a multiplication which is not required to satisfy any
-conditions at all, and `k` is a not-necessarily-associative semiring. In this case the construction
-yields a not-necessarily-unital, not-necessarily-associative algebra.
+The definition is separated from `Finsupp` by wrapping it with a structure.
+For https://github.com/leanprover-community/mathlib4/pull/15878, the goal is only to get this separation right. This means that
+most of what makes these objects skewed is currently missing from this PR.
 
-## Main Definitions
-- `SkewMonoidAlgebra k G`: the skew monoid algebra of `G` over `k` is the type of finite formal
-  `k`-linear combinations of terms of `G`, endowed with a skewed convolution product.
+The goal will then be to define a skewed convolution product on `SkewMonoidAlgebra k G`.
+Here, the product of two elements `f g : SkewMonoidAlgebra k G` is the finitely supported
+function whose value at `a` is the sum of `f x * (x • g y)` over all pairs `x, y`
+such that `x * y = a`. (See https://github.com/leanprover-community/mathlib4/pull/10541 at line 558 for an implementation.)
 
+The associativity of the skewed multiplication depends on the `[MulSemiringAction G k]` instance.
+In particular, this means that unlike in `Mathlib.Algebra.MonoidAlgebra.Basic`, `G` will
+need to be a monoid for most of our uses.
 -/
 
 noncomputable section
@@ -39,6 +39,122 @@ namespace SkewMonoidAlgebra
 
 variable {k G : Type*}
 
-section AddMonoid
+section AddCommMonoid
 
-variable [AddMonoid k]
+variable [AddCommMonoid k]
+
+@[simp]
+theorem eta (f : SkewMonoidAlgebra k G) : ofFinsupp f.toFinsupp = f := rfl
+
+@[irreducible]
+private def add :
+    SkewMonoidAlgebra k G → SkewMonoidAlgebra k G → SkewMonoidAlgebra k G
+  | ⟨a⟩, ⟨b⟩ => ⟨a + b⟩
+
+private def smul {S : Type*} [SMulZeroClass S k] :
+    S → SkewMonoidAlgebra k G → SkewMonoidAlgebra k G
+  | s, ⟨b⟩ => ⟨s • b⟩
+
+instance instZero : Zero (SkewMonoidAlgebra k G) := ⟨⟨0⟩⟩
+
+instance instAdd : Add (SkewMonoidAlgebra k G) := ⟨add⟩
+
+instance instSMulZeroClass {S : Type*} [SMulZeroClass S k] :
+    SMulZeroClass S (SkewMonoidAlgebra k G) where
+  smul s f := smul s f
+  smul_zero a := by simp only [smul]; exact congr_arg ofFinsupp (smul_zero a)
+
+@[simp]
+theorem ofFinsupp_zero : (⟨0⟩ : SkewMonoidAlgebra k G) = 0 := rfl
+
+@[simp]
+theorem ofFinsupp_add {a b} : (⟨a + b⟩ : SkewMonoidAlgebra k G) = ⟨a⟩ + ⟨b⟩ :=
+  show _ = add _ _ by rw [add]
+
+@[simp]
+theorem ofFinsupp_smul {S : Type*} [SMulZeroClass S k] (a : S) (b : G →₀ k) :
+    (⟨a • b⟩ : SkewMonoidAlgebra k G) = (a • ⟨b⟩ : SkewMonoidAlgebra k G) :=
+  show _ = smul _ _ by rw [smul]
+
+@[simp]
+theorem toFinsupp_zero : (0 : SkewMonoidAlgebra k G).toFinsupp = 0 := rfl
+
+@[simp]
+theorem toFinsupp_add (a b : SkewMonoidAlgebra k G) :
+    (a + b).toFinsupp = a.toFinsupp + b.toFinsupp := by
+  cases a
+  cases b
+  rw [← ofFinsupp_add]
+
+@[simp]
+theorem toFinsupp_smul {S : Type*} [SMulZeroClass S k] (a : S) (b : SkewMonoidAlgebra k G) :
+    (a • b).toFinsupp = a • b.toFinsupp := by
+  cases b
+  rw [← ofFinsupp_smul]
+
+theorem _root_.IsSMulRegular.skewMonoidAlgebra {S : Type*} [Monoid S] [DistribMulAction S k] {a : S}
+    (ha : IsSMulRegular k a) : IsSMulRegular (SkewMonoidAlgebra k G) a
+  | ⟨_⟩, ⟨_⟩, h => by
+    simp only [← ofFinsupp_smul] at h
+    exact congr_arg _ <| ha.finsupp (ofFinsupp.inj h)
+
+theorem toFinsupp_injective :
+    Function.Injective (toFinsupp : SkewMonoidAlgebra k G → Finsupp _ _) :=
+  fun ⟨_⟩ _ => congr_arg _
+
+@[simp]
+theorem toFinsupp_inj {a b : SkewMonoidAlgebra k G} : a.toFinsupp = b.toFinsupp ↔ a = b :=
+  toFinsupp_injective.eq_iff
+
+theorem ofFinsupp_injective :
+    Function.Injective (ofFinsupp : Finsupp _ _ → SkewMonoidAlgebra k G) :=
+  fun _ _ => congr_arg toFinsupp
+
+theorem ofFinsupp_inj {a b} : (⟨a⟩ : SkewMonoidAlgebra k G) = ⟨b⟩ ↔ a = b :=
+  ofFinsupp_injective.eq_iff
+
+@[simp]
+theorem toFinsupp_eq_zero {a : SkewMonoidAlgebra k G} : a.toFinsupp = 0 ↔ a = 0 := by
+  rw [← toFinsupp_zero, toFinsupp_inj]
+
+@[simp]
+theorem ofFinsupp_eq_zero {a} : (⟨a⟩ : SkewMonoidAlgebra k G) = 0 ↔ a = 0 := by
+  rw [← ofFinsupp_zero, ofFinsupp_inj]
+
+instance instInhabited : Inhabited (SkewMonoidAlgebra k G) := ⟨0⟩
+
+instance instNontrivial [Nontrivial k] [Nonempty G] :
+    Nontrivial (SkewMonoidAlgebra k G) := Function.Injective.nontrivial ofFinsupp_injective
+
+instance instAddCommMonoid : AddCommMonoid (SkewMonoidAlgebra k G) where
+  __ := toFinsupp_injective.addCommMonoid _ toFinsupp_zero toFinsupp_add
+    (fun _ _ => toFinsupp_smul _ _)
+  toAdd  := SkewMonoidAlgebra.instAdd
+  toZero := SkewMonoidAlgebra.instZero
+  nsmul  := (· • ·)
+
+section Support
+
+def support : SkewMonoidAlgebra k G → Finset G
+  | ⟨p⟩ => p.support
+
+@[simp]
+theorem support_ofFinsupp (p) : support (⟨p⟩ : SkewMonoidAlgebra k G) = p.support := by
+  rw [support]
+
+theorem support_toFinsupp (p : SkewMonoidAlgebra k G) : p.toFinsupp.support = p.support := by
+  rw [support]
+
+@[simp]
+theorem support_zero : (0 : SkewMonoidAlgebra k G).support = ∅ := rfl
+
+@[simp]
+theorem support_eq_empty {p} : p.support = ∅ ↔ (p : SkewMonoidAlgebra k G) = 0 := by
+  rcases p with ⟨⟩
+  simp only [support, Finsupp.support_eq_empty, ofFinsupp_eq_zero]
+
+end Support
+
+end AddCommMonoid
+
+end SkewMonoidAlgebra

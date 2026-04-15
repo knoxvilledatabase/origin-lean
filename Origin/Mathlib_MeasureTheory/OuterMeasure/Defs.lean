@@ -1,8 +1,9 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/Defs.lean
-Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
+Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Topology.Instances.ENNReal
 
 /-!
 # Definitions of an outer measure and the corresponding `FunLike` class
@@ -31,15 +32,11 @@ We also define a typeclass `MeasureTheory.OuterMeasureClass`.
 outer measure
 -/
 
-assert_not_exists Module.Basis IsTopologicalRing UniformSpace
-
 open scoped ENNReal
 
 variable {α : Type*}
 
 namespace MeasureTheory
-
-open scoped Function -- required for scoped `on` notation
 
 structure OuterMeasure (α : Type*) where
   /-- Outer measure function. Use automatic coercion instead. -/
@@ -57,4 +54,17 @@ class OuterMeasureClass (F : Type*) (α : outParam Type*) [FunLike F (Set α) �
 
 namespace OuterMeasure
 
--- INSTANCE (free from Core): :
+instance : FunLike (OuterMeasure α) (Set α) ℝ≥0∞ where
+  coe m := m.measureOf
+  coe_injective' | ⟨_, _, _, _⟩, ⟨_, _, _, _⟩, rfl => rfl
+
+@[simp] theorem measureOf_eq_coe (m : OuterMeasure α) : m.measureOf = m := rfl
+
+instance : OuterMeasureClass (OuterMeasure α) α where
+  measure_empty f := f.empty
+  measure_mono f := f.mono
+  measure_iUnion_nat_le f := f.iUnion_nat
+
+end OuterMeasure
+
+end MeasureTheory

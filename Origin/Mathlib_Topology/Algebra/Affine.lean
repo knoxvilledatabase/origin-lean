@@ -1,46 +1,73 @@
 /-
 Extracted from Topology/Algebra/Affine.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 4 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.AffineSpace.AffineMap
+import Mathlib.Topology.Algebra.Group.Basic
+import Mathlib.Topology.Algebra.MulAction
 
 /-!
 # Topological properties of affine spaces and maps
 
-This file contains a few facts regarding the continuity of affine maps.
+For now, this contains only a few facts regarding the continuity of affine maps in the special
+case when the point space and vector space are the same.
+
+TODO: Deal with the case where the point spaces are different from the vector spaces. Note that
+we do have some results in this direction under the assumption that the topologies are induced by
+(semi)norms.
 -/
 
 namespace AffineMap
 
-variable
-  {R V P W Q : Type*}
-  [AddCommGroup V] [TopologicalSpace V]
-  [AddTorsor V P] [TopologicalSpace P] [IsTopologicalAddTorsor P]
-  [AddCommGroup W] [TopologicalSpace W]
-  [AddTorsor W Q] [TopologicalSpace Q] [IsTopologicalAddTorsor Q]
+variable {R E F : Type*}
+
+variable [AddCommGroup E] [TopologicalSpace E]
+
+variable [AddCommGroup F] [TopologicalSpace F] [TopologicalAddGroup F]
 
 section Ring
 
-variable [Ring R] [Module R V] [Module R W]
+variable [Ring R] [Module R E] [Module R F]
 
-theorem continuous_linear_iff {f : P →ᵃ[R] Q} : Continuous f.linear ↔ Continuous f := by
-  inhabit P
-  have :
-    (f.linear : V → W) =
-      (Homeomorph.vaddConst <| f default).symm ∘ f ∘ (Homeomorph.vaddConst default) := by
-    ext v
-    simp
-  rw [this]
-  simp only [Homeomorph.comp_continuous_iff, Homeomorph.comp_continuous_iff']
+theorem continuous_iff {f : E →ᵃ[R] F} : Continuous f ↔ Continuous f.linear := by
+  constructor
+  · intro hc
+    rw [decomp' f]
+    exact hc.sub continuous_const
+  · intro hc
+    rw [decomp f]
+    exact hc.add continuous_const
 
-theorem isOpenMap_linear_iff {f : P →ᵃ[R] Q} : IsOpenMap f.linear ↔ IsOpenMap f := by
-  inhabit P
-  have :
-    (f.linear : V → W) =
-      (Homeomorph.vaddConst <| f default).symm ∘ f ∘ (Homeomorph.vaddConst default) := by
-    ext v
-    simp
-  rw [this]
-  simp only [Homeomorph.comp_isOpenMap_iff, Homeomorph.comp_isOpenMap_iff']
+@[continuity]
+theorem lineMap_continuous [TopologicalSpace R] [ContinuousSMul R F] {p v : F} :
+    Continuous (lineMap p v : R →ᵃ[R] F) :=
+  continuous_iff.mpr <|
+    (continuous_id.smul continuous_const).add <| @continuous_const _ _ _ _ (0 : F)
 
-variable [TopologicalSpace R] [ContinuousSMul R V]
+end Ring
+
+section CommRing
+
+variable [CommRing R] [Module R F] [ContinuousConstSMul R F]
+
+@[continuity]
+theorem homothety_continuous (x : F) (t : R) : Continuous <| homothety x t := by
+  suffices ⇑(homothety x t) = fun y => t • (y - x) + x by
+    rw [this]
+    exact ((continuous_id.sub continuous_const).const_smul _).add continuous_const
+    -- Porting note: proof was `by continuity`
+  ext y
+  simp [homothety_apply]
+
+end CommRing
+
+section Field
+
+variable [Field R] [Module R F] [ContinuousConstSMul R F]
+
+-- DISSOLVED: homothety_isOpenMap
+
+end Field
+
+end AffineMap

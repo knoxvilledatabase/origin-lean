@@ -1,8 +1,9 @@
 /-
 Extracted from Data/Finset/Update.lean
-Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 of 6 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Basic
 
 /-!
 # Update a function on a set of values
@@ -15,7 +16,6 @@ for other purposes.
 -/
 
 variable {ι : Sort _} {π : ι → Sort _} {x : ∀ i, π i} [DecidableEq ι]
-  {s t : Finset ι} {y : ∀ i : s, π i} {z : ∀ i : t, π i} {i : ι}
 
 namespace Function
 
@@ -23,3 +23,41 @@ def updateFinset (x : ∀ i, π i) (s : Finset ι) (y : ∀ i : ↥s, π i) (i :
   if hi : i ∈ s then y ⟨i, hi⟩ else x i
 
 open Finset Equiv
+
+theorem updateFinset_def {s : Finset ι} {y} :
+    updateFinset x s y = fun i ↦ if hi : i ∈ s then y ⟨i, hi⟩ else x i :=
+  rfl
+
+@[simp] theorem updateFinset_empty {y} : updateFinset x ∅ y = x :=
+  rfl
+
+theorem updateFinset_singleton {i y} :
+    updateFinset x {i} y = Function.update x i (y ⟨i, mem_singleton_self i⟩) := by
+  congr with j
+  by_cases hj : j = i
+  · cases hj
+    simp only [dif_pos, Finset.mem_singleton, update_same, updateFinset]
+  · simp [hj, updateFinset]
+
+theorem update_eq_updateFinset {i y} :
+    Function.update x i y = updateFinset x {i} (uniqueElim y) := by
+  congr with j
+  by_cases hj : j = i
+  · cases hj
+    simp only [dif_pos, Finset.mem_singleton, update_same, updateFinset]
+    exact uniqueElim_default (α := fun j : ({i} : Finset ι) => π j) y
+  · simp [hj, updateFinset]
+
+theorem updateFinset_updateFinset {s t : Finset ι} (hst : Disjoint s t)
+    {y : ∀ i : ↥s, π i} {z : ∀ i : ↥t, π i} :
+    updateFinset (updateFinset x s y) t z =
+    updateFinset x (s ∪ t) (Equiv.piFinsetUnion π hst ⟨y, z⟩) := by
+  set e := Equiv.Finset.union s t hst
+  congr with i
+  by_cases his : i ∈ s <;> by_cases hit : i ∈ t <;>
+    simp only [updateFinset, his, hit, dif_pos, dif_neg, Finset.mem_union, false_or, not_false_iff]
+  · exfalso; exact Finset.disjoint_left.mp hst his hit
+  · exact piCongrLeft_sum_inl (fun b : ↥(s ∪ t) => π b) e y z ⟨i, his⟩ |>.symm
+  · exact piCongrLeft_sum_inr (fun b : ↥(s ∪ t) => π b) e y z ⟨i, hit⟩ |>.symm
+
+end Function

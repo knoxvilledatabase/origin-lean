@@ -3,6 +3,9 @@ Extracted from RingTheory/Ideal/IdempotentFG.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Ring.Idempotents
+import Mathlib.Order.Basic
+import Mathlib.RingTheory.Finiteness.Nakayama
 
 /-!
 ## Lemmas on idempotent finitely generated ideals

@@ -3,13 +3,16 @@ Extracted from CategoryTheory/MorphismProperty/Concrete.lean
 Genuine: 7 of 15 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.ConcreteCategory.Basic
+import Mathlib.CategoryTheory.MorphismProperty.Composition
+import Mathlib.CategoryTheory.MorphismProperty.Factorization
 
 /-!
 # Morphism properties defined in concrete categories
 
 In this file, we define the class of morphisms `MorphismProperty.injective`,
 `MorphismProperty.surjective`, `MorphismProperty.bijective` in concrete
-categories, and show that it is stable under composition and respects isomorphisms.
+categories, and show that it is stable under composition and respect isomorphisms.
 
 We introduce type-classes `HasSurjectiveInjectiveFactorization` and
 `HasFunctorialSurjectiveInjectiveFactorization` expressing that in a concrete category `C`,
@@ -22,13 +25,13 @@ universe v u
 
 namespace CategoryTheory
 
-variable (C : Type u) [Category.{v} C] {FC : C → C → Type*} {CC : C → Type*}
-
-variable [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory C FC]
+variable (C : Type u) [Category.{v} C] [ConcreteCategory C]
 
 namespace MorphismProperty
 
 open Function
+
+attribute [local instance] ConcreteCategory.instFunLike ConcreteCategory.hasCoeToSort
 
 protected def injective : MorphismProperty C := fun _ _ f => Injective f
 
@@ -36,17 +39,51 @@ protected def surjective : MorphismProperty C := fun _ _ f => Surjective f
 
 protected def bijective : MorphismProperty C := fun _ _ f => Bijective f
 
--- INSTANCE (free from Core): :
+theorem bijective_eq_sup :
+    MorphismProperty.bijective C = MorphismProperty.injective C ⊓ MorphismProperty.surjective C :=
+  rfl
 
--- INSTANCE (free from Core): :
+instance : (MorphismProperty.injective C).IsMultiplicative where
+  id_mem X := by
+    delta MorphismProperty.injective
+    convert injective_id
+    aesop
+  comp_mem f g hf hg := by
+    delta MorphismProperty.injective
+    rw [coe_comp]
+    exact hg.comp hf
 
--- INSTANCE (free from Core): :
+instance : (MorphismProperty.surjective C).IsMultiplicative where
+  id_mem X := by
+    delta MorphismProperty.surjective
+    convert surjective_id
+    aesop
+  comp_mem f g hf hg := by
+    delta MorphismProperty.surjective
+    rw [coe_comp]
+    exact hg.comp hf
 
--- INSTANCE (free from Core): injective_respectsIso
+instance : (MorphismProperty.bijective C).IsMultiplicative where
+  id_mem X := by
+    delta MorphismProperty.bijective
+    convert bijective_id
+    aesop
+  comp_mem f g hf hg := by
+    delta MorphismProperty.bijective
+    rw [coe_comp]
+    exact hg.comp hf
 
--- INSTANCE (free from Core): surjective_respectsIso
+instance injective_respectsIso : (MorphismProperty.injective C).RespectsIso :=
+  respectsIso_of_isStableUnderComposition
+    (fun _ _ f (_ : IsIso f) => ((forget C).mapIso (asIso f)).toEquiv.injective)
 
--- INSTANCE (free from Core): bijective_respectsIso
+instance surjective_respectsIso : (MorphismProperty.surjective C).RespectsIso :=
+  respectsIso_of_isStableUnderComposition
+    (fun _ _ f (_ : IsIso f) => ((forget C).mapIso (asIso f)).toEquiv.surjective)
+
+instance bijective_respectsIso : (MorphismProperty.bijective C).RespectsIso :=
+  respectsIso_of_isStableUnderComposition
+    (fun _ _ f (_ : IsIso f) => ((forget C).mapIso (asIso f)).toEquiv.bijective)
 
 end MorphismProperty
 
@@ -68,17 +105,17 @@ open ConcreteCategory
 def functorialSurjectiveInjectiveFactorizationData :
     FunctorialSurjectiveInjectiveFactorizationData (Type u) where
   Z :=
-    { obj := fun f => Subtype (Set.range f.hom.hom)
-      map := fun φ => TypeCat.ofHom fun y => ⟨φ.right y.1, by
+    { obj := fun f => Subtype (Set.range f.hom)
+      map := fun φ y => ⟨φ.right y.1, by
         obtain ⟨_, x, rfl⟩ := y
-        exact ⟨φ.left x, congr_hom φ.w x⟩ ⟩ }
+        exact ⟨φ.left x, congr_fun φ.w x⟩ ⟩ }
   i :=
-    { app := fun f => TypeCat.ofHom fun x => ⟨f.hom x, ⟨x, rfl⟩⟩
+    { app := fun f x => ⟨f.hom x, ⟨x, rfl⟩⟩
       naturality := fun f g φ => by
         ext x
-        exact congr_hom φ.w x }
+        exact congr_fun φ.w x }
   p :=
-    { app := fun _ => TypeCat.ofHom (fun y => y.1)
+    { app := fun _ y => y.1
       naturality := by intros; rfl; }
   fac := rfl
   hi := by
@@ -88,6 +125,8 @@ def functorialSurjectiveInjectiveFactorizationData :
     rw [Subtype.ext_iff]
     exact h
 
--- INSTANCE (free from Core): :
+instance : HasFunctorialSurjectiveInjectiveFactorization (Type u) where
+  nonempty_functorialFactorizationData :=
+    ⟨functorialSurjectiveInjectiveFactorizationData⟩
 
 end CategoryTheory

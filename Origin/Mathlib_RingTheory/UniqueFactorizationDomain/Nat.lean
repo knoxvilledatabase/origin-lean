@@ -3,6 +3,9 @@ Extracted from RingTheory/UniqueFactorizationDomain/Nat.lean
 Genuine: 1 of 4 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.ENat.Basic
+import Mathlib.Data.Nat.Factors
+import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
 
 /-!
 # Unique factorization of natural numbers
@@ -12,13 +15,26 @@ import Origin.Core
 * `Nat.instUniqueFactorizationMonoid`: the natural numbers have unique factorization
 -/
 
-assert_not_exists Field
-
 namespace Nat
 
--- INSTANCE (free from Core): instWfDvdMonoid
+instance instWfDvdMonoid : WfDvdMonoid ℕ where
+  wf := by
+    refine RelHomClass.wellFounded
+      (⟨fun x : ℕ => if x = 0 then (⊤ : ℕ∞) else x, ?_⟩ : DvdNotUnit →r (· < ·)) wellFounded_lt
+    intro a b h
+    cases' a with a
+    · exfalso
+      revert h
+      simp [DvdNotUnit]
+    cases b
+    · simpa [succ_ne_zero] using ENat.coe_lt_top (a + 1)
+    cases' dvd_and_not_dvd_iff.2 h with h1 h2
+    simp only [succ_ne_zero, cast_lt, if_false]
+    refine lt_of_le_of_ne (Nat.le_of_dvd (Nat.succ_pos _) h1) fun con => h2 ?_
+    rw [con]
 
--- INSTANCE (free from Core): instUniqueFactorizationMonoid
+instance instUniqueFactorizationMonoid : UniqueFactorizationMonoid ℕ where
+  irreducible_iff_prime := Nat.irreducible_iff_prime
 
 open UniqueFactorizationMonoid
 
@@ -28,7 +44,7 @@ lemma factors_multiset_prod_of_irreducible {s : Multiset ℕ} (h : ∀ x : ℕ, 
     normalizedFactors s.prod = s := by
   rw [← Multiset.rel_eq, ← associated_eq_eq]
   apply UniqueFactorizationMonoid.factors_unique irreducible_of_normalized_factor h
-    (prod_normalizedFactors _)
+    (normalizedFactors_prod _)
   rw [Ne, Multiset.prod_eq_zero_iff]
   exact fun con ↦ not_irreducible_zero (h 0 con)
 

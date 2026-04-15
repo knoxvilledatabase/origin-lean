@@ -1,8 +1,10 @@
 /-
 Extracted from RingTheory/Valuation/ExtendToLocalization.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Localization.AtPrime
+import Mathlib.RingTheory.Valuation.Basic
 
 /-!
 
@@ -33,10 +35,13 @@ noncomputable def Valuation.extendToLocalization : Valuation B Γ :=
             ring_nf
       convert_to f.lift h (f.mk' (a + b) s) ≤ max (f.lift h _) (f.lift h _)
       · refine congr_arg (f.lift h) (IsLocalization.eq_mk'_iff_mul_eq.2 ?_)
-        rw [add_mul, map_add]
-        rw [← IsLocalization.toLocalizationMap_apply S B, f.mk'_spec, f.mk'_spec,
-          IsLocalization.toLocalizationMap_apply,
-          IsLocalization.toLocalizationMap_apply]
+        rw [add_mul, _root_.map_add]
+        iterate 2 erw [IsLocalization.mk'_spec]
       iterate 3 rw [f.lift_mk']
-      dsimp
-      grw [max_mul_mul_right, v.map_add a b] }
+      rw [max_mul_mul_right]
+      apply mul_le_mul_right' (v.map_add a b) }
+
+@[simp]
+theorem Valuation.extendToLocalization_apply_map_apply (a : A) :
+    v.extendToLocalization hS B (algebraMap A B a) = v a :=
+  Submonoid.LocalizationMap.lift_eq _ _ a

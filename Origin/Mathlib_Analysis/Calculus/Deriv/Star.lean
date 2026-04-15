@@ -1,54 +1,55 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Star.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Star
 
 /-!
 # Star operations on derivatives
 
 This file contains the usual formulas (and existence assertions) for the derivative of the star
-operation.
-
-Most of the results in this file only apply when the field that the derivative is respect to has a
-trivial star operation; which as should be expected rules out `𝕜 = ℂ`. The exceptions are
-`HasDerivAt.conj_conj` and `DifferentiableAt.conj_conj`, showing that `conj ∘ f ∘ conj` is
-differentiable when `f` is (and giving a formula for its derivative).
+operation. Note that these only apply when the field that the derivative is respect to has a trivial
+star operation; which as should be expected rules out `𝕜 = ℂ`.
 -/
 
 universe u v w
 
-variable {𝕜 : Type u} [NontriviallyNormedField 𝕜] [StarRing 𝕜]
-  {F : Type v} [NormedAddCommGroup F] [NormedSpace 𝕜 F] [StarAddMonoid F] [StarModule 𝕜 F]
-  [ContinuousStar F] {f : 𝕜 → F} {f' : F} {x : 𝕜}
+variable {𝕜 : Type u} [NontriviallyNormedField 𝕜]
+
+variable {F : Type v} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
+
+variable {f : 𝕜 → F}
 
 /-! ### Derivative of `x ↦ star x` -/
 
-section TrivialStar
+variable [StarRing 𝕜] [TrivialStar 𝕜] [StarAddMonoid F] [ContinuousStar F]
 
-variable [TrivialStar 𝕜] {s : Set 𝕜} {L : Filter (𝕜 × 𝕜)}
+variable [StarModule 𝕜 F] {f' : F} {s : Set 𝕜} {x : 𝕜} {L : Filter 𝕜}
 
-protected theorem HasDerivAtFilter.star (h : HasDerivAtFilter f f' L) :
-    HasDerivAtFilter (fun x => star (f x)) (star f') L := by
-  simpa using h.hasFDerivAtFilter.star.hasDerivAtFilter
+protected nonrec theorem HasDerivAtFilter.star (h : HasDerivAtFilter f f' x L) :
+    HasDerivAtFilter (fun x => star (f x)) (star f') x L := by
+  simpa using h.star.hasDerivAtFilter
 
-protected theorem HasDerivWithinAt.star (h : HasDerivWithinAt f f' s x) :
+protected nonrec theorem HasDerivWithinAt.star (h : HasDerivWithinAt f f' s x) :
     HasDerivWithinAt (fun x => star (f x)) (star f') s x :=
-  HasDerivAtFilter.star h
+  h.star
 
-protected theorem HasDerivAt.star (h : HasDerivAt f f' x) :
+protected nonrec theorem HasDerivAt.star (h : HasDerivAt f f' x) :
     HasDerivAt (fun x => star (f x)) (star f') x :=
-  HasDerivAtFilter.star h
+  h.star
 
 protected nonrec theorem HasStrictDerivAt.star (h : HasStrictDerivAt f f' x) :
-    HasStrictDerivAt (fun x => star (f x)) (star f') x :=
-  HasDerivAtFilter.star h
+    HasStrictDerivAt (fun x => star (f x)) (star f') x := by simpa using h.star.hasStrictDerivAt
 
-protected theorem derivWithin.star :
-    derivWithin (fun y => star (f y)) s x = star (derivWithin f s x) := by
-  by_cases hxs : UniqueDiffWithinAt 𝕜 s x
-  · exact DFunLike.congr_fun (fderivWithin_star hxs) _
-  · simp [derivWithin_zero_of_not_uniqueDiffWithinAt hxs]
+protected theorem derivWithin.star (hxs : UniqueDiffWithinAt 𝕜 s x) :
+    derivWithin (fun y => star (f y)) s x = star (derivWithin f s x) :=
+  DFunLike.congr_fun (fderivWithin_star hxs) _
 
 protected theorem deriv.star : deriv (fun y => star (f y)) x = star (deriv f x) :=
   DFunLike.congr_fun fderiv_star _
+
+@[simp]
+protected theorem deriv.star' : (deriv fun y => star (f y)) = fun x => star (deriv f x) :=
+  funext fun _ => deriv.star

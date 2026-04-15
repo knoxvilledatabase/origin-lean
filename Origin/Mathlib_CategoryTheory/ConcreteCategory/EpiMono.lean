@@ -1,8 +1,13 @@
 /-
 Extracted from CategoryTheory/ConcreteCategory/EpiMono.lean
-Genuine: 14 of 20 | Dissolved: 0 | Infrastructure: 6
+Genuine: 15 of 18 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.Images
+import Mathlib.CategoryTheory.MorphismProperty.Concrete
+import Mathlib.CategoryTheory.Types
+import Mathlib.CategoryTheory.Limits.Preserves.Basic
+import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
 /-!
 # Epi and mono in concrete categories
@@ -20,25 +25,37 @@ universe w v v' u u'
 
 namespace CategoryTheory
 
-variable {C : Type u} [Category.{v} C] {FC : C → C → Type*} {CC : C → Type w}
-
-variable [∀ X Y, FunLike (FC X Y) (CC X) (CC Y)] [ConcreteCategory.{w} C FC]
+variable {C : Type u} [Category.{v} C] [ConcreteCategory.{w} C]
 
 open Limits MorphismProperty
 
 namespace ConcreteCategory
 
--- INSTANCE (free from Core): [(forget
+section
 
--- INSTANCE (free from Core): [(forget
+attribute [local instance] ConcreteCategory.instFunLike in
 
 theorem mono_of_injective {X Y : C} (f : X ⟶ Y) (i : Function.Injective f) :
     Mono f :=
   (forget C).mono_of_mono_map ((mono_iff_injective ((forget C).map f)).2 i)
 
--- INSTANCE (free from Core): forget₂_preservesMonomorphisms
+instance forget₂_preservesMonomorphisms (C : Type u) (D : Type u')
+    [Category.{v} C] [ConcreteCategory.{w} C] [Category.{v'} D] [ConcreteCategory.{w} D]
+    [HasForget₂ C D] [(forget C).PreservesMonomorphisms] :
+    (forget₂ C D).PreservesMonomorphisms :=
+  have : (forget₂ C D ⋙ forget D).PreservesMonomorphisms := by
+    simp only [HasForget₂.forget_comp]
+    infer_instance
+  Functor.preservesMonomorphisms_of_preserves_of_reflects _ (forget D)
 
--- INSTANCE (free from Core): forget₂_preservesEpimorphisms
+instance forget₂_preservesEpimorphisms (C : Type u) (D : Type u')
+    [Category.{v} C] [ConcreteCategory.{w} C] [Category.{v'} D] [ConcreteCategory.{w} D]
+    [HasForget₂ C D] [(forget C).PreservesEpimorphisms] :
+    (forget₂ C D).PreservesEpimorphisms :=
+  have : (forget₂ C D ⋙ forget D).PreservesEpimorphisms := by
+    simp only [HasForget₂.forget_comp]
+    infer_instance
+  Functor.preservesEpimorphisms_of_preserves_of_reflects _ (forget D)
 
 variable (C)
 
@@ -103,11 +120,19 @@ noncomputable def functorialSurjectiveInjectiveFactorizationData :
     (by rw [surjective_eq_epimorphisms])
     (by rw [injective_eq_monomorphisms])
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) : HasFunctorialSurjectiveInjectiveFactorization C where
+  nonempty_functorialFactorizationData :=
+    ⟨functorialSurjectiveInjectiveFactorizationData C⟩
 
 end
 
+section
+
 open CategoryTheory.Limits
+
+attribute [local instance] ConcreteCategory.hasCoeToSort
+
+attribute [local instance] ConcreteCategory.instFunLike
 
 theorem injective_of_mono_of_preservesPullback {X Y : C} (f : X ⟶ Y) [Mono f]
     [PreservesLimitsOfShape WalkingCospan (forget C)] : Function.Injective f :=
@@ -130,9 +155,14 @@ theorem epi_iff_surjective_of_preservesPushout {X Y : C} (f : X ⟶ Y)
   ((forget C).epi_map_iff_epi _).symm.trans (epi_iff_surjective _)
 
 theorem bijective_of_isIso {X Y : C} (f : X ⟶ Y) [IsIso f] :
-    Function.Bijective f := by
-  rw [bijective_iff_isIso_ofHom]
+    Function.Bijective ((forget C).map f) := by
+  rw [← isIso_iff_bijective]
   infer_instance
+
+theorem isIso_iff_bijective [(forget C).ReflectsIsomorphisms]
+    {X Y : C} (f : X ⟶ Y) : IsIso f ↔ Function.Bijective ((forget C).map f) := by
+  rw [← CategoryTheory.isIso_iff_bijective]
+  exact ⟨fun _ ↦ inferInstance, fun _ ↦ isIso_of_reflects_iso f (forget C)⟩
 
 end
 

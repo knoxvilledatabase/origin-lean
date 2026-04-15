@@ -1,8 +1,10 @@
 /-
 Extracted from CategoryTheory/Adjunction/Restrict.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Adjunction.Basic
+import Mathlib.CategoryTheory.HomCongr
 
 /-!
 
@@ -32,8 +34,6 @@ variable {iC : C ⥤ C'} {iD : D ⥤ D'}
 
 attribute [local simp] homEquiv_unit homEquiv_counit
 
-set_option backward.isDefEq.respectTransparency false in
-
 noncomputable def restrictFullyFaithful : L ⊣ R :=
   Adjunction.mkOfHomEquiv
     { homEquiv := fun X Y =>
@@ -52,3 +52,29 @@ noncomputable def restrictFullyFaithful : L ⊣ R :=
         suffices R'.map (iD.map g) ≫ comm2.hom.app Y = comm2.hom.app Y' ≫ iC.map (R.map g) by
           simp [Trans.trans, this]
         apply comm2.hom.naturality g }
+
+@[simp, reassoc]
+lemma map_restrictFullyFaithful_unit_app (X : C) :
+    iC.map ((adj.restrictFullyFaithful hiC hiD comm1 comm2).unit.app X) =
+    adj.unit.app (iC.obj X) ≫ R'.map (comm1.hom.app X) ≫ comm2.hom.app (L.obj X) := by
+  simp [restrictFullyFaithful]
+
+@[simp, reassoc]
+lemma map_restrictFullyFaithful_counit_app (X : D) :
+    iD.map ((adj.restrictFullyFaithful hiC hiD comm1 comm2).counit.app X) =
+    comm1.inv.app (R.obj X) ≫ L'.map (comm2.inv.app X) ≫ adj.counit.app (iD.obj X) := by
+  dsimp [restrictFullyFaithful]
+  simp
+
+lemma restrictFullyFaithful_homEquiv_apply {X : C} {Y : D} (f : L.obj X ⟶ Y) :
+    (adj.restrictFullyFaithful hiC hiD comm1 comm2).homEquiv X Y f =
+      hiC.preimage (adj.unit.app (iC.obj X) ≫ R'.map (comm1.hom.app X) ≫
+        R'.map (iD.map f) ≫ comm2.hom.app Y) := by
+  -- This proof was just `simp [restrictFullyFaithful]` before https://github.com/leanprover-community/mathlib4/pull/16317
+  apply hiC.map_injective
+  simp only [homEquiv_apply, Functor.comp_obj, Functor.map_comp, map_restrictFullyFaithful_unit_app,
+    Functor.id_obj, assoc, Functor.FullyFaithful.map_preimage]
+  congr 2
+  exact (comm2.hom.naturality _).symm
+
+end CategoryTheory.Adjunction

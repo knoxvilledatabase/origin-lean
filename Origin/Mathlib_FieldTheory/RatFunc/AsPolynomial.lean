@@ -1,8 +1,13 @@
 /-
 Extracted from FieldTheory/RatFunc/AsPolynomial.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 of 28 | Dissolved: 6 | Infrastructure: 6
 -/
 import Origin.Core
+import Mathlib.FieldTheory.RatFunc.Basic
+import Mathlib.RingTheory.EuclideanDomain
+import Mathlib.RingTheory.DedekindDomain.AdicValuation
+import Mathlib.RingTheory.Localization.FractionRing
+import Mathlib.RingTheory.Polynomial.Content
 
 /-!
 # Generalities on the polynomial structure of rational functions
@@ -27,6 +32,8 @@ namespace RatFunc
 
 section Eval
 
+open scoped Classical
+
 open scoped nonZeroDivisors Polynomial
 
 open RatFunc
@@ -37,4 +44,132 @@ section Domain
 
 variable [CommRing K] [IsDomain K]
 
-def C : K →+* K⟮X⟯ := algebraMap _ _
+def C : K →+* RatFunc K := algebraMap _ _
+
+@[simp]
+theorem algebraMap_eq_C : algebraMap K (RatFunc K) = C :=
+  rfl
+
+@[simp]
+theorem algebraMap_C (a : K) : algebraMap K[X] (RatFunc K) (Polynomial.C a) = C a :=
+  rfl
+
+@[simp]
+theorem algebraMap_comp_C : (algebraMap K[X] (RatFunc K)).comp Polynomial.C = C :=
+  rfl
+
+theorem smul_eq_C_mul (r : K) (x : RatFunc K) : r • x = C r * x := by
+  rw [Algebra.smul_def, algebraMap_eq_C]
+
+def X : RatFunc K :=
+  algebraMap K[X] (RatFunc K) Polynomial.X
+
+@[simp]
+theorem algebraMap_X : algebraMap K[X] (RatFunc K) Polynomial.X = X :=
+  rfl
+
+end Domain
+
+section Field
+
+variable [Field K]
+
+@[simp]
+theorem num_C (c : K) : num (C c) = Polynomial.C c :=
+  num_algebraMap _
+
+@[simp]
+theorem denom_C (c : K) : denom (C c) = 1 :=
+  denom_algebraMap _
+
+@[simp]
+theorem num_X : num (X : RatFunc K) = Polynomial.X :=
+  num_algebraMap _
+
+@[simp]
+theorem denom_X : denom (X : RatFunc K) = 1 :=
+  denom_algebraMap _
+
+-- DISSOLVED: X_ne_zero
+
+variable {L : Type u} [Field L]
+
+def eval (f : K →+* L) (a : L) (p : RatFunc K) : L :=
+  (num p).eval₂ f a / (denom p).eval₂ f a
+
+variable {f : K →+* L} {a : L}
+
+theorem eval_eq_zero_of_eval₂_denom_eq_zero {x : RatFunc K}
+    (h : Polynomial.eval₂ f a (denom x) = 0) : eval f a x = 0 := by rw [eval, h, div_zero]
+
+-- DISSOLVED: eval₂_denom_ne_zero
+
+variable (f a)
+
+@[simp]
+theorem eval_C {c : K} : eval f a (C c) = f c := by simp [eval]
+
+@[simp]
+theorem eval_X : eval f a X = a := by simp [eval]
+
+@[simp]
+theorem eval_zero : eval f a 0 = 0 := by simp [eval]
+
+@[simp]
+theorem eval_one : eval f a 1 = 1 := by simp [eval]
+
+@[simp]
+theorem eval_algebraMap {S : Type*} [CommSemiring S] [Algebra S K[X]] (p : S) :
+    eval f a (algebraMap _ _ p) = (algebraMap _ K[X] p).eval₂ f a := by
+  simp [eval, IsScalarTower.algebraMap_apply S K[X] (RatFunc K)]
+
+-- DISSOLVED: eval_add
+
+-- DISSOLVED: eval_mul
+
+end Field
+
+end Eval
+
+end RatFunc
+
+section AdicValuation
+
+variable (K : Type*) [Field K]
+
+namespace Polynomial
+
+open IsDedekindDomain.HeightOneSpectrum
+
+def idealX : IsDedekindDomain.HeightOneSpectrum K[X] where
+  asIdeal := Ideal.span {X}
+  isPrime := by rw [Ideal.span_singleton_prime]; exacts [Polynomial.prime_X, Polynomial.X_ne_zero]
+  ne_bot  := by rw [ne_eq, Ideal.span_singleton_eq_bot]; exact Polynomial.X_ne_zero
+
+@[simp]
+theorem idealX_span : (idealX K).asIdeal = Ideal.span {X} := rfl
+
+@[simp]
+theorem valuation_X_eq_neg_one :
+    (idealX K).valuation (RatFunc.X : RatFunc K) = Multiplicative.ofAdd (-1 : ℤ) := by
+  rw [← RatFunc.algebraMap_X, valuation_of_algebraMap, intValuation_singleton]
+  · exact Polynomial.X_ne_zero
+  · exact idealX_span K
+
+-- DISSOLVED: valuation_of_mk
+
+end Polynomial
+
+namespace RatFunc
+
+open scoped Multiplicative
+
+open Polynomial
+
+instance : Valued (RatFunc K) ℤₘ₀ := Valued.mk' (idealX K).valuation
+
+-- DISSOLVED: WithZero.valued_def
+
+end RatFunc
+
+end AdicValuation

@@ -3,6 +3,8 @@ Extracted from Order/ZornAtoms.lean
 Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Order.Zorn
+import Mathlib.Order.Atoms
 
 /-!
 # Zorn lemma for (co)atoms

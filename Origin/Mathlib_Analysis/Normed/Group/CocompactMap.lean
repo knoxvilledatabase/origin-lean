@@ -3,6 +3,9 @@ Extracted from Analysis/Normed/Group/CocompactMap.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Group.Basic
+import Mathlib.Topology.ContinuousMap.CocompactMap
+import Mathlib.Topology.MetricSpace.Bounded
 
 /-!
 # Cocompact maps in normed groups
@@ -13,7 +16,7 @@ This file gives a characterization of cocompact maps in terms of norm estimates.
 
 * `CocompactMapClass.norm_le`: Every cocompact map satisfies a norm estimate
 * `ContinuousMapClass.toCocompactMapClass_of_norm`: Conversely, this norm estimate implies that a
-  map is cocompact.
+map is cocompact.
 
 -/
 
@@ -33,7 +36,7 @@ theorem CocompactMapClass.norm_le [ProperSpace F] [FunLike 𝓕 E F] [CocompactM
   rcases closedBall_compl_subset_of_mem_cocompact h 0 with ⟨r, hr⟩
   use r
   intro x hx
-  suffices x ∈ f ⁻¹' (Metric.closedBall 0 ε)ᶜ by simp_all
+  suffices x ∈ f⁻¹' (Metric.closedBall 0 ε)ᶜ by aesop
   apply hr
   simp [hx]
 

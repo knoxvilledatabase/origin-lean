@@ -1,8 +1,13 @@
 /-
 Extracted from NumberTheory/NumberField/Discriminant/Basic.lean
-Genuine: 22 of 24 | Dissolved: 2 | Infrastructure: 0
+Genuine: 14 of 16 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.ZLattice.Covolume
+import Mathlib.Data.Real.Pi.Bounds
+import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.ConvexBody
+import Mathlib.Tactic.Rify
+import Mathlib.NumberTheory.NumberField.Discriminant.Defs
 
 /-!
 # Number field discriminant
@@ -11,10 +16,10 @@ This file defines the discriminant of a number field.
 ## Main result
 
 * `NumberField.abs_discr_gt_two`: **Hermite-Minkowski Theorem**. A nontrivial number field has
-  discriminant greater than `2`.
+discriminant greater than `2`.
 
 * `NumberField.finite_of_discr_bdd`: **Hermite Theorem**. Let `N` be an integer. There are only
-  finitely many number fields (in some fixed extension of `ℚ`) of discriminant bounded by `N`.
+finitely many number fields (in some fixed extension of `ℚ`) of discriminant bounded by `N`.
 
 ## Tags
 number field, discriminant
@@ -24,56 +29,13 @@ namespace NumberField
 
 open Module NumberField NumberField.InfinitePlace Matrix
 
-open scoped Real nonZeroDivisors
+open scoped Classical Real nonZeroDivisors
 
 variable (K : Type*) [Field K] [NumberField K]
 
 open MeasureTheory MeasureTheory.Measure ZSpan NumberField.mixedEmbedding
 
   NumberField.InfinitePlace ENNReal NNReal Complex
-
-theorem discr_eq_basisMatrix_det_sq [DecidableEq (K →+* ℂ)] :
-    discr K = (basisMatrix K).det ^ 2 := by
-  rw [← Rat.cast_intCast, coe_discr, basisMatrix_eq_embeddingsMatrixReindex,
-    ← Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two, ← (equivReindex K).symm_symm,
-    Algebra.discr_reindex, eq_ratCast]
-
-set_option backward.isDefEq.respectTransparency false in
-
-open scoped ComplexConjugate ComplexOrder in
-
-theorem sign_discr :
-    (discr K).sign = (-1) ^ nrComplexPlaces K := by
-  classical
-  have : 0 ≤ (discr K : ℂ) ↔ Even (nrComplexPlaces K) := by
-    rw [discr_eq_basisMatrix_det_sq, Complex.sq_nonneg_iff, ← conj_eq_iff_im, RingHom.map_det,
-      RingHom.mapMatrix_apply, conj_basisMatrix, reindex_apply, Equiv.refl_symm, Equiv.coe_refl,
-      Function.Involutive.toPerm_symm, det_permute', mul_eq_right₀,
-      ComplexEmbedding.conjugate_sign]
-    · simp only [Units.val_pow_eq_pow_val, Units.val_neg, Units.val_one, Int.reduceNeg,
-        Int.cast_pow, Int.cast_neg, Int.cast_one]
-      rw [neg_one_pow_eq_one_iff_even (by norm_num)]
-    · exact det_of_basisMatrix_non_zero K
-  obtain h | h | h := Int.lt_trichotomy 0 (discr K)
-  · rw [Int.sign_eq_one_of_pos h, Even.neg_one_pow (this.mp <| Int.cast_nonneg h.le)]
-  · grind [discr_ne_zero]
-  · rw [Int.sign_eq_neg_one_of_neg h, Odd.neg_one_pow]
-    rwa [← Nat.not_even_iff_odd, ← this, Int.cast_nonneg_iff, not_le]
-
-section rootDiscr
-
-noncomputable def rootDiscr : ℝ :=
-  |discr K| ^ (finrank ℚ K : ℝ)⁻¹
-
-theorem rootDiscr_def : rootDiscr K = |discr K| ^ (finrank ℚ K : ℝ)⁻¹ := by
-  rw [rootDiscr]
-
-theorem rootDiscr_rat : rootDiscr ℚ = 1 := by
-  simp [rootDiscr_def]
-
-end rootDiscr
-
-open scoped Classical in
 
 theorem _root_.NumberField.mixedEmbedding.volume_fundamentalDomain_latticeBasis :
     volume (fundamentalDomain (latticeBasis K)) =
@@ -95,7 +57,7 @@ theorem _root_.NumberField.mixedEmbedding.volume_fundamentalDomain_latticeBasis 
         rw [← nnnorm_real, ← ofRealHom_eq_coe, RingHom.map_det, RingHom.mapMatrix_apply, this,
           det_mul, det_transpose, det_reindex_self]
       _ = (2 : ℝ≥0∞)⁻¹ ^ Fintype.card {w : InfinitePlace K // IsComplex w} * sqrt ‖N.det ^ 2‖₊ := by
-        have : ‖Complex.I‖₊ = 1 := by rw [← norm_toNNReal, norm_I, Real.toNNReal_one]
+        have : ‖Complex.I‖₊ = 1 := by rw [← norm_toNNReal, norm_eq_abs, abs_I, Real.toNNReal_one]
         rw [det_matrixToStdBasis, nnnorm_mul, nnnorm_pow, nnnorm_mul, this, mul_one, nnnorm_inv,
           coe_mul, ENNReal.coe_pow, ← norm_toNNReal, RCLike.norm_two, Real.toNNReal_ofNat,
           coe_inv two_ne_zero, coe_ofNat, nnnorm_pow, NNReal.sqrt_sq]
@@ -109,25 +71,19 @@ theorem _root_.NumberField.mixedEmbedding.volume_fundamentalDomain_latticeBasis 
     stdBasis_repr_eq_matrixToStdBasis_mul K _ (fun _ => rfl)]
   rfl
 
-open scoped Classical in
-
 theorem _root_.NumberField.mixedEmbedding.covolume_integerLattice :
     ZLattice.covolume (mixedEmbedding.integerLattice K) =
-      (2⁻¹) ^ nrComplexPlaces K * √|discr K| := by
+      (2 ⁻¹) ^ nrComplexPlaces K * √|discr K| := by
   rw [ZLattice.covolume_eq_measure_fundamentalDomain _ _ (fundamentalDomain_integerLattice K),
-    measureReal_def,
     volume_fundamentalDomain_latticeBasis, ENNReal.toReal_mul, ENNReal.toReal_pow,
     ENNReal.toReal_inv, toReal_ofNat, ENNReal.coe_toReal, Real.coe_sqrt, coe_nnnorm,
     Int.norm_eq_abs]
 
-open scoped Classical in
-
 theorem _root_.NumberField.mixedEmbedding.covolume_idealLattice (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
     ZLattice.covolume (mixedEmbedding.idealLattice K I) =
       (FractionalIdeal.absNorm (I : FractionalIdeal (𝓞 K)⁰ K)) *
-        (2⁻¹) ^ nrComplexPlaces K * √|discr K| := by
+        (2 ⁻¹) ^ nrComplexPlaces K * √|discr K| := by
   rw [ZLattice.covolume_eq_measure_fundamentalDomain _ _ (fundamentalDomain_idealLattice K I),
-    measureReal_def,
     volume_fundamentalDomain_fractionalIdealLatticeBasis, volume_fundamentalDomain_latticeBasis,
     ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.toReal_pow, ENNReal.toReal_inv, toReal_ofNat,
     ENNReal.coe_toReal, Real.coe_sqrt, coe_nnnorm, Int.norm_eq_abs,
@@ -137,9 +93,10 @@ theorem _root_.NumberField.mixedEmbedding.covolume_idealLattice (I : (Fractional
 
 -- DISSOLVED: exists_ne_zero_mem_ringOfIntegers_of_norm_le_mul_sqrt_discr
 
-theorem abs_discr_ge' :
-    (finrank ℚ K) ^ (2 * finrank ℚ K) / ((4 / π) ^ (2 * nrComplexPlaces K) *
-      (finrank ℚ K).factorial ^ 2) ≤ |discr K| := by
+variable {K}
+
+theorem abs_discr_ge (h : 1 < finrank ℚ K) :
+    (4 / 9 : ℝ) * (3 * π / 4) ^ finrank ℚ K ≤ |discr K| := by
   -- We use `exists_ne_zero_mem_ringOfIntegers_of_norm_le_mul_sqrt_discr` to get a nonzero
   -- algebraic integer `x` of small norm and the fact that `1 ≤ |Norm x|` to get a lower bound
   -- on `sqrt |discr K|`.
@@ -148,35 +105,11 @@ theorem abs_discr_ge' :
     rw [← Algebra.coe_norm_int, ← Int.cast_one, ← Int.cast_abs, Rat.cast_intCast, Int.cast_le]
     exact Int.one_le_abs (Algebra.norm_ne_zero_iff.mpr h_nz)
   replace h_bd := le_trans h_nm h_bd
-  rwa [← inv_mul_le_iff₀, inv_div, mul_one, Real.le_sqrt (by positivity) (by positivity),
-    ← Int.cast_abs, div_pow, mul_pow, ← pow_mul, mul_comm _ 2, ← pow_mul, mul_comm _ 2] at h_bd
-  exact div_pos (by positivity) <| pow_pos (Nat.cast_pos.mpr finrank_pos) (finrank ℚ K)
-
-theorem abs_discr_ge_of_isTotallyComplex [IsTotallyComplex K] :
-    (finrank ℚ K) ^ (2 * finrank ℚ K) / ((4 / π) ^ (finrank ℚ K) *
-      (finrank ℚ K).factorial ^ 2) ≤ |discr K| := by
-  have := abs_discr_ge' K
-  rwa [← IsTotallyComplex.finrank] at this
-
-theorem abs_discr_rpow_ge_of_isTotallyComplex [IsTotallyComplex K] :
-    (finrank ℚ K) ^ 2 / ((4 / π) * (finrank ℚ K).factorial ^ (2 * (finrank ℚ K : ℝ)⁻¹)) ≤
-        |discr K| ^ (finrank ℚ K : ℝ)⁻¹ := by
-  have h : 0 < (finrank ℚ K : ℝ) := Nat.cast_pos.mpr finrank_pos
-  rw [← Real.rpow_le_rpow_iff (z := finrank ℚ K) (by positivity) (by positivity) h, Real.div_rpow
-    (by positivity) (by positivity), ← Real.rpow_mul (by positivity), inv_mul_cancel₀ h.ne',
-    Real.rpow_one, Real.mul_rpow (by positivity) (by positivity), Real.rpow_natCast,
-    Real.rpow_natCast, ← pow_mul, ← Real.rpow_mul (by positivity),
-    inv_mul_cancel_right₀ h.ne', Real.rpow_two]
-  exact abs_discr_ge_of_isTotallyComplex K
-
-variable {K}
-
-theorem abs_discr_ge (h : 1 < finrank ℚ K) :
-    (4 / 9 : ℝ) * (3 * π / 4) ^ finrank ℚ K ≤ |discr K| := by
-  refine le_trans ?_ (abs_discr_ge' K)
-  -- The sequence `a n` is a lower bound for `|discr K|`. We prove below by induction a uniform
+  rw [← inv_mul_le_iff₀ (by positivity), inv_div, mul_one, Real.le_sqrt (by positivity)
+    (by positivity), ← Int.cast_abs, div_pow, mul_pow, ← pow_mul, ← pow_mul] at h_bd
+  refine le_trans ?_ h_bd
+  -- The sequence `a n` is a lower bound for `|discr K|`. We prove below by induction an uniform
   -- lower bound for this sequence from which we deduce the result.
-  rw [mul_comm 2 _]
   let a : ℕ → ℝ := fun n => (n : ℝ) ^ (n * 2) / ((4 / π) ^ n * (n.factorial : ℝ) ^ 2)
   suffices ∀ n, 2 ≤ n → (4 / 9 : ℝ) * (3 * π / 4) ^ n ≤ a n by
     refine le_trans (this (finrank ℚ K) h) ?_
@@ -187,18 +120,16 @@ theorem abs_discr_ge (h : 1 < finrank ℚ K) :
       exact Nat.le_add_left _ _
   intro n hn
   induction n, hn using Nat.le_induction with
-  | base => exact le_of_eq <| by simp [a, Nat.factorial_two]; field
+  | base => exact le_of_eq <| by norm_num [a, Nat.factorial_two]; field_simp; ring
   | succ m _ h_m =>
       suffices (3 : ℝ) ≤ (1 + 1 / m : ℝ) ^ (2 * m) by
         convert_to _ ≤ (a m) * (1 + 1 / m : ℝ) ^ (2 * m) / (4 / π)
         · simp_rw [a, add_mul, one_mul, pow_succ, Nat.factorial_succ]
-          field_simp
-          simp [field, div_pow]
-          ring
+          field_simp; ring
         · rw [_root_.le_div_iff₀ (by positivity), pow_succ]
           convert (mul_le_mul h_m this (by positivity) (by positivity)) using 1
-          field
-      refine le_trans (le_of_eq (by simp [field]; norm_num)) (one_add_mul_le_pow ?_ (2 * m))
+          field_simp; ring
+      refine le_trans (le_of_eq (by field_simp; norm_num)) (one_add_mul_le_pow ?_ (2 * m))
       exact le_trans (by norm_num : (-2 : ℝ) ≤ 0) (by positivity)
 
 theorem abs_discr_gt_two (h : 1 < finrank ℚ K) : 2 < |discr K| := by
@@ -233,7 +164,7 @@ Thus it follows from `mixedEmbedding.exists_primitive_element_lt_of_isComplex` a
 `x` of `K` such that `K = ℚ(x)` and the conjugates of `x` are all bounded by some quantity
 depending only on `N`.
 
-Since the primitive element `x` is constructed differently depending on whether `K` has an infinite
+Since the primitive element `x` is constructed differently depending on whether `K` has a infinite
 real place or not, the theorem is proved in two parts.
 -/
 
@@ -252,7 +183,7 @@ theorem finite_of_finite_generating_set {p : IntermediateField ℚ A → Prop}
   rw [← Set.finite_coe_iff] at hT
   refine Set.finite_coe_iff.mp <| Finite.of_injective
     (fun ⟨F, hF⟩ ↦ (⟨(h F hF).choose, (h F hF).choose_spec.1⟩ : T)) (fun _ _ h_eq ↦ ?_)
-  rw [Subtype.ext_iff, Subtype.ext_iff]
+  rw [Subtype.ext_iff_val, Subtype.ext_iff_val]
   convert congr_arg (ℚ⟮·⟯) (Subtype.mk_eq_mk.mp h_eq)
   all_goals exact (h _ (Subtype.mem _)).choose_spec.2
 
@@ -275,7 +206,7 @@ theorem rank_le_rankOfDiscrBdd :
   have h₂ : 1 < 3 * π / 4 := by
     rw [_root_.lt_div_iff₀ (by positivity), ← _root_.div_lt_iff₀' (by positivity), one_mul]
     linarith [Real.pi_gt_three]
-  obtain h | h := lt_or_ge 1 (finrank ℚ K)
+  obtain h | h := lt_or_le 1 (finrank ℚ K)
   · apply le_max_of_le_right
     rw [Nat.le_floor_iff]
     · have h := le_trans (abs_discr_ge h) (Int.cast_le.mpr hK)
@@ -285,7 +216,7 @@ theorem rank_le_rankOfDiscrBdd :
       refine lt_of_le_of_lt ?_ (mul_lt_mul_of_pos_left
         (Real.rpow_lt_rpow_of_exponent_lt h₂ h) (by positivity : (0 : ℝ) < 4 / 9))
       rw [Real.rpow_logb (lt_trans zero_lt_one h₂) (ne_of_gt h₂) (by positivity), ← mul_assoc,
-            ← inv_div, inv_mul_cancel₀ (by simp), one_mul, Int.cast_natCast]
+            ← inv_div, inv_mul_cancel₀ (by norm_num), one_mul, Int.cast_natCast]
     · refine div_nonneg (Real.log_nonneg ?_) (Real.log_nonneg (le_of_lt h₂))
       rw [mul_comm, ← mul_div_assoc, _root_.le_div_iff₀ (by positivity), one_mul,
         ← _root_.div_le_iff₀ (by positivity)]
@@ -303,7 +234,7 @@ theorem minkowskiBound_lt_boundOfDiscBdd : minkowskiBound K ↑1 < boundOfDiscBd
     ENNReal.ofReal_one, one_mul, mixedEmbedding.finrank, volume_fundamentalDomain_latticeBasis,
     coe_mul, ENNReal.coe_pow, coe_ofNat, show sqrt N = (1 : ℝ≥0∞) * sqrt N by rw [one_mul]]
   gcongr
-  · exact pow_le_one₀ (by positivity) (by simp)
+  · exact pow_le_one₀ (by positivity) (by norm_num)
   · rwa [← NNReal.coe_le_coe, coe_nnnorm, Int.norm_eq_abs, ← Int.cast_abs,
       NNReal.coe_natCast, ← Int.cast_natCast, Int.cast_le]
   · exact one_le_two
@@ -320,22 +251,19 @@ theorem natDegree_le_rankOfDiscrBdd (a : 𝓞 K) (h : ℚ⟮(a : K)⟯ = ⊤) :
 
 variable (N)
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem finite_of_discr_bdd_of_isReal :
     {K : { F : IntermediateField ℚ A // FiniteDimensional ℚ F} |
       haveI :  NumberField K := @NumberField.mk _ _ inferInstance K.prop
       {w : InfinitePlace K | IsReal w}.Nonempty ∧ |discr K| ≤ N }.Finite := by
-  classical
   -- The bound on the degree of the generating polynomials
   let D := rankOfDiscrBdd N
   -- The bound on the Minkowski bound
   let B := boundOfDiscBdd N
   -- The bound on the coefficients of the generating polynomials
-  let C := Nat.ceil ((max B 1) ^ D * Nat.choose D (D / 2))
+  let C := Nat.ceil ((max B 1) ^ D *  Nat.choose D (D / 2))
   refine finite_of_finite_generating_set A _ (bUnion_roots_finite (algebraMap ℤ A) D
       (Set.finite_Icc (-C : ℤ) C)) (fun ⟨K, hK₀⟩ ⟨hK₁, hK₂⟩ ↦ ?_)
-  -- We now need to prove that each field is generated by an element of the union of the root set
+  -- We now need to prove that each field is generated by an element of the union of the rootset
   simp_rw [Set.mem_iUnion]
   -- this is purely an optimization
   have : CharZero K := SubsemiringClass.instCharZero K
@@ -370,13 +298,10 @@ theorem finite_of_discr_bdd_of_isReal :
     _ = 1 * B := by rw [one_mul]
     _ ≤ convexBodyLTFactor K * B := by gcongr; exact mod_cast one_le_convexBodyLTFactor K
 
-set_option backward.isDefEq.respectTransparency false in
-
 theorem finite_of_discr_bdd_of_isComplex :
     {K : { F : IntermediateField ℚ A // FiniteDimensional ℚ F} |
       haveI :  NumberField K := @NumberField.mk _ _ inferInstance K.prop
       {w : InfinitePlace K | IsComplex w}.Nonempty ∧ |discr K| ≤ N }.Finite := by
-  classical
   -- The bound on the degree of the generating polynomials
   let D := rankOfDiscrBdd N
   -- The bound on the Minkowski bound
@@ -385,7 +310,7 @@ theorem finite_of_discr_bdd_of_isComplex :
   let C := Nat.ceil ((max (sqrt (1 + B ^ 2)) 1) ^ D * Nat.choose D (D / 2))
   refine finite_of_finite_generating_set A _ (bUnion_roots_finite (algebraMap ℤ A) D
       (Set.finite_Icc (-C : ℤ) C)) (fun ⟨K, hK₀⟩ ⟨hK₁, hK₂⟩ ↦ ?_)
-  -- We now need to prove that each field is generated by an element of the union of the root set
+  -- We now need to prove that each field is generated by an element of the union of the rootset
   simp_rw [Set.mem_iUnion]
   -- this is purely an optimization
   have : CharZero K := SubsemiringClass.instCharZero K

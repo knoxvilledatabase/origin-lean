@@ -3,6 +3,7 @@ Extracted from Topology/FiberBundle/IsHomeomorphicTrivialBundle.lean
 Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Topology.Homeomorph
 
 /-!
 # Maps equivariantly-homeomorphic to projection in a product
@@ -31,6 +32,25 @@ variable {F} {proj : Z → B}
 protected theorem proj_eq (h : IsHomeomorphicTrivialFiberBundle F proj) :
     ∃ e : Z ≃ₜ B × F, proj = Prod.fst ∘ e :=
   ⟨h.choose, (funext h.choose_spec).symm⟩
+
+protected theorem surjective_proj [Nonempty F] (h : IsHomeomorphicTrivialFiberBundle F proj) :
+    Function.Surjective proj := by
+  obtain ⟨e, rfl⟩ := h.proj_eq
+  exact Prod.fst_surjective.comp e.surjective
+
+protected theorem continuous_proj (h : IsHomeomorphicTrivialFiberBundle F proj) :
+    Continuous proj := by
+  obtain ⟨e, rfl⟩ := h.proj_eq; exact continuous_fst.comp e.continuous
+
+protected theorem isOpenMap_proj (h : IsHomeomorphicTrivialFiberBundle F proj) :
+    IsOpenMap proj := by
+  obtain ⟨e, rfl⟩ := h.proj_eq; exact isOpenMap_fst.comp e.isOpenMap
+
+protected theorem isQuotientMap_proj [Nonempty F] (h : IsHomeomorphicTrivialFiberBundle F proj) :
+    IsQuotientMap proj :=
+  h.isOpenMap_proj.isQuotientMap h.continuous_proj h.surjective_proj
+
+alias quotientMap_proj := IsHomeomorphicTrivialFiberBundle.isQuotientMap_proj
 
 end IsHomeomorphicTrivialFiberBundle
 

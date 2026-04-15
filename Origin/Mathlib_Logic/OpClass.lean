@@ -3,6 +3,7 @@ Extracted from Logic/OpClass.lean
 Genuine: 4 of 9 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Init
 
 /-!
 # Typeclasses for commuting heterogeneous operations
@@ -34,15 +35,20 @@ class RightCommutative (op : β → α → β) : Prop where
   /-- A right-commutative operation satisfies `op (op b a₁) a₂ = op (op b a₂) a₁`. -/
   right_comm : (b : β) → (a₁ a₂ : α) → op (op b a₁) a₂ = op (op b a₂) a₁
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) isSymmOp_of_isCommutative (α : Sort u) (op : α → α → α)
+    [Std.Commutative op] : IsSymmOp op where symm_op := Std.Commutative.comm
 
 theorem IsSymmOp.flip_eq (op : α → α → β) [IsSymmOp op] : flip op = op :=
   funext fun a ↦ funext fun b ↦ (IsSymmOp.symm_op a b).symm
 
--- INSTANCE (free from Core): {f
+instance {f : α → β → β} [h : LeftCommutative f] : RightCommutative (fun x y ↦ f y x) :=
+  ⟨fun _ _ _ ↦ (h.left_comm _ _ _).symm⟩
 
--- INSTANCE (free from Core): {f
+instance {f : β → α → β} [h : RightCommutative f] : LeftCommutative (fun x y ↦ f y x) :=
+  ⟨fun _ _ _ ↦ (h.right_comm _ _ _).symm⟩
 
--- INSTANCE (free from Core): {f
+instance {f : α → α → α} [hc : Std.Commutative f] [ha : Std.Associative f] : LeftCommutative f :=
+  ⟨fun a b c ↦ by rw [← ha.assoc, hc.comm a, ha.assoc]⟩
 
--- INSTANCE (free from Core): {f
+instance {f : α → α → α} [hc : Std.Commutative f] [ha : Std.Associative f] : RightCommutative f :=
+  ⟨fun a b c ↦ by rw [ha.assoc, hc.comm b, ha.assoc]⟩

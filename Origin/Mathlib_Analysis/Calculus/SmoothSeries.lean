@@ -3,6 +3,10 @@ Extracted from Analysis/Calculus/SmoothSeries.lean
 Genuine: 18 of 18 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.ContDiff.Basic
+import Mathlib.Analysis.Calculus.UniformLimitsDeriv
+import Mathlib.Topology.Algebra.InfiniteSum.Module
+import Mathlib.Analysis.NormedSpace.FunctionSeries
 
 /-!
 # Smoothness of series
@@ -12,7 +16,7 @@ function in the series is and additionally suitable uniform summable bounds are 
 
 More specifically,
 * `differentiable_tsum` ensures that a series of differentiable functions is differentiable.
-* `contDiff_tsum` ensures that a series of `C^n` functions is `C^n`.
+* `contDiff_tsum` ensures that a series of smooth functions is smooth.
 
 We also give versions of these statements which are localized to a set.
 -/
@@ -39,9 +43,10 @@ theorem summable_of_summable_hasFDerivAt_of_isPreconnected (hu : Summable u) (hs
   rw [summable_iff_cauchySeq_finset] at hf0 ⊢
   have A : UniformCauchySeqOn (fun t : Finset α => fun x => ∑ i ∈ t, f' i x) atTop s :=
     (tendstoUniformlyOn_tsum hu hf').uniformCauchySeqOn
+  -- Porting note: Lean 4 failed to find `f` by unification
   refine cauchy_map_of_uniformCauchySeqOn_fderiv (f := fun t x ↦ ∑ i ∈ t, f i x)
     hs h's A (fun t y hy => ?_) hx₀ hx hf0
-  exact HasFDerivAt.fun_sum fun i _ => hf i y hy
+  exact HasFDerivAt.sum fun i _ => hf i y hy
 
 theorem summable_of_summable_hasDerivAt_of_isPreconnected (hu : Summable u) (ht : IsOpen t)
     (h't : IsPreconnected t) (hg : ∀ n y, y ∈ t → HasDerivAt (g n) (g' n y) y)
@@ -49,7 +54,7 @@ theorem summable_of_summable_hasDerivAt_of_isPreconnected (hu : Summable u) (ht 
     (hy : y ∈ t) : Summable fun n => g n y := by
   simp_rw [hasDerivAt_iff_hasFDerivAt] at hg
   refine summable_of_summable_hasFDerivAt_of_isPreconnected hu ht h't hg ?_ hy₀ hg0 hy
-  simpa
+  simpa? says simpa only [ContinuousLinearMap.norm_smulRight_apply, norm_one, one_mul]
 
 theorem hasFDerivAt_tsum_of_isPreconnected (hu : Summable u) (hs : IsOpen s)
     (h's : IsPreconnected s) (hf : ∀ n x, x ∈ s → HasFDerivAt (f n) (f' n x) x)
@@ -63,7 +68,7 @@ theorem hasFDerivAt_tsum_of_isPreconnected (hu : Summable u) (hs : IsOpen s)
       exact summable_of_summable_hasFDerivAt_of_isPreconnected hu hs h's hf hf' hx₀ hf0 hy
     refine hasFDerivAt_of_tendstoUniformlyOn hs (tendstoUniformlyOn_tsum hu hf')
       (fun t y hy => ?_) A hx
-    exact HasFDerivAt.fun_sum fun n _ => hf n y hy
+    exact HasFDerivAt.sum fun n _ => hf n y hy
 
 theorem hasDerivAt_tsum_of_isPreconnected (hu : Summable u) (ht : IsOpen t)
     (h't : IsPreconnected t) (hg : ∀ n y, y ∈ t → HasDerivAt (g n) (g' n y) y)
@@ -72,8 +77,8 @@ theorem hasDerivAt_tsum_of_isPreconnected (hu : Summable u) (ht : IsOpen t)
   simp_rw [hasDerivAt_iff_hasFDerivAt] at hg ⊢
   convert hasFDerivAt_tsum_of_isPreconnected hu ht h't hg ?_ hy₀ hg0 hy
   · exact (ContinuousLinearMap.smulRightL 𝕜 𝕜 F 1).map_tsum <|
-      .of_norm_bounded hu fun n ↦ hg' n y hy
-  · simpa
+      .of_norm_bounded u hu fun n ↦ hg' n y hy
+  · simpa? says simpa only [ContinuousLinearMap.norm_smulRight_apply, norm_one, one_mul]
 
 theorem summable_of_summable_hasFDerivAt (hu : Summable u)
     (hf : ∀ n x, HasFDerivAt (f n) (f' n x) x) (hf' : ∀ n x, ‖f' n x‖ ≤ u n)
@@ -105,11 +110,12 @@ theorem hasDerivAt_tsum (hu : Summable u) (hg : ∀ n y, HasDerivAt (g n) (g' n 
 
 theorem differentiable_tsum (hu : Summable u) (hf : ∀ n x, HasFDerivAt (f n) (f' n x) x)
     (hf' : ∀ n x, ‖f' n x‖ ≤ u n) : Differentiable 𝕜 fun y => ∑' n, f n y := by
-  by_cases! h : ∃ x₀, Summable fun n => f n x₀
+  by_cases h : ∃ x₀, Summable fun n => f n x₀
   · rcases h with ⟨x₀, hf0⟩
     intro x
     exact (hasFDerivAt_tsum hu hf hf' hf0 x).differentiableAt
-  · have : (fun x => ∑' n, f n x) = 0 := by ext1 x; exact tsum_eq_zero_of_not_summable (h x)
+  · push_neg at h
+    have : (fun x => ∑' n, f n x) = 0 := by ext1 x; exact tsum_eq_zero_of_not_summable (h x)
     rw [this]
     exact differentiable_const 0
 
@@ -117,7 +123,7 @@ theorem differentiable_tsum' (hu : Summable u) (hg : ∀ n y, HasDerivAt (g n) (
     (hg' : ∀ n y, ‖g' n y‖ ≤ u n) : Differentiable 𝕜 fun z => ∑' n, g n z := by
   simp_rw [hasDerivAt_iff_hasFDerivAt] at hg
   refine differentiable_tsum hu hg ?_
-  simpa
+  simpa? says simpa only [ContinuousLinearMap.norm_smulRight_apply, norm_one, one_mul]
 
 theorem fderiv_tsum_apply (hu : Summable u) (hf : ∀ n, Differentiable 𝕜 (f n))
     (hf' : ∀ n x, ‖fderiv 𝕜 (f n) x‖ ≤ u n) (hf0 : Summable fun n => f n x₀) (x : E) :
@@ -148,15 +154,13 @@ theorem iteratedFDeriv_tsum (hf : ∀ i, ContDiff 𝕜 N (f i))
     (h'f : ∀ (k : ℕ) (i : α) (x : E), (k : ℕ∞) ≤ N → ‖iteratedFDeriv 𝕜 k (f i) x‖ ≤ v k i) {k : ℕ}
     (hk : (k : ℕ∞) ≤ N) :
     (iteratedFDeriv 𝕜 k fun y => ∑' n, f n y) = fun x => ∑' n, iteratedFDeriv 𝕜 k (f n) x := by
-  induction k with
-  | zero =>
-    ext1 x
+  induction' k with k IH
+  · ext1 x
     simp_rw [iteratedFDeriv_zero_eq_comp]
     exact (continuousMultilinearCurryFin0 𝕜 E F).symm.toContinuousLinearEquiv.map_tsum
-  | succ k IH =>
-    have h'k : (k : ℕ∞) < N := lt_of_lt_of_le (WithTop.coe_lt_coe.2 (Nat.lt_succ_self _)) hk
+  · have h'k : (k : ℕ∞) < N := lt_of_lt_of_le (WithTop.coe_lt_coe.2 (Nat.lt_succ_self _)) hk
     have A : Summable fun n => iteratedFDeriv 𝕜 k (f n) 0 :=
-      .of_norm_bounded (hv k h'k.le) fun n ↦ h'f k n 0 h'k.le
+      .of_norm_bounded (v k) (hv k h'k.le) fun n => h'f k n 0 h'k.le
     simp_rw [iteratedFDeriv_succ_eq_comp_left, IH h'k.le]
     rw [fderiv_tsum (hv _ hk) (fun n => (hf n).differentiable_iteratedFDeriv
         (mod_cast h'k)) _ A]
@@ -220,8 +224,8 @@ theorem contDiff_tsum_of_eventually (hf : ∀ i, ContDiff 𝕜 N (f i))
     have : (fun x => ∑' i, f i x) = (fun x => ∑ i ∈ T, f i x) +
         fun x => ∑' i : { i // i ∉ T }, f i x := by
       ext1 x
-      refine (Summable.sum_add_tsum_subtype_compl ?_ T).symm
-      refine .of_norm_bounded_eventually (hv 0 (zero_le _)) ?_
+      refine (sum_add_tsum_subtype_compl ?_ T).symm
+      refine .of_norm_bounded_eventually _ (hv 0 (zero_le _)) ?_
       filter_upwards [h'f 0 (zero_le _)] with i hi
       simpa only [norm_iteratedFDeriv_zero] using hi x
     rw [this]

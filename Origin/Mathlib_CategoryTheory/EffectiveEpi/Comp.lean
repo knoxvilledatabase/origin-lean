@@ -3,6 +3,7 @@ Extracted from CategoryTheory/EffectiveEpi/Comp.lean
 Genuine: 7 of 10 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
 /-!
 
@@ -16,7 +17,7 @@ namespace CategoryTheory
 
 open Limits Category
 
-variable {C : Type*} [Category* C]
+variable {C : Type*} [Category C]
 
 noncomputable
 
@@ -27,7 +28,7 @@ def effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi' {α : Type*} {B : C} {X 
   desc e w := EffectiveEpiFamily.desc _ f (fun a ↦ i a ≫ e a) fun a₁ a₂ g₁ g₂ _ ↦ (by
     simp only [← Category.assoc]
     apply w _ _ (g₁ ≫ i a₁) (g₂ ≫ i a₂)
-    simp only [Category.assoc]
+    simp only [Category.assoc, hi]
     simp only [← Category.assoc, hi]
     simpa)
   fac e w a := by
@@ -50,15 +51,19 @@ def effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi {α : Type*} {B : C} {X Y
     (fun a ↦ section_ (g a))
     (fun a ↦ IsSplitEpi.id (g a))
 
--- INSTANCE (free from Core): {α
+instance {α : Type*} {B : C} {X Y : α → C}
+    (f : (a : α) → X a ⟶ B) (g : (a : α) → Y a ⟶ X a) [∀ a, IsSplitEpi (g a)]
+    [EffectiveEpiFamily _ f] : EffectiveEpiFamily _ (fun a ↦ g a ≫ f a) :=
+  ⟨⟨effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi f g⟩⟩
 
 example {B X Y : C} (f : X ⟶ B) (g : Y ⟶ X) [IsSplitEpi g] [EffectiveEpi f] :
-
     EffectiveEpi (g ≫ f) := inferInstance
 
--- INSTANCE (free from Core): IsSplitEpi.EffectiveEpi
+instance IsSplitEpi.EffectiveEpi {B X : C} (f : X ⟶ B) [IsSplitEpi f] : EffectiveEpi f := by
+  rw [← Category.comp_id f]
+  infer_instance
 
-noncomputable def effectiveEpiFamilyStructOfComp {C : Type*} [Category* C]
+noncomputable def effectiveEpiFamilyStructOfComp {C : Type*} [Category C]
     {I : Type*} {Z Y : I → C} {X : C} (g : ∀ i, Z i ⟶ Y i) (f : ∀ i, Y i ⟶ X)
     [EffectiveEpiFamily _ (fun i => g i ≫ f i)] [∀ i, Epi (g i)] :
     EffectiveEpiFamilyStruct _ f where
@@ -66,6 +71,7 @@ noncomputable def effectiveEpiFamilyStructOfComp {C : Type*} [Category* C]
     (fun i => g i ≫ φ i) (fun {T} i₁ i₂ g₁ g₂ eq =>
       by simpa [assoc] using h i₁ i₂ (g₁ ≫ g i₁) (g₂ ≫ g i₂) (by simpa [assoc] using eq))
   fac {W} φ h i := by
+    dsimp
     rw [← cancel_epi (g i), ← assoc, EffectiveEpiFamily.fac _ (fun i => g i ≫ f i)]
   uniq {W} φ _ m hm := EffectiveEpiFamily.uniq _ (fun i => g i ≫ f i) _ _ _
     (fun i => by rw [assoc, hm])
@@ -93,7 +99,9 @@ theorem effectiveEpiFamilyStructCompIso_aux
       g₁ ≫ π a₁ ≫ i = g₂ ≫ π a₂ ≫ i → g₁ ≫ e a₁ = g₂ ≫ e a₂)
     {Z : C} (a₁ a₂ : α) (g₁ : Z ⟶ X a₁) (g₂ : Z ⟶ X a₂) (hg : g₁ ≫ π a₁ = g₂ ≫ π a₂) :
     g₁ ≫ e a₁ = g₂ ≫ e a₂ := by
-  grind
+  apply h
+  rw [← Category.assoc, hg]
+  simp
 
 variable [EffectiveEpiFamily X π] [IsIso i]
 
@@ -107,7 +115,7 @@ def effectiveEpiFamilyStructCompIso : EffectiveEpiFamilyStruct X (fun a ↦ π a
     simp [← EffectiveEpiFamily.uniq X π e
       (effectiveEpiFamilyStructCompIso_aux X π i e h) (i ≫ m) hm]
 
--- INSTANCE (free from Core): :
+instance : EffectiveEpiFamily X (fun a ↦ π a ≫ i) := ⟨⟨effectiveEpiFamilyStructCompIso X π i⟩⟩
 
 end CompIso
 
@@ -117,7 +125,6 @@ variable {B : C} {α : Type*} (X Y : α → C) (π : (a : α) → (X a ⟶ B)) [
   (i : (a : α) → Y a ⟶ X a) [∀ a, IsIso (i a)]
 
 example : EffectiveEpiFamily Y (fun a ↦ i a ≫ π a) :=
-
   inferInstance
 
 end IsoComp

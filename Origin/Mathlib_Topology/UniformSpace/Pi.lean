@@ -3,6 +3,7 @@ Extracted from Topology/UniformSpace/Pi.lean
 Genuine: 17 of 20 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Topology.UniformSpace.UniformEmbedding
 
 /-!
 # Indexed product of uniform spaces
@@ -18,7 +19,10 @@ universe u
 
 variable {ι ι' β : Type*} (α : ι → Type u) [U : ∀ i, UniformSpace (α i)] [UniformSpace β]
 
--- INSTANCE (free from Core): Pi.uniformSpace
+instance Pi.uniformSpace : UniformSpace (∀ i, α i) :=
+  UniformSpace.ofCoreEq (⨅ i, UniformSpace.comap (eval i) (U i)).toCore
+      Pi.topologicalSpace <|
+    Eq.symm toTopologicalSpace_iInf
 
 lemma Pi.uniformSpace_eq :
     Pi.uniformSpace α = ⨅ i, UniformSpace.comap (eval i) (U i) := by
@@ -30,10 +34,14 @@ theorem Pi.uniformity :
 
 variable {α}
 
--- INSTANCE (free from Core): [Countable
+instance [Countable ι] [∀ i, IsCountablyGenerated (𝓤 (α i))] :
+    IsCountablyGenerated (𝓤 (∀ i, α i)) := by
+  rw [Pi.uniformity]
+  infer_instance
 
 theorem uniformContinuous_pi {β : Type*} [UniformSpace β] {f : β → ∀ i, α i} :
     UniformContinuous f ↔ ∀ i, UniformContinuous fun x => f x i := by
+  -- Porting note: required `Function.comp` to close
   simp only [UniformContinuous, Pi.uniformity, tendsto_iInf, tendsto_comap_iff, Function.comp_def]
 
 variable (α)
@@ -75,23 +83,29 @@ lemma Pi.uniformContinuous_restrict (S : Set ι) :
 lemma Pi.uniformSpace_comap_restrict (S : Set ι) :
     UniformSpace.comap (S.restrict) (Pi.uniformSpace (fun i : S ↦ α i)) =
     ⨅ i ∈ S, UniformSpace.comap (eval i) (U i) := by
-  simp +unfoldPartialApp
+  simp (config := { unfoldPartialApp := true })
     [← iInf_subtype'', ← uniformSpace_comap_precomp' _ ((↑) : S → ι), Set.restrict]
 
 lemma cauchy_pi_iff [Nonempty ι] {l : Filter (∀ i, α i)} :
     Cauchy l ↔ ∀ i, Cauchy (map (eval i) l) := by
-  simp_rw +instances [Pi.uniformSpace_eq, cauchy_iInf_uniformSpace, cauchy_comap_uniformSpace]
+  simp_rw [Pi.uniformSpace_eq, cauchy_iInf_uniformSpace, cauchy_comap_uniformSpace]
 
 lemma cauchy_pi_iff' {l : Filter (∀ i, α i)} [l.NeBot] :
     Cauchy l ↔ ∀ i, Cauchy (map (eval i) l) := by
-  simp_rw +instances [Pi.uniformSpace_eq, cauchy_iInf_uniformSpace', cauchy_comap_uniformSpace]
+  simp_rw [Pi.uniformSpace_eq, cauchy_iInf_uniformSpace', cauchy_comap_uniformSpace]
 
 lemma Cauchy.pi [Nonempty ι] {l : ∀ i, Filter (α i)} (hl : ∀ i, Cauchy (l i)) :
     Cauchy (Filter.pi l) := by
   have := fun i ↦ (hl i).1
   simpa [cauchy_pi_iff]
 
--- INSTANCE (free from Core): Pi.complete
+instance Pi.complete [∀ i, CompleteSpace (α i)] : CompleteSpace (∀ i, α i) where
+  complete {f} hf := by
+    have := hf.1
+    simp_rw [cauchy_pi_iff', cauchy_iff_exists_le_nhds] at hf
+    choose x hx using hf
+    use x
+    rwa [nhds_pi, le_pi]
 
 lemma Pi.uniformSpace_comap_restrict_sUnion (𝔖 : Set (Set ι)) :
     UniformSpace.comap (⋃₀ 𝔖).restrict (Pi.uniformSpace (fun i : (⋃₀ 𝔖) ↦ α i)) =

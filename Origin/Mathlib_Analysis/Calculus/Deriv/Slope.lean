@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Slope.lean
-Genuine: 26 of 28 | Dissolved: 0 | Infrastructure: 2
+Genuine: 17 of 19 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.LinearAlgebra.AffineSpace.Slope
 
 /-!
 # Derivative as the limit of the slope
@@ -15,7 +17,7 @@ use `slope f x y = (y - x)⁻¹ • (f y - f x)` instead of division.
 We also prove some estimates on the upper/lower limits of the slope in terms of the derivative.
 
 For a more detailed overview of one-dimensional derivatives in mathlib, see the module docstring of
-`Mathlib/Analysis/Calculus/Deriv/Basic.lean`.
+`analysis/calculus/deriv/basic`.
 
 ## Keywords
 
@@ -43,18 +45,18 @@ variable {x : 𝕜}
 variable {s : Set 𝕜}
 
 theorem hasDerivAtFilter_iff_tendsto_slope {x : 𝕜} {L : Filter 𝕜} :
-    HasDerivAtFilter f f' (L ×ˢ pure x) ↔ Tendsto (slope f x) (L ⊓ 𝓟 {x}ᶜ) (𝓝 f') :=
-  calc HasDerivAtFilter f f' (L ×ˢ pure x)
-    _ ↔ Tendsto (fun y ↦ slope f x y - (y - x)⁻¹ • (y - x) • f') L (𝓝 0) := by
-      simp only [hasDerivAtFilter_iff_tendsto, prod_pure, tendsto_map'_iff, Function.comp_def,
-        ← norm_inv, ← norm_smul, ← tendsto_zero_iff_norm_tendsto_zero, slope_def_module, smul_sub]
-    _ ↔ Tendsto (fun y ↦ slope f x y - (y - x)⁻¹ • (y - x) • f') (L ⊓ 𝓟 {x}ᶜ) (𝓝 0) :=
-      .symm <| tendsto_inf_principal_nhds_iff_of_forall_eq <| by simp
-    _ ↔ Tendsto (fun y ↦ slope f x y - f') (L ⊓ 𝓟 {x}ᶜ) (𝓝 0) := tendsto_congr' <| by
-      refine (EqOn.eventuallyEq fun y hy ↦ ?_).filter_mono inf_le_right
-      rw [inv_smul_smul₀ (sub_ne_zero.2 hy) f']
-    _ ↔ Tendsto (slope f x) (L ⊓ 𝓟 {x}ᶜ) (𝓝 f') := by
-      rw [← nhds_translation_sub f', tendsto_comap_iff]; rfl
+    HasDerivAtFilter f f' x L ↔ Tendsto (slope f x) (L ⊓ 𝓟 {x}ᶜ) (𝓝 f') :=
+  calc HasDerivAtFilter f f' x L
+    ↔ Tendsto (fun y ↦ slope f x y - (y - x)⁻¹ • (y - x) • f') L (𝓝 0) := by
+        simp only [hasDerivAtFilter_iff_tendsto, ← norm_inv, ← norm_smul,
+          ← tendsto_zero_iff_norm_tendsto_zero, slope_def_module, smul_sub]
+  _ ↔ Tendsto (fun y ↦ slope f x y - (y - x)⁻¹ • (y - x) • f') (L ⊓ 𝓟 {x}ᶜ) (𝓝 0) :=
+        .symm <| tendsto_inf_principal_nhds_iff_of_forall_eq <| by simp
+  _ ↔ Tendsto (fun y ↦ slope f x y - f') (L ⊓ 𝓟 {x}ᶜ) (𝓝 0) := tendsto_congr' <| by
+        refine (EqOn.eventuallyEq fun y hy ↦ ?_).filter_mono inf_le_right
+        rw [inv_smul_smul₀ (sub_ne_zero.2 hy) f']
+  _ ↔ Tendsto (slope f x) (L ⊓ 𝓟 {x}ᶜ) (𝓝 f') := by
+        rw [← nhds_translation_sub f', tendsto_comap_iff]; rfl
 
 theorem hasDerivWithinAt_iff_tendsto_slope :
     HasDerivWithinAt f f' s x ↔ Tendsto (slope f x) (𝓝[s \ {x}] x) (𝓝 f') := by
@@ -68,31 +70,38 @@ theorem hasDerivWithinAt_iff_tendsto_slope' (hs : x ∉ s) :
 theorem hasDerivAt_iff_tendsto_slope : HasDerivAt f f' x ↔ Tendsto (slope f x) (𝓝[≠] x) (𝓝 f') :=
   hasDerivAtFilter_iff_tendsto_slope
 
-alias ⟨HasDerivAt.tendsto_slope, _⟩ := hasDerivAt_iff_tendsto_slope
-
-theorem hasDerivAt_iff_tendsto_slope_left_right [LinearOrder 𝕜] : HasDerivAt f f' x ↔
-    Tendsto (slope f x) (𝓝[<] x) (𝓝 f') ∧ Tendsto (slope f x) (𝓝[>] x) (𝓝 f') := by
-  simp [hasDerivAt_iff_tendsto_slope, ← Iio_union_Ioi, nhdsWithin_union]
-
 theorem hasDerivAt_iff_tendsto_slope_zero :
     HasDerivAt f f' x ↔ Tendsto (fun t ↦ t⁻¹ • (f (x + t) - f x)) (𝓝[≠] 0) (𝓝 f') := by
-  have : 𝓝[≠] x = Filter.map (fun t ↦ x + t) (𝓝[≠] 0) := by simp
-  simp [hasDerivAt_iff_tendsto_slope, this, -map_add_left_nhdsNE, slope, Function.comp_def]
+  have : 𝓝[≠] x = Filter.map (fun t ↦ x + t) (𝓝[≠] 0) := by
+    simp [nhdsWithin, map_add_left_nhds_zero x, Filter.map_inf, add_right_injective x]
+  simp [hasDerivAt_iff_tendsto_slope, this, slope, Function.comp_def]
 
 alias ⟨HasDerivAt.tendsto_slope_zero, _⟩ := hasDerivAt_iff_tendsto_slope_zero
+
+theorem HasDerivAt.tendsto_slope_zero_right [PartialOrder 𝕜] (h : HasDerivAt f f' x) :
+    Tendsto (fun t ↦ t⁻¹ • (f (x + t) - f x)) (𝓝[>] 0) (𝓝 f') :=
+  h.tendsto_slope_zero.mono_left (nhds_right'_le_nhds_ne 0)
+
+theorem HasDerivAt.tendsto_slope_zero_left [PartialOrder 𝕜] (h : HasDerivAt f f' x) :
+    Tendsto (fun t ↦ t⁻¹ • (f (x + t) - f x)) (𝓝[<] 0) (𝓝 f') :=
+  h.tendsto_slope_zero.mono_left (nhds_left'_le_nhds_ne 0)
 
 theorem range_derivWithin_subset_closure_span_image
     (f : 𝕜 → F) {s t : Set 𝕜} (h : s ⊆ closure (s ∩ t)) :
     range (derivWithin f s) ⊆ closure (Submodule.span 𝕜 (f '' t)) := by
   rintro - ⟨x, rfl⟩
-  by_cases H : UniqueDiffWithinAt 𝕜 s x; swap
-  · simpa [derivWithin_zero_of_not_uniqueDiffWithinAt H] using subset_closure (zero_mem _)
+  rcases eq_or_neBot (𝓝[s \ {x}] x) with H|H
+  · simpa [derivWithin, fderivWithin, H] using subset_closure (zero_mem _)
   by_cases H' : DifferentiableWithinAt 𝕜 f s x; swap
   · rw [derivWithin_zero_of_not_differentiableWithinAt H']
     exact subset_closure (zero_mem _)
   have I : (𝓝[(s ∩ t) \ {x}] x).NeBot := by
-    rw [← accPt_principal_iff_nhdsWithin, ← uniqueDiffWithinAt_iff_accPt]
-    exact H.mono_closure h
+    rw [← mem_closure_iff_nhdsWithin_neBot] at H ⊢
+    have A : closure (s \ {x}) ⊆ closure (closure (s ∩ t) \ {x}) :=
+      closure_mono (diff_subset_diff_left h)
+    have B : closure (s ∩ t) \ {x} ⊆ closure ((s ∩ t) \ {x}) := by
+      convert closure_diff; exact closure_singleton.symm
+    simpa using A.trans (closure_mono B) H
   have : Tendsto (slope f x) (𝓝[(s ∩ t) \ {x}] x) (𝓝 (derivWithin f s x)) := by
     apply Tendsto.mono_left (hasDerivWithinAt_iff_tendsto_slope.1 H'.hasDerivWithinAt)
     rw [inter_comm, inter_diff_assoc]
@@ -107,7 +116,7 @@ theorem range_derivWithin_subset_closure_span_image
     exact mem_image_of_mem _ hy.1.2
   · apply Submodule.closure_subset_topologicalClosure_span
     suffices A : f x ∈ closure (f '' (s ∩ t)) from
-      closure_mono (image_mono inter_subset_right) A
+      closure_mono (image_subset _ inter_subset_right) A
     apply ContinuousWithinAt.mem_closure_image
     · apply H'.continuousWithinAt.mono inter_subset_left
     rw [mem_closure_iff_nhdsWithin_neBot]
@@ -137,58 +146,6 @@ lemma HasDerivAt.continuousAt_div [DecidableEq 𝕜] {f : 𝕜 → 𝕜} {c a : 
     ContinuousAt (Function.update (fun x ↦ (f x - f c) / (x - c)) c a) c := by
   rw [← slope_fun_def_field]
   exact continuousAt_update_same.mpr <| hasDerivAt_iff_tendsto_slope.mp hf
-
-section Order
-
-variable [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜] [OrderTopology 𝕜] {g : 𝕜 → 𝕜} {g' : 𝕜}
-
-lemma HasDerivWithinAt.nonneg_of_monotoneOn (hx : AccPt x (𝓟 s))
-    (hd : HasDerivWithinAt g g' s x) (hg : MonotoneOn g s) : 0 ≤ g' := by
-  have : (𝓝[s \ {x}] x).NeBot := accPt_principal_iff_nhdsWithin.mp hx
-  have h'g : MonotoneOn g (insert x s) :=
-    hg.insert_of_continuousWithinAt hx.clusterPt hd.continuousWithinAt
-  have : Tendsto (slope g x) (𝓝[s \ {x}] x) (𝓝 g') := hasDerivWithinAt_iff_tendsto_slope.mp hd
-  apply ge_of_tendsto this
-  filter_upwards [self_mem_nhdsWithin] with y hy
-  simp only [mem_diff, mem_singleton_iff] at hy
-  exact h'g.slope_nonneg (by simp) (by simp [hy])
-
-lemma MonotoneOn.derivWithin_nonneg (hg : MonotoneOn g s) :
-    0 ≤ derivWithin g s x := by
-  by_cases hd : DifferentiableWithinAt 𝕜 g s x; swap
-  · simp [derivWithin_zero_of_not_differentiableWithinAt hd]
-  by_cases hx : AccPt x (𝓟 s); swap
-  · simp [derivWithin_zero_of_not_accPt hx]
-  exact hd.hasDerivWithinAt.nonneg_of_monotoneOn hx hg
-
-lemma HasDerivAt.nonneg_of_monotone (hd : HasDerivAt g g' x) (hg : Monotone g) : 0 ≤ g' := by
-  rw [← hasDerivWithinAt_univ] at hd
-  apply hd.nonneg_of_monotoneOn _ (hg.monotoneOn _)
-  exact PerfectSpace.univ_preperfect _ (mem_univ _)
-
-lemma Monotone.deriv_nonneg (hg : Monotone g) : 0 ≤ deriv g x := by
-  rw [← derivWithin_univ]
-  exact (hg.monotoneOn univ).derivWithin_nonneg
-
-lemma HasDerivWithinAt.nonpos_of_antitoneOn (hx : AccPt x (𝓟 s))
-    (hd : HasDerivWithinAt g g' s x) (hg : AntitoneOn g s) : g' ≤ 0 := by
-  have : MonotoneOn (-g) s := fun x hx y hy hxy ↦ by simpa using hg hx hy hxy
-  simpa using hd.neg.nonneg_of_monotoneOn hx this
-
-lemma AntitoneOn.derivWithin_nonpos (hg : AntitoneOn g s) :
-    derivWithin g s x ≤ 0 := by
-  simpa [derivWithin.fun_neg] using hg.neg.derivWithin_nonneg
-
-lemma HasDerivAt.nonpos_of_antitone (hd : HasDerivAt g g' x) (hg : Antitone g) : g' ≤ 0 := by
-  rw [← hasDerivWithinAt_univ] at hd
-  apply hd.nonpos_of_antitoneOn _ (hg.antitoneOn _)
-  exact PerfectSpace.univ_preperfect _ (mem_univ _)
-
-lemma Antitone.deriv_nonpos (hg : Antitone g) : deriv g x ≤ 0 := by
-  rw [← derivWithin_univ]
-  exact (hg.antitoneOn univ).derivWithin_nonpos
-
-end Order
 
 end NormedField
 
@@ -236,7 +193,8 @@ theorem HasDerivWithinAt.limsup_slope_norm_le (hf : HasDerivWithinAt f f' s x) (
     ∀ᶠ z in 𝓝[s] x, ‖z - x‖⁻¹ * (‖f z‖ - ‖f x‖) < r := by
   apply (hf.limsup_norm_slope_le hr).mono
   intro z hz
-  exact lt_of_le_of_lt (mul_le_mul_of_nonneg_left (norm_sub_norm_le _ _) (by positivity)) hz
+  refine lt_of_le_of_lt (mul_le_mul_of_nonneg_left (norm_sub_norm_le _ _) ?_) hz
+  exact inv_nonneg.2 (norm_nonneg _)
 
 theorem HasDerivWithinAt.liminf_right_norm_slope_le (hf : HasDerivWithinAt f f' (Ici x) x)
     (hr : ‖f'‖ < r) : ∃ᶠ z in 𝓝[>] x, ‖z - x‖⁻¹ * ‖f z - f x‖ < r :=

@@ -3,9 +3,11 @@ Extracted from RingTheory/TwoSidedIdeal/BigOperators.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Congruence.BigOperators
+import Mathlib.RingTheory.TwoSidedIdeal.Basic
 
 /-!
-# Interactions between `∑, ∏` and two-sided ideals
+# Interactions between `∑, ∏` and two sided ideals
 
 -/
 

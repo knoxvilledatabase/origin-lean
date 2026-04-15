@@ -3,11 +3,13 @@ Extracted from Topology/MetricSpace/Equicontinuity.lean
 Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.UniformSpace.Equicontinuity
+import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 
 /-!
 # Equicontinuity in metric spaces
 
-This file contains various facts about (uniform) equicontinuity in metric spaces. Most
+This files contains various facts about (uniform) equicontinuity in metric spaces. Most
 importantly, we prove the usual characterization of equicontinuity of `F` at `x₀` in the case of
 (pseudo) metric spaces: `∀ ε > 0, ∃ δ > 0, ∀ x, dist x x₀ < δ → ∀ i, dist (F i x₀) (F i x) < ε`,
 and we prove that functions sharing a common (local or global) continuity modulus are
@@ -70,7 +72,9 @@ theorem equicontinuousAt_of_continuity_modulus {ι : Type*} [TopologicalSpace β
     (H : ∀ᶠ x in 𝓝 x₀, ∀ i, dist (F i x₀) (F i x) ≤ b x) : EquicontinuousAt F x₀ := by
   rw [Metric.equicontinuousAt_iff_right]
   intro ε ε0
-  filter_upwards [b_lim (Iio_mem_nhds ε0), H] using fun x hx₁ hx₂ i => (hx₂ i).trans_lt hx₁
+  -- Porting note: Lean 3 didn't need `Filter.mem_map.mp` here
+  filter_upwards [Filter.mem_map.mp <| b_lim (Iio_mem_nhds ε0), H] using
+    fun x hx₁ hx₂ i => (hx₂ i).trans_lt hx₁
 
 theorem uniformEquicontinuous_of_continuity_modulus {ι : Type*} [PseudoMetricSpace β] (b : ℝ → ℝ)
     (b_lim : Tendsto b (𝓝 0) (𝓝 0)) (F : ι → β → α)

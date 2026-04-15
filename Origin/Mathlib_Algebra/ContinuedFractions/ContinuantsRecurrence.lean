@@ -3,6 +3,7 @@ Extracted from Algebra/ContinuedFractions/ContinuantsRecurrence.lean
 Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.ContinuedFractions.Translations
 
 /-!
 # Recurrence Lemmas for the Continuants (`conts`) Function of Continued Fractions

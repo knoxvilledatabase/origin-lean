@@ -3,6 +3,9 @@ Extracted from Topology/Category/Stonean/Adjunctions.lean
 Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.Category.Stonean.Basic
+import Mathlib.Topology.Category.TopCat.Adjunctions
+import Mathlib.Topology.StoneCech
 
 /-!
 # Adjunctions involving the category of Stonean spaces
@@ -26,7 +29,7 @@ def stoneCechObj (X : Type u) : Stonean :=
   of (StoneCech X)
 
 noncomputable def stoneCechEquivalence (X : Type u) (Y : Stonean.{u}) :
-    (stoneCechObj X ⟶ Y) ≃ (X ⟶ Y) := by
+    (stoneCechObj X ⟶ Y) ≃ (X ⟶ (forget Stonean).obj Y) := by
   letI : TopologicalSpace X := ⊥
   haveI : DiscreteTopology X := ⟨rfl⟩
   refine fullyFaithfulToCompHaus.homEquiv.trans ?_
@@ -36,13 +39,14 @@ noncomputable def stoneCechEquivalence (X : Type u) (Y : Stonean.{u}) :
 end Stonean
 
 noncomputable def typeToStonean : Type u ⥤ Stonean.{u} :=
-  leftAdjointOfEquiv (G := forget _) Stonean.stoneCechEquivalence fun _ _ _ _ _ => rfl
+  leftAdjointOfEquiv Stonean.stoneCechEquivalence fun _ _ _ _ _ => rfl
 
 namespace Stonean
 
 noncomputable def stoneCechAdjunction : typeToStonean ⊣ (forget Stonean) :=
-  adjunctionOfEquivLeft (G := forget _) stoneCechEquivalence fun _ _ _ _ _ => rfl
+  adjunctionOfEquivLeft stoneCechEquivalence fun _ _ _ _ _ => rfl
 
--- INSTANCE (free from Core): forget.preservesLimits
+noncomputable instance forget.preservesLimits : Limits.PreservesLimits (forget Stonean) :=
+  rightAdjoint_preservesLimits stoneCechAdjunction
 
 end Stonean

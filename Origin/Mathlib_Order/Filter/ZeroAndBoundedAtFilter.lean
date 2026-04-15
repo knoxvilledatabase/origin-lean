@@ -1,8 +1,12 @@
 /-
 Extracted from Order/Filter/ZeroAndBoundedAtFilter.lean
-Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Submodule.Basic
+import Mathlib.Topology.Algebra.Monoid
+import Mathlib.Analysis.Asymptotics.Asymptotics
+import Mathlib.Algebra.Algebra.Pi
 
 /-!
 # Zero and Bounded at filter
@@ -32,12 +36,11 @@ nonrec theorem ZeroAtFilter.add [TopologicalSpace β] [AddZeroClass β] [Continu
     ZeroAtFilter l (f + g) := by
   simpa using hf.add hg
 
-nonrec theorem ZeroAtFilter.neg [TopologicalSpace β] [SubtractionMonoid β] [ContinuousNeg β]
-    {l : Filter α} {f : α → β} (hf : ZeroAtFilter l f) : ZeroAtFilter l (-f) := by
-  simpa using hf.neg
+nonrec theorem ZeroAtFilter.neg [TopologicalSpace β] [AddGroup β] [ContinuousNeg β] {l : Filter α}
+    {f : α → β} (hf : ZeroAtFilter l f) : ZeroAtFilter l (-f) := by simpa using hf.neg
 
-theorem ZeroAtFilter.smul [TopologicalSpace β] [Zero β]
-    [SMulZeroClass 𝕜 β] [ContinuousConstSMul 𝕜 β] {l : Filter α} {f : α → β} (c : 𝕜)
+theorem ZeroAtFilter.smul [TopologicalSpace β] [Zero 𝕜] [Zero β]
+    [SMulWithZero 𝕜 β] [ContinuousConstSMul 𝕜 β] {l : Filter α} {f : α → β} (c : 𝕜)
     (hf : ZeroAtFilter l f) : ZeroAtFilter l (c • f) := by simpa using hf.const_smul c
 
 variable (𝕜) in
@@ -77,7 +80,7 @@ theorem BoundedAtFilter.neg [SeminormedAddCommGroup β] {l : Filter α} {f : α 
   hf.neg_left
 
 theorem BoundedAtFilter.smul
-    [SeminormedRing 𝕜] [SeminormedAddCommGroup β] [Module 𝕜 β] [IsBoundedSMul 𝕜 β]
+    [SeminormedRing 𝕜] [SeminormedAddCommGroup β] [Module 𝕜 β] [BoundedSMul 𝕜 β]
     {l : Filter α} {f : α → β} (c : 𝕜) (hf : BoundedAtFilter l f) : BoundedAtFilter l (c • f) :=
   hf.const_smul_left c
 
@@ -90,7 +93,7 @@ nonrec theorem BoundedAtFilter.mul [SeminormedRing β] {l : Filter α} {f g : α
 variable (𝕜) in
 
 def boundedFilterSubmodule
-    [SeminormedRing 𝕜] [SeminormedAddCommGroup β] [Module 𝕜 β] [IsBoundedSMul 𝕜 β] (l : Filter α) :
+    [SeminormedRing 𝕜] [SeminormedAddCommGroup β] [Module 𝕜 β] [BoundedSMul 𝕜 β] (l : Filter α) :
     Submodule 𝕜 (α → β) where
   carrier := BoundedAtFilter l
   zero_mem' := const_boundedAtFilter l 0
@@ -100,16 +103,11 @@ def boundedFilterSubmodule
 variable (𝕜) in
 
 def boundedFilterSubalgebra
-    [SeminormedCommRing 𝕜] [SeminormedRing β] [Algebra 𝕜 β] [IsBoundedSMul 𝕜 β] (l : Filter α) :
+    [SeminormedCommRing 𝕜] [SeminormedRing β] [Algebra 𝕜 β] [BoundedSMul 𝕜 β] (l : Filter α) :
     Subalgebra 𝕜 (α → β) :=
   Submodule.toSubalgebra
     (boundedFilterSubmodule 𝕜 l)
     (const_boundedAtFilter l (1 : β))
     (fun f g hf hg ↦ by simpa only [Pi.one_apply, mul_one, norm_mul] using hf.mul hg)
-
-theorem BoundedAtFilter.prod {ι : Type} (s : Finset ι) [SeminormedCommRing β]
-    {l : Filter α} {f : ι → α → β} (h : ∀ i ∈ s, BoundedAtFilter l (f i)) :
-    BoundedAtFilter l (∏ i ∈ s, f i) :=
-  (boundedFilterSubalgebra β l).prod_mem (f := f) h
 
 end Filter

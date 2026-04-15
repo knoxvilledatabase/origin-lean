@@ -3,6 +3,7 @@ Extracted from Data/Nat/Upto.lean
 Genuine: 5 of 6 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Ring.Nat
 
 /-!
 # `Nat.Upto`
@@ -13,10 +14,10 @@ import Origin.Core
 This type has the property that `>` is well-founded when `∃ i, p i`, which allows us to implement
 searches on `ℕ`, starting at `0` and with an unknown upper-bound.
 
-It is similar to the well-founded relation constructed to define `Nat.find` with
+It is similar to the well founded relation constructed to define `Nat.find` with
 the difference that, in `Nat.Upto p`, `p` does not need to be decidable. In fact,
 `Nat.find` could be slightly altered to factor decidability out of its
-well-founded relation and would then fulfill the same purpose as this file.
+well founded relation and would then fulfill the same purpose as this file.
 -/
 
 namespace Nat
@@ -31,7 +32,8 @@ variable {p : ℕ → Prop}
 protected def GT (p) (x y : Upto p) : Prop :=
   x.1 > y.1
 
--- INSTANCE (free from Core): :
+instance : LT (Upto p) :=
+  ⟨fun x y => x.1 < y.1⟩
 
 protected theorem wf : (∃ x, p x) → WellFounded (Upto.GT p)
   | ⟨x, h⟩ => by
@@ -40,7 +42,7 @@ protected theorem wf : (∃ x, p x) → WellFounded (Upto.GT p)
       exact (measure _).wf
     ext ⟨a, ha⟩ ⟨b, _⟩
     dsimp [InvImage, Upto.GT]
-    rw [tsub_lt_tsub_iff_left_of_le (le_of_not_gt fun h' => ha _ h' h)]
+    rw [tsub_lt_tsub_iff_left_of_le (le_of_not_lt fun h' => ha _ h' h)]
 
 def zero : Nat.Upto p :=
   ⟨0, fun _ h => False.elim (Nat.not_lt_zero _ h)⟩

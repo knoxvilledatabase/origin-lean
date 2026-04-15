@@ -3,6 +3,8 @@ Extracted from NumberTheory/EulerProduct/DirichletLSeries.lean
 Genuine: 9 of 16 | Dissolved: 7 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.NumberTheory.EulerProduct.ExpLog
+import Mathlib.NumberTheory.LSeries.Dirichlet
 
 /-!
 # The Euler Product for the Riemann Zeta Function and Dirichlet L-Series

@@ -1,8 +1,13 @@
 /-
 Extracted from NumberTheory/FunctionField.lean
-Genuine: 6 of 12 | Dissolved: 0 | Infrastructure: 6
+Genuine: 15 of 30 | Dissolved: 3 | Infrastructure: 12
 -/
 import Origin.Core
+import Mathlib.Algebra.Order.Group.TypeTags
+import Mathlib.FieldTheory.RatFunc.Degree
+import Mathlib.RingTheory.DedekindDomain.IntegralClosure
+import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import Mathlib.Topology.Algebra.Valued.ValuedField
 
 /-!
 # Function fields
@@ -10,22 +15,25 @@ import Origin.Core
 This file defines a function field and the ring of integers corresponding to it.
 
 ## Main definitions
-
-- `FunctionField F K` states that `K` is a function field over the field `F`,
-  i.e. it is a finite extension of the field of rational functions in one variable over `F`.
-- `FunctionField.ringOfIntegers` defines the ring of integers corresponding to a function field
-  as the integral closure of `F[X]` in the function field.
+ - `FunctionField Fq F` states that `F` is a function field over the (finite) field `Fq`,
+   i.e. it is a finite extension of the field of rational functions in one variable over `Fq`.
+ - `FunctionField.ringOfIntegers` defines the ring of integers corresponding to a function field
+    as the integral closure of `Fq[X]` in the function field.
+ - `FunctionField.inftyValuation` : The place at infinity on `Fq(t)` is the nonarchimedean
+    valuation on `Fq(t)` with uniformizer `1/t`.
+ - `FunctionField.FqtInfty` : The completion `Fq((t⁻¹))` of `Fq(t)` with respect to the
+    valuation at infinity.
 
 ## Implementation notes
 The definitions that involve a field of fractions choose a canonical field of fractions,
-but are independent of that choice. We also omit assumptions like
-`IsScalarTower F[X] (FractionRing F[X]) K` in definitions,
+but are independent of that choice. We also omit assumptions like `Finite Fq` or
+`IsScalarTower Fq[X] (FractionRing Fq[X]) F` in definitions,
 adding them back in lemmas when they are needed.
 
 ## References
 * [D. Marcus, *Number Fields*][marcus1977number]
-* [J.W.S. Cassels, A. Fröhlich, *Algebraic Number Theory*][cassels1967algebraic]
-* [P. Samuel, *Algebraic Theory of Numbers*][samuel1967]
+* [J.W.S. Cassels, A. Frölich, *Algebraic Number Theory*][cassels1967algebraic]
+* [P. Samuel, *Algebraic Theory of Numbers*][samuel1970algebraic]
 
 ## Tags
 function field, ring of integers
@@ -33,77 +41,173 @@ function field, ring of integers
 
 noncomputable section
 
-open scoped nonZeroDivisors Polynomial WithZero
+open scoped nonZeroDivisors Polynomial Multiplicative
 
-variable (F K : Type*) [Field F] [Field K]
+variable (Fq F : Type*) [Field Fq] [Field F]
 
-abbrev FunctionField [Algebra (RatFunc F) K] : Prop :=
-  FiniteDimensional (RatFunc F) K
+abbrev FunctionField [Algebra (RatFunc Fq) F] : Prop :=
+  FiniteDimensional (RatFunc Fq) F
 
-theorem functionField_iff (Ft : Type*) [Field Ft] [Algebra F[X] Ft]
-    [IsFractionRing F[X] Ft] [Algebra (RatFunc F) K] [Algebra Ft K] [Algebra F[X] K]
-    [IsScalarTower F[X] Ft K] [IsScalarTower F[X] (RatFunc F) K] :
-    FunctionField F K ↔ FiniteDimensional Ft K := by
-  let e := IsLocalization.algEquiv F[X]⁰ (RatFunc F) Ft
-  have : ∀ (c) (x : K), e c • x = c • x := by
+theorem functionField_iff (Fqt : Type*) [Field Fqt] [Algebra Fq[X] Fqt]
+    [IsFractionRing Fq[X] Fqt] [Algebra (RatFunc Fq) F] [Algebra Fqt F] [Algebra Fq[X] F]
+    [IsScalarTower Fq[X] Fqt F] [IsScalarTower Fq[X] (RatFunc Fq) F] :
+    FunctionField Fq F ↔ FiniteDimensional Fqt F := by
+  let e := IsLocalization.algEquiv Fq[X]⁰ (RatFunc Fq) Fqt
+  have : ∀ (c) (x : F), e c • x = c • x := by
     intro c x
     rw [Algebra.smul_def, Algebra.smul_def]
     congr
-    refine congr_fun (f := fun c => algebraMap Ft K (e c)) ?_ c
-    refine IsLocalization.ext (nonZeroDivisors F[X]) _ _ ?_ ?_ ?_ ?_ ?_ <;> intros <;>
+    refine congr_fun (f := fun c => algebraMap Fqt F (e c)) ?_ c -- Porting note: Added `(f := _)`
+    refine IsLocalization.ext (nonZeroDivisors Fq[X]) _ _ ?_ ?_ ?_ ?_ ?_ <;> intros <;>
       simp only [map_one, map_mul, AlgEquiv.commutes, ← IsScalarTower.algebraMap_apply]
   constructor <;> intro h
-  · let b := Module.finBasis (RatFunc F) K
-    exact (b.mapCoeffs e this).finiteDimensional_of_finite
-  · let b := Module.finBasis Ft K
-    refine (b.mapCoeffs e.symm ?_).finiteDimensional_of_finite
+  · let b := Module.finBasis (RatFunc Fq) F
+    exact FiniteDimensional.of_fintype_basis (b.mapCoeffs e this)
+  · let b := Module.finBasis Fqt F
+    refine FiniteDimensional.of_fintype_basis (b.mapCoeffs e.symm ?_)
     intro c x; convert (this (e.symm c) x).symm; simp only [e.apply_symm_apply]
+
+theorem algebraMap_injective [Algebra Fq[X] F] [Algebra (RatFunc Fq) F]
+    [IsScalarTower Fq[X] (RatFunc Fq) F] : Function.Injective (⇑(algebraMap Fq[X] F)) := by
+  rw [IsScalarTower.algebraMap_eq Fq[X] (RatFunc Fq) F]
+  exact (algebraMap (RatFunc Fq) F).injective.comp (IsFractionRing.injective Fq[X] (RatFunc Fq))
 
 namespace FunctionField
 
-theorem algebraMap_injective [Algebra F[X] K] [Algebra (RatFunc F) K]
-    [IsScalarTower F[X] (RatFunc F) K] : Function.Injective (⇑(algebraMap F[X] K)) := by
-  rw [IsScalarTower.algebraMap_eq F[X] (RatFunc F) K]
-  exact (algebraMap (RatFunc F) K).injective.comp (IsFractionRing.injective F[X] (RatFunc F))
-
-def ringOfIntegers [Algebra F[X] K] :=
-  integralClosure F[X] K
+def ringOfIntegers [Algebra Fq[X] F] :=
+  integralClosure Fq[X] F
 
 namespace ringOfIntegers
 
-variable [Algebra F[X] K]
+variable [Algebra Fq[X] F]
 
--- INSTANCE (free from Core): :
+instance : IsDomain (ringOfIntegers Fq F) :=
+  (ringOfIntegers Fq F).isDomain
 
--- INSTANCE (free from Core): :
+instance : IsIntegralClosure (ringOfIntegers Fq F) Fq[X] F :=
+  integralClosure.isIntegralClosure _ _
 
-variable [Algebra (RatFunc F) K] [IsScalarTower F[X] (RatFunc F) K]
+variable [Algebra (RatFunc Fq) F] [IsScalarTower Fq[X] (RatFunc Fq) F]
 
-theorem algebraMap_injective : Function.Injective (⇑(algebraMap F[X] (ringOfIntegers F K))) := by
-  have hinj : Function.Injective (⇑(algebraMap F[X] K)) := by
-    rw [IsScalarTower.algebraMap_eq F[X] (RatFunc F) K]
-    exact (algebraMap (RatFunc F) K).injective.comp (IsFractionRing.injective F[X] (RatFunc F))
-  rw [injective_iff_map_eq_zero (algebraMap F[X] (↥(ringOfIntegers F K)))]
+theorem algebraMap_injective : Function.Injective (⇑(algebraMap Fq[X] (ringOfIntegers Fq F))) := by
+  have hinj : Function.Injective (⇑(algebraMap Fq[X] F)) := by
+    rw [IsScalarTower.algebraMap_eq Fq[X] (RatFunc Fq) F]
+    exact (algebraMap (RatFunc Fq) F).injective.comp (IsFractionRing.injective Fq[X] (RatFunc Fq))
+  rw [injective_iff_map_eq_zero (algebraMap Fq[X] (↥(ringOfIntegers Fq F)))]
   intro p hp
   rw [← Subtype.coe_inj, Subalgebra.coe_zero] at hp
-  rw [injective_iff_map_eq_zero (algebraMap F[X] K)] at hinj
+  rw [injective_iff_map_eq_zero (algebraMap Fq[X] F)] at hinj
   exact hinj p hp
 
-theorem not_isField : ¬IsField (ringOfIntegers F K) := by
-  simpa [← (IsIntegralClosure.isIntegral_algebra F[X] K).isField_iff_isField
-      (algebraMap_injective F K)] using
-    Polynomial.not_isField F
+theorem not_isField : ¬IsField (ringOfIntegers Fq F) := by
+  simpa [← (IsIntegralClosure.isIntegral_algebra Fq[X] F).isField_iff_isField
+      (algebraMap_injective Fq F)] using
+    Polynomial.not_isField Fq
 
-variable [FunctionField F K]
+variable [FunctionField Fq F]
 
--- INSTANCE (free from Core): :
+instance : IsFractionRing (ringOfIntegers Fq F) F :=
+  integralClosure.isFractionRing_of_finite_extension (RatFunc Fq) F
 
--- INSTANCE (free from Core): :
+instance : IsIntegrallyClosed (ringOfIntegers Fq F) :=
+  integralClosure.isIntegrallyClosedOfFiniteExtension (RatFunc Fq)
 
--- INSTANCE (free from Core): [Algebra.IsSeparable
+instance [Algebra.IsSeparable (RatFunc Fq) F] : IsNoetherian Fq[X] (ringOfIntegers Fq F) :=
+  IsIntegralClosure.isNoetherian _ (RatFunc Fq) F _
 
--- INSTANCE (free from Core): [Algebra.IsSeparable
+instance [Algebra.IsSeparable (RatFunc Fq) F] : IsDedekindDomain (ringOfIntegers Fq F) :=
+  IsIntegralClosure.isDedekindDomain Fq[X] (RatFunc Fq) F _
 
 end ringOfIntegers
 
-section deprecated
+/-! ### The place at infinity on Fq(t) -/
+
+section InftyValuation
+
+variable [DecidableEq (RatFunc Fq)]
+
+def inftyValuationDef (r : RatFunc Fq) : ℤₘ₀ :=
+  if r = 0 then 0 else ↑(Multiplicative.ofAdd r.intDegree)
+
+theorem InftyValuation.map_zero' : inftyValuationDef Fq 0 = 0 :=
+  if_pos rfl
+
+theorem InftyValuation.map_one' : inftyValuationDef Fq 1 = 1 :=
+  (if_neg one_ne_zero).trans <| by rw [RatFunc.intDegree_one, ofAdd_zero, WithZero.coe_one]
+
+theorem InftyValuation.map_mul' (x y : RatFunc Fq) :
+    inftyValuationDef Fq (x * y) = inftyValuationDef Fq x * inftyValuationDef Fq y := by
+  rw [inftyValuationDef, inftyValuationDef, inftyValuationDef]
+  by_cases hx : x = 0
+  · rw [hx, zero_mul, if_pos (Eq.refl _), zero_mul]
+  · by_cases hy : y = 0
+    · rw [hy, mul_zero, if_pos (Eq.refl _), mul_zero]
+    · rw [if_neg hx, if_neg hy, if_neg (mul_ne_zero hx hy), ← WithZero.coe_mul, WithZero.coe_inj,
+        ← ofAdd_add, RatFunc.intDegree_mul hx hy]
+
+theorem InftyValuation.map_add_le_max' (x y : RatFunc Fq) :
+    inftyValuationDef Fq (x + y) ≤ max (inftyValuationDef Fq x) (inftyValuationDef Fq y) := by
+  by_cases hx : x = 0
+  · rw [hx, zero_add]
+    conv_rhs => rw [inftyValuationDef, if_pos (Eq.refl _)]
+    rw [max_eq_right (WithZero.zero_le (inftyValuationDef Fq y))]
+  · by_cases hy : y = 0
+    · rw [hy, add_zero]
+      conv_rhs => rw [max_comm, inftyValuationDef, if_pos (Eq.refl _)]
+      rw [max_eq_right (WithZero.zero_le (inftyValuationDef Fq x))]
+    · by_cases hxy : x + y = 0
+      · rw [inftyValuationDef, if_pos hxy]; exact zero_le'
+      · rw [inftyValuationDef, inftyValuationDef, inftyValuationDef, if_neg hx, if_neg hy,
+          if_neg hxy]
+        rw [le_max_iff, WithZero.coe_le_coe, Multiplicative.ofAdd_le, WithZero.coe_le_coe,
+          Multiplicative.ofAdd_le, ← le_max_iff]
+        exact RatFunc.intDegree_add_le hy hxy
+
+-- DISSOLVED: inftyValuation_of_nonzero
+
+def inftyValuation : Valuation (RatFunc Fq) ℤₘ₀ where
+  toFun := inftyValuationDef Fq
+  map_zero' := InftyValuation.map_zero' Fq
+  map_one' := InftyValuation.map_one' Fq
+  map_mul' := InftyValuation.map_mul' Fq
+  map_add_le_max' := InftyValuation.map_add_le_max' Fq
+
+@[simp]
+theorem inftyValuation_apply {x : RatFunc Fq} : inftyValuation Fq x = inftyValuationDef Fq x :=
+  rfl
+
+-- DISSOLVED: inftyValuation.C
+
+@[simp]
+theorem inftyValuation.X : inftyValuationDef Fq RatFunc.X = Multiplicative.ofAdd (1 : ℤ) := by
+  rw [inftyValuationDef, if_neg RatFunc.X_ne_zero, RatFunc.intDegree_X]
+
+-- DISSOLVED: inftyValuation.polynomial
+
+def inftyValuedFqt : Valued (RatFunc Fq) ℤₘ₀ :=
+  Valued.mk' <| inftyValuation Fq
+
+theorem inftyValuedFqt.def {x : RatFunc Fq} :
+    @Valued.v (RatFunc Fq) _ _ _ (inftyValuedFqt Fq) x = inftyValuationDef Fq x :=
+  rfl
+
+def FqtInfty :=
+  @UniformSpace.Completion (RatFunc Fq) <| (inftyValuedFqt Fq).toUniformSpace
+
+instance : Field (FqtInfty Fq) :=
+  letI := inftyValuedFqt Fq
+  UniformSpace.Completion.instField
+
+instance : Inhabited (FqtInfty Fq) :=
+  ⟨(0 : FqtInfty Fq)⟩
+
+instance valuedFqtInfty : Valued (FqtInfty Fq) ℤₘ₀ :=
+  @Valued.valuedCompletion _ _ _ _ (inftyValuedFqt Fq)
+
+theorem valuedFqtInfty.def {x : FqtInfty Fq} :
+    Valued.v x = @Valued.extension (RatFunc Fq) _ _ _ (inftyValuedFqt Fq) x :=
+  rfl
+
+end InftyValuation
+
+end FunctionField

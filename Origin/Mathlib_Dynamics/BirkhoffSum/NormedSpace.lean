@@ -21,6 +21,8 @@ open Function Set Filter
 
 open scoped Topology ENNReal Uniformity
 
+section
+
 variable {α E : Type*}
 
 theorem Function.IsFixedPt.tendsto_birkhoffAverage

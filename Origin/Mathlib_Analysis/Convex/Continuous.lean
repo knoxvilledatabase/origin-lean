@@ -3,11 +3,12 @@ Extracted from Analysis/Convex/Continuous.lean
 Genuine: 19 of 20 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Normed
 
 /-!
 # Convex functions are continuous
 
-This file proves that a convex function from a finite-dimensional real normed space to `ℝ` is
+This file proves that a convex function from a finite dimensional real normed space to `ℝ` is
 continuous.
 -/
 
@@ -41,7 +42,7 @@ lemma ConvexOn.lipschitzOnWith_of_abs_le (hf : ConvexOn ℝ (ball x₀ r) f) (h�
         _ = r := by simp
     let a := ε / (ε + ‖x - y‖)
     let b := ‖x - y‖ / (ε + ‖x - y‖)
-    have hab : a + b = 1 := by simp [field, a, b]
+    have hab : a + b = 1 := by field_simp [a, b]
     have hxyz : x = a • y + b • z := by
       calc
         x = a • x + b • x := by rw [Convex.combo_self hab]
@@ -49,10 +50,10 @@ lemma ConvexOn.lipschitzOnWith_of_abs_le (hf : ConvexOn ℝ (ball x₀ r) f) (h�
     rw [hK, mul_comm, ← mul_div_assoc, le_div_iff₀' hε]
     calc
       ε * (f x - f y) ≤ ‖x - y‖ * (f z - f x) := by
+        rw [mul_sub, mul_sub, sub_le_sub_iff, ← add_mul]
         have h := hf.2 hy' hz (by positivity) (by positivity) hab
-        simp only [← hxyz, smul_eq_mul, a, b] at h
-        field_simp at h
-        linear_combination h
+        field_simp [← hxyz, a, b, ← mul_div_right_comm] at h
+        rwa [← le_div_iff₀' (by positivity), add_comm (_ * _)]
       _ ≤ _ := by
         rw [sub_eq_add_neg (f _), two_mul]
         gcongr
@@ -106,6 +107,54 @@ lemma ConcaveOn.isBoundedUnder_abs (hf : ConcaveOn ℝ C f) {x₀ : E} (hC : C �
     (𝓝 x₀).IsBoundedUnder (· ≤ ·) |f| ↔ (𝓝 x₀).IsBoundedUnder (· ≥ ·) f := by
   simpa [Pi.neg_def, Pi.abs_def] using hf.neg.isBoundedUnder_abs hC
 
+lemma ConvexOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : ConvexOn ℝ C f) : TFAE [
+    LocallyLipschitzOn C f,
+    ContinuousOn f C,
+    ∃ x₀ ∈ C, ContinuousAt f x₀,
+    ∃ x₀ ∈ C, (𝓝 x₀).IsBoundedUnder (· ≤ ·) f,
+    ∀ ⦃x₀⦄, x₀ ∈ C → (𝓝 x₀).IsBoundedUnder (· ≤ ·) f,
+    ∀ ⦃x₀⦄, x₀ ∈ C → (𝓝 x₀).IsBoundedUnder (· ≤ ·) |f|] := by
+  tfae_have 1 → 2 := LocallyLipschitzOn.continuousOn
+  tfae_have 2 → 3 := by
+    obtain ⟨x₀, hx₀⟩ := hC'
+    exact fun h ↦ ⟨x₀, hx₀, h.continuousAt <| hC.mem_nhds hx₀⟩
+  tfae_have 3 → 4
+  | ⟨x₀, hx₀, h⟩ =>
+    ⟨x₀, hx₀, f x₀ + 1, by simpa using h.eventually (eventually_le_nhds (by simp))⟩
+  tfae_have 4 → 5
+  | ⟨x₀, hx₀, r, hr⟩, x, hx => by
+    have : ∀ᶠ δ in 𝓝 (0 : ℝ), (1 - δ)⁻¹ • x - (δ / (1 - δ)) • x₀ ∈ C := by
+      have h : ContinuousAt (fun δ : ℝ ↦ (1 - δ)⁻¹ • x - (δ / (1 - δ)) • x₀) 0 := by
+        fun_prop (disch := norm_num)
+      exact h (by simpa using hC.mem_nhds hx)
+    obtain ⟨δ, hδ₀, hy, hδ₁⟩ := (this.and <| eventually_lt_nhds zero_lt_one).exists_gt
+    set y := (1 - δ)⁻¹ • x - (δ / (1 - δ)) • x₀
+    refine ⟨max r (f y), ?_⟩
+    simp only [Filter.eventually_map, Pi.abs_apply] at hr ⊢
+    obtain ⟨ε, hε, hr⟩ := Metric.eventually_nhds_iff.1 <| hr.and (hC.eventually_mem hx₀)
+    refine Metric.eventually_nhds_iff.2 ⟨ε * δ, by positivity, fun z hz ↦ ?_⟩
+    have hx₀' : δ⁻¹ • (x - y) + y = x₀ := MulAction.injective₀ (sub_ne_zero.2 hδ₁.ne') <| by
+      simp [y, smul_sub, smul_smul, hδ₀.ne', div_eq_mul_inv, sub_ne_zero.2 hδ₁.ne', mul_left_comm,
+        sub_mul, sub_smul]
+    let w := δ⁻¹ • (z - y) + y
+    have hwyz : δ • w + (1 - δ) • y = z := by simp [w, hδ₀.ne', sub_smul]
+    have hw : dist w x₀ < ε := by
+      simpa [w, ← hx₀', dist_smul₀, abs_of_nonneg, hδ₀.le, inv_mul_lt_iff₀', hδ₀]
+    calc
+      f z ≤ max (f w) (f y) :=
+        hf.le_max_of_mem_segment (hr hw).2 hy ⟨_, _, hδ₀.le, sub_nonneg.2 hδ₁.le, by simp, hwyz⟩
+      _ ≤ max r (f y) := by gcongr; exact (hr hw).1
+  tfae_have 6 ↔ 5 := forall₂_congr fun x₀ hx₀ ↦ hf.isBoundedUnder_abs (hC.mem_nhds hx₀)
+  tfae_have 6 → 1
+  | h, x, hx => by
+    obtain ⟨r, hr⟩ := h hx
+    obtain ⟨ε, hε, hεD⟩ := Metric.mem_nhds_iff.1 <| Filter.inter_mem (hC.mem_nhds hx) hr
+    simp only [preimage_setOf_eq, Pi.abs_apply, subset_inter_iff, hC.nhdsWithin_eq hx] at hεD ⊢
+    obtain ⟨K, hK⟩ := exists_lipschitzOnWith_of_isBounded (hf.subset hεD.1 (convex_ball ..))
+      (half_lt_self hε) <| isBounded_iff_forall_norm_le.2 ⟨r, by simpa using hεD.2⟩
+    exact ⟨K, _, ball_mem_nhds _ (by simpa), hK⟩
+  tfae_finish
+
 lemma ConcaveOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : ConcaveOn ℝ C f) : TFAE [
     LocallyLipschitzOn C f,
     ContinuousOn f C,
@@ -114,8 +163,7 @@ lemma ConcaveOn.continuousOn_tfae (hC : IsOpen C) (hC' : C.Nonempty) (hf : Conca
     ∀ ⦃x₀⦄, x₀ ∈ C → (𝓝 x₀).IsBoundedUnder (· ≥ ·) f,
     ∀ ⦃x₀⦄, x₀ ∈ C → (𝓝 x₀).IsBoundedUnder (· ≤ ·) |f|] := by
   have := hf.neg.continuousOn_tfae hC hC'
-  simp only [locallyLipschitzOn_neg_iff, continuousOn_neg_iff, continuousAt_neg_iff, abs_neg]
-    at this
+  simp at this
   convert this using 8 <;> exact (Equiv.neg ℝ).exists_congr (by simp)
 
 lemma ConvexOn.locallyLipschitzOn_iff_continuousOn (hC : IsOpen C) (hf : ConvexOn ℝ C f) :

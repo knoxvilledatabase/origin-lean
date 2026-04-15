@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Sigma/Interval.lean
-Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
+Genuine: 8 of 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Sigma.Order
+import Mathlib.Order.Interval.Finset.Defs
 
 /-!
 # Finite intervals in a sigma type
@@ -25,11 +27,29 @@ variable {ι : Type*} {α : ι → Type*}
 
 section Disjoint
 
-section LocallyFiniteOrder
-
 variable [DecidableEq ι] [∀ i, Preorder (α i)] [∀ i, LocallyFiniteOrder (α i)]
 
--- INSTANCE (free from Core): instLocallyFiniteOrder
+instance instLocallyFiniteOrder : LocallyFiniteOrder (Σ i, α i) where
+  finsetIcc := sigmaLift fun _ => Icc
+  finsetIco := sigmaLift fun _ => Ico
+  finsetIoc := sigmaLift fun _ => Ioc
+  finsetIoo := sigmaLift fun _ => Ioo
+  finset_mem_Icc := fun ⟨i, a⟩ ⟨j, b⟩ ⟨k, c⟩ => by
+    simp_rw [mem_sigmaLift, le_def, mem_Icc, exists_and_left, ← exists_and_right, ← exists_prop]
+    exact exists₂_congr fun _ _ => by constructor <;> rintro ⟨⟨⟩, ht⟩ <;> exact ⟨rfl, ht⟩
+  finset_mem_Ico := fun ⟨i, a⟩ ⟨j, b⟩ ⟨k, c⟩ => by
+    simp_rw [mem_sigmaLift, le_def, lt_def, mem_Ico, exists_and_left, ← exists_and_right, ←
+      exists_prop]
+    exact exists₂_congr fun _ _ => by constructor <;> rintro ⟨⟨⟩, ht⟩ <;> exact ⟨rfl, ht⟩
+  finset_mem_Ioc := fun ⟨i, a⟩ ⟨j, b⟩ ⟨k, c⟩ => by
+    simp_rw [mem_sigmaLift, le_def, lt_def, mem_Ioc, exists_and_left, ← exists_and_right, ←
+      exists_prop]
+    exact exists₂_congr fun _ _ => by constructor <;> rintro ⟨⟨⟩, ht⟩ <;> exact ⟨rfl, ht⟩
+  finset_mem_Ioo := fun ⟨i, a⟩ ⟨j, b⟩ ⟨k, c⟩ => by
+    simp_rw [mem_sigmaLift, lt_def, mem_Ioo, exists_and_left, ← exists_and_right, ← exists_prop]
+    exact exists₂_congr fun _ _ => by constructor <;> rintro ⟨⟨⟩, ht⟩ <;> exact ⟨rfl, ht⟩
+
+section
 
 variable (a b : Σ i, α i)
 
@@ -48,3 +68,23 @@ theorem card_Ioo : #(Ioo a b) = if h : a.1 = b.1 then #(Ioo (h.rec a.2) b.2) els
 end
 
 variable (i : ι) (a b : α i)
+
+@[simp]
+theorem Icc_mk_mk : Icc (⟨i, a⟩ : Sigma α) ⟨i, b⟩ = (Icc a b).map (Embedding.sigmaMk i) :=
+  dif_pos rfl
+
+@[simp]
+theorem Ico_mk_mk : Ico (⟨i, a⟩ : Sigma α) ⟨i, b⟩ = (Ico a b).map (Embedding.sigmaMk i) :=
+  dif_pos rfl
+
+@[simp]
+theorem Ioc_mk_mk : Ioc (⟨i, a⟩ : Sigma α) ⟨i, b⟩ = (Ioc a b).map (Embedding.sigmaMk i) :=
+  dif_pos rfl
+
+@[simp]
+theorem Ioo_mk_mk : Ioo (⟨i, a⟩ : Sigma α) ⟨i, b⟩ = (Ioo a b).map (Embedding.sigmaMk i) :=
+  dif_pos rfl
+
+end Disjoint
+
+end Sigma

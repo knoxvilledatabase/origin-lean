@@ -3,10 +3,12 @@ Extracted from Geometry/Manifold/Sheaf/LocallyRingedSpace.lean
 Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.Sheaf.Smooth
+import Mathlib.Geometry.RingedSpace.LocallyRingedSpace
 
 /-! # Smooth manifolds as locally ringed spaces
 
-This file equips a smooth manifold with the structure of a locally ringed space.
+This file equips a smooth manifold-with-corners with the structure of a locally ringed space.
 
 ## Main results
 
@@ -16,14 +18,13 @@ This file equips a smooth manifold with the structure of a locally ringed space.
 
 ## Main definitions
 
-* `ChartedSpace.locallyRingedSpace`: A smooth manifold can be considered as a locally ringed space.
-* `ChartedSpace.locallyRingedSpaceMap`: A smooth map between smooth manifolds induces a morphism
-  of locally ringed spaces.
+* `SmoothManifoldWithCorners.locallyRingedSpace`: A smooth manifold-with-corners can be considered
+  as a locally ringed space.
 
 ## TODO
 
-- Show that every morphism of locally ringed spaces between two smooth manifolds is induced
-  by a smooth map via `ChartedSpace.locallyRingedSpaceMap`.
+Characterize morphisms-of-locally-ringed-spaces (`AlgebraicGeometry.LocallyRingedSpace.Hom`) between
+smooth manifolds.
 
 -/
 
@@ -31,18 +32,12 @@ noncomputable section
 
 universe u
 
-open scoped ContDiff
+local notation "∞" => (⊤ : ℕ∞)
 
 variable {𝕜 : Type u} [NontriviallyNormedField 𝕜]
   {EM : Type*} [NormedAddCommGroup EM] [NormedSpace 𝕜 EM]
   {HM : Type*} [TopologicalSpace HM] (IM : ModelWithCorners 𝕜 EM HM)
   {M : Type u} [TopologicalSpace M] [ChartedSpace HM M]
-  {EN : Type*} [NormedAddCommGroup EN] [NormedSpace 𝕜 EN]
-  {HN : Type*} [TopologicalSpace HN] (IN : ModelWithCorners 𝕜 EN HN)
-  {N : Type u} [TopologicalSpace N] [ChartedSpace HN N]
-  {EP : Type*} [NormedAddCommGroup EP] [NormedSpace 𝕜 EP]
-  {HP : Type*} [TopologicalSpace HP] (IP : ModelWithCorners 𝕜 EP HP)
-  {P : Type u} [TopologicalSpace P] [ChartedSpace HP P]
 
 open AlgebraicGeometry Manifold TopologicalSpace Topology
 
@@ -62,7 +57,7 @@ theorem smoothSheafCommRing.isUnit_stalk_iff {x : M}
       convert hf
       exact (smoothSheafCommRing.eval_germ U x hxU f).symm
     -- In fact, by continuity, `f` is nonzero on a neighbourhood `V` of `x`
-    have H : ∀ᶠ (z : U) in 𝓝 ⟨x, hxU⟩, f z ≠ 0 := f.2.continuous.continuousAt.eventually_ne hf'
+    have H :  ∀ᶠ (z : U) in 𝓝 ⟨x, hxU⟩, f z ≠ 0 := f.2.continuous.continuousAt.eventually_ne hf'
     rw [eventually_nhds_iff] at H
     obtain ⟨V₀, hV₀f, hV₀, hxV₀⟩ := H
     let V : Opens M := ⟨Subtype.val '' V₀, U.2.isOpenMap_subtype_val V₀ hV₀⟩
@@ -70,7 +65,7 @@ theorem smoothSheafCommRing.isUnit_stalk_iff {x : M}
     have hV : V₀ = Set.range (Set.inclusion hUV) := by
       convert (Set.range_inclusion hUV).symm
       ext y
-      change _ ↔ y ∈ Subtype.val ⁻¹' (Subtype.val '' V₀)
+      show _ ↔ y ∈ Subtype.val ⁻¹' (Subtype.val '' V₀)
       rw [Set.preimage_image_eq _ Subtype.coe_injective]
     clear_value V
     subst hV
@@ -83,7 +78,7 @@ theorem smoothSheafCommRing.isUnit_stalk_iff {x : M}
     -- Let `g` be the pointwise inverse of `f` on `V`, which is smooth since `f` is nonzero there
     let g : C^∞⟮IM, V; 𝓘(𝕜), 𝕜⟯ := ⟨(f ∘ Set.inclusion hUV)⁻¹, ?_⟩
     -- The germ of `g` is inverse to the germ of `f`, so `f` is a unit
-    · refine ⟨⟨S.germ _ x (hxV) (ContMDiffMap.restrictRingHom IM 𝓘(𝕜) 𝕜 hUV f), S.germ _ x hxV g,
+    · refine ⟨⟨S.germ _ x (hxV) (SmoothMap.restrictRingHom IM 𝓘(𝕜) 𝕜 hUV f), S.germ _ x hxV g,
         ?_, ?_⟩, S.germ_res_apply hUV.hom x hxV f⟩
       · rw [← map_mul]
         -- Qualified the name to avoid Lean not finding a `OneHomClass` https://github.com/leanprover-community/mathlib4/pull/8386
@@ -100,8 +95,10 @@ theorem smoothSheafCommRing.isUnit_stalk_iff {x : M}
         apply inv_mul_cancel₀
         exact hVf y
     · intro y
-      exact (((contDiffAt_inv _ (hVf y)).contMDiffAt).comp y
-        (f.contMDiff.comp (contMDiff_inclusion hUV)).contMDiffAt :)
+      #adaptation_note /-- https://github.com/leanprover/lean4/pull/6024
+        was `exact`; somehow `convert` bypasess unification issues -/
+      convert ((contDiffAt_inv _ (hVf y)).contMDiffAt).comp y
+        (f.contMDiff.comp (contMDiff_inclusion hUV)).contMDiffAt
 
 theorem smoothSheafCommRing.nonunits_stalk (x : M) :
     nonunits ((smoothSheafCommRing IM 𝓘(𝕜) M 𝕜).presheaf.stalk x)
@@ -110,12 +107,17 @@ theorem smoothSheafCommRing.nonunits_stalk (x : M) :
   rw [mem_nonunits_iff, not_iff_comm, Iff.comm]
   apply smoothSheafCommRing.isUnit_stalk_iff
 
--- INSTANCE (free from Core): smoothSheafCommRing.instLocalRing_stalk
+instance smoothSheafCommRing.instLocalRing_stalk (x : M) :
+    IsLocalRing ((smoothSheafCommRing IM 𝓘(𝕜) M 𝕜).presheaf.stalk x) := by
+  apply IsLocalRing.of_nonunits_add
+  rw [smoothSheafCommRing.nonunits_stalk]
+  intro f g
+  exact Ideal.add_mem _
 
 variable (M)
 
-def ChartedSpace.locallyRingedSpace : LocallyRingedSpace where
+def SmoothManifoldWithCorners.locallyRingedSpace : LocallyRingedSpace where
   carrier := TopCat.of M
   presheaf := smoothPresheafCommRing IM 𝓘(𝕜) M 𝕜
-  IsSheaf := (smoothSheafCommRing IM 𝓘(𝕜) M 𝕜).property
+  IsSheaf := (smoothSheafCommRing IM 𝓘(𝕜) M 𝕜).cond
   isLocalRing x := smoothSheafCommRing.instLocalRing_stalk IM x

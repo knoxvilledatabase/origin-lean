@@ -1,8 +1,10 @@
 /-
 Extracted from ModelTheory/Algebra/Ring/FreeCommRing.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.ModelTheory.Algebra.Ring.Basic
+import Mathlib.RingTheory.FreeCommRing
 
 /-!
 # Making a term in the language of rings from an element of the FreeCommRing
@@ -22,28 +24,40 @@ open Language
 
 variable {α : Type*}
 
-attribute [local instance] compatibleRingOfRing
+section
 
-set_option backward.privateInPublic true in
+attribute [local instance] compatibleRingOfRing
 
 private theorem exists_term_realize_eq_freeCommRing (p : FreeCommRing α) :
     ∃ t : Language.ring.Term α,
       (t.realize FreeCommRing.of : FreeCommRing α) = p :=
   FreeCommRing.induction_on p
-    ⟨-1, by simp⟩
+    ⟨-1, by simp [Term.realize]⟩
     (fun a => ⟨Term.var a, by simp [Term.realize]⟩)
     (fun x y ⟨t₁, ht₁⟩ ⟨t₂, ht₂⟩ =>
-      ⟨t₁ + t₂, by simp_all⟩)
+      ⟨t₁ + t₂, by simp_all [Term.realize]⟩)
     (fun x y ⟨t₁, ht₁⟩ ⟨t₂, ht₂⟩ =>
-      ⟨t₁ * t₂, by simp_all⟩)
+      ⟨t₁ * t₂, by simp_all [Term.realize]⟩)
 
 end
-
-set_option backward.privateInPublic true in
-
-set_option backward.privateInPublic.warn false in
 
 noncomputable def termOfFreeCommRing (p : FreeCommRing α) : Language.ring.Term α :=
   Classical.choose (exists_term_realize_eq_freeCommRing p)
 
 variable {R : Type*} [CommRing R] [CompatibleRing R]
+
+@[simp]
+theorem realize_termOfFreeCommRing (p : FreeCommRing α) (v : α → R) :
+    (termOfFreeCommRing p).realize v = FreeCommRing.lift v p := by
+  let _ := compatibleRingOfRing (FreeCommRing α)
+  rw [termOfFreeCommRing]
+  conv_rhs => rw [← Classical.choose_spec (exists_term_realize_eq_freeCommRing p)]
+  induction Classical.choose (exists_term_realize_eq_freeCommRing p) with
+  | var _ => simp
+  | func f a ih =>
+    cases f <;>
+    simp [ih]
+
+end Ring
+
+end FirstOrder

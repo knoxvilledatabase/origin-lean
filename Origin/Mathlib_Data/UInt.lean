@@ -1,8 +1,11 @@
 /-
 Extracted from Data/UInt.lean
-Genuine: 7 of 8 | Dissolved: 0 | Infrastructure: 1
+Genuine: 6 of 7 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Ring.InjSurj
+import Mathlib.Data.ZMod.Defs
+import Mathlib.Data.BitVec
 
 /-!
 # Adds Mathlib specific instances to the `UIntX` data types.
@@ -19,7 +22,7 @@ version also interferes more with software-verification use-cases, which is reas
 cautious here.
 -/
 
-set_option linter.style.emptyLine false in
+example : (0 : UInt8) = ⟨0⟩ := rfl
 
 set_option hygiene false in
 
@@ -33,60 +36,58 @@ run_cmd
 
     namespace $typeName
 
-      open $typeName (toBitVec_mul) in
+      instance : Neg $typeName where
+        neg a := mk ⟨-a.val⟩
 
-set_option linter.style.emptyLine false in
+      instance : Pow $typeName ℕ where
+        pow a n := mk ⟨a.val ^ n⟩
 
-set_option hygiene false in
+      instance : SMul ℕ $typeName where
+        smul n a := mk ⟨n • a.val⟩
 
-run_cmd
+      instance : SMul ℤ $typeName where
+        smul z a := mk ⟨z • a.val⟩
 
-  for typeName' in [`UInt8, `UInt16, `UInt32, `UInt64, `USize] do
+      lemma neg_def (a : $typeName) : -a = ⟨⟨-a.val⟩⟩ := rfl
 
-  let typeName := Lean.mkIdent typeName'
+      lemma pow_def (a : $typeName) (n : ℕ) : a ^ n = ⟨⟨a.val ^ n⟩⟩ := rfl
 
-  Lean.Elab.Command.elabCommand (← `(
+      lemma nsmul_def (n : ℕ) (a : $typeName) : n • a = ⟨⟨n • a.val⟩⟩ := rfl
 
-    namespace $typeName
+      lemma zsmul_def (z : ℤ) (a : $typeName) : z • a = ⟨⟨z • a.val⟩⟩ := rfl
 
-      open $typeName (eq_of_toFin_eq) in
-
-      lemma toFin_injective : Function.Injective toFin := @eq_of_toFin_eq
+      open $typeName (eq_of_val_eq) in
+      lemma val_injective : Function.Injective val := @eq_of_val_eq
 
       open $typeName (eq_of_toBitVec_eq) in
       lemma toBitVec_injective : Function.Injective toBitVec := @eq_of_toBitVec_eq
 
-      open $typeName (toBitVec_one toBitVec_mul toBitVec_pow) in
       instance instCommMonoid : CommMonoid $typeName :=
         Function.Injective.commMonoid toBitVec toBitVec_injective
-          toBitVec_one (fun _ _ => toBitVec_mul) (fun _ _ => toBitVec_pow _ _)
+          rfl (fun _ _ => rfl) (fun _ _ => rfl)
 
-      open $typeName (
-        toBitVec_zero toBitVec_add toBitVec_mul toBitVec_neg toBitVec_sub toBitVec_nsmul
-        toBitVec_zsmul) in
       instance instNonUnitalCommRing : NonUnitalCommRing $typeName :=
         Function.Injective.nonUnitalCommRing toBitVec toBitVec_injective
-          toBitVec_zero (fun _ _ => toBitVec_add) (fun _ _ => toBitVec_mul) (fun _ => toBitVec_neg)
-          (fun _ _ => toBitVec_sub)
-          (fun _ _ => toBitVec_nsmul _ _) (fun _ _ => toBitVec_zsmul _ _)
+          rfl (fun _ _ => rfl) (fun _ _ => rfl) (fun _ => rfl) (fun _ _ => rfl)
+          (fun _ _ => rfl) (fun _ _ => rfl)
 
-      attribute [local instance] intCast natCast
+      local instance instNatCast : NatCast $typeName where
+        natCast n := mk n
 
-      open $typeName (
-        toBitVec_zero toBitVec_one toBitVec_add toBitVec_mul toBitVec_neg
-        toBitVec_sub toBitVec_nsmul toBitVec_zsmul toBitVec_pow
-        toBitVec_natCast toBitVec_intCast) in
-      -- `noncomputable` should not be necessary but triggers some codegen assertion
-      noncomputable local instance instCommRing : CommRing $typeName :=
+      local instance instIntCast : IntCast $typeName where
+        intCast z := mk z
+
+      lemma natCast_def (n : ℕ) : (n : $typeName) = ⟨n⟩ := rfl
+
+      lemma intCast_def (z : ℤ) : (z : $typeName) = ⟨z⟩ := rfl
+
+      local instance instCommRing : CommRing $typeName :=
         Function.Injective.commRing toBitVec toBitVec_injective
-          toBitVec_zero toBitVec_one (fun _ _ => toBitVec_add) (fun _ _ => toBitVec_mul)
-          (fun _ => toBitVec_neg) (fun _ _ => toBitVec_sub)
-          (fun _ _ => toBitVec_nsmul _ _) (fun _ _ => toBitVec_zsmul _ _)
-          (fun _ _ => toBitVec_pow _ _)
-          toBitVec_natCast toBitVec_intCast
+          rfl rfl (fun _ _ => rfl) (fun _ _ => rfl) (fun _ => rfl) (fun _ _ => rfl)
+          (fun _ _ => rfl) (fun _ _ => rfl) (fun _ _ => rfl) (fun _ => rfl) (fun _ => rfl)
 
       namespace CommRing
-      attribute [scoped instance] instCommRing natCast intCast
+      attribute [scoped instance] instCommRing instNatCast instIntCast
       end CommRing
 
     end $typeName
@@ -95,10 +96,9 @@ run_cmd
   let docString :=
     s!"To use this instance, use `open scoped {typeName'}.CommRing`.\n\n" ++
     "See the module docstring for an explanation"
-  Lean.addDocStringCore (typeName'.mkStr "instCommRing") docString
-  -- TODO: add these docstrings in core?
-  -- Lean.addDocStringCore (typeName'.mkStr "instNatCast") docString
-  -- Lean.addDocStringCore (typeName'.mkStr "instIntCast") docString
+  Lean.addDocString (typeName'.mkStr "instCommRing") docString
+  Lean.addDocString (typeName'.mkStr "instNatCast") docString
+  Lean.addDocString (typeName'.mkStr "instIntCast") docString
 
 namespace UInt8
 

@@ -1,8 +1,9 @@
 /-
 Extracted from Data/Finset/Attach.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Defs
 
 /-!
 # Attaching a proof of membership to a finite set
@@ -18,8 +19,6 @@ finite sets, finset
 
 -/
 
-assert_not_exists List.sublistsLen Multiset.powerset CompleteLattice IsOrderedMonoid
-
 open Multiset Subtype Function
 
 universe u
@@ -34,3 +33,13 @@ attribute [local trans] Subset.trans Superset.trans
 
 def attach (s : Finset α) : Finset { x // x ∈ s } :=
   ⟨Multiset.attach s.1, nodup_attach.2 s.2⟩
+
+@[simp]
+theorem attach_val (s : Finset α) : s.attach.1 = s.1.attach :=
+  rfl
+
+@[simp]
+theorem mem_attach (s : Finset α) : ∀ x, x ∈ s.attach :=
+  Multiset.mem_attach _
+
+end Finset

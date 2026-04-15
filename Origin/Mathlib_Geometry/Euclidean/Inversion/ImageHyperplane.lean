@@ -3,6 +3,8 @@ Extracted from Geometry/Euclidean/Inversion/ImageHyperplane.lean
 Genuine: 1 of 9 | Dissolved: 8 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Geometry.Euclidean.Inversion.Basic
+import Mathlib.Geometry.Euclidean.PerpBisector
 
 /-!
 # Image of a hyperplane under inversion
@@ -30,8 +32,6 @@ variable {V P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricS
   [NormedAddTorsor V P] {c x y : P} {R : ℝ}
 
 namespace EuclideanGeometry
-
-set_option linter.unusedSimpArgs false in
 
 -- DISSOLVED: inversion_mem_perpBisector_inversion_iff
 

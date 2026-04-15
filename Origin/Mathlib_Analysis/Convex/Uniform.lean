@@ -3,6 +3,7 @@ Extracted from Analysis/Convex/Uniform.lean
 Genuine: 3 of 5 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.StrictConvexSpace
 
 /-!
 # Uniformly convex spaces
@@ -54,10 +55,10 @@ theorem exists_forall_closed_ball_dist_add_le_two_sub (hε : 0 < ε) :
   obtain ⟨δ, hδ, h⟩ := exists_forall_sphere_dist_add_le_two_sub E hε'
   set δ' := min (1 / 2) (min (ε / 3) <| δ / 3)
   refine ⟨δ', lt_min one_half_pos <| lt_min hε' (div_pos hδ zero_lt_three), fun x hx y hy hxy => ?_⟩
-  obtain hx' | hx' := le_or_gt ‖x‖ (1 - δ')
+  obtain hx' | hx' := le_or_lt ‖x‖ (1 - δ')
   · rw [← one_add_one_eq_two]
     exact (norm_add_le_of_le hx' hy).trans (sub_add_eq_add_sub _ _ _).le
-  obtain hy' | hy' := le_or_gt ‖y‖ (1 - δ')
+  obtain hy' | hy' := le_or_lt ‖y‖ (1 - δ')
   · rw [← one_add_one_eq_two]
     exact (norm_add_le_of_le hx hy').trans (add_sub_assoc _ _ _).ge
   have hδ' : 0 < 1 - δ' := sub_pos_of_lt (min_lt_of_left_lt one_half_lt_one)
@@ -88,15 +89,30 @@ theorem exists_forall_closed_ball_dist_add_le_two_sub (hε : 0 < ε) :
       have : ∀ x' y', x + y = x' + y' + (x - x') + (y - y') := fun _ _ => by abel
       rw [norm_sub_rev, norm_sub_rev y', this]
       exact norm_add₃_le
-    _ ≤ 2 - δ + δ' + δ' := by
-      gcongr
-      exacts [h (h₁ _ hx') (h₁ _ hy') hxy', h₂ _ hx hx'.le, h₂ _ hy hy'.le]
+    _ ≤ 2 - δ + δ' + δ' :=
+      (add_le_add_three (h (h₁ _ hx') (h₁ _ hy') hxy') (h₂ _ hx hx'.le) (h₂ _ hy hy'.le))
     _ ≤ 2 - δ' := by
       suffices δ' ≤ δ / 3 by linarith
       exact min_le_of_right_le <| min_le_right _ _
+
+theorem exists_forall_closed_ball_dist_add_le_two_mul_sub (hε : 0 < ε) (r : ℝ) :
+    ∃ δ, 0 < δ ∧ ∀ ⦃x : E⦄, ‖x‖ ≤ r → ∀ ⦃y⦄, ‖y‖ ≤ r → ε ≤ ‖x - y‖ → ‖x + y‖ ≤ 2 * r - δ := by
+  obtain hr | hr := le_or_lt r 0
+  · exact ⟨1, one_pos, fun x hx y hy h => (hε.not_le <|
+      h.trans <| (norm_sub_le _ _).trans <| add_nonpos (hx.trans hr) (hy.trans hr)).elim⟩
+  obtain ⟨δ, hδ, h⟩ := exists_forall_closed_ball_dist_add_le_two_sub E (div_pos hε hr)
+  refine ⟨δ * r, mul_pos hδ hr, fun x hx y hy hxy => ?_⟩
+  rw [← div_le_one hr, div_eq_inv_mul, ← norm_smul_of_nonneg (inv_nonneg.2 hr.le)] at hx hy
+  have := h hx hy
+  simp_rw [← smul_add, ← smul_sub, norm_smul_of_nonneg (inv_nonneg.2 hr.le), ← div_eq_inv_mul,
+    div_le_div_iff_of_pos_right hr, div_le_iff₀ hr, sub_mul] at this
+  exact this hxy
 
 end SeminormedAddCommGroup
 
 variable [NormedAddCommGroup E] [NormedSpace ℝ E] [UniformConvexSpace E]
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) UniformConvexSpace.toStrictConvexSpace : StrictConvexSpace ℝ E :=
+  StrictConvexSpace.of_norm_add_ne_two fun _ _ hx hy hxy =>
+    let ⟨_, hδ, h⟩ := exists_forall_closed_ball_dist_add_le_two_sub E (norm_sub_pos_iff.2 hxy)
+    ((h hx.le hy.le le_rfl).trans_lt <| sub_lt_self _ hδ).ne

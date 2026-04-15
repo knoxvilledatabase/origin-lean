@@ -1,119 +1,115 @@
 /-
 Extracted from Topology/Metrizable/Basic.lean
-Genuine: 8 of 25 | Dissolved: 0 | Infrastructure: 17
+Genuine: 7 of 19 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
+import Mathlib.Topology.MetricSpace.Basic
 
 /-!
-# Metrizable Spaces
+# Metrizability of a T₃ topological space with second countable topology
 
 In this file we define metrizable topological spaces, i.e., topological spaces for which there
 exists a metric space structure that generates the same topology.
-We define it without any reference to metric spaces in order to avoid importing the real numbers.
-For the proof that metrizable spaces admit a compatible metric,
-see `Mathlib/Topology/Metrizable/Uniformity.lean`.
 -/
 
-assert_not_exists AddMonoidWithOne
-
-open Filter Set Topology Uniformity UniformSpace SetRel
+open Filter Set Metric Topology
 
 namespace TopologicalSpace
 
-variable {ι X Y : Type*} {A : ι → Type*} [TopologicalSpace X] [TopologicalSpace Y] [Finite ι]
-  [∀ i, TopologicalSpace (A i)]
+variable {ι X Y : Type*} {π : ι → Type*} [TopologicalSpace X] [TopologicalSpace Y] [Finite ι]
+  [∀ i, TopologicalSpace (π i)]
 
 class PseudoMetrizableSpace (X : Type*) [t : TopologicalSpace X] : Prop where
-  exists_countably_generated :
-    ∃ u : UniformSpace X, u.toTopologicalSpace = t ∧ (uniformity X).IsCountablyGenerated
+  exists_pseudo_metric : ∃ m : PseudoMetricSpace X, m.toUniformSpace.toTopologicalSpace = t
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) _root_.PseudoMetricSpace.toPseudoMetrizableSpace {X : Type*}
+    [m : PseudoMetricSpace X] : PseudoMetrizableSpace X :=
+  ⟨⟨m, rfl⟩⟩
 
-noncomputable abbrev pseudoMetrizableSpaceUniformity (X : Type*) [TopologicalSpace X]
-    [h : PseudoMetrizableSpace X] : UniformSpace X :=
-  h.exists_countably_generated.choose.replaceTopology
-    h.exists_countably_generated.choose_spec.1.symm
+noncomputable def pseudoMetrizableSpacePseudoMetric (X : Type*) [TopologicalSpace X]
+    [h : PseudoMetrizableSpace X] : PseudoMetricSpace X :=
+  h.exists_pseudo_metric.choose.replaceTopology h.exists_pseudo_metric.choose_spec.symm
 
-example {X : Type*} [t : TopologicalSpace X] [PseudoMetrizableSpace X] :
-
-    (pseudoMetrizableSpaceUniformity X).toTopologicalSpace = t := by
-
-  with_reducible_and_instances rfl
-
--- INSTANCE (free from Core): pseudoMetrizableSpace_prod
+instance pseudoMetrizableSpace_prod [PseudoMetrizableSpace X] [PseudoMetrizableSpace Y] :
+    PseudoMetrizableSpace (X × Y) :=
+  letI : PseudoMetricSpace X := pseudoMetrizableSpacePseudoMetric X
+  letI : PseudoMetricSpace Y := pseudoMetrizableSpacePseudoMetric Y
+  inferInstance
 
 theorem _root_.Topology.IsInducing.pseudoMetrizableSpace [PseudoMetrizableSpace Y] {f : X → Y}
     (hf : IsInducing f) : PseudoMetrizableSpace X :=
-  let u : UniformSpace Y := pseudoMetrizableSpaceUniformity Y
-  have : (uniformity Y).IsCountablyGenerated :=
-    pseudoMetrizableSpaceUniformity_countably_generated Y
-  ⟨⟨u.comap f, u.toTopologicalSpace_comap.trans hf.eq_induced.symm,
-    Filter.comap.isCountablyGenerated (uniformity Y) (Prod.map f f)⟩⟩
+  letI : PseudoMetricSpace Y := pseudoMetrizableSpacePseudoMetric Y
+  ⟨⟨hf.comapPseudoMetricSpace, rfl⟩⟩
 
--- INSTANCE (free from Core): (priority
+alias _root_.Inducing.pseudoMetrizableSpace := IsInducing.pseudoMetrizableSpace
 
--- INSTANCE (free from Core): PseudoMetrizableSpace.subtype
+instance (priority := 100) PseudoMetrizableSpace.firstCountableTopology
+    [h : PseudoMetrizableSpace X] : FirstCountableTopology X := by
+  rcases h with ⟨_, hm⟩
+  rw [← hm]
+  exact @UniformSpace.firstCountableTopology X PseudoMetricSpace.toUniformSpace
+    EMetric.instIsCountablyGeneratedUniformity
 
--- INSTANCE (free from Core): pseudoMetrizableSpace_pi
+instance PseudoMetrizableSpace.subtype [PseudoMetrizableSpace X] (s : Set X) :
+    PseudoMetrizableSpace s :=
+  IsInducing.subtypeVal.pseudoMetrizableSpace
 
--- INSTANCE (free from Core): PseudoMetrizableSpace.regularSpace
+instance pseudoMetrizableSpace_pi [∀ i, PseudoMetrizableSpace (π i)] :
+    PseudoMetrizableSpace (∀ i, π i) := by
+  cases nonempty_fintype ι
+  letI := fun i => pseudoMetrizableSpacePseudoMetric (π i)
+  infer_instance
 
--- INSTANCE (free from Core): (priority
+class MetrizableSpace (X : Type*) [t : TopologicalSpace X] : Prop where
+  exists_metric : ∃ m : MetricSpace X, m.toUniformSpace.toTopologicalSpace = t
 
-class MetrizableSpace (X : Type*) [t : TopologicalSpace X] : Prop extends
-    PseudoMetrizableSpace X, T0Space X
+instance (priority := 100) _root_.MetricSpace.toMetrizableSpace {X : Type*} [m : MetricSpace X] :
+    MetrizableSpace X :=
+  ⟨⟨m, rfl⟩⟩
 
--- INSTANCE (free from Core): 100]
+instance (priority := 100) MetrizableSpace.toPseudoMetrizableSpace [h : MetrizableSpace X] :
+    PseudoMetrizableSpace X :=
+  let ⟨m, hm⟩ := h.1
+  ⟨⟨m.toPseudoMetricSpace, hm⟩⟩
 
--- INSTANCE (free from Core): 100]
+noncomputable def metrizableSpaceMetric (X : Type*) [TopologicalSpace X] [h : MetrizableSpace X] :
+    MetricSpace X :=
+  h.exists_metric.choose.replaceTopology h.exists_metric.choose_spec.symm
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) t2Space_of_metrizableSpace [MetrizableSpace X] : T2Space X :=
+  letI : MetricSpace X := metrizableSpaceMetric X
+  inferInstance
 
--- INSTANCE (free from Core): (priority
-
--- INSTANCE (free from Core): metrizableSpace_prod
+instance metrizableSpace_prod [MetrizableSpace X] [MetrizableSpace Y] : MetrizableSpace (X × Y) :=
+  letI : MetricSpace X := metrizableSpaceMetric X
+  letI : MetricSpace Y := metrizableSpaceMetric Y
+  inferInstance
 
 theorem _root_.Topology.IsEmbedding.metrizableSpace [MetrizableSpace Y] {f : X → Y}
-    (hf : IsEmbedding f) : MetrizableSpace X where
-  toPseudoMetrizableSpace := hf.toIsInducing.pseudoMetrizableSpace
-  toT0Space := hf.t0Space
+    (hf : IsEmbedding f) : MetrizableSpace X :=
+  letI : MetricSpace Y := metrizableSpaceMetric Y
+  ⟨⟨hf.comapMetricSpace f, rfl⟩⟩
 
--- INSTANCE (free from Core): MetrizableSpace.subtype
+alias _root_.Embedding.metrizableSpace := IsEmbedding.metrizableSpace
 
--- INSTANCE (free from Core): metrizableSpace_pi
+instance MetrizableSpace.subtype [MetrizableSpace X] (s : Set X) : MetrizableSpace s :=
+  IsEmbedding.subtypeVal.metrizableSpace
+
+instance metrizableSpace_pi [∀ i, MetrizableSpace (π i)] : MetrizableSpace (∀ i, π i) := by
+  cases nonempty_fintype ι
+  letI := fun i => metrizableSpaceMetric (π i)
+  infer_instance
 
 theorem IsSeparable.secondCountableTopology [PseudoMetrizableSpace X] {s : Set X}
-    (hs : IsSeparable s) : SecondCountableTopology s :=
-  let ⟨u, hu, hs⟩ := hs
-  have := hu.to_subtype
-  have : SeparableSpace (closure u) :=
-    ⟨Set.range (u.inclusion subset_closure), Set.countable_range (u.inclusion subset_closure),
-      Subtype.dense_iff.2 <| by rw [← Set.range_comp, Set.val_comp_inclusion, Subtype.range_coe]⟩
-  let := pseudoMetrizableSpaceUniformity (closure u)
-  have := pseudoMetrizableSpaceUniformity_countably_generated (closure u)
-  have := secondCountable_of_separable (closure u)
-  (Topology.IsEmbedding.inclusion hs).secondCountableTopology
+    (hs : IsSeparable s) : SecondCountableTopology s := by
+  letI := pseudoMetrizableSpacePseudoMetric X
+  have := hs.separableSpace
+  exact UniformSpace.secondCountable_of_separable s
 
--- INSTANCE (free from Core): (X
-
-theorem IsSeparable.exists_countable_dense_subset [PseudoMetrizableSpace X]
-    {s : Set X} (hs : IsSeparable s) : ∃ t, t ⊆ s ∧ t.Countable ∧ s ⊆ closure t := by
-  let := pseudoMetrizableSpaceUniformity X
-  have := pseudoMetrizableSpaceUniformity_countably_generated X
-  apply subset_countable_closure_of_almost_dense_set
-  intro U hU
-  obtain ⟨t, htc, hst⟩ := hs
-  refine ⟨t, htc, fun x hx => ?_⟩
-  obtain ⟨y, hyx, hyt⟩ := mem_closure_iff_ball.1 (hst hx) (symmetrize_mem_uniformity hU)
-  exact mem_biUnion hyt (ball_mono SetRel.symmetrize_subset_inv x hyx)
-
-theorem IsSeparable.separableSpace [PseudoMetrizableSpace X] {s : Set X} (hs : IsSeparable s) :
-    SeparableSpace s := by
-  rcases hs.exists_countable_dense_subset with ⟨t, hts, htc, hst⟩
-  lift t to Set s using hts
-  refine ⟨⟨t, countable_of_injective_of_countable_image Subtype.coe_injective.injOn htc, ?_⟩⟩
-  rwa [IsInducing.subtypeVal.dense_iff, Subtype.forall]
-
--- INSTANCE (free from Core): (priority
+instance (X : Type*) [TopologicalSpace X] [c : CompactSpace X] [MetrizableSpace X] :
+    SecondCountableTopology X := by
+  obtain ⟨_, h⟩ := MetrizableSpace.exists_metric (X := X)
+  rw [← h] at c ⊢
+  infer_instance
 
 end TopologicalSpace

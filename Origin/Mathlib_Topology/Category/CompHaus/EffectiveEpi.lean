@@ -3,6 +3,8 @@ Extracted from Topology/Category/CompHaus/EffectiveEpi.lean
 Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Topology.Category.CompHaus.Limits
+import Mathlib.Topology.Category.CompHausLike.EffectiveEpi
 
 /-!
 
@@ -10,7 +12,7 @@ import Origin.Core
 
 This file proves that `EffectiveEpi`, `Epi` and `Surjective` are all equivalent in `CompHaus`.
 As a consequence we deduce from the material in
-`Mathlib/Topology/Category/CompHausLike/EffectiveEpi.lean` that `CompHaus` is `Preregular`
+`Mathlib.Topology.Category.CompHausLike.EffectiveEpi` that `CompHaus` is `Preregular`
 and `Precoherent`.
 
 We also prove that for a finite family of morphisms in `CompHaus` with fixed
@@ -28,6 +30,8 @@ universe u
 
 open CategoryTheory Limits CompHausLike
 
+attribute [local instance] ConcreteCategory.instFunLike
+
 namespace CompHaus
 
 open List in
@@ -44,11 +48,10 @@ theorem effectiveEpi_tfae
   tfae_have 3 → 1 := fun hπ ↦ ⟨⟨effectiveEpiStruct π hπ⟩⟩
   tfae_finish
 
--- INSTANCE (free from Core): :
+instance : Preregular CompHaus :=
+  preregular fun _ _ _ ↦ ((effectiveEpi_tfae _).out 0 2).mp
 
 example : Precoherent CompHaus.{u} := inferInstance
-
-set_option backward.isDefEq.respectTransparency false in
 
 open List in
 
@@ -84,7 +87,7 @@ theorem effectiveEpiFamily_tfae
     refine ⟨q.1,q.2,?_⟩
     have : t = i.inv (i.hom t) := show t = (i.hom ≫ i.inv) t by simp only [i.hom_inv_id]; rfl
     rw [this]
-    change _ = (i.inv ≫ Sigma.desc π) (i.hom t)
+    show _ = (i.inv ≫ Sigma.desc π) (i.hom t)
     suffices i.inv ≫ Sigma.desc π = finiteCoproduct.desc X π by
       rw [this]; rfl
     rw [Iso.inv_comp_eq]

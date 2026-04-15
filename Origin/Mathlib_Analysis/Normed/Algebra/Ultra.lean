@@ -3,6 +3,8 @@ Extracted from Analysis/Normed/Algebra/Ultra.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Normed.Field.Ultra
+import Mathlib.Analysis.Normed.Module.Basic
 
 /-!
 # Normed algebra preserves ultrametricity

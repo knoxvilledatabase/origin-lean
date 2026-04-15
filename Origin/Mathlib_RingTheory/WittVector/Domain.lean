@@ -3,6 +3,7 @@ Extracted from RingTheory/WittVector/Domain.lean
 Genuine: 3 of 7 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.RingTheory.WittVector.Identities
 
 /-!
 
@@ -32,6 +33,8 @@ the 0th component of which must be nonzero.
 
 noncomputable section
 
+open scoped Classical
+
 namespace WittVector
 
 open Function
@@ -47,6 +50,9 @@ local notation "𝕎" => WittVector p -- type as `\bbW`
 def shift (x : 𝕎 R) (n : ℕ) : 𝕎 R :=
   @mk' p R fun i => x.coeff (n + i)
 
+theorem shift_coeff (x : 𝕎 R) (n k : ℕ) : (x.shift n).coeff k = x.coeff (n + k) :=
+  rfl
+
 variable [hp : Fact p.Prime] [CommRing R]
 
 theorem verschiebung_shift (x : 𝕎 R) (k : ℕ) (h : ∀ i < k + 1, x.coeff i = 0) :
@@ -60,10 +66,9 @@ theorem verschiebung_shift (x : 𝕎 R) (k : ℕ) (h : ∀ i < k + 1, x.coeff i 
 
 theorem eq_iterate_verschiebung {x : 𝕎 R} {n : ℕ} (h : ∀ i < n, x.coeff i = 0) :
     x = verschiebung^[n] (x.shift n) := by
-  induction n with
-  | zero => cases x; simp [shift]
-  | succ k ih =>
-    dsimp; rw [verschiebung_shift]
+  induction' n with k ih
+  · cases x; simp [shift]
+  · dsimp; rw [verschiebung_shift]
     · exact ih fun i hi => h _ (hi.trans (Nat.lt_succ_self _))
     · exact h
 
@@ -77,8 +82,18 @@ This argument is adapted from
 <https://math.stackexchange.com/questions/4117247/ring-of-witt-vectors-over-an-integral-domain/4118723#4118723>.
 -/
 
--- INSTANCE (free from Core): [CharP
+instance [CharP R p] [NoZeroDivisors R] : NoZeroDivisors (𝕎 R) :=
+  ⟨fun {x y} => by
+    contrapose!
+    rintro ⟨ha, hb⟩
+    rcases verschiebung_nonzero ha with ⟨na, wa, hwa0, rfl⟩
+    rcases verschiebung_nonzero hb with ⟨nb, wb, hwb0, rfl⟩
+    refine ne_of_apply_ne (fun x => x.coeff (na + nb)) ?_
+    dsimp only
+    rw [iterate_verschiebung_mul_coeff, zero_coeff]
+    exact mul_ne_zero (pow_ne_zero _ hwa0) (pow_ne_zero _ hwb0)⟩
 
--- INSTANCE (free from Core): instIsDomain
+instance instIsDomain [CharP R p] [IsDomain R] : IsDomain (𝕎 R) :=
+  NoZeroDivisors.to_isDomain _
 
 end WittVector

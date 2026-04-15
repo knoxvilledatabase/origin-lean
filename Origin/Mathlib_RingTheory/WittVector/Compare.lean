@@ -3,6 +3,9 @@ Extracted from RingTheory/WittVector/Compare.lean
 Genuine: 18 of 19 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.WittVector.Truncated
+import Mathlib.RingTheory.WittVector.Identities
+import Mathlib.NumberTheory.Padics.RingHoms
 
 /-!
 
@@ -39,7 +42,7 @@ theorem eq_of_le_of_cast_pow_eq_zero [CharP R p] (i : ℕ) (hin : i ≤ n)
   contrapose! hpi
   replace hin := lt_of_le_of_ne hin hpi; clear hpi
   have : (p : TruncatedWittVector p n R) ^ i = WittVector.truncate n ((p : 𝕎 R) ^ i) := by
-    rw [map_pow, map_natCast]
+    rw [RingHom.map_pow, map_natCast]
   rw [this, ne_eq, TruncatedWittVector.ext_iff, not_forall]; clear this
   use ⟨i, hin⟩
   rw [WittVector.coeff_truncate, coeff_zero, Fin.val_mk, WittVector.coeff_p_pow]
@@ -60,6 +63,11 @@ attribute [local instance] charP_zmod
 
 def zmodEquivTrunc : ZMod (p ^ n) ≃+* TruncatedWittVector p n (ZMod p) :=
   ZMod.ringEquiv (TruncatedWittVector p n (ZMod p)) (card_zmod _ _)
+
+theorem zmodEquivTrunc_apply {x : ZMod (p ^ n)} :
+    zmodEquivTrunc p n x =
+      ZMod.castHom (m := p ^ n) (by rfl) (TruncatedWittVector p n (ZMod p)) x :=
+  rfl
 
 theorem commutes {m : ℕ} (hm : n ≤ m) :
     (truncate hm).comp (zmodEquivTrunc p m).toRingHom =
@@ -148,7 +156,7 @@ def equiv : 𝕎 (ZMod p) ≃+* ℤ_[p] where
   invFun := fromPadicInt p
   left_inv := fromPadicInt_comp_toPadicInt_ext _
   right_inv := toPadicInt_comp_fromPadicInt_ext _
-  map_mul' := map_mul _
-  map_add' := map_add _
+  map_mul' := RingHom.map_mul _
+  map_add' := RingHom.map_add _
 
 end WittVector

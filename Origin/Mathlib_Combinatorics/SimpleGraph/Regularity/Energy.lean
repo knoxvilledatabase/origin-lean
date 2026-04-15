@@ -1,8 +1,12 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Energy.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.NatInt
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Combinatorics.SimpleGraph.Density
+import Mathlib.Data.Rat.BigOperators
 
 /-!
 # Energy of a partition
@@ -43,3 +47,10 @@ theorem energy_le_one : P.energy G ≤ 1 :=
         norm_cast
         rw [sq]
         exact tsub_le_self
+
+@[simp, norm_cast]
+theorem coe_energy {𝕜 : Type*} [LinearOrderedField 𝕜] : (P.energy G : 𝕜) =
+    (∑ uv ∈ P.parts.offDiag, (G.edgeDensity uv.1 uv.2 : 𝕜) ^ 2) / (#P.parts : 𝕜) ^ 2 := by
+  rw [energy]; norm_cast
+
+end Finpartition

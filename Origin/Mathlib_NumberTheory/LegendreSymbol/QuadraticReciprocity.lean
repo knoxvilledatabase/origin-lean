@@ -3,6 +3,8 @@ Extracted from NumberTheory/LegendreSymbol/QuadraticReciprocity.lean
 Genuine: 10 of 10 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.NumberTheory.LegendreSymbol.Basic
+import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.GaussSum
 
 /-!
 # Quadratic reciprocity.
@@ -62,13 +64,21 @@ namespace ZMod
 
 theorem exists_sq_eq_two_iff (hp : p ≠ 2) : IsSquare (2 : ZMod p) ↔ p % 8 = 1 ∨ p % 8 = 7 := by
   rw [FiniteField.isSquare_two_iff, card p]
-  have h₁ := (Prime.mod_two_eq_one_iff_ne_two Fact.out).mpr hp
-  lia
+  have h₁ := Prime.mod_two_eq_one_iff_ne_two.mpr hp
+  rw [← mod_mod_of_dvd p (by decide : 2 ∣ 8)] at h₁
+  have h₂ := mod_lt p (by norm_num : 0 < 8)
+  revert h₂ h₁
+  generalize p % 8 = m; clear! p
+  intros; interval_cases m <;> simp_all -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11043): was `decide!`
 
 theorem exists_sq_eq_neg_two_iff (hp : p ≠ 2) : IsSquare (-2 : ZMod p) ↔ p % 8 = 1 ∨ p % 8 = 3 := by
   rw [FiniteField.isSquare_neg_two_iff, card p]
-  have h₁ := (Prime.mod_two_eq_one_iff_ne_two Fact.out).mpr hp
-  lia
+  have h₁ := Prime.mod_two_eq_one_iff_ne_two.mpr hp
+  rw [← mod_mod_of_dvd p (by decide : 2 ∣ 8)] at h₁
+  have h₂ := mod_lt p (by norm_num : 0 < 8)
+  revert h₂ h₁
+  generalize p % 8 = m; clear! p
+  intros; interval_cases m <;> simp_all -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11043): was `decide!`
 
 end ZMod
 
@@ -105,23 +115,23 @@ theorem quadratic_reciprocity (hp : p ≠ 2) (hq : q ≠ 2) (hpq : p ≠ q) :
 
 theorem quadratic_reciprocity' (hp : p ≠ 2) (hq : q ≠ 2) :
     legendreSym q p = (-1) ^ (p / 2 * (q / 2)) * legendreSym p q := by
-  rcases eq_or_ne p q with rfl | h
-  · rw [(eq_zero_iff p p).mpr (mod_cast natCast_self p), mul_zero]
+  rcases eq_or_ne p q with h | h
+  · subst p
+    rw [(eq_zero_iff q q).mpr (mod_cast natCast_self q), mul_zero]
   · have qr := congr_arg (· * legendreSym p q) (quadratic_reciprocity hp hq h)
     have : ((q : ℤ) : ZMod p) ≠ 0 := mod_cast prime_ne_zero p q h
     simpa only [mul_assoc, ← pow_two, sq_one p this, mul_one] using qr
 
 theorem quadratic_reciprocity_one_mod_four (hp : p % 4 = 1) (hq : q ≠ 2) :
     legendreSym q p = legendreSym p q := by
-  rw [quadratic_reciprocity'
-      ((Prime.mod_two_eq_one_iff_ne_two Fact.out).mp (odd_of_mod_four_eq_one hp)) hq,
+  rw [quadratic_reciprocity' (Prime.mod_two_eq_one_iff_ne_two.mp (odd_of_mod_four_eq_one hp)) hq,
     pow_mul, neg_one_pow_div_two_of_one_mod_four hp, one_pow, one_mul]
 
 theorem quadratic_reciprocity_three_mod_four (hp : p % 4 = 3) (hq : q % 4 = 3) :
     legendreSym q p = -legendreSym p q := by
   let nop := @neg_one_pow_div_two_of_three_mod_four
   rw [quadratic_reciprocity', pow_mul, nop hp, nop hq, neg_one_mul] <;>
-  rwa [← Prime.mod_two_eq_one_iff_ne_two Fact.out, odd_of_mod_four_eq_three]
+  rwa [← Prime.mod_two_eq_one_iff_ne_two, odd_of_mod_four_eq_three]
 
 end legendreSym
 
@@ -131,8 +141,8 @@ open legendreSym
 
 theorem exists_sq_eq_prime_iff_of_mod_four_eq_one (hp1 : p % 4 = 1) (hq1 : q ≠ 2) :
     IsSquare (q : ZMod p) ↔ IsSquare (p : ZMod q) := by
-  rcases eq_or_ne p q with rfl | h
-  · rfl
+  rcases eq_or_ne p q with h | h
+  · subst p; rfl
   · rw [← eq_one_iff' p (prime_ne_zero p q h), ← eq_one_iff' q (prime_ne_zero q p h.symm),
       quadratic_reciprocity_one_mod_four hp1 hq1]
 

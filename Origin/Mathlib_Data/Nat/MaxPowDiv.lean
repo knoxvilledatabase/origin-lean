@@ -1,63 +1,107 @@
 /-
 Extracted from Data/Nat/MaxPowDiv.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 of 8 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Divisibility.Units
+import Mathlib.Algebra.Order.Ring.Nat
+import Mathlib.Tactic.Common
 
 /-!
 # The maximal power of one natural number dividing another
 
-Here we introduce `p.maxPowDvd n` which returns the maximal `k : ℕ` for
-which `p ^ k ∣ n` with the convention that `maxPowDvd 1 n = 0` for all `n`.
+Here we introduce `p.maxPowDiv n` which returns the maximal `k : ℕ` for
+which `p ^ k ∣ n` with the convention that `maxPowDiv 1 n = 0` for all `n`.
 
-We prove enough about `maxPowDvd` in this file to show equality with `Nat.padicValNat` in
-`padicValNat.padicValNat_eq_maxPowDvd`.
+We prove enough about `maxPowDiv` in this file to show equality with `Nat.padicValNat` in
+`padicValNat.padicValNat_eq_maxPowDiv`.
 
-The implementation of `maxPowDvd` improves on the speed of `padicValNat`.
+The implementation of `maxPowDiv` improves on the speed of `padicValNat`.
 -/
 
 namespace Nat
 
-def maxPowDvdDiv (p n : ℕ) : ℕ × ℕ :=
-  if H : 1 < p ∧ n ≠ 0 then
-    go p H
+def maxPowDiv (p n : ℕ) : ℕ :=
+  go 0 p n
+where go (k p n : ℕ) : ℕ :=
+  if 1 < p ∧ 0 < n ∧ n % p = 0 then
+    go (k+1) p (n / p)
   else
-    (0, n)
-  where
-  /-- Auxiliary definition for `Nat.maxPowDvdDiv`. -/
-  go (p : ℕ) (hp : 1 < p ∧ n ≠ 0) :=
-    if hmod : n % p = 0 then
-      let (e, q) := go (p * p) <| by simp [Nat.one_lt_mul_iff, hp, Nat.lt_trans Nat.one_pos]
-      if q % p = 0 then (2 * e + 1, q / p) else (2 * e, q)
-    else
-      (0, n)
-  termination_by n / p
-  decreasing_by
-    rw [← Nat.dvd_iff_mod_eq_zero] at hmod
-    rcases hmod with ⟨m, rfl⟩
-    have hp₀ : 0 < p := Nat.lt_trans Nat.one_pos hp.1
-    rw [Nat.mul_div_mul_left _ _ hp₀, Nat.mul_div_cancel_left _ hp₀]
-    exact Nat.div_lt_self (by grind) hp.1
+    k
+  termination_by n
+  decreasing_by apply Nat.div_lt_self <;> tauto
 
-def _root_.padicValNat (p n : ℕ) : ℕ := (maxPowDvdDiv p n).fst
+attribute [inherit_doc maxPowDiv] maxPowDiv.go
 
-def divMaxPow (n p : ℕ) : ℕ := (maxPowDvdDiv p n).snd
+end Nat
 
-theorem maxPowDvdDiv.go_spec {n p : ℕ} (hnp) :
-    (go n p hnp).2 * p ^ (go n p hnp).1 = n ∧ ¬p ∣ (go n p hnp).2 := by
-  fun_induction go with
-  | case1 p hp hmod e q heq hqp ih =>
-    rw [heq] at ih
-    rcases ih with ⟨rfl, hdvd⟩
-    have hp₀ : 0 < p := Nat.lt_trans Nat.one_pos hp.1
-    simp_all [← Nat.dvd_iff_mod_eq_zero, Nat.pow_add', ← Nat.mul_assoc, Nat.div_mul_cancel,
-      Nat.two_mul, Nat.mul_pow]
-  | case2 p hp hmod e q heq hqp ih =>
-    rw [heq] at ih
-    rcases ih with ⟨rfl, hdvd⟩
-    simp_all [Nat.dvd_iff_mod_eq_zero, Nat.two_mul, Nat.mul_pow, Nat.pow_add]
-  | case3 =>
-    simp_all [Nat.dvd_iff_mod_eq_zero]
+namespace Nat.maxPowDiv
 
-theorem maxPowDvdDiv_of_base_le_one {p : ℕ} (hp : p ≤ 1) (n : ℕ) : maxPowDvdDiv p n = (0, n) := by
-  simp [maxPowDvdDiv, Nat.not_lt_of_ge hp]
+theorem go_succ {k p n : ℕ} : go (k+1) p n = go k p n + 1 := by
+  induction k, p, n using go.induct
+  case case1 h ih =>
+    unfold go
+    simp only [if_pos h]
+    exact ih
+  case case2 h =>
+    unfold go
+    simp only [if_neg h]
+
+@[simp]
+theorem zero_base {n : ℕ} : maxPowDiv 0 n = 0 := by
+  dsimp [maxPowDiv]
+  rw [maxPowDiv.go]
+  simp
+
+@[simp]
+theorem zero {p : ℕ} : maxPowDiv p 0 = 0 := by
+  dsimp [maxPowDiv]
+  rw [maxPowDiv.go]
+  simp
+
+theorem base_mul_eq_succ {p n : ℕ} (hp : 1 < p) (hn : 0 < n) :
+    p.maxPowDiv (p*n) = p.maxPowDiv n + 1 := by
+  have : 0 < p := lt_trans (b := 1) (by simp) hp
+  dsimp [maxPowDiv]
+  rw [maxPowDiv.go, if_pos, mul_div_right _ this]
+  · apply go_succ
+  · refine ⟨hp, ?_, by simp⟩
+    apply Nat.mul_pos this hn
+
+theorem base_pow_mul {p n exp : ℕ} (hp : 1 < p) (hn : 0 < n) :
+    p.maxPowDiv (p ^ exp * n) = p.maxPowDiv n + exp := by
+  match exp with
+  | 0 => simp
+  | e + 1 =>
+    rw [Nat.pow_succ, mul_assoc, mul_comm, mul_assoc, base_mul_eq_succ hp, mul_comm,
+      base_pow_mul hp hn]
+    · ac_rfl
+    · apply Nat.mul_pos hn <| pow_pos (pos_of_gt hp) e
+
+theorem pow_dvd (p n : ℕ) : p ^ (p.maxPowDiv n) ∣ n := by
+  dsimp [maxPowDiv]
+  rw [go]
+  by_cases h : (1 < p ∧ 0 < n ∧ n % p = 0)
+  · have : n / p < n := by apply Nat.div_lt_self <;> aesop
+    rw [if_pos h]
+    have ⟨c,hc⟩ := pow_dvd p (n / p)
+    rw [go_succ, pow_succ]
+    nth_rw 2 [← mod_add_div' n p]
+    rw [h.right.right, zero_add]
+    exact ⟨c,by nth_rw 1 [hc]; ac_rfl⟩
+  · rw [if_neg h]
+    simp
+
+theorem le_of_dvd {p n pow : ℕ} (hp : 1 < p) (hn : 0 < n) (h : p ^ pow ∣ n) :
+    pow ≤ p.maxPowDiv n := by
+  have ⟨c, hc⟩ := h
+  have : 0 < c := by
+    apply Nat.pos_of_ne_zero
+    intro h'
+    rw [h',mul_zero] at hc
+    exact not_eq_zero_of_lt hn hc
+  simp [hc, base_pow_mul hp this]
+
+end maxPowDiv
+
+end Nat

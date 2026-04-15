@@ -3,6 +3,7 @@ Extracted from CategoryTheory/EffectiveEpi/Enough.lean
 Genuine: 5 of 7 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
 /-!
 
@@ -16,7 +17,7 @@ namespace CategoryTheory
 
 open Limits
 
-variable {C D : Type*} [Category* C] [Category* D] (F : C ⥤ D)
+variable {C D : Type*} [Category C] [Category D] (F : C ⥤ D)
 
 namespace Functor
 
@@ -40,9 +41,8 @@ noncomputable def effectiveEpiOverObj (X : D) : D :=
 noncomputable def effectiveEpiOver (X : D) : F.effectiveEpiOverObj X ⟶ X :=
   (EffectivelyEnough.presentation X).some.f
 
--- INSTANCE (free from Core): (X
-
-set_option backward.isDefEq.respectTransparency false in
+instance (X : D) : EffectiveEpi (F.effectiveEpiOver X) :=
+  (EffectivelyEnough.presentation X).some.effectiveEpi
 
 def equivalenceEffectivePresentation (e : C ≌ D) (X : D) :
     EffectivePresentation e.functor X where
@@ -50,7 +50,8 @@ def equivalenceEffectivePresentation (e : C ≌ D) (X : D) :
   f := e.counit.app _
   effectiveEpi := inferInstance
 
--- INSTANCE (free from Core): [IsEquivalence
+instance [IsEquivalence F] : EffectivelyEnough F where
+  presentation X := ⟨equivalenceEffectivePresentation F.asEquivalence X⟩
 
 end Functor
 

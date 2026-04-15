@@ -1,8 +1,10 @@
 /-
 Extracted from Probability/Distributions/Geometric.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Probability.ProbabilityMassFunction.Basic
+import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 
 /-! # Geometric distributions over ℕ
 
@@ -29,7 +31,7 @@ section GeometricPMF
 
 noncomputable
 
-def geometricPMFReal (p : ℝ) (n : ℕ) : ℝ := (1 - p) ^ n * p
+def geometricPMFReal (p : ℝ) (n : ℕ) : ℝ := (1-p) ^ n * p
 
 lemma geometricPMFRealSum (hp_pos : 0 < p) (hp_le_one : p ≤ 1) :
     HasSum (fun n ↦ geometricPMFReal p n) 1 := by
@@ -43,12 +45,14 @@ lemma geometricPMFRealSum (hp_pos : 0 < p) (hp_le_one : p ≤ 1) :
 lemma geometricPMFReal_pos {n : ℕ} (hp_pos : 0 < p) (hp_lt_one : p < 1) :
     0 < geometricPMFReal p n := by
   rw [geometricPMFReal]
-  positivity [sub_pos.mpr hp_lt_one]
+  have : 0 < 1 - p := sub_pos.mpr hp_lt_one
+  positivity
 
 lemma geometricPMFReal_nonneg {n : ℕ} (hp_pos : 0 < p) (hp_le_one : p ≤ 1) :
     0 ≤ geometricPMFReal p n := by
   rw [geometricPMFReal]
-  positivity [sub_nonneg.mpr hp_le_one]
+  have : 0 ≤ 1 - p := sub_nonneg.mpr hp_le_one
+  positivity
 
 noncomputable
 
@@ -58,3 +62,24 @@ def geometricPMF (hp_pos : 0 < p) (hp_le_one : p ≤ 1) : PMF ℕ :=
     rw [← toNNReal_one]
     exact (geometricPMFRealSum hp_pos hp_le_one).toNNReal
       (fun n ↦ geometricPMFReal_nonneg hp_pos hp_le_one)⟩
+
+@[measurability]
+lemma measurable_geometricPMFReal : Measurable (geometricPMFReal p) := by
+  measurability
+
+@[measurability]
+lemma stronglyMeasurable_geometricPMFReal : StronglyMeasurable (geometricPMFReal p) :=
+  stronglyMeasurable_iff_measurable.mpr measurable_geometricPMFReal
+
+end GeometricPMF
+
+noncomputable
+
+def geometricMeasure (hp_pos : 0 < p) (hp_le_one : p ≤ 1) : Measure ℕ :=
+  (geometricPMF hp_pos hp_le_one).toMeasure
+
+lemma isProbabilityMeasureGeometric (hp_pos : 0 < p) (hp_le_one : p ≤ 1) :
+    IsProbabilityMeasure (geometricMeasure hp_pos hp_le_one) :=
+  PMF.toMeasure.isProbabilityMeasure (geometricPMF hp_pos hp_le_one)
+
+end ProbabilityTheory

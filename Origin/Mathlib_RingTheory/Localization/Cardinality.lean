@@ -1,8 +1,11 @@
 /-
 Extracted from RingTheory/Localization/Cardinality.lean
-Genuine: 5 of 5 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 of 8 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Localization.FractionRing
+import Mathlib.GroupTheory.MonoidLocalization.Cardinality
+import Mathlib.RingTheory.OreLocalization.Cardinality
 
 /-!
 # Cardinality of localizations
@@ -51,7 +54,11 @@ namespace Localization
 
 theorem cardinalMk {S : Submonoid R} (hS : S ≤ R⁰) : #(Localization S) = #R := by
   apply OreLocalization.cardinalMk
-  rwa [nonZeroDivisorsLeft_eq_nonZeroDivisors]
+  convert hS using 1
+  ext x
+  rw [mem_nonZeroDivisorsRight_iff, mem_nonZeroDivisors_iff]
+  congr! 3
+  rw [mul_comm]
 
 end Localization
 
@@ -69,3 +76,23 @@ theorem cardinalMk (L : Type u) [CommRing L] [Algebra R L]
   simpa using lift_cardinalMk L S hS
 
 end IsLocalization
+
+@[simp]
+theorem Cardinal.mk_fractionRing (R : Type u) [CommRing R] : #(FractionRing R) = #R :=
+  IsLocalization.cardinalMk (FractionRing R) R⁰ le_rfl
+
+alias FractionRing.cardinalMk := Cardinal.mk_fractionRing
+
+namespace IsFractionRing
+
+variable (R L)
+
+theorem lift_cardinalMk [IsFractionRing R L] : Cardinal.lift.{u} #L = Cardinal.lift.{v} #R :=
+  IsLocalization.lift_cardinalMk L _ le_rfl
+
+theorem cardinalMk (L : Type u) [CommRing L] [Algebra R L] [IsFractionRing R L] : #L = #R :=
+  IsLocalization.cardinalMk L _ le_rfl
+
+end IsFractionRing
+
+end CommRing

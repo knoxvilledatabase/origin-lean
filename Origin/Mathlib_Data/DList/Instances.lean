@@ -1,8 +1,11 @@
 /-
 Extracted from Data/DList/Instances.lean
-Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
+Genuine: 1 of 4 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Batteries.Data.DList.Lemmas
+import Mathlib.Control.Traversable.Equiv
+import Mathlib.Control.Traversable.Instances
 
 /-!
 # Traversable instance for DLists
@@ -23,8 +26,13 @@ def DList.listEquivDList : List α ≃ DList α where
   left_inv _ := DList.toList_ofList _
   right_inv _ := DList.ofList_toList _
 
--- INSTANCE (free from Core): :
+instance : Traversable DList :=
+  Equiv.traversable DList.listEquivDList
 
--- INSTANCE (free from Core): :
+instance : LawfulTraversable DList :=
+  Equiv.isLawfulTraversable DList.listEquivDList
+
+instance {α} : Inhabited (DList α) :=
+  ⟨DList.empty⟩
 
 end Batteries

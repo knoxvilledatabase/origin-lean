@@ -3,6 +3,7 @@ Extracted from Topology/ContinuousMap/SecondCountableSpace.lean
 Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Topology.CompactOpen
 
 /-!
 # Second countable topology on `C(X, Y)`
@@ -35,7 +36,7 @@ theorem compactOpen_eq_generateFrom {S : Set (Set X)} {T : Set (Set Y)}
     intro K (hK : IsCompact K) U (hU : IsOpen U) hfKU
     simp only [TopologicalSpace.nhds_generateFrom]
     obtain ⟨t, htT, htf, hTU, hKT⟩ : ∃ t ⊆ T, t.Finite ∧ (∀ V ∈ t, V ⊆ U) ∧ f '' K ⊆ ⋃₀ t := by
-      rw [hT.open_eq_sUnion' hU, mapsTo_iff_image_subset, sUnion_eq_biUnion] at hfKU
+      rw [hT.open_eq_sUnion' hU, mapsTo', sUnion_eq_biUnion] at hfKU
       obtain ⟨t, ht, hfin, htK⟩ :=
         (hK.image (map_continuous f)).elim_finite_subcover_image (fun V hV ↦ hT.isOpen hV.1) hfKU
       refine ⟨t, fun _ h ↦ (ht h).1, hfin, fun _ h ↦ (ht h).2, ?_⟩
@@ -72,8 +73,32 @@ theorem secondCountableTopology [SecondCountableTopology Y]
       apply hS
       exacts [isOpen_of_mem_countableBasis hV, hx]
 
--- INSTANCE (free from Core): instSecondCountableTopology
+instance instSecondCountableTopology [SecondCountableTopology X] [LocallyCompactSpace X]
+    [SecondCountableTopology Y] : SecondCountableTopology C(X, Y) := by
+  apply secondCountableTopology
+  have (U : countableBasis X) : LocallyCompactSpace U.1 :=
+    (isOpen_of_mem_countableBasis U.2).locallyCompactSpace
+  set K := fun U : countableBasis X ↦ CompactExhaustion.choice U.1
+  use ⋃ U : countableBasis X, Set.range fun n ↦ K U n
+  refine ⟨countable_iUnion fun _ ↦ countable_range _, ?_, ?_⟩
+  · simp only [mem_iUnion, mem_range]
+    rintro K ⟨U, n, rfl⟩
+    exact ((K U).isCompact _).image continuous_subtype_val
+  · intro f V hVo x hxV
+    obtain ⟨U, hU, hxU, hUV⟩ : ∃ U ∈ countableBasis X, x ∈ U ∧ U ⊆ f ⁻¹' V := by
+      rw [← (isBasis_countableBasis _).mem_nhds_iff]
+      exact (hVo.preimage (map_continuous f)).mem_nhds hxV
+    lift x to U using hxU
+    lift U to countableBasis X using hU
+    rcases (K U).exists_mem_nhds x with ⟨n, hn⟩
+    refine ⟨K U n, mem_iUnion.2 ⟨U, mem_range_self _⟩, ?_, ?_⟩
+    · rw [← map_nhds_subtype_coe_eq_nhds x.2]
+      exacts [image_mem_map hn, (isOpen_of_mem_countableBasis U.2).mem_nhds x.2]
+    · rw [mapsTo_image_iff]
+      exact fun y _ ↦ hUV y.2
 
--- INSTANCE (free from Core): instSeparableSpace
+instance instSeparableSpace [SecondCountableTopology X] [LocallyCompactSpace X]
+    [SecondCountableTopology Y] : SeparableSpace C(X, Y) :=
+  inferInstance
 
 end ContinuousMap

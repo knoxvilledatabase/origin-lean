@@ -1,8 +1,9 @@
 /-
 Extracted from GroupTheory/Perm/Closure.lean
-Genuine: 3 of 4 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.GroupTheory.Perm.Cycle.Basic
 
 /-!
 # Closure results for permutation groups
@@ -54,7 +55,7 @@ theorem closure_cycle_adjacent_swap {σ : Perm α} (h1 : IsCycle σ) (h2 : σ.su
     intro n
     induction n with
     | zero =>
-      simp only [pow_zero, coe_one, id_eq, swap_self]
+      simp only [pow_zero, coe_one, id_eq, swap_self, Set.mem_singleton_iff]
       convert H.one_mem
     | succ n ih =>
       by_cases h5 : x = (σ ^ n) x
@@ -71,7 +72,7 @@ theorem closure_cycle_adjacent_swap {σ : Perm α} (h1 : IsCycle σ) (h2 : σ.su
     rw [← h2, mem_support] at hx
     have hy : y ∈ univ := Finset.mem_univ y
     rw [← h2, mem_support] at hy
-    obtain ⟨n, hn⟩ := IsCycle.exists_pow_eq h1 hx hy
+    cases' IsCycle.exists_pow_eq h1 hx hy with n hn
     rw [← hn]
     exact step2 n
   have step4 : ∀ y z : α, swap y z ∈ H := by
@@ -93,7 +94,7 @@ theorem closure_cycle_coprime_swap {n : ℕ} {σ : Perm α} (h0 : Nat.Coprime n 
     (h1 : IsCycle σ) (h2 : σ.support = Finset.univ) (x : α) :
     closure ({σ, swap x ((σ ^ n) x)} : Set (Perm α)) = ⊤ := by
   rw [← Finset.card_univ, ← h2, ← h1.orderOf] at h0
-  obtain ⟨m, hm⟩ := exists_pow_eq_self_of_coprime h0
+  cases' exists_pow_eq_self_of_coprime h0 with m hm
   have h2' : (σ ^ n).support = univ := Eq.trans (support_pow_coprime h0) h2
   have h1' : IsCycle ((σ ^ n) ^ (m : ℤ)) := by rwa [← hm] at h1
   replace h1' : IsCycle (σ ^ n) :=
@@ -102,6 +103,19 @@ theorem closure_cycle_coprime_swap {n : ℕ} {σ : Perm α} (h0 : Nat.Coprime n 
   exact
     ⟨Subgroup.pow_mem (closure _) (subset_closure (Set.mem_insert σ _)) n,
       Set.singleton_subset_iff.mpr (subset_closure (Set.mem_insert_of_mem _ (Set.mem_singleton _)))⟩
+
+theorem closure_prime_cycle_swap {σ τ : Perm α} (h0 : (Fintype.card α).Prime) (h1 : IsCycle σ)
+    (h2 : σ.support = Finset.univ) (h3 : IsSwap τ) : closure ({σ, τ} : Set (Perm α)) = ⊤ := by
+  obtain ⟨x, y, h4, h5⟩ := h3
+  obtain ⟨i, hi⟩ :=
+    h1.exists_pow_eq (mem_support.mp ((Finset.ext_iff.mp h2 x).mpr (Finset.mem_univ x)))
+      (mem_support.mp ((Finset.ext_iff.mp h2 y).mpr (Finset.mem_univ y)))
+  rw [h5, ← hi]
+  refine closure_cycle_coprime_swap
+    (Nat.Coprime.symm (h0.coprime_iff_not_dvd.mpr fun h => h4 ?_)) h1 h2 x
+  cases' h with m hm
+  rwa [hm, pow_mul, ← Finset.card_univ, ← h2, ← h1.orderOf, pow_orderOf_eq_one, one_pow,
+    one_apply] at hi
 
 end Generation
 

@@ -3,6 +3,8 @@ Extracted from Topology/Sheaves/SheafOfFunctions.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Sheaves.PresheafOfFunctions
+import Mathlib.Topology.Sheaves.SheafCondition.UniqueGluing
 
 /-!
 # Sheaf conditions for presheaves of (continuous) functions.
@@ -13,29 +15,30 @@ We show that
 
 For
 * `Top.sheafToTop`: continuous functions into a topological space form a sheaf
-
-please see `Mathlib/Topology/Sheaves/LocalPredicate.lean`, where we set up a general framework
+please see `Topology/Sheaves/LocalPredicate.lean`, where we set up a general framework
 for constructing sub(pre)sheaves of the sheaf of dependent functions.
 
 ## Future work
 Obviously there's more to do:
 * sections of a fiber bundle
-* various classes of smooth and structure-preserving functions
+* various classes of smooth and structure preserving functions
 * functions into spaces with algebraic structure, which the sections inherit
 -/
 
 open CategoryTheory Limits TopologicalSpace Opens
 
+universe u
+
 noncomputable section
 
-variable (X : TopCat)
+variable (X : TopCat.{u})
 
 open TopCat
 
 namespace TopCat.Presheaf
 
-theorem toTypes_isSheaf (T : X → Type*) : (presheafToTypes X T).IsSheaf :=
-  isSheaf_of_isSheafUniqueGluing_types _ fun ι U sf hsf => by
+theorem toTypes_isSheaf (T : X → Type u) : (presheafToTypes X T).IsSheaf :=
+  isSheaf_of_isSheafUniqueGluing_types.{u} _ fun ι U sf hsf => by
   -- We use the sheaf condition in terms of unique gluing
   -- U is a family of open sets, indexed by `ι` and `sf` is a compatible family of sections.
   -- In the informal comments below, I'll just write `U` to represent the union.
@@ -62,17 +65,17 @@ theorem toTypes_isSheaf (T : X → Type*) : (presheafToTypes X T).IsSheaf :=
       funext x
       exact congr_fun (ht (index x)) ⟨x.1, index_spec x⟩
 
-theorem toType_isSheaf (T : Type*) : (presheafToType X T).IsSheaf :=
+theorem toType_isSheaf (T : Type u) : (presheafToType X T).IsSheaf :=
   toTypes_isSheaf X fun _ => T
 
 end TopCat.Presheaf
 
 namespace TopCat
 
-def sheafToTypes (T : X → Type*) : Sheaf (Type _) X :=
+def sheafToTypes (T : X → Type u) : Sheaf (Type u) X :=
   ⟨presheafToTypes X T, Presheaf.toTypes_isSheaf _ _⟩
 
-def sheafToType (T : Type*) : Sheaf (Type _) X :=
+def sheafToType (T : Type u) : Sheaf (Type u) X :=
   ⟨presheafToType X T, Presheaf.toType_isSheaf _ _⟩
 
 end TopCat

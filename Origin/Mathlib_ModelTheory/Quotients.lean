@@ -3,6 +3,8 @@ Extracted from ModelTheory/Quotients.lean
 Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Fintype.Quotient
+import Mathlib.ModelTheory.Semantics
 
 /-!
 # Quotients of First-Order Structures
@@ -28,7 +30,6 @@ open FirstOrder
 open Structure
 
 class Prestructure (s : Setoid M) where
-  /-- The underlying first-order structure -/
   toStructure : L.Structure M
   fun_equiv : ∀ {n} {f : L.Functions n} (x y : Fin n → M), x ≈ y → funMap f x ≈ funMap f y
   rel_equiv : ∀ {n} {r : L.Relations n} (x y : Fin n → M) (_ : x ≈ y), RelMap r x = RelMap r y
@@ -37,7 +38,11 @@ variable {L} {s : Setoid M}
 
 variable [ps : L.Prestructure s]
 
--- INSTANCE (free from Core): quotientStructure
+instance quotientStructure : L.Structure (Quotient s) where
+  funMap {n} f x :=
+    Quotient.map (@funMap L M ps.toStructure n f) Prestructure.fun_equiv (Quotient.finChoice x)
+  RelMap {n} r x :=
+    Quotient.lift (@RelMap L M ps.toStructure n r) Prestructure.rel_equiv (Quotient.finChoice x)
 
 variable (s)
 

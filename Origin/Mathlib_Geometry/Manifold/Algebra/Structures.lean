@@ -3,41 +3,51 @@ Extracted from Geometry/Manifold/Algebra/Structures.lean
 Genuine: 2 of 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
+import Mathlib.Geometry.Manifold.Algebra.LieGroup
 
 /-!
-# `C^n` structures
+# Smooth structures
 
-In this file we define `C^n` structures that build on Lie groups. We prefer using the
-term `ContMDiffRing` instead of Lie mainly because Lie ring has currently another use
-in mathematics.
+In this file we define smooth structures that build on Lie groups. We prefer using the term smooth
+instead of Lie mainly because Lie ring has currently another use in mathematics.
 -/
 
 open scoped Manifold ContDiff
 
-section ContMDiffRing
+section SmoothRing
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H] {E : Type*}
-  [NormedAddCommGroup E] [NormedSpace 𝕜 E] {n : WithTop ℕ∞}
+  [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
-class ContMDiffRing (I : ModelWithCorners 𝕜 E H) (n : WithTop ℕ∞)
-    (R : Type*) [Semiring R] [TopologicalSpace R] [ChartedSpace H R] : Prop
-    extends ContMDiffAdd I n R where
-  contMDiff_mul : CMDiff n fun p : R × R => p.1 * p.2
+class SmoothRing (I : ModelWithCorners 𝕜 E H) (R : Type*) [Semiring R] [TopologicalSpace R]
+    [ChartedSpace H R] extends SmoothAdd I R : Prop where
+  smooth_mul : ContMDiff (I.prod I) I ⊤ fun p : R × R => p.1 * p.2
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) SmoothRing.toSmoothMul (I : ModelWithCorners 𝕜 E H) (R : Type*)
+    [Semiring R] [TopologicalSpace R] [ChartedSpace H R] [h : SmoothRing I R] :
+    SmoothMul I R :=
+  { h with }
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) SmoothRing.toLieAddGroup (I : ModelWithCorners 𝕜 E H) (R : Type*)
+    [Ring R] [TopologicalSpace R] [ChartedSpace H R] [SmoothRing I R] : LieAddGroup I R where
+  compatible := StructureGroupoid.compatible (contDiffGroupoid ∞ I)
+  smooth_add := contMDiff_add I
+  smooth_neg := by simpa only [neg_one_mul] using contMDiff_mul_left (G := R) (a := -1)
 
-end ContMDiffRing
+end SmoothRing
 
-set_option backward.isDefEq.respectTransparency false in
-
--- INSTANCE (free from Core): (priority
+instance (priority := 100) fieldSmoothRing {𝕜 : Type*} [NontriviallyNormedField 𝕜] :
+    SmoothRing 𝓘(𝕜) 𝕜 :=
+  { normedSpaceLieAddGroup with
+    smooth_mul := by
+      rw [contMDiff_iff]
+      refine ⟨continuous_mul, fun x y => ?_⟩
+      simp only [mfld_simps]
+      rw [contDiffOn_univ]
+      exact contDiff_mul }
 
 variable {𝕜 R E H : Type*} [TopologicalSpace R] [TopologicalSpace H] [NontriviallyNormedField 𝕜]
   [NormedAddCommGroup E] [NormedSpace 𝕜 E] [ChartedSpace H R] (I : ModelWithCorners 𝕜 E H)
-  (n : WithTop ℕ∞)
 
-theorem topologicalSemiring_of_contMDiffRing [Semiring R] [ContMDiffRing I n R] :
-    IsTopologicalSemiring R :=
-  { continuousMul_of_contMDiffMul I n, continuousAdd_of_contMDiffAdd I n with }
+theorem topologicalSemiring_of_smooth [Semiring R] [SmoothRing I R] : TopologicalSemiring R :=
+  { continuousMul_of_smooth I, continuousAdd_of_smooth I with }

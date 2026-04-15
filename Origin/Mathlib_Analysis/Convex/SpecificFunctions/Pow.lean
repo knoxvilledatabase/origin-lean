@@ -3,6 +3,8 @@ Extracted from Analysis/Convex/SpecificFunctions/Pow.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 
 /-!
 # Convexity properties of `rpow`
@@ -64,10 +66,10 @@ open NNReal
 lemma strictConcaveOn_rpow {p : ℝ} (hp₀ : 0 < p) (hp₁ : p < 1) :
     StrictConcaveOn ℝ (Set.Ici 0) fun x : ℝ ↦ x ^ p := by
   refine ⟨convex_Ici _, fun x hx y hy hxy a b ha hb hab => ?_⟩
-  let x' : ℝ≥0 := .mk x hx
-  let y' : ℝ≥0 := .mk y hy
-  let a' : ℝ≥0 := .mk a ha.le
-  let b' : ℝ≥0 := .mk b hb.le
+  let x' : ℝ≥0 := ⟨x, hx⟩
+  let y' : ℝ≥0 := ⟨y, hy⟩
+  let a' : ℝ≥0 := ⟨a, ha.le⟩
+  let b' : ℝ≥0 := ⟨b, hb.le⟩
   have hxy' : x' ≠ y' := Subtype.coe_ne_coe.1 hxy
   have hab' : a' + b' = 1 := by ext; simp [a', b', hab]
   exact_mod_cast (NNReal.strictConcaveOn_rpow hp₀ hp₁).2 (Set.mem_univ x') (Set.mem_univ y')

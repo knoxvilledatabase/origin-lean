@@ -1,74 +1,21 @@
 /-
 Extracted from LinearAlgebra/Matrix/InvariantBasisNumber.lean
-Genuine: 6 of 11 | Dissolved: 0 | Infrastructure: 5
+Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.LinearAlgebra.Matrix.ToLin
+import Mathlib.LinearAlgebra.InvariantBasisNumber
 
 /-!
 # Invertible matrices over a ring with invariant basis number are square.
 -/
 
-open Function Matrix LinearMap
-
-variable {R : Type*} [Semiring R]
-
--- INSTANCE (free from Core): (priority
-
--- INSTANCE (free from Core): (priority
-
-theorem rankCondition_iff_le_of_comp_eq_one : RankCondition R ↔ ∀ n m
-    (f : (Fin n → R) →ₗ[R] Fin m → R) (g : (Fin m → R) →ₗ[R] Fin n → R), f ∘ₗ g = 1 → m ≤ n :=
-  (rankCondition_iff R).trans ⟨fun h _ _ f _ eq ↦ h f (surjective_of_comp_eq_id _ _ eq),
-    fun h _ _ _ hf ↦ have ⟨_, eq⟩ := Module.projective_lifting_property _ .id hf; h _ _ _ _ eq⟩
-
-theorem rankCondition_iff_matrix : RankCondition R ↔ ∀ n m
-    (f : Matrix (Fin n) (Fin m) R) (g : Matrix (Fin m) (Fin n) R), g * f = 1 → m ≤ n := by
-  simp_rw [rankCondition_iff_le_of_comp_eq_one, ← toLinearMapRight'.toEquiv
-    |>.forall_congr_right, LinearEquiv.coe_toEquiv, ← toLinearMapRight'_mul,
-    Module.End.one_eq_id, ← toLinearMapRight'_one, toLinearMapRight'.injective.eq_iff]
-
-theorem invariantBasisNumber_iff_matrix : InvariantBasisNumber R ↔ ∀ n m
-    (f : Matrix (Fin n) (Fin m) R) (g : Matrix (Fin m) (Fin n) R), f * g = 1 → g * f = 1 → n = m :=
-  (invariantBasisNumber_iff R).trans <| .intro (fun h n m f g hfg hgf ↦
-      h (toLinearEquivRight'OfInv hfg hgf).symm) fun h n m e ↦ h n m (toMatrixRight' e)
-    (toMatrixRight' e.symm) (by simp [← toMatrixRight'_comp]) (by simp [← toMatrixRight'_comp])
-
-protected theorem MulOpposite.rankCondition_iff : RankCondition Rᵐᵒᵖ ↔ RankCondition R := by
-  simp_rw [rankCondition_iff_matrix, ← opEquiv.mapMatrix.forall_congr_right,
-    ← opEquiv.mapMatrix.symm.injective.eq_iff]
-  congr! 2 with n m
-  refine forall_comm.trans <| .trans (forall_congr' ?_) (transposeAddEquiv ..).forall_congr_right
-  refine fun f ↦ .trans (forall_congr' fun g ↦ ?_) (transposeAddEquiv ..).forall_congr_right
-  rw [← (transposeAddEquiv ..).injective.eq_iff]
-  congrm (?_ = ?_ → _)
-  · ext; simp [map, mul_apply]
-  · simp
-
-protected theorem MulOpposite.invariantBasisNumber_iff :
-    InvariantBasisNumber Rᵐᵒᵖ ↔ InvariantBasisNumber R := by
-  simp_rw [invariantBasisNumber_iff_matrix, ← opEquiv.mapMatrix.forall_congr_right,
-    ← opEquiv.mapMatrix.symm.injective.eq_iff]
-  congr! 2 with n m
-  refine forall_comm.trans <| .trans (forall_congr' ?_) (transposeAddEquiv ..).forall_congr_right
-  refine fun f ↦ .trans (forall_congr' fun g ↦ ?_) (transposeAddEquiv ..).forall_congr_right
-  rw [← (transposeAddEquiv ..).injective.eq_iff, ← (transposeAddEquiv (Fin m) ..).injective.eq_iff]
-  congrm (?_ = ?_ → ?_ = ?_ → _)
-  iterate 2 ext; simp [map, mul_apply]; simp
-
--- INSTANCE (free from Core): [RankCondition
-
--- INSTANCE (free from Core): [InvariantBasisNumber
-
-end
-
 variable {n m : Type*} [Fintype n] [DecidableEq n] [Fintype m] [DecidableEq m]
 
 variable {R : Type*} [Semiring R] [InvariantBasisNumber R]
 
+open Matrix
+
 theorem Matrix.square_of_invertible (M : Matrix n m R) (N : Matrix m n R) (h : M * N = 1)
     (h' : N * M = 1) : Fintype.card n = Fintype.card m :=
   card_eq_of_linearEquiv R (Matrix.toLinearEquivRight'OfInv h' h)
-
-open Function in
-
--- INSTANCE (free from Core): (priority

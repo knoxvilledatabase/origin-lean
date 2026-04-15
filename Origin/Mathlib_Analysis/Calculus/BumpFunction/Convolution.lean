@@ -3,6 +3,12 @@ Extracted from Analysis/Calculus/BumpFunction/Convolution.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Convolution
+import Mathlib.Analysis.Calculus.BumpFunction.Normed
+import Mathlib.MeasureTheory.Integral.Average
+import Mathlib.MeasureTheory.Covering.Differentiation
+import Mathlib.MeasureTheory.Covering.BesicovitchVectorSpace
+import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
 # Convolution with a bump function
@@ -40,21 +46,24 @@ namespace ContDiffBump
 
 variable {G : Type uG} {E' : Type uE'} [NormedAddCommGroup E'] {g : G → E'} [MeasurableSpace G]
   {μ : MeasureTheory.Measure G} [NormedSpace ℝ E'] [NormedAddCommGroup G] [NormedSpace ℝ G]
-  [CompleteSpace E'] {φ : ContDiffBump (0 : G)} {x₀ : G}
+  [HasContDiffBump G] [CompleteSpace E'] {φ : ContDiffBump (0 : G)} {x₀ : G}
 
-theorem convolution_eq_right [HasContDiffBump G] {x₀ : G} (hg : ∀ x ∈ ball x₀ φ.rOut, g x = g x₀) :
+theorem convolution_eq_right {x₀ : G} (hg : ∀ x ∈ ball x₀ φ.rOut, g x = g x₀) :
     (φ ⋆[lsmul ℝ ℝ, μ] g : G → E') x₀ = integral μ φ • g x₀ := by
   simp_rw [convolution_eq_right' _ φ.support_eq.subset hg, lsmul_apply, integral_smul_const]
 
-variable [BorelSpace G] [FiniteDimensional ℝ G]
+variable [BorelSpace G]
 
-theorem normed_convolution_eq_right [IsLocallyFiniteMeasure μ] [μ.IsOpenPosMeasure] {x₀ : G}
-    (hg : ∀ x ∈ ball x₀ φ.rOut, g x = g x₀) :
+variable [IsLocallyFiniteMeasure μ] [μ.IsOpenPosMeasure]
+
+variable [FiniteDimensional ℝ G]
+
+theorem normed_convolution_eq_right {x₀ : G} (hg : ∀ x ∈ ball x₀ φ.rOut, g x = g x₀) :
     (φ.normed μ ⋆[lsmul ℝ ℝ, μ] g : G → E') x₀ = g x₀ := by
   rw [convolution_eq_right' _ φ.support_normed_eq.subset hg]
   exact integral_normed_smul φ μ (g x₀)
 
-variable [μ.IsAddHaarMeasure]
+variable [μ.IsAddLeftInvariant]
 
 theorem dist_normed_convolution_le {x₀ : G} {ε : ℝ} (hmg : AEStronglyMeasurable g μ)
     (hg : ∀ x ∈ ball x₀ φ.rOut, dist (g x) (g x₀) ≤ ε) :
@@ -82,6 +91,7 @@ theorem ae_convolution_tendsto_right_of_locallyIntegrable
     (hφ : Tendsto (fun i ↦ (φ i).rOut) l (𝓝 0))
     (h'φ : ∀ᶠ i in l, (φ i).rOut ≤ K * (φ i).rIn) (hg : LocallyIntegrable g μ) : ∀ᵐ x₀ ∂μ,
     Tendsto (fun i ↦ ((φ i).normed μ ⋆[lsmul ℝ ℝ, μ] g) x₀) l (𝓝 (g x₀)) := by
+  have : IsAddHaarMeasure μ := ⟨⟩
   -- By Lebesgue differentiation theorem, the average of `g` on a small ball converges
   -- almost everywhere to the value of `g` as the radius shrinks to zero.
   -- We will see that this set of points satisfies the desired conclusion.
@@ -90,7 +100,7 @@ theorem ae_convolution_tendsto_right_of_locallyIntegrable
   have hφ' : Tendsto (fun i ↦ (φ i).rOut) l (𝓝[>] 0) :=
     tendsto_nhdsWithin_iff.2 ⟨hφ, Eventually.of_forall (fun i ↦ (φ i).rOut_pos)⟩
   have := (h₀.comp (Besicovitch.tendsto_filterAt μ x₀)).comp hφ'
-  simp only at this
+  simp only [Function.comp] at this
   apply tendsto_integral_smul_of_tendsto_average_norm_sub (K ^ (Module.finrank ℝ G)) this
   · filter_upwards with i using
       hg.integrableOn_isCompact (isCompact_closedBall _ _)
@@ -104,7 +114,7 @@ theorem ae_convolution_tendsto_right_of_locallyIntegrable
     simp only [mem_preimage, mem_ball, dist_zero_right] at hx
     simpa [dist_eq_norm_sub'] using hx.le
   · filter_upwards [h'φ] with i hi x
-    rw [abs_of_nonneg (nonneg_normed _ _), addHaar_real_closedBall_center]
+    rw [abs_of_nonneg (nonneg_normed _ _), addHaar_closedBall_center]
     exact (φ i).normed_le_div_measure_closedBall_rOut _ _ hi _
 
 end ContDiffBump

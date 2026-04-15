@@ -1,19 +1,22 @@
 /-
 Extracted from Algebra/CharP/Basic.lean
-Genuine: 11 of 21 | Dissolved: 4 | Infrastructure: 6
+Genuine: 7 of 19 | Dissolved: 4 | Infrastructure: 8
 -/
 import Origin.Core
+import Mathlib.RingTheory.SimpleRing.Basic
+import Mathlib.Algebra.CharP.Defs
+import Mathlib.Algebra.Group.Fin.Basic
+import Mathlib.Algebra.Group.ULift
+import Mathlib.Data.Nat.Cast.Prod
 
 /-!
 # Characteristic of semirings
 
 This file collects some fundamental results on the characteristic of rings that don't need the extra
-imports of `Mathlib/Algebra/CharP/Lemmas.lean`.
+imports of `CharP/Lemmas.lean`.
 
 As such, we can probably reorganize and find a better home for most of these lemmas.
 -/
-
-assert_not_exists Finset TwoSidedIdeal
 
 open Set
 
@@ -27,23 +30,7 @@ variable [AddMonoidWithOne R] (p : ℕ)
 
 variable [CharP R p] {a b : ℕ}
 
-lemma natCast_eq_natCast' (h : a ≡ b [MOD p]) : (a : R) = b := by
-  wlog hle : a ≤ b
-  · exact (this R p h.symm (le_of_not_ge hle)).symm
-  rw [Nat.modEq_iff_dvd' hle] at h
-  rw [← Nat.sub_add_cancel hle, Nat.cast_add, (cast_eq_zero_iff R p _).mpr h, zero_add]
-
-lemma natCast_eq_natCast_mod (a : ℕ) : (a : R) = a % p :=
-  natCast_eq_natCast' R p (Nat.mod_modEq a p).symm
-
 variable [IsRightCancelAdd R]
-
-lemma natCast_eq_natCast : (a : R) = b ↔ a ≡ b [MOD p] := by
-  wlog hle : a ≤ b
-  · rw [eq_comm, this R p (le_of_not_ge hle), Nat.ModEq.comm]
-  rw [Nat.modEq_iff_dvd' hle, ← cast_eq_zero_iff R p (b - a),
-    ← add_right_cancel_iff (G := R) (a := a) (b := b - a), zero_add, ← Nat.cast_add,
-    Nat.sub_add_cancel hle, eq_comm]
 
 lemma natCast_injOn_Iio : (Set.Iio p).InjOn ((↑) : ℕ → R) :=
   fun _a ha _b hb hab ↦ ((natCast_eq_natCast _ _).1 hab).eq_of_lt_of_lt ha hb
@@ -53,12 +40,6 @@ end AddMonoidWithOne
 section AddGroupWithOne
 
 variable [AddGroupWithOne R] (p : ℕ) [CharP R p] {a b : ℤ}
-
-lemma intCast_eq_intCast : (a : R) = b ↔ a ≡ b [ZMOD p] := by
-  rw [eq_comm, ← sub_eq_zero, ← Int.cast_sub, CharP.intCast_eq_zero_iff R p, Int.modEq_iff_dvd]
-
-lemma intCast_eq_intCast_mod : (a : R) = a % (p : ℤ) :=
-  (CharP.intCast_eq_intCast R p).mpr (Int.mod_modEq a p).symm
 
 lemma intCast_injOn_Ico [IsRightCancelAdd R] : InjOn (Int.cast : ℤ → R) (Ico 0 p) := by
   rintro a ⟨ha₀, ha⟩ b ⟨hb₀, hb⟩ hab
@@ -70,6 +51,10 @@ lemma intCast_injOn_Ico [IsRightCancelAdd R] : InjOn (Int.cast : ℤ → R) (Ico
 end AddGroupWithOne
 
 end CharP
+
+lemma RingHom.charP_iff_charP {K L : Type*} [DivisionRing K] [Semiring L] [Nontrivial L]
+    (f : K →+* L) (p : ℕ) : CharP K p ↔ CharP L p := by
+  simp only [charP_iff, ← f.injective.eq_iff, map_natCast f, map_zero f]
 
 namespace CharP
 
@@ -94,6 +79,8 @@ end NonAssocSemiring
 
 end CharP
 
+section
+
 -- DISSOLVED: Ring.two_ne_zero
 
 -- DISSOLVED: Ring.neg_one_ne_one_of_char_ne_two
@@ -111,19 +98,28 @@ section Prod
 
 variable (S : Type*) [AddMonoidWithOne R] [AddMonoidWithOne S] (p q : ℕ) [CharP R p]
 
--- INSTANCE (free from Core): Nat.lcm.charP
+instance Nat.lcm.charP [CharP S q] : CharP (R × S) (Nat.lcm p q) where
+  cast_eq_zero_iff' := by
+    simp [Prod.ext_iff, CharP.cast_eq_zero_iff R p, CharP.cast_eq_zero_iff S q, Nat.lcm_dvd_iff]
 
--- INSTANCE (free from Core): Prod.charP
+instance Prod.charP [CharP S p] : CharP (R × S) p := by
+  convert Nat.lcm.charP R S p p; simp
 
--- INSTANCE (free from Core): Prod.charZero_of_left
+instance Prod.charZero_of_left [CharZero R] : CharZero (R × S) where
+  cast_injective _ _ h := CharZero.cast_injective congr(Prod.fst $h)
 
--- INSTANCE (free from Core): Prod.charZero_of_right
+instance Prod.charZero_of_right [CharZero S] : CharZero (R × S) where
+  cast_injective _ _ h := CharZero.cast_injective congr(Prod.snd $h)
 
 end Prod
 
--- INSTANCE (free from Core): ULift.charP
+instance ULift.charP [AddMonoidWithOne R] (p : ℕ) [CharP R p] : CharP (ULift R) p where
+  cast_eq_zero_iff' n := Iff.trans ULift.ext_iff <| CharP.cast_eq_zero_iff R p n
 
--- INSTANCE (free from Core): MulOpposite.charP
+instance MulOpposite.charP [AddMonoidWithOne R] (p : ℕ) [CharP R p] : CharP Rᵐᵒᵖ p where
+  cast_eq_zero_iff' n := MulOpposite.unop_inj.symm.trans <| CharP.cast_eq_zero_iff R p n
+
+section
 
 lemma Int.cast_injOn_of_ringChar_ne_two {R : Type*} [NonAssocRing R] [Nontrivial R]
     (hR : ringChar R ≠ 2) : ({0, 1, -1} : Set ℤ).InjOn ((↑) : ℤ → R) := by
@@ -143,4 +139,20 @@ end CharZero
 
 namespace Fin
 
-open Fin.NatCast
+@[stacks 09FS "First part. We don't require `p` to be a prime in mathlib."]
+instance charP (n : ℕ) [NeZero n] : CharP (Fin n) n where cast_eq_zero_iff' _ := natCast_eq_zero
+
+end Fin
+
+section AddMonoidWithOne
+
+variable [AddMonoidWithOne R]
+
+instance (S : Type*) [Semiring S] (p) [ExpChar R p] [ExpChar S p] : ExpChar (R × S) p := by
+  obtain hp | ⟨hp⟩ := ‹ExpChar R p›
+  · have := Prod.charZero_of_left R S; exact .zero
+  obtain _ | _ := ‹ExpChar S p›
+  · exact (Nat.not_prime_one hp).elim
+  · have := Prod.charP R S p; exact .prime hp
+
+end AddMonoidWithOne

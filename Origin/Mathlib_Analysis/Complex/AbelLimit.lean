@@ -3,6 +3,10 @@ Extracted from Analysis/Complex/AbelLimit.lean
 Genuine: 11 of 12 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.SpecificLimits.Normed
+import Mathlib.Tactic.Peel
+import Mathlib.Tactic.Positivity
 
 /-!
 # Abel's limit theorem
@@ -43,7 +47,7 @@ theorem stolzSet_empty {M : ℝ} (hM : M ≤ 1) : stolzSet M = ∅ := by
   rw [stolzSet, Set.mem_setOf, Set.mem_empty_iff_false, iff_false, not_and, not_lt, ← sub_pos]
   intro zn
   calc
-    _ ≤ 1 * (1 - ‖z‖) := by gcongr
+    _ ≤ 1 * (1 - ‖z‖) := mul_le_mul_of_nonneg_right hM zn.le
     _ = ‖(1 : ℂ)‖ - ‖z‖ := by rw [one_mul, norm_one]
     _ ≤ _ := norm_sub_norm_le _ _
 
@@ -52,35 +56,35 @@ theorem nhdsWithin_lt_le_nhdsWithin_stolzSet {M : ℝ} (hM : 1 < M) :
   rw [← tendsto_id']
   refine tendsto_map' <| tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within ofReal
     (tendsto_nhdsWithin_of_tendsto_nhds <| ofRealCLM.continuous.tendsto' 1 1 rfl) ?_
-  simp only [eventually_iff, mem_nhdsWithin]
-  refine ⟨Set.Ioo 0 2, isOpen_Ioo, by simp, fun x hx ↦ ?_⟩
-  push _ ∈ _ at hx
-  simp only [Set.mem_setOf_eq, stolzSet, ← ofReal_one, ← ofReal_sub, norm_real,
-    norm_of_nonneg hx.1.1.le, norm_of_nonneg <| (sub_pos.mpr hx.2).le]
+  simp only [eventually_iff, norm_eq_abs, abs_ofReal, abs_lt, mem_nhdsWithin]
+  refine ⟨Set.Ioo 0 2, isOpen_Ioo, by norm_num, fun x hx ↦ ?_⟩
+  simp only [Set.mem_inter_iff, Set.mem_Ioo, Set.mem_Iio] at hx
+  simp only [Set.mem_setOf_eq, stolzSet, ← ofReal_one, ← ofReal_sub, norm_eq_abs, abs_ofReal,
+    abs_of_pos hx.1.1, abs_of_pos <| sub_pos.mpr hx.2]
   exact ⟨hx.2, lt_mul_left (sub_pos.mpr hx.2) hM⟩
 
 private lemma stolzCone_subset_stolzSet_aux' (s : ℝ) :
     ∃ M ε, 0 < M ∧ 0 < ε ∧ ∀ x y, 0 < x → x < ε → |y| < s * x →
-      √(x ^ 2 + y ^ 2) < M * (1 - √((1 - x) ^ 2 + y ^ 2)) := by
-  refine ⟨2 * √(1 + s ^ 2) + 1, 1 / (1 + s ^ 2), by positivity, by positivity,
+      sqrt (x ^ 2 + y ^ 2) < M * (1 - sqrt ((1 - x) ^ 2 + y ^ 2)) := by
+  refine ⟨2 * sqrt (1 + s ^ 2) + 1, 1 / (1 + s ^ 2), by positivity, by positivity,
     fun x y hx₀ hx₁ hy ↦ ?_⟩
-  have H : √((1 - x) ^ 2 + y ^ 2) ≤ 1 - x / 2 := by
-    calc √((1 - x) ^ 2 + y ^ 2)
-      _ ≤ √((1 - x) ^ 2 + (s * x) ^ 2) := sqrt_le_sqrt <| by rw [← sq_abs y]; gcongr
-      _ = √(1 - 2 * x + (1 + s ^ 2) * x * x) := by congr 1; ring
-      _ ≤ √(1 - 2 * x + (1 + s ^ 2) * (1 / (1 + s ^ 2)) * x) := by gcongr
-      _ = √(1 - x) := by congr 1; field
+  have H : sqrt ((1 - x) ^ 2 + y ^ 2) ≤ 1 - x / 2 := by
+    calc sqrt ((1 - x) ^ 2 + y ^ 2)
+      _ ≤ sqrt ((1 - x) ^ 2 + (s * x) ^ 2) := sqrt_le_sqrt <| by rw [← _root_.sq_abs y]; gcongr
+      _ = sqrt (1 - 2 * x + (1 + s ^ 2) * x * x) := by congr 1; ring
+      _ ≤ sqrt (1 - 2 * x + (1 + s ^ 2) * (1 / (1 + s ^ 2)) * x) := sqrt_le_sqrt <| by gcongr
+      _ = sqrt (1 - x) := by congr 1; field_simp; ring
       _ ≤ 1 - x / 2 := by
         simp_rw [sub_eq_add_neg, ← neg_div]
         refine sqrt_one_add_le <| neg_le_neg_iff.mpr (hx₁.trans_le ?_).le
         rw [div_le_one (by positivity)]
         exact le_add_of_nonneg_right <| sq_nonneg s
-  calc √(x ^ 2 + y ^ 2)
-    _ ≤ √(x ^ 2 + (s * x) ^ 2) := by rw [← sq_abs y]; gcongr
-    _ = √((1 + s ^ 2) * x ^ 2) := by congr; ring
-    _ = √(1 + s ^ 2) * x := by rw [sqrt_mul' _ (sq_nonneg x), sqrt_sq hx₀.le]
-    _ = 2 * √(1 + s ^ 2) * (x / 2) := by ring
-    _ < (2 * √(1 + s ^ 2) + 1) * (x / 2) := by gcongr; exact lt_add_one _
+  calc sqrt (x ^ 2 + y ^ 2)
+    _ ≤ sqrt (x ^ 2 + (s * x) ^ 2) := sqrt_le_sqrt <| by rw [← _root_.sq_abs y]; gcongr
+    _ = sqrt ((1 + s ^ 2) * x ^ 2) := by congr; ring
+    _ = sqrt (1 + s ^ 2) * x := by rw [sqrt_mul' _ (sq_nonneg x), sqrt_sq hx₀.le]
+    _ = 2 * sqrt (1 + s ^ 2) * (x / 2) := by ring
+    _ < (2 * sqrt (1 + s ^ 2) + 1) * (x / 2) := by gcongr; exact lt_add_one _
     _ ≤ _ := by gcongr; exact le_sub_comm.mpr H
 
 lemma stolzCone_subset_stolzSet_aux {s : ℝ} (hs : 0 < s) :
@@ -92,9 +96,9 @@ lemma stolzCone_subset_stolzSet_aux {s : ℝ} (hs : 0 < s) :
   replace H :=
     H (1 - z).re z.im ((mul_pos_iff_of_pos_left hs).mp <| (abs_nonneg z.im).trans_lt hzr) hzl hzr
   have h : z.im ^ 2 = (1 - z).im ^ 2 := by
-    simp only [sub_im, one_im, zero_sub, neg_sq]
-  rw [h, ← norm_eq_sqrt_sq_add_sq, ← h, sub_re, one_re, sub_sub_cancel,
-    ← norm_eq_sqrt_sq_add_sq] at H
+    simp only [sub_im, one_im, zero_sub, even_two, neg_sq]
+  rw [h, ← abs_eq_sqrt_sq_add_sq, ← norm_eq_abs, ← h, sub_re, one_re, sub_sub_cancel,
+    ← abs_eq_sqrt_sq_add_sq, ← norm_eq_abs] at H
   exact ⟨sub_pos.mp <| (mul_pos_iff_of_pos_left hM).mp <| (norm_nonneg _).trans_lt H, H⟩
 
 lemma nhdsWithin_stolzCone_le_nhdsWithin_stolzSet {s : ℝ} (hs : 0 < s) :
@@ -109,11 +113,42 @@ end StolzSet
 
 variable {f : ℕ → ℂ} {l : ℂ}
 
+lemma abel_aux (h : Tendsto (fun n ↦ ∑ i ∈ range n, f i) atTop (𝓝 l)) {z : ℂ} (hz : ‖z‖ < 1) :
+    Tendsto (fun n ↦ (1 - z) * ∑ i ∈ range n, (l - ∑ j ∈ range (i + 1), f j) * z ^ i)
+      atTop (𝓝 (l - ∑' n, f n * z ^ n)) := by
+  let s := fun n ↦ ∑ i ∈ range n, f i
+  have k := h.sub (summable_powerSeries_of_norm_lt_one h.cauchySeq hz).hasSum.tendsto_sum_nat
+  simp_rw [← sum_sub_distrib, ← mul_one_sub, ← geom_sum_mul_neg, ← mul_assoc, ← sum_mul,
+    mul_comm, mul_sum _ _ (f _), range_eq_Ico, ← sum_Ico_Ico_comm', ← range_eq_Ico,
+    ← sum_mul] at k
+  conv at k =>
+    enter [1, n]
+    rw [sum_congr (g := fun j ↦ (∑ k ∈ range n, f k - ∑ k ∈ range (j + 1), f k) * z ^ j)
+      rfl (fun j hj ↦ by congr 1; exact sum_Ico_eq_sub _ (mem_range.mp hj))]
+  suffices Tendsto (fun n ↦ (l - s n) * ∑ i ∈ range n, z ^ i) atTop (𝓝 0) by
+    simp_rw [mul_sum] at this
+    replace this := (this.const_mul (1 - z)).add k
+    conv at this =>
+      enter [1, n]
+      rw [← mul_add, ← sum_add_distrib]
+      enter [2, 2, i]
+      rw [← add_mul, sub_add_sub_cancel]
+    rwa [mul_zero, zero_add] at this
+  rw [← zero_mul (-1 / (z - 1))]
+  apply Tendsto.mul
+  · simpa only [neg_zero, neg_sub] using (tendsto_sub_nhds_zero_iff.mpr h).neg
+  · conv =>
+      enter [1, n]
+      rw [geom_sum_eq (by contrapose! hz; simp [hz]), sub_div, sub_eq_add_neg, ← neg_div]
+    rw [← zero_add (-1 / (z - 1)), ← zero_div (z - 1)]
+    apply Tendsto.add (Tendsto.div_const (tendsto_pow_atTop_nhds_zero_of_norm_lt_one hz) (z - 1))
+    simp only [zero_div, zero_add, tendsto_const_nhds_iff]
+
 theorem tendsto_tsum_powerSeries_nhdsWithin_stolzSet
     (h : Tendsto (fun n ↦ ∑ i ∈ range n, f i) atTop (𝓝 l)) {M : ℝ} :
     Tendsto (fun z ↦ ∑' n, f n * z ^ n) (𝓝[stolzSet M] 1) (𝓝 l) := by
   -- If `M ≤ 1` the Stolz set is empty and the statement is trivial
-  rcases le_or_gt M 1 with hM | hM
+  cases' le_or_lt M 1 with hM hM
   · simp_rw [stolzSet_empty hM, nhdsWithin_empty, tendsto_bot]
   -- Abbreviations
   let s := fun n ↦ ∑ i ∈ range n, f i
@@ -176,7 +211,7 @@ theorem tendsto_tsum_powerSeries_nhdsWithin_stolzSet
         rw [← mul_sum, ← mul_assoc]
       _ ≤ ‖1 - z‖ * (ε / 4 / M) * ∑' i, ‖z‖ ^ i := by
         gcongr
-        exact Summable.sum_le_tsum _ (fun _ _ ↦ by positivity)
+        exact sum_le_tsum _ (fun _ _ ↦ by positivity)
           (summable_geometric_of_lt_one (by positivity) zn)
       _ = ‖1 - z‖ * (ε / 4 / M) / (1 - ‖z‖) := by
         rw [tsum_geometric_of_lt_one (by positivity) zn, ← div_eq_mul_inv]

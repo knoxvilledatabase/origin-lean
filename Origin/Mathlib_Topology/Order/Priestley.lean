@@ -3,6 +3,8 @@ Extracted from Topology/Order/Priestley.lean
 Genuine: 3 of 5 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Order.UpperLower.Basic
+import Mathlib.Topology.Separation.Basic
 
 /-!
 # Priestley spaces
@@ -54,6 +56,16 @@ section PartialOrder
 
 variable [PartialOrder α] [PriestleySpace α] {x y : α}
 
--- INSTANCE (free from Core): (priority
+theorem exists_isClopen_upper_or_lower_of_ne (h : x ≠ y) :
+    ∃ U : Set α, IsClopen U ∧ (IsUpperSet U ∨ IsLowerSet U) ∧ x ∈ U ∧ y ∉ U := by
+  obtain h | h := h.not_le_or_not_le
+  · exact (exists_isClopen_upper_of_not_le h).imp fun _ ↦ And.imp_right <| And.imp_left Or.inl
+  · obtain ⟨U, hU, hU', hy, hx⟩ := exists_isClopen_lower_of_not_le h
+    exact ⟨U, hU, Or.inr hU', hx, hy⟩
+
+instance (priority := 100) PriestleySpace.toT2Space : T2Space α :=
+  ⟨fun _ _ h ↦
+    let ⟨U, hU, _, hx, hy⟩ := exists_isClopen_upper_or_lower_of_ne h
+    ⟨U, Uᶜ, hU.isOpen, hU.compl.isOpen, hx, hy, disjoint_compl_right⟩⟩
 
 end PartialOrder

@@ -1,8 +1,10 @@
 /-
 Extracted from Data/Fintype/Sort.lean
-Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Sort
+import Mathlib.Data.Fintype.Basic
 
 /-!
 # Sorting a finite type
@@ -25,5 +27,15 @@ def finSumEquivOfFinset (hm : #s = m) (hn : #sᶜ = n) : Fin m ⊕ Fin n ≃ α 
   calc
     Fin m ⊕ Fin n ≃ (s : Set α) ⊕ (sᶜ : Set α) :=
       Equiv.sumCongr (s.orderIsoOfFin hm).toEquiv <|
-        (sᶜ.orderIsoOfFin hn).toEquiv.trans <| Equiv.setCongr s.coe_compl
+        (sᶜ.orderIsoOfFin hn).toEquiv.trans <| Equiv.Set.ofEq s.coe_compl
     _ ≃ α := Equiv.Set.sumCompl _
+
+@[simp]
+theorem finSumEquivOfFinset_inl (hm : #s = m) (hn : #sᶜ = n) (i : Fin m) :
+    finSumEquivOfFinset hm hn (Sum.inl i) = s.orderEmbOfFin hm i :=
+  rfl
+
+@[simp]
+theorem finSumEquivOfFinset_inr (hm : #s = m) (hn : #sᶜ = n) (i : Fin n) :
+    finSumEquivOfFinset hm hn (Sum.inr i) = sᶜ.orderEmbOfFin hn i :=
+  rfl

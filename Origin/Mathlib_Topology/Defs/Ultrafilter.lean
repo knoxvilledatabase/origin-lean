@@ -3,6 +3,10 @@ Extracted from Topology/Defs/Ultrafilter.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Defs.Basic
+import Mathlib.Order.Filter.Ultrafilter
+import Mathlib.Data.Set.Lattice
+import Mathlib.Topology.Defs.Filter
 
 /-!
 # Limit of an ultrafilter.

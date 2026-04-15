@@ -3,13 +3,15 @@ Extracted from CategoryTheory/Sites/LocallyBijective.lean
 Genuine: 10 of 14 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Sites.LocallySurjective
+import Mathlib.CategoryTheory.Sites.Localization
 
 /-!
 # Locally bijective morphisms of presheaves
 
-Let `C` be a category equipped with a Grothendieck topology `J`.
+Let `C` a be category equipped with a Grothendieck topology `J`.
 Let `A` be a concrete category.
-In this file, we introduce a type class `J.WEqualsLocallyBijective A` which says
+In this file, we introduce a type-class `J.WEqualsLocallyBijective A` which says
 that the class `J.W` (of morphisms of presheaves which become isomorphisms
 after sheafification) is the class of morphisms that are both locally injective
 and locally surjective (i.e. locally bijective). We prove that this holds iff
@@ -23,12 +25,11 @@ universe w' w v' v u' u
 namespace CategoryTheory
 
 variable {C : Type u} [Category.{v} C] {J : GrothendieckTopology C}
-
-variable {A : Type u'} [Category.{v'} A] {FA : A → A → Type*} {CA : A → Type w'}
-
-variable [∀ X Y, FunLike (FA X Y) (CA X) (CA Y)] [ConcreteCategory.{w'} A FA]
+  {A : Type u'} [Category.{v'} A] [ConcreteCategory.{w} A]
 
 namespace Sheaf
+
+section
 
 variable {F G : Sheaf J (Type w)} (f : F ⟶ G)
 
@@ -37,36 +38,38 @@ private lemma isLocallyBijective_iff_isIso' :
   constructor
   · rintro ⟨h₁, _⟩
     rw [isLocallyInjective_iff_injective] at h₁
-    suffices ∀ (X : Cᵒᵖ), Function.Surjective (f.hom.app X) by
+    suffices ∀ (X : Cᵒᵖ), Function.Surjective (f.val.app X) by
       rw [← isIso_iff_of_reflects_iso _ (sheafToPresheaf _ _), NatTrans.isIso_iff_isIso_app]
       intro X
       rw [isIso_iff_bijective]
       exact ⟨h₁ X, this X⟩
     intro X s
-    have H := (isSheaf_iff_isSheaf_of_type J F.obj).1 F.property _
-      (Presheaf.imageSieve_mem J f.hom s)
-    let t : Presieve.FamilyOfElements F.obj (Presheaf.imageSieve f.hom s).arrows :=
-      fun Y g hg => Presheaf.localPreimage f.hom s g hg
+    have H := (isSheaf_iff_isSheaf_of_type J F.val).1 F.cond _ (Presheaf.imageSieve_mem J f.val s)
+    let t : Presieve.FamilyOfElements F.val (Presheaf.imageSieve f.val s).arrows :=
+      fun Y g hg => Presheaf.localPreimage f.val s g hg
     have ht : t.Compatible := by
       intro Y₁ Y₂ W g₁ g₂ f₁ f₂ hf₁ hf₂ w
       apply h₁
-      have eq₁ := NatTrans.naturality_apply f.hom g₁.op (t f₁ hf₁)
-      have eq₂ := NatTrans.naturality_apply f.hom g₂.op (t f₂ hf₂)
-      have eq₃ := congr_arg (G.obj.map g₁.op) (Presheaf.app_localPreimage f.hom s _ hf₁)
-      have eq₄ := congr_arg (G.obj.map g₂.op) (Presheaf.app_localPreimage f.hom s _ hf₂)
+      have eq₁ := FunctorToTypes.naturality _ _ f.val g₁.op (t f₁ hf₁)
+      have eq₂ := FunctorToTypes.naturality _ _ f.val g₂.op (t f₂ hf₂)
+      have eq₃ := congr_arg (G.val.map g₁.op) (Presheaf.app_localPreimage f.val s _ hf₁)
+      have eq₄ := congr_arg (G.val.map g₂.op) (Presheaf.app_localPreimage f.val s _ hf₂)
       refine eq₁.trans (eq₃.trans (Eq.trans ?_ (eq₄.symm.trans eq₂.symm)))
-      rw [← Functor.map_comp_apply, ← Functor.map_comp_apply]
+      erw [← FunctorToTypes.map_comp_apply, ← FunctorToTypes.map_comp_apply]
       simp only [← op_comp, w]
     refine ⟨H.amalgamate t ht, ?_⟩
-    · apply (((isSheaf_iff_isSheaf_of_type J G.obj).1 G.property).isSeparated _
-        (Presheaf.imageSieve_mem J f.hom s)).ext
+    · apply (Presieve.isSeparated_of_isSheaf _ _
+        ((isSheaf_iff_isSheaf_of_type J G.val).1 G.cond) _
+        (Presheaf.imageSieve_mem J f.val s)).ext
       intro Y g hg
-      rw [← NatTrans.naturality_apply, H.valid_glue ht]
-      exact Presheaf.app_localPreimage f.hom s g hg
+      rw [← FunctorToTypes.naturality, H.valid_glue ht]
+      exact Presheaf.app_localPreimage f.val s g hg
   · intro
     constructor <;> infer_instance
 
 end
+
+section
 
 variable {F G : Sheaf J A} (f : F ⟶ G) [(forget A).ReflectsIsomorphisms]
   [J.HasSheafCompose (forget A)]
@@ -93,6 +96,8 @@ class WEqualsLocallyBijective : Prop where
   iff {X Y : Cᵒᵖ ⥤ A} (f : X ⟶ Y) :
     J.W f ↔ Presheaf.IsLocallyInjective J f ∧ Presheaf.IsLocallySurjective J f
 
+section
+
 variable {A}
 
 variable [J.WEqualsLocallyBijective A] {X Y : Cᵒᵖ ⥤ A} (f : X ⟶ Y)
@@ -116,9 +121,11 @@ lemma W.isLocallySurjective (hf : J.W f) : Presheaf.IsLocallySurjective J f :=
 
 variable [HasWeakSheafify J A] (P : Cᵒᵖ ⥤ A)
 
--- INSTANCE (free from Core): :
+instance : Presheaf.IsLocallyInjective J (CategoryTheory.toSheafify J P) :=
+  (J.W_toSheafify P).isLocallyInjective
 
--- INSTANCE (free from Core): :
+instance : Presheaf.IsLocallySurjective J (CategoryTheory.toSheafify J P) :=
+  (J.W_toSheafify P).isLocallySurjective
 
 end
 
@@ -128,15 +135,19 @@ lemma WEqualsLocallyBijective.mk' [HasWeakSheafify J A] [(forget A).ReflectsIsom
     [∀ (P : Cᵒᵖ ⥤ A), Presheaf.IsLocallySurjective J (CategoryTheory.toSheafify J P)] :
     J.WEqualsLocallyBijective A where
   iff {P Q} f := by
-    rw [W_iff, ← Sheaf.isLocallyBijective_iff_isIso (A := A),
+    rw [W_iff, ← Sheaf.isLocallyBijective_iff_isIso,
       ← Presheaf.isLocallyInjective_comp_iff J f (CategoryTheory.toSheafify J Q),
       ← Presheaf.isLocallySurjective_comp_iff J f (CategoryTheory.toSheafify J Q),
       CategoryTheory.toSheafify_naturality, Presheaf.comp_isLocallyInjective_iff,
       Presheaf.comp_isLocallySurjective_iff]
 
--- INSTANCE (free from Core): {D
+instance {D : Type w} [Category.{w'} D] [ConcreteCategory.{max u v} D]
+    [HasWeakSheafify J D] [J.HasSheafCompose (forget D)]
+    [J.PreservesSheafification (forget D)] [(forget D).ReflectsIsomorphisms] :
+    J.WEqualsLocallyBijective D := by
+  apply WEqualsLocallyBijective.mk'
 
--- INSTANCE (free from Core): :
+instance : J.WEqualsLocallyBijective (Type (max u v)) := inferInstance
 
 end GrothendieckTopology
 
@@ -146,23 +157,19 @@ variable {A}
 
 variable [HasWeakSheafify J A] [J.WEqualsLocallyBijective A] {P Q : Cᵒᵖ ⥤ A} (φ : P ⟶ Q)
 
-set_option backward.isDefEq.respectTransparency false in
-
 lemma isLocallyInjective_presheafToSheaf_map_iff :
     Sheaf.IsLocallyInjective ((presheafToSheaf J A).map φ) ↔ IsLocallyInjective J φ := by
   rw [← Sheaf.isLocallyInjective_sheafToPresheaf_map_iff,
     ← isLocallyInjective_comp_iff J _ (toSheafify J Q),
     ← comp_isLocallyInjective_iff J (toSheafify J P),
-    toSheafify_naturality, ObjectProperty.ι_map]
-
-set_option backward.isDefEq.respectTransparency false in
+    toSheafify_naturality, sheafToPresheaf_map]
 
 lemma isLocallySurjective_presheafToSheaf_map_iff :
     Sheaf.IsLocallySurjective ((presheafToSheaf J A).map φ) ↔ IsLocallySurjective J φ := by
   rw [← Sheaf.isLocallySurjective_sheafToPresheaf_map_iff,
     ← isLocallySurjective_comp_iff J _ (toSheafify J Q),
     ← comp_isLocallySurjective_iff J (toSheafify J P),
-    toSheafify_naturality, ObjectProperty.ι_map]
+    toSheafify_naturality, sheafToPresheaf_map]
 
 end Presheaf
 

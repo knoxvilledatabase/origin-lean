@@ -3,6 +3,11 @@ Extracted from NumberTheory/LegendreSymbol/AddCharacter.lean
 Genuine: 16 of 25 | Dissolved: 9 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
+import Mathlib.FieldTheory.Finite.Trace
+import Mathlib.Algebra.Group.AddChar
+import Mathlib.Data.ZMod.Units
+import Mathlib.Analysis.Complex.Polynomial.Basic
 
 /-!
 # Additive characters of finite rings and fields
@@ -55,7 +60,7 @@ theorem to_mulShift_inj_of_isPrimitive {ψ : AddChar R R'} (hψ : IsPrimitive ψ
     Function.Injective ψ.mulShift := by
   intro a b h
   apply_fun fun x => x * mulShift ψ (-b) at h
-  simp only [mulShift_mul, mulShift_zero, add_neg_cancel] at h
+  simp only [mulShift_mul, mulShift_zero, add_neg_cancel, mulShift_apply] at h
   simpa [← sub_eq_add_neg, sub_eq_zero] using (hψ · h)
 
 -- DISSOLVED: IsPrimitive.of_ne_one
@@ -63,8 +68,7 @@ theorem to_mulShift_inj_of_isPrimitive {ψ : AddChar R R'} (hψ : IsPrimitive ψ
 lemma not_isPrimitive_mulShift [Finite R] (e : AddChar R R') {r : R}
     (hr : ¬ IsUnit r) : ¬ IsPrimitive (e.mulShift r) := by
   simp only [IsPrimitive, not_forall]
-  simp only [isUnit_iff_mem_nonZeroDivisors_of_finite,
-    mem_nonZeroDivisors_iff_right, not_forall] at hr
+  simp only [isUnit_iff_mem_nonZeroDivisors_of_finite, mem_nonZeroDivisors_iff, not_forall] at hr
   rcases hr with ⟨x, h, h'⟩
   exact ⟨x, h', by simp only [mulShift_mulShift, mul_comm r, h, mulShift_zero, not_ne_iff]⟩
 
@@ -126,8 +130,6 @@ theorem zmod_char_primitive_of_eq_one_only_at_zero (n : ℕ) (ψ : AddChar (ZMod
 
 -- DISSOLVED: zmodChar_primitive_of_primitive_root
 
-set_option backward.isDefEq.respectTransparency false in
-
 -- DISSOLVED: primitiveZModChar
 
 end ZModChar
@@ -144,7 +146,7 @@ noncomputable def FiniteField.primitiveChar (F F' : Type*) [Field F] [Finite F] 
   haveI hp : Fact p.Prime := ⟨CharP.char_is_prime F _⟩
   let pp := p.toPNat hp.1.pos
   have hp₂ : ¬ringChar F' ∣ p := by
-    rcases CharP.char_is_prime_or_zero F' (ringChar F') with hq | hq
+    cases' CharP.char_is_prime_or_zero F' (ringChar F') with hq hq
     · exact mt (Nat.Prime.dvd_iff_eq hp.1 (Nat.Prime.ne_one hq)).mp h.symm
     · rw [hq]
       exact fun hf => Nat.Prime.ne_zero hp.1 (zero_dvd_iff.mp hf)
@@ -214,20 +216,15 @@ variable (F : Type*) [Field F] [Finite F]
 private lemma ringChar_ne : ringChar ℂ ≠ ringChar F := by
   simpa only [ringChar.eq_zero] using (CharP.ringChar_ne_zero_of_finite F).symm
 
-set_option backward.isDefEq.respectTransparency false in
-
 noncomputable def FiniteField.primitiveChar_to_Complex : AddChar F ℂ := by
-  letI ch := primitiveChar F ℂ <| by exact ringChar_ne F
-  refine MonoidHom.compAddChar ?_ ch.char
-  exact (IsCyclotomicExtension.algEquiv {(ch.n : ℕ)} ℂ (CyclotomicField ch.n ℂ) ℂ).toMonoidHom
-
-set_option backward.isDefEq.respectTransparency false in
+  refine MonoidHom.compAddChar ?_ (primitiveChar F ℂ <| ringChar_ne F).char
+  exact (IsCyclotomicExtension.algEquiv ?n ℂ (CyclotomicField ?n ℂ) ℂ : CyclotomicField ?n ℂ →* ℂ)
 
 lemma FiniteField.primitiveChar_to_Complex_isPrimitive :
     (primitiveChar_to_Complex F).IsPrimitive := by
   refine IsPrimitive.compMulHom_of_isPrimitive (PrimitiveAddChar.prim _) ?_
   let nn := (primitiveChar F ℂ <| ringChar_ne F).n
-  exact (IsCyclotomicExtension.algEquiv {(nn : ℕ)} ℂ (CyclotomicField nn ℂ) ℂ).injective
+  exact (IsCyclotomicExtension.algEquiv nn ℂ (CyclotomicField nn ℂ) ℂ).injective
 
 end Field
 

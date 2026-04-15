@@ -1,8 +1,9 @@
 /-
 Extracted from RingTheory/WittVector/Teichmuller.lean
-Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
+Genuine: 10 of 11 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.RingTheory.WittVector.Basic
 
 /-!
 # Teichmüller lifts
@@ -67,7 +68,7 @@ private theorem map_teichmullerFun (f : R →+* S) (r : R) :
 private theorem teichmuller_mul_aux₁ {R : Type*} (x y : MvPolynomial R ℚ) :
     teichmullerFun p (x * y) = teichmullerFun p x * teichmullerFun p y := by
   apply (ghostMap.bijective_of_invertible p (MvPolynomial R ℚ)).1
-  rw [map_mul]
+  rw [RingHom.map_mul]
   ext1 n
   simp only [Pi.mul_apply, ghostMap_apply, ghostComponent_teichmullerFun, mul_pow]
 
@@ -75,7 +76,7 @@ private theorem teichmuller_mul_aux₂ {R : Type*} (x y : MvPolynomial R ℤ) :
     teichmullerFun p (x * y) = teichmullerFun p x * teichmullerFun p y := by
   refine map_injective (MvPolynomial.map (Int.castRingHom ℚ))
     (MvPolynomial.map_injective _ Int.cast_injective) ?_
-  simp only [teichmuller_mul_aux₁, map_teichmullerFun, map_mul]
+  simp only [teichmuller_mul_aux₁, map_teichmullerFun, RingHom.map_mul]
 
 def teichmuller : R →* 𝕎 R where
   toFun := teichmullerFun p
@@ -87,4 +88,27 @@ def teichmuller : R →* 𝕎 R where
     intro x y
     rcases counit_surjective R x with ⟨x, rfl⟩
     rcases counit_surjective R y with ⟨y, rfl⟩
-    simp only [← map_teichmullerFun, ← map_mul, teichmuller_mul_aux₂]
+    simp only [← map_teichmullerFun, ← RingHom.map_mul, teichmuller_mul_aux₂]
+
+@[simp]
+theorem teichmuller_coeff_zero (r : R) : (teichmuller p r).coeff 0 = r :=
+  rfl
+
+@[simp]
+theorem teichmuller_coeff_pos (r : R) : ∀ (n : ℕ) (_ : 0 < n), (teichmuller p r).coeff n = 0
+  | _ + 1, _ => rfl
+
+@[simp]
+theorem teichmuller_zero : teichmuller p (0 : R) = 0 := by
+  ext ⟨⟩ <;> · rw [zero_coeff]; rfl
+
+@[simp]
+theorem map_teichmuller (f : R →+* S) (r : R) : map f (teichmuller p r) = teichmuller p (f r) :=
+  map_teichmullerFun _ _ _
+
+@[simp]
+theorem ghostComponent_teichmuller (r : R) (n : ℕ) :
+    ghostComponent n (teichmuller p r) = r ^ p ^ n :=
+  ghostComponent_teichmullerFun _ _ _
+
+end WittVector

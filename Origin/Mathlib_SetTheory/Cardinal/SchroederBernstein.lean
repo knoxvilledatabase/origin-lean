@@ -1,8 +1,10 @@
 /-
 Extracted from SetTheory/Cardinal/SchroederBernstein.lean
-Genuine: 5 of 6 | Dissolved: 0 | Infrastructure: 1
+Genuine: 4 of 5 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Order.FixedPoints
+import Mathlib.Order.Zorn
 
 /-!
 # Schröder-Bernstein theorem, well-ordering of cardinals
@@ -34,17 +36,16 @@ section antisymm
 
 variable {α : Type u} {β : Type v}
 
-theorem schroeder_bernstein_of_rel {f : α → β} {g : β → α} (hf : Function.Injective f)
-    (hg : Function.Injective g) (R : α → β → Prop) (hp₁ : ∀ a : α, R a (f a))
-    (hp₂ : ∀ b : β, R (g b) b) :
-    ∃ h : α → β, Bijective h ∧ ∀ a : α, R a (h a) := by
+theorem schroeder_bernstein {f : α → β} {g : β → α} (hf : Function.Injective f)
+    (hg : Function.Injective g) : ∃ h : α → β, Bijective h := by
   classical
-  rcases isEmpty_or_nonempty β with hβ | hβ
+  cases' isEmpty_or_nonempty β with hβ hβ
   · have : IsEmpty α := Function.isEmpty f
-    exact ⟨_, ((Equiv.equivEmpty α).trans (Equiv.equivEmpty β).symm).bijective, by simp⟩
+    exact ⟨_, ((Equiv.equivEmpty α).trans (Equiv.equivEmpty β).symm).bijective⟩
   set F : Set α →o Set α :=
     { toFun := fun s => (g '' (f '' s)ᶜ)ᶜ
-      monotone' := fun s t hst => by dsimp at hst ⊢; gcongr }
+      monotone' := fun s t hst =>
+        compl_subset_compl.mpr <| image_subset _ <| compl_subset_compl.mpr <| image_subset _ hst }
   set s : Set α := F.lfp
   have hs : (g '' (f '' s)ᶜ)ᶜ = s := F.map_lfp
   have hns : g '' (f '' s)ᶜ = sᶜ := compl_injective (by simp [hs])
@@ -64,20 +65,7 @@ theorem schroeder_bernstein_of_rel {f : α → β} {g : β → α} (hf : Functio
       obtain ⟨y', hy', rfl⟩ : y ∈ g '' (f '' s)ᶜ := by rwa [hns]
       rw [g'g _] at hxy
       exact hy' ⟨x, hx, hxy⟩
-  refine ⟨h, ⟨‹Injective h›, ‹Surjective h›⟩, fun a ↦ ?_⟩
-  simp only [h, Set.piecewise, g']
-  split
-  · exact hp₁ a
-  · have : g (invFun g a) = a := by
-      have : a ∈ g '' (f '' s)ᶜ := by grind
-      obtain ⟨x, _, hx⟩ := mem_image _ _ _ |>.mp this
-      exact Function.invFun_eq ⟨x, hx⟩
-    grind
-
-theorem schroeder_bernstein {f : α → β} {g : β → α} (hf : Function.Injective f)
-    (hg : Function.Injective g) : ∃ h : α → β, Bijective h := by
-  obtain ⟨f, hf, _⟩ := schroeder_bernstein_of_rel hf hg (fun x y ↦ True) (by simp) (by simp)
-  exact ⟨f, hf⟩
+  exact ⟨h, ‹Injective h›, ‹Surjective h›⟩
 
 theorem antisymm : (α ↪ β) → (β ↪ α) → Nonempty (α ≃ β)
   | ⟨_, h₁⟩, ⟨_, h₂⟩ =>
@@ -107,7 +95,7 @@ theorem min_injective [I : Nonempty ι] : ∃ i, Nonempty (∀ j, β i ↪ β j)
         let ⟨f, hf⟩ := Classical.axiom_of_choice h
         have : f ∈ s :=
           have : insert f s ∈ sets β := fun i x hx y hy => by
-            rcases hx with hx | hx <;> rcases hy with hy | hy; · simp [hx, hy]
+            cases' hx with hx hx <;> cases' hy with hy hy; · simp [hx, hy]
             · subst x
               exact fun e => (hf i y hy e.symm).elim
             · subst y
@@ -120,6 +108,16 @@ theorem min_injective [I : Nonempty ι] : ∃ i, Nonempty (∀ j, β i ↪ β j)
     ((hs.1 j).injective).comp (injective_surjInv _)⟩⟩⟩
 
 end Wo
+
+theorem total (α : Type u) (β : Type v) : Nonempty (α ↪ β) ∨ Nonempty (β ↪ α) :=
+  match @min_injective Bool (fun b => cond b (ULift.{max u v, u} α) (ULift.{max u v, v} β)) ⟨true⟩
+    with
+  | ⟨true, ⟨h⟩⟩ =>
+    let ⟨f, hf⟩ := h false
+    Or.inl ⟨Embedding.congr Equiv.ulift Equiv.ulift ⟨f, hf⟩⟩
+  | ⟨false, ⟨h⟩⟩ =>
+    let ⟨f, hf⟩ := h true
+    Or.inr ⟨Embedding.congr Equiv.ulift Equiv.ulift ⟨f, hf⟩⟩
 
 end Embedding
 

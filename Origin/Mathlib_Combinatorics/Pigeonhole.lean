@@ -3,6 +3,9 @@ Extracted from Combinatorics/Pigeonhole.lean
 Genuine: 29 of 29 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.BigOperators
+import Mathlib.Algebra.Order.Ring.Nat
+import Mathlib.Data.Nat.ModEq
 
 /-!
 # Pigeonhole principles
@@ -90,7 +93,9 @@ There are a few bits we can change in this theorem:
 We can do all these variations independently, so we have eight versions of the theorem.
 -/
 
-variable [AddCommMonoid M] [LinearOrder M] [IsOrderedCancelAddMonoid M]
+section
+
+variable [LinearOrderedCancelAddCommMonoid M]
 
 /-!
 #### Strict inequality versions
@@ -145,7 +150,7 @@ theorem exists_sum_fiber_le_of_sum_fiber_nonneg_of_sum_le_nsmul
 
 end
 
-variable [CommSemiring M] [LinearOrder M] [IsStrictOrderedRing M]
+variable [LinearOrderedCommSemiring M]
 
 /-!
 ### The pigeonhole principles on `Finset`s, pigeons counted by heads
@@ -211,7 +216,9 @@ open Finset
 
 variable [Fintype α] [Fintype β] (f : α → β) {w : α → M} {b : M} {n : ℕ}
 
-variable [AddCommMonoid M] [LinearOrder M] [IsOrderedCancelAddMonoid M]
+section
+
+variable [LinearOrderedCancelAddCommMonoid M]
 
 /-!
 ### The pigeonhole principles on `Fintypes`s, pigeons counted by weight
@@ -241,7 +248,7 @@ theorem exists_sum_fiber_le_of_sum_le_nsmul [Nonempty β] (hb : ∑ x, w x ≤ c
 
 end
 
-variable [CommSemiring M] [LinearOrder M] [IsStrictOrderedRing M]
+variable [LinearOrderedCommSemiring M]
 
 theorem exists_lt_card_fiber_of_nsmul_lt_card (hb : card β • b < card α) :
     ∃ y : β, b < #{x | f x = y} :=

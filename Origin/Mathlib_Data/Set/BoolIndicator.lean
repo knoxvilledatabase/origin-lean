@@ -3,14 +3,13 @@ Extracted from Data/Set/BoolIndicator.lean
 Genuine: 7 of 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Set.Basic
 
 /-!
 # Indicator function valued in bool
 
 See also `Set.indicator` and `Set.piecewise`.
 -/
-
-assert_not_exists RelIso
 
 open Bool
 
@@ -25,7 +24,7 @@ theorem mem_iff_boolIndicator (x : α) : x ∈ s ↔ s.boolIndicator x = true :=
   unfold boolIndicator
   split_ifs with h <;> simp [h]
 
-theorem notMem_iff_boolIndicator (x : α) : x ∉ s ↔ s.boolIndicator x = false := by
+theorem not_mem_iff_boolIndicator (x : α) : x ∉ s ↔ s.boolIndicator x = false := by
   unfold boolIndicator
   split_ifs with h <;> simp [h]
 
@@ -33,9 +32,9 @@ theorem preimage_boolIndicator_true : s.boolIndicator ⁻¹' {true} = s :=
   ext fun x ↦ (s.mem_iff_boolIndicator x).symm
 
 theorem preimage_boolIndicator_false : s.boolIndicator ⁻¹' {false} = sᶜ :=
-  ext fun x ↦ (s.notMem_iff_boolIndicator x).symm
+  ext fun x ↦ (s.not_mem_iff_boolIndicator x).symm
 
-open scoped Classical in
+open scoped Classical
 
 theorem preimage_boolIndicator_eq_union (t : Set Bool) :
     s.boolIndicator ⁻¹' t = (if true ∈ t then s else ∅) ∪ if false ∈ t then sᶜ else ∅ := by

@@ -1,8 +1,10 @@
 /-
 Extracted from Analysis/Calculus/InverseFunctionTheorem/Deriv.lean
-Genuine: 6 of 7 | Dissolved: 1 | Infrastructure: 0
+Genuine: 4 of 5 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Analysis.Calculus.Deriv.Inverse
+import Mathlib.Analysis.Calculus.InverseFunctionTheorem.FDeriv
 
 /-!
 # Inverse function theorem, 1D case
@@ -31,12 +33,6 @@ abbrev localInverse : 𝕜 → 𝕜 :=
 
 variable {f f' a}
 
-lemma eventually_left_inverse : ∀ᶠ x in 𝓝 a, localInverse f f' a hf hf' (f x) = x :=
-  HasStrictFDerivAt.eventually_left_inverse ..
-
-lemma eventually_right_inverse : ∀ᶠ x in 𝓝 (f a), f (localInverse f f' a hf hf' x) = x :=
-  HasStrictFDerivAt.eventually_right_inverse ..
-
 theorem map_nhds_eq : map f (𝓝 a) = 𝓝 (f a) :=
   (hf.hasStrictFDerivAt_equiv hf').map_nhds_eq_of_equiv
 
@@ -52,3 +48,5 @@ end HasStrictDerivAt
 variable {f}
 
 -- DISSOLVED: isOpenMap_of_hasStrictDerivAt
+
+alias open_map_of_strict_deriv := isOpenMap_of_hasStrictDerivAt

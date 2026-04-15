@@ -3,6 +3,8 @@ Extracted from Analysis/Convex/Contractible.lean
 Genuine: 2 of 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Analysis.Convex.Star
+import Mathlib.Topology.Homotopy.Contractible
 
 /-!
 # A convex set is contractible
@@ -17,14 +19,25 @@ variable {E : Type*} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [Conti
 protected theorem StarConvex.contractibleSpace (h : StarConvex ℝ x s) (hne : s.Nonempty) :
     ContractibleSpace s := by
   refine
-    (contractible_iff_id_nullhomotopic s).2 ⟨⟨x, h.mem hne⟩,
-      ⟨⟨⟨fun p ↦ ⟨p.1.1 • x + (1 - p.1.1) • (p.2 : E), ?_⟩, ?_⟩, fun x ↦ by simp, fun x ↦ by simp⟩⟩⟩
+    (contractible_iff_id_nullhomotopic s).2
+      ⟨⟨x, h.mem hne⟩,
+        ⟨⟨⟨fun p => ⟨p.1.1 • x + (1 - p.1.1) • (p.2 : E), ?_⟩, ?_⟩, fun x => ?_, fun x => ?_⟩⟩⟩
   · exact h p.2.2 p.1.2.1 (sub_nonneg.2 p.1.2.2) (add_sub_cancel _ _)
-  · exact Continuous.subtype_mk (by fun_prop) _
+  · exact
+      ((continuous_subtype_val.fst'.smul continuous_const).add
+            ((continuous_const.sub continuous_subtype_val.fst').smul
+              continuous_subtype_val.snd')).subtype_mk
+        _
+  · ext1
+    simp
+  · ext1
+    simp
 
 protected theorem Convex.contractibleSpace (hs : Convex ℝ s) (hne : s.Nonempty) :
     ContractibleSpace s :=
   let ⟨_, hx⟩ := hne
   (hs.starConvex hx).contractibleSpace hne
 
--- INSTANCE (free from Core): (priority
+instance (priority := 100) RealTopologicalVectorSpace.contractibleSpace : ContractibleSpace E :=
+  (Homeomorph.Set.univ E).contractibleSpace_iff.mp <|
+    convex_univ.contractibleSpace Set.univ_nonempty

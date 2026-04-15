@@ -1,8 +1,11 @@
 /-
 Extracted from MeasureTheory/Measure/Lebesgue/Integral.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Integral.SetIntegral
+import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-! # Properties of integration with respect to the Lebesgue measure -/
 
@@ -44,8 +47,8 @@ theorem Real.integrable_of_summable_norm_Icc {E : Type*} [NormedAddCommGroup E] 
     (fun n : ℤ => mul_nonneg (norm_nonneg
       (f.restrict (⟨Icc (n : ℝ) ((n : ℝ) + 1), isCompact_Icc⟩ : Compacts ℝ)))
         ENNReal.toReal_nonneg) (fun n => ?_) hf) ?_
-  · simp only [Compacts.coe_mk, le_add_iff_nonneg_right, zero_le_one, volume_real_Icc_of_le,
-      add_sub_cancel_left, mul_one, norm_le _ (norm_nonneg _), ContinuousMap.restrict_apply]
+  · simp only [Compacts.coe_mk, Real.volume_Icc, add_sub_cancel_left,
+      ENNReal.toReal_ofReal zero_le_one, mul_one, norm_le _ (norm_nonneg _)]
     intro x
     have := ((f.comp <| ContinuousMap.addRight n).restrict (Icc 0 1)).norm_coe_le_norm
         ⟨x - n, ⟨sub_nonneg.mpr x.2.1, sub_le_iff_le_add'.mpr x.2.2⟩⟩
@@ -62,3 +65,43 @@ These lemmas are stated in terms of either `Iic` or `Ioi` (neglecting `Iio` and 
 mathlib's conventions for integrals over finite intervals (see `intervalIntegral`). For the case
 of finite integrals, see `intervalIntegral.integral_comp_neg`.
 -/
+
+theorem integral_comp_neg_Iic {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (c : ℝ) (f : ℝ → E) : (∫ x in Iic c, f (-x)) = ∫ x in Ioi (-c), f x := by
+  have A : MeasurableEmbedding fun x : ℝ => -x :=
+    (Homeomorph.neg ℝ).isClosedEmbedding.measurableEmbedding
+  have := MeasurableEmbedding.setIntegral_map (μ := volume) A f (Ici (-c))
+  rw [Measure.map_neg_eq_self (volume : Measure ℝ)] at this
+  simp_rw [← integral_Ici_eq_integral_Ioi, this, neg_preimage, neg_Ici, neg_neg]
+
+theorem integral_comp_neg_Ioi {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (c : ℝ) (f : ℝ → E) : (∫ x in Ioi c, f (-x)) = ∫ x in Iic (-c), f x := by
+  rw [← neg_neg c, ← integral_comp_neg_Iic]
+  simp only [neg_neg]
+
+theorem integral_comp_abs {f : ℝ → ℝ} :
+    ∫ x, f |x| = 2 * ∫ x in Ioi (0 : ℝ), f x := by
+  have eq : ∫ (x : ℝ) in Ioi 0, f |x| = ∫ (x : ℝ) in Ioi 0, f x := by
+    refine setIntegral_congr_fun measurableSet_Ioi (fun _ hx => ?_)
+    rw [abs_eq_self.mpr (le_of_lt (by exact hx))]
+  by_cases hf : IntegrableOn (fun x => f |x|) (Ioi 0)
+  · have int_Iic : IntegrableOn (fun x ↦ f |x|) (Iic 0) := by
+      rw [← Measure.map_neg_eq_self (volume : Measure ℝ)]
+      let m : MeasurableEmbedding fun x : ℝ => -x := (Homeomorph.neg ℝ).measurableEmbedding
+      rw [m.integrableOn_map_iff]
+      simp_rw [Function.comp_def, abs_neg, neg_preimage, neg_Iic, neg_zero]
+      exact integrableOn_Ici_iff_integrableOn_Ioi.mpr hf
+    calc
+      _ = (∫ x in Iic 0, f |x|) + ∫ x in Ioi 0, f |x| := by
+        rw [← setIntegral_union (Iic_disjoint_Ioi le_rfl) measurableSet_Ioi int_Iic hf,
+          Iic_union_Ioi, restrict_univ]
+      _ = 2 * ∫ x in Ioi 0, f x := by
+        rw [two_mul, eq]
+        congr! 1
+        rw [← neg_zero, ← integral_comp_neg_Iic, neg_zero]
+        refine setIntegral_congr_fun measurableSet_Iic (fun _ hx => ?_)
+        rw [abs_eq_neg_self.mpr (by exact hx)]
+  · have : ¬ Integrable (fun x => f |x|) := by
+      contrapose! hf
+      exact hf.integrableOn
+    rw [← eq, integral_undef hf, integral_undef this, mul_zero]

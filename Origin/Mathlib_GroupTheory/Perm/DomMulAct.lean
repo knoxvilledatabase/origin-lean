@@ -3,9 +3,15 @@ Extracted from GroupTheory/Perm/DomMulAct.lean
 Genuine: 9 of 10 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Algebra.Group.Action.Basic
+import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Fintype.Perm
+import Mathlib.Data.Set.Card
+import Mathlib.GroupTheory.GroupAction.Defs
+import Mathlib.GroupTheory.GroupAction.DomAct.Basic
+import Mathlib.SetTheory.Cardinal.Finite
 
-/-!
-# Subgroup of `Equiv.Perm α` preserving a function
+/-!  Subgroup of `Equiv.Perm α` preserving a function
 
 Let `α` and `ι` by types and let `f : α → ι`
 
@@ -27,11 +33,9 @@ Let `α` and `ι` by types and let `f : α → ι`
   formula, where the product is restricted to `Finset.univ.image f`.
 -/
 
-assert_not_exists Field
+variable {α ι : Type*} {f : α → ι}
 
 open Equiv MulAction
-
-variable {α ι : Type*} {f : α → ι}
 
 namespace DomMulAct
 
@@ -58,7 +62,7 @@ def stabilizerEquiv_invFun_aux (g : ∀ i, Perm {a // f a = i}) : Perm α where
     rw [stabilizerEquiv_invFun_eq _ (comp_stabilizerEquiv_invFun _ a)]
     exact congr_arg Subtype.val ((g <| f a).right_inv _)
 
-variable (f) in
+variable (f)
 
 def stabilizerMulEquiv : (stabilizer (Perm α)ᵈᵐᵃ f)ᵐᵒᵖ ≃* (∀ i, Perm {a // f a = i}) where
   toFun g i := Perm.subtypePerm (mk.symm g.unop) fun a ↦ by
@@ -67,8 +71,14 @@ def stabilizerMulEquiv : (stabilizer (Perm α)ᵈᵐᵃ f)ᵐᵒᵖ ≃* (∀ i,
     ext a
     rw [smul_apply, symm_apply_apply, Perm.smul_def]
     apply comp_stabilizerEquiv_invFun⟩
+  left_inv _ := rfl
   right_inv g := by ext i a; apply stabilizerEquiv_invFun_eq
   map_mul' _ _ := rfl
+
+variable {f}
+
+lemma stabilizerMulEquiv_apply (g : (stabilizer (Perm α)ᵈᵐᵃ f)ᵐᵒᵖ) {a : α} {i : ι} (h : f a = i) :
+    ((stabilizerMulEquiv f)) g i ⟨a, h⟩ = (mk.symm g.unop : Equiv.Perm α) a := rfl
 
 section Fintype
 
@@ -94,22 +104,26 @@ theorem stabilizer_ncard [Finite α] [Fintype ι] :
     Set.ncard {g : Perm α | f ∘ g = f} = ∏ i, (Set.ncard {a | f a = i})! := by
   classical
   cases nonempty_fintype α
-  simp only [← Nat.card_coe_set_eq, Set.coe_setOf, card_eq_fintype_card]
+  simp only [← Set.Nat.card_coe_set_eq, Set.coe_setOf, card_eq_fintype_card]
   exact stabilizer_card f
 
 variable [DecidableEq α] [DecidableEq ι]
 
-theorem stabilizer_card' :
+theorem stabilizer_card':
     Fintype.card {g : Perm α // f ∘ g = f} =
-      ∏ i ∈ Finset.univ.image f, (Fintype.card ({a // f a = i}))! := by
+      ∏ i in Finset.univ.image f, (Fintype.card ({a // f a = i}))! := by
   set φ : α → Finset.univ.image f :=
     Set.codRestrict f (Finset.univ.image f) (fun a => by simp)
   suffices ∀ g : Perm α, f ∘ g = f ↔ φ ∘ g = φ by
     simp only [this, stabilizer_card]
     apply Finset.prod_bij (fun g _ => g.val)
     · exact fun g _ => Finset.coe_mem g
-    · exact fun g _ g' _ => SetCoe.ext
-    · simp
+    · exact fun g _ g' _ =>  SetCoe.ext
+    · exact fun g hg => by
+        rw [Finset.mem_image] at hg
+        obtain ⟨a, _, rfl⟩ := hg
+        use ⟨f a, by simp only [Finset.mem_image, Finset.mem_univ, true_and, exists_apply_eq_apply]⟩
+        simp only [Finset.univ_eq_attach, Finset.mem_attach, exists_const]
     · intro i _
       apply congr_arg
       apply Fintype.card_congr

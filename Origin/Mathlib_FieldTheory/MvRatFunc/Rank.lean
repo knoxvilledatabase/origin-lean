@@ -3,6 +3,11 @@ Extracted from FieldTheory/MvRatFunc/Rank.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.MvPolynomial.Cardinal
+import Mathlib.RingTheory.Algebraic.LinearIndependent
+import Mathlib.RingTheory.Algebraic.MvPolynomial
+import Mathlib.RingTheory.Localization.Cardinality
+import Mathlib.RingTheory.MvPolynomial
 
 /-!
 # Rank of multivariate rational function field

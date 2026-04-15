@@ -1,25 +1,25 @@
 /-
 Extracted from Algebra/Module/Submodule/Invariant.lean
-Genuine: 5 of 8 | Dissolved: 0 | Infrastructure: 3
+Genuine: 16 of 18 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Algebra.Module.Submodule.Map
+import Mathlib.Order.Sublattice
 
 /-!
 # The lattice of invariant submodules
 
 In this file we defined the type `Module.End.invtSubmodule`, associated to a linear endomorphism of
-a module. Its utility stems primarily from those occasions on which we wish to take advantage of the
+a module. Its utilty stems primarily from those occasions on which we wish to take advantage of the
 lattice structure of invariant submodules.
 
-See also `Mathlib/Algebra/Polynomial/Module/AEval.lean`.
+See also `Module.AEval`.
 
 -/
 
-open Submodule (span)
-
 namespace Module.End
 
-variable {R M : Type*} [Semiring R] [AddCommMonoid M] [Module R M] (f g : End R M)
+variable {R M : Type*} [Semiring R] [AddCommMonoid M] [Module R M] (f : End R M)
 
 def invtSubmodule : Sublattice (Submodule R M) where
   carrier := {p : Submodule R M | p ≤ p.comap f}
@@ -30,23 +30,100 @@ def invtSubmodule : Sublattice (Submodule R M) where
     simp only [Set.mem_setOf_eq, Submodule.comap_inf, le_inf_iff]
     exact ⟨inf_le_of_left_le hp, inf_le_of_right_le hq⟩
 
-theorem mem_invtSubmodule_iff_map_le {p : Submodule R M} :
-    p ∈ f.invtSubmodule ↔ p.map f ≤ p := Submodule.map_le_iff_le_comap.symm
+lemma mem_invtSubmodule {p : Submodule R M} :
+    p ∈ f.invtSubmodule ↔ p ≤ p.comap f :=
+  Iff.rfl
 
-alias ⟨_, _root_.Set.Mapsto.mem_invtSubmodule⟩ := mem_invtSubmodule_iff_mapsTo
+namespace invtSubmodule
 
-lemma mem_invtSubmodule_symm_iff_le_map {f : M ≃ₗ[R] M} {p : Submodule R M} :
-    p ∈ invtSubmodule f.symm ↔ p ≤ p.map (f : M →ₗ[R] M) :=
-  (mem_invtSubmodule_iff_map_le _).trans (f.toEquiv.symm.subset_symm_image _ _).symm
+variable {f}
 
-lemma invtSubmodule_inf_invtSubmodule_le_invtSubmodule_add :
-    f.invtSubmodule ⊓ g.invtSubmodule ≤ (f + g).invtSubmodule :=
-  fun p ⟨hfp, hgp⟩ _ hx ↦ p.add_mem (hfp hx) (hgp hx)
+lemma inf_mem {p q : Submodule R M} (hp : p ∈ f.invtSubmodule) (hq : q ∈ f.invtSubmodule) :
+    p ⊓ q ∈ f.invtSubmodule :=
+  ((⟨p, hp⟩ : f.invtSubmodule) ⊓ (⟨q, hq⟩ : f.invtSubmodule)).property
 
-section CommRing
+lemma sup_mem {p q : Submodule R M} (hp : p ∈ f.invtSubmodule) (hq : q ∈ f.invtSubmodule) :
+    p ⊔ q ∈ f.invtSubmodule :=
+  ((⟨p, hp⟩ : f.invtSubmodule) ⊔ (⟨q, hq⟩ : f.invtSubmodule)).property
 
-variable {R S : Type*} [Semiring R] [Semiring S] [Module R M] [Module S M]
-  [DistribSMul S R] [SMulCommClass R S M] [IsScalarTower S R M] (f : End R M)
+variable (f)
 
-lemma invtSubmodule_le_invtSubmodule_smul (c : S) : f.invtSubmodule ≤ (c • f).invtSubmodule :=
-  fun p hfp _ hx ↦ p.smul_of_tower_mem c (hfp hx)
+@[simp]
+protected lemma top_mem : ⊤ ∈ f.invtSubmodule := by simp [invtSubmodule]
+
+@[simp]
+protected lemma bot_mem : ⊥ ∈ f.invtSubmodule := by simp [invtSubmodule]
+
+instance : BoundedOrder (f.invtSubmodule) where
+  top := ⟨⊤, invtSubmodule.top_mem f⟩
+  bot := ⟨⊥, invtSubmodule.bot_mem f⟩
+  le_top := fun ⟨p, hp⟩ ↦ by simp
+  bot_le := fun ⟨p, hp⟩ ↦ by simp
+
+@[simp]
+protected lemma zero :
+    (0 : End R M).invtSubmodule = ⊤ :=
+  eq_top_iff.mpr fun x ↦ by simp [invtSubmodule]
+
+@[simp]
+protected lemma id :
+    invtSubmodule (LinearMap.id : End R M) = ⊤ :=
+  eq_top_iff.mpr fun x ↦ by simp [invtSubmodule]
+
+protected lemma mk_eq_bot_iff {p : Submodule R M} (hp : p ∈ f.invtSubmodule) :
+    (⟨p, hp⟩ : f.invtSubmodule) = ⊥ ↔ p = ⊥ :=
+  Subtype.mk_eq_bot_iff (by simp [invtSubmodule]) _
+
+protected lemma mk_eq_top_iff {p : Submodule R M} (hp : p ∈ f.invtSubmodule) :
+    (⟨p, hp⟩ : f.invtSubmodule) = ⊤ ↔ p = ⊤ :=
+  Subtype.mk_eq_top_iff (by simp [invtSubmodule]) _
+
+@[simp]
+protected lemma disjoint_mk_iff {p q : Submodule R M}
+    (hp : p ∈ f.invtSubmodule) (hq : q ∈ f.invtSubmodule) :
+    Disjoint (α := f.invtSubmodule) ⟨p, hp⟩ ⟨q, hq⟩ ↔ Disjoint p q := by
+  rw [disjoint_iff, disjoint_iff, Sublattice.mk_inf_mk,
+    Subtype.mk_eq_bot_iff (⊥ : f.invtSubmodule).property]
+
+protected lemma disjoint_iff {p q : f.invtSubmodule} :
+    Disjoint p q ↔ Disjoint (p : Submodule R M) (q : Submodule R M) := by
+  obtain ⟨p, hp⟩ := p
+  obtain ⟨q, hq⟩ := q
+  simp
+
+@[simp]
+protected lemma codisjoint_mk_iff {p q : Submodule R M}
+    (hp : p ∈ f.invtSubmodule) (hq : q ∈ f.invtSubmodule) :
+    Codisjoint (α := f.invtSubmodule) ⟨p, hp⟩ ⟨q, hq⟩ ↔ Codisjoint p q := by
+  rw [codisjoint_iff, codisjoint_iff, Sublattice.mk_sup_mk,
+    Subtype.mk_eq_top_iff (⊤ : f.invtSubmodule).property]
+
+protected lemma codisjoint_iff {p q : f.invtSubmodule} :
+    Codisjoint p q ↔ Codisjoint (p : Submodule R M) (q : Submodule R M) := by
+  obtain ⟨p, hp⟩ := p
+  obtain ⟨q, hq⟩ := q
+  simp
+
+@[simp]
+protected lemma isCompl_mk_iff {p q : Submodule R M}
+    (hp : p ∈ f.invtSubmodule) (hq : q ∈ f.invtSubmodule) :
+    IsCompl (α := f.invtSubmodule) ⟨p, hp⟩ ⟨q, hq⟩ ↔ IsCompl p q := by
+  simp [isCompl_iff]
+
+protected lemma isCompl_iff {p q : f.invtSubmodule} :
+    IsCompl p q ↔ IsCompl (p : Submodule R M) (q : Submodule R M) := by
+  obtain ⟨p, hp⟩ := p
+  obtain ⟨q, hq⟩ := q
+  simp
+
+lemma map_subtype_mem_of_mem_invtSubmodule {p : Submodule R M} (hp : p ∈ f.invtSubmodule)
+    {q : Submodule R p} (hq : q ∈ invtSubmodule (LinearMap.restrict f hp)) :
+    Submodule.map p.subtype q ∈ f.invtSubmodule := by
+  rintro - ⟨⟨x, hx⟩, hx', rfl⟩
+  specialize hq hx'
+  rw [Submodule.mem_comap, LinearMap.restrict_apply] at hq
+  simpa [hq] using hp hx
+
+end invtSubmodule
+
+end Module.End

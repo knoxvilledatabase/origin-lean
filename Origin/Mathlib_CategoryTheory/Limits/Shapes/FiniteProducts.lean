@@ -3,6 +3,8 @@ Extracted from CategoryTheory/Limits/Shapes/FiniteProducts.lean
 Genuine: 4 of 8 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
+import Mathlib.CategoryTheory.Limits.Shapes.Products
 
 /-!
 # Categories with finite (co)products
@@ -14,6 +16,8 @@ universe w v u
 
 open CategoryTheory
 
+open scoped Classical
+
 namespace CategoryTheory.Limits
 
 variable (C : Type u) [Category.{v} C]
@@ -22,9 +26,15 @@ class HasFiniteProducts : Prop where
   /-- `C` has finite products -/
   out (n : ℕ) : HasLimitsOfShape (Discrete (Fin n)) C
 
--- INSTANCE (free from Core): (priority
+instance (priority := 10) hasFiniteProducts_of_hasFiniteLimits [HasFiniteLimits C] :
+    HasFiniteProducts C :=
+  ⟨fun _ => inferInstance⟩
 
--- INSTANCE (free from Core): hasLimitsOfShape_discrete
+instance hasLimitsOfShape_discrete [HasFiniteProducts C] (ι : Type w) [Finite ι] :
+    HasLimitsOfShape (Discrete ι) C := by
+  rcases Finite.exists_equiv_fin ι with ⟨n, ⟨e⟩⟩
+  haveI : HasLimitsOfShape (Discrete (Fin n)) C := HasFiniteProducts.out n
+  exact hasLimitsOfShape_of_equivalence (Discrete.equivalence e.symm)
 
 noncomputable example [HasFiniteProducts C] (X : C) : C :=
 
@@ -37,9 +47,15 @@ class HasFiniteCoproducts : Prop where
   /-- `C` has all finite coproducts -/
   out (n : ℕ) : HasColimitsOfShape (Discrete (Fin n)) C
 
--- INSTANCE (free from Core): hasColimitsOfShape_discrete
+instance hasColimitsOfShape_discrete [HasFiniteCoproducts C] (ι : Type w) [Finite ι] :
+    HasColimitsOfShape (Discrete ι) C := by
+  rcases Finite.exists_equiv_fin ι with ⟨n, ⟨e⟩⟩
+  haveI : HasColimitsOfShape (Discrete (Fin n)) C := HasFiniteCoproducts.out n
+  exact hasColimitsOfShape_of_equivalence (Discrete.equivalence e.symm)
 
--- INSTANCE (free from Core): (priority
+instance (priority := 10) hasFiniteCoproducts_of_hasFiniteColimits [HasFiniteColimits C] :
+    HasFiniteCoproducts C :=
+  ⟨fun J => by infer_instance⟩
 
 theorem hasFiniteCoproducts_of_hasCoproducts [HasCoproducts.{w} C] : HasFiniteCoproducts C :=
   ⟨fun _ => hasColimitsOfShape_of_equivalence (Discrete.equivalence Equiv.ulift.{w})⟩

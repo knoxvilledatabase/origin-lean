@@ -3,6 +3,9 @@ Extracted from Combinatorics/Additive/ErdosGinzburgZiv.lean
 Genuine: 9 of 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.BigOperators.Ring
+import Mathlib.Data.Multiset.Fintype
+import Mathlib.FieldTheory.ChevalleyWarning
 
 /-!
 # The Erdős–Ginzburg–Ziv theorem
@@ -40,7 +43,7 @@ private lemma totalDegree_f₁_add_totalDegree_f₂ {a : ι → ZMod p} :
       gcongr <;> apply totalDegree_finsetSum_le <;> rintro i _
       · exact (totalDegree_X_pow ..).le
       · exact (totalDegree_smul_le ..).trans (totalDegree_X_pow ..).le
-    _ < 2 * p - 1 := by have := (Fact.out : p.Prime).two_le; lia
+    _ < 2 * p - 1 := by have := (Fact.out : p.Prime).two_le; omega
 
 private theorem ZMod.erdos_ginzburg_ziv_prime (a : ι → ZMod p) (hs : #s = 2 * p - 1) :
     ∃ t ⊆ s, #t = p ∧ ∑ i ∈ t, a i = 0 := by
@@ -121,24 +124,23 @@ theorem Int.erdos_ginzburg_ziv (a : ι → ℤ) (hs : 2 * n - 1 ≤ #s) :
       -- We are done.
       refine ⟨ℬ.biUnion fun x ↦ x, biUnion_subset.2 fun t ht ↦ (h𝒜 <| hℬ𝒜 ht).1, ?_, ?_⟩
       · rw [card_biUnion (h𝒜disj.mono hℬ𝒜), sum_const_nat fun t ht ↦ (h𝒜 <| hℬ𝒜 ht).2.1, hℬcard]
-      rwa [sum_biUnion, Int.natCast_mul, mul_comm, ← Int.dvd_div_iff_mul_dvd, Int.sum_div]
+      rwa [sum_biUnion, natCast_mul, mul_comm, ← Int.dvd_div_iff_mul_dvd, Int.sum_div]
       · exact fun t ht ↦ (h𝒜 <| hℬ𝒜 ht).2.2
       · exact dvd_sum fun t ht ↦ (h𝒜 <| hℬ𝒜 ht).2.2
       · exact h𝒜disj.mono hℬ𝒜
     -- Now, let's find those `2 * m - 1` sets.
     rintro k hk
     -- We induct on the size `k ≤ 2 * m - 1` of the family we are constructing.
-    induction k with
+    induction' k with k ih
     -- For `k = 0`, the empty family trivially works.
-    | zero => exact ⟨∅, by simp⟩
-    | succ k ih =>
+    · exact ⟨∅, by simp⟩
     -- At `k + 1`, call `𝒜` the existing family of size `k ≤ 2 * m - 2`.
     obtain ⟨𝒜, h𝒜card, h𝒜disj, h𝒜⟩ := ih (Nat.le_of_succ_le hk)
     -- There are at least `2 * (m * n) - 1 - k * n ≥ 2 * m - 1` elements in `s` that have not been
     -- taken in any element of `𝒜`.
     have : 2 * n - 1 ≤ #(s \ 𝒜.biUnion id) := by
       calc
-        _ ≤ (2 * m - k) * n - 1 := by gcongr; lia
+        _ ≤ (2 * m - k) * n - 1 := by gcongr; omega
         _ = (2 * (m * n) - 1) - ∑ t ∈ 𝒜, #t := by
           rw [tsub_mul, mul_assoc, tsub_right_comm, sum_const_nat fun t ht ↦ (h𝒜 ht).2.1, h𝒜card]
         _ ≤ #s - #(𝒜.biUnion id) := by gcongr; exact card_biUnion_le
@@ -151,7 +153,7 @@ theorem Int.erdos_ginzburg_ziv (a : ι → ℤ) (hs : 2 * n - 1 ≤ #s) :
       rintro h
       obtain rfl : n = 0 := by
         simpa [← card_eq_zero, ht₀card] using sdiff_disjoint.mono ht₀ <| subset_biUnion_of_mem id h
-      lia
+      omega
     refine ⟨𝒜.cons t₀ this, by rw [card_cons, h𝒜card], ?_, ?_⟩
     · simp only [cons_eq_insert, coe_insert, Set.pairwise_insert_of_symmetric symmetric_disjoint,
         mem_coe, ne_eq]

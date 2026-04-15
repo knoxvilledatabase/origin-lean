@@ -3,6 +3,8 @@ Extracted from Topology/Order/Filter.lean
 Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.Filter
+import Mathlib.Topology.Order.Basic
 
 /-!
 # Topology on filters of a space with order topology

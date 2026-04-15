@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/TopologicalEntropy/DynamicalEntourage.lean
-Genuine: 11 of 11 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 of 16 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Finset.Nat
@@ -94,3 +94,32 @@ lemma dynEntourage_monotone (T : X → X) (n : ℕ) :
 lemma dynEntourage_antitone (T : X → X) (U : Set (X × X)) :
     Antitone (fun n : ℕ ↦ dynEntourage T U n) :=
   fun m n m_n ↦ iInter₂_mono' fun k k_m ↦ by use k, lt_of_lt_of_le k_m m_n
+
+@[simp]
+lemma dynEntourage_zero {T : X → X} {U : Set (X × X)} :
+    dynEntourage T U 0 = univ := by simp [dynEntourage]
+
+@[simp]
+lemma dynEntourage_one {T : X → X} {U : Set (X × X)} :
+    dynEntourage T U 1 = U := by simp [dynEntourage]
+
+@[simp]
+lemma dynEntourage_univ {T : X → X} {n : ℕ} :
+    dynEntourage T univ n = univ := by simp [dynEntourage]
+
+lemma mem_ball_dynEntourage_comp (T : X → X) (n : ℕ) {U : Set (X × X)} (U_symm : SymmetricRel U)
+    (x y : X) (h : (ball x (dynEntourage T U n) ∩ ball y (dynEntourage T U n)).Nonempty) :
+    x ∈ ball y (dynEntourage T (U ○ U) n) := by
+  rcases h with ⟨z, z_Bx, z_By⟩
+  rw [mem_ball_symmetry (SymmetricRel.dynEntourage T U_symm n)] at z_Bx
+  exact dynEntourage_comp_subset T U U n (mem_ball_comp z_By z_Bx)
+
+lemma _root_.Function.Semiconj.preimage_dynEntourage {Y : Type*} {S : X → X} {T : Y → Y} {φ : X → Y}
+    (h : Function.Semiconj φ S T) (U : Set (Y × Y)) (n : ℕ) :
+    (map φ φ)⁻¹' (dynEntourage T U n) = dynEntourage S ((map φ φ)⁻¹' U) n := by
+  rw [dynEntourage, preimage_iInter₂]
+  refine iInter₂_congr fun k _ ↦ ?_
+  rw [← preimage_comp, ← preimage_comp, map_iterate S S k, map_iterate T T k, map_comp_map,
+    map_comp_map, (Function.Semiconj.iterate_right h k).comp_eq]
+
+end Dynamics

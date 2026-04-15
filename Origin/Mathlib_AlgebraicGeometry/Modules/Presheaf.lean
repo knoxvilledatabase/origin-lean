@@ -1,8 +1,11 @@
 /-
 Extracted from AlgebraicGeometry/Modules/Presheaf.lean
-Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Category.ModuleCat.Presheaf
+import Mathlib.AlgebraicGeometry.Scheme
+import Mathlib.CategoryTheory.Sites.Whiskering
 
 /-!
 # The category of presheaves of modules over a scheme
@@ -21,18 +24,11 @@ open CategoryTheory
 
 namespace AlgebraicGeometry.Scheme
 
-variable (X Y : Scheme.{u})
+variable (X : Scheme.{u})
 
 abbrev ringCatSheaf : TopCat.Sheaf RingCat.{u} X :=
-  (sheafCompose _ (forget₂ CommRingCat RingCat.{u})).obj X.sheaf
+  (sheafCompose _ (forget₂ CommRingCat RingCat)).obj X.sheaf
 
-nonrec abbrev PresheafOfModules := PresheafOfModules.{u} X.ringCatSheaf.obj
-
-variable {X Y} in
-
-def Hom.toRingCatSheafHom (f : X ⟶ Y) :
-    Y.ringCatSheaf ⟶ ((TopologicalSpace.Opens.map f.base).sheafPushforwardContinuous
-      _ _ _).obj X.ringCatSheaf where
-  hom := Functor.whiskerRight f.c _
+nonrec abbrev PresheafOfModules := PresheafOfModules.{u} X.ringCatSheaf.val
 
 end AlgebraicGeometry.Scheme

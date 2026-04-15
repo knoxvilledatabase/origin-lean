@@ -1,8 +1,10 @@
 /-
 Extracted from CategoryTheory/Limits/FinallySmall.lean
-Genuine: 22 of 33 | Dissolved: 0 | Infrastructure: 11
+Genuine: 22 of 26 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Logic.Small.Set
+import Mathlib.CategoryTheory.Filtered.Final
 
 /-!
 # Finally small categories
@@ -12,17 +14,17 @@ A category given by `(J : Type u) [Category.{v} J]` is `w`-finally small if ther
 `FinalModel J ⥤ J`.
 
 This means that if a category `C` has colimits of size `w` and `J` is `w`-finally small, then
-`C` has colimits of shape `J`. In this way, the notion of "finally small" can be seen as a
+`C` has colimits of shape `J`. In this way, the notion of "finally small" can be seen of a
 generalization of the notion of "essentially small" for indexing categories of colimits.
 
 Dually, we have a notion of initially small category.
 
 We show that a finally small category admits a small weakly terminal set, i.e., a small set `s` of
-objects such that from every object there is a morphism to a member of `s`. We also show that the
+objects such that from every object there a morphism to a member of `s`. We also show that the
 converse holds if `J` is filtered.
 -/
 
-universe w w' v v₁ u u₁
+universe w v v₁ u u₁
 
 open CategoryTheory Functor
 
@@ -43,13 +45,17 @@ theorem FinallySmall.mk' {J : Type u} [Category.{v} J] {S : Type w} [SmallCatego
 def FinalModel [FinallySmall.{w} J] : Type w :=
   Classical.choose (@FinallySmall.final_smallCategory J _ _)
 
--- INSTANCE (free from Core): smallCategoryFinalModel
+noncomputable instance smallCategoryFinalModel [FinallySmall.{w} J] :
+    SmallCategory (FinalModel J) :=
+  Classical.choose (Classical.choose_spec (@FinallySmall.final_smallCategory J _ _))
 
 noncomputable def fromFinalModel [FinallySmall.{w} J] : FinalModel J ⥤ J :=
   Classical.choose (Classical.choose_spec (Classical.choose_spec
     (@FinallySmall.final_smallCategory J _ _)))
 
--- INSTANCE (free from Core): final_fromFinalModel
+instance final_fromFinalModel [FinallySmall.{w} J] : Final (fromFinalModel J) :=
+  Classical.choose_spec (Classical.choose_spec (Classical.choose_spec
+    (@FinallySmall.final_smallCategory J _ _)))
 
 theorem finallySmall_of_essentiallySmall [EssentiallySmall.{w} J] : FinallySmall.{w} J :=
   FinallySmall.mk' (equivSmallModel.{w} J).inverse
@@ -68,10 +74,6 @@ theorem finallySmall_of_final_of_essentiallySmall [EssentiallySmall.{w} K] (F : 
   have := finallySmall_of_essentiallySmall K
   finallySmall_of_final_of_finallySmall F
 
--- INSTANCE (free from Core): [Limits.HasTerminal
-
--- INSTANCE (free from Core): {J'
-
 end FinallySmall
 
 section InitiallySmall
@@ -89,13 +91,17 @@ theorem InitiallySmall.mk' {J : Type u} [Category.{v} J] {S : Type w} [SmallCate
 def InitialModel [InitiallySmall.{w} J] : Type w :=
   Classical.choose (@InitiallySmall.initial_smallCategory J _ _)
 
--- INSTANCE (free from Core): smallCategoryInitialModel
+noncomputable instance smallCategoryInitialModel [InitiallySmall.{w} J] :
+    SmallCategory (InitialModel J) :=
+  Classical.choose (Classical.choose_spec (@InitiallySmall.initial_smallCategory J _ _))
 
 noncomputable def fromInitialModel [InitiallySmall.{w} J] : InitialModel J ⥤ J :=
   Classical.choose (Classical.choose_spec (Classical.choose_spec
     (@InitiallySmall.initial_smallCategory J _ _)))
 
--- INSTANCE (free from Core): initial_fromInitialModel
+instance initial_fromInitialModel [InitiallySmall.{w} J] : Initial (fromInitialModel J) :=
+  Classical.choose_spec (Classical.choose_spec (Classical.choose_spec
+    (@InitiallySmall.initial_smallCategory J _ _)))
 
 theorem initiallySmall_of_essentiallySmall [EssentiallySmall.{w} J] : InitiallySmall.{w} J :=
   InitiallySmall.mk' (equivSmallModel.{w} J).inverse
@@ -114,17 +120,7 @@ theorem initiallySmall_of_initial_of_essentiallySmall [EssentiallySmall.{w} K]
   have := initiallySmall_of_essentiallySmall K
   initiallySmall_of_initial_of_initiallySmall F
 
--- INSTANCE (free from Core): [Limits.HasInitial
-
--- INSTANCE (free from Core): [LocallySmall.{w}
-
--- INSTANCE (free from Core): {J'
-
 end InitiallySmall
-
--- INSTANCE (free from Core): {J
-
--- INSTANCE (free from Core): {J
 
 section WeaklyTerminal
 
@@ -140,8 +136,8 @@ variable {J} in
 
 theorem finallySmall_of_small_weakly_terminal_set [IsFilteredOrEmpty J] (s : Set J) [Small.{v} s]
     (hs : ∀ i, ∃ j ∈ s, Nonempty (i ⟶ j)) : FinallySmall.{v} J := by
-  suffices Functor.Final (ObjectProperty.ι (· ∈ s)) from
-    finallySmall_of_final_of_essentiallySmall (ObjectProperty.ι (· ∈ s))
+  suffices Functor.Final (fullSubcategoryInclusion (· ∈ s)) from
+    finallySmall_of_final_of_essentiallySmall (fullSubcategoryInclusion (· ∈ s))
   refine Functor.final_of_exists_of_isFiltered_of_fullyFaithful _ (fun i => ?_)
   obtain ⟨j, hj₁, hj₂⟩ := hs i
   exact ⟨⟨j, hj₁⟩, hj₂⟩
@@ -168,8 +164,8 @@ variable {J} in
 
 theorem initiallySmall_of_small_weakly_initial_set [IsCofilteredOrEmpty J] (s : Set J) [Small.{v} s]
     (hs : ∀ i, ∃ j ∈ s, Nonempty (j ⟶ i)) : InitiallySmall.{v} J := by
-  suffices Functor.Initial (ObjectProperty.ι (· ∈ s)) from
-    initiallySmall_of_initial_of_essentiallySmall (ObjectProperty.ι (· ∈ s))
+  suffices Functor.Initial (fullSubcategoryInclusion (· ∈ s)) from
+    initiallySmall_of_initial_of_essentiallySmall (fullSubcategoryInclusion (· ∈ s))
   refine Functor.initial_of_exists_of_isCofiltered_of_fullyFaithful _ (fun i => ?_)
   obtain ⟨j, hj₁, hj₂⟩ := hs i
   exact ⟨⟨j, hj₁⟩, hj₂⟩

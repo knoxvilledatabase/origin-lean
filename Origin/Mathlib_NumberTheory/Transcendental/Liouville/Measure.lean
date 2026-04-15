@@ -1,8 +1,12 @@
 /-
 Extracted from NumberTheory/Transcendental/Liouville/Measure.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+import Mathlib.NumberTheory.Transcendental.Liouville.Residual
+import Mathlib.NumberTheory.Transcendental.Liouville.LiouvilleWith
+import Mathlib.Analysis.PSeries
 
 /-!
 # Volume of the set of Liouville numbers
@@ -54,8 +58,8 @@ theorem setOf_liouvilleWith_subset_aux :
       _ ≤ (b : ℝ) ^ (2 + 1 / (n + 1 : ℕ) : ℝ) :=
         rpow_le_rpow_of_exponent_le hb (one_le_two.trans ?_)
     simpa using n.cast_add_one_pos.le
-  rw [sub_div' hb0.ne', abs_div, abs_of_pos hb0, div_lt_div_iff_of_pos_right hb0, abs_sub_lt_iff,
-    sub_lt_iff_lt_add, sub_lt_iff_lt_add, ← sub_lt_iff_lt_add'] at hlt
+  rw [sub_div' _ _ _ hb0.ne', abs_div, abs_of_pos hb0, div_lt_div_iff_of_pos_right hb0,
+    abs_sub_lt_iff, sub_lt_iff_lt_add, sub_lt_iff_lt_add, ← sub_lt_iff_lt_add'] at hlt
   rw [Finset.mem_Icc, ← Int.lt_add_one_iff, ← Int.lt_add_one_iff, ← neg_lt_iff_pos_add, add_comm, ←
     @Int.cast_lt ℝ, ← @Int.cast_lt ℝ]
   push_cast
@@ -63,3 +67,49 @@ theorem setOf_liouvilleWith_subset_aux :
   · simp only [mul_nonneg hx01.left b.cast_nonneg, neg_le_sub_iff_le_add, le_add_iff_nonneg_left]
   · rw [add_le_add_iff_left]
     exact mul_le_of_le_one_left hb0.le hx01.2.le
+
+@[simp]
+theorem volume_iUnion_setOf_liouvilleWith :
+    volume (⋃ (p : ℝ) (_hp : 2 < p), { x : ℝ | LiouvilleWith p x }) = 0 := by
+  simp only [← setOf_exists, exists_prop]
+  refine measure_mono_null setOf_liouvilleWith_subset_aux ?_
+  rw [measure_iUnion_null_iff]; intro m; rw [measure_preimage_add_right]; clear m
+  refine (measure_biUnion_null_iff <| to_countable _).2 fun n (hn : 1 ≤ n) => ?_
+  generalize hr : (2 + 1 / n : ℝ) = r
+  replace hr : 2 < r := by simp [← hr, zero_lt_one.trans_le hn]
+  clear hn n
+  refine measure_setOf_frequently_eq_zero ?_
+  simp only [setOf_exists, ← exists_prop, ← Real.dist_eq, ← mem_ball, setOf_mem_eq]
+  set B : ℤ → ℕ → Set ℝ := fun a b => ball (a / b) (1 / (b : ℝ) ^ r)
+  have hB : ∀ a b, volume (B a b) = ↑((2 : ℝ≥0) / (b : ℝ≥0) ^ r) := fun a b ↦ by
+    rw [Real.volume_ball, mul_one_div, ← NNReal.coe_two, ← NNReal.coe_natCast, ← NNReal.coe_rpow,
+      ← NNReal.coe_div, ENNReal.ofReal_coe_nnreal]
+  have : ∀ b : ℕ, volume (⋃ a ∈ Finset.Icc (0 : ℤ) b, B a b) ≤
+      ↑(2 * ((b : ℝ≥0) ^ (1 - r) + (b : ℝ≥0) ^ (-r))) := fun b ↦
+    calc
+      volume (⋃ a ∈ Finset.Icc (0 : ℤ) b, B a b) ≤ ∑ a ∈ Finset.Icc (0 : ℤ) b, volume (B a b) :=
+        measure_biUnion_finset_le _ _
+      _ = ↑((b + 1) * (2 / (b : ℝ≥0) ^ r)) := by
+        simp only [hB, Int.card_Icc, Finset.sum_const, nsmul_eq_mul, sub_zero, ← Int.ofNat_succ,
+          Int.toNat_natCast, ← Nat.cast_succ, ENNReal.coe_mul, ENNReal.coe_natCast]
+      _ = _ := by
+        have : 1 - r ≠ 0 := by linarith
+        rw [ENNReal.coe_inj]
+        simp [add_mul, div_eq_mul_inv, NNReal.rpow_neg, NNReal.rpow_sub' this, mul_add,
+          mul_left_comm]
+  refine ne_top_of_le_ne_top (ENNReal.tsum_coe_ne_top_iff_summable.2 ?_) (ENNReal.tsum_le_tsum this)
+  refine (Summable.add ?_ ?_).mul_left _ <;> simp only [NNReal.summable_rpow] <;> linarith
+
+theorem ae_not_liouvilleWith : ∀ᵐ x, ∀ p > (2 : ℝ), ¬LiouvilleWith p x := by
+  simpa only [ae_iff, not_forall, Classical.not_not, setOf_exists] using
+    volume_iUnion_setOf_liouvilleWith
+
+theorem ae_not_liouville : ∀ᵐ x, ¬Liouville x :=
+  ae_not_liouvilleWith.mono fun _ h₁ h₂ => h₁ 3 (by norm_num) (h₂.liouvilleWith 3)
+
+@[simp]
+theorem volume_setOf_liouville : volume { x : ℝ | Liouville x } = 0 := by
+  simpa only [ae_iff, Classical.not_not] using ae_not_liouville
+
+theorem Real.disjoint_residual_ae : Disjoint (residual ℝ) (ae volume) :=
+  disjoint_of_disjoint_of_mem disjoint_compl_right eventually_residual_liouville ae_not_liouville

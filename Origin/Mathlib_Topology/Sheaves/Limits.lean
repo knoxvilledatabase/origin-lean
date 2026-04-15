@@ -1,8 +1,11 @@
 /-
 Extracted from Topology/Sheaves/Limits.lean
-Genuine: 2 of 10 | Dissolved: 0 | Infrastructure: 8
+Genuine: 2 of 6 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
+import Mathlib.Topology.Sheaves.Sheaf
+import Mathlib.CategoryTheory.Sites.Limits
+import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 
 /-!
 # Presheaves in `C` have limits and colimits when `C` does.
@@ -10,35 +13,29 @@ import Origin.Core
 
 noncomputable section
 
-universe v u w t
+universe v u w
 
 open CategoryTheory
 
 open CategoryTheory.Limits
 
-variable {C : Type u} [Category.{v} C] {J : Type w} [Category* J]
+variable {C : Type u} [Category.{v} C] {J : Type v} [SmallCategory J]
 
 namespace TopCat
 
--- INSTANCE (free from Core): [HasLimitsOfShape
+instance [HasLimits C] (X : TopCat.{v}) : HasLimits.{v} (Presheaf C X) :=
+  Limits.functorCategoryHasLimitsOfSize.{v, v}
 
--- INSTANCE (free from Core): [HasLimits
+instance [HasColimits.{v, u} C] (X : TopCat.{w}) : HasColimitsOfSize.{v, v} (Presheaf C X) :=
+  Limits.functorCategoryHasColimitsOfSize
 
--- INSTANCE (free from Core): [HasColimitsOfShape
+instance [HasLimits C] (X : TopCat) : CreatesLimits.{v, v} (Sheaf.forget C X) :=
+  Sheaf.createsLimits.{u, v, v}
 
--- INSTANCE (free from Core): [HasColimits.{v,
+instance [HasLimits C] (X : TopCat.{v}) : HasLimitsOfSize.{v, v} (Sheaf.{v} C X) :=
+  hasLimits_of_hasLimits_createsLimits (Sheaf.forget C X)
 
--- INSTANCE (free from Core): [HasLimitsOfShape
-
--- INSTANCE (free from Core): [HasLimitsOfShape
-
--- INSTANCE (free from Core): [HasLimits
-
--- INSTANCE (free from Core): [HasLimits
-
-set_option backward.isDefEq.respectTransparency false in
-
-theorem isSheaf_of_isLimit [HasLimitsOfShape J C] {X : TopCat} (F : J ⥤ Presheaf.{v} C X)
+theorem isSheaf_of_isLimit [HasLimits C] {X : TopCat} (F : J ⥤ Presheaf.{v} C X)
     (H : ∀ j, (F.obj j).IsSheaf) {c : Cone F} (hc : IsLimit c) : c.pt.IsSheaf := by
   let F' : J ⥤ Sheaf C X :=
     { obj := fun j => ⟨F.obj j, H j⟩
@@ -48,7 +45,7 @@ theorem isSheaf_of_isLimit [HasLimitsOfShape J C] {X : TopCat} (F : J ⥤ Preshe
     ((isLimitOfPreserves (Sheaf.forget C X) (limit.isLimit F')).conePointsIsoOfNatIso hc e)
     (limit F').2
 
-theorem limit_isSheaf [HasLimitsOfShape J C] {X : TopCat} (F : J ⥤ Presheaf.{v} C X)
+theorem limit_isSheaf [HasLimits C] {X : TopCat} (F : J ⥤ Presheaf.{v} C X)
     (H : ∀ j, (F.obj j).IsSheaf) : (limit F).IsSheaf :=
   isSheaf_of_isLimit F H (limit.isLimit F)
 

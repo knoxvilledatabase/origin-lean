@@ -3,6 +3,10 @@ Extracted from Topology/MetricSpace/ShrinkingLemma.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.EMetricSpace.Paracompact
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
+import Mathlib.Topology.ShrinkingLemma
 
 /-!
 # Shrinking lemma in a proper metric space

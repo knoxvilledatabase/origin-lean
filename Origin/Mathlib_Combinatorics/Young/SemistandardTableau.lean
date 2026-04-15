@@ -1,8 +1,9 @@
 /-
 Extracted from Combinatorics/Young/SemistandardTableau.lean
-Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
+Genuine: 10 of 15 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
+import Mathlib.Combinatorics.Young.YoungDiagram
 
 /-!
 # Semistandard Young tableaux
@@ -28,8 +29,8 @@ for all pairs `(i, j) ∉ μ` and to satisfy the row-weak and column-strict cond
 - `SemistandardYoungTableau (μ : YoungDiagram)`: semistandard Young tableaux of shape `μ`. There is
   a `coe` instance such that `T i j` is value of the `(i, j)` entry of the semistandard Young
   tableau `T`.
-- `SemistandardYoungTableau.highestWeight (μ : YoungDiagram)`: the semistandard Young tableau whose
-  `i`th row consists entirely of `i`s, for each `i`.
+- `Ssyt.highestWeight (μ : YoungDiagram)`: the semistandard Young tableau whose `i`th row
+  consists entirely of `i`s, for each `i`.
 
 ## Tags
 
@@ -53,4 +54,81 @@ structure SemistandardYoungTableau (μ : YoungDiagram) where
 
 namespace SemistandardYoungTableau
 
--- INSTANCE (free from Core): instFunLike
+instance instFunLike {μ : YoungDiagram} : FunLike (SemistandardYoungTableau μ) ℕ (ℕ → ℕ) where
+  coe := SemistandardYoungTableau.entry
+  coe_injective' T T' h := by
+    cases T
+    cases T'
+    congr
+
+@[simp]
+theorem to_fun_eq_coe {μ : YoungDiagram} {T : SemistandardYoungTableau μ} :
+    T.entry = (T : ℕ → ℕ → ℕ) :=
+  rfl
+
+@[ext]
+theorem ext {μ : YoungDiagram} {T T' : SemistandardYoungTableau μ} (h : ∀ i j, T i j = T' i j) :
+    T = T' :=
+  DFunLike.ext T T' fun _ ↦ by
+    funext
+    apply h
+
+protected def copy {μ : YoungDiagram} (T : SemistandardYoungTableau μ) (entry' : ℕ → ℕ → ℕ)
+    (h : entry' = T) : SemistandardYoungTableau μ where
+  entry := entry'
+  row_weak' := h.symm ▸ T.row_weak'
+  col_strict' := h.symm ▸ T.col_strict'
+  zeros' := h.symm ▸ T.zeros'
+
+@[simp]
+theorem coe_copy {μ : YoungDiagram} (T : SemistandardYoungTableau μ) (entry' : ℕ → ℕ → ℕ)
+    (h : entry' = T) : ⇑(T.copy entry' h) = entry' :=
+  rfl
+
+theorem copy_eq {μ : YoungDiagram} (T : SemistandardYoungTableau μ) (entry' : ℕ → ℕ → ℕ)
+    (h : entry' = T) : T.copy entry' h = T :=
+  DFunLike.ext' h
+
+theorem row_weak {μ : YoungDiagram} (T : SemistandardYoungTableau μ) {i j1 j2 : ℕ} (hj : j1 < j2)
+    (hcell : (i, j2) ∈ μ) : T i j1 ≤ T i j2 :=
+  T.row_weak' hj hcell
+
+theorem col_strict {μ : YoungDiagram} (T : SemistandardYoungTableau μ) {i1 i2 j : ℕ} (hi : i1 < i2)
+    (hcell : (i2, j) ∈ μ) : T i1 j < T i2 j :=
+  T.col_strict' hi hcell
+
+theorem zeros {μ : YoungDiagram} (T : SemistandardYoungTableau μ) {i j : ℕ}
+    (not_cell : (i, j) ∉ μ) : T i j = 0 :=
+  T.zeros' not_cell
+
+theorem row_weak_of_le {μ : YoungDiagram} (T : SemistandardYoungTableau μ) {i j1 j2 : ℕ}
+    (hj : j1 ≤ j2) (cell : (i, j2) ∈ μ) : T i j1 ≤ T i j2 := by
+  cases' eq_or_lt_of_le hj with h h
+  · rw [h]
+  · exact T.row_weak h cell
+
+theorem col_weak {μ : YoungDiagram} (T : SemistandardYoungTableau μ) {i1 i2 j : ℕ} (hi : i1 ≤ i2)
+    (cell : (i2, j) ∈ μ) : T i1 j ≤ T i2 j := by
+  cases' eq_or_lt_of_le hi with h h
+  · rw [h]
+  · exact le_of_lt (T.col_strict h cell)
+
+def highestWeight (μ : YoungDiagram) : SemistandardYoungTableau μ where
+  entry i j := if (i, j) ∈ μ then i else 0
+  row_weak' hj hcell := by
+    simp only
+    rw [if_pos hcell, if_pos (μ.up_left_mem (by rfl) (le_of_lt hj) hcell)]
+  col_strict' hi hcell := by
+    simp only
+    rwa [if_pos hcell, if_pos (μ.up_left_mem (le_of_lt hi) (by rfl) hcell)]
+  zeros' not_cell := if_neg not_cell
+
+@[simp]
+theorem highestWeight_apply {μ : YoungDiagram} {i j : ℕ} :
+    highestWeight μ i j = if (i, j) ∈ μ then i else 0 :=
+  rfl
+
+instance {μ : YoungDiagram} : Inhabited (SemistandardYoungTableau μ) :=
+  ⟨highestWeight μ⟩
+
+end SemistandardYoungTableau

@@ -1,8 +1,10 @@
 /-
 Extracted from LinearAlgebra/Matrix/StdBasis.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 of 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Data.Matrix.Basis
+import Mathlib.LinearAlgebra.StdBasis
 
 /-!
 # Standard basis on matrices
@@ -12,9 +14,7 @@ import Origin.Core
 * `Basis.matrix`: extend a basis on `M` to the standard basis on `Matrix n m M`
 -/
 
-open Module
-
-namespace Module.Basis
+namespace Basis
 
 variable {ι R M : Type*} (m n : Type*)
 
@@ -27,3 +27,26 @@ protected noncomputable def matrix (b : Basis ι R M) :
     |>.map (Matrix.ofLinearEquiv R)
 
 variable {n m}
+
+@[simp]
+theorem matrix_apply (b : Basis ι R M) (i : m) (j : n) (k : ι) [DecidableEq m] [DecidableEq n] :
+    b.matrix m n (i, j, k) = Matrix.stdBasisMatrix i j (b k) := by
+  simp [Basis.matrix, Matrix.stdBasisMatrix_eq_of_single_single]
+
+end Basis
+
+namespace Matrix
+
+variable (R : Type*) (m n : Type*) [Fintype m] [Finite n] [Semiring R]
+
+noncomputable def stdBasis : Basis (m × n) R (Matrix m n R) :=
+  Basis.reindex (Pi.basis fun _ : m => Pi.basisFun R n) (Equiv.sigmaEquivProd _ _)
+    |>.map (ofLinearEquiv R)
+
+variable {n m}
+
+theorem stdBasis_eq_stdBasisMatrix (i : m) (j : n) [DecidableEq m] [DecidableEq n] :
+    stdBasis R m n (i, j) = stdBasisMatrix i j (1 : R) := by
+  simp [stdBasis, stdBasisMatrix_eq_of_single_single]
+
+end Matrix

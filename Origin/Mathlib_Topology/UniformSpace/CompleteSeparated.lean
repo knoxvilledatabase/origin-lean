@@ -3,6 +3,7 @@ Extracted from Topology/UniformSpace/CompleteSeparated.lean
 Genuine: 3 of 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.UniformSpace.UniformEmbedding
 
 /-!
 # Theory of complete separated uniform spaces.
@@ -28,6 +29,14 @@ theorem IsUniformEmbedding.isClosedEmbedding [UniformSpace α] [UniformSpace β]
     [T0Space β] {f : α → β} (hf : IsUniformEmbedding f) :
     IsClosedEmbedding f :=
   ⟨hf.isEmbedding, hf.isUniformInducing.isComplete_range.isClosed⟩
+
+alias IsUniformEmbedding.toIsClosedEmbedding := IsUniformEmbedding.isClosedEmbedding
+
+alias IsUniformEmbedding.toClosedEmbedding := IsUniformEmbedding.isClosedEmbedding
+
+alias UniformEmbedding.toIsClosedEmbedding := IsUniformEmbedding.isClosedEmbedding
+
+alias UniformEmbedding.toClosedEmbedding := IsUniformEmbedding.isClosedEmbedding
 
 namespace IsDenseInducing
 

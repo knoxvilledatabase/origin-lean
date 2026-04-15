@@ -1,31 +1,59 @@
 /-
 Extracted from Data/Fintype/List.lean
-Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 of 4 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Finset.Powerset
+import Mathlib.Data.List.Permutation
 
 /-!
 
 # Fintype instance for nodup lists
 
-The subtype of `{l : List α // l.Nodup}` over a `[Fintype α]`
+The subtype of `{l : List α // l.nodup}` over a `[Fintype α]`
 admits a `Fintype` instance.
 
 ## Implementation details
 To construct the `Fintype` instance, a function lifting a `Multiset α`
-to the `Multiset (List α)` is provided.
+to the `Finset (List α)` that can construct it is provided.
 This function is applied to the `Finset.powerset` of `Finset.univ`.
+
+In general, a `DecidableEq` instance is not necessary to define this function,
+but a proof of `(List.permutations l).nodup` is required to avoid it,
+which is a TODO.
 
 -/
 
-variable {α : Type*}
+variable {α : Type*} [DecidableEq α]
 
 open List
 
 namespace Multiset
 
-def lists : Multiset α → Multiset (List α) := fun s =>
-  Quotient.liftOn s (fun l => l.permutations) fun l l' (h : l ~ l') => by
-    simp only
-    refine coe_eq_coe.mpr ?_
-    exact Perm.permutations h
+def lists : Multiset α → Finset (List α) := fun s =>
+  Quotient.liftOn s (fun l => l.permutations.toFinset) fun l l' (h : l ~ l') => by
+    ext sl
+    simp only [mem_permutations, List.mem_toFinset]
+    exact ⟨fun hs => hs.trans h, fun hs => hs.trans h.symm⟩
+
+@[simp]
+theorem lists_coe (l : List α) : lists (l : Multiset α) = l.permutations.toFinset :=
+  rfl
+
+@[simp]
+theorem mem_lists_iff (s : Multiset α) (l : List α) : l ∈ lists s ↔ s = ⟦l⟧ := by
+  induction s using Quotient.inductionOn
+  simpa using perm_comm
+
+end Multiset
+
+instance fintypeNodupList [Fintype α] : Fintype { l : List α // l.Nodup } :=
+  Fintype.subtype ((Finset.univ : Finset α).powerset.biUnion fun s => s.val.lists) fun l => by
+    suffices (∃ a : Finset α, a.val = ↑l) ↔ l.Nodup by simpa
+    constructor
+    · rintro ⟨s, hs⟩
+      simpa [← Multiset.coe_nodup, ← hs] using s.nodup
+    · intro hl
+      refine ⟨⟨↑l, hl⟩, ?_⟩
+      simp

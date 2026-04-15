@@ -3,6 +3,8 @@ Extracted from Order/CompactlyGenerated/Intervals.lean
 Genuine: 1 of 3 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
+import Mathlib.Order.CompleteLatticeIntervals
+import Mathlib.Order.CompactlyGenerated.Basic
 
 /-!
 # Results about compactness properties for intervals in complete lattices
@@ -12,7 +14,28 @@ variable {ι α : Type*} [CompleteLattice α]
 
 namespace Set.Iic
 
--- INSTANCE (free from Core): instIsCompactlyGenerated
+theorem isCompactElement {a : α} {b : Iic a} (h : CompleteLattice.IsCompactElement (b : α)) :
+    CompleteLattice.IsCompactElement b := by
+  simp only [CompleteLattice.isCompactElement_iff, Finset.sup_eq_iSup] at h ⊢
+  intro ι s hb
+  replace hb : (b : α) ≤ iSup ((↑) ∘ s) := le_trans hb <| (coe_iSup s) ▸ le_refl _
+  obtain ⟨t, ht⟩ := h ι ((↑) ∘ s) hb
+  exact ⟨t, (by simpa using ht : (b : α) ≤ _)⟩
+
+instance instIsCompactlyGenerated [IsCompactlyGenerated α] {a : α} :
+    IsCompactlyGenerated (Iic a) := by
+  refine ⟨fun ⟨x, (hx : x ≤ a)⟩ ↦ ?_⟩
+  obtain ⟨s, hs, rfl⟩ := IsCompactlyGenerated.exists_sSup_eq x
+  rw [sSup_le_iff] at hx
+  let f : s → Iic a := fun y ↦ ⟨y, hx _ y.property⟩
+  refine ⟨range f, ?_, ?_⟩
+  · rintro - ⟨⟨y, hy⟩, hy', rfl⟩
+    exact isCompactElement (hs _ hy)
+  · rw [Subtype.ext_iff]
+    change sSup (((↑) : Iic a → α) '' (range f)) = sSup s
+    congr
+    ext b
+    simpa [f] using hx b
 
 end Set.Iic
 

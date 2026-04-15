@@ -3,12 +3,15 @@ Extracted from Topology/UniformSpace/Ascoli.lean
 Genuine: 17 of 17 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Topology.UniformSpace.CompactConvergence
+import Mathlib.Topology.UniformSpace.Equicontinuity
+import Mathlib.Topology.UniformSpace.Equiv
 
 /-!
 # Ascoli Theorem
 
 In this file, we prove the general **Arzela-Ascoli theorem**, and various related statements about
-the topology of equicontinuous subsets of `X →ᵤ[𝔖] α`, where `X` is a topological space, `𝔖` is
+the topology of equicontinuous subsetes of `X →ᵤ[𝔖] α`, where `X` is a topological space, `𝔖` is
 a family of compact subsets of `X`, and `α` is a uniform space.
 
 ## Main statements
@@ -49,7 +52,7 @@ a family of compact subsets of `X`, and `α` is a uniform space.
 ## TODO
 
 * Prove that, on an equicontinuous family, pointwise convergence and pointwise convergence on a
-  dense subset coincide, and deduce metrizability criteria for equicontinuous subsets.
+  dense subset coincide, and deduce metrizability criterions for equicontinuous subsets.
 
 * Prove the total boundedness version of the theorem
 
@@ -75,8 +78,8 @@ theorem Equicontinuous.comap_uniformFun_eq [CompactSpace X] (F_eqcont : Equicont
   -- The `≤` inequality is trivial
   refine le_antisymm (UniformSpace.comap_mono UniformFun.uniformContinuous_toFun) ?_
   -- A bit of rewriting to get a nice intermediate statement.
-  simp_rw [UniformSpace.comap, UniformSpace.le_def, uniformity_comap, Pi.uniformity,
-    Filter.comap_iInf, comap_comap, Function.comp_def]
+  change comap _ _ ≤ comap _ _
+  simp_rw [Pi.uniformity, Filter.comap_iInf, comap_comap, Function.comp_def]
   refine ((UniformFun.hasBasis_uniformity X α).comap (Prod.map F F)).ge_iff.mpr ?_
   -- Core of the proof: we need to show that, for any entourage `U` in `α`,
   -- the set `𝐓(U) := {(i,j) : ι × ι | ∀ x : X, (F i x, F j x) ∈ U}` belongs to the filter
@@ -105,8 +108,8 @@ theorem Equicontinuous.comap_uniformFun_eq [CompactSpace X] (F_eqcont : Equicont
     rcases mem_iUnion₂.mp (Acover.symm.subset <| mem_univ x) with ⟨a, ha, hax⟩
     -- Since `(i, j) ∈ 𝐒(V, a)` we also have `(F i a, F j a) ∈ V`, and finally we get
     -- `(F i x, F j x) ∈ V ○ V ○ V ⊆ U`.
-    exact hVU <| SetRel.prodMk_mem_comp (SetRel.prodMk_mem_comp (SetRel.symm V <| hax i) (hij a ha))
-      (hax j)
+    exact hVU (prod_mk_mem_compRel (prod_mk_mem_compRel
+      (Vsymm.mk_mem_comm.mp (hax i)) (hij a ha)) (hax j))
   -- This completes the proof.
   exact mem_of_superset
     (A.iInter_mem_sets.mpr fun x _ ↦ mem_iInf_of_mem x <| preimage_mem_comap hV) this
@@ -117,6 +120,9 @@ lemma Equicontinuous.isUniformInducing_uniformFun_iff_pi [UniformSpace ι] [Comp
   rw [isUniformInducing_iff_uniformSpace, isUniformInducing_iff_uniformSpace,
       ← F_eqcont.comap_uniformFun_eq]
   rfl
+
+alias Equicontinuous.uniformInducing_uniformFun_iff_pi :=
+  Equicontinuous.isUniformInducing_uniformFun_iff_pi
 
 lemma Equicontinuous.inducing_uniformFun_iff_pi [TopologicalSpace ι] [CompactSpace X]
     (F_eqcont : Equicontinuous F) :
@@ -130,12 +136,12 @@ theorem Equicontinuous.tendsto_uniformFun_iff_pi [CompactSpace X]
     (F_eqcont : Equicontinuous F) (ℱ : Filter ι) (f : X → α) :
     Tendsto (UniformFun.ofFun ∘ F) ℱ (𝓝 <| UniformFun.ofFun f) ↔
     Tendsto F ℱ (𝓝 f) := by
-  -- Assume `ℱ` is non-trivial.
+  -- Assume `ℱ` is non trivial.
   rcases ℱ.eq_or_neBot with rfl | ℱ_ne
   · simp
   constructor <;> intro H
   -- The forward direction is always true, the interesting part is the converse.
-  · exact UniformFun.uniformContinuous_toFun.continuous.tendsto _ |>.comp H
+  · exact UniformFun.uniformContinuous_toFun.continuous.tendsto _|>.comp H
   -- To prove it, assume that `F` tends to `f` *pointwise* along `ℱ`.
   · set S : Set (X → α) := closure (range F)
     set 𝒢 : Filter S := comap (↑) (map F ℱ)
@@ -163,8 +169,6 @@ theorem Equicontinuous.tendsto_uniformFun_iff_pi [CompactSpace X]
     have H' : Tendsto id 𝒢 (𝓝 ⟨f, f_mem⟩) := by
       rwa [tendsto_id', nhds_induced, ← map_le_iff_le_comap, h𝒢ℱ]
     rwa [ind.tendsto_nhds_iff, comp_id, ← tendsto_map'_iff, h𝒢ℱ] at H'
-
-set_option backward.isDefEq.respectTransparency false in
 
 theorem EquicontinuousOn.comap_uniformOnFun_eq {𝔖 : Set (Set X)} (𝔖_compact : ∀ K ∈ 𝔖, IsCompact K)
     (F_eqcont : ∀ K ∈ 𝔖, EquicontinuousOn F K) :
@@ -205,6 +209,9 @@ lemma EquicontinuousOn.isUniformInducing_uniformOnFun_iff_pi' [UniformSpace ι]
       ← EquicontinuousOn.comap_uniformOnFun_eq 𝔖_compact F_eqcont]
   rfl
 
+alias EquicontinuousOn.uniformInducing_uniformOnFun_iff_pi' :=
+  EquicontinuousOn.isUniformInducing_uniformOnFun_iff_pi'
+
 lemma EquicontinuousOn.isUniformInducing_uniformOnFun_iff_pi [UniformSpace ι]
     {𝔖 : Set (Set X)} (𝔖_covers : ⋃₀ 𝔖 = univ) (𝔖_compact : ∀ K ∈ 𝔖, IsCompact K)
     (F_eqcont : ∀ K ∈ 𝔖, EquicontinuousOn F K) :
@@ -218,6 +225,9 @@ lemma EquicontinuousOn.isUniformInducing_uniformOnFun_iff_pi [UniformSpace ι]
   rw [EquicontinuousOn.isUniformInducing_uniformOnFun_iff_pi' 𝔖_compact F_eqcont,
       show restrict (⋃₀ 𝔖) ∘ F = φ.symm ∘ F by rfl]
   exact ⟨fun H ↦ φ.isUniformInducing.comp H, fun H ↦ φ.symm.isUniformInducing.comp H⟩
+
+alias EquicontinuousOn.uniformInducing_uniformOnFun_iff_pi :=
+  EquicontinuousOn.isUniformInducing_uniformOnFun_iff_pi
 
 lemma EquicontinuousOn.inducing_uniformOnFun_iff_pi' [TopologicalSpace ι]
     {𝔖 : Set (Set X)} (𝔖_compact : ∀ K ∈ 𝔖, IsCompact K)
@@ -243,6 +253,9 @@ lemma EquicontinuousOn.isInducing_uniformOnFun_iff_pi [TopologicalSpace ι]
       show restrict (⋃₀ 𝔖) ∘ F = φ.symm ∘ F by rfl]
   exact ⟨fun H ↦ φ.isInducing.comp H, fun H ↦ φ.symm.isInducing.comp H⟩
 
+alias EquicontinuousOn.inducing_uniformOnFun_iff_pi :=
+  EquicontinuousOn.isInducing_uniformOnFun_iff_pi
+
 theorem EquicontinuousOn.tendsto_uniformOnFun_iff_pi'
     {𝔖 : Set (Set X)} (𝔖_compact : ∀ K ∈ 𝔖, IsCompact K)
     (F_eqcont : ∀ K ∈ 𝔖, EquicontinuousOn F K) (ℱ : Filter ι) (f : X → α) :
@@ -256,9 +269,8 @@ theorem EquicontinuousOn.tendsto_uniformOnFun_iff_pi'
   -- Thus, we just have to compare the two sides of our goal when restricted to some
   -- `K ∈ 𝔖`, where we can apply `Equicontinuous.tendsto_uniformFun_iff_pi`.
   rw [← Filter.tendsto_comap_iff (g := (⋃₀ 𝔖).restrict), ← nhds_induced]
-  simp_rw +instances [UniformOnFun.topologicalSpace_eq,
-    Pi.induced_restrict_sUnion 𝔖 (A := fun _ ↦ α), _root_.nhds_iInf, nhds_induced, tendsto_iInf,
-    tendsto_comap_iff]
+  simp_rw [UniformOnFun.topologicalSpace_eq, Pi.induced_restrict_sUnion 𝔖 (π := fun _ ↦ α),
+    _root_.nhds_iInf, nhds_induced, tendsto_iInf, tendsto_comap_iff]
   congrm ∀ K (hK : K ∈ 𝔖), ?_
   have : CompactSpace K := isCompact_iff_compactSpace.mp (𝔖_compact K hK)
   rw [← (equicontinuous_restrict_iff _ |>.mpr <| F_eqcont K hK).tendsto_uniformFun_iff_pi]
@@ -303,7 +315,6 @@ theorem EquicontinuousOn.isClosed_range_uniformOnFun_iff_pi
     (UniformOnFun.ofFun 𝔖).injective.mem_set_image]
 
 alias ⟨EquicontinuousOn.isClosed_range_pi_of_uniformOnFun, _⟩ :=
-
   EquicontinuousOn.isClosed_range_uniformOnFun_iff_pi
 
 theorem ArzelaAscoli.compactSpace_of_closed_inducing' [TopologicalSpace ι] {𝔖 : Set (Set X)}
@@ -339,6 +350,8 @@ theorem ArzelaAscoli.compactSpace_of_isClosedEmbedding [TopologicalSpace ι] {�
   compactSpace_of_closed_inducing' 𝔖_compact F_clemb.isInducing F_clemb.isClosed_range
     F_eqcont F_pointwiseCompact
 
+alias ArzelaAscoli.compactSpace_of_closedEmbedding := ArzelaAscoli.compactSpace_of_isClosedEmbedding
+
 theorem ArzelaAscoli.isCompact_closure_of_isClosedEmbedding [TopologicalSpace ι] [T2Space α]
     {𝔖 : Set (Set X)} (𝔖_compact : ∀ K ∈ 𝔖, IsCompact K)
     (F_clemb : IsClosedEmbedding (UniformOnFun.ofFun 𝔖 ∘ F))
@@ -353,12 +366,15 @@ theorem ArzelaAscoli.isCompact_closure_of_isClosedEmbedding [TopologicalSpace ι
   have cls_eqcont : ∀ K ∈ 𝔖, EquicontinuousOn (F ∘ ((↑) : closure s → ι)) K :=
     fun K hK ↦ (s_eqcont K hK).closure' <| show Continuous (K.restrict ∘ F) from
       continuous_pi fun ⟨x, hx⟩ ↦ this K hK x hx
-  have cls_pointwiseCompact : ∀ K ∈ 𝔖, ∀ x ∈ K, ∃ Q, IsCompact Q ∧ closure s ⊆ {i | F i x ∈ Q} :=
+  have cls_pointwiseCompact : ∀ K ∈ 𝔖, ∀ x ∈ K, ∃ Q, IsCompact Q ∧ ∀ i ∈ closure s, F i x ∈ Q :=
     fun K hK x hx ↦ (s_pointwiseCompact K hK x hx).imp fun Q hQ ↦ ⟨hQ.1, closure_minimal hQ.2 <|
       hQ.1.isClosed.preimage (this K hK x hx)⟩
   exact ArzelaAscoli.compactSpace_of_isClosedEmbedding 𝔖_compact
     (F_clemb.comp isClosed_closure.isClosedEmbedding_subtypeVal) cls_eqcont
     fun K hK x hx ↦ (cls_pointwiseCompact K hK x hx).imp fun Q hQ ↦ ⟨hQ.1, by simpa using hQ.2⟩
+
+alias ArzelaAscoli.isCompact_closure_of_closedEmbedding :=
+  ArzelaAscoli.isCompact_closure_of_isClosedEmbedding
 
 theorem ArzelaAscoli.isCompact_of_equicontinuous
     (S : Set C(X, α)) (hS1 : IsCompact (ContinuousMap.toFun '' S))

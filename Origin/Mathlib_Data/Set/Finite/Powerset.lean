@@ -3,6 +3,8 @@ Extracted from Data/Set/Finite/Powerset.lean
 Genuine: 1 of 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
+import Mathlib.Data.Finset.Powerset
+import Mathlib.Data.Set.Finite.Basic
 
 /-!
 # Finiteness of the powerset of a finite set
@@ -16,8 +18,6 @@ and a `Set.Finite` constructor.
 
 finite sets
 -/
-
-assert_not_exists IsOrderedRing MonoidWithZero
 
 open Set Function
 
@@ -42,6 +42,9 @@ theorem Finite.finite_subsets {α : Type u} {a : Set α} (h : a.Finite) : { b | 
   ext s
   simpa [← @exists_finite_iff_finset α fun t => t ⊆ a ∧ t = s, Finite.subset_toFinset,
     ← and_assoc, Finset.coeEmb] using h.subset
+
+protected theorem Finite.powerset {s : Set α} (h : s.Finite) : (𝒫 s).Finite :=
+  h.finite_subsets
 
 end SetFiniteConstructors
 

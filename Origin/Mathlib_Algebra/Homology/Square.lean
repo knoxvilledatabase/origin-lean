@@ -3,11 +3,13 @@ Extracted from Algebra/Homology/Square.lean
 Genuine: 6 of 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.Algebra.Homology.CommSq
+import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Square
 
 /-!
 # Relation between pullback/pushout squares and kernel/cokernel sequences
 
-This file is the bundled counterpart of `Mathlib/Algebra/Homology/CommSq.lean`.
+This file is the bundled counterpart of `Algebra.Homology.CommSq`.
 The same results are obtained here for squares `sq : Square C` where
 `C` is an additive category.
 
@@ -19,10 +21,10 @@ open Category Limits
 
 namespace Square
 
-variable {C : Type*} [Category* C] [Preadditive C]
+variable {C : Type*} [Category C] [Preadditive C]
   (sq : Square C) [HasBinaryBiproduct sq.X₂ sq.X₃]
 
-noncomputable abbrev cokernelCofork :
+noncomputable abbrev cokernelCofork  :
     CokernelCofork (biprod.lift sq.f₁₂ (-sq.f₁₃)) :=
   CokernelCofork.ofπ (biprod.desc sq.f₂₄ sq.f₃₄) (by simp [sq.fac])
 
@@ -31,6 +33,7 @@ noncomputable def isPushoutEquivIsColimitCokernelCofork :
   Equiv.trans
     { toFun := fun h ↦ h.isColimit
       invFun := fun h ↦ IsPushout.mk _ h
+      left_inv := fun _ ↦ rfl
       right_inv := fun _ ↦ Subsingleton.elim _ _ }
     sq.commSq.isColimitEquivIsColimitCokernelCofork
 
@@ -40,7 +43,7 @@ noncomputable def IsPushout.isColimitCokernelCofork (h : sq.IsPushout) :
     IsColimit sq.cokernelCofork :=
   h.isColimitEquivIsColimitCokernelCofork h.isColimit
 
-noncomputable abbrev kernelFork :
+noncomputable abbrev kernelFork  :
     KernelFork (biprod.desc sq.f₂₄ (-sq.f₃₄)) :=
   KernelFork.ofι (biprod.lift sq.f₁₂ sq.f₁₃) (by simp [sq.fac])
 
@@ -49,6 +52,7 @@ noncomputable def isPullbackEquivIsLimitKernelFork :
   Equiv.trans
     { toFun := fun h ↦ h.isLimit
       invFun := fun h ↦ IsPullback.mk _ h
+      left_inv := fun _ ↦ rfl
       right_inv := fun _ ↦ Subsingleton.elim _ _ }
     sq.commSq.isLimitEquivIsLimitKernelFork
 

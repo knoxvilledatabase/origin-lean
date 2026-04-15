@@ -3,6 +3,8 @@ Extracted from RingTheory/Finiteness/Bilinear.lean
 Genuine: 1 of 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
+import Mathlib.RingTheory.Finiteness.Defs
+import Mathlib.Algebra.Module.Submodule.Bilinear
 
 /-!
 # Finitely generated submodules and bilinear maps
@@ -10,6 +12,8 @@ import Origin.Core
 -/
 
 open Function (Surjective)
+
+open Finsupp
 
 namespace Submodule
 
