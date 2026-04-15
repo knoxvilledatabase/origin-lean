@@ -7,7 +7,7 @@ import Origin.Foundation
 # Origin Test: Option Int
 
 Can the entire Val foundation be replaced by Option α plus the
-absorption theorem?
+origin theorem?
 
 Instantiate the derivation on Int. Build Option operations.
 Prove the critical distinction. Count what you get for free.
@@ -17,8 +17,8 @@ Prove the critical distinction. Count what you get for free.
 -- Step 1: The Derivation Instantiates on Int
 -- ============================================================================
 
-theorem int_absorption (n : Int) : n * 0 = 0 :=
-  absorption 0 Int.add_right_neg Int.mul_add (fun a b => (Int.neg_mul_eq_mul_neg a b).symm) n
+theorem int_origin (n : Int) : n * 0 = 0 :=
+  origin 0 Int.add_right_neg Int.mul_add (fun a b => (Int.neg_mul_eq_mul_neg a b).symm) n
 
 -- The four-step proof works on Int. Not by convention. By derivation.
 
@@ -106,7 +106,7 @@ theorem measurement_ne_ground : some (0 : Int) ≠ none := by
 
 -- Some 0 can exist as input (a sensor read zero). But it cannot survive
 -- multiplication — because zero under multiplication IS the ground.
--- The derivation (absorption theorem) is why.
+-- The derivation (origin theorem) is why.
 
 -- ============================================================================
 -- Step 9: Concrete Computation
@@ -134,11 +134,11 @@ example : oMul (some 0) (some 5) = none := by native_decide
 -- Step 10: What You Get For Free
 -- ============================================================================
 
--- From Option α + the absorption theorem:
+-- From Option α + the origin theorem:
 --
 --   ✓ Additive identity (ground + x = x)
 --   ✓ Cancellation (x - x = ground)
---   ✓ Multiplicative absorption (ground × x = ground)
+--   ✓ Multiplicative origin (ground × x = ground)
 --   ✓ Multiplication by zero = ground (the derivation)
 --   ✓ Critical distinction (Some 0 ≠ None)
 --   ✓ Concrete computation
