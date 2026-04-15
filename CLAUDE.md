@@ -9,25 +9,34 @@
    Say what you understand the current state to be and what the next
    step is. Wait for their confirmation.
 
-3. **Run the fruit script** to find the highest-impact target:
+3. **Run the classify script** to see what needs writing:
    ```bash
    cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
-   ./scripts/fruit.sh --all 10
+   ./scripts/classify.sh NumberTheory   # one domain
+   ./scripts/classify.sh --all          # all domains (takes minutes)
    ```
+   This classifies every declaration in every file:
+   - GENUINE — real content to write in Origin
+   - DISSOLVE — ≠ 0 / NeZero hypotheses (vanish with none)
+   - INSTANCE — typeclass infrastructure (free from Core)
+   - SIMP — @[simp] lemmas (free from Core)
+   - TRIVIAL — rfl / by simp / exact h (nothing to write)
 
-4. **Pick the top file.** Open it from Mathlib source at:
+   **The GENUINE count is what to write.** Everything else is free or dissolves.
+
+4. **Pick files with highest GENUINE count.** Open from Mathlib source at:
    `/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib/`
 
-5. **Triage it theorem-by-theorem.** For each declaration:
-   - Zero-management hypothesis? → Dissolves with Origin. Skip.
-   - Free from Core's instances? → Skip.
-   - Genuine domain content? → Write it in Origin.
+5. **Write only the GENUINE declarations.** Import Origin.Core. Standard
+   notation. Build. Verify. Show the user. Confirm before moving on.
 
-6. **Write the Origin version.** Import Origin.Core. Standard notation.
-   Build. Verify. Show the user. Confirm before moving to the next file.
+6. **Other scripts available:**
+   ```bash
+   ./scripts/triage.sh NumberTheory    # Type A/B breakdown per file
+   ./scripts/fruit.sh --all 10        # top 10 by dissolution density
+   ```
 
-7. **Repeat.** Pick the next file from the fruit script. Confirm with
-   the user between each file.
+7. **Repeat.** Pick the next file. Confirm with the user between each file.
 
 **Always confirm between steps. The user holds the architecture.**
 
