@@ -271,6 +271,9 @@ def extract_smart(filepath: Path) -> tuple[str, dict]:
     if genuine_count == 0:
         return f"-- {relpath}: 0 genuine declarations. {dissolved} dissolved, {infra} infrastructure.\n", stats
 
+    # Collect original imports (we keep them — the file needs Mathlib's types)
+    original_imports = [b.text for b in blocks if b.kind == "import"]
+
     # Build output preserving structure
     for b in blocks:
         if b.kind == "comment":
@@ -280,7 +283,7 @@ def extract_smart(filepath: Path) -> tuple[str, dict]:
             continue
 
         if b.kind == "import":
-            continue  # We'll add our own
+            continue  # We'll add our own (original + Origin.Core)
 
         if b.kind in ("namespace", "end_namespace"):
             output_parts.append(b.text)
@@ -307,12 +310,19 @@ def extract_smart(filepath: Path) -> tuple[str, dict]:
             output_parts.append(b.text)
 
     # Assemble
+    # Keep original Mathlib imports (the file needs Mathlib's types)
+    # Add Origin.Core for the foundation
+    import_block = "import Origin.Core\n"
+    for imp in original_imports:
+        # Convert 'public import' to 'import'
+        clean = imp.strip().replace("public import ", "import ")
+        import_block += clean + "\n"
+
     header = f"""/-
 Extracted from {relpath}
 Genuine: {genuine_count} of {total_count} | Dissolved: {dissolved} | Infrastructure: {infra}
 -/
-import Origin.Core
-"""
+{import_block}"""
 
     body = "\n\n".join(p for p in output_parts if p.strip())
     return header + "\n" + body + "\n", stats

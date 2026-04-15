@@ -46,6 +46,11 @@
 
 **Always confirm between steps. The user holds the architecture.**
 
+**Build note:** Extracted files keep Mathlib imports (they need Mathlib's
+types) plus `import Origin.Core`. To build, origin-lean needs Mathlib as
+a dependency in the lakefile. The extracted files are Mathlib theorems
+with infrastructure stripped — they live alongside Mathlib, not standalone.
+
 ---
 
 ## What This Project Discovered
