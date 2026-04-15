@@ -96,6 +96,20 @@ class Classifier:
     TRIVIAL_RE = re.compile(
         r":=\s*(rfl|h\b|by\s+simp\s*$|by\s+rfl|by\s+exact\s+\w+\s*$|Iff\.rfl)")
 
+    # Ring-assumption patterns: theorems that assume ground = zero
+    # These conflate the additive identity with the multiplicative absorber.
+    # In Origin, none (absorber) ≠ some 0 (cancellation result).
+    # These theorems need rewriting, not just filtering.
+    RING_CONFLATION = re.compile(
+        r"mul_zero|zero_mul|"                      # 0 * a = 0 (assumes identity = absorber)
+        r"mul_self_sub_mul_self|"                   # a² - b² patterns through zero
+        r"Ring\b|CommRing\b|Semiring\b|"            # Ring typeclass constraints
+        r"RingHom\b|RingEquiv\b|"                   # Ring morphisms
+        r"SubringClass\b|Subring\b|"                # Ring substructures
+        r"zero_ne_one|one_ne_zero|"                 # 0 ≠ 1 (assumes 0 is in the domain)
+        r"nontrivial|Nontrivial"                    # ∃ a b, a ≠ b (often via 0 ≠ 1)
+    )
+
     # Files that are ENTIRELY about zero infrastructure
     INFRA_FILE_PATTERNS = [
         "GroupWithZero", "NeZero", "NoZeroDivisors", "NoZeroSMul",
@@ -110,7 +124,17 @@ class Classifier:
         return bool(self.INFRA_NAMES.search(name))
 
     def classify(self, kind: str, name: str, full_text: str) -> str:
-        """Classify a declaration. Override to add new classification rules."""
+        """Classify a declaration. Override to add new classification rules.
+
+        Categories:
+          dissolves    — zero-management (≠ 0, NeZero). Vanishes with none.
+          conflates    — assumes ground = zero (Ring axiom). Needs rewriting.
+          genuine      — real math. Keeps as-is or compresses.
+          instance     — typeclass instance.
+          infra_name   — declaration name is zero infrastructure.
+          simp_trivial — trivial simp lemma.
+          trivial      — trivial proof.
+        """
         sig_part = full_text.split(":=")[0] if ":=" in full_text else full_text
 
         if kind == "instance":
@@ -119,6 +143,8 @@ class Classifier:
             return "infra_name"
         if self.ZERO_SIG.search(sig_part):
             return "dissolves"
+        if self.RING_CONFLATION.search(sig_part):
+            return "conflates"
         if self.TRIVIAL_RE.search(full_text) and kind in ("theorem", "lemma"):
             return "simp_trivial" if "@[simp]" in full_text else "trivial"
         return "genuine"
@@ -368,19 +394,21 @@ class Extractor:
 
         if self.classifier.is_infra_file(filepath):
             return (f"-- {relpath}: entire file is zero-management infrastructure. Dissolves completely.\n",
-                    {"total": 0, "genuine": 0, "dissolved": 0, "infra": 0, "skipped_file": True})
+                    {"total": 0, "genuine": 0, "dissolved": 0, "conflates": 0, "infra": 0, "skipped_file": True})
 
         blocks = self.parser.parse(text)
-        stats = {"total": 0, "genuine": 0, "dissolved": 0, "infra": 0, "skipped_file": False}
+        stats = {"total": 0, "genuine": 0, "dissolved": 0, "conflates": 0, "infra": 0, "skipped_file": False}
 
         decls = [b for b in blocks if b.kind == "decl"]
         genuine_count = sum(1 for d in decls if d.classification == "genuine")
         dissolved = sum(1 for d in decls if d.classification in ("dissolves", "infra_name"))
+        conflates = sum(1 for d in decls if d.classification == "conflates")
         infra = sum(1 for d in decls if d.classification in ("instance", "simp_trivial", "trivial"))
 
-        stats.update(total=len(decls), genuine=genuine_count, dissolved=dissolved, infra=infra)
+        stats.update(total=len(decls), genuine=genuine_count, dissolved=dissolved,
+                     conflates=conflates, infra=infra)
 
-        if genuine_count == 0:
+        if genuine_count == 0 and conflates == 0:
             return (f"-- {relpath}: 0 genuine declarations. {dissolved} dissolved, {infra} infrastructure.\n", stats)
 
         imports = [b.text for b in blocks if b.kind == "import"]
@@ -396,7 +424,10 @@ class Extractor:
             clean = imp.strip().replace("public import ", "import ")
             import_block += clean + "\n"
 
-        header = f"/-\nExtracted from {relpath}\nGenuine: {genuine_count} of {len(decls)} | Dissolved: {dissolved} | Infrastructure: {infra}\n-/\n{import_block}"
+        header = (f"/-\nExtracted from {relpath}\n"
+                  f"Genuine: {genuine_count} | Conflates: {conflates} | "
+                  f"Dissolved: {dissolved} | Infrastructure: {infra}\n"
+                  f"-/\n{import_block}")
         body = "\n\n".join(p for p in parts if p.strip())
         return (header + "\n" + body + "\n", stats)
 
@@ -411,6 +442,8 @@ class Extractor:
         if b.kind == "decl":
             if b.classification in ("dissolves", "infra_name"):
                 return f"-- DISSOLVED: {b.name}"
+            if b.classification == "conflates":
+                return f"-- CONFLATES (assumes ground = zero): {b.name}\n{b.text}"
             return b.text
         if b.kind == "other":
             return b.text
