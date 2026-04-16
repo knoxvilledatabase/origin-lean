@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.MulAction
 import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-! # Constructions of continuous linear maps between (semi-)normed spaces
 
 A fundamental fact about (semi-)linear maps between normed spaces over sensible fields is that
@@ -74,26 +76,6 @@ theorem continuous_of_linear_of_bound {f : E → G} (h_add : ∀ x y, f (x + y) 
       map_smul' := h_smul }
   AddMonoidHomClass.continuous_of_bound φ C h_bound
 
-@[simp, norm_cast]
-theorem LinearMap.mkContinuous_coe (C : ℝ) (h : ∀ x, ‖f x‖ ≤ C * ‖x‖) :
-    (f.mkContinuous C h : E →ₛₗ[σ] F) = f :=
-  rfl
-
-@[simp]
-theorem LinearMap.mkContinuous_apply (C : ℝ) (h : ∀ x, ‖f x‖ ≤ C * ‖x‖) (x : E) :
-    f.mkContinuous C h x = f x :=
-  rfl
-
-@[simp, norm_cast]
-theorem LinearMap.mkContinuousOfExistsBound_coe (h : ∃ C, ∀ x, ‖f x‖ ≤ C * ‖x‖) :
-    (f.mkContinuousOfExistsBound h : E →ₛₗ[σ] F) = f :=
-  rfl
-
-@[simp]
-theorem LinearMap.mkContinuousOfExistsBound_apply (h : ∃ C, ∀ x, ‖f x‖ ≤ C * ‖x‖) (x : E) :
-    f.mkContinuousOfExistsBound h x = f x :=
-  rfl
-
 namespace ContinuousLinearMap
 
 theorem antilipschitz_of_bound (f : E →SL[σ] F) {K : ℝ≥0} (h : ∀ x, ‖x‖ ≤ K * ‖f x‖) :
@@ -130,16 +112,6 @@ def LinearMap.toContinuousLinearMap₁ (f : 𝕜 →ₗ[𝕜] E) : 𝕜 →L[�
   f.mkContinuous ‖f 1‖ fun x => by
     conv_lhs => rw [← mul_one x]
     rw [← smul_eq_mul, f.map_smul, mul_comm]; exact norm_smul_le _ _
-
-@[simp]
-theorem LinearMap.toContinuousLinearMap₁_coe (f : 𝕜 →ₗ[𝕜] E) :
-    (f.toContinuousLinearMap₁ : 𝕜 →ₗ[𝕜] E) = f :=
-  rfl
-
-@[simp]
-theorem LinearMap.toContinuousLinearMap₁_apply (f : 𝕜 →ₗ[𝕜] E) (x) :
-    f.toContinuousLinearMap₁ x = f x :=
-  rfl
 
 end SeminormedBounded
 

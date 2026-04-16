@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Lattice
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
+noncomputable section
+
 /-!
 # Theory of sieves
 
@@ -139,15 +141,6 @@ theorem ofArrows_surj {ι : Type*} {Y : ι → C} (f : ∀ i, Y i ⟶ X) {Z : C}
   exact ⟨i, rfl, by simp only [eqToHom_refl, id_comp]⟩
 
 def functorPullback (R : Presieve (F.obj X)) : Presieve X := fun _ f => R (F.map f)
-
-@[simp]
-theorem functorPullback_mem (R : Presieve (F.obj X)) {Y} (f : Y ⟶ X) :
-    R.functorPullback F f ↔ R (F.map f) :=
-  Iff.rfl
-
-@[simp]
-theorem functorPullback_id (R : Presieve X) : R.functorPullback (𝟭 _) = R :=
-  rfl
 
 class hasPullbacks (R : Presieve X) : Prop where
   /-- For all arrows `f` and `g` in `R`, the pullback of `f` and `g` exists. -/
@@ -283,22 +276,9 @@ instance sieveInhabited : Inhabited (Sieve X) :=
   ⟨⊤⟩
 
 @[simp]
-theorem sInf_apply {Ss : Set (Sieve X)} {Y} (f : Y ⟶ X) :
-    sInf Ss f ↔ ∀ (S : Sieve X) (_ : S ∈ Ss), S f :=
-  Iff.rfl
-
-@[simp]
 theorem sSup_apply {Ss : Set (Sieve X)} {Y} (f : Y ⟶ X) :
     sSup Ss f ↔ ∃ (S : Sieve X) (_ : S ∈ Ss), S f := by
   simp [sSup, Sieve.sup, setOf]
-
-@[simp]
-theorem inter_apply {R S : Sieve X} {Y} (f : Y ⟶ X) : (R ⊓ S) f ↔ R f ∧ S f :=
-  Iff.rfl
-
-@[simp]
-theorem union_apply {R S : Sieve X} {Y} (f : Y ⟶ X) : (R ⊔ S) f ↔ R f ∨ S f :=
-  Iff.rfl
 
 @[simp]
 theorem top_apply (f : Y ⟶ X) : (⊤ : Sieve X) f :=
@@ -522,16 +502,6 @@ def functorPullback (R : Sieve (F.obj X)) : Sieve X where
     rw [F.map_comp]
     exact R.downward_closed hf (F.map g)
 
-@[simp]
-theorem functorPullback_arrows (R : Sieve (F.obj X)) :
-    (R.functorPullback F).arrows = R.arrows.functorPullback F :=
-  rfl
-
-@[simp]
-theorem functorPullback_id (R : Sieve X) : R.functorPullback (𝟭 _) = R := by
-  ext
-  rfl
-
 theorem functorPullback_comp (R : Sieve ((F ⋙ G).obj X)) :
     R.functorPullback (F ⋙ G) = (R.functorPullback G).functorPullback F := by
   ext
@@ -603,14 +573,6 @@ theorem functorPushforward_union (S R : Sieve X) :
     (S ⊔ R).functorPushforward F = S.functorPushforward F ⊔ R.functorPushforward F :=
   (functor_galoisConnection F X).l_sup
 
-theorem functorPullback_union (S R : Sieve (F.obj X)) :
-    (S ⊔ R).functorPullback F = S.functorPullback F ⊔ R.functorPullback F :=
-  rfl
-
-theorem functorPullback_inter (S R : Sieve (F.obj X)) :
-    (S ⊓ R).functorPullback F = S.functorPullback F ⊓ R.functorPullback F :=
-  rfl
-
 @[simp]
 theorem functorPushforward_bot (F : C ⥤ D) (X : C) : (⊥ : Sieve X).functorPushforward F = ⊥ :=
   (functor_galoisConnection F X).l_bot
@@ -620,14 +582,6 @@ theorem functorPushforward_top (F : C ⥤ D) (X : C) : (⊤ : Sieve X).functorPu
   refine (generate_sieve _).symm.trans ?_
   apply generate_of_contains_isSplitEpi (𝟙 (F.obj X))
   exact ⟨X, 𝟙 _, 𝟙 _, trivial, by simp⟩
-
-@[simp]
-theorem functorPullback_bot (F : C ⥤ D) (X : C) : (⊥ : Sieve (F.obj X)).functorPullback F = ⊥ :=
-  rfl
-
-@[simp]
-theorem functorPullback_top (F : C ⥤ D) (X : C) : (⊤ : Sieve (F.obj X)).functorPullback F = ⊤ :=
-  rfl
 
 theorem image_mem_functorPushforward (R : Sieve X) {V} {f : V ⟶ X} (h : R f) :
     R.functorPushforward F (F.map f) :=
@@ -712,10 +666,6 @@ def natTransOfLe {S T : Sieve X} (h : S ≤ T) : S.functor ⟶ T.functor where a
 
 @[simps]
 def functorInclusion (S : Sieve X) : S.functor ⟶ yoneda.obj X where app _ f := f.1
-
-theorem natTransOfLe_comm {S T : Sieve X} (h : S ≤ T) :
-    natTransOfLe h ≫ functorInclusion _ = functorInclusion _ :=
-  rfl
 
 instance functorInclusion_is_mono : Mono S.functorInclusion :=
   ⟨fun f g h => by

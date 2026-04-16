@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Nat/Even.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Even
 import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Data.Nat.Sqrt
+
+noncomputable section
 
 /-!
 # `IsSquare` and `Even` for natural numbers
@@ -29,7 +31,8 @@ instance : DecidablePred (IsSquare : ℕ → Prop) :=
 
 lemma not_even_iff : ¬ Even n ↔ n % 2 = 1 := by rw [even_iff, mod_two_not_eq_zero]
 
--- DISSOLVED: two_dvd_ne_zero
+@[simp] lemma two_dvd_ne_zero : ¬2 ∣ n ↔ n % 2 = 1 :=
+  (even_iff_exists_two_nsmul _).symm.not.trans not_even_iff
 
 @[simp] lemma not_even_one : ¬Even 1 := by simp [even_iff]
 
@@ -58,9 +61,10 @@ lemma two_not_dvd_two_mul_sub_one : ∀ {n}, 0 < n → ¬2 ∣ 2 * n - 1
   rcases mod_two_eq_zero_or_one m with h₁ | h₁ <;> rcases mod_two_eq_zero_or_one n with h₂ | h₂ <;>
     simp [even_iff, h₁, h₂, Nat.mul_mod]
 
--- DISSOLVED: even_pow
+@[parity_simps] lemma even_pow : Even (m ^ n) ↔ Even m ∧ n ≠ 0 := by
+  induction n <;> simp +contextual [*, pow_succ', even_mul]
 
--- DISSOLVED: even_pow'
+lemma even_pow' (h : n ≠ 0) : Even (m ^ n) ↔ Even m := even_pow.trans <| and_iff_left h
 
 lemma even_mul_succ_self (n : ℕ) : Even (n * (n + 1)) := by rw [even_mul, even_add_one]; exact em _
 
@@ -74,7 +78,11 @@ lemma two_mul_div_two_of_even : Even n → 2 * (n / 2) = n := fun h ↦
 lemma div_two_mul_two_of_even : Even n → n / 2 * 2 = n :=
   fun h ↦ Nat.div_mul_cancel ((even_iff_exists_two_nsmul _).1 h)
 
--- DISSOLVED: one_lt_of_ne_zero_of_even
+theorem one_lt_of_ne_zero_of_even {n : ℕ} (h0 : n ≠ 0) (hn : Even n) : 1 < n := by
+  refine Nat.one_lt_iff_ne_zero_and_ne_one.mpr (And.intro h0 ?_)
+  intro h
+  rw [h] at hn
+  exact Nat.not_even_one hn
 
 theorem add_one_lt_of_even {n m : ℕ} (hn : Even n) (hm : Even m) (hnm : n < m) :
     n + 1 < m := by

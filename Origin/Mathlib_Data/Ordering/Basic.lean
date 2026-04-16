@@ -7,6 +7,8 @@ import Batteries.Tactic.Alias
 import Mathlib.Tactic.Lemma
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Helper definitions and instances for `Ordering`
 -/
@@ -23,12 +25,6 @@ def Compares [LT α] : Ordering → α → α → Prop
   | lt, a, b => a < b
   | eq, a, b => a = b
   | gt, a, b => a > b
-
-@[simp] lemma compares_lt [LT α] (a b : α) : Compares lt a b = (a < b) := rfl
-
-@[simp] lemma compares_eq [LT α] (a b : α) : Compares eq a b = (a = b) := rfl
-
-@[simp] lemma compares_gt [LT α] (a b : α) : Compares gt a b = (a > b) := rfl
 
 end Ordering
 

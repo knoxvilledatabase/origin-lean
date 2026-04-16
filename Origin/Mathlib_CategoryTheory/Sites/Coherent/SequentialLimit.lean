@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Sites/Coherent/SequentialLimit.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.OfSequence
 import Mathlib.CategoryTheory.Sites.Coherent.LocallySurjective
 import Mathlib.CategoryTheory.Sites.EpiMono
 import Mathlib.CategoryTheory.Sites.Subcanonical
+
+noncomputable section
 
 /-!
 
@@ -47,7 +49,6 @@ private structure struct (F : ℕᵒᵖ ⥤ Sheaf (coherentTopology C) (Type v))
       (F.obj (op n)).val.map (map n).op (x n)
 
 include hF in
-
 private lemma exists_effectiveEpi (n : ℕ) (X : C) (y : (F.obj ⟨n⟩).val.obj ⟨X⟩) :
     ∃ (X' : C) (φ : X' ⟶ X) (_ : EffectiveEpi φ) (x : (F.obj ⟨n + 1⟩).val.obj ⟨X'⟩),
       ((F.map (homOfLE (n.le_add_right 1)).op).val.app ⟨X'⟩) x = ((F.obj ⟨n⟩).val.map φ.op) y := by
@@ -91,7 +92,6 @@ variable (h : ∀ (G : ℕᵒᵖ ⥤ C),
   (∀ n, EffectiveEpi (G.map (homOfLE (Nat.le_succ n)).op)) → EffectiveEpi (limit.π G ⟨0⟩))
 
 include hF h hc in
-
 lemma isLocallySurjective_π_app_zero_of_isLocallySurjective_map  :
     Sheaf.IsLocallySurjective (c.π.app ⟨0⟩) := by
   rw [coherentTopology.isLocallySurjective_iff, regularTopology.isLocallySurjective_iff]
@@ -107,7 +107,6 @@ lemma isLocallySurjective_π_app_zero_of_isLocallySurjective_map  :
   rfl
 
 include h in
-
 lemma epi_π_app_zero_of_epi [HasSheafify (coherentTopology C) (Type v)]
     [Balanced (Sheaf (coherentTopology C) (Type v))]
     [(coherentTopology C).WEqualsLocallyBijective (Type v)]

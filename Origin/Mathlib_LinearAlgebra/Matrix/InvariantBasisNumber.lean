@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.LinearAlgebra.InvariantBasisNumber
 
+noncomputable section
+
 /-!
 # Invertible matrices over a ring with invariant basis number are square.
 -/

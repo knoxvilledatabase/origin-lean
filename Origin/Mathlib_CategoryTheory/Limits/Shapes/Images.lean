@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Mono
 import Mathlib.CategoryTheory.Limits.Shapes.StrongEpi
 import Mathlib.CategoryTheory.MorphismProperty.Factorization
 
+noncomputable section
+
 /-!
 # Categorical images
 
@@ -178,13 +180,7 @@ def isoExt {F F' : MonoFactorisation f} (hF : IsImage F) (hF' : IsImage F') :
 
 variable {F F' : MonoFactorisation f} (hF : IsImage F) (hF' : IsImage F')
 
-theorem isoExt_hom_m : (isoExt hF hF').hom ≫ F'.m = F.m := by simp
-
-theorem isoExt_inv_m : (isoExt hF hF').inv ≫ F.m = F'.m := by simp
-
 theorem e_isoExt_hom : F.e ≫ (isoExt hF hF').hom = F'.e := by simp
-
-theorem e_isoExt_inv : F'.e ≫ (isoExt hF hF').inv = F.e := by simp
 
 @[simps]
 def ofArrowIso {f g : Arrow C} {F : MonoFactorisation f.hom} (hF : IsImage F) (sq : f ⟶ g)
@@ -257,10 +253,6 @@ instance : Mono (image.ι f) :=
 def factorThruImage : X ⟶ image f :=
   (Image.monoFactorisation f).e
 
-@[simp]
-theorem as_factorThruImage : (Image.monoFactorisation f).e = factorThruImage f :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem image.fac : factorThruImage f ≫ image.ι f = f :=
   (Image.monoFactorisation f).fac
@@ -277,10 +269,6 @@ theorem image.lift_fac (F' : MonoFactorisation f) : image.lift F' ≫ F'.m = ima
 @[reassoc (attr := simp)]
 theorem image.fac_lift (F' : MonoFactorisation f) : factorThruImage f ≫ image.lift F' = F'.e :=
   (Image.isImage f).fac_lift F'
-
-@[simp]
-theorem image.isImage_lift (F : MonoFactorisation f) : (Image.isImage f).lift F = image.lift F :=
-  rfl
 
 @[reassoc (attr := simp)]
 theorem IsImage.lift_ι {F : MonoFactorisation f} (hF : IsImage F) :
@@ -631,9 +619,6 @@ variable [HasImageMap sq]
 
 abbrev image.map : image f.hom ⟶ image g.hom :=
   (HasImageMap.imageMap sq).map
-
-theorem image.factor_map :
-    factorThruImage f.hom ≫ image.map sq = sq.left ≫ factorThruImage g.hom := by simp
 
 theorem image.map_ι : image.map sq ≫ image.ι g.hom = image.ι f.hom ≫ sq.right := by simp
 

@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/LSeries/Linearity.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.Basic
+
+noncomputable section
 
 /-!
 # Linearity of the L-series of `f` as a function of `f`
@@ -119,9 +121,13 @@ lemma LSeriesSummable.smul {f : ℕ → ℂ} (c : ℂ) {s : ℂ} (hf : LSeriesSu
     LSeriesSummable (c • f) s := by
   simpa only [LSeriesSummable, term_smul, smul_eq_mul] using hf.const_smul c
 
--- DISSOLVED: LSeriesSummable.of_smul
+lemma LSeriesSummable.of_smul {f : ℕ → ℂ} {c s : ℂ} (hc : c ≠ 0) (hf : LSeriesSummable (c • f) s) :
+    LSeriesSummable f s := by
+  simpa only [ne_eq, hc, not_false_eq_true, inv_smul_smul₀] using hf.smul (c⁻¹)
 
--- DISSOLVED: LSeriesSummable.smul_iff
+lemma LSeriesSummable.smul_iff {f : ℕ → ℂ} {c s : ℂ} (hc : c ≠ 0) :
+    LSeriesSummable (c • f) s ↔ LSeriesSummable f s :=
+  ⟨of_smul hc, smul c⟩
 
 @[simp]
 lemma LSeries_smul (f : ℕ → ℂ) (c s : ℂ) : LSeries (c • f) s = c * LSeries f s := by

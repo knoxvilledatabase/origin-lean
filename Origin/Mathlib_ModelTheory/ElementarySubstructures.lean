@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.ModelTheory.ElementaryMaps
 
+noncomputable section
+
 /-!
 # Elementary Substructures
 
@@ -63,10 +65,6 @@ def subtype (S : L.ElementarySubstructure M) : S ↪ₑ[L] M where
   toFun := (↑)
   map_formula' := S.isElementary
 
-@[simp]
-theorem coeSubtype {S : L.ElementarySubstructure M} : ⇑S.subtype = ((↑) : S → M) :=
-  rfl
-
 instance instTop : Top (L.ElementarySubstructure M) :=
   ⟨⟨⊤, fun _ _ _ => Substructure.realize_formula_top.symm⟩⟩
 
@@ -76,10 +74,6 @@ instance instInhabited : Inhabited (L.ElementarySubstructure M) :=
 @[simp]
 theorem mem_top (x : M) : x ∈ (⊤ : L.ElementarySubstructure M) :=
   Set.mem_univ x
-
-@[simp]
-theorem coe_top : ((⊤ : L.ElementarySubstructure M) : Set M) = Set.univ :=
-  rfl
 
 @[simp]
 theorem realize_sentence (S : L.ElementarySubstructure M) (φ : L.Sentence) : S ⊨ φ ↔ M ⊨ φ :=

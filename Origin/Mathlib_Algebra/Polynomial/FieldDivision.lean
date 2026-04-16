@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Polynomial/FieldDivision.lean
-Genuine: 44 | Conflates: 5 | Dissolved: 32 | Infrastructure: 6
+Genuine: 75 | Conflates: 6 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Algebra.Polynomial.Eval.SMul
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.RingTheory.EuclideanDomain
+
+noncomputable section
 
 /-!
 # Theory of univariate polynomials
@@ -29,7 +31,11 @@ section CommRing
 
 variable [CommRing R]
 
--- DISSOLVED: rootMultiplicity_sub_one_le_derivative_rootMultiplicity_of_ne_zero
+theorem rootMultiplicity_sub_one_le_derivative_rootMultiplicity_of_ne_zero
+    (p : R[X]) (t : R) (hnezero : derivative p ≠ 0) :
+    p.rootMultiplicity t - 1 ≤ p.derivative.rootMultiplicity t :=
+  (le_rootMultiplicity_iff hnezero).2 <|
+    pow_sub_one_dvd_derivative_of_pow_dvd (p.pow_rootMultiplicity_dvd t)
 
 theorem derivative_rootMultiplicity_of_root_of_mem_nonZeroDivisors
     {p : R[X]} {t : R} (hpt : Polynomial.IsRoot p t)
@@ -70,17 +76,61 @@ theorem eval_iterate_derivative_rootMultiplicity {p : R[X]} {t : R} :
       Nat.sub_sub_self (mem_range_succ_iff.mp hb), eval_sub, eval_X, eval_C, sub_self,
       zero_pow hb0, smul_zero, zero_mul, smul_zero]
 
--- DISSOLVED: lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors
+theorem lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors
+    {p : R[X]} {t : R} {n : ℕ} (h : p ≠ 0)
+    (hroot : ∀ m ≤ n, (derivative^[m] p).IsRoot t)
+    (hnzd : (n.factorial : R) ∈ nonZeroDivisors R) :
+    n < p.rootMultiplicity t := by
+  by_contra! h'
+  replace hroot := hroot _ h'
+  simp only [IsRoot, eval_iterate_derivative_rootMultiplicity] at hroot
+  obtain ⟨q, hq⟩ := Nat.cast_dvd_cast (α := R) <| Nat.factorial_dvd_factorial h'
+  rw [hq, mul_mem_nonZeroDivisors] at hnzd
+  rw [nsmul_eq_mul, mul_left_mem_nonZeroDivisors_eq_zero_iff hnzd.1] at hroot
+  exact eval_divByMonic_pow_rootMultiplicity_ne_zero t h hroot
 
--- DISSOLVED: lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors'
+theorem lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors'
+    {p : R[X]} {t : R} {n : ℕ} (h : p ≠ 0)
+    (hroot : ∀ m ≤ n, (derivative^[m] p).IsRoot t)
+    (hnzd : ∀ m ≤ n, m ≠ 0 → (m : R) ∈ nonZeroDivisors R) :
+    n < p.rootMultiplicity t := by
+  apply lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors h hroot
+  clear hroot
+  induction n with
+  | zero =>
+    simp only [Nat.factorial_zero, Nat.cast_one]
+    exact Submonoid.one_mem _
+  | succ n ih =>
+    rw [Nat.factorial_succ, Nat.cast_mul, mul_mem_nonZeroDivisors]
+    exact ⟨hnzd _ le_rfl n.succ_ne_zero, ih fun m h ↦ hnzd m (h.trans n.le_succ)⟩
 
--- DISSOLVED: lt_rootMultiplicity_iff_isRoot_iterate_derivative_of_mem_nonZeroDivisors
+theorem lt_rootMultiplicity_iff_isRoot_iterate_derivative_of_mem_nonZeroDivisors
+    {p : R[X]} {t : R} {n : ℕ} (h : p ≠ 0)
+    (hnzd : (n.factorial : R) ∈ nonZeroDivisors R) :
+    n < p.rootMultiplicity t ↔ ∀ m ≤ n, (derivative^[m] p).IsRoot t :=
+  ⟨fun hn _ hm ↦ isRoot_iterate_derivative_of_lt_rootMultiplicity <| hm.trans_lt hn,
+    fun hr ↦ lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors h hr hnzd⟩
 
--- DISSOLVED: lt_rootMultiplicity_iff_isRoot_iterate_derivative_of_mem_nonZeroDivisors'
+theorem lt_rootMultiplicity_iff_isRoot_iterate_derivative_of_mem_nonZeroDivisors'
+    {p : R[X]} {t : R} {n : ℕ} (h : p ≠ 0)
+    (hnzd : ∀ m ≤ n, m ≠ 0 → (m : R) ∈ nonZeroDivisors R) :
+    n < p.rootMultiplicity t ↔ ∀ m ≤ n, (derivative^[m] p).IsRoot t :=
+  ⟨fun hn _ hm ↦ isRoot_iterate_derivative_of_lt_rootMultiplicity <| Nat.lt_of_le_of_lt hm hn,
+    fun hr ↦ lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors' h hr hnzd⟩
 
--- DISSOLVED: one_lt_rootMultiplicity_iff_isRoot_iterate_derivative
+theorem one_lt_rootMultiplicity_iff_isRoot_iterate_derivative
+    {p : R[X]} {t : R} (h : p ≠ 0) :
+    1 < p.rootMultiplicity t ↔ ∀ m ≤ 1, (derivative^[m] p).IsRoot t :=
+  lt_rootMultiplicity_iff_isRoot_iterate_derivative_of_mem_nonZeroDivisors h
+    (by rw [Nat.factorial_one, Nat.cast_one]; exact Submonoid.one_mem _)
 
--- DISSOLVED: one_lt_rootMultiplicity_iff_isRoot
+theorem one_lt_rootMultiplicity_iff_isRoot
+    {p : R[X]} {t : R} (h : p ≠ 0) :
+    1 < p.rootMultiplicity t ↔ p.IsRoot t ∧ (derivative p).IsRoot t := by
+  rw [one_lt_rootMultiplicity_iff_isRoot_iterate_derivative h]
+  refine ⟨fun h ↦ ⟨h 0 (by norm_num), h 1 (by norm_num)⟩, fun ⟨h0, h1⟩ m hm ↦ ?_⟩
+  obtain (_|_|m) := m
+  exacts [h0, h1, by omega]
 
 end CommRing
 
@@ -88,7 +138,10 @@ section IsDomain
 
 variable [CommRing R] [IsDomain R]
 
--- DISSOLVED: one_lt_rootMultiplicity_iff_isRoot_gcd
+theorem one_lt_rootMultiplicity_iff_isRoot_gcd
+    [GCDMonoid R[X]] {p : R[X]} {t : R} (h : p ≠ 0) :
+    1 < p.rootMultiplicity t ↔ (gcd p (derivative p)).IsRoot t := by
+  simp_rw [one_lt_rootMultiplicity_iff_isRoot h, ← dvd_iff_isRoot, dvd_gcd_iff]
 
 theorem derivative_rootMultiplicity_of_root [CharZero R] {p : R[X]} {t : R} (hpt : p.IsRoot t) :
     p.derivative.rootMultiplicity t = p.rootMultiplicity t - 1 := by
@@ -104,11 +157,38 @@ theorem rootMultiplicity_sub_one_le_derivative_rootMultiplicity [CharZero R] (p 
   · rw [rootMultiplicity_eq_zero h, zero_tsub]
     exact zero_le _
 
--- DISSOLVED: lt_rootMultiplicity_of_isRoot_iterate_derivative
+theorem lt_rootMultiplicity_of_isRoot_iterate_derivative
+    [CharZero R] {p : R[X]} {t : R} {n : ℕ} (h : p ≠ 0)
+    (hroot : ∀ m ≤ n, (derivative^[m] p).IsRoot t) :
+    n < p.rootMultiplicity t :=
+  lt_rootMultiplicity_of_isRoot_iterate_derivative_of_mem_nonZeroDivisors h hroot <|
+    mem_nonZeroDivisors_of_ne_zero <| Nat.cast_ne_zero.2 <| Nat.factorial_ne_zero n
 
--- DISSOLVED: lt_rootMultiplicity_iff_isRoot_iterate_derivative
+theorem lt_rootMultiplicity_iff_isRoot_iterate_derivative
+    [CharZero R] {p : R[X]} {t : R} {n : ℕ} (h : p ≠ 0) :
+    n < p.rootMultiplicity t ↔ ∀ m ≤ n, (derivative^[m] p).IsRoot t :=
+  ⟨fun hn _ hm ↦ isRoot_iterate_derivative_of_lt_rootMultiplicity <| Nat.lt_of_le_of_lt hm hn,
+    fun hr ↦ lt_rootMultiplicity_of_isRoot_iterate_derivative h hr⟩
 
--- DISSOLVED: isRoot_of_isRoot_of_dvd_derivative_mul
+theorem isRoot_of_isRoot_of_dvd_derivative_mul [CharZero R] {f g : R[X]} (hf0 : f ≠ 0)
+    (hfd : f ∣ f.derivative * g) {a : R} (haf : f.IsRoot a) : g.IsRoot a := by
+  rcases hfd with ⟨r, hr⟩
+  by_cases hdf0 : derivative f = 0
+  · rw [eq_C_of_derivative_eq_zero hdf0] at haf hf0
+    simp only [eval_C, derivative_C, zero_mul, dvd_zero, iff_true, IsRoot.def] at haf
+    rw [haf, map_zero] at hf0
+    exact (hf0 rfl).elim
+  by_contra hg
+  have hdfg0 : f.derivative * g ≠ 0 := mul_ne_zero hdf0 (by rintro rfl; simp at hg)
+  have hr' := congr_arg (rootMultiplicity a) hr
+  rw [rootMultiplicity_mul hdfg0, derivative_rootMultiplicity_of_root haf,
+    rootMultiplicity_eq_zero hg, add_zero, rootMultiplicity_mul (hr ▸ hdfg0), add_comm,
+    Nat.sub_eq_iff_eq_add (Nat.succ_le_iff.2 ((rootMultiplicity_pos hf0).2 haf))] at hr'
+  refine lt_irrefl (rootMultiplicity a f) ?_
+  refine lt_of_lt_of_le (Nat.lt_succ_self _)
+    (le_trans (le_add_of_nonneg_left (Nat.zero_le (rootMultiplicity a r))) ?_)
+  conv_rhs => rw [hr']
+  simp [add_assoc]
 
 section NormalizationMonoid
 
@@ -166,7 +246,10 @@ section DivisionRing
 
 variable [DivisionRing R] {p q : R[X]}
 
--- DISSOLVED: degree_pos_of_ne_zero_of_nonunit
+theorem degree_pos_of_ne_zero_of_nonunit (hp0 : p ≠ 0) (hp : ¬IsUnit p) : 0 < degree p :=
+  lt_of_not_ge fun h => by
+    rw [eq_C_of_degree_le_zero h] at hp0 hp
+    exact hp (IsUnit.map C (IsUnit.mk0 (coeff p 0) (mt C_inj.2 (by simpa using hp0))))
 
 -- CONFLATES (assumes ground = zero): map_eq_zero
 @[simp]
@@ -175,7 +258,9 @@ theorem map_eq_zero [Semiring S] [Nontrivial S] (f : R →+* S) : p.map f = 0 �
   congr!
   simp [map_eq_zero, coeff_map, coeff_zero]
 
--- DISSOLVED: map_ne_zero
+-- CONFLATES (assumes ground = zero): map_ne_zero
+theorem map_ne_zero [Semiring S] [Nontrivial S] {f : R →+* S} (hp : p ≠ 0) : p.map f ≠ 0 :=
+  mt (map_eq_zero f).1 hp
 
 -- CONFLATES (assumes ground = zero): degree_map
 @[simp]
@@ -206,7 +291,15 @@ section Field
 
 variable [Field R] {p q : R[X]}
 
--- DISSOLVED: isUnit_iff_degree_eq_zero
+theorem isUnit_iff_degree_eq_zero : IsUnit p ↔ degree p = 0 :=
+  ⟨degree_eq_zero_of_isUnit, fun h =>
+    have : degree p ≤ 0 := by simp [*, le_refl]
+    have hc : coeff p 0 ≠ 0 := fun hc => by
+      rw [eq_C_of_degree_le_zero this, hc] at h; simp only [map_zero] at h; contradiction
+    isUnit_iff_dvd_one.2
+      ⟨C (coeff p 0)⁻¹, by
+        conv in p => rw [eq_C_of_degree_le_zero this]
+        rw [← C_mul, mul_inv_cancel₀ hc, C_1]⟩⟩
 
 def div (p q : R[X]) :=
   C (leadingCoeff q)⁻¹ * (p /ₘ (q * C (leadingCoeff q)⁻¹))
@@ -222,7 +315,9 @@ private theorem quotient_mul_add_remainder_eq_aux (p q : R[X]) : q * div p q + m
       rw [← modByMonic_add_div p (monic_mul_leadingCoeff_inv h)]
     rw [div, mod, add_comm, mul_assoc]
 
--- DISSOLVED: remainder_lt_aux
+private theorem remainder_lt_aux (p : R[X]) (hq : q ≠ 0) : degree (mod p q) < degree q := by
+  rw [← degree_mul_leadingCoeff_inv q hq]
+  exact degree_modByMonic_lt p (monic_mul_leadingCoeff_inv hq)
 
 instance : Div R[X] :=
   ⟨div⟩
@@ -261,18 +356,46 @@ instance instEuclideanDomain : EuclideanDomain R[X] :=
     remainder_lt := fun _ _ hq => remainder_lt_aux _ hq
     mul_left_not_lt := fun _ _ hq => not_lt_of_ge (degree_le_mul_left _ hq) }
 
--- DISSOLVED: mod_eq_self_iff
+theorem mod_eq_self_iff (hq0 : q ≠ 0) : p % q = p ↔ degree p < degree q :=
+  ⟨fun h => h ▸ EuclideanDomain.mod_lt _ hq0, fun h => by
+    classical
+    have : ¬degree (q * C (leadingCoeff q)⁻¹) ≤ degree p :=
+      not_le_of_gt <| by rwa [degree_mul_leadingCoeff_inv q hq0]
+    rw [mod_def, modByMonic, dif_pos (monic_mul_leadingCoeff_inv hq0)]
+    unfold divModByMonicAux
+    dsimp
+    simp only [this, false_and, if_false]⟩
 
--- DISSOLVED: div_eq_zero_iff
+theorem div_eq_zero_iff (hq0 : q ≠ 0) : p / q = 0 ↔ degree p < degree q :=
+  ⟨fun h => by
+    have := EuclideanDomain.div_add_mod p q
+    rwa [h, mul_zero, zero_add, mod_eq_self_iff hq0] at this,
+  fun h => by
+    have hlt : degree p < degree (q * C (leadingCoeff q)⁻¹) := by
+      rwa [degree_mul_leadingCoeff_inv q hq0]
+    have hm : Monic (q * C (leadingCoeff q)⁻¹) := monic_mul_leadingCoeff_inv hq0
+    rw [div_def, (divByMonic_eq_zero_iff hm).2 hlt, mul_zero]⟩
 
--- DISSOLVED: degree_add_div
+theorem degree_add_div (hq0 : q ≠ 0) (hpq : degree q ≤ degree p) :
+    degree q + degree (p / q) = degree p := by
+  have : degree (p % q) < degree (q * (p / q)) :=
+    calc
+      degree (p % q) < degree q := EuclideanDomain.mod_lt _ hq0
+      _ ≤ _ := degree_le_mul_left _ (mt (div_eq_zero_iff hq0).1 (not_lt_of_ge hpq))
+
+  conv_rhs =>
+    rw [← EuclideanDomain.div_add_mod p q, degree_add_eq_left_of_degree_lt this, degree_mul]
 
 theorem degree_div_le (p q : R[X]) : degree (p / q) ≤ degree p := by
   by_cases hq : q = 0
   · simp [hq]
   · rw [div_def, mul_comm, degree_mul_leadingCoeff_inv _ hq]; exact degree_divByMonic_le _ _
 
--- DISSOLVED: degree_div_lt
+theorem degree_div_lt (hp : p ≠ 0) (hq : 0 < degree q) : degree (p / q) < degree p := by
+  have hq0 : q ≠ 0 := fun hq0 => by simp [hq0] at hq
+  rw [div_def, mul_comm, degree_mul_leadingCoeff_inv _ hq0]
+  exact degree_divByMonic_lt _ (monic_mul_leadingCoeff_inv hq0) hp
+    (by rw [degree_mul_leadingCoeff_inv _ hq0]; exact hq)
 
 theorem isUnit_map [Field k] (f : R →+* k) : IsUnit (p.map f) ↔ IsUnit p := by
   simp_rw [isUnit_iff_degree_eq_zero, degree_map]
@@ -289,7 +412,20 @@ theorem map_mod [Field k] (f : R →+* k) : (p % q).map f = p.map f % q.map f :=
   · rw [mod_def, mod_def, leadingCoeff_map f, ← map_inv₀ f, ← map_C f, ← Polynomial.map_mul f,
       map_modByMonic f (monic_mul_leadingCoeff_inv hq0)]
 
--- DISSOLVED: natDegree_mod_lt
+lemma natDegree_mod_lt [Field k] (p : k[X]) {q : k[X]} (hq : q.natDegree ≠ 0) :
+    (p % q).natDegree < q.natDegree := by
+  have hq' : q.leadingCoeff ≠ 0 := by
+    rw [leadingCoeff_ne_zero]
+    contrapose! hq
+    simp [hq]
+  rw [mod_def]
+  refine (natDegree_modByMonic_lt p ?_ ?_).trans_le ?_
+  · refine monic_mul_C_of_leadingCoeff_mul_eq_one ?_
+    rw [mul_inv_eq_one₀ hq']
+  · contrapose! hq
+    rw [← natDegree_mul_C_eq_of_mul_eq_one ((inv_mul_eq_one₀ hq').mpr rfl)]
+    simp [hq]
+  · exact natDegree_mul_C_le q q.leadingCoeff⁻¹
 
 section
 
@@ -335,15 +471,31 @@ theorem isCoprime_map [Field k] (f : R →+* k) : IsCoprime (p.map f) (q.map f) 
   classical
   rw [← EuclideanDomain.gcd_isUnit_iff, ← EuclideanDomain.gcd_isUnit_iff, gcd_map, isUnit_map]
 
--- DISSOLVED: mem_roots_map
+theorem mem_roots_map [CommRing k] [IsDomain k] {f : R →+* k} {x : k} (hp : p ≠ 0) :
+    x ∈ (p.map f).roots ↔ p.eval₂ f x = 0 := by
+  rw [mem_roots (map_ne_zero hp), IsRoot, Polynomial.eval_map]
 
--- DISSOLVED: rootSet_monomial
+theorem rootSet_monomial [CommRing S] [IsDomain S] [Algebra R S] {n : ℕ} (hn : n ≠ 0) {a : R}
+    (ha : a ≠ 0) : (monomial n a).rootSet S = {0} := by
+  classical
+  rw [rootSet, aroots_monomial ha,
+    Multiset.toFinset_nsmul _ _ hn, Multiset.toFinset_singleton, Finset.coe_singleton]
 
--- DISSOLVED: rootSet_C_mul_X_pow
+theorem rootSet_C_mul_X_pow [CommRing S] [IsDomain S] [Algebra R S] {n : ℕ} (hn : n ≠ 0) {a : R}
+    (ha : a ≠ 0) : rootSet (C a * X ^ n) S = {0} := by
+  rw [C_mul_X_pow_eq_monomial, rootSet_monomial hn ha]
 
--- DISSOLVED: rootSet_X_pow
+theorem rootSet_X_pow [CommRing S] [IsDomain S] [Algebra R S] {n : ℕ} (hn : n ≠ 0) :
+    (X ^ n : R[X]).rootSet S = {0} := by
+  rw [← one_mul (X ^ n : R[X]), ← C_1, rootSet_C_mul_X_pow hn]
+  exact one_ne_zero
 
--- DISSOLVED: rootSet_prod
+theorem rootSet_prod [CommRing S] [IsDomain S] [Algebra R S] {ι : Type*} (f : ι → R[X])
+    (s : Finset ι) (h : s.prod f ≠ 0) : (s.prod f).rootSet S = ⋃ i ∈ s, (f i).rootSet S := by
+  classical
+  simp only [rootSet, aroots, ← Finset.mem_coe]
+  rw [Polynomial.map_prod, roots_prod, Finset.bind_toFinset, s.val_toFinset, Finset.coe_biUnion]
+  rwa [← Polynomial.map_prod, Ne, map_eq_zero]
 
 theorem exists_root_of_degree_eq_one (h : degree p = 1) : ∃ x, IsRoot p x :=
   ⟨-(p.coeff 0 / p.coeff 1), by
@@ -363,7 +515,10 @@ theorem coeff_inv_units (u : R[X]ˣ) (n : ℕ) : ((↑u : R[X]).coeff n)⁻¹ = 
     simp
   · simp
 
--- DISSOLVED: monic_normalize
+theorem monic_normalize [DecidableEq R] (hp0 : p ≠ 0) : Monic (normalize p) := by
+  rw [Ne, ← leadingCoeff_eq_zero, ← Ne, ← isUnit_iff_ne_zero] at hp0
+  rw [Monic, leadingCoeff_normalize, normalize_eq_one]
+  apply hp0
 
 theorem leadingCoeff_div (hpq : q.degree ≤ p.degree) :
     (p / q).leadingCoeff = p.leadingCoeff / q.leadingCoeff := by
@@ -381,11 +536,23 @@ theorem div_C_mul : p / (C a * q) = C a⁻¹ * (p / q) := by
   congr 3
   rw [mul_left_comm q, ← mul_assoc, ← C.map_mul, mul_inv_cancel₀ ha, C.map_one, one_mul]
 
--- DISSOLVED: C_mul_dvd
+theorem C_mul_dvd (ha : a ≠ 0) : C a * p ∣ q ↔ p ∣ q :=
+  ⟨fun h => dvd_trans (dvd_mul_left _ _) h, fun ⟨r, hr⟩ =>
+    ⟨C a⁻¹ * r, by
+      rw [mul_assoc, mul_left_comm p, ← mul_assoc, ← C.map_mul, mul_inv_cancel₀ ha, C.map_one,
+        one_mul, hr]⟩⟩
 
--- DISSOLVED: dvd_C_mul
+theorem dvd_C_mul (ha : a ≠ 0) : p ∣ Polynomial.C a * q ↔ p ∣ q :=
+  ⟨fun ⟨r, hr⟩ =>
+    ⟨C a⁻¹ * r, by
+      rw [mul_left_comm p, ← hr, ← mul_assoc, ← C.map_mul, inv_mul_cancel₀ ha, C.map_one,
+        one_mul]⟩,
+    fun h => dvd_trans h (dvd_mul_left _ _)⟩
 
--- DISSOLVED: coe_normUnit_of_ne_zero
+theorem coe_normUnit_of_ne_zero [DecidableEq R] (hp : p ≠ 0) :
+    (normUnit p : R[X]) = C p.leadingCoeff⁻¹ := by
+  have : p.leadingCoeff ≠ 0 := mt leadingCoeff_eq_zero.mp hp
+  simp [CommGroupWithZero.coe_normUnit _ this]
 
 theorem map_dvd_map' [Field k] (f : R →+* k) {x y : R[X]} : x.map f ∣ y.map f ↔ x ∣ y := by
   by_cases H : x = 0
@@ -443,11 +610,35 @@ theorem X_sub_C_dvd_derivative_of_X_sub_C_dvd_divByMonic {K : Type*} [Field K] (
   rw [← key, hu, ← mul_add (X - C a) u _]
   use (u + derivative ((X - C a) * u))
 
--- DISSOLVED: isCoprime_of_is_root_of_eval_derivative_ne_zero
+theorem isCoprime_of_is_root_of_eval_derivative_ne_zero {K : Type*} [Field K] (f : K[X]) (a : K)
+    (hf' : f.derivative.eval a ≠ 0) : IsCoprime (X - C a : K[X]) (f /ₘ (X - C a)) := by
+  classical
+  refine Or.resolve_left
+      (EuclideanDomain.dvd_or_coprime (X - C a) (f /ₘ (X - C a))
+        (irreducible_of_degree_eq_one (Polynomial.degree_X_sub_C a))) ?_
+  contrapose! hf' with h
+  have : X - C a ∣ derivative f := X_sub_C_dvd_derivative_of_X_sub_C_dvd_divByMonic f h
+  rw [← modByMonic_eq_zero_iff_dvd (monic_X_sub_C _), modByMonic_X_sub_C_eq_C_eval] at this
+  rwa [← C_inj, C_0]
 
--- DISSOLVED: irreducible_iff_degree_lt
+theorem irreducible_iff_degree_lt (p : R[X]) (hp0 : p ≠ 0) (hpu : ¬ IsUnit p) :
+    Irreducible p ↔ ∀ q, q.degree ≤ ↑(natDegree p / 2) → q ∣ p → IsUnit q := by
+  rw [← irreducible_mul_leadingCoeff_inv,
+      (monic_mul_leadingCoeff_inv hp0).irreducible_iff_degree_lt]
+  · simp [hp0, natDegree_mul_leadingCoeff_inv]
+  · contrapose! hpu
+    exact isUnit_of_mul_eq_one _ _ hpu
 
--- DISSOLVED: irreducible_iff_lt_natDegree_lt
+theorem irreducible_iff_lt_natDegree_lt {p : R[X]} (hp0 : p ≠ 0) (hpu : ¬ IsUnit p) :
+    Irreducible p ↔ ∀ q, Monic q → natDegree q ∈ Finset.Ioc 0 (natDegree p / 2) → ¬ q ∣ p := by
+  have : p * C (leadingCoeff p)⁻¹ ≠ 1 := by
+    contrapose! hpu
+    exact isUnit_of_mul_eq_one _ _ hpu
+  rw [← irreducible_mul_leadingCoeff_inv,
+      (monic_mul_leadingCoeff_inv hp0).irreducible_iff_lt_natDegree_lt this,
+      natDegree_mul_leadingCoeff_inv _ hp0]
+  simp only [IsUnit.dvd_mul_right
+    (isUnit_C.mpr (IsUnit.mk0 (leadingCoeff p)⁻¹ (inv_ne_zero (leadingCoeff_ne_zero.mpr hp0))))]
 
 end Field
 

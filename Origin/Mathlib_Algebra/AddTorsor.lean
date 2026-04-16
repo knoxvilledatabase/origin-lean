@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/AddTorsor.lean
-Genuine: 47 | Conflates: 0 | Dissolved: 1 | Infrastructure: 16
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Basic
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
+
+noncomputable section
 
 /-!
 # Torsors of additive group actions
@@ -55,10 +57,6 @@ instance addGroupIsAddTorsor (G : Type*) [AddGroup G] : AddTorsor G G where
   vsub_vadd' := sub_add_cancel
   vadd_vsub' := add_sub_cancel_right
 
-@[simp]
-theorem vsub_eq_sub {G : Type*} [AddGroup G] (g₁ g₂ : G) : g₁ -ᵥ g₂ = g₁ - g₂ :=
-  rfl
-
 section General
 
 variable {G : Type*} {P : Type*} [AddGroup G] [T : AddTorsor G P]
@@ -97,7 +95,8 @@ theorem eq_of_vsub_eq_zero {p₁ p₂ : P} (h : p₁ -ᵥ p₂ = (0 : G)) : p₁
 theorem vsub_eq_zero_iff_eq {p₁ p₂ : P} : p₁ -ᵥ p₂ = (0 : G) ↔ p₁ = p₂ :=
   Iff.intro eq_of_vsub_eq_zero fun h => h ▸ vsub_self _
 
--- DISSOLVED: vsub_ne_zero
+theorem vsub_ne_zero {p q : P} : p -ᵥ q ≠ (0 : G) ↔ p ≠ q :=
+  not_congr vsub_eq_zero_iff_eq
 
 @[simp]
 theorem vsub_add_vsub_cancel (p₁ p₂ p₃ : P) : p₁ -ᵥ p₂ + (p₂ -ᵥ p₃) = p₁ -ᵥ p₃ := by
@@ -200,31 +199,6 @@ instance instAddTorsor : AddTorsor (G × G') (P × P') where
   vsub_vadd' _ _ := Prod.ext (vsub_vadd _ _) (vsub_vadd _ _)
   vadd_vsub' _ _ := Prod.ext (vadd_vsub _ _) (vadd_vsub _ _)
 
-@[simp]
-theorem fst_vadd (v : G × G') (p : P × P') : (v +ᵥ p).1 = v.1 +ᵥ p.1 :=
-  rfl
-
-@[simp]
-theorem snd_vadd (v : G × G') (p : P × P') : (v +ᵥ p).2 = v.2 +ᵥ p.2 :=
-  rfl
-
-@[simp]
-theorem mk_vadd_mk (v : G) (v' : G') (p : P) (p' : P') : (v, v') +ᵥ (p, p') = (v +ᵥ p, v' +ᵥ p') :=
-  rfl
-
-@[simp]
-theorem fst_vsub (p₁ p₂ : P × P') : (p₁ -ᵥ p₂ : G × G').1 = p₁.1 -ᵥ p₂.1 :=
-  rfl
-
-@[simp]
-theorem snd_vsub (p₁ p₂ : P × P') : (p₁ -ᵥ p₂ : G × G').2 = p₁.2 -ᵥ p₂.2 :=
-  rfl
-
-@[simp]
-theorem mk_vsub_mk (p₁ p₂ : P) (p₁' p₂' : P') :
-    ((p₁, p₁') -ᵥ (p₂, p₂') : G × G') = (p₁ -ᵥ p₂, p₁' -ᵥ p₂') :=
-  rfl
-
 end Prod
 
 namespace Pi
@@ -255,25 +229,11 @@ def vaddConst (p : P) : G ≃ P where
   left_inv _ := vadd_vsub _ _
   right_inv _ := vsub_vadd _ _
 
-@[simp]
-theorem coe_vaddConst (p : P) : ⇑(vaddConst p) = fun v => v +ᵥ p :=
-  rfl
-
-@[simp]
-theorem coe_vaddConst_symm (p : P) : ⇑(vaddConst p).symm = fun p' => p' -ᵥ p :=
-  rfl
-
 def constVSub (p : P) : P ≃ G where
   toFun := (p -ᵥ ·)
   invFun := (-· +ᵥ p)
   left_inv p' := by simp
   right_inv v := by simp [vsub_vadd_eq_vsub_sub]
-
-@[simp] lemma coe_constVSub (p : P) : ⇑(constVSub p) = (p -ᵥ ·) := rfl
-
-@[simp]
-theorem coe_constVSub_symm (p : P) : ⇑(constVSub p).symm = fun (v : G) => -v +ᵥ p :=
-  rfl
 
 variable (P)
 
@@ -282,8 +242,6 @@ def constVAdd (v : G) : Equiv.Perm P where
   invFun := (-v +ᵥ ·)
   left_inv p := by simp [vadd_vadd]
   right_inv p := by simp [vadd_vadd]
-
-@[simp] lemma coe_constVAdd (v : G) : ⇑(constVAdd P v) = (v +ᵥ ·) := rfl
 
 variable (G)
 

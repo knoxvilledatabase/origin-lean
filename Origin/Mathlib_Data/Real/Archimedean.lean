@@ -9,6 +9,8 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 import Mathlib.Order.Interval.Set.Disjoint
 
+noncomputable section
+
 /-!
 # The real numbers are an Archimedean floor ring, and a conditionally complete linear order.
 

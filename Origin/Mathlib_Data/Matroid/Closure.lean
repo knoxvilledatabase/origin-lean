@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matroid.Restrict
 import Mathlib.Order.Closure
 
+noncomputable section
+
 /-!
 # Matroid Closure
 

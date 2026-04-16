@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Tendsto
 import Mathlib.Data.PFun
 
+noncomputable section
+
 /-!
 # `Tendsto` for relations and partial functions
 
@@ -60,10 +62,6 @@ def rmap (r : Rel α β) (l : Filter α) : Filter β where
 
 theorem rmap_sets (r : Rel α β) (l : Filter α) : (l.rmap r).sets = r.core ⁻¹' l.sets :=
   rfl
-
-@[simp]
-theorem mem_rmap (r : Rel α β) (l : Filter α) (s : Set β) : s ∈ l.rmap r ↔ r.core s ∈ l :=
-  Iff.rfl
 
 @[simp]
 theorem rmap_rmap (r : Rel α β) (s : Rel β γ) (l : Filter α) :
@@ -123,15 +121,6 @@ def rcomap' (r : Rel α β) (f : Filter β) : Filter α where
       (@Rel.preimage_inter _ _ r _ _).trans (Set.inter_subset_inter ha₂ hb₂)⟩
 
 @[simp]
-theorem mem_rcomap' (r : Rel α β) (l : Filter β) (s : Set α) :
-    s ∈ l.rcomap' r ↔ ∃ t ∈ l, r.preimage t ⊆ s :=
-  Iff.rfl
-
-theorem rcomap'_sets (r : Rel α β) (f : Filter β) :
-    (rcomap' r f).sets = Rel.image (fun s t => r.preimage s ⊆ t) f.sets :=
-  rfl
-
-@[simp]
 theorem rcomap'_rcomap' (r : Rel α β) (s : Rel β γ) (l : Filter γ) :
     rcomap' r (rcomap' s l) = rcomap' (r.comp s) l :=
   Filter.ext fun t => by
@@ -177,10 +166,6 @@ def PTendsto (f : α →. β) (l₁ : Filter α) (l₂ : Filter β) :=
 
 theorem ptendsto_def (f : α →. β) (l₁ : Filter α) (l₂ : Filter β) :
     PTendsto f l₁ l₂ ↔ ∀ s ∈ l₂, f.core s ∈ l₁ :=
-  Iff.rfl
-
-theorem ptendsto_iff_rtendsto (l₁ : Filter α) (l₂ : Filter β) (f : α →. β) :
-    PTendsto f l₁ l₂ ↔ RTendsto f.graph' l₁ l₂ :=
   Iff.rfl
 
 theorem pmap_res (l : Filter α) (s : Set α) (f : α → β) :

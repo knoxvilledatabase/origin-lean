@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.PUnit
 import Mathlib.CategoryTheory.Groupoid
 import Mathlib.CategoryTheory.Category.ULift
 
+noncomputable section
+
 /-!
 # Connected category
 

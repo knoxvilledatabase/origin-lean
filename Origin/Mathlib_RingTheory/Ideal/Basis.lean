@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Ideal/Basis.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Bilinear
 import Mathlib.LinearAlgebra.Basis.Defs
 import Mathlib.RingTheory.Ideal.Span
+
+noncomputable section
 
 /-!
 # The basis of ideals
@@ -17,11 +19,29 @@ namespace Ideal
 
 variable {ι R S : Type*} [CommSemiring R] [CommRing S] [IsDomain S] [Algebra R S]
 
--- DISSOLVED: basisSpanSingleton
+noncomputable def basisSpanSingleton (b : Basis ι R S) {x : S} (hx : x ≠ 0) :
+    Basis ι R (span ({x} : Set S)) :=
+  b.map <|
+    LinearEquiv.ofInjective (LinearMap.mulLeft R x) (mul_right_injective₀ hx) ≪≫ₗ
+        LinearEquiv.ofEq _ _
+          (by
+            ext
+            simp [mem_span_singleton', mul_comm]) ≪≫ₗ
+      (Submodule.restrictScalarsEquiv R S S (Ideal.span ({x} : Set S))).restrictScalars R
 
--- DISSOLVED: basisSpanSingleton_apply
+@[simp]
+theorem basisSpanSingleton_apply (b : Basis ι R S) {x : S} (hx : x ≠ 0) (i : ι) :
+    (basisSpanSingleton b hx i : S) = x * b i := by
+  simp only [basisSpanSingleton, Basis.map_apply, LinearEquiv.trans_apply,
+    Submodule.restrictScalarsEquiv_apply, LinearEquiv.ofInjective_apply, LinearEquiv.coe_ofEq_apply,
+    LinearEquiv.restrictScalars_apply, LinearMap.mulLeft_apply, LinearMap.mul_apply']
 
--- DISSOLVED: constr_basisSpanSingleton
+@[simp]
+theorem constr_basisSpanSingleton {N : Type*} [Semiring N] [Module N S] [SMulCommClass R N S]
+    (b : Basis ι R S) {x : S} (hx : x ≠ 0) :
+    (b.constr N).toFun (((↑) : _ → S) ∘ (basisSpanSingleton b hx)) = Algebra.lmul R S x :=
+  b.ext fun i => by
+    erw [Basis.constr_basis, Function.comp_apply, basisSpanSingleton_apply, LinearMap.mul_apply']
 
 end Ideal
 

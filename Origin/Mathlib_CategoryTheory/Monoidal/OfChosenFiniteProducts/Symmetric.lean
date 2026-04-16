@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Monoidal.OfChosenFiniteProducts.Basic
 
+noncomputable section
+
 /-!
 # The symmetric monoidal structure on a category with chosen finite products.
 

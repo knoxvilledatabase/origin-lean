@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Cast.NeZero
 import Mathlib.Algebra.Order.ZeroLEOne
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # Cast of natural numbers: lemmas about order
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Filtered.Basic
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # Limits of eventually constant functors
 

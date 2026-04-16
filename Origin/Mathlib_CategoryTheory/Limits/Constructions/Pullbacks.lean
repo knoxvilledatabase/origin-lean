@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
+noncomputable section
+
 /-!
 # Constructing pullbacks from binary products and equalizers
 

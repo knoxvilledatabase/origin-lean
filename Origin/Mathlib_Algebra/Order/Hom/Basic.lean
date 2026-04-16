@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Hom/Basic.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Logic.Basic
 import Mathlib.Tactic.Positivity.Basic
+
+noncomputable section
 
 /-!
 # Algebraic order homomorphism classes
@@ -42,36 +44,6 @@ multiplicative ring norms but outside of this use we only consider real-valued s
 ## TODO
 
 Finitary versions of the current lemmas.
--/
-
-library_note "out-param inheritance"/--
-
-Diamond inheritance cannot depend on `outParam`s in the following circumstances:
-
- * there are three classes `Top`, `Middle`, `Bottom`
-
- * all of these classes have a parameter `(α : outParam _)`
-
- * all of these classes have an instance parameter `[Root α]` that depends on this `outParam`
- * the `Root` class has two child classes: `Left` and `Right`, these are siblings in the hierarchy
- * the instance `Bottom.toMiddle` takes a `[Left α]` parameter
- * the instance `Middle.toTop` takes a `[Right α]` parameter
- * there is a `Leaf` class that inherits from both `Left` and `Right`.
-
-In that case, given instances `Bottom α` and `Leaf α`, Lean cannot synthesize a `Top α` instance,
-
-even though the hypotheses of the instances `Bottom.toMiddle` and `Middle.toTop` are satisfied.
-
-There are two workarounds:
-
-* You could replace the bundled inheritance implemented by the instance `Middle.toTop` with
-  unbundled inheritance implemented by adding a `[Top α]` parameter to the `Middle` class. This is
-  the preferred option since it is also more compatible with Lean 4, at the cost of being more work
-  to implement and more verbose to use.
-
-* You could weaken the `Bottom.toMiddle` instance by making it depend on a subclass of
-  `Middle.toTop`'s parameter, in this example replacing `[Left α]` with `[Leaf α]`.
-
 -/
 
 open Function
@@ -251,11 +223,16 @@ theorem map_eq_zero_iff_eq_one : f x = 0 ↔ x = 1 :=
     rintro rfl
     exact map_one_eq_zero _⟩
 
--- DISSOLVED: map_ne_zero_iff_ne_one
+@[to_additive]
+theorem map_ne_zero_iff_ne_one : f x ≠ 0 ↔ x ≠ 1 :=
+  (map_eq_zero_iff_eq_one _).not
 
 end GroupNormClass
 
--- DISSOLVED: map_pos_of_ne_one
+@[to_additive]
+theorem map_pos_of_ne_one [Group α] [LinearOrderedAddCommMonoid β] [GroupNormClass F α β] (f : F)
+    {x : α} (hx : x ≠ 1) : 0 < f x :=
+  (apply_nonneg _ _).lt_of_ne <| ((map_ne_zero_iff_ne_one _).2 hx).symm
 
 /-! ### Ring (semi)norms -/
 

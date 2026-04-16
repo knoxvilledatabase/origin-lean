@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.SplitCoequalizer
 import Mathlib.CategoryTheory.Limits.Shapes.SplitEqualizer
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
+noncomputable section
+
 /-!
 # Preserving (co)equalizers
 

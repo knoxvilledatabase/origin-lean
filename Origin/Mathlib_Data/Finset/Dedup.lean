@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Defs
 import Mathlib.Data.Multiset.Dedup
 
+noncomputable section
+
 /-!
 # Deduplicating Multisets to make Finsets
 
@@ -39,10 +41,6 @@ variable [DecidableEq α] {s t : Multiset α}
 
 def toFinset (s : Multiset α) : Finset α :=
   ⟨_, nodup_dedup s⟩
-
-@[simp]
-theorem toFinset_val (s : Multiset α) : s.toFinset.1 = s.dedup :=
-  rfl
 
 theorem toFinset_eq {s : Multiset α} (n : Nodup s) : Finset.mk s n = s.toFinset :=
   Finset.val_inj.1 n.dedup.symm
@@ -93,14 +91,6 @@ variable [DecidableEq α] {l l' : List α} {a : α} {f : α → β}
 
 def toFinset (l : List α) : Finset α :=
   Multiset.toFinset l
-
-@[simp]
-theorem toFinset_val (l : List α) : l.toFinset.1 = (l.dedup : Multiset α) :=
-  rfl
-
-@[simp]
-theorem toFinset_coe (l : List α) : (l : Multiset α).toFinset = l.toFinset :=
-  rfl
 
 theorem toFinset_eq (n : Nodup l) : @Finset.mk α l n = l.toFinset :=
   Multiset.toFinset_eq <| by rwa [Multiset.coe_nodup]

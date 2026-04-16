@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs
 import Mathlib.Algebra.Group.Subsemigroup.Defs
 
+noncomputable section
+
 /-!
 # Submonoids: definition
 
@@ -115,26 +117,6 @@ initialize_simps_projections Submonoid (carrier → coe, as_prefix coe)
 
 initialize_simps_projections AddSubmonoid (carrier → coe, as_prefix coe)
 
-@[to_additive (attr := simp)]
-theorem mem_toSubsemigroup {s : Submonoid M} {x : M} : x ∈ s.toSubsemigroup ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive]
-theorem mem_carrier {s : Submonoid M} {x : M} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive (attr := simp)]
-theorem mem_mk {s : Subsemigroup M} {x : M} (h_one) : x ∈ mk s h_one ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive (attr := simp)]
-theorem coe_set_mk {s : Subsemigroup M} (h_one) : (mk s h_one : Set M) = s :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_le_mk {s t : Subsemigroup M} (h_one) (h_one') : mk s h_one ≤ mk t h_one' ↔ s ≤ t :=
-  Iff.rfl
-
 @[to_additive (attr := ext) "Two `AddSubmonoid`s are equal if they have the same elements."]
 theorem ext {S T : Submonoid M} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -146,10 +128,6 @@ protected def copy (S : Submonoid M) (s : Set M) (hs : s = S) : Submonoid M wher
   mul_mem' := hs.symm ▸ S.mul_mem'
 
 variable {S : Submonoid M}
-
-@[to_additive (attr := simp)]
-theorem coe_copy {s : Set M} (hs : s = S) : (S.copy s hs : Set M) = s :=
-  rfl
 
 @[to_additive]
 theorem copy_eq {s : Set M} (hs : s = S) : S.copy s hs = S :=
@@ -191,28 +169,12 @@ theorem mem_bot {x : M} : x ∈ (⊥ : Submonoid M) ↔ x = 1 :=
 theorem mem_top (x : M) : x ∈ (⊤ : Submonoid M) :=
   Set.mem_univ x
 
-@[to_additive (attr := simp)]
-theorem coe_top : ((⊤ : Submonoid M) : Set M) = Set.univ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_bot : ((⊥ : Submonoid M) : Set M) = {1} :=
-  rfl
-
 @[to_additive "The inf of two `AddSubmonoid`s is their intersection."]
 instance : Min (Submonoid M) :=
   ⟨fun S₁ S₂ =>
     { carrier := S₁ ∩ S₂
       one_mem' := ⟨S₁.one_mem, S₂.one_mem⟩
       mul_mem' := fun ⟨hx, hx'⟩ ⟨hy, hy'⟩ => ⟨S₁.mul_mem hx hy, S₂.mul_mem hx' hy'⟩ }⟩
-
-@[to_additive (attr := simp)]
-theorem coe_inf (p p' : Submonoid M) : ((p ⊓ p' : Submonoid M) : Set M) = (p : Set M) ∩ p' :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mem_inf {p p' : Submonoid M} {x : M} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
 
 @[to_additive (attr := simp)]
 theorem subsingleton_iff : Subsingleton (Submonoid M) ↔ Subsingleton M :=
@@ -272,10 +234,6 @@ variable {A M₁ : Type*} [SetLike A M₁] [One M₁] [hA : OneMemClass A M₁] 
 instance one : One S' :=
   ⟨⟨1, OneMemClass.one_mem S'⟩⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_one : ((1 : S') : M₁) = 1 :=
-  rfl
-
 variable {S'}
 
 @[to_additive (attr := simp, norm_cast)]
@@ -283,10 +241,6 @@ theorem coe_eq_one {x : S'} : (↑x : M₁) = 1 ↔ x = 1 :=
   (Subtype.ext_iff.symm : (x : M₁) = (1 : S') ↔ x = 1)
 
 variable (S')
-
-@[to_additive]
-theorem one_def : (1 : S') = ⟨1, OneMemClass.one_mem S'⟩ :=
-  rfl
 
 end OneMemClass
 
@@ -302,16 +256,6 @@ instance nPow {M} [Monoid M] {A : Type*} [SetLike A M] [SubmonoidClass A M] (S :
   ⟨fun a n => ⟨a.1 ^ n, pow_mem a.2 n⟩⟩
 
 attribute [to_additive existing nSMul] nPow
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_pow {M} [Monoid M] {A : Type*} [SetLike A M] [SubmonoidClass A M] {S : A} (x : S)
-    (n : ℕ) : ↑(x ^ n) = (x : M) ^ n :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_pow {M} [Monoid M] {A : Type*} [SetLike A M] [SubmonoidClass A M] {S : A} (x : M)
-    (hx : x ∈ S) (n : ℕ) : (⟨x, hx⟩ : S) ^ n = ⟨x ^ n, pow_mem hx n⟩ :=
-  rfl
 
 @[to_additive
       "An `AddSubmonoid` of a unital additive magma inherits a unital additive magma structure."]
@@ -333,10 +277,6 @@ instance (priority := 75) toCommMonoid {M} [CommMonoid M] {A : Type*} [SetLike A
 def subtype : S' →* M where
   toFun := Subtype.val; map_one' := rfl; map_mul' _ _ := by simp
 
-@[to_additive (attr := simp)]
-theorem coe_subtype : (SubmonoidClass.subtype S' : S' → M) = Subtype.val :=
-  rfl
-
 end SubmonoidClass
 
 namespace Submonoid
@@ -351,29 +291,8 @@ instance mul : Mul S :=
 instance one : One S :=
   ⟨⟨_, S.one_mem⟩⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_mul (x y : S) : (↑(x * y) : M) = ↑x * ↑y :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_one : ((1 : S) : M) = 1 :=
-  rfl
-
 @[to_additive (attr := simp)]
 lemma mk_eq_one {a : M} {ha} : (⟨a, ha⟩ : S) = 1 ↔ a = 1 := by simp [← SetLike.coe_eq_coe]
-
-@[to_additive (attr := simp)]
-theorem mk_mul_mk (x y : M) (hx : x ∈ S) (hy : y ∈ S) :
-    (⟨x, hx⟩ : S) * ⟨y, hy⟩ = ⟨x * y, S.mul_mem hx hy⟩ :=
-  rfl
-
-@[to_additive]
-theorem mul_def (x y : S) : x * y = ⟨x * y, S.mul_mem x.2 y.2⟩ :=
-  rfl
-
-@[to_additive]
-theorem one_def : (1 : S) = ⟨1, S.one_mem⟩ :=
-  rfl
 
 @[to_additive
       "An `AddSubmonoid` of a unital additive magma inherits a unital additive magma structure."]
@@ -396,9 +315,5 @@ instance toCommMonoid {M} [CommMonoid M] (S : Submonoid M) : CommMonoid S :=
 @[to_additive "The natural monoid hom from an `AddSubmonoid` of `AddMonoid` `M` to `M`."]
 def subtype : S →* M where
   toFun := Subtype.val; map_one' := rfl; map_mul' _ _ := by simp
-
-@[to_additive (attr := simp)]
-theorem coe_subtype : ⇑S.subtype = Subtype.val :=
-  rfl
 
 end Submonoid

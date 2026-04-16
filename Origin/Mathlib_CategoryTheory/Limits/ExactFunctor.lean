@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 
+noncomputable section
+
 /-!
 # Bundled exact functors
 
@@ -99,52 +101,6 @@ instance : (RightExactFunctor.ofExact C D).Faithful :=
 
 variable {C D}
 
-@[simp]
-theorem LeftExactFunctor.ofExact_obj (F : C ⥤ₑ D) :
-    (LeftExactFunctor.ofExact C D).obj F = ⟨F.1, F.2.1⟩ :=
-  rfl
-
-@[simp]
-theorem RightExactFunctor.ofExact_obj (F : C ⥤ₑ D) :
-    (RightExactFunctor.ofExact C D).obj F = ⟨F.1, F.2.2⟩ :=
-  rfl
-
-@[simp]
-theorem LeftExactFunctor.ofExact_map {F G : C ⥤ₑ D} (α : F ⟶ G) :
-    (LeftExactFunctor.ofExact C D).map α = α :=
-  rfl
-
-@[simp]
-theorem RightExactFunctor.ofExact_map {F G : C ⥤ₑ D} (α : F ⟶ G) :
-    (RightExactFunctor.ofExact C D).map α = α :=
-  rfl
-
-@[simp]
-theorem LeftExactFunctor.forget_obj (F : C ⥤ₗ D) : (LeftExactFunctor.forget C D).obj F = F.1 :=
-  rfl
-
-@[simp]
-theorem RightExactFunctor.forget_obj (F : C ⥤ᵣ D) : (RightExactFunctor.forget C D).obj F = F.1 :=
-  rfl
-
-@[simp]
-theorem ExactFunctor.forget_obj (F : C ⥤ₑ D) : (ExactFunctor.forget C D).obj F = F.1 :=
-  rfl
-
-@[simp]
-theorem LeftExactFunctor.forget_map {F G : C ⥤ₗ D} (α : F ⟶ G) :
-    (LeftExactFunctor.forget C D).map α = α :=
-  rfl
-
-@[simp]
-theorem RightExactFunctor.forget_map {F G : C ⥤ᵣ D} (α : F ⟶ G) :
-    (RightExactFunctor.forget C D).map α = α :=
-  rfl
-
-@[simp]
-theorem ExactFunctor.forget_map {F G : C ⥤ₑ D} (α : F ⟶ G) : (ExactFunctor.forget C D).map α = α :=
-  rfl
-
 def LeftExactFunctor.of (F : C ⥤ D) [PreservesFiniteLimits F] : C ⥤ₗ D :=
   ⟨F, inferInstance⟩
 
@@ -153,33 +109,6 @@ def RightExactFunctor.of (F : C ⥤ D) [PreservesFiniteColimits F] : C ⥤ᵣ D 
 
 def ExactFunctor.of (F : C ⥤ D) [PreservesFiniteLimits F] [PreservesFiniteColimits F] : C ⥤ₑ D :=
   ⟨F, ⟨inferInstance, inferInstance⟩⟩
-
-@[simp]
-theorem LeftExactFunctor.of_fst (F : C ⥤ D) [PreservesFiniteLimits F] :
-    (LeftExactFunctor.of F).obj = F :=
-  rfl
-
-@[simp]
-theorem RightExactFunctor.of_fst (F : C ⥤ D) [PreservesFiniteColimits F] :
-    (RightExactFunctor.of F).obj = F :=
-  rfl
-
-@[simp]
-theorem ExactFunctor.of_fst (F : C ⥤ D) [PreservesFiniteLimits F] [PreservesFiniteColimits F] :
-    (ExactFunctor.of F).obj = F :=
-  rfl
-
-theorem LeftExactFunctor.forget_obj_of (F : C ⥤ D) [PreservesFiniteLimits F] :
-    (LeftExactFunctor.forget C D).obj (LeftExactFunctor.of F) = F :=
-  rfl
-
-theorem RightExactFunctor.forget_obj_of (F : C ⥤ D) [PreservesFiniteColimits F] :
-    (RightExactFunctor.forget C D).obj (RightExactFunctor.of F) = F :=
-  rfl
-
-theorem ExactFunctor.forget_obj_of (F : C ⥤ D) [PreservesFiniteLimits F]
-    [PreservesFiniteColimits F] : (ExactFunctor.forget C D).obj (ExactFunctor.of F) = F :=
-  rfl
 
 noncomputable instance (F : C ⥤ₗ D) : PreservesFiniteLimits F.obj :=
   F.property

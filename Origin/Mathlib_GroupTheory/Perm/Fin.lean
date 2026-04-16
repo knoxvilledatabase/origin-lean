@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/Perm/Fin.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import Mathlib.GroupTheory.Perm.Option
 import Mathlib.Logic.Equiv.Fin
 import Mathlib.Logic.Equiv.Fintype
+
+noncomputable section
 
 /-!
 # Permutations of `Fin n`
@@ -246,9 +248,20 @@ theorem cycleRange_symm_succ {n : ℕ} (i : Fin (n + 1)) (j : Fin n) :
     i.cycleRange.symm j.succ = i.succAbove j :=
   i.cycleRange.injective (by simp)
 
--- DISSOLVED: isCycle_cycleRange
+theorem isCycle_cycleRange {n : ℕ} {i : Fin (n + 1)} (h0 : i ≠ 0) : IsCycle (cycleRange i) := by
+  cases' i with i hi
+  cases i
+  · exact (h0 rfl).elim
+  exact isCycle_finRotate.extendDomain _
 
--- DISSOLVED: cycleType_cycleRange
+@[simp]
+theorem cycleType_cycleRange {n : ℕ} {i : Fin (n + 1)} (h0 : i ≠ 0) :
+    cycleType (cycleRange i) = {(i + 1 : ℕ)} := by
+  cases' i with i hi
+  cases i
+  · exact (h0 rfl).elim
+  rw [cycleRange, cycleType_extendDomain]
+  exact cycleType_finRotate
 
 theorem isThreeCycle_cycleRange_two {n : ℕ} : IsThreeCycle (cycleRange 2 : Perm (Fin (n + 3))) := by
   rw [IsThreeCycle, cycleType_cycleRange] <;> simp [Fin.ext_iff]

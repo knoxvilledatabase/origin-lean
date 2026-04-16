@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Dimension/RankNullity.lean
-Genuine: 17 | Conflates: 1 | Dissolved: 4 | Infrastructure: 0
+Genuine: 21 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.Finite
+
+noncomputable section
 
 /-!
 
@@ -121,9 +123,24 @@ theorem exists_linearIndependent_snoc_of_lt_rank [StrongRankCondition R] {n : �
   have ⟨x, hx⟩ := exists_linearIndependent_cons_of_lt_rank hv h
   exact ⟨x, hx.comp _ (finRotate _).injective⟩
 
--- DISSOLVED: exists_linearIndependent_pair_of_one_lt_rank
+theorem exists_linearIndependent_pair_of_one_lt_rank [StrongRankCondition R]
+    [NoZeroSMulDivisors R M] (h : 1 < Module.rank R M) {x : M} (hx : x ≠ 0) :
+    ∃ y, LinearIndependent R ![x, y] := by
+  obtain ⟨y, hy⟩ := exists_linearIndependent_snoc_of_lt_rank (linearIndependent_unique ![x] hx) h
+  have : Fin.snoc ![x] y = ![x, y] := by simp [Fin.snoc, ← List.ofFn_inj]
+  rw [this] at hy
+  exact ⟨y, hy⟩
 
--- DISSOLVED: Submodule.exists_smul_not_mem_of_rank_lt
+theorem Submodule.exists_smul_not_mem_of_rank_lt {N : Submodule R M}
+    (h : Module.rank R N < Module.rank R M) : ∃ m : M, ∀ r : R, r ≠ 0 → r • m ∉ N := by
+  have : Module.rank R (M ⧸ N) ≠ 0 := by
+    intro e
+    rw [← rank_quotient_add_rank N, e, zero_add] at h
+    exact h.ne rfl
+  rw [ne_eq, rank_eq_zero_iff, (Submodule.Quotient.mk_surjective N).forall] at this
+  push_neg at this
+  simp_rw [← N.mkQ_apply, ← map_smul, N.mkQ_apply, ne_eq, Submodule.Quotient.mk_eq_zero] at this
+  exact this
 
 open Cardinal Basis Submodule Function Set LinearMap
 
@@ -159,7 +176,10 @@ theorem exists_linearIndependent_cons_of_lt_finrank {n : ℕ} {v : Fin n → M}
     ∃ (x : M), LinearIndependent R (Fin.cons x v) :=
   exists_linearIndependent_cons_of_lt_rank hv (lt_rank_of_lt_finrank h)
 
--- DISSOLVED: exists_linearIndependent_pair_of_one_lt_finrank
+theorem exists_linearIndependent_pair_of_one_lt_finrank [NoZeroSMulDivisors R M]
+    (h : 1 < finrank R M) {x : M} (hx : x ≠ 0) :
+    ∃ y, LinearIndependent R ![x, y] :=
+  exists_linearIndependent_pair_of_one_lt_rank (one_lt_rank_of_one_lt_finrank h) hx
 
 lemma Submodule.finrank_quotient_add_finrank [Module.Finite R M] (N : Submodule R M) :
     finrank R (M ⧸ N) + finrank R N = finrank R M := by
@@ -191,6 +211,16 @@ open Submodule Module
 
 variable [StrongRankCondition R] [Module.Finite R M]
 
--- DISSOLVED: Submodule.exists_of_finrank_lt
+lemma Submodule.exists_of_finrank_lt (N : Submodule R M) (h : finrank R N < finrank R M) :
+    ∃ m : M, ∀ r : R, r ≠ 0 → r • m ∉ N := by
+  obtain ⟨s, hs, hs'⟩ :=
+    exists_finset_linearIndependent_of_le_finrank (R := R) (M := M ⧸ N) le_rfl
+  obtain ⟨v, hv⟩ : s.Nonempty := by rwa [Finset.nonempty_iff_ne_empty, ne_eq, ← Finset.card_eq_zero,
+    hs, finrank_quotient, tsub_eq_zero_iff_le, not_le]
+  obtain ⟨v, rfl⟩ := N.mkQ_surjective v
+  refine ⟨v, fun r hr ↦ mt ?_ hr⟩
+  have := linearIndependent_iff.mp hs' (Finsupp.single ⟨_, hv⟩ r)
+  rwa [Finsupp.linearCombination_single, Finsupp.single_eq_zero, ← LinearMap.map_smul,
+    Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at this
 
 end

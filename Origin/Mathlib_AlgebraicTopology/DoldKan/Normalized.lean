@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.FunctorN
 
+noncomputable section
+
 /-!
 
 # Comparison with the normalized Moore complex functor

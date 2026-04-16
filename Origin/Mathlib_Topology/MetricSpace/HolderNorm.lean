@@ -1,9 +1,11 @@
 /-
 Extracted from Topology/MetricSpace/HolderNorm.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Holder
+
+noncomputable section
 
 /-!
 # Hölder norm
@@ -41,11 +43,9 @@ section PseudoEMetricSpace
 variable [PseudoEMetricSpace X] [PseudoEMetricSpace Y] {r : ℝ≥0} {f : X → Y}
 
 noncomputable
-
 def eHolderNorm (r : ℝ≥0) (f : X → Y) : ℝ≥0∞ := ⨅ (C) (_ : HolderWith C r f), C
 
 noncomputable
-
 def nnHolderNorm (r : ℝ≥0) (f : X → Y) : ℝ≥0 := (eHolderNorm r f).toNNReal
 
 def MemHolder (r : ℝ≥0) (f : X → Y) : Prop := ∃ C, HolderWith C r f

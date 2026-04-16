@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.RingTheory.Finiteness.Bilinear
 
+noncomputable section
+
 /-!
 # Subalgebras that are finitely generated as submodules
 -/

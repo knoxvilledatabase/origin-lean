@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.TopCat.Opens
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # The category of open neighborhoods of a point
 
@@ -76,10 +78,6 @@ def infLERight {x : X} (U V : OpenNhds x) : U ⊓ V ⟶ V :=
 def inclusion (x : X) : OpenNhds x ⥤ Opens X :=
   fullSubcategoryInclusion _
 
-@[simp]
-theorem inclusion_obj (x : X) (U) (p) : (inclusion x).obj ⟨U, p⟩ = U :=
-  rfl
-
 theorem isOpenEmbedding {x : X} (U : OpenNhds x) : IsOpenEmbedding U.1.inclusion' :=
   U.1.isOpenEmbedding
 
@@ -89,35 +87,9 @@ def map (x : X) : OpenNhds (f x) ⥤ OpenNhds x where
   obj U := ⟨(Opens.map f).obj U.1, U.2⟩
   map i := (Opens.map f).map i
 
-@[simp]
-theorem map_obj (x : X) (U) (q) : (map f x).obj ⟨U, q⟩ = ⟨(Opens.map f).obj U, q⟩ :=
-  rfl
-
-@[simp]
-theorem map_id_obj (x : X) (U) : (map (𝟙 X) x).obj U = U := rfl
-
-@[simp]
-theorem map_id_obj' (x : X) (U) (p) (q) : (map (𝟙 X) x).obj ⟨⟨U, p⟩, q⟩ = ⟨⟨U, p⟩, q⟩ :=
-  rfl
-
-@[simp]
-theorem map_id_obj_unop (x : X) (U : (OpenNhds x)ᵒᵖ) : (map (𝟙 X) x).obj (unop U) = unop U := by
-  simp
-
-@[simp]
-theorem op_map_id_obj (x : X) (U : (OpenNhds x)ᵒᵖ) : (map (𝟙 X) x).op.obj U = U := by simp
-
 @[simps! hom_app inv_app]
 def inclusionMapIso (x : X) : inclusion (f x) ⋙ Opens.map f ≅ map f x ⋙ inclusion x :=
   NatIso.ofComponents fun U => { hom := 𝟙 _, inv := 𝟙 _ }
-
-@[simp]
-theorem inclusionMapIso_hom (x : X) : (inclusionMapIso f x).hom = 𝟙 _ :=
-  rfl
-
-@[simp]
-theorem inclusionMapIso_inv (x : X) : (inclusionMapIso f x).inv = 𝟙 _ :=
-  rfl
 
 end OpenNhds
 

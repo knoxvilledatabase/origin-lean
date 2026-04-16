@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.FinEnum
 import Mathlib.Logic.Equiv.Fin
 
+noncomputable section
+
 /-!
 # FinEnum instance for Option
 

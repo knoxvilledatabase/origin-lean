@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.UniformSpace.UniformEmbedding
 import Mathlib.Topology.UniformSpace.Equiv
 
+noncomputable section
+
 /-!
 # Abstract theory of Hausdorff completions of uniform spaces
 

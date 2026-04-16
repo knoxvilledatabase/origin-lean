@@ -9,6 +9,8 @@ import Mathlib.Analysis.Complex.UpperHalfPlane.Manifold
 import Mathlib.Geometry.Manifold.MFDeriv.SpecificFunctions
 import Mathlib.NumberTheory.ModularForms.SlashInvariantForms
 
+noncomputable section
+
 /-!
 # Modular forms
 
@@ -74,19 +76,6 @@ instance (priority := 100) CuspFormClass.cuspForm : CuspFormClass (CuspForm Γ k
 
 variable {F Γ k}
 
-theorem ModularForm.toFun_eq_coe (f : ModularForm Γ k) : f.toFun = (f : ℍ → ℂ) :=
-  rfl
-
-@[simp]
-theorem ModularForm.toSlashInvariantForm_coe (f : ModularForm Γ k) : ⇑f.1 = f :=
-  rfl
-
-theorem CuspForm.toFun_eq_coe {f : CuspForm Γ k} : f.toFun = (f : ℍ → ℂ) :=
-  rfl
-
-@[simp]
-theorem CuspForm.toSlashInvariantForm_coe (f : CuspForm Γ k) : ⇑f.1 = f := rfl
-
 @[ext]
 theorem ModularForm.ext {f g : ModularForm Γ k} (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext f g h
@@ -124,10 +113,6 @@ instance add : Add (ModularForm Γ k) :=
 theorem coe_add (f g : ModularForm Γ k) : ⇑(f + g) = f + g :=
   rfl
 
-@[simp]
-theorem add_apply (f g : ModularForm Γ k) (z : ℍ) : (f + g) z = f z + g z :=
-  rfl
-
 instance instZero : Zero (ModularForm Γ k) :=
   ⟨ { toSlashInvariantForm := 0
       holo' := fun _ => mdifferentiableAt_const
@@ -135,10 +120,6 @@ instance instZero : Zero (ModularForm Γ k) :=
 
 @[simp]
 theorem coe_zero : ⇑(0 : ModularForm Γ k) = (0 : ℍ → ℂ) :=
-  rfl
-
-@[simp]
-theorem zero_apply (z : ℍ) : (0 : ModularForm Γ k) z = 0 :=
   rfl
 
 section
@@ -155,10 +136,6 @@ instance instSMul : SMul α (ModularForm Γ k) :=
 theorem coe_smul (f : ModularForm Γ k) (n : α) : ⇑(n • f) = n • ⇑f :=
   rfl
 
-@[simp]
-theorem smul_apply (f : ModularForm Γ k) (n : α) (z : ℍ) : (n • f) z = n • f z :=
-  rfl
-
 end
 
 instance instNeg : Neg (ModularForm Γ k) :=
@@ -171,19 +148,11 @@ instance instNeg : Neg (ModularForm Γ k) :=
 theorem coe_neg (f : ModularForm Γ k) : ⇑(-f) = -f :=
   rfl
 
-@[simp]
-theorem neg_apply (f : ModularForm Γ k) (z : ℍ) : (-f) z = -f z :=
-  rfl
-
 instance instSub : Sub (ModularForm Γ k) :=
   ⟨fun f g => f + -g⟩
 
 @[simp]
 theorem coe_sub (f g : ModularForm Γ k) : ⇑(f - g) = f - g :=
-  rfl
-
-@[simp]
-theorem sub_apply (f g : ModularForm Γ k) (z : ℍ) : (f - g) z = f z - g z :=
   rfl
 
 instance : AddCommGroup (ModularForm Γ k) :=
@@ -208,11 +177,6 @@ def mul {k_1 k_2 : ℤ} {Γ : Subgroup SL(2, ℤ)} (f : ModularForm Γ k_1) (g :
   bdd_at_infty' A := by
     simpa only [coe_mul, mul_slash_SL2] using (f.bdd_at_infty' A).mul (g.bdd_at_infty' A)
 
-@[simp]
-theorem mul_coe {k_1 k_2 : ℤ} {Γ : Subgroup SL(2, ℤ)} (f : ModularForm Γ k_1)
-    (g : ModularForm Γ k_2) : (f.mul g : ℍ → ℂ) = f * g :=
-  rfl
-
 @[simps! (config := .asFn) toFun toSlashInvariantForm]
 def const (x : ℂ) : ModularForm Γ 0 where
   toSlashInvariantForm := .const x
@@ -224,29 +188,11 @@ def const (x : ℂ) : ModularForm Γ 0 where
 instance : One (ModularForm Γ 0) where
   one := { const 1 with toSlashInvariantForm := 1 }
 
-@[simp]
-theorem one_coe_eq_one : ⇑(1 : ModularForm Γ 0) = 1 :=
-  rfl
-
 instance (Γ : Subgroup SL(2, ℤ)) : NatCast (ModularForm Γ 0) where
   natCast n := const n
 
-@[simp, norm_cast]
-lemma coe_natCast (Γ : Subgroup SL(2, ℤ)) (n : ℕ) :
-    ⇑(n : ModularForm Γ 0) = n := rfl
-
-lemma toSlashInvariantForm_natCast (Γ : Subgroup SL(2, ℤ)) (n : ℕ) :
-    (n : ModularForm Γ 0).toSlashInvariantForm = n := rfl
-
 instance (Γ : Subgroup SL(2, ℤ)) : IntCast (ModularForm Γ 0) where
   intCast z := const z
-
-@[simp, norm_cast]
-lemma coe_intCast (Γ : Subgroup SL(2, ℤ)) (z : ℤ) :
-    ⇑(z : ModularForm Γ 0) = z := rfl
-
-lemma toSlashInvariantForm_intCast (Γ : Subgroup SL(2, ℤ)) (z : ℤ) :
-    (z : ModularForm Γ 0).toSlashInvariantForm = z := rfl
 
 end ModularForm
 
@@ -266,10 +212,6 @@ instance hasAdd : Add (CuspForm Γ k) :=
 theorem coe_add (f g : CuspForm Γ k) : ⇑(f + g) = f + g :=
   rfl
 
-@[simp]
-theorem add_apply (f g : CuspForm Γ k) (z : ℍ) : (f + g) z = f z + g z :=
-  rfl
-
 instance instZero : Zero (CuspForm Γ k) :=
   ⟨ { toSlashInvariantForm := 0
       holo' := fun _ => mdifferentiableAt_const
@@ -277,10 +219,6 @@ instance instZero : Zero (CuspForm Γ k) :=
 
 @[simp]
 theorem coe_zero : ⇑(0 : CuspForm Γ k) = (0 : ℍ → ℂ) :=
-  rfl
-
-@[simp]
-theorem zero_apply (z : ℍ) : (0 : CuspForm Γ k) z = 0 :=
   rfl
 
 section
@@ -297,10 +235,6 @@ instance instSMul : SMul α (CuspForm Γ k) :=
 theorem coe_smul (f : CuspForm Γ k) (n : α) : ⇑(n • f) = n • ⇑f :=
   rfl
 
-@[simp]
-theorem smul_apply (f : CuspForm Γ k) (n : α) {z : ℍ} : (n • f) z = n • f z :=
-  rfl
-
 end
 
 instance instNeg : Neg (CuspForm Γ k) :=
@@ -313,19 +247,11 @@ instance instNeg : Neg (CuspForm Γ k) :=
 theorem coe_neg (f : CuspForm Γ k) : ⇑(-f) = -f :=
   rfl
 
-@[simp]
-theorem neg_apply (f : CuspForm Γ k) (z : ℍ) : (-f) z = -f z :=
-  rfl
-
 instance instSub : Sub (CuspForm Γ k) :=
   ⟨fun f g => f + -g⟩
 
 @[simp]
 theorem coe_sub (f g : CuspForm Γ k) : ⇑(f - g) = f - g :=
-  rfl
-
-@[simp]
-theorem sub_apply (f g : CuspForm Γ k) (z : ℍ) : (f - g) z = f z - g z :=
   rfl
 
 instance : AddCommGroup (CuspForm Γ k) :=

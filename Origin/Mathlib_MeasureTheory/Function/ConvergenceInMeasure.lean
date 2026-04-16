@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Function/ConvergenceInMeasure.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.MeasureTheory.Function.Egorov
 import Mathlib.MeasureTheory.Function.LpSpace
+
+noncomputable section
 
 /-!
 # Convergence in measure
@@ -240,12 +242,42 @@ variable [NormedAddCommGroup E] {p : ℝ≥0∞}
 
 variable {f : ι → α → E} {g : α → E}
 
--- DISSOLVED: tendstoInMeasure_of_tendsto_eLpNorm_of_stronglyMeasurable
+theorem tendstoInMeasure_of_tendsto_eLpNorm_of_stronglyMeasurable (hp_ne_zero : p ≠ 0)
+    (hp_ne_top : p ≠ ∞) (hf : ∀ n, StronglyMeasurable (f n)) (hg : StronglyMeasurable g)
+    {l : Filter ι} (hfg : Tendsto (fun n => eLpNorm (f n - g) p μ) l (𝓝 0)) :
+    TendstoInMeasure μ f l g := by
+  intro ε hε
+  replace hfg := ENNReal.Tendsto.const_mul
+    (Tendsto.ennrpow_const p.toReal hfg) (Or.inr <| @ENNReal.ofReal_ne_top (1 / ε ^ p.toReal))
+  simp only [mul_zero,
+    ENNReal.zero_rpow_of_pos (ENNReal.toReal_pos hp_ne_zero hp_ne_top)] at hfg
+  rw [ENNReal.tendsto_nhds_zero] at hfg ⊢
+  intro δ hδ
+  refine (hfg δ hδ).mono fun n hn => ?_
+  refine le_trans ?_ hn
+  rw [ENNReal.ofReal_div_of_pos (Real.rpow_pos_of_pos hε _), ENNReal.ofReal_one, mul_comm,
+    mul_one_div, ENNReal.le_div_iff_mul_le _ (Or.inl ENNReal.ofReal_ne_top), mul_comm]
+  · rw [← ENNReal.ofReal_rpow_of_pos hε]
+    convert mul_meas_ge_le_pow_eLpNorm' μ hp_ne_zero hp_ne_top ((hf n).sub hg).aestronglyMeasurable
+        (ENNReal.ofReal ε)
+    rw [dist_eq_norm, ← ENNReal.ofReal_le_ofReal_iff (norm_nonneg _), ofReal_norm_eq_coe_nnnorm]
+    exact Iff.rfl
+  · rw [Ne, ENNReal.ofReal_eq_zero, not_le]
+    exact Or.inl (Real.rpow_pos_of_pos hε _)
 
 alias tendstoInMeasure_of_tendsto_snorm_of_stronglyMeasurable :=
   tendstoInMeasure_of_tendsto_eLpNorm_of_stronglyMeasurable
 
--- DISSOLVED: tendstoInMeasure_of_tendsto_eLpNorm_of_ne_top
+theorem tendstoInMeasure_of_tendsto_eLpNorm_of_ne_top (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞)
+    (hf : ∀ n, AEStronglyMeasurable (f n) μ) (hg : AEStronglyMeasurable g μ) {l : Filter ι}
+    (hfg : Tendsto (fun n => eLpNorm (f n - g) p μ) l (𝓝 0)) : TendstoInMeasure μ f l g := by
+  refine TendstoInMeasure.congr (fun i => (hf i).ae_eq_mk.symm) hg.ae_eq_mk.symm ?_
+  refine tendstoInMeasure_of_tendsto_eLpNorm_of_stronglyMeasurable
+    hp_ne_zero hp_ne_top (fun i => (hf i).stronglyMeasurable_mk) hg.stronglyMeasurable_mk ?_
+  have : (fun n => eLpNorm ((hf n).mk (f n) - hg.mk g) p μ) = fun n => eLpNorm (f n - g) p μ := by
+    ext1 n; refine eLpNorm_congr_ae (EventuallyEq.sub (hf n).ae_eq_mk.symm hg.ae_eq_mk.symm)
+  rw [this]
+  exact hfg
 
 alias tendstoInMeasure_of_tendsto_snorm_of_ne_top := tendstoInMeasure_of_tendsto_eLpNorm_of_ne_top
 
@@ -272,7 +304,13 @@ theorem tendstoInMeasure_of_tendsto_eLpNorm_top {E} [NormedAddCommGroup E] {f : 
 
 alias tendstoInMeasure_of_tendsto_snorm_top := tendstoInMeasure_of_tendsto_eLpNorm_top
 
--- DISSOLVED: tendstoInMeasure_of_tendsto_eLpNorm
+theorem tendstoInMeasure_of_tendsto_eLpNorm {l : Filter ι} (hp_ne_zero : p ≠ 0)
+    (hf : ∀ n, AEStronglyMeasurable (f n) μ) (hg : AEStronglyMeasurable g μ)
+    (hfg : Tendsto (fun n => eLpNorm (f n - g) p μ) l (𝓝 0)) : TendstoInMeasure μ f l g := by
+  by_cases hp_ne_top : p = ∞
+  · subst hp_ne_top
+    exact tendstoInMeasure_of_tendsto_eLpNorm_top hfg
+  · exact tendstoInMeasure_of_tendsto_eLpNorm_of_ne_top hp_ne_zero hp_ne_top hf hg hfg
 
 alias tendstoInMeasure_of_tendsto_snorm := tendstoInMeasure_of_tendsto_eLpNorm
 

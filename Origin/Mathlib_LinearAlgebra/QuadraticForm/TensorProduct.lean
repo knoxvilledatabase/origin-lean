@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.TensorProduct
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
+noncomputable section
+
 /-!
 # The quadratic form on a tensor product
 

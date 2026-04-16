@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Vector.Basic
 
+noncomputable section
+
 /-!
 # Theorems about membership of elements in vectors
 

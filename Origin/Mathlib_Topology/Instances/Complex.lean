@@ -10,6 +10,8 @@ import Mathlib.Topology.Algebra.Field
 import Mathlib.Topology.Algebra.UniformRing
 import Mathlib.FieldTheory.IntermediateField.Basic
 
+noncomputable section
+
 /-!
 # Some results about the topology of ℂ
 -/

@@ -7,6 +7,8 @@ import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Tactic.TryThis
 import Mathlib.Util.AtomM
 
+noncomputable section
+
 /-!
 # The `abel` tactic
 
@@ -343,6 +345,7 @@ elab_rules : tactic | `(tactic| abel1 $[!%$tk]?) => withMainContext do
     mkEqTrans p₁ (← mkEqSymm p₂)
 
 @[inherit_doc abel1] macro (name := abel1!) "abel1!" : tactic => `(tactic| abel1 !)
+
 theorem term_eq {α : Type*} [AddCommMonoid α] (n : ℕ) (x a : α) : term n x a = n • x + a := rfl
 
 theorem termg_eq {α : Type*} [AddCommGroup α] (n : ℤ) (x a : α) : termg n x a = n • x + a := rfl
@@ -434,22 +437,19 @@ syntax (name := abel_term) "abel" (&" raw" <|> &" term")? (location)? : tactic
 syntax (name := abel!_term) "abel!" (&" raw" <|> &" term")? (location)? : tactic
 
 elab (name := abelNF) "abel_nf" tk:"!"? cfg:optConfig loc:(location)? : tactic => do
-
   let mut cfg ← elabAbelNFConfig cfg
-
   if tk.isSome then cfg := { cfg with red := .default }
-
   let loc := (loc.map expandLocation).getD (.targets #[] true)
-
   let s ← IO.mkRef {}
-
   withLocation loc (abelNFLocalDecl s cfg) (abelNFTarget s cfg)
-
     fun _ ↦ throwError "abel_nf made no progress"
+
+@[inherit_doc abelNF] macro "abel_nf!" cfg:optConfig loc:(location)? : tactic =>
 
   `(tactic| abel_nf ! $cfg:optConfig $(loc)?)
 
 @[inherit_doc abelNF] syntax (name := abelNFConv) "abel_nf" "!"? optConfig : conv
+
 @[tactic abelNFConv] def elabAbelNFConv : Tactic := fun stx ↦ match stx with
   | `(conv| abel_nf $[!%$tk]? $cfg:optConfig) => withMainContext do
     let mut cfg ← elabAbelNFConfig cfg
@@ -457,15 +457,19 @@ elab (name := abelNF) "abel_nf" tk:"!"? cfg:optConfig loc:(location)? : tactic =
     Conv.applySimpResult (← abelNFCore (← IO.mkRef {}) cfg (← instantiateMVars (← Conv.getLhs)))
   | _ => Elab.throwUnsupportedSyntax
 
-macro (name := abel) "abel" : tactic =>
+@[inherit_doc abelNF] macro "abel_nf!" cfg:optConfig : conv => `(conv| abel_nf ! $cfg:optConfig)
 
+macro (name := abel) "abel" : tactic =>
   `(tactic| first | abel1 | try_this abel_nf)
+
+@[inherit_doc abel] macro "abel!" : tactic =>
 
   `(tactic| first | abel1! | try_this abel_nf!)
 
 macro (name := abelConv) "abel" : conv =>
-
   `(conv| first | discharge => abel1 | try_this abel_nf)
+
+@[inherit_doc abelConv] macro "abel!" : conv =>
 
   `(conv| first | discharge => abel1! | try_this abel_nf!)
 

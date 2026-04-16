@@ -7,6 +7,8 @@ import Mathlib.Algebra.GCDMonoid.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Polynomial.Eisenstein.Basic
 
+noncomputable section
+
 /-!
 
 # GCD domains are integrally closed

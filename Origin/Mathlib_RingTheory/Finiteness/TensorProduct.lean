@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.RingTheory.Finiteness.Bilinear
 import Mathlib.RingTheory.Ideal.Quotient.Basic
 
+noncomputable section
+
 /-!
 # Finiteness of the tensor product of (sub)modules
 

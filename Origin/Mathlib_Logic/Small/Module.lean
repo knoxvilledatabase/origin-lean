@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Small.Group
 import Mathlib.Logic.Small.Ring
 
+noncomputable section
+
 /-!
 # Transfer module and algebra structures from `α` to `Shrink α`.
 -/

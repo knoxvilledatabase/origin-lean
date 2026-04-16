@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/ITauto.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Batteries.Tactic.Exact
@@ -9,6 +9,8 @@ import Mathlib.Logic.Basic
 import Mathlib.Tactic.DeriveToExpr
 import Mathlib.Util.AtomM
 import Qq
+
+noncomputable section
 
 /-!
 
@@ -256,61 +258,6 @@ def Proof.app : Proof → Proof → Proof
   | .orImpR p, q => p.app q.orInR
   | .impImpSimp x p, q => p.app (.intro x q)
   | p, q => p.app' q
-
-def Proof.check : Lean.NameMap IProp → Proof → Option IProp
-  | _, .sorry A => some A
-  | Γ, .hyp i => Γ.find? i
-  | _, triv => some .true
-  | Γ, .exfalso' A p => guard (p.check Γ = some .false) *> pure A
-  | Γ, .intro x A p => do let B ← p.check (Γ.insert x A); pure (.imp A B)
-  | Γ, .andLeft ak p => do
-    let .and' ak' A B ← p.check Γ | none
-    guard (ak = ak') *> pure (ak.sides A B).1
-  | Γ, .andRight ak p => do
-    let .and' ak' A B ← p.check Γ | none
-    guard (ak = ak') *> pure (ak.sides A B).2
-  | Γ, .andIntro .and p q => do
-    let A ← p.check Γ; let B ← q.check Γ
-    pure (A.and B)
-  | Γ, .andIntro ak p q => do
-    let .imp A B ← p.check Γ | none
-    let C ← q.check Γ; guard (C = .imp B A) *> pure (A.and' ak B)
-  | Γ, .curry ak p => do
-    let .imp (.and' ak' A B) C ← p.check Γ | none
-    let (A', B') := ak.sides A B
-    guard (ak = ak') *> pure (A'.imp $ B'.imp C)
-  | Γ, .curry₂ ak p q => do
-    let .imp (.and' ak' A B) C ← p.check Γ | none
-    let A₂ ← q.check Γ
-    let (A', B') := ak.sides A B
-    guard (ak = ak' ∧ A₂ = A') *> pure (B'.imp C)
-  | Γ, .app' p q => do
-    let .imp A B ← p.check Γ | none
-    let A' ← q.check Γ
-    guard (A = A') *> pure B
-  | Γ, .orImpL B p => do
-    let .imp (.or A B') C ← p.check Γ | none
-    guard (B = B') *> pure (A.imp C)
-  | Γ, .orImpR A p => do
-    let .imp (.or A' B) C ← p.check Γ | none
-    guard (A = A') *> pure (B.imp C)
-  | Γ, .orInL B p => do let A ← p.check Γ; pure (A.or B)
-  | Γ, .orInR A p => do let B ← p.check Γ; pure (A.or B)
-  | Γ, .orElim' p x q r => do
-    let .or A B ← p.check Γ | none
-    let C ← q.check (Γ.insert x A)
-    let C' ← r.check (Γ.insert x B)
-    guard (C = C') *> pure C
-  | _, .em _ _ A => pure (A.or A.not)
-  | Γ, .decidableElim _ A _ x p₂ p₃ => do
-    let C ← p₂.check (Γ.insert x A)
-    let C' ← p₃.check (Γ.insert x A.not)
-    guard (C = C') *> pure C
-  | Γ, .impImpSimp _ A p => do
-    let .imp (.imp A' B) C ← p.check Γ | none
-    guard (A = A') *> pure (B.imp C)
-
--/
 
 @[inline] def freshName : StateM Nat Name := fun n => (Name.mkSimple s!"h{n}", n + 1)
 
@@ -633,12 +580,11 @@ elab_rules : tactic
 
     liftMetaTactic (itautoCore · true cl.isSome hs *> pure [])
 
+@[inherit_doc itauto] syntax (name := itauto!) "itauto!" (" *" <|> (" [" term,* "]"))? : tactic
+
 macro_rules
-
   | `(tactic| itauto!) => `(tactic| itauto !)
-
   | `(tactic| itauto! *) => `(tactic| itauto ! *)
-
   | `(tactic| itauto! [$hs,*]) => `(tactic| itauto ! [$hs,*])
 
 end Mathlib.Tactic.ITauto

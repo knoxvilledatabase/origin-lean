@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.FreeGroup.Basic
 import Mathlib.GroupTheory.QuotientGroup.Defs
 
+noncomputable section
+
 /-!
 # Defining a group given by generators and relations
 
@@ -44,14 +46,6 @@ theorem mk_surjective (rels : Set (FreeGroup α)) : Function.Surjective <| mk re
 
 def of {rels : Set (FreeGroup α)} (x : α) : PresentedGroup rels :=
   mk rels (FreeGroup.of x)
-
-@[simp]
-theorem closure_range_of (rels : Set (FreeGroup α)) :
-    Subgroup.closure (Set.range (PresentedGroup.of : α → PresentedGroup rels)) = ⊤ := by
-  have : (PresentedGroup.of : α → PresentedGroup rels) = QuotientGroup.mk' _ ∘ FreeGroup.of := rfl
-  rw [this, Set.range_comp, ← MonoidHom.map_closure (QuotientGroup.mk' _),
-    FreeGroup.closure_range_of, ← MonoidHom.range_eq_map]
-  exact MonoidHom.range_eq_top.2 (QuotientGroup.mk'_surjective _)
 
 @[induction_eliminator]
 theorem induction_on {rels : Set (FreeGroup α)} {C : PresentedGroup rels → Prop}
@@ -111,14 +105,6 @@ def equivPresentedGroup (rels : Set (FreeGroup α)) (e : α ≃ β) :
     (Subgroup.normalClosure ((FreeGroup.freeGroupCongr e) '' rels)) (FreeGroup.freeGroupCongr e)
     (Subgroup.map_normalClosure rels (FreeGroup.freeGroupCongr e).toMonoidHom
       (FreeGroup.freeGroupCongr e).surjective)
-
-theorem equivPresentedGroup_apply_of (x : α) (rels : Set (FreeGroup α)) (e : α ≃ β) :
-    equivPresentedGroup rels e (PresentedGroup.of x) =
-      PresentedGroup.of (rels := FreeGroup.freeGroupCongr e '' rels) (e x) := rfl
-
-theorem equivPresentedGroup_symm_apply_of (x : β) (rels : Set (FreeGroup α)) (e : α ≃ β) :
-    (equivPresentedGroup rels e).symm (PresentedGroup.of x) =
-      PresentedGroup.of (rels := rels) (e.symm x) := rfl
 
 end ToGroup
 

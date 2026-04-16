@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Abelian/ProjectiveResolution.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.ProjectiveResolution
 import Mathlib.Algebra.Homology.HomotopyCategory
 import Mathlib.Tactic.SuppressCompilation
+
+noncomputable section
 
 /-!
 # Abelian categories with enough projectives have projective resolutions
@@ -61,7 +63,11 @@ def liftFOne {Y Z : C} (f : Y ⟶ Z) (P : ProjectiveResolution Y) (Q : Projectiv
     P.complex.X 1 ⟶ Q.complex.X 1 :=
   Q.exact₀.liftFromProjective (P.complex.d 1 0 ≫ liftFZero f P Q) (by simp [liftFZero])
 
--- DISSOLVED: liftFOne_zero_comm
+@[simp]
+theorem liftFOne_zero_comm {Y Z : C} (f : Y ⟶ Z) (P : ProjectiveResolution Y)
+    (Q : ProjectiveResolution Z) :
+    liftFOne f P Q ≫ Q.complex.d 1 0 = P.complex.d 1 0 ≫ liftFZero f P Q := by
+  apply Q.exact₀.liftFromProjective_comp
 
 def liftFSucc {Y Z : C} (P : ProjectiveResolution Y) (Q : ProjectiveResolution Z) (n : ℕ)
     (g : P.complex.X n ⟶ Q.complex.X n) (g' : P.complex.X (n + 1) ⟶ Q.complex.X (n + 1))

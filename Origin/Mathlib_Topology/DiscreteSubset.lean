@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Discrete subsets of topological spaces
 

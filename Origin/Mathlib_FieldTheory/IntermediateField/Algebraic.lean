@@ -9,6 +9,8 @@ import Mathlib.FieldTheory.Tower
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.RingTheory.Algebraic.Integral
 
+noncomputable section
+
 /-!
 # Results on finite dimensionality and algebraicity of intermediate fields.
 -/
@@ -46,14 +48,6 @@ variable (F E : IntermediateField K L)
 instance finiteDimensional_left [FiniteDimensional K L] : FiniteDimensional K F := .left K F L
 
 instance finiteDimensional_right [FiniteDimensional K L] : FiniteDimensional F L := .right K F L
-
-@[simp]
-theorem rank_eq_rank_subalgebra : Module.rank K F.toSubalgebra = Module.rank K F :=
-  rfl
-
-@[simp]
-theorem finrank_eq_finrank_subalgebra : finrank K F.toSubalgebra = finrank K F :=
-  rfl
 
 variable {F} {E}
 
@@ -101,23 +95,3 @@ theorem minpoly_eq (x : S) : minpoly K x = minpoly K (x : L) :=
   (minpoly.algebraMap_eq (algebraMap S L).injective x).symm
 
 end IntermediateField
-
-def subalgebraEquivIntermediateField [Algebra.IsAlgebraic K L] :
-    Subalgebra K L ≃o IntermediateField K L where
-  toFun S := S.toIntermediateField fun x hx => S.inv_mem_of_algebraic
-    (Algebra.IsAlgebraic.isAlgebraic ((⟨x, hx⟩ : S) : L))
-  invFun S := S.toSubalgebra
-  left_inv _ := toSubalgebra_toIntermediateField _ _
-  right_inv := toIntermediateField_toSubalgebra
-  map_rel_iff' := Iff.rfl
-
-@[simp]
-theorem mem_subalgebraEquivIntermediateField [Algebra.IsAlgebraic K L] {S : Subalgebra K L}
-    {x : L} : x ∈ subalgebraEquivIntermediateField S ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
-theorem mem_subalgebraEquivIntermediateField_symm [Algebra.IsAlgebraic K L]
-    {S : IntermediateField K L} {x : L} :
-    x ∈ subalgebraEquivIntermediateField.symm S ↔ x ∈ S :=
-  Iff.rfl

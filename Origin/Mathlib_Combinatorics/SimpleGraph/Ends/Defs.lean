@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.CofilteredSystem
 import Mathlib.Combinatorics.SimpleGraph.Path
 import Mathlib.Data.Finite.Set
 
+noncomputable section
+
 /-!
 # Ends
 
@@ -45,11 +47,6 @@ theorem ComponentCompl.supp_inj {C D : G.ComponentCompl K} : C.supp = D.supp ↔
 instance ComponentCompl.setLike : SetLike (G.ComponentCompl K) V where
   coe := ComponentCompl.supp
   coe_injective' _ _ := ComponentCompl.supp_inj.mp
-
-@[simp]
-theorem ComponentCompl.mem_supp_iff {v : V} {C : ComponentCompl G K} :
-    v ∈ C ↔ ∃ vK : v ∉ K, G.componentComplMk vK = C :=
-  Iff.rfl
 
 theorem componentComplMk_mem (G : SimpleGraph V) {v : V} (vK : v ∉ K) : v ∈ G.componentComplMk vK :=
   ⟨vK, rfl⟩

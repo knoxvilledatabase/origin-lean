@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Localization/NumDen.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.Localization.Integer
 import Mathlib.RingTheory.UniqueFactorizationDomain.GCDMonoid
+
+noncomputable section
 
 /-!
 # Numerator and denominator in a localization
@@ -125,13 +127,28 @@ theorem isUnit_den_iff (x : K) : IsUnit (den A x : A) ↔ IsLocalization.IsInteg
       exact nonZeroDivisors.coe_ne_zero _ <| NoZeroSMulDivisors.algebraMap_injective A K h
     exact NoZeroSMulDivisors.algebraMap_injective A K
 
--- DISSOLVED: isUnit_den_zero
+theorem isUnit_den_zero : IsUnit (den A (0 : K) : A) := by
+  simp [isUnit_den_iff, IsLocalization.isInteger_zero]
 
--- DISSOLVED: isUnit_den_of_num_eq_zero
+theorem isUnit_den_of_num_eq_zero {x : K} (h : num A x = 0) : IsUnit (den A x : A) :=
+  eq_zero_of_num_eq_zero h ▸ isUnit_den_zero
 
--- DISSOLVED: associated_den_num_inv
+lemma associated_den_num_inv (x : K) (hx : x ≠ 0) : Associated (den A x : A) (num A x⁻¹) :=
+  associated_of_dvd_dvd
+    (IsRelPrime.dvd_of_dvd_mul_right (IsFractionRing.num_den_reduced A x).symm <|
+      dvd_of_mul_left_dvd (a := (den A x⁻¹ : A)) <| dvd_of_eq <|
+      NoZeroSMulDivisors.algebraMap_injective A K <| Eq.symm <| eq_of_div_eq_one
+      (by simp [mul_div_mul_comm, hx]))
+    (IsRelPrime.dvd_of_dvd_mul_right (IsFractionRing.num_den_reduced A x⁻¹) <|
+      dvd_of_mul_left_dvd (a := (num A x : A)) <| dvd_of_eq <|
+      NoZeroSMulDivisors.algebraMap_injective A K <| eq_of_div_eq_one
+      (by simp [mul_div_mul_comm, hx]))
 
--- DISSOLVED: associated_num_den_inv
+lemma associated_num_den_inv (x : K) (hx : x ≠ 0) : Associated (num A x : A) (den A x⁻¹) := by
+  have : Associated (num A x⁻¹⁻¹ : A) (den A x⁻¹) :=
+    (associated_den_num_inv x⁻¹ (inv_ne_zero hx)).symm
+  rw [inv_inv] at this
+  exact this
 
 end NumDen
 

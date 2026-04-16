@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic
 
+noncomputable section
+
 /-!
 # Rank in a well-founded relation
 

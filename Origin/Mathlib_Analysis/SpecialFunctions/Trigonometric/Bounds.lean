@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Bounds.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
+
+noncomputable section
 
 /-!
 # Polynomial bounds for trigonometric functions
@@ -86,18 +88,30 @@ lemma mul_abs_le_abs_sin (hx : |x| ≤ π / 2) : 2 / π * |x| ≤ |sin x| := by
   rw [abs_of_nonneg hx₀] at hx ⊢
   exact (mul_le_sin hx₀ hx).trans (le_abs_self _)
 
--- DISSOLVED: sin_sq_lt_sq
+lemma sin_sq_lt_sq (hx : x ≠ 0) : sin x ^ 2 < x ^ 2 := by
+  wlog hx₀ : 0 < x
+  case inr =>
+    simpa using this (neg_ne_zero.2 hx) <| neg_pos_of_neg <| hx.lt_of_le <| le_of_not_lt hx₀
+  rcases le_or_lt x 1 with hxπ | hxπ
+  case inl =>
+    exact pow_lt_pow_left₀ (sin_lt hx₀)
+      (sin_nonneg_of_nonneg_of_le_pi hx₀.le (by linarith [two_le_pi])) (by simp)
+  case inr =>
+    exact (sin_sq_le_one _).trans_lt (by rwa [one_lt_sq_iff₀ hx₀.le])
 
 lemma sin_sq_le_sq : sin x ^ 2 ≤ x ^ 2 := by
   rcases eq_or_ne x 0 with rfl | hx
   case inl => simp
   case inr => exact (sin_sq_lt_sq hx).le
 
--- DISSOLVED: abs_sin_lt_abs
+lemma abs_sin_lt_abs (hx : x ≠ 0) : |sin x| < |x| := sq_lt_sq.1 (sin_sq_lt_sq hx)
 
 lemma abs_sin_le_abs : |sin x| ≤ |x| := sq_le_sq.1 sin_sq_le_sq
 
--- DISSOLVED: one_sub_sq_div_two_lt_cos
+lemma one_sub_sq_div_two_lt_cos (hx : x ≠ 0) : 1 - x ^ 2 / 2 < cos x := by
+  have := (sin_sq_lt_sq (by positivity)).trans_eq' (sin_sq_eq_half_sub (x / 2)).symm
+  ring_nf at this
+  linarith
 
 lemma one_sub_sq_div_two_le_cos : 1 - x ^ 2 / 2 ≤ cos x := by
   rcases eq_or_ne x 0 with rfl | hx
@@ -131,7 +145,9 @@ theorem sin_gt_sub_cube {x : ℝ} (h : 0 < x) (h' : x ≤ 1) : x - x ^ 3 / 4 < s
   apply pow_le_pow_of_le_one h.le h'
   norm_num
 
--- DISSOLVED: deriv_tan_sub_id
+theorem deriv_tan_sub_id (x : ℝ) (h : cos x ≠ 0) :
+    deriv (fun y : ℝ => tan y - y) x = 1 / cos x ^ 2 - 1 :=
+  HasDerivAt.deriv <| by simpa using (hasDerivAt_tan h).add (hasDerivAt_id x).neg
 
 theorem lt_tan {x : ℝ} (h1 : 0 < x) (h2 : x < π / 2) : x < tan x := by
   let U := Ico 0 (π / 2)
@@ -169,7 +185,28 @@ theorem le_tan {x : ℝ} (h1 : 0 ≤ x) (h2 : x < π / 2) : x ≤ tan x := by
   · rw [tan_zero]
   · exact le_of_lt (lt_tan h1' h2)
 
--- DISSOLVED: cos_lt_one_div_sqrt_sq_add_one
+theorem cos_lt_one_div_sqrt_sq_add_one {x : ℝ} (hx1 : -(3 * π / 2) ≤ x) (hx2 : x ≤ 3 * π / 2)
+    (hx3 : x ≠ 0) : cos x < (1 / √(x ^ 2 + 1) : ℝ) := by
+  suffices ∀ {y : ℝ}, 0 < y → y ≤ 3 * π / 2 → cos y < 1 / sqrt (y ^ 2 + 1) by
+    rcases lt_or_lt_iff_ne.mpr hx3.symm with ⟨h⟩
+    · exact this h hx2
+    · convert this (by linarith : 0 < -x) (by linarith) using 1
+      · rw [cos_neg]
+      · rw [neg_sq]
+  intro y hy1 hy2
+  have hy3 : ↑0 < y ^ 2 + 1 := by linarith [sq_nonneg y]
+  rcases lt_or_le y (π / 2) with (hy2' | hy1')
+  · -- Main case : `0 < y < π / 2`
+    have hy4 : 0 < cos y := cos_pos_of_mem_Ioo ⟨by linarith, hy2'⟩
+    rw [← abs_of_nonneg (cos_nonneg_of_mem_Icc ⟨by linarith, hy2'.le⟩), ←
+      abs_of_nonneg (one_div_nonneg.mpr (sqrt_nonneg _)), ← sq_lt_sq, div_pow, one_pow,
+      sq_sqrt hy3.le, lt_one_div (pow_pos hy4 _) hy3, ← inv_one_add_tan_sq hy4.ne', one_div,
+      inv_inv, add_comm, add_lt_add_iff_left, sq_lt_sq, abs_of_pos hy1,
+      abs_of_nonneg (tan_nonneg_of_nonneg_of_le_pi_div_two hy1.le hy2'.le)]
+    exact Real.lt_tan hy1 hy2'
+  · -- Easy case : `π / 2 ≤ y ≤ 3 * π / 2`
+    refine lt_of_le_of_lt ?_ (one_div_pos.mpr <| sqrt_pos_of_pos hy3)
+    exact cos_nonpos_of_pi_div_two_le_of_le hy1' (by linarith [pi_pos])
 
 theorem cos_le_one_div_sqrt_sq_add_one {x : ℝ} (hx1 : -(3 * π / 2) ≤ x) (hx2 : x ≤ 3 * π / 2) :
     cos x ≤ (1 : ℝ) / √(x ^ 2 + 1) := by

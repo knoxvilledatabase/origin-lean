@@ -1,12 +1,14 @@
 /-
 Extracted from Topology/MetricSpace/Contracting.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Data.Setoid.Basic
 import Mathlib.Dynamics.FixedPoints.Topology
 import Mathlib.Topology.MetricSpace.Lipschitz
+
+noncomputable section
 
 /-!
 # Contracting maps
@@ -45,7 +47,8 @@ theorem toLipschitzWith (hf : ContractingWith K f) : LipschitzWith K f := hf.2
 
 theorem one_sub_K_pos' (hf : ContractingWith K f) : (0 : ℝ≥0∞) < 1 - K := by simp [hf.1]
 
--- DISSOLVED: one_sub_K_ne_zero
+theorem one_sub_K_ne_zero (hf : ContractingWith K f) : (1 : ℝ≥0∞) - K ≠ 0 :=
+  ne_of_gt hf.one_sub_K_pos'
 
 theorem one_sub_K_ne_top : (1 : ℝ≥0∞) - K ≠ ∞ := by
   norm_cast

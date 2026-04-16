@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Coherence.Normalize
 import Mathlib.Tactic.CategoryTheory.Monoidal.Datatypes
 
+noncomputable section
+
 /-!
 # Normalization of morphisms in monoidal categories
 

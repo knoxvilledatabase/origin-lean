@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Graded/Internal.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 16
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Graded.External
 import Mathlib.RingTheory.GradedAlgebra.Basic
+
+noncomputable section
 
 /-!
 # Graded tensor products over graded algebras
@@ -90,13 +92,7 @@ def of : A ⊗[R] B ≃ₗ[R] 𝒜 ᵍ⊗[R] ℬ := LinearEquiv.refl _ _
 theorem of_one : of R 𝒜 ℬ 1 = 1 := rfl
 
 @[simp]
-theorem of_symm_one : (of R 𝒜 ℬ).symm 1 = 1 := rfl
-
-@[simp]
 theorem of_symm_of (x : A ⊗[R] B) : (of R 𝒜 ℬ).symm (of R 𝒜 ℬ x) = x := rfl
-
-@[simp]
-theorem symm_of_of (x : 𝒜 ᵍ⊗[R] ℬ) : of R 𝒜 ℬ ((of R 𝒜 ℬ).symm x) = x := rfl
 
 @[ext]
 theorem hom_ext {M} [AddCommMonoid M] [Module R M] ⦃f g : 𝒜 ᵍ⊗[R] ℬ →ₗ[R] M⦄
@@ -183,9 +179,15 @@ theorem tmul_coe_mul_coe_tmul {j₁ i₂ : ι} (a₁ : A) (b₁ : ℬ j₁) (a�
   dsimp
   simp_rw [decompose_symm_mul, decompose_symm_of, Equiv.symm_apply_apply]
 
--- DISSOLVED: tmul_zero_coe_mul_coe_tmul
+theorem tmul_zero_coe_mul_coe_tmul {i₂ : ι} (a₁ : A) (b₁ : ℬ 0) (a₂ : 𝒜 i₂) (b₂ : B) :
+    (a₁ ᵍ⊗ₜ[R] (b₁ : B) * (a₂ : A) ᵍ⊗ₜ[R] b₂ : 𝒜 ᵍ⊗[R] ℬ) =
+      ((a₁ * a₂ : A) ᵍ⊗ₜ (b₁ * b₂ : B)) := by
+  rw [tmul_coe_mul_coe_tmul, zero_mul, uzpow_zero, one_smul]
 
--- DISSOLVED: tmul_coe_mul_zero_coe_tmul
+theorem tmul_coe_mul_zero_coe_tmul {j₁ : ι} (a₁ : A) (b₁ : ℬ j₁) (a₂ : 𝒜 0) (b₂ : B) :
+    (a₁ ᵍ⊗ₜ[R] (b₁ : B) * (a₂ : A) ᵍ⊗ₜ[R] b₂ : 𝒜 ᵍ⊗[R] ℬ) =
+      ((a₁ * a₂ : A) ᵍ⊗ₜ (b₁ * b₂ : B)) := by
+  rw [tmul_coe_mul_coe_tmul, mul_zero, uzpow_zero, one_smul]
 
 theorem tmul_one_mul_coe_tmul {i₂ : ι} (a₁ : A) (a₂ : 𝒜 i₂) (b₂ : B) :
     (a₁ ᵍ⊗ₜ[R] (1 : B) * (a₂ : A) ᵍ⊗ₜ[R] b₂ : 𝒜 ᵍ⊗[R] ℬ) = (a₁ * a₂ : A) ᵍ⊗ₜ (b₂ : B) := by
@@ -295,13 +297,6 @@ def lift (f : A →ₐ[R] C) (g : B →ₐ[R] C)
       simp_rw [AlgHom.toLinearMap_apply, map_mul]
       simp_rw [mul_assoc (f a₁), ← mul_assoc _ _ (g b₂), h_anti_commutes, mul_smul_comm,
         smul_mul_assoc, smul_smul, Int.units_mul_self, one_smul])
-
-@[simp]
-theorem lift_tmul (f : A →ₐ[R] C) (g : B →ₐ[R] C)
-    (h_anti_commutes : ∀ ⦃i j⦄ (a : 𝒜 i) (b : ℬ j), f a * g b = (-1 : ℤˣ)^(j * i) • (g b * f a))
-    (a : A) (b : B) :
-    lift 𝒜 ℬ f g h_anti_commutes (a ᵍ⊗ₜ b) = f a * g b :=
-  rfl
 
 def liftEquiv :
     { fg : (A →ₐ[R] C) × (B →ₐ[R] C) //

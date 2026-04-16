@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Perm.Basic
 import Mathlib.Logic.Equiv.Set
 
+noncomputable section
+
 /-!
 # `Equiv.Perm.viaEmbedding`, a noncomputable analogue of `Equiv.Perm.viaFintypeEmbedding`.
 -/
@@ -31,9 +33,6 @@ theorem viaEmbedding_apply_of_not_mem (x : β) (hx : x ∉ Set.range ι) : e.via
 
 noncomputable def viaEmbeddingHom : Perm α →* Perm β :=
   extendDomainHom (ofInjective ι.1 ι.2)
-
-theorem viaEmbeddingHom_apply : viaEmbeddingHom ι e = viaEmbedding e ι :=
-  rfl
 
 theorem viaEmbeddingHom_injective : Function.Injective (viaEmbeddingHom ι) :=
   extendDomainHom_injective (ofInjective ι.1 ι.2)

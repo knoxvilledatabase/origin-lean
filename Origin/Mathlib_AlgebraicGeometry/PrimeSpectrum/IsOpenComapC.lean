@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.RingTheory.Polynomial.Basic
 
+noncomputable section
+
 /-!
 The morphism `Spec R[x] --> Spec R` induced by the natural inclusion `R --> R[x]` is an open map.
 

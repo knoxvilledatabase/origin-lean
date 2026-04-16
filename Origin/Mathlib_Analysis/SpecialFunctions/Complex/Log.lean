@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Complex/Log.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Arg
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+noncomputable section
 
 /-!
 # The complex `log` function
@@ -32,7 +34,11 @@ theorem neg_pi_lt_log_im (x : ℂ) : -π < (log x).im := by simp only [log_im, n
 
 theorem log_im_le_pi (x : ℂ) : (log x).im ≤ π := by simp only [log_im, arg_le_pi]
 
--- DISSOLVED: exp_log
+theorem exp_log {x : ℂ} (hx : x ≠ 0) : exp (log x) = x := by
+  rw [log, exp_add_mul_I, ← ofReal_sin, sin_arg, ← ofReal_cos, cos_arg hx, ← ofReal_exp,
+    Real.exp_log (abs.pos hx), mul_add, ofReal_div, ofReal_div,
+    mul_div_cancel₀ _ (ofReal_ne_zero.2 <| abs.ne_zero hx), ← mul_assoc,
+    mul_div_cancel₀ _ (ofReal_ne_zero.2 <| abs.ne_zero hx), re_add_im]
 
 @[simp]
 theorem range_exp : Set.range exp = {0}ᶜ :=
@@ -63,11 +69,20 @@ lemma ofNat_log {n : ℕ} [n.AtLeastTwo] :
 
 theorem log_ofReal_re (x : ℝ) : (log (x : ℂ)).re = Real.log x := by simp [log_re]
 
--- DISSOLVED: log_ofReal_mul
+theorem log_ofReal_mul {r : ℝ} (hr : 0 < r) {x : ℂ} (hx : x ≠ 0) :
+    log (r * x) = Real.log r + log x := by
+  replace hx := Complex.abs.ne_zero_iff.mpr hx
+  simp_rw [log, map_mul, abs_ofReal, arg_real_mul _ hr, abs_of_pos hr, Real.log_mul hr.ne' hx,
+    ofReal_add, add_assoc]
 
--- DISSOLVED: log_mul_ofReal
+theorem log_mul_ofReal (r : ℝ) (hr : 0 < r) (x : ℂ) (hx : x ≠ 0) :
+    log (x * r) = Real.log r + log x := by rw [mul_comm, log_ofReal_mul hr hx]
 
--- DISSOLVED: log_mul_eq_add_log_iff
+lemma log_mul_eq_add_log_iff {x y : ℂ} (hx₀ : x ≠ 0) (hy₀ : y ≠ 0) :
+    log (x * y) = log x + log y ↔ arg x + arg y ∈ Set.Ioc (-π) π := by
+  refine Complex.ext_iff.trans <| Iff.trans ?_ <| arg_mul_eq_add_arg_iff hx₀ hy₀
+  simp_rw [add_re, add_im, log_re, log_im, AbsoluteValue.map_mul,
+    Real.log_mul (abs.ne_zero hx₀) (abs.ne_zero hy₀), true_and]
 
 alias ⟨_, log_mul⟩ := log_mul_eq_add_log_iff
 
@@ -107,7 +122,7 @@ theorem log_inv_eq_ite (x : ℂ) : log x⁻¹ = if x.arg = π then -conj (log x)
 
 theorem log_inv (x : ℂ) (hx : x.arg ≠ π) : log x⁻¹ = -log x := by rw [log_inv_eq_ite, if_neg hx]
 
--- DISSOLVED: two_pi_I_ne_zero
+theorem two_pi_I_ne_zero : (2 * π * I : ℂ) ≠ 0 := by norm_num [Real.pi_ne_zero, I_ne_zero]
 
 theorem exp_eq_one_iff {x : ℂ} : exp x = 1 ↔ ∃ n : ℤ, x = n * (2 * π * I) := by
   constructor
@@ -270,10 +285,30 @@ lemma Real.summable_cexp_multipliable (f : ι → α → ℝ) (hfn : ∀ x n, 0 
 
 open Complex
 
--- DISSOLVED: Complex.HasSum_cexp_HasProd
+lemma Complex.HasSum_cexp_HasProd (f : ι → α → ℂ) (hfn : ∀ x n, f n x ≠ 0)
+    (hf : ∀ x : α, HasSum (fun n => log (f n x)) (∑' i, log (f i x))) (a : α) :
+       HasProd (fun b ↦ f b a) (∏' n : ι, (f n a)) := by
+  have : HasProd (fun b ↦ f b a) ((cexp ∘ fun a ↦ ∑' (n : ι), log (f n a)) a) := by
+    apply ((hf a).cexp).congr
+    intro _
+    congr
+    exact funext fun x ↦ exp_log (hfn a x)
+  rwa [HasProd.tprod_eq this]
 
--- DISSOLVED: Complex.summable_cexp_multipliable
+lemma Complex.summable_cexp_multipliable (f : ι → α → ℂ) (hfn : ∀ x n, f n x ≠ 0)
+    (hf : ∀ x : α, Summable fun n => log (f n x)) (a : α):
+      Multipliable fun b ↦ f b a := by
+  have := (Complex.HasSum_cexp_HasProd f hfn fun a => (hf a).hasSum) a
+  use (∏' n : ι, (f n a))
 
--- DISSOLVED: Complex.cexp_tsum_eq_tprod
+lemma Complex.cexp_tsum_eq_tprod (f : ι → α → ℂ) (hfn : ∀ x n, f n x ≠ 0)
+    (hf : ∀ x : α, Summable fun n => log (f n x)) :
+      (cexp ∘ (fun a : α => (∑' n : ι, log (f n a)))) = (fun a : α => ∏' n : ι, ((f n a))) := by
+  ext a
+  apply (HasProd.tprod_eq ?_).symm
+  apply ((hf a).hasSum.cexp).congr
+  intro _
+  congr
+  exact funext fun x ↦ exp_log (hfn a x)
 
 end tsum_tprod

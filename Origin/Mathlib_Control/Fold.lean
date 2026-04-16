@@ -12,6 +12,8 @@ import Mathlib.CategoryTheory.Types
 import Mathlib.CategoryTheory.Category.KleisliCat
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 
 # List folds generalized to `Traversable`

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.Faces
 import Mathlib.CategoryTheory.Idempotents.Basic
 
+noncomputable section
+
 /-!
 
 # Construction of projections for the Dold-Kan correspondence

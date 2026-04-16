@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 import Origin.Core
 import Mathlib.Order.Filter.Cofinite
 
+noncomputable section
+
 /-!
 # Computational realization of filters (experimental)
 
@@ -44,9 +46,6 @@ variable [PartialOrder α] (F : CFilter α σ)
 instance : CoeFun (CFilter α σ) fun _ ↦ σ → α :=
   ⟨CFilter.f⟩
 
-theorem coe_mk (f pt inf h₁ h₂ a) : (@CFilter.mk α σ _ f pt inf h₁ h₂) a = f a :=
-  rfl
-
 def ofEquiv (E : σ ≃ τ) : CFilter α σ → CFilter α τ
   | ⟨f, p, g, h₁, h₂⟩ =>
     { f := fun a ↦ f (E.symm a)
@@ -67,10 +66,6 @@ def toFilter (F : CFilter (Set α) σ) : Filter α where
   sets_of_superset := fun ⟨b, h⟩ s ↦ ⟨b, Subset.trans h s⟩
   inter_sets := fun ⟨a, h₁⟩ ⟨b, h₂⟩ ↦ ⟨F.inf a b,
     subset_inter (Subset.trans (F.inf_le_left _ _) h₁) (Subset.trans (F.inf_le_right _ _) h₂)⟩
-
-@[simp]
-theorem mem_toFilter_sets (F : CFilter (Set α) σ) {a : Set α} : a ∈ F.toFilter ↔ ∃ b, F b ⊆ a :=
-  Iff.rfl
 
 end CFilter
 
@@ -105,14 +100,6 @@ def ofEquiv {f : Filter α} (F : f.Realizer) (E : F.σ ≃ τ) : f.Realizer :=
     exact filter_eq (Set.ext fun _ ↦
       ⟨fun ⟨s, h⟩ ↦ ⟨E.symm s, by simpa using h⟩, fun ⟨t, h⟩ ↦ ⟨E t, by simp [h]⟩⟩)⟩
 
-@[simp]
-theorem ofEquiv_σ {f : Filter α} (F : f.Realizer) (E : F.σ ≃ τ) : (F.ofEquiv E).σ = τ :=
-  rfl
-
-@[simp]
-theorem ofEquiv_F {f : Filter α} (F : f.Realizer) (E : F.σ ≃ τ) (s : τ) :
-    (F.ofEquiv E).F s = F.F (E.symm s) := rfl
-
 protected def principal (s : Set α) : (principal s).Realizer :=
   ⟨Unit,
     { f := fun _ ↦ s
@@ -122,38 +109,14 @@ protected def principal (s : Set α) : (principal s).Realizer :=
       inf_le_right := fun _ _ ↦ le_rfl },
     filter_eq <| Set.ext fun _ ↦ ⟨fun ⟨_, s⟩ ↦ s, fun h ↦ ⟨(), h⟩⟩⟩
 
-@[simp]
-theorem principal_σ (s : Set α) : (Realizer.principal s).σ = Unit :=
-  rfl
-
-@[simp]
-theorem principal_F (s : Set α) (u : Unit) : (Realizer.principal s).F u = s :=
-  rfl
-
 instance (s : Set α) : Inhabited (principal s).Realizer :=
   ⟨Realizer.principal s⟩
 
 protected def top : (⊤ : Filter α).Realizer :=
   (Realizer.principal _).ofEq principal_univ
 
-@[simp]
-theorem top_σ : (@Realizer.top α).σ = Unit :=
-  rfl
-
-@[simp]
-theorem top_F (u : Unit) : (@Realizer.top α).F u = univ :=
-  rfl
-
 protected def bot : (⊥ : Filter α).Realizer :=
   (Realizer.principal _).ofEq principal_empty
-
-@[simp]
-theorem bot_σ : (@Realizer.bot α).σ = Unit :=
-  rfl
-
-@[simp]
-theorem bot_F (u : Unit) : (@Realizer.bot α).F u = ∅ :=
-  rfl
 
 protected def map (m : α → β) {f : Filter α} (F : f.Realizer) : (map m f).Realizer :=
   ⟨F.σ,
@@ -165,14 +128,6 @@ protected def map (m : α → β) {f : Filter α} (F : f.Realizer) : (map m f).R
     filter_eq <| Set.ext fun _ ↦ by
       simp only [CFilter.toFilter, image_subset_iff, mem_setOf_eq, Filter.mem_sets, mem_map]
       rw [F.mem_sets]⟩
-
-@[simp]
-theorem map_σ (m : α → β) {f : Filter α} (F : f.Realizer) : (F.map m).σ = F.σ :=
-  rfl
-
-@[simp]
-theorem map_F (m : α → β) {f : Filter α} (F : f.Realizer) (s) : (F.map m).F s = image m (F.F s) :=
-  rfl
 
 protected def comap (m : α → β) {f : Filter β} (F : f.Realizer) : (comap m f).Realizer :=
   ⟨F.σ,

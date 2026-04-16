@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Compactness.CompactlyGeneratedSpace
 import Mathlib.Topology.Maps.Proper.Basic
 
+noncomputable section
+
 /-!
 # A map is proper iff preimage of compact sets are compact
 

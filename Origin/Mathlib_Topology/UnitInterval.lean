@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/UnitInterval.lean
-Genuine: 54 | Conflates: 0 | Dissolved: 4 | Infrastructure: 16
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Interval.Set.Instances
 import Mathlib.Order.Interval.Set.ProjIcc
 import Mathlib.Topology.Instances.Real
+
+noncomputable section
 
 /-!
 # The unit interval, as a topological space
@@ -61,9 +63,9 @@ instance : BoundedOrder I := have : Fact ((0 : ℝ) ≤ 1) := ⟨zero_le_one⟩;
 
 lemma univ_eq_Icc : (univ : Set I) = Icc (0 : I) (1 : I) := Icc_bot_top.symm
 
--- DISSOLVED: coe_ne_zero
+@[norm_cast] theorem coe_ne_zero {x : I} : (x : ℝ) ≠ 0 ↔ x ≠ 0 := coe_eq_zero.not
 
--- DISSOLVED: coe_ne_one
+@[norm_cast] theorem coe_ne_one {x : I} : (x : ℝ) ≠ 1 ↔ x ≠ 1 := coe_eq_one.not
 
 @[simp, norm_cast] theorem coe_pos {x : I} : (0 : ℝ) < x ↔ 0 < x := Iff.rfl
 
@@ -176,9 +178,9 @@ theorem nonneg' {t : I} : 0 ≤ t :=
 theorem le_one' {t : I} : t ≤ 1 :=
   t.2.2
 
--- DISSOLVED: pos_iff_ne_zero
+protected lemma pos_iff_ne_zero {x : I} : 0 < x ↔ x ≠ 0 := bot_lt_iff_ne_bot
 
--- DISSOLVED: lt_one_iff_ne_one
+protected lemma lt_one_iff_ne_one {x : I} : x < 1 ↔ x ≠ 1 := lt_top_iff_ne_top
 
 lemma eq_one_or_eq_zero_of_le_mul {i j : I} (h : i ≤ j * i) : i = 0 ∨ j = 1 := by
   contrapose! h
@@ -203,11 +205,6 @@ def submonoid : Submonoid ℝ where
   carrier := unitInterval
   one_mem' := unitInterval.one_mem
   mul_mem' := unitInterval.mul_mem
-
-@[simp] theorem coe_unitIntervalSubmonoid : submonoid = unitInterval := rfl
-
-@[simp] theorem mem_unitIntervalSubmonoid {x} : x ∈ submonoid ↔ x ∈ unitInterval :=
-  Iff.rfl
 
 protected theorem prod_mem {ι : Type*} {t : Finset ι} {f : ι → ℝ}
     (h : ∀ c ∈ t, f c ∈ unitInterval) :
@@ -315,15 +312,10 @@ theorem projIcc_eq_one {x : ℝ} : projIcc (0 : ℝ) 1 zero_le_one x = 1 ↔ 1 �
 namespace Tactic.Interactive
 
 macro "unit_interval" : tactic =>
-
   `(tactic| (first
-
   | apply unitInterval.nonneg
-
   | apply unitInterval.one_minus_nonneg
-
   | apply unitInterval.le_one
-
   | apply unitInterval.one_minus_le_one))
 
 example (x : unitInterval) : 0 ≤ (x : ℝ) := by unit_interval
@@ -343,15 +335,5 @@ def iccHomeoI (a b : 𝕜) (h : a < b) : Set.Icc a b ≃ₜ Set.Icc (0 : 𝕜) (
   apply Homeomorph.setCongr
   rw [affineHomeomorph_image_I _ _ (sub_pos.2 h)]
   simp
-
-@[simp]
-theorem iccHomeoI_apply_coe (a b : 𝕜) (h : a < b) (x : Set.Icc a b) :
-    ((iccHomeoI a b h) x : 𝕜) = (x - a) / (b - a) :=
-  rfl
-
-@[simp]
-theorem iccHomeoI_symm_apply_coe (a b : 𝕜) (h : a < b) (x : Set.Icc (0 : 𝕜) (1 : 𝕜)) :
-    ((iccHomeoI a b h).symm x : 𝕜) = (b - a) * x + a :=
-  rfl
 
 end

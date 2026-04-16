@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/ZMultiples.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Rat
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Topology.Algebra.UniformGroup.Basic
 import Mathlib.Topology.Instances.Real
 import Mathlib.Topology.Metrizable.Basic
+
+noncomputable section
 
 /-!
 The subgroup "multiples of `a`" (`zmultiples a`) is a discrete subgroup of `ℝ`, i.e. its
@@ -43,7 +45,11 @@ theorem tendsto_coe_cofinite : Tendsto ((↑) : ℤ → ℝ) cofinite (cocompact
   rw [range_castAddHom]
   infer_instance
 
--- DISSOLVED: tendsto_zmultiplesHom_cofinite
+theorem tendsto_zmultiplesHom_cofinite {a : ℝ} (ha : a ≠ 0) :
+    Tendsto (zmultiplesHom ℝ a) cofinite (cocompact ℝ) := by
+  apply (zmultiplesHom ℝ a).tendsto_coe_cofinite_of_discrete <| smul_left_injective ℤ ha
+  rw [AddSubgroup.range_zmultiplesHom]
+  infer_instance
 
 end Int
 

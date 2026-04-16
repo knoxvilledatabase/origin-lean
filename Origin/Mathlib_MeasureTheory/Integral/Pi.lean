@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Integral.Prod
 
+noncomputable section
+
 /-!
 # Integration with respect to a finite product of measures
 

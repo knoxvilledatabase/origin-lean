@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Map
 import Mathlib.Order.Sublattice
 
+noncomputable section
+
 /-!
 # The lattice of invariant submodules
 
@@ -29,10 +31,6 @@ def invtSubmodule : Sublattice (Submodule R M) where
   infClosed' p hp q hq := by
     simp only [Set.mem_setOf_eq, Submodule.comap_inf, le_inf_iff]
     exact ⟨inf_le_of_left_le hp, inf_le_of_right_le hq⟩
-
-lemma mem_invtSubmodule {p : Submodule R M} :
-    p ∈ f.invtSubmodule ↔ p ≤ p.comap f :=
-  Iff.rfl
 
 namespace invtSubmodule
 

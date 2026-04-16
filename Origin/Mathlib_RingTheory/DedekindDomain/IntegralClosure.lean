@@ -10,6 +10,8 @@ import Mathlib.RingTheory.DedekindDomain.Basic
 import Mathlib.RingTheory.Localization.Module
 import Mathlib.RingTheory.Trace.Basic
 
+noncomputable section
+
 /-!
 # Integral closure of Dedekind domains
 

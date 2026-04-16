@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.SetTheory.Cardinal.ToNat
 import Mathlib.Data.Nat.PartENat
 
+noncomputable section
+
 /-!
 # Projection from cardinal numbers to `PartENat`
 
@@ -87,8 +89,5 @@ theorem toPartENat_lift (c : Cardinal.{v}) : toPartENat (lift.{u, v} c) = toPart
 
 theorem toPartENat_congr {β : Type v} (e : α ≃ β) : toPartENat #α = toPartENat #β := by
   rw [← toPartENat_lift, lift_mk_eq.{_, _,v}.mpr ⟨e⟩, toPartENat_lift]
-
-theorem mk_toPartENat_eq_coe_card [Fintype α] : toPartENat #α = Fintype.card α := by
-  simp
 
 end Cardinal

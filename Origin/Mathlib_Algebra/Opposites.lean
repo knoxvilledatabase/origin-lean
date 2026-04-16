@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Opposites.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 2 | Infrastructure: 49
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Logic.Equiv.Defs
 import Mathlib.Logic.Nontrivial.Basic
 import Mathlib.Logic.IsEmpty
+
+noncomputable section
 
 /-!
 # Multiplicative opposite and algebraic operations on it
@@ -70,14 +72,6 @@ theorem unop_op (x : α) : unop (op x) = x := rfl
 
 @[to_additive (attr := simp)]
 theorem op_unop (x : αᵐᵒᵖ) : op (unop x) = x :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem op_comp_unop : (op : α → αᵐᵒᵖ) ∘ unop = id :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem unop_comp_op : (unop : αᵐᵒᵖ → α) ∘ op = id :=
   rfl
 
 @[to_additive (attr := simp, elab_as_elim, induction_eliminator, cases_eliminator)
@@ -165,41 +159,6 @@ instance instInvolutiveInv [InvolutiveInv α] : InvolutiveInv αᵐᵒᵖ where
 
 @[to_additive] instance instSMul [SMul α β] : SMul α βᵐᵒᵖ where smul c x := op (c • unop x)
 
-@[simp] lemma op_zero [Zero α] : op (0 : α) = 0 := rfl
-
-@[simp] lemma unop_zero [Zero α] : unop (0 : αᵐᵒᵖ) = 0 := rfl
-
-@[to_additive (attr := simp)] lemma op_one [One α] : op (1 : α) = 1 := rfl
-
-@[to_additive (attr := simp)] lemma unop_one [One α] : unop (1 : αᵐᵒᵖ) = 1 := rfl
-
-@[simp] lemma op_add [Add α] (x y : α) : op (x + y) = op x + op y := rfl
-
-@[simp] lemma unop_add [Add α] (x y : αᵐᵒᵖ) : unop (x + y) = unop x + unop y := rfl
-
-@[simp] lemma op_neg [Neg α] (x : α) : op (-x) = -op x := rfl
-
-@[simp] lemma unop_neg [Neg α] (x : αᵐᵒᵖ) : unop (-x) = -unop x := rfl
-
-@[to_additive (attr := simp)] lemma op_mul [Mul α] (x y : α) : op (x * y) = op y * op x := rfl
-
-@[to_additive (attr := simp)]
-lemma unop_mul [Mul α] (x y : αᵐᵒᵖ) : unop (x * y) = unop y * unop x := rfl
-
-@[to_additive (attr := simp)] lemma op_inv [Inv α] (x : α) : op x⁻¹ = (op x)⁻¹ := rfl
-
-@[to_additive (attr := simp)] lemma unop_inv [Inv α] (x : αᵐᵒᵖ) : unop x⁻¹ = (unop x)⁻¹ := rfl
-
-@[simp] lemma op_sub [Sub α] (x y : α) : op (x - y) = op x - op y := rfl
-
-@[simp] lemma unop_sub [Sub α] (x y : αᵐᵒᵖ) : unop (x - y) = unop x - unop y := rfl
-
-@[to_additive (attr := simp)]
-lemma op_smul [SMul α β] (a : α) (b : β) : op (a • b) = a • op b := rfl
-
-@[to_additive (attr := simp)]
-lemma unop_smul [SMul α β] (a : α) (b : βᵐᵒᵖ) : unop (a • b) = a • unop b := rfl
-
 @[simp, nolint simpComm]
 theorem unop_eq_zero_iff [Zero α] (a : αᵐᵒᵖ) : a.unop = (0 : α) ↔ a = (0 : αᵐᵒᵖ) :=
   unop_injective.eq_iff' rfl
@@ -208,9 +167,11 @@ theorem unop_eq_zero_iff [Zero α] (a : αᵐᵒᵖ) : a.unop = (0 : α) ↔ a =
 theorem op_eq_zero_iff [Zero α] (a : α) : op a = (0 : αᵐᵒᵖ) ↔ a = (0 : α) :=
   op_injective.eq_iff' rfl
 
--- DISSOLVED: unop_ne_zero_iff
+theorem unop_ne_zero_iff [Zero α] (a : αᵐᵒᵖ) : a.unop ≠ (0 : α) ↔ a ≠ (0 : αᵐᵒᵖ) :=
+  not_congr <| unop_eq_zero_iff a
 
--- DISSOLVED: op_ne_zero_iff
+theorem op_ne_zero_iff [Zero α] (a : α) : op a ≠ (0 : αᵐᵒᵖ) ↔ a ≠ (0 : α) :=
+  not_congr <| op_eq_zero_iff a
 
 @[to_additive (attr := simp, nolint simpComm)]
 theorem unop_eq_one_iff [One α] (a : αᵐᵒᵖ) : a.unop = 1 ↔ a = 1 :=
@@ -227,10 +188,6 @@ namespace AddOpposite
 
 instance instOne [One α] : One αᵃᵒᵖ where one := op 1
 
-@[simp] lemma op_one [One α] : op (1 : α) = 1 := rfl
-
-@[simp] lemma unop_one [One α] : unop 1 = (1 : α) := rfl
-
 @[simp] lemma op_eq_one_iff [One α] {a : α} : op a = 1 ↔ a = 1 := op_injective.eq_iff
 
 @[simp] lemma unop_eq_one_iff [One α] {a : αᵃᵒᵖ} : unop a = 1 ↔ a = 1 := unop_injective.eq_iff
@@ -239,23 +196,11 @@ attribute [nolint simpComm] unop_eq_one_iff
 
 instance instMul [Mul α] : Mul αᵃᵒᵖ where mul a b := op (unop a * unop b)
 
-@[simp] lemma op_mul [Mul α] (a b : α) : op (a * b) = op a * op b := rfl
-
-@[simp] lemma unop_mul [Mul α] (a b : αᵃᵒᵖ) : unop (a * b) = unop a * unop b := rfl
-
 instance instInv [Inv α] : Inv αᵃᵒᵖ where inv a := op (unop a)⁻¹
 
 instance instInvolutiveInv [InvolutiveInv α] : InvolutiveInv αᵃᵒᵖ where
   inv_inv _ := unop_injective <| inv_inv _
 
-@[simp] lemma op_inv [Inv α] (a : α) : op a⁻¹ = (op a)⁻¹ := rfl
-
-@[simp] lemma unop_inv [Inv α] (a : αᵃᵒᵖ) : unop a⁻¹ = (unop a)⁻¹ := rfl
-
 instance instDiv [Div α] : Div αᵃᵒᵖ where div a b := op (unop a / unop b)
-
-@[simp] lemma op_div [Div α] (a b : α) : op (a / b) = op a / op b := rfl
-
-@[simp] lemma unop_div [Div α] (a b : αᵃᵒᵖ) : unop (a / b) = unop a / unop b := rfl
 
 end AddOpposite

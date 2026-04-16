@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Defs
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 
 # Ideals over a ring

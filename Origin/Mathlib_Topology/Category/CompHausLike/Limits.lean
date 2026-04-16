@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Extensive
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.Topology.Category.CompHausLike.Basic
 
+noncomputable section
+
 /-!
 
 # Explicit limits and colimits
@@ -63,10 +65,6 @@ def finiteCoproduct.desc {B : CompHausLike P} (e : (a : α) → (X a ⟶ B)) :
   continuous_toFun := by
     apply continuous_sigma
     intro a; exact (e a).continuous
-
-@[reassoc (attr := simp)]
-lemma finiteCoproduct.ι_desc {B : CompHausLike P} (e : (a : α) → (X a ⟶ B)) (a : α) :
-    finiteCoproduct.ι X a ≫ finiteCoproduct.desc X e = e a := rfl
 
 lemma finiteCoproduct.hom_ext {B : CompHausLike P} (f g : finiteCoproduct X ⟶ B)
     (h : ∀ a : α, finiteCoproduct.ι X a ≫ f = finiteCoproduct.ι X a ≫ g) : f = g := by

@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.Structures
 
+noncomputable section
+
 /-!
 # Algebraic structures over smooth functions
 
@@ -36,11 +38,6 @@ protected instance instMul {G : Type*} [Mul G] [TopologicalSpace G] [ChartedSpac
 @[to_additive (attr := simp)]
 theorem coe_mul {G : Type*} [Mul G] [TopologicalSpace G] [ChartedSpace H' G] [SmoothMul I' G]
     (f g : C^∞⟮I, N; I', G⟯) : ⇑(f * g) = f * g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mul_comp {G : Type*} [Mul G] [TopologicalSpace G] [ChartedSpace H' G] [SmoothMul I' G]
-    (f g : C^∞⟮I'', N'; I', G⟯) (h : C^∞⟮I, N; I'', N'⟯) : (f * g).comp h = f.comp h * g.comp h :=
   rfl
 
 @[to_additive]
@@ -134,16 +131,6 @@ instance group {G : Type*} [Group G] [TopologicalSpace G] [ChartedSpace H' G] [L
     div := fun f g => ⟨f / g, f.contMDiff.div g.contMDiff⟩
     div_eq_mul_inv := fun f g => by ext; exact div_eq_mul_inv _ _ }
 
-@[to_additive (attr := simp)]
-theorem coe_inv {G : Type*} [Group G] [TopologicalSpace G] [ChartedSpace H' G] [LieGroup I' G]
-    (f : C^∞⟮I, N; I', G⟯) : ⇑f⁻¹ = (⇑f)⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_div {G : Type*} [Group G] [TopologicalSpace G] [ChartedSpace H' G] [LieGroup I' G]
-    (f g : C^∞⟮I, N; I', G⟯) : ⇑(f / g) = f / g :=
-  rfl
-
 @[to_additive]
 instance commGroup {G : Type*} [CommGroup G] [TopologicalSpace G] [ChartedSpace H' G]
     [LieGroup I' G] : CommGroup C^∞⟮I, N; I', G⟯ :=
@@ -226,11 +213,6 @@ theorem coe_smul {V : Type*} [NormedAddCommGroup V] [NormedSpace 𝕜 V] (r : �
     (f : C^∞⟮I, N; 𝓘(𝕜, V), V⟯) : ⇑(r • f) = r • ⇑f :=
   rfl
 
-@[simp]
-theorem smul_comp {V : Type*} [NormedAddCommGroup V] [NormedSpace 𝕜 V] (r : 𝕜)
-    (g : C^∞⟮I'', N'; 𝓘(𝕜, V), V⟯) (h : C^∞⟮I, N; I'', N'⟯) : (r • g).comp h = r • g.comp h :=
-  rfl
-
 instance module {V : Type*} [NormedAddCommGroup V] [NormedSpace 𝕜 V] :
     Module 𝕜 C^∞⟮I, N; 𝓘(𝕜, V), V⟯ :=
   Function.Injective.module 𝕜 coeFnAddMonoidHom ContMDiffMap.coe_injective coe_smul
@@ -269,16 +251,6 @@ instance algebra : Algebra 𝕜 C^∞⟮I, N; 𝓘(𝕜, A), A⟯ :=
     commutes' := fun c f => by ext x; exact Algebra.commutes' _ _
     smul_def' := fun c f => by ext x; exact Algebra.smul_def' _ _ }
 
-@[simps]
-def coeFnAlgHom : C^∞⟮I, N; 𝓘(𝕜, A), A⟯ →ₐ[𝕜] N → A where
-  toFun := (↑)
-  commutes' _ := rfl
-  -- `(SmoothMap.coeFnRingHom : C^∞⟮I, N; 𝓘(𝕜, A), A⟯ →+* _) with` times out for some reason
-  map_zero' := SmoothMap.coe_zero
-  map_one' := SmoothMap.coe_one
-  map_add' := SmoothMap.coe_add
-  map_mul' := SmoothMap.coe_mul
-
 end AlgebraStructure
 
 section ModuleOverContinuousFunctions
@@ -292,12 +264,6 @@ is naturally a vector space over the ring of smooth functions from `N` to `𝕜`
 instance instSMul' {V : Type*} [NormedAddCommGroup V] [NormedSpace 𝕜 V] :
     SMul C^∞⟮I, N; 𝕜⟯ C^∞⟮I, N; 𝓘(𝕜, V), V⟯ :=
   ⟨fun f g => ⟨fun x => f x • g x, ContMDiff.smul f.2 g.2⟩⟩
-
-@[simp]
-theorem smul_comp' {V : Type*} [NormedAddCommGroup V] [NormedSpace 𝕜 V] (f : C^∞⟮I'', N'; 𝕜⟯)
-    (g : C^∞⟮I'', N'; 𝓘(𝕜, V), V⟯) (h : C^∞⟮I, N; I'', N'⟯) :
-    (f • g).comp h = f.comp h • g.comp h :=
-  rfl
 
 instance module' {V : Type*} [NormedAddCommGroup V] [NormedSpace 𝕜 V] :
     Module C^∞⟮I, N; 𝓘(𝕜), 𝕜⟯ C^∞⟮I, N; 𝓘(𝕜, V), V⟯ where

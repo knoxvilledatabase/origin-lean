@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Monotone.Union
 import Mathlib.Algebra.Order.Group.Instances
 
+noncomputable section
+
 /-!
 # Monotonicity of odd functions
 

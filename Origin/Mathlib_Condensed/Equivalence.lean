@@ -8,6 +8,8 @@ import Mathlib.Topology.Category.Stonean.EffectiveEpi
 import Mathlib.Condensed.Basic
 import Mathlib.CategoryTheory.Sites.Coherent.SheafComparison
 
+noncomputable section
+
 /-!
 
 # Sheaves on CompHaus are equivalent to sheaves on Stonean
@@ -42,7 +44,6 @@ namespace Condensed
 namespace StoneanCompHaus
 
 noncomputable
-
 def equivalence (A : Type*) [Category A]
     [∀ X, HasLimitsOfShape (StructuredArrow X Stonean.toCompHaus.op) A] :
     Sheaf (coherentTopology Stonean) A ≌ Condensed.{u} A :=
@@ -70,7 +71,6 @@ instance : Stonean.toProfinite.EffectivelyEnough where
   presentation X := ⟨stoneanToProfiniteEffectivePresentation X⟩
 
 noncomputable
-
 def equivalence (A : Type*) [Category A]
     [∀ X, HasLimitsOfShape (StructuredArrow X Stonean.toProfinite.op) A] :
     Sheaf (coherentTopology Stonean) A ≌ Sheaf (coherentTopology Profinite) A :=
@@ -81,7 +81,6 @@ end StoneanProfinite
 namespace ProfiniteCompHaus
 
 noncomputable
-
 def equivalence (A : Type*) [Category A]
     [∀ X, HasLimitsOfShape (StructuredArrow X profiniteToCompHaus.op) A] :
     Sheaf (coherentTopology Profinite) A ≌ Condensed.{u} A :=

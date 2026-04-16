@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Finset/Max.lean
-Genuine: 90 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
+Genuine: 90 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold
+
+noncomputable section
 
 /-!
 # Maximum and minimum of finite sets
@@ -24,10 +26,8 @@ variable [LinearOrder α]
 protected def max (s : Finset α) : WithBot α :=
   sup s (↑)
 
-theorem max_eq_sup_coe {s : Finset α} : s.max = s.sup (↑) :=
+theorem max_eq_sup_withBot (s : Finset α) : s.max = sup s (↑) :=
   rfl
-
--- DISSOLVED: max_eq_sup_withBot
 
 @[simp]
 theorem max_empty : (∅ : Finset α).max = ⊥ :=
@@ -101,10 +101,7 @@ protected lemma max_eq_top [OrderTop α] {s : Finset α} : s.max = ⊤ ↔ ⊤ �
 protected def min (s : Finset α) : WithTop α :=
   inf s (↑)
 
--- DISSOLVED: min_eq_inf_withTop
-
-@[simp]
-theorem min_empty : (∅ : Finset α).min = ⊤ :=
+theorem min_eq_inf_withTop (s : Finset α) : s.min = inf s (↑) :=
   rfl
 
 @[simp]
@@ -210,10 +207,6 @@ theorem max'_lt_iff {x} : s.max' H < x ↔ ∀ y ∈ s, y < x :=
 @[simp]
 theorem lt_min'_iff : x < s.min' H ↔ ∀ y ∈ s, x < y :=
   @max'_lt_iff αᵒᵈ _ _ H _
-
-theorem max'_eq_sup' : s.max' H = s.sup' H id := rfl
-
-theorem min'_eq_inf' : s.min' H = s.inf' H id := rfl
 
 @[simp]
 theorem max'_singleton (a : α) : ({a} : Finset α).max' (singleton_nonempty _) = a := by simp [max']

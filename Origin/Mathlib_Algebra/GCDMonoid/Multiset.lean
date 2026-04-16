@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/GCDMonoid/Multiset.lean
-Genuine: 29 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
+Genuine: 30 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Basic
 import Mathlib.Data.Multiset.FinsetOps
 import Mathlib.Data.Multiset.Fold
+
+noncomputable section
 
 /-!
 # GCD and LCM operations on multisets
@@ -190,7 +192,21 @@ theorem extract_gcd' (s t : Multiset α) (hs : ∃ x, x ∈ s ∧ x ≠ (0 : α)
     contrapose! hs
     exact s.gcd_eq_zero_iff.1 hs
 
--- DISSOLVED: extract_gcd
+theorem extract_gcd (s : Multiset α) (hs : s ≠ 0) :
+    ∃ t : Multiset α, s = t.map (s.gcd * ·) ∧ t.gcd = 1 := by
+  classical
+    by_cases h : ∀ x ∈ s, x = (0 : α)
+    · use replicate (card s) 1
+      rw [map_replicate, eq_replicate, mul_one, s.gcd_eq_zero_iff.2 h, ← nsmul_singleton,
+    ← gcd_dedup, dedup_nsmul (card_pos.2 hs).ne', dedup_singleton, gcd_singleton]
+      exact ⟨⟨rfl, h⟩, normalize_one⟩
+    · choose f hf using @gcd_dvd _ _ _ s
+      push_neg at h
+      refine ⟨s.pmap @f fun _ ↦ id, ?_, extract_gcd' s _ h ?_⟩ <;>
+      · rw [map_pmap]
+        conv_lhs => rw [← s.map_id, ← s.pmap_eq_map _ _ fun _ ↦ id]
+        congr with (x hx)
+        rw [id, ← hf hx]
 
 end gcd
 

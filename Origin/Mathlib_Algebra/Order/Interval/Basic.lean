@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Order/Interval/Basic.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 49
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Order.Interval.Basic
 import Mathlib.Tactic.Positivity.Core
+
+noncomputable section
 
 /-!
 # Interval arithmetic
@@ -42,14 +44,6 @@ namespace NonemptyInterval
 theorem toProd_one : (1 : NonemptyInterval α).toProd = 1 :=
   rfl
 
-@[to_additive]
-theorem fst_one : (1 : NonemptyInterval α).fst = 1 :=
-  rfl
-
-@[to_additive]
-theorem snd_one : (1 : NonemptyInterval α).snd = 1 :=
-  rfl
-
 @[to_additive (attr := push_cast, simp)]
 theorem coe_one_interval : ((1 : NonemptyInterval α) : Interval α) = 1 :=
   rfl
@@ -68,7 +62,7 @@ theorem pure_one : pure (1 : α) = 1 :=
 
 @[to_additive] lemma one_ne_bot : (1 : Interval α) ≠ ⊥ := pure_ne_bot
 
--- DISSOLVED: bot_ne_one
+@[to_additive] lemma bot_ne_one : (⊥ : Interval α) ≠ 1 := bot_ne_pure
 
 end Interval
 
@@ -132,14 +126,6 @@ variable (s t : NonemptyInterval α) (a b : α)
 theorem toProd_mul : (s * t).toProd = s.toProd * t.toProd :=
   rfl
 
-@[to_additive]
-theorem fst_mul : (s * t).fst = s.fst * t.fst :=
-  rfl
-
-@[to_additive]
-theorem snd_mul : (s * t).snd = s.snd * t.snd :=
-  rfl
-
 @[to_additive (attr := simp)]
 theorem coe_mul_interval : (↑(s * t) : Interval α) = s * t :=
   rfl
@@ -153,10 +139,6 @@ end NonemptyInterval
 namespace Interval
 
 variable (s t : Interval α)
-
-@[to_additive (attr := simp)]
-theorem bot_mul : ⊥ * t = ⊥ :=
-  rfl
 
 @[to_additive]
 theorem mul_bot : s * ⊥ = ⊥ :=
@@ -191,18 +173,6 @@ variable (s : NonemptyInterval α) (a : α) (n : ℕ)
 
 @[to_additive (attr := simp) toProd_nsmul]
 theorem toProd_pow : (s ^ n).toProd = s.toProd ^ n :=
-  rfl
-
-@[to_additive]
-theorem fst_pow : (s ^ n).fst = s.fst ^ n :=
-  rfl
-
-@[to_additive]
-theorem snd_pow : (s ^ n).snd = s.snd ^ n :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem pure_pow : pure a ^ n = pure (a ^ n) :=
   rfl
 
 end NonemptyInterval
@@ -249,7 +219,10 @@ namespace Interval
 
 variable [OrderedCommMonoid α] (s : Interval α) {n : ℕ}
 
--- DISSOLVED: bot_pow
+@[to_additive]
+theorem bot_pow : ∀ {n : ℕ}, n ≠ 0 → (⊥ : Interval α) ^ n = ⊥
+  | 0, h => (h rfl).elim
+  | Nat.succ n, _ => mul_bot (⊥ ^ n)
 
 end Interval
 
@@ -274,34 +247,14 @@ namespace NonemptyInterval
 
 variable (s t : NonemptyInterval α) {a b : α}
 
-@[simp]
-theorem fst_sub : (s - t).fst = s.fst - t.snd :=
-  rfl
-
-@[simp]
-theorem snd_sub : (s - t).snd = s.snd - t.fst :=
-  rfl
-
-@[simp]
-theorem coe_sub_interval : (↑(s - t) : Interval α) = s - t :=
-  rfl
-
 theorem sub_mem_sub (ha : a ∈ s) (hb : b ∈ t) : a - b ∈ s - t :=
   ⟨tsub_le_tsub ha.1 hb.2, tsub_le_tsub ha.2 hb.1⟩
-
-@[simp]
-theorem pure_sub_pure (a b : α) : pure a - pure b = pure (a - b) :=
-  rfl
 
 end NonemptyInterval
 
 namespace Interval
 
 variable (s t : Interval α)
-
-@[simp]
-theorem bot_sub : ⊥ - t = ⊥ :=
-  rfl
 
 @[simp]
 theorem sub_bot : s - ⊥ = ⊥ :=
@@ -333,35 +286,15 @@ namespace NonemptyInterval
 
 variable (s t : NonemptyInterval α) (a b : α)
 
-@[to_additive existing (attr := simp)]
-theorem fst_div : (s / t).fst = s.fst / t.snd :=
-  rfl
-
-@[to_additive existing (attr := simp)]
-theorem snd_div : (s / t).snd = s.snd / t.fst :=
-  rfl
-
-@[to_additive existing (attr := simp)]
-theorem coe_div_interval : (↑(s / t) : Interval α) = s / t :=
-  rfl
-
 @[to_additive existing]
 theorem div_mem_div (ha : a ∈ s) (hb : b ∈ t) : a / b ∈ s / t :=
   ⟨div_le_div'' ha.1 hb.2, div_le_div'' ha.2 hb.1⟩
-
-@[to_additive existing (attr := simp)]
-theorem pure_div_pure : pure a / pure b = pure (a / b) :=
-  rfl
 
 end NonemptyInterval
 
 namespace Interval
 
 variable (s t : Interval α)
-
-@[to_additive existing (attr := simp)]
-theorem bot_div : ⊥ / t = ⊥ :=
-  rfl
 
 @[to_additive existing (attr := simp)]
 theorem div_bot : s / ⊥ = ⊥ :=
@@ -389,18 +322,6 @@ namespace NonemptyInterval
 
 variable (s t : NonemptyInterval α) (a : α)
 
-@[to_additive (attr := simp)]
-theorem fst_inv : s⁻¹.fst = s.snd⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_inv : s⁻¹.snd = s.fst⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_inv_interval : (↑(s⁻¹) : Interval α) = (↑s)⁻¹ :=
-  rfl
-
 @[to_additive]
 theorem inv_mem_inv (ha : a ∈ s) : a⁻¹ ∈ s⁻¹ :=
   ⟨inv_le_inv' ha.2, inv_le_inv' ha.1⟩
@@ -410,10 +331,6 @@ theorem inv_pure : (pure a)⁻¹ = pure a⁻¹ :=
   rfl
 
 end NonemptyInterval
-
-@[to_additive (attr := simp)]
-theorem Interval.inv_bot : (⊥ : Interval α)⁻¹ = ⊥ :=
-  rfl
 
 end Inv
 

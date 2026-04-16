@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 
+noncomputable section
+
 /-!
 
 # Partial fractions

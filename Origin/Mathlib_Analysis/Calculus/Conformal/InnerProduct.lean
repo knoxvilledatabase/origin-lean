@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Conformal.NormedSpace
 import Mathlib.Analysis.InnerProductSpace.ConformalLinearMap
 
+noncomputable section
+
 /-!
 # Conformal maps between inner product spaces
 

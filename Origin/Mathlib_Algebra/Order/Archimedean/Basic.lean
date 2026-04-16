@@ -9,6 +9,8 @@ import Mathlib.Data.Int.LeastGreatest
 import Mathlib.Data.Rat.Floor
 import Mathlib.Data.NNRat.Defs
 
+noncomputable section
+
 /-!
 # Archimedean groups and fields.
 

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.FullSubcategory
 import Mathlib.CategoryTheory.MorphismProperty.Comma
 import Mathlib.CategoryTheory.MorphismProperty.Limits
 
+noncomputable section
+
 /-!
 # (Co)limits in subcategories of comma categories defined by morphism properties
 

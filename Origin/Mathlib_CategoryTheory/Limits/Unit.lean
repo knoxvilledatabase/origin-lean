@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.PUnit
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # `Discrete PUnit` has limits and colimits
 

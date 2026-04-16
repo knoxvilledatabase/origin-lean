@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.UniqueFactorizationDomain.FactorSet
 import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
 
+noncomputable section
+
 /-!
 # Building GCD out of unique factorization
 
@@ -20,26 +22,6 @@ local infixl:50 " ~ᵤ " => Associated
 section
 
 open Associates UniqueFactorizationMonoid
-
-noncomputable def UniqueFactorizationMonoid.toGCDMonoid (α : Type*) [CancelCommMonoidWithZero α]
-    [UniqueFactorizationMonoid α] : GCDMonoid α where
-  gcd a b := Quot.out (Associates.mk a ⊓ Associates.mk b : Associates α)
-  lcm a b := Quot.out (Associates.mk a ⊔ Associates.mk b : Associates α)
-  gcd_dvd_left a b := by
-    rw [← mk_dvd_mk, Associates.quot_out, congr_fun₂ dvd_eq_le]
-    exact inf_le_left
-  gcd_dvd_right a b := by
-    rw [← mk_dvd_mk, Associates.quot_out, congr_fun₂ dvd_eq_le]
-    exact inf_le_right
-  dvd_gcd {a b c} hac hab := by
-    rw [← mk_dvd_mk, Associates.quot_out, congr_fun₂ dvd_eq_le, le_inf_iff,
-      mk_le_mk_iff_dvd, mk_le_mk_iff_dvd]
-    exact ⟨hac, hab⟩
-  lcm_zero_left a := by simp
-  lcm_zero_right a := by simp
-  gcd_mul_lcm a b := by
-    rw [← mk_eq_mk_iff_associated, ← Associates.mk_mul_mk, ← associated_iff_eq, Associates.quot_out,
-      Associates.quot_out, mul_comm, sup_mul_inf, Associates.mk_mul_mk]
 
 noncomputable def UniqueFactorizationMonoid.toNormalizedGCDMonoid (α : Type*)
     [CancelCommMonoidWithZero α] [UniqueFactorizationMonoid α] [NormalizationMonoid α] :

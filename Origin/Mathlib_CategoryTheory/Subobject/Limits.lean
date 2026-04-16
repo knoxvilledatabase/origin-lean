@@ -5,6 +5,8 @@ Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Lattice
 
+noncomputable section
+
 /-!
 # Specific subobjects
 

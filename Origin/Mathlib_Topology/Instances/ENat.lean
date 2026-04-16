@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Monoid
 import Mathlib.Topology.Instances.Discrete
 import Mathlib.Order.Interval.Set.WithBotTop
 
+noncomputable section
+
 /-!
 # Topology on extended natural numbers
 -/

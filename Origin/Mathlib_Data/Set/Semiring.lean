@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.Kleene
 import Mathlib.Algebra.Order.Ring.Canonical
 
+noncomputable section
+
 /-!
 # Sets as a semiring under union
 
@@ -45,28 +47,6 @@ open SetSemiring (down)
 
 open Set (up)
 
-@[simp]
-protected theorem down_up (s : Set α) : SetSemiring.down (Set.up s) = s :=
-  rfl
-
-@[simp]
-protected theorem up_down (s : SetSemiring α) : Set.up (SetSemiring.down s) = s :=
-  rfl
-
-theorem up_le_up {s t : Set α} : Set.up s ≤ Set.up t ↔ s ⊆ t :=
-  Iff.rfl
-
-theorem up_lt_up {s t : Set α} : Set.up s < Set.up t ↔ s ⊂ t :=
-  Iff.rfl
-
-@[simp]
-theorem down_subset_down {s t : SetSemiring α} : SetSemiring.down s ⊆ SetSemiring.down t ↔ s ≤ t :=
-  Iff.rfl
-
-@[simp]
-theorem down_ssubset_down {s t : SetSemiring α} : SetSemiring.down s ⊂ SetSemiring.down t ↔ s < t :=
-  Iff.rfl
-
 instance : Zero (SetSemiring α) where zero := Set.up (∅ : Set α)
 
 instance : Add (SetSemiring α) where add s t := Set.up (SetSemiring.down s ∪ SetSemiring.down t)
@@ -77,28 +57,6 @@ instance : AddCommMonoid (SetSemiring α) where
   add_zero := union_empty
   add_comm := union_comm
   nsmul := nsmulRec
-
-theorem zero_def : (0 : SetSemiring α) = Set.up ∅ :=
-  rfl
-
-@[simp]
-theorem down_zero : down (0 : SetSemiring α) = ∅ :=
-  rfl
-
-@[simp]
-theorem _root_.Set.up_empty : Set.up (∅ : Set α) = 0 :=
-  rfl
-
-theorem add_def (s t : SetSemiring α) : s + t = up (down s ∪ down t) :=
-  rfl
-
-@[simp]
-theorem down_add (s t : SetSemiring α) : down (s + t) = down s ∪ down t :=
-  rfl
-
-@[simp]
-theorem _root_.Set.up_union (s t : Set α) : up (s ∪ t) = up s + up t :=
-  rfl
 
 instance addLeftMono : AddLeftMono (SetSemiring α) :=
   ⟨fun _ _ _ => union_subset_union_right _⟩
@@ -114,17 +72,6 @@ instance : NonUnitalNonAssocSemiring (SetSemiring α) :=
     mul_zero := fun _ => mul_empty
     left_distrib := fun _ _ _ => mul_union
     right_distrib := fun _ _ _ => union_mul }
-
-theorem mul_def (s t : SetSemiring α) : s * t = up (down s * down t) :=
-  rfl
-
-@[simp]
-theorem down_mul (s t : SetSemiring α) : down (s * t) = down s * down t :=
-  rfl
-
-@[simp]
-theorem _root_.Set.up_mul (s t : Set α) : up (s * t) = up s * up t :=
-  rfl
 
 instance : NoZeroDivisors (SetSemiring α) :=
   ⟨fun {a b} ab =>
@@ -146,15 +93,8 @@ variable [One α]
 
 instance : One (SetSemiring α) where one := Set.up (1 : Set α)
 
-theorem one_def : (1 : SetSemiring α) = Set.up 1 :=
-  rfl
-
 @[simp]
 theorem down_one : down (1 : SetSemiring α) = 1 :=
-  rfl
-
-@[simp]
-theorem _root_.Set.up_one : up (1 : Set α) = 1 :=
   rfl
 
 end One
@@ -197,19 +137,5 @@ def imageHom [MulOneClass α] [MulOneClass β] (f : α →* β) : SetSemiring α
     rw [down_one, image_one, map_one, singleton_one, up_one]
   map_add' := image_union _
   map_mul' _ _ := image_mul f
-
-lemma imageHom_def [MulOneClass α] [MulOneClass β] (f : α →* β) (s : SetSemiring α) :
-    imageHom f s = up (image f (down s)) :=
-  rfl
-
-@[simp]
-lemma down_imageHom [MulOneClass α] [MulOneClass β] (f : α →* β) (s : SetSemiring α) :
-    down (imageHom f s) = f '' down s :=
-  rfl
-
-@[simp]
-lemma _root_.Set.up_image [MulOneClass α] [MulOneClass β] (f : α →* β) (s : Set α) :
-    up (f '' s) = imageHom f (up s) :=
-  rfl
 
 end SetSemiring

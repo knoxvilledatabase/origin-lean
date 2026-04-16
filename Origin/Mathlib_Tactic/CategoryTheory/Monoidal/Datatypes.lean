@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Coherence.Datatypes
 import Mathlib.Tactic.CategoryTheory.MonoidalComp
 
+noncomputable section
+
 /-!
 # Expressions for monoidal categories
 

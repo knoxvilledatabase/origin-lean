@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Data.Finite.Prod
 
+noncomputable section
+
 /-!
 # N-ary images of finsets
 
@@ -132,8 +134,6 @@ theorem image₂_singleton_right : image₂ f s {b} = s.image fun a => f a b :=
 
 theorem image₂_singleton_left' : image₂ f {a} t = t.image (f a) :=
   image₂_singleton_left
-
-theorem image₂_singleton : image₂ f {a} {b} = {f a b} := by simp
 
 theorem image₂_union_left [DecidableEq α] : image₂ f (s ∪ s') t = image₂ f s t ∪ image₂ f s' t :=
   coe_injective <| by
@@ -266,14 +266,6 @@ theorem image₂_image_right (f : α → γ → δ) (g : β → γ) :
 @[simp]
 theorem image₂_mk_eq_product [DecidableEq α] [DecidableEq β] (s : Finset α) (t : Finset β) :
     image₂ Prod.mk s t = s ×ˢ t := by ext; simp [Prod.ext_iff]
-
-@[simp]
-theorem image₂_curry (f : α × β → γ) (s : Finset α) (t : Finset β) :
-    image₂ (curry f) s t = (s ×ˢ t).image f := rfl
-
-@[simp]
-theorem image_uncurry_product (f : α → β → γ) (s : Finset α) (t : Finset β) :
-    (s ×ˢ t).image (uncurry f) = image₂ f s t := rfl
 
 theorem image₂_swap (f : α → β → γ) (s : Finset α) (t : Finset β) :
     image₂ f s t = image₂ (fun a b => f b a) t s :=

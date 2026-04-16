@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Floor
 import Mathlib.Data.Nat.Log
 
+noncomputable section
+
 /-!
 # Integer logarithms in a field with respect to a natural base
 

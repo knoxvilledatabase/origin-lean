@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 
+noncomputable section
+
 /-!
 # Category instances for `Mul`, `Add`, `Semigroup` and `AddSemigroup`
 
@@ -75,10 +77,6 @@ def of (M : Type u) [Mul M] : MagmaCat :=
   Bundled.of M
 
 @[to_additive (attr := simp)]
-theorem coe_of (R : Type u) [Mul R] : (MagmaCat.of R : Type u) = R :=
-  rfl
-
-@[to_additive (attr := simp)]
 lemma mulEquiv_coe_eq {X Y : Type _} [Mul X] [Mul Y] (e : X ≃* Y) :
     (@DFunLike.coe (MagmaCat.of X ⟶ MagmaCat.of Y) _ (fun _ => (forget MagmaCat).obj _)
       ConcreteCategory.instFunLike (e : X →ₙ* Y) : X → Y) = ↑e :=
@@ -139,10 +137,6 @@ instance instMulHomClass (X Y : Semigrp) : MulHomClass (X ⟶ Y) X Y :=
 @[to_additive]
 def of (M : Type u) [Semigroup M] : Semigrp :=
   Bundled.of M
-
-@[to_additive (attr := simp)]
-theorem coe_of (R : Type u) [Semigroup R] : (Semigrp.of R : Type u) = R :=
-  rfl
 
 @[to_additive (attr := simp)]
 lemma mulEquiv_coe_eq {X Y : Type _} [Semigroup X] [Semigroup Y] (e : X ≃* Y) :

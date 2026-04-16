@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.AtTopBot.Group
 import Mathlib.Topology.Algebra.Group.Basic
 
+noncomputable section
+
 /-!
 # Topological closure of the submonoid closure
 

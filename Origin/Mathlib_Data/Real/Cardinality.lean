@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Data.Rat.Cardinal
 import Mathlib.SetTheory.Cardinal.Continuum
 
+noncomputable section
+
 /-!
 # The cardinality of the reals
 

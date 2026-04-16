@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Bifunctor
 import Mathlib.Control.Traversable.Basic
 
+noncomputable section
+
 /-!
 # Bitraversable type class
 

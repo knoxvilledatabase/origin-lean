@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.Homology.TotalComplex
 
+noncomputable section
+
 /-! The symmetry of the total complex of a bicomplex
 
 Let `K : HomologicalComplex₂ C c₁ c₂` be a bicomplex. If we assume both

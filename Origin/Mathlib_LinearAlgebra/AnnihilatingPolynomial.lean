@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/AnnihilatingPolynomial.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Field
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.Algebra.Polynomial.Module.AEval
+
+noncomputable section
 
 /-!
 # Annihilating Ideal
@@ -94,7 +96,9 @@ theorem mem_iff_eq_smul_annIdealGenerator {p : 𝕜[X]} (a : A) :
     p ∈ annIdeal 𝕜 a ↔ ∃ s : 𝕜[X], p = s • annIdealGenerator 𝕜 a := by
   simp_rw [@eq_comm _ p, ← mem_span_singleton, ← span_singleton_annIdealGenerator 𝕜 a, Ideal.span]
 
--- DISSOLVED: monic_annIdealGenerator
+theorem monic_annIdealGenerator (a : A) (hg : annIdealGenerator 𝕜 a ≠ 0) :
+    Monic (annIdealGenerator 𝕜 a) :=
+  monic_mul_leadingCoeff_inv (mul_ne_zero_iff.mp hg).1
 
 /-! We are working toward showing the generator of the annihilating ideal
 in the field case is the minimal polynomial. We are going to use a uniqueness
@@ -111,7 +115,9 @@ theorem mem_iff_annIdealGenerator_dvd {p : 𝕜[X]} {a : A} :
     p ∈ annIdeal 𝕜 a ↔ annIdealGenerator 𝕜 a ∣ p := by
   rw [← Ideal.mem_span_singleton, span_singleton_annIdealGenerator]
 
--- DISSOLVED: degree_annIdealGenerator_le_of_mem
+theorem degree_annIdealGenerator_le_of_mem (a : A) (p : 𝕜[X]) (hp : p ∈ annIdeal 𝕜 a)
+    (hpn0 : p ≠ 0) : degree (annIdealGenerator 𝕜 a) ≤ degree p :=
+  degree_le_of_dvd (mem_iff_annIdealGenerator_dvd.1 hp) hpn0
 
 variable (𝕜)
 

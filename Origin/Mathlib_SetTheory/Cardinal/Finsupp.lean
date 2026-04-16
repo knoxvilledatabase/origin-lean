@@ -7,6 +7,8 @@ import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Data.Finsupp.Multiset
 
+noncomputable section
+
 /-! # Results on the cardinality of finitely supported functions and multisets. -/
 
 universe u v
@@ -17,9 +19,6 @@ namespace Cardinal
 theorem mk_finsupp_lift_of_fintype (α : Type u) (β : Type v) [Fintype α] [Zero β] :
     #(α →₀ β) = lift.{u} #β ^ Fintype.card α := by
   simpa using (@Finsupp.equivFunOnFinite α β _ _).cardinal_eq
-
-theorem mk_finsupp_of_fintype (α β : Type u) [Fintype α] [Zero β] :
-    #(α →₀ β) = #β ^ Fintype.card α := by simp
 
 -- CONFLATES (assumes ground = zero): mk_finsupp_lift_of_infinite
 @[simp]
@@ -52,9 +51,6 @@ theorem mk_finsupp_lift_of_infinite' (α : Type u) (β : Type v) [Nonempty α] [
     exacts [Fintype.card_pos, lift_le_aleph0.2 (lt_aleph0_of_finite _).le]
   · apply mk_finsupp_lift_of_infinite
 
-theorem mk_finsupp_of_infinite' (α β : Type u) [Nonempty α] [Zero β] [Infinite β] :
-    #(α →₀ β) = max #α #β := by simp
-
 theorem mk_finsupp_nat (α : Type u) [Nonempty α] : #(α →₀ ℕ) = max #α ℵ₀ := by simp
 
 theorem mk_multiset_of_isEmpty (α : Type u) [IsEmpty α] : #(Multiset α) = 1 :=
@@ -64,8 +60,6 @@ theorem mk_multiset_of_isEmpty (α : Type u) [IsEmpty α] : #(Multiset α) = 1 :
 theorem mk_multiset_of_nonempty (α : Type u) [Nonempty α] : #(Multiset α) = max #α ℵ₀ := by
   classical
   exact Multiset.toFinsupp.toEquiv.cardinal_eq.trans (mk_finsupp_nat α)
-
-theorem mk_multiset_of_infinite (α : Type u) [Infinite α] : #(Multiset α) = #α := by simp
 
 theorem mk_multiset_of_countable (α : Type u) [Countable α] [Nonempty α] : #(Multiset α) = ℵ₀ := by
   classical

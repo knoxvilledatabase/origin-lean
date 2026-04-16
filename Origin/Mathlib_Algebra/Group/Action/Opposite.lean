@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Action.Faithful
 import Mathlib.Algebra.Group.Action.Pretransitive
 import Mathlib.Algebra.Group.Opposite
 
+noncomputable section
+
 /-!
 # Scalar actions on and by `Mᵐᵒᵖ`
 
@@ -141,8 +143,6 @@ open MulOpposite
 @[to_additive "Like `Add.toVAdd`, but adds on the right.
   See also `AddMonoid.toOppositeAddAction`."]
 instance Mul.toHasOppositeSMul [Mul α] : SMul αᵐᵒᵖ α where smul c x := x * c.unop
-
-@[to_additive] lemma op_smul_eq_mul [Mul α] {a a' : α} : op a • a' = a' * a := rfl
 
 @[to_additive (attr := simp)]
 lemma MulOpposite.smul_eq_mul_unop [Mul α] {a : αᵐᵒᵖ} {a' : α} : a • a' = a' * a.unop := rfl

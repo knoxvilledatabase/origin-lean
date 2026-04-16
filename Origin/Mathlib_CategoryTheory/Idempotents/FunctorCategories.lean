@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.CategoryTheory.Idempotents.Karoubi
 
+noncomputable section
+
 /-!
 # Idempotent completeness and functor categories
 

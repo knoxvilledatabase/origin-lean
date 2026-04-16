@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 import Mathlib.NumberTheory.NumberField.Embeddings
 
+noncomputable section
+
 /-!
 # Cyclotomic extensions of `ℚ` are totally complex number fields.
 We prove that cyclotomic extensions of `ℚ` are totally complex, meaning that

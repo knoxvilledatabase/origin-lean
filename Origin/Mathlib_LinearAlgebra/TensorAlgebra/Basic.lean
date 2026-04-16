@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/TensorAlgebra/Basic.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
+Genuine: 27 | Conflates: 1 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.FreeAlgebra
@@ -8,6 +8,8 @@ import Mathlib.Algebra.RingQuot
 import Mathlib.Algebra.TrivSqZeroExt
 import Mathlib.Algebra.Algebra.Operations
 import Mathlib.LinearAlgebra.Multilinear.Basic
+
+noncomputable section
 
 /-!
 # Tensor Algebras
@@ -248,7 +250,11 @@ theorem ι_eq_algebraMap_iff (x : M) (r : R) : ι R x = algebraMap R _ r ↔ x =
   · rintro ⟨rfl, rfl⟩
     rw [LinearMap.map_zero, RingHom.map_zero]
 
--- DISSOLVED: ι_ne_one
+-- CONFLATES (assumes ground = zero): ι_ne_one
+@[simp]
+theorem ι_ne_one [Nontrivial R] (x : M) : ι R x ≠ 1 := by
+  rw [← (algebraMap R (TensorAlgebra R M)).map_one, Ne, ι_eq_algebraMap_iff]
+  exact one_ne_zero ∘ And.right
 
 theorem ι_range_disjoint_one :
     Disjoint (LinearMap.range (ι R : M →ₗ[R] TensorAlgebra R M))
@@ -262,10 +268,6 @@ variable (R M)
 
 def tprod (n : ℕ) : MultilinearMap R (fun _ : Fin n => M) (TensorAlgebra R M) :=
   (MultilinearMap.mkPiAlgebraFin R n (TensorAlgebra R M)).compLinearMap fun _ => ι R
-
-@[simp]
-theorem tprod_apply {n : ℕ} (x : Fin n → M) : tprod R M n x = (List.ofFn fun i => ι R (x i)).prod :=
-  rfl
 
 variable {R M}
 

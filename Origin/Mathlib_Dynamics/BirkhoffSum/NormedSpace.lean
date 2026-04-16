@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Dynamics.BirkhoffSum.Average
 
+noncomputable section
+
 /-!
 # Birkhoff average in a normed space
 

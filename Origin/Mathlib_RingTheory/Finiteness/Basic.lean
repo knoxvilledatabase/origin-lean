@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Pi
 import Mathlib.LinearAlgebra.Quotient.Defs
 import Mathlib.RingTheory.Finiteness.Defs
 
+noncomputable section
+
 /-!
 # Basic results on finitely generated (sub)modules
 

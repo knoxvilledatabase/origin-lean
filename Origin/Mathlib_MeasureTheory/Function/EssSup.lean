@@ -1,12 +1,14 @@
 /-
 Extracted from MeasureTheory/Function/EssSup.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 52 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 import Mathlib.MeasureTheory.Measure.Count
 import Mathlib.Order.Filter.ENNReal
 import Mathlib.Probability.UniformOn
+
+noncomputable section
 
 /-!
 # Essential supremum and infimum
@@ -54,24 +56,30 @@ theorem essInf_congr_ae {f g : α → β} (hfg : f =ᵐ[μ] g) : essInf f μ = e
 
 -- DISSOLVED: essInf_const'
 
--- DISSOLVED: essSup_const
+theorem essSup_const (c : β) (hμ : μ ≠ 0) : essSup (fun _ : α => c) μ = c :=
+  have := NeZero.mk hμ; essSup_const' _
 
--- DISSOLVED: essInf_const
+theorem essInf_const (c : β) (hμ : μ ≠ 0) : essInf (fun _ : α => c) μ = c :=
+  have := NeZero.mk hμ; essInf_const' _
 
 section SMul
 
 variable {R : Type*} [Zero R] [SMulWithZero R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
   [NoZeroSMulDivisors R ℝ≥0∞] {c : R}
 
--- DISSOLVED: essSup_smul_measure
+@[simp]
+lemma essSup_smul_measure (hc : c ≠ 0) (f : α → β) : essSup f (c • μ) = essSup f μ := by
+  simp_rw [essSup, Measure.ae_smul_measure_eq hc]
 
 end SMul
 
 variable [Nonempty α]
 
--- DISSOLVED: essSup_eq_ciSup
+lemma essSup_eq_ciSup (hμ : ∀ a, μ {a} ≠ 0) (hf : BddAbove (Set.range f)) :
+    essSup f μ = ⨆ a, f a := by rw [essSup, ae_eq_top.2 hμ, limsup_top_eq_ciSup hf]
 
--- DISSOLVED: essInf_eq_ciInf
+lemma essInf_eq_ciInf (hμ : ∀ a, μ {a} ≠ 0) (hf : BddBelow (Set.range f)) :
+    essInf f μ = ⨅ a, f a := by rw [essInf, ae_eq_top.2 hμ, liminf_top_eq_ciInf hf]
 
 variable [MeasurableSingletonClass α]
 
@@ -193,9 +201,11 @@ theorem essInf_antitone_measure {f : α → β} (hμν : μ ≪ ν) : essInf f �
   refine liminf_le_liminf_of_le (Measure.ae_le_iff_absolutelyContinuous.mpr hμν) ?_ ?_
   all_goals isBoundedDefault
 
--- DISSOLVED: essSup_eq_iSup
+lemma essSup_eq_iSup (hμ : ∀ a, μ {a} ≠ 0) (f : α → β) : essSup f μ = ⨆ i, f i := by
+  rw [essSup, ae_eq_top.2 hμ, limsup_top_eq_iSup]
 
--- DISSOLVED: essInf_eq_iInf
+lemma essInf_eq_iInf (hμ : ∀ a, μ {a} ≠ 0) (f : α → β) : essInf f μ = ⨅ i, f i := by
+  rw [essInf, ae_eq_top.2 hμ, liminf_top_eq_iInf]
 
 @[simp] lemma essSup_count [MeasurableSingletonClass α] (f : α → β) : essSup f .count = ⨆ i, f i :=
   essSup_eq_iSup (by simp) _

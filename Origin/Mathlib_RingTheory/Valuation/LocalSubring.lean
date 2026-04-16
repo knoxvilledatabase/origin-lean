@@ -7,6 +7,8 @@ import Mathlib.RingTheory.LocalRing.Subring
 import Mathlib.RingTheory.Ideal.Over
 import Mathlib.RingTheory.Valuation.ValuationSubring
 
+noncomputable section
+
 /-!
 
 # Valuation subrings are exactly the maximal local subrings

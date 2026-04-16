@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Embedding.Basic
 import Mathlib.Algebra.Homology.Additive
 
+noncomputable section
+
 /-!
 # The restriction functor of an embedding of complex shapes
 
@@ -56,13 +58,6 @@ lemma restrictionMap_f' {i : ι} {i' : ι'} (hi : e.f i = i') :
   simp [restrictionXIso]
 
 variable (K)
-
-@[simp]
-lemma restrictionMap_id : restrictionMap (𝟙 K) e = 𝟙 _ := rfl
-
-@[simp, reassoc]
-lemma restrictionMap_comp :
-    restrictionMap (φ ≫ φ') e = restrictionMap φ e ≫ restrictionMap φ' e := rfl
 
 end HomologicalComplex
 

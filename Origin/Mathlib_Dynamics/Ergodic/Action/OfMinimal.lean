@@ -7,6 +7,8 @@ import Mathlib.Dynamics.Ergodic.Action.Regular
 import Mathlib.MeasureTheory.Measure.ContinuousPreimage
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 
+noncomputable section
+
 /-!
 # Ergodicity from minimality
 

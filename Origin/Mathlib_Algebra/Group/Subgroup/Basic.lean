@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Conj
 import Mathlib.Algebra.Group.Pi.Lemmas
 import Mathlib.Algebra.Group.Subgroup.Ker
 
+noncomputable section
+
 /-!
 # Basic results on subgroups
 
@@ -174,11 +176,6 @@ variable [∀ i, Group (f i)]
 def pi (I : Set η) (H : ∀ i, Subgroup (f i)) : Subgroup (∀ i, f i) :=
   { Submonoid.pi I fun i => (H i).toSubmonoid with
     inv_mem' := fun hp i hI => (H i).inv_mem (hp i hI) }
-
-@[to_additive]
-theorem coe_pi (I : Set η) (H : ∀ i, Subgroup (f i)) :
-    (pi I H : Set (∀ i, f i)) = Set.pi I fun i => (H i : Set (f i)) :=
-  rfl
 
 @[to_additive]
 theorem mem_pi (I : Set η) {H : ∀ i, Subgroup (f i)} {p : ∀ i, f i} :

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Preadditive.Injective
 import Mathlib.CategoryTheory.Preadditive.Generator
 import Mathlib.CategoryTheory.Abelian.Opposite
 
+noncomputable section
+
 /-!
 # A complete abelian category with enough injectives and a separator has an injective coseparator
 

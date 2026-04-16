@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Defs
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Definitions about upper/lower bounds
 

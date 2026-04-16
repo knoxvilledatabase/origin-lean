@@ -1,12 +1,14 @@
 /-
 Extracted from Topology/MetricSpace/Dilation.lean
-Genuine: 48 | Conflates: 2 | Dissolved: 9 | Infrastructure: 17
+Genuine: 57 | Conflates: 2 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Antilipschitz
 import Mathlib.Topology.MetricSpace.Isometry
 import Mathlib.Topology.MetricSpace.Lipschitz
 import Mathlib.Data.FunLike.Basic
+
+noncomputable section
 
 /-!
 # Dilations
@@ -58,11 +60,15 @@ section Defs
 
 variable (α : Type*) (β : Type*) [PseudoEMetricSpace α] [PseudoEMetricSpace β]
 
--- DISSOLVED: Dilation
+structure Dilation where
+  toFun : α → β
+  edist_eq' : ∃ r : ℝ≥0, r ≠ 0 ∧ ∀ x y : α, edist (toFun x) (toFun y) = r * edist x y
 
 infixl:25 " →ᵈ " => Dilation
 
--- DISSOLVED: DilationClass
+class DilationClass (F : Type*) (α β : outParam Type*) [PseudoEMetricSpace α] [PseudoEMetricSpace β]
+    [FunLike F α β] : Prop where
+  edist_eq' : ∀ f : F, ∃ r : ℝ≥0, r ≠ 0 ∧ ∀ x y : α, edist (f x) (f y) = r * edist x y
 
 end Defs
 
@@ -80,14 +86,6 @@ instance funLike : FunLike (α →ᵈ β) α β where
 
 instance toDilationClass : DilationClass (α →ᵈ β) α β where
   edist_eq' f := edist_eq' f
-
-@[simp]
-theorem toFun_eq_coe {f : α →ᵈ β} : f.toFun = (f : α → β) :=
-  rfl
-
-@[simp]
-theorem coe_mk (f : α → β) (h) : ⇑(⟨f, h⟩ : α →ᵈ β) = f :=
-  rfl
 
 protected theorem congr_fun {f g : α →ᵈ β} (h : f = g) (x : α) : f x = g x :=
   DFunLike.congr_fun h x
@@ -127,7 +125,10 @@ theorem ratio_of_trivial [DilationClass F α β] (f : F)
 theorem ratio_of_subsingleton [Subsingleton α] [DilationClass F α β] (f : F) : ratio f = 1 :=
   if_pos fun x y ↦ by simp [Subsingleton.elim x y]
 
--- DISSOLVED: ratio_ne_zero
+theorem ratio_ne_zero [DilationClass F α β] (f : F) : ratio f ≠ 0 := by
+  rw [ratio]; split_ifs
+  · exact one_ne_zero
+  exact (DilationClass.edist_eq' f).choose_spec.1
 
 theorem ratio_pos [DilationClass F α β] (f : F) : 0 < ratio f :=
   (ratio_ne_zero f).bot_lt
@@ -155,30 +156,40 @@ theorem dist_eq {α β F : Type*} [PseudoMetricSpace α] [PseudoMetricSpace β] 
     dist (f x) (f y) = ratio f * dist x y := by
   simp only [dist_nndist, nndist_eq, NNReal.coe_mul]
 
--- DISSOLVED: ratio_unique
+theorem ratio_unique [DilationClass F α β] {f : F} {x y : α} {r : ℝ≥0} (h₀ : edist x y ≠ 0)
+    (htop : edist x y ≠ ⊤) (hr : edist (f x) (f y) = r * edist x y) : r = ratio f := by
+  simpa only [hr, ENNReal.mul_eq_mul_right h₀ htop, ENNReal.coe_inj] using edist_eq f x y
 
--- DISSOLVED: ratio_unique_of_nndist_ne_zero
+theorem ratio_unique_of_nndist_ne_zero {α β F : Type*} [PseudoMetricSpace α] [PseudoMetricSpace β]
+    [FunLike F α β] [DilationClass F α β] {f : F} {x y : α} {r : ℝ≥0} (hxy : nndist x y ≠ 0)
+    (hr : nndist (f x) (f y) = r * nndist x y) : r = ratio f :=
+  ratio_unique (by rwa [edist_nndist, ENNReal.coe_ne_zero]) (edist_ne_top x y)
+    (by rw [edist_nndist, edist_nndist, hr, ENNReal.coe_mul])
 
--- DISSOLVED: ratio_unique_of_dist_ne_zero
+theorem ratio_unique_of_dist_ne_zero {α β} {F : Type*} [PseudoMetricSpace α] [PseudoMetricSpace β]
+    [FunLike F α β] [DilationClass F α β] {f : F} {x y : α} {r : ℝ≥0} (hxy : dist x y ≠ 0)
+    (hr : dist (f x) (f y) = r * dist x y) : r = ratio f :=
+  ratio_unique_of_nndist_ne_zero (NNReal.coe_ne_zero.1 hxy) <|
+    NNReal.eq <| by rw [coe_nndist, hr, NNReal.coe_mul, coe_nndist]
 
--- DISSOLVED: mkOfNNDistEq
-
-@[simp]
-theorem coe_mkOfNNDistEq {α β} [PseudoMetricSpace α] [PseudoMetricSpace β] (f : α → β) (h) :
-    ⇑(mkOfNNDistEq f h : α →ᵈ β) = f :=
-  rfl
+def mkOfNNDistEq {α β} [PseudoMetricSpace α] [PseudoMetricSpace β] (f : α → β)
+    (h : ∃ r : ℝ≥0, r ≠ 0 ∧ ∀ x y : α, nndist (f x) (f y) = r * nndist x y) : α →ᵈ β where
+  toFun := f
+  edist_eq' := by
+    rcases h with ⟨r, hne, h⟩
+    refine ⟨r, hne, fun x y => ?_⟩
+    rw [edist_nndist, edist_nndist, ← ENNReal.coe_mul, h x y]
 
 @[simp]
 theorem mk_coe_of_nndist_eq {α β} [PseudoMetricSpace α] [PseudoMetricSpace β] (f : α →ᵈ β)
     (h) : Dilation.mkOfNNDistEq f h = f :=
   ext fun _ => rfl
 
--- DISSOLVED: mkOfDistEq
-
-@[simp]
-theorem coe_mkOfDistEq {α β} [PseudoMetricSpace α] [PseudoMetricSpace β] (f : α → β) (h) :
-    ⇑(mkOfDistEq f h : α →ᵈ β) = f :=
-  rfl
+def mkOfDistEq {α β} [PseudoMetricSpace α] [PseudoMetricSpace β] (f : α → β)
+    (h : ∃ r : ℝ≥0, r ≠ 0 ∧ ∀ x y : α, dist (f x) (f y) = r * dist x y) : α →ᵈ β :=
+  mkOfNNDistEq f <|
+    h.imp fun r hr =>
+      ⟨hr.1, fun x y => NNReal.eq <| by rw [coe_nndist, hr.2, NNReal.coe_mul, coe_nndist]⟩
 
 @[simp]
 theorem mk_coe_of_dist_eq {α β} [PseudoMetricSpace α] [PseudoMetricSpace β] (f : α →ᵈ β) (h) :
@@ -227,10 +238,6 @@ protected def id (α) [PseudoEMetricSpace α] : α →ᵈ α where
 instance : Inhabited (α →ᵈ α) :=
   ⟨Dilation.id α⟩
 
-@[simp]
-protected theorem coe_id : ⇑(Dilation.id α) = id :=
-  rfl
-
 theorem ratio_id : ratio (Dilation.id α) = 1 := by
   by_cases h : ∀ x y : α, edist x y = 0 ∨ edist x y = ∞
   · rw [ratio, if_pos h]
@@ -255,7 +262,13 @@ theorem coe_comp (g : β →ᵈ γ) (f : α →ᵈ β) : (g.comp f : α → γ) 
 theorem comp_apply (g : β →ᵈ γ) (f : α →ᵈ β) (x : α) : (g.comp f : α → γ) x = g (f x) :=
   rfl
 
--- DISSOLVED: ratio_comp'
+theorem ratio_comp' {g : β →ᵈ γ} {f : α →ᵈ β}
+    (hne : ∃ x y : α, edist x y ≠ 0 ∧ edist x y ≠ ⊤) : ratio (g.comp f) = ratio g * ratio f := by
+  rcases hne with ⟨x, y, hα⟩
+  have hgf := (edist_eq (g.comp f) x y).symm
+  simp_rw [coe_comp, Function.comp, edist_eq, ← mul_assoc, ENNReal.mul_eq_mul_right hα.1 hα.2]
+    at hgf
+  rwa [← ENNReal.coe_inj, ENNReal.coe_mul]
 
 @[simp]
 theorem comp_id (f : α →ᵈ β) : f.comp (Dilation.id α) = f :=
@@ -271,12 +284,6 @@ instance : Monoid (α →ᵈ α) where
   mul_one := comp_id
   one_mul := id_comp
   mul_assoc _ _ _ := comp_assoc _ _ _
-
-theorem one_def : (1 : α →ᵈ α) = Dilation.id α :=
-  rfl
-
-theorem mul_def (f g : α →ᵈ α) : f * g = f.comp g :=
-  rfl
 
 @[simp]
 theorem coe_one : ⇑(1 : α →ᵈ α) = id :=

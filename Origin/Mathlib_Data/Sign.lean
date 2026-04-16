@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Sign.lean
-Genuine: 58 | Conflates: 1 | Dissolved: 3 | Infrastructure: 20
+Genuine: 60 | Conflates: 1 | Dissolved: 1 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Ring.Cast
 import Mathlib.Data.Fintype.BigOperators
+
+noncomputable section
 
 /-!
 # Sign function
@@ -154,7 +156,7 @@ theorem neg_one_lt_iff {a : SignType} : -1 < a ↔ 0 ≤ a := by cases a <;> dec
 
 theorem nonpos_iff {a : SignType} : a ≤ 0 ↔ a = -1 ∨ a = 0 := by cases a <;> decide
 
--- DISSOLVED: nonpos_iff_ne_one
+theorem nonpos_iff_ne_one {a : SignType} : a ≤ 0 ↔ a ≠ 1 := by cases a <;> decide
 
 theorem lt_one_iff {a : SignType} : a < 1 ↔ a ≤ 0 := by cases a <;> decide
 
@@ -222,18 +224,6 @@ lemma map_cast {α β F : Type*} [AddGroupWithOne α] [One β] [SubtractionMonoi
     [FunLike F α β] [AddMonoidHomClass F α β] [OneHomClass F α β] (f : F) (s : SignType) :
     f s = s := by
   apply map_cast' <;> simp
-
-@[simp]
-theorem coe_zero : ↑(0 : SignType) = (0 : α) :=
-  rfl
-
-@[simp]
-theorem coe_one : ↑(1 : SignType) = (1 : α) :=
-  rfl
-
-@[simp]
-theorem coe_neg_one : ↑(-1 : SignType) = (-1 : α) :=
-  rfl
 
 @[simp, norm_cast]
 lemma coe_neg {α : Type*} [One α] [SubtractionMonoid α] (s : SignType) :
@@ -331,7 +321,8 @@ theorem sign_eq_zero_iff : sign a = 0 ↔ a = 0 := by
   cases' h
   exact (le_of_not_lt h_1).eq_of_not_lt h_2
 
--- DISSOLVED: sign_ne_zero
+theorem sign_ne_zero : sign a ≠ 0 ↔ a ≠ 0 :=
+  sign_eq_zero_iff.not
 
 @[simp]
 theorem sign_nonneg_iff : 0 ≤ sign a ↔ 0 ≤ a := by

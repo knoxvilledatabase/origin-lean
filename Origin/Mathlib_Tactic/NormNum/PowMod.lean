@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.NormNum.Pow
 
+noncomputable section
+
 /-!
 # `norm_num` handling for expressions of the form `a ^ b % m`.
 

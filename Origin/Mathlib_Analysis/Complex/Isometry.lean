@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.Circle
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Basic
 
+noncomputable section
+
 /-!
 # Isometries of the Complex Plane
 

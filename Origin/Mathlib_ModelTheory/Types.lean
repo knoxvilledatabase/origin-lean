@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.ModelTheory.Satisfiability
 
+noncomputable section
+
 /-!
 # Type Spaces
 
@@ -164,9 +166,6 @@ theorem mem_typeOf {φ : L[[α]].Sentence} :
     φ ∈ T.typeOf v ↔ (Formula.equivSentence.symm φ).Realize v :=
   letI : (constantsOn α).Structure M := constantsOn.structure v
   mem_completeTheory.trans (Formula.realize_equivSentence_symm _ _ _).symm
-
-theorem formula_mem_typeOf {φ : L.Formula α} :
-    Formula.equivSentence φ ∈ T.typeOf v ↔ φ.Realize v := by simp
 
 end CompleteType
 

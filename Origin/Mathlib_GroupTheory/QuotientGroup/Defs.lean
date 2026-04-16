@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Subgroup.Ker
 import Mathlib.GroupTheory.Congruence.Hom
 import Mathlib.GroupTheory.Coset.Defs
 
+noncomputable section
+
 /-!
 # Quotients of groups by normal subgroups
 
@@ -56,14 +58,6 @@ instance Quotient.group : Group (G ⧸ N) :=
 def mk' : G →* G ⧸ N :=
   MonoidHom.mk' QuotientGroup.mk fun _ _ => rfl
 
-@[to_additive (attr := simp)]
-theorem coe_mk' : (mk' N : G → G ⧸ N) = mk :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk'_apply (x : G) : mk' N x = x :=
-  rfl
-
 @[to_additive]
 theorem mk'_surjective : Surjective <| mk' N :=
   @mk_surjective _ _ N
@@ -108,27 +102,11 @@ instance Quotient.commGroup {G : Type*} [CommGroup G] (N : Subgroup G) : CommGro
 local notation " Q " => G ⧸ N
 
 @[to_additive (attr := simp)]
-theorem mk_one : ((1 : G) : Q) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem mk_mul (a b : G) : ((a * b : G) : Q) = a * b :=
   rfl
 
 @[to_additive (attr := simp)]
-theorem mk_inv (a : G) : ((a⁻¹ : G) : Q) = (a : Q)⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem mk_div (a b : G) : ((a / b : G) : Q) = a / b :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_pow (a : G) (n : ℕ) : ((a ^ n : G) : Q) = (a : Q) ^ n :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_zpow (a : G) (n : ℤ) : ((a ^ n : G) : Q) = (a : Q) ^ n :=
   rfl
 
 @[to_additive (attr := simp)] lemma map_mk'_self : N.map (mk' N) = ⊥ := by aesop
@@ -142,19 +120,6 @@ def lift (φ : G →* M) (HN : N ≤ φ.ker) : Q →* M :=
     calc
       φ x = φ (y * (x⁻¹ * y)⁻¹) := by rw [mul_inv_rev, inv_inv, mul_inv_cancel_left]
       _ = φ y := by rw [φ.map_mul, HN (N.inv_mem h), mul_one]
-
-@[to_additive (attr := simp)]
-theorem lift_mk {φ : G →* M} (HN : N ≤ φ.ker) (g : G) : lift N φ HN (g : Q) = φ g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem lift_mk' {φ : G →* M} (HN : N ≤ φ.ker) (g : G) : lift N φ HN (mk g : Q) = φ g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem lift_quot_mk {φ : G →* M} (HN : N ≤ φ.ker) (g : G) :
-    lift N φ HN (Quot.mk _ g : Q) = φ g :=
-  rfl
 
 @[to_additive
       "An `AddGroup` homomorphism `f : G →+ H` induces a map `G/N →+ H/M` if `N ⊆ f⁻¹(M)`."]
@@ -249,27 +214,9 @@ def congr (e : G ≃* H) (he : G'.map e = H') : G ⧸ G' ≃* H ⧸ H' :=
         MulEquiv.coe_monoidHom_refl, map_id_apply] }
 
 @[simp]
-theorem congr_mk (e : G ≃* H) (he : G'.map ↑e = H') (x) : congr G' H' e he (mk x) = e x :=
-  rfl
-
-theorem congr_mk' (e : G ≃* H) (he : G'.map ↑e = H') (x) :
-    congr G' H' e he (mk' G' x) = mk' H' (e x) :=
-  rfl
-
-@[simp]
-theorem congr_apply (e : G ≃* H) (he : G'.map ↑e = H') (x : G) :
-    congr G' H' e he x = mk' H' (e x) :=
-  rfl
-
-@[simp]
 theorem congr_refl (he : G'.map (MulEquiv.refl G : G →* G) = G' := Subgroup.map_id G') :
     congr G' G' (MulEquiv.refl G) he = MulEquiv.refl (G ⧸ G') := by
   ext ⟨x⟩
-  rfl
-
-@[simp]
-theorem congr_symm (e : G ≃* H) (he : G'.map ↑e = H') :
-    (congr G' H' e he).symm = congr H' G' e.symm ((Subgroup.map_symm_eq_iff_map_eq _).mpr he) :=
   rfl
 
 end congr

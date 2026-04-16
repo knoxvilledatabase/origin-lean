@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Zorn
 import Mathlib.Order.Atoms
 
+noncomputable section
+
 /-!
 # Zorn lemma for (co)atoms
 

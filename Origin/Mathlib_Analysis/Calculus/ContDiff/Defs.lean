@@ -7,6 +7,8 @@ import Mathlib.Analysis.Analytic.Within
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Calculus.ContDiff.FTaylorSeries
 
+noncomputable section
+
 /-!
 # Higher differentiability
 

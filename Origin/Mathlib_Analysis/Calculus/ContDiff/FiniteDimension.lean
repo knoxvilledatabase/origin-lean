@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 
+noncomputable section
+
 /-!
 # Higher differentiability in finite dimensions.
 

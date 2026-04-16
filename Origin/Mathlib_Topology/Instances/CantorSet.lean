@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.GroupWithZero
 import Mathlib.Topology.Instances.Real
 
+noncomputable section
+
 /-!
 # Ternary Cantor Set
 
@@ -24,10 +26,6 @@ def preCantorSet : ℕ → Set ℝ
   | n + 1 => (· / 3) '' preCantorSet n ∪ (fun x ↦ (2 + x) / 3) '' preCantorSet n
 
 @[simp] lemma preCantorSet_zero : preCantorSet 0 = Set.Icc 0 1 := rfl
-
-@[simp] lemma preCantorSet_succ (n : ℕ) :
-    preCantorSet (n + 1) = (· / 3) '' preCantorSet n ∪ (fun x ↦ (2 + x) / 3) '' preCantorSet n :=
-  rfl
 
 def cantorSet : Set ℝ := ⋂ n, preCantorSet n
 

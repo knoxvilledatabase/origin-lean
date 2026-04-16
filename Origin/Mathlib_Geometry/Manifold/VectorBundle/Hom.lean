@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.VectorBundle.Basic
 import Mathlib.Topology.VectorBundle.Hom
 
+noncomputable section
+
 /-! # Homs of smooth vector bundles over the same base space
 
 Here we show that `Bundle.ContinuousLinearMap` is a smooth vector bundle.

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 import Mathlib.CategoryTheory.Limits.Final
 import Mathlib.CategoryTheory.Limits.Over
 
+noncomputable section
+
 /-!
 # Colimit of representables
 
@@ -144,6 +146,7 @@ noncomputable def yonedaAdjunction : L ⊣ restrictedYoneda A :=
         simp [yonedaEquiv] }
 
 include α in
+/-- Any left Kan extension along the Yoneda embedding preserves colimits. -/
 
 lemma preservesColimitsOfSize_of_isLeftKanExtension :
     PreservesColimitsOfSize.{v₃, u₃} L :=

@@ -8,6 +8,8 @@ import Mathlib.Data.Matrix.Basis
 import Mathlib.Data.Matrix.DMatrix
 import Mathlib.RingTheory.MatrixAlgebra
 
+noncomputable section
+
 /-!
 # Algebra isomorphism between matrices of polynomials and polynomials of matrices
 
@@ -229,13 +231,6 @@ theorem matPolyEquiv_coeff_apply (m : Matrix n n R[X]) (k : ℕ) (i j : n) :
     · rcases h with ⟨rfl, rfl⟩
       simp [stdBasisMatrix]
     · simp [stdBasisMatrix, h]
-
-@[simp]
-theorem matPolyEquiv_symm_apply_coeff (p : (Matrix n n R)[X]) (i j : n) (k : ℕ) :
-    coeff (matPolyEquiv.symm p i j) k = coeff p k i j := by
-  have t : p = matPolyEquiv (matPolyEquiv.symm p) := by simp
-  conv_rhs => rw [t]
-  simp only [matPolyEquiv_coeff_apply]
 
 theorem matPolyEquiv_smul_one (p : R[X]) :
     matPolyEquiv (p • (1 : Matrix n n R[X])) = p.map (algebraMap R (Matrix n n R)) := by

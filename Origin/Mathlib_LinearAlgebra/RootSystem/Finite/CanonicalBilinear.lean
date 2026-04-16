@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Algebra.Ring.SumsOfSquares
 import Mathlib.LinearAlgebra.RootSystem.Defs
 
+noncomputable section
+
 /-!
 # The canonical bilinear form on a finite root pairing
 Given a finite root pairing, we define a canonical map from weight space to coweight space, and the
@@ -75,9 +77,6 @@ def CoPolarization : N →ₗ[R] M :=
 lemma CoPolarization_apply (x : N) :
     P.CoPolarization x = ∑ i, P.root' i x • P.root i := by
   simp [CoPolarization]
-
-lemma CoPolarization_eq : P.CoPolarization = P.flip.Polarization :=
-  rfl
 
 def RootForm : LinearMap.BilinForm R M :=
   ∑ i, (P.coroot' i).smulRight (P.coroot' i)

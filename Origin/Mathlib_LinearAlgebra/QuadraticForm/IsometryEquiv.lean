@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 
+noncomputable section
+
 /-!
 # Isometric equivalences with respect to quadratic forms
 
@@ -57,10 +59,6 @@ instance : LinearEquivClass (Q₁.IsometryEquiv Q₂) R M₁ M₂ where
 
 instance : CoeOut (Q₁.IsometryEquiv Q₂) (M₁ ≃ₗ[R] M₂) :=
   ⟨IsometryEquiv.toLinearEquiv⟩
-
-@[simp]
-theorem coe_toLinearEquiv (f : Q₁.IsometryEquiv Q₂) : ⇑(f : M₁ ≃ₗ[R] M₂) = f :=
-  rfl
 
 @[simp]
 theorem map_app (f : Q₁.IsometryEquiv Q₂) (m : M₁) : Q₂ (f m) = Q₁ m :=

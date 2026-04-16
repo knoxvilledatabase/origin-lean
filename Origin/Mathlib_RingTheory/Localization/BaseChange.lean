@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Localization/BaseChange.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.IsTensorProduct
 import Mathlib.RingTheory.Localization.Module
 import Mathlib.LinearAlgebra.DirectSum.Finsupp
+
+noncomputable section
 
 /-!
 # Localized Module
@@ -74,7 +76,6 @@ noncomputable def tensorSelfAlgEquiv : A ⊗[R] A ≃ₐ[A] A :=
   lmulEquiv R A
 
 set_option linter.docPrime false in
-
 theorem bijective_linearMap_mul' : Function.Bijective (LinearMap.mul' R A) :=
   (tensorSelfAlgEquiv S A).bijective
 

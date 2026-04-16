@@ -1,12 +1,14 @@
 /-
 Extracted from Combinatorics/Additive/AP/Three/Behrend.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Combinatorics.Additive.AP.Three.Defs
 import Mathlib.Combinatorics.Pigeonhole
 import Mathlib.Data.Complex.ExponentialBounds
+
+noncomputable section
 
 /-!
 # Behrend's bound on Roth numbers
@@ -251,7 +253,11 @@ theorem bound_aux' (n d : ℕ) : ((d ^ n :) / (n * d ^ 2 :) : ℝ) ≤ rothNumbe
   let ⟨_, h⟩ := exists_large_sphere n d
   h.trans <| cast_le.2 <| card_sphere_le_rothNumberNat _ _ _
 
--- DISSOLVED: bound_aux
+theorem bound_aux (hd : d ≠ 0) (hn : 2 ≤ n) :
+    (d ^ (n - 2 :) / n : ℝ) ≤ rothNumberNat ((2 * d - 1) ^ n) := by
+  convert bound_aux' n d using 1
+  rw [cast_mul, cast_pow, mul_comm, ← div_div, pow_sub₀ _ _ hn, ← div_eq_mul_inv, cast_pow]
+  rwa [cast_ne_zero]
 
 open scoped Filter Topology
 

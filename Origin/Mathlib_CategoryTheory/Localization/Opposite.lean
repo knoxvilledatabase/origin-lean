@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Predicate
 
+noncomputable section
+
 /-!
 
 # Localization of the opposite category

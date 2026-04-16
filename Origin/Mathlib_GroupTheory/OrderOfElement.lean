@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/OrderOfElement.lean
-Genuine: 137 | Conflates: 0 | Dissolved: 11 | Infrastructure: 9
+Genuine: 149 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Group.Action
 import Mathlib.Algebra.Order.Ring.Abs
 import Mathlib.GroupTheory.Index
 import Mathlib.Order.Interval.Set.Infinite
+
+noncomputable section
 
 /-!
 # Order of an element
@@ -49,17 +51,12 @@ additive monoid to be of finite order, i.e. there exists `n ≥ 1` such that `n 
 def IsOfFinOrder (x : G) : Prop :=
   (1 : G) ∈ periodicPts (x * ·)
 
-theorem isOfFinAddOrder_ofMul_iff : IsOfFinAddOrder (Additive.ofMul x) ↔ IsOfFinOrder x :=
-  Iff.rfl
-
-theorem isOfFinOrder_ofAdd_iff {α : Type*} [AddMonoid α] {x : α} :
-    IsOfFinOrder (Multiplicative.ofAdd x) ↔ IsOfFinAddOrder x := Iff.rfl
-
 @[to_additive]
 theorem isOfFinOrder_iff_pow_eq_one : IsOfFinOrder x ↔ ∃ n, 0 < n ∧ x ^ n = 1 := by
   simp [IsOfFinOrder, mem_periodicPts, isPeriodicPt_mul_iff_pow_eq_one]
 
 @[to_additive] alias ⟨IsOfFinOrder.exists_pow_eq_one, _⟩ := isOfFinOrder_iff_pow_eq_one
+
 @[to_additive]
 lemma isOfFinOrder_iff_zpow_eq_one {G} [Group G] {x : G} :
     IsOfFinOrder x ↔ ∃ (n : ℤ), n ≠ 0 ∧ x ^ n = 1 := by
@@ -95,7 +92,11 @@ lemma IsOfFinOrder.pow {n : ℕ} : IsOfFinOrder a → IsOfFinOrder (a ^ n) := by
   rintro ⟨m, hm, ha⟩
   exact ⟨m, hm, by simp [pow_right_comm _ n, ha]⟩
 
--- DISSOLVED: IsOfFinOrder.of_pow
+@[to_additive]
+lemma IsOfFinOrder.of_pow {n : ℕ} (h : IsOfFinOrder (a ^ n)) (hn : n ≠ 0) : IsOfFinOrder a := by
+  rw [isOfFinOrder_iff_pow_eq_one] at *
+  rcases h with ⟨m, hm, ha⟩
+  exact ⟨n * m, by positivity, by rwa [pow_mul]⟩
 
 @[to_additive (attr := simp)]
 lemma isOfFinOrder_pow {n : ℕ} : IsOfFinOrder (a ^ n) ↔ IsOfFinOrder a ∨ n = 0 := by
@@ -136,14 +137,6 @@ end IsOfFinOrder
   exists. Otherwise, i.e. if `a` is of infinite order, then `addOrderOf a` is `0` by convention."]
 noncomputable def orderOf (x : G) : ℕ :=
   minimalPeriod (x * ·) 1
-
-@[simp]
-theorem addOrderOf_ofMul_eq_orderOf (x : G) : addOrderOf (Additive.ofMul x) = orderOf x :=
-  rfl
-
-@[simp]
-lemma orderOf_ofAdd_eq_addOrderOf {α : Type*} [AddMonoid α] (a : α) :
-    orderOf (Multiplicative.ofAdd a) = addOrderOf a := rfl
 
 @[to_additive]
 protected lemma IsOfFinOrder.orderOf_pos (h : IsOfFinOrder x) : 0 < orderOf x :=
@@ -190,7 +183,9 @@ theorem orderOf_pos_iff : 0 < orderOf x ↔ IsOfFinOrder x := by
 theorem IsOfFinOrder.mono [Monoid β] {y : β} (hx : IsOfFinOrder x) (h : orderOf y ∣ orderOf x) :
     IsOfFinOrder y := by rw [← orderOf_pos_iff] at hx ⊢; exact Nat.pos_of_dvd_of_pos h hx
 
--- DISSOLVED: pow_ne_one_of_lt_orderOf
+@[to_additive]
+theorem pow_ne_one_of_lt_orderOf (n0 : n ≠ 0) (h : n < orderOf x) : x ^ n ≠ 1 := fun j =>
+  not_isPeriodicPt_of_pos_of_lt_minimalPeriod n0 h ((isPeriodicPt_mul_iff_pow_eq_one x).mpr j)
 
 @[to_additive]
 theorem orderOf_le_of_pow_eq_one (hn : 0 < n) (h : x ^ n = 1) : orderOf x ≤ n :=
@@ -264,7 +259,26 @@ theorem exists_pow_eq_self_of_coprime (h : n.Coprime (orderOf x)) : ∃ m : ℕ,
   obtain ⟨m, h⟩ := exists_mul_emod_eq_one_of_coprime h (one_lt_iff_ne_zero_and_ne_one.mpr ⟨h0, h1⟩)
   exact ⟨m, by rw [← pow_mul, ← pow_mod_orderOf, h, pow_one]⟩
 
--- DISSOLVED: orderOf_eq_of_pow_and_pow_div_prime
+@[to_additive addOrderOf_eq_of_nsmul_and_div_prime_nsmul "If `n * x = 0`, but `n/p * x ≠ 0` for
+all prime factors `p` of `n`, then `x` has order `n` in `G`."]
+theorem orderOf_eq_of_pow_and_pow_div_prime (hn : 0 < n) (hx : x ^ n = 1)
+    (hd : ∀ p : ℕ, p.Prime → p ∣ n → x ^ (n / p) ≠ 1) : orderOf x = n := by
+  -- Let `a` be `n/(orderOf x)`, and show `a = 1`
+  cases' exists_eq_mul_right_of_dvd (orderOf_dvd_of_pow_eq_one hx) with a ha
+  suffices a = 1 by simp [this, ha]
+  -- Assume `a` is not one...
+  by_contra h
+  have a_min_fac_dvd_p_sub_one : a.minFac ∣ n := by
+    obtain ⟨b, hb⟩ : ∃ b : ℕ, a = b * a.minFac := exists_eq_mul_left_of_dvd a.minFac_dvd
+    rw [hb, ← mul_assoc] at ha
+    exact Dvd.intro_left (orderOf x * b) ha.symm
+  -- Use the minimum prime factor of `a` as `p`.
+  refine hd a.minFac (Nat.minFac_prime h) a_min_fac_dvd_p_sub_one ?_
+  rw [← orderOf_dvd_iff_pow_eq_one, Nat.dvd_div_iff_mul_dvd a_min_fac_dvd_p_sub_one, ha, mul_comm,
+    Nat.mul_dvd_mul_iff_left (IsOfFinOrder.orderOf_pos _)]
+  · exact Nat.minFac_dvd a
+  · rw [isOfFinOrder_iff_pow_eq_one]
+    exact Exists.intro n (id ⟨hn, hx⟩)
 
 @[to_additive]
 theorem orderOf_eq_orderOf_iff {H : Type*} [Monoid H] {y : H} :
@@ -294,9 +308,8 @@ theorem orderOf_submonoid {H : Submonoid G} (y : H) : orderOf (y : G) = orderOf 
 theorem orderOf_units {y : Gˣ} : orderOf (y : G) = orderOf y :=
   orderOf_injective (Units.coeHom G) Units.ext y
 
-noncomputable
-
 @[simps]
+noncomputable
 def IsOfFinOrder.unit {M} [Monoid M] {x : M} (hx : IsOfFinOrder x) : Mˣ :=
 
 ⟨x, x ^ (orderOf x - 1),
@@ -309,11 +322,20 @@ lemma IsOfFinOrder.isUnit {M} [Monoid M] {x : M} (hx : IsOfFinOrder x) : IsUnit 
 
 variable (x)
 
--- DISSOLVED: orderOf_pow'
+@[to_additive]
+theorem orderOf_pow' (h : n ≠ 0) : orderOf (x ^ n) = orderOf x / gcd (orderOf x) n := by
+  unfold orderOf
+  rw [← minimalPeriod_iterate_eq_div_gcd h, mul_left_iterate]
 
--- DISSOLVED: orderOf_pow_of_dvd
+@[to_additive]
+lemma orderOf_pow_of_dvd {x : G} {n : ℕ} (hn : n ≠ 0) (dvd : n ∣ orderOf x) :
+    orderOf (x ^ n) = orderOf x / n := by rw [orderOf_pow' _ hn, Nat.gcd_eq_right dvd]
 
--- DISSOLVED: orderOf_pow_orderOf_div
+@[to_additive]
+lemma orderOf_pow_orderOf_div {x : G} {n : ℕ} (hx : orderOf x ≠ 0) (hn : n ∣ orderOf x) :
+    orderOf (x ^ (orderOf x / n)) = n := by
+  rw [orderOf_pow_of_dvd _ (Nat.div_dvd_of_dvd hn), Nat.div_div_self hn hx]
+  rw [← Nat.div_mul_cancel hn] at hx; exact left_ne_zero_of_mul hx
 
 variable (n)
 
@@ -513,6 +535,7 @@ theorem isOfFinOrder_inv_iff {x : G} : IsOfFinOrder x⁻¹ ↔ IsOfFinOrder x :=
   simp [isOfFinOrder_iff_pow_eq_one]
 
 @[to_additive] alias ⟨IsOfFinOrder.of_inv, IsOfFinOrder.inv⟩ := isOfFinOrder_inv_iff
+
 @[to_additive]
 theorem orderOf_dvd_iff_zpow_eq_one : (orderOf x : ℤ) ∣ i ↔ x ^ i = 1 := by
   rcases Int.eq_nat_or_neg i with ⟨i, rfl | rfl⟩
@@ -606,12 +629,6 @@ noncomputable def finEquivZPowers (x : G) (hx : IsOfFinOrder x) :
   (finEquivPowers x hx).trans <| Equiv.Set.ofEq hx.powers_eq_zpowers
 
 @[to_additive (attr := simp, nolint simpNF)]
-lemma finEquivZPowers_apply (hx) {n : Fin (orderOf x)} :
-    finEquivZPowers x hx n = ⟨x ^ (n : ℕ), n, zpow_natCast x n⟩ := rfl
-
- -- This lemma has always been bad, but the linter only noticed after https://github.com/leanprover/lean4/pull/2644.
-
-@[to_additive (attr := simp, nolint simpNF)]
 lemma finEquivZPowers_symm_apply (x : G) (hx) (n : ℕ) :
     (finEquivZPowers x hx).symm ⟨x ^ n, ⟨n, by simp⟩⟩ =
     ⟨n % orderOf x, Nat.mod_lt _ hx.orderOf_pos⟩ := by
@@ -633,7 +650,30 @@ section FiniteMonoid
 
 variable [Monoid G] {x : G} {n : ℕ}
 
--- DISSOLVED: sum_card_orderOf_eq_card_pow_eq_one
+@[to_additive]
+theorem sum_card_orderOf_eq_card_pow_eq_one [Fintype G] [DecidableEq G] (hn : n ≠ 0) :
+    (∑ m ∈ (Finset.range n.succ).filter (· ∣ n),
+        (Finset.univ.filter fun x : G => orderOf x = m).card) =
+      (Finset.univ.filter fun x : G => x ^ n = 1).card :=
+  calc
+    (∑ m ∈ (Finset.range n.succ).filter (· ∣ n),
+          (Finset.univ.filter fun x : G => orderOf x = m).card) = _ :=
+      (Finset.card_biUnion
+          (by
+            intros
+            apply Finset.disjoint_filter.2
+            rintro _ _ rfl; assumption)).symm
+    _ = _ :=
+      congr_arg Finset.card
+        (Finset.ext
+          (by
+            intro x
+            suffices orderOf x ≤ n ∧ orderOf x ∣ n ↔ x ^ n = 1 by simpa [Nat.lt_succ_iff]
+            exact
+              ⟨fun h => by
+                let ⟨m, hm⟩ := h.2
+                rw [hm, pow_mul, pow_orderOf_eq_one, one_pow], fun h =>
+                ⟨orderOf_le_of_pow_eq_one hn.bot_lt h, orderOf_dvd_of_pow_eq_one h⟩⟩))
 
 @[to_additive]
 theorem orderOf_le_card_univ [Fintype G] : orderOf x ≤ Fintype.card G :=
@@ -718,7 +758,12 @@ section Finite
 
 variable [Finite G]
 
--- DISSOLVED: exists_zpow_eq_one
+@[to_additive]
+theorem exists_zpow_eq_one (x : G) : ∃ (i : ℤ) (_ : i ≠ 0), x ^ (i : ℤ) = 1 := by
+  obtain ⟨w, hw1, hw2⟩ := isOfFinOrder_of_finite x
+  refine ⟨w, Int.natCast_ne_zero.mpr (_root_.ne_of_gt hw1), ?_⟩
+  rw [zpow_natCast]
+  exact (isPeriodicPt_mul_iff_pow_eq_one _).mp hw2
 
 @[to_additive]
 lemma mem_powers_iff_mem_zpowers : y ∈ powers x ↔ y ∈ zpowers x :=
@@ -758,7 +803,11 @@ theorem Fintype.card_zpowers : Fintype.card (zpowers x) = orderOf x :=
   (Fintype.card_eq.2 ⟨finEquivZPowers x <| isOfFinOrder_of_finite _⟩).symm.trans <|
     Fintype.card_fin (orderOf x)
 
--- DISSOLVED: card_zpowers_le
+@[to_additive]
+theorem card_zpowers_le (a : G) {k : ℕ} (k_pos : k ≠ 0)
+    (ha : a ^ k = 1) : Fintype.card (Subgroup.zpowers a) ≤ k := by
+  rw [Fintype.card_zpowers]
+  apply orderOf_le_of_pow_eq_one k_pos.bot_lt ha
 
 open QuotientGroup
 
@@ -964,7 +1013,13 @@ protected lemma IsOfFinOrder.eq_neg_one (ha₀ : a ≤ 0) (ha : IsOfFinOrder a) 
   (sq_eq_one_iff.1 <| ha.pow.eq_one <| sq_nonneg a).resolve_left <| by
     rintro rfl; exact one_pos.not_le ha₀
 
--- DISSOLVED: orderOf_abs_ne_one
+theorem orderOf_abs_ne_one (h : |x| ≠ 1) : orderOf x = 0 := by
+  rw [orderOf_eq_zero_iff']
+  intro n hn hx
+  replace hx : |x| ^ n = 1 := by simpa only [abs_one, abs_pow] using congr_arg abs hx
+  cases' h.lt_or_lt with h h
+  · exact ((pow_lt_one₀ (abs_nonneg x) h hn.ne').ne hx).elim
+  · exact ((one_lt_pow₀ h hn.ne').ne' hx).elim
 
 theorem LinearOrderedRing.orderOf_le_two : orderOf x ≤ 2 := by
   cases' ne_or_eq |x| 1 with h h
@@ -992,8 +1047,6 @@ alias add_orderOf_fst_dvd_add_orderOf := addOrderOf_fst_dvd_addOrderOf
 @[to_additive]
 theorem orderOf_snd_dvd_orderOf : orderOf x.2 ∣ orderOf x :=
   minimalPeriod_snd_dvd
-
-add_orderOf_snd_dvd_add_orderOf := addOrderOf_snd_dvd_addOrderOf
 
 @[to_additive]
 theorem IsOfFinOrder.fst {x : α × β} (hx : IsOfFinOrder x) : IsOfFinOrder x.1 :=
@@ -1028,7 +1081,18 @@ variable [Fintype R]
 
 variable {R} in
 
--- DISSOLVED: charP_of_ne_zero
+lemma charP_of_ne_zero (hn : card R = p) (hR : ∀ i < p, (i : R) = 0 → i = 0) : CharP R p where
+  cast_eq_zero_iff' n := by
+    have H : (p : R) = 0 := by rw [← hn, Nat.cast_card_eq_zero]
+    constructor
+    · intro h
+      rw [← Nat.mod_add_div n p, Nat.cast_add, Nat.cast_mul, H, zero_mul, add_zero] at h
+      rw [Nat.dvd_iff_mod_eq_zero]
+      apply hR _ (Nat.mod_lt _ _) h
+      rw [← hn, gt_iff_lt, Fintype.card_pos_iff]
+      exact ⟨0⟩
+    · rintro ⟨n, rfl⟩
+      rw [Nat.cast_mul, H, zero_mul]
 
 end NonAssocRing
 

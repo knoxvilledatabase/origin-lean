@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.ShortComplex.Exact
 import Mathlib.Algebra.Homology.ShortComplex.Preadditive
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # The short complexes attached to homological complexes
 

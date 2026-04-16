@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Coherence.Normalize
 import Mathlib.Tactic.CategoryTheory.Bicategory.Datatypes
 
+noncomputable section
+
 /-!
 # Normalization of 2-morphisms in bicategories
 

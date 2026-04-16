@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Localization.Module
 import Mathlib.RingTheory.Norm.Basic
 import Mathlib.RingTheory.Discriminant
 
+noncomputable section
+
 /-!
 
 # Field/algebra norm / trace and localization

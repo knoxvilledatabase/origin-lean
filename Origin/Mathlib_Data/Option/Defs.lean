@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Lemma
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Extra definitions on `Option`
 
@@ -28,17 +30,9 @@ protected def elim' (b : β) (f : α → β) : Option α → β
   | some a => f a
   | none => b
 
-@[simp]
-theorem elim'_none (b : β) (f : α → β) : Option.elim' b f none = b := rfl
-
-@[simp]
-theorem elim'_some {a : α} (b : β) (f : α → β) : Option.elim' b f (some a) = f a := rfl
-
 lemma elim'_eq_elim {α β : Type*} (b : β) (f : α → β) (a : Option α) :
     Option.elim' b f a = Option.elim a b f := by
   cases a <;> rfl
-
-theorem mem_some_iff {α : Type*} {a b : α} : a ∈ some b ↔ b = a := by simp
 
 @[inline]
 def decidableEqNone {o : Option α} : Decidable (o = none) :=
@@ -59,9 +53,6 @@ instance decidableExistsMem {p : α → Prop} [DecidablePred p] :
 abbrev iget [Inhabited α] : Option α → α
   | some x => x
   | none => default
-
-theorem iget_some [Inhabited α] {a : α} : (some a).iget = a :=
-  rfl
 
 instance liftOrGet_isCommutative (f : α → α → α) [Std.Commutative f] :
     Std.Commutative (liftOrGet f) :=

@@ -12,6 +12,8 @@ import Mathlib.SetTheory.Game.Birthday
 import Mathlib.SetTheory.Surreal.Multiplication
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # Dyadic numbers
 Dyadic numbers are obtained by localizing ℤ away from 2. They are the initial object in the category
@@ -44,18 +46,8 @@ theorem powHalf_zero : powHalf 0 = 1 :=
 
 theorem powHalf_leftMoves (n) : (powHalf n).LeftMoves = PUnit := by cases n <;> rfl
 
-theorem powHalf_zero_rightMoves : (powHalf 0).RightMoves = PEmpty :=
-  rfl
-
-theorem powHalf_succ_rightMoves (n) : (powHalf (n + 1)).RightMoves = PUnit :=
-  rfl
-
 @[simp]
 theorem powHalf_moveLeft (n i) : (powHalf n).moveLeft i = 0 := by cases n <;> cases i <;> rfl
-
-@[simp]
-theorem powHalf_succ_moveRight (n i) : (powHalf (n + 1)).moveRight i = powHalf n :=
-  rfl
 
 instance uniquePowHalfLeftMoves (n) : Unique (powHalf n).LeftMoves := by
   cases n <;> exact PUnit.unique

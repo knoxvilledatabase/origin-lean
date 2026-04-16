@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Cast.Order.Field
 import Mathlib.Order.Partition.Equipartition
 import Mathlib.SetTheory.Cardinal.Basic
 
+noncomputable section
+
 /-!
 # Graph uniformity and uniform partitions
 

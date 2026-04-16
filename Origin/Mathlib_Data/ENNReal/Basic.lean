@@ -1,11 +1,13 @@
 /-
 Extracted from Data/ENNReal/Basic.lean
-Genuine: 119 | Conflates: 0 | Dissolved: 8 | Infrastructure: 53
+Genuine: 127 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.WithTop
 import Mathlib.Algebra.Order.Sub.WithTop
 import Mathlib.Data.NNReal.Defs
+
+noncomputable section
 
 /-!
 # Extended non-negative reals
@@ -158,12 +160,6 @@ def recTopCoe {C : ℝ≥0∞ → Sort*} (top : C ∞) (coe : ∀ x : ℝ≥0, C
 
 instance canLift : CanLift ℝ≥0∞ ℝ≥0 ofNNReal (· ≠ ∞) := WithTop.canLift
 
-@[simp] theorem none_eq_top : (none : ℝ≥0∞) = ∞ := rfl
-
-@[simp] theorem some_eq_coe (a : ℝ≥0) : (Option.some a : ℝ≥0∞) = (↑a : ℝ≥0∞) := rfl
-
-@[simp] theorem some_eq_coe' (a : ℝ≥0) : (WithTop.some a : ℝ≥0∞) = (↑a : ℝ≥0∞) := rfl
-
 lemma coe_injective : Injective ((↑) : ℝ≥0 → ℝ≥0∞) := WithTop.coe_injective
 
 @[simp, norm_cast] lemma coe_inj : (p : ℝ≥0∞) = q ↔ p = q := coe_injective.eq_iff
@@ -195,8 +191,6 @@ theorem ofReal_toReal {a : ℝ≥0∞} (h : a ≠ ∞) : ENNReal.ofReal a.toReal
 theorem toReal_ofReal {r : ℝ} (h : 0 ≤ r) : (ENNReal.ofReal r).toReal = r :=
   max_eq_left h
 
-theorem toReal_ofReal' {r : ℝ} : (ENNReal.ofReal r).toReal = max r 0 := rfl
-
 theorem coe_toNNReal_le_self : ∀ {a : ℝ≥0∞}, ↑a.toNNReal ≤ a
   | ofNNReal r => by rw [toNNReal_coe]
   | ⊤ => le_top
@@ -207,8 +201,6 @@ theorem coe_nnreal_eq (r : ℝ≥0) : (r : ℝ≥0∞) = ENNReal.ofReal r := by
 theorem ofReal_eq_coe_nnreal {x : ℝ} (h : 0 ≤ x) :
     ENNReal.ofReal x = ofNNReal ⟨x, h⟩ :=
   (coe_nnreal_eq ⟨x, h⟩).symm
-
-theorem ofNNReal_toNNReal (x : ℝ) : (Real.toNNReal x : ℝ≥0∞) = ENNReal.ofReal x := rfl
 
 @[simp] theorem ofReal_coe_nnreal : ENNReal.ofReal p = p := (coe_nnreal_eq p).symm
 
@@ -222,20 +214,6 @@ theorem ofNNReal_toNNReal (x : ℝ) : (Real.toNNReal x : ℝ≥0∞) = ENNReal.o
 
 @[simp] theorem toNNReal_toReal_eq (z : ℝ≥0∞) : z.toReal.toNNReal = z.toNNReal := by
   ext; simp [coe_toNNReal_eq_toReal]
-
-@[simp] theorem top_toNNReal : ∞.toNNReal = 0 := rfl
-
-@[simp] theorem top_toReal : ∞.toReal = 0 := rfl
-
-@[simp] theorem one_toReal : (1 : ℝ≥0∞).toReal = 1 := rfl
-
-@[simp] theorem one_toNNReal : (1 : ℝ≥0∞).toNNReal = 1 := rfl
-
-@[simp] theorem coe_toReal (r : ℝ≥0) : (r : ℝ≥0∞).toReal = r := rfl
-
-@[simp] theorem zero_toNNReal : (0 : ℝ≥0∞).toNNReal = 0 := rfl
-
-@[simp] theorem zero_toReal : (0 : ℝ≥0∞).toReal = 0 := rfl
 
 @[simp] theorem ofReal_zero : ENNReal.ofReal (0 : ℝ) = 0 := by simp [ENNReal.ofReal]
 
@@ -259,9 +237,11 @@ theorem toNNReal_eq_zero_iff (x : ℝ≥0∞) : x.toNNReal = 0 ↔ x = 0 ∨ x =
 theorem toReal_eq_zero_iff (x : ℝ≥0∞) : x.toReal = 0 ↔ x = 0 ∨ x = ∞ := by
   simp [ENNReal.toReal, toNNReal_eq_zero_iff]
 
--- DISSOLVED: toNNReal_ne_zero
+theorem toNNReal_ne_zero : a.toNNReal ≠ 0 ↔ a ≠ 0 ∧ a ≠ ∞ :=
+  a.toNNReal_eq_zero_iff.not.trans not_or
 
--- DISSOLVED: toReal_ne_zero
+theorem toReal_ne_zero : a.toReal ≠ 0 ↔ a ≠ 0 ∧ a ≠ ∞ :=
+  a.toReal_eq_zero_iff.not.trans not_or
 
 theorem toNNReal_eq_one_iff (x : ℝ≥0∞) : x.toNNReal = 1 ↔ x = 1 :=
   WithTop.untop'_eq_iff.trans <| by simp
@@ -269,9 +249,11 @@ theorem toNNReal_eq_one_iff (x : ℝ≥0∞) : x.toNNReal = 1 ↔ x = 1 :=
 theorem toReal_eq_one_iff (x : ℝ≥0∞) : x.toReal = 1 ↔ x = 1 := by
   rw [ENNReal.toReal, NNReal.coe_eq_one, ENNReal.toNNReal_eq_one_iff]
 
--- DISSOLVED: toNNReal_ne_one
+theorem toNNReal_ne_one : a.toNNReal ≠ 1 ↔ a ≠ 1 :=
+  a.toNNReal_eq_one_iff.not
 
--- DISSOLVED: toReal_ne_one
+theorem toReal_ne_one : a.toReal ≠ 1 ↔ a ≠ 1 :=
+  a.toReal_eq_one_iff.not
 
 @[simp, aesop (rule_sets := [finiteness]) safe apply]
 theorem coe_ne_top : (r : ℝ≥0∞) ≠ ∞ := WithTop.coe_ne_top
@@ -301,11 +283,11 @@ theorem toReal_ofReal_eq_iff {a : ℝ} : (ENNReal.ofReal a).toReal = a ↔ 0 ≤
 
 @[simp, aesop (rule_sets := [finiteness]) safe apply] theorem zero_ne_top : 0 ≠ ∞ := coe_ne_top
 
--- DISSOLVED: top_ne_zero
+@[simp] theorem top_ne_zero : ∞ ≠ 0 := top_ne_coe
 
 @[simp, aesop (rule_sets := [finiteness]) safe apply] theorem one_ne_top : 1 ≠ ∞ := coe_ne_top
 
--- DISSOLVED: top_ne_one
+@[simp] theorem top_ne_one : ∞ ≠ 1 := top_ne_coe
 
 @[simp] theorem zero_lt_top : 0 < ∞ := coe_lt_top
 
@@ -335,23 +317,13 @@ theorem coe_strictMono : StrictMono ofNNReal := fun _ _ => coe_lt_coe.2
 
 @[simp, norm_cast] theorem coe_pos : 0 < (r : ℝ≥0∞) ↔ 0 < r := coe_lt_coe
 
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero : (r : ℝ≥0∞) ≠ 0 ↔ r ≠ 0 := coe_eq_zero.not
 
--- DISSOLVED: coe_ne_one
+lemma coe_ne_one : (r : ℝ≥0∞) ≠ 1 ↔ r ≠ 1 := coe_eq_one.not
 
 @[simp, norm_cast] lemma coe_add (x y : ℝ≥0) : (↑(x + y) : ℝ≥0∞) = x + y := rfl
 
 @[simp, norm_cast] lemma coe_mul (x y : ℝ≥0) : (↑(x * y) : ℝ≥0∞) = x * y := rfl
-
-@[norm_cast] lemma coe_nsmul (n : ℕ) (x : ℝ≥0) : (↑(n • x) : ℝ≥0∞) = n • x := rfl
-
-@[simp, norm_cast] lemma coe_pow (x : ℝ≥0) (n : ℕ) : (↑(x ^ n) : ℝ≥0∞) = x ^ n := rfl
-
-@[simp, norm_cast]
-theorem coe_ofNat (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n) : ℝ≥0) : ℝ≥0∞) = OfNat.ofNat n := rfl
-
-theorem coe_two : ((2 : ℝ≥0) : ℝ≥0∞) = 2 := rfl
 
 theorem toNNReal_eq_toNNReal_iff (x y : ℝ≥0∞) :
     x.toNNReal = y.toNNReal ↔ x = y ∨ x = 0 ∧ y = ⊤ ∨ x = ⊤ ∧ y = 0 :=
@@ -418,11 +390,7 @@ def ofNNRealHom : ℝ≥0 →+* ℝ≥0∞ where
   map_zero' := coe_zero
   map_add' _ _ := coe_add _ _
 
-@[simp] theorem coe_ofNNRealHom : ⇑ofNNRealHom = some := rfl
-
 section Order
-
-theorem bot_eq_zero : (⊥ : ℝ≥0∞) = 0 := rfl
 
 theorem not_top_le_coe : ¬∞ ≤ ↑r := WithTop.not_top_le_coe r
 
@@ -569,12 +537,6 @@ theorem iInter_Ici_coe_nat : ⋂ n : ℕ, Ici (n : ℝ≥0∞) = {∞} := by
 @[simp]
 theorem iInter_Ioi_coe_nat : ⋂ n : ℕ, Ioi (n : ℝ≥0∞) = {∞} := by
   simp only [← compl_Iic, ← compl_iUnion, iUnion_Iic_coe_nat, compl_compl]
-
-@[simp, norm_cast]
-theorem coe_min (r p : ℝ≥0) : ((min r p : ℝ≥0) : ℝ≥0∞) = min (r : ℝ≥0∞) p := rfl
-
-@[simp, norm_cast]
-theorem coe_max (r p : ℝ≥0) : ((max r p : ℝ≥0) : ℝ≥0∞) = max (r : ℝ≥0∞) p := rfl
 
 theorem le_of_top_imp_top_of_toNNReal_le {a b : ℝ≥0∞} (h : a = ⊤ → b = ⊤)
     (h_nnreal : a ≠ ⊤ → b ≠ ⊤ → a.toNNReal ≤ b.toNNReal) : a ≤ b := by

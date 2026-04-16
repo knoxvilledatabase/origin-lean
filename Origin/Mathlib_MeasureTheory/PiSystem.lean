@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Encodable.Lattice
 import Mathlib.MeasureTheory.MeasurableSpace.Defs
 
+noncomputable section
+
 /-!
 # Induction principles for measurable sets, related to π-systems and λ-systems.
 
@@ -270,39 +272,6 @@ theorem mem_generatePiSystem_iUnion_elim {α β} {g : β → Set (Set α)} (h_pi
     · rw [Finset.mem_union] at h_b
       apply False.elim (h_b.elim hbs hbt)
 
-theorem mem_generatePiSystem_iUnion_elim' {α β} {g : β → Set (Set α)} {s : Set β}
-    (h_pi : ∀ b ∈ s, IsPiSystem (g b)) (t : Set α) (h_t : t ∈ generatePiSystem (⋃ b ∈ s, g b)) :
-    ∃ (T : Finset β) (f : β → Set α), ↑T ⊆ s ∧ (t = ⋂ b ∈ T, f b) ∧ ∀ b ∈ T, f b ∈ g b := by
-  classical
-  have : t ∈ generatePiSystem (⋃ b : Subtype s, (g ∘ Subtype.val) b) := by
-    suffices h1 : ⋃ b : Subtype s, (g ∘ Subtype.val) b = ⋃ b ∈ s, g b by rwa [h1]
-    ext x
-    simp only [exists_prop, Set.mem_iUnion, Function.comp_apply, Subtype.exists, Subtype.coe_mk]
-    rfl
-  rcases @mem_generatePiSystem_iUnion_elim α (Subtype s) (g ∘ Subtype.val)
-      (fun b => h_pi b.val b.property) t this with
-    ⟨T, ⟨f, ⟨rfl, h_t'⟩⟩⟩
-  refine
-    ⟨T.image (fun x : s => (x : β)),
-      Function.extend (fun x : s => (x : β)) f fun _ : β => (∅ : Set α), by simp, ?_, ?_⟩
-  · ext a
-    constructor <;>
-      · simp (config := { proj := false }) only
-          [Set.mem_iInter, Subtype.forall, Finset.set_biInter_finset_image]
-        intro h1 b h_b h_b_in_T
-        have h2 := h1 b h_b h_b_in_T
-        revert h2
-        rw [Subtype.val_injective.extend_apply]
-        apply id
-  · intros b h_b
-    simp_rw [Finset.mem_image, Subtype.exists, exists_and_right, exists_eq_right]
-      at h_b
-    cases' h_b with h_b_w h_b_h
-    have h_b_alt : b = (Subtype.mk b h_b_w).val := rfl
-    rw [h_b_alt, Subtype.val_injective.extend_apply]
-    apply h_t'
-    apply h_b_h
-
 section UnionInter
 
 variable {α ι : Type*}
@@ -553,9 +522,6 @@ def generate (s : Set (Set α)) : DynkinSystem α where
   has_empty := GenerateHas.empty
   has_compl {_} := GenerateHas.compl
   has_iUnion_nat {_} := GenerateHas.iUnion
-
-theorem generateHas_def {C : Set (Set α)} : (generate C).Has = GenerateHas C :=
-  rfl
 
 instance : Inhabited (DynkinSystem α) :=
   ⟨generate univ⟩

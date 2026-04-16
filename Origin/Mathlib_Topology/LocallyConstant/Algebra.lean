@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Pi
 import Mathlib.LinearAlgebra.Pi
 import Mathlib.Topology.LocallyConstant.Basic
 
+noncomputable section
+
 /-!
 # Algebraic structure on locally constant functions
 
@@ -22,36 +24,12 @@ variable {X Y : Type*} [TopologicalSpace X]
 @[to_additive]
 instance [One Y] : One (LocallyConstant X Y) where one := const X 1
 
-@[to_additive (attr := simp)]
-theorem coe_one [One Y] : ⇑(1 : LocallyConstant X Y) = (1 : X → Y) :=
-  rfl
-
-@[to_additive]
-theorem one_apply [One Y] (x : X) : (1 : LocallyConstant X Y) x = 1 :=
-  rfl
-
 @[to_additive]
 instance [Inv Y] : Inv (LocallyConstant X Y) where inv f := ⟨f⁻¹, f.isLocallyConstant.inv⟩
-
-@[to_additive (attr := simp)]
-theorem coe_inv [Inv Y] (f : LocallyConstant X Y) : ⇑(f⁻¹ : LocallyConstant X Y) = (f : X → Y)⁻¹ :=
-  rfl
-
-@[to_additive]
-theorem inv_apply [Inv Y] (f : LocallyConstant X Y) (x : X) : f⁻¹ x = (f x)⁻¹ :=
-  rfl
 
 @[to_additive]
 instance [Mul Y] : Mul (LocallyConstant X Y) where
   mul f g := ⟨f * g, f.isLocallyConstant.mul g.isLocallyConstant⟩
-
-@[to_additive (attr := simp)]
-theorem coe_mul [Mul Y] (f g : LocallyConstant X Y) : ⇑(f * g) = f * g :=
-  rfl
-
-@[to_additive]
-theorem mul_apply [Mul Y] (f g : LocallyConstant X Y) (x : X) : (f * g) x = f x * g x :=
-  rfl
 
 @[to_additive]
 instance [MulOneClass Y] : MulOneClass (LocallyConstant X Y) :=
@@ -82,9 +60,6 @@ variable (Y) [MulZeroOneClass Y] {U V : Set X}
 noncomputable def charFn (hU : IsClopen U) : LocallyConstant X Y :=
   indicator 1 hU
 
-theorem coe_charFn (hU : IsClopen U) : (charFn Y hU : X → Y) = Set.indicator U 1 :=
-  rfl
-
 -- CONFLATES (assumes ground = zero): charFn_eq_one
 theorem charFn_eq_one [Nontrivial Y] (x : X) (hU : IsClopen U) : charFn Y hU x = (1 : Y) ↔ x ∈ U :=
   Set.indicator_eq_one_iff_mem _
@@ -105,14 +80,6 @@ instance [Div Y] : Div (LocallyConstant X Y) where
   div f g := ⟨f / g, f.isLocallyConstant.div g.isLocallyConstant⟩
 
 @[to_additive]
-theorem coe_div [Div Y] (f g : LocallyConstant X Y) : ⇑(f / g) = f / g :=
-  rfl
-
-@[to_additive]
-theorem div_apply [Div Y] (f g : LocallyConstant X Y) (x : X) : (f / g) x = f x / g x :=
-  rfl
-
-@[to_additive]
 instance [Semigroup Y] : Semigroup (LocallyConstant X Y) :=
   Function.Injective.semigroup DFunLike.coe DFunLike.coe_injective' fun _ _ => rfl
 
@@ -128,14 +95,6 @@ variable {α R : Type*}
 @[to_additive]
 instance smul [SMul α Y] : SMul α (LocallyConstant X Y) where
   smul n f := f.map (n • ·)
-
-@[to_additive (attr := simp)]
-theorem coe_smul [SMul R Y] (r : R) (f : LocallyConstant X Y) : ⇑(r • f) = r • (f : X → Y) :=
-  rfl
-
-@[to_additive]
-theorem smul_apply [SMul R Y] (r : R) (f : LocallyConstant X Y) (x : X) : (r • f) x = r • f x :=
-  rfl
 
 @[to_additive existing LocallyConstant.smul]
 instance [Pow Y α] : Pow (LocallyConstant X Y) α where
@@ -254,10 +213,6 @@ instance : Algebra R (LocallyConstant X Y) where
     intros
     ext
     exact Algebra.smul_def' _ _
-
-@[simp]
-theorem coe_algebraMap (r : R) : ⇑(algebraMap R (LocallyConstant X Y) r) = algebraMap R (X → Y) r :=
-  rfl
 
 end Algebra
 
@@ -409,19 +364,6 @@ def congrRightₐ (R : Type*) [CommSemiring R] [Semiring Y] [Algebra R Y] [Semir
 end Map
 
 section Const
-
-@[simps!]
-def constₗ (R : Type*) [Semiring R] [AddCommMonoid Y] [Module R Y] :
-    Y →ₗ[R] LocallyConstant X Y where
-  toFun := const X
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-@[simps!]
-def constₐ (R : Type*) [CommSemiring R] [Semiring Y] [Algebra R Y] :
-    Y →ₐ[R] LocallyConstant X Y where
-  toRingHom := constRingHom
-  commutes' _ := rfl
 
 end Const
 

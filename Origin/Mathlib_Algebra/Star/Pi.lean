@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Star.Basic
 import Mathlib.Algebra.Ring.Pi
 
+noncomputable section
+
 /-!
 # `star` on pi types
 
@@ -25,9 +27,6 @@ instance [∀ i, Star (f i)] : Star (∀ i, f i) where star x i := star (x i)
 
 @[simp]
 theorem star_apply [∀ i, Star (f i)] (x : ∀ i, f i) (i : I) : star x i = star (x i) :=
-  rfl
-
-theorem star_def [∀ i, Star (f i)] (x : ∀ i, f i) : star x = fun i => star (x i) :=
   rfl
 
 instance [∀ i, Star (f i)] [∀ i, TrivialStar (f i)] : TrivialStar (∀ i, f i) where
@@ -54,10 +53,6 @@ theorem single_star [∀ i, AddMonoid (f i)] [∀ i, StarAddMonoid (f i)] [Decid
   single_op (fun i => @star (f i) _) (fun _ => star_zero _) i a
 
 open scoped ComplexConjugate
-
-@[simp]
-lemma conj_apply {ι : Type*} {α : ι → Type*} [∀ i, CommSemiring (α i)] [∀ i, StarRing (α i)]
-    (f : ∀ i, α i) (i : ι) : conj f i = conj (f i) := rfl
 
 end Pi
 

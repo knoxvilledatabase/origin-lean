@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.CategoryTheory.FiberedCategory.Cartesian
 
+noncomputable section
+
 /-!
 
 # Fibered categories

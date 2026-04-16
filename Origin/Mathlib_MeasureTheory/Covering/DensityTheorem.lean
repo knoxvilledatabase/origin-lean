@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Measure.Doubling
 import Mathlib.MeasureTheory.Covering.Vitali
 import Mathlib.MeasureTheory.Covering.Differentiation
 
+noncomputable section
+
 /-!
 # Uniformly locally doubling measures and Lebesgue's density theorem
 

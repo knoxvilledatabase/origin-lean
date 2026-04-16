@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.RepresentationTheory.Rep
 import Mathlib.RingTheory.TensorProduct.Free
 
+noncomputable section
+
 /-!
 # The structure of the `k[G]`-module `k[Gⁿ]`
 

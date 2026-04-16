@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Matrix/PosDef.lean
-Genuine: 59 | Conflates: 4 | Dissolved: 2 | Infrastructure: 0
+Genuine: 59 | Conflates: 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Spectrum
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
+
+noncomputable section
 
 /-! # Positive Definite Matrices
 
@@ -209,7 +211,6 @@ lemma sq_sqrt : hA.sqrt ^ 2 = A := by
 lemma sqrt_mul_self : hA.sqrt * hA.sqrt = A := by rw [← pow_two, sq_sqrt]
 
 include hA in
-
 lemma eq_of_sq_eq_sq {B : Matrix n n 𝕜} (hB : PosSemidef B) (hAB : A ^ 2 = B ^ 2) : A = B := by
   /- This is deceptively hard, much more difficult than the positive *definite* case. We follow a
   clever proof due to Koeber and Schäfer. The idea is that if `A ≠ B`, then `A - B` has a nonzero
@@ -250,7 +251,6 @@ lemma sqrt_sq : (hA.pow 2 : PosSemidef (A ^ 2)).sqrt = A :=
   (hA.pow 2).posSemidef_sqrt.eq_of_sq_eq_sq hA (hA.pow 2).sq_sqrt
 
 include hA in
-
 lemma eq_sqrt_of_sq_eq {B : Matrix n n 𝕜} (hB : PosSemidef B) (hAB : A ^ 2 = B) : A = hB.sqrt := by
   subst B
   rw [hA.sqrt_sq]
@@ -324,7 +324,9 @@ namespace PosDef
 theorem isHermitian {M : Matrix n n R} (hM : M.PosDef) : M.IsHermitian :=
   hM.1
 
--- DISSOLVED: re_dotProduct_pos
+theorem re_dotProduct_pos {M : Matrix n n 𝕜} (hM : M.PosDef) {x : n → 𝕜} (hx : x ≠ 0) :
+    0 < RCLike.re (dotProduct (star x) (M *ᵥ x)) :=
+  RCLike.pos_iff.mp (hM.2 _ hx) |>.1
 
 theorem posSemidef {M : Matrix n n R} (hM : M.PosDef) : M.PosSemidef := by
   refine ⟨hM.1, ?_⟩
@@ -365,7 +367,13 @@ protected theorem one [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R] :
     PosDef (1 : Matrix n n R) :=
   ⟨isHermitian_one, fun x hx => by simpa only [one_mulVec, dotProduct_star_self_pos_iff]⟩
 
--- DISSOLVED: natCast
+protected theorem natCast [StarOrderedRing R] [DecidableEq n] [NoZeroDivisors R]
+    (d : ℕ) (hd : d ≠ 0) :
+    PosDef (d : Matrix n n R) :=
+  ⟨isHermitian_natCast _, fun x hx => by
+    simp only [natCast_mulVec, dotProduct_smul]
+    rw [Nat.cast_smul_eq_nsmul]
+    refine nsmul_pos (dotProduct_star_self_pos_iff.mpr hx) hd⟩
 
 -- CONFLATES (assumes ground = zero): _root_.Matrix.posDef_natCast_iff
 @[simp]

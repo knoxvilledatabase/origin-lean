@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Finset/Card.lean
-Genuine: 121 | Conflates: 2 | Dissolved: 4 | Infrastructure: 7
+Genuine: 126 | Conflates: 2 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Image
+
+noncomputable section
 
 /-!
 # Cardinality of a finite set
@@ -35,17 +37,9 @@ variable {s t : Finset α} {a b : α}
 def card (s : Finset α) : ℕ :=
   Multiset.card s.1
 
+@[inherit_doc] scoped prefix:arg "#" => Finset.card
+
 theorem card_def (s : Finset α) : #s = Multiset.card s.1 :=
-  rfl
-
-@[simp] lemma card_val (s : Finset α) : Multiset.card s.1 = #s := rfl
-
-@[simp]
-theorem card_mk {m nodup} : #(⟨m, nodup⟩ : Finset α) = Multiset.card m :=
-  rfl
-
-@[simp]
-theorem card_empty : #(∅ : Finset α) = 0 :=
   rfl
 
 @[gcongr]
@@ -57,7 +51,7 @@ theorem card_mono : Monotone (@card α) := by apply card_le_card
 
 @[simp] lemma card_eq_zero : #s = 0 ↔ s = ∅ := Multiset.card_eq_zero.trans val_eq_zero
 
--- DISSOLVED: card_ne_zero
+lemma card_ne_zero : #s ≠ 0 ↔ s.Nonempty := card_eq_zero.ne.trans nonempty_iff_ne_empty.symm
 
 @[simp] lemma card_pos : 0 < #s ↔ s.Nonempty := Nat.pos_iff_ne_zero.trans card_ne_zero
 
@@ -67,7 +61,8 @@ alias ⟨_, Nonempty.card_pos⟩ := card_pos
 
 alias ⟨_, Nonempty.card_ne_zero⟩ := card_ne_zero
 
--- DISSOLVED: card_ne_zero_of_mem
+theorem card_ne_zero_of_mem (h : a ∈ s) : #s ≠ 0 :=
+  (not_congr card_eq_zero).2 <| ne_empty_of_mem h
 
 @[simp]
 theorem card_singleton (a : α) : #{a} = 1 :=
@@ -180,9 +175,6 @@ section ToMLListultiset
 
 variable [DecidableEq α] (m : Multiset α) (l : List α)
 
-theorem Multiset.card_toFinset : #m.toFinset = Multiset.card m.dedup :=
-  rfl
-
 theorem Multiset.toFinset_card_le : #m.toFinset ≤ Multiset.card m :=
   card_le_card <| dedup_le _
 
@@ -196,9 +188,6 @@ theorem Multiset.dedup_card_eq_card_iff_nodup {m : Multiset α} :
 
 theorem Multiset.toFinset_card_eq_card_iff_nodup {m : Multiset α} :
     #m.toFinset = card m ↔ m.Nodup := dedup_card_eq_card_iff_nodup
-
-theorem List.card_toFinset : #l.toFinset = l.dedup.length :=
-  rfl
 
 theorem List.toFinset_card_le : #l.toFinset ≤ l.length :=
   Multiset.toFinset_card_le ⟦l⟧
@@ -238,7 +227,9 @@ theorem card_image_of_injective [DecidableEq β] (s : Finset α) (H : Injective 
     #(s.image f) = #s :=
   card_image_of_injOn fun _ _ _ _ h => H h
 
--- DISSOLVED: fiber_card_ne_zero_iff_mem_image
+theorem fiber_card_ne_zero_iff_mem_image (s : Finset α) (f : α → β) [DecidableEq β] (y : β) :
+    #(s.filter fun x ↦ f x = y) ≠ 0 ↔ y ∈ s.image f := by
+  rw [← Nat.pos_iff_ne_zero, card_pos, fiber_nonempty_iff_mem_image]
 
 lemma card_filter_le_iff (s : Finset α) (P : α → Prop) [DecidablePred P] (n : ℕ) :
     #(s.filter P) ≤ n ↔ ∀ s' ⊆ s, n < #s' → ∃ a ∈ s', ¬ P a :=
@@ -443,8 +434,7 @@ lemma card_union_eq_card_add_card : #(s ∪ t) = #s + #t ↔ Disjoint s t := by
   rw [← card_union_add_card_inter]; simp [disjoint_iff_inter_eq_empty]
 
 @[simp] alias ⟨_, card_union_of_disjoint⟩ := card_union_eq_card_add_card
-@[deprecated (since := "2024-02-09")] alias card_union_eq := card_union_of_disjoint
-@[deprecated (since := "2024-02-09")] alias card_disjoint_union := card_union_of_disjoint
+
 lemma cast_card_inter [AddGroupWithOne R] :
     (#(s ∩ t) : R) = #s + #t - #(s ∪ t) := by
   rw [eq_sub_iff_add_eq, ← cast_add, card_inter_add_card_union, cast_add]
@@ -544,7 +534,9 @@ theorem card_eq_one : #s = 1 ↔ ∃ a, s = {a} := by
   cases s
   simp only [Multiset.card_eq_one, Finset.card, ← val_inj, singleton_val]
 
--- DISSOLVED: _root_.Multiset.toFinset_card_eq_one_iff
+theorem _root_.Multiset.toFinset_card_eq_one_iff [DecidableEq α] (s : Multiset α) :
+    #s.toFinset = 1 ↔ Multiset.card s ≠ 0 ∧ ∃ a : α, s = Multiset.card s • {a} := by
+  simp_rw [card_eq_one, Multiset.toFinset_eq_singleton_iff, exists_and_left]
 
 theorem exists_eq_insert_iff [DecidableEq α] {s t : Finset α} :
     (∃ a ∉ s, insert a s = t) ↔ s ⊆ t ∧ #s + 1 = #t := by

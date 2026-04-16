@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.EffectiveEpi.RegularEpi
 import Mathlib.Topology.Category.TopCat.Limits.Pullbacks
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms in `TopCat`
@@ -22,7 +24,6 @@ open CategoryTheory Limits Topology
 namespace TopCat
 
 noncomputable
-
 def effectiveEpiStructOfQuotientMap {B X : TopCat.{u}} (π : X ⟶ B) (hπ : IsQuotientMap π) :
     EffectiveEpiStruct π where
   /- `IsQuotientMap.lift` gives the required morphism -/

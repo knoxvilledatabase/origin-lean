@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Topology.Category.TopCat.Limits.Konig
 
+noncomputable section
+
 /-!
 # Cofiltered systems
 

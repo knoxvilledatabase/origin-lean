@@ -7,6 +7,8 @@ import Mathlib.Topology.LocalAtTarget
 import Mathlib.Topology.Separation.Basic
 import Mathlib.Tactic.StacksAttribute
 
+noncomputable section
+
 /-!
 
 # Jacobson spaces

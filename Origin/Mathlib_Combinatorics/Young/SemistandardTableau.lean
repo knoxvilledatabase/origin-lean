@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Combinatorics.Young.YoungDiagram
 
+noncomputable section
+
 /-!
 # Semistandard Young tableaux
 
@@ -61,11 +63,6 @@ instance instFunLike {μ : YoungDiagram} : FunLike (SemistandardYoungTableau μ)
     cases T'
     congr
 
-@[simp]
-theorem to_fun_eq_coe {μ : YoungDiagram} {T : SemistandardYoungTableau μ} :
-    T.entry = (T : ℕ → ℕ → ℕ) :=
-  rfl
-
 @[ext]
 theorem ext {μ : YoungDiagram} {T T' : SemistandardYoungTableau μ} (h : ∀ i j, T i j = T' i j) :
     T = T' :=
@@ -79,11 +76,6 @@ protected def copy {μ : YoungDiagram} (T : SemistandardYoungTableau μ) (entry'
   row_weak' := h.symm ▸ T.row_weak'
   col_strict' := h.symm ▸ T.col_strict'
   zeros' := h.symm ▸ T.zeros'
-
-@[simp]
-theorem coe_copy {μ : YoungDiagram} (T : SemistandardYoungTableau μ) (entry' : ℕ → ℕ → ℕ)
-    (h : entry' = T) : ⇑(T.copy entry' h) = entry' :=
-  rfl
 
 theorem copy_eq {μ : YoungDiagram} (T : SemistandardYoungTableau μ) (entry' : ℕ → ℕ → ℕ)
     (h : entry' = T) : T.copy entry' h = T :=
@@ -122,11 +114,6 @@ def highestWeight (μ : YoungDiagram) : SemistandardYoungTableau μ where
     simp only
     rwa [if_pos hcell, if_pos (μ.up_left_mem (le_of_lt hi) (by rfl) hcell)]
   zeros' not_cell := if_neg not_cell
-
-@[simp]
-theorem highestWeight_apply {μ : YoungDiagram} {i j : ℕ} :
-    highestWeight μ i j = if (i, j) ∈ μ then i else 0 :=
-  rfl
 
 instance {μ : YoungDiagram} : Inhabited (SemistandardYoungTableau μ) :=
   ⟨highestWeight μ⟩

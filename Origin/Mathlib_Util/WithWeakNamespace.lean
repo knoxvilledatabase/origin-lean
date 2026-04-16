@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Defines `with_weak_namespace` command.
 
@@ -27,7 +29,6 @@ def withWeakNamespace {α : Type} (ns : Name) (m : CommandElabM α) : CommandEla
   try m finally modifyScope ({ · with currNamespace := old })
 
 elab "with_weak_namespace " ns:ident cmd:command : command =>
-
   withWeakNamespace ns.getId (elabCommand cmd)
 
 end Lean.Elab.Command

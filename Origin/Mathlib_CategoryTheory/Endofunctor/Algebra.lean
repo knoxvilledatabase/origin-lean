@@ -5,6 +5,8 @@ Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.IsTerminal
 
+noncomputable section
+
 /-!
 
 # Algebras of endofunctors
@@ -72,23 +74,7 @@ instance (F : C ⥤ C) : CategoryStruct (Algebra F) where
 lemma ext {A B : Algebra F} {f g : A ⟶ B} (w : f.f = g.f := by aesop_cat) : f = g :=
   Hom.ext w
 
-@[simp]
-theorem id_eq_id : Algebra.Hom.id A = 𝟙 A :=
-  rfl
-
-@[simp]
-theorem id_f : (𝟙 _ : A ⟶ A).1 = 𝟙 A.1 :=
-  rfl
-
 variable (f : A₀ ⟶ A₁) (g : A₁ ⟶ A₂)
-
-@[simp]
-theorem comp_eq_comp : Algebra.Hom.comp f g = f ≫ g :=
-  rfl
-
-@[simp]
-theorem comp_f : (f ≫ g).1 = f.1 ≫ g.1 :=
-  rfl
 
 instance (F : C ⥤ C) : Category (Algebra F) := { }
 
@@ -221,23 +207,7 @@ instance (F : C ⥤ C) : CategoryStruct (Coalgebra F) where
 lemma ext {A B : Coalgebra F} {f g : A ⟶ B} (w : f.f = g.f := by aesop_cat) : f = g :=
   Hom.ext w
 
-@[simp]
-theorem id_eq_id : Coalgebra.Hom.id V = 𝟙 V :=
-  rfl
-
-@[simp]
-theorem id_f : (𝟙 _ : V ⟶ V).1 = 𝟙 V.1 :=
-  rfl
-
 variable (f : V₀ ⟶ V₁) (g : V₁ ⟶ V₂)
-
-@[simp]
-theorem comp_eq_comp : Coalgebra.Hom.comp f g = f ≫ g :=
-  rfl
-
-@[simp]
-theorem comp_f : (f ≫ g).1 = f.1 ≫ g.1 :=
-  rfl
 
 instance (F : C ⥤ C) : Category (Coalgebra F) := { }
 

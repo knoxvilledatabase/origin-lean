@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.FunLike.Basic
 import Mathlib.Tactic.FunProp.ToBatteries
 
+noncomputable section
+
 /-!
 ## `funProp` Meta programming functions like in Lean.Expr.* but for working with bundled morphisms.
 

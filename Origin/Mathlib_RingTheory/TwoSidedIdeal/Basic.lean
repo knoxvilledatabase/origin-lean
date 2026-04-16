@@ -7,6 +7,8 @@ import Mathlib.Tactic.Abel
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.RingTheory.Congruence.Basic
 
+noncomputable section
+
 /-!
 # Two Sided Ideals
 
@@ -144,8 +146,8 @@ lemma mem_mk' (carrier : Set R) (zero_mem add_mem neg_mem mul_mem_left mul_mem_r
   simp [mk']
 
 set_option linter.docPrime false in
-
 @[simp]
+
 lemma coe_mk' (carrier : Set R) (zero_mem add_mem neg_mem mul_mem_left mul_mem_right) :
     (mk' carrier zero_mem add_mem neg_mem mul_mem_left mul_mem_right : Set R) = carrier :=
   Set.ext <| mem_mk' carrier zero_mem add_mem neg_mem mul_mem_left mul_mem_right
@@ -171,12 +173,6 @@ instance : SMul ℤ I where smul n x := ⟨n • x.1, I.zsmul_mem n x.2⟩
 instance addCommGroup : AddCommGroup I :=
   Function.Injective.addCommGroup _ Subtype.coe_injective
     rfl (fun _ _ ↦ rfl) (fun _ ↦ rfl) (fun _ _ ↦ rfl) (fun _ _ ↦ rfl) (fun _ _ ↦ rfl)
-
-@[simp]
-def coeAddMonoidHom : I →+ R where
-  toFun := (↑)
-  map_zero' := rfl
-  map_add' _ _ := rfl
 
 end NonUnitalNonAssocRing
 

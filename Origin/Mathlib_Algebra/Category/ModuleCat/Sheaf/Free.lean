@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Colimits
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.Colimits
 
+noncomputable section
+
 /-!
 # Free sheaves of modules
 

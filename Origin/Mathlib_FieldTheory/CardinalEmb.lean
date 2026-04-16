@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.FreeAlgebra
 import Mathlib.Order.Interval.Set.WithBotTop
 import Mathlib.Order.DirectedInverseSystem
 
+noncomputable section
+
 /-!
 # Number of embeddings of an algebraic extension of infinite separable degree
 
@@ -289,9 +291,6 @@ def equivLim : (E⟮<i⟯ →ₐ[F] Ē) ≃ limit (embFunctor F E) i where
     have := Nonempty.intro j
     simp_rw [dif_pos this]
     apply Subalgebra.iSupLift_comp_inclusion
-
-theorem equivLim_coherence (x l) : (equivLim hi x).1 l = embFunctor F E (mem_Iio.mp l.2).le x :=
-  rfl
 
 end Lim
 

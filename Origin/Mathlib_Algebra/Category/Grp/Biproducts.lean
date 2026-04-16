@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Preadditive.Biproducts
 import Mathlib.Algebra.Category.Grp.Limits
 import Mathlib.Tactic.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # The category of abelian groups has finite biproducts
 -/
@@ -42,16 +44,6 @@ def binaryProductLimitCone (G H : AddCommGrp.{u}) : Limits.LimitCone (pair G H) 
       uniq := fun s m w => by
         simp_rw [← w ⟨WalkingPair.left⟩, ← w ⟨WalkingPair.right⟩]
         rfl }
-
-@[simp]
-theorem binaryProductLimitCone_cone_π_app_left (G H : AddCommGrp.{u}) :
-    (binaryProductLimitCone G H).cone.π.app ⟨WalkingPair.left⟩ = AddMonoidHom.fst G H :=
-  rfl
-
-@[simp]
-theorem binaryProductLimitCone_cone_π_app_right (G H : AddCommGrp.{u}) :
-    (binaryProductLimitCone G H).cone.π.app ⟨WalkingPair.right⟩ = AddMonoidHom.snd G H :=
-  rfl
 
 noncomputable def biprodIsoProd (G H : AddCommGrp.{u}) :
     (G ⊞ H : AddCommGrp) ≅ AddCommGrp.of (G × H) :=

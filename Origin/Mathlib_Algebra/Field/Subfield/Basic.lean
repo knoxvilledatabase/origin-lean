@@ -8,6 +8,8 @@ import Mathlib.Algebra.Field.Subfield.Defs
 import Mathlib.Algebra.Ring.Subring.Basic
 import Mathlib.RingTheory.SimpleRing.Basic
 
+noncomputable section
+
 /-!
 # Subfields
 
@@ -116,16 +118,8 @@ def comap (s : Subfield L) : Subfield K :=
         exact s.inv_mem hx }
 
 @[simp]
-theorem coe_comap (s : Subfield L) : (s.comap f : Set K) = f ⁻¹' s :=
-  rfl
-
-@[simp]
 theorem mem_comap {s : Subfield L} {f : K →+* L} {x : K} : x ∈ s.comap f ↔ f x ∈ s :=
   Iff.rfl
-
-theorem comap_comap (s : Subfield M) (g : L →+* M) (f : K →+* L) :
-    (s.comap g).comap f = s.comap (g.comp f) :=
-  rfl
 
 /-! # map -/
 
@@ -134,10 +128,6 @@ def map (s : Subfield K) : Subfield L :=
     inv_mem' := by
       rintro _ ⟨x, hx, rfl⟩
       exact ⟨x⁻¹, s.inv_mem hx, map_inv₀ f x⟩ }
-
-@[simp]
-theorem coe_map : (s.map f : Set L) = f '' s :=
-  rfl
 
 @[simp]
 theorem mem_map {f : K →+* L} {s : Subfield K} {y : L} : y ∈ s.map f ↔ ∃ x ∈ s, f x = y := by
@@ -164,14 +154,6 @@ variable (g : L →+* M) (f : K →+* L)
 
 def fieldRange : Subfield L :=
   ((⊤ : Subfield K).map f).copy (Set.range f) Set.image_univ.symm
-
-@[simp]
-theorem coe_fieldRange : (f.fieldRange : Set L) = Set.range f :=
-  rfl
-
-@[simp]
-theorem mem_fieldRange {f : K →+* L} {y : L} : y ∈ f.fieldRange ↔ ∃ x, f x = y :=
-  Iff.rfl
 
 theorem fieldRange_eq_map : f.fieldRange = Subfield.map f ⊤ := by
   ext
@@ -202,10 +184,6 @@ instance : Min (Subfield K) :=
       inv_mem' := fun _ hx =>
         Subring.mem_inf.mpr
           ⟨s.inv_mem (Subring.mem_inf.mp hx).1, t.inv_mem (Subring.mem_inf.mp hx).2⟩ }⟩
-
-@[simp]
-theorem coe_inf (p p' : Subfield K) : ((p ⊓ p' : Subfield K) : Set K) = p.carrier ∩ p'.carrier :=
-  rfl
 
 @[simp]
 theorem mem_inf {p p' : Subfield K} {x : K} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
@@ -410,10 +388,6 @@ open Subfield
 def rangeRestrictField (f : K →+* L) : K →+* f.fieldRange :=
   f.rangeSRestrict
 
-@[simp]
-theorem coe_rangeRestrictField (f : K →+* L) (x : K) : (f.rangeRestrictField x : L) = f x :=
-  rfl
-
 section eqLocus
 
 variable {L : Type v} [Semiring L]
@@ -558,9 +532,6 @@ variable {X Y}
 
 instance [SMul K X] (F : Subfield K) : SMul F X :=
   inferInstanceAs (SMul F.toSubsemiring X)
-
-theorem smul_def [SMul K X] {F : Subfield K} (g : F) (m : X) : g • m = (g : K) • m :=
-  rfl
 
 instance smulCommClass_left [SMul K Y] [SMul X Y] [SMulCommClass K X Y] (F : Subfield K) :
     SMulCommClass F X Y :=

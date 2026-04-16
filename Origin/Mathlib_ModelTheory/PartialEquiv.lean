@@ -1,10 +1,12 @@
 /-
 Extracted from ModelTheory/PartialEquiv.lean
-Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.ModelTheory.DirectLimit
 import Mathlib.Order.Ideal
+
+noncomputable section
 
 /-!
 # Partial Isomorphisms
@@ -72,10 +74,6 @@ def symm (f : M ≃ₚ[L] N) : N ≃ₚ[L] M where
 
 @[simp]
 theorem symm_symm (f : M ≃ₚ[L] N) : f.symm.symm = f :=
-  rfl
-
-@[simp]
-theorem symm_apply (f : M ≃ₚ[L] N) (x : f.cod) : f.symm.toEquiv x = f.toEquiv.symm x :=
   rfl
 
 instance : LE (M ≃ₚ[L] N) :=
@@ -267,11 +265,6 @@ theorem toPartialEquiv_injective :
   rw [PartialEquiv.ext_iff] at h
   rcases h with ⟨_, H⟩
   exact H _ (Substructure.mem_top _)
-
-@[simp]
-theorem toEmbedding_toPartialEquiv (f : M ↪[L] N) :
-    PartialEquiv.toEmbeddingOfEqTop (f := f.toPartialEquiv) rfl = f :=
-  rfl
 
 @[simp]
 theorem toPartialEquiv_toEmbedding {f :  M ≃ₚ[L] N} (h : f.dom = ⊤) :

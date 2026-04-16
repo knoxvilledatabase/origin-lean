@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Galois.Examples
 import Mathlib.CategoryTheory.Galois.Prorepresentability
 
+noncomputable section
+
 /-!
 
 # Induced functor to finite `Aut F`-sets
@@ -34,12 +36,6 @@ def functorToAction : C ⥤ Action FintypeCat.{u} (MonCat.of (Aut F)) where
     hom := F.map f
     comm := fun g ↦ symm <| g.hom.naturality f
   }
-
-lemma functorToAction_comp_forget₂_eq : functorToAction F ⋙ forget₂ _ FintypeCat = F := rfl
-
-@[simp]
-lemma functorToAction_map {X Y : C} (f : X ⟶ Y) : ((functorToAction F).map f).hom = F.map f :=
-  rfl
 
 instance (X : C) : MulAction (Aut X) ((functorToAction F).obj X).V :=
   inferInstanceAs <| MulAction (Aut X) (F.obj X)

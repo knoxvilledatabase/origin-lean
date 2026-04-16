@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Pi
 import Mathlib.LinearAlgebra.Quotient.Basic
 
+noncomputable section
+
 /-!
 # Submodule quotients and direct sums
 

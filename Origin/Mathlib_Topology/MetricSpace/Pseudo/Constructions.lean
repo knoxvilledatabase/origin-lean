@@ -7,6 +7,8 @@ import Mathlib.Topology.Bornology.Constructions
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
 import Mathlib.Topology.UniformSpace.UniformEmbedding
 
+noncomputable section
+
 /-!
 # Products of pseudometric spaces and other constructions
 
@@ -47,35 +49,17 @@ def IsUniformInducing.comapPseudoMetricSpace {α β} [UniformSpace α] [m : Pseu
 instance Subtype.pseudoMetricSpace {p : α → Prop} : PseudoMetricSpace (Subtype p) :=
   PseudoMetricSpace.induced Subtype.val ‹_›
 
-lemma Subtype.dist_eq {p : α → Prop} (x y : Subtype p) : dist x y = dist (x : α) y := rfl
-
-lemma Subtype.nndist_eq {p : α → Prop} (x y : Subtype p) : nndist x y = nndist (x : α) y := rfl
-
 namespace MulOpposite
 
 @[to_additive]
 instance instPseudoMetricSpace : PseudoMetricSpace αᵐᵒᵖ :=
   PseudoMetricSpace.induced MulOpposite.unop ‹_›
 
-@[to_additive (attr := simp)]
-lemma dist_unop (x y : αᵐᵒᵖ) : dist (unop x) (unop y) = dist x y := rfl
-
-@[to_additive (attr := simp)]
-lemma dist_op (x y : α) : dist (op x) (op y) = dist x y := rfl
-
-@[to_additive (attr := simp)]
-lemma nndist_unop (x y : αᵐᵒᵖ) : nndist (unop x) (unop y) = nndist x y := rfl
-
-@[to_additive (attr := simp)]
-lemma nndist_op (x y : α) : nndist (op x) (op y) = nndist x y := rfl
-
 end MulOpposite
 
 section NNReal
 
 instance : PseudoMetricSpace ℝ≥0 := Subtype.pseudoMetricSpace
-
-lemma NNReal.dist_eq (a b : ℝ≥0) : dist a b = |(a : ℝ) - b| := rfl
 
 lemma NNReal.nndist_eq (a b : ℝ≥0) : nndist a b = max (a - b) (b - a) :=
   eq_of_forall_ge_iff fun _ => by
@@ -127,10 +111,6 @@ instance : PseudoMetricSpace (ULift β) := PseudoMetricSpace.induced ULift.down 
 lemma dist_eq (x y : ULift β) : dist x y = dist x.down y.down := rfl
 
 lemma nndist_eq (x y : ULift β) : nndist x y = nndist x.down y.down := rfl
-
-@[simp] lemma dist_up_up (x y : β) : dist (ULift.up x) (ULift.up y) = dist x y := rfl
-
-@[simp] lemma nndist_up_up (x y : β) : nndist (ULift.up x) (ULift.up y) = nndist x y := rfl
 
 end ULift
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.MvPolynomial.Equiv
 import Mathlib.Data.Finsupp.Fintype
 import Mathlib.SetTheory.Cardinal.Finsupp
 
+noncomputable section
+
 /-!
 # Cardinality of Multivariate Polynomial Ring
 
@@ -55,8 +57,6 @@ variable {σ R : Type u} [CommSemiring R]
 -- CONFLATES (assumes ground = zero): cardinalMk_eq_max
 theorem cardinalMk_eq_max [Nonempty σ] [Nontrivial R] :
     #(MvPolynomial σ R) = max (max #R #σ) ℵ₀ := by simp
-
-theorem cardinalMk_eq [IsEmpty σ] : #(MvPolynomial σ R) = #R := by simp
 
 theorem cardinalMk_le_max : #(MvPolynomial σ R) ≤ max (max #R #σ) ℵ₀ :=
   cardinalMk_le_max_lift.trans <| by rw [lift_id, lift_id]

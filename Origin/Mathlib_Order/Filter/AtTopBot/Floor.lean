@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Floor
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # `a * c ^ n < (n - d)!` holds true for sufficiently large `n`.
 -/

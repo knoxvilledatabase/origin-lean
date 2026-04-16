@@ -10,6 +10,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.IsIso
 import Mathlib.AlgebraicGeometry.ResidueField
 import Mathlib.AlgebraicGeometry.Properties
 
+noncomputable section
+
 /-!
 
 # Closed immersions of schemes

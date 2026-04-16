@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Finsupp
 import Mathlib.Data.Finsupp.Order
 import Mathlib.Order.Interval.Finset.Basic
 
+noncomputable section
+
 /-!
 # Finite intervals of finitely supported functions
 

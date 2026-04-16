@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Dynamics.PeriodicPts
 import Mathlib.GroupTheory.GroupAction.Defs
 
+noncomputable section
+
 /-!
 # Properties of `fixedPoints` and `fixedBy`
 

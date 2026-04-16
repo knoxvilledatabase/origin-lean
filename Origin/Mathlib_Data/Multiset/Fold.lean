@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Data.Multiset.Bind
 
+noncomputable section
+
 /-!
 # The fold operation for a commutative associative operation over a multiset.
 -/
@@ -23,14 +25,6 @@ local notation a " * " b => op a b
 
 def fold : α → Multiset α → α :=
   foldr op
-
-theorem fold_eq_foldr (b : α) (s : Multiset α) :
-    fold op b s = foldr op b s :=
-  rfl
-
-@[simp]
-theorem coe_fold_r (b : α) (l : List α) : fold op b l = l.foldr op b :=
-  rfl
 
 theorem coe_fold_l (b : α) (l : List α) : fold op b l = l.foldl op b :=
   (coe_foldr_swap op b l).trans <| by simp [hc.comm]

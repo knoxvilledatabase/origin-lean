@@ -5,6 +5,8 @@ Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.JacobiSymbol
 
+noncomputable section
+
 /-!
 # A `norm_num` extension for Jacobi and Legendre symbols
 

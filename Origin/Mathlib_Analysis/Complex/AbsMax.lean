@@ -8,6 +8,8 @@ import Mathlib.Analysis.NormedSpace.Extr
 import Mathlib.Data.Complex.FiniteDimensional
 import Mathlib.Topology.Order.ExtrClosure
 
+noncomputable section
+
 /-!
 # Maximum modulus principle
 

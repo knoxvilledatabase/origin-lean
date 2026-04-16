@@ -7,6 +7,8 @@ import Mathlib.RepresentationTheory.Action.Basic
 import Mathlib.Topology.Algebra.MulAction
 import Mathlib.Topology.Category.TopCat.Basic
 
+noncomputable section
+
 /-!
 
 # Topological subcategories of `Action V G`

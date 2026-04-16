@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Card
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Radon's theorem on convex sets
 

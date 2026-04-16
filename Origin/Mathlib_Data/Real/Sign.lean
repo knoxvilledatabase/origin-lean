@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Real/Sign.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.NormNum.Inv
+
+noncomputable section
 
 /-!
 # Real sign function
@@ -45,7 +47,8 @@ theorem sign_apply_eq (r : ℝ) : sign r = -1 ∨ sign r = 0 ∨ sign r = 1 := b
   · exact Or.inr <| Or.inl <| sign_zero
   · exact Or.inr <| Or.inr <| sign_of_pos hp
 
--- DISSOLVED: sign_apply_eq_of_ne_zero
+theorem sign_apply_eq_of_ne_zero (r : ℝ) (h : r ≠ 0) : sign r = -1 ∨ sign r = 1 :=
+  h.lt_or_lt.imp sign_of_neg sign_of_pos
 
 @[simp]
 theorem sign_eq_zero_iff {r : ℝ} : sign r = 0 ↔ r = 0 := by
@@ -80,7 +83,10 @@ theorem sign_mul_nonneg (r : ℝ) : 0 ≤ sign r * r := by
   · rw [sign_of_pos hp, one_mul]
     exact hp.le
 
--- DISSOLVED: sign_mul_pos_of_ne_zero
+theorem sign_mul_pos_of_ne_zero (r : ℝ) (hr : r ≠ 0) : 0 < sign r * r := by
+  refine lt_of_le_of_ne (sign_mul_nonneg r) fun h => hr ?_
+  have hs0 := (zero_eq_mul.mp h).resolve_right hr
+  exact sign_eq_zero_iff.mp hs0
 
 @[simp]
 theorem inv_sign (r : ℝ) : (sign r)⁻¹ = sign r := by

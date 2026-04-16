@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Nat/Factorization/Root.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 8 | Infrastructure: 2
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Floor.Div
 import Mathlib.Data.Nat.Factorization.Defs
+
+noncomputable section
 
 /-!
 # Roots of natural numbers, rounded up and down
@@ -48,11 +50,13 @@ lemma floorRoot_def :
 @[simp] lemma floorRoot_one_left (a : ℕ) : floorRoot 1 a = a := by
   simp [floorRoot]; split_ifs <;> simp [*]
 
--- DISSOLVED: floorRoot_one_right
+@[simp] lemma floorRoot_one_right (hn : n ≠ 0) : floorRoot n 1 = 1 := by simp [floorRoot, hn]
 
--- DISSOLVED: floorRoot_pow_self
+@[simp] lemma floorRoot_pow_self (hn : n ≠ 0) (a : ℕ) : floorRoot n (a ^ n) = a := by
+  simp [floorRoot_def, pos_iff_ne_zero.2, hn]; split_ifs <;> simp [*]
 
--- DISSOLVED: floorRoot_ne_zero
+lemma floorRoot_ne_zero : floorRoot n a ≠ 0 ↔ n ≠ 0 ∧ a ≠ 0 := by
+  simp +contextual [floorRoot, not_imp_not, not_or]
 
 @[simp] lemma floorRoot_eq_zero : floorRoot n a = 0 ↔ n = 0 ∨ a = 0 :=
   floorRoot_ne_zero.not_right.trans <| by simp only [not_and_or, ne_eq, not_not]
@@ -95,11 +99,13 @@ lemma ceilRoot_def :
 @[simp] lemma ceilRoot_one_left (a : ℕ) : ceilRoot 1 a = a := by
   simp [ceilRoot]; split_ifs <;> simp [*]
 
--- DISSOLVED: ceilRoot_one_right
+@[simp] lemma ceilRoot_one_right (hn : n ≠ 0) : ceilRoot n 1 = 1 := by simp [ceilRoot, hn]
 
--- DISSOLVED: ceilRoot_pow_self
+@[simp] lemma ceilRoot_pow_self (hn : n ≠ 0) (a : ℕ) : ceilRoot n (a ^ n) = a := by
+  simp [ceilRoot_def, pos_iff_ne_zero.2, hn]; split_ifs <;> simp [*]
 
--- DISSOLVED: ceilRoot_ne_zero
+lemma ceilRoot_ne_zero : ceilRoot n a ≠ 0 ↔ n ≠ 0 ∧ a ≠ 0 := by
+  simp +contextual [ceilRoot_def, not_imp_not, not_or]
 
 @[simp] lemma ceilRoot_eq_zero : ceilRoot n a = 0 ↔ n = 0 ∨ a = 0 :=
   ceilRoot_ne_zero.not_right.trans <| by simp only [not_and_or, ne_eq, not_not]
@@ -113,8 +119,16 @@ lemma ceilRoot_def :
   have : p.Prime ∧ p ∣ a ∧ ¬a = 0 := by simpa using support_ceilDiv_subset hp
   exact this.1
 
--- DISSOLVED: dvd_pow_iff_ceilRoot_dvd
+lemma dvd_pow_iff_ceilRoot_dvd (hn : n ≠ 0) : a ∣ b ^ n ↔ ceilRoot n a ∣ b := by
+  obtain rfl | ha := eq_or_ne a 0
+  · aesop
+  obtain rfl | hb := eq_or_ne b 0
+  · simp [hn]
+  rw [← factorization_le_iff_dvd ha (pow_ne_zero _ hb),
+    ← factorization_le_iff_dvd (ceilRoot_ne_zero.2 ⟨hn, ha⟩) hb, factorization_pow,
+    factorization_ceilRoot, ceilDiv_le_iff_le_smul (β := ℕ →₀ ℕ) (pos_iff_ne_zero.2 hn)]
 
--- DISSOLVED: dvd_ceilRoot_pow
+lemma dvd_ceilRoot_pow (hn : n ≠ 0) : a ∣ ceilRoot n a ^ n :=
+  (dvd_pow_iff_ceilRoot_dvd hn).2 dvd_rfl
 
 end Nat

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Meta.Tactic.TryThis
 
+noncomputable section
+
 /-!
 # Adaptation notes
 
@@ -37,11 +39,9 @@ def reportAdaptationNote (f : Syntax → Meta.Tactic.TryThis.Suggestion) : MetaM
     Meta.Tactic.TryThis.addSuggestion (← getRef) (f stx') (origSpan? := ← getRef)
 
 elab (name := adaptationNoteCmd) "#adaptation_note " (docComment)? : command => do
-
   Elab.Command.liftTermElabM <| reportAdaptationNote (fun s => (⟨s⟩ : TSyntax `tactic))
 
 elab "#adaptation_note " (docComment)? : tactic =>
-
   reportAdaptationNote (fun s => (⟨s⟩ : TSyntax `tactic))
 
 syntax (name := adaptationNoteTermStx) "#adaptation_note " (docComment)? term : term

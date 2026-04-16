@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 import Mathlib.Topology.Algebra.ContinuousMonoidHom
 
+noncomputable section
+
 /-!
 # Pontryagin dual
 
@@ -89,11 +91,6 @@ noncomputable instance instMonoidHomClass : MonoidHomClass (PontryaginDual A) A 
 noncomputable def map (f : ContinuousMonoidHom A B) :
     ContinuousMonoidHom (PontryaginDual B) (PontryaginDual A) :=
   f.compLeft Circle
-
-@[simp]
-theorem map_apply (f : ContinuousMonoidHom A B) (x : PontryaginDual B) (y : A) :
-    map f x y = x (f y) :=
-  rfl
 
 @[simp]
 theorem map_one : map (one A B) = one (PontryaginDual B) (PontryaginDual A) :=

@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 import Mathlib.MeasureTheory.Integral.Layercake
 import Mathlib.MeasureTheory.Integral.BoundedContinuousFunction
 
+noncomputable section
+
 /-!
 # Characterizations of weak convergence of finite measures and probability measures
 

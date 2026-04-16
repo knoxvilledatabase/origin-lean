@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/MonoidAlgebra/ToDirectSum.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Algebra
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.Data.Finsupp.ToDFinsupp
+
+noncomputable section
 
 /-!
 # Conversion between `AddMonoidAlgebra` and homogeneous `DirectSum`
@@ -153,11 +155,24 @@ namespace DirectSum
 
 variable [DecidableEq ι]
 
--- DISSOLVED: toAddMonoidAlgebra_zero
+@[simp]
+theorem toAddMonoidAlgebra_zero [Semiring M] [∀ m : M, Decidable (m ≠ 0)] :
+    toAddMonoidAlgebra 0 = (0 : AddMonoidAlgebra M ι) :=
+  DFinsupp.toFinsupp_zero
 
--- DISSOLVED: toAddMonoidAlgebra_add
+@[simp]
+theorem toAddMonoidAlgebra_add [Semiring M] [∀ m : M, Decidable (m ≠ 0)] (f g : ⨁ _ : ι, M) :
+    (f + g).toAddMonoidAlgebra = toAddMonoidAlgebra f + toAddMonoidAlgebra g :=
+  DFinsupp.toFinsupp_add _ _
 
--- DISSOLVED: toAddMonoidAlgebra_mul
+@[simp]
+theorem toAddMonoidAlgebra_mul [AddMonoid ι] [Semiring M]
+    [∀ m : M, Decidable (m ≠ 0)] (f g : ⨁ _ : ι, M) :
+    (f * g).toAddMonoidAlgebra = toAddMonoidAlgebra f * toAddMonoidAlgebra g := by
+  apply_fun AddMonoidAlgebra.toDirectSum
+  · simp
+  · apply Function.LeftInverse.injective
+    apply AddMonoidAlgebra.toDirectSum_toAddMonoidAlgebra
 
 end DirectSum
 

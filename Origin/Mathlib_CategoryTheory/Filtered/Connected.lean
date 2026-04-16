@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/Filtered/Connected.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Filtered.Basic
 import Mathlib.CategoryTheory.IsConnected
+
+noncomputable section
 
 /-!
 # Filtered categories are connected
@@ -27,12 +29,10 @@ theorem IsCofilteredOrEmpty.isPreconnected [IsCofilteredOrEmpty C] : IsPreconnec
     (.single <| .inl <| .intro <| IsCofiltered.minToRight j j')
 
 attribute [local instance] IsFiltered.nonempty in
-
 theorem IsFiltered.isConnected [IsFiltered C] : IsConnected C :=
   { IsFilteredOrEmpty.isPreconnected C with }
 
 attribute [local instance] IsCofiltered.nonempty in
-
 theorem IsCofiltered.isConnected [IsCofiltered C] : IsConnected C :=
   { IsCofilteredOrEmpty.isPreconnected C with }
 

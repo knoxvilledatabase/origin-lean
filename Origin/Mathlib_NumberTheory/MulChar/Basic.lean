@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/MulChar/Basic.lean
-Genuine: 46 | Conflates: 8 | Dissolved: 5 | Infrastructure: 14
+Genuine: 50 | Conflates: 8 | Dissolved: 1 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Basic
 import Mathlib.Algebra.CharP.Lemmas
 import Mathlib.Data.Fintype.Units
 import Mathlib.GroupTheory.OrderOfElement
+
+noncomputable section
 
 /-!
 # Multiplicative characters of finite rings and fields
@@ -170,24 +172,12 @@ noncomputable def equivToUnitHom : MulChar R R' ≃ (Rˣ →* R'ˣ) where
     simp only [coe_toUnitHom, ofUnitHom_coe]
 
 @[simp]
-theorem toUnitHom_eq (χ : MulChar R R') : toUnitHom χ = equivToUnitHom χ :=
-  rfl
-
-@[simp]
-theorem ofUnitHom_eq (χ : Rˣ →* R'ˣ) : ofUnitHom χ = equivToUnitHom.symm χ :=
-  rfl
-
-@[simp]
 theorem coe_equivToUnitHom (χ : MulChar R R') (a : Rˣ) : ↑(equivToUnitHom χ a) = χ a :=
   coe_toUnitHom χ a
 
 @[simp]
 theorem equivToUnitHom_symm_coe (f : Rˣ →* R'ˣ) (a : Rˣ) : equivToUnitHom.symm f ↑a = f a :=
   ofUnitHom_coe f a
-
-@[simp]
-lemma coe_toMonoidHom (χ : MulChar R R')
-    (x : R) : χ.toMonoidHom x = χ x := rfl
 
 /-!
 ### Commutative group structure on multiplicative characters
@@ -300,7 +290,10 @@ theorem pow_apply_coe (χ : MulChar R R') (n : ℕ) (a : Rˣ) : (χ ^ n) a = χ 
   · rw [pow_zero, pow_zero, one_apply_coe]
   · rw [pow_succ, pow_succ, mul_apply, ih]
 
--- DISSOLVED: pow_apply'
+theorem pow_apply' (χ : MulChar R R') {n : ℕ} (hn : n ≠ 0) (a : R) : (χ ^ n) a = χ a ^ n := by
+  by_cases ha : IsUnit a
+  · exact pow_apply_coe χ n ha.unit
+  · rw [map_nonunit (χ ^ n) ha, map_nonunit χ ha, zero_pow hn]
 
 lemma equivToUnitHom_mul_apply (χ₁ χ₂ : MulChar R R') (a : Rˣ) :
     equivToUnitHom (χ₁ * χ₂) a = equivToUnitHom χ₁ a * equivToUnitHom χ₂ a := by
@@ -309,7 +302,6 @@ lemma equivToUnitHom_mul_apply (χ₁ χ₂ : MulChar R R') (a : Rˣ) :
   simp_rw [coe_equivToUnitHom, coeToFun_mul, Pi.mul_apply]
 
 noncomputable
-
 def mulEquivToUnitHom : MulChar R R' ≃* (Rˣ →* R'ˣ) :=
   { equivToUnitHom with
     map_mul' := by
@@ -339,13 +331,15 @@ variable {R : Type*} [CommMonoid R] {R' : Type*} [CommMonoidWithZero R']
 lemma eq_one_iff {χ : MulChar R R'} : χ = 1 ↔ ∀ a : Rˣ, χ a = 1 := by
   simp only [MulChar.ext_iff, one_apply_coe]
 
--- DISSOLVED: ne_one_iff
+lemma ne_one_iff {χ : MulChar R R'} : χ ≠ 1 ↔ ∃ a : Rˣ, χ a ≠ 1 := by
+  simp only [Ne, eq_one_iff, not_forall]
 
 -- CONFLATES (assumes ground = zero): IsNontrivial
 def IsNontrivial (χ : MulChar R R') : Prop :=
   ∃ a : Rˣ, χ a ≠ 1
 
 set_option linter.deprecated false in
+/-- A multiplicative character is nontrivial iff it is not the trivial character. -/
 
 -- CONFLATES (assumes ground = zero): isNontrivial_iff
 theorem isNontrivial_iff (χ : MulChar R R') : χ.IsNontrivial ↔ χ ≠ 1 := by
@@ -404,9 +398,12 @@ lemma ringHomComp_eq_one_iff {f : R' →+* R''} (hf : Function.Injective f) {χ 
   conv_lhs => rw [← (show (1 : MulChar R R').ringHomComp f = 1 by ext; simp)]
   exact (injective_ringHomComp hf).eq_iff
 
--- DISSOLVED: ringHomComp_ne_one_iff
+lemma ringHomComp_ne_one_iff {f : R' →+* R''} (hf : Function.Injective f) {χ : MulChar R R'} :
+    χ.ringHomComp f ≠ 1 ↔ χ ≠ 1 :=
+  (ringHomComp_eq_one_iff hf).not
 
 set_option linter.deprecated false in
+/-- Composition with an injective ring homomorphism preserves nontriviality. -/
 
 -- CONFLATES (assumes ground = zero): IsNontrivial.comp
 theorem IsNontrivial.comp {χ : MulChar R R'} (hχ : χ.IsNontrivial) {f : R' →+* R''}
@@ -499,9 +496,13 @@ section sum
 
 variable {R : Type*} [CommMonoid R] [Fintype R] {R' : Type*} [CommRing R']
 
--- DISSOLVED: sum_eq_zero_of_ne_one
+theorem sum_eq_zero_of_ne_one [IsDomain R'] {χ : MulChar R R'} (hχ : χ ≠ 1) : ∑ a, χ a = 0 := by
+  rcases ne_one_iff.mp hχ with ⟨b, hb⟩
+  refine eq_zero_of_mul_eq_self_left hb ?_
+  simpa only [Finset.mul_sum, ← map_mul] using b.mulLeft_bijective.sum_comp _
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-06-16")]
 
 -- CONFLATES (assumes ground = zero): IsNontrivial.sum_eq_zero
 lemma IsNontrivial.sum_eq_zero [IsDomain R'] {χ : MulChar R R'} (hχ : χ.IsNontrivial) :

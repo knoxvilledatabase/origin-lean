@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.CategoryTheory.Limits.Preserves.Limits
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 
+noncomputable section
+
 /-! # Limits in categories of presheaves of modules
 
 In this file, it is shown that under suitable assumptions,

@@ -7,6 +7,8 @@ import Mathlib.Data.Analysis.Filter
 import Mathlib.Topology.Bases
 import Mathlib.Topology.LocallyFinite
 
+noncomputable section
+
 /-!
 # Computational realization of topological spaces (experimental)
 
@@ -52,8 +54,6 @@ variable (F : Ctop α σ)
 
 instance : CoeFun (Ctop α σ) fun _ ↦ σ → Set α :=
   ⟨Ctop.f⟩
-
-theorem coe_mk (f T h₁ I h₂ h₃ a) : (@Ctop.mk α σ f T h₁ I h₂ h₃) a = f a := rfl
 
 def ofEquiv (E : σ ≃ τ) : Ctop α σ → Ctop α τ
   | ⟨f, T, h₁, I, h₂, h₃⟩ =>
@@ -162,9 +162,6 @@ def ofEquiv (F : Realizer α) (E : F.σ ≃ τ) : Realizer α :=
         ⟨fun ⟨s, h⟩ ↦ ⟨E s, by simpa using h⟩, fun ⟨t, h⟩ ↦ ⟨E.symm t, by simpa using h⟩⟩⟩
 
 @[simp]
-theorem ofEquiv_σ (F : Realizer α) (E : F.σ ≃ τ) : (F.ofEquiv E).σ = τ := rfl
-
-@[simp]
 theorem ofEquiv_F (F : Realizer α) (E : F.σ ≃ τ) (s : τ) : (F.ofEquiv E).F s = F.F (E.symm s) := by
   delta ofEquiv; simp
 
@@ -180,12 +177,6 @@ protected def nhds (F : Realizer α) (a : α) : (𝓝 a).Realizer :=
         ⟨fun ⟨⟨_s, as⟩, h⟩ ↦ mem_nhds_iff.2 ⟨_, h, F.isOpen _, as⟩, fun h ↦
           let ⟨s, h, as⟩ := F.mem_nhds.1 h
           ⟨⟨s, h⟩, as⟩⟩⟩
-
-@[simp]
-theorem nhds_σ (F : Realizer α) (a : α) : (F.nhds a).σ = { s : F.σ // a ∈ F.F s } := rfl
-
-@[simp]
-theorem nhds_F (F : Realizer α) (a : α) (s) : (F.nhds a).F s = F.F s.1 := rfl
 
 theorem tendsto_nhds_iff {m : β → α} {f : Filter β} (F : f.Realizer) (R : Realizer α) {a : α} :
     Tendsto m f (𝓝 a) ↔ ∀ t, a ∈ R.F t → ∃ s, ∀ x ∈ F.F s, m x ∈ R.F t :=

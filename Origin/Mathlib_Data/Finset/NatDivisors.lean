@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.NumberTheory.Divisors
 
+noncomputable section
+
 /-!
 #  `Nat.divisors` as a multiplicative homomorpism
 

@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.Data.Nat.Fib.Basic
 import Mathlib.Tactic.Monotonicity
 
+noncomputable section
+
 /-!
 # Approximations for Continued Fraction Computations (`GenContFract.of`)
 

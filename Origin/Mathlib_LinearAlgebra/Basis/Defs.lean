@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.LinearAlgebra.Span.Basic
 
+noncomputable section
+
 /-!
 # Bases
 
@@ -101,10 +103,6 @@ instance instFunLike : FunLike (Basis ι R M) ι M where
   coe b i := b.repr.symm (Finsupp.single i 1)
   coe_injective' f g h := repr_injective <| LinearEquiv.symm_bijective.injective <|
     LinearEquiv.toLinearMap_injective <| by ext; exact congr_fun h _
-
-@[simp]
-theorem coe_ofRepr (e : M ≃ₗ[R] ι →₀ R) : ⇑(ofRepr e) = fun i => e.symm (Finsupp.single i 1) :=
-  rfl
 
 -- CONFLATES (assumes ground = zero): injective
 protected theorem injective [Nontrivial R] : Injective b :=
@@ -281,13 +279,6 @@ variable (f : M ≃ₗ[R] M')
 protected def map : Basis ι R M' :=
   ofRepr (f.symm.trans b.repr)
 
-@[simp]
-theorem map_apply (i) : b.map f i = f (b i) :=
-  rfl
-
-theorem coe_map : (b.map f : ι → M') = f ∘ b :=
-  rfl
-
 end Map
 
 section SMul
@@ -307,12 +298,6 @@ instance : SMul G (Basis ι R M) where
 theorem smul_apply (g : G) (b : Basis ι R M) (i : ι) : (g • b) i = g • b i := rfl
 
 @[norm_cast] theorem coe_smul (g : G) (b : Basis ι R M) : ⇑(g • b) = g • ⇑b := rfl
-
-@[simp]
-theorem smul_eq_map (g : M ≃ₗ[R] M) (b : Basis ι R M) : g • b = b.map g := rfl
-
-@[simp] theorem repr_smul (g : G) (b : Basis ι R M) :
-    (g • b).repr = (DistribMulAction.toLinearEquiv _ _ g).symm.trans b.repr := rfl
 
 instance : MulAction G (Basis ι R M) :=
   Function.Injective.mulAction _ DFunLike.coe_injective coe_smul
@@ -665,11 +650,6 @@ theorem Basis.equivFun_symm_apply [Fintype ι] (b : Basis ι R M) (x : ι → R)
 
 @[simp]
 theorem Basis.equivFun_apply [Finite ι] (b : Basis ι R M) (u : M) : b.equivFun u = b.repr u :=
-  rfl
-
-@[simp]
-theorem Basis.map_equivFun [Finite ι] (b : Basis ι R M) (f : M ≃ₗ[R] M') :
-    (b.map f).equivFun = f.symm.trans b.equivFun :=
   rfl
 
 theorem Basis.sum_equivFun [Fintype ι] (b : Basis ι R M) (u : M) :

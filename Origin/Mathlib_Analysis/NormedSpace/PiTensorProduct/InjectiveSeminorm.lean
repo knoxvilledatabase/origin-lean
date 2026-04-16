@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.NormedSpace.PiTensorProduct.ProjectiveSeminorm
 import Mathlib.LinearAlgebra.Isomorphisms
 
+noncomputable section
+
 /-!
 # Injective seminorm on the tensor of a finite family of normed spaces.
 

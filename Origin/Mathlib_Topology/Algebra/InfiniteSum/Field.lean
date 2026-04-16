@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Defs
 
+noncomputable section
+
 /-!
 # Infinite sums and products in topological fields
 

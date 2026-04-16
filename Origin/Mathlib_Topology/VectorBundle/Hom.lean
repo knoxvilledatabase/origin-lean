@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Topology.VectorBundle.Basic
 
+noncomputable section
+
 /-!
 # The vector bundle of continuous (semi)linear maps
 
@@ -238,34 +240,3 @@ instance Bundle.ContinuousLinearMap.memTrivializationAtlas :
   out := ⟨_, ⟨e₁, e₂, by infer_instance, by infer_instance, rfl⟩, rfl⟩
 
 variable {e₁ e₂}
-
-@[simp]
-theorem Trivialization.baseSet_continuousLinearMap :
-    (e₁.continuousLinearMap σ e₂).baseSet = e₁.baseSet ∩ e₂.baseSet :=
-  rfl
-
-theorem Trivialization.continuousLinearMap_apply
-    (p : TotalSpace (F₁ →SL[σ] F₂) (Bundle.ContinuousLinearMap σ E₁ E₂)) :
-    e₁.continuousLinearMap σ e₂ p =
-      ⟨p.1, (e₂.continuousLinearMapAt 𝕜₂ p.1 : _ →L[𝕜₂] _).comp
-        (p.2.comp (e₁.symmL 𝕜₁ p.1 : F₁ →L[𝕜₁] E₁ p.1) : F₁ →SL[σ] E₂ p.1)⟩ :=
-  rfl
-
-theorem hom_trivializationAt_apply (x₀ : B)
-    (x : TotalSpace (F₁ →SL[σ] F₂) (Bundle.ContinuousLinearMap σ E₁ E₂)) :
-    trivializationAt (F₁ →SL[σ] F₂) (fun x => E₁ x →SL[σ] E₂ x) x₀ x =
-      ⟨x.1, inCoordinates F₁ E₁ F₂ E₂ x₀ x.1 x₀ x.1 x.2⟩ :=
-  rfl
-
-@[simp, mfld_simps]
-theorem hom_trivializationAt_source (x₀ : B) :
-    (trivializationAt (F₁ →SL[σ] F₂) (Bundle.ContinuousLinearMap σ E₁ E₂) x₀).source =
-      π (F₁ →SL[σ] F₂) (Bundle.ContinuousLinearMap σ E₁ E₂) ⁻¹'
-        ((trivializationAt F₁ E₁ x₀).baseSet ∩ (trivializationAt F₂ E₂ x₀).baseSet) :=
-  rfl
-
-@[simp, mfld_simps]
-theorem hom_trivializationAt_target (x₀ : B) :
-    (trivializationAt (F₁ →SL[σ] F₂) (fun x => E₁ x →SL[σ] E₂ x) x₀).target =
-      ((trivializationAt F₁ E₁ x₀).baseSet ∩ (trivializationAt F₂ E₂ x₀).baseSet) ×ˢ Set.univ :=
-  rfl

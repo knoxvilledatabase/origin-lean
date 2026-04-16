@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.AbsoluteValue
 import Mathlib.Algebra.Ring.Int.Units
 import Mathlib.Data.Int.Cast.Lemmas
 
+noncomputable section
+
 /-!
 # Absolute values and the integers
 

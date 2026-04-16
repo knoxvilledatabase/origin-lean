@@ -1,9 +1,11 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Diam.lean
-Genuine: 22 | Conflates: 5 | Dissolved: 5 | Infrastructure: 1
+Genuine: 23 | Conflates: 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Metric
+
+noncomputable section
 
 /-!
 # Diameter of a simple graph
@@ -52,16 +54,28 @@ lemma ediam_eq_zero_of_subsingleton [Subsingleton α] : G.ediam = 0 := by
   rw [ediam_def, ENat.iSup_eq_zero]
   simpa [edist_eq_zero_iff, Prod.forall] using subsingleton_iff.mp ‹_›
 
--- DISSOLVED: nontrivial_of_ediam_ne_zero
+-- CONFLATES (assumes ground = zero): nontrivial_of_ediam_ne_zero
+lemma nontrivial_of_ediam_ne_zero (h : G.ediam ≠ 0) : Nontrivial α := by
+  contrapose! h
+  rw [not_nontrivial_iff_subsingleton] at h
+  exact ediam_eq_zero_of_subsingleton
 
--- DISSOLVED: ediam_ne_zero
+-- CONFLATES (assumes ground = zero): ediam_ne_zero
+lemma ediam_ne_zero [Nontrivial α] : G.ediam ≠ 0 := by
+  obtain ⟨u, v, huv⟩ := exists_pair_ne ‹_›
+  contrapose! huv
+  simp only [ediam, nonpos_iff_eq_zero, ENat.iSup_eq_zero, edist_eq_zero_iff] at huv
+  exact huv u v
 
 lemma subsingleton_of_ediam_eq_zero (h : G.ediam = 0) : Subsingleton α := by
   contrapose! h
   apply not_subsingleton_iff_nontrivial.mp at h
   exact ediam_ne_zero
 
--- DISSOLVED: ediam_ne_zero_iff_nontrivial
+-- CONFLATES (assumes ground = zero): ediam_ne_zero_iff_nontrivial
+lemma ediam_ne_zero_iff_nontrivial :
+    G.ediam ≠ 0 ↔ Nontrivial α :=
+  ⟨nontrivial_of_ediam_ne_zero, fun _ ↦ ediam_ne_zero⟩
 
 @[simp]
 lemma ediam_eq_zero_iff_subsingleton :
@@ -134,7 +148,11 @@ lemma diam_def : G.diam = (⨆ p : α × α, G.edist p.1 p.2).toNat := by
 lemma dist_le_diam (h : G.ediam ≠ ⊤) {u v : α} : G.dist u v ≤ G.diam :=
   ENat.toNat_le_toNat edist_le_ediam h
 
--- DISSOLVED: nontrivial_of_diam_ne_zero
+-- CONFLATES (assumes ground = zero): nontrivial_of_diam_ne_zero
+lemma nontrivial_of_diam_ne_zero (h : G.diam ≠ 0) : Nontrivial α := by
+  apply G.nontrivial_of_ediam_ne_zero
+  contrapose! h
+  simp [diam, h]
 
 lemma diam_eq_zero_of_not_connected (h : ¬G.Connected) : G.diam = 0 := by
   cases isEmpty_or_nonempty α
@@ -144,7 +162,8 @@ lemma diam_eq_zero_of_not_connected (h : ¬G.Connected) : G.diam = 0 := by
 lemma diam_eq_zero_of_ediam_eq_top (h : G.ediam = ⊤) : G.diam = 0 := by
   rw [diam, h, ENat.toNat_top]
 
--- DISSOLVED: ediam_ne_top_of_diam_ne_zero
+lemma ediam_ne_top_of_diam_ne_zero (h : G.diam ≠ 0) : G.ediam ≠ ⊤ :=
+  mt diam_eq_zero_of_ediam_eq_top  h
 
 lemma exists_dist_eq_diam [Nonempty α] :
     ∃ u v, G.dist u v = G.diam := by

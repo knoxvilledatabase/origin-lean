@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Basic
 import Mathlib.Order.Basic
 import Mathlib.Order.Monotone.Basic
 
+noncomputable section
+
 /-!
 
 # Covariants and contravariants

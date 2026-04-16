@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Order.Zorn
 
+noncomputable section
+
 /-!
 # Extend a partial order to a linear order
 

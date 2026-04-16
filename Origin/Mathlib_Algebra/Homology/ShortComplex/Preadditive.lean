@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ShortComplex.Homology
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.CategoryTheory.Preadditive.Opposite
 
+noncomputable section
+
 /-!
 # Homology of preadditive categories
 

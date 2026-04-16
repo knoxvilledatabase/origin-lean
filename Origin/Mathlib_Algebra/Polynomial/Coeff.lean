@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Polynomial/Coeff.lean
-Genuine: 47 | Conflates: 2 | Dissolved: 6 | Infrastructure: 4
+Genuine: 52 | Conflates: 2 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Support
 import Mathlib.Algebra.Polynomial.Basic
 import Mathlib.Algebra.Regular.Basic
 import Mathlib.Data.Nat.Choose.Sum
+
+noncomputable section
 
 /-!
 # Theory of univariate polynomials
@@ -132,10 +134,6 @@ def constantCoeff : R[X] →+* R where
 theorem isUnit_C {x : R} : IsUnit (C x) ↔ IsUnit x :=
   ⟨fun h => (congr_arg IsUnit coeff_C_zero).mp (h.map <| @constantCoeff R _), fun h => h.map C⟩
 
-theorem coeff_mul_X_zero (p : R[X]) : coeff (p * X) 0 = 0 := by simp
-
--- DISSOLVED: coeff_X_mul_zero
-
 theorem coeff_C_mul_X_pow (x : R) (k n : ℕ) :
     coeff (C x * X ^ k : R[X]) n = if n = k then x else 0 := by
   rw [C_mul_X_pow_eq_monomial, coeff_monomial]
@@ -189,13 +187,32 @@ section Fewnomials
 
 open Finset
 
--- DISSOLVED: support_binomial
+theorem support_binomial {k m : ℕ} (hkm : k ≠ m) {x y : R} (hx : x ≠ 0) (hy : y ≠ 0) :
+    support (C x * X ^ k + C y * X ^ m) = {k, m} := by
+  apply subset_antisymm (support_binomial' k m x y)
+  simp_rw [insert_subset_iff, singleton_subset_iff, mem_support_iff, coeff_add, coeff_C_mul,
+    coeff_X_pow_self, mul_one, coeff_X_pow, if_neg hkm, if_neg hkm.symm, mul_zero, zero_add,
+    add_zero, Ne, hx, hy, not_false_eq_true, and_true]
 
--- DISSOLVED: support_trinomial
+theorem support_trinomial {k m n : ℕ} (hkm : k < m) (hmn : m < n) {x y z : R} (hx : x ≠ 0)
+    (hy : y ≠ 0) (hz : z ≠ 0) :
+    support (C x * X ^ k + C y * X ^ m + C z * X ^ n) = {k, m, n} := by
+  apply subset_antisymm (support_trinomial' k m n x y z)
+  simp_rw [insert_subset_iff, singleton_subset_iff, mem_support_iff, coeff_add, coeff_C_mul,
+    coeff_X_pow_self, mul_one, coeff_X_pow, if_neg hkm.ne, if_neg hkm.ne', if_neg hmn.ne,
+    if_neg hmn.ne', if_neg (hkm.trans hmn).ne, if_neg (hkm.trans hmn).ne', mul_zero, add_zero,
+    zero_add, Ne, hx, hy, hz, not_false_eq_true, and_true]
 
--- DISSOLVED: card_support_binomial
+theorem card_support_binomial {k m : ℕ} (h : k ≠ m) {x y : R} (hx : x ≠ 0) (hy : y ≠ 0) :
+    #(support (C x * X ^ k + C y * X ^ m)) = 2 := by
+  rw [support_binomial h hx hy, card_insert_of_not_mem (mt mem_singleton.mp h), card_singleton]
 
--- DISSOLVED: card_support_trinomial
+theorem card_support_trinomial {k m n : ℕ} (hkm : k < m) (hmn : m < n) {x y z : R} (hx : x ≠ 0)
+    (hy : y ≠ 0) (hz : z ≠ 0) : #(support (C x * X ^ k + C y * X ^ m + C z * X ^ n)) = 3 := by
+  rw [support_trinomial hkm hmn hx hy hz,
+    card_insert_of_not_mem
+      (mt mem_insert.mp (not_or_intro hkm.ne (mt mem_singleton.mp (hkm.trans hmn).ne))),
+    card_insert_of_not_mem (mt mem_singleton.mp hmn.ne), card_singleton]
 
 end Fewnomials
 
@@ -249,7 +266,9 @@ theorem coeff_mul_monomial_zero (p : R[X]) (d : ℕ) (r : R) :
     coeff (p * monomial 0 r) d = coeff p d * r :=
   coeff_mul_monomial p 0 d r
 
--- DISSOLVED: coeff_monomial_zero_mul
+theorem coeff_monomial_zero_mul (p : R[X]) (d : ℕ) (r : R) :
+    coeff (monomial 0 r * p) d = r * coeff p d :=
+  coeff_monomial_mul p 0 d r
 
 theorem mul_X_pow_eq_zero {p : R[X]} {n : ℕ} (H : p * X ^ n = 0) : p = 0 :=
   ext fun k => (coeff_mul_X_pow p n k).symm.trans <| ext_iff.1 H (k + n)

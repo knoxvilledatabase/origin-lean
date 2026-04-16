@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Flat/FaithfullyFlat.lean
-Genuine: 19 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
+Genuine: 19 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Quotient
 import Mathlib.RingTheory.Flat.Stability
 import Mathlib.RingTheory.Ideal.Quotient.Basic
+
+noncomputable section
 
 /-!
 # Faithfully flat modules
@@ -126,8 +128,6 @@ lemma lTensor_reflects_triviality
   apply rTensor_reflects_triviality R M
 
 attribute [-simp] Ideal.Quotient.mk_eq_mk in
-
--- CONFLATES (assumes ground = zero): iff_flat_and_rTensor_faithful
 lemma iff_flat_and_rTensor_faithful :
     FaithfullyFlat R M ↔
     (Flat R M ∧
@@ -456,6 +456,9 @@ variable (M : Type*) [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R
 variable [FaithfullyFlat R S] [FaithfullyFlat S M]
 
 include S in
+/-- If `S` is a faithfully flat `R`-algebra, then any faithfully flat `S`-Module is faithfully flat
+
+as an `R`-module. -/
 
 theorem trans : FaithfullyFlat R M := by
   rw [iff_zero_iff_lTensor_zero]

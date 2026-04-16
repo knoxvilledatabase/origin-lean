@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/Deligne.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gamma.Beta
+
+noncomputable section
 
 /-!
 # Deligne's archimedean Gamma-factors
@@ -41,11 +43,25 @@ noncomputable def Gammaℂ (s : ℂ) := 2 * (2 * π) ^ (-s) * Gamma s
 
 lemma Gammaℂ_def (s : ℂ) : Gammaℂ s = 2 * (2 * π) ^ (-s) * Gamma s := rfl
 
--- DISSOLVED: Gammaℝ_add_two
+lemma Gammaℝ_add_two {s : ℂ} (hs : s ≠ 0) : Gammaℝ (s + 2) = Gammaℝ s * s / 2 / π := by
+  rw [Gammaℝ_def, Gammaℝ_def, neg_div, add_div, neg_add, div_self two_ne_zero,
+    Gamma_add_one _ (div_ne_zero hs two_ne_zero),
+    cpow_add _ _ (ofReal_ne_zero.mpr pi_ne_zero), cpow_neg_one]
+  field_simp [pi_ne_zero]
+  ring
 
--- DISSOLVED: Gammaℂ_add_one
+lemma Gammaℂ_add_one {s : ℂ} (hs : s ≠ 0) : Gammaℂ (s + 1) = Gammaℂ s * s / 2 / π := by
+  rw [Gammaℂ_def, Gammaℂ_def, Gamma_add_one _ hs, neg_add,
+    cpow_add _ _ (mul_ne_zero two_ne_zero (ofReal_ne_zero.mpr pi_ne_zero)), cpow_neg_one]
+  field_simp [pi_ne_zero]
+  ring
 
--- DISSOLVED: Gammaℝ_ne_zero_of_re_pos
+lemma Gammaℝ_ne_zero_of_re_pos {s : ℂ} (hs : 0 < re s) : Gammaℝ s ≠ 0 := by
+  apply mul_ne_zero
+  · simp [pi_ne_zero]
+  · apply Gamma_ne_zero_of_re_pos
+    rw [div_ofNat_re]
+    exact div_pos hs two_pos
 
 lemma Gammaℝ_eq_zero_iff {s : ℂ} : Gammaℝ s = 0 ↔ ∃ n : ℕ, s = -(2 * n) := by
   simp [Gammaℝ_def, Complex.Gamma_eq_zero_iff, pi_ne_zero, div_eq_iff (two_ne_zero' ℂ), mul_comm]

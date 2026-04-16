@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ExactSequence
 import Mathlib.CategoryTheory.Abelian.Refinements
 
+noncomputable section
+
 /-!
 # The four and five lemmas
 
@@ -128,15 +130,8 @@ variable {R₁ R₂ : ComposableArrows C 4} (hR₁ : R₁.Exact) (hR₂ : R₂.E
 
 include hR₁ hR₂
 
-We turn off simprocs here.
-
-Ideally someone will investigate whether `simp` lemmas can be rearranged
-
-so that this works without the `set_option`,
-
-*or* come up with a proposal regarding finer control of disabling simprocs. -/
-
 set_option simprocs false in
+/-- The five lemma. -/
 
 theorem isIso_of_epi_of_isIso_of_isIso_of_mono (h₀ : Epi (app' φ 0)) (h₁ : IsIso (app' φ 1))
     (h₂ : IsIso (app' φ 3)) (h₃ : Mono (app' φ 4)) : IsIso (app' φ 2) := by

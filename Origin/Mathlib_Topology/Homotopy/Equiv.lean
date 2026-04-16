@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 import Origin.Core
 import Mathlib.Topology.Homotopy.Basic
 
+noncomputable section
+
 /-!
 
 # Homotopy equivalences between topological spaces
@@ -47,10 +49,6 @@ namespace HomotopyEquiv
 
 instance : CoeFun (X ≃ₕ Y) fun _ => X → Y := ⟨toFun'⟩
 
-@[simp]
-theorem toFun_eq_coe (h : HomotopyEquiv X Y) : (h.toFun : X → Y) = h :=
-  rfl
-
 @[continuity]
 theorem continuous (h : HomotopyEquiv X Y) : Continuous h :=
   h.toFun.continuous
@@ -69,10 +67,6 @@ def toHomotopyEquiv (h : X ≃ₜ Y) : X ≃ₕ Y where
   left_inv := by rw [symm_comp_toContinuousMap]
   right_inv := by rw [toContinuousMap_comp_symm]
 
-@[simp]
-theorem coe_toHomotopyEquiv (h : X ≃ₜ Y) : (h.toHomotopyEquiv : X → Y) = h :=
-  rfl
-
 end Homeomorph
 
 namespace ContinuousMap
@@ -84,10 +78,6 @@ def symm (h : X ≃ₕ Y) : Y ≃ₕ X where
   invFun := h.toFun
   left_inv := h.right_inv
   right_inv := h.left_inv
-
-@[simp]
-theorem coe_invFun (h : HomotopyEquiv X Y) : (⇑h.invFun : Y → X) = ⇑h.symm :=
-  rfl
 
 def Simps.apply (h : X ≃ₕ Y) : X → Y :=
   h
@@ -117,8 +107,6 @@ def trans (h₁ : X ≃ₕ Y) (h₂ : Y ≃ₕ Z) : X ≃ₕ Z where
     refine Homotopic.trans ?_ h₂.right_inv
     exact ((Homotopic.refl _).hcomp h₁.right_inv).hcomp (Homotopic.refl _)
 
-theorem symm_trans (h₁ : X ≃ₕ Y) (h₂ : Y ≃ₕ Z) : (h₁.trans h₂).symm = h₂.symm.trans h₁.symm := rfl
-
 def prodCongr (h₁ : X ≃ₕ Y) (h₂ : Z ≃ₕ Z') : (X × Z) ≃ₕ (Y × Z') where
   toFun := h₁.toFun.prodMap h₂.toFun
   invFun := h₁.invFun.prodMap h₂.invFun
@@ -140,19 +128,5 @@ end ContinuousMap
 open ContinuousMap
 
 namespace Homeomorph
-
-@[simp]
-theorem refl_toHomotopyEquiv (X : Type u) [TopologicalSpace X] :
-    (Homeomorph.refl X).toHomotopyEquiv = HomotopyEquiv.refl X :=
-  rfl
-
-@[simp]
-theorem symm_toHomotopyEquiv (h : X ≃ₜ Y) : h.symm.toHomotopyEquiv = h.toHomotopyEquiv.symm :=
-  rfl
-
-@[simp]
-theorem trans_toHomotopyEquiv (h₀ : X ≃ₜ Y) (h₁ : Y ≃ₜ Z) :
-    (h₀.trans h₁).toHomotopyEquiv = h₀.toHomotopyEquiv.trans h₁.toHomotopyEquiv :=
-  rfl
 
 end Homeomorph

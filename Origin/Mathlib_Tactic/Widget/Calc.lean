@@ -9,6 +9,8 @@ import Mathlib.Tactic.Widget.SelectPanelUtils
 import Batteries.CodeAction.Attr
 import Batteries.Lean.Position
 
+noncomputable section
+
 /-! # Calc widget
 
 This file redefines the `calc` tactic so that it displays a widget panel allowing to create

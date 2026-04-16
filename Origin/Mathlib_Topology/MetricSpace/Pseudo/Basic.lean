@@ -8,6 +8,8 @@ import Mathlib.Tactic.Bound.Attribute
 import Mathlib.Topology.EMetricSpace.Basic
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
 
+noncomputable section
+
 /-!
 ## Pseudo-metric spaces
 

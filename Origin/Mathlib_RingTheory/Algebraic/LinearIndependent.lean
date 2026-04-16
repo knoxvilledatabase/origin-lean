@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.LinearIndependent
 import Mathlib.RingTheory.Algebraic.Defs
 
+noncomputable section
+
 /-!
 # Linear independence of transcendental elements
 

@@ -5,6 +5,8 @@ Genuine: 90 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 
+noncomputable section
+
 /-!
 # Measurable embeddings and equivalences
 
@@ -196,8 +198,6 @@ def trans (ab : α ≃ᵐ β) (bc : β ≃ᵐ γ) : α ≃ᵐ γ where
   measurable_toFun := bc.measurable_toFun.comp ab.measurable_toFun
   measurable_invFun := ab.measurable_invFun.comp bc.measurable_invFun
 
-theorem coe_trans (ab : α ≃ᵐ β) (bc : β ≃ᵐ γ) : ⇑(ab.trans bc) = bc ∘ ab := rfl
-
 def symm (ab : α ≃ᵐ β) : β ≃ᵐ α where
   toEquiv := ab.toEquiv.symm
   measurable_toFun := ab.measurable_invFun
@@ -215,11 +215,6 @@ initialize_simps_projections MeasurableEquiv (toFun → apply, invFun → symm_a
 
 @[ext] theorem ext {e₁ e₂ : α ≃ᵐ β} (h : (e₁ : α → β) = e₂) : e₁ = e₂ := DFunLike.ext' h
 
-@[simp]
-theorem symm_mk (e : α ≃ β) (h1 : Measurable e) (h2 : Measurable e.symm) :
-    (⟨e, h1, h2⟩ : α ≃ᵐ β).symm = ⟨e.symm, h2, h1⟩ :=
-  rfl
-
 attribute [simps! apply toEquiv] trans refl
 
 @[simp]
@@ -228,10 +223,6 @@ theorem symm_symm (e : α ≃ᵐ β) : e.symm.symm = e := rfl
 theorem symm_bijective :
     Function.Bijective (MeasurableEquiv.symm : (α ≃ᵐ β) → β ≃ᵐ α) :=
   Function.bijective_iff_has_inverse.mpr ⟨_, symm_symm, symm_symm⟩
-
-@[simp]
-theorem symm_refl (α : Type*) [MeasurableSpace α] : (refl α).symm = refl α :=
-  rfl
 
 @[simp]
 theorem symm_comp_self (e : α ≃ᵐ β) : e.symm ∘ e = id :=
@@ -454,9 +445,6 @@ def piCongrLeft (f : δ ≃ δ') : (∀ b, π (f b)) ≃ᵐ ∀ a, π a where
     rw [measurable_pi_iff]
     exact fun i => measurable_pi_apply (f i)
 
-theorem coe_piCongrLeft (f : δ ≃ δ') :
-    ⇑(MeasurableEquiv.piCongrLeft π f) = f.piCongrLeft π := by rfl
-
 lemma piCongrLeft_apply_apply {ι ι' : Type*} (e : ι ≃ ι') {β : ι' → Type*}
     [∀ i', MeasurableSpace (β i')] (x : (i : ι) → β (e i)) (i : ι) :
     piCongrLeft (fun i' ↦ β i') e x (e i) = x i := by
@@ -542,12 +530,6 @@ def sumPiEquivProdPi (α : δ ⊕ δ' → Type*) [∀ i, MeasurableSpace (α i)]
     · exact measurable_pi_iff.1 measurable_fst _
     · exact measurable_pi_iff.1 measurable_snd _
 
-theorem coe_sumPiEquivProdPi (α : δ ⊕ δ' → Type*) [∀ i, MeasurableSpace (α i)] :
-    ⇑(MeasurableEquiv.sumPiEquivProdPi α) = Equiv.sumPiEquivProdPi α := by rfl
-
-theorem coe_sumPiEquivProdPi_symm (α : δ ⊕ δ' → Type*) [∀ i, MeasurableSpace (α i)] :
-    ⇑(MeasurableEquiv.sumPiEquivProdPi α).symm = (Equiv.sumPiEquivProdPi α).symm := by rfl
-
 def piOptionEquivProd {δ : Type*} (α : Option δ → Type*) [∀ i, MeasurableSpace (α i)] :
     (∀ i, α i) ≃ᵐ (∀ (i : δ), α i) × α none :=
   let e : Option δ ≃ δ ⊕ Unit := Equiv.optionEquivSumPUnit δ
@@ -579,12 +561,6 @@ def ofInvolutive (f : α → α) (hf : Involutive f) (hf' : Measurable f) : α �
   toEquiv := hf.toPerm
   measurable_toFun := hf'
   measurable_invFun := hf'
-
-@[simp] theorem ofInvolutive_apply (f : α → α) (hf : Involutive f) (hf' : Measurable f) (a : α) :
-    ofInvolutive f hf hf' a = f a := rfl
-
-@[simp] theorem ofInvolutive_symm (f : α → α) (hf : Involutive f) (hf' : Measurable f) :
-    (ofInvolutive f hf hf').symm = ofInvolutive f hf hf' := rfl
 
 end MeasurableEquiv
 

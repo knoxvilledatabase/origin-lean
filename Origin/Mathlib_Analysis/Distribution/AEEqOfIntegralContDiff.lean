@@ -7,6 +7,8 @@ import Mathlib.Geometry.Manifold.PartitionOfUnity
 import Mathlib.Geometry.Manifold.Metrizable
 import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 
+noncomputable section
+
 /-!
 # Functions which vanish as distributions vanish as functions
 

@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/IntegralDomain.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+
+noncomputable section
 
 /-!
 # Integral domains
@@ -35,11 +37,21 @@ section CancelMonoidWithZero
 
 variable {M : Type*} [CancelMonoidWithZero M] [Finite M]
 
--- DISSOLVED: mul_right_bijective_of_finite₀
+theorem mul_right_bijective_of_finite₀ {a : M} (ha : a ≠ 0) : Bijective fun b => a * b :=
+  Finite.injective_iff_bijective.1 <| mul_right_injective₀ ha
 
--- DISSOLVED: mul_left_bijective_of_finite₀
+theorem mul_left_bijective_of_finite₀ {a : M} (ha : a ≠ 0) : Bijective fun b => b * a :=
+  Finite.injective_iff_bijective.1 <| mul_left_injective₀ ha
 
--- DISSOLVED: Fintype.groupWithZeroOfCancel
+def Fintype.groupWithZeroOfCancel (M : Type*) [CancelMonoidWithZero M] [DecidableEq M] [Fintype M]
+    [Nontrivial M] : GroupWithZero M :=
+  { ‹Nontrivial M›,
+    ‹CancelMonoidWithZero M› with
+    inv := fun a => if h : a = 0 then 0 else Fintype.bijInv (mul_right_bijective_of_finite₀ h) 1
+    mul_inv_cancel := fun a ha => by
+      simp only [Inv.inv, dif_neg ha]
+      exact Fintype.rightInverse_bijInv _ _
+    inv_zero := by simp [Inv.inv, dif_pos rfl] }
 
 theorem exists_eq_pow_of_mul_eq_pow_of_coprime {R : Type*} [CommSemiring R] [IsDomain R]
     [GCDMonoid R] [Subsingleton Rˣ] {a b c : R} {n : ℕ} (cp : IsCoprime a b) (h : a * b = c ^ n) :

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/MvPolynomial/Degrees.lean
-Genuine: 60 | Conflates: 4 | Dissolved: 5 | Infrastructure: 0
+Genuine: 65 | Conflates: 4 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Degree
 import Mathlib.Algebra.MvPolynomial.Rename
+
+noncomputable section
 
 /-!
 # Degrees of polynomials
@@ -80,7 +82,10 @@ theorem degrees_monomial (s : σ →₀ ℕ) (a : R) : degrees (monomial s a) �
     split_ifs
     exacts [bot_le, le_rfl]
 
--- DISSOLVED: degrees_monomial_eq
+theorem degrees_monomial_eq (s : σ →₀ ℕ) (a : R) (ha : a ≠ 0) :
+    degrees (monomial s a) = toMultiset s := by
+  classical
+    exact (supDegree_single s a).trans (if_neg ha)
 
 theorem degrees_C (a : R) : degrees (C a : MvPolynomial σ R) = 0 :=
   Multiset.le_zero.1 <| degrees_monomial _ _
@@ -122,7 +127,10 @@ theorem degrees_prod {ι : Type*} (s : Finset ι) (f : ι → MvPolynomial σ R)
 theorem degrees_pow (p : MvPolynomial σ R) (n : ℕ) : (p ^ n).degrees ≤ n • p.degrees := by
   simpa using degrees_prod (Finset.range n) fun _ ↦ p
 
--- DISSOLVED: mem_degrees
+theorem mem_degrees {p : MvPolynomial σ R} {i : σ} :
+    i ∈ p.degrees ↔ ∃ d, p.coeff d ≠ 0 ∧ i ∈ d.support := by
+  classical
+  simp only [degrees_def, Multiset.mem_sup, ← mem_support_iff, Finsupp.mem_toMultiset, exists_prop]
 
 theorem le_degrees_add {p q : MvPolynomial σ R} (h : Disjoint p.degrees q.degrees) :
     p.degrees ≤ (p + q).degrees := by
@@ -241,7 +249,9 @@ theorem monomial_le_degreeOf (i : σ) {f : MvPolynomial σ R} {m : σ →₀ ℕ
   rw [degreeOf_eq_sup i]
   apply Finset.le_sup h_m
 
--- DISSOLVED: degreeOf_monomial_eq
+lemma degreeOf_monomial_eq [DecidableEq σ] (s : σ →₀ ℕ) (i : σ) {a : R} (ha : a ≠ 0) :
+    (monomial s a).degreeOf i = s i := by
+  rw [degreeOf_def, degrees_monomial_eq _ _ ha, Finsupp.count_toMultiset]
 
 theorem degreeOf_mul_le (i : σ) (f g : MvPolynomial σ R) :
     degreeOf i (f * g) ≤ degreeOf i f + degreeOf i g := by
@@ -283,7 +293,18 @@ theorem degreeOf_mul_X_eq (j : σ) (f : MvPolynomial σ R) :
   convert Multiset.count_le_of_le j (degrees_X' (R := R) j)
   rw [Multiset.count_singleton_self]
 
--- DISSOLVED: degreeOf_mul_X_eq_degreeOf_add_one_iff
+theorem degreeOf_mul_X_eq_degreeOf_add_one_iff (j : σ) (f : MvPolynomial σ R) :
+    degreeOf j (f * X j) = degreeOf j f + 1 ↔ f ≠ 0 := by
+  refine ⟨fun h => by by_contra ha; simp [ha] at h, fun h => ?_⟩
+  apply Nat.le_antisymm (degreeOf_mul_X_eq j f)
+  have : (f.support.sup fun m ↦ m j) + 1 = (f.support.sup fun m ↦ (m j + 1)) :=
+    Finset.comp_sup_eq_sup_comp_of_nonempty @Nat.succ_le_succ (support_nonempty.mpr h)
+  simp only [degreeOf_eq_sup, support_mul_X, this]
+  apply Finset.sup_le
+  intro x hx
+  simp only [Finset.sup_map, bot_eq_zero', add_pos_iff, zero_lt_one, or_true, Finset.le_sup_iff]
+  use x
+  simpa using mem_support_iff.mp hx
 
 theorem degreeOf_C_mul_le (p : MvPolynomial σ R) (i : σ) (c : R) :
     (C c * p).degreeOf i ≤ p.degreeOf i := by
@@ -394,7 +415,10 @@ theorem totalDegree_pow (a : MvPolynomial σ R) (n : ℕ) :
   refine supDegree_prod_le rfl (fun _ _ => ?_)
   exact Finsupp.sum_add_index' (fun _ => rfl) (fun _ _ _ => rfl)
 
--- DISSOLVED: totalDegree_monomial
+@[simp]
+theorem totalDegree_monomial (s : σ →₀ ℕ) {c : R} (hc : c ≠ 0) :
+    (monomial s c : MvPolynomial σ R).totalDegree = s.sum fun _ e => e := by
+  classical simp [totalDegree, support_monomial, if_neg hc]
 
 theorem totalDegree_monomial_le (s : σ →₀ ℕ) (c : R) :
     (monomial s c).totalDegree ≤ s.sum fun _ ↦ id := by

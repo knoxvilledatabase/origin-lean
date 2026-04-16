@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Hom.Monoid
 import Mathlib.SetTheory.Game.Ordinal
 
+noncomputable section
+
 /-!
 # Surreal numbers
 
@@ -290,14 +292,8 @@ instance instLE : LE Surreal :=
 @[simp]
 lemma mk_le_mk {x y : PGame.{u}} {hx hy} : mk x hx ≤ mk y hy ↔ x ≤ y := Iff.rfl
 
-lemma zero_le_mk {x : PGame.{u}} {hx} : 0 ≤ mk x hx ↔ 0 ≤ x := Iff.rfl
-
 instance instLT : LT Surreal :=
   ⟨lift₂ (fun x y _ _ => x < y) fun _ _ _ _ hx hy => propext (lt_congr hx hy)⟩
-
-lemma mk_lt_mk {x y : PGame.{u}} {hx hy} : mk x hx < mk y hy ↔ x < y := Iff.rfl
-
-lemma zero_lt_mk {x : PGame.{u}} {hx} : 0 < mk x hx ↔ 0 < x := Iff.rfl
 
 theorem mk_moveLeft_lt_mk {x : PGame} (o : Numeric x) (i) :
     Surreal.mk (x.moveLeft i) (Numeric.moveLeft o i) < Surreal.mk x o := Numeric.moveLeft_lt o i
@@ -331,14 +327,6 @@ instance orderedAddCommGroup : OrderedAddCommGroup Surreal where
   nsmul := nsmulRec
   zsmul := zsmulRec
 
-lemma mk_add {x y : PGame} (hx : x.Numeric) (hy : y.Numeric) :
-    Surreal.mk (x + y) (hx.add hy) = Surreal.mk x hx + Surreal.mk y hy := by rfl
-
-lemma mk_sub {x y : PGame} (hx : x.Numeric) (hy : y.Numeric) :
-    Surreal.mk (x - y) (hx.sub hy) = Surreal.mk x hx - Surreal.mk y hy := by rfl
-
-lemma zero_def : 0 = mk 0 numeric_zero := by rfl
-
 noncomputable instance : LinearOrderedAddCommGroup Surreal :=
   { Surreal.orderedAddCommGroup with
     le_total := by
@@ -354,9 +342,6 @@ def toGame : Surreal →+o Game where
   map_zero' := rfl
   map_add' := by rintro ⟨_, _⟩ ⟨_, _⟩; rfl
   monotone' := by rintro ⟨_, _⟩ ⟨_, _⟩; exact id
-
-theorem zero_toGame : toGame 0 = 0 :=
-  rfl
 
 @[simp]
 theorem one_toGame : toGame 1 = 1 :=

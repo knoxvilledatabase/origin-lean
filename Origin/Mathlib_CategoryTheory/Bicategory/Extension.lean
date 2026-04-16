@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Basic
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
 
+noncomputable section
+
 /-!
 # Extensions and lifts in bicategories
 
@@ -68,11 +70,6 @@ def ofCompId (t : LeftExtension f (g ≫ 𝟙 c)) : LeftExtension f g :=
 
 def whisker (t : LeftExtension f g) {x : B} (h : c ⟶ x) : LeftExtension f (g ≫ h) :=
   .mk _ <| t.unit ▷ h ≫ (α_ _ _ _).hom
-
-@[simp]
-theorem whisker_extension (t : LeftExtension f g) {x : B} (h : c ⟶ x) :
-    (t.whisker h).extension = t.extension ≫ h :=
-  rfl
 
 @[simp]
 theorem whisker_unit (t : LeftExtension f g) {x : B} (h : c ⟶ x) :

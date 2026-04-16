@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Basic
 import Mathlib.RingTheory.PrimeSpectrum
 import Mathlib.Order.KrullDimension
 
+noncomputable section
+
 /-!
 # Krull dimensions of (commutative) rings
 

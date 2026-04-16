@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Field/Defs.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 5
+Genuine: 12 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Data.Rat.Init
+
+noncomputable section
 
 /-!
 # Division (semi)rings and (semi)fields
@@ -57,14 +59,68 @@ def NNRat.castRec [NatCast K] [Div K] (q : ℚ≥0) : K := q.num / q.den
 
 def Rat.castRec [NatCast K] [IntCast K] [Div K] (q : ℚ) : K := q.num / q.den
 
--- DISSOLVED: DivisionSemiring
+class DivisionSemiring (K : Type*) extends Semiring K, GroupWithZero K, NNRatCast K where
+  protected nnratCast := NNRat.castRec
+  /-- However `NNRat.cast` is defined, it must be propositionally equal to `a / b`.
 
--- DISSOLVED: DivisionRing
+  Do not use this lemma directly. Use `NNRat.cast_def` instead. -/
+  protected nnratCast_def (q : ℚ≥0) : (NNRat.cast q : K) = q.num / q.den := by intros; rfl
+  /-- Scalar multiplication by a nonnegative rational number.
+
+  Unless there is a risk of a `Module ℚ≥0 _` instance diamond, write `nnqsmul := _`. This will set
+  `nnqsmul` to `(NNRat.cast · * ·)` thanks to unification in the default proof of `nnqsmul_def`.
+
+  Do not use directly. Instead use the `•` notation. -/
+  protected nnqsmul : ℚ≥0 → K → K
+  /-- However `qsmul` is defined, it must be propositionally equal to multiplication by `Rat.cast`.
+
+  Do not use this lemma directly. Use `NNRat.smul_def` instead. -/
+  protected nnqsmul_def (q : ℚ≥0) (a : K) : nnqsmul q a = NNRat.cast q * a := by intros; rfl
+
+-- CONFLATES (assumes ground = zero): DivisionRing
+class DivisionRing (K : Type*)
+  extends Ring K, DivInvMonoid K, Nontrivial K, NNRatCast K, RatCast K where
+  /-- For a nonzero `a`, `a⁻¹` is a right multiplicative inverse. -/
+  protected mul_inv_cancel : ∀ (a : K), a ≠ 0 → a * a⁻¹ = 1
+  /-- The inverse of `0` is `0` by convention. -/
+  protected inv_zero : (0 : K)⁻¹ = 0
+  protected nnratCast := NNRat.castRec
+  /-- However `NNRat.cast` is defined, it must be equal to `a / b`.
+
+  Do not use this lemma directly. Use `NNRat.cast_def` instead. -/
+  protected nnratCast_def (q : ℚ≥0) : (NNRat.cast q : K) = q.num / q.den := by intros; rfl
+  /-- Scalar multiplication by a nonnegative rational number.
+
+  Unless there is a risk of a `Module ℚ≥0 _` instance diamond, write `nnqsmul := _`. This will set
+  `nnqsmul` to `(NNRat.cast · * ·)` thanks to unification in the default proof of `nnqsmul_def`.
+
+  Do not use directly. Instead use the `•` notation. -/
+  protected nnqsmul : ℚ≥0 → K → K
+  /-- However `qsmul` is defined, it must be propositionally equal to multiplication by `Rat.cast`.
+
+  Do not use this lemma directly. Use `NNRat.smul_def` instead. -/
+  protected nnqsmul_def (q : ℚ≥0) (a : K) : nnqsmul q a = NNRat.cast q * a := by intros; rfl
+  protected ratCast := Rat.castRec
+  /-- However `Rat.cast q` is defined, it must be propositionally equal to `q.num / q.den`.
+
+  Do not use this lemma directly. Use `Rat.cast_def` instead. -/
+  protected ratCast_def (q : ℚ) : (Rat.cast q : K) = q.num / q.den := by intros; rfl
+  /-- Scalar multiplication by a rational number.
+
+  Unless there is a risk of a `Module ℚ _` instance diamond, write `qsmul := _`. This will set
+  `qsmul` to `(Rat.cast · * ·)` thanks to unification in the default proof of `qsmul_def`.
+
+  Do not use directly. Instead use the `•` notation. -/
+  protected qsmul : ℚ → K → K
+  /-- However `qsmul` is defined, it must be propositionally equal to multiplication by `Rat.cast`.
+
+  Do not use this lemma directly. Use `Rat.cast_def` instead. -/
+  protected qsmul_def (a : ℚ) (x : K) : qsmul a x = Rat.cast a * x := by intros; rfl
 
 instance (priority := 100) DivisionRing.toDivisionSemiring [DivisionRing K] : DivisionSemiring K :=
   { ‹DivisionRing K› with }
 
--- DISSOLVED: Semifield
+class Semifield (K : Type*) extends CommSemiring K, DivisionSemiring K, CommGroupWithZero K
 
 @[stacks 09FD "first part"]
 class Field (K : Type u) extends CommRing K, DivisionRing K
@@ -105,7 +161,3 @@ theorem smul_one_eq_cast (A : Type*) [DivisionRing A] (m : ℚ) : m • (1 : A) 
   rw [Rat.smul_def, mul_one]
 
 end Rat
-
-@[simp]
-theorem Rat.ofScientific_eq_ofScientific (m : ℕ) (s : Bool) (e : ℕ) :
-    Rat.ofScientific (OfNat.ofNat m) s (OfNat.ofNat e) = OfScientific.ofScientific m s e := rfl

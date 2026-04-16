@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Quaternion
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # Basis on a quaternion-like algebra
 

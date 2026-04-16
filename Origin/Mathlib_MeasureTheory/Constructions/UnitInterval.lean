@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 
+noncomputable section
+
 /-!
 # The canonical measure on the unit interval
 
@@ -22,8 +24,6 @@ open MeasureTheory
 namespace unitInterval
 
 noncomputable instance : MeasureSpace I := Measure.Subtype.measureSpace
-
-theorem volume_def : (volume : Measure I) = volume.comap Subtype.val := rfl
 
 instance : IsProbabilityMeasure (volume : Measure I) where
   measure_univ := by

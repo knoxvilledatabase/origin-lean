@@ -10,6 +10,8 @@ import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Topology.Bornology.BoundedOperation
 import Mathlib.Tactic.Monotonicity
 
+noncomputable section
+
 /-!
 # Bounded continuous functions
 
@@ -98,14 +100,8 @@ theorem eq_of_empty [h : IsEmpty α] (f g : α →ᵇ β) : f = g :=
 def mkOfBound (f : C(α, β)) (C : ℝ) (h : ∀ x y : α, dist (f x) (f y) ≤ C) : α →ᵇ β :=
   ⟨f, ⟨C, h⟩⟩
 
-@[simp]
-theorem mkOfBound_coe {f} {C} {h} : (mkOfBound f C h : α → β) = (f : α → β) := rfl
-
 def mkOfCompact [CompactSpace α] (f : C(α, β)) : α →ᵇ β :=
   ⟨f, isBounded_range_iff.1 (isCompact_range f.continuous).isBounded⟩
-
-@[simp]
-theorem mkOfCompact_apply [CompactSpace α] (f : C(α, β)) (a : α) : mkOfCompact f a = f a := rfl
 
 @[simps]
 def mkOfDiscrete [DiscreteTopology α] (f : α → β) (C : ℝ) (h : ∀ x y : α, dist (f x) (f y) ≤ C) :
@@ -232,8 +228,6 @@ def const (b : β) : α →ᵇ β :=
 
 variable {α}
 
-theorem const_apply' (a : α) (b : β) : (const α b : α → β) a = b := rfl
-
 instance [Inhabited β] : Inhabited (α →ᵇ β) :=
   ⟨const α default⟩
 
@@ -292,14 +286,6 @@ def compContinuous {δ : Type*} [TopologicalSpace δ] (f : α →ᵇ β) (g : C(
   toContinuousMap := f.1.comp g
   map_bounded' := f.map_bounded'.imp fun _ hC _ _ => hC _ _
 
-@[simp]
-theorem coe_compContinuous {δ : Type*} [TopologicalSpace δ] (f : α →ᵇ β) (g : C(δ, α)) :
-    ⇑(f.compContinuous g) = f ∘ g := rfl
-
-@[simp]
-theorem compContinuous_apply {δ : Type*} [TopologicalSpace δ] (f : α →ᵇ β) (g : C(δ, α)) (x : δ) :
-    f.compContinuous g x = f (g x) := rfl
-
 theorem lipschitz_compContinuous {δ : Type*} [TopologicalSpace δ] (g : C(δ, α)) :
     LipschitzWith 1 fun f : α →ᵇ β => f.compContinuous g :=
   LipschitzWith.mk_one fun _ _ => (dist_le dist_nonneg).2 fun x => dist_coe_le_dist (g x)
@@ -310,12 +296,6 @@ theorem continuous_compContinuous {δ : Type*} [TopologicalSpace δ] (g : C(δ, 
 
 def restrict (f : α →ᵇ β) (s : Set α) : s →ᵇ β :=
   f.compContinuous <| (ContinuousMap.id _).restrict s
-
-@[simp]
-theorem coe_restrict (f : α →ᵇ β) (s : Set α) : ⇑(f.restrict s) = f ∘ (↑) := rfl
-
-@[simp]
-theorem restrict_apply (f : α →ᵇ β) (s : Set α) (x : s) : f.restrict s x = f x := rfl
 
 def comp (G : β → γ) {C : ℝ≥0} (H : LipschitzWith C G) (f : α →ᵇ β) : α →ᵇ γ :=
   ⟨⟨fun x => G (f x), H.continuous.comp f.continuous⟩,
@@ -371,29 +351,6 @@ nonrec theorem extend_apply' {f : α ↪ δ} {x : δ} (hx : x ∉ range f) (g : 
 
 theorem extend_of_empty [IsEmpty α] (f : α ↪ δ) (g : α →ᵇ β) (h : δ →ᵇ β) : extend f g h = h :=
   DFunLike.coe_injective <| Function.extend_of_isEmpty f g h
-
-@[simp]
-theorem dist_extend_extend (f : α ↪ δ) (g₁ g₂ : α →ᵇ β) (h₁ h₂ : δ →ᵇ β) :
-    dist (g₁.extend f h₁) (g₂.extend f h₂) =
-      max (dist g₁ g₂) (dist (h₁.restrict (range f)ᶜ) (h₂.restrict (range f)ᶜ)) := by
-  refine le_antisymm ((dist_le <| le_max_iff.2 <| Or.inl dist_nonneg).2 fun x => ?_) (max_le ?_ ?_)
-  · rcases em (∃ y, f y = x) with (⟨x, rfl⟩ | hx)
-    · simp only [extend_apply]
-      exact (dist_coe_le_dist x).trans (le_max_left _ _)
-    · simp only [extend_apply' hx]
-      lift x to ((range f)ᶜ : Set δ) using hx
-      calc
-        dist (h₁ x) (h₂ x) = dist (h₁.restrict (range f)ᶜ x) (h₂.restrict (range f)ᶜ x) := rfl
-        _ ≤ dist (h₁.restrict (range f)ᶜ) (h₂.restrict (range f)ᶜ) := dist_coe_le_dist x
-        _ ≤ _ := le_max_right _ _
-  · refine (dist_le dist_nonneg).2 fun x => ?_
-    rw [← extend_apply f g₁ h₁, ← extend_apply f g₂ h₂]
-    exact dist_coe_le_dist _
-  · refine (dist_le dist_nonneg).2 fun x => ?_
-    calc
-      dist (h₁ x) (h₂ x) = dist (extend f g₁ h₁ x) (extend f g₂ h₂ x) := by
-        rw [extend_apply' x.coe_prop, extend_apply' x.coe_prop]
-      _ ≤ _ := dist_coe_le_dist _
 
 theorem isometry_extend (f : α ↪ δ) (h : δ →ᵇ β) : Isometry fun g : α →ᵇ β => extend f g h :=
   Isometry.of_dist_eq fun g₁ g₂ => by simp [dist_nonneg]
@@ -513,16 +470,9 @@ variable [TopologicalSpace α] [PseudoMetricSpace β] [One β]
 @[to_additive (attr := simp)]
 theorem coe_one : ((1 : α →ᵇ β) : α → β) = 1 := rfl
 
-@[to_additive (attr := simp)]
-theorem mkOfCompact_one [CompactSpace α] : mkOfCompact (1 : C(α, β)) = 1 := rfl
-
 @[to_additive]
 theorem forall_coe_one_iff_one (f : α →ᵇ β) : (∀ x, f x = 1) ↔ f = 1 :=
   (@DFunLike.ext_iff _ _ _ _ f 1).symm
-
-@[to_additive (attr := simp)]
-theorem one_compContinuous [TopologicalSpace γ] (f : C(γ, α)) : (1 : α →ᵇ β).compContinuous f = 1 :=
-  rfl
 
 end One
 
@@ -544,13 +494,6 @@ theorem coe_add : ⇑(f + g) = f + g := rfl
 theorem add_apply : (f + g) x = f x + g x := rfl
 
 @[simp]
-theorem mkOfCompact_add [CompactSpace α] (f g : C(α, β)) :
-    mkOfCompact (f + g) = mkOfCompact f + mkOfCompact g := rfl
-
-theorem add_compContinuous [TopologicalSpace γ] (h : C(γ, α)) :
-    (g + f).compContinuous h = g.compContinuous h + f.compContinuous h := rfl
-
-@[simp]
 theorem coe_nsmulRec : ∀ n, ⇑(nsmulRec n f) = n • ⇑f
   | 0 => by rw [nsmulRec, zero_smul, coe_zero]
   | n + 1 => by rw [nsmulRec, succ_nsmul, coe_add, coe_nsmulRec n]
@@ -563,9 +506,6 @@ instance instSMulNat : SMul ℕ (α →ᵇ β) where
 @[simp]
 theorem coe_nsmul (r : ℕ) (f : α →ᵇ β) : ⇑(r • f) = r • ⇑f := rfl
 
-@[simp]
-theorem nsmul_apply (r : ℕ) (f : α →ᵇ β) (v : α) : (r • f) v = r • f v := rfl
-
 instance instAddMonoid : AddMonoid (α →ᵇ β) :=
   DFunLike.coe_injective.addMonoid _ coe_zero coe_add fun _ _ => coe_nsmul _ _
 
@@ -576,15 +516,6 @@ def coeFnAddHom : (α →ᵇ β) →+ α → β where
   map_add' := coe_add
 
 variable (α β)
-
-@[simps]
-def toContinuousMapAddHom : (α →ᵇ β) →+ C(α, β) where
-  toFun := toContinuousMap
-  map_zero' := rfl
-  map_add' := by
-    intros
-    ext
-    simp
 
 end add
 
@@ -602,9 +533,6 @@ instance instAddCommMonoid : AddCommMonoid (α →ᵇ β) where
 theorem coe_sum {ι : Type*} (s : Finset ι) (f : ι → α →ᵇ β) :
     ⇑(∑ i ∈ s, f i) = ∑ i ∈ s, (f i : α → β) :=
   map_sum coeFnAddHom f s
-
-theorem sum_apply {ι : Type*} (s : Finset ι) (f : ι → α →ᵇ β) (a : α) :
-    (∑ i ∈ s, f i) a = ∑ i ∈ s, f i a := by simp
 
 end comm_add
 
@@ -654,13 +582,7 @@ variable [TopologicalSpace α] {β : Type*} [PseudoMetricSpace β]
 
 instance [NatCast β] : NatCast (α →ᵇ β) := ⟨fun n ↦ BoundedContinuousFunction.const _ n⟩
 
-@[simp]
-theorem natCast_apply [NatCast β] (n : ℕ) (x : α) : (n : α →ᵇ β) x = n := rfl
-
 instance [IntCast β] : IntCast (α →ᵇ β) := ⟨fun m ↦ BoundedContinuousFunction.const _ m⟩
-
-@[simp]
-theorem intCast_apply [IntCast β] (m : ℤ) (x : α) : (m : α →ᵇ β) x = m := rfl
 
 end casts
 
@@ -691,10 +613,6 @@ instance instPow [Monoid R] [BoundedMul R] [ContinuousMul R] : Pow (α →ᵇ R)
 
 theorem coe_pow [Monoid R] [BoundedMul R] [ContinuousMul R] (n : ℕ) (f : α →ᵇ R) :
     ⇑(f ^ n) = (⇑f) ^ n := rfl
-
-@[simp]
-theorem pow_apply [Monoid R] [BoundedMul R] [ContinuousMul R] (n : ℕ) (f : α →ᵇ R) (x : α) :
-    (f ^ n) x = f x ^ n := rfl
 
 instance instMonoid [Monoid R] [BoundedMul R] [ContinuousMul R] :
     Monoid (α →ᵇ R) :=
@@ -791,11 +709,6 @@ def ofNormedAddCommGroup {α : Type u} {β : Type v} [TopologicalSpace α] [Semi
     (f : α → β) (Hf : Continuous f) (C : ℝ) (H : ∀ x, ‖f x‖ ≤ C) : α →ᵇ β :=
   ⟨⟨fun n => f n, Hf⟩, ⟨_, dist_le_two_norm' H⟩⟩
 
-@[simp]
-theorem coe_ofNormedAddCommGroup {α : Type u} {β : Type v} [TopologicalSpace α]
-    [SeminormedAddCommGroup β] (f : α → β) (Hf : Continuous f) (C : ℝ) (H : ∀ x, ‖f x‖ ≤ C) :
-    (ofNormedAddCommGroup f Hf C H : α → β) = f := rfl
-
 theorem norm_ofNormedAddCommGroup_le {f : α → β} (hfc : Continuous f) {C : ℝ} (hC : 0 ≤ C)
     (hfC : ∀ x, ‖f x‖ ≤ C) : ‖ofNormedAddCommGroup f hfc C hfC‖ ≤ C :=
   (norm_le hC).2 hfC
@@ -803,11 +716,6 @@ theorem norm_ofNormedAddCommGroup_le {f : α → β} (hfc : Continuous f) {C : �
 def ofNormedAddCommGroupDiscrete {α : Type u} {β : Type v} [TopologicalSpace α] [DiscreteTopology α]
     [SeminormedAddCommGroup β] (f : α → β) (C : ℝ) (H : ∀ x, norm (f x) ≤ C) : α →ᵇ β :=
   ofNormedAddCommGroup f continuous_of_discreteTopology C H
-
-@[simp]
-theorem coe_ofNormedAddCommGroupDiscrete {α : Type u} {β : Type v} [TopologicalSpace α]
-    [DiscreteTopology α] [SeminormedAddCommGroup β] (f : α → β) (C : ℝ) (H : ∀ x, ‖f x‖ ≤ C) :
-    (ofNormedAddCommGroupDiscrete f C H : α → β) = f := rfl
 
 def normComp : α →ᵇ ℝ :=
   f.comp norm lipschitzWith_one_norm
@@ -836,15 +744,6 @@ instance : Neg (α →ᵇ β) :=
 @[simp]
 theorem coe_neg : ⇑(-f) = -f := rfl
 
-theorem neg_apply : (-f) x = -f x := rfl
-
-@[simp]
-theorem mkOfCompact_neg [CompactSpace α] (f : C(α, β)) : mkOfCompact (-f) = -mkOfCompact f := rfl
-
-@[simp]
-theorem mkOfCompact_sub [CompactSpace α] (f g : C(α, β)) :
-    mkOfCompact (f - g) = mkOfCompact f - mkOfCompact g := rfl
-
 @[simp]
 theorem coe_zsmulRec : ∀ z, ⇑(zsmulRec (· • ·) z f) = z • ⇑f
   | Int.ofNat n => by rw [zsmulRec, Int.ofNat_eq_coe, coe_nsmul, natCast_zsmul]
@@ -858,9 +757,6 @@ instance instSMulInt : SMul ℤ (α →ᵇ β) where
 @[simp]
 theorem coe_zsmul (r : ℤ) (f : α →ᵇ β) : ⇑(r • f) = r • ⇑f := rfl
 
-@[simp]
-theorem zsmul_apply (r : ℤ) (f : α →ᵇ β) (v : α) : (r • f) v = r • f v := rfl
-
 instance instAddCommGroup : AddCommGroup (α →ᵇ β) :=
   DFunLike.coe_injective.addCommGroup _ coe_zero coe_add coe_neg coe_sub (fun _ _ => coe_nsmul _ _)
     fun _ _ => coe_zsmul _ _
@@ -873,8 +769,6 @@ instance instNormedAddCommGroup {α β} [TopologicalSpace α] [NormedAddCommGrou
   { instSeminormedAddCommGroup with
     -- Porting note (https://github.com/leanprover-community/mathlib4/issues/10888): Added a proof for `eq_of_dist_eq_zero`
     eq_of_dist_eq_zero }
-
-theorem nnnorm_def : ‖f‖₊ = nndist f 0 := rfl
 
 theorem nnnorm_coe_le_nnnorm (x : α) : ‖f x‖₊ ≤ ‖f‖₊ :=
   norm_coe_le_norm _ _
@@ -1008,16 +902,7 @@ def evalCLM (x : α) : (α →ᵇ β) →L[𝕜] β where
   map_add' _ _ := add_apply _ _
   map_smul' _ _ := smul_apply _ _ _
 
-@[simp]
-theorem evalCLM_apply (x : α) (f : α →ᵇ β) : evalCLM 𝕜 x f = f x := rfl
-
 variable (α β)
-
-@[simps]
-def toContinuousMapLinearMap : (α →ᵇ β) →ₗ[𝕜] C(α, β) where
-  toFun := toContinuousMap
-  map_smul' _ _ := rfl
-  map_add' _ _ := rfl
 
 end Module
 
@@ -1060,10 +945,6 @@ protected def _root_.ContinuousLinearMap.compLeftContinuousBounded (g : β →L[
       map_smul' := fun c f => by ext; simp } ‖g‖ fun f =>
         norm_ofNormedAddCommGroup_le _ (mul_nonneg (norm_nonneg g) (norm_nonneg f))
           (fun x => by exact g.le_opNorm_of_le (f.norm_coe_le_norm x))
-
-@[simp]
-theorem _root_.ContinuousLinearMap.compLeftContinuousBounded_apply (g : β →L[𝕜] γ) (f : α →ᵇ β)
-    (x : α) : (g.compLeftContinuousBounded α f) x = g (f x) := rfl
 
 end NormedSpace
 
@@ -1132,11 +1013,6 @@ instance : NatCast (α →ᵇ R) :=
 
 @[simp, norm_cast]
 theorem coe_natCast (n : ℕ) : ((n : α →ᵇ R) : α → R) = n := rfl
-
-@[simp, norm_cast]
-theorem coe_ofNat (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n) : α →ᵇ R) : α → R) = OfNat.ofNat n :=
-  rfl
 
 instance : IntCast (α →ᵇ R) :=
   ⟨fun n => BoundedContinuousFunction.const _ n⟩
@@ -1318,12 +1194,6 @@ instance instSemilatticeInf : SemilatticeInf (α →ᵇ β) :=
 
 instance instLattice : Lattice (α →ᵇ β) := DFunLike.coe_injective.lattice _ coe_sup coe_inf
 
-@[simp, norm_cast] lemma coe_abs (f : α →ᵇ β) : ⇑|f| = |⇑f| := rfl
-
-@[simp, norm_cast] lemma coe_posPart (f : α →ᵇ β) : ⇑f⁺ = (⇑f)⁺ := rfl
-
-@[simp, norm_cast] lemma coe_negPart (f : α →ᵇ β) : ⇑f⁻ = (⇑f)⁻ := rfl
-
 instance instNormedLatticeAddCommGroup : NormedLatticeAddCommGroup (α →ᵇ β) :=
   { instSeminormedAddCommGroup with
     add_le_add_left := by
@@ -1348,15 +1218,9 @@ variable [TopologicalSpace α]
 def nnrealPart (f : α →ᵇ ℝ) : α →ᵇ ℝ≥0 :=
   BoundedContinuousFunction.comp _ (show LipschitzWith 1 Real.toNNReal from lipschitzWith_posPart) f
 
-@[simp]
-theorem nnrealPart_coeFn_eq (f : α →ᵇ ℝ) : ⇑f.nnrealPart = Real.toNNReal ∘ ⇑f := rfl
-
 def nnnorm (f : α →ᵇ ℝ) : α →ᵇ ℝ≥0 :=
   BoundedContinuousFunction.comp _
     (show LipschitzWith 1 fun x : ℝ => ‖x‖₊ from lipschitzWith_one_norm) f
-
-@[simp]
-theorem nnnorm_coeFn_eq (f : α →ᵇ ℝ) : ⇑f.nnnorm = NNNorm.nnnorm ∘ ⇑f := rfl
 
 theorem self_eq_nnrealPart_sub_nnrealPart_neg (f : α →ᵇ ℝ) :
     ⇑f = (↑) ∘ f.nnrealPart - (↑) ∘ (-f).nnrealPart := by

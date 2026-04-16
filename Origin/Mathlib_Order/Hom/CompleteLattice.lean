@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.Hom.Lattice
 
+noncomputable section
+
 /-!
 # Complete lattice homomorphisms
 
@@ -209,10 +211,6 @@ instance : FunLike (sSupHom α β) α β where
 instance : sSupHomClass (sSupHom α β) α β where
   map_sSup := sSupHom.map_sSup'
 
-@[simp] lemma toFun_eq_coe (f : sSupHom α β) : f.toFun = f := rfl
-
-@[simp, norm_cast] lemma coe_mk (f : α → β) (hf) : ⇑(mk f hf) = f := rfl
-
 @[ext]
 theorem ext {f g : sSupHom α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -220,10 +218,6 @@ theorem ext {f g : sSupHom α β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : sSupHom α β) (f' : α → β) (h : f' = f) : sSupHom α β where
   toFun := f'
   map_sSup' := h.symm ▸ f.map_sSup'
-
-@[simp]
-theorem coe_copy (f : sSupHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : sSupHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -236,31 +230,14 @@ protected def id : sSupHom α α :=
 instance : Inhabited (sSupHom α α) :=
   ⟨sSupHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(sSupHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : sSupHom.id α a = a :=
-  rfl
 
 def comp (f : sSupHom β γ) (g : sSupHom α β) : sSupHom α γ where
   toFun := f ∘ g
   map_sSup' s := by rw [comp_apply, map_sSup, map_sSup, Set.image_image]; simp only [Function.comp]
 
 @[simp]
-theorem coe_comp (f : sSupHom β γ) (g : sSupHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : sSupHom β γ) (g : sSupHom α β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : sSupHom γ δ) (g : sSupHom β γ) (h : sSupHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -298,14 +275,6 @@ instance : OrderBot (sSupHom α β) where
   bot := ⊥
   bot_le := fun _ _ ↦ CompleteLattice.bot_le _
 
-@[simp]
-theorem coe_bot : ⇑(⊥ : sSupHom α β) = ⊥ :=
-  rfl
-
-@[simp]
-theorem bot_apply (a : α) : (⊥ : sSupHom α β) a = ⊥ :=
-  rfl
-
 end sSupHom
 
 /-! ### Infimum homomorphisms -/
@@ -325,10 +294,6 @@ instance : FunLike (sInfHom α β) α β where
 instance : sInfHomClass (sInfHom α β) α β where
   map_sInf := sInfHom.map_sInf'
 
-@[simp] lemma toFun_eq_coe (f : sInfHom α β) : f.toFun = f := rfl
-
-@[simp] lemma coe_mk (f : α → β) (hf) : ⇑(mk f hf) = f := rfl
-
 @[ext]
 theorem ext {f g : sInfHom α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -336,10 +301,6 @@ theorem ext {f g : sInfHom α β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : sInfHom α β) (f' : α → β) (h : f' = f) : sInfHom α β where
   toFun := f'
   map_sInf' := h.symm ▸ f.map_sInf'
-
-@[simp]
-theorem coe_copy (f : sInfHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : sInfHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -352,31 +313,14 @@ protected def id : sInfHom α α :=
 instance : Inhabited (sInfHom α α) :=
   ⟨sInfHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(sInfHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : sInfHom.id α a = a :=
-  rfl
 
 def comp (f : sInfHom β γ) (g : sInfHom α β) : sInfHom α γ where
   toFun := f ∘ g
   map_sInf' s := by rw [comp_apply, map_sInf, map_sInf, Set.image_image]; simp only [Function.comp]
 
 @[simp]
-theorem coe_comp (f : sInfHom β γ) (g : sInfHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : sInfHom β γ) (g : sInfHom α β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : sInfHom γ δ) (g : sInfHom β γ) (h : sInfHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -414,14 +358,6 @@ instance : OrderTop (sInfHom α β) where
   top := ⊤
   le_top := fun _ _ => CompleteLattice.le_top _
 
-@[simp]
-theorem coe_top : ⇑(⊤ : sInfHom α β) = ⊤ :=
-  rfl
-
-@[simp]
-theorem top_apply (a : α) : (⊤ : sInfHom α β) a = ⊤ :=
-  rfl
-
 end sInfHom
 
 /-! ### Frame homomorphisms -/
@@ -445,24 +381,12 @@ instance : FrameHomClass (FrameHom α β) α β where
 def toLatticeHom (f : FrameHom α β) : LatticeHom α β :=
   f
 
-lemma toFun_eq_coe (f : FrameHom α β) : f.toFun = f := rfl
-
-@[simp] lemma coe_toInfTopHom (f : FrameHom α β) : ⇑f.toInfTopHom = f := rfl
-
-@[simp] lemma coe_toLatticeHom (f : FrameHom α β) : ⇑f.toLatticeHom = f := rfl
-
-@[simp] lemma coe_mk (f : InfTopHom α β) (hf) : ⇑(mk f hf) = f := rfl
-
 @[ext]
 theorem ext {f g : FrameHom α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
 protected def copy (f : FrameHom α β) (f' : α → β) (h : f' = f) : FrameHom α β :=
   { (f : sSupHom α β).copy f' h with toInfTopHom := f.toInfTopHom.copy f' h }
-
-@[simp]
-theorem coe_copy (f : FrameHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : FrameHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -475,31 +399,14 @@ protected def id : FrameHom α α :=
 instance : Inhabited (FrameHom α α) :=
   ⟨FrameHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(FrameHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : FrameHom.id α a = a :=
-  rfl
 
 def comp (f : FrameHom β γ) (g : FrameHom α β) : FrameHom α γ :=
   { (f : sSupHom β γ).comp (g : sSupHom α β) with
     toInfTopHom := f.toInfTopHom.comp g.toInfTopHom }
 
 @[simp]
-theorem coe_comp (f : FrameHom β γ) (g : FrameHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : FrameHom β γ) (g : FrameHom α β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : FrameHom γ δ) (g : FrameHom β γ) (h : FrameHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -545,17 +452,9 @@ def tosSupHom (f : CompleteLatticeHom α β) : sSupHom α β :=
 def toBoundedLatticeHom (f : CompleteLatticeHom α β) : BoundedLatticeHom α β :=
   f
 
-lemma toFun_eq_coe (f : CompleteLatticeHom α β) : f.toFun = f := rfl
-
-@[simp] lemma coe_tosInfHom (f : CompleteLatticeHom α β) : ⇑f.tosInfHom = f := rfl
-
-@[simp] lemma coe_tosSupHom (f : CompleteLatticeHom α β) : ⇑f.tosSupHom = f := rfl
-
 @[simp] lemma coe_toBoundedLatticeHom (f : CompleteLatticeHom α β) : ⇑f.toBoundedLatticeHom = f :=
 
 rfl
-
-@[simp] lemma coe_mk (f : sInfHom α β) (hf) : ⇑(mk f hf) = f := rfl
 
 @[ext]
 theorem ext {f g : CompleteLatticeHom α β} (h : ∀ a, f a = g a) : f = g :=
@@ -564,10 +463,6 @@ theorem ext {f g : CompleteLatticeHom α β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : CompleteLatticeHom α β) (f' : α → β) (h : f' = f) :
     CompleteLatticeHom α β :=
   { f.tosSupHom.copy f' h with tosInfHom := f.tosInfHom.copy f' h }
-
-@[simp]
-theorem coe_copy (f : CompleteLatticeHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : CompleteLatticeHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -580,31 +475,14 @@ protected def id : CompleteLatticeHom α α :=
 instance : Inhabited (CompleteLatticeHom α α) :=
   ⟨CompleteLatticeHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(CompleteLatticeHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : CompleteLatticeHom.id α a = a :=
-  rfl
 
 def comp (f : CompleteLatticeHom β γ) (g : CompleteLatticeHom α β) : CompleteLatticeHom α γ :=
   { f.tosSupHom.comp g.tosSupHom with tosInfHom := f.tosInfHom.comp g.tosInfHom }
 
 @[simp]
-theorem coe_comp (f : CompleteLatticeHom β γ) (g : CompleteLatticeHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : CompleteLatticeHom β γ) (g : CompleteLatticeHom α β) (a : α) :
     (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : CompleteLatticeHom γ δ) (g : CompleteLatticeHom β γ)
-    (h : CompleteLatticeHom α β) : (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -640,24 +518,6 @@ protected def dual : sSupHom α β ≃ sInfHom αᵒᵈ βᵒᵈ where
   left_inv _ := sSupHom.ext fun _ => rfl
   right_inv _ := sInfHom.ext fun _ => rfl
 
-@[simp]
-theorem dual_id : sSupHom.dual (sSupHom.id α) = sInfHom.id _ :=
-  rfl
-
-@[simp]
-theorem dual_comp (g : sSupHom β γ) (f : sSupHom α β) :
-    sSupHom.dual (g.comp f) = (sSupHom.dual g).comp (sSupHom.dual f) :=
-  rfl
-
-@[simp]
-theorem symm_dual_id : sSupHom.dual.symm (sInfHom.id _) = sSupHom.id α :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : sInfHom βᵒᵈ γᵒᵈ) (f : sInfHom αᵒᵈ βᵒᵈ) :
-    sSupHom.dual.symm (g.comp f) = (sSupHom.dual.symm g).comp (sSupHom.dual.symm f) :=
-  rfl
-
 end sSupHom
 
 namespace sInfHom
@@ -675,24 +535,6 @@ protected def dual : sInfHom α β ≃ sSupHom αᵒᵈ βᵒᵈ where
   left_inv _ := sInfHom.ext fun _ => rfl
   right_inv _ := sSupHom.ext fun _ => rfl
 
-@[simp]
-theorem dual_id : sInfHom.dual (sInfHom.id α) = sSupHom.id _ :=
-  rfl
-
-@[simp]
-theorem dual_comp (g : sInfHom β γ) (f : sInfHom α β) :
-    sInfHom.dual (g.comp f) = (sInfHom.dual g).comp (sInfHom.dual f) :=
-  rfl
-
-@[simp]
-theorem symm_dual_id : sInfHom.dual.symm (sSupHom.id _) = sInfHom.id α :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : sSupHom βᵒᵈ γᵒᵈ) (f : sSupHom αᵒᵈ βᵒᵈ) :
-    sInfHom.dual.symm (g.comp f) = (sInfHom.dual.symm g).comp (sInfHom.dual.symm f) :=
-  rfl
-
 end sInfHom
 
 namespace CompleteLatticeHom
@@ -706,27 +548,6 @@ protected def dual : CompleteLatticeHom α β ≃ CompleteLatticeHom αᵒᵈ β
   left_inv _ := ext fun _ => rfl
   right_inv _ := ext fun _ => rfl
 
-@[simp]
-theorem dual_id : CompleteLatticeHom.dual (CompleteLatticeHom.id α) = CompleteLatticeHom.id _ :=
-  rfl
-
-@[simp]
-theorem dual_comp (g : CompleteLatticeHom β γ) (f : CompleteLatticeHom α β) :
-    CompleteLatticeHom.dual (g.comp f) =
-      (CompleteLatticeHom.dual g).comp (CompleteLatticeHom.dual f) :=
-  rfl
-
-@[simp]
-theorem symm_dual_id :
-    CompleteLatticeHom.dual.symm (CompleteLatticeHom.id _) = CompleteLatticeHom.id α :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : CompleteLatticeHom βᵒᵈ γᵒᵈ) (f : CompleteLatticeHom αᵒᵈ βᵒᵈ) :
-    CompleteLatticeHom.dual.symm (g.comp f) =
-      (CompleteLatticeHom.dual.symm g).comp (CompleteLatticeHom.dual.symm f) :=
-  rfl
-
 end CompleteLatticeHom
 
 /-! ### Concrete homs -/
@@ -737,22 +558,6 @@ def setPreimage (f : α → β) : CompleteLatticeHom (Set β) (Set α) where
   toFun := preimage f
   map_sSup' s := preimage_sUnion.trans <| by simp only [Set.sSup_eq_sUnion, Set.sUnion_image]
   map_sInf' s := preimage_sInter.trans <| by simp only [Set.sInf_eq_sInter, Set.sInter_image]
-
-@[simp]
-theorem coe_setPreimage (f : α → β) : ⇑(setPreimage f) = preimage f :=
-  rfl
-
-@[simp]
-theorem setPreimage_apply (f : α → β) (s : Set β) : setPreimage f s = s.preimage f :=
-  rfl
-
-@[simp]
-theorem setPreimage_id : setPreimage (id : α → α) = CompleteLatticeHom.id _ :=
-  rfl
-
-theorem setPreimage_comp (g : β → γ) (f : α → β) :
-    setPreimage (g ∘ f) = (setPreimage f).comp (setPreimage g) :=
-  rfl
 
 end CompleteLatticeHom
 
@@ -782,11 +587,3 @@ def supsSupHom : sSupHom (α × α) α where
 def infsInfHom : sInfHom (α × α) α where
   toFun x := x.1 ⊓ x.2
   map_sInf' s := by simp_rw [Prod.fst_sInf, Prod.snd_sInf, sInf_image, iInf_inf_eq]
-
-@[simp, norm_cast]
-theorem supsSupHom_apply : supsSupHom x = x.1 ⊔ x.2 :=
-  rfl
-
-@[simp, norm_cast]
-theorem infsInfHom_apply : infsInfHom x = x.1 ⊓ x.2 :=
-  rfl

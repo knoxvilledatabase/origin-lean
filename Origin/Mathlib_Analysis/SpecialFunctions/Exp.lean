@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.Asymptotics
 import Mathlib.Analysis.SpecificLimits.Normed
 
+noncomputable section
+
 /-!
 # Complex and real exponential
 
@@ -296,10 +298,6 @@ def expOrderIso : ℝ ≃o Ioi (0 : ℝ) :=
     (continuous_exp.subtype_mk _).surjective
       (by rw [tendsto_Ioi_atTop]; simp only [tendsto_exp_atTop])
       (by rw [tendsto_Ioi_atBot]; simp only [tendsto_exp_atBot_nhdsWithin])
-
-@[simp]
-theorem coe_expOrderIso_apply (x : ℝ) : (expOrderIso x : ℝ) = exp x :=
-  rfl
 
 @[simp]
 theorem coe_comp_expOrderIso : (↑) ∘ expOrderIso = exp :=

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Basic.lean
-Genuine: 203 | Conflates: 0 | Dissolved: 6 | Infrastructure: 28
+Genuine: 209 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subgroup.Ker
 import Mathlib.Analysis.Normed.Group.Seminorm
 import Mathlib.Topology.Metrizable.Uniformity
 import Mathlib.Topology.Sequences
+
+noncomputable section
 
 /-!
 # Normed (semi)groups
@@ -378,7 +380,11 @@ end Mathlib.Meta.Positivity
 @[to_additive (attr := simp) norm_zero]
 theorem norm_one' : ‖(1 : E)‖ = 0 := by rw [← dist_one_right, dist_self]
 
--- DISSOLVED: ne_one_of_norm_ne_zero
+@[to_additive]
+theorem ne_one_of_norm_ne_zero : ‖a‖ ≠ 0 → a ≠ 1 :=
+  mt <| by
+    rintro rfl
+    exact norm_one'
 
 @[to_additive (attr := nontriviality) norm_of_subsingleton]
 theorem norm_of_subsingleton' [Subsingleton E] (a : E) : ‖a‖ = 0 := by
@@ -522,19 +528,19 @@ theorem mem_sphere_one_iff_norm : a ∈ sphere (1 : E) r ↔ ‖a‖ = r := by s
 theorem norm_eq_of_mem_sphere' (x : sphere (1 : E) r) : ‖(x : E)‖ = r :=
   mem_sphere_one_iff_norm.mp x.2
 
--- DISSOLVED: ne_one_of_mem_sphere
+@[to_additive]
+theorem ne_one_of_mem_sphere (hr : r ≠ 0) (x : sphere (1 : E) r) : (x : E) ≠ 1 :=
+  ne_one_of_norm_ne_zero <| by rwa [norm_eq_of_mem_sphere' x]
 
--- DISSOLVED: ne_one_of_mem_unit_sphere
+@[to_additive ne_zero_of_mem_unit_sphere]
+theorem ne_one_of_mem_unit_sphere (x : sphere (1 : E) 1) : (x : E) ≠ 1 :=
+  ne_one_of_mem_sphere one_ne_zero _
 
 variable (E)
 
 @[to_additive "The norm of a seminormed group as an additive group seminorm."]
 def normGroupSeminorm : GroupSeminorm E :=
   ⟨norm, norm_one', norm_mul_le', norm_inv'⟩
-
-@[to_additive (attr := simp)]
-theorem coe_normGroupSeminorm : ⇑(normGroupSeminorm E) = norm :=
-  rfl
 
 variable {E}
 
@@ -576,13 +582,6 @@ section NNNorm
 instance (priority := 100) SeminormedGroup.toNNNorm : NNNorm E :=
   ⟨fun a => ⟨‖a‖, norm_nonneg' a⟩⟩
 
-@[to_additive (attr := simp, norm_cast) coe_nnnorm]
-theorem coe_nnnorm' (a : E) : (‖a‖₊ : ℝ) = ‖a‖ := rfl
-
-@[to_additive (attr := simp) coe_comp_nnnorm]
-theorem coe_comp_nnnorm' : (toReal : ℝ≥0 → ℝ) ∘ (nnnorm : E → ℝ≥0) = norm :=
-  rfl
-
 @[to_additive norm_toNNReal]
 theorem norm_toNNReal' : ‖a‖.toNNReal = ‖a‖₊ :=
   @Real.toNNReal_coe ‖a‖₊
@@ -603,7 +602,11 @@ theorem edist_one_right (a : E) : edist a 1 = ‖a‖₊ := by
 @[to_additive (attr := simp) nnnorm_zero]
 theorem nnnorm_one' : ‖(1 : E)‖₊ = 0 := NNReal.eq norm_one'
 
--- DISSOLVED: ne_one_of_nnnorm_ne_zero
+@[to_additive]
+theorem ne_one_of_nnnorm_ne_zero {a : E} : ‖a‖₊ ≠ 0 → a ≠ 1 :=
+  mt <| by
+    rintro rfl
+    exact nnnorm_one'
 
 @[to_additive nnnorm_add_le]
 theorem nnnorm_mul_le' (a b : E) : ‖a * b‖₊ ≤ ‖a‖₊ + ‖b‖₊ :=
@@ -768,14 +771,14 @@ theorem continuous_nnnorm' : Continuous fun a : E => ‖a‖₊ :=
   continuous_norm'.subtype_mk _
 
 set_option linter.docPrime false in
-
 @[to_additive Inseparable.norm_eq_norm]
+
 theorem Inseparable.norm_eq_norm' {u v : E} (h : Inseparable u v) : ‖u‖ = ‖v‖ :=
   h.map continuous_norm' |>.eq
 
 set_option linter.docPrime false in
-
 @[to_additive Inseparable.nnnorm_eq_nnnorm]
+
 theorem Inseparable.nnnorm_eq_nnnorm' {u v : E} (h : Inseparable u v) : ‖u‖₊ = ‖v‖₊ :=
   h.map continuous_nnnorm' |>.eq
 
@@ -1181,8 +1184,6 @@ namespace NNReal
 instance : NNNorm ℝ≥0 where
   nnnorm x := x
 
-@[simp] lemma nnnorm_eq_self (x : ℝ≥0) : ‖x‖₊ = x := rfl
-
 end NNReal
 
 end SeminormedCommGroup
@@ -1200,7 +1201,8 @@ lemma norm_pos_iff' : 0 < ‖a‖ ↔ a ≠ 1 := by rw [← not_le, norm_le_zero
 @[to_additive (attr := simp) norm_eq_zero]
 lemma norm_eq_zero' : ‖a‖ = 0 ↔ a = 1 := (norm_nonneg' a).le_iff_eq.symm.trans norm_le_zero_iff'
 
--- DISSOLVED: norm_ne_zero_iff'
+@[to_additive norm_ne_zero_iff]
+lemma norm_ne_zero_iff' : ‖a‖ ≠ 0 ↔ a ≠ 1 := norm_eq_zero'.not
 
 @[to_additive]
 theorem norm_div_eq_zero_iff : ‖a / b‖ = 0 ↔ a = b := by rw [norm_eq_zero', div_eq_one]
@@ -1230,7 +1232,9 @@ theorem eq_one_or_nnnorm_pos (a : E) : a = 1 ∨ 0 < ‖a‖₊ :=
 theorem nnnorm_eq_zero' : ‖a‖₊ = 0 ↔ a = 1 := by
   rw [← NNReal.coe_eq_zero, coe_nnnorm', norm_eq_zero']
 
--- DISSOLVED: nnnorm_ne_zero_iff'
+@[to_additive nnnorm_ne_zero_iff]
+theorem nnnorm_ne_zero_iff' : ‖a‖₊ ≠ 0 ↔ a ≠ 1 :=
+  nnnorm_eq_zero'.not
 
 @[to_additive (attr := simp) nnnorm_pos]
 lemma nnnorm_pos' : 0 < ‖a‖₊ ↔ a ≠ 1 := pos_iff_ne_zero.trans nnnorm_ne_zero_iff'
@@ -1254,10 +1258,6 @@ variable (E)
 @[to_additive "The norm of a normed group as an additive group norm."]
 def normGroupNorm : GroupNorm E :=
   { normGroupSeminorm _ with eq_one_of_map_eq_zero' := fun _ => norm_eq_zero'.1 }
-
-@[simp]
-theorem coe_normGroupNorm : ⇑(normGroupNorm E) = norm :=
-  rfl
 
 @[to_additive comap_norm_nhdsWithin_Ioi_zero]
 lemma comap_norm_nhdsWithin_Ioi_zero' : comap norm (𝓝[>] 0) = 𝓝[≠] (1 : E) := by

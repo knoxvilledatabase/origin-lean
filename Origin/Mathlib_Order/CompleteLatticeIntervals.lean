@@ -7,6 +7,8 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Order.LatticeIntervals
 import Mathlib.Order.Interval.Set.OrdConnected
 
+noncomputable section
+
 /-! # Subtypes of conditionally complete linear orders
 
 In this file we give conditions on a subset of a conditionally complete linear order, to ensure that
@@ -40,14 +42,6 @@ attribute [local instance] subsetSupSet
 
 open Classical in
 
-@[simp]
-theorem subset_sSup_def [Inhabited s] :
-    @sSup s _ = fun t =>
-      if ht : t.Nonempty ∧ BddAbove t ∧ sSup ((↑) '' t : Set α) ∈ s
-      then ⟨sSup ((↑) '' t : Set α), ht.2.2⟩
-      else default :=
-  rfl
-
 theorem subset_sSup_of_within [Inhabited s] {t : Set s}
     (h' : t.Nonempty) (h'' : BddAbove t) (h : sSup ((↑) '' t : Set α) ∈ s) :
     sSup ((↑) '' t : Set α) = (@sSup s _ t : α) := by simp [dif_pos, h, h', h'']
@@ -77,14 +71,6 @@ noncomputable def subsetInfSet [Inhabited s] : InfSet s where
 attribute [local instance] subsetInfSet
 
 open Classical in
-
-@[simp]
-theorem subset_sInf_def [Inhabited s] :
-    @sInf s _ = fun t =>
-      if ht : t.Nonempty ∧ BddBelow t ∧ sInf ((↑) '' t : Set α) ∈ s
-      then ⟨sInf ((↑) '' t : Set α), ht.2.2⟩ else
-      default :=
-  rfl
 
 theorem subset_sInf_of_within [Inhabited s] {t : Set s}
     (h' : t.Nonempty) (h'' : BddBelow t) (h : sInf ((↑) '' t : Set α) ∈ s) :
@@ -238,8 +224,6 @@ variable (S : Set <| Iic a) (f : ι → Iic a) (p : ι → Prop)
 
 @[simp] theorem coe_iSup : (↑(⨆ i, f i) : α) = ⨆ i, (f i : α) := by
   rw [iSup, coe_sSup]; congr; ext; simp
-
-theorem coe_biSup : (↑(⨆ i, ⨆ (_ : p i), f i) : α) = ⨆ i, ⨆ (_ : p i), (f i : α) := by simp
 
 @[simp] theorem coe_sInf : (↑(sInf S) : α) = a ⊓ sInf ((↑) '' S) := rfl
 

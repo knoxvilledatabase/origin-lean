@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.NormalMono.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 
+noncomputable section
+
 /-!
 # Normal mono categories with finite products and kernels have all equalizers.
 

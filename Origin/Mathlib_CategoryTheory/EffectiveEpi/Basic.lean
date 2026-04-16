@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms
@@ -61,12 +63,10 @@ class EffectiveEpi {X Y : C} (f : Y ⟶ X) : Prop where
   effectiveEpi : Nonempty (EffectiveEpiStruct f)
 
 noncomputable
-
 def EffectiveEpi.getStruct {X Y : C} (f : Y ⟶ X) [EffectiveEpi f] : EffectiveEpiStruct f :=
   EffectiveEpi.effectiveEpi.some
 
 noncomputable
-
 def EffectiveEpi.desc {X Y W : C} (f : Y ⟶ X) [EffectiveEpi f]
     (e : Y ⟶ W) (h : ∀ {Z : C} (g₁ g₂ : Z ⟶ Y), g₁ ≫ f = g₂ ≫ f → g₁ ≫ e = g₂ ≫ e) :
     X ⟶ W := (EffectiveEpi.getStruct f).desc e h
@@ -117,13 +117,11 @@ class EffectiveEpiFamily {B : C} {α : Type*} (X : α → C) (π : (a : α) → 
   effectiveEpiFamily : Nonempty (EffectiveEpiFamilyStruct X π)
 
 noncomputable
-
 def EffectiveEpiFamily.getStruct {B : C} {α : Type*} (X : α → C) (π : (a : α) → (X a ⟶ B))
     [EffectiveEpiFamily X π] : EffectiveEpiFamilyStruct X π :=
   EffectiveEpiFamily.effectiveEpiFamily.some
 
 noncomputable
-
 def EffectiveEpiFamily.desc {B W : C} {α : Type*} (X : α → C) (π : (a : α) → (X a ⟶ B))
     [EffectiveEpiFamily X π] (e : (a : α) → (X a ⟶ W))
     (h : ∀ {Z : C} (a₁ a₂ : α) (g₁ : Z ⟶ X a₁) (g₂ : Z ⟶ X a₂),
@@ -156,7 +154,6 @@ lemma EffectiveEpiFamily.hom_ext {B W : C} {α : Type*} (X : α → C) (π : (a 
   exact EffectiveEpiFamily.uniq _ _ _ _ _ h
 
 noncomputable
-
 def effectiveEpiFamilyStructSingletonOfEffectiveEpi {B X : C} (f : X ⟶ B) [EffectiveEpi f] :
     EffectiveEpiFamilyStruct (fun () ↦ X) (fun () ↦ f) where
   desc e h := EffectiveEpi.desc f (e ()) (fun g₁ g₂ hg ↦ h () () g₁ g₂ hg)
@@ -167,7 +164,6 @@ instance {B X : C} (f : X ⟶ B) [EffectiveEpi f] : EffectiveEpiFamily (fun () �
   ⟨⟨effectiveEpiFamilyStructSingletonOfEffectiveEpi f⟩⟩
 
 noncomputable
-
 def effectiveEpiStructOfEffectiveEpiFamilySingleton {B X : C} (f : X ⟶ B)
     [EffectiveEpiFamily (fun () ↦ X) (fun () ↦ f)] :
     EffectiveEpiStruct f where
@@ -187,7 +183,6 @@ theorem effectiveEpi_iff_effectiveEpiFamily {B X : C} (f : X ⟶ B) :
   ⟨fun _ ↦ inferInstance, fun _ ↦ inferInstance⟩
 
 noncomputable
-
 def effectiveEpiFamilyStructOfIsIsoDesc {B : C} {α : Type*} (X : α → C)
     (π : (a : α) → (X a ⟶ B)) [HasCoproduct X] [IsIso (Sigma.desc π)] :
     EffectiveEpiFamilyStruct X π where
@@ -211,7 +206,6 @@ instance {B : C} {α : Type*} (X : α → C) (π : (a : α) → (X a ⟶ B)) [Ha
   ⟨⟨effectiveEpiFamilyStructOfIsIsoDesc X π⟩⟩
 
 noncomputable
-
 def effectiveEpiStructOfIsIso {X Y : C} (f : X ⟶ Y) [IsIso f] : EffectiveEpiStruct f where
   desc e _ := inv f ≫ e
   fac _ _ := by simp

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Setoid/Partition.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Range
 import Mathlib.Order.Partition.Finpartition
+
+noncomputable section
 
 /-!
 # Equivalence relations: partitions
@@ -294,18 +296,15 @@ attribute [simp] some_mem --mem_index
 variable (hs : IndexedPartition s)
 
 include hs in
-
 theorem exists_mem (x : α) : ∃ i, x ∈ s i :=
   ⟨hs.index x, hs.mem_index x⟩
 
 include hs in
-
 theorem iUnion : ⋃ i, s i = univ := by
   ext x
   simp [hs.exists_mem x]
 
 include hs in
-
 theorem disjoint : Pairwise (Disjoint on s) := fun {_i _j} h =>
   disjoint_left.mpr fun {_x} hxi hxj => h (hs.eq_of_mem hxi hxj)
 
@@ -348,19 +347,11 @@ def equivQuotient : ι ≃ hs.Quotient :=
 theorem equivQuotient_index_apply (x : α) : hs.equivQuotient (hs.index x) = hs.proj x :=
   hs.proj_eq_iff.mpr (some_index hs x)
 
-@[simp]
-theorem equivQuotient_symm_proj_apply (x : α) : hs.equivQuotient.symm (hs.proj x) = hs.index x :=
-  rfl
-
 theorem equivQuotient_index : hs.equivQuotient ∘ hs.index = hs.proj :=
   funext hs.equivQuotient_index_apply
 
 def out : hs.Quotient ↪ α :=
   hs.equivQuotient.symm.toEmbedding.trans ⟨hs.some, Function.LeftInverse.injective hs.index_some⟩
-
-@[simp]
-theorem out_proj (x : α) : hs.out (hs.proj x) = hs.some (hs.index x) :=
-  rfl
 
 theorem index_out (x : hs.Quotient) : hs.index x.out = hs.index (hs.out x) :=
   Quotient.inductionOn' x fun x => (Setoid.ker_apply_mk_out x).trans (hs.index_some _).symm

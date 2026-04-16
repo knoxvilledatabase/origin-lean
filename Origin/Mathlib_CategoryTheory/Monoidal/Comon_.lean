@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Monoidal.Transport
 import Mathlib.CategoryTheory.Monoidal.CoherenceLemmas
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
+noncomputable section
+
 /-!
 # The category of comonoids in a monoidal category.
 
@@ -43,6 +45,14 @@ class Comon_Class (X : C) where
   comul_assoc' : comul ≫ X ◁ comul = comul ≫ (comul ▷ X) ≫ (α_ X X X).hom := by aesop_cat
 
 namespace Comon_Class
+
+@[inherit_doc] scoped notation "Δ" => Comon_Class.comul
+
+@[inherit_doc] scoped notation "Δ["M"]" => Comon_Class.comul (X := M)
+
+@[inherit_doc] scoped notation "ε" => Comon_Class.counit
+
+@[inherit_doc] scoped notation "ε["M"]" => Comon_Class.counit (X := M)
 
 attribute [reassoc] counit_comul' comul_counit' comul_assoc'
 
@@ -160,12 +170,6 @@ instance : Category (Comon_ C) where
 
 @[ext] lemma ext {X Y : Comon_ C} {f g : X ⟶ Y} (w : f.hom = g.hom) : f = g := Hom.ext w
 
-@[simp] theorem id_hom' (M : Comon_ C) : (𝟙 M : Hom M M).hom = 𝟙 M.X := rfl
-
-@[simp]
-theorem comp_hom' {M N K : Comon_ C} (f : M ⟶ N) (g : N ⟶ K) : (f ≫ g).hom = f.hom ≫ g.hom :=
-  rfl
-
 section
 
 variable (C)
@@ -273,18 +277,8 @@ instance monoidal [BraidedCategory C] : MonoidalCategory (Comon_ C) :=
 
 variable [BraidedCategory C]
 
-theorem tensorObj_X (A B : Comon_ C) : (A ⊗ B).X = A.X ⊗ B.X := rfl
-
 instance (A B : C) [Comon_Class A] [Comon_Class B] : Comon_Class (A ⊗ B) :=
   inferInstanceAs <| Comon_Class (Comon_.mk' A ⊗ Comon_.mk' B).X
-
-theorem tensorObj_counit (A B : Comon_ C) : (A ⊗ B).counit = (A.counit ⊗ B.counit) ≫ (λ_ _).hom :=
-  rfl
-
-theorem tensorObj_comul' (A B : Comon_ C) :
-    (A ⊗ B).comul =
-      (A.comul ⊗ B.comul) ≫ (tensorμ (op A.X) (op B.X) (op A.X) (op B.X)).unop := by
-  rfl
 
 theorem tensorObj_comul (A B : Comon_ C) :
     (A ⊗ B).comul = (A.comul ⊗ B.comul) ≫ tensorμ A.X A.X B.X B.X := by
@@ -301,14 +295,6 @@ instance : (forget C).Monoidal :=
       μIso := fun _ _ ↦ Iso.refl _ }
 
 open Functor.LaxMonoidal Functor.OplaxMonoidal
-
-@[simp] theorem forget_ε : «ε» (forget C) = 𝟙 (𝟙_ C) := rfl
-
-@[simp] theorem forget_η : η (forget C) = 𝟙 (𝟙_ C) := rfl
-
-@[simp] theorem forget_μ (X Y : Comon_ C) : μ (forget C) X Y = 𝟙 (X.X ⊗ Y.X) := rfl
-
-@[simp] theorem forget_δ (X Y : Comon_ C) : δ (forget C) X Y = 𝟙 (X.X ⊗ Y.X) := rfl
 
 end Comon_
 

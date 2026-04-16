@@ -11,6 +11,8 @@ import Mathlib.Topology.Algebra.MulAction
 import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Analysis.NormedSpace.Extend
 
+noncomputable section
+
 /-!
 # Separation Hahn-Banach theorem
 

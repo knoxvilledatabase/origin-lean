@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Function.AEEqFun.DomAct
 import Mathlib.MeasureTheory.Function.LpSpace
 
+noncomputable section
+
 /-!
 # Action of `Mᵈᵐᵃ` on `Lᵖ` spaces
 
@@ -33,31 +35,9 @@ variable [SMul M α] [SMulInvariantMeasure M α μ] [MeasurableSMul M α]
 instance : SMul Mᵈᵐᵃ (Lp E p μ) where
   smul c f := Lp.compMeasurePreserving (mk.symm c • ·) (measurePreserving_smul _ _) f
 
-@[to_additive (attr := simp)]
-theorem smul_Lp_val (c : Mᵈᵐᵃ) (f : Lp E p μ) : (c • f).1 = c • f.1 := rfl
-
 @[to_additive]
 theorem smul_Lp_ae_eq (c : Mᵈᵐᵃ) (f : Lp E p μ) : c • f =ᵐ[μ] (f <| mk.symm c • ·) :=
   Lp.coeFn_compMeasurePreserving _ _
-
-@[to_additive]
-theorem mk_smul_toLp (c : M) {f : α → E} (hf : Memℒp f p μ) :
-    mk c • hf.toLp f =
-      (hf.comp_measurePreserving <| measurePreserving_smul c μ).toLp (f <| c • ·) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem smul_Lp_const [IsFiniteMeasure μ] (c : Mᵈᵐᵃ) (a : E) :
-    c • Lp.const p μ a = Lp.const p μ a :=
-  rfl
-
-@[to_additive]
-theorem mk_smul_indicatorConstLp (c : M)
-    {s : Set α} (hs : MeasurableSet s) (hμs : μ s ≠ ∞) (b : E) :
-    mk c • indicatorConstLp p hs hμs b =
-      indicatorConstLp p (hs.preimage <| measurable_const_smul c)
-        (by rwa [SMulInvariantMeasure.measure_preimage_smul c hs]) b :=
-  rfl
 
 instance [SMul N α] [SMulCommClass M N α] [SMulInvariantMeasure N α μ] [MeasurableSMul N α] :
     SMulCommClass Mᵈᵐᵃ Nᵈᵐᵃ (Lp E p μ) :=
@@ -76,9 +56,6 @@ theorem smul_Lp_add (c : Mᵈᵐᵃ) : ∀ f g : Lp E p μ, c • (f + g) = c �
   rintro ⟨⟨⟩, _⟩ ⟨⟨⟩, _⟩; rfl
 
 attribute [simp] DomAddAct.vadd_Lp_add
-
-@[to_additive (attr := simp 1001)]
-theorem smul_Lp_zero (c : Mᵈᵐᵃ) : c • (0 : Lp E p μ) = 0 := rfl
 
 @[to_additive]
 theorem smul_Lp_neg (c : Mᵈᵐᵃ) (f : Lp E p μ) : c • (-f) = -(c • f) := by

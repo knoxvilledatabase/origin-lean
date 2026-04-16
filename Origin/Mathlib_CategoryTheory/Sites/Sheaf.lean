@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Sites.SheafOfTypes
 import Mathlib.CategoryTheory.Sites.EqualizerSheafCondition
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
+noncomputable section
+
 /-!
 # Sheaves taking values in a category
 
@@ -71,6 +73,9 @@ def IsSheaf (P : Cᵒᵖ ⥤ A) : Prop :=
   ∀ E : A, Presieve.IsSheaf J (P ⋙ coyoneda.obj (op E))
 
 attribute [local instance] ConcreteCategory.hasCoeToSort ConcreteCategory.instFunLike in
+/-- Condition that a presheaf with values in a concrete category is separated for
+
+a Grothendieck topology. -/
 
 def IsSeparated (P : Cᵒᵖ ⥤ A) [ConcreteCategory A] : Prop :=
   ∀ (X : C) (S : Sieve X) (_ : S ∈ J X) (x y : P.obj (op X)),
@@ -429,10 +434,6 @@ instance sheafHomHasNSMul : SMul ℕ (P ⟶ Q) where
 instance : Zero (P ⟶ Q) where zero := Sheaf.Hom.mk 0
 
 instance : Add (P ⟶ Q) where add f g := Sheaf.Hom.mk <| f.1 + g.1
-
-@[simp]
-theorem Sheaf.Hom.add_app (f g : P ⟶ Q) (U) : (f + g).1.app U = f.1.app U + g.1.app U :=
-  rfl
 
 instance Sheaf.Hom.addCommGroup : AddCommGroup (P ⟶ Q) :=
   Function.Injective.addCommGroup (fun f : Sheaf.Hom P Q => f.1)

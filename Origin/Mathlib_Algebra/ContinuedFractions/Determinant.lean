@@ -7,6 +7,8 @@ import Mathlib.Algebra.ContinuedFractions.ContinuantsRecurrence
 import Mathlib.Algebra.ContinuedFractions.TerminatedStable
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # Determinant Formula for Simple Continued Fraction
 

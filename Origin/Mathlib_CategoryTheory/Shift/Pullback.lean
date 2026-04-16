@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Shift.Basic
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 
+noncomputable section
+
 /-!
 # The pullback of a shift by a monoid morphism
 

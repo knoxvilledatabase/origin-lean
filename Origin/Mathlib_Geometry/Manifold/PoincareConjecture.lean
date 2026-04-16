@@ -9,6 +9,8 @@ import Mathlib.Geometry.Manifold.Instances.Sphere
 import Mathlib.Topology.Homotopy.Equiv
 import Mathlib.Util.Superscript
 
+noncomputable section
+
 /-!
 # Statement of the generalized Poincaré conjecture
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Linear.LinearFunctor
 import Mathlib.CategoryTheory.Triangulated.Rotate
 import Mathlib.Algebra.Ring.NegOnePow
 
+noncomputable section
+
 /-!
 # The shift on the category of triangles
 
@@ -146,10 +148,6 @@ noncomputable instance : HasShift (Triangle C) ℤ :=
           rw [← shiftFunctorAdd'_assoc_hom_app a b c _ _ _ rfl rfl (add_assoc a b c)]
           dsimp only [CategoryTheory.shiftFunctorAdd']
           simp }
-
-@[simp]
-lemma shiftFunctor_eq (n : ℤ) :
-    CategoryTheory.shiftFunctor (Triangle C) n = Triangle.shiftFunctor C n := rfl
 
 @[simp]
 lemma shiftFunctorZero_eq :

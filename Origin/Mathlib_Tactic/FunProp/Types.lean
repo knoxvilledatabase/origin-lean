@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.FunProp.FunctionData
 import Batteries.Data.RBMap.Basic
 
+noncomputable section
+
 /-!
 ## `funProp`
 

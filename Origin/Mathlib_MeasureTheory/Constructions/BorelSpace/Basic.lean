@@ -8,6 +8,8 @@ import Mathlib.Topology.GDelta.UniformSpace
 import Mathlib.Topology.Instances.EReal
 import Mathlib.Topology.Instances.Rat
 
+noncomputable section
+
 /-!
 # Borel (measurable) space
 
@@ -482,15 +484,6 @@ def Homeomorph.toMeasurableEquiv (h : γ ≃ₜ γ₂) : γ ≃ᵐ γ₂ where
 
 lemma Homeomorph.measurableEmbedding (h : γ ≃ₜ γ₂) : MeasurableEmbedding h :=
   h.toMeasurableEquiv.measurableEmbedding
-
-@[simp]
-theorem Homeomorph.toMeasurableEquiv_coe (h : γ ≃ₜ γ₂) : (h.toMeasurableEquiv : γ → γ₂) = h :=
-  rfl
-
-@[simp]
-theorem Homeomorph.toMeasurableEquiv_symm_coe (h : γ ≃ₜ γ₂) :
-    (h.toMeasurableEquiv.symm : γ₂ → γ) = h.symm :=
-  rfl
 
 end Homeomorph
 

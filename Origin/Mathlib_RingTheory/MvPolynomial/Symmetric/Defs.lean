@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/MvPolynomial/Symmetric/Defs.lean
-Genuine: 51 | Conflates: 4 | Dissolved: 1 | Infrastructure: 1
+Genuine: 52 | Conflates: 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.MvPolynomial.CommRing
 import Mathlib.Combinatorics.Enumerative.Partition
+
+noncomputable section
 
 /-!
 # Symmetric Polynomials and Elementary Symmetric Polynomials
@@ -92,11 +94,6 @@ def symmetricSubalgebra (σ R : Type*) [CommSemiring R] : Subalgebra R (MvPolyno
   algebraMap_mem' r e := rename_C e r
   mul_mem' ha hb e := by rw [map_mul, ha, hb]
   add_mem' ha hb e := by rw [map_add, ha, hb]
-
-@[simp]
-theorem mem_symmetricSubalgebra [CommSemiring R] (p : MvPolynomial σ R) :
-    p ∈ symmetricSubalgebra σ R ↔ p.IsSymmetric :=
-  Iff.rfl
 
 namespace IsSymmetric
 
@@ -337,7 +334,9 @@ theorem psum_one : psum σ R 1 = ∑ i, X i := by simp [psum]
 @[simp]
 theorem psumPart_zero : psumPart σ R (.indiscrete 0) = 1 := by simp [psumPart]
 
--- DISSOLVED: psumPart_indiscrete
+@[simp]
+theorem psumPart_indiscrete {n : ℕ} (npos : n ≠ 0) :
+    psumPart σ R (.indiscrete n) = psum σ R n := by simp [psumPart, npos]
 
 @[simp]
 theorem rename_psum (n : ℕ) (e : σ ≃ τ) : rename e (psum σ R n) = psum τ R n := by

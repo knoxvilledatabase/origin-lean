@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Algebra.Module.Submodule.Defs
 import Mathlib.GroupTheory.QuotientGroup.Defs
 
+noncomputable section
+
 /-!
 # Quotients by submodules
 
@@ -50,16 +52,6 @@ namespace Quotient
 def mk {p : Submodule R M} : M → M ⧸ p :=
   Quotient.mk''
 
-theorem mk'_eq_mk' {p : Submodule R M} (x : M) :
-    @Quotient.mk' _ (quotientRel p) x = mk x :=
-  rfl
-
-theorem mk''_eq_mk {p : Submodule R M} (x : M) : (Quotient.mk'' x : M ⧸ p) = mk x :=
-  rfl
-
-theorem quot_mk_eq_mk {p : Submodule R M} (x : M) : (Quot.mk _ x : M ⧸ p) = mk x :=
-  rfl
-
 protected theorem eq' {x y : M} : (mk x : M ⧸ p) = mk y ↔ -x + y ∈ p :=
   QuotientAddGroup.eq
 
@@ -84,18 +76,6 @@ theorem mk_eq_zero : (mk x : M ⧸ p) = 0 ↔ x ∈ p := by simpa using (Quotien
 
 instance addCommGroup : AddCommGroup (M ⧸ p) :=
   QuotientAddGroup.Quotient.addCommGroup p.toAddSubgroup
-
-@[simp]
-theorem mk_add : (mk (x + y) : M ⧸ p) = mk x + mk y :=
-  rfl
-
-@[simp]
-theorem mk_neg : (mk (-x) : M ⧸ p) = -(mk x) :=
-  rfl
-
-@[simp]
-theorem mk_sub : (mk (x - y) : M ⧸ p) = mk x - mk y :=
-  rfl
 
 protected nonrec lemma «forall» {P : M ⧸ p → Prop} : (∀ a, P a) ↔ ∀ a, P (mk a) := Quotient.forall
 
@@ -200,10 +180,6 @@ def mkQ : M →ₗ[R] M ⧸ p where
   map_add' := by simp
   map_smul' := by simp
 
-@[simp]
-theorem mkQ_apply (x : M) : p.mkQ x = Quotient.mk x :=
-  rfl
-
 theorem mkQ_surjective : Function.Surjective p.mkQ := by
   rintro ⟨x⟩; exact ⟨x, rfl⟩
 
@@ -225,12 +201,6 @@ def quotEquivOfEq (h : p = p') : (M ⧸ p) ≃ₗ[R] M ⧸ p' :=
     map_smul' := by
       rintro x ⟨y⟩
       rfl }
-
-@[simp]
-theorem quotEquivOfEq_mk (h : p = p') (x : M) :
-    Submodule.quotEquivOfEq p p' h (Submodule.Quotient.mk x) =
-      (Submodule.Quotient.mk x) :=
-  rfl
 
 end Submodule
 

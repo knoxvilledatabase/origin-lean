@@ -8,6 +8,8 @@ import Mathlib.Algebra.Ring.Rat
 import Mathlib.Data.Rat.Encodable
 import Mathlib.SetTheory.Cardinal.Basic
 
+noncomputable section
+
 /-!
 # Cardinality of ℚ
 

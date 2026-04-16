@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subgroup.Defs
 import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.Algebra.GroupWithZero.Action.Defs
 
+noncomputable section
+
 /-!
 # Definition of `orbit`, `fixedPoints` and `stabilizer`
 
@@ -117,10 +119,6 @@ variable {M α}
 theorem mem_fixedPoints {a : α} : a ∈ fixedPoints M α ↔ ∀ m : M, m • a = a :=
   Iff.rfl
 
-@[to_additive (attr := simp)]
-theorem mem_fixedBy {m : M} {a : α} : a ∈ fixedBy α m ↔ m • a = a :=
-  Iff.rfl
-
 @[to_additive]
 theorem mem_fixedPoints' {a : α} : a ∈ fixedPoints M α ↔ ∀ a', a' ∈ orbit M a → a' = a :=
   ⟨fun h _ h₁ =>
@@ -147,10 +145,6 @@ variable {M}
 instance [DecidableEq α] (a : α) : DecidablePred (· ∈ stabilizerSubmonoid M a) :=
   fun _ => inferInstanceAs <| Decidable (_ = _)
 
-@[to_additive (attr := simp)]
-theorem mem_stabilizerSubmonoid_iff {a : α} {m : M} : m ∈ stabilizerSubmonoid M a ↔ m • a = a :=
-  Iff.rfl
-
 end Stabilizers
 
 end MulAction
@@ -168,10 +162,6 @@ def FixedPoints.submonoid : Submonoid α where
   one_mem' := smul_one
   mul_mem' ha hb _ := by rw [smul_mul', ha, hb]
 
-@[simp]
-lemma FixedPoints.mem_submonoid (a : α) : a ∈ submonoid M α ↔ ∀ m : M, m • a = a :=
-  Iff.rfl
-
 end Monoid
 
 section Group
@@ -186,14 +176,6 @@ def subgroup : Subgroup α where
 
 scoped notation α "^*" M:51 => FixedPoints.subgroup M α
 
-@[simp]
-lemma mem_subgroup (a : α) : a ∈ α^*M ↔ ∀ m : M, m • a = a :=
-  Iff.rfl
-
-@[simp]
-lemma subgroup_toSubmonoid : (α^*M).toSubmonoid = submonoid M α :=
-  rfl
-
 end FixedPoints
 
 end Group
@@ -207,10 +189,6 @@ def FixedPoints.addSubmonoid : AddSubmonoid α where
   zero_mem' := smul_zero
   add_mem' ha hb _ := by rw [smul_add, ha, hb]
 
-@[simp]
-lemma FixedPoints.mem_addSubmonoid (a : α) : a ∈ addSubmonoid M α ↔ ∀ m : M, m • a = a :=
-  Iff.rfl
-
 end AddMonoid
 
 section AddGroup
@@ -222,14 +200,6 @@ def FixedPoints.addSubgroup : AddSubgroup α where
   neg_mem' ha _ := by rw [smul_neg, ha]
 
 notation α "^+" M:51 => FixedPoints.addSubgroup M α
-
-@[simp]
-lemma FixedPoints.mem_addSubgroup (a : α) : a ∈ α^+M ↔ ∀ m : M, m • a = a :=
-  Iff.rfl
-
-@[simp]
-lemma FixedPoints.addSubgroup_toAddSubmonoid : (α^+M).toAddSubmonoid = addSubmonoid M α :=
-  rfl
 
 end AddGroup
 
@@ -368,11 +338,6 @@ variable {G α}
 nonrec def orbitRel.Quotient.orbit (x : orbitRel.Quotient G α) : Set α :=
   Quotient.liftOn' x (orbit G) fun _ _ => MulAction.orbit_eq_iff.2
 
-@[to_additive (attr := simp)]
-theorem orbitRel.Quotient.orbit_mk (a : α) :
-    orbitRel.Quotient.orbit (Quotient.mk'' a : orbitRel.Quotient G α) = MulAction.orbit G a :=
-  rfl
-
 @[to_additive]
 theorem orbitRel.Quotient.mem_orbit {a : α} {x : orbitRel.Quotient G α} :
     a ∈ x.orbit ↔ Quotient.mk'' a = x := by
@@ -428,11 +393,6 @@ instance (x : orbitRel.Quotient G α) : MulAction G x.orbit where
   smul g := (orbitRel.Quotient.mapsTo_smul_orbit g x).restrict _ _ _
   one_smul a := Subtype.ext (one_smul G (a : α))
   mul_smul g g' a' := Subtype.ext (mul_smul g g' (a' : α))
-
-@[to_additive (attr := simp)]
-lemma orbitRel.Quotient.orbit.coe_smul {g : G} {x : orbitRel.Quotient G α} {a : x.orbit} :
-    ↑(g • a) = g • (a : α) :=
-  rfl
 
 @[to_additive (attr := norm_cast, simp)]
 lemma orbitRel.Quotient.mem_subgroup_orbit_iff {H : Subgroup G} {x : orbitRel.Quotient G α}

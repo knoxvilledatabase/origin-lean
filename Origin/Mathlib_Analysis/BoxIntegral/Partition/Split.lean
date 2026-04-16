@@ -5,6 +5,8 @@ Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Basic
 
+noncomputable section
+
 /-!
 # Split a box along one or more hyperplanes
 

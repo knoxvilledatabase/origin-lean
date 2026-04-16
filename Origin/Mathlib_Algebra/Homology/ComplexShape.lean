@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Logic.Relation
 
+noncomputable section
+
 /-!
 # Shapes of homological complexes
 

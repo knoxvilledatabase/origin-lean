@@ -7,6 +7,8 @@ import Mathlib.Logic.Function.Basic
 import Mathlib.Data.Set.Defs
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Relations holding pairwise
 

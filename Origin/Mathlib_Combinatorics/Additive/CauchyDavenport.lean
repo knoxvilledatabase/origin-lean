@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.Additive.ETransform
 import Mathlib.GroupTheory.Order.Min
 
+noncomputable section
+
 /-!
 # The Cauchy-Davenport theorem
 

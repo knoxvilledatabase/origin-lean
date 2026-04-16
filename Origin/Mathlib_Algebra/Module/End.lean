@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Hom.End
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Module.NatInt
 
+noncomputable section
+
 /-!
 # Module structure and endomorphisms
 
@@ -23,10 +25,6 @@ variable {R S M M₂ : Type*}
 section AddCommMonoid
 
 variable [Semiring R] [AddCommMonoid M] [Module R M] (r s : R) (x : M)
-
-theorem AddMonoid.End.natCast_def (n : ℕ) :
-    (↑n : AddMonoid.End M) = DistribMulAction.toAddMonoidEnd ℕ M n :=
-  rfl
 
 variable (R M)
 
@@ -46,19 +44,11 @@ def smulAddHom : R →+ M →+ M :=
 
 variable {R M}
 
-@[simp]
-theorem smulAddHom_apply (r : R) (x : M) : smulAddHom R M r x = r • x :=
-  rfl
-
 end AddCommMonoid
 
 section AddCommGroup
 
 variable (R M) [Semiring R] [AddCommGroup M]
-
-theorem AddMonoid.End.intCast_def (z : ℤ) :
-    (↑z : AddMonoid.End M) = DistribMulAction.toAddMonoidEnd ℤ M z :=
-  rfl
 
 end AddCommGroup
 

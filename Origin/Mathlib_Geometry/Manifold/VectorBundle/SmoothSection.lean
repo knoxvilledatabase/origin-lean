@@ -8,6 +8,8 @@ import Mathlib.Geometry.Manifold.MFDeriv.Basic
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Geometry.Manifold.VectorBundle.Basic
 
+noncomputable section
+
 /-!
 # Smooth sections
 
@@ -39,6 +41,8 @@ structure ContMDiffSection where
   protected contMDiff_toFun : ContMDiff I (I.prod 𝓘(𝕜, F)) n fun x ↦
     TotalSpace.mk' F x (toFun x)
 
+@[inherit_doc] scoped[Manifold] notation "Cₛ^" n "⟮" I "; " F ", " V "⟯" => ContMDiffSection I F n V
+
 namespace ContMDiffSection
 
 variable {I} {n} {F} {V}
@@ -48,12 +52,6 @@ instance : DFunLike Cₛ^n⟮I; F, V⟯ M V where
   coe_injective' := by rintro ⟨⟩ ⟨⟩ h; congr
 
 variable {s t : Cₛ^n⟮I; F, V⟯}
-
-@[simp]
-theorem coeFn_mk (s : ∀ x, V x)
-    (hs : ContMDiff I (I.prod 𝓘(𝕜, F)) n fun x => TotalSpace.mk x (s x)) :
-    (mk s hs : ∀ x, V x) = s :=
-  rfl
 
 protected theorem contMDiff (s : Cₛ^n⟮I; F, V⟯) :
     ContMDiff I (I.prod 𝓘(𝕜, F)) n fun x => TotalSpace.mk' F x (s x : V x) :=

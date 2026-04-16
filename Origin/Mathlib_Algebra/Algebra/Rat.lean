@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.Action.Basic
 import Mathlib.Algebra.Module.End
 import Mathlib.Data.Rat.Cast.CharZero
 
+noncomputable section
+
 /-!
 # Further basic results about `Algebra`'s over `ℚ`.
 
@@ -110,8 +112,6 @@ instance instSMulCommClass' [SMulCommClass S R S] : SMulCommClass R ℚ S :=
   have := SMulCommClass.symm S R S; SMulCommClass.symm _ _ _
 
 end DivisionRing
-
-lemma _root_.algebraMap_rat_rat : algebraMap ℚ ℚ = RingHom.id ℚ := rfl
 
 instance algebra_rat_subsingleton {R} [Semiring R] : Subsingleton (Algebra ℚ R) :=
   ⟨fun x y => Algebra.algebra_ext x y <| RingHom.congr_fun <| Subsingleton.elim _ _⟩

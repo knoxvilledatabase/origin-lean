@@ -1,9 +1,11 @@
 /-
 Extracted from Probability/Kernel/Basic.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 1 | Infrastructure: 21
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Defs
+
+noncomputable section
 
 /-!
 # Basic kernels
@@ -111,7 +113,6 @@ end Id
 section Copy
 
 noncomputable
-
 def copy (α : Type*) [MeasurableSpace α] : Kernel α (α × α) :=
   Kernel.deterministic (fun x ↦ (x, x)) (measurable_id.prod measurable_id)
 
@@ -124,7 +125,6 @@ end Copy
 section Discard
 
 noncomputable
-
 def discard (α : Type*) [MeasurableSpace α] : Kernel α Unit :=
   Kernel.deterministic (fun _ ↦ ()) measurable_const
 
@@ -138,7 +138,6 @@ end Discard
 section Swap
 
 noncomputable
-
 def swap (α β : Type*) [MeasurableSpace α] [MeasurableSpace β] : Kernel (α × β) (β × α) :=
   Kernel.deterministic Prod.swap measurable_swap
 
@@ -372,7 +371,26 @@ alias set_lintegral_piecewise := setLIntegral_piecewise
 
 end Piecewise
 
--- DISSOLVED: exists_ae_eq_isMarkovKernel
+lemma exists_ae_eq_isMarkovKernel {μ : Measure α}
+    (h : ∀ᵐ a ∂μ, IsProbabilityMeasure (κ a)) (h' : μ ≠ 0) :
+    ∃ (η : Kernel α β), (κ =ᵐ[μ] η) ∧ IsMarkovKernel η := by
+  classical
+  obtain ⟨s, s_meas, μs, hs⟩ : ∃ s, MeasurableSet s ∧ μ s = 0
+      ∧ ∀ a ∉ s, IsProbabilityMeasure (κ a) := by
+    refine ⟨toMeasurable μ {a | ¬ IsProbabilityMeasure (κ a)}, measurableSet_toMeasurable _ _,
+      by simpa [measure_toMeasurable] using h, ?_⟩
+    intro a ha
+    contrapose! ha
+    exact subset_toMeasurable _ _ ha
+  obtain ⟨a, ha⟩ : sᶜ.Nonempty := by
+    contrapose! h'; simpa [μs, h'] using measure_univ_le_add_compl s (μ := μ)
+  refine ⟨Kernel.piecewise s_meas (Kernel.const _ (κ a)) κ, ?_, ?_⟩
+  · filter_upwards [measure_zero_iff_ae_nmem.1 μs] with b hb
+    simp [hb, piecewise]
+  · refine ⟨fun b ↦ ?_⟩
+    by_cases hb : b ∈ s
+    · simpa [hb, piecewise] using hs _ ha
+    · simpa [hb, piecewise] using hs _ hb
 
 end Kernel
 

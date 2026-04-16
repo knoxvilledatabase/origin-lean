@@ -1,11 +1,13 @@
 /-
 Extracted from Tactic/NormNum/Inv.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Data.Rat.Cast.CharZero
 import Mathlib.Algebra.Field.Basic
+
+noncomputable section
 
 /-!
 # `norm_num` plugins for `Rat.cast` and `⁻¹`.
@@ -19,23 +21,42 @@ namespace Mathlib.Meta.NormNum
 
 open Lean.Meta Qq
 
--- DISSOLVED: inferCharZeroOfRing
+def inferCharZeroOfRing {α : Q(Type u)} (_i : Q(Ring $α) := by with_reducible assumption) :
+    MetaM Q(CharZero $α) :=
+  return ← synthInstanceQ (q(CharZero $α) : Q(Prop)) <|>
+    throwError "not a characteristic zero ring"
 
--- DISSOLVED: inferCharZeroOfRing?
+def inferCharZeroOfRing? {α : Q(Type u)} (_i : Q(Ring $α) := by with_reducible assumption) :
+    MetaM (Option Q(CharZero $α)) :=
+  return (← trySynthInstanceQ (q(CharZero $α) : Q(Prop))).toOption
 
--- DISSOLVED: inferCharZeroOfAddMonoidWithOne
+def inferCharZeroOfAddMonoidWithOne {α : Q(Type u)}
+    (_i : Q(AddMonoidWithOne $α) := by with_reducible assumption) : MetaM Q(CharZero $α) :=
+  return ← synthInstanceQ (q(CharZero $α) : Q(Prop)) <|>
+    throwError "not a characteristic zero AddMonoidWithOne"
 
--- DISSOLVED: inferCharZeroOfAddMonoidWithOne?
+def inferCharZeroOfAddMonoidWithOne? {α : Q(Type u)}
+    (_i : Q(AddMonoidWithOne $α) := by with_reducible assumption) :
+      MetaM (Option Q(CharZero $α)) :=
+  return (← trySynthInstanceQ (q(CharZero $α) : Q(Prop))).toOption
 
--- DISSOLVED: inferCharZeroOfDivisionRing
+def inferCharZeroOfDivisionRing {α : Q(Type u)}
+    (_i : Q(DivisionRing $α) := by with_reducible assumption) : MetaM Q(CharZero $α) :=
+  return ← synthInstanceQ (q(CharZero $α) : Q(Prop)) <|>
+    throwError "not a characteristic zero division ring"
 
--- DISSOLVED: inferCharZeroOfDivisionRing?
+def inferCharZeroOfDivisionRing? {α : Q(Type u)}
+    (_i : Q(DivisionRing $α) := by with_reducible assumption) : MetaM (Option Q(CharZero $α)) :=
+  return (← trySynthInstanceQ (q(CharZero $α) : Q(Prop))).toOption
 
 theorem isRat_mkRat : {a na n : ℤ} → {b nb d : ℕ} → IsInt a na → IsNat b nb →
     IsRat (na / nb : ℚ) n d → IsRat (mkRat a b) n d
   | _, _, _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, ⟨_, h⟩ => by rw [Rat.mkRat_eq_div]; exact ⟨_, h⟩
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `mkRat a b`,
+
+such that `norm_num` successfully recognises both `a` and `b`, and returns `a / b`. -/
 
 @[norm_num mkRat _ _]
 def evalMkRat : NormNumExt where eval {u α} (e : Q(ℚ)) : MetaM (Result e) := do
@@ -89,7 +110,9 @@ theorem isRat_inv_one {α} [DivisionRing α] : {a : α} →
     IsNat a (nat_lit 1) → IsNat a⁻¹ (nat_lit 1)
   | _, ⟨rfl⟩ => ⟨by simp⟩
 
--- DISSOLVED: isRat_inv_zero
+theorem isRat_inv_zero {α} [DivisionRing α] : {a : α} →
+    IsNat a (nat_lit 0) → IsNat a⁻¹ (nat_lit 0)
+  | _, ⟨rfl⟩ => ⟨by simp⟩
 
 theorem isRat_inv_neg_one {α} [DivisionRing α] : {a : α} →
     IsInt a (.negOfNat (nat_lit 1)) → IsInt a⁻¹ (.negOfNat (nat_lit 1))
@@ -107,6 +130,9 @@ theorem isRat_inv_neg {α} [DivisionRing α] [CharZero α] {a : α} {n d : ℕ} 
 open Lean
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a⁻¹`,
+
+such that `norm_num` successfully recognises `a`. -/
 
 @[norm_num _⁻¹] def evalInv : NormNumExt where eval {u α} e := do
   let .app f (a : Q($α)) ← whnfR e | failure

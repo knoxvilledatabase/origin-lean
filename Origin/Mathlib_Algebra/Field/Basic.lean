@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Field/Basic.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 29 | Infrastructure: 16
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
 import Mathlib.Algebra.Ring.Commute
 import Mathlib.Algebra.Ring.Invertible
 import Mathlib.Order.Synonym
+
+noncomputable section
 
 /-!
 # Lemmas about division (semi)rings and (semi)fields
@@ -29,29 +31,46 @@ theorem add_div (a b c : K) : (a + b) / c = a / c + b / c := by simp_rw [div_eq_
 theorem div_add_div_same (a b c : K) : a / c + b / c = (a + b) / c :=
   (add_div _ _ _).symm
 
--- DISSOLVED: same_add_div
+theorem same_add_div (h : b ≠ 0) : (b + a) / b = 1 + a / b := by rw [← div_self h, add_div]
 
--- DISSOLVED: div_add_same
+theorem div_add_same (h : b ≠ 0) : (a + b) / b = a / b + 1 := by rw [← div_self h, add_div]
 
--- DISSOLVED: one_add_div
+theorem one_add_div (h : b ≠ 0) : 1 + a / b = (b + a) / b :=
+  (same_add_div h).symm
 
--- DISSOLVED: div_add_one
+theorem div_add_one (h : b ≠ 0) : a / b + 1 = (a + b) / b :=
+  (div_add_same h).symm
 
--- DISSOLVED: inv_add_inv'
+theorem inv_add_inv' (ha : a ≠ 0) (hb : b ≠ 0) :
+    a⁻¹ + b⁻¹ = a⁻¹ * (a + b) * b⁻¹ :=
+  let _ := invertibleOfNonzero ha; let _ := invertibleOfNonzero hb; invOf_add_invOf a b
 
--- DISSOLVED: one_div_mul_add_mul_one_div_eq_one_div_add_one_div
+theorem one_div_mul_add_mul_one_div_eq_one_div_add_one_div (ha : a ≠ 0) (hb : b ≠ 0) :
+    1 / a * (a + b) * (1 / b) = 1 / a + 1 / b := by
+  simpa only [one_div] using (inv_add_inv' ha hb).symm
 
--- DISSOLVED: add_div_eq_mul_add_div
+theorem add_div_eq_mul_add_div (a b : K) (hc : c ≠ 0) : a + b / c = (a * c + b) / c :=
+  (eq_div_iff_mul_eq hc).2 <| by rw [right_distrib, div_mul_cancel₀ _ hc]
 
--- DISSOLVED: add_div'
+@[field_simps]
+theorem add_div' (a b c : K) (hc : c ≠ 0) : b + a / c = (b * c + a) / c := by
+  rw [add_div, mul_div_cancel_right₀ _ hc]
 
--- DISSOLVED: div_add'
+@[field_simps]
+theorem div_add' (a b c : K) (hc : c ≠ 0) : a / c + b = (a + b * c) / c := by
+  rwa [add_comm, add_div', add_comm]
 
--- DISSOLVED: Commute.div_add_div
+protected theorem Commute.div_add_div (hbc : Commute b c) (hbd : Commute b d) (hb : b ≠ 0)
+    (hd : d ≠ 0) : a / b + c / d = (a * d + b * c) / (b * d) := by
+  rw [add_div, mul_div_mul_right _ b hd, hbc.eq, hbd.eq, mul_div_mul_right c d hb]
 
--- DISSOLVED: Commute.one_div_add_one_div
+protected theorem Commute.one_div_add_one_div (hab : Commute a b) (ha : a ≠ 0) (hb : b ≠ 0) :
+    1 / a + 1 / b = (a + b) / (a * b) := by
+  rw [(Commute.one_right a).div_add_div hab ha hb, one_mul, mul_one, add_comm]
 
--- DISSOLVED: Commute.inv_add_inv
+protected theorem Commute.inv_add_inv (hab : Commute a b) (ha : a ≠ 0) (hb : b ≠ 0) :
+    a⁻¹ + b⁻¹ = (a + b) / (a * b) := by
+  rw [inv_eq_one_div, inv_eq_one_div, hab.one_div_add_one_div ha hb]
 
 end DivisionSemiring
 
@@ -100,34 +119,47 @@ section DivisionRing
 
 variable [DivisionRing K] {a b c d : K}
 
--- DISSOLVED: div_neg_self
+@[simp]
+theorem div_neg_self {a : K} (h : a ≠ 0) : a / -a = -1 := by rw [div_neg_eq_neg_div, div_self h]
 
--- DISSOLVED: neg_div_self
+@[simp]
+theorem neg_div_self {a : K} (h : a ≠ 0) : -a / a = -1 := by rw [neg_div, div_self h]
 
 theorem div_sub_div_same (a b c : K) : a / c - b / c = (a - b) / c := by
   rw [sub_eq_add_neg, ← neg_div, div_add_div_same, sub_eq_add_neg]
 
--- DISSOLVED: same_sub_div
+theorem same_sub_div {a b : K} (h : b ≠ 0) : (b - a) / b = 1 - a / b := by
+  simpa only [← @div_self _ _ b h] using (div_sub_div_same b a b).symm
 
--- DISSOLVED: one_sub_div
+theorem one_sub_div {a b : K} (h : b ≠ 0) : 1 - a / b = (b - a) / b :=
+  (same_sub_div h).symm
 
--- DISSOLVED: div_sub_same
+theorem div_sub_same {a b : K} (h : b ≠ 0) : (a - b) / b = a / b - 1 := by
+  simpa only [← @div_self _ _ b h] using (div_sub_div_same a b b).symm
 
--- DISSOLVED: div_sub_one
+theorem div_sub_one {a b : K} (h : b ≠ 0) : a / b - 1 = (a - b) / b :=
+  (div_sub_same h).symm
 
 theorem sub_div (a b c : K) : (a - b) / c = a / c - b / c :=
   (div_sub_div_same _ _ _).symm
 
--- DISSOLVED: inv_sub_inv'
+theorem inv_sub_inv' {a b : K} (ha : a ≠ 0) (hb : b ≠ 0) : a⁻¹ - b⁻¹ = a⁻¹ * (b - a) * b⁻¹ :=
+  let _ := invertibleOfNonzero ha; let _ := invertibleOfNonzero hb; invOf_sub_invOf a b
 
--- DISSOLVED: one_div_mul_sub_mul_one_div_eq_one_div_add_one_div
+theorem one_div_mul_sub_mul_one_div_eq_one_div_add_one_div (ha : a ≠ 0) (hb : b ≠ 0) :
+    1 / a * (b - a) * (1 / b) = 1 / a - 1 / b := by
+  simpa only [one_div] using (inv_sub_inv' ha hb).symm
 
 instance (priority := 100) DivisionRing.isDomain : IsDomain K :=
   NoZeroDivisors.to_isDomain _
 
--- DISSOLVED: Commute.div_sub_div
+protected theorem Commute.div_sub_div (hbc : Commute b c) (hbd : Commute b d) (hb : b ≠ 0)
+    (hd : d ≠ 0) : a / b - c / d = (a * d - b * c) / (b * d) := by
+  simpa only [mul_neg, neg_div, ← sub_eq_add_neg] using hbc.neg_right.div_add_div hbd hb hd
 
--- DISSOLVED: Commute.inv_sub_inv
+protected theorem Commute.inv_sub_inv (hab : Commute a b) (ha : a ≠ 0) (hb : b ≠ 0) :
+    a⁻¹ - b⁻¹ = (b - a) / (a * b) := by
+  simp only [inv_eq_one_div, (Commute.one_right a).div_sub_div hab ha hb, one_mul, mul_one]
 
 end DivisionRing
 
@@ -135,11 +167,15 @@ section Semifield
 
 variable [Semifield K] {a b d : K}
 
--- DISSOLVED: div_add_div
+theorem div_add_div (a : K) (c : K) (hb : b ≠ 0) (hd : d ≠ 0) :
+    a / b + c / d = (a * d + b * c) / (b * d) :=
+  (Commute.all b _).div_add_div (Commute.all _ _) hb hd
 
--- DISSOLVED: one_div_add_one_div
+theorem one_div_add_one_div (ha : a ≠ 0) (hb : b ≠ 0) : 1 / a + 1 / b = (a + b) / (a * b) :=
+  (Commute.all a _).one_div_add_one_div ha hb
 
--- DISSOLVED: inv_add_inv
+theorem inv_add_inv (ha : a ≠ 0) (hb : b ≠ 0) : a⁻¹ + b⁻¹ = (a + b) / (a * b) :=
+  (Commute.all a _).inv_add_inv ha hb
 
 end Semifield
 
@@ -149,13 +185,21 @@ variable [Field K]
 
 attribute [local simp] mul_assoc mul_comm mul_left_comm
 
--- DISSOLVED: div_sub_div
+@[field_simps]
+theorem div_sub_div (a : K) {b : K} (c : K) {d : K} (hb : b ≠ 0) (hd : d ≠ 0) :
+    a / b - c / d = (a * d - b * c) / (b * d) :=
+  (Commute.all b _).div_sub_div (Commute.all _ _) hb hd
 
--- DISSOLVED: inv_sub_inv
+theorem inv_sub_inv {a b : K} (ha : a ≠ 0) (hb : b ≠ 0) : a⁻¹ - b⁻¹ = (b - a) / (a * b) := by
+  rw [inv_eq_one_div, inv_eq_one_div, div_sub_div _ _ ha hb, one_mul, mul_one]
 
--- DISSOLVED: sub_div'
+@[field_simps]
+theorem sub_div' (a b c : K) (hc : c ≠ 0) : b - a / c = (b * c - a) / c := by
+  simpa using div_sub_div b a one_ne_zero hc
 
--- DISSOLVED: div_sub'
+@[field_simps]
+theorem div_sub' (a b c : K) (hc : c ≠ 0) : a / c - b = (a - c * b) / c := by
+  simpa using div_sub_div a b hc one_ne_zero
 
 instance (priority := 100) Field.isDomain : IsDomain K :=
   { DivisionRing.isDomain with }
@@ -258,10 +302,6 @@ instance instField [Field K] : Field Kᵒᵈ := ‹_›
 
 end OrderDual
 
-@[simp] lemma toDual_ratCast [RatCast K] (n : ℚ) : toDual (n : K) = n := rfl
-
-@[simp] lemma ofDual_ratCast [RatCast K] (n : ℚ) : (ofDual n : K) = n := rfl
-
 /-! ### Lexicographic order -/
 
 namespace Lex
@@ -277,7 +317,3 @@ instance instSemifield [Semifield K] : Semifield (Lex K) := ‹_›
 instance instField [Field K] : Field (Lex K) := ‹_›
 
 end Lex
-
-@[simp] lemma toLex_ratCast [RatCast K] (n : ℚ) : toLex (n : K) = n := rfl
-
-@[simp] lemma ofLex_ratCast [RatCast K] (n : ℚ) : (ofLex n : K) = n := rfl

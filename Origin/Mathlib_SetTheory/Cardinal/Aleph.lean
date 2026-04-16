@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Cardinal/Aleph.lean
-Genuine: 128 | Conflates: 0 | Dissolved: 1 | Infrastructure: 10
+Genuine: 130 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Order.Bounded
 import Mathlib.SetTheory.Cardinal.PartENat
 import Mathlib.SetTheory.Ordinal.Enum
+
+noncomputable section
 
 /-!
 # Omega, aleph, and beth functions
@@ -240,10 +242,6 @@ def preAleph : Ordinal.{u} ≃o Cardinal.{u} :=
   (enumOrdOrderIso _ not_bddAbove_isInitial).trans isInitialIso
 
 @[simp]
-theorem _root_.Ordinal.card_preOmega (o : Ordinal) : (preOmega o).card = preAleph o :=
-  rfl
-
-@[simp]
 theorem ord_preAleph (o : Ordinal) : (preAleph o).ord = preOmega o := by
   rw [← o.card_preOmega, (isInitial_preOmega o).ord_card]
 
@@ -320,10 +318,6 @@ scoped notation "ℵ_ " => aleph
 scoped notation "ℵ₁" => ℵ_ 1
 
 theorem aleph_eq_preAleph (o : Ordinal) : ℵ_ o = preAleph (ω + o) :=
-  rfl
-
-@[simp]
-theorem _root_.Ordinal.card_omega (o : Ordinal) : (ω_ o).card = ℵ_ o :=
   rfl
 
 @[simp]
@@ -477,14 +471,8 @@ def alephIdx.relIso : @RelIso Cardinal.{u} Ordinal.{u} (· < ·) (· < ·) :=
 def alephIdx : Cardinal → Ordinal :=
   aleph'.symm
 
-theorem alephIdx.relIso_coe : (alephIdx.relIso : Cardinal → Ordinal) = alephIdx :=
-  rfl
-
 def Aleph'.relIso :=
   aleph'
-
-theorem aleph'.relIso_coe : (Aleph'.relIso : Ordinal → Cardinal) = aleph' :=
-  rfl
 
 theorem aleph'_lt {o₁ o₂ : Ordinal} : aleph' o₁ < aleph' o₂ ↔ o₁ < o₂ :=
   aleph'.lt_iff_lt
@@ -527,9 +515,6 @@ alias aleph'_omega := aleph'_omega0
 
 def aleph'Equiv : Ordinal ≃ Cardinal :=
   ⟨aleph', alephIdx, alephIdx_aleph', aleph'_alephIdx⟩
-
-theorem aleph_eq_aleph' (o : Ordinal) : ℵ_ o = preAleph (ω + o) :=
-  rfl
 
 theorem aleph0_le_aleph' {o : Ordinal} : ℵ₀ ≤ aleph' o ↔ ω ≤ o := by
   rw [← aleph'_omega0, aleph'_le]
@@ -623,7 +608,8 @@ theorem aleph0_le_beth (o : Ordinal) : ℵ₀ ≤ ℶ_ o :=
 theorem beth_pos (o : Ordinal) : 0 < ℶ_ o :=
   aleph0_pos.trans_le <| aleph0_le_beth o
 
--- DISSOLVED: beth_ne_zero
+theorem beth_ne_zero (o : Ordinal) : ℶ_ o ≠ 0 :=
+  (beth_pos o).ne'
 
 theorem isNormal_beth : IsNormal (ord ∘ beth) := by
   refine (isNormal_iff_strictMono_limit _).2

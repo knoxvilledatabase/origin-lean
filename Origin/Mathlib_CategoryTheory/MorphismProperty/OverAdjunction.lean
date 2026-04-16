@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.MorphismProperty.Comma
 import Mathlib.CategoryTheory.Adjunction.Over
 import Mathlib.CategoryTheory.MorphismProperty.Limits
 
+noncomputable section
+
 /-!
 # Adjunction of pushforward and pullback in `P.Over Q X`
 
@@ -73,13 +75,6 @@ noncomputable def Over.pullbackComp [Q.RespectsIso] {X Y Z : T} (f : X ⟶ Y) (g
     Over.pullback P Q (f ≫ g) ≅ Over.pullback P Q g ⋙ Over.pullback P Q f :=
   NatIso.ofComponents
     (fun X ↦ Over.isoMk ((pullbackLeftPullbackSndIso X.hom g f).symm) (by simp))
-
-lemma Over.pullbackComp_left_fst_fst [Q.RespectsIso] {X Y Z : T} (f : X ⟶ Y) (g : Y ⟶ Z)
-    (A : P.Over Q Z) :
-    ((Over.pullbackComp f g).hom.app A).left ≫
-      pullback.fst (pullback.snd A.hom g) f ≫ pullback.fst A.hom g =
-        pullback.fst A.hom (f ≫ g) := by
-  simp
 
 noncomputable def Over.pullbackCongr {X Y : T} {f g : X ⟶ Y} (h : f = g) :
     Over.pullback P Q f ≅ Over.pullback P Q g :=

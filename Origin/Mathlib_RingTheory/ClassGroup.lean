@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/ClassGroup.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 5 | Infrastructure: 5
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Ideal
+
+noncomputable section
 
 /-!
 # The ideal class group
@@ -103,9 +105,41 @@ theorem ClassGroup.mk_eq_mk {I J : (FractionalIdeal R⁰ <| FractionRing R)ˣ} :
   erw [QuotientGroup.mk'_eq_mk', canonicalEquiv_self, Units.map_id, Set.exists_range_iff]
   rfl
 
--- DISSOLVED: ClassGroup.mk_eq_mk_of_coe_ideal
+theorem ClassGroup.mk_eq_mk_of_coe_ideal {I J : (FractionalIdeal R⁰ <| FractionRing R)ˣ}
+    {I' J' : Ideal R} (hI : (I : FractionalIdeal R⁰ <| FractionRing R) = I')
+    (hJ : (J : FractionalIdeal R⁰ <| FractionRing R) = J') :
+    ClassGroup.mk I = ClassGroup.mk J ↔
+      ∃ x y : R, x ≠ 0 ∧ y ≠ 0 ∧ Ideal.span {x} * I' = Ideal.span {y} * J' := by
+  rw [ClassGroup.mk_eq_mk]
+  constructor
+  · rintro ⟨x, rfl⟩
+    rw [Units.val_mul, hI, coe_toPrincipalIdeal, mul_comm,
+      spanSingleton_mul_coeIdeal_eq_coeIdeal] at hJ
+    exact ⟨_, _, sec_fst_ne_zero (R := R) le_rfl x.ne_zero,
+      sec_snd_ne_zero (R := R) le_rfl (x : FractionRing R), hJ⟩
+  · rintro ⟨x, y, hx, hy, h⟩
+    have : IsUnit (mk' (FractionRing R) x ⟨y, mem_nonZeroDivisors_of_ne_zero hy⟩) := by
+      simpa only [isUnit_iff_ne_zero, ne_eq, mk'_eq_zero_iff_eq_zero] using hx
+    refine ⟨this.unit, ?_⟩
+    rw [mul_comm, ← Units.eq_iff, Units.val_mul, coe_toPrincipalIdeal]
+    convert
+      (mk'_mul_coeIdeal_eq_coeIdeal (FractionRing R) <| mem_nonZeroDivisors_of_ne_zero hy).2 h
 
--- DISSOLVED: ClassGroup.mk_eq_one_of_coe_ideal
+theorem ClassGroup.mk_eq_one_of_coe_ideal {I : (FractionalIdeal R⁰ <| FractionRing R)ˣ}
+    {I' : Ideal R} (hI : (I : FractionalIdeal R⁰ <| FractionRing R) = I') :
+    ClassGroup.mk I = 1 ↔ ∃ x : R, x ≠ 0 ∧ I' = Ideal.span {x} := by
+  rw [← map_one (ClassGroup.mk (R := R) (K := FractionRing R)),
+    ClassGroup.mk_eq_mk_of_coe_ideal hI]
+  any_goals rfl
+  constructor
+  · rintro ⟨x, y, hx, hy, h⟩
+    rw [Ideal.mul_top] at h
+    rcases Ideal.mem_span_singleton_mul.mp ((Ideal.span_singleton_le_iff_mem _).mp h.ge) with
+      ⟨i, _hi, rfl⟩
+    rw [← Ideal.span_singleton_mul_span_singleton, Ideal.span_singleton_mul_right_inj hx] at h
+    exact ⟨i, right_ne_zero_of_mul hy, h⟩
+  · rintro ⟨x, hx, rfl⟩
+    exact ⟨1, x, one_ne_zero, hx, by rw [Ideal.span_singleton_one, Ideal.top_mul, Ideal.mul_top]⟩
 
 variable (K)
 
@@ -224,14 +258,44 @@ theorem ClassGroup.mk0_eq_mk0_iff_exists_fraction_ring [IsDedekindDomain R] {I J
 
 variable {K}
 
--- DISSOLVED: ClassGroup.mk0_eq_mk0_iff
+theorem ClassGroup.mk0_eq_mk0_iff [IsDedekindDomain R] {I J : (Ideal R)⁰} :
+    ClassGroup.mk0 I = ClassGroup.mk0 J ↔
+      ∃ (x y : R) (_hx : x ≠ 0) (_hy : y ≠ 0), Ideal.span {x} * (I : Ideal R) =
+      Ideal.span {y} * J := by
+  refine (ClassGroup.mk0_eq_mk0_iff_exists_fraction_ring (FractionRing R)).trans ⟨?_, ?_⟩
+  · rintro ⟨z, hz, h⟩
+    obtain ⟨x, ⟨y, hy⟩, rfl⟩ := IsLocalization.mk'_surjective R⁰ z
+    refine ⟨x, y, ?_, mem_nonZeroDivisors_iff_ne_zero.mp hy, ?_⟩
+    · rintro hx; apply hz
+      rw [hx, IsFractionRing.mk'_eq_div, _root_.map_zero, zero_div]
+    · exact (FractionalIdeal.mk'_mul_coeIdeal_eq_coeIdeal _ hy).mp h
+  · rintro ⟨x, y, hx, hy, h⟩
+    have hy' : y ∈ R⁰ := mem_nonZeroDivisors_iff_ne_zero.mpr hy
+    refine ⟨IsLocalization.mk' _ x ⟨y, hy'⟩, ?_, ?_⟩
+    · contrapose! hx
+      rwa [mk'_eq_iff_eq_mul, zero_mul, ← (algebraMap R (FractionRing R)).map_zero,
+        (IsFractionRing.injective R (FractionRing R)).eq_iff] at hx
+    · exact (FractionalIdeal.mk'_mul_coeIdeal_eq_coeIdeal _ hy').mpr h
 
 noncomputable def ClassGroup.integralRep (I : FractionalIdeal R⁰ (FractionRing R)) :
     Ideal R := I.num
 
--- DISSOLVED: ClassGroup.integralRep_mem_nonZeroDivisors
+theorem ClassGroup.integralRep_mem_nonZeroDivisors
+    {I : FractionalIdeal R⁰ (FractionRing R)} (hI : I ≠ 0) :
+    I.num ∈ (Ideal R)⁰ := by
+  rwa [mem_nonZeroDivisors_iff_ne_zero, ne_eq, FractionalIdeal.num_eq_zero_iff]
 
--- DISSOLVED: ClassGroup.mk0_integralRep
+theorem ClassGroup.mk0_integralRep [IsDedekindDomain R]
+    (I : (FractionalIdeal R⁰ (FractionRing R))ˣ) :
+    ClassGroup.mk0 ⟨ClassGroup.integralRep I, ClassGroup.integralRep_mem_nonZeroDivisors I.ne_zero⟩
+      = ClassGroup.mk I := by
+  rw [← ClassGroup.mk_mk0 (FractionRing R), eq_comm, ClassGroup.mk_eq_mk]
+  have fd_ne_zero : (algebraMap R (FractionRing R)) I.1.den ≠ 0 := by
+    exact IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (SetLike.coe_mem _)
+  refine ⟨Units.mk0 (algebraMap R _ I.1.den) fd_ne_zero, ?_⟩
+  apply Units.ext
+  rw [mul_comm, val_mul, coe_toPrincipalIdeal, val_mk0]
+  exact FractionalIdeal.den_mul_self_eq_num' R⁰ (FractionRing R) I
 
 theorem ClassGroup.mk0_surjective [IsDedekindDomain R] :
     Function.Surjective (ClassGroup.mk0 : (Ideal R)⁰ → ClassGroup R) := by

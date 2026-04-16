@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Valuation/Basic.lean
-Genuine: 92 | Conflates: 2 | Dissolved: 20 | Infrastructure: 16
+Genuine: 106 | Conflates: 7 | Dissolved: 1 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.Tactic.TFAE
+
+noncomputable section
 
 /-!
 
@@ -119,11 +121,6 @@ instance : ValuationClass (Valuation R Γ₀) R Γ₀ where
   map_zero f := f.map_zero'
   map_add_le_max f := f.map_add_le_max'
 
-@[simp]
-theorem coe_mk (f : R →*₀ Γ₀) (h) : ⇑(Valuation.mk f h) = f := rfl
-
-theorem toFun_eq_coe (v : Valuation R Γ₀) : v.toFun = v := rfl
-
 -- DISSOLVED: toMonoidWithZeroHom_coe_eq_coe
 
 @[ext]
@@ -131,9 +128,6 @@ theorem ext {v₁ v₂ : Valuation R Γ₀} (h : ∀ r, v₁ r = v₂ r) : v₁ 
   DFunLike.ext _ _ h
 
 variable (v : Valuation R Γ₀)
-
-@[simp, norm_cast]
-theorem coe_coe : ⇑(v : R →*₀ Γ₀) = v := rfl
 
 theorem map_zero : v 0 = 0 :=
   v.map_zero'
@@ -167,7 +161,13 @@ theorem map_sum_le {ι : Type*} {s : Finset ι} {f : ι → R} {g : Γ₀} (hf :
   rw [Finset.forall_mem_insert] at hf; rw [Finset.sum_insert has]
   exact v.map_add_le hf.1 (ih hf.2)
 
--- DISSOLVED: map_sum_lt
+theorem map_sum_lt {ι : Type*} {s : Finset ι} {f : ι → R} {g : Γ₀} (hg : g ≠ 0)
+    (hf : ∀ i ∈ s, v (f i) < g) : v (∑ i ∈ s, f i) < g := by
+  refine
+    Finset.induction_on s (fun _ => v.map_zero ▸ (zero_lt_iff.2 hg))
+      (fun a s has ih hf => ?_) hf
+  rw [Finset.forall_mem_insert] at hf; rw [Finset.sum_insert has]
+  exact v.map_add_lt hf.1 (ih hf.2)
 
 theorem map_sum_lt' {ι : Type*} {s : Finset ι} {f : ι → R} {g : Γ₀} (hg : 0 < g)
     (hf : ∀ i ∈ s, v (f i) < g) : v (∑ i ∈ s, f i) < g :=
@@ -183,16 +183,22 @@ def toPreorder : Preorder R :=
 theorem zero_iff [Nontrivial Γ₀] (v : Valuation K Γ₀) {x : K} : v x = 0 ↔ x = 0 :=
   map_eq_zero v
 
--- DISSOLVED: ne_zero_iff
+-- CONFLATES (assumes ground = zero): ne_zero_iff
+theorem ne_zero_iff [Nontrivial Γ₀] (v : Valuation K Γ₀) {x : K} : v x ≠ 0 ↔ x ≠ 0 :=
+  map_ne_zero v
 
--- DISSOLVED: pos_iff
+-- CONFLATES (assumes ground = zero): pos_iff
+lemma pos_iff [Nontrivial Γ₀] (v : Valuation K Γ₀) {x : K} : 0 < v x ↔ x ≠ 0 := by
+  rw [zero_lt_iff, ne_zero_iff]
 
-theorem unit_map_eq (u : Rˣ) : (Units.map (v : R →* Γ₀) u : Γ₀) = v u :=
-  rfl
+-- CONFLATES (assumes ground = zero): ne_zero_of_unit
+theorem ne_zero_of_unit [Nontrivial Γ₀] (v : Valuation K Γ₀) (x : Kˣ) : v x ≠ (0 : Γ₀) := by
+  simp only [ne_eq, Valuation.zero_iff, Units.ne_zero x, not_false_iff]
 
--- DISSOLVED: ne_zero_of_unit
-
--- DISSOLVED: ne_zero_of_isUnit
+-- CONFLATES (assumes ground = zero): ne_zero_of_isUnit
+theorem ne_zero_of_isUnit [Nontrivial Γ₀] (v : Valuation K Γ₀) (x : K) (hx : IsUnit x) :
+    v x ≠ (0 : Γ₀) := by
+  simpa [hx.choose_spec] using ne_zero_of_unit v hx.choose
 
 def comap {S : Type*} [Ring S] (f : S →+* R) (v : Valuation R Γ₀) : Valuation S Γ₀ :=
   { v.toMonoidWithZeroHom.comp f.toMonoidWithZeroHom with
@@ -219,10 +225,6 @@ def map (f : Γ₀ →*₀ Γ'₀) (hf : Monotone f) (v : Valuation R Γ₀) : V
         f (v (r + s)) ≤ f (max (v r) (v s)) := hf (v.map_add r s)
         _ = max (f (v r)) (f (v s)) := hf.map_max
          }
-
-@[simp]
-lemma map_apply (f : Γ₀ →*₀ Γ'₀) (hf : Monotone f) (v : Valuation R Γ₀) (r : R) :
-    v.map f hf r = f (v r) := rfl
 
 def IsEquiv (v₁ : Valuation R Γ₀) (v₂ : Valuation R Γ'₀) : Prop :=
   ∀ r s, v₁ r ≤ v₁ s ↔ v₂ r ≤ v₂ s
@@ -280,7 +282,11 @@ theorem map_sub_eq_of_lt_right (h : v x < v y) : v (x - y) = v y := by
   rw [sub_eq_add_neg, map_add_eq_of_lt_right, map_neg]
   rwa [map_neg]
 
--- DISSOLVED: map_sum_eq_of_lt
+theorem map_sum_eq_of_lt {ι : Type*} {s : Finset ι} {f : ι → R} {j : ι}
+    (hj : j ∈ s) (h0 : v (f j) ≠ 0) (hf : ∀ i ∈ s \ {j}, v (f i) < v (f j)) :
+    v (∑ i ∈ s, f i) = v (f j) := by
+  rw [Finset.sum_eq_add_sum_diff_singleton hj]
+  exact map_add_eq_of_lt_left _ (map_sum_lt _ h0 hf)
 
 theorem map_sub_eq_of_lt_left (h : v y < v x) : v (x - y) = v x := by
   rw [sub_eq_add_neg, map_add_eq_of_lt_left]
@@ -300,13 +306,17 @@ theorem map_one_sub_of_lt (h : v x < 1) : v (1 - x) = 1 := by
   rw [sub_eq_add_neg 1 x]
   simpa only [v.map_one, v.map_neg] using v.map_add_eq_of_lt_left h
 
--- DISSOLVED: one_lt_val_iff
+theorem one_lt_val_iff (v : Valuation K Γ₀) {x : K} (h : x ≠ 0) : 1 < v x ↔ v x⁻¹ < 1 := by
+  simp [inv_lt_one₀ (v.pos_iff.2 h)]
 
--- DISSOLVED: one_le_val_iff
+theorem one_le_val_iff (v : Valuation K Γ₀) {x : K} (h : x ≠ 0) : 1 ≤ v x ↔ v x⁻¹ ≤ 1 := by
+  simp [inv_le_one₀ (v.pos_iff.2 h)]
 
--- DISSOLVED: val_lt_one_iff
+theorem val_lt_one_iff (v : Valuation K Γ₀) {x : K} (h : x ≠ 0) : v x < 1 ↔ 1 < v x⁻¹ := by
+  simp [one_lt_inv₀ (v.pos_iff.2 h)]
 
--- DISSOLVED: val_le_one_iff
+theorem val_le_one_iff (v : Valuation K Γ₀) {x : K} (h : x ≠ 0) : v x ≤ 1 ↔ 1 ≤ v x⁻¹ := by
+  simp [one_le_inv₀ (v.pos_iff.2 h)]
 
 theorem val_eq_one_iff (v : Valuation K Γ₀) {x : K} : v x = 1 ↔ v x⁻¹ = 1 := by
   by_cases h : x = 0
@@ -322,12 +332,6 @@ theorem val_le_one_or_val_inv_le_one (v : Valuation K Γ₀) (x : K) : v x ≤ 1
   by_cases h : x = 0
   · simp only [h, _root_.map_zero, zero_le', inv_zero, or_self]
   · simp only [← one_le_val_iff v h, le_total]
-
-def ltAddSubgroup (v : Valuation R Γ₀) (γ : Γ₀ˣ) : AddSubgroup R where
-  carrier := { x | v x < γ }
-  zero_mem' := by simp
-  add_mem' {x y} x_in y_in := lt_of_le_of_lt (v.map_add x y) (max_lt x_in y_in)
-  neg_mem' x_in := by rwa [Set.mem_setOf, map_neg]
 
 end Group
 
@@ -365,7 +369,9 @@ theorem comap {S : Type*} [Ring S] (f : S →+* R) (h : v₁.IsEquiv v₂) :
 theorem val_eq (h : v₁.IsEquiv v₂) {r s : R} : v₁ r = v₁ s ↔ v₂ r = v₂ s := by
   simpa only [le_antisymm_iff] using and_congr (h r s) (h s r)
 
--- DISSOLVED: ne_zero
+theorem ne_zero (h : v₁.IsEquiv v₂) {r : R} : v₁ r ≠ 0 ↔ v₂ r ≠ 0 := by
+  have : v₁ r ≠ v₁ 0 ↔ v₂ r ≠ v₂ 0 := not_congr h.val_eq
+  rwa [v₁.map_zero, v₂.map_zero] at this
 
 end IsEquiv
 
@@ -376,29 +382,118 @@ theorem isEquiv_of_map_strictMono [LinearOrderedCommMonoidWithZero Γ₀]
     (H : StrictMono f) : IsEquiv (v.map f H.monotone) v := fun _x _y =>
   ⟨H.le_iff_le.mp, fun h => H.monotone h⟩
 
--- DISSOLVED: isEquiv_iff_val_lt_val
+theorem isEquiv_iff_val_lt_val [LinearOrderedCommGroupWithZero Γ₀]
+    [LinearOrderedCommGroupWithZero Γ'₀] {v : Valuation K Γ₀} {v' : Valuation K Γ'₀} :
+    v.IsEquiv v' ↔ ∀ {x y : K}, v x < v y ↔ v' x < v' y := by
+  simp only [IsEquiv, le_iff_le_iff_lt_iff_lt]
+  exact forall_comm
 
 alias ⟨IsEquiv.lt_iff_lt, _⟩ := isEquiv_iff_val_lt_val
 
--- DISSOLVED: isEquiv_of_val_le_one
+theorem isEquiv_of_val_le_one [LinearOrderedCommGroupWithZero Γ₀]
+    [LinearOrderedCommGroupWithZero Γ'₀] {v : Valuation K Γ₀} {v' : Valuation K Γ'₀}
+    (h : ∀ {x : K}, v x ≤ 1 ↔ v' x ≤ 1) : v.IsEquiv v' := by
+  intro x y
+  obtain rfl | hy := eq_or_ne y 0
+  · simp
+  · rw [← div_le_one₀, ← v.map_div, h, v'.map_div, div_le_one₀] <;>
+      rwa [zero_lt_iff, ne_zero_iff]
 
--- DISSOLVED: isEquiv_iff_val_le_one
+theorem isEquiv_iff_val_le_one [LinearOrderedCommGroupWithZero Γ₀]
+    [LinearOrderedCommGroupWithZero Γ'₀] {v : Valuation K Γ₀} {v' : Valuation K Γ'₀} :
+    v.IsEquiv v' ↔ ∀ {x : K}, v x ≤ 1 ↔ v' x ≤ 1 :=
+  ⟨fun h x => by simpa using h x 1, isEquiv_of_val_le_one⟩
 
 alias ⟨IsEquiv.le_one_iff_le_one, _⟩ := isEquiv_iff_val_le_one
 
--- DISSOLVED: isEquiv_iff_val_eq_one
+theorem isEquiv_iff_val_eq_one [LinearOrderedCommGroupWithZero Γ₀]
+    [LinearOrderedCommGroupWithZero Γ'₀] {v : Valuation K Γ₀} {v' : Valuation K Γ'₀} :
+    v.IsEquiv v' ↔ ∀ {x : K}, v x = 1 ↔ v' x = 1 := by
+  constructor
+  · intro h x
+    simpa using @IsEquiv.val_eq _ _ _ _ _ _ v v' h x 1
+  · intro h
+    apply isEquiv_of_val_le_one
+    intro x
+    constructor
+    · intro hx
+      rcases lt_or_eq_of_le hx with hx' | hx'
+      · have : v (1 + x) = 1 := by
+          rw [← v.map_one]
+          apply map_add_eq_of_lt_left
+          simpa
+        rw [h] at this
+        rw [show x = -1 + (1 + x) by simp]
+        refine le_trans (v'.map_add _ _) ?_
+        simp [this]
+      · rw [h] at hx'
+        exact le_of_eq hx'
+    · intro hx
+      rcases lt_or_eq_of_le hx with hx' | hx'
+      · have : v' (1 + x) = 1 := by
+          rw [← v'.map_one]
+          apply map_add_eq_of_lt_left
+          simpa
+        rw [← h] at this
+        rw [show x = -1 + (1 + x) by simp]
+        refine le_trans (v.map_add _ _) ?_
+        simp [this]
+      · rw [← h] at hx'
+        exact le_of_eq hx'
 
 alias ⟨IsEquiv.eq_one_iff_eq_one, _⟩ := isEquiv_iff_val_eq_one
 
--- DISSOLVED: isEquiv_iff_val_lt_one
+theorem isEquiv_iff_val_lt_one [LinearOrderedCommGroupWithZero Γ₀]
+    [LinearOrderedCommGroupWithZero Γ'₀] {v : Valuation K Γ₀} {v' : Valuation K Γ'₀} :
+    v.IsEquiv v' ↔ ∀ {x : K}, v x < 1 ↔ v' x < 1 := by
+  constructor
+  · intro h x
+    simp only [lt_iff_le_and_ne,
+      and_congr h.le_one_iff_le_one h.eq_one_iff_eq_one.not]
+  · rw [isEquiv_iff_val_eq_one]
+    intro h x
+    by_cases hx : x = 0
+    · simp only [(zero_iff _).2 hx, zero_ne_one]
+    constructor
+    · intro hh
+      by_contra h_1
+      cases ne_iff_lt_or_gt.1 h_1 with
+      | inl h_2 => simpa [hh, lt_self_iff_false] using h.2 h_2
+      | inr h_2 =>
+          rw [← inv_one, ← inv_eq_iff_eq_inv, ← map_inv₀] at hh
+          exact hh.not_lt (h.2 ((one_lt_val_iff v' hx).1 h_2))
+    · intro hh
+      by_contra h_1
+      cases ne_iff_lt_or_gt.1 h_1 with
+      | inl h_2 => simpa [hh, lt_self_iff_false] using h.1 h_2
+      | inr h_2 =>
+        rw [← inv_one, ← inv_eq_iff_eq_inv, ← map_inv₀] at hh
+        exact hh.not_lt (h.1 ((one_lt_val_iff v hx).1 h_2))
 
 alias ⟨IsEquiv.lt_one_iff_lt_one, _⟩ := isEquiv_iff_val_lt_one
 
--- DISSOLVED: isEquiv_iff_val_sub_one_lt_one
+theorem isEquiv_iff_val_sub_one_lt_one [LinearOrderedCommGroupWithZero Γ₀]
+    [LinearOrderedCommGroupWithZero Γ'₀] {v : Valuation K Γ₀} {v' : Valuation K Γ'₀} :
+    v.IsEquiv v' ↔ ∀ {x : K}, v (x - 1) < 1 ↔ v' (x - 1) < 1 := by
+  rw [isEquiv_iff_val_lt_one]
+  exact (Equiv.subRight 1).surjective.forall
 
 alias ⟨IsEquiv.val_sub_one_lt_one_iff, _⟩ := isEquiv_iff_val_sub_one_lt_one
 
--- DISSOLVED: isEquiv_tfae
+theorem isEquiv_tfae [LinearOrderedCommGroupWithZero Γ₀] [LinearOrderedCommGroupWithZero Γ'₀]
+    (v : Valuation K Γ₀) (v' : Valuation K Γ'₀) :
+    [ v.IsEquiv v',
+      ∀ {x y}, v x < v y ↔ v' x < v' y,
+      ∀ {x}, v x ≤ 1 ↔ v' x ≤ 1,
+      ∀ {x}, v x = 1 ↔ v' x = 1,
+      ∀ {x}, v x < 1 ↔ v' x < 1,
+      ∀ {x}, v (x - 1) < 1 ↔ v' (x - 1) < 1 ].TFAE := by
+  tfae_have 1 ↔ 2 := isEquiv_iff_val_lt_val
+  tfae_have 1 ↔ 3 := isEquiv_iff_val_le_one
+  tfae_have 1 ↔ 4 := isEquiv_iff_val_eq_one
+  tfae_have 1 ↔ 5 := isEquiv_iff_val_lt_one
+  tfae_have 1 ↔ 6 := isEquiv_iff_val_sub_one_lt_one
+  tfae_finish
 
 end
 
@@ -433,16 +528,6 @@ instance [Nontrivial Γ₀] [NoZeroDivisors Γ₀] : Ideal.IsPrime (supp v) :=
     simp only [mem_supp_iff] at hxy ⊢
     rw [v.map_mul x y] at hxy
     exact eq_zero_or_eq_zero_of_mul_eq_zero hxy⟩
-
-theorem map_add_supp (a : R) {s : R} (h : s ∈ supp v) : v (a + s) = v a := by
-  have aux : ∀ a s, v s = 0 → v (a + s) ≤ v a := by
-    intro a' s' h'
-    refine le_trans (v.map_add a' s') (max_le le_rfl ?_)
-    simp [h']
-  apply le_antisymm (aux a s h)
-  calc
-    v a = v (a + s + -s) := by simp
-    _ ≤ v (a + s) := aux (a + s) (-s) (by rwa [← Ideal.neg_mem_iff] at h)
 
 theorem comap_supp {S : Type*} [CommRing S] (f : S →+* R) :
     supp (v.comap f) = Ideal.comap f v.supp :=
@@ -492,15 +577,8 @@ def of : AddValuation R Γ₀ where
 
 variable {h0} {h1} {hadd} {hmul} {r : R}
 
-@[simp]
-theorem of_apply : (of f h0 h1 hadd hmul) r = f r := rfl
-
 def valuation : Valuation R (Multiplicative Γ₀ᵒᵈ) :=
   v
-
-@[simp]
-theorem valuation_apply (r : R) : v.valuation r = Multiplicative.ofAdd (OrderDual.toDual (v r)) :=
-  rfl
 
 end
 
@@ -561,7 +639,9 @@ def toPreorder : Preorder R :=
 theorem top_iff [Nontrivial Γ₀] (v : AddValuation K Γ₀) {x : K} : v x = (⊤ : Γ₀) ↔ x = 0 :=
   v.zero_iff
 
--- DISSOLVED: ne_top_iff
+-- CONFLATES (assumes ground = zero): ne_top_iff
+theorem ne_top_iff [Nontrivial Γ₀] (v : AddValuation K Γ₀) {x : K} : v x ≠ (⊤ : Γ₀) ↔ x ≠ 0 :=
+  v.ne_zero_iff
 
 def comap {S : Type*} [Ring S] (f : S →+* R) (v : AddValuation R Γ₀) : AddValuation S Γ₀ :=
   Valuation.comap f v
@@ -581,10 +661,6 @@ def map (f : Γ₀ →+ Γ'₀) (ht : f ⊤ = ⊤) (hf : Monotone f) (v : AddVal
       map_mul' := f.map_add
       map_one' := f.map_zero
       map_zero' := ht } (fun _ _ h => hf h) v
-
-@[simp]
-lemma map_apply (f : Γ₀ →+ Γ'₀) (ht : f ⊤ = ⊤) (hf : Monotone f) (v : AddValuation R Γ₀) (r : R) :
-    v.map f ht hf r = f (v r) := rfl
 
 def IsEquiv (v₁ : AddValuation R Γ₀) (v₂ : AddValuation R Γ'₀) : Prop :=
   Valuation.IsEquiv v₁ v₂
@@ -695,9 +771,6 @@ def supp : Ideal R :=
 @[simp]
 theorem mem_supp_iff (x : R) : x ∈ supp v ↔ v x = (⊤ : Γ₀) :=
   Valuation.mem_supp_iff v x
-
-theorem map_add_supp (a : R) {s : R} (h : s ∈ supp v) : v (a + s) = v a :=
-  Valuation.map_add_supp v a h
 
 end Supp
 

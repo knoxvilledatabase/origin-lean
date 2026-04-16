@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Constructions.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.CrossProduct
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.LinearAlgebra.Projectivization.Basic
+
+noncomputable section
 
 /-!
 
@@ -34,7 +36,9 @@ def orthogonal : ℙ F (m → F) → ℙ F (m → F) → Prop :=
     simp_rw [← h1, ← h2, Matrix.dotProduct_smul, Matrix.smul_dotProduct, smul_smul,
       smul_eq_zero_iff_eq])
 
--- DISSOLVED: orthogonal_mk
+lemma orthogonal_mk {v w : m → F} (hv : v ≠ 0) (hw : w ≠ 0) :
+    orthogonal (mk F v hv) (mk F w hw) ↔ Matrix.dotProduct v w = 0 :=
+  Iff.rfl
 
 lemma orthogonal_comm {v w : ℙ F (m → F)} : orthogonal v w ↔ orthogonal w v := by
   induction' v with v hv
@@ -55,7 +59,10 @@ end DotProduct
 
 section CrossProduct
 
--- DISSOLVED: mk_eq_mk_iff_crossProduct_eq_zero
+lemma mk_eq_mk_iff_crossProduct_eq_zero {v w : Fin 3 → F} (hv : v ≠ 0) (hw : w ≠ 0) :
+    mk F v hv = mk F w hw ↔ crossProduct v w = 0 := by
+  rw [← not_iff_not, mk_eq_mk_iff', not_exists, ← LinearIndependent.pair_iff' hw,
+    ← crossProduct_ne_zero_iff_linearIndependent, ← cross_anticomm, neg_ne_zero]
 
 variable [DecidableEq F]
 
@@ -68,18 +75,31 @@ def cross : ℙ F (Fin 3 → F) → ℙ F (Fin 3 → F) → ℙ F (Fin 3 → F) 
       · use a
       · use a * b)
 
--- DISSOLVED: cross_mk
+lemma cross_mk {v w : Fin 3 → F} (hv : v ≠ 0) (hw : w ≠ 0) :
+    cross (mk F v hv) (mk F w hw) =
+      if h : crossProduct v w = 0 then mk F v hv else mk F (crossProduct v w) h := by
+  change Quotient.mk'' _ = _
+  split_ifs with h <;> simp only [h] <;> rfl
 
--- DISSOLVED: cross_mk_of_cross_eq_zero
+lemma cross_mk_of_cross_eq_zero {v w : Fin 3 → F} (hv : v ≠ 0) (hw : w ≠ 0)
+    (h : crossProduct v w = 0) :
+    cross (mk F v hv) (mk F w hw) = mk F v hv := by
+  rw [cross_mk, dif_pos h]
 
--- DISSOLVED: cross_mk_of_cross_ne_zero
+lemma cross_mk_of_cross_ne_zero {v w : Fin 3 → F} (hv : v ≠ 0) (hw : w ≠ 0)
+    (h : crossProduct v w ≠ 0) :
+    cross (mk F v hv) (mk F w hw) = mk F (crossProduct v w) h := by
+  rw [cross_mk, dif_neg h]
 
 lemma cross_self (v : ℙ F (Fin 3 → F)) : cross v v = v := by
   induction' v with v hv
   rw [cross_mk_of_cross_eq_zero]
   rw [← mk_eq_mk_iff_crossProduct_eq_zero hv]
 
--- DISSOLVED: cross_mk_of_ne
+lemma cross_mk_of_ne {v w : Fin 3 → F} (hv : v ≠ 0) (hw : w ≠ 0) (h : mk F v hv ≠ mk F w hw) :
+    cross (mk F v hv) (mk F w hw) = mk F (crossProduct v w)
+      (mt (mk_eq_mk_iff_crossProduct_eq_zero hv hw).mpr h) := by
+  rw [cross_mk_of_cross_ne_zero]
 
 lemma cross_comm (v w : ℙ F (Fin 3 → F)) : cross v w = cross w v := by
   rcases eq_or_ne v w with rfl | h

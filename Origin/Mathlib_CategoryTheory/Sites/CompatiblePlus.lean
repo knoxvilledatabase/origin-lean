@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Whiskering
 import Mathlib.CategoryTheory.Sites.Plus
 
+noncomputable section
+
 /-!
 
 In this file, we prove that the plus functor is compatible with functors which

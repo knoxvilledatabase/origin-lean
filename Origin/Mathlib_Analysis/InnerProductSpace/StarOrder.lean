@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Positive
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
 import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
 
+noncomputable section
+
 /-!
 # Continuous linear maps on a Hilbert space are a `StarOrderedRing`
 

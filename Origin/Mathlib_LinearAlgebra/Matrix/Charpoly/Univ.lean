@@ -7,6 +7,8 @@ import Mathlib.Algebra.MvPolynomial.Equiv
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.RingTheory.MvPolynomial.Homogeneous
 
+noncomputable section
+
 /-!
 # The universal characteristic polynomial
 
@@ -38,7 +40,6 @@ variable (f : R →+* S)
 variable (R)
 
 noncomputable
-
 abbrev univ : Polynomial (MvPolynomial (n × n) R) :=
   charpoly <| mvPolynomialX n n R
 

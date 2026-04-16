@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Process.Stopping
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Hitting time
 
@@ -43,11 +45,6 @@ variable {Ω β ι : Type*} {m : MeasurableSpace Ω}
 
 noncomputable def hitting [Preorder ι] [InfSet ι] (u : ι → Ω → β) (s : Set β) (n m : ι) : Ω → ι :=
   fun x => if ∃ j ∈ Set.Icc n m, u j x ∈ s then sInf (Set.Icc n m ∩ {i : ι | u i x ∈ s}) else m
-
-theorem hitting_def [Preorder ι] [InfSet ι] (u : ι → Ω → β) (s : Set β) (n m : ι) :
-    hitting u s n m =
-    fun x => if ∃ j ∈ Set.Icc n m, u j x ∈ s then sInf (Set.Icc n m ∩ {i : ι | u i x ∈ s}) else m :=
-  rfl
 
 section Inequalities
 

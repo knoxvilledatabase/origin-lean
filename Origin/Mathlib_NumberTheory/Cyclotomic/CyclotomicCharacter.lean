@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/Cyclotomic/CyclotomicCharacter.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+
+noncomputable section
 
 /-!
 
@@ -73,17 +75,27 @@ theorem rootsOfUnity.integer_power_of_ringEquiv' (g : L ≃+* L) :
     ∃ m : ℤ, ∀ t ∈ rootsOfUnity n L, g (t : Lˣ) = (t ^ m : Lˣ) := by
   simpa using rootsOfUnity.integer_power_of_ringEquiv n g
 
--- DISSOLVED: ModularCyclotomicCharacter_aux
+noncomputable def ModularCyclotomicCharacter_aux (g : L ≃+* L) (n : ℕ) [NeZero n] : ℤ :=
+  (rootsOfUnity.integer_power_of_ringEquiv n g).choose
 
--- DISSOLVED: ModularCyclotomicCharacter_aux_spec
+theorem ModularCyclotomicCharacter_aux_spec (g : L ≃+* L) (n : ℕ) [NeZero n] :
+    ∀ t : rootsOfUnity n L, g (t : Lˣ) = (t ^ (ModularCyclotomicCharacter_aux g n) : Lˣ) :=
+  (rootsOfUnity.integer_power_of_ringEquiv n g).choose_spec
 
--- DISSOLVED: ModularCyclotomicCharacter.toFun
+noncomputable def ModularCyclotomicCharacter.toFun (n : ℕ) [NeZero n] (g : L ≃+* L) :
+    ZMod (Fintype.card (rootsOfUnity n L)) :=
+  ModularCyclotomicCharacter_aux g n
 
 namespace ModularCyclotomicCharacter
 
 local notation "χ₀" => ModularCyclotomicCharacter.toFun
 
--- DISSOLVED: toFun_spec
+theorem toFun_spec (g : L ≃+* L) {n : ℕ} [NeZero n] (t : rootsOfUnity n L) :
+    g (t : Lˣ) = (t ^ (χ₀ n g).val : Lˣ) := by
+  rw [ModularCyclotomicCharacter_aux_spec g n t, ← zpow_natCast, ModularCyclotomicCharacter.toFun,
+    ZMod.val_intCast, ← Subgroup.coe_zpow]
+  exact Units.ext_iff.1 <| SetCoe.ext_iff.2 <|
+    zpow_eq_zpow_emod _ pow_card_eq_one (G := rootsOfUnity n L)
 
 -- DISSOLVED: toFun_spec'
 
@@ -125,8 +137,6 @@ end ModularCyclotomicCharacter
 
 variable (L)
 
-noncomputable
-
 -- DISSOLVED: ModularCyclotomicCharacter'
 
 lemma spec' (g : L ≃+* L) {t : Lˣ} (ht : t ∈ rootsOfUnity n L) :
@@ -139,7 +149,11 @@ lemma unique' (g : L ≃+* L) {c : ZMod (Fintype.card { x // x ∈ rootsOfUnity 
     c = ModularCyclotomicCharacter' L n g :=
   ModularCyclotomicCharacter.toFun_unique' _ _ _ hc
 
--- DISSOLVED: ModularCyclotomicCharacter
+noncomputable def ModularCyclotomicCharacter {n : ℕ} [NeZero n]
+    (hn : Fintype.card { x // x ∈ rootsOfUnity n L } = n) :
+    (L ≃+* L) →* (ZMod n)ˣ :=
+  (Units.mapEquiv <| (ZMod.ringEquivCongr hn).toMulEquiv).toMonoidHom.comp
+  (ModularCyclotomicCharacter' L n)
 
 namespace ModularCyclotomicCharacter
 

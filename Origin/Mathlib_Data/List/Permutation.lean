@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Permutation.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.List.Flatten
@@ -10,6 +10,8 @@ import Mathlib.Data.List.Duplicate
 import Mathlib.Data.List.InsertIdx
 import Batteries.Data.List.Perm
 import Mathlib.Data.List.Perm.Basic
+
+noncomputable section
 
 /-!
 # Permutations of a list
@@ -54,11 +56,6 @@ theorem permutationsAux2_fst (t : α) (ts : List α) (r : List β) :
     ∀ (ys : List α) (f : List α → β), (permutationsAux2 t ts r ys f).1 = ys ++ ts
   | [], _ => rfl
   | y :: ys, f => by simp [permutationsAux2, permutationsAux2_fst t _ _ ys]
-
-@[simp]
-theorem permutationsAux2_snd_nil (t : α) (ts : List α) (r : List β) (f : List α → β) :
-    (permutationsAux2 t ts r [] f).2 = r :=
-  rfl
 
 @[simp]
 theorem permutationsAux2_snd_cons (t : α) (ts : List α) (r : List β) (y : α) (ys : List α)
@@ -166,14 +163,12 @@ theorem mem_foldr_permutationsAux2 {t : α} {ts : List α} {r L : List (List α)
     append_assoc, cons_append, exists_prop]
 
 set_option linter.deprecated false in
-
 theorem length_foldr_permutationsAux2 (t : α) (ts : List α) (r L : List (List α)) :
     length (foldr (fun y r => (permutationsAux2 t ts r y id).2) r L) =
       Nat.sum (map length L) + length r := by
   simp [foldr_permutationsAux2, Function.comp_def, length_permutationsAux2, length_flatMap']
 
 set_option linter.deprecated false in
-
 theorem length_foldr_permutationsAux2' (t : α) (ts : List α) (r L : List (List α)) (n)
     (H : ∀ l ∈ L, length l = n) :
     length (foldr (fun y r => (permutationsAux2 t ts r y id).2) r L) = n * length L + length r := by

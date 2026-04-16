@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Modification.Oplax
 
+noncomputable section
+
 /-!
 # The bicategory of oplax functors between two bicategories
 

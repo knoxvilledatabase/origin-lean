@@ -8,6 +8,8 @@ import Mathlib.Data.List.Defs
 import Mathlib.Data.Nat.PSub
 import Mathlib.Data.Option.Basic
 
+noncomputable section
+
 /-!
 # Ordered sets
 
@@ -100,13 +102,6 @@ instance : Singleton α (Ordnode α) :=
 def size : Ordnode α → ℕ
   | nil => 0
   | node sz _ _ _ => sz
-
-@[simp] theorem size_nil : size (nil : Ordnode α) = 0 :=
-  rfl
-
-@[simp] theorem size_node (sz : ℕ) (l : Ordnode α) (x : α) (r : Ordnode α) :
-    size (node sz l x r) = sz :=
-  rfl
 
 @[inline]
 def empty : Ordnode α → Bool

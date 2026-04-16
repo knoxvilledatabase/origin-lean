@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Grothendieck
 
+noncomputable section
+
 /-!
 # Grothendieck pretopologies
 
@@ -96,10 +98,6 @@ def toGrothendieck (K : Pretopology C) : GrothendieckTopology C where
     refine ⟨_, K.transitive _ _ hR' fun _ f hf => t₂ (RS _ hf), ?_⟩
     rintro Y _ ⟨Z, g, f, hg, hf, rfl⟩
     apply t₃ (RS _ hg) _ hf
-
-theorem mem_toGrothendieck (K : Pretopology C) (X S) :
-    S ∈ toGrothendieck C K X ↔ ∃ R ∈ K X, R ≤ (S : Presieve X) :=
-  Iff.rfl
 
 def ofGrothendieck (J : GrothendieckTopology C) : Pretopology C where
   coverings X R := Sieve.generate R ∈ J X
@@ -225,10 +223,6 @@ instance : CompleteLattice (Pretopology C) where
   inf_le_right _ _ _ _ hS := hS.right
   le_inf _ _ _ hts htr X _ hS := ⟨hts X hS, htr X hS⟩
   __ := completeLatticeOfInf _ (isGLB_sInf C)
-
-lemma mem_inf (t₁ t₂ : Pretopology C) {X : C} (S : Presieve X) :
-    S ∈ (t₁ ⊓ t₂) X ↔ S ∈ t₁ X ∧ S ∈ t₂ X :=
-  Iff.rfl
 
 end Pretopology
 

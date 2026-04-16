@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Defs.Sequences
 import Mathlib.Topology.UniformSpace.Cauchy
 
+noncomputable section
+
 /-!
 # Sequences in topological spaces
 

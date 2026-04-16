@@ -7,6 +7,8 @@ import Mathlib.RingTheory.WittVector.FrobeniusFractionField
 import Mathlib.Algebra.Module.Rat
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
 
+noncomputable section
+
 /-!
 
 ## F-isocrystals over a perfect field

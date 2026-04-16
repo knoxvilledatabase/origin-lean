@@ -8,6 +8,8 @@ import Mathlib.AlgebraicTopology.SimplicialSet.Path
 import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 import Mathlib.CategoryTheory.Functor.KanExtension.Basic
 
+noncomputable section
+
 /-!
 # Strict Segal simplicial sets
 

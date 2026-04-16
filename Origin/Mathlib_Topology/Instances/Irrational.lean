@@ -7,6 +7,8 @@ import Mathlib.Data.Real.Irrational
 import Mathlib.Data.Rat.Encodable
 import Mathlib.Topology.Separation.GDelta
 
+noncomputable section
+
 /-!
 # Topology of irrational numbers
 

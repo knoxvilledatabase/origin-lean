@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.MFDeriv.Defs
 import Mathlib.Geometry.Manifold.ContMDiff.Defs
 
+noncomputable section
+
 /-!
 # Basic properties of the manifold Fréchet derivative
 
@@ -49,11 +51,6 @@ theorem uniqueMDiffWithinAt_univ : UniqueMDiffWithinAt I univ x := by
   exact I.uniqueDiffOn _ (mem_range_self _)
 
 variable {I}
-
-theorem uniqueMDiffWithinAt_iff_inter_range {s : Set M} {x : M} :
-    UniqueMDiffWithinAt I s x ↔
-      UniqueDiffWithinAt 𝕜 ((extChartAt I x).symm ⁻¹' s ∩ range I)
-        ((extChartAt I x) x) := Iff.rfl
 
 theorem uniqueMDiffWithinAt_iff {s : Set M} {x : M} :
     UniqueMDiffWithinAt I s x ↔
@@ -759,15 +756,6 @@ theorem tangentMapWithin_eq_tangentMap {p : TangentBundle I M} (hs : UniqueMDiff
   rw [← mdifferentiableWithinAt_univ] at h
   rw [← tangentMapWithin_univ]
   exact tangentMapWithin_subset (subset_univ _) hs h
-
-@[simp, mfld_simps]
-theorem tangentMapWithin_proj {p : TangentBundle I M} :
-    (tangentMapWithin I I' f s p).proj = f p.proj :=
-  rfl
-
-@[simp, mfld_simps]
-theorem tangentMap_proj {p : TangentBundle I M} : (tangentMap I I' f p).proj = f p.proj :=
-  rfl
 
 theorem preimage_extChartAt_eventuallyEq_compl_singleton (y : M) (h : s =ᶠ[𝓝[{y}ᶜ] x] t) :
     ((extChartAt I x).symm ⁻¹' s ∩ range I : Set E) =ᶠ[𝓝[{extChartAt I x x}ᶜ] (extChartAt I x x)]

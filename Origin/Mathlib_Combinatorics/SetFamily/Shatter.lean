@@ -1,12 +1,14 @@
 /-
 Extracted from Combinatorics/SetFamily/Shatter.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Combinatorics.SetFamily.Compression.Down
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Order.Interval.Finset.Nat
+
+noncomputable section
 
 /-!
 # Shattering families

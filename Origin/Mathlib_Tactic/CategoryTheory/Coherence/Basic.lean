@@ -7,6 +7,8 @@ import Mathlib.Tactic.CategoryTheory.Coherence.Normalize
 import Mathlib.Tactic.CategoryTheory.Coherence.PureCoherence
 import Mathlib.CategoryTheory.Category.Basic
 
+noncomputable section
+
 /-!
 # The Core function for `monoidal` and `bicategory` tactics
 

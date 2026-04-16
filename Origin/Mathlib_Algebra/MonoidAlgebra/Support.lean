@@ -7,6 +7,8 @@ import Mathlib.Algebra.MonoidAlgebra.Defs
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.LinearAlgebra.Finsupp.Supported
 
+noncomputable section
+
 /-!
 #  Lemmas about the support of a finitely supported function
 -/

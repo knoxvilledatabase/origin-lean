@@ -7,6 +7,8 @@ import Mathlib.Topology.ExtremallyDisconnected
 import Mathlib.Topology.Category.CompHaus.Projective
 import Mathlib.Topology.Category.Profinite.Basic
 
+noncomputable section
+
 /-!
 # Extremally disconnected sets
 
@@ -175,7 +177,6 @@ end Stonean
 namespace CompHaus
 
 noncomputable
-
 def presentation (X : CompHaus) : Stonean where
   toTop := (projectivePresentation X).p.1
   prop := by
@@ -190,19 +191,16 @@ def presentation (X : CompHaus) : Stonean where
     rfl
 
 noncomputable
-
 def presentation.π (X : CompHaus) : Stonean.toCompHaus.obj X.presentation ⟶ X :=
   (projectivePresentation X).f
 
 noncomputable
-
 instance presentation.epi_π (X : CompHaus) : Epi (π X) :=
   (projectivePresentation X).epi
 
 abbrev _root_.Stonean.compHaus (X : Stonean) := Stonean.toCompHaus.obj X
 
 noncomputable
-
 def lift {X Y : CompHaus} {Z : Stonean} (e : Z.compHaus ⟶ Y) (f : X ⟶ Y) [Epi f] :
     Z.compHaus ⟶ X :=
   Projective.factorThru e f
@@ -227,18 +225,15 @@ end CompHaus
 namespace Profinite
 
 noncomputable
-
 def presentation (X : Profinite) : Stonean where
   toTop := (profiniteToCompHaus.obj X).projectivePresentation.p.toTop
   prop := (profiniteToCompHaus.obj X).presentation.prop
 
 noncomputable
-
 def presentation.π (X : Profinite) : Stonean.toProfinite.obj X.presentation ⟶ X :=
   (profiniteToCompHaus.obj X).projectivePresentation.f
 
 noncomputable
-
 instance presentation.epi_π (X : Profinite) : Epi (π X) := by
   have := (profiniteToCompHaus.obj X).projectivePresentation.epi
   rw [CompHaus.epi_iff_surjective] at this
@@ -246,7 +241,6 @@ instance presentation.epi_π (X : Profinite) : Epi (π X) := by
   exact this
 
 noncomputable
-
 def lift {X Y : Profinite} {Z : Stonean} (e : Stonean.toProfinite.obj Z ⟶ Y) (f : X ⟶ Y) [Epi f] :
     Stonean.toProfinite.obj Z ⟶ X := Projective.factorThru e f
 

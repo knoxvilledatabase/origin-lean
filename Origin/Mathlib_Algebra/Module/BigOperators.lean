@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Data.Fintype.BigOperators
 
+noncomputable section
+
 /-!
 # Finite sums over modules over a ring
 -/

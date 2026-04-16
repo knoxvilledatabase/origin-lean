@@ -7,6 +7,8 @@ import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent
 import Mathlib.Analysis.Calculus.FDeriv.Linear
 import Mathlib.Analysis.Calculus.FDeriv.Comp
 
+noncomputable section
+
 /-!
 # The derivative of a linear equivalence
 

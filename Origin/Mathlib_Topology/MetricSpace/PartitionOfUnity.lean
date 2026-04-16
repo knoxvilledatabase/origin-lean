@@ -7,6 +7,8 @@ import Mathlib.Topology.EMetricSpace.Paracompact
 import Mathlib.Topology.Instances.ENNReal
 import Mathlib.Analysis.Convex.PartitionOfUnity
 
+noncomputable section
+
 /-!
 # Lemmas about (e)metric spaces that need partition of unity
 

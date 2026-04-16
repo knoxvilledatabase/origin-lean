@@ -11,6 +11,8 @@ import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 import Mathlib.RingTheory.Nakayama
 import Mathlib.RingTheory.TensorProduct.Free
 
+noncomputable section
+
 /-!
 # Finite modules over local rings
 

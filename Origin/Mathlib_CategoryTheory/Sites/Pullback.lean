@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Functor.Flat
 import Mathlib.CategoryTheory.Sites.Continuous
 import Mathlib.CategoryTheory.Sites.LeftExact
 
+noncomputable section
+
 /-!
 # Pullback of sheaves
 

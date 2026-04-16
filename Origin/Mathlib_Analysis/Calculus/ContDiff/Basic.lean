@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/ContDiff/Basic.lean
-Genuine: 237 | Conflates: 4 | Dissolved: 13 | Infrastructure: 5
+Genuine: 250 | Conflates: 4 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Defs
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.ContDiff.FaaDiBruno
 import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.Calculus.FDeriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Inverse
+
+noncomputable section
 
 /-!
 # Higher differentiability of usual operations
@@ -118,9 +120,17 @@ theorem iteratedFDeriv_succ_const (n : ℕ) (c : F) :
   funext fun x ↦ by simpa [← iteratedFDerivWithin_univ] using
     iteratedFDerivWithin_succ_const n c uniqueDiffOn_univ (mem_univ x)
 
--- DISSOLVED: iteratedFDerivWithin_const_of_ne
+theorem iteratedFDerivWithin_const_of_ne {n : ℕ} (hn : n ≠ 0) (c : F)
+    (hs : UniqueDiffOn 𝕜 s) (hx : x ∈ s) :
+    iteratedFDerivWithin 𝕜 n (fun _ : E ↦ c) s x = 0 := by
+  cases n with
+  | zero => contradiction
+  | succ n => exact iteratedFDerivWithin_succ_const n c hs hx
 
--- DISSOLVED: iteratedFDeriv_const_of_ne
+theorem iteratedFDeriv_const_of_ne {n : ℕ} (hn : n ≠ 0) (c : F) :
+    (iteratedFDeriv 𝕜 n fun _ : E ↦ c) = 0 :=
+  funext fun x ↦ by simpa [← iteratedFDerivWithin_univ] using
+    iteratedFDerivWithin_const_of_ne hn c uniqueDiffOn_univ (mem_univ x)
 
 theorem contDiffWithinAt_singleton : ContDiffWithinAt 𝕜 n f {x} x :=
   (contDiffWithinAt_const (c := f x)).congr (by simp) rfl
@@ -1105,11 +1115,6 @@ end Pi
 
 section Add
 
-theorem HasFTaylorSeriesUpToOn.add {n : WithTop ℕ∞} {q g} (hf : HasFTaylorSeriesUpToOn n f p s)
-    (hg : HasFTaylorSeriesUpToOn n g q s) : HasFTaylorSeriesUpToOn n (f + g) (p + q) s := by
-  exact HasFTaylorSeriesUpToOn.continuousLinearMap_comp
-    (ContinuousLinearMap.fst 𝕜 F F + .snd 𝕜 F F) (hf.prod hg)
-
 theorem contDiff_add : ContDiff 𝕜 n fun p : F × F => p.1 + p.2 :=
   (IsBoundedLinearMap.fst.add IsBoundedLinearMap.snd).contDiff
 
@@ -1492,28 +1497,46 @@ theorem contDiffAt_ring_inverse [HasSummableGeomSeries R] (x : Rˣ) :
 
 variable {𝕜' : Type*} [NormedField 𝕜'] [NormedAlgebra 𝕜 𝕜']
 
--- DISSOLVED: contDiffAt_inv
+theorem contDiffAt_inv {x : 𝕜'} (hx : x ≠ 0) {n} : ContDiffAt 𝕜 n Inv.inv x := by
+  simpa only [Ring.inverse_eq_inv'] using contDiffAt_ring_inverse 𝕜 (Units.mk0 x hx)
 
 theorem contDiffOn_inv {n} : ContDiffOn 𝕜 n (Inv.inv : 𝕜' → 𝕜') {0}ᶜ := fun _ hx =>
   (contDiffAt_inv 𝕜 hx).contDiffWithinAt
 
 variable {𝕜}
 
--- DISSOLVED: ContDiffWithinAt.inv
+theorem ContDiffWithinAt.inv {f : E → 𝕜'} {n} (hf : ContDiffWithinAt 𝕜 n f s x) (hx : f x ≠ 0) :
+    ContDiffWithinAt 𝕜 n (fun x => (f x)⁻¹) s x :=
+  (contDiffAt_inv 𝕜 hx).comp_contDiffWithinAt x hf
 
--- DISSOLVED: ContDiffOn.inv
+theorem ContDiffOn.inv {f : E → 𝕜'} (hf : ContDiffOn 𝕜 n f s) (h : ∀ x ∈ s, f x ≠ 0) :
+    ContDiffOn 𝕜 n (fun x => (f x)⁻¹) s := fun x hx => (hf.contDiffWithinAt hx).inv (h x hx)
 
--- DISSOLVED: ContDiffAt.inv
+nonrec theorem ContDiffAt.inv {f : E → 𝕜'} (hf : ContDiffAt 𝕜 n f x) (hx : f x ≠ 0) :
+    ContDiffAt 𝕜 n (fun x => (f x)⁻¹) x :=
+  hf.inv hx
 
--- DISSOLVED: ContDiff.inv
+theorem ContDiff.inv {f : E → 𝕜'} (hf : ContDiff 𝕜 n f) (h : ∀ x, f x ≠ 0) :
+    ContDiff 𝕜 n fun x => (f x)⁻¹ := by
+  rw [contDiff_iff_contDiffAt]; exact fun x => hf.contDiffAt.inv (h x)
 
--- DISSOLVED: ContDiffWithinAt.div
+theorem ContDiffWithinAt.div {f g : E → 𝕜} {n} (hf : ContDiffWithinAt 𝕜 n f s x)
+    (hg : ContDiffWithinAt 𝕜 n g s x) (hx : g x ≠ 0) :
+    ContDiffWithinAt 𝕜 n (fun x => f x / g x) s x := by
+  simpa only [div_eq_mul_inv] using hf.mul (hg.inv hx)
 
--- DISSOLVED: ContDiffOn.div
+theorem ContDiffOn.div {f g : E → 𝕜} {n} (hf : ContDiffOn 𝕜 n f s)
+    (hg : ContDiffOn 𝕜 n g s) (h₀ : ∀ x ∈ s, g x ≠ 0) : ContDiffOn 𝕜 n (f / g) s := fun x hx =>
+  (hf x hx).div (hg x hx) (h₀ x hx)
 
--- DISSOLVED: ContDiffAt.div
+nonrec theorem ContDiffAt.div {f g : E → 𝕜} {n} (hf : ContDiffAt 𝕜 n f x)
+    (hg : ContDiffAt 𝕜 n g x) (hx : g x ≠ 0) : ContDiffAt 𝕜 n (fun x => f x / g x) x :=
+  hf.div hg hx
 
--- DISSOLVED: ContDiff.div
+theorem ContDiff.div {f g : E → 𝕜} {n} (hf : ContDiff 𝕜 n f) (hg : ContDiff 𝕜 n g)
+    (h0 : ∀ x, g x ≠ 0) : ContDiff 𝕜 n fun x => f x / g x := by
+  simp only [contDiff_iff_contDiffAt] at *
+  exact fun x => (hf x).div (hg x) (h0 x)
 
 end AlgebraInverse
 
@@ -1605,9 +1628,16 @@ theorem Homeomorph.contDiff_symm [CompleteSpace E] (f : E ≃ₜ F) {f₀' : E �
   contDiff_iff_contDiffAt.2 fun x =>
     f.toPartialHomeomorph.contDiffAt_symm (mem_univ x) (hf₀' _) hf.contDiffAt
 
--- DISSOLVED: PartialHomeomorph.contDiffAt_symm_deriv
+theorem PartialHomeomorph.contDiffAt_symm_deriv [CompleteSpace 𝕜] (f : PartialHomeomorph 𝕜 𝕜)
+    {f₀' a : 𝕜} (h₀ : f₀' ≠ 0) (ha : a ∈ f.target) (hf₀' : HasDerivAt f f₀' (f.symm a))
+    (hf : ContDiffAt 𝕜 n f (f.symm a)) : ContDiffAt 𝕜 n f.symm a :=
+  f.contDiffAt_symm ha (hf₀'.hasFDerivAt_equiv h₀) hf
 
--- DISSOLVED: Homeomorph.contDiff_symm_deriv
+theorem Homeomorph.contDiff_symm_deriv [CompleteSpace 𝕜] (f : 𝕜 ≃ₜ 𝕜) {f' : 𝕜 → 𝕜}
+    (h₀ : ∀ x, f' x ≠ 0) (hf' : ∀ x, HasDerivAt f (f' x) x) (hf : ContDiff 𝕜 n (f : 𝕜 → 𝕜)) :
+    ContDiff 𝕜 n (f.symm : 𝕜 → 𝕜) :=
+  contDiff_iff_contDiffAt.2 fun x =>
+    f.toPartialHomeomorph.contDiffAt_symm_deriv (h₀ _) (mem_univ x) (hf' _) hf.contDiffAt
 
 namespace PartialHomeomorph
 

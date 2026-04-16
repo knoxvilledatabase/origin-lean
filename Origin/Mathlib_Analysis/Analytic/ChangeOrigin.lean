@@ -5,6 +5,8 @@ Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Analysis.Analytic.Basic
 
+noncomputable section
+
 /-!
 # Changing origin in a power series
 

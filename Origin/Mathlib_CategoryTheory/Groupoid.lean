@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Pi.Basic
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.Combinatorics.Quiver.Symmetric
 
+noncomputable section
+
 /-!
 # Groupoids
 
@@ -70,22 +72,12 @@ instance (priority := 100) groupoidHasInvolutiveReverse : Quiver.HasInvolutiveRe
     dsimp [Quiver.reverse]
     simp
 
-@[simp]
-theorem Groupoid.reverse_eq_inv (f : X ⟶ Y) : Quiver.reverse f = Groupoid.inv f :=
-  rfl
-
 instance functorMapReverse {D : Type*} [Groupoid D] (F : C ⥤ D) : F.toPrefunctor.MapReverse where
   map_reverse' f := by
     simp only [Quiver.reverse, Quiver.HasReverse.reverse', Groupoid.inv_eq_inv,
       Functor.map_inv]
 
 variable (X Y)
-
-def Groupoid.isoEquivHom : (X ≅ Y) ≃ (X ⟶ Y) where
-  toFun := Iso.hom
-  invFun f := ⟨f, Groupoid.inv f, (by aesop_cat), (by aesop_cat)⟩
-  left_inv _ := Iso.ext rfl
-  right_inv _ := rfl
 
 variable (C)
 

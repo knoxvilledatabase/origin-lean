@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Equiv
 
+noncomputable section
+
 /-!
 # Some lemmas relating polynomials and multivariable polynomials.
 -/

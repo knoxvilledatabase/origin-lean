@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/BoxIntegral/UnitPartition.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 5 | Infrastructure: 2
+Genuine: 31 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Measure
 import Mathlib.Analysis.BoxIntegral.Partition.Tagged
+
+noncomputable section
 
 /-!
 # Unit Partition
@@ -73,15 +75,25 @@ open Bornology MeasureTheory Fintype BoxIntegral
 
 variable (n : ℕ)
 
--- DISSOLVED: box
+def box [NeZero n] (ν : ι → ℤ) : Box ι where
+  lower := fun i ↦ ν i / n
+  upper := fun i ↦ (ν i + 1) / n
+  lower_lt_upper := fun _ ↦ by norm_num [add_div, n.pos_of_neZero]
 
--- DISSOLVED: box_lower
+@[simp]
+theorem box_lower [NeZero n] (ν : ι → ℤ) :
+    (box n ν).lower = fun i ↦ (ν i / n : ℝ) := rfl
 
--- DISSOLVED: box_upper
+@[simp]
+theorem box_upper [NeZero n] (ν : ι → ℤ) :
+    (box n ν).upper = fun i ↦ ((ν i + 1)/ n : ℝ) := rfl
 
 variable {n} in
 
--- DISSOLVED: mem_box_iff
+@[simp]
+theorem mem_box_iff [NeZero n] {ν : ι → ℤ} {x : ι → ℝ} :
+    x ∈ box n ν ↔ ∀ i, ν i / n < x i ∧ x i ≤ (ν i + 1) / n := by
+  simp_rw [Box.mem_def, box, Set.mem_Ioc]
 
 variable {n} in
 

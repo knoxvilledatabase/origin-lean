@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Topology.Instances.NNReal
 
+noncomputable section
+
 /-!
 # Infinite sums in (semi)normed groups
 

@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Groupoid
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # Subgroupoid
 
@@ -158,9 +160,6 @@ instance : SetLike (Subgroupoid C) (Σ c d : C, c ⟶ d) where
   coe := toSet
   coe_injective' := fun ⟨S, _, _⟩ ⟨T, _, _⟩ h => by ext c d f; apply Set.ext_iff.1 h ⟨c, d, f⟩
 
-theorem mem_iff (S : Subgroupoid C) (F : Σ c d, c ⟶ d) : F ∈ S ↔ F.2.2 ∈ S.arrows F.1 F.2.1 :=
-  Iff.rfl
-
 theorem le_iff (S T : Subgroupoid C) : S ≤ T ↔ ∀ {c d}, S.arrows c d ⊆ T.arrows c d := by
   rw [SetLike.le_def, Sigma.forall]; exact forall_congr' fun c => Sigma.forall
 
@@ -239,13 +238,6 @@ theorem inclusion_faithful {S T : Subgroupoid C} (h : S ≤ T) (s t : S.objs) :
 
 theorem inclusion_refl {S : Subgroupoid C} : inclusion (le_refl S) = 𝟭 S.objs :=
   Functor.hext (fun _ => rfl) fun _ _ _ => HEq.refl _
-
-theorem inclusion_trans {R S T : Subgroupoid C} (k : R ≤ S) (h : S ≤ T) :
-    inclusion (k.trans h) = inclusion k ⋙ inclusion h :=
-  rfl
-
-theorem inclusion_comp_embedding {S T : Subgroupoid C} (h : S ≤ T) : inclusion h ⋙ T.hom = S.hom :=
-  rfl
 
 inductive Discrete.Arrows : ∀ c d : C, (c ⟶ d) → Prop
   | id (c : C) : Discrete.Arrows c c (𝟙 c)
@@ -368,10 +360,6 @@ theorem isNormal_comap {S : Subgroupoid D} (Sn : IsNormal S) : IsNormal (comap �
     simp_rw [inv_eq_inv f, comap, mem_setOf, Functor.map_comp, Functor.map_inv, ← inv_eq_inv]
     exact Sn.conj _ hγ
 
-@[simp]
-theorem comap_comp {E : Type*} [Groupoid E] (ψ : D ⥤ E) : comap (φ ⋙ ψ) = comap φ ∘ comap ψ :=
-  rfl
-
 def ker : Subgroupoid C :=
   comap φ discrete
 
@@ -381,10 +369,6 @@ theorem mem_ker_iff {c d : C} (f : c ⟶ d) :
 
 theorem ker_isNormal : (ker φ).IsNormal :=
   isNormal_comap φ discrete_isNormal
-
-@[simp]
-theorem ker_comp {E : Type*} [Groupoid E] (ψ : D ⥤ E) : ker (φ ⋙ ψ) = comap φ (ker ψ) :=
-  rfl
 
 inductive Map.Arrows (hφ : Function.Injective φ.obj) (S : Subgroupoid C) : ∀ c d : D, (c ⟶ d) → Prop
   | im {c d : C} (f : c ⟶ d) (hf : f ∈ S.arrows c d) : Map.Arrows hφ S (φ.obj c) (φ.obj d) (φ.map f)

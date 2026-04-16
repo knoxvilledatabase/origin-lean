@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Nilpotent/Basic.lean
-Genuine: 20 | Conflates: 2 | Dissolved: 2 | Infrastructure: 2
+Genuine: 21 | Conflates: 2 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
@@ -12,6 +12,8 @@ import Mathlib.Algebra.SMulWithZero
 import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Data.Nat.Lattice
 import Mathlib.RingTheory.Nilpotent.Defs
+
+noncomputable section
 
 /-!
 # Nilpotent elements
@@ -116,7 +118,11 @@ theorem isReduced_iff_pow_one_lt [MonoidWithZero R] (k : ℕ) (hk : 1 < k) :
     IsReduced R ↔ ∀ x : R, x ^ k = 0 → x = 0 := by
   simp_rw [← zero_isRadical_iff, isRadical_iff_pow_one_lt k hk, zero_dvd_iff]
 
--- DISSOLVED: IsRadical.of_dvd
+theorem IsRadical.of_dvd [CancelCommMonoidWithZero R] {x y : R} (hy : IsRadical y) (h0 : y ≠ 0)
+    (hxy : x ∣ y) : IsRadical x := (isRadical_iff_pow_one_lt 2 one_lt_two).2 <| by
+  obtain ⟨z, rfl⟩ := hxy
+  refine fun w dvd ↦ ((mul_dvd_mul_iff_right <| right_ne_zero_of_mul h0).mp <| hy 2 _ ?_)
+  rw [mul_pow, sq z]; exact mul_dvd_mul dvd (dvd_mul_left z z)
 
 namespace Commute
 

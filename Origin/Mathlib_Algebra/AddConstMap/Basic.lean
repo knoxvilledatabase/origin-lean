@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Archimedean.Basic
 import Mathlib.Algebra.Order.Group.Instances
 import Mathlib.Logic.Function.Iterate
 
+noncomputable section
+
 /-!
 # Maps (semi)conjugating a shift to a shift
 
@@ -303,12 +305,6 @@ instance : FunLike (G →+c[a, b] H) G H where
   coe := AddConstMap.toFun
   coe_injective' | ⟨_, _⟩, ⟨_, _⟩, rfl => rfl
 
-@[simp, push_cast] theorem coe_mk (f : G → H) (hf) : ⇑(mk f hf : G →+c[a, b] H) = f := rfl
-
-@[simp] theorem mk_coe (f : G →+c[a, b] H) : mk f f.2 = f := rfl
-
-@[simp] theorem toFun_eq_coe (f : G →+c[a, b] H) : f.toFun = f := rfl
-
 instance : AddConstMapClass (G →+c[a, b] H) G H a b where
   map_add_const f := f.map_add_const'
 
@@ -330,10 +326,6 @@ instance : Inhabited (G →+c[a, a] G) := ⟨.id⟩
 def comp {K : Type*} [Add K] {c : K} (g : H →+c[b, c] K) (f : G →+c[a, b] H) :
     G →+c[a, c] K :=
   ⟨g ∘ f, by simp⟩
-
-@[simp] theorem comp_id (f : G →+c[a, b] H) : f.comp .id = f := rfl
-
-@[simp] theorem id_comp (f : G →+c[a, b] H) : .comp .id f = f := rfl
 
 @[simps (config := .asFn)]
 def replaceConsts (f : G →+c[a, b] H) (a' b') (ha : a = a') (hb : b = b') :
@@ -370,24 +362,6 @@ instance : Pow (G →+c[a, a] G) ℕ where
 
 instance : Monoid (G →+c[a, a] G) :=
   DFunLike.coe_injective.monoid (M₂ := Function.End G) _ rfl (fun _ _ ↦ rfl) fun _ _ ↦ rfl
-
-theorem mul_def (f g : G →+c[a, a] G) : f * g = f.comp g := rfl
-
-@[simp, push_cast] theorem coe_mul (f g : G →+c[a, a] G) : ⇑(f * g) = f ∘ g := rfl
-
-theorem one_def : (1 : G →+c[a, a] G) = .id := rfl
-
-@[simp, push_cast] theorem coe_one : ⇑(1 : G →+c[a, a] G) = id := rfl
-
-@[simp, push_cast] theorem coe_pow (f : G →+c[a, a] G) (n : ℕ) : ⇑(f ^ n) = f^[n] := rfl
-
-theorem pow_apply (f : G →+c[a, a] G) (n : ℕ) (x : G) : (f ^ n) x = f^[n] x := rfl
-
-@[simps (config := .asFn)]
-def toEnd : (G →+c[a, a] G) →* Function.End G where
-  toFun := DFunLike.coe
-  map_mul' _ _ := rfl
-  map_one' := rfl
 
 end Add
 
@@ -432,8 +406,6 @@ variable {G H : Type*} [AddCommGroup G] [AddCommGroup H] {a : G} {b : H}
 def conjNeg : (G →+c[a, b] H) ≃ (G →+c[a, b] H) :=
   Involutive.toPerm (fun f ↦ ⟨fun x ↦ - f (-x), fun _ ↦ by simp [neg_add_eq_sub]⟩) fun _ ↦
     AddConstMap.ext fun _ ↦ by simp
-
-@[simp] theorem conjNeg_symm : (conjNeg (a := a) (b := b)).symm = conjNeg := rfl
 
 end AddCommGroup
 

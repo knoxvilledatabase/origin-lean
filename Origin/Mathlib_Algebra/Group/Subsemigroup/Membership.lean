@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Group.Subsemigroup.Basic
 
+noncomputable section
+
 /-!
 # Subsemigroups: membership criteria
 

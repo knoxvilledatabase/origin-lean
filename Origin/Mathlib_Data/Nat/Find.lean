@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Nat/Find.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Defs
 import Batteries.WF
+
+noncomputable section
 
 /-!
 # `Nat.find` and `Nat.findGreatest`
@@ -134,7 +136,34 @@ lemma findGreatest_succ (n : ℕ) :
 lemma findGreatest_of_not (h : ¬ P (n + 1)) : findGreatest P (n + 1) = findGreatest P n := by
   simp [Nat.findGreatest, h]
 
--- DISSOLVED: findGreatest_eq_iff
+lemma findGreatest_eq_iff :
+    Nat.findGreatest P k = m ↔ m ≤ k ∧ (m ≠ 0 → P m) ∧ ∀ ⦃n⦄, m < n → n ≤ k → ¬P n := by
+  induction k generalizing m with
+  | zero =>
+    rw [eq_comm, Iff.comm]
+    simp only [zero_eq, Nat.le_zero, ne_eq, findGreatest_zero, and_iff_left_iff_imp]
+    rintro rfl
+    exact ⟨fun h ↦ (h rfl).elim, fun n hlt heq ↦ by omega⟩
+  | succ k ihk =>
+    by_cases hk : P (k + 1)
+    · rw [findGreatest_eq hk]
+      constructor
+      · rintro rfl
+        exact ⟨le_refl _, fun _ ↦ hk, fun n hlt hle ↦ by omega⟩
+      · rintro ⟨hle, h0, hm⟩
+        rcases Decidable.eq_or_lt_of_le hle with (rfl | hlt)
+        exacts [rfl, (hm hlt (le_refl _) hk).elim]
+    · rw [findGreatest_of_not hk, ihk]
+      constructor
+      · rintro ⟨hle, hP, hm⟩
+        refine ⟨le_trans hle k.le_succ, hP, fun n hlt hle ↦ ?_⟩
+        rcases Decidable.eq_or_lt_of_le hle with (rfl | hlt')
+        exacts [hk, hm hlt <| Nat.lt_succ_iff.1 hlt']
+      · rintro ⟨hle, hP, hm⟩
+        refine ⟨Nat.lt_succ_iff.1 (lt_of_le_of_ne hle ?_), hP,
+          fun n hlt hle ↦ hm hlt (le_trans hle k.le_succ)⟩
+        rintro rfl
+        exact hk (hP k.succ_ne_zero)
 
 lemma findGreatest_eq_zero_iff : Nat.findGreatest P k = 0 ↔ ∀ ⦃n⦄, 0 < n → n ≤ k → ¬P n := by
   simp [findGreatest_eq_iff]
@@ -182,7 +211,8 @@ lemma findGreatest_mono [DecidablePred Q] (hPQ : ∀ n, P n → Q n) (hmn : m �
 theorem findGreatest_is_greatest (hk : Nat.findGreatest P n < k) (hkb : k ≤ n) : ¬P k :=
   (findGreatest_eq_iff.1 rfl).2.2 hk hkb
 
--- DISSOLVED: findGreatest_of_ne_zero
+theorem findGreatest_of_ne_zero (h : Nat.findGreatest P n = m) (h0 : m ≠ 0) : P m :=
+  (findGreatest_eq_iff.1 h).2.1 h0
 
 end FindGreatest
 

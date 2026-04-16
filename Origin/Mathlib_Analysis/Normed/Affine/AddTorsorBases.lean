@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 
+noncomputable section
+
 /-!
 # Bases in normed affine spaces.
 

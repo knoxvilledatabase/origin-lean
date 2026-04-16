@@ -7,6 +7,8 @@ import Mathlib.RingTheory.WittVector.Truncated
 import Mathlib.RingTheory.WittVector.Identities
 import Mathlib.NumberTheory.Padics.RingHoms
 
+noncomputable section
+
 /-!
 
 # Comparison isomorphism between `WittVector p (ZMod p)` and `ℤ_[p]`
@@ -63,11 +65,6 @@ attribute [local instance] charP_zmod
 
 def zmodEquivTrunc : ZMod (p ^ n) ≃+* TruncatedWittVector p n (ZMod p) :=
   ZMod.ringEquiv (TruncatedWittVector p n (ZMod p)) (card_zmod _ _)
-
-theorem zmodEquivTrunc_apply {x : ZMod (p ^ n)} :
-    zmodEquivTrunc p n x =
-      ZMod.castHom (m := p ^ n) (by rfl) (TruncatedWittVector p n (ZMod p)) x :=
-  rfl
 
 theorem commutes {m : ℕ} (hm : n ≤ m) :
     (truncate hm).comp (zmodEquivTrunc p m).toRingHom =

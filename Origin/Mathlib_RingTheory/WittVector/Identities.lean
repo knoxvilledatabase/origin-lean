@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/WittVector/Identities.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 17 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Frobenius
 import Mathlib.RingTheory.WittVector.Verschiebung
 import Mathlib.RingTheory.WittVector.MulP
+
+noncomputable section
 
 /-!
 ## Identities between operations on the ring of Witt vectors
@@ -73,9 +75,14 @@ theorem coeff_p_zero [CharP R p] : (p : 𝕎 R).coeff 0 = 0 := by
 @[simp]
 theorem coeff_p_one [CharP R p] : (p : 𝕎 R).coeff 1 = 1 := by rw [coeff_p, if_pos rfl]
 
--- DISSOLVED: p_nonzero
+-- CONFLATES (assumes ground = zero): p_nonzero
+theorem p_nonzero [Nontrivial R] [CharP R p] : (p : 𝕎 R) ≠ 0 := by
+  intro h
+  simpa only [h, zero_coeff, zero_ne_one] using coeff_p_one p R
 
--- DISSOLVED: FractionRing.p_nonzero
+-- CONFLATES (assumes ground = zero): FractionRing.p_nonzero
+theorem FractionRing.p_nonzero [Nontrivial R] [CharP R p] : (p : FractionRing (𝕎 R)) ≠ 0 := by
+  simpa using (IsFractionRing.injective (𝕎 R) (FractionRing (𝕎 R))).ne (WittVector.p_nonzero _ _)
 
 variable {p R}
 

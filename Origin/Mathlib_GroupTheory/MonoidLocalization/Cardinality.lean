@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.MonoidLocalization.Basic
 import Mathlib.GroupTheory.OreLocalization.Cardinality
 
+noncomputable section
+
 /-!
 
 # Cardinality of localizations of commutative monoids

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.EisensteinCriterion
 import Mathlib.RingTheory.Polynomial.ScaleRoots
 
+noncomputable section
+
 /-!
 # Eisenstein polynomials
 Given an ideal `𝓟` of a commutative semiring `R`, we say that a polynomial `f : R[X]` is

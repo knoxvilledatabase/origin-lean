@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.ModEq
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Zify
 
+noncomputable section
+
 /-!
 # Frobenius Number in Two Variables
 

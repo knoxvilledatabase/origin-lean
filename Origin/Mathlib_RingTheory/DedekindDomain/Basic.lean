@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Ideal.Over
 import Mathlib.RingTheory.Polynomial.RationalRoot
 
+noncomputable section
+
 /-!
 # Dedekind rings and domains
 

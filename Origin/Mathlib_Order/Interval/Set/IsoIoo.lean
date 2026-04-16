@@ -7,6 +7,8 @@ import Mathlib.Order.Monotone.Odd
 import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.Tactic.FieldSimp
 
+noncomputable section
+
 /-!
 # Order isomorphism between a linear ordered field and `(-1, 1)`
 

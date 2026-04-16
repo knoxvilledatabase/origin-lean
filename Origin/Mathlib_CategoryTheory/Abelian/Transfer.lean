@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Abelian.Basic
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 import Mathlib.CategoryTheory.Adjunction.Limits
 
+noncomputable section
+
 /-!
 # Transferring "abelian-ness" across a functor
 

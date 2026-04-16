@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Algebra.Lie.Abelian
 
+noncomputable section
+
 /-!
 # Tensor products of Lie modules
 

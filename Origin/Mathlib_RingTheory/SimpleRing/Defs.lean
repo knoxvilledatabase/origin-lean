@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.TwoSidedIdeal.Lattice
 import Mathlib.Order.Atoms
 
+noncomputable section
+
 /-! # Simple rings
 
 A ring `R` is **simple** if it has only two two-sided ideals, namely `⊥` and `⊤`.

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Ring.Subsemiring.Basic
 import Mathlib.RingTheory.Localization.Defs
 
+noncomputable section
+
 /-!
 # Integer elements of a localization
 

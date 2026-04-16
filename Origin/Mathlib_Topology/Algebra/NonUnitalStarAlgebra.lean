@@ -7,6 +7,8 @@ import Mathlib.Algebra.Star.NonUnitalSubalgebra
 import Mathlib.Topology.Algebra.NonUnitalAlgebra
 import Mathlib.Topology.Algebra.Star
 
+noncomputable section
+
 /-!
 # Non-unital topological star (sub)algebras
 
@@ -136,11 +138,6 @@ instance {A : Type*} [UniformSpace A] [CompleteSpace A] [NonUnitalSemiring A] [S
     [SMulCommClass R A A] [StarModule R A] [ContinuousConstSMul R A] (x : A) :
     CompleteSpace (elemental R x) :=
   isClosed_closure.completeSpace_coe
-
-theorem isClosedEmbedding_coe (x : A) : Topology.IsClosedEmbedding ((↑) : elemental R x → A) where
-  eq_induced := rfl
-  injective := Subtype.coe_injective
-  isClosed_range := by simpa using isClosed R x
 
 end elemental
 

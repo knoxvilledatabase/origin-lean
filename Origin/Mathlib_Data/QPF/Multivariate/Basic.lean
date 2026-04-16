@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Data.PFunctor.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # Multivariate quotients of polynomial functors.
 
@@ -70,11 +72,12 @@ each proves that some operations on functors preserves the QPF structure
 -/
 
 set_option linter.style.longLine false in
-
 /-!
+
 ## Reference
 
 [Jeremy Avigad, Mario M. Carneiro and Simon Hudon, *Data Types as Quotients of Polynomial Functors*][avigad-carneiro-hudon2019]
+
 -/
 
 universe u

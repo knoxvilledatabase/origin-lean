@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Sets.Closeds
 import Mathlib.Topology.QuasiSeparated
 
+noncomputable section
+
 /-!
 # Compact sets
 
@@ -55,10 +57,6 @@ instance : CanLift (Set α) (Compacts α) (↑) IsCompact where prf K hK := ⟨�
 @[ext]
 protected theorem ext {s t : Compacts α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
-
-@[simp]
-theorem coe_mk (s : Set α) (h) : (mk s h : Set α) = s :=
-  rfl
 
 @[simp]
 theorem carrier_eq_coe (s : Compacts α) : s.carrier = s :=
@@ -149,10 +147,6 @@ theorem equiv_trans (f : α ≃ₜ β) (g : β ≃ₜ γ) :
   -- Porting note: can no longer write `map_comp _ _ _ _` and unify
   Equiv.ext <| map_comp g f g.continuous f.continuous
 
-@[simp]
-theorem equiv_symm (f : α ≃ₜ β) : Compacts.equiv f.symm = (Compacts.equiv f).symm :=
-  rfl
-
 theorem coe_equiv_apply_eq_preimage (f : α ≃ₜ β) (K : Compacts α) :
     (Compacts.equiv f K : Set β) = f.symm ⁻¹' (K : Set α) :=
   f.toEquiv.image_eq_preimage K
@@ -199,15 +193,8 @@ def toCloseds [T2Space α] (s : NonemptyCompacts α) : Closeds α :=
 protected theorem ext {s t : NonemptyCompacts α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
 
-@[simp]
-theorem coe_mk (s : Compacts α) (h) : (mk s h : Set α) = s :=
-  rfl
-
 theorem carrier_eq_coe (s : NonemptyCompacts α) : s.carrier = s :=
   rfl
-
-@[simp]
-theorem coe_toCompacts (s : NonemptyCompacts α) : (s.toCompacts : Set α) = s := rfl
 
 instance : Max (NonemptyCompacts α) :=
   ⟨fun s t => ⟨s.toCompacts ⊔ t.toCompacts, s.nonempty.mono subset_union_left⟩⟩
@@ -284,15 +271,7 @@ def toNonemptyCompacts (s : PositiveCompacts α) : NonemptyCompacts α :=
 protected theorem ext {s t : PositiveCompacts α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
 
-@[simp]
-theorem coe_mk (s : Compacts α) (h) : (mk s h : Set α) = s :=
-  rfl
-
 theorem carrier_eq_coe (s : PositiveCompacts α) : s.carrier = s :=
-  rfl
-
-@[simp]
-theorem coe_toCompacts (s : PositiveCompacts α) : (s.toCompacts : Set α) = s :=
   rfl
 
 instance : Max (PositiveCompacts α) :=
@@ -404,10 +383,6 @@ def toClopens [T2Space α] (s : CompactOpens α) : Clopens α :=
 @[ext]
 protected theorem ext {s t : CompactOpens α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
-
-@[simp]
-theorem coe_mk (s : Compacts α) (h) : (mk s h : Set α) = s :=
-  rfl
 
 instance : Max (CompactOpens α) :=
   ⟨fun s t => ⟨s.toCompacts ⊔ t.toCompacts, s.isOpen.union t.isOpen⟩⟩

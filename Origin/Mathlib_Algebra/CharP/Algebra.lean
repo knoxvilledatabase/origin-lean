@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/CharP/Algebra.lean
-Genuine: 12 | Conflates: 1 | Dissolved: 4 | Infrastructure: 4
+Genuine: 16 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Basic
 import Mathlib.Algebra.FreeAlgebra
 import Mathlib.RingTheory.Localization.FractionRing
+
+noncomputable section
 
 /-!
 # Characteristics of algebras
@@ -41,9 +43,13 @@ theorem charP_of_injective_algebraMap' (R A : Type*) [Field R] [Semiring A] [Alg
     [Nontrivial A] (p : ℕ) [CharP R p] : CharP A p :=
   charP_of_injective_algebraMap (algebraMap R A).injective p
 
--- DISSOLVED: charZero_of_injective_ringHom
+theorem charZero_of_injective_ringHom {R A : Type*} [NonAssocSemiring R] [NonAssocSemiring A]
+    {f : R →+* A} (h : Function.Injective f) [CharZero R] : CharZero A where
+  cast_injective _ _ _ := CharZero.cast_injective <| h <| by simpa only [map_natCast f]
 
--- DISSOLVED: charZero_of_injective_algebraMap
+theorem charZero_of_injective_algebraMap {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A]
+    (h : Function.Injective (algebraMap R A)) [CharZero R] : CharZero A :=
+  charZero_of_injective_ringHom h
 
 theorem RingHom.charP {R A : Type*} [NonAssocSemiring R] [NonAssocSemiring A] (f : R →+* A)
     (H : Function.Injective f) (p : ℕ) [CharP A p] : CharP R p := by
@@ -86,7 +92,8 @@ variable (R : Type*) [Nontrivial R]
 theorem algebraRat.charP_zero [Semiring R] [Algebra ℚ R] : CharP R 0 :=
   charP_of_injective_algebraMap (algebraMap ℚ R).injective 0
 
--- DISSOLVED: algebraRat.charZero
+theorem algebraRat.charZero [Ring R] [Algebra ℚ R] : CharZero R :=
+  @CharP.charP_to_charZero R _ (algebraRat.charP_zero R)
 
 end QAlgebra
 
@@ -128,7 +135,8 @@ variable (p : ℕ)
 theorem charP_of_isFractionRing [CharP R p] : CharP K p :=
   charP_of_injective_algebraMap (IsFractionRing.injective R K) p
 
--- DISSOLVED: charZero_of_isFractionRing
+theorem charZero_of_isFractionRing [CharZero R] : CharZero K :=
+  @CharP.charP_to_charZero K _ (charP_of_isFractionRing R 0)
 
 variable [IsDomain R]
 

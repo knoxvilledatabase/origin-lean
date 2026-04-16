@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Ideal.Colon
 import Mathlib.RingTheory.Localization.AsSubring
 import Mathlib.RingTheory.PrimeSpectrum
 
+noncomputable section
+
 /-!
 # Maximal spectrum of a commutative ring
 

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Basic
 import Mathlib.CategoryTheory.Limits.TypesFiltered
 import Mathlib.CategoryTheory.Limits.Yoneda
 
+noncomputable section
+
 /-!
 # Facts about (co)limits of functors into concrete categories
 -/

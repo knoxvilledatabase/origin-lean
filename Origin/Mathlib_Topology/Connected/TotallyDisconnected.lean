@@ -5,6 +5,8 @@ Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Topology.Connected.Clopen
 
+noncomputable section
+
 /-!
 # Totally disconnected and totally separated topological spaces
 
@@ -232,16 +234,6 @@ def Continuous.connectedComponentsLift (h : Continuous f) : ConnectedComponents 
 theorem Continuous.connectedComponentsLift_continuous (h : Continuous f) :
     Continuous h.connectedComponentsLift :=
   h.quotient_liftOn' <| by convert h.image_eq_of_connectedComponent_eq
-
-@[simp]
-theorem Continuous.connectedComponentsLift_apply_coe (h : Continuous f) (x : α) :
-    h.connectedComponentsLift x = f x :=
-  rfl
-
-@[simp]
-theorem Continuous.connectedComponentsLift_comp_coe (h : Continuous f) :
-    h.connectedComponentsLift ∘ (↑) = f :=
-  rfl
 
 theorem connectedComponents_lift_unique' {β : Sort*} {g₁ g₂ : ConnectedComponents α → β}
     (hg : g₁ ∘ ((↑) : α → ConnectedComponents α) = g₂ ∘ (↑)) : g₁ = g₂ :=

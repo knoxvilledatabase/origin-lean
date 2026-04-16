@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Integral.Layercake
 
+noncomputable section
+
 /-!
 # Japanese Bracket
 

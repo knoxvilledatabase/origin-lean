@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Coherent.SheafComparison
 import Mathlib.Condensed.Light.Module
 
+noncomputable section
+
 /-!
 
 # The explicit sheaf condition for light condensed sets

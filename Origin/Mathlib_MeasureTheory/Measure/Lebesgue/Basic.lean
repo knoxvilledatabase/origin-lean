@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Lebesgue/Basic.lean
-Genuine: 47 | Conflates: 0 | Dissolved: 9 | Infrastructure: 6
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
@@ -11,6 +11,8 @@ import Mathlib.MeasureTheory.Group.LIntegral
 import Mathlib.MeasureTheory.Integral.Marginal
 import Mathlib.MeasureTheory.Measure.Stieltjes
 import Mathlib.MeasureTheory.Measure.Haar.OfBasis
+
+noncomputable section
 
 /-!
 # Lebesgue measure on the real line and on `ℝⁿ`
@@ -117,23 +119,7 @@ theorem volume_interval {a b : ℝ} : volume (uIcc a b) = ofReal |b - a| := by
   rw [← Icc_min_max, volume_Icc, max_sub_min_eq_abs]
 
 @[simp]
-theorem volume_Ioi {a : ℝ} : volume (Ioi a) = ∞ :=
-  top_unique <|
-    le_of_tendsto' ENNReal.tendsto_nat_nhds_top fun n =>
-      calc
-        (n : ℝ≥0∞) = volume (Ioo a (a + n)) := by simp
-        _ ≤ volume (Ioi a) := measure_mono Ioo_subset_Ioi_self
-
-@[simp]
 theorem volume_Ici {a : ℝ} : volume (Ici a) = ∞ := by rw [← measure_congr Ioi_ae_eq_Ici]; simp
-
-@[simp]
-theorem volume_Iio {a : ℝ} : volume (Iio a) = ∞ :=
-  top_unique <|
-    le_of_tendsto' ENNReal.tendsto_nat_nhds_top fun n =>
-      calc
-        (n : ℝ≥0∞) = volume (Ioo (a - n) a) := by simp
-        _ ≤ volume (Iio a) := measure_mono Ioo_subset_Iio_self
 
 @[simp]
 theorem volume_Iic {a : ℝ} : volume (Iic a) = ∞ := by rw [← measure_congr Iio_ae_eq_Iic]; simp
@@ -242,17 +228,47 @@ theorem volume_pi_le_diam_pow (s : Set (ι → ℝ)) : volume s ≤ EMetric.diam
 ### Images of the Lebesgue measure under multiplication in ℝ
 -/
 
--- DISSOLVED: smul_map_volume_mul_left
+theorem smul_map_volume_mul_left {a : ℝ} (h : a ≠ 0) :
+    ENNReal.ofReal |a| • Measure.map (a * ·) volume = volume := by
+  refine (Real.measure_ext_Ioo_rat fun p q => ?_).symm
+  cases' lt_or_gt_of_ne h with h h
+  · simp only [Real.volume_Ioo, Measure.smul_apply, ← ENNReal.ofReal_mul (le_of_lt <| neg_pos.2 h),
+      Measure.map_apply (measurable_const_mul a) measurableSet_Ioo, neg_sub_neg, neg_mul,
+      preimage_const_mul_Ioo_of_neg _ _ h, abs_of_neg h, mul_sub, smul_eq_mul,
+      mul_div_cancel₀ _ (ne_of_lt h)]
+  · simp only [Real.volume_Ioo, Measure.smul_apply, ← ENNReal.ofReal_mul (le_of_lt h),
+      Measure.map_apply (measurable_const_mul a) measurableSet_Ioo, preimage_const_mul_Ioo _ _ h,
+      abs_of_pos h, mul_sub, mul_div_cancel₀ _ (ne_of_gt h), smul_eq_mul]
 
--- DISSOLVED: map_volume_mul_left
+theorem map_volume_mul_left {a : ℝ} (h : a ≠ 0) :
+    Measure.map (a * ·) volume = ENNReal.ofReal |a⁻¹| • volume := by
+  conv_rhs =>
+    rw [← Real.smul_map_volume_mul_left h, smul_smul, ← ENNReal.ofReal_mul (abs_nonneg _), ←
+      abs_mul, inv_mul_cancel₀ h, abs_one, ENNReal.ofReal_one, one_smul]
 
--- DISSOLVED: volume_preimage_mul_left
+@[simp]
+theorem volume_preimage_mul_left {a : ℝ} (h : a ≠ 0) (s : Set ℝ) :
+    volume ((a * ·) ⁻¹' s) = ENNReal.ofReal (abs a⁻¹) * volume s :=
+  calc
+    volume ((a * ·) ⁻¹' s) = Measure.map (a * ·) volume s :=
+      ((Homeomorph.mulLeft₀ a h).toMeasurableEquiv.map_apply s).symm
+    _ = ENNReal.ofReal (abs a⁻¹) * volume s := by rw [map_volume_mul_left h]; rfl
 
--- DISSOLVED: smul_map_volume_mul_right
+theorem smul_map_volume_mul_right {a : ℝ} (h : a ≠ 0) :
+    ENNReal.ofReal |a| • Measure.map (· * a) volume = volume := by
+  simpa only [mul_comm] using Real.smul_map_volume_mul_left h
 
--- DISSOLVED: map_volume_mul_right
+theorem map_volume_mul_right {a : ℝ} (h : a ≠ 0) :
+    Measure.map (· * a) volume = ENNReal.ofReal |a⁻¹| • volume := by
+  simpa only [mul_comm] using Real.map_volume_mul_left h
 
--- DISSOLVED: volume_preimage_mul_right
+@[simp]
+theorem volume_preimage_mul_right {a : ℝ} (h : a ≠ 0) (s : Set ℝ) :
+    volume ((· * a) ⁻¹' s) = ENNReal.ofReal (abs a⁻¹) * volume s :=
+  calc
+    volume ((· * a) ⁻¹' s) = Measure.map (· * a) volume s :=
+      ((Homeomorph.mulRight₀ a h).toMeasurableEquiv.map_apply s).symm
+    _ = ENNReal.ofReal (abs a⁻¹) * volume s := by rw [map_volume_mul_right h]; rfl
 
 /-!
 ### Images of the Lebesgue measure under translation/linear maps in ℝⁿ
@@ -260,7 +276,29 @@ theorem volume_pi_le_diam_pow (s : Set (ι → ℝ)) : volume s ≤ EMetric.diam
 
 open Matrix
 
--- DISSOLVED: smul_map_diagonal_volume_pi
+theorem smul_map_diagonal_volume_pi [DecidableEq ι] {D : ι → ℝ} (h : det (diagonal D) ≠ 0) :
+    ENNReal.ofReal (abs (det (diagonal D))) • Measure.map (toLin' (diagonal D)) volume =
+      volume := by
+  refine (Measure.pi_eq fun s hs => ?_).symm
+  simp only [det_diagonal, Measure.coe_smul, Algebra.id.smul_eq_mul, Pi.smul_apply]
+  rw [Measure.map_apply _ (MeasurableSet.univ_pi hs)]
+  swap; · exact Continuous.measurable (LinearMap.continuous_on_pi _)
+  have :
+    (Matrix.toLin' (diagonal D) ⁻¹' Set.pi Set.univ fun i : ι => s i) =
+      Set.pi Set.univ fun i : ι => (D i * ·) ⁻¹' s i := by
+    ext f
+    simp only [LinearMap.coe_proj, Algebra.id.smul_eq_mul, LinearMap.smul_apply, mem_univ_pi,
+      mem_preimage, LinearMap.pi_apply, diagonal_toLin']
+  have B : ∀ i, ofReal (abs (D i)) * volume ((D i * ·) ⁻¹' s i) = volume (s i) := by
+    intro i
+    have A : D i ≠ 0 := by
+      simp only [det_diagonal, Ne] at h
+      exact Finset.prod_ne_zero_iff.1 h i (Finset.mem_univ i)
+    rw [volume_preimage_mul_left A, ← mul_assoc, ← ENNReal.ofReal_mul (abs_nonneg _), ← abs_mul,
+      mul_inv_cancel₀ A, abs_one, ENNReal.ofReal_one, one_mul]
+  rw [this, volume_pi_pi, Finset.abs_prod,
+    ENNReal.ofReal_prod_of_nonneg fun i _ => abs_nonneg (D i), ← Finset.prod_mul_distrib]
+  simp only [B]
 
 theorem volume_preserving_transvectionStruct [DecidableEq ι] (t : TransvectionStruct ι ℝ) :
     MeasurePreserving (toLin' t.toMatrix) := by
@@ -282,9 +320,37 @@ theorem volume_preserving_transvectionStruct [DecidableEq ι] (t : TransvectionS
   simp [transvection, mulVec_stdBasisMatrix, t_hij.symm, ← Function.update_add,
     lintegral_add_right_eq_self fun xᵢ ↦ indicator (univ.pi s) 1 (Function.update x t_i xᵢ)]
 
--- DISSOLVED: map_matrix_volume_pi_eq_smul_volume_pi
+theorem map_matrix_volume_pi_eq_smul_volume_pi [DecidableEq ι] {M : Matrix ι ι ℝ} (hM : det M ≠ 0) :
+    Measure.map (toLin' M) volume = ENNReal.ofReal (abs (det M)⁻¹) • volume := by
+  -- This follows from the cases we have already proved, of diagonal matrices and transvections,
+  -- as these matrices generate all invertible matrices.
+  apply diagonal_transvection_induction_of_det_ne_zero _ M hM
+  · intro D hD
+    conv_rhs => rw [← smul_map_diagonal_volume_pi hD]
+    rw [smul_smul, ← ENNReal.ofReal_mul (abs_nonneg _), ← abs_mul, inv_mul_cancel₀ hD, abs_one,
+      ENNReal.ofReal_one, one_smul]
+  · intro t
+    simp_rw [Matrix.TransvectionStruct.det, _root_.inv_one, abs_one, ENNReal.ofReal_one, one_smul,
+      (volume_preserving_transvectionStruct _).map_eq]
+  · intro A B _ _ IHA IHB
+    rw [toLin'_mul, det_mul, LinearMap.coe_comp, ← Measure.map_map, IHB, Measure.map_smul, IHA,
+      smul_smul, ← ENNReal.ofReal_mul (abs_nonneg _), ← abs_mul, mul_comm, mul_inv]
+    · apply Continuous.measurable
+      apply LinearMap.continuous_on_pi
+    · apply Continuous.measurable
+      apply LinearMap.continuous_on_pi
 
--- DISSOLVED: map_linearMap_volume_pi_eq_smul_volume_pi
+theorem map_linearMap_volume_pi_eq_smul_volume_pi {f : (ι → ℝ) →ₗ[ℝ] ι → ℝ}
+    (hf : LinearMap.det f ≠ 0) : Measure.map f volume =
+      ENNReal.ofReal (abs (LinearMap.det f)⁻¹) • volume := by
+  classical
+    -- this is deduced from the matrix case
+    let M := LinearMap.toMatrix' f
+    have A : LinearMap.det f = det M := by simp only [M, LinearMap.det_toMatrix']
+    have B : f = toLin' M := by simp only [M, toLin'_toMatrix']
+    rw [A, B]
+    apply map_matrix_volume_pi_eq_smul_volume_pi
+    rwa [A] at hf
 
 end Real
 

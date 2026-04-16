@@ -7,6 +7,8 @@ import Mathlib.Probability.Martingale.Convergence
 import Mathlib.Probability.Martingale.OptionalStopping
 import Mathlib.Probability.Martingale.Centering
 
+noncomputable section
+
 /-!
 
 # Generalized Borel-Cantelli lemma

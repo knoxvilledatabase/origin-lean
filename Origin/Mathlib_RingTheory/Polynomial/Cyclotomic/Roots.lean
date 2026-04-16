@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Polynomial/Cyclotomic/Roots.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Basic
 import Mathlib.RingTheory.RootsOfUnity.Minpoly
+
+noncomputable section
 
 /-!
 # Roots of cyclotomic polynomials.
@@ -62,7 +64,12 @@ theorem _root_.IsPrimitiveRoot.isRoot_cyclotomic (hpos : 0 < n) {μ : R} (h : Is
 
 -- DISSOLVED: isRoot_cyclotomic_iff'
 
--- DISSOLVED: isRoot_cyclotomic_iff
+theorem isRoot_cyclotomic_iff [NeZero (n : R)] {μ : R} :
+    IsRoot (cyclotomic n R) μ ↔ IsPrimitiveRoot μ n := by
+  have hf : Function.Injective _ := IsFractionRing.injective R (FractionRing R)
+  haveI : NeZero (n : FractionRing R) := NeZero.nat_of_injective hf
+  rw [← isRoot_map_iff hf, ← IsPrimitiveRoot.map_iff_of_injective hf, map_cyclotomic, ←
+    isRoot_cyclotomic_iff']
 
 -- DISSOLVED: roots_cyclotomic_nodup
 
@@ -70,7 +77,10 @@ theorem _root_.IsPrimitiveRoot.isRoot_cyclotomic (hpos : 0 < n) {μ : R} (h : Is
 
 -- DISSOLVED: cyclotomic.roots_eq_primitiveRoots_val
 
--- DISSOLVED: isRoot_cyclotomic_iff_charZero
+theorem isRoot_cyclotomic_iff_charZero {n : ℕ} {R : Type*} [CommRing R] [IsDomain R] [CharZero R]
+    {μ : R} (hn : 0 < n) : (Polynomial.cyclotomic n R).IsRoot μ ↔ IsPrimitiveRoot μ n :=
+  letI := NeZero.of_gt hn
+  isRoot_cyclotomic_iff
 
 end IsDomain
 

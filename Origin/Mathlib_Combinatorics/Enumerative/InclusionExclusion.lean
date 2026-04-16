@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Pi
 import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Algebra.Module.BigOperators
 
+noncomputable section
+
 /-!
 # Inclusion-exclusion principle
 

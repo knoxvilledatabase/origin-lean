@@ -5,6 +5,8 @@ Genuine: 74 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntegrableOn
 
+noncomputable section
+
 /-!
 # Locally integrable functions
 

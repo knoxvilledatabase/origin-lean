@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.Semisimple.Defs
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
+noncomputable section
+
 /-!
 # Lie algebras with non-degenerate invariant bilinear forms are semisimple
 

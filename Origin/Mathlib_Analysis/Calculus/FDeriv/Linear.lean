@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Basic
 import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
 
+noncomputable section
+
 /-!
 # The derivative of bounded linear maps
 

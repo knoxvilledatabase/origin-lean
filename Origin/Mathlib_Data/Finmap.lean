@@ -7,6 +7,8 @@ import Mathlib.Data.List.AList
 import Mathlib.Data.Finset.Sigma
 import Mathlib.Data.Part
 
+noncomputable section
+
 /-!
 # Finite maps over `Multiset`
 -/
@@ -24,16 +26,8 @@ namespace Multiset
 def keys (s : Multiset (Sigma β)) : Multiset α :=
   s.map Sigma.fst
 
-@[simp]
-theorem coe_keys {l : List (Sigma β)} : keys (l : Multiset (Sigma β)) = (l.keys : Multiset α) :=
-  rfl
-
 def NodupKeys (s : Multiset (Sigma β)) : Prop :=
   Quot.liftOn s List.NodupKeys fun _ _ p => propext <| perm_nodupKeys p
-
-@[simp]
-theorem coe_nodupKeys {l : List (Sigma β)} : @NodupKeys α β l ↔ l.NodupKeys :=
-  Iff.rfl
 
 lemma nodup_keys {m : Multiset (Σ a, β a)} : m.keys.Nodup ↔ m.NodupKeys := by
   rcases m with ⟨l⟩; rfl
@@ -63,10 +57,6 @@ theorem AList.toFinmap_eq {s₁ s₂ : AList β} :
   cases s₁
   cases s₂
   simp [AList.toFinmap]
-
-@[simp]
-theorem AList.toFinmap_entries (s : AList β) : ⟦s⟧.entries = s.entries :=
-  rfl
 
 def List.toFinmap [DecidableEq α] (s : List (Sigma β)) : Finmap β :=
   s.toAList.toFinmap
@@ -153,10 +143,6 @@ def keys (s : Finmap β) : Finset α :=
   ⟨s.entries.keys, s.nodupKeys.nodup_keys⟩
 
 @[simp]
-theorem keys_val (s : AList β) : (keys ⟦s⟧).val = s.keys :=
-  rfl
-
-@[simp]
 theorem keys_ext {s₁ s₂ : AList β} : keys ⟦s₁⟧ = keys ⟦s₂⟧ ↔ s₁.keys ~ s₂.keys := by
   simp [keys, AList.keys]
 
@@ -182,18 +168,10 @@ theorem toFinmap_nil [DecidableEq α] : ([].toFinmap : Finmap β) = ∅ :=
 theorem not_mem_empty {a : α} : a ∉ (∅ : Finmap β) :=
   Multiset.not_mem_zero a
 
-@[simp]
-theorem keys_empty : (∅ : Finmap β).keys = ∅ :=
-  rfl
-
 /-! ### singleton -/
 
 def singleton (a : α) (b : β a) : Finmap β :=
   ⟦AList.singleton a b⟧
-
-@[simp]
-theorem keys_singleton (a : α) (b : β a) : (singleton a b).keys = {a} :=
-  rfl
 
 @[simp]
 theorem mem_singleton (x y : α) (b : β y) : x ∈ singleton y b ↔ x = y := by
@@ -218,10 +196,6 @@ theorem lookup_toFinmap (a : α) (s : AList β) : lookup a ⟦s⟧ = s.lookup a 
 @[simp]
 theorem dlookup_list_toFinmap (a : α) (s : List (Sigma β)) : lookup a s.toFinmap = s.dlookup a := by
   rw [List.toFinmap, lookup_toFinmap, lookup_to_alist]
-
-@[simp]
-theorem lookup_empty (a) : lookup a (∅ : Finmap β) = none :=
-  rfl
 
 theorem lookup_isSome {a : α} {s : Finmap β} : (s.lookup a).isSome ↔ a ∈ s :=
   induction_on s fun _ => AList.lookup_isSome

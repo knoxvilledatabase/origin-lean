@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Finiteness.Defs
 import Mathlib.RingTheory.Nilpotent.Defs
 
+noncomputable section
+
 /-!
 # Nilpotent maps on finite modules
 

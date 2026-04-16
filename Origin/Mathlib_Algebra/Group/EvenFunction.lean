@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Group.Action.Pi
 import Mathlib.Algebra.NoZeroSMulDivisors.Basic
 
+noncomputable section
+
 /-!
 # Even and odd functions
 

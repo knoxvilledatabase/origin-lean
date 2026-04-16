@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/DirichletCharacter/GaussSum.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.DirichletCharacter.Basic
 import Mathlib.NumberTheory.GaussSum
+
+noncomputable section
 
 /-!
 # Gauss sums for Dirichlet characters
@@ -31,7 +33,14 @@ lemma gaussSum_aux_of_mulShift (χ : DirichletCharacter R N) {d : ℕ}
   rwa [MonoidHom.coe_coe, this, ← Int.cast_one, eq_comm,
     ZMod.intCast_eq_intCast_iff_dvd_sub] at hu
 
--- DISSOLVED: factorsThrough_of_gaussSum_ne_zero
+lemma factorsThrough_of_gaussSum_ne_zero [IsDomain R] {χ : DirichletCharacter R N} {d : ℕ}
+    (hd : d ∣ N) (he : e.mulShift d = 1) (h_ne : gaussSum χ e ≠ 0) :
+    χ.FactorsThrough d := by
+  rw [DirichletCharacter.factorsThrough_iff_ker_unitsMap hd]
+  intro u hu
+  rw [MonoidHom.mem_ker, ← Units.eq_iff, MulChar.coe_toUnitHom]
+  simpa only [Units.val_one, ne_eq, h_ne, not_false_eq_true, mul_eq_right₀] using
+    gaussSum_aux_of_mulShift e χ hd he hu
 
 lemma gaussSum_eq_zero_of_isPrimitive_of_not_isPrimitive [IsDomain R]
     {χ : DirichletCharacter R N} (hχ : IsPrimitive χ) (he : ¬IsPrimitive e) :

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.RingTheory.Localization.Integral
 
+noncomputable section
+
 /-!
 
 # The meta properties of integral ring homomorphisms.

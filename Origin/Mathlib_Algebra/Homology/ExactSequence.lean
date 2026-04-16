@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Homology/ExactSequence.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Exact
 import Mathlib.CategoryTheory.ComposableArrows
+
+noncomputable section
 
 /-!
 # Exact sequences
@@ -164,16 +166,7 @@ lemma isComplex₂_mk (S : ComposableArrows C 2) (w : S.map' 0 1 ≫ S.map' 1 2 
     S.IsComplex :=
   S.isComplex₂_iff.2 w
 
-We turn off simprocs here.
-
-Ideally someone will investigate whether `simp` lemmas can be rearranged
-
-so that this works without the `set_option`,
-
-*or* come up with a proposal regarding finer control of disabling simprocs. -/
-
 set_option simprocs false in
-
 lemma _root_.CategoryTheory.ShortComplex.isComplex_toComposableArrows (S : ShortComplex C) :
     S.toComposableArrows.IsComplex :=
   isComplex₂_mk _ (by simp)

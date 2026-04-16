@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Atoms
 import Mathlib.Algebra.Group.Subgroup.Basic
 
+noncomputable section
+
 /-!
 # Simple groups
 

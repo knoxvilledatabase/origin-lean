@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Fib/Basic.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.BinaryRec
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Zify
+
+noncomputable section
 
 /-!
 # Fibonacci Numbers
@@ -55,22 +57,11 @@ namespace Nat
 def fib (n : ℕ) : ℕ :=
   ((fun p : ℕ × ℕ => (p.snd, p.fst + p.snd))^[n] (0, 1)).fst
 
-@[simp]
-theorem fib_zero : fib 0 = 0 :=
-  rfl
-
-@[simp]
-theorem fib_one : fib 1 = 1 :=
-  rfl
-
-@[simp]
-theorem fib_two : fib 2 = 1 :=
-  rfl
-
 theorem fib_add_two {n : ℕ} : fib (n + 2) = fib n + fib (n + 1) := by
   simp [fib, Function.iterate_succ_apply']
 
--- DISSOLVED: fib_add_one
+lemma fib_add_one : ∀ {n}, n ≠ 0 → fib (n + 1) = fib (n - 1) + fib n
+  | _n + 1, _ => fib_add_two
 
 theorem fib_le_fib_succ {n : ℕ} : fib n ≤ fib (n + 1) := by cases n <;> simp [fib_add_two]
 

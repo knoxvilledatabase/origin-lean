@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Card
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Intersecting families
 

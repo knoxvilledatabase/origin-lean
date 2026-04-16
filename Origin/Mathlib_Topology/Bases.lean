@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Bases.lean
-Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
+Genuine: 100 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Data.Set.Constructions
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.ContinuousOn
+
+noncomputable section
 
 /-!
 # Bases of topologies. Countability axioms.

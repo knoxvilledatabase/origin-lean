@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Atoms.lean
-Genuine: 110 | Conflates: 3 | Dissolved: 0 | Infrastructure: 42
+Genuine: 112 | Conflates: 3 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice
@@ -9,6 +9,8 @@ import Mathlib.Order.SuccPred.Basic
 import Mathlib.Order.WellFounded
 import Mathlib.Tactic.Nontriviality
 import Mathlib.Order.ConditionallyCompleteLattice.Indexed
+
+noncomputable section
 
 /-!
 # Atoms, Coatoms, and Simple Lattices
@@ -196,10 +198,6 @@ theorem Set.Iic.isCoatom_iff {a : Set.Iic b} : IsCoatom a ↔ ↑a ⋖ b := by
   rw [← covBy_top_iff]
   refine (Set.OrdConnected.apply_covBy_apply_iff (OrderEmbedding.subtype fun c => c ≤ b) ?_).symm
   simpa only [OrderEmbedding.subtype_apply, Subtype.range_coe_subtype] using Set.ordConnected_Iic
-
-theorem covBy_iff_atom_Ici (h : a ≤ b) : a ⋖ b ↔ IsAtom (⟨b, h⟩ : Set.Ici a) := by simp
-
-theorem covBy_iff_coatom_Iic (h : a ≤ b) : a ⋖ b ↔ IsCoatom (⟨a, h⟩ : Set.Iic b) := by simp
 
 end PartialOrder
 

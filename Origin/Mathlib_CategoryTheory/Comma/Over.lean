@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
 import Mathlib.CategoryTheory.Category.Cat
 
+noncomputable section
+
 /-!
 # Over and under categories
 
@@ -53,10 +55,6 @@ theorem OverMorphism.ext {X : T} {U V : Over X} {f g : U ⟶ V} (h : f.left = g.
 @[simp]
 theorem over_right (U : Over X) : U.right = ⟨⟨⟩⟩ := by simp only
 
-@[simp]
-theorem id_left (U : Over X) : CommaMorphism.left (𝟙 U) = 𝟙 U.left :=
-  rfl
-
 @[simp, reassoc]
 theorem comp_left (a b c : Over X) (f : a ⟶ b) (g : b ⟶ c) : (f ≫ g).left = f.left ≫ g.left :=
   rfl
@@ -73,10 +71,6 @@ def coeFromHom {X Y : T} : CoeOut (Y ⟶ X) (Over X) where coe := mk
 section
 
 attribute [local instance] coeFromHom
-
-@[simp]
-theorem coe_hom {X Y : T} (f : Y ⟶ X) : (f : Over X).hom = f :=
-  rfl
 
 end
 
@@ -112,14 +106,6 @@ def forget : Over X ⥤ T :=
 
 end
 
-@[simp]
-theorem forget_obj {U : Over X} : (forget X).obj U = U.left :=
-  rfl
-
-@[simp]
-theorem forget_map {U V : Over X} {f : U ⟶ V} : (forget X).map f = f.left :=
-  rfl
-
 @[simps]
 def forgetCocone (X : T) : Limits.Cocone (forget X) :=
   { pt := X
@@ -132,26 +118,10 @@ section
 
 variable {Y : T} {f : X ⟶ Y} {U V : Over X} {g : U ⟶ V}
 
-@[simp]
-theorem map_obj_left : ((map f).obj U).left = U.left :=
-  rfl
-
-@[simp]
-theorem map_obj_hom : ((map f).obj U).hom = U.hom ≫ f :=
-  rfl
-
-@[simp]
-theorem map_map_left : ((map f).map g).left = g.left :=
-  rfl
-
 end
 
 def mapIso {Y : T} (f : X ≅ Y) : Over X ≌ Over Y :=
   Comma.mapRightIso _ <| Discrete.natIso fun _ ↦ f
-
-@[simp] lemma mapIso_functor {Y : T} (f : X ≅ Y) : (mapIso f).functor = map f.hom := rfl
-
-@[simp] lemma mapIso_inverse {Y : T} (f : X ≅ Y) : (mapIso f).inverse = map f.inv := rfl
 
 section coherences
 
@@ -270,14 +240,6 @@ def iteratedSliceEquiv : Over f ≌ Over f.left where
   unitIso := NatIso.ofComponents (fun g => Over.isoMk (Over.isoMk (Iso.refl _)))
   counitIso := NatIso.ofComponents (fun g => Over.isoMk (Iso.refl _))
 
-theorem iteratedSliceForward_forget :
-    iteratedSliceForward f ⋙ forget f.left = forget f ⋙ forget X :=
-  rfl
-
-theorem iteratedSliceBackward_forget_forget :
-    iteratedSliceBackward f ⋙ forget f ⋙ forget X = forget f.left :=
-  rfl
-
 end IteratedSlice
 
 @[simps]
@@ -285,10 +247,6 @@ def post (F : T ⥤ D) : Over X ⥤ Over (F.obj X) where
   obj Y := mk <| F.map Y.hom
   map f := Over.homMk (F.map f.left)
     (by simp only [Functor.id_obj, mk_left, Functor.const_obj_obj, mk_hom, ← F.map_comp, w])
-
-lemma post_comp {E : Type*} [Category E] (F : T ⥤ D) (G : D ⥤ E) :
-    post (X := X) (F ⋙ G) = post (X := X) F ⋙ post G :=
-  rfl
 
 @[simps!]
 def postComp {E : Type*} [Category E] (F : T ⥤ D) (G : D ⥤ E) :
@@ -379,10 +337,6 @@ theorem UnderMorphism.ext {X : T} {U V : Under X} {f g : U ⟶ V} (h : f.right =
 theorem under_left (U : Under X) : U.left = ⟨⟨⟩⟩ := by simp only
 
 @[simp]
-theorem id_right (U : Under X) : CommaMorphism.right (𝟙 U) = 𝟙 U.right :=
-  rfl
-
-@[simp]
 theorem comp_right (a b c : Under X) (f : a ⟶ b) (g : b ⟶ c) : (f ≫ g).right = f.right ≫ g.right :=
   rfl
 
@@ -403,16 +357,6 @@ def isoMk {f g : Under X} (hr : f.right ≅ g.right)
     (hw : f.hom ≫ hr.hom = g.hom := by aesop_cat) : f ≅ g :=
   StructuredArrow.isoMk hr hw
 
-@[simp]
-theorem isoMk_hom_right {f g : Under X} (hr : f.right ≅ g.right) (hw : f.hom ≫ hr.hom = g.hom) :
-    (isoMk hr hw).hom.right = hr.hom :=
-  rfl
-
-@[simp]
-theorem isoMk_inv_right {f g : Under X} (hr : f.right ≅ g.right) (hw : f.hom ≫ hr.hom = g.hom) :
-    (isoMk hr hw).inv.right = hr.inv :=
-  rfl
-
 @[reassoc (attr := simp)]
 lemma hom_right_inv_right {f g : Under X} (e : f ≅ g) :
     e.hom.right ≫ e.inv.right = 𝟙 f.right := by
@@ -432,14 +376,6 @@ def forget : Under X ⥤ T :=
 
 end
 
-@[simp]
-theorem forget_obj {U : Under X} : (forget X).obj U = U.right :=
-  rfl
-
-@[simp]
-theorem forget_map {U V : Under X} {f : U ⟶ V} : (forget X).map f = f.right :=
-  rfl
-
 @[simps]
 def forgetCone (X : T) : Limits.Cone (forget X) :=
   { pt := X
@@ -452,26 +388,10 @@ section
 
 variable {Y : T} {f : X ⟶ Y} {U V : Under Y} {g : U ⟶ V}
 
-@[simp]
-theorem map_obj_right : ((map f).obj U).right = U.right :=
-  rfl
-
-@[simp]
-theorem map_obj_hom : ((map f).obj U).hom = f ≫ U.hom :=
-  rfl
-
-@[simp]
-theorem map_map_right : ((map f).map g).right = g.right :=
-  rfl
-
 end
 
 def mapIso {Y : T} (f : X ≅ Y) : Under Y ≌ Under X :=
   Comma.mapLeftIso _ <| Discrete.natIso fun _ ↦ f.symm
-
-@[simp] lemma mapIso_functor {Y : T} (f : X ≅ Y) : (mapIso f).functor = map f.hom := rfl
-
-@[simp] lemma mapIso_inverse {Y : T} (f : X ≅ Y) : (mapIso f).inverse = map f.inv := rfl
 
 section coherences
 
@@ -568,10 +488,6 @@ def post {X : T} (F : T ⥤ D) : Under X ⥤ Under (F.obj X) where
   map f := Under.homMk (F.map f.right)
     (by simp only [Functor.id_obj, Functor.const_obj_obj, mk_right, mk_hom, ← F.map_comp, w])
 
-lemma post_comp {E : Type*} [Category E] (F : T ⥤ D) (G : D ⥤ E) :
-    post (X := X) (F ⋙ G) = post (X := X) F ⋙ post G :=
-  rfl
-
 @[simps!]
 def postComp {E : Type*} [Category E] (F : T ⥤ D) (G : D ⥤ E) :
     post (X := X) (F ⋙ G) ≅ post F ⋙ post G :=
@@ -652,11 +568,6 @@ def toOverCompForget (F : S ⥤ T) (X : T) (f : (Y : S) → F.obj Y ⟶ X)
     (h : ∀ {Y Z : S} (g : Y ⟶ Z), F.map g ≫ f Z = f Y) : F.toOver X f h ⋙ Over.forget _ ≅ F :=
   Iso.refl _
 
-@[simp]
-lemma toOver_comp_forget (F : S ⥤ T) (X : T) (f : (Y : S) → F.obj Y ⟶ X)
-    (h : ∀ {Y Z : S} (g : Y ⟶ Z), F.map g ≫ f Z = f Y) : F.toOver X f h ⋙ Over.forget _ = F :=
-  rfl
-
 @[simps! obj_right map_right]
 def toUnder (F : S ⥤ T) (X : T) (f : (Y : S) → X ⟶ F.obj Y)
     (h : ∀ {Y Z : S} (g : Y ⟶ Z), f Y ≫ F.map g = f Z) : S ⥤ Under X :=
@@ -665,11 +576,6 @@ def toUnder (F : S ⥤ T) (X : T) (f : (Y : S) → X ⟶ F.obj Y)
 def toUnderCompForget (F : S ⥤ T) (X : T) (f : (Y : S) → X ⟶ F.obj Y)
     (h : ∀ {Y Z : S} (g : Y ⟶ Z), f Y ≫ F.map g = f Z) : F.toUnder X f h ⋙ Under.forget _ ≅ F :=
   Iso.refl _
-
-@[simp]
-lemma toUnder_comp_forget (F : S ⥤ T) (X : T) (f : (Y : S) → X ⟶ F.obj Y)
-    (h : ∀ {Y Z : S} (g : Y ⟶ Z), f Y ≫ F.map g = f Z) : F.toUnder X f h ⋙ Under.forget _ = F :=
-  rfl
 
 end Functor
 

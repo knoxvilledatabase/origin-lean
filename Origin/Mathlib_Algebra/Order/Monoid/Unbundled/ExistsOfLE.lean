@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 import Mathlib.Order.MinMax
 
+noncomputable section
+
 /-!
 # Unbundled and weaker forms of canonically ordered monoids
 

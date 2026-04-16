@@ -9,6 +9,8 @@ import Mathlib.Analysis.Normed.Algebra.Spectrum
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Algebra.Star.StarAlgHom
 
+noncomputable section
+
 /-! # Spectral properties in C⋆-algebras
 
 In this file, we establish various properties related to the spectrum of elements in C⋆-algebras.

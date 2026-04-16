@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Ideal/Over.lean
-Genuine: 40 | Conflates: 7 | Dissolved: 8 | Infrastructure: 22
+Genuine: 47 | Conflates: 8 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Pointwise
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.RingTheory.Localization.Integral
+
+noncomputable section
 
 /-!
 # Ideals over/under ideals
@@ -46,7 +48,21 @@ theorem coeff_zero_mem_comap_of_root_mem {r : S} (hr : r ∈ I) {p : R[X]} (hp :
     p.coeff 0 ∈ I.comap f :=
   coeff_zero_mem_comap_of_root_mem_of_eval_mem hr (hp.symm ▸ I.zero_mem)
 
--- DISSOLVED: exists_coeff_ne_zero_mem_comap_of_non_zero_divisor_root_mem
+theorem exists_coeff_ne_zero_mem_comap_of_non_zero_divisor_root_mem {r : S}
+    (r_non_zero_divisor : ∀ {x}, x * r = 0 → x = 0) (hr : r ∈ I) {p : R[X]} :
+    p ≠ 0 → p.eval₂ f r = 0 → ∃ i, p.coeff i ≠ 0 ∧ p.coeff i ∈ I.comap f := by
+  refine p.recOnHorner ?_ ?_ ?_
+  · intro h
+    contradiction
+  · intro p a coeff_eq_zero a_ne_zero _ _ hp
+    refine ⟨0, ?_, coeff_zero_mem_comap_of_root_mem hr hp⟩
+    simp [coeff_eq_zero, a_ne_zero]
+  · intro p p_nonzero ih _ hp
+    rw [eval₂_mul, eval₂_X] at hp
+    obtain ⟨i, hi, mem⟩ := ih p_nonzero (r_non_zero_divisor hp)
+    refine ⟨i + 1, ?_, ?_⟩
+    · simp [hi, mem]
+    · simpa [hi] using mem
 
 theorem injective_quotient_le_comap_map (P : Ideal R[X]) :
     Function.Injective <|
@@ -72,7 +88,17 @@ theorem quotient_mk_maps_eq (P : Ideal R[X]) :
   repeat' rw [RingHom.coe_comp, Function.comp_apply]
   rw [quotientMap_mk, coe_mapRingHom, map_C]
 
--- DISSOLVED: exists_nonzero_mem_of_ne_bot
+theorem exists_nonzero_mem_of_ne_bot {P : Ideal R[X]} (Pb : P ≠ ⊥) (hP : ∀ x : R, C x ∈ P → x = 0) :
+    ∃ p : R[X], p ∈ P ∧ Polynomial.map (Quotient.mk (P.comap (C : R →+* R[X]))) p ≠ 0 := by
+  obtain ⟨m, hm⟩ := Submodule.nonzero_mem_of_bot_lt (bot_lt_iff_ne_bot.mpr Pb)
+  refine ⟨m, Submodule.coe_mem m, fun pp0 => hm (Submodule.coe_eq_zero.mp ?_)⟩
+  refine
+    (injective_iff_map_eq_zero (Polynomial.mapRingHom (Ideal.Quotient.mk
+      (P.comap (C : R →+* R[X]))))).mp
+      ?_ _ pp0
+  refine map_injective _ ((Ideal.Quotient.mk (P.comap C)).injective_iff_ker_eq_bot.mpr ?_)
+  rw [mk_ker]
+  exact (Submodule.eq_bot_iff _).mpr fun x hx => hP x (mem_comap.mp hx)
 
 variable {p : Ideal R} {P : Ideal S}
 
@@ -100,11 +126,6 @@ theorem Quotient.algebraMap_quotient_map_quotient (x : R) :
     Ideal.Quotient.mk (map f p) (f x) :=
   rfl
 
-@[simp]
-theorem Quotient.mk_smul_mk_quotient_map_quotient (x : R) (y : S) :
-    Quotient.mk p x • Quotient.mk (map f p) y = Quotient.mk (map f p) (f x * y) :=
-  rfl
-
 instance Quotient.tower_quotient_map_quotient [Algebra R S] :
     IsScalarTower R (R ⧸ p) (S ⧸ map (algebraMap R S) p) :=
   IsScalarTower.of_algebraMap_eq fun x => by
@@ -123,11 +144,38 @@ section IsDomain
 
 variable {S : Type*} [CommRing S] {f : R →+* S} {I J : Ideal S}
 
--- DISSOLVED: exists_coeff_ne_zero_mem_comap_of_root_mem
+theorem exists_coeff_ne_zero_mem_comap_of_root_mem [IsDomain S] {r : S} (r_ne_zero : r ≠ 0)
+    (hr : r ∈ I) {p : R[X]} :
+    p ≠ 0 → p.eval₂ f r = 0 → ∃ i, p.coeff i ≠ 0 ∧ p.coeff i ∈ I.comap f :=
+  exists_coeff_ne_zero_mem_comap_of_non_zero_divisor_root_mem
+    (fun {_} h => Or.resolve_right (mul_eq_zero.mp h) r_ne_zero) hr
 
--- DISSOLVED: exists_coeff_mem_comap_sdiff_comap_of_root_mem_sdiff
+theorem exists_coeff_mem_comap_sdiff_comap_of_root_mem_sdiff [IsPrime I] (hIJ : I ≤ J) {r : S}
+    (hr : r ∈ (J : Set S) \ I) {p : R[X]} (p_ne_zero : p.map (Quotient.mk (I.comap f)) ≠ 0)
+    (hpI : p.eval₂ f r ∈ I) : ∃ i, p.coeff i ∈ (J.comap f : Set R) \ I.comap f := by
+  obtain ⟨hrJ, hrI⟩ := hr
+  have rbar_ne_zero : Ideal.Quotient.mk I r ≠ 0 := mt (Quotient.mk_eq_zero I).mp hrI
+  have rbar_mem_J : Ideal.Quotient.mk I r ∈ J.map (Ideal.Quotient.mk I) := mem_map_of_mem _ hrJ
+  have quotient_f : ∀ x ∈ I.comap f, (Ideal.Quotient.mk I).comp f x = 0 := by
+    simp [Quotient.eq_zero_iff_mem]
+  have rbar_root :
+    (p.map (Ideal.Quotient.mk (I.comap f))).eval₂ (Quotient.lift (I.comap f) _ quotient_f)
+        (Ideal.Quotient.mk I r) =
+      0 := by
+    convert Quotient.eq_zero_iff_mem.mpr hpI
+    exact _root_.trans (eval₂_map _ _ _) (hom_eval₂ p f (Ideal.Quotient.mk I) r).symm
+  obtain ⟨i, ne_zero, mem⟩ :=
+    exists_coeff_ne_zero_mem_comap_of_root_mem rbar_ne_zero rbar_mem_J p_ne_zero rbar_root
+  rw [coeff_map] at ne_zero mem
+  refine ⟨i, (mem_quotient_iff_mem hIJ).mp ?_, mt ?_ ne_zero⟩
+  · simpa using mem
+  simp [Quotient.eq_zero_iff_mem]
 
--- DISSOLVED: comap_lt_comap_of_root_mem_sdiff
+theorem comap_lt_comap_of_root_mem_sdiff [I.IsPrime] (hIJ : I ≤ J) {r : S}
+    (hr : r ∈ (J : Set S) \ I) {p : R[X]} (p_ne_zero : p.map (Quotient.mk (I.comap f)) ≠ 0)
+    (hp : p.eval₂ f r ∈ I) : I.comap f < J.comap f :=
+  let ⟨i, hJ, hI⟩ := exists_coeff_mem_comap_sdiff_comap_of_root_mem_sdiff hIJ hr p_ne_zero hp
+  SetLike.lt_iff_le_and_exists.mpr ⟨comap_mono hIJ, p.coeff i, hJ, hI⟩
 
 theorem mem_of_one_mem (h : (1 : S) ∈ I) (x) : x ∈ I :=
   (I.eq_top_iff_one.mpr h).symm ▸ mem_top
@@ -139,7 +187,10 @@ theorem comap_lt_comap_of_integral_mem_sdiff [Algebra R S] [hI : I.IsPrime] (hIJ
   refine comap_lt_comap_of_root_mem_sdiff hIJ mem (map_monic_ne_zero p_monic) ?_
   convert I.zero_mem
 
--- DISSOLVED: comap_ne_bot_of_root_mem
+theorem comap_ne_bot_of_root_mem [IsDomain S] {r : S} (r_ne_zero : r ≠ 0) (hr : r ∈ I) {p : R[X]}
+    (p_ne_zero : p ≠ 0) (hp : p.eval₂ f r = 0) : I.comap f ≠ ⊥ := fun h =>
+  let ⟨_, hi, mem⟩ := exists_coeff_ne_zero_mem_comap_of_root_mem r_ne_zero hr p_ne_zero hp
+  absurd (mem_bot.mp (eq_bot_iff.mp h mem)) hi
 
 theorem isMaximal_of_isIntegral_of_isMaximal_comap [Algebra R S] [Algebra.IsIntegral R S]
     (I : Ideal S) [I.IsPrime] (hI : IsMaximal (I.comap (algebraMap R S))) : IsMaximal I :=
@@ -157,9 +208,15 @@ theorem isMaximal_of_isIntegral_of_isMaximal_comap' (f : R →+* S) (hf : f.IsIn
 
 variable [Algebra R S]
 
--- DISSOLVED: comap_ne_bot_of_algebraic_mem
+theorem comap_ne_bot_of_algebraic_mem [IsDomain S] {x : S} (x_ne_zero : x ≠ 0) (x_mem : x ∈ I)
+    (hx : IsAlgebraic R x) : I.comap (algebraMap R S) ≠ ⊥ :=
+  let ⟨_, p_ne_zero, hp⟩ := hx
+  comap_ne_bot_of_root_mem x_ne_zero x_mem p_ne_zero hp
 
--- DISSOLVED: comap_ne_bot_of_integral_mem
+-- CONFLATES (assumes ground = zero): comap_ne_bot_of_integral_mem
+theorem comap_ne_bot_of_integral_mem [Nontrivial R] [IsDomain S] {x : S} (x_ne_zero : x ≠ 0)
+    (x_mem : x ∈ I) (hx : IsIntegral R x) : I.comap (algebraMap R S) ≠ ⊥ :=
+  comap_ne_bot_of_algebraic_mem x_ne_zero x_mem hx.isAlgebraic
 
 -- CONFLATES (assumes ground = zero): eq_bot_of_comap_eq_bot
 theorem eq_bot_of_comap_eq_bot [Nontrivial R] [IsDomain S] [Algebra.IsIntegral R S]
@@ -349,8 +406,6 @@ variable (A : Type*) [CommSemiring A] {B C : Type*} [Semiring B] [Semiring C] [A
 
 abbrev under : Ideal A := Ideal.comap (algebraMap A B) P
 
-theorem under_def : P.under A = Ideal.comap (algebraMap A B) P := rfl
-
 instance IsPrime.under [hP : P.IsPrime] : (P.under A).IsPrime :=
   hP.comap (algebraMap A B)
 
@@ -483,16 +538,8 @@ def algEquivOfEqMap (h : Q = P.map σ) : (B ⧸ P) ≃ₐ[A ⧸ p] (C ⧸ Q) whe
     rintro ⟨x⟩
     exact congrArg (Ideal.Quotient.mk Q) (AlgHomClass.commutes σ x)
 
-@[simp]
-theorem algEquivOfEqMap_apply (h : Q = P.map σ) (x : B) : algEquivOfEqMap p σ h x = σ x :=
-  rfl
-
 def algEquivOfEqComap (h : P = Q.comap σ) : (B ⧸ P) ≃ₐ[A ⧸ p] (C ⧸ Q) :=
   algEquivOfEqMap p σ ((congrArg (map σ) h).trans (Q.map_comap_eq_self_of_equiv σ)).symm
-
-@[simp]
-theorem algEquivOfEqComap_apply (h : P = Q.comap σ) (x : B) : algEquivOfEqComap p σ h x = σ x :=
-  rfl
 
 end algEquiv
 
@@ -504,10 +551,6 @@ def stabilizerHom : MulAction.stabilizer G P →* ((B ⧸ P) ≃ₐ[A ⧸ p] (B 
   map_mul' g h := by
     ext ⟨x⟩
     exact congrArg (Ideal.Quotient.mk P) (mul_smul g h x)
-
-@[simp] theorem stabilizerHom_apply (g : MulAction.stabilizer G P) (b : B) :
-    stabilizerHom P p G g b = ↑(g • b) :=
-  rfl
 
 end Quotient
 

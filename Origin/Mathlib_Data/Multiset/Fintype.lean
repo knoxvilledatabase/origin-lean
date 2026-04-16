@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 # Multiset coercion to type
 

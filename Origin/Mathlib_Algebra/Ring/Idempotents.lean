@@ -10,6 +10,8 @@ import Mathlib.Algebra.Ring.Defs
 import Mathlib.Data.Subtype
 import Mathlib.Order.Notation
 
+noncomputable section
+
 /-!
 # Idempotents
 
@@ -107,22 +109,10 @@ section Instances
 
 instance : Zero { p : M₀ // IsIdempotentElem p } where zero := ⟨0, zero⟩
 
-@[simp]
-theorem coe_zero : ↑(0 : { p : M₀ // IsIdempotentElem p }) = (0 : M₀) :=
-  rfl
-
 instance : One { p : M₁ // IsIdempotentElem p } where one := ⟨1, one⟩
-
-@[simp]
-theorem coe_one : ↑(1 : { p : M₁ // IsIdempotentElem p }) = (1 : M₁) :=
-  rfl
 
 instance : HasCompl { p : R // IsIdempotentElem p } :=
   ⟨fun p => ⟨1 - p, p.prop.one_sub⟩⟩
-
-@[simp]
-theorem coe_compl (p : { p : R // IsIdempotentElem p }) : ↑pᶜ = (1 : R) - ↑p :=
-  rfl
 
 @[simp]
 theorem compl_compl (p : { p : R // IsIdempotentElem p }) : pᶜᶜ = p :=

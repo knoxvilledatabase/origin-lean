@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Galois.Prorepresentability
 import Mathlib.Topology.Algebra.Group.Basic
 
+noncomputable section
+
 /-!
 
 # Topology of fundamental group
@@ -35,10 +37,6 @@ variable {C : Type u₁} [Category.{u₂} C] (F : C ⥤ FintypeCat.{w})
 
 def autEmbedding : Aut F →* ∀ X, Aut (F.obj X) :=
   MonoidHom.mk' (fun σ X ↦ σ.app X) (fun _ _ ↦ rfl)
-
-@[simp]
-lemma autEmbedding_apply (σ : Aut F) (X : C) : autEmbedding F σ X = σ.app X :=
-  rfl
 
 lemma autEmbedding_injective : Function.Injective (autEmbedding F) := by
   intro σ τ h

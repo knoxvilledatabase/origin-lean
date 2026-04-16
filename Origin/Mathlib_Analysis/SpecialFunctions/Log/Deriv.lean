@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Log/Deriv.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 24 | Infrastructure: 1
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Pow
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.LogDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Tactic.AdaptationNote
+
+noncomputable section
 
 /-!
 # Derivative and series expansion of real logarithm
@@ -36,16 +38,25 @@ theorem hasStrictDerivAt_log_of_pos (hx : 0 < x) : HasStrictDerivAt log x⁻¹ x
       Eventually.mono (lt_mem_nhds hx) @exp_log
   rwa [exp_log hx] at this
 
--- DISSOLVED: hasStrictDerivAt_log
+theorem hasStrictDerivAt_log (hx : x ≠ 0) : HasStrictDerivAt log x⁻¹ x := by
+  cases' hx.lt_or_lt with hx hx
+  · convert (hasStrictDerivAt_log_of_pos (neg_pos.mpr hx)).comp x (hasStrictDerivAt_neg x) using 1
+    · ext y; exact (log_neg_eq_log y).symm
+    · field_simp [hx.ne]
+  · exact hasStrictDerivAt_log_of_pos hx
 
--- DISSOLVED: hasDerivAt_log
+theorem hasDerivAt_log (hx : x ≠ 0) : HasDerivAt log x⁻¹ x :=
+  (hasStrictDerivAt_log hx).hasDerivAt
 
--- DISSOLVED: differentiableAt_log
+@[fun_prop] theorem differentiableAt_log (hx : x ≠ 0) : DifferentiableAt ℝ log x :=
+  (hasDerivAt_log hx).differentiableAt
 
 theorem differentiableOn_log : DifferentiableOn ℝ log {0}ᶜ := fun _x hx =>
   (differentiableAt_log hx).differentiableWithinAt
 
--- DISSOLVED: differentiableAt_log_iff
+@[simp]
+theorem differentiableAt_log_iff : DifferentiableAt ℝ log x ↔ x ≠ 0 :=
+  ⟨fun h => continuousAt_log_iff.1 h.continuousAt, differentiableAt_log⟩
 
 theorem deriv_log (x : ℝ) : deriv log x = x⁻¹ :=
   if hx : x = 0 then by
@@ -56,7 +67,22 @@ theorem deriv_log (x : ℝ) : deriv log x = x⁻¹ :=
 theorem deriv_log' : deriv log = Inv.inv :=
   funext deriv_log
 
--- DISSOLVED: contDiffAt_log
+theorem contDiffAt_log {n : WithTop ℕ∞} {x : ℝ} : ContDiffAt ℝ n log x ↔ x ≠ 0 := by
+  refine ⟨fun h ↦ continuousAt_log_iff.1 h.continuousAt, fun hx ↦ ?_⟩
+  have A y (hy : 0 < y) : ContDiffAt ℝ n log y := by
+    apply expPartialHomeomorph.contDiffAt_symm_deriv (f₀' := y) hy.ne' (by simpa)
+    · convert hasDerivAt_exp (log y)
+      rw [exp_log hy]
+    · exact analyticAt_rexp.contDiffAt
+  rcases hx.lt_or_lt with hx | hx
+  · have : ContDiffAt ℝ n (log ∘ (fun y ↦ -y)) x := by
+      apply ContDiffAt.comp
+      apply A _ (Left.neg_pos_iff.mpr hx)
+      apply contDiffAt_id.neg
+    convert this
+    ext x
+    simp
+  · exact A x hx
 
 theorem contDiffOn_log {n : WithTop ℕ∞} : ContDiffOn ℝ n log {0}ᶜ := by
   intro x hx
@@ -73,17 +99,35 @@ section deriv
 
 variable {f : ℝ → ℝ} {x f' : ℝ} {s : Set ℝ}
 
--- DISSOLVED: HasDerivWithinAt.log
+theorem HasDerivWithinAt.log (hf : HasDerivWithinAt f f' s x) (hx : f x ≠ 0) :
+    HasDerivWithinAt (fun y => log (f y)) (f' / f x) s x := by
+  rw [div_eq_inv_mul]
+  exact (hasDerivAt_log hx).comp_hasDerivWithinAt x hf
 
--- DISSOLVED: HasDerivAt.log
+theorem HasDerivAt.log (hf : HasDerivAt f f' x) (hx : f x ≠ 0) :
+    HasDerivAt (fun y => log (f y)) (f' / f x) x := by
+  rw [← hasDerivWithinAt_univ] at *
+  exact hf.log hx
 
--- DISSOLVED: HasStrictDerivAt.log
+theorem HasStrictDerivAt.log (hf : HasStrictDerivAt f f' x) (hx : f x ≠ 0) :
+    HasStrictDerivAt (fun y => log (f y)) (f' / f x) x := by
+  rw [div_eq_inv_mul]
+  exact (hasStrictDerivAt_log hx).comp x hf
 
--- DISSOLVED: derivWithin.log
+theorem derivWithin.log (hf : DifferentiableWithinAt ℝ f s x) (hx : f x ≠ 0)
+    (hxs : UniqueDiffWithinAt ℝ s x) :
+    derivWithin (fun x => log (f x)) s x = derivWithin f s x / f x :=
+  (hf.hasDerivWithinAt.log hx).derivWithin hxs
 
--- DISSOLVED: deriv.log
+@[simp]
+theorem deriv.log (hf : DifferentiableAt ℝ f x) (hx : f x ≠ 0) :
+    deriv (fun x => log (f x)) x = deriv f x / f x :=
+  (hf.hasDerivAt.log hx).deriv
 
--- DISSOLVED: Real.deriv_log_comp_eq_logDeriv
+lemma Real.deriv_log_comp_eq_logDeriv {f : ℝ → ℝ} {x : ℝ} (h₁ : DifferentiableAt ℝ f x)
+    (h₂ : f x ≠ 0) : deriv (log ∘ f) x = logDeriv f x := by
+  simp only [ne_eq, logDeriv, Pi.div_apply, ← deriv.log h₁ h₂]
+  rfl
 
 end deriv
 
@@ -92,31 +136,59 @@ section fderiv
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {f : E → ℝ} {x : E} {f' : E →L[ℝ] ℝ}
   {s : Set E}
 
--- DISSOLVED: HasFDerivWithinAt.log
+theorem HasFDerivWithinAt.log (hf : HasFDerivWithinAt f f' s x) (hx : f x ≠ 0) :
+    HasFDerivWithinAt (fun x => log (f x)) ((f x)⁻¹ • f') s x :=
+  (hasDerivAt_log hx).comp_hasFDerivWithinAt x hf
 
--- DISSOLVED: HasFDerivAt.log
+theorem HasFDerivAt.log (hf : HasFDerivAt f f' x) (hx : f x ≠ 0) :
+    HasFDerivAt (fun x => log (f x)) ((f x)⁻¹ • f') x :=
+  (hasDerivAt_log hx).comp_hasFDerivAt x hf
 
--- DISSOLVED: HasStrictFDerivAt.log
+theorem HasStrictFDerivAt.log (hf : HasStrictFDerivAt f f' x) (hx : f x ≠ 0) :
+    HasStrictFDerivAt (fun x => log (f x)) ((f x)⁻¹ • f') x :=
+  (hasStrictDerivAt_log hx).comp_hasStrictFDerivAt x hf
 
--- DISSOLVED: DifferentiableWithinAt.log
+theorem DifferentiableWithinAt.log (hf : DifferentiableWithinAt ℝ f s x) (hx : f x ≠ 0) :
+    DifferentiableWithinAt ℝ (fun x => log (f x)) s x :=
+  (hf.hasFDerivWithinAt.log hx).differentiableWithinAt
 
--- DISSOLVED: DifferentiableAt.log
+@[simp, fun_prop]
+theorem DifferentiableAt.log (hf : DifferentiableAt ℝ f x) (hx : f x ≠ 0) :
+    DifferentiableAt ℝ (fun x => log (f x)) x :=
+  (hf.hasFDerivAt.log hx).differentiableAt
 
--- DISSOLVED: ContDiffAt.log
+theorem ContDiffAt.log {n} (hf : ContDiffAt ℝ n f x) (hx : f x ≠ 0) :
+    ContDiffAt ℝ n (fun x => log (f x)) x :=
+  (contDiffAt_log.2 hx).comp x hf
 
--- DISSOLVED: ContDiffWithinAt.log
+theorem ContDiffWithinAt.log {n} (hf : ContDiffWithinAt ℝ n f s x) (hx : f x ≠ 0) :
+    ContDiffWithinAt ℝ n (fun x => log (f x)) s x :=
+  (contDiffAt_log.2 hx).comp_contDiffWithinAt x hf
 
--- DISSOLVED: ContDiffOn.log
+theorem ContDiffOn.log {n} (hf : ContDiffOn ℝ n f s) (hs : ∀ x ∈ s, f x ≠ 0) :
+    ContDiffOn ℝ n (fun x => log (f x)) s := fun x hx => (hf x hx).log (hs x hx)
 
--- DISSOLVED: ContDiff.log
+theorem ContDiff.log {n} (hf : ContDiff ℝ n f) (h : ∀ x, f x ≠ 0) :
+    ContDiff ℝ n fun x => log (f x) :=
+  contDiff_iff_contDiffAt.2 fun x => hf.contDiffAt.log (h x)
 
--- DISSOLVED: DifferentiableOn.log
+@[fun_prop]
+theorem DifferentiableOn.log (hf : DifferentiableOn ℝ f s) (hx : ∀ x ∈ s, f x ≠ 0) :
+    DifferentiableOn ℝ (fun x => log (f x)) s := fun x h => (hf x h).log (hx x h)
 
--- DISSOLVED: Differentiable.log
+@[simp, fun_prop]
+theorem Differentiable.log (hf : Differentiable ℝ f) (hx : ∀ x, f x ≠ 0) :
+    Differentiable ℝ fun x => log (f x) := fun x => (hf x).log (hx x)
 
--- DISSOLVED: fderivWithin.log
+theorem fderivWithin.log (hf : DifferentiableWithinAt ℝ f s x) (hx : f x ≠ 0)
+    (hxs : UniqueDiffWithinAt ℝ s x) :
+    fderivWithin ℝ (fun x => log (f x)) s x = (f x)⁻¹ • fderivWithin ℝ f s x :=
+  (hf.hasFDerivWithinAt.log hx).fderivWithin hxs
 
--- DISSOLVED: fderiv.log
+@[simp]
+theorem fderiv.log (hf : DifferentiableAt ℝ f x) (hx : f x ≠ 0) :
+    fderiv ℝ (fun x => log (f x)) x = (f x)⁻¹ • fderiv ℝ f x :=
+  (hf.hasFDerivAt.log hx).fderiv
 
 end fderiv
 

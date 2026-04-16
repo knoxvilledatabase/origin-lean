@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/WithOne/Defs.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 3 | Infrastructure: 19
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Data.Option.Defs
 import Mathlib.Logic.Nontrivial.Basic
 import Mathlib.Tactic.Common
+
+noncomputable section
 
 /-!
 # Adjoining a zero/one to semigroups and related algebraic structures
@@ -97,33 +99,25 @@ def recOneCoe {C : WithOne α → Sort*} (h₁ : C 1) (h₂ : ∀ a : α, C a) :
   | Option.none => h₁
   | Option.some x => h₂ x
 
-@[to_additive (attr := simp)]
-lemma recOneCoe_one {C : WithOne α → Sort*} (h₁ h₂) :
-    recOneCoe h₁ h₂ (1 : WithOne α) = (h₁ : C 1) :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma recOneCoe_coe {C : WithOne α → Sort*} (h₁ h₂) (a : α) :
-    recOneCoe h₁ h₂ (a : WithOne α) = (h₂ : ∀ a : α, C a) a :=
-  rfl
-
--- DISSOLVED: unone
-
-@[to_additive (attr := simp) unzero_coe]
-theorem unone_coe {x : α} (hx : (x : WithOne α) ≠ 1) : unone hx = x :=
-  rfl
+@[to_additive unzero
+      "Deconstruct an `x : WithZero α` to the underlying value in `α`, given a proof that `x ≠ 0`."]
+def unone : ∀ {x : WithOne α}, x ≠ 1 → α | (x : α), _ => x
 
 @[to_additive (attr := simp) coe_unzero]
 lemma coe_unone : ∀ {x : WithOne α} (hx : x ≠ 1), unone hx = x
   | (x : α), _ => rfl
 
--- DISSOLVED: coe_ne_one
+@[to_additive (attr := simp)]
+theorem coe_ne_one {a : α} : (a : WithOne α) ≠ (1 : WithOne α) :=
+  Option.some_ne_none a
 
 @[to_additive (attr := simp)]
 theorem one_ne_coe {a : α} : (1 : WithOne α) ≠ a :=
   coe_ne_one.symm
 
--- DISSOLVED: ne_one_iff_exists
+@[to_additive]
+theorem ne_one_iff_exists {x : WithOne α} : x ≠ 1 ↔ ∃ a : α, ↑a = x :=
+  Option.ne_none_iff_exists
 
 @[to_additive]
 instance canLift : CanLift (WithOne α) α (↑) fun a => a ≠ 1 where
@@ -163,9 +157,5 @@ instance commMonoid [CommSemigroup α] : CommMonoid (WithOne α) where
     | (_ : α), 1 => rfl
     | 1, (_ : α) => rfl
     | 1, 1 => rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_inv [Inv α] (a : α) : ((a⁻¹ : α) : WithOne α) = (a : WithOne α)⁻¹ :=
-  rfl
 
 end WithOne

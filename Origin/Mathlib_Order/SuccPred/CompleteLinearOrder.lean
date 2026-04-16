@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Order.SuccPred.Limit
 
+noncomputable section
+
 /-!
 
 # Relation between `IsSuccPrelimit` and `iSup` in (conditionally) complete linear orders.

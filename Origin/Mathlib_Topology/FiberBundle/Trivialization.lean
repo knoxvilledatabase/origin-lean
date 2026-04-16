@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Image
 import Mathlib.Topology.PartialHomeomorph
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Trivializations
 
@@ -306,11 +308,6 @@ theorem source_inter_preimage_target_inter (s : Set (B × F)) :
     e.source ∩ e ⁻¹' (e.target ∩ s) = e.source ∩ e ⁻¹' s :=
   e.toPartialHomeomorph.source_inter_preimage_target_inter s
 
-@[simp, mfld_simps]
-theorem coe_mk (e : PartialHomeomorph Z (B × F)) (i j k l m) (x : Z) :
-    (Trivialization.mk e i j k l m : Trivialization F proj) x = e x :=
-  rfl
-
 theorem mem_target {x : B × F} : x ∈ e.target ↔ x.1 ∈ e.baseSet :=
   e.toPretrivialization.mem_target
 
@@ -428,17 +425,6 @@ def preimageSingletonHomeomorph {b : B} (hb : b ∈ e.baseSet) : proj ⁻¹' {b}
     .trans (.prodCongr (Homeomorph.homeomorphOfUnique ({b} : Set B) PUnit.{1}) (Homeomorph.refl F))
       (Homeomorph.punitProd F)
 
-@[simp]
-theorem preimageSingletonHomeomorph_apply {b : B} (hb : b ∈ e.baseSet) (p : proj ⁻¹' {b}) :
-    e.preimageSingletonHomeomorph hb p = (e p).2 :=
-  rfl
-
-@[simp]
-theorem preimageSingletonHomeomorph_symm_apply {b : B} (hb : b ∈ e.baseSet) (p : F) :
-    (e.preimageSingletonHomeomorph hb).symm p =
-      ⟨e.symm (b, p), by rw [mem_preimage, e.proj_symm_apply' hb, mem_singleton_iff]⟩ :=
-  rfl
-
 theorem continuousAt_proj (ex : x ∈ e.source) : ContinuousAt proj x :=
   (e.map_proj_nhds ex).le
 
@@ -546,11 +532,6 @@ def transFiberHomeomorph {F' : Type*} [TopologicalSpace F'] (e : Trivialization 
   target_eq := by simp [target_eq, prod_univ, preimage_preimage]
   proj_toFun := e.proj_toFun
 
-@[simp]
-theorem transFiberHomeomorph_apply {F' : Type*} [TopologicalSpace F'] (e : Trivialization F proj)
-    (h : F ≃ₜ F') (x : Z) : e.transFiberHomeomorph h x = ((e x).1, h (e x).2) :=
-  rfl
-
 def coordChange (e₁ e₂ : Trivialization F proj) (b : B) (x : F) : F :=
   (e₂ <| e₁.toPartialHomeomorph.symm (b, x)).2
 
@@ -596,11 +577,6 @@ protected def coordChangeHomeomorph (e₁ e₂ : Trivialization F proj) {b : B} 
   right_inv x := by simp only [*, coordChange_coordChange, coordChange_same_apply]
   continuous_toFun := e₁.continuous_coordChange e₂ h₁ h₂
   continuous_invFun := e₂.continuous_coordChange e₁ h₂ h₁
-
-@[simp]
-theorem coordChangeHomeomorph_coe (e₁ e₂ : Trivialization F proj) {b : B} (h₁ : b ∈ e₁.baseSet)
-    (h₂ : b ∈ e₂.baseSet) : ⇑(e₁.coordChangeHomeomorph e₂ h₁ h₂) = e₁.coordChange e₂ b :=
-  rfl
 
 theorem isImage_preimage_prod (e : Trivialization F proj) (s : Set B) :
     e.toPartialHomeomorph.IsImage (proj ⁻¹' s) (s ×ˢ univ) := fun x hx => by simp [e.coe_fst', hx]

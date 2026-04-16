@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Data.Set.Sigma
 import Mathlib.Order.CompleteLattice.Finset
 
+noncomputable section
+
 /-!
 # Finite sets in a sigma type
 
@@ -72,12 +74,6 @@ theorem pairwiseDisjoint_map_sigmaMk :
   simp_rw [mem_map, Function.Embedding.sigmaMk_apply]
   rintro _ ⟨y, _, rfl⟩ ⟨z, _, hz'⟩
   exact hij (congr_arg Sigma.fst hz'.symm)
-
-@[simp]
-theorem disjiUnion_map_sigma_mk :
-    s.disjiUnion (fun i => (t i).map (Embedding.sigmaMk i)) pairwiseDisjoint_map_sigmaMk =
-      s.sigma t :=
-  rfl
 
 theorem sigma_eq_biUnion [DecidableEq (Σi, α i)] (s : Finset ι) (t : ∀ i, Finset (α i)) :
     s.sigma t = s.biUnion fun i => (t i).map <| Embedding.sigmaMk i := by

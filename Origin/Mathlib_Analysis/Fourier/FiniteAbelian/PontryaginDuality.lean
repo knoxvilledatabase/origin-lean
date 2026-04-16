@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Fourier/FiniteAbelian/PontryaginDuality.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 8 | Infrastructure: 2
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.AddChar
 import Mathlib.Analysis.Fourier.FiniteAbelian.Orthogonality
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 import Mathlib.GroupTheory.FiniteAbelian.Basic
+
+noncomputable section
 
 /-!
 # Pontryagin duality for finite abelian groups
@@ -71,9 +73,13 @@ def zmodHom : AddChar (ZMod n) (AddChar (ZMod n) Circle) where
   map_zero_eq_one' := by simp
   map_add_eq_mul' := by simp
 
--- DISSOLVED: mkZModAux
+private def mkZModAux {ι : Type} [DecidableEq ι] (n : ι → ℕ) [∀ i, NeZero (n i)]
+    (u : ∀ i, ZMod (n i)) : AddChar (⨁ i, ZMod (n i)) Circle :=
+  AddChar.directSum fun i ↦ zmod (n i) (u i)
 
--- DISSOLVED: mkZModAux_injective
+private lemma mkZModAux_injective {ι : Type} [DecidableEq ι] {n : ι → ℕ} [∀ i, NeZero (n i)] :
+    Injective (mkZModAux n) :=
+  AddChar.directSum_injective.comp fun f g h ↦ by simpa [funext_iff] using h
 
 def circleEquivComplex [Finite α] : AddChar α Circle ≃+ AddChar α ℂ where
   toFun ψ := toMonoidHomEquiv.symm <| coeHom.comp ψ.toMonoidHom
@@ -101,9 +107,6 @@ def zmodAddEquiv : ZMod n ≃+ AddChar (ZMod n) ℂ := by
   rw [Fintype.bijective_iff_injective_and_card, card_eq]
   exact ⟨circleEquivComplex.injective.comp zmod_injective, rfl⟩
 
-@[simp] lemma zmodAddEquiv_apply (x : ZMod n) :
-    zmodAddEquiv x = circleEquivComplex (zmod n x) := rfl
-
 section Finite
 
 variable (α) [Finite α]
@@ -121,7 +124,18 @@ variable {α}
 @[simp]
 lemma complexBasis_apply (ψ : AddChar α ℂ) : complexBasis α ψ = ψ := by rw [coe_complexBasis]
 
--- DISSOLVED: exists_apply_ne_zero
+lemma exists_apply_ne_zero : (∃ ψ : AddChar α ℂ, ψ a ≠ 1) ↔ a ≠ 0 := by
+  refine ⟨?_, fun ha ↦ ?_⟩
+  · rintro ⟨ψ, hψ⟩ rfl
+    exact hψ ψ.map_zero_eq_one
+  classical
+  by_contra! h
+  let f : α → ℂ := fun b ↦ if a = b then 1 else 0
+  have h₀ := congr_fun ((complexBasis α).sum_repr f) 0
+  have h₁ := congr_fun ((complexBasis α).sum_repr f) a
+  simp only [complexBasis_apply, Fintype.sum_apply, Pi.smul_apply, h, smul_eq_mul, mul_one,
+    map_zero_eq_one, if_pos rfl, if_neg ha, f] at h₀ h₁
+  exact one_ne_zero (h₁.symm.trans h₀)
 
 lemma forall_apply_eq_zero : (∀ ψ : AddChar α ℂ, ψ a = 1) ↔ a = 0 := by
   simpa using exists_apply_ne_zero.not
@@ -142,12 +156,10 @@ lemma doubleDualEmb_inj : (doubleDualEmb a : AddChar (AddChar α ℂ) ℂ) = dou
 @[simp] lemma doubleDualEmb_eq_zero : (doubleDualEmb a : AddChar (AddChar α ℂ) ℂ) = 0 ↔ a = 0 := by
   rw [← map_zero doubleDualEmb, doubleDualEmb_inj]
 
--- DISSOLVED: doubleDualEmb_ne_zero
+lemma doubleDualEmb_ne_zero : (doubleDualEmb a : AddChar (AddChar α ℂ) ℂ) ≠ 0 ↔ a ≠ 0 :=
+  doubleDualEmb_eq_zero.not
 
 def doubleDualEquiv : α ≃+ AddChar (AddChar α ℂ) ℂ := .ofBijective _ doubleDualEmb_bijective
-
-@[simp]
-lemma coe_doubleDualEquiv : ⇑(doubleDualEquiv : α ≃+ AddChar (AddChar α ℂ) ℂ) = doubleDualEmb := rfl
 
 @[simp] lemma doubleDualEmb_doubleDualEquiv_symm_apply (a : AddChar (AddChar α ℂ) ℂ) :
     doubleDualEmb (doubleDualEquiv.symm a) = a :=
@@ -166,12 +178,21 @@ lemma expect_apply_eq_ite [Fintype α] [DecidableEq α] (a : α) :
     𝔼 ψ : AddChar α ℂ, ψ a = if a = 0 then 1 else 0 := by
   simpa using expect_eq_ite (doubleDualEmb a : AddChar (AddChar α ℂ) ℂ)
 
--- DISSOLVED: sum_apply_eq_zero_iff_ne_zero
+lemma sum_apply_eq_zero_iff_ne_zero [Finite α] : ∑ ψ : AddChar α ℂ, ψ a = 0 ↔ a ≠ 0 := by
+  classical
+  cases nonempty_fintype α
+  rw [sum_apply_eq_ite, Ne.ite_eq_right_iff]
+  exact Nat.cast_ne_zero.2 Fintype.card_ne_zero
 
--- DISSOLVED: sum_apply_ne_zero_iff_eq_zero
+lemma sum_apply_ne_zero_iff_eq_zero [Finite α] : ∑ ψ : AddChar α ℂ, ψ a ≠ 0 ↔ a = 0 :=
+  sum_apply_eq_zero_iff_ne_zero.not_left
 
--- DISSOLVED: expect_apply_eq_zero_iff_ne_zero
+lemma expect_apply_eq_zero_iff_ne_zero [Finite α] : 𝔼 ψ : AddChar α ℂ, ψ a = 0 ↔ a ≠ 0 := by
+  classical
+  cases nonempty_fintype α
+  rw [expect_apply_eq_ite, one_ne_zero.ite_eq_right_iff]
 
--- DISSOLVED: expect_apply_ne_zero_iff_eq_zero
+lemma expect_apply_ne_zero_iff_eq_zero [Finite α] : 𝔼 ψ : AddChar α ℂ, ψ a ≠ 0 ↔ a = 0 :=
+  expect_apply_eq_zero_iff_ne_zero.not_left
 
 end AddChar

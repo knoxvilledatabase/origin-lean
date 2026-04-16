@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/MeanInequalities.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Expect
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Convex.Jensen
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 import Mathlib.Data.Real.ConjExponents
+
+noncomputable section
 
 /-!
 # Mean value inequalities
@@ -153,11 +155,38 @@ theorem geom_mean_le_arith_mean {ι : Type*} (s : Finset ι) (w : ι → ℝ) (z
   · simp_rw [div_eq_mul_inv, ← Finset.sum_mul]
     exact mul_inv_cancel₀ (by linarith)
 
--- DISSOLVED: geom_mean_weighted_of_constant
+theorem geom_mean_weighted_of_constant (w z : ι → ℝ) (x : ℝ) (hw : ∀ i ∈ s, 0 ≤ w i)
+    (hw' : ∑ i ∈ s, w i = 1) (hz : ∀ i ∈ s, 0 ≤ z i) (hx : ∀ i ∈ s, w i ≠ 0 → z i = x) :
+    ∏ i ∈ s, z i ^ w i = x :=
+  calc
+    ∏ i ∈ s, z i ^ w i = ∏ i ∈ s, x ^ w i := by
+      refine prod_congr rfl fun i hi => ?_
+      rcases eq_or_ne (w i) 0 with h₀ | h₀
+      · rw [h₀, rpow_zero, rpow_zero]
+      · rw [hx i hi h₀]
+    _ = x := by
+      rw [← rpow_sum_of_nonneg _ hw, hw', rpow_one]
+      have : (∑ i ∈ s, w i) ≠ 0 := by
+        rw [hw']
+        exact one_ne_zero
+      obtain ⟨i, his, hi⟩ := exists_ne_zero_of_sum_ne_zero this
+      rw [← hx i his hi]
+      exact hz i his
 
--- DISSOLVED: arith_mean_weighted_of_constant
+theorem arith_mean_weighted_of_constant (w z : ι → ℝ) (x : ℝ) (hw' : ∑ i ∈ s, w i = 1)
+    (hx : ∀ i ∈ s, w i ≠ 0 → z i = x) : ∑ i ∈ s, w i * z i = x :=
+  calc
+    ∑ i ∈ s, w i * z i = ∑ i ∈ s, w i * x := by
+      refine sum_congr rfl fun i hi => ?_
+      rcases eq_or_ne (w i) 0 with hwi | hwi
+      · rw [hwi, zero_mul, zero_mul]
+      · rw [hx i hi hwi]
+    _ = x := by rw [← sum_mul, hw', one_mul]
 
--- DISSOLVED: geom_mean_eq_arith_mean_weighted_of_constant
+theorem geom_mean_eq_arith_mean_weighted_of_constant (w z : ι → ℝ) (x : ℝ) (hw : ∀ i ∈ s, 0 ≤ w i)
+    (hw' : ∑ i ∈ s, w i = 1) (hz : ∀ i ∈ s, 0 ≤ z i) (hx : ∀ i ∈ s, w i ≠ 0 → z i = x) :
+    ∏ i ∈ s, z i ^ w i = ∑ i ∈ s, w i * z i := by
+  rw [geom_mean_weighted_of_constant, arith_mean_weighted_of_constant] <;> assumption
 
 end Real
 

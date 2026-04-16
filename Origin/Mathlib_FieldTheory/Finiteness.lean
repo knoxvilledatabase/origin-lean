@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.Finite
 
+noncomputable section
+
 /-!
 # A module over a division ring is noetherian if and only if it is finite.
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Derivation.AdjointAction
 import Mathlib.Algebra.Lie.Killing
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
+noncomputable section
+
 /-!
 # Derivations of finite dimensional Killing Lie algebras
 

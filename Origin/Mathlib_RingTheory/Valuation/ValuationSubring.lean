@@ -10,6 +10,8 @@ import Mathlib.Algebra.Ring.Action.Field
 import Mathlib.RingTheory.PrimeSpectrum
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 
+noncomputable section
+
 /-!
 
 # Valuation subrings of a field
@@ -122,9 +124,6 @@ instance : Algebra A K :=
 
 instance isLocalRing : IsLocalRing A := ValuationRing.isLocalRing A
 
-@[simp]
-theorem algebraMap_apply (a : A) : algebraMap A K a = a := rfl
-
 instance : IsFractionRing A K where
   map_units' := fun ⟨y, hy⟩ =>
     (Units.mk0 (y : K) fun c => nonZeroDivisors.ne_zero hy <| Subtype.ext c).isUnit
@@ -160,9 +159,6 @@ theorem valuation_le_one_iff (x : K) : A.valuation x ≤ 1 ↔ x ∈ A :=
 
 theorem valuation_eq_iff (x y : K) : A.valuation x = A.valuation y ↔ ∃ a : Aˣ, (a : K) * y = x :=
   Quotient.eq''
-
-theorem valuation_le_iff (x y : K) : A.valuation x ≤ A.valuation y ↔ ∃ a : A, (a : K) * y = x :=
-  Iff.rfl
 
 theorem valuation_surjective : Function.Surjective A.valuation := Quot.mk_surjective
 
@@ -390,9 +386,6 @@ section UnitGroup
 def unitGroup : Subgroup Kˣ :=
   (A.valuation.toMonoidWithZeroHom.toMonoidHom.comp (Units.coeHom K)).ker
 
-@[simp]
-theorem mem_unitGroup_iff (x : Kˣ) : x ∈ A.unitGroup ↔ A.valuation x = 1 := Iff.rfl
-
 def unitGroupMulEquiv : A.unitGroup ≃* Aˣ where
   toFun x :=
     { val := ⟨(x : Kˣ), mem_of_valuation_le_one A _ x.prop.le⟩
@@ -405,14 +398,6 @@ def unitGroupMulEquiv : A.unitGroup ≃* Aˣ where
   left_inv a := by ext; rfl
   right_inv a := by ext; rfl
   map_mul' a b := by ext; rfl
-
-@[simp]
-theorem coe_unitGroupMulEquiv_apply (a : A.unitGroup) :
-    ((A.unitGroupMulEquiv a : A) : K) = ((a : Kˣ) : K) := rfl
-
-@[simp]
-theorem coe_unitGroupMulEquiv_symm_apply (a : Aˣ) : ((A.unitGroupMulEquiv.symm a : Kˣ) : K) = a :=
-  rfl
 
 theorem unitGroup_le_unitGroup {A B : ValuationSubring K} : A.unitGroup ≤ B.unitGroup ↔ A ≤ B := by
   constructor
@@ -568,34 +553,8 @@ theorem coe_mem_principalUnitGroup_iff {x : A.unitGroup} :
   rw [← π.map_one, ← sub_eq_zero, ← π.map_sub, Ideal.Quotient.eq_zero_iff_mem, valuation_lt_one_iff]
   simp [mem_principalUnitGroup_iff]
 
-def principalUnitGroupEquiv :
-    A.principalUnitGroup ≃* (Units.map (IsLocalRing.residue A).toMonoidHom).ker where
-  toFun x :=
-    ⟨A.unitGroupMulEquiv ⟨_, A.principal_units_le_units x.2⟩,
-      A.coe_mem_principalUnitGroup_iff.1 x.2⟩
-  invFun x :=
-    ⟨A.unitGroupMulEquiv.symm x, by
-      rw [A.coe_mem_principalUnitGroup_iff]; simp⟩
-  left_inv x := by simp
-  right_inv x := by simp
-  map_mul' _ _ := rfl
-
-theorem principalUnitGroupEquiv_apply (a : A.principalUnitGroup) :
-    (((principalUnitGroupEquiv A a : Aˣ) : A) : K) = (a : Kˣ) :=
-  rfl
-
-theorem principalUnitGroup_symm_apply (a : (Units.map (IsLocalRing.residue A).toMonoidHom).ker) :
-    ((A.principalUnitGroupEquiv.symm a : Kˣ) : K) = ((a : Aˣ) : A) :=
-  rfl
-
 def unitGroupToResidueFieldUnits : A.unitGroup →* (IsLocalRing.ResidueField A)ˣ :=
   MonoidHom.comp (Units.map <| (Ideal.Quotient.mk _).toMonoidHom) A.unitGroupMulEquiv.toMonoidHom
-
-@[simp]
-theorem coe_unitGroupToResidueFieldUnits_apply (x : A.unitGroup) :
-    (A.unitGroupToResidueFieldUnits x : IsLocalRing.ResidueField A) =
-      Ideal.Quotient.mk _ (A.unitGroupMulEquiv x : A) :=
-  rfl
 
 theorem ker_unitGroupToResidueFieldUnits :
     A.unitGroupToResidueFieldUnits.ker = A.principalUnitGroup.comap A.unitGroup.subtype := by
@@ -620,16 +579,6 @@ def unitsModPrincipalUnitsEquivResidueFieldUnits :
 
 local instance : MulOneClass ({ x // x ∈ unitGroup A } ⧸
   Subgroup.comap (Subgroup.subtype (unitGroup A)) (principalUnitGroup A)) := inferInstance
-
-theorem unitsModPrincipalUnitsEquivResidueFieldUnits_comp_quotientGroup_mk :
-    (A.unitsModPrincipalUnitsEquivResidueFieldUnits : _ ⧸ Subgroup.comap _ _ →* _).comp
-        (QuotientGroup.mk' (A.principalUnitGroup.subgroupOf A.unitGroup)) =
-      A.unitGroupToResidueFieldUnits := rfl
-
-theorem unitsModPrincipalUnitsEquivResidueFieldUnits_comp_quotientGroup_mk_apply
-    (x : A.unitGroup) :
-    A.unitsModPrincipalUnitsEquivResidueFieldUnits.toMonoidHom (QuotientGroup.mk x) =
-      A.unitGroupToResidueFieldUnits x := rfl
 
 end PrincipalUnitGroup
 
@@ -660,9 +609,6 @@ def pointwiseHasSMul : SMul G (ValuationSubring K) where
 scoped[Pointwise] attribute [instance] ValuationSubring.pointwiseHasSMul
 
 open scoped Pointwise
-
-@[simp]
-theorem coe_pointwise_smul (g : G) (S : ValuationSubring K) : ↑(g • S) = g • (S : Set K) := rfl
 
 @[simp]
 theorem pointwise_smul_toSubring (g : G) (S : ValuationSubring K) :
@@ -719,14 +665,8 @@ def comap (A : ValuationSubring L) (f : K →+* L) : ValuationSubring K :=
   { A.toSubring.comap f with mem_or_inv_mem' := fun k => by simp [ValuationSubring.mem_or_inv_mem] }
 
 @[simp]
-theorem coe_comap (A : ValuationSubring L) (f : K →+* L) : (A.comap f : Set K) = f ⁻¹' A := rfl
-
-@[simp]
 theorem mem_comap {A : ValuationSubring L} {f : K →+* L} {x : K} : x ∈ A.comap f ↔ f x ∈ A :=
   Iff.rfl
-
-theorem comap_comap (A : ValuationSubring J) (g : L →+* J) (f : K →+* L) :
-    (A.comap g).comap f = A.comap (g.comp f) := rfl
 
 end
 
@@ -735,8 +675,5 @@ end ValuationSubring
 namespace Valuation
 
 variable {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] (v : Valuation K Γ) (x : Kˣ)
-
-theorem mem_unitGroup_iff : x ∈ v.valuationSubring.unitGroup ↔ v x = 1 :=
-  IsEquiv.eq_one_iff_eq_one (Valuation.isEquiv_valuation_valuationSubring _).symm
 
 end Valuation

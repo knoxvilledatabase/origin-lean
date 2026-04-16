@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/DirectSum/Basic.lean
-Genuine: 41 | Conflates: 0 | Dissolved: 4 | Infrastructure: 11
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.Data.DFinsupp.Sigma
 import Mathlib.Data.DFinsupp.Submonoid
+
+noncomputable section
 
 /-!
 # Direct sum
@@ -65,17 +67,9 @@ instance : AddCommGroup (DirectSum ι β) :=
 
 variable {β}
 
-@[simp]
-theorem sub_apply (g₁ g₂ : ⨁ i, β i) (i : ι) : (g₁ - g₂) i = g₁ i - g₂ i :=
-  rfl
-
 end AddCommGroup
 
 variable [∀ i, AddCommMonoid (β i)]
-
-@[simp]
-theorem zero_apply (i : ι) : (0 : ⨁ i, β i) i = 0 :=
-  rfl
 
 variable {β}
 
@@ -119,13 +113,22 @@ theorem mk_apply_of_not_mem {s : Finset ι} {f : ∀ i : (↑s : Set ι), β i.v
   dsimp only [Finset.coe_sort_coe, mk, AddMonoidHom.coe_mk, ZeroHom.coe_mk, DFinsupp.mk_apply]
   rw [dif_neg hn]
 
--- DISSOLVED: support_zero
+@[simp]
+theorem support_zero [∀ (i : ι) (x : β i), Decidable (x ≠ 0)] : (0 : ⨁ i, β i).support = ∅ :=
+  DFinsupp.support_zero
 
--- DISSOLVED: support_of
+@[simp]
+theorem support_of [∀ (i : ι) (x : β i), Decidable (x ≠ 0)] (i : ι) (x : β i) (h : x ≠ 0) :
+    (of _ i x).support = {i} :=
+  DFinsupp.support_single_ne_zero h
 
--- DISSOLVED: support_of_subset
+theorem support_of_subset [∀ (i : ι) (x : β i), Decidable (x ≠ 0)] {i : ι} {b : β i} :
+    (of _ i b).support ⊆ {i} :=
+  DFinsupp.support_single_subset
 
--- DISSOLVED: sum_support_of
+theorem sum_support_of [∀ (i : ι) (x : β i), Decidable (x ≠ 0)] (x : ⨁ i, β i) :
+    (∑ i ∈ x.support, of β i (x i)) = x :=
+  DFinsupp.sum_single
 
 theorem sum_univ_of [Fintype ι] (x : ⨁ i, β i) :
     ∑ i ∈ Finset.univ, of β i (x i) = x := by

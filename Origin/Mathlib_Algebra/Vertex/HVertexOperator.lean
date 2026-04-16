@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.RingTheory.HahnSeries.Multiplication
 
+noncomputable section
+
 /-!
 # Vertex operators
 In this file we introduce heterogeneous vertex operators using Hahn series.  When `R = ℂ`, `V = W`,
@@ -123,11 +125,6 @@ def comp : HVertexOperator (Γ' ×ₗ Γ) R U W where
     ext g
     simp only [HahnSeries.ofIterate, compHahnSeries_smul, HahnSeries.smul_coeff,
       compHahnSeries_coeff, coeff_apply, Equiv.symm_apply_apply, RingHom.id_apply, of_symm_smul]
-
-@[simp]
-theorem comp_coeff (g : Γ' ×ₗ Γ) :
-    (comp A B).coeff g = A.coeff (ofLex g).2 ∘ₗ B.coeff (ofLex g).1 := by
-  rfl
 
 end Products
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Holor.lean
-Genuine: 37 | Conflates: 0 | Dissolved: 2 | Infrastructure: 13
+Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Module.Pi
+
+noncomputable section
 
 /-!
 # Basic properties of holors
@@ -141,7 +143,9 @@ theorem mul_right_distrib [Distrib α] (x : Holor α ds₁) (y : Holor α ds₁)
 
 -- DISSOLVED: zero_mul
 
--- DISSOLVED: mul_zero
+@[simp]
+nonrec theorem mul_zero {α : Type} [Ring α] (x : Holor α ds₁) : x ⊗ (0 : Holor α ds₂) = 0 :=
+  funext fun t => mul_zero (x (HolorIndex.take t))
 
 theorem mul_scalar_mul [Monoid α] (x : Holor α []) (y : Holor α ds) :
     x ⊗ y = x ⟨[], Forall₂.nil⟩ • y := by

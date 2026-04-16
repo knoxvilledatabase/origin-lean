@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Comp
 import Mathlib.Analysis.Calculus.FDeriv.Equiv
 import Mathlib.Topology.Algebra.Module.Star
 
+noncomputable section
+
 /-!
 # Star operations on derivatives
 

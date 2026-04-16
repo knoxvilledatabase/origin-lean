@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Prod.lean
-Genuine: 90 | Conflates: 0 | Dissolved: 9 | Infrastructure: 22
+Genuine: 93 | Conflates: 0 | Dissolved: 6 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Integral.Lebesgue
 import Mathlib.MeasureTheory.MeasurableSpace.Prod
 import Mathlib.MeasureTheory.Measure.GiryMonad
 import Mathlib.MeasureTheory.Measure.OpenPos
+
+noncomputable section
 
 /-!
 # The product measure
@@ -149,10 +151,6 @@ protected irreducible_def prod (μ : Measure α) (ν : Measure β) : Measure (α
 
 instance prod.measureSpace {α β} [MeasureSpace α] [MeasureSpace β] : MeasureSpace (α × β) where
   volume := volume.prod volume
-
-theorem volume_eq_prod (α β) [MeasureSpace α] [MeasureSpace β] :
-    (volume : Measure (α × β)) = (volume : Measure α).prod (volume : Measure β) :=
-  rfl
 
 variable [SFinite ν]
 
@@ -342,7 +340,13 @@ lemma _root_.MeasureTheory.NullMeasurableSet.prod {s : Set α} {t : Set β}
   let ⟨t₀, mble_t₀, t_aeeq_t₀⟩ := t_mble
   ⟨s₀ ×ˢ t₀, ⟨mble_s₀.prod mble_t₀, set_prod_ae_eq s_aeeq_s₀ t_aeeq_t₀⟩⟩
 
--- DISSOLVED: _root_.MeasureTheory.NullMeasurableSet.right_of_prod
+lemma _root_.MeasureTheory.NullMeasurableSet.right_of_prod {s : Set α} {t : Set β}
+    (h : NullMeasurableSet (s ×ˢ t) (μ.prod ν)) (hs : μ s ≠ 0) : NullMeasurableSet t ν := by
+  rcases h with ⟨u, hum, hu⟩
+  obtain ⟨x, hxs, hx⟩ : ∃ x ∈ s, (Prod.mk x ⁻¹' (s ×ˢ t)) =ᵐ[ν] (Prod.mk x ⁻¹' u) :=
+    ((frequently_ae_iff.2 hs).and_eventually (ae_ae_eq_curry_of_prod hu)).exists
+  refine ⟨Prod.mk x ⁻¹' u, measurable_prod_mk_left hum, ?_⟩
+  rwa [mk_preimage_prod_right hxs] at hx
 
 -- DISSOLVED: _root_.MeasureTheory.NullMeasurableSet.of_preimage_snd
 
@@ -453,7 +457,11 @@ theorem ae_ae_comm {p : α → β → Prop} (h : MeasurableSet {x : α × β | p
   _ ↔ ∀ᵐ x ∂ν.prod μ, p x.2 x.1 := by rw [← prod_swap, ae_map_iff (by fun_prop) h]; rfl
   _ ↔ ∀ᵐ y ∂ν, ∀ᵐ x ∂μ, p x y := ae_prod_iff_ae_ae <| measurable_swap h
 
--- DISSOLVED: _root_.MeasureTheory.NullMeasurableSet.left_of_prod
+lemma _root_.MeasureTheory.NullMeasurableSet.left_of_prod {s : Set α} {t : Set β}
+    (h : NullMeasurableSet (s ×ˢ t) (μ.prod ν)) (ht : ν t ≠ 0) : NullMeasurableSet s μ := by
+  refine .right_of_prod ?_ ht
+  rw [← preimage_swap_prod]
+  exact h.preimage measurePreserving_swap.quasiMeasurePreserving
 
 -- DISSOLVED: _root_.MeasureTheory.NullMeasurableSet.of_preimage_fst
 
@@ -461,7 +469,9 @@ theorem ae_ae_comm {p : α → β → Prop} (h : MeasurableSet {x : α × β | p
 
 -- DISSOLVED: nullMeasurable_comp_fst
 
--- DISSOLVED: nullMeasurableSet_prod_of_ne_zero
+lemma nullMeasurableSet_prod_of_ne_zero {s : Set α} {t : Set β} (hs : μ s ≠ 0) (ht : ν t ≠ 0) :
+    NullMeasurableSet (s ×ˢ t) (μ.prod ν) ↔ NullMeasurableSet s μ ∧ NullMeasurableSet t ν :=
+  ⟨fun h ↦ ⟨h.left_of_prod ht, h.right_of_prod hs⟩, fun ⟨hs, ht⟩ ↦ hs.prod ht⟩
 
 lemma nullMeasurableSet_prod {s : Set α} {t : Set β} :
     NullMeasurableSet (s ×ˢ t) (μ.prod ν) ↔

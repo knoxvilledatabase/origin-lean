@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Calculus/FormalMultilinearSeries.lean
-Genuine: 26 | Conflates: 2 | Dissolved: 8 | Infrastructure: 14
+Genuine: 33 | Conflates: 3 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Multilinear.Curry
+
+noncomputable section
 
 /-!
 # Formal multilinear series
@@ -63,9 +65,6 @@ namespace FormalMultilinearSeries
 @[simp, nolint simpNF]
 theorem zero_apply (n : ℕ) : (0 : FormalMultilinearSeries 𝕜 E F) n = 0 := rfl
 
-@[simp]
-theorem neg_apply (f : FormalMultilinearSeries 𝕜 E F) (n : ℕ) : (-f) n = - f n := rfl
-
 @[ext]
 protected theorem ext {p q : FormalMultilinearSeries 𝕜 E F} (h : ∀ n, p n = q n) : p = q :=
   funext h
@@ -88,15 +87,6 @@ def removeZero (p : FormalMultilinearSeries 𝕜 E F) : FormalMultilinearSeries 
   | 0 => 0
   | n + 1 => p (n + 1)
 
-@[simp]
-theorem removeZero_coeff_zero (p : FormalMultilinearSeries 𝕜 E F) : p.removeZero 0 = 0 :=
-  rfl
-
-@[simp]
-theorem removeZero_coeff_succ (p : FormalMultilinearSeries 𝕜 E F) (n : ℕ) :
-    p.removeZero (n + 1) = p (n + 1) :=
-  rfl
-
 theorem removeZero_of_pos (p : FormalMultilinearSeries 𝕜 E F) {n : ℕ} (h : 0 < n) :
     p.removeZero n = p n := by
   rw [← Nat.succ_pred_eq_of_pos h]
@@ -111,11 +101,6 @@ theorem congr (p : FormalMultilinearSeries 𝕜 E F) {m n : ℕ} {v : Fin m → 
 
 def compContinuousLinearMap (p : FormalMultilinearSeries 𝕜 F G) (u : E →L[𝕜] F) :
     FormalMultilinearSeries 𝕜 E G := fun n => (p n).compContinuousLinearMap fun _ : Fin n => u
-
-@[simp]
-theorem compContinuousLinearMap_apply (p : FormalMultilinearSeries 𝕜 F G) (u : E →L[𝕜] F) (n : ℕ)
-    (v : Fin n → E) : (p.compContinuousLinearMap u) n v = p n (u ∘ v) :=
-  rfl
 
 variable (𝕜) [Ring 𝕜'] [SMul 𝕜 𝕜']
 
@@ -158,15 +143,6 @@ namespace ContinuousLinearMap
 def compFormalMultilinearSeries (f : F →L[𝕜] G) (p : FormalMultilinearSeries 𝕜 E F) :
     FormalMultilinearSeries 𝕜 E G := fun n => f.compContinuousMultilinearMap (p n)
 
-@[simp]
-theorem compFormalMultilinearSeries_apply (f : F →L[𝕜] G) (p : FormalMultilinearSeries 𝕜 E F)
-    (n : ℕ) : (f.compFormalMultilinearSeries p) n = f.compContinuousMultilinearMap (p n) :=
-  rfl
-
-theorem compFormalMultilinearSeries_apply' (f : F →L[𝕜] G) (p : FormalMultilinearSeries 𝕜 E F)
-    (n : ℕ) (v : Fin n → E) : (f.compFormalMultilinearSeries p) n v = f (p n v) :=
-  rfl
-
 end ContinuousLinearMap
 
 namespace ContinuousMultilinearMap
@@ -199,19 +175,27 @@ noncomputable def order (p : FormalMultilinearSeries 𝕜 E F) : ℕ :=
 @[simp]
 theorem order_zero : (0 : FormalMultilinearSeries 𝕜 E F).order = 0 := by simp [order]
 
--- DISSOLVED: ne_zero_of_order_ne_zero
+theorem ne_zero_of_order_ne_zero (hp : p.order ≠ 0) : p ≠ 0 := fun h => by simp [h] at hp
 
--- DISSOLVED: order_eq_find
+theorem order_eq_find [DecidablePred fun n => p n ≠ 0] (hp : ∃ n, p n ≠ 0) :
+    p.order = Nat.find hp := by convert Nat.sInf_def hp
 
--- DISSOLVED: order_eq_find'
+theorem order_eq_find' [DecidablePred fun n => p n ≠ 0] (hp : p ≠ 0) :
+    p.order = Nat.find (FormalMultilinearSeries.ne_iff.mp hp) :=
+  order_eq_find _
 
--- DISSOLVED: order_eq_zero_iff'
+theorem order_eq_zero_iff' : p.order = 0 ↔ p = 0 ∨ p 0 ≠ 0 := by
+  simpa [order, Nat.sInf_eq_zero, FormalMultilinearSeries.ext_iff, eq_empty_iff_forall_not_mem]
+    using or_comm
 
--- DISSOLVED: order_eq_zero_iff
+theorem order_eq_zero_iff (hp : p ≠ 0) : p.order = 0 ↔ p 0 ≠ 0 := by
+  simp [order_eq_zero_iff', hp]
 
--- DISSOLVED: apply_order_ne_zero
+theorem apply_order_ne_zero (hp : p ≠ 0) : p p.order ≠ 0 :=
+  Nat.sInf_mem (FormalMultilinearSeries.ne_iff.1 hp)
 
--- DISSOLVED: apply_order_ne_zero'
+theorem apply_order_ne_zero' (hp : p.order ≠ 0) : p p.order ≠ 0 :=
+  apply_order_ne_zero (ne_zero_of_order_ne_zero hp)
 
 theorem apply_eq_zero_of_lt_order (hp : n < p.order) : p n = 0 :=
   by_contra <| Nat.not_mem_of_lt_sInf hp
@@ -237,8 +221,6 @@ theorem apply_eq_prod_smul_coeff : p n y = (∏ i, y i) • p.coeff n := by
 
 theorem coeff_eq_zero : p.coeff n = 0 ↔ p n = 0 := by
   rw [← mkPiRing_coeff_eq p, ContinuousMultilinearMap.mkPiRing_eq_zero_iff]
-
-theorem apply_eq_pow_smul_coeff : (p n fun _ => z) = z ^ n • p.coeff n := by simp
 
 @[simp]
 theorem norm_apply_eq_norm_coef : ‖p n‖ = ‖coeff p n‖ := by
@@ -280,7 +262,12 @@ def constFormalMultilinearSeries (𝕜 : Type*) [NontriviallyNormedField 𝕜] (
   | 0 => ContinuousMultilinearMap.uncurry0 _ _ c
   | _ => 0
 
--- DISSOLVED: constFormalMultilinearSeries_apply
+-- CONFLATES (assumes ground = zero): constFormalMultilinearSeries_apply
+@[simp]
+theorem constFormalMultilinearSeries_apply [NontriviallyNormedField 𝕜] [NormedAddCommGroup E]
+    [NormedAddCommGroup F] [NormedSpace 𝕜 E] [NormedSpace 𝕜 F] {c : F} {n : ℕ} (hn : n ≠ 0) :
+    constFormalMultilinearSeries 𝕜 E c n = 0 :=
+  Nat.casesOn n (fun hn => (hn rfl).elim) (fun _ _ => rfl) hn
 
 -- CONFLATES (assumes ground = zero): constFormalMultilinearSeries_zero
 @[simp]
@@ -308,20 +295,6 @@ def fpowerSeries (f : E →L[𝕜] F) (x : E) : FormalMultilinearSeries 𝕜 E F
   | 0 => ContinuousMultilinearMap.uncurry0 𝕜 _ (f x)
   | 1 => (continuousMultilinearCurryFin1 𝕜 E F).symm f
   | _ => 0
-
-@[simp]
-theorem fpowerSeries_apply_zero (f : E →L[𝕜] F) (x : E) :
-    f.fpowerSeries x 0 = ContinuousMultilinearMap.uncurry0 𝕜 _ (f x) :=
-  rfl
-
-@[simp]
-theorem fpowerSeries_apply_one (f : E →L[𝕜] F) (x : E) :
-    f.fpowerSeries x 1 = (continuousMultilinearCurryFin1 𝕜 E F).symm f :=
-  rfl
-
-@[simp]
-theorem fpowerSeries_apply_add_two (f : E →L[𝕜] F) (x : E) (n : ℕ) : f.fpowerSeries x (n + 2) = 0 :=
-  rfl
 
 end ContinuousLinearMap
 

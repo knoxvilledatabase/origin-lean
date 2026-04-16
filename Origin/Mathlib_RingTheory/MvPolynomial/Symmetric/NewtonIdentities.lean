@@ -10,6 +10,8 @@ import Mathlib.Data.Finset.Card
 import Mathlib.Data.Fintype.Basic
 import Mathlib.RingTheory.MvPolynomial.Symmetric.Defs
 
+noncomputable section
+
 /-!
 # Newton's Identities
 

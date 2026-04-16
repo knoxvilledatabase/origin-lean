@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
 
+noncomputable section
+
 /-!
 # Affine map restrictions
 
@@ -53,11 +55,6 @@ theorem AffineMap.restrict.linear_aux {φ : P₁ →ᵃ[k] P₂} {E : AffineSubs
     {F : AffineSubspace k P₂} (hEF : E.map φ ≤ F) : E.direction ≤ F.direction.comap φ.linear := by
   rw [← Submodule.map_le_iff_le_comap, ← AffineSubspace.map_direction]
   exact AffineSubspace.direction_le hEF
-
-theorem AffineMap.restrict.linear (φ : P₁ →ᵃ[k] P₂) {E : AffineSubspace k P₁}
-    {F : AffineSubspace k P₂} [Nonempty E] [Nonempty F] (hEF : E.map φ ≤ F) :
-    (φ.restrict hEF).linear = φ.linear.restrict (AffineMap.restrict.linear_aux hEF) :=
-  rfl
 
 theorem AffineMap.restrict.injective {φ : P₁ →ᵃ[k] P₂} (hφ : Function.Injective φ)
     {E : AffineSubspace k P₁} {F : AffineSubspace k P₂} [Nonempty E] [Nonempty F]

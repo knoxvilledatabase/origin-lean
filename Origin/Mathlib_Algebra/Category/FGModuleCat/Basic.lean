@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Coevaluation
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 import Mathlib.RingTheory.Finiteness.TensorProduct
 
+noncomputable section
+
 /-!
 # The category of finitely generated modules over a ring
 
@@ -51,8 +53,6 @@ instance : CoeSort (FGModuleCat R) (Type u) :=
   ⟨FGModuleCat.carrier⟩
 
 attribute [coe] FGModuleCat.carrier
-
-@[simp] lemma obj_carrier (M : FGModuleCat R) : M.obj.carrier = M.carrier := rfl
 
 instance (M : FGModuleCat R) : AddCommGroup M := by
   change AddCommGroup M.obj
@@ -143,10 +143,6 @@ instance instMonoidalCategory : MonoidalCategory (FGModuleCat R) := by
 
 open MonoidalCategory
 
-@[simp] lemma tensorUnit_obj : (𝟙_ (FGModuleCat R)).obj = 𝟙_ (ModuleCat R) := rfl
-
-@[simp] lemma tensorObj_obj (M N : FGModuleCat.{u} R) : (M ⊗ N).obj = (M.obj ⊗ N.obj) := rfl
-
 instance : SymmetricCategory (FGModuleCat R) := by
   dsimp [FGModuleCat]
   infer_instance
@@ -165,10 +161,6 @@ instance : (forget₂ (FGModuleCat.{u} R) (ModuleCat.{u} R)).Monoidal :=
 instance : (forget₂ (FGModuleCat.{u} R) (ModuleCat.{u} R)).Additive where
 
 instance : (forget₂ (FGModuleCat.{u} R) (ModuleCat.{u} R)).Linear R where
-
-theorem Iso.conj_eq_conj {V W : FGModuleCat R} (i : V ≅ W) (f : End V) :
-    Iso.conj i f = LinearEquiv.conj (isoToLinearEquiv i) f :=
-  rfl
 
 end CommRing
 
@@ -191,17 +183,8 @@ instance : MonoidalClosed (FGModuleCat K) := by
 
 variable (V W : FGModuleCat K)
 
-@[simp]
-theorem ihom_obj : (ihom V).obj W = FGModuleCat.of K (V →ₗ[K] W) :=
-  rfl
-
 def FGModuleCatDual : FGModuleCat K :=
   ⟨ModuleCat.of K (Module.Dual K V), Subspace.instModuleDualFiniteDimensional⟩
-
-@[simp] lemma FGModuleCatDual_obj : (FGModuleCatDual K V).obj = ModuleCat.of K (Module.Dual K V) :=
-  rfl
-
-@[simp] lemma FGModuleCatDual_coe : (FGModuleCatDual K V : Type u) = Module.Dual K V := rfl
 
 open CategoryTheory.MonoidalCategory
 

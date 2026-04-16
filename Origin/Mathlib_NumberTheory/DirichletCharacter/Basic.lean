@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/DirichletCharacter/Basic.lean
-Genuine: 44 | Conflates: 0 | Dissolved: 11 | Infrastructure: 10
+Genuine: 48 | Conflates: 0 | Dissolved: 7 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.EvenFunction
 import Mathlib.Data.ZMod.Units
 import Mathlib.NumberTheory.MulChar.Basic
+
+noncomputable section
 
 /-!
 # Dirichlet Characters
@@ -37,12 +39,6 @@ open MulChar
 variable {R : Type*} [CommMonoidWithZero R] {n : ℕ} (χ : DirichletCharacter R n)
 
 namespace DirichletCharacter
-
-lemma toUnitHom_eq_char' {a : ZMod n} (ha : IsUnit a) : χ a = χ.toUnitHom ha.unit := by simp
-
-lemma toUnitHom_eq_iff (ψ : DirichletCharacter R n) : toUnitHom χ = toUnitHom ψ ↔ χ = ψ := by simp
-
-lemma eval_modulus_sub (x : ZMod n) : χ (n - x) = χ (-x) := by simp
 
 /-!
 ### Changing levels
@@ -95,7 +91,6 @@ variable {χ}
 lemma dvd {d : ℕ} (h : FactorsThrough χ d) : d ∣ n := h.1
 
 noncomputable
-
 def χ₀ {d : ℕ} (h : FactorsThrough χ d) : DirichletCharacter R d := Classical.choose h.2
 
 lemma eq_changeLevel {d : ℕ} (h : FactorsThrough χ d) : χ = changeLevel h.dvd h.χ₀ :=
@@ -164,13 +159,22 @@ lemma conductor_dvd_level : conductor χ ∣ n := (conductor_mem_conductorSet χ
 
 lemma factorsThrough_conductor : FactorsThrough χ (conductor χ) := conductor_mem_conductorSet χ
 
--- DISSOLVED: conductor_ne_zero
+lemma conductor_ne_zero (hn : n ≠ 0) : conductor χ ≠ 0 :=
+  fun h ↦ hn <| Nat.eq_zero_of_zero_dvd <| h ▸ conductor_dvd_level _
 
--- DISSOLVED: conductor_one
+lemma conductor_one (hn : n ≠ 0) : conductor (1 : DirichletCharacter R n) = 1 := by
+  suffices FactorsThrough (1 : DirichletCharacter R n) 1 by
+    have h : conductor (1 : DirichletCharacter R n) ≤ 1 :=
+      Nat.sInf_le <| (mem_conductorSet_iff _).mpr this
+    exact Nat.le_antisymm h (Nat.pos_of_ne_zero <| conductor_ne_zero _ hn)
+  exact (factorsThrough_one_iff _).mpr rfl
 
 variable {χ}
 
--- DISSOLVED: eq_one_iff_conductor_eq_one
+lemma eq_one_iff_conductor_eq_one (hn : n ≠ 0) : χ = 1 ↔ conductor χ = 1 := by
+  refine ⟨fun h ↦ h ▸ conductor_one hn, fun hχ ↦ ?_⟩
+  obtain ⟨h', χ₀, h⟩ := factorsThrough_conductor χ
+  exact (level_one' χ₀ hχ ▸ h).trans <| changeLevel_one h'
 
 lemma conductor_eq_zero_iff_level_eq_zero : conductor χ = 0 ↔ n = 0 := by
   refine ⟨(conductor_ne_zero χ).mtr, ?_⟩
@@ -212,7 +216,11 @@ lemma primitiveCharacter_isPrimitive : IsPrimitive (χ.primitiveCharacter) := by
   · exact le_antisymm (Nat.le_of_dvd (Nat.pos_of_ne_zero h) (conductor_dvd_level _)) <|
       conductor_le_conductor_mem_conductorSet <| conductor_mem_conductorSet χ
 
--- DISSOLVED: primitiveCharacter_one
+lemma primitiveCharacter_one (hn : n ≠ 0) :
+    (1 : DirichletCharacter R n).primitiveCharacter = 1 := by
+  rw [eq_one_iff_conductor_eq_one <| (@conductor_one R _ _ hn) ▸ Nat.one_ne_zero,
+      (isPrimitive_def _).1 (1 : DirichletCharacter R n).primitiveCharacter_isPrimitive,
+      conductor_one hn]
 
 noncomputable def mul {m : ℕ} (χ₁ : DirichletCharacter R n) (χ₂ : DirichletCharacter R m) :
     DirichletCharacter R (Nat.lcm n m) :=
@@ -221,10 +229,6 @@ noncomputable def mul {m : ℕ} (χ₁ : DirichletCharacter R n) (χ₂ : Dirich
 noncomputable def primitive_mul {m : ℕ} (χ₁ : DirichletCharacter R n)
     (χ₂ : DirichletCharacter R m) : DirichletCharacter R (mul χ₁ χ₂).conductor :=
   primitiveCharacter (mul χ₁ χ₂)
-
-lemma mul_def {n m : ℕ} {χ : DirichletCharacter R n} {ψ : DirichletCharacter R m} :
-    χ.primitive_mul ψ = primitiveCharacter (mul χ ψ) :=
-  rfl
 
 lemma primitive_mul_isPrimitive {m : ℕ} (ψ : DirichletCharacter R m) :
     IsPrimitive (primitive_mul χ ψ) :=

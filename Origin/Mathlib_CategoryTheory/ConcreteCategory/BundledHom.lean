@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/ConcreteCategory/BundledHom.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.ConcreteCategory.Bundled
+
+noncomputable section
 
 /-!
 # Category instances for algebraic structures that use bundled homs.
@@ -49,6 +51,13 @@ namespace BundledHom
 variable [𝒞 : BundledHom hom]
 
 set_option synthInstance.checkSynthOrder false in
+/-- Every `@BundledHom c _` defines a category with objects in `Bundled c`.
+
+This instance generates the type-class problem `BundledHom ?m`.
+
+Currently that is not a problem, as there are almost no instances of `BundledHom`.
+
+-/
 
 instance category : Category (Bundled c) where
   Hom := fun X Y => hom X.str Y.str

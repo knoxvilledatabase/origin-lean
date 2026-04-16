@@ -7,6 +7,8 @@ import Mathlib.Tactic.CategoryTheory.Monoidal.Basic
 import Mathlib.CategoryTheory.Closed.Monoidal
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Rigid (autonomous) monoidal categories
 
@@ -93,6 +95,10 @@ def coevaluation : 𝟙_ C ⟶ X ⊗ Y := @coevaluation' _ _ _ X Y _
 
 def evaluation : Y ⊗ X ⟶ 𝟙_ C := @evaluation' _ _ _ X Y _
 
+@[inherit_doc] notation "η_" => ExactPairing.coevaluation
+
+@[inherit_doc] notation "ε_" => ExactPairing.evaluation
+
 lemma coevaluation_evaluation :
     Y ◁ η_ _ _ ≫ (α_ _ _ _).inv ≫ ε_ X _ ▷ Y = (ρ_ Y).hom ≫ (λ_ Y).inv :=
   coevaluation_evaluation'
@@ -137,6 +143,10 @@ attribute [instance] HasLeftDual.exact
 
 open ExactPairing HasRightDual HasLeftDual MonoidalCategory
 
+@[inherit_doc] prefix:1024 "ᘁ" => leftDual
+
+@[inherit_doc] postfix:1024 "ᘁ" => rightDual
+
 instance hasRightDualUnit : HasRightDual (𝟙_ C) where
   rightDual := 𝟙_ C
 
@@ -149,19 +159,15 @@ instance hasRightDualLeftDual {X : C} [HasLeftDual X] : HasRightDual ᘁX where
 instance hasLeftDualRightDual {X : C} [HasRightDual X] : HasLeftDual Xᘁ where
   leftDual := X
 
-@[simp]
-theorem leftDual_rightDual {X : C} [HasRightDual X] : ᘁXᘁ = X :=
-  rfl
-
-@[simp]
-theorem rightDual_leftDual {X : C} [HasLeftDual X] : (ᘁX)ᘁ = X :=
-  rfl
-
 def rightAdjointMate {X Y : C} [HasRightDual X] [HasRightDual Y] (f : X ⟶ Y) : Yᘁ ⟶ Xᘁ :=
   (ρ_ _).inv ≫ _ ◁ η_ _ _ ≫ _ ◁ f ▷ _ ≫ (α_ _ _ _).inv ≫ ε_ _ _ ▷ _ ≫ (λ_ _).hom
 
 def leftAdjointMate {X Y : C} [HasLeftDual X] [HasLeftDual Y] (f : X ⟶ Y) : ᘁY ⟶ ᘁX :=
   (λ_ _).inv ≫ η_ (ᘁX) X ▷ _ ≫ (_ ◁ f) ▷ _ ≫ (α_ _ _ _).hom ≫ _ ◁ ε_ _ _ ≫ (ρ_ _).hom
+
+@[inherit_doc] notation f "ᘁ" => rightAdjointMate f
+
+@[inherit_doc] notation "ᘁ" f => leftAdjointMate f
 
 @[simp]
 theorem rightAdjointMate_id {X : C} [HasRightDual X] : (𝟙 X)ᘁ = 𝟙 (Xᘁ) := by

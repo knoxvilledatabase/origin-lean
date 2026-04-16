@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ShortComplex.Basic
 import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts
 import Mathlib.CategoryTheory.Triangulated.TriangleShift
 
+noncomputable section
+
 /-!
 # Pretriangulated Categories
 

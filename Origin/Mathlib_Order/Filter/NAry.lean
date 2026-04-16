@@ -5,6 +5,8 @@ Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Order.Filter.Prod
 
+noncomputable section
+
 /-!
 # N-ary maps of filter
 
@@ -34,10 +36,6 @@ variable {α α' β β' γ γ' δ δ' ε ε' : Type*} {m : α → β → γ} {f 
 def map₂ (m : α → β → γ) (f : Filter α) (g : Filter β) : Filter γ :=
   ((f ×ˢ g).map (uncurry m)).copy { s | ∃ u ∈ f, ∃ v ∈ g, image2 m u v ⊆ s } fun _ ↦ by
     simp only [mem_map, mem_prod_iff, image2_subset_iff, prod_subset_iff]; rfl
-
-@[simp 900]
-theorem mem_map₂_iff : u ∈ map₂ m f g ↔ ∃ s ∈ f, ∃ t ∈ g, image2 m s t ⊆ u :=
-  Iff.rfl
 
 theorem image2_mem_map₂ (hs : s ∈ f) (ht : t ∈ g) : image2 m s t ∈ map₂ m f g :=
   ⟨_, hs, _, ht, Subset.rfl⟩

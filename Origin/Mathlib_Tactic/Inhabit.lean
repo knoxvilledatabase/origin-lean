@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Tactic.ElabTerm
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 Defines the `inhabit α` tactic, which tries to construct an `Inhabited α` instance,
 constructively or otherwise.

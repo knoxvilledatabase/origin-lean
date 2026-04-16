@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Calculus/TangentCone.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Topology
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
+
+noncomputable section
 
 /-!
 # Tangent cone
@@ -68,7 +70,12 @@ section TangentCone
 
 open NormedField
 
--- DISSOLVED: mem_tangentConeAt_of_pow_smul
+theorem mem_tangentConeAt_of_pow_smul {r : 𝕜} (hr₀ : r ≠ 0) (hr : ‖r‖ < 1)
+    (hs : ∀ᶠ n : ℕ in atTop, x + r ^ n • y ∈ s) : y ∈ tangentConeAt 𝕜 s x := by
+  refine ⟨fun n ↦ (r ^ n)⁻¹, fun n ↦ r ^ n • y, hs, ?_, ?_⟩
+  · simp only [norm_inv, norm_pow, ← inv_pow]
+    exact tendsto_pow_atTop_atTop_of_one_lt <| (one_lt_inv₀ (norm_pos_iff.2 hr₀)).2 hr
+  · simp only [inv_smul_smul₀ (pow_ne_zero _ hr₀), tendsto_const_nhds]
 
 theorem tangentCone_univ : tangentConeAt 𝕜 univ x = univ :=
   let ⟨_r, hr₀, hr⟩ := exists_norm_lt_one 𝕜

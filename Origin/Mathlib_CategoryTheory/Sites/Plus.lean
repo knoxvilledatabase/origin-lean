@@ -5,6 +5,8 @@ Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf
 
+noncomputable section
+
 /-!
 
 # The plus construction for presheaves.
@@ -246,10 +248,6 @@ theorem isIso_toPlus_of_isSheaf (hP : Presheaf.IsSheaf J P) : IsIso (J.toPlus P)
 def isoToPlus (hP : Presheaf.IsSheaf J P) : P ≅ J.plusObj P :=
   letI := isIso_toPlus_of_isSheaf J P hP
   asIso (J.toPlus P)
-
-@[simp]
-theorem isoToPlus_hom (hP : Presheaf.IsSheaf J P) : (J.isoToPlus P hP).hom = J.toPlus P :=
-  rfl
 
 def plusLift {P Q : Cᵒᵖ ⥤ D} (η : P ⟶ Q) (hQ : Presheaf.IsSheaf J Q) : J.plusObj P ⟶ Q :=
   J.plusMap η ≫ (J.isoToPlus Q hQ).inv

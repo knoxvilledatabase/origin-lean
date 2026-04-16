@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Localization/CalculusOfFractions/Preadditive.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.CalculusOfFractions.Fractions
 import Mathlib.CategoryTheory.Localization.HasLocalization
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.Logic.Equiv.TransferInstance
+
+noncomputable section
 
 /-!
 # The preadditive category structure on the localized category
@@ -307,7 +309,6 @@ lemma functor_additive :
 attribute [irreducible] preadditive
 
 include W in
-
 lemma functor_additive_iff {E : Type*} [Category E] [Preadditive E] [Preadditive D] [L.Additive]
     (G : D ⥤ E) :
     G.Additive ↔ (L ⋙ G).Additive := by

@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/FreeCommRing.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Equiv
 import Mathlib.Algebra.MvPolynomial.CommRing
 import Mathlib.Logic.Equiv.Functor
 import Mathlib.RingTheory.FreeRing
+
+noncomputable section
 
 /-!
 # Free commutative rings
@@ -77,12 +79,15 @@ theorem of_injective : Function.Injective (of : α → FreeCommRing α) :=
   FreeAbelianGroup.of_injective.comp fun _ _ =>
     (Multiset.coe_eq_coe.trans List.singleton_perm_singleton).mp
 
--- DISSOLVED: of_ne_zero
+@[simp]
+theorem of_ne_zero (x : α) : of x ≠ 0 := FreeAbelianGroup.of_ne_zero _
 
 @[simp]
 theorem zero_ne_of (x : α) : 0 ≠ of x := FreeAbelianGroup.zero_ne_of _
 
--- DISSOLVED: of_ne_one
+@[simp]
+theorem of_ne_one (x : α) : of x ≠ 1 :=
+  FreeAbelianGroup.of_injective.ne <| Multiset.singleton_ne_zero _
 
 @[simp]
 theorem one_ne_of (x : α) : 1 ≠ of x :=
@@ -283,12 +288,6 @@ instance FreeCommRing.instCoe : Coe (FreeRing α) (FreeCommRing α) :=
 
 def coeRingHom : FreeRing α →+* FreeCommRing α :=
   toFreeCommRing
-
-@[simp, norm_cast]
-protected theorem coe_zero : ↑(0 : FreeRing α) = (0 : FreeCommRing α) := rfl
-
-@[simp, norm_cast]
-protected theorem coe_one : ↑(1 : FreeRing α) = (1 : FreeCommRing α) := rfl
 
 variable {α}
 

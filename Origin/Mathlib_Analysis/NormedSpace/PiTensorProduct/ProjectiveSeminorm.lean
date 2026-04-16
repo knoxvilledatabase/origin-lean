@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.NormedSpace.Multilinear.Basic
 import Mathlib.LinearAlgebra.PiTensorProduct
 
+noncomputable section
+
 /-!
 # Projective seminorm on the tensor of a finite family of normed spaces.
 

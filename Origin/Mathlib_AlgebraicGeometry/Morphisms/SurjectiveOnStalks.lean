@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.RingHomProperties
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.TensorProduct
 import Mathlib.Topology.LocalAtTarget
 
+noncomputable section
+
 /-!
 # Morphisms surjective on stalks
 

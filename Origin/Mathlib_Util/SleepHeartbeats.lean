@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.Tactic.Basic
 
+noncomputable section
+
 /-!
 # Defines `sleep_heartbeats` tactic.
 
@@ -21,11 +23,10 @@ def sleepAtLeastHeartbeats (n : Nat) : IO Unit := do
     continue
 
 elab "sleep_heartbeats " n:num : tactic => do
-
   match Syntax.isNatLit? n with
-
   | none    => throwIllFormedSyntax
-
+  /- as this is a user facing command we multiply the user input by 1000 to match the maxHeartbeats
+     option -/
   | some m => sleepAtLeastHeartbeats (m * 1000)
 
 example : 1 = 1 := by

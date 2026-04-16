@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.LinearPMap
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Partially defined linear operators over topological vector spaces
 
@@ -132,18 +134,6 @@ structure HasCore (f : E →ₗ.[R] F) (S : Submodule R E) : Prop where
 theorem hasCore_def {f : E →ₗ.[R] F} {S : Submodule R E} (h : f.HasCore S) :
     (f.domRestrict S).closure = f :=
   h.2
-
-theorem closureHasCore (f : E →ₗ.[R] F) : f.closure.HasCore f.domain := by
-  refine ⟨f.le_closure.1, ?_⟩
-  congr
-  ext x y hxy
-  · simp only [domRestrict_domain, Submodule.mem_inf, and_iff_left_iff_imp]
-    intro hx
-    exact f.le_closure.1 hx
-  let z : f.closure.domain := ⟨y.1, f.le_closure.1 y.2⟩
-  have hyz : (y : E) = z := by simp
-  rw [f.le_closure.2 hyz]
-  exact domRestrict_apply (hxy.trans hyz)
 
 /-! ### Topological properties of the inverse -/
 

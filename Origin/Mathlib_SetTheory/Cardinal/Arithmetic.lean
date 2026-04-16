@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Cardinal/Arithmetic.lean
-Genuine: 101 | Conflates: 0 | Dissolved: 10 | Infrastructure: 1
+Genuine: 111 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Aleph
 import Mathlib.SetTheory.Ordinal.Principal
 import Mathlib.Tactic.Linarith
+
+noncomputable section
 
 /-!
 # Cardinal arithmetic
@@ -131,12 +133,23 @@ theorem mul_le_max_of_aleph0_le_left {a b : Cardinal} (h : ℵ₀ ≤ a) : a * b
   rw [mul_eq_self]
   exact h.trans (le_max_left a b)
 
--- DISSOLVED: mul_eq_max_of_aleph0_le_left
+theorem mul_eq_max_of_aleph0_le_left {a b : Cardinal} (h : ℵ₀ ≤ a) (h' : b ≠ 0) :
+    a * b = max a b := by
+  rcases le_or_lt ℵ₀ b with hb | hb
+  · exact mul_eq_max h hb
+  refine (mul_le_max_of_aleph0_le_left h).antisymm ?_
+  have : b ≤ a := hb.le.trans h
+  rw [max_eq_left this]
+  convert mul_le_mul_left' (one_le_iff_ne_zero.mpr h') a
+  rw [mul_one]
 
 theorem mul_le_max_of_aleph0_le_right {a b : Cardinal} (h : ℵ₀ ≤ b) : a * b ≤ max a b := by
   simpa only [mul_comm b, max_comm b] using mul_le_max_of_aleph0_le_left h
 
--- DISSOLVED: mul_eq_max_of_aleph0_le_right
+theorem mul_eq_max_of_aleph0_le_right {a b : Cardinal} (h' : a ≠ 0) (h : ℵ₀ ≤ b) :
+    a * b = max a b := by
+  rw [mul_comm, max_comm]
+  exact mul_eq_max_of_aleph0_le_left h h'
 
 theorem mul_eq_max' {a b : Cardinal} (h : ℵ₀ ≤ a * b) : a * b = max a b := by
   rcases aleph0_le_mul_iff.mp h with ⟨ha, hb, ha' | hb'⟩
@@ -154,15 +167,63 @@ theorem mul_le_max (a b : Cardinal) : a * b ≤ max (max a b) ℵ₀ := by
       exact le_max_left _ _
     · exact le_max_of_le_right (mul_lt_aleph0 ha hb).le
 
--- DISSOLVED: mul_eq_left
+theorem mul_eq_left {a b : Cardinal} (ha : ℵ₀ ≤ a) (hb : b ≤ a) (hb' : b ≠ 0) : a * b = a := by
+  rw [mul_eq_max_of_aleph0_le_left ha hb', max_eq_left hb]
 
--- DISSOLVED: mul_eq_right
+theorem mul_eq_right {a b : Cardinal} (hb : ℵ₀ ≤ b) (ha : a ≤ b) (ha' : a ≠ 0) : a * b = b := by
+  rw [mul_comm, mul_eq_left hb ha ha']
 
--- DISSOLVED: le_mul_left
+theorem le_mul_left {a b : Cardinal} (h : b ≠ 0) : a ≤ b * a := by
+  convert mul_le_mul_right' (one_le_iff_ne_zero.mpr h) a
+  rw [one_mul]
 
--- DISSOLVED: le_mul_right
+theorem le_mul_right {a b : Cardinal} (h : b ≠ 0) : a ≤ a * b := by
+  rw [mul_comm]
+  exact le_mul_left h
 
--- DISSOLVED: mul_eq_left_iff
+theorem mul_eq_left_iff {a b : Cardinal} : a * b = a ↔ max ℵ₀ b ≤ a ∧ b ≠ 0 ∨ b = 1 ∨ a = 0 := by
+  rw [max_le_iff]
+  refine ⟨fun h => ?_, ?_⟩
+  · rcases le_or_lt ℵ₀ a with ha | ha
+    · have : a ≠ 0 := by
+        rintro rfl
+        exact ha.not_lt aleph0_pos
+      left
+      rw [and_assoc]
+      use ha
+      constructor
+      · rw [← not_lt]
+        exact fun hb => ne_of_gt (hb.trans_le (le_mul_left this)) h
+      · rintro rfl
+        apply this
+        rw [mul_zero] at h
+        exact h.symm
+    right
+    by_cases h2a : a = 0
+    · exact Or.inr h2a
+    have hb : b ≠ 0 := by
+      rintro rfl
+      apply h2a
+      rw [mul_zero] at h
+      exact h.symm
+    left
+    rw [← h, mul_lt_aleph0_iff, lt_aleph0, lt_aleph0] at ha
+    rcases ha with (rfl | rfl | ⟨⟨n, rfl⟩, ⟨m, rfl⟩⟩)
+    · contradiction
+    · contradiction
+    rw [← Ne] at h2a
+    rw [← one_le_iff_ne_zero] at h2a hb
+    norm_cast at h2a hb h ⊢
+    apply le_antisymm _ hb
+    rw [← not_lt]
+    apply fun h2b => ne_of_gt _ h
+    conv_rhs => left; rw [← mul_one n]
+    rw [mul_lt_mul_left]
+    · exact id
+    apply Nat.lt_of_succ_le h2a
+  · rintro (⟨⟨ha, hab⟩, hb⟩ | rfl | rfl)
+    · rw [mul_eq_max_of_aleph0_le_left ha hb, max_eq_left hab]
+    all_goals simp
 
 end mul
 
@@ -508,11 +569,18 @@ theorem mk_embedding_eq_zero_iff_lift_lt : #(α ↪ β') = 0 ↔ lift.{u} #β' <
 theorem mk_embedding_eq_zero_iff_lt : #(α ↪ β) = 0 ↔ #β < #α := by
   rw [mk_embedding_eq_zero_iff_lift_lt, lift_lt]
 
--- DISSOLVED: mk_arrow_eq_zero_iff
+theorem mk_arrow_eq_zero_iff : #(α → β') = 0 ↔ #α ≠ 0 ∧ #β' = 0 := by
+  simp_rw [mk_eq_zero_iff, mk_ne_zero_iff, isEmpty_fun]
 
--- DISSOLVED: mk_surjective_eq_zero_iff_lift
+theorem mk_surjective_eq_zero_iff_lift :
+    #{f : α → β' | Surjective f} = 0 ↔ lift.{v} #α < lift.{u} #β' ∨ (#α ≠ 0 ∧ #β' = 0) := by
+  rw [← not_iff_not, not_or, not_lt, lift_mk_le', ← Ne, not_and_or, not_ne_iff, and_comm]
+  simp_rw [mk_ne_zero_iff, mk_eq_zero_iff, nonempty_coe_sort,
+    Set.Nonempty, mem_setOf, exists_surjective_iff, nonempty_fun]
 
--- DISSOLVED: mk_surjective_eq_zero_iff
+theorem mk_surjective_eq_zero_iff :
+    #{f : α → β | Surjective f} = 0 ↔ #α < #β ∨ (#α ≠ 0 ∧ #β = 0) := by
+  rw [mk_surjective_eq_zero_iff_lift, lift_lt]
 
 variable (α β')
 

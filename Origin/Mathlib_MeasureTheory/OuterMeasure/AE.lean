@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/AE.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Basic
+
+noncomputable section
 
 /-!
 # The “almost everywhere” filter of co-null sets.
@@ -60,9 +62,11 @@ theorem ae_iff {p : α → Prop} : (∀ᵐ a ∂μ, p a) ↔ μ { a | ¬p a } = 
 
 theorem compl_mem_ae_iff {s : Set α} : sᶜ ∈ ae μ ↔ μ s = 0 := by simp only [mem_ae_iff, compl_compl]
 
--- DISSOLVED: frequently_ae_iff
+theorem frequently_ae_iff {p : α → Prop} : (∃ᵐ a ∂μ, p a) ↔ μ { a | p a } ≠ 0 :=
+  not_congr compl_mem_ae_iff
 
--- DISSOLVED: frequently_ae_mem_iff
+theorem frequently_ae_mem_iff {s : Set α} : (∃ᵐ a ∂μ, a ∈ s) ↔ μ s ≠ 0 :=
+  not_congr compl_mem_ae_iff
 
 theorem measure_zero_iff_ae_nmem {s : Set α} : μ s = 0 ↔ ∀ᵐ a ∂μ, a ∉ s :=
   compl_mem_ae_iff.symm
@@ -81,7 +85,9 @@ theorem all_ae_of {ι : Sort*} {p : α → ι → Prop} (hp : ∀ᵐ a ∂μ, �
     ∀ᵐ a ∂μ, p a i := by
   filter_upwards [hp] with a ha using ha i
 
--- DISSOLVED: ae_iff_of_countable
+lemma ae_iff_of_countable [Countable α] {p : α → Prop} : (∀ᵐ x ∂μ, p x) ↔ ∀ x, μ {x} ≠ 0 → p x := by
+  rw [ae_iff, measure_null_iff_singleton]
+  exacts [forall_congr' fun _ ↦ not_imp_comm, Set.to_countable _]
 
 theorem ae_ball_iff {ι : Type*} {S : Set ι} (hS : S.Countable) {p : α → ∀ i ∈ S, Prop} :
     (∀ᵐ x ∂μ, ∀ i (hi : i ∈ S), p x i hi) ↔ ∀ i (hi : i ∈ S), ∀ᵐ x ∂μ, p x i hi :=
@@ -99,7 +105,14 @@ theorem ae_eq_symm {f g : α → β} (h : f =ᵐ[μ] g) : g =ᵐ[μ] f :=
 theorem ae_eq_trans {f g h : α → β} (h₁ : f =ᵐ[μ] g) (h₂ : g =ᵐ[μ] h) : f =ᵐ[μ] h :=
   h₁.trans h₂
 
--- DISSOLVED: ae_eq_top
+@[simp] lemma ae_eq_top  : ae μ = ⊤ ↔ ∀ a, μ {a} ≠ 0 := by
+  simp only [Filter.ext_iff, mem_ae_iff, mem_top, ne_eq]
+  refine ⟨fun h a ha ↦ by simpa [ha] using (h {a}ᶜ).1, fun h s ↦ ⟨fun hs ↦ ?_, ?_⟩⟩
+  · rw [← compl_empty_iff, ← not_nonempty_iff_eq_empty]
+    rintro ⟨a, ha⟩
+    exact h _ <| measure_mono_null (singleton_subset_iff.2 ha) hs
+  · rintro rfl
+    simp
 
 theorem ae_le_of_ae_lt {β : Type*} [Preorder β] {f g : α → β} (h : ∀ᵐ x ∂μ, f x < g x) :
     f ≤ᵐ[μ] g :=

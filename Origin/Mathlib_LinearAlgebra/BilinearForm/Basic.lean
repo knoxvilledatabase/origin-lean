@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.LinearAlgebra.BilinearMap
 
+noncomputable section
+
 /-!
 # Bilinear form
 
@@ -103,40 +105,11 @@ theorem ext (H : ∀ x y : M, B x y = D x y) : B = D := ext₂ H
 
 theorem congr_fun (h : B = D) (x y : M) : B x y = D x y := congr_fun₂ h _ _
 
-theorem coe_zero : ⇑(0 : BilinForm R M) = 0 :=
-  rfl
-
-@[simp]
-theorem zero_apply (x y : M) : (0 : BilinForm R M) x y = 0 :=
-  rfl
-
 variable (B D B₁ D₁)
-
-theorem coe_add : ⇑(B + D) = B + D :=
-  rfl
 
 @[simp]
 theorem add_apply (x y : M) : (B + D) x y = B x y + D x y :=
   rfl
-
-theorem coe_neg : ⇑(-B₁) = -B₁ :=
-  rfl
-
-@[simp]
-theorem neg_apply (x y : M₁) : (-B₁) x y = -B₁ x y :=
-  rfl
-
-theorem coe_sub : ⇑(B₁ - D₁) = B₁ - D₁ :=
-  rfl
-
-@[simp]
-theorem sub_apply (x y : M₁) : (B₁ - D₁) x y = B₁ x y - D₁ x y :=
-  rfl
-
-def coeFnAddMonoidHom : BilinForm R M →+ M → M → R where
-  toFun := fun B x y => B x y
-  map_zero' := rfl
-  map_add' _ _ := rfl
 
 section flip
 

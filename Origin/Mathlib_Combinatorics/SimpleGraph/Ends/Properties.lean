@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Ends.Defs
 import Mathlib.CategoryTheory.CofilteredSystem
 
+noncomputable section
+
 /-!
 # Properties of the ends of graphs
 

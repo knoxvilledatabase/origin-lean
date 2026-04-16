@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Positivity/Core.lean
-Genuine: 24 | Conflates: 1 | Dissolved: 6 | Infrastructure: 0
+Genuine: 30 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Core
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Ring.Cast
 import Mathlib.Control.Basic
 import Mathlib.Data.Nat.Cast.Basic
 import Qq
+
+noncomputable section
 
 /-!
 ## `positivity` core functionality
@@ -32,7 +34,12 @@ namespace Mathlib.Meta.Positivity
 
 variable {u : Level} {α : Q(Type u)} (zα : Q(Zero $α)) (pα : Q(PartialOrder $α))
 
--- DISSOLVED: Strictness
+inductive Strictness (e : Q($α)) where
+  | positive (pf : Q(0 < $e))
+  | nonnegative (pf : Q(0 ≤ $e))
+  | nonzero (pf : Q($e ≠ 0))
+  | none
+  deriving Repr
 
 def Strictness.toString {e : Q($α)} : Strictness zα pα e → String
   | positive _ => "positive"
@@ -45,9 +52,15 @@ def Strictness.toNonneg {e} : Strictness zα pα e → Option Q(0 ≤ $e)
   | .nonnegative pf => some pf
   | _ => .none
 
--- DISSOLVED: Strictness.toNonzero
+def Strictness.toNonzero {e} : Strictness zα pα e → Option Q($e ≠ 0)
+  | .positive pf => some q(ne_of_gt $pf)
+  | .nonzero pf => some pf
+  | _ => .none
 
--- DISSOLVED: PositivityExt
+structure PositivityExt where
+  /-- Attempts to prove an expression `e : α` is `>0`, `≥0`, or `≠0`. -/
+  eval {u} {α : Q(Type u)} (zα : Q(Zero $α)) (pα : Q(PartialOrder $α)) (e : Q($α)) :
+    MetaM (Strictness zα pα e)
 
 def mkPositivityExt (n : Name) : ImportM PositivityExt := do
   let { env, opts, .. } ← read
@@ -146,7 +159,12 @@ lemma nonneg_of_isNat {n : ℕ} [OrderedSemiring A]
   rw [NormNum.IsNat.to_eq h rfl]
   exact Nat.cast_nonneg n
 
--- DISSOLVED: nz_of_isNegNat
+lemma nz_of_isNegNat {n : ℕ} [StrictOrderedRing A]
+    (h : NormNum.IsInt e (.negOfNat n)) (w : Nat.ble 1 n = true) : (e : A) ≠ 0 := by
+  rw [NormNum.IsInt.neg_to_eq h rfl]
+  simp only [ne_eq, neg_eq_zero]
+  apply ne_of_gt
+  simpa using w
 
 lemma pos_of_isRat {n : ℤ} {d : ℕ} [LinearOrderedRing A] :
     (NormNum.IsRat e n d) → (decide (0 < n)) → ((0 : A) < (e : A))
@@ -160,7 +178,14 @@ lemma nonneg_of_isRat {n : ℤ} {d : ℕ} [LinearOrderedRing A] :
     (NormNum.IsRat e n d) → (decide (n = 0)) → (0 ≤ (e : A))
   | ⟨inv, eq⟩, h => by rw [eq, of_decide_eq_true h]; simp
 
--- DISSOLVED: nz_of_isRat
+lemma nz_of_isRat {n : ℤ} {d : ℕ} [LinearOrderedRing A] :
+    (NormNum.IsRat e n d) → (decide (n < 0)) → ((e : A) ≠ 0)
+  | ⟨inv, eq⟩, h => by
+    have pos_invOf_d : (0 < ⅟ (d : A)) := pos_invOf_of_invertible_cast d
+    have neg_n : ((n : A) < 0) := Int.cast_lt_zero (n := n) |>.2 (of_decide_eq_true h)
+    have neg := mul_neg_of_neg_of_pos neg_n pos_invOf_d
+    rw [eq]
+    exact ne_iff_lt_or_gt.2 (Or.inl neg)
 
 variable {zα pα} in
 
@@ -322,7 +347,11 @@ def core (e : Q($α)) : MetaM (Strictness zα pα e) := do
   trace[Tactic.positivity] "{e} => {result.toString}"
   throwNone (pure result)
 
--- DISSOLVED: OrderRel
+private inductive OrderRel : Type
+| le : OrderRel -- `0 ≤ a`
+| lt : OrderRel -- `0 < a`
+| ne : OrderRel -- `a ≠ 0`
+| ne' : OrderRel -- `0 ≠ a`
 
 end Meta.Positivity
 
@@ -390,7 +419,6 @@ namespace Tactic.Positivity
 open Lean Elab Tactic
 
 elab (name := positivity) "positivity" : tactic => do
-
   liftMetaTactic fun g => do Meta.Positivity.positivity g; pure []
 
 end Positivity

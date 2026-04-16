@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/AbelRuffini.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Solvable
 import Mathlib.FieldTheory.PolynomialGaloisGroup
 import Mathlib.RingTheory.RootsOfUnity.Basic
+
+noncomputable section
 
 /-!
 # The Abel-Ruffini Theorem
@@ -131,7 +133,44 @@ theorem gal_X_pow_sub_C_isSolvable_aux (n : ℕ) (a : F)
   rw [σ.mul_apply, τ.mul_apply, hc, map_mul, τ.commutes, hd, map_mul, σ.commutes, hc,
     mul_assoc, mul_assoc, mul_right_inj' hb', mul_comm]
 
--- DISSOLVED: splits_X_pow_sub_one_of_X_pow_sub_C
+theorem splits_X_pow_sub_one_of_X_pow_sub_C {F : Type*} [Field F] {E : Type*} [Field E]
+    (i : F →+* E) (n : ℕ) {a : F} (ha : a ≠ 0) (h : (X ^ n - C a).Splits i) :
+    (X ^ n - 1 : F[X]).Splits i := by
+  have ha' : i a ≠ 0 := mt ((injective_iff_map_eq_zero i).mp i.injective a) ha
+  by_cases hn : n = 0
+  · rw [hn, pow_zero, sub_self]
+    exact splits_zero i
+  have hn' : 0 < n := pos_iff_ne_zero.mpr hn
+  have hn'' : (X ^ n - C a).degree ≠ 0 :=
+    ne_of_eq_of_ne (degree_X_pow_sub_C hn' a) (mt WithBot.coe_eq_coe.mp hn)
+  obtain ⟨b, hb⟩ := exists_root_of_splits i h hn''
+  rw [eval₂_sub, eval₂_X_pow, eval₂_C, sub_eq_zero] at hb
+  have hb' : b ≠ 0 := by
+    intro hb'
+    rw [hb', zero_pow hn] at hb
+    exact ha' hb.symm
+  let s := ((X ^ n - C a).map i).roots
+  have hs : _ = _ * (s.map _).prod := eq_prod_roots_of_splits h
+  rw [leadingCoeff_X_pow_sub_C hn', RingHom.map_one, C_1, one_mul] at hs
+  have hs' : Multiset.card s = n := (natDegree_eq_card_roots h).symm.trans natDegree_X_pow_sub_C
+  apply @splits_of_exists_multiset F E _ _ i (X ^ n - 1) (s.map fun c : E => c / b)
+  rw [leadingCoeff_X_pow_sub_one hn', RingHom.map_one, C_1, one_mul, Multiset.map_map]
+  have C_mul_C : C (i a⁻¹) * C (i a) = 1 := by
+    rw [← C_mul, ← i.map_mul, inv_mul_cancel₀ ha, i.map_one, C_1]
+  have key1 : (X ^ n - 1 : F[X]).map i = C (i a⁻¹) * ((X ^ n - C a).map i).comp (C b * X) := by
+    rw [Polynomial.map_sub, Polynomial.map_sub, Polynomial.map_pow, map_X, map_C,
+      Polynomial.map_one, sub_comp, pow_comp, X_comp, C_comp, mul_pow, ← C_pow, hb, mul_sub, ←
+      mul_assoc, C_mul_C, one_mul]
+  have key2 : ((fun q : E[X] => q.comp (C b * X)) ∘ fun c : E => X - C c) = fun c : E =>
+      C b * (X - C (c / b)) := by
+    ext1 c
+    dsimp only [Function.comp_apply]
+    rw [sub_comp, X_comp, C_comp, mul_sub, ← C_mul, mul_div_cancel₀ c hb']
+  rw [key1, hs, multiset_prod_comp, Multiset.map_map, key2, Multiset.prod_map_mul,
+    -- Porting note: needed for `Multiset.map_const` to work
+    show (fun (_ : E) => C b) = Function.const E (C b) by rfl,
+    Multiset.map_const, Multiset.prod_replicate, hs', ← C_pow, hb, ← mul_assoc, C_mul_C, one_mul]
+  rfl
 
 theorem gal_X_pow_sub_C_isSolvable (n : ℕ) (x : F) : IsSolvable (X ^ n - C x).Gal := by
   by_cases hx : x = 0
@@ -150,7 +189,13 @@ end GalXPowSubC
 
 variable (F)
 
--- DISSOLVED: IsSolvableByRad
+inductive IsSolvableByRad : E → Prop
+  | base (α : F) : IsSolvableByRad (algebraMap F E α)
+  | add (α β : E) : IsSolvableByRad α → IsSolvableByRad β → IsSolvableByRad (α + β)
+  | neg (α : E) : IsSolvableByRad α → IsSolvableByRad (-α)
+  | mul (α β : E) : IsSolvableByRad α → IsSolvableByRad β → IsSolvableByRad (α * β)
+  | inv (α : E) : IsSolvableByRad α → IsSolvableByRad α⁻¹
+  | rad (α : E) (n : ℕ) (hn : n ≠ 0) : IsSolvableByRad (α ^ n) → IsSolvableByRad α
 
 variable (E)
 
@@ -171,7 +216,39 @@ namespace solvableByRad
 
 variable {F} {E} {α : E}
 
--- DISSOLVED: induction
+theorem induction (P : solvableByRad F E → Prop)
+    (base : ∀ α : F, P (algebraMap F (solvableByRad F E) α))
+    (add : ∀ α β : solvableByRad F E, P α → P β → P (α + β))
+    (neg : ∀ α : solvableByRad F E, P α → P (-α))
+    (mul : ∀ α β : solvableByRad F E, P α → P β → P (α * β))
+    (inv : ∀ α : solvableByRad F E, P α → P α⁻¹)
+    (rad : ∀ α : solvableByRad F E, ∀ n : ℕ, n ≠ 0 → P (α ^ n) → P α) (α : solvableByRad F E) :
+    P α := by
+  revert α
+  suffices ∀ α : E, IsSolvableByRad F α → ∃ β : solvableByRad F E, ↑β = α ∧ P β by
+    intro α
+    obtain ⟨α₀, hα₀, Pα⟩ := this α (Subtype.mem α)
+    convert Pα
+    exact Subtype.ext hα₀.symm
+  apply IsSolvableByRad.rec
+  · exact fun α => ⟨algebraMap F (solvableByRad F E) α, rfl, base α⟩
+  · intro α β _ _ Pα Pβ
+    obtain ⟨⟨α₀, hα₀, Pα⟩, β₀, hβ₀, Pβ⟩ := Pα, Pβ
+    exact ⟨α₀ + β₀, by rw [← hα₀, ← hβ₀]; rfl, add α₀ β₀ Pα Pβ⟩
+  · intro α _ Pα
+    obtain ⟨α₀, hα₀, Pα⟩ := Pα
+    exact ⟨-α₀, by rw [← hα₀]; rfl, neg α₀ Pα⟩
+  · intro α β _ _ Pα Pβ
+    obtain ⟨⟨α₀, hα₀, Pα⟩, β₀, hβ₀, Pβ⟩ := Pα, Pβ
+    exact ⟨α₀ * β₀, by rw [← hα₀, ← hβ₀]; rfl, mul α₀ β₀ Pα Pβ⟩
+  · intro α _ Pα
+    obtain ⟨α₀, hα₀, Pα⟩ := Pα
+    exact ⟨α₀⁻¹, by rw [← hα₀]; rfl, inv α₀ Pα⟩
+  · intro α n hn hα Pα
+    obtain ⟨α₀, hα₀, Pα⟩ := Pα
+    refine ⟨⟨α, IsSolvableByRad.rad α n hn hα⟩, rfl, rad _ n hn ?_⟩
+    convert Pα
+    exact Subtype.ext (Eq.trans ((solvableByRad F E).coe_pow _ n) hα₀.symm)
 
 theorem isIntegral (α : solvableByRad F E) : IsIntegral F α := by
   revert α
@@ -192,7 +269,30 @@ theorem isIntegral (α : solvableByRad F E) : IsIntegral F α := by
 def P (α : solvableByRad F E) : Prop :=
   IsSolvable (minpoly F α).Gal
 
--- DISSOLVED: induction3
+theorem induction3 {α : solvableByRad F E} {n : ℕ} (hn : n ≠ 0) (hα : P (α ^ n)) : P α := by
+  let p := minpoly F (α ^ n)
+  have hp : p.comp (X ^ n) ≠ 0 := by
+    intro h
+    cases' comp_eq_zero_iff.mp h with h' h'
+    · exact minpoly.ne_zero (isIntegral (α ^ n)) h'
+    · exact hn (by rw [← @natDegree_C F, ← h'.2, natDegree_X_pow])
+  apply gal_isSolvable_of_splits
+  · exact ⟨splits_of_splits_of_dvd _ hp (SplittingField.splits (p.comp (X ^ n)))
+      (minpoly.dvd F α (by rw [aeval_comp, aeval_X_pow, minpoly.aeval]))⟩
+  · refine gal_isSolvable_tower p (p.comp (X ^ n)) ?_ hα ?_
+    · exact Gal.splits_in_splittingField_of_comp _ _ (by rwa [natDegree_X_pow])
+    · obtain ⟨s, hs⟩ := (splits_iff_exists_multiset _).1 (SplittingField.splits p)
+      rw [map_comp, Polynomial.map_pow, map_X, hs, mul_comp, C_comp]
+      apply gal_mul_isSolvable (gal_C_isSolvable _)
+      rw [multiset_prod_comp]
+      apply gal_prod_isSolvable
+      intro q hq
+      rw [Multiset.mem_map] at hq
+      obtain ⟨q, hq, rfl⟩ := hq
+      rw [Multiset.mem_map] at hq
+      obtain ⟨q, _, rfl⟩ := hq
+      rw [sub_comp, X_comp, C_comp]
+      exact gal_X_pow_sub_C_isSolvable n q
 
 theorem induction2 {α β γ : solvableByRad F E} (hγ : γ ∈ F⟮α, β⟯) (hα : P α) (hβ : P β) : P γ := by
   let p := minpoly F α

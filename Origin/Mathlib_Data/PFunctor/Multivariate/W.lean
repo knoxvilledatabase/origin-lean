@@ -5,6 +5,8 @@ Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Data.PFunctor.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # The W construction as a multivariate polynomial functor.
 

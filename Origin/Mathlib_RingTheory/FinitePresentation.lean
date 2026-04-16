@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Finiteness.Ideal
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.MvPolynomial.Tower
 
+noncomputable section
+
 /-!
 # Finiteness conditions in commutative algebra
 
@@ -157,6 +159,7 @@ theorem iff_quotient_mvPolynomial' :
     -- exact RingHom.ker_coe_equiv equiv.symm.toRingEquiv
 
 universe v in
+-- Porting note: make universe level explicit to ensure `ι, ι'` has the same universe level
 
 theorem mvPolynomial_of_finitePresentation [FinitePresentation.{w₁, w₂} R A]
     (ι : Type v) [Finite ι] :

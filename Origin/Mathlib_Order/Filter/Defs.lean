@@ -7,6 +7,8 @@ import Mathlib.Order.SetNotation
 import Mathlib.Order.Bounds.Defs
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Definitions about filters
 
@@ -84,14 +86,6 @@ instance instMembership : Membership (Set α) (Filter α) := ⟨fun F U => U ∈
 protected theorem ext (h : ∀ s, s ∈ f ↔ s ∈ g) : f = g := filter_eq <| Set.ext h
 
 @[simp]
-protected theorem mem_mk {t : Set (Set α)} {h₁ h₂ h₃} : s ∈ mk t h₁ h₂ h₃ ↔ s ∈ t :=
-  Iff.rfl
-
-@[simp]
-protected theorem mem_sets : s ∈ f.sets ↔ s ∈ f :=
-  Iff.rfl
-
-@[simp]
 theorem univ_mem : univ ∈ f :=
   f.univ_sets
 
@@ -113,8 +107,6 @@ protected def copy (f : Filter α) (S : Set (Set α)) (hmem : ∀ s, s ∈ S ↔
   sets_of_superset h hsub := (hmem _).2 <| mem_of_superset ((hmem _).1 h) hsub
   inter_sets h₁ h₂ := (hmem _).2 <| inter_mem ((hmem _).1 h₁) ((hmem _).1 h₂)
 
-@[simp] theorem mem_copy {S hmem} : s ∈ f.copy S hmem ↔ s ∈ S := Iff.rfl
-
 def comk (p : Set α → Prop) (he : p ∅) (hmono : ∀ t, p t → ∀ s ⊆ t, p s)
     (hunion : ∀ s, p s → ∀ t, p t → p (s ∪ t)) : Filter α where
   sets := {t | p tᶜ}
@@ -135,14 +127,8 @@ def principal (s : Set α) : Filter α where
 
 scoped notation "𝓟" => Filter.principal
 
-@[simp] theorem mem_principal : s ∈ 𝓟 t ↔ t ⊆ s := Iff.rfl
-
 instance : Pure Filter where
   pure x := .copy (𝓟 {x}) {s | x ∈ s} fun _ ↦ by simp
-
-@[simp]
-theorem mem_pure {a : α} {s : Set α} : s ∈ (pure a : Filter α) ↔ a ∈ s :=
-  Iff.rfl
 
 def ker (f : Filter α) : Set α := ⋂₀ f.sets
 
@@ -152,18 +138,11 @@ def join (f : Filter (Filter α)) : Filter α where
   sets_of_superset hx xy := mem_of_superset hx fun f h => mem_of_superset h xy
   inter_sets hx hy := mem_of_superset (inter_mem hx hy) fun f ⟨h₁, h₂⟩ => inter_mem h₁ h₂
 
-@[simp]
-theorem mem_join {s : Set α} {f : Filter (Filter α)} : s ∈ join f ↔ { t | s ∈ t } ∈ f :=
-  Iff.rfl
-
 instance : PartialOrder (Filter α) where
   le f g := ∀ ⦃U : Set α⦄, U ∈ g → U ∈ f
   le_antisymm a b h₁ h₂ := filter_eq <| Subset.antisymm h₂ h₁
   le_refl a := Subset.rfl
   le_trans a b c h₁ h₂ := Subset.trans h₂ h₁
-
-theorem le_def : f ≤ g ↔ ∀ x ∈ g, x ∈ f :=
-  Iff.rfl
 
 instance instSupSet : SupSet (Filter α) where
   sSup S := join (𝓟 S)
@@ -267,9 +246,6 @@ instance instSProd : SProd (Filter α) (Filter β) (Filter (α × β)) where
 
 protected def prod (f : Filter α) (g : Filter β) : Filter (α × β) := f ×ˢ g
 
-theorem prod_eq_inf (f : Filter α) (g : Filter β) : f ×ˢ g = f.comap Prod.fst ⊓ g.comap Prod.snd :=
-  rfl
-
 def bind (f : Filter α) (m : α → Filter β) : Filter β :=
   join (map m f)
 
@@ -315,7 +291,6 @@ namespace Mathlib.Tactic
 open Lean Meta Elab Tactic
 
 syntax (name := filterUpwards) "filter_upwards" (" [" term,* "]")?
-
   (" with" (ppSpace colGt term:max)*)? (" using " term)? : tactic
 
 elab_rules : tactic

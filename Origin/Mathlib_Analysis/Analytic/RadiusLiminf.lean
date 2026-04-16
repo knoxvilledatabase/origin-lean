@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Analytic.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 
+noncomputable section
+
 /-!
 # Representation of `FormalMultilinearSeries.radius` as a `liminf`
 

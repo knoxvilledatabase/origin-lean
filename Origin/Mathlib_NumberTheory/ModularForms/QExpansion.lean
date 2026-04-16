@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/ModularForms/QExpansion.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Periodic
 import Mathlib.NumberTheory.ModularForms.Basic
 import Mathlib.NumberTheory.ModularForms.Identities
+
+noncomputable section
 
 /-!
 # q-expansions of modular forms
@@ -32,7 +34,12 @@ local notation "I∞" => comap Complex.im atTop
 
 local notation "𝕢" => Periodic.qParam
 
--- DISSOLVED: Function.Periodic.im_invQParam_pos_of_abs_lt_one
+theorem Function.Periodic.im_invQParam_pos_of_abs_lt_one
+    {h : ℝ} (hh : 0 < h) {q : ℂ} (hq : q.abs < 1) (hq_ne : q ≠ 0) :
+    0 < im (Periodic.invQParam h q) :=
+  im_invQParam .. ▸ mul_pos_of_neg_of_neg
+    (div_neg_of_neg_of_pos (neg_lt_zero.mpr hh) Real.two_pi_pos)
+    ((Real.log_neg_iff (Complex.abs.pos hq_ne)).mpr hq)
 
 namespace SlashInvariantFormClass
 

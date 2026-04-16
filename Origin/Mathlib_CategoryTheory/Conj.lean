@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Units.Equiv
 import Mathlib.CategoryTheory.Endomorphism
 import Mathlib.CategoryTheory.HomCongr
 
+noncomputable section
+
 /-!
 # Conjugate morphisms by isomorphisms
 

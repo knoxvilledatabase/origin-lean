@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Basic
 
+noncomputable section
+
 /-!
 # Instances on spaces of monoid and group morphisms
 
@@ -68,13 +70,6 @@ instance MonoidHom.commGroup {M G} [MulOneClass M] [CommGroup G] : CommGroup (M 
 instance AddMonoid.End.instAddCommMonoid [AddCommMonoid M] : AddCommMonoid (AddMonoid.End M) :=
   AddMonoidHom.addCommMonoid
 
-@[simp]
-theorem AddMonoid.End.zero_apply [AddCommMonoid M] (m : M) : (0 : AddMonoid.End M) m = 0 :=
-  rfl
-
-theorem AddMonoid.End.one_apply [AddCommMonoid M] (m : M) : (1 : AddMonoid.End M) m = m :=
-  rfl
-
 instance AddMonoid.End.instAddCommGroup [AddCommGroup M] : AddCommGroup (AddMonoid.End M) :=
   AddMonoidHom.addCommGroup
 
@@ -87,11 +82,6 @@ theorem AddMonoid.End.intCast_apply [AddCommGroup M] (z : ℤ) (m : M) :
   rfl
 
 alias AddMonoid.End.int_cast_apply := AddMonoid.End.intCast_apply
-
-@[to_additive (attr := simp)] lemma MonoidHom.pow_apply {M N : Type*} [MulOneClass M]
-    [CommMonoid N] (f : M →* N) (n : ℕ) (x : M) :
-    (f ^ n) x = (f x) ^ n :=
-  rfl
 
 /-!
 ### Morphisms of morphisms
@@ -116,11 +106,6 @@ def flip {mM : MulOneClass M} {mN : MulOneClass N} {mP : CommMonoid P} (f : M �
       map_mul' := fun x₁ x₂ => by simp [f.map_mul, mul_apply] }
   map_one' := ext fun x => (f x).map_one
   map_mul' y₁ y₂ := ext fun x => (f x).map_mul y₁ y₂
-
-@[to_additive (attr := simp)]
-theorem flip_apply {_ : MulOneClass M} {_ : MulOneClass N} {_ : CommMonoid P} (f : M →* N →* P)
-    (x : M) (y : N) : f.flip y x = f x y :=
-  rfl
 
 @[to_additive]
 theorem map_one₂ {_ : MulOneClass M} {_ : MulOneClass N} {_ : CommMonoid P} (f : M →* N →* P)
@@ -187,21 +172,11 @@ def compl₂ [MulOneClass M] [MulOneClass N] [CommMonoid P] [MulOneClass Q] (f :
     (g : Q →* N) : M →* Q →* P :=
   (compHom' g).comp f
 
-@[to_additive (attr := simp)]
-theorem compl₂_apply [MulOneClass M] [MulOneClass N] [CommMonoid P] [MulOneClass Q]
-    (f : M →* N →* P) (g : Q →* N) (m : M) (q : Q) : (compl₂ f g) m q = f m (g q) :=
-  rfl
-
 @[to_additive
       "The expression `fun m n ↦ g (f m n)` as an `AddMonoidHom`.
       This also exists as a `LinearMap` version, `LinearMap.compr₂`"]
 def compr₂ [MulOneClass M] [MulOneClass N] [CommMonoid P] [CommMonoid Q] (f : M →* N →* P)
     (g : P →* Q) : M →* N →* Q :=
   (compHom g).comp f
-
-@[to_additive (attr := simp)]
-theorem compr₂_apply [MulOneClass M] [MulOneClass N] [CommMonoid P] [CommMonoid Q] (f : M →* N →* P)
-    (g : P →* Q) (m : M) (n : N) : (compr₂ f g) m n = g (f m n) :=
-  rfl
 
 end MonoidHom

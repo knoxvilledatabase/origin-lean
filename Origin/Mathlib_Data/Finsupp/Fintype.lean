@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finsupp.Defs
 import Mathlib.Data.Fintype.BigOperators
 
+noncomputable section
+
 /-!
 
 # Finiteness and infiniteness of `Finsupp`

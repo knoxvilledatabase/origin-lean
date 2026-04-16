@@ -8,6 +8,8 @@ import Mathlib.Logic.Equiv.Set
 import Mathlib.Order.RelIso.Set
 import Mathlib.Order.WellFounded
 
+noncomputable section
+
 /-!
 # Initial and principal segments
 
@@ -78,16 +80,6 @@ instance : RelHomClass (r ≼i s) r s where
 def toOrderEmbedding [PartialOrder α] [PartialOrder β] (f : α ≤i β) : α ↪o β :=
   f.orderEmbeddingOfLTEmbedding
 
-@[simp]
-theorem toOrderEmbedding_apply [PartialOrder α] [PartialOrder β] (f : α ≤i β) (x : α) :
-    f.toOrderEmbedding x = f x :=
-  rfl
-
-@[simp]
-theorem coe_toOrderEmbedding [PartialOrder α] [PartialOrder β] (f : α ≤i β) :
-    (f.toOrderEmbedding : α → β) = f :=
-  rfl
-
 instance [PartialOrder α] [PartialOrder β] : OrderHomClass (α ≤i β) α β where
   map_rel f := f.toOrderEmbedding.map_rel_iff.2
 
@@ -138,10 +130,6 @@ protected def trans (f : r ≼i s) (g : s ≼i t) : r ≼i t :=
     rcases f.2 _ _ h with ⟨a', rfl⟩; exact ⟨a', rfl⟩⟩
 
 @[simp]
-theorem refl_apply (x : α) : InitialSeg.refl r x = x :=
-  rfl
-
-@[simp]
 theorem trans_apply (f : r ≼i s) (g : s ≼i t) (a : α) : (f.trans g) a = g (f a) :=
   rfl
 
@@ -173,10 +161,6 @@ def antisymm [IsWellOrder β s] (f : r ≼i s) (g : s ≼i r) : r ≃r s :=
   ⟨⟨f, g, antisymm_aux f g, antisymm_aux g f⟩, f.map_rel_iff'⟩
 
 @[simp]
-theorem antisymm_toFun [IsWellOrder β s] (f : r ≼i s) (g : s ≼i r) : (antisymm f g : α → β) = f :=
-  rfl
-
-@[simp]
 theorem antisymm_symm [IsWellOrder α r] [IsWellOrder β s] (f : r ≼i s) (g : s ≼i r) :
     (antisymm f g).symm = antisymm g f :=
   RelIso.coe_fn_injective rfl
@@ -201,20 +185,12 @@ def codRestrict (p : Set β) (f : r ≼i s) (H : ∀ a, f a ∈ p) : r ≼i Subr
     let ⟨a', e⟩ := f.mem_range_of_rel h
     ⟨a', by subst e; rfl⟩⟩
 
-@[simp]
-theorem codRestrict_apply (p) (f : r ≼i s) (H a) : codRestrict p f H a = ⟨f a, H a⟩ :=
-  rfl
-
 def ofIsEmpty (r : α → α → Prop) (s : β → β → Prop) [IsEmpty α] : r ≼i s :=
   ⟨RelEmbedding.ofIsEmpty r s, isEmptyElim⟩
 
 def leAdd (r : α → α → Prop) (s : β → β → Prop) : r ≼i Sum.Lex r s :=
   ⟨⟨⟨Sum.inl, fun _ _ => Sum.inl.inj⟩, Sum.lex_inl_inl⟩, fun a b => by
     cases b <;> [exact fun _ => ⟨_, rfl⟩; exact False.elim ∘ Sum.lex_inr_inl]⟩
-
-@[simp]
-theorem leAdd_apply (r : α → α → Prop) (s : β → β → Prop) (a) : leAdd r s a = Sum.inl a :=
-  rfl
 
 protected theorem acc (f : r ≼i s) (a : α) : Acc r a ↔ Acc s (f a) :=
   ⟨by
@@ -269,10 +245,6 @@ theorem ext [IsIrrefl β s] [IsTrichotomous β s] {f g : r ≺i s} (h : ∀ x, f
   ext
   exact h _
 
-@[simp]
-theorem coe_fn_mk (f : r ↪r s) (t o) : (@PrincipalSeg.mk _ _ r s f t o : α → β) = f :=
-  rfl
-
 theorem mem_range_iff_rel (f : r ≺i s) : ∀ {b : β}, b ∈ Set.range f ↔ s b f.top :=
   f.mem_range_iff_rel' _
 
@@ -298,9 +270,6 @@ theorem surjOn (f : r ≺i s) : Set.SurjOn f Set.univ { b | s b f.top } := by
 instance hasCoeInitialSeg [IsTrans β s] : Coe (r ≺i s) (r ≼i s) :=
   ⟨fun f => ⟨f.toRelEmbedding, fun _ _ => f.mem_range_of_rel⟩⟩
 
-theorem coe_coe_fn' [IsTrans β s] (f : r ≺i s) : ((f : r ≼i s) : α → β) = f :=
-  rfl
-
 theorem _root_.InitialSeg.eq_principalSeg [IsWellOrder β s] (f : r ≼i s) (g : r ≺i s) (a : α) :
     g a = f a :=
   InitialSeg.eq g f a
@@ -316,11 +285,6 @@ alias init_iff := exists_eq_iff_rel
 noncomputable def _root_.InitialSeg.toPrincipalSeg [IsWellOrder β s] (f : r ≼i s)
     (hf : ¬ Surjective f) : r ≺i s :=
   ⟨f, _, Classical.choose_spec (f.eq_or_principal.resolve_left hf)⟩
-
-@[simp]
-theorem _root_.InitialSeg.toPrincipalSeg_apply [IsWellOrder β s] (f : r ≼i s)
-    (hf : ¬ Surjective f) (x : α) : f.toPrincipalSeg hf x = f x :=
-  rfl
 
 theorem irrefl {r : α → α → Prop} [IsWellOrder α r] (f : r ≺i r) : False := by
   have h := f.lt_top f.top
@@ -345,14 +309,10 @@ theorem transInitial_top (f : r ≺i s) (g : s ≼i t) : (f.transInitial g).top 
 alias ltLe := transInitial
 
 set_option linter.deprecated false in
-
-theorem lt_le_apply (f : r ≺i s) (g : s ≼i t) (a : α) : (f.ltLe g) a = g (f a) :=
-  rfl
+@[deprecated transInitial_apply (since := "2024-10-20")]
 
 set_option linter.deprecated false in
-
-theorem lt_le_top (f : r ≺i s) (g : s ≼i t) : (f.ltLe g).top = g f.top :=
-  rfl
+@[deprecated transInitial_top (since := "2024-10-20")]
 
 @[trans]
 protected def trans [IsTrans γ t] (f : r ≺i s) (g : s ≺i t) : r ≺i t :=
@@ -362,10 +322,6 @@ protected def trans [IsTrans γ t] (f : r ≺i s) (g : s ≺i t) : r ≺i t :=
 theorem trans_apply [IsTrans γ t] (f : r ≺i s) (g : s ≺i t) (a : α) : f.trans g a = g (f a) :=
   rfl
 
-@[simp]
-theorem trans_top [IsTrans γ t] (f : r ≺i s) (g : s ≺i t) : (f.trans g).top = g f.top :=
-  rfl
-
 def relIsoTrans (f : r ≃r s) (g : s ≺i t) : r ≺i t :=
   ⟨@RelEmbedding.trans _ _ _ r s t f g, g.top, fun c => by simp [g.mem_range_iff_rel]⟩
 
@@ -373,34 +329,18 @@ def relIsoTrans (f : r ≃r s) (g : s ≺i t) : r ≺i t :=
 theorem relIsoTrans_apply (f : r ≃r s) (g : s ≺i t) (a : α) : relIsoTrans f g a = g (f a) :=
   rfl
 
-@[simp]
-theorem relIsoTrans_top (f : r ≃r s) (g : s ≺i t) : (relIsoTrans f g).top = g.top :=
-  rfl
-
 alias equivLT := relIsoTrans
 
 set_option linter.deprecated false in
-
-theorem equivLT_apply (f : r ≃r s) (g : s ≺i t) (a : α) : (equivLT f g) a = g (f a) :=
-  rfl
+@[deprecated transInitial_top (since := "2024-10-20")]
 
 set_option linter.deprecated false in
-
-theorem equivLT_top (f : r ≃r s) (g : s ≺i t) : (equivLT f g).top = g.top :=
-  rfl
+@[deprecated transInitial_top (since := "2024-10-20")]
 
 def transRelIso (f : r ≺i s) (g : s ≃r t) : r ≺i t :=
   transInitial f g.toInitialSeg
 
 alias ltEquiv := transRelIso
-
-@[simp]
-theorem transRelIso_apply (f : r ≺i s) (g : s ≃r t) (a : α) : transRelIso f g a = g (f a) :=
-  rfl
-
-@[simp]
-theorem transRelIso_top (f : r ≺i s) (g : s ≃r t) : (transRelIso f g).top = g f.top :=
-  rfl
 
 instance [IsWellOrder β s] : Subsingleton (r ≺i s) where
   allEq f g := ext ((f : r ≼i s).eq g)
@@ -423,10 +363,6 @@ def ofElement {α : Type*} (r : α → α → Prop) (a : α) :
     @PrincipalSeg { b // r b a } α (Subrel r { b | r b a }) r :=
   ⟨Subrel.relEmbedding _ _, a, fun _ => ⟨fun ⟨⟨_, h⟩, rfl⟩ => h, fun h => ⟨⟨_, h⟩, rfl⟩⟩⟩
 
-@[simp]
-theorem ofElement_apply {α : Type*} (r : α → α → Prop) (a : α) (b) : ofElement r a b = b.1 :=
-  rfl
-
 @[simps! symm_apply]
 noncomputable def subrelIso (f : r ≺i s) :
     @RelIso { b // s b f.top } α (Subrel s { b | s b f.top }) r :=
@@ -444,23 +380,10 @@ theorem subrelIso_apply (f : r ≺i s) (a : α) : f.subrelIso ⟨f a, f.lt_top a
 def codRestrict (p : Set β) (f : r ≺i s) (H : ∀ a, f a ∈ p) (H₂ : f.top ∈ p) : r ≺i Subrel s p :=
   ⟨RelEmbedding.codRestrict p f H, ⟨f.top, H₂⟩, fun ⟨_, _⟩ => by simp [← f.mem_range_iff_rel]⟩
 
-@[simp]
-theorem codRestrict_apply (p) (f : r ≺i s) (H H₂ a) : codRestrict p f H H₂ a = ⟨f a, H a⟩ :=
-  rfl
-
-@[simp]
-theorem codRestrict_top (p) (f : r ≺i s) (H H₂) : (codRestrict p f H H₂).top = ⟨f.top, H₂⟩ :=
-  rfl
-
 def ofIsEmpty (r : α → α → Prop) [IsEmpty α] {b : β} (H : ∀ b', ¬s b' b) : r ≺i s :=
   { RelEmbedding.ofIsEmpty r s with
     top := b
     mem_range_iff_rel' := by simp [H] }
-
-@[simp]
-theorem ofIsEmpty_top (r : α → α → Prop) [IsEmpty α] {b : β} (H : ∀ b', ¬s b' b) :
-    (ofIsEmpty r H).top = b :=
-  rfl
 
 abbrev pemptyToPunit : @EmptyRelation PEmpty ≺i @EmptyRelation PUnit :=
   (@ofIsEmpty _ _ EmptyRelation _ _ PUnit.unit) fun _ => not_false
@@ -505,6 +428,7 @@ theorem transPrincipal_apply [IsWellOrder β s] [IsTrans γ t] (f : r ≼i s) (g
 alias leLT := transPrincipal
 
 set_option linter.deprecated false in
+@[deprecated transPrincipal_apply (since := "2024-10-20")]
 
 theorem leLT_apply [IsWellOrder β s] [IsTrans γ t] (f : r ≼i s) (g : s ≺i t) (a : α) :
     f.leLT g a = g (f a) :=

@@ -7,6 +7,8 @@ import Mathlib.Geometry.Manifold.ContMDiff.Atlas
 import Mathlib.Geometry.Manifold.VectorBundle.FiberwiseLinear
 import Mathlib.Topology.VectorBundle.Constructions
 
+noncomputable section
+
 /-! # Smooth vector bundles
 
 This file defines smooth vector bundles over a smooth manifold.

@@ -8,6 +8,8 @@ import Mathlib.AlgebraicTopology.DoldKan.Decomposition
 import Mathlib.CategoryTheory.Idempotents.HomologicalComplex
 import Mathlib.CategoryTheory.Idempotents.KaroubiKaroubi
 
+noncomputable section
+
 /-!
 
 # N₁ and N₂ reflects isomorphisms

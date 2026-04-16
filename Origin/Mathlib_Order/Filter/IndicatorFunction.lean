@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Indicator
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # Indicator function and filters
 

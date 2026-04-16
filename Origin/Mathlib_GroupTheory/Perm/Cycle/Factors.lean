@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Perm/Cycle/Factors.lean
-Genuine: 72 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 73 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators
@@ -11,6 +11,8 @@ import Mathlib.GroupTheory.Perm.List
 import Mathlib.GroupTheory.Perm.Sign
 import Mathlib.Logic.Equiv.Fintype
 import Mathlib.GroupTheory.Perm.Cycle.Basic
+
+noncomputable section
 
 /-!
 # Cycle factors of a permutation
@@ -202,9 +204,6 @@ theorem Disjoint.cycleOf_mul_distrib [DecidableRel f.SameCycle] [DecidableRel g.
   cases' (disjoint_iff_eq_or_eq.mp h) x with hfx hgx
   · simp [h.commute.eq, cycleOf_mul_of_apply_right_eq_self h.symm.commute, hfx]
   · simp [cycleOf_mul_of_apply_right_eq_self h.commute, hgx]
-
-theorem support_cycleOf_eq_nil_iff [DecidableEq α] [Fintype α] :
-    (f.cycleOf x).support = ∅ ↔ x ∉ f.support := by simp
 
 theorem support_cycleOf_le [DecidableEq α] [Fintype α] (f : Perm α) (x : α) :
     support (f.cycleOf x) ≤ support f := by
@@ -490,7 +489,10 @@ theorem cycleOf_mem_cycleFactorsFinset_iff {f : Perm α} {x : α} :
     · rw [cycleOf_apply_of_not_sameCycle H] at hy
       contradiction
 
--- DISSOLVED: cycleOf_ne_one_iff_mem_cycleFactorsFinset
+lemma cycleOf_ne_one_iff_mem_cycleFactorsFinset {g : Equiv.Perm α} {x : α} :
+    g.cycleOf x ≠ 1 ↔ g.cycleOf x ∈ g.cycleFactorsFinset := by
+  rw [Equiv.Perm.cycleOf_mem_cycleFactorsFinset_iff, Equiv.Perm.mem_support,
+        ne_eq, Equiv.Perm.cycleOf_eq_one_iff]
 
 theorem mem_cycleFactorsFinset_support_le {p f : Perm α} (h : p ∈ cycleFactorsFinset f) :
     p.support ≤ f.support := by

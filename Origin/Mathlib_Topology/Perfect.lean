@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Perfect Sets
 

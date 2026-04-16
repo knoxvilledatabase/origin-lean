@@ -8,6 +8,8 @@ import Mathlib.Geometry.RingedSpace.Basic
 import Mathlib.Geometry.RingedSpace.Stalks
 import Mathlib.RingTheory.Nilpotent.Defs
 
+noncomputable section
+
 /-!
 # The category of locally ringed spaces
 
@@ -63,11 +65,6 @@ structure Hom (X Y : LocallyRingedSpace.{u})
 
 abbrev Hom.toShHom {X Y : LocallyRingedSpace.{u}} (f : X.Hom Y) :
   X.toSheafedSpace ⟶ Y.toSheafedSpace := f.1
-
-@[simp, nolint simpVarHead]
-lemma Hom.toShHom_mk {X Y : LocallyRingedSpace.{u}}
-    (f : X.toPresheafedSpace.Hom Y.toPresheafedSpace) (hf) :
-  Hom.toShHom ⟨f, hf⟩ = f := rfl
 
 instance : Quiver LocallyRingedSpace :=
   ⟨Hom⟩
@@ -134,20 +131,8 @@ theorem comp_toShHom {X Y Z : LocallyRingedSpace.{u}} (f : X ⟶ Y) (g : Y ⟶ Z
     (f ≫ g).toShHom = f.toShHom ≫ g.toShHom :=
   rfl
 
-@[simp] theorem id_toShHom' (X : LocallyRingedSpace.{u}) :
-    Hom.toShHom (𝟙 X) = 𝟙 X.toSheafedSpace :=
-  rfl
-
 theorem comp_base {X Y Z : LocallyRingedSpace.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) :
     (f ≫ g).base = f.base ≫ g.base :=
-  rfl
-
-theorem comp_c {X Y Z : LocallyRingedSpace.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).c = g.c ≫ (Presheaf.pushforward _ g.base).map f.c :=
-  rfl
-
-theorem comp_c_app {X Y Z : LocallyRingedSpace.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) (U : (Opens Z)ᵒᵖ) :
-    (f ≫ g).c.app U = g.c.app U ≫ f.c.app (op <| (Opens.map g.base).obj U.unop) :=
   rfl
 
 @[simps! toShHom]
@@ -196,23 +181,6 @@ def restrictTopIso (X : LocallyRingedSpace.{u}) :
 def Γ : LocallyRingedSpace.{u}ᵒᵖ ⥤ CommRingCat.{u} :=
   forgetToSheafedSpace.op ⋙ SheafedSpace.Γ
 
-theorem Γ_def : Γ = forgetToSheafedSpace.op ⋙ SheafedSpace.Γ :=
-  rfl
-
-@[simp]
-theorem Γ_obj (X : LocallyRingedSpace.{u}ᵒᵖ) : Γ.obj X = X.unop.presheaf.obj (op ⊤) :=
-  rfl
-
-theorem Γ_obj_op (X : LocallyRingedSpace.{u}) : Γ.obj (op X) = X.presheaf.obj (op ⊤) :=
-  rfl
-
-@[simp]
-theorem Γ_map {X Y : LocallyRingedSpace.{u}ᵒᵖ} (f : X ⟶ Y) : Γ.map f = f.unop.c.app (op ⊤) :=
-  rfl
-
-theorem Γ_map_op {X Y : LocallyRingedSpace.{u}} (f : X ⟶ Y) : Γ.map f.op = f.c.app (op ⊤) :=
-  rfl
-
 def empty : LocallyRingedSpace.{u} where
   carrier := TopCat.of PEmpty
   presheaf := (CategoryTheory.Functor.const _).obj (CommRingCat.of PUnit)
@@ -227,13 +195,11 @@ def emptyTo (X : LocallyRingedSpace) : ∅ ⟶ X :=
     fun x => PEmpty.elim x⟩
 
 noncomputable
-
 instance {X : LocallyRingedSpace} : Unique (∅ ⟶ X) where
   default := LocallyRingedSpace.emptyTo X
   uniq f := by ext ⟨⟩ x; aesop_cat
 
 noncomputable
-
 def emptyIsInitial : Limits.IsInitial (∅ : LocallyRingedSpace.{u}) := Limits.IsInitial.ofUnique _
 
 theorem basicOpen_zero (X : LocallyRingedSpace.{u}) (U : Opens X.carrier) :
@@ -392,7 +358,6 @@ variable {U : TopCat} (X : LocallyRingedSpace.{u}) {f : U ⟶ X.toTopCat} (h : I
   (V : Opens U) (x : U) (hx : x ∈ V)
 
 noncomputable
-
 def restrictStalkIso : (X.restrict h).presheaf.stalk x ≅ X.presheaf.stalk (f x) :=
   X.toPresheafedSpace.restrictStalkIso h x
 

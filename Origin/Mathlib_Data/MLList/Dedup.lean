@@ -7,6 +7,8 @@ import Mathlib.Init
 import Batteries.Data.MLList.Basic
 import Batteries.Data.HashMap.Basic
 
+noncomputable section
+
 /-!
 # Lazy deduplication of lazy lists
 

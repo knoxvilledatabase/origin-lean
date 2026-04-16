@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.CategoryTheory.PathCategory.Basic
 
+noncomputable section
+
 /-!
 # The category of quivers
 
@@ -43,10 +45,6 @@ instance category : LargeCategory.{max v u} Quiv.{v, u} where
 def forget : Cat.{v, u} ⥤ Quiv.{v, u} where
   obj C := Quiv.of C
   map F := F.toPrefunctor
-
-theorem id_eq_id (X : Quiv) : 𝟙 X = 𝟭q X := rfl
-
-theorem comp_eq_comp {X Y Z : Quiv} (F : X ⟶ Y) (G : Y ⟶ Z) : F ≫ G = F ⋙q G := rfl
 
 end Quiv
 

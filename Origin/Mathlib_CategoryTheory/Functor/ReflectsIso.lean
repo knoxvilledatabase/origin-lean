@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Balanced
 import Mathlib.CategoryTheory.Functor.EpiMono
 import Mathlib.CategoryTheory.Functor.FullyFaithful
 
+noncomputable section
+
 /-!
 # Functors which reflect isomorphisms
 

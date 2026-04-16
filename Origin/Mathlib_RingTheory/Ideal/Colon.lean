@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Quotient.Defs
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-!
 # The colon ideal
 

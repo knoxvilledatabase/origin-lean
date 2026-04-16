@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/SeparatedMap.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.Connected.Basic
 import Mathlib.Topology.Separation.Basic
+
+noncomputable section
 
 /-!
 # Separated maps and locally injective maps out of a topological space.
@@ -181,14 +183,12 @@ variable {f : X → Y} {g₁ g₂ : A → X} (h₁ : Continuous g₁) (h₂ : Co
 include h₁ h₂
 
 set_option linter.unusedVariables false in
-
 theorem IsSeparatedMap.isClosed_eqLocus (sep : IsSeparatedMap f) (he : f ∘ g₁ = f ∘ g₂) :
     IsClosed {a | g₁ a = g₂ a} :=
   let g : A → f.Pullback f := fun a ↦ ⟨⟨g₁ a, g₂ a⟩, congr_fun he a⟩
   (isSeparatedMap_iff_isClosed_diagonal.mp sep).preimage (by fun_prop : Continuous g)
 
 set_option linter.unusedVariables false in
-
 theorem IsLocallyInjective.isOpen_eqLocus (inj : IsLocallyInjective f) (he : f ∘ g₁ = f ∘ g₂) :
     IsOpen {a | g₁ a = g₂ a} :=
   let g : A → f.Pullback f := fun a ↦ ⟨⟨g₁ a, g₂ a⟩, congr_fun he a⟩

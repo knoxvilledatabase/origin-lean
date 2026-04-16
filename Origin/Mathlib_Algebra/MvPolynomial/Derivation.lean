@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Supported
 import Mathlib.RingTheory.Derivation.Basic
 
+noncomputable section
+
 /-!
 # Derivations of multivariate polynomials
 
@@ -47,12 +49,6 @@ theorem mkDerivationₗ_X (f : σ → A) (i : σ) : mkDerivationₗ R f (X i) = 
 @[simp]
 theorem derivation_C (D : Derivation R (MvPolynomial σ R) A) (a : R) : D (C a) = 0 :=
   D.map_algebraMap a
-
-@[simp]
-theorem derivation_C_mul (D : Derivation R (MvPolynomial σ R) A) (a : R) (f : MvPolynomial σ R) :
-    C (σ := σ) a • D f = a • D f := by
-  have : C (σ := σ) a • D f = D (C a * f) := by simp
-  rw [this, C_mul', D.map_smul]
 
 theorem derivation_eqOn_supported {D₁ D₂ : Derivation R (MvPolynomial σ R) A} {s : Set σ}
     (h : Set.EqOn (D₁ ∘ X) (D₂ ∘ X) s) {f : MvPolynomial σ R} (hf : f ∈ supported R s) :

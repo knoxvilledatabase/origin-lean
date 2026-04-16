@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Index.lean
-Genuine: 65 | Conflates: 0 | Dissolved: 17 | Infrastructure: 13
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.Coset.Card
 import Mathlib.GroupTheory.Finiteness
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.QuotientGroup.Basic
+
+noncomputable section
 
 /-!
 # Index of a Subgroup
@@ -273,15 +275,34 @@ theorem relindex_eq_zero_of_le_right (hKL : K ≤ L) (hHK : H.relindex K = 0) : 
 theorem index_eq_zero_of_relindex_eq_zero (h : H.relindex K = 0) : H.index = 0 :=
   H.relindex_top_right.symm.trans (relindex_eq_zero_of_le_right le_top h)
 
--- DISSOLVED: relindex_le_of_le_left
+@[to_additive]
+theorem relindex_le_of_le_left (hHK : H ≤ K) (hHL : H.relindex L ≠ 0) :
+    K.relindex L ≤ H.relindex L :=
+  Nat.le_of_dvd (Nat.pos_of_ne_zero hHL) (relindex_dvd_of_le_left L hHK)
 
--- DISSOLVED: relindex_le_of_le_right
+@[to_additive]
+theorem relindex_le_of_le_right (hKL : K ≤ L) (hHL : H.relindex L ≠ 0) :
+    H.relindex K ≤ H.relindex L :=
+  Finite.card_le_of_embedding' (quotientSubgroupOfEmbeddingOfLE H hKL) fun h => (hHL h).elim
 
--- DISSOLVED: relindex_ne_zero_trans
+@[to_additive]
+theorem relindex_ne_zero_trans (hHK : H.relindex K ≠ 0) (hKL : K.relindex L ≠ 0) :
+    H.relindex L ≠ 0 := fun h =>
+  mul_ne_zero (mt (relindex_eq_zero_of_le_right (show K ⊓ L ≤ K from inf_le_left)) hHK) hKL
+    ((relindex_inf_mul_relindex H K L).trans (relindex_eq_zero_of_le_left inf_le_left h))
 
--- DISSOLVED: relindex_inf_ne_zero
+@[to_additive]
+theorem relindex_inf_ne_zero (hH : H.relindex L ≠ 0) (hK : K.relindex L ≠ 0) :
+    (H ⊓ K).relindex L ≠ 0 := by
+  replace hH : H.relindex (K ⊓ L) ≠ 0 := mt (relindex_eq_zero_of_le_right inf_le_right) hH
+  rw [← inf_relindex_right] at hH hK ⊢
+  rw [inf_assoc]
+  exact relindex_ne_zero_trans hH hK
 
--- DISSOLVED: index_inf_ne_zero
+@[to_additive]
+theorem index_inf_ne_zero (hH : H.index ≠ 0) (hK : K.index ≠ 0) : (H ⊓ K).index ≠ 0 := by
+  rw [← relindex_top_right] at hH hK ⊢
+  exact relindex_inf_ne_zero hH hK
 
 @[to_additive]
 theorem relindex_inf_le : (H ⊓ K).relindex L ≤ H.relindex L * K.relindex L := by
@@ -295,7 +316,13 @@ theorem relindex_inf_le : (H ⊓ K).relindex L ≤ H.relindex L * K.relindex L :
 theorem index_inf_le : (H ⊓ K).index ≤ H.index * K.index := by
   simp_rw [← relindex_top_right, relindex_inf_le]
 
--- DISSOLVED: relindex_iInf_ne_zero
+@[to_additive]
+theorem relindex_iInf_ne_zero {ι : Type*} [_hι : Finite ι] {f : ι → Subgroup G}
+    (hf : ∀ i, (f i).relindex L ≠ 0) : (⨅ i, f i).relindex L ≠ 0 :=
+  haveI := Fintype.ofFinite ι
+  (Finset.prod_ne_zero_iff.mpr fun i _hi => hf i) ∘
+    Nat.card_pi.symm.trans ∘
+      Finite.card_eq_zero_of_embedding (quotientiInfSubgroupOfEmbedding f L)
 
 @[to_additive]
 theorem relindex_iInf_le {ι : Type*} [Fintype ι] (f : ι → Subgroup G) :
@@ -306,7 +333,11 @@ theorem relindex_iInf_le {ι : Type*} [Fintype ι] (f : ι → Subgroup G) :
       relindex_eq_zero_of_le_left (iInf_le f i) h)
     Nat.card_pi
 
--- DISSOLVED: index_iInf_ne_zero
+@[to_additive]
+theorem index_iInf_ne_zero {ι : Type*} [Finite ι] {f : ι → Subgroup G}
+    (hf : ∀ i, (f i).index ≠ 0) : (⨅ i, f i).index ≠ 0 := by
+  simp_rw [← relindex_top_right] at hf ⊢
+  exact relindex_iInf_ne_zero hf
 
 @[to_additive]
 theorem index_iInf_le {ι : Type*} [Fintype ι] (f : ι → Subgroup G) :
@@ -326,9 +357,15 @@ theorem relindex_eq_one : H.relindex K = 1 ↔ K ≤ H :=
 theorem card_eq_one : Nat.card H = 1 ↔ H = ⊥ :=
   H.relindex_bot_left ▸ relindex_eq_one.trans le_bot_iff
 
--- DISSOLVED: index_ne_zero_of_finite
+@[to_additive]
+theorem index_ne_zero_of_finite [hH : Finite (G ⧸ H)] : H.index ≠ 0 := by
+  cases nonempty_fintype (G ⧸ H)
+  rw [index_eq_card]
+  exact Nat.card_pos.ne'
 
--- DISSOLVED: fintypeOfIndexNeZero
+@[to_additive "Finite index implies finite quotient."]
+noncomputable def fintypeOfIndexNeZero (hH : H.index ≠ 0) : Fintype (G ⧸ H) :=
+  @Fintype.ofFinite _ (Nat.finite_of_card_ne_zero hH)
 
 @[to_additive]
 lemma index_eq_zero_iff_infinite : H.index = 0 ↔ Infinite (G ⧸ H) := by
@@ -338,17 +375,69 @@ lemma index_eq_zero_iff_infinite : H.index = 0 ↔ Infinite (G ⧸ H) := by
 theorem one_lt_index_of_ne_top [Finite (G ⧸ H)] (hH : H ≠ ⊤) : 1 < H.index :=
   Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨index_ne_zero_of_finite, mt index_eq_one.mp hH⟩
 
--- DISSOLVED: finite_quotient_of_finite_quotient_of_index_ne_zero
+@[to_additive]
+lemma finite_quotient_of_finite_quotient_of_index_ne_zero {X : Type*} [MulAction G X]
+    [Finite <| MulAction.orbitRel.Quotient G X] (hi : H.index ≠ 0) :
+    Finite <| MulAction.orbitRel.Quotient H X := by
+  have := fintypeOfIndexNeZero hi
+  exact MulAction.finite_quotient_of_finite_quotient_of_finite_quotient
 
--- DISSOLVED: finite_quotient_of_pretransitive_of_index_ne_zero
+@[to_additive]
+lemma finite_quotient_of_pretransitive_of_index_ne_zero {X : Type*} [MulAction G X]
+    [MulAction.IsPretransitive G X] (hi : H.index ≠ 0) :
+    Finite <| MulAction.orbitRel.Quotient H X := by
+  have := (MulAction.pretransitive_iff_subsingleton_quotient G X).1 inferInstance
+  exact finite_quotient_of_finite_quotient_of_index_ne_zero hi
 
--- DISSOLVED: exists_pow_mem_of_index_ne_zero
+@[to_additive]
+lemma exists_pow_mem_of_index_ne_zero (h : H.index ≠ 0) (a : G) :
+    ∃ n, 0 < n ∧ n ≤ H.index ∧ a ^ n ∈ H := by
+  suffices ∃ n₁ n₂, n₁ < n₂ ∧ n₂ ≤ H.index ∧ ((a ^ n₂ : G) : G ⧸ H) = ((a ^ n₁ : G) : G ⧸ H) by
+    rcases this with ⟨n₁, n₂, hlt, hle, he⟩
+    refine ⟨n₂ - n₁, by omega, by omega, ?_⟩
+    rw [eq_comm, QuotientGroup.eq, ← zpow_natCast, ← zpow_natCast, ← zpow_neg, ← zpow_add,
+        add_comm] at he
+    rw [← zpow_natCast]
+    convert he
+    omega
+  suffices ∃ n₁ n₂, n₁ ≠ n₂ ∧ n₁ ≤ H.index ∧ n₂ ≤ H.index ∧
+      ((a ^ n₂ : G) : G ⧸ H) = ((a ^ n₁ : G) : G ⧸ H) by
+    rcases this with ⟨n₁, n₂, hne, hle₁, hle₂, he⟩
+    rcases hne.lt_or_lt with hlt | hlt
+    · exact ⟨n₁, n₂, hlt, hle₂, he⟩
+    · exact ⟨n₂, n₁, hlt, hle₁, he.symm⟩
+  by_contra hc
+  simp_rw [not_exists] at hc
+  let f : (Set.Icc 0 H.index) → G ⧸ H := fun n ↦ (a ^ (n : ℕ) : G)
+  have hf : Function.Injective f := by
+    rintro ⟨n₁, h₁, hle₁⟩ ⟨n₂, h₂, hle₂⟩ he
+    have hc' := hc n₁ n₂
+    dsimp only [f] at he
+    simpa [hle₁, hle₂, he] using hc'
+  have := (fintypeOfIndexNeZero h).finite
+  have hcard := Finite.card_le_of_injective f hf
+  simp [← index_eq_card] at hcard
 
--- DISSOLVED: exists_pow_mem_of_relindex_ne_zero
+@[to_additive]
+lemma exists_pow_mem_of_relindex_ne_zero (h : H.relindex K ≠ 0) {a : G} (ha : a ∈ K) :
+    ∃ n, 0 < n ∧ n ≤ H.relindex K ∧ a ^ n ∈ H ⊓ K := by
+  rcases exists_pow_mem_of_index_ne_zero h ⟨a, ha⟩ with ⟨n, hlt, hle, he⟩
+  refine ⟨n, hlt, hle, ?_⟩
+  simpa [pow_mem ha, mem_subgroupOf] using he
 
--- DISSOLVED: pow_mem_of_index_ne_zero_of_dvd
+@[to_additive]
+lemma pow_mem_of_index_ne_zero_of_dvd (h : H.index ≠ 0) (a : G) {n : ℕ}
+    (hn : ∀ m, 0 < m → m ≤ H.index → m ∣ n) : a ^ n ∈ H := by
+  rcases exists_pow_mem_of_index_ne_zero h a with ⟨m, hlt, hle, he⟩
+  rcases hn m hlt hle with ⟨k, rfl⟩
+  rw [pow_mul]
+  exact pow_mem he _
 
--- DISSOLVED: pow_mem_of_relindex_ne_zero_of_dvd
+@[to_additive]
+lemma pow_mem_of_relindex_ne_zero_of_dvd (h : H.relindex K ≠ 0) {a : G} (ha : a ∈ K) {n : ℕ}
+    (hn : ∀ m, 0 < m → m ≤ H.relindex K → m ∣ n) : a ^ n ∈ H ⊓ K := by
+  convert pow_mem_of_index_ne_zero_of_dvd h ⟨a, ha⟩ hn
+  simp [pow_mem ha, mem_subgroupOf]
 
 @[to_additive (attr := simp)]
 lemma index_prod (H : Subgroup G) (K : Subgroup G') : (H.prod K).index = H.index * K.index := by
@@ -365,32 +454,17 @@ lemma index_pi {ι : Type*} [Fintype ι] (H : ι → Subgroup G) :
     ((Quotient.congrRight (fun x y ↦ ?_)).trans (Setoid.piQuotientEquiv _).symm)
   rw [QuotientGroup.leftRel_pi]
 
-@[simp]
-lemma index_toAddSubgroup : (Subgroup.toAddSubgroup H).index = H.index :=
-  rfl
-
-@[simp]
-lemma _root_.AddSubgroup.index_toSubgroup {G : Type*} [AddGroup G] (H : AddSubgroup G) :
-    (AddSubgroup.toSubgroup H).index = H.index :=
-  rfl
-
-@[simp]
-lemma relindex_toAddSubgroup :
-    (Subgroup.toAddSubgroup H).relindex (Subgroup.toAddSubgroup K) = H.relindex K :=
-  rfl
-
-@[simp]
-lemma _root_.AddSubgroup.relindex_toSubgroup {G : Type*} [AddGroup G] (H K : AddSubgroup G) :
-    (AddSubgroup.toSubgroup H).relindex (AddSubgroup.toSubgroup K) = H.relindex K :=
-  rfl
-
 section FiniteIndex
 
 variable (H K)
 
--- DISSOLVED: FiniteIndex
+class FiniteIndex : Prop where
+  /-- The subgroup has finite index -/
+  finiteIndex : H.index ≠ 0
 
--- DISSOLVED: _root_.AddSubgroup.FiniteIndex
+class _root_.AddSubgroup.FiniteIndex {G : Type*} [AddGroup G] (H : AddSubgroup G) : Prop where
+  /-- The additive subgroup has finite index -/
+  finiteIndex : H.index ≠ 0
 
 @[to_additive "A finite index subgroup has finite quotient"]
 noncomputable def fintypeQuotientOfFiniteIndex [FiniteIndex H] : Fintype (G ⧸ H) :=

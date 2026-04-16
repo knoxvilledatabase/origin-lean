@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful
 
+noncomputable section
+
 /-!
 # Sum instances for additive and multiplicative actions
 
@@ -30,18 +32,6 @@ variable [SMul M α] [SMul M β] [SMul N α] [SMul N β] (a : M) (b : α) (c : �
 @[to_additive Sum.hasVAdd]
 instance : SMul M (α ⊕ β) :=
   ⟨fun a => Sum.map (a • ·) (a • ·)⟩
-
-@[to_additive]
-theorem smul_def : a • x = x.map (a • ·) (a • ·) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem smul_inl : a • (inl b : α ⊕ β) = inl (a • b) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem smul_inr : a • (inr c : α ⊕ β) = inr (a • c) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem smul_swap : (a • x).swap = a • x.swap := by cases x <;> rfl

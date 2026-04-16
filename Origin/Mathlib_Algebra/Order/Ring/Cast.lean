@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Order/Ring/Cast.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 10
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Abs
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Data.Nat.Cast.Order.Ring
+
+noncomputable section
 
 /-!
 # Order properties of cast of integers
@@ -57,6 +59,14 @@ lemma cast_strictMono : StrictMono (fun x : ℤ => (x : R)) :=
 
 @[simp, norm_cast] lemma cast_lt : (m : R) < n ↔ m < n := cast_strictMono.lt_iff_lt
 
+@[gcongr] protected alias ⟨_, GCongr.intCast_strictMono⟩ := Int.cast_lt
+
+@[simp] lemma cast_nonpos : (n : R) ≤ 0 ↔ n ≤ 0 := by rw [← cast_zero, cast_le]
+
+@[simp] lemma cast_pos : (0 : R) < n ↔ 0 < n := by rw [← cast_zero, cast_lt]
+
+@[simp] lemma cast_lt_zero : (n : R) < 0 ↔ n < 0 := by rw [← cast_zero, cast_lt]
+
 end OrderedAddCommGroupWithOne
 
 section LinearOrderedRing
@@ -80,7 +90,8 @@ lemma cast_le_neg_one_of_neg (h : a < 0) : (a : R) ≤ -1 := by
 
 variable (R) in
 
--- DISSOLVED: cast_le_neg_one_or_one_le_cast_of_ne_zero
+lemma cast_le_neg_one_or_one_le_cast_of_ne_zero (hn : n ≠ 0) : (n : R) ≤ -1 ∨ 1 ≤ (n : R) :=
+  hn.lt_or_lt.imp cast_le_neg_one_of_neg cast_one_le_of_pos
 
 lemma nneg_mul_add_sq_of_abs_le_one (n : ℤ) (hx : |x| ≤ 1) : (0 : R) ≤ n * x + n * n := by
   have hnx : 0 < n → 0 ≤ x + n := fun hn => by
@@ -118,10 +129,6 @@ instance instAddCommGroupWithOne [AddCommGroupWithOne R] : AddCommGroupWithOne R
 
 end OrderDual
 
-@[simp] lemma toDual_intCast [IntCast R] (n : ℤ) : toDual (n : R) = n := rfl
-
-@[simp] lemma ofDual_intCast [IntCast R] (n : ℤ) : (ofDual n : R) = n := rfl
-
 /-! ### Lexicographic order -/
 
 namespace Lex
@@ -133,7 +140,3 @@ instance instAddGroupWithOne     [AddGroupWithOne R]     : AddGroupWithOne (Lex 
 instance instAddCommGroupWithOne [AddCommGroupWithOne R] : AddCommGroupWithOne (Lex R) := ‹_›
 
 end Lex
-
-@[simp] lemma toLex_intCast [IntCast R] (n : ℤ) : toLex (n : R) = n := rfl
-
-@[simp] lemma ofLex_intCast [IntCast R] (n : ℤ) : (ofLex n : R) = n := rfl

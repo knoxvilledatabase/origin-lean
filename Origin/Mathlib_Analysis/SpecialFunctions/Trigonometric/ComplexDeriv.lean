@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/ComplexDeriv.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Complex
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+
+noncomputable section
 
 /-!
 # Complex trigonometric functions
@@ -20,9 +22,13 @@ open Set Filter
 
 open scoped Real
 
--- DISSOLVED: hasStrictDerivAt_tan
+theorem hasStrictDerivAt_tan {x : ℂ} (h : cos x ≠ 0) : HasStrictDerivAt tan (1 / cos x ^ 2) x := by
+  convert (hasStrictDerivAt_sin x).div (hasStrictDerivAt_cos x) h using 1
+  rw_mod_cast [← sin_sq_add_cos_sq x]
+  ring
 
--- DISSOLVED: hasDerivAt_tan
+theorem hasDerivAt_tan {x : ℂ} (h : cos x ≠ 0) : HasDerivAt tan (1 / cos x ^ 2) x :=
+  (hasStrictDerivAt_tan h).hasDerivAt
 
 open scoped Topology
 
@@ -39,9 +45,15 @@ theorem tendsto_abs_tan_atTop (k : ℤ) :
     Tendsto (fun x => abs (tan x)) (𝓝[≠] ((2 * k + 1) * π / 2 : ℂ)) atTop :=
   tendsto_abs_tan_of_cos_eq_zero <| cos_eq_zero_iff.2 ⟨k, rfl⟩
 
--- DISSOLVED: continuousAt_tan
+@[simp]
+theorem continuousAt_tan {x : ℂ} : ContinuousAt tan x ↔ cos x ≠ 0 := by
+  refine ⟨fun hc h₀ => ?_, fun h => (hasDerivAt_tan h).continuousAt⟩
+  exact not_tendsto_nhds_of_tendsto_atTop (tendsto_abs_tan_of_cos_eq_zero h₀) _
+    (hc.norm.tendsto.mono_left inf_le_left)
 
--- DISSOLVED: differentiableAt_tan
+@[simp]
+theorem differentiableAt_tan {x : ℂ} : DifferentiableAt ℂ tan x ↔ cos x ≠ 0 :=
+  ⟨fun h => continuousAt_tan.1 h.continuousAt, fun h => (hasDerivAt_tan h).differentiableAt⟩
 
 @[simp]
 theorem deriv_tan (x : ℂ) : deriv tan x = 1 / cos x ^ 2 :=
@@ -50,6 +62,8 @@ theorem deriv_tan (x : ℂ) : deriv tan x = 1 / cos x ^ 2 :=
     simp [deriv_zero_of_not_differentiableAt this, h, sq]
   else (hasDerivAt_tan h).deriv
 
--- DISSOLVED: contDiffAt_tan
+@[simp]
+theorem contDiffAt_tan {x : ℂ} {n : WithTop ℕ∞} : ContDiffAt ℂ n tan x ↔ cos x ≠ 0 :=
+  ⟨fun h => continuousAt_tan.1 h.continuousAt, contDiff_sin.contDiffAt.div contDiff_cos.contDiffAt⟩
 
 end Complex

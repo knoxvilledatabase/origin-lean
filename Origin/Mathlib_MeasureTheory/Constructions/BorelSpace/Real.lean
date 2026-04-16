@@ -5,6 +5,8 @@ Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 
+noncomputable section
+
 /-!
 # Borel (measurable) spaces ℝ, ℝ≥0, ℝ≥0∞
 
@@ -276,13 +278,9 @@ theorem measurable_of_tendsto' {ι : Type*} {f : ι → α → ℝ≥0∞} {g : 
   show Measurable fun y => liminf (fun n => (f (x n) y : ℝ≥0∞)) atTop
   exact .liminf fun n => hf (x n)
 
-_root_.measurable_of_tendsto_ennreal' := ENNReal.measurable_of_tendsto'
-
 theorem measurable_of_tendsto {f : ℕ → α → ℝ≥0∞} {g : α → ℝ≥0∞} (hf : ∀ i, Measurable (f i))
     (lim : Tendsto f atTop (𝓝 g)) : Measurable g :=
   measurable_of_tendsto' atTop hf lim
-
-_root_.measurable_of_tendsto_ennreal := ENNReal.measurable_of_tendsto
 
 lemma aemeasurable_of_tendsto' {ι : Type*} {f : ι → α → ℝ≥0∞} {g : α → ℝ≥0∞}
     {μ : Measure α} (u : Filter ι) [NeBot u] [IsCountablyGenerated u]
@@ -437,13 +435,9 @@ theorem measurable_of_tendsto' {ι} {f : ι → α → ℝ≥0} {g : α → ℝ�
   rw [tendsto_pi_nhds] at lim ⊢
   exact fun x => (ENNReal.continuous_coe.tendsto (g x)).comp (lim x)
 
-_root_.measurable_of_tendsto_nnreal' := NNReal.measurable_of_tendsto'
-
 theorem measurable_of_tendsto {f : ℕ → α → ℝ≥0} {g : α → ℝ≥0} (hf : ∀ i, Measurable (f i))
     (lim : Tendsto f atTop (𝓝 g)) : Measurable g :=
   measurable_of_tendsto' atTop hf lim
-
-_root_.measurable_of_tendsto_nnreal := NNReal.measurable_of_tendsto
 
 end NNReal
 

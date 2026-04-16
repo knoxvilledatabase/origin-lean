@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/CancelDenoms/Core.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic
@@ -10,6 +10,8 @@ import Mathlib.Logic.Basic
 import Mathlib.Tactic.NormNum.Core
 import Mathlib.Util.SynthesizeUsing
 import Mathlib.Util.Qq
+
+noncomputable section
 
 /-!
 # A tactic for canceling numeric denominators
@@ -45,7 +47,9 @@ theorem div_subst {α} [Field α] {n1 n2 k e1 e2 t1 : α}
     (h1 : n1 * e1 = t1) (h2 : n2 / e2 = 1) (h3 : n1 * n2 = k) : k * (e1 / e2) = t1 := by
   rw [← h3, mul_assoc, mul_div_left_comm, h2, ← mul_assoc, h1, mul_comm, one_mul]
 
--- DISSOLVED: cancel_factors_eq_div
+theorem cancel_factors_eq_div {α} [Field α] {n e e' : α}
+    (h : n * e = e') (h2 : n ≠ 0) : e = e' / n :=
+  eq_div_of_mul_eq h2 <| by rwa [mul_comm] at h
 
 theorem add_subst {α} [Ring α] {n e1 e2 t1 t2 : α} (h1 : n * e1 = t1) (h2 : n * e2 = t2) :
     n * (e1 + e2) = t1 + t2 := by simp [left_distrib, *]
@@ -59,7 +63,8 @@ theorem pow_subst {α} [CommRing α] {n e1 t1 k l : α} {e2 : ℕ}
     (h1 : n * e1 = t1) (h2 : l * n ^ e2 = k) : k * (e1 ^ e2) = l * t1 ^ e2 := by
   rw [← h2, ← h1, mul_pow, mul_assoc]
 
--- DISSOLVED: inv_subst
+theorem inv_subst {α} [Field α] {n k e : α} (h2 : e ≠ 0) (h3 : n * e = k) :
+    k * (e ⁻¹) = n := by rw [← div_eq_mul_inv, ← h3, mul_div_cancel_right₀ _ h2]
 
 theorem cancel_factors_lt {α} [LinearOrderedField α] {a b ad bd a' b' gcd : α}
     (ha : ad * a = a') (hb : bd * b = b') (had : 0 < ad) (hbd : 0 < bd) (hgcd : 0 < gcd) :
@@ -75,9 +80,26 @@ theorem cancel_factors_le {α} [LinearOrderedField α] {a b ad bd a' b' gcd : α
   · exact mul_pos had hbd
   · exact one_div_pos.2 hgcd
 
--- DISSOLVED: cancel_factors_eq
+theorem cancel_factors_eq {α} [Field α] {a b ad bd a' b' gcd : α} (ha : ad * a = a')
+    (hb : bd * b = b') (had : ad ≠ 0) (hbd : bd ≠ 0) (hgcd : gcd ≠ 0) :
+    (a = b) = (1 / gcd * (bd * a') = 1 / gcd * (ad * b')) := by
+  rw [← ha, ← hb, ← mul_assoc bd, ← mul_assoc ad, mul_comm bd]
+  ext; constructor
+  · rintro rfl
+    rfl
+  · intro h
+    simp only [← mul_assoc] at h
+    refine mul_left_cancel₀ (mul_ne_zero ?_ ?_) h
+    on_goal 1 => apply mul_ne_zero
+    on_goal 1 => apply div_ne_zero
+    · exact one_ne_zero
+    all_goals assumption
 
--- DISSOLVED: cancel_factors_ne
+theorem cancel_factors_ne {α} [Field α] {a b ad bd a' b' gcd : α} (ha : ad * a = a')
+    (hb : bd * b = b') (had : ad ≠ 0) (hbd : bd ≠ 0) (hgcd : gcd ≠ 0) :
+    (a ≠ b) = (1 / gcd * (bd * a') ≠ 1 / gcd * (ad * b')) := by
+  classical
+  rw [eq_iff_iff, not_iff_not, cancel_factors_eq ha hb had hbd hgcd]
 
 /-! ### Computing cancellation factors -/
 
@@ -270,7 +292,5 @@ def cancelDenominators (loc : Location) : TacticM Unit := do
     (fun _ ↦ throwError "Failed to cancel any denominators")
 
 elab "cancel_denoms" loc?:(location)? : tactic => do
-
   cancelDenominators (expandOptLocation (Lean.mkOptionalNode loc?))
-
   Lean.Elab.Tactic.evalTactic (← `(tactic| try norm_num [← mul_assoc] $[$loc?]?))

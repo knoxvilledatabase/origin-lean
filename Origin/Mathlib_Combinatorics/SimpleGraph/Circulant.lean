@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Combinatorics.SimpleGraph.Hasse
 
+noncomputable section
+
 /-!
 # Definition of circulant graphs
 
@@ -50,9 +52,6 @@ theorem circulantGraph_eq_symm : circulantGraph s = circulantGraph (s ∪ (-s)) 
 
 instance [DecidableEq G] [DecidablePred (· ∈ s)] : DecidableRel (circulantGraph s).Adj :=
   fun _ _ => inferInstanceAs (Decidable (_ ∧ _))
-
-theorem circulantGraph_adj_translate {s : Set G} {u v d : G} :
-    (circulantGraph s).Adj (u + d) (v + d) ↔ (circulantGraph s).Adj u v := by simp
 
 def cycleGraph : (n : ℕ) → SimpleGraph (Fin n)
   | 0 => ⊥

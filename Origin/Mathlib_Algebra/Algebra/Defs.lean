@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Algebra/Defs.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LinearMap.Defs
+
+noncomputable section
 
 /-!
 # Algebras over commutative semirings
@@ -151,22 +153,13 @@ end CommRingRing
 
 end algebraMap
 
-def RingHom.toAlgebra' {R S} [CommSemiring R] [Semiring S] (i : R →+* S)
-    (h : ∀ c x, i c * x = x * i c) : Algebra R S where
-  smul c x := i c * x
-  commutes' := h
-  smul_def' _ _ := rfl
-  toRingHom := i
-
 set_option linter.docPrime false in
-
 theorem RingHom.smul_toAlgebra' {R S} [CommSemiring R] [Semiring S] (i : R →+* S)
     (h : ∀ c x, i c * x = x * i c) (r : R) (s : S) :
     let _ := RingHom.toAlgebra' i h
     r • s = i r * s := rfl
 
 set_option linter.docPrime false in
-
 theorem RingHom.algebraMap_toAlgebra' {R S} [CommSemiring R] [Semiring S] (i : R →+* S)
     (h : ∀ c x, i c * x = x * i c) :
     @algebraMap R S _ _ (i.toAlgebra' h) = i :=
@@ -288,31 +281,12 @@ abbrev compHom : Algebra S A where
   commutes' _ _ := Algebra.commutes _ _
   smul_def' _ _ := Algebra.smul_def _ _
 
-theorem compHom_smul_def (s : S) (x : A) :
-    letI := compHom A f
-    s • x = f s • x := rfl
-
-theorem compHom_algebraMap_eq :
-    letI := compHom A f
-    algebraMap S A = (algebraMap R A).comp f := rfl
-
-theorem compHom_algebraMap_apply (s : S) :
-    letI := compHom A f
-    algebraMap S A s = (algebraMap R A) (f s) := rfl
-
 end compHom
 
 variable (R A)
 
 protected def linearMap : R →ₗ[R] A :=
   { algebraMap R A with map_smul' := fun x y => by simp [Algebra.smul_def] }
-
-@[simp]
-theorem linearMap_apply (r : R) : Algebra.linearMap R A r = algebraMap R A r :=
-  rfl
-
-theorem coe_linearMap : ⇑(Algebra.linearMap R A) = algebraMap R A :=
-  rfl
 
 instance (priority := 1100) id : Algebra R R where
   -- We override `toFun` and `toSMul` because `RingHom.id` is not reducible and cannot
@@ -325,13 +299,6 @@ instance (priority := 1100) id : Algebra R R where
 variable {R A}
 
 namespace id
-
-@[simp]
-theorem map_eq_id : algebraMap R R = RingHom.id _ :=
-  rfl
-
-theorem map_eq_self (x : R) : algebraMap R R x = x :=
-  rfl
 
 @[simp]
 theorem smul_eq_mul (x y : R) : x • y = x * y :=

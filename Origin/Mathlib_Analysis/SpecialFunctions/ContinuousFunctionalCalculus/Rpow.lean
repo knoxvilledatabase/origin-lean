@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/SpecialFunctions/ContinuousFunctionalCalculus/Rpow.lean
-Genuine: 46 | Conflates: 0 | Dissolved: 6 | Infrastructure: 11
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.NonUnital
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+
+noncomputable section
 
 /-!
 # Real powers defined via the continuous functional calculus
@@ -72,9 +74,6 @@ noncomputable instance (priority := 100) : Pow A ℝ≥0 where
   pow a y := nnrpow a y
 
 @[simp]
-lemma nnrpow_eq_pow {a : A} {y : ℝ≥0} : nnrpow a y = a ^ y := rfl
-
-@[simp]
 lemma nnrpow_nonneg {a : A} {x : ℝ≥0} : 0 ≤ a ^ x := cfcₙ_predicate _ a
 
 lemma nnrpow_def {a : A} {y : ℝ≥0} : a ^ y = cfcₙ (NNReal.nnrpow · y) a := rfl
@@ -123,11 +122,19 @@ lemma nnrpow_nnrpow [UniqueNonUnitalContinuousFunctionalCalculus ℝ≥0 A]
   case neg =>
     simp [nnrpow_def, cfcₙ_apply_of_not_predicate a ha]
 
--- DISSOLVED: nnrpow_nnrpow_inv
+lemma nnrpow_nnrpow_inv [UniqueNonUnitalContinuousFunctionalCalculus ℝ≥0 A]
+    (a : A) {x : ℝ≥0} (hx : x ≠ 0) (ha : 0 ≤ a := by cfc_tac) : (a ^ x) ^ x⁻¹ = a := by
+  simp [mul_inv_cancel₀ hx, nnrpow_one _ ha]
 
--- DISSOLVED: nnrpow_inv_nnrpow
+lemma nnrpow_inv_nnrpow [UniqueNonUnitalContinuousFunctionalCalculus ℝ≥0 A]
+    (a : A) {x : ℝ≥0} (hx : x ≠ 0) (ha : 0 ≤ a := by cfc_tac) : (a ^ x⁻¹) ^ x = a := by
+  simp [inv_mul_cancel₀ hx, nnrpow_one _ ha]
 
--- DISSOLVED: nnrpow_inv_eq
+lemma nnrpow_inv_eq [UniqueNonUnitalContinuousFunctionalCalculus ℝ≥0 A]
+    (a b : A) {x : ℝ≥0} (hx : x ≠ 0) (ha : 0 ≤ a := by cfc_tac) (hb : 0 ≤ b := by cfc_tac) :
+    a ^ x⁻¹ = b ↔ b ^ x = a :=
+  ⟨fun h ↦ nnrpow_inv_nnrpow a hx ▸ congr($(h) ^ x).symm,
+    fun h ↦ nnrpow_nnrpow_inv b hx ▸ congr($(h) ^ x⁻¹).symm⟩
 
 section sqrt
 
@@ -215,7 +222,7 @@ lemma one_rpow {x : ℝ} : (1 : A) ^ x = (1 : A) := by simp [rpow_def]
 lemma rpow_zero (a : A) (ha : 0 ≤ a := by cfc_tac) : a ^ (0 : ℝ) = 1 := by
   simp [rpow_def, cfc_const_one ℝ≥0 a]
 
--- DISSOLVED: zero_rpow
+lemma zero_rpow {x : ℝ} (hx : x ≠ 0) : rpow (0 : A) x = 0 := by simp [rpow, NNReal.zero_rpow hx]
 
 lemma rpow_natCast (a : A) (n : ℕ) (ha : 0 ≤ a := by cfc_tac) : a ^ (n : ℝ) = a ^ n := by
   rw [← cfc_pow_id (R := ℝ≥0) a n, rpow_def]
@@ -236,7 +243,13 @@ lemma rpow_add {a : A} {x y : ℝ} (ha : 0 ∉ spectrum ℝ≥0 a) :
   have : z ≠ 0 := by aesop
   simp [NNReal.rpow_add this _ _]
 
--- DISSOLVED: rpow_rpow
+lemma rpow_rpow [UniqueContinuousFunctionalCalculus ℝ≥0 A]
+    (a : A) (x y : ℝ) (ha₁ : 0 ∉ spectrum ℝ≥0 a) (hx : x ≠ 0) (ha₂ : 0 ≤ a := by cfc_tac) :
+    (a ^ x) ^ y = a ^ (x * y) := by
+  simp only [rpow_def]
+  rw [← cfc_comp _ _ a ha₂]
+  refine cfc_congr fun _ _ => ?_
+  simp [NNReal.rpow_mul]
 
 lemma rpow_rpow_of_exponent_nonneg [UniqueContinuousFunctionalCalculus ℝ≥0 A] (a : A) (x y : ℝ)
     (hx : 0 ≤ x) (hy : 0 ≤ y) (ha₂ : 0 ≤ a := by cfc_tac) : (a ^ x) ^ y = a ^ (x * y) := by
@@ -310,34 +323,18 @@ lemma sqrt_algebraMap {r : ℝ≥0} : sqrt (algebraMap ℝ≥0 A r) = algebraMap
 @[simp]
 lemma sqrt_one : sqrt (1 : A) = 1 := by simp [sqrt_eq_cfc]
 
--- DISSOLVED: sqrt_rpow
+lemma sqrt_rpow [UniqueContinuousFunctionalCalculus ℝ≥0 A] {a : A} {x : ℝ} (h : 0 ∉ spectrum ℝ≥0 a)
+    (hx : x ≠ 0) : sqrt (a ^ x) = a ^ (x / 2) := by
+  by_cases hnonneg : 0 ≤ a
+  case pos =>
+    simp only [sqrt_eq_rpow, div_eq_mul_inv, one_mul, rpow_rpow _ _ _ h hx]
+  case neg =>
+    simp [sqrt_eq_cfc, rpow_def, cfc_apply_of_not_predicate a hnonneg]
 
 lemma rpow_sqrt [UniqueContinuousFunctionalCalculus ℝ≥0 A] (a : A) (x : ℝ) (h : 0 ∉ spectrum ℝ≥0 a)
     (ha : 0 ≤ a := by cfc_tac) : (sqrt a) ^ x = a ^ (x / 2) := by
   rw [sqrt_eq_rpow, div_eq_mul_inv, one_mul,
       rpow_rpow _ _ _ h (by norm_num), inv_mul_eq_div]
-
-lemma sqrt_rpow_nnreal {a : A} {x : ℝ≥0} : sqrt (a ^ (x : ℝ)) = a ^ (x / 2 : ℝ) := by
-  by_cases htriv : 0 ≤ a
-  case neg => simp [sqrt_eq_cfc, rpow_def, cfc_apply_of_not_predicate a htriv]
-  case pos =>
-    by_cases hx : x = 0
-    case pos => simp [hx, rpow_zero _ htriv]
-    case neg =>
-      have h₁ : 0 < x := lt_of_le_of_ne (by aesop) (Ne.symm hx)
-      have h₂ : (x : ℝ) / 2 = NNReal.toReal (x / 2) := rfl
-      have h₃ : 0 < x / 2 := by positivity
-      rw [← nnrpow_eq_rpow h₁, h₂, ← nnrpow_eq_rpow h₃, sqrt_nnrpow (A := A)]
-
-lemma rpow_sqrt_nnreal [UniqueContinuousFunctionalCalculus ℝ≥0 A] {a : A} {x : ℝ≥0}
-    (ha : 0 ≤ a := by cfc_tac) : (sqrt a) ^ (x : ℝ) = a ^ (x / 2 : ℝ) := by
-  by_cases hx : x = 0
-  case pos =>
-    have ha' : 0 ≤ sqrt a := by exact sqrt_nonneg
-    simp [hx, rpow_zero _ ha', rpow_zero _ ha]
-  case neg =>
-    have h₁ : 0 ≤ (x : ℝ) := by exact NNReal.zero_le_coe
-    rw [sqrt_eq_rpow, rpow_rpow_of_exponent_nonneg _ _ _ (by norm_num) h₁, one_div_mul_eq_div]
 
 end unital_vs_nonunital
 

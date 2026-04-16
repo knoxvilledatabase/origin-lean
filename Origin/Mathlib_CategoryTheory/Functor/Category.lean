@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.NatTrans
 import Mathlib.CategoryTheory.Iso
 
+noncomputable section
+
 /-!
 # The category of functors and natural transformations between two fixed categories.
 
@@ -45,15 +47,7 @@ namespace NatTrans
 @[ext]
 theorem ext' {α β : F ⟶ G} (w : α.app = β.app) : α = β := NatTrans.ext w
 
-@[simp]
-theorem vcomp_eq_comp (α : F ⟶ G) (β : G ⟶ H) : vcomp α β = α ≫ β := rfl
-
-theorem vcomp_app' (α : F ⟶ G) (β : G ⟶ H) (X : C) : (α ≫ β).app X = α.app X ≫ β.app X := rfl
-
 theorem congr_app {α β : F ⟶ G} (h : α = β) (X : C) : α.app X = β.app X := by rw [h]
-
-@[simp]
-theorem id_app (F : C ⥤ D) (X : C) : (𝟙 F : F ⟶ F).app X = 𝟙 (F.obj X) := rfl
 
 @[simp]
 theorem comp_app {F G H : C ⥤ D} (α : F ⟶ G) (β : G ⟶ H) (X : C) :
@@ -100,11 +94,6 @@ def hcomp {H I : D ⥤ E} (α : F ⟶ G) (β : H ⟶ I) : F ⋙ H ⟶ G ⋙ I wh
       map_comp, assoc]
 
 infixl:80 " ◫ " => hcomp
-
-theorem hcomp_id_app {H : D ⥤ E} (α : F ⟶ G) (X : C) : (α ◫ 𝟙 H).app X = H.map (α.app X) := by
-  simp
-
-theorem id_hcomp_app {H : E ⥤ C} (α : F ⟶ G) (X : E) : (𝟙 H ◫ α).app X = α.app _ := by simp
 
 theorem exchange {I J K : D ⥤ E} (α : F ⟶ G) (β : G ⟶ H) (γ : I ⟶ J) (δ : J ⟶ K) :
     (α ≫ β) ◫ (γ ≫ δ) = (α ◫ γ) ≫ β ◫ δ := by

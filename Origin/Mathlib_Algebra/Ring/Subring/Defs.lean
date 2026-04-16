@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Subsemiring.Defs
 import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.RingTheory.NonUnitalSubring.Defs
 
+noncomputable section
+
 /-!
 # Subrings
 
@@ -104,10 +106,6 @@ def subtype (s : S) : s →+* R :=
   { SubmonoidClass.subtype s, AddSubgroupClass.subtype s with
     toFun := (↑) }
 
-@[simp]
-theorem coeSubtype : (subtype s : s → R) = ((↑) : s → R) :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_natCast (n : ℕ) : ((n : s) : R) = n :=
   map_natCast (subtype s) n
@@ -139,22 +137,6 @@ instance : SubringClass (Subring R) R where
 
 initialize_simps_projections Subring (carrier → coe, as_prefix coe)
 
-@[simp]
-theorem mem_toSubsemiring {s : Subring R} {x : R} : x ∈ s.toSubsemiring ↔ x ∈ s := Iff.rfl
-
-theorem mem_carrier {s : Subring R} {x : R} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem mem_mk {S : Subsemiring R} {x : R} (h) : x ∈ (⟨S, h⟩ : Subring R) ↔ x ∈ S := Iff.rfl
-
-@[simp] theorem coe_set_mk (S : Subsemiring R) (h) : ((⟨S, h⟩ : Subring R) : Set R) = S := rfl
-
-@[simp]
-theorem mk_le_mk {S S' : Subsemiring R} (h₁ h₂) :
-    (⟨S, h₁⟩ : Subring R) ≤ (⟨S', h₂⟩ : Subring R) ↔ S ≤ S' :=
-  Iff.rfl
-
 @[ext]
 theorem ext {S T : Subring R} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -181,11 +163,6 @@ theorem toSubmonoid_injective : Function.Injective (fun s : Subring R => s.toSub
 protected def mk' (s : Set R) (sm : Submonoid R) (sa : AddSubgroup R) (hm : ↑sm = s)
     (ha : ↑sa = s) : Subring R :=
   { sm.copy s hm.symm, sa.copy s ha.symm with }
-
-@[simp]
-theorem mem_mk' {s : Set R} {sm : Submonoid R} (hm : ↑sm = s) {sa : AddSubgroup R} (ha : ↑sa = s)
-    {x : R} : x ∈ Subring.mk' s sm sa hm ha ↔ x ∈ s :=
-  Iff.rfl
 
 @[simp]
 theorem mk'_toSubmonoid {s : Set R} {sm : Submonoid R} (hm : ↑sm = s) {sa : AddSubgroup R}
@@ -237,23 +214,7 @@ protected theorem pow_mem {x : R} (hx : x ∈ s) (n : ℕ) : x ^ n ∈ s :=
   pow_mem hx n
 
 @[simp, norm_cast]
-theorem coe_add (x y : s) : (↑(x + y) : R) = ↑x + ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_neg (x : s) : (↑(-x) : R) = -↑x :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_mul (x y : s) : (↑(x * y) : R) = ↑x * ↑y :=
-  rfl
-
-@[simp, norm_cast]
 theorem coe_zero : ((0 : s) : R) = 0 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_one : ((1 : s) : R) = 1 :=
   rfl
 
 @[simp, norm_cast]
@@ -278,10 +239,6 @@ instance {R} [Ring R] [IsDomain R] (s : Subring R) : IsDomain s :=
 def subtype (s : Subring R) : s →+* R :=
   { s.toSubmonoid.subtype, s.toAddSubgroup.subtype with toFun := (↑) }
 
-@[simp]
-theorem coeSubtype : ⇑s.subtype = ((↑) : s → R) :=
-  rfl
-
 @[norm_cast]
 theorem coe_natCast : ∀ n : ℕ, ((n : s) : R) = n :=
   map_natCast s.subtype
@@ -291,26 +248,6 @@ theorem coe_intCast : ∀ n : ℤ, ((n : s) : R) = n :=
   map_intCast s.subtype
 
 /-! ## Partial order -/
-
-@[simp]
-theorem coe_toSubsemiring (s : Subring R) : (s.toSubsemiring : Set R) = s :=
-  rfl
-
-@[simp, nolint simpNF]
-theorem mem_toSubmonoid {s : Subring R} {x : R} : x ∈ s.toSubmonoid ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toSubmonoid (s : Subring R) : (s.toSubmonoid : Set R) = s :=
-  rfl
-
-@[simp, nolint simpNF]
-theorem mem_toAddSubgroup {s : Subring R} {x : R} : x ∈ s.toAddSubgroup ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toAddSubgroup (s : Subring R) : (s.toAddSubgroup : Set R) = s :=
-  rfl
 
 end Subring
 

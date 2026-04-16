@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/Pi/Lemmas.lean
-Genuine: 46 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Hom.Instances
 import Mathlib.Data.Set.Function
 import Mathlib.Logic.Pairwise
+
+noncomputable section
 
 /-!
 # Extra lemmas about products of monoids and groups
@@ -45,10 +47,6 @@ variable {α β : Type*} [Preorder α] [Preorder β]
 end Pi
 
 namespace MulHom
-
-@[to_additive]
-theorem coe_mul {M N} {_ : Mul M} {_ : CommSemigroup N} (f g : M →ₙ* N) : (f * g : M → N) =
-    fun x => f x * g x := rfl
 
 end MulHom
 
@@ -170,21 +168,12 @@ nonrec def OneHom.mulSingle [∀ i, One <| f i] (i : I) : OneHom (f i) (∀ i, f
   toFun := mulSingle i
   map_one' := mulSingle_one i
 
-@[to_additive (attr := simp)]
-theorem OneHom.mulSingle_apply [∀ i, One <| f i] (i : I) (x : f i) :
-    mulSingle f i x = Pi.mulSingle i x := rfl
-
 @[to_additive
       "The additive monoid homomorphism including a single additive monoid into a dependent family
       of additive monoids, as functions supported at a point.
       This is the `AddMonoidHom` version of `Pi.single`."]
 def MonoidHom.mulSingle [∀ i, MulOneClass <| f i] (i : I) : f i →* ∀ i, f i :=
   { OneHom.mulSingle f i with map_mul' := mulSingle_op₂ (fun _ => (· * ·)) (fun _ => one_mul _) _ }
-
-@[to_additive (attr := simp)]
-theorem MonoidHom.mulSingle_apply [∀ i, MulOneClass <| f i] (i : I) (x : f i) :
-    mulSingle f i x = Pi.mulSingle i x :=
-  rfl
 
 variable {f}
 
@@ -335,7 +324,9 @@ variable [One α] [Nonempty ι] {a : α}
 theorem const_eq_one : const ι a = 1 ↔ a = 1 :=
   @const_inj _ _ _ _ 1
 
--- DISSOLVED: const_ne_one
+@[to_additive]
+theorem const_ne_one : const ι a ≠ 1 ↔ a ≠ 1 :=
+  Iff.not const_eq_one
 
 end Function
 
@@ -393,30 +384,6 @@ variable {α : Type*} {β : α → Type*} {γ : ∀ a, β a → Type*}
 
 @[to_additive (attr := simp)]
 theorem curry_one [∀ a b, One (γ a b)] : Sigma.curry (1 : (i : Σ a, β a) → γ i.1 i.2) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem uncurry_one [∀ a b, One (γ a b)] : Sigma.uncurry (1 : ∀ a b, γ a b) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem curry_mul [∀ a b, Mul (γ a b)] (x y : (i : Σ a, β a) → γ i.1 i.2) :
-    Sigma.curry (x * y) = Sigma.curry x * Sigma.curry y :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem uncurry_mul [∀ a b, Mul (γ a b)] (x y : ∀ a b, γ a b) :
-    Sigma.uncurry (x * y) = Sigma.uncurry x * Sigma.uncurry y :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem curry_inv [∀ a b, Inv (γ a b)] (x : (i : Σ a, β a) → γ i.1 i.2) :
-    Sigma.curry (x⁻¹) = (Sigma.curry x)⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem uncurry_inv [∀ a b, Inv (γ a b)] (x : ∀ a b, γ a b) :
-    Sigma.uncurry (x⁻¹) = (Sigma.uncurry x)⁻¹ :=
   rfl
 
 @[to_additive (attr := simp)]

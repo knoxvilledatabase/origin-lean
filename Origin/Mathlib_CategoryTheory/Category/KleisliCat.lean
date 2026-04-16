@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Basic
 
+noncomputable section
+
 /-!
 # The Kleisli construction on the Type category
 
@@ -41,14 +43,6 @@ instance KleisliCat.category {m} [Monad.{u, v} m] [LawfulMonad m] : Category (Kl
   refine { id_comp := ?_, comp_id := ?_, assoc := ?_ } <;> intros <;>
   refine funext (fun x => ?_) <;>
   simp (config := { unfoldPartialApp := true }) [CategoryStruct.id, CategoryStruct.comp, (· >=> ·)]
-
-@[simp]
-theorem KleisliCat.id_def {m} [Monad m] (α : KleisliCat m) : 𝟙 α = @pure m _ α :=
-  rfl
-
-theorem KleisliCat.comp_def {m} [Monad m] (α β γ : KleisliCat m) (xs : α ⟶ β) (ys : β ⟶ γ) (a : α) :
-    (xs ≫ ys) a = xs a >>= ys :=
-  rfl
 
 instance : Inhabited (KleisliCat id) :=
   ⟨PUnit⟩

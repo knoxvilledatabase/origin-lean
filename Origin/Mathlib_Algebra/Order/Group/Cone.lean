@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.Algebra.Order.Monoid.Submonoid
 
+noncomputable section
+
 /-!
 # Construct ordered groups from groups with a specified positive cone.
 
@@ -71,15 +73,6 @@ variable (H) in
 def oneLE : GroupCone H where
   __ := Submonoid.oneLE H
   eq_one_of_mem_of_inv_mem' {a} := by simpa using ge_antisymm
-
-@[to_additive (attr := simp) nonneg_toAddSubmonoid]
-lemma oneLE_toSubmonoid : (oneLE H).toSubmonoid = .oneLE H := rfl
-
-@[to_additive (attr := simp) mem_nonneg]
-lemma mem_oneLE : a ∈ oneLE H ↔ 1 ≤ a := Iff.rfl
-
-@[to_additive (attr := simp, norm_cast) coe_nonneg]
-lemma coe_oneLE : oneLE H = {x : H | 1 ≤ x} := rfl
 
 @[to_additive nonneg.isMaxCone]
 instance oneLE.isMaxMulCone {H : Type*} [LinearOrderedCommGroup H] : IsMaxMulCone (oneLE H) where

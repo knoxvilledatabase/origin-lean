@@ -12,6 +12,8 @@ import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 import Mathlib.RingTheory.Filtration
 import Mathlib.RingTheory.Nakayama
 
+noncomputable section
+
 /-!
 # The module `I ⧸ I ^ 2`
 
@@ -135,10 +137,6 @@ noncomputable def cotangentEquivIdeal : I.Cotangent ≃ₗ[R] I.cotangentIdeal :
   · rintro ⟨_, x, hx, rfl⟩
     exact ⟨I.toCotangent ⟨x, hx⟩, Subtype.ext rfl⟩
 
-@[simp]
-theorem cotangentEquivIdeal_apply (x : I.Cotangent) :
-    ↑(I.cotangentEquivIdeal x) = I.cotangentToQuotientSquare x := rfl
-
 theorem cotangentEquivIdeal_symm_apply (x : R) (hx : x ∈ I) :
     -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 had to specify `(R₂ := R)` because `I.toCotangent` suggested `R ⧸ I^2` instead
     I.cotangentEquivIdeal.symm ⟨(I ^ 2).mkQ x,
@@ -192,11 +190,6 @@ def mapCotangent (I₁ : Ideal A) (I₂ : Ideal B) (f : A →ₐ[R] B) (h : I₁
       (n := ⟨f b, h hb⟩) (h ha) (Submodule.mem_top)) using 1
     ext
     exact _root_.map_mul f a b
-
-@[simp]
-lemma mapCotangent_toCotangent
-    (I₁ : Ideal A) (I₂ : Ideal B) (f : A →ₐ[R] B) (h : I₁ ≤ I₂.comap f) (x : I₁) :
-    Ideal.mapCotangent I₁ I₂ f h (Ideal.toCotangent I₁ x) = Ideal.toCotangent I₂ ⟨f x, h x.2⟩ := rfl
 
 end Ideal
 

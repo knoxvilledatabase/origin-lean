@@ -12,6 +12,8 @@ import Mathlib.Data.Nat.Cast.Order.Basic
 import Mathlib.Order.CompleteLatticeIntervals
 import Mathlib.Order.LatticeIntervals
 
+noncomputable section
+
 /-!
 # The type of nonnegative elements
 
@@ -90,12 +92,6 @@ theorem mk_eq_zero [Zero α] [Preorder α] {x : α} (hx : 0 ≤ x) :
 instance add [AddZeroClass α] [Preorder α] [AddLeftMono α] : Add { x : α // 0 ≤ x } :=
   ⟨fun x y => ⟨x + y, add_nonneg x.2 y.2⟩⟩
 
-@[simp]
-theorem mk_add_mk [AddZeroClass α] [Preorder α] [AddLeftMono α] {x y : α}
-    (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x }) + ⟨y, hy⟩ = ⟨x + y, add_nonneg hx hy⟩ :=
-  rfl
-
 @[simp, norm_cast]
 protected theorem coe_add [AddZeroClass α] [Preorder α] [AddLeftMono α]
     (a b : { x : α // 0 ≤ x }) : ((a + b : { x : α // 0 ≤ x }) : α) = a + b :=
@@ -103,16 +99,6 @@ protected theorem coe_add [AddZeroClass α] [Preorder α] [AddLeftMono α]
 
 instance nsmul [AddMonoid α] [Preorder α] [AddLeftMono α] : SMul ℕ { x : α // 0 ≤ x } :=
   ⟨fun n x => ⟨n • (x : α), nsmul_nonneg x.prop n⟩⟩
-
-@[simp]
-theorem nsmul_mk [AddMonoid α] [Preorder α] [AddLeftMono α] (n : ℕ) {x : α}
-    (hx : 0 ≤ x) : (n • (⟨x, hx⟩ : { x : α // 0 ≤ x })) = ⟨n • x, nsmul_nonneg hx n⟩ :=
-  rfl
-
-@[simp, norm_cast]
-protected theorem coe_nsmul [AddMonoid α] [Preorder α] [AddLeftMono α]
-    (n : ℕ) (a : { x : α // 0 ≤ x }) : ((n • a : { x : α // 0 ≤ x }) : α) = n • (a : α) :=
-  rfl
 
 section One
 
@@ -142,11 +128,6 @@ instance mul : Mul { x : α // 0 ≤ x } where
 @[simp, norm_cast]
 protected theorem coe_mul (a b : { x : α // 0 ≤ x }) :
     ((a * b : { x : α // 0 ≤ x }) : α) = a * b :=
-  rfl
-
-@[simp]
-theorem mk_mul_mk {x y : α} (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x }) * ⟨y, hy⟩ = ⟨x * y, mul_nonneg hx hy⟩ :=
   rfl
 
 end Mul
@@ -222,16 +203,6 @@ theorem pow_nonneg {a : α} (H : 0 ≤ a) : ∀ n : ℕ, 0 ≤ a ^ n
 instance pow : Pow { x : α // 0 ≤ x } ℕ where
   pow x n := ⟨(x : α) ^ n, pow_nonneg x.2 n⟩
 
-@[simp, norm_cast]
-protected theorem coe_pow (a : { x : α // 0 ≤ x }) (n : ℕ) :
-    (↑(a ^ n) : α) = (a : α) ^ n :=
-  rfl
-
-@[simp]
-theorem mk_pow {x : α} (hx : 0 ≤ x) (n : ℕ) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x }) ^ n = ⟨x ^ n, pow_nonneg hx n⟩ :=
-  rfl
-
 end Pow
 
 section Semiring
@@ -277,10 +248,6 @@ def toNonneg (a : α) : { x : α // 0 ≤ x } :=
   ⟨max a 0, le_max_right _ _⟩
 
 @[simp]
-theorem coe_toNonneg {a : α} : (toNonneg a : α) = max a 0 :=
-  rfl
-
-@[simp]
 theorem toNonneg_of_nonneg {a : α} (h : 0 ≤ a) : toNonneg a = ⟨a, h⟩ := by simp [toNonneg, h]
 
 @[simp]
@@ -299,11 +266,6 @@ theorem toNonneg_lt {a : { x : α // 0 ≤ x }} {b : α} : a < toNonneg b ↔ �
 
 instance sub [Sub α] : Sub { x : α // 0 ≤ x } :=
   ⟨fun x y => toNonneg (x - y)⟩
-
-@[simp]
-theorem mk_sub_mk [Sub α] {x y : α} (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x }) - ⟨y, hy⟩ = toNonneg (x - y) :=
-  rfl
 
 end LinearOrder
 

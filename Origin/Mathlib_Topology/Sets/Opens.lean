@@ -10,6 +10,8 @@ import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Order.CompactlyGenerated.Basic
 import Mathlib.Order.Copy
 
+noncomputable section
+
 /-!
 # Open sets
 
@@ -79,20 +81,12 @@ instance instSecondCountableOpens [SecondCountableTopology α] (U : Opens α) :
 theorem «forall» {p : Opens α → Prop} : (∀ U, p U) ↔ ∀ (U : Set α) (hU : IsOpen U), p ⟨U, hU⟩ :=
   ⟨fun h _ _ => h _, fun h _ => h _ _⟩
 
-@[simp] theorem carrier_eq_coe (U : Opens α) : U.1 = ↑U := rfl
-
 @[simp]
 theorem coe_mk {U : Set α} {hU : IsOpen U} : ↑(⟨U, hU⟩ : Opens α) = U :=
   rfl
 
-@[simp]
-theorem mem_mk {x : α} {U : Set α} {h : IsOpen U} : x ∈ mk U h ↔ x ∈ U := Iff.rfl
-
 protected theorem nonempty_coeSort {U : Opens α} : Nonempty U ↔ (U : Set α).Nonempty :=
   Set.nonempty_coe_sort
-
-protected theorem nonempty_coe {U : Opens α} : (U : Set α).Nonempty ↔ ∃ x, x ∈ U :=
-  Iff.rfl
 
 @[ext] -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11215): TODO: replace with `∀ x, x ∈ U ↔ x ∈ V`
 theorem ext {U V : Opens α} (h : (U : Set α) = V) : U = V :=
@@ -105,8 +99,6 @@ abbrev inclusion {U V : Opens α} (h : U ≤ V) : U → V := Set.inclusion h
 
 protected theorem isOpen (U : Opens α) : IsOpen (U : Set α) :=
   U.is_open'
-
-@[simp] theorem mk_coe (U : Opens α) : mk (↑U) U.isOpen = U := rfl
 
 def Simps.coe (U : Opens α) : Set α := U
 
@@ -147,11 +139,6 @@ instance : CompleteLattice (Opens α) :=
     -- sInf
     _ rfl
 
-@[simp]
-theorem mk_inf_mk {U V : Set α} {hU : IsOpen U} {hV : IsOpen V} :
-    (⟨U, hU⟩ ⊓ ⟨V, hV⟩ : Opens α) = ⟨U ⊓ V, IsOpen.inter hU hV⟩ :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_inf (s t : Opens α) : (↑(s ⊓ t) : Set α) = ↑s ∩ ↑t :=
   rfl
@@ -164,8 +151,6 @@ theorem coe_sup (s t : Opens α) : (↑(s ⊔ t) : Set α) = ↑s ∪ ↑t :=
 theorem coe_bot : ((⊥ : Opens α) : Set α) = ∅ :=
   rfl
 
-@[simp] theorem mk_empty : (⟨∅, isOpen_empty⟩ : Opens α) = ⊥ := rfl
-
 @[simp, norm_cast]
 theorem coe_eq_empty {U : Opens α} : (U : Set α) = ∅ ↔ U = ⊥ :=
   SetLike.coe_injective.eq_iff' rfl
@@ -176,8 +161,6 @@ lemma mem_top (x : α) : x ∈ (⊤ : Opens α) := trivial
 @[simp, norm_cast]
 theorem coe_top : ((⊤ : Opens α) : Set α) = Set.univ :=
   rfl
-
-@[simp] theorem mk_univ : (⟨univ, isOpen_univ⟩ : Opens α) = ⊤ := rfl
 
 @[simp, norm_cast]
 theorem coe_eq_univ {U : Opens α} : (U : Set α) = univ ↔ U = ⊤ :=
@@ -339,19 +322,7 @@ theorem comap_mono (f : C(α, β)) {s t : Opens β} (h : s ≤ t) : comap f s �
   OrderHomClass.mono (comap f) h
 
 @[simp]
-theorem coe_comap (f : C(α, β)) (U : Opens β) : ↑(comap f U) = f ⁻¹' U :=
-  rfl
-
-@[simp]
 theorem mem_comap {f : C(α, β)} {U : Opens β} {x : α} : x ∈ comap f U ↔ f x ∈ U := .rfl
-
-protected theorem comap_comp (g : C(β, γ)) (f : C(α, β)) :
-    comap (g.comp f) = (comap f).comp (comap g) :=
-  rfl
-
-protected theorem comap_comap (g : C(β, γ)) (f : C(α, β)) (U : Opens γ) :
-    comap f (comap g U) = comap (g.comp f) U :=
-  rfl
 
 theorem comap_injective [T0Space β] : Injective (comap : C(α, β) → FrameHom (Opens β) (Opens α)) :=
   fun f g h =>
@@ -369,10 +340,6 @@ def _root_.Homeomorph.opensCongr (f : α ≃ₜ β) : Opens α ≃o Opens β whe
   right_inv _ := ext <| f.toEquiv.symm_preimage_preimage _
   map_rel_iff' := by
     simp only [← SetLike.coe_subset_coe]; exact f.symm.surjective.preimage_subset_preimage_iff
-
-@[simp]
-theorem _root_.Homeomorph.opensCongr_symm (f : α ≃ₜ β) : f.opensCongr.symm = f.symm.opensCongr :=
-  rfl
 
 instance [Finite α] : Finite (Opens α) :=
   Finite.of_injective _ SetLike.coe_injective

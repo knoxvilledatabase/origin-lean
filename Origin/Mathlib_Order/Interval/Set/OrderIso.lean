@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Set.Basic
 import Mathlib.Order.Hom.Set
 
+noncomputable section
+
 /-!
 # Lemmas about images of intervals under order isomorphisms.
 -/

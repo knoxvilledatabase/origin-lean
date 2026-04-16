@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.Choose.Vandermonde
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Positivity
 
+noncomputable section
+
 /-!
 # Hasse derivative of polynomials
 

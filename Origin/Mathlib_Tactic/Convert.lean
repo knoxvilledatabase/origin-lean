@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.CongrExclamation
 
+noncomputable section
+
 /-!
 # The `convert` tactic.
 -/
@@ -37,7 +39,6 @@ def Lean.MVarId.convertLocalDecl (g : MVarId) (fvarId : FVarId) (typeNew : Expr)
 namespace Mathlib.Tactic
 
 syntax (name := convert) "convert" (Parser.Tactic.config)? " ←"? ppSpace term (" using " num)?
-
   (" with" (ppSpace colGt rintroPat)*)? : tactic
 
 def elabTermForConvert (term : Syntax) (expectedType? : Option Expr) :
@@ -71,7 +72,6 @@ elab_rules : tactic
       return (← g.convert e sym.isSome (n.map (·.getNat)) config patterns) ++ gs
 
 syntax (name := convertTo) "convert_to" (Parser.Tactic.config)? " ←"? ppSpace term (" using " num)?
-
   (" with" (ppSpace colGt rintroPat)*)? (Parser.Tactic.location)? : tactic
 
 elab_rules : tactic

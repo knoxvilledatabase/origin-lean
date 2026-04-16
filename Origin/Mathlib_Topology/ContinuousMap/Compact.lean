@@ -10,6 +10,8 @@ import Mathlib.Topology.CompactOpen
 import Mathlib.Topology.Sets.Compacts
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 
+noncomputable section
+
 /-!
 # Continuous functions on a compact space
 
@@ -69,16 +71,6 @@ alias uniformEmbedding_equivBoundedOfCompact := isUniformEmbedding_equivBoundedO
 def addEquivBoundedOfCompact [AddMonoid β] [LipschitzAdd β] : C(α, β) ≃+ (α →ᵇ β) :=
   ({ toContinuousMapAddHom α β, (equivBoundedOfCompact α β).symm with } : (α →ᵇ β) ≃+ C(α, β)).symm
 
-@[simp]
-theorem addEquivBoundedOfCompact_symm_apply [AddMonoid β] [LipschitzAdd β] :
-    ⇑((addEquivBoundedOfCompact α β).symm) = toContinuousMapAddHom α β :=
-  rfl
-
-@[simp]
-theorem addEquivBoundedOfCompact_apply [AddMonoid β] [LipschitzAdd β] :
-    ⇑(addEquivBoundedOfCompact α β) = mkOfCompact :=
-  rfl
-
 instance instPseudoMetricSpace : PseudoMetricSpace C(α, β) :=
   (isUniformEmbedding_equivBoundedOfCompact α β).comapPseudoMetricSpace _
 
@@ -86,22 +78,7 @@ instance instMetricSpace {β : Type*} [MetricSpace β] :
     MetricSpace C(α, β) :=
   (isUniformEmbedding_equivBoundedOfCompact α β).comapMetricSpace _
 
-@[simps! (config := .asFn) toEquiv apply symm_apply]
-def isometryEquivBoundedOfCompact : C(α, β) ≃ᵢ (α →ᵇ β) where
-  isometry_toFun _ _ := rfl
-  toEquiv := equivBoundedOfCompact α β
-
 end
-
-@[simp]
-theorem _root_.BoundedContinuousFunction.dist_mkOfCompact (f g : C(α, β)) :
-    dist (mkOfCompact f) (mkOfCompact g) = dist f g :=
-  rfl
-
-@[simp]
-theorem _root_.BoundedContinuousFunction.dist_toContinuousMap (f g : α →ᵇ β) :
-    dist f.toContinuousMap g.toContinuousMap = dist f g :=
-  rfl
 
 open BoundedContinuousFunction
 
@@ -139,15 +116,6 @@ instance {R} [Zero R] [Zero β] [PseudoMetricSpace R] [SMul R β] [BoundedSMul R
 end
 
 instance : Norm C(α, E) where norm x := dist x 0
-
-@[simp]
-theorem _root_.BoundedContinuousFunction.norm_mkOfCompact (f : C(α, E)) : ‖mkOfCompact f‖ = ‖f‖ :=
-  rfl
-
-@[simp]
-theorem _root_.BoundedContinuousFunction.norm_toContinuousMap_eq (f : α →ᵇ E) :
-    ‖f.toContinuousMap‖ = ‖f‖ :=
-  rfl
 
 open BoundedContinuousFunction
 
@@ -281,32 +249,6 @@ def evalCLM (x : α) : C(α, E) →L[𝕜] E :=
 
 end
 
-@[simp]
-theorem linearIsometryBoundedOfCompact_symm_apply (f : α →ᵇ E) :
-    (linearIsometryBoundedOfCompact α E 𝕜).symm f = f.toContinuousMap :=
-  rfl
-
-@[simp]
-theorem linearIsometryBoundedOfCompact_apply_apply (f : C(α, E)) (a : α) :
-    (linearIsometryBoundedOfCompact α E 𝕜 f) a = f a :=
-  rfl
-
-@[simp]
-theorem linearIsometryBoundedOfCompact_toIsometryEquiv :
-    (linearIsometryBoundedOfCompact α E 𝕜).toIsometryEquiv = isometryEquivBoundedOfCompact α E :=
-  rfl
-
-@[simp]
-theorem linearIsometryBoundedOfCompact_toAddEquiv :
-    ((linearIsometryBoundedOfCompact α E 𝕜).toLinearEquiv : C(α, E) ≃+ (α →ᵇ E)) =
-      addEquivBoundedOfCompact α E :=
-  rfl
-
-@[simp]
-theorem linearIsometryBoundedOfCompact_of_compact_toEquiv :
-    (linearIsometryBoundedOfCompact α E 𝕜).toLinearEquiv.toEquiv = equivBoundedOfCompact α E :=
-  rfl
-
 end
 
 @[simp] lemma nnnorm_smul_const {R β : Type*} [NormedAddCommGroup β] [NormedDivisionRing R]
@@ -381,11 +323,6 @@ theorem ContinuousLinearMap.toLinear_compLeftContinuousCompact (g : β →L[𝕜
   ext f
   rfl
 
-@[simp]
-theorem ContinuousLinearMap.compLeftContinuousCompact_apply (g : β →L[𝕜] γ) (f : C(X, β)) (x : X) :
-    g.compLeftContinuousCompact X f x = g (f x) :=
-  rfl
-
 end CompLeft
 
 namespace ContinuousMap
@@ -434,10 +371,6 @@ section NormedSpace
 variable {α : Type*} {β : Type*}
 
 variable [TopologicalSpace α] [SeminormedAddCommGroup β] [StarAddMonoid β] [NormedStarGroup β]
-
-theorem _root_.BoundedContinuousFunction.mkOfCompact_star [CompactSpace α] (f : C(α, β)) :
-    mkOfCompact (star f) = star (mkOfCompact f) :=
-  rfl
 
 instance [CompactSpace α] : NormedStarGroup C(α, β) where
   norm_star f := by

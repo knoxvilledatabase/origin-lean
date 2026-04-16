@@ -8,6 +8,8 @@ import Mathlib.AlgebraicGeometry.Noetherian
 import Mathlib.AlgebraicGeometry.Stalk
 import Mathlib.AlgebraicGeometry.Properties
 
+noncomputable section
+
 /-!
 # Spreading out morphisms
 
@@ -118,7 +120,6 @@ lemma Scheme.IsGermInjective.of_openCover
   infer_instance
 
 protected
-
 lemma Scheme.IsGermInjective.Spec
     (H : ∀ I : Ideal R, I.IsPrime → ∃ f : R, f ∉ I ∧ ∀ (x y : R)
         (_ : y * x = 0) (_ : y ∉ I), ∃ n, f ^ n * x = 0) : (Spec R).IsGermInjective := by

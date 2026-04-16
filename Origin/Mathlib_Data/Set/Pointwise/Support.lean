@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Set/Pointwise/Support.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Support
 import Mathlib.Data.Set.Pointwise.SMul
+
+noncomputable section
 
 /-!
 # Support of a function composed with a scalar action
@@ -38,9 +40,15 @@ section GroupWithZero
 
 variable {α β γ : Type*} [GroupWithZero α] [MulAction α β]
 
--- DISSOLVED: mulSupport_comp_inv_smul₀
+theorem mulSupport_comp_inv_smul₀ [One γ] {c : α} (hc : c ≠ 0) (f : β → γ) :
+    (mulSupport fun x ↦ f (c⁻¹ • x)) = c • mulSupport f := by
+  ext x
+  simp only [mem_smul_set_iff_inv_smul_mem₀ hc, mem_mulSupport]
 
--- DISSOLVED: support_comp_inv_smul₀
+theorem support_comp_inv_smul₀ [Zero γ] {c : α} (hc : c ≠ 0) (f : β → γ) :
+    (support fun x ↦ f (c⁻¹ • x)) = c • support f := by
+  ext x
+  simp only [mem_smul_set_iff_inv_smul_mem₀ hc, mem_support]
 
 attribute [to_additive existing support_comp_inv_smul₀] mulSupport_comp_inv_smul₀
 

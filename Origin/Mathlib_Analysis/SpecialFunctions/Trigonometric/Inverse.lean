@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Topology.Order.ProjIcc
 
+noncomputable section
+
 /-!
 # Inverse trigonometric functions.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Sigma.Basic
 import Mathlib.Algebra.Order.Ring.Nat
 
+noncomputable section
+
 /-!
 # A computable model of ZFA without infinity
 
@@ -66,9 +68,6 @@ def toList : ∀ {b}, Lists' α b → List (Lists α)
   | _, atom _ => []
   | _, nil => []
   | _, cons' a l => ⟨_, a⟩ :: l.toList
-
-@[simp]
-theorem toList_cons (a : Lists α) (l) : toList (cons a l) = a :: l.toList := rfl
 
 @[simp]
 def ofList : List (Lists α) → Lists' α true

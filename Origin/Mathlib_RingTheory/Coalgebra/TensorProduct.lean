@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Algebra.Category.CoalgebraCat.ComonEquivalence
 
+noncomputable section
+
 /-!
 # Tensor products of coalgebras
 
@@ -76,7 +78,6 @@ variable {R M N P Q : Type u} [CommRing R]
   [Module R P] [Module R Q] [Coalgebra R M] [Coalgebra R N] [Coalgebra R P] [Coalgebra R Q]
 
 attribute [local instance] CoalgebraCat.instMonoidalCategoryAux in
-
 section
 
 noncomputable def map (f : M →ₗc[R] N) (g : P →ₗc[R] Q) :
@@ -88,15 +89,6 @@ noncomputable def map (f : M →ₗc[R] N) (g : P →ₗc[R] Q) :
   map_comp_comul := by
     simp_rw [← tensorHom_toLinearMap, ← comul_tensorObj]
     apply (CoalgebraCat.ofHom f ⊗ CoalgebraCat.ofHom g).1.map_comp_comul
-
-@[simp]
-theorem map_tmul (f : M →ₗc[R] N) (g : P →ₗc[R] Q) (x : M) (y : P) :
-    map f g (x ⊗ₜ y) = f x ⊗ₜ g y :=
-  rfl
-
-@[simp]
-theorem map_toLinearMap (f : M →ₗc[R] N) (g : P →ₗc[R] Q) :
-    map f g = _root_.TensorProduct.map (f : M →ₗ[R] N) (g : P →ₗ[R] Q) := rfl
 
 variable (R M N P)
 
@@ -116,20 +108,6 @@ protected noncomputable def assoc :
 
 variable {R M N P}
 
-@[simp]
-theorem assoc_tmul (x : M) (y : N) (z : P) :
-    Coalgebra.TensorProduct.assoc R M N P ((x ⊗ₜ y) ⊗ₜ z) = x ⊗ₜ (y ⊗ₜ z) :=
-  rfl
-
-@[simp]
-theorem assoc_symm_tmul (x : M) (y : N) (z : P) :
-    (Coalgebra.TensorProduct.assoc R M N P).symm (x ⊗ₜ (y ⊗ₜ z)) = (x ⊗ₜ y) ⊗ₜ z :=
-  rfl
-
-@[simp]
-theorem assoc_toLinearEquiv :
-    Coalgebra.TensorProduct.assoc R M N P = _root_.TensorProduct.assoc R M N P := rfl
-
 variable (R M)
 
 protected noncomputable def lid : R ⊗[R] M ≃ₗc[R] M :=
@@ -143,16 +121,6 @@ protected noncomputable def lid : R ⊗[R] M ≃ₗc[R] M :=
 
 variable {R M}
 
-@[simp]
-theorem lid_toLinearEquiv :
-    (Coalgebra.TensorProduct.lid R M) = _root_.TensorProduct.lid R M := rfl
-
-@[simp]
-theorem lid_tmul (r : R) (a : M) : Coalgebra.TensorProduct.lid R M (r ⊗ₜ a) = r • a := rfl
-
-@[simp]
-theorem lid_symm_apply (a : M) : (Coalgebra.TensorProduct.lid R M).symm a = 1 ⊗ₜ a := rfl
-
 variable (R M)
 
 protected noncomputable def rid : M ⊗[R] R ≃ₗc[R] M :=
@@ -165,16 +133,6 @@ protected noncomputable def rid : M ⊗[R] R ≃ₗc[R] M :=
       apply CoalgHom.map_comp_comul (ρ_ (CoalgebraCat.of R M)).hom.1 }
 
 variable {R M}
-
-@[simp]
-theorem rid_toLinearEquiv :
-    (Coalgebra.TensorProduct.rid R M) = _root_.TensorProduct.rid R M := rfl
-
-@[simp]
-theorem rid_tmul (r : R) (a : M) : Coalgebra.TensorProduct.rid R M (a ⊗ₜ r) = r • a := rfl
-
-@[simp]
-theorem rid_symm_apply (a : M) : (Coalgebra.TensorProduct.rid R M).symm a = a ⊗ₜ 1 := rfl
 
 end
 

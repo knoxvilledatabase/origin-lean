@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Data.List.Nodup
 
+noncomputable section
+
 /-!
 # Finite products of types
 
@@ -58,10 +60,6 @@ protected def mk : ∀ (l : List ι) (_f : ∀ i, α i), TProd α l
 
 instance [∀ i, Inhabited (α i)] : Inhabited (TProd α l) :=
   ⟨TProd.mk l default⟩
-
-@[simp]
-theorem fst_mk (i : ι) (l : List ι) (f : ∀ i, α i) : (TProd.mk (i :: l) f).1 = f i :=
-  rfl
 
 @[simp]
 theorem snd_mk (i : ι) (l : List ι) (f : ∀ i, α i) :

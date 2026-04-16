@@ -10,6 +10,8 @@ import Mathlib.RingTheory.EssentialFiniteness
 import Mathlib.Algebra.Exact
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 
+noncomputable section
+
 /-!
 # The module of kaehler differentials
 
@@ -702,9 +704,8 @@ lemma KaehlerDifferential.exact_mapBaseChange_map :
 
 end
 
-noncomputable
-
 @[simps]
+noncomputable
 def KaehlerDifferential.kerToTensor :
     RingHom.ker (algebraMap A B) →ₗ[A] B ⊗[A] Ω[A⁄R] where
   toFun x := 1 ⊗ₜ D R A x
@@ -715,7 +716,6 @@ def KaehlerDifferential.kerToTensor :
     RingHom.id_apply]
 
 noncomputable
-
 def KaehlerDifferential.kerCotangentToTensor :
     (RingHom.ker (algebraMap A B)).Cotangent →ₗ[A] B ⊗[A] Ω[A⁄R] :=
   Submodule.liftQ _ (kerToTensor R A B) <| by
@@ -726,10 +726,6 @@ def KaehlerDifferential.kerCotangentToTensor :
     simp only [Submodule.mem_comap, LinearMap.lsmul_apply, LinearMap.mem_ker, map_smul,
       kerToTensor_apply, TensorProduct.smul_tmul', ← algebraMap_eq_smul_one,
       RingHom.mem_ker.mp hx, TensorProduct.zero_tmul]
-
-@[simp]
-lemma KaehlerDifferential.kerCotangentToTensor_toCotangent (x) :
-    kerCotangentToTensor R A B (Ideal.toCotangent _ x) = 1 ⊗ₜ D _ _ x.1 := rfl
 
 variable [Algebra R B] [IsScalarTower R A B]
 

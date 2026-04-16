@@ -9,6 +9,8 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Fintype.Fin
 import Mathlib.Logic.Equiv.Fin
 
+noncomputable section
+
 /-!
 # Big operators and `Fin`
 
@@ -89,9 +91,6 @@ theorem prod_snoc [CommMonoid β] {n : ℕ} (x : β) (f : Fin n → β) :
     (∏ i : Fin n.succ, (snoc f x : Fin n.succ → β) i) = (∏ i : Fin n, f i) * x := by
   simp [prod_univ_castSucc]
 
-@[to_additive sum_univ_one]
-theorem prod_univ_one [CommMonoid β] (f : Fin 1 → β) : ∏ i, f i = f 0 := by simp
-
 @[to_additive (attr := simp)]
 theorem prod_univ_two [CommMonoid β] (f : Fin 2 → β) : ∏ i, f i = f 0 * f 1 := by
   simp [prod_univ_succ]
@@ -138,10 +137,6 @@ theorem prod_univ_eight [CommMonoid β] (f : Fin 8 → β) :
 theorem sum_pow_mul_eq_add_pow {n : ℕ} {R : Type*} [CommSemiring R] (a b : R) :
     (∑ s : Finset (Fin n), a ^ s.card * b ^ (n - s.card)) = (a + b) ^ n := by
   simpa using Fintype.sum_pow_mul_eq_add_pow (Fin n) a b
-
-theorem prod_const [CommMonoid α] (n : ℕ) (x : α) : ∏ _i : Fin n, x = x ^ n := by simp
-
-theorem sum_const [AddCommMonoid α] (n : ℕ) (x : α) : ∑ _i : Fin n, x = n • x := by simp
 
 @[to_additive]
 theorem prod_Ioi_zero {M : Type*} [CommMonoid M] {n : ℕ} {v : Fin n.succ → M} :
@@ -285,10 +280,6 @@ def finFunctionFinEquiv {m n : ℕ} : (Fin n → Fin m) ≃ Fin (m ^ n) :=
         -- Caused by a refactor of the `npow` instance for `Fin`.
         exact a.is_lt.trans_eq (pow_succ' _ _)
 
-theorem finFunctionFinEquiv_apply {m n : ℕ} (f : Fin n → Fin m) :
-    (finFunctionFinEquiv f : ℕ) = ∑ i : Fin n, ↑(f i) * m ^ (i : ℕ) :=
-  rfl
-
 -- DISSOLVED: finFunctionFinEquiv_single
 
 def finPiFinEquiv {m : ℕ} {n : Fin m → ℕ} : (∀ i : Fin m, Fin (n i)) ≃ Fin (∏ i : Fin m, n i) :=
@@ -358,9 +349,6 @@ def finPiFinEquiv {m : ℕ} {n : Fin m → ℕ} : (∀ i : Fin m, Fin (n i)) ≃
         · cases j
           rfl-/)
 
-theorem finPiFinEquiv_apply {m : ℕ} {n : Fin m → ℕ} (f : ∀ i : Fin m, Fin (n i)) :
-    (finPiFinEquiv f : ℕ) = ∑ i, f i * ∏ j, n (Fin.castLE i.is_lt.le j) := rfl
-
 -- DISSOLVED: finPiFinEquiv_single
 
 namespace List
@@ -368,34 +356,6 @@ namespace List
 section CommMonoid
 
 variable [CommMonoid α]
-
-@[to_additive]
-theorem prod_take_ofFn {n : ℕ} (f : Fin n → α) (i : ℕ) :
-    ((ofFn f).take i).prod = ∏ j ∈ Finset.univ.filter fun j : Fin n => j.val < i, f j := by
-  induction i with
-  | zero =>
-    simp
-  | succ i IH =>
-    by_cases h : i < n
-    · have : i < length (ofFn f) := by rwa [length_ofFn f]
-      rw [prod_take_succ _ _ this]
-      have A : ((Finset.univ : Finset (Fin n)).filter fun j => j.val < i + 1) =
-          ((Finset.univ : Finset (Fin n)).filter fun j => j.val < i) ∪ {(⟨i, h⟩ : Fin n)} := by
-        ext ⟨_, _⟩
-        simp [Nat.lt_succ_iff_lt_or_eq]
-      have B : _root_.Disjoint (Finset.filter (fun j : Fin n => j.val < i) Finset.univ)
-          (singleton (⟨i, h⟩ : Fin n)) := by simp
-      rw [A, Finset.prod_union B, IH]
-      simp
-    · have A : (ofFn f).take i = (ofFn f).take i.succ := by
-        rw [← length_ofFn f] at h
-        have : length (ofFn f) ≤ i := not_lt.mp h
-        rw [take_of_length_le this, take_of_length_le (le_trans this (Nat.le_succ _))]
-      have B : ∀ j : Fin n, ((j : ℕ) < i.succ) = ((j : ℕ) < i) := by
-        intro j
-        have : (j : ℕ) < i := lt_of_lt_of_le j.2 (not_lt.mp h)
-        simp [this, lt_trans this (Nat.lt_succ_self _)]
-      simp [← A, B, IH]
 
 @[to_additive]
 theorem prod_ofFn {n : ℕ} {f : Fin n → α} : (ofFn f).prod = ∏ i, f i :=

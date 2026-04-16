@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Int/Cast/Lemmas.lean
-Genuine: 46 | Conflates: 0 | Dissolved: 2 | Infrastructure: 15
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Hom.Basic
 import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Algebra.Ring.Parity
+
+noncomputable section
 
 /-!
 # Cast of integers (additional theorems)
@@ -46,8 +48,6 @@ section AddGroupWithOne
 
 variable [AddGroupWithOne α]
 
-@[simp] lemma coe_castAddHom : ⇑(castAddHom α) = fun x : ℤ => (x : α) := rfl
-
 lemma _root_.Even.intCast {n : ℤ} (h : Even n) : Even (n : α) := h.map (castAddHom α)
 
 variable [CharZero α] {m n : ℤ}
@@ -66,11 +66,11 @@ lemma cast_inj : (m : α) = n ↔ m = n := by rw [← sub_eq_zero, ← cast_sub,
 
 lemma cast_injective : Injective (Int.cast : ℤ → α) := fun _ _ ↦ cast_inj.1
 
--- DISSOLVED: cast_ne_zero
+lemma cast_ne_zero : (n : α) ≠ 0 ↔ n ≠ 0 := not_congr cast_eq_zero
 
 @[simp] lemma cast_eq_one : (n : α) = 1 ↔ n = 1 := by rw [← cast_one, cast_inj]
 
--- DISSOLVED: cast_ne_one
+lemma cast_ne_one : (n : α) ≠ 1 ↔ n ≠ 1 := cast_eq_one.not
 
 end AddGroupWithOne
 
@@ -86,8 +86,6 @@ def castRingHom : ℤ →+* α where
   map_add' := cast_add
   map_one' := cast_one
   map_mul' := cast_mul
-
-@[simp] lemma coe_castRingHom : ⇑(castRingHom α) = fun x : ℤ ↦ (x : α) := rfl
 
 lemma cast_commute : ∀ (n : ℤ) (a : α), Commute ↑n a
   | (n : ℕ), x => by simpa using n.cast_commute x
@@ -303,17 +301,6 @@ def zpowersMulHom : α ≃* (Multiplicative ℤ →* α) :=
 
 variable {α}
 
-@[simp]
-lemma zpowersMulHom_apply (x : α) (n : Multiplicative ℤ) : zpowersMulHom α x n = x ^ n.toAdd := rfl
-
-@[simp]
-lemma zpowersMulHom_symm_apply (f : Multiplicative ℤ →* α) :
-    (zpowersMulHom α).symm f = f (ofAdd 1) := rfl
-
-@[simp] lemma zmultiplesAddHom_apply (x : β) (n : ℤ) : zmultiplesAddHom β x n = n • x := rfl
-
-@[simp] lemma zmultiplesAddHom_symm_apply (f : ℤ →+ β) : (zmultiplesAddHom β).symm f = f 1 := rfl
-
 end CommGroup
 
 section NonAssocRing
@@ -352,13 +339,6 @@ namespace Pi
 variable {π : ι → Type*} [∀ i, IntCast (π i)]
 
 instance instIntCast : IntCast (∀ i, π i) where intCast n _ := n
-
-theorem intCast_apply (n : ℤ) (i : ι) : (n : ∀ i, π i) i = n :=
-  rfl
-
-@[simp]
-theorem intCast_def (n : ℤ) : (n : ∀ i, π i) = fun _ => ↑n :=
-  rfl
 
 end Pi
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Coset.Basic
 import Mathlib.SetTheory.Cardinal.Finite
 
+noncomputable section
+
 /-!
 # Lagrange's theorem: the order of a subgroup divides the order of the group.
 -/

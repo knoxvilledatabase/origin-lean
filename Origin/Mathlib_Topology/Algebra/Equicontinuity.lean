@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.UniformConvergence
 import Mathlib.Topology.UniformSpace.Equicontinuity
 
+noncomputable section
+
 /-!
 # Algebra-related equicontinuity criterions
 -/

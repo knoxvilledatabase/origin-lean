@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.Tactic.Conv
 
+noncomputable section
+
 /-!
 # The `slice` tactic
 
@@ -42,15 +44,11 @@ elab "slice " a:num ppSpace b:num : conv => evalSlice a.getNat b.getNat
 syntax (name := sliceLHS) "slice_lhs " num ppSpace num " => " convSeq : tactic
 
 macro_rules
-
   | `(tactic| slice_lhs $a $b => $seq) =>
-
     `(tactic| conv => lhs; slice $a $b; ($seq:convSeq))
 
 syntax (name := sliceRHS) "slice_rhs " num ppSpace num " => " convSeq : tactic
 
 macro_rules
-
   | `(tactic| slice_rhs $a $b => $seq) =>
-
     `(tactic| conv => rhs; slice $a $b; ($seq:convSeq))

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Functor.Multivariate
 import Mathlib.Data.PFunctor.Univariate.Basic
 
+noncomputable section
+
 /-!
 # Multivariate polynomial functors.
 
@@ -88,9 +90,6 @@ theorem const.get_map (f : α ⟹ β) (x : const n A α) : const.get (f <$$> x) 
   rfl
 
 @[simp]
-theorem const.get_mk (x : A) : const.get (const.mk n x : const n A α) = x := rfl
-
-@[simp]
 theorem const.mk_get (x : const n A α) : const.mk n (const.get x) = x := by
   cases x
   dsimp [const.get, const.mk]
@@ -109,18 +108,6 @@ def comp.mk (x : P (fun i => Q i α)) : comp P Q α :=
 
 def comp.get (x : comp P Q α) : P (fun i => Q i α) :=
   ⟨x.1.1, fun i a => ⟨x.fst.snd i a, fun (j : Fin2 m) (b : (Q i).B _ j) => x.snd j ⟨i, ⟨a, b⟩⟩⟩⟩
-
-theorem comp.get_map (f : α ⟹ β) (x : comp P Q α) :
-    comp.get (f <$$> x) = (fun i (x : Q i α) => f <$$> x) <$$> comp.get x := by
-  rfl
-
-@[simp]
-theorem comp.get_mk (x : P (fun i => Q i α)) : comp.get (comp.mk x) = x := by
-  rfl
-
-@[simp]
-theorem comp.mk_get (x : comp P Q α) : comp.mk (comp.get x) = x := by
-  rfl
 
 theorem liftP_iff {α : TypeVec n} (p : ∀ ⦃i⦄, α i → Prop) (x : P α) :
     LiftP p x ↔ ∃ a f, x = ⟨a, f⟩ ∧ ∀ i j, p (f i j) := by

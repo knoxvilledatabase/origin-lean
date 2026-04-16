@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Nilpotent.Defs
 import Mathlib.Tactic.StacksAttribute
 
+noncomputable section
+
 /-!
 
 ## Idempotents in rings

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.EMetricSpace.Basic
 import Mathlib.Topology.UniformSpace.Pi
 
+noncomputable section
+
 /-!
 # Indexed product of extended metric spaces
 -/

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PowerSeries/Basic.lean
-Genuine: 91 | Conflates: 0 | Dissolved: 4 | Infrastructure: 45
+Genuine: 93 | Conflates: 1 | Dissolved: 0 | Infrastructure: 46
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Polynomial.Basic
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.MvPowerSeries.Basic
 import Mathlib.Tactic.MoveAdd
+
+noncomputable section
 
 /-!
 # Formal power series (in one variable)
@@ -212,7 +214,8 @@ theorem coeff_C (n : ℕ) (a : R) : coeff R n (C R a : R⟦X⟧) = if n = 0 then
 theorem coeff_zero_C (a : R) : coeff R 0 (C R a) = a := by
   rw [coeff_C, if_pos rfl]
 
--- DISSOLVED: coeff_ne_zero_C
+theorem coeff_ne_zero_C {a : R} {n : ℕ} (h : n ≠ 0) : coeff R n (C R a) = 0 := by
+  rw [coeff_C, if_neg h]
 
 @[simp]
 theorem coeff_succ_C {a : R} {n : ℕ} : coeff R (n + 1) (C R a) = 0 :=
@@ -241,7 +244,10 @@ theorem coeff_zero_X : coeff R 0 (X : R⟦X⟧) = 0 := by
 @[simp]
 theorem coeff_one_X : coeff R 1 (X : R⟦X⟧) = 1 := by rw [coeff_X, if_pos rfl]
 
--- DISSOLVED: X_ne_zero
+-- CONFLATES (assumes ground = zero): X_ne_zero
+@[simp]
+theorem X_ne_zero [Nontrivial R] : (X : R⟦X⟧) ≠ 0 := fun H => by
+  simpa only [coeff_one_X, one_ne_zero, map_zero] using congr_arg (coeff R 1) H
 
 theorem X_pow_eq (n : ℕ) : (X : R⟦X⟧) ^ n = monomial R n 1 :=
   MvPowerSeries.X_pow_eq _ n
@@ -275,16 +281,6 @@ theorem coeff_mul_C (n : ℕ) (φ : R⟦X⟧) (a : R) : coeff R n (φ * C R a) =
 theorem coeff_C_mul (n : ℕ) (φ : R⟦X⟧) (a : R) : coeff R n (C R a * φ) = a * coeff R n φ :=
   MvPowerSeries.coeff_C_mul _ φ a
 
-@[simp]
-theorem coeff_smul {S : Type*} [Semiring S] [Module R S] (n : ℕ) (φ : PowerSeries S) (a : R) :
-    coeff S n (a • φ) = a • coeff S n φ :=
-  rfl
-
-@[simp]
-theorem constantCoeff_smul {S : Type*} [Semiring S] [Module R S] (φ : PowerSeries S) (a : R) :
-    constantCoeff S (a • φ) = a • constantCoeff S φ :=
-  rfl
-
 theorem smul_eq_C_mul (f : R⟦X⟧) (a : R) : a • f = C R a * f := by
   ext
   simp
@@ -306,27 +302,12 @@ theorem constantCoeff_C (a : R) : constantCoeff R (C R a) = a :=
   rfl
 
 @[simp]
-theorem constantCoeff_comp_C : (constantCoeff R).comp (C R) = RingHom.id R :=
-  rfl
-
-@[simp]
-theorem constantCoeff_zero : constantCoeff R 0 = 0 :=
-  rfl
-
-@[simp]
 theorem constantCoeff_one : constantCoeff R 1 = 1 :=
   rfl
 
 @[simp]
 theorem constantCoeff_X : constantCoeff R X = 0 :=
   MvPowerSeries.coeff_zero_X _
-
-@[simp]
-theorem constantCoeff_mk {f : ℕ → R} : constantCoeff R (mk f) = f 0 := rfl
-
--- DISSOLVED: coeff_zero_mul_X
-
-theorem coeff_zero_X_mul (φ : R⟦X⟧) : coeff R 0 (X * φ) = 0 := by simp
 
 theorem constantCoeff_surj : Function.Surjective (constantCoeff R) :=
   fun r => ⟨(C R) r, constantCoeff_C r⟩
@@ -414,17 +395,6 @@ def map : R⟦X⟧ →+* S⟦X⟧ :=
   MvPowerSeries.map _ f
 
 @[simp]
-theorem map_id : (map (RingHom.id R) : R⟦X⟧ → R⟦X⟧) = id :=
-  rfl
-
-theorem map_comp : map (g.comp f) = (map g).comp (map f) :=
-  rfl
-
-@[simp]
-theorem coeff_map (n : ℕ) (φ : R⟦X⟧) : coeff S n (map f φ) = f (coeff R n φ) :=
-  rfl
-
-@[simp]
 theorem map_C (r : R) : map f (C _ r) = C _ (f r) := by
   ext
   simp [coeff_C, apply_ite f]
@@ -496,8 +466,6 @@ theorem rescale_zero : rescale 0 = (C R).comp (constantCoeff R) := by
     PowerSeries.coeff_mk _ _, coeff_C]
   split_ifs with h <;> simp [h]
 
-theorem rescale_zero_apply : rescale 0 X = C R (constantCoeff R X) := by simp
-
 @[simp]
 theorem rescale_one : rescale 1 = RingHom.id R⟦X⟧ := by
   ext
@@ -537,52 +505,6 @@ theorem coeff_prod (f : ι → PowerSeries R) (d : ℕ) (s : Finset ι) :
   simp only [AddEquiv.toEquiv_eq_coe, Finsupp.mapRange.addEquiv_toEquiv, AddEquiv.toEquiv_symm,
     Equiv.coe_toEmbedding, Finsupp.mapRange.equiv_apply, AddEquiv.coe_toEquiv_symm,
     Finsupp.mapRange_apply, AddEquiv.finsuppUnique_symm]
-
-lemma coeff_pow (k n : ℕ) (φ : R⟦X⟧) :
-    coeff R n (φ ^ k) = ∑ l ∈ finsuppAntidiag (range k) n, ∏ i ∈ range k, coeff R (l i) φ := by
-  have h₁ (i : ℕ) : Function.const ℕ φ i = φ := rfl
-  have h₂ (i : ℕ) : ∏ j ∈ range i, Function.const ℕ φ j = φ ^ i := by
-    apply prod_range_induction (fun _ => φ) (fun i => φ ^ i) rfl (congrFun rfl) i
-  rw [← h₂, ← h₁ k]
-  apply coeff_prod (f := Function.const ℕ φ) (d := n) (s := range k)
-
-lemma coeff_one_mul (φ ψ : R⟦X⟧) : coeff R 1 (φ * ψ) =
-    coeff R 1 φ * constantCoeff R ψ + coeff R 1 ψ * constantCoeff R φ := by
-  have : Finset.antidiagonal 1 = {(0, 1), (1, 0)} := by exact rfl
-  rw [coeff_mul, this, Finset.sum_insert, Finset.sum_singleton, coeff_zero_eq_constantCoeff,
-    mul_comm, add_comm]
-  norm_num
-
-lemma coeff_one_pow (n : ℕ) (φ : R⟦X⟧) :
-    coeff R 1 (φ ^ n) = n * coeff R 1 φ * (constantCoeff R φ) ^ (n - 1) := by
-  rcases Nat.eq_zero_or_pos n with (rfl | hn)
-  · simp
-  induction n with
-  | zero => by_contra; linarith
-  | succ n' ih =>
-      have h₁ (m : ℕ) : φ ^ (m + 1) = φ ^ m * φ := by exact rfl
-      have h₂ : Finset.antidiagonal 1 = {(0, 1), (1, 0)} := by exact rfl
-      rw [h₁, coeff_mul, h₂, Finset.sum_insert, Finset.sum_singleton]
-      · simp only [coeff_zero_eq_constantCoeff, map_pow, Nat.cast_add, Nat.cast_one,
-          add_tsub_cancel_right]
-        have h₀ : n' = 0 ∨ 1 ≤ n' := by omega
-        rcases h₀ with h' | h'
-        · by_contra h''
-          rw [h'] at h''
-          simp only [pow_zero, one_mul, coeff_one, one_ne_zero, ↓reduceIte, zero_mul, add_zero,
-            CharP.cast_eq_zero, zero_add, mul_one, not_true_eq_false] at h''
-          norm_num at h''
-        · rw [ih]
-          · conv => lhs; arg 2; rw [mul_comm, ← mul_assoc]
-            move_mul [← (constantCoeff R) φ ^ (n' - 1)]
-            conv => enter [1, 2, 1, 1, 2]; rw [← pow_one (a := constantCoeff R φ)]
-            rw [← pow_add (a := constantCoeff R φ)]
-            conv => enter [1, 2, 1, 1]; rw [Nat.sub_add_cancel h']
-            conv => enter [1, 2, 1]; rw [mul_comm]
-            rw [mul_assoc, ← one_add_mul, add_comm, mul_assoc]
-            conv => enter [1, 2]; rw [mul_comm]
-          exact h'
-      · decide
 
 end CommSemiring
 
@@ -692,16 +614,21 @@ theorem X_prime : Prime (X : R⟦X⟧) := by
 
 theorem X_irreducible : Irreducible (X : R⟦X⟧) := X_prime.irreducible
 
--- DISSOLVED: rescale_injective
+theorem rescale_injective {a : R} (ha : a ≠ 0) : Function.Injective (rescale a) := by
+  intro p q h
+  rw [PowerSeries.ext_iff] at *
+  intro n
+  specialize h n
+  rw [coeff_rescale, coeff_rescale, mul_eq_mul_left_iff] at h
+  apply h.resolve_right
+  intro h'
+  exact ha (pow_eq_zero h')
 
 end IsDomain
 
 section Algebra
 
 variable {A : Type*} [CommSemiring R] [Semiring A] [Algebra R A]
-
-theorem C_eq_algebraMap {r : R} : C R r = (algebraMap R R⟦X⟧) r :=
-  rfl
 
 theorem algebraMap_apply {r : R} : algebraMap R A⟦X⟧ r = C A (algebraMap R A r) :=
   MvPowerSeries.algebraMap_apply
@@ -727,9 +654,6 @@ def toPowerSeries : R[X] → (PowerSeries R) := fun φ =>
 
 instance coeToPowerSeries : Coe R[X] (PowerSeries R) :=
   ⟨toPowerSeries⟩
-
-theorem coe_def : (φ : PowerSeries R) = PowerSeries.mk (coeff φ) :=
-  rfl
 
 @[simp, norm_cast]
 theorem coeff_coe (n) : PowerSeries.coeff R n φ = coeff φ n :=
@@ -767,10 +691,6 @@ theorem coe_C (a : R) : ((C a : R[X]) : PowerSeries R) = PowerSeries.C R a := by
 @[simp, norm_cast]
 theorem coe_X : ((X : R[X]) : PowerSeries R) = PowerSeries.X :=
   coe_monomial _ _
-
-@[simp]
-theorem constantCoeff_coe : PowerSeries.constantCoeff R φ = φ.coeff 0 :=
-  rfl
 
 variable (R)
 
@@ -822,11 +742,6 @@ def coeToPowerSeries.algHom : R[X] →ₐ[R] PowerSeries A :=
   { (PowerSeries.map (algebraMap R A)).comp coeToPowerSeries.ringHom with
     commutes' := fun r => by simp [algebraMap_apply, PowerSeries.algebraMap_apply] }
 
-@[simp]
-theorem coeToPowerSeries.algHom_apply :
-    coeToPowerSeries.algHom A φ = PowerSeries.map (algebraMap R A) ↑φ :=
-  rfl
-
 end CommSemiring
 
 section CommRing
@@ -864,13 +779,6 @@ instance (priority := 100) algebraPolynomial' {A : Type*} [CommSemiring A] [Alge
   RingHom.toAlgebra <| Polynomial.coeToPowerSeries.ringHom.comp (algebraMap R A[X])
 
 variable (A)
-
-theorem algebraMap_apply' (p : R[X]) : algebraMap R[X] A⟦X⟧ p = map (algebraMap R A) p :=
-  rfl
-
-theorem algebraMap_apply'' :
-    algebraMap R⟦X⟧ A⟦X⟧ f = map (algebraMap R A) f :=
-  rfl
 
 end Algebra
 

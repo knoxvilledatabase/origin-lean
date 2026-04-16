@@ -5,6 +5,8 @@ Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Order.Filter.Tendsto
 
+noncomputable section
+
 /-!
 # Product and coproduct filters
 
@@ -356,9 +358,6 @@ theorem map_pure_prod (f : α → β → γ) (a : α) (B : Filter β) :
 theorem prod_pure {b : β} : f ×ˢ pure b = map (fun a => (a, b)) f := by
   rw [prod_eq, seq_pure, map_map]; rfl
 
-theorem prod_pure_pure {a : α} {b : β} :
-    (pure a : Filter α) ×ˢ (pure b : Filter β) = pure (a, b) := by simp
-
 @[simp]
 theorem prod_eq_bot : f ×ˢ g = ⊥ ↔ f = ⊥ ∨ g = ⊥ := by
   simp_rw [← empty_mem_iff_bot, mem_prod_iff, subset_empty_iff, prod_eq_empty_iff, ← exists_prop,
@@ -421,8 +420,6 @@ theorem bot_coprod (l : Filter β) : (⊥ : Filter α).coprod l = comap Prod.snd
 @[simp]
 theorem coprod_bot (l : Filter α) : l.coprod (⊥ : Filter β) = comap Prod.fst l := by
   simp [Filter.coprod]
-
-theorem bot_coprod_bot : (⊥ : Filter α).coprod (⊥ : Filter β) = ⊥ := by simp
 
 theorem compl_mem_coprod {s : Set (α × β)} {la : Filter α} {lb : Filter β} :
     sᶜ ∈ la.coprod lb ↔ (Prod.fst '' s)ᶜ ∈ la ∧ (Prod.snd '' s)ᶜ ∈ lb := by

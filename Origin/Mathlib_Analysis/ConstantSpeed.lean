@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/ConstantSpeed.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Set.Function
 import Mathlib.Analysis.BoundedVariation
+
+noncomputable section
 
 /-!
 # Constant speed
@@ -160,7 +162,21 @@ theorem hasConstantSpeedOnWith_zero_iff :
     rw [← h]
     exact eVariationOn.mono f inter_subset_left
 
--- DISSOLVED: HasConstantSpeedOnWith.ratio
+theorem HasConstantSpeedOnWith.ratio {l' : ℝ≥0} (hl' : l' ≠ 0) {φ : ℝ → ℝ} (φm : MonotoneOn φ s)
+    (hfφ : HasConstantSpeedOnWith (f ∘ φ) s l) (hf : HasConstantSpeedOnWith f (φ '' s) l') ⦃x : ℝ⦄
+    (xs : x ∈ s) : EqOn φ (fun y => l / l' * (y - x) + φ x) s := by
+  rintro y ys
+  rw [← sub_eq_iff_eq_add, mul_comm, ← mul_div_assoc, eq_div_iff (NNReal.coe_ne_zero.mpr hl')]
+  rw [hasConstantSpeedOnWith_iff_variationOnFromTo_eq] at hf
+  rw [hasConstantSpeedOnWith_iff_variationOnFromTo_eq] at hfφ
+  symm
+  calc
+    (y - x) * l = l * (y - x) := by rw [mul_comm]
+    _ = variationOnFromTo (f ∘ φ) s x y := (hfφ.2 xs ys).symm
+    _ = variationOnFromTo f (φ '' s) (φ x) (φ y) :=
+      (variationOnFromTo.comp_eq_of_monotoneOn f φ φm xs ys)
+    _ = l' * (φ y - φ x) := (hf.2 ⟨x, xs, rfl⟩ ⟨y, ys, rfl⟩)
+    _ = (φ y - φ x) * l' := by rw [mul_comm]
 
 def HasUnitSpeedOn (f : ℝ → E) (s : Set ℝ) :=
   HasConstantSpeedOnWith f s 1

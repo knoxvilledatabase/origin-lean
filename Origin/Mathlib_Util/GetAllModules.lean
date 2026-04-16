@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Util.Path
 
+noncomputable section
+
 /-!
 # Utility functions for finding all `.lean` files or modules in a project.
 

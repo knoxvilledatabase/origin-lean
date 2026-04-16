@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Grp.FiniteGrp
 import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.FieldTheory.Galois.GaloisClosure
 
+noncomputable section
+
 /-!
 
 # Main definitions and results

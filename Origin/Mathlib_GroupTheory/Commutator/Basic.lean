@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.Tactic.Group
 
+noncomputable section
+
 /-!
 # Commutators of Subgroups
 
@@ -186,9 +188,6 @@ variable (G)
 def commutatorSet : Set G :=
   { g | ∃ g₁ g₂ : G, ⁅g₁, g₂⁆ = g }
 
-theorem commutatorSet_def : commutatorSet G = { g | ∃ g₁ g₂ : G, ⁅g₁, g₂⁆ = g } :=
-  rfl
-
 theorem one_mem_commutatorSet : (1 : G) ∈ commutatorSet G :=
   ⟨1, 1, commutatorElement_self 1⟩
 
@@ -196,9 +195,6 @@ instance : Nonempty (commutatorSet G) :=
   ⟨⟨1, one_mem_commutatorSet G⟩⟩
 
 variable {G g}
-
-theorem mem_commutatorSet_iff : g ∈ commutatorSet G ↔ ∃ g₁ g₂ : G, ⁅g₁, g₂⁆ = g :=
-  Iff.rfl
 
 theorem commutator_mem_commutatorSet : ⁅g₁, g₂⁆ ∈ commutatorSet G :=
   ⟨g₁, g₂, rfl⟩

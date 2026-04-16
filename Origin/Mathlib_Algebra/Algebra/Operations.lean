@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Operations.lean
-Genuine: 83 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
+Genuine: 85 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Bilinear
@@ -11,6 +11,8 @@ import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
 import Mathlib.Algebra.Module.Submodule.Pointwise
 import Mathlib.Data.Set.Semiring
 import Mathlib.GroupTheory.GroupAction.SubMulAction.Pointwise
+
+noncomputable section
 
 /-!
 # Multiplication and division of submodules of an algebra.
@@ -166,12 +168,6 @@ theorem sup_mul : (M ⊔ N) * P = M * P ⊔ N * P :=
 theorem mul_subset_mul : (↑M : Set A) * (↑N : Set A) ⊆ (↑(M * N) : Set A) :=
   AddSubmonoid.mul_subset_mul
 
-lemma restrictScalars_mul {A B C} [Semiring A] [Semiring B] [Semiring C]
-    [SMul A B] [Module A C] [Module B C] [IsScalarTower A C C] [IsScalarTower B C C]
-    [IsScalarTower A B C] {I J : Submodule B C} :
-    (I * J).restrictScalars A = I.restrictScalars A * J.restrictScalars A :=
-  rfl
-
 variable {ι : Sort uι}
 
 theorem iSup_mul (s : ι → Submodule R A) (t : Submodule R A) : (⨆ i, s i) * t = ⨆ i, s i * t :=
@@ -192,8 +188,6 @@ instance : NonUnitalSemiring (Submodule R A) where
 instance : Pow (Submodule R A) ℕ where
   pow s n := npowRec n s
 
-theorem pow_eq_npowRec {n : ℕ} : M ^ n = npowRec n M := rfl
-
 protected theorem pow_zero : M ^ 0 = 1 := rfl
 
 protected theorem pow_succ {n : ℕ} : M ^ (n + 1) = M ^ n * M := rfl
@@ -201,7 +195,14 @@ protected theorem pow_succ {n : ℕ} : M ^ (n + 1) = M ^ n * M := rfl
 protected theorem pow_one : M ^ 1 = M := by
   rw [Submodule.pow_succ, Submodule.pow_zero, Submodule.one_mul]
 
--- DISSOLVED: pow_toAddSubmonoid
+theorem pow_toAddSubmonoid {n : ℕ} (h : n ≠ 0) : (M ^ n).toAddSubmonoid = M.toAddSubmonoid ^ n := by
+  induction n with
+  | zero => exact (h rfl).elim
+  | succ n ih =>
+    rw [Submodule.pow_succ, pow_succ, mul_toAddSubmonoid]
+    cases n with
+    | zero => rw [Submodule.pow_zero, pow_zero, one_mul, ← mul_toAddSubmonoid, Submodule.one_mul]
+    | succ n => rw [ih n.succ_ne_zero]
 
 theorem le_pow_toAddSubmonoid {n : ℕ} : M.toAddSubmonoid ^ n ≤ (M ^ n).toAddSubmonoid := by
   obtain rfl | hn := Decidable.eq_or_ne n 0
@@ -406,7 +407,11 @@ theorem mem_mul_span_singleton {x y : A} : x ∈ P * span R {y} ↔ ∃ z ∈ P,
 lemma span_singleton_mul {x : A} {p : Submodule R A} :
     Submodule.span R {x} * p = x • p := ext fun _ ↦ mem_span_singleton_mul
 
--- DISSOLVED: mem_smul_iff_inv_mul_mem
+lemma mem_smul_iff_inv_mul_mem {S} [Field S] [Algebra R S] {x : S} {p : Submodule R S} {y : S}
+    (hx : x ≠ 0) : y ∈ x • p ↔ x⁻¹ * y ∈ p := by
+  constructor
+  · rintro ⟨a, ha : a ∈ p, rfl⟩; simpa [inv_mul_cancel_left₀ hx]
+  · exact fun h ↦ ⟨_, h, by simp [mul_inv_cancel_left₀ hx]⟩
 
 lemma mul_mem_smul_iff {S} [CommRing S] [Algebra R S] {x : S} {p : Submodule R S} {y : S}
     (hx : x ∈ nonZeroDivisors S) :

@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
 
+noncomputable section
+
 /-!
 
 ## Algebraize tactic
@@ -250,9 +252,7 @@ elab_rules : tactic
 syntax "algebraize_only" (ppSpace algebraizeTermSeq)? : tactic
 
 macro_rules
-
   | `(tactic| algebraize_only $[$args]?) =>
-
     `(tactic| algebraize -properties $[$args]?)
 
 end Mathlib.Tactic

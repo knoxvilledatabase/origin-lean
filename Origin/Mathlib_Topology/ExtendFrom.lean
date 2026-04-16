@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Extending a function from a subset
 

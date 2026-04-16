@@ -5,6 +5,8 @@ Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 import Origin.Core
 import Mathlib.Data.List.Basic
 
+noncomputable section
+
 /-!
 # Prefixes, suffixes, infixes
 
@@ -96,9 +98,6 @@ instance decidableInfix [DecidableEq α] : ∀ l₁ l₂ : List α, Decidable (l
     @decidable_of_decidable_of_iff (l₁ <+: b :: l₂ ∨ l₁ <:+: l₂) _ _
       infix_cons_iff.symm
 
-theorem cons_prefix_iff : a :: l₁ <+: b :: l₂ ↔ a = b ∧ l₁ <+: l₂ := by
-  simp
-
 protected theorem IsPrefix.reduceOption {l₁ l₂ : List (Option α)} (h : l₁ <+: l₂) :
     l₁.reduceOption <+: l₂.reduceOption :=
   h.filterMap id
@@ -159,11 +158,6 @@ theorem mem_tails : ∀ s t : List α, s ∈ tails t ↔ s <:+ t
           | _, t, ⟨[], rfl⟩ => Or.inl rfl
           | s, t, ⟨b :: l, he⟩ => List.noConfusion he fun _ lt => Or.inr ⟨l, lt⟩⟩
 
-theorem inits_cons (a : α) (l : List α) : inits (a :: l) = [] :: l.inits.map fun t => a :: t := by
-  simp
-
-theorem tails_cons (a : α) (l : List α) : tails (a :: l) = (a :: l) :: l.tails := by simp
-
 @[simp]
 theorem inits_append : ∀ s t : List α, inits (s ++ t) = s.inits ++ t.inits.tail.map fun l => s ++ l
   | [], [] => by simp
@@ -220,9 +214,6 @@ theorem getElem_tails (l : List α) (n : Nat) (h : n < (tails l).length) :
     | zero => simp
     | succ n => simp [ihl]
 
-theorem get_tails (l : List α) (n : Fin (length (tails l))) : (tails l).get n = l.drop n := by
-  simp
-
 @[simp]
 theorem getElem_inits (l : List α) (n : Nat) (h : n < length (inits l)) :
     (inits l)[n] = l.take n := by
@@ -232,9 +223,6 @@ theorem getElem_inits (l : List α) (n : Nat) (h : n < length (inits l)) :
     cases n with
     | zero => simp
     | succ n => simp [ihl]
-
-theorem get_inits (l : List α) (n : Fin (length (inits l))) : (inits l).get n = l.take n := by
-  simp
 
 lemma map_inits {β : Type*} (g : α → β) : (l.map g).inits = l.inits.map (map g) := by
   induction' l using reverseRecOn <;> simp [*]

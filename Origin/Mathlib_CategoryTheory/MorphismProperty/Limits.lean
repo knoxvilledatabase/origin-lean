@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 import Mathlib.CategoryTheory.Limits.Shapes.Diagonal
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 
+noncomputable section
+
 /-!
 # Relation of morphism properties with limits
 

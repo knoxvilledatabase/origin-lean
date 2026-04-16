@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Preadditive.Yoneda.Basic
 import Mathlib.CategoryTheory.Preadditive.Projective
 import Mathlib.Algebra.Category.Grp.EpiMono
 
+noncomputable section
+
 /-!
 An object is projective iff the preadditive coyoneda functor on it preserves epimorphisms.
 -/

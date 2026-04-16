@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 
+noncomputable section
+
 /-!
 # Convexity properties of `rpow`
 

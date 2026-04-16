@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Analytic/IsolatedZeros.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Calculus.DSlope
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Analytic.Uniqueness
+
+noncomputable section
 
 /-!
 # Principle of isolated zeros
@@ -80,7 +82,10 @@ theorem has_fpower_series_iterate_dslope_fslope (n : ℕ) (hp : HasFPowerSeriesA
   | zero => exact hp
   | succ n ih => simpa using ih (has_fpower_series_dslope_fslope hp)
 
--- DISSOLVED: iterate_dslope_fslope_ne_zero
+theorem iterate_dslope_fslope_ne_zero (hp : HasFPowerSeriesAt f p z₀) (h : p ≠ 0) :
+    (swap dslope z₀)^[p.order] f z₀ ≠ 0 := by
+  rw [← coeff_zero (has_fpower_series_iterate_dslope_fslope p.order hp) 1]
+  simpa [coeff_eq_zero] using apply_order_ne_zero h
 
 theorem eq_pow_order_mul_iterate_dslope (hp : HasFPowerSeriesAt f p z₀) :
     ∀ᶠ z in 𝓝 z₀, f z = (z - z₀) ^ p.order • (swap dslope z₀)^[p.order] f z := by
@@ -93,7 +98,12 @@ theorem eq_pow_order_mul_iterate_dslope (hp : HasFPowerSeriesAt f p z₀) :
   simp only [coeff_iterate_fslope] at hx1
   exact hx1.unique hs2
 
--- DISSOLVED: locally_ne_zero
+theorem locally_ne_zero (hp : HasFPowerSeriesAt f p z₀) (h : p ≠ 0) : ∀ᶠ z in 𝓝[≠] z₀, f z ≠ 0 := by
+  rw [eventually_nhdsWithin_iff]
+  have h2 := (has_fpower_series_iterate_dslope_fslope p.order hp).continuousAt
+  have h3 := h2.eventually_ne (iterate_dslope_fslope_ne_zero hp h)
+  filter_upwards [eq_pow_order_mul_iterate_dslope hp, h3] with z e1 e2 e3
+  simpa [e1, e2, e3] using pow_ne_zero p.order (sub_ne_zero.mpr e3)
 
 theorem locally_zero_iff (hp : HasFPowerSeriesAt f p z₀) : (∀ᶠ z in 𝓝 z₀, f z = 0) ↔ p = 0 :=
   ⟨fun hf => hp.eq_zero_of_eventually hf, fun h => eventually_eq_zero (𝕜 := 𝕜) (by rwa [h] at hp)⟩
@@ -102,7 +112,12 @@ end HasFPowerSeriesAt
 
 namespace AnalyticAt
 
--- DISSOLVED: eventually_eq_zero_or_eventually_ne_zero
+theorem eventually_eq_zero_or_eventually_ne_zero (hf : AnalyticAt 𝕜 f z₀) :
+    (∀ᶠ z in 𝓝 z₀, f z = 0) ∨ ∀ᶠ z in 𝓝[≠] z₀, f z ≠ 0 := by
+  rcases hf with ⟨p, hp⟩
+  by_cases h : p = 0
+  · exact Or.inl (HasFPowerSeriesAt.eventually_eq_zero (by rwa [h] at hp))
+  · exact Or.inr (hp.locally_ne_zero h)
 
 theorem eventually_eq_or_eventually_ne (hf : AnalyticAt 𝕜 f z₀) (hg : AnalyticAt 𝕜 g z₀) :
     (∀ᶠ z in 𝓝 z₀, f z = g z) ∨ ∀ᶠ z in 𝓝[≠] z₀, f z ≠ g z := by
@@ -117,11 +132,53 @@ theorem frequently_eq_iff_eventually_eq (hf : AnalyticAt 𝕜 f z₀) (hg : Anal
     (∃ᶠ z in 𝓝[≠] z₀, f z = g z) ↔ ∀ᶠ z in 𝓝 z₀, f z = g z := by
   simpa [sub_eq_zero] using frequently_zero_iff_eventually_zero (hf.sub hg)
 
--- DISSOLVED: unique_eventuallyEq_zpow_smul_nonzero
+lemma unique_eventuallyEq_zpow_smul_nonzero {m n : ℤ}
+    (hm : ∃ g, AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ z in 𝓝[≠] z₀, f z = (z - z₀) ^ m • g z)
+    (hn : ∃ g, AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ z in 𝓝[≠] z₀, f z = (z - z₀) ^ n • g z) :
+    m = n := by
+  wlog h_le : n ≤ m generalizing m n
+  · exact ((this hn hm) (not_le.mp h_le).le).symm
+  let ⟨g, hg_an, _, hg_eq⟩ := hm
+  let ⟨j, hj_an, hj_ne, hj_eq⟩ := hn
+  contrapose! hj_ne
+  have : ∃ᶠ z in 𝓝[≠] z₀, j z = (z - z₀) ^ (m - n) • g z := by
+    apply Filter.Eventually.frequently
+    rw [eventually_nhdsWithin_iff] at hg_eq hj_eq ⊢
+    filter_upwards [hg_eq, hj_eq] with z hfz hfz' hz
+    rw [← add_sub_cancel_left n m, add_sub_assoc, zpow_add₀ <| sub_ne_zero.mpr hz, mul_smul,
+      hfz' hz, smul_right_inj <| zpow_ne_zero _ <| sub_ne_zero.mpr hz] at hfz
+    exact hfz hz
+  rw [frequently_eq_iff_eventually_eq hj_an] at this
+  · rw [EventuallyEq.eq_of_nhds this, sub_self, zero_zpow _ (sub_ne_zero.mpr hj_ne), zero_smul]
+  conv => enter [2, z, 1]; rw [← Int.toNat_sub_of_le h_le, zpow_natCast]
+  exact ((analyticAt_id.sub analyticAt_const).pow _).smul hg_an
 
--- DISSOLVED: unique_eventuallyEq_pow_smul_nonzero
+lemma unique_eventuallyEq_pow_smul_nonzero {m n : ℕ}
+    (hm : ∃ g, AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ z in 𝓝 z₀, f z = (z - z₀) ^ m • g z)
+    (hn : ∃ g, AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ z in 𝓝 z₀, f z = (z - z₀) ^ n • g z) :
+    m = n := by
+  simp_rw [← zpow_natCast] at hm hn
+  exact Int.ofNat_inj.mp <| unique_eventuallyEq_zpow_smul_nonzero
+    (let ⟨g, h₁, h₂, h₃⟩ := hm; ⟨g, h₁, h₂, h₃.filter_mono nhdsWithin_le_nhds⟩)
+    (let ⟨g, h₁, h₂, h₃⟩ := hn; ⟨g, h₁, h₂, h₃.filter_mono nhdsWithin_le_nhds⟩)
 
--- DISSOLVED: exists_eventuallyEq_pow_smul_nonzero_iff
+theorem exists_eventuallyEq_pow_smul_nonzero_iff (hf : AnalyticAt 𝕜 f z₀) :
+    (∃ (n : ℕ), ∃ (g : 𝕜 → E), AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧
+    ∀ᶠ z in 𝓝 z₀, f z = (z - z₀) ^ n • g z) ↔ (¬∀ᶠ z in 𝓝 z₀, f z = 0) := by
+  constructor
+  · rintro ⟨n, g, hg_an, hg_ne, hg_eq⟩
+    contrapose! hg_ne
+    apply EventuallyEq.eq_of_nhds
+    rw [EventuallyEq, ← AnalyticAt.frequently_eq_iff_eventually_eq hg_an analyticAt_const]
+    refine (eventually_nhdsWithin_iff.mpr ?_).frequently
+    filter_upwards [hg_eq, hg_ne] with z hf_eq hf0 hz
+    rwa [hf0, eq_comm, smul_eq_zero_iff_right] at hf_eq
+    exact pow_ne_zero _ (sub_ne_zero.mpr hz)
+  · intro hf_ne
+    rcases hf with ⟨p, hp⟩
+    exact ⟨p.order, _, ⟨_, hp.has_fpower_series_iterate_dslope_fslope p.order⟩,
+      hp.iterate_dslope_fslope_ne_zero (hf_ne.imp hp.locally_zero_iff.mpr),
+      hp.eq_pow_order_mul_iterate_dslope⟩
 
 noncomputable def order (hf : AnalyticAt 𝕜 f z₀) : ENat :=
   if h : ∀ᶠ z in 𝓝 z₀, f z = 0 then ⊤
@@ -133,7 +190,17 @@ lemma order_eq_top_iff (hf : AnalyticAt 𝕜 f z₀) : hf.order = ⊤ ↔ ∀ᶠ
   · rwa [eq_self, true_iff]
   · simpa only [ne_eq, ENat.coe_ne_top, false_iff] using h
 
--- DISSOLVED: order_eq_nat_iff
+lemma order_eq_nat_iff (hf : AnalyticAt 𝕜 f z₀) (n : ℕ) : hf.order = ↑n ↔
+    ∃ (g : 𝕜 → E), AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ z in 𝓝 z₀, f z = (z - z₀) ^ n • g z := by
+  unfold order
+  split_ifs with h
+  · simp only [ENat.top_ne_coe, false_iff]
+    contrapose! h
+    rw [← hf.exists_eventuallyEq_pow_smul_nonzero_iff]
+    exact ⟨n, h⟩
+  · rw [← hf.exists_eventuallyEq_pow_smul_nonzero_iff] at h
+    refine ⟨fun hn ↦ (WithTop.coe_inj.mp hn : h.choose = n) ▸ h.choose_spec, fun h' ↦ ?_⟩
+    rw [unique_eventuallyEq_pow_smul_nonzero h.choose_spec h']
 
 end AnalyticAt
 
@@ -146,7 +213,14 @@ theorem eqOn_zero_of_preconnected_of_frequently_eq_zero (hf : AnalyticOnNhd 𝕜
   hf.eqOn_zero_of_preconnected_of_eventuallyEq_zero hU h₀
     ((hf z₀ h₀).frequently_zero_iff_eventually_zero.1 hfw)
 
--- DISSOLVED: eqOn_zero_or_eventually_ne_zero_of_preconnected
+theorem eqOn_zero_or_eventually_ne_zero_of_preconnected (hf : AnalyticOnNhd 𝕜 f U)
+    (hU : IsPreconnected U) : EqOn f 0 U ∨ ∀ᶠ x in codiscreteWithin U, f x ≠ 0 := by
+  simp only [or_iff_not_imp_right, ne_eq, eventually_iff, mem_codiscreteWithin,
+    disjoint_principal_right, not_forall]
+  rintro ⟨x, hx, hx2⟩
+  refine hf.eqOn_zero_of_preconnected_of_frequently_eq_zero hU hx fun nh ↦ hx2 ?_
+  filter_upwards [nh] with a ha
+  simp_all
 
 theorem eqOn_zero_of_preconnected_of_mem_closure (hf : AnalyticOnNhd 𝕜 f U) (hU : IsPreconnected U)
     (h₀ : z₀ ∈ U) (hfz₀ : z₀ ∈ closure ({z | f z = 0} \ {z₀})) : EqOn f 0 U :=

@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.RingTheory.Finiteness.Basic
 
+noncomputable section
+
 /-!
 # Finite modules and types with finitely many elements
 

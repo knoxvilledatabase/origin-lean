@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Monoid
 import Mathlib.Analysis.Asymptotics.Asymptotics
 import Mathlib.Algebra.Algebra.Pi
 
+noncomputable section
+
 /-!
 # Zero and Bounded at filter
 

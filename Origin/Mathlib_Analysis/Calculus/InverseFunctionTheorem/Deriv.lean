@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/InverseFunctionTheorem/Deriv.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Inverse
 import Mathlib.Analysis.Calculus.InverseFunctionTheorem.FDeriv
+
+noncomputable section
 
 /-!
 # Inverse function theorem, 1D case
@@ -47,6 +49,8 @@ end HasStrictDerivAt
 
 variable {f}
 
--- DISSOLVED: isOpenMap_of_hasStrictDerivAt
+theorem isOpenMap_of_hasStrictDerivAt {f' : 𝕜 → 𝕜}
+    (hf : ∀ x, HasStrictDerivAt f (f' x) x) (h0 : ∀ x, f' x ≠ 0) : IsOpenMap f :=
+  isOpenMap_iff_nhds_le.2 fun x => ((hf x).map_nhds_eq (h0 x)).ge
 
 alias open_map_of_strict_deriv := isOpenMap_of_hasStrictDerivAt

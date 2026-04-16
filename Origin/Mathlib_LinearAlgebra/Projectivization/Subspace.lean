@@ -1,9 +1,11 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Subspace.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 3 | Infrastructure: 5
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Projectivization.Basic
+
+noncomputable section
 
 /-!
 # Subspaces of Projective Space
@@ -35,7 +37,13 @@ namespace Projectivization
 
 open scoped LinearAlgebra.Projectivization
 
--- DISSOLVED: Subspace
+@[ext]
+structure Subspace where
+  /-- The set of points. -/
+  carrier : Set (ℙ K V)
+  /-- The addition rule. -/
+  mem_add' (v w : V) (hv : v ≠ 0) (hw : w ≠ 0) (hvw : v + w ≠ 0) :
+    mk K v hv ∈ carrier → mk K w hw ∈ carrier → mk K (v + w) hvw ∈ carrier
 
 namespace Subspace
 
@@ -52,9 +60,16 @@ instance : SetLike (Subspace K V) (ℙ K V) where
 theorem mem_carrier_iff (A : Subspace K V) (x : ℙ K V) : x ∈ A.carrier ↔ x ∈ A :=
   Iff.refl _
 
--- DISSOLVED: mem_add
+theorem mem_add (T : Subspace K V) (v w : V) (hv : v ≠ 0) (hw : w ≠ 0) (hvw : v + w ≠ 0) :
+    Projectivization.mk K v hv ∈ T →
+      Projectivization.mk K w hw ∈ T → Projectivization.mk K (v + w) hvw ∈ T :=
+  T.mem_add' v w hv hw hvw
 
--- DISSOLVED: spanCarrier
+inductive spanCarrier (S : Set (ℙ K V)) : Set (ℙ K V)
+  | of (x : ℙ K V) (hx : x ∈ S) : spanCarrier S x
+  | mem_add (v w : V) (hv : v ≠ 0) (hw : w ≠ 0) (hvw : v + w ≠ 0) :
+      spanCarrier S (Projectivization.mk K v hv) →
+      spanCarrier S (Projectivization.mk K w hw) → spanCarrier S (Projectivization.mk K (v + w) hvw)
 
 def span (S : Set (ℙ K V)) : Subspace K V where
   carrier := spanCarrier S

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.UniformSpace.Equicontinuity
 import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 
+noncomputable section
+
 /-!
 # Equicontinuity in metric spaces
 

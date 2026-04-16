@@ -6,6 +6,8 @@ import Origin.Core
 import Aesop
 import Mathlib.Order.BoundedOrder.Lattice
 
+noncomputable section
+
 /-!
 # Disjointness and complements
 
@@ -349,26 +351,6 @@ theorem Codisjoint.dual [SemilatticeSup α] [OrderTop α] {a b : α} :
     Codisjoint a b → Disjoint (toDual a) (toDual b) :=
   id
 
-@[simp]
-theorem disjoint_toDual_iff [SemilatticeSup α] [OrderTop α] {a b : α} :
-    Disjoint (toDual a) (toDual b) ↔ Codisjoint a b :=
-  Iff.rfl
-
-@[simp]
-theorem disjoint_ofDual_iff [SemilatticeInf α] [OrderBot α] {a b : αᵒᵈ} :
-    Disjoint (ofDual a) (ofDual b) ↔ Codisjoint a b :=
-  Iff.rfl
-
-@[simp]
-theorem codisjoint_toDual_iff [SemilatticeInf α] [OrderBot α] {a b : α} :
-    Codisjoint (toDual a) (toDual b) ↔ Disjoint a b :=
-  Iff.rfl
-
-@[simp]
-theorem codisjoint_ofDual_iff [SemilatticeSup α] [OrderTop α] {a b : αᵒᵈ} :
-    Codisjoint (ofDual a) (ofDual b) ↔ Disjoint a b :=
-  Iff.rfl
-
 section DistribLattice
 
 variable [DistribLattice α] [BoundedOrder α] {a b c : α}
@@ -612,12 +594,6 @@ theorem coe_injective : Injective ((↑) : Complementeds α → α) := Subtype.c
 @[simp, norm_cast]
 theorem coe_inj : (a : α) = b ↔ a = b := Subtype.coe_inj
 
-@[norm_cast]
-theorem coe_le_coe : (a : α) ≤ b ↔ a ≤ b := by simp
-
-@[norm_cast]
-theorem coe_lt_coe : (a : α) < b ↔ a < b := Iff.rfl
-
 instance : BoundedOrder (Complementeds α) :=
   Subtype.boundedOrder isComplemented_bot isComplemented_top
 
@@ -626,10 +602,6 @@ theorem coe_bot : ((⊥ : Complementeds α) : α) = ⊥ := rfl
 
 @[simp, norm_cast]
 theorem coe_top : ((⊤ : Complementeds α) : α) = ⊤ := rfl
-
-theorem mk_bot : (⟨⊥, isComplemented_bot⟩ : Complementeds α) = ⊥ := rfl
-
-theorem mk_top : (⟨⊤, isComplemented_top⟩ : Complementeds α) = ⊤ := rfl
 
 instance : Inhabited (Complementeds α) := ⟨⊥⟩
 
@@ -648,14 +620,6 @@ theorem coe_sup (a b : Complementeds α) : ↑(a ⊔ b) = (a : α) ⊔ b := rfl
 
 @[simp, norm_cast]
 theorem coe_inf (a b : Complementeds α) : ↑(a ⊓ b) = (a : α) ⊓ b := rfl
-
-@[simp]
-theorem mk_sup_mk {a b : α} (ha : IsComplemented a) (hb : IsComplemented b) :
-    (⟨a, ha⟩ ⊔ ⟨b, hb⟩ : Complementeds α) = ⟨a ⊔ b, ha.sup hb⟩ := rfl
-
-@[simp]
-theorem mk_inf_mk {a b : α} (ha : IsComplemented a) (hb : IsComplemented b) :
-    (⟨a, ha⟩ ⊓ ⟨b, hb⟩ : Complementeds α) = ⟨a ⊓ b, ha.inf hb⟩ := rfl
 
 instance : DistribLattice (Complementeds α) :=
   Complementeds.coe_injective.distribLattice _ coe_sup coe_inf

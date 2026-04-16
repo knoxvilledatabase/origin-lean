@@ -5,6 +5,8 @@ Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Bicategory.Basic
 
+noncomputable section
+
 /-!
 # Adjunctions in bicategories
 
@@ -66,6 +68,8 @@ structure Adjunction (f : a ⟶ b) (g : b ⟶ a) where
   left_triangle : leftZigzag unit counit = (λ_ _).hom ≫ (ρ_ _).inv := by aesop_cat
   /-- The composition of the unit and the counit is equal to the identity up to unitors. -/
   right_triangle : rightZigzag unit counit = (ρ_ _).hom ≫ (λ_ _).inv := by aesop_cat
+
+@[inherit_doc] scoped infixr:15 " ⊣ " => Bicategory.Adjunction
 
 namespace Adjunction
 
@@ -144,14 +148,6 @@ abbrev rightZigzagIso (η : 𝟙 a ≅ f ≫ g) (ε : g ≫ f ≅ 𝟙 b) :=
   whiskerLeftIso g η ≪⊗≫ whiskerRightIso ε g
 
 @[simp]
-theorem leftZigzagIso_hom : (leftZigzagIso η ε).hom = leftZigzag η.hom ε.hom :=
-  rfl
-
-@[simp]
-theorem rightZigzagIso_hom : (rightZigzagIso η ε).hom = rightZigzag η.hom ε.hom :=
-  rfl
-
-@[simp]
 theorem leftZigzagIso_inv : (leftZigzagIso η ε).inv = rightZigzag ε.inv η.inv := by
   simp [bicategoricalComp, bicategoricalIsoComp]
 
@@ -211,6 +207,8 @@ structure Equivalence (a b : B) where
   /-- The composition of the unit and the counit is equal to the identity up to unitors. -/
   left_triangle : leftZigzagIso unit counit = λ_ hom ≪≫ (ρ_ hom).symm := by aesop_cat
 
+@[inherit_doc] scoped infixr:10 " ≌ " => Bicategory.Equivalence
+
 namespace Equivalence
 
 def id (a : B) : a ≌ a := ⟨_, _, (ρ_ _).symm, ρ_ _, by ext; simp [bicategoricalIsoComp]⟩
@@ -240,10 +238,9 @@ end Equivalence
 
 end
 
-noncomputable
-
 section
 
+noncomputable
 structure RightAdjoint (left : a ⟶ b) where
   /-- The right adjoint to `left`. -/
   right : b ⟶ a

@@ -7,6 +7,8 @@ import Mathlib.Tactic.Peel
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unital
 import Mathlib.Analysis.Complex.Basic
 
+noncomputable section
+
 /-! # Conditions on unitary elements imposed by the continuous functional calculus
 
 ## Main theorems

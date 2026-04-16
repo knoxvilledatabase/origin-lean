@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Membership
 import Mathlib.GroupTheory.MonoidLocalization.Basic
 
+noncomputable section
+
 /-!
 # Localizing commutative monoids away from an alement
 

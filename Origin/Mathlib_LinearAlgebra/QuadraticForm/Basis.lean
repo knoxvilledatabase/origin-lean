@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Sym
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
+noncomputable section
+
 /-!
 # Constructing a bilinear map from a quadratic map, given a basis
 

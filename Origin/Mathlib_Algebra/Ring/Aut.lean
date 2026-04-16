@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Aut
 import Mathlib.Algebra.Ring.Action.Group
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # Ring automorphisms
 
@@ -47,21 +49,6 @@ instance : Group (RingAut R) where
 instance : Inhabited (RingAut R) :=
   ⟨1⟩
 
-def toAddAut : RingAut R →* AddAut R where
-  toFun := RingEquiv.toAddEquiv
-  map_one' := rfl
-  map_mul' _ _ := rfl
-
-def toMulAut : RingAut R →* MulAut R where
-  toFun := RingEquiv.toMulEquiv
-  map_one' := rfl
-  map_mul' _ _ := rfl
-
-def toPerm : RingAut R →* Equiv.Perm R where
-  toFun := RingEquiv.toEquiv
-  map_one' := rfl
-  map_mul' _ _ := rfl
-
 end mul_add
 
 section Semiring
@@ -77,10 +64,6 @@ instance applyMulSemiringAction :
   smul_mul := RingEquiv.map_mul
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
-
-@[simp]
-protected theorem smul_def (f : RingAut R) (r : R) : f • r = f r :=
-  rfl
 
 instance apply_faithfulSMul : FaithfulSMul (RingAut R) R :=
   ⟨RingEquiv.ext⟩

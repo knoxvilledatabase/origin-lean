@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Polynomial/Degree/CardPowDegree.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.EuclideanAbsoluteValue
 import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.Algebra.Polynomial.FieldDivision
+
+noncomputable section
 
 /-!
 # Absolute value on polynomials over a finite field.
@@ -75,9 +77,9 @@ theorem cardPowDegree_apply [DecidableEq Fq] (p : Fq[X]) :
   convert rfl
 
 @[simp]
-theorem cardPowDegree_zero : cardPowDegree (0 : Fq[X]) = 0 := rfl
-
--- DISSOLVED: cardPowDegree_nonzero
+theorem cardPowDegree_nonzero (p : Fq[X]) (hp : p ≠ 0) :
+    cardPowDegree p = (Fintype.card Fq : ℤ) ^ p.natDegree :=
+  if_neg hp
 
 theorem cardPowDegree_isEuclidean : IsEuclidean (cardPowDegree : AbsoluteValue Fq[X] ℤ) :=
   have card_pos : 0 < Fintype.card Fq := Fintype.card_pos_iff.mpr inferInstance

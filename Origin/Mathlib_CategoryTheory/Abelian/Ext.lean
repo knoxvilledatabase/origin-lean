@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Abelian.Opposite
 import Mathlib.CategoryTheory.Abelian.ProjectiveResolution
 import Mathlib.CategoryTheory.Linear.Yoneda
 
+noncomputable section
+
 /-!
 # Ext
 

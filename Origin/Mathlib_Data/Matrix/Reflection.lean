@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matrix.Notation
 import Mathlib.Data.Fin.Tuple.Reflection
 
+noncomputable section
+
 /-!
 # Lemmas for concrete matrices `Matrix (Fin m) (Fin n) α`
 

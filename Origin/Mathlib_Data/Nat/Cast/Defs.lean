@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Tactic.SplitIfs
 
+noncomputable section
+
 /-!
 # Cast of natural numbers
 
@@ -49,15 +51,6 @@ instance (priority := 100) instOfNatAtLeastTwo {n : ℕ} [NatCast R] [Nat.AtLeas
     OfNat R n where
   ofNat := n.cast
 
-library_note "no_index around OfNat.ofNat"
-
-@[simp, norm_cast] theorem Nat.cast_ofNat {n : ℕ} [NatCast R] [Nat.AtLeastTwo n] :
-  (Nat.cast (no_index (OfNat.ofNat n)) : R) = OfNat.ofNat n := rfl
-
-theorem Nat.cast_eq_ofNat {n : ℕ} [NatCast R] [Nat.AtLeastTwo n] :
-    (Nat.cast n : R) = OfNat.ofNat n :=
-  rfl
-
 /-! ### Additive monoids with one -/
 
 class AddMonoidWithOne (R : Type*) extends NatCast R, AddMonoid R, One R where
@@ -68,8 +61,6 @@ class AddMonoidWithOne (R : Type*) extends NatCast R, AddMonoid R, One R where
   natCast_succ : ∀ n, natCast (n + 1) = natCast n + 1 := by intros; rfl
 
 class AddCommMonoidWithOne (R : Type*) extends AddMonoidWithOne R, AddCommMonoid R
-
-library_note "coercion into rings"
 
 namespace Nat
 
@@ -128,12 +119,6 @@ theorem binCast_eq [AddMonoidWithOne R] (n : ℕ) :
         have h1 := Or.resolve_left (Nat.mod_two_eq_zero_or_one (succ k)) h
         rw [h1, Nat.add_comm 1, Nat.succ_mul, Nat.one_mul]
         simp only [Nat.cast_add, Nat.cast_one]
-
-theorem cast_two [AddMonoidWithOne R] : ((2 : ℕ) : R) = (2 : R) := rfl
-
-theorem cast_three [AddMonoidWithOne R] : ((3 : ℕ) : R) = (3 : R) := rfl
-
-theorem cast_four [AddMonoidWithOne R] : ((4 : ℕ) : R) = (4 : R) := rfl
 
 attribute [simp, norm_cast] Int.natAbs_ofNat
 

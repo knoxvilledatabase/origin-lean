@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp
 import Mathlib.MeasureTheory.SetAlgebra
 
+noncomputable section
+
 /-!
 # Separable measure
 

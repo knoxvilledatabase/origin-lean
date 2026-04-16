@@ -7,6 +7,8 @@ import Mathlib.Data.ENat.Lattice
 import Mathlib.Order.OrderIsoNat
 import Mathlib.Tactic.TFAE
 
+noncomputable section
+
 /-!
 
 # Maximal length of chains

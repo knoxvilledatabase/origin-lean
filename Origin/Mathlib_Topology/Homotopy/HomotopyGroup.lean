@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.EckmannHilton
 import Mathlib.Logic.Equiv.TransferInstance
 import Mathlib.Algebra.Group.Ext
 
+noncomputable section
+
 /-!
 # `n`th homotopy group
 
@@ -81,6 +83,8 @@ instance LoopSpace.inhabited : Inhabited (Path x x) :=
 def GenLoop : Set C(I^N, X) :=
   {p | ∀ y ∈ Cube.boundary N, p y = x}
 
+@[inherit_doc] scoped[Topology.Homotopy] notation "Ω^" => GenLoop
+
 open Topology.Homotopy
 
 variable {N X x}
@@ -119,10 +123,6 @@ theorem boundary (f : Ω^ N X x) : ∀ y ∈ Cube.boundary N, f y = x :=
 
 def const : Ω^ N X x :=
   ⟨ContinuousMap.const _ x, fun _ _ => rfl⟩
-
-@[simp]
-theorem const_apply {t} : (@const N X _ x) t = x :=
-  rfl
 
 instance inhabited : Inhabited (Ω^ N X x) :=
   ⟨const⟩
@@ -211,10 +211,6 @@ def loopHomeo (i : N) : Ω^ N X x ≃ₜ Ω (Ω^ { j // j ≠ i } X x) const whe
 
 theorem toLoop_apply (i : N) {p : Ω^ N X x} {t} {tn} :
     toLoop i p t tn = p (Cube.insertAt i ⟨t, tn⟩) :=
-  rfl
-
-theorem fromLoop_apply (i : N) {p : Ω (Ω^ { j // j ≠ i } X x) const} {t : I^N} :
-    fromLoop i p t = p (t i) (Cube.splitAt i t).snd :=
   rfl
 
 abbrev cCompInsert (i : N) : C(C(I^N, X), C(I × I^{ j // j ≠ i }, X)) :=
@@ -426,9 +422,6 @@ theorem symmAt_indep {i} (j) (f : Ω^ N X x) :
   simp_rw [← fromLoop_symm_toLoop]
   let inv := fun (G) (_ : Group G) => ((·⁻¹) : G → G)
   exact congr_fun (congr_arg (inv <| HomotopyGroup N X x) <| auxGroup_indep i j) ⟦f⟧
-
-theorem one_def [Nonempty N] : (1 : HomotopyGroup N X x) = ⟦const⟧ :=
-  rfl
 
 theorem mul_spec [Nonempty N] {i} {p q : Ω^ N X x} :
     -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11215): TODO: introduce `HomotopyGroup.mk` and remove defeq abuse.

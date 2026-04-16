@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Bases
 import Mathlib.Order.Filter.Tendsto
 
+noncomputable section
+
 /-!
 # (Co)product of a family of filters
 

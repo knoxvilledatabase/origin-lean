@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Topology.Algebra.InfiniteSum.Group
 import Mathlib.Topology.Algebra.Nonarchimedean.Basic
 
+noncomputable section
+
 /-!
 # Infinite sums and products in nonarchimedean abelian groups
 

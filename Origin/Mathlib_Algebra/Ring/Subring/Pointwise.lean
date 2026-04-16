@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Ring/Subring/Pointwise.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 6 | Infrastructure: 6
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Ring.Subring.Basic
 import Mathlib.Algebra.Ring.Subsemiring.Pointwise
+
+noncomputable section
 
 /-! # Pointwise instances on `Subring`s
 
@@ -40,24 +42,6 @@ protected def pointwiseMulAction : MulAction M (Subring R) where
 scoped[Pointwise] attribute [instance] Subring.pointwiseMulAction
 
 open Pointwise
-
-theorem pointwise_smul_def {a : M} (S : Subring R) :
-    a • S = S.map (MulSemiringAction.toRingHom _ _ a) :=
-  rfl
-
-@[simp]
-theorem coe_pointwise_smul (m : M) (S : Subring R) : ↑(m • S) = m • (S : Set R) :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toAddSubgroup (m : M) (S : Subring R) :
-    (m • S).toAddSubgroup = m • S.toAddSubgroup :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toSubsemiring (m : M) (S : Subring R) :
-    (m • S).toSubsemiring = m • S.toSubsemiring :=
-  rfl
 
 theorem smul_mem_pointwise_smul (m : M) (r : R) (S : Subring R) : r ∈ S → m • r ∈ m • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ m • (S : Set R))
@@ -122,17 +106,29 @@ variable [GroupWithZero M] [Ring R] [MulSemiringAction M R]
 
 open Pointwise
 
--- DISSOLVED: smul_mem_pointwise_smul_iff₀
+@[simp]
+theorem smul_mem_pointwise_smul_iff₀ {a : M} (ha : a ≠ 0) (S : Subring R) (x : R) :
+    a • x ∈ a • S ↔ x ∈ S :=
+  smul_mem_smul_set_iff₀ ha (S : Set R) x
 
--- DISSOLVED: mem_pointwise_smul_iff_inv_smul_mem₀
+theorem mem_pointwise_smul_iff_inv_smul_mem₀ {a : M} (ha : a ≠ 0) (S : Subring R) (x : R) :
+    x ∈ a • S ↔ a⁻¹ • x ∈ S :=
+  mem_smul_set_iff_inv_smul_mem₀ ha (S : Set R) x
 
--- DISSOLVED: mem_inv_pointwise_smul_iff₀
+theorem mem_inv_pointwise_smul_iff₀ {a : M} (ha : a ≠ 0) (S : Subring R) (x : R) :
+    x ∈ a⁻¹ • S ↔ a • x ∈ S :=
+  mem_inv_smul_set_iff₀ ha (S : Set R) x
 
--- DISSOLVED: pointwise_smul_le_pointwise_smul_iff₀
+@[simp]
+theorem pointwise_smul_le_pointwise_smul_iff₀ {a : M} (ha : a ≠ 0) {S T : Subring R} :
+    a • S ≤ a • T ↔ S ≤ T :=
+  set_smul_subset_set_smul_iff₀ ha
 
--- DISSOLVED: pointwise_smul_le_iff₀
+theorem pointwise_smul_le_iff₀ {a : M} (ha : a ≠ 0) {S T : Subring R} : a • S ≤ T ↔ S ≤ a⁻¹ • T :=
+  set_smul_subset_iff₀ ha
 
--- DISSOLVED: le_pointwise_smul_iff₀
+theorem le_pointwise_smul_iff₀ {a : M} (ha : a ≠ 0) {S T : Subring R} : S ≤ a • T ↔ a⁻¹ • S ≤ T :=
+  subset_set_smul_iff₀ ha
 
 end GroupWithZero
 

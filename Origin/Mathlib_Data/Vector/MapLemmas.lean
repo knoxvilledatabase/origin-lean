@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Vector.Basic
 import Mathlib.Data.Vector.Snoc
 
+noncomputable section
+
 /-!
   This file establishes a set of normalization lemmas for `map`/`mapAccumr` operations on vectors
 -/

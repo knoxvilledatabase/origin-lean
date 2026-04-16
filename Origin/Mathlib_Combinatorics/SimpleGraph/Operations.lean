@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Operations.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Combinatorics.SimpleGraph.Maps
+
+noncomputable section
 
 /-!
 # Local graph operations
@@ -32,7 +34,6 @@ namespace Iso
 variable {G} {W : Type*} {G' : SimpleGraph W} (f : G ≃g G')
 
 include f in
-
 theorem card_edgeFinset_eq [Fintype G.edgeSet] [Fintype G'.edgeSet] :
     #G.edgeFinset = #G'.edgeFinset := by
   apply Finset.card_eq_of_equiv

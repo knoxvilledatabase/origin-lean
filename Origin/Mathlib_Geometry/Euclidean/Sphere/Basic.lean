@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.StrictConvexBetween
 import Mathlib.Geometry.Euclidean.Basic
 
+noncomputable section
+
 /-!
 # Spheres
 
@@ -56,25 +58,11 @@ instance : Coe (Sphere P) (Set P) :=
 instance : Membership P (Sphere P) :=
   ⟨fun s p => p ∈ (s : Set P)⟩
 
-theorem Sphere.mk_center (c : P) (r : ℝ) : (⟨c, r⟩ : Sphere P).center = c :=
-  rfl
-
-theorem Sphere.mk_radius (c : P) (r : ℝ) : (⟨c, r⟩ : Sphere P).radius = r :=
-  rfl
-
 @[simp]
 theorem Sphere.mk_center_radius (s : Sphere P) : (⟨s.center, s.radius⟩ : Sphere P) = s := by
   ext <;> rfl
 
-@[simp]
-theorem Sphere.coe_mk (c : P) (r : ℝ) : ↑(⟨c, r⟩ : Sphere P) = Metric.sphere c r :=
-  rfl
-
 theorem Sphere.mem_coe {p : P} {s : Sphere P} : p ∈ (s : Set P) ↔ p ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem Sphere.mem_coe' {p : P} {s : Sphere P} : dist p s.center = s.radius ↔ p ∈ s :=
   Iff.rfl
 
 theorem mem_sphere {p : P} {s : Sphere P} : p ∈ s ↔ dist p s.center = s.radius :=
@@ -82,9 +70,6 @@ theorem mem_sphere {p : P} {s : Sphere P} : p ∈ s ↔ dist p s.center = s.radi
 
 theorem mem_sphere' {p : P} {s : Sphere P} : p ∈ s ↔ dist s.center p = s.radius :=
   Metric.mem_sphere'
-
-theorem subset_sphere {ps : Set P} {s : Sphere P} : ps ⊆ s ↔ ∀ p ∈ ps, p ∈ s :=
-  Iff.rfl
 
 theorem dist_of_mem_subset_sphere {p : P} {ps : Set P} {s : Sphere P} (hp : p ∈ ps)
     (hps : ps ⊆ (s : Set P)) : dist p s.center = s.radius :=
@@ -119,10 +104,6 @@ theorem dist_center_eq_dist_center_of_mem_sphere' {p₁ p₂ : P} {s : Sphere P}
 def Cospherical (ps : Set P) : Prop :=
   ∃ (center : P) (radius : ℝ), ∀ p ∈ ps, dist p center = radius
 
-theorem cospherical_def (ps : Set P) :
-    Cospherical ps ↔ ∃ (center : P) (radius : ℝ), ∀ p ∈ ps, dist p center = radius :=
-  Iff.rfl
-
 theorem cospherical_iff_exists_sphere {ps : Set P} :
     Cospherical ps ↔ ∃ s : Sphere P, ps ⊆ (s : Set P) := by
   refine ⟨fun h => ?_, fun h => ?_⟩
@@ -154,6 +135,7 @@ section NormedSpace
 variable [NormedAddCommGroup V] [NormedSpace ℝ V] [MetricSpace P] [NormedAddTorsor V P]
 
 include V in
+/-- Two points are cospherical. -/
 
 theorem cospherical_pair (p₁ p₂ : P) : Cospherical ({p₁, p₂} : Set P) :=
   ⟨midpoint ℝ p₁ p₂, ‖(2 : ℝ)‖⁻¹ * dist p₁ p₂, by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Measure.WithDensity
 import Mathlib.Analysis.Normed.Module.Basic
 
+noncomputable section
+
 /-! # A lemma about measurability with density under scalar multiplication in normed spaces -/
 
 open MeasureTheory Filter ENNReal Set

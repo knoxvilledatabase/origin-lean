@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.LinearAlgebra.RootSystem.Defs
 
+noncomputable section
+
 /-!
 # Root data and root systems
 

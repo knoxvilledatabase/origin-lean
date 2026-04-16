@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Algebra/Tower.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 11
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv
 import Mathlib.LinearAlgebra.Span.Basic
+
+noncomputable section
 
 /-!
 # Towers of algebras
@@ -42,9 +44,6 @@ def lsmul : A →ₐ[R] Module.End B M where
   map_zero' := LinearMap.ext fun _ => zero_smul A _
   map_add' _a _b := LinearMap.ext fun _ => add_smul _ _ _
   commutes' r := LinearMap.ext <| algebraMap_smul A r
-
-@[simp]
-theorem lsmul_coe (a : A) : (lsmul R B M a : M → M) = (a • ·) := rfl
 
 end Algebra
 
@@ -113,14 +112,9 @@ theorem Algebra.ext {S : Type u} {A : Type v} [CommSemiring S] [Semiring A] (h1 
 def toAlgHom : S →ₐ[R] A :=
   { algebraMap S A with commutes' := fun _ => (algebraMap_apply _ _ _ _).symm }
 
-theorem toAlgHom_apply (y : S) : toAlgHom R S A y = algebraMap S A y := rfl
-
 @[simp]
 theorem coe_toAlgHom : ↑(toAlgHom R S A) = algebraMap S A :=
   RingHom.ext fun _ => rfl
-
-@[simp]
-theorem coe_toAlgHom' : (toAlgHom R S A : S → A) = algebraMap S A := rfl
 
 variable {R S A B}
 
@@ -171,14 +165,6 @@ def restrictScalars (f : A →ₐ[S] B) : A →ₐ[R] B :=
       rw [algebraMap_apply R S A, algebraMap_apply R S B]
       exact f.commutes (algebraMap R S r) }
 
-theorem restrictScalars_apply (f : A →ₐ[S] B) (x : A) : f.restrictScalars R x = f x := rfl
-
-@[simp]
-theorem coe_restrictScalars (f : A →ₐ[S] B) : (f.restrictScalars R : A →+* B) = f := rfl
-
-@[simp]
-theorem coe_restrictScalars' (f : A →ₐ[S] B) : (restrictScalars R f : A → B) = f := rfl
-
 theorem restrictScalars_injective :
     Function.Injective (restrictScalars R : (A →ₐ[S] B) → A →ₐ[R] B) := fun _ _ h =>
   AlgHom.ext (AlgHom.congr_fun h : _)
@@ -192,14 +178,6 @@ def restrictScalars (f : A ≃ₐ[S] B) : A ≃ₐ[R] B :=
     commutes' := fun r => by
       rw [algebraMap_apply R S A, algebraMap_apply R S B]
       exact f.commutes (algebraMap R S r) }
-
-theorem restrictScalars_apply (f : A ≃ₐ[S] B) (x : A) : f.restrictScalars R x = f x := rfl
-
-@[simp]
-theorem coe_restrictScalars (f : A ≃ₐ[S] B) : (f.restrictScalars R : A ≃+* B) = f := rfl
-
-@[simp]
-theorem coe_restrictScalars' (f : A ≃ₐ[S] B) : (restrictScalars R f : A → B) = f := rfl
 
 theorem restrictScalars_injective :
     Function.Injective (restrictScalars R : (A ≃ₐ[S] B) → A ≃ₐ[R] B) := fun _ _ h =>
@@ -311,7 +289,9 @@ variable [AddCommGroup M] [Module R M] [Module A M] [Module B M]
 
 variable [IsScalarTower R A M] [IsScalarTower R B M] [SMulCommClass A B M]
 
--- DISSOLVED: lsmul_injective
+theorem lsmul_injective [NoZeroSMulDivisors A M] {x : A} (hx : x ≠ 0) :
+    Function.Injective (lsmul R B M x) :=
+  smul_right_injective M hx
 
 end Algebra
 

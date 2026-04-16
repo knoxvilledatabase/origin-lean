@@ -5,6 +5,8 @@ Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 
+noncomputable section
+
 /-!
 # Thickenings in pseudo-metric spaces
 
@@ -48,19 +50,12 @@ open EMetric
 def thickening (δ : ℝ) (E : Set α) : Set α :=
   { x : α | infEdist x E < ENNReal.ofReal δ }
 
-theorem mem_thickening_iff_infEdist_lt : x ∈ thickening δ s ↔ infEdist x s < ENNReal.ofReal δ :=
-  Iff.rfl
-
 lemma eventually_not_mem_thickening_of_infEdist_pos {E : Set α} {x : α} (h : x ∉ closure E) :
     ∀ᶠ δ in 𝓝 (0 : ℝ), x ∉ Metric.thickening δ E := by
   obtain ⟨ε, ⟨ε_pos, ε_lt⟩⟩ := exists_real_pos_lt_infEdist_of_not_mem_closure h
   filter_upwards [eventually_lt_nhds ε_pos] with δ hδ
   simp only [thickening, mem_setOf_eq, not_lt]
   exact (ENNReal.ofReal_le_ofReal hδ.le).trans ε_lt.le
-
-theorem thickening_eq_preimage_infEdist (δ : ℝ) (E : Set α) :
-    thickening δ E = (infEdist · E) ⁻¹' Iio (ENNReal.ofReal δ) :=
-  rfl
 
 theorem isOpen_thickening {δ : ℝ} {E : Set α} : IsOpen (thickening δ E) :=
   Continuous.isOpen_preimage continuous_infEdist _ isOpen_Iio
@@ -175,10 +170,6 @@ theorem mem_cthickening_of_dist_le {α : Type*} [PseudoMetricSpace α] (x y : α
   apply mem_cthickening_of_edist_le x y δ E h
   rw [edist_dist]
   exact ENNReal.ofReal_le_ofReal h'
-
-theorem cthickening_eq_preimage_infEdist (δ : ℝ) (E : Set α) :
-    cthickening δ E = (fun x => infEdist x E) ⁻¹' Iic (ENNReal.ofReal δ) :=
-  rfl
 
 theorem isClosed_cthickening {δ : ℝ} {E : Set α} : IsClosed (cthickening δ E) :=
   IsClosed.preimage continuous_infEdist isClosed_Iic

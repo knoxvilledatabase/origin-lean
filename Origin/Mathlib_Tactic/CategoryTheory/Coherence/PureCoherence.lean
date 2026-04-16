@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Meta.Tactic.Apply
 import Mathlib.Tactic.CategoryTheory.Coherence.Datatypes
 
+noncomputable section
+
 /-!
 # Coherence tactic
 

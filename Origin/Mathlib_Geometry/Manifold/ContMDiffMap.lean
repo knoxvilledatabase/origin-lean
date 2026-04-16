@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 
+noncomputable section
+
 /-!
 # Smooth bundled map
 
@@ -54,11 +56,6 @@ attribute [to_additive_ignore_args 21] ContMDiffMap ContMDiffMap.instFunLike
 
 variable {f g : C^n⟮I, M; I', M'⟯}
 
-@[simp]
-theorem coeFn_mk (f : M → M') (hf : ContMDiff I I' n f) :
-    DFunLike.coe (F := C^n⟮I, M; I', M'⟯) ⟨f, hf⟩ = f :=
-  rfl
-
 theorem coe_injective ⦃f g : C^n⟮I, M; I', M'⟯⦄ (h : (f : M → M') = g) : f = g :=
   DFunLike.ext' h
 
@@ -74,11 +71,6 @@ nonrec def id : C^n⟮I, M; I, M⟯ :=
 def comp (f : C^n⟮I', M'; I'', M''⟯) (g : C^n⟮I, M; I', M'⟯) : C^n⟮I, M; I'', M''⟯ where
   val a := f (g a)
   property := f.contMDiff.comp g.contMDiff
-
-@[simp]
-theorem comp_apply (f : C^n⟮I', M'; I'', M''⟯) (g : C^n⟮I, M; I', M'⟯) (x : M) :
-    f.comp g x = f (g x) :=
-  rfl
 
 instance [Inhabited M'] : Inhabited C^n⟮I, M; I', M'⟯ :=
   ⟨⟨fun _ => default, contMDiff_const⟩⟩

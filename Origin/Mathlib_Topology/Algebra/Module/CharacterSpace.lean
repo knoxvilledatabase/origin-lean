@@ -8,6 +8,8 @@ import Mathlib.Algebra.Algebra.Spectrum
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Character space of a topological algebra
 
@@ -56,20 +58,12 @@ instance instContinuousLinearMapClass : ContinuousLinearMapClass (characterSpace
   map_add φ := (φ : WeakDual 𝕜 A).map_add
   map_continuous φ := (φ : WeakDual 𝕜 A).cont
 
-@[simp, norm_cast]
-protected theorem coe_coe (φ : characterSpace 𝕜 A) : ⇑(φ : WeakDual 𝕜 A) = (φ : A → 𝕜) :=
-  rfl
-
 @[ext]
 theorem ext {φ ψ : characterSpace 𝕜 A} (h : ∀ x, φ x = ψ x) : φ = ψ :=
   DFunLike.ext _ _ h
 
 def toCLM (φ : characterSpace 𝕜 A) : A →L[𝕜] 𝕜 :=
   (φ : WeakDual 𝕜 A)
-
-@[simp]
-theorem coe_toCLM (φ : characterSpace 𝕜 A) : ⇑(toCLM φ) = φ :=
-  rfl
 
 instance instNonUnitalAlgHomClass : NonUnitalAlgHomClass (characterSpace 𝕜 A) 𝕜 A 𝕜 :=
   { CharacterSpace.instContinuousLinearMapClass with
@@ -83,10 +77,6 @@ def toNonUnitalAlgHom (φ : characterSpace 𝕜 A) : A →ₙₐ[𝕜] 𝕜 wher
   map_smul' := map_smul φ
   map_zero' := map_zero φ
   map_add' := map_add φ
-
-@[simp]
-theorem coe_toNonUnitalAlgHom (φ : characterSpace 𝕜 A) : ⇑(toNonUnitalAlgHom φ) = φ :=
-  rfl
 
 instance instIsEmpty [Subsingleton A] : IsEmpty (characterSpace 𝕜 A) :=
   ⟨fun φ => φ.prop.1 <|

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Prod
 import Mathlib.Algebra.Group.Subsemigroup.Basic
 import Mathlib.Algebra.Group.TypeTags.Basic
 
+noncomputable section
+
 /-!
 # Operations on `Subsemigroup`s
 
@@ -160,17 +162,8 @@ def comap (f : M →ₙ* N) (S : Subsemigroup N) :
   mul_mem' ha hb := show f (_ * _) ∈ S by rw [map_mul]; exact mul_mem ha hb
 
 @[to_additive (attr := simp)]
-theorem coe_comap (S : Subsemigroup N) (f : M →ₙ* N) : (S.comap f : Set M) = f ⁻¹' S :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem mem_comap {S : Subsemigroup N} {f : M →ₙ* N} {x : M} : x ∈ S.comap f ↔ f x ∈ S :=
   Iff.rfl
-
-@[to_additive]
-theorem comap_comap (S : Subsemigroup P) (g : N →ₙ* P) (f : M →ₙ* N) :
-    (S.comap g).comap f = S.comap (g.comp f) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem comap_id (S : Subsemigroup P) : S.comap (MulHom.id _) = S :=
@@ -184,10 +177,6 @@ def map (f : M →ₙ* N) (S : Subsemigroup M) : Subsemigroup N where
   mul_mem' := by
     rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
     exact ⟨x * y, @mul_mem (Subsemigroup M) M _ _ _ _ _ _ hx hy, by rw [map_mul]⟩
-
-@[to_additive (attr := simp)]
-theorem coe_map (f : M →ₙ* N) (S : Subsemigroup M) : (S.map f : Set N) = f '' S :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem mem_map {f : M →ₙ* N} {S : Subsemigroup M} {y : N} : y ∈ S.map f ↔ ∃ x ∈ S, f x = y :=
@@ -413,19 +402,9 @@ def topEquiv : (⊤ : Subsemigroup M) ≃* M where
   right_inv _ := rfl
   map_mul' _ _ := rfl
 
-@[to_additive (attr := simp)]
-theorem topEquiv_toMulHom :
-    ((topEquiv : _ ≃* M) : _ →ₙ* M) = MulMemClass.subtype (⊤ : Subsemigroup M) :=
-  rfl
-
 @[to_additive "An additive subsemigroup is isomorphic to its image under an injective function"]
 noncomputable def equivMapOfInjective (f : M →ₙ* N) (hf : Function.Injective f) : S ≃* S.map f :=
   { Equiv.Set.image f S hf with map_mul' := fun _ _ => Subtype.ext (map_mul f _ _) }
-
-@[to_additive (attr := simp)]
-theorem coe_equivMapOfInjective_apply (f : M →ₙ* N) (hf : Function.Injective f) (x : S) :
-    (equivMapOfInjective S f hf x : N) = f x :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem closure_closure_coe_preimage {s : Set M} :
@@ -537,9 +516,6 @@ private theorem srange_mk_aux_mul {f : M → N} (hf : ∀ (x y : M), f (x * y) =
     x * y ∈ Set.range f :=
   (srange ⟨f, hf⟩).mul_mem hx hy
 
-@[to_additive (attr := simp)] theorem srange_mk (f : M → N) (hf) :
-    srange ⟨f, hf⟩ = ⟨Set.range f, srange_mk_aux_mul hf⟩ := rfl
-
 @[to_additive]
 theorem srange_eq_map (f : M →ₙ* N) : f.srange = (⊤ : Subsemigroup M).map f :=
   copy_eq _
@@ -576,11 +552,6 @@ theorem map_mclosure (f : M →ₙ* N) (s : Set M) : (closure s).map f = closure
 def restrict {N : Type*} [Mul N] [SetLike σ M] [MulMemClass σ M] (f : M →ₙ* N) (S : σ) : S →ₙ* N :=
   f.comp (MulMemClass.subtype S)
 
-@[to_additive (attr := simp)]
-theorem restrict_apply {N : Type*} [Mul N] [SetLike σ M] [MulMemClass σ M] (f : M →ₙ* N) {S : σ}
-    (x : S) : f.restrict S x = f x :=
-  rfl
-
 @[to_additive (attr := simps)
   "Restriction of an `AddSemigroup` hom to an `AddSubsemigroup` of the codomain."]
 def codRestrict [SetLike σ N] [MulMemClass σ N] (f : M →ₙ* N) (S : σ) (h : ∀ x, f x ∈ S) :
@@ -591,10 +562,6 @@ def codRestrict [SetLike σ N] [MulMemClass σ N] (f : M →ₙ* N) (S : σ) (h 
 @[to_additive "Restriction of an `AddSemigroup` hom to its range interpreted as a subsemigroup."]
 def srangeRestrict {N} [Mul N] (f : M →ₙ* N) : M →ₙ* f.srange :=
   (f.codRestrict f.srange) fun x => ⟨x, rfl⟩
-
-@[to_additive (attr := simp)]
-theorem coe_srangeRestrict {N} [Mul N] (f : M →ₙ* N) (x : M) : (f.srangeRestrict x : N) = f x :=
-  rfl
 
 @[to_additive]
 theorem srangeRestrict_surjective (f : M →ₙ* N) : Function.Surjective f.srangeRestrict :=

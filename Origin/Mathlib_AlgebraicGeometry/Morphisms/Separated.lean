@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.Over.Basic
 import Mathlib.CategoryTheory.Limits.Constructions.Over.Products
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Equalizer
 
+noncomputable section
+
 /-!
 
 # Separated morphisms

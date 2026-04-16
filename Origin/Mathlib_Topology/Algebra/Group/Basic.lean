@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/Group/Basic.lean
-Genuine: 176 | Conflates: 0 | Dissolved: 1 | Infrastructure: 50
+Genuine: 180 | Conflates: 0 | Dissolved: 0 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Order.Archimedean.Basic
 import Mathlib.Topology.Algebra.Monoid
+
+noncomputable section
 
 /-!
 # Topological groups
@@ -51,10 +53,6 @@ protected def Homeomorph.mulLeft (a : G) : G ≃ₜ G :=
     continuous_toFun := continuous_const.mul continuous_id
     continuous_invFun := continuous_const.mul continuous_id }
 
-@[to_additive (attr := simp)]
-theorem Homeomorph.coe_mulLeft (a : G) : ⇑(Homeomorph.mulLeft a) = (a * ·) :=
-  rfl
-
 @[to_additive]
 theorem Homeomorph.mulLeft_symm (a : G) : (Homeomorph.mulLeft a).symm = Homeomorph.mulLeft a⁻¹ := by
   ext
@@ -79,9 +77,6 @@ protected def Homeomorph.mulRight (a : G) : G ≃ₜ G :=
   { Equiv.mulRight a with
     continuous_toFun := continuous_id.mul continuous_const
     continuous_invFun := continuous_id.mul continuous_const }
-
-@[to_additive (attr := simp)]
-lemma Homeomorph.coe_mulRight (a : G) : ⇑(Homeomorph.mulRight a) = (· * a) := rfl
 
 @[to_additive]
 theorem Homeomorph.mulRight_symm (a : G) :
@@ -281,10 +276,6 @@ protected def Homeomorph.inv (G : Type*) [TopologicalSpace G] [InvolutiveInv G]
     continuous_toFun := continuous_inv
     continuous_invFun := continuous_inv }
 
-@[to_additive (attr := simp)]
-lemma Homeomorph.coe_inv {G : Type*} [TopologicalSpace G] [InvolutiveInv G] [ContinuousInv G] :
-    ⇑(Homeomorph.inv G) = Inv.inv := rfl
-
 @[to_additive]
 theorem nhds_inv (a : G) : 𝓝 a⁻¹ = (𝓝 a)⁻¹ :=
   ((Homeomorph.inv G).map_nhds_eq a).symm
@@ -323,6 +314,12 @@ lemma continuousAt_inv_iff : ContinuousAt f⁻¹ x ↔ ContinuousAt f x :=
 @[to_additive (attr := simp)]
 lemma continuousOn_inv_iff : ContinuousOn f⁻¹ s ↔ ContinuousOn f s :=
   (Homeomorph.inv G).comp_continuousOn_iff _ _
+
+@[to_additive] alias ⟨Continuous.of_inv, _⟩ := continuous_inv_iff
+
+@[to_additive] alias ⟨ContinuousAt.of_inv, _⟩ := continuousAt_inv_iff
+
+@[to_additive] alias ⟨ContinuousOn.of_inv, _⟩ := continuousOn_inv_iff
 
 end ContinuousInvolutiveInv
 
@@ -532,16 +529,6 @@ protected def Homeomorph.shearMulRight : G × G ≃ₜ G × G :=
   { Equiv.prodShear (Equiv.refl _) Equiv.mulLeft with
     continuous_toFun := continuous_fst.prod_mk continuous_mul
     continuous_invFun := continuous_fst.prod_mk <| continuous_fst.inv.mul continuous_snd }
-
-@[to_additive (attr := simp)]
-theorem Homeomorph.shearMulRight_coe :
-    ⇑(Homeomorph.shearMulRight G) = fun z : G × G => (z.1, z.1 * z.2) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem Homeomorph.shearMulRight_symm_coe :
-    ⇑(Homeomorph.shearMulRight G).symm = fun z : G × G => (z.1, z.1⁻¹ * z.2) :=
-  rfl
 
 variable {G}
 
@@ -841,7 +828,12 @@ theorem Filter.Tendsto.div_const' {c : G} {f : α → G} {l : Filter α} (h : Te
     (b : G) : Tendsto (f · / b) l (𝓝 (c / b)) :=
   h.div' tendsto_const_nhds
 
--- DISSOLVED: Filter.tendsto_div_const_iff
+lemma Filter.tendsto_div_const_iff {G : Type*}
+    [CommGroupWithZero G] [TopologicalSpace G] [ContinuousDiv G]
+    {b : G} (hb : b ≠ 0) {c : G} {f : α → G} {l : Filter α} :
+    Tendsto (f · / b) l (𝓝 (c / b)) ↔ Tendsto f l (𝓝 c) := by
+  refine ⟨fun h ↦ ?_, fun h ↦ Filter.Tendsto.div_const' h b⟩
+  convert h.div_const' b⁻¹ with k <;> rw [div_div, mul_inv_cancel₀ hb, div_one]
 
 lemma Filter.tendsto_sub_const_iff {G : Type*}
     [AddCommGroup G] [TopologicalSpace G] [ContinuousSub G]
@@ -1111,20 +1103,6 @@ lemma subset_mul_closure_one {G} [MulOneClass G] [TopologicalSpace G] (s : Set G
     s ⊆ s * (closure {1} : Set G) := by
   have : s ⊆ s * ({1} : Set G) := by simp
   exact this.trans (smul_subset_smul_left subset_closure)
-
-@[to_additive]
-lemma IsCompact.mul_closure_one_eq_closure {K : Set G} (hK : IsCompact K) :
-    K * (closure {1} : Set G) = closure K := by
-  apply Subset.antisymm ?_ ?_
-  · calc
-    K * (closure {1} : Set G) ⊆ closure K * (closure {1} : Set G) :=
-      smul_subset_smul_right subset_closure
-    _ ⊆ closure (K * ({1} : Set G)) := smul_set_closure_subset _ _
-    _ = closure K := by simp
-  · have : IsClosed (K * (closure {1} : Set G)) :=
-      IsClosed.smul_left_of_isCompact isClosed_closure hK
-    rw [IsClosed.closure_subset_iff this]
-    exact subset_mul_closure_one K
 
 @[to_additive]
 lemma IsClosed.mul_closure_one_eq {F : Set G} (hF : IsClosed F) :
@@ -1562,10 +1540,6 @@ instance : Top (GroupTopology α) :=
   ⟨{  continuous_mul := continuous_top
       continuous_inv := continuous_top }⟩
 
-@[to_additive (attr := simp)]
-theorem toTopologicalSpace_top : (⊤ : GroupTopology α).toTopologicalSpace = ⊤ :=
-  rfl
-
 @[to_additive]
 instance : Bot (GroupTopology α) :=
   let _t : TopologicalSpace α := ⊥
@@ -1573,10 +1547,6 @@ instance : Bot (GroupTopology α) :=
         haveI := discreteTopology_bot α
         continuity
       continuous_inv := continuous_bot }⟩
-
-@[to_additive (attr := simp)]
-theorem toTopologicalSpace_bot : (⊥ : GroupTopology α).toTopologicalSpace = ⊥ :=
-  rfl
 
 @[to_additive]
 instance : BoundedOrder (GroupTopology α) where
@@ -1605,10 +1575,6 @@ instance : Inhabited (GroupTopology α) :=
 instance : InfSet (GroupTopology α) where
   sInf S :=
     ⟨sInf (toTopologicalSpace '' S), topologicalGroup_sInf <| forall_mem_image.2 fun t _ => t.2⟩
-
-@[to_additive (attr := simp)]
-theorem toTopologicalSpace_sInf (s : Set (GroupTopology α)) :
-    (sInf s).toTopologicalSpace = sInf (toTopologicalSpace '' s) := rfl
 
 @[to_additive (attr := simp)]
 theorem toTopologicalSpace_iInf {ι} (s : ι → GroupTopology α) :

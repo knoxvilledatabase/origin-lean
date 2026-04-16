@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.EqToHom
 import Mathlib.Topology.Category.TopCat.EpiMono
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # The category of open sets in a topological space.
 
@@ -64,37 +66,14 @@ noncomputable def botLE (U : Opens X) : ⊥ ⟶ U :=
 noncomputable def leTop (U : Opens X) : U ⟶ ⊤ :=
   le_top.hom
 
-theorem infLELeft_apply (U V : Opens X) (x) :
-    (infLELeft U V) x = ⟨x.1, (@inf_le_left _ _ U V : _ ≤ _) x.2⟩ :=
-  rfl
-
-@[simp]
-theorem infLELeft_apply_mk (U V : Opens X) (x) (m) :
-    (infLELeft U V) ⟨x, m⟩ = ⟨x, (@inf_le_left _ _ U V : _ ≤ _) m⟩ :=
-  rfl
-
-@[simp]
-theorem leSupr_apply_mk {ι : Type*} (U : ι → Opens X) (i : ι) (x) (m) :
-    (leSupr U i) ⟨x, m⟩ = ⟨x, (le_iSup U i : _) m⟩ :=
-  rfl
-
 def toTopCat (X : TopCat.{u}) : Opens X ⥤ TopCat where
   obj U := ⟨U, inferInstance⟩
   map i := ⟨fun x ↦ ⟨x.1, i.le x.2⟩, IsEmbedding.subtypeVal.continuous_iff.2 continuous_induced_dom⟩
-
-@[simp]
-theorem toTopCat_map (X : TopCat.{u}) {U V : Opens X} {f : U ⟶ V} {x} {h} :
-    ((toTopCat X).map f) ⟨x, h⟩ = ⟨x, f.le h⟩ :=
-  rfl
 
 @[simps (config := .asFn)]
 def inclusion' {X : TopCat.{u}} (U : Opens X) : (toTopCat X).obj U ⟶ X where
   toFun := _
   continuous_toFun := continuous_subtype_val
-
-@[simp]
-theorem coe_inclusion' {X : TopCat} {U : Opens X} :
-    (inclusion' U : U → X) = Subtype.val := rfl
 
 theorem isOpenEmbedding {X : TopCat.{u}} (U : Opens X) : IsOpenEmbedding (inclusion' U) :=
   U.2.isOpenEmbedding_subtypeVal
@@ -118,18 +97,8 @@ theorem map_obj (f : X ⟶ Y) (U) (p) : (map f).obj ⟨U, p⟩ = ⟨f ⁻¹' U, 
   rfl
 
 @[simp]
-lemma map_homOfLE (f : X ⟶ Y) {U V : Opens Y} (e : U ≤ V) :
-    (TopologicalSpace.Opens.map f).map (homOfLE e) =
-      homOfLE (show (Opens.map f).obj U ≤ (Opens.map f).obj V from fun _ hx ↦ e hx) :=
-  rfl
-
-@[simp]
 theorem map_id_obj (U : Opens X) : (map (𝟙 X)).obj U = U :=
   let ⟨_, _⟩ := U
-  rfl
-
-@[simp 1100]
-theorem map_id_obj' (U) (p) : (map (𝟙 X)).obj ⟨U, p⟩ = ⟨U, p⟩ :=
   rfl
 
 @[simp 1100]
@@ -137,38 +106,12 @@ theorem map_id_obj_unop (U : (Opens X)ᵒᵖ) : (map (𝟙 X)).obj (unop U) = un
   let ⟨_, _⟩ := U.unop
   rfl
 
-@[simp 1100]
-theorem op_map_id_obj (U : (Opens X)ᵒᵖ) : (map (𝟙 X)).op.obj U = U := by simp
-
-@[simp]
-lemma map_top (f : X ⟶ Y) : (Opens.map f).obj ⊤ = ⊤ := rfl
-
 noncomputable def leMapTop (f : X ⟶ Y) (U : Opens X) : U ⟶ (map f).obj ⊤ :=
   leTop U
 
 @[simp]
 theorem map_comp_obj (f : X ⟶ Y) (g : Y ⟶ Z) (U) :
     (map (f ≫ g)).obj U = (map f).obj ((map g).obj U) :=
-  rfl
-
-@[simp]
-theorem map_comp_obj' (f : X ⟶ Y) (g : Y ⟶ Z) (U) (p) :
-    (map (f ≫ g)).obj ⟨U, p⟩ = (map f).obj ((map g).obj ⟨U, p⟩) :=
-  rfl
-
-@[simp]
-theorem map_comp_map (f : X ⟶ Y) (g : Y ⟶ Z) {U V} (i : U ⟶ V) :
-    (map (f ≫ g)).map i = (map f).map ((map g).map i) :=
-  rfl
-
-@[simp]
-theorem map_comp_obj_unop (f : X ⟶ Y) (g : Y ⟶ Z) (U) :
-    (map (f ≫ g)).obj (unop U) = (map f).obj ((map g).obj (unop U)) :=
-  rfl
-
-@[simp]
-theorem op_map_comp_obj (f : X ⟶ Y) (g : Y ⟶ Z) (U) :
-    (map (f ≫ g)).op.obj U = (map f).op.obj ((map g).op.obj U) :=
   rfl
 
 theorem map_iSup (f : X ⟶ Y) {ι : Type*} (U : ι → Opens Y) :
@@ -185,9 +128,6 @@ def mapId : map (𝟙 X) ≅ 𝟭 (Opens X) where
   hom := { app := fun U => eqToHom (map_id_obj U) }
   inv := { app := fun U => eqToHom (map_id_obj U).symm }
 
-theorem map_id_eq : map (𝟙 X) = 𝟭 (Opens X) := by
-  rfl
-
 end
 
 @[simps]
@@ -195,28 +135,11 @@ def mapComp (f : X ⟶ Y) (g : Y ⟶ Z) : map (f ≫ g) ≅ map g ⋙ map f wher
   hom := { app := fun U => eqToHom (map_comp_obj f g U) }
   inv := { app := fun U => eqToHom (map_comp_obj f g U).symm }
 
-theorem map_comp_eq (f : X ⟶ Y) (g : Y ⟶ Z) : map (f ≫ g) = map g ⋙ map f :=
-  rfl
-
 def mapIso (f g : X ⟶ Y) (h : f = g) : map f ≅ map g :=
   NatIso.ofComponents fun U => eqToIso (by rw [congr_arg map h])
 
 theorem map_eq (f g : X ⟶ Y) (h : f = g) : map f = map g := by
   subst h
-  rfl
-
-@[simp]
-theorem mapIso_refl (f : X ⟶ Y) (h) : mapIso f f h = Iso.refl (map _) :=
-  rfl
-
-@[simp]
-theorem mapIso_hom_app (f g : X ⟶ Y) (h : f = g) (U : Opens Y) :
-    (mapIso f g h).hom.app U = eqToHom (by rw [h]) :=
-  rfl
-
-@[simp]
-theorem mapIso_inv_app (f g : X ⟶ Y) (h : f = g) (U : Opens Y) :
-    (mapIso f g h).inv.app U = eqToHom (by rw [h]) :=
   rfl
 
 @[simps]

@@ -9,6 +9,8 @@ import Mathlib.Algebra.Ring.Action.Basic
 import Mathlib.GroupTheory.GroupAction.Hom
 import Mathlib.GroupTheory.GroupAction.Quotient
 
+noncomputable section
+
 /-!
 # Group action on rings applied to polynomials
 
@@ -132,8 +134,5 @@ protected noncomputable def polynomial (g : P →+*[M] Q) : P[X] →+*[M] Q[X] w
   map_add' _ _ := Polynomial.map_add g.toRingHom
   map_one' := Polynomial.map_one g.toRingHom
   map_mul' _ _ := Polynomial.map_mul g.toRingHom
-
-@[simp]
-theorem coe_polynomial (g : P →+*[M] Q) : (g.polynomial : P[X] → Q[X]) = map g := rfl
 
 end MulSemiringActionHom

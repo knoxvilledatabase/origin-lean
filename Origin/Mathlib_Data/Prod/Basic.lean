@@ -8,6 +8,8 @@ import Mathlib.Logic.Function.Iterate
 import Aesop
 import Mathlib.Tactic.Inhabit
 
+noncomputable section
+
 /-!
 # Extra facts about `Prod`
 
@@ -35,18 +37,7 @@ theorem forall' {p : α → β → Prop} : (∀ x : α × β, p x.1 x.2) ↔ ∀
 theorem exists' {p : α → β → Prop} : (∃ x : α × β, p x.1 x.2) ↔ ∃ a b, p a b :=
   Prod.exists
 
-@[simp]
-theorem snd_comp_mk (x : α) : Prod.snd ∘ (Prod.mk x : β → α × β) = id :=
-  rfl
-
-@[simp]
-theorem fst_comp_mk (x : α) : Prod.fst ∘ (Prod.mk x : β → α × β) = Function.const β x :=
-  rfl
-
 attribute [mfld_simps] map_apply
-
-theorem map_apply' (f : α → γ) (g : β → δ) (p : α × β) : map f g p = (f p.1, g p.2) :=
-  rfl
 
 theorem map_fst' (f : α → γ) (g : β → δ) : Prod.fst ∘ map f g = f ∘ Prod.fst :=
   funext <| map_fst f g
@@ -72,9 +63,6 @@ lemma mk_inj_right {a₁ a₂ : α} {b : β} : (a₁, b) = (a₂, b) ↔ a₁ = 
 
 theorem map_def {f : α → γ} {g : β → δ} : Prod.map f g = fun p : α × β ↦ (f p.1, g p.2) :=
   funext fun p ↦ Prod.ext (map_fst f g p) (map_snd f g p)
-
-theorem id_prod : (fun p : α × β ↦ (p.1, p.2)) = id :=
-  rfl
 
 @[simp]
 theorem map_iterate (f : α → α) (g : β → β) (n : ℕ) :

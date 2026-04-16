@@ -8,6 +8,8 @@ import Mathlib.Order.Disjointed
 import Mathlib.Tactic.FunProp.Attr
 import Mathlib.Tactic.Measurability
 
+noncomputable section
+
 /-!
 # Measurable spaces and measurable functions
 
@@ -59,6 +61,7 @@ def MeasurableSet [MeasurableSpace α] (s : Set α) : Prop :=
 namespace MeasureTheory
 
 set_option quotPrecheck false in
+/-- Notation for `MeasurableSet` with respect to a non-standard σ-algebra. -/
 
 scoped notation "MeasurableSet[" m "]" => @MeasurableSet _ m
 
@@ -283,10 +286,6 @@ protected def copy (m : MeasurableSpace α) (p : Set α → Prop) (h : ∀ s, p 
   measurableSet_compl := by simpa only [h] using m.measurableSet_compl
   measurableSet_iUnion := by simpa only [h] using m.measurableSet_iUnion
 
-lemma measurableSet_copy {m : MeasurableSpace α} {p : Set α → Prop}
-    (h : ∀ s, p s ↔ MeasurableSet[m] s) {s} : MeasurableSet[.copy m p h] s ↔ p s :=
-  Iff.rfl
-
 lemma copy_eq {m : MeasurableSpace α} {p : Set α → Prop} (h : ∀ s, p s ↔ MeasurableSet[m] s) :
     m.copy p h = m :=
   ext h
@@ -294,9 +293,6 @@ lemma copy_eq {m : MeasurableSpace α} {p : Set α → Prop} (h : ∀ s, p s ↔
 section CompleteLattice
 
 instance : LE (MeasurableSpace α) where le m₁ m₂ := ∀ s, MeasurableSet[m₁] s → MeasurableSet[m₂] s
-
-theorem le_def {α} {a b : MeasurableSpace α} : a ≤ b ↔ a.MeasurableSet' ≤ b.MeasurableSet' :=
-  Iff.rfl
 
 instance : PartialOrder (MeasurableSpace α) :=
   { PartialOrder.lift (@MeasurableSet α) measurableSet_injective with
@@ -433,10 +429,6 @@ theorem measurableSet_iInf {ι} {m : ι → MeasurableSpace α} {s : Set α} :
     MeasurableSet[iInf m] s ↔ ∀ i, MeasurableSet[m i] s := by
   rw [iInf, measurableSet_sInf, forall_mem_range]
 
-theorem measurableSet_sup {m₁ m₂ : MeasurableSpace α} {s : Set α} :
-    MeasurableSet[m₁ ⊔ m₂] s ↔ GenerateMeasurable (MeasurableSet[m₁] ∪ MeasurableSet[m₂]) s :=
-  Iff.rfl
-
 theorem measurableSet_sSup {ms : Set (MeasurableSpace α)} {s : Set α} :
     MeasurableSet[sSup ms] s ↔
       GenerateMeasurable { s : Set α | ∃ m ∈ ms, MeasurableSet[m] s } s := by
@@ -468,6 +460,7 @@ def Measurable [MeasurableSpace α] [MeasurableSpace β] (f : α → β) : Prop 
 namespace MeasureTheory
 
 set_option quotPrecheck false in
+/-- Notation for `Measurable` with respect to a non-standard σ-algebra in the domain. -/
 
 scoped notation "Measurable[" m "]" => @Measurable _ _ m _
 

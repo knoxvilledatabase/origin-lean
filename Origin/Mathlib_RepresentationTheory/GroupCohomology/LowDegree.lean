@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.RepresentationTheory.GroupCohomology.Basic
 import Mathlib.RepresentationTheory.Invariants
 
+noncomputable section
+
 /-!
 # The low-degree cohomology of a `k`-linear `G`-representation
 
@@ -165,12 +167,6 @@ variable {A}
 
 instance : FunLike (oneCocycles A) G A := ⟨Subtype.val, Subtype.val_injective⟩
 
-@[simp]
-theorem oneCocycles.coe_mk (f : G → A) (hf) : ((⟨f, hf⟩ : oneCocycles A) : G → A) = f := rfl
-
-@[simp]
-theorem oneCocycles.val_eq_coe (f : oneCocycles A) : f.1 = f := rfl
-
 @[ext]
 theorem oneCocycles_ext {f₁ f₂ : oneCocycles A} (h : ∀ g : G, f₁ g = f₂ g) : f₁ = f₂ :=
   DFunLike.ext f₁ f₂ h
@@ -224,12 +220,6 @@ variable (A)
 variable {A}
 
 instance : FunLike (twoCocycles A) (G × G) A := ⟨Subtype.val, Subtype.val_injective⟩
-
-@[simp]
-theorem twoCocycles.coe_mk (f : G × G → A) (hf) : ((⟨f, hf⟩ : twoCocycles A) : G × G → A) = f := rfl
-
-@[simp]
-theorem twoCocycles.val_eq_coe (f : twoCocycles A) : f.1 = f := rfl
 
 @[ext]
 theorem twoCocycles_ext {f₁ f₂ : twoCocycles A} (h : ∀ g h : G, f₁ (g, h) = f₂ (g, h)) : f₁ = f₂ :=
@@ -286,15 +276,9 @@ def oneCoboundariesOfMemRange {f : G → A} (h : f ∈ LinearMap.range (dZero A)
   ⟨⟨f, LinearMap.range_le_ker_iff.2 (dOne_comp_dZero A) h⟩,
     by rcases h with ⟨x, rfl⟩; exact ⟨x, rfl⟩⟩
 
-theorem oneCoboundaries_of_mem_range_apply {f : G → A} (h : f ∈ LinearMap.range (dZero A)) :
-    (oneCoboundariesOfMemRange h).1.1 = f := rfl
-
 def oneCoboundariesOfEq {f : G → A} {x : A} (hf : ∀ g, A.ρ g x - x = f g) :
     oneCoboundaries A :=
   oneCoboundariesOfMemRange ⟨x, funext hf⟩
-
-theorem oneCoboundariesOfEq_apply {f : G → A} {x : A} (hf : ∀ g, A.ρ g x - x = f g) :
-    (oneCoboundariesOfEq hf).1.1 = f := rfl
 
 theorem mem_range_of_mem_oneCoboundaries {f : oneCocycles A} (h : f ∈ oneCoboundaries A) :
     f.1 ∈ LinearMap.range (dZero A) := by
@@ -315,17 +299,10 @@ def twoCoboundariesOfMemRange {f : G × G → A} (h : f ∈ LinearMap.range (dOn
   ⟨⟨f, LinearMap.range_le_ker_iff.2 (dTwo_comp_dOne A) h⟩,
     by rcases h with ⟨x, rfl⟩; exact ⟨x, rfl⟩⟩
 
-theorem twoCoboundariesOfMemRange_apply {f : G × G → A} (h : f ∈ LinearMap.range (dOne A)) :
-    (twoCoboundariesOfMemRange h).1.1 = f := rfl
-
 def twoCoboundariesOfEq {f : G × G → A} {x : G → A}
     (hf : ∀ g h, A.ρ g (x h) - x (g * h) + x g = f (g, h)) :
     twoCoboundaries A :=
   twoCoboundariesOfMemRange ⟨x, funext fun g ↦ hf g.1 g.2⟩
-
-theorem twoCoboundariesOfEq_apply {f : G × G → A} {x : G → A}
-    (hf : ∀ g h, A.ρ g (x h) - x (g * h) + x g = f (g, h)) :
-    (twoCoboundariesOfEq hf).1.1 = f := rfl
 
 theorem mem_range_of_mem_twoCoboundaries {f : twoCocycles A} (h : f ∈ twoCoboundaries A) :
     (twoCocycles A).subtype f ∈ LinearMap.range (dOne A) := by
@@ -561,15 +538,6 @@ section H0
 def H0LequivOfIsTrivial [A.IsTrivial] :
     H0 A ≃ₗ[k] A := LinearEquiv.ofTop _ (invariants_eq_top A.ρ)
 
-@[simp] theorem H0LequivOfIsTrivial_eq_subtype [A.IsTrivial] :
-    H0LequivOfIsTrivial A = A.ρ.invariants.subtype := rfl
-
-theorem H0LequivOfIsTrivial_apply [A.IsTrivial] (x : H0 A) :
-    H0LequivOfIsTrivial A x = x := rfl
-
-@[simp] theorem H0LequivOfIsTrivial_symm_apply [A.IsTrivial] (x : A) :
-    (H0LequivOfIsTrivial A).symm x = x := rfl
-
 end H0
 
 section H1
@@ -582,14 +550,6 @@ def H1LequivOfIsTrivial [A.IsTrivial] :
 theorem H1LequivOfIsTrivial_comp_H1_π [A.IsTrivial] :
     (H1LequivOfIsTrivial A).comp (H1_π A) = oneCocyclesLequivOfIsTrivial A := by
   ext; rfl
-
-@[simp] theorem H1LequivOfIsTrivial_H1_π_apply_apply
-    [A.IsTrivial] (f : oneCocycles A) (x : Additive G) :
-    H1LequivOfIsTrivial A (H1_π A f) x = f x.toMul := rfl
-
-@[simp] theorem H1LequivOfIsTrivial_symm_apply [A.IsTrivial] (f : Additive G →+ A) :
-    (H1LequivOfIsTrivial A).symm f = H1_π A ((oneCocyclesLequivOfIsTrivial A).symm f) :=
-  rfl
 
 end H1
 

@@ -13,6 +13,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Limits.Preserves.Opposites
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 
+noncomputable section
+
 /-!
 # Representably flat functors
 

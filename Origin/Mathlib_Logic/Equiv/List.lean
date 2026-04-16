@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Sort
 import Mathlib.Data.Vector.Basic
 import Mathlib.Logic.Denumerable
 
+noncomputable section
+
 /-!
 # Equivalences involving `List`-like types
 
@@ -48,11 +50,6 @@ instance _root_.List.countable {α : Type*} [Countable α] : Countable (List α)
 
 @[simp]
 theorem encode_list_nil : encode (@nil α) = 0 :=
-  rfl
-
-@[simp]
-theorem encode_list_cons (a : α) (l : List α) :
-    encode (a :: l) = succ (pair (encode a) (encode l)) :=
   rfl
 
 @[simp]

@@ -5,6 +5,8 @@ Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Order.Ideal
 
+noncomputable section
+
 /-!
 # Order filters
 
@@ -79,10 +81,6 @@ theorem mem_of_mem_of_le {F G : PFilter P} (hx : x ∈ F) (hle : F ≤ G) : x �
 
 def principal (p : P) : PFilter P :=
   ⟨Ideal.principal (toDual p)⟩
-
-@[simp]
-theorem mem_mk (x : P) (I : Ideal Pᵒᵈ) : x ∈ (⟨I⟩ : PFilter P) ↔ toDual x ∈ I :=
-  Iff.rfl
 
 @[simp]
 theorem principal_le_iff {F : PFilter P} : principal x ≤ F ↔ x ∈ F :=

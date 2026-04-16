@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/Bernoulli.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.PowerSeries.Inverse
 import Mathlib.RingTheory.PowerSeries.WellKnown
+
+noncomputable section
 
 /-!
 # Bernoulli numbers
@@ -180,7 +182,12 @@ theorem bernoulli_zero : bernoulli 0 = 1 := by simp [bernoulli]
 @[simp]
 theorem bernoulli_one : bernoulli 1 = -1 / 2 := by norm_num [bernoulli]
 
--- DISSOLVED: bernoulli_eq_bernoulli'_of_ne_one
+theorem bernoulli_eq_bernoulli'_of_ne_one {n : ℕ} (hn : n ≠ 1) : bernoulli n = bernoulli' n := by
+  by_cases h0 : n = 0; · simp [h0]
+  rw [bernoulli, neg_one_pow_eq_pow_mod_two]
+  cases' mod_two_eq_zero_or_one n with h h
+  · simp [h]
+  · simp [bernoulli'_odd_eq_zero (odd_iff.mpr h) (one_lt_iff_ne_zero_and_ne_one.mpr ⟨h0, hn⟩)]
 
 @[simp]
 theorem sum_bernoulli (n : ℕ) :

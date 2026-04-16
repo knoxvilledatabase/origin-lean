@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Star/Conjneg.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Pi
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Star.Pi
+
+noncomputable section
 
 /-!
 # Conjugation-negation operator
@@ -28,8 +30,6 @@ variable [CommSemiring R] [StarRing R] {f g : G → R}
 
 def conjneg (f : G → R) : G → R := conj fun x ↦ f (-x)
 
-@[simp] lemma conjneg_apply (f : G → R) (x : G) : conjneg f x = conj (f (-x)) := rfl
-
 @[simp] lemma conjneg_conjneg (f : G → R) : conjneg (conjneg f) = f := by ext; simp
 
 lemma conjneg_involutive : Involutive (conjneg : (G → R) → G → R) := conjneg_conjneg
@@ -43,8 +43,6 @@ lemma conjneg_surjective : Surjective (conjneg : (G → R) → G → R) := conjn
 @[simp] lemma conjneg_inj : conjneg f = conjneg g ↔ f = g := conjneg_injective.eq_iff
 
 lemma conjneg_ne_conjneg : conjneg f ≠ conjneg g ↔ f ≠ g := conjneg_injective.ne_iff
-
-@[simp] lemma conjneg_conj (f : G → R) : conjneg (conj f) = conj (conjneg f) := rfl
 
 @[simp] lemma conjneg_zero : conjneg (0 : G → R) = 0 := by ext; simp
 
@@ -66,9 +64,9 @@ lemma conjneg_ne_conjneg : conjneg f ≠ conjneg g ↔ f ≠ g := conjneg_inject
 @[simp] lemma conjneg_eq_one : conjneg f = 1 ↔ f = 1 := by
   rw [← conjneg_inj, conjneg_conjneg, conjneg_one]
 
--- DISSOLVED: conjneg_ne_zero
+lemma conjneg_ne_zero : conjneg f ≠ 0 ↔ f ≠ 0 := conjneg_eq_zero.not
 
--- DISSOLVED: conjneg_ne_one
+lemma conjneg_ne_one : conjneg f ≠ 1 ↔ f ≠ 1 := conjneg_eq_one.not
 
 lemma sum_conjneg [Fintype G] (f : G → R) : ∑ a, conjneg f a = ∑ a, conj (f a) :=
   Fintype.sum_equiv (Equiv.neg _) _ _ fun _ ↦ rfl

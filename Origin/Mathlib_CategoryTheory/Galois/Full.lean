@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.CategoryTheory.Galois.Action
 
+noncomputable section
+
 /-!
 
 # Fiber functors are (faithfully) full

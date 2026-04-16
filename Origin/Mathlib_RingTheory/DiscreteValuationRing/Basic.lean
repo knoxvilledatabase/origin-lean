@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DiscreteValuationRing/Basic.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.AdicCompletion.Basic
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Basic
 import Mathlib.RingTheory.Valuation.PrimeMultiplicity
 import Mathlib.RingTheory.Valuation.ValuationRing
+
+noncomputable section
 
 /-!
 # Discrete valuation rings
@@ -62,7 +64,20 @@ variable {R}
 
 open PrincipalIdealRing
 
--- DISSOLVED: irreducible_of_span_eq_maximalIdeal
+theorem irreducible_of_span_eq_maximalIdeal {R : Type*} [CommRing R] [IsLocalRing R] [IsDomain R]
+    (ϖ : R) (hϖ : ϖ ≠ 0) (h : maximalIdeal R = Ideal.span {ϖ}) : Irreducible ϖ := by
+  have h2 : ¬IsUnit ϖ := show ϖ ∈ maximalIdeal R from h.symm ▸ Submodule.mem_span_singleton_self ϖ
+  refine ⟨h2, ?_⟩
+  intro a b hab
+  by_contra! h
+  obtain ⟨ha : a ∈ maximalIdeal R, hb : b ∈ maximalIdeal R⟩ := h
+  rw [h, mem_span_singleton'] at ha hb
+  rcases ha with ⟨a, rfl⟩
+  rcases hb with ⟨b, rfl⟩
+  rw [show a * ϖ * (b * ϖ) = ϖ * (ϖ * (a * b)) by ring] at hab
+  apply hϖ
+  apply eq_zero_of_mul_eq_self_right _ hab.symm
+  exact fun hh => h2 (isUnit_of_dvd_one ⟨_, hh.symm⟩)
 
 theorem irreducible_iff_uniformizer (ϖ : R) : Irreducible ϖ ↔ maximalIdeal R = Ideal.span {ϖ} :=
   ⟨fun hϖ => (eq_maximalIdeal (isMaximal_of_irreducible hϖ)).symm,
@@ -269,9 +284,29 @@ variable [CommRing R] [IsDomain R] [DiscreteValuationRing R]
 
 variable {R}
 
--- DISSOLVED: associated_pow_irreducible
+theorem associated_pow_irreducible {x : R} (hx : x ≠ 0) {ϖ : R} (hirr : Irreducible ϖ) :
+    ∃ n : ℕ, Associated x (ϖ ^ n) := by
+  have : WfDvdMonoid R := IsNoetherianRing.wfDvdMonoid
+  cases' WfDvdMonoid.exists_factors x hx with fx hfx
+  use Multiset.card fx
+  have H := hfx.2
+  rw [← Associates.mk_eq_mk_iff_associated] at H ⊢
+  rw [← H, ← Associates.prod_mk, Associates.mk_pow, ← Multiset.prod_replicate]
+  congr 1
+  rw [Multiset.eq_replicate]
+  simp only [true_and, and_imp, Multiset.card_map, eq_self_iff_true, Multiset.mem_map, exists_imp]
+  rintro _ _ _ rfl
+  rw [Associates.mk_eq_mk_iff_associated]
+  refine associated_of_irreducible _ ?_ hirr
+  apply hfx.1
+  assumption
 
--- DISSOLVED: eq_unit_mul_pow_irreducible
+theorem eq_unit_mul_pow_irreducible {x : R} (hx : x ≠ 0) {ϖ : R} (hirr : Irreducible ϖ) :
+    ∃ (n : ℕ) (u : Rˣ), x = u * ϖ ^ n := by
+  obtain ⟨n, hn⟩ := associated_pow_irreducible hx hirr
+  obtain ⟨u, rfl⟩ := hn.symm
+  use n, u
+  apply mul_comm
 
 open Submodule.IsPrincipal
 

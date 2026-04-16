@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finite.Defs
 import Mathlib.Algebra.Category.Grp.Basic
 
+noncomputable section
+
 /-!
 
 ## Main definitions and results
@@ -69,10 +71,5 @@ def of (G : Type u) [Group G] [Finite G] : FiniteGrp where
 @[to_additive "The morphism in `FiniteAddGrp`, induced from a morphism of the category `AddGrp`"]
 def ofHom {X Y : Type u} [Group X] [Finite X] [Group Y] [Finite Y] (f : X →* Y) : of X ⟶ of Y :=
   Grp.ofHom f
-
-@[to_additive]
-lemma ofHom_apply {X Y : Type u} [Group X] [Finite X] [Group Y] [Finite Y] (f : X →* Y) (x : X) :
-    ofHom f x = f x :=
-  rfl
 
 end FiniteGrp

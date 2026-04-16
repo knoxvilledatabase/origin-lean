@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Variables
 
+noncomputable section
+
 /-!
 # Polynomials supported by a set of variables
 

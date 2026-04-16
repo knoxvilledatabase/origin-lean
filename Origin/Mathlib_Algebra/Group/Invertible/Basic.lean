@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/Invertible/Basic.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Units
 import Mathlib.Algebra.Group.Invertible.Defs
 import Mathlib.Algebra.Group.Hom.Defs
 import Mathlib.Logic.Equiv.Defs
+
+noncomputable section
 
 /-!
 # Theorems about invertible elements
@@ -107,7 +109,8 @@ instance invertiblePow (m : α) [Invertible m] (n : ℕ) : Invertible (m ^ n) wh
 lemma invOf_pow (m : α) [Invertible m] (n : ℕ) [Invertible (m ^ n)] : ⅟ (m ^ n) = ⅟ m ^ n :=
   @invertible_unique _ _ _ _ _ (invertiblePow m n) rfl
 
--- DISSOLVED: invertibleOfPowEqOne
+def invertibleOfPowEqOne (x : α) (n : ℕ) (hx : x ^ n = 1) (hn : n ≠ 0) : Invertible x :=
+  (Units.ofPowEqOne x n hx hn).invertible
 
 end Monoid
 

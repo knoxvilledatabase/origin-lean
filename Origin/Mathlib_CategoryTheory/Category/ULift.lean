@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Equivalence
 import Mathlib.CategoryTheory.EqToHom
 import Mathlib.Data.ULift
 
+noncomputable section
+
 /-!
 # Basic API for ULift
 
@@ -99,14 +101,6 @@ def ULiftHom.objDown {C} (A : ULiftHom C) : C :=
 def ULiftHom.objUp {C} (A : C) : ULiftHom C :=
   A
 
-@[simp]
-theorem objDown_objUp {C} (A : C) : (ULiftHom.objUp A).objDown = A :=
-  rfl
-
-@[simp]
-theorem objUp_objDown {C} (A : ULiftHom C) : ULiftHom.objUp A.objDown = A :=
-  rfl
-
 instance ULiftHom.category : Category.{max v₂ v₁} (ULiftHom.{v₂} C) where
   Hom A B := ULift.{v₂} <| A.objDown ⟶ B.objDown
   id _ := ⟨𝟙 _⟩
@@ -147,10 +141,6 @@ def AsSmall.up : C ⥤ AsSmall C where
 def AsSmall.down : AsSmall C ⥤ C where
   obj X := ULift.down X
   map f := f.down
-
-@[reassoc]
-theorem down_comp {X Y Z : AsSmall C} (f : X ⟶ Y) (g : Y ⟶ Z) : (f ≫ g).down = f.down ≫ g.down :=
-  rfl
 
 @[simp]
 theorem eqToHom_down {X Y : AsSmall C} (h : X = Y) :

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Pi
 import Mathlib.Algebra.Order.Star.Basic
 import Mathlib.Algebra.Star.Conjneg
 
+noncomputable section
+
 /-!
 # Order properties of conjugation-negation
 -/

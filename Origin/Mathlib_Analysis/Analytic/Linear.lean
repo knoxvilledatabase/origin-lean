@@ -5,6 +5,8 @@ Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Analysis.Analytic.Basic
 
+noncomputable section
+
 /-!
 # Linear functions are analytic
 
@@ -61,36 +63,11 @@ def uncurryBilinear (f : E →L[𝕜] F →L[𝕜] G) : E × F[×2]→L[𝕜] G 
     (↑(continuousMultilinearCurryFin1 𝕜 (E × F) G).symm : (E × F →L[𝕜] G) →L[𝕜] _).comp <|
       f.bilinearComp (fst _ _ _) (snd _ _ _)
 
-@[simp]
-theorem uncurryBilinear_apply (f : E →L[𝕜] F →L[𝕜] G) (m : Fin 2 → E × F) :
-    f.uncurryBilinear m = f (m 0).1 (m 1).2 :=
-  rfl
-
 def fpowerSeriesBilinear (f : E →L[𝕜] F →L[𝕜] G) (x : E × F) : FormalMultilinearSeries 𝕜 (E × F) G
   | 0 => ContinuousMultilinearMap.uncurry0 𝕜 _ (f x.1 x.2)
   | 1 => (continuousMultilinearCurryFin1 𝕜 (E × F) G).symm (f.deriv₂ x)
   | 2 => f.uncurryBilinear
   | _ => 0
-
-@[simp]
-theorem fpowerSeriesBilinear_apply_zero (f : E →L[𝕜] F →L[𝕜] G) (x : E × F) :
-    fpowerSeriesBilinear f x 0 = ContinuousMultilinearMap.uncurry0 𝕜 _ (f x.1 x.2) :=
-  rfl
-
-@[simp]
-theorem fpowerSeriesBilinear_apply_one (f : E →L[𝕜] F →L[𝕜] G) (x : E × F) :
-    fpowerSeriesBilinear f x 1 = (continuousMultilinearCurryFin1 𝕜 (E × F) G).symm (f.deriv₂ x) :=
-  rfl
-
-@[simp]
-theorem fpowerSeriesBilinear_apply_two (f : E →L[𝕜] F →L[𝕜] G) (x : E × F) :
-    fpowerSeriesBilinear f x 2 = f.uncurryBilinear :=
-  rfl
-
-@[simp]
-theorem fpowerSeriesBilinear_apply_add_three (f : E →L[𝕜] F →L[𝕜] G) (x : E × F) (n) :
-    fpowerSeriesBilinear f x (n + 3) = 0 :=
-  rfl
 
 @[simp]
 theorem fpowerSeriesBilinear_radius (f : E →L[𝕜] F →L[𝕜] G) (x : E × F) :

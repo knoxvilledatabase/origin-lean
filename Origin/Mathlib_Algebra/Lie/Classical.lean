@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Algebra.Lie.SkewAdjoint
 import Mathlib.LinearAlgebra.SymplecticGroup
 
+noncomputable section
+
 /-!
 # Classical Lie algebras
 
@@ -102,10 +104,6 @@ def Eb (h : j ≠ i) : sl n R :=
   ⟨Matrix.stdBasisMatrix i j (1 : R),
     show Matrix.stdBasisMatrix i j (1 : R) ∈ LinearMap.ker (Matrix.traceLinearMap n R R) from
       Matrix.StdBasisMatrix.trace_zero i j (1 : R) h⟩
-
-@[simp]
-theorem eb_val (h : j ≠ i) : (Eb R i j h).val = Matrix.stdBasisMatrix i j 1 :=
-  rfl
 
 end ElementaryBasis
 

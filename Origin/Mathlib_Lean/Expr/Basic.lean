@@ -8,6 +8,8 @@ import Lean.Meta.Tactic.Rewrite
 import Batteries.Tactic.Alias
 import Lean.Elab.Binders
 
+noncomputable section
+
 /-!
 # Additional operations on Expr and related types
 

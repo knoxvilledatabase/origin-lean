@@ -5,6 +5,8 @@ Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 import Origin.Core
 import Mathlib.CategoryTheory.Shift.Basic
 
+noncomputable section
+
 /-!
 # Functors which commute with shifts
 

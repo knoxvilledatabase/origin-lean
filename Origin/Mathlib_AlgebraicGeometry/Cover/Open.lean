@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Cover.MorphismProperty
 
+noncomputable section
+
 /-!
 # Open covers of schemes
 
@@ -118,10 +120,6 @@ def affineOpenCover (X : Scheme.{u}) : X.AffineOpenCover where
   f := X.affineCover.f
   covers := X.affineCover.covers
 
-@[simp]
-lemma openCover_affineOpenCover (X : Scheme.{u}) : X.affineOpenCover.openCover = X.affineCover :=
-  rfl
-
 def OpenCover.affineRefinement {X : Scheme.{u}} (𝓤 : X.OpenCover) : X.AffineOpenCover where
   J := (𝓤.bind fun j => (𝓤.obj j).affineCover).J
   map := (𝓤.bind fun j => (𝓤.obj j).affineCover).map
@@ -162,9 +160,8 @@ lemma OpenCover.pullbackCoverAffineRefinementObjIso_inv_pullbackHom
   convert pullbackSymmetry_inv_comp_fst ((𝒰.obj i.1).affineCover.map i.2) (pullback.fst _ _)
   exact pullbackRightPullbackFstIso_hom_fst _ _ _
 
-noncomputable
-
 @[simps]
+noncomputable
 def affineOpenCoverOfSpanRangeEqTop {R : CommRingCat} {ι : Type*} (s : ι → R)
     (hs : Ideal.span (Set.range s) = ⊤) : (Spec R).AffineOpenCover where
   J := ι
@@ -238,10 +235,6 @@ def affineBasisCover (X : Scheme.{u}) : OpenCover X :=
 
 def affineBasisCoverRing (X : Scheme.{u}) (i : X.affineBasisCover.J) : CommRingCat :=
   CommRingCat.of <| @Localization.Away (X.local_affine i.1).choose_spec.choose _ i.2
-
-theorem affineBasisCover_obj (X : Scheme.{u}) (i : X.affineBasisCover.J) :
-    X.affineBasisCover.obj i = Spec (X.affineBasisCoverRing i) :=
-  rfl
 
 theorem affineBasisCover_map_range (X : Scheme.{u}) (x : X)
     (r : (X.local_affine x).choose_spec.choose) :

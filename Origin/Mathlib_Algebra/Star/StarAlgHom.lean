@@ -9,6 +9,8 @@ import Mathlib.Algebra.Algebra.Prod
 import Mathlib.Algebra.Star.Prod
 import Mathlib.Algebra.Star.StarRingHom
 
+noncomputable section
+
 /-!
 # Morphisms of star algebras
 
@@ -51,7 +53,9 @@ structure NonUnitalStarAlgHom (R A B : Type*) [Monoid R] [NonUnitalNonAssocSemir
   map_star' : ∀ a : A, toFun (star a) = star (toFun a)
 
 @[inherit_doc NonUnitalStarAlgHom] infixr:25 " →⋆ₙₐ " => NonUnitalStarAlgHom _
+
 @[inherit_doc] notation:25 A " →⋆ₙₐ[" R "] " B => NonUnitalStarAlgHom R A B
+
 class NonUnitalStarAlgHomClass (F : Type*) (R A B : outParam Type*)
   [Monoid R] [Star A] [Star B] [NonUnitalNonAssocSemiring A] [NonUnitalNonAssocSemiring B]
   [DistribMulAction R A] [DistribMulAction R B] [FunLike F A B] [NonUnitalAlgHomClass F R A B]
@@ -114,11 +118,6 @@ initialize_simps_projections NonUnitalStarAlgHom
   (toFun → apply)
 
 @[simp]
-protected theorem coe_coe {F : Type*} [FunLike F A B] [NonUnitalAlgHomClass F R A B]
-    [StarHomClass F A B] (f : F) :
-    ⇑(f : A →⋆ₙₐ[R] B) = f := rfl
-
-@[simp]
 theorem coe_toNonUnitalAlgHom {f : A →⋆ₙₐ[R] B} : (f.toNonUnitalAlgHom : A → B) = f :=
   rfl
 
@@ -134,22 +133,8 @@ protected def copy (f : A →⋆ₙₐ[R] B) (f' : A → B) (h : f' = f) : A →
   map_mul' := h.symm ▸ map_mul f
   map_star' := h.symm ▸ map_star f
 
-@[simp]
-theorem coe_copy (f : A →⋆ₙₐ[R] B) (f' : A → B) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : A →⋆ₙₐ[R] B) (f' : A → B) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
-
-@[simp]
-theorem coe_mk (f : A → B) (h₁ h₂ h₃ h₄ h₅) :
-    ((⟨⟨⟨⟨f, h₁⟩, h₂, h₃⟩, h₄⟩, h₅⟩ : A →⋆ₙₐ[R] B) : A → B) = f :=
-  rfl
-
-@[simp]
-theorem coe_mk' (f : A →ₙₐ[R] B) (h) :
-    ((⟨f, h⟩ : A →⋆ₙₐ[R] B) : A → B) = f :=
-  rfl
 
 @[simp]
 theorem mk_coe (f : A →⋆ₙₐ[R] B) (h₁ h₂ h₃ h₄ h₅) :
@@ -163,10 +148,6 @@ variable (R A)
 
 protected def id : A →⋆ₙₐ[R] A :=
   { (1 : A →ₙₐ[R] A) with map_star' := fun _ => rfl }
-
-@[simp]
-theorem coe_id : ⇑(NonUnitalStarAlgHom.id R A) = id :=
-  rfl
 
 end
 
@@ -204,13 +185,6 @@ instance : Monoid (A →⋆ₙₐ[R] A) where
   one_mul := id_comp
   mul_one := comp_id
 
-@[simp]
-theorem coe_one : ((1 : A →⋆ₙₐ[R] A) : A → A) = id :=
-  rfl
-
-theorem one_apply (a : A) : (1 : A →⋆ₙₐ[R] A) a = a :=
-  rfl
-
 end Basic
 
 section Zero
@@ -233,13 +207,6 @@ instance : MonoidWithZero (A →⋆ₙₐ[R] A) :=
     zero_mul := fun _ => ext fun _ => rfl
     mul_zero := fun f => ext fun _ => map_zero f }
 
-@[simp]
-theorem coe_zero : ((0 : A →⋆ₙₐ[R] B) : A → B) = 0 :=
-  rfl
-
-theorem zero_apply (a : A) : (0 : A →⋆ₙₐ[R] B) a = 0 :=
-  rfl
-
 end Zero
 
 section RestrictScalars
@@ -252,13 +219,6 @@ variable (R : Type*) {S A B : Type*} [Monoid R] [Monoid S] [Star A] [Star B]
 def restrictScalars (f : A →⋆ₙₐ[S] B) : A →⋆ₙₐ[R] B :=
   { (f : A →ₙₐ[S] B).restrictScalars R with
     map_star' := map_star f }
-
-@[simp]
-lemma restrictScalars_apply (f : A →⋆ₙₐ[S] B) (x : A) : f.restrictScalars R x = f x := rfl
-
-lemma coe_restrictScalars (f : A →⋆ₙₐ[S] B) : (f.restrictScalars R : A →ₙ+* B) = f := rfl
-
-lemma coe_restrictScalars' (f : A →⋆ₙₐ[S] B) : (f.restrictScalars R : A → B) = f := rfl
 
 theorem restrictScalars_injective :
     Function.Injective (restrictScalars R : (A →⋆ₙₐ[S] B) → A →⋆ₙₐ[R] B) :=
@@ -278,7 +238,9 @@ structure StarAlgHom (R A B : Type*) [CommSemiring R] [Semiring A] [Algebra R A]
   map_star' : ∀ x : A, toFun (star x) = star (toFun x)
 
 @[inherit_doc StarAlgHom] infixr:25 " →⋆ₐ " => StarAlgHom _
+
 @[inherit_doc] notation:25 A " →⋆ₐ[" R "] " B => StarAlgHom R A B
+
 class StarAlgHomClass (F : Type*) (R A B : outParam Type*)
     [CommSemiring R] [Semiring A] [Algebra R A] [Star A] [Semiring B] [Algebra R B] [Star B]
     [FunLike F A B] [AlgHomClass F R A B] extends StarHomClass F A B : Prop
@@ -322,12 +284,6 @@ instance : AlgHomClass (A →⋆ₐ[R] B) R A B where
 instance : StarHomClass (A →⋆ₐ[R] B) A B where
   map_star f := f.map_star'
 
-@[simp]
-protected theorem coe_coe {F : Type*} [FunLike F A B] [AlgHomClass F R A B]
-    [StarHomClass F A B] (f : F) :
-    ⇑(f : A →⋆ₐ[R] B) = f :=
-  rfl
-
 def Simps.apply (f : A →⋆ₐ[R] B) : A → B := f
 
 initialize_simps_projections StarAlgHom (toFun → apply)
@@ -349,22 +305,8 @@ protected def copy (f : A →⋆ₐ[R] B) (f' : A → B) (h : f' = f) : A →⋆
   commutes' := h.symm ▸ AlgHomClass.commutes f
   map_star' := h.symm ▸ map_star f
 
-@[simp]
-theorem coe_copy (f : A →⋆ₐ[R] B) (f' : A → B) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : A →⋆ₐ[R] B) (f' : A → B) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
-
-@[simp]
-theorem coe_mk (f : A → B) (h₁ h₂ h₃ h₄ h₅ h₆) :
-    ((⟨⟨⟨⟨⟨f, h₁⟩, h₂⟩, h₃, h₄⟩, h₅⟩, h₆⟩ : A →⋆ₐ[R] B) : A → B) = f :=
-  rfl
-
-@[simp]
-theorem coe_mk' (f : A →ₐ[R] B) (h) :
-    ((⟨f, h⟩ : A →⋆ₐ[R] B) : A → B) = f :=
-  rfl
 
 @[simp]
 theorem mk_coe (f : A →⋆ₐ[R] B) (h₁ h₂ h₃ h₄ h₅ h₆) :
@@ -378,10 +320,6 @@ variable (R A)
 
 protected def id : A →⋆ₐ[R] A :=
   { AlgHom.id _ _ with map_star' := fun _ => rfl }
-
-@[simp]
-theorem coe_id : ⇑(StarAlgHom.id R A) = id :=
-  rfl
 
 @[simps]
 def ofId (R A : Type*) [CommSemiring R] [StarRing R] [Semiring A] [StarMul A]
@@ -432,10 +370,6 @@ instance : Monoid (A →⋆ₐ[R] A) where
 def toNonUnitalStarAlgHom (f : A →⋆ₐ[R] B) : A →⋆ₙₐ[R] B :=
   { f with map_smul' := map_smul f }
 
-@[simp]
-theorem coe_toNonUnitalStarAlgHom (f : A →⋆ₐ[R] B) : (f.toNonUnitalStarAlgHom : A → B) = f :=
-  rfl
-
 end StarAlgHom
 
 end Unital
@@ -466,9 +400,6 @@ variable {R A B C}
 def prod (f : A →⋆ₙₐ[R] B) (g : A →⋆ₙₐ[R] C) : A →⋆ₙₐ[R] B × C :=
   { f.toNonUnitalAlgHom.prod g.toNonUnitalAlgHom with
     map_star' := fun x => by simp [map_star, Prod.star_def] }
-
-theorem coe_prod (f : A →⋆ₙₐ[R] B) (g : A →⋆ₙₐ[R] C) : ⇑(f.prod g) = Pi.prod f g :=
-  rfl
 
 @[simp]
 theorem fst_prod (f : A →⋆ₙₐ[R] B) (g : A →⋆ₙₐ[R] C) : (fst R B C).comp (prod f g) = f := by
@@ -505,20 +436,6 @@ def inr : B →⋆ₙₐ[R] A × B :=
 
 variable {R A B}
 
-@[simp]
-theorem coe_inl : (inl R A B : A → A × B) = fun x => (x, 0) :=
-  rfl
-
-theorem inl_apply (x : A) : inl R A B x = (x, 0) :=
-  rfl
-
-@[simp]
-theorem coe_inr : (inr R A B : B → A × B) = Prod.mk 0 :=
-  rfl
-
-theorem inr_apply (x : B) : inr R A B x = (0, x) :=
-  rfl
-
 end InlInr
 
 end NonUnitalStarAlgHom
@@ -541,9 +458,6 @@ variable {R A B C}
 @[simps!]
 def prod (f : A →⋆ₐ[R] B) (g : A →⋆ₐ[R] C) : A →⋆ₐ[R] B × C :=
   { f.toAlgHom.prod g.toAlgHom with map_star' := fun x => by simp [Prod.star_def, map_star] }
-
-theorem coe_prod (f : A →⋆ₐ[R] B) (g : A →⋆ₐ[R] C) : ⇑(f.prod g) = Pi.prod f g :=
-  rfl
 
 @[simp]
 theorem fst_prod (f : A →⋆ₐ[R] B) (g : A →⋆ₐ[R] C) : (fst R B C).comp (prod f g) = f := by
@@ -576,7 +490,9 @@ structure StarAlgEquiv (R A B : Type*) [Add A] [Add B] [Mul A] [Mul B] [SMul R A
   map_smul' : ∀ (r : R) (a : A), toFun (r • a) = r • toFun a
 
 @[inherit_doc StarAlgEquiv] infixr:25 " ≃⋆ₐ " => StarAlgEquiv _
+
 @[inherit_doc] notation:25 A " ≃⋆ₐ[" R "] " B => StarAlgEquiv R A B
+
 class NonUnitalAlgEquivClass (F : Type*) (R A B : outParam Type*)
   [Add A] [Mul A] [SMul R A] [Add B] [Mul B] [SMul R B] [EquivLike F A B]
   extends RingEquivClass F A B, MulActionSemiHomClass F (@id R) A B : Prop where
@@ -644,10 +560,6 @@ instance : FunLike (A ≃⋆ₐ[R] B) A B where
   coe f := f.toFun
   coe_injective' := DFunLike.coe_injective
 
-@[simp]
-theorem toRingEquiv_eq_coe (e : A ≃⋆ₐ[R] B) : e.toRingEquiv = e :=
-  rfl
-
 @[ext]
 theorem ext {f g : A ≃⋆ₐ[R] B} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -660,10 +572,6 @@ def refl : A ≃⋆ₐ[R] A :=
 
 instance : Inhabited (A ≃⋆ₐ[R] A) :=
   ⟨refl⟩
-
-@[simp]
-theorem coe_refl : ⇑(refl : A ≃⋆ₐ[R] A) = id :=
-  rfl
 
 @[symm]
 nonrec def symm (e : A ≃⋆ₐ[R] B) : B ≃⋆ₐ[R] A :=
@@ -683,17 +591,10 @@ def Simps.symm_apply (e : A ≃⋆ₐ[R] B) : B → A :=
 initialize_simps_projections StarAlgEquiv (toFun → apply, invFun → symm_apply)
 
 @[simp]
-theorem invFun_eq_symm {e : A ≃⋆ₐ[R] B} : EquivLike.inv e = e.symm :=
-  rfl
-
-@[simp]
 theorem symm_symm (e : A ≃⋆ₐ[R] B) : e.symm.symm = e := rfl
 
 theorem symm_bijective : Function.Bijective (symm : (A ≃⋆ₐ[R] B) → B ≃⋆ₐ[R] A) :=
   Function.bijective_iff_has_inverse.mpr ⟨_, symm_symm, symm_symm⟩
-
-@[simp]
-theorem coe_mk (e h₁ h₂) : ⇑(⟨e, h₁, h₂⟩ : A ≃⋆ₐ[R] B) = e := rfl
 
 @[simp]
 theorem mk_coe (e : A ≃⋆ₐ[R] B) (e' h₁ h₂ h₃ h₄ h₅ h₆) :
@@ -708,17 +609,6 @@ theorem symm_mk (f f') (h₁ h₂ h₃ h₄ h₅ h₆) :
       { symm_mk.aux f f' h₁ h₂ h₃ h₄ h₅ h₆ with
         toFun := f'
         invFun := f } :=
-  rfl
-
-@[simp]
-theorem refl_symm : (StarAlgEquiv.refl : A ≃⋆ₐ[R] A).symm = StarAlgEquiv.refl :=
-  rfl
-
-theorem to_ringEquiv_symm (f : A ≃⋆ₐ[R] B) : (f : A ≃+* B).symm = f.symm :=
-  rfl
-
-@[simp]
-theorem symm_to_ringEquiv (e : A ≃⋆ₐ[R] B) : (e.symm : B ≃+* A) = (e : A ≃+* B).symm :=
   rfl
 
 @[trans]
@@ -739,19 +629,6 @@ theorem apply_symm_apply (e : A ≃⋆ₐ[R] B) : ∀ x, e (e.symm x) = x :=
 @[simp]
 theorem symm_apply_apply (e : A ≃⋆ₐ[R] B) : ∀ x, e.symm (e x) = x :=
   e.toRingEquiv.symm_apply_apply
-
-@[simp]
-theorem symm_trans_apply (e₁ : A ≃⋆ₐ[R] B) (e₂ : B ≃⋆ₐ[R] C) (x : C) :
-    (e₁.trans e₂).symm x = e₁.symm (e₂.symm x) :=
-  rfl
-
-@[simp]
-theorem coe_trans (e₁ : A ≃⋆ₐ[R] B) (e₂ : B ≃⋆ₐ[R] C) : ⇑(e₁.trans e₂) = e₂ ∘ e₁ :=
-  rfl
-
-@[simp]
-theorem trans_apply (e₁ : A ≃⋆ₐ[R] B) (e₂ : B ≃⋆ₐ[R] C) (x : A) : (e₁.trans e₂) x = e₂ (e₁ x) :=
-  rfl
 
 theorem leftInverse_symm (e : A ≃⋆ₐ[R] B) : Function.LeftInverse e.symm e :=
   e.left_inv
@@ -791,15 +668,6 @@ noncomputable def ofBijective (f : F) (hf : Function.Bijective f) : A ≃⋆ₐ[
     toFun := f
     map_star' := map_star f
     map_smul' := map_smul f }
-
-@[simp]
-theorem coe_ofBijective {f : F} (hf : Function.Bijective f) :
-    (StarAlgEquiv.ofBijective f hf : A → B) = f :=
-  rfl
-
-theorem ofBijective_apply {f : F} (hf : Function.Bijective f) (a : A) :
-    (StarAlgEquiv.ofBijective f hf) a = f a :=
-  rfl
 
 end Bijective
 

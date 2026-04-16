@@ -7,6 +7,8 @@ import Lean.Meta.Basic
 import Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.SimplexAlgorithm
 import Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.Gauss
 
+noncomputable section
+
 /-!
 # `linarith` certificate search as an LP problem
 

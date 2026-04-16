@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.UniformMulAction
 import Mathlib.Topology.UniformSpace.Completion
 
+noncomputable section
+
 /-!
 # Completion of topological groups:
 
@@ -48,10 +50,6 @@ instance [Add α] : Add (Completion α) :=
 
 instance [Sub α] : Sub (Completion α) :=
   ⟨Completion.map₂ Sub.sub⟩
-
-@[norm_cast]
-theorem UniformSpace.Completion.coe_zero [Zero α] : ((0 : α) : Completion α) = 0 :=
-  rfl
 
 end Group
 

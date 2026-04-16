@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Sum/Lattice.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Sum.Order
 import Mathlib.Order.Hom.Lattice
+
+noncomputable section
 
 /-!
 # Lexicographic sum of lattices
@@ -24,7 +26,6 @@ section SemilatticeSup
 variable [SemilatticeSup α] [SemilatticeSup β]
 
 set_option linter.unusedVariables false in
-
 instance instSemilatticeSup : SemilatticeSup (α ⊕ₗ β) where
   sup x y := match x, y with
     | inlₗ a₁, inlₗ a₂ => inl (a₁ ⊔ a₂)
@@ -59,7 +60,6 @@ section SemilatticeInf
 variable [SemilatticeInf α] [SemilatticeInf β]
 
 set_option linter.unusedVariables false in
-
 instance instSemilatticeInf : SemilatticeInf (α ⊕ₗ β) where
   inf x y := match x, y with
     | inlₗ a₁, inlₗ a₂ => inl (a₁ ⊓ a₂)
@@ -94,16 +94,6 @@ section Lattice
 variable [Lattice α] [Lattice β]
 
 instance instLattice : Lattice (α ⊕ₗ β) := { instSemilatticeSup, instSemilatticeInf with }
-
-def inlLatticeHom : LatticeHom α (α ⊕ₗ β) where
-  toFun := inlₗ
-  map_sup' _ _ := rfl
-  map_inf' _ _ := rfl
-
-def inrLatticeHom : LatticeHom β (α ⊕ₗ β) where
-  toFun := inrₗ
-  map_sup' _ _ := rfl
-  map_inf' _ _ := rfl
 
 end Lattice
 

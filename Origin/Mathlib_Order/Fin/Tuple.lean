@@ -9,6 +9,8 @@ import Mathlib.Order.Fin.Basic
 import Mathlib.Order.PiLex
 import Mathlib.Order.Interval.Set.Defs
 
+noncomputable section
+
 /-!
 # Order properties on tuples
 -/
@@ -143,9 +145,6 @@ def finSuccAboveOrderIso (p : Fin (n + 1)) : Fin n ≃o { x : Fin (n + 1) // x �
   __ := finSuccAboveEquiv p
   map_rel_iff' := p.succAboveOrderEmb.map_rel_iff'
 
-lemma finSuccAboveOrderIso_apply (p : Fin (n + 1)) (i : Fin n) :
-    finSuccAboveOrderIso p i = ⟨p.succAbove i, p.succAbove_ne i⟩ := rfl
-
 lemma finSuccAboveOrderIso_symm_apply_last (x : { x : Fin (n + 1) // x ≠ Fin.last n }) :
     (finSuccAboveOrderIso (Fin.last n)).symm x = Fin.castLT x.1 (Fin.val_lt_last x.2) := by
   rw [← Option.some_inj]
@@ -157,11 +156,3 @@ lemma finSuccAboveOrderIso_symm_apply_ne_last {p : Fin (n + 1)} (h : p ≠ Fin.l
     (finSuccAboveEquiv p).symm x = (p.castLT (Fin.val_lt_last h)).predAbove x := by
   rw [← Option.some_inj]
   simpa [finSuccAboveEquiv, OrderIso.symm] using finSuccEquiv'_ne_last_apply h x.property
-
-@[simps apply symm_apply]
-def Fin.castLEOrderIso {n m : ℕ} (h : n ≤ m) : Fin n ≃o { i : Fin m // (i : ℕ) < n } where
-  toFun i := ⟨Fin.castLE h i, by simp⟩
-  invFun i := ⟨i, i.prop⟩
-  left_inv _ := by simp
-  right_inv _ := by simp
-  map_rel_iff' := by simp [(strictMono_castLE h).le_iff_le]

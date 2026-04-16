@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/EuclideanAbsoluteValue.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.AbsoluteValue
 import Mathlib.Algebra.EuclideanDomain.Int
+
+noncomputable section
 
 /-!
 # Euclidean absolute values
@@ -44,7 +46,8 @@ theorem map_lt_map_iff {x y : R} (h : abv.IsEuclidean) : abv x < abv y ↔ x ≺
 
 attribute [simp] map_lt_map_iff
 
--- DISSOLVED: sub_mod_lt
+theorem sub_mod_lt (h : abv.IsEuclidean) (a : R) {b : R} (hb : b ≠ 0) : abv (a % b) < abv b :=
+  h.map_lt_map_iff.mpr (EuclideanDomain.mod_lt a hb)
 
 end IsEuclidean
 

@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Defs
 
+noncomputable section
+
 /-!
 # σ-algebra of sets invariant under a self-map
 

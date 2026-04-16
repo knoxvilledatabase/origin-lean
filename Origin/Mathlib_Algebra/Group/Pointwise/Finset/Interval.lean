@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Order.Group.Pointwise.Interval
 import Mathlib.Order.Interval.Finset.Defs
 
+noncomputable section
+
 /-! # Pointwise operations on intervals
 
 This should be kept in sync with `Mathlib/Data/Set/Pointwise/Interval.lean`.

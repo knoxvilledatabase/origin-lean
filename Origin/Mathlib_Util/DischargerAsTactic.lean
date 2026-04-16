@@ -8,6 +8,8 @@ import Lean.Elab.Tactic.Basic
 import Lean.Meta.Tactic.Simp.Rewrite
 import Batteries.Tactic.Exact
 
+noncomputable section
+
 /-!
 ## Dischargers for `simp` to tactics
 

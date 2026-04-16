@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
 
+noncomputable section
+
 /-!
 # Preserving (co)kernels
 
@@ -39,9 +41,6 @@ lemma map_condition : G.map c.ι ≫ G.map f = 0 := by
 
 def map : KernelFork (G.map f) :=
   KernelFork.ofι (G.map c.ι) (c.map_condition G)
-
-@[simp]
-lemma map_ι : (c.map G).ι = G.map c.ι := rfl
 
 def isLimitMapConeEquiv :
     IsLimit (G.mapCone c) ≃ IsLimit (c.map G) := by
@@ -134,9 +133,6 @@ lemma map_condition : G.map f ≫ G.map c.π = 0 := by
 
 def map : CokernelCofork (G.map f) :=
   CokernelCofork.ofπ (G.map c.π) (c.map_condition G)
-
-@[simp]
-lemma map_π : (c.map G).π = G.map c.π := rfl
 
 def isColimitMapCoconeEquiv :
     IsColimit (G.mapCocone c) ≃ IsColimit (c.map G) := by

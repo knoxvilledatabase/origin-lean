@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Monad.Algebra
 
+noncomputable section
+
 /-!
 # Algebras for the coproduct monad
 

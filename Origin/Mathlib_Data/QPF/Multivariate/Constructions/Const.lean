@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Functor.Multivariate
 import Mathlib.Data.QPF.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # Constant functors are QPFs
 
@@ -40,16 +42,11 @@ protected def mk (x : A) : Const n A α := x
 protected def get (x : Const n A α) : A := x
 
 @[simp]
-protected theorem mk_get (x : Const n A α) : Const.mk (Const.get x) = x := rfl
-
-@[simp]
 protected theorem get_mk (x : A) : Const.get (Const.mk x : Const n A α) = x := rfl
 
 protected def map : Const n A α → Const n A β := fun x => x
 
 instance MvFunctor : MvFunctor (Const n A) where map _f := Const.map
-
-theorem map_mk (x : A) : f <$$> Const.mk x = Const.mk x := rfl
 
 theorem get_map (x : (Const n A) α) : Const.get (f <$$> x) = Const.get x := rfl
 

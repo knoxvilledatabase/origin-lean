@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/QuadraticChar/Basic.lean
-Genuine: 17 | Conflates: 1 | Dissolved: 10 | Infrastructure: 0
+Genuine: 27 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Parity
 import Mathlib.NumberTheory.LegendreSymbol.ZModChar
 import Mathlib.FieldTheory.Finite.Basic
+
+noncomputable section
 
 /-!
 # Quadratic characters of finite fields
@@ -61,9 +63,15 @@ theorem quadraticCharFun_zero : quadraticCharFun F 0 = 0 := by
 theorem quadraticCharFun_one : quadraticCharFun F 1 = 1 := by
   simp only [quadraticCharFun, one_ne_zero, isSquare_one, if_true, if_false]
 
--- DISSOLVED: quadraticCharFun_eq_one_of_char_two
+theorem quadraticCharFun_eq_one_of_char_two (hF : ringChar F = 2) {a : F} (ha : a ≠ 0) :
+    quadraticCharFun F a = 1 := by
+  simp only [quadraticCharFun, ha, if_false, ite_eq_left_iff]
+  exact fun h ↦ (h (FiniteField.isSquare_of_char_two hF a)).elim
 
--- DISSOLVED: quadraticCharFun_eq_pow_of_char_ne_two
+theorem quadraticCharFun_eq_pow_of_char_ne_two (hF : ringChar F ≠ 2) {a : F} (ha : a ≠ 0) :
+    quadraticCharFun F a = if a ^ (Fintype.card F / 2) = 1 then 1 else -1 := by
+  simp only [quadraticCharFun, ha, if_false]
+  simp_rw [FiniteField.isSquare_iff hF ha]
 
 theorem quadraticCharFun_mul (a b : F) :
     quadraticCharFun F (a * b) = quadraticCharFun F a * quadraticCharFun F b := by
@@ -106,15 +114,25 @@ theorem quadraticChar_eq_zero_iff {a : F} : quadraticChar F a = 0 ↔ a = 0 :=
 theorem quadraticChar_zero : quadraticChar F 0 = 0 := by
   simp only [quadraticChar_apply, quadraticCharFun_zero]
 
--- DISSOLVED: quadraticChar_one_iff_isSquare
+theorem quadraticChar_one_iff_isSquare {a : F} (ha : a ≠ 0) :
+    quadraticChar F a = 1 ↔ IsSquare a := by
+  simp only [quadraticChar_apply, quadraticCharFun, ha, if_false, ite_eq_left_iff,
+    (by omega : (-1 : ℤ) ≠ 1), imp_false, not_not, reduceCtorEq]
 
--- DISSOLVED: quadraticChar_sq_one'
+theorem quadraticChar_sq_one' {a : F} (ha : a ≠ 0) : quadraticChar F (a ^ 2) = 1 := by
+  simp only [quadraticChar_apply, quadraticCharFun, sq_eq_zero_iff, ha, IsSquare_sq, if_true,
+    if_false]
 
--- DISSOLVED: quadraticChar_sq_one
+theorem quadraticChar_sq_one {a : F} (ha : a ≠ 0) : quadraticChar F a ^ 2 = 1 := by
+  rwa [pow_two, ← map_mul, ← pow_two, quadraticChar_sq_one']
 
--- DISSOLVED: quadraticChar_dichotomy
+theorem quadraticChar_dichotomy {a : F} (ha : a ≠ 0) :
+    quadraticChar F a = 1 ∨ quadraticChar F a = -1 :=
+  sq_eq_one_iff.1 <| quadraticChar_sq_one ha
 
--- DISSOLVED: quadraticChar_eq_neg_one_iff_not_one
+theorem quadraticChar_eq_neg_one_iff_not_one {a : F} (ha : a ≠ 0) :
+    quadraticChar F a = -1 ↔ ¬quadraticChar F a = 1 :=
+  ⟨fun h ↦ by rw [h]; omega, fun h₂ ↦ (or_iff_right h₂).mp (quadraticChar_dichotomy ha)⟩
 
 theorem quadraticChar_neg_one_iff_not_isSquare {a : F} : quadraticChar F a = -1 ↔ ¬IsSquare a := by
   by_cases ha : a = 0
@@ -129,9 +147,13 @@ lemma quadraticChar_exists_neg_one' (hF : ringChar F ≠ 2) : ∃ a : Fˣ, quadr
   contrapose ha
   exact ne_of_eq_of_ne ((quadraticChar F).map_nonunit ha) (mt zero_eq_neg.mp one_ne_zero)
 
--- DISSOLVED: quadraticChar_eq_one_of_char_two
+theorem quadraticChar_eq_one_of_char_two (hF : ringChar F = 2) {a : F} (ha : a ≠ 0) :
+    quadraticChar F a = 1 :=
+  quadraticCharFun_eq_one_of_char_two hF ha
 
--- DISSOLVED: quadraticChar_eq_pow_of_char_ne_two
+theorem quadraticChar_eq_pow_of_char_ne_two (hF : ringChar F ≠ 2) {a : F} (ha : a ≠ 0) :
+    quadraticChar F a = if a ^ (Fintype.card F / 2) = 1 then 1 else -1 :=
+  quadraticCharFun_eq_pow_of_char_ne_two hF ha
 
 theorem quadraticChar_eq_pow_of_char_ne_two' (hF : ringChar F ≠ 2) (a : F) :
     (quadraticChar F a : F) = a ^ (Fintype.card F / 2) := by
@@ -155,9 +177,13 @@ theorem quadraticChar_isQuadratic : (quadraticChar F).IsQuadratic := by
 
 variable {F}
 
--- DISSOLVED: quadraticChar_ne_one
+theorem quadraticChar_ne_one (hF : ringChar F ≠ 2) : quadraticChar F ≠ 1 := by
+  rcases quadraticChar_exists_neg_one' hF with ⟨a, ha⟩
+  intro hχ
+  simp only [hχ, one_apply a.isUnit, one_ne_zero, reduceCtorEq] at ha
 
 set_option linter.deprecated false in
+@[deprecated quadraticChar_ne_one (since := "2024-06-16")]
 
 -- CONFLATES (assumes ground = zero): quadraticChar_isNontrivial
 theorem quadraticChar_isNontrivial (hF : ringChar F ≠ 2) : (quadraticChar F).IsNontrivial :=

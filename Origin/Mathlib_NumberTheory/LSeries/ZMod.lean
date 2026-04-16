@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/LSeries/ZMod.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Fourier.ZMod
 import Mathlib.Analysis.NormedSpace.Connected
 import Mathlib.NumberTheory.LSeries.RiemannZeta
+
+noncomputable section
 
 /-!
 # L-series of functions on `ZMod N`
@@ -141,7 +143,39 @@ private lemma LFunction_stdAddChar_eq_expZeta_of_one_lt_re (j : ZMod N) {s : ℂ
   conv_rhs at this => rw [Int.cast_mul, Int.cast_natCast, Int.cast_natCast, mul_div_assoc]
   rw [← this, Int.cast_mul, Int.cast_natCast, Int.cast_natCast, natCast_zmod_val]
 
--- DISSOLVED: LFunction_stdAddChar_eq_expZeta
+lemma LFunction_stdAddChar_eq_expZeta (j : ZMod N) (s : ℂ) (hjs : j ≠ 0 ∨ s ≠ 1) :
+    LFunction (fun k ↦ 𝕖 (j * k)) s = expZeta (ZMod.toAddCircle j) s := by
+  let U := if j = 0 then {z : ℂ | z ≠ 1} else univ -- region of analyticity of both functions
+  let V := {z : ℂ | 1 < re z} -- convergence region
+  have hUo : IsOpen U := by
+    by_cases h : j = 0
+    · simpa only [h, ↓reduceIte, U] using isOpen_compl_singleton
+    · simp only [h, ↓reduceIte, isOpen_univ, U]
+  let f := LFunction (fun k ↦ stdAddChar (j * k))
+  let g := expZeta (toAddCircle j)
+  have hU {u} : u ∈ U ↔ u ≠ 1 ∨ j ≠ 0 := by simp only [mem_ite_univ_right, U]; tauto
+  -- hypotheses for uniqueness of analytic continuation
+  have hf : AnalyticOnNhd ℂ f U := by
+    refine DifferentiableOn.analyticOnNhd (fun u hu ↦ ?_) hUo
+    refine (differentiableAt_LFunction _ _ ((hU.mp hu).imp_right fun h ↦ ?_)).differentiableWithinAt
+    simp only [mul_comm j, AddChar.sum_mulShift _ (isPrimitive_stdAddChar _), h,
+      ↓reduceIte, CharP.cast_eq_zero, or_true]
+  have hg : AnalyticOnNhd ℂ g U := by
+    refine DifferentiableOn.analyticOnNhd (fun u hu ↦ ?_) hUo
+    refine (differentiableAt_expZeta _ _ ((hU.mp hu).imp_right fun h ↦ ?_)).differentiableWithinAt
+    rwa [ne_eq, toAddCircle_eq_zero]
+  have hUc : IsPreconnected U := by
+    by_cases h : j = 0
+    · simpa only [h, ↓reduceIte, U] using
+        (isConnected_compl_singleton_of_one_lt_rank (by simp) _).isPreconnected
+    · simpa only [h, ↓reduceIte, U] using isPreconnected_univ
+  have hV : V ∈ 𝓝 2 := (continuous_re.isOpen_preimage _ isOpen_Ioi).mem_nhds (by simp)
+  have hUmem : 2 ∈ U := by simp [U]
+  have hUmem' : s ∈ U := hU.mpr hjs.symm
+  -- apply uniqueness result
+  refine hf.eqOn_of_preconnected_of_eventuallyEq hg hUc hUmem ?_ hUmem'
+  -- now remains to prove equality on `1 < re s`
+  filter_upwards [hV] with z using LFunction_stdAddChar_eq_expZeta_of_one_lt_re _
 
 lemma LFunction_dft (Φ : ZMod N → ℂ) {s : ℂ} (hs : Φ 0 = 0 ∨ s ≠ 1) :
     LFunction (𝓕 Φ) s = ∑ j : ZMod N, Φ j * expZeta (toAddCircle (-j)) s := by
@@ -270,13 +304,34 @@ lemma completedLFunction_eq (Φ : ZMod N → ℂ) (s : ℂ) :
     ← sum_mul, completedLFunction₀, mul_assoc]
   abel
 
--- DISSOLVED: differentiableAt_completedLFunction
+lemma differentiableAt_completedLFunction (Φ : ZMod N → ℂ) (s : ℂ) (hs₀ : s ≠ 0 ∨ Φ 0 = 0)
+    (hs₁ : s ≠ 1 ∨ ∑ j, Φ j = 0) : DifferentiableAt ℂ (completedLFunction Φ) s := by
+  simp only [funext (completedLFunction_eq Φ), mul_div_assoc]
+  -- We know `completedLFunction₀` is differentiable everywhere, so it suffices to show that the
+  -- correction terms from `completedLFunction_eq` are differentiable at `s`.
+  refine ((differentiable_completedLFunction₀ _ _).sub ?_).sub ?_
+  · -- term with `1 / s`
+    refine .mul (by fun_prop) (hs₀.elim ?_ ?_)
+    · exact fun h ↦ (differentiableAt_const _).div differentiableAt_id h
+    · exact fun h ↦ by simp only [h, funext zero_div, differentiableAt_const]
+  · -- term with `1 / (1 - s)`
+    refine .mul (by fun_prop) (hs₁.elim ?_ ?_)
+    · exact fun h ↦ .div (by fun_prop) (by fun_prop) (by rwa [sub_ne_zero, ne_comm])
+    · exact fun h ↦ by simp only [h, zero_div, differentiableAt_const]
 
 lemma differentiable_completedLFunction (hΦ₂ : Φ 0 = 0) (hΦ₃ : ∑ j, Φ j = 0) :
     Differentiable ℂ (completedLFunction Φ) :=
   fun s ↦ differentiableAt_completedLFunction Φ s (.inr hΦ₂) (.inr hΦ₃)
 
--- DISSOLVED: LFunction_eq_completed_div_gammaFactor_even
+lemma LFunction_eq_completed_div_gammaFactor_even (hΦ : Φ.Even) (s : ℂ) (hs : s ≠ 0 ∨ Φ 0 = 0) :
+    LFunction Φ s = completedLFunction Φ s / Gammaℝ s := by
+  simp only [completedLFunction_def_even hΦ, LFunction_def_even hΦ, mul_div_assoc, sum_div]
+  congr 2 with i
+  rcases ne_or_eq i 0 with hi | rfl
+  · rw [hurwitzZetaEven_def_of_ne_or_ne (.inl (hi ∘ toAddCircle_eq_zero.mp))]
+  · rcases hs with hs | hΦ'
+    · rw [hurwitzZetaEven_def_of_ne_or_ne (.inr hs)]
+    · simp only [hΦ', map_zero, zero_mul]
 
 lemma LFunction_eq_completed_div_gammaFactor_odd (hΦ : Φ.Odd) (s : ℂ) :
     LFunction Φ s = completedLFunction Φ s / Gammaℝ (s + 1) := by
@@ -324,7 +379,52 @@ private lemma completedLFunction_one_sub_of_one_lt_odd (hΦ : Φ.Odd) {s : ℂ} 
     ring
   _ = I * LFunction (𝓕 Φ) s := by rw [inv_I, neg_neg]
 
--- DISSOLVED: completedLFunction_one_sub_even
+theorem completedLFunction_one_sub_even (hΦ : Φ.Even) (s : ℂ)
+    (hs₀ : s ≠ 0 ∨ ∑ j, Φ j = 0) (hs₁ : s ≠ 1 ∨ Φ 0 = 0) :
+    completedLFunction Φ (1 - s) = N ^ (s - 1) * completedLFunction (𝓕 Φ) s := by
+  -- We prove this using `AnalyticOnNhd.eqOn_of_preconnected_of_eventuallyEq`, so we need to
+  -- gather up the ingredients for this big theorem.
+  -- First set up some notations:
+  let F (t) := completedLFunction Φ (1 - t)
+  let G (t) := ↑N ^ (t - 1) * completedLFunction (𝓕 Φ) t
+  -- Set on which F, G are analytic:
+  let U := {t : ℂ | (t ≠ 0 ∨ ∑ j, Φ j = 0) ∧ (t ≠ 1 ∨ Φ 0 = 0)}
+  -- Properties of U:
+  have hsU : s ∈ U := ⟨hs₀, hs₁⟩
+  have h2U : 2 ∈ U := ⟨.inl two_ne_zero, .inl (OfNat.ofNat_ne_one _)⟩
+  have hUo : IsOpen U := (isOpen_compl_singleton.union isOpen_const).inter
+    (isOpen_compl_singleton.union isOpen_const)
+  have hUp : IsPreconnected U := by
+    -- need to write `U` as the complement of an obviously countable set
+    let Uc : Set ℂ := (if ∑ j, Φ j = 0 then ∅ else {0}) ∪ (if Φ 0 = 0 then ∅ else {1})
+    have : Uc.Countable := by
+      apply Countable.union <;>
+      split_ifs <;>
+      simp only [countable_singleton, countable_empty]
+    convert (this.isConnected_compl_of_one_lt_rank ?_).isPreconnected using 1
+    · ext x
+      by_cases h : Φ 0 = 0 <;>
+      by_cases h' : ∑ j, Φ j = 0 <;>
+      simp [U, Uc, h, h', and_comm]
+    · simp only [rank_real_complex, Nat.one_lt_ofNat]
+  -- Analyticity on U:
+  have hF : AnalyticOnNhd ℂ F U := by
+    refine DifferentiableOn.analyticOnNhd
+      (fun t ht ↦ DifferentiableAt.differentiableWithinAt ?_) hUo
+    refine (differentiableAt_completedLFunction Φ _ ?_ ?_).comp t (differentiableAt_id.const_sub 1)
+    exacts [ht.2.imp_left (sub_ne_zero.mpr ∘ Ne.symm), ht.1.imp_left sub_eq_self.not.mpr]
+  have hG : AnalyticOnNhd ℂ G U := by
+    refine DifferentiableOn.analyticOnNhd
+      (fun t ht ↦ DifferentiableAt.differentiableWithinAt ?_) hUo
+    apply ((differentiableAt_id.sub_const 1).const_cpow (.inl (NeZero.ne _))).mul
+    apply differentiableAt_completedLFunction _ _ (ht.1.imp_right fun h ↦ dft_apply_zero Φ ▸ h)
+    exact ht.2.imp_right (fun h ↦ by simp only [← dft_apply_zero, dft_dft, neg_zero, h, smul_zero])
+  -- set where we know equality
+  have hV : {z | 1 < re z} ∈ 𝓝 2 := (continuous_re.isOpen_preimage _ isOpen_Ioi).mem_nhds (by simp)
+  have hFG : F =ᶠ[𝓝 2] G := eventually_of_mem hV <| fun t ht ↦ by
+    simpa only [F, G, pow_zero, mul_one] using completedLFunction_one_sub_of_one_lt_even hΦ ht
+  -- now apply the big hammer to finish
+  exact hF.eqOn_of_preconnected_of_eventuallyEq hG hUp h2U hFG hsU
 
 theorem completedLFunction_one_sub_odd (hΦ : Φ.Odd) (s : ℂ) :
     completedLFunction Φ (1 - s) = N ^ (s - 1) * I * completedLFunction (𝓕 Φ) s := by

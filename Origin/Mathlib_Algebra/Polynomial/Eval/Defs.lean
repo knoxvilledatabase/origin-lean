@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Polynomial/Eval/Defs.lean
-Genuine: 136 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
+Genuine: 137 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic
+
+noncomputable section
 
 /-!
 # Evaluating a polynomial
@@ -202,10 +204,6 @@ def eval₂RingHom (f : R →+* S) (x : S) : R[X] →+* S :=
     map_one' := eval₂_one _ _
     map_mul' := fun _ _ => eval₂_mul _ _ }
 
-@[simp]
-theorem coe_eval₂RingHom (f : R →+* S) (x) : ⇑(eval₂RingHom f x) = eval₂ f x :=
-  rfl
-
 theorem eval₂_pow (n : ℕ) : (p ^ n).eval₂ f x = p.eval₂ f x ^ n :=
   (eval₂RingHom _ _).map_pow _ _
 
@@ -346,7 +344,7 @@ theorem IsRoot.dvd {R : Type*} [CommSemiring R] {p q : R[X]} {x : R} (h : p.IsRo
     (hpq : p ∣ q) : q.IsRoot x := by
   rwa [IsRoot, eval, eval₂_eq_zero_of_dvd_of_eval₂_eq_zero _ _ hpq]
 
--- DISSOLVED: not_isRoot_C
+theorem not_isRoot_C (r a : R) (hr : r ≠ 0) : ¬IsRoot (C r) a := by simpa using hr
 
 theorem eval_surjective (x : R) : Function.Surjective <| eval x := fun y => ⟨C y, eval_C⟩
 
@@ -513,10 +511,6 @@ def mapRingHom (f : R →+* S) : R[X] →+* S[X] where
   map_one' := Polynomial.map_one f
 
 @[simp]
-theorem coe_mapRingHom (f : R →+* S) : ⇑(mapRingHom f) = map f :=
-  rfl
-
-@[simp]
 protected theorem map_natCast (n : ℕ) : (n : R[X]).map f = n :=
   map_natCast (mapRingHom f) n
 
@@ -583,10 +577,6 @@ def evalRingHom : R → R[X] →+* R :=
   eval₂RingHom (RingHom.id _)
 
 @[simp]
-theorem coe_evalRingHom (r : R) : (evalRingHom r : R[X] → R) = eval r :=
-  rfl
-
-@[simp]
 theorem eval_pow (n : ℕ) : (p ^ n).eval x = p.eval x ^ n :=
   eval₂_pow _ _ _
 
@@ -603,13 +593,6 @@ lemma isRoot_comp {R} [CommSemiring R] {p q : R[X]} {r : R} :
 
 def compRingHom : R[X] → R[X] →+* R[X] :=
   eval₂RingHom C
-
-@[simp]
-theorem coe_compRingHom (q : R[X]) : (compRingHom q : R[X] → R[X]) = fun p => comp p q :=
-  rfl
-
-theorem coe_compRingHom_apply (p q : R[X]) : (compRingHom q : R[X] → R[X]) p = comp p q :=
-  rfl
 
 theorem root_mul_left_of_isRoot (p : R[X]) {q : R[X]} : IsRoot q a → IsRoot (p * q) a := fun H => by
   rw [IsRoot, eval_mul, IsRoot.def.1 H, mul_zero]

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.DiscreteCategory
 import Mathlib.CategoryTheory.Opposites
 import Mathlib.CategoryTheory.Category.ULift
 
+noncomputable section
+
 /-!
 # Finite categories
 

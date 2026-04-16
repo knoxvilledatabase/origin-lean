@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Regular/RegularSequence.lean
-Genuine: 49 | Conflates: 9 | Dissolved: 0 | Infrastructure: 0
+Genuine: 48 | Conflates: 9 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Regular.IsSMulRegular
 import Mathlib.RingTheory.Artinian
 import Mathlib.Logic.Equiv.TransferInstance
 import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
+
+noncomputable section
 
 /-!
 # Regular sequences and weakly regular sequences
@@ -555,7 +557,6 @@ private lemma IsWeaklyRegular.swap {a b : R} (h1 : IsWeaklyRegular M [a, b])
       ← h2.isSMulRegular_on_quot_iff_smul_top_inf_eq_smul, and_iff_left hb]
 
 set_option linter.unusedVariables false in
-
 lemma IsWeaklyRegular.prototype_perm {rs : List R} (h : IsWeaklyRegular M rs)
     {rs'} (h'' : rs ~ rs') (h' : ∀ a b rs', (a :: b :: rs') <+~ rs →
       let K := torsionBy R (M ⧸ (Ideal.ofList rs' • ⊤ : Submodule R M)) b

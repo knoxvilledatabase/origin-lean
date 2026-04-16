@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf
 import Mathlib.Algebra.Category.ModuleCat.Colimits
 
+noncomputable section
+
 /-! # Colimits in categories of presheaves of modules
 
 In this file, it is shown that under suitable assumptions,

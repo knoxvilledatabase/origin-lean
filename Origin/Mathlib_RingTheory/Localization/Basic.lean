@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Basic.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.MonoidLocalization.MonoidWithZero
 import Mathlib.RingTheory.Ideal.Defs
 import Mathlib.RingTheory.Localization.Defs
 import Mathlib.RingTheory.OreLocalization.Ring
+
+noncomputable section
 
 /-!
 # Localizations of commutative rings
@@ -94,7 +96,6 @@ theorem mk'_mem_iff {x} {y : M} {I : Ideal S} : mk' S x y ∈ I ↔ algebraMap R
 variable (M S) in
 
 include M in
-
 theorem linearMap_compatibleSMul (N₁ N₂) [AddCommMonoid N₁] [AddCommMonoid N₂] [Module R N₁]
     [Module S N₁] [Module R N₂] [Module S N₂] [IsScalarTower R S N₁] [IsScalarTower R S N₂] :
     LinearMap.CompatibleSMul N₁ N₂ S R where
@@ -108,6 +109,8 @@ variable {g : R →+* P} (hg : ∀ y : M, IsUnit (g y))
 variable (M) in
 
 include M in
+/- This is not an instance because the submonoid `M` would become a metavariable
+  in typeclass search. -/
 
 theorem algHom_subsingleton [Algebra R P] : Subsingleton (S →ₐ[R] P) :=
   ⟨fun f g =>
@@ -129,15 +132,9 @@ noncomputable def algEquiv : S ≃ₐ[R] Q :=
 
 end
 
-theorem algEquiv_mk' (x : R) (y : M) : algEquiv M S Q (mk' S x y) = mk' Q x y := by
-  simp
-
-theorem algEquiv_symm_mk' (x : R) (y : M) : (algEquiv M S Q).symm (mk' Q x y) = mk' S x y := by simp
-
 variable (M) in
 
 include M in
-
 protected lemma bijective (f : S →+* Q) (hf : f.comp (algebraMap R S) = algebraMap R Q) :
     Function.Bijective f :=
   (show f = IsLocalization.algEquiv M S Q by
@@ -161,13 +158,6 @@ noncomputable def liftAlgHom : S →ₐ[A] P where
   commutes' r := show lift hf (algebraMap A S r) = _ by
     simp [IsScalarTower.algebraMap_apply A R S]
 
-theorem liftAlgHom_toRingHom : (liftAlgHom hf : S →ₐ[A] P).toRingHom = lift hf := rfl
-
-@[simp]
-theorem coe_liftAlgHom : ⇑(liftAlgHom hf : S →ₐ[A] P) = lift hf := rfl
-
-theorem liftAlgHom_apply : liftAlgHom hf x = lift hf x := rfl
-
 end liftAlgHom
 
 section AlgEquivOfAlgEquiv
@@ -189,26 +179,11 @@ noncomputable def algEquivOfAlgEquiv : S ≃ₐ[A] Q where
 
 variable {S Q h}
 
-theorem algEquivOfAlgEquiv_eq_map :
-    (algEquivOfAlgEquiv S Q h H : S →+* Q) =
-      map Q (h : R →+* P) (M.le_comap_of_map_le (le_of_eq H)) :=
-  rfl
-
-theorem algEquivOfAlgEquiv_eq (x : R) :
-    algEquivOfAlgEquiv S Q h H ((algebraMap R S) x) = algebraMap P Q (h x) := by
-  simp
-
 set_option linter.docPrime false in
-
 theorem algEquivOfAlgEquiv_mk' (x : R) (y : M) :
     algEquivOfAlgEquiv S Q h H (mk' S x y) =
       mk' Q (h x) ⟨h y, show h y ∈ T from H ▸ Set.mem_image_of_mem h y.2⟩ := by
   simp [map_mk']
-
-theorem algEquivOfAlgEquiv_symm : (algEquivOfAlgEquiv S Q h H).symm =
-    algEquivOfAlgEquiv Q S h.symm (show Submonoid.map h.symm T = M by
-      erw [← H, ← Submonoid.comap_equiv_eq_map_symm,
-        Submonoid.comap_map_eq_of_injective h.injective]) := rfl
 
 end AlgEquivOfAlgEquiv
 
@@ -342,25 +317,10 @@ noncomputable def _root_.IsLocalization.unique (R Rₘ) [CommSemiring R] [CommSe
 
 end
 
-nonrec theorem algEquiv_mk' (x : R) (y : M) : algEquiv M S (mk' (Localization M) x y) = mk' S x y :=
-  algEquiv_mk' _ _
-
-nonrec theorem algEquiv_symm_mk' (x : R) (y : M) :
-    (algEquiv M S).symm (mk' S x y) = mk' (Localization M) x y :=
-  algEquiv_symm_mk' _ _
-
 theorem algEquiv_mk (x y) : algEquiv M S (mk x y) = mk' S x y := by rw [mk_eq_mk', algEquiv_mk']
 
 theorem algEquiv_symm_mk (x : R) (y : M) : (algEquiv M S).symm (mk' S x y) = mk x y := by
   rw [mk_eq_mk', algEquiv_symm_mk']
-
-lemma coe_algEquiv :
-    (Localization.algEquiv M S : Localization M →+* S) =
-    IsLocalization.map (M := M) (T := M) _ (RingHom.id R) le_rfl := rfl
-
-lemma coe_algEquiv_symm :
-    ((Localization.algEquiv M S).symm : S →+* Localization M) =
-    IsLocalization.map (M := M) (T := M) _ (RingHom.id R) le_rfl := rfl
 
 end Localization
 

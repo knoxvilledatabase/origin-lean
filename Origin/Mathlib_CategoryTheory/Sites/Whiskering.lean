@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf
 
+noncomputable section
+
 /-!
 
 In this file we construct the functor `Sheaf J A ⥤ Sheaf J B` between sheaf categories
@@ -74,13 +76,6 @@ variable {F G}
 
 def sheafCompose_map : sheafCompose J F ⟶ sheafCompose J G where
   app := fun _ => .mk <| whiskerLeft _ η
-
-@[simp]
-lemma sheafCompose_id : sheafCompose_map (F := F) J (𝟙 _) = 𝟙 _ := rfl
-
-@[simp]
-lemma sheafCompose_comp :
-    sheafCompose_map J (η ≫ γ) = sheafCompose_map J η ≫ sheafCompose_map J γ := rfl
 
 namespace GrothendieckTopology.Cover
 

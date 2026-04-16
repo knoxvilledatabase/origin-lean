@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Subgraph.lean
-Genuine: 146 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
+Genuine: 147 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Combinatorics.SimpleGraph.Maps
+
+noncomputable section
 
 /-!
 # Subgraphs of a simple graph
@@ -149,15 +151,6 @@ lemma spanningCoe_le (G' : G.Subgraph) : G'.spanningCoe ≤ G := fun _ _ ↦ G'.
 
 theorem spanningCoe_inj : G₁.spanningCoe = G₂.spanningCoe ↔ G₁.Adj = G₂.Adj := by
   simp [Subgraph.spanningCoe]
-
-@[simps]
-def spanningCoeEquivCoeOfSpanning (G' : Subgraph G) (h : G'.IsSpanning) :
-    G'.spanningCoe ≃g G'.coe where
-  toFun v := ⟨v, h v⟩
-  invFun v := v
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_rel_iff' := Iff.rfl
 
 def IsInduced (G' : Subgraph G) : Prop :=
   ∀ {v w : V}, v ∈ G'.verts → w ∈ G'.verts → G.Adj v w → G'.Adj v w
@@ -308,22 +301,6 @@ theorem verts_sup (G₁ G₂ : G.Subgraph) : (G₁ ⊔ G₂).verts = G₁.verts 
   rfl
 
 @[simp]
-theorem verts_inf (G₁ G₂ : G.Subgraph) : (G₁ ⊓ G₂).verts = G₁.verts ∩ G₂.verts :=
-  rfl
-
-@[simp]
-theorem verts_top : (⊤ : G.Subgraph).verts = Set.univ :=
-  rfl
-
-@[simp]
-theorem verts_bot : (⊥ : G.Subgraph).verts = ∅ :=
-  rfl
-
-@[simp]
-theorem sSup_adj {s : Set G.Subgraph} : (sSup s).Adj a b ↔ ∃ G ∈ s, Adj G a b :=
-  Iff.rfl
-
-@[simp]
 theorem sInf_adj {s : Set G.Subgraph} : (sInf s).Adj a b ↔ (∀ G' ∈ s, Adj G' a b) ∧ G.Adj a b :=
   Iff.rfl
 
@@ -348,29 +325,12 @@ theorem iInf_adj_of_nonempty [Nonempty ι] {f : ι → G.Subgraph} :
   simp
 
 @[simp]
-theorem verts_sSup (s : Set G.Subgraph) : (sSup s).verts = ⋃ G' ∈ s, verts G' :=
-  rfl
-
-@[simp]
-theorem verts_sInf (s : Set G.Subgraph) : (sInf s).verts = ⋂ G' ∈ s, verts G' :=
-  rfl
-
-@[simp]
 theorem verts_iSup {f : ι → G.Subgraph} : (⨆ i, f i).verts = ⋃ i, (f i).verts := by simp [iSup]
 
 @[simp]
 theorem verts_iInf {f : ι → G.Subgraph} : (⨅ i, f i).verts = ⋂ i, (f i).verts := by simp [iInf]
 
-@[simp] lemma coe_bot : (⊥ : G.Subgraph).coe = ⊥ := rfl
-
 @[simp] lemma IsInduced.top : (⊤ : G.Subgraph).IsInduced := fun _ _ ↦ id
-
-def topIso : (⊤ : G.Subgraph).coe ≃g G where
-  toFun := (↑)
-  invFun a := ⟨a, Set.mem_univ _⟩
-  left_inv _ := Subtype.eta ..
-  right_inv _ := rfl
-  map_rel_iff' := .rfl
 
 theorem verts_spanningCoe_injective :
     (fun G' : Subgraph G => (G'.verts, G'.spanningCoe)).Injective := by
@@ -425,20 +385,6 @@ lemma verts_monotone : Monotone (verts : G.Subgraph → Set V) := fun _ _ h ↦ 
 instance subgraphInhabited : Inhabited (Subgraph G) := ⟨⊥⟩
 
 @[simp]
-theorem neighborSet_sup {H H' : G.Subgraph} (v : V) :
-    (H ⊔ H').neighborSet v = H.neighborSet v ∪ H'.neighborSet v := rfl
-
-@[simp]
-theorem neighborSet_inf {H H' : G.Subgraph} (v : V) :
-    (H ⊓ H').neighborSet v = H.neighborSet v ∩ H'.neighborSet v := rfl
-
-@[simp]
-theorem neighborSet_top (v : V) : (⊤ : G.Subgraph).neighborSet v = G.neighborSet v := rfl
-
-@[simp]
-theorem neighborSet_bot (v : V) : (⊥ : G.Subgraph).neighborSet v = ∅ := rfl
-
-@[simp]
 theorem neighborSet_sSup (s : Set G.Subgraph) (v : V) :
     (sSup s).neighborSet v = ⋃ G' ∈ s, neighborSet G' v := by
   ext
@@ -457,9 +403,6 @@ theorem neighborSet_iSup (f : ι → G.Subgraph) (v : V) :
 @[simp]
 theorem neighborSet_iInf (f : ι → G.Subgraph) (v : V) :
     (⨅ i, f i).neighborSet v = (⋂ i, (f i).neighborSet v) ∩ G.neighborSet v := by simp [iInf]
-
-@[simp]
-theorem edgeSet_top : (⊤ : Subgraph G).edgeSet = G.edgeSet := rfl
 
 @[simp]
 theorem edgeSet_bot : (⊥ : Subgraph G).edgeSet = ∅ :=
@@ -495,12 +438,6 @@ theorem edgeSet_iInf (f : ι → G.Subgraph) :
     (⨅ i, f i).edgeSet = (⋂ i, (f i).edgeSet) ∩ G.edgeSet := by
   simp [iInf]
 
-@[simp]
-theorem spanningCoe_top : (⊤ : Subgraph G).spanningCoe = G := rfl
-
-@[simp]
-theorem spanningCoe_bot : (⊥ : Subgraph G).spanningCoe = ⊥ := rfl
-
 @[simps]
 def _root_.SimpleGraph.toSubgraph (H : SimpleGraph V) (h : H ≤ G) : G.Subgraph where
   verts := Set.univ
@@ -518,20 +455,6 @@ theorem _root_.SimpleGraph.toSubgraph.isSpanning (H : SimpleGraph V) (h : H ≤ 
 
 theorem spanningCoe_le_of_le {H H' : Subgraph G} (h : H ≤ H') : H.spanningCoe ≤ H'.spanningCoe :=
   h.2
-
-def topEquiv : (⊤ : Subgraph G).coe ≃g G where
-  toFun v := ↑v
-  invFun v := ⟨v, trivial⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_rel_iff' := Iff.rfl
-
-def botEquiv : (⊥ : Subgraph G).coe ≃g (⊥ : SimpleGraph Empty) where
-  toFun v := v.property.elim
-  invFun v := v.elim
-  left_inv := fun ⟨_, h⟩ ↦ h.elim
-  right_inv v := v.elim
-  map_rel_iff' := Iff.rfl
 
 theorem edgeSet_mono {H₁ H₂ : Subgraph G} (h : H₁ ≤ H₂) : H₁.edgeSet ≤ H₂.edgeSet :=
   Sym2.ind h.2
@@ -626,9 +549,6 @@ theorem inclusion.injective {x y : Subgraph G} (h : x ≤ y) : Function.Injectiv
 protected def hom (x : Subgraph G) : x.coe →g G where
   toFun v := v
   map_rel' := x.adj_sub
-
-@[simp] lemma coe_hom (x : Subgraph G) :
-    (x.hom : x.verts → V) = (fun (v : x.verts) => (v : V)) := rfl
 
 theorem hom.injective {x : Subgraph G} : Function.Injective x.hom :=
   fun _ _ ↦ Subtype.ext
@@ -732,10 +652,6 @@ theorem map_singletonSubgraph (f : G →g G') {v : V} :
   exact False.elim
 
 @[simp]
-theorem neighborSet_singletonSubgraph (v w : V) : (G.singletonSubgraph v).neighborSet w = ∅ :=
-  rfl
-
-@[simp]
 theorem edgeSet_singletonSubgraph (v : V) : (G.singletonSubgraph v).edgeSet = ∅ :=
   Sym2.fromRel_bot
 
@@ -826,14 +742,6 @@ theorem neighborSet_subgraphOfAdj [DecidableEq V] {u v w : V} (hvw : G.Adj v w) 
     (if u = v then {w} else ∅) ∪ if u = w then {v} else ∅ := by
   split_ifs <;> subst_vars <;> simp [*]
 
-theorem singletonSubgraph_fst_le_subgraphOfAdj {u v : V} {h : G.Adj u v} :
-    G.singletonSubgraph u ≤ G.subgraphOfAdj h := by
-  simp
-
-theorem singletonSubgraph_snd_le_subgraphOfAdj {u v : V} {h : G.Adj u v} :
-    G.singletonSubgraph v ≤ G.subgraphOfAdj h := by
-  simp
-
 @[simp]
 lemma support_subgraphOfAdj {u v : V} (h : G.Adj u v) :
     (G.subgraphOfAdj h).support = {u , v} := by
@@ -857,10 +765,6 @@ protected abbrev coeSubgraph {G' : G.Subgraph} : G'.coe.Subgraph → G.Subgraph 
 
 protected abbrev restrict {G' : G.Subgraph} : G.Subgraph → G'.coe.Subgraph :=
   Subgraph.comap G'.hom
-
-@[simp]
-lemma verts_coeSubgraph {G' : Subgraph G} (G'' : Subgraph G'.coe) :
-    G''.coeSubgraph.verts = (G''.verts : Set V) := rfl
 
 lemma coeSubgraph_adj {G' : G.Subgraph} (G'' : G'.coe.Subgraph) (v w : V) :
     (G'.coeSubgraph G'').Adj v w ↔
@@ -1069,9 +973,6 @@ abbrev deleteVerts (G' : G.Subgraph) (s : Set V) : G.Subgraph :=
 section DeleteVerts
 
 variable {G' : G.Subgraph} {s : Set V}
-
-theorem deleteVerts_verts : (G'.deleteVerts s).verts = G'.verts \ s :=
-  rfl
 
 theorem deleteVerts_adj {u v : V} :
     (G'.deleteVerts s).Adj u v ↔ u ∈ G'.verts ∧ ¬u ∈ s ∧ v ∈ G'.verts ∧ ¬v ∈ s ∧ G'.Adj u v := by

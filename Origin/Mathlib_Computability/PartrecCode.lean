@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Computability.Partrec
 import Mathlib.Data.Option.Basic
 
+noncomputable section
+
 /-!
 # Gödel Numbering for Partial Recursive Functions.
 

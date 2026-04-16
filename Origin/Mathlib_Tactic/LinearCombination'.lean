@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # linear_combination' Tactic
 
@@ -165,32 +167,7 @@ syntax normStx := atomic(" (" &"norm" " := ") withoutPosition(tactic) ")"
 
 syntax expStx := atomic(" (" &"exp" " := ") withoutPosition(num) ")"
 
-example (x y z : ℝ) (ha : x + 2*y - z = 4) (hb : 2*x + y + z = -2)
-    (hc : x + 2*y + z = 2) :
-    -3*x - 3*y - 4*z = 2 := by
-  linear_combination' ha - hb - 2*hc
-
-example (x y : ℚ) (h1 : x + y = 3) (h2 : 3*x = 7) :
-    x*x*y + y*x*y + 6*x = 3*x*y + 14 := by
-  linear_combination' x*y*h1 + 2*h2
-
-example (x y : ℤ) (h1 : x = -3) (h2 : y = 10) : 2*x = -6 := by
-  linear_combination' (norm := skip) 2*h1
-  simp
-
-axiom qc : ℚ
-
-axiom hqc : qc = 2*qc
-
-example (a b : ℚ) (h : ∀ p q : ℚ, p = q) : 3*a + qc = 3*b + 2*qc := by
-  linear_combination' 3 * h a b + hqc
-
-```
-
--/
-
 syntax (name := linearCombination') "linear_combination'"
-
   (normStx)? (expStx)? (ppSpace colGt term)? : tactic
 
 elab_rules : tactic

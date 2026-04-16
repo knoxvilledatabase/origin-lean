@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Divisibility/Basic.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 7
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Tactic.Common
+
+noncomputable section
 
 /-!
 # Divisibility
@@ -110,11 +112,13 @@ alias Eq.dvd := dvd_of_eq
 lemma pow_dvd_pow (a : α) (h : m ≤ n) : a ^ m ∣ a ^ n :=
   ⟨a ^ (n - m), by rw [← pow_add, Nat.add_comm, Nat.sub_add_cancel h]⟩
 
--- DISSOLVED: dvd_pow
+lemma dvd_pow (hab : a ∣ b) : ∀ {n : ℕ} (_ : n ≠ 0), a ∣ b ^ n
+  | 0,     hn => (hn rfl).elim
+  | n + 1, _  => by rw [pow_succ']; exact hab.mul_right _
 
 alias Dvd.dvd.pow := dvd_pow
 
--- DISSOLVED: dvd_pow_self
+lemma dvd_pow_self (a : α) {n : ℕ} (hn : n ≠ 0) : a ∣ a ^ n := dvd_rfl.pow hn
 
 theorem mul_dvd_mul_left (a : α) (h : b ∣ c) : a * b ∣ a * c := by
   obtain ⟨d, rfl⟩ := h

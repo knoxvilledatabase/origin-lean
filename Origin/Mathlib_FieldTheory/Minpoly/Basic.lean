@@ -1,9 +1,11 @@
 /-
 Extracted from FieldTheory/Minpoly/Basic.lean
-Genuine: 15 | Conflates: 5 | Dissolved: 6 | Infrastructure: 0
+Genuine: 19 | Conflates: 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
+
+noncomputable section
 
 /-!
 # Minimal polynomials
@@ -43,12 +45,15 @@ theorem monic (hx : IsIntegral A x) : Monic (minpoly A x) := by
   rw [dif_pos hx]
   exact (degree_lt_wf.min_mem _ hx).1
 
--- DISSOLVED: ne_zero
+theorem ne_zero [Nontrivial A] (hx : IsIntegral A x) : minpoly A x ≠ 0 :=
+  (monic hx).ne_zero
 
 theorem eq_zero (hx : ¬IsIntegral A x) : minpoly A x = 0 :=
   dif_neg hx
 
--- DISSOLVED: ne_zero_iff
+-- CONFLATES (assumes ground = zero): ne_zero_iff
+theorem ne_zero_iff [Nontrivial A] : minpoly A x ≠ 0 ↔ IsIntegral A x :=
+  ⟨fun h => of_not_not <| eq_zero.mt h, ne_zero⟩
 
 theorem algHom_eq (f : B →ₐ[A] B') (hf : Function.Injective f) (x : B) :
     minpoly A (f x) = minpoly A x := by
@@ -77,9 +82,18 @@ theorem aeval : aeval x (minpoly A x) = 0 := by
 theorem aeval_algHom (f : B →ₐ[A] B') (x : B) : (Polynomial.aeval (f x)) (minpoly A x) = 0 := by
   rw [Polynomial.aeval_algHom, AlgHom.coe_comp, comp_apply, aeval, map_zero]
 
--- DISSOLVED: ne_one
+theorem ne_one [Nontrivial B] : minpoly A x ≠ 1 := by
+  intro h
+  refine (one_ne_zero : (1 : B) ≠ 0) ?_
+  simpa using congr_arg (Polynomial.aeval x) h
 
--- DISSOLVED: map_ne_one
+-- CONFLATES (assumes ground = zero): map_ne_one
+theorem map_ne_one [Nontrivial B] {R : Type*} [Semiring R] [Nontrivial R] (f : A →+* R) :
+    (minpoly A x).map f ≠ 1 := by
+  by_cases hx : IsIntegral A x
+  · exact mt ((monic hx).eq_one_of_map_eq_one f) (ne_one A x)
+  · rw [eq_zero hx, Polynomial.map_zero]
+    exact zero_ne_one
 
 -- CONFLATES (assumes ground = zero): not_isUnit
 theorem not_isUnit [Nontrivial B] : ¬IsUnit (minpoly A x) := by
@@ -106,7 +120,29 @@ theorem min {p : A[X]} (pmonic : p.Monic) (hp : Polynomial.aeval x p = 0) :
   · exact le_of_not_lt (degree_lt_wf.not_lt_min _ hx ⟨pmonic, hp⟩)
   · simp only [degree_zero, bot_le]
 
--- DISSOLVED: unique'
+theorem unique' {p : A[X]} (hm : p.Monic) (hp : Polynomial.aeval x p = 0)
+    (hl : ∀ q : A[X], degree q < degree p → q = 0 ∨ Polynomial.aeval x q ≠ 0) :
+    p = minpoly A x := by
+  nontriviality A
+  have hx : IsIntegral A x := ⟨p, hm, hp⟩
+  obtain h | h := hl _ ((minpoly A x).degree_modByMonic_lt hm)
+  swap
+  · exact (h <| (aeval_modByMonic_eq_self_of_root hm hp).trans <| aeval A x).elim
+  obtain ⟨r, hr⟩ := (modByMonic_eq_zero_iff_dvd hm).1 h
+  rw [hr]
+  have hlead := congr_arg leadingCoeff hr
+  rw [mul_comm, leadingCoeff_mul_monic hm, (monic hx).leadingCoeff] at hlead
+  have : natDegree r ≤ 0 := by
+    have hr0 : r ≠ 0 := by
+      rintro rfl
+      exact ne_zero hx (mul_zero p ▸ hr)
+    apply_fun natDegree at hr
+    rw [hm.natDegree_mul' hr0] at hr
+    apply Nat.le_of_add_le_add_left
+    rw [add_zero]
+    exact hr.symm.trans_le (natDegree_le_natDegree <| min A x hm hp)
+  rw [eq_C_of_natDegree_le_zero this, ← Nat.eq_zero_of_le_zero this, ← leadingCoeff, ← hlead, C_1,
+    mul_one]
 
 -- CONFLATES (assumes ground = zero): subsingleton
 @[nontriviality]
@@ -195,7 +231,18 @@ variable [Ring B] [Algebra A B]
 
 variable {x : B}
 
--- DISSOLVED: aeval_ne_zero_of_dvdNotUnit_minpoly
+theorem aeval_ne_zero_of_dvdNotUnit_minpoly {a : A[X]} (hx : IsIntegral A x) (hamonic : a.Monic)
+    (hdvd : DvdNotUnit a (minpoly A x)) : Polynomial.aeval x a ≠ 0 := by
+  refine fun ha => (min A x hamonic ha).not_lt (degree_lt_degree ?_)
+  obtain ⟨_, c, hu, he⟩ := hdvd
+  have hcm := hamonic.of_mul_monic_left (he.subst <| monic hx)
+  rw [he, hamonic.natDegree_mul hcm]
+  -- TODO: port Nat.lt_add_of_zero_lt_left from lean3 core
+  apply lt_add_of_pos_right
+  refine (lt_of_not_le fun h => hu ?_)
+  rw [eq_C_of_natDegree_le_zero h, ← Nat.eq_zero_of_le_zero h, ← leadingCoeff, hcm.leadingCoeff,
+    C_1]
+  exact isUnit_one
 
 variable [IsDomain A] [IsDomain B]
 

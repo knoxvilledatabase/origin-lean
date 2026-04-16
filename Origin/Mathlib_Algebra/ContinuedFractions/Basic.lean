@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Seq.Seq
 import Mathlib.Algebra.Field.Defs
 
+noncomputable section
+
 /-!
 # Basic Definitions/Theorems for Continued Fractions
 
@@ -73,9 +75,6 @@ def coeFn : Pair α → Pair β := map (↑)
 instance : Coe (Pair α) (Pair β) :=
   ⟨coeFn⟩
 
-@[simp, norm_cast]
-theorem coe_toPair {a b : α} : (↑(Pair.mk a b) : Pair β) = Pair.mk (a : β) (b : β) := rfl
-
 end coe
 
 end GenContFract.Pair
@@ -126,11 +125,6 @@ def coeFn : GenContFract α → GenContFract β :=
 
 instance : Coe (GenContFract α) (GenContFract β) :=
   ⟨coeFn⟩
-
-@[simp, norm_cast]
-theorem coe_toGenContFract {g : GenContFract α} :
-    (g : GenContFract β) =
-      ⟨(g.h : β), (g.s.map (↑) : Stream'.Seq <| Pair β)⟩ := rfl
 
 end coe
 

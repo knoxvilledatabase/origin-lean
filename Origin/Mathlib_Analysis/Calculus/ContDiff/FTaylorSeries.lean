@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Equiv
 import Mathlib.Analysis.Calculus.FormalMultilinearSeries
 
+noncomputable section
+
 /-!
 # Iterated derivatives of a function
 
@@ -240,6 +242,7 @@ theorem hasFTaylorSeriesUpToOn_succ_iff_left {n : ℕ} :
         exact h.2.2
 
 set_option maxSynthPendingDepth 2 in
+-- Porting note: this was split out from `hasFTaylorSeriesUpToOn_succ_iff_right` to avoid a timeout.
 
 theorem HasFTaylorSeriesUpToOn.shift_of_succ
     {n : ℕ} (H : HasFTaylorSeriesUpToOn (n + 1 : ℕ) f p s) :
@@ -368,12 +371,6 @@ theorem iteratedFDerivWithin_succ_eq_comp_left {n : ℕ} :
     iteratedFDerivWithin 𝕜 (n + 1) f s =
       (continuousMultilinearCurryLeftEquiv 𝕜 (fun _ : Fin (n + 1) => E) F).symm ∘
         fderivWithin 𝕜 (iteratedFDerivWithin 𝕜 n f s) s :=
-  rfl
-
-theorem fderivWithin_iteratedFDerivWithin {s : Set E} {n : ℕ} :
-    fderivWithin 𝕜 (iteratedFDerivWithin 𝕜 n f s) s =
-      (continuousMultilinearCurryLeftEquiv 𝕜 (fun _ : Fin (n + 1) => E) F) ∘
-        iteratedFDerivWithin 𝕜 (n + 1) f s :=
   rfl
 
 theorem norm_fderivWithin_iteratedFDerivWithin {n : ℕ} :
@@ -637,8 +634,6 @@ theorem norm_iteratedFDeriv_zero : ‖iteratedFDeriv 𝕜 0 f x‖ = ‖f x‖ :
   -- Porting note: added `comp_apply`.
   rw [iteratedFDeriv_zero_eq_comp, comp_apply, LinearIsometryEquiv.norm_map]
 
-theorem iteratedFDerivWithin_zero_eq : iteratedFDerivWithin 𝕜 0 f s = iteratedFDeriv 𝕜 0 f := rfl
-
 theorem iteratedFDeriv_succ_apply_left {n : ℕ} (m : Fin (n + 1) → E) :
     (iteratedFDeriv 𝕜 (n + 1) f x : (Fin (n + 1) → E) → F) m =
       (fderiv 𝕜 (iteratedFDeriv 𝕜 n f) x : E → E[×n]→L[𝕜] F) (m 0) (tail m) :=
@@ -648,12 +643,6 @@ theorem iteratedFDeriv_succ_eq_comp_left {n : ℕ} :
     iteratedFDeriv 𝕜 (n + 1) f =
       (continuousMultilinearCurryLeftEquiv 𝕜 (fun _ : Fin (n + 1) => E) F).symm ∘
         fderiv 𝕜 (iteratedFDeriv 𝕜 n f) :=
-  rfl
-
-theorem fderiv_iteratedFDeriv {n : ℕ} :
-    fderiv 𝕜 (iteratedFDeriv 𝕜 n f) =
-      continuousMultilinearCurryLeftEquiv 𝕜 (fun _ : Fin (n + 1) => E) F ∘
-        iteratedFDeriv 𝕜 (n + 1) f :=
   rfl
 
 theorem tsupport_iteratedFDeriv_subset (n : ℕ) : tsupport (iteratedFDeriv 𝕜 n f) ⊆ tsupport f := by

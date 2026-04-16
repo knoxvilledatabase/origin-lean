@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Algebra.Module.BigOperators
 import Mathlib.LinearAlgebra.Basis.Basic
 
+noncomputable section
+
 /-!
 # Towers of algebras
 
@@ -123,7 +125,6 @@ theorem Basis.isScalarTower_finsupp {ι} (b : Basis ι S A) : IsScalarTower R S 
 variable {R}
 
 noncomputable
-
 def Basis.smulTower {ι : Type v₁} {ι' : Type w₁} (b : Basis ι R S) (c : Basis ι' S A) :
     Basis (ι × ι') R A :=
   haveI := c.isScalarTower_finsupp R

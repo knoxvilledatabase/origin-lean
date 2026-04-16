@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Ordinal/Topology.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 6 | Infrastructure: 3
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Enum
 import Mathlib.Tactic.TFAE
 import Mathlib.Topology.Order.Monotone
+
+noncomputable section
 
 /-!
 ### Topology of ordinals
@@ -58,7 +60,8 @@ theorem nhds_left'_eq_nhds_ne (a : Ordinal) : 𝓝[<] a = 𝓝[≠] a := by
 theorem nhds_left_eq_nhds (a : Ordinal) : 𝓝[≤] a = 𝓝 a := by
   rw [← nhds_left_sup_nhds_right', nhds_right', sup_bot_eq]
 
--- DISSOLVED: nhdsBasis_Ioc
+theorem nhdsBasis_Ioc (h : a ≠ 0) : (𝓝 a).HasBasis (· < a) (Set.Ioc · a) :=
+  nhds_left_eq_nhds a ▸ nhdsWithin_Iic_basis' ⟨0, h.bot_lt⟩
 
 theorem nhds_eq_pure : 𝓝 a = pure a ↔ ¬IsLimit a :=
   (isOpen_singleton_iff_nhds_eq_pure _).symm.trans isOpen_singleton_iff
@@ -73,7 +76,44 @@ theorem isOpen_iff : IsOpen s ↔ ∀ o ∈ s, IsLimit o → ∃ a < o, Set.Ioo 
 
 open List Set in
 
--- DISSOLVED: mem_closure_tfae
+theorem mem_closure_tfae (a : Ordinal.{u}) (s : Set Ordinal) :
+    TFAE [a ∈ closure s,
+      a ∈ closure (s ∩ Iic a),
+      (s ∩ Iic a).Nonempty ∧ sSup (s ∩ Iic a) = a,
+      ∃ t, t ⊆ s ∧ t.Nonempty ∧ BddAbove t ∧ sSup t = a,
+      ∃ (o : Ordinal.{u}), o ≠ 0 ∧ ∃ (f : ∀ x < o, Ordinal),
+        (∀ x hx, f x hx ∈ s) ∧ bsup.{u, u} o f = a,
+      ∃ (ι : Type u), Nonempty ι ∧ ∃ f : ι → Ordinal, (∀ i, f i ∈ s) ∧ ⨆ i, f i = a] := by
+  tfae_have 1 → 2 := by
+    simp only [mem_closure_iff_nhdsWithin_neBot, inter_comm s, nhdsWithin_inter', nhds_left_eq_nhds]
+    exact id
+  tfae_have 2 → 3
+  | h => by
+    rcases (s ∩ Iic a).eq_empty_or_nonempty with he | hne
+    · simp [he] at h
+    · refine ⟨hne, (isLUB_of_mem_closure ?_ h).csSup_eq hne⟩
+      exact fun x hx => hx.2
+  tfae_have 3 → 4
+  | h => ⟨_, inter_subset_left, h.1, bddAbove_Iic.mono inter_subset_right, h.2⟩
+  tfae_have 4 → 5 := by
+    rintro ⟨t, hts, hne, hbdd, rfl⟩
+    have hlub : IsLUB t (sSup t) := isLUB_csSup hne hbdd
+    let ⟨y, hyt⟩ := hne
+    classical
+      refine ⟨succ (sSup t), succ_ne_zero _, fun x _ => if x ∈ t then x else y, fun x _ => ?_, ?_⟩
+      · simp only
+        split_ifs with h <;> exact hts ‹_›
+      · refine le_antisymm (bsup_le fun x _ => ?_) (csSup_le hne fun x hx => ?_)
+        · split_ifs <;> exact hlub.1 ‹_›
+        · refine (if_pos hx).symm.trans_le (le_bsup _ _ <| (hlub.1 hx).trans_lt (lt_succ _))
+  tfae_have 5 → 6 := by
+    rintro ⟨o, h₀, f, hfs, rfl⟩
+    exact ⟨_, toType_nonempty_iff_ne_zero.2 h₀, familyOfBFamily o f, fun _ => hfs _ _, rfl⟩
+  tfae_have 6 → 1 := by
+    rintro ⟨ι, hne, f, hfs, rfl⟩
+    exact closure_mono (range_subset_iff.2 hfs) <| csSup_mem_closure (range_nonempty f)
+      (bddAbove_range.{u, u} f)
+  tfae_finish
 
 theorem mem_closure_iff_iSup :
     a ∈ closure s ↔
@@ -82,6 +122,7 @@ theorem mem_closure_iff_iSup :
   simp_rw [exists_prop]
 
 set_option linter.deprecated false in
+@[deprecated mem_closure_iff_iSup (since := "2024-08-27")]
 
 theorem mem_closure_iff_sup :
     a ∈ closure s ↔
@@ -94,15 +135,25 @@ theorem mem_iff_iSup_of_isClosed (hs : IsClosed s) :
   rw [← mem_closure_iff_iSup, hs.closure_eq]
 
 set_option linter.deprecated false in
+@[deprecated mem_iff_iSup_of_isClosed (since := "2024-08-27")]
 
 theorem mem_closed_iff_sup (hs : IsClosed s) :
     a ∈ s ↔ ∃ (ι : Type u) (_hι : Nonempty ι) (f : ι → Ordinal),
       (∀ i, f i ∈ s) ∧ sup f = a :=
   mem_iff_iSup_of_isClosed hs
 
--- DISSOLVED: mem_closure_iff_bsup
+theorem mem_closure_iff_bsup :
+    a ∈ closure s ↔
+      ∃ (o : Ordinal) (_ho : o ≠ 0) (f : ∀ a < o, Ordinal),
+        (∀ i hi, f i hi ∈ s) ∧ bsup.{u, u} o f = a := by
+  apply ((mem_closure_tfae a s).out 0 4).trans
+  simp_rw [exists_prop]
 
--- DISSOLVED: mem_closed_iff_bsup
+theorem mem_closed_iff_bsup (hs : IsClosed s) :
+    a ∈ s ↔
+      ∃ (o : Ordinal) (_ho : o ≠ 0) (f : ∀ a < o, Ordinal),
+        (∀ i hi, f i hi ∈ s) ∧ bsup.{u, u} o f = a := by
+  rw [← mem_closure_iff_bsup, hs.closure_eq]
 
 theorem isClosed_iff_iSup :
     IsClosed s ↔
@@ -114,6 +165,7 @@ theorem isClosed_iff_iSup :
   exact h hι f hf
 
 set_option linter.deprecated false in
+@[deprecated mem_iff_iSup_of_isClosed (since := "2024-08-27")]
 
 theorem isClosed_iff_sup :
     IsClosed s ↔
@@ -124,7 +176,16 @@ theorem isClosed_iff_sup :
   rcases mem_closure_iff_sup.1 hx with ⟨ι, hι, f, hf, rfl⟩
   exact h hι f hf
 
--- DISSOLVED: isClosed_iff_bsup
+theorem isClosed_iff_bsup :
+    IsClosed s ↔
+      ∀ {o : Ordinal}, o ≠ 0 → ∀ f : ∀ a < o, Ordinal,
+        (∀ i hi, f i hi ∈ s) → bsup.{u, u} o f ∈ s := by
+  rw [isClosed_iff_iSup]
+  refine ⟨fun H o ho f hf => H (toType_nonempty_iff_ne_zero.2 ho) _ ?_, fun H ι hι f hf => ?_⟩
+  · exact fun i => hf _ _
+  · rw [← Ordinal.sup, ← bsup_eq_sup]
+    apply H (type_ne_zero_iff_nonempty.2 hι)
+    exact fun i hi => hf _
 
 theorem isLimit_of_mem_frontier (ha : a ∈ frontier s) : IsLimit a := by
   simp only [frontier_eq_closure_inter_closure, Set.mem_inter_iff, mem_closure_iff] at ha
@@ -193,7 +254,28 @@ def IsAcc (o : Ordinal) (S : Set Ordinal) : Prop :=
 def IsClosedBelow (S : Set Ordinal) (o : Ordinal) : Prop :=
   IsClosed (Iio o ↓∩ S)
 
--- DISSOLVED: isAcc_iff
+theorem isAcc_iff (o : Ordinal) (S : Set Ordinal) : o.IsAcc S ↔
+    o ≠ 0 ∧ ∀ p < o, (S ∩ Ioo p o).Nonempty := by
+  dsimp [IsAcc]
+  constructor
+  · rw [accPt_iff_nhds]
+    intro h
+    constructor
+    · rintro rfl
+      obtain ⟨x, hx⟩ := h (Iio 1) (Iio_mem_nhds zero_lt_one)
+      exact hx.2 <| lt_one_iff_zero.mp hx.1.1
+    · intro p plt
+      obtain ⟨x, hx⟩ := h (Ioo p (o + 1)) <| Ioo_mem_nhds plt (lt_succ o)
+      use x
+      refine ⟨hx.1.2, ⟨hx.1.1.1, lt_of_le_of_ne ?_ hx.2⟩⟩
+      have := hx.1.1.2
+      rwa [← succ_eq_add_one, lt_succ_iff] at this
+  · rw [accPt_iff_nhds]
+    intro h u umem
+    obtain ⟨l, hl⟩ := exists_Ioc_subset_of_mem_nhds umem ⟨0, Ordinal.pos_iff_ne_zero.mpr h.1⟩
+    obtain ⟨x, hx⟩ := h.2 l hl.1
+    use x
+    exact ⟨⟨hl.2 ⟨hx.2.1, hx.2.2.le⟩, hx.1⟩, hx.2.2.ne⟩
 
 theorem IsAcc.forall_lt {o : Ordinal} {S : Set Ordinal} (h : o.IsAcc S) :
     ∀ p < o, (S ∩ Ioo p o).Nonempty := ((isAcc_iff _ _).mp h).2

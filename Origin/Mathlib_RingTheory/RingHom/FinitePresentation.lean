@@ -8,6 +8,8 @@ import Mathlib.RingTheory.MvPolynomial.Localization
 import Mathlib.RingTheory.RingHom.FiniteType
 import Mathlib.RingTheory.Localization.Away.AdjoinRoot
 
+noncomputable section
+
 /-!
 
 # The meta properties of finitely-presented ring homomorphisms.

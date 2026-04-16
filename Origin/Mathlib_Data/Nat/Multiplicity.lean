@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Multiplicity.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals
@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.Log
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.Nat.Digits
 import Mathlib.RingTheory.Multiplicity
+
+noncomputable section
 
 /-!
 # Natural number multiplicity
@@ -205,16 +207,73 @@ theorem emultiplicity_le_emultiplicity_choose_add {p : ℕ} (hp : p.Prime) :
 
 variable {p n k : ℕ}
 
--- DISSOLVED: emultiplicity_choose_prime_pow_add_emultiplicity
+theorem emultiplicity_choose_prime_pow_add_emultiplicity (hp : p.Prime) (hkn : k ≤ p ^ n)
+    (hk0 : k ≠ 0) : emultiplicity p (choose (p ^ n) k) + emultiplicity p k = n :=
+  le_antisymm
+    (by
+      have hdisj :
+        Disjoint {i ∈ Ico 1 n.succ | p ^ i ≤ k % p ^ i + (p ^ n - k) % p ^ i}
+          {i ∈ Ico 1 n.succ | p ^ i ∣ k} := by
+        simp +contextual [disjoint_right, *, dvd_iff_mod_eq_zero,
+          Nat.mod_lt _ (pow_pos hp.pos _)]
+      rw [emultiplicity_choose hp hkn (lt_succ_self _),
+        emultiplicity_eq_card_pow_dvd (ne_of_gt hp.one_lt) hk0.bot_lt
+          (lt_succ_of_le (log_mono_right hkn)),
+        ← Nat.cast_add]
+      apply WithTop.coe_mono
+      rw [log_pow hp.one_lt, ← card_union_of_disjoint hdisj, filter_union_right]
+      have filter_le_Ico := (Ico 1 n.succ).card_filter_le
+        fun x => p ^ x ≤ k % p ^ x + (p ^ n - k) % p ^ x ∨ p ^ x ∣ k
+      rwa [card_Ico 1 n.succ] at filter_le_Ico)
+    (by rw [← hp.emultiplicity_pow_self]; exact emultiplicity_le_emultiplicity_choose_add hp _ _)
 
--- DISSOLVED: emultiplicity_choose_prime_pow
+theorem emultiplicity_choose_prime_pow {p n k : ℕ} (hp : p.Prime) (hkn : k ≤ p ^ n) (hk0 : k ≠ 0) :
+    emultiplicity p (choose (p ^ n) k) = ↑(n - multiplicity p k) := by
+  push_cast
+  rw [← emultiplicity_choose_prime_pow_add_emultiplicity hp hkn hk0,
+    (multiplicity_finite_iff.2 ⟨hp.ne_one, Nat.pos_of_ne_zero hk0⟩).emultiplicity_eq_multiplicity,
+    (multiplicity_finite_iff.2 ⟨hp.ne_one, choose_pos hkn⟩).emultiplicity_eq_multiplicity]
+  norm_cast
+  rw [Nat.add_sub_cancel_right]
 
--- DISSOLVED: dvd_choose_pow
+theorem dvd_choose_pow (hp : Prime p) (hk : k ≠ 0) (hkp : k ≠ p ^ n) : p ∣ (p ^ n).choose k := by
+  obtain hkp | hkp := hkp.symm.lt_or_lt
+  · simp [choose_eq_zero_of_lt hkp]
+  refine emultiplicity_ne_zero.1 fun h => hkp.not_le <| Nat.le_of_dvd hk.bot_lt ?_
+  have H := hp.emultiplicity_choose_prime_pow_add_emultiplicity hkp.le hk
+  rw [h, zero_add, emultiplicity_eq_coe] at H
+  exact H.1
 
--- DISSOLVED: dvd_choose_pow_iff
+theorem dvd_choose_pow_iff (hp : Prime p) : p ∣ (p ^ n).choose k ↔ k ≠ 0 ∧ k ≠ p ^ n := by
+  refine ⟨fun h => ⟨?_, ?_⟩, fun h => dvd_choose_pow hp h.1 h.2⟩ <;> rintro rfl <;>
+    simp [hp.ne_one] at h
 
 end Prime
 
--- DISSOLVED: emultiplicity_two_factorial_lt
+theorem emultiplicity_two_factorial_lt : ∀ {n : ℕ} (_ : n ≠ 0), emultiplicity 2 n ! < n := by
+  have h2 := prime_two.prime
+  refine binaryRec ?_ ?_
+  · exact fun h => False.elim <| h rfl
+  · intro b n ih h
+    by_cases hn : n = 0
+    · subst hn
+      simp only [ne_eq, bit_eq_zero_iff, true_and, Bool.not_eq_false] at h
+      simp only [h, factorial, mul_one, Nat.isUnit_iff, cast_one]
+      rw [Prime.emultiplicity_one]
+      · exact zero_lt_one
+      · decide
+    have : emultiplicity 2 (2 * n)! < (2 * n : ℕ) := by
+      rw [prime_two.emultiplicity_factorial_mul]
+      rw [two_mul]
+      push_cast
+      apply WithTop.add_lt_add_right _ (ih hn)
+      exact Ne.symm nofun
+    cases b
+    · simpa
+    · suffices emultiplicity 2 (2 * n + 1) + emultiplicity 2 (2 * n)! < ↑(2 * n) + 1 by
+        simpa [emultiplicity_mul, h2, prime_two, bit, factorial]
+      rw [emultiplicity_eq_zero.2 (two_not_dvd_two_mul_add_one n), zero_add]
+      refine this.trans ?_
+      exact mod_cast lt_succ_self _
 
 end Nat

@@ -7,6 +7,8 @@ import Mathlib.Probability.Notation
 import Mathlib.Probability.CDF
 import Mathlib.Probability.Distributions.Gamma
 
+noncomputable section
+
 /-! # Exponential distributions over ℝ
 
 Define the Exponential measure over the reals.
@@ -35,12 +37,10 @@ namespace ProbabilityTheory
 section ExponentialPDF
 
 noncomputable
-
 def exponentialPDFReal (r x : ℝ) : ℝ :=
   gammaPDFReal 1 r x
 
 noncomputable
-
 def exponentialPDF (r x : ℝ) : ℝ≥0∞ :=
   ENNReal.ofReal (exponentialPDFReal r x)
 
@@ -83,7 +83,6 @@ end ExponentialPDF
 open MeasureTheory
 
 noncomputable
-
 def expMeasure (r : ℝ) : Measure ℝ := gammaMeasure 1 r
 
 lemma isProbabilityMeasureExponential {r : ℝ} (hr : 0 < r) :
@@ -92,7 +91,6 @@ lemma isProbabilityMeasureExponential {r : ℝ} (hr : 0 < r) :
 section ExponentialCDF
 
 noncomputable
-
 def exponentialCDFReal (r : ℝ) : StieltjesFunction :=
   cdf (expMeasure r)
 

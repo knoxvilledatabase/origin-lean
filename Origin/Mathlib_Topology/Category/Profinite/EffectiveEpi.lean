@@ -8,6 +8,8 @@ import Mathlib.Topology.Category.CompHaus.EffectiveEpi
 import Mathlib.Topology.Category.Profinite.Limits
 import Mathlib.Topology.Category.Stonean.Basic
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms in `Profinite`

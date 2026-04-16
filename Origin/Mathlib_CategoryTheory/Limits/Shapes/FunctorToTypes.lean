@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Limits.Types
 
+noncomputable section
+
 /-!
 # Binary (co)products of type-valued functors
 
@@ -49,14 +51,6 @@ def prod.lift {F₁ F₂ : C ⥤ Type w} (τ₁ : F ⟶ F₁) (τ₂ : F ⟶ F�
     simp only [types_comp_apply, FunctorToTypes.naturality]
     aesop
 
-@[simp]
-lemma prod.lift_fst {F₁ F₂ : C ⥤ Type w} (τ₁ : F ⟶ F₁) (τ₂ : F ⟶ F₂) :
-    prod.lift τ₁ τ₂ ≫ prod.fst = τ₁ := rfl
-
-@[simp]
-lemma prod.lift_snd {F₁ F₂ : C ⥤ Type w} (τ₁ : F ⟶ F₁) (τ₂ : F ⟶ F₂) :
-    prod.lift τ₁ τ₂ ≫ prod.snd = τ₂ := rfl
-
 variable (F G)
 
 @[simps!]
@@ -76,14 +70,6 @@ def binaryProductLimitCone : Limits.LimitCone (pair F G) :=
 
 noncomputable def binaryProductIso : F ⨯ G ≅ prod F G :=
   limit.isoLimitCone (binaryProductLimitCone F G)
-
-@[simp]
-lemma binaryProductIso_hom_comp_fst :
-    (binaryProductIso F G).hom ≫ prod.fst = Limits.prod.fst := rfl
-
-@[simp]
-lemma binaryProductIso_hom_comp_snd :
-    (binaryProductIso F G).hom ≫ prod.snd = Limits.prod.snd := rfl
 
 @[simp]
 lemma binaryProductIso_inv_comp_fst :
@@ -108,7 +94,6 @@ lemma binaryProductIso_inv_comp_snd_apply (a : C) (z : (prod F G).obj a) :
 variable {F G}
 
 noncomputable
-
 def prodMk {a : C} (x : F.obj a) (y : G.obj a) : (F ⨯ G).obj a :=
   ((binaryProductIso F G).inv).app a ⟨x, y⟩
 
@@ -128,9 +113,8 @@ lemma prod_ext {a : C} (z w : (prod F G).obj a) (h1 : z.1 = w.1) (h2 : z.2 = w.2
 
 variable (F G)
 
-noncomputable
-
 @[simps]
+noncomputable
 def binaryProductEquiv (a : C) : (F ⨯ G).obj a ≃ (F.obj a) × (G.obj a) where
   toFun z := ⟨((binaryProductIso F G).hom.app a z).1, ((binaryProductIso F G).hom.app a z).2⟩
   invFun z := prodMk z.1 z.2
@@ -177,14 +161,6 @@ def coprod.desc {F₁ F₂ : C ⥤ Type w} (τ₁ : F₁ ⟶ F) (τ₂ : F₂ �
     ext x
     cases x with | _ => simp only [coprod, types_comp_apply, FunctorToTypes.naturality]
 
-@[simp]
-lemma coprod.desc_inl {F₁ F₂ : C ⥤ Type w} (τ₁ : F₁ ⟶ F) (τ₂ : F₂ ⟶ F) :
-    coprod.inl ≫ coprod.desc τ₁ τ₂ = τ₁ := rfl
-
-@[simp]
-lemma coprod.desc_inr {F₁ F₂ : C ⥤ Type w} (τ₁ : F₁ ⟶ F) (τ₂ : F₂ ⟶ F) :
-    coprod.inr ≫ coprod.desc τ₁ τ₂ = τ₂ := rfl
-
 variable (F G)
 
 @[simps!]
@@ -227,39 +203,20 @@ lemma inr_comp_binaryCoproductIso_hom_apply (a : C) (x : G.obj a) :
     (binaryCoproductIso F G).hom.app a ((Limits.coprod.inr (X := F)).app a x) = .inr x :=
   congr_fun (congr_app (inr_comp_binaryCoproductIso_hom F G) a) x
 
-@[simp]
-lemma inl_comp_binaryCoproductIso_inv :
-    coprod.inl ≫ (binaryCoproductIso F G).inv = (Limits.coprod.inl (X := F)) := rfl
-
-@[simp]
-lemma inl_comp_binaryCoproductIso_inv_apply (a : C) (x : F.obj a) :
-    (binaryCoproductIso F G).inv.app a (.inl x) = (Limits.coprod.inl (X := F)).app a x := rfl
-
-@[simp]
-lemma inr_comp_binaryCoproductIso_inv :
-    coprod.inr ≫ (binaryCoproductIso F G).inv = (Limits.coprod.inr (X := F)) := rfl
-
-@[simp]
-lemma inr_comp_binaryCoproductIso_inv_apply (a : C) (x : G.obj a) :
-    (binaryCoproductIso F G).inv.app a (.inr x) = (Limits.coprod.inr (X := F)).app a x := rfl
-
 variable {F G}
 
 noncomputable
-
 abbrev coprodInl {a : C} (x : F.obj a) : (F ⨿ G).obj a :=
   (binaryCoproductIso F G).inv.app a (.inl x)
 
 noncomputable
-
 abbrev coprodInr {a : C} (x : G.obj a) : (F ⨿ G).obj a :=
   (binaryCoproductIso F G).inv.app a (.inr x)
 
 variable (F G)
 
-noncomputable
-
 @[simps]
+noncomputable
 def binaryCoproductEquiv (a : C) :
     (F ⨿ G).obj a ≃ (F.obj a) ⊕ (G.obj a) where
   toFun z := (binaryCoproductIso F G).hom.app a z

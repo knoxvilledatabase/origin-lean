@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Expr
 import Mathlib.Util.MemoFix
 
+noncomputable section
+
 /-!
 # ReplaceRec
 

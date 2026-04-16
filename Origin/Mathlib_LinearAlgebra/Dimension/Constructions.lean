@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.LinearAlgebra.Isomorphisms
 
+noncomputable section
+
 /-!
 # Rank of various constructions
 
@@ -128,8 +130,6 @@ theorem rank_prod : Module.rank R (M × M') =
   simpa [rank_eq_card_chooseBasisIndex R M, rank_eq_card_chooseBasisIndex R M', lift_umax]
     using ((chooseBasis R M).prod (chooseBasis R M')).mk_eq_rank.symm
 
-theorem rank_prod' : Module.rank R (M × M₁) = Module.rank R M + Module.rank R M₁ := by simp
-
 @[simp]
 theorem Module.finrank_prod [Module.Finite R M] [Module.Finite R M'] :
     finrank R (M × M') = finrank R M + finrank R M' := by
@@ -157,8 +157,6 @@ theorem rank_finsupp' (ι : Type v) : Module.rank R (ι →₀ M) = #ι * Module
 
 theorem rank_finsupp_self (ι : Type w) : Module.rank R (ι →₀ R) = Cardinal.lift.{u} #ι := by
   simp [rank_finsupp]
-
-theorem rank_finsupp_self' {ι : Type u} : Module.rank R (ι →₀ R) = #ι := by simp
 
 @[simp]
 theorem rank_directSum {ι : Type v} (M : ι → Type w) [∀ i : ι, AddCommGroup (M i)]
@@ -193,9 +191,6 @@ theorem rank_matrix (m : Type v) (n : Type w) [Finite m] [Finite n] :
 theorem rank_matrix' (m n : Type v) [Finite m] [Finite n] :
     Module.rank R (Matrix m n R) = Cardinal.lift.{u} (#m * #n) := by
   rw [rank_matrix, lift_mul, lift_umax.{v, u}]
-
-theorem rank_matrix'' (m n : Type u) [Finite m] [Finite n] :
-    Module.rank R (Matrix m n R) = #m * #n := by simp
 
 open Fintype
 
@@ -279,18 +274,7 @@ variable (R)
 theorem Module.finrank_fintype_fun_eq_card : finrank R (η → R) = Fintype.card η :=
   finrank_eq_of_rank_eq rank_fun'
 
-theorem Module.finrank_fin_fun {n : ℕ} : finrank R (Fin n → R) = n := by simp
-
 variable {R}
-
-def finDimVectorspaceEquiv (n : ℕ) (hn : Module.rank R M = n) : M ≃ₗ[R] Fin n → R := by
-  haveI := nontrivial_of_invariantBasisNumber R
-  have : Cardinal.lift.{u} (n : Cardinal.{v}) = Cardinal.lift.{v} (n : Cardinal.{u}) := by simp
-  have hn := Cardinal.lift_inj.{v, u}.2 hn
-  rw [this] at hn
-  rw [← @rank_fin_fun R _ _ n] at hn
-  haveI : Module.Free R (Fin n → R) := Module.Free.pi _ _
-  exact Classical.choice (nonempty_linearEquiv_of_lift_rank_eq hn)
 
 end Pi
 
@@ -316,17 +300,9 @@ theorem rank_tensorProduct :
   obtain ⟨⟨_, bN⟩⟩ := Module.Free.exists_basis (R := S) (M := M')
   rw [← bM.mk_eq_rank'', ← bN.mk_eq_rank'', ← (bM.tensorProduct bN).mk_eq_rank'', Cardinal.mk_prod]
 
-theorem rank_tensorProduct' :
-    Module.rank R (M ⊗[S] M₁) = Module.rank R M * Module.rank S M₁ := by simp
-
-theorem Module.rank_baseChange :
-    Module.rank R (R ⊗[S] M') = Cardinal.lift.{u} (Module.rank S M') := by simp
-
 @[simp]
 theorem Module.finrank_tensorProduct :
     finrank R (M ⊗[S] M') = finrank R M * finrank S M' := by simp [finrank]
-
-theorem Module.finrank_baseChange : finrank R (R ⊗[S] M') = finrank S M' := by simp
 
 end TensorProduct
 
@@ -403,11 +379,6 @@ variable {R}
 theorem finrank_span_le_card (s : Set M) [Fintype s] : finrank R (span R s) ≤ s.toFinset.card :=
   finrank_le_of_rank_le (by simpa using rank_span_le (R := R) s)
 
-theorem finrank_span_finset_le_card (s : Finset M) : (s : Set M).finrank R ≤ s.card :=
-  calc
-    (s : Set M).finrank R ≤ (s : Set M).toFinset.card := finrank_span_le_card (M := M) s
-    _ = s.card := by simp
-
 theorem finrank_range_le_card {ι : Type*} [Fintype ι] (b : ι → M) :
     (Set.range b).finrank R ≤ Fintype.card ι := by
   classical
@@ -460,16 +431,6 @@ section SubalgebraRank
 open Module
 
 variable {F E : Type*} [CommRing F] [Ring E] [Algebra F E]
-
-@[simp]
-theorem Subalgebra.rank_toSubmodule (S : Subalgebra F E) :
-    Module.rank F (Subalgebra.toSubmodule S) = Module.rank F S :=
-  rfl
-
-@[simp]
-theorem Subalgebra.finrank_toSubmodule (S : Subalgebra F E) :
-    finrank F (Subalgebra.toSubmodule S) = finrank F S :=
-  rfl
 
 theorem subalgebra_top_rank_eq_submodule_top_rank :
     Module.rank F (⊤ : Subalgebra F E) = Module.rank F (⊤ : Submodule F E) := by

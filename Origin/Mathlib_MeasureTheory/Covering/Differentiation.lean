@@ -10,6 +10,8 @@ import Mathlib.MeasureTheory.Integral.Lebesgue
 import Mathlib.MeasureTheory.Integral.Average
 import Mathlib.MeasureTheory.Decomposition.Lebesgue
 
+noncomputable section
+
 /-!
 # Differentiation of measures
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Hom.Instances
 import Mathlib.Algebra.Ring.Basic
 
+noncomputable section
+
 /-!
 # Instances on spaces of monoid and group morphisms
 
@@ -27,12 +29,6 @@ instance instAddMonoidWithOne (M) [AddCommMonoid M] : AddMonoidWithOne (AddMonoi
   natCast n := n • (1 : AddMonoid.End M)
   natCast_zero := AddMonoid.nsmul_zero _
   natCast_succ n := AddMonoid.nsmul_succ n 1
-
-@[simp]
-lemma natCast_apply [AddCommMonoid M] (n : ℕ) (m : M) : (↑n : AddMonoid.End M) m = n • m := rfl
-
-@[simp] lemma ofNat_apply [AddCommMonoid M] (n : ℕ) [n.AtLeastTwo] (m : M) :
-    (no_index (OfNat.ofNat n : AddMonoid.End M)) m = n • m := rfl
 
 instance instSemiring [AddCommMonoid M] : Semiring (AddMonoid.End M) :=
   { AddMonoid.End.monoid M, AddMonoidHom.addCommMonoid, AddMonoid.End.instAddMonoidWithOne M with
@@ -65,18 +61,6 @@ def AddMonoidHom.mul : R →+ R →+ R where
   toFun := AddMonoidHom.mulLeft
   map_zero' := AddMonoidHom.ext <| zero_mul
   map_add' a b := AddMonoidHom.ext <| add_mul a b
-
-theorem AddMonoidHom.mul_apply (x y : R) : AddMonoidHom.mul x y = x * y :=
-  rfl
-
-@[simp]
-theorem AddMonoidHom.coe_mul : ⇑(AddMonoidHom.mul : R →+ R →+ R) = AddMonoidHom.mulLeft :=
-  rfl
-
-@[simp]
-theorem AddMonoidHom.coe_flip_mul :
-    ⇑(AddMonoidHom.mul : R →+ R →+ R).flip = AddMonoidHom.mulRight :=
-  rfl
 
 theorem AddMonoidHom.map_mul_iff (f : R →+ S) :
     (∀ x y, f (x * y) = f x * f y) ↔

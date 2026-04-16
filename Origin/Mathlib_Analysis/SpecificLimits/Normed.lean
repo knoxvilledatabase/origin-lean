@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecificLimits/Normed.lean
-Genuine: 73 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Module
@@ -15,6 +15,8 @@ import Mathlib.Data.Nat.Choose.Bounds
 import Mathlib.Order.Filter.AtTopBot.ModEq
 import Mathlib.RingTheory.Polynomial.Pochhammer
 import Mathlib.Tactic.NoncommRing
+
+noncomputable section
 
 /-!
 # A collection of specific limit computations
@@ -146,7 +148,10 @@ theorem tendsto_pow_const_mul_const_pow_of_abs_lt_one (k : ℕ) {r : ℝ} (hr : 
   rw [tendsto_zero_iff_norm_tendsto_zero]
   simpa [div_eq_mul_inv] using tendsto_pow_const_div_const_pow_of_one_lt k hr'
 
--- DISSOLVED: tendsto_const_div_pow
+lemma tendsto_const_div_pow (r : ℝ) (k : ℕ) (hk : k ≠ 0) :
+    Tendsto (fun n : ℕ => r / n ^ k) atTop (𝓝 0) := by
+  simpa using Filter.Tendsto.const_div_atTop (tendsto_natCast_atTop_atTop (R := ℝ).comp
+    (tendsto_pow_atTop hk) ) r
 
 theorem tendsto_pow_const_mul_const_pow_of_lt_one (k : ℕ) {r : ℝ} (hr : 0 ≤ r) (h'r : r < 1) :
     Tendsto (fun n ↦ (n : ℝ) ^ k * r ^ n : ℕ → ℝ) atTop (𝓝 0) :=
@@ -544,9 +549,34 @@ theorem summable_of_ratio_norm_eventually_le {α : Type*} [SeminormedAddCommGrou
     by_contra! h
     exact not_lt.mpr (norm_nonneg _) (lt_of_le_of_lt hn <| mul_neg_of_neg_of_pos hr₀ h)
 
--- DISSOLVED: summable_of_ratio_test_tendsto_lt_one
+theorem summable_of_ratio_test_tendsto_lt_one {α : Type*} [NormedAddCommGroup α] [CompleteSpace α]
+    {f : ℕ → α} {l : ℝ} (hl₁ : l < 1) (hf : ∀ᶠ n in atTop, f n ≠ 0)
+    (h : Tendsto (fun n ↦ ‖f (n + 1)‖ / ‖f n‖) atTop (𝓝 l)) : Summable f := by
+  rcases exists_between hl₁ with ⟨r, hr₀, hr₁⟩
+  refine summable_of_ratio_norm_eventually_le hr₁ ?_
+  filter_upwards [h.eventually_le_const hr₀, hf] with _ _ h₁
+  rwa [← div_le_iff₀ (norm_pos_iff.mpr h₁)]
 
--- DISSOLVED: not_summable_of_ratio_norm_eventually_ge
+theorem not_summable_of_ratio_norm_eventually_ge {α : Type*} [SeminormedAddCommGroup α] {f : ℕ → α}
+    {r : ℝ} (hr : 1 < r) (hf : ∃ᶠ n in atTop, ‖f n‖ ≠ 0)
+    (h : ∀ᶠ n in atTop, r * ‖f n‖ ≤ ‖f (n + 1)‖) : ¬Summable f := by
+  rw [eventually_atTop] at h
+  rcases h with ⟨N₀, hN₀⟩
+  rw [frequently_atTop] at hf
+  rcases hf N₀ with ⟨N, hNN₀ : N₀ ≤ N, hN⟩
+  rw [← @summable_nat_add_iff α _ _ _ _ N]
+  refine mt Summable.tendsto_atTop_zero
+    fun h' ↦ not_tendsto_atTop_of_tendsto_nhds (tendsto_norm_zero.comp h') ?_
+  convert tendsto_atTop_of_geom_le _ hr _
+  · refine lt_of_le_of_ne (norm_nonneg _) ?_
+    intro h''
+    specialize hN₀ N hNN₀
+    simp only [comp_apply, zero_add] at h''
+    exact hN h''.symm
+  · intro i
+    dsimp only [comp_apply]
+    convert hN₀ (i + N) (hNN₀.trans (N.le_add_left i)) using 3
+    ac_rfl
 
 theorem not_summable_of_ratio_test_tendsto_gt_one {α : Type*} [SeminormedAddCommGroup α]
     {f : ℕ → α} {l : ℝ} (hl : 1 < l) (h : Tendsto (fun n ↦ ‖f (n + 1)‖ / ‖f n‖) atTop (𝓝 l)) :

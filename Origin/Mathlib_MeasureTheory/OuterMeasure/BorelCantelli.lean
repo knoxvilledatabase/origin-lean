@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.AE
 
+noncomputable section
+
 /-!
 # Borel-Cantelli lemma, part 1
 

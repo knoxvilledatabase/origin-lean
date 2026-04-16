@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf
 import Mathlib.Topology.Category.LightProfinite.EffectiveEpi
 
+noncomputable section
+
 /-!
 
 # Light condensed objects
@@ -30,14 +32,6 @@ abbrev LightCondSet := LightCondensed.{u} (Type u)
 namespace LightCondensed
 
 variable {C : Type w} [Category.{v} C]
-
-@[simp]
-lemma id_val (X : LightCondensed.{u} C) : (𝟙 X : X ⟶ X).val = 𝟙 _ := rfl
-
-@[simp]
-lemma comp_val {X Y Z : LightCondensed.{u} C} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).val = f.val ≫ g.val :=
-  rfl
 
 @[ext]
 lemma hom_ext {X Y : LightCondensed.{u} C} (f g : X ⟶ Y) (h : ∀ S, f.val.app S = g.val.app S) :

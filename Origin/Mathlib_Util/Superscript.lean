@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Batteries.Tactic.Lint
 
+noncomputable section
+
 /-!
 # A parser for superscripts and subscripts
 

@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Topology.Homeomorph
 
+noncomputable section
+
 /-!
 # Topological space structure on the opposite monoid and on the units group
 

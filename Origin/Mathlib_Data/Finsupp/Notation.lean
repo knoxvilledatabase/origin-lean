@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Finsupp.Defs
 
+noncomputable section
+
 /-!
 # Notation for `Finsupp`
 
@@ -40,33 +42,19 @@ def elabUpdate₀ : Elab.Term.TermElab
   | _ => fun _ => Elab.throwUnsupportedSyntax
 
 macro_rules
-
   | `(term| fun₀ $x:matchAlt*) => do
-
     let mut stx : Term ← `(0)
-
     let mut fst : Bool := true
-
     for xi in x do
-
       for xii in (← Elab.Term.expandMatchAlt xi) do
-
         match xii with
-
         | `(matchAltExpr| | $pat => $val) =>
-
           if fst then
-
             stx ← `(single₀ $pat $val)
-
           else
-
             stx ← `(update₀ $stx $pat $val)
-
           fst := false
-
         | _ => Macro.throwUnsupported
-
     pure stx
 
 @[app_unexpander Finsupp.single]

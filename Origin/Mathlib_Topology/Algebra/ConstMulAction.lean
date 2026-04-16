@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/ConstMulAction.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 18 | Infrastructure: 12
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ULift
@@ -11,6 +11,8 @@ import Mathlib.Topology.Algebra.Constructions
 import Mathlib.Topology.Algebra.Support
 import Mathlib.Topology.Bases
 import Mathlib.Topology.Homeomorph
+
+noncomputable section
 
 /-!
 # Monoid actions continuous in the second variable
@@ -247,6 +249,8 @@ theorem subset_interior_smul_right {s : Set G} {t : Set α} : s • interior t �
 theorem smul_mem_nhds_smul_iff {t : Set α} (g : G) {a : α} : g • t ∈ 𝓝 (g • a) ↔ t ∈ 𝓝 a :=
   (Homeomorph.smul g).isOpenEmbedding.image_mem_nhds
 
+@[to_additive] alias ⟨_, smul_mem_nhds_smul⟩ := smul_mem_nhds_smul_iff
+
 alias smul_mem_nhds := smul_mem_nhds_smul
 
 @[to_additive (attr := simp)]
@@ -261,29 +265,43 @@ section GroupWithZero
 variable {G₀ : Type*} [TopologicalSpace α] [GroupWithZero G₀] [MulAction G₀ α]
   [ContinuousConstSMul G₀ α]
 
--- DISSOLVED: tendsto_const_smul_iff₀
+theorem tendsto_const_smul_iff₀ {f : β → α} {l : Filter β} {a : α} {c : G₀} (hc : c ≠ 0) :
+    Tendsto (fun x => c • f x) l (𝓝 <| c • a) ↔ Tendsto f l (𝓝 a) :=
+  tendsto_const_smul_iff (Units.mk0 c hc)
 
 variable [TopologicalSpace β] {f : β → α} {b : β} {c : G₀} {s : Set β}
 
--- DISSOLVED: continuousWithinAt_const_smul_iff₀
+theorem continuousWithinAt_const_smul_iff₀ (hc : c ≠ 0) :
+    ContinuousWithinAt (fun x => c • f x) s b ↔ ContinuousWithinAt f s b :=
+  tendsto_const_smul_iff (Units.mk0 c hc)
 
--- DISSOLVED: continuousOn_const_smul_iff₀
+theorem continuousOn_const_smul_iff₀ (hc : c ≠ 0) :
+    ContinuousOn (fun x => c • f x) s ↔ ContinuousOn f s :=
+  continuousOn_const_smul_iff (Units.mk0 c hc)
 
--- DISSOLVED: continuousAt_const_smul_iff₀
+theorem continuousAt_const_smul_iff₀ (hc : c ≠ 0) :
+    ContinuousAt (fun x => c • f x) b ↔ ContinuousAt f b :=
+  continuousAt_const_smul_iff (Units.mk0 c hc)
 
--- DISSOLVED: continuous_const_smul_iff₀
+theorem continuous_const_smul_iff₀ (hc : c ≠ 0) : (Continuous fun x => c • f x) ↔ Continuous f :=
+  continuous_const_smul_iff (Units.mk0 c hc)
 
--- DISSOLVED: Homeomorph.smulOfNeZero
+@[simps! (config := .asFn) apply]
+protected def Homeomorph.smulOfNeZero (c : G₀) (hc : c ≠ 0) : α ≃ₜ α :=
+  Homeomorph.smul (Units.mk0 c hc)
 
--- DISSOLVED: Homeomorph.smulOfNeZero_symm_apply
+theorem isOpenMap_smul₀ {c : G₀} (hc : c ≠ 0) : IsOpenMap fun x : α => c • x :=
+  (Homeomorph.smulOfNeZero c hc).isOpenMap
 
--- DISSOLVED: isOpenMap_smul₀
+theorem IsOpen.smul₀ {c : G₀} {s : Set α} (hs : IsOpen s) (hc : c ≠ 0) : IsOpen (c • s) :=
+  isOpenMap_smul₀ hc s hs
 
--- DISSOLVED: IsOpen.smul₀
+theorem interior_smul₀ {c : G₀} (hc : c ≠ 0) (s : Set α) : interior (c • s) = c • interior s :=
+  ((Homeomorph.smulOfNeZero c hc).image_interior s).symm
 
--- DISSOLVED: interior_smul₀
-
--- DISSOLVED: closure_smul₀'
+theorem closure_smul₀' {c : G₀} (hc : c ≠ 0) (s : Set α) :
+    closure (c • s) = c • closure s :=
+  ((Homeomorph.smulOfNeZero c hc).image_closure s).symm
 
 theorem closure_smul₀ {E} [Zero E] [MulActionWithZero G₀ E] [TopologicalSpace E] [T1Space E]
     [ContinuousConstSMul G₀ E] (c : G₀) (s : Set E) : closure (c • s) = c • closure s := by
@@ -294,9 +312,12 @@ theorem closure_smul₀ {E} [Zero E] [MulActionWithZero G₀ E] [TopologicalSpac
       exact closure_singleton
   · exact closure_smul₀' hc s
 
--- DISSOLVED: isClosedMap_smul_of_ne_zero
+theorem isClosedMap_smul_of_ne_zero {c : G₀} (hc : c ≠ 0) : IsClosedMap fun x : α => c • x :=
+  (Homeomorph.smulOfNeZero c hc).isClosedMap
 
--- DISSOLVED: IsClosed.smul_of_ne_zero
+theorem IsClosed.smul_of_ne_zero {c : G₀} {s : Set α} (hs : IsClosed s) (hc : c ≠ 0) :
+    IsClosed (c • s) :=
+  isClosedMap_smul_of_ne_zero hc s hs
 
 theorem isClosedMap_smul₀ {E : Type*} [Zero E] [MulActionWithZero G₀ E] [TopologicalSpace E]
     [T1Space E] [ContinuousConstSMul G₀ E] (c : G₀) : IsClosedMap fun x : E => c • x := by
@@ -310,9 +331,13 @@ theorem IsClosed.smul₀ {E : Type*} [Zero E] [MulActionWithZero G₀ E] [Topolo
     IsClosed (c • s) :=
   isClosedMap_smul₀ c s hs
 
--- DISSOLVED: HasCompactMulSupport.comp_smul
+theorem HasCompactMulSupport.comp_smul {β : Type*} [One β] {f : α → β} (h : HasCompactMulSupport f)
+    {c : G₀} (hc : c ≠ 0) : HasCompactMulSupport fun x => f (c • x) :=
+  h.comp_homeomorph (Homeomorph.smulOfNeZero c hc)
 
--- DISSOLVED: HasCompactSupport.comp_smul
+theorem HasCompactSupport.comp_smul {β : Type*} [Zero β] {f : α → β} (h : HasCompactSupport f)
+    {c : G₀} (hc : c ≠ 0) : HasCompactSupport fun x => f (c • x) :=
+  h.comp_homeomorph (Homeomorph.smulOfNeZero c hc)
 
 attribute [to_additive existing HasCompactSupport.comp_smul] HasCompactMulSupport.comp_smul
 
@@ -441,13 +466,17 @@ section MulAction
 variable {G₀ : Type*} [GroupWithZero G₀] [MulAction G₀ α] [TopologicalSpace α]
   [ContinuousConstSMul G₀ α]
 
--- DISSOLVED: smul_mem_nhds_smul_iff₀
+theorem smul_mem_nhds_smul_iff₀ {c : G₀} {s : Set α} {x : α} (hc : c ≠ 0) :
+    c • s ∈ 𝓝 (c • x : α) ↔ s ∈ 𝓝 x :=
+  smul_mem_nhds_smul_iff (Units.mk0 c hc)
 
 alias set_smul_mem_nhds_smul_iff := smul_mem_nhds_smul_iff₀
 
 alias ⟨_, smul_mem_nhds_smul₀⟩ := smul_mem_nhds_smul_iff₀
 
--- DISSOLVED: set_smul_mem_nhds_smul
+theorem set_smul_mem_nhds_smul {c : G₀} {s : Set α} {x : α} (hs : s ∈ 𝓝 x) (hc : c ≠ 0) :
+    c • s ∈ 𝓝 (c • x : α) :=
+  smul_mem_nhds_smul₀ hc hs
 
 end MulAction
 
@@ -456,7 +485,10 @@ section DistribMulAction
 variable {G₀ : Type*} [GroupWithZero G₀] [AddMonoid α] [DistribMulAction G₀ α] [TopologicalSpace α]
   [ContinuousConstSMul G₀ α]
 
--- DISSOLVED: set_smul_mem_nhds_zero_iff
+theorem set_smul_mem_nhds_zero_iff {s : Set α} {c : G₀} (hc : c ≠ 0) :
+    c • s ∈ 𝓝 (0 : α) ↔ s ∈ 𝓝 (0 : α) := by
+  refine Iff.trans ?_ (smul_mem_nhds_smul_iff₀ hc)
+  rw [smul_zero]
 
 end DistribMulAction
 

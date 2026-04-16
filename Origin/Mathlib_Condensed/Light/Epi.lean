@@ -1,12 +1,14 @@
 /-
 Extracted from Condensed/Light/Epi.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono
 import Mathlib.CategoryTheory.Sites.EpiMono
 import Mathlib.CategoryTheory.Sites.Coherent.SequentialLimit
 import Mathlib.Condensed.Light.Module
+
+noncomputable section
 
 /-!
 
@@ -84,7 +86,6 @@ variable {F : ℕᵒᵖ ⥤ LightCondMod R} {c : Cone F} (hc : IsLimit c)
   (hF : ∀ n, Epi (F.map (homOfLE (Nat.le_succ n)).op))
 
 include hc hF in
-
 lemma epi_π_app_zero_of_epi : Epi (c.π.app ⟨0⟩) := by
   apply Functor.epi_of_epi_map (forget R)
   change Epi (((forget R).mapCone c).π.app ⟨0⟩)

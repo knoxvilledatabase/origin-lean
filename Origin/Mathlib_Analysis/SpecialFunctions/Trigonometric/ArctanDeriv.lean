@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/ArctanDeriv.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.ComplexDeriv
+
+noncomputable section
 
 /-!
 # Derivatives of the `tan` and `arctan` functions.
@@ -20,9 +22,11 @@ open Set Filter
 
 open scoped Topology Real
 
--- DISSOLVED: hasStrictDerivAt_tan
+theorem hasStrictDerivAt_tan {x : ℝ} (h : cos x ≠ 0) : HasStrictDerivAt tan (1 / cos x ^ 2) x :=
+  mod_cast (Complex.hasStrictDerivAt_tan (by exact mod_cast h)).real_of_complex
 
--- DISSOLVED: hasDerivAt_tan
+theorem hasDerivAt_tan {x : ℝ} (h : cos x ≠ 0) : HasDerivAt tan (1 / cos x ^ 2) x :=
+  mod_cast (Complex.hasDerivAt_tan (by exact mod_cast h)).real_of_complex
 
 theorem tendsto_abs_tan_of_cos_eq_zero {x : ℝ} (hx : cos x = 0) :
     Tendsto (fun x => abs (tan x)) (𝓝[≠] x) atTop := by
@@ -36,9 +40,13 @@ theorem tendsto_abs_tan_atTop (k : ℤ) :
     Tendsto (fun x => abs (tan x)) (𝓝[≠] ((2 * k + 1) * π / 2)) atTop :=
   tendsto_abs_tan_of_cos_eq_zero <| cos_eq_zero_iff.2 ⟨k, rfl⟩
 
--- DISSOLVED: continuousAt_tan
+theorem continuousAt_tan {x : ℝ} : ContinuousAt tan x ↔ cos x ≠ 0 := by
+  refine ⟨fun hc h₀ => ?_, fun h => (hasDerivAt_tan h).continuousAt⟩
+  exact not_tendsto_nhds_of_tendsto_atTop (tendsto_abs_tan_of_cos_eq_zero h₀) _
+    (hc.norm.tendsto.mono_left inf_le_left)
 
--- DISSOLVED: differentiableAt_tan
+theorem differentiableAt_tan {x : ℝ} : DifferentiableAt ℝ tan x ↔ cos x ≠ 0 :=
+  ⟨fun h => continuousAt_tan.1 h.continuousAt, fun h => (hasDerivAt_tan h).differentiableAt⟩
 
 @[simp]
 theorem deriv_tan (x : ℝ) : deriv tan x = 1 / cos x ^ 2 :=
@@ -47,7 +55,10 @@ theorem deriv_tan (x : ℝ) : deriv tan x = 1 / cos x ^ 2 :=
     simp [deriv_zero_of_not_differentiableAt this, h, sq]
   else (hasDerivAt_tan h).deriv
 
--- DISSOLVED: contDiffAt_tan
+@[simp]
+theorem contDiffAt_tan {n : WithTop ℕ∞} {x : ℝ} : ContDiffAt ℝ n tan x ↔ cos x ≠ 0 :=
+  ⟨fun h => continuousAt_tan.1 h.continuousAt, fun h =>
+    (Complex.contDiffAt_tan.2 <| mod_cast h).real_of_complex⟩
 
 theorem hasDerivAt_tan_of_mem_Ioo {x : ℝ} (h : x ∈ Ioo (-(π / 2) : ℝ) (π / 2)) :
     HasDerivAt tan (1 / cos x ^ 2) x :=

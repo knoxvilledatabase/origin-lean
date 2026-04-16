@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Finsupp/Weight.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 6 | Infrastructure: 2
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Module.Defs
 import Mathlib.Data.Finsupp.Antidiagonal
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+
+noncomputable section
 
 /-! # weights of Finsupp functions
 
@@ -88,15 +90,34 @@ alias _root_.MvPolynomial.weightedDegree_apply := weight_apply
 class NonTorsionWeight (w : σ → M) : Prop where
   eq_zero_of_smul_eq_zero {n : ℕ} {s : σ} (h : n • w s = 0)  : n = 0
 
--- DISSOLVED: nonTorsionWeight_of
+theorem nonTorsionWeight_of [NoZeroSMulDivisors ℕ M] (hw : ∀ i : σ, w i ≠ 0) :
+    NonTorsionWeight w where
+  eq_zero_of_smul_eq_zero {n s} h := by
+    rw [smul_eq_zero, or_iff_not_imp_right] at h
+    exact h (hw s)
 
--- DISSOLVED: NonTorsionWeight.ne_zero
+theorem NonTorsionWeight.ne_zero [NonTorsionWeight w] (s : σ) :
+    w s ≠ 0 := fun h ↦ by
+  rw [← one_smul ℕ (w s)] at h
+  apply Nat.zero_ne_one.symm
+  exact NonTorsionWeight.eq_zero_of_smul_eq_zero h
 
 end AddCommMonoid
 
 section OrderedAddCommMonoid
 
--- DISSOLVED: le_weight
+theorem le_weight (w : σ → ℕ) {s : σ} (hs : w s ≠ 0) (f : σ →₀ ℕ) :
+    f s ≤ weight w f := by
+  classical
+  simp only [weight_apply, Finsupp.sum]
+  by_cases h : s ∈ f.support
+  · rw [Finset.sum_eq_add_sum_diff_singleton h]
+    refine le_trans ?_ (Nat.le_add_right _ _)
+    apply Nat.le_mul_of_pos_right
+    exact Nat.zero_lt_of_ne_zero hs
+  · simp only [not_mem_support_iff] at h
+    rw [h]
+    apply zero_le
 
 variable [OrderedAddCommMonoid M] (w : σ → M)
 
@@ -107,7 +128,17 @@ instance : SMulPosMono ℕ M :=
 
 variable {w} in
 
--- DISSOLVED: le_weight_of_ne_zero
+theorem le_weight_of_ne_zero (hw : ∀ s, 0 ≤ w s) {s : σ} {f : σ →₀ ℕ} (hs : f s ≠ 0) :
+    w s ≤ weight w f := by
+  classical
+  simp only [weight_apply, Finsupp.sum]
+  trans f s • w s
+  · apply le_smul_of_one_le_left (hw s)
+    exact Nat.one_le_iff_ne_zero.mpr hs
+  · rw [← Finsupp.mem_support_iff] at hs
+    rw [Finset.sum_eq_add_sum_diff_singleton hs]
+    exact le_add_of_nonneg_right <| Finset.sum_nonneg <|
+      fun i _ ↦ nsmul_nonneg (hw i) (f i)
 
 end OrderedAddCommMonoid
 
@@ -115,7 +146,9 @@ section CanonicallyOrderedAddCommMonoid
 
 variable {M : Type*} [CanonicallyOrderedAddCommMonoid M] (w : σ → M)
 
--- DISSOLVED: le_weight_of_ne_zero'
+theorem le_weight_of_ne_zero' {s : σ} {f : σ →₀ ℕ} (hs : f s ≠ 0) :
+    w s ≤ weight w f :=
+  le_weight_of_ne_zero (fun _ ↦ zero_le _) hs
 
 theorem weight_eq_zero_iff_eq_zero
     (w : σ → M) [NonTorsionWeight w] {f : σ →₀ ℕ} :
@@ -132,7 +165,24 @@ theorem weight_eq_zero_iff_eq_zero
   · intro h
     rw [h, map_zero]
 
--- DISSOLVED: finite_of_nat_weight_le
+theorem finite_of_nat_weight_le [Finite σ] (w : σ → ℕ) (hw : ∀ x, w x ≠ 0) (n : ℕ) :
+    {d : σ →₀ ℕ | weight w d ≤ n}.Finite := by
+  classical
+  set fg := Finset.antidiagonal (Finsupp.equivFunOnFinite.symm (Function.const σ n)) with hfg
+  suffices {d : σ →₀ ℕ | weight w d ≤ n} ⊆ ↑(fg.image fun uv => uv.fst) by
+    exact Set.Finite.subset (Finset.finite_toSet _) this
+  intro d hd
+  rw [hfg]
+  simp only [Finset.coe_image, Set.mem_image, Finset.mem_coe,
+    Finset.mem_antidiagonal, Prod.exists, exists_and_right, exists_eq_right]
+  use Finsupp.equivFunOnFinite.symm (Function.const σ n) - d
+  ext x
+  simp only [Finsupp.coe_add, Finsupp.coe_tsub, Pi.add_apply, Pi.sub_apply,
+    Finsupp.equivFunOnFinite_symm_apply_toFun, Function.const_apply]
+  rw [add_comm]
+  apply Nat.sub_add_cancel
+  apply le_trans (le_weight w (hw x) d)
+  simpa only [Set.mem_setOf_eq] using hd
 
 end CanonicallyOrderedAddCommMonoid
 

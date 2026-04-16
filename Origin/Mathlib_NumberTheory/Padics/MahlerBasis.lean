@@ -12,6 +12,8 @@ import Mathlib.Topology.Algebra.Polynomial
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 import Mathlib.Topology.MetricSpace.Ultra.ContinuousMaps
 
+noncomputable section
+
 /-!
 # The Mahler basis of continuous functions
 
@@ -316,11 +318,6 @@ noncomputable def mahlerEquiv : C(ℤ_[p], E) ≃ₗᵢ[ℚ_[p]] C₀(ℕ, E) wh
       refine le_trans (le_of_eq ?_) (BoundedContinuousFunction.norm_coe_le_norm _ n)
       simp only [ZeroAtInftyContinuousMap.toBCF_toFun, ZeroAtInftyContinuousMap.coe_mk,
         norm_mahlerTerm, (hasSum_mahler f).tsum_eq]
-
-lemma mahlerEquiv_apply (f : C(ℤ_[p], E)) : mahlerEquiv E f = fun n ↦ Δ_[1]^[n] f 0 := rfl
-
-lemma mahlerEquiv_symm_apply (a : C₀(ℕ, E)) : (mahlerEquiv E).symm a = (mahlerSeries (p := p) a) :=
-  rfl
 
 end mahler_coeff
 

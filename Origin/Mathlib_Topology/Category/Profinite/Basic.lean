@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.FintypeCat
 import Mathlib.Topology.Category.CompHaus.Basic
 import Mathlib.Topology.LocallyConstant.Basic
 
+noncomputable section
+
 /-!
 # The category of Profinite Types
 
@@ -94,10 +96,6 @@ def Profinite.toCompHausEquivalence (X : CompHaus.{u}) (Y : Profinite.{u}) :
 
 def CompHaus.toProfinite : CompHaus ⥤ Profinite :=
   Adjunction.leftAdjointOfEquiv Profinite.toCompHausEquivalence fun _ _ _ _ _ => rfl
-
-theorem CompHaus.toProfinite_obj' (X : CompHaus) :
-    ↥(CompHaus.toProfinite.obj X) = ConnectedComponents X :=
-  rfl
 
 def FintypeCat.botTopology (A : FintypeCat) : TopologicalSpace A := ⊥
 

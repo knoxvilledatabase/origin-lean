@@ -5,6 +5,8 @@ Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Order.LeftRightNhds
 
+noncomputable section
+
 /-!
 # Properties of LUB and GLB in an order topology
 -/

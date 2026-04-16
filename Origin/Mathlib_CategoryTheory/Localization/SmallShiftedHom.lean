@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Localization/SmallShiftedHom.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.SmallHom
 import Mathlib.CategoryTheory.Shift.ShiftedHom
 import Mathlib.CategoryTheory.Shift.Localization
+
+noncomputable section
 
 /-!
 # Shrinking morphisms in localized categories equipped with shifts
@@ -71,7 +73,6 @@ lemma hasSmallLocalizedShiftedHom_iff_source [W.IsCompatibleWithShift M]
 variable [HasSmallLocalizedShiftedHom.{w} W M X Y]
 
 include M in
-
 lemma hasSmallLocalizedHom_of_hasSmallLocalizedShiftedHom₀ :
     HasSmallLocalizedHom.{w} W X Y :=
   (hasSmallLocalizedHom_iff_of_isos W

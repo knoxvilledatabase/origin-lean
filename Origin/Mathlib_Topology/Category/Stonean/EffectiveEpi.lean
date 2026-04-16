@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Sites.Coherent.ReflectsPreregular
 import Mathlib.Topology.Category.CompHaus.EffectiveEpi
 import Mathlib.Topology.Category.Stonean.Limits
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms in `Stonean`

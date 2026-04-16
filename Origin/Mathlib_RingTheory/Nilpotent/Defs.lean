@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Nilpotent/Defs.lean
-Genuine: 22 | Conflates: 4 | Dissolved: 8 | Infrastructure: 5
+Genuine: 28 | Conflates: 6 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Hom
 import Mathlib.Algebra.GroupWithZero.Units.Basic
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Data.Nat.Lattice
+
+noncomputable section
 
 /-!
 # Definition of nilpotent elements
@@ -58,9 +60,16 @@ theorem  IsNilpotent.of_pow [MonoidWithZero R] {x : R} {m : ℕ}
   use m*n
   rw [← h, pow_mul x m n]
 
--- DISSOLVED: IsNilpotent.pow_of_pos
+lemma IsNilpotent.pow_of_pos {n} {S : Type*} [MonoidWithZero S] {x : S}
+    (hx : IsNilpotent x) (hn : n ≠ 0) : IsNilpotent (x ^ n) := by
+  cases n with
+  | zero => contradiction
+  | succ => exact  IsNilpotent.pow_succ _ hx
 
--- DISSOLVED: IsNilpotent.pow_iff_pos
+@[simp]
+lemma IsNilpotent.pow_iff_pos {n} {S : Type*} [MonoidWithZero S] {x : S}
+    (hn : n ≠ 0) : IsNilpotent (x ^ n) ↔ IsNilpotent x :=
+ ⟨fun h => of_pow h, fun h => pow_of_pos h hn⟩
 
 theorem IsNilpotent.map [MonoidWithZero R] [MonoidWithZero S] {r : R} {F : Type*}
     [FunLike F R S] [MonoidWithZeroHomClass F R S] (hr : IsNilpotent r) (f : F) :
@@ -116,7 +125,11 @@ section MonoidWithZero
 
 variable [MonoidWithZero R]
 
--- DISSOLVED: nilpotencyClass_eq_succ_iff
+lemma nilpotencyClass_eq_succ_iff {k : ℕ} :
+    nilpotencyClass x = k + 1 ↔ x ^ (k + 1) = 0 ∧ x ^ k ≠ 0 := by
+  let s : Set ℕ := {k | x ^ k = 0}
+  have : ∀ k₁ k₂ : ℕ, k₁ ≤ k₂ → k₁ ∈ s → k₂ ∈ s := fun k₁ k₂ h_le hk₁ ↦ pow_eq_zero_of_le h_le hk₁
+  simp [s, nilpotencyClass, Nat.sInf_upward_closed_eq_succ_iff this]
 
 -- CONFLATES (assumes ground = zero): nilpotencyClass_zero
 @[simp] lemma nilpotencyClass_zero [Nontrivial R] :
@@ -131,7 +144,10 @@ variable [MonoidWithZero R]
   rw [hx', pow_zero] at hx
   exact one_ne_zero hx
 
--- DISSOLVED: pow_pred_nilpotencyClass
+-- CONFLATES (assumes ground = zero): pow_pred_nilpotencyClass
+lemma pow_pred_nilpotencyClass [Nontrivial R] (hx : IsNilpotent x) :
+    x ^ (nilpotencyClass x - 1) ≠ 0 :=
+  (nilpotencyClass_eq_succ_iff.mp <| Nat.eq_add_of_sub_eq (pos_nilpotencyClass_iff.mpr hx) rfl).2
 
 lemma eq_zero_of_nilpotencyClass_eq_one (hx : nilpotencyClass x = 1) :
     x = 0 := by
@@ -157,13 +173,21 @@ namespace IsReduced
 theorem pow_eq_zero [Zero R] [Pow R ℕ] [IsReduced R] {n : ℕ} (h : x ^ n = 0) :
     x = 0 := IsReduced.eq_zero x ⟨n, h⟩
 
--- DISSOLVED: pow_eq_zero_iff
+@[simp]
+theorem pow_eq_zero_iff [MonoidWithZero R] [IsReduced R] {n : ℕ} (hn : n ≠ 0) :
+    x ^ n = 0 ↔ x = 0 := ⟨pow_eq_zero, fun h ↦ h.symm ▸ zero_pow hn⟩
 
--- DISSOLVED: pow_ne_zero_iff
+theorem pow_ne_zero_iff [MonoidWithZero R] [IsReduced R] {n : ℕ} (hn : n ≠ 0) :
+    x ^ n ≠ 0 ↔ x ≠ 0 := not_congr (pow_eq_zero_iff hn)
 
--- DISSOLVED: pow_ne_zero
+theorem pow_ne_zero [Zero R] [Pow R ℕ] [IsReduced R] (n : ℕ) (h : x ≠ 0) :
+    x ^ n ≠ 0 := fun H ↦ h (pow_eq_zero H)
 
--- DISSOLVED: pow_eq_zero_iff'
+-- CONFLATES (assumes ground = zero): pow_eq_zero_iff'
+@[simp]
+theorem pow_eq_zero_iff' [MonoidWithZero R] [IsReduced R] [Nontrivial R] {n : ℕ} :
+    x ^ n = 0 ↔ x = 0 ∧ n ≠ 0 := by
+  cases n <;> simp
 
 end IsReduced
 

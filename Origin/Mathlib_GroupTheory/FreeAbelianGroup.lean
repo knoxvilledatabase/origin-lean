@@ -1,11 +1,13 @@
 /-
 Extracted from GroupTheory/FreeAbelianGroup.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 1 | Infrastructure: 25
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.NatInt
 import Mathlib.GroupTheory.Abelianization
 import Mathlib.GroupTheory.FreeGroup.Basic
+
+noncomputable section
 
 /-!
 # Free abelian groups
@@ -131,7 +133,13 @@ theorem of_injective : Function.Injective (of : α → FreeAbelianGroup α) :=
     have hfy0 : f (of y) = 0 := (lift.of _ _).trans <| if_neg hxy
     one_ne_zero <| hfy1.symm.trans hfy0
 
--- DISSOLVED: of_ne_zero
+@[simp]
+theorem of_ne_zero (x : α) : of x ≠ 0 := by
+  intro h
+  let f : FreeAbelianGroup α →+ ℤ := lift 1
+  have hfx : f (of x) = 1 := lift.of _ _
+  have hf0 : f (of x) = 0 := by rw [h, map_zero]
+  exact one_ne_zero <| hfx.symm.trans hf0
 
 @[simp]
 theorem zero_ne_of (x : α) : 0 ≠ of x := of_ne_zero _ |>.symm
@@ -204,10 +212,6 @@ protected theorem map_neg (f : α → β) (x : FreeAbelianGroup α) : f <$> (-x)
 protected theorem map_sub (f : α → β) (x y : FreeAbelianGroup α) :
     f <$> (x - y) = f <$> x - f <$> y :=
   map_sub (lift <| of ∘ f) _ _
-
-@[simp]
-theorem map_of (f : α → β) (y : α) : f <$> of y = of (f y) :=
-  rfl
 
 theorem pure_bind (f : α → FreeAbelianGroup β) (x) : pure x >>= f = f x :=
   lift.of _ _
@@ -339,10 +343,6 @@ theorem map_comp_apply {f : α → β} {g : β → γ} (x : FreeAbelianGroup α)
   rw [map_comp]
   rfl
 
-@[simp]
-theorem map_of_apply {f : α → β} (a : α) : map f (of a) = of (f a) :=
-  rfl
-
 variable (α)
 
 section Mul
@@ -466,25 +466,6 @@ def liftMonoid : (α →* R) ≃ (FreeAbelianGroup α →+* R) where
     simp only
     rw [← lift.apply_symm_apply (↑F : FreeAbelianGroup α →+ R)]
     rfl
-
-@[simp]
-theorem liftMonoid_coe_addMonoidHom (f : α →* R) : ↑(liftMonoid f) = lift f :=
-  rfl
-
-@[simp]
-theorem liftMonoid_coe (f : α →* R) : ⇑(liftMonoid f) = lift f :=
-  rfl
-
-@[simp]
-theorem liftMonoid_symm_coe (f : FreeAbelianGroup α →+* R) :
-    ⇑(liftMonoid.symm f) = lift.symm (↑f : FreeAbelianGroup α →+ R) :=
-  rfl
-
-theorem one_def : (1 : FreeAbelianGroup α) = of 1 :=
-  rfl
-
-theorem of_one : (of 1 : FreeAbelianGroup α) = 1 :=
-  rfl
 
 end Monoid
 

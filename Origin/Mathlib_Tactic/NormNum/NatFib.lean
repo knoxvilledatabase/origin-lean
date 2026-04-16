@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Fib.Basic
 import Mathlib.Tactic.NormNum
 
+noncomputable section
+
 /-! # `norm_num` extension for `Nat.fib`
 
 This `norm_num` extension uses a strategy parallel to that of `Nat.fastFib`, but it instead

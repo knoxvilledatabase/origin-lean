@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Eval.Defs
 import Mathlib.Computability.Encoding
 import Mathlib.Computability.TuringMachine
 
+noncomputable section
+
 /-!
 # Computable functions
 

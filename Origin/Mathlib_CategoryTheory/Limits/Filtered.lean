@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Filtered.Basic
 import Mathlib.CategoryTheory.Limits.HasLimits
 import Mathlib.CategoryTheory.Limits.Types
 
+noncomputable section
+
 /-!
 # Filtered categories and limits
 

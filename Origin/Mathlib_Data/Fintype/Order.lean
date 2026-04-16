@@ -10,6 +10,8 @@ import Mathlib.Data.Set.Finite.Range
 import Mathlib.Order.Atoms
 import Mathlib.Order.Minimal
 
+noncomputable section
+
 /-!
 # Order structures on finite types
 

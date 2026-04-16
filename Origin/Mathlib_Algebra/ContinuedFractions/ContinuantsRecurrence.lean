@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Translations
 
+noncomputable section
+
 /-!
 # Recurrence Lemmas for the Continuants (`conts`) Function of Continued Fractions
 

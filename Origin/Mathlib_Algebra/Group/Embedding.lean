@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Logic.Embedding.Basic
 
+noncomputable section
+
 /-!
 # The embedding of a cancellative semigroup into itself by multiplication by a fixed element.
 -/

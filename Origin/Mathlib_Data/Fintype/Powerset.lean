@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Powerset
 
+noncomputable section
+
 /-!
 # fintype instance for `Set α`, when `α` is a fintype
 -/

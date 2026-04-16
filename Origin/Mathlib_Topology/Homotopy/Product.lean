@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Constructions
 import Mathlib.Topology.Homotopy.Path
 
+noncomputable section
+
 /-!
 # Product of homotopies
 

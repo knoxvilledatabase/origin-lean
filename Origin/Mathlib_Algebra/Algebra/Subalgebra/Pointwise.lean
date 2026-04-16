@@ -8,6 +8,8 @@ import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Ring.Subring.Pointwise
 import Mathlib.RingTheory.Adjoin.Basic
 
+noncomputable section
+
 /-!
 # Pointwise actions on subalgebras.
 
@@ -68,26 +70,6 @@ protected def pointwiseMulAction : MulAction R' (Subalgebra R A) where
 scoped[Pointwise] attribute [instance] Subalgebra.pointwiseMulAction
 
 open Pointwise
-
-@[simp]
-theorem coe_pointwise_smul (m : R') (S : Subalgebra R A) : ↑(m • S) = m • (S : Set A) :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toSubsemiring (m : R') (S : Subalgebra R A) :
-    (m • S).toSubsemiring = m • S.toSubsemiring :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toSubmodule (m : R') (S : Subalgebra R A) :
-    Subalgebra.toSubmodule (m • S) = m • Subalgebra.toSubmodule S :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toSubring {R' R A : Type*} [Semiring R'] [CommRing R] [Ring A]
-    [MulSemiringAction R' A] [Algebra R A] [SMulCommClass R' R A] (m : R') (S : Subalgebra R A) :
-    (m • S).toSubring = m • S.toSubring :=
-  rfl
 
 theorem smul_mem_pointwise_smul (m : R') (r : A) (S : Subalgebra R A) : r ∈ S → m • r ∈ m • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ m • (S : Set A))

@@ -10,6 +10,8 @@ import Mathlib.Analysis.Convex.Segment
 import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Module
 
+noncomputable section
+
 /-!
 # Star-convex sets
 

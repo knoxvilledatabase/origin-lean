@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
+noncomputable section
+
 /-!
 # Wedderburn's Little Theorem
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.Algebra.Category.Ring.Basic
 
+noncomputable section
+
 /-!
 # Presheaves of modules over a presheaf of rings.
 
@@ -79,15 +81,6 @@ variable {M₁ M₂}
 lemma hom_ext {f g : M₁ ⟶ M₂} (h : ∀ (X : Cᵒᵖ), f.app X = g.app X) :
     f = g := Hom.ext (by ext1; apply h)
 
-@[simp]
-lemma id_app (M : PresheafOfModules R) (X : Cᵒᵖ) : Hom.app (𝟙 M) X = 𝟙 _ := by
-  rfl
-
-@[simp]
-lemma comp_app {M₁ M₂ M₃ : PresheafOfModules R} (f : M₁ ⟶ M₂) (g : M₂ ⟶ M₃) (X : Cᵒᵖ) :
-    (f ≫ g).app X = f.app X ≫ g.app X := by
-  rfl
-
 lemma naturality_apply (f : M₁ ⟶ M₂) {X Y : Cᵒᵖ} (g : X ⟶ Y) (x : M₁.obj X) :
     Hom.app f Y (M₁.map g x) = M₂.map g (Hom.app f X x) :=
   congr_fun ((forget _).congr_map (Hom.naturality f g)) x
@@ -108,14 +101,6 @@ def presheaf : Cᵒᵖ ⥤ Ab where
   obj X := (forget₂ _ _).obj (M.obj X)
   map f := AddMonoidHom.mk' (M.map f) (by simp)
 
-@[simp]
-lemma presheaf_obj_coe (X : Cᵒᵖ) :
-    (M.presheaf.obj X : Type _) = M.obj X := rfl
-
-@[simp]
-lemma presheaf_map_apply_coe {X Y : Cᵒᵖ} (f : X ⟶ Y) (x : M.obj X) :
-    DFunLike.coe (α := M.obj X) (β := fun _ ↦ M.obj Y) (M.presheaf.map f) x = M.map f x := rfl
-
 instance (M : PresheafOfModules R) (X : Cᵒᵖ) :
     Module (R.obj X) (M.presheaf.obj X) :=
   inferInstanceAs (Module (R.obj X) (M.obj X))
@@ -128,15 +113,6 @@ def toPresheaf : PresheafOfModules.{v} R ⥤ Cᵒᵖ ⥤ Ab where
     { app := fun X ↦ AddMonoidHom.mk' (Hom.app f X) (by simp)
       naturality := fun X Y g ↦ by ext x; exact naturality_apply f g x }
 
-@[simp]
-lemma toPresheaf_obj_coe (X : Cᵒᵖ) :
-    (((toPresheaf R).obj M).obj X : Type _) = M.obj X := rfl
-
-@[simp]
-lemma toPresheaf_map_app_apply (f : M₁ ⟶ M₂) (X : Cᵒᵖ) (x : M₁.obj X) :
-    DFunLike.coe (α := M₁.obj X) (β := fun _ ↦ M₂.obj X)
-      (((toPresheaf R).map f).app X) x = f.app X x := rfl
-
 instance : (toPresheaf R).Faithful where
   map_injective {_ _ f g} h := by
     ext X x
@@ -148,30 +124,7 @@ variable (M : Cᵒᵖ ⥤ Ab.{v}) [∀ X, Module (R.obj X) (M.obj X)]
   (map_smul : ∀ ⦃X Y : Cᵒᵖ⦄ (f : X ⟶ Y) (r : R.obj X) (m : M.obj X),
     M.map f (r • m) = R.map f r • M.map f m)
 
-@[simps]
-def ofPresheaf : PresheafOfModules.{v} R where
-  obj X := ModuleCat.of _ (M.obj X)
-  map f :=
-    { toFun := fun x ↦ M.map f x
-      map_add' := by simp
-      map_smul' := fun r m ↦ map_smul f r m }
-
-@[simp]
-lemma ofPresheaf_presheaf : (ofPresheaf M map_smul).presheaf = M := rfl
-
 end
-
-@[simps]
-def homMk (φ : M₁.presheaf ⟶ M₂.presheaf)
-    (hφ : ∀ (X : Cᵒᵖ) (r : R.obj X) (m : M₁.obj X), φ.app X (r • m) = r • φ.app X m) :
-    M₁ ⟶ M₂ where
-  app X :=
-    { toFun := φ.app X
-      map_add' := by simp
-      map_smul' := hφ X }
-  naturality := fun f ↦ by
-    ext x
-    exact congr_fun ((forget _).congr_map (φ.naturality f)) x
 
 instance : Zero (M₁ ⟶ M₂) where
   zero := { app := fun _ ↦ 0 }
@@ -286,14 +239,6 @@ def sectionsMap {M N : PresheafOfModules.{v} R} (f : M ⟶ N) (s : M.sections) :
   N.sectionsMk (fun X ↦ f.app X (s.1 _))
     (fun X Y g ↦ by rw [← naturality_apply, sections_property])
 
-@[simp]
-lemma sectionsMap_comp {M N P : PresheafOfModules.{v} R} (f : M ⟶ N) (g : N ⟶ P) (s : M.sections) :
-    sectionsMap (f ≫ g) s = sectionsMap g (sectionsMap f s) := rfl
-
-@[simp]
-lemma sectionsMap_id {M : PresheafOfModules.{v} R} (s : M.sections) :
-    sectionsMap (𝟙 M) s = s := rfl
-
 @[simps! apply_coe]
 def unitHomEquiv (M : PresheafOfModules R) :
     (unit R ⟶ M) ≃ M.sections where
@@ -330,10 +275,6 @@ variable (M : PresheafOfModules.{v} R)
 noncomputable abbrev forgetToPresheafModuleCatObjObj (Y : Cᵒᵖ) : ModuleCat (R.obj X) :=
   (ModuleCat.restrictScalars (R.map (hX.to Y))).obj (M.obj Y)
 
-@[simp]
-lemma forgetToPresheafModuleCatObjObj_coe (Y : Cᵒᵖ) :
-    (forgetToPresheafModuleCatObjObj X hX M Y : Type _) = M.obj Y := rfl
-
 def forgetToPresheafModuleCatObjMap {Y Z : Cᵒᵖ} (f : Y ⟶ Z) :
     forgetToPresheafModuleCatObjObj X hX M Y ⟶
       forgetToPresheafModuleCatObjObj X hX M Z where
@@ -345,11 +286,6 @@ def forgetToPresheafModuleCatObjMap {Y Z : Cᵒᵖ} (f : Y ⟶ Z) :
     rw [← CategoryTheory.comp_apply, ← R.map_comp]
     congr
     apply hX.hom_ext
-
-@[simp]
-lemma forgetToPresheafModuleCatObjMap_apply {Y Z : Cᵒᵖ} (f : Y ⟶ Z) (m : M.obj Y) :
-    DFunLike.coe (α := M.obj Y) (β := fun _ ↦ M.obj Z)
-      (forgetToPresheafModuleCatObjMap X hX M f) m = M.map f m := rfl
 
 @[simps]
 noncomputable def forgetToPresheafModuleCatObj

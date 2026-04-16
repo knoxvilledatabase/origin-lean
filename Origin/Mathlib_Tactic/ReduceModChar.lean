@@ -9,6 +9,8 @@ import Mathlib.Tactic.NormNum.DivMod
 import Mathlib.Tactic.NormNum.PowMod
 import Mathlib.Tactic.ReduceModChar.Ext
 
+noncomputable section
+
 /-!
 # `reduce_mod_char` tactic
 
@@ -60,6 +62,7 @@ lemma CharP.isNat_pow {α} [Semiring α] : ∀ {f : α → ℕ → α} {a : α} 
     rfl⟩
 
 attribute [local instance] Mathlib.Meta.monadLiftOptionMetaM in
+/-- Evaluates `e` to an integer using `norm_num` and reduces the result modulo `n`. -/
 
 def normBareNumeral {α : Q(Type u)} (n n' : Q(ℕ)) (pn : Q(IsNat «$n» «$n'»))
     (e : Q($α)) (_ : Q(Ring $α)) (instCharP : Q(CharP $α $n)) : MetaM (Result e) := do

@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Set.Operations
 
+noncomputable section
+
 /-!
 # Additional Expr recognizers needing theory imports
 

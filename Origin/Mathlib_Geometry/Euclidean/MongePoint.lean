@@ -5,6 +5,8 @@ Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Circumcenter
 
+noncomputable section
+
 /-!
 # Monge point and orthocenter
 

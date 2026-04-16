@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Covering.DensityTheorem
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
+noncomputable section
+
 /-!
 # Covering theorems for Lebesgue measure in one dimension
 

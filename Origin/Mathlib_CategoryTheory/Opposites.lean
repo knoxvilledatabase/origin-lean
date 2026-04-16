@@ -5,6 +5,8 @@ Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 import Origin.Core
 import Mathlib.CategoryTheory.Equivalence
 
+noncomputable section
+
 /-!
 # Opposite categories
 
@@ -40,18 +42,8 @@ theorem Quiver.Hom.unop_inj {X Y : Cᵒᵖ} :
   fun _ _ H => congr_arg Quiver.Hom.op H
 
 @[simp]
-theorem Quiver.Hom.unop_op {X Y : C} (f : X ⟶ Y) : f.op.unop = f :=
-  rfl
-
-@[simp]
-theorem Quiver.Hom.unop_op' {X Y : Cᵒᵖ} {x} :
-    @Quiver.Hom.unop C _ X Y no_index (Opposite.op (unop := x)) = x := rfl
-
-@[simp]
 theorem Quiver.Hom.op_unop {X Y : Cᵒᵖ} (f : X ⟶ Y) : f.unop.op = f :=
   rfl
-
-@[simp] theorem Quiver.Hom.unop_mk {X Y : Cᵒᵖ} (f : X ⟶ Y) : Quiver.Hom.unop {unop := f} = f := rfl
 
 end Quiver
 
@@ -77,14 +69,6 @@ theorem unop_comp {X Y Z : Cᵒᵖ} {f : X ⟶ Y} {g : Y ⟶ Z} : (f ≫ g).unop
 
 @[simp]
 theorem unop_id {X : Cᵒᵖ} : (𝟙 X).unop = 𝟙 (unop X) :=
-  rfl
-
-@[simp]
-theorem unop_id_op {X : C} : (𝟙 (op X)).unop = 𝟙 X :=
-  rfl
-
-@[simp]
-theorem op_id_unop {X : Cᵒᵖ} : (𝟙 (unop X)).op = 𝟙 X :=
   rfl
 
 section
@@ -188,9 +172,6 @@ protected def rightOp (F : Cᵒᵖ ⥤ D) : C ⥤ Dᵒᵖ where
   obj X := op (F.obj (op X))
   map f := (F.map f.op).op
 
-lemma rightOp_map_unop {F : Cᵒᵖ ⥤ D} {X Y} (f : X ⟶ Y) :
-    (F.rightOp.map f).unop = F.map f.op := rfl
-
 instance {F : C ⥤ D} [Full F] : Full F.op where
   map_surjective f := ⟨(F.preimage f.unop).op, by simp⟩
 
@@ -257,19 +238,11 @@ protected def removeOp (α : F.op ⟶ G.op) : G ⟶ F where
   naturality X Y f :=
     Quiver.Hom.op_inj <| by simpa only [Functor.op_map] using (α.naturality f.op).symm
 
-@[simp]
-theorem removeOp_id (F : C ⥤ D) : NatTrans.removeOp (𝟙 F.op) = 𝟙 F :=
-  rfl
-
 @[simps]
 protected def removeUnop {F G : Cᵒᵖ ⥤ Dᵒᵖ} (α : F.unop ⟶ G.unop) : G ⟶ F where
   app X := (α.app (unop X)).op
   naturality X Y f :=
     Quiver.Hom.unop_inj <| by simpa only [Functor.unop_map] using (α.naturality f.unop).symm
-
-@[simp]
-theorem removeUnop_id (F : Cᵒᵖ ⥤ Dᵒᵖ) : NatTrans.removeUnop (𝟙 F.unop) = 𝟙 F :=
-  rfl
 
 end
 
@@ -282,24 +255,11 @@ protected def leftOp (α : F ⟶ G) : G.leftOp ⟶ F.leftOp where
   app X := (α.app (unop X)).unop
   naturality X Y f := Quiver.Hom.op_inj (by simp)
 
-@[simp]
-theorem leftOp_id : NatTrans.leftOp (𝟙 F : F ⟶ F) = 𝟙 F.leftOp :=
-  rfl
-
-@[simp]
-theorem leftOp_comp (α : F ⟶ G) (β : G ⟶ H) : NatTrans.leftOp (α ≫ β) =
-    NatTrans.leftOp β ≫ NatTrans.leftOp α :=
-  rfl
-
 @[simps]
 protected def removeLeftOp (α : F.leftOp ⟶ G.leftOp) : G ⟶ F where
   app X := (α.app (op X)).op
   naturality X Y f :=
     Quiver.Hom.unop_inj <| by simpa only [Functor.leftOp_map] using (α.naturality f.op).symm
-
-@[simp]
-theorem removeLeftOp_id : NatTrans.removeLeftOp (𝟙 F.leftOp) = 𝟙 F :=
-  rfl
 
 end
 
@@ -312,24 +272,11 @@ protected def rightOp (α : F ⟶ G) : G.rightOp ⟶ F.rightOp where
   app _ := (α.app _).op
   naturality X Y f := Quiver.Hom.unop_inj (by simp)
 
-@[simp]
-theorem rightOp_id : NatTrans.rightOp (𝟙 F : F ⟶ F) = 𝟙 F.rightOp :=
-  rfl
-
-@[simp]
-theorem rightOp_comp (α : F ⟶ G) (β : G ⟶ H) : NatTrans.rightOp (α ≫ β) =
-    NatTrans.rightOp β ≫ NatTrans.rightOp α :=
-  rfl
-
 @[simps]
 protected def removeRightOp (α : F.rightOp ⟶ G.rightOp) : G ⟶ F where
   app X := (α.app X.unop).unop
   naturality X Y f :=
     Quiver.Hom.op_inj <| by simpa only [Functor.rightOp_map] using (α.naturality f.unop).symm
-
-@[simp]
-theorem removeRightOp_id : NatTrans.removeRightOp (𝟙 F.rightOp) = 𝟙 F :=
-  rfl
 
 end
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/ContinuousOn.lean
-Genuine: 240 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
+Genuine: 243 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Indicator
 import Mathlib.Topology.Constructions
+
+noncomputable section
 
 /-!
 # Neighborhoods and continuity relative to a subset
@@ -260,9 +262,6 @@ theorem nhdsWithin_singleton (a : α) : 𝓝[{a}] a = pure a := by
 @[simp]
 theorem nhdsWithin_insert (a : α) (s : Set α) : 𝓝[insert a s] a = pure a ⊔ 𝓝[s] a := by
   rw [← singleton_union, nhdsWithin_union, nhdsWithin_singleton]
-
-theorem mem_nhdsWithin_insert {a : α} {s t : Set α} : t ∈ 𝓝[insert a s] a ↔ a ∈ t ∧ t ∈ 𝓝[s] a := by
-  simp
 
 theorem insert_mem_nhdsWithin_insert {a : α} {s t : Set α} (h : t ∈ 𝓝[s] a) :
     insert a t ∈ 𝓝[insert a s] a := by simp [mem_of_superset h]

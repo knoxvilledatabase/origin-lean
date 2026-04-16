@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Kernels.lean
-Genuine: 120 | Conflates: 0 | Dissolved: 6 | Infrastructure: 20
+Genuine: 126 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
+
+noncomputable section
 
 /-!
 # Kernels and cokernels
@@ -145,12 +147,6 @@ def isKernelCompMono {c : KernelFork f} (i : IsLimit c) {Z} (g : Y ⟶ Z) [hg : 
     ⟨l.1, l.2, fun hm => by
       apply Fork.IsLimit.hom_ext i; rw [Fork.ι_ofι] at hm; rw [hm]; exact l.2.symm⟩
 
-theorem isKernelCompMono_lift {c : KernelFork f} (i : IsLimit c) {Z} (g : Y ⟶ Z) [hg : Mono g]
-    {h : X ⟶ Z} (hh : h = f ≫ g) (s : KernelFork h) :
-    (isKernelCompMono i g hh).lift s = i.lift (Fork.ofι s.ι (by
-      rw [← cancel_mono g, Category.assoc, ← hh]
-      simp)) := rfl
-
 def isKernelOfComp {W : C} (g : Y ⟶ W) (h : X ⟶ W) {c : KernelFork h} (i : IsLimit c)
     (hf : c.ι ≫ f = 0) (hfg : f ≫ g = h) : IsLimit (KernelFork.ofι c.ι hf) :=
   Fork.IsLimit.mk _ (fun s => i.lift (KernelFork.ofι s.ι (by simp [← hfg])))
@@ -231,9 +227,6 @@ abbrev kernel (f : X ⟶ Y) [HasKernel f] : C :=
 abbrev kernel.ι : kernel f ⟶ X :=
   equalizer.ι f 0
 
-@[simp]
-theorem equalizer_as_kernel : equalizer.ι f 0 = kernel.ι f := rfl
-
 @[reassoc (attr := simp)]
 theorem kernel.condition : kernel.ι f ≫ f = 0 :=
   KernelFork.condition _
@@ -291,9 +284,6 @@ def kernelZeroIsoSource : kernel (0 : X ⟶ Y) ≅ X :=
   equalizer.isoSourceOfSelf 0
 
 @[simp]
-theorem kernelZeroIsoSource_hom : kernelZeroIsoSource.hom = kernel.ι (0 : X ⟶ Y) := rfl
-
-@[simp]
 theorem kernelZeroIsoSource_inv :
     kernelZeroIsoSource.inv = kernel.lift (0 : X ⟶ Y) (𝟙 X) (by simp) := by
   ext
@@ -336,9 +326,11 @@ theorem kernelIsoOfEq_trans {f g h : X ⟶ Y} [HasKernel f] [HasKernel g] [HasKe
 
 variable {f}
 
--- DISSOLVED: kernel_not_epi_of_nonzero
+theorem kernel_not_epi_of_nonzero (w : f ≠ 0) : ¬Epi (kernel.ι f) := fun _ =>
+  w (eq_zero_of_epi_kernel f)
 
--- DISSOLVED: kernel_not_iso_of_nonzero
+theorem kernel_not_iso_of_nonzero (w : f ≠ 0) : IsIso (kernel.ι f) → False := fun _ =>
+  kernel_not_epi_of_nonzero w inferInstance
 
 instance hasKernel_comp_mono {X Y Z : C} (f : X ⟶ Y) [HasKernel f] (g : Y ⟶ Z) [Mono g] :
     HasKernel (f ≫ g) :=
@@ -384,7 +376,13 @@ def kernel.zeroKernelFork : KernelFork f where
   pt := 0
   π := { app := fun _ => 0 }
 
--- DISSOLVED: kernel.isLimitConeZeroCone
+def kernel.isLimitConeZeroCone [Mono f] : IsLimit (kernel.zeroKernelFork f) :=
+  Fork.IsLimit.mk _ (fun _ => 0)
+    (fun s => by
+      rw [zero_comp]
+      refine (zero_of_comp_mono f ?_).symm
+      exact KernelFork.condition _)
+    fun _ _ _ => zero_of_to_zero _
 
 def kernel.ofMono [HasKernel f] [Mono f] : kernel f ≅ 0 :=
   Functor.mapIso (Cones.forget _) <|
@@ -514,17 +512,6 @@ def isCokernelEpiComp {c : CokernelCofork f} (i : IsColimit c) {W} (g : W ⟶ X)
     ⟨l.1, l.2, fun hm => by
       apply Cofork.IsColimit.hom_ext i; rw [Cofork.π_ofπ] at hm; rw [hm]; exact l.2.symm⟩
 
-@[simp]
-theorem isCokernelEpiComp_desc {c : CokernelCofork f} (i : IsColimit c) {W} (g : W ⟶ X) [hg : Epi g]
-    {h : W ⟶ Y} (hh : h = g ≫ f) (s : CokernelCofork h) :
-    (isCokernelEpiComp i g hh).desc s =
-      i.desc
-        (Cofork.ofπ s.π
-          (by
-            rw [← cancel_epi g, ← Category.assoc, ← hh]
-            simp)) :=
-  rfl
-
 def isCokernelOfComp {W : C} (g : W ⟶ X) (h : W ⟶ Y) {c : CokernelCofork h} (i : IsColimit c)
     (hf : f ≫ c.π = 0) (hfg : g ≫ f = h) : IsColimit (CokernelCofork.ofπ c.π hf) :=
   Cofork.IsColimit.mk _ (fun s => i.desc (CokernelCofork.ofπ s.π (by simp [← hfg])))
@@ -608,10 +595,6 @@ abbrev cokernel : C :=
 abbrev cokernel.π : Y ⟶ cokernel f :=
   coequalizer.π f 0
 
-@[simp]
-theorem coequalizer_as_cokernel : coequalizer.π f 0 = cokernel.π f :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem cokernel.condition : f ≫ cokernel.π f = 0 :=
   CokernelCofork.condition _
@@ -686,10 +669,6 @@ theorem cokernelZeroIsoTarget_hom :
     cokernelZeroIsoTarget.hom = cokernel.desc (0 : X ⟶ Y) (𝟙 Y) (by simp) := by
   ext; simp [cokernelZeroIsoTarget]
 
-@[simp]
-theorem cokernelZeroIsoTarget_inv : cokernelZeroIsoTarget.inv = cokernel.π (0 : X ⟶ Y) :=
-  rfl
-
 def cokernelIsoOfEq {f g : X ⟶ Y} [HasCokernel f] [HasCokernel g] (h : f = g) :
     cokernel f ≅ cokernel g :=
   HasColimit.isoOfNatIso (by simp [h]; rfl)
@@ -728,9 +707,11 @@ theorem cokernelIsoOfEq_trans {f g h : X ⟶ Y} [HasCokernel f] [HasCokernel g] 
 
 variable {f}
 
--- DISSOLVED: cokernel_not_mono_of_nonzero
+theorem cokernel_not_mono_of_nonzero (w : f ≠ 0) : ¬Mono (cokernel.π f) := fun _ =>
+  w (eq_zero_of_mono_cokernel f)
 
--- DISSOLVED: cokernel_not_iso_of_nonzero
+theorem cokernel_not_iso_of_nonzero (w : f ≠ 0) : IsIso (cokernel.π f) → False := fun _ =>
+  cokernel_not_mono_of_nonzero w inferInstance
 
 instance hasCokernel_comp_iso {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) [HasCokernel f] [IsIso g] :
     HasCokernel (f ≫ g) where
@@ -779,7 +760,13 @@ def cokernel.zeroCokernelCofork : CokernelCofork f where
   pt := 0
   ι := { app := fun _ => 0 }
 
--- DISSOLVED: cokernel.isColimitCoconeZeroCocone
+def cokernel.isColimitCoconeZeroCocone [Epi f] : IsColimit (cokernel.zeroCokernelCofork f) :=
+  Cofork.IsColimit.mk _ (fun _ => 0)
+    (fun s => by
+      erw [zero_comp]
+      refine (zero_of_epi_comp f ?_).symm
+      exact CokernelCofork.condition _)
+    fun _ _ _ => zero_of_from_zero _
 
 def cokernel.ofEpi [HasCokernel f] [Epi f] : cokernel f ≅ 0 :=
   Functor.mapIso (Cocones.forget _) <|

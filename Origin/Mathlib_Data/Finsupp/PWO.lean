@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finsupp.Order
 import Mathlib.Order.WellFoundedSet
 
+noncomputable section
+
 /-!
 # Partial well ordering on finsupps
 

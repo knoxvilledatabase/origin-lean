@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 
+noncomputable section
+
 /-!
 
 # Submodules of a module
@@ -46,27 +48,7 @@ instance addSubmonoidClass : AddSubmonoidClass (Submodule R M) M where
 instance smulMemClass : SMulMemClass (Submodule R M) R M where
   smul_mem {s} c _ h := SubMulAction.smul_mem' s.toSubMulAction c h
 
-@[simp]
-theorem mem_toAddSubmonoid (p : Submodule R M) (x : M) : x ∈ p.toAddSubmonoid ↔ x ∈ p :=
-  Iff.rfl
-
 variable {p q : Submodule R M}
-
-@[simp]
-theorem mem_mk {S : AddSubmonoid M} {x : M} (h) : x ∈ (⟨S, h⟩ : Submodule R M) ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
-theorem coe_set_mk (S : AddSubmonoid M) (h) : ((⟨S, h⟩ : Submodule R M) : Set M) = S :=
-  rfl
-
-@[simp] theorem eta (h) : ({p with smul_mem' := h} : Submodule R M) = p :=
-  rfl
-
-@[simp]
-theorem mk_le_mk {S S' : AddSubmonoid M} (h h') :
-    (⟨S, h⟩ : Submodule R M) ≤ (⟨S', h'⟩ : Submodule R M) ↔ S ≤ S' :=
-  Iff.rfl
 
 @[ext]
 theorem ext (h : ∀ x, x ∈ p ↔ x ∈ q) : p = q :=
@@ -82,10 +64,6 @@ protected def copy (p : Submodule R M) (s : Set M) (hs : s = ↑p) : Submodule R
   add_mem' := hs.symm ▸ p.add_mem'
   smul_mem' := by simpa [hs] using p.smul_mem'
 
-@[simp]
-theorem coe_copy (S : Submodule R M) (s : Set M) (hs : s = ↑S) : (S.copy s hs : Set M) = s :=
-  rfl
-
 theorem copy_eq (S : Submodule R M) (s : Set M) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs
 
@@ -96,19 +74,11 @@ theorem toAddSubmonoid_injective : Injective (toAddSubmonoid : Submodule R M →
 theorem toAddSubmonoid_eq : p.toAddSubmonoid = q.toAddSubmonoid ↔ p = q :=
   toAddSubmonoid_injective.eq_iff
 
-@[simp]
-theorem coe_toAddSubmonoid (p : Submodule R M) : (p.toAddSubmonoid : Set M) = p :=
-  rfl
-
 theorem toSubMulAction_injective : Injective (toSubMulAction : Submodule R M → SubMulAction R M) :=
   fun p q h => SetLike.ext'_iff.2 (show (p.toSubMulAction : Set M) = q from SetLike.ext'_iff.1 h)
 
 theorem toSubMulAction_eq : p.toSubMulAction = q.toSubMulAction ↔ p = q :=
   toSubMulAction_injective.eq_iff
-
-@[simp]
-theorem coe_toSubMulAction (p : Submodule R M) : (p.toSubMulAction : Set M) = p :=
-  rfl
 
 end Submodule
 
@@ -142,9 +112,6 @@ variable {p q : Submodule R M}
 variable {r : R} {x y : M}
 
 variable (p)
-
-theorem mem_carrier : x ∈ p.carrier ↔ x ∈ (p : Set M) :=
-  Iff.rfl
 
 @[simp]
 protected theorem zero_mem : (0 : M) ∈ p :=
@@ -198,25 +165,7 @@ theorem coe_eq_zero {x : p} : (x : M) = 0 ↔ x = 0 :=
   (SetLike.coe_eq_coe : (x : M) = (0 : p) ↔ x = 0)
 
 @[simp, norm_cast]
-theorem coe_add (x y : p) : (↑(x + y) : M) = ↑x + ↑y :=
-  rfl
-
-@[simp, norm_cast]
 theorem coe_zero : ((0 : p) : M) = 0 :=
-  rfl
-
-@[norm_cast]
-theorem coe_smul (r : R) (x : p) : ((r • x : p) : M) = r • (x : M) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_smul_of_tower [SMul S R] [SMul S M] [IsScalarTower S R M] (r : S) (x : p) :
-    ((r • x : p) : M) = r • (x : M) :=
-  rfl
-
-@[norm_cast] -- Porting note: removed `@[simp]` because this is now structure eta
-
-theorem coe_mk (x : M) (hx : x ∈ p) : ((⟨x, hx⟩ : p) : M) = x :=
   rfl
 
 theorem coe_mem (x : p) : (x : M) ∈ p :=
@@ -257,14 +206,6 @@ protected theorem neg_mem (hx : x ∈ p) : -x ∈ p :=
 
 def toAddSubgroup : AddSubgroup M :=
   { p.toAddSubmonoid with neg_mem' := fun {_} => p.neg_mem }
-
-@[simp]
-theorem coe_toAddSubgroup : (p.toAddSubgroup : Set M) = p :=
-  rfl
-
-@[simp]
-theorem mem_toAddSubgroup : x ∈ p.toAddSubgroup ↔ x ∈ p :=
-  Iff.rfl
 
 theorem toAddSubgroup_injective : Injective (toAddSubgroup : Submodule R M → AddSubgroup M)
   | _, _, h => SetLike.ext (SetLike.ext_iff.1 h : _)

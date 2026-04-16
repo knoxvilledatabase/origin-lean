@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Operations
 import Mathlib.Util.Notation3
 
+noncomputable section
+
 /-!
 # Notation classes for set supremum and infimum
 
@@ -143,14 +145,6 @@ def sUnion (S : Set (Set α)) : Set α :=
 
 prefix:110 "⋃₀ " => sUnion
 
-@[simp]
-theorem mem_sInter {x : α} {S : Set (Set α)} : x ∈ ⋂₀ S ↔ ∀ t ∈ S, x ∈ t :=
-  Iff.rfl
-
-@[simp]
-theorem mem_sUnion {x : α} {S : Set (Set α)} : x ∈ ⋃₀ S ↔ ∃ t ∈ S, x ∈ t :=
-  Iff.rfl
-
 def iUnion (s : ι → Set α) : Set α :=
   iSup s
 
@@ -230,21 +224,5 @@ theorem mem_iUnion {x : α} {s : ι → Set α} : (x ∈ ⋃ i, s i) ↔ ∃ i, 
 theorem mem_iInter {x : α} {s : ι → Set α} : (x ∈ ⋂ i, s i) ↔ ∀ i, x ∈ s i :=
   ⟨fun (h : ∀ a ∈ { a : Set α | ∃ i, s i = a }, x ∈ a) a => h (s a) ⟨a, rfl⟩,
     fun h _ ⟨a, (eq : s a = _)⟩ => eq ▸ h a⟩
-
-@[simp]
-theorem sSup_eq_sUnion (S : Set (Set α)) : sSup S = ⋃₀S :=
-  rfl
-
-@[simp]
-theorem sInf_eq_sInter (S : Set (Set α)) : sInf S = ⋂₀ S :=
-  rfl
-
-@[simp]
-theorem iSup_eq_iUnion (s : ι → Set α) : iSup s = iUnion s :=
-  rfl
-
-@[simp]
-theorem iInf_eq_iInter (s : ι → Set α) : iInf s = iInter s :=
-  rfl
 
 end Set

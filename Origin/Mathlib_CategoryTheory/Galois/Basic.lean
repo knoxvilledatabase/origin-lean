@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Galois/Basic.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 19
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Diagonal
 import Mathlib.CategoryTheory.SingleObj
 import Mathlib.Data.Finite.Card
 import Mathlib.Logic.Equiv.TransferInstance
+
+noncomputable section
 
 /-!
 # Definition and basic properties of Galois categories
@@ -175,10 +177,6 @@ instance (X : C) : MulAction (Aut F) (F.obj X) where
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
 
-lemma mulAction_def {X : C} (σ : Aut F) (x : F.obj X) :
-    σ • x = σ.hom.app X x :=
-  rfl
-
 lemma mulAction_naturality {X Y : C} (σ : Aut F) (f : X ⟶ Y) (x : F.obj X) :
     σ • F.map f x = F.map f (σ • x) :=
   FunctorToFintypeCat.naturality F F σ.hom f x
@@ -333,7 +331,12 @@ lemma lt_card_fiber_of_mono_of_notIso {X Y : C} (f : X ⟶ Y) [Mono f]
   exact Nat.le_antisymm
     (Finite.card_le_of_injective (F.map f) (injective_of_mono_of_preservesPullback (F.map f))) hlt
 
--- DISSOLVED: non_zero_card_fiber_of_not_initial
+lemma non_zero_card_fiber_of_not_initial (X : C) (h : IsInitial X → False) :
+    Nat.card (F.obj X) ≠ 0 := by
+  intro hzero
+  refine Nonempty.elim ?_ h
+  rw [initial_iff_fiber_empty F]
+  exact Finite.card_eq_zero_iff.mp hzero
 
 lemma card_fiber_coprod_eq_sum (X Y : C) :
     Nat.card (F.obj (X ⨿ Y)) = Nat.card (F.obj X) + Nat.card (F.obj Y) := by

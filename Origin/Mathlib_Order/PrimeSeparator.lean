@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.PrimeIdeal
 import Mathlib.Order.Zorn
 
+noncomputable section
+
 /-!
 # Separating prime filters and ideals
 

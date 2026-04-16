@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/PrimeFin.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 8 | Infrastructure: 3
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Defs
 import Mathlib.Data.Nat.Factors
 import Mathlib.Data.Nat.Prime.Infinite
 import Mathlib.Data.Set.Finite.Lattice
+
+noncomputable section
 
 /-!
 # Prime numbers
@@ -31,11 +33,15 @@ def primeFactors (n : ℕ) : Finset ℕ := n.primeFactorsList.toFinset
 
 @[simp] lemma toFinset_factors (n : ℕ) : n.primeFactorsList.toFinset = n.primeFactors := rfl
 
--- DISSOLVED: mem_primeFactors
+@[simp] lemma mem_primeFactors : p ∈ n.primeFactors ↔ p.Prime ∧ p ∣ n ∧ n ≠ 0 := by
+  simp_rw [← toFinset_factors, List.mem_toFinset, mem_primeFactorsList']
 
--- DISSOLVED: mem_primeFactors_of_ne_zero
+lemma mem_primeFactors_of_ne_zero (hn : n ≠ 0) : p ∈ n.primeFactors ↔ p.Prime ∧ p ∣ n := by
+  simp [hn]
 
--- DISSOLVED: primeFactors_mono
+lemma primeFactors_mono (hmn : m ∣ n) (hn : n ≠ 0) : primeFactors m ⊆ primeFactors n := by
+  simp only [subset_iff, mem_primeFactors, and_imp]
+  exact fun p hp hpm _ ↦ ⟨hp, hpm.trans hmn, hn⟩
 
 lemma mem_primeFactors_iff_mem_primeFactorsList : p ∈ n.primeFactors ↔ p ∈ n.primeFactorsList := by
   simp only [primeFactors, List.mem_toFinset]
@@ -76,15 +82,23 @@ lemma nonempty_primeFactors {n : ℕ} : n.primeFactors.Nonempty ↔ 1 < n := by
 @[simp] protected lemma Prime.primeFactors (hp : p.Prime) : p.primeFactors = {p} := by
   simp [Nat.primeFactors, primeFactorsList_prime hp]
 
--- DISSOLVED: primeFactors_mul
+lemma primeFactors_mul (ha : a ≠ 0) (hb : b ≠ 0) :
+    (a * b).primeFactors = a.primeFactors ∪ b.primeFactors := by
+  ext; simp only [Finset.mem_union, mem_primeFactors_iff_mem_primeFactorsList,
+    mem_primeFactorsList_mul ha hb]
 
 lemma Coprime.primeFactors_mul {a b : ℕ} (hab : Coprime a b) :
     (a * b).primeFactors = a.primeFactors ∪ b.primeFactors :=
   (List.toFinset.ext <| mem_primeFactorsList_mul_of_coprime hab).trans <| List.toFinset_union _ _
 
--- DISSOLVED: primeFactors_gcd
+lemma primeFactors_gcd (ha : a ≠ 0) (hb : b ≠ 0) :
+    (a.gcd b).primeFactors = a.primeFactors ∩ b.primeFactors := by
+  ext; simp [dvd_gcd_iff, ha, hb, gcd_ne_zero_left ha]; aesop
 
--- DISSOLVED: disjoint_primeFactors
+@[simp] lemma disjoint_primeFactors (ha : a ≠ 0) (hb : b ≠ 0) :
+    Disjoint a.primeFactors b.primeFactors ↔ Coprime a b := by
+  simp [disjoint_iff_inter_eq_empty, coprime_iff_gcd_eq_one, ← primeFactors_gcd, gcd_ne_zero_left,
+    ha, hb]
 
 protected lemma Coprime.disjoint_primeFactors (hab : Coprime a b) :
     Disjoint a.primeFactors b.primeFactors :=
@@ -97,8 +111,12 @@ lemma primeFactors_pow_succ (n k : ℕ) : (n ^ (k + 1)).primeFactors = n.primeFa
   · simp
   · rw [pow_succ', primeFactors_mul hn (pow_ne_zero _ hn), ih, Finset.union_idempotent]
 
--- DISSOLVED: primeFactors_pow
+lemma primeFactors_pow (n : ℕ) (hk : k ≠ 0) : (n ^ k).primeFactors = n.primeFactors := by
+  cases k
+  · simp at hk
+  rw [primeFactors_pow_succ]
 
--- DISSOLVED: primeFactors_prime_pow
+lemma primeFactors_prime_pow (hk : k ≠ 0) (hp : Prime p) :
+    (p ^ k).primeFactors = {p} := by simp [primeFactors_pow p hk, hp]
 
 end Nat

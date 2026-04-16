@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.GramSchmidtOrtho
 import Mathlib.LinearAlgebra.Matrix.PosDef
 
+noncomputable section
+
 /-! # LDL decomposition
 
 This file proves the LDL-decomposition of matrices: Any positive definite matrix `S` can be

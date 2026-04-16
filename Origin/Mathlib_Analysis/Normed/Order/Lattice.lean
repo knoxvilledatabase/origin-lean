@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Group.Rat
 import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Topology.Order.Lattice
 
+noncomputable section
+
 /-!
 # Normed lattice ordered groups
 

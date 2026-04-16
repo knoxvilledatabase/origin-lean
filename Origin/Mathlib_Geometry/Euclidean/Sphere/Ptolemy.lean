@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Euclidean.Sphere.Power
 import Mathlib.Geometry.Euclidean.Triangle
 
+noncomputable section
+
 /-!
 # Ptolemy's theorem
 

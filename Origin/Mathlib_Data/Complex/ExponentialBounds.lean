@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Complex.Exponential
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
+noncomputable section
+
 /-!
 # Bounds on specific values of the exponential
 -/

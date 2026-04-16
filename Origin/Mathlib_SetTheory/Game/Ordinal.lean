@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.SetTheory.Game.Basic
 import Mathlib.SetTheory.Ordinal.NaturalOps
 
+noncomputable section
+
 /-!
 # Ordinals as games
 
@@ -85,16 +87,9 @@ noncomputable instance uniqueOneToPGameLeftMoves : Unique (toPGame 1).LeftMoves 
   (Equiv.cast <| toPGame_leftMoves 1).unique
 
 @[simp]
-theorem one_toPGame_leftMoves_default_eq :
-    (default : (toPGame 1).LeftMoves) = @toLeftMovesToPGame 1 ⟨0, Set.mem_Iio.mpr zero_lt_one⟩ :=
-  rfl
-
-@[simp]
 theorem to_leftMoves_one_toPGame_symm (i) :
     (@toLeftMovesToPGame 1).symm i = ⟨0, Set.mem_Iio.mpr zero_lt_one⟩ := by
   simp [eq_iff_true_of_subsingleton]
-
-theorem one_toPGame_moveLeft (x) : (toPGame 1).moveLeft x = toPGame 0 := by simp
 
 noncomputable def oneToPGameRelabelling : toPGame 1 ≡r 1 :=
   ⟨Equiv.equivOfUnique _ _, Equiv.equivOfIsEmpty _ _, fun i => by

@@ -8,6 +8,8 @@ import Mathlib.RingTheory.LocalRing.MaximalIdeal.Defs
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.RingTheory.Nilpotent.Lemmas
 
+noncomputable section
+
 /-!
 
 # Maximal ideal of local rings

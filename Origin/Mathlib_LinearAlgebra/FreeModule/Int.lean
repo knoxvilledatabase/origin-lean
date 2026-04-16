@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/FreeModule/Int.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Quotient
 import Mathlib.GroupTheory.Index
 import Mathlib.LinearAlgebra.FreeModule.PID
+
+noncomputable section
 
 /-! # Index of submodules of free ℤ-modules (considered as an `AddSubgroup`).
 
@@ -145,7 +147,19 @@ lemma toAddSubgroup_index_eq_ite [Infinite R] [Module R M] {N : Submodule R M}
       Ne.lt_of_le h (by simpa using Fintype.card_le_of_embedding snf.f)
     simp [hlt]
 
--- DISSOLVED: toAddSubgroup_index_ne_zero_iff
+lemma toAddSubgroup_index_ne_zero_iff {N : Submodule ℤ M} (snf : Basis.SmithNormalForm N ι n) :
+    N.toAddSubgroup.index ≠ 0 ↔ n = Fintype.card ι := by
+  rw [snf.toAddSubgroup_index_eq_ite]
+  rcases snf with ⟨bM, bN, f, a, snf⟩
+  simp only [ne_eq, ite_eq_right_iff, Classical.not_imp, and_iff_left_iff_imp]
+  have ha : ∀ i, a i ≠ 0 := by
+    intro i hi
+    apply Basis.ne_zero bN i
+    specialize snf i
+    simpa [hi] using snf
+  intro h
+  simpa [Ideal.span_singleton_toAddSubgroup_eq_zmultiples, Int.index_zmultiples,
+    Finset.prod_eq_zero_iff] using ha
 
 end Basis.SmithNormalForm
 
@@ -153,10 +167,34 @@ namespace Int
 
 variable [Finite ι]
 
--- DISSOLVED: submodule_toAddSubgroup_index_ne_zero_iff
+lemma submodule_toAddSubgroup_index_ne_zero_iff {N : Submodule ℤ (ι → ℤ)} :
+    N.toAddSubgroup.index ≠ 0 ↔ Nonempty (N ≃ₗ[ℤ] (ι → ℤ)) := by
+  obtain ⟨n, snf⟩ := N.smithNormalForm <| Basis.ofEquivFun <| LinearEquiv.refl _ _
+  have := Fintype.ofFinite ι
+  rw [snf.toAddSubgroup_index_ne_zero_iff]
+  rcases snf with ⟨-, bN, -, -, -⟩
+  refine ⟨fun h ↦ ?_, fun ⟨e⟩ ↦ ?_⟩
+  · subst h
+    exact ⟨(bN.reindex (Fintype.equivFin _).symm).equivFun⟩
+  · have hc := card_eq_of_linearEquiv ℤ <| bN.equivFun.symm.trans e
+    simpa using hc
 
--- DISSOLVED: addSubgroup_index_ne_zero_iff
+lemma addSubgroup_index_ne_zero_iff {H : AddSubgroup (ι → ℤ)} :
+    H.index ≠ 0 ↔ Nonempty (H ≃+ (ι → ℤ)) := by
+  convert submodule_toAddSubgroup_index_ne_zero_iff (N := AddSubgroup.toIntSubmodule H) using 1
+  exact ⟨fun ⟨e⟩ ↦ ⟨e.toIntLinearEquiv⟩, fun ⟨e⟩ ↦ ⟨e.toAddEquiv⟩⟩
 
--- DISSOLVED: subgroup_index_ne_zero_iff
+lemma subgroup_index_ne_zero_iff {H : Subgroup (ι → Multiplicative ℤ)} :
+    H.index ≠ 0 ↔ Nonempty (H ≃* (ι → Multiplicative ℤ)) := by
+  let em : Multiplicative (ι → ℤ) ≃* (ι → Multiplicative ℤ) :=
+    MulEquiv.funMultiplicative _ _
+  let H' : Subgroup (Multiplicative (ι → ℤ)) := H.comap em
+  let eH' : H' ≃* H := (MulEquiv.subgroupCongr <| Subgroup.comap_equiv_eq_map_symm em H).trans
+    (MulEquiv.subgroupMap em.symm _).symm
+  have h : H'.index = H.index := Subgroup.index_comap_of_surjective _ em.surjective
+  rw [← h, ← Subgroup.index_toAddSubgroup, addSubgroup_index_ne_zero_iff]
+  exact ⟨fun ⟨e⟩ ↦ ⟨(eH'.symm.trans (AddEquiv.toMultiplicative e)).trans em⟩,
+    fun ⟨e⟩ ↦ ⟨(MulEquiv.toAdditive ((eH'.trans e).trans em.symm)).trans
+      (AddEquiv.additiveMultiplicative _)⟩⟩
 
 end Int

@@ -11,6 +11,8 @@ import Mathlib.Algebra.MonoidAlgebra.Defs
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.LinearAlgebra.Finsupp.SumProd
 
+noncomputable section
+
 /-!
 # Monoid algebras
 
@@ -121,13 +123,6 @@ theorem coe_algebraMap {A : Type*} [CommSemiring k] [Semiring A] [Algebra k A] [
     ⇑(algebraMap k (MonoidAlgebra A G)) = single 1 ∘ algebraMap k A :=
   rfl
 
-theorem single_eq_algebraMap_mul_of [CommSemiring k] [Monoid G] (a : G) (b : k) :
-    single a b = algebraMap k (MonoidAlgebra k G) b * of k G a := by simp
-
-theorem single_algebraMap_eq_algebraMap_mul_of {A : Type*} [CommSemiring k] [Semiring A]
-    [Algebra k A] [Monoid G] (a : G) (b : k) :
-    single a (algebraMap k A b) = algebraMap k (MonoidAlgebra A G) b * of A G a := by simp
-
 end Algebra
 
 section lift
@@ -166,19 +161,10 @@ def lift : (G →* A) ≃ (MonoidAlgebra k G →ₐ[k] A) where
 
 variable {k G H A}
 
-theorem lift_apply' (F : G →* A) (f : MonoidAlgebra k G) :
-    lift k G A F f = f.sum fun a b => algebraMap k A b * F a :=
-  rfl
-
 theorem lift_apply (F : G →* A) (f : MonoidAlgebra k G) :
     lift k G A F f = f.sum fun a b => b • F a := by simp only [lift_apply', Algebra.smul_def]
 
 theorem lift_def (F : G →* A) : ⇑(lift k G A F) = liftNC ((algebraMap k A : k →+* A) : k →+ A) F :=
-  rfl
-
-@[simp]
-theorem lift_symm_apply (F : MonoidAlgebra k G →ₐ[k] A) (x : G) :
-    (lift k G A).symm F x = F (single x 1) :=
   rfl
 
 @[simp]
@@ -240,22 +226,12 @@ def domCongr (e : G ≃* H) : MonoidAlgebra A G ≃ₐ[k] MonoidAlgebra A H :=
 theorem domCongr_toAlgHom (e : G ≃* H) : (domCongr k A e).toAlgHom = mapDomainAlgHom k A e :=
   AlgHom.ext fun _ => equivMapDomain_eq_mapDomain _ _
 
-@[simp] theorem domCongr_apply (e : G ≃* H) (f : MonoidAlgebra A G) (h : H) :
-    domCongr k A e f h = f (e.symm h) :=
-  rfl
-
-@[simp] theorem domCongr_support (e : G ≃* H) (f : MonoidAlgebra A G) :
-    (domCongr k A e f).support = f.support.map e :=
-  rfl
-
 @[simp] theorem domCongr_single (e : G ≃* H) (g : G) (a : A) :
     domCongr k A e (single g a) = single (e g) a :=
   Finsupp.equivMapDomain_single _ _ _
 
 @[simp] theorem domCongr_refl : domCongr k A (MulEquiv.refl G) = AlgEquiv.refl :=
   AlgEquiv.ext fun _ => Finsupp.ext fun _ => rfl
-
-@[simp] theorem domCongr_symm (e : G ≃* H) : (domCongr k A e).symm = domCongr k A e.symm := rfl
 
 end lift
 
@@ -269,12 +245,6 @@ def GroupSMul.linearMap [Monoid G] [CommSemiring k] (V : Type u₃) [AddCommMono
   map_add' x y := smul_add (single g (1 : k)) x y
   map_smul' _c _x := smul_algebra_smul_comm _ _ _
 
-@[simp]
-theorem GroupSMul.linearMap_apply [Monoid G] [CommSemiring k] (V : Type u₃) [AddCommMonoid V]
-    [Module k V] [Module (MonoidAlgebra k G) V] [IsScalarTower k (MonoidAlgebra k G) V] (g : G)
-    (v : V) : (GroupSMul.linearMap k V g) v = single g (1 : k) • v :=
-  rfl
-
 section
 
 variable {k}
@@ -284,26 +254,7 @@ variable [Monoid G] [CommSemiring k] {V : Type u₃} {W : Type u₄} [AddCommMon
   [Module k W] [Module (MonoidAlgebra k G) W] [IsScalarTower k (MonoidAlgebra k G) W]
   (f : V →ₗ[k] W)
 
-def equivariantOfLinearOfComm
-    (h : ∀ (g : G) (v : V), f (single g (1 : k) • v) = single g (1 : k) • f v) :
-    V →ₗ[MonoidAlgebra k G] W where
-  toFun := f
-  map_add' v v' := by simp
-  map_smul' c v := by
-    -- Porting note: Was `apply`.
-    refine Finsupp.induction c ?_ ?_
-    · simp
-    · intro g r c' _nm _nz w
-      dsimp at *
-      simp only [add_smul, f.map_add, w, add_left_inj, single_eq_algebraMap_mul_of, ← smul_smul]
-      erw [algebraMap_smul (MonoidAlgebra k G) r, algebraMap_smul (MonoidAlgebra k G) r, f.map_smul,
-        h g v, of_apply]
-
 variable (h : ∀ (g : G) (v : V), f (single g (1 : k) • v) = single g (1 : k) • f v)
-
-@[simp]
-theorem equivariantOfLinearOfComm_apply (v : V) : (equivariantOfLinearOfComm f h) v = f v :=
-  rfl
 
 end
 
@@ -406,21 +357,12 @@ def lift : (Multiplicative G →* A) ≃ (k[G] →ₐ[k] A) :=
 
 variable {k G A}
 
-theorem lift_apply' (F : Multiplicative G →* A) (f : MonoidAlgebra k G) :
-    lift k G A F f = f.sum fun a b => algebraMap k A b * F (Multiplicative.ofAdd a) :=
-  rfl
-
 theorem lift_apply (F : Multiplicative G →* A) (f : MonoidAlgebra k G) :
     lift k G A F f = f.sum fun a b => b • F (Multiplicative.ofAdd a) := by
   simp only [lift_apply', Algebra.smul_def]
 
 theorem lift_def (F : Multiplicative G →* A) :
     ⇑(lift k G A F) = liftNC ((algebraMap k A : k →+* A) : k →+ A) F :=
-  rfl
-
-@[simp]
-theorem lift_symm_apply (F : k[G] →ₐ[k] A) (x : Multiplicative G) :
-    (lift k G A).symm F x = F (single x.toAdd 1) :=
   rfl
 
 theorem lift_of (F : Multiplicative G →* A) (x : Multiplicative G) :
@@ -496,22 +438,12 @@ def domCongr (e : G ≃+ H) : A[G] ≃ₐ[k] A[H] :=
 theorem domCongr_toAlgHom (e : G ≃+ H) : (domCongr k A e).toAlgHom = mapDomainAlgHom k A e :=
   AlgHom.ext fun _ => equivMapDomain_eq_mapDomain _ _
 
-@[simp] theorem domCongr_apply (e : G ≃+ H) (f : MonoidAlgebra A G) (h : H) :
-    domCongr k A e f h = f (e.symm h) :=
-  rfl
-
-@[simp] theorem domCongr_support (e : G ≃+ H) (f : MonoidAlgebra A G) :
-    (domCongr k A e f).support = f.support.map e :=
-  rfl
-
 @[simp] theorem domCongr_single (e : G ≃+ H) (g : G) (a : A) :
     domCongr k A e (single g a) = single (e g) a :=
   Finsupp.equivMapDomain_single _ _ _
 
 @[simp] theorem domCongr_refl : domCongr k A (AddEquiv.refl G) = AlgEquiv.refl :=
   AlgEquiv.ext fun _ => Finsupp.ext fun _ => rfl
-
-@[simp] theorem domCongr_symm (e : G ≃+ H) : (domCongr k A e).symm = domCongr k A e.symm := rfl
 
 end AddMonoidAlgebra
 

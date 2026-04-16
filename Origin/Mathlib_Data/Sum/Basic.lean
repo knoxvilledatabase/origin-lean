@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.Basic
 import Mathlib.Tactic.MkIffOfInductiveProp
 
+noncomputable section
+
 /-!
 # Additional lemmas about sum types
 

@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.MulAction
 import Mathlib.Topology.Maps.Proper.Basic
 import Mathlib.Topology.Maps.OpenQuotient
 
+noncomputable section
+
 /-!
 # Proper group action
 

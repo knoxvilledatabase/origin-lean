@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Sites.Coherent.Basic
 import Mathlib.CategoryTheory.EffectiveEpi.Comp
 import Mathlib.CategoryTheory.EffectiveEpi.Extensive
 
+noncomputable section
+
 /-!
 
 # Connections between the regular, extensive and coherent topologies

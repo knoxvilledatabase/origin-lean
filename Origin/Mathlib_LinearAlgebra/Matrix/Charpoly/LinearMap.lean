@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
+noncomputable section
+
 /-!
 
 # Cayley-Hamilton theorem for f.g. modules.

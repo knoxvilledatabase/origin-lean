@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Dynamics.FixedPoints.Basic
 
+noncomputable section
+
 /-!
 # Birkhoff sums
 

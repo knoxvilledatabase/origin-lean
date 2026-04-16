@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Rank.lean
-Genuine: 28 | Conflates: 1 | Dissolved: 1 | Infrastructure: 1
+Genuine: 29 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Determinant
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.LinearAlgebra.Matrix.Diagonal
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.LinearAlgebra.Matrix.Dual
+
+noncomputable section
 
 /-!
 # Rank of matrices
@@ -160,7 +162,10 @@ section Field
 
 variable [Field R]
 
--- DISSOLVED: rank_diagonal
+theorem rank_diagonal [Fintype m] [DecidableEq m] [DecidableEq R] (w : m → R) :
+    (diagonal w).rank = Fintype.card {i // (w i) ≠ 0} := by
+  rw [Matrix.rank, ← Matrix.toLin'_apply', Module.finrank, ← LinearMap.rank,
+    LinearMap.rank_diagonal, Cardinal.toNat_natCast]
 
 end Field
 

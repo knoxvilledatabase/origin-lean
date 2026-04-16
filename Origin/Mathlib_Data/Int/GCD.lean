@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/GCD.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 8 | Infrastructure: 5
+Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Int
@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.GCD.Basic
 import Mathlib.Data.Set.Operations
 import Mathlib.Order.Basic
 import Mathlib.Order.Bounds.Defs
+
+noncomputable section
 
 /-!
 # Extended GCD and divisibility over ℤ
@@ -70,9 +72,19 @@ theorem gcdB_zero_left {s : ℕ} : gcdB 0 s = 1 := by
   unfold gcdB
   rw [xgcd, xgcd_zero_left]
 
--- DISSOLVED: gcdA_zero_right
+@[simp]
+theorem gcdA_zero_right {s : ℕ} (h : s ≠ 0) : gcdA s 0 = 1 := by
+  unfold gcdA xgcd
+  obtain ⟨s, rfl⟩ := Nat.exists_eq_succ_of_ne_zero h
+  rw [xgcdAux]
+  simp
 
--- DISSOLVED: gcdB_zero_right
+@[simp]
+theorem gcdB_zero_right {s : ℕ} (h : s ≠ 0) : gcdB s 0 = 0 := by
+  unfold gcdB xgcd
+  obtain ⟨s, rfl⟩ := Nat.exists_eq_succ_of_ne_zero h
+  rw [xgcdAux]
+  simp
 
 @[simp]
 theorem xgcdAux_fst (x y) : ∀ s t s' t', (xgcdAux x s t y s' t').1 = gcd x y :=
@@ -131,10 +143,6 @@ end Nat
 
 namespace Int
 
-theorem gcd_def (i j : ℤ) : gcd i j = Nat.gcd i.natAbs j.natAbs := rfl
-
-@[simp, norm_cast] protected lemma gcd_natCast_natCast (m n : ℕ) : gcd ↑m ↑n = m.gcd n := rfl
-
 def gcdA : ℤ → ℤ → ℤ
   | ofNat m, n => m.gcdA n.natAbs
   | -[m+1], n => -m.succ.gcdA n.natAbs
@@ -153,12 +161,6 @@ theorem gcd_eq_gcd_ab : ∀ x y : ℤ, (gcd x y : ℤ) = x * gcdA x y + y * gcdB
     show (_ : ℤ) = -(m + 1) * -_ + -(n + 1) * -_ by
       rw [Int.neg_mul_neg, Int.neg_mul_neg]
       apply Nat.gcd_eq_gcd_ab
-
-theorem lcm_def (i j : ℤ) : lcm i j = Nat.lcm (natAbs i) (natAbs j) :=
-  rfl
-
-protected theorem coe_nat_lcm (m n : ℕ) : Int.lcm ↑m ↑n = Nat.lcm m n :=
-  rfl
 
 theorem dvd_gcd {i j k : ℤ} (h1 : k ∣ i) (h2 : k ∣ j) : k ∣ gcd i j :=
   natAbs_dvd.1 <|
@@ -190,14 +192,17 @@ theorem gcd_mul_right (i j k : ℤ) : gcd (i * j) (k * j) = gcd i k * natAbs j :
   rw [Int.gcd, Int.gcd, natAbs_mul, natAbs_mul]
   apply Nat.gcd_mul_right
 
--- DISSOLVED: gcd_pos_of_ne_zero_left
+theorem gcd_pos_of_ne_zero_left {i : ℤ} (j : ℤ) (hi : i ≠ 0) : 0 < gcd i j :=
+  Nat.gcd_pos_of_pos_left _ <| natAbs_pos.2 hi
 
--- DISSOLVED: gcd_pos_of_ne_zero_right
+theorem gcd_pos_of_ne_zero_right (i : ℤ) {j : ℤ} (hj : j ≠ 0) : 0 < gcd i j :=
+  Nat.gcd_pos_of_pos_right _ <| natAbs_pos.2 hj
 
 theorem gcd_eq_zero_iff {i j : ℤ} : gcd i j = 0 ↔ i = 0 ∧ j = 0 := by
   rw [gcd, Nat.gcd_eq_zero_iff, natAbs_eq_zero, natAbs_eq_zero]
 
--- DISSOLVED: gcd_pos_iff
+theorem gcd_pos_iff {i j : ℤ} : 0 < gcd i j ↔ i ≠ 0 ∨ j ≠ 0 :=
+  Nat.pos_iff_ne_zero.trans <| gcd_eq_zero_iff.not.trans not_and_or
 
 theorem gcd_div {i j k : ℤ} (H1 : k ∣ i) (H2 : k ∣ j) :
     gcd (i / k) (j / k) = gcd i j / natAbs k := by
@@ -238,7 +243,9 @@ theorem gcd_eq_left {i j : ℤ} (H : i ∣ j) : gcd i j = natAbs i :=
 
 theorem gcd_eq_right {i j : ℤ} (H : j ∣ i) : gcd i j = natAbs j := by rw [gcd_comm, gcd_eq_left H]
 
--- DISSOLVED: ne_zero_of_gcd
+theorem ne_zero_of_gcd {x y : ℤ} (hc : gcd x y ≠ 0) : x ≠ 0 ∨ y ≠ 0 := by
+  contrapose! hc
+  rw [hc.left, hc.right, gcd_zero_right, natAbs_zero]
 
 theorem exists_gcd_one {m n : ℤ} (H : 0 < gcd m n) :
     ∃ m' n' : ℤ, gcd m' n' = 1 ∧ m = m' * gcd m n ∧ n = n' * gcd m n :=
@@ -250,7 +257,10 @@ theorem exists_gcd_one' {m n : ℤ} (H : 0 < gcd m n) :
   let ⟨m', n', h⟩ := exists_gcd_one H
   ⟨_, m', n', H, h⟩
 
--- DISSOLVED: pow_dvd_pow_iff
+theorem pow_dvd_pow_iff {m n : ℤ} {k : ℕ} (k0 : k ≠ 0) : m ^ k ∣ n ^ k ↔ m ∣ n := by
+  refine ⟨fun h => ?_, fun h => pow_dvd_pow_of_dvd h _⟩
+  rwa [← natAbs_dvd_natAbs, ← Nat.pow_dvd_pow_iff k0, ← Int.natAbs_pow, ← Int.natAbs_pow,
+    natAbs_dvd_natAbs]
 
 theorem gcd_dvd_iff {a b : ℤ} {n : ℕ} : gcd a b ∣ n ↔ ∃ x y : ℤ, ↑n = a * x + b * y := by
   constructor
@@ -279,7 +289,13 @@ theorem dvd_of_dvd_mul_right_of_gcd_one {a b c : ℤ} (habc : a ∣ b * c) (hab 
   rw [mul_comm] at habc
   exact dvd_of_dvd_mul_left_of_gcd_one habc hab
 
--- DISSOLVED: gcd_least_linear
+theorem gcd_least_linear {a b : ℤ} (ha : a ≠ 0) :
+    IsLeast { n : ℕ | 0 < n ∧ ∃ x y : ℤ, ↑n = a * x + b * y } (a.gcd b) := by
+  simp_rw [← gcd_dvd_iff]
+  constructor
+  · simpa [and_true, dvd_refl, Set.mem_setOf_eq] using gcd_pos_of_ne_zero_left b ha
+  · simp only [lowerBounds, and_imp, Set.mem_setOf_eq]
+    exact fun n hn_pos hn => Nat.le_of_dvd hn_pos hn
 
 /-! ### lcm -/
 

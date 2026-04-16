@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 
+noncomputable section
+
 /-!
 # Sequence of measurable functions associated to a sequence of a.e.-measurable functions
 

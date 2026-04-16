@@ -13,6 +13,8 @@ import Mathlib.Analysis.SpecialFunctions.JapaneseBracket
 import Mathlib.Topology.Algebra.UniformFilterBasis
 import Mathlib.Tactic.MoveAdd
 
+noncomputable section
+
 /-!
 # Schwartz space
 
@@ -265,10 +267,6 @@ theorem coe_zero : DFunLike.coe (0 : 𝓢(E, F)) = (0 : E → F) :=
   rfl
 
 @[simp]
-theorem coeFn_zero : ⇑(0 : 𝓢(E, F)) = (0 : E → F) :=
-  rfl
-
-@[simp]
 theorem zero_apply {x : E} : (0 : 𝓢(E, F)) x = 0 :=
   rfl
 
@@ -320,10 +318,6 @@ instance instSub : Sub 𝓢(E, F) :=
       rw [sub_eq_add_neg]
       rw [← decay_neg_aux k n g x]
       convert decay_add_le_aux k n f (-g) x⟩⟩
-
-@[simp]
-theorem sub_apply {f g : 𝓢(E, F)} {x : E} : (f - g) x = f x - g x :=
-  rfl
 
 end Sub
 
@@ -412,11 +406,6 @@ def _root_.schwartzSeminormFamily : SeminormFamily 𝕜 𝓢(E, F) (ℕ × ℕ) 
 @[simp]
 theorem schwartzSeminormFamily_apply (n k : ℕ) :
     schwartzSeminormFamily 𝕜 E F (n, k) = SchwartzMap.seminorm 𝕜 n k :=
-  rfl
-
-@[simp]
-theorem schwartzSeminormFamily_apply_zero :
-    schwartzSeminormFamily 𝕜 E F 0 = SchwartzMap.seminorm 𝕜 0 0 :=
   rfl
 
 variable {𝕜 E F}
@@ -710,54 +699,6 @@ variable [NormedAddCommGroup D] [NormedSpace ℝ D]
 
 variable [NormedAddCommGroup G] [NormedSpace ℝ G]
 
-def bilinLeftCLM (B : E →L[ℝ] F →L[ℝ] G) {g : D → F} (hg : g.HasTemperateGrowth) :
-    𝓢(D, E) →L[ℝ] 𝓢(D, G) := by
-  -- Todo (after port): generalize to `B : E →L[𝕜] F →L[𝕜] G` and `𝕜`-linear
-  refine mkCLM (fun f x => B (f x) (g x))
-    (fun _ _ _ => by
-      simp only [map_add, add_left_inj, Pi.add_apply, eq_self_iff_true,
-        ContinuousLinearMap.add_apply])
-    (fun _ _ _ => by
-      simp only [smul_apply, map_smul, ContinuousLinearMap.coe_smul', Pi.smul_apply,
-        RingHom.id_apply])
-    (fun f => (B.isBoundedBilinearMap.contDiff.restrict_scalars ℝ).comp (f.smooth'.prod hg.1)) ?_
-  rintro ⟨k, n⟩
-  rcases hg.norm_iteratedFDeriv_le_uniform_aux n with ⟨l, C, hC, hgrowth⟩
-  use
-    Finset.Iic (l + k, n), ‖B‖ * ((n : ℝ) + (1 : ℝ)) * n.choose (n / 2) * (C * 2 ^ (l + k)),
-    by positivity
-  intro f x
-  have hxk : 0 ≤ ‖x‖ ^ k := by positivity
-  have hnorm_mul :=
-    ContinuousLinearMap.norm_iteratedFDeriv_le_of_bilinear B f.smooth' hg.1 x (n := n)
-    (mod_cast le_top)
-  refine le_trans (mul_le_mul_of_nonneg_left hnorm_mul hxk) ?_
-  move_mul [← ‖B‖]
-  simp_rw [mul_assoc ‖B‖]
-  gcongr _ * ?_
-  rw [Finset.mul_sum]
-  have : (∑ _x ∈ Finset.range (n + 1), (1 : ℝ)) = n + 1 := by simp
-  simp_rw [mul_assoc ((n : ℝ) + 1)]
-  rw [← this, Finset.sum_mul]
-  refine Finset.sum_le_sum fun i hi => ?_
-  simp only [one_mul]
-  move_mul [(Nat.choose n i : ℝ), (Nat.choose n (n / 2) : ℝ)]
-  gcongr ?_ * ?_
-  swap
-  · norm_cast
-    exact i.choose_le_middle n
-  specialize hgrowth (n - i) (by simp only [tsub_le_self]) x
-  refine le_trans (mul_le_mul_of_nonneg_left hgrowth (by positivity)) ?_
-  move_mul [C]
-  gcongr ?_ * C
-  rw [Finset.mem_range_succ_iff] at hi
-  change i ≤ (l + k, n).snd at hi
-  refine le_trans ?_ (one_add_le_sup_seminorm_apply le_rfl hi f x)
-  rw [pow_add]
-  move_mul [(1 + ‖x‖) ^ l]
-  gcongr
-  simp
-
 end Multiplication
 
 section Comp
@@ -833,10 +774,6 @@ def compCLM {g : D → E} (hg : g.HasTemperateGrowth)
   refine le_trans (mul_le_mul_of_nonneg_right hg_upper'' hpos) ?_
   rw [← mul_assoc]
 
-@[simp] lemma compCLM_apply {g : D → E} (hg : g.HasTemperateGrowth)
-    (hg_upper : ∃ (k : ℕ) (C : ℝ), ∀ x, ‖x‖ ≤ C * (1 + ‖g x‖) ^ k) (f : 𝓢(E, F)) :
-    compCLM 𝕜 hg hg_upper f = f ∘ g := rfl
-
 def compCLMOfAntilipschitz {K : ℝ≥0} {g : D → E}
     (hg : g.HasTemperateGrowth) (h'g : AntilipschitzWith K g) :
     𝓢(E, F) →L[𝕜] 𝓢(D, F) := by
@@ -856,16 +793,9 @@ def compCLMOfAntilipschitz {K : ℝ≥0} {g : D → E}
     gcongr
     exact le_mul_of_one_le_right (by positivity) (le_max_left _ _)
 
-@[simp] lemma compCLMOfAntilipschitz_apply {K : ℝ≥0} {g : D → E} (hg : g.HasTemperateGrowth)
-    (h'g : AntilipschitzWith K g) (f : 𝓢(E, F)) :
-    compCLMOfAntilipschitz 𝕜 hg h'g f = f ∘ g := rfl
-
 def compCLMOfContinuousLinearEquiv (g : D ≃L[ℝ] E) :
     𝓢(E, F) →L[𝕜] 𝓢(D, F) :=
   compCLMOfAntilipschitz 𝕜 (g.toContinuousLinearMap.hasTemperateGrowth) g.antilipschitz
-
-@[simp] lemma compCLMOfContinuousLinearEquiv_apply (g : D ≃L[ℝ] E) (f : 𝓢(E, F)) :
-    compCLMOfContinuousLinearEquiv 𝕜 g f = f ∘ g := rfl
 
 end Comp
 
@@ -885,10 +815,6 @@ def fderivCLM : 𝓢(E, F) →L[𝕜] 𝓢(E, E →L[ℝ] F) :=
       simpa only [schwartzSeminormFamily_apply, Seminorm.comp_apply, Finset.sup_singleton,
         one_smul, norm_iteratedFDeriv_fderiv, one_mul] using f.le_seminorm 𝕜 k (n + 1) x⟩
 
-@[simp]
-theorem fderivCLM_apply (f : 𝓢(E, F)) (x : E) : fderivCLM 𝕜 f x = fderiv ℝ f x :=
-  rfl
-
 def derivCLM : 𝓢(ℝ, F) →L[𝕜] 𝓢(ℝ, F) :=
   mkCLM deriv (fun f g _ => deriv_add f.differentiableAt g.differentiableAt)
     (fun a f _ => deriv_const_smul a f.differentiableAt)
@@ -897,10 +823,6 @@ def derivCLM : 𝓢(ℝ, F) →L[𝕜] 𝓢(ℝ, F) :=
       simpa only [Real.norm_eq_abs, Finset.sup_singleton, schwartzSeminormFamily_apply, one_mul,
         norm_iteratedFDeriv_eq_norm_iteratedDeriv, ← iteratedDeriv_succ'] using
         f.le_seminorm' 𝕜 k (n + 1) x⟩
-
-@[simp]
-theorem derivCLM_apply (f : 𝓢(ℝ, F)) (x : ℝ) : derivCLM 𝕜 f x = deriv f x :=
-  rfl
 
 def pderivCLM (m : E) : 𝓢(E, F) →L[𝕜] 𝓢(E, F) :=
   (SchwartzMap.evalCLM m).comp (fderivCLM 𝕜)
@@ -1030,9 +952,6 @@ def integralCLM : 𝓢(D, V) →L[𝕜] V := by
 
 variable (𝕜) in
 
-@[simp]
-lemma integralCLM_apply (f : 𝓢(D, V)) : integralCLM 𝕜 μ f = ∫ x, f x ∂μ := by rfl
-
 end Integration
 
 section BoundedContinuousFunction
@@ -1050,11 +969,6 @@ def toBoundedContinuousFunction (f : 𝓢(E, F)) : E →ᵇ F :=
   BoundedContinuousFunction.ofNormedAddCommGroup f (SchwartzMap.continuous f)
     (SchwartzMap.seminorm ℝ 0 0 f) (norm_le_seminorm ℝ f)
 
-@[simp]
-theorem toBoundedContinuousFunction_apply (f : 𝓢(E, F)) (x : E) :
-    f.toBoundedContinuousFunction x = f x :=
-  rfl
-
 def toContinuousMap (f : 𝓢(E, F)) : C(E, F) :=
   f.toBoundedContinuousFunction.toContinuousMap
 
@@ -1068,21 +982,12 @@ def toBoundedContinuousFunctionCLM : 𝓢(E, F) →L[𝕜] E →ᵇ F :=
     (⟨{0}, 1, zero_le_one, by
       simpa [BoundedContinuousFunction.norm_le (apply_nonneg _ _)] using norm_le_seminorm 𝕜 ⟩)
 
-@[simp]
-theorem toBoundedContinuousFunctionCLM_apply (f : 𝓢(E, F)) (x : E) :
-    toBoundedContinuousFunctionCLM 𝕜 E F f x = f x :=
-  rfl
-
 variable {E}
 
 section DiracDelta
 
 def delta (x : E) : 𝓢(E, F) →L[𝕜] F :=
   (BoundedContinuousFunction.evalCLM 𝕜 x).comp (toBoundedContinuousFunctionCLM 𝕜 E F)
-
-@[simp]
-theorem delta_apply (x₀ : E) (f : 𝓢(E, F)) : delta 𝕜 F x₀ f = f x₀ :=
-  rfl
 
 open MeasureTheory MeasureTheory.Measure
 
@@ -1124,13 +1029,6 @@ def toZeroAtInfty (f : 𝓢(E, F)) : C₀(E, F) where
   toFun := f
   zero_at_infty' := zero_at_infty f
 
-@[simp] theorem toZeroAtInfty_apply (f : 𝓢(E, F)) (x : E) : f.toZeroAtInfty x = f x :=
-  rfl
-
-@[simp] theorem toZeroAtInfty_toBCF (f : 𝓢(E, F)) :
-    f.toZeroAtInfty.toBCF = f.toBoundedContinuousFunction :=
-  rfl
-
 variable (𝕜 E F)
 
 variable [RCLike 𝕜] [NormedSpace 𝕜 F] [SMulCommClass ℝ 𝕜 F]
@@ -1140,9 +1038,6 @@ def toZeroAtInftyCLM : 𝓢(E, F) →L[𝕜] C₀(E, F) :=
     (by intro a f; ext; exact smul_apply)
     (⟨{0}, 1, zero_le_one, by simpa [← ZeroAtInftyContinuousMap.norm_toBCF_eq_norm,
       BoundedContinuousFunction.norm_le (apply_nonneg _ _)] using norm_le_seminorm 𝕜 ⟩)
-
-@[simp] theorem toZeroAtInftyCLM_apply (f : 𝓢(E, F)) (x : E) : toZeroAtInftyCLM 𝕜 E F f x = f x :=
-  rfl
 
 end ZeroAtInfty
 

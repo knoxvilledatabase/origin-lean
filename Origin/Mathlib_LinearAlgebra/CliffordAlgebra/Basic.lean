@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.TensorAlgebra.Basic
 import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.LinearAlgebra.QuadraticForm.IsometryEquiv
 
+noncomputable section
+
 /-!
 # Clifford Algebras
 
@@ -323,11 +325,6 @@ def equivOfIsometry (e : Q₁.IsometryEquiv Q₂) : CliffordAlgebra Q₁ ≃ₐ[
       convert map_id Q₁ using 2  -- Porting note: replaced `_` with `Q₁`
       ext m
       exact e.toLinearEquiv.symm_apply_apply m)
-
-@[simp]
-theorem equivOfIsometry_symm (e : Q₁.IsometryEquiv Q₂) :
-    (equivOfIsometry e).symm = equivOfIsometry e.symm :=
-  rfl
 
 @[simp]
 theorem equivOfIsometry_trans (e₁₂ : Q₁.IsometryEquiv Q₂) (e₂₃ : Q₂.IsometryEquiv Q₃) :

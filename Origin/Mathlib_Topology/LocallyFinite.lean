@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Order.Filter.SmallSets
 
+noncomputable section
+
 /-!
 ### Locally finite families of sets
 

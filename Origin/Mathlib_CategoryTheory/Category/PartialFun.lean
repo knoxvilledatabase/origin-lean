@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Category.Pointed
 import Mathlib.Data.PFun
 
+noncomputable section
+
 /-!
 # The category of types with partial functions
 
@@ -144,18 +146,3 @@ noncomputable def partialFunEquivPointed : PartialFun.{u} ≌ Pointed where
     · rfl
     · simp
       rfl
-
-@[simps!]
-noncomputable def typeToPartialFunIsoPartialFunToPointed :
-    typeToPartialFun ⋙ partialFunToPointed ≅ typeToPointed :=
-  NatIso.ofComponents
-    (fun _ =>
-      { hom := ⟨id, rfl⟩
-        inv := ⟨id, rfl⟩
-        hom_inv_id := rfl
-        inv_hom_id := rfl })
-    fun f =>
-    Pointed.Hom.ext <|
-      funext fun a => Option.recOn a rfl fun a => by
-        convert Part.some_toOption _
-        simpa using (Part.get_eq_iff_mem (by trivial)).mp rfl

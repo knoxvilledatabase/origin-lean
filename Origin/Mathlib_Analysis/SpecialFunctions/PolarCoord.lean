@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Function.Jacobian
 import Mathlib.MeasureTheory.Measure.Lebesgue.Complex
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
+noncomputable section
+
 /-!
 # Polar coordinates
 
@@ -160,16 +162,10 @@ protected theorem polarCoord_apply (a : ℂ) :
 
 protected theorem polarCoord_source : Complex.polarCoord.source = slitPlane := rfl
 
-protected theorem polarCoord_target :
-    Complex.polarCoord.target = Set.Ioi (0 : ℝ) ×ˢ Set.Ioo (-π) π := rfl
-
 @[simp]
 protected theorem polarCoord_symm_apply (p : ℝ × ℝ) :
     Complex.polarCoord.symm p = p.1 * (Real.cos p.2 + Real.sin p.2 * Complex.I) := by
   simp [Complex.polarCoord, equivRealProdCLM_symm_apply, mul_add, mul_assoc]
-
-theorem polarCoord_symm_abs (p : ℝ × ℝ) :
-    Complex.abs (Complex.polarCoord.symm p) = |p.1| := by simp
 
 protected theorem integral_comp_polarCoord_symm {E : Type*} [NormedAddCommGroup E]
     [NormedSpace ℝ E] (f : ℂ → E) :

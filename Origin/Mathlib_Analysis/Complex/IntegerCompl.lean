@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Complex/IntegerCompl.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+
+noncomputable section
 
 /-!
 # Integer Complement
@@ -21,10 +23,6 @@ namespace Complex
 
 local notation "ℂ_ℤ " => integerComplement
 
-lemma integerComplement_eq : ℂ_ℤ = {z : ℂ | ¬ ∃ (n : ℤ), n = z} := rfl
-
-lemma integerComplement.mem_iff {x : ℂ} : x ∈ ℂ_ℤ ↔ ¬ ∃ (n : ℤ), n = x := Iff.rfl
-
 lemma UpperHalfPlane.coe_mem_integerComplement (z : ℍ) : ↑z ∈ ℂ_ℤ :=
   not_exists.mpr fun x hx ↦ ne_int z x hx.symm
 
@@ -33,10 +31,13 @@ lemma integerComplement.add_coe_int_mem {x : ℂ} (a : ℤ) : x + (a : ℂ) ∈ 
   exact ⟨(Exists.elim · fun n hn ↦ ⟨n - a, by simp [hn]⟩),
     (Exists.elim · fun n hn ↦ ⟨n + a, by simp [hn]⟩)⟩
 
--- DISSOLVED: integerComplement.ne_zero
+lemma integerComplement.ne_zero {x : ℂ} (hx : x ∈ ℂ_ℤ) : x ≠ 0 :=
+  fun hx' ↦ hx ⟨0, by exact_mod_cast hx'.symm⟩
 
--- DISSOLVED: integerComplement_add_ne_zero
+lemma integerComplement_add_ne_zero {x : ℂ} (hx : x ∈ ℂ_ℤ) (a : ℤ) : x + (a : ℂ)  ≠ 0 :=
+  integerComplement.ne_zero ((integerComplement.add_coe_int_mem a).mpr hx)
 
--- DISSOLVED: integerComplement.ne_one
+lemma integerComplement.ne_one {x : ℂ} (hx : x ∈ ℂ_ℤ): x ≠ 1 :=
+  fun hx' ↦ hx ⟨1, by exact_mod_cast hx'.symm⟩
 
 end Complex

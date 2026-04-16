@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Trifunctor
 
+noncomputable section
+
 /-!
 # The associator for actions of bifunctors on graded objects
 

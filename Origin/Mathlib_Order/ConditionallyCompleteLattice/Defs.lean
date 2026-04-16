@@ -7,6 +7,8 @@ import Mathlib.Order.Bounds.Basic
 import Mathlib.Order.SetNotation
 import Mathlib.Order.WellFounded
 
+noncomputable section
+
 /-!
 # Definitions of conditionally complete lattices
 

@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.LinearAlgebra.Quotient.Basic
 
+noncomputable section
+
 /-!
 # Isomorphism theorems for modules.
 
@@ -42,11 +44,6 @@ noncomputable def quotKerEquivOfSurjective (f : M →ₗ[R] M₂) (hf : Function
   f.quotKerEquivRange.trans <| .ofTop (LinearMap.range f) <| range_eq_top.2 hf
 
 @[simp]
-theorem quotKerEquivRange_apply_mk (x : M) :
-    (f.quotKerEquivRange (Submodule.Quotient.mk x) : M₂) = f x :=
-  rfl
-
-@[simp]
 theorem quotKerEquivRange_symm_apply_image (x : M) (h : f x ∈ LinearMap.range f) :
     f.quotKerEquivRange.symm ⟨f x, h⟩ = f.ker.mkQ x :=
   f.quotKerEquivRange.symm_apply_apply (f.ker.mkQ x)
@@ -81,10 +78,6 @@ noncomputable def quotientInfEquivSupQuotient (p p' : Submodule R M) :
     (p ⧸ comap p.subtype (p ⊓ p')) ≃ₗ[R] _ ⧸ comap (p ⊔ p').subtype p' :=
   LinearEquiv.ofBijective (quotientInfToSupQuotient p p')
     ⟨quotientInfEquivSupQuotient_injective p p', quotientInfEquivSupQuotient_surjective p p'⟩
-
-theorem coe_quotientInfToSupQuotient (p p' : Submodule R M) :
-    ⇑(quotientInfToSupQuotient p p') = quotientInfEquivSupQuotient p p' :=
-  rfl
 
 @[simp, nolint simpNF]
 theorem quotientInfEquivSupQuotient_apply_mk (p p' : Submodule R M) (x : p) :
@@ -131,10 +124,6 @@ def quotientQuotientEquivQuotientAux (h : S ≤ T) : (M ⧸ S) ⧸ T.map S.mkQ �
 theorem quotientQuotientEquivQuotientAux_mk (x : M ⧸ S) :
     quotientQuotientEquivQuotientAux S T h (Quotient.mk x) = mapQ S T LinearMap.id h x :=
   liftQ_apply _ _ _
-
-@[simp]
-theorem quotientQuotientEquivQuotientAux_mk_mk (x : M) :
-    quotientQuotientEquivQuotientAux S T h (Quotient.mk (Quotient.mk x)) = Quotient.mk x := by simp
 
 def quotientQuotientEquivQuotient : ((M ⧸ S) ⧸ T.map S.mkQ) ≃ₗ[R] M ⧸ T :=
   { quotientQuotientEquivQuotientAux S T h with

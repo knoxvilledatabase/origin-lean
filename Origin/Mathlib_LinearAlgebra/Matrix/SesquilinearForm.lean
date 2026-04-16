@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/SesquilinearForm.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 4 | Infrastructure: 7
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Opposite
@@ -11,6 +11,8 @@ import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 import Mathlib.LinearAlgebra.SesquilinearForm
 import Mathlib.LinearAlgebra.Basis.Bilinear
+
+noncomputable section
 
 /-!
 # Sesquilinear form
@@ -164,10 +166,6 @@ def Matrix.toLinearMap₂' : Matrix n m N₂ ≃ₗ[R] (n → S₁) →ₗ[S₁]
 
 variable {R}
 
-theorem Matrix.toLinearMapₛₗ₂'_aux_eq (M : Matrix n m N₂) :
-    Matrix.toLinearMap₂'Aux σ₁ σ₂ M = Matrix.toLinearMapₛₗ₂' R σ₁ σ₂ M :=
-  rfl
-
 theorem Matrix.toLinearMapₛₗ₂'_apply (M : Matrix n m N₂) (x : n → R₁) (y : m → R₂) :
     -- porting note: we don't seem to have `∑ i j` as valid notation yet
     Matrix.toLinearMapₛₗ₂' R σ₁ σ₂ M x y = ∑ i, ∑ j, σ₁ (x i) •  σ₂ (y j) • M i j := by
@@ -195,8 +193,8 @@ theorem Matrix.toLinearMapₛₗ₂'_single (M : Matrix n m N₂) (i : n) (j : m
   Matrix.toLinearMap₂'Aux_single σ₁ σ₂ M i j
 
 set_option linter.deprecated false in
-
 @[simp, deprecated Matrix.toLinearMapₛₗ₂'_single (since := "2024-08-09")]
+
 theorem Matrix.toLinearMapₛₗ₂'_stdBasis (M : Matrix n m N₂) (i : n) (j : m) :
     Matrix.toLinearMapₛₗ₂' R σ₁ σ₂ M (LinearMap.stdBasis R₁ (fun _ => R₁) i 1)
       (LinearMap.stdBasis R₂ (fun _ => R₂) j 1) = M i j :=
@@ -208,18 +206,13 @@ theorem Matrix.toLinearMap₂'_single (M : Matrix n m N₂) (i : n) (j : m) :
   Matrix.toLinearMap₂'Aux_single _ _ M i j
 
 set_option linter.deprecated false in
-
 @[simp, deprecated Matrix.toLinearMap₂'_single (since := "2024-08-09")]
+
 theorem Matrix.toLinearMap₂'_stdBasis (M : Matrix n m N₂) (i : n) (j : m) :
     Matrix.toLinearMap₂' R M (LinearMap.stdBasis R (fun _ => R) i 1)
       (LinearMap.stdBasis R (fun _ => R) j 1) = M i j :=
   show Matrix.toLinearMap₂' R M (Pi.single i 1) (Pi.single j 1) = M i j
   from Matrix.toLinearMap₂'Aux_single _ _ M i j
-
-@[simp]
-theorem LinearMap.toMatrixₛₗ₂'_symm :
-    ((LinearMap.toMatrixₛₗ₂' R).symm : Matrix n m N₂ ≃ₗ[R] _) = Matrix.toLinearMapₛₗ₂' R σ₁ σ₂ :=
-  rfl
 
 @[simp]
 theorem Matrix.toLinearMapₛₗ₂'_symm :
@@ -245,11 +238,6 @@ theorem LinearMap.toMatrix'_toLinearMapₛₗ₂' (M : Matrix n m N₂) :
 theorem LinearMap.toMatrix'_toLinearMap₂' (M : Matrix n m N₂) :
     LinearMap.toMatrix₂' R (Matrix.toLinearMap₂' R (S₁ := S₁) (S₂ := S₂) M) = M :=
   (LinearMap.toMatrixₛₗ₂' R).apply_symm_apply M
-
-@[simp]
-theorem LinearMap.toMatrixₛₗ₂'_apply (B : (n → R₁) →ₛₗ[σ₁] (m → R₂) →ₛₗ[σ₂] N₂) (i : n) (j : m) :
-    LinearMap.toMatrixₛₗ₂' R B i j = B (Pi.single i 1) (Pi.single j 1) :=
-  rfl
 
 @[simp]
 theorem LinearMap.toMatrix₂'_apply (B : (n → S₁) →ₗ[S₁] (m → S₂) →ₗ[S₂] N₂) (i : n) (j : m) :
@@ -300,11 +288,6 @@ theorem LinearMap.toMatrix₂'_comp (B : (n → R) →ₗ[R] (m → R) →ₗ[R]
 theorem LinearMap.toMatrix₂'_compl₂ (B : (n → R) →ₗ[R] (m → R) →ₗ[R] R) (f : (m' → R) →ₗ[R] m → R) :
     toMatrix₂' R (B.compl₂ f) = toMatrix₂' R B * toMatrix' f := by
   rw [← LinearMap.comp_id B, ← LinearMap.compl₁₂]
-  simp
-
-theorem LinearMap.mul_toMatrix₂'_mul (B : (n → R) →ₗ[R] (m → R) →ₗ[R] R) (M : Matrix n' n R)
-    (N : Matrix m m' R) :
-    M * toMatrix₂' R B * N = toMatrix₂' R (B.compl₁₂ (toLin' Mᵀ) (toLin' N)) := by
   simp
 
 theorem LinearMap.mul_toMatrix' (B : (n → R) →ₗ[R] (m → R) →ₗ[R] R) (M : Matrix n' n R) :
@@ -367,11 +350,6 @@ theorem Matrix.toLinearMap₂_apply (M : Matrix n m N₂) (x : M₁) (y : M₂) 
 theorem LinearMap.toMatrix₂Aux_eq (B : M₁ →ₗ[R] M₂ →ₗ[R] N₂) :
     LinearMap.toMatrix₂Aux R b₁ b₂ B = LinearMap.toMatrix₂ b₁ b₂ B :=
   Matrix.ext fun i j => by rw [LinearMap.toMatrix₂_apply, LinearMap.toMatrix₂Aux_apply]
-
-@[simp]
-theorem LinearMap.toMatrix₂_symm :
-    (LinearMap.toMatrix₂ b₁ b₂).symm = Matrix.toLinearMap₂ (N₂ := N₂) b₁ b₂ :=
-  rfl
 
 @[simp]
 theorem Matrix.toLinearMap₂_symm :
@@ -673,13 +651,21 @@ theorem SeparatingLeft.toMatrix₂ {B : M₁ →ₗ[R₁] M₁ →ₗ[R₁] R₁
 
 variable [IsDomain R₁]
 
--- DISSOLVED: separatingLeft_toLinearMap₂'_iff_det_ne_zero
+theorem separatingLeft_toLinearMap₂'_iff_det_ne_zero {M : Matrix ι ι R₁} :
+    (Matrix.toLinearMap₂' R₁ M).SeparatingLeft (R := R₁) ↔ M.det ≠ 0 := by
+  rw [Matrix.separatingLeft_toLinearMap₂'_iff, Matrix.nondegenerate_iff_det_ne_zero]
 
--- DISSOLVED: separatingLeft_toLinearMap₂'_of_det_ne_zero'
+theorem separatingLeft_toLinearMap₂'_of_det_ne_zero' (M : Matrix ι ι R₁) (h : M.det ≠ 0) :
+    (Matrix.toLinearMap₂' R₁ M).SeparatingLeft (R := R₁) :=
+  separatingLeft_toLinearMap₂'_iff_det_ne_zero.mpr h
 
--- DISSOLVED: separatingLeft_iff_det_ne_zero
+theorem separatingLeft_iff_det_ne_zero {B : M₁ →ₗ[R₁] M₁ →ₗ[R₁] R₁} (b : Basis ι R₁ M₁) :
+    B.SeparatingLeft ↔ (toMatrix₂ b b B).det ≠ 0 := by
+  rw [← Matrix.nondegenerate_iff_det_ne_zero, nondegenerate_toMatrix_iff]
 
--- DISSOLVED: separatingLeft_of_det_ne_zero
+theorem separatingLeft_of_det_ne_zero {B : M₁ →ₗ[R₁] M₁ →ₗ[R₁] R₁} (b : Basis ι R₁ M₁)
+    (h : (toMatrix₂ b b B).det ≠ 0) : B.SeparatingLeft :=
+  (separatingLeft_iff_det_ne_zero b).mpr h
 
 end Det
 

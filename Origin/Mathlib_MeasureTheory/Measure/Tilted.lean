@@ -5,6 +5,8 @@ Genuine: 31 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.RadonNikodym
 
+noncomputable section
+
 /-!
 # Exponentially tilted measures
 
@@ -32,7 +34,6 @@ namespace MeasureTheory
 variable {α : Type*} {mα : MeasurableSpace α} {μ : Measure α} {f : α → ℝ}
 
 noncomputable
-
 def Measure.tilted (μ : Measure α) (f : α → ℝ) : Measure α :=
   μ.withDensity (fun x ↦ ENNReal.ofReal (exp (f x) / ∫ x, exp (f x) ∂μ))
 

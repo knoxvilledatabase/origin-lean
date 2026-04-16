@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Bases
 import Mathlib.Topology.DenseEmbedding
 
+noncomputable section
+
 /-! # Stone-Čech compactification
 
 Construction of the Stone-Čech compactification using ultrafilters.

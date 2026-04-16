@@ -12,6 +12,8 @@ import Mathlib.LinearAlgebra.Pi
 import Mathlib.Logic.Equiv.Fintype
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Multilinear maps
 
@@ -112,10 +114,6 @@ instance : FunLike (MultilinearMap R M₁ M₂) (∀ i, M₁ i) M₂ where
 initialize_simps_projections MultilinearMap (toFun → apply)
 
 @[simp]
-theorem toFun_eq_coe : f.toFun = ⇑f :=
-  rfl
-
-@[simp]
 theorem coe_mk (f : (∀ i, M₁ i) → M₂) (h₁ h₂) : ⇑(⟨f, h₁, h₂⟩ : MultilinearMap R M₁ M₂) = f :=
   rfl
 
@@ -135,10 +133,6 @@ theorem coe_inj {f g : MultilinearMap R M₁ M₂} : (f : (∀ i, M₁ i) → M�
 @[ext]
 theorem ext {f f' : MultilinearMap R M₁ M₂} (H : ∀ x, f x = f' x) : f = f' :=
   DFunLike.ext _ _ H
-
-@[simp]
-theorem mk_coe (f : MultilinearMap R M₁ M₂) (h₁ h₂) :
-    (⟨f, h₁, h₂⟩ : MultilinearMap R M₁ M₂) = f := rfl
 
 @[simp]
 protected theorem map_update_add [DecidableEq ι] (m : ∀ i, M₁ i) (i : ι) (x y : M₁ i) :
@@ -266,25 +260,6 @@ def constOfIsEmpty [IsEmpty ι] (m : M₂) : MultilinearMap R M₁ M₂ where
 
 end
 
-def restr {k n : ℕ} (f : MultilinearMap R (fun _ : Fin n => M') M₂) (s : Finset (Fin n))
-    (hk : #s = k) (z : M') : MultilinearMap R (fun _ : Fin k => M') M₂ where
-  toFun v := f fun j => if h : j ∈ s then v ((s.orderIsoOfFin hk).symm ⟨j, h⟩) else z
-  /- Porting note: The proofs of the following two lemmas used to only use `erw` followed by `simp`,
-  but it seems `erw` no longer unfolds or unifies well enough to work without more help. -/
-  map_update_add' v i x y := by
-    have : DFunLike.coe (s.orderIsoOfFin hk).symm = (s.orderIsoOfFin hk).toEquiv.symm := rfl
-    simp only [this]
-    erw [dite_comp_equiv_update (s.orderIsoOfFin hk).toEquiv,
-      dite_comp_equiv_update (s.orderIsoOfFin hk).toEquiv,
-      dite_comp_equiv_update (s.orderIsoOfFin hk).toEquiv]
-    simp
-  map_update_smul' v i c x := by
-    have : DFunLike.coe (s.orderIsoOfFin hk).symm = (s.orderIsoOfFin hk).toEquiv.symm := rfl
-    simp only [this]
-    erw [dite_comp_equiv_update (s.orderIsoOfFin hk).toEquiv,
-      dite_comp_equiv_update (s.orderIsoOfFin hk).toEquiv]
-    simp
-
 theorem cons_add (f : MultilinearMap R M M₂) (m : ∀ i : Fin n, M i.succ) (x y : M 0) :
     f (cons (x + y) m) = f (cons x m) + f (cons y m) := by
   simp_rw [← update_cons_zero x m (x + y), f.map_update_add, update_cons_zero]
@@ -319,16 +294,6 @@ def compLinearMap (g : MultilinearMap R M₁' M₂) (f : ∀ i, M₁ i →ₗ[R]
     have : ∀ j z, f j (update m i z j) = update (fun k => f k (m k)) i (f i z) j := fun j z =>
       Function.apply_update (fun k => f k) _ _ _ _
     simp [this]
-
-@[simp]
-theorem compLinearMap_apply (g : MultilinearMap R M₁' M₂) (f : ∀ i, M₁ i →ₗ[R] M₁' i)
-    (m : ∀ i, M₁ i) : g.compLinearMap f m = g fun i => f i (m i) :=
-  rfl
-
-theorem compLinearMap_assoc (g : MultilinearMap R M₁'' M₂) (f₁ : ∀ i, M₁' i →ₗ[R] M₁'' i)
-    (f₂ : ∀ i, M₁ i →ₗ[R] M₁' i) :
-    (g.compLinearMap f₁).compLinearMap f₂ = g.compLinearMap fun i => f₁ i ∘ₗ f₂ i :=
-  rfl
 
 @[simp]
 theorem zero_compLinearMap (f : ∀ i, M₁ i →ₗ[R] M₁' i) :
@@ -565,10 +530,6 @@ def restrictScalars (f : MultilinearMap A M₁ M₂) : MultilinearMap R M₁ M�
   map_update_add' := f.map_update_add
   map_update_smul' m i := (f.toLinearMap m i).map_smul_of_tower
 
-@[simp]
-theorem coe_restrictScalars (f : MultilinearMap A M₁ M₂) : ⇑(f.restrictScalars R) = f :=
-  rfl
-
 end RestrictScalar
 
 section
@@ -587,16 +548,6 @@ def domDomCongr (σ : ι₁ ≃ ι₂) (m : MultilinearMap R (fun _ : ι₁ => M
     letI := σ.injective.decidableEq
     simp_rw [Function.update_apply_equiv_apply v]
     rw [m.map_update_smul]
-
-theorem domDomCongr_trans (σ₁ : ι₁ ≃ ι₂) (σ₂ : ι₂ ≃ ι₃)
-    (m : MultilinearMap R (fun _ : ι₁ => M₂) M₃) :
-    m.domDomCongr (σ₁.trans σ₂) = (m.domDomCongr σ₁).domDomCongr σ₂ :=
-  rfl
-
-theorem domDomCongr_mul (σ₁ : Equiv.Perm ι₁) (σ₂ : Equiv.Perm ι₁)
-    (m : MultilinearMap R (fun _ : ι₁ => M₂) M₃) :
-    m.domDomCongr (σ₂ * σ₁) = (m.domDomCongr σ₁).domDomCongr σ₂ :=
-  rfl
 
 @[simps apply symm_apply]
 def domDomCongrEquiv (σ : ι₁ ≃ ι₂) :
@@ -663,11 +614,6 @@ def domDomRestrict (f : MultilinearMap R M₁ M₂) (P : ι → Prop) [Decidable
     repeat (rw [domDomRestrict_aux])
     simp only [MultilinearMap.map_update_smul]
 
-@[simp]
-lemma domDomRestrict_apply (f : MultilinearMap R M₁ M₂) (P : ι → Prop)
-    [DecidablePred P] (x : (i : {a // P a}) → M₁ i) (z : (i : {a // ¬ P a}) → M₁ i) :
-    f.domDomRestrict P z x = f (fun j => if h : P j then x ⟨j, h⟩ else z ⟨j, h⟩) := rfl
-
 def linearDeriv [DecidableEq ι] [Fintype ι] (f : MultilinearMap R M₁ M₂)
     (x : (i : ι) → M₁ i) : ((i : ι) → M₁ i) →ₗ[R] M₂ :=
   ∑ i : ι, (f.toLinearMap x i).comp (LinearMap.proj i)
@@ -695,23 +641,9 @@ def compMultilinearMap (g : M₂ →ₗ[R] M₃) (f : MultilinearMap R M₁ M₂
   map_update_smul' m i c x := by simp
 
 @[simp]
-theorem coe_compMultilinearMap (g : M₂ →ₗ[R] M₃) (f : MultilinearMap R M₁ M₂) :
-    ⇑(g.compMultilinearMap f) = g ∘ f :=
-  rfl
-
-@[simp]
-theorem compMultilinearMap_apply (g : M₂ →ₗ[R] M₃) (f : MultilinearMap R M₁ M₂) (m : ∀ i, M₁ i) :
-    g.compMultilinearMap f m = g (f m) :=
-  rfl
-
-@[simp]
 theorem compMultilinearMap_zero (g : M₂ →ₗ[R] M₃) :
     g.compMultilinearMap (0 : MultilinearMap R M₁ M₂) = 0 :=
   MultilinearMap.ext fun _ => map_zero g
-
-@[simp]
-theorem zero_compMultilinearMap (f: MultilinearMap R M₁ M₂) :
-    (0 : M₂ →ₗ[R] M₃).compMultilinearMap f = 0 := rfl
 
 @[simp]
 theorem compMultilinearMap_add (g : M₂ →ₗ[R] M₃) (f₁ f₂ : MultilinearMap R M₁ M₂) :
@@ -719,32 +651,11 @@ theorem compMultilinearMap_add (g : M₂ →ₗ[R] M₃) (f₁ f₂ : Multilinea
   MultilinearMap.ext fun _ => map_add g _ _
 
 @[simp]
-theorem add_compMultilinearMap (g₁ g₂ : M₂ →ₗ[R] M₃) (f: MultilinearMap R M₁ M₂) :
-    (g₁ + g₂).compMultilinearMap f = g₁.compMultilinearMap f + g₂.compMultilinearMap f := rfl
-
-@[simp]
 theorem compMultilinearMap_smul [Monoid S] [DistribMulAction S M₂] [DistribMulAction S M₃]
     [SMulCommClass R S M₂] [SMulCommClass R S M₃] [CompatibleSMul M₂ M₃ S R]
     (g : M₂ →ₗ[R] M₃) (s : S) (f : MultilinearMap R M₁ M₂) :
     g.compMultilinearMap (s • f) = s • g.compMultilinearMap f :=
   MultilinearMap.ext fun _ => g.map_smul_of_tower _ _
-
-@[simp]
-theorem smul_compMultilinearMap [Monoid S] [DistribMulAction S M₃] [SMulCommClass R S M₃]
-    (g : M₂ →ₗ[R] M₃) (s : S) (f : MultilinearMap R M₁ M₂) :
-    (s • g).compMultilinearMap f = s • g.compMultilinearMap f := rfl
-
-@[simp]
-theorem subtype_compMultilinearMap_codRestrict (f : MultilinearMap R M₁ M₂) (p : Submodule R M₂)
-    (h) : p.subtype.compMultilinearMap (f.codRestrict p h) = f :=
-  rfl
-
-@[simp]
-theorem compMultilinearMap_codRestrict (g : M₂ →ₗ[R] M₃) (f : MultilinearMap R M₁ M₂)
-    (p : Submodule R M₃) (h) :
-    (g.codRestrict p h).compMultilinearMap f =
-      (g.compMultilinearMap f).codRestrict p fun v => h (f v) :=
-  rfl
 
 variable {ι₁ ι₂ : Type*}
 
@@ -843,15 +754,6 @@ def domDomCongrLinearEquiv' {ι' : Type*} (σ : ι ≃ ι') :
   right_inv f := by
     ext
     simp only [coe_mk, comp_apply, Equiv.apply_symm_apply]
-
-@[simps]
-def constLinearEquivOfIsEmpty [IsEmpty ι] : M₂ ≃ₗ[S] MultilinearMap R M₁ M₂ where
-  toFun := MultilinearMap.constOfIsEmpty R _
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  invFun f := f 0
-  left_inv _ := rfl
-  right_inv f := ext fun _ => MultilinearMap.congr_arg f <| Subsingleton.elim _ _
 
 @[simps apply symm_apply]
 def domDomCongrLinearEquiv {ι₁ ι₂} (σ : ι₁ ≃ ι₂) :
@@ -999,10 +901,6 @@ protected def mkPiAlgebra : MultilinearMap R (fun _ : ι => A) A where
 
 variable {R A ι}
 
-@[simp]
-theorem mkPiAlgebra_apply (m : ι → A) : MultilinearMap.mkPiAlgebra R ι A m = ∏ i, m i :=
-  rfl
-
 end
 
 section
@@ -1027,23 +925,10 @@ protected def mkPiAlgebraFin : MultilinearMap R (fun _ : Fin n => A) A where
 
 variable {R A n}
 
-@[simp]
-theorem mkPiAlgebraFin_apply (m : Fin n → A) :
-    MultilinearMap.mkPiAlgebraFin R n A m = (List.ofFn m).prod :=
-  rfl
-
-theorem mkPiAlgebraFin_apply_const (a : A) :
-    (MultilinearMap.mkPiAlgebraFin R n A fun _ => a) = a ^ n := by simp
-
 end
 
 def smulRight (f : MultilinearMap R M₁ R) (z : M₂) : MultilinearMap R M₁ M₂ :=
   (LinearMap.smulRight LinearMap.id z).compMultilinearMap f
-
-@[simp]
-theorem smulRight_apply (f : MultilinearMap R M₁ R) (z : M₂) (m : ∀ i, M₁ i) :
-    f.smulRight z m = f m • z :=
-  rfl
 
 variable (R ι)
 
@@ -1090,20 +975,12 @@ variable [Semiring R] [∀ i, AddCommMonoid (M₁ i)] [AddCommGroup M₂] [∀ i
 instance : Neg (MultilinearMap R M₁ M₂) :=
   ⟨fun f => ⟨fun m => -f m, fun m i x y => by simp [add_comm], fun m i c x => by simp⟩⟩
 
-@[simp]
-theorem neg_apply (m : ∀ i, M₁ i) : (-f) m = -f m :=
-  rfl
-
 instance : Sub (MultilinearMap R M₁ M₂) :=
   ⟨fun f g =>
     ⟨fun m => f m - g m, fun m i x y => by
       simp only [MultilinearMap.map_update_add, sub_eq_add_neg, neg_add]
       abel,
       fun m i c x => by simp only [MultilinearMap.map_update_smul, smul_sub]⟩⟩
-
-@[simp]
-theorem sub_apply (m : ∀ i, M₁ i) : (f - g) m = f m - g m :=
-  rfl
 
 instance : AddCommGroup (MultilinearMap R M₁ M₂) :=
   { MultilinearMap.addCommMonoid with
@@ -1203,18 +1080,6 @@ section CommSemiring
 variable [CommSemiring R] [∀ i, AddCommMonoid (M₁ i)] [AddCommMonoid M₂] [∀ i, Module R (M₁ i)]
   [Module R M₂]
 
-protected def piRingEquiv [Fintype ι] : M₂ ≃ₗ[R] MultilinearMap R (fun _ : ι => R) M₂ where
-  toFun z := MultilinearMap.mkPiRing R ι z
-  invFun f := f fun _ => 1
-  map_add' z z' := by
-    ext m
-    simp [smul_add]
-  map_smul' c z := by
-    ext m
-    simp [smul_smul, mul_comm]
-  left_inv z := by simp
-  right_inv f := f.mkPiRing_apply_one_eq_self
-
 end CommSemiring
 
 end MultilinearMap
@@ -1312,15 +1177,6 @@ theorem MultilinearMap.uncurry_curryLeft (f : MultilinearMap R M M₂) :
 
 variable (R M M₂)
 
-def multilinearCurryLeftEquiv :
-    MultilinearMap R M M₂ ≃ₗ[R] (M 0 →ₗ[R] MultilinearMap R (fun i : Fin n => M i.succ) M₂) where
-  toFun := MultilinearMap.curryLeft
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  invFun := LinearMap.uncurryLeft
-  left_inv := MultilinearMap.uncurry_curryLeft
-  right_inv := LinearMap.curry_uncurryLeft
-
 variable {R M M₂}
 
 /-! #### Right currying -/
@@ -1404,16 +1260,6 @@ theorem MultilinearMap.uncurry_curryRight (f : MultilinearMap R M M₂) :
 
 variable (R M M₂)
 
-def multilinearCurryRightEquiv :
-    MultilinearMap R M M₂ ≃ₗ[R]
-      MultilinearMap R (fun i : Fin n => M (castSucc i)) (M (last n) →ₗ[R] M₂) where
-  toFun := MultilinearMap.curryRight
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  invFun := MultilinearMap.uncurryRight
-  left_inv := MultilinearMap.uncurry_curryRight
-  right_inv := MultilinearMap.curry_uncurryRight
-
 namespace MultilinearMap
 
 variable {ι' : Type*} {R M₂}
@@ -1437,11 +1283,6 @@ def currySum (f : MultilinearMap R (fun _ : ι ⊕ ι' => M') M₂) :
       letI := Classical.decEq ι'
       simp only [MultilinearMap.coe_mk, smul_apply, ← Sum.update_elim_inl, f.map_update_smul]
 
-@[simp]
-theorem currySum_apply (f : MultilinearMap R (fun _ : ι ⊕ ι' => M') M₂) (u : ι → M')
-    (v : ι' → M') : f.currySum u v = f (Sum.elim u v) :=
-  rfl
-
 def uncurrySum (f : MultilinearMap R (fun _ : ι => M') (MultilinearMap R (fun _ : ι' => M') M₂)) :
     MultilinearMap R (fun _ : ι ⊕ ι' => M') M₂ where
   toFun u := f (u ∘ Sum.inl) (u ∘ Sum.inr)
@@ -1457,12 +1298,6 @@ def uncurrySum (f : MultilinearMap R (fun _ : ι => M') (MultilinearMap R (fun _
     cases i <;>
       simp only [MultilinearMap.map_update_smul, smul_apply, Sum.update_inl_comp_inl,
         Sum.update_inl_comp_inr, Sum.update_inr_comp_inl, Sum.update_inr_comp_inr]
-
-@[simp]
-theorem uncurrySum_aux_apply
-    (f : MultilinearMap R (fun _ : ι => M') (MultilinearMap R (fun _ : ι' => M') M₂))
-    (u : ι ⊕ ι' → M') : f.uncurrySum u = f (u ∘ Sum.inl) (u ∘ Sum.inr) :=
-  rfl
 
 variable (ι ι' R M₂ M')
 
@@ -1484,14 +1319,6 @@ def currySumEquiv :
 
 variable {ι ι' R M₂ M'}
 
-@[simp]
-theorem coe_currySumEquiv : ⇑(currySumEquiv R ι M₂ M' ι') = currySum :=
-  rfl
-
-@[simp]
-theorem coe_currySumEquiv_symm : ⇑(currySumEquiv R ι M₂ M' ι').symm = uncurrySum :=
-  rfl
-
 variable (R M₂ M')
 
 def curryFinFinset {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k) (hl : #sᶜ = l) :
@@ -1501,13 +1328,6 @@ def curryFinFinset {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k) (hl : #sᶜ 
     (currySumEquiv R (Fin k) M₂ M' (Fin l))
 
 variable {R M₂ M'}
-
-@[simp]
-theorem curryFinFinset_apply {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k) (hl : #sᶜ = l)
-    (f : MultilinearMap R (fun _ : Fin n => M') M₂) (mk : Fin k → M') (ml : Fin l → M') :
-    curryFinFinset R M₂ M' hk hl f mk ml =
-      f fun i => Sum.elim mk ml ((finSumEquivOfFinset hk hl).symm i) :=
-  rfl
 
 @[simp]
 theorem curryFinFinset_symm_apply {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k)
@@ -1532,13 +1352,6 @@ theorem curryFinFinset_symm_apply_piecewise_const {k l n : ℕ} {s : Finset (Fin
   · ext
     rw [finSumEquivOfFinset_inr, Finset.piecewise_eq_of_not_mem]
     exact Finset.mem_compl.1 (Finset.orderEmbOfFin_mem _ _ _)
-
-@[simp]
-theorem curryFinFinset_symm_apply_const {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k)
-    (hl : #sᶜ = l)
-    (f : MultilinearMap R (fun _ : Fin k => M') (MultilinearMap R (fun _ : Fin l => M') M₂))
-    (x : M') : ((curryFinFinset R M₂ M' hk hl).symm f fun _ => x) = f (fun _ => x) fun _ => x :=
-  rfl
 
 theorem curryFinFinset_apply_const {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k)
     (hl : #sᶜ = l) (f : MultilinearMap R (fun _ : Fin n => M') M₂) (x y : M') :

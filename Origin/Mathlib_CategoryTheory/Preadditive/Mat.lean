@@ -15,6 +15,8 @@ import Mathlib.CategoryTheory.Preadditive.SingleObj
 import Mathlib.Data.Matrix.DMatrix
 import Mathlib.Data.Matrix.Mul
 
+noncomputable section
+
 /-!
 # Matrices over a category.
 
@@ -118,10 +120,6 @@ theorem id_apply_self (M : Mat_ C) (i : M.ι) : (𝟙 M : Hom M M) i i = 𝟙 _ 
 theorem id_apply_of_ne (M : Mat_ C) (i j : M.ι) (h : i ≠ j) : (𝟙 M : Hom M M) i j = 0 := by
   simp [id_apply, h]
 
-theorem comp_def {M N K : Mat_ C} (f : M ⟶ N) (g : N ⟶ K) :
-    f ≫ g = fun i k => ∑ j : N.ι, f i j ≫ g j k :=
-  rfl
-
 @[simp]
 theorem comp_apply {M N K : Mat_ C} (f : M ⟶ N) (g : N ⟶ K) (i k) :
     (f ≫ g) i k = ∑ j : N.ι, f i j ≫ g j k :=
@@ -135,10 +133,6 @@ end
 instance (M N : Mat_ C) : AddCommGroup (M ⟶ N) := by
   change AddCommGroup (DMatrix M.ι N.ι _)
   infer_instance
-
-@[simp]
-theorem add_apply {M N : Mat_ C} (f g : M ⟶ N) (i j) : (f + g) i j = f i j + g i j :=
-  rfl
 
 instance : Preadditive (Mat_ C) where
   add_comp M N K f f' g := by ext; simp [Finset.sum_add_distrib]
@@ -414,18 +408,6 @@ def equivalenceSelfOfHasFiniteBiproducts (C : Type (u₁ + 1)) [LargeCategory C]
       (𝟭 C))
     (embedding C) (ext equivalenceSelfOfHasFiniteBiproductsAux) (embeddingLiftIso (𝟭 C))
 
-@[simp]
-theorem equivalenceSelfOfHasFiniteBiproducts_functor {C : Type (u₁ + 1)} [LargeCategory C]
-    [Preadditive C] [HasFiniteBiproducts C] :
-    (equivalenceSelfOfHasFiniteBiproducts C).functor = lift (𝟭 C) :=
-  rfl
-
-@[simp]
-theorem equivalenceSelfOfHasFiniteBiproducts_inverse {C : Type (u₁ + 1)} [LargeCategory C]
-    [Preadditive C] [HasFiniteBiproducts C] :
-    (equivalenceSelfOfHasFiniteBiproducts C).inverse = embedding C :=
-  rfl
-
 end Mat_
 
 universe u
@@ -473,10 +455,6 @@ theorem id_apply_self (M : Mat R) (i : M) : (𝟙 M : Matrix M M R) i i = 1 := b
 @[simp]
 theorem id_apply_of_ne (M : Mat R) (i j : M) (h : i ≠ j) : (𝟙 M : Matrix M M R) i j = 0 := by
   simp [id_apply, h]
-
-theorem comp_def {M N K : Mat R} (f : M ⟶ N) (g : N ⟶ K) :
-    f ≫ g = fun i k => ∑ j : N, f i j * g j k :=
-  rfl
 
 @[simp]
 theorem comp_apply {M N K : Mat R} (f : M ⟶ N) (g : N ⟶ K) (i k) :
@@ -530,10 +508,6 @@ instance (X Y : Mat R) : AddCommGroup (X ⟶ Y) := by
   infer_instance
 
 variable {R}
-
-@[simp]
-theorem add_apply {M N : Mat R} (f g : M ⟶ N) (i j) : (f + g) i j = f i j + g i j :=
-  rfl
 
 attribute [local simp] add_mul mul_add Finset.sum_add_distrib
 

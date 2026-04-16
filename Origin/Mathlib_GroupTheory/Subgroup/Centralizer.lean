@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupWithZero.Action.Basic
 import Mathlib.GroupTheory.Subgroup.Center
 import Mathlib.GroupTheory.Submonoid.Centralizer
 
+noncomputable section
+
 /-!
 # Centralizers of subgroups
 -/

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Eval.Defs
 import Mathlib.LinearAlgebra.Dimension.Constructions
 
+noncomputable section
+
 /-!
 # Linear recurrence
 
@@ -105,9 +107,6 @@ def solSpace : Submodule α (ℕ → α) where
   zero_mem' n := by simp
   add_mem' {u v} hu hv n := by simp [mul_add, sum_add_distrib, hu n, hv n]
   smul_mem' a u hu n := by simp [hu n, mul_sum]; congr; ext; ac_rfl
-
-theorem is_sol_iff_mem_solSpace (u : ℕ → α) : E.IsSolution u ↔ u ∈ E.solSpace :=
-  Iff.rfl
 
 def toInit : E.solSpace ≃ₗ[α] Fin E.order → α where
   toFun u x := (u : ℕ → α) x

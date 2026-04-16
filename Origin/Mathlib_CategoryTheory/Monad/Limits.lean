@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monad.Adjunction
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Limits.Shapes.IsTerminal
 
+noncomputable section
+
 /-!
 # Limits and colimits in the category of (co)algebras
 

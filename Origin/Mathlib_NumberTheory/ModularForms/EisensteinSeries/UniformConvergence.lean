@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ModularForms/EisensteinSeries/UniformConvergence.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.UpperHalfPlane.Topology
@@ -8,6 +8,8 @@ import Mathlib.Analysis.NormedSpace.FunctionSeries
 import Mathlib.Analysis.PSeries
 import Mathlib.Order.Interval.Finset.Box
 import Mathlib.NumberTheory.ModularForms.EisensteinSeries.Defs
+
+noncomputable section
 
 /-!
 # Uniform convergence of Eisenstein series
@@ -89,9 +91,29 @@ lemma auxbound2 (c : ℝ) {d : ℝ} (hd : 1 ≤ d ^ 2) : r z ≤ Complex.abs (c 
   simpa only [r, abs_apply, normSq_apply, add_re, re_ofReal_mul, coe_re, ofReal_re, ← pow_two,
     add_im, im_ofReal_mul, coe_im, ofReal_im, add_zero, min_le_iff] using Or.inr H1
 
--- DISSOLVED: div_max_sq_ge_one
+lemma div_max_sq_ge_one (x : Fin 2 → ℤ) (hx : x ≠ 0) :
+    1 ≤ (x 0 / ‖x‖) ^ 2 ∨ 1 ≤ (x 1 / ‖x‖) ^ 2 := by
+  refine (max_choice (x 0).natAbs (x 1).natAbs).imp (fun H0 ↦ ?_) (fun H1 ↦ ?_)
+  · have : x 0 ≠ 0 := by
+      rwa [← norm_ne_zero_iff, norm_eq_max_natAbs, H0, Nat.cast_ne_zero, Int.natAbs_ne_zero] at hx
+    simp only [norm_eq_max_natAbs, H0, Int.cast_natAbs, Int.cast_abs, div_pow, _root_.sq_abs, ne_eq,
+      OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff, Int.cast_eq_zero, this, div_self,
+      le_refl]
+  · have : x 1 ≠ 0 := by
+      rwa [← norm_ne_zero_iff, norm_eq_max_natAbs, H1, Nat.cast_ne_zero, Int.natAbs_ne_zero] at hx
+    simp only [norm_eq_max_natAbs, H1, Int.cast_natAbs, Int.cast_abs, div_pow, _root_.sq_abs, ne_eq,
+      OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff, Int.cast_eq_zero, this, div_self,
+      le_refl]
 
--- DISSOLVED: r_mul_max_le
+lemma r_mul_max_le {x : Fin 2 → ℤ} (hx : x ≠ 0) : r z * ‖x‖ ≤ Complex.abs (x 0 * z + x 1) := by
+  have hn0 : ‖x‖ ≠ 0 := by rwa [norm_ne_zero_iff]
+  have h11 : x 0 * (z : ℂ) + x 1 = (x 0 / ‖x‖ * z + x 1 / ‖x‖) * ‖x‖ := by
+    rw [div_mul_eq_mul_div, ← add_div, div_mul_cancel₀ _ (mod_cast hn0)]
+  rw [norm_eq_max_natAbs, h11, map_mul, Complex.abs_ofReal, abs_norm, norm_eq_max_natAbs]
+  gcongr
+  · rcases div_max_sq_ge_one x hx with H1 | H2
+    · simpa only [norm_eq_max_natAbs, ofReal_div, ofReal_intCast] using auxbound1 z (x 1 / ‖x‖) H1
+    · simpa only [norm_eq_max_natAbs, ofReal_div, ofReal_intCast] using auxbound2 z (x 0 / ‖x‖) H2
 
 lemma summand_bound {k : ℝ} (hk : 0 ≤ k) (x : Fin 2 → ℤ) :
     Complex.abs (x 0 * z + x 1) ^ (-k) ≤ (r z) ^ (-k) * ‖x‖ ^ (-k) := by

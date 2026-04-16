@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Insert
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Constructions involving sets of sets.
 

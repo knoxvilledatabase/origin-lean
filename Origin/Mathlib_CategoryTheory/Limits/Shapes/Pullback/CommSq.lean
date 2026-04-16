@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.ZeroObjects
 import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Pasting
 
+noncomputable section
+
 /-!
 # Pullback and pushout squares, and bicartesian squares
 
@@ -62,18 +64,6 @@ def cocone (s : CommSq f g h i) : PushoutCocone f g :=
   PushoutCocone.mk _ _ s.w
 
 @[simp]
-theorem cone_fst (s : CommSq f g h i) : s.cone.fst = f :=
-  rfl
-
-@[simp]
-theorem cone_snd (s : CommSq f g h i) : s.cone.snd = g :=
-  rfl
-
-@[simp]
-theorem cocone_inl (s : CommSq f g h i) : s.cocone.inl = h :=
-  rfl
-
-@[simp]
 theorem cocone_inr (s : CommSq f g h i) : s.cocone.inr = i :=
   rfl
 
@@ -123,14 +113,6 @@ variable {P X Y Z : C} {fst : P ⟶ X} {snd : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ 
 
 def cone (h : IsPullback fst snd f g) : PullbackCone f g :=
   h.toCommSq.cone
-
-@[simp]
-theorem cone_fst (h : IsPullback fst snd f g) : h.cone.fst = fst :=
-  rfl
-
-@[simp]
-theorem cone_snd (h : IsPullback fst snd f g) : h.cone.snd = snd :=
-  rfl
 
 noncomputable def isLimit (h : IsPullback fst snd f g) : IsLimit h.cone :=
   h.isLimit'.some
@@ -315,10 +297,6 @@ variable {Z X Y P : C} {f : Z ⟶ X} {g : Z ⟶ Y} {inl : X ⟶ P} {inr : Y ⟶ 
 
 def cocone (h : IsPushout f g inl inr) : PushoutCocone f g :=
   h.toCommSq.cocone
-
-@[simp]
-theorem cocone_inl (h : IsPushout f g inl inr) : h.cocone.inl = inl :=
-  rfl
 
 @[simp]
 theorem cocone_inr (h : IsPushout f g inl inr) : h.cocone.inr = inr :=

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Eval.Coeff
 import Mathlib.Algebra.Polynomial.Eval.Degree
 import Mathlib.Algebra.Prime.Defs
 
+noncomputable section
+
 /-!
 # Mapping irreducible polynomials
 

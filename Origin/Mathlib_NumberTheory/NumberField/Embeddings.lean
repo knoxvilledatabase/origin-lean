@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Embeddings.lean
-Genuine: 116 | Conflates: 0 | Dissolved: 5 | Infrastructure: 27
+Genuine: 121 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Hom.Rat
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.NumberTheory.NumberField.Norm
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 import Mathlib.Topology.Instances.Complex
+
+noncomputable section
 
 /-!
 # Embeddings of number fields
@@ -126,9 +128,6 @@ variable {K : Type*} [Field K] {A : Type*} [NormedDivisionRing A] [Nontrivial A]
 
 def NumberField.place : AbsoluteValue K ℝ :=
   (IsAbsoluteValue.toAbsoluteValue (norm : A → ℝ)).comp φ.injective
-
-@[simp]
-theorem NumberField.place_apply (x : K) : (NumberField.place φ) x = norm (φ x) := rfl
 
 end Place
 
@@ -276,7 +275,7 @@ theorem eq_iff_eq (x : K) (r : ℝ) : (∀ w : InfinitePlace K, w x = r) ↔ ∀
 theorem le_iff_le (x : K) (r : ℝ) : (∀ w : InfinitePlace K, w x ≤ r) ↔ ∀ φ : K →+* ℂ, ‖φ x‖ ≤ r :=
   ⟨fun hw φ => hw (mk φ), by rintro hφ ⟨w, ⟨φ, rfl⟩⟩; exact hφ φ⟩
 
--- DISSOLVED: pos_iff
+theorem pos_iff {w : InfinitePlace K} {x : K} : 0 < w x ↔ x ≠ 0 := AbsoluteValue.pos_iff w.1
 
 @[simp]
 theorem mk_eq_iff {φ ψ : K →+* ℂ} : mk φ = mk ψ ↔ φ = ψ ∨ ComplexEmbedding.conjugate φ = ψ := by
@@ -403,7 +402,8 @@ theorem mult_pos {w : InfinitePlace K} : 0 < mult w := by
   rw [mult]
   split_ifs <;> norm_num
 
--- DISSOLVED: mult_ne_zero
+@[simp]
+theorem mult_ne_zero {w : InfinitePlace K} : mult w ≠ 0 := ne_of_gt mult_pos
 
 theorem one_le_mult {w : InfinitePlace K} : (1 : ℝ) ≤ mult w := by
   rw [← Nat.cast_one, Nat.cast_le]
@@ -445,10 +445,6 @@ noncomputable def mkComplex :
   Subtype.map mk fun φ hφ => ⟨φ, hφ, rfl⟩
 
 @[simp]
-theorem mkReal_coe (φ : { φ : K →+* ℂ // ComplexEmbedding.IsReal φ }) :
-    (mkReal φ : InfinitePlace K) = mk (φ : K →+* ℂ) := rfl
-
-@[simp]
 theorem mkComplex_coe (φ : { φ : K →+* ℂ // ¬ComplexEmbedding.IsReal φ }) :
     (mkComplex φ : InfinitePlace K) = mk (φ : K →+* ℂ) := rfl
 
@@ -467,13 +463,52 @@ theorem prod_eq_abs_norm (x : K) :
     simp_rw [Finset.prod_congr rfl (this _), Finset.prod_const, card_filter_mk_eq]
   · rw [eq_ratCast, Rat.cast_abs, ← Complex.abs_ofReal, Complex.ofReal_ratCast]
 
--- DISSOLVED: one_le_of_lt_one
+theorem one_le_of_lt_one {w : InfinitePlace K} {a : (𝓞 K)} (ha : a ≠ 0)
+    (h : ∀ ⦃z⦄, z ≠ w → z a < 1) : 1 ≤ w a := by
+  suffices (1 : ℝ) ≤ |Algebra.norm ℚ (a : K)| by
+    contrapose! this
+    rw [← InfinitePlace.prod_eq_abs_norm, ← Finset.prod_const_one]
+    refine Finset.prod_lt_prod_of_nonempty (fun _ _ ↦ ?_) (fun z _ ↦ ?_) Finset.univ_nonempty
+    · exact pow_pos (pos_iff.mpr ((Subalgebra.coe_eq_zero _).not.mpr ha)) _
+    · refine pow_lt_one₀ (apply_nonneg _ _) ?_ (by rw [mult]; split_ifs <;> norm_num)
+      by_cases hz : z = w
+      · rwa [hz]
+      · exact h hz
+  rw [← Algebra.coe_norm_int, ← Int.cast_one, ← Int.cast_abs, Rat.cast_intCast, Int.cast_le]
+  exact Int.one_le_abs (Algebra.norm_ne_zero_iff.mpr ha)
 
 open scoped IntermediateField in
 
--- DISSOLVED: _root_.NumberField.is_primitive_element_of_infinitePlace_lt
+theorem _root_.NumberField.is_primitive_element_of_infinitePlace_lt {x : 𝓞 K}
+    {w : InfinitePlace K} (h₁ : x ≠ 0) (h₂ : ∀ ⦃w'⦄, w' ≠ w → w' x < 1)
+    (h₃ : IsReal w ∨ |(w.embedding x).re| < 1) : ℚ⟮(x : K)⟯ = ⊤ := by
+  rw [Field.primitive_element_iff_algHom_eq_of_eval ℚ ℂ ?_ _ w.embedding.toRatAlgHom]
+  · intro ψ hψ
+    have h : 1 ≤ w x := one_le_of_lt_one h₁ h₂
+    have main : w = InfinitePlace.mk ψ.toRingHom := by
+      erw [← norm_embedding_eq, hψ] at h
+      contrapose! h
+      exact h₂ h.symm
+    rw [(mk_embedding w).symm, mk_eq_iff] at main
+    cases h₃ with
+    | inl hw =>
+      rw [conjugate_embedding_eq_of_isReal hw, or_self] at main
+      exact congr_arg RingHom.toRatAlgHom main
+    | inr hw =>
+      refine congr_arg RingHom.toRatAlgHom (main.resolve_right fun h' ↦ hw.not_le ?_)
+      have : (embedding w x).im = 0 := by
+        erw [← Complex.conj_eq_iff_im, RingHom.congr_fun h' x]
+        exact hψ.symm
+      rwa [← norm_embedding_eq, ← Complex.re_add_im (embedding w x), this, Complex.ofReal_zero,
+        zero_mul, add_zero, Complex.norm_eq_abs, Complex.abs_ofReal] at h
+  · exact fun x ↦ IsAlgClosed.splits_codomain (minpoly ℚ x)
 
--- DISSOLVED: _root_.NumberField.adjoin_eq_top_of_infinitePlace_lt
+theorem _root_.NumberField.adjoin_eq_top_of_infinitePlace_lt {x : 𝓞 K} {w : InfinitePlace K}
+    (h₁ : x ≠ 0) (h₂ : ∀ ⦃w'⦄, w' ≠ w → w' x < 1) (h₃ : IsReal w ∨ |(w.embedding x).re| < 1) :
+    Algebra.adjoin ℚ {(x : K)} = ⊤ := by
+  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_integral (IsIntegral.of_finite ℚ _)]
+  exact congr_arg IntermediateField.toSubalgebra <|
+    NumberField.is_primitive_element_of_infinitePlace_lt h₁ h₂ h₃
 
 end NumberField
 
@@ -542,8 +577,6 @@ variable {K}
 @[simp]
 lemma comap_mk (φ : K →+* ℂ) (f : k →+* K) : (mk φ).comap f = mk (φ.comp f) := rfl
 
-lemma comap_id (w : InfinitePlace K) : w.comap (RingHom.id K) = w := rfl
-
 lemma comap_comp (w : InfinitePlace K) (f : F →+* K) (g : k →+* F) :
     w.comap (f.comp g) = (w.comap f).comap g := rfl
 
@@ -586,10 +619,6 @@ instance : MulAction (K ≃ₐ[k] K) (InfinitePlace K) where
   smul := fun σ w ↦ w.comap σ.symm
   one_smul := fun _ ↦ rfl
   mul_smul := fun _ _ _ ↦ rfl
-
-lemma smul_eq_comap : σ • w = w.comap σ.symm := rfl
-
-@[simp] lemma smul_apply (x) : (σ • w) x = w (σ.symm x) := rfl
 
 @[simp] lemma smul_mk (φ : K →+* ℂ) : σ • mk φ = mk (φ.comp σ.symm) := rfl
 
@@ -636,7 +665,6 @@ lemma mem_orbit_iff [IsGalois k K] {w w' : InfinitePlace K} :
   congr 1; ext1; simp
 
 noncomputable
-
 def orbitRelEquiv [IsGalois k K] :
     Quotient (MulAction.orbitRel (K ≃ₐ[k] K) (InfinitePlace K)) ≃ InfinitePlace k := by
   refine Equiv.ofBijective (Quotient.lift (comap · (algebraMap k K))
@@ -646,9 +674,6 @@ def orbitRelEquiv [IsGalois k K] :
   · intro w
     obtain ⟨w', hw⟩ := comap_surjective (K := K) w
     exact ⟨⟦w'⟧, hw⟩
-
-lemma orbitRelEquiv_apply_mk'' [IsGalois k K] (w : InfinitePlace K) :
-    orbitRelEquiv (Quotient.mk'' w) = comap w (algebraMap k K) := rfl
 
 variable (k w)
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Order.Sub.Basic
 import Mathlib.Algebra.Ring.Parity
 
+noncomputable section
+
 /-!
 # Canonically ordered rings and semirings.
 

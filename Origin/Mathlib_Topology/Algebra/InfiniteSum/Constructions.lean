@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Group
 import Mathlib.Topology.Algebra.Star
 
+noncomputable section
+
 /-!
 # Topological sums and functorial constructions
 

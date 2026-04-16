@@ -7,6 +7,8 @@ import Mathlib.Geometry.Euclidean.Sphere.Basic
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 import Mathlib.Tactic.DeriveFintype
 
+noncomputable section
+
 /-!
 # Circumcenter and circumradius
 
@@ -236,14 +238,6 @@ def circumcenter {n : ℕ} (s : Simplex ℝ P n) : P :=
 
 def circumradius {n : ℕ} (s : Simplex ℝ P n) : ℝ :=
   s.circumsphere.radius
-
-@[simp]
-theorem circumsphere_center {n : ℕ} (s : Simplex ℝ P n) : s.circumsphere.center = s.circumcenter :=
-  rfl
-
-@[simp]
-theorem circumsphere_radius {n : ℕ} (s : Simplex ℝ P n) : s.circumsphere.radius = s.circumradius :=
-  rfl
 
 theorem circumcenter_mem_affineSpan {n : ℕ} (s : Simplex ℝ P n) :
     s.circumcenter ∈ affineSpan ℝ (Set.range s.points) :=

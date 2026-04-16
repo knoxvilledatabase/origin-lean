@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Algebra.Group.Units.Defs
 import Mathlib.Logic.Unique
 
+noncomputable section
+
 /-!
 # The unit of the natural numbers
 -/

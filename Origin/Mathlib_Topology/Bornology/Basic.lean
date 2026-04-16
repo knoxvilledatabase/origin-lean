@@ -5,6 +5,8 @@ Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.Order.Filter.Cofinite
 
+noncomputable section
+
 /-!
 # Basic theory of bornology
 
@@ -194,10 +196,6 @@ theorem ext_iff_isBounded {t t' : Bornology α} :
 
 variable {s : Set α}
 
-theorem isCobounded_ofBounded_iff (B : Set (Set α)) {empty_mem subset_mem union_mem sUnion_univ} :
-    @IsCobounded _ (ofBounded B empty_mem subset_mem union_mem sUnion_univ) s ↔ sᶜ ∈ B :=
-  Iff.rfl
-
 theorem isBounded_ofBounded_iff (B : Set (Set α)) {empty_mem subset_mem union_mem sUnion_univ} :
     @IsBounded _ (ofBounded B empty_mem subset_mem union_mem sUnion_univ) s ↔ s ∈ B := by
   rw [isBounded_def, ofBounded_cobounded, compl_mem_comk]
@@ -303,17 +301,5 @@ namespace OrderDual
 variable [Bornology α]
 
 instance instBornology : Bornology αᵒᵈ := ‹Bornology α›
-
-@[simp] lemma isCobounded_preimage_ofDual {s : Set α} :
-    IsCobounded (ofDual ⁻¹' s) ↔ IsCobounded s := Iff.rfl
-
-@[simp] lemma isCobounded_preimage_toDual {s : Set αᵒᵈ} :
-    IsCobounded (toDual ⁻¹' s) ↔ IsCobounded s := Iff.rfl
-
-@[simp] lemma isBounded_preimage_ofDual {s : Set α} :
-    IsBounded (ofDual ⁻¹' s) ↔ IsBounded s := Iff.rfl
-
-@[simp] lemma isBounded_preimage_toDual {s : Set αᵒᵈ} :
-    IsBounded (toDual ⁻¹' s) ↔ IsBounded s := Iff.rfl
 
 end OrderDual

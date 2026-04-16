@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Function.SimpleFunc
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Metrizable
 
+noncomputable section
+
 /-!
 # Density of simple functions
 
@@ -63,14 +65,6 @@ noncomputable def nearestPtInd (e : ℕ → α) : ℕ → α →ₛ ℕ
 noncomputable def nearestPt (e : ℕ → α) (N : ℕ) : α →ₛ α :=
   (nearestPtInd e N).map e
 
-@[simp]
-theorem nearestPtInd_zero (e : ℕ → α) : nearestPtInd e 0 = const α 0 :=
-  rfl
-
-@[simp]
-theorem nearestPt_zero (e : ℕ → α) : nearestPt e 0 = const α (e 0) :=
-  rfl
-
 theorem nearestPtInd_succ (e : ℕ → α) (N : ℕ) (x : α) :
     nearestPtInd e (N + 1) x =
       if ∀ k ≤ N, edist (e (N + 1)) x < edist (e k) x then N + 1 else nearestPtInd e N x := by
@@ -110,11 +104,6 @@ noncomputable def approxOn (f : β → α) (hf : Measurable f) (s : Set α) (y�
     [SeparableSpace s] (n : ℕ) : β →ₛ α :=
   haveI : Nonempty s := ⟨⟨y₀, h₀⟩⟩
   comp (nearestPt (fun k => Nat.casesOn k y₀ ((↑) ∘ denseSeq s) : ℕ → α) n) f hf
-
-@[simp]
-theorem approxOn_zero {f : β → α} (hf : Measurable f) {s : Set α} {y₀ : α} (h₀ : y₀ ∈ s)
-    [SeparableSpace s] (x : β) : approxOn f hf s y₀ h₀ 0 x = y₀ :=
-  rfl
 
 theorem approxOn_mem {f : β → α} (hf : Measurable f) {s : Set α} {y₀ : α} (h₀ : y₀ ∈ s)
     [SeparableSpace s] (n : ℕ) (x : β) : approxOn f hf s y₀ h₀ n x ∈ s := by

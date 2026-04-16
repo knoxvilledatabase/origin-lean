@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Meta.AppBuilder
 import Lean.Meta.Basic
 
+noncomputable section
+
 /-!
 # Additions to `Lean.Meta.Basic`
 

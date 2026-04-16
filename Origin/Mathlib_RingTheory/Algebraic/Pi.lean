@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 
+noncomputable section
+
 /-!
 # Algebraic functions
 
@@ -29,11 +31,6 @@ attribute [local instance] Polynomial.hasSMulPi Polynomial.hasSMulPi'
 @[simp]
 theorem polynomial_smul_apply [Semiring R] [SMul R S] (p : R[X]) (f : R → S) (x : R) :
     (p • f) x = eval x p • f x :=
-  rfl
-
-@[simp]
-theorem polynomial_smul_apply' [CommSemiring R] [Semiring S] [Algebra R S] [SMul S T]
-    (p : R[X]) (f : S → T) (x : S) : (p • f) x = aeval x p • f x :=
   rfl
 
 variable [CommSemiring R] [CommSemiring S] [CommSemiring T] [Algebra R S] [Algebra S T]
@@ -62,15 +59,5 @@ noncomputable def Polynomial.algebraPi : Algebra R[X] (S → T) :=
         MonoidHom.coe_mk, OneHom.coe_mk, Pi.mul_apply, Algebra.smul_mul_assoc, one_mul] }
 
 attribute [local instance] Polynomial.algebraPi
-
-@[simp]
-theorem Polynomial.algebraMap_pi_eq_aeval :
-    (algebraMap R[X] (S → T) : R[X] → S → T) = fun p z => algebraMap _ _ (aeval z p) :=
-  rfl
-
-@[simp]
-theorem Polynomial.algebraMap_pi_self_eq_eval :
-    (algebraMap R[X] (R → R) : R[X] → R → R) = fun p z => eval z p :=
-  rfl
 
 end Pi

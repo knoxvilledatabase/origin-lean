@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.PFunctor.Multivariate.W
 import Mathlib.Data.QPF.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # The initial algebra of a multivariate qpf is again a qpf.
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.AlgebraCat.Basic
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # The monoidal category structure on R-algebras
 -/

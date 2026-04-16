@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Preimage
 import Mathlib.Order.Interval.Set.Image
 import Mathlib.Order.Interval.Set.UnorderedInterval
 
+noncomputable section
+
 /-!
 # Locally finite orders
 
@@ -342,12 +344,6 @@ instance (priority := 100) _root_.LocallyFiniteOrder.toLocallyFiniteOrderTop :
   finset_mem_Ici a x := by rw [mem_Icc, and_iff_left le_top]
   finset_mem_Ioi a x := by rw [mem_Ioc, and_iff_left le_top]
 
-theorem Ici_eq_Icc (a : α) : Ici a = Icc a ⊤ :=
-  rfl
-
-theorem Ioi_eq_Ioc (a : α) : Ioi a = Ioc a ⊤ :=
-  rfl
-
 end OrderTop
 
 section OrderBot
@@ -360,12 +356,6 @@ instance (priority := 100) LocallyFiniteOrder.toLocallyFiniteOrderBot :
   finsetIio := Ico ⊥
   finset_mem_Iic a x := by rw [mem_Icc, and_iff_right bot_le]
   finset_mem_Iio a x := by rw [mem_Ico, and_iff_right bot_le]
-
-theorem Iic_eq_Icc : Iic = Icc (⊥ : α) :=
-  rfl
-
-theorem Iio_eq_Ico : Iio = Ico (⊥ : α) :=
-  rfl
 
 end OrderBot
 
@@ -695,11 +685,6 @@ instance Prod.instLocallyFiniteOrder : LocallyFiniteOrder (α × β) :=
   LocallyFiniteOrder.ofIcc' (α × β) (fun x y ↦ Icc x.1 y.1 ×ˢ Icc x.2 y.2) fun a b x => by
     rw [mem_product, mem_Icc, mem_Icc, and_and_and_comm, le_def, le_def]
 
-lemma Finset.Icc_prod_def (x y : α × β) : Icc x y = Icc x.1 y.1 ×ˢ Icc x.2 y.2 := rfl
-
-lemma Finset.Icc_product_Icc (a₁ a₂ : α) (b₁ b₂ : β) :
-    Icc a₁ a₂ ×ˢ Icc b₁ b₂ = Icc (a₁, b₁) (a₂, b₂) := rfl
-
 lemma Finset.card_Icc_prod (x y : α × β) : #(Icc x y) = #(Icc x.1 y.1) * #(Icc x.2 y.2) :=
   card_product ..
 
@@ -712,10 +697,6 @@ variable [LocallyFiniteOrderTop α] [LocallyFiniteOrderTop β] [@DecidableRel (�
 instance Prod.instLocallyFiniteOrderTop : LocallyFiniteOrderTop (α × β) :=
   LocallyFiniteOrderTop.ofIci' (α × β) (fun x => Ici x.1 ×ˢ Ici x.2) fun a x => by
     rw [mem_product, mem_Ici, mem_Ici, le_def]
-
-lemma Finset.Ici_prod_def (x : α × β) : Ici x = Ici x.1 ×ˢ Ici x.2 := rfl
-
-lemma Finset.Ici_product_Ici (a : α) (b : β) : Ici a ×ˢ Ici b = Ici (a, b) := rfl
 
 lemma Finset.card_Ici_prod (x : α × β) : #(Ici x) = #(Ici x.1) * #(Ici x.2) :=
   card_product _ _
@@ -730,10 +711,6 @@ instance Prod.instLocallyFiniteOrderBot : LocallyFiniteOrderBot (α × β) :=
   LocallyFiniteOrderBot.ofIic' (α × β) (fun x ↦ Iic x.1 ×ˢ Iic x.2) fun a x ↦ by
     rw [mem_product, mem_Iic, mem_Iic, le_def]
 
-lemma Finset.Iic_prod_def (x : α × β) : Iic x = Iic x.1 ×ˢ Iic x.2 := rfl
-
-lemma Finset.Iic_product_Iic (a : α) (b : β) : Iic a ×ˢ Iic b = Iic (a, b) := rfl
-
 lemma Finset.card_Iic_prod (x : α × β) : #(Iic x) = #(Iic x.1) * #(Iic x.2) := card_product ..
 
 end LocallyFiniteOrderBot
@@ -744,11 +721,6 @@ section Lattice
 
 variable [Lattice α] [Lattice β] [LocallyFiniteOrder α] [LocallyFiniteOrder β]
   [@DecidableRel (α × β) (· ≤ ·)]
-
-lemma Finset.uIcc_prod_def (x y : α × β) : uIcc x y = uIcc x.1 y.1 ×ˢ uIcc x.2 y.2 := rfl
-
-lemma Finset.uIcc_product_uIcc (a₁ a₂ : α) (b₁ b₂ : β) :
-    uIcc a₁ a₂ ×ˢ uIcc b₁ b₂ = uIcc (a₁, b₁) (a₂, b₂) := rfl
 
 lemma Finset.card_uIcc_prod (x y : α × β) : #(uIcc x y) = #(uIcc x.1 y.1) * #(uIcc x.2 y.2) :=
   card_product ..
@@ -853,30 +825,6 @@ instance locallyFiniteOrder : LocallyFiniteOrder (WithTop α) where
 
 variable (a b : α)
 
-theorem Icc_coe_top : Icc (a : WithTop α) ⊤ = insertNone (Ici a) :=
-  rfl
-
-theorem Icc_coe_coe : Icc (a : WithTop α) b = (Icc a b).map Embedding.some :=
-  rfl
-
-theorem Ico_coe_top : Ico (a : WithTop α) ⊤ = (Ici a).map Embedding.some :=
-  rfl
-
-theorem Ico_coe_coe : Ico (a : WithTop α) b = (Ico a b).map Embedding.some :=
-  rfl
-
-theorem Ioc_coe_top : Ioc (a : WithTop α) ⊤ = insertNone (Ioi a) :=
-  rfl
-
-theorem Ioc_coe_coe : Ioc (a : WithTop α) b = (Ioc a b).map Embedding.some :=
-  rfl
-
-theorem Ioo_coe_top : Ioo (a : WithTop α) ⊤ = (Ioi a).map Embedding.some :=
-  rfl
-
-theorem Ioo_coe_coe : Ioo (a : WithTop α) b = (Ioo a b).map Embedding.some :=
-  rfl
-
 end WithTop
 
 namespace WithBot
@@ -887,30 +835,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder (WithBot α) :=
   OrderDual.instLocallyFiniteOrder (α := WithTop αᵒᵈ)
 
 variable (a b : α)
-
-theorem Icc_bot_coe : Icc (⊥ : WithBot α) b = insertNone (Iic b) :=
-  rfl
-
-theorem Icc_coe_coe : Icc (a : WithBot α) b = (Icc a b).map Embedding.some :=
-  rfl
-
-theorem Ico_bot_coe : Ico (⊥ : WithBot α) b = insertNone (Iio b) :=
-  rfl
-
-theorem Ico_coe_coe : Ico (a : WithBot α) b = (Ico a b).map Embedding.some :=
-  rfl
-
-theorem Ioc_bot_coe : Ioc (⊥ : WithBot α) b = (Iic b).map Embedding.some :=
-  rfl
-
-theorem Ioc_coe_coe : Ioc (a : WithBot α) b = (Ioc a b).map Embedding.some :=
-  rfl
-
-theorem Ioo_bot_coe : Ioo (⊥ : WithBot α) b = (Iio b).map Embedding.some :=
-  rfl
-
-theorem Ioo_coe_coe : Ioo (a : WithBot α) b = (Ioo a b).map Embedding.some :=
-  rfl
 
 end WithBot
 
@@ -929,18 +853,6 @@ abbrev locallyFiniteOrder [LocallyFiniteOrder β] (f : α ≃o β) : LocallyFini
   finset_mem_Ico := by simp
   finset_mem_Ioc := by simp
   finset_mem_Ioo := by simp
-
-abbrev locallyFiniteOrderTop [LocallyFiniteOrderTop β] (f : α ≃o β) : LocallyFiniteOrderTop α where
-  finsetIci a := (Ici (f a)).map f.symm.toEquiv.toEmbedding
-  finsetIoi a := (Ioi (f a)).map f.symm.toEquiv.toEmbedding
-  finset_mem_Ici := by simp
-  finset_mem_Ioi := by simp
-
-abbrev locallyFiniteOrderBot [LocallyFiniteOrderBot β] (f : α ≃o β) : LocallyFiniteOrderBot α where
-  finsetIic a := (Iic (f a)).map f.symm.toEquiv.toEmbedding
-  finsetIio a := (Iio (f a)).map f.symm.toEquiv.toEmbedding
-  finset_mem_Iic := by simp
-  finset_mem_Iio := by simp
 
 end OrderIso
 

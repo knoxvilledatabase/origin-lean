@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Restrict
 
+noncomputable section
+
 /-! # Mutually singular measures
 
 Two measures `μ`, `ν` are said to be mutually singular (`MeasureTheory.Measure.MutuallySingular`,
@@ -54,12 +56,6 @@ lemma measure_nullSet (h : μ ⟂ₘ ν) : μ h.nullSet = 0 := h.choose_spec.2.1
 
 @[simp]
 lemma measure_compl_nullSet (h : μ ⟂ₘ ν) : ν h.nullSetᶜ = 0 := h.choose_spec.2.2
-
-@[simp]
-lemma restrict_nullSet (h : μ ⟂ₘ ν) : μ.restrict h.nullSet = 0 := by simp
-
-@[simp]
-lemma restrict_compl_nullSet (h : μ ⟂ₘ ν) : ν.restrict h.nullSetᶜ = 0 := by simp
 
 @[simp]
 theorem zero_right : μ ⟂ₘ 0 :=

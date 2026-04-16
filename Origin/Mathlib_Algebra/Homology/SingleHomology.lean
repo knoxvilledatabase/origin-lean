@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Single
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 
+noncomputable section
+
 /-!
 # The homology of single complexes
 

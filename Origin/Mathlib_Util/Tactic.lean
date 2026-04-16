@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.MetavarContext
 
+noncomputable section
+
 /-!
 # Miscellaneous helper functions for tactics.
 

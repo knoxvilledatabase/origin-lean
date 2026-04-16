@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Filtered.Basic
 import Mathlib.Topology.Category.TopCat.Limits.Basic
 
+noncomputable section
+
 /-!
 # Topological Kőnig's lemma
 

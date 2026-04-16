@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Bracket Notation
 This file provides notation which can be used for the Lie bracket, for the commutator of two
@@ -25,3 +27,5 @@ class Bracket (L M : Type*) where
   /-- `⁅x, y⁆` is the result of a bracket operation on elements `x` and `y`.
   It is supported by the `Bracket` typeclass. -/
   bracket : L → M → M
+
+@[inherit_doc] notation "⁅" x ", " y "⁆" => Bracket.bracket x y

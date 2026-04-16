@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Between.lean
-Genuine: 98 | Conflates: 0 | Dissolved: 2 | Infrastructure: 14
+Genuine: 100 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Invertible
@@ -9,6 +9,8 @@ import Mathlib.Analysis.Convex.Basic
 import Mathlib.Analysis.Convex.Segment
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 import Mathlib.Tactic.FieldSimp
+
+noncomputable section
 
 /-!
 # Betweenness in affine spaces
@@ -377,7 +379,9 @@ theorem wbtw_zero_one_iff {x : R} : Wbtw R 0 x 1 ↔ x ∈ Set.Icc (0 : R) 1 := 
   simp_rw [lineMap_apply_ring]
   simp
 
--- DISSOLVED: wbtw_one_zero_iff
+@[simp]
+theorem wbtw_one_zero_iff {x : R} : Wbtw R 1 x 0 ↔ x ∈ Set.Icc (0 : R) 1 := by
+  rw [wbtw_comm, wbtw_zero_one_iff]
 
 @[simp]
 theorem sbtw_zero_one_iff {x : R} : Sbtw R 0 x 1 ↔ x ∈ Set.Ioo (0 : R) 1 := by
@@ -386,7 +390,9 @@ theorem sbtw_zero_one_iff {x : R} : Sbtw R 0 x 1 ↔ x ∈ Set.Ioo (0 : R) 1 := 
     ⟨fun h => ⟨h.1.1.lt_of_ne (Ne.symm h.2.1), h.1.2.lt_of_ne h.2.2⟩, fun h =>
       ⟨⟨h.1.le, h.2.le⟩, h.1.ne', h.2.ne⟩⟩
 
--- DISSOLVED: sbtw_one_zero_iff
+@[simp]
+theorem sbtw_one_zero_iff {x : R} : Sbtw R 1 x 0 ↔ x ∈ Set.Ioo (0 : R) 1 := by
+  rw [sbtw_comm, sbtw_zero_one_iff]
 
 theorem Wbtw.trans_left {w x y z : P} (h₁ : Wbtw R w y z) (h₂ : Wbtw R w x y) : Wbtw R w x z := by
   rcases h₁ with ⟨t₁, ht₁, rfl⟩

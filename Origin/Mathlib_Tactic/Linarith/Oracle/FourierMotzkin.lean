@@ -7,6 +7,8 @@ import Mathlib.Std.Data.HashMap
 import Batteries.Lean.HashMap
 import Mathlib.Tactic.Linarith.Datatypes
 
+noncomputable section
+
 /-!
 # The Fourier-Motzkin elimination procedure
 

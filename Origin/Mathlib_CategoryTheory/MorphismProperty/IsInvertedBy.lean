@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 import Mathlib.CategoryTheory.MorphismProperty.Basic
 
+noncomputable section
+
 /-!
 # Morphism properties that are inverted by a functor
 
@@ -137,9 +139,6 @@ lemma IsInvertedBy.iff_comp {C₁ C₂ C₃ : Type*} [Category C₁] [Category C
     exact isIso_of_reflects_iso (F.map f) G
   · intro hF
     exact IsInvertedBy.of_comp W F hF G
-
-lemma IsInvertedBy.iff_le_inverseImage_isomorphisms (W : MorphismProperty C) (F : C ⥤ D) :
-    W.IsInvertedBy F ↔ W ≤ (isomorphisms D).inverseImage F := Iff.rfl
 
 lemma IsInvertedBy.iff_map_le_isomorphisms (W : MorphismProperty C) (F : C ⥤ D) :
     W.IsInvertedBy F ↔ W.map F ≤ isomorphisms D := by

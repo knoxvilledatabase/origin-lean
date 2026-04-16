@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 
+noncomputable section
+
 /-!
 # Results about pointwise operations on sets and big operators.
 -/

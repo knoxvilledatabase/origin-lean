@@ -8,6 +8,8 @@ import Mathlib.Data.Matrix.Block
 import Mathlib.Data.Matrix.RowCol
 import Mathlib.Data.Matrix.Notation
 
+noncomputable section
+
 /-!
 # Trace of a matrix
 
@@ -180,6 +182,7 @@ theorem trace_units_conj (M : (Matrix m m R)ˣ) (N : Matrix m m R) :
   rw [trace_mul_cycle, Units.inv_mul, one_mul]
 
 set_option linter.docPrime false in
+-- TODO(https://github.com/leanprover-community/mathlib4/issues/6607): fix elaboration so that the ascription isn't needed
 
 theorem trace_units_conj' (M : (Matrix m m R)ˣ) (N : Matrix m m R) :
     trace ((↑M⁻¹ : Matrix _ _ _) * N * (↑M : Matrix _ _ _)) = trace N :=
@@ -193,10 +196,6 @@ variable [AddCommMonoid R]
 
 /-! ### Special cases for `Fin n` for low values of `n`
 -/
-
-@[simp]
-theorem trace_fin_zero (A : Matrix (Fin 0) (Fin 0) R) : trace A = 0 :=
-  rfl
 
 theorem trace_fin_one (A : Matrix (Fin 1) (Fin 1) R) : trace A = A 0 0 :=
   add_zero _

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
+noncomputable section
+
 /-!
 # Results on discretized exponentials
 

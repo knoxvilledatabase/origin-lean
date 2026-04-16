@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Path
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 
 # Acyclic graphs and trees

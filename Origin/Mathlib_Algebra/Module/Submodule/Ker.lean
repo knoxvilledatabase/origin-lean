@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Module/Submodule/Ker.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Ker
 import Mathlib.Algebra.Module.Submodule.Map
+
+noncomputable section
 
 /-!
 # Kernel of a linear map
@@ -65,15 +67,8 @@ theorem mem_ker {f : F} {y} : y ∈ ker f ↔ f y = 0 :=
   mem_bot R₂
 
 @[simp]
-theorem ker_id : ker (LinearMap.id : M →ₗ[R] M) = ⊥ :=
-  rfl
-
-@[simp]
 theorem map_coe_ker (f : F) (x : ker f) : f x = 0 :=
   mem_ker.1 x.2
-
-theorem ker_toAddSubmonoid (f : M →ₛₗ[τ₁₂] M₂) : f.ker.toAddSubmonoid = (AddMonoidHom.mker f) :=
-  rfl
 
 theorem comp_ker_subtype (f : M →ₛₗ[τ₁₂] M₂) : f.comp f.ker.subtype = 0 :=
   LinearMap.ext fun x => mem_ker.1 x.2
@@ -128,10 +123,6 @@ theorem ker_zero : ker (0 : M →ₛₗ[τ₁₂] M₂) = ⊤ :=
 theorem ker_eq_top {f : M →ₛₗ[τ₁₂] M₂} : ker f = ⊤ ↔ f = 0 :=
   ⟨fun h => ext fun _ => mem_ker.1 <| h.symm ▸ trivial, fun h => h.symm ▸ ker_zero⟩
 
-@[simp]
-theorem _root_.AddMonoidHom.coe_toIntLinearMap_ker {M M₂ : Type*} [AddCommGroup M] [AddCommGroup M₂]
-    (f : M →+ M₂) : LinearMap.ker f.toIntLinearMap = AddSubgroup.toIntSubmodule f.ker := rfl
-
 theorem ker_eq_bot_of_injective {f : F} (hf : Injective f) : ker f = ⊥ := by
   have : Disjoint ⊤ (ker f) := by
     -- Porting note: `← map_zero f` should work here, but it needs to be directly applied to H.
@@ -166,9 +157,6 @@ variable {F : Type*} [FunLike F M M₂] [SemilinearMapClass F τ₁₂ M M₂]
 variable {f : F}
 
 open Submodule
-
-theorem ker_toAddSubgroup (f : M →ₛₗ[τ₁₂] M₂) : (ker f).toAddSubgroup = f.toAddMonoidHom.ker :=
-  rfl
 
 theorem sub_mem_ker_iff {x y} : x - y ∈ ker f ↔ f x = f y := by rw [mem_ker, map_sub, sub_eq_zero]
 
@@ -221,9 +209,11 @@ variable [AddCommMonoid V] [Module K V]
 
 variable [AddCommMonoid V₂] [Module K V₂]
 
--- DISSOLVED: ker_smul
+theorem ker_smul (f : V →ₗ[K] V₂) (a : K) (h : a ≠ 0) : ker (a • f) = ker f :=
+  Submodule.comap_smul f _ a h
 
--- DISSOLVED: ker_smul'
+theorem ker_smul' (f : V →ₗ[K] V₂) (a : K) : ker (a • f) = ⨅ _ : a ≠ 0, ker f :=
+  Submodule.comap_smul' f _ a
 
 end Semifield
 

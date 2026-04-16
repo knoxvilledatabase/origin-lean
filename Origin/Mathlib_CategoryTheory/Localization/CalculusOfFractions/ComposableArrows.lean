@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ComposableArrows
 import Mathlib.CategoryTheory.Localization.CalculusOfFractions
 
+noncomputable section
+
 /-! # Essential surjectivity of the functor induced on composable arrows
 
 Assuming that `L : C ⥤ D` is a localization functor for a class of morphisms `W`

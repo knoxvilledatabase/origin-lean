@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.LocalExtr.Basic
 
+noncomputable section
+
 /-!
 # Darboux's theorem
 

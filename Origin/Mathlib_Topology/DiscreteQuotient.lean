@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Setoid.Partition
 import Mathlib.Topology.LocallyConstant.Basic
 
+noncomputable section
+
 /-!
 
 # Discrete quotients of a topological space.
@@ -155,13 +157,6 @@ def comap (S : DiscreteQuotient Y) : DiscreteQuotient X where
   toSetoid := Setoid.comap f S.1
   isOpen_setOf_rel _ := (S.2 _).preimage f.continuous
 
-@[simp]
-theorem comap_id : S.comap (ContinuousMap.id X) = S := rfl
-
-@[simp]
-theorem comap_comp (S : DiscreteQuotient Z) : S.comap (g.comp f) = (S.comap g).comap f :=
-  rfl
-
 @[mono]
 theorem comap_mono {A B : DiscreteQuotient Y} (h : A ≤ B) : A.comap f ≤ B.comap f := by tauto
 
@@ -178,8 +173,6 @@ def ofLE (h : A ≤ B) : A → B :=
 theorem ofLE_refl : ofLE (le_refl A) = id := by
   ext ⟨⟩
   rfl
-
-theorem ofLE_refl_apply (a : A) : ofLE (le_refl A) a = a := by simp
 
 @[simp]
 theorem ofLE_ofLE (h₁ : A ≤ B) (h₂ : B ≤ C) (x : A) :
@@ -238,10 +231,6 @@ theorem leComap_id : LEComap (.id X) A A := le_rfl
 
 variable {A A' B B'} {f} {g : C(Y, Z)} {C : DiscreteQuotient Z}
 
-@[simp]
-theorem leComap_id_iff : LEComap (ContinuousMap.id X) A A' ↔ A ≤ A' :=
-  Iff.rfl
-
 theorem LEComap.comp : LEComap g B C → LEComap f A B → LEComap (g.comp f) A C := by tauto
 
 @[mono]
@@ -252,14 +241,6 @@ def map (f : C(X, Y)) (cond : LEComap f A B) : A → B := Quotient.map' f cond
 
 theorem map_continuous (cond : LEComap f A B) : Continuous (map f cond) :=
   continuous_of_discreteTopology
-
-@[simp]
-theorem map_comp_proj (cond : LEComap f A B) : map f cond ∘ A.proj = B.proj ∘ f :=
-  rfl
-
-@[simp]
-theorem map_proj (cond : LEComap f A B) (x : X) : map f cond (A.proj x) = B.proj (f x) :=
-  rfl
 
 @[simp]
 theorem map_id : map _ (leComap_id A) = id := by ext ⟨⟩; rfl
@@ -354,7 +335,6 @@ theorem finsetClopens_inj [CompactSpace X] :
   exact h
 
 noncomputable
-
 def equivFinsetClopens [CompactSpace X] := Equiv.ofInjective _ (finsetClopens_inj X)
 
 variable {X}
@@ -371,8 +351,5 @@ def discreteQuotient : DiscreteQuotient X where
 
 def lift : LocallyConstant f.discreteQuotient α :=
   ⟨fun a => Quotient.liftOn' a f fun _ _ => id, fun _ => isOpen_discrete _⟩
-
-@[simp]
-theorem lift_comp_proj : f.lift ∘ f.discreteQuotient.proj = f := rfl
 
 end LocallyConstant

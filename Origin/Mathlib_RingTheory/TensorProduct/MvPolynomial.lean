@@ -8,6 +8,8 @@ import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.Algebra.MvPolynomial.Equiv
 
+noncomputable section
+
 /-!
 
 # Tensor Product of (multivariate) polynomial rings

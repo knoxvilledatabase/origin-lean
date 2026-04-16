@@ -7,6 +7,8 @@ import Mathlib.Analysis.CStarAlgebra.Module.Defs
 import Mathlib.Analysis.CStarAlgebra.Module.Synonym
 import Mathlib.Topology.MetricSpace.Bilipschitz
 
+noncomputable section
+
 /-! # Constructions of Hilbert C⋆-modules
 
 In this file we define the following constructions of `CStarModule`s where `A` denotes a C⋆-algebra.
@@ -82,8 +84,6 @@ instance : CStarModule A A where
 
 open scoped InnerProductSpace in
 
-lemma inner_def (x y : A) : ⟪x, y⟫_A = star x * y := rfl
-
 end Self
 
 /-! ## Products of C⋆-modules -/
@@ -133,8 +133,6 @@ noncomputable instance : CStarModule A (C⋆ᵐᵒᵈ (E × F)) where
   inner_smul_right_complex := by simp [smul_add]
   star_inner x y := by simp
   norm_eq_sqrt_norm_inner_self {x} := by with_reducible_and_instances rfl
-
-lemma prod_inner (x y : C⋆ᵐᵒᵈ (E × F)) : ⟪x, y⟫_A = ⟪x.1, y.1⟫_A + ⟪x.2, y.2⟫_A := rfl
 
 lemma max_le_prod_norm (x : C⋆ᵐᵒᵈ (E × F)) : max ‖x.1‖ ‖x.2‖ ≤ ‖x‖ := by
   rw [prod_norm]

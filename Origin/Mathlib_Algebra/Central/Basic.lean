@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Algebra.Central.Defs
 
+noncomputable section
+
 /-!
 # Central Algebras
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.AbsMax
 import Mathlib.Analysis.Asymptotics.SuperpolynomialDecay
 
+noncomputable section
+
 /-!
 # Phragmen-Lindelöf principle
 

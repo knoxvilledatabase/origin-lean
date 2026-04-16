@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Algebra.Prime.Defs
 import Mathlib.Algebra.Ring.Units
 
+noncomputable section
+
 /-!
 # Prime elements in rings
 This file contains lemmas about prime elements of commutative rings.

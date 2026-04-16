@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Analysis.Normed.MulAction
 
+noncomputable section
+
 /-!
 # The null subgroup in a seminormed commutative group
 
@@ -43,9 +45,6 @@ def nullSubgroup : Subgroup M where
 lemma isClosed_nullSubgroup : IsClosed (nullSubgroup M : Set M) := by
   apply isClosed_singleton.preimage continuous_norm'
 
-@[to_additive (attr := simp)]
-lemma mem_nullSubgroup_iff {x : M} : x ∈ nullSubgroup M ↔ ‖x‖ = 0 := Iff.rfl
-
 variable {𝕜 E : Type*}
 
 variable [SeminormedAddCommGroup E] [SeminormedRing 𝕜] [Module 𝕜 E] [BoundedSMul 𝕜 E]
@@ -60,6 +59,3 @@ def nullSubmodule : Submodule 𝕜 E where
     rw [hx, mul_zero]
 
 lemma isClosed_nullSubmodule : IsClosed (nullSubmodule 𝕜 E : Set E) := isClosed_nullAddSubgroup
-
-@[simp]
-lemma mem_nullSubmodule_iff {x : E} : x ∈ nullSubmodule 𝕜 E ↔ ‖x‖ = 0 := Iff.rfl

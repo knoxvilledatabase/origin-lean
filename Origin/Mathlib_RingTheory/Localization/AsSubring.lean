@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.RingTheory.Localization.LocalizationLocalization
 
+noncomputable section
+
 /-!
 
 # Localizations of domains as subalgebras of the fraction field.
@@ -31,12 +33,6 @@ theorem map_isUnit_of_le (hS : S ≤ A⁰) (s : S) : IsUnit (algebraMap A K s) :
 noncomputable def mapToFractionRing (B : Type*) [CommRing B] [Algebra A B] [IsLocalization S B]
     (hS : S ≤ A⁰) : B →ₐ[A] K :=
   { IsLocalization.lift (map_isUnit_of_le K S hS) with commutes' := fun a => by simp }
-
-@[simp]
-theorem mapToFractionRing_apply {B : Type*} [CommRing B] [Algebra A B] [IsLocalization S B]
-    (hS : S ≤ A⁰) (b : B) :
-    mapToFractionRing K S B hS b = IsLocalization.lift (map_isUnit_of_le K S hS) b :=
-  rfl
 
 theorem mem_range_mapToFractionRing_iff (B : Type*) [CommRing B] [Algebra A B] [IsLocalization S B]
     (hS : S ≤ A⁰) (x : K) :

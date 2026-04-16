@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.TypeStar
 import Mathlib.Tactic.Simps.NotationClass
 
+noncomputable section
+
 /-!
 # Notation classes for lattice operations
 

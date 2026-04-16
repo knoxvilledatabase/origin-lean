@@ -9,6 +9,8 @@ import Mathlib.Data.Sigma.Basic
 import Mathlib.Order.Lattice
 import Mathlib.Order.BoundedOrder.Basic
 
+noncomputable section
+
 /-!
 # Orders on a sigma type
 

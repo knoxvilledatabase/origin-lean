@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.LinearAlgebra.Prod
 
+noncomputable section
+
 /-!
 # Projection to a subspace
 
@@ -73,11 +75,6 @@ def quotientEquivOfIsCompl (h : IsCompl p q) : (E ⧸ p) ≃ₗ[R] q :=
         rw [← range_eq_top, range_comp, range_subtype, map_mkQ_eq_top, h.sup_eq_top]⟩
 
 @[simp]
-theorem quotientEquivOfIsCompl_symm_apply (h : IsCompl p q) (x : q) :
-    -- Porting note: type ascriptions needed on the RHS
-    (quotientEquivOfIsCompl p q h).symm x = (Quotient.mk (x : E) : E ⧸ p) := rfl
-
-@[simp]
 theorem quotientEquivOfIsCompl_apply_mk_coe (h : IsCompl p q) (x : q) :
     quotientEquivOfIsCompl p q h (Quotient.mk x) = x :=
   (quotientEquivOfIsCompl p q h).apply_symm_apply x
@@ -98,10 +95,6 @@ def prodEquivOfIsCompl (h : IsCompl p q) : (p × q) ≃ₗ[R] E := by
 @[simp]
 theorem coe_prodEquivOfIsCompl (h : IsCompl p q) :
     (prodEquivOfIsCompl p q h : p × q →ₗ[R] E) = p.subtype.coprod q.subtype := rfl
-
-@[simp]
-theorem coe_prodEquivOfIsCompl' (h : IsCompl p q) (x : p × q) :
-    prodEquivOfIsCompl p q h x = x.1 + x.2 := rfl
 
 @[simp]
 theorem prodEquivOfIsCompl_symm_apply_left (h : IsCompl p q) (x : p) :
@@ -255,11 +248,6 @@ def ofIsComplProd {p q : Submodule R₁ E} (h : IsCompl p q) :
   map_add' := by intro φ ψ; dsimp only; rw [Prod.snd_add, Prod.fst_add, ofIsCompl_add]
   map_smul' := by intro c φ; simp [Prod.smul_snd, Prod.smul_fst, ofIsCompl_smul]
 
-@[simp]
-theorem ofIsComplProd_apply {p q : Submodule R₁ E} (h : IsCompl p q)
-    (φ : (p →ₗ[R₁] F) × (q →ₗ[R₁] F)) : ofIsComplProd h φ = ofIsCompl h φ.1 φ.2 :=
-  rfl
-
 def ofIsComplProdEquiv {p q : Submodule R₁ E} (h : IsCompl p q) :
     ((p →ₗ[R₁] F) × (q →ₗ[R₁] F)) ≃ₗ[R₁] E →ₗ[R₁] F :=
   { ofIsComplProd h with
@@ -290,16 +278,6 @@ def equivProdOfSurjectiveOfIsCompl (f : E →ₗ[R] F) (g : E →ₗ[R] G) (hf :
       rw [← range_eq_top]
       simp [range_prod_eq hfg.sup_eq_top, *]⟩
 
-@[simp]
-theorem coe_equivProdOfSurjectiveOfIsCompl {f : E →ₗ[R] F} {g : E →ₗ[R] G} (hf : range f = ⊤)
-    (hg : range g = ⊤) (hfg : IsCompl (ker f) (ker g)) :
-    (equivProdOfSurjectiveOfIsCompl f g hf hg hfg : E →ₗ[R] F × G) = f.prod g := rfl
-
-@[simp]
-theorem equivProdOfSurjectiveOfIsCompl_apply {f : E →ₗ[R] F} {g : E →ₗ[R] G} (hf : range f = ⊤)
-    (hg : range g = ⊤) (hfg : IsCompl (ker f) (ker g)) (x : E) :
-    equivProdOfSurjectiveOfIsCompl f g hf hg hfg x = (f x, g x) := rfl
-
 end LinearMap
 
 namespace Submodule
@@ -311,27 +289,6 @@ def isComplEquivProj : { q // IsCompl p q } ≃ { f : E →ₗ[R] p // ∀ x : p
   invFun f := ⟨ker (f : E →ₗ[R] p), isCompl_of_proj f.2⟩
   left_inv := fun ⟨q, hq⟩ => by simp only [linearProjOfIsCompl_ker, Subtype.coe_mk]
   right_inv := fun ⟨f, hf⟩ => Subtype.eq <| f.linearProjOfIsCompl_of_proj hf
-
-@[simp]
-theorem coe_isComplEquivProj_apply (q : { q // IsCompl p q }) :
-    (p.isComplEquivProj q : E →ₗ[R] p) = linearProjOfIsCompl p q q.2 := rfl
-
-@[simp]
-theorem coe_isComplEquivProj_symm_apply (f : { f : E →ₗ[R] p // ∀ x : p, f x = x }) :
-    (p.isComplEquivProj.symm f : Submodule R E) = ker (f : E →ₗ[R] p) := rfl
-
-@[simps] def isIdempotentElemEquiv :
-    { f : Module.End R E // IsIdempotentElem f ∧ range f = p } ≃
-    { f : E →ₗ[R] p // ∀ x : p, f x = x } where
-  toFun f := ⟨f.1.codRestrict _ fun x ↦ by simp_rw [← f.2.2]; exact mem_range_self f.1 x,
-    fun ⟨x, hx⟩ ↦ Subtype.ext <| by
-      obtain ⟨x, rfl⟩ := f.2.2.symm ▸ hx
-      exact DFunLike.congr_fun f.2.1 x⟩
-  invFun f := ⟨p.subtype ∘ₗ f.1, LinearMap.ext fun x ↦ by simp [f.2], le_antisymm
-    ((range_comp_le_range _ _).trans_eq p.range_subtype)
-    fun x hx ↦ ⟨x, Subtype.ext_iff.1 <| f.2 ⟨x, hx⟩⟩⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 end Submodule
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.FunctorCategory
 import Mathlib.CategoryTheory.Linear.Basic
 
+noncomputable section
+
 /-!
 # Linear structure on functor categories
 
@@ -65,16 +67,6 @@ instance functorCategoryLinear : Linear R (C ⥤ D) where
 namespace NatTrans
 
 variable {F G : C ⥤ D}
-
-@[simps]
-def appLinearMap (X : C) : (F ⟶ G) →ₗ[R] F.obj X ⟶ G.obj X where
-  toFun α := α.app X
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-@[simp]
-theorem app_smul (X : C) (r : R) (α : F ⟶ G) : (r • α).app X = r • α.app X :=
-  rfl
 
 end NatTrans
 

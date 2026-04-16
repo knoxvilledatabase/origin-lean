@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/NormedSpace/HahnBanach/SeparatingDual.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.HahnBanach.Extension
 import Mathlib.Analysis.NormedSpace.HahnBanach.Separation
 import Mathlib.LinearAlgebra.Dual
 import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
+
+noncomputable section
 
 /-!
 # Spaces with separating dual
@@ -22,7 +24,11 @@ Under the assumption `SeparatingDual R V`, we show in
 equivalences acts transitively on the set of nonzero vectors.
 -/
 
--- DISSOLVED: SeparatingDual
+@[mk_iff separatingDual_def]
+class SeparatingDual (R V : Type*) [Ring R] [AddCommGroup V] [TopologicalSpace V]
+    [TopologicalSpace R] [Module R V] : Prop where
+  /-- Any nonzero vector can be mapped by a continuous linear map to a nonzero scalar. -/
+  exists_ne_zero' : ∀ (x : V), x ≠ 0 → ∃ f : V →L[R] R, f x ≠ 0
 
 instance {E : Type*} [TopologicalSpace E] [AddCommGroup E] [TopologicalAddGroup E]
     [Module ℝ E] [ContinuousSMul ℝ E] [LocallyConvexSpace ℝ E] [T1Space E] : SeparatingDual ℝ E :=
@@ -44,7 +50,9 @@ section Ring
 variable {R V : Type*} [Ring R] [AddCommGroup V] [TopologicalSpace V]
   [TopologicalSpace R] [Module R V] [SeparatingDual R V]
 
--- DISSOLVED: exists_ne_zero
+lemma exists_ne_zero {x : V} (hx : x ≠ 0) :
+    ∃ f : V →L[R] R, f x ≠ 0 :=
+  exists_ne_zero' x hx
 
 theorem exists_separating_of_ne {x y : V} (h : x ≠ y) :
     ∃ f : V →L[R] R, f x ≠ f y := by
@@ -87,13 +95,52 @@ theorem dualMap_surjective_iff {W} [AddCommGroup W] [Module R W] [FiniteDimensio
   rw [← LinearMap.coe_comp] at this
   exact LinearMap.flip_surjective_iff₁.mpr this
 
--- DISSOLVED: exists_eq_one
+lemma exists_eq_one {x : V} (hx : x ≠ 0) :
+    ∃ f : V →L[R] R, f x = 1 := by
+  rcases exists_ne_zero (R := R) hx with ⟨f, hf⟩
+  exact ⟨(f x)⁻¹ • f, inv_mul_cancel₀ hf⟩
 
--- DISSOLVED: exists_eq_one_ne_zero_of_ne_zero_pair
+-- CONFLATES (assumes ground = zero): exists_eq_one_ne_zero_of_ne_zero_pair
+theorem exists_eq_one_ne_zero_of_ne_zero_pair {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ∃ f : V →L[R] R, f x = 1 ∧ f y ≠ 0 := by
+  obtain ⟨u, ux⟩ : ∃ u : V →L[R] R, u x = 1 := exists_eq_one hx
+  rcases ne_or_eq (u y) 0 with uy|uy
+  · exact ⟨u, ux, uy⟩
+  obtain ⟨v, vy⟩ : ∃ v : V →L[R] R, v y = 1 := exists_eq_one hy
+  rcases ne_or_eq (v x) 0 with vx|vx
+  · exact ⟨(v x)⁻¹ • v, inv_mul_cancel₀ vx, show (v x)⁻¹ * v y ≠ 0 by simp [vx, vy]⟩
+  · exact ⟨u + v, by simp [ux, vx], by simp [uy, vy]⟩
 
 variable [TopologicalAddGroup V]
 
--- DISSOLVED: exists_continuousLinearEquiv_apply_eq
+theorem exists_continuousLinearEquiv_apply_eq [ContinuousSMul R V]
+    {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ∃ A : V ≃L[R] V, A x = y := by
+  obtain ⟨G, Gx, Gy⟩ : ∃ G : V →L[R] R, G x = 1 ∧ G y ≠ 0 :=
+    exists_eq_one_ne_zero_of_ne_zero_pair hx hy
+  let A : V ≃L[R] V :=
+  { toFun := fun z ↦ z + G z • (y - x)
+    invFun := fun z ↦ z + ((G y) ⁻¹ * G z) • (x - y)
+    map_add' := fun a b ↦ by simp [add_smul]; abel
+    map_smul' := by simp [smul_smul]
+    left_inv := fun z ↦ by
+      simp only [id_eq, eq_mpr_eq_cast, RingHom.id_apply, smul_eq_mul, AddHom.toFun_eq_coe,
+        -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 had to change `map_smulₛₗ` into `map_smulₛₗ _`
+        AddHom.coe_mk, map_add, map_smulₛₗ _, map_sub, Gx, mul_sub, mul_one, add_sub_cancel]
+      rw [mul_comm (G z), ← mul_assoc, inv_mul_cancel₀ Gy]
+      simp only [smul_sub, one_mul]
+      abel
+    right_inv := fun z ↦ by
+        -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 had to change `map_smulₛₗ` into `map_smulₛₗ _`
+      simp only [map_add, map_smulₛₗ _, map_mul, map_inv₀, RingHom.id_apply, map_sub, Gx,
+        smul_eq_mul, mul_sub, mul_one]
+      rw [mul_comm _ (G y), ← mul_assoc, mul_inv_cancel₀ Gy]
+      simp only [smul_sub, one_mul, add_sub_cancel]
+      abel
+    continuous_toFun := continuous_id.add (G.continuous.smul continuous_const)
+    continuous_invFun :=
+      continuous_id.add ((continuous_const.mul G.continuous).smul continuous_const) }
+  exact ⟨A, show x + G x • (y - x) = y by simp [Gx]⟩
 
 open Filter
 
@@ -127,9 +174,27 @@ open ContinuousMultilinearMap
 variable {ι : Type*} [Finite ι] {M : ι → Type*} [∀ i, NormedAddCommGroup (M i)]
   [∀ i, NormedSpace 𝕜 (M i)] [∀ i, SeparatingDual 𝕜 (M i)]
 
--- DISSOLVED: completeSpace_of_completeSpace_continuousMultilinearMap
+lemma completeSpace_of_completeSpace_continuousMultilinearMap
+    [CompleteSpace (ContinuousMultilinearMap 𝕜 M F)]
+    {m : ∀ i, M i} (hm : ∀ i, m i ≠ 0) : CompleteSpace F := by
+  refine Metric.complete_of_cauchySeq_tendsto fun f hf => ?_
+  have : ∀ i, ∃ φ : M i →L[𝕜] 𝕜, φ (m i) = 1 := fun i ↦ exists_eq_one (hm i)
+  choose φ hφ using this
+  cases nonempty_fintype ι
+  let g : ℕ → (ContinuousMultilinearMap 𝕜 M F) := fun n ↦
+    compContinuousLinearMapL φ
+    (ContinuousMultilinearMap.smulRightL 𝕜 _ F ((ContinuousMultilinearMap.mkPiAlgebra 𝕜 ι 𝕜)) (f n))
+  have : CauchySeq g := by
+    refine (ContinuousLinearMap.lipschitz _).cauchySeq_comp ?_
+    exact (ContinuousLinearMap.lipschitz _).cauchySeq_comp hf
+  obtain ⟨a, ha⟩ : ∃ a, Tendsto g atTop (𝓝 a) := cauchy_iff_exists_le_nhds.mp this
+  refine ⟨a m, ?_⟩
+  have : Tendsto (fun n ↦ g n m) atTop (𝓝 (a m)) := ((continuous_eval_const _).tendsto _).comp ha
+  simpa [g, hφ]
 
--- DISSOLVED: completeSpace_continuousMultilinearMap_iff
+lemma completeSpace_continuousMultilinearMap_iff {m : ∀ i, M i} (hm : ∀ i, m i ≠ 0) :
+    CompleteSpace (ContinuousMultilinearMap 𝕜 M F) ↔ CompleteSpace F :=
+  ⟨fun _h ↦ completeSpace_of_completeSpace_continuousMultilinearMap 𝕜 F hm, fun _h ↦ inferInstance⟩
 
 end
 

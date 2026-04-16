@@ -7,6 +7,8 @@ import Mathlib.RingTheory.DedekindDomain.AdicValuation
 import Mathlib.RingTheory.DedekindDomain.Factorization
 import Mathlib.Algebra.Order.GroupWithZero.WithZero
 
+noncomputable section
+
 /-!
 # The finite adèle ring of a Dedekind domain
 We define the ring of finite adèles of a Dedekind domain `R`.
@@ -124,10 +126,6 @@ section AlgebraInstances
 instance : Algebra K (K_hat R K) :=
   (by infer_instance : Algebra K <| ∀ v : HeightOneSpectrum R, v.adicCompletion K)
 
-@[simp]
-lemma ProdAdicCompletions.algebraMap_apply' (k : K) :
-    algebraMap K (K_hat R K) k v = (k : v.adicCompletion K) := rfl
-
 instance ProdAdicCompletions.algebra' : Algebra R (K_hat R K) :=
   (by infer_instance : Algebra R <| ∀ v : HeightOneSpectrum R, v.adicCompletion K)
 
@@ -158,9 +156,6 @@ def Coe.algHom : AlgHom R (R_hat R K) (K_hat R K) :=
     toFun := (↑)
     commutes' := fun _ => rfl }
 
-theorem Coe.algHom_apply (x : R_hat R K) (v : HeightOneSpectrum R) : (Coe.algHom R K) x v = x v :=
-  rfl
-
 end FiniteIntegralAdeles
 
 /-! ### The finite adèle ring of a Dedekind domain
@@ -174,10 +169,6 @@ variable {R K}
 
 def IsFiniteAdele (x : K_hat R K) :=
   ∀ᶠ v : HeightOneSpectrum R in Filter.cofinite, x v ∈ v.adicCompletionIntegers K
-
-@[simp]
-lemma isFiniteAdele_iff (x : K_hat R K) :
-    x.IsFiniteAdele ↔ {v | x v ∉ adicCompletionIntegers K v}.Finite := Iff.rfl
 
 namespace IsFiniteAdele
 

@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Covering.Besicovitch
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Satellite configurations for Besicovitch covering lemma in vector spaces
 

@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.Harmonic.Defs
 import Mathlib.Analysis.Normed.Order.Lattice
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
+noncomputable section
+
 /-!
 # The Euler-Mascheroni constant `γ`
 

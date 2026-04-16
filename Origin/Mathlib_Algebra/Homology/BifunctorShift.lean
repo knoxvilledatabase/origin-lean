@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Bifunctor
 import Mathlib.Algebra.Homology.TotalComplexShift
 
+noncomputable section
+
 /-!
 # Behavior of the action of a bifunctor on cochain complexes with respect to shifts
 

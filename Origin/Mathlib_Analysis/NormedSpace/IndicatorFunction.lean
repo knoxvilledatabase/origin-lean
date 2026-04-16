@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.Indicator
 import Mathlib.Analysis.Normed.Group.Basic
 
+noncomputable section
+
 /-!
 # Indicator function and norm
 

@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Topology.Instances.Nat
 
+noncomputable section
+
 /-!
 # Topology on the positive natural numbers
 
@@ -18,11 +20,6 @@ open Metric
 namespace PNat
 
 instance : MetricSpace ℕ+ := inferInstanceAs (MetricSpace { n : ℕ // 0 < n })
-
-theorem dist_eq (x y : ℕ+) : dist x y = |(↑x : ℝ) - ↑y| := rfl
-
-@[simp, norm_cast]
-theorem dist_coe (x y : ℕ+) : dist (↑x : ℕ) (↑y : ℕ) = dist x y := rfl
 
 theorem isUniformEmbedding_coe : IsUniformEmbedding ((↑) : ℕ+ → ℕ) := isUniformEmbedding_subtype_val
 

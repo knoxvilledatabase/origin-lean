@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sieves
 import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
+noncomputable section
+
 /-!
 
 # Effective epimorphic sieves
@@ -77,7 +79,6 @@ def isColimitOfEffectiveEpiStruct {X Y : C} (f : Y ⟶ X) (Hf : EffectiveEpiStru
       exact hm ⟨Over.mk f, 𝟙 _, by simp⟩ }
 
 noncomputable
-
 def effectiveEpiStructOfIsColimit {X Y : C} (f : Y ⟶ X)
     (Hf : IsColimit (Sieve.generateSingleton f : Presieve X).cocone) :
     EffectiveEpiStruct f :=
@@ -173,7 +174,6 @@ def isColimitOfEffectiveEpiFamilyStruct {B : C} {α : Type*}
       exact hm ⟨Over.mk (π a), a, 𝟙 _, by simp⟩ }
 
 noncomputable
-
 def effectiveEpiFamilyStructOfIsColimit {B : C} {α : Type*}
     (X : α → C) (π : (a : α) → (X a ⟶ B))
     (H : IsColimit (Sieve.generateFamily X π : Presieve B).cocone) :

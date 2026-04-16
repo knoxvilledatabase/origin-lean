@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Ring.Nat
 
+noncomputable section
+
 /-!
 # Double countings
 
@@ -44,10 +46,6 @@ variable (r : α → β → Prop) (s : Finset α) (t : Finset β) (a : α) (b : 
 def bipartiteBelow : Finset α := {a ∈ s | r a b}
 
 def bipartiteAbove : Finset β := {b ∈ t | r a b}
-
-theorem bipartiteBelow_swap : t.bipartiteBelow (swap r) a = t.bipartiteAbove r a := rfl
-
-theorem bipartiteAbove_swap : s.bipartiteAbove (swap r) b = s.bipartiteBelow r b := rfl
 
 @[simp, norm_cast]
 theorem coe_bipartiteBelow : s.bipartiteBelow r b = ({a ∈ s | r a b} : Set α) := coe_filter _ _

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Defs
 import Mathlib.Control.Functor
 import Mathlib.Control.Basic
 
+noncomputable section
+
 /-!
 # `applicative` instances
 
@@ -130,12 +132,6 @@ end Comp
 end Functor
 
 open Functor
-
-@[functor_norm]
-theorem Comp.seq_mk {α β : Type w} {f : Type u → Type v} {g : Type w → Type u} [Applicative f]
-    [Applicative g] (h : f (g (α → β))) (x : f (g α)) :
-    Comp.mk h <*> Comp.mk x = Comp.mk ((· <*> ·) <$> h <*> x) :=
-  rfl
 
 instance {α} [One α] [Mul α] : Applicative (Const α) where
   pure _ := (1 : α)

@@ -1,10 +1,12 @@
 /-
 Extracted from Dynamics/BirkhoffSum/Average.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Dynamics.BirkhoffSum.Basic
 import Mathlib.Algebra.Module.Basic
+
+noncomputable section
 
 /-!
 # Birkhoff average
@@ -59,7 +61,10 @@ theorem birkhoffAverage_congr_ring' (S : Type*) [DivisionSemiring S] [Module S M
     birkhoffAverage (α := α) (M := M) R = birkhoffAverage S := by
   ext; apply birkhoffAverage_congr_ring
 
--- DISSOLVED: Function.IsFixedPt.birkhoffAverage_eq
+theorem Function.IsFixedPt.birkhoffAverage_eq [CharZero R] {f : α → α} {x : α} (h : IsFixedPt f x)
+    (g : α → M) {n : ℕ} (hn : n ≠ 0) : birkhoffAverage R f g n x = g x := by
+  rw [birkhoffAverage, h.birkhoffSum_eq, ← Nat.cast_smul_eq_nsmul R, inv_smul_smul₀]
+  rwa [Nat.cast_ne_zero]
 
 end birkhoffAverage
 

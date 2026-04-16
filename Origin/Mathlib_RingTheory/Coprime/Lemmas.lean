@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Coprime/Lemmas.lean
-Genuine: 35 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 35 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Int.GCD
 import Mathlib.RingTheory.Coprime.Basic
+
+noncomputable section
 
 /-!
 # Additional lemmas about elements of a ring satisfying `IsCoprime`
@@ -48,7 +50,11 @@ theorem Nat.Coprime.cast {R : Type*} [CommRing R] {a b : ℕ} (h : Nat.Coprime a
   rw [← Int.cast_natCast a, ← Int.cast_natCast b]
   exact IsCoprime.intCast h
 
--- DISSOLVED: ne_zero_or_ne_zero_of_nat_coprime
+-- CONFLATES (assumes ground = zero): ne_zero_or_ne_zero_of_nat_coprime
+theorem ne_zero_or_ne_zero_of_nat_coprime {A : Type u} [CommRing A] [Nontrivial A] {a b : ℕ}
+    (h : Nat.Coprime a b) : (a : A) ≠ 0 ∨ (b : A) ≠ 0 :=
+  IsCoprime.ne_zero_or_ne_zero (R := A) <| by
+    simpa only [map_natCast] using IsCoprime.map (Nat.Coprime.isCoprime h) (Int.castRingHom A)
 
 theorem IsCoprime.prod_left : (∀ i ∈ t, IsCoprime (s i) x) → IsCoprime (∏ i ∈ t, s i) x := by
   classical

@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import Mathlib.RingTheory.Finiteness.Basic
 
+noncomputable section
+
 /-!
 
 # Some finiteness results of tensor product

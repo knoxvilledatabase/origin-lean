@@ -8,6 +8,8 @@ import Mathlib.Order.Directed
 import Mathlib.Order.BoundedOrder.Monotone
 import Mathlib.Order.Interval.Set.Basic
 
+noncomputable section
+
 /-!
 # Upper / lower bounds
 
@@ -34,14 +36,7 @@ theorem mem_upperBounds : a ∈ upperBounds s ↔ ∀ x ∈ s, x ≤ a :=
 theorem mem_lowerBounds : a ∈ lowerBounds s ↔ ∀ x ∈ s, a ≤ x :=
   Iff.rfl
 
-lemma mem_upperBounds_iff_subset_Iic : a ∈ upperBounds s ↔ s ⊆ Iic a := Iff.rfl
-
-lemma mem_lowerBounds_iff_subset_Ici : a ∈ lowerBounds s ↔ s ⊆ Ici a := Iff.rfl
-
 theorem bddAbove_def : BddAbove s ↔ ∃ x, ∀ y ∈ s, y ≤ x :=
-  Iff.rfl
-
-theorem bddBelow_def : BddBelow s ↔ ∃ x, ∀ y ∈ s, x ≤ y :=
   Iff.rfl
 
 theorem bot_mem_lowerBounds [OrderBot α] (s : Set α) : ⊥ ∈ lowerBounds s := fun _ _ => bot_le
@@ -69,16 +64,6 @@ theorem not_bddAbove_iff {α : Type*} [LinearOrder α] {s : Set α} :
 theorem not_bddBelow_iff {α : Type*} [LinearOrder α] {s : Set α} :
     ¬BddBelow s ↔ ∀ x, ∃ y ∈ s, y < x :=
   @not_bddAbove_iff αᵒᵈ _ _
-
-@[simp] lemma bddBelow_preimage_ofDual {s : Set α} : BddBelow (ofDual ⁻¹' s) ↔ BddAbove s := Iff.rfl
-
-@[simp] lemma bddAbove_preimage_ofDual {s : Set α} : BddAbove (ofDual ⁻¹' s) ↔ BddBelow s := Iff.rfl
-
-@[simp] lemma bddBelow_preimage_toDual {s : Set αᵒᵈ} :
-    BddBelow (toDual ⁻¹' s) ↔ BddAbove s := Iff.rfl
-
-@[simp] lemma bddAbove_preimage_toDual {s : Set αᵒᵈ} :
-    BddAbove (toDual ⁻¹' s) ↔ BddBelow s := Iff.rfl
 
 theorem BddAbove.dual (h : BddAbove s) : BddBelow (ofDual ⁻¹' s) :=
   h
@@ -724,11 +709,8 @@ protected theorem OrderBot.bddBelow [OrderBot α] (s : Set α) : BddBelow s :=
   ⟨⊥, fun a _ => OrderBot.bot_le a⟩
 
 macro "bddDefault" : tactic =>
-
   `(tactic| first
-
     | apply OrderTop.bddAbove
-
     | apply OrderBot.bddBelow)
 
 /-!

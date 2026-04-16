@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.List.Basic
 import Mathlib.Data.Sigma.Basic
 
+noncomputable section
+
 /-!
 # Lists in product and sigma types
 
@@ -19,10 +21,6 @@ variable {α β : Type*}
 namespace List
 
 /-! ### product -/
-
-@[simp]
-theorem nil_product (l : List β) : (@nil α) ×ˢ l = [] :=
-  rfl
 
 @[simp]
 theorem product_cons (a : α) (l₁ : List α) (l₂ : List β) :
@@ -52,10 +50,6 @@ theorem length_product (l₁ : List α) (l₂ : List β) :
 variable {σ : α → Type*}
 
 @[simp]
-theorem nil_sigma (l : ∀ a, List (σ a)) : (@nil α).sigma l = [] :=
-  rfl
-
-@[simp]
 theorem sigma_cons (a : α) (l₁ : List α) (l₂ : ∀ a, List (σ a)) :
     (a :: l₁).sigma l₂ = map (Sigma.mk a) (l₂ a) ++ l₁.sigma l₂ :=
   rfl
@@ -72,6 +66,7 @@ theorem mem_sigma {l₁ : List α} {l₂ : ∀ a, List (σ a)} {a : α} {b : σ 
     exists_eq_left, heq_iff_eq, exists_eq_right]
 
 set_option linter.deprecated false in
+/-- See `List.length_sigma` for the corresponding statement using `List.sum`. -/
 
 theorem length_sigma' (l₁ : List α) (l₂ : ∀ a, List (σ a)) :
     length (l₁.sigma l₂) = Nat.sum (l₁.map fun a ↦ length (l₂ a)) := by

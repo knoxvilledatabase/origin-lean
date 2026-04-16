@@ -8,6 +8,8 @@ import Mathlib.Order.CompleteLatticeIntervals
 import Mathlib.Topology.Order.DenselyOrdered
 import Mathlib.Topology.Order.Monotone
 
+noncomputable section
+
 /-!
 # Intermediate Value Theorem
 

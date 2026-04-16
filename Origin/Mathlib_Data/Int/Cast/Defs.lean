@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Nat.Cast.Defs
 
+noncomputable section
+
 /-!
 # Cast of integers
 

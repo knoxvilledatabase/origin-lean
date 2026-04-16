@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/Minpoly/IsIntegrallyClosed.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.FieldTheory.Minpoly.Field
 import Mathlib.RingTheory.Polynomial.GaussLemma
+
+noncomputable section
 
 /-!
 # Minimal polynomials over a GCD monoid
@@ -90,7 +92,11 @@ theorem ker_eval {s : S} (hs : IsIntegral R s) :
   simp_rw [RingHom.mem_ker, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom,
     isIntegrallyClosed_dvd_iff hs, ← Ideal.mem_span_singleton]
 
--- DISSOLVED: IsIntegrallyClosed.degree_le_of_ne_zero
+theorem IsIntegrallyClosed.degree_le_of_ne_zero {s : S} (hs : IsIntegral R s) {p : R[X]}
+    (hp0 : p ≠ 0) (hp : Polynomial.aeval s p = 0) : degree (minpoly R s) ≤ degree p := by
+  rw [degree_eq_natDegree (minpoly.ne_zero hs), degree_eq_natDegree hp0]
+  norm_cast
+  exact natDegree_le_of_dvd ((isIntegrallyClosed_dvd_iff hs _).mp hp) hp0
 
 theorem _root_.IsIntegrallyClosed.minpoly.unique {s : S} {P : R[X]} (hmo : P.Monic)
     (hP : Polynomial.aeval s P = 0)
@@ -135,10 +141,6 @@ def _root_.Algebra.adjoin.powerBasis' (hx : IsIntegral R x) :
   PowerBasis.map (AdjoinRoot.powerBasis' (minpoly.monic hx)) (minpoly.equivAdjoin hx)
 
 @[simp]
-theorem _root_.Algebra.adjoin.powerBasis'_dim (hx : IsIntegral R x) :
-    (Algebra.adjoin.powerBasis' hx).dim = (minpoly R x).natDegree := rfl
-
-@[simp]
 theorem _root_.Algebra.adjoin.powerBasis'_gen (hx : IsIntegral R x) :
     (adjoin.powerBasis' hx).gen = ⟨x, SetLike.mem_coe.1 <| subset_adjoin <| mem_singleton x⟩ := by
   rw [Algebra.adjoin.powerBasis', PowerBasis.map_gen, AdjoinRoot.powerBasis'_gen, equivAdjoin,
@@ -149,11 +151,6 @@ noncomputable def _root_.PowerBasis.ofGenMemAdjoin' (B : PowerBasis R S) (hint :
   (Algebra.adjoin.powerBasis' hint).map <|
     (Subalgebra.equivOfEq _ _ <| PowerBasis.adjoin_eq_top_of_gen_mem_adjoin hx).trans
       Subalgebra.topEquiv
-
-@[simp]
-theorem _root_.PowerBasis.ofGenMemAdjoin'_dim (B : PowerBasis R S) (hint : IsIntegral R x)
-    (hx : B.gen ∈ adjoin R ({x} : Set S)) :
-    (B.ofGenMemAdjoin' hint hx).dim = (minpoly R x).natDegree := rfl
 
 @[simp]
 theorem _root_.PowerBasis.ofGenMemAdjoin'_gen (B : PowerBasis R S) (hint : IsIntegral R x)

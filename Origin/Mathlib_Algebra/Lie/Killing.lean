@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.InvariantForm
 import Mathlib.Algebra.Lie.Semisimple.Basic
 import Mathlib.Algebra.Lie.TraceForm
 
+noncomputable section
+
 /-!
 # Lie algebras with non-degenerate Killing forms.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic
 import Mathlib.SetTheory.Cardinal.Finsupp
 
+noncomputable section
+
 /-!
 # Cardinality of Polynomial Ring
 

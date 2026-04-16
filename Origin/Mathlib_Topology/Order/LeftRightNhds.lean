@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Pointwise.Set
 import Mathlib.Order.Filter.AtTopBot.Group
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Neighborhoods to the left and to the right on an `OrderTopology`
 

@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SimpleGraph.Path
 import Mathlib.Combinatorics.SimpleGraph.Subgraph
 import Mathlib.SetTheory.Cardinal.Finite
 
+noncomputable section
+
 /-!
 # Counting walks of a given length
 
@@ -56,15 +58,6 @@ theorem set_walk_length_succ_eq (u v : V) (n : ℕ) :
       exact ⟨w, huw, pwv, rfl, rfl⟩
     · rintro ⟨w, huw, pwv, rfl, rfl, rfl⟩
       rfl
-
-@[simps]
-def walkLengthTwoEquivCommonNeighbors (u v : V) :
-    {p : G.Walk u v // p.length = 2} ≃ G.commonNeighbors u v where
-  toFun p := ⟨p.val.getVert 1, match p with
-    | ⟨.cons _ (.cons _ .nil), _⟩ => ⟨‹G.Adj u _›, ‹G.Adj _ v›.symm⟩⟩
-  invFun w := ⟨w.prop.1.toWalk.concat w.prop.2.symm, rfl⟩
-  left_inv | ⟨.cons _ (.cons _ .nil), hp⟩ => by rfl
-  right_inv _ := rfl
 
 section LocallyFinite
 

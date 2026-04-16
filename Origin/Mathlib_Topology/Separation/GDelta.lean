@@ -10,6 +10,8 @@ import Mathlib.Topology.Inseparable
 import Mathlib.Topology.Separation.Basic
 import Mathlib.Topology.GDelta.Basic
 
+noncomputable section
+
 /-!
 # Separation properties of topological spaces.
 

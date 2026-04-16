@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Center
 import Mathlib.Algebra.Group.Subsemigroup.Defs
 
+noncomputable section
+
 /-!
 # Centers of semigroups, as subsemigroups.
 

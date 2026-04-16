@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Localization.CalculusOfFractions
 import Mathlib.CategoryTheory.Localization.Triangulated
 import Mathlib.CategoryTheory.Shift.Localization
 
+noncomputable section
+
 /-! # Triangulated subcategories
 
 In this file, we introduce the notion of triangulated subcategory of

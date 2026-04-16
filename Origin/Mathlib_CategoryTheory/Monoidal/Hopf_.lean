@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Bimon_
 import Mathlib.CategoryTheory.Monoidal.Conv
 
+noncomputable section
+
 /-!
 # The category of Hopf monoids in a braided monoidal category.
 
@@ -35,6 +37,10 @@ class Hopf_Class (X : C) extends Bimon_Class X where
   antipode_right' : Δ ≫ X ◁ antipode ≫ μ = ε ≫ η := by aesop_cat
 
 namespace Hopf_Class
+
+@[inherit_doc] scoped notation "𝒮" => Hopf_Class.antipode
+
+@[inherit_doc] scoped notation "𝒮["X"]" => Hopf_Class.antipode (X := X)
 
 attribute [reassoc] antipode_left' antipode_right'
 

@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.CliffordAlgebra.Even
 import Mathlib.LinearAlgebra.QuadraticForm.Prod
 import Mathlib.Tactic.LiftLets
 
+noncomputable section
+
 /-!
 # Isomorphisms with the even subalgebra of a Clifford algebra
 

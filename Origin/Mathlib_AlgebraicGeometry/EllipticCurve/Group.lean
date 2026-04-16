@@ -1,12 +1,14 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Group.lean
-Genuine: 43 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
+Genuine: 45 | Conflates: 2 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.Jacobian
 import Mathlib.LinearAlgebra.FreeModule.Norm
 import Mathlib.RingTheory.ClassGroup
 import Mathlib.RingTheory.Polynomial.UniqueFactorization
+
+noncomputable section
 
 /-!
 # Group law on Weierstrass curves
@@ -207,12 +209,18 @@ section Ring
 noncomputable def XClass (x : R) : W.CoordinateRing :=
   mk W <| C <| X - C x
 
--- DISSOLVED: XClass_ne_zero
+-- CONFLATES (assumes ground = zero): XClass_ne_zero
+lemma XClass_ne_zero [Nontrivial R] (x : R) : XClass W x ≠ 0 :=
+  AdjoinRoot.mk_ne_zero_of_natDegree_lt W.monic_polynomial (C_ne_zero.mpr <| X_sub_C_ne_zero x) <|
+    by rw [natDegree_polynomial, natDegree_C]; norm_num1
 
 noncomputable def YClass (y : R[X]) : W.CoordinateRing :=
   mk W <| Y - C y
 
--- DISSOLVED: YClass_ne_zero
+-- CONFLATES (assumes ground = zero): YClass_ne_zero
+lemma YClass_ne_zero [Nontrivial R] (y : R[X]) : YClass W y ≠ 0 :=
+  AdjoinRoot.mk_ne_zero_of_natDegree_lt W.monic_polynomial (X_sub_C_ne_zero y) <|
+    by rw [natDegree_polynomial, natDegree_X_sub_C]; norm_num1
 
 lemma C_addPolynomial (x y L : R) : mk W (C <| W.addPolynomial x y L) =
     mk W ((Y - C (linePolynomial x y L)) * (W.negPolynomial - C (linePolynomial x y L))) :=
@@ -445,11 +453,20 @@ lemma degree_norm_smul_basis [IsDomain R] (p q : R[X]) :
 
 variable {W} in
 
--- DISSOLVED: degree_norm_ne_one
+lemma degree_norm_ne_one [IsDomain R] (x : W.CoordinateRing) :
+    (Algebra.norm R[X] x).degree ≠ 1 := by
+  rcases exists_smul_basis_eq x with ⟨p, q, rfl⟩
+  rw [degree_norm_smul_basis]
+  rcases p.degree with (_ | _ | _ | _) <;> cases q.degree
+  any_goals rintro (_ | _)
+  -- Porting note: replaced `dec_trivial` with `by exact (cmp_eq_lt_iff ..).mp rfl`
+  exact (lt_max_of_lt_right <| by exact (cmp_eq_lt_iff ..).mp rfl).ne'
 
 variable {W} in
 
--- DISSOLVED: natDegree_norm_ne_one
+lemma natDegree_norm_ne_one [IsDomain R] (x : W.CoordinateRing) :
+    (Algebra.norm R[X] x).natDegree ≠ 1 :=
+  degree_norm_ne_one x ∘ (degree_eq_iff_natDegree_eq_of_pos zero_lt_one).mpr
 
 end Norm
 
@@ -479,13 +496,6 @@ noncomputable def toClass : W.Point →+ Additive (ClassGroup W.CoordinateRing) 
     · have h hx hy := h ⟨hx, hy⟩
       rw [add_of_imp h]
       exact (CoordinateRing.mk_XYIdeal'_mul_mk_XYIdeal' h₁ h₂ h).symm
-
-lemma toClass_zero : toClass (0 : W.Point) = 0 :=
-  rfl
-
-lemma toClass_some {x y : F} (h : W.Nonsingular x y) :
-    toClass (some h) = ClassGroup.mk (CoordinateRing.XYIdeal' h) :=
-  rfl
 
 private lemma add_eq_zero (P Q : W.Point) : P + Q = 0 ↔ P = -Q := by
   rcases P, Q with ⟨_ | @⟨x₁, y₁, _⟩, _ | @⟨x₂, y₂, _⟩⟩

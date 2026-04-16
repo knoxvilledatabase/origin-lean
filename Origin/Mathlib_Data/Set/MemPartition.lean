@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Data.Set.Finite.Lattice
 
+noncomputable section
+
 /-!
 # Partitions based on membership of a sequence of sets
 
@@ -99,7 +101,6 @@ instance instFinite_memPartition (f : ℕ → Set α) (n : ℕ) : Finite (memPar
   Set.finite_coe_iff.mp (finite_memPartition _ _)
 
 noncomputable
-
 instance instFintype_memPartition (f : ℕ → Set α) (n : ℕ) : Fintype (memPartition f n) :=
   (finite_memPartition f n).fintype
 

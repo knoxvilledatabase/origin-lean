@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Subring.Defs
 import Mathlib.Data.Rat.Cast.Defs
 
+noncomputable section
+
 /-!
 # Subfields
 
@@ -72,10 +74,6 @@ instance instNNRatCast (s : S) : NNRatCast s where nnratCast q := ⟨q, nnratCas
 
 instance instRatCast (s : S) : RatCast s where ratCast q := ⟨q, ratCast_mem s q⟩
 
-@[simp, norm_cast] lemma coe_nnratCast (s : S) (q : ℚ≥0) : ((q : s) : K) = q := rfl
-
-@[simp, norm_cast] lemma coe_ratCast (s : S) (x : ℚ) : ((x : s) : K) = x := rfl
-
 @[aesop safe apply (rule_sets := [SetLike])]
 lemma nnqsmul_mem (s : S) (q : ℚ≥0) (hx : x ∈ s) : q • x ∈ s := by
   simpa only [NNRat.smul_def] using mul_mem (nnratCast_mem _ _) hx
@@ -138,22 +136,6 @@ instance : SubfieldClass (Subfield K) K where
   one_mem s := s.one_mem'
   inv_mem {s} := s.inv_mem' _
 
-theorem mem_carrier {s : Subfield K} {x : K} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem mem_mk {S : Subring K} {x : K} (h) : x ∈ (⟨S, h⟩ : Subfield K) ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
-theorem coe_set_mk (S : Subring K) (h) : ((⟨S, h⟩ : Subfield K) : Set K) = S :=
-  rfl
-
-@[simp]
-theorem mk_le_mk {S S' : Subring K} (h h') : (⟨S, h⟩ : Subfield K) ≤ (⟨S', h'⟩ : Subfield K) ↔
-    S ≤ S' :=
-  Iff.rfl
-
 @[ext]
 theorem ext {S T : Subfield K} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -163,20 +145,8 @@ protected def copy (S : Subfield K) (s : Set K) (hs : s = ↑S) : Subfield K :=
     carrier := s
     inv_mem' := hs.symm ▸ S.inv_mem' }
 
-@[simp]
-theorem coe_copy (S : Subfield K) (s : Set K) (hs : s = ↑S) : (S.copy s hs : Set K) = s :=
-  rfl
-
 theorem copy_eq (S : Subfield K) (s : Set K) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs
-
-@[simp]
-theorem coe_toSubring (s : Subfield K) : (s.toSubring : Set K) = s :=
-  rfl
-
-@[simp]
-theorem mem_toSubring (s : Subfield K) (x : K) : x ∈ s.toSubring ↔ x ∈ s :=
-  Iff.rfl
 
 end Subfield
 
@@ -250,68 +220,13 @@ instance toField {K} [Field K] (s : Subfield K) : Field s :=
     (fun _ _ => rfl) (fun _ _ => rfl) (fun _ _ => rfl) (fun _ _ ↦ rfl) (fun _ => rfl)
     (fun _ => rfl) (fun _ ↦ rfl) fun _ => rfl
 
-@[simp, norm_cast]
-theorem coe_add (x y : s) : (↑(x + y) : K) = ↑x + ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_sub (x y : s) : (↑(x - y) : K) = ↑x - ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_neg (x : s) : (↑(-x) : K) = -↑x :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_mul (x y : s) : (↑(x * y) : K) = ↑x * ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_div (x y : s) : (↑(x / y) : K) = ↑x / ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inv (x : s) : (↑x⁻¹ : K) = (↑x)⁻¹ :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_zero : ((0 : s) : K) = 0 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_one : ((1 : s) : K) = 1 :=
-  rfl
-
 end DerivedFromSubfieldClass
 
 def subtype (s : Subfield K) : s →+* K :=
   { s.toSubmonoid.subtype, s.toAddSubgroup.subtype with toFun := (↑) }
 
-@[simp]
-theorem coe_subtype : ⇑(s.subtype) = ((↑) : s → K) :=
-  rfl
-
 variable (K) in
 
-theorem toSubring_subtype_eq_subtype (S : Subfield K) :
-    S.toSubring.subtype = S.subtype :=
-  rfl
-
 /-! # Partial order -/
-
-theorem mem_toSubmonoid {s : Subfield K} {x : K} : x ∈ s.toSubmonoid ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toSubmonoid : (s.toSubmonoid : Set K) = s :=
-  rfl
-
-@[simp]
-theorem mem_toAddSubgroup {s : Subfield K} {x : K} : x ∈ s.toAddSubgroup ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toAddSubgroup : (s.toAddSubgroup : Set K) = s :=
-  rfl
 
 end Subfield

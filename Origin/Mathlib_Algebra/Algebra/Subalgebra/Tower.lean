@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.Algebra.Tower
 
+noncomputable section
+
 /-!
 # Subalgebras in towers of algebras
 
@@ -83,10 +85,6 @@ def restrictScalars (U : Subalgebra S A) : Subalgebra R A :=
     algebraMap_mem' := fun x ↦ by
       rw [algebraMap_apply R S A]
       exact U.algebraMap_mem _ }
-
-@[simp]
-theorem coe_restrictScalars {U : Subalgebra S A} : (restrictScalars R U : Set A) = (U : Set A) :=
-  rfl
 
 @[simp]
 theorem restrictScalars_top : restrictScalars R (⊤ : Subalgebra S A) = ⊤ :=

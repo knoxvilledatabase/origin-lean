@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.CategoryTheory.EqToHom
 
+noncomputable section
+
 /-!
 # Functors from the category of the ordered set `ℕ`
 

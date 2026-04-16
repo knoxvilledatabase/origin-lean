@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Complex
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Metric
 
+noncomputable section
+
 /-!
 # Measurability of real and complex functions
 

@@ -5,6 +5,8 @@ Genuine: 59 | Conflates: 1 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Data.Finset.Card
 
+noncomputable section
+
 /-!
 # Finsets in product types
 
@@ -37,10 +39,6 @@ protected def product (s : Finset α) (t : Finset β) : Finset (α × β) :=
 
 instance instSProd : SProd (Finset α) (Finset β) (Finset (α × β)) where
   sprod := Finset.product
-
-@[simp]
-theorem product_val : (s ×ˢ t).1 = s.1 ×ˢ t.1 :=
-  rfl
 
 @[simp]
 theorem mem_product {p : α × β} : p ∈ s ×ˢ t ↔ p.1 ∈ s ∧ p.2 ∈ t :=
@@ -153,10 +151,6 @@ theorem filter_product_card (s : Finset α) (t : Finset β) (p : α → Prop) (q
       rintro _ _ (_|_) <;> simp [*]
   · apply Finset.disjoint_filter_filter'
     exact (disjoint_compl_right.inf_left _).inf_right _
-
-@[simp]
-theorem empty_product (t : Finset β) : (∅ : Finset α) ×ˢ t = ∅ :=
-  rfl
 
 @[simp]
 theorem product_empty (s : Finset α) : s ×ˢ (∅ : Finset β) = ∅ :=
@@ -293,14 +287,6 @@ theorem diag_mono : Monotone (diag : Finset α → Finset (α × α)) := fun _ _
 @[mono]
 theorem offDiag_mono : Monotone (offDiag : Finset α → Finset (α × α)) := fun _ _ h _ hx =>
   mem_offDiag.2 <| And.imp (@h _) (And.imp_left <| @h _) <| mem_offDiag.1 hx
-
-@[simp]
-theorem diag_empty : (∅ : Finset α).diag = ∅ :=
-  rfl
-
-@[simp]
-theorem offDiag_empty : (∅ : Finset α).offDiag = ∅ :=
-  rfl
 
 @[simp]
 theorem diag_union_offDiag : s.diag ∪ s.offDiag = s ×ˢ s := by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Coalgebra.Equiv
 import Mathlib.RingTheory.Bialgebra.Hom
 
+noncomputable section
+
 /-!
 # Isomorphisms of `R`-bialgebras
 
@@ -125,10 +127,6 @@ instance : BialgEquivClass (A ≃ₐc[R] B) R A B where
 theorem toBialgHom_inj {e₁ e₂ : A ≃ₐc[R] B} : (↑e₁ : A →ₐc[R] B) = e₂ ↔ e₁ = e₂ :=
   toBialgHom_injective.eq_iff
 
-@[simp]
-theorem coe_mk {f h h₀ h₁ h₂ h₃ h₄ h₅ h₆} :
-    (⟨⟨⟨⟨⟨f, h⟩, h₀⟩, h₁, h₂⟩, h₃, h₄, h₅⟩, h₆⟩ : A ≃ₐc[R] B) = f := rfl
-
 end
 
 section
@@ -144,39 +142,6 @@ def Simps.apply {R : Type u} [CommSemiring R] {α : Type v} {β : Type w}
     (f : α ≃ₐc[R] β) : α → β := f
 
 initialize_simps_projections BialgEquiv (toFun → apply)
-
-@[simp, norm_cast]
-theorem coe_coe : ⇑(e : A →ₐc[R] B) = e :=
-  rfl
-
-@[simp]
-theorem toCoalgEquiv_eq_coe (f : A ≃ₐc[R] B) : f.toCoalgEquiv = f :=
-  rfl
-
-@[simp]
-theorem toBialgHom_eq_coe (f : A ≃ₐc[R] B) : f.toBialgHom = f :=
-  rfl
-
-@[simp]
-theorem toAlgEquiv_eq_coe (f : A ≃ₐc[R] B) : f.toAlgEquiv = f :=
-  rfl
-
-@[simp]
-theorem coe_toCoalgEquiv : ⇑(e : A ≃ₐ[R] B) = e :=
-  rfl
-
-@[simp]
-theorem coe_toBialgHom : ⇑(e : A →ₐc[R] B) = e :=
-  rfl
-
-@[simp]
-theorem coe_toAlgEquiv : ⇑(e : A ≃ₐ[R] B) = e :=
-  rfl
-
-theorem toCoalgEquiv_toCoalgHom : ((e : A ≃ₐc[R] B) : A →ₗc[R] B) = (e : A →ₐc[R] B) :=
-  rfl
-
-theorem toBialgHom_toAlgHom : ((e : A →ₐc[R] B) : A →ₐ[R] B) = e := rfl
 
 section
 
@@ -204,20 +169,9 @@ def refl : A ≃ₐc[R] A :=
 
 end
 
-@[simp]
-theorem refl_toCoalgEquiv : refl R A = CoalgEquiv.refl R A := rfl
-
-@[simp]
-theorem refl_toBialgHom : refl R A = BialgHom.id R A :=
-  rfl
-
 @[symm]
 def symm (e : A ≃ₐc[R] B) : B ≃ₐc[R] A :=
   { (e : A ≃ₗc[R] B).symm, (e : A ≃* B).symm with }
-
-@[simp]
-theorem symm_toCoalgEquiv (e : A ≃ₐc[R] B) :
-    e.symm = (e : A ≃ₗc[R] B).symm := rfl
 
 def Simps.symm_apply {R : Type*} [CommSemiring R]
     {A : Type*} {B : Type*} [Semiring A] [Semiring B] [Algebra R A] [Algebra R B]
@@ -227,30 +181,11 @@ def Simps.symm_apply {R : Type*} [CommSemiring R]
 
 initialize_simps_projections BialgEquiv (invFun → symm_apply)
 
-theorem invFun_eq_symm : e.invFun = e.symm :=
-  rfl
-
-@[simp]
-theorem coe_toEquiv_symm : e.toEquiv.symm = e.symm :=
-  rfl
-
 variable {e₁₂ : A ≃ₐc[R] B} {e₂₃ : B ≃ₐc[R] C}
 
 @[trans, simps!]
 def trans (e₁₂ : A ≃ₐc[R] B) (e₂₃ : B ≃ₐc[R] C) : A ≃ₐc[R] C :=
   { (e₁₂ : A ≃ₗc[R] B).trans (e₂₃ : B ≃ₗc[R] C), (e₁₂ : A ≃* B).trans (e₂₃ : B ≃* C) with }
-
-@[simp]
-theorem trans_toCoalgEquiv :
-    (e₁₂.trans e₂₃ : A ≃ₗc[R] C) = (e₁₂ : A ≃ₗc[R] B).trans (e₂₃ : B ≃ₗc[R] C) := rfl
-
-@[simp]
-theorem trans_toBialgHom :
-    (e₁₂.trans e₂₃ : A →ₐc[R] C) = (e₂₃ : B →ₐc[R] C).comp e₁₂ := rfl
-
-@[simp]
-theorem coe_toEquiv_trans : (e₁₂ : A ≃ B).trans e₂₃ = (e₁₂.trans e₂₃ : A ≃ C) :=
-  rfl
 
 end
 

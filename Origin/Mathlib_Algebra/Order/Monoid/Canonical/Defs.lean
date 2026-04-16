@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Monoid/Canonical/Defs.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
+Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Units.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Monoid.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE
 import Mathlib.Algebra.NeZero
 import Mathlib.Order.BoundedOrder.Basic
+
+noncomputable section
 
 /-!
 # Canonically ordered monoids
@@ -101,7 +103,9 @@ theorem bot_eq_one : (⊥ : α) = 1 :=
 theorem le_one_iff_eq_one : a ≤ 1 ↔ a = 1 :=
   (one_le a).le_iff_eq
 
--- DISSOLVED: one_lt_iff_ne_one
+@[to_additive]
+theorem one_lt_iff_ne_one : 1 < a ↔ a ≠ 1 :=
+  (one_le a).lt_iff_ne.trans ne_comm
 
 @[to_additive]
 theorem eq_one_or_one_lt (a : α) : a = 1 ∨ 1 < a := (one_le a).eq_or_lt.imp_left Eq.symm
@@ -157,7 +161,8 @@ namespace NeZero
 
 -- DISSOLVED: pos
 
--- DISSOLVED: of_gt
+theorem of_gt {M} [CanonicallyOrderedAddCommMonoid M] {x y : M} (h : x < y) : NeZero y :=
+  of_pos <| pos_of_gt h
 
 instance (priority := 10) of_gt' {M : Type*} [CanonicallyOrderedAddCommMonoid M] [One M] {y : M}
   -- Porting note: Fact.out has different type signature from mathlib3

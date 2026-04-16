@@ -10,6 +10,8 @@ import Mathlib.Topology.ContinuousMap.ContinuousMapZero
 import Mathlib.Topology.ContinuousMap.Weierstrass
 import Mathlib.Topology.ContinuousMap.Lattice
 
+noncomputable section
+
 /-!
 # The Stone-Weierstrass theorem
 

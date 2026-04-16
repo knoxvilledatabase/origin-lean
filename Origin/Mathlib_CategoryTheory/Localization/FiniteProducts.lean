@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Localization/FiniteProducts.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.ConeCategory
@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Localization.Adjunction
 import Mathlib.CategoryTheory.Localization.HasLocalization
 import Mathlib.CategoryTheory.Localization.Pi
 import Mathlib.CategoryTheory.MorphismProperty.Limits
+
+noncomputable section
 
 /-! The localized category has finite products
 
@@ -102,12 +104,16 @@ lemma preservesProductsOfShape (J : Type) [Finite J]
 variable [HasFiniteProducts C] [W.IsStableUnderFiniteProducts]
 
 include W in
-
 lemma hasFiniteProducts : HasFiniteProducts D :=
   ⟨fun _ => hasProductsOfShape L W _
     (W.isStableUnderProductsOfShape_of_isStableUnderFiniteProducts _)⟩
 
 include W in
+/-- When `C` has finite products and `W : MorphismProperty C` contains
+
+identities and is stable by finite products,
+
+then any localization functor for `W` preserves finite products. -/
 
 lemma preservesFiniteProducts :
     PreservesFiniteProducts L where

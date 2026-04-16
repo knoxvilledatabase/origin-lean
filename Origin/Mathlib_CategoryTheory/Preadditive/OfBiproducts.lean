@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 import Mathlib.GroupTheory.EckmannHilton
 import Mathlib.Tactic.CategoryTheory.Reassoc
 
+noncomputable section
+
 /-!
 # Constructing a semiadditive structure from binary biproducts
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Normed/Ring/SeminormFromBounded.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 24 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Ring.Seminorm
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
+
+noncomputable section
 
 /-!
 # seminormFromBounded
@@ -54,11 +56,27 @@ def seminormFromBounded' : R → ℝ := fun x ↦ iSup fun y : R ↦ f (x * y) /
 
 variable {f}
 
--- DISSOLVED: map_one_ne_zero
+-- CONFLATES (assumes ground = zero): map_one_ne_zero
+theorem map_one_ne_zero (f_ne_zero : f ≠ 0) (f_nonneg : 0 ≤ f)
+    (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) : f 1 ≠ 0 := by
+  intro h1
+  specialize f_mul 1
+  simp_rw [h1, one_mul, mul_zero, zero_mul] at f_mul
+  obtain ⟨z, hz⟩ := Function.ne_iff.mp f_ne_zero
+  exact hz <| (f_mul z).antisymm (f_nonneg z)
 
--- DISSOLVED: map_pow_ne_zero
+theorem map_pow_ne_zero (f_nonneg : 0 ≤ f) {x : R} (hx : IsUnit x) (hfx : f x ≠ 0) (n : ℕ)
+    (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) : f (x ^ n) ≠ 0 := by
+  have h1 : f 1 ≠ 0 := map_one_ne_zero (Function.ne_iff.mpr ⟨x, hfx⟩) f_nonneg f_mul
+  intro hxn
+  have : f 1 ≤ 0 := by simpa [← mul_pow, hxn] using f_mul (x ^ n) (hx.unit⁻¹ ^ n)
+  exact h1 <| this.antisymm (f_nonneg 1)
 
--- DISSOLVED: map_mul_zero_of_map_zero
+theorem map_mul_zero_of_map_zero (f_nonneg : 0 ≤ f)
+    (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) {x : R} (hx : f x = 0)
+    (y : R) : f (x * y) = 0 := by
+  replace f_mul : f (x * y) ≤ 0 := by simpa [hx] using f_mul x y
+  exact le_antisymm f_mul (f_nonneg _)
 
 theorem seminormFromBounded_zero (f_zero : f 0 = 0) : seminormFromBounded' f (0 : R) = 0 := by
   simp_rw [seminormFromBounded', zero_mul, f_zero, zero_div, ciSup_const]
@@ -161,7 +179,23 @@ theorem seminormFromBounded_mul (f_nonneg : 0 ≤ f)
         apply le_ciSup_of_le (seminormFromBounded_bddAbove_range f_nonneg f_mul y) (x * z)
         rw [div_le_div_iff_of_pos_right (lt_of_le_of_ne' (f_nonneg _) hxz), mul_comm x y, mul_assoc]
 
--- DISSOLVED: seminormFromBounded_one
+theorem seminormFromBounded_one (f_ne_zero : f ≠ 0) (f_nonneg : 0 ≤ f)
+    (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) :
+    seminormFromBounded' f 1 = 1 := by
+  simp_rw [seminormFromBounded', one_mul]
+  apply le_antisymm
+  · refine ciSup_le (fun x ↦ ?_)
+    by_cases hx : f x = 0
+    · rw [hx, div_zero]; exact zero_le_one
+    · rw [div_self hx]
+  · rw [← div_self (map_one_ne_zero f_ne_zero f_nonneg f_mul)]
+    have h_bdd : BddAbove (Set.range fun y ↦ f y / f y) := by
+      use (1 : ℝ)
+      rintro r ⟨y, rfl⟩
+      by_cases hy : f y = 0
+      · simp only [hy, div_zero, zero_le_one]
+      · simp only [div_self hy, le_refl]
+    exact le_ciSup h_bdd (1 : R)
 
 theorem seminormFromBounded_one_le (f_nonneg : 0 ≤ f)
     (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) :
@@ -260,7 +294,14 @@ theorem seminormFromBounded_of_mul_le (f_nonneg : 0 ≤ f) {x : R}
         exact hx
       rw [heq, mul_one, div_one]
 
--- DISSOLVED: seminormFromBounded_nonzero
+theorem seminormFromBounded_nonzero (f_ne_zero : f ≠ 0) (f_nonneg : 0 ≤ f)
+    (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) :
+    seminormFromBounded' f ≠ 0 := by
+  obtain ⟨x, hx⟩ := Function.ne_iff.mp f_ne_zero
+  rw [Function.ne_iff]
+  use x
+  rw [ne_eq, Pi.zero_apply, seminormFromBounded_eq_zero_iff f_nonneg f_mul x]
+  exact hx
 
 theorem seminormFromBounded_ker (f_nonneg : 0 ≤ f)
     (f_mul : ∀ x y : R, f (x * y) ≤ c * f x * f y) :

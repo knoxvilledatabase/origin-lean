@@ -7,6 +7,8 @@ import Mathlib.Order.Interval.Set.OrdConnected
 import Mathlib.Order.Filter.SmallSets
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # Convergence of intervals
 

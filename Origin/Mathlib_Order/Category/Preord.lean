@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
 import Mathlib.Order.Hom.Basic
 import Mathlib.Order.CompleteBooleanAlgebra
 
+noncomputable section
+
 /-!
 # Category of preorders
 
@@ -40,10 +42,6 @@ instance : CoeSort Preord Type* :=
 
 def of (α : Type*) [Preorder α] : Preord :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [Preorder α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited Preord :=
   ⟨of PUnit⟩

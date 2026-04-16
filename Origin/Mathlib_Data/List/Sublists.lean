@@ -1,12 +1,14 @@
 /-
 Extracted from Data/List/Sublists.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.List.FinRange
 import Mathlib.Data.List.Perm.Basic
 import Mathlib.Data.List.Lex
+
+noncomputable section
 
 /-! # sublists
 
@@ -27,10 +29,6 @@ namespace List
 
 @[simp]
 theorem sublists'_nil : sublists' (@nil α) = [[]] :=
-  rfl
-
-@[simp]
-theorem sublists'_singleton (a : α) : sublists' [a] = [[], [a]] :=
   rfl
 
 def sublists'Aux (a : α) (r₁ r₂ : List (List α)) : List (List α) :=
@@ -175,6 +173,7 @@ theorem map_pure_sublist_sublists (l : List α) : map pure l <+ sublists l := by
           ((append_sublist_append_right _).2 ih)
 
 set_option linter.deprecated false in
+@[deprecated map_pure_sublist_sublists (since := "2024-03-24")]
 
 theorem map_ret_sublist_sublists (l : List α) : map List.ret l <+ sublists l :=
   map_pure_sublist_sublists l

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Basic.lean
-Genuine: 19 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
+Genuine: 20 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Group.Indicator
 import Mathlib.Algebra.GroupWithZero.Action.Units
 import Mathlib.Algebra.Module.NatInt
 import Mathlib.Algebra.NoZeroSMulDivisors.Defs
+
+noncomputable section
 
 /-!
 # Further basic results about modules.
@@ -101,7 +103,9 @@ lemma support_smul_subset_right [Zero M] [SMulZeroClass R M] (f : α → R) (g :
     support (f • g) ⊆ support g :=
   fun x hbf hf ↦ hbf <| by rw [Pi.smul_apply', hf, smul_zero]
 
--- DISSOLVED: support_const_smul_of_ne_zero
+lemma support_const_smul_of_ne_zero [Zero R] [Zero M] [SMulWithZero R M] [NoZeroSMulDivisors R M]
+    (c : R) (g : α → M) (hc : c ≠ 0) : support (c • g) = support g :=
+  ext fun x ↦ by simp only [hc, mem_support, Pi.smul_apply, Ne, smul_eq_zero, false_or]
 
 lemma support_smul [Zero R] [Zero M] [SMulWithZero R M] [NoZeroSMulDivisors R M] (f : α → R)
     (g : α → M) : support (f • g) = support f ∩ support g :=

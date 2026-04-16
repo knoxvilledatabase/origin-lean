@@ -7,6 +7,8 @@ import Mathlib.Data.Fin.Fin2
 import Mathlib.Util.Notation3
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Alternate definition of `Vector` in terms of `Fin2`
 
@@ -58,14 +60,6 @@ end
 
 scoped notation a " :: " b => cons a b
 
-@[simp]
-theorem cons_fz (a : α) (v : Vector3 α n) : (a :: v) fz = a :=
-  rfl
-
-@[simp]
-theorem cons_fs (a : α) (v : Vector3 α n) (i) : (a :: v) (fs i) = v i :=
-  rfl
-
 abbrev nth (i : Fin2 n) (v : Vector3 α n) : α :=
   v i
 
@@ -91,10 +85,6 @@ def nilElim {C : Vector3 α 0 → Sort u} (H : C []) (v : Vector3 α 0) : C v :=
 def consElim {C : Vector3 α (n + 1) → Sort u} (H : ∀ (a : α) (t : Vector3 α n), C (a :: t))
     (v : Vector3 α (n + 1)) : C v := by rw [← cons_head_tail v]; apply H
 
-@[simp]
-theorem consElim_cons {C H a t} : @consElim α n C H (a :: t) = H a t :=
-  rfl
-
 @[elab_as_elim]
 protected def recOn {C : ∀ {n}, Vector3 α n → Sort u} {n} (v : Vector3 α n) (H0 : C [])
     (Hs : ∀ {n} (a) (w : Vector3 α n), C w → C (a :: w)) : C v :=
@@ -102,27 +92,10 @@ protected def recOn {C : ∀ {n}, Vector3 α n → Sort u} {n} (v : Vector3 α n
   | 0 => v.nilElim H0
   | _ + 1 => v.consElim fun a t => Hs a t (Vector3.recOn t H0 Hs)
 
-@[simp]
-theorem recOn_nil {C H0 Hs} : @Vector3.recOn α (@C) 0 [] H0 @Hs = H0 :=
-  rfl
-
-@[simp]
-theorem recOn_cons {C H0 Hs n a v} :
-    @Vector3.recOn α (@C) (n + 1) (a :: v) H0 @Hs = Hs a v (@Vector3.recOn α (@C) n v H0 @Hs) :=
-  rfl
-
 def append (v : Vector3 α m) (w : Vector3 α n) : Vector3 α (n + m) :=
   v.recOn w (fun a _ IH => a :: IH)
 
 local infixl:65 " +-+ " => Vector3.append
-
-@[simp]
-theorem append_nil (w : Vector3 α n) : [] +-+ w = w :=
-  rfl
-
-@[simp]
-theorem append_cons (a : α) (v : Vector3 α m) (w : Vector3 α n) : (a :: v) +-+ w = a :: v +-+ w :=
-  rfl
 
 @[simp]
 theorem append_left :
@@ -199,14 +172,6 @@ theorem vectorAll_iff_forall : ∀ {n} (f : Vector3 α n → Prop), VectorAll n 
 def VectorAllP (p : α → Prop) (v : Vector3 α n) : Prop :=
   Vector3.recOn v True fun a v IH =>
     @Vector3.recOn _ (fun _ => Prop) _ v (p a) fun _ _ _ => p a ∧ IH
-
-@[simp]
-theorem vectorAllP_nil (p : α → Prop) : VectorAllP p [] = True :=
-  rfl
-
-@[simp]
-theorem vectorAllP_singleton (p : α → Prop) (x : α) : VectorAllP p (cons x []) = p x :=
-  rfl
 
 @[simp]
 theorem vectorAllP_cons (p : α → Prop) (x : α) (v : Vector3 α n) :

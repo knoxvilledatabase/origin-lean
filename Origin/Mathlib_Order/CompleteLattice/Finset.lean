@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Option
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Lattice operations on finsets
 
@@ -144,12 +146,6 @@ theorem iInf_biUnion (s : Finset γ) (t : γ → Finset α) (f : α → β) :
   @iSup_biUnion _ βᵒᵈ _ _ _ _ _ _
 
 end Lattice
-
-theorem set_biUnion_coe (s : Finset α) (t : α → Set β) : ⋃ x ∈ (↑s : Set α), t x = ⋃ x ∈ s, t x :=
-  rfl
-
-theorem set_biInter_coe (s : Finset α) (t : α → Set β) : ⋂ x ∈ (↑s : Set α), t x = ⋂ x ∈ s, t x :=
-  rfl
 
 theorem set_biUnion_singleton (a : α) (s : α → Set β) : ⋃ x ∈ ({a} : Finset α), s x = s a :=
   iSup_singleton a s

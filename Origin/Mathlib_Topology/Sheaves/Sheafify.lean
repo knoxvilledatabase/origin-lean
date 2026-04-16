@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Sheaves.LocalPredicate
 import Mathlib.Topology.Sheaves.Stalks
 
+noncomputable section
+
 /-!
 # Sheafification of `Type` valued presheaves
 

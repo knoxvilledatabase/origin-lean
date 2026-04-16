@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Nilpotent.Lemmas
 import Mathlib.RingTheory.Polynomial.Nilpotent
 import Mathlib.RingTheory.Polynomial.Tower
 
+noncomputable section
+
 /-!
 # Newton-Raphson method
 

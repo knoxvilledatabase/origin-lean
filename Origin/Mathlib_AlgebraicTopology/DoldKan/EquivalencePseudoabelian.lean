@@ -8,6 +8,8 @@ import Mathlib.AlgebraicTopology.DoldKan.Compatibility
 import Mathlib.CategoryTheory.Idempotents.SimplicialObject
 import Mathlib.Tactic.SuppressCompilation
 
+noncomputable section
+
 /-!
 
 # The Dold-Kan correspondence for pseudoabelian categories
@@ -61,10 +63,6 @@ def isoN₁ :
     (toKaroubiEquivalence (SimplicialObject C)).functor ⋙
       Preadditive.DoldKan.equivalence.functor ≅ N₁ := toKaroubiCompN₂IsoN₁
 
-@[simp]
-lemma isoN₁_hom_app_f (X : SimplicialObject C) :
-    (isoN₁.hom.app X).f = PInfty := rfl
-
 def isoΓ₀ :
     (toKaroubiEquivalence (ChainComplex C ℕ)).functor ⋙ Preadditive.DoldKan.equivalence.inverse ≅
       Γ ⋙ (toKaroubiEquivalence _).functor :=
@@ -78,9 +76,6 @@ lemma N₂_map_isoΓ₀_hom_app_f (X : ChainComplex C ℕ) :
 
 def equivalence : SimplicialObject C ≌ ChainComplex C ℕ :=
   Compatibility.equivalence isoN₁ isoΓ₀
-
-theorem equivalence_functor : (equivalence : SimplicialObject C ≌ _).functor = N :=
-  rfl
 
 theorem equivalence_inverse : (equivalence : SimplicialObject C ≌ _).inverse = Γ :=
   rfl

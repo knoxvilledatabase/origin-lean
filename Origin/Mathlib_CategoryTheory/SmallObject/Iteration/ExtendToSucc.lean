@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.SmallObject.Iteration.Basic
 
+noncomputable section
+
 /-!
 # Extension of a functor from `Set.Iic j` to `Set.Iic (Order.succ j)`
 
@@ -103,6 +105,9 @@ end extendToSucc
 open extendToSucc in
 
 include hj in
+/-- The extension to `Set.Iic (Order.succ j) ⥤ C` of a functor `F : Set.Iic j ⥤ C`,
+
+when we specify a morphism `F.obj ⟨j, _⟩ ⟶ X`. -/
 
 def extendToSucc : Set.Iic (Order.succ j) ⥤ C where
   obj := obj F X

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Data.Nat.Choose.Cast
 import Mathlib.NumberTheory.Bernoulli
 
+noncomputable section
+
 /-!
 # Bernoulli polynomials
 

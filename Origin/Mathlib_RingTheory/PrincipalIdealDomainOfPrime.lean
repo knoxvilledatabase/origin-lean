@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Ideal.Colon
 import Mathlib.RingTheory.PrincipalIdealDomain
 
+noncomputable section
+
 /-!
 # Principal ideal domains and prime ideals
 

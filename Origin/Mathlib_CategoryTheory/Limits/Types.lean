@@ -7,6 +7,8 @@ import Mathlib.Data.TypeMax
 import Mathlib.Logic.UnivLE
 import Mathlib.CategoryTheory.Limits.Shapes.Images
 
+noncomputable section
+
 /-!
 # Limits in the category of types.
 
@@ -290,9 +292,6 @@ def Quot.desc : Quot F → c.pt :=
     exact congr_fun (c.ι.naturality φ).symm x
 
 @[simp]
-lemma Quot.ι_desc (j : J) (x : F.obj j) : Quot.desc c (Quot.ι F j x) = c.ι.app j x := rfl
-
-@[simp]
 lemma Quot.map_ι {j j' : J} {f : j ⟶ j'} (x : F.obj j) : Quot.ι F j' (F.map f x) = Quot.ι F j x :=
   (Quot.sound ⟨f, rfl⟩).symm
 
@@ -561,7 +560,6 @@ private noncomputable def limitOfSurjectionsSurjective.preimage
     | n+1 => (hF n (preimage a n)).choose
 
 include hF in
-
 open limitOfSurjectionsSurjective in
 
 lemma surjective_π_app_zero_of_surjective_map_aux :
@@ -622,20 +620,6 @@ def opCompYonedaSectionsEquiv (F : J ⥤ C) (X : C) :
         rw [Category.comp_id]
         exact (s.property f.op) }
   invFun τ := ⟨fun j => τ.app j.unop, fun {j j'} f => by simp [τ.naturality f.unop]⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
-
-@[simps]
-def compYonedaSectionsEquiv (F : J ⥤ Cᵒᵖ) (X : C) :
-    (F ⋙ yoneda.obj X).sections ≃ ((const J).obj (op X) ⟶ F) where
-  toFun s :=
-    { app := fun j => (s.val j).op
-      naturality := fun j j' f => by
-        dsimp
-        rw [Category.id_comp]
-        exact Quiver.Hom.unop_inj (s.property f).symm }
-  invFun τ := ⟨fun j => (τ.app j).unop,
-    fun {j j'} f => Quiver.Hom.op_inj (by simpa using (τ.naturality f).symm)⟩
   left_inv _ := rfl
   right_inv _ := rfl
 

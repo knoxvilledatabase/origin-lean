@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Group/Pointwise/Interval.lean
-Genuine: 137 | Conflates: 0 | Dissolved: 4 | Infrastructure: 12
+Genuine: 141 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.Algebra.Order.Group.MinMax
 import Mathlib.Algebra.Order.Interval.Set.Monoid
 import Mathlib.Order.Interval.Set.UnorderedInterval
+
+noncomputable section
 
 /-!
 # (Pre)images of intervals
@@ -337,22 +339,6 @@ theorem image_add_const_Iio : (fun x => x + a) '' Iio b = Iio (b + a) := by simp
 ### Images under `x ↦ -x`
 -/
 
-theorem image_neg_Ici : Neg.neg '' Ici a = Iic (-a) := by simp
-
-theorem image_neg_Iic : Neg.neg '' Iic a = Ici (-a) := by simp
-
-theorem image_neg_Ioi : Neg.neg '' Ioi a = Iio (-a) := by simp
-
-theorem image_neg_Iio : Neg.neg '' Iio a = Ioi (-a) := by simp
-
-theorem image_neg_Icc : Neg.neg '' Icc a b = Icc (-b) (-a) := by simp
-
-theorem image_neg_Ico : Neg.neg '' Ico a b = Ioc (-b) (-a) := by simp
-
-theorem image_neg_Ioc : Neg.neg '' Ioc a b = Ico (-b) (-a) := by simp
-
-theorem image_neg_Ioo : Neg.neg '' Ioo a b = Ioo (-b) (-a) := by simp
-
 /-!
 ### Images under `x ↦ a - x`
 -/
@@ -477,8 +463,6 @@ theorem preimage_const_sub_uIcc : (fun x => a - x) ⁻¹' [[b, c]] = [[a - b, a 
 
 theorem image_const_add_uIcc : (fun x => a + x) '' [[b, c]] = [[a + b, a + c]] := by simp [add_comm]
 
-theorem image_add_const_uIcc : (fun x => x + a) '' [[b, c]] = [[b + a, c + a]] := by simp
-
 @[simp]
 theorem image_const_sub_uIcc : (fun x => a - x) '' [[b, c]] = [[a - b, a - c]] := by
   have := image_comp (fun x => a + x) fun x => -x; dsimp [Function.comp_def] at this
@@ -487,8 +471,6 @@ theorem image_const_sub_uIcc : (fun x => a - x) '' [[b, c]] = [[a - b, a - c]] :
 @[simp]
 theorem image_sub_const_uIcc : (fun x => x - a) '' [[b, c]] = [[b - a, c - a]] := by
   simp [sub_eq_add_neg, add_comm]
-
-theorem image_neg_uIcc : Neg.neg '' [[a, b]] = [[-a, -b]] := by simp
 
 variable {a b c d}
 
@@ -659,13 +641,35 @@ theorem preimage_const_mul_Icc_of_neg (a b : α) {c : α} (h : c < 0) :
     (c * ·) ⁻¹' Icc a b = Icc (b / c) (a / c) := by
   simpa only [mul_comm] using preimage_mul_const_Icc_of_neg a b h
 
--- DISSOLVED: preimage_mul_const_uIcc
+@[simp]
+theorem preimage_mul_const_uIcc (ha : a ≠ 0) (b c : α) :
+    (· * a) ⁻¹' [[b, c]] = [[b / a, c / a]] :=
+  (lt_or_gt_of_ne ha).elim
+    (fun h => by
+      simp [← Icc_min_max, h, h.le, min_div_div_right_of_nonpos, max_div_div_right_of_nonpos])
+    fun ha : 0 < a => by simp [← Icc_min_max, ha, ha.le, min_div_div_right, max_div_div_right]
 
--- DISSOLVED: preimage_const_mul_uIcc
+@[simp]
+theorem preimage_const_mul_uIcc (ha : a ≠ 0) (b c : α) :
+    (a * ·) ⁻¹' [[b, c]] = [[b / a, c / a]] := by
+  simp only [← preimage_mul_const_uIcc ha, mul_comm]
 
--- DISSOLVED: preimage_div_const_uIcc
+@[simp]
+theorem preimage_div_const_uIcc (ha : a ≠ 0) (b c : α) :
+    (fun x => x / a) ⁻¹' [[b, c]] = [[b * a, c * a]] := by
+  simp only [div_eq_mul_inv, preimage_mul_const_uIcc (inv_ne_zero ha), inv_inv]
 
--- DISSOLVED: preimage_const_mul_Ioi_or_Iio
+lemma preimage_const_mul_Ioi_or_Iio (hb : a ≠ 0) {U V : Set α}
+    (hU : U ∈ {s | ∃ a, s = Ioi a ∨ s = Iio a}) (hV : V = HMul.hMul a ⁻¹' U) :
+    V ∈ {s | ∃ a, s = Ioi a ∨ s = Iio a} := by
+  obtain ⟨aU, (haU | haU)⟩ := hU <;>
+  simp only [hV, haU, mem_setOf_eq] <;>
+  use a⁻¹ * aU <;>
+  rcases lt_or_gt_of_ne hb with (hb | hb)
+  · right; rw [Set.preimage_const_mul_Ioi_of_neg _ hb, div_eq_inv_mul]
+  · left; rw [Set.preimage_const_mul_Ioi _ hb, div_eq_inv_mul]
+  · left; rw [Set.preimage_const_mul_Iio_of_neg _ hb, div_eq_inv_mul]
+  · right; rw [Set.preimage_const_mul_Iio _ hb, div_eq_inv_mul]
 
 @[simp]
 theorem image_mul_const_uIcc (a b c : α) : (· * a) '' [[b, c]] = [[b * a, c * a]] :=

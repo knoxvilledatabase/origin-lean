@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Dimension/FreeAndStrongRankCondition.lean
-Genuine: 16 | Conflates: 4 | Dissolved: 3 | Infrastructure: 2
+Genuine: 18 | Conflates: 4 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.LinearAlgebra.Dimension.Constructions
+
+noncomputable section
 
 /-!
 
@@ -32,10 +34,6 @@ noncomputable def Basis.ofRankEqZero [Module.Free K V] {ι : Type*} [IsEmpty ι]
     haveI := mk_eq_zero_iff.1 (hV ▸ b.mk_eq_rank'')
     exact b.repr.toEquiv.subsingleton
   Basis.empty _
-
-@[simp]
-theorem Basis.ofRankEqZero_apply [Module.Free K V] {ι : Type*} [IsEmpty ι]
-    (hV : Module.rank K V = 0) (i : ι) : Basis.ofRankEqZero hV i = 0 := rfl
 
 theorem le_rank_iff_exists_linearIndependent [Module.Free K V] {c : Cardinal} :
     c ≤ Module.rank K V ↔ ∃ s : Set V, #s = c ∧ LinearIndependent K ((↑) : s → V) := by
@@ -89,7 +87,21 @@ theorem rank_le_one_iff [Module.Free K V] :
     refine (rank_span_le _).trans_eq ?_
     simp
 
--- DISSOLVED: rank_eq_one_iff
+theorem rank_eq_one_iff [Module.Free K V] :
+    Module.rank K V = 1 ↔ ∃ v₀ : V, v₀ ≠ 0 ∧ ∀ v, ∃ r : K, r • v₀ = v := by
+  haveI := nontrivial_of_invariantBasisNumber K
+  refine ⟨fun h ↦ ?_, fun ⟨v₀, h, hv⟩ ↦ (rank_le_one_iff.2 ⟨v₀, hv⟩).antisymm ?_⟩
+  · obtain ⟨v₀, hv⟩ := rank_le_one_iff.1 h.le
+    refine ⟨v₀, fun hzero ↦ ?_, hv⟩
+    simp_rw [hzero, smul_zero, exists_const] at hv
+    haveI : Subsingleton V := .intro fun _ _ ↦ by simp_rw [← hv]
+    exact one_ne_zero (h ▸ rank_subsingleton' K V)
+  · by_contra H
+    rw [not_le, lt_one_iff_zero] at H
+    obtain ⟨κ, b⟩ := Module.Free.exists_basis (R := K) (M := V)
+    haveI := mk_eq_zero_iff.1 (H ▸ b.mk_eq_rank'')
+    haveI := b.repr.toEquiv.subsingleton
+    exact h (Subsingleton.elim _ _)
 
 theorem rank_submodule_le_one_iff (s : Submodule K V) [Module.Free K s] :
     Module.rank K s ≤ 1 ↔ ∃ v₀ ∈ s, s ≤ K ∙ v₀ := by
@@ -108,7 +120,17 @@ theorem rank_submodule_le_one_iff (s : Submodule K V) [Module.Free K s] :
     use r
     rwa [Subtype.ext_iff, coe_smul]
 
--- DISSOLVED: rank_submodule_eq_one_iff
+theorem rank_submodule_eq_one_iff (s : Submodule K V) [Module.Free K s] :
+    Module.rank K s = 1 ↔ ∃ v₀ ∈ s, v₀ ≠ 0 ∧ s ≤ K ∙ v₀ := by
+  simp_rw [rank_eq_one_iff, le_span_singleton_iff]
+  refine ⟨fun ⟨⟨v₀, hv₀⟩, H, h⟩ ↦ ⟨v₀, hv₀, fun h' ↦ by
+    simp only [h', ne_eq] at H; exact H rfl, fun v hv ↦ ?_⟩,
+    fun ⟨v₀, hv₀, H, h⟩ ↦ ⟨⟨v₀, hv₀⟩,
+      fun h' ↦ H (by rwa [AddSubmonoid.mk_eq_zero] at h'), fun ⟨v, hv⟩ ↦ ?_⟩⟩
+  · obtain ⟨r, hr⟩ := h ⟨v, hv⟩
+    exact ⟨r, by rwa [Subtype.ext_iff, coe_smul] at hr⟩
+  · obtain ⟨r, hr⟩ := h v hv
+    exact ⟨r, by rwa [Subtype.ext_iff, coe_smul]⟩
 
 theorem rank_submodule_le_one_iff' (s : Submodule K V) [Module.Free K s] :
     Module.rank K s ≤ 1 ↔ ∃ v₀, s ≤ K ∙ v₀ := by
@@ -147,7 +169,10 @@ theorem finrank_eq_one_iff [Module.Free K V] (ι : Type*) [Unique ι] :
   · rintro ⟨b⟩
     simpa using finrank_eq_card_basis b
 
--- DISSOLVED: finrank_eq_one_iff'
+theorem finrank_eq_one_iff' [Module.Free K V] :
+    finrank K V = 1 ↔ ∃ v ≠ 0, ∀ w : V, ∃ c : K, c • v = w := by
+  rw [← rank_eq_one_iff]
+  exact toNat_eq_iff one_ne_zero
 
 theorem finrank_le_one_iff [Module.Free K V] [Module.Finite K V] :
     finrank K V ≤ 1 ↔ ∃ v : V, ∀ w : V, ∃ c : K, c • v = w := by

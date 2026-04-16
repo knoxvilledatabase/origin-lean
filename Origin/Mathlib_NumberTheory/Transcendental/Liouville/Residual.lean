@@ -8,6 +8,8 @@ import Mathlib.Topology.Baire.Lemmas
 import Mathlib.Topology.Baire.LocallyCompactRegular
 import Mathlib.Topology.Instances.Irrational
 
+noncomputable section
+
 /-!
 # Density of Liouville numbers
 

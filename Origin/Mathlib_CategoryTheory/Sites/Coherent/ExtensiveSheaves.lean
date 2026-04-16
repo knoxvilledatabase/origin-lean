@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Sites.Canonical
 import Mathlib.CategoryTheory.Sites.Coherent.Basic
 import Mathlib.CategoryTheory.Sites.Preserves
 
+noncomputable section
+
 /-!
 
 # Sheaves for the extensive topology

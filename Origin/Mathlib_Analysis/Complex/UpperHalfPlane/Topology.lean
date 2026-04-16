@@ -11,6 +11,8 @@ import Mathlib.Analysis.Complex.ReImTopology
 import Mathlib.Topology.Homotopy.Contractible
 import Mathlib.Topology.PartialHomeomorph
 
+noncomputable section
+
 /-!
 # Topology on the upper half plane
 
@@ -71,9 +73,6 @@ instance : LocallyCompactSpace ℍ :=
 section strips
 
 def verticalStrip (A B : ℝ) := {z : ℍ | |z.re| ≤ A ∧ B ≤ z.im}
-
-theorem mem_verticalStrip_iff (A B : ℝ) (z : ℍ) : z ∈ verticalStrip A B ↔ |z.re| ≤ A ∧ B ≤ z.im :=
-  Iff.rfl
 
 @[gcongr]
 lemma verticalStrip_mono {A B A' B' : ℝ} (hA : A ≤ A') (hB : B' ≤ B) :

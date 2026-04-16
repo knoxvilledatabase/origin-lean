@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Sheaves.PresheafOfFunctions
 import Mathlib.Topology.Sheaves.SheafCondition.UniqueGluing
 
+noncomputable section
+
 /-!
 # Sheaf conditions for presheaves of (continuous) functions.
 

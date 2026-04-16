@@ -1,9 +1,11 @@
 /-
 Extracted from Order/ConditionallyCompleteLattice/Indexed.lean
-Genuine: 93 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
+
+noncomputable section
 
 /-!
 # Indexed sup / inf in conditionally complete lattices
@@ -25,17 +27,34 @@ Extension of `iSup` and `iInf` from a preorder `α` to `WithTop α` and `WithBot
 
 variable [Preorder α]
 
--- DISSOLVED: WithTop.iInf_empty
+@[simp]
+theorem WithTop.iInf_empty [IsEmpty ι] [InfSet α] (f : ι → WithTop α) :
+    ⨅ i, f i = ⊤ := by rw [iInf, range_eq_empty, WithTop.sInf_empty]
 
--- DISSOLVED: WithTop.coe_iInf
+@[norm_cast]
+theorem WithTop.coe_iInf [Nonempty ι] [InfSet α] {f : ι → α} (hf : BddBelow (range f)) :
+    ↑(⨅ i, f i) = (⨅ i, f i : WithTop α) := by
+  rw [iInf, iInf, WithTop.coe_sInf' (range_nonempty f) hf, ← range_comp, Function.comp_def]
 
--- DISSOLVED: WithTop.coe_iSup
+@[norm_cast]
+theorem WithTop.coe_iSup [SupSet α] (f : ι → α) (h : BddAbove (Set.range f)) :
+    ↑(⨆ i, f i) = (⨆ i, f i : WithTop α) := by
+  rw [iSup, iSup, WithTop.coe_sSup' h, ← range_comp, Function.comp_def]
 
--- DISSOLVED: WithBot.ciSup_empty
+@[simp]
+theorem WithBot.ciSup_empty [IsEmpty ι] [SupSet α] (f : ι → WithBot α) :
+    ⨆ i, f i = ⊥ :=
+  WithTop.iInf_empty (α := αᵒᵈ) _
 
--- DISSOLVED: WithBot.coe_iSup
+@[norm_cast]
+theorem WithBot.coe_iSup [Nonempty ι] [SupSet α] {f : ι → α} (hf : BddAbove (range f)) :
+    ↑(⨆ i, f i) = (⨆ i, f i : WithBot α) :=
+  WithTop.coe_iInf (α := αᵒᵈ) hf
 
--- DISSOLVED: WithBot.coe_iInf
+@[norm_cast]
+theorem WithBot.coe_iInf [InfSet α] (f : ι → α) (h : BddBelow (Set.range f)) :
+    ↑(⨅ i, f i) = (⨅ i, f i : WithBot α) :=
+  WithTop.coe_iSup (α := αᵒᵈ) _ h
 
 end
 

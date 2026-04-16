@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
+noncomputable section
+
 /-!
 # The category of small categories has all small limits.
 

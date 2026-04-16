@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/ContinuedFractions/Computation/CorrectnessTerminating.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Computation.Translations
@@ -9,6 +9,8 @@ import Mathlib.Algebra.ContinuedFractions.ContinuantsRecurrence
 import Mathlib.Order.Filter.AtTopBot
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 # Correctness of Terminating Continued Fraction Computations (`GenContFract.of`)
@@ -57,7 +59,12 @@ protected def compExactValue (pconts conts : Pair K) (fr : K) : K :=
 
 variable [FloorRing K]
 
--- DISSOLVED: compExactValue_correctness_of_stream_eq_some_aux_comp
+protected theorem compExactValue_correctness_of_stream_eq_some_aux_comp {a : K} (b c : K)
+    (fract_a_ne_zero : Int.fract a ≠ 0) :
+    ((⌊a⌋ : K) * b + c) / Int.fract a + b = (b * a + c) / Int.fract a := by
+  field_simp [fract_a_ne_zero]
+  rw [Int.fract]
+  ring
 
 open GenContFract
 

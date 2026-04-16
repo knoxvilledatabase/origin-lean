@@ -7,6 +7,8 @@ import Mathlib.AlgebraicTopology.DoldKan.FunctorGamma
 import Mathlib.AlgebraicTopology.DoldKan.SplitSimplicialObject
 import Mathlib.CategoryTheory.Idempotents.HomologicalComplex
 
+noncomputable section
+
 /-! The counit isomorphism of the Dold-Kan equivalence
 
 The purpose of this file is to construct natural isomorphisms

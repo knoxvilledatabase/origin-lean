@@ -5,6 +5,8 @@ Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Analysis.Convex.Hull
 
+noncomputable section
+
 /-!
 # Convex join
 
@@ -55,8 +57,6 @@ theorem convexJoin_singleton_left (t : Set E) (x : E) :
 @[simp]
 theorem convexJoin_singleton_right (s : Set E) (y : E) :
     convexJoin 𝕜 s {y} = ⋃ x ∈ s, segment 𝕜 x y := by simp [convexJoin]
-
-theorem convexJoin_singletons (x : E) : convexJoin 𝕜 {x} {y} = segment 𝕜 x y := by simp
 
 @[simp]
 theorem convexJoin_union_left (s₁ s₂ t : Set E) :

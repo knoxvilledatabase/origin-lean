@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Extensive
 import Mathlib.CategoryTheory.Sites.Coverage
 import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
+noncomputable section
+
 /-!
 
 # The Coherent, Regular and Extensive Grothendieck Topologies

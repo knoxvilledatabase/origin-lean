@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.Pointwise.Interval
 import Mathlib.Topology.MetricSpace.Pseudo.Pi
 
+noncomputable section
+
 /-!
 # Lemmas about distances between points in intervals in `ℝ`.
 -/

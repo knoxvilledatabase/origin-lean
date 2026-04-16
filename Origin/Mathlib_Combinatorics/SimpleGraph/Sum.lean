@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Maps
 
+noncomputable section
+
 /-!
 # Disjoint sum of graphs
 
@@ -38,6 +40,8 @@ protected def sum (G : SimpleGraph α) (H : SimpleGraph β) : SimpleGraph (α �
     | Sum.inl _, Sum.inr _ | Sum.inr _, Sum.inl _ => id
   loopless u := by cases u <;> simp
 
+@[inherit_doc] infixl:60 " ⊕g " => SimpleGraph.sum
+
 variable {G : SimpleGraph α} {H : SimpleGraph β}
 
 @[simps!]
@@ -53,17 +57,5 @@ def Iso.sumAssoc {I : SimpleGraph γ} : (G ⊕g H) ⊕g I ≃g G ⊕g (H ⊕g I)
   · cases u <;> simp
   · cases v <;> simp
   · simp⟩
-
-@[simps]
-def Embedding.sumInl : G ↪g G ⊕g H where
-  toFun u := _root_.Sum.inl u
-  inj' u v := by simp
-  map_rel_iff' := by simp
-
-@[simps]
-def Embedding.sumInr : H ↪g G ⊕g H where
-  toFun u := _root_.Sum.inr u
-  inj' u v := by simp
-  map_rel_iff' := by simp
 
 end SimpleGraph

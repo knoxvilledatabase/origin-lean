@@ -7,6 +7,8 @@ import Mathlib.Data.Part
 import Mathlib.Order.Hom.Basic
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Monotonicity of monadic operations on `Part`
 -/

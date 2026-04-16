@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Gauge.lean
-Genuine: 64 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Topology
@@ -8,6 +8,8 @@ import Mathlib.Analysis.NormedSpace.Pointwise
 import Mathlib.Analysis.Seminorm
 import Mathlib.Analysis.LocallyConvex.Bounded
 import Mathlib.Analysis.RCLike.Basic
+
+noncomputable section
 
 /-!
 # The Minkowski functional
@@ -320,7 +322,9 @@ theorem gauge_eq_zero (hs : Absorbent ℝ s) (hb : Bornology.IsVonNBounded ℝ s
   rcases ((nhds_basis_zero_abs_sub_lt _).comap _).mem_iff.1 this with ⟨r, hr₀, hr⟩
   exact hr (by simpa [h₀]) rfl
 
--- DISSOLVED: gauge_pos
+theorem gauge_pos (hs : Absorbent ℝ s) (hb : Bornology.IsVonNBounded ℝ s) :
+    0 < gauge s x ↔ x ≠ 0 := by
+  simp only [(gauge_nonneg _).gt_iff_ne, Ne, gauge_eq_zero hs hb]
 
 end TopologicalSpace
 
@@ -546,17 +550,6 @@ theorem mul_gauge_le_norm (hs : Metric.ball (0 : E) r ⊆ s) : r * gauge s x ≤
   · exact (mul_nonpos_of_nonpos_of_nonneg hr <| gauge_nonneg _).trans (norm_nonneg _)
   rw [mul_comm, ← le_div_iff₀ hr, ← gauge_ball hr.le]
   exact gauge_mono (absorbent_ball_zero hr) hs x
-
-theorem Convex.lipschitzWith_gauge {r : ℝ≥0} (hc : Convex ℝ s) (hr : 0 < r)
-    (hs : Metric.ball (0 : E) r ⊆ s) : LipschitzWith r⁻¹ (gauge s) :=
-  have : Absorbent ℝ (Metric.ball (0 : E) r) := absorbent_ball_zero hr
-  LipschitzWith.of_le_add_mul _ fun x y =>
-    calc
-      gauge s x = gauge s (y + (x - y)) := by simp
-      _ ≤ gauge s y + gauge s (x - y) := gauge_add_le hc (this.mono hs) _ _
-      _ ≤ gauge s y + ‖x - y‖ / r :=
-        add_le_add_left ((gauge_mono this hs (x - y)).trans_eq (gauge_ball hr.le _)) _
-      _ = gauge s y + r⁻¹ * dist x y := by rw [dist_eq_norm, div_eq_inv_mul, NNReal.coe_inv]
 
 theorem Convex.lipschitz_gauge (hc : Convex ℝ s) (h₀ : s ∈ 𝓝 (0 : E)) :
     ∃ K, LipschitzWith K (gauge s) :=

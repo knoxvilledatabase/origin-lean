@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Comma.Arrow
 import Mathlib.CategoryTheory.CommSq
 
+noncomputable section
+
 /-!
 # The category of commutative squares
 

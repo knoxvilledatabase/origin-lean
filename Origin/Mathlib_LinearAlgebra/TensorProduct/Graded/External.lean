@@ -9,6 +9,8 @@ import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.LinearAlgebra.DirectSum.TensorProduct
 import Mathlib.Algebra.DirectSum.Algebra
 
+noncomputable section
+
 /-!
 # Graded tensor products over graded algebras
 

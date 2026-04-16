@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Function.ConditionalExpectation.Indicator
 import Mathlib.MeasureTheory.Function.UniformIntegrable
 import Mathlib.MeasureTheory.Decomposition.RadonNikodym
 
+noncomputable section
+
 /-!
 
 # Conditional expectation of real-valued functions

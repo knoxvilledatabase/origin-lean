@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.Transcendental.Liouville.Residual
 import Mathlib.NumberTheory.Transcendental.Liouville.LiouvilleWith
 import Mathlib.Analysis.PSeries
 
+noncomputable section
+
 /-!
 # Volume of the set of Liouville numbers
 

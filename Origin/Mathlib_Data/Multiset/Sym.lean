@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.List.Sym
 
+noncomputable section
+
 /-! # Unordered tuples of elements of a multiset
 
 Defines `Multiset.sym` and the specialized `Multiset.sym2` for computing multisets of all
@@ -44,9 +46,6 @@ protected def sym2 (m : Multiset α) : Multiset (Sym2 α) :=
 @[simp]
 theorem sym2_eq_zero_iff {m : Multiset α} : m.sym2 = 0 ↔ m = 0 :=
   m.inductionOn fun xs => by simp
-
-@[simp]
-theorem sym2_zero : (0 : Multiset α).sym2 = 0 := rfl
 
 theorem sym2_cons (a : α) (m : Multiset α) :
     (m.cons a).sym2 = ((m.cons a).map <| fun b => s(a, b)) + m.sym2 :=

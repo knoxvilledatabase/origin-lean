@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Sub.Defs
 import Mathlib.Data.Finset.Basic
 import Mathlib.Order.Interval.Finset.Defs
 
+noncomputable section
+
 /-! # Antidiagonal with values in general types
 
 We define a type class `Finset.HasAntidiagonal A` which contains a function
@@ -162,17 +164,6 @@ theorem filter_snd_eq_antidiagonal (n m : A) [DecidablePred (· = m)] [Decidable
   simp [this, filter_fst_eq_antidiagonal, apply_ite (Finset.map _)]
 
 end OrderedSub
-
-@[simps]
-def sigmaAntidiagonalEquivProd [AddMonoid A] [HasAntidiagonal A] :
-    (Σ n : A, antidiagonal n) ≃ A × A where
-  toFun x := x.2
-  invFun x := ⟨x.1 + x.2, x, mem_antidiagonal.mpr rfl⟩
-  left_inv := by
-    rintro ⟨n, ⟨k, l⟩, h⟩
-    rw [mem_antidiagonal] at h
-    exact Sigma.subtype_ext h rfl
-  right_inv _ := rfl
 
 variable {A : Type*}
   [CanonicallyOrderedAddCommMonoid A]

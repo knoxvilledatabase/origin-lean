@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Tactic.Lint
 import Mathlib.Tactic.DeclarationNames
 
+noncomputable section
+
 /-!
 # Linters for Mathlib
 

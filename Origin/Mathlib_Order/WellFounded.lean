@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Function
 import Mathlib.Order.Bounds.Defs
 
+noncomputable section
+
 /-!
 # Well-founded relations
 

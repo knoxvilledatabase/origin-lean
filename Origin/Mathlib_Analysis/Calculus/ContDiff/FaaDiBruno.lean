@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Calculus/ContDiff/FaaDiBruno.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 3 | Infrastructure: 7
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Within
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Calculus.ContDiff.FTaylorSeries
+
+noncomputable section
 
 /-!
 # Faa di Bruno formula
@@ -192,13 +194,18 @@ noncomputable def equivSigma : ((i : Fin c.length) × Fin (c.partSize i)) ≃ Fi
 
 lemma length_pos (h : 0 < n) : 0 < c.length := Nat.zero_lt_of_lt (c.index ⟨0, h⟩).2
 
--- DISSOLVED: neZero_length
+lemma neZero_length [NeZero n] (c : OrderedFinpartition n) : NeZero c.length :=
+  ⟨(c.length_pos size_pos').ne'⟩
 
--- DISSOLVED: neZero_partSize
+lemma neZero_partSize (c : OrderedFinpartition n) (i : Fin c.length) : NeZero (c.partSize i) :=
+  .of_pos (c.partSize_pos i)
 
 attribute [local instance] neZero_length neZero_partSize
 
--- DISSOLVED: emb_zero
+lemma emb_zero [NeZero n] : c.emb (c.index 0) 0 = 0 := by
+  apply le_antisymm _ (Fin.zero_le' _)
+  conv_rhs => rw [← c.emb_invEmbedding 0]
+  apply (c.emb_strictMono _).monotone (Fin.zero_le' _)
 
 lemma partSize_eq_one_of_range_emb_eq_singleton
     (c : OrderedFinpartition n) {i : Fin c.length} {j : Fin n}

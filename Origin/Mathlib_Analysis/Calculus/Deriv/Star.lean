@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Star
 
+noncomputable section
+
 /-!
 # Star operations on derivatives
 

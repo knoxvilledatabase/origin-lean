@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 import Mathlib.CategoryTheory.Subobject.MonoOver
 
+noncomputable section
+
 /-!
 # Subterminal objects
 
@@ -127,17 +129,5 @@ def subterminalsEquivMonoOverTerminal [HasTerminal C] : Subterminals C ≌ MonoO
   counitIso := NatIso.ofComponents (fun X => MonoOver.isoMk (Iso.refl _)) (by subsingleton)
   functor_unitIso_comp := by subsingleton
   -- With `aesop` filling the auto-params this was taking 20s or so
-
-@[simp]
-theorem subterminals_to_monoOver_terminal_comp_forget [HasTerminal C] :
-    (subterminalsEquivMonoOverTerminal C).functor ⋙ MonoOver.forget _ ⋙ Over.forget _ =
-      subterminalInclusion C :=
-  rfl
-
-@[simp]
-theorem monoOver_terminal_to_subterminals_comp [HasTerminal C] :
-    (subterminalsEquivMonoOverTerminal C).inverse ⋙ subterminalInclusion C =
-      MonoOver.forget _ ⋙ Over.forget _ :=
-  rfl
 
 end CategoryTheory

@@ -9,6 +9,8 @@ import Mathlib.Logic.Equiv.Defs
 import Mathlib.Logic.Equiv.Option
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Derangements on types
 

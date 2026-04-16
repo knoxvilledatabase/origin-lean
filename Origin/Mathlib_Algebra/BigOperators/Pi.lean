@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
 import Mathlib.Algebra.Group.Action.Pi
 import Mathlib.Algebra.Ring.Pi
 
+noncomputable section
+
 /-!
 # Big operators for Pi Types
 

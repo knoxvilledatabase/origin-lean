@@ -11,6 +11,8 @@ import Mathlib.Order.Iterate
 import Mathlib.Order.Part
 import Mathlib.Order.ScottContinuity
 
+noncomputable section
+
 /-!
 # Omega Complete Partial Orders
 
@@ -123,17 +125,11 @@ theorem map_le_map {g : α →o β} (h : f ≤ g) : c.map f ≤ c.map g :=
 def zip (c₀ : Chain α) (c₁ : Chain β) : Chain (α × β) :=
   OrderHom.prod c₀ c₁
 
-@[simp] theorem zip_coe (c₀ : Chain α) (c₁ : Chain β) (n : ℕ) : c₀.zip c₁ n = (c₀ n, c₁ n) := rfl
-
 def pair (a b : α) (hab : a ≤ b) : Chain α where
   toFun n := match n with
     | 0 => a
     | _ => b
   monotone' _ _ _ := by aesop
-
-@[simp] lemma pair_zero (a b : α) (hab) : pair a b hab 0 = a := rfl
-
-@[simp] lemma pair_succ (a b : α) (hab) (n : ℕ) : pair a b hab (n + 1) = b := rfl
 
 @[simp] lemma range_pair (a b : α) (hab) : Set.range (pair a b hab) = {a, b} := by
   ext; exact Nat.or_exists_add_one.symm.trans (by aesop)
@@ -623,6 +619,8 @@ structure ContinuousHom extends OrderHom α β where
 
 attribute [nolint docBlame] ContinuousHom.toOrderHom
 
+@[inherit_doc] infixr:25 " →𝒄 " => ContinuousHom -- Input: \r\MIc
+
 instance : FunLike (α →𝒄 β) α β where
   coe f := f.toFun
   coe_injective' := by rintro ⟨⟩ ⟨⟩ h; congr; exact DFunLike.ext' h
@@ -663,6 +661,7 @@ theorem apply_mono {f g : α →𝒄 β} {x y : α} (h₁ : f ≤ g) (h₂ : x �
   OrderHom.apply_mono (show (f : α →o β) ≤ g from h₁) h₂
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-07-27")]
 
 theorem ite_continuous' {p : Prop} [hp : Decidable p] (f g : α → β) (hf : Continuous' f)
     (hg : Continuous' g) : Continuous' fun x => if p then f x else g x := by
@@ -757,13 +756,6 @@ protected theorem coe_inj (f g : α →𝒄 β) (h : (f : α → β) = g) : f = 
 theorem comp_id (f : β →𝒄 γ) : f.comp id = f := rfl
 
 @[simp]
-theorem id_comp (f : β →𝒄 γ) : id.comp f = f := rfl
-
-@[simp]
-theorem comp_assoc (f : γ →𝒄 δ) (g : β →𝒄 γ) (h : α →𝒄 β) : f.comp (g.comp h) = (f.comp g).comp h :=
-  rfl
-
-@[simp]
 theorem coe_apply (a : α) (f : α →𝒄 β) : (f : α →o β) a = f a :=
   rfl
 
@@ -835,9 +827,6 @@ def apply : (α →𝒄 β) × α →𝒄 β where
       rfl
 
 end Prod
-
-theorem ωSup_def (c : Chain (α →𝒄 β)) (x : α) : ωSup c x = ContinuousHom.ωSup c x :=
-  rfl
 
 theorem ωSup_apply_ωSup (c₀ : Chain (α →𝒄 β)) (c₁ : Chain α) :
     ωSup c₀ (ωSup c₁) = Prod.apply (ωSup (c₀.zip c₁)) := by simp [Prod.apply_apply, Prod.ωSup_zip]

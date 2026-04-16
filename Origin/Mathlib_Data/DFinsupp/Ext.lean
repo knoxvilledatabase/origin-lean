@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Basic
 import Mathlib.Data.DFinsupp.Defs
 
+noncomputable section
+
 /-!
 # Extensionality principles for `DFinsupp`
 

@@ -8,6 +8,8 @@ import Mathlib.Analysis.InnerProductSpace.Calculus
 import Mathlib.Analysis.Calculus.Deriv.Inv
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Derivative of the inversion
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Nilpotent.Lemmas
 
+noncomputable section
+
 /-!
 # Nilpotent elements in quotient rings
 -/

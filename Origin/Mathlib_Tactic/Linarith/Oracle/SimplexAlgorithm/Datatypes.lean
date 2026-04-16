@@ -7,6 +7,8 @@ import Mathlib.Init
 import Batteries.Data.Rat.Basic
 import Std.Data.HashMap.Basic
 
+noncomputable section
+
 /-!
 # Datatypes for the Simplex Algorithm implementation
 -/

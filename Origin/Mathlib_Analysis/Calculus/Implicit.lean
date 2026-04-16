@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.Calculus.FDeriv.Prod
 import Mathlib.Analysis.Normed.Module.Complemented
 
+noncomputable section
+
 /-!
 # Implicit function theorem
 
@@ -112,10 +114,6 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCom
 def prodFun (x : E) : F × G :=
   (φ.leftFun x, φ.rightFun x)
 
-@[simp]
-theorem prodFun_apply (x : E) : φ.prodFun x = (φ.leftFun x, φ.rightFun x) :=
-  rfl
-
 protected theorem hasStrictFDerivAt :
     HasStrictFDerivAt φ.prodFun
       (φ.leftDeriv.equivProdOfSurjectiveOfIsCompl φ.rightDeriv φ.left_range φ.right_range
@@ -129,13 +127,6 @@ def toPartialHomeomorph : PartialHomeomorph E (F × G) :=
 
 def implicitFunction : F → G → E :=
   Function.curry <| φ.toPartialHomeomorph.symm
-
-@[simp]
-theorem toPartialHomeomorph_coe : ⇑φ.toPartialHomeomorph = φ.prodFun :=
-  rfl
-
-theorem toPartialHomeomorph_apply (x : E) : φ.toPartialHomeomorph x = (φ.leftFun x, φ.rightFun x) :=
-  rfl
 
 theorem pt_mem_toPartialHomeomorph_source : φ.pt ∈ φ.toPartialHomeomorph.source :=
   φ.hasStrictFDerivAt.mem_toPartialHomeomorph_source
@@ -227,12 +218,6 @@ def implicitFunctionOfComplemented (hf : HasStrictFDerivAt f f' a) (hf' : range 
   (implicitFunctionDataOfComplemented f f' hf hf' hker).implicitFunction
 
 end Defs
-
-@[simp]
-theorem implicitToPartialHomeomorphOfComplemented_fst (hf : HasStrictFDerivAt f f' a)
-    (hf' : range f' = ⊤) (hker : (ker f').ClosedComplemented) (x : E) :
-    (hf.implicitToPartialHomeomorphOfComplemented f f' hf' hker x).fst = f x :=
-  rfl
 
 theorem implicitToPartialHomeomorphOfComplemented_apply (hf : HasStrictFDerivAt f f' a)
     (hf' : range f' = ⊤) (hker : (ker f').ClosedComplemented) (y : E) :
@@ -341,11 +326,6 @@ def implicitFunction (hf : HasStrictFDerivAt f f' a) (hf' : range f' = ⊤) : F 
   Function.curry <| (hf.implicitToPartialHomeomorph f f' hf').symm
 
 variable {f f'}
-
-@[simp]
-theorem implicitToPartialHomeomorph_fst (hf : HasStrictFDerivAt f f' a) (hf' : range f' = ⊤)
-    (x : E) : (hf.implicitToPartialHomeomorph f f' hf' x).fst = f x :=
-  rfl
 
 @[simp]
 theorem implicitToPartialHomeomorph_apply_ker (hf : HasStrictFDerivAt f f' a) (hf' : range f' = ⊤)

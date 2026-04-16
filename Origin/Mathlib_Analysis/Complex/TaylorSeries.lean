@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.Complex.CauchyIntegral
 
+noncomputable section
+
 /-!
 # Convergence of Taylor series of holomorphic functions
 
@@ -37,6 +39,9 @@ variable {c : ℂ} {r : ℝ} (hf : DifferentiableOn ℂ f (Metric.ball c r))
 variable {z : ℂ} (hz : z ∈ Metric.ball c r)
 
 include hf hz in
+/-- A function that is complex differentiable on the open ball of radius `r` around `c`
+
+is given by evaluating its Taylor series at `c` on this open ball. -/
 
 lemma hasSum_taylorSeries_on_ball :
     HasSum (fun n : ℕ ↦ (n ! : ℂ)⁻¹ • (z - c) ^ n • iteratedDeriv n f c) (f z) := by
@@ -56,12 +61,18 @@ lemma hasSum_taylorSeries_on_ball :
     using ((iteratedFDeriv ℂ n f c).map_smul_univ (fun _ ↦ z - c) (fun _ ↦ 1)).symm
 
 include hf hz in
+/-- A function that is complex differentiable on the open ball of radius `r` around `c`
+
+is given by evaluating its Taylor series at `c` on this open ball. -/
 
 lemma taylorSeries_eq_on_ball :
     ∑' n : ℕ, (n ! : ℂ)⁻¹ • (z - c) ^ n • iteratedDeriv n f c = f z :=
   (hasSum_taylorSeries_on_ball hf hz).tsum_eq
 
 include hz in
+/-- A function that is complex differentiable on the open ball of radius `r` around `c`
+
+is given by evaluating its Taylor series at `c` on this open ball. -/
 
 lemma taylorSeries_eq_on_ball' {f : ℂ → ℂ} (hf : DifferentiableOn ℂ f (Metric.ball c r)) :
     ∑' n : ℕ, (n ! : ℂ)⁻¹ * iteratedDeriv n f c * (z - c) ^ n = f z := by
@@ -77,6 +88,9 @@ variable {c : ℂ} {r : ENNReal} (hf : DifferentiableOn ℂ f (EMetric.ball c r)
 variable {z : ℂ} (hz : z ∈ EMetric.ball c r)
 
 include hf hz in
+/-- A function that is complex differentiable on the open ball of radius `r ≤ ∞` around `c`
+
+is given by evaluating its Taylor series at `c` on this open ball. -/
 
 lemma hasSum_taylorSeries_on_emetric_ball :
     HasSum (fun n : ℕ ↦ (n ! : ℂ)⁻¹ • (z - c) ^ n • iteratedDeriv n f c) (f z) := by
@@ -88,12 +102,18 @@ lemma hasSum_taylorSeries_on_emetric_ball :
   exact hf.mono <| EMetric.ball_subset_ball hr'.le
 
 include hf hz in
+/-- A function that is complex differentiable on the open ball of radius `r ≤ ∞` around `c`
+
+is given by evaluating its Taylor series at `c` on this open ball. -/
 
 lemma taylorSeries_eq_on_emetric_ball :
     ∑' n : ℕ, (n ! : ℂ)⁻¹ • (z - c) ^ n • iteratedDeriv n f c = f z :=
   (hasSum_taylorSeries_on_emetric_ball hf hz).tsum_eq
 
 include hz in
+/-- A function that is complex differentiable on the open ball of radius `r ≤ ∞` around `c`
+
+is given by evaluating its Taylor series at `c` on this open ball. -/
 
 lemma taylorSeries_eq_on_emetric_ball' {f : ℂ → ℂ} (hf : DifferentiableOn ℂ f (EMetric.ball c r)) :
     ∑' n : ℕ, (n ! : ℂ)⁻¹ * iteratedDeriv n f c * (z - c) ^ n = f z := by
@@ -107,6 +127,9 @@ section entire
 variable {f : ℂ → E} (hf : Differentiable ℂ f) (c z : ℂ)
 
 include hf in
+/-- A function that is complex differentiable on the complex plane is given by evaluating
+
+its Taylor series at any point `c`. -/
 
 lemma hasSum_taylorSeries_of_entire :
     HasSum (fun n : ℕ ↦ (n ! : ℂ)⁻¹ • (z - c) ^ n • iteratedDeriv n f c) (f z) :=
@@ -114,6 +137,9 @@ lemma hasSum_taylorSeries_of_entire :
     edist_lt_top ..
 
 include hf in
+/-- A function that is complex differentiable on the complex plane is given by evaluating
+
+its Taylor series at any point `c`. -/
 
 lemma taylorSeries_eq_of_entire :
     ∑' n : ℕ, (n ! : ℂ)⁻¹ • (z - c) ^ n • iteratedDeriv n f c = f z :=

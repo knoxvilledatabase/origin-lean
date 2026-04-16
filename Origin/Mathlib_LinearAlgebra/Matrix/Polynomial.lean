@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Tactic.ComputeDegree
 
+noncomputable section
+
 /-!
 # Matrices of polynomials and polynomials of matrices
 

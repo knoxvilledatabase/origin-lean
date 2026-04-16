@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Independent.lean
-Genuine: 48 | Conflates: 5 | Dissolved: 1 | Infrastructure: 14
+Genuine: 50 | Conflates: 6 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Sort
@@ -9,6 +9,8 @@ import Mathlib.Data.Sign
 import Mathlib.LinearAlgebra.AffineSpace.Combination
 import Mathlib.LinearAlgebra.AffineSpace.AffineEquiv
 import Mathlib.LinearAlgebra.Basis.VectorSpace
+
+noncomputable section
 
 /-!
 # Affine independence
@@ -47,12 +49,6 @@ variable [AffineSpace V P] {ι : Type*}
 def AffineIndependent (p : ι → P) : Prop :=
   ∀ (s : Finset ι) (w : ι → k),
     ∑ i ∈ s, w i = 0 → s.weightedVSub p w = (0 : V) → ∀ i ∈ s, w i = 0
-
-theorem affineIndependent_def (p : ι → P) :
-    AffineIndependent k p ↔
-      ∀ (s : Finset ι) (w : ι → k),
-        ∑ i ∈ s, w i = 0 → s.weightedVSub p w = (0 : V) → ∀ i ∈ s, w i = 0 :=
-  Iff.rfl
 
 theorem affineIndependent_of_subsingleton [Subsingleton ι] (p : ι → P) : AffineIndependent k p :=
   fun _ _ h _ i hi => Fintype.eq_of_subsingleton_of_sum_eq h i hi
@@ -345,12 +341,6 @@ theorem AffineEquiv.affineIndependent_iff {p : ι → P} (e : P ≃ᵃ[k] P₂) 
     AffineIndependent k (e ∘ p) ↔ AffineIndependent k p :=
   e.toAffineMap.affineIndependent_iff e.toEquiv.injective
 
-theorem AffineEquiv.affineIndependent_set_of_eq_iff {s : Set P} (e : P ≃ᵃ[k] P₂) :
-    AffineIndependent k ((↑) : e '' s → P₂) ↔ AffineIndependent k ((↑) : s → P) := by
-  have : e ∘ ((↑) : s → P) = ((↑) : e '' s → P₂) ∘ (e : P ≃ P₂).image s := rfl
-  -- This used to be `rw`, but we need `erw` after https://github.com/leanprover/lean4/pull/2644
-  erw [← e.affineIndependent_iff, this, affineIndependent_equiv]
-
 end Composition
 
 -- CONFLATES (assumes ground = zero): AffineIndependent.exists_mem_inter_of_exists_mem_inter_affineSpan
@@ -395,7 +385,25 @@ theorem AffineIndependent.not_mem_affineSpan_diff [Nontrivial k] {p : ι → P}
     (ha : AffineIndependent k p) (i : ι) (s : Set ι) : p i ∉ affineSpan k (p '' (s \ {i})) := by
   simp [ha]
 
--- DISSOLVED: exists_nontrivial_relation_sum_zero_of_not_affine_ind
+-- CONFLATES (assumes ground = zero): exists_nontrivial_relation_sum_zero_of_not_affine_ind
+theorem exists_nontrivial_relation_sum_zero_of_not_affine_ind {t : Finset V}
+    (h : ¬AffineIndependent k ((↑) : t → V)) :
+    ∃ f : V → k, ∑ e ∈ t, f e • e = 0 ∧ ∑ e ∈ t, f e = 0 ∧ ∃ x ∈ t, f x ≠ 0 := by
+  classical
+    rw [affineIndependent_iff_of_fintype] at h
+    simp only [exists_prop, not_forall] at h
+    obtain ⟨w, hw, hwt, i, hi⟩ := h
+    simp only [Finset.weightedVSub_eq_weightedVSubOfPoint_of_sum_eq_zero _ w ((↑) : t → V) hw 0,
+      vsub_eq_sub, Finset.weightedVSubOfPoint_apply, sub_zero] at hwt
+    let f : ∀ x : V, x ∈ t → k := fun x hx => w ⟨x, hx⟩
+    refine ⟨fun x => if hx : x ∈ t then f x hx else (0 : k), ?_, ?_, by use i; simp [hi]⟩
+    on_goal 1 =>
+      suffices (∑ e ∈ t, dite (e ∈ t) (fun hx => f e hx • e) fun _ => 0) = 0 by
+        convert this
+        rename V => x
+        by_cases hx : x ∈ t <;> simp [hx]
+    all_goals
+      simp only [Finset.sum_dite_of_true fun _ h => h, Finset.mk_coe, hwt, hw]
 
 variable {s : Finset ι} {w w₁ w₂ : ι → k} {p : ι → V}
 
@@ -504,29 +512,6 @@ theorem exists_subset_affineIndependent_affineSpan_eq_top {s : Set P}
       exact affineSpan_singleton_union_vadd_eq_top_of_span_eq_top p₁ hsvt
 
 variable (k V)
-
-theorem exists_affineIndependent (s : Set P) :
-    ∃ t ⊆ s, affineSpan k t = affineSpan k s ∧ AffineIndependent k ((↑) : t → P) := by
-  rcases s.eq_empty_or_nonempty with (rfl | ⟨p, hp⟩)
-  · exact ⟨∅, Set.empty_subset ∅, rfl, affineIndependent_of_subsingleton k _⟩
-  obtain ⟨b, hb₁, hb₂, hb₃⟩ := exists_linearIndependent k ((Equiv.vaddConst p).symm '' s)
-  have hb₀ : ∀ v : V, v ∈ b → v ≠ 0 := fun v hv => hb₃.ne_zero (⟨v, hv⟩ : b)
-  rw [linearIndependent_set_iff_affineIndependent_vadd_union_singleton k hb₀ p] at hb₃
-  refine ⟨{p} ∪ Equiv.vaddConst p '' b, ?_, ?_, hb₃⟩
-  · apply Set.union_subset (Set.singleton_subset_iff.mpr hp)
-    rwa [← (Equiv.vaddConst p).subset_symm_image b s]
-  · rw [Equiv.coe_vaddConst_symm, ← vectorSpan_eq_span_vsub_set_right k hp] at hb₂
-    apply AffineSubspace.ext_of_direction_eq
-    · have : Submodule.span k b = Submodule.span k (insert 0 b) := by simp
-      simp only [direction_affineSpan, ← hb₂, Equiv.coe_vaddConst, Set.singleton_union,
-        vectorSpan_eq_span_vsub_set_right k (Set.mem_insert p _), this]
-      congr
-      change (Equiv.vaddConst p).symm '' insert p (Equiv.vaddConst p '' b) = _
-      rw [Set.image_insert_eq, ← Set.image_comp]
-      simp
-    · use p
-      simp only [Equiv.coe_vaddConst, Set.singleton_union, Set.mem_inter_iff, coe_affineSpan]
-      exact ⟨mem_spanPoints k _ _ (Set.mem_insert p _), mem_spanPoints k _ _ hp⟩
 
 variable {V}
 
@@ -711,10 +696,6 @@ def face {n : ℕ} (s : Simplex k P n) {fs : Finset (Fin (n + 1))} {m : ℕ} (h 
 theorem face_points {n : ℕ} (s : Simplex k P n) {fs : Finset (Fin (n + 1))} {m : ℕ}
     (h : #fs = m + 1) (i : Fin (m + 1)) :
     (s.face h).points i = s.points (fs.orderEmbOfFin h i) :=
-  rfl
-
-theorem face_points' {n : ℕ} (s : Simplex k P n) {fs : Finset (Fin (n + 1))} {m : ℕ}
-    (h : #fs = m + 1) : (s.face h).points = s.points ∘ fs.orderEmbOfFin h :=
   rfl
 
 @[simp]

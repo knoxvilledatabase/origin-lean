@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Integral/IntegrableOn.lean
-Genuine: 88 | Conflates: 1 | Dissolved: 1 | Infrastructure: 15
+Genuine: 89 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.L1Space
 import Mathlib.Analysis.NormedSpace.IndicatorFunction
+
+noncomputable section
 
 /-! # Functions integrable on a set and at a filter
 
@@ -252,7 +254,20 @@ theorem integrable_indicatorConstLp {E} [NormedAddCommGroup E] {p : ℝ≥0∞} 
   right
   simpa only [Set.univ_inter, MeasurableSet.univ, Measure.restrict_apply] using hμs
 
--- DISSOLVED: IntegrableOn.restrict_toMeasurable
+theorem IntegrableOn.restrict_toMeasurable (hf : IntegrableOn f s μ) (h's : ∀ x ∈ s, f x ≠ 0) :
+    μ.restrict (toMeasurable μ s) = μ.restrict s := by
+  rcases exists_seq_strictAnti_tendsto (0 : ℝ) with ⟨u, _, u_pos, u_lim⟩
+  let v n := toMeasurable (μ.restrict s) { x | u n ≤ ‖f x‖ }
+  have A : ∀ n, μ (s ∩ v n) ≠ ∞ := by
+    intro n
+    rw [inter_comm, ← Measure.restrict_apply (measurableSet_toMeasurable _ _),
+      measure_toMeasurable]
+    exact (hf.measure_norm_ge_lt_top (u_pos n)).ne
+  apply Measure.restrict_toMeasurable_of_cover _ A
+  intro x hx
+  have : 0 < ‖f x‖ := by simp only [h's x hx, norm_pos_iff, Ne, not_false_iff]
+  obtain ⟨n, hn⟩ : ∃ n, u n < ‖f x‖ := ((tendsto_order.1 u_lim).2 _ this).exists
+  exact mem_iUnion.2 ⟨n, subset_toMeasurable _ _ hn.le⟩
 
 theorem IntegrableOn.of_ae_diff_eq_zero (hf : IntegrableOn f s μ) (ht : NullMeasurableSet t μ)
     (h't : ∀ᵐ x ∂μ, x ∈ t \ s → f x = 0) : IntegrableOn f t μ := by

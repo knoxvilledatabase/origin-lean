@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Polynomial/Content.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 9 | Infrastructure: 2
+Genuine: 46 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Finset
 import Mathlib.Algebra.Polynomial.CancelLeads
 import Mathlib.Algebra.Polynomial.EraseLead
 import Mathlib.Algebra.Polynomial.FieldDivision
+
+noncomputable section
 
 /-!
 # GCD structures on polynomials
@@ -47,7 +49,10 @@ theorem Monic.isPrimitive {p : R[X]} (hp : p.Monic) : p.IsPrimitive := by
   rintro r ⟨q, h⟩
   exact isUnit_of_mul_eq_one r (q.coeff p.natDegree) (by rwa [← coeff_C_mul, ← h])
 
--- DISSOLVED: IsPrimitive.ne_zero
+-- CONFLATES (assumes ground = zero): IsPrimitive.ne_zero
+theorem IsPrimitive.ne_zero [Nontrivial R] {p : R[X]} (hp : p.IsPrimitive) : p ≠ 0 := by
+  rintro rfl
+  exact (hp 0 (dvd_zero (C 0))).ne_zero rfl
 
 theorem isPrimitive_of_dvd {p q : R[X]} (hp : IsPrimitive p) (hq : q ∣ p) : IsPrimitive q :=
   fun a ha => isPrimitive_iff_isUnit_of_C_dvd.mp hp a (dvd_trans ha hq)
@@ -220,7 +225,8 @@ theorem isPrimitive_primPart (p : R[X]) : p.primPart.IsPrimitive := by
 theorem content_primPart (p : R[X]) : p.primPart.content = 1 :=
   p.isPrimitive_primPart.content_eq_one
 
--- DISSOLVED: primPart_ne_zero
+theorem primPart_ne_zero (p : R[X]) : p.primPart ≠ 0 :=
+  p.isPrimitive_primPart.ne_zero
 
 theorem natDegree_primPart (p : R[X]) : p.primPart.natDegree = p.natDegree := by
   by_cases h : C p.content = 0
@@ -250,9 +256,23 @@ theorem isUnit_primPart_C (r : R) : IsUnit (C r).primPart := by
 theorem primPart_dvd (p : R[X]) : p.primPart ∣ p :=
   Dvd.intro_left (C p.content) p.eq_C_content_mul_primPart.symm
 
--- DISSOLVED: aeval_primPart_eq_zero
+theorem aeval_primPart_eq_zero {S : Type*} [Ring S] [IsDomain S] [Algebra R S]
+    [NoZeroSMulDivisors R S] {p : R[X]} {s : S} (hpzero : p ≠ 0) (hp : aeval s p = 0) :
+    aeval s p.primPart = 0 := by
+  rw [eq_C_content_mul_primPart p, map_mul, aeval_C] at hp
+  have hcont : p.content ≠ 0 := fun h => hpzero (content_eq_zero_iff.1 h)
+  replace hcont := Function.Injective.ne (NoZeroSMulDivisors.algebraMap_injective R S) hcont
+  rw [map_zero] at hcont
+  exact eq_zero_of_ne_zero_of_mul_left_eq_zero hcont hp
 
--- DISSOLVED: eval₂_primPart_eq_zero
+theorem eval₂_primPart_eq_zero {S : Type*} [CommRing S] [IsDomain S] {f : R →+* S}
+    (hinj : Function.Injective f) {p : R[X]} {s : S} (hpzero : p ≠ 0) (hp : eval₂ f s p = 0) :
+    eval₂ f s p.primPart = 0 := by
+  rw [eq_C_content_mul_primPart p, eval₂_mul, eval₂_C] at hp
+  have hcont : p.content ≠ 0 := fun h => hpzero (content_eq_zero_iff.1 h)
+  replace hcont := Function.Injective.ne hinj hcont
+  rw [map_zero] at hcont
+  exact eq_zero_of_ne_zero_of_mul_left_eq_zero hcont hp
 
 end PrimPart
 
@@ -327,9 +347,23 @@ theorem IsPrimitive.mul {p q : R[X]} (hp : p.IsPrimitive) (hq : q.IsPrimitive) :
     (p * q).IsPrimitive := by
   rw [isPrimitive_iff_content_eq_one, content_mul, hp.content_eq_one, hq.content_eq_one, mul_one]
 
--- DISSOLVED: primPart_mul
+@[simp]
+theorem primPart_mul {p q : R[X]} (h0 : p * q ≠ 0) :
+    (p * q).primPart = p.primPart * q.primPart := by
+  rw [Ne, ← content_eq_zero_iff, ← C_eq_zero] at h0
+  apply mul_left_cancel₀ h0
+  conv_lhs =>
+    rw [← (p * q).eq_C_content_mul_primPart, p.eq_C_content_mul_primPart,
+      q.eq_C_content_mul_primPart]
+  rw [content_mul, RingHom.map_mul]
+  ring
 
--- DISSOLVED: IsPrimitive.dvd_primPart_iff_dvd
+theorem IsPrimitive.dvd_primPart_iff_dvd {p q : R[X]} (hp : p.IsPrimitive) (hq : q ≠ 0) :
+    p ∣ q.primPart ↔ p ∣ q := by
+  refine ⟨fun h => h.trans (Dvd.intro_left _ q.eq_C_content_mul_primPart.symm), fun h => ?_⟩
+  rcases h with ⟨r, rfl⟩
+  apply Dvd.intro _
+  rw [primPart_mul hq, hp.primPart_eq]
 
 theorem exists_primitive_lcm_of_isPrimitive {p q : R[X]} (hp : p.IsPrimitive) (hq : q.IsPrimitive) :
     ∃ r : R[X], r.IsPrimitive ∧ ∀ s : R[X], p ∣ s ∧ q ∣ s ↔ r ∣ s := by
@@ -373,7 +407,14 @@ theorem exists_primitive_lcm_of_isPrimitive {p q : R[X]} (hp : p.IsPrimitive) (h
     apply h.trans (Associated.symm ⟨u, _⟩).dvd
     rw [primPart_mul (mul_ne_zero hC0 s0), hu, mul_comm]
 
--- DISSOLVED: dvd_iff_content_dvd_content_and_primPart_dvd_primPart
+theorem dvd_iff_content_dvd_content_and_primPart_dvd_primPart {p q : R[X]} (hq : q ≠ 0) :
+    p ∣ q ↔ p.content ∣ q.content ∧ p.primPart ∣ q.primPart := by
+  constructor <;> intro h
+  · rcases h with ⟨r, rfl⟩
+    rw [content_mul, p.isPrimitive_primPart.dvd_primPart_iff_dvd hq]
+    exact ⟨Dvd.intro _ rfl, p.primPart_dvd.trans (Dvd.intro _ rfl)⟩
+  · rw [p.eq_C_content_mul_primPart, q.eq_C_content_mul_primPart]
+    exact mul_dvd_mul (RingHom.map_dvd C h.1) h.2
 
 noncomputable instance (priority := 100) normalizedGcdMonoid : NormalizedGCDMonoid R[X] :=
   letI := Classical.decEq R
@@ -393,9 +434,13 @@ noncomputable instance (priority := 100) normalizedGcdMonoid : NormalizedGCDMono
       (isUnit_primPart_C (lcm p.content q.content)).mul_left_dvd, ← hr s.primPart]
     tauto
 
--- DISSOLVED: degree_gcd_le_left
+theorem degree_gcd_le_left {p : R[X]} (hp : p ≠ 0) (q) : (gcd p q).degree ≤ p.degree := by
+  have := natDegree_le_iff_degree_le.mp (natDegree_le_of_dvd (gcd_dvd_left p q) hp)
+  rwa [degree_eq_natDegree hp]
 
--- DISSOLVED: degree_gcd_le_right
+theorem degree_gcd_le_right (p) {q : R[X]} (hq : q ≠ 0) : (gcd p q).degree ≤ q.degree := by
+  rw [gcd_comm]
+  exact degree_gcd_le_left hq p
 
 end NormalizedGCDMonoid
 

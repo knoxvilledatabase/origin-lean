@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Instances related to the discrete topology
 

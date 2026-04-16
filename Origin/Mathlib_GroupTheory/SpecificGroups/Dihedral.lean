@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/SpecificGroups/Dihedral.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 10
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.Exponent
 import Mathlib.GroupTheory.GroupAction.CardCommute
 import Mathlib.Data.Finite.Sum
+
+noncomputable section
 
 /-!
 # Dihedral Groups
@@ -66,14 +68,6 @@ theorem r_mul_r (i j : ZMod n) : r i * r j = r (i + j) :=
   rfl
 
 @[simp]
-theorem r_mul_sr (i j : ZMod n) : r i * sr j = sr (j - i) :=
-  rfl
-
-@[simp]
-theorem sr_mul_r (i j : ZMod n) : sr i * r j = sr (i + j) :=
-  rfl
-
-@[simp]
 theorem sr_mul_sr (i j : ZMod n) : sr i * sr j = r (j - i) :=
   rfl
 
@@ -99,7 +93,8 @@ instance : Infinite (DihedralGroup 0) :=
 instance : Nontrivial (DihedralGroup n) :=
   ⟨⟨r 0, sr 0, by simp_rw [ne_eq, reduceCtorEq, not_false_eq_true]⟩⟩
 
--- DISSOLVED: card
+theorem card [NeZero n] : Fintype.card (DihedralGroup n) = 2 * n := by
+  rw [← Fintype.card_eq.mpr ⟨fintypeHelper⟩, Fintype.card_sum, ZMod.card, two_mul]
 
 theorem nat_card : Nat.card (DihedralGroup n) = 2 * n := by
   cases n
@@ -148,7 +143,9 @@ theorem orderOf_r_one : orderOf (r 1 : DihedralGroup n) = n := by
     rw [← ZMod.val_eq_zero, ZMod.val_natCast, Nat.mod_eq_of_lt h] at h2
     exact absurd h2.symm (orderOf_pos _).ne
 
--- DISSOLVED: orderOf_r
+theorem orderOf_r [NeZero n] (i : ZMod n) : orderOf (r i) = n / Nat.gcd n i.val := by
+  conv_lhs => rw [← ZMod.natCast_zmod_val i]
+  rw [← r_one_pow, orderOf_pow, orderOf_r_one]
 
 theorem exponent : Monoid.exponent (DihedralGroup n) = lcm n 2 := by
   rcases eq_zero_or_neZero n with (rfl | hn)

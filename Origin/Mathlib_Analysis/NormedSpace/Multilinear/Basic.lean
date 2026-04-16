@@ -8,6 +8,8 @@ import Mathlib.Logic.Embedding.Basic
 import Mathlib.Data.Fintype.CardEmbedding
 import Mathlib.Topology.Algebra.Module.Multilinear.Topology
 
+noncomputable section
+
 /-!
 # Operator norm on the space of continuous multilinear maps
 
@@ -261,11 +263,6 @@ theorem continuous_of_bound (f : MultilinearMap 𝕜 E G) (C : ℝ) (H : ∀ m, 
 def mkContinuous (f : MultilinearMap 𝕜 E G) (C : ℝ) (H : ∀ m, ‖f m‖ ≤ C * ∏ i, ‖m i‖) :
     ContinuousMultilinearMap 𝕜 E G :=
   { f with cont := f.continuous_of_bound C H }
-
-@[simp]
-theorem coe_mkContinuous (f : MultilinearMap 𝕜 E G) (C : ℝ) (H : ∀ m, ‖f m‖ ≤ C * ∏ i, ‖m i‖) :
-    ⇑(f.mkContinuous C H) = f :=
-  rfl
 
 theorem restr_norm_le {k n : ℕ} (f : MultilinearMap 𝕜 (fun _ : Fin n => G) G')
     (s : Finset (Fin n)) (hk : #s = k) (z : G) {C : ℝ} (H : ∀ m, ‖f m‖ ≤ C * ∏ i, ‖m i‖)
@@ -539,20 +536,6 @@ section
 
 variable (𝕜 E E' G G')
 
-@[simps]
-def prodL :
-    ContinuousMultilinearMap 𝕜 E G × ContinuousMultilinearMap 𝕜 E G' ≃ₗᵢ[𝕜]
-      ContinuousMultilinearMap 𝕜 E (G × G') where
-  toFun f := f.1.prod f.2
-  invFun f :=
-    ((ContinuousLinearMap.fst 𝕜 G G').compContinuousMultilinearMap f,
-      (ContinuousLinearMap.snd 𝕜 G G').compContinuousMultilinearMap f)
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  left_inv f := by ext <;> rfl
-  right_inv f := by ext <;> rfl
-  norm_map' f := opNorm_prod f.1 f.2
-
 @[simps! apply symm_apply]
 def piₗᵢ {ι' : Type v'} [Fintype ι'] {E' : ι' → Type wE'} [∀ i', NormedAddCommGroup (E' i')]
     [∀ i', NormedSpace 𝕜 (E' i')] :
@@ -573,18 +556,7 @@ variable [NormedSpace 𝕜' G] [IsScalarTower 𝕜' 𝕜 G]
 
 variable [∀ i, NormedSpace 𝕜' (E i)] [∀ i, IsScalarTower 𝕜' 𝕜 (E i)]
 
-@[simp]
-theorem norm_restrictScalars (f : ContinuousMultilinearMap 𝕜 E G) :
-    ‖f.restrictScalars 𝕜'‖ = ‖f‖ :=
-  rfl
-
 variable (𝕜')
-
-def restrictScalarsₗᵢ : ContinuousMultilinearMap 𝕜 E G →ₗᵢ[𝕜'] ContinuousMultilinearMap 𝕜' E G where
-  toFun := restrictScalars 𝕜'
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  norm_map' _ := rfl
 
 end RestrictScalars
 
@@ -730,28 +702,11 @@ def smulRightL : ContinuousMultilinearMap 𝕜 E 𝕜 →L[𝕜] G →L[𝕜] Co
       map_smul' := fun c f ↦ by ext; simp [smul_smul] }
     1 (fun f z ↦ by simp [norm_smulRight])
 
-@[simp] lemma smulRightL_apply (f : ContinuousMultilinearMap 𝕜 E 𝕜) (z : G) :
-  smulRightL 𝕜 E G f z = f.smulRight z := rfl
-
 set_option maxSynthPendingDepth 2 in
-
 lemma norm_smulRightL_le : ‖smulRightL 𝕜 E G‖ ≤ 1 :=
   LinearMap.mkContinuous₂_norm_le _ zero_le_one _
 
 variable (𝕜 ι G)
-
-protected def piFieldEquiv : G ≃ₗᵢ[𝕜] ContinuousMultilinearMap 𝕜 (fun _ : ι => 𝕜) G where
-  toFun z := ContinuousMultilinearMap.mkPiRing 𝕜 ι z
-  invFun f := f fun _ => 1
-  map_add' z z' := by
-    ext m
-    simp [smul_add]
-  map_smul' c z := by
-    ext m
-    simp [smul_smul, mul_comm]
-  left_inv z := by simp
-  right_inv f := f.mkPiRing_apply_one_eq_self
-  norm_map' := norm_mkPiRing
 
 end ContinuousMultilinearMap
 
@@ -795,18 +750,7 @@ def _root_.ContinuousLinearEquiv.compContinuousMultilinearMapL (g : G ≃L[𝕜]
     continuous_invFun :=
       (compContinuousMultilinearMapL 𝕜 E G' G g.symm.toContinuousLinearMap).continuous }
 
-@[simp]
-theorem _root_.ContinuousLinearEquiv.compContinuousMultilinearMapL_symm (g : G ≃L[𝕜] G') :
-    (g.compContinuousMultilinearMapL E).symm = g.symm.compContinuousMultilinearMapL E :=
-  rfl
-
 variable {E}
-
-@[simp]
-theorem _root_.ContinuousLinearEquiv.compContinuousMultilinearMapL_apply (g : G ≃L[𝕜] G')
-    (f : ContinuousMultilinearMap 𝕜 E G) :
-    g.compContinuousMultilinearMapL E f = (g : G →L[𝕜] G').compContinuousMultilinearMap f :=
-  rfl
 
 @[simps! apply_apply]
 def flipMultilinear (f : G →L[𝕜] ContinuousMultilinearMap 𝕜 E G') :
@@ -890,12 +834,6 @@ def mkContinuousMultilinear (f : MultilinearMap 𝕜 E (MultilinearMap 𝕜 E' G
       refine ((f m).mkContinuous_norm_le' _).trans_eq ?_
       rw [max_mul_of_nonneg, zero_mul]
       positivity
-
-@[simp]
-theorem mkContinuousMultilinear_apply (f : MultilinearMap 𝕜 E (MultilinearMap 𝕜 E' G)) {C : ℝ}
-    (H : ∀ m₁ m₂, ‖f m₁ m₂‖ ≤ (C * ∏ i, ‖m₁ i‖) * ∏ i, ‖m₂ i‖) (m : ∀ i, E i) :
-    ⇑(mkContinuousMultilinear f C H m) = f m :=
-  rfl
 
 theorem mkContinuousMultilinear_norm_le' (f : MultilinearMap 𝕜 E (MultilinearMap 𝕜 E' G)) (C : ℝ)
     (H : ∀ m₁ m₂, ‖f m₁ m₂‖ ≤ (C * ∏ i, ‖m₁ i‖) * ∏ i, ‖m₂ i‖) :
@@ -983,11 +921,6 @@ def compContinuousLinearMapLRight (g : ContinuousMultilinearMap 𝕜 E₁ G) :
           exact apply_update (fun (i : ι) (f : E i →L[𝕜] E₁ i) ↦ f (x i)) f i _ _ }
     (‖g‖) (fun f ↦ by simp [norm_compContinuousLinearMap_le])
 
-@[simp]
-theorem compContinuousLinearMapLRight_apply (g : ContinuousMultilinearMap 𝕜 E₁ G)
-    (f : ∀ i, E i →L[𝕜] E₁ i) : compContinuousLinearMapLRight g f = g.compContinuousLinearMap f :=
-  rfl
-
 variable (E) in
 
 theorem norm_compContinuousLinearMapLRight_le (g : ContinuousMultilinearMap 𝕜 E₁ G) :
@@ -1045,20 +978,7 @@ def compContinuousLinearMapEquivL (f : ∀ i, E i ≃L[𝕜] E₁ i) :
         ContinuousLinearMap.coe_coe, compContinuousLinearMap_apply,
         ContinuousLinearEquiv.coe_coe, ContinuousLinearEquiv.symm_apply_apply] }
 
-@[simp]
-theorem compContinuousLinearMapEquivL_symm (f : ∀ i, E i ≃L[𝕜] E₁ i) :
-    (compContinuousLinearMapEquivL G f).symm =
-      compContinuousLinearMapEquivL G fun i : ι => (f i).symm :=
-  rfl
-
 variable {G}
-
-@[simp]
-theorem compContinuousLinearMapEquivL_apply (g : ContinuousMultilinearMap 𝕜 E₁ G)
-    (f : ∀ i, E i ≃L[𝕜] E₁ i) :
-    compContinuousLinearMapEquivL G f g =
-      g.compContinuousLinearMap fun i => (f i : E i →L[𝕜] E₁ i) :=
-  rfl
 
 noncomputable def iteratedFDerivComponent {α : Type*} [Fintype α]
     (f : ContinuousMultilinearMap 𝕜 E₁ G) {s : Set ι} (e : α ≃ s) [DecidablePred (· ∈ s)] :

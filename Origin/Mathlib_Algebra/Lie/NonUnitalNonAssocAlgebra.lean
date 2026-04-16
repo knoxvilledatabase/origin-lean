@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalHom
 import Mathlib.Algebra.Lie.Basic
 
+noncomputable section
+
 /-!
 # Lie algebras as non-unital, non-associative algebras
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.GroupTheory.Subsemigroup.Center
 
+noncomputable section
+
 /-!
 # Centers of monoids
 
@@ -31,10 +33,6 @@ def center : Submonoid M where
   carrier := Set.center M
   one_mem' := Set.one_mem_center
   mul_mem' := Set.mul_mem_center
-
-@[to_additive]
-theorem coe_center : ↑(center M) = Set.center M :=
-  rfl
 
 @[to_additive (attr := simp) AddSubmonoid.center_toAddSubsemigroup]
 theorem center_toSubsemigroup : (center M).toSubsemigroup = Subsemigroup.center M :=

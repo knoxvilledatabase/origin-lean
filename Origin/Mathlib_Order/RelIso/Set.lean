@@ -7,6 +7,8 @@ import Mathlib.Order.RelIso.Basic
 import Mathlib.Logic.Embedding.Set
 import Mathlib.Logic.Equiv.Set
 
+noncomputable section
+
 /-!
 # Interactions between relation homomorphisms and sets
 
@@ -47,18 +49,10 @@ end RelIso
 def Subrel (r : α → α → Prop) (p : Set α) : p → p → Prop :=
   (Subtype.val : p → α) ⁻¹'o r
 
-@[simp]
-theorem subrel_val (r : α → α → Prop) (p : Set α) {a b} : Subrel r p a b ↔ r a.1 b.1 :=
-  Iff.rfl
-
 namespace Subrel
 
 protected def relEmbedding (r : α → α → Prop) (p : Set α) : Subrel r p ↪r r :=
   ⟨Embedding.subtype _, Iff.rfl⟩
-
-@[simp]
-theorem relEmbedding_apply (r : α → α → Prop) (p a) : Subrel.relEmbedding r p a = a.1 :=
-  rfl
 
 instance (r : α → α → Prop) [IsWellOrder α r] (p : Set α) : IsWellOrder p (Subrel r p) :=
   RelEmbedding.isWellOrder (Subrel.relEmbedding r p)
@@ -83,11 +77,6 @@ end Subrel
 
 def RelEmbedding.codRestrict (p : Set β) (f : r ↪r s) (H : ∀ a, f a ∈ p) : r ↪r Subrel s p :=
   ⟨f.toEmbedding.codRestrict p H, f.map_rel_iff'⟩
-
-@[simp]
-theorem RelEmbedding.codRestrict_apply (p) (f : r ↪r s) (H a) :
-    RelEmbedding.codRestrict p f H a = ⟨f a, H a⟩ :=
-  rfl
 
 section image
 

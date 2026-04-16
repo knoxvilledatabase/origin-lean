@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.GroupTheory.GroupAction.Hom
 
+noncomputable section
+
 /-!
 # Pointwise actions of equivariant maps
 

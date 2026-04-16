@@ -8,6 +8,8 @@ import Mathlib.Order.Basic
 import Mathlib.Tactic.MkIffOfInductiveProp
 import Batteries.WF
 
+noncomputable section
+
 /-!
 # Unbundled relation classes
 
@@ -103,10 +105,6 @@ theorem not_rel_of_subsingleton (r) [IsIrrefl α r] [Subsingleton α] (x y) : ¬
 
 theorem rel_of_subsingleton (r) [IsRefl α r] [Subsingleton α] (x y) : r x y :=
   Subsingleton.elim x y ▸ refl x
-
-@[simp]
-theorem empty_relation_apply (a b : α) : EmptyRelation a b ↔ False :=
-  Iff.rfl
 
 theorem eq_empty_relation (r) [IsIrrefl α r] [Subsingleton α] : r = EmptyRelation :=
   funext₂ <| by simpa using not_rel_of_subsingleton r

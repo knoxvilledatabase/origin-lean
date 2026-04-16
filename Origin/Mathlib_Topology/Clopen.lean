@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Clopen.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Data.Set.BoolIndicator
+
+noncomputable section
 
 /-!
 # Clopen sets
@@ -33,6 +35,7 @@ theorem isClopen_iff_frontier_eq_empty : IsClopen s ↔ frontier s = ∅ := by
     interior_subset.antisymm (subset_closure.trans h)⟩
 
 @[simp] alias ⟨IsClopen.frontier_eq, _⟩ := isClopen_iff_frontier_eq_empty
+
 theorem IsClopen.union (hs : IsClopen s) (ht : IsClopen t) : IsClopen (s ∪ t) :=
   ⟨hs.1.union ht.1, hs.2.union ht.2⟩
 

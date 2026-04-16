@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List
 import Mathlib.Algebra.Group.Subgroup.Ker
 
+noncomputable section
+
 /-!
 # Free groups
 
@@ -386,21 +388,6 @@ def mk (L : List (α × Bool)) : FreeGroup α :=
 theorem quot_mk_eq_mk : Quot.mk Red.Step L = mk L :=
   rfl
 
-@[to_additive (attr := simp)]
-theorem quot_lift_mk (β : Type v) (f : List (α × Bool) → β)
-    (H : ∀ L₁ L₂, Red.Step L₁ L₂ → f L₁ = f L₂) : Quot.lift f H (mk L) = f L :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem quot_liftOn_mk (β : Type v) (f : List (α × Bool) → β)
-    (H : ∀ L₁ L₂, Red.Step L₁ L₂ → f L₁ = f L₂) : Quot.liftOn (mk L) f H = f L :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem quot_map_mk (β : Type v) (f : List (α × Bool) → List (β × Bool))
-    (H : (Red.Step ⇒ Red.Step) f f) : Quot.map f H (mk L) = mk (f L) :=
-  rfl
-
 @[to_additive]
 instance : One (FreeGroup α) :=
   ⟨mk []⟩
@@ -441,10 +428,6 @@ theorem invRev_length : (invRev L₁).length = L₁.length := by simp [invRev]
 theorem invRev_invRev : invRev (invRev L₁) = L₁ := by
   simp [invRev, List.map_reverse, Function.comp_def]
 
-@[to_additive (attr := simp)]
-theorem invRev_empty : invRev ([] : List (α × Bool)) = [] :=
-  rfl
-
 @[to_additive]
 theorem invRev_involutive : Function.Involutive (@invRev α) := fun _ => invRev_invRev
 
@@ -467,10 +450,6 @@ instance : Inv (FreeGroup α) :=
         intro a b h
         cases h
         simp [invRev])⟩
-
-@[to_additive (attr := simp)]
-theorem inv_mk : (mk L)⁻¹ = mk (invRev L) :=
-  rfl
 
 @[to_additive]
 theorem Red.Step.invRev {L₁ L₂ : List (α × Bool)} (h : Red.Step L₁ L₂) :
@@ -562,10 +541,6 @@ def lift : (α → β) ≃ (FreeGroup α →* β) where
           simpa [Lift.aux] using ih)
 
 variable {f}
-
-@[to_additive (attr := simp)]
-theorem lift.mk : lift f (mk L) = List.prod (L.map fun x => cond x.2 (f x.1) (f x.1)⁻¹) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem lift.of {x} : lift f (of x) = f x :=
@@ -675,10 +650,6 @@ def freeGroupCongr {α β} (e : α ≃ β) : FreeGroup α ≃* FreeGroup β wher
 theorem freeGroupCongr_refl : freeGroupCongr (Equiv.refl α) = MulEquiv.refl _ :=
   MulEquiv.ext map.id
 
-@[to_additive (attr := simp)]
-theorem freeGroupCongr_symm {α β} (e : α ≃ β) : (freeGroupCongr e).symm = freeGroupCongr e.symm :=
-  rfl
-
 @[to_additive]
 theorem freeGroupCongr_trans {α β γ} (e : α ≃ β) (f : β ≃ γ) :
     (freeGroupCongr e).trans (freeGroupCongr f) = freeGroupCongr (e.trans f) :=
@@ -696,10 +667,6 @@ def prod : FreeGroup α →* α :=
   lift id
 
 variable {x y}
-
-@[to_additive (attr := simp)]
-theorem prod_mk : prod (mk L) = List.prod (L.map fun x => cond x.2 x.1 x.1⁻¹) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem prod.of {x : α} : prod (of x) = x :=

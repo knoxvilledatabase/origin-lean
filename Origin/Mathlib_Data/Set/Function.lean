@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Set/Function.lean
-Genuine: 317 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
+Genuine: 318 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Data.Set.Prod
 import Mathlib.Logic.Function.Conjugate
+
+noncomputable section
 
 /-!
 # Functions over sets
@@ -43,13 +45,7 @@ section restrict
 
 def restrict (s : Set α) (f : ∀ a : α, π a) : ∀ a : s, π a := fun x => f x
 
-theorem restrict_def (s : Set α) : s.restrict (π := π) = fun f x ↦ f x := rfl
-
 theorem restrict_eq (f : α → β) (s : Set α) : s.restrict f = f ∘ Subtype.val :=
-  rfl
-
-@[simp]
-theorem restrict_apply (f : (a : α) → π a) (s : Set α) (x : s) : s.restrict f x = f x :=
   rfl
 
 theorem restrict_eq_iff {f : ∀ a, π a} {s : Set α} {g : ∀ a : s, π a} :
@@ -115,15 +111,6 @@ theorem restrict_extend_compl_range (f : α → β) (g : α → γ) (g' : β →
 def restrict₂ {s t : Set α} (hst : s ⊆ t) (f : ∀ a : t, π a) : ∀ a : s, π a :=
   fun x => f ⟨x.1, hst x.2⟩
 
-theorem restrict₂_def {s t : Set α} (hst : s ⊆ t) :
-    restrict₂ (π := π) hst = fun f x ↦ f ⟨x.1, hst x.2⟩ := rfl
-
-theorem restrict₂_comp_restrict {s t : Set α} (hst : s ⊆ t) :
-    (restrict₂ (π := π) hst) ∘ t.restrict = s.restrict := rfl
-
-theorem restrict₂_comp_restrict₂ {s t u : Set α} (hst : s ⊆ t) (htu : t ⊆ u) :
-    (restrict₂ (π := π) hst) ∘ (restrict₂ htu) = restrict₂ (hst.trans htu) := rfl
-
 theorem range_extend_subset (f : α → β) (g : α → γ) (g' : β → γ) :
     range (extend f g g') ⊆ range g ∪ g' '' (range f)ᶜ := by
   classical
@@ -143,11 +130,6 @@ def codRestrict (f : ι → α) (s : Set α) (h : ∀ x, f x ∈ s) : ι → s :
 @[simp]
 theorem val_codRestrict_apply (f : ι → α) (s : Set α) (h : ∀ x, f x ∈ s) (x : ι) :
     (codRestrict f s h x : α) = f x :=
-  rfl
-
-@[simp]
-theorem restrict_comp_codRestrict {f : ι → α} {g : α → β} {b : Set α} (h : ∀ x, f x ∈ b) :
-    b.restrict g ∘ b.codRestrict f h = g ∘ f :=
   rfl
 
 @[simp]
@@ -240,19 +222,6 @@ theorem MapsTo.coe_iterate_restrict {f : α → α} (h : MapsTo f s s) (x : s) (
   | zero => simp
   | succ k ih => simp only [iterate_succ', comp_apply, val_restrict_apply, ih]
 
-@[simp]
-theorem codRestrict_restrict (h : ∀ x : s, f x ∈ t) :
-    codRestrict (s.restrict f) t h = MapsTo.restrict f s t fun x hx => h ⟨x, hx⟩ :=
-  rfl
-
-theorem MapsTo.restrict_eq_codRestrict (h : MapsTo f s t) :
-    h.restrict f s t = codRestrict (s.restrict f) t fun x => h x.2 :=
-  rfl
-
-theorem MapsTo.coe_restrict (h : Set.MapsTo f s t) :
-    Subtype.val ∘ h.restrict f s t = s.restrict f :=
-  rfl
-
 theorem MapsTo.range_restrict (f : α → β) (s : Set α) (t : Set β) (h : MapsTo f s t) :
     range (h.restrict f s t) = Subtype.val ⁻¹' (f '' s) :=
   Set.range_subtype_map f h
@@ -269,8 +238,6 @@ theorem mapsTo_prod_map_diagonal : MapsTo (Prod.map f f) (diagonal α) (diagonal
   diagonal_subset_iff.2 fun _ => rfl
 
 theorem MapsTo.subset_preimage (hf : MapsTo f s t) : s ⊆ f ⁻¹' t := hf
-
-theorem mapsTo_iff_subset_preimage : MapsTo f s t ↔ s ⊆ f ⁻¹' t := Iff.rfl
 
 @[simp]
 theorem mapsTo_singleton {x : α} : MapsTo f {x} t ↔ f x ∈ t :=
@@ -411,9 +378,6 @@ variable (f) in
 
 theorem range_restrictPreimage : range (t.restrictPreimage f) = Subtype.val ⁻¹' range f := by
   simp only [← image_univ, ← image_restrictPreimage, preimage_univ]
-
-@[simp]
-theorem restrictPreimage_mk (h : a ∈ f ⁻¹' t) : t.restrictPreimage f ⟨a, h⟩ = ⟨f a, h⟩ := rfl
 
 theorem image_val_preimage_restrictPreimage {u : Set t} :
     Subtype.val '' (t.restrictPreimage f ⁻¹' u) = f ⁻¹' (Subtype.val '' u) := by
@@ -1448,9 +1412,6 @@ theorem pi_piecewise {ι : Type*} {α : ι → Type*} (s s' : Set ι) (t t' : �
 theorem univ_pi_piecewise {ι : Type*} {α : ι → Type*} (s : Set ι) (t t' : ∀ i, Set (α i))
     [∀ x, Decidable (x ∈ s)] : pi univ (s.piecewise t t') = pi s t ∩ pi sᶜ t' := by
   simp [compl_eq_univ_diff]
-
-theorem univ_pi_piecewise_univ {ι : Type*} {α : ι → Type*} (s : Set ι) (t : ∀ i, Set (α i))
-    [∀ x, Decidable (x ∈ s)] : pi univ (s.piecewise t fun _ => univ) = pi s t := by simp
 
 end Set
 

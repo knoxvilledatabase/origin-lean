@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Opposite
 import Mathlib.Algebra.Group.TypeTags.Basic
 
+noncomputable section
+
 /-!
 # Squares and even elements
 
@@ -55,9 +57,6 @@ instance [DecidablePred (IsSquare : α → Prop)] : DecidablePred (IsSquare : α
   fun _ ↦ decidable_of_iff _ isSquare_unop_iff
 
 @[simp]
-lemma even_ofMul_iff {a : α} : Even (Additive.ofMul a) ↔ IsSquare a := Iff.rfl
-
-@[simp]
 lemma isSquare_toMul_iff {a : Additive α} : IsSquare (a.toMul) ↔ Even a := Iff.rfl
 
 instance Additive.instDecidablePredEven [DecidablePred (IsSquare : α → Prop)] :
@@ -69,8 +68,6 @@ end Mul
 section Add
 
 variable [Add α]
-
-@[simp] lemma isSquare_ofAdd_iff {a : α} : IsSquare (Multiplicative.ofAdd a) ↔ Even a := Iff.rfl
 
 @[simp]
 lemma even_toAdd_iff {a : Multiplicative α} : Even a.toAdd ↔ IsSquare a := Iff.rfl

@@ -6,6 +6,8 @@ import Origin.Core
 import ImportGraph.Imports
 import Mathlib.Tactic.MinImports
 
+noncomputable section
+
 /-! # The `upstreamableDecl` linter
 
 The `upstreamableDecl` linter detects declarations that could be moved to a file higher up in the

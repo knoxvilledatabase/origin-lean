@@ -7,6 +7,8 @@ import Mathlib.Algebra.MonoidAlgebra.Defs
 import Mathlib.RingTheory.Ideal.BigOperators
 import Mathlib.RingTheory.Ideal.Span
 
+noncomputable section
+
 /-!
 # Lemmas about ideals of `MonoidAlgebra` and `AddMonoidAlgebra`
 -/

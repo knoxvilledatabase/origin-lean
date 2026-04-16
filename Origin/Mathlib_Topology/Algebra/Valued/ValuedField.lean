@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/Valued/ValuedField.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Valued.ValuationTopology
 import Mathlib.Topology.Algebra.WithZeroTopology
 import Mathlib.Topology.Algebra.UniformField
+
+noncomputable section
 
 /-!
 # Valued fields and their completions
@@ -41,7 +43,28 @@ section InversionEstimate
 
 variable (v : Valuation K Γ₀)
 
--- DISSOLVED: Valuation.inversion_estimate
+theorem Valuation.inversion_estimate {x y : K} {γ : Γ₀ˣ} (y_ne : y ≠ 0)
+    (h : v (x - y) < min (γ * (v y * v y)) (v y)) : v (x⁻¹ - y⁻¹) < γ := by
+  have hyp1 : v (x - y) < γ * (v y * v y) := lt_of_lt_of_le h (min_le_left _ _)
+  have hyp1' : v (x - y) * (v y * v y)⁻¹ < γ := mul_inv_lt_of_lt_mul₀ hyp1
+  have hyp2 : v (x - y) < v y := lt_of_lt_of_le h (min_le_right _ _)
+  have key : v x = v y := Valuation.map_eq_of_sub_lt v hyp2
+  have x_ne : x ≠ 0 := by
+    intro h
+    apply y_ne
+    rw [h, v.map_zero] at key
+    exact v.zero_iff.1 key.symm
+  have decomp : x⁻¹ - y⁻¹ = x⁻¹ * (y - x) * y⁻¹ := by
+    rw [mul_sub_left_distrib, sub_mul, mul_assoc, show y * y⁻¹ = 1 from mul_inv_cancel₀ y_ne,
+      show x⁻¹ * x = 1 from inv_mul_cancel₀ x_ne, mul_one, one_mul]
+  calc
+    v (x⁻¹ - y⁻¹) = v (x⁻¹ * (y - x) * y⁻¹) := by rw [decomp]
+    _ = v x⁻¹ * (v <| y - x) * v y⁻¹ := by repeat' rw [Valuation.map_mul]
+    _ = (v x)⁻¹ * (v <| y - x) * (v y)⁻¹ := by rw [map_inv₀, map_inv₀]
+    _ = (v <| y - x) * (v y * v y)⁻¹ := by rw [mul_assoc, mul_comm, key, mul_assoc, mul_inv_rev]
+    _ = (v <| y - x) * (v y * v y)⁻¹ := rfl
+    _ = (v <| x - y) * (v y * v y)⁻¹ := by rw [Valuation.map_sub_swap]
+    _ < γ := hyp1'
 
 end InversionEstimate
 

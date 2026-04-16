@@ -5,6 +5,8 @@ Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 
+noncomputable section
+
 /-!
 # Topological study of spaces `Π (n : ℕ), E n`
 
@@ -173,10 +175,6 @@ open List
 def res (x : ℕ → α) : ℕ → List α
   | 0 => nil
   | Nat.succ n => x n :: res x n
-
-@[simp]
-theorem res_zero (x : ℕ → α) : res x 0 = @nil α :=
-  rfl
 
 @[simp]
 theorem res_succ (x : ℕ → α) (n : ℕ) : res x n.succ = x n :: res x n :=
@@ -622,92 +620,6 @@ theorem exists_retraction_subtype_of_isClosed {s : Set (∀ n, E n)} (hs : IsClo
 end PiNat
 
 open PiNat
-
-theorem exists_nat_nat_continuous_surjective_of_completeSpace (α : Type*) [MetricSpace α]
-    [CompleteSpace α] [SecondCountableTopology α] [Nonempty α] :
-    ∃ f : (ℕ → ℕ) → α, Continuous f ∧ Surjective f := by
-  /- First, we define a surjective map from a closed subset `s` of `ℕ → ℕ`. Then, we compose
-    this map with a retraction of `ℕ → ℕ` onto `s` to obtain the desired map.
-    Let us consider a dense sequence `u` in `α`. Then `s` is the set of sequences `xₙ` such that the
-    balls `closedBall (u xₙ) (1/2^n)` have a nonempty intersection. This set is closed,
-    and we define `f x` there to be the unique point in the intersection.
-    This function is continuous and surjective by design. -/
-  letI : MetricSpace (ℕ → ℕ) := PiNat.metricSpaceNatNat
-  have I0 : (0 : ℝ) < 1 / 2 := by norm_num
-  have I1 : (1 / 2 : ℝ) < 1 := by norm_num
-  rcases exists_dense_seq α with ⟨u, hu⟩
-  let s : Set (ℕ → ℕ) := { x | (⋂ n : ℕ, closedBall (u (x n)) ((1 / 2) ^ n)).Nonempty }
-  let g : s → α := fun x => x.2.some
-  have A : ∀ (x : s) (n : ℕ), dist (g x) (u ((x : ℕ → ℕ) n)) ≤ (1 / 2) ^ n := fun x n =>
-    (mem_iInter.1 x.2.some_mem n : _)
-  have g_cont : Continuous g := by
-    refine continuous_iff_continuousAt.2 fun y => ?_
-    refine continuousAt_of_locally_lipschitz zero_lt_one 4 fun x hxy => ?_
-    rcases eq_or_ne x y with (rfl | hne)
-    · simp
-    have hne' : x.1 ≠ y.1 := Subtype.coe_injective.ne hne
-    have dist' : dist x y = dist x.1 y.1 := rfl
-    let n := firstDiff x.1 y.1 - 1
-    have diff_pos : 0 < firstDiff x.1 y.1 := by
-      by_contra! h
-      apply apply_firstDiff_ne hne'
-      rw [Nat.le_zero.1 h]
-      apply apply_eq_of_dist_lt _ le_rfl
-      rw [pow_zero]
-      exact hxy
-    have hn : firstDiff x.1 y.1 = n + 1 := (Nat.succ_pred_eq_of_pos diff_pos).symm
-    rw [dist', dist_eq_of_ne hne', hn]
-    have B : x.1 n = y.1 n := mem_cylinder_firstDiff x.1 y.1 n (Nat.pred_lt diff_pos.ne')
-    calc
-      dist (g x) (g y) ≤ dist (g x) (u (x.1 n)) + dist (g y) (u (x.1 n)) :=
-        dist_triangle_right _ _ _
-      _ = dist (g x) (u (x.1 n)) + dist (g y) (u (y.1 n)) := by rw [← B]
-      _ ≤ (1 / 2) ^ n + (1 / 2) ^ n := add_le_add (A x n) (A y n)
-      _ = 4 * (1 / 2) ^ (n + 1) := by ring
-  have g_surj : Surjective g := fun y ↦ by
-    have : ∀ n : ℕ, ∃ j, y ∈ closedBall (u j) ((1 / 2) ^ n) := fun n ↦ by
-      rcases hu.exists_dist_lt y (by simp : (0 : ℝ) < (1 / 2) ^ n) with ⟨j, hj⟩
-      exact ⟨j, hj.le⟩
-    choose x hx using this
-    have I : (⋂ n : ℕ, closedBall (u (x n)) ((1 / 2) ^ n)).Nonempty := ⟨y, mem_iInter.2 hx⟩
-    refine ⟨⟨x, I⟩, ?_⟩
-    refine dist_le_zero.1 ?_
-    have J : ∀ n : ℕ, dist (g ⟨x, I⟩) y ≤ (1 / 2) ^ n + (1 / 2) ^ n := fun n =>
-      calc
-        dist (g ⟨x, I⟩) y ≤ dist (g ⟨x, I⟩) (u (x n)) + dist y (u (x n)) :=
-          dist_triangle_right _ _ _
-        _ ≤ (1 / 2) ^ n + (1 / 2) ^ n := add_le_add (A ⟨x, I⟩ n) (hx n)
-    have L : Tendsto (fun n : ℕ => (1 / 2 : ℝ) ^ n + (1 / 2) ^ n) atTop (𝓝 (0 + 0)) :=
-      (tendsto_pow_atTop_nhds_zero_of_lt_one I0.le I1).add
-        (tendsto_pow_atTop_nhds_zero_of_lt_one I0.le I1)
-    rw [add_zero] at L
-    exact ge_of_tendsto' L J
-  have s_closed : IsClosed s := by
-    refine isClosed_iff_clusterPt.mpr fun x hx ↦ ?_
-    have L : Tendsto (fun n : ℕ => diam (closedBall (u (x n)) ((1 / 2) ^ n))) atTop (𝓝 0) := by
-      have : Tendsto (fun n : ℕ => (2 : ℝ) * (1 / 2) ^ n) atTop (𝓝 (2 * 0)) :=
-        (tendsto_pow_atTop_nhds_zero_of_lt_one I0.le I1).const_mul _
-      rw [mul_zero] at this
-      exact
-        squeeze_zero (fun n => diam_nonneg) (fun n => diam_closedBall (pow_nonneg I0.le _)) this
-    refine nonempty_iInter_of_nonempty_biInter (fun n => isClosed_ball)
-      (fun n => isBounded_closedBall) (fun N ↦ ?_) L
-    obtain ⟨y, hxy, ys⟩ : ∃ y, y ∈ ball x ((1 / 2) ^ N) ∩ s :=
-      clusterPt_principal_iff.1 hx _ (ball_mem_nhds x (pow_pos I0 N))
-    have E :
-      ⋂ (n : ℕ) (H : n ≤ N), closedBall (u (x n)) ((1 / 2) ^ n) =
-        ⋂ (n : ℕ) (H : n ≤ N), closedBall (u (y n)) ((1 / 2) ^ n) := by
-      refine iInter_congr fun n ↦ iInter_congr fun hn ↦ ?_
-      have : x n = y n := apply_eq_of_dist_lt (mem_ball'.1 hxy) hn
-      rw [this]
-    rw [E]
-    apply Nonempty.mono _ ys
-    apply iInter_subset_iInter₂
-  obtain ⟨f, -, f_surj, f_cont⟩ :
-    ∃ f : (ℕ → ℕ) → s, (∀ x : s, f x = x) ∧ Surjective f ∧ Continuous f := by
-    apply exists_retraction_subtype_of_isClosed s_closed
-    simpa only [nonempty_coe_sort] using g_surj.nonempty
-  exact ⟨g ∘ f, g_cont.comp f_cont, g_surj.comp f_surj⟩
 
 namespace PiCountable
 

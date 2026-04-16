@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.CompactOpen
 import Mathlib.Topology.Order.ProjIcc
 
+noncomputable section
+
 /-!
 # Continuous bundled maps on intervals
 

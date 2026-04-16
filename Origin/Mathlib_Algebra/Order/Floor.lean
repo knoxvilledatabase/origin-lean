@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Floor.lean
-Genuine: 275 | Conflates: 0 | Dissolved: 10 | Infrastructure: 14
+Genuine: 285 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas
@@ -14,6 +14,8 @@ import Mathlib.Tactic.Abel
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Positivity.Basic
+
+noncomputable section
 
 /-!
 # Floor and ceil
@@ -96,14 +98,6 @@ def floor : α → ℕ :=
 def ceil : α → ℕ :=
   FloorSemiring.ceil
 
-@[simp]
-theorem floor_nat : (Nat.floor : ℕ → ℕ) = id :=
-  rfl
-
-@[simp]
-theorem ceil_nat : (Nat.ceil : ℕ → ℕ) = id :=
-  rfl
-
 notation "⌊" a "⌋₊" => Nat.floor a
 
 notation "⌈" a "⌉₊" => Nat.ceil a
@@ -176,13 +170,20 @@ theorem floor_mono : Monotone (floor : α → ℕ) := fun a b h => by
 
 @[gcongr, bound] lemma floor_le_floor (hab : a ≤ b) : ⌊a⌋₊ ≤ ⌊b⌋₊ := floor_mono hab
 
--- DISSOLVED: le_floor_iff'
+theorem le_floor_iff' (hn : n ≠ 0) : n ≤ ⌊a⌋₊ ↔ (n : α) ≤ a := by
+  obtain ha | ha := le_total a 0
+  · rw [floor_of_nonpos ha]
+    exact
+      iff_of_false (Nat.pos_of_ne_zero hn).not_le
+        (not_le_of_lt <| ha.trans_lt <| cast_pos.2 <| Nat.pos_of_ne_zero hn)
+  · exact le_floor_iff ha
 
 @[simp]
 theorem one_le_floor_iff (x : α) : 1 ≤ ⌊x⌋₊ ↔ 1 ≤ x :=
   mod_cast @le_floor_iff' α _ _ x 1 one_ne_zero
 
--- DISSOLVED: floor_lt'
+theorem floor_lt' (hn : n ≠ 0) : ⌊a⌋₊ < n ↔ a < n :=
+  lt_iff_lt_of_le_iff_le <| le_floor_iff' hn
 
 theorem floor_pos : 0 < ⌊a⌋₊ ↔ 1 ≤ a := by
   -- Porting note: broken `convert le_floor_iff' Nat.one_ne_zero`
@@ -209,7 +210,9 @@ theorem floor_eq_iff (ha : 0 ≤ a) : ⌊a⌋₊ = n ↔ ↑n ≤ a ∧ a < ↑n
   rw [← le_floor_iff ha, ← Nat.cast_one, ← Nat.cast_add, ← floor_lt ha, Nat.lt_add_one_iff,
     le_antisymm_iff, and_comm]
 
--- DISSOLVED: floor_eq_iff'
+theorem floor_eq_iff' (hn : n ≠ 0) : ⌊a⌋₊ = n ↔ ↑n ≤ a ∧ a < ↑n + 1 := by
+  rw [← le_floor_iff' hn, ← Nat.cast_one, ← Nat.cast_add, ← floor_lt' (Nat.add_one_ne_zero n),
+    Nat.lt_add_one_iff, le_antisymm_iff, and_comm]
 
 theorem floor_eq_on_Ico (n : ℕ) : ∀ a ∈ (Set.Ico n (n + 1) : Set α), ⌊a⌋₊ = n := fun _ ⟨h₀, h₁⟩ =>
   (floor_eq_iff <| n.cast_nonneg.trans h₀).mpr ⟨h₀, h₁⟩
@@ -222,7 +225,9 @@ theorem floor_eq_on_Ico' (n : ℕ) :
 theorem preimage_floor_zero : (floor : α → ℕ) ⁻¹' {0} = Iio 1 :=
   ext fun _ => floor_eq_zero
 
--- DISSOLVED: preimage_floor_of_ne_zero
+theorem preimage_floor_of_ne_zero {n : ℕ} (hn : n ≠ 0) :
+    (floor : α → ℕ) ⁻¹' {n} = Ico (n : α) (n + 1) :=
+  ext fun _ => floor_eq_iff' hn
 
 /-! #### Ceil -/
 
@@ -295,13 +300,17 @@ theorem floor_lt_ceil_of_lt_of_pos {a b : α} (h : a < b) (h' : 0 < b) : ⌊a⌋
     exact h.trans_le (le_ceil _)
   · rwa [floor_of_nonpos ha.le, lt_ceil, Nat.cast_zero]
 
--- DISSOLVED: ceil_eq_iff
+theorem ceil_eq_iff (hn : n ≠ 0) : ⌈a⌉₊ = n ↔ ↑(n - 1) < a ∧ a ≤ n := by
+  rw [← ceil_le, ← not_le, ← ceil_le, not_le,
+    tsub_lt_iff_right (Nat.add_one_le_iff.2 (pos_iff_ne_zero.2 hn)), Nat.lt_add_one_iff,
+    le_antisymm_iff, and_comm]
 
 @[simp]
 theorem preimage_ceil_zero : (Nat.ceil : α → ℕ) ⁻¹' {0} = Iic 0 :=
   ext fun _ => ceil_eq_zero
 
--- DISSOLVED: preimage_ceil_of_ne_zero
+theorem preimage_ceil_of_ne_zero (hn : n ≠ 0) : (Nat.ceil : α → ℕ) ⁻¹' {n} = Ioc (↑(n - 1) : α) n :=
+  ext fun _ => ceil_eq_iff hn
 
 /-! #### Intervals -/
 
@@ -563,28 +572,12 @@ def fract (a : α) : α :=
   a - floor a
 
 @[simp]
-theorem floor_int : (Int.floor : ℤ → ℤ) = id :=
-  rfl
-
-@[simp]
-theorem ceil_int : (Int.ceil : ℤ → ℤ) = id :=
-  rfl
-
-@[simp]
 theorem fract_int : (Int.fract : ℤ → ℤ) = 0 :=
   funext fun x => by simp [fract]
 
 notation "⌊" a "⌋" => Int.floor a
 
 notation "⌈" a "⌉" => Int.ceil a
-
-@[simp]
-theorem floorRing_floor_eq : @FloorRing.floor = @Int.floor :=
-  rfl
-
-@[simp]
-theorem floorRing_ceil_eq : @FloorRing.ceil = @Int.ceil :=
-  rfl
 
 /-! #### Floor -/
 
@@ -898,7 +891,15 @@ theorem fract_add (a b : α) : ∃ z : ℤ, fract (a + b) - fract a - fract b = 
     simp only [sub_eq_add_neg, neg_add_rev, neg_neg, cast_add, cast_neg]
     abel⟩
 
--- DISSOLVED: fract_neg
+theorem fract_neg {x : α} (hx : fract x ≠ 0) : fract (-x) = 1 - fract x := by
+  rw [fract_eq_iff]
+  constructor
+  · rw [le_sub_iff_add_le, zero_add]
+    exact (fract_lt_one x).le
+  refine ⟨sub_lt_self _ (lt_of_le_of_ne' (fract_nonneg x) hx), -⌊x⌋ - 1, ?_⟩
+  simp only [sub_sub_eq_add_sub, cast_sub, cast_neg, cast_one, sub_left_inj]
+  conv in -x => rw [← floor_add_fract x]
+  simp [-floor_add_fract]
 
 @[simp]
 theorem fract_neg_eq_zero {x : α} : fract (-x) = 0 ↔ fract x = 0 := by
@@ -941,7 +942,9 @@ theorem fract_div_mul_self_mem_Ico (a b : k) (ha : 0 < a) : fract (b / a) * a �
   ⟨(mul_nonneg_iff_of_pos_right ha).2 (fract_nonneg (b / a)),
     (mul_lt_iff_lt_one_left ha).2 (fract_lt_one (b / a))⟩
 
--- DISSOLVED: fract_div_mul_self_add_zsmul_eq
+theorem fract_div_mul_self_add_zsmul_eq (a b : k) (ha : a ≠ 0) :
+    fract (b / a) * a + ⌊b / a⌋ • a = b := by
+  rw [zsmul_eq_mul, ← add_mul, fract_add_floor, div_mul_cancel₀ b ha]
 
 theorem sub_floor_div_mul_nonneg (a : k) (hb : 0 < b) : 0 ≤ a - ⌊a / b⌋ * b :=
   sub_nonneg_of_le <| (le_div_iff₀ hb).1 <| floor_le _
@@ -1154,9 +1157,13 @@ theorem fract_eq_zero_or_add_one_sub_ceil (a : α) : fract a = 0 ∨ fract a = a
   rw [cast_add, cast_one, add_tsub_cancel_right, ← self_sub_fract a, sub_lt_self_iff]
   exact ha.symm.lt_of_le (fract_nonneg a)
 
--- DISSOLVED: ceil_eq_add_one_sub_fract
+theorem ceil_eq_add_one_sub_fract (ha : fract a ≠ 0) : (⌈a⌉ : α) = a + 1 - fract a := by
+  rw [(or_iff_right ha).mp (fract_eq_zero_or_add_one_sub_ceil a)]
+  abel
 
--- DISSOLVED: ceil_sub_self_eq
+theorem ceil_sub_self_eq (ha : fract a ≠ 0) : (⌈a⌉ : α) - a = 1 - fract a := by
+  rw [(or_iff_right ha).mp (fract_eq_zero_or_add_one_sub_ceil a)]
+  abel
 
 section LinearOrderedField
 
@@ -1502,14 +1509,6 @@ theorem Int.floor_toNat (a : α) : ⌊a⌋.toNat = ⌊a⌋₊ :=
   rfl
 
 theorem Int.ceil_toNat (a : α) : ⌈a⌉.toNat = ⌈a⌉₊ :=
-  rfl
-
-@[simp]
-theorem Nat.floor_int : (Nat.floor : ℤ → ℕ) = Int.toNat :=
-  rfl
-
-@[simp]
-theorem Nat.ceil_int : (Nat.ceil : ℤ → ℕ) = Int.toNat :=
   rfl
 
 variable {a : α}

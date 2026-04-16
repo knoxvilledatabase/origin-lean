@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.CategoryTheory.ConcreteCategory.Elementwise
 import Mathlib.Algebra.Category.Grp.Colimits
 
+noncomputable section
+
 /-!
 # The category of R-modules has all colimits.
 

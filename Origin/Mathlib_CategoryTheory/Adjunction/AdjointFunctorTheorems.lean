@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.WeaklyInitial
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Subobject.Comma
 
+noncomputable section
+
 /-!
 # Adjoint functor theorem
 

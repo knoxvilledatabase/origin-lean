@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.Order
 import Mathlib.Order.Category.BddDistLat
 import Mathlib.Order.Category.FinPartOrd
 
+noncomputable section
+
 /-!
 # The category of finite bounded distributive lattices
 
@@ -85,8 +87,3 @@ def dualEquiv : FinBddDistLat ≌ FinBddDistLat where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end FinBddDistLat
-
-theorem finBddDistLat_dual_comp_forget_to_bddDistLat :
-    FinBddDistLat.dual ⋙ forget₂ FinBddDistLat BddDistLat =
-      forget₂ FinBddDistLat BddDistLat ⋙ BddDistLat.dual :=
-  rfl

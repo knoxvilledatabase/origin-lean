@@ -12,6 +12,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.Products.Bifunctor
 import Mathlib.Data.Countable.Small
 
+noncomputable section
+
 /-!
 # Filtered colimits commute with finite limits.
 

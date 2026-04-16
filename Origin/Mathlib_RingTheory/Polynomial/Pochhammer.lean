@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Pochhammer.lean
-Genuine: 36 | Conflates: 4 | Dissolved: 2 | Infrastructure: 4
+Genuine: 38 | Conflates: 4 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.CharP.Defs
 import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.Algebra.Polynomial.Eval.Algebra
 import Mathlib.Tactic.Abel
+
+noncomputable section
 
 /-!
 # The Pochhammer polynomials
@@ -101,9 +103,9 @@ theorem ascPochhammer_eval_zero {n : ℕ} : (ascPochhammer S n).eval 0 = if n = 
   · simp
   · simp [X_mul, Nat.succ_ne_zero, ascPochhammer_succ_left]
 
-theorem ascPochhammer_zero_eval_zero : (ascPochhammer S 0).eval 0 = 1 := by simp
-
--- DISSOLVED: ascPochhammer_ne_zero_eval_zero
+@[simp]
+theorem ascPochhammer_ne_zero_eval_zero {n : ℕ} (h : n ≠ 0) : (ascPochhammer S n).eval 0 = 0 := by
+  simp [ascPochhammer_eval_zero, h]
 
 theorem ascPochhammer_succ_right (n : ℕ) :
     ascPochhammer S (n + 1) = ascPochhammer S n * (X + (n : S[X])) := by
@@ -267,9 +269,9 @@ theorem descPochhammer_eval_zero {n : ℕ} :
   · simp
   · simp [X_mul, Nat.succ_ne_zero, descPochhammer_succ_left]
 
-theorem descPochhammer_zero_eval_zero : (descPochhammer R 0).eval 0 = 1 := by simp
-
--- DISSOLVED: descPochhammer_ne_zero_eval_zero
+@[simp]
+theorem descPochhammer_ne_zero_eval_zero {n : ℕ} (h : n ≠ 0) : (descPochhammer R n).eval 0 = 0 := by
+  simp [descPochhammer_eval_zero, h]
 
 theorem descPochhammer_succ_right (n : ℕ) :
     descPochhammer R (n + 1) = descPochhammer R n * (X - (n : R[X])) := by

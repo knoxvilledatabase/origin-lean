@@ -7,6 +7,8 @@ import Mathlib.Geometry.Manifold.Diffeomorph
 import Mathlib.Geometry.Manifold.Instances.Real
 import Mathlib.Geometry.Manifold.PartitionOfUnity
 
+noncomputable section
+
 /-!
 # Whitney embedding theorem
 

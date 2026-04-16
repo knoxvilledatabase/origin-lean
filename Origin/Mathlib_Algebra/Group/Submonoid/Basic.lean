@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Submonoid.Defs
 import Mathlib.Algebra.Group.Subsemigroup.Basic
 import Mathlib.Algebra.Group.Units.Defs
 
+noncomputable section
+
 /-!
 # Submonoids: `CompleteLattice` structure
 
@@ -331,11 +333,6 @@ def ofClosureMEqTopLeft {M N} [Monoid M] [Monoid N] {s : Set M} (f : M → N) (h
     dense_induction (p := _) _ hs hmul fun y => by rw [one_mul, h1, one_mul]
       (fun a b ha hb y => by rw [mul_assoc, ha, ha, hb, mul_assoc]) x
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_ofClosureMEqTopLeft (f : M → N) (hs : closure s = ⊤) (h1 hmul) :
-    ⇑(ofClosureMEqTopLeft f hs h1 hmul) = f :=
-  rfl
-
 @[to_additive
       "Let `s` be a subset of an additive monoid `M` such that the closure of `s` is
       the whole monoid. Then `AddMonoidHom.ofClosureEqTopRight` defines an additive monoid
@@ -349,11 +346,6 @@ def ofClosureMEqTopRight {M N} [Monoid M] [Monoid N] {s : Set M} (f : M → N) (
     dense_induction _ hs (fun y hy x => hmul x y hy) (by simp [h1])
       (fun y₁ y₂ (h₁ : ∀ _, f _ = f _ * f _) (h₂ : ∀ _, f _ = f _ * f _) x => by
         simp [← mul_assoc, h₁, h₂]) y x
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_ofClosureMEqTopRight (f : M → N) (hs : closure s = ⊤) (h1 hmul) :
-    ⇑(ofClosureMEqTopRight f hs h1 hmul) = f :=
-  rfl
 
 end MonoidHom
 

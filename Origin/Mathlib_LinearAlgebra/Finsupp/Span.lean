@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.Defs
 import Mathlib.LinearAlgebra.Span.Basic
 
+noncomputable section
+
 /-!
 # Finitely supported functions and spans
 

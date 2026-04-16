@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Limits
 import Mathlib.CategoryTheory.Abelian.Basic
 
+noncomputable section
+
 /-!
 # Equivalence between subobjects and quotients in an abelian category
 

@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/Basic.lean
-Genuine: 31 | Conflates: 1 | Dissolved: 6 | Infrastructure: 9
+Genuine: 36 | Conflates: 1 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Normal
 import Mathlib.FieldTheory.Perfect
 import Mathlib.RingTheory.Localization.Integral
+
+noncomputable section
 
 /-!
 # Algebraically Closed Field
@@ -64,7 +66,9 @@ namespace IsAlgClosed
 
 variable {k}
 
--- DISSOLVED: exists_root
+@[stacks 09GR "(4) ⟹ (3)"]
+theorem exists_root [IsAlgClosed k] (p : k[X]) (hp : p.degree ≠ 0) : ∃ x, IsRoot p x :=
+  exists_root_of_splits _ (IsAlgClosed.splits p) hp
 
 theorem exists_pow_nat_eq [IsAlgClosed k] (x : k) {n : ℕ} (hn : 0 < n) : ∃ z, z ^ n = x := by
   have : degree (X ^ n - C x) ≠ 0 := by
@@ -88,15 +92,25 @@ theorem roots_eq_zero_iff [IsAlgClosed k] {p : k[X]} :
     rw [← mem_roots (ne_zero_of_degree_gt hd), h] at hz
     simp at hz
 
--- DISSOLVED: exists_eval₂_eq_zero_of_injective
+theorem exists_eval₂_eq_zero_of_injective {R : Type*} [Ring R] [IsAlgClosed k] (f : R →+* k)
+    (hf : Function.Injective f) (p : R[X]) (hp : p.degree ≠ 0) : ∃ x, p.eval₂ f x = 0 :=
+  let ⟨x, hx⟩ := exists_root (p.map f) (by rwa [degree_map_eq_of_injective hf])
+  ⟨x, by rwa [eval₂_eq_eval_map, ← IsRoot]⟩
 
--- DISSOLVED: exists_eval₂_eq_zero
+theorem exists_eval₂_eq_zero {R : Type*} [Field R] [IsAlgClosed k] (f : R →+* k) (p : R[X])
+    (hp : p.degree ≠ 0) : ∃ x, p.eval₂ f x = 0 :=
+  exists_eval₂_eq_zero_of_injective f f.injective p hp
 
 variable (k)
 
--- DISSOLVED: exists_aeval_eq_zero_of_injective
+theorem exists_aeval_eq_zero_of_injective {R : Type*} [CommRing R] [IsAlgClosed k] [Algebra R k]
+    (hinj : Function.Injective (algebraMap R k)) (p : R[X]) (hp : p.degree ≠ 0) :
+    ∃ x : k, aeval x p = 0 :=
+  exists_eval₂_eq_zero_of_injective (algebraMap R k) hinj p hp
 
--- DISSOLVED: exists_aeval_eq_zero
+theorem exists_aeval_eq_zero {R : Type*} [Field R] [IsAlgClosed k] [Algebra R k] (p : R[X])
+    (hp : p.degree ≠ 0) : ∃ x : k, aeval x p = 0 :=
+  exists_eval₂_eq_zero (algebraMap R k) p hp
 
 @[stacks 09GR "(3) ⟹ (4)"]
 theorem of_exists_root (H : ∀ p : k[X], p.Monic → Irreducible p → ∃ x, p.eval x = 0) :
@@ -163,7 +177,16 @@ theorem IntermediateField.eq_bot_of_isAlgClosed_of_isAlgebraic {k K : Type*} [Fi
   obtain ⟨y, hy⟩ := IsAlgClosed.algebraMap_surjective_of_isIntegral (k := k) (⟨x, hx⟩ : L)
   exact ⟨y, congr_arg (algebraMap L K) hy⟩
 
--- DISSOLVED: Polynomial.isCoprime_iff_aeval_ne_zero_of_isAlgClosed
+lemma Polynomial.isCoprime_iff_aeval_ne_zero_of_isAlgClosed (K : Type v) [Field K] [IsAlgClosed K]
+    [Algebra k K] (p q : k[X]) : IsCoprime p q ↔ ∀ a : K, aeval a p ≠ 0 ∨ aeval a q ≠ 0 := by
+  refine ⟨fun h => aeval_ne_zero_of_isCoprime h, fun h => isCoprime_of_dvd _ _ ?_ fun x hu h0 => ?_⟩
+  · replace h := h 0
+    contrapose! h
+    rw [h.left, h.right, map_zero, and_self]
+  · rintro ⟨_, rfl⟩ ⟨_, rfl⟩
+    obtain ⟨a, ha : _ = _⟩ := IsAlgClosed.exists_root (x.map <| algebraMap k K) <| by
+      simpa only [degree_map] using (ne_of_lt <| degree_pos_of_ne_zero_of_nonunit h0 hu).symm
+    exact not_and_or.mpr (h a) (by simp_rw [map_mul, ← eval_map_algebraMap, ha, zero_mul, true_and])
 
 @[stacks 09GS]
 class IsAlgClosure (R : Type u) (K : Type v) [CommRing R] [Field K] [Algebra R K]
@@ -399,10 +422,6 @@ def IntermediateField.algHomEquivAlgHomOfSplits (L : IntermediateField F A)
   left_inv _ := rfl
   right_inv _ := by rfl
 
-theorem IntermediateField.algHomEquivAlgHomOfSplits_apply_apply (L : IntermediateField F A)
-    (hL : ∀ x : K, (minpoly F x).Splits (algebraMap F L)) (f : K →ₐ[F] L) (x : K) :
-    algHomEquivAlgHomOfSplits A L hL f x = algebraMap L A (f x) := rfl
-
 noncomputable def Algebra.IsAlgebraic.algHomEquivAlgHomOfSplits (L : Type*) [Field L]
     [Algebra F L] [Algebra L A] [IsScalarTower F L A]
     (hL : ∀ x : K, (minpoly F x).Splits (algebraMap F L)) :
@@ -410,10 +429,5 @@ noncomputable def Algebra.IsAlgebraic.algHomEquivAlgHomOfSplits (L : Type*) [Fie
   (AlgEquiv.refl.arrowCongr (AlgEquiv.ofInjectiveField (IsScalarTower.toAlgHom F L A))).trans <|
     IntermediateField.algHomEquivAlgHomOfSplits A (IsScalarTower.toAlgHom F L A).fieldRange
     fun x ↦ splits_of_algHom (hL x) (AlgHom.rangeRestrict _)
-
-theorem Algebra.IsAlgebraic.algHomEquivAlgHomOfSplits_apply_apply (L : Type*) [Field L]
-    [Algebra F L] [Algebra L A] [IsScalarTower F L A]
-    (hL : ∀ x : K, (minpoly F x).Splits (algebraMap F L)) (f : K →ₐ[F] L) (x : K) :
-    Algebra.IsAlgebraic.algHomEquivAlgHomOfSplits A L hL f x = algebraMap L A (f x) := rfl
 
 end Algebra.IsAlgebraic

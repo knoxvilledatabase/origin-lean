@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Group/List.lean
-Genuine: 88 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Basic
@@ -12,6 +12,8 @@ import Mathlib.Data.List.Perm.Basic
 import Mathlib.Data.List.ProdSigma
 import Mathlib.Data.List.Range
 import Mathlib.Data.List.Rotate
+
+noncomputable section
 
 /-!
 # Sums and products from lists
@@ -116,9 +118,6 @@ theorem prod_concat : (l.concat a).prod = l.prod * a := by
 theorem prod_flatten {l : List (List M)} : l.flatten.prod = (l.map List.prod).prod := by
   induction l <;> [rfl; simp only [*, List.flatten, map, prod_append, prod_cons]]
 
-@[to_additive]
-theorem prod_eq_foldr {l : List M} : l.prod = foldr (· * ·) 1 l := rfl
-
 @[to_additive (attr := simp)]
 theorem prod_replicate (n : ℕ) (a : M) : (replicate n a).prod = a ^ n := by
   induction n with
@@ -200,7 +199,11 @@ theorem prod_take_succ (L : List M) (i : ℕ) (p : i < L.length) :
     (L.take (i + 1)).prod = (L.take i).prod * L[i] := by
   simp [← take_concat_get', p]
 
--- DISSOLVED: length_pos_of_prod_ne_one
+@[to_additive "A list with sum not zero must have positive length."]
+theorem length_pos_of_prod_ne_one (L : List M) (h : L.prod ≠ 1) : 0 < L.length := by
+  cases L
+  · simp at h
+  · simp
 
 @[to_additive length_pos_of_sum_pos "A list with positive sum must have positive length."]
 theorem length_pos_of_one_lt_prod [Preorder M] (L : List M) (h : 1 < L.prod) : 0 < L.length :=
@@ -220,7 +223,11 @@ theorem prod_set :
     simp [set, prod_set xs i a, mul_assoc, Nat.add_lt_add_iff_right]
   | [], _, _ => by simp [set, (Nat.zero_le _).not_lt, Nat.zero_le]
 
--- DISSOLVED: get?_zero_mul_tail_prod
+@[to_additive "We'd like to state this as `L.headI + L.tail.sum = L.sum`, but because `L.headI`
+  relies on an inhabited instance to return a garbage value on the empty list, this is not possible.
+  Instead, we write the statement in terms of `(L.get? 0).getD 0`."]
+theorem get?_zero_mul_tail_prod (l : List M) : (l.get? 0).getD 1 * l.tail.prod = l.prod := by
+  cases l <;> simp
 
 @[to_additive "Same as `get?_zero_add_tail_sum`, but avoiding the `List.headI` garbage complication
   by requiring the list to be nonempty."]
@@ -260,7 +267,8 @@ lemma prod_range_succ' (f : ℕ → M) (n : ℕ) :
     rw [List.prod_cons, hil fun x hx ↦ hl _ (mem_cons_of_mem i hx),
       hl _ (mem_cons_self i l), one_mul]
 
--- DISSOLVED: exists_mem_ne_one_of_prod_ne_one
+@[to_additive] lemma exists_mem_ne_one_of_prod_ne_one (h : l.prod ≠ 1) :
+    ∃ x ∈ l, x ≠ (1 : M) := by simpa only [not_forall, exists_prop] using mt prod_eq_one h
 
 @[to_additive]
 lemma prod_erase_of_comm [DecidableEq M] (ha : a ∈ l) (comm : ∀ x ∈ l, ∀ y ∈ l, x * y = y * x) :
@@ -494,11 +502,6 @@ theorem alternatingProd_nil : alternatingProd ([] : List α) = 1 :=
 theorem alternatingProd_singleton (a : α) : alternatingProd [a] = a :=
   rfl
 
-@[to_additive]
-theorem alternatingProd_cons_cons' (a b : α) (l : List α) :
-    alternatingProd (a :: b :: l) = a * b⁻¹ * alternatingProd l :=
-  rfl
-
 end
 
 @[to_additive]
@@ -595,9 +598,7 @@ end MonoidHom
 end MonoidHom
 
 set_option linter.deprecated false in
-
 @[simp, deprecated "No deprecation message was provided." (since := "2024-10-17")]
-lemma Nat.sum_eq_listSum (l : List ℕ) : Nat.sum l = l.sum := rfl
 
 namespace List
 

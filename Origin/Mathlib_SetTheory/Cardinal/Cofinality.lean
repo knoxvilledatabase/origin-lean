@@ -1,10 +1,12 @@
 /-
 Extracted from SetTheory/Cardinal/Cofinality.lean
-Genuine: 148 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
+Genuine: 150 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.SetTheory.Ordinal.FixedPoint
+
+noncomputable section
 
 /-!
 # Cofinality
@@ -281,6 +283,7 @@ theorem cof_iSup_le_lift {ι} {f : ι → Ordinal} (H : ∀ i, f i < iSup f) :
   exact cof_lsub_le_lift f
 
 set_option linter.deprecated false in
+@[deprecated cof_iSup_le_lift (since := "2024-08-27")]
 
 theorem cof_sup_le_lift {ι} {f : ι → Ordinal} (H : ∀ i, f i < sup.{u, v} f) :
     cof (sup.{u, v} f) ≤ Cardinal.lift.{v, u} #ι := by
@@ -294,6 +297,7 @@ theorem cof_iSup_le {ι} {f : ι → Ordinal} (H : ∀ i, f i < iSup f) :
   exact cof_iSup_le_lift H
 
 set_option linter.deprecated false in
+@[deprecated cof_iSup_le (since := "2024-08-27")]
 
 theorem cof_sup_le {ι} {f : ι → Ordinal} (H : ∀ i, f i < sup.{u, u} f) :
     cof (sup.{u, u} f) ≤ #ι := by
@@ -305,6 +309,7 @@ theorem iSup_lt_ord_lift {ι} {f : ι → Ordinal} {c : Ordinal} (hι : Cardinal
   (sup_le_lsub.{u, v} f).trans_lt (lsub_lt_ord_lift hι hf)
 
 set_option linter.deprecated false in
+@[deprecated iSup_lt_ord_lift (since := "2024-08-27")]
 
 theorem sup_lt_ord_lift {ι} {f : ι → Ordinal} {c : Ordinal} (hι : Cardinal.lift.{v, u} #ι < c.cof)
     (hf : ∀ i, f i < c) : sup.{u, v} f < c :=
@@ -315,6 +320,7 @@ theorem iSup_lt_ord {ι} {f : ι → Ordinal} {c : Ordinal} (hι : #ι < c.cof) 
   iSup_lt_ord_lift (by rwa [(#ι).lift_id])
 
 set_option linter.deprecated false in
+@[deprecated iSup_lt_ord (since := "2024-08-27")]
 
 theorem sup_lt_ord {ι} {f : ι → Ordinal} {c : Ordinal} (hι : #ι < c.cof) :
     (∀ i, f i < c) → sup.{u, u} f < c :=
@@ -348,6 +354,7 @@ theorem nfpFamily_lt_ord {ι} {f : ι → Ordinal → Ordinal} {c} (hc : ℵ₀ 
   nfpFamily_lt_ord_lift hc (by rwa [(#ι).lift_id]) hf
 
 set_option linter.deprecated false in
+@[deprecated nfpFamily_lt_ord_lift (since := "2024-10-14")]
 
 theorem nfpBFamily_lt_ord_lift {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal} {c} (hc : ℵ₀ < cof c)
     (hc' : Cardinal.lift.{v, u} o.card < cof c) (hf : ∀ (i hi), ∀ b < c, f i hi b < c) {a} :
@@ -355,6 +362,7 @@ theorem nfpBFamily_lt_ord_lift {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal
   nfpFamily_lt_ord_lift hc (by rwa [mk_toType]) fun _ => hf _ _
 
 set_option linter.deprecated false in
+@[deprecated nfpFamily_lt_ord (since := "2024-10-14")]
 
 theorem nfpBFamily_lt_ord {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal} {c} (hc : ℵ₀ < cof c)
     (hc' : o.card < cof c) (hf : ∀ (i hi), ∀ b < c, f i hi b < c) {a} :
@@ -436,7 +444,8 @@ theorem cof_eq_zero {o} : cof o = 0 ↔ o = 0 :=
           (mk_eq_zero_iff.1 (e.trans z)).elim' ⟨_, h⟩⟩,
     fun e => by simp [e]⟩
 
--- DISSOLVED: cof_ne_zero
+theorem cof_ne_zero {o} : cof o ≠ 0 ↔ o ≠ 0 :=
+  cof_eq_zero.not
 
 @[simp]
 theorem cof_succ (o) : cof (succ o) = 1 := by
@@ -619,7 +628,12 @@ theorem IsNormal.cof_le {f} (hf : IsNormal f) (a) : cof a ≤ cof (f a) := by
     exact (Ordinal.zero_le (f b)).trans_lt (hf.1 b)
   · rw [hf.cof_eq ha]
 
--- DISSOLVED: cof_add
+@[simp]
+theorem cof_add (a b : Ordinal) : b ≠ 0 → cof (a + b) = cof b := fun h => by
+  rcases zero_or_succ_or_limit b with (rfl | ⟨c, rfl⟩ | hb)
+  · contradiction
+  · rw [add_succ, cof_succ, cof_succ]
+  · exact (isNormal_add_right a).cof_eq hb
 
 theorem aleph0_le_cof {o} : ℵ₀ ≤ cof o ↔ IsLimit o := by
   rcases zero_or_succ_or_limit o with (rfl | ⟨o, rfl⟩ | l)
@@ -647,16 +661,19 @@ theorem cof_omega {o : Ordinal} (ho : o.IsLimit) : (ω_ o).cof = o.cof :=
   isNormal_omega.cof_eq ho
 
 set_option linter.deprecated false in
+@[deprecated cof_preOmega (since := "2024-10-22")]
 
 theorem preAleph_cof {o : Ordinal} (ho : o.IsLimit) : (preAleph o).ord.cof = o.cof :=
   aleph'_isNormal.cof_eq ho
 
 set_option linter.deprecated false in
+@[deprecated cof_preOmega (since := "2024-10-22")]
 
 theorem aleph'_cof {o : Ordinal} (ho : o.IsLimit) : (aleph' o).ord.cof = o.cof :=
   aleph'_isNormal.cof_eq ho
 
 set_option linter.deprecated false in
+@[deprecated cof_omega (since := "2024-10-22")]
 
 theorem aleph_cof {o : Ordinal} (ho : o.IsLimit) : (ℵ_  o).ord.cof = o.cof :=
   aleph_isNormal.cof_eq ho
@@ -767,7 +784,8 @@ open Ordinal
 def IsStrongLimit (c : Cardinal) : Prop :=
   c ≠ 0 ∧ ∀ x < c, (2^x) < c
 
--- DISSOLVED: IsStrongLimit.ne_zero
+theorem IsStrongLimit.ne_zero {c} (h : IsStrongLimit c) : c ≠ 0 :=
+  h.1
 
 theorem IsStrongLimit.two_power_lt {x c} (h : IsStrongLimit c) : x < c → (2^x) < c :=
   h.2 x
@@ -789,6 +807,7 @@ theorem IsStrongLimit.aleph0_le {c} (H : IsStrongLimit c) : ℵ₀ ≤ c :=
   aleph0_le_of_isSuccLimit H.isSuccLimit
 
 set_option linter.deprecated false in
+@[deprecated IsStrongLimit.isSuccLimit (since := "2024-09-17")]
 
 theorem IsStrongLimit.isLimit {c} (H : IsStrongLimit c) : IsLimit c :=
   ⟨H.ne_zero, H.isSuccPrelimit⟩
@@ -912,6 +931,7 @@ theorem isRegular_preAleph_succ {o : Ordinal} (h : ω ≤ o) : IsRegular (preAle
   exact isRegular_succ (aleph0_le_preAleph.2 h)
 
 set_option linter.deprecated false in
+@[deprecated isRegular_preAleph_succ (since := "2024-10-22")]
 
 theorem isRegular_aleph'_succ {o : Ordinal} (h : ω ≤ o) : IsRegular (aleph' (succ o)) := by
   rw [aleph'_succ]
@@ -966,6 +986,7 @@ theorem iSup_lt_ord_lift_of_isRegular {ι} {f : ι → Ordinal} {c} (hc : IsRegu
   iSup_lt_ord_lift (by rwa [hc.cof_eq])
 
 set_option linter.deprecated false in
+@[deprecated iSup_lt_ord_lift_of_isRegular (since := "2024-08-27")]
 
 theorem sup_lt_ord_lift_of_isRegular {ι} {f : ι → Ordinal} {c} (hc : IsRegular c)
     (hι : Cardinal.lift.{v, u} #ι < c) : (∀ i, f i < c.ord) → Ordinal.sup.{u, v} f < c.ord :=
@@ -976,6 +997,7 @@ theorem iSup_lt_ord_of_isRegular {ι} {f : ι → Ordinal} {c} (hc : IsRegular c
   iSup_lt_ord (by rwa [hc.cof_eq])
 
 set_option linter.deprecated false in
+@[deprecated iSup_lt_ord_of_isRegular (since := "2024-08-27")]
 
 theorem sup_lt_ord_of_isRegular {ι} {f : ι → Ordinal} {c} (hc : IsRegular c) (hι : #ι < c) :
     (∀ i, f i < c.ord) → Ordinal.sup f < c.ord :=
@@ -1055,6 +1077,7 @@ theorem nfpFamily_lt_ord_of_isRegular {ι} {f : ι → Ordinal → Ordinal} {c} 
   nfpFamily_lt_ord_lift_of_isRegular hc (by rwa [lift_id]) hc' hf
 
 set_option linter.deprecated false in
+@[deprecated nfpFamily_lt_ord_lift_of_isRegular (since := "2024-10-14")]
 
 theorem nfpBFamily_lt_ord_lift_of_isRegular {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal} {c}
     (hc : IsRegular c) (ho : Cardinal.lift.{v, u} o.card < c) (hc' : c ≠ ℵ₀)
@@ -1063,6 +1086,7 @@ theorem nfpBFamily_lt_ord_lift_of_isRegular {o : Ordinal} {f : ∀ a < o, Ordina
   nfpFamily_lt_ord_lift_of_isRegular hc (by rwa [mk_toType]) hc' fun _ => hf _ _
 
 set_option linter.deprecated false in
+@[deprecated nfpFamily_lt_ord_of_isRegular (since := "2024-10-14")]
 
 theorem nfpBFamily_lt_ord_of_isRegular {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal} {c}
     (hc : IsRegular c) (ho : o.card < c) (hc' : c ≠ ℵ₀)
@@ -1110,6 +1134,7 @@ theorem derivFamily_lt_ord {ι} {f : ι → Ordinal → Ordinal} {c} (hc : IsReg
   derivFamily_lt_ord_lift hc (by rwa [lift_id]) hc' hf
 
 set_option linter.deprecated false in
+@[deprecated derivFamily_lt_ord_lift (since := "2024-10-14")]
 
 theorem derivBFamily_lt_ord_lift {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal} {c}
     (hc : IsRegular c) (hι : Cardinal.lift.{v, u} o.card < c) (hc' : c ≠ ℵ₀)
@@ -1118,6 +1143,7 @@ theorem derivBFamily_lt_ord_lift {o : Ordinal} {f : ∀ a < o, Ordinal → Ordin
   derivFamily_lt_ord_lift hc (by rwa [mk_toType]) hc' fun _ => hf _ _
 
 set_option linter.deprecated false in
+@[deprecated derivFamily_lt_ord (since := "2024-10-14")]
 
 theorem derivBFamily_lt_ord {o : Ordinal} {f : ∀ a < o, Ordinal → Ordinal} {c} (hc : IsRegular c)
     (hι : o.card < c) (hc' : c ≠ ℵ₀) (hf : ∀ (i hi), ∀ b < c.ord, f i hi b < c.ord) {a} :

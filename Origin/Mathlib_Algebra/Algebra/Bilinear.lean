@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Algebra/Bilinear.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 3 | Infrastructure: 9
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Algebra.Algebra.NonUnitalHom
 import Mathlib.Algebra.GroupPower.IterateHom
 import Mathlib.LinearAlgebra.TensorProduct.Basic
+
+noncomputable section
 
 /-!
 # Facts about algebras involving bilinear maps and tensor products
@@ -40,9 +42,6 @@ def mulLeft (a : A) : A →ₗ[R] A where
 @[simp]
 theorem mulLeft_apply (a b : A) : mulLeft R a b = a * b := rfl
 
-@[simp]
-theorem mulLeft_toAddMonoidHom (a : A) : (mulLeft R a : A →+ A) = AddMonoidHom.mulLeft a := rfl
-
 variable (A) in
 
 @[simp]
@@ -61,9 +60,6 @@ def mulRight (b : A) : A →ₗ[R] A where
 
 @[simp]
 theorem mulRight_apply (a b : A) : mulRight R a b = b * a := rfl
-
-@[simp]
-theorem mulRight_toAddMonoidHom (a : A) : (mulRight R a : A →+ A) = AddMonoidHom.mulRight a := rfl
 
 variable (A) in
 
@@ -91,18 +87,6 @@ def mulLeftRight (ab : A × A) : A →ₗ[R] A :=
   (mulRight R ab.snd).comp (mulLeft R ab.fst)
 
 variable {R}
-
-@[simp]
-theorem mul_apply' (a b : A) : mul R A a b = a * b :=
-  rfl
-
-@[simp]
-theorem mulLeftRight_apply (a b x : A) : mulLeftRight R (a, b) x = a * x * b :=
-  rfl
-
-@[simp]
-theorem mul'_apply {a b : A} : mul' R A (a ⊗ₜ b) = a * b :=
-  rfl
 
 end NonUnitalNonAssoc
 
@@ -140,10 +124,6 @@ def _root_.NonUnitalAlgHom.lmul : A →ₙₐ[R] End R A where
   map_zero' := mulLeft_zero_eq_zero _ _
 
 variable {R A B}
-
-@[simp]
-theorem _root_.NonUnitalAlgHom.coe_lmul_eq_mul : ⇑(NonUnitalAlgHom.lmul R A) = mul R A :=
-  rfl
 
 theorem commute_mulLeft_right (a b : A) : Commute (mulLeft R a) (mulRight R b) := by
   ext c
@@ -221,10 +201,6 @@ def _root_.Algebra.lmul : A →ₐ[R] End R A where
 
 variable {R A}
 
-@[simp]
-theorem _root_.Algebra.coe_lmul_eq_mul : ⇑(Algebra.lmul R A) = mul R A :=
-  rfl
-
 theorem _root_.Algebra.lmul_injective : Function.Injective (Algebra.lmul R A) :=
   fun a₁ a₂ h ↦ by simpa using DFunLike.congr_fun h 1
 
@@ -242,11 +218,16 @@ section Ring
 
 variable {R A : Type*} [CommSemiring R] [Ring A] [Algebra R A]
 
--- DISSOLVED: mulLeft_injective
+theorem mulLeft_injective [NoZeroDivisors A] {x : A} (hx : x ≠ 0) :
+    Function.Injective (mulLeft R x) :=
+  mul_right_injective₀ hx
 
--- DISSOLVED: mulRight_injective
+theorem mulRight_injective [NoZeroDivisors A] {x : A} (hx : x ≠ 0) :
+    Function.Injective (mulRight R x) :=
+  mul_left_injective₀ hx
 
--- DISSOLVED: mul_injective
+theorem mul_injective [NoZeroDivisors A] {x : A} (hx : x ≠ 0) : Function.Injective (mul R A x) :=
+   mul_right_injective₀ hx
 
 end Ring
 

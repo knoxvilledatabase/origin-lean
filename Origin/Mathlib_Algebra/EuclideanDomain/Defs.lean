@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/EuclideanDomain/Defs.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 7 | Infrastructure: 4
+Genuine: 22 | Conflates: 1 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Basic
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Order.RelClasses
+
+noncomputable section
 
 /-!
 # Euclidean domains
@@ -63,7 +65,29 @@ Euclidean domain, transfinite Euclidean domain, Bézout's lemma
 
 universe u
 
--- DISSOLVED: EuclideanDomain
+-- CONFLATES (assumes ground = zero): EuclideanDomain
+class EuclideanDomain (R : Type u) extends CommRing R, Nontrivial R where
+  /-- A division function (denoted `/`) on `R`.
+    This satisfies the property `b * (a / b) + a % b = a`, where `%` denotes `remainder`. -/
+  protected quotient : R → R → R
+  /-- Division by zero should always give zero by convention. -/
+  protected quotient_zero : ∀ a, quotient a 0 = 0
+  /-- A remainder function (denoted `%`) on `R`.
+    This satisfies the property `b * (a / b) + a % b = a`, where `/` denotes `quotient`. -/
+  protected remainder : R → R → R
+  /-- The property that links the quotient and remainder functions.
+    This allows us to compute GCDs and LCMs. -/
+  protected quotient_mul_add_remainder_eq : ∀ a b, b * quotient a b + remainder a b = a
+  /-- A well-founded relation on `R`, satisfying `r (a % b) b`.
+    This ensures that the GCD algorithm always terminates. -/
+  protected r : R → R → Prop
+  /-- The relation `r` must be well-founded.
+    This ensures that the GCD algorithm always terminates. -/
+  r_wellFounded : WellFounded r
+  /-- The relation `r` satisfies `r (a % b) b`. -/
+  protected remainder_lt : ∀ (a) {b}, b ≠ 0 → r (remainder a b) b
+  /-- An additional constraint on `r`. -/
+  mul_left_not_lt : ∀ (a) {b}, b ≠ 0 → ¬r (a * b) a
 
 namespace EuclideanDomain
 
@@ -102,9 +126,12 @@ theorem mod_eq_sub_mul_div {R : Type*} [EuclideanDomain R] (a b : R) : a % b = a
     a % b = b * (a / b) + a % b - b * (a / b) := (add_sub_cancel_left _ _).symm
     _ = a - b * (a / b) := by rw [div_add_mod]
 
--- DISSOLVED: mod_lt
+theorem mod_lt : ∀ (a) {b : R}, b ≠ 0 → a % b ≺ b :=
+  EuclideanDomain.remainder_lt
 
--- DISSOLVED: mul_right_not_lt
+theorem mul_right_not_lt {a : R} (b) (h : a ≠ 0) : ¬a * b ≺ b := by
+  rw [mul_comm]
+  exact mul_left_not_lt b h
 
 @[simp]
 theorem mod_zero (a : R) : a % 0 = a := by simpa only [zero_mul, zero_add] using div_add_mod a 0
@@ -113,13 +140,25 @@ theorem lt_one (a : R) : a ≺ (1 : R) → a = 0 :=
   haveI := Classical.dec
   not_imp_not.1 fun h => by simpa only [one_mul] using mul_left_not_lt 1 h
 
--- DISSOLVED: val_dvd_le
+theorem val_dvd_le : ∀ a b : R, b ∣ a → a ≠ 0 → ¬a ≺ b
+  | _, b, ⟨d, rfl⟩, ha => mul_left_not_lt b (mt (by rintro rfl; exact mul_zero _) ha)
 
 -- DISSOLVED: div_zero
 
 section
 
--- DISSOLVED: GCD.induction
+@[elab_as_elim]
+theorem GCD.induction {P : R → R → Prop} (a b : R) (H0 : ∀ x, P 0 x)
+    (H1 : ∀ a b, a ≠ 0 → P (b % a) a → P a b) : P a b := by
+  classical
+  exact if a0 : a = 0 then by
+    -- Porting note: required for hygiene, the equation compiler introduces a dummy variable `x`
+    -- See https://leanprover.zulipchat.com/#narrow/stream/270676-lean4/topic/unnecessarily.20tombstoned.20argument/near/314573315
+    change P a b
+    exact a0.symm ▸ H0 b
+  else
+    have _ := mod_lt b a0
+    H1 _ _ a0 (GCD.induction (b % a) a H0 H1)
 
 termination_by a
 
@@ -156,7 +195,12 @@ theorem xgcd_zero_left {s t r' s' t' : R} : xgcdAux 0 s t r' s' t' = (r', s', t'
   unfold xgcdAux
   exact if_pos rfl
 
--- DISSOLVED: xgcdAux_rec
+theorem xgcdAux_rec {r s t r' s' t' : R} (h : r ≠ 0) :
+    xgcdAux r s t r' s' t' = xgcdAux (r' % r) (s' - r' / r * s) (t' - r' / r * t) r s t := by
+  conv =>
+    lhs
+    rw [xgcdAux]
+  exact if_neg h
 
 def xgcd (x y : R) : R × R :=
   (xgcdAux x 1 0 y 0 1).2
@@ -176,9 +220,6 @@ theorem gcdA_zero_left {s : R} : gcdA 0 s = 0 := by
 theorem gcdB_zero_left {s : R} : gcdB 0 s = 1 := by
   unfold gcdB
   rw [xgcd, xgcd_zero_left]
-
-theorem xgcd_val (x y : R) : xgcd x y = (gcdA x y, gcdB x y) :=
-  rfl
 
 end GCD
 

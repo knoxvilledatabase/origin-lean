@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Calculus.Deriv.Linear
 import Mathlib.Analysis.Complex.Basic
 
+noncomputable section
+
 /-! # Real differentiability of complex-differentiable functions
 
 `HasDerivAt.real_of_complex` expresses that, if a function on `ℂ` is differentiable (over `ℂ`),

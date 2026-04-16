@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/TraceForm.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.LinearMap
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Lie.Weights.Cartan
 import Mathlib.Algebra.Lie.Weights.Linear
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.LinearAlgebra.PID
+
+noncomputable section
 
 /-!
 # The trace and Killing forms of a Lie algebra.
@@ -187,16 +189,6 @@ lemma trace_toEnd_eq_zero_of_mem_lcs
   · simp [hu, hv]
   · simp [hu]
 
-@[simp]
-lemma traceForm_lieSubalgebra_mk_left (L' : LieSubalgebra R L) {x : L} (hx : x ∈ L') (y : L') :
-    traceForm R L' M ⟨x, hx⟩ y = traceForm R L M x y :=
-  rfl
-
-@[simp]
-lemma traceForm_lieSubalgebra_mk_right (L' : LieSubalgebra R L) {x : L'} {y : L} (hy : y ∈ L') :
-    traceForm R L' M x ⟨y, hy⟩ = traceForm R L M x y :=
-  rfl
-
 open TensorProduct
 
 variable [LieAlgebra.IsNilpotent R L] [IsDomain R] [IsPrincipalIdealRing R]
@@ -296,7 +288,6 @@ lemma trace_eq_trace_restrict_of_le_idealizer
   exact fun m ↦ N.lie_mem (h hy m)
 
 include h in
-
 lemma traceForm_eq_of_le_idealizer :
     traceForm R I N = (traceForm R L M).restrict I := by
   ext ⟨x, hx⟩ ⟨y, hy⟩
@@ -305,6 +296,11 @@ lemma traceForm_eq_of_le_idealizer :
   rfl
 
 include h hy in
+/-- Note that this result is slightly stronger than it might look at first glance: we only assume
+
+that `N` is trivial over `I` rather than all of `L`. This means that it applies in the important
+
+case of an Abelian ideal (which has `M = L` and `N = I`). -/
 
 lemma traceForm_eq_zero_of_isTrivial [LieModule.IsTrivial I N] :
     trace R M (φ x ∘ₗ φ y) = 0 := by
@@ -342,10 +338,6 @@ variable (I : LieIdeal R L)
 noncomputable def killingCompl : LieIdeal R L :=
   LieAlgebra.InvariantForm.orthogonal (killingForm R L) (LieModule.traceForm_lieInvariant R L L) I
 
-@[simp] lemma toSubmodule_killingCompl :
-    LieSubmodule.toSubmodule I.killingCompl = (killingForm R L).orthogonal I.toSubmodule :=
-  rfl
-
 @[simp] lemma mem_killingCompl {x : L} :
     x ∈ I.killingCompl ↔ ∀ y ∈ I, killingForm R L y x = 0 := by
   rfl
@@ -354,10 +346,6 @@ lemma coe_killingCompl_top :
     killingCompl R L ⊤ = LinearMap.ker (killingForm R L) := by
   ext x
   simp [LinearMap.ext_iff, LinearMap.BilinForm.IsOrtho, LieModule.traceForm_comm R L L x]
-
-lemma restrict_killingForm :
-    (killingForm R L).restrict I = LieModule.traceForm R I L :=
-  rfl
 
 variable [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R]
 

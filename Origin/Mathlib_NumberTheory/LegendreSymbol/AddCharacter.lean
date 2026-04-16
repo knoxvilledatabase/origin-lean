@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/AddCharacter.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
@@ -8,6 +8,8 @@ import Mathlib.FieldTheory.Finite.Trace
 import Mathlib.Algebra.Group.AddChar
 import Mathlib.Data.ZMod.Units
 import Mathlib.Analysis.Complex.Polynomial.Basic
+
+noncomputable section
 
 /-!
 # Additive characters of finite rings and fields
@@ -63,7 +65,9 @@ theorem to_mulShift_inj_of_isPrimitive {ψ : AddChar R R'} (hψ : IsPrimitive ψ
   simp only [mulShift_mul, mulShift_zero, add_neg_cancel, mulShift_apply] at h
   simpa [← sub_eq_add_neg, sub_eq_zero] using (hψ · h)
 
--- DISSOLVED: IsPrimitive.of_ne_one
+theorem IsPrimitive.of_ne_one {F : Type u} [Field F] {ψ : AddChar F R'} (hψ : ψ ≠ 1) :
+    IsPrimitive ψ :=
+  fun a ha h ↦ hψ <| by simpa [mulShift_mulShift, ha] using congr_arg (mulShift · a⁻¹) h
 
 lemma not_isPrimitive_mulShift [Finite R] (e : AddChar R R') {r : R}
     (hr : ¬ IsUnit r) : ¬ IsPrimitive (e.mulShift r) := by
@@ -108,9 +112,14 @@ variable {C : Type v} [CommMonoid C]
 
 section ZModCharDef
 
--- DISSOLVED: zmodChar
+def zmodChar (n : ℕ) [NeZero n] {ζ : C} (hζ : ζ ^ n = 1) : AddChar (ZMod n) C where
+  toFun a := ζ ^ a.val
+  map_zero_eq_one' := by simp only [ZMod.val_zero, pow_zero]
+  map_add_eq_mul' x y := by simp only [ZMod.val_add, ← pow_eq_pow_mod _ hζ, ← pow_add]
 
--- DISSOLVED: zmodChar_apply
+theorem zmodChar_apply {n : ℕ} [NeZero n] {ζ : C} (hζ : ζ ^ n = 1) (a : ZMod n) :
+    zmodChar n hζ a = ζ ^ a.val :=
+  rfl
 
 -- DISSOLVED: zmodChar_apply'
 
@@ -128,9 +137,18 @@ theorem zmod_char_primitive_of_eq_one_only_at_zero (n : ℕ) (ψ : AddChar (ZMod
   rw [mulShift_apply, mul_one] at h; norm_cast at h
   exact ha (hψ a h)
 
--- DISSOLVED: zmodChar_primitive_of_primitive_root
+theorem zmodChar_primitive_of_primitive_root (n : ℕ) [NeZero n] {ζ : C} (h : IsPrimitiveRoot ζ n) :
+    IsPrimitive (zmodChar n ((IsPrimitiveRoot.iff_def ζ n).mp h).left) := by
+  apply zmod_char_primitive_of_eq_one_only_at_zero
+  intro a ha
+  rw [zmodChar_apply, ← pow_zero ζ] at ha
+  exact (ZMod.val_eq_zero a).mp (IsPrimitiveRoot.pow_inj h (ZMod.val_lt a) (NeZero.pos _) ha)
 
--- DISSOLVED: primitiveZModChar
+noncomputable def primitiveZModChar (n : ℕ+) (F' : Type v) [Field F'] (h : (n : F') ≠ 0) :
+    PrimitiveAddChar (ZMod n) F' :=
+  have : NeZero (n : F') := ⟨h⟩
+  ⟨n, zmodChar n (IsCyclotomicExtension.zeta_pow n F' _),
+    zmodChar_primitive_of_primitive_root n (IsCyclotomicExtension.zeta_spec n F' _)⟩
 
 end ZModChar
 
@@ -168,7 +186,14 @@ section sum
 
 variable {R : Type*} [AddGroup R] [Fintype R] {R' : Type*} [CommRing R']
 
--- DISSOLVED: sum_eq_zero_of_ne_one
+theorem sum_eq_zero_of_ne_one [IsDomain R'] {ψ : AddChar R R'} (hψ : ψ ≠ 1) : ∑ a, ψ a = 0 := by
+  rcases ne_one_iff.1 hψ with ⟨b, hb⟩
+  have h₁ : ∑ a : R, ψ (b + a) = ∑ a : R, ψ a :=
+    Fintype.sum_bijective _ (AddGroup.addLeft_bijective b) _ _ fun x => rfl
+  simp_rw [map_add_eq_mul] at h₁
+  have h₂ : ∑ a : R, ψ a = Finset.univ.sum ↑ψ := rfl
+  rw [← Finset.mul_sum, h₂] at h₁
+  exact eq_zero_of_mul_eq_self_left hb h₁
 
 theorem sum_eq_card_of_eq_one {ψ : AddChar R R'} (hψ : ψ = 1) :
     ∑ a, ψ a = Fintype.card R := by simp [hψ]

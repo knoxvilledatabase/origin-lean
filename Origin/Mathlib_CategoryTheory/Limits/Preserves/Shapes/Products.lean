@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
+noncomputable section
+
 /-!
 # Preserving products
 

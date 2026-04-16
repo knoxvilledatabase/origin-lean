@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.EffectiveEpi.Coproduct
 import Mathlib.CategoryTheory.Extensive
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 
+noncomputable section
+
 /-!
 
 # Preserving and reflecting effective epis on extensive categories

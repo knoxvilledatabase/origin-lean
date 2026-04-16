@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Max
 
+noncomputable section
+
 /-!
 # Lemmas relating fintypes and order/lattice structure.
 -/

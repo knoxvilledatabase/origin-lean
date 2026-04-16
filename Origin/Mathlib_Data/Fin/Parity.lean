@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Parity
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.ZMod.Defs
 
+noncomputable section
+
 /-!
 # Parity in `Fin n`
 

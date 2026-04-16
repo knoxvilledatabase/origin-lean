@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Polynomial.Wronskian
 import Mathlib.RingTheory.Radical
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicative
 
+noncomputable section
+
 /-!
 # Radical of a polynomial
 

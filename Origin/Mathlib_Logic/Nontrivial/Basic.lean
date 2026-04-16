@@ -10,6 +10,8 @@ import Mathlib.Logic.Unique
 import Mathlib.Order.Defs.LinearOrder
 import Mathlib.Tactic.Attr.Register
 
+noncomputable section
+
 /-!
 # Nontrivial types
 

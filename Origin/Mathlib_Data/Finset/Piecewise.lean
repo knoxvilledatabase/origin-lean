@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Order.Interval.Set.Basic
 
+noncomputable section
+
 /-!
 # Functions defined piecewise on a finset
 

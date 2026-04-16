@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Data.Nat.Find
 
+noncomputable section
+
 /-! # Least upper bound and greatest lower bound properties for integers
 
 In this file we prove that a bounded above nonempty set of integers has the greatest element, and a

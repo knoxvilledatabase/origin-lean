@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Ideal.Quotient.Basic
 import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 
+noncomputable section
+
 /-!
 
 # Residue Field of local rings

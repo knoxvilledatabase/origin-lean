@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Zero.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Charpoly.ToMatrix
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Determinant
 import Mathlib.LinearAlgebra.Eigenspace.Minpoly
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.RingTheory.Artinian
+
+noncomputable section
 
 /-!
 # Results on the eigenvalue 0
@@ -85,13 +87,57 @@ lemma charpoly_eq_X_pow_iff [IsNoetherian R M] (φ : Module.End R M) :
 
 open Module.Free in
 
--- DISSOLVED: hasEigenvalue_zero_tfae
+lemma hasEigenvalue_zero_tfae (φ : Module.End K M) :
+    List.TFAE [
+      Module.End.HasEigenvalue φ 0,
+      IsRoot (minpoly K φ) 0,
+      constantCoeff φ.charpoly = 0,
+      LinearMap.det φ = 0,
+      ⊥ < ker φ,
+      ∃ (m : M), m ≠ 0 ∧ φ m = 0 ] := by
+  tfae_have 1 ↔ 2 := Module.End.hasEigenvalue_iff_isRoot
+  tfae_have 2 → 3 := by
+    obtain ⟨F, hF⟩ := minpoly_dvd_charpoly φ
+    simp only [IsRoot.def, constantCoeff_apply, coeff_zero_eq_eval_zero, hF, eval_mul]
+    intro h; rw [h, zero_mul]
+  tfae_have 3 → 4 := by
+    rw [← LinearMap.det_toMatrix (chooseBasis K M), Matrix.det_eq_sign_charpoly_coeff,
+      constantCoeff_apply, charpoly]
+    intro h; rw [h, mul_zero]
+  tfae_have 4 → 5 := bot_lt_ker_of_det_eq_zero
+  tfae_have 5 → 6 := by
+    contrapose!
+    simp only [not_bot_lt_iff, eq_bot_iff]
+    intro h x
+    simp only [mem_ker, Submodule.mem_bot]
+    contrapose!
+    apply h
+  tfae_have 6 → 1
+  | ⟨x, h1, h2⟩ => by
+    apply Module.End.hasEigenvalue_of_hasEigenvector ⟨_, h1⟩
+    simpa only [Module.End.eigenspace_zero, mem_ker] using h2
+  tfae_finish
 
--- DISSOLVED: charpoly_constantCoeff_eq_zero_iff
+lemma charpoly_constantCoeff_eq_zero_iff (φ : Module.End K M) :
+    constantCoeff φ.charpoly = 0 ↔ ∃ (m : M), m ≠ 0 ∧ φ m = 0 :=
+  (hasEigenvalue_zero_tfae φ).out 2 5
 
 open Module.Free in
 
--- DISSOLVED: not_hasEigenvalue_zero_tfae
+lemma not_hasEigenvalue_zero_tfae (φ : Module.End K M) :
+    List.TFAE [
+      ¬ Module.End.HasEigenvalue φ 0,
+      ¬ IsRoot (minpoly K φ) 0,
+      constantCoeff φ.charpoly ≠ 0,
+      LinearMap.det φ ≠ 0,
+      ker φ = ⊥,
+      ∀ (m : M), φ m = 0 → m = 0 ] := by
+  have := (hasEigenvalue_zero_tfae φ).not
+  dsimp only [List.map] at this
+  push_neg at this
+  have aux₁ : ∀ m, (m ≠ 0 → φ m ≠ 0) ↔ (φ m = 0 → m = 0) := by intro m; apply not_imp_not
+  have aux₂ : ker φ = ⊥ ↔ ¬ ⊥ < ker φ := by rw [bot_lt_iff_ne_bot, not_not]
+  simpa only [aux₁, aux₂] using this
 
 open Module.Free in
 

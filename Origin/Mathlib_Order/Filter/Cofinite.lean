@@ -9,6 +9,8 @@ import Mathlib.Order.Filter.AtTopBot
 import Mathlib.Order.Filter.Ker
 import Mathlib.Order.Filter.Pi
 
+noncomputable section
+
 /-!
 # The cofinite filter
 

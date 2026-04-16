@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Comon_
 
+noncomputable section
+
 /-!
 # The convolution monoid.
 

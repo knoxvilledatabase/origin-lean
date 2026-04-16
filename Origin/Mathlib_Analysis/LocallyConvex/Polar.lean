@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.LinearAlgebra.SesquilinearForm
 import Mathlib.Topology.Algebra.Module.WeakBilin
 
+noncomputable section
+
 /-!
 # Polar set
 

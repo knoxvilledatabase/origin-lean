@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Basic.lean
-Genuine: 63 | Conflates: 1 | Dissolved: 5 | Infrastructure: 49
+Genuine: 68 | Conflates: 1 | Dissolved: 0 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic
@@ -9,6 +9,8 @@ import Mathlib.Data.Finsupp.Antidiagonal
 import Mathlib.Data.Finsupp.Weight
 import Mathlib.Tactic.Linarith
 import Mathlib.LinearAlgebra.Pi
+
+noncomputable section
 
 /-!
 # Formal (multivariate) power series
@@ -125,9 +127,6 @@ def monomial (n : σ →₀ ℕ) : R →ₗ[R] MvPowerSeries σ R :=
 def coeff (n : σ →₀ ℕ) : MvPowerSeries σ R →ₗ[R] R :=
   LinearMap.proj n
 
-theorem coeff_apply (f : MvPowerSeries σ R) (d : σ →₀ ℕ) : coeff R d f = f d :=
-  rfl
-
 variable {R}
 
 @[ext]
@@ -158,7 +157,9 @@ theorem coeff_monomial_ne {m n : σ →₀ ℕ} (h : m ≠ n) (a : R) : coeff R 
   rw [monomial_def]
   exact Pi.single_eq_of_ne h _
 
--- DISSOLVED: eq_of_coeff_monomial_ne_zero
+theorem eq_of_coeff_monomial_ne_zero {m n : σ →₀ ℕ} {a : R} (h : coeff R m (monomial R n a) ≠ 0) :
+    m = n :=
+  by_contra fun h' => h <| coeff_monomial_ne h' a
 
 @[simp]
 theorem coeff_comp_monomial (n : σ →₀ ℕ) : (coeff R n).comp (monomial R n) = LinearMap.id :=
@@ -172,7 +173,9 @@ theorem eq_zero_iff_forall_coeff_zero {f : MvPowerSeries σ R} :
     f = 0 ↔ (∀ d : σ →₀ ℕ, coeff R d f = 0) :=
   MvPowerSeries.ext_iff
 
--- DISSOLVED: ne_zero_iff_exists_coeff_ne_zero
+theorem ne_zero_iff_exists_coeff_ne_zero (f : MvPowerSeries σ R) :
+    f ≠ 0 ↔ (∃ d : σ →₀ ℕ, coeff R d f ≠ 0) := by
+  simp only [MvPowerSeries.ext_iff, ne_eq, coeff_zero, not_forall]
 
 variable (m n : σ →₀ ℕ) (φ ψ : MvPowerSeries σ R)
 
@@ -204,9 +207,11 @@ theorem coeff_mul [DecidableEq σ] :
   refine Finset.sum_congr ?_ fun _ _ => rfl
   rw [Subsingleton.elim (Classical.decEq σ) ‹DecidableEq σ›]
 
--- DISSOLVED: zero_mul
+protected theorem zero_mul : (0 : MvPowerSeries σ R) * φ = 0 :=
+  ext fun n => by classical simp [coeff_mul]
 
--- DISSOLVED: mul_zero
+protected theorem mul_zero : φ * 0 = 0 :=
+  ext fun n => by classical simp [coeff_mul]
 
 theorem coeff_monomial_mul (a : R) :
     coeff R m (monomial R n a * φ) = if n ≤ m then a * coeff R (m - n) φ else 0 := by
@@ -329,13 +334,6 @@ def C : R →+* MvPowerSeries σ R :=
 
 variable {σ} {R}
 
-@[simp]
-theorem monomial_zero_eq_C : ⇑(monomial R (0 : σ →₀ ℕ)) = C σ R :=
-  rfl
-
-theorem monomial_zero_eq_C_apply (a : R) : monomial R (0 : σ →₀ ℕ) a = C σ R a :=
-  rfl
-
 theorem coeff_C [DecidableEq σ] (n : σ →₀ ℕ) (a : R) :
     coeff R n (C σ R a) = if n = 0 then a else 0 :=
   coeff_monomial _ _ _
@@ -367,9 +365,6 @@ theorem coeff_zero_X (s : σ) : coeff R (0 : σ →₀ ℕ) (X s : MvPowerSeries
 theorem commute_X (φ : MvPowerSeries σ R) (s : σ) : Commute φ (X s) :=
   φ.commute_monomial.mpr fun _m => Commute.one_right _
 
-theorem X_def (s : σ) : X s = monomial R (single s 1) 1 :=
-  rfl
-
 theorem X_pow_eq (s : σ) (n : ℕ) : (X s : MvPowerSeries σ R) ^ n = monomial R (single s n) 1 := by
   induction n with
   | zero => simp
@@ -387,7 +382,9 @@ theorem coeff_mul_C (n : σ →₀ ℕ) (φ : MvPowerSeries σ R) (a : R) :
 theorem coeff_C_mul (n : σ →₀ ℕ) (φ : MvPowerSeries σ R) (a : R) :
     coeff R n (C σ R a * φ) = a * coeff R n φ := by simpa using coeff_add_monomial_mul 0 n φ a
 
--- DISSOLVED: coeff_zero_mul_X
+theorem coeff_zero_mul_X (φ : MvPowerSeries σ R) (s : σ) : coeff R (0 : σ →₀ ℕ) (φ * X s) = 0 := by
+  have : ¬single s 1 ≤ 0 := fun h => by simpa using h s
+  simp only [X, coeff_mul_monomial, if_neg this]
 
 theorem coeff_zero_X_mul (φ : MvPowerSeries σ R) (s : σ) : coeff R (0 : σ →₀ ℕ) (X s * φ) = 0 := by
   rw [← (φ.commute_X s).eq, coeff_zero_mul_X]
@@ -407,26 +404,6 @@ variable {σ} {R}
 theorem coeff_zero_eq_constantCoeff : ⇑(coeff R (0 : σ →₀ ℕ)) = constantCoeff σ R :=
   rfl
 
-theorem coeff_zero_eq_constantCoeff_apply (φ : MvPowerSeries σ R) :
-    coeff R (0 : σ →₀ ℕ) φ = constantCoeff σ R φ :=
-  rfl
-
-@[simp]
-theorem constantCoeff_C (a : R) : constantCoeff σ R (C σ R a) = a :=
-  rfl
-
-@[simp]
-theorem constantCoeff_comp_C : (constantCoeff σ R).comp (C σ R) = RingHom.id R :=
-  rfl
-
-@[simp]
-theorem constantCoeff_zero : constantCoeff σ R 0 = 0 :=
-  rfl
-
-@[simp]
-theorem constantCoeff_one : constantCoeff σ R 1 = 1 :=
-  rfl
-
 @[simp]
 theorem constantCoeff_X (s : σ) : constantCoeff σ R (X s) = 0 :=
   coeff_zero_X s
@@ -434,10 +411,6 @@ theorem constantCoeff_X (s : σ) : constantCoeff σ R (X s) = 0 :=
 theorem isUnit_constantCoeff (φ : MvPowerSeries σ R) (h : IsUnit φ) :
     IsUnit (constantCoeff σ R φ) :=
   h.map _
-
-@[simp]
-theorem coeff_smul (f : MvPowerSeries σ R) (n) (a : R) : coeff _ n (a • f) = a * coeff _ n f :=
-  rfl
 
 theorem smul_eq_C_mul (f : MvPowerSeries σ R) (a : R) : a • f = C σ R a * f := by
   ext
@@ -491,22 +464,6 @@ def map : MvPowerSeries σ R →+* MvPowerSeries σ S where
         rintro ⟨i, j⟩ _; rw [f.map_mul]; rfl
 
 variable {σ}
-
-@[simp]
-theorem map_id : map σ (RingHom.id R) = RingHom.id _ :=
-  rfl
-
-theorem map_comp : map σ (g.comp f) = (map σ g).comp (map σ f) :=
-  rfl
-
-@[simp]
-theorem coeff_map (n : σ →₀ ℕ) (φ : MvPowerSeries σ R) : coeff S n (map σ f φ) = f (coeff R n φ) :=
-  rfl
-
-@[simp]
-theorem constantCoeff_map (φ : MvPowerSeries σ R) :
-    constantCoeff σ S (map σ f φ) = f (constantCoeff σ R φ) :=
-  rfl
 
 @[simp]
 theorem map_monomial (n : σ →₀ ℕ) (a : R) : map σ f (monomial R n a) = monomial S n (f a) := by
@@ -692,9 +649,6 @@ instance : Algebra R (MvPowerSeries σ A) :=
       simp [(coeff A n).map_smul_of_tower a, Algebra.smul_def]
     toRingHom := (MvPowerSeries.map σ (algebraMap R A)).comp (C σ R) }
 
-theorem c_eq_algebraMap : C σ R = algebraMap R (MvPowerSeries σ R) :=
-  rfl
-
 theorem algebraMap_apply {r : R} :
     algebraMap R (MvPowerSeries σ A) r = C σ A (algebraMap R A r) := by
   change (MvPowerSeries.map σ (algebraMap R A)).comp (C σ R) r = _
@@ -728,9 +682,6 @@ def toMvPowerSeries : MvPolynomial σ R → MvPowerSeries σ R :=
 
 instance coeToMvPowerSeries : Coe (MvPolynomial σ R) (MvPowerSeries σ R) :=
   ⟨toMvPowerSeries⟩
-
-theorem coe_def : (φ : MvPowerSeries σ R) = fun n => coeff n φ :=
-  rfl
 
 @[simp, norm_cast]
 theorem coeff_coe (n : σ →₀ ℕ) : MvPowerSeries.coeff R n ↑φ = coeff n φ :=
@@ -804,10 +755,6 @@ theorem coe_pow (n : ℕ) :
 
 variable (φ ψ)
 
-@[simp]
-theorem coeToMvPowerSeries.ringHom_apply : coeToMvPowerSeries.ringHom φ = φ :=
-  rfl
-
 section Algebra
 
 variable (A : Type*) [CommSemiring A] [Algebra R A]
@@ -815,11 +762,6 @@ variable (A : Type*) [CommSemiring A] [Algebra R A]
 def coeToMvPowerSeries.algHom : MvPolynomial σ R →ₐ[R] MvPowerSeries σ A :=
   { (MvPowerSeries.map σ (algebraMap R A)).comp coeToMvPowerSeries.ringHom with
     commutes' := fun r => by simp [algebraMap_apply, MvPowerSeries.algebraMap_apply] }
-
-@[simp]
-theorem coeToMvPowerSeries.algHom_apply :
-    coeToMvPowerSeries.algHom A φ = MvPowerSeries.map σ (algebraMap R A) ↑φ :=
-  rfl
 
 end Algebra
 
@@ -836,14 +778,6 @@ instance algebraMvPowerSeries : Algebra (MvPowerSeries σ R) (MvPowerSeries σ A
   (map σ (algebraMap R A)).toAlgebra
 
 variable (A)
-
-theorem algebraMap_apply' (p : MvPolynomial σ R) :
-    algebraMap (MvPolynomial σ R) (MvPowerSeries σ A) p = map σ (algebraMap R A) p :=
-  rfl
-
-theorem algebraMap_apply'' :
-    algebraMap (MvPowerSeries σ R) (MvPowerSeries σ A) f = map σ (algebraMap R A) f :=
-  rfl
 
 end MvPowerSeries
 

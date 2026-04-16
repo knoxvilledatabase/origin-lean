@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Units/Basic.lean
-Genuine: 64 | Conflates: 0 | Dissolved: 4 | Infrastructure: 14
+Genuine: 68 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
@@ -10,6 +10,8 @@ import Mathlib.Logic.Unique
 import Mathlib.Tactic.Nontriviality
 import Mathlib.Tactic.Lift
 import Mathlib.Tactic.Subsingleton
+
+noncomputable section
 
 /-!
 # Units (i.e., invertible elements) of a monoid
@@ -161,7 +163,8 @@ protected theorem mul_eq_one : a * b = 1 ↔ a = 1 ∧ b = 1 :=
     rintro ⟨rfl, rfl⟩
     exact mul_one _⟩
 
--- DISSOLVED: mul_ne_one
+@[to_additive]
+protected theorem mul_ne_one : a * b ≠ 1 ↔ a ≠ 1 ∨ b ≠ 1 := by rw [not_iff_comm]; simp
 
 end LeftCancelMonoid
 
@@ -184,7 +187,8 @@ protected theorem mul_eq_one : a * b = 1 ↔ a = 1 ∧ b = 1 :=
     rintro ⟨rfl, rfl⟩
     exact mul_one _⟩
 
--- DISSOLVED: mul_ne_one
+@[to_additive]
+protected theorem mul_ne_one : a * b ≠ 1 ↔ a ≠ 1 ∨ b ≠ 1 := by rw [not_iff_comm]; simp
 
 end RightCancelMonoid
 
@@ -201,7 +205,8 @@ theorem eq_one_of_mul_left' (h : a * b = 1) : b = 1 := LeftCancelMonoid.eq_one_o
 @[to_additive]
 theorem mul_eq_one' : a * b = 1 ↔ a = 1 ∧ b = 1 := LeftCancelMonoid.mul_eq_one
 
--- DISSOLVED: mul_ne_one'
+@[to_additive]
+theorem mul_ne_one' : a * b ≠ 1 ↔ a ≠ 1 ∨ b ≠ 1 := LeftCancelMonoid.mul_ne_one
 
 end CancelMonoid
 
@@ -237,7 +242,7 @@ theorem mul_eq_one : a * b = 1 ↔ a = 1 ∧ b = 1 :=
     rintro ⟨rfl, rfl⟩
     exact mul_one _⟩
 
--- DISSOLVED: mul_ne_one
+@[to_additive] theorem mul_ne_one : a * b ≠ 1 ↔ a ≠ 1 ∨ b ≠ 1 := by rw [not_iff_comm]; simp
 
 end CommMonoid
 

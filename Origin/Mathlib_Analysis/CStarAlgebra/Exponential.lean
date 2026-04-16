@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.Normed.Algebra.Exponential
 
+noncomputable section
+
 /-! # The exponential map from selfadjoint to unitary
 In this file, we establish various properties related to the map
 `fun a ↦ NormedSpace.exp ℂ A (I • a)` between the subtypes `selfAdjoint A` and `unitary A`.

@@ -7,6 +7,8 @@ import Mathlib.FieldTheory.Extension
 import Mathlib.FieldTheory.SplittingField.Construction
 import Mathlib.GroupTheory.Solvable
 
+noncomputable section
+
 /-!
 # Normal field extensions
 
@@ -196,11 +198,6 @@ instance normal_inf
 variable {F K}
 
 variable {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
-
-@[simp]
-theorem restrictScalars_normal {E : IntermediateField K L} :
-    Normal F (E.restrictScalars F) ↔ Normal F E :=
-  Iff.rfl
 
 end IntermediateField
 

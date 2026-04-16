@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Data.Multiset.Pi
 
+noncomputable section
+
 /-!
 # The cartesian product of lists
 
@@ -37,14 +39,6 @@ def cons (a : α i) (f : ∀ j ∈ l, α j) : ∀ j ∈ i :: l, α j :=
 
 variable {i l}
 
-lemma cons_def (a : α i) (f : ∀ j ∈ l, α j) : cons _ _ a f =
-    fun j hj ↦ if h : j = i then h.symm.rec a else f j <| (mem_cons.1 hj).resolve_left h :=
-  rfl
-
-@[simp] lemma _root_.Multiset.Pi.cons_coe {l : List ι} (a : α i) (f : ∀ j ∈ l, α j) :
-    Multiset.Pi.cons l _ a f = cons _ _ a f :=
-  rfl
-
 @[simp] lemma cons_eta (f : ∀ j ∈ i :: l, α j) :
     cons _ _ (head f) (tail f) = f :=
   Multiset.Pi.cons_eta (α := ι) (m := l) f
@@ -69,10 +63,6 @@ def pi : ∀ l : List ι, (∀ i, List (α i)) → List (∀ i, i ∈ l → α i
 
 @[simp] lemma pi_nil (t : ∀ i, List (α i)) :
     pi [] t = [Pi.nil α] :=
-  rfl
-
-@[simp] lemma pi_cons (i : ι) (l : List ι) (t : ∀ j, List (α j)) :
-    pi (i :: l) t = ((t i).flatMap fun b ↦ (pi l t).map <| Pi.cons _ _ b) :=
   rfl
 
 lemma _root_.Multiset.pi_coe (l : List ι) (fs : ∀ i, List (α i)) :

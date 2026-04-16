@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Measure/OpenPos.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 5 | Infrastructure: 2
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
+
+noncomputable section
 
 /-!
 # Measures positive on nonempty opens
@@ -29,11 +31,13 @@ section Basic
 variable {X Y : Type*} [TopologicalSpace X] {m : MeasurableSpace X} [TopologicalSpace Y]
   [T2Space Y] (μ ν : Measure X)
 
--- DISSOLVED: IsOpenPosMeasure
+class IsOpenPosMeasure : Prop where
+  open_pos : ∀ U : Set X, IsOpen U → U.Nonempty → μ U ≠ 0
 
 variable [IsOpenPosMeasure μ] {s U F : Set X} {x : X}
 
--- DISSOLVED: _root_.IsOpen.measure_ne_zero
+theorem _root_.IsOpen.measure_ne_zero (hU : IsOpen U) (hne : U.Nonempty) : μ U ≠ 0 :=
+  IsOpenPosMeasure.open_pos U hU hne
 
 theorem _root_.IsOpen.measure_pos (hU : IsOpen U) (hne : U.Nonempty) : 0 < μ U :=
   (hU.measure_ne_zero μ hne).bot_lt
@@ -54,7 +58,8 @@ theorem measure_pos_of_nonempty_interior (h : (interior s).Nonempty) : 0 < μ s 
 theorem measure_pos_of_mem_nhds (h : s ∈ 𝓝 x) : 0 < μ s :=
   measure_pos_of_nonempty_interior _ ⟨x, mem_interior_iff_mem_nhds.2 h⟩
 
--- DISSOLVED: isOpenPosMeasure_smul
+theorem isOpenPosMeasure_smul {c : ℝ≥0∞} (h : c ≠ 0) : IsOpenPosMeasure (c • μ) :=
+  ⟨fun _U Uo Une => mul_ne_zero h (Uo.measure_ne_zero μ Une)⟩
 
 variable {μ ν}
 
@@ -208,9 +213,11 @@ namespace EMetric
 variable {X : Type*} [PseudoEMetricSpace X] {m : MeasurableSpace X} (μ : Measure X)
   [IsOpenPosMeasure μ]
 
--- DISSOLVED: measure_ball_pos
+theorem measure_ball_pos (x : X) {r : ℝ≥0∞} (hr : r ≠ 0) : 0 < μ (ball x r) :=
+  isOpen_ball.measure_pos μ ⟨x, mem_ball_self hr.bot_lt⟩
 
--- DISSOLVED: measure_closedBall_pos
+theorem measure_closedBall_pos (x : X) {r : ℝ≥0∞} (hr : r ≠ 0) : 0 < μ (closedBall x r) :=
+  (measure_ball_pos μ x hr).trans_le (measure_mono ball_subset_closedBall)
 
 end EMetric
 

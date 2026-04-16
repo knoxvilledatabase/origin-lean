@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.EffectiveEpi.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 
 # Effective epimorphic families and coproducts
@@ -23,7 +25,6 @@ open Limits
 variable {C : Type*} [Category C]
 
 noncomputable
-
 def effectiveEpiStructIsColimitDescOfEffectiveEpiFamily {B : C} {α : Type*} (X : α → C)
     (c : Cofan X) (hc : IsColimit c) (π : (a : α) → (X a ⟶ B)) [EffectiveEpiFamily X π] :
     EffectiveEpiStruct (hc.desc (Cofan.mk B π)) where
@@ -35,7 +36,6 @@ def effectiveEpiStructIsColimitDescOfEffectiveEpiFamily {B : C} {α : Type*} (X 
       (fun _ _ _ _ hg ↦ (by simp [← hm, reassoc_of% hg])) m (fun _ ↦ (by simp [← hm]))
 
 noncomputable
-
 def effectiveEpiStructDescOfEffectiveEpiFamily {B : C} {α : Type*} (X : α → C)
     (π : (a : α) → (X a ⟶ B)) [HasCoproduct X] [EffectiveEpiFamily X π] :
     EffectiveEpiStruct (Sigma.desc π) := by
@@ -84,7 +84,6 @@ theorem effectiveEpiFamilyStructOfEffectiveEpiDesc_aux {B : C} {α : Type*} {X :
   simpa using hg
 
 noncomputable
-
 def effectiveEpiFamilyStructOfEffectiveEpiDesc {B : C} {α : Type*} (X : α → C)
     (π : (a : α) → (X a ⟶ B)) [HasCoproduct X] [EffectiveEpi (Sigma.desc π)]
     [∀ {Z : C} (g : Z ⟶ ∐ X) (a : α), HasPullback g (Sigma.ι X a)]

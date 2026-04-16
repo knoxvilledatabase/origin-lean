@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.FunProp.StateList
 import Mathlib.Algebra.Group.Pi.Basic
 
+noncomputable section
+
 /-!
 We define discrimination trees for the purpose of unifying local expressions with library results.
 

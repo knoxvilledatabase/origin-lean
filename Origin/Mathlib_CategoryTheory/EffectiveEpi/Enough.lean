@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
+noncomputable section
+
 /-!
 
 # Effectively enough objects in the image of a functor

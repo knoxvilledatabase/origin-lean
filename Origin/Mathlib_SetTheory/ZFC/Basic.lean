@@ -8,6 +8,8 @@ import Mathlib.Logic.Small.Basic
 import Mathlib.Logic.Function.OfArity
 import Mathlib.Order.WellFounded
 
+noncomputable section
+
 /-!
 # A model of ZFC
 
@@ -62,10 +64,6 @@ def «Type» : PSet → Type u
 
 def Func : ∀ x : PSet, x.Type → PSet
   | ⟨_, A⟩ => A
-
-@[simp]
-theorem mk_type (α A) : «Type» ⟨α, A⟩ = α :=
-  rfl
 
 @[simp]
 theorem mk_func (α A) : Func ⟨α, A⟩ = A :=
@@ -251,15 +249,8 @@ theorem mem_toSet (a u : PSet.{u}) : a ∈ u.toSet ↔ a ∈ u :=
 protected def Nonempty (u : PSet) : Prop :=
   u.toSet.Nonempty
 
-theorem nonempty_def (u : PSet) : u.Nonempty ↔ ∃ x, x ∈ u :=
-  Iff.rfl
-
 theorem nonempty_of_mem {x u : PSet} (h : x ∈ u) : u.Nonempty :=
   ⟨x, h⟩
-
-@[simp]
-theorem nonempty_toSet_iff {u : PSet} : u.toSet.Nonempty ↔ u.Nonempty :=
-  Iff.rfl
 
 theorem nonempty_type_iff_nonempty {x : PSet} : Nonempty x.Type ↔ PSet.Nonempty x :=
   ⟨fun ⟨i⟩ => ⟨_, func_mem _ i⟩, fun ⟨_, j, _⟩ => ⟨j⟩⟩
@@ -598,6 +589,7 @@ namespace Classical
 open PSet ZFSet
 
 set_option linter.deprecated false in
+/-- All functions are classically definable. -/
 
 noncomputable def allDefinable : ∀ {n} (F : OfArity ZFSet ZFSet n), Definable n F
   | 0, F =>
@@ -633,10 +625,7 @@ theorem exact {x y : PSet} : mk x = mk y → PSet.Equiv x y :=
   Quotient.exact
 
 set_option linter.deprecated false in
-
-theorem eval_mk {n f x} :
-    (@Resp.eval (n + 1) f : ZFSet → OfArity ZFSet ZFSet n) (mk x) = Resp.eval n (Resp.f f x) :=
-  rfl
+@[deprecated "No deprecation message was provided." (since := "2024-09-02"), simp]
 
 protected def Mem : ZFSet → ZFSet → Prop :=
   Quotient.lift₂ (· ∈ ·) fun _ _ _ _ hx hy =>
@@ -668,15 +657,8 @@ instance small_toSet (x : ZFSet.{u}) : Small.{u} x.toSet :=
 protected def Nonempty (u : ZFSet) : Prop :=
   u.toSet.Nonempty
 
-theorem nonempty_def (u : ZFSet) : u.Nonempty ↔ ∃ x, x ∈ u :=
-  Iff.rfl
-
 theorem nonempty_of_mem {x u : ZFSet} (h : x ∈ u) : u.Nonempty :=
   ⟨x, h⟩
-
-@[simp]
-theorem nonempty_toSet_iff {u : ZFSet} : u.toSet.Nonempty ↔ u.Nonempty :=
-  Iff.rfl
 
 protected def Subset (x y : ZFSet.{u}) :=
   ∀ ⦃z⦄, z ∈ x → z ∈ y
@@ -1027,10 +1009,6 @@ theorem mem_inter {x y z : ZFSet.{u}} : z ∈ x ∩ y ↔ z ∈ x ∧ z ∈ y :=
 theorem mem_diff {x y z : ZFSet.{u}} : z ∈ x \ y ↔ z ∈ x ∧ z ∉ y :=
   @mem_sep (fun z : ZFSet.{u} => z ∉ y) x z
 
-@[simp]
-theorem sUnion_pair {x y : ZFSet.{u}} : ⋃₀ ({x, y} : ZFSet.{u}) = x ∪ y :=
-  rfl
-
 theorem mem_wf : @WellFounded ZFSet (· ∈ ·) :=
   (wellFounded_lift₂_iff (H := fun a b c d hx hy =>
     propext ((@Mem.congr_left a c hx).trans (@Mem.congr_right b d hy _)))).mpr PSet.mem_wf
@@ -1358,10 +1336,6 @@ theorem coe_apply {x y : ZFSet.{u}} : (y : Class.{u}) x ↔ x ∈ y :=
   Iff.rfl
 
 @[simp, norm_cast]
-theorem coe_subset (x y : ZFSet.{u}) : (x : Class.{u}) ⊆ y ↔ x ⊆ y :=
-  Iff.rfl
-
-@[simp, norm_cast]
 theorem coe_sep (p : Class.{u}) (x : ZFSet.{u}) :
     (ZFSet.sep p x : Class) = { y ∈ x | p y } :=
   ext fun _ => ZFSet.mem_sep
@@ -1389,10 +1363,6 @@ theorem coe_diff (x y : ZFSet.{u}) : ↑(x \ y) = (x : Class.{u}) \ y :=
 @[simp, norm_cast]
 theorem coe_powerset (x : ZFSet.{u}) : ↑x.powerset = powerset.{u} x :=
   ext fun _ => ZFSet.mem_powerset
-
-@[simp]
-theorem powerset_apply {A : Class.{u}} {x : ZFSet.{u}} : powerset A x ↔ ↑x ⊆ A :=
-  Iff.rfl
 
 @[simp]
 theorem sUnion_apply {x : Class} {y : ZFSet} : (⋃₀ x) y ↔ ∃ z : ZFSet, x z ∧ y ∈ z := by

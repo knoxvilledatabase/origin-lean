@@ -1,12 +1,14 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Unoriented/Affine.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 4 | Infrastructure: 7
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Between
 import Mathlib.Analysis.Normed.Group.AddTorsor
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.Basic
 import Mathlib.Analysis.Normed.Affine.Isometry
+
+noncomputable section
 
 /-!
 # Angles between points
@@ -36,6 +38,8 @@ variable {V P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricS
 
 nonrec def angle (p1 p2 p3 : P) : ℝ :=
   angle (p1 -ᵥ p2 : V) (p3 -ᵥ p2)
+
+@[inherit_doc] scoped notation "∠" => EuclideanGeometry.angle
 
 theorem continuousAt_angle {x : P × P × P} (hx12 : x.1 ≠ x.2.1) (hx32 : x.2.2 ≠ x.2.1) :
     ContinuousAt (fun y : P × P × P => ∠ y.1 y.2.1 y.2.2) x := by
@@ -150,9 +154,14 @@ theorem angle_eq_angle_of_angle_eq_pi_of_angle_eq_pi {p1 p2 p3 p4 p5 : P} (hapc 
   linarith [angle_add_angle_eq_pi_of_angle_eq_pi p1 hbpd, angle_comm p4 p5 p1,
     angle_add_angle_eq_pi_of_angle_eq_pi p4 hapc, angle_comm p4 p5 p3]
 
--- DISSOLVED: left_dist_ne_zero_of_angle_eq_pi
+theorem left_dist_ne_zero_of_angle_eq_pi {p1 p2 p3 : P} (h : ∠ p1 p2 p3 = π) : dist p1 p2 ≠ 0 := by
+  by_contra heq
+  rw [dist_eq_zero] at heq
+  rw [heq, angle_self_left] at h
+  exact Real.pi_ne_zero (by linarith)
 
--- DISSOLVED: right_dist_ne_zero_of_angle_eq_pi
+theorem right_dist_ne_zero_of_angle_eq_pi {p1 p2 p3 : P} (h : ∠ p1 p2 p3 = π) : dist p3 p2 ≠ 0 :=
+  left_dist_ne_zero_of_angle_eq_pi <| (angle_comm _ _ _).trans h
 
 theorem dist_eq_add_dist_of_angle_eq_pi {p1 p2 p3 : P} (h : ∠ p1 p2 p3 = π) :
     dist p1 p3 = dist p1 p2 + dist p3 p2 := by
@@ -329,7 +338,9 @@ theorem collinear_of_angle_eq_pi {p₁ p₂ p₃ : P} (h : ∠ p₁ p₂ p₃ = 
     Collinear ℝ ({p₁, p₂, p₃} : Set P) :=
   collinear_iff_eq_or_eq_or_angle_eq_zero_or_angle_eq_pi.2 <| Or.inr <| Or.inr <| Or.inr h
 
--- DISSOLVED: angle_ne_zero_of_not_collinear
+theorem angle_ne_zero_of_not_collinear {p₁ p₂ p₃ : P} (h : ¬Collinear ℝ ({p₁, p₂, p₃} : Set P)) :
+    ∠ p₁ p₂ p₃ ≠ 0 :=
+  mt collinear_of_angle_eq_zero h
 
 theorem angle_ne_pi_of_not_collinear {p₁ p₂ p₃ : P} (h : ¬Collinear ℝ ({p₁, p₂, p₃} : Set P)) :
     ∠ p₁ p₂ p₃ ≠ π :=
@@ -372,7 +383,9 @@ theorem sin_pos_of_not_collinear {p₁ p₂ p₃ : P} (h : ¬Collinear ℝ ({p�
     0 < Real.sin (∠ p₁ p₂ p₃) :=
   Real.sin_pos_of_pos_of_lt_pi (angle_pos_of_not_collinear h) (angle_lt_pi_of_not_collinear h)
 
--- DISSOLVED: sin_ne_zero_of_not_collinear
+theorem sin_ne_zero_of_not_collinear {p₁ p₂ p₃ : P} (h : ¬Collinear ℝ ({p₁, p₂, p₃} : Set P)) :
+    Real.sin (∠ p₁ p₂ p₃) ≠ 0 :=
+  ne_of_gt (sin_pos_of_not_collinear h)
 
 theorem collinear_of_sin_eq_zero {p₁ p₂ p₃ : P} (h : Real.sin (∠ p₁ p₂ p₃) = 0) :
     Collinear ℝ ({p₁, p₂, p₃} : Set P) := by

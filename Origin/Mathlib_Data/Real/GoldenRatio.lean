@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Real/GoldenRatio.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Basic
@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.Fib.Basic
 import Mathlib.Data.Real.Irrational
 import Mathlib.Tactic.NormNum.NatFib
 import Mathlib.Tactic.NormNum.Prime
+
+noncomputable section
 
 /-!
 # The golden ratio and its conjugate
@@ -30,10 +32,12 @@ abbrev goldenRatio : ℝ := (1 + √5) / 2
 
 abbrev goldenConj : ℝ := (1 - √5) / 2
 
+@[inherit_doc goldenRatio] scoped[goldenRatio] notation "φ" => goldenRatio
+
+@[inherit_doc goldenConj] scoped[goldenRatio] notation "ψ" => goldenConj
+
 open Real goldenRatio
 
-@[inherit_doc goldenRatio] scoped[goldenRatio] notation "φ" => goldenRatio
-@[inherit_doc goldenConj] scoped[goldenRatio] notation "ψ" => goldenConj
 theorem inv_gold : φ⁻¹ = -ψ := by
   have : 1 + √5 ≠ 0 := ne_of_gt (add_pos (by norm_num) <| Real.sqrt_pos.mpr (by norm_num))
   field_simp [sub_mul, mul_add]
@@ -86,20 +90,18 @@ theorem goldConj_sq : ψ ^ 2 = ψ + 1 := by
 theorem gold_pos : 0 < φ :=
   mul_pos (by apply add_pos <;> norm_num) <| inv_pos.2 zero_lt_two
 
--- DISSOLVED: gold_ne_zero
+theorem gold_ne_zero : φ ≠ 0 :=
+  ne_of_gt gold_pos
 
 theorem one_lt_gold : 1 < φ := by
   refine lt_of_mul_lt_mul_left ?_ (le_of_lt gold_pos)
   simp [← sq, gold_pos, zero_lt_one]
 
-theorem gold_lt_two : φ < 2 := by calc
-  (1 + sqrt 5) / 2 < (1 + 3) / 2 := by gcongr; rw [sqrt_lt'] <;> norm_num
-  _ = 2 := by norm_num
-
 theorem goldConj_neg : ψ < 0 := by
   linarith [one_sub_goldConj, one_lt_gold]
 
--- DISSOLVED: goldConj_ne_zero
+theorem goldConj_ne_zero : ψ ≠ 0 :=
+  ne_of_lt goldConj_neg
 
 theorem neg_one_lt_goldConj : -1 < ψ := by
   rw [neg_lt, ← inv_gold]
@@ -186,13 +188,6 @@ theorem Real.coe_fib_eq' :
 
 theorem Real.coe_fib_eq : ∀ n, (Nat.fib n : ℝ) = (φ ^ n - ψ ^ n) / √5 := by
   rw [← funext_iff, Real.coe_fib_eq']
-
-theorem fib_golden_conj_exp (n : ℕ) : Nat.fib (n + 1) - φ * Nat.fib n = ψ ^ n := by
-  repeat rw [coe_fib_eq]
-  rw [mul_div, div_sub_div_same, mul_sub, ← pow_succ']
-  ring_nf
-  have nz : sqrt 5 ≠ 0 := by norm_num
-  rw [← (mul_inv_cancel₀ nz).symm, one_mul]
 
 theorem fib_golden_exp' (n : ℕ) : φ * Nat.fib (n + 1) + Nat.fib n = φ ^ (n + 1) := by
   induction n with

@@ -8,6 +8,8 @@ import Batteries.Tactic.Congr
 import Mathlib.Data.Set.Basic
 import Mathlib.Tactic.Contrapose
 
+noncomputable section
+
 /-!
 
 # Partial Equivalences
@@ -99,14 +101,6 @@ protected def trans (f : α ≃. β) (g : β ≃. γ) :
   toFun a := (f a).bind g
   invFun a := (g.symm a).bind f.symm
   inv a b := by simp_all [and_comm, eq_some_iff f, eq_some_iff g, bind_eq_some]
-
-@[simp]
-theorem refl_apply (a : α) : PEquiv.refl α a = some a :=
-  rfl
-
-@[simp]
-theorem symm_refl : (PEquiv.refl α).symm = PEquiv.refl α :=
-  rfl
 
 @[simp]
 theorem symm_symm (f : α ≃. β) : f.symm.symm = f := rfl
@@ -203,10 +197,6 @@ theorem ofSet_eq_some_self_iff {s : Set α} {_ : DecidablePred (· ∈ s)} {a : 
   mem_ofSet_self_iff
 
 @[simp]
-theorem ofSet_symm : (ofSet s).symm = ofSet s :=
-  rfl
-
-@[simp]
 theorem ofSet_univ : ofSet Set.univ = PEquiv.refl α :=
   rfl
 
@@ -250,14 +240,6 @@ instance : Inhabited (α ≃. β) :=
   ⟨⊥⟩
 
 @[simp]
-theorem bot_apply (a : α) : (⊥ : α ≃. β) a = none :=
-  rfl
-
-@[simp]
-theorem symm_bot : (⊥ : α ≃. β).symm = ⊥ :=
-  rfl
-
-@[simp]
 theorem trans_bot (f : α ≃. β) : f.trans (⊥ : β ≃. γ) = ⊥ := by
   ext; dsimp [PEquiv.trans]; simp
 
@@ -292,10 +274,6 @@ theorem mem_single (a : α) (b : β) : b ∈ single a b a :=
 
 theorem mem_single_iff (a₁ a₂ : α) (b₁ b₂ : β) : b₁ ∈ single a₂ b₂ a₁ ↔ a₁ = a₂ ∧ b₁ = b₂ := by
   dsimp [single]; split_ifs <;> simp [*, eq_comm]
-
-@[simp]
-theorem symm_single (a : α) (b : β) : (single a b).symm = single b a :=
-  rfl
 
 @[simp]
 theorem single_apply (a : α) (b : β) : single a b a = some b :=
@@ -358,9 +336,6 @@ instance instPartialOrderPEquiv : PartialOrder (α ≃. β) where
         · exact eq_none_iff_forall_not_mem.2 fun b hb => Option.not_mem_none b <| h ▸ fg a b hb
         · exact gf _ _ h)
 
-theorem le_def {f g : α ≃. β} : f ≤ g ↔ ∀ (a : α) (b : β), b ∈ f a → b ∈ g a :=
-  Iff.rfl
-
 instance : OrderBot (α ≃. β) :=
   { instBotPEquiv with bot_le := fun _ _ _ h => (not_mem_none _ h).elim }
 
@@ -405,19 +380,5 @@ def toPEquiv (f : α ≃ β) : α ≃. β where
   toFun := some ∘ f
   invFun := some ∘ f.symm
   inv := by simp [Equiv.eq_symm_apply, eq_comm]
-
-@[simp]
-theorem toPEquiv_refl : (Equiv.refl α).toPEquiv = PEquiv.refl α :=
-  rfl
-
-theorem toPEquiv_trans (f : α ≃ β) (g : β ≃ γ) :
-    (f.trans g).toPEquiv = f.toPEquiv.trans g.toPEquiv :=
-  rfl
-
-theorem toPEquiv_symm (f : α ≃ β) : f.symm.toPEquiv = f.toPEquiv.symm :=
-  rfl
-
-theorem toPEquiv_apply (f : α ≃ β) (x : α) : f.toPEquiv x = some (f x) :=
-  rfl
 
 end Equiv

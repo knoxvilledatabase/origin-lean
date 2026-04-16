@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Finset/Box.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Prod
@@ -9,6 +9,8 @@ import Mathlib.Order.Disjointed
 import Mathlib.Tactic.AdaptationNote
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Zify
+
+noncomputable section
 
 /-!
 # Decomposing a locally finite ordered ring into boxes
@@ -83,7 +85,13 @@ variable {x : ℤ × ℤ}
 
 attribute [norm_cast] toNat_ofNat
 
--- DISSOLVED: card_box
+lemma card_box : ∀ {n}, n ≠ 0 → #(box n : Finset (ℤ × ℤ)) = 8 * n
+  | n + 1, _ => by
+    simp_rw [Prod.card_box_succ, card_Icc, sub_neg_eq_add]
+    norm_cast
+    refine tsub_eq_of_eq_add ?_
+    zify
+    ring
 
 @[simp] lemma mem_box : ∀ {n}, x ∈ box n ↔ max x.1.natAbs x.2.natAbs = n
   | 0 => by simp [Prod.ext_iff]

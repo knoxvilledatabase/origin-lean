@@ -7,6 +7,8 @@ import Mathlib.Tactic.ApplyFun
 import Mathlib.Topology.Separation.Basic
 import Mathlib.Topology.UniformSpace.Basic
 
+noncomputable section
+
 /-!
 # Hausdorff properties of uniform spaces. Separation quotient.
 

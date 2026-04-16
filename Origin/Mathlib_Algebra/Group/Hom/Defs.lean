@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Hom/Defs.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 4 | Infrastructure: 68
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 68
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic
 import Mathlib.Data.FunLike.Basic
 import Mathlib.Logic.Function.Iterate
+
+noncomputable section
 
 /-!
 # Monoid and group homomorphisms
@@ -64,9 +66,16 @@ variable {F : Type*}
 
 section Zero
 
--- DISSOLVED: ZeroHom
+structure ZeroHom (M : Type*) (N : Type*) [Zero M] [Zero N] where
+  /-- The underlying function -/
+  protected toFun : M → N
+  /-- The proposition that the function preserves 0 -/
+  protected map_zero' : toFun 0 = 0
 
--- DISSOLVED: ZeroHomClass
+class ZeroHomClass (F : Type*) (M N : outParam Type*) [Zero M] [Zero N] [FunLike F M N] :
+    Prop where
+  /-- The proposition that the function preserves 0 -/
+  map_zero : ∀ f : F, f 0 = 0
 
 end Zero
 
@@ -128,15 +137,11 @@ instance OneHom.funLike : FunLike (OneHom M N) M N where
 instance OneHom.oneHomClass : OneHomClass (OneHom M N) M N where
   map_one := OneHom.map_one'
 
-library_note "low priority simp lemmas"
-
 variable [FunLike F M N]
 
 @[to_additive (attr := simp low)]
 theorem map_one [OneHomClass F M N] (f : F) : f 1 = 1 :=
   OneHomClass.map_one f
-
-@[to_additive] lemma map_comp_one [OneHomClass F M N] (f : F) : f ∘ (1 : ι → M) = 1 := by simp
 
 @[to_additive]
 theorem Subsingleton.of_oneHomClass [Subsingleton M] [OneHomClass F M N] :
@@ -150,9 +155,13 @@ theorem map_eq_one_iff [OneHomClass F M N] (f : F) (hf : Function.Injective f)
     {x : M} :
     f x = 1 ↔ x = 1 := hf.eq_iff' (map_one f)
 
--- DISSOLVED: map_ne_one_iff
+@[to_additive]
+theorem map_ne_one_iff {R S F : Type*} [One R] [One S] [FunLike F R S] [OneHomClass F R S] (f : F)
+    (hf : Function.Injective f) {x : R} : f x ≠ 1 ↔ x ≠ 1 := (map_eq_one_iff f hf).not
 
--- DISSOLVED: ne_one_of_map
+@[to_additive]
+theorem ne_one_of_map {R S F : Type*} [One R] [One S] [FunLike F R S] [OneHomClass F R S]
+    {f : F} {x : R} (hx : f x ≠ 1) : x ≠ 1 := ne_of_apply_ne f <| (by rwa [(map_one f)])
 
 @[to_additive (attr := coe)
 "Turn an element of a type `F` satisfying `ZeroHomClass F M N` into an actual
@@ -165,10 +174,6 @@ def OneHomClass.toOneHom [OneHomClass F M N] (f : F) : OneHom M N where
 `ZeroHomClass.toZeroHom`. "]
 instance [OneHomClass F M N] : CoeTC F (OneHom M N) :=
   ⟨OneHomClass.toOneHom⟩
-
-@[to_additive (attr := simp)]
-theorem OneHom.coe_coe [OneHomClass F M N] (f : F) :
-    ((f : OneHom M N) : M → N) = f := rfl
 
 end One
 
@@ -220,9 +225,6 @@ def MulHomClass.toMulHom [MulHomClass F M N] (f : F) : M →ₙ* N where
 `AddHomClass.toAddHom`."]
 instance [MulHomClass F M N] : CoeTC F (M →ₙ* N) :=
   ⟨MulHomClass.toMulHom⟩
-
-@[to_additive (attr := simp)]
-theorem MulHom.coe_coe [MulHomClass F M N] (f : F) : ((f : MulHom M N) : M → N) = f := rfl
 
 end Mul
 
@@ -277,9 +279,6 @@ def MonoidHomClass.toMonoidHom [MonoidHomClass F M N] (f : F) : M →* N :=
 instance [MonoidHomClass F M N] : CoeTC F (M →* N) :=
   ⟨MonoidHomClass.toMonoidHom⟩
 
-@[to_additive (attr := simp)]
-theorem MonoidHom.coe_coe [MonoidHomClass F M N] (f : F) : ((f : M →* N) : M → N) = f := rfl
-
 @[to_additive]
 theorem map_mul_eq_one [MonoidHomClass F M N] (f : F) {a b : M} (h : a * b = 1) :
     f a * f b = 1 := by
@@ -309,10 +308,6 @@ lemma map_comp_inv [Group G] [DivisionMonoid H] [MonoidHomClass F G H] (f : F) (
 @[to_additive "Additive group homomorphisms preserve subtraction."]
 theorem map_mul_inv [Group G] [DivisionMonoid H] [MonoidHomClass F G H] (f : F) (a b : G) :
     f (a * b⁻¹) = f a * (f b)⁻¹ := by rw [map_mul, map_inv]
-
-@[to_additive]
-lemma map_comp_mul_inv [Group G] [DivisionMonoid H] [MonoidHomClass F G H] (f : F) (g h : ι → G) :
-    f ∘ (g * h⁻¹) = f ∘ g * (f ∘ h)⁻¹ := by simp
 
 @[to_additive (attr := simp low) "Additive group homomorphisms preserve subtraction."]
 theorem map_div [Group G] [DivisionMonoid H] [MonoidHomClass F G H] (f : F) :
@@ -386,33 +381,6 @@ initialize_simps_projections MulHom (toFun → apply)
 
 initialize_simps_projections MonoidHom (toFun → apply)
 
-@[to_additive (attr := simp)]
-theorem OneHom.coe_mk [One M] [One N] (f : M → N) (h1) : (OneHom.mk f h1 : M → N) = f := rfl
-
-@[to_additive (attr := simp)]
-theorem OneHom.toFun_eq_coe [One M] [One N] (f : OneHom M N) : f.toFun = f := rfl
-
-@[to_additive (attr := simp)]
-theorem MulHom.coe_mk [Mul M] [Mul N] (f : M → N) (hmul) : (MulHom.mk f hmul : M → N) = f := rfl
-
-@[to_additive (attr := simp)]
-theorem MulHom.toFun_eq_coe [Mul M] [Mul N] (f : M →ₙ* N) : f.toFun = f := rfl
-
-@[to_additive (attr := simp)]
-theorem MonoidHom.coe_mk [MulOneClass M] [MulOneClass N] (f hmul) :
-    (MonoidHom.mk f hmul : M → N) = f := rfl
-
-@[to_additive (attr := simp)]
-theorem MonoidHom.toOneHom_coe [MulOneClass M] [MulOneClass N] (f : M →* N) :
-    (f.toOneHom : M → N) = f := rfl
-
-@[to_additive (attr := simp)]
-theorem MonoidHom.toMulHom_coe [MulOneClass M] [MulOneClass N] (f : M →* N) :
-    f.toMulHom.toFun = f := rfl
-
-@[to_additive]
-theorem MonoidHom.toFun_eq_coe [MulOneClass M] [MulOneClass N] (f : M →* N) : f.toFun = f := rfl
-
 @[to_additive (attr := ext)]
 theorem OneHom.ext [One M] [One N] ⦃f g : OneHom M N⦄ (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext _ _ h
@@ -466,11 +434,6 @@ protected def OneHom.copy [One M] [One N] (f : OneHom M N) (f' : M → N) (h : f
   toFun := f'
   map_one' := h.symm ▸ f.map_one'
 
-@[to_additive (attr := simp)]
-theorem OneHom.coe_copy {_ : One M} {_ : One N} (f : OneHom M N) (f' : M → N) (h : f' = f) :
-    (f.copy f' h) = f' :=
-  rfl
-
 @[to_additive]
 theorem OneHom.coe_copy_eq {_ : One M} {_ : One N} (f : OneHom M N) (f' : M → N) (h : f' = f) :
     f.copy f' h = f :=
@@ -484,11 +447,6 @@ protected def MulHom.copy [Mul M] [Mul N] (f : M →ₙ* N) (f' : M → N) (h : 
   toFun := f'
   map_mul' := h.symm ▸ f.map_mul'
 
-@[to_additive (attr := simp)]
-theorem MulHom.coe_copy {_ : Mul M} {_ : Mul N} (f : M →ₙ* N) (f' : M → N) (h : f' = f) :
-    (f.copy f' h) = f' :=
-  rfl
-
 @[to_additive]
 theorem MulHom.coe_copy_eq {_ : Mul M} {_ : Mul N} (f : M →ₙ* N) (f' : M → N) (h : f' = f) :
     f.copy f' h = f :=
@@ -500,11 +458,6 @@ theorem MulHom.coe_copy_eq {_ : Mul M} {_ : Mul N} (f : M →ₙ* N) (f' : M →
 protected def MonoidHom.copy [MulOneClass M] [MulOneClass N] (f : M →* N) (f' : M → N)
     (h : f' = f) : M →* N :=
   { f.toOneHom.copy f' h, f.toMulHom.copy f' h with }
-
-@[to_additive (attr := simp)]
-theorem MonoidHom.coe_copy {_ : MulOneClass M} {_ : MulOneClass N} (f : M →* N) (f' : M → N)
-    (h : f' = f) : (f.copy f' h) = f' :=
-  rfl
 
 @[to_additive]
 theorem MonoidHom.copy_eq {_ : MulOneClass M} {_ : MulOneClass N} (f : M →* N) (f' : M → N)
@@ -585,14 +538,6 @@ def MonoidHom.comp [MulOneClass M] [MulOneClass N] [MulOneClass P] (hnp : N →*
 theorem OneHom.coe_comp [One M] [One N] [One P] (g : OneHom N P) (f : OneHom M N) :
     ↑(g.comp f) = g ∘ f := rfl
 
-@[to_additive (attr := simp)]
-theorem MulHom.coe_comp [Mul M] [Mul N] [Mul P] (g : N →ₙ* P) (f : M →ₙ* N) :
-    ↑(g.comp f) = g ∘ f := rfl
-
-@[to_additive (attr := simp)]
-theorem MonoidHom.coe_comp [MulOneClass M] [MulOneClass N] [MulOneClass P]
-    (g : N →* P) (f : M →* N) : ↑(g.comp f) = g ∘ f := rfl
-
 @[to_additive]
 theorem OneHom.comp_apply [One M] [One N] [One P] (g : OneHom N P) (f : OneHom M N) (x : M) :
     g.comp f x = g (f x) := rfl
@@ -609,10 +554,6 @@ theorem MonoidHom.comp_apply [MulOneClass M] [MulOneClass N] [MulOneClass P]
 theorem OneHom.comp_assoc {Q : Type*} [One M] [One N] [One P] [One Q]
     (f : OneHom M N) (g : OneHom N P) (h : OneHom P Q) :
     (h.comp g).comp f = h.comp (g.comp f) := rfl
-
-@[to_additive]
-theorem MulHom.comp_assoc {Q : Type*} [Mul M] [Mul N] [Mul P] [Mul Q]
-    (f : M →ₙ* N) (g : N →ₙ* P) (h : P →ₙ* Q) : (h.comp g).comp f = h.comp (g.comp f) := rfl
 
 @[to_additive]
 theorem MonoidHom.comp_assoc {Q : Type*} [MulOneClass M] [MulOneClass N] [MulOneClass P]
@@ -757,15 +698,7 @@ instance : Monoid (Monoid.End M) where
 
 instance : Inhabited (Monoid.End M) := ⟨1⟩
 
-@[simp, norm_cast] lemma coe_pow (f : Monoid.End M) (n : ℕ) : (↑(f ^ n) : M → M) = f^[n] := rfl
-
 end End
-
-@[simp]
-theorem coe_one : ((1 : Monoid.End M) : M → M) = id := rfl
-
-@[simp]
-theorem coe_mul (f g) : ((f * g : Monoid.End M) : M → M) = f ∘ g := rfl
 
 end Monoid
 
@@ -786,18 +719,12 @@ instance instOne : One (AddMonoid.End A) where one := .id _
 
 instance instMul : Mul (AddMonoid.End A) where mul := .comp
 
-@[simp, norm_cast] lemma coe_one : ((1 : AddMonoid.End A) : A → A) = id := rfl
-
-@[simp, norm_cast] lemma coe_mul (f g : AddMonoid.End A) : (f * g : A → A) = f ∘ g := rfl
-
 instance monoid : Monoid (AddMonoid.End A) where
   mul_assoc _ _ _ := AddMonoidHom.comp_assoc _ _ _
   mul_one := AddMonoidHom.comp_id
   one_mul := AddMonoidHom.id_comp
   npow n f := (npowRec n f).copy (Nat.iterate f n) <| by induction n <;> simp [npowRec, *] <;> rfl
   npow_succ _ _ := DFunLike.coe_injective <| Function.iterate_succ _ _
-
-@[simp, norm_cast] lemma coe_pow (f : AddMonoid.End A) (n : ℕ) : (↑(f ^ n) : A → A) = f^[n] := rfl
 
 instance : Inhabited (AddMonoid.End A) := ⟨1⟩
 
@@ -822,13 +749,6 @@ instance [MulOneClass M] [MulOneClass N] : One (M →* N) :=
 theorem OneHom.one_apply [One M] [One N] (x : M) : (1 : OneHom M N) x = 1 := rfl
 
 @[to_additive (attr := simp)]
-theorem MonoidHom.one_apply [MulOneClass M] [MulOneClass N] (x : M) : (1 : M →* N) x = 1 := rfl
-
-@[to_additive (attr := simp)]
-theorem OneHom.one_comp [One M] [One N] [One P] (f : OneHom M N) :
-    (1 : OneHom N P).comp f = 1 := rfl
-
-@[to_additive (attr := simp)]
 theorem OneHom.comp_one [One M] [One N] [One P] (f : OneHom N P) : f.comp (1 : OneHom M N) = 1 := by
   ext
   simp only [OneHom.map_one, OneHom.coe_comp, Function.comp_apply, OneHom.one_apply]
@@ -843,10 +763,6 @@ instance [Mul M] [MulOneClass N] : Inhabited (M →ₙ* N) := ⟨1⟩
 instance [MulOneClass M] [MulOneClass N] : Inhabited (M →* N) := ⟨1⟩
 
 namespace MonoidHom
-
-@[to_additive (attr := simp)]
-theorem one_comp [MulOneClass M] [MulOneClass N] [MulOneClass P] (f : M →* N) :
-    (1 : N →* P).comp f = 1 := rfl
 
 @[to_additive (attr := simp)]
 theorem comp_one [MulOneClass M] [MulOneClass N] [MulOneClass P] (f : N →* P) :

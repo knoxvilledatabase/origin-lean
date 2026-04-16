@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.AlgebraicTopology.SimplicialSet.Basic
 
+noncomputable section
+
 /-!
 # Paths in simplicial sets
 
@@ -90,10 +92,6 @@ def Path.map {X Y : SSet.{u}} {n : ℕ} (f : X.Path n) (σ : X ⟶ Y) : Y.Path n
     simp only [← f.arrow_tgt i]
     exact congr (σ.naturality (δ 0).op) rfl |>.symm
 
-lemma map_interval {X Y : SSet.{u}} {n : ℕ} (f : X.Path n) (σ : X ⟶ Y)
-    (j l : ℕ) (hjl : j + l ≤ n) :
-    (f.map σ).interval j l hjl = (f.interval j l hjl).map σ := rfl
-
 def standardSimplex.spineId (n : ℕ) : Path Δ[n] n :=
   spine Δ[n] n (standardSimplex.id n)
 
@@ -117,11 +115,5 @@ def horn.spineId {n : ℕ} (i : Fin (n + 3))
   arrow_tgt := by
     simp only [horn, SimplicialObject.δ, Subtype.mk.injEq]
     exact standardSimplex.spineId _ |>.arrow_tgt
-
-@[simp]
-lemma horn.spineId_map_hornInclusion {n : ℕ} (i : Fin (n + 3))
-    (h₀ : 0 < i) (hₙ : i < Fin.last (n + 2)) :
-    Path.map (horn.spineId i h₀ hₙ) (hornInclusion (n + 2) i) =
-      standardSimplex.spineId (n + 2) := rfl
 
 end SSet

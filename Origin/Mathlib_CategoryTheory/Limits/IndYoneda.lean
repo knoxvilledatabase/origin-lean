@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Opposites
 import Mathlib.CategoryTheory.Limits.Preserves.Limits
 import Mathlib.CategoryTheory.Limits.Yoneda
 
+noncomputable section
+
 /-!
 
 # Ind- and pro- (co)yoneda lemmas

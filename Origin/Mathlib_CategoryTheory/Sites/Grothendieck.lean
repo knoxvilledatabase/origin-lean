@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.Order.Copy
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Grothendieck topologies
 
@@ -86,10 +88,6 @@ variable (J : GrothendieckTopology C)
 @[ext]
 theorem ext {J₁ J₂ : GrothendieckTopology C} (h : (J₁ : ∀ X : C, Set (Sieve X)) = J₂) : J₁ = J₂ :=
   DFunLike.coe_injective h
-
-@[simp]
-theorem mem_sieves_iff_coe : S ∈ J.sieves X ↔ S ∈ J X :=
-  Iff.rfl
 
 @[simp]
 theorem top_mem (X : C) : ⊤ ∈ J X :=
@@ -249,14 +247,6 @@ instance : Inhabited (GrothendieckTopology C) :=
   ⟨⊤⟩
 
 @[simp]
-theorem trivial_eq_bot : trivial C = ⊥ :=
-  rfl
-
-@[simp]
-theorem discrete_eq_top : discrete C = ⊤ :=
-  rfl
-
-@[simp]
 theorem bot_covering : S ∈ (⊥ : GrothendieckTopology C) X ↔ S = ⊤ :=
   trivial_covering
 
@@ -283,9 +273,6 @@ def dense : GrothendieckTopology C where
     rcases H₁ f with ⟨Z, g, H₃⟩
     rcases H₂ H₃ (𝟙 Z) with ⟨W, h, H₄⟩
     exact ⟨W, h ≫ g, by simpa using H₄⟩
-
-theorem dense_covering : S ∈ dense X ↔ ∀ {Y} (f : Y ⟶ X), ∃ (Z : _) (g : Z ⟶ Y), S (g ≫ f) :=
-  Iff.rfl
 
 def RightOreCondition (C : Type u) [Category.{v} C] : Prop :=
   ∀ {X Y Z : C} (yx : Y ⟶ X) (zx : Z ⟶ X), ∃ (W : _) (wy : W ⟶ Y) (wz : W ⟶ Z), wy ≫ yx = wz ≫ zx
@@ -396,11 +383,6 @@ def Arrow.Relation.base
   g₁ := r.g₁
   g₂ := r.g₂
   w := by simp [r.w_assoc]
-
-@[simp]
-theorem coe_pullback {Z : C} (f : Y ⟶ X) (g : Z ⟶ Y) (S : J.Cover X) :
-    (S.pullback f) g ↔ S (g ≫ f) :=
-  Iff.rfl
 
 def pullbackId (S : J.Cover X) : S.pullback (𝟙 X) ≅ S :=
   eqToIso <| Cover.ext _ _ fun Y f => by simp

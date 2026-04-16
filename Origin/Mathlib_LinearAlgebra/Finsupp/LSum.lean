@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Finsupp/LSum.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 15
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 import Mathlib.Algebra.Module.Equiv.Basic
 import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.LinearAlgebra.Finsupp.Defs
+
+noncomputable section
 
 /-!
 # Sums as a linear map
@@ -100,22 +102,12 @@ def lsum : (α → M →ₗ[R] N) ≃ₗ[S] (α →₀ M) →ₗ[R] N where
     ext x y
     simp
 
-@[simp]
-theorem coe_lsum (f : α → M →ₗ[R] N) : (lsum S f : (α →₀ M) → N) = fun d => d.sum fun i => f i :=
-  rfl
-
-theorem lsum_apply (f : α → M →ₗ[R] N) (l : α →₀ M) : Finsupp.lsum S f l = l.sum fun b => f b :=
-  rfl
-
 theorem lsum_single (f : α → M →ₗ[R] N) (i : α) (m : M) :
     Finsupp.lsum S f (Finsupp.single i m) = f i m :=
   Finsupp.sum_single_index (f i).map_zero
 
 @[simp] theorem lsum_comp_lsingle (f : α → M →ₗ[R] N) (i : α) :
     Finsupp.lsum S f ∘ₗ lsingle i = f i := by ext; simp
-
-theorem lsum_symm_apply (f : (α →₀ M) →ₗ[R] N) (x : α) : (lsum S).symm f x = f.comp (lsingle x) :=
-  rfl
 
 end LSum
 
@@ -130,10 +122,6 @@ noncomputable def lift : (X → M) ≃+ ((X →₀ R) →ₗ[R] M) :=
     (lsum _ : _ ≃ₗ[ℕ] _).toAddEquiv
 
 @[simp]
-theorem lift_symm_apply (f) (x) : ((lift M R X).symm f) x = f (single x 1) :=
-  rfl
-
-@[simp]
 theorem lift_apply (f) (g) : ((lift M R X) f) g = g.sum fun x r => r • f x :=
   rfl
 
@@ -146,25 +134,11 @@ noncomputable def llift : (X → M) ≃ₗ[S] (X →₀ R) →ₗ[R] M :=
       simp only [coe_comp, Function.comp_apply, lsingle_apply, lift_apply, Pi.smul_apply,
         sum_single_index, zero_smul, one_smul, LinearMap.smul_apply] }
 
-@[simp]
-theorem llift_apply (f : X → M) (x : X →₀ R) : llift M R S X f x = lift M R X f x :=
-  rfl
-
-@[simp]
-theorem llift_symm_apply (f : (X →₀ R) →ₗ[R] M) (x : X) :
-    (llift M R S X).symm f x = f (single x 1) :=
-  rfl
-
 end
 
 protected def domLCongr {α₁ α₂ : Type*} (e : α₁ ≃ α₂) : (α₁ →₀ M) ≃ₗ[R] α₂ →₀ M :=
   (Finsupp.domCongr e : (α₁ →₀ M) ≃+ (α₂ →₀ M)).toLinearEquiv <| by
     simpa only [equivMapDomain_eq_mapDomain, domCongr_apply] using (lmapDomain M R e).map_smul
-
-@[simp]
-theorem domLCongr_apply {α₁ : Type*} {α₂ : Type*} (e : α₁ ≃ α₂) (v : α₁ →₀ M) :
-    (Finsupp.domLCongr e : _ ≃ₗ[R] _) v = Finsupp.domCongr e v :=
-  rfl
 
 @[simp]
 theorem domLCongr_refl : Finsupp.domLCongr (Equiv.refl α) = LinearEquiv.refl R (α →₀ M) :=
@@ -180,21 +154,12 @@ theorem domLCongr_symm {α₁ α₂ : Type*} (f : α₁ ≃ α₂) :
     ((Finsupp.domLCongr f).symm : (_ →₀ M) ≃ₗ[R] _) = Finsupp.domLCongr f.symm :=
   LinearEquiv.ext fun _ => rfl
 
-theorem domLCongr_single {α₁ : Type*} {α₂ : Type*} (e : α₁ ≃ α₂) (i : α₁) (m : M) :
-    (Finsupp.domLCongr e : _ ≃ₗ[R] _) (Finsupp.single i m) = Finsupp.single (e i) m := by
-  simp
-
 def lcongr {ι κ : Sort _} (e₁ : ι ≃ κ) (e₂ : M ≃ₗ[R] N) : (ι →₀ M) ≃ₗ[R] κ →₀ N :=
   (Finsupp.domLCongr e₁).trans (mapRange.linearEquiv e₂)
 
 @[simp]
 theorem lcongr_single {ι κ : Sort _} (e₁ : ι ≃ κ) (e₂ : M ≃ₗ[R] N) (i : ι) (m : M) :
     lcongr e₁ e₂ (Finsupp.single i m) = Finsupp.single (e₁ i) (e₂ m) := by simp [lcongr]
-
-@[simp]
-theorem lcongr_apply_apply {ι κ : Sort _} (e₁ : ι ≃ κ) (e₂ : M ≃ₗ[R] N) (f : ι →₀ M) (k : κ) :
-    lcongr e₁ e₂ f k = e₂ (f (e₁.symm k)) :=
-  rfl
 
 theorem lcongr_symm_single {ι κ : Sort _} (e₁ : ι ≃ κ) (e₂ : M ≃ₗ[R] N) (k : κ) (n : N) :
     (lcongr e₁ e₂).symm (Finsupp.single k n) = Finsupp.single (e₁.symm k) (e₂.symm n) := by
@@ -219,7 +184,9 @@ section
 
 variable (R)
 
--- DISSOLVED: Submodule.finsupp_sum_mem
+protected theorem Submodule.finsupp_sum_mem {ι β : Type*} [Zero β] (S : Submodule R M) (f : ι →₀ β)
+    (g : ι → β → M) (h : ∀ c, f c ≠ 0 → g c (f c) ∈ S) : f.sum g ∈ S :=
+  AddSubmonoidClass.finsupp_sum_mem S f g h
 
 end
 
@@ -265,9 +232,6 @@ variable {γ : Type*} [Zero γ]
 
 section Finsupp
 
-theorem coe_finsupp_sum (t : ι →₀ γ) (g : ι → γ → M →ₛₗ[σ₁₂] M₂) :
-    ⇑(t.sum g) = t.sum fun i d => g i d := rfl
-
 @[simp]
 theorem finsupp_sum_apply (t : ι →₀ γ) (g : ι → γ → M →ₛₗ[σ₁₂] M₂) (b : M) :
     (t.sum g) b = t.sum fun i d => g i d b :=
@@ -290,9 +254,6 @@ variable [SMulCommClass R S S]
 def mulLeftMap {M : Submodule R S} (N : Submodule R S) {ι : Type*} (m : ι → M) :
     (ι →₀ N) →ₗ[R] S := Finsupp.lsum R fun i ↦ (m i).1 • N.subtype
 
-theorem mulLeftMap_apply {M N : Submodule R S} {ι : Type*} (m : ι → M) (n : ι →₀ N) :
-    mulLeftMap N m n = Finsupp.sum n fun (i : ι) (n : N) ↦ (m i).1 * n.1 := rfl
-
 @[simp]
 theorem mulLeftMap_apply_single {M N : Submodule R S} {ι : Type*} (m : ι → M) (i : ι) (n : N) :
     mulLeftMap N m (Finsupp.single i n) = (m i).1 * n.1 := by
@@ -304,9 +265,6 @@ variable [IsScalarTower R S S]
 
 def mulRightMap (M : Submodule R S) {N : Submodule R S} {ι : Type*} (n : ι → N) :
     (ι →₀ M) →ₗ[R] S := Finsupp.lsum R fun i ↦ MulOpposite.op (n i).1 • M.subtype
-
-theorem mulRightMap_apply {M N : Submodule R S} {ι : Type*} (n : ι → N) (m : ι →₀ M) :
-    mulRightMap M n m = Finsupp.sum m fun (i : ι) (m : M) ↦ m.1 * (n i).1 := rfl
 
 @[simp]
 theorem mulRightMap_apply_single {M N : Submodule R S} {ι : Type*} (n : ι → N) (i : ι) (m : M) :

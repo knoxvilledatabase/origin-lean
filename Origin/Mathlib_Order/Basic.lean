@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Basic.lean
-Genuine: 171 | Conflates: 0 | Dissolved: 0 | Infrastructure: 66
+Genuine: 173 | Conflates: 0 | Dissolved: 0 | Infrastructure: 66
 -/
 import Origin.Core
 import Mathlib.Data.Subtype
@@ -11,6 +11,8 @@ import Mathlib.Tactic.Spread
 import Mathlib.Tactic.Convert
 import Mathlib.Tactic.Inhabit
 import Mathlib.Tactic.SimpRw
+
+noncomputable section
 
 /-!
 # Basic definitions about `≤` and `<`
@@ -705,15 +707,6 @@ instance Prop.hasCompl : HasCompl Prop :=
 instance Pi.hasCompl [∀ i, HasCompl (π i)] : HasCompl (∀ i, π i) :=
   ⟨fun x i ↦ (x i)ᶜ⟩
 
-theorem Pi.compl_def [∀ i, HasCompl (π i)] (x : ∀ i, π i) :
-    xᶜ = fun i ↦ (x i)ᶜ :=
-  rfl
-
-@[simp]
-theorem Pi.compl_apply [∀ i, HasCompl (π i)] (x : ∀ i, π i) (i : ι) :
-    xᶜ i = (x i)ᶜ :=
-  rfl
-
 instance IsIrrefl.compl (r) [IsIrrefl α r] : IsRefl α rᶜ :=
   ⟨@irrefl α r _⟩
 
@@ -838,15 +831,6 @@ end Function
 
 instance Pi.sdiff [∀ i, SDiff (π i)] : SDiff (∀ i, π i) :=
   ⟨fun x y i ↦ x i \ y i⟩
-
-theorem Pi.sdiff_def [∀ i, SDiff (π i)] (x y : ∀ i, π i) :
-    x \ y = fun i ↦ x i \ y i :=
-  rfl
-
-@[simp]
-theorem Pi.sdiff_apply [∀ i, SDiff (π i)] (x y : ∀ i, π i) (i : ι) :
-    (x \ y) i = x i \ y i :=
-  rfl
 
 namespace Function
 
@@ -993,26 +977,18 @@ instance le [LE α] {p : α → Prop} : LE (Subtype p) :=
 instance lt [LT α] {p : α → Prop} : LT (Subtype p) :=
   ⟨fun x y ↦ (x : α) < y⟩
 
-@[simp]
-theorem mk_le_mk [LE α] {p : α → Prop} {x y : α} {hx : p x} {hy : p y} :
-    (⟨x, hx⟩ : Subtype p) ≤ ⟨y, hy⟩ ↔ x ≤ y :=
-  Iff.rfl
-
-@[simp]
-theorem mk_lt_mk [LT α] {p : α → Prop} {x y : α} {hx : p x} {hy : p y} :
-    (⟨x, hx⟩ : Subtype p) < ⟨y, hy⟩ ↔ x < y :=
-  Iff.rfl
-
 @[simp, norm_cast]
 theorem coe_le_coe [LE α] {p : α → Prop} {x y : Subtype p} : (x : α) ≤ y ↔ x ≤ y :=
   Iff.rfl
 
 @[gcongr] alias ⟨_, GCongr.coe_le_coe⟩ := coe_le_coe
+
 @[simp, norm_cast]
 theorem coe_lt_coe [LT α] {p : α → Prop} {x y : Subtype p} : (x : α) < y ↔ x < y :=
   Iff.rfl
 
 @[gcongr] alias ⟨_, GCongr.coe_lt_coe⟩ := coe_lt_coe
+
 instance preorder [Preorder α] (p : α → Prop) : Preorder (Subtype p) :=
   Preorder.lift (fun (a : Subtype p) ↦ (a : α))
 
@@ -1053,10 +1029,6 @@ theorem le_def [LE α] [LE β] {x y : α × β} : x ≤ y ↔ x.1 ≤ y.1 ∧ x.
   Iff.rfl
 
 @[simp]
-theorem mk_le_mk [LE α] [LE β] {x₁ x₂ : α} {y₁ y₂ : β} : (x₁, y₁) ≤ (x₂, y₂) ↔ x₁ ≤ x₂ ∧ y₁ ≤ y₂ :=
-  Iff.rfl
-
-@[simp]
 theorem swap_le_swap [LE α] [LE β] {x y : α × β} : x.swap ≤ y.swap ↔ x ≤ y :=
   and_comm
 
@@ -1093,10 +1065,6 @@ theorem lt_iff : x < y ↔ x.1 < y.1 ∧ x.2 ≤ y.2 ∨ x.1 ≤ y.1 ∧ x.2 < y
   · rintro (⟨h₁, h₂⟩ | ⟨h₁, h₂⟩)
     · exact ⟨⟨h₁.le, h₂⟩, fun h ↦ h₁.not_le h.1⟩
     · exact ⟨⟨h₁, h₂.le⟩, fun h ↦ h₂.not_le h.2⟩
-
-@[simp]
-theorem mk_lt_mk : (a₁, b₁) < (a₂, b₂) ↔ a₁ < a₂ ∧ b₁ ≤ b₂ ∨ a₁ ≤ a₂ ∧ b₁ < b₂ :=
-  lt_iff
 
 protected lemma lt_of_lt_of_le (h₁ : x.1 < y.1) (h₂ : x.2 ≤ y.2) : x < y := by simp [lt_iff, *]
 
@@ -1212,12 +1180,6 @@ instance instLinearOrder : LinearOrder PUnit where
   le_antisymm := by intros; rfl
   lt_iff_le_not_le := by simp only [not_true, and_false, forall_const]
 
-theorem max_eq : max a b = unit :=
-  rfl
-
-theorem min_eq : min a b = unit :=
-  rfl
-
 protected theorem le : a ≤ b :=
   trivial
 
@@ -1233,13 +1195,6 @@ section «Prop»
 
 instance Prop.le : LE Prop :=
   ⟨(· → ·)⟩
-
-@[simp]
-theorem le_Prop_eq : ((· ≤ ·) : Prop → Prop → Prop) = (· → ·) :=
-  rfl
-
-theorem subrelation_iff_le {r s : α → α → Prop} : Subrelation r s ↔ r ≤ s :=
-  Iff.rfl
 
 instance Prop.partialOrder : PartialOrder Prop where
   __ := Prop.le

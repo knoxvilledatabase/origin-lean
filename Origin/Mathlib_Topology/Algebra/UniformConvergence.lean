@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.UniformMulAction
 import Mathlib.Algebra.Module.Pi
 import Mathlib.Topology.UniformSpace.UniformConvergenceTopology
 
+noncomputable section
+
 /-!
 # Algebraic facts about the topology of uniform convergence
 
@@ -47,71 +49,19 @@ variable {α β ι R : Type*} {𝔖 : Set <| Set α} {x : α}
 
 @[to_additive] instance [One β] : One (α →ᵤ β) := Pi.instOne
 
-@[to_additive (attr := simp)]
-lemma UniformFun.toFun_one [One β] : toFun (1 : α →ᵤ β) = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma UniformFun.ofFun_one [One β] : ofFun (1 : α → β) = 1 := rfl
-
 @[to_additive] instance [One β] : One (α →ᵤ[𝔖] β) := Pi.instOne
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_one [One β] : toFun 𝔖 (1 : α →ᵤ[𝔖] β) = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.one_apply [One β] : ofFun 𝔖 (1 : α → β) = 1 := rfl
 
 @[to_additive] instance [Mul β] : Mul (α →ᵤ β) := Pi.instMul
 
-@[to_additive (attr := simp)]
-lemma UniformFun.toFun_mul [Mul β] (f g : α →ᵤ β) : toFun (f * g) = toFun f * toFun g := rfl
-
-@[to_additive (attr := simp)]
-lemma UniformFun.ofFun_mul [Mul β] (f g : α → β) : ofFun (f * g) = ofFun f * ofFun g := rfl
-
 @[to_additive] instance [Mul β] : Mul (α →ᵤ[𝔖] β) := Pi.instMul
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_mul [Mul β] (f g : α →ᵤ[𝔖] β) :
-    toFun 𝔖 (f * g) = toFun 𝔖 f * toFun 𝔖 g :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.ofFun_mul [Mul β] (f g : α → β) : ofFun 𝔖 (f * g) = ofFun 𝔖 f * ofFun 𝔖 g := rfl
 
 @[to_additive] instance [Inv β] : Inv (α →ᵤ β) := Pi.instInv
 
-@[to_additive (attr := simp)]
-lemma UniformFun.toFun_inv [Inv β] (f : α →ᵤ β) : toFun (f⁻¹) = (toFun f)⁻¹ := rfl
-
-@[to_additive (attr := simp)]
-lemma UniformFun.ofFun_inv [Inv β] (f : α → β) : ofFun (f⁻¹) = (ofFun f)⁻¹ := rfl
-
 @[to_additive] instance [Inv β] : Inv (α →ᵤ[𝔖] β) := Pi.instInv
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_inv [Inv β] (f : α →ᵤ[𝔖] β) : toFun 𝔖 (f⁻¹) = (toFun 𝔖 f)⁻¹ := rfl
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.ofFun_inv [Inv β] (f : α → β) : ofFun 𝔖 (f⁻¹) = (ofFun 𝔖 f)⁻¹ := rfl
 
 @[to_additive] instance [Div β] : Div (α →ᵤ β) := Pi.instDiv
 
-@[to_additive (attr := simp)]
-lemma UniformFun.toFun_div [Div β] (f g : α →ᵤ β) : toFun (f / g) = toFun f / toFun g := rfl
-
-@[to_additive (attr := simp)]
-lemma UniformFun.ofFun_div [Div β] (f g : α → β) : ofFun (f / g) = ofFun f / ofFun g := rfl
-
 @[to_additive] instance [Div β] : Div (α →ᵤ[𝔖] β) := Pi.instDiv
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.toFun_div [Div β] (f g : α →ᵤ[𝔖] β) :
-    toFun 𝔖 (f / g) = toFun 𝔖 f / toFun 𝔖 g :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma UniformOnFun.ofFun_div [Div β] (f g : α → β) : ofFun 𝔖 (f / g) = ofFun 𝔖 f / ofFun 𝔖 g := rfl
 
 @[to_additive]
 instance [Monoid β] : Monoid (α →ᵤ β) :=
@@ -147,27 +97,7 @@ instance [CommGroup β] : CommGroup (α →ᵤ[𝔖] β) :=
 
 instance {M : Type*} [SMul M β] : SMul M (α →ᵤ β) := Pi.instSMul
 
-@[simp]
-lemma UniformFun.toFun_smul {M : Type*} [SMul M β] (c : M) (f : α →ᵤ β) :
-    toFun (c • f) = c • toFun f :=
-  rfl
-
-@[simp]
-lemma UniformFun.ofFun_smul {M : Type*} [SMul M β] (c : M) (f : α → β) :
-    ofFun (c • f) = c • ofFun f :=
-  rfl
-
 instance {M : Type*} [SMul M β] : SMul M (α →ᵤ[𝔖] β) := Pi.instSMul
-
-@[simp]
-lemma UniformOnFun.toFun_smul {M : Type*} [SMul M β] (c : M) (f : α →ᵤ[𝔖] β) :
-    toFun 𝔖 (c • f) = c • toFun 𝔖 f :=
-  rfl
-
-@[simp]
-lemma UniformOnFun.ofFun_smul {M : Type*} [SMul M β] (c : M) (f : α → β) :
-    ofFun 𝔖 (c • f) = c • ofFun 𝔖 f :=
-  rfl
 
 instance {M N : Type*} [SMul M N] [SMul M β] [SMul N β] [IsScalarTower M N β] :
     IsScalarTower M N (α →ᵤ β) :=

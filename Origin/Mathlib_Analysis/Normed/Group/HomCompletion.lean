@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Hom
 import Mathlib.Analysis.Normed.Group.Completion
 
+noncomputable section
+
 /-!
 # Completion of normed group homs
 
@@ -180,10 +182,6 @@ def NormedAddGroupHom.extension (f : NormedAddGroupHom G H) : NormedAddGroupHom 
   .ofLipschitz (f.toAddMonoidHom.extension f.continuous) <|
     let _ := MetricSpace.ofT0PseudoMetricSpace H
     f.lipschitz.completion_extension
-
-theorem NormedAddGroupHom.extension_def (f : NormedAddGroupHom G H) (v : G) :
-    f.extension v = Completion.extension f v :=
-  rfl
 
 @[simp]
 theorem NormedAddGroupHom.extension_coe (f : NormedAddGroupHom G H) (v : G) : f.extension v = f v :=

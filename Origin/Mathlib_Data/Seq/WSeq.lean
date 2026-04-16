@@ -8,6 +8,8 @@ import Mathlib.Data.Option.Basic
 import Mathlib.Data.Seq.Seq
 import Batteries.Data.DList.Basic
 
+noncomputable section
+
 /-!
 # Partially defined possibly infinite lists
 
@@ -989,10 +991,6 @@ theorem length_eq_map (s : WSeq α) : length s = Computation.map List.length (to
   · refine ⟨l, s, ?_, ?_⟩ <;> simp
 
 @[simp]
-theorem ofList_nil : ofList [] = (nil : WSeq α) :=
-  rfl
-
-@[simp]
 theorem ofList_cons (a : α) (l) : ofList (a::l) = cons a (ofList l) :=
   show Seq.map some (Seq.ofList (a::l)) = Seq.cons (some a) (Seq.map some (Seq.ofList l)) by simp
 
@@ -1121,10 +1119,6 @@ theorem toSeq_ofSeq (s : Seq α) : toSeq (ofSeq s) = s := by
 
 def ret (a : α) : WSeq α :=
   ofList [a]
-
-@[simp]
-theorem map_nil (f : α → β) : map f nil = nil :=
-  rfl
 
 @[simp]
 theorem map_cons (f : α → β) (a s) : map f (cons a s) = cons (f a) (map f s) :=

@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Cardinal/Basic.lean
-Genuine: 337 | Conflates: 1 | Dissolved: 20 | Infrastructure: 59
+Genuine: 355 | Conflates: 1 | Dissolved: 0 | Infrastructure: 61
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
@@ -15,6 +15,8 @@ import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 import Mathlib.Order.InitialSeg
 import Mathlib.Order.SuccPred.CompleteLinearOrder
 import Mathlib.SetTheory.Cardinal.SchroederBernstein
+
+noncomputable section
 
 /-!
 # Cardinal Numbers
@@ -135,9 +137,6 @@ theorem induction_on_pi {ι : Type u} {p : (ι → Cardinal.{v}) → Prop}
 protected theorem eq : #α = #β ↔ Nonempty (α ≃ β) :=
   Quotient.eq'
 
-theorem mk'_def (α : Type u) : @Eq Cardinal ⟦α⟧ #α :=
-  rfl
-
 @[simp]
 theorem mk_out (c : Cardinal) : #c.out = c :=
   Quotient.out_eq _
@@ -152,11 +151,6 @@ alias _root_.Equiv.cardinal_eq := mk_congr
 
 def map (f : Type u → Type v) (hf : ∀ α β, α ≃ β → f α ≃ f β) : Cardinal.{u} → Cardinal.{v} :=
   Quotient.map f fun α β ⟨e⟩ => ⟨hf α β e⟩
-
-@[simp]
-theorem map_mk (f : Type u → Type v) (hf : ∀ α β, α ≃ β → f α ≃ f β) (α : Type u) :
-    map f hf #α = #(f α) :=
-  rfl
 
 def map₂ (f : Type u → Type v → Type w) (hf : ∀ α β γ δ, α ≃ β → γ ≃ δ → f α γ ≃ f β δ) :
     Cardinal.{u} → Cardinal.{v} → Cardinal.{w} :=
@@ -378,9 +372,12 @@ theorem mk_eq_zero_iff {α : Type u} : #α = 0 ↔ IsEmpty α :=
     h.isEmpty,
     @mk_eq_zero α⟩
 
--- DISSOLVED: mk_ne_zero_iff
+theorem mk_ne_zero_iff {α : Type u} : #α ≠ 0 ↔ Nonempty α :=
+  (not_iff_not.2 mk_eq_zero_iff).trans not_isEmpty_iff
 
--- DISSOLVED: mk_ne_zero
+@[simp]
+theorem mk_ne_zero (α : Type u) [Nonempty α] : #α ≠ 0 :=
+  mk_ne_zero_iff.2 ‹_›
 
 instance : One Cardinal.{u} :=
   -- `PUnit` might be more canonical, but this is convenient for defeq with natCast
@@ -406,9 +403,6 @@ alias _root_.Set.Subsingleton.cardinal_mk_le_one := Set.Subsingleton.cardinalMk_
 
 instance : Add Cardinal.{u} :=
   ⟨map₂ Sum fun _ _ _ _ => Equiv.sumCongr⟩
-
-theorem add_def (α β : Type u) : #α + #β = #(α ⊕ β) :=
-  rfl
 
 instance : NatCast Cardinal.{u} :=
   ⟨fun n => lift #(Fin n)⟩
@@ -498,13 +492,18 @@ instance commSemiring : CommSemiring Cardinal.{u} where
 theorem one_power {a : Cardinal} : (1 : Cardinal) ^ a = 1 :=
   inductionOn a fun _ => mk_eq_one _
 
-theorem mk_bool : #Bool = 2 := by simp
+@[simp]
+theorem zero_power {a : Cardinal} : a ≠ 0 → (0 : Cardinal) ^ a = 0 :=
+  inductionOn a fun _ heq =>
+    mk_eq_zero_iff.2 <|
+      isEmpty_pi.2 <|
+        let ⟨a⟩ := mk_ne_zero_iff.1 heq
+        ⟨a, inferInstance⟩
 
-theorem mk_Prop : #Prop = 2 := by simp
-
--- DISSOLVED: zero_power
-
--- DISSOLVED: power_ne_zero
+theorem power_ne_zero {a : Cardinal} (b : Cardinal) : a ≠ 0 → a ^ b ≠ 0 :=
+  inductionOn₂ a b fun _ _ h =>
+    let ⟨a⟩ := mk_ne_zero_iff.1 h
+    mk_ne_zero_iff.2 ⟨fun _ => a⟩
 
 theorem mul_power {a b c : Cardinal} : (a * b) ^ c = a ^ c * b ^ c :=
   inductionOn₃ a b c fun α β γ => mk_congr <| Equiv.arrowProdEquivProdArrow α β γ
@@ -605,7 +604,10 @@ theorem zero_power_le (c : Cardinal.{u}) : (0 : Cardinal.{u}) ^ c ≤ 1 := by
   · rw [zero_power h]
     apply zero_le
 
--- DISSOLVED: power_le_power_left
+theorem power_le_power_left : ∀ {a b c : Cardinal}, a ≠ 0 → b ≤ c → a ^ b ≤ a ^ c := by
+  rintro ⟨α⟩ ⟨β⟩ ⟨γ⟩ hα ⟨e⟩
+  let ⟨a⟩ := mk_ne_zero_iff.1 hα
+  exact ⟨@Function.Embedding.arrowCongrLeft _ _ _ ⟨a⟩ e⟩
 
 theorem self_le_power (a : Cardinal) {b : Cardinal} (hb : 1 ≤ b) : a ≤ a ^ b := by
   rcases eq_or_ne a 0 with (rfl | ha)
@@ -700,7 +702,8 @@ theorem succ_def (c : Cardinal) : succ c = sInf { c' | c < c' } :=
 theorem succ_pos : ∀ c : Cardinal, 0 < succ c :=
   bot_lt_succ
 
--- DISSOLVED: succ_ne_zero
+theorem succ_ne_zero (c : Cardinal) : succ c ≠ 0 :=
+  (succ_pos _).ne'
 
 theorem add_one_le_succ (c : Cardinal.{u}) : c + 1 ≤ succ c := by
   -- Porting note: rewrote the next three lines to avoid defeq abuse.
@@ -728,12 +731,14 @@ theorem lift_succ (a) : lift.{v, u} (succ a) = succ (lift.{v, u} a) :=
 def IsLimit (c : Cardinal) : Prop :=
   c ≠ 0 ∧ IsSuccPrelimit c
 
--- DISSOLVED: ne_zero_of_isSuccLimit
+theorem ne_zero_of_isSuccLimit {c} (h : IsSuccLimit c) : c ≠ 0 :=
+  h.ne_bot
 
 theorem isSuccPrelimit_zero : IsSuccPrelimit (0 : Cardinal) :=
   isSuccPrelimit_bot
 
--- DISSOLVED: isSuccLimit_iff
+protected theorem isSuccLimit_iff {c : Cardinal} : IsSuccLimit c ↔ c ≠ 0 ∧ IsSuccPrelimit c :=
+  isSuccLimit_iff
 
 section deprecated
 
@@ -742,7 +747,8 @@ set_option linter.deprecated false
 protected theorem IsLimit.isSuccPrelimit {c} (h : IsLimit c) : IsSuccPrelimit c :=
   h.2
 
--- DISSOLVED: IsLimit.ne_zero
+protected theorem IsLimit.ne_zero {c} (h : IsLimit c) : c ≠ 0 :=
+  h.1
 
 alias IsLimit.isSuccLimit := IsLimit.isSuccPrelimit
 
@@ -807,8 +813,6 @@ theorem sum_const (ι : Type u) (a : Cardinal.{v}) :
         (Σ _ : ι, Quotient.out #α) ≃ ι × Quotient.out #α := Equiv.sigmaEquivProd _ _
         _ ≃ ULift ι × ULift α := Equiv.ulift.symm.prodCongr (outMkEquiv.trans Equiv.ulift.symm)
 
-theorem sum_const' (ι : Type u) (a : Cardinal.{u}) : (sum fun _ : ι => a) = #ι * a := by simp
-
 @[simp]
 theorem sum_add_distrib {ι} (f g : ι → Cardinal) : sum (f + g) = sum f + sum g := by
   have := mk_congr (Equiv.sigmaSumDistrib (Quotient.out ∘ f) (Quotient.out ∘ g))
@@ -837,24 +841,6 @@ theorem mk_le_mk_mul_of_mk_preimage_le {c : Cardinal} (f : α → β) (hf : ∀ 
     #α ≤ #β * c := by
   simpa only [← mk_congr (@Equiv.sigmaFiberEquiv α β f), mk_sigma, ← sum_const'] using
     sum_le_sum _ _ hf
-
-theorem lift_mk_le_lift_mk_mul_of_lift_mk_preimage_le {α : Type u} {β : Type v} {c : Cardinal}
-    (f : α → β) (hf : ∀ b : β, lift.{v} #(f ⁻¹' {b}) ≤ c) : lift.{v} #α ≤ lift.{u} #β * c :=
-  (mk_le_mk_mul_of_mk_preimage_le fun x : ULift.{v} α => ULift.up.{u} (f x.1)) <|
-    ULift.forall.2 fun b =>
-      (mk_congr <|
-            (Equiv.ulift.image _).trans
-              (Equiv.trans
-                (by
-                  rw [Equiv.image_eq_preimage]
-                  /- Porting note: Need to insert the following `have` b/c bad fun coercion
-                   behaviour for Equivs -/
-                  have : DFunLike.coe (Equiv.symm (Equiv.ulift (α := α))) = ULift.up (α := α) := rfl
-                  rw [this]
-                  simp only [preimage, mem_singleton_iff, ULift.up_inj, mem_setOf_eq, coe_setOf]
-                  exact Equiv.refl _)
-                Equiv.ulift.symm)).trans_le
-        (hf b)
 
 theorem sum_nat_eq_add_sum_succ (f : ℕ → Cardinal.{u}) :
     Cardinal.sum f = f 0 + Cardinal.sum fun i => f (i + 1) := by
@@ -1007,6 +993,7 @@ lemma exists_eq_of_iSup_eq_of_not_isSuccLimit
   exact (le_ciSup hf _).trans h
 
 set_option linter.deprecated false in
+@[deprecated exists_eq_of_iSup_eq_of_not_isSuccLimit (since := "2024-09-17")]
 
 lemma exists_eq_of_iSup_eq_of_not_isLimit
     {ι : Type u} [hι : Nonempty ι] (f : ι → Cardinal.{v}) (hf : BddAbove (range f))
@@ -1071,7 +1058,7 @@ theorem prod_eq_zero {ι} (f : ι → Cardinal.{u}) : prod f = 0 ↔ ∃ i, f i 
   lift f to ι → Type u using fun _ => trivial
   simp only [mk_eq_zero_iff, ← mk_pi, isEmpty_pi]
 
--- DISSOLVED: prod_ne_zero
+theorem prod_ne_zero {ι} (f : ι → Cardinal) : prod f ≠ 0 ↔ ∀ i, f i ≠ 0 := by simp [prod_eq_zero]
 
 theorem power_sum {ι} (a : Cardinal) (f : ι → Cardinal) :
     a ^ sum f = prod fun i ↦ a ^ f i := by
@@ -1134,7 +1121,8 @@ scoped notation "ℵ₀" => Cardinal.aleph0
 theorem mk_nat : #ℕ = ℵ₀ :=
   (lift_id _).symm
 
--- DISSOLVED: aleph0_ne_zero
+theorem aleph0_ne_zero : ℵ₀ ≠ 0 :=
+  mk_ne_zero _
 
 theorem aleph0_pos : 0 < ℵ₀ :=
   pos_iff_ne_zero.2 aleph0_ne_zero
@@ -1168,8 +1156,6 @@ theorem lift_eq_aleph0 {c : Cardinal.{u}} : lift.{v} c = ℵ₀ ↔ c = ℵ₀ :
   simpa using lift_inj (b := ℵ₀)
 
 /-! ### Properties about the cast from `ℕ` -/
-
-theorem mk_fin (n : ℕ) : #(Fin n) = n := by simp
 
 @[simp]
 theorem lift_natCast (n : ℕ) : lift.{u} (n : Cardinal.{v}) = n := by induction n <;> simp [*]
@@ -1334,7 +1320,8 @@ theorem cantor' (a) {b : Cardinal} (hb : 1 < b) : a < b ^ a := by
 theorem one_le_iff_pos {c : Cardinal} : 1 ≤ c ↔ 0 < c := by
   rw [← succ_zero, succ_le_iff]
 
--- DISSOLVED: one_le_iff_ne_zero
+theorem one_le_iff_ne_zero {c : Cardinal} : 1 ≤ c ↔ c ≠ 0 := by
+  rw [one_le_iff_pos, pos_iff_ne_zero]
 
 @[simp]
 theorem lt_one_iff_zero {c : Cardinal} : c < 1 ↔ c = 0 := by
@@ -1493,7 +1480,8 @@ theorem nsmul_lt_aleph0_iff {n : ℕ} {a : Cardinal} : n • a < ℵ₀ ↔ n = 
       · simp
       rw [succ_nsmul, add_lt_aleph0_iff, ih, and_self_iff]
 
--- DISSOLVED: nsmul_lt_aleph0_iff_of_ne_zero
+theorem nsmul_lt_aleph0_iff_of_ne_zero {n : ℕ} {a : Cardinal} (h : n ≠ 0) : n • a < ℵ₀ ↔ a < ℵ₀ :=
+  nsmul_lt_aleph0_iff.trans <| or_iff_right h
 
 theorem mul_lt_aleph0 {a b : Cardinal} (ha : a < ℵ₀) (hb : b < ℵ₀) : a * b < ℵ₀ :=
   match a, b, lt_aleph0.1 ha, lt_aleph0.1 hb with
@@ -1515,11 +1503,17 @@ theorem mul_lt_aleph0_iff {a b : Cardinal} : a * b < ℵ₀ ↔ a = 0 ∨ b = 0 
       exact (mul_le_mul' ha le_rfl).trans_lt h
   rintro (rfl | rfl | ⟨ha, hb⟩) <;> simp only [*, mul_lt_aleph0, aleph0_pos, zero_mul, mul_zero]
 
--- DISSOLVED: aleph0_le_mul_iff
+theorem aleph0_le_mul_iff {a b : Cardinal} : ℵ₀ ≤ a * b ↔ a ≠ 0 ∧ b ≠ 0 ∧ (ℵ₀ ≤ a ∨ ℵ₀ ≤ b) := by
+  let h := (@mul_lt_aleph0_iff a b).not
+  rwa [not_lt, not_or, not_or, not_and_or, not_lt, not_lt] at h
 
--- DISSOLVED: aleph0_le_mul_iff'
+theorem aleph0_le_mul_iff' {a b : Cardinal.{u}} : ℵ₀ ≤ a * b ↔ a ≠ 0 ∧ ℵ₀ ≤ b ∨ ℵ₀ ≤ a ∧ b ≠ 0 := by
+  have : ∀ {a : Cardinal.{u}}, ℵ₀ ≤ a → a ≠ 0 := fun a => ne_bot_of_le_ne_bot aleph0_ne_zero a
+  simp only [aleph0_le_mul_iff, and_or_left, and_iff_right_of_imp this, @and_left_comm (a ≠ 0)]
+  simp only [and_comm, or_comm]
 
--- DISSOLVED: mul_lt_aleph0_iff_of_ne_zero
+theorem mul_lt_aleph0_iff_of_ne_zero {a b : Cardinal} (ha : a ≠ 0) (hb : b ≠ 0) :
+    a * b < ℵ₀ ↔ a < ℵ₀ ∧ b < ℵ₀ := by simp [mul_lt_aleph0_iff, ha, hb]
 
 theorem power_lt_aleph0 {a b : Cardinal} (ha : a < ℵ₀) (hb : b < ℵ₀) : a ^ b < ℵ₀ :=
   match a, b, lt_aleph0.1 ha, lt_aleph0.1 hb with
@@ -1565,9 +1559,14 @@ theorem aleph0_add_aleph0 : ℵ₀ + ℵ₀ = ℵ₀ :=
 theorem aleph0_mul_aleph0 : ℵ₀ * ℵ₀ = ℵ₀ :=
   mk_denumerable _
 
--- DISSOLVED: nat_mul_aleph0
+@[simp]
+theorem nat_mul_aleph0 {n : ℕ} (hn : n ≠ 0) : ↑n * ℵ₀ = ℵ₀ :=
+  le_antisymm (lift_mk_fin n ▸ mk_le_aleph0) <|
+    le_mul_of_one_le_left (zero_le _) <| by
+      rwa [← Nat.cast_one, Nat.cast_le, Nat.one_le_iff_ne_zero]
 
--- DISSOLVED: aleph0_mul_nat
+@[simp]
+theorem aleph0_mul_nat {n : ℕ} (hn : n ≠ 0) : ℵ₀ * n = ℵ₀ := by rw [mul_comm, nat_mul_aleph0 hn]
 
 @[simp]
 theorem ofNat_mul_aleph0 {n : ℕ} [Nat.AtLeastTwo n] : no_index (OfNat.ofNat n) * ℵ₀ = ℵ₀ :=
@@ -1621,10 +1620,6 @@ theorem mk_punit : #PUnit = 1 :=
 theorem mk_unit : #Unit = 1 :=
   mk_punit
 
-@[simp] theorem mk_additive : #(Additive α) = #α := rfl
-
-@[simp] theorem mk_multiplicative : #(Multiplicative α) = #α := rfl
-
 @[to_additive (attr := simp)] theorem mk_mulOpposite : #(MulOpposite α) = #α :=
   mk_congr MulOpposite.opEquiv.symm
 
@@ -1640,11 +1635,6 @@ theorem mk_plift_false : #(PLift False) = 0 :=
 @[simp]
 theorem mk_vector (α : Type u) (n : ℕ) : #(Vector α n) = #α ^ n :=
   (mk_congr (Equiv.vectorEquivFin α n)).trans <| by simp
-
-theorem mk_list_eq_sum_pow (α : Type u) : #(List α) = sum fun n : ℕ => #α ^ n :=
-  calc
-    #(List α) = #(Σn, Vector α n) := mk_congr (Equiv.sigmaFiberEquiv List.length).symm
-    _ = sum fun n : ℕ => #α ^ n := by simp
 
 theorem mk_quot_le {α : Type u} {r : α → α → Prop} : #(Quot r) ≤ #α :=
   mk_le_of_surjective Quot.exists_rep
@@ -1977,7 +1967,9 @@ theorem powerlt_le_powerlt_left {a b c : Cardinal} (h : b ≤ c) : a ^< b ≤ a 
 
 theorem powerlt_mono_left (a) : Monotone fun c => a ^< c := fun _ _ => powerlt_le_powerlt_left
 
--- DISSOLVED: powerlt_succ
+theorem powerlt_succ {a b : Cardinal} (h : a ≠ 0) : a ^< succ b = a ^ b :=
+  (powerlt_le.2 fun _ h' => power_le_power_left h <| le_of_lt_succ h').antisymm <|
+    le_powerlt a (lt_succ b)
 
 theorem powerlt_min {a b c : Cardinal} : a ^< min b c = min (a ^< b) (a ^< c) :=
   (powerlt_mono_left a).map_min
@@ -1985,7 +1977,10 @@ theorem powerlt_min {a b c : Cardinal} : a ^< min b c = min (a ^< b) (a ^< c) :=
 theorem powerlt_max {a b c : Cardinal} : a ^< max b c = max (a ^< b) (a ^< c) :=
   (powerlt_mono_left a).map_max
 
--- DISSOLVED: zero_powerlt
+theorem zero_powerlt {a : Cardinal} (h : a ≠ 0) : 0 ^< a = 1 := by
+  apply (powerlt_le.2 fun c _ => zero_power_le _).antisymm
+  rw [← power_zero]
+  exact le_powerlt 0 (pos_iff_ne_zero.2 h)
 
 @[simp]
 theorem powerlt_zero {a : Cardinal} : a ^< 0 = 0 := by

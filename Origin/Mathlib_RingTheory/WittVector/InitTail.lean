@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.WittVector.Basic
 import Mathlib.RingTheory.WittVector.IsPoly
 
+noncomputable section
+
 /-!
 
 # `init` and `tail`

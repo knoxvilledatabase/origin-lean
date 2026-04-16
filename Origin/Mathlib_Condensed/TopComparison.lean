@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Sites.Coherent.SheafComparison
 import Mathlib.Condensed.Basic
 import Mathlib.Topology.Category.TopCat.Yoneda
 
+noncomputable section
+
 /-!
 
 # The functor from topological spaces to condensed sets

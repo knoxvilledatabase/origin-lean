@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Algebra.Norm
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 
+noncomputable section
+
 /-!
 # Equivalent power-multiplicative norms
 
@@ -68,21 +70,3 @@ theorem eq_seminorms {F : Type*} {α : outParam (Type*)} [Ring α] [FunLike F α
     (contraction_of_isPowMul_of_boundedWrt f hgpm hle x)
 
 variable {R S : Type*} [NormedCommRing R] [CommRing S] [Algebra R S]
-
-theorem eq_of_powMul_faithful (f₁ : AlgebraNorm R S) (hf₁_pm : IsPowMul f₁) (f₂ : AlgebraNorm R S)
-    (hf₂_pm : IsPowMul f₂)
-    (h_eq : ∀ y : S, ∃ (C₁ C₂ : ℝ) (_ : 0 < C₁) (_ : 0 < C₂),
-      ∀ x : Algebra.adjoin R {y}, f₁ x.val ≤ C₁ * f₂ x.val ∧ f₂ x.val ≤ C₂ * f₁ x.val) :
-    f₁ = f₂ := by
-  ext x
-  set g₁ : AlgebraNorm R (Algebra.adjoin R ({x} : Set S)) := AlgebraNorm.restriction _ f₁
-  set g₂ : AlgebraNorm R (Algebra.adjoin R ({x} : Set S)) := AlgebraNorm.restriction _ f₂
-  have hg₁_pm : IsPowMul g₁ := IsPowMul.restriction _ hf₁_pm
-  have hg₂_pm : IsPowMul g₂ := IsPowMul.restriction _ hf₂_pm
-  let y : Algebra.adjoin R ({x} : Set S) := ⟨x, Algebra.self_mem_adjoin_singleton R x⟩
-  have hy : x = y.val := rfl
-  have h1 : f₁ y.val = g₁ y := rfl
-  have h2 : f₂ y.val = g₂ y := rfl
-  obtain ⟨C₁, C₂, hC₁_pos, hC₂_pos, hC⟩ := h_eq x
-  obtain ⟨hC₁, hC₂⟩ := forall_and.mp hC
-  rw [hy, h1, h2, eq_seminorms hg₁_pm hg₂_pm ⟨C₁, hC₁_pos, hC₁⟩ ⟨C₂, hC₂_pos, hC₂⟩]

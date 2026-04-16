@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Complex.Module
 import Mathlib.LinearAlgebra.Determinant
 
+noncomputable section
+
 /-!
 # Determinants of maps in the complex numbers as a vector space over `ℝ`
 

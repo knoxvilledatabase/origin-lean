@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/Subgroup/MulOppositeLemmas.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Algebra.Group.Subgroup.MulOpposite
 import Mathlib.Algebra.Group.Submonoid.MulOpposite
 import Mathlib.Logic.Encodable.Basic
+
+noncomputable section
 
 /-!
 # Mul-opposite subgroups
@@ -59,12 +61,6 @@ theorem op_sup (S₁ S₂ : Subgroup G) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.
 @[to_additive]
 theorem unop_sup (S₁ S₂ : Subgroup Gᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
   opEquiv.symm.map_sup _ _
-
-@[to_additive]
-theorem op_inf (S₁ S₂ : Subgroup G) : (S₁ ⊓ S₂).op = S₁.op ⊓ S₂.op := rfl
-
-@[to_additive]
-theorem unop_inf (S₁ S₂ : Subgroup Gᵐᵒᵖ) : (S₁ ⊓ S₂).unop = S₁.unop ⊓ S₂.unop := rfl
 
 @[to_additive]
 theorem op_sSup (S : Set (Subgroup G)) : (sSup S).op = sSup (.unop ⁻¹' S) :=
@@ -125,6 +121,7 @@ theorem normal_op {H : Subgroup G} : H.op.Normal ↔ H.Normal := by
   simp only [← normalizer_eq_top, ← op_normalizer, op_eq_top]
 
 @[to_additive] alias ⟨Normal.of_op, Normal.op⟩ := normal_op
+
 @[to_additive]
 instance op.instNormal {H : Subgroup G} [H.Normal] : H.op.Normal := .op ‹_›
 
@@ -133,6 +130,7 @@ theorem normal_unop {H : Subgroup Gᵐᵒᵖ} : H.unop.Normal ↔ H.Normal := by
   rw [← normal_op, op_unop]
 
 @[to_additive] alias ⟨Normal.of_unop, Normal.unop⟩ := normal_unop
+
 @[to_additive]
 instance unop.instNormal {H : Subgroup Gᵐᵒᵖ} [H.Normal] : H.unop.Normal := .unop ‹_›
 

@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 import Mathlib.MeasureTheory.Covering.VitaliFamily
 import Mathlib.Data.Set.Pairwise.Lattice
 
+noncomputable section
+
 /-!
 # Vitali covering theorems
 

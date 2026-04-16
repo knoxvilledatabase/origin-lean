@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Idempotents
 import Mathlib.Order.Basic
 import Mathlib.RingTheory.Finiteness.Nakayama
 
+noncomputable section
+
 /-!
 ## Lemmas on idempotent finitely generated ideals
 -/

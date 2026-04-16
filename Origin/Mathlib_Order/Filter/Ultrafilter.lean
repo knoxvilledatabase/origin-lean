@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Cofinite
 import Mathlib.Order.ZornAtoms
 
+noncomputable section
+
 /-!
 # Ultrafilters
 
@@ -166,14 +168,6 @@ theorem finite_biUnion_mem_iff {is : Set β} {s : β → Set α} (his : is.Finit
 nonrec def map (m : α → β) (f : Ultrafilter α) : Ultrafilter β :=
   ofComplNotMemIff (map m f) fun s => @compl_not_mem_iff _ f (m ⁻¹' s)
 
-@[simp, norm_cast]
-theorem coe_map (m : α → β) (f : Ultrafilter α) : (map m f : Filter β) = Filter.map m ↑f :=
-  rfl
-
-@[simp]
-theorem mem_map {m : α → β} {f : Ultrafilter α} {s : Set β} : s ∈ map m f ↔ m ⁻¹' s ∈ f :=
-  Iff.rfl
-
 @[simp]
 nonrec theorem map_id (f : Ultrafilter α) : f.map id = f :=
   coe_injective map_id
@@ -199,11 +193,6 @@ theorem mem_comap {m : α → β} (u : Ultrafilter β) (inj : Injective m) (larg
     {s : Set α} : s ∈ u.comap inj large ↔ m '' s ∈ u :=
   mem_comap_iff inj large
 
-@[simp, norm_cast]
-theorem coe_comap {m : α → β} (u : Ultrafilter β) (inj : Injective m) (large : Set.range m ∈ u) :
-    (u.comap inj large : Filter α) = Filter.comap m u :=
-  rfl
-
 @[simp]
 nonrec theorem comap_id (f : Ultrafilter α) (h₀ : Injective (id : α → α) := injective_id)
     (h₁ : range id ∈ f := (by rw [range_id]; exact univ_mem)) :
@@ -223,15 +212,7 @@ instance : Pure Ultrafilter :=
   ⟨fun a => ofComplNotMemIff (pure a) fun s => by simp⟩
 
 @[simp]
-theorem mem_pure {a : α} {s : Set α} : s ∈ (pure a : Ultrafilter α) ↔ a ∈ s :=
-  Iff.rfl
-
-@[simp]
 theorem coe_pure (a : α) : ↑(pure a : Ultrafilter α) = (pure a : Filter α) :=
-  rfl
-
-@[simp]
-theorem map_pure (m : α → β) (a : α) : map m (pure a) = pure (m a) :=
   rfl
 
 @[simp]

@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SimpleGraph.Dart
 import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # Degree-sum formula and handshaking lemma
 

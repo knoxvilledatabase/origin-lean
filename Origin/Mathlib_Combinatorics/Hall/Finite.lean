@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Set.Finite.Basic
 
+noncomputable section
+
 /-!
 # Hall's Marriage Theorem for finite index types
 

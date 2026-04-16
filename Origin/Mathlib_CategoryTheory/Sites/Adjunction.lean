@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.Restrict
 import Mathlib.CategoryTheory.Adjunction.Whiskering
 import Mathlib.CategoryTheory.Sites.PreservesSheafification
 
+noncomputable section
+
 /-!
 
 In this file, we show that an adjunction `G ⊣ F` induces an adjunction between

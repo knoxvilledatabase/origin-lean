@@ -1,11 +1,13 @@
 /-
 Extracted from GroupTheory/FiniteAbelian/Basic.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.PID
 import Mathlib.Algebra.Group.TypeTags.Finite
 import Mathlib.Data.ZMod.Quotient
+
+noncomputable section
 
 /-!
 # Structure of finite(ly generated) abelian groups
@@ -20,9 +22,30 @@ import Mathlib.Data.ZMod.Quotient
 
 open scoped DirectSum
 
--- DISSOLVED: directSumNeZeroMulHom
+private def directSumNeZeroMulHom {ι : Type} [DecidableEq ι] (p : ι → ℕ) (n : ι → ℕ) :
+    (⨁ i : {i // n i ≠ 0}, ZMod (p i ^ n i)) →+ ⨁ i, ZMod (p i ^ n i) :=
+  DirectSum.toAddMonoid fun i ↦ DirectSum.of (fun i ↦ ZMod (p i ^ n i)) i
 
--- DISSOLVED: directSumNeZeroMulEquiv
+private def directSumNeZeroMulEquiv (ι : Type) [DecidableEq ι] (p : ι → ℕ) (n : ι → ℕ) :
+    (⨁ i : {i // n i ≠ 0}, ZMod (p i ^ n i)) ≃+ ⨁ i, ZMod (p i ^ n i) where
+  toFun := directSumNeZeroMulHom p n
+  invFun := DirectSum.toAddMonoid fun i ↦
+    if h : n i = 0 then 0 else DirectSum.of (fun j : {i // n i ≠ 0} ↦ ZMod (p j ^ n j)) ⟨i, h⟩
+  left_inv x := by
+    induction' x using DirectSum.induction_on with i x x y hx hy
+    · simp
+    · rw [directSumNeZeroMulHom, DirectSum.toAddMonoid_of, DirectSum.toAddMonoid_of,
+        dif_neg i.prop]
+    · rw [map_add, map_add, hx, hy]
+  right_inv x := by
+    induction' x using DirectSum.induction_on with i x x y hx hy
+    · rw [map_zero, map_zero]
+    · rw [DirectSum.toAddMonoid_of]
+      split_ifs with h
+      · simp [(ZMod.subsingleton_iff.2 <| by rw [h, pow_zero]).elim x 0]
+      · simp_rw [directSumNeZeroMulHom, DirectSum.toAddMonoid_of]
+    · rw [map_add, map_add, hx, hy]
+  map_add' := map_add (directSumNeZeroMulHom p n)
 
 universe u
 

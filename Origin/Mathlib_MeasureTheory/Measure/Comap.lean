@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 
+noncomputable section
+
 /-!
 # Pullback of a measure
 

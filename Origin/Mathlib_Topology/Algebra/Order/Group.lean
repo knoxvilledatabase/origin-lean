@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.Order.LeftRightNhds
 
+noncomputable section
+
 /-!
 # Topology on a linear ordered additive commutative group
 

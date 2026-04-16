@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/CircleIntegral.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.Deriv.ZPow
 import Mathlib.Analysis.NormedSpace.Pointwise
 import Mathlib.Analysis.SpecialFunctions.NonIntegrable
 import Mathlib.Analysis.Analytic.Basic
+
+noncomputable section
 
 /-!
 # Integral over a circle in `ℂ`
@@ -83,7 +85,13 @@ def circleMap (c : ℂ) (R : ℝ) : ℝ → ℂ := fun θ => c + R * exp (θ * I
 theorem periodic_circleMap (c : ℂ) (R : ℝ) : Periodic (circleMap c R) (2 * π) := fun θ => by
   simp [circleMap, add_mul, exp_periodic _]
 
--- DISSOLVED: Set.Countable.preimage_circleMap
+theorem Set.Countable.preimage_circleMap {s : Set ℂ} (hs : s.Countable) (c : ℂ) {R : ℝ}
+    (hR : R ≠ 0) : (circleMap c R ⁻¹' s).Countable :=
+  show (((↑) : ℝ → ℂ) ⁻¹' ((· * I) ⁻¹'
+      (exp ⁻¹' ((R * ·) ⁻¹' ((c + ·) ⁻¹' s))))).Countable from
+    (((hs.preimage (add_right_injective _)).preimage <|
+      mul_right_injective₀ <| ofReal_ne_zero.2 hR).preimage_cexp.preimage <|
+        mul_left_injective₀ I_ne_zero).preimage ofReal_injective
 
 @[simp]
 theorem circleMap_sub_center (c : ℂ) (R : ℝ) (θ : ℝ) : circleMap c R θ - c = circleMap 0 R θ := by
@@ -94,8 +102,6 @@ theorem circleMap_zero (R θ : ℝ) : circleMap 0 R θ = R * exp (θ * I) :=
 
 @[simp]
 theorem abs_circleMap_zero (R : ℝ) (θ : ℝ) : abs (circleMap 0 R θ) = |R| := by simp [circleMap]
-
-theorem circleMap_mem_sphere' (c : ℂ) (R : ℝ) (θ : ℝ) : circleMap c R θ ∈ sphere c |R| := by simp
 
 theorem circleMap_mem_sphere (c : ℂ) {R : ℝ} (hR : 0 ≤ R) (θ : ℝ) :
     circleMap c R θ ∈ sphere c R := by
@@ -134,7 +140,8 @@ theorem circleMap_eq_center_iff {c : ℂ} {R : ℝ} {θ : ℝ} : circleMap c R �
 theorem circleMap_zero_radius (c : ℂ) : circleMap c 0 = const ℝ c :=
   funext fun _ => circleMap_eq_center_iff.2 rfl
 
--- DISSOLVED: circleMap_ne_center
+theorem circleMap_ne_center {c : ℂ} {R : ℝ} (hR : R ≠ 0) {θ : ℝ} : circleMap c R θ ≠ c :=
+  mt circleMap_eq_center_iff.1 hR
 
 theorem hasDerivAt_circleMap (c : ℂ) (R : ℝ) (θ : ℝ) :
     HasDerivAt (circleMap c R) (circleMap 0 R θ * I) θ := by
@@ -159,7 +166,9 @@ theorem deriv_circleMap (c : ℂ) (R : ℝ) (θ : ℝ) : deriv (circleMap c R) �
 theorem deriv_circleMap_eq_zero_iff {c : ℂ} {R : ℝ} {θ : ℝ} :
     deriv (circleMap c R) θ = 0 ↔ R = 0 := by simp [I_ne_zero]
 
--- DISSOLVED: deriv_circleMap_ne_zero
+theorem deriv_circleMap_ne_zero {c : ℂ} {R : ℝ} {θ : ℝ} (hR : R ≠ 0) :
+    deriv (circleMap c R) θ ≠ 0 :=
+  mt deriv_circleMap_eq_zero_iff.1 hR
 
 theorem lipschitzWith_circleMap (c : ℂ) (R : ℝ) : LipschitzWith (Real.nnabs R) (circleMap c R) :=
   lipschitzWith_of_nnnorm_deriv_le (differentiable_circleMap _ _) fun θ =>
@@ -369,7 +378,12 @@ theorem integral_const_mul (a : ℂ) (f : ℂ → ℂ) (c : ℂ) (R : ℝ) :
     (∮ z in C(c, R), a * f z) = a * ∮ z in C(c, R), f z :=
   integral_smul a f c R
 
--- DISSOLVED: integral_sub_center_inv
+@[simp]
+theorem integral_sub_center_inv (c : ℂ) {R : ℝ} (hR : R ≠ 0) :
+    (∮ z in C(c, R), (z - c)⁻¹) = 2 * π * I := by
+  simp [circleIntegral, ← div_eq_mul_inv, mul_div_cancel_left₀ _ (circleMap_ne_center hR),
+    -- Porting note: `simp` didn't need a hint to apply `integral_const` here
+    intervalIntegral.integral_const I]
 
 theorem integral_eq_zero_of_hasDerivWithinAt' [CompleteSpace E] {f f' : ℂ → E} {c : ℂ} {R : ℝ}
     (h : ∀ z ∈ sphere c |R|, HasDerivWithinAt f (f' z) (sphere c |R|) z) :

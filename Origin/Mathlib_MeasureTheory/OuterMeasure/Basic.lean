@@ -1,12 +1,14 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/Basic.lean
-Genuine: 37 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Countable.Basic
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Order.Disjointed
 import Mathlib.MeasureTheory.OuterMeasure.Defs
+
+noncomputable section
 
 /-!
 # Outer Measures
@@ -52,7 +54,8 @@ theorem measure_mono (h : s ⊆ t) : μ s ≤ μ t :=
 theorem measure_mono_null (h : s ⊆ t) (ht : μ t = 0) : μ s = 0 :=
   eq_bot_mono (measure_mono h) ht
 
--- DISSOLVED: measure_pos_of_superset
+theorem measure_pos_of_superset (h : s ⊆ t) (hs : μ s ≠ 0) : 0 < μ t :=
+  hs.bot_lt.trans_le (measure_mono h)
 
 theorem measure_iUnion_le [Countable ι] (s : ι → Set α) : μ (⋃ i, s i) ≤ ∑' i, μ (s i) := by
   refine rel_iSup_tsum μ measure_empty (· ≤ ·) (fun t ↦ ?_) _
@@ -137,7 +140,12 @@ theorem measure_null_of_locally_null [TopologicalSpace α] [SecondCountableTopol
   apply measure_mono_null ht
   exact (measure_biUnion_null_iff t_count).2 fun x hx => hu₀ x (ts hx)
 
--- DISSOLVED: exists_mem_forall_mem_nhdsWithin_pos_measure
+theorem exists_mem_forall_mem_nhdsWithin_pos_measure [TopologicalSpace α]
+    [SecondCountableTopology α] {s : Set α} (hs : μ s ≠ 0) :
+    ∃ x ∈ s, ∀ t ∈ 𝓝[s] x, 0 < μ t := by
+  contrapose! hs
+  simp only [nonpos_iff_eq_zero] at hs
+  exact measure_null_of_locally_null s hs
 
 end OuterMeasureClass
 
@@ -152,7 +160,9 @@ theorem mono' (m : OuterMeasure α) {s₁ s₂} (h : s₁ ⊆ s₂) : m s₁ ≤
 theorem mono_null (m : OuterMeasure α) {s t} (h : s ⊆ t) (ht : m t = 0) : m s = 0 :=
   measure_mono_null h ht
 
--- DISSOLVED: pos_of_subset_ne_zero
+theorem pos_of_subset_ne_zero (m : OuterMeasure α) {a b : Set α} (hs : a ⊆ b) (hnz : m a ≠ 0) :
+    0 < m b :=
+  measure_pos_of_superset hs hnz
 
 protected theorem iUnion (m : OuterMeasure α) {β} [Countable β] (s : β → Set α) :
     m (⋃ i, s i) ≤ ∑' i, m (s i) :=
@@ -182,7 +192,9 @@ theorem null_of_locally_null [TopologicalSpace α] [SecondCountableTopology α] 
     (s : Set α) (hs : ∀ x ∈ s, ∃ u ∈ 𝓝[s] x, m u = 0) : m s = 0 :=
   measure_null_of_locally_null s hs
 
--- DISSOLVED: exists_mem_forall_mem_nhds_within_pos
+theorem exists_mem_forall_mem_nhds_within_pos [TopologicalSpace α] [SecondCountableTopology α]
+    (m : OuterMeasure α) {s : Set α} (hs : m s ≠ 0) : ∃ x ∈ s, ∀ t ∈ 𝓝[s] x, 0 < m t :=
+  exists_mem_forall_mem_nhdsWithin_pos_measure hs
 
 theorem iUnion_of_tendsto_zero {ι} (m : OuterMeasure α) {s : ι → Set α} (l : Filter ι) [NeBot l]
     (h0 : Tendsto (fun k => m ((⋃ n, s n) \ s k)) l (𝓝 0)) : m (⋃ n, s n) = ⨆ n, m (s n) :=

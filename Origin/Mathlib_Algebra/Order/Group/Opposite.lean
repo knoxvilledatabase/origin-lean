@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.Algebra.Group.Opposite
 
+noncomputable section
+
 /-!
 # Order instances for `MulOpposite`/`AddOpposite`
 

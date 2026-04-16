@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Order.Lattice
 import Mathlib.NumberTheory.ModularForms.EisensteinSeries.UniformConvergence
 import Mathlib.NumberTheory.ModularForms.Identities
 
+noncomputable section
+
 /-!
 # Boundedness of Eisenstein series
 

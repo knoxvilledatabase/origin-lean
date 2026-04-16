@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Convex/Strong.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
+
+noncomputable section
 
 /-!
 # Uniformly and strongly convex functions
@@ -60,9 +62,21 @@ lemma UniformConvexOn.convexOn (hf : UniformConvexOn s φ f) (hφ : 0 ≤ φ) : 
 lemma UniformConcaveOn.concaveOn (hf : UniformConcaveOn s φ f) (hφ : 0 ≤ φ) : ConcaveOn ℝ s f := by
   simpa using hf.mono hφ
 
--- DISSOLVED: UniformConvexOn.strictConvexOn
+lemma UniformConvexOn.strictConvexOn (hf : UniformConvexOn s φ f) (hφ : ∀ r, r ≠ 0 → 0 < φ r) :
+    StrictConvexOn ℝ s f := by
+  refine ⟨hf.1, fun x hx y hy hxy a b ha hb hab ↦ (hf.2 hx hy ha.le hb.le hab).trans_lt <|
+    sub_lt_self _ ?_⟩
+  rw [← sub_ne_zero, ← norm_pos_iff] at hxy
+  have := hφ _ hxy.ne'
+  positivity
 
--- DISSOLVED: UniformConcaveOn.strictConcaveOn
+lemma UniformConcaveOn.strictConcaveOn (hf : UniformConcaveOn s φ f) (hφ : ∀ r, r ≠ 0 → 0 < φ r) :
+    StrictConcaveOn ℝ s f := by
+  refine ⟨hf.1, fun x hx y hy hxy a b ha hb hab ↦ (hf.2 hx hy ha.le hb.le hab).trans_lt' <|
+    lt_add_of_pos_right _ ?_⟩
+  rw [← sub_ne_zero, ← norm_pos_iff] at hxy
+  have := hφ _ hxy.ne'
+  positivity
 
 lemma UniformConvexOn.add (hf : UniformConvexOn s φ f) (hg : UniformConvexOn s ψ g) :
     UniformConvexOn s (φ + ψ) (f + g) := by

@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Localization/Ideal.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.MonoidLocalization.Away
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Localization.Basic
+
+noncomputable section
 
 /-!
 # Ideals in localizations of commutative rings
@@ -66,7 +68,6 @@ lemma mk'_mem_map_algebraMap_iff (I : Ideal R) (x : R) (s : M) :
     ⟨⟨⟨_, h⟩, ⟨s, hs⟩⟩, 1, by simp⟩⟩
 
 include M in
-
 theorem map_comap (J : Ideal S) :
     Ideal.map (algebraMap R S) (Ideal.comap (algebraMap R S) J) = J :=
   le_antisymm (Ideal.map_le_iff_le_comap.2 le_rfl) fun x hJ => by
@@ -153,6 +154,9 @@ variable {R : Type*} [CommRing R] (M : Submonoid R) (S : Type*) [CommRing S]
 variable [Algebra R S] [IsLocalization M S]
 
 include M in
+/-- `quotientMap` applied to maximal ideals of a localization is `surjective`.
+  The quotient by a maximal ideal is a field, so inverses to elements already exist,
+  and the localization necessarily maps the equivalence class of the inverse in the localization -/
 
 theorem surjective_quotientMap_of_maximal_of_localization {I : Ideal S} [I.IsPrime] {J : Ideal R}
     {H : J ≤ I.comap (algebraMap R S)} (hI : (I.comap (algebraMap R S)).IsMaximal) :

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/SpecificFunctions/Deriv.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.ZPow
@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 import Mathlib.Analysis.Convex.Deriv
+
+noncomputable section
 
 /-!
 # Collection of convex functions
@@ -39,7 +41,13 @@ theorem strictConvexOn_pow {n : ℕ} (hn : 2 ≤ n) : StrictConvexOn ℝ (Ici 0)
   exact fun x (hx : 0 < x) y _ hxy => mul_lt_mul_of_pos_left
     (pow_lt_pow_left₀ hxy hx.le <| Nat.sub_ne_zero_of_lt hn) (by positivity)
 
--- DISSOLVED: Even.strictConvexOn_pow
+theorem Even.strictConvexOn_pow {n : ℕ} (hn : Even n) (h : n ≠ 0) :
+    StrictConvexOn ℝ Set.univ fun x : ℝ => x ^ n := by
+  apply StrictMono.strictConvexOn_univ_of_deriv (continuous_pow n)
+  rw [deriv_pow']
+  replace h := Nat.pos_of_ne_zero h
+  exact StrictMono.const_mul (Odd.strictMono_pow <| Nat.Even.sub_odd h hn <| Nat.odd_iff.2 rfl)
+    (Nat.cast_pos.2 h)
 
 theorem Finset.prod_nonneg_of_card_nonpos_even {α β : Type*} [LinearOrderedCommRing β] {f : α → β}
     [DecidablePred fun x => f x ≤ 0] {s : Finset α} (h0 : Even (s.filter fun x => f x ≤ 0).card) :
@@ -79,11 +87,27 @@ theorem int_prod_range_pos {m : ℤ} {n : ℕ} (hn : Even n) (hm : m ∉ Ico (0 
   rw [sub_eq_zero.1 h]
   exact ⟨Int.ofNat_zero_le _, Int.ofNat_lt.2 <| Finset.mem_range.1 ha⟩
 
--- DISSOLVED: strictConvexOn_zpow
+theorem strictConvexOn_zpow {m : ℤ} (hm₀ : m ≠ 0) (hm₁ : m ≠ 1) :
+    StrictConvexOn ℝ (Ioi 0) fun x : ℝ => x ^ m := by
+  apply strictConvexOn_of_deriv2_pos' (convex_Ioi 0)
+  · exact (continuousOn_zpow₀ m).mono fun x hx => ne_of_gt hx
+  intro x hx
+  rw [mem_Ioi] at hx
+  rw [iter_deriv_zpow]
+  refine mul_pos ?_ (zpow_pos hx _)
+  norm_cast
+  refine int_prod_range_pos (by decide) fun hm => ?_
+  rw [← Finset.coe_Ico] at hm
+  norm_cast at hm
+  fin_cases hm <;> simp_all
 
 section SqrtMulLog
 
--- DISSOLVED: hasDerivAt_sqrt_mul_log
+theorem hasDerivAt_sqrt_mul_log {x : ℝ} (hx : x ≠ 0) :
+    HasDerivAt (fun x => √x * log x) ((2 + log x) / (2 * √x)) x := by
+  convert (hasDerivAt_sqrt hx).mul (hasDerivAt_log hx) using 1
+  rw [add_div, div_mul_cancel_left₀ two_ne_zero, ← div_eq_mul_inv, sqrt_div_self', add_comm,
+    one_div, one_div, ← div_eq_inv_mul]
 
 theorem deriv_sqrt_mul_log (x : ℝ) :
     deriv (fun x => √x * log x) x = (2 + log x) / (2 * √x) := by

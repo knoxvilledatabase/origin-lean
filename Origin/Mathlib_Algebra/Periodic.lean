@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Periodic.lean
-Genuine: 99 | Conflates: 0 | Dissolved: 10 | Infrastructure: 8
+Genuine: 105 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Opposite
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Module.Opposite
 import Mathlib.Algebra.Order.Archimedean.Basic
 import Mathlib.Algebra.Ring.NegOnePow
 import Mathlib.GroupTheory.Coset.Card
+
+noncomputable section
 
 /-!
 # Periodicity
@@ -244,7 +246,13 @@ theorem Periodic.image_Icc [LinearOrderedAddCommGroup α] [Archimedean α] (h : 
     (hc : 0 < c) (a : α) : f '' Icc a (a + c) = range f :=
   (image_subset_range _ _).antisymm <| h.image_Ioc hc a ▸ image_subset _ Ioc_subset_Icc_self
 
--- DISSOLVED: Periodic.image_uIcc
+theorem Periodic.image_uIcc [LinearOrderedAddCommGroup α] [Archimedean α] (h : Periodic f c)
+    (hc : c ≠ 0) (a : α) : f '' uIcc a (a + c) = range f := by
+  cases hc.lt_or_lt with
+  | inl hc =>
+    rw [uIcc_of_ge (add_le_of_nonpos_right hc.le), ← h.neg.image_Icc (neg_pos.2 hc) (a + c),
+      add_neg_cancel_right]
+  | inr hc => rw [uIcc_of_le (le_add_of_nonneg_right hc.le), h.image_Icc hc]
 
 theorem periodic_with_period_zero [AddZeroClass α] (f : α → β) : Periodic f 0 := fun x => by
   rw [add_zero]
@@ -265,12 +273,8 @@ def Periodic.lift [AddGroup α] (h : Periodic f c) (x : α ⧸ AddSubgroup.zmult
     obtain ⟨k, hk⟩ := h'
     exact (h.zsmul k _).symm.trans (congr_arg f (add_eq_of_eq_neg_add hk))
 
-@[simp]
-theorem Periodic.lift_coe [AddGroup α] (h : Periodic f c) (a : α) :
-    h.lift (a : α ⧸ AddSubgroup.zmultiples c) = f a :=
-  rfl
-
--- DISSOLVED: Periodic.not_injective
+lemma Periodic.not_injective {R X : Type*} [AddZeroClass R] {f : R → X} {c : R}
+    (hf : Periodic f c) (hc : c ≠ 0) : ¬ Injective f := fun h ↦ hc <| h hf.eq
 
 /-! ### Antiperiodicity -/
 
@@ -429,25 +433,41 @@ theorem Antiperiodic.const_smul [AddMonoid α] [Neg β] [Group γ] [DistribMulAc
     (h : Antiperiodic f c) (a : γ) : Antiperiodic (fun x => f (a • x)) (a⁻¹ • c) := fun x => by
   simpa only [smul_add, smul_inv_smul] using h (a • x)
 
--- DISSOLVED: Antiperiodic.const_smul₀
+theorem Antiperiodic.const_smul₀ [AddCommMonoid α] [Neg β] [DivisionSemiring γ] [Module γ α]
+    (h : Antiperiodic f c) {a : γ} (ha : a ≠ 0) : Antiperiodic (fun x => f (a • x)) (a⁻¹ • c) :=
+  fun x => by simpa only [smul_add, smul_inv_smul₀ ha] using h (a • x)
 
--- DISSOLVED: Antiperiodic.const_mul
+theorem Antiperiodic.const_mul [DivisionSemiring α] [Neg β] (h : Antiperiodic f c) {a : α}
+    (ha : a ≠ 0) : Antiperiodic (fun x => f (a * x)) (a⁻¹ * c) :=
+  h.const_smul₀ ha
 
 theorem Antiperiodic.const_inv_smul [AddMonoid α] [Neg β] [Group γ] [DistribMulAction γ α]
     (h : Antiperiodic f c) (a : γ) : Antiperiodic (fun x => f (a⁻¹ • x)) (a • c) := by
   simpa only [inv_inv] using h.const_smul a⁻¹
 
--- DISSOLVED: Antiperiodic.const_inv_smul₀
+theorem Antiperiodic.const_inv_smul₀ [AddCommMonoid α] [Neg β] [DivisionSemiring γ] [Module γ α]
+    (h : Antiperiodic f c) {a : γ} (ha : a ≠ 0) : Antiperiodic (fun x => f (a⁻¹ • x)) (a • c) := by
+  simpa only [inv_inv] using h.const_smul₀ (inv_ne_zero ha)
 
--- DISSOLVED: Antiperiodic.const_inv_mul
+theorem Antiperiodic.const_inv_mul [DivisionSemiring α] [Neg β] (h : Antiperiodic f c) {a : α}
+    (ha : a ≠ 0) : Antiperiodic (fun x => f (a⁻¹ * x)) (a * c) :=
+  h.const_inv_smul₀ ha
 
--- DISSOLVED: Antiperiodic.mul_const
+theorem Antiperiodic.mul_const [DivisionSemiring α] [Neg β] (h : Antiperiodic f c) {a : α}
+    (ha : a ≠ 0) : Antiperiodic (fun x => f (x * a)) (c * a⁻¹) :=
+  h.const_smul₀ <| (MulOpposite.op_ne_zero_iff a).mpr ha
 
--- DISSOLVED: Antiperiodic.mul_const'
+theorem Antiperiodic.mul_const' [DivisionSemiring α] [Neg β] (h : Antiperiodic f c) {a : α}
+    (ha : a ≠ 0) : Antiperiodic (fun x => f (x * a)) (c / a) := by
+  simpa only [div_eq_mul_inv] using h.mul_const ha
 
--- DISSOLVED: Antiperiodic.mul_const_inv
+theorem Antiperiodic.mul_const_inv [DivisionSemiring α] [Neg β] (h : Antiperiodic f c) {a : α}
+    (ha : a ≠ 0) : Antiperiodic (fun x => f (x * a⁻¹)) (c * a) :=
+  h.const_inv_smul₀ <| (MulOpposite.op_ne_zero_iff a).mpr ha
 
--- DISSOLVED: Antiperiodic.div_inv
+theorem Antiperiodic.div_inv [DivisionSemiring α] [Neg β] (h : Antiperiodic f c) {a : α}
+    (ha : a ≠ 0) : Antiperiodic (fun x => f (x / a)) (c * a) := by
+  simpa only [div_eq_mul_inv] using h.mul_const_inv ha
 
 theorem Antiperiodic.add [AddGroup α] [InvolutiveNeg β] (h1 : Antiperiodic f c₁)
     (h2 : Antiperiodic f c₂) : Periodic f (c₁ + c₂) := by simp_all [← add_assoc]

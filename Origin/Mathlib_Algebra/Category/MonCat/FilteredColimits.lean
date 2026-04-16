@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Filtered
 import Mathlib.CategoryTheory.ConcreteCategory.Elementwise
 import Mathlib.CategoryTheory.Limits.TypesFiltered
 
+noncomputable section
+
 /-!
 # The forgetful functor from (commutative) (additive) monoids preserves filtered colimits.
 

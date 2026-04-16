@@ -7,6 +7,8 @@ import Mathlib.Tactic.Continuity
 import Mathlib.Tactic.Lift
 import Mathlib.Topology.Defs.Basic
 
+noncomputable section
+
 /-!
 # Continuous bundled maps
 
@@ -66,10 +68,6 @@ instance instFunLike : FunLike C(X, Y) X Y where
 instance instContinuousMapClass : ContinuousMapClass C(X, Y) X Y where
   map_continuous := ContinuousMap.continuous_toFun
 
-@[simp]
-theorem toFun_eq_coe {f : C(X, Y)} : f.toFun = (f : X → Y) :=
-  rfl
-
 instance : CanLift (X → Y) C(X, Y) DFunLike.coe Continuous := ⟨fun f hf ↦ ⟨⟨f, hf⟩, rfl⟩⟩
 
 def Simps.apply (f : C(X, Y)) : X → Y := f
@@ -81,10 +79,6 @@ protected theorem coe_coe {F : Type*} [FunLike F X Y] [ContinuousMapClass F X Y]
     ⇑(f : C(X, Y)) = f :=
   rfl
 
-protected theorem coe_apply {F : Type*} [FunLike F X Y] [ContinuousMapClass F X Y] (f : F) (x : X) :
-    (f : C(X, Y)) x = f x :=
-  rfl
-
 @[ext]
 theorem ext {f g : C(X, Y)} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext _ _ h
@@ -92,10 +86,6 @@ theorem ext {f g : C(X, Y)} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : C(X, Y)) (f' : X → Y) (h : f' = f) : C(X, Y) where
   toFun := f'
   continuous_toFun := h.symm ▸ f.continuous_toFun
-
-@[simp]
-theorem coe_copy (f : C(X, Y)) (f' : X → Y) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : C(X, Y)) (f' : X → Y) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -114,9 +104,5 @@ protected theorem congr_arg (f : C(X, Y)) {x y : X} (h : x = y) : f x = f y :=
 
 theorem coe_injective : Function.Injective (DFunLike.coe : C(X, Y) → (X → Y)) :=
   DFunLike.coe_injective
-
-@[simp]
-theorem coe_mk (f : X → Y) (h : Continuous f) : ⇑(⟨f, h⟩ : C(X, Y)) = f :=
-  rfl
 
 end ContinuousMap

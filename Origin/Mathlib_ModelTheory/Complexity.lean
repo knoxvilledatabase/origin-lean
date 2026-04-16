@@ -5,6 +5,8 @@ Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.ModelTheory.Equivalence
 
+noncomputable section
+
 /-!
 # Quantifier Complexity
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Hom.Bounded
 import Mathlib.Topology.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # Esakia morphisms
 
@@ -104,9 +106,6 @@ instance : PseudoEpimorphismClass (PseudoEpimorphism α β) α β where
   map_rel f _ _ h := f.monotone' h
   exists_map_eq_of_map_le := PseudoEpimorphism.exists_map_eq_of_map_le'
 
-@[simp]
-theorem toOrderHom_eq_coe (f : PseudoEpimorphism α β) : ⇑f.toOrderHom = f := rfl
-
 theorem toFun_eq_coe {f : PseudoEpimorphism α β} : f.toFun = (f : α → β) := rfl
 
 @[ext]
@@ -115,9 +114,6 @@ theorem ext {f g : PseudoEpimorphism α β} (h : ∀ a, f a = g a) : f = g :=
 
 protected def copy (f : PseudoEpimorphism α β) (f' : α → β) (h : f' = f) : PseudoEpimorphism α β :=
   ⟨f.toOrderHom.copy f' h, by simpa only [h.symm, toFun_eq_coe] using f.exists_map_eq_of_map_le'⟩
-
-@[simp]
-theorem coe_copy (f : PseudoEpimorphism α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' := rfl
 
 theorem copy_eq (f : PseudoEpimorphism α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -130,16 +126,7 @@ protected def id : PseudoEpimorphism α α :=
 instance : Inhabited (PseudoEpimorphism α α) :=
   ⟨PseudoEpimorphism.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(PseudoEpimorphism.id α) = id := rfl
-
-@[simp]
-theorem coe_id_orderHom : (PseudoEpimorphism.id α : α →o α) = OrderHom.id := rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : PseudoEpimorphism.id α a = a := rfl
 
 def comp (g : PseudoEpimorphism β γ) (f : PseudoEpimorphism α β) : PseudoEpimorphism α γ :=
   ⟨g.toOrderHom.comp f.toOrderHom, fun a b h₀ => by
@@ -148,20 +135,8 @@ def comp (g : PseudoEpimorphism β γ) (f : PseudoEpimorphism α β) : PseudoEpi
     exact ⟨b, h₂, rfl⟩⟩
 
 @[simp]
-theorem coe_comp (g : PseudoEpimorphism β γ) (f : PseudoEpimorphism α β) :
-    (g.comp f : α → γ) = g ∘ f := rfl
-
-@[simp]
-theorem coe_comp_orderHom (g : PseudoEpimorphism β γ) (f : PseudoEpimorphism α β) :
-    (g.comp f : α →o γ) = (g : β →o γ).comp f := rfl
-
-@[simp]
 theorem comp_apply (g : PseudoEpimorphism β γ) (f : PseudoEpimorphism α β) (a : α) :
     (g.comp f) a = g (f a) := rfl
-
-@[simp]
-theorem comp_assoc (h : PseudoEpimorphism γ δ) (g : PseudoEpimorphism β γ)
-    (f : PseudoEpimorphism α β) : (h.comp g).comp f = h.comp (g.comp f) := rfl
 
 @[simp]
 theorem comp_id (f : PseudoEpimorphism α β) : f.comp (PseudoEpimorphism.id α) = f :=
@@ -205,10 +180,6 @@ instance : EsakiaHomClass (EsakiaHom α β) α β where
   map_continuous f := f.continuous_toFun
   exists_map_eq_of_map_le f := f.exists_map_eq_of_map_le'
 
-@[simp]
-theorem toContinuousOrderHom_coe {f : EsakiaHom α β} :
-    f.toContinuousOrderHom = (f : α → β) := rfl
-
 theorem toFun_eq_coe {f : EsakiaHom α β} : f.toFun = (f : α → β) := rfl
 
 @[ext]
@@ -218,9 +189,6 @@ theorem ext {f g : EsakiaHom α β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : EsakiaHom α β) (f' : α → β) (h : f' = f) : EsakiaHom α β :=
   ⟨f.toContinuousOrderHom.copy f' h, by
     simpa only [h.symm, toFun_eq_coe] using f.exists_map_eq_of_map_le'⟩
-
-@[simp]
-theorem coe_copy (f : EsakiaHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' := rfl
 
 theorem copy_eq (f : EsakiaHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -233,20 +201,7 @@ protected def id : EsakiaHom α α :=
 instance : Inhabited (EsakiaHom α α) :=
   ⟨EsakiaHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(EsakiaHom.id α) = id := rfl
-
-@[simp]
-theorem coe_id_pseudoEpimorphism :
-    (EsakiaHom.id α : PseudoEpimorphism α α) = PseudoEpimorphism.id α := rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : EsakiaHom.id α a = a := rfl
-
-@[simp]
-theorem coe_id_continuousOrderHom : (EsakiaHom.id α : α →Co α) = ContinuousOrderHom.id α := rfl
 
 def comp (g : EsakiaHom β γ) (f : EsakiaHom α β) : EsakiaHom α γ :=
   ⟨g.toContinuousOrderHom.comp f.toContinuousOrderHom, fun a b h₀ => by
@@ -255,22 +210,7 @@ def comp (g : EsakiaHom β γ) (f : EsakiaHom α β) : EsakiaHom α γ :=
     exact ⟨b, h₂, rfl⟩⟩
 
 @[simp]
-theorem coe_comp_continuousOrderHom (g : EsakiaHom β γ) (f : EsakiaHom α β) :
-    (g.comp f : α →Co γ) = (g : β →Co γ).comp f := rfl
-
-@[simp]
-theorem coe_comp_pseudoEpimorphism (g : EsakiaHom β γ) (f : EsakiaHom α β) :
-    (g.comp f : PseudoEpimorphism α γ) = (g : PseudoEpimorphism β γ).comp f := rfl
-
-@[simp]
-theorem coe_comp (g : EsakiaHom β γ) (f : EsakiaHom α β) : (g.comp f : α → γ) = g ∘ f := rfl
-
-@[simp]
 theorem comp_apply (g : EsakiaHom β γ) (f : EsakiaHom α β) (a : α) : (g.comp f) a = g (f a) := rfl
-
-@[simp]
-theorem comp_assoc (h : EsakiaHom γ δ) (g : EsakiaHom β γ) (f : EsakiaHom α β) :
-    (h.comp g).comp f = h.comp (g.comp f) := rfl
 
 @[simp]
 theorem comp_id (f : EsakiaHom α β) : f.comp (EsakiaHom.id α) = f :=

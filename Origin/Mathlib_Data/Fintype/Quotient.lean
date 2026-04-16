@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.List.Pi
 import Mathlib.Data.Fintype.Basic
 
+noncomputable section
+
 /-!
 # Quotients of families indexed by a finite type
 

@@ -7,6 +7,8 @@ import Mathlib.Topology.LocallyConstant.Algebra
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Topology.ContinuousMap.Algebra
 
+noncomputable section
+
 /-!
 # The algebra morphism from locally constant functions to continuous functions.
 

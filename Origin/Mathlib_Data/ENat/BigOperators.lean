@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.ENat.Lattice
 
+noncomputable section
+
 /-!
 # Sum of suprema in `ENat`
 -/

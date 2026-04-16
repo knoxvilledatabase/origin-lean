@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/WittVector/Defs.lean
-Genuine: 46 | Conflates: 0 | Dissolved: 1 | Infrastructure: 15
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.StructurePolynomial
+
+noncomputable section
 
 /-!
 # Witt vectors
@@ -163,7 +165,11 @@ theorem wittZero_eq_zero (n : ℕ) : wittZero p n = 0 := by
   simp only [wittZero, wittStructureRat, bind₁, aeval_zero', constantCoeff_xInTermsOfW, map_zero,
     map_wittStructureInt]
 
--- DISSOLVED: wittOne_zero_eq_one
+@[simp]
+theorem wittOne_zero_eq_one : wittOne p 0 = 1 := by
+  apply MvPolynomial.map_injective (Int.castRingHom ℚ) Int.cast_injective
+  simp only [wittOne, wittStructureRat, xInTermsOfW_zero, map_one, bind₁_X_right,
+    map_wittStructureInt]
 
 @[simp]
 theorem wittOne_pos_eq_zero (n : ℕ) (hn : 0 < n) : wittOne p n = 0 := by

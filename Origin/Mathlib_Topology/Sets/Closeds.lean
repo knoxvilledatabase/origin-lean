@@ -5,6 +5,8 @@ Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 import Origin.Core
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # Closed sets
 
@@ -49,10 +51,6 @@ initialize_simps_projections Closeds (carrier → coe, as_prefix coe)
 @[ext]
 protected theorem ext {s t : Closeds α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
-
-@[simp]
-theorem coe_mk (s : Set α) (h) : (mk s h : Set α) = s :=
-  rfl
 
 @[simps]
 protected def closure (s : Set α) : Closeds α :=
@@ -124,10 +122,6 @@ theorem coe_nonempty {s : Closeds α} : (s : Set α).Nonempty ↔ s ≠ ⊥ :=
 theorem coe_sInf {S : Set (Closeds α)} : (↑(sInf S) : Set α) = ⋂ i ∈ S, ↑i :=
   rfl
 
-@[simp]
-lemma coe_sSup {S : Set (Closeds α)} : ((sSup S : Closeds α) : Set α) =
-    closure (⋃₀ ((↑) '' S)) := by rfl
-
 @[simp, norm_cast]
 theorem coe_finset_sup (f : ι → Closeds α) (s : Finset ι) :
     (↑(s.sup f) : Set α) = s.sup ((↑) ∘ f) :=
@@ -165,8 +159,6 @@ instance instCoframe : Coframe (Closeds α) := .ofMinimalAxioms coframeMinimalAx
 @[simps]
 def singleton [T1Space α] (x : α) : Closeds α :=
   ⟨{x}, isClosed_singleton⟩
-
-@[simp] lemma mem_singleton [T1Space α] {a b : α} : a ∈ singleton b ↔ a = b := Iff.rfl
 
 end Closeds
 
@@ -260,10 +252,6 @@ def toOpens (s : Clopens α) : Opens α :=
 protected theorem ext {s t : Clopens α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
 
-@[simp]
-theorem coe_mk (s : Set α) (h) : (mk s h : Set α) = s :=
-  rfl
-
 @[simp] lemma mem_mk {s : Set α} {x h} : x ∈ mk s h ↔ x ∈ s := .rfl
 
 instance : Max (Clopens α) := ⟨fun s t => ⟨s ∪ t, s.isClopen.union t.isClopen⟩⟩
@@ -338,15 +326,9 @@ initialize_simps_projections IrreducibleCloseds (carrier → coe, as_prefix coe)
 protected theorem ext {s t : IrreducibleCloseds α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
 
-@[simp]
-theorem coe_mk (s : Set α) (h : IsIrreducible s) (h' : IsClosed s) : (mk s h h' : Set α) = s :=
-  rfl
-
 @[simps]
 def singleton [T1Space α] (x : α) : IrreducibleCloseds α :=
   ⟨{x}, isIrreducible_singleton, isClosed_singleton⟩
-
-@[simp] lemma mem_singleton [T1Space α] {a b : α} : a ∈ singleton b ↔ a = b := Iff.rfl
 
 @[simps apply symm_apply]
 def equivSubtype : IrreducibleCloseds α ≃ { x : Set α // IsIrreducible x ∧ IsClosed x } where

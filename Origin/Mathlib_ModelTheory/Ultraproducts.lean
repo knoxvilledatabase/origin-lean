@@ -7,6 +7,8 @@ import Mathlib.ModelTheory.Quotients
 import Mathlib.Order.Filter.Germ.Basic
 import Mathlib.Order.Filter.Ultrafilter
 
+noncomputable section
+
 /-!
 # Ultraproducts and Łoś's Theorem
 

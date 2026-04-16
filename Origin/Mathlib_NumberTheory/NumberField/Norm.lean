@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.RingTheory.Localization.NormTrace
 
+noncomputable section
+
 /-!
 # Norm in number fields
 Given a finite extension of number fields, we define the norm morphism as a function between the

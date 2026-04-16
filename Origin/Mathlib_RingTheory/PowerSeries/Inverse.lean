@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PowerSeries/Inverse.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 15 | Infrastructure: 8
+Genuine: 42 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.FieldDivision
@@ -10,6 +10,8 @@ import Mathlib.RingTheory.PowerSeries.Basic
 import Mathlib.RingTheory.PowerSeries.Order
 import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
+
+noncomputable section
 
 /-! # Formal power series - Inverses
 
@@ -144,22 +146,35 @@ theorem inv_eq_zero {φ : k⟦X⟧} : φ⁻¹ = 0 ↔ constantCoeff k φ = 0 :=
 
 -- DISSOLVED: zero_inv
 
--- DISSOLVED: invOfUnit_eq
+@[simp]
+theorem invOfUnit_eq (φ : k⟦X⟧) (h : constantCoeff k φ ≠ 0) :
+    invOfUnit φ (Units.mk0 _ h) = φ⁻¹ :=
+  MvPowerSeries.invOfUnit_eq _ _
 
 @[simp]
 theorem invOfUnit_eq' (φ : k⟦X⟧) (u : Units k) (h : constantCoeff k φ = u) :
     invOfUnit φ u = φ⁻¹ :=
   MvPowerSeries.invOfUnit_eq' φ _ h
 
--- DISSOLVED: mul_inv_cancel
+@[simp]
+protected theorem mul_inv_cancel (φ : k⟦X⟧) (h : constantCoeff k φ ≠ 0) : φ * φ⁻¹ = 1 :=
+  MvPowerSeries.mul_inv_cancel φ h
 
--- DISSOLVED: inv_mul_cancel
+@[simp]
+protected theorem inv_mul_cancel (φ : k⟦X⟧) (h : constantCoeff k φ ≠ 0) : φ⁻¹ * φ = 1 :=
+  MvPowerSeries.inv_mul_cancel φ h
 
--- DISSOLVED: eq_mul_inv_iff_mul_eq
+theorem eq_mul_inv_iff_mul_eq {φ₁ φ₂ φ₃ : k⟦X⟧} (h : constantCoeff k φ₃ ≠ 0) :
+    φ₁ = φ₂ * φ₃⁻¹ ↔ φ₁ * φ₃ = φ₂ :=
+  MvPowerSeries.eq_mul_inv_iff_mul_eq h
 
--- DISSOLVED: eq_inv_iff_mul_eq_one
+theorem eq_inv_iff_mul_eq_one {φ ψ : k⟦X⟧} (h : constantCoeff k ψ ≠ 0) :
+    φ = ψ⁻¹ ↔ φ * ψ = 1 :=
+  MvPowerSeries.eq_inv_iff_mul_eq_one h
 
--- DISSOLVED: inv_eq_iff_mul_eq_one
+theorem inv_eq_iff_mul_eq_one {φ ψ : k⟦X⟧} (h : constantCoeff k ψ ≠ 0) :
+    ψ⁻¹ = φ ↔ φ * ψ = 1 :=
+  MvPowerSeries.inv_eq_iff_mul_eq_one h
 
 protected theorem mul_inv_rev (φ ψ : k⟦X⟧) : (φ * ψ)⁻¹ = ψ⁻¹ * φ⁻¹ :=
   MvPowerSeries.mul_inv_rev _ _
@@ -178,13 +193,31 @@ theorem X_inv : (X : k⟦X⟧)⁻¹ = 0 :=
 theorem smul_inv (r : k) (φ : k⟦X⟧) : (r • φ)⁻¹ = r⁻¹ • φ⁻¹ :=
   MvPowerSeries.smul_inv _ _
 
--- DISSOLVED: firstUnitCoeff
+def firstUnitCoeff {f : k⟦X⟧} (hf : f ≠ 0) : kˣ :=
+  let d := f.order.lift (order_finite_iff_ne_zero.mpr hf)
+  have f_const : coeff k d f ≠ 0 := by apply coeff_order
+  have : Invertible (constantCoeff k (divided_by_X_pow_order hf)) := by
+    apply invertibleOfNonzero
+    convert f_const using 1
+    rw [← coeff_zero_eq_constantCoeff, ← zero_add d]
+    convert (coeff_X_pow_mul (exists_eq_mul_right_of_dvd (X_pow_order_dvd
+      (order_finite_iff_ne_zero.mpr hf))).choose d 0).symm
+    exact (self_eq_X_pow_order_mul_divided_by_X_pow_order hf).symm
+  unitOfInvertible (constantCoeff k (divided_by_X_pow_order hf))
 
--- DISSOLVED: Inv_divided_by_X_pow_order
+def Inv_divided_by_X_pow_order {f : k⟦X⟧} (hf : f ≠ 0) : k⟦X⟧ :=
+  invOfUnit (divided_by_X_pow_order hf) (firstUnitCoeff hf)
 
--- DISSOLVED: Inv_divided_by_X_pow_order_rightInv
+@[simp]
+theorem Inv_divided_by_X_pow_order_rightInv {f : k⟦X⟧} (hf : f ≠ 0) :
+    divided_by_X_pow_order hf * Inv_divided_by_X_pow_order hf = 1 :=
+  mul_invOfUnit (divided_by_X_pow_order hf) (firstUnitCoeff hf) rfl
 
--- DISSOLVED: Inv_divided_by_X_pow_order_leftInv
+@[simp]
+theorem Inv_divided_by_X_pow_order_leftInv {f : k⟦X⟧} (hf : f ≠ 0) :
+    (Inv_divided_by_X_pow_order hf) * (divided_by_X_pow_order hf) = 1 := by
+  rw [mul_comm]
+  exact mul_invOfUnit (divided_by_X_pow_order hf) (firstUnitCoeff hf) rfl
 
 open scoped Classical
 
@@ -196,15 +229,26 @@ def Unit_of_divided_by_X_pow_order (f : k⟦X⟧) : k⟦X⟧ˣ :=
       val_inv := Inv_divided_by_X_pow_order_rightInv hf
       inv_val := Inv_divided_by_X_pow_order_leftInv hf }
 
--- DISSOLVED: isUnit_divided_by_X_pow_order
+theorem isUnit_divided_by_X_pow_order {f : k⟦X⟧} (hf : f ≠ 0) :
+    IsUnit (divided_by_X_pow_order hf) :=
+  ⟨Unit_of_divided_by_X_pow_order f,
+    by simp only [Unit_of_divided_by_X_pow_order, dif_neg hf, Units.val_mk]⟩
 
--- DISSOLVED: Unit_of_divided_by_X_pow_order_nonzero
+theorem Unit_of_divided_by_X_pow_order_nonzero {f : k⟦X⟧} (hf : f ≠ 0) :
+    ↑(Unit_of_divided_by_X_pow_order f) = divided_by_X_pow_order hf := by
+  simp only [Unit_of_divided_by_X_pow_order, dif_neg hf, Units.val_mk]
 
 @[simp]
 theorem Unit_of_divided_by_X_pow_order_zero : Unit_of_divided_by_X_pow_order (0 : k⟦X⟧) = 1 := by
   simp only [Unit_of_divided_by_X_pow_order, dif_pos]
 
--- DISSOLVED: eq_divided_by_X_pow_order_Iff_Unit
+theorem eq_divided_by_X_pow_order_Iff_Unit {f : k⟦X⟧} (hf : f ≠ 0) :
+    f = divided_by_X_pow_order hf ↔ IsUnit f :=
+  ⟨fun h ↦ by rw [h]; exact isUnit_divided_by_X_pow_order hf, fun h ↦ by
+    have : f.order.lift (order_finite_iff_ne_zero.mpr hf) = 0 := by
+      simp [order_zero_of_unit h]
+    convert (self_eq_X_pow_order_mul_divided_by_X_pow_order hf).symm
+    simp only [this, pow_zero, one_mul]⟩
 
 end Field
 
@@ -293,7 +337,16 @@ theorem X_eq_normalizeX : (X : k⟦X⟧) = normalize X := by
 
 open UniqueFactorizationMonoid Classical
 
--- DISSOLVED: normalized_count_X_eq_of_coe
+theorem normalized_count_X_eq_of_coe {P : k[X]} (hP : P ≠ 0) :
+    Multiset.count PowerSeries.X (normalizedFactors (P : k⟦X⟧)) =
+      Multiset.count Polynomial.X (normalizedFactors P) := by
+  apply eq_of_forall_le_iff
+  simp only [← Nat.cast_le (α := ℕ∞)]
+  rw [X_eq_normalize, PowerSeries.X_eq_normalizeX, ← emultiplicity_eq_count_normalizedFactors
+    irreducible_X hP, ← emultiplicity_eq_count_normalizedFactors X_irreducible] <;>
+  simp only [← pow_dvd_iff_le_emultiplicity, Polynomial.X_pow_dvd_iff,
+    PowerSeries.X_pow_dvd_iff, Polynomial.coeff_coe P, implies_true, ne_eq, coe_eq_zero_iff, hP,
+    not_false_eq_true]
 
 open IsLocalRing
 

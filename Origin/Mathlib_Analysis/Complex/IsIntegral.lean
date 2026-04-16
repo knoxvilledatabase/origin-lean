@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 
+noncomputable section
+
 /-!
 # Integral elements of ℂ
 

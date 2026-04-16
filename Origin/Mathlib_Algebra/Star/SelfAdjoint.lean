@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Star.Pi
 import Mathlib.Algebra.Star.Rat
 
+noncomputable section
+
 /-!
 # Self-adjoint, skew-adjoint and normal elements of a star additive group
 
@@ -63,9 +65,6 @@ theorem all [Star R] [TrivialStar R] (r : R) : IsSelfAdjoint r :=
 
 theorem star_eq [Star R] {x : R} (hx : IsSelfAdjoint x) : star x = x :=
   hx
-
-theorem _root_.isSelfAdjoint_iff [Star R] {x : R} : IsSelfAdjoint x ↔ star x = x :=
-  Iff.rfl
 
 @[simp]
 theorem star_iff [InvolutiveStar R] {x : R} : IsSelfAdjoint (star x) ↔ IsSelfAdjoint x := by

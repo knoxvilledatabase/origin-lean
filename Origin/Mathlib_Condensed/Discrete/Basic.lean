@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Sites.Equivalence
 import Mathlib.Condensed.Basic
 import Mathlib.Condensed.Light.Basic
 
+noncomputable section
+
 /-!
 
 # Discrete-underlying adjunction

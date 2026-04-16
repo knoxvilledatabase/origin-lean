@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses
 
+noncomputable section
+
 /-!
 # Restriction of a measure to a sub-σ-algebra
 
@@ -22,7 +24,6 @@ namespace MeasureTheory
 variable {α : Type*}
 
 noncomputable
-
 def Measure.trim {m m0 : MeasurableSpace α} (μ : @Measure α m0) (hm : m ≤ m0) : @Measure α m :=
   @OuterMeasure.toMeasure α m μ.toOuterMeasure (hm.trans (le_toOuterMeasure_caratheodory μ))
 

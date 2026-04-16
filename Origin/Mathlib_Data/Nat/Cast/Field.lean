@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Cast/Field.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Defs
@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Cast.Basic
 import Mathlib.Tactic.Common
 import Mathlib.Algebra.Field.Defs
 import Mathlib.Algebra.GroupWithZero.Units.Basic
+
+noncomputable section
 
 /-!
 # Cast of naturals into fields
@@ -23,7 +25,13 @@ namespace Nat
 
 variable {α : Type*}
 
--- DISSOLVED: cast_div
+@[simp]
+theorem cast_div [DivisionSemiring α] {m n : ℕ} (n_dvd : n ∣ m) (hn : (n : α) ≠ 0) :
+    ((m / n : ℕ) : α) = m / n := by
+  rcases n_dvd with ⟨k, rfl⟩
+  have : n ≠ 0 := by rintro rfl; simp at hn
+  rw [Nat.mul_div_cancel_left _ <| zero_lt_of_ne_zero this, mul_comm n,
+    cast_mul, mul_div_cancel_right₀ _ hn]
 
 theorem cast_div_div_div_cancel_right [DivisionSemiring α] [CharZero α] {m n d : ℕ}
     (hn : d ∣ n) (hm : d ∣ m) :

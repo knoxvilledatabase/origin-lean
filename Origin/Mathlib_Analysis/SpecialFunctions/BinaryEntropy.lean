@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/BinaryEntropy.lean
-Genuine: 39 | Conflates: 0 | Dissolved: 6 | Infrastructure: 2
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+
+noncomputable section
 
 /-!
 # Properties of Shannon q-ary entropy and binary entropy functions
@@ -152,13 +154,29 @@ lemma binEntropy_eq_log_two : binEntropy p = log 2 ↔ p = 2⁻¹ := by
 @[fun_prop] lemma binEntropy_continuous : Continuous binEntropy := by
   rw [binEntropy_eq_negMulLog_add_negMulLog_one_sub']; fun_prop
 
--- DISSOLVED: differentiableAt_binEntropy
+@[fun_prop] lemma differentiableAt_binEntropy (hp₀ : p ≠ 0) (hp₁ : p ≠ 1) :
+    DifferentiableAt ℝ binEntropy p := by
+  rw [ne_comm, ← sub_ne_zero] at hp₁
+  unfold binEntropy
+  simp only [log_inv, mul_neg]
+  fun_prop (disch := assumption)
 
 set_option push_neg.use_distrib true in
-
--- DISSOLVED: differentiableAt_binEntropy_iff_ne_zero_one
+lemma differentiableAt_binEntropy_iff_ne_zero_one :
+    DifferentiableAt ℝ binEntropy p ↔ p ≠ 0 ∧ p ≠ 1 := by
+  refine ⟨fun h ↦ ⟨?_, ?_⟩, fun h ↦ differentiableAt_binEntropy h.1 h.2⟩
+    <;> rintro rfl <;> unfold binEntropy at h
+  · rw [DifferentiableAt.add_iff_left] at h
+    · simp [log_inv, mul_neg, ← neg_mul, ← negMulLog_def, differentiableAt_negMulLog_iff] at h
+    · fun_prop (disch := simp)
+  · rw [DifferentiableAt.add_iff_right, differentiableAt_iff_comp_const_sub (b := 1)] at h
+    · simp [log_inv, mul_neg, ← neg_mul, ← negMulLog_def, differentiableAt_negMulLog_iff] at h
+    · fun_prop (disch := simp)
 
 set_option push_neg.use_distrib true in
+/-- Binary entropy has derivative `log (1 - p) - log p`.
+
+It's not differentiable at `0` or `1` but the junk values of `deriv` and `log` coincide there. -/
 
 lemma deriv_binEntropy (p : ℝ) : deriv binEntropy p = log (1 - p) - log p := by
   by_cases hp : p ≠ 0 ∧ p ≠ 1
@@ -206,13 +224,24 @@ lemma qaryEntropy_nonpos_of_nonpos (hp : p ≤ 0) : qaryEntropy q p ≤ 0 :=
 @[fun_prop] lemma qaryEntropy_continuous : Continuous (qaryEntropy q) := by
   unfold qaryEntropy; fun_prop
 
--- DISSOLVED: differentiableAt_qaryEntropy
+@[fun_prop] lemma differentiableAt_qaryEntropy (hp₀ : p ≠ 0) (hp₁ : p ≠ 1) :
+    DifferentiableAt ℝ (qaryEntropy q) p := by unfold qaryEntropy; fun_prop (disch := assumption)
 
--- DISSOLVED: deriv_qaryEntropy
+lemma deriv_qaryEntropy (hp₀ : p ≠ 0) (hp₁ : p ≠ 1) :
+    deriv (qaryEntropy q) p = log (q - 1) + log (1 - p) - log p := by
+  unfold qaryEntropy
+  rw [deriv_add]
+  · simp only [Int.cast_sub, Int.cast_natCast, Int.cast_one, differentiableAt_id', deriv_mul_const,
+      deriv_id'', one_mul, deriv_binEntropy, add_sub_assoc]
+  all_goals fun_prop (disch := assumption)
 
--- DISSOLVED: hasDerivAt_binEntropy
+lemma hasDerivAt_binEntropy (hp₀ : p ≠ 0) (hp₁ : p ≠ 1) :
+    HasDerivAt binEntropy (log (1 - p) - log p) p :=
+  deriv_binEntropy _ ▸ (differentiableAt_binEntropy hp₀ hp₁).hasDerivAt
 
--- DISSOLVED: hasDerivAt_qaryEntropy
+lemma hasDerivAt_qaryEntropy (hp₀ : p ≠ 0) (hp₁ : p ≠ 1) :
+    HasDerivAt (qaryEntropy q) (log (q - 1) + log (1 - p) - log p) p :=
+  deriv_qaryEntropy hp₀ hp₁ ▸ (differentiableAt_qaryEntropy hp₀ hp₁).hasDerivAt
 
 open Filter Topology Set
 

@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Monad combinators, as in Haskell's Control.Monad.
 -/

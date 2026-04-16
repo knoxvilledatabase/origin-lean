@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.RingHomProperties
 import Mathlib.RingTheory.RingHom.StandardSmooth
 
+noncomputable section
+
 /-!
 
 # Smooth morphisms

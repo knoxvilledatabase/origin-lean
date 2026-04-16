@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/FractionalIdeal/Basic.lean
-Genuine: 65 | Conflates: 0 | Dissolved: 4 | Infrastructure: 36
+Genuine: 67 | Conflates: 2 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.Integer
 import Mathlib.RingTheory.Localization.Submodule
+
+noncomputable section
 
 /-!
 # Fractional ideals
@@ -104,7 +106,21 @@ theorem den_mul_self_eq_num (I : FractionalIdeal S P) :
   rintro _ ⟨a, ha, rfl⟩
   exact I.2.choose_spec.2 a ha
 
--- DISSOLVED: equivNum
+-- CONFLATES (assumes ground = zero): equivNum
+noncomputable def equivNum [Nontrivial P] [NoZeroSMulDivisors R P]
+    {I : FractionalIdeal S P} (h_nz : (I.den : R) ≠ 0) : I ≃ₗ[R] I.num := by
+  refine LinearEquiv.trans
+    (LinearEquiv.ofBijective ((DistribMulAction.toLinearMap R P I.den).restrict fun _ hx ↦ ?_)
+      ⟨fun _ _ hxy ↦ ?_, fun ⟨y, hy⟩ ↦ ?_⟩)
+    (Submodule.equivMapOfInjective (Algebra.linearMap R P)
+      (NoZeroSMulDivisors.algebraMap_injective R P) (num I)).symm
+  · rw [← den_mul_self_eq_num]
+    exact Submodule.smul_mem_pointwise_smul _ _ _ hx
+  · simp_rw [LinearMap.restrict_apply, DistribMulAction.toLinearMap_apply, Subtype.mk.injEq] at hxy
+    rwa [Submonoid.smul_def, Submonoid.smul_def, smul_right_inj h_nz, SetCoe.ext_iff] at hxy
+  · rw [← den_mul_self_eq_num] at hy
+    obtain ⟨x, hx, hxy⟩ := hy
+    exact ⟨⟨x, hx⟩, by simp_rw [LinearMap.restrict_apply, Subtype.ext_iff, ← hxy]; rfl⟩
 
 section SetLike
 
@@ -120,7 +136,15 @@ theorem mem_coe {I : FractionalIdeal S P} {x : P} : x ∈ (I : Submodule R P) �
 theorem ext {I J : FractionalIdeal S P} : (∀ x, x ∈ I ↔ x ∈ J) → I = J :=
   SetLike.ext
 
--- DISSOLVED: equivNum_apply
+-- CONFLATES (assumes ground = zero): equivNum_apply
+@[simp]
+ theorem equivNum_apply [Nontrivial P] [NoZeroSMulDivisors R P] {I : FractionalIdeal S P}
+    (h_nz : (I.den : R) ≠ 0) (x : I) :
+    algebraMap R P (equivNum h_nz x) = I.den • x := by
+  change Algebra.linearMap R P _ = _
+  rw [equivNum, LinearEquiv.trans_apply, LinearEquiv.ofBijective_apply, LinearMap.restrict_apply,
+    Submodule.map_equivMapOfInjective_symm_apply, Subtype.coe_mk,
+    DistribMulAction.toLinearMap_apply]
 
 protected def copy (p : FractionalIdeal S P) (s : Set P) (hs : s = ↑p) : FractionalIdeal S P :=
   ⟨Submodule.copy p s hs, by
@@ -129,10 +153,6 @@ protected def copy (p : FractionalIdeal S P) (s : Set P) (hs : s = ↑p) : Fract
     simp only [hs]
     rfl⟩
 
-@[simp]
-theorem coe_copy (p : FractionalIdeal S P) (s : Set P) (hs : s = ↑p) : ↑(p.copy s hs) = s :=
-  rfl
-
 theorem coe_eq (p : FractionalIdeal S P) (s : Set P) (hs : s = ↑p) : p.copy s hs = p :=
   SetLike.coe_injective hs
 
@@ -140,17 +160,9 @@ end SetLike
 
 lemma zero_mem (I : FractionalIdeal S P) : 0 ∈ I := I.coeToSubmodule.zero_mem
 
-@[simp]
-theorem val_eq_coe (I : FractionalIdeal S P) : I.val = I :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_mk (I : Submodule R P) (hI : IsFractional S I) :
     coeToSubmodule ⟨I, hI⟩ = I :=
-  rfl
-
-theorem coeToSet_coeToSubmodule (I : FractionalIdeal S P) :
-    ((I : Submodule R P) : Set P) = I :=
   rfl
 
 /-! Transfer instances from `Submodule R P` to `FractionalIdeal S P`. -/
@@ -186,11 +198,6 @@ def coeIdeal (I : Ideal R) : FractionalIdeal S P :=
 
 instance : CoeTC (Ideal R) (FractionalIdeal S P) :=
   ⟨fun I => coeIdeal I⟩
-
-@[simp, norm_cast]
-theorem coe_coeIdeal (I : Ideal R) :
-    ((I : FractionalIdeal S P) : Submodule R P) = coeSubmodule P I :=
-  rfl
 
 variable (S)
 
@@ -255,14 +262,17 @@ theorem coeIdeal_eq_zero' {I : Ideal R} (h : S ≤ nonZeroDivisors R) :
     (I : FractionalIdeal S P) = 0 ↔ I = (⊥ : Ideal R) :=
   coeIdeal_inj' h
 
--- DISSOLVED: coeIdeal_ne_zero'
+theorem coeIdeal_ne_zero' {I : Ideal R} (h : S ≤ nonZeroDivisors R) :
+    (I : FractionalIdeal S P) ≠ 0 ↔ I ≠ (⊥ : Ideal R) :=
+  not_iff_not.mpr <| coeIdeal_eq_zero' h
 
 end
 
 theorem coeToSubmodule_eq_bot {I : FractionalIdeal S P} : (I : Submodule R P) = ⊥ ↔ I = 0 :=
   ⟨fun h => coeToSubmodule_injective (by simp [h]), fun h => by simp [h]⟩
 
--- DISSOLVED: coeToSubmodule_ne_bot
+theorem coeToSubmodule_ne_bot {I : FractionalIdeal S P} : ↑I ≠ (⊥ : Submodule R P) ↔ I ≠ 0 :=
+  not_iff_not.mpr coeToSubmodule_eq_bot
 
 instance : Inhabited (FractionalIdeal S P) :=
   ⟨0⟩
@@ -332,10 +342,6 @@ instance orderBot : OrderBot (FractionalIdeal S P) where
   bot_le := zero_le
 
 @[simp]
-theorem bot_eq_zero : (⊥ : FractionalIdeal S P) = 0 :=
-  rfl
-
-@[simp]
 theorem le_zero_iff {I : FractionalIdeal S P} : I ≤ 0 ↔ I = 0 :=
   le_bot_iff
 
@@ -388,10 +394,6 @@ section Semiring
 
 instance : Add (FractionalIdeal S P) :=
   ⟨(· ⊔ ·)⟩
-
-@[simp]
-theorem sup_eq_add (I J : FractionalIdeal S P) : I ⊔ J = I + J :=
-  rfl
 
 @[simp, norm_cast]
 theorem coe_add (I J : FractionalIdeal S P) : (↑(I + J) : Submodule R P) = I + J :=

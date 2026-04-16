@@ -5,6 +5,8 @@ Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Finset.Empty
 
+noncomputable section
+
 /-!
 # Filtering a finite set
 
@@ -85,10 +87,6 @@ namespace Finset
 section Filter
 
 variable (p q : α → Prop) [DecidablePred p] [DecidablePred q] {s t : Finset α}
-
-@[simp]
-theorem filter_val (s : Finset α) : (filter p s).1 = s.1.filter p :=
-  rfl
 
 @[simp]
 theorem filter_subset (s : Finset α) : s.filter p ⊆ s :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Function
 import Mathlib.Order.Interval.Set.OrdConnected
 
+noncomputable section
+
 /-!
 # Projection of a line onto a closed interval
 
@@ -41,15 +43,6 @@ def projIcc (a b : α) (h : a ≤ b) (x : α) : Icc a b :=
   ⟨max a (min b x), le_max_left _ _, max_le h (min_le_left _ _)⟩
 
 variable {a b : α} (h : a ≤ b) {x : α}
-
-@[norm_cast]
-theorem coe_projIci (a x : α) : (projIci a x : α) = max a x := rfl
-
-@[norm_cast]
-theorem coe_projIic (b x : α) : (projIic b x : α) = min b x := rfl
-
-@[norm_cast]
-theorem coe_projIcc (a b : α) (h : a ≤ b) (x : α) : (projIcc a b h x : α) = max a (min b x) := rfl
 
 theorem projIci_of_le (hx : x ≤ a) : projIci a x = ⟨a, le_rfl⟩ := Subtype.ext <| max_eq_left hx
 
@@ -150,15 +143,6 @@ def IicExtend (f : Iic b → β) : α → β :=
 
 def IccExtend {a b : α} (h : a ≤ b) (f : Icc a b → β) : α → β :=
   f ∘ projIcc a b h
-
-theorem IciExtend_apply (f : Ici a → β) (x : α) : IciExtend f x = f ⟨max a x, le_max_left _ _⟩ :=
-  rfl
-
-theorem IicExtend_apply (f : Iic b → β) (x : α) : IicExtend f x = f ⟨min b x, min_le_left _ _⟩ :=
-  rfl
-
-theorem IccExtend_apply (h : a ≤ b) (f : Icc a b → β) (x : α) :
-    IccExtend h f x = f ⟨max a (min b x), le_max_left _ _, max_le h (min_le_left _ _)⟩ := rfl
 
 @[simp]
 theorem range_IciExtend (f : Ici a → β) : range (IciExtend f) = range f := by

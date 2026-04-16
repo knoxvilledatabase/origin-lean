@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Hom.Basic
 import Mathlib.Logic.Relation
 
+noncomputable section
+
 /-!
 # Turning a preorder into a partial order
 
@@ -160,16 +162,6 @@ instance [@DecidableRel α (· ≤ ·)] [@DecidableRel α (· < ·)] [IsTotal α
     decidableLT := fun _ _ => show Decidable (Quotient.liftOn₂' _ _ _ _) from inferInstance }
 
 @[simp]
-theorem toAntisymmetrization_le_toAntisymmetrization_iff :
-    @toAntisymmetrization α (· ≤ ·) _ a ≤ @toAntisymmetrization α (· ≤ ·) _ b ↔ a ≤ b :=
-  Iff.rfl
-
-@[simp]
-theorem toAntisymmetrization_lt_toAntisymmetrization_iff :
-    @toAntisymmetrization α (· ≤ ·) _ a < @toAntisymmetrization α (· ≤ ·) _ b ↔ a < b :=
-  Iff.rfl
-
-@[simp]
 theorem ofAntisymmetrization_le_ofAntisymmetrization_iff {a b : Antisymmetrization α (· ≤ ·)} :
     ofAntisymmetrization (· ≤ ·) a ≤ ofAntisymmetrization (· ≤ ·) b ↔ a ≤ b :=
   (Quotient.outRelEmbedding _).map_rel_iff
@@ -191,15 +183,6 @@ protected def OrderHom.antisymmetrization (f : α →o β) :
   ⟨Quotient.map' f <| liftFun_antisymmRel f, fun a b => Quotient.inductionOn₂' a b <| f.mono⟩
 
 @[simp]
-theorem OrderHom.coe_antisymmetrization (f : α →o β) :
-    ⇑f.antisymmetrization = Quotient.map' f (liftFun_antisymmRel f) :=
-  rfl
-
-theorem OrderHom.antisymmetrization_apply (f : α →o β) (a : Antisymmetrization α (· ≤ ·)) :
-    f.antisymmetrization a = Quotient.map' f (liftFun_antisymmRel f) a :=
-  rfl
-
-@[simp]
 theorem OrderHom.antisymmetrization_apply_mk (f : α →o β) (a : α) :
     f.antisymmetrization (toAntisymmetrization _ a) = toAntisymmetrization _ (f a) :=
   @Quotient.map_mk _ _ (_root_.id _) (_root_.id _) f (liftFun_antisymmRel f) _
@@ -218,18 +201,6 @@ def OrderIso.dualAntisymmetrization :
   right_inv a := Quotient.inductionOn' a fun a => by simp_rw [Quotient.map'_mk'', id]
   map_rel_iff' := @fun a b => Quotient.inductionOn₂' a b fun _ _ => Iff.rfl
 
-@[simp]
-theorem OrderIso.dualAntisymmetrization_apply (a : α) :
-    OrderIso.dualAntisymmetrization _ (toDual <| toAntisymmetrization _ a) =
-      toAntisymmetrization _ (toDual a) :=
-  rfl
-
-@[simp]
-theorem OrderIso.dualAntisymmetrization_symm_apply (a : α) :
-    (OrderIso.dualAntisymmetrization _).symm (toAntisymmetrization _ <| toDual a) =
-      toDual (toAntisymmetrization _ a) :=
-  rfl
-
 end Preorder
 
 section Prod
@@ -247,10 +218,6 @@ def prodEquiv : Antisymmetrization (α × β) (· ≤ ·) ≃o
   left_inv := by rintro ⟨_⟩; rfl
   right_inv := by rintro ⟨⟨_⟩, ⟨_⟩⟩; rfl
   map_rel_iff' := by rintro ⟨_⟩ ⟨_⟩; rfl
-
-@[simp] lemma prodEquiv_apply_mk {ab} : prodEquiv α β ⟦ab⟧ = (⟦ab.1⟧, ⟦ab.2⟧) := rfl
-
-@[simp] lemma prodEquiv_symm_apply_mk {a b} : (prodEquiv α β).symm (⟦a⟧, ⟦b⟧) = ⟦(a, b)⟧ := rfl
 
 end Antisymmetrization
 

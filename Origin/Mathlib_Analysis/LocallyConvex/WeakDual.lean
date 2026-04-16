@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Topology.Algebra.Module.WeakBilin
 
+noncomputable section
+
 /-!
 # Weak Dual in Topological Vector Spaces
 
@@ -50,9 +52,6 @@ variable [NormedField 𝕜] [AddCommGroup E] [Module 𝕜 E] [AddCommGroup F] [M
 def toSeminorm (f : E →ₗ[𝕜] 𝕜) : Seminorm 𝕜 E :=
   (normSeminorm 𝕜 𝕜).comp f
 
-theorem coe_toSeminorm {f : E →ₗ[𝕜] 𝕜} : ⇑f.toSeminorm = fun x => ‖f x‖ :=
-  rfl
-
 @[simp]
 theorem toSeminorm_apply {f : E →ₗ[𝕜] 𝕜} {x : E} : f.toSeminorm x = ‖f x‖ :=
   rfl
@@ -68,10 +67,6 @@ theorem toSeminorm_comp (f : F →ₗ[𝕜] 𝕜) (g : E →ₗ[𝕜] F) :
 
 def toSeminormFamily (B : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜) : SeminormFamily 𝕜 E F := fun y =>
   (B.flip y).toSeminorm
-
-@[simp]
-theorem toSeminormFamily_apply {B : E →ₗ[𝕜] F →ₗ[𝕜] 𝕜} {x y} : (B.toSeminormFamily y) x = ‖B x y‖ :=
-  rfl
 
 end LinearMap
 

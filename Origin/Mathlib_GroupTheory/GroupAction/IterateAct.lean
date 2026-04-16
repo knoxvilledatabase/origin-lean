@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Data.Countable.Defs
 
+noncomputable section
+
 /-!
 # Monoid action by iterates of a map
 
@@ -49,8 +51,5 @@ instance instMulAction : MulAction (IterateMulAct f) α where
   smul n x := f^[n.val] x
   one_smul _ := rfl
   mul_smul _ _ := Function.iterate_add_apply f _ _
-
-@[to_additive (attr := simp)]
-theorem mk_smul (n : ℕ) (x : α) : mk (f := f) n • x = f^[n] x := rfl
 
 end IterateMulAct

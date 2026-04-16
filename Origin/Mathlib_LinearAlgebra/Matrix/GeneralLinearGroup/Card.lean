@@ -7,6 +7,8 @@ import Mathlib.Data.Matrix.Rank
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 
+noncomputable section
+
 /-!
 # Cardinal of the general linear group over finite rings
 
@@ -32,7 +34,6 @@ local notation "q" => Fintype.card K
 local notation "n" => Module.finrank K V
 
 attribute [local instance] Fintype.ofFinite in
-
 open Fintype in
 
 theorem card_linearIndependent {k : ℕ} (hk : k ≤ n) :

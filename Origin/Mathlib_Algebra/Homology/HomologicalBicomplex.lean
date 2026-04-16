@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplex
 
+noncomputable section
+
 /-!
 # Bicomplexes
 
@@ -42,10 +44,6 @@ def toGradedObject (K : HomologicalComplex₂ C c₁ c₂) :
 def toGradedObjectMap {K L : HomologicalComplex₂ C c₁ c₂} (φ : K ⟶ L) :
     K.toGradedObject ⟶ L.toGradedObject :=
   fun ⟨i₁, i₂⟩ => (φ.f i₁).f i₂
-
-@[simp]
-lemma toGradedObjectMap_apply {K L : HomologicalComplex₂ C c₁ c₂} (φ : K ⟶ L) (i₁ : I₁) (i₂ : I₂) :
-    toGradedObjectMap φ ⟨i₁, i₂⟩ = (φ.f i₁).f i₂ := rfl
 
 variable (C c₁ c₂) in
 
@@ -89,11 +87,6 @@ def ofGradedObject :
     exact shape₁ i₁ i₁' h i₂
   d_comp_d' i₁ i₁' i₁'' _ _ := by ext i₂; apply d₁_comp_d₁
 
-@[simp]
-lemma ofGradedObject_toGradedObject :
-    (ofGradedObject c₁ c₂ X d₁ d₂ shape₁ shape₂ d₁_comp_d₁ d₂_comp_d₂ comm).toGradedObject = X :=
-  rfl
-
 end OfGradedObject
 
 @[simps!]
@@ -120,11 +113,6 @@ lemma d_f_comp_d_f (K : HomologicalComplex₂ C c₁ c₂)
     (K.d i₁ i₁').f i₂ ≫ (K.d i₁' i₁'').f i₂ = 0 := by
   rw [← comp_f, d_comp_d, zero_f]
 
-@[reassoc]
-lemma d_comm (K : HomologicalComplex₂ C c₁ c₂) (i₁ i₁' : I₁) (i₂ i₂' : I₂) :
-    (K.d i₁ i₁').f i₂ ≫ (K.X i₁').d i₂ i₂' = (K.X i₁).d i₂ i₂' ≫ (K.d i₁ i₁').f i₂' := by
-  simp
-
 @[reassoc (attr := simp)]
 lemma comm_f {K L : HomologicalComplex₂ C c₁ c₂} (f : K ⟶ L) (i₁ i₁' : I₁) (i₂ : I₂) :
     (f.f i₁).f i₂ ≫ (L.d i₁ i₁').f i₂ = (K.d i₁ i₁').f i₂ ≫ (f.f i₁').f i₂ :=
@@ -140,9 +128,6 @@ def flip (K : HomologicalComplex₂ C c₁ c₂) : HomologicalComplex₂ C c₂ 
   shape i i' w := by
     ext j
     exact (K.X j).shape i i' w
-
-@[simp]
-lemma flip_flip (K : HomologicalComplex₂ C c₁ c₂) : K.flip.flip = K := rfl
 
 variable (C c₁ c₂)
 
@@ -183,9 +168,5 @@ variable (K : HomologicalComplex₂ C c₁ c₂)
 def XXIsoOfEq {x₁ y₁ : I₁} (h₁ : x₁ = y₁) {x₂ y₂ : I₂} (h₂ : x₂ = y₂) :
     (K.X x₁).X x₂ ≅ (K.X y₁).X y₂ :=
   eqToIso (by subst h₁ h₂; rfl)
-
-@[simp]
-lemma XXIsoOfEq_rfl (i₁ : I₁) (i₂ : I₂) :
-    K.XXIsoOfEq _ _ _ (rfl : i₁ = i₁) (rfl : i₂ = i₂) = Iso.refl _ := rfl
 
 end HomologicalComplex₂

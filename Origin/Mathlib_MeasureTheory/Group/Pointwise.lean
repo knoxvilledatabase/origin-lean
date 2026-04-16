@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Arithmetic
 
+noncomputable section
+
 /-!
 # Pointwise set operations on `MeasurableSet`s
 

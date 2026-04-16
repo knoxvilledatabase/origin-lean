@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/AddChar.lean
-Genuine: 46 | Conflates: 2 | Dissolved: 5 | Infrastructure: 53
+Genuine: 51 | Conflates: 2 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Regular
 import Mathlib.Logic.Equiv.TransferInstance
 import Mathlib.Algebra.BigOperators.Pi
 import Mathlib.Algebra.BigOperators.Ring
+
+noncomputable section
 
 /-!
 # Characters from additive to multiplicative monoids
@@ -86,11 +88,6 @@ instance instFunLike : FunLike (AddChar A M) A M where
 @[ext] lemma ext (f g : AddChar A M) (h : ∀ x : A, f x = g x) : f = g :=
   DFunLike.ext f g h
 
-@[simp] lemma coe_mk (f : A → M)
-    (map_zero_eq_one' : f 0 = 1) (map_add_eq_mul' : ∀ a b : A, f (a + b) = f a * f b) :
-    AddChar.mk f map_zero_eq_one' map_add_eq_mul' = f := by
-  rfl
-
 @[simp] lemma map_zero_eq_one (ψ : AddChar A M) : ψ 0 = 1 := ψ.map_zero_eq_one'
 
 lemma map_add_eq_mul (ψ : AddChar A M) (x y : A) : ψ (x + y) = ψ x * ψ y := ψ.map_add_eq_mul' x y
@@ -99,10 +96,6 @@ def toMonoidHom (φ : AddChar A M) : Multiplicative A →* M where
   toFun := φ.toFun
   map_one' := φ.map_zero_eq_one'
   map_mul' := φ.map_add_eq_mul'
-
-@[simp] lemma toMonoidHom_apply (ψ : AddChar A M) (a : Multiplicative A) :
-  ψ.toMonoidHom a = ψ a.toAdd :=
-  rfl
 
 lemma map_nsmul_eq_pow (ψ : AddChar A M) (n : ℕ) (x : A) : ψ (n • x) = ψ x ^ n :=
   ψ.toMonoidHom.map_pow x n
@@ -116,27 +109,10 @@ def toMonoidHomEquiv : AddChar A M ≃ (Multiplicative A →* M) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-@[simp, norm_cast] lemma coe_toMonoidHomEquiv (ψ : AddChar A M) :
-    ⇑(toMonoidHomEquiv ψ) = ψ ∘ Multiplicative.toAdd := rfl
-
-@[simp, norm_cast] lemma coe_toMonoidHomEquiv_symm (ψ : Multiplicative A →* M) :
-    ⇑(toMonoidHomEquiv.symm ψ) = ψ ∘ Multiplicative.ofAdd := rfl
-
-@[simp] lemma toMonoidHomEquiv_apply (ψ : AddChar A M) (a : Multiplicative A) :
-    toMonoidHomEquiv ψ a = ψ a.toAdd := rfl
-
-@[simp] lemma toMonoidHomEquiv_symm_apply (ψ : Multiplicative A →* M) (a : A) :
-    toMonoidHomEquiv.symm ψ a = ψ (Multiplicative.ofAdd a) := rfl
-
 def toAddMonoidHom (φ : AddChar A M) : A →+ Additive M where
   toFun := φ.toFun
   map_zero' := φ.map_zero_eq_one'
   map_add' := φ.map_add_eq_mul'
-
-@[simp] lemma coe_toAddMonoidHom (ψ : AddChar A M) : ⇑ψ.toAddMonoidHom = Additive.ofMul ∘ ψ := rfl
-
-@[simp] lemma toAddMonoidHom_apply (ψ : AddChar A M) (a : A) :
-    ψ.toAddMonoidHom a = Additive.ofMul (ψ a) := rfl
 
 def toAddMonoidHomEquiv : AddChar A M ≃ (A →+ Additive M) where
   toFun φ := φ.toAddMonoidHom
@@ -147,24 +123,9 @@ def toAddMonoidHomEquiv : AddChar A M ≃ (A →+ Additive M) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-@[simp, norm_cast]
-lemma coe_toAddMonoidHomEquiv (ψ : AddChar A M) :
-    ⇑(toAddMonoidHomEquiv ψ) = Additive.ofMul ∘ ψ := rfl
-
-@[simp, norm_cast] lemma coe_toAddMonoidHomEquiv_symm (ψ : A →+ Additive M) :
-    ⇑(toAddMonoidHomEquiv.symm ψ) = Additive.toMul ∘ ψ := rfl
-
-@[simp] lemma toAddMonoidHomEquiv_apply (ψ : AddChar A M) (a : A) :
-    toAddMonoidHomEquiv ψ a = Additive.ofMul (ψ a) := rfl
-
-@[simp] lemma toAddMonoidHomEquiv_symm_apply (ψ : A →+ Additive M) (a : A) :
-    toAddMonoidHomEquiv.symm ψ a = (ψ a).toMul  := rfl
-
 instance instOne : One (AddChar A M) := toMonoidHomEquiv.one
 
 instance instZero : Zero (AddChar A M) := ⟨1⟩
-
-@[simp, norm_cast] lemma coe_one : ⇑(1 : AddChar A M) = 1 := rfl
 
 @[simp, norm_cast] lemma coe_zero : ⇑(0 : AddChar A M) = 1 := rfl
 
@@ -172,33 +133,12 @@ instance instZero : Zero (AddChar A M) := ⟨1⟩
 
 @[simp] lemma zero_apply (a : A) : (0 : AddChar A M) a = 1 := rfl
 
-lemma one_eq_zero : (1 : AddChar A M) = (0 : AddChar A M) := rfl
-
 @[simp, norm_cast] lemma coe_eq_one : ⇑ψ = 1 ↔ ψ = 0 := by rw [← coe_zero, DFunLike.coe_fn_eq]
-
-@[simp] lemma toMonoidHomEquiv_zero : toMonoidHomEquiv (0 : AddChar A M) = 1 := rfl
-
-@[simp] lemma toMonoidHomEquiv_symm_one :
-    toMonoidHomEquiv.symm (1 : Multiplicative A →* M) = 0 := rfl
-
-@[simp] lemma toAddMonoidHomEquiv_zero : toAddMonoidHomEquiv (0 : AddChar A M) = 0 := rfl
-
-@[simp] lemma toAddMonoidHomEquiv_symm_zero :
-    toAddMonoidHomEquiv.symm (0 : A →+ Additive M) = 0 := rfl
 
 instance instInhabited : Inhabited (AddChar A M) := ⟨1⟩
 
 def _root_.MonoidHom.compAddChar {N : Type*} [Monoid N] (f : M →* N) (φ : AddChar A M) :
     AddChar A N := toMonoidHomEquiv.symm (f.comp φ.toMonoidHom)
-
-@[simp, norm_cast]
-lemma _root_.MonoidHom.coe_compAddChar {N : Type*} [Monoid N] (f : M →* N) (φ : AddChar A M) :
-    f.compAddChar φ = f ∘ φ :=
-  rfl
-
-@[simp, norm_cast]
-lemma _root_.MonoidHom.compAddChar_apply (f : M →* N) (φ : AddChar A M) : f.compAddChar φ = f ∘ φ :=
-  rfl
 
 lemma _root_.MonoidHom.compAddChar_injective_left (ψ : AddChar A M) (hψ : Surjective ψ) :
     Injective fun f : M →* N ↦ f.compAddChar ψ := by
@@ -210,12 +150,6 @@ lemma _root_.MonoidHom.compAddChar_injective_right (f : M →* N) (hf : Injectiv
 
 def compAddMonoidHom (φ : AddChar B M) (f : A →+ B) : AddChar A M :=
   toAddMonoidHomEquiv.symm (φ.toAddMonoidHom.comp f)
-
-@[simp, norm_cast]
-lemma coe_compAddMonoidHom (φ : AddChar B M) (f : A →+ B) : φ.compAddMonoidHom f = φ ∘ f := rfl
-
-@[simp] lemma compAddMonoidHom_apply (ψ : AddChar B M) (f : A →+ B)
-    (a : A) : ψ.compAddMonoidHom f a = ψ (f a) := rfl
 
 lemma compAddMonoidHom_injective_left (f : A →+ B) (hf : Surjective f) :
     Injective fun ψ : AddChar B M ↦ ψ.compAddMonoidHom f := by
@@ -230,14 +164,15 @@ lemma eq_one_iff : ψ = 1 ↔ ∀ x, ψ x = 1 := DFunLike.ext_iff
 
 lemma eq_zero_iff : ψ = 0 ↔ ∀ x, ψ x = 1 := DFunLike.ext_iff
 
--- DISSOLVED: ne_one_iff
+lemma ne_one_iff : ψ ≠ 1 ↔ ∃ x, ψ x ≠ 1 := DFunLike.ne_iff
 
--- DISSOLVED: ne_zero_iff
+lemma ne_zero_iff : ψ ≠ 0 ↔ ∃ x, ψ x ≠ 1 := DFunLike.ne_iff
 
 -- CONFLATES (assumes ground = zero): IsNontrivial
 def IsNontrivial (ψ : AddChar A M) : Prop := ∃ a : A, ψ a ≠ 1
 
 set_option linter.deprecated false in
+/-- An additive character is nontrivial iff it is not the trivial character. -/
 
 -- CONFLATES (assumes ground = zero): isNontrivial_iff_ne_trivial
 lemma isNontrivial_iff_ne_trivial (ψ : AddChar A M) : IsNontrivial ψ ↔ ψ ≠ 1 :=
@@ -255,14 +190,6 @@ instance instCommMonoid : CommMonoid (AddChar A M) := toMonoidHomEquiv.commMonoi
 
 instance instAddCommMonoid : AddCommMonoid (AddChar A M) := Additive.addCommMonoid
 
-@[simp, norm_cast] lemma coe_mul (ψ χ : AddChar A M) : ⇑(ψ * χ) = ψ * χ := rfl
-
-@[simp, norm_cast] lemma coe_add (ψ χ : AddChar A M) : ⇑(ψ + χ) = ψ * χ := rfl
-
-@[simp, norm_cast] lemma coe_pow (ψ : AddChar A M) (n : ℕ) : ⇑(ψ ^ n) = ψ ^ n := rfl
-
-@[simp, norm_cast] lemma coe_nsmul (n : ℕ) (ψ : AddChar A M) : ⇑(n • ψ) = ψ ^ n := rfl
-
 @[simp, norm_cast]
 lemma coe_prod (s : Finset ι) (ψ : ι → AddChar A M) : ∏ i in s, ψ i = ∏ i in s, ⇑(ψ i) := by
   induction s using Finset.cons_induction <;> simp [*]
@@ -271,13 +198,7 @@ lemma coe_prod (s : Finset ι) (ψ : ι → AddChar A M) : ∏ i in s, ψ i = �
 lemma coe_sum (s : Finset ι) (ψ : ι → AddChar A M) : ∑ i in s, ψ i = ∏ i in s, ⇑(ψ i) := by
   induction s using Finset.cons_induction <;> simp [*]
 
-@[simp] lemma mul_apply (ψ φ : AddChar A M) (a : A) : (ψ * φ) a = ψ a * φ a := rfl
-
-@[simp] lemma add_apply (ψ φ : AddChar A M) (a : A) : (ψ + φ) a = ψ a * φ a := rfl
-
 @[simp] lemma pow_apply (ψ : AddChar A M) (n : ℕ) (a : A) : (ψ ^ n) a = (ψ a) ^ n := rfl
-
-@[simp] lemma nsmul_apply (ψ : AddChar A M) (n : ℕ) (a : A) : (n • ψ) a = (ψ a) ^ n := rfl
 
 lemma prod_apply (s : Finset ι) (ψ : ι → AddChar A M) (a : A) :
     (∏ i in s, ψ i) a = ∏ i in s, ψ i a := by rw [coe_prod, Finset.prod_apply]
@@ -285,32 +206,11 @@ lemma prod_apply (s : Finset ι) (ψ : ι → AddChar A M) (a : A) :
 lemma sum_apply (s : Finset ι) (ψ : ι → AddChar A M) (a : A) :
     (∑ i in s, ψ i) a = ∏ i in s, ψ i a := by rw [coe_sum, Finset.prod_apply]
 
-lemma mul_eq_add (ψ χ : AddChar A M) : ψ * χ = ψ + χ := rfl
-
-lemma pow_eq_nsmul (ψ : AddChar A M) (n : ℕ) : ψ ^ n = n • ψ := rfl
-
-lemma prod_eq_sum (s : Finset ι) (ψ : ι → AddChar A M) : ∏ i in s, ψ i = ∑ i in s, ψ i := rfl
-
-@[simp] lemma toMonoidHomEquiv_add (ψ φ : AddChar A M) :
-    toMonoidHomEquiv (ψ + φ) = toMonoidHomEquiv ψ * toMonoidHomEquiv φ := rfl
-
-@[simp] lemma toMonoidHomEquiv_symm_mul (ψ φ : Multiplicative A →* M) :
-    toMonoidHomEquiv.symm (ψ * φ) = toMonoidHomEquiv.symm ψ + toMonoidHomEquiv.symm φ := rfl
-
 def toMonoidHomMulEquiv : AddChar A M ≃* (Multiplicative A →* M) :=
   { toMonoidHomEquiv with map_mul' := fun φ ψ ↦ by rfl }
 
 def toAddMonoidAddEquiv : Additive (AddChar A M) ≃+ (A →+ Additive M) :=
   { toAddMonoidHomEquiv with map_add' := fun φ ψ ↦ by rfl }
-
-def doubleDualEmb : A →+ AddChar (AddChar A M) M where
-  toFun a := { toFun := fun ψ ↦ ψ a
-               map_zero_eq_one' := by simp
-               map_add_eq_mul' := by simp }
-  map_zero' := by ext; simp
-  map_add' _ _ := by ext; simp [map_add_eq_mul]
-
-@[simp] lemma doubleDualEmb_apply (a : A) (ψ : AddChar A M) : doubleDualEmb a ψ = ψ a := rfl
 
 end toCommMonoid
 
@@ -330,9 +230,11 @@ lemma sum_eq_ite (ψ : AddChar A R) [Decidable (ψ = 0)] :
 
 variable [CharZero R]
 
--- DISSOLVED: sum_eq_zero_iff_ne_zero
+lemma sum_eq_zero_iff_ne_zero : ∑ x, ψ x = 0 ↔ ψ ≠ 0 := by
+  classical
+  rw [sum_eq_ite, Ne.ite_eq_right_iff]; exact Nat.cast_ne_zero.2 Fintype.card_ne_zero
 
--- DISSOLVED: sum_ne_zero_iff_eq_zero
+lemma sum_ne_zero_iff_eq_zero : ∑ x, ψ x ≠ 0 ↔ ψ = 0 := sum_eq_zero_iff_ne_zero.not_left
 
 end CommSemiring
 
@@ -412,7 +314,8 @@ section MonoidWithZero
 
 variable {A M₀ : Type*} [AddGroup A] [MonoidWithZero M₀] [Nontrivial M₀]
 
--- DISSOLVED: coe_ne_zero
+@[simp] lemma coe_ne_zero (ψ : AddChar A M₀) : (ψ : A → M₀) ≠ 0 :=
+  ne_iff.2 ⟨0, fun h ↦ by simpa only [h, Pi.zero_apply, zero_ne_one] using map_zero_eq_one ψ⟩
 
 end MonoidWithZero
 

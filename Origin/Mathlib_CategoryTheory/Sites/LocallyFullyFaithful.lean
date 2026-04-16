@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.LocallySurjective
 
+noncomputable section
+
 /-!
 # Locally fully faithful functors into sites
 
@@ -50,13 +52,6 @@ def Sieve.equalizer {U V : C} (f₁ f₂ : U ⟶ V) : Sieve U where
 
 @[simp]
 lemma Sieve.equalizer_self {U V : C} (f : U ⟶ V) : equalizer f f = ⊤ := by ext; simp
-
-lemma Sieve.equalizer_eq_equalizerSieve {U V : C} (f₁ f₂ : U ⟶ V) :
-    Sieve.equalizer f₁ f₂ = Presheaf.equalizerSieve (F := yoneda.obj _) f₁ f₂ := rfl
-
-lemma Functor.imageSieve_eq_imageSieve {D : Type uD} [Category.{vC} D] (G : C ⥤ D) {U V : C}
-    (f : G.obj U ⟶ G.obj V) :
-    G.imageSieve f = Presheaf.imageSieve (yonedaMap G V) f := rfl
 
 open Presieve Opposite
 

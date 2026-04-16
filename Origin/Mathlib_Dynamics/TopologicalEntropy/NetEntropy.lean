@@ -5,6 +5,8 @@ Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Dynamics.TopologicalEntropy.CoverEntropy
 
+noncomputable section
+
 /-!
 # Topological entropy via nets
 We implement Bowen-Dinaburg's definitions of the topological entropy, via nets.

@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/Basic.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Map
@@ -9,6 +9,8 @@ import Mathlib.Data.Set.Finite.Range
 import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Data.Setoid.Basic
 import Mathlib.GroupTheory.GroupAction.Defs
+
+noncomputable section
 
 /-!
 # Basic properties of group actions
@@ -90,7 +92,12 @@ end FixedPoints
 
 end MulAction
 
--- DISSOLVED: smul_cancel_of_non_zero_divisor
+theorem smul_cancel_of_non_zero_divisor {M R : Type*} [Monoid M] [NonUnitalNonAssocRing R]
+    [DistribMulAction M R] (k : M) (h : ∀ x : R, k • x = 0 → x = 0) {a b : R} (h' : k • a = k • b) :
+    a = b := by
+  rw [← sub_eq_zero]
+  refine h _ ?_
+  rw [smul_sub, h', sub_self]
 
 namespace MulAction
 

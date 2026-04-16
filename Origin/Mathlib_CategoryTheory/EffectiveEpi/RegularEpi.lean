@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.RegularMono
 import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
+noncomputable section
+
 /-!
 
 # The relationship between effective and regular epimorphisms.

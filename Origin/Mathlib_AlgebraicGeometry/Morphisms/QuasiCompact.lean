@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.UnderlyingMap
 import Mathlib.Topology.Spectral.Hom
 import Mathlib.AlgebraicGeometry.Limits
 
+noncomputable section
+
 /-!
 # Quasi-compact morphisms
 

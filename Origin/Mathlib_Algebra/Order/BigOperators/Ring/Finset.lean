@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/BigOperators/Ring/Finset.lean
-Genuine: 18 | Conflates: 3 | Dissolved: 0 | Infrastructure: 0
+Genuine: 19 | Conflates: 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.AbsoluteValue
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.BigOperators.Ring.Multiset
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 # Big operators on a finset in ordered rings
@@ -236,6 +238,21 @@ open Qq Lean Meta Finset
 private alias ⟨_, prod_ne_zero⟩ := prod_ne_zero_iff
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `positivity` extension which proves that `∏ i ∈ s, f i` is nonnegative if `f` is, and
+
+positive if each `f i` is.
+
+TODO: The following example does not work
+
+```
+
+example (s : Finset ℕ) (f : ℕ → ℤ) (hf : ∀ n, 0 ≤ f n) : 0 ≤ s.prod f := by positivity
+
+```
+
+because `compareHyp` can't look for assumptions behind binders.
+
+-/
 
 @[positivity Finset.prod _ _]
 def evalFinsetProd : PositivityExt where eval {u α} zα pα e := do

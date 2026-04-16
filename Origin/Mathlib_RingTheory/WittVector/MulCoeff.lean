@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Supported
 import Mathlib.RingTheory.WittVector.Truncated
 
+noncomputable section
+
 /-!
 # Leading terms of Witt vector multiplication
 

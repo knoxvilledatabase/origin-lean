@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/EisensteinCriterion.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Cast.WithTop
 import Mathlib.RingTheory.Ideal.Quotient.Basic
 import Mathlib.RingTheory.Polynomial.Content
 import Mathlib.RingTheory.Prime
+
+noncomputable section
 
 /-!
 # Eisenstein's criterion
@@ -51,9 +53,18 @@ theorem le_natDegree_of_map_eq_mul_X_pow {n : ℕ} {P : Ideal R} (hP : P.IsPrime
       _ ≤ natDegree q := degree_le_natDegree
       )
 
--- DISSOLVED: eval_zero_mem_ideal_of_eq_mul_X_pow
+theorem eval_zero_mem_ideal_of_eq_mul_X_pow {n : ℕ} {P : Ideal R} {q : R[X]}
+    {c : Polynomial (R ⧸ P)} (hq : map (mk P) q = c * X ^ n) (hn0 : n ≠ 0) : eval 0 q ∈ P := by
+  rw [← coeff_zero_eq_eval_zero, ← eq_zero_iff_mem, ← coeff_map, hq,
+    coeff_zero_eq_eval_zero, eval_mul, eval_pow, eval_X, zero_pow hn0, mul_zero]
 
--- DISSOLVED: isUnit_of_natDegree_eq_zero_of_isPrimitive
+theorem isUnit_of_natDegree_eq_zero_of_isPrimitive {p q : R[X]}
+    -- Porting note: stated using `IsPrimitive` which is defeq to old statement.
+    (hu : IsPrimitive (p * q)) (hpm : p.natDegree = 0) : IsUnit p := by
+  rw [eq_C_of_degree_le_zero (natDegree_eq_zero_iff_degree_le_zero.1 hpm), isUnit_C]
+  refine hu _ ?_
+  rw [← eq_C_of_degree_le_zero (natDegree_eq_zero_iff_degree_le_zero.1 hpm)]
+  exact dvd_mul_right _ _
 
 end EisensteinCriterionAux
 

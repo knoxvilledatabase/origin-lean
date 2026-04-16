@@ -5,6 +5,8 @@ Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Geometry.Manifold.ChartedSpace
 
+noncomputable section
+
 /-!
 # Local properties invariant under a groupoid
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Algebra/Module/Multilinear/Basic.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.LinearAlgebra.Multilinear.Basic
+
+noncomputable section
 
 /-!
 # Continuous multilinear maps
@@ -83,10 +85,6 @@ initialize_simps_projections ContinuousMultilinearMap (-toMultilinearMap,
 theorem coe_continuous : Continuous (f : (∀ i, M₁ i) → M₂) :=
   f.cont
 
-@[simp]
-theorem coe_coe : (f.toMultilinearMap : (∀ i, M₁ i) → M₂) = f :=
-  rfl
-
 @[ext]
 theorem ext {f f' : ContinuousMultilinearMap R M₁ M₂} (H : ∀ x, f x = f' x) : f = f' :=
   DFunLike.ext _ _ H
@@ -136,11 +134,6 @@ instance : SMul R' (ContinuousMultilinearMap A M₁ M₂) :=
   ⟨fun c f => { c • f.toMultilinearMap with cont := f.cont.const_smul c }⟩
 
 @[simp]
-theorem smul_apply (f : ContinuousMultilinearMap A M₁ M₂) (c : R') (m : ∀ i, M₁ i) :
-    (c • f) m = c • f m :=
-  rfl
-
-@[simp]
 theorem toMultilinearMap_smul (c : R') (f : ContinuousMultilinearMap A M₁ M₂) :
     (c • f).toMultilinearMap = c • f.toMultilinearMap :=
   rfl
@@ -167,10 +160,6 @@ variable [ContinuousAdd M₂]
 
 instance : Add (ContinuousMultilinearMap R M₁ M₂) :=
   ⟨fun f f' => ⟨f.toMultilinearMap + f'.toMultilinearMap, f.cont.add f'.cont⟩⟩
-
-@[simp]
-theorem add_apply (m : ∀ i, M₁ i) : (f + f') m = f m + f' m :=
-  rfl
 
 @[simp]
 theorem toMultilinearMap_add (f g : ContinuousMultilinearMap R M₁ M₂) :
@@ -200,27 +189,11 @@ def prod (f : ContinuousMultilinearMap R M₁ M₂) (g : ContinuousMultilinearMa
     ContinuousMultilinearMap R M₁ (M₂ × M₃) :=
   { f.toMultilinearMap.prod g.toMultilinearMap with cont := f.cont.prod_mk g.cont }
 
-@[simp]
-theorem prod_apply (f : ContinuousMultilinearMap R M₁ M₂) (g : ContinuousMultilinearMap R M₁ M₃)
-    (m : ∀ i, M₁ i) : (f.prod g) m = (f m, g m) :=
-  rfl
-
 def pi {ι' : Type*} {M' : ι' → Type*} [∀ i, AddCommMonoid (M' i)] [∀ i, TopologicalSpace (M' i)]
     [∀ i, Module R (M' i)] (f : ∀ i, ContinuousMultilinearMap R M₁ (M' i)) :
     ContinuousMultilinearMap R M₁ (∀ i, M' i) where
   cont := continuous_pi fun i => (f i).coe_continuous
   toMultilinearMap := MultilinearMap.pi fun i => (f i).toMultilinearMap
-
-@[simp]
-theorem coe_pi {ι' : Type*} {M' : ι' → Type*} [∀ i, AddCommMonoid (M' i)]
-    [∀ i, TopologicalSpace (M' i)] [∀ i, Module R (M' i)]
-    (f : ∀ i, ContinuousMultilinearMap R M₁ (M' i)) : ⇑(pi f) = fun m j => f j m :=
-  rfl
-
-theorem pi_apply {ι' : Type*} {M' : ι' → Type*} [∀ i, AddCommMonoid (M' i)]
-    [∀ i, TopologicalSpace (M' i)] [∀ i, Module R (M' i)]
-    (f : ∀ i, ContinuousMultilinearMap R M₁ (M' i)) (m : ∀ i, M₁ i) (j : ι') : pi f m j = f j m :=
-  rfl
 
 @[simps! toMultilinearMap apply_coe]
 def codRestrict (f : ContinuousMultilinearMap R M₁ M₂) (p : Submodule R M₂) (h : ∀ v, f v ∈ p) :
@@ -255,12 +228,6 @@ def compContinuousLinearMap (g : ContinuousMultilinearMap R M₁' M₄)
     (f : ∀ i : ι, M₁ i →L[R] M₁' i) : ContinuousMultilinearMap R M₁ M₄ :=
   { g.toMultilinearMap.compLinearMap fun i => (f i).toLinearMap with
     cont := g.cont.comp <| continuous_pi fun j => (f j).cont.comp <| continuous_apply _ }
-
-@[simp]
-theorem compContinuousLinearMap_apply (g : ContinuousMultilinearMap R M₁' M₄)
-    (f : ∀ i : ι, M₁ i →L[R] M₁' i) (m : ∀ i, M₁ i) :
-    g.compContinuousLinearMap f m = g fun i => f i <| m i :=
-  rfl
 
 def _root_.ContinuousLinearMap.compContinuousMultilinearMap (g : M₂ →L[R] M₃)
     (f : ContinuousMultilinearMap R M₁ M₂) : ContinuousMultilinearMap R M₁ M₃ :=
@@ -361,10 +328,6 @@ def restrictScalars (f : ContinuousMultilinearMap A M₁ M₂) : ContinuousMulti
   toMultilinearMap := f.toMultilinearMap.restrictScalars R
   cont := f.cont
 
-@[simp]
-theorem coe_restrictScalars (f : ContinuousMultilinearMap A M₁ M₂) : ⇑(f.restrictScalars R) = f :=
-  rfl
-
 end RestrictScalar
 
 end Semiring
@@ -388,16 +351,8 @@ variable [TopologicalAddGroup M₂]
 instance : Neg (ContinuousMultilinearMap R M₁ M₂) :=
   ⟨fun f => { -f.toMultilinearMap with cont := f.cont.neg }⟩
 
-@[simp]
-theorem neg_apply (m : ∀ i, M₁ i) : (-f) m = -f m :=
-  rfl
-
 instance : Sub (ContinuousMultilinearMap R M₁ M₂) :=
   ⟨fun f g => { f.toMultilinearMap - g.toMultilinearMap with cont := f.cont.sub g.cont }⟩
-
-@[simp]
-theorem sub_apply (m : ∀ i, M₁ i) : (f - f') m = f m - f' m :=
-  rfl
 
 instance : AddCommGroup (ContinuousMultilinearMap R M₁ M₂) :=
   toMultilinearMap_injective.addCommGroup _ rfl (fun _ _ => rfl) (fun _ => rfl) (fun _ _ => rfl)
@@ -479,10 +434,6 @@ protected def mkPiAlgebra : ContinuousMultilinearMap R (fun _ : ι => A) A where
   cont := continuous_finset_prod _ fun _ _ => continuous_apply _
   toMultilinearMap := MultilinearMap.mkPiAlgebra R ι A
 
-@[simp]
-theorem mkPiAlgebra_apply (m : ι → A) : ContinuousMultilinearMap.mkPiAlgebra R ι A m = ∏ i, m i :=
-  rfl
-
 end CommAlgebra
 
 section Algebra
@@ -498,11 +449,6 @@ protected def mkPiAlgebraFin : A[×n]→L[R] A where
   toMultilinearMap := MultilinearMap.mkPiAlgebraFin R n A
 
 variable {R n A}
-
-@[simp]
-theorem mkPiAlgebraFin_apply (m : Fin n → A) :
-    ContinuousMultilinearMap.mkPiAlgebraFin R n A m = (List.ofFn m).prod :=
-  rfl
 
 end Algebra
 

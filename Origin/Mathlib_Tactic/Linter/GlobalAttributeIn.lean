@@ -1,10 +1,12 @@
 /-
 Extracted from Tactic/Linter/GlobalAttributeIn.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Lean.Elab.Command
 import Mathlib.Tactic.Linter.Header
+
+noncomputable section
 
 /-!
 # Linter for `attribute [...] in` declarations
@@ -50,24 +52,27 @@ For *removing* attributes, the `in` works as expected.
 error: failed to synthesize
   Add Nat
 -/
-
+#guard_msgs in
 attribute [-instance] instAddNat in
-
 #synth Add Nat
 
+-- the `instance` persists
+/-- info: instAddNat -/
+#guard_msgs in
 #synth Add Nat
 
 @[simp]
 theorem what : False := sorry
 
+/-- error: simp made no progress -/
+#guard_msgs in
 attribute [-simp] what in
-
 example : False := by simp
 
+-- the `simp` attribute persists
+#guard_msgs in
 example : False := by simp
-
 ```
-
 -/
 
 open Lean Elab Command

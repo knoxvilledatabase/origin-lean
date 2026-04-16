@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import Mathlib.RingTheory.Finiteness.Basic
 
+noncomputable section
+
 /-!
 # Finiteness of (sub)modules and finitely supported functions
 

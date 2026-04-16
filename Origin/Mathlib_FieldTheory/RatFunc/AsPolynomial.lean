@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/RatFunc/AsPolynomial.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 6 | Infrastructure: 6
+Genuine: 21 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.FieldTheory.RatFunc.Basic
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.EuclideanDomain
 import Mathlib.RingTheory.DedekindDomain.AdicValuation
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.Polynomial.Content
+
+noncomputable section
 
 /-!
 # Generalities on the polynomial structure of rational functions
@@ -50,14 +52,6 @@ def C : K →+* RatFunc K := algebraMap _ _
 theorem algebraMap_eq_C : algebraMap K (RatFunc K) = C :=
   rfl
 
-@[simp]
-theorem algebraMap_C (a : K) : algebraMap K[X] (RatFunc K) (Polynomial.C a) = C a :=
-  rfl
-
-@[simp]
-theorem algebraMap_comp_C : (algebraMap K[X] (RatFunc K)).comp Polynomial.C = C :=
-  rfl
-
 theorem smul_eq_C_mul (r : K) (x : RatFunc K) : r • x = C r * x := by
   rw [Algebra.smul_def, algebraMap_eq_C]
 
@@ -90,7 +84,8 @@ theorem num_X : num (X : RatFunc K) = Polynomial.X :=
 theorem denom_X : denom (X : RatFunc K) = 1 :=
   denom_algebraMap _
 
--- DISSOLVED: X_ne_zero
+theorem X_ne_zero : (X : RatFunc K) ≠ 0 :=
+  RatFunc.algebraMap_ne_zero Polynomial.X_ne_zero
 
 variable {L : Type u} [Field L]
 
@@ -102,7 +97,9 @@ variable {f : K →+* L} {a : L}
 theorem eval_eq_zero_of_eval₂_denom_eq_zero {x : RatFunc K}
     (h : Polynomial.eval₂ f a (denom x) = 0) : eval f a x = 0 := by rw [eval, h, div_zero]
 
--- DISSOLVED: eval₂_denom_ne_zero
+theorem eval₂_denom_ne_zero {x : RatFunc K} (h : eval f a x ≠ 0) :
+    Polynomial.eval₂ f a (denom x) ≠ 0 :=
+  mt eval_eq_zero_of_eval₂_denom_eq_zero h
 
 variable (f a)
 
@@ -123,9 +120,31 @@ theorem eval_algebraMap {S : Type*} [CommSemiring S] [Algebra S K[X]] (p : S) :
     eval f a (algebraMap _ _ p) = (algebraMap _ K[X] p).eval₂ f a := by
   simp [eval, IsScalarTower.algebraMap_apply S K[X] (RatFunc K)]
 
--- DISSOLVED: eval_add
+theorem eval_add {x y : RatFunc K} (hx : Polynomial.eval₂ f a (denom x) ≠ 0)
+    (hy : Polynomial.eval₂ f a (denom y) ≠ 0) : eval f a (x + y) = eval f a x + eval f a y := by
+  unfold eval
+  by_cases hxy : Polynomial.eval₂ f a (denom (x + y)) = 0
+  · have := Polynomial.eval₂_eq_zero_of_dvd_of_eval₂_eq_zero f a (denom_add_dvd x y) hxy
+    rw [Polynomial.eval₂_mul] at this
+    cases mul_eq_zero.mp this <;> contradiction
+  rw [div_add_div _ _ hx hy, eq_div_iff (mul_ne_zero hx hy), div_eq_mul_inv, mul_right_comm, ←
+    div_eq_mul_inv, div_eq_iff hxy]
+  simp only [← Polynomial.eval₂_mul, ← Polynomial.eval₂_add]
+  congr 1
+  apply num_denom_add
 
--- DISSOLVED: eval_mul
+theorem eval_mul {x y : RatFunc K} (hx : Polynomial.eval₂ f a (denom x) ≠ 0)
+    (hy : Polynomial.eval₂ f a (denom y) ≠ 0) : eval f a (x * y) = eval f a x * eval f a y := by
+  unfold eval
+  by_cases hxy : Polynomial.eval₂ f a (denom (x * y)) = 0
+  · have := Polynomial.eval₂_eq_zero_of_dvd_of_eval₂_eq_zero f a (denom_mul_dvd x y) hxy
+    rw [Polynomial.eval₂_mul] at this
+    cases mul_eq_zero.mp this <;> contradiction
+  rw [div_mul_div_comm, eq_div_iff (mul_ne_zero hx hy), div_eq_mul_inv, mul_right_comm, ←
+    div_eq_mul_inv, div_eq_iff hxy]
+  repeat' rw [← Polynomial.eval₂_mul]
+  congr 1
+  apply num_denom_mul
 
 end Field
 
@@ -156,7 +175,10 @@ theorem valuation_X_eq_neg_one :
   · exact Polynomial.X_ne_zero
   · exact idealX_span K
 
--- DISSOLVED: valuation_of_mk
+theorem valuation_of_mk (f : Polynomial K) {g : Polynomial K} (hg : g ≠ 0) :
+    (Polynomial.idealX K).valuation (RatFunc.mk f g) =
+      (Polynomial.idealX K).intValuation f / (Polynomial.idealX K).intValuation g := by
+  simp only [RatFunc.mk_eq_mk' _ hg, valuation_of_mk']
 
 end Polynomial
 

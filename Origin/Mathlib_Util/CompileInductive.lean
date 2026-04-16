@@ -9,6 +9,8 @@ import Lean.Compiler.CSimpAttr
 import Lean.Util.FoldConsts
 import Lean.Data.AssocList
 
+noncomputable section
+
 /-!
 # Define the `compile_inductive%` command.
 
@@ -71,17 +73,11 @@ def isCompiled (env : Environment) (n : Name) : Bool :=
   env.contains (n.str "_cstage2") || (Compiler.CSimp.ext.getState env).map.contains n
 
 elab tk:"compile_def% " i:ident : command => Command.liftTermElabM do
-
   let n ← realizeGlobalConstNoOverloadWithInfo i
-
   if isCompiled (← getEnv) n then
-
     logWarningAt tk m!"already compiled {n}"
-
     return
-
   let dv ← withRef i <| getConstInfoDefn n
-
   withRef tk <| compileDefn dv
 
 private def compileStructOnly (iv : InductiveVal) (rv : RecursorVal) : MetaM Unit := do
@@ -199,11 +195,8 @@ partial def compileSizeOf (iv : InductiveVal) : MetaM Unit := do
 end
 
 elab tk:"compile_inductive% " i:ident : command => Command.liftTermElabM do
-
   let n ← realizeGlobalConstNoOverloadWithInfo i
-
   let iv ← withRef i <| getConstInfoInduct n
-
   withRef tk <| compileInductive iv
 
 end Mathlib.Util
@@ -241,10 +234,6 @@ private unsafe def Float.mkUnsafe : floatSpec.float → Float := unsafeCast
 @[implemented_by Float.valUnsafe] private def Float.valImpl (x : Float) : floatSpec.float := x.1
 
 @[implemented_by Float.mkUnsafe] private def Float.mkImpl (x : floatSpec.float) : Float := ⟨x⟩
-
-@[csimp] private theorem Float.val_eq : @Float.val = Float.valImpl := rfl
-
-@[csimp] private theorem Float.mk_eq : @Float.mk = Float.mkImpl := rfl
 
 open Lean Meta Elab Mathlib.Util in
 

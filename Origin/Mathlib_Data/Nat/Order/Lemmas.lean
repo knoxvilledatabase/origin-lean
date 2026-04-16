@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Defs
 import Mathlib.Data.Nat.Find
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Further lemmas about the natural numbers
 
@@ -25,10 +27,6 @@ instance Subtype.orderBot (s : Set ℕ) [DecidablePred (· ∈ s)] [h : Nonempty
 
 instance Subtype.semilatticeSup (s : Set ℕ) : SemilatticeSup s :=
   { Subtype.instLinearOrder s, LinearOrder.toLattice with }
-
-theorem Subtype.coe_bot {s : Set ℕ} [DecidablePred (· ∈ s)] [h : Nonempty s] :
-    ((⊥ : s) : ℕ) = Nat.find (nonempty_subtype.1 h) :=
-  rfl
 
 theorem set_eq_univ {S : Set ℕ} : S = Set.univ ↔ 0 ∈ S ∧ ∀ k : ℕ, k ∈ S → k + 1 ∈ S :=
   ⟨by rintro rfl; simp, fun ⟨h0, hs⟩ => Set.eq_univ_of_forall (set_induction h0 hs)⟩

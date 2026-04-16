@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.TypeStar
 import Mathlib.Tactic.ToAdditive
 
+noncomputable section
+
 /-!
 # Notations for operations involving order and algebraic structure
 
@@ -42,3 +44,11 @@ export LeOnePart (leOnePart)
 export PosPart (posPart)
 
 export NegPart (negPart)
+
+@[inherit_doc] postfix:max "⁺ᵐ " => OneLePart.oneLePart
+
+@[inherit_doc] postfix:max "⁻ᵐ" => LeOnePart.leOnePart
+
+@[inherit_doc] postfix:max "⁺" => PosPart.posPart
+
+@[inherit_doc] postfix:max "⁻" => NegPart.negPart

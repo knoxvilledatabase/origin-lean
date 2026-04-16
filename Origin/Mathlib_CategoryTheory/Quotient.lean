@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.NatIso
 import Mathlib.CategoryTheory.EqToHom
 
+noncomputable section
+
 /-!
 # Quotient category
 
@@ -72,11 +74,6 @@ def comp ⦃a b c : Quotient r⦄ : Hom r a b → Hom r b c → Hom r a c := fun
       Quot.liftOn hg (fun g ↦ Quot.mk _ (f ≫ g)) fun g₁ g₂ h ↦
         Quot.sound <| comp_left r f g₁ g₂ h)
     fun f₁ f₂ h ↦ Quot.inductionOn hg fun g ↦ Quot.sound <| comp_right r g f₁ f₂ h
-
-@[simp]
-theorem comp_mk {a b c : Quotient r} (f : a.as ⟶ b.as) (g : b.as ⟶ c.as) :
-    comp r (Quot.mk _ f) (Quot.mk _ g) = Quot.mk _ (f ≫ g) :=
-  rfl
 
 instance category : Category (Quotient r) where
   Hom := Hom r
@@ -177,17 +174,6 @@ lemma lift_unique' (F₁ F₂ : Quotient r ⥤ D) (h : functor r ⋙ F₁ = func
 def lift.isLift : functor r ⋙ lift r F H ≅ F :=
   NatIso.ofComponents fun _ ↦ Iso.refl _
 
-@[simp]
-theorem lift.isLift_hom (X : C) : (lift.isLift r F H).hom.app X = 𝟙 (F.obj X) :=
-  rfl
-
-@[simp]
-theorem lift.isLift_inv (X : C) : (lift.isLift r F H).inv.app X = 𝟙 (F.obj X) :=
-  rfl
-
-theorem lift_obj_functor_obj (X : C) :
-    (lift r F H).obj ((functor r).obj X) = F.obj X := rfl
-
 theorem lift_map_functor_map {X Y : C} (f : X ⟶ Y) :
     (lift r F H).map ((functor r).map f) = F.map f := by
   rw [← NatIso.naturality_1 (lift.isLift r F H)]
@@ -208,11 +194,6 @@ def natTransLift {F G : Quotient r ⥤ D} (τ : Quotient.functor r ⋙ F ⟶ Quo
   naturality := fun ⟨X⟩ ⟨Y⟩ => by
     rintro ⟨f⟩
     exact τ.naturality f
-
-@[simp]
-lemma natTransLift_app (F G : Quotient r ⥤ D)
-    (τ : Quotient.functor r ⋙ F ⟶ Quotient.functor r ⋙ G) (X : C) :
-  (natTransLift r τ).app ((Quotient.functor r).obj X) = τ.app X := rfl
 
 @[reassoc]
 lemma comp_natTransLift {F G H : Quotient r ⥤ D}

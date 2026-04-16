@@ -9,6 +9,8 @@ import Mathlib.Util.AtomM
 import Mathlib.Data.List.TFAE
 import Mathlib.Tactic.ExtendDoc
 
+noncomputable section
+
 /-!
 # The Following Are Equivalent (TFAE)
 
@@ -67,51 +69,7 @@ end Parser
 
 open Parser
 
-  tfae_have 2 → 1 := sorry /- proof of Q → P -/
-
-  tfae_have 2 ↔ 3 := sorry /- proof of Q ↔ R -/
-
-  tfae_finish
-
-```
-
-All features of `have` are supported by `tfae_have`, including naming, matching,
-
-destructuring, and goal creation. These are demonstrated below.
-
-```lean4
-
-example : TFAE [P, Q] := by
-  -- assert `tfae_1_to_2 : P → Q`:
-  tfae_have 1 → 2 := sorry
-
-  tfae_have hpq : 1 → 2 := sorry
-
-  tfae_have 1 → 2
-
-  | p => f p
-
-  tfae_have ⟨pq, qp⟩ : 1 ↔ 2 := sorry
-
-  tfae_have h : 1 → 2 := f ?a
-
-  ...
-
-```
-
--/
-
 syntax (name := tfaeHave) "tfae_have " tfaeHaveDecl : tactic
-
-  tfae_have 2 → 1 := sorry /- proof of Q → P -/
-
-  tfae_have 2 ↔ 3 := sorry /- proof of Q ↔ R -/
-
-  tfae_finish
-
-```
-
--/
 
 syntax (name := tfaeFinish) "tfae_finish" : tactic
 

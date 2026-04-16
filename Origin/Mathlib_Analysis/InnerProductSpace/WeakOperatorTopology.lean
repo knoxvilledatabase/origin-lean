@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.LocallyConvex.WeakOperatorTopology
 
+noncomputable section
+
 /-!
 # The weak operator topology in Hilbert spaces
 

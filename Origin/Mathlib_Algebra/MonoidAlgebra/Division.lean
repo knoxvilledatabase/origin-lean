@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/MonoidAlgebra/Division.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Defs
+
+noncomputable section
 
 /-!
 # Division of `AddMonoidAlgebra` by monomials
@@ -56,12 +58,8 @@ theorem divOf_apply (g : G) (x : k[G]) (g' : G) : (x /ᵒᶠ g) g' = x (g + g') 
   rfl
 
 @[simp]
-theorem support_divOf (g : G) (x : k[G]) :
-    (x /ᵒᶠ g).support =
-      x.support.preimage (g + ·) (Function.Injective.injOn (add_right_injective g)) :=
-  rfl
-
--- DISSOLVED: zero_divOf
+theorem zero_divOf (g : G) : (0 : k[G]) /ᵒᶠ g = 0 :=
+  map_zero (Finsupp.comapDomain.addMonoidHom _)
 
 @[simp]
 theorem divOf_zero (x : k[G]) : x /ᵒᶠ 0 = x := by

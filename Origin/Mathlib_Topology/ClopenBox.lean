@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.CompactOpen
 import Mathlib.Topology.Sets.Closeds
 
+noncomputable section
+
 /-!
 # Clopen subsets in cartesian products
 

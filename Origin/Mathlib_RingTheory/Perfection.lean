@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Perfection.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 9 | Infrastructure: 18
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.ExpChar
@@ -10,6 +10,8 @@ import Mathlib.Algebra.CharP.Subring
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 import Mathlib.FieldTheory.Perfect
 import Mathlib.RingTheory.Valuation.Integers
+
+noncomputable section
 
 /-!
 # Ring Perfection and Tilt
@@ -88,9 +90,6 @@ def pthRoot : Ring.Perfection R p →+* Ring.Perfection R p where
 
 variable {R p}
 
-@[simp]
-theorem coeff_mk (f : ℕ → R) (hf) (n : ℕ) : coeff R p n ⟨f, hf⟩ = f n := rfl
-
 theorem coeff_pthRoot (f : Ring.Perfection R p) (n : ℕ) :
     coeff R p n (pthRoot R p f) = coeff R p (n + 1) f := rfl
 
@@ -121,9 +120,15 @@ theorem frobenius_pthRoot : (frobenius _ p).comp (pthRoot R p) = RingHom.id _ :=
       rw [RingHom.comp_apply, RingHom.id_apply, RingHom.map_frobenius, coeff_pthRoot,
         ← @RingHom.map_frobenius (Ring.Perfection R p) _ R, coeff_frobenius]
 
--- DISSOLVED: coeff_add_ne_zero
+theorem coeff_add_ne_zero {f : Ring.Perfection R p} {n : ℕ} (hfn : coeff R p n f ≠ 0) (k : ℕ) :
+    coeff R p (n + k) f ≠ 0 :=
+  Nat.recOn k hfn fun k ih h => ih <| by
+    erw [← coeff_pow_p, RingHom.map_pow, h, zero_pow hp.1.ne_zero]
 
--- DISSOLVED: coeff_ne_zero_of_le
+theorem coeff_ne_zero_of_le {f : Ring.Perfection R p} {m n : ℕ} (hfm : coeff R p m f ≠ 0)
+    (hmn : m ≤ n) : coeff R p n f ≠ 0 :=
+  let ⟨k, hk⟩ := Nat.exists_eq_add_of_le hmn
+  hk.symm ▸ coeff_add_ne_zero hfm k
 
 variable (R p)
 
@@ -221,9 +226,6 @@ noncomputable def equiv {π : P →+* R} (m : PerfectionMap p π) : P ≃+* Ring
       let ⟨x, hx⟩ := m.surjective f.1 f.2
       ⟨x, Perfection.ext <| hx⟩⟩
 
-theorem equiv_apply {π : P →+* R} (m : PerfectionMap p π) (x : P) :
-    m.equiv x = Perfection.lift p P R π x := rfl
-
 theorem comp_equiv {π : P →+* R} (m : PerfectionMap p π) (x : P) :
     Perfection.coeff R p 0 (m.equiv x) = π x := rfl
 
@@ -319,12 +321,26 @@ noncomputable def preVal (x : ModP K v O hv p) : ℝ≥0 :=
 
 variable {K v O hv p}
 
--- DISSOLVED: preVal_mk
+theorem preVal_mk {x : O} (hx : (Ideal.Quotient.mk _ x : ModP K v O hv p) ≠ 0) :
+    preVal K v O hv p (Ideal.Quotient.mk _ x) = v (algebraMap O K x) := by
+  obtain ⟨r, hr⟩ : ∃ (a : O), a * (p : O) = (Quotient.mk'' x).out - x :=
+    Ideal.mem_span_singleton'.1 <| Ideal.Quotient.eq.1 <| Quotient.sound' <| Quotient.mk_out' _
+  refine (if_neg hx).trans (v.map_eq_of_sub_lt <| lt_of_not_le ?_)
+  erw [← RingHom.map_sub, ← hr, hv.le_iff_dvd]
+  exact fun hprx =>
+    hx (Ideal.Quotient.eq_zero_iff_mem.2 <| Ideal.mem_span_singleton.2 <| dvd_of_mul_left_dvd hprx)
 
 theorem preVal_zero : preVal K v O hv p 0 = 0 :=
   if_pos rfl
 
--- DISSOLVED: preVal_mul
+theorem preVal_mul {x y : ModP K v O hv p} (hxy0 : x * y ≠ 0) :
+    preVal K v O hv p (x * y) = preVal K v O hv p x * preVal K v O hv p y := by
+  have hx0 : x ≠ 0 := mt (by rintro rfl; rw [zero_mul]) hxy0
+  have hy0 : y ≠ 0 := mt (by rintro rfl; rw [mul_zero]) hxy0
+  obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective x
+  obtain ⟨s, rfl⟩ := Ideal.Quotient.mk_surjective y
+  rw [← map_mul (Ideal.Quotient.mk (Ideal.span {↑p})) r s] at hxy0 ⊢
+  rw [preVal_mk hx0, preVal_mk hy0, preVal_mk hxy0, RingHom.map_mul, v.map_mul]
 
 theorem preVal_add (x y : ModP K v O hv p) :
     preVal K v O hv p (x + y) ≤ max (preVal K v O hv p x) (preVal K v O hv p y) := by
@@ -339,7 +355,12 @@ theorem preVal_add (x y : ModP K v O hv p) :
   rw [← map_add (Ideal.Quotient.mk (Ideal.span {↑p})) r s] at hxy0 ⊢
   rw [preVal_mk hx0, preVal_mk hy0, preVal_mk hxy0, RingHom.map_add]; exact v.map_add _ _
 
--- DISSOLVED: v_p_lt_preVal
+theorem v_p_lt_preVal {x : ModP K v O hv p} : v p < preVal K v O hv p x ↔ x ≠ 0 := by
+  refine ⟨fun h hx => by rw [hx, preVal_zero] at h; exact not_lt_zero' h,
+    fun h => lt_of_not_le fun hp => h ?_⟩
+  obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective x
+  rw [preVal_mk h, ← map_natCast (algebraMap O K) p, hv.le_iff_dvd] at hp
+  rw [Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]; exact hp
 
 theorem preVal_eq_zero {x : ModP K v O hv p} : preVal K v O hv p x = 0 ↔ x = 0 :=
   ⟨fun hvx =>
@@ -352,7 +373,10 @@ variable (hv) -- Porting note: Originally `(hv hvp)`. Removed `(hvp)` because it
 
 include hv
 
--- DISSOLVED: v_p_lt_val
+theorem v_p_lt_val {x : O} :
+    v p < v (algebraMap O K x) ↔ (Ideal.Quotient.mk _ x : ModP K v O hv p) ≠ 0 := by
+  rw [lt_iff_not_le, not_iff_not, ← map_natCast (algebraMap O K) p, hv.le_iff_dvd,
+    Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
 
 open NNReal
 
@@ -360,7 +384,24 @@ variable {hv} -- Porting note: Originally `{hv} (hvp)`. Removed `(hvp)` because 
 
 variable [hp : Fact p.Prime]
 
--- DISSOLVED: mul_ne_zero_of_pow_p_ne_zero
+theorem mul_ne_zero_of_pow_p_ne_zero {x y : ModP K v O hv p} (hx : x ^ p ≠ 0) (hy : y ^ p ≠ 0) :
+    x * y ≠ 0 := by
+  obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective x
+  obtain ⟨s, rfl⟩ := Ideal.Quotient.mk_surjective y
+  have h1p : (0 : ℝ) < 1 / p := one_div_pos.2 (Nat.cast_pos.2 hp.1.pos)
+  rw [← (Ideal.Quotient.mk (Ideal.span {(p : O)})).map_mul]
+  rw [← (Ideal.Quotient.mk (Ideal.span {(p : O)})).map_pow] at hx hy
+  rw [← v_p_lt_val hv] at hx hy ⊢
+  rw [RingHom.map_pow, v.map_pow, ← rpow_lt_rpow_iff h1p, ← rpow_natCast, ← rpow_mul,
+    mul_one_div_cancel (Nat.cast_ne_zero.2 hp.1.ne_zero : (p : ℝ) ≠ 0), rpow_one] at hx hy
+  rw [RingHom.map_mul, v.map_mul]; refine lt_of_le_of_lt ?_ (mul_lt_mul'' hx hy zero_le' zero_le')
+  by_cases hvp : v p = 0
+  · rw [hvp]; exact zero_le _
+  replace hvp := zero_lt_iff.2 hvp
+  conv_lhs => rw [← rpow_one (v p)]
+  rw [← rpow_add (ne_of_gt hvp)]
+  refine rpow_le_rpow_of_exponent_ge hvp (map_natCast (algebraMap O K) p ▸ hv.2 _) ?_
+  rw [← add_div, div_le_one (Nat.cast_pos.2 hp.1.pos : 0 < (p : ℝ))]; exact mod_cast hp.1.two_le
 
 end Classical
 
@@ -392,9 +433,26 @@ noncomputable def valAux (f : PreTilt K v O hv p) : ℝ≥0 :=
 
 variable {K v O hv p}
 
--- DISSOLVED: coeff_nat_find_add_ne_zero
+theorem coeff_nat_find_add_ne_zero {f : PreTilt K v O hv p} {h : ∃ n, coeff _ _ n f ≠ 0} (k : ℕ) :
+    coeff _ _ (Nat.find h + k) f ≠ 0 :=
+  coeff_add_ne_zero (Nat.find_spec h) k
 
--- DISSOLVED: valAux_eq
+theorem valAux_eq {f : PreTilt K v O hv p} {n : ℕ} (hfn : coeff _ _ n f ≠ 0) :
+    valAux K v O hv p f = ModP.preVal K v O hv p (coeff _ _ n f) ^ p ^ n := by
+  have h : ∃ n, coeff _ _ n f ≠ 0 := ⟨n, hfn⟩
+  rw [valAux, dif_pos h]
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le (Nat.find_min' h hfn)
+  induction' k with k ih
+  · rfl
+  obtain ⟨x, hx⟩ := Ideal.Quotient.mk_surjective (coeff (ModP K v O hv p) p (Nat.find h + k + 1) f)
+  have h1 : (Ideal.Quotient.mk _ x : ModP K v O hv p) ≠ 0 := hx.symm ▸ hfn
+  have h2 : (Ideal.Quotient.mk _ (x ^ p) : ModP K v O hv p) ≠ 0 := by
+    erw [RingHom.map_pow, hx, ← RingHom.map_pow, coeff_pow_p]
+    exact coeff_nat_find_add_ne_zero k
+  erw [ih (coeff_nat_find_add_ne_zero k), ← hx, ← coeff_pow_p, RingHom.map_pow, ← hx,
+    ← RingHom.map_pow, ModP.preVal_mk h1, ModP.preVal_mk h2, RingHom.map_pow, v.map_pow, ← pow_mul,
+    pow_succ']
+  rfl
 
 theorem valAux_zero : valAux K v O hv p 0 = 0 :=
   dif_neg fun ⟨_, hn⟩ => hn rfl

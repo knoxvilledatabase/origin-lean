@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Homology
 
+noncomputable section
+
 /-!
 # Quasi-isomorphisms of short complexes
 

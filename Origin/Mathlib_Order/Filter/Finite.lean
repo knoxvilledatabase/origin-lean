@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Order.Filter.Basic
 
+noncomputable section
+
 /-!
 # Results filters related to finiteness.
 

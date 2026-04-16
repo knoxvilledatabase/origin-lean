@@ -1,12 +1,14 @@
 /-
 Extracted from FieldTheory/Finite/Basic.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 12 | Infrastructure: 2
+Genuine: 47 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Separable
 import Mathlib.RingTheory.IntegralDomain
 import Mathlib.Algebra.CharP.Reduced
 import Mathlib.Tactic.ApplyFun
+
+noncomputable section
 
 /-!
 # Finite fields
@@ -101,7 +103,32 @@ theorem prod_univ_units_id_eq_neg_one [CommRing K] [IsDomain K] [Fintype Kˣ] :
         (fun a => by simp [@inv_eq_iff_eq_inv _ _ a]) (by simp)
     rw [← insert_erase (mem_univ (-1 : Kˣ)), prod_insert (not_mem_erase _ _), this, mul_one]
 
--- DISSOLVED: card_cast_subgroup_card_ne_zero
+-- CONFLATES (assumes ground = zero): card_cast_subgroup_card_ne_zero
+theorem card_cast_subgroup_card_ne_zero [Ring K] [NoZeroDivisors K] [Nontrivial K]
+    (G : Subgroup Kˣ) [Fintype G] : (Fintype.card G : K) ≠ 0 := by
+  let n := Fintype.card G
+  intro nzero
+  have ⟨p, char_p⟩ := CharP.exists K
+  have hd : p ∣ n := (CharP.cast_eq_zero_iff K p n).mp nzero
+  cases CharP.char_is_prime_or_zero K p with
+  | inr pzero =>
+    exact (Fintype.card_pos).ne' <| Nat.eq_zero_of_zero_dvd <| pzero ▸ hd
+  | inl pprime =>
+    have fact_pprime := Fact.mk pprime
+    -- G has an element x of order p by Cauchy's theorem
+    have ⟨x, hx⟩ := exists_prime_orderOf_dvd_card p hd
+    -- F has an element u (= ↑↑x) of order p
+    let u := ((x : Kˣ) : K)
+    have hu : orderOf u = p := by rwa [orderOf_units, Subgroup.orderOf_coe]
+    -- u ^ p = 1 implies (u - 1) ^ p = 0 and hence u = 1 ...
+    have h : u = 1 := by
+      rw [← sub_left_inj, sub_self 1]
+      apply pow_eq_zero (n := p)
+      rw [sub_pow_char_of_commute, one_pow, ← hu, pow_orderOf_eq_one, sub_self]
+      exact Commute.one_right u
+    -- ... meaning x didn't have order p after all, contradiction
+    apply pprime.one_lt.ne
+    rw [← hu, h, orderOf_one]
 
 theorem sum_subgroup_units_eq_zero [Ring K] [NoZeroDivisors K]
     {G : Subgroup Kˣ} [Fintype G] (hg : G ≠ ⊥) :
@@ -138,13 +165,53 @@ theorem sum_subgroup_units [Ring K] [NoZeroDivisors K]
   · simp only [G_bot, ite_false]
     exact sum_subgroup_units_eq_zero G_bot
 
--- DISSOLVED: sum_subgroup_pow_eq_zero
+@[simp]
+theorem sum_subgroup_pow_eq_zero [CommRing K] [NoZeroDivisors K]
+    {G : Subgroup Kˣ} [Fintype G] {k : ℕ} (k_pos : k ≠ 0) (k_lt_card_G : k < Fintype.card G) :
+    ∑ x : G, ((x : Kˣ) : K) ^ k = 0 := by
+  rw [← Nat.card_eq_fintype_card] at k_lt_card_G
+  nontriviality K
+  have := NoZeroDivisors.to_isDomain K
+  rcases (exists_pow_ne_one_of_isCyclic k_pos k_lt_card_G) with ⟨a, ha⟩
+  rw [Finset.sum_eq_multiset_sum]
+  have h_multiset_map :
+    Finset.univ.val.map (fun x : G => ((x : Kˣ) : K) ^ k) =
+      Finset.univ.val.map (fun x : G => ((x : Kˣ) : K) ^ k * ((a : Kˣ) : K) ^ k) := by
+    simp_rw [← mul_pow]
+    have as_comp :
+      (fun x : ↥G => (((x : Kˣ) : K) * ((a : Kˣ) : K)) ^ k)
+        = (fun x : ↥G => ((x : Kˣ) : K) ^ k) ∘ fun x : ↥G => x * a := by
+      funext x
+      simp only [Function.comp_apply, Subgroup.coe_mul, Units.val_mul]
+    rw [as_comp, ← Multiset.map_map]
+    congr
+    rw [eq_comm]
+    exact Multiset.map_univ_val_equiv (Equiv.mulRight a)
+  have h_multiset_map_sum : (Multiset.map (fun x : G => ((x : Kˣ) : K) ^ k) Finset.univ.val).sum =
+    (Multiset.map (fun x : G => ((x : Kˣ) : K) ^ k * ((a : Kˣ) : K) ^ k) Finset.univ.val).sum := by
+    rw [h_multiset_map]
+  rw [Multiset.sum_map_mul_right] at h_multiset_map_sum
+  have hzero : (((a : Kˣ) : K) ^ k - 1 : K)
+                  * (Multiset.map (fun i : G => (i.val : K) ^ k) Finset.univ.val).sum = 0 := by
+    rw [sub_mul, mul_comm, ← h_multiset_map_sum, one_mul, sub_self]
+  rw [mul_eq_zero] at hzero
+  refine hzero.resolve_left fun h => ha ?_
+  ext
+  rw [← sub_eq_zero]
+  simp_rw [SubmonoidClass.coe_pow, Units.val_pow_eq_pow_val, OneMemClass.coe_one, Units.val_one, h]
 
 section
 
 variable [GroupWithZero K] [Fintype K]
 
--- DISSOLVED: pow_card_sub_one_eq_one
+theorem pow_card_sub_one_eq_one (a : K) (ha : a ≠ 0) : a ^ (q - 1) = 1 := by
+  calc
+    a ^ (Fintype.card K - 1) = (Units.mk0 a ha ^ (Fintype.card K - 1) : Kˣ).1 := by
+      rw [Units.val_pow_eq_pow_val, Units.val_mk0]
+    _ = 1 := by
+      classical
+        rw [← Fintype.card_units, pow_card_eq_one]
+        rfl
 
 theorem pow_card (a : K) : a ^ q = a := by
   by_cases h : a = 0; · rw [h]; apply zero_pow Fintype.card_ne_zero
@@ -239,11 +306,18 @@ theorem X_pow_card_sub_X_natDegree_eq (hp : 1 < p) : (X ^ p - X : K'[X]).natDegr
     exact mod_cast hp
   rw [natDegree_eq_of_degree_eq (degree_sub_eq_left_of_degree_lt h1), natDegree_X_pow]
 
--- DISSOLVED: X_pow_card_pow_sub_X_natDegree_eq
+theorem X_pow_card_pow_sub_X_natDegree_eq (hn : n ≠ 0) (hp : 1 < p) :
+    (X ^ p ^ n - X : K'[X]).natDegree = p ^ n :=
+  X_pow_card_sub_X_natDegree_eq K' <| Nat.one_lt_pow hn hp
 
--- DISSOLVED: X_pow_card_sub_X_ne_zero
+theorem X_pow_card_sub_X_ne_zero (hp : 1 < p) : (X ^ p - X : K'[X]) ≠ 0 :=
+  ne_zero_of_natDegree_gt <|
+    calc
+      1 < _ := hp
+      _ = _ := (X_pow_card_sub_X_natDegree_eq K' hp).symm
 
--- DISSOLVED: X_pow_card_pow_sub_X_ne_zero
+theorem X_pow_card_pow_sub_X_ne_zero (hn : n ≠ 0) (hp : 1 < p) : (X ^ p ^ n - X : K'[X]) ≠ 0 :=
+  X_pow_card_sub_X_ne_zero K' <| Nat.one_lt_pow hn hp
 
 end
 
@@ -323,7 +397,12 @@ theorem Nat.sq_add_sq_modEq (p : ℕ) [Fact p.Prime] (x : ℕ) :
 
 namespace CharP
 
--- DISSOLVED: sq_add_sq
+theorem sq_add_sq (R : Type*) [CommRing R] [IsDomain R] (p : ℕ) [NeZero p] [CharP R p] (x : ℤ) :
+    ∃ a b : ℕ, ((a : R) ^ 2 + (b : R) ^ 2) = x := by
+  haveI := char_is_prime_of_pos R p
+  obtain ⟨a, b, hab⟩ := ZMod.sq_add_sq p x
+  refine ⟨a.val, b.val, ?_⟩
+  simpa using congr_arg (ZMod.castHom dvd_rfl R) hab
 
 end CharP
 
@@ -384,14 +463,23 @@ theorem card_units (p : ℕ) [Fact p.Prime] : Fintype.card (ZMod p)ˣ = p - 1 :=
 theorem units_pow_card_sub_one_eq_one (p : ℕ) [Fact p.Prime] (a : (ZMod p)ˣ) : a ^ (p - 1) = 1 := by
   rw [← card_units p, pow_card_eq_one]
 
--- DISSOLVED: pow_card_sub_one_eq_one
+theorem pow_card_sub_one_eq_one {p : ℕ} [Fact p.Prime] {a : ZMod p} (ha : a ≠ 0) :
+    a ^ (p - 1) = 1 := by
+    have h := FiniteField.pow_card_sub_one_eq_one a ha
+    rwa [ZMod.card p] at h
 
--- DISSOLVED: pow_card_sub_one
+lemma pow_card_sub_one {p : ℕ} [Fact p.Prime] (a : ZMod p) :
+    a ^ (p - 1) = if a ≠ 0 then 1 else 0 := by
+  split_ifs with ha
+  · exact pow_card_sub_one_eq_one ha
+  · simp [of_not_not ha, (Fact.out : p.Prime).one_lt, tsub_eq_zero_iff_le]
 
 theorem orderOf_units_dvd_card_sub_one {p : ℕ} [Fact p.Prime] (u : (ZMod p)ˣ) : orderOf u ∣ p - 1 :=
   orderOf_dvd_of_pow_eq_one <| units_pow_card_sub_one_eq_one _ _
 
--- DISSOLVED: orderOf_dvd_card_sub_one
+theorem orderOf_dvd_card_sub_one {p : ℕ} [Fact p.Prime] {a : ZMod p} (ha : a ≠ 0) :
+    orderOf a ∣ p - 1 :=
+  orderOf_dvd_of_pow_eq_one <| pow_card_sub_one_eq_one ha
 
 open Polynomial
 
@@ -443,7 +531,12 @@ theorem even_card_of_char_two (hF : ringChar F = 2) : Fintype.card F % 2 = 0 :=
 theorem odd_card_of_char_ne_two (hF : ringChar F ≠ 2) : Fintype.card F % 2 = 1 :=
   Nat.mod_two_ne_zero.mp (mt even_card_iff_char_two.mpr hF)
 
--- DISSOLVED: pow_dichotomy
+theorem pow_dichotomy (hF : ringChar F ≠ 2) {a : F} (ha : a ≠ 0) :
+    a ^ (Fintype.card F / 2) = 1 ∨ a ^ (Fintype.card F / 2) = -1 := by
+  have h₁ := FiniteField.pow_card_sub_one_eq_one a ha
+  rw [← Nat.two_mul_odd_div_two (FiniteField.odd_card_of_char_ne_two hF), mul_comm, pow_mul,
+    pow_two] at h₁
+  exact mul_self_eq_one_iff.mp h₁
 
 theorem unit_isSquare_iff (hF : ringChar F ≠ 2) (a : Fˣ) :
     IsSquare a ↔ a ^ (Fintype.card F / 2) = 1 := by
@@ -469,7 +562,16 @@ theorem unit_isSquare_iff (hF : ringChar F ≠ 2) (a : Fˣ) :
       dsimp
       rw [mul_comm, pow_mul, pow_two]
 
--- DISSOLVED: isSquare_iff
+theorem isSquare_iff (hF : ringChar F ≠ 2) {a : F} (ha : a ≠ 0) :
+    IsSquare a ↔ a ^ (Fintype.card F / 2) = 1 := by
+  apply
+    (iff_congr _ (by simp [Units.ext_iff])).mp (FiniteField.unit_isSquare_iff hF (Units.mk0 a ha))
+  simp only [IsSquare, Units.ext_iff, Units.val_mk0, Units.val_mul]
+  constructor
+  · rintro ⟨y, hy⟩; exact ⟨y, hy⟩
+  · rintro ⟨y, rfl⟩
+    have hy : y ≠ 0 := by rintro rfl; simp at ha
+    refine ⟨Units.mk0 y hy, ?_⟩; simp
 
 end FiniteField
 

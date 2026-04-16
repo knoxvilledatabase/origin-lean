@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Group/Unbundled/Abs.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Even
 import Mathlib.Algebra.Order.Group.Lattice
+
+noncomputable section
 
 /-!
 # Absolute values in ordered groups
@@ -176,8 +178,6 @@ variable [Group α] [LinearOrder α] {a b : α}
 
 @[to_additive] lemma le_mabs : a ≤ |b|ₘ ↔ a ≤ b ∨ a ≤ b⁻¹ := le_max_iff
 
-@[to_additive] lemma mabs_eq_max_inv : |a|ₘ = max a a⁻¹ := rfl
-
 @[to_additive] lemma lt_mabs : a < |b|ₘ ↔ a < b ∨ a < b⁻¹ := lt_max_iff
 
 @[to_additive] lemma mabs_by_cases (P : α → Prop) (h1 : P a) (h2 : P a⁻¹) : P |a|ₘ :=
@@ -222,7 +222,8 @@ variable [MulLeftMono α] {a b : α}
 
 variable [MulRightMono α]
 
--- DISSOLVED: mabs_ne_one
+@[to_additive] lemma mabs_ne_one : |a|ₘ ≠ 1 ↔ a ≠ 1 :=
+  (one_le_mabs a).gt_iff_ne.symm.trans one_lt_mabs
 
 @[to_additive (attr := simp)] lemma mabs_eq_one : |a|ₘ = 1 ↔ a = 1 := not_iff_not.1 mabs_ne_one
 
@@ -268,9 +269,5 @@ end LatticeOrderedAddCommGroup
 namespace Pi
 
 variable {ι : Type*} {α : ι → Type*} [∀ i, AddGroup (α i)] [∀ i, Lattice (α i)]
-
-@[simp] lemma abs_apply (f : ∀ i, α i) (i : ι) : |f| i = |f i| := rfl
-
-lemma abs_def (f : ∀ i, α i) : |f| = fun i ↦ |f i| := rfl
 
 end Pi

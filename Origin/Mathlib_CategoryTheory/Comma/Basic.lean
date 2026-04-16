@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Products.Unitor
 
+noncomputable section
+
 /-!
 # Comma categories
 
@@ -171,12 +173,6 @@ lemma inv_right [IsIso e] : (inv e).right = inv e.right := by
   apply IsIso.eq_inv_of_hom_inv_id
   rw [← Comma.comp_right, IsIso.hom_inv_id, id_right]
 
-lemma left_hom_inv_right [IsIso e] : L.map (e.left) ≫ Y.hom ≫ R.map (inv e.right) = X.hom := by
-  simp
-
-lemma inv_left_hom_right [IsIso e] : L.map (inv e.left) ≫ X.hom ≫ R.map e.right = Y.hom := by
-  simp
-
 end
 
 section
@@ -263,17 +259,9 @@ noncomputable instance isEquivalenceMap
     [F₁.IsEquivalence] [F₂.IsEquivalence] [F.Faithful] [F.Full] [IsIso α] [IsIso β] :
     (map α β).IsEquivalence where
 
-@[simp]
-theorem map_fst : map α β ⋙ fst L' R' = fst L R ⋙ F₁ :=
-  rfl
-
 @[simps!]
 def mapFst : map α β ⋙ fst L' R' ≅ fst L R ⋙ F₁ :=
   NatIso.ofComponents (fun _ => Iso.refl _) (by aesop_cat)
-
-@[simp]
-theorem map_snd : map α β ⋙ snd L' R' = snd L R ⋙ F₂ :=
-  rfl
 
 @[simps!]
 def mapSnd : map α β ⋙ snd L' R' ≅ snd L R ⋙ F₂ :=
@@ -451,22 +439,10 @@ def toPUnitIdEquiv (L : A ⥤ Discrete PUnit) (R : Discrete PUnit ⥤ Discrete P
     Comma L R ≌ A :=
   (equivProd L _).trans (prod.rightUnitorEquivalence A)
 
-@[simp]
-theorem toPUnitIdEquiv_functor_iso {L : A ⥤ Discrete PUnit}
-    {R : Discrete PUnit ⥤ Discrete PUnit} :
-    (toPUnitIdEquiv L R).functor = fst L R :=
-  rfl
-
 @[simps!]
 def toIdPUnitEquiv (L : Discrete PUnit ⥤ Discrete PUnit) (R : B ⥤ Discrete PUnit) :
     Comma L R ≌ B :=
   (equivProd _ R).trans (prod.leftUnitorEquivalence B)
-
-@[simp]
-theorem toIdPUnitEquiv_functor_iso {L : Discrete PUnit ⥤ Discrete PUnit}
-    {R : B ⥤ Discrete PUnit} :
-    (toIdPUnitEquiv L R).functor = snd L R :=
-  rfl
 
 end
 

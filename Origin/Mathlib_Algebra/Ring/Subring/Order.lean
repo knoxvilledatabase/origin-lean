@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Hom.Ring
 import Mathlib.Algebra.Order.Ring.InjSurj
 import Mathlib.Algebra.Ring.Subring.Defs
 
+noncomputable section
+
 /-!
 
 # Subrings of ordered rings
@@ -72,7 +74,5 @@ def orderedSubtype {R : Type*} [OrderedRing R] (s : Subring R) : s →+*o R wher
   monotone' := fun _ _ h ↦ h
 
 variable {R : Type*} [OrderedRing R]
-
-lemma orderedSubtype_coe (s : Subring R) : Subring.orderedSubtype s = Subring.subtype s := rfl
 
 end Subring

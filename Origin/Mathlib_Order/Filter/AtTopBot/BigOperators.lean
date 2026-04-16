@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # Two lemmas about limit of `Π b ∈ s, f b` along
 

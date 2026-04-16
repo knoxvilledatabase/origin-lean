@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subsemigroup.Basic
 import Mathlib.RingTheory.NonUnitalSubsemiring.Basic
 import Mathlib.Algebra.Star.Center
 
+noncomputable section
+
 /-!
 # Non-unital Star Subsemirings
 
@@ -51,9 +53,6 @@ instance instNonUnitalSubsemiringClass : NonUnitalSubsemiringClass (NonUnitalSta
 instance instStarMemClass : StarMemClass (NonUnitalStarSubsemiring R) R where
   star_mem {s} := s.star_mem'
 
-theorem mem_carrier {s : NonUnitalStarSubsemiring R} {x : R} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
 protected def copy (S : NonUnitalStarSubsemiring R) (s : Set R) (hs : s = ↑S) :
     NonUnitalStarSubsemiring R :=
   { S.toNonUnitalSubsemiring.copy s hs with
@@ -61,11 +60,6 @@ protected def copy (S : NonUnitalStarSubsemiring R) (s : Set R) (hs : s = ↑S) 
       show star x ∈ s
       rw [hs] at hx ⊢
       exact S.star_mem' hx }
-
-@[simp]
-theorem coe_copy (S : NonUnitalStarSubsemiring R) (s : Set R) (hs : s = ↑S) :
-    (S.copy s hs : Set R) = s :=
-  rfl
 
 theorem copy_eq (S : NonUnitalStarSubsemiring R) (s : Set R) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs

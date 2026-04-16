@@ -9,6 +9,8 @@ import Mathlib.Lean.Elab.Tactic.Basic
 import Mathlib.Logic.Basic
 import Qq
 
+noncomputable section
+
 /-!
 The `tauto` tactic.
 -/

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Ostrowski.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Lemmas
@@ -9,6 +9,8 @@ import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 import Mathlib.NumberTheory.Padics.PadicNorm
+
+noncomputable section
 
 /-!
 # Ostrowski’s Theorem
@@ -137,6 +139,7 @@ def mulRingNorm_padic (p : ℕ) [Fact p.Prime] : MulRingNorm ℚ :=
 variable (hf_nontriv : f ≠ 1) (bdd : ∀ n : ℕ, f n ≤ 1)
 
 include hf_nontriv bdd in
+/-- There exists a minimal positive integer with absolute value smaller than 1. -/
 
 lemma exists_minimal_nat_zero_lt_mulRingNorm_lt_one : ∃ p : ℕ, (0 < f p ∧ f p < 1) ∧
     ∀ m : ℕ, 0 < f m ∧ f m < 1 → p ≤ m := by
@@ -156,6 +159,7 @@ lemma exists_minimal_nat_zero_lt_mulRingNorm_lt_one : ∃ p : ℕ, (0 < f p ∧ 
 variable {p : ℕ} (hp0 : 0 < f p) (hp1 : f p < 1) (hmin : ∀ m : ℕ, 0 < f m ∧ f m < 1 → p ≤ m)
 
 include hp0 hp1 hmin in
+/-- The minimal positive integer with absolute value smaller than 1 is a prime number.-/
 
 lemma is_prime_of_minimal_nat_zero_lt_mulRingNorm_lt_one : p.Prime := by
   rw [← Nat.irreducible_iff_nat_prime]
@@ -182,6 +186,7 @@ lemma is_prime_of_minimal_nat_zero_lt_mulRingNorm_lt_one : p.Prime := by
 open Real
 
 include hp0 hp1 hmin bdd in
+/-- A natural number not divible by `p` has absolute value 1. -/
 
 lemma mulRingNorm_eq_one_of_not_dvd {m : ℕ} (hpm : ¬ p ∣ m) : f m = 1 := by
   apply le_antisymm (bdd m)
@@ -223,6 +228,7 @@ lemma mulRingNorm_eq_one_of_not_dvd {m : ℕ} (hpm : ¬ p ∣ m) : f m = 1 := by
     linarith only [le_half hp0 hp1 le_sup_left, le_half hm₀ hm le_sup_right]
 
 include hp0 hp1 hmin in
+/-- The absolute value of `p` is `p ^ (-t)` for some positive real number `t`. -/
 
 lemma exists_pos_mulRingNorm_eq_pow_neg : ∃ t : ℝ, 0 < t ∧ f p = p ^ (-t) := by
   have pprime := is_prime_of_minimal_nat_zero_lt_mulRingNorm_lt_one hp0 hp1 hmin
@@ -232,6 +238,7 @@ lemma exists_pos_mulRingNorm_eq_pow_neg : ∃ t : ℝ, 0 < t ∧ f p = p ^ (-t) 
   simp only [ne_eq, Nat.cast_eq_one,Nat.Prime.ne_one pprime, not_false_eq_true]
 
 include hf_nontriv bdd in
+/-- If `f` is bounded and not trivial, then it is equivalent to a p-adic absolute value. -/
 
 theorem mulRingNorm_equiv_padic_of_bounded :
     ∃! p, ∃ (_ : Fact (p.Prime)), MulRingNorm.equiv f (mulRingNorm_padic p) := by
@@ -390,17 +397,48 @@ lemma one_lt_of_not_bounded (notbdd : ¬ ∀ n : ℕ, f n ≤ 1) {n₀ : ℕ} (h
 variable {m n : ℕ} (hm : 1 < m) (hn : 1 < n) (notbdd : ¬ ∀ (n : ℕ), f n ≤ 1)
 
 include hm notbdd in
-
 private lemma expr_pos : 0 < m * f m / (f m - 1) := by
   apply div_pos (mul_pos (mod_cast zero_lt_of_lt hm)
       (map_pos_of_ne_zero f (mod_cast ne_zero_of_lt hm)))
   linarith only [one_lt_of_not_bounded notbdd hm]
 
 include hn hm notbdd in
-
--- DISSOLVED: param_upperbound
+private lemma param_upperbound {k : ℕ} (hk : k ≠ 0) :
+    f n ≤ (m * f m / (f m - 1)) ^ (k : ℝ)⁻¹ * (f m) ^ (logb m n) := by
+  have h_ineq1 {m n : ℕ} (hm : 1 < m) (hn : 1 < n) :
+      f n ≤ (m * f m / (f m - 1)) * (f m) ^ (logb m n) := by
+    let d := Nat.log m n
+    calc
+    f n ≤ ((Nat.digits m n).mapIdx fun i _ ↦ m * f m ^ i).sum :=
+      mulRingNorm_apply_le_sum_digits n hm
+    _ = m * ((Nat.digits m n).mapIdx fun i _ ↦ (f m) ^ i).sum := list_mul_sum (m.digits n) (f m) m
+    _ = m * ((f m ^ (d + 1) - 1) / (f m - 1)) := by
+      rw [list_geom _ (ne_of_gt (one_lt_of_not_bounded notbdd hm)),
+      (Nat.digits_len m n hm (not_eq_zero_of_lt hn)).symm]
+    _ ≤ m * ((f m ^ (d + 1))/(f m - 1)) := by
+      gcongr
+      · linarith only [one_lt_of_not_bounded notbdd hm]
+      · simp only [tsub_le_iff_right, le_add_iff_nonneg_right, zero_le_one]
+    _ = ↑m * f ↑m / (f ↑m - 1) * f ↑m ^ d := by ring
+    _ ≤ ↑m * f ↑m / (f ↑m - 1) * f ↑m ^ logb ↑m ↑n := by
+      gcongr
+      · exact le_of_lt (expr_pos hm notbdd)
+      · rw [← Real.rpow_natCast, Real.rpow_le_rpow_left_iff (one_lt_of_not_bounded notbdd hm)]
+        exact natLog_le_logb n m
+  apply le_of_pow_le_pow_left₀ hk (mul_nonneg (rpow_nonneg
+    (le_of_lt (expr_pos hm notbdd)) (k : ℝ)⁻¹) (rpow_nonneg (apply_nonneg f ↑m) (logb m n)))
+  nth_rw 2 [← Real.rpow_natCast]
+  rw [mul_rpow (rpow_nonneg (le_of_lt (expr_pos hm notbdd)) (k : ℝ)⁻¹)
+    (rpow_nonneg (apply_nonneg f ↑m) (logb ↑m ↑n)), ← rpow_mul (le_of_lt (expr_pos hm notbdd)),
+    ← rpow_mul (apply_nonneg f ↑m), inv_mul_cancel₀ (mod_cast hk), rpow_one, mul_comm (logb ↑m ↑n)]
+  calc
+    (f n) ^ k = f ↑(n ^ k) := by simp only [Nat.cast_pow, map_pow]
+    _ ≤ (m * f m / (f m - 1)) * (f m) ^ (logb m ↑(n ^ k)) := h_ineq1 hm (Nat.one_lt_pow hk hn)
+    _ = (m * f m / (f m - 1)) * (f m) ^ (k * logb m n) := by
+      rw [Nat.cast_pow, Real.logb_pow]
 
 include hm hn notbdd in
+/-- Given two natural numbers `n, m` greater than 1 we have `f n ≤ f m ^ logb m n`. -/
 
 lemma mulRingNorm_le_mulRingNorm_pow_log : f n ≤ f m ^ logb m n := by
   have : Tendsto (fun k : ℕ ↦ (m * f m / (f m - 1)) ^ (k : ℝ)⁻¹ * (f m) ^ (logb m n))
@@ -411,6 +449,7 @@ lemma mulRingNorm_le_mulRingNorm_pow_log : f n ≤ f m ^ logb m n := by
     fun b hb ↦ param_upperbound hm hn notbdd (not_eq_zero_of_lt hb)⟩))
 
 include hm hn notbdd in
+/-- Given `m,n ≥ 2` and `f m = m ^ s`, `f n = n ^ t` for `s, t > 0`, we have `t ≤ s`. -/
 
 lemma le_of_mulRingNorm_eq {s t : ℝ} (hfm : f m = m ^ s) (hfn : f n = n ^ t)  : t ≤ s := by
     have hmn : f n ≤ f m ^ Real.logb m n := mulRingNorm_le_mulRingNorm_pow_log hm hn notbdd
@@ -421,12 +460,14 @@ lemma le_of_mulRingNorm_eq {s t : ℝ} (hfm : f m = m ^ s) (hfn : f n = n ^ t)  
       (mod_cast zero_lt_of_lt hn)]
 
 include hm hn notbdd in
-
 private lemma symmetric_roles {s t : ℝ} (hfm : f m = m ^ s) (hfn : f n = n ^ t) : s = t :=
     le_antisymm (le_of_mulRingNorm_eq hn hm notbdd hfn hfm)
     (le_of_mulRingNorm_eq hm hn notbdd hfm hfn)
 
 include notbdd in
+/-- If `f` is not bounded and not trivial, then it is equivalent to the standard absolute value on
+
+`ℚ`. -/
 
 theorem mulRingNorm_equiv_standard_of_unbounded : MulRingNorm.equiv f mulRingNorm_real := by
   obtain ⟨m, hm⟩ := Classical.exists_not_of_not_forall notbdd

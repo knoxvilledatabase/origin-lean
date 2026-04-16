@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Hausdorff.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 7 | Infrastructure: 5
+Genuine: 73 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Between
@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 import Mathlib.Topology.MetricSpace.Holder
 import Mathlib.Topology.MetricSpace.MetricSeparated
+
+noncomputable section
 
 /-!
 # Hausdorff measure and metric (outer) measures
@@ -293,7 +295,22 @@ theorem mkMetric'_isMetric (m : Set X → ℝ≥0∞) : (mkMetric' m).IsMetric :
   have : ε < diam u := εr.trans_le ((hr x hxs y hyt).trans <| edist_le_diam_of_mem hxu hyu)
   exact iInf_eq_top.2 fun h => (this.not_le h).elim
 
--- DISSOLVED: mkMetric_mono_smul
+theorem mkMetric_mono_smul {m₁ m₂ : ℝ≥0∞ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ ∞) (h0 : c ≠ 0)
+    (hle : m₁ ≤ᶠ[𝓝[≥] 0] c • m₂) : (mkMetric m₁ : OuterMeasure X) ≤ c • mkMetric m₂ := by
+  classical
+  rcases (mem_nhdsWithin_Ici_iff_exists_Ico_subset' zero_lt_one).1 hle with ⟨r, hr0, hr⟩
+  refine fun s =>
+    le_of_tendsto_of_tendsto (mkMetric'.tendsto_pre _ s)
+      (ENNReal.Tendsto.const_mul (mkMetric'.tendsto_pre _ s) (Or.inr hc))
+      (mem_of_superset (Ioo_mem_nhdsWithin_Ioi ⟨le_rfl, hr0⟩) fun r' hr' => ?_)
+  simp only [mem_setOf_eq, mkMetric'.pre, RingHom.id_apply]
+  rw [← smul_eq_mul, ← smul_apply, smul_boundedBy hc]
+  refine le_boundedBy.2 (fun t => (boundedBy_le _).trans ?_) _
+  simp only [smul_eq_mul, Pi.smul_apply, extend, iInf_eq_if]
+  split_ifs with ht
+  · apply hr
+    exact ⟨zero_le _, ht.trans_lt hr'.2⟩
+  · simp [h0]
 
 @[simp]
 theorem mkMetric_top : (mkMetric (fun _ => ∞ : ℝ≥0∞ → ℝ≥0∞) : OuterMeasure X) = ⊤ := by
@@ -321,9 +338,15 @@ theorem isometry_comap_mkMetric (m : ℝ≥0∞ → ℝ≥0∞) {f : X → Y} (h
     apply le_trans _ (h_mono (diam_mono hst))
     simp only [(diam_mono hst).trans ht, le_refl, ciInf_pos]
 
--- DISSOLVED: mkMetric_smul
+theorem mkMetric_smul (m : ℝ≥0∞ → ℝ≥0∞) {c : ℝ≥0∞} (hc : c ≠ ∞) (hc' : c ≠ 0) :
+    (mkMetric (c • m) : OuterMeasure X) = c • mkMetric m := by
+  simp only [mkMetric, mkMetric', mkMetric'.pre, inducedOuterMeasure, ENNReal.smul_iSup]
+  simp_rw [smul_iSup, smul_boundedBy hc, smul_extend _ hc', Pi.smul_apply]
 
--- DISSOLVED: mkMetric_nnreal_smul
+theorem mkMetric_nnreal_smul (m : ℝ≥0∞ → ℝ≥0∞) {c : ℝ≥0} (hc : c ≠ 0) :
+    (mkMetric (c • m) : OuterMeasure X) = c • mkMetric m := by
+  rw [ENNReal.smul_def, ENNReal.smul_def,
+    mkMetric_smul m ENNReal.coe_ne_top (ENNReal.coe_ne_zero.mpr hc)]
 
 theorem isometry_map_mkMetric (m : ℝ≥0∞ → ℝ≥0∞) {f : X → Y} (hf : Isometry f)
     (H : Monotone m ∨ Surjective f) : map f (mkMetric m) = restrict (range f) (mkMetric m) := by
@@ -370,11 +393,6 @@ def mkMetric (m : ℝ≥0∞ → ℝ≥0∞) : Measure X :=
   (OuterMeasure.mkMetric m).toMeasure (OuterMeasure.mkMetric'_isMetric _).le_caratheodory
 
 @[simp]
-theorem mkMetric'_toOuterMeasure (m : Set X → ℝ≥0∞) :
-    (mkMetric' m).toOuterMeasure = (OuterMeasure.mkMetric' m).trim :=
-  rfl
-
-@[simp]
 theorem mkMetric_toOuterMeasure (m : ℝ≥0∞ → ℝ≥0∞) :
     (mkMetric m : Measure X).toOuterMeasure = OuterMeasure.mkMetric m :=
   OuterMeasure.trim_mkMetric m
@@ -389,7 +407,10 @@ namespace Measure
 
 variable [MeasurableSpace X] [BorelSpace X]
 
--- DISSOLVED: mkMetric_mono_smul
+theorem mkMetric_mono_smul {m₁ m₂ : ℝ≥0∞ → ℝ≥0∞} {c : ℝ≥0∞} (hc : c ≠ ∞) (h0 : c ≠ 0)
+    (hle : m₁ ≤ᶠ[𝓝[≥] 0] c • m₂) : (mkMetric m₁ : Measure X) ≤ c • mkMetric m₂ := fun s ↦ by
+  rw [← OuterMeasure.coe_mkMetric, coe_smul, ← OuterMeasure.coe_mkMetric]
+  exact OuterMeasure.mkMetric_mono_smul hc h0 hle s
 
 @[simp]
 theorem mkMetric_top : (mkMetric (fun _ => ∞ : ℝ≥0∞ → ℝ≥0∞) : Measure X) = ⊤ := by
@@ -657,7 +678,19 @@ end LipschitzWith
 
 open scoped Pointwise
 
--- DISSOLVED: MeasureTheory.Measure.hausdorffMeasure_smul₀
+theorem MeasureTheory.Measure.hausdorffMeasure_smul₀ {𝕜 E : Type*} [NormedAddCommGroup E]
+    [NormedField 𝕜] [NormedSpace 𝕜 E] [MeasurableSpace E] [BorelSpace E] {d : ℝ} (hd : 0 ≤ d)
+    {r : 𝕜} (hr : r ≠ 0) (s : Set E) : μH[d] (r • s) = ‖r‖₊ ^ d • μH[d] s := by
+  have {r : 𝕜} (s : Set E) : μH[d] (r • s) ≤ ‖r‖₊ ^ d • μH[d] s := by
+    simpa [ENNReal.coe_rpow_of_nonneg, hd]
+      using (lipschitzWith_smul r).hausdorffMeasure_image_le hd s
+  refine le_antisymm (this s) ?_
+  rw [← le_inv_smul_iff_of_pos]
+  · dsimp
+    rw [← NNReal.inv_rpow, ← nnnorm_inv]
+    · refine Eq.trans_le ?_ (this (r • s))
+      rw [inv_smul_smul₀ hr]
+  · simp [pos_iff_ne_zero, hr]
 
 /-!
 ### Antilipschitz maps do not decrease Hausdorff measures and dimension
@@ -942,9 +975,22 @@ variable [NormedField 𝕜] [NormedAddCommGroup E] [NormedSpace 𝕜 E] [Measura
 
 variable [MetricSpace P] [NormedAddTorsor E P] [BorelSpace P]
 
--- DISSOLVED: hausdorffMeasure_homothety_image
+theorem hausdorffMeasure_homothety_image {d : ℝ} (hd : 0 ≤ d) (x : P) {c : 𝕜} (hc : c ≠ 0)
+    (s : Set P) : μH[d] (AffineMap.homothety x c '' s) = ‖c‖₊ ^ d • μH[d] s := by
+  suffices
+    μH[d] (IsometryEquiv.vaddConst x '' ((c • ·) '' ((IsometryEquiv.vaddConst x).symm '' s))) =
+      ‖c‖₊ ^ d • μH[d] s by
+    simpa only [Set.image_image]
+  borelize E
+  rw [IsometryEquiv.hausdorffMeasure_image, Set.image_smul, Measure.hausdorffMeasure_smul₀ hd hc,
+    IsometryEquiv.hausdorffMeasure_image]
 
--- DISSOLVED: hausdorffMeasure_homothety_preimage
+theorem hausdorffMeasure_homothety_preimage {d : ℝ} (hd : 0 ≤ d) (x : P) {c : 𝕜} (hc : c ≠ 0)
+    (s : Set P) : μH[d] (AffineMap.homothety x c ⁻¹' s) = ‖c‖₊⁻¹ ^ d • μH[d] s := by
+  change μH[d] (AffineEquiv.homothetyUnitsMulHom x (Units.mk0 c hc) ⁻¹' s) = _
+  rw [← AffineEquiv.image_symm, AffineEquiv.coe_homothetyUnitsMulHom_apply_symm,
+    hausdorffMeasure_homothety_image hd x (_ : 𝕜ˣ).isUnit.ne_zero, Units.val_inv_eq_inv_val,
+    Units.val_mk0, nnnorm_inv]
 
 /-! TODO: prove `Measure.map (AffineMap.homothety x c) μH[d] = ‖c‖₊⁻¹ ^ d • μH[d]`, which needs a
 more general version of `AffineMap.homothety_continuous`. -/

@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Algebraic/Basic.lean
-Genuine: 54 | Conflates: 9 | Dissolved: 9 | Infrastructure: 3
+Genuine: 63 | Conflates: 9 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Expand
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.RingTheory.Algebraic.Defs
 import Mathlib.RingTheory.Polynomial.Tower
+
+noncomputable section
 
 /-!
 # Algebraic elements and algebraic extensions
@@ -37,9 +39,19 @@ variable (R) in
 theorem Polynomial.transcendental_X : Transcendental R (X (R := R)) := by
   simp [transcendental_iff]
 
--- DISSOLVED: IsAlgebraic.of_aeval
+theorem IsAlgebraic.of_aeval {r : A} (f : R[X]) (hf : f.natDegree ≠ 0)
+    (hf' : f.leadingCoeff ∈ nonZeroDivisors R) (H : IsAlgebraic R (aeval r f)) :
+    IsAlgebraic R r := by
+  obtain ⟨p, h1, h2⟩ := H
+  have : (p.comp f).coeff (p.natDegree * f.natDegree) ≠ 0 := fun h ↦ h1 <| by
+    rwa [coeff_comp_degree_mul_degree hf,
+      mul_right_mem_nonZeroDivisors_eq_zero_iff (pow_mem hf' _),
+      leadingCoeff_eq_zero] at h
+  exact ⟨p.comp f, fun h ↦ this (by simp [h]), by rwa [aeval_comp]⟩
 
--- DISSOLVED: Transcendental.aeval
+theorem Transcendental.aeval {r : A} (H : Transcendental R r) (f : R[X]) (hf : f.natDegree ≠ 0)
+    (hf' : f.leadingCoeff ∈ nonZeroDivisors R) :
+    Transcendental R (aeval r f) := fun h ↦ H (h.of_aeval f hf hf')
 
 theorem Transcendental.aeval_of_transcendental {r : A} (H : Transcendental R r)
     {f : R[X]} (hf : Transcendental R f) : Transcendental R (Polynomial.aeval r f) := by
@@ -58,7 +70,10 @@ theorem IsAlgebraic.of_aeval_of_transcendental {r : A} {f : R[X]}
   contrapose H
   exact Transcendental.aeval_of_transcendental H hf
 
--- DISSOLVED: Polynomial.transcendental
+theorem Polynomial.transcendental (f : R[X]) (hf : f.natDegree ≠ 0)
+    (hf' : f.leadingCoeff ∈ nonZeroDivisors R) :
+    Transcendental R f := by
+  simpa using (transcendental_X R).aeval f hf hf'
 
 theorem isAlgebraic_iff_not_injective {x : A} :
     IsAlgebraic R x ↔ ¬Function.Injective (Polynomial.aeval x : R[X] →ₐ[R] A) := by
@@ -453,15 +468,6 @@ theorem bijective_of_isScalarTower' [Field R] [Algebra K R]
 
 variable (K L)
 
-@[simps]
-noncomputable def algEquivEquivAlgHom [NoZeroSMulDivisors K L] [Algebra.IsAlgebraic K L] :
-    (L ≃ₐ[K] L) ≃* (L →ₐ[K] L) where
-  toFun ϕ := ϕ.toAlgHom
-  invFun ϕ := AlgEquiv.ofBijective ϕ (algHom_bijective ϕ)
-  left_inv _ := by ext; rfl
-  right_inv _ := by ext; rfl
-  map_mul' _ _ := rfl
-
 end Algebra.IsAlgebraic
 
 end NoZeroSMulDivisors
@@ -472,9 +478,22 @@ section
 
 variable {R S : Type*} [CommRing R] [Ring S] [Algebra R S]
 
--- DISSOLVED: IsAlgebraic.exists_nonzero_coeff_and_aeval_eq_zero
+theorem IsAlgebraic.exists_nonzero_coeff_and_aeval_eq_zero
+    {s : S} (hRs : IsAlgebraic R s) (hs : s ∈ nonZeroDivisors S) :
+    ∃ (q : Polynomial R), q.coeff 0 ≠ 0 ∧ aeval s q = 0 := by
+  obtain ⟨p, hp0, hp⟩ := hRs
+  obtain ⟨q, hpq, hq⟩ := Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd p hp0 0
+  simp only [C_0, sub_zero, X_pow_mul, X_dvd_iff] at hpq hq
+  rw [hpq, map_mul, aeval_X_pow] at hp
+  exact ⟨q, hq, (nonZeroDivisors S).pow_mem hs (rootMultiplicity 0 p) (aeval s q) hp⟩
 
--- DISSOLVED: IsAlgebraic.exists_nonzero_dvd
+theorem IsAlgebraic.exists_nonzero_dvd
+    {s : S} (hRs : IsAlgebraic R s) (hs : s ∈ nonZeroDivisors S) :
+    ∃ r : R, r ≠ 0 ∧ s ∣ (algebraMap R S) r := by
+  obtain ⟨q, hq0, hq⟩ := hRs.exists_nonzero_coeff_and_aeval_eq_zero hs
+  have key := map_dvd (Polynomial.aeval s) (Polynomial.X_dvd_sub_C (p := q))
+  rw [map_sub, hq, zero_sub, dvd_neg, Polynomial.aeval_X, Polynomial.aeval_C] at key
+  exact ⟨q.coeff 0, hq0, key⟩
 
 theorem IsAlgebraic.exists_smul_eq_mul
     (a : S) {b : S} (hRb : IsAlgebraic R b) (hb : b ∈ nonZeroDivisors S) :
@@ -484,7 +503,10 @@ theorem IsAlgebraic.exists_smul_eq_mul
 
 variable (R)
 
--- DISSOLVED: Algebra.IsAlgebraic.exists_smul_eq_mul
+theorem Algebra.IsAlgebraic.exists_smul_eq_mul [IsDomain S] [Algebra.IsAlgebraic R S]
+    (a : S) {b : S} (hb : b ≠ 0) :
+    ∃ᵉ (c : S) (d ≠ (0 : R)), d • a = b * c :=
+  (Algebra.IsAlgebraic.isAlgebraic b).exists_smul_eq_mul a (mem_nonZeroDivisors_iff_ne_zero.mpr hb)
 
 end
 
@@ -494,11 +516,34 @@ section Field
 
 variable {K L : Type*} [Field K] [Field L] [Algebra K L] (A : Subalgebra K L)
 
--- DISSOLVED: inv_eq_of_aeval_divX_ne_zero
+theorem inv_eq_of_aeval_divX_ne_zero {x : L} {p : K[X]} (aeval_ne : aeval x (divX p) ≠ 0) :
+    x⁻¹ = aeval x (divX p) / (aeval x p - algebraMap _ _ (p.coeff 0)) := by
+  rw [inv_eq_iff_eq_inv, inv_div, eq_comm, div_eq_iff, sub_eq_iff_eq_add, mul_comm]
+  conv_lhs => rw [← divX_mul_X_add p]
+  · rw [map_add, map_mul, aeval_X, aeval_C]
+  · exact aeval_ne
 
--- DISSOLVED: inv_eq_of_root_of_coeff_zero_ne_zero
+theorem inv_eq_of_root_of_coeff_zero_ne_zero {x : L} {p : K[X]} (aeval_eq : aeval x p = 0)
+    (coeff_zero_ne : p.coeff 0 ≠ 0) : x⁻¹ = -(aeval x (divX p) / algebraMap _ _ (p.coeff 0)) := by
+  convert inv_eq_of_aeval_divX_ne_zero (p := p) (L := L)
+    (mt (fun h => (algebraMap K L).injective ?_) coeff_zero_ne) using 1
+  · rw [aeval_eq, zero_sub, div_neg]
+  rw [RingHom.map_zero]
+  convert aeval_eq
+  conv_rhs => rw [← divX_mul_X_add p]
+  rw [map_add, map_mul, h, zero_mul, zero_add, aeval_C]
 
--- DISSOLVED: Subalgebra.inv_mem_of_root_of_coeff_zero_ne_zero
+theorem Subalgebra.inv_mem_of_root_of_coeff_zero_ne_zero {x : A} {p : K[X]}
+    (aeval_eq : aeval x p = 0) (coeff_zero_ne : p.coeff 0 ≠ 0) : (x⁻¹ : L) ∈ A := by
+  suffices (x⁻¹ : L) = (-p.coeff 0)⁻¹ • aeval x (divX p) by
+    rw [this]
+    exact A.smul_mem (aeval x _).2 _
+  have : aeval (x : L) p = 0 := by rw [Subalgebra.aeval_coe, aeval_eq, Subalgebra.coe_zero]
+  -- Porting note: this was a long sequence of `rw`.
+  rw [inv_eq_of_root_of_coeff_zero_ne_zero this coeff_zero_ne, div_eq_inv_mul, Algebra.smul_def]
+  simp only [aeval_coe, Submonoid.coe_mul, Subsemiring.coe_toSubmonoid, coe_toSubsemiring,
+    coe_algebraMap]
+  rw [map_inv₀, map_neg, inv_neg, neg_mul]
 
 theorem Subalgebra.inv_mem_of_algebraic {x : A} (hx : _root_.IsAlgebraic K (x : L)) :
     (x⁻¹ : L) ∈ A := by

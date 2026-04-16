@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Ulift
 import Mathlib.CategoryTheory.Sites.Canonical
 import Mathlib.CategoryTheory.Sites.Whiskering
 
+noncomputable section
+
 /-!
 
 # Subcanonical Grothendieck topologies
@@ -93,12 +95,6 @@ def yonedaULiftEquiv {X : C} {F : Sheaf J (Type (max v v'))} :
 
 theorem yonedaULiftEquiv_apply {X : C} {F : Sheaf J (Type (max v v'))}
     (f : J.yonedaULift.obj X ⟶ F) : yonedaULiftEquiv.{v'} J f = f.val.app (op X) ⟨𝟙 X⟩ :=
-  rfl
-
-@[simp]
-theorem yonedaULiftEquiv_symm_app_apply {X : C} {F : Sheaf J (Type (max v v'))}
-    (x : F.val.obj (op X)) (Y : Cᵒᵖ) (f : Y.unop ⟶ X) :
-      (J.yonedaULiftEquiv.symm x).val.app Y ⟨f⟩ = F.val.map f.op x :=
   rfl
 
 lemma yonedaULiftEquiv_naturality {X Y : C} {F : Sheaf J (Type (max v v'))}

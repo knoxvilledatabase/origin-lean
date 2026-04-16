@@ -12,6 +12,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
+noncomputable section
+
 /-!
 # Limits in concrete categories
 
@@ -280,12 +282,6 @@ noncomputable def multiequalizerEquiv (I : MulticospanIndex.{w, w'} C) [HasMulti
   letI h2 := isLimitOfPreserves (forget C) h1
   letI E := h2.conePointUniqueUpToIso (Types.limitConeIsLimit.{max w w', v} _)
   Equiv.trans E.toEquiv (Concrete.multiequalizerEquivAux I)
-
-@[simp]
-theorem multiequalizerEquiv_apply (I : MulticospanIndex.{w, w'} C) [HasMultiequalizer I]
-    [PreservesLimit I.multicospan (forget C)] (x : ↑(multiequalizer I)) (i : I.L) :
-    ((Concrete.multiequalizerEquiv I) x : ∀ i : I.L, I.left i) i = Multiequalizer.ι I i x :=
-  rfl
 
 end Multiequalizer
 

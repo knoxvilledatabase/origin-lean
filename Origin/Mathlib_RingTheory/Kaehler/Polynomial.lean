@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Kaehler.Basic
 import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.Algebra.Polynomial.Derivation
 
+noncomputable section
+
 /-!
 # The Kaehler differential module of polynomial algebras
 -/
@@ -100,19 +102,6 @@ lemma KaehlerDifferential.polynomial_D_apply (P : R[X]) :
     D R R[X] P = derivative P • D R R[X] X := by
   rw [← aeval_X_left_apply P, (D R R[X]).map_aeval, aeval_X_left_apply, aeval_X_left_apply]
 
-def KaehlerDifferential.polynomialEquiv : Ω[R[X]⁄R] ≃ₗ[R[X]] R[X] where
-  __ := derivative'.liftKaehlerDifferential
-  invFun := (Algebra.lsmul R R _).toLinearMap.flip (D R R[X] X)
-  left_inv := by
-    intro x
-    obtain ⟨x, rfl⟩ := linearCombination_surjective _ _ x
-    induction' x using Finsupp.induction_linear with x y hx hy x y
-    · simp
-    · simp only [map_add, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, LinearMap.flip_apply,
-        AlgHom.toLinearMap_apply, lsmul_coe] at *; simp only [*]
-    · simp [polynomial_D_apply _ x]
-  right_inv x := by simp
-
 lemma KaehlerDifferential.polynomialEquiv_comp_D :
     (polynomialEquiv R).compDer (D R R[X]) = derivative' :=
   Derivation.liftKaehlerDifferential_comp _
@@ -121,9 +110,5 @@ lemma KaehlerDifferential.polynomialEquiv_comp_D :
 lemma KaehlerDifferential.polynomialEquiv_D (P) :
     polynomialEquiv R (D R R[X] P) = derivative P :=
   Derivation.congr_fun (polynomialEquiv_comp_D R) P
-
-@[simp]
-lemma KaehlerDifferential.polynomialEquiv_symm (P) :
-    (polynomialEquiv R).symm P = P • D R R[X] X := rfl
 
 end Polynomial

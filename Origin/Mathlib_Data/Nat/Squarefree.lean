@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Nat/Squarefree.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 8 | Infrastructure: 2
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Squarefree.Basic
 import Mathlib.Data.Nat.Factorization.PrimePow
 import Mathlib.RingTheory.UniqueFactorizationDomain.Nat
+
+noncomputable section
 
 /-!
 # Lemmas about squarefreeness of natural numbers
@@ -24,7 +26,10 @@ open Finset
 
 namespace Nat
 
--- DISSOLVED: squarefree_iff_nodup_primeFactorsList
+theorem squarefree_iff_nodup_primeFactorsList {n : ℕ} (h0 : n ≠ 0) :
+    Squarefree n ↔ n.primeFactorsList.Nodup := by
+  rw [UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors h0, Nat.factors_eq]
+  simp
 
 alias squarefree_iff_nodup_factors := squarefree_iff_nodup_primeFactorsList
 
@@ -59,9 +64,16 @@ lemma factorization_eq_one_of_squarefree (hn : Squarefree n) (hp : p.Prime) (hpn
     factorization n p = 1 :=
   (hn.natFactorization_le_one _).antisymm <| (hp.dvd_iff_one_le_factorization hn.ne_zero).1 hpn
 
--- DISSOLVED: squarefree_of_factorization_le_one
+theorem squarefree_of_factorization_le_one {n : ℕ} (hn : n ≠ 0) (hn' : ∀ p, n.factorization p ≤ 1) :
+    Squarefree n := by
+  rw [squarefree_iff_nodup_primeFactorsList hn, List.nodup_iff_count_le_one]
+  intro a
+  rw [primeFactorsList_count_eq]
+  apply hn'
 
--- DISSOLVED: squarefree_iff_factorization_le_one
+theorem squarefree_iff_factorization_le_one {n : ℕ} (hn : n ≠ 0) :
+    Squarefree n ↔ ∀ p, n.factorization p ≤ 1 :=
+  ⟨fun hn => hn.natFactorization_le_one, squarefree_of_factorization_le_one hn⟩
 
 theorem Squarefree.ext_iff {n m : ℕ} (hn : Squarefree n) (hm : Squarefree m) :
     n = m ↔ ∀ p, Prime p → (p ∣ n ↔ p ∣ m) := by
@@ -80,7 +92,16 @@ theorem Squarefree.ext_iff {n m : ℕ} (hn : Squarefree n) (hm : Squarefree m) :
       simp only [Nat.one_ne_zero, not_false_iff, reduceCtorEq]
   rw [factorization_eq_zero_of_non_prime _ hp, factorization_eq_zero_of_non_prime _ hp]
 
--- DISSOLVED: squarefree_pow_iff
+theorem squarefree_pow_iff {n k : ℕ} (hn : n ≠ 1) (hk : k ≠ 0) :
+    Squarefree (n ^ k) ↔ Squarefree n ∧ k = 1 := by
+  refine ⟨fun h => ?_, by rintro ⟨hn, rfl⟩; simpa⟩
+  rcases eq_or_ne n 0 with (rfl | -)
+  · simp [zero_pow hk] at h
+  refine ⟨h.squarefree_of_dvd (dvd_pow_self _ hk), by_contradiction fun h₁ => ?_⟩
+  have : 2 ≤ k := k.two_le_iff.mpr ⟨hk, h₁⟩
+  apply hn (Nat.isUnit_iff.1 (h _ _))
+  rw [← sq]
+  exact pow_dvd_pow _ this
 
 theorem squarefree_and_prime_pow_iff_prime {n : ℕ} : Squarefree n ∧ IsPrimePow n ↔ Prime n := by
   refine ⟨?_, fun hn => ⟨hn.squarefree, hn.isPrimePow⟩⟩
@@ -227,9 +248,63 @@ theorem divisors_filter_squarefree_of_squarefree {n : ℕ} (hn : Squarefree n) :
 
 open UniqueFactorizationMonoid
 
--- DISSOLVED: divisors_filter_squarefree
+theorem divisors_filter_squarefree {n : ℕ} (h0 : n ≠ 0) :
+    {d ∈ n.divisors | Squarefree d}.val =
+      (UniqueFactorizationMonoid.normalizedFactors n).toFinset.powerset.val.map fun x =>
+        x.val.prod := by
+  rw [(Finset.nodup _).ext ((Finset.nodup _).map_on _)]
+  · intro a
+    simp only [Multiset.mem_filter, id, Multiset.mem_map, Finset.filter_val, ← Finset.mem_def,
+      mem_divisors]
+    constructor
+    · rintro ⟨⟨an, h0⟩, hsq⟩
+      use (UniqueFactorizationMonoid.normalizedFactors a).toFinset
+      simp only [id, Finset.mem_powerset]
+      rcases an with ⟨b, rfl⟩
+      rw [mul_ne_zero_iff] at h0
+      rw [UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors h0.1] at hsq
+      rw [Multiset.toFinset_subset, Multiset.toFinset_val, hsq.dedup, ← associated_iff_eq,
+        normalizedFactors_mul h0.1 h0.2]
+      exact ⟨Multiset.subset_of_le (Multiset.le_add_right _ _), normalizedFactors_prod h0.1⟩
+    · rintro ⟨s, hs, rfl⟩
+      rw [Finset.mem_powerset, ← Finset.val_le_iff, Multiset.toFinset_val] at hs
+      have hs0 : s.val.prod ≠ 0 := by
+        rw [Ne, Multiset.prod_eq_zero_iff]
+        intro con
+        apply
+          not_irreducible_zero
+            (irreducible_of_normalized_factor 0 (Multiset.mem_dedup.1 (Multiset.mem_of_le hs con)))
+      rw [(normalizedFactors_prod h0).symm.dvd_iff_dvd_right]
+      refine ⟨⟨Multiset.prod_dvd_prod_of_le (le_trans hs (Multiset.dedup_le _)), h0⟩, ?_⟩
+      have h :=
+        UniqueFactorizationMonoid.factors_unique irreducible_of_normalized_factor
+          (fun x hx =>
+            irreducible_of_normalized_factor x
+              (Multiset.mem_of_le (le_trans hs (Multiset.dedup_le _)) hx))
+          (normalizedFactors_prod hs0)
+      rw [associated_eq_eq, Multiset.rel_eq] at h
+      rw [UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hs0, h]
+      apply s.nodup
+  · intro x hx y hy h
+    rw [← Finset.val_inj, ← Multiset.rel_eq, ← associated_eq_eq]
+    rw [← Finset.mem_def, Finset.mem_powerset] at hx hy
+    apply UniqueFactorizationMonoid.factors_unique _ _ (associated_iff_eq.2 h)
+    · intro z hz
+      apply irreducible_of_normalized_factor z
+      · rw [← Multiset.mem_toFinset]
+        apply hx hz
+    · intro z hz
+      apply irreducible_of_normalized_factor z
+      · rw [← Multiset.mem_toFinset]
+        apply hy hz
 
--- DISSOLVED: sum_divisors_filter_squarefree
+theorem sum_divisors_filter_squarefree {n : ℕ} (h0 : n ≠ 0) {α : Type*} [AddCommMonoid α]
+    {f : ℕ → α} :
+    ∑ d ∈ n.divisors with Squarefree d, f d =
+      ∑ i ∈ (UniqueFactorizationMonoid.normalizedFactors n).toFinset.powerset, f i.val.prod := by
+  rw [Finset.sum_eq_multiset_sum, divisors_filter_squarefree h0, Multiset.map_map,
+    Finset.sum_eq_multiset_sum]
+  rfl
 
 theorem sq_mul_squarefree_of_pos {n : ℕ} (hn : 0 < n) :
     ∃ a b : ℕ, 0 < a ∧ 0 < b ∧ b ^ 2 * a = n ∧ Squarefree a := by
@@ -284,7 +359,11 @@ theorem squarefree_mul_iff {m n : ℕ} :
   ⟨fun h => ⟨coprime_of_squarefree_mul h, (squarefree_mul <| coprime_of_squarefree_mul h).mp h⟩,
     fun h => (squarefree_mul h.1).mpr h.2⟩
 
--- DISSOLVED: coprime_div_gcd_of_squarefree
+lemma coprime_div_gcd_of_squarefree (hm : Squarefree m) (hn : n ≠ 0) : Coprime (m / gcd m n) n := by
+  have : Coprime (m / gcd m n) (gcd m n) :=
+    coprime_of_squarefree_mul <| by simpa [Nat.div_mul_cancel, gcd_dvd_left]
+  simpa [Nat.div_mul_cancel, gcd_dvd_right] using
+    (coprime_div_gcd_div_gcd (m := m) (gcd_ne_zero_right hn).bot_lt).mul_right this
 
 lemma prod_primeFactors_of_squarefree (hn : Squarefree n) : ∏ p ∈ n.primeFactors, p = n := by
   rw [← toFinset_factors, List.prod_toFinset _ hn.nodup_primeFactorsList,
@@ -298,7 +377,18 @@ lemma primeFactors_prod (hs : ∀ p ∈ s, p.Prime) : primeFactors (∏ p ∈ s,
   rintro ⟨hp, q, hq, hpq⟩
   rwa [← ((hs _ hq).dvd_iff_eq hp.ne_one).1 hpq]
 
--- DISSOLVED: primeFactors_div_gcd
+lemma primeFactors_div_gcd (hm : Squarefree m) (hn : n ≠ 0) :
+    primeFactors (m / m.gcd n) = primeFactors m \ primeFactors n := by
+  ext p
+  have : m / m.gcd n ≠ 0 :=
+    (Nat.div_ne_zero_iff <| gcd_ne_zero_right hn).2 <| gcd_le_left _ hm.ne_zero.bot_lt
+  simp only [mem_primeFactors, ne_eq, this, not_false_eq_true, and_true, not_and, mem_sdiff,
+    hm.ne_zero, hn, dvd_div_iff_mul_dvd (gcd_dvd_left _ _)]
+  refine ⟨fun hp ↦ ⟨⟨hp.1, dvd_of_mul_left_dvd hp.2⟩, fun _ hpn ↦ hp.1.not_unit <| hm _ <|
+    (mul_dvd_mul_right (dvd_gcd (dvd_of_mul_left_dvd hp.2) hpn) _).trans hp.2⟩, fun hp ↦
+      ⟨hp.1.1, Coprime.mul_dvd_of_dvd_of_dvd ?_ (gcd_dvd_left _ _) hp.1.2⟩⟩
+  rw [coprime_comm, hp.1.1.coprime_iff_not_dvd]
+  exact fun hpn ↦ hp.2 hp.1.1 <| hpn.trans <| gcd_dvd_right _ _
 
 lemma prod_primeFactors_invOn_squarefree :
     Set.InvOn (fun n : ℕ ↦ (factorization n).support) (fun s ↦ ∏ p ∈ s, p)
@@ -318,12 +408,14 @@ end Nat
 
 /-! ### Square-free prover -/
 
+
 open NormNum
 
 namespace Tactic
 
 namespace NormNum
 
+/-- A predicate representing partial progress in a proof of `Squarefree`. -/
 def SquarefreeHelper (n k : ℕ) : Prop :=
   0 < k → (∀ m, Nat.Prime m → m ∣ bit1 n → bit1 k ≤ m) → Squarefree (bit1 n)
 
@@ -408,6 +500,7 @@ theorem not_squarefree_mul (a aa b n : ℕ) (ha : a * a = aa) (hb : aa * b = n) 
   rw [← hb, ← ha]
   exact fun H => ne_of_gt h₁ (Nat.isUnit_iff.1 <| H _ ⟨_, rfl⟩)
 
+/-- Given `e` a natural numeral and `a : ℕ` with `a^2 ∣ n`, return `⊢ ¬ Squarefree e`. -/
 unsafe def prove_non_squarefree (e : expr) (n a : ℕ) : tactic expr := do
   let ea := reflect a
   let eaa := reflect (a * a)
@@ -420,6 +513,8 @@ unsafe def prove_non_squarefree (e : expr) (n a : ℕ) : tactic expr := do
   guard (e' == e)
   return <| q(@not_squarefree_mul).mk_app [ea, eaa, eb, e, pa, pb, p₁]
 
+/-- Given `en`,`en1 := bit1 en`, `n1` the value of `en1`, `ek`,
+  returns `⊢ squarefree_helper en ek`. -/
 unsafe def prove_squarefree_aux :
     ∀ (ic : instance_cache) (en en1 : expr) (n1 : ℕ) (ek : expr) (k : ℕ), tactic expr
   | ic, en, en1, n1, ek, k => do
@@ -452,6 +547,7 @@ unsafe def prove_squarefree_aux :
             let p₂ ← prove_squarefree_aux ic en en1 n1 ek' k'
             pure <| q(squarefreeHelper_2).mk_app [en, ek, ek', ec, p₁, pc, p₀, p₂]
 
+/-- Given `n > 0` a squarefree natural numeral, returns `⊢ Squarefree n`. -/
 unsafe def prove_squarefree (en : expr) (n : ℕ) : tactic expr :=
   match match_numeral en with
   | match_numeral_result.one => pure q(@squarefree_one ℕ _)
@@ -469,6 +565,7 @@ unsafe def prove_squarefree (en : expr) (n : ℕ) : tactic expr :=
     pure <| q(squarefree_bit1).mk_app [en', p]
   | _ => failed
 
+/-- Evaluates the `Squarefree` predicate on naturals. -/
 @[norm_num]
 unsafe def eval_squarefree : expr → tactic (expr × expr)
   | q(@Squarefree ℕ $(inst) $(e)) => do

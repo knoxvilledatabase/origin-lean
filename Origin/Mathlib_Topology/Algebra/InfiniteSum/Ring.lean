@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Ring.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 8 | Infrastructure: 1
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.NatAntidiagonal
 import Mathlib.Topology.Algebra.InfiniteSum.Constructions
 import Mathlib.Topology.Algebra.Ring.Basic
+
+noncomputable section
 
 /-!
 # Infinite sum in a ring
@@ -71,17 +73,23 @@ theorem HasSum.div_const (h : HasSum f a) (b : α) : HasSum (fun i ↦ f i / b) 
 theorem Summable.div_const (h : Summable f) (b : α) : Summable fun i ↦ f i / b :=
   (h.hasSum.div_const _).summable
 
--- DISSOLVED: hasSum_mul_left_iff
+theorem hasSum_mul_left_iff (h : a₂ ≠ 0) : HasSum (fun i ↦ a₂ * f i) (a₂ * a₁) ↔ HasSum f a₁ :=
+  ⟨fun H ↦ by simpa only [inv_mul_cancel_left₀ h] using H.mul_left a₂⁻¹, HasSum.mul_left _⟩
 
--- DISSOLVED: hasSum_mul_right_iff
+theorem hasSum_mul_right_iff (h : a₂ ≠ 0) : HasSum (fun i ↦ f i * a₂) (a₁ * a₂) ↔ HasSum f a₁ :=
+  ⟨fun H ↦ by simpa only [mul_inv_cancel_right₀ h] using H.mul_right a₂⁻¹, HasSum.mul_right _⟩
 
--- DISSOLVED: hasSum_div_const_iff
+theorem hasSum_div_const_iff (h : a₂ ≠ 0) : HasSum (fun i ↦ f i / a₂) (a₁ / a₂) ↔ HasSum f a₁ := by
+  simpa only [div_eq_mul_inv] using hasSum_mul_right_iff (inv_ne_zero h)
 
--- DISSOLVED: summable_mul_left_iff
+theorem summable_mul_left_iff (h : a ≠ 0) : (Summable fun i ↦ a * f i) ↔ Summable f :=
+  ⟨fun H ↦ by simpa only [inv_mul_cancel_left₀ h] using H.mul_left a⁻¹, fun H ↦ H.mul_left _⟩
 
--- DISSOLVED: summable_mul_right_iff
+theorem summable_mul_right_iff (h : a ≠ 0) : (Summable fun i ↦ f i * a) ↔ Summable f :=
+  ⟨fun H ↦ by simpa only [mul_inv_cancel_right₀ h] using H.mul_right a⁻¹, fun H ↦ H.mul_right _⟩
 
--- DISSOLVED: summable_div_const_iff
+theorem summable_div_const_iff (h : a ≠ 0) : (Summable fun i ↦ f i / a) ↔ Summable f := by
+  simpa only [div_eq_mul_inv] using summable_mul_right_iff (inv_ne_zero h)
 
 theorem tsum_mul_left [T2Space α] : ∑' x, a * f x = a * ∑' x, f x := by
   classical
@@ -109,9 +117,12 @@ theorem Summable.const_div (h : Summable (fun x ↦ 1 / f x)) (b : α) :
     Summable fun i ↦ b / f i :=
   (h.hasSum.const_div b).summable
 
--- DISSOLVED: hasSum_const_div_iff
+theorem hasSum_const_div_iff (h : a₂ ≠ 0) :
+    HasSum (fun i ↦ a₂ / f i) (a₂ * a₁) ↔ HasSum (1/ f) a₁ := by
+  simpa only [div_eq_mul_inv, one_mul] using hasSum_mul_left_iff h
 
--- DISSOLVED: summable_const_div_iff
+theorem summable_const_div_iff (h : a ≠ 0) : (Summable fun i ↦ a / f i) ↔ Summable (1 / f) := by
+  simpa only [div_eq_mul_inv, one_mul] using summable_mul_left_iff h
 
 end DivisionSemiring
 

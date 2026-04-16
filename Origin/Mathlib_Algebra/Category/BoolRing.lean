@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Algebra.Ring.BooleanRing
 import Mathlib.Order.Category.BoolAlg
 
+noncomputable section
+
 /-!
 # The category of Boolean rings
 
@@ -34,10 +36,6 @@ instance (X : BoolRing) : BooleanRing X :=
 
 def of (α : Type*) [BooleanRing α] : BoolRing :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [BooleanRing α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited BoolRing :=
   ⟨of PUnit⟩

@@ -9,6 +9,8 @@ import Mathlib.Algebra.GroupPower.IterateHom
 import Mathlib.Logic.Equiv.Set
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # The group of permutations (self-equivalences) of a type `α`
 
@@ -42,10 +44,6 @@ instance permGroup : Group (Perm α) where
   zpow := zpowRec fun n f ↦ f ^ n
   zpow_succ' _ _ := coe_fn_injective <| Function.iterate_succ _ _
 
-@[simp]
-theorem default_eq : (default : Perm α) = 1 :=
-  rfl
-
 @[simps]
 def equivUnitsEnd : Perm α ≃* Units (Function.End α) where
   -- Porting note: needed to add `.toFun`.
@@ -63,9 +61,6 @@ def _root_.MonoidHom.toHomPerm {G : Type*} [Group G] (f : G →* Function.End α
 theorem mul_apply (f g : Perm α) (x) : (f * g) x = f (g x) :=
   Equiv.trans_apply _ _ _
 
-theorem one_apply (x) : (1 : Perm α) x = x :=
-  rfl
-
 @[simp]
 theorem inv_apply_self (f : Perm α) (x) : f⁻¹ (f x) = x :=
   f.symm_apply_apply x
@@ -74,22 +69,7 @@ theorem inv_apply_self (f : Perm α) (x) : f⁻¹ (f x) = x :=
 theorem apply_inv_self (f : Perm α) (x) : f (f⁻¹ x) = x :=
   f.apply_symm_apply x
 
-theorem one_def : (1 : Perm α) = Equiv.refl α :=
-  rfl
-
-theorem mul_def (f g : Perm α) : f * g = g.trans f :=
-  rfl
-
-theorem inv_def (f : Perm α) : f⁻¹ = f.symm :=
-  rfl
-
-@[simp, norm_cast] lemma coe_one : ⇑(1 : Perm α) = id := rfl
-
-@[simp, norm_cast] lemma coe_mul (f g : Perm α) : ⇑(f * g) = f ∘ g := rfl
-
 @[norm_cast] lemma coe_pow (f : Perm α) (n : ℕ) : ⇑(f ^ n) = f^[n] := rfl
-
-@[simp] lemma iterate_eq_pow (f : Perm α) (n : ℕ) : f^[n] = ⇑(f ^ n) := rfl
 
 theorem eq_inv_iff_eq {f : Perm α} {x y : α} : x = f⁻¹ y ↔ f x = y :=
   f.eq_symm_apply
@@ -232,10 +212,6 @@ theorem subtypeCongrHom_injective (p : α → Prop) [DecidablePred p] :
   rw [Prod.mk.inj_iff]
   constructor <;> ext i <;> simpa using Equiv.congr_fun h i
 
-@[simp]
-theorem permCongr_eq_mul (e p : Perm α) : e.permCongr p = e * p * e⁻¹ :=
-  rfl
-
 section ExtendDomain
 
 /-! Lemmas about `Equiv.Perm.extendDomain` re-expressed via the group structure. -/
@@ -245,10 +221,6 @@ variable (e : Perm α) {p : β → Prop} [DecidablePred p] (f : α ≃ Subtype p
 @[simp]
 theorem extendDomain_one : extendDomain 1 f = 1 :=
   extendDomain_refl f
-
-@[simp]
-theorem extendDomain_inv : (e.extendDomain f)⁻¹ = e⁻¹.extendDomain f :=
-  rfl
 
 @[simp]
 theorem extendDomain_mul (e e' : Perm α) :
@@ -291,15 +263,6 @@ def subtypePerm (f : Perm α) (h : ∀ x, p x ↔ p (f x)) : Perm { x // p x } w
   right_inv _ := by simp only [Perm.apply_inv_self, Subtype.coe_eta, Subtype.coe_mk]
 
 @[simp]
-theorem subtypePerm_apply (f : Perm α) (h : ∀ x, p x ↔ p (f x)) (x : { x // p x }) :
-    subtypePerm f h x = ⟨f x, (h _).1 x.2⟩ :=
-  rfl
-
-@[simp]
-theorem subtypePerm_one (p : α → Prop) (h := fun _ => Iff.rfl) : @subtypePerm α p 1 h = 1 :=
-  rfl
-
-@[simp]
 theorem subtypePerm_mul (f g : Perm α) (hf hg) :
     (f.subtypePerm hf * g.subtypePerm hg : Perm { x // p x }) =
       (f * g).subtypePerm fun _ => (hg _).trans <| hf _ :=
@@ -310,11 +273,6 @@ private theorem inv_aux : (∀ x, p x ↔ p (f x)) ↔ ∀ x, p x ↔ p (f⁻¹ 
 
 theorem subtypePerm_inv (f : Perm α) (hf) :
     f⁻¹.subtypePerm hf = (f.subtypePerm <| inv_aux.2 hf : Perm { x // p x })⁻¹ :=
-  rfl
-
-@[simp]
-theorem inv_subtypePerm (f : Perm α) (hf) :
-    (f.subtypePerm hf : Perm { x // p x })⁻¹ = f⁻¹.subtypePerm (inv_aux.1 hf) :=
   rfl
 
 private theorem pow_aux (hf : ∀ x, p x ↔ p (f x)) : ∀ {n : ℕ} (x), p x ↔ p ((f ^ n) x)

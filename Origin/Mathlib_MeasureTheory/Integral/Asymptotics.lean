@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Integral.IntegrableOn
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Function.LocallyIntegrable
 
+noncomputable section
+
 /-!
 # Bounding of integrals by asymptotics
 

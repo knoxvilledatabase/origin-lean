@@ -1,12 +1,14 @@
 /-
 Extracted from FieldTheory/Differential/Basic.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Field
 import Mathlib.RingTheory.Derivation.DifferentialRing
 import Mathlib.RingTheory.LocalRing.Basic
 import Mathlib.Tactic.FieldSimp
+
+noncomputable section
 
 /-!
 # Differential Fields
@@ -31,9 +33,15 @@ lemma logDeriv_zero : logDeriv (0 : R) = 0 := by
 lemma logDeriv_one : logDeriv (1 : R) = 0 := by
   simp [logDeriv]
 
--- DISSOLVED: logDeriv_mul
+lemma logDeriv_mul (ha : a ≠ 0) (hb : b ≠ 0) : logDeriv (a * b) = logDeriv a + logDeriv b := by
+  unfold logDeriv
+  field_simp
+  ring
 
--- DISSOLVED: logDeriv_div
+lemma logDeriv_div (ha : a ≠ 0) (hb : b ≠ 0) : logDeriv (a / b) = logDeriv a - logDeriv b := by
+  unfold logDeriv
+  field_simp [Derivation.leibniz_div, smul_sub]
+  ring
 
 @[simp]
 lemma logDeriv_pow (n : ℕ) (a : R) : logDeriv (a ^ n) = n * logDeriv a := by
@@ -49,9 +57,20 @@ lemma logDeriv_eq_zero : logDeriv a = 0 ↔ a′ = 0 :=
   ⟨fun h ↦ by simp only [logDeriv, div_eq_zero_iff] at h; rcases h with h|h <;> simp [h],
   fun h ↦ by unfold logDeriv at *; simp [h]⟩
 
--- DISSOLVED: logDeriv_multisetProd
+lemma logDeriv_multisetProd {ι : Type*} (s : Multiset ι) {f : ι → R} (h : ∀ x ∈ s, f x ≠ 0) :
+    logDeriv (s.map f).prod = (s.map fun x ↦ logDeriv (f x)).sum := by
+  induction s using Multiset.induction_on
+  · simp
+  · rename_i h₂
+    simp only [Function.comp_apply, Multiset.map_cons, Multiset.sum_cons, Multiset.prod_cons]
+    rw [← h₂]
+    · apply logDeriv_mul
+      · simp [h]
+      · simp_all
+    · simp_all
 
--- DISSOLVED: logDeriv_prod
+lemma logDeriv_prod (ι : Type*) (s : Finset ι) (f : ι → R) (h : ∀ x ∈ s, f x ≠ 0) :
+    logDeriv (∏ x ∈ s, f x) = ∑ x ∈ s, logDeriv (f x) := logDeriv_multisetProd _ h
 
 lemma logDeriv_prod_of_eq_zero (ι : Type*) (s : Finset ι) (f : ι → R) (h : ∀ x ∈ s, f x = 0) :
     logDeriv (∏ x ∈ s, f x) = ∑ x ∈ s, logDeriv (f x) := by

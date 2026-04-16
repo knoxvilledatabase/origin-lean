@@ -7,6 +7,8 @@ import Mathlib.RingTheory.DedekindDomain.Dvr
 import Mathlib.RingTheory.IntegralClosure.IntegralRestrict
 import Mathlib.RingTheory.LocalRing.Quotient
 
+noncomputable section
+
 /-!
 
 We gather results about the relations between the trace map on `B → A` and the trace map on
@@ -66,7 +68,6 @@ variable (Rₚ)
 attribute [local instance] Ideal.Quotient.field
 
 noncomputable
-
 def equivQuotMaximalIdealOfIsLocalization : R ⧸ p ≃+* Rₚ ⧸ maximalIdeal Rₚ := by
   refine (Ideal.quotEquivOfEq ?_).trans
     (RingHom.quotientKerEquivOfSurjective (f := algebraMap R (Rₚ ⧸ maximalIdeal Rₚ)) ?_)
@@ -133,7 +134,6 @@ lemma comap_map_eq_map_of_isLocalization_algebraMapSubmonoid :
 variable (S Sₚ)
 
 noncomputable
-
 def quotMapEquivQuotMapMaximalIdealOfIsLocalization : S ⧸ pS ≃+* Sₚ ⧸ pSₚ := by
   haveI h : pSₚ = Ideal.map (algebraMap S Sₚ) pS := by
     rw [← IsLocalization.AtPrime.map_eq_maximalIdeal p Rₚ, Ideal.map_map,

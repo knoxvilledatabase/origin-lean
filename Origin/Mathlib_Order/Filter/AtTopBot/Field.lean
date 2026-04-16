@@ -1,10 +1,12 @@
 /-
 Extracted from Order/Filter/AtTopBot/Field.lean
-Genuine: 42 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Order.Filter.AtTopBot.Ring
+
+noncomputable section
 
 /-!
 # Convergence to ±infinity in linear ordered (semi)fields
@@ -61,9 +63,17 @@ theorem Tendsto.atTop_div_const (hr : 0 < r) (hf : Tendsto f l atTop) :
     Tendsto (fun x => f x / r) l atTop := by
   simpa only [div_eq_mul_inv] using hf.atTop_mul_const (inv_pos.2 hr)
 
--- DISSOLVED: tendsto_const_mul_pow_atTop
+theorem tendsto_const_mul_pow_atTop (hn : n ≠ 0) (hc : 0 < c) :
+    Tendsto (fun x => c * x ^ n) atTop atTop :=
+  Tendsto.const_mul_atTop hc (tendsto_pow_atTop hn)
 
--- DISSOLVED: tendsto_const_mul_pow_atTop_iff
+theorem tendsto_const_mul_pow_atTop_iff :
+    Tendsto (fun x => c * x ^ n) atTop atTop ↔ n ≠ 0 ∧ 0 < c := by
+  refine ⟨fun h => ⟨?_, ?_⟩, fun h => tendsto_const_mul_pow_atTop h.1 h.2⟩
+  · rintro rfl
+    simp only [pow_zero, not_tendsto_const_atTop] at h
+  · rcases ((h.eventually_gt_atTop 0).and (eventually_ge_atTop 0)).exists with ⟨k, hck, hk⟩
+    exact pos_of_mul_pos_left hck (pow_nonneg hk _)
 
 lemma tendsto_zpow_atTop_atTop {n : ℤ} (hn : 0 < n) : Tendsto (fun x : α ↦ x ^ n) atTop atTop := by
   lift n to ℕ+ using hn; simp
@@ -203,9 +213,13 @@ theorem Tendsto.atBot_mul_const_of_neg (hr : r < 0) (hf : Tendsto f l atBot) :
     Tendsto (fun x => f x * r) l atTop :=
   (tendsto_mul_const_atTop_of_neg hr).2 hf
 
--- DISSOLVED: tendsto_neg_const_mul_pow_atTop
+theorem tendsto_neg_const_mul_pow_atTop {c : α} {n : ℕ} (hn : n ≠ 0) (hc : c < 0) :
+    Tendsto (fun x => c * x ^ n) atTop atBot :=
+  (tendsto_pow_atTop hn).const_mul_atTop_of_neg hc
 
--- DISSOLVED: tendsto_const_mul_pow_atBot_iff
+theorem tendsto_const_mul_pow_atBot_iff {c : α} {n : ℕ} :
+    Tendsto (fun x => c * x ^ n) atTop atBot ↔ n ≠ 0 ∧ c < 0 := by
+  simp only [← tendsto_neg_atTop_iff, ← neg_mul, tendsto_const_mul_pow_atTop_iff, neg_pos]
 
 alias Tendsto.neg_const_mul_atTop := Tendsto.const_mul_atTop_of_neg
 

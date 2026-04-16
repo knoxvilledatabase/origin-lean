@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Probability.Kernel.Disintegration.Integral
 
+noncomputable section
+
 /-!
 # Uniqueness of the conditional kernel
 

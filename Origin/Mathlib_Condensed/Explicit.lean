@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Condensed.Module
 import Mathlib.Condensed.Equivalence
 
+noncomputable section
+
 /-!
 
 # The explicit sheaf condition for condensed sets

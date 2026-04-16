@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.RingTheory.Localization.Ideal
 
+noncomputable section
+
 /-!
 # Localization of algebra maps
 
@@ -64,11 +66,6 @@ def RingHom.toKerIsLocalization (hy : M ≤ Submonoid.comap g T) :
     simp only [SetLike.val_smul, smul_eq_mul, map_mul, id_apply, SetLike.mk_smul_of_tower_mk,
       Algebra.smul_def]
 
-@[simp]
-lemma RingHom.toKerIsLocalization_apply (hy : M ≤ Submonoid.comap g T) (r : RingHom.ker g) :
-    (RingHom.toKerIsLocalization S Q g hy r).val = algebraMap R S r :=
-  rfl
-
 lemma RingHom.toKerIsLocalization_isLocalizedModule (hT : Submonoid.map g M = T) :
     IsLocalizedModule M (toKerIsLocalization S Q g (hT.symm ▸ Submonoid.le_comap_map M)) := by
   let e := LinearEquiv.ofEq _ _ (IsLocalization.ker_map (S := S) Q g hT).symm
@@ -108,11 +105,6 @@ noncomputable def mapₐ (f : A →ₐ[R] B) : Aₚ →ₐ[Rₚ] Bₚ :=
     obtain ⟨a, m, rfl⟩ := IsLocalization.mk'_surjective M r
     simp [algebraMap_mk' (S := A), algebraMap_mk' (S := B), map_mk']⟩
 
-@[simp]
-lemma mapₐ_coe (f : A →ₐ[R] B) :
-    (mapₐ M Rₚ Aₚ Bₚ f : Aₚ → Bₚ) = map Bₚ f.toRingHom (algebraMapSubmonoid_le_comap M f)  :=
-  rfl
-
 lemma mapₐ_injective_of_injective (f : A →ₐ[R] B) (hf : Function.Injective f) :
     Function.Injective (mapₐ M Rₚ Aₚ Bₚ f) :=
   IsLocalization.map_injective_of_injective _ _ _ hf
@@ -128,12 +120,6 @@ open IsLocalization
 def AlgHom.toKerIsLocalization (f : A →ₐ[R] B) :
     RingHom.ker f →ₗ[A] RingHom.ker (mapₐ M Rₚ Aₚ Bₚ f) :=
   RingHom.toKerIsLocalization Aₚ Bₚ f.toRingHom (algebraMapSubmonoid_le_comap M f)
-
-@[simp]
-lemma AlgHom.toKerIsLocalization_apply (f : A →ₐ[R] B) (x : RingHom.ker f) :
-    AlgHom.toKerIsLocalization M Rₚ Aₚ Bₚ f x =
-      RingHom.toKerIsLocalization Aₚ Bₚ f.toRingHom (algebraMapSubmonoid_le_comap M f) x :=
-  rfl
 
 lemma AlgHom.toKerIsLocalization_isLocalizedModule (f : A →ₐ[R] B) :
     IsLocalizedModule (Algebra.algebraMapSubmonoid A M)

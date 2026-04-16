@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/Bicategory/End.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Basic
 import Mathlib.CategoryTheory.Monoidal.Category
+
+noncomputable section
 
 /-!
 # Endomorphisms of an object in a bicategory, as a monoidal category.
@@ -30,7 +32,6 @@ open MonoidalCategory
 open Bicategory
 
 attribute [local simp] EndMonoidal in
-
 instance (X : C) : MonoidalCategory (EndMonoidal X) where
   tensorObj f g := f ≫ g
   whiskerLeft {f _ _} η := f ◁ η

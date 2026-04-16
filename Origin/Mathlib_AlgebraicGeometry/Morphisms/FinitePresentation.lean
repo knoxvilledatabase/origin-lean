@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.RingHomProperties
 import Mathlib.RingTheory.RingHom.FinitePresentation
 
+noncomputable section
+
 /-!
 
 # Morphisms of finite presentation

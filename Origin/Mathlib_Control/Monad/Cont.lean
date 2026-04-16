@@ -9,6 +9,8 @@ import Mathlib.Control.Lawful
 import Batteries.Tactic.Congr
 import Batteries.Lean.Except
 
+noncomputable section
+
 /-!
 # Continuation Monad
 
@@ -58,14 +60,7 @@ def run : ContT r m α → (α → m r) → m r :=
 def map (f : m r → m r) (x : ContT r m α) : ContT r m α :=
   f ∘ x
 
-theorem run_contT_map_contT (f : m r → m r) (x : ContT r m α) : run (map f x) = f ∘ run x :=
-  rfl
-
 def withContT (f : (β → m r) → α → m r) (x : ContT r m α) : ContT r m β := fun g => x <| f g
-
-theorem run_withContT (f : (β → m r) → α → m r) (x : ContT r m α) :
-    run (withContT f x) = run x ∘ f :=
-  rfl
 
 @[ext]
 protected theorem ext {x y : ContT r m α} (h : ∀ f, x.run f = y.run f) : x = y := by

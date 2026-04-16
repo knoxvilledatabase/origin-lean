@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.DiscreteCategory
 import Mathlib.CategoryTheory.Bicategory.Functor.Prelax
 import Mathlib.CategoryTheory.Bicategory.Strict
 
+noncomputable section
+
 /-!
 # Locally discrete bicategories
 
@@ -36,9 +38,6 @@ structure LocallyDiscrete (C : Type u) where
 
 namespace LocallyDiscrete
 
-@[simp]
-theorem mk_as (a : LocallyDiscrete C) : mk a.as = a := rfl
-
 @[simps]
 def locallyDiscreteEquiv : LocallyDiscrete C ≃ C where
   toFun := LocallyDiscrete.as
@@ -58,14 +57,6 @@ instance categoryStruct [CategoryStruct.{v} C] : CategoryStruct (LocallyDiscrete
   comp f g := ⟨f.as ≫ g.as⟩
 
 variable [CategoryStruct.{v} C]
-
-@[simp]
-lemma id_as (a : LocallyDiscrete C) : (𝟙 a : Discrete (a.as ⟶ a.as)).as = 𝟙 a.as :=
-  rfl
-
-@[simp]
-lemma comp_as {a b c : LocallyDiscrete C} (f : a ⟶ b) (g : b ⟶ c) : (f ≫ g).as = f.as ≫ g.as :=
-  rfl
 
 instance (priority := 900) homSmallCategory (a b : LocallyDiscrete C) : SmallCategory (a ⟶ b) :=
   CategoryTheory.discreteCategory (a.as ⟶ b.as)
@@ -136,14 +127,6 @@ variable {C : Type u} [CategoryStruct.{v} C]
 @[simps]
 def toLoc {a b : C} (f : a ⟶ b) : LocallyDiscrete.mk a ⟶ LocallyDiscrete.mk b :=
   ⟨f⟩
-
-@[simp]
-lemma id_toLoc (a : C) : (𝟙 a).toLoc = 𝟙 (LocallyDiscrete.mk a) :=
-  rfl
-
-@[simp]
-lemma comp_toLoc {a b c : C} (f : a ⟶ b) (g : b ⟶ c) : (f ≫ g).toLoc = f.toLoc ≫ g.toLoc :=
-  rfl
 
 end Quiver.Hom
 

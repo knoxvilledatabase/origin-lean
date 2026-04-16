@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.DFinsupp.BigOperators
 import Mathlib.Data.DFinsupp.Order
 
+noncomputable section
+
 /-!
 # Equivalence between `Multiset` and `ℕ`-valued finitely supported functions
 
@@ -44,10 +46,6 @@ def toDFinsupp : Multiset α →+ Π₀ _ : α, ℕ where
       support' := Trunc.mk ⟨s, fun i ↦ (em (i ∈ s)).imp_right Multiset.count_eq_zero_of_not_mem⟩ }
   map_zero' := rfl
   map_add' _ _ := DFinsupp.ext fun _ ↦ Multiset.count_add _ _ _
-
-@[simp]
-theorem toDFinsupp_apply (s : Multiset α) (a : α) : Multiset.toDFinsupp s a = s.count a :=
-  rfl
 
 @[simp]
 theorem toDFinsupp_support (s : Multiset α) : s.toDFinsupp.support = s.toFinset :=

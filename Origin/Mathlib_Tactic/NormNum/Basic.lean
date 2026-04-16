@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/NormNum/Basic.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Invertible
@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.Cast.Commute
 import Mathlib.Tactic.NormNum.Core
 import Mathlib.Tactic.HaveI
 import Mathlib.Tactic.ClearExclamation
+
+noncomputable section
 
 /-!
 ## `norm_num` basic plugins
@@ -139,30 +141,6 @@ alias isInt_cast := isintCast
 
 /-! # Arithmetic -/
 
-library_note "norm_num lemma function equality"/--
-
-Note: Many of the lemmas in this file use a function equality hypothesis like `f = HAdd.hAdd`
-
-below. The reason for this is that when this is applied, to prove e.g. `100 + 200 = 300`, the
-
-`+` here is `HAdd.hAdd` with an instance that may not be syntactically equal to the one supplied
-
-by the `AddMonoidWithOne` instance, and rather than attempting to prove the instances equal lean
-
-will sometimes decide to evaluate `100 + 200` directly (into whatever `+` is defined to do in this
-
-ring), which is definitely not what we want; if the subterms are expensive to kernel-reduce then
-
-this could cause a `(kernel) deep recursion detected` error (see https://github.com/leanprover/lean4/issues/2171, https://github.com/leanprover-community/mathlib4/pull/4048).
-
-By using an equality for the unapplied `+` function and proving it by `rfl` we take away the
-
-opportunity for lean to unfold the numerals (and the instance defeq problem is usually comparatively
-
-easy).
-
--/
-
 theorem isNat_add {α} [AddMonoidWithOne α] : ∀ {f : α → α → α} {a b : α} {a' b' c : ℕ},
     f = HAdd.hAdd → IsNat a a' → IsNat b b' → Nat.add a' b' = c → IsNat (f a b) c
   | _, _, _, _, _, _, rfl, ⟨rfl⟩, ⟨rfl⟩, rfl => ⟨(Nat.cast_add _ _).symm⟩
@@ -207,6 +185,9 @@ def _root_.Mathlib.Meta.monadLiftOptionMetaM : MonadLift Option MetaM where
   | some e => pure e
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a + b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num _ + _] def evalAdd : NormNumExt where eval {u α} e := do
   let .app (.app (f : Q($α → $α → $α)) (a : Q($α))) (b : Q($α)) ← whnfR e | failure
@@ -266,6 +247,9 @@ theorem isRat_neg {α} [Ring α] : ∀ {f : α → α} {a : α} {n n' : ℤ} {d 
   | _, _, _, _, _, rfl, ⟨h, rfl⟩, rfl => ⟨h, by rw [← neg_mul, ← Int.cast_neg]; rfl⟩
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `-a`,
+
+such that `norm_num` successfully recognises `a`. -/
 
 @[norm_num -_] def evalNeg : NormNumExt where eval {u α} e := do
   let .app (f : Q($α → $α)) (a : Q($α)) ← whnfR e | failure
@@ -311,6 +295,9 @@ theorem isRat_sub {α} [Ring α] {f : α → α → α} {a b : α} {na nb nc : �
   rw [show Int.mul (-nb) _ = _ from neg_mul ..]; exact h₁
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a - b` in a ring,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num _ - _] def evalSub : NormNumExt where eval {u α} e := do
   let .app (.app (f : Q($α → $α → $α)) (a : Q($α))) (b : Q($α)) ← whnfR e | failure
@@ -379,6 +366,9 @@ theorem isRat_mul {α} [Ring α] {f : α → α → α} {a b : α} {na nb nc : �
     (Nat.cast_commute (α := α) db dc).invOf_left.invOf_right.right_comm]
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a * b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num _ * _] def evalMul : NormNumExt where eval {u α} e := do
   let .app (.app (f : Q($α → $α → $α)) (a : Q($α))) (b : Q($α)) ← whnfR e | failure
@@ -431,6 +421,9 @@ def inferDivisionRing {u : Level} (α : Q(Type u)) : MetaM Q(DivisionRing $α) :
   return ← synthInstanceQ (q(DivisionRing $α) : Q(Type u)) <|> throwError "not a division ring"
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a / b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num _ / _] def evalDiv : NormNumExt where eval {u α} e := do
   let .app (.app f (a : Q($α))) (b : Q($α)) ← whnfR e | failure
@@ -556,7 +549,9 @@ theorem isNat_dvd_true : {a b : ℕ} → {a' b' : ℕ} →
     IsNat a a' → IsNat b b' → Nat.mod b' a' = nat_lit 0 → a ∣ b
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, e => Nat.dvd_of_mod_eq_zero e
 
--- DISSOLVED: isNat_dvd_false
+theorem isNat_dvd_false : {a b : ℕ} → {a' b' c : ℕ} →
+    IsNat a a' → IsNat b b' → Nat.mod b' a' = Nat.succ c → ¬a ∣ b
+  | _, _, _, _, c, ⟨rfl⟩, ⟨rfl⟩, e => mt Nat.mod_eq_zero_of_dvd (e.symm ▸ Nat.succ_ne_zero c :)
 
 @[norm_num (_ : ℕ) ∣ _] def evalNatDvd : NormNumExt where eval {u α} e := do
   let .app (.app f (a : Q(ℕ))) (b : Q(ℕ)) ← whnfR e | failure

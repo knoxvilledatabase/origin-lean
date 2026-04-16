@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Exp
 
+noncomputable section
+
 /-!
 # Limits of `P(x) / e ^ x` for a polynomial `P`
 

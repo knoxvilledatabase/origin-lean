@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Order.WellFoundedSet
 
+noncomputable section
+
 /-! # Multiplication antidiagonal -/
 
 namespace Set

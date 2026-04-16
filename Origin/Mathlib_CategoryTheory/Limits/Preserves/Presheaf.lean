@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.FilteredColimitCommutesFiniteLimit
 import Mathlib.CategoryTheory.Limits.Elements
 
+noncomputable section
+
 /-!
 # Finite-limit-preserving presheaves
 

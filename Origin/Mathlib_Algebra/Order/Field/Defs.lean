@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Field.Defs
 
+noncomputable section
+
 /-!
 # Linear ordered (semi)fields
 

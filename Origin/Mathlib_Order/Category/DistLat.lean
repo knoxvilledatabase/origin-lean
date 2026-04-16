@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Order.Category.Lat
 
+noncomputable section
+
 /-!
 # The category of distributive lattices
 
@@ -32,10 +34,6 @@ instance (X : DistLat) : DistribLattice X :=
 
 def of (α : Type*) [DistribLattice α] : DistLat :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [DistribLattice α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited DistLat :=
   ⟨of PUnit⟩
@@ -75,7 +73,3 @@ def dualEquiv : DistLat ≌ DistLat where
   counitIso := NatIso.ofComponents (fun X => Iso.mk <| OrderIso.dualDual X) fun _ => rfl
 
 end DistLat
-
-theorem distLat_dual_comp_forget_to_Lat :
-    DistLat.dual ⋙ forget₂ DistLat Lat = forget₂ DistLat Lat ⋙ Lat.dual :=
-  rfl

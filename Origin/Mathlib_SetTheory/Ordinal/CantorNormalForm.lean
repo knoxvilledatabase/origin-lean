@@ -1,10 +1,12 @@
 /-
 Extracted from SetTheory/Ordinal/CantorNormalForm.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic
 import Mathlib.SetTheory.Ordinal.Exponential
+
+noncomputable section
 
 /-!
 # Cantor Normal Form
@@ -36,15 +38,24 @@ open List
 
 namespace Ordinal
 
--- DISSOLVED: CNFRec
+@[elab_as_elim]
+noncomputable def CNFRec (b : Ordinal) {C : Ordinal → Sort*} (H0 : C 0)
+    (H : ∀ o, o ≠ 0 → C (o % b ^ log b o) → C o) (o : Ordinal) : C o :=
+  if h : o = 0 then h ▸ H0 else H o h (CNFRec b H0 H (o % b ^ log b o))
 
 termination_by o
 
 decreasing_by exact mod_opow_log_lt_self b h
 
--- DISSOLVED: CNFRec_zero
+@[simp]
+theorem CNFRec_zero {C : Ordinal → Sort*} (b : Ordinal) (H0 : C 0)
+    (H : ∀ o, o ≠ 0 → C (o % b ^ log b o) → C o) : CNFRec b H0 H 0 = H0 := by
+  rw [CNFRec, dif_pos rfl]
 
--- DISSOLVED: CNFRec_pos
+theorem CNFRec_pos (b : Ordinal) {o : Ordinal} {C : Ordinal → Sort*} (ho : o ≠ 0) (H0 : C 0)
+    (H : ∀ o, o ≠ 0 → C (o % b ^ log b o) → C o) :
+    CNFRec b H0 H o = H o ho (@CNFRec b C H0 H _) := by
+  rw [CNFRec, dif_neg]
 
 @[pp_nodot]
 def CNF (b o : Ordinal) : List (Ordinal × Ordinal) :=
@@ -54,15 +65,20 @@ def CNF (b o : Ordinal) : List (Ordinal × Ordinal) :=
 theorem CNF_zero (b : Ordinal) : CNF b 0 = [] :=
   CNFRec_zero b _ _
 
--- DISSOLVED: CNF_ne_zero
+theorem CNF_ne_zero {b o : Ordinal} (ho : o ≠ 0) :
+    CNF b o = (log b o, o / b ^ log b o)::CNF b (o % b ^ log b o) :=
+  CNFRec_pos b ho _ _
 
--- DISSOLVED: zero_CNF
+theorem zero_CNF {o : Ordinal} (ho : o ≠ 0) : CNF 0 o = [(0, o)] := by simp [CNF_ne_zero ho]
 
--- DISSOLVED: one_CNF
+theorem one_CNF {o : Ordinal} (ho : o ≠ 0) : CNF 1 o = [(0, o)] := by simp [CNF_ne_zero ho]
 
--- DISSOLVED: CNF_of_le_one
+theorem CNF_of_le_one {b o : Ordinal} (hb : b ≤ 1) (ho : o ≠ 0) : CNF b o = [(0, o)] := by
+  rcases le_one_iff.1 hb with (rfl | rfl)
+  exacts [zero_CNF ho, one_CNF ho]
 
--- DISSOLVED: CNF_of_lt
+theorem CNF_of_lt {b o : Ordinal} (ho : o ≠ 0) (hb : o < b) : CNF b o = [(0, o)] := by
+  rw [CNF_ne_zero ho, log_eq_zero hb, opow_zero, div_one, mod_one, CNF_zero]
 
 theorem CNF_foldr (b o : Ordinal) : (CNF b o).foldr (fun p r ↦ b ^ p.1 * p.2 + r) 0 = o := by
   refine CNFRec b ?_ ?_ o

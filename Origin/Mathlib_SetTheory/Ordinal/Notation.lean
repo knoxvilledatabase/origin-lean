@@ -1,6 +1,6 @@
 /-
 Extracted from SetTheory/Ordinal/Notation.lean
-Genuine: 96 | Conflates: 0 | Dissolved: 3 | Infrastructure: 55
+Genuine: 98 | Conflates: 0 | Dissolved: 0 | Infrastructure: 55
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Divisibility.Basic
@@ -8,6 +8,8 @@ import Mathlib.Data.Ordering.Lemmas
 import Mathlib.Data.PNat.Basic
 import Mathlib.SetTheory.Ordinal.Principal
 import Mathlib.Tactic.NormNum
+
+noncomputable section
 
 /-!
 # Ordinal notation
@@ -27,6 +29,13 @@ are defined on `ONote` and `NONote`.
 open Ordinal Order
 
 set_option genSizeOfSpec false in
+/-- Recursive definition of an ordinal notation. `zero` denotes the ordinal 0, and `oadd e n a` is
+
+intended to refer to `ω ^ e * n + a`. For this to be a valid Cantor normal form, we must have the
+
+exponents decrease to the right, but we can't state this condition until we've defined `repr`, so we
+
+make it a separate definition `NF`. -/
 
 inductive ONote : Type
   | zero : ONote
@@ -92,9 +101,6 @@ instance : Preorder ONote where
 theorem lt_def {x y : ONote} : x < y ↔ repr x < repr y :=
   Iff.rfl
 
-theorem le_def {x y : ONote} : x ≤ y ↔ repr x ≤ repr y :=
-  Iff.rfl
-
 instance : WellFoundedRelation ONote :=
   ⟨(· < ·), InvImage.wf repr Ordinal.lt_wf⟩
 
@@ -102,12 +108,6 @@ instance : WellFoundedRelation ONote :=
 def ofNat : ℕ → ONote
   | 0 => 0
   | Nat.succ n => oadd 0 n.succPNat 0
-
-@[simp] theorem ofNat_zero : ofNat 0 = 0 :=
-  rfl
-
-@[simp] theorem ofNat_succ (n) : ofNat (Nat.succ n) = oadd 0 n.succPNat 0 :=
-  rfl
 
 instance nat (n : ℕ) : OfNat ONote n where
   ofNat := ofNat n
@@ -306,7 +306,9 @@ theorem NF.of_dvd_omega0_opow {b e n a} (h : NF (ONote.oadd e n a))
 
 alias NF.of_dvd_omega_opow := NF.of_dvd_omega0_opow
 
--- DISSOLVED: NF.of_dvd_omega0
+theorem NF.of_dvd_omega0 {e n a} (h : NF (ONote.oadd e n a)) :
+    ω ∣ repr (ONote.oadd e n a) → repr e ≠ 0 ∧ ω ∣ repr a := by
+  (rw [← opow_one ω, ← one_le_iff_ne_zero]; exact h.of_dvd_omega0_opow)
 
 alias NF.of_dvd_omega := NF.of_dvd_omega0
 
@@ -729,13 +731,109 @@ theorem scale_opowAux (e a0 a : ONote) [NF e] [NF a0] [NF a] :
       rw [repr_add, repr_scale, scale_opowAux _ _ _ k]
       simp only [repr_add, repr_scale, opow_add, mul_assoc, zero_add, mul_add]
 
--- DISSOLVED: repr_opow_aux₁
+theorem repr_opow_aux₁ {e a} [Ne : NF e] [Na : NF a] {a' : Ordinal} (e0 : repr e ≠ 0)
+    (h : a' < (ω : Ordinal.{0}) ^ repr e) (aa : repr a = a') (n : ℕ+) :
+    ((ω : Ordinal.{0}) ^ repr e * (n : ℕ) + a') ^ (ω : Ordinal.{0}) =
+      (ω ^ repr e) ^ (ω : Ordinal.{0}) := by
+  subst aa
+  have No := Ne.oadd n (Na.below_of_lt' h)
+  have := omega0_le_oadd e n a
+  rw [repr] at this
+  refine le_antisymm ?_ (opow_le_opow_left _ this)
+  apply (opow_le_of_limit ((opow_pos _ omega0_pos).trans_le this).ne' isLimit_omega0).2
+  intro b l
+  have := (No.below_of_lt (lt_succ _)).repr_lt
+  rw [repr] at this
+  apply (opow_le_opow_left b <| this.le).trans
+  rw [← opow_mul, ← opow_mul]
+  apply opow_le_opow_right omega0_pos
+  rcases le_or_lt ω (repr e) with h | h
+  · apply (mul_le_mul_left' (le_succ b) _).trans
+    rw [← add_one_eq_succ, add_mul_succ _ (one_add_of_omega0_le h), add_one_eq_succ, succ_le_iff,
+      Ordinal.mul_lt_mul_iff_left (Ordinal.pos_iff_ne_zero.2 e0)]
+    exact isLimit_omega0.2 _ l
+  · apply (principal_mul_omega0 (isLimit_omega0.2 _ h) l).le.trans
+    simpa using mul_le_mul_right' (one_le_iff_ne_zero.2 e0) ω
 
 section
 
 set_option linter.unusedVariables false in
-
--- DISSOLVED: repr_opow_aux₂
+theorem repr_opow_aux₂ {a0 a'} [N0 : NF a0] [Na' : NF a'] (m : ℕ) (d : ω ∣ repr a')
+    (e0 : repr a0 ≠ 0) (h : repr a' + m < (ω ^ repr a0)) (n : ℕ+) (k : ℕ) :
+    let R := repr (opowAux 0 a0 (oadd a0 n a' * ofNat m) k m)
+    (k ≠ 0 → R < ((ω ^ repr a0) ^ succ (k : Ordinal))) ∧
+      ((ω ^ repr a0) ^ (k : Ordinal)) * ((ω ^ repr a0) * (n : ℕ) + repr a') + R =
+        ((ω ^ repr a0) * (n : ℕ) + repr a' + m) ^ succ (k : Ordinal) := by
+  intro R'
+  haveI No : NF (oadd a0 n a') :=
+    N0.oadd n (Na'.below_of_lt' <| lt_of_le_of_lt (le_add_right _ _) h)
+  induction' k with k IH
+  · cases m <;> simp [R', opowAux]
+  -- rename R => R'
+  let R := repr (opowAux 0 a0 (oadd a0 n a' * ofNat m) k m)
+  let ω0 := ω ^ repr a0
+  let α' := ω0 * n + repr a'
+  change (k ≠ 0 → R < (ω0 ^ succ (k : Ordinal))) ∧ (ω0 ^ (k : Ordinal)) * α' + R
+    = (α' + m) ^ (succ ↑k : Ordinal) at IH
+  have RR : R' = ω0 ^ (k : Ordinal) * (α' * m) + R := by
+    by_cases h : m = 0
+    · simp only [R, R', h, ONote.ofNat, Nat.cast_zero, zero_add, ONote.repr, mul_zero,
+        ONote.opowAux, add_zero]
+    · simp only [R', ONote.repr_scale, ONote.repr, ONote.mulNat_eq_mul, ONote.opowAux,
+        ONote.repr_ofNat, ONote.repr_mul, ONote.repr_add, Ordinal.opow_mul, ONote.zero_add]
+  have α0 : 0 < α' := by simpa [lt_def, repr] using oadd_pos a0 n a'
+  have ω00 : 0 < ω0 ^ (k : Ordinal) := opow_pos _ (opow_pos _ omega0_pos)
+  have Rl : R < ω ^ (repr a0 * succ ↑k) := by
+    by_cases k0 : k = 0
+    · simp only [k0, Nat.cast_zero, succ_zero, mul_one, R]
+      refine lt_of_lt_of_le ?_ (opow_le_opow_right omega0_pos (one_le_iff_ne_zero.2 e0))
+      cases' m with m <;> simp [opowAux, omega0_pos]
+      rw [← add_one_eq_succ, ← Nat.cast_succ]
+      apply nat_lt_omega0
+    · rw [opow_mul]
+      exact IH.1 k0
+  refine ⟨fun _ => ?_, ?_⟩
+  · rw [RR, ← opow_mul _ _ (succ k.succ)]
+    have e0 := Ordinal.pos_iff_ne_zero.2 e0
+    have rr0 : 0 < repr a0 + repr a0 := lt_of_lt_of_le e0 (le_add_left _ _)
+    apply principal_add_omega0_opow
+    · simp only [Nat.succ_eq_add_one, Nat.cast_add, Nat.cast_one, add_one_eq_succ,
+        opow_mul, opow_succ, mul_assoc]
+      rw [Ordinal.mul_lt_mul_iff_left ω00, ← Ordinal.opow_add]
+      have : _ < ω ^ (repr a0 + repr a0) := (No.below_of_lt ?_).repr_lt
+      · exact mul_lt_omega0_opow rr0 this (nat_lt_omega0 _)
+      · simpa using (add_lt_add_iff_left (repr a0)).2 e0
+    · exact
+        lt_of_lt_of_le Rl
+          (opow_le_opow_right omega0_pos <|
+            mul_le_mul_left' (succ_le_succ_iff.2 (Nat.cast_le.2 (le_of_lt k.lt_succ_self))) _)
+  calc
+    (ω0 ^ (k.succ : Ordinal)) * α' + R'
+    _ = (ω0 ^ succ (k : Ordinal)) * α' + ((ω0 ^ (k : Ordinal)) * α' * m + R) := by
+        rw [natCast_succ, RR, ← mul_assoc]
+    _ = ((ω0 ^ (k : Ordinal)) * α' + R) * α' + ((ω0 ^ (k : Ordinal)) * α' + R) * m := ?_
+    _ = (α' + m) ^ succ (k.succ : Ordinal) := by rw [← mul_add, natCast_succ, opow_succ, IH.2]
+  congr 1
+  · have αd : ω ∣ α' :=
+      dvd_add (dvd_mul_of_dvd_left (by simpa using opow_dvd_opow ω (one_le_iff_ne_zero.2 e0)) _) d
+    rw [mul_add (ω0 ^ (k : Ordinal)), add_assoc, ← mul_assoc, ← opow_succ,
+      add_mul_limit _ (isLimit_iff_omega0_dvd.2 ⟨ne_of_gt α0, αd⟩), mul_assoc,
+      @mul_omega0_dvd n (Nat.cast_pos'.2 n.pos) (nat_lt_omega0 _) _ αd]
+    apply @add_absorp _ (repr a0 * succ ↑k)
+    · refine principal_add_omega0_opow _ ?_ Rl
+      rw [opow_mul, opow_succ, Ordinal.mul_lt_mul_iff_left ω00]
+      exact No.snd'.repr_lt
+    · have := mul_le_mul_left' (one_le_iff_pos.2 <| Nat.cast_pos'.2 n.pos) (ω0 ^ succ (k : Ordinal))
+      rw [opow_mul]
+      simpa [-opow_succ]
+  · cases m
+    · have : R = 0 := by cases k <;> simp [R, opowAux]
+      simp [this]
+    · rw [natCast_succ, add_mul_succ]
+      apply add_absorp Rl
+      rw [opow_mul, opow_succ]
+      apply mul_le_mul_left'
+      simpa [repr] using omega0_le_oadd a0 n a'
 
 end
 
@@ -828,21 +926,6 @@ def FundamentalSequenceProp (o : ONote) : (Option ONote) ⊕ (ℕ → ONote) →
   | Sum.inr f =>
     o.repr.IsLimit ∧
       (∀ i, f i < f (i + 1) ∧ f i < o ∧ (o.NF → (f i).NF)) ∧ ∀ a, a < o.repr → ∃ i, a < (f i).repr
-
-theorem fundamentalSequenceProp_inl_none (o) :
-    FundamentalSequenceProp o (Sum.inl none) ↔ o = 0 :=
-  Iff.rfl
-
-theorem fundamentalSequenceProp_inl_some (o a) :
-    FundamentalSequenceProp o (Sum.inl (some a)) ↔ o.repr = succ a.repr ∧ (o.NF → a.NF) :=
-  Iff.rfl
-
-theorem fundamentalSequenceProp_inr (o f) :
-    FundamentalSequenceProp o (Sum.inr f) ↔
-      o.repr.IsLimit ∧
-        (∀ i, f i < f (i + 1) ∧ f i < o ∧ (o.NF → (f i).NF)) ∧
-        ∀ a, a < o.repr → ∃ i, a < (f i).repr :=
-  Iff.rfl
 
 theorem fundamentalSequence_has_prop (o) : FundamentalSequenceProp o (fundamentalSequence o) := by
   induction' o with a m b iha ihb; · exact rfl

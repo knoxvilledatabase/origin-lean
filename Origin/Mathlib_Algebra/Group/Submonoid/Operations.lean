@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Submonoid/Operations.lean
-Genuine: 126 | Conflates: 1 | Dissolved: 2 | Infrastructure: 29
+Genuine: 126 | Conflates: 2 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Algebra.Group.Prod
 import Mathlib.Algebra.Group.Submonoid.Basic
 import Mathlib.Algebra.Group.TypeTags.Basic
+
+noncomputable section
 
 /-!
 # Operations on `Submonoid`s
@@ -165,17 +167,8 @@ def comap (f : F) (S : Submonoid N) :
   mul_mem' ha hb := show f (_ * _) ∈ S by rw [map_mul]; exact S.mul_mem ha hb
 
 @[to_additive (attr := simp)]
-theorem coe_comap (S : Submonoid N) (f : F) : (S.comap f : Set M) = f ⁻¹' S :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem mem_comap {S : Submonoid N} {f : F} {x : M} : x ∈ S.comap f ↔ f x ∈ S :=
   Iff.rfl
-
-@[to_additive]
-theorem comap_comap (S : Submonoid P) (g : N →* P) (f : M →* N) :
-    (S.comap g).comap f = S.comap (g.comp f) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem comap_id (S : Submonoid P) : S.comap (MonoidHom.id P) = S :=
@@ -190,10 +183,6 @@ def map (f : F) (S : Submonoid M) :
   mul_mem' := by
     rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
     exact ⟨x * y, S.mul_mem hx hy, by rw [map_mul]⟩
-
-@[to_additive (attr := simp)]
-theorem coe_map (f : F) (S : Submonoid M) : (S.map f : Set N) = f '' S :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem mem_map {f : F} {S : Submonoid M} {y : N} : y ∈ S.map f ↔ ∃ x ∈ S, f x = y := Iff.rfl
@@ -406,19 +395,10 @@ def topEquiv : (⊤ : Submonoid M) ≃* M where
   right_inv _ := rfl
   map_mul' _ _ := rfl
 
-@[to_additive (attr := simp)]
-theorem topEquiv_toMonoidHom : ((topEquiv : _ ≃* M) : _ →* M) = (⊤ : Submonoid M).subtype :=
-  rfl
-
 @[to_additive "An additive subgroup is isomorphic to its image under an injective function. If you
 have an isomorphism, use `AddEquiv.addSubmonoidMap` for better definitional equalities."]
 noncomputable def equivMapOfInjective (f : M →* N) (hf : Function.Injective f) : S ≃* S.map f :=
   { Equiv.Set.image f S hf with map_mul' := fun _ _ => Subtype.ext (f.map_mul _ _) }
-
-@[to_additive (attr := simp)]
-theorem coe_equivMapOfInjective_apply (f : M →* N) (hf : Function.Injective f) (x : S) :
-    (equivMapOfInjective S f hf x : N) = f x :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem closure_closure_coe_preimage {s : Set M} : closure (((↑) : closure s → M) ⁻¹' s) = ⊤ :=
@@ -563,58 +543,6 @@ variable {F : Type*} [FunLike F M N] [mc : MonoidHomClass F M N]
 
 open Submonoid
 
-library_note "range copy pattern"/--
-
-For many categories (monoids, modules, rings, ...) the set-theoretic image of a morphism `f` is
-
-a subobject of the codomain. When this is the case, it is useful to define the range of a morphism
-
-in such a way that the underlying carrier set of the range subobject is definitionally
-
-`Set.range f`. In particular this means that the types `↥(Set.range f)` and `↥f.range` are
-
-interchangeable without proof obligations.
-
-A convenient candidate definition for range which is mathematically correct is `map ⊤ f`, just as
-
-`Set.range` could have been defined as `f '' Set.univ`. However, this lacks the desired definitional
-
-convenience, in that it both does not match `Set.range`, and that it introduces a redundant `x ∈ ⊤`
-
-term which clutters proofs. In such a case one may resort to the `copy`
-
-pattern. A `copy` function converts the definitional problem for the carrier set of a subobject
-
-into a one-off propositional proof obligation which one discharges while writing the definition of
-
-the definitionally convenient range (the parameter `hs` in the example below).
-
-A good example is the case of a morphism of monoids. A convenient definition for
-
-`MonoidHom.mrange` would be `(⊤ : Submonoid M).map f`. However since this lacks the required
-
-definitional convenience, we first define `Submonoid.copy` as follows:
-
-```lean
-
-protected def copy (S : Submonoid M) (s : Set M) (hs : s = S) : Submonoid M :=
-  { carrier  := s,
-    one_mem' := hs.symm ▸ S.one_mem',
-    mul_mem' := hs.symm ▸ S.mul_mem' }
-
-```
-
-and then finally define:
-
-```lean
-
-def mrange (f : M →* N) : Submonoid N :=
-  ((⊤ : Submonoid M).map f).copy (Set.range f) Set.image_univ.symm
-
-```
-
--/
-
 @[to_additive "The range of an `AddMonoidHom` is an `AddSubmonoid`."]
 def mrange (f : F) : Submonoid N :=
   ((⊤ : Submonoid M).map f).copy (Set.range f) Set.image_univ.symm
@@ -676,11 +604,6 @@ def restrict {N S : Type*} [MulOneClass N] [SetLike S M] [SubmonoidClass S M] (f
   f.comp (SubmonoidClass.subtype _)
 
 @[to_additive (attr := simp)]
-theorem restrict_apply {N S : Type*} [MulOneClass N] [SetLike S M] [SubmonoidClass S M]
-    (f : M →* N) (s : S) (x : s) : f.restrict s x = f x :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem restrict_mrange (f : M →* N) : mrange (f.restrict S) = S.map f := by
   simp [SetLike.ext_iff]
 
@@ -701,11 +624,6 @@ lemma injective_codRestrict {S} [SetLike S N] [SubmonoidClass S N] (f : M →* N
 def mrangeRestrict {N} [MulOneClass N] (f : M →* N) : M →* (mrange f) :=
   (f.codRestrict (mrange f)) fun x => ⟨x, rfl⟩
 
-@[to_additive (attr := simp)]
-theorem coe_mrangeRestrict {N} [MulOneClass N] (f : M →* N) (x : M) :
-    (f.mrangeRestrict x : N) = f x :=
-  rfl
-
 @[to_additive]
 theorem mrangeRestrict_surjective (f : M →* N) : Function.Surjective f.mrangeRestrict :=
   fun ⟨_, ⟨x, rfl⟩⟩ => ⟨x, rfl⟩
@@ -721,24 +639,8 @@ theorem mem_mker {f : F} {x : M} : x ∈ mker f ↔ f x = 1 :=
   Iff.rfl
 
 @[to_additive]
-theorem coe_mker (f : F) : (mker f : Set M) = (f : M → N) ⁻¹' {1} :=
-  rfl
-
-@[to_additive]
 instance decidableMemMker [DecidableEq N] (f : F) : DecidablePred (· ∈ mker f) := fun x =>
   decidable_of_iff (f x = 1) mem_mker
-
-@[to_additive]
-theorem comap_mker (g : N →* P) (f : M →* N) : g.mker.comap f = mker (comp g f) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem comap_bot' (f : F) : (⊥ : Submonoid N).comap f = mker f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem restrict_mker (f : M →* N) : mker (f.restrict S) = f.mker.comap S.subtype :=
-  rfl
 
 @[to_additive]
 theorem mrangeRestrict_mker (f : M →* N) : mker (mrangeRestrict f) = mker f := by
@@ -851,6 +753,7 @@ theorem mrange_subtype (s : Submonoid M) : mrange s.subtype = s :=
   SetLike.coe_injective <| (coe_mrange _).trans <| Subtype.range_coe
 
 @[to_additive (attr := deprecated (since := "2024-11-25"))] alias range_subtype := mrange_subtype
+
 @[to_additive]
 theorem eq_top_iff' : S = ⊤ ↔ ∀ x : M, x ∈ S :=
   eq_top_iff.trans ⟨fun h m => h <| mem_top m, fun h m _ => h m⟩
@@ -865,7 +768,13 @@ theorem eq_bot_of_subsingleton [Subsingleton S] : S = ⊥ := by
   intro y hy
   simpa using congr_arg ((↑) : S → M) <| Subsingleton.elim (⟨y, hy⟩ : S) 1
 
--- DISSOLVED: nontrivial_iff_exists_ne_one
+-- CONFLATES (assumes ground = zero): nontrivial_iff_exists_ne_one
+@[to_additive]
+theorem nontrivial_iff_exists_ne_one (S : Submonoid M) : Nontrivial S ↔ ∃ x ∈ S, x ≠ (1 : M) :=
+  calc
+    Nontrivial S ↔ ∃ x : S, x ≠ 1 := nontrivial_iff_exists_ne 1
+    _ ↔ ∃ (x : _) (hx : x ∈ S), (⟨x, hx⟩ : S) ≠ ⟨1, S.one_mem⟩ := Subtype.exists
+    _ ↔ ∃ x ∈ S, x ≠ (1 : M) := by simp [Ne]
 
 -- CONFLATES (assumes ground = zero): bot_or_nontrivial
 @[to_additive "An additive submonoid is either the trivial additive submonoid or nontrivial."]
@@ -873,7 +782,11 @@ theorem bot_or_nontrivial (S : Submonoid M) : S = ⊥ ∨ Nontrivial S := by
   simp only [eq_bot_iff_forall, nontrivial_iff_exists_ne_one, ← not_forall, ← Classical.not_imp,
     Classical.em]
 
--- DISSOLVED: bot_or_exists_ne_one
+@[to_additive
+      "An additive submonoid is either the trivial additive submonoid or contains a nonzero
+      element."]
+theorem bot_or_exists_ne_one (S : Submonoid M) : S = ⊥ ∨ ∃ x ∈ S, x ≠ (1 : M) :=
+  S.bot_or_nontrivial.imp_right S.nontrivial_iff_exists_ne_one.mp
 
 end Submonoid
 
@@ -908,11 +821,6 @@ def ofLeftInverse' (f : M →* N) {g : N → M} (h : Function.LeftInverse g f) :
       `AddMonoidHom.addSubmonoidMap` for a variant for `AddMonoidHom`s."]
 def submonoidMap (e : M ≃* N) (S : Submonoid M) : S ≃* S.map e :=
   { (e : M ≃ N).image S with map_mul' := fun _ _ => Subtype.ext (map_mul e _ _) }
-
-@[to_additive (attr := simp)]
-theorem coe_submonoidMap_apply (e : M ≃* N) (S : Submonoid M) (g : S) :
-    ((submonoidMap e S g : S.map (e : M →* N)) : N) = e g :=
-  rfl
 
 @[to_additive (attr := simp) AddEquiv.add_submonoid_map_symm_apply]
 theorem submonoidMap_symm_apply (e : M ≃* N) (S : Submonoid M) (g : S.map (e : M →* N)) :
@@ -968,11 +876,6 @@ instance isScalarTower [SMul α β] [SMul M' α] [SMul M' β] [IsScalarTower M' 
 section SMul
 
 variable [SMul M' α] {S : Submonoid M'}
-
-@[to_additive] lemma smul_def (g : S) (a : α) : g • a = (g : M') • a := rfl
-
-@[to_additive (attr := simp)]
-lemma mk_smul (g : M') (hg : g ∈ S) (a : α) : (⟨g, hg⟩ : S) • a = g • a := rfl
 
 instance faithfulSMul [FaithfulSMul M' α] : FaithfulSMul S α :=
   ⟨fun h => Subtype.ext <| eq_of_smul_eq_smul h⟩

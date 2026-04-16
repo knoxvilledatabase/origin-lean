@@ -1,12 +1,14 @@
 /-
 Extracted from Combinatorics/Additive/Dissociation.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Group.Units.Equiv
 import Mathlib.Data.Fintype.Card
+
+noncomputable section
 
 /-!
 # Dissociation and span
@@ -74,6 +76,8 @@ lemma not_mulDissociated_iff_exists_disjoint :
 
 @[to_additive (attr := simp)] lemma mulDissociated_inv : MulDissociated s⁻¹ ↔ MulDissociated s :=
   (MulEquiv.inv α).mulDissociated_preimage
+
+@[to_additive] protected alias ⟨MulDissociated.of_inv, MulDissociated.inv⟩ := mulDissociated_inv
 
 end dissociation
 

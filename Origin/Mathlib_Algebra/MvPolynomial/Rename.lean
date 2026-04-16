@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/MvPolynomial/Rename.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic
+
+noncomputable section
 
 /-!
 # Renaming variables of polynomials
@@ -139,10 +141,6 @@ theorem renameEquiv_refl : renameEquiv R (Equiv.refl σ) = AlgEquiv.refl :=
   AlgEquiv.ext rename_id
 
 @[simp]
-theorem renameEquiv_symm (f : σ ≃ τ) : (renameEquiv R f).symm = renameEquiv R f.symm :=
-  rfl
-
-@[simp]
 theorem renameEquiv_trans (e : σ ≃ τ) (f : τ ≃ α) :
     (renameEquiv R e).trans (renameEquiv R f) = renameEquiv R (e.trans f) :=
   AlgEquiv.ext (rename_rename e f)
@@ -275,7 +273,10 @@ theorem coeff_rename_eq_zero (f : σ → τ) (φ : MvPolynomial σ R) (d : τ �
   simp? at h hu says simp only [Finsupp.mem_support_iff, ne_eq] at h hu
   contradiction
 
--- DISSOLVED: coeff_rename_ne_zero
+theorem coeff_rename_ne_zero (f : σ → τ) (φ : MvPolynomial σ R) (d : τ →₀ ℕ)
+    (h : (rename f φ).coeff d ≠ 0) : ∃ u : σ →₀ ℕ, u.mapDomain f = d ∧ φ.coeff u ≠ 0 := by
+  contrapose! h
+  apply coeff_rename_eq_zero _ _ _ h
 
 @[simp]
 theorem constantCoeff_rename {τ : Type*} (f : σ → τ) (φ : MvPolynomial σ R) :

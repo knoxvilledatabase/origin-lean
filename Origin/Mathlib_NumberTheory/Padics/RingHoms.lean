@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.Padics.PadicIntegers
 import Mathlib.RingTheory.ZMod
 
+noncomputable section
+
 /-!
 
 # Relating `ℤ_[p]` to `ZMod (p ^ n)`

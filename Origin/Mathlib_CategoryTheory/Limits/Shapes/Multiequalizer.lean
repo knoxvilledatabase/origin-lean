@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.ConeCategory
 
+noncomputable section
+
 /-!
 
 # Multi-(co)equalizers
@@ -73,14 +75,6 @@ instance : SmallCategory (WalkingMulticospan fst snd) where
   assoc := by
     rintro (_ | _) (_ | _) (_ | _) (_ | _) (_ | _ | _) (_ | _ | _) (_ | _ | _) <;> rfl
 
-@[simp]
-lemma Hom.id_eq_id (X : WalkingMulticospan fst snd) :
-    Hom.id X = 𝟙 X := rfl
-
-@[simp]
-lemma Hom.comp_eq_comp {X Y Z : WalkingMulticospan fst snd}
-    (f : X ⟶ Y) (g : Y ⟶ Z) : Hom.comp f g = f ≫ g := rfl
-
 end WalkingMulticospan
 
 namespace WalkingMultispan
@@ -115,13 +109,6 @@ instance : SmallCategory (WalkingMultispan fst snd) where
     rintro (_ | _) (_ | _) (_ | _ | _) <;> rfl
   assoc := by
     rintro (_ | _) (_ | _) (_ | _) (_ | _) (_ | _ | _) (_ | _ | _) (_ | _ | _) <;> rfl
-
-@[simp]
-lemma Hom.id_eq_id (X : WalkingMultispan fst snd) : Hom.id X = 𝟙 X := rfl
-
-@[simp]
-lemma Hom.comp_eq_comp {X Y Z : WalkingMultispan fst snd}
-    (f : X ⟶ Y) (g : Y ⟶ Z) : Hom.comp f g = f ≫ g := rfl
 
 end WalkingMultispan
 
@@ -214,14 +201,6 @@ theorem multispan_obj_left (a) : I.multispan.obj (WalkingMultispan.left a) = I.l
 theorem multispan_obj_right (b) : I.multispan.obj (WalkingMultispan.right b) = I.right b :=
   rfl
 
-@[simp]
-theorem multispan_map_fst (a) : I.multispan.map (WalkingMultispan.Hom.fst a) = I.fst a :=
-  rfl
-
-@[simp]
-theorem multispan_map_snd (a) : I.multispan.map (WalkingMultispan.Hom.snd a) = I.snd a :=
-  rfl
-
 variable [HasCoproduct I.left] [HasCoproduct I.right]
 
 noncomputable def fstSigmaMap : ∐ I.left ⟶ ∐ I.right :=
@@ -257,10 +236,6 @@ variable {I : MulticospanIndex.{w, w'} C} (K : Multifork I)
 
 def ι (a : I.L) : K.pt ⟶ I.left a :=
   K.π.app (WalkingMulticospan.left _)
-
-@[simp]
-theorem app_left_eq_ι (a) : K.π.app (WalkingMulticospan.left a) = K.ι a :=
-  rfl
 
 @[simp]
 theorem app_right_eq_ι_comp_fst (b) :
@@ -360,10 +335,6 @@ noncomputable def toPiFork (K : Multifork I) : Fork I.fstPiMap I.sndPiMap where
             pi_condition, parallelPair_obj_one] }
 
 @[simp]
-theorem toPiFork_π_app_zero : K.toPiFork.ι = Pi.lift K.ι :=
-  rfl
-
-@[simp]
 theorem toPiFork_π_app_one : K.toPiFork.π.app WalkingParallelPair.one = Pi.lift K.ι ≫ I.fstPiMap :=
   rfl
 
@@ -383,16 +354,6 @@ noncomputable def ofPiFork (c : Fork I.fstPiMap I.sndPiMap) : Multifork I where
         · simp
         · dsimp; rw [c.condition_assoc]; simp
         · simp }
-
-@[simp]
-theorem ofPiFork_π_app_left (c : Fork I.fstPiMap I.sndPiMap) (a) :
-    (ofPiFork I c).ι a = c.ι ≫ Pi.π _ _ :=
-  rfl
-
-@[simp]
-theorem ofPiFork_π_app_right (c : Fork I.fstPiMap I.sndPiMap) (a) :
-    (ofPiFork I c).π.app (WalkingMulticospan.right a) = c.ι ≫ I.fstPiMap ≫ Pi.π _ _ :=
-  rfl
 
 end Multifork
 
@@ -519,10 +480,6 @@ noncomputable def toSigmaCofork (K : Multicofork I) : Cofork I.fstSigmaMap I.snd
           simp only [Functor.map_id, parallelPair_obj_zero,
             parallelPair_obj_one, sigma_condition, Category.id_comp, Category.comp_id] }
 
-@[simp]
-theorem toSigmaCofork_π : K.toSigmaCofork.π = Sigma.desc K.π :=
-  rfl
-
 variable (I)
 
 @[simps pt]
@@ -544,15 +501,6 @@ noncomputable def ofSigmaCofork (c : Cofork I.fstSigmaMap I.sndSigmaMap) : Multi
 theorem ofSigmaCofork_ι_app_left (c : Cofork I.fstSigmaMap I.sndSigmaMap) (a) :
     (ofSigmaCofork I c).ι.app (WalkingMultispan.left a) =
       (Sigma.ι I.left a : _) ≫ I.fstSigmaMap ≫ c.π :=
-  rfl
-
-theorem ofSigmaCofork_ι_app_right (c : Cofork I.fstSigmaMap I.sndSigmaMap) (b) :
-    (ofSigmaCofork I c).ι.app (WalkingMultispan.right b) = (Sigma.ι I.right b : _) ≫ c.π :=
-  rfl
-
-@[simp]
-theorem ofSigmaCofork_ι_app_right' (c : Cofork I.fstSigmaMap I.sndSigmaMap) (b) :
-    π (ofSigmaCofork I c) b = (Sigma.ι I.right b : _) ≫ c.π :=
   rfl
 
 end Multicofork
@@ -631,15 +579,6 @@ abbrev ι (a : I.L) : multiequalizer I ⟶ I.left a :=
 abbrev multifork : Multifork I :=
   limit.cone _
 
-@[simp]
-theorem multifork_ι (a) : (Multiequalizer.multifork I).ι a = Multiequalizer.ι I a :=
-  rfl
-
-@[simp]
-theorem multifork_π_app_left (a) :
-    (Multiequalizer.multifork I).π.app (WalkingMulticospan.left a) = Multiequalizer.ι I a :=
-  rfl
-
 @[reassoc]
 theorem condition (b) :
     Multiequalizer.ι I (I.fstTo b) ≫ I.fst b = Multiequalizer.ι I (I.sndTo b) ≫ I.snd b :=
@@ -690,19 +629,6 @@ abbrev π (b : I.R) : I.right b ⟶ multicoequalizer I :=
 
 abbrev multicofork : Multicofork I :=
   colimit.cocone _
-
-@[simp]
-theorem multicofork_π (b) : (Multicoequalizer.multicofork I).π b = Multicoequalizer.π I b :=
-  rfl
-
-theorem multicofork_ι_app_right (b) :
-    (Multicoequalizer.multicofork I).ι.app (WalkingMultispan.right b) = Multicoequalizer.π I b :=
-  rfl
-
-@[simp]
-theorem multicofork_ι_app_right' (b) :
-    colimit.ι (MultispanIndex.multispan I) (WalkingMultispan.right b) = π I b :=
-  rfl
 
 @[reassoc]
 theorem condition (a) :

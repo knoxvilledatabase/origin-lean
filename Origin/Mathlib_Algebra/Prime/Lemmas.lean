@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Prime/Lemmas.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Divisibility.Hom
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Group.Units.Equiv
 import Mathlib.Algebra.GroupWithZero.Hom
 import Mathlib.Algebra.Prime.Defs
 import Mathlib.Order.Monotone.Basic
+
+noncomputable section
 
 /-!
 # Associated, prime, and irreducible elements.
@@ -253,10 +255,16 @@ theorem DvdNotUnit.ne [CancelCommMonoidWithZero M] {p q : M} (h : DvdNotUnit p q
   rw [(mul_left_cancel₀ hp hx'').symm] at hx'
   exact hx' isUnit_one
 
--- DISSOLVED: pow_injective_of_not_isUnit
+theorem pow_injective_of_not_isUnit [CancelCommMonoidWithZero M] {q : M} (hq : ¬IsUnit q)
+    (hq' : q ≠ 0) : Function.Injective fun n : ℕ => q ^ n := by
+  refine injective_of_lt_imp_ne fun n m h => DvdNotUnit.ne ⟨pow_ne_zero n hq', q ^ (m - n), ?_, ?_⟩
+  · exact not_isUnit_of_not_isUnit_dvd hq (dvd_pow (dvd_refl _) (Nat.sub_pos_of_lt h).ne')
+  · exact (pow_mul_pow_sub q h.le).symm
 
 alias pow_injective_of_not_unit := pow_injective_of_not_isUnit
 
--- DISSOLVED: pow_inj_of_not_isUnit
+theorem pow_inj_of_not_isUnit [CancelCommMonoidWithZero M] {q : M} (hq : ¬IsUnit q)
+    (hq' : q ≠ 0) {m n : ℕ} : q ^ m = q ^ n ↔ m = n :=
+  (pow_injective_of_not_isUnit hq hq').eq_iff
 
 end CancelCommMonoidWithZero

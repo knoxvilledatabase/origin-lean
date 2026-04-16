@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/NormedSpace/HahnBanach/Extension.lean
-Genuine: 4 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
+Genuine: 5 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Cone.Extension
 import Mathlib.Analysis.NormedSpace.RCLike
 import Mathlib.Analysis.NormedSpace.Extend
 import Mathlib.Analysis.RCLike.Lemmas
+
+noncomputable section
 
 /-!
 # Extension Hahn-Banach theorem
@@ -131,9 +133,30 @@ variable {E : Type u} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
 open ContinuousLinearEquiv Submodule
 
--- DISSOLVED: coord_norm'
+theorem coord_norm' {x : E} (h : x ≠ 0) : ‖(‖x‖ : 𝕜) • coord 𝕜 x h‖ = 1 := by
+  #adaptation_note
+  /--
+  `set_option maxSynthPendingDepth 2` required after https://github.com/leanprover/lean4/pull/4119
+  Alternatively, we can add:
+  ```
+  let X : SeminormedAddCommGroup (↥(span 𝕜 {x}) →L[𝕜] 𝕜) := inferInstance
+  have : BoundedSMul 𝕜 (↥(span 𝕜 {x}) →L[𝕜] 𝕜) := @NormedSpace.boundedSMul 𝕜 _ _ X _
+  ```
+  -/
+  set_option maxSynthPendingDepth 2 in
+  rw [norm_smul (α := 𝕜) (x := coord 𝕜 x h), RCLike.norm_coe_norm, coord_norm,
+    mul_inv_cancel₀ (mt norm_eq_zero.mp h)]
 
--- DISSOLVED: exists_dual_vector
+theorem exists_dual_vector (x : E) (h : x ≠ 0) : ∃ g : E →L[𝕜] 𝕜, ‖g‖ = 1 ∧ g x = ‖x‖ := by
+  let p : Submodule 𝕜 E := 𝕜 ∙ x
+  let f := (‖x‖ : 𝕜) • coord 𝕜 x h
+  obtain ⟨g, hg⟩ := exists_extension_norm_eq p f
+  refine ⟨g, ?_, ?_⟩
+  · rw [hg.2, coord_norm']
+  · calc
+      g x = g (⟨x, mem_span_singleton_self x⟩ : 𝕜 ∙ x) := by rw [coe_mk]
+      _ = ((‖x‖ : 𝕜) • coord 𝕜 x h) (⟨x, mem_span_singleton_self x⟩ : 𝕜 ∙ x) := by rw [← hg.1]
+      _ = ‖x‖ := by simp
 
 -- CONFLATES (assumes ground = zero): exists_dual_vector'
 theorem exists_dual_vector' [Nontrivial E] (x : E) : ∃ g : E →L[𝕜] 𝕜, ‖g‖ = 1 ∧ g x = ‖x‖ := by

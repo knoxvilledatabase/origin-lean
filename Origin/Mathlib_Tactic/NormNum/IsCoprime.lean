@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Coprime.Lemmas
 import Mathlib.Tactic.NormNum.GCD
 
+noncomputable section
+
 /-! # `norm_num` extension for `IsCoprime`
 
 This module defines a `norm_num` extension for `IsCoprime` over `ℤ`.

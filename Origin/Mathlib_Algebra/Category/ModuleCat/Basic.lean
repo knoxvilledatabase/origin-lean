@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Conj
 import Mathlib.CategoryTheory.Linear.Basic
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 
+noncomputable section
+
 /-!
 # The category of `R`-modules
 
@@ -119,30 +121,11 @@ instance hasForgetToAddCommGroup : HasForget₂ (ModuleCat R) AddCommGrp where
 def of (X : Type v) [AddCommGroup X] [Module R X] : ModuleCat R :=
   ⟨X⟩
 
-@[simp]
-theorem forget₂_obj (X : ModuleCat R) :
-    (forget₂ (ModuleCat R) AddCommGrp).obj X = AddCommGrp.of X :=
-  rfl
-
-theorem forget₂_obj_moduleCat_of (X : Type v) [AddCommGroup X] [Module R X] :
-    (forget₂ (ModuleCat R) AddCommGrp).obj (of R X) = AddCommGrp.of X :=
-  rfl
-
-@[simp]
-theorem forget₂_map (X Y : ModuleCat R) (f : X ⟶ Y) :
-    (forget₂ (ModuleCat R) AddCommGrp).map f = LinearMap.toAddMonoidHom f :=
-  rfl
-
 instance : Inhabited (ModuleCat R) :=
   ⟨of R PUnit⟩
 
 instance ofUnique {X : Type v} [AddCommGroup X] [Module R X] [i : Unique X] : Unique (of R X) :=
   i
-
-@[simp] theorem of_coe (X : ModuleCat R) : of R X = X := rfl
-
-theorem coe_of (X : Type v) [AddCommGroup X] [Module R X] : (of R X : Type v) = X :=
-  rfl
 
 variable {R}
 
@@ -166,19 +149,6 @@ instance : HasZeroObject (ModuleCat.{v} R) :=
 
 variable {M N U : ModuleCat.{v} R}
 
-@[simp]
-theorem id_apply (m : M) : (𝟙 M : M → M) m = m :=
-  rfl
-
-@[simp]
-theorem coe_comp (f : M ⟶ N) (g : N ⟶ U) : (f ≫ g : M → U) = g ∘ f :=
-  rfl
-
-theorem comp_def (f : M ⟶ N) (g : N ⟶ U) : f ≫ g = g.comp f :=
-  rfl
-
-@[simp] lemma forget_map (f : M ⟶ N) : (forget (ModuleCat R)).map f = (f : M → N) := rfl
-
 end ModuleCat
 
 variable {R}
@@ -192,11 +162,6 @@ def ModuleCat.asHom [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂] [Mod
   id
 
 scoped[ModuleCat] notation "↟" f:1024 => ModuleCat.asHom f
-
-@[simp 1100]
-theorem ModuleCat.asHom_apply {R : Type u} [Ring R] {X Y : Type v} [AddCommGroup X] [Module R X]
-    [AddCommGroup Y] [Module R Y] (f : X →ₗ[R] Y) (x : X) : (↟ f) x = f x :=
-  rfl
 
 def ModuleCat.asHomRight [AddCommGroup X₁] [Module R X₁] {X₂ : ModuleCat.{v} R} :
     (X₁ →ₗ[R] X₂) → (ModuleCat.of R X₁ ⟶ X₂) :=
@@ -275,14 +240,6 @@ instance : Linear S (ModuleCat.{v} S) where
 
 variable {X Y X' Y' : ModuleCat.{v} S}
 
-theorem Iso.homCongr_eq_arrowCongr (i : X ≅ X') (j : Y ≅ Y') (f : X ⟶ Y) :
-    Iso.homCongr i j f = LinearEquiv.arrowCongr i.toLinearEquiv j.toLinearEquiv f :=
-  rfl
-
-theorem Iso.conj_eq_conj (i : X ≅ X') (f : End X) :
-    Iso.conj i f = LinearEquiv.conj i.toLinearEquiv f :=
-  rfl
-
 end
 
 variable (M N : ModuleCat.{v} R)
@@ -330,10 +287,6 @@ instance : AddCommGroup (mkOfSMul' φ) := by
 
 instance : SMul R (mkOfSMul' φ) := ⟨fun r (x : A) => (show A ⟶ A from φ r) x⟩
 
-@[simp]
-lemma mkOfSMul'_smul (r : R) (x : mkOfSMul' φ) :
-    r • x = (show A ⟶ A from φ r) x := rfl
-
 instance : Module R (mkOfSMul' φ) where
   smul_zero _ := map_zero (N := A) _
   smul_add _ _ _ := map_add (N := A) _ _ _
@@ -343,9 +296,6 @@ instance : Module R (mkOfSMul' φ) where
   zero_smul := by simp
 
 abbrev mkOfSMul := ModuleCat.of R (mkOfSMul' φ)
-
-@[simp, nolint simpNF]
-lemma mkOfSMul_smul (r : R) : (mkOfSMul φ).smul r = φ r := rfl
 
 end
 
@@ -361,9 +311,6 @@ def homMk : M ⟶ N where
   toFun := φ
   map_add' _ _ := φ.map_add _ _
   map_smul' r x := (congr_hom (hφ r) x).symm
-
-lemma forget₂_map_homMk :
-    (forget₂ (ModuleCat R) AddCommGrp).map (homMk φ hφ) = φ := rfl
 
 end
 

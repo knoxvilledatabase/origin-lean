@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Preadditive.Injective
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.Topology.Instances.AddCircle
 
+noncomputable section
+
 /-!
 # Injective objects in the category of abelian groups
 

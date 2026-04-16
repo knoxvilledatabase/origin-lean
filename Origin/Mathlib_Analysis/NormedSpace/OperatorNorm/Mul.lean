@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Mul.lean
-Genuine: 21 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
+
+noncomputable section
 
 /-!
 # Results about operator norms in normed algebras
@@ -36,10 +38,6 @@ def mul : 𝕜' →L[𝕜] 𝕜' →L[𝕜] 𝕜' :=
   (LinearMap.mul 𝕜 𝕜').mkContinuous₂ 1 fun x y => by simpa using norm_mul_le x y
 
 @[simp]
-theorem mul_apply' (x y : 𝕜') : mul 𝕜 𝕜' x y = x * y :=
-  rfl
-
-@[simp]
 theorem opNorm_mul_apply_le (x : 𝕜') : ‖mul 𝕜 𝕜' x‖ ≤ ‖x‖ :=
   opNorm_le_bound _ (norm_nonneg x) (norm_mul_le x)
 
@@ -53,16 +51,8 @@ def _root_.NonUnitalAlgHom.Lmul : 𝕜' →ₙₐ[𝕜] 𝕜' →L[𝕜] 𝕜' :
 
 variable {𝕜 𝕜'} in
 
-@[simp]
-theorem _root_.NonUnitalAlgHom.coe_Lmul : ⇑(NonUnitalAlgHom.Lmul 𝕜 𝕜') = mul 𝕜 𝕜' :=
-  rfl
-
 def mulLeftRight : 𝕜' →L[𝕜] 𝕜' →L[𝕜] 𝕜' →L[𝕜] 𝕜' :=
   ((compL 𝕜 𝕜' 𝕜' 𝕜').comp (mul 𝕜 𝕜').flip).flip.comp (mul 𝕜 𝕜')
-
-@[simp]
-theorem mulLeftRight_apply (x y z : 𝕜') : mulLeftRight 𝕜 𝕜' x y z = x * z * y :=
-  rfl
 
 theorem opNorm_mulLeftRight_apply_apply_le (x y : 𝕜') : ‖mulLeftRight 𝕜 𝕜' x y‖ ≤ ‖x‖ * ‖y‖ :=
   (opNorm_comp_le _ _).trans <|
@@ -80,7 +70,6 @@ theorem opNorm_mulLeftRight_apply_le (x : 𝕜') : ‖mulLeftRight 𝕜 𝕜' x�
 alias op_norm_mulLeftRight_apply_le := opNorm_mulLeftRight_apply_le
 
 set_option maxSynthPendingDepth 2 in
-
 theorem opNorm_mulLeftRight_le :
     ‖mulLeftRight 𝕜 𝕜'‖ ≤ 1 :=
   opNorm_le_bound _ zero_le_one fun x => (one_mul ‖x‖).symm ▸ opNorm_mulLeftRight_apply_le 𝕜 𝕜' x
@@ -112,10 +101,6 @@ lemma opNNNorm_mul_apply (x : 𝕜') : ‖mul 𝕜 𝕜' x‖₊ = ‖x‖₊ :=
 def mulₗᵢ : 𝕜' →ₗᵢ[𝕜] 𝕜' →L[𝕜] 𝕜' where
   toLinearMap := mul 𝕜 𝕜'
   norm_map' x := opNorm_mul_apply 𝕜 𝕜' x
-
-@[simp]
-theorem coe_mulₗᵢ : ⇑(mulₗᵢ 𝕜 𝕜') = mul 𝕜 𝕜' :=
-  rfl
 
 end NonUnital
 

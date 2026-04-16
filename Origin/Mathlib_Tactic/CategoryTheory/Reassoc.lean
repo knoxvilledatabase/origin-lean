@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.Basic
 import Mathlib.Util.AddRelatedDecl
 
+noncomputable section
+
 /-!
 # The `reassoc` attribute
 
@@ -68,7 +70,6 @@ initialize registerBuiltinAttribute {
 open Term in
 
 elab "reassoc_of% " t:term : term => do
-
   reassocExpr (← elabTerm t none)
 
 end CategoryTheory

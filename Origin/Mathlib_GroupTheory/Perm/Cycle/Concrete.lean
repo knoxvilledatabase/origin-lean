@@ -7,6 +7,8 @@ import Mathlib.Data.List.Cycle
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import Mathlib.GroupTheory.Perm.List
 
+noncomputable section
+
 /-!
 
 # Properties of cyclic permutations constructed from lists/cycles
@@ -296,10 +298,6 @@ theorem pow_apply_mem_toList_iff_mem_support {n : ℕ} : (p ^ n) x ∈ p.toList 
   refine fun _ => SameCycle.symm ?_
   rw [sameCycle_pow_left]
 
-theorem toList_formPerm_nil (x : α) : toList (formPerm ([] : List α)) x = [] := by simp
-
-theorem toList_formPerm_singleton (x y : α) : toList (formPerm [x]) y = [] := by simp
-
 -- CONFLATES (assumes ground = zero): toList_formPerm_nontrivial
 theorem toList_formPerm_nontrivial (l : List α) (hl : 2 ≤ l.length) (hn : Nodup l) :
     toList (formPerm l) (l.get ⟨0, (zero_lt_two.trans_le hl)⟩) = l := by
@@ -452,9 +450,7 @@ def isoCycle' : { f : Perm α // IsCycle f } ≃ { s : Cycle α // s.Nodup ∧ s
     right_inv := Fintype.leftInverse_bijInv _ }
 
 set_option linter.unusedTactic false in
-
 notation3 (prettyPrint := false) "c["(l", "* => foldr (h t => List.cons h t) List.nil)"]" =>
-
   Cycle.formPerm (Cycle.ofList l) (Iff.mpr Cycle.nodup_coe_iff (by decide))
 
 unsafe instance repr_perm [Repr α] : Repr (Perm α) :=

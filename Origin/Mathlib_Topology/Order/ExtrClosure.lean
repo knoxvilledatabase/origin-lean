@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Order.OrderClosed
 import Mathlib.Topology.Order.LocalExtr
 
+noncomputable section
+
 /-!
 # Maximum/minimum on the closure of a set
 

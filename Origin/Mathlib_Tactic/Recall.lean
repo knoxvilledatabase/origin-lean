@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Elab.Command
 import Lean.Elab.DeclUtil
 
+noncomputable section
+
 /-!
 # `recall` command
 -/

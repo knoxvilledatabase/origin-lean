@@ -1,11 +1,13 @@
 /-
 Extracted from Geometry/RingedSpace/SheafedSpace.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.PresheafedSpace.HasColimits
 import Mathlib.Geometry.RingedSpace.Stalks
 import Mathlib.Topology.Sheaves.Functors
+
+noncomputable section
 
 /-!
 # Sheafed spaces
@@ -42,12 +44,6 @@ instance coeSort : CoeSort (SheafedSpace C) Type* where
 
 def sheaf (X : SheafedSpace C) : Sheaf C (X : TopCat) :=
   ⟨X.presheaf, X.IsSheaf⟩
-
-theorem mk_coe (carrier) (presheaf) (h) :
-    (({ carrier
-        presheaf
-        IsSheaf := h } : SheafedSpace C) : TopCat) = carrier :=
-  rfl
 
 instance (X : SheafedSpace C) : TopologicalSpace X :=
   X.carrier.str
@@ -91,32 +87,6 @@ section
 
 attribute [local simp] id comp
 
-@[simp]
-theorem id_base (X : SheafedSpace C) : (𝟙 X : X ⟶ X).base = 𝟙 (X : TopCat) :=
-  rfl
-
-theorem id_c (X : SheafedSpace C) :
-    (𝟙 X : X ⟶ X).c = eqToHom (Presheaf.Pushforward.id_eq X.presheaf).symm :=
-  rfl
-
-@[simp]
-theorem id_c_app (X : SheafedSpace C) (U) :
-    (𝟙 X : X ⟶ X).c.app U = 𝟙 _ := rfl
-
-@[simp]
-theorem comp_base {X Y Z : SheafedSpace C} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).base = f.base ≫ g.base :=
-  rfl
-
-@[simp]
-theorem comp_c_app {X Y Z : SheafedSpace C} (α : X ⟶ Y) (β : Y ⟶ Z) (U) :
-    (α ≫ β).c.app U = β.c.app U ≫ α.c.app (op ((Opens.map β.base).obj (unop U))) :=
-  rfl
-
-theorem comp_c_app' {X Y Z : SheafedSpace C} (α : X ⟶ Y) (β : Y ⟶ Z) (U) :
-    (α ≫ β).c.app (op U) = β.c.app (op U) ≫ α.c.app (op ((Opens.map β.base).obj U)) :=
-  rfl
-
 theorem congr_app {X Y : SheafedSpace C} {α β : X ⟶ Y} (h : α = β) (U) :
     α.c.app U = β.c.app U ≫ X.presheaf.map (eqToHom (by subst h; rfl)) :=
   PresheafedSpace.congr_app h U
@@ -146,23 +116,6 @@ def restrictTopIso (X : SheafedSpace C) : X.restrict (Opens.isOpenEmbedding ⊤)
 def Γ : (SheafedSpace C)ᵒᵖ ⥤ C :=
   forgetToPresheafedSpace.op ⋙ PresheafedSpace.Γ
 
-theorem Γ_def : (Γ : _ ⥤ C) = forgetToPresheafedSpace.op ⋙ PresheafedSpace.Γ :=
-  rfl
-
-@[simp]
-theorem Γ_obj (X : (SheafedSpace C)ᵒᵖ) : Γ.obj X = (unop X).presheaf.obj (op ⊤) :=
-  rfl
-
-theorem Γ_obj_op (X : SheafedSpace C) : Γ.obj (op X) = X.presheaf.obj (op ⊤) :=
-  rfl
-
-@[simp]
-theorem Γ_map {X Y : (SheafedSpace C)ᵒᵖ} (f : X ⟶ Y) : Γ.map f = f.unop.c.app (op ⊤) :=
-  rfl
-
-theorem Γ_map_op {X Y : SheafedSpace C} (f : X ⟶ Y) : Γ.map f.op = f.c.app (op ⊤) :=
-  rfl
-
 noncomputable instance [HasLimits C] :
     CreatesColimits (forgetToPresheafedSpace : SheafedSpace C ⥤ _) :=
   ⟨fun {_ _} =>
@@ -189,7 +142,6 @@ variable [PreservesFilteredColimits (CategoryTheory.forget C)]
 variable [(CategoryTheory.forget C).ReflectsIsomorphisms]
 
 attribute [local instance] ConcreteCategory.instFunLike in
-
 lemma hom_stalk_ext {X Y : SheafedSpace C} (f g : X ⟶ Y) (h : f.base = g.base)
     (h' : ∀ x, f.stalkMap x = (Y.presheaf.stalkCongr (h ▸ rfl)).hom ≫ g.stalkMap x) :
     f = g := by

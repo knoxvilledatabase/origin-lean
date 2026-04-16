@@ -1,9 +1,11 @@
 /-
 Extracted from Order/TypeTags.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 2 | Infrastructure: 12
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Order.Notation
+
+noncomputable section
 
 /-!
 # Order-related type synonyms
@@ -16,7 +18,7 @@ without exploding its imports.
 
 variable {α : Type*}
 
--- DISSOLVED: WithBot
+def WithBot (α : Type*) := Option α
 
 namespace WithBot
 
@@ -43,19 +45,10 @@ def recBotCoe {C : WithBot α → Sort*} (bot : C ⊥) (coe : ∀ a : α, C a) :
   | ⊥ => bot
   | (a : α) => coe a
 
-@[simp]
-theorem recBotCoe_bot {C : WithBot α → Sort*} (d : C ⊥) (f : ∀ a : α, C a) :
-    @recBotCoe _ C d f ⊥ = d :=
-  rfl
-
-@[simp]
-theorem recBotCoe_coe {C : WithBot α → Sort*} (d : C ⊥) (f : ∀ a : α, C a) (x : α) :
-    @recBotCoe _ C d f ↑x = f x :=
-  rfl
-
 end WithBot
 
--- DISSOLVED: WithTop
+def WithTop (α : Type*) :=
+  Option α
 
 namespace WithTop
 
@@ -81,15 +74,5 @@ instance inhabited : Inhabited (WithTop α) :=
 def recTopCoe {C : WithTop α → Sort*} (top : C ⊤) (coe : ∀ a : α, C a) : ∀ n : WithTop α, C n
   | none => top
   | Option.some a => coe a
-
-@[simp]
-theorem recTopCoe_top {C : WithTop α → Sort*} (d : C ⊤) (f : ∀ a : α, C a) :
-    @recTopCoe _ C d f ⊤ = d :=
-  rfl
-
-@[simp]
-theorem recTopCoe_coe {C : WithTop α → Sort*} (d : C ⊤) (f : ∀ a : α, C a) (x : α) :
-    @recTopCoe _ C d f ↑x = f x :=
-  rfl
 
 end WithTop

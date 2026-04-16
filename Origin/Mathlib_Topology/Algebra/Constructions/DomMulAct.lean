@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Homeomorph
 import Mathlib.GroupTheory.GroupAction.DomAct.Basic
 
+noncomputable section
+
 /-!
 # Topological space structure on `Mᵈᵐᵃ` and `Mᵈᵃᵃ`
 
@@ -39,11 +41,6 @@ theorem continuous_mk_symm : Continuous (@mk M).symm := continuous_induced_dom
 @[to_additive (attr := simps toEquiv) "`DomAddAct.mk` as a homeomorphism."]
 def mkHomeomorph : M ≃ₜ Mᵈᵐᵃ where
   toEquiv := mk
-
-@[to_additive (attr := simp)] theorem coe_mkHomeomorph : ⇑(mkHomeomorph : M ≃ₜ Mᵈᵐᵃ) = mk := rfl
-
-@[to_additive (attr := simp)]
-theorem coe_mkHomeomorph_symm : ⇑(mkHomeomorph : M ≃ₜ Mᵈᵐᵃ).symm = mk.symm := rfl
 
 @[to_additive] theorem isInducing_mk : IsInducing (@mk M) := mkHomeomorph.isInducing
 

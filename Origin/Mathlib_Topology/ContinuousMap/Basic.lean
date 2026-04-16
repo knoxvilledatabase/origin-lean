@@ -7,6 +7,8 @@ import Mathlib.Data.Set.UnionLift
 import Mathlib.Topology.ContinuousMap.Defs
 import Mathlib.Topology.Homeomorph
 
+noncomputable section
+
 /-!
 # Continuous bundled maps
 
@@ -65,16 +67,8 @@ variable (α)
 protected def id : C(α, α) where
   toFun := id
 
-@[simp]
-theorem coe_id : ⇑(ContinuousMap.id α) = id :=
-  rfl
-
 def const (b : β) : C(α, β) where
   toFun := fun _ : α => b
-
-@[simp]
-theorem coe_const (b : β) : ⇑(const α b) = Function.const α b :=
-  rfl
 
 @[simps (config := .asFn)]
 def constPi : C(β, α → β) where
@@ -85,28 +79,11 @@ instance [Inhabited β] : Inhabited C(α, β) :=
 
 variable {α}
 
-@[simp]
-theorem id_apply (a : α) : ContinuousMap.id α a = a :=
-  rfl
-
-@[simp]
-theorem const_apply (b : β) (a : α) : const α b a = b :=
-  rfl
-
 def comp (f : C(β, γ)) (g : C(α, β)) : C(α, γ) where
   toFun := f ∘ g
 
 @[simp]
-theorem coe_comp (f : C(β, γ)) (g : C(α, β)) : ⇑(comp f g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : C(β, γ)) (g : C(α, β)) (a : α) : comp f g a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : C(γ, δ)) (g : C(β, γ)) (h : C(α, β)) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -159,10 +136,6 @@ def prodMk (f : C(α, β₁)) (g : C(α, β₂)) : C(α, β₁ × β₂) where
 def prodMap (f : C(α₁, α₂)) (g : C(β₁, β₂)) : C(α₁ × β₁, α₂ × β₂) where
   toFun := Prod.map f g
 
-@[simp]
-theorem prod_eval (f : C(α, β₁)) (g : C(α, β₂)) (a : α) : (prodMk f g) a = (f a, g a) :=
-  rfl
-
 @[simps!]
 def prodSwap : C(α × β, β × α) := .prodMk .snd .fst
 
@@ -199,10 +172,6 @@ variable {I A : Type*} {X Y : I → Type*} [TopologicalSpace A] [∀ i, Topologi
 def pi (f : ∀ i, C(A, X i)) : C(A, ∀ i, X i) where
   toFun (a : A) (i : I) := f i a
 
-@[simp]
-theorem pi_eval (f : ∀ i, C(A, X i)) (a : A) : (pi f) a = fun i : I => (f i) a :=
-  rfl
-
 @[simps (config := .asFn)]
 def eval (i : I) : C(∀ j, X j, X i) where
   toFun := Function.eval i
@@ -234,15 +203,6 @@ def restrict (f : C(α, β)) : C(s, β) where
 
 @[simp]
 theorem coe_restrict (f : C(α, β)) : ⇑(f.restrict s) = f ∘ ((↑) : s → α) :=
-  rfl
-
-@[simp]
-theorem restrict_apply (f : C(α, β)) (s : Set α) (x : s) : f.restrict s x = f x :=
-  rfl
-
-@[simp]
-theorem restrict_apply_mk (f : C(α, β)) (s : Set α) (x : α) (hx : x ∈ s) :
-    f.restrict s ⟨x, hx⟩ = f x :=
   rfl
 
 theorem injective_restrict [T2Space β] {s : Set α} (hs : Dense s) :

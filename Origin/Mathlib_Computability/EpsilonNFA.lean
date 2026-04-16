@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 import Origin.Core
 import Mathlib.Computability.NFA
 
+noncomputable section
+
 /-!
 # Epsilon Nondeterministic Finite Automata
 
@@ -75,10 +77,6 @@ theorem evalFrom_nil (S : Set σ) : M.evalFrom S [] = M.εClosure S :=
   rfl
 
 @[simp]
-theorem evalFrom_singleton (S : Set σ) (a : α) : M.evalFrom S [a] = M.stepSet (M.εClosure S) a :=
-  rfl
-
-@[simp]
 theorem evalFrom_append_singleton (S : Set σ) (x : List α) (a : α) :
     M.evalFrom S (x ++ [a]) = M.stepSet (M.evalFrom S x) a := by
   rw [evalFrom, List.foldl_append, List.foldl_cons, List.foldl_nil]
@@ -93,14 +91,6 @@ def eval :=
   M.evalFrom M.start
 
 @[simp]
-theorem eval_nil : M.eval [] = M.εClosure M.start :=
-  rfl
-
-@[simp]
-theorem eval_singleton (a : α) : M.eval [a] = M.stepSet (M.εClosure M.start) a :=
-  rfl
-
-@[simp]
 theorem eval_append_singleton (x : List α) (a : α) : M.eval (x ++ [a]) = M.stepSet (M.eval x) a :=
   evalFrom_append_singleton _ _ _ _
 
@@ -113,15 +103,6 @@ def toNFA : NFA α σ where
   step S a := M.εClosure (M.step S a)
   start := M.εClosure M.start
   accept := M.accept
-
-@[simp]
-theorem toNFA_evalFrom_match (start : Set σ) :
-    M.toNFA.evalFrom (M.εClosure start) = M.evalFrom start :=
-  rfl
-
-@[simp]
-theorem toNFA_correct : M.toNFA.accepts = M.accepts :=
-  rfl
 
 theorem pumping_lemma [Fintype σ] {x : List α} (hx : x ∈ M.accepts)
     (hlen : Fintype.card (Set σ) ≤ List.length x) :
@@ -178,29 +159,5 @@ instance : One (εNFA α σ) :=
 
 instance : Inhabited (εNFA α σ) :=
   ⟨0⟩
-
-@[simp]
-theorem step_zero (s a) : (0 : εNFA α σ).step s a = ∅ :=
-  rfl
-
-@[simp]
-theorem step_one (s a) : (1 : εNFA α σ).step s a = ∅ :=
-  rfl
-
-@[simp]
-theorem start_zero : (0 : εNFA α σ).start = ∅ :=
-  rfl
-
-@[simp]
-theorem start_one : (1 : εNFA α σ).start = univ :=
-  rfl
-
-@[simp]
-theorem accept_zero : (0 : εNFA α σ).accept = ∅ :=
-  rfl
-
-@[simp]
-theorem accept_one : (1 : εNFA α σ).accept = univ :=
-  rfl
 
 end εNFA

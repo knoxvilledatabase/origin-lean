@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/Minpoly/MinpolyDiv.lean
-Genuine: 16 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
+Genuine: 16 | Conflates: 3 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
 import Mathlib.FieldTheory.PrimitiveElement
 import Mathlib.FieldTheory.IsAlgClosed.Basic
+
+noncomputable section
 
 /-!
 # Results about `minpoly R x / (X - C x)`
@@ -100,7 +102,12 @@ variable (hx : IsIntegral R x)
 
 include hx
 
--- DISSOLVED: minpolyDiv_ne_zero
+-- CONFLATES (assumes ground = zero): minpolyDiv_ne_zero
+lemma minpolyDiv_ne_zero [Nontrivial S] : minpolyDiv R x ≠ 0 := by
+  intro e
+  have := minpolyDiv_spec R x
+  rw [e, zero_mul] at this
+  exact ((minpoly.monic hx).map (algebraMap R S)).ne_zero this.symm
 
 lemma minpolyDiv_monic : Monic (minpolyDiv R x) := by
   nontriviality S

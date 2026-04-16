@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Matrix/DotProduct.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Star.Basic
 import Mathlib.Data.Matrix.RowCol
 import Mathlib.LinearAlgebra.StdBasis
+
+noncomputable section
 
 /-!
 # Dot product of two vectors
@@ -35,13 +37,14 @@ section Semiring
 variable [Semiring R] [Fintype n]
 
 set_option linter.deprecated false in
-
 @[simp, deprecated dotProduct_single (since := "2024-08-09")]
+
 theorem dotProduct_stdBasis_eq_mul [DecidableEq n] (v : n → R) (c : R) (i : n) :
     dotProduct v (LinearMap.stdBasis R (fun _ => R) i c) = v i * c :=
   dotProduct_single ..
 
 set_option linter.deprecated false in
+@[deprecated dotProduct_single_one (since := "2024-08-09")]
 
 theorem dotProduct_stdBasis_one [DecidableEq n] (v : n → R) (i : n) :
     dotProduct v (LinearMap.stdBasis R (fun _ => R) i 1) = v i :=
@@ -162,9 +165,23 @@ lemma vecMul_self_mul_conjTranspose_eq_zero (A : Matrix m n R) (v : m → R) :
     v ᵥ* (A * Aᴴ) = 0 ↔ v ᵥ* A = 0 := by
   simpa only [conjTranspose_conjTranspose] using vecMul_conjTranspose_mul_self_eq_zero Aᴴ _
 
--- DISSOLVED: dotProduct_star_self_pos_iff
+@[simp]
+theorem dotProduct_star_self_pos_iff {v : n → R} :
+    0 < dotProduct (star v) v ↔ v ≠ 0 := by
+  cases subsingleton_or_nontrivial R
+  · obtain rfl : v = 0 := Subsingleton.elim _ _
+    simp
+  refine (Fintype.sum_pos_iff_of_nonneg fun i => star_mul_self_nonneg _).trans ?_
+  simp_rw [Pi.lt_def, Function.ne_iff, Pi.zero_apply]
+  refine (and_iff_right fun i => star_mul_self_nonneg (v i)).trans <| exists_congr fun i => ?_
+  constructor
+  · rintro h hv
+    simp [hv] at h
+  · exact (star_mul_self_pos <| isRegular_of_ne_zero ·)
 
--- DISSOLVED: dotProduct_self_star_pos_iff
+@[simp]
+theorem dotProduct_self_star_pos_iff {v : n → R} : 0 < dotProduct v (star v) ↔ v ≠ 0 := by
+  simpa using dotProduct_star_self_pos_iff (v := star v)
 
 end StarOrderedRing
 

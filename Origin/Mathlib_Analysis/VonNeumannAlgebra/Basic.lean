@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousLinearMap
 import Mathlib.Analysis.Normed.Module.Dual
 
+noncomputable section
+
 /-!
 # Von Neumann algebras
 
@@ -53,21 +55,6 @@ instance instSubringClass : SubringClass (VonNeumannAlgebra H) (H →L[ℂ] H) w
   one_mem {s} := s.one_mem'
   zero_mem {s} := s.zero_mem'
   neg_mem {s} a ha := show -a ∈ s.toStarSubalgebra from neg_mem ha
-
-@[simp]
-theorem mem_carrier {S : VonNeumannAlgebra H} {x : H →L[ℂ] H} :
-    x ∈ S.toStarSubalgebra ↔ x ∈ (S : Set (H →L[ℂ] H)) :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toStarSubalgebra (S : VonNeumannAlgebra H) :
-    (S.toStarSubalgebra : Set (H →L[ℂ] H)) = S :=
-  rfl
-
-@[simp]
-theorem coe_mk (S : StarSubalgebra ℂ (H →L[ℂ] H)) (h) :
-    ((⟨S, h⟩ : VonNeumannAlgebra H) : Set (H →L[ℂ] H)) = S :=
-  rfl
 
 @[ext]
 theorem ext {S T : VonNeumannAlgebra H} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=

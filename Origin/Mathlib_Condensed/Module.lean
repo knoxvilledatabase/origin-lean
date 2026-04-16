@@ -12,6 +12,8 @@ import Mathlib.CategoryTheory.Sites.Adjunction
 import Mathlib.CategoryTheory.Sites.LeftExact
 import Mathlib.Condensed.Basic
 
+noncomputable section
+
 /-!
 
 # Condensed `R`-modules
@@ -39,12 +41,10 @@ noncomputable instance : Abelian (CondensedMod.{u} R) := sheafIsAbelian
 def Condensed.forget : CondensedMod R ⥤ CondensedSet := sheafCompose _ (CategoryTheory.forget _)
 
 noncomputable
-
 def Condensed.free : CondensedSet ⥤ CondensedMod R :=
   Sheaf.composeAndSheafify _ (ModuleCat.free R)
 
 noncomputable
-
 def Condensed.freeForgetAdjunction : free R ⊣ forget R := Sheaf.adjunction _ (ModuleCat.adj R)
 
 abbrev CondensedAb := CondensedMod.{u} (ULift ℤ)

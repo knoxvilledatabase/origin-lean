@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Coprime.Lemmas
 import Mathlib.RingTheory.Int.Basic
 import Mathlib.Tactic.Basic
 
+noncomputable section
+
 /-!
 # Diophantine Approximation
 

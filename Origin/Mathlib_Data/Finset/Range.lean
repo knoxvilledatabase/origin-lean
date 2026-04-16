@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Finset/Range.lean
-Genuine: 15 | Conflates: 1 | Dissolved: 2 | Infrastructure: 5
+Genuine: 19 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Insert
 import Mathlib.Order.Interval.Set.Defs
+
+noncomputable section
 
 /-!
 # Finite sets made of a range of elements.
@@ -43,24 +45,12 @@ def range (n : ℕ) : Finset ℕ :=
   ⟨_, nodup_range n⟩
 
 @[simp]
-theorem range_val (n : ℕ) : (range n).1 = Multiset.range n :=
-  rfl
-
-@[simp]
 theorem mem_range : m ∈ range n ↔ m < n :=
   Multiset.mem_range
 
 @[simp, norm_cast]
 theorem coe_range (n : ℕ) : (range n : Set ℕ) = Set.Iio n :=
   Set.ext fun _ => mem_range
-
-@[simp]
-theorem range_zero : range 0 = ∅ :=
-  rfl
-
-@[simp]
-theorem range_one : range 1 = {0} :=
-  rfl
 
 theorem range_succ : range (succ n) = insert n (range n) :=
   eq_of_veq <| (Multiset.range_succ n).trans <| (ndinsert_of_not_mem not_mem_range_self).symm
@@ -81,16 +71,22 @@ theorem range_subset {n m} : range n ⊆ range m ↔ n ≤ m :=
 theorem range_mono : Monotone range := fun _ _ => range_subset.2
 
 @[gcongr] alias ⟨_, _root_.GCongr.finset_range_subset_of_le⟩ := range_subset
+
 theorem mem_range_succ_iff {a b : ℕ} : a ∈ Finset.range b.succ ↔ a ≤ b :=
   Finset.mem_range.trans Nat.lt_succ_iff
 
 theorem mem_range_le {n x : ℕ} (hx : x ∈ range n) : x ≤ n :=
   (mem_range.1 hx).le
 
--- DISSOLVED: mem_range_sub_ne_zero
+theorem mem_range_sub_ne_zero {n x : ℕ} (hx : x ∈ range n) : n - x ≠ 0 :=
+  _root_.ne_of_gt <| Nat.sub_pos_of_lt <| mem_range.1 hx
 
--- DISSOLVED: nonempty_range_iff
+@[simp]
+theorem nonempty_range_iff : (range n).Nonempty ↔ n ≠ 0 :=
+  ⟨fun ⟨k, hk⟩ => (k.zero_le.trans_lt <| mem_range.1 hk).ne',
+   fun h => ⟨0, mem_range.2 <| Nat.pos_iff_ne_zero.2 h⟩⟩
 
+@[aesop safe apply (rule_sets := [finsetNonempty])]
 protected alias ⟨_, Aesop.range_nonempty⟩ := nonempty_range_iff
 
 @[simp]
@@ -122,13 +118,3 @@ def notMemRangeEquiv (k : ℕ) : { n // n ∉ range k } ≃ ℕ where
     apply Nat.sub_add_cancel
     simpa using j.2
   right_inv _ := Nat.add_sub_cancel_right _ _
-
-@[simp]
-theorem coe_notMemRangeEquiv (k : ℕ) :
-    (notMemRangeEquiv k : { n // n ∉ range k } → ℕ) = fun (i : { n // n ∉ range k }) => i - k :=
-  rfl
-
-@[simp]
-theorem coe_notMemRangeEquiv_symm (k : ℕ) :
-    ((notMemRangeEquiv k).symm : ℕ → { n // n ∉ range k }) = fun j => ⟨j + k, by simp⟩ :=
-  rfl

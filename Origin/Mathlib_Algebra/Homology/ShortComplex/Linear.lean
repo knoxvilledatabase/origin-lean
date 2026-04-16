@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Preadditive
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 
+noncomputable section
+
 /-!
 # Homology of linear categories
 
@@ -32,12 +34,6 @@ instance : SMul R (S₁ ⟶ S₂) where
     { τ₁ := a • φ.τ₁
       τ₂ := a • φ.τ₂
       τ₃ := a • φ.τ₃ }
-
-@[simp] lemma smul_τ₁ (a : R) (φ : S₁ ⟶ S₂) : (a • φ).τ₁ = a • φ.τ₁ := rfl
-
-@[simp] lemma smul_τ₂ (a : R) (φ : S₁ ⟶ S₂) : (a • φ).τ₂ = a • φ.τ₂ := rfl
-
-@[simp] lemma smul_τ₃ (a : R) (φ : S₁ ⟶ S₂) : (a • φ).τ₃ = a • φ.τ₃ := rfl
 
 instance : Module R (S₁ ⟶ S₂) where
   zero_smul := by aesop_cat

@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Pointwise/SMul.lean
-Genuine: 64 | Conflates: 1 | Dissolved: 17 | Infrastructure: 11
+Genuine: 81 | Conflates: 1 | Dissolved: 1 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.NoZeroSMulDivisors.Defs
 import Mathlib.Algebra.Ring.Opposite
 import Mathlib.Data.Set.Pairwise.Basic
+
+noncomputable section
 
 /-!
 # Pointwise action on sets
@@ -136,7 +138,9 @@ protected def mulActionSet [Monoid α] [MulAction α β] : MulAction α (Set β)
 
 scoped[Pointwise] attribute [instance] Set.mulActionSet Set.addActionSet Set.mulAction Set.addAction
 
--- DISSOLVED: smulZeroClassSet
+protected def smulZeroClassSet [Zero β] [SMulZeroClass α β] :
+    SMulZeroClass α (Set β) where
+  smul_zero _ := image_singleton.trans <| by rw [smul_zero, singleton_zero]
 
 scoped[Pointwise] attribute [instance] Set.smulZeroClassSet
 
@@ -207,15 +211,19 @@ section SMulZeroClass
 
 variable [Zero β] [SMulZeroClass α β] {s : Set α} {t : Set β} {a : α}
 
--- DISSOLVED: smul_zero_subset
+theorem smul_zero_subset (s : Set α) : s • (0 : Set β) ⊆ 0 := by simp [subset_def, mem_smul]
 
--- DISSOLVED: Nonempty.smul_zero
+theorem Nonempty.smul_zero (hs : s.Nonempty) : s • (0 : Set β) = 0 :=
+  s.smul_zero_subset.antisymm <| by simpa [mem_smul] using hs
 
 theorem zero_mem_smul_set (h : (0 : β) ∈ t) : (0 : β) ∈ a • t := ⟨0, h, smul_zero _⟩
 
 variable [Zero α] [NoZeroSMulDivisors α β]
 
--- DISSOLVED: zero_mem_smul_set_iff
+theorem zero_mem_smul_set_iff (ha : a ≠ 0) : (0 : β) ∈ a • t ↔ (0 : β) ∈ t := by
+  refine ⟨?_, zero_mem_smul_set⟩
+  rintro ⟨b, hb, h⟩
+  rwa [(eq_zero_or_eq_zero_of_smul_eq_zero h).resolve_left ha] at hb
 
 end SMulZeroClass
 
@@ -410,6 +418,8 @@ lemma disjoint_smul_set_left : Disjoint (a • s) t ↔ Disjoint s (a⁻¹ • t
 lemma disjoint_smul_set_right : Disjoint s (a • t) ↔ Disjoint (a⁻¹ • s) t := by
   simpa using disjoint_smul_set (a := a) (s := a⁻¹ • s)
 
+@[to_additive] alias smul_set_disjoint_iff := disjoint_smul_set
+
 attribute [deprecated disjoint_smul_set (since := "2024-10-18")] smul_set_disjoint_iff
 
 attribute [deprecated disjoint_vadd_set (since := "2024-10-18")] vadd_set_disjoint_iff
@@ -471,31 +481,45 @@ section GroupWithZero
 
 variable [GroupWithZero α] [MulAction α β] {s t : Set β} {a : α}
 
--- DISSOLVED: smul_mem_smul_set_iff₀
+@[simp]
+theorem smul_mem_smul_set_iff₀ (ha : a ≠ 0) (A : Set β) (x : β) : a • x ∈ a • A ↔ x ∈ A :=
+  show Units.mk0 a ha • _ ∈ _ ↔ _ from smul_mem_smul_set_iff
 
--- DISSOLVED: mem_smul_set_iff_inv_smul_mem₀
+theorem mem_smul_set_iff_inv_smul_mem₀ (ha : a ≠ 0) (A : Set β) (x : β) : x ∈ a • A ↔ a⁻¹ • x ∈ A :=
+  show _ ∈ Units.mk0 a ha • _ ↔ _ from mem_smul_set_iff_inv_smul_mem
 
--- DISSOLVED: mem_inv_smul_set_iff₀
+theorem mem_inv_smul_set_iff₀ (ha : a ≠ 0) (A : Set β) (x : β) : x ∈ a⁻¹ • A ↔ a • x ∈ A :=
+  show _ ∈ (Units.mk0 a ha)⁻¹ • _ ↔ _ from mem_inv_smul_set_iff
 
--- DISSOLVED: preimage_smul₀
+theorem preimage_smul₀ (ha : a ≠ 0) (t : Set β) : (fun x ↦ a • x) ⁻¹' t = a⁻¹ • t :=
+  preimage_smul (Units.mk0 a ha) t
 
--- DISSOLVED: preimage_smul_inv₀
+theorem preimage_smul_inv₀ (ha : a ≠ 0) (t : Set β) : (fun x ↦ a⁻¹ • x) ⁻¹' t = a • t :=
+  preimage_smul (Units.mk0 a ha)⁻¹ t
 
--- DISSOLVED: set_smul_subset_set_smul_iff₀
+@[simp]
+theorem set_smul_subset_set_smul_iff₀ (ha : a ≠ 0) {A B : Set β} : a • A ⊆ a • B ↔ A ⊆ B :=
+  show Units.mk0 a ha • _ ⊆ _ ↔ _ from set_smul_subset_set_smul_iff
 
--- DISSOLVED: set_smul_subset_iff₀
+theorem set_smul_subset_iff₀ (ha : a ≠ 0) {A B : Set β} : a • A ⊆ B ↔ A ⊆ a⁻¹ • B :=
+  show Units.mk0 a ha • _ ⊆ _ ↔ _ from set_smul_subset_iff
 
--- DISSOLVED: subset_set_smul_iff₀
+theorem subset_set_smul_iff₀ (ha : a ≠ 0) {A B : Set β} : A ⊆ a • B ↔ a⁻¹ • A ⊆ B :=
+  show _ ⊆ Units.mk0 a ha • _ ↔ _ from subset_set_smul_iff
 
--- DISSOLVED: smul_set_inter₀
+theorem smul_set_inter₀ (ha : a ≠ 0) : a • (s ∩ t) = a • s ∩ a • t :=
+  show Units.mk0 a ha • _ = _ from smul_set_inter
 
--- DISSOLVED: smul_set_sdiff₀
+theorem smul_set_sdiff₀ (ha : a ≠ 0) : a • (s \ t) = a • s \ a • t :=
+  image_diff (MulAction.injective₀ ha) _ _
 
 open scoped symmDiff in
 
--- DISSOLVED: smul_set_symmDiff₀
+theorem smul_set_symmDiff₀ (ha : a ≠ 0) : a • s ∆ t = (a • s) ∆ (a • t) :=
+  image_symmDiff (MulAction.injective₀ ha) _ _
 
--- DISSOLVED: smul_set_univ₀
+theorem smul_set_univ₀ (ha : a ≠ 0) : a • (univ : Set β) = univ :=
+  image_univ_of_surjective <| MulAction.surjective₀ ha
 
 theorem smul_univ₀ {s : Set α} (hs : ¬s ⊆ 0) : s • (univ : Set β) = univ :=
   let ⟨a, ha, ha₀⟩ := not_subset.1 hs

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.Quiver.Path
 import Mathlib.Combinatorics.Quiver.Push
 
+noncomputable section
+
 /-!
 ## Symmetric quivers and arrow reversal
 
@@ -94,10 +96,6 @@ instance :
       (Symmetrify V) where
   toHasReverse := ⟨fun e ↦ e.swap⟩
   inv' e := congr_fun Sum.swap_swap_eq e
-
-@[simp]
-theorem symmetrify_reverse {a b : Symmetrify V} (e : a ⟶ b) : reverse e = e.swap :=
-  rfl
 
 section Paths
 

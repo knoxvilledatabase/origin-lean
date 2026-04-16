@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
 
+noncomputable section
+
 /-!
 # Non integrable functions
 

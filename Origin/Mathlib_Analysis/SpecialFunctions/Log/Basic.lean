@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/SpecialFunctions/Log/Basic.lean
-Genuine: 75 | Conflates: 0 | Dissolved: 18 | Infrastructure: 0
+Genuine: 93 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Data.Nat.Factorization.Defs
 import Mathlib.Analysis.NormedSpace.Real
 import Mathlib.Data.Rat.Cast.CharZero
+
+noncomputable section
 
 /-!
 # Real logarithm
@@ -36,14 +38,16 @@ variable {x y : ℝ}
 noncomputable def log (x : ℝ) : ℝ :=
   if hx : x = 0 then 0 else expOrderIso.symm ⟨|x|, abs_pos.2 hx⟩
 
--- DISSOLVED: log_of_ne_zero
+theorem log_of_ne_zero (hx : x ≠ 0) : log x = expOrderIso.symm ⟨|x|, abs_pos.2 hx⟩ :=
+  dif_neg hx
 
 theorem log_of_pos (hx : 0 < x) : log x = expOrderIso.symm ⟨x, hx⟩ := by
   rw [log_of_ne_zero hx.ne']
   congr
   exact abs_of_pos hx
 
--- DISSOLVED: exp_log_eq_abs
+theorem exp_log_eq_abs (hx : x ≠ 0) : exp (log x) = |x| := by
+  rw [log_of_ne_zero hx, ← coe_expOrderIso_apply, OrderIso.apply_symm_apply, Subtype.coe_mk]
 
 theorem exp_log (hx : 0 < x) : exp (log x) = x := by
   rw [exp_log_eq_abs hx.ne']
@@ -98,9 +102,13 @@ theorem cosh_log {x : ℝ} (hx : 0 < x) : cosh (log x) = (x + x⁻¹) / 2 := by
 theorem surjOn_log' : SurjOn log (Iio 0) univ := fun x _ =>
   ⟨-exp x, neg_lt_zero.2 <| exp_pos x, by rw [log_neg_eq_log, log_exp]⟩
 
--- DISSOLVED: log_mul
+theorem log_mul (hx : x ≠ 0) (hy : y ≠ 0) : log (x * y) = log x + log y :=
+  exp_injective <| by
+    rw [exp_log_eq_abs (mul_ne_zero hx hy), exp_add, exp_log_eq_abs hx, exp_log_eq_abs hy, abs_mul]
 
--- DISSOLVED: log_div
+theorem log_div (hx : x ≠ 0) (hy : y ≠ 0) : log (x / y) = log x - log y :=
+  exp_injective <| by
+    rw [exp_log_eq_abs (div_ne_zero hx hy), exp_sub, exp_log_eq_abs hx, exp_log_eq_abs hy, abs_div]
 
 @[simp]
 theorem log_inv (x : ℝ) : log x⁻¹ = -log x := by
@@ -223,7 +231,8 @@ theorem log_lt_sub_one_of_pos (hx1 : 0 < x) (hx2 : x ≠ 1) : log x < x - 1 := b
 theorem eq_one_of_pos_of_log_eq_zero {x : ℝ} (h₁ : 0 < x) (h₂ : log x = 0) : x = 1 :=
   log_injOn_pos (Set.mem_Ioi.2 h₁) (Set.mem_Ioi.2 zero_lt_one) (h₂.trans Real.log_one.symm)
 
--- DISSOLVED: log_ne_zero_of_pos_of_ne_one
+theorem log_ne_zero_of_pos_of_ne_one {x : ℝ} (hx_pos : 0 < x) (hx : x ≠ 1) : log x ≠ 0 :=
+  mt (eq_one_of_pos_of_log_eq_zero hx_pos) hx
 
 @[simp]
 theorem log_eq_zero {x : ℝ} : log x = 0 ↔ x = 0 ∨ x = 1 ∨ x = -1 := by
@@ -237,7 +246,8 @@ theorem log_eq_zero {x : ℝ} : log x = 0 ↔ x = 0 ∨ x = 1 ∨ x = -1 := by
     · exact Or.inr (Or.inl (eq_one_of_pos_of_log_eq_zero x_gt_zero h))
   · rintro (rfl | rfl | rfl) <;> simp only [log_one, log_zero, log_neg_eq_log]
 
--- DISSOLVED: log_ne_zero
+theorem log_ne_zero {x : ℝ} : log x ≠ 0 ↔ x ≠ 0 ∧ x ≠ 1 ∧ x ≠ -1 := by
+  simpa only [not_or] using log_eq_zero.not
 
 @[simp]
 theorem log_pow (x : ℝ) (n : ℕ) : log (x ^ n) = n * log x := by
@@ -305,17 +315,30 @@ theorem continuousOn_log : ContinuousOn log {0}ᶜ := by
   conv in log _ => rw [log_of_ne_zero (show (x : ℝ) ≠ 0 from x.2)]
   exact expOrderIso.symm.continuous.comp (continuous_subtype_val.norm.subtype_mk _)
 
--- DISSOLVED: continuous_log
+@[fun_prop]
+theorem continuous_log : Continuous fun x : { x : ℝ // x ≠ 0 } => log x :=
+  continuousOn_iff_continuous_restrict.1 <| continuousOn_log.mono fun _ => id
 
 @[fun_prop]
 theorem continuous_log' : Continuous fun x : { x : ℝ // 0 < x } => log x :=
   continuousOn_iff_continuous_restrict.1 <| continuousOn_log.mono fun _ hx => ne_of_gt hx
 
--- DISSOLVED: continuousAt_log
+theorem continuousAt_log (hx : x ≠ 0) : ContinuousAt log x :=
+  (continuousOn_log x hx).continuousAt <| isOpen_compl_singleton.mem_nhds hx
 
--- DISSOLVED: continuousAt_log_iff
+@[simp]
+theorem continuousAt_log_iff : ContinuousAt log x ↔ x ≠ 0 := by
+  refine ⟨?_, continuousAt_log⟩
+  rintro h rfl
+  exact not_tendsto_nhds_of_tendsto_atBot tendsto_log_nhdsWithin_zero _
+    (h.tendsto.mono_left inf_le_left)
 
--- DISSOLVED: log_prod
+theorem log_prod {α : Type*} (s : Finset α) (f : α → ℝ) (hf : ∀ x ∈ s, f x ≠ 0) :
+    log (∏ i ∈ s, f i) = ∑ i ∈ s, log (f i) := by
+  induction' s using Finset.cons_induction_on with a s ha ih
+  · simp
+  · rw [Finset.forall_mem_cons] at hf
+    simp [ih hf.2, log_mul hf.1 (Finset.prod_ne_zero_iff.2 hf.2)]
 
 protected theorem _root_.Finsupp.log_prod {α β : Type*} [Zero β] (f : α →₀ β) (g : α → β → ℝ)
     (hg : ∀ a, g a (f a) = 0 → f a = 0) : log (f.prod g) = f.sum fun a b ↦ log (g a b) :=
@@ -330,7 +353,10 @@ theorem log_nat_eq_sum_factorization (n : ℕ) :
     intro p hp
     rw [pow_eq_zero (Nat.cast_eq_zero.1 hp), Nat.factorization_zero_right]
 
--- DISSOLVED: tendsto_pow_log_div_mul_add_atTop
+theorem tendsto_pow_log_div_mul_add_atTop (a b : ℝ) (n : ℕ) (ha : a ≠ 0) :
+    Tendsto (fun x => log x ^ n / (a * x + b)) atTop (𝓝 0) :=
+  ((tendsto_div_pow_mul_exp_add_atTop a b n ha.symm).comp tendsto_log_atTop).congr' <| by
+    filter_upwards [eventually_gt_atTop (0 : ℝ)] with x hx using by simp [exp_log hx]
 
 theorem isLittleO_pow_log_id_atTop {n : ℕ} : (fun x => log x ^ n) =o[atTop] id := by
   rw [Asymptotics.isLittleO_iff_tendsto']
@@ -346,20 +372,6 @@ theorem isLittleO_const_log_atTop {c : ℝ} : (fun _ => c) =o[atTop] log := by
   filter_upwards [eventually_gt_atTop 1] with x hx
   aesop (add safe forward log_pos)
 
-@[simps] noncomputable def expPartialHomeomorph : PartialHomeomorph ℝ ℝ where
-  toFun := Real.exp
-  invFun := Real.log
-  source := univ
-  target := Ioi (0 : ℝ)
-  map_source' x _ := exp_pos x
-  map_target' _ _ := mem_univ _
-  left_inv' _ _ := by simp
-  right_inv' _ hx := exp_log hx
-  open_source := isOpen_univ
-  open_target := isOpen_Ioi
-  continuousOn_toFun := continuousOn_exp
-  continuousOn_invFun x hx := (continuousAt_log (ne_of_gt hx)).continuousWithinAt
-
 end Real
 
 section Continuity
@@ -368,17 +380,28 @@ open Real
 
 variable {α : Type*}
 
--- DISSOLVED: Filter.Tendsto.log
+theorem Filter.Tendsto.log {f : α → ℝ} {l : Filter α} {x : ℝ} (h : Tendsto f l (𝓝 x)) (hx : x ≠ 0) :
+    Tendsto (fun x => log (f x)) l (𝓝 (log x)) :=
+  (continuousAt_log hx).tendsto.comp h
 
 variable [TopologicalSpace α] {f : α → ℝ} {s : Set α} {a : α}
 
--- DISSOLVED: Continuous.log
+@[fun_prop]
+theorem Continuous.log (hf : Continuous f) (h₀ : ∀ x, f x ≠ 0) : Continuous fun x => log (f x) :=
+  continuousOn_log.comp_continuous hf h₀
 
--- DISSOLVED: ContinuousAt.log
+@[fun_prop]
+nonrec theorem ContinuousAt.log (hf : ContinuousAt f a) (h₀ : f a ≠ 0) :
+    ContinuousAt (fun x => log (f x)) a :=
+  hf.log h₀
 
--- DISSOLVED: ContinuousWithinAt.log
+nonrec theorem ContinuousWithinAt.log (hf : ContinuousWithinAt f s a) (h₀ : f a ≠ 0) :
+    ContinuousWithinAt (fun x => log (f x)) s a :=
+  hf.log h₀
 
--- DISSOLVED: ContinuousOn.log
+@[fun_prop]
+theorem ContinuousOn.log (hf : ContinuousOn f s) (h₀ : ∀ x ∈ s, f x ≠ 0) :
+    ContinuousOn (fun x => log (f x)) s := fun x hx => (hf x hx).log (h₀ x hx)
 
 end Continuity
 
@@ -446,9 +469,21 @@ lemma log_pos_of_isRat_neg {n : ℤ} :
     have : (n : ℝ) / d < -1 := by exact_mod_cast of_decide_eq_true h
     exact Real.log_pos_of_lt_neg_one this
 
--- DISSOLVED: log_nz_of_isRat
+lemma log_nz_of_isRat {n : ℤ} : (NormNum.IsRat e n d) → (decide ((0 : ℚ) < n / d))
+    → (decide (n / d < (1 : ℚ))) → (Real.log (e : ℝ) ≠ 0)
+  | ⟨inv, eq⟩, h₁, h₂ => by
+    rw [eq, invOf_eq_inv, ← div_eq_mul_inv]
+    have h₁' : 0 < (n : ℝ) / d := by exact_mod_cast of_decide_eq_true h₁
+    have h₂' : (n : ℝ) / d < 1 := by exact_mod_cast of_decide_eq_true h₂
+    exact ne_of_lt <| Real.log_neg h₁' h₂'
 
--- DISSOLVED: log_nz_of_isRat_neg
+lemma log_nz_of_isRat_neg {n : ℤ} : (NormNum.IsRat e n d) → (decide (n / d < (0 : ℚ)))
+    → (decide ((-1 : ℚ) < n / d)) → (Real.log (e : ℝ) ≠ 0)
+  | ⟨inv, eq⟩, h₁, h₂ => by
+    rw [eq, invOf_eq_inv, ← div_eq_mul_inv]
+    have h₁' : (n : ℝ) / d < 0 := by exact_mod_cast of_decide_eq_true h₁
+    have h₂' : -1 < (n : ℝ) / d := by exact_mod_cast of_decide_eq_true h₂
+    exact ne_of_lt <| Real.log_neg_of_lt_zero h₁' h₂'
 
 @[positivity Real.log (Nat.cast _)]
 def evalLogNatCast : PositivityExt where eval {u α} _zα _pα e := do

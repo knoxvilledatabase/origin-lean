@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Functor.EpiMono
 
+noncomputable section
+
 /-!
 
 # Adjunctions involving evaluation

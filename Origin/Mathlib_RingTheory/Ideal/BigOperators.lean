@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.RingTheory.Ideal.Defs
 
+noncomputable section
+
 /-!
 
 # Big operators for ideals

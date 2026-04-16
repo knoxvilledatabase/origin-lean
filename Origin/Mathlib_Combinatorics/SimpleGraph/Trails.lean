@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Combinatorics.SimpleGraph.Path
 
+noncomputable section
+
 /-!
 
 # Trails and Eulerian trails

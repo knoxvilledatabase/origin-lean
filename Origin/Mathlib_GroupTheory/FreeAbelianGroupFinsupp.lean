@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/FreeAbelianGroupFinsupp.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags
 import Mathlib.GroupTheory.FreeAbelianGroup
 import Mathlib.GroupTheory.FreeGroup.IsFreeGroup
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+
+noncomputable section
 
 /-!
 # Isomorphism between `FreeAbelianGroup X` and `X →₀ ℤ`
@@ -115,7 +117,9 @@ def coeff (x : X) : FreeAbelianGroup X →+ ℤ :=
 def support (a : FreeAbelianGroup X) : Finset X :=
   a.toFinsupp.support
 
--- DISSOLVED: mem_support_iff
+theorem mem_support_iff (x : X) (a : FreeAbelianGroup X) : x ∈ a.support ↔ coeff x a ≠ 0 := by
+  rw [support, Finsupp.mem_support_iff]
+  exact Iff.rfl
 
 theorem not_mem_support_iff (x : X) (a : FreeAbelianGroup X) : x ∉ a.support ↔ coeff x a = 0 := by
   rw [support, Finsupp.not_mem_support_iff]
@@ -133,9 +137,18 @@ theorem support_of (x : X) : support (of x) = {x} := by
 theorem support_neg (a : FreeAbelianGroup X) : support (-a) = support a := by
   simp only [support, AddMonoidHom.map_neg, Finsupp.support_neg]
 
--- DISSOLVED: support_zsmul
+@[simp]
+theorem support_zsmul (k : ℤ) (h : k ≠ 0) (a : FreeAbelianGroup X) :
+    support (k • a) = support a := by
+  ext x
+  simp only [mem_support_iff, AddMonoidHom.map_zsmul]
+  simp only [h, zsmul_int_int, false_or, Ne, mul_eq_zero]
 
--- DISSOLVED: support_nsmul
+@[simp]
+theorem support_nsmul (k : ℕ) (h : k ≠ 0) (a : FreeAbelianGroup X) :
+    support (k • a) = support a := by
+  apply support_zsmul k _ a
+  exact mod_cast h
 
 open scoped Classical
 

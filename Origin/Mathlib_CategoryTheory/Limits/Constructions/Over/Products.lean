@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 
+noncomputable section
+
 /-!
 # Products in the over category
 
@@ -148,7 +150,6 @@ lemma isPullback_of_binaryFan_isLimit (c : BinaryFan Y Z) (hc : IsLimit c) :
 variable (Y Z) [HasPullback Y.hom Z.hom] [HasBinaryProduct Y Z]
 
 noncomputable
-
 def prodLeftIsoPullback :
     (Y ⨯ Z).left ≅ pullback Y.hom Z.hom :=
   (Over.isPullback_of_binaryFan_isLimit _ (prodIsProd Y Z)).isoPullback

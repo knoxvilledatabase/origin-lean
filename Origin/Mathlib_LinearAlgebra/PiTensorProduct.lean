@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Multilinear.TensorProduct
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Tensor product of an indexed family of modules over commutative semirings
 
@@ -208,9 +210,6 @@ instance hasSMul' : SMul R₁ (⨂[R] i, s i) :=
 
 instance : SMul R (⨂[R] i, s i) :=
   PiTensorProduct.hasSMul'
-
-theorem smul_tprodCoeff' (r : R₁) (z : R) (f : Π i, s i) :
-    r • tprodCoeff R z f = tprodCoeff R (r • z) f := rfl
 
 protected theorem smul_add (r : R₁) (x y : ⨂[R] i, s i) : r • (x + y) = r • x + r • y :=
   AddMonoidHom.map_add _ _ _
@@ -419,10 +418,6 @@ theorem lift.unique' {φ' : (⨂[R] i, s i) →ₗ[R] E}
 theorem lift.unique {φ' : (⨂[R] i, s i) →ₗ[R] E} (H : ∀ f, φ' (PiTensorProduct.tprod R f) = φ f) :
     φ' = lift φ :=
   lift.unique' (MultilinearMap.ext H)
-
-@[simp]
-theorem lift_symm (φ' : (⨂[R] i, s i) →ₗ[R] E) : lift.symm φ' = φ'.compMultilinearMap (tprod R) :=
-  rfl
 
 @[simp]
 theorem lift_tprod : lift (tprod R : MultilinearMap R s _) = LinearMap.id :=
@@ -702,6 +697,7 @@ theorem map_reindex_symm (f : Π i, s i →ₗ[R] t i) (e : ι ≃ ι₂) (x : �
 variable (ι)
 
 attribute [local simp] eq_iff_true_of_subsingleton in
+/-- The tensor product over an empty index type `ι` is isomorphic to the base ring. -/
 
 @[simps symm_apply]
 def isEmptyEquiv [IsEmpty ι] : (⨂[R] i : ι, s i) ≃ₗ[R] R where

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.Embedding.Basic
 import Mathlib.Algebra.Homology.Additive
 import Mathlib.Algebra.Homology.Opposite
 
+noncomputable section
+
 /-!
 # The extension of a homological complex by an embedding of complex shapes
 

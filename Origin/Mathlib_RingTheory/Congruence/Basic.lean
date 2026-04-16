@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Action.Basic
 import Mathlib.GroupTheory.Congruence.Basic
 import Mathlib.RingTheory.Congruence.Defs
 
+noncomputable section
+
 /-!
 # Congruence relations on rings
 
@@ -45,10 +47,6 @@ section SMul
 variable [Add R] [MulOneClass R] [SMul α R] [IsScalarTower α R R] (c : RingCon R)
 
 instance : SMul α c.Quotient := inferInstanceAs (SMul α c.toCon.Quotient)
-
-@[simp, norm_cast]
-theorem coe_smul (a : α) (x : R) : (↑(a • x) : c.Quotient) = a • (x : c.Quotient) :=
-  rfl
 
 end SMul
 
@@ -144,18 +142,6 @@ instance : CompleteLattice (RingCon R) where
       add' := congr_arg₂ _ }
   bot_le c := fun x _y h => h ▸ c.refl x
 
-@[simp, norm_cast]
-theorem coe_top : ⇑(⊤ : RingCon R) = ⊤ := rfl
-
-@[simp, norm_cast]
-theorem coe_bot : ⇑(⊥ : RingCon R) = Eq := rfl
-
-@[simp, norm_cast]
-theorem coe_inf {c d : RingCon R} : ⇑(c ⊓ d) = ⇑c ⊓ ⇑d := rfl
-
-theorem inf_iff_and {c d : RingCon R} {x y} : (c ⊓ d) x y ↔ c x y ∧ d x y :=
-  Iff.rfl
-
 instance [Nontrivial R] : Nontrivial (RingCon R) where
   exists_pair_ne :=
     let ⟨x, y, ne⟩ := exists_pair_ne R
@@ -207,14 +193,6 @@ theorem sSup_def {S : Set (RingCon R)} :
   simp only [sSup_image, iSup_apply, iSup_Prop_eq, exists_prop, rel_eq_coe]
 
 variable (R)
-
-protected def gi : @GaloisInsertion (R → R → Prop) (RingCon R) _ _ ringConGen (⇑) where
-  choice r _h := ringConGen r
-  gc _r c :=
-    ⟨fun H _ _ h => H <| RingConGen.Rel.of _ _ h, fun H =>
-      ringConGen_of_ringCon c ▸ ringConGen_mono H⟩
-  le_l_u x := (ringConGen_of_ringCon x).symm ▸ le_refl x
-  choice_eq _ _ := rfl
 
 end Lattice
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
+noncomputable section
+
 /-!
 # Factorial with big operators
 

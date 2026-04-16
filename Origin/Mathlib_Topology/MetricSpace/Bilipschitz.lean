@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.MetricSpace.Antilipschitz
 import Mathlib.Topology.MetricSpace.Lipschitz
 
+noncomputable section
+
 /-! # Bilipschitz equivalence
 
 A common pattern in Mathlib is to replace the topology, uniformity and bornology on a type

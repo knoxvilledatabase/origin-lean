@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic
 
+noncomputable section
+
 /-! The cohomology of a sheaf of groups in degree 1
 
 In this file, we shall define the cohomology in degree 1 of a sheaf
@@ -56,14 +58,8 @@ instance : Group (ZeroCochain G U) := Pi.group
 
 namespace Cochain₀
 
-@[simp, nolint simpNF]
-lemma one_apply (i : I) : (1 : ZeroCochain G U) i = 1 := rfl
-
 @[simp]
 lemma inv_apply (γ : ZeroCochain G U) (i : I) : γ⁻¹ i = (γ i)⁻¹ := rfl
-
-@[simp]
-lemma mul_apply (γ₁ γ₂ : ZeroCochain G U) (i : I) : (γ₁ * γ₂) i = γ₁ i * γ₂ i := rfl
 
 end Cochain₀
 
@@ -81,25 +77,13 @@ attribute [simp] OneCochain.ev_precomp
 instance : One (OneCochain G U) where
   one := { ev := fun _ _ _ _ _ ↦ 1 }
 
-@[simp]
-lemma one_ev (i j : I) {T : C} (a : T ⟶ U i) (b : T ⟶ U j) :
-    (1 : OneCochain G U).ev i j a b = 1 := rfl
-
 variable {G U}
 
 instance : Mul (OneCochain G U) where
   mul γ₁ γ₂ := { ev := fun i j _ a b ↦ γ₁.ev i j a b * γ₂.ev i j a b }
 
-@[simp]
-lemma mul_ev (γ₁ γ₂ : OneCochain G U) (i j : I) {T : C} (a : T ⟶ U i) (b : T ⟶ U j) :
-    (γ₁ * γ₂).ev i j a b = γ₁.ev i j a b * γ₂.ev i j a b := rfl
-
 instance : Inv (OneCochain G U) where
   inv γ := { ev := fun i j _ a b ↦ (γ.ev i j a b) ⁻¹}
-
-@[simp]
-lemma inv_ev (γ : OneCochain G U) (i j : I) {T : C} (a : T ⟶ U i) (b : T ⟶ U j) :
-    (γ⁻¹).ev i j a b = (γ.ev i j a b)⁻¹ := rfl
 
 instance : Group (OneCochain G U) where
   mul_assoc _ _ _ := by ext; apply mul_assoc
@@ -117,9 +101,6 @@ namespace OneCocycle
 
 instance : One (OneCocycle G U) where
   one := OneCocycle.mk 1
-
-@[simp]
-lemma one_toOneCochain : (1 : OneCocycle G U).toOneCochain = 1 := rfl
 
 @[simp]
 lemma ev_refl (γ : OneCocycle G U) (i : I) ⦃T : C⦄ (a : T ⟶ U i) :

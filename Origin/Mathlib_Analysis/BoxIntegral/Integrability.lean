@@ -7,6 +7,8 @@ import Mathlib.Analysis.BoxIntegral.Basic
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Tactic.Generalize
 
+noncomputable section
+
 /-!
 # McShane integrability vs Bochner integrability
 

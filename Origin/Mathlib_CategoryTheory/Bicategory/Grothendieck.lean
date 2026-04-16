@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
 import Mathlib.CategoryTheory.Bicategory.Functor.Pseudofunctor
 
+noncomputable section
+
 /-!
 # The Grothendieck construction
 

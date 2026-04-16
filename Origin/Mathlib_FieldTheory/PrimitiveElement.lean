@@ -7,6 +7,8 @@ import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.IntegralDomain
 import Mathlib.RingTheory.Polynomial.UniqueFactorization
 
+noncomputable section
+
 /-!
 # Primitive Element Theorem
 

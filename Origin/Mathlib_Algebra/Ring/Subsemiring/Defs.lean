@@ -5,6 +5,8 @@ Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 import Origin.Core
 import Mathlib.RingTheory.NonUnitalSubsemiring.Defs
 
+noncomputable section
+
 /-!
 # Bundled subsemirings
 
@@ -74,10 +76,6 @@ instance noZeroDivisors [NoZeroDivisors R] : NoZeroDivisors s :=
 def subtype : s →+* R :=
   { SubmonoidClass.subtype s, AddSubmonoidClass.subtype s with toFun := (↑) }
 
-@[simp]
-theorem coe_subtype : (subtype s : s → R) = ((↑) : s → R) :=
-  rfl
-
 instance (priority := 75) toSemiring {R} [Semiring R] [SetLike S R] [SubsemiringClass S R] :
     Semiring s :=
   Subtype.coe_injective.semiring Subtype.val rfl rfl (fun _ _ => rfl) (fun _ _ => rfl)
@@ -117,13 +115,6 @@ instance : SubsemiringClass (Subsemiring R) R where
 
 initialize_simps_projections Subsemiring (carrier → coe, as_prefix coe)
 
-@[simp]
-theorem mem_toSubmonoid {s : Subsemiring R} {x : R} : x ∈ s.toSubmonoid ↔ x ∈ s :=
-  Iff.rfl
-
-theorem mem_carrier {s : Subsemiring R} {x : R} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
 @[ext]
 theorem ext {S T : Subsemiring R} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -150,11 +141,6 @@ protected def mk' (s : Set R) (sm : Submonoid R) (hm : ↑sm = s) (sa : AddSubmo
   one_mem' := by exact hm ▸ sm.one_mem
   add_mem' {x y} := by simpa only [← ha] using sa.add_mem
   mul_mem' {x y} := by simpa only [← hm] using sm.mul_mem
-
-@[simp]
-theorem mem_mk' {s : Set R} {sm : Submonoid R} (hm : ↑sm = s) {sa : AddSubmonoid R} (ha : ↑sa = s)
-    {x : R} : x ∈ Subsemiring.mk' s sm hm sa ha ↔ x ∈ s :=
-  Iff.rfl
 
 @[simp]
 theorem mk'_toSubmonoid {s : Set R} {sm : Submonoid R} (hm : ↑sm = s) {sa : AddSubmonoid R}
@@ -188,22 +174,6 @@ instance toNonAssocSemiring : NonAssocSemiring s :=
   -- Porting note: this used to be a specialized instance which needed to be expensively unified.
   SubsemiringClass.toNonAssocSemiring _
 
-@[simp, norm_cast]
-theorem coe_one : ((1 : s) : R) = (1 : R) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_zero : ((0 : s) : R) = (0 : R) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_add (x y : s) : ((x + y : s) : R) = (x + y : R) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_mul (x y : s) : ((x * y : s) : R) = (x * y : R) :=
-  rfl
-
 instance nontrivial [Nontrivial R] : Nontrivial s :=
   nontrivial_of_ne 0 1 fun H => zero_ne_one (congr_arg Subtype.val H)
 
@@ -231,26 +201,8 @@ instance toCommSemiring {R} [CommSemiring R] (s : Subsemiring R) : CommSemiring 
 def subtype : s →+* R :=
   { s.toSubmonoid.subtype, s.toAddSubmonoid.subtype with toFun := (↑) }
 
-@[simp]
-theorem coe_subtype : ⇑s.subtype = ((↑) : s → R) :=
-  rfl
-
 protected theorem nsmul_mem {x : R} (hx : x ∈ s) (n : ℕ) : n • x ∈ s :=
   nsmul_mem hx n
-
-@[simp]
-theorem coe_toSubmonoid (s : Subsemiring R) : (s.toSubmonoid : Set R) = s :=
-  rfl
-
-@[simp]
-theorem coe_carrier_toSubmonoid (s : Subsemiring R) : (s.toSubmonoid.carrier : Set R) = s :=
-  rfl
-
-theorem mem_toAddSubmonoid {s : Subsemiring R} {x : R} : x ∈ s.toAddSubmonoid ↔ x ∈ s :=
-  Iff.rfl
-
-theorem coe_toAddSubmonoid (s : Subsemiring R) : (s.toAddSubmonoid : Set R) = s :=
-  rfl
 
 instance : Top (Subsemiring R) :=
   ⟨{ (⊤ : Submonoid R), (⊤ : AddSubmonoid R) with }⟩
@@ -259,10 +211,6 @@ instance : Top (Subsemiring R) :=
 theorem mem_top (x : R) : x ∈ (⊤ : Subsemiring R) :=
   Set.mem_univ x
 
-@[simp]
-theorem coe_top : ((⊤ : Subsemiring R) : Set R) = Set.univ :=
-  rfl
-
 end Subsemiring
 
 namespace Subsemiring
@@ -270,14 +218,6 @@ namespace Subsemiring
 instance : Min (Subsemiring R) :=
   ⟨fun s t =>
     { s.toSubmonoid ⊓ t.toSubmonoid, s.toAddSubmonoid ⊓ t.toAddSubmonoid with carrier := s ∩ t }⟩
-
-@[simp]
-theorem coe_inf (p p' : Subsemiring R) : ((p ⊓ p' : Subsemiring R) : Set R) = (p : Set R) ∩ p' :=
-  rfl
-
-@[simp]
-theorem mem_inf {p p' : Subsemiring R} {x : R} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
 
 end Subsemiring
 
@@ -289,10 +229,6 @@ open Subsemiring
 
 def domRestrict (f : R →+* S) (s : σR) : s →+* S :=
   f.comp <| SubsemiringClass.subtype s
-
-@[simp]
-theorem restrict_apply (f : R →+* S) {s : σR} (x : s) : f.domRestrict s x = f x :=
-  rfl
 
 def eqLocusS (f g : R →+* S) : Subsemiring R :=
   { (f : R →* S).eqLocusM g, (f : R →+ S).eqLocusM g with carrier := { x | f x = g x } }

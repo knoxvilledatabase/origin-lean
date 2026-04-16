@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Limits.Preserves.Limits
 
+noncomputable section
+
 /-!
 # Limits in the category of elements
 

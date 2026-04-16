@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 import Mathlib.CategoryTheory.Monoidal.Preadditive
 
+noncomputable section
+
 /-!
 # Linear monoidal categories
 

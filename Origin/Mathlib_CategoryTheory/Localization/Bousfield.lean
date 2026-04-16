@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.ClosedUnderIsomorphisms
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 import Mathlib.CategoryTheory.Localization.Adjunction
 
+noncomputable section
+
 /-!
 # Bousfield localization
 

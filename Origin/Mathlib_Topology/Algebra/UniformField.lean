@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/UniformField.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 3 | Infrastructure: 6
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Subfield.Basic
 import Mathlib.Topology.Algebra.Field
 import Mathlib.Topology.Algebra.UniformRing
+
+noncomputable section
 
 /-!
 # Completion of topological fields
@@ -56,7 +58,28 @@ variable {K}
 def hatInv : hat K → hat K :=
   isDenseInducing_coe.extend fun x : K => (↑x⁻¹ : hat K)
 
--- DISSOLVED: continuous_hatInv
+theorem continuous_hatInv [CompletableTopField K] {x : hat K} (h : x ≠ 0) :
+    ContinuousAt hatInv x := by
+  refine isDenseInducing_coe.continuousAt_extend ?_
+  apply mem_of_superset (compl_singleton_mem_nhds h)
+  intro y y_ne
+  rw [mem_compl_singleton_iff] at y_ne
+  apply CompleteSpace.complete
+  have : (fun (x : K) => (↑x⁻¹ : hat K)) =
+      ((fun (y : K) => (↑y : hat K))∘(fun (x : K) => (x⁻¹ : K))) := by
+    unfold Function.comp
+    simp
+  rw [this, ← Filter.map_map]
+  apply Cauchy.map _ (Completion.uniformContinuous_coe K)
+  apply CompletableTopField.nice
+  · haveI := isDenseInducing_coe.comap_nhds_neBot y
+    apply cauchy_nhds.comap
+    rw [Completion.comap_coe_eq_uniformity]
+  · have eq_bot : 𝓝 (0 : hat K) ⊓ 𝓝 y = ⊥ := by
+      by_contra h
+      exact y_ne (eq_of_nhds_neBot <| neBot_iff.mpr h).symm
+    erw [isDenseInducing_coe.nhds_eq_comap (0 : K), ← Filter.comap_inf, eq_bot]
+    exact comap_bot
 
 open Classical in
 
@@ -65,7 +88,8 @@ instance instInvCompletion : Inv (hat K) :=
 
 variable [TopologicalDivisionRing K]
 
--- DISSOLVED: hatInv_extends
+theorem hatInv_extends {x : K} (h : x ≠ 0) : hatInv (x : hat K) = ↑(x⁻¹ : K) :=
+  isDenseInducing_coe.extend_eq_at ((continuous_coe K).continuousAt.comp (continuousAt_inv₀ h))
 
 variable [CompletableTopField K]
 
@@ -83,7 +107,34 @@ theorem coe_inv (x : K) : (x : hat K)⁻¹ = ((x⁻¹ : K) : hat K) := by
 
 variable [UniformAddGroup K]
 
--- DISSOLVED: mul_hatInv_cancel
+theorem mul_hatInv_cancel {x : hat K} (x_ne : x ≠ 0) : x * hatInv x = 1 := by
+  haveI : T1Space (hat K) := T2Space.t1Space
+  let f := fun x : hat K => x * hatInv x
+  let c := (fun (x : K) => (x : hat K))
+  change f x = 1
+  have cont : ContinuousAt f x := by
+    letI : TopologicalSpace (hat K × hat K) := instTopologicalSpaceProd
+    have : ContinuousAt (fun y : hat K => ((y, hatInv y) : hat K × hat K)) x :=
+      continuous_id.continuousAt.prod (continuous_hatInv x_ne)
+    exact (_root_.continuous_mul.continuousAt.comp this : _)
+  have clo : x ∈ closure (c '' {0}ᶜ) := by
+    have := isDenseInducing_coe.dense x
+    rw [← image_univ, show (univ : Set K) = {0} ∪ {0}ᶜ from (union_compl_self _).symm,
+      image_union] at this
+    apply mem_closure_of_mem_closure_union this
+    rw [image_singleton]
+    exact compl_singleton_mem_nhds x_ne
+  have fxclo : f x ∈ closure (f '' (c '' {0}ᶜ)) := mem_closure_image cont clo
+  have : f '' (c '' {0}ᶜ) ⊆ {1} := by
+    rw [image_image]
+    rintro _ ⟨z, z_ne, rfl⟩
+    rw [mem_singleton_iff]
+    rw [mem_compl_singleton_iff] at z_ne
+    dsimp [f]
+    rw [hatInv_extends z_ne, ← coe_mul]
+    rw [mul_inv_cancel₀ z_ne, coe_one]
+  replace fxclo := closure_mono this fxclo
+  rwa [closure_singleton, mem_singleton_iff] at fxclo
 
 instance instField : Field (hat K) where
   exists_pair_ne := ⟨0, 1, fun h => zero_ne_one ((isUniformEmbedding_coe K).injective h)⟩

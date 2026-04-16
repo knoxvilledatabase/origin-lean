@@ -9,6 +9,8 @@ import Mathlib.Tactic.FunProp.Types
 import Mathlib.Lean.Expr.Basic
 import Batteries.Tactic.Exact
 
+noncomputable section
+
 /-!
 # Tactic `fun_prop` for proving function properties like `Continuous f`, `Differentiable ℝ f`, ...
 -/

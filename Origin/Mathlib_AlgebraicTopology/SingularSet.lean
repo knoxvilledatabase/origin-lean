@@ -8,6 +8,8 @@ import Mathlib.AlgebraicTopology.TopologicalSimplex
 import Mathlib.CategoryTheory.Limits.Presheaf
 import Mathlib.Topology.Category.TopCat.Limits.Basic
 
+noncomputable section
+
 /-!
 # The singular simplicial set of a topological space and geometric realization of a simplicial set
 

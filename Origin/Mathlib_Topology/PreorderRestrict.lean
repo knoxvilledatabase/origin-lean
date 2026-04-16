@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Restriction
 import Mathlib.Topology.Constructions
 
+noncomputable section
+
 /-!
 # Continuity of the restriction function for functions indexed by a preorder
 

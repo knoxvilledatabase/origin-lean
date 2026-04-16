@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Module/LocalizedModule/Basic.lean
-Genuine: 114 | Conflates: 0 | Dissolved: 2 | Infrastructure: 31
+Genuine: 114 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.RingTheory.Localization.Defs
+
+noncomputable section
 
 /-!
 # Localized Module
@@ -166,7 +168,8 @@ private theorem add_zero' (x : LocalizedModule S M) : x + 0 = x :=
 
 instance hasNatSMul : SMul ℕ (LocalizedModule S M) where smul n := nsmulRec n
 
--- DISSOLVED: nsmul_zero'
+private theorem nsmul_zero' (x : LocalizedModule S M) : (0 : ℕ) • x = 0 :=
+  LocalizedModule.induction_on (fun _ _ => rfl) x
 
 private theorem nsmul_succ' (n : ℕ) (x : LocalizedModule S M) : n.succ • x = n • x + x :=
   LocalizedModule.induction_on (fun _ _ => rfl) x
@@ -335,7 +338,8 @@ private theorem smul_add_aux (x : T) (p q : LocalizedModule S M) :
   · simp only [Submonoid.smul_def, smul_add, ← mul_smul, Submonoid.coe_mul]; ring_nf
   · rw [mul_mul_mul_comm] -- ring does not work here
 
--- DISSOLVED: smul_zero_aux
+private theorem smul_zero_aux (x : T) : x • (0 : LocalizedModule S M) = 0 := by
+  erw [smul_def, smul_zero, zero_mk]
 
 private theorem add_smul_aux (x y : T) (p : LocalizedModule S M) :
     (x + y) • p = x • p + y • p := by
@@ -853,12 +857,10 @@ noncomputable def linearEquiv [IsLocalizedModule S g] : M' ≃ₗ[R] M'' :=
 variable {S}
 
 include f in
-
 theorem smul_injective (s : S) : Function.Injective fun m : M' => s • m :=
   ((Module.End_isUnit_iff _).mp (IsLocalizedModule.map_units f s)).injective
 
 include f in
-
 theorem smul_inj (s : S) (m₁ m₂ : M') : s • m₁ = s • m₂ ↔ m₁ = m₂ :=
   (smul_injective f s).eq_iff
 
@@ -992,12 +994,10 @@ variable (S₁ S₂ : Submonoid R) (h : S₁ ≤ S₂) (f₁ : M →ₗ[R] M₁)
 variable [IsLocalizedModule S₁ f₁] [IsLocalizedModule S₂ f₂]
 
 noncomputable
-
 def liftOfLE : M₁ →ₗ[R] M₂ :=
   lift S₁ f₁ f₂ fun x ↦ map_units f₂ ⟨x.1, h x.2⟩
 
 noncomputable
-
 abbrev _root_.LocalizedModule.liftOfLE : LocalizedModule S₁ M →ₗ[R] LocalizedModule S₂ M :=
   IsLocalizedModule.liftOfLE S₁ S₂ h
     (LocalizedModule.mkLinearMap S₁ M) (LocalizedModule.mkLinearMap S₂ M)
@@ -1035,7 +1035,6 @@ variable {N N'} [AddCommMonoid N] [AddCommMonoid N'] [Module R N] [Module R N']
 variable (g : N →ₗ[R] N') [IsLocalizedModule S g]
 
 noncomputable
-
 def map : (M →ₗ[R] N) →ₗ[R] (M' →ₗ[R] N') where
   toFun h := lift S f (g ∘ₗ h) (IsLocalizedModule.map_units g)
   map_add' h₁ h₂ := by

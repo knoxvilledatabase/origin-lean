@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Priestley spaces
 

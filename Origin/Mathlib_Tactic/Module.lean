@@ -8,6 +8,8 @@ import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 import Mathlib.Tactic.Ring
 import Mathlib.Util.AtomM
 
+noncomputable section
+
 /-! # A tactic for normalization over modules
 
 This file provides the two tactics `match_scalars` and `module`.  Given a goal which is an equality
@@ -47,6 +49,7 @@ variable {S : Type*} {R : Type*} {M : Type*}
 def cons (p : R × M) (l : NF R M) : NF R M := p :: l
 
 @[inherit_doc cons] infixl:100 " ::ᵣ " => cons
+
 def eval [Add M] [Zero M] [SMul R M] (l : NF R M) : M := (l.map (fun (⟨r, x⟩ : R × M) ↦ r • x)).sum
 
 @[simp] theorem eval_cons [AddMonoid M] [SMul R M] (p : R × M) (l : NF R M) :
@@ -478,9 +481,7 @@ def matchScalars (g : MVarId) : MetaM (List MVarId) := do
 elab "match_scalars" : tactic => Tactic.liftMetaTactic matchScalars
 
 elab "module" : tactic => Tactic.liftMetaFinishingTactic fun g ↦ do
-
   let l ← matchScalars g
-
   discard <| l.mapM fun mvar ↦ AtomM.run .instances (Ring.proveEq mvar)
 
 end Mathlib.Tactic.Module

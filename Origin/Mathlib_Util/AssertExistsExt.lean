@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Environment
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Environment extension for tracking existence of declarations and imports
 

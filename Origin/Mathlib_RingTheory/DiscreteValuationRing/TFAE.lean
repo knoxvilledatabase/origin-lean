@@ -8,6 +8,8 @@ import Mathlib.RingTheory.DiscreteValuationRing.Basic
 import Mathlib.RingTheory.Finiteness.Ideal
 import Mathlib.RingTheory.Ideal.Cotangent
 
+noncomputable section
+
 /-!
 
 # Equivalent conditions for DVR

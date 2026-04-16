@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.TensorProduct.Submodule
 import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.RingTheory.Flat.Basic
 
+noncomputable section
+
 /-!
 
 # Linearly disjoint submodules
@@ -148,10 +150,6 @@ variable {M N}
 
 protected def LinearDisjoint.mulMap (H : M.LinearDisjoint N) : M ⊗[R] N ≃ₗ[R] M * N :=
   LinearEquiv.ofInjective (M.mulMap N) H.injective ≪≫ₗ LinearEquiv.ofEq _ _ (mulMap_range M N)
-
-@[simp]
-theorem LinearDisjoint.val_mulMap_tmul (H : M.LinearDisjoint N) (m : M) (n : N) :
-    (H.mulMap (m ⊗ₜ[R] n) : S) = m.1 * n.1 := rfl
 
 -- CONFLATES (assumes ground = zero): LinearDisjoint.of_subsingleton
 @[nontriviality]

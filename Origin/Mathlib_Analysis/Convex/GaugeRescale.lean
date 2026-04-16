@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Convex/GaugeRescale.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Gauge
 import Mathlib.Analysis.Convex.Normed
+
+noncomputable section
 
 /-!
 # "Gauge rescale" homeomorphism between convex sets
@@ -39,7 +41,10 @@ theorem gaugeRescale_smul (s t : Set E) {c : ℝ} (hc : 0 ≤ c) (x : E) :
   simp only [gaugeRescale, gauge_smul_of_nonneg hc, smul_smul, smul_eq_mul]
   rw [mul_div_mul_comm, mul_right_comm, div_self_mul_self]
 
--- DISSOLVED: gauge_gaugeRescale'
+theorem gauge_gaugeRescale' (s : Set E) {t : Set E} {x : E} (hx : gauge t x ≠ 0) :
+    gauge t (gaugeRescale s t x) = gauge s x := by
+  rw [gaugeRescale, gauge_smul_of_nonneg (div_nonneg (gauge_nonneg _) (gauge_nonneg _)),
+    smul_eq_mul, div_mul_cancel₀ _ hx]
 
 theorem gauge_gaugeRescale_le (s t : Set E) (x : E) :
     gauge t (gaugeRescale s t x) ≤ gauge s x := by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.RingTheory.Ideal.Cotangent
 
+noncomputable section
+
 /-!
 
 # Extension of algebras
@@ -91,9 +93,8 @@ lemma algebraMap_surjective : Function.Surjective (algebraMap P.Ring S) := (⟨_
 
 section Construction
 
-noncomputable
-
 @[simps (config := .lemmasOnly) Ring σ]
+noncomputable
 def ofSurjective {P : Type w} [CommRing P] [Algebra R P] (f : P →ₐ[R] S)
     (h : Function.Surjective f) : Extension.{w} R S where
   Ring := P
@@ -104,14 +105,6 @@ def ofSurjective {P : Type w} [CommRing P] [Algebra R P] (f : P →ₐ[R] S)
 
 variable (R S) in
 
-noncomputable
-
-@[simps (config := .lemmasOnly) Ring σ]
-def self : Extension R S where
-  Ring := S
-  σ := _root_.id
-  algebraMap_σ _ := rfl
-
 section Localization
 
 variable (M : Submonoid S) {S' : Type*} [CommRing S'] [Algebra S S'] [IsLocalization M S']
@@ -119,7 +112,6 @@ variable (M : Submonoid S) {S' : Type*} [CommRing S'] [Algebra S S'] [IsLocaliza
 variable [Algebra R S'] [IsScalarTower R S S']
 
 noncomputable
-
 def localization (P : Extension.{w} R S) : Extension R S' where
   Ring := Localization (M.comap (algebraMap P.Ring S))
   algebra₂ := (IsLocalization.lift (M := (M.comap (algebraMap P.Ring S)))
@@ -144,7 +136,6 @@ end Localization
 variable {T} [CommRing T] [Algebra R T] [Algebra S T] [IsScalarTower R S T]
 
 noncomputable
-
 def baseChange {T} [CommRing T] [Algebra R T] (P : Extension R S) : Extension T (T ⊗[R] S) where
   Ring := T ⊗[R] P.Ring
   __ := ofSurjective (P := T ⊗[R] P.Ring) (Algebra.TensorProduct.map (AlgHom.id T T)
@@ -179,7 +170,6 @@ attribute [simp] Hom.toRingHom_algebraMap Hom.algebraMap_toRingHom
 variable {P P'}
 
 noncomputable
-
 def Hom.toAlgHom [Algebra R S'] [IsScalarTower R R' S'] (f : Hom P P') :
     P.Ring →ₐ[R] P'.Ring where
   __ := f.toRingHom
@@ -225,7 +215,6 @@ abbrev ker : Ideal P.Ring := RingHom.ker (algebraMap P.Ring S)
 def Cotangent : Type _ := P.ker.Cotangent
 
 noncomputable
-
 instance : AddCommGroup P.Cotangent := inferInstanceAs (AddCommGroup P.ker.Cotangent)
 
 variable {P}
@@ -241,19 +230,7 @@ namespace Cotangent
 
 variable (x y : P.Cotangent) (w z : P.ker.Cotangent)
 
-@[simp] lemma val_add : (x + y).val = x.val + y.val := rfl
-
-@[simp] lemma val_zero : (0 : P.Cotangent).val = 0 := rfl
-
-@[simp] lemma of_add : of (w + z) = of w + of z := rfl
-
-@[simp] lemma of_zero : (of 0 : P.Cotangent) = 0 := rfl
-
-@[simp] lemma of_val : of x.val = x := rfl
-
 @[simp] lemma val_of : (of w).val = w := rfl
-
-@[simp] lemma val_sub : (x - y).val = x.val - y.val := rfl
 
 end Cotangent
 
@@ -266,7 +243,6 @@ lemma Cotangent.smul_eq_zero_of_mem (p : P.Ring) (hp : p ∈ P.ker) (m : P.ker.C
 attribute [local simp] RingHom.mem_ker
 
 noncomputable
-
 instance Cotangent.module : Module S P.Cotangent where
   smul := fun r s ↦ .of (P.σ r • s.val)
   smul_zero := fun r ↦ ext (smul_zero (P.σ r))
@@ -283,7 +259,6 @@ instance Cotangent.module : Module S P.Cotangent where
     simpa only [sub_smul, mul_smul, sub_eq_zero] using this
 
 noncomputable
-
 instance {R₀} [CommRing R₀] [Algebra R₀ S] : Module R₀ P.Cotangent :=
   Module.compHom P.Cotangent (algebraMap R₀ S)
 
@@ -294,9 +269,6 @@ instance {R₁ R₂} [CommRing R₁] [CommRing R₂] [Algebra R₁ S] [Algebra R
   intros r s m
   show algebraMap R₂ S (r • s) • m = (algebraMap _ S r) • (algebraMap _ S s) • m
   rw [Algebra.smul_def, map_mul, mul_smul, ← IsScalarTower.algebraMap_apply]
-
-lemma Cotangent.val_smul''' {R₀} [CommRing R₀] [Algebra R₀ S] (r : R₀) (x : P.Cotangent) :
-    (r • x).val = P.σ (algebraMap R₀ S r) • x.val := rfl
 
 @[simp]
 lemma Cotangent.val_smul (r : S) (x : P.Cotangent) : (r • x).val = P.σ r • x.val := rfl
@@ -310,14 +282,6 @@ lemma Cotangent.val_smul' (r : P.Ring) (x : P.Cotangent) : (r • x).val = r •
 lemma Cotangent.val_smul'' (r : R) (x : P.Cotangent) : (r • x).val = r • x.val := by
   rw [← algebraMap_smul P.Ring, val_smul', algebraMap_smul]
 
-def Cotangent.mk : P.ker →ₗ[P.Ring] P.Cotangent where
-  toFun x := .of (Ideal.toCotangent _ x)
-  map_add' x y := by simp
-  map_smul' x y := ext <| by simp
-
-@[simp]
-lemma Cotangent.val_mk (x : P.ker) : (mk x).val = Ideal.toCotangent _ x := rfl
-
 lemma Cotangent.mk_surjective : Function.Surjective (mk (P := P)) :=
   fun x ↦ Ideal.toCotangent_surjective P.ker x.val
 
@@ -330,7 +294,6 @@ variable [Algebra S S'] [Algebra S' S''] [Algebra S S'']
 variable [Algebra R S'] [IsScalarTower R R' S']
 
 noncomputable
-
 def Cotangent.map (f : Hom P P') : P.Cotangent →ₗ[S] P'.Cotangent where
   toFun x := .of (Ideal.mapCotangent (R := R) _ _ f.toAlgHom
     (fun x hx ↦ by simpa using RingHom.congr_arg (algebraMap S S') hx) x.val)
@@ -346,12 +309,6 @@ def Cotangent.map (f : Hom P P') : P.Cotangent →ₗ[S] P'.Cotangent where
     congr 1
     ext1
     simp only [SetLike.val_smul, smul_eq_mul, map_mul, Hom.toAlgHom_apply]
-
-@[simp]
-lemma Cotangent.map_mk (f : Hom P P') (x) :
-    Cotangent.map f (.mk x) =
-      .mk ⟨f.toAlgHom x, by simpa [-map_aeval] using RingHom.congr_arg (algebraMap S S') x.2⟩ :=
-  rfl
 
 @[simp]
 lemma Cotangent.map_id :

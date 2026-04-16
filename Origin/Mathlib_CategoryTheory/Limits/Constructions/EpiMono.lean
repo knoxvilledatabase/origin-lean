@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Mono
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Pullbacks
 
+noncomputable section
+
 /-!
 # Relating monomorphisms and epimorphisms to limits and colimits
 

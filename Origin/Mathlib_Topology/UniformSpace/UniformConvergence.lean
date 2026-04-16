@@ -5,6 +5,8 @@ Genuine: 105 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.Topology.UniformSpace.Cauchy
 
+noncomputable section
+
 /-!
 # Uniform convergence
 

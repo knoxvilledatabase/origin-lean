@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Prod
 import Mathlib.RingTheory.Ideal.Operations
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 
+noncomputable section
+
 /-!
 
 # Interaction between Quotients and Tensor Products
@@ -73,19 +75,6 @@ noncomputable def quotientTensorQuotientEquiv (m : Submodule R M) (n : Submodule
       exact congr($eq (a, b)))
     (by ext; simp) (by ext; simp)
 
-@[simp]
-lemma quotientTensorQuotientEquiv_apply_tmul_mk_tmul_mk
-    (m : Submodule R M) (n : Submodule R N) (x : M) (y : N) :
-    quotientTensorQuotientEquiv m n
-      (Submodule.Quotient.mk x ⊗ₜ[R] Submodule.Quotient.mk y) =
-      Submodule.Quotient.mk (x ⊗ₜ y) := rfl
-
-@[simp]
-lemma quotientTensorQuotientEquiv_symm_apply_mk_tmul
-    (m : Submodule R M) (n : Submodule R N) (x : M) (y : N) :
-    (quotientTensorQuotientEquiv m n).symm (Submodule.Quotient.mk (x ⊗ₜ y)) =
-      Submodule.Quotient.mk x ⊗ₜ[R] Submodule.Quotient.mk y := rfl
-
 variable (N) in
 
 noncomputable def quotientTensorEquiv (m : Submodule R M) :
@@ -100,18 +89,6 @@ noncomputable def quotientTensorEquiv (m : Submodule R M) :
     rw [map_range_eq_span_tmul, map_range_eq_span_tmul]
     aesop)
 
-@[simp]
-lemma quotientTensorEquiv_apply_tmul_mk (m : Submodule R M) (x : M) (y : N) :
-    quotientTensorEquiv N m (Submodule.Quotient.mk x ⊗ₜ[R] y) =
-    Submodule.Quotient.mk (x ⊗ₜ y) :=
-  rfl
-
-@[simp]
-lemma quotientTensorEquiv_symm_apply_mk_tmul (m : Submodule R M) (x : M) (y : N) :
-    (quotientTensorEquiv N m).symm (Submodule.Quotient.mk (x ⊗ₜ y)) =
-    Submodule.Quotient.mk x ⊗ₜ[R] y :=
-  rfl
-
 variable (M) in
 
 noncomputable def tensorQuotientEquiv (n : Submodule R N) :
@@ -125,18 +102,6 @@ noncomputable def tensorQuotientEquiv (n : Submodule R N) :
     simp only [sup_eq_right]
     rw [map_range_eq_span_tmul, map_range_eq_span_tmul]
     aesop)
-
-@[simp]
-lemma tensorQuotientEquiv_apply_mk_tmul (n : Submodule R N) (x : M) (y : N) :
-    tensorQuotientEquiv M n (x ⊗ₜ[R] Submodule.Quotient.mk y) =
-    Submodule.Quotient.mk (x ⊗ₜ y) :=
-  rfl
-
-@[simp]
-lemma tensorQuotientEquiv_symm_apply_tmul_mk (n : Submodule R N) (x : M) (y : N) :
-    (tensorQuotientEquiv M n).symm (Submodule.Quotient.mk (x ⊗ₜ y)) =
-    x ⊗ₜ[R] Submodule.Quotient.mk y :=
-  rfl
 
 variable (M) in
 

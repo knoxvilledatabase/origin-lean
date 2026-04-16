@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.Topology.NoetherianSpace
 
+noncomputable section
+
 /-!
 This file proves additional properties of the prime spectrum a ring is Noetherian.
 -/

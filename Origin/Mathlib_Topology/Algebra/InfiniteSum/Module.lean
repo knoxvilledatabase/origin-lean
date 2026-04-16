@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Constructions
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-! # Infinite sums in topological vector spaces -/
 
 variable {α β γ δ : Type*}

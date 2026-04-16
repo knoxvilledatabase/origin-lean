@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Finiteness.Nakayama
 import Mathlib.RingTheory.JacobsonIdeal
 
+noncomputable section
+
 /-!
 # Nakayama's lemma
 

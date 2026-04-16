@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.InverseFunctionTheorem.ApproximatesLinearOn
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 
+noncomputable section
+
 /-!
 # A lemma about `ApproximatesLinearOn` that needs `FiniteDimensional`
 

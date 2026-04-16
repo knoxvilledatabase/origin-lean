@@ -8,6 +8,8 @@ import Mathlib.Tactic.Attr.Register
 import Mathlib.Data.Int.Cast.Basic
 import Mathlib.Order.Basic
 
+noncomputable section
+
 /-!
 # `zify` tactic
 
@@ -21,9 +23,7 @@ example (a b c x y z : Nat) (h : ¬ x*y*z < 0) : c < a + 3*b := by
   h : ¬↑x * ↑y * ↑z < 0
   ⊢ ↑c < ↑a + 3 * ↑b
   -/
-
 ```
-
 -/
 
 namespace Mathlib.Tactic.Zify
@@ -35,38 +35,6 @@ open Lean.Meta
 open Lean.Parser.Tactic
 
 open Lean.Elab.Tactic
-
-```
-
-`zify` can be given extra lemmas to use in simplification. This is especially useful in the
-
-presence of nat subtraction: passing `≤` arguments will allow `push_cast` to do more work.
-
-```
-
-example (a b c : Nat) (h : a - b < c) (hab : b ≤ a) : false := by
-  zify [hab] at h
-  /- h : ↑a - ↑b < ↑c -/
-
-```
-
-`zify` makes use of the `@[zify_simps]` attribute to move propositions,
-
-and the `push_cast` tactic to simplify the `Int`-valued expressions.
-
-`zify` is in some sense dual to the `lift` tactic.
-
-`lift (z : Int) to Nat` will change the type of an
-
-integer `z` (in the supertype) to `Nat` (the subtype), given a proof that `z ≥ 0`;
-
-propositions concerning `z` will still be over `Int`.
-
-`zify` changes propositions about `Nat` (the subtype) to propositions about `Int` (the supertype),
-
-without changing the type of any variable.
-
--/
 
 syntax (name := zify) "zify" (simpArgs)? (location)? : tactic
 

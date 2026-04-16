@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Limits/MonoCoprod.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.RegularMono
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms
+
+noncomputable section
 
 /-!
 
@@ -172,7 +174,6 @@ variable (hι : Function.Injective ι) (c : Cofan X) (c₁ : Cofan (X ∘ ι))
 include hι
 
 include hc in
-
 lemma mono_of_injective [HasCoproduct (fun (k : ((Set.range ι)ᶜ : Set I)) => X k.1)] :
     Mono (Cofan.IsColimit.desc hc₁ (fun i => c.inj (ι i))) :=
   mono_of_injective_aux X ι hι c c₁ hc hc₁ _ (colimit.isColimit _)

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/List/Nodup.lean
-Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.List.Forall2
 import Mathlib.Data.Set.Pairwise.Basic
+
+noncomputable section
 
 /-!
 # Lists with no duplicates

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Sites.PreservesSheafification
 import Mathlib.CategoryTheory.Sites.Subsheaf
 import Mathlib.CategoryTheory.Sites.Whiskering
 
+noncomputable section
+
 /-!
 # Locally injective morphisms of (pre)sheaves
 
@@ -201,9 +203,6 @@ variable {J}
 variable {F₁ F₂ : Sheaf J D} (φ : F₁ ⟶ F₂)
 
 abbrev IsLocallyInjective := Presheaf.IsLocallyInjective J φ.val
-
-lemma isLocallyInjective_sheafToPresheaf_map_iff :
-    Presheaf.IsLocallyInjective J ((sheafToPresheaf J D).map φ) ↔ IsLocallyInjective φ := by rfl
 
 instance isLocallyInjective_of_iso [IsIso φ] : IsLocallyInjective φ := by
   change Presheaf.IsLocallyInjective J ((sheafToPresheaf _ _).map φ)

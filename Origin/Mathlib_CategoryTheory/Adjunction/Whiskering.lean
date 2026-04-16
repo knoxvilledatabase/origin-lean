@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Whiskering
 import Mathlib.CategoryTheory.Adjunction.Basic
 
+noncomputable section
+
 /-!
 
 Given categories `C D E`, functors `F : D ⥤ E` and `G : E ⥤ D` with an adjunction

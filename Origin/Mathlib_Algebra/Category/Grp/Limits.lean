@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.CategoryTheory.Limits.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.ConcreteCategory.ReflectsIso
 
+noncomputable section
+
 /-!
 # The category of (commutative) (additive) groups has all limits
 

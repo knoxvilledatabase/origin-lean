@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Multilinear.Basic
 import Mathlib.LinearAlgebra.Basis.Defs
 
+noncomputable section
+
 /-!
 # Multilinear maps in relation to bases.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Eval.Irreducible
 import Mathlib.RingTheory.Polynomial.Nilpotent
 
+noncomputable section
+
 /-!
 
 # Polynomials over an irreducible ring

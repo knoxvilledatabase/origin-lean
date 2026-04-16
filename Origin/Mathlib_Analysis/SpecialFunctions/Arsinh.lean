@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Arsinh.lean
-Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+noncomputable section
 
 /-!
 # Inverse of the sinh function
@@ -120,6 +122,7 @@ theorem arsinh_le_arsinh : arsinh x ≤ arsinh y ↔ x ≤ y :=
   sinhOrderIso.symm.le_iff_le
 
 @[gcongr] protected alias ⟨_, GCongr.arsinh_le_arsinh⟩ := arsinh_le_arsinh
+
 @[simp]
 theorem arsinh_lt_arsinh : arsinh x < arsinh y ↔ x < y :=
   sinhOrderIso.symm.lt_iff_lt

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.Data.Finsupp.Defs
 
+noncomputable section
+
 /-!
 # The pointwise product on `Finsupp`.
 

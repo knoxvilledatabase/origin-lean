@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Rayleigh.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 13 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Calculus
@@ -8,6 +8,8 @@ import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.Calculus.LagrangeMultipliers
 import Mathlib.LinearAlgebra.Eigenspace.Basic
+
+noncomputable section
 
 /-!
 # The Rayleigh quotient
@@ -50,7 +52,14 @@ variable (T : E →L[𝕜] E)
 
 noncomputable abbrev rayleighQuotient (x : E) := T.reApplyInnerSelf x / ‖(x : E)‖ ^ 2
 
--- DISSOLVED: rayleigh_smul
+theorem rayleigh_smul (x : E) {c : 𝕜} (hc : c ≠ 0) :
+    rayleighQuotient T (c • x) = rayleighQuotient T x := by
+  by_cases hx : x = 0
+  · simp [hx]
+  have : ‖c‖ ≠ 0 := by simp [hc]
+  have : ‖x‖ ≠ 0 := by simp [hx]
+  field_simp [norm_smul, T.reApplyInnerSelf_smul]
+  ring
 
 theorem image_rayleigh_eq_image_rayleigh_sphere {r : ℝ} (hr : 0 < r) :
     rayleighQuotient T '' {0}ᶜ = rayleighQuotient T '' sphere 0 r := by
@@ -67,9 +76,19 @@ theorem image_rayleigh_eq_image_rayleigh_sphere {r : ℝ} (hr : 0 < r) :
   · rintro ⟨x, hx, hxT⟩
     exact ⟨x, ne_zero_of_mem_sphere hr.ne' ⟨x, hx⟩, hxT⟩
 
--- DISSOLVED: iSup_rayleigh_eq_iSup_rayleigh_sphere
+theorem iSup_rayleigh_eq_iSup_rayleigh_sphere {r : ℝ} (hr : 0 < r) :
+    ⨆ x : { x : E // x ≠ 0 }, rayleighQuotient T x =
+      ⨆ x : sphere (0 : E) r, rayleighQuotient T x :=
+  show ⨆ x : ({0}ᶜ : Set E), rayleighQuotient T x = _ by
+    simp only [← @sSup_image' _ _ _ _ (rayleighQuotient T),
+      T.image_rayleigh_eq_image_rayleigh_sphere hr]
 
--- DISSOLVED: iInf_rayleigh_eq_iInf_rayleigh_sphere
+theorem iInf_rayleigh_eq_iInf_rayleigh_sphere {r : ℝ} (hr : 0 < r) :
+    ⨅ x : { x : E // x ≠ 0 }, rayleighQuotient T x =
+      ⨅ x : sphere (0 : E) r, rayleighQuotient T x :=
+  show ⨅ x : ({0}ᶜ : Set E), rayleighQuotient T x = _ by
+    simp only [← @sInf_image' _ _ _ _ (rayleighQuotient T),
+      T.image_rayleigh_eq_image_rayleigh_sphere hr]
 
 end ContinuousLinearMap
 
@@ -90,7 +109,26 @@ theorem _root_.LinearMap.IsSymmetric.hasStrictFDerivAt_reApplyInnerSelf {T : F �
 
 variable [CompleteSpace F] {T : F →L[ℝ] F}
 
--- DISSOLVED: linearly_dependent_of_isLocalExtrOn
+theorem linearly_dependent_of_isLocalExtrOn (hT : IsSelfAdjoint T) {x₀ : F}
+    (hextr : IsLocalExtrOn T.reApplyInnerSelf (sphere (0 : F) ‖x₀‖) x₀) :
+    ∃ a b : ℝ, (a, b) ≠ 0 ∧ a • x₀ + b • T x₀ = 0 := by
+  have H : IsLocalExtrOn T.reApplyInnerSelf {x : F | ‖x‖ ^ 2 = ‖x₀‖ ^ 2} x₀ := by
+    convert hextr
+    ext x
+    simp [dist_eq_norm]
+  -- find Lagrange multipliers for the function `T.re_apply_inner_self` and the
+  -- hypersurface-defining function `fun x ↦ ‖x‖ ^ 2`
+  obtain ⟨a, b, h₁, h₂⟩ :=
+    IsLocalExtrOn.exists_multipliers_of_hasStrictFDerivAt_1d H (hasStrictFDerivAt_norm_sq x₀)
+      (hT.isSymmetric.hasStrictFDerivAt_reApplyInnerSelf x₀)
+  refine ⟨a, b, h₁, ?_⟩
+  apply (InnerProductSpace.toDualMap ℝ F).injective
+  simp only [LinearIsometry.map_add, LinearIsometry.map_smul, LinearIsometry.map_zero]
+  -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 changed `map_smulₛₗ` into `map_smulₛₗ _`
+  simp only [map_smulₛₗ _, RCLike.conj_to_real]
+  change a • innerSL ℝ x₀ + b • innerSL ℝ (T x₀) = 0
+  apply smul_right_injective (F →L[ℝ] ℝ) (two_ne_zero : (2 : ℝ) ≠ 0)
+  simpa only [two_smul, smul_add, add_smul, add_zero] using h₂
 
 open scoped InnerProductSpace in
 
@@ -129,11 +167,44 @@ theorem eq_smul_self_of_isLocalExtrOn (hT : IsSelfAdjoint T) {x₀ : E}
   let hSA := hT.isSymmetric.restrictScalars.toSelfAdjoint.prop
   exact hSA.eq_smul_self_of_isLocalExtrOn_real hextr
 
--- DISSOLVED: hasEigenvector_of_isLocalExtrOn
+theorem hasEigenvector_of_isLocalExtrOn (hT : IsSelfAdjoint T) {x₀ : E} (hx₀ : x₀ ≠ 0)
+    (hextr : IsLocalExtrOn T.reApplyInnerSelf (sphere (0 : E) ‖x₀‖) x₀) :
+    HasEigenvector (T : E →ₗ[𝕜] E) (↑(T.rayleighQuotient x₀)) x₀ := by
+  refine ⟨?_, hx₀⟩
+  rw [Module.End.mem_eigenspace_iff]
+  exact hT.eq_smul_self_of_isLocalExtrOn hextr
 
--- DISSOLVED: hasEigenvector_of_isMaxOn
+theorem hasEigenvector_of_isMaxOn (hT : IsSelfAdjoint T) {x₀ : E} (hx₀ : x₀ ≠ 0)
+    (hextr : IsMaxOn T.reApplyInnerSelf (sphere (0 : E) ‖x₀‖) x₀) :
+    HasEigenvector (T : E →ₗ[𝕜] E) (↑(⨆ x : { x : E // x ≠ 0 }, T.rayleighQuotient x)) x₀ := by
+  convert hT.hasEigenvector_of_isLocalExtrOn hx₀ (Or.inr hextr.localize)
+  have hx₀' : 0 < ‖x₀‖ := by simp [hx₀]
+  have hx₀'' : x₀ ∈ sphere (0 : E) ‖x₀‖ := by simp
+  rw [T.iSup_rayleigh_eq_iSup_rayleigh_sphere hx₀']
+  refine IsMaxOn.iSup_eq hx₀'' ?_
+  intro x hx
+  dsimp
+  have : ‖x‖ = ‖x₀‖ := by simpa using hx
+  simp only [ContinuousLinearMap.rayleighQuotient]
+  rw [this]
+  gcongr
+  exact hextr hx
 
--- DISSOLVED: hasEigenvector_of_isMinOn
+theorem hasEigenvector_of_isMinOn (hT : IsSelfAdjoint T) {x₀ : E} (hx₀ : x₀ ≠ 0)
+    (hextr : IsMinOn T.reApplyInnerSelf (sphere (0 : E) ‖x₀‖) x₀) :
+    HasEigenvector (T : E →ₗ[𝕜] E) (↑(⨅ x : { x : E // x ≠ 0 }, T.rayleighQuotient x)) x₀ := by
+  convert hT.hasEigenvector_of_isLocalExtrOn hx₀ (Or.inl hextr.localize)
+  have hx₀' : 0 < ‖x₀‖ := by simp [hx₀]
+  have hx₀'' : x₀ ∈ sphere (0 : E) ‖x₀‖ := by simp
+  rw [T.iInf_rayleigh_eq_iInf_rayleigh_sphere hx₀']
+  refine IsMinOn.iInf_eq hx₀'' ?_
+  intro x hx
+  dsimp
+  have : ‖x‖ = ‖x₀‖ := by simpa using hx
+  simp only [ContinuousLinearMap.rayleighQuotient]
+  rw [this]
+  gcongr
+  exact hextr hx
 
 end CompleteSpace
 
@@ -147,9 +218,41 @@ namespace LinearMap
 
 namespace IsSymmetric
 
--- DISSOLVED: hasEigenvalue_iSup_of_finiteDimensional
+-- CONFLATES (assumes ground = zero): hasEigenvalue_iSup_of_finiteDimensional
+theorem hasEigenvalue_iSup_of_finiteDimensional [Nontrivial E] (hT : T.IsSymmetric) :
+    HasEigenvalue T ↑(⨆ x : { x : E // x ≠ 0 }, RCLike.re ⟪T x, x⟫ / ‖(x : E)‖ ^ 2 : ℝ) := by
+  haveI := FiniteDimensional.proper_rclike 𝕜 E
+  let T' := hT.toSelfAdjoint
+  obtain ⟨x, hx⟩ : ∃ x : E, x ≠ 0 := exists_ne 0
+  have H₁ : IsCompact (sphere (0 : E) ‖x‖) := isCompact_sphere _ _
+  have H₂ : (sphere (0 : E) ‖x‖).Nonempty := ⟨x, by simp⟩
+  -- key point: in finite dimension, a continuous function on the sphere has a max
+  obtain ⟨x₀, hx₀', hTx₀⟩ :=
+    H₁.exists_isMaxOn H₂ T'.val.reApplyInnerSelf_continuous.continuousOn
+  have hx₀ : ‖x₀‖ = ‖x‖ := by simpa using hx₀'
+  have : IsMaxOn T'.val.reApplyInnerSelf (sphere 0 ‖x₀‖) x₀ := by simpa only [← hx₀] using hTx₀
+  have hx₀_ne : x₀ ≠ 0 := by
+    have : ‖x₀‖ ≠ 0 := by simp only [hx₀, norm_eq_zero, hx, Ne, not_false_iff]
+    simpa [← norm_eq_zero, Ne]
+  exact hasEigenvalue_of_hasEigenvector (T'.prop.hasEigenvector_of_isMaxOn hx₀_ne this)
 
--- DISSOLVED: hasEigenvalue_iInf_of_finiteDimensional
+-- CONFLATES (assumes ground = zero): hasEigenvalue_iInf_of_finiteDimensional
+theorem hasEigenvalue_iInf_of_finiteDimensional [Nontrivial E] (hT : T.IsSymmetric) :
+    HasEigenvalue T ↑(⨅ x : { x : E // x ≠ 0 }, RCLike.re ⟪T x, x⟫ / ‖(x : E)‖ ^ 2 : ℝ) := by
+  haveI := FiniteDimensional.proper_rclike 𝕜 E
+  let T' := hT.toSelfAdjoint
+  obtain ⟨x, hx⟩ : ∃ x : E, x ≠ 0 := exists_ne 0
+  have H₁ : IsCompact (sphere (0 : E) ‖x‖) := isCompact_sphere _ _
+  have H₂ : (sphere (0 : E) ‖x‖).Nonempty := ⟨x, by simp⟩
+  -- key point: in finite dimension, a continuous function on the sphere has a min
+  obtain ⟨x₀, hx₀', hTx₀⟩ :=
+    H₁.exists_isMinOn H₂ T'.val.reApplyInnerSelf_continuous.continuousOn
+  have hx₀ : ‖x₀‖ = ‖x‖ := by simpa using hx₀'
+  have : IsMinOn T'.val.reApplyInnerSelf (sphere 0 ‖x₀‖) x₀ := by simpa only [← hx₀] using hTx₀
+  have hx₀_ne : x₀ ≠ 0 := by
+    have : ‖x₀‖ ≠ 0 := by simp only [hx₀, norm_eq_zero, hx, Ne, not_false_iff]
+    simpa [← norm_eq_zero, Ne]
+  exact hasEigenvalue_of_hasEigenvector (T'.prop.hasEigenvector_of_isMinOn hx₀_ne this)
 
 theorem subsingleton_of_no_eigenvalue_finiteDimensional (hT : T.IsSymmetric)
     (hT' : ∀ μ : 𝕜, Module.End.eigenspace (T : E →ₗ[𝕜] E) μ = ⊥) : Subsingleton E :=

@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/StrongLaw.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Probability.IdentDistrib
@@ -9,6 +9,8 @@ import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.Analysis.SpecificLimits.FloorPow
 import Mathlib.Analysis.PSeries
 import Mathlib.Analysis.Asymptotics.SpecificAsymptotics
+
+noncomputable section
 
 /-!
 # The strong law of large numbers
@@ -123,9 +125,41 @@ theorem _root_.MeasureTheory.AEStronglyMeasurable.integrable_truncation [IsFinit
     (hf : AEStronglyMeasurable f μ) {A : ℝ} : Integrable (truncation f A) μ := by
   rw [← memℒp_one_iff_integrable]; exact hf.memℒp_truncation
 
--- DISSOLVED: moment_truncation_eq_intervalIntegral
+theorem moment_truncation_eq_intervalIntegral (hf : AEStronglyMeasurable f μ) {A : ℝ} (hA : 0 ≤ A)
+    {n : ℕ} (hn : n ≠ 0) : ∫ x, truncation f A x ^ n ∂μ = ∫ y in -A..A, y ^ n ∂Measure.map f μ := by
+  have M : MeasurableSet (Set.Ioc (-A) A) := measurableSet_Ioc
+  change ∫ x, (fun z => indicator (Set.Ioc (-A) A) id z ^ n) (f x) ∂μ = _
+  rw [← integral_map (f := fun z => _ ^ n) hf.aemeasurable, intervalIntegral.integral_of_le,
+    ← integral_indicator M]
+  · simp only [indicator, zero_pow hn, id, ite_pow]
+  · linarith
+  · exact ((measurable_id.indicator M).pow_const n).aestronglyMeasurable
 
--- DISSOLVED: moment_truncation_eq_intervalIntegral_of_nonneg
+theorem moment_truncation_eq_intervalIntegral_of_nonneg (hf : AEStronglyMeasurable f μ) {A : ℝ}
+    {n : ℕ} (hn : n ≠ 0) (h'f : 0 ≤ f) :
+    ∫ x, truncation f A x ^ n ∂μ = ∫ y in (0)..A, y ^ n ∂Measure.map f μ := by
+  have M : MeasurableSet (Set.Ioc 0 A) := measurableSet_Ioc
+  have M' : MeasurableSet (Set.Ioc A 0) := measurableSet_Ioc
+  rw [truncation_eq_of_nonneg h'f]
+  change ∫ x, (fun z => indicator (Set.Ioc 0 A) id z ^ n) (f x) ∂μ = _
+  rcases le_or_lt 0 A with (hA | hA)
+  · rw [← integral_map (f := fun z => _ ^ n) hf.aemeasurable, intervalIntegral.integral_of_le hA,
+      ← integral_indicator M]
+    · simp only [indicator, zero_pow hn, id, ite_pow]
+    · exact ((measurable_id.indicator M).pow_const n).aestronglyMeasurable
+  · rw [← integral_map (f := fun z => _ ^ n) hf.aemeasurable, intervalIntegral.integral_of_ge hA.le,
+      ← integral_indicator M']
+    · simp only [Set.Ioc_eq_empty_of_le hA.le, zero_pow hn, Set.indicator_empty, integral_zero,
+        zero_eq_neg]
+      apply integral_eq_zero_of_ae
+      have : ∀ᵐ x ∂Measure.map f μ, (0 : ℝ) ≤ x :=
+        (ae_map_iff hf.aemeasurable measurableSet_Ici).2 (Eventually.of_forall h'f)
+      filter_upwards [this] with x hx
+      simp only [indicator, Set.mem_Ioc, Pi.zero_apply, ite_eq_right_iff, and_imp]
+      intro _ h''x
+      have : x = 0 := by linarith
+      simp [this, zero_pow hn]
+    · exact ((measurable_id.indicator M).pow_const n).aestronglyMeasurable
 
 theorem integral_truncation_eq_intervalIntegral (hf : AEStronglyMeasurable f μ) {A : ℝ}
     (hA : 0 ≤ A) : ∫ x, truncation f A x ∂μ = ∫ y in -A..A, y ∂Measure.map f μ := by
@@ -337,6 +371,11 @@ variable (X : ℕ → Ω → ℝ) (hint : Integrable (X 0))
   (hnonneg : ∀ i ω, 0 ≤ X i ω)
 
 include hint hindep hident hnonneg in
+/-- The truncation of `Xᵢ` up to `i` satisfies the strong law of large numbers (with respect to
+
+the truncated expectation) along the sequence `c^n`, for any `c > 1`, up to a given `ε > 0`.
+
+This follows from a variance control. -/
 
 theorem strong_law_aux1 {c : ℝ} (c_one : 1 < c) {ε : ℝ} (εpos : 0 < ε) : ∀ᵐ ω, ∀ᶠ n : ℕ in atTop,
     |∑ i ∈ range ⌊c ^ n⌋₊, truncation (X i) i ω - 𝔼[∑ i ∈ range ⌊c ^ n⌋₊, truncation (X i) i]| <
@@ -440,6 +479,11 @@ theorem strong_law_aux1 {c : ℝ} (c_one : 1 < c) {ε : ℝ} (εpos : 0 < ε) : 
   convert hω; simp only [sum_apply]
 
 include hint hindep hident hnonneg in
+/- The truncation of `Xᵢ` up to `i` satisfies the strong law of large numbers
+
+(with respect to the truncated expectation) along the sequence
+
+`c^n`, for any `c > 1`. This follows from `strong_law_aux1` by varying `ε`. -/
 
 theorem strong_law_aux2 {c : ℝ} (c_one : 1 < c) :
     ∀ᵐ ω, (fun n : ℕ => ∑ i ∈ range ⌊c ^ n⌋₊, truncation (X i) i ω -
@@ -456,6 +500,9 @@ theorem strong_law_aux2 {c : ℝ} (c_one : 1 < c) :
   exact hn.le.trans (mul_le_mul_of_nonneg_right hi.le (Nat.cast_nonneg _))
 
 include hint hident in
+/-- The expectation of the truncated version of `Xᵢ` behaves asymptotically like the whole
+
+expectation. This follows from convergence and Cesàro averaging. -/
 
 theorem strong_law_aux3 :
     (fun n => 𝔼[∑ i ∈ range n, truncation (X i) i] - n * 𝔼[X 0]) =o[atTop] ((↑) : ℕ → ℝ) := by
@@ -470,6 +517,13 @@ theorem strong_law_aux3 :
   exact ((hident i).symm.integrable_snd hint).1.integrable_truncation
 
 include hint hindep hident hnonneg in
+/- The truncation of `Xᵢ` up to `i` satisfies the strong law of large numbers
+
+(with respect to the original expectation) along the sequence
+
+`c^n`, for any `c > 1`. This follows from the version from the truncated expectation, and the
+
+fact that the truncated and the original expectations have the same asymptotic behavior. -/
 
 theorem strong_law_aux4 {c : ℝ} (c_one : 1 < c) :
     ∀ᵐ ω, (fun n : ℕ => ∑ i ∈ range ⌊c ^ n⌋₊, truncation (X i) i ω - ⌊c ^ n⌋₊ * 𝔼[X 0]) =o[atTop]
@@ -482,6 +536,11 @@ theorem strong_law_aux4 {c : ℝ} (c_one : 1 < c) :
   simp
 
 include hint hident hnonneg in
+/-- The truncated and non-truncated versions of `Xᵢ` have the same asymptotic behavior, as they
+
+almost surely coincide at all but finitely many steps. This follows from a probability computation
+
+and Borel-Cantelli. -/
 
 theorem strong_law_aux5 :
     ∀ᵐ ω, (fun n : ℕ => ∑ i ∈ range n, truncation (X i) i ω - ∑ i ∈ range n, X i ω) =o[atTop]
@@ -508,6 +567,11 @@ theorem strong_law_aux5 :
   rw [sum_sub_distrib]
 
 include hint hindep hident hnonneg in
+/- `Xᵢ` satisfies the strong law of large numbers along the sequence
+
+`c^n`, for any `c > 1`. This follows from the version for the truncated `Xᵢ`, and the fact that
+
+`Xᵢ` and its truncated version have the same asymptotic behavior. -/
 
 theorem strong_law_aux6 {c : ℝ} (c_one : 1 < c) :
     ∀ᵐ ω, Tendsto (fun n : ℕ => (∑ i ∈ range ⌊c ^ n⌋₊, X i ω) / ⌊c ^ n⌋₊) atTop (𝓝 𝔼[X 0]) := by
@@ -529,6 +593,13 @@ theorem strong_law_aux6 {c : ℝ} (c_one : 1 < c) :
   (ext1 n; field_simp [(H n).ne'])
 
 include hint hindep hident hnonneg in
+/-- `Xᵢ` satisfies the strong law of large numbers along all integers. This follows from the
+
+corresponding fact along the sequences `c^n`, and the fact that any integer can be sandwiched
+
+between `c^n` and `c^(n+1)` with comparably small error if `c` is close enough to `1`
+
+(which is formalized in `tendsto_div_of_monotone_of_tendsto_div_floor_pow`). -/
 
 theorem strong_law_aux7 :
     ∀ᵐ ω, Tendsto (fun n : ℕ => (∑ i ∈ range n, X i ω) / n) atTop (𝓝 𝔼[X 0]) := by
@@ -726,6 +797,13 @@ lemma strong_law_ae_of_measurable
   _ < ε := hδ
 
 omit [IsProbabilityMeasure μ] in
+/-- **Strong law of large numbers**, almost sure version: if `X n` is a sequence of independent
+
+identically distributed integrable random variables taking values in a Banach space,
+
+then `n⁻¹ • ∑ i ∈ range n, X i` converges almost surely to `𝔼[X 0]`. We give here the strong
+
+version, due to Etemadi, that only requires pairwise independence. -/
 
 theorem strong_law_ae (X : ℕ → Ω → E) (hint : Integrable (X 0) μ)
     (hindep : Pairwise ((IndepFun · · μ) on X))

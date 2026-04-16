@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.Subsemigroup.Center
 import Mathlib.RingTheory.NonUnitalSubring.Defs
 import Mathlib.RingTheory.NonUnitalSubsemiring.Basic
 
+noncomputable section
+
 /-!
 # `NonUnitalSubring`s
 
@@ -120,16 +122,8 @@ def comap {F : Type w} {R : Type u} {S : Type v} [NonUnitalNonAssocRing R] [NonU
     carrier := f ⁻¹' s.carrier }
 
 @[simp]
-theorem coe_comap (s : NonUnitalSubring S) (f : F) : (s.comap f : Set R) = f ⁻¹' s :=
-  rfl
-
-@[simp]
 theorem mem_comap {s : NonUnitalSubring S} {f : F} {x : R} : x ∈ s.comap f ↔ f x ∈ s :=
   Iff.rfl
-
-theorem comap_comap (s : NonUnitalSubring T) (g : S →ₙ+* T) (f : R →ₙ+* S) :
-    (s.comap g).comap f = s.comap (g.comp f) :=
-  rfl
 
 /-! ## map -/
 
@@ -138,10 +132,6 @@ def map {F : Type w} {R : Type u} {S : Type v} [NonUnitalNonAssocRing R] [NonUni
     NonUnitalSubring S :=
   { s.toSubsemigroup.map (f : R →ₙ* S), s.toAddSubgroup.map (f : R →+ S) with
     carrier := f '' s.carrier }
-
-@[simp]
-theorem coe_map (f : F) (s : NonUnitalSubring R) : (s.map f : Set S) = f '' s :=
-  rfl
 
 @[simp]
 theorem mem_map {f : F} {s : NonUnitalSubring R} {y : S} : y ∈ s.map f ↔ ∃ x ∈ s, f x = y :=
@@ -169,11 +159,6 @@ noncomputable def equivMapOfInjective (f : F) (hf : Function.Injective (f : R �
       hf with
     map_mul' := fun _ _ => Subtype.ext (map_mul f _ _)
     map_add' := fun _ _ => Subtype.ext (map_add f _ _) }
-
-@[simp]
-theorem coe_equivMapOfInjective_apply (f : F) (hf : Function.Injective f) (x : s) :
-    (equivMapOfInjective s f hf x : S) = f x :=
-  rfl
 
 end NonUnitalSubring
 
@@ -237,15 +222,6 @@ instance : Min (NonUnitalSubring R) :=
     { s.toSubsemigroup ⊓ t.toSubsemigroup, s.toAddSubgroup ⊓ t.toAddSubgroup with
       carrier := s ∩ t }⟩
 
-@[simp]
-theorem coe_inf (p p' : NonUnitalSubring R) :
-    ((p ⊓ p' : NonUnitalSubring R) : Set R) = (p : Set R) ∩ p' :=
-  rfl
-
-@[simp]
-theorem mem_inf {p p' : NonUnitalSubring R} {x : R} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
-
 instance : InfSet (NonUnitalSubring R) :=
   ⟨fun s =>
     NonUnitalSubring.mk' (⋂ t ∈ s, ↑t) (⨅ t ∈ s, NonUnitalSubring.toSubsemigroup t)
@@ -307,14 +283,6 @@ variable (R) [NonUnitalNonAssocRing R]
 def center : NonUnitalSubring R :=
   { NonUnitalSubsemiring.center R with
     neg_mem' := Set.neg_mem_center }
-
-theorem coe_center : ↑(center R) = Set.center R :=
-  rfl
-
-@[simp]
-theorem center_toNonUnitalSubsemiring :
-    (center R).toNonUnitalSubsemiring = NonUnitalSubsemiring.center R :=
-  rfl
 
 instance center.instNonUnitalCommRing : NonUnitalCommRing (center R) :=
   { NonUnitalSubsemiring.center.instNonUnitalCommSemiring R,
@@ -533,11 +501,6 @@ def prod (s : NonUnitalSubring R) (t : NonUnitalSubring S) : NonUnitalSubring (R
   { s.toSubsemigroup.prod t.toSubsemigroup, s.toAddSubgroup.prod t.toAddSubgroup with
     carrier := s ×ˢ t }
 
-@[norm_cast]
-theorem coe_prod (s : NonUnitalSubring R) (t : NonUnitalSubring S) :
-    (s.prod t : Set (R × S)) = (s : Set R) ×ˢ t :=
-  rfl
-
 theorem mem_prod {s : NonUnitalSubring R} {t : NonUnitalSubring S} {p : R × S} :
     p ∈ s.prod t ↔ p.1 ∈ s ∧ p.2 ∈ t :=
   Iff.rfl
@@ -618,10 +581,6 @@ open NonUnitalSubring
 def rangeRestrict (f : R →ₙ+* S) : R →ₙ+* f.range :=
   NonUnitalRingHom.codRestrict f f.range fun x => ⟨x, rfl⟩
 
-@[simp]
-theorem coe_rangeRestrict (f : R →ₙ+* S) (x : R) : (f.rangeRestrict x : S) = f x :=
-  rfl
-
 theorem rangeRestrict_surjective (f : R →ₙ+* S) : Function.Surjective f.rangeRestrict :=
   fun ⟨_y, hy⟩ =>
   let ⟨x, hx⟩ := mem_range.mp hy
@@ -701,16 +660,6 @@ def ofLeftInverse' {g : S → R} {f : R →ₙ+* S} (h : Function.LeftInverse g 
       Subtype.ext <|
         let ⟨x', hx'⟩ := NonUnitalRingHom.mem_range.mp x.prop
         show f (g x) = x by rw [← hx', h x'] }
-
-@[simp]
-theorem ofLeftInverse'_apply {g : S → R} {f : R →ₙ+* S} (h : Function.LeftInverse g f) (x : R) :
-    ↑(ofLeftInverse' h x) = f x :=
-  rfl
-
-@[simp]
-theorem ofLeftInverse'_symm_apply {g : S → R} {f : R →ₙ+* S} (h : Function.LeftInverse g f)
-    (x : f.range) : (ofLeftInverse' h).symm x = g x :=
-  rfl
 
 end RingEquiv
 

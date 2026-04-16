@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Finset/Sym.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Data.Fintype.Vector
 import Mathlib.Data.Multiset.Sym
+
+noncomputable section
 
 /-!
 # Symmetric powers of a finset
@@ -99,9 +101,6 @@ theorem sym2_toFinset [DecidableEq α] (m : Multiset α) :
   simp only [mk_mem_sym2_iff, Multiset.mem_toFinset, Multiset.mk_mem_sym2_iff]
 
 @[simp]
-theorem sym2_empty : (∅ : Finset α).sym2 = ∅ := rfl
-
-@[simp]
 theorem sym2_eq_empty : s.sym2 = ∅ ↔ s = ∅ := by
   rw [← val_eq_zero, sym2_val, Multiset.sym2_eq_zero_iff, val_eq_zero]
 
@@ -110,10 +109,8 @@ theorem sym2_nonempty : s.sym2.Nonempty ↔ s.Nonempty := by
   rw [← not_iff_not]
   simp_rw [not_nonempty_iff_eq_empty, sym2_eq_empty]
 
+@[aesop safe apply (rule_sets := [finsetNonempty])]
 protected alias ⟨_, Nonempty.sym2⟩ := sym2_nonempty
-
-@[simp]
-theorem sym2_singleton (a : α) : ({a} : Finset α).sym2 = {Sym2.diag a} := rfl
 
 theorem card_sym2 (s : Finset α) : s.sym2.card = Nat.choose (s.card + 1) 2 := by
   rw [card_def, sym2_val, Multiset.card_sym2, ← card_def]
@@ -178,12 +175,6 @@ protected def sym (s : Finset α) : ∀ n, Finset (Sym α n)
   | n + 1 => s.sup fun a ↦ Finset.image (Sym.cons a) (s.sym n)
 
 @[simp]
-theorem sym_zero : s.sym 0 = {∅} := rfl
-
-@[simp]
-theorem sym_succ : s.sym (n + 1) = s.sup fun a ↦ (s.sym n).image <| Sym.cons a := rfl
-
-@[simp]
 theorem mem_sym_iff {m : Sym α n} : m ∈ s.sym n ↔ ∀ a ∈ m, a ∈ s := by
   induction' n with n ih
   · refine mem_singleton.trans ⟨?_, fun _ ↦ Sym.eq_nil_of_card_zero _⟩
@@ -222,7 +213,13 @@ theorem eq_empty_of_sym_eq_empty (h : s.sym n = ∅) : s = ∅ := by
   rw [← not_nonempty_iff_eq_empty] at h ⊢
   exact fun hs ↦ h (hs.sym _)
 
--- DISSOLVED: sym_eq_empty
+@[simp]
+theorem sym_eq_empty : s.sym n = ∅ ↔ n ≠ 0 ∧ s = ∅ := by
+  cases n
+  · exact iff_of_false (singleton_ne_empty _) fun h ↦ (h.1 rfl).elim
+  · refine ⟨fun h ↦ ⟨Nat.succ_ne_zero _, eq_empty_of_sym_eq_empty h⟩, ?_⟩
+    rintro ⟨_, rfl⟩
+    exact sym_empty _
 
 @[simp]
 theorem sym_nonempty : (s.sym n).Nonempty ↔ n = 0 ∨ s.Nonempty := by

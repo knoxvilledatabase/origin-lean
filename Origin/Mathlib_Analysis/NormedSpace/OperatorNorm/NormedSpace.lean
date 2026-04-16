@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/NormedSpace.lean
-Genuine: 13 | Conflates: 10 | Dissolved: 1 | Infrastructure: 4
+Genuine: 13 | Conflates: 10 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Bilinear
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NNNorm
 import Mathlib.Analysis.Normed.Module.Span
+
+noncomputable section
 
 /-!
 # Operator norm for maps on normed spaces
@@ -153,13 +155,6 @@ theorem norm_toContinuousLinearMap_comp [RingHomIsometric σ₁₂] (f : F →�
   opNorm_ext (f.toContinuousLinearMap.comp g) g fun x => by
     simp only [norm_map, coe_toContinuousLinearMap, coe_comp', Function.comp_apply]
 
-def postcomp [RingHomIsometric σ₁₂] [RingHomIsometric σ₁₃] (a : F →ₛₗᵢ[σ₂₃] G) :
-    (E →SL[σ₁₂] F) →ₛₗᵢ[σ₂₃] (E →SL[σ₁₃] G) where
-  toFun f := a.toContinuousLinearMap.comp f
-  map_add' f g := by simp
-  map_smul' c f := by simp
-  norm_map' f := by simp [a.norm_toContinuousLinearMap_comp]
-
 end LinearIsometry
 
 end
@@ -199,7 +194,6 @@ theorem norm_smulRightL (c : E →L[𝕜] 𝕜) [Nontrivial Fₗ] : ‖smulRight
   ContinuousLinearMap.homothety_norm _ c.norm_smulRight_apply
 
 set_option maxSynthPendingDepth 2 in
-
 lemma norm_smulRightL_le : ‖smulRightL 𝕜 E Fₗ‖ ≤ 1 :=
   LinearMap.mkContinuous₂_norm_le _ zero_le_one _
 
@@ -265,7 +259,12 @@ theorem subsingleton_or_nnnorm_symm_pos [RingHomIsometric σ₁₂] (e : E ≃SL
 
 variable (𝕜)
 
--- DISSOLVED: coord_norm
+@[simp]
+theorem coord_norm (x : E) (h : x ≠ 0) : ‖coord 𝕜 x h‖ = ‖x‖⁻¹ := by
+  have hx : 0 < ‖x‖ := norm_pos_iff.mpr h
+  haveI : Nontrivial (𝕜 ∙ x) := Submodule.nontrivial_span_singleton h
+  exact ContinuousLinearMap.homothety_norm _ fun y =>
+    homothety_inverse _ hx _ (LinearEquiv.toSpanNonzeroSingleton_homothety 𝕜 x h) _
 
 end
 

@@ -7,6 +7,8 @@ import ProofWidgets.Component.PenroseDiagram
 import ProofWidgets.Presentation.Expr
 import Mathlib.CategoryTheory.Category.Basic
 
+noncomputable section
+
 /-! This module defines tactic/meta infrastructure for displaying commutative diagrams in the
 infoview. -/
 

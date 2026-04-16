@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Calculus.ContDiff.RCLike
 import Mathlib.Analysis.Calculus.InverseFunctionTheorem.FDeriv
 
+noncomputable section
+
 /-!
 # Inverse function theorem, smooth case
 
@@ -30,12 +32,6 @@ def toPartialHomeomorph (hf : ContDiffAt 𝕂 n f a) (hf' : HasFDerivAt f (f' : 
   (hf.hasStrictFDerivAt' hf' hn).toPartialHomeomorph f
 
 variable {f}
-
-@[simp]
-theorem toPartialHomeomorph_coe (hf : ContDiffAt 𝕂 n f a)
-    (hf' : HasFDerivAt f (f' : E →L[𝕂] F) a) (hn : 1 ≤ n) :
-    (hf.toPartialHomeomorph f hf' hn : E → F) = f :=
-  rfl
 
 theorem mem_toPartialHomeomorph_source (hf : ContDiffAt 𝕂 n f a)
     (hf' : HasFDerivAt f (f' : E →L[𝕂] F) a) (hn : 1 ≤ n) :

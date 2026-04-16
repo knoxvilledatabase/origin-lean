@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.AddTorsor.AffineMap
 import Mathlib.Analysis.Normed.Affine.AddTorsorBases
 
+noncomputable section
+
 /-!
 # Barycentric coordinates are smooth
 -/

@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Matrix.Transvection
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.Tactic.FinCases
 
+noncomputable section
+
 /-!
 # Block matrices and their determinant
 

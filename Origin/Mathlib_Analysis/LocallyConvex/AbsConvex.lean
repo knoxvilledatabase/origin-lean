@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/LocallyConvex/AbsConvex.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.BalancedCoreHull
 import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Analysis.Convex.Gauge
 import Mathlib.Analysis.Convex.TotallyBounded
+
+noncomputable section
 
 /-!
 # Absolutely convex sets

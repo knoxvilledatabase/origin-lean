@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
 import Mathlib.Topology.FiberBundle.Basic
 
+noncomputable section
+
 /-!
 # Vector bundles
 
@@ -173,26 +175,12 @@ def linearEquivAt (e : Trivialization F (π F E)) [e.IsLinear R] (b : B) (hb : b
 
 variable {R}
 
-@[simp]
-theorem linearEquivAt_apply (e : Trivialization F (π F E)) [e.IsLinear R] (b : B)
-    (hb : b ∈ e.baseSet) (v : E b) : e.linearEquivAt R b hb v = (e ⟨b, v⟩).2 :=
-  rfl
-
-@[simp]
-theorem linearEquivAt_symm_apply (e : Trivialization F (π F E)) [e.IsLinear R] (b : B)
-    (hb : b ∈ e.baseSet) (v : F) : (e.linearEquivAt R b hb).symm v = e.symm b v :=
-  rfl
-
 variable (R)
 
 protected def symmₗ (e : Trivialization F (π F E)) [e.IsLinear R] (b : B) : F →ₗ[R] E b :=
   e.toPretrivialization.symmₗ R b
 
 variable {R}
-
-theorem coe_symmₗ (e : Trivialization F (π F E)) [e.IsLinear R] (b : B) :
-    ⇑(e.symmₗ R b) = e.symm b :=
-  rfl
 
 variable (R)
 
@@ -320,14 +308,6 @@ namespace Bundle
 
 def zeroSection [∀ x, Zero (E x)] : B → TotalSpace F E := (⟨·, 0⟩)
 
-@[simp, mfld_simps]
-theorem zeroSection_proj [∀ x, Zero (E x)] (x : B) : (zeroSection F E x).proj = x :=
-  rfl
-
-@[simp, mfld_simps]
-theorem zeroSection_snd [∀ x, Zero (E x)] (x : B) : (zeroSection F E x).2 = 0 :=
-  rfl
-
 end Bundle
 
 open Bundle
@@ -412,11 +392,6 @@ theorem coe_continuousLinearEquivAt_eq (e : Trivialization F (π F E)) [e.IsLine
 theorem symm_continuousLinearEquivAt_eq (e : Trivialization F (π F E)) [e.IsLinear R] {b : B}
     (hb : b ∈ e.baseSet) : ((e.continuousLinearEquivAt R b hb).symm : F → E b) = e.symmL R b :=
   rfl
-
-@[simp]
-theorem continuousLinearEquivAt_apply' (e : Trivialization F (π F E)) [e.IsLinear R]
-    (x : TotalSpace F E) (hx : x ∈ e.source) :
-    e.continuousLinearEquivAt R x.proj (e.mem_source.1 hx) x.2 = (e x).2 := rfl
 
 variable (R)
 
@@ -544,10 +519,6 @@ instance toTopologicalSpace : TopologicalSpace Z.TotalSpace :=
 
 variable (b : B) (a : F)
 
-@[simp, mfld_simps]
-theorem coe_coordChange (i j : ι) : Z.toFiberBundleCore.coordChange i j b = Z.coordChange i j b :=
-  rfl
-
 def localTriv (i : ι) : Trivialization F (π F Z.Fiber) :=
   Z.toFiberBundleCore.localTriv i
 
@@ -566,10 +537,6 @@ variable (i j : ι)
 @[simp, mfld_simps]
 theorem mem_localTriv_source (p : Z.TotalSpace) : p ∈ (Z.localTriv i).source ↔ p.1 ∈ Z.baseSet i :=
   Iff.rfl
-
-@[simp, mfld_simps]
-theorem baseSet_at : Z.baseSet i = (Z.localTriv i).baseSet :=
-  rfl
 
 @[simp, mfld_simps]
 theorem mem_localTriv_target (p : B × F) :
@@ -594,10 +561,6 @@ theorem localTriv_coordChange_eq {b : B} (hb : b ∈ Z.baseSet i ∩ Z.baseSet j
 
 def localTrivAt (b : B) : Trivialization F (π F Z.Fiber) :=
   Z.localTriv (Z.indexAt b)
-
-@[simp, mfld_simps]
-theorem localTrivAt_def : Z.localTriv (Z.indexAt b) = Z.localTrivAt b :=
-  rfl
 
 @[simp, mfld_simps]
 theorem mem_source_at : (⟨b, a⟩ : Z.TotalSpace) ∈ (Z.localTrivAt b).source := by

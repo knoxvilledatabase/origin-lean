@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Basic
 import Mathlib.ModelTheory.Syntax
 import Mathlib.Data.List.ProdSigma
 
+noncomputable section
+
 /-!
 # Basics on First-Order Semantics
 
@@ -72,13 +74,6 @@ def realize (v : α → M) : ∀ _t : L.Term α, M
   | func f ts => funMap f fun i => (ts i).realize v
 
 @[simp]
-theorem realize_var (v : α → M) (k) : realize v (var k : L.Term α) = v k := rfl
-
-@[simp]
-theorem realize_func (v : α → M) {n} (f : L.Functions n) (ts) :
-    realize v (func f ts : L.Term α) = funMap f fun i => (ts i).realize v := rfl
-
-@[simp]
 theorem realize_relabel {t : L.Term α} {g : α → β} {v : β → M} :
     (t.relabel g).realize v = t.realize (v ∘ g) := by
   induction' t with _ n f ts ih
@@ -110,9 +105,6 @@ theorem realize_functions_apply₂ {f : L.Functions 2} {t₁ t₂ : L.Term α} {
   refine congr rfl (funext (Fin.cases ?_ ?_))
   · simp only [Matrix.cons_val_zero]
   · simp only [Matrix.cons_val_succ, Matrix.cons_val_fin_one, forall_const]
-
-theorem realize_con {A : Set M} {a : A} {v : α → M} : (L.con a).term.realize v = a :=
-  rfl
 
 @[simp]
 theorem realize_subst {t : L.Term α} {tf : α → L.Term β} {v : β → M} :
@@ -224,10 +216,6 @@ def Realize : ∀ {l} (_f : L.BoundedFormula α l) (_v : α → M) (_xs : Fin l 
 variable {l : ℕ} {φ ψ : L.BoundedFormula α l} {θ : L.BoundedFormula α l.succ}
 
 variable {v : α → M} {xs : Fin l → M}
-
-@[simp]
-theorem realize_bot : (⊥ : L.BoundedFormula α l).Realize v xs ↔ False :=
-  Iff.rfl
 
 @[simp]
 theorem realize_not : φ.not.Realize v xs ↔ ¬φ.Realize v xs :=
@@ -489,10 +477,6 @@ variable {φ ψ : L.Formula α} {v : α → M}
 
 @[simp]
 theorem realize_not : φ.not.Realize v ↔ ¬φ.Realize v :=
-  Iff.rfl
-
-@[simp]
-theorem realize_bot : (⊥ : L.Formula α).Realize v ↔ False :=
   Iff.rfl
 
 @[simp]

@@ -7,6 +7,8 @@ import Mathlib.Logic.Equiv.Defs
 import Mathlib.Tactic.MkIffOfInductiveProp
 import Mathlib.Tactic.PPWithUniv
 
+noncomputable section
+
 /-!
 # Small types
 

@@ -8,6 +8,8 @@ import Mathlib.Logic.Small.List
 import Mathlib.ModelTheory.Syntax
 import Mathlib.SetTheory.Cardinal.Arithmetic
 
+noncomputable section
+
 /-!
 # Encodings and Cardinality of First-Order Syntax
 

@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Normed
 import Mathlib.Analysis.NormedSpace.Connected
 import Mathlib.LinearAlgebra.AffineSpace.ContinuousAffineEquiv
 
+noncomputable section
+
 /-!
 # Ample subsets of real vector spaces
 

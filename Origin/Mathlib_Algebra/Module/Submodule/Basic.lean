@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Basic.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Submonoid.Membership
 import Mathlib.Algebra.Module.Submodule.Defs
 import Mathlib.Algebra.NoZeroSMulDivisors.Defs
 import Mathlib.GroupTheory.GroupAction.SubMulAction
+
+noncomputable section
 
 /-!
 # Submodules of a module
@@ -35,9 +37,6 @@ variable {p q : Submodule R M}
 @[mono]
 theorem toAddSubmonoid_strictMono : StrictMono (toAddSubmonoid : Submodule R M → AddSubmonoid M) :=
   fun _ _ => id
-
-theorem toAddSubmonoid_le : p.toAddSubmonoid ≤ q.toAddSubmonoid ↔ p ≤ q :=
-  Iff.rfl
 
 @[mono]
 theorem toAddSubmonoid_mono : Monotone (toAddSubmonoid : Submodule R M → AddSubmonoid M) :=
@@ -106,9 +105,6 @@ instance [VAdd M α] [FaithfulVAdd M α] : FaithfulVAdd p α :=
 
 variable {p}
 
-theorem vadd_def [VAdd M α] (g : p) (m : α) : g +ᵥ m = (g : M) +ᵥ m :=
-  rfl
-
 end AddAction
 
 end AddCommMonoid
@@ -126,9 +122,6 @@ variable {r : R} {x y : M}
 @[mono]
 theorem toAddSubgroup_strictMono : StrictMono (toAddSubgroup : Submodule R M → AddSubgroup M) :=
   fun _ _ => id
-
-theorem toAddSubgroup_le : p.toAddSubgroup ≤ p'.toAddSubgroup ↔ p ≤ p' :=
-  Iff.rfl
 
 @[mono]
 theorem toAddSubgroup_mono : Monotone (toAddSubgroup : Submodule R M → AddSubgroup M) :=
@@ -150,7 +143,9 @@ theorem not_mem_of_ortho {x : M} {N : Submodule R M}
   intro hx
   simpa using ortho (-1) x hx
 
--- DISSOLVED: ne_zero_of_ortho
+theorem ne_zero_of_ortho {x : M} {N : Submodule R M}
+    (ortho : ∀ (c : R), ∀ y ∈ N, c • x + y = (0 : M) → c = 0) : x ≠ 0 :=
+  mt (fun h => show x ∈ N from h.symm ▸ N.zero_mem) (not_mem_of_ortho ortho)
 
 end IsDomain
 
@@ -164,7 +159,8 @@ variable [SMul S R] [Module S M] [IsScalarTower S R M]
 
 variable (p : Submodule R M) {s : S} {x y : M}
 
--- DISSOLVED: smul_mem_iff
+theorem smul_mem_iff (s0 : s ≠ 0) : s • x ∈ p ↔ x ∈ p :=
+  p.toSubMulAction.smul_mem_iff s0
 
 end Submodule
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 import Mathlib.Topology.Category.TopCat.Basic
 
+noncomputable section
+
 /-!
 
 # Categories of Compact Hausdorff Spaces
@@ -107,19 +109,6 @@ def of : CompHausLike P where
   is_compact := ‹_›
   is_hausdorff := ‹_›
   prop := HasProp.hasProp
-
-@[simp]
-theorem coe_of : (CompHausLike.of P X : Type _) = X :=
-  rfl
-
-@[simp]
-theorem coe_id (X : CompHausLike P) : (𝟙 ((forget (CompHausLike P)).obj X)) = id :=
-  rfl
-
-@[simp]
-theorem coe_comp {X Y Z : CompHausLike P} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    ((forget (CompHausLike P)).map f ≫ (forget (CompHausLike P)).map g) = g ∘ f :=
-  rfl
 
 instance (X : CompHausLike.{u} P) : TopologicalSpace ((forget (CompHausLike P)).obj X) :=
   inferInstanceAs (TopologicalSpace X.toTop)
@@ -229,19 +218,8 @@ def isoOfHomeo {X Y : CompHausLike.{u} P} (f : X ≃ₜ Y) : X ≅ Y :=
 def homeoOfIso {X Y : CompHausLike.{u} P} (f : X ≅ Y) : X ≃ₜ Y :=
   TopCat.homeoOfIso <| (compHausLikeToTop P).mapIso f
 
-@[simps]
-def isoEquivHomeo {X Y : CompHausLike.{u} P} : (X ≅ Y) ≃ (X ≃ₜ Y) where
-  toFun := homeoOfIso
-  invFun := isoOfHomeo
-  left_inv _ := rfl
-  right_inv _ := rfl
-
 def const {P : TopCat.{u} → Prop}
     (T : CompHausLike.{u} P) {S : CompHausLike.{u} P} (s : S) : T ⟶ S :=
   ContinuousMap.const _ s
-
-lemma const_comp {P : TopCat.{u} → Prop} {S T U : CompHausLike.{u} P}
-    (s : S) (g : S ⟶ U) : T.const s ≫ g = T.const (g s) :=
-  rfl
 
 end CompHausLike

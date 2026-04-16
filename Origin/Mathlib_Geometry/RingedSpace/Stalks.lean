@@ -7,6 +7,8 @@ import Mathlib.Geometry.RingedSpace.PresheafedSpace
 import Mathlib.CategoryTheory.Limits.Final
 import Mathlib.Topology.Sheaves.Stalks
 
+noncomputable section
+
 /-!
 # Stalks for presheaved spaces
 

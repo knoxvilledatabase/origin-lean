@@ -1,11 +1,13 @@
 /-
 Extracted from Data/DFinsupp/Submonoid.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Membership
 import Mathlib.Data.DFinsupp.BigOperators
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
+
+noncomputable section
 
 /-!
 # `DFinsupp` and submonoids
@@ -28,9 +30,19 @@ open DFinsupp
 
 variable [DecidableEq ι]
 
--- DISSOLVED: dfinsupp_prod_mem
+@[to_additive]
+theorem dfinsupp_prod_mem [∀ i, Zero (β i)] [∀ (i) (x : β i), Decidable (x ≠ 0)]
+    [CommMonoid γ] {S : Type*} [SetLike S γ] [SubmonoidClass S γ]
+    (s : S) (f : Π₀ i, β i) (g : ∀ i, β i → γ)
+    (h : ∀ c, f c ≠ 0 → g c (f c) ∈ s) : f.prod g ∈ s :=
+  prod_mem fun _ hi => h _ <| mem_support_iff.1 hi
 
--- DISSOLVED: dfinsupp_sumAddHom_mem
+theorem dfinsupp_sumAddHom_mem [∀ i, AddZeroClass (β i)] [AddCommMonoid γ] {S : Type*}
+    [SetLike S γ] [AddSubmonoidClass S γ] (s : S) (f : Π₀ i, β i) (g : ∀ i, β i →+ γ)
+    (h : ∀ c, f c ≠ 0 → g c (f c) ∈ s) : DFinsupp.sumAddHom g f ∈ s := by
+  classical
+    rw [DFinsupp.sumAddHom_apply]
+    exact dfinsupp_sum_mem s f (g ·) h
 
 theorem AddSubmonoid.iSup_eq_mrange_dfinsupp_sumAddHom
     [AddCommMonoid γ] (S : ι → AddSubmonoid γ) :
@@ -61,7 +73,12 @@ theorem AddSubmonoid.mem_iSup_iff_exists_dfinsupp [AddCommMonoid γ] (S : ι →
     (x : γ) : x ∈ iSup S ↔ ∃ f : Π₀ i, S i, DFinsupp.sumAddHom (fun i => (S i).subtype) f = x :=
   SetLike.ext_iff.mp (AddSubmonoid.iSup_eq_mrange_dfinsupp_sumAddHom S) x
 
--- DISSOLVED: AddSubmonoid.mem_iSup_iff_exists_dfinsupp'
+theorem AddSubmonoid.mem_iSup_iff_exists_dfinsupp' [AddCommMonoid γ] (S : ι → AddSubmonoid γ)
+    [∀ (i) (x : S i), Decidable (x ≠ 0)] (x : γ) :
+    x ∈ iSup S ↔ ∃ f : Π₀ i, S i, (f.sum fun _ xi => ↑xi) = x := by
+  rw [AddSubmonoid.mem_iSup_iff_exists_dfinsupp]
+  simp_rw [sumAddHom_apply]
+  rfl
 
 theorem AddSubmonoid.mem_bsupr_iff_exists_dfinsupp (p : ι → Prop) [DecidablePred p]
     [AddCommMonoid γ] (S : ι → AddSubmonoid γ) (x : γ) :

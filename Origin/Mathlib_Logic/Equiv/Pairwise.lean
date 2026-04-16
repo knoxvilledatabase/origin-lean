@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.FunLike.Equiv
 import Mathlib.Logic.Pairwise
 
+noncomputable section
+
 /-!
 # Interaction of equivalences with `Pairwise`
 -/

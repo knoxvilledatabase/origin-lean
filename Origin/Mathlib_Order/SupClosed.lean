@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Order.Closure
 
+noncomputable section
+
 /-!
 # Sets closed under join/meet
 
@@ -244,12 +246,6 @@ lemma isSublattice_pi {ι : Type*} {α : ι → Type*} [∀ i, Lattice (α i)] {
     {t : ∀ i, Set (α i)} (ht : ∀ i ∈ s, IsSublattice (t i)) : IsSublattice (s.pi t) :=
   ⟨supClosed_pi fun _i hi ↦ (ht _ hi).1, infClosed_pi fun _i hi ↦ (ht _ hi).2⟩
 
-@[simp] lemma supClosed_preimage_toDual {s : Set αᵒᵈ} :
-    SupClosed (toDual ⁻¹' s) ↔ InfClosed s := Iff.rfl
-
-@[simp] lemma infClosed_preimage_toDual {s : Set αᵒᵈ} :
-    InfClosed (toDual ⁻¹' s) ↔ SupClosed s := Iff.rfl
-
 @[simp] lemma supClosed_preimage_ofDual {s : Set α} :
     SupClosed (ofDual ⁻¹' s) ↔ InfClosed s := Iff.rfl
 
@@ -321,12 +317,6 @@ alias ⟨_, SupClosed.supClosure_eq⟩ := supClosure_eq_self
 lemma supClosure_idem (s : Set α) : supClosure (supClosure s) = supClosure s :=
   supClosure.idempotent _
 
-@[simp] lemma supClosure_empty : supClosure (∅ : Set α) = ∅ := by simp
-
-@[simp] lemma supClosure_singleton : supClosure {a} = {a} := by simp
-
-@[simp] lemma supClosure_univ : supClosure (Set.univ : Set α) = Set.univ := by simp
-
 @[simp] lemma upperBounds_supClosure (s : Set α) : upperBounds (supClosure s) = upperBounds s :=
   (upperBounds_mono_set subset_supClosure).antisymm <| by
     rintro a ha _ ⟨t, ht, hts, rfl⟩
@@ -394,12 +384,6 @@ alias ⟨_, InfClosed.infClosure_eq⟩ := infClosure_eq_self
 lemma infClosure_idem (s : Set α) : infClosure (infClosure s) = infClosure s :=
   infClosure.idempotent _
 
-@[simp] lemma infClosure_empty : infClosure (∅ : Set α) = ∅ := by simp
-
-@[simp] lemma infClosure_singleton : infClosure {a} = {a} := by simp
-
-@[simp] lemma infClosure_univ : infClosure (Set.univ : Set α) = Set.univ := by simp
-
 @[simp] lemma lowerBounds_infClosure (s : Set α) : lowerBounds (infClosure s) = lowerBounds s :=
   (lowerBounds_mono_set subset_infClosure).antisymm <| by
     rintro a ha _ ⟨t, ht, hts, rfl⟩
@@ -462,12 +446,6 @@ alias ⟨_, IsSublattice.latticeClosure_eq⟩ := latticeClosure_eq_self
 
 lemma latticeClosure_idem (s : Set α) : latticeClosure (latticeClosure s) = latticeClosure s :=
   latticeClosure.idempotent _
-
-@[simp] lemma latticeClosure_empty : latticeClosure (∅ : Set α) = ∅ := by simp
-
-@[simp] lemma latticeClosure_singleton (a : α) : latticeClosure {a} = {a} := by simp
-
-@[simp] lemma latticeClosure_univ : latticeClosure (Set.univ : Set α) = Set.univ := by simp
 
 end Lattice
 

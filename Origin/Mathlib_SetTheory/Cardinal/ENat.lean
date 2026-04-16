@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Cardinal/ENat.lean
-Genuine: 70 | Conflates: 0 | Dissolved: 2 | Infrastructure: 7
+Genuine: 79 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Hom.Ring
 import Mathlib.Data.ENat.Basic
 import Mathlib.SetTheory.Cardinal.Basic
+
+noncomputable section
 
 /-!
 # Conversion between `Cardinal` and `ℕ∞`
@@ -40,17 +42,11 @@ namespace Cardinal
 
 instance : Coe ENat Cardinal := ⟨Cardinal.ofENat⟩
 
-@[simp, norm_cast] lemma ofENat_top : ofENat ⊤ = ℵ₀ := rfl
-
 @[simp, norm_cast] lemma ofENat_nat (n : ℕ) : ofENat n = n := rfl
 
 @[simp, norm_cast] lemma ofENat_zero : ofENat 0 = 0 := rfl
 
 @[simp, norm_cast] lemma ofENat_one : ofENat 1 = 1 := rfl
-
-@[simp, norm_cast] lemma ofENat_ofNat (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n : ℕ∞)) : Cardinal) = OfNat.ofNat n :=
-  rfl
 
 lemma ofENat_strictMono : StrictMono ofENat :=
   WithTop.strictMono_iff.2 ⟨Nat.strictMono_cast, nat_lt_aleph0⟩
@@ -60,6 +56,7 @@ lemma ofENat_lt_ofENat {m n : ℕ∞} : (m : Cardinal) < n ↔ m < n :=
   ofENat_strictMono.lt_iff_lt
 
 @[gcongr, mono] alias ⟨_, ofENat_lt_ofENat_of_lt⟩ := ofENat_lt_ofENat
+
 @[simp, norm_cast]
 lemma ofENat_lt_aleph0 {m : ℕ∞} : (m : Cardinal) < ℵ₀ ↔ m < ⊤ :=
   ofENat_lt_ofENat (n := ⊤)
@@ -83,13 +80,17 @@ lemma ofENat_mono : Monotone ofENat := ofENat_strictMono.monotone
 @[simp, norm_cast]
 lemma ofENat_le_ofENat {m n : ℕ∞} : (m : Cardinal) ≤ n ↔ m ≤ n := ofENat_strictMono.le_iff_le
 
+@[gcongr, mono] alias ⟨_, ofENat_le_ofENat_of_le⟩ := ofENat_le_ofENat
+
+@[simp] lemma ofENat_le_aleph0 (n : ℕ∞) : ↑n ≤ ℵ₀ := ofENat_le_ofENat.2 le_top
+
+@[simp] lemma ofENat_le_nat {m : ℕ∞} {n : ℕ} : ofENat m ≤ n ↔ m ≤ n := by norm_cast
+
+@[simp] lemma ofENat_le_one {m : ℕ∞} : ofENat m ≤ 1 ↔ m ≤ 1 := by norm_cast
+
+@[simp] lemma ofENat_le_ofNat {m : ℕ∞} {n : ℕ} [n.AtLeastTwo] :
     ofENat m ≤ no_index (OfNat.ofNat n) ↔ m ≤ OfNat.ofNat n := ofENat_le_nat
 
-@[gcongr, mono] alias ⟨_, ofENat_le_ofENat_of_le⟩ := ofENat_le_ofENat
-@[simp] lemma ofENat_le_aleph0 (n : ℕ∞) : ↑n ≤ ℵ₀ := ofENat_le_ofENat.2 le_top
-@[simp] lemma ofENat_le_nat {m : ℕ∞} {n : ℕ} : ofENat m ≤ n ↔ m ≤ n := by norm_cast
-@[simp] lemma ofENat_le_one {m : ℕ∞} : ofENat m ≤ 1 ↔ m ≤ 1 := by norm_cast
-@[simp] lemma ofENat_le_ofNat {m : ℕ∞} {n : ℕ} [n.AtLeastTwo] :
 @[simp] lemma nat_le_ofENat {m : ℕ} {n : ℕ∞} : (m : Cardinal) ≤ n ↔ m ≤ n := by norm_cast
 
 @[simp] lemma one_le_ofENat {n : ℕ∞} : 1 ≤ (n : Cardinal) ↔ 1 ≤ n := by norm_cast
@@ -235,6 +236,7 @@ lemma ofENat_toENat_eq_self {a : Cardinal} : toENat a = a ↔ a ≤ ℵ₀ := by
   simpa only [mem_range, eq_comm] using Set.ext_iff.1 range_ofENat a
 
 @[simp] alias ⟨_, ofENat_toENat⟩ := ofENat_toENat_eq_self
+
 lemma toENat_nat (n : ℕ) : toENat n = n := map_natCast _ n
 
 @[simp] lemma toENat_le_nat {a : Cardinal} {n : ℕ} : toENat a ≤ n ↔ a ≤ n := toENatAux_le_nat
@@ -285,9 +287,13 @@ lemma ofENat_add (m n : ℕ∞) : ofENat (m + n) = m + n := by apply toENat_injO
 
 @[simp] lemma ofENat_add_aleph0 (m : ℕ∞) : m + ℵ₀ = ℵ₀ := by rw [add_comm, aleph0_add_ofENat]
 
--- DISSOLVED: ofENat_mul_aleph0
+@[simp] lemma ofENat_mul_aleph0 {m : ℕ∞} (hm : m ≠ 0) : ↑m * ℵ₀ = ℵ₀ := by
+  induction m with
+  | top => exact aleph0_mul_aleph0
+  | coe m => rw [ofENat_nat, nat_mul_aleph0 (mod_cast hm)]
 
--- DISSOLVED: aleph0_mul_ofENat
+@[simp] lemma aleph0_mul_ofENat {m : ℕ∞} (hm : m ≠ 0) : ℵ₀ * m = ℵ₀ := by
+  rw [mul_comm, ofENat_mul_aleph0 hm]
 
 @[simp] lemma ofENat_mul (m n : ℕ∞) : ofENat (m * n) = m * n :=
   toENat_injOn (by simp)

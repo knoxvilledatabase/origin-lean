@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Functor
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Functors with two arguments
 

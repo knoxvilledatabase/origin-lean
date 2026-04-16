@@ -1,6 +1,6 @@
 /-
 Extracted from Testing/Plausible/Functions.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.ToDFinsupp
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Nat
 import Mathlib.Data.Int.Range
 import Mathlib.Data.List.Sigma
 import Plausible.Functions
+
+noncomputable section
 
 /-!
 ## `Plausible`: generators for functions
@@ -73,7 +75,10 @@ variable [Zero β] [DecidableEq β]
 def zeroDefault : TotalFunction α β → TotalFunction α β
   | .withDefault A _ => .withDefault A 0
 
--- DISSOLVED: zeroDefaultSupp
+@[simp]
+def zeroDefaultSupp : TotalFunction α β → Finset α
+  | .withDefault A _ =>
+    List.toFinset <| (A.dedupKeys.filter fun ab => Sigma.snd ab ≠ 0).map Sigma.fst
 
 def applyFinsupp (tf : TotalFunction α β) : α →₀ β where
   support := zeroDefaultSupp tf

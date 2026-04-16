@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.Normed.Operator.Banach
 import Mathlib.LinearAlgebra.SesquilinearForm
 
+noncomputable section
+
 /-!
 # Symmetric linear maps in an inner product space
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Logic.Function.Basic
 
+noncomputable section
+
 /-!
 # Units (i.e., invertible elements) of a monoid
 
@@ -89,10 +91,6 @@ initialize_simps_projections AddUnits
 
   (as_prefix val, val_neg → null, neg → val_neg, as_prefix val_neg)
 
-@[to_additive]
-theorem val_mk (a : α) (b h₁ h₂) : ↑(Units.mk a b h₁ h₂) = a :=
-  rfl
-
 @[to_additive (attr := ext)]
 theorem ext : Function.Injective (val : αˣ → α)
   | ⟨v, i₁, vi₁, iv₁⟩, ⟨v', i₂, vi₂, iv₂⟩, e => by
@@ -156,14 +154,6 @@ theorem val_one : ((1 : αˣ) : α) = 1 :=
 
 @[to_additive (attr := simp, norm_cast)]
 theorem val_eq_one {a : αˣ} : (a : α) = 1 ↔ a = 1 := by rw [← Units.val_one, eq_iff]
-
-@[to_additive (attr := simp)]
-theorem inv_mk (x y : α) (h₁ h₂) : (mk x y h₁ h₂)⁻¹ = mk y x h₂ h₁ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem inv_eq_val_inv : a.inv = ((a⁻¹ : αˣ) : α) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem inv_mul : (↑a⁻¹ * a : α) = 1 :=
@@ -234,9 +224,6 @@ an additive commutative group."]
 instance instCommGroupUnits {α} [CommMonoid α] : CommGroup αˣ where
   mul_comm := fun _ _ => ext <| mul_comm _ _
 
-@[to_additive (attr := simp, norm_cast)]
-lemma val_pow_eq_pow_val (n : ℕ) : ↑(a ^ n) = (a ^ n : α) := rfl
-
 end Monoid
 
 section DivisionMonoid
@@ -257,11 +244,6 @@ end Units
   "For `a, b` in an `AddCommMonoid` such that `a + b = 0`, makes an addUnit out of `a`."]
 def Units.mkOfMulEqOne [CommMonoid α] (a b : α) (hab : a * b = 1) : αˣ :=
   ⟨a, b, hab, (mul_comm b a).trans hab⟩
-
-@[to_additive (attr := simp)]
-theorem Units.val_mkOfMulEqOne [CommMonoid α] {a b : α} (h : a * b = 1) :
-    (Units.mkOfMulEqOne a b h : α) = a :=
-  rfl
 
 section Monoid
 
@@ -286,10 +268,6 @@ theorem divp_assoc (a b : α) (u : αˣ) : a * b /ₚ u = a * (b /ₚ u) :=
 @[field_simps]
 theorem divp_assoc' (x y : α) (u : αˣ) : x * (y /ₚ u) = x * y /ₚ u :=
   (divp_assoc _ _ _).symm
-
-@[simp]
-theorem divp_inv (u : αˣ) : a /ₚ u⁻¹ = a * u :=
-  rfl
 
 @[simp]
 theorem divp_mul_cancel (a : α) (u : αˣ) : a /ₚ u * u = a :=
@@ -490,8 +468,6 @@ an additive monoid which is an additive unit. As opposed to `IsAddUnit.addUnit`,
 computable and comes from the negation on `α`. This is useful to transfer properties of negation
 in `AddUnits α` to `α`. See also `toAddUnits`."]
 def unit' (h : IsUnit a) : αˣ := ⟨a, a⁻¹, h.mul_inv_cancel, h.inv_mul_cancel⟩
-
-@[to_additive] lemma val_inv_unit' (h : IsUnit a) : ↑(h.unit'⁻¹) = a⁻¹ := rfl
 
 @[to_additive (attr := simp)]
 protected lemma mul_inv_cancel_left (h : IsUnit a) : ∀ b, a * (a⁻¹ * b) = b :=

@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/EulerProduct/DirichletLSeries.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.EulerProduct.ExpLog
 import Mathlib.NumberTheory.LSeries.Dirichlet
+
+noncomputable section
 
 /-!
 # The Euler Product for the Riemann Zeta Function and Dirichlet L-Series
@@ -27,22 +29,52 @@ open Complex
 variable {s : ℂ}
 
 noncomputable
-
--- DISSOLVED: riemannZetaSummandHom
+def riemannZetaSummandHom (hs : s ≠ 0) : ℕ →*₀ ℂ where
+  toFun n := (n : ℂ) ^ (-s)
+  map_zero' := by simp [hs]
+  map_one' := by simp
+  map_mul' m n := by
+    simpa only [Nat.cast_mul, ofReal_natCast]
+      using mul_cpow_ofReal_nonneg m.cast_nonneg n.cast_nonneg _
 
 noncomputable
+def dirichletSummandHom {n : ℕ} (χ : DirichletCharacter ℂ n) (hs : s ≠ 0) : ℕ →*₀ ℂ where
+  toFun n := χ n * (n : ℂ) ^ (-s)
+  map_zero' := by simp [hs]
+  map_one' := by simp
+  map_mul' m n := by
+    simp_rw [← ofReal_natCast]
+    simpa only [Nat.cast_mul, IsUnit.mul_iff, not_and, map_mul, ofReal_mul,
+      mul_cpow_ofReal_nonneg m.cast_nonneg n.cast_nonneg _]
+      using mul_mul_mul_comm ..
 
--- DISSOLVED: dirichletSummandHom
+lemma summable_riemannZetaSummand (hs : 1 < s.re) :
+    Summable (fun n ↦ ‖riemannZetaSummandHom (ne_zero_of_one_lt_re hs) n‖) := by
+  simp only [riemannZetaSummandHom, MonoidWithZeroHom.coe_mk, ZeroHom.coe_mk]
+  convert Real.summable_nat_rpow_inv.mpr hs with n
+  rw [← ofReal_natCast, Complex.norm_eq_abs,
+    abs_cpow_eq_rpow_re_of_nonneg (Nat.cast_nonneg n) <| re_neg_ne_zero_of_one_lt_re hs,
+    neg_re, Real.rpow_neg <| Nat.cast_nonneg n]
 
--- DISSOLVED: summable_riemannZetaSummand
+lemma tsum_riemannZetaSummand (hs : 1 < s.re) :
+    ∑' (n : ℕ), riemannZetaSummandHom (ne_zero_of_one_lt_re hs) n = riemannZeta s := by
+  have hsum := summable_riemannZetaSummand hs
+  rw [zeta_eq_tsum_one_div_nat_add_one_cpow hs, tsum_eq_zero_add hsum.of_norm, map_zero, zero_add]
+  simp only [riemannZetaSummandHom, cpow_neg, MonoidWithZeroHom.coe_mk, ZeroHom.coe_mk,
+    Nat.cast_add, Nat.cast_one, one_div]
 
--- DISSOLVED: tsum_riemannZetaSummand
-
--- DISSOLVED: summable_dirichletSummand
+lemma summable_dirichletSummand {N : ℕ} (χ : DirichletCharacter ℂ N) (hs : 1 < s.re) :
+    Summable (fun n ↦ ‖dirichletSummandHom χ (ne_zero_of_one_lt_re hs) n‖) := by
+  simp only [dirichletSummandHom, MonoidWithZeroHom.coe_mk, ZeroHom.coe_mk, norm_mul]
+  exact (summable_riemannZetaSummand hs).of_nonneg_of_le (fun _ ↦ by positivity)
+    (fun n ↦ mul_le_of_le_one_left (norm_nonneg _) <| χ.norm_le_one n)
 
 open scoped LSeries.notation in
 
--- DISSOLVED: tsum_dirichletSummand
+lemma tsum_dirichletSummand {N : ℕ} (χ : DirichletCharacter ℂ N) (hs : 1 < s.re) :
+    ∑' (n : ℕ), dirichletSummandHom χ (ne_zero_of_one_lt_re hs) n = L ↗χ s := by
+  simp only [dirichletSummandHom, cpow_neg, MonoidWithZeroHom.coe_mk, ZeroHom.coe_mk, LSeries,
+    LSeries.term_of_ne_zero' (ne_zero_of_one_lt_re hs), div_eq_mul_inv]
 
 open Filter Nat Topology EulerProduct
 

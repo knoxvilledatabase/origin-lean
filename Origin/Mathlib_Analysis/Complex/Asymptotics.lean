@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.Asymptotics.Theta
 
+noncomputable section
+
 /-!
 # Lemmas about asymptotics and the natural embedding `ℝ → ℂ`
 

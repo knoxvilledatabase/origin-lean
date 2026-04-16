@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.Basis
 import Mathlib.LinearAlgebra.FiniteDimensional
 
+noncomputable section
+
 /-!
 # Finite-dimensional subspaces of affine spaces.
 

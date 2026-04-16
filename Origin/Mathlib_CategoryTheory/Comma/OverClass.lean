@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Reassoc
 import Mathlib.CategoryTheory.Comma.Over
 
+noncomputable section
+
 /-!
 # Typeclasses for `S`-objects and `S`-morphisms
 

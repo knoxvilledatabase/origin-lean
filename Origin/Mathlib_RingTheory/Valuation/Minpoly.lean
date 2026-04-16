@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Valuation/Minpoly.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Adjoin
 import Mathlib.RingTheory.Valuation.Basic
+
+noncomputable section
 
 /-!
 # Minimal polynomials.
@@ -34,6 +36,12 @@ theorem coeff_zero_minpoly (x : K) : v ((minpoly K (algebraMap K L x)).coeff 0) 
 
 variable {L}
 
--- DISSOLVED: pow_coeff_zero_ne_zero_of_unit
+theorem pow_coeff_zero_ne_zero_of_unit [FiniteDimensional K L] (x : L) (hx : IsUnit x):
+    v ((minpoly K x).coeff 0) ^ (finrank K L / (minpoly K x).natDegree) ≠ (0 : Γ₀) := by
+  have h_alg : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  have hx₀ : IsIntegral K x := (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
+  have hdeg := Nat.div_pos (natDegree_le x) (natDegree_pos hx₀)
+  rw [ne_eq, pow_eq_zero_iff hdeg.ne.symm, Valuation.zero_iff]
+  exact coeff_zero_ne_zero hx₀ hx.ne_zero
 
 end Valuation

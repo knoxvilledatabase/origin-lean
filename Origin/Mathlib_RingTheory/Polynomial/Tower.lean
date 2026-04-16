@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Algebra.Polynomial.AlgebraMap
 
+noncomputable section
+
 /-!
 # Algebra towers for polynomial
 

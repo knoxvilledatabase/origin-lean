@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Star.NonUnitalSubsemiring
 import Mathlib.Algebra.Ring.Subsemiring.Basic
 
+noncomputable section
+
 /-!
 # Star subrings
 
@@ -47,23 +49,13 @@ instance starRing (s : StarSubsemiring R) : StarRing s :=
 instance semiring (s : StarSubsemiring R) : NonAssocSemiring s :=
   s.toSubsemiring.toNonAssocSemiring
 
-theorem mem_carrier {s : StarSubsemiring R} {x : R} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
 @[ext]
 theorem ext {S T : StarSubsemiring R} (h : ∀ x : R, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
 
 @[simp]
-lemma coe_mk (S : Subsemiring R) (h) : ((⟨S, h⟩ : StarSubsemiring R) : Set R) = S := rfl
-
-@[simp]
 theorem mem_toSubsemiring {S : StarSubsemiring R} {x} : x ∈ S.toSubsemiring ↔ x ∈ S :=
   Iff.rfl
-
-@[simp]
-theorem coe_toSubsemiring (S : StarSubsemiring R) : (S.toSubsemiring : Set R) = S :=
-  rfl
 
 theorem toSubsemiring_injective :
     Function.Injective (toSubsemiring : StarSubsemiring R → Subsemiring R) := fun S T h =>
@@ -72,17 +64,9 @@ theorem toSubsemiring_injective :
 theorem toSubsemiring_inj {S U : StarSubsemiring R} : S.toSubsemiring = U.toSubsemiring ↔ S = U :=
   toSubsemiring_injective.eq_iff
 
-theorem toSubsemiring_le_iff {S₁ S₂ : StarSubsemiring R} :
-    S₁.toSubsemiring ≤ S₂.toSubsemiring ↔ S₁ ≤ S₂ :=
-  Iff.rfl
-
 protected def copy (S : StarSubsemiring R) (s : Set R) (hs : s = ↑S) : StarSubsemiring R where
   toSubsemiring := Subsemiring.copy S.toSubsemiring s hs
   star_mem' := @fun a ha => hs ▸ (S.star_mem' (by simpa [hs] using ha) : star a ∈ (S : Set R))
-
-@[simp]
-theorem coe_copy (S : StarSubsemiring R) (s : Set R) (hs : s = ↑S) : (S.copy s hs : Set R) = s :=
-  rfl
 
 theorem copy_eq (S : StarSubsemiring R) (s : Set R) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs

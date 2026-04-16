@@ -7,6 +7,8 @@ import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
 import Mathlib.Topology.Compactness.Paracompact
 import Mathlib.Topology.Metrizable.Urysohn
 
+noncomputable section
+
 /-!
 # Metrizability of a σ-compact manifold
 

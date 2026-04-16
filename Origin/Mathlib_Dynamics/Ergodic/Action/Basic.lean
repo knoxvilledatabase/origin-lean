@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Group.AEStabilizer
 import Mathlib.Dynamics.Ergodic.Ergodic
 
+noncomputable section
+
 /-!
 # Ergodic group actions
 

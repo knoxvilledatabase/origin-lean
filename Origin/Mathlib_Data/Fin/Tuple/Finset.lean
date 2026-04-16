@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Prod
 import Mathlib.Data.Fintype.Pi
 
+noncomputable section
+
 /-!
 # Fin-indexed tuples of finsets
 -/

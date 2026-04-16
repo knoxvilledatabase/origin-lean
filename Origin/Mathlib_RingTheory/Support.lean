@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Support.lean
-Genuine: 17 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
+Genuine: 18 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.PrimeSpectrum
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.Algebra.Exact
 import Mathlib.Algebra.Module.LocalizedModule.Basic
+
+noncomputable section
 
 /-!
 
@@ -50,7 +52,11 @@ lemma Module.not_mem_support_iff' :
   rw [not_mem_support_iff, LocalizedModule.subsingleton_iff]
   rfl
 
--- DISSOLVED: Module.mem_support_iff'
+lemma Module.mem_support_iff' :
+    p ∈ Module.support R M ↔ ∃ m : M, ∀ r ∉ p.asIdeal, r • m ≠ 0 := by
+  rw [← @not_not (_ ∈ _), not_mem_support_iff']
+  push_neg
+  rfl
 
 lemma Module.mem_support_iff_exists_annihilator :
     p ∈ Module.support R M ↔ ∃ m : M, (R ∙ m).annihilator ≤ p.asIdeal := by

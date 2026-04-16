@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
 import Mathlib.MeasureTheory.Integral.MeanInequalities
 
+noncomputable section
+
 /-!
 # Compare Lp seminorms for different values of `p`
 

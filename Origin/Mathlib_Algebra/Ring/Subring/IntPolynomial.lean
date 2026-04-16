@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 
+noncomputable section
+
 /-!
 # Polynomials over subrings.
 
@@ -37,17 +39,11 @@ namespace Polynomial
 variable (P : K[X]) (hP : ∀ n : ℕ, P.coeff n ∈ R)
 
 @[simp]
-theorem int_coeff_eq  (n : ℕ) : ↑((P.int R hP).coeff n) = P.coeff n := rfl
-
-@[simp]
 theorem int_leadingCoeff_eq : ↑(P.int R hP).leadingCoeff = P.leadingCoeff := rfl
 
 @[simp]
 theorem int_monic_iff : (P.int R hP).Monic ↔ P.Monic := by
   rw [Monic, Monic, ← int_leadingCoeff_eq, OneMemClass.coe_eq_one]
-
-@[simp]
-theorem int_natDegree : (P.int R hP).natDegree = P.natDegree := rfl
 
 variable {L : Type*} [Field L] [Algebra K L]
 

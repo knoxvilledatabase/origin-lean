@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Analytic/Composition.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Basic
 import Mathlib.Combinatorics.Enumerative.Composition
+
+noncomputable section
 
 /-!
 # Composition of analytic functions
@@ -951,7 +953,6 @@ theorem length_sigmaCompositionAux (a : Composition n) (b : Composition a.length
     rw [getElem_map_rev List.length, getElem_of_eq (map_length_splitWrtComposition _ _)]; rfl
 
 set_option linter.deprecated false in
-
 theorem blocksFun_sigmaCompositionAux (a : Composition n) (b : Composition a.length)
     (i : Fin b.length) (j : Fin (blocksFun b i)) :
     blocksFun (sigmaCompositionAux a b ⟨i, (length_gather a b).symm ▸ i.2⟩)
@@ -961,6 +962,19 @@ theorem blocksFun_sigmaCompositionAux (a : Composition n) (b : Composition a.len
     rw [get_of_eq (get_splitWrtComposition _ _ _), get_drop', get_take']; rfl
 
 set_option linter.deprecated false in
+/-- Auxiliary lemma to prove that the composition of formal multilinear series is associative.
+
+Consider a composition `a` of `n` and a composition `b` of `a.length`. Grouping together some
+
+blocks of `a` according to `b` as in `a.gather b`, one can compute the total size of the blocks
+
+of `a` up to an index `sizeUpTo b i + j` (where the `j` corresponds to a set of blocks of `a`
+
+that do not fill a whole block of `a.gather b`). The first part corresponds to a sum of blocks
+
+in `a.gather b`, and the second one to a sum of blocks in the next block of
+
+`sigmaCompositionAux a b`. This is the content of this lemma. -/
 
 theorem sizeUpTo_sizeUpTo_add (a : Composition n) (b : Composition a.length) {i j : ℕ}
     (hi : i < b.length) (hj : j < blocksFun b ⟨i, hi⟩) :

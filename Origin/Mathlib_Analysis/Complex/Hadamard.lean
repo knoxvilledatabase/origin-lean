@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 import Mathlib.Analysis.Complex.PhragmenLindelof
 
+noncomputable section
+
 /-!
 # Hadamard three-lines Theorem
 

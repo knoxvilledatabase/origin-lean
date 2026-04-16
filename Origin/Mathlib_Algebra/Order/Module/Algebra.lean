@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Algebra.Order.Module.Defs
 
+noncomputable section
+
 /-!
 # Ordered algebras
 

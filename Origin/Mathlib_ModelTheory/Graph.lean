@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.ModelTheory.Satisfiability
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
+noncomputable section
+
 /-!
 # First-Order Structures in Graph Theory
 

@@ -10,6 +10,8 @@ import Mathlib.Order.Hom.CompleteLattice
 import Mathlib.Tactic.ApplyFun
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # The category of finite boolean algebras
 
@@ -47,10 +49,6 @@ attribute [instance] FinBoolAlg.isFintype
 
 def of (α : Type*) [BooleanAlgebra α] [Fintype α] : FinBoolAlg :=
   ⟨{α := α}⟩
-
-@[simp]
-theorem coe_of (α : Type*) [BooleanAlgebra α] [Fintype α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited FinBoolAlg :=
   ⟨of PUnit⟩
@@ -121,11 +119,6 @@ def dualEquiv : FinBoolAlg ≌ FinBoolAlg where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end FinBoolAlg
-
-theorem finBoolAlg_dual_comp_forget_to_finBddDistLat :
-    FinBoolAlg.dual ⋙ forget₂ FinBoolAlg FinBddDistLat =
-      forget₂ FinBoolAlg FinBddDistLat ⋙ FinBddDistLat.dual :=
-  rfl
 
 @[simps]
 def fintypeToFinBoolAlgOp : FintypeCat ⥤ FinBoolAlgᵒᵖ where

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.Iso
 
+noncomputable section
+
 /-!
 # Natural isomorphisms
 
@@ -66,17 +68,6 @@ end Iso
 namespace NatIso
 
 open CategoryTheory.Category CategoryTheory.Functor
-
-@[simp]
-theorem trans_app {F G H : C ⥤ D} (α : F ≅ G) (β : G ≅ H) (X : C) :
-    (α ≪≫ β).app X = α.app X ≪≫ β.app X :=
-  rfl
-
-theorem app_hom {F G : C ⥤ D} (α : F ≅ G) (X : C) : (α.app X).hom = α.hom.app X :=
-  rfl
-
-theorem app_inv {F G : C ⥤ D} (α : F ≅ G) (X : C) : (α.app X).inv = α.inv.app X :=
-  rfl
 
 variable {F G : C ⥤ D}
 
@@ -139,14 +130,8 @@ end
 
 variable {X Y : C}
 
-theorem naturality_1 (α : F ≅ G) (f : X ⟶ Y) : α.inv.app X ≫ F.map f ≫ α.hom.app Y = G.map f := by
-  simp
-
 theorem naturality_2 (α : F ≅ G) (f : X ⟶ Y) : α.hom.app X ≫ G.map f ≫ α.inv.app Y = F.map f := by
   simp
-
-theorem naturality_1' (α : F ⟶ G) (f : X ⟶ Y) {_ : IsIso (α.app X)} :
-    inv (α.app X) ≫ F.map f ≫ α.app Y = G.map f := by simp
 
 @[reassoc (attr := simp)]
 theorem naturality_2' (α : F ⟶ G) (f : X ⟶ Y) {_ : IsIso (α.app Y)} :

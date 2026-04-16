@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PrincipalIdealDomain.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 5 | Infrastructure: 13
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Field
@@ -8,6 +8,8 @@ import Mathlib.Algebra.GCDMonoid.Basic
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Ideal.Nonunits
 import Mathlib.RingTheory.Noetherian.UniqueFactorizationDomain
+
+noncomputable section
 
 /-!
 # Principal ideal rings, principal ideal domains, and Bézout rings
@@ -300,13 +302,25 @@ open scoped Classical
 noncomputable def factors (a : R) : Multiset R :=
   if h : a = 0 then ∅ else Classical.choose (WfDvdMonoid.exists_factors a h)
 
--- DISSOLVED: factors_spec
+theorem factors_spec (a : R) (h : a ≠ 0) :
+    (∀ b ∈ factors a, Irreducible b) ∧ Associated (factors a).prod a := by
+  unfold factors; rw [dif_neg h]
+  exact Classical.choose_spec (WfDvdMonoid.exists_factors a h)
 
--- DISSOLVED: ne_zero_of_mem_factors
+theorem ne_zero_of_mem_factors {R : Type v} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R]
+    {a b : R} (ha : a ≠ 0) (hb : b ∈ factors a) : b ≠ 0 :=
+  Irreducible.ne_zero ((factors_spec a ha).1 b hb)
 
--- DISSOLVED: mem_submonoid_of_factors_subset_of_units_subset
+theorem mem_submonoid_of_factors_subset_of_units_subset (s : Submonoid R) {a : R} (ha : a ≠ 0)
+    (hfac : ∀ b ∈ factors a, b ∈ s) (hunit : ∀ c : Rˣ, (c : R) ∈ s) : a ∈ s := by
+  rcases (factors_spec a ha).2 with ⟨c, hc⟩
+  rw [← hc]
+  exact mul_mem (multiset_prod_mem _ hfac) (hunit _)
 
--- DISSOLVED: ringHom_mem_submonoid_of_factors_subset_of_units_subset
+theorem ringHom_mem_submonoid_of_factors_subset_of_units_subset {R S : Type*} [CommRing R]
+    [IsDomain R] [IsPrincipalIdealRing R] [Semiring S] (f : R →+* S) (s : Submonoid S) (a : R)
+    (ha : a ≠ 0) (h : ∀ b ∈ factors a, f b ∈ s) (hf : ∀ c : Rˣ, f c ∈ s) : f a ∈ s :=
+  mem_submonoid_of_factors_subset_of_units_subset (s.comap f.toMonoidHom) ha h hf
 
 instance (priority := 100) to_uniqueFactorizationMonoid : UniqueFactorizationMonoid R :=
   { (IsNoetherianRing.wfDvdMonoid : WfDvdMonoid R) with
@@ -361,7 +375,9 @@ section Bezout
 
 variable [IsBezout R]
 
--- DISSOLVED: isCoprime_of_dvd
+theorem isCoprime_of_dvd (x y : R) (nonzero : ¬(x = 0 ∧ y = 0))
+    (H : ∀ z ∈ nonunits R, z ≠ 0 → z ∣ x → ¬z ∣ y) : IsCoprime x y :=
+  (isRelPrime_of_no_nonunits_factors nonzero H).isCoprime
 
 theorem dvd_or_coprime (x y : R) (h : Irreducible x) : x ∣ y ∨ IsCoprime x y :=
   h.dvd_or_isRelPrime.imp_right IsRelPrime.isCoprime

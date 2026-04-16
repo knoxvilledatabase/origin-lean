@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Data.Fintype.Sigma
 
+noncomputable section
+
 /-!
 # Darts in graphs
 
@@ -56,20 +58,12 @@ def Dart.edge (d : G.Dart) : Sym2 V :=
   Sym2.mk d.toProd
 
 @[simp]
-theorem Dart.edge_mk {p : V × V} (h : G.Adj p.1 p.2) : (Dart.mk p h).edge = Sym2.mk p :=
-  rfl
-
-@[simp]
 theorem Dart.edge_mem (d : G.Dart) : d.edge ∈ G.edgeSet :=
   d.adj
 
 @[simps]
 def Dart.symm (d : G.Dart) : G.Dart :=
   ⟨d.toProd.swap, G.symm d.adj⟩
-
-@[simp]
-theorem Dart.symm_mk {p : V × V} (h : G.Adj p.1 p.2) : (Dart.mk p h).symm = Dart.mk p.swap h.symm :=
-  rfl
 
 @[simp]
 theorem Dart.edge_symm (d : G.Dart) : d.symm.edge = d.edge :=

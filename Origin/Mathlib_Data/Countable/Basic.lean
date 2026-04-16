@@ -8,6 +8,8 @@ import Mathlib.Data.Fin.Tuple.Basic
 import Mathlib.Data.ENat.Defs
 import Mathlib.Logic.Equiv.Nat
 
+noncomputable section
+
 /-!
 # Countable types
 

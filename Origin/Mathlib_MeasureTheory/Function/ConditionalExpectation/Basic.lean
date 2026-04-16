@@ -5,6 +5,8 @@ Genuine: 31 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.CondexpL1
 
+noncomputable section
+
 /-! # Conditional expectation
 
 We build the conditional expectation of an integrable function `f` with value in a Banach space

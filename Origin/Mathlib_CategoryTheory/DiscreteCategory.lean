@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Pi.Basic
 import Mathlib.Data.ULift
 
+noncomputable section
+
 /-!
 # Discrete categories
 
@@ -42,10 +44,6 @@ structure Discrete (α : Type u₁) where
   with the only morphisms being equalities. -/
   as : α
 
-@[simp]
-theorem Discrete.mk_as {α : Type u₁} (X : Discrete α) : Discrete.mk X.as = X := by
-  rfl
-
 @[simps]
 def discreteEquiv {α : Type u₁} : Discrete α ≃ α where
   toFun := Discrete.as
@@ -80,7 +78,6 @@ instance instSubsingletonDiscreteHom (X Y : Discrete α) : Subsingleton (X ⟶ Y
   show Subsingleton (ULift (PLift _)) from inferInstance
 
 macro "discrete_cases" : tactic =>
-
   `(tactic| fail_if_no_progress casesm* Discrete _, (_ : Discrete _) ⟶ (_ : Discrete _), PLift _)
 
 open Lean Elab Tactic in
@@ -106,10 +103,6 @@ abbrev eqToHom' {a b : α} (h : a = b) : Discrete.mk a ⟶ Discrete.mk b :=
 abbrev eqToIso' {a b : α} (h : a = b) : Discrete.mk a ≅ Discrete.mk b :=
   Discrete.eqToIso h
 
-@[simp]
-theorem id_def (X : Discrete α) : ULift.up (PLift.up (Eq.refl X.as)) = 𝟙 X :=
-  rfl
-
 variable {C : Type u₂} [Category.{v₂} C]
 
 instance {I : Type u₁} {i j : Discrete I} (f : i ⟶ j) : IsIso f :=
@@ -124,11 +117,6 @@ def functor {I : Type u₁} (F : I → C) : Discrete I ⥤ C where
     dsimp
     rcases f with ⟨⟨h⟩⟩
     exact eqToHom (congrArg _ h)
-
-@[simp]
-theorem functor_obj {I : Type u₁} (F : I → C) (i : I) :
-    (Discrete.functor F).obj (Discrete.mk i) = F i :=
-  rfl
 
 @[simp]
 theorem functor_map {I : Type u₁} (F : I → C) {i : Discrete I} (f : i ⟶ i) :
@@ -227,23 +215,6 @@ theorem functor_map_id (F : Discrete J ⥤ C) {j : Discrete J} (f : j ⟶ j) :
   simp
 
 end Discrete
-
-@[simps]
-def piEquivalenceFunctorDiscrete (J : Type u₂) (C : Type u₁) [Category.{v₁} C] :
-    (J → C) ≌ (Discrete J ⥤ C) where
-  functor :=
-    { obj := fun F => Discrete.functor F
-      map := fun f => Discrete.natTrans (fun j => f j.as) }
-  inverse :=
-    { obj := fun F j => F.obj ⟨j⟩
-      map := fun f j => f.app ⟨j⟩ }
-  unitIso := Iso.refl _
-  counitIso := NatIso.ofComponents (fun F => (NatIso.ofComponents (fun _ => Iso.refl _)
-    (by
-      rintro ⟨x⟩ ⟨y⟩ f
-      obtain rfl : x = y := Discrete.eq_of_hom f
-      obtain rfl : f = 𝟙 _ := rfl
-      simp))) (by aesop_cat)
 
 class IsDiscrete (C : Type*) [Category C] : Prop where
   subsingleton (X Y : C) : Subsingleton (X ⟶ Y) := by infer_instance

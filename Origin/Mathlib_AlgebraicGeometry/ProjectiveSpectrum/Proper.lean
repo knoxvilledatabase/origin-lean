@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Separated
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic
 
+noncomputable section
+
 /-!
 # Properness of `Proj A`
 

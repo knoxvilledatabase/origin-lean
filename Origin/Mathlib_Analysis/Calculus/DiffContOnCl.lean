@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Calculus/DiffContOnCl.lean
-Genuine: 20 | Conflates: 2 | Dissolved: 1 | Infrastructure: 2
+Genuine: 21 | Conflates: 2 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Real
 import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.Calculus.FDeriv.Mul
+
+noncomputable section
 
 /-!
 # Functions differentiable on a domain and continuous on its closure
@@ -109,7 +111,9 @@ theorem smul_const {𝕜' : Type*} [NontriviallyNormedField 𝕜'] [NormedAlgebr
     (y : F) : DiffContOnCl 𝕜 (fun x => c x • y) s :=
   hc.smul diffContOnCl_const
 
--- DISSOLVED: inv
+theorem inv {f : E → 𝕜} (hf : DiffContOnCl 𝕜 f s) (h₀ : ∀ x ∈ closure s, f x ≠ 0) :
+    DiffContOnCl 𝕜 f⁻¹ s :=
+  ⟨differentiableOn_inv.comp hf.1 fun _ hx => h₀ _ (subset_closure hx), hf.2.inv₀ h₀⟩
 
 end DiffContOnCl
 

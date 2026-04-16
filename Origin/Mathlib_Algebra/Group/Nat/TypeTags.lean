@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Algebra.Group.TypeTags.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about `Multiplicative ℕ`
 -/

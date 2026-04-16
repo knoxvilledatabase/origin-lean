@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SimpleGraph.Regularity.Uniform
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # Triangle counting lemma
 

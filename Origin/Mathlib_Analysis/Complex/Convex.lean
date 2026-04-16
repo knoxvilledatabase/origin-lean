@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Topology
 import Mathlib.Analysis.Complex.ReImTopology
 
+noncomputable section
+
 /-!
 # Theorems about convexity on the complex plane
 

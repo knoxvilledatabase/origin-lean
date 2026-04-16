@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.ConstMulAction
 import Mathlib.Topology.Maps.Proper.Basic
 
+noncomputable section
+
 /-!
 # Actions by proper maps
 

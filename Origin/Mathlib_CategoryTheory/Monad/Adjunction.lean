@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Reflective
 import Mathlib.CategoryTheory.Monad.Algebra
 
+noncomputable section
+
 /-!
 # Adjunctions and (co)monads
 
@@ -133,9 +135,6 @@ def Monad.comparisonForget (h : L ⊣ R) : Monad.comparison h ⋙ h.toMonad.forg
   hom := { app := fun _ => 𝟙 _ }
   inv := { app := fun _ => 𝟙 _ }
 
-theorem Monad.left_comparison (h : L ⊣ R) : L ⋙ Monad.comparison h = h.toMonad.free :=
-  rfl
-
 instance [R.Faithful] (h : L ⊣ R) : (Monad.comparison h).Faithful where
   map_injective {_ _} _ _ w := R.map_injective (congr_arg Monad.Algebra.Hom.f w : _)
 
@@ -170,9 +169,6 @@ def Comonad.comparisonForget {L : C ⥤ D} {R : D ⥤ C} (h : L ⊣ R) :
     Comonad.comparison h ⋙ h.toComonad.forget ≅ L where
   hom := { app := fun _ => 𝟙 _ }
   inv := { app := fun _ => 𝟙 _ }
-
-theorem Comonad.left_comparison (h : L ⊣ R) : R ⋙ Comonad.comparison h = h.toComonad.cofree :=
-  rfl
 
 instance Comonad.comparison_faithful_of_faithful [L.Faithful] (h : L ⊣ R) :
     (Comonad.comparison h).Faithful where

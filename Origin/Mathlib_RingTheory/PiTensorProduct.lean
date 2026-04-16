@@ -8,6 +8,8 @@ import Mathlib.Algebra.Algebra.Bilinear
 import Mathlib.Algebra.Algebra.Equiv
 import Mathlib.Data.Finset.NoncommProd
 
+noncomputable section
+
 /-!
 # Tensor product of `R`-algebras and rings
 
@@ -45,6 +47,11 @@ variable [CommSemiring R] [∀ i, NonUnitalNonAssocSemiring (A i)]
 variable [∀ i, Module R (A i)] [∀ i, SMulCommClass R (A i) (A i)] [∀ i, IsScalarTower R (A i) (A i)]
 
 attribute [aesop safe] mul_add mul_smul_comm smul_mul_assoc add_mul in
+/--
+
+The multiplication in tensor product of rings is induced by `(xᵢ) * (yᵢ) = (xᵢ * yᵢ)`
+
+-/
 
 def mul : (⨂[R] i, A i) →ₗ[R] (⨂[R] i, A i) →ₗ[R] (⨂[R] i, A i) :=
   PiTensorProduct.piTensorHomMap₂ <| tprod R fun _ ↦ LinearMap.mul _ _
@@ -282,10 +289,6 @@ variable {R ι}
 theorem constantBaseRingEquiv_tprod (x : ι → R) :
     constantBaseRingEquiv ι R (tprod R x) = ∏ i, x i := by
   simp [constantBaseRingEquiv]
-
-@[simp]
-theorem constantBaseRingEquiv_symm (r : R) :
-    (constantBaseRingEquiv ι R).symm r = algebraMap _ _ r := rfl
 
 end
 

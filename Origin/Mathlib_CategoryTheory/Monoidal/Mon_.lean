@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Monoidal.CoherenceLemmas
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 import Mathlib.Algebra.PUnitInstances.Algebra
 
+noncomputable section
+
 /-!
 # The category of monoids in a monoidal category.
 
@@ -40,6 +42,14 @@ class Mon_Class (X : C) where
   mul_assoc' : (mul ▷ X) ≫ mul = (α_ X X X).hom ≫ (X ◁ mul) ≫ mul := by aesop_cat
 
 namespace Mon_Class
+
+@[inherit_doc] scoped notation "μ" => Mon_Class.mul
+
+@[inherit_doc] scoped notation "μ["M"]" => Mon_Class.mul (X := M)
+
+@[inherit_doc] scoped notation "η" => Mon_Class.one
+
+@[inherit_doc] scoped notation "η["M"]" => Mon_Class.one (X := M)
 
 attribute [reassoc] one_mul' mul_one' mul_assoc'
 
@@ -126,9 +136,6 @@ theorem one_mul_hom {Z : C} (f : Z ⟶ M.X) : (M.one ⊗ f) ≫ M.mul = (λ_ Z).
 theorem mul_one_hom {Z : C} (f : Z ⟶ M.X) : (f ⊗ M.one) ≫ M.mul = (ρ_ Z).hom ≫ f := by
   rw [tensorHom_def_assoc, M.mul_one, rightUnitor_naturality]
 
-theorem mul_assoc_flip :
-    (M.X ◁ M.mul) ≫ M.mul = (α_ M.X M.X M.X).inv ≫ (M.mul ▷ M.X) ≫ M.mul := by simp
-
 @[ext]
 structure Hom (M N : Mon_ C) where
   hom : M.X ⟶ N.X
@@ -156,15 +163,6 @@ instance : Category (Mon_ C) where
 @[ext]
 lemma ext {X Y : Mon_ C} {f g : X ⟶ Y} (w : f.hom = g.hom) : f = g :=
   Hom.ext w
-
-@[simp]
-theorem id_hom' (M : Mon_ C) : (𝟙 M : Hom M M).hom = 𝟙 M.X :=
-  rfl
-
-@[simp]
-theorem comp_hom' {M N K : Mon_ C} (f : M ⟶ N) (g : N ⟶ K) :
-    (f ≫ g : Hom M K).hom = f.hom ≫ g.hom :=
-  rfl
 
 section
 
@@ -274,14 +272,6 @@ instance (A : Mon_ C) : (monToLaxMonoidalObj A).LaxMonoidal where
   ε' := A.one
   μ' := fun _ _ => A.mul
 
-@[simp]
-lemma monToLaxMonoidalObj_ε (A : Mon_ C) :
-    ε (monToLaxMonoidalObj A) = A.one := rfl
-
-@[simp]
-lemma monToLaxMonoidalObj_μ (A : Mon_ C) (X Y) :
-    «μ» (monToLaxMonoidalObj A) X Y = A.mul := rfl
-
 variable (C)
 
 @[simps]
@@ -295,6 +285,7 @@ attribute [local aesop safe tactic (rule_sets := [CategoryTheory])]
   CategoryTheory.Discrete.discreteCases
 
 set_option maxHeartbeats 400000 in
+/-- Implementation of `Mon_.equivLaxMonoidalFunctorPUnit`. -/
 
 @[simps!]
 def unitIso :
@@ -487,22 +478,6 @@ instance monMonoidalStruct : MonoidalCategoryStruct (Mon_ C) :=
     rightUnitor := fun M ↦ mkIso (ρ_ M.X) one_rightUnitor mul_rightUnitor }
 
 @[simp]
-theorem tensorUnit_X : (𝟙_ (Mon_ C)).X = 𝟙_ C := rfl
-
-@[simp]
-theorem tensorUnit_one : (𝟙_ (Mon_ C)).one = 𝟙 (𝟙_ C) := rfl
-
-@[simp]
-theorem tensorUnit_mul : (𝟙_ (Mon_ C)).mul = (λ_ (𝟙_ C)).hom := rfl
-
-@[simp]
-theorem tensorObj_one (X Y : Mon_ C) : (X ⊗ Y).one = (λ_ (𝟙_ C)).inv ≫ (X.one ⊗ Y.one) := rfl
-
-@[simp]
-theorem tensorObj_mul (X Y : Mon_ C) :
-    (X ⊗ Y).mul = tensorμ X.X Y.X X.X Y.X ≫ (X.mul ⊗ Y.mul) := rfl
-
-@[simp]
 theorem whiskerLeft_hom {X Y : Mon_ C} (f : X ⟶ Y) (Z : Mon_ C) :
     (f ▷ Z).hom = f.hom ▷ Z.X := by
   rw [← tensorHom_id]; rfl
@@ -513,29 +488,7 @@ theorem whiskerRight_hom (X : Mon_ C) {Y Z : Mon_ C} (f : Y ⟶ Z) :
   rw [← id_tensorHom]; rfl
 
 @[simp]
-theorem leftUnitor_hom_hom (X : Mon_ C) : (λ_ X).hom.hom = (λ_ X.X).hom := rfl
-
-@[simp]
-theorem leftUnitor_inv_hom (X : Mon_ C) : (λ_ X).inv.hom = (λ_ X.X).inv := rfl
-
-@[simp]
-theorem rightUnitor_hom_hom (X : Mon_ C) : (ρ_ X).hom.hom = (ρ_ X.X).hom := rfl
-
-@[simp]
-theorem rightUnitor_inv_hom (X : Mon_ C) : (ρ_ X).inv.hom = (ρ_ X.X).inv := rfl
-
-@[simp]
-theorem associator_hom_hom (X Y Z : Mon_ C) : (α_ X Y Z).hom.hom = (α_ X.X Y.X Z.X).hom := rfl
-
-@[simp]
-theorem associator_inv_hom (X Y Z : Mon_ C) : (α_ X Y Z).inv.hom = (α_ X.X Y.X Z.X).inv := rfl
-
-@[simp]
 theorem tensor_one (M N : Mon_ C) : (M ⊗ N).one = (λ_ (𝟙_ C)).inv ≫ (M.one ⊗ N.one) := rfl
-
-@[simp]
-theorem tensor_mul (M N : Mon_ C) : (M ⊗ N).mul =
-    tensorμ M.X N.X M.X N.X ≫ (M.mul ⊗ N.mul) := rfl
 
 instance monMonoidal : MonoidalCategory (Mon_ C) where
   tensorHom_def := by intros; ext; simp [tensorHom_def]
@@ -550,14 +503,6 @@ instance : (forget C).Monoidal :=
   Functor.CoreMonoidal.toMonoidal
     { εIso := Iso.refl _
       μIso := fun _ _ ↦ Iso.refl _ }
-
-@[simp] theorem forget_ε : ε (forget C) = 𝟙 (𝟙_ C) := rfl
-
-@[simp] theorem forget_η : «η» (forget C) = 𝟙 (𝟙_ C) := rfl
-
-@[simp] theorem forget_μ (X Y : Mon_ C) : «μ» (forget C) X Y = 𝟙 (X.X ⊗ Y.X) := rfl
-
-@[simp] theorem forget_δ (X Y : Mon_ C) : δ (forget C) X Y = 𝟙 (X.X ⊗ Y.X) := rfl
 
 variable {C}
 

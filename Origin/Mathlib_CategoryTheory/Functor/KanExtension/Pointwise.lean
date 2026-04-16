@@ -5,6 +5,8 @@ Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.KanExtension.Basic
 
+noncomputable section
+
 /-!
 # Pointwise Kan extensions
 

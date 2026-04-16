@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
 import Mathlib.LinearAlgebra.Matrix.Reindex
 import Mathlib.RingTheory.Polynomial.Nilpotent
 
+noncomputable section
+
 /-!
 # Characteristic polynomials
 

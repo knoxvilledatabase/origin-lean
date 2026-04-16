@@ -8,6 +8,8 @@ import Mathlib.RingTheory.MvPolynomial.FreeCommRing
 import Mathlib.RingTheory.Nullstellensatz
 import Mathlib.ModelTheory.Algebra.Ring.FreeCommRing
 
+noncomputable section
+
 /-!
 
 # Definable Subsets in the language of rings

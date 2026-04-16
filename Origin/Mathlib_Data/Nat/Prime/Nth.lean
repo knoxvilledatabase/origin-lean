@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.Nat.Nth
 
+noncomputable section
+
 /-!
 # The Nth primes
 -/

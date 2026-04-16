@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Star.Basic
 import Mathlib.Algebra.FreeAlgebra
 
+noncomputable section
+
 /-!
 # A *-algebra structure on the free algebra.
 
@@ -24,14 +26,6 @@ instance : StarMul (FreeMonoid α) where
   star := List.reverse
   star_involutive := List.reverse_reverse
   star_mul := List.reverse_append
-
-@[simp]
-theorem star_of (x : α) : star (of x) = of x :=
-  rfl
-
-@[simp]
-theorem star_one : star (1 : FreeMonoid α) = 1 :=
-  rfl
 
 end FreeMonoid
 

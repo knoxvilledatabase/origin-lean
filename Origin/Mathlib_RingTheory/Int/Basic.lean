@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Int/Basic.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.EuclideanDomain.Int
 import Mathlib.Algebra.GCDMonoid.Nat
 import Mathlib.Data.Nat.Prime.Int
 import Mathlib.RingTheory.PrincipalIdealDomain
+
+noncomputable section
 
 /-!
 # Divisibility over ℕ and ℤ
@@ -47,7 +49,9 @@ theorem gcd_eq_one_iff_coprime {a b : ℤ} : Int.gcd a b = 1 ↔ IsCoprime a b :
 theorem coprime_iff_nat_coprime {a b : ℤ} : IsCoprime a b ↔ Nat.Coprime a.natAbs b.natAbs := by
   rw [← gcd_eq_one_iff_coprime, Nat.coprime_iff_gcd_eq_one, gcd_eq_natAbs]
 
--- DISSOLVED: gcd_ne_one_iff_gcd_mul_right_ne_one
+theorem gcd_ne_one_iff_gcd_mul_right_ne_one {a : ℤ} {m n : ℕ} :
+    a.gcd (m * n) ≠ 1 ↔ a.gcd m ≠ 1 ∨ a.gcd n ≠ 1 := by
+  simp only [gcd_eq_one_iff_coprime, ← not_and_or, not_iff_not, IsCoprime.mul_right_iff]
 
 theorem sq_of_gcd_eq_one {a b c : ℤ} (h : Int.gcd a b = 1) (heq : a * b = c ^ 2) :
     ∃ a0 : ℤ, a = a0 ^ 2 ∨ a = -a0 ^ 2 := by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 # Urysohn's lemma for bounded continuous functions
 

@@ -5,6 +5,8 @@ Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 import Origin.Core
 import Mathlib.CategoryTheory.NatIso
 
+noncomputable section
+
 /-!
 # Bicategories
 
@@ -283,14 +285,6 @@ theorem associator_naturality_left {f f' : a ⟶ b} (η : f ⟶ f') (g : b ⟶ c
     η ▷ g ▷ h ≫ (α_ f' g h).hom = (α_ f g h).hom ≫ η ▷ (g ≫ h) := by simp
 
 @[reassoc]
-theorem associator_inv_naturality_left {f f' : a ⟶ b} (η : f ⟶ f') (g : b ⟶ c) (h : c ⟶ d) :
-    η ▷ (g ≫ h) ≫ (α_ f' g h).inv = (α_ f g h).inv ≫ η ▷ g ▷ h := by simp
-
-@[reassoc]
-theorem whiskerRight_comp_symm {f f' : a ⟶ b} (η : f ⟶ f') (g : b ⟶ c) (h : c ⟶ d) :
-    η ▷ g ▷ h = (α_ f g h).hom ≫ η ▷ (g ≫ h) ≫ (α_ f' g h).inv := by simp
-
-@[reassoc]
 theorem associator_naturality_middle (f : a ⟶ b) {g g' : b ⟶ c} (η : g ⟶ g') (h : c ⟶ d) :
     (f ◁ η) ▷ h ≫ (α_ f g' h).hom = (α_ f g h).hom ≫ f ◁ η ▷ h := by simp
 
@@ -299,43 +293,12 @@ theorem associator_inv_naturality_middle (f : a ⟶ b) {g g' : b ⟶ c} (η : g 
     f ◁ η ▷ h ≫ (α_ f g' h).inv = (α_ f g h).inv ≫ (f ◁ η) ▷ h := by simp
 
 @[reassoc]
-theorem whisker_assoc_symm (f : a ⟶ b) {g g' : b ⟶ c} (η : g ⟶ g') (h : c ⟶ d) :
-    f ◁ η ▷ h = (α_ f g h).inv ≫ (f ◁ η) ▷ h ≫ (α_ f g' h).hom := by simp
-
-@[reassoc]
-theorem associator_naturality_right (f : a ⟶ b) (g : b ⟶ c) {h h' : c ⟶ d} (η : h ⟶ h') :
-    (f ≫ g) ◁ η ≫ (α_ f g h').hom = (α_ f g h).hom ≫ f ◁ g ◁ η := by simp
-
-@[reassoc]
 theorem associator_inv_naturality_right (f : a ⟶ b) (g : b ⟶ c) {h h' : c ⟶ d} (η : h ⟶ h') :
     f ◁ g ◁ η ≫ (α_ f g h').inv = (α_ f g h).inv ≫ (f ≫ g) ◁ η := by simp
 
 @[reassoc]
-theorem comp_whiskerLeft_symm (f : a ⟶ b) (g : b ⟶ c) {h h' : c ⟶ d} (η : h ⟶ h') :
-    f ◁ g ◁ η = (α_ f g h).inv ≫ (f ≫ g) ◁ η ≫ (α_ f g h').hom := by simp
-
-@[reassoc]
-theorem leftUnitor_naturality {f g : a ⟶ b} (η : f ⟶ g) :
-    𝟙 a ◁ η ≫ (λ_ g).hom = (λ_ f).hom ≫ η := by
-  simp
-
-@[reassoc]
-theorem leftUnitor_inv_naturality {f g : a ⟶ b} (η : f ⟶ g) :
-    η ≫ (λ_ g).inv = (λ_ f).inv ≫ 𝟙 a ◁ η := by simp
-
-theorem id_whiskerLeft_symm {f g : a ⟶ b} (η : f ⟶ g) : η = (λ_ f).inv ≫ 𝟙 a ◁ η ≫ (λ_ g).hom := by
-  simp
-
-@[reassoc]
 theorem rightUnitor_naturality {f g : a ⟶ b} (η : f ⟶ g) :
     η ▷ 𝟙 b ≫ (ρ_ g).hom = (ρ_ f).hom ≫ η := by simp
-
-@[reassoc]
-theorem rightUnitor_inv_naturality {f g : a ⟶ b} (η : f ⟶ g) :
-    η ≫ (ρ_ g).inv = (ρ_ f).inv ≫ η ▷ 𝟙 b := by simp
-
-theorem whiskerRight_id_symm {f g : a ⟶ b} (η : f ⟶ g) : η = (ρ_ f).inv ≫ η ▷ 𝟙 b ≫ (ρ_ g).hom := by
-  simp
 
 theorem whiskerLeft_iff {f g : a ⟶ b} (η θ : f ⟶ g) : 𝟙 a ◁ η = 𝟙 a ◁ θ ↔ η = θ := by simp
 
@@ -367,20 +330,8 @@ theorem whiskerLeft_rightUnitor_inv (f : a ⟶ b) (g : b ⟶ c) :
   eq_of_inv_eq_inv (by simp)
 
 @[reassoc]
-theorem leftUnitor_comp (f : a ⟶ b) (g : b ⟶ c) :
-    (λ_ (f ≫ g)).hom = (α_ (𝟙 a) f g).inv ≫ (λ_ f).hom ▷ g := by simp
-
-@[reassoc]
-theorem leftUnitor_comp_inv (f : a ⟶ b) (g : b ⟶ c) :
-    (λ_ (f ≫ g)).inv = (λ_ f).inv ▷ g ≫ (α_ (𝟙 a) f g).hom := by simp
-
-@[reassoc]
 theorem rightUnitor_comp (f : a ⟶ b) (g : b ⟶ c) :
     (ρ_ (f ≫ g)).hom = (α_ f g (𝟙 c)).hom ≫ f ◁ (ρ_ g).hom := by simp
-
-@[reassoc]
-theorem rightUnitor_comp_inv (f : a ⟶ b) (g : b ⟶ c) :
-    (ρ_ (f ≫ g)).inv = f ◁ (ρ_ g).inv ≫ (α_ f g (𝟙 c)).inv := by simp
 
 @[simp]
 theorem unitors_equal : (λ_ (𝟙 a)).hom = (ρ_ (𝟙 a)).hom := by

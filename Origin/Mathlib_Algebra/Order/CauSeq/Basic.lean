@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/CauSeq/Basic.lean
-Genuine: 90 | Conflates: 0 | Dissolved: 1 | Infrastructure: 60
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 61
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Pi
@@ -11,6 +11,8 @@ import Mathlib.Algebra.Ring.Pi
 import Mathlib.Data.Setoid.Basic
 import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.Tactic.GCongr
+
+noncomputable section
 
 /-!
 # Cauchy sequences
@@ -185,10 +187,6 @@ instance : Add (CauSeq β abv) :=
 theorem coe_add (f g : CauSeq β abv) : ⇑(f + g) = (f : ℕ → β) + g :=
   rfl
 
-@[simp, norm_cast]
-theorem add_apply (f g : CauSeq β abv) (i : ℕ) : (f + g) i = f i + g i :=
-  rfl
-
 variable (abv)
 
 def const (x : β) : CauSeq β abv := ⟨fun _ ↦ x, IsCauSeq.const _⟩
@@ -196,10 +194,6 @@ def const (x : β) : CauSeq β abv := ⟨fun _ ↦ x, IsCauSeq.const _⟩
 variable {abv}
 
 local notation "const" => const abv
-
-@[simp, norm_cast]
-theorem coe_const (x : β) : (const x : ℕ → β) = Function.const ℕ x :=
-  rfl
 
 @[simp, norm_cast]
 theorem const_apply (x : β) (i : ℕ) : (const x : ℕ → β) i = x :=
@@ -217,44 +211,10 @@ instance : One (CauSeq β abv) :=
 instance : Inhabited (CauSeq β abv) :=
   ⟨0⟩
 
-@[simp, norm_cast]
-theorem coe_zero : ⇑(0 : CauSeq β abv) = 0 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_one : ⇑(1 : CauSeq β abv) = 1 :=
-  rfl
-
-@[simp, norm_cast]
-theorem zero_apply (i) : (0 : CauSeq β abv) i = 0 :=
-  rfl
-
-@[simp, norm_cast]
-theorem one_apply (i) : (1 : CauSeq β abv) i = 1 :=
-  rfl
-
-@[simp]
-theorem const_zero : const 0 = 0 :=
-  rfl
-
-@[simp]
-theorem const_one : const 1 = 1 :=
-  rfl
-
-theorem const_add (x y : β) : const (x + y) = const x + const y :=
-  rfl
-
 instance : Mul (CauSeq β abv) := ⟨fun f g ↦ ⟨f * g, f.2.mul g.2⟩⟩
 
 @[simp, norm_cast]
 theorem coe_mul (f g : CauSeq β abv) : ⇑(f * g) = (f : ℕ → β) * g :=
-  rfl
-
-@[simp, norm_cast]
-theorem mul_apply (f g : CauSeq β abv) (i : ℕ) : (f * g) i = f i * g i :=
-  rfl
-
-theorem const_mul (x y : β) : const (x * y) = const x * const y :=
   rfl
 
 instance : Neg (CauSeq β abv) := ⟨fun f ↦ ⟨-f, f.2.neg⟩⟩
@@ -295,10 +255,6 @@ instance : SMul G (CauSeq β abv) :=
 theorem coe_smul (a : G) (f : CauSeq β abv) : ⇑(a • f) = a • (f : ℕ → β) :=
   rfl
 
-@[simp, norm_cast]
-theorem smul_apply (a : G) (f : CauSeq β abv) (i : ℕ) : (a • f) i = a • f i :=
-  rfl
-
 theorem const_smul (a : G) (x : β) : const (a • x) = a • const x :=
   rfl
 
@@ -329,13 +285,6 @@ instance : Pow (CauSeq β abv) ℕ :=
 
 @[simp, norm_cast]
 theorem coe_pow (f : CauSeq β abv) (n : ℕ) : ⇑(f ^ n) = (f : ℕ → β) ^ n :=
-  rfl
-
-@[simp, norm_cast]
-theorem pow_apply (f : CauSeq β abv) (n i : ℕ) : (f ^ n) i = f i ^ n :=
-  rfl
-
-theorem const_pow (x : β) (n : ℕ) : const (x ^ n) = const x ^ n :=
   rfl
 
 instance ring : Ring (CauSeq β abv) :=
@@ -533,14 +482,6 @@ theorem inv_aux {f : CauSeq β abv} (hf : ¬LimZero f) :
 def inv (f : CauSeq β abv) (hf : ¬LimZero f) : CauSeq β abv :=
   ⟨_, inv_aux hf⟩
 
-@[simp, norm_cast]
-theorem coe_inv {f : CauSeq β abv} (hf) : ⇑(inv f hf) = (f : ℕ → β)⁻¹ :=
-  rfl
-
-@[simp, norm_cast]
-theorem inv_apply {f : CauSeq β abv} (hf i) : inv f hf i = (f i)⁻¹ :=
-  rfl
-
 theorem inv_mul_cancel {f : CauSeq β abv} (hf) : inv f hf * f ≈ 1 := fun ε ε0 =>
   let ⟨K, K0, i, H⟩ := abv_pos_of_not_limZero hf
   ⟨i, fun j ij => by simpa [(abv_pos abv).1 (lt_of_lt_of_le K0 (H _ ij)), abv_zero abv] using ε0⟩
@@ -548,8 +489,6 @@ theorem inv_mul_cancel {f : CauSeq β abv} (hf) : inv f hf * f ≈ 1 := fun ε �
 theorem mul_inv_cancel {f : CauSeq β abv} (hf) : f * inv f hf ≈ 1 := fun ε ε0 =>
   let ⟨K, K0, i, H⟩ := abv_pos_of_not_limZero hf
   ⟨i, fun j ij => by simpa [(abv_pos abv).1 (lt_of_lt_of_le K0 (H _ ij)), abv_zero abv] using ε0⟩
-
--- DISSOLVED: const_inv
 
 end DivisionRing
 
@@ -707,14 +646,6 @@ instance : Min (CauSeq α abs) :=
       (exists_forall_ge_and (f.cauchy₃ ε0) (g.cauchy₃ ε0)).imp fun _ H _ ij =>
         let ⟨H₁, H₂⟩ := H _ le_rfl
         rat_inf_continuous_lemma (H₁ _ ij) (H₂ _ ij)⟩⟩
-
-@[simp, norm_cast]
-theorem coe_sup (f g : CauSeq α abs) : ⇑(f ⊔ g) = (f : ℕ → α) ⊔ g :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inf (f g : CauSeq α abs) : ⇑(f ⊓ g) = (f : ℕ → α) ⊓ g :=
-  rfl
 
 theorem sup_limZero {f g : CauSeq α abs} (hf : LimZero f) (hg : LimZero g) : LimZero (f ⊔ g)
   | ε, ε0 =>

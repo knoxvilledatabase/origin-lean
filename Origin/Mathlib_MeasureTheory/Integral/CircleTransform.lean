@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 
+noncomputable section
+
 /-!
 # Circle integral transform
 

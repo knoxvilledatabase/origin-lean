@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 
+noncomputable section
+
 /-!
 # Projective objects and categories with enough projectives
 

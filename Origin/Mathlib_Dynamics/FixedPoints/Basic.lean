@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Function
 import Mathlib.Logic.Function.Iterate
 import Mathlib.GroupTheory.Perm.Basic
 
+noncomputable section
+
 /-!
 # Fixed points of a self-map
 
@@ -103,13 +105,6 @@ def fixedPoints (f : α → α) : Set α :=
 instance fixedPoints.decidable [DecidableEq α] (f : α → α) (x : α) :
     Decidable (x ∈ fixedPoints f) :=
   IsFixedPt.decidable
-
-@[simp]
-theorem mem_fixedPoints : x ∈ fixedPoints f ↔ IsFixedPt f x :=
-  Iff.rfl
-
-theorem mem_fixedPoints_iff {α : Type*} {f : α → α} {x : α} : x ∈ fixedPoints f ↔ f x = x := by
-  rfl
 
 @[simp]
 theorem fixedPoints_id : fixedPoints (@id α) = Set.univ :=

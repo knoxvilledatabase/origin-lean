@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Localization.Away.Basic
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.RingTheory.MvPolynomial.Basic
 
+noncomputable section
+
 /-!
 
 # Localization and multivariate polynomial rings
@@ -129,22 +131,5 @@ private lemma auxInv_auxHom : (auxInv S r).comp (auxHom (S := S) r).toRingHom = 
     rw [← map_one (Ideal.Quotient.mk _), ← map_mul, Ideal.Quotient.mk_eq_mk_iff_sub_mem,
       ← Ideal.neg_mem_iff, neg_sub]
     exact Ideal.mem_span_singleton_self (C r * X x - 1)
-
-noncomputable def mvPolynomialQuotientEquiv :
-    ((MvPolynomial Unit R) ⧸ Ideal.span { C r * X () - 1 }) ≃ₐ[R] S where
-  toFun := auxHom S r
-  invFun := auxInv S r
-  left_inv x := by
-    simpa using congrFun (congrArg DFunLike.coe <| auxInv_auxHom S r) x
-  right_inv s := by
-    simpa using congrFun (congrArg DFunLike.coe <| auxHom_auxInv S r) s
-  map_mul' := by simp
-  map_add' := by simp
-  commutes' := by simp
-
-@[simp]
-lemma mvPolynomialQuotientEquiv_apply (p : MvPolynomial Unit R) :
-    mvPolynomialQuotientEquiv S r (Ideal.Quotient.mk _ p) = aeval (S₁ := S) (fun _ ↦ invSelf r) p :=
-  rfl
 
 end IsLocalization.Away

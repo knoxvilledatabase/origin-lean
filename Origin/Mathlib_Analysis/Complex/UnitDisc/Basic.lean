@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Complex/UnitDisc/Basic.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 3 | Infrastructure: 31
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Circle
 import Mathlib.Analysis.NormedSpace.BallAction
+
+noncomputable section
 
 /-!
 # Poincaré disc
@@ -24,6 +26,8 @@ namespace Complex
 def UnitDisc : Type :=
   ball (0 : ℂ) 1 deriving TopologicalSpace
 
+@[inherit_doc] scoped[UnitDisc] notation "𝔻" => Complex.UnitDisc
+
 open UnitDisc
 
 namespace UnitDisc
@@ -40,39 +44,30 @@ theorem coe_injective : Injective ((↑) : 𝔻 → ℂ) :=
 theorem abs_lt_one (z : 𝔻) : abs (z : ℂ) < 1 :=
   mem_ball_zero_iff.1 z.2
 
--- DISSOLVED: abs_ne_one
+theorem abs_ne_one (z : 𝔻) : abs (z : ℂ) ≠ 1 :=
+  z.abs_lt_one.ne
 
 theorem normSq_lt_one (z : 𝔻) : normSq z < 1 := by
   convert (Real.sqrt_lt' one_pos).1 z.abs_lt_one
   exact (one_pow 2).symm
 
--- DISSOLVED: coe_ne_one
+theorem coe_ne_one (z : 𝔻) : (z : ℂ) ≠ 1 :=
+  ne_of_apply_ne abs <| (map_one abs).symm ▸ z.abs_ne_one
 
 theorem coe_ne_neg_one (z : 𝔻) : (z : ℂ) ≠ -1 :=
   ne_of_apply_ne abs <| by
     rw [abs.map_neg, map_one]
     exact z.abs_ne_one
 
--- DISSOLVED: one_add_coe_ne_zero
-
-@[simp, norm_cast]
-theorem coe_mul (z w : 𝔻) : ↑(z * w) = (z * w : ℂ) :=
-  rfl
+theorem one_add_coe_ne_zero (z : 𝔻) : (1 + z : ℂ) ≠ 0 :=
+  mt neg_eq_iff_add_eq_zero.2 z.coe_ne_neg_one.symm
 
 def mk (z : ℂ) (hz : abs z < 1) : 𝔻 :=
   ⟨z, mem_ball_zero_iff.2 hz⟩
 
 @[simp]
-theorem coe_mk (z : ℂ) (hz : abs z < 1) : (mk z hz : ℂ) = z :=
-  rfl
-
-@[simp]
 theorem mk_coe (z : 𝔻) (hz : abs (z : ℂ) < 1 := z.abs_lt_one) : mk z hz = z :=
   Subtype.eta _ _
-
-@[simp]
-theorem mk_neg (z : ℂ) (hz : abs (-z) < 1) : mk (-z) hz = -mk z (abs.map_neg z ▸ hz) :=
-  rfl
 
 instance : SemigroupWithZero 𝔻 :=
   { instCommSemigroup with
@@ -106,10 +101,6 @@ instance instSMulCommClass_circle : SMulCommClass Circle 𝔻 𝔻 :=
 instance instSMulCommClass_circle' : SMulCommClass 𝔻 Circle 𝔻 :=
   SMulCommClass.symm _ _ _
 
-@[simp, norm_cast]
-theorem coe_smul_circle (z : Circle) (w : 𝔻) : ↑(z • w) = (z * w : ℂ) :=
-  rfl
-
 instance closedBallAction : MulAction (closedBall (0 : ℂ) 1) 𝔻 :=
   mulActionClosedBallBall
 
@@ -132,38 +123,14 @@ instance instSMulCommClass_circle_closedBall : SMulCommClass Circle (closedBall 
 instance instSMulCommClass_closedBall_circle : SMulCommClass (closedBall (0 : ℂ) 1) Circle 𝔻 :=
   SMulCommClass.symm _ _ _
 
-@[simp, norm_cast]
-theorem coe_smul_closedBall (z : closedBall (0 : ℂ) 1) (w : 𝔻) : ↑(z • w) = (z * w : ℂ) :=
-  rfl
-
 def re (z : 𝔻) : ℝ :=
   Complex.re z
 
 def im (z : 𝔻) : ℝ :=
   Complex.im z
 
-@[simp, norm_cast]
-theorem re_coe (z : 𝔻) : (z : ℂ).re = z.re :=
-  rfl
-
-@[simp, norm_cast]
-theorem im_coe (z : 𝔻) : (z : ℂ).im = z.im :=
-  rfl
-
-@[simp]
-theorem re_neg (z : 𝔻) : (-z).re = -z.re :=
-  rfl
-
-@[simp]
-theorem im_neg (z : 𝔻) : (-z).im = -z.im :=
-  rfl
-
 def conj (z : 𝔻) : 𝔻 :=
   mk (conj' ↑z) <| (abs_conj z).symm ▸ z.abs_lt_one
-
-@[simp]
-theorem coe_conj (z : 𝔻) : (z.conj : ℂ) = conj' ↑z :=
-  rfl
 
 @[simp]
 theorem conj_zero : conj 0 = 0 :=
@@ -172,18 +139,6 @@ theorem conj_zero : conj 0 = 0 :=
 @[simp]
 theorem conj_conj (z : 𝔻) : conj (conj z) = z :=
   coe_injective <| Complex.conj_conj (z : ℂ)
-
-@[simp]
-theorem conj_neg (z : 𝔻) : (-z).conj = -z.conj :=
-  rfl
-
-@[simp]
-theorem re_conj (z : 𝔻) : z.conj.re = z.re :=
-  rfl
-
-@[simp]
-theorem im_conj (z : 𝔻) : z.conj.im = -z.im :=
-  rfl
 
 @[simp]
 theorem conj_mul (z w : 𝔻) : (z * w).conj = z.conj * w.conj :=

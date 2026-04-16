@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.Finset.Defs
 
+noncomputable section
+
 /-!
 # Erasing an element from a finite set
 
@@ -36,10 +38,6 @@ variable [DecidableEq α] {s t u v : Finset α} {a b : α}
 
 def erase (s : Finset α) (a : α) : Finset α :=
   ⟨_, s.2.erase a⟩
-
-@[simp]
-theorem erase_val (s : Finset α) (a : α) : (erase s a).1 = s.1.erase a :=
-  rfl
 
 @[simp]
 theorem mem_erase {a b : α} {s : Finset α} : a ∈ erase s b ↔ a ≠ b ∧ a ∈ s :=
@@ -84,8 +82,6 @@ theorem subset_erase {a : α} {s t : Finset α} : s ⊆ t.erase a ↔ s ⊆ t �
 @[simp, norm_cast]
 theorem coe_erase (a : α) (s : Finset α) : ↑(erase s a) = (s \ {a} : Set α) :=
   Set.ext fun _ => mem_erase.trans <| by rw [and_comm, Set.mem_diff, Set.mem_singleton_iff, mem_coe]
-
-theorem erase_idem {a : α} {s : Finset α} : erase (erase s a) a = erase s a := by simp
 
 theorem erase_right_comm {a b : α} {s : Finset α} : erase (erase s a) b = erase (erase s b) a := by
   ext x

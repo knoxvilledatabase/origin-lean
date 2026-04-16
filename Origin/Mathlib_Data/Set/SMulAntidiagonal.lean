@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.AddTorsor
 import Mathlib.Order.WellFoundedSet
 
+noncomputable section
+
 /-!
 # Antidiagonal for scalar multiplication
 

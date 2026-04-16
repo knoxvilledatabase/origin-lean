@@ -1,10 +1,12 @@
 /-
 Extracted from FieldTheory/SplittingField/IsSplittingField.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Adjoin.Field
 import Mathlib.FieldTheory.IntermediateField.Basic
+
+noncomputable section
 
 /-!
 # Splitting fields
@@ -80,7 +82,19 @@ theorem splits_iff (f : K[X]) [IsSplittingField K L f] :
         rw [RingEquiv.toRingHom_trans]
         exact splits_comp_of_splits _ _ (splits L f)⟩
 
--- DISSOLVED: mul
+theorem mul (f g : F[X]) (hf : f ≠ 0) (hg : g ≠ 0) [IsSplittingField F K f]
+    [IsSplittingField K L (g.map <| algebraMap F K)] : IsSplittingField F L (f * g) :=
+  ⟨(IsScalarTower.algebraMap_eq F K L).symm ▸
+      splits_mul _ (splits_comp_of_splits _ _ (splits K f))
+        ((splits_map_iff _ _).1 (splits L <| g.map <| algebraMap F K)), by
+    classical
+    rw [rootSet, aroots_mul (mul_ne_zero hf hg),
+      Multiset.toFinset_add, Finset.coe_union, Algebra.adjoin_union_eq_adjoin_adjoin,
+      aroots_def, aroots_def, IsScalarTower.algebraMap_eq F K L, ← map_map,
+      roots_map (algebraMap K L) ((splits_id_iff_splits <| algebraMap F K).2 <| splits K f),
+      Multiset.toFinset_map, Finset.coe_image, Algebra.adjoin_algebraMap, ← rootSet, adjoin_rootSet,
+      Algebra.map_top, IsScalarTower.adjoin_range_toAlgHom, ← map_map, ← rootSet, adjoin_rootSet,
+      Subalgebra.restrictScalars_top]⟩
 
 end ScalarTower
 

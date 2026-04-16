@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.SemiNormedGrp
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.Analysis.Normed.Group.HomCompletion
 
+noncomputable section
+
 /-!
 # Completions of normed groups
 

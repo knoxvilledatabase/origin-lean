@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Monoidal.Types.Basic
 import Mathlib.RepresentationTheory.Action.Concrete
 import Mathlib.RepresentationTheory.Action.Limits
 
+noncomputable section
+
 /-!
 # Induced monoidal structure on `Action V G`
 
@@ -40,20 +42,6 @@ instance instMonoidalCategory : MonoidalCategory (Action V G) :=
   Monoidal.transport (Action.functorCategoryEquivalence _ _).symm
 
 @[simp]
-theorem tensorUnit_ρ' {g : G} :
-    @DFunLike.coe (G →* MonCat.of (End (𝟙_ V))) _ _ _ (𝟙_ (Action V G)).ρ g = 𝟙 (𝟙_ V) := by
-  rfl
-
-@[simp]
-theorem tensorUnit_ρ {g : G} : (𝟙_ (Action V G)).ρ g = 𝟙 (𝟙_ V) :=
-  rfl
-
-@[simp]
-theorem tensor_ρ' {X Y : Action V G} {g : G} :
-    @DFunLike.coe (G →* MonCat.of (End (X.V ⊗ Y.V))) _ _ _ (X ⊗ Y).ρ g = X.ρ g ⊗ Y.ρ g :=
-  rfl
-
-@[simp]
 theorem tensor_ρ {X Y : Action V G} {g : G} : (X ⊗ Y).ρ g = X.ρ g ⊗ Y.ρ g :=
   rfl
 
@@ -69,15 +57,7 @@ instance : (Action.forget V G).Monoidal :=
 
 open Functor.LaxMonoidal Functor.OplaxMonoidal
 
-@[simp] lemma forget_ε : ε (Action.forget V G) = 𝟙 _ := rfl
-
-@[simp] lemma forget_η : ε (Action.forget V G) = 𝟙 _ := rfl
-
 variable {V G}
-
-@[simp] lemma forget_μ (X Y : Action V G) : μ (Action.forget V G) X Y = 𝟙 _ := rfl
-
-@[simp] lemma forget_δ (X Y : Action V G) : δ (Action.forget V G) X Y = 𝟙 _ := rfl
 
 variable (V G)
 
@@ -126,22 +106,6 @@ instance : (FunctorCategoryEquivalence.inverse (V := V) (G := G)).Monoidal :=
 instance : (functorCategoryEquivalence V G).inverse.Monoidal := by
   dsimp only [functorCategoryEquivalence_inverse]; infer_instance
 
-@[simp]
-lemma FunctorCategoryEquivalence.functor_ε :
-    ε (FunctorCategoryEquivalence.functor (V := V) (G := G)) = 𝟙 _ := rfl
-
-@[simp]
-lemma FunctorCategoryEquivalence.functor_η :
-    η (FunctorCategoryEquivalence.functor (V := V) (G := G)) = 𝟙 _ := rfl
-
-@[simp]
-lemma FunctorCategoryEquivalence.functor_μ (A B : Action V G) :
-    μ FunctorCategoryEquivalence.functor A B = 𝟙 _ := rfl
-
-@[simp]
-lemma FunctorCategoryEquivalence.functor_δ (A B : Action V G) :
-    δ FunctorCategoryEquivalence.functor A B = 𝟙 _ := rfl
-
 variable (H : Grp.{u})
 
 instance [RightRigidCategory V] : RightRigidCategory (SingleObj (H : MonCat.{u}) ⥤ V) := by
@@ -166,14 +130,6 @@ instance [RigidCategory V] : RigidCategory (Action V H) :=
 variable {V H}
 
 variable (X : Action V H)
-
-@[simp]
-theorem rightDual_v [RightRigidCategory V] : Xᘁ.V = X.Vᘁ :=
-  rfl
-
-@[simp]
-theorem leftDual_v [LeftRigidCategory V] : (ᘁX).V = ᘁX.V :=
-  rfl
 
 @[simp, nolint simpNF]
 theorem rightDual_ρ [RightRigidCategory V] (h : H) : Xᘁ.ρ h = (X.ρ (h⁻¹ : H))ᘁ := by
@@ -240,6 +196,9 @@ variable {W : Type (u + 1)} [LargeCategory W] [MonoidalCategory V] [MonoidalCate
 open Functor.LaxMonoidal Functor.OplaxMonoidal Functor.Monoidal
 
 set_option maxHeartbeats 400000 in
+/-- A lax monoidal functor induces a lax monoidal functor between
+
+the categories of `G`-actions within those categories. -/
 
 instance [F.LaxMonoidal] : (F.mapAction G).LaxMonoidal where
   ε' :=
@@ -256,13 +215,6 @@ instance [F.LaxMonoidal] : (F.mapAction G).LaxMonoidal where
   left_unitality' _ := by ext; simp
   right_unitality' _ := by ext; simp
 
-@[simp]
-lemma mapAction_ε_hom [F.LaxMonoidal] : (ε (F.mapAction G)).hom = ε F := rfl
-
-@[simp]
-lemma mapAction_μ_hom [F.LaxMonoidal] (X Y : Action V G) :
-    (μ (F.mapAction G) X Y).hom = μ F X.V Y.V := rfl
-
 instance [F.OplaxMonoidal] : (F.mapAction G).OplaxMonoidal where
   η' :=
     { hom := η F
@@ -277,13 +229,6 @@ instance [F.OplaxMonoidal] : (F.mapAction G).OplaxMonoidal where
   oplax_associativity' _ _ _ := by ext; simp
   oplax_left_unitality' _ := by ext; simp
   oplax_right_unitality' _ := by ext; simp
-
-@[simp]
-lemma mapAction_η_hom [F.OplaxMonoidal] : (η (F.mapAction G)).hom = η F := rfl
-
-@[simp]
-lemma mapAction_δ_hom [F.OplaxMonoidal] (X Y : Action V G) :
-    (δ (F.mapAction G) X Y).hom = δ F X.V Y.V := rfl
 
 instance [F.Monoidal] : (F.mapAction G).Monoidal where
   η_ε := by ext; dsimp; rw [η_ε]

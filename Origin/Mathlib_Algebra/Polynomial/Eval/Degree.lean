@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Polynomial/Eval/Degree.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Support
 import Mathlib.Algebra.Polynomial.Degree.Units
 import Mathlib.Algebra.Polynomial.Eval.Coeff
+
+noncomputable section
 
 /-!
 # Evaluation of polynomials and degrees
@@ -87,7 +89,22 @@ end Eval
 
 section Comp
 
--- DISSOLVED: coeff_comp_degree_mul_degree
+theorem coeff_comp_degree_mul_degree (hqd0 : natDegree q ≠ 0) :
+    coeff (p.comp q) (natDegree p * natDegree q) =
+    leadingCoeff p * leadingCoeff q ^ natDegree p := by
+  rw [comp, eval₂_def, coeff_sum]
+  -- Porting note: `convert` → `refine`
+  refine Eq.trans (Finset.sum_eq_single p.natDegree ?h₀ ?h₁) ?h₂
+  case h₂ =>
+    simp only [coeff_natDegree, coeff_C_mul, coeff_pow_mul_natDegree]
+  case h₀ =>
+    intro b hbs hbp
+    refine coeff_eq_zero_of_natDegree_lt (natDegree_mul_le.trans_lt ?_)
+    rw [natDegree_C, zero_add]
+    refine natDegree_pow_le.trans_lt ((mul_lt_mul_right (pos_iff_ne_zero.mpr hqd0)).mpr ?_)
+    exact lt_of_le_of_ne (le_natDegree_of_mem_supp _ hbs) hbp
+  case h₁ =>
+    simp +contextual
 
 end Comp
 
@@ -111,7 +128,9 @@ theorem map_monic_eq_zero_iff (hp : p.Monic) : p.map f = 0 ↔ ∀ x, f x = 0 :=
       ,
     fun h => ext fun n => by simp only [h, coeff_map, coeff_zero]⟩
 
--- DISSOLVED: map_monic_ne_zero
+-- CONFLATES (assumes ground = zero): map_monic_ne_zero
+theorem map_monic_ne_zero (hp : p.Monic) [Nontrivial S] : p.map f ≠ 0 := fun h =>
+  f.map_one_ne_zero ((map_monic_eq_zero_iff hp).mp h _)
 
 lemma degree_map_le : degree (p.map f) ≤ degree p := by
   refine (degree_le_iff_coeff_zero _ _).2 fun m hm => ?_
@@ -120,9 +139,15 @@ lemma degree_map_le : degree (p.map f) ≤ degree p := by
 
 lemma natDegree_map_le : natDegree (p.map f) ≤ natDegree p := natDegree_le_natDegree degree_map_le
 
--- DISSOLVED: degree_map_lt
+lemma degree_map_lt (hp : f p.leadingCoeff = 0) (hp₀ : p ≠ 0) : (p.map f).degree < p.degree := by
+  refine degree_map_le.lt_of_ne fun hpq ↦ hp₀ ?_
+  rw [leadingCoeff, ← coeff_map, ← natDegree_eq_natDegree hpq, ← leadingCoeff, leadingCoeff_eq_zero]
+    at hp
+  rw [← degree_eq_bot, ← hpq, hp, degree_zero]
 
--- DISSOLVED: natDegree_map_lt
+lemma natDegree_map_lt (hp : f p.leadingCoeff = 0) (hp₀ : map f p ≠ 0) :
+    (p.map f).natDegree < p.natDegree :=
+  natDegree_lt_natDegree hp₀ <| degree_map_lt hp <| by rintro rfl; simp at hp₀
 
 lemma natDegree_map_lt' (hp : f p.leadingCoeff = 0) (hp₀ : 0 < natDegree p) :
     (p.map f).natDegree < p.natDegree := by
@@ -130,11 +155,24 @@ lemma natDegree_map_lt' (hp : f p.leadingCoeff = 0) (hp₀ : 0 < natDegree p) :
   · rwa [H, natDegree_zero]
   · exact natDegree_map_lt hp H
 
--- DISSOLVED: degree_map_eq_of_leadingCoeff_ne_zero
+theorem degree_map_eq_of_leadingCoeff_ne_zero (f : R →+* S) (hf : f (leadingCoeff p) ≠ 0) :
+    degree (p.map f) = degree p := by
+  refine degree_map_le.antisymm ?_
+  have hp0 : p ≠ 0 :=
+    leadingCoeff_ne_zero.mp fun hp0 => hf (_root_.trans (congr_arg _ hp0) f.map_zero)
+  rw [degree_eq_natDegree hp0]
+  refine le_degree_of_ne_zero ?_
+  rw [coeff_map]
+  exact hf
 
--- DISSOLVED: natDegree_map_of_leadingCoeff_ne_zero
+theorem natDegree_map_of_leadingCoeff_ne_zero (f : R →+* S) (hf : f (leadingCoeff p) ≠ 0) :
+    natDegree (p.map f) = natDegree p :=
+  natDegree_eq_of_degree_eq (degree_map_eq_of_leadingCoeff_ne_zero f hf)
 
--- DISSOLVED: leadingCoeff_map_of_leadingCoeff_ne_zero
+theorem leadingCoeff_map_of_leadingCoeff_ne_zero (f : R →+* S) (hf : f (leadingCoeff p) ≠ 0) :
+    leadingCoeff (p.map f) = f (leadingCoeff p) := by
+  unfold leadingCoeff
+  rw [coeff_map, natDegree_map_of_leadingCoeff_ne_zero f hf]
 
 end Map
 

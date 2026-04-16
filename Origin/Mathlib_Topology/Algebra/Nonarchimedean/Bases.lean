@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/Nonarchimedean/Bases.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Nonarchimedean.Basic
 import Mathlib.Topology.Algebra.FilterBasis
 import Mathlib.Algebra.Module.Submodule.Pointwise
+
+noncomputable section
 
 /-!
 # Neighborhood bases for non-archimedean rings and modules
@@ -114,10 +116,6 @@ def toRingFilterBasis [Nonempty ι] {B : ι → AddSubgroup A} (hB : RingSubgrou
     · exact hk
 
 variable [Nonempty ι] {B : ι → AddSubgroup A} (hB : RingSubgroupsBasis B)
-
-theorem mem_addGroupFilterBasis_iff {V : Set A} :
-    V ∈ hB.toRingFilterBasis.toAddGroupFilterBasis ↔ ∃ i, V = B i :=
-  Iff.rfl
 
 theorem mem_addGroupFilterBasis (i) : (B i : Set A) ∈ hB.toRingFilterBasis.toAddGroupFilterBasis :=
   ⟨i, rfl⟩
@@ -303,16 +301,6 @@ theorem nonarchimedean (hB : SubmodulesBasis B) : @NonarchimedeanAddGroup M _ hB
   obtain ⟨-, ⟨i, rfl⟩, hi : (B i : Set M) ⊆ U⟩ :=
     hB.toModuleFilterBasis.toAddGroupFilterBasis.nhds_zero_hasBasis.mem_iff.mp hU
   exact ⟨hB.openAddSubgroup i, hi⟩
-
-library_note "nonarchimedean non instances"/--
-
-The non archimedean subgroup basis lemmas cannot be instances because some instances
-
-(such as `MeasureTheory.AEEqFun.instAddMonoid` or `TopologicalAddGroup.toContinuousAdd`)
-
-cause the search for `@TopologicalAddGroup β ?m1 ?m2`, i.e. a search for a topological group where
-
-the topology/group structure are unknown. -/
 
 end SubmodulesBasis
 

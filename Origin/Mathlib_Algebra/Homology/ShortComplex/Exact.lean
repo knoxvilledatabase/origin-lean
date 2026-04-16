@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Abelian.Opposite
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.CategoryTheory.Preadditive.Injective
 
+noncomputable section
+
 /-!
 # Exact short complexes
 

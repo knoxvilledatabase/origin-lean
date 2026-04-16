@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.ULift
 
+noncomputable section
+
 /-!
 # Finiteness of `Set.range`
 

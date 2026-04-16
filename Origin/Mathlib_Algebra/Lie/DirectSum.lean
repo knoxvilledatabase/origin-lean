@@ -8,6 +8,8 @@ import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Algebra.Lie.Submodule
 import Mathlib.Algebra.Lie.Basic
 
+noncomputable section
+
 /-!
 # Direct sums of Lie algebras and Lie modules
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.FiberBundle.Trivialization
 import Mathlib.Topology.Order.LeftRightNhds
 
+noncomputable section
+
 /-!
 # Fiber bundles
 
@@ -530,10 +532,6 @@ def localTriv (i : ι) : Trivialization F Z.proj where
 def localTrivAt (b : B) : Trivialization F (π F Z.Fiber) :=
   Z.localTriv (Z.indexAt b)
 
-@[simp, mfld_simps]
-theorem localTrivAt_def (b : B) : Z.localTriv (Z.indexAt b) = Z.localTrivAt b :=
-  rfl
-
 theorem localTrivAt_snd (b : B) (p) :
     (Z.localTrivAt b p).2 = Z.coordChange (Z.indexAt p.1) (Z.indexAt b) p.1 p.2 :=
   rfl
@@ -551,25 +549,6 @@ theorem continuous_const_section (v : F)
     have : ContinuousOn (fun _ : B => v) (Z.baseSet (Z.indexAt x)) := continuousOn_const
     refine (this.congr fun y hy ↦ ?_).continuousAt A
     exact h _ _ _ ⟨mem_baseSet_at _ _, hy⟩
-
-@[simp, mfld_simps]
-theorem localTrivAsPartialEquiv_coe : ⇑(Z.localTrivAsPartialEquiv i) = Z.localTriv i :=
-  rfl
-
-@[simp, mfld_simps]
-theorem localTrivAsPartialEquiv_source :
-    (Z.localTrivAsPartialEquiv i).source = (Z.localTriv i).source :=
-  rfl
-
-@[simp, mfld_simps]
-theorem localTrivAsPartialEquiv_target :
-    (Z.localTrivAsPartialEquiv i).target = (Z.localTriv i).target :=
-  rfl
-
-@[simp, mfld_simps]
-theorem localTrivAsPartialEquiv_symm :
-    (Z.localTrivAsPartialEquiv i).symm = (Z.localTriv i).toPartialEquiv.symm :=
-  rfl
 
 @[simp, mfld_simps]
 theorem baseSet_at : Z.baseSet i = (Z.localTriv i).baseSet :=
@@ -590,16 +569,6 @@ theorem localTrivAt_apply_mk (b : B) (a : F) : (Z.localTrivAt b) ⟨b, a⟩ = �
   Z.localTrivAt_apply _
 
 @[simp, mfld_simps]
-theorem mem_localTriv_source (p : Z.TotalSpace) :
-    p ∈ (Z.localTriv i).source ↔ p.1 ∈ (Z.localTriv i).baseSet :=
-  Iff.rfl
-
-@[simp, mfld_simps]
-theorem mem_localTrivAt_source (p : Z.TotalSpace) (b : B) :
-    p ∈ (Z.localTrivAt b).source ↔ p.1 ∈ (Z.localTrivAt b).baseSet :=
-  Iff.rfl
-
-@[simp, mfld_simps]
 theorem mem_localTriv_target (p : B × F) :
     p ∈ (Z.localTriv i).target ↔ p.1 ∈ (Z.localTriv i).baseSet :=
   Trivialization.mem_target _
@@ -608,11 +577,6 @@ theorem mem_localTriv_target (p : B × F) :
 theorem mem_localTrivAt_target (p : B × F) (b : B) :
     p ∈ (Z.localTrivAt b).target ↔ p.1 ∈ (Z.localTrivAt b).baseSet :=
   Trivialization.mem_target _
-
-@[simp, mfld_simps]
-theorem localTriv_symm_apply (p : B × F) :
-    (Z.localTriv i).toPartialHomeomorph.symm p = ⟨p.1, Z.coordChange i (Z.indexAt p.1) p.1 p.2⟩ :=
-  rfl
 
 @[simp, mfld_simps]
 theorem mem_localTrivAt_baseSet (b : B) : b ∈ (Z.localTrivAt b).baseSet := by

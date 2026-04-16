@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 
+noncomputable section
+
 /-!
 # Limits in lattice categories are given by infimums and supremums.
 -/
@@ -83,49 +85,11 @@ instance (priority := 100) [SemilatticeInf α] [OrderTop α] : HasBinaryProducts
     infer_instance
   apply hasBinaryProducts_of_hasLimit_pair
 
-@[simp]
-theorem prod_eq_inf [SemilatticeInf α] [OrderTop α] (x y : α) : Limits.prod x y = x ⊓ y :=
-  calc
-    Limits.prod x y = limit (pair x y) := rfl
-    _ = Finset.univ.inf (pair x y).obj := by rw [finite_limit_eq_finset_univ_inf (pair.{u} x y)]
-    _ = x ⊓ (y ⊓ ⊤) := rfl
-    -- Note: finset.inf is realized as a fold, hence the definitional equality
-    _ = x ⊓ y := by rw [inf_top_eq]
-
 instance (priority := 100) [SemilatticeSup α] [OrderBot α] : HasBinaryCoproducts α := by
   have : ∀ x y : α, HasColimit (pair x y) := by
     letI := hasFiniteColimits_of_hasFiniteColimits_of_size.{u} α
     infer_instance
   apply hasBinaryCoproducts_of_hasColimit_pair
-
-@[simp]
-theorem coprod_eq_sup [SemilatticeSup α] [OrderBot α] (x y : α) : Limits.coprod x y = x ⊔ y :=
-  calc
-    Limits.coprod x y = colimit (pair x y) := rfl
-    _ = Finset.univ.sup (pair x y).obj := by rw [finite_colimit_eq_finset_univ_sup (pair x y)]
-    _ = x ⊔ (y ⊔ ⊥) := rfl
-    -- Note: Finset.sup is realized as a fold, hence the definitional equality
-    _ = x ⊔ y := by rw [sup_bot_eq]
-
-@[simp]
-theorem pullback_eq_inf [SemilatticeInf α] [OrderTop α] {x y z : α} (f : x ⟶ z) (g : y ⟶ z) :
-    pullback f g = x ⊓ y :=
-  calc
-    pullback f g = limit (cospan f g) := rfl
-    _ = Finset.univ.inf (cospan f g).obj := by rw [finite_limit_eq_finset_univ_inf]
-    _ = z ⊓ (x ⊓ (y ⊓ ⊤)) := rfl
-    _ = z ⊓ (x ⊓ y) := by rw [inf_top_eq]
-    _ = x ⊓ y := inf_eq_right.mpr (inf_le_of_left_le f.le)
-
-@[simp]
-theorem pushout_eq_sup [SemilatticeSup α] [OrderBot α] (x y z : α) (f : z ⟶ x) (g : z ⟶ y) :
-    pushout f g = x ⊔ y :=
-  calc
-    pushout f g = colimit (span f g) := rfl
-    _ = Finset.univ.sup (span f g).obj := by rw [finite_colimit_eq_finset_univ_sup]
-    _ = z ⊔ (x ⊔ (y ⊔ ⊥)) := rfl
-    _ = z ⊔ (x ⊔ y) := by rw [sup_bot_eq]
-    _ = x ⊔ y := sup_eq_right.mpr (le_sup_of_le_left f.le)
 
 end Semilattice
 

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Finiteness/Defs.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Hom
@@ -9,6 +9,8 @@ import Mathlib.Data.Finsupp.Defs
 import Mathlib.GroupTheory.Finiteness
 import Mathlib.RingTheory.Ideal.Span
 import Mathlib.Tactic.Algebraize
+
+noncomputable section
 
 /-!
 # Finiteness conditions in commutative algebra
@@ -64,7 +66,6 @@ theorem fg_iff_exists_fin_generating_family {N : Submodule R M} :
     exact ⟨range s, finite_range s, hs⟩
 
 universe w v u in
-
 lemma fg_iff_exists_finite_generating_family {A : Type u} [Semiring A] {M : Type v}
     [AddCommMonoid M] [Module A M] {N : Submodule A M} :
     N.FG ↔ ∃ (G : Type w) (_ : Finite G) (g : G → M), Submodule.span A (Set.range g) = N := by

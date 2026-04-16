@@ -1,12 +1,14 @@
 /-
 Extracted from Topology/MetricSpace/Pseudo/Defs.lean
-Genuine: 191 | Conflates: 0 | Dissolved: 2 | Infrastructure: 24
+Genuine: 193 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Real
 import Mathlib.Tactic.Bound.Attribute
 import Mathlib.Topology.EMetricSpace.Defs
 import Mathlib.Topology.UniformSpace.Compact
+
+noncomputable section
 
 /-!
 ## Pseudo-metric spaces
@@ -122,24 +124,6 @@ attribute [instance] PseudoMetricSpace.toUniformSpace PseudoMetricSpace.toBornol
 instance (priority := 200) PseudoMetricSpace.toEDist : EDist α :=
   ⟨PseudoMetricSpace.edist⟩
 
-def PseudoMetricSpace.ofDistTopology {α : Type u} [TopologicalSpace α] (dist : α → α → ℝ)
-    (dist_self : ∀ x : α, dist x x = 0) (dist_comm : ∀ x y : α, dist x y = dist y x)
-    (dist_triangle : ∀ x y z : α, dist x z ≤ dist x y + dist y z)
-    (H : ∀ s : Set α, IsOpen s ↔ ∀ x ∈ s, ∃ ε > 0, ∀ y, dist x y < ε → y ∈ s) :
-    PseudoMetricSpace α :=
-  { dist := dist
-    dist_self := dist_self
-    dist_comm := dist_comm
-    dist_triangle := dist_triangle
-    toUniformSpace :=
-      (UniformSpace.ofDist dist dist_self dist_comm dist_triangle).replaceTopology <|
-        TopologicalSpace.ext_iff.2 fun s ↦ (H s).trans <| forall₂_congr fun x _ ↦
-          ((UniformSpace.hasBasis_ofFun (exists_gt (0 : ℝ)) dist dist_self dist_comm dist_triangle
-            UniformSpace.ofDist_aux).comap (Prod.mk x)).mem_iff.symm
-    uniformity_dist := rfl
-    toBornology := Bornology.ofDist dist dist_comm dist_triangle
-    cobounded_sets := rfl }
-
 @[simp]
 theorem dist_self (x : α) : dist x x = 0 :=
   PseudoMetricSpace.dist_self x
@@ -214,9 +198,6 @@ instance (priority := 100) PseudoMetricSpace.toNNDist : NNDist α :=
 
 theorem dist_nndist (x y : α) : dist x y = nndist x y := rfl
 
-@[simp, norm_cast]
-theorem coe_nndist (x y : α) : ↑(nndist x y) = dist x y := rfl
-
 theorem edist_nndist (x y : α) : edist x y = nndist x y := by
   rw [edist_dist, dist_nndist, ENNReal.ofReal_coe_nnreal]
 
@@ -242,14 +223,6 @@ theorem edist_ne_top (x y : α) : edist x y ≠ ⊤ :=
   (edist_lt_top x y).ne
 
 @[simp] theorem nndist_self (a : α) : nndist a a = 0 := NNReal.coe_eq_zero.1 (dist_self a)
-
-@[simp, norm_cast]
-theorem dist_lt_coe {x y : α} {c : ℝ≥0} : dist x y < c ↔ nndist x y < c :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem dist_le_coe {x y : α} {c : ℝ≥0} : dist x y ≤ c ↔ nndist x y ≤ c :=
-  Iff.rfl
 
 @[simp]
 theorem edist_lt_ofReal {x y : α} {r : ℝ} : edist x y < ENNReal.ofReal r ↔ dist x y < r := by
@@ -341,7 +314,8 @@ def sphere (x : α) (ε : ℝ) := { y | dist y x = ε }
 
 theorem mem_sphere' : y ∈ sphere x ε ↔ dist x y = ε := by rw [dist_comm, mem_sphere]
 
--- DISSOLVED: ne_of_mem_sphere
+theorem ne_of_mem_sphere (h : y ∈ sphere x ε) (hε : ε ≠ 0) : y ≠ x :=
+  ne_of_mem_of_not_mem h <| by simpa using hε.symm
 
 theorem nonneg_of_mem_sphere (hy : y ∈ sphere x ε) : 0 ≤ ε :=
   dist_nonneg.trans_eq hy
@@ -350,7 +324,8 @@ theorem nonneg_of_mem_sphere (hy : y ∈ sphere x ε) : 0 ≤ ε :=
 theorem sphere_eq_empty_of_neg (hε : ε < 0) : sphere x ε = ∅ :=
   Set.eq_empty_iff_forall_not_mem.mpr fun _y hy => (nonneg_of_mem_sphere hy).not_lt hε
 
--- DISSOLVED: sphere_eq_empty_of_subsingleton
+theorem sphere_eq_empty_of_subsingleton [Subsingleton α] (hε : ε ≠ 0) : sphere x ε = ∅ :=
+  Set.eq_empty_iff_forall_not_mem.mpr fun _ h => ne_of_mem_sphere h hε (Subsingleton.elim _ _)
 
 instance sphere_isEmpty_of_subsingleton [Subsingleton α] [NeZero ε] : IsEmpty (sphere x ε) := by
   rw [sphere_eq_empty_of_subsingleton (NeZero.ne ε)]; infer_instance

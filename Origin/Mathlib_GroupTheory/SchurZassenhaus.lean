@@ -5,6 +5,8 @@ Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.GroupTheory.Transfer
 
+noncomputable section
+
 /-!
 # The Schur-Zassenhaus Theorem
 
@@ -154,6 +156,7 @@ private theorem step0 : N ≠ ⊥ := by
 variable [Finite G]
 
 include h2 in
+/-- Do not use this lemma: It is made obsolete by `exists_right_complement'_of_coprime` -/
 
 private theorem step1 (K : Subgroup G) (hK : K ⊔ N = ⊤) : K = ⊤ := by
   contrapose! h3
@@ -178,6 +181,7 @@ private theorem step1 (K : Subgroup G) (hK : K ⊔ N = ⊤) : K = ⊤ := by
   exact ⟨H.map K.subtype, isComplement'_of_coprime h7 h8⟩
 
 include h2 in
+/-- Do not use this lemma: It is made obsolete by `exists_right_complement'_of_coprime` -/
 
 private theorem step2 (K : Subgroup G) [K.Normal] (hK : K ≤ N) : K = ⊥ ∨ K = N := by
   have : Function.Surjective (QuotientGroup.mk' K) := Quotient.mk''_surjective
@@ -209,6 +213,7 @@ private theorem step2 (K : Subgroup G) [K.Normal] (hK : K ≤ N) : K = ⊥ ∨ K
     exact h4.2 (le_antisymm hK hH)
 
 include h2 in
+/-- Do not use this lemma: It is made obsolete by `exists_right_complement'_of_coprime` -/
 
 private theorem step3 (K : Subgroup N) [(K.map N.subtype).Normal] : K = ⊥ ∨ K = ⊤ := by
   have key := step2 h1 h2 h3 (K.map N.subtype) (map_subtype_le K)
@@ -229,6 +234,7 @@ private theorem step5 {P : Sylow (Nat.card N).minFac N} : P.1 ≠ ⊥ := by
   exact (Nat.card N).minFac_dvd
 
 include h2 in
+/-- Do not use this lemma: It is made obsolete by `exists_right_complement'_of_coprime` -/
 
 private theorem step6 : IsPGroup (Nat.card N).minFac N := by
   haveI : Fact (Nat.card N).minFac.Prime := ⟨step4 h1 h3⟩
@@ -239,6 +245,7 @@ private theorem step6 : IsPGroup (Nat.card N).minFac N := by
   exact (step3 h1 h2 h3 P.1).resolve_left (step5 h1 h3)
 
 include h2 in
+/-- Do not use this lemma: It is made obsolete by `exists_right_complement'_of_coprime` -/
 
 theorem step7 : IsCommutative N := by
   haveI := N.bot_or_nontrivial.resolve_left (step0 h1 h3)

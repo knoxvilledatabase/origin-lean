@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Opposites
 import Mathlib.CategoryTheory.Groupoid
 
+noncomputable section
+
 /-!
 # Facts about epimorphisms and monomorphisms.
 

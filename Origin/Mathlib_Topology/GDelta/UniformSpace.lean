@@ -7,6 +7,8 @@ import Mathlib.Topology.GDelta.Basic
 import Mathlib.Order.Filter.CountableInter
 import Mathlib.Topology.UniformSpace.Basic
 
+noncomputable section
+
 /-!
 # `Gδ` sets and uniform spaces
 

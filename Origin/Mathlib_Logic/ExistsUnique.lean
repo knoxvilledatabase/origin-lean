@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # `ExistsUnique`
 
@@ -29,23 +31,14 @@ def isExplicitBinderSingular (xs : TSyntax ``explicitBinders) : Bool :=
 open TSyntax.Compat in
 
 macro "∃!" xs:explicitBinders ", " b:term : term => do
-
   if !isExplicitBinderSingular xs then
-
     Macro.throwErrorAt xs "\
-
       The `ExistsUnique` notation should not be used with more than one binder.\n\
-
       \n\
-
       The reason for this is that `∃! (x : α), ∃! (y : β), p x y` has a completely different \
-
       meaning from `∃! q : α × β, p q.1 q.2`. \
-
       To prevent confusion, this notation requires that you be explicit \
-
       and use one with the correct interpretation."
-
   expandExplicitBinders ``ExistsUnique xs b
 
 @[app_unexpander ExistsUnique] def unexpandExistsUnique : Lean.PrettyPrinter.Unexpander
@@ -56,9 +49,7 @@ macro "∃!" xs:explicitBinders ", " b:term : term => do
 syntax "∃! " binderIdent binderPred ", " term : term
 
 macro_rules
-
   | `(∃! $x:ident $p:binderPred, $b) => `(∃! $x:ident, satisfies_binder_pred% $x $p ∧ $b)
-
   | `(∃! _ $p:binderPred, $b) => `(∃! x, satisfies_binder_pred% x $p ∧ $b)
 
 end Mathlib.Notation
@@ -95,8 +86,6 @@ theorem exists_unique_const {b : Prop} (α : Sort*) [i : Nonempty α] [Subsingle
 
 @[simp] theorem exists_unique_eq' {a' : α} : ∃! a, a' = a := by
   simp only [ExistsUnique, and_self, forall_eq', exists_eq']
-
-theorem exists_unique_prop {p q : Prop} : (∃! _ : p, q) ↔ p ∧ q := by simp
 
 @[simp] theorem exists_unique_false : ¬∃! _ : α, False := fun ⟨_, h, _⟩ ↦ h
 

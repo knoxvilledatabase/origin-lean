@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/Free.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 import Mathlib.RingTheory.AlgebraTower
 import Mathlib.SetTheory.Cardinal.Finsupp
+
+noncomputable section
 
 /-!
 # Rank of free modules
@@ -164,7 +166,10 @@ theorem finite_of_finrank_pos (h : 0 < finrank R M) : Module.Finite R M := by
 theorem finite_of_finrank_eq_succ {n : ℕ} (hn : finrank R M = n.succ) : Module.Finite R M :=
   finite_of_finrank_pos <| by rw [hn]; exact n.succ_pos
 
--- DISSOLVED: finite_iff_of_rank_eq_nsmul
+theorem finite_iff_of_rank_eq_nsmul {W} [AddCommGroup W] [Module R W] [Module.Free R W] {n : ℕ}
+    (hn : n ≠ 0) (hVW : Module.rank R M = n • Module.rank R W) :
+    Module.Finite R M ↔ Module.Finite R W := by
+  simp only [← rank_lt_aleph0_iff, hVW, nsmul_lt_aleph0_iff_of_ne_zero hn]
 
 variable (R M)
 

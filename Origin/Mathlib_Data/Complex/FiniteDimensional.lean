@@ -8,6 +8,8 @@ import Mathlib.Data.Complex.Cardinality
 import Mathlib.Data.Complex.Module
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 
+noncomputable section
+
 /-!
 # Complex number as a finite dimensional vector space over `ℝ`
 

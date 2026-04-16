@@ -1,11 +1,13 @@
 /-
 Extracted from Computability/AkraBazzi/AkraBazzi.lean
-Genuine: 75 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Computability.AkraBazzi.GrowsPolynomially
 import Mathlib.Analysis.Calculus.Deriv.Inv
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
+
+noncomputable section
 
 /-!
 # Divide-and-conquer recurrences and the Akra-Bazzi theorem
@@ -350,7 +352,6 @@ lemma eventually_one_sub_smoothingFn_nonneg : ∀ᶠ (n : ℕ) in atTop, 0 ≤ 1
   filter_upwards [eventually_one_sub_smoothingFn_pos] with n hn; exact le_of_lt hn
 
 include R in
-
 lemma eventually_one_sub_smoothingFn_r_pos : ∀ᶠ (n : ℕ) in atTop, ∀ i, 0 < 1 - ε (r i n) := by
   rw [Filter.eventually_all]
   exact fun i => (R.tendsto_atTop_r_real i).eventually eventually_one_sub_smoothingFn_pos_real
@@ -437,7 +438,6 @@ lemma eventually_one_add_smoothingFn_pos : ∀ᶠ (n : ℕ) in atTop, 0 < 1 + ε
   positivity
 
 include R in
-
 lemma eventually_one_add_smoothingFn_r_pos : ∀ᶠ (n : ℕ) in atTop, ∀ i, 0 < 1 + ε (r i n) := by
   rw [Filter.eventually_all]
   exact fun i => (R.tendsto_atTop_r i).eventually (f := r i) eventually_one_add_smoothingFn_pos
@@ -556,8 +556,8 @@ variable (a b) in
 noncomputable irreducible_def p : ℝ := Function.invFun (fun (p : ℝ) => ∑ i, a i * (b i) ^ p) 1
 
 include R in
-
 @[simp]
+
 lemma sumCoeffsExp_p_eq_one : ∑ i, a i * (b i) ^ p a b = 1 := by
   simp only [p]
   exact Function.invFun_eq (by rw [← Set.mem_range]; exact R.one_mem_range_sumCoeffsExp)
@@ -823,13 +823,69 @@ lemma eventually_deriv_rpow_p_mul_one_add_smoothingFn (p : ℝ) :
             filter_upwards [eventually_gt_atTop 0] with x hx
             simp [mul_div, ← Real.rpow_neg_one, ← Real.rpow_add (by positivity), sub_eq_add_neg]
 
--- DISSOLVED: isEquivalent_deriv_rpow_p_mul_one_sub_smoothingFn
+lemma isEquivalent_deriv_rpow_p_mul_one_sub_smoothingFn {p : ℝ} (hp : p ≠ 0) :
+    deriv (fun z => z ^ p * (1 - ε z)) ~[atTop] fun z => p * z ^ (p-1) := calc
+  deriv (fun z => z ^ p * (1 - ε z))
+    =ᶠ[atTop] fun z => p * z ^ (p-1) * (1 - ε z) + z^(p-1) / (log z ^ 2) :=
+        eventually_deriv_rpow_p_mul_one_sub_smoothingFn p
+  _ ~[atTop] fun z => p * z ^ (p-1) := by
+        refine IsEquivalent.add_isLittleO ?one ?two
+        case one => calc
+          (fun z => p * z ^ (p-1) * (1 - ε z)) ~[atTop] fun z => p * z ^ (p-1) * 1 :=
+                IsEquivalent.mul IsEquivalent.refl isEquivalent_one_sub_smoothingFn_one
+          _ = fun z => p * z ^ (p-1) := by ext; ring
+        case two => calc
+          (fun z => z ^ (p-1) / (log z ^ 2)) =o[atTop] fun z => z ^ (p-1) / 1 := by
+                      simp_rw [div_eq_mul_inv]
+                      refine IsBigO.mul_isLittleO (isBigO_refl _ _)
+                        (IsLittleO.inv_rev ?_ (by aesop (add safe Eventually.of_forall)))
+                      rw [isLittleO_const_left]
+                      refine Or.inr <| Tendsto.comp tendsto_norm_atTop_atTop ?_
+                      exact Tendsto.comp (g := fun z => z ^ 2)
+                        (tendsto_pow_atTop (by norm_num)) tendsto_log_atTop
+          _ = fun z => z ^ (p-1) := by ext; simp
+          _ =Θ[atTop] fun z => p * z ^ (p-1) := by
+                      exact IsTheta.const_mul_right hp <| isTheta_refl _ _
 
--- DISSOLVED: isEquivalent_deriv_rpow_p_mul_one_add_smoothingFn
+lemma isEquivalent_deriv_rpow_p_mul_one_add_smoothingFn {p : ℝ} (hp : p ≠ 0) :
+    deriv (fun z => z ^ p * (1 + ε z)) ~[atTop] fun z => p * z ^ (p-1) := calc
+  deriv (fun z => z ^ p * (1 + ε z))
+    =ᶠ[atTop] fun z => p * z ^ (p-1) * (1 + ε z) - z ^ (p-1) / (log z ^ 2) :=
+        eventually_deriv_rpow_p_mul_one_add_smoothingFn p
+  _ ~[atTop] fun z => p * z ^ (p-1) := by
+        refine IsEquivalent.add_isLittleO ?one ?two
+        case one => calc
+          (fun z => p * z ^ (p-1) * (1 + ε z)) ~[atTop] fun z => p * z ^ (p-1) * 1 :=
+                IsEquivalent.mul IsEquivalent.refl isEquivalent_one_add_smoothingFn_one
+          _ = fun z => p * z ^ (p-1) := by ext; ring
+        case two => calc
+          (fun z => -(z ^ (p-1) / (log z ^ 2))) =o[atTop] fun z => z ^ (p-1) / 1 := by
+                      simp_rw [isLittleO_neg_left, div_eq_mul_inv]
+                      refine IsBigO.mul_isLittleO (isBigO_refl _ _)
+                        (IsLittleO.inv_rev ?_ (by aesop (add safe Eventually.of_forall)))
+                      rw [isLittleO_const_left]
+                      refine Or.inr <| Tendsto.comp tendsto_norm_atTop_atTop ?_
+                      exact Tendsto.comp (g := fun z => z ^ 2)
+                        (tendsto_pow_atTop (by norm_num)) tendsto_log_atTop
+          _ = fun z => z ^ (p-1) := by ext; simp
+          _ =Θ[atTop] fun z => p * z ^ (p-1) := by
+                      exact IsTheta.const_mul_right hp <| isTheta_refl _ _
 
--- DISSOLVED: isTheta_deriv_rpow_p_mul_one_sub_smoothingFn
+lemma isTheta_deriv_rpow_p_mul_one_sub_smoothingFn {p : ℝ} (hp : p ≠ 0) :
+    (fun x => ‖deriv (fun z => z ^ p * (1 - ε z)) x‖) =Θ[atTop] fun z => z ^ (p-1) := by
+  refine IsTheta.norm_left ?_
+  calc (fun x => deriv (fun z => z ^ p * (1 - ε z)) x) =Θ[atTop] fun z => p * z ^ (p-1) :=
+            (isEquivalent_deriv_rpow_p_mul_one_sub_smoothingFn hp).isTheta
+    _ =Θ[atTop] fun z => z ^ (p-1) :=
+            IsTheta.const_mul_left hp <| isTheta_refl _ _
 
--- DISSOLVED: isTheta_deriv_rpow_p_mul_one_add_smoothingFn
+lemma isTheta_deriv_rpow_p_mul_one_add_smoothingFn {p : ℝ} (hp : p ≠ 0) :
+    (fun x => ‖deriv (fun z => z ^ p * (1 + ε z)) x‖) =Θ[atTop] fun z => z ^ (p-1) := by
+  refine IsTheta.norm_left ?_
+  calc (fun x => deriv (fun z => z ^ p * (1 + ε z)) x) =Θ[atTop] fun z => p * z ^ (p-1) :=
+            (isEquivalent_deriv_rpow_p_mul_one_add_smoothingFn hp).isTheta
+    _ =Θ[atTop] fun z => z ^ (p-1) :=
+            IsTheta.const_mul_left hp <| isTheta_refl _ _
 
 lemma growsPolynomially_deriv_rpow_p_mul_one_sub_smoothingFn (p : ℝ) :
     GrowsPolynomially fun x => ‖deriv (fun z => z ^ p * (1 - ε z)) x‖ := by

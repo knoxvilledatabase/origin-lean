@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Nat/Factorization/PrimePow.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.IsPrimePow
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Data.Nat.Prime.Pow
+
+noncomputable section
 
 /-!
 # Prime powers and factorizations
@@ -98,7 +100,12 @@ theorem isPrimePow_iff_unique_prime_dvd {n : ℕ} : IsPrimePow n ↔ ∃! p : �
   cases hq _ hq'.1 hq'.2
   simp
 
--- DISSOLVED: isPrimePow_pow_iff
+theorem isPrimePow_pow_iff {n k : ℕ} (hk : k ≠ 0) : IsPrimePow (n ^ k) ↔ IsPrimePow n := by
+  simp only [isPrimePow_iff_unique_prime_dvd]
+  apply existsUnique_congr
+  simp only [and_congr_right_iff]
+  intro p hp
+  exact ⟨hp.dvd_of_dvd_pow, fun t => t.trans (dvd_pow_self _ hk)⟩
 
 theorem Nat.Coprime.isPrimePow_dvd_mul {n a b : ℕ} (hab : Nat.Coprime a b) (hn : IsPrimePow n) :
     n ∣ a * b ↔ n ∣ a ∨ n ∣ b := by
@@ -136,7 +143,11 @@ theorem Nat.mul_divisors_filter_prime_pow {a b : ℕ} (hab : a.Coprime b) :
     and_congr_left_iff, not_false_iff, Nat.mem_divisors, or_self_iff]
   apply hab.isPrimePow_dvd_mul
 
--- DISSOLVED: IsPrimePow.factorization_minFac_ne_zero
+lemma IsPrimePow.factorization_minFac_ne_zero {n : ℕ} (hn : IsPrimePow n) :
+    n.factorization n.minFac ≠ 0 := by
+  refine mt (Nat.factorization_eq_zero_iff _ _).mp ?_
+  push_neg
+  exact ⟨n.minFac_prime hn.ne_one, n.minFac_dvd, hn.ne_zero⟩
 
 def Nat.Primes.prodNatEquiv : Nat.Primes × ℕ ≃ {n : ℕ // IsPrimePow n} where
   toFun pk :=
@@ -151,19 +162,3 @@ def Nat.Primes.prodNatEquiv : Nat.Primes × ℕ ≃ {n : ℕ // IsPrimePow n} wh
     ext1
     dsimp only
     rw [sub_one_add_one n.prop.factorization_minFac_ne_zero, n.prop.minFac_pow_factorization_eq]
-
-@[simp]
-lemma Nat.Primes.prodNatEquiv_apply (p : Nat.Primes) (k : ℕ) :
-    prodNatEquiv (p, k) = ⟨p ^ (k + 1), p, k + 1, prime_iff.mp p.prop, k.add_one_pos, rfl⟩ := by
-  rfl
-
-@[simp]
-lemma Nat.Primes.coe_prodNatEquiv_apply (p : Nat.Primes) (k : ℕ) :
-    (prodNatEquiv (p, k) : ℕ) = p ^ (k + 1) :=
-  rfl
-
-@[simp]
-lemma Nat.Primes.prodNatEquiv_symm_apply {n : ℕ} (hn : IsPrimePow n) :
-    prodNatEquiv.symm ⟨n, hn⟩ =
-      (⟨n.minFac, minFac_prime hn.ne_one⟩, n.factorization n.minFac - 1) :=
-  rfl

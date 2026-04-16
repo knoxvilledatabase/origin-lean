@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Shift.Quotient
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # The shift on cochain complexes and on the homotopy category
 
@@ -103,19 +105,6 @@ instance (n : ℤ) :
 
 end
 
-@[simp]
-lemma shiftFunctor_obj_X' (K : CochainComplex C ℤ) (n p : ℤ) :
-    ((CategoryTheory.shiftFunctor (CochainComplex C ℤ) n).obj K).X p = K.X (p + n) := rfl
-
-@[simp]
-lemma shiftFunctor_map_f' {K L : CochainComplex C ℤ} (φ : K ⟶ L) (n p : ℤ) :
-    ((CategoryTheory.shiftFunctor (CochainComplex C ℤ) n).map φ).f p = φ.f (p + n) := rfl
-
-@[simp]
-lemma shiftFunctor_obj_d' (K : CochainComplex C ℤ) (n i j : ℤ) :
-    ((CategoryTheory.shiftFunctor (CochainComplex C ℤ) n).obj K).d i j =
-      n.negOnePow • K.d _ _ := rfl
-
 lemma shiftFunctorAdd_inv_app_f (K : CochainComplex C ℤ) (a b n : ℤ) :
     ((shiftFunctorAdd (CochainComplex C ℤ) a b).inv.app K).f n =
       (K.XIsoOfEq (by dsimp; rw [add_comm a, add_assoc])).hom := rfl
@@ -155,9 +144,6 @@ lemma shiftFunctorZero_hom_app_f (K : CochainComplex C ℤ) (n : ℤ) :
   rw [← cancel_mono (((shiftFunctorZero (CochainComplex C ℤ) ℤ).inv.app K).f n), ← comp_f,
     Iso.hom_inv_id_app, id_f, shiftFunctorZero_inv_app_f]
   simp only [XIsoOfEq, eqToIso.hom, eqToHom_trans, eqToHom_refl]
-
-lemma XIsoOfEq_shift (K : CochainComplex C ℤ) (n : ℤ) {p q : ℤ} (hpq : p = q) :
-    (K⟦n⟧).XIsoOfEq hpq = K.XIsoOfEq (show p + n = q + n by rw [hpq]) := rfl
 
 variable (C)
 
@@ -238,18 +224,6 @@ instance commShiftMapCochainComplex :
     simp only [CochainComplex.shiftFunctorAdd_hom_app_f,
       CochainComplex.shiftFunctorAdd_inv_app_f, HomologicalComplex.XIsoOfEq, eqToIso,
       eqToHom_map, eqToHom_trans, eqToHom_refl]
-
-lemma mapHomologicalComplex_commShiftIso_eq (n : ℤ) :
-    (F.mapHomologicalComplex (ComplexShape.up ℤ)).commShiftIso n =
-      F.mapCochainComplexShiftIso n := rfl
-
-@[simp]
-lemma mapHomologicalComplex_commShiftIso_hom_app_f (K : CochainComplex C ℤ) (n i : ℤ) :
-    (((F.mapHomologicalComplex (ComplexShape.up ℤ)).commShiftIso n).hom.app K).f i = 𝟙 _ := rfl
-
-@[simp]
-lemma mapHomologicalComplex_commShiftIso_inv_app_f (K : CochainComplex C ℤ) (n i : ℤ) :
-    (((F.mapHomologicalComplex (ComplexShape.up ℤ)).commShiftIso n).inv.app K).f i = 𝟙 _ := rfl
 
 end Functor
 

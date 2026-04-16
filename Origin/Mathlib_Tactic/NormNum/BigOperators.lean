@@ -7,6 +7,8 @@ import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.List.FinRange
 
+noncomputable section
+
 /-!
 # `norm_num` plugin for big operators
 
@@ -88,6 +90,11 @@ lemma List.range_succ_eq_map' {n nn n' : ℕ} (pn : NormNum.IsNat n nn) (pn' : n
   rw [pn.out, Nat.cast_id, pn', List.range_succ_eq_map]
 
 set_option linter.unusedVariables false in
+/-- Either show the expression `s : Q(List α)` is Nil, or remove one element from it.
+
+Fails if we cannot determine which of the alternatives apply to the expression.
+
+-/
 
 partial def List.proveNilOrCons {u : Level} {α : Q(Type u)} (s : Q(List $α)) :
     MetaM (List.ProveNilOrConsResult s) :=
@@ -142,10 +149,6 @@ def Multiset.ProveZeroOrConsResult.eq_trans {α : Q(Type u)} {s t : Q(Multiset $
     Multiset.ProveZeroOrConsResult t → Multiset.ProveZeroOrConsResult s
   | .zero pf => .zero q(Eq.trans $eq $pf)
   | .cons a s' pf => .cons a s' q(Eq.trans $eq $pf)
-
-lemma Multiset.insert_eq_cons {α : Type*} (a : α) (s : Multiset α) :
-    insert a s = Multiset.cons a s :=
-  rfl
 
 lemma Multiset.range_zero' {n : ℕ} (pn : NormNum.IsNat n 0) :
     Multiset.range n = 0 := by rw [pn.out, Nat.cast_zero, Multiset.range_zero]
@@ -302,6 +305,11 @@ partial def evalFinsetBigop {α : Q(Type u)} {β : Q(Type v)}
       pure (res.eq_trans eq)
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- `norm_num` plugin for evaluating products of finsets.
+
+If your finset is not supported, you can add it to the match in `Finset.proveEmptyOrCons`.
+
+-/
 
 @[norm_num @Finset.prod _ _ _ _ _]
 partial def evalFinsetProd : NormNumExt where eval {u β} e := do
@@ -329,6 +337,11 @@ partial def evalFinsetProd : NormNumExt where eval {u β} e := do
     s
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- `norm_num` plugin for evaluating sums of finsets.
+
+If your finset is not supported, you can add it to the match in `Finset.proveEmptyOrCons`.
+
+-/
 
 @[norm_num @Finset.sum _ _ _ _ _]
 partial def evalFinsetSum : NormNumExt where eval {u β} e := do

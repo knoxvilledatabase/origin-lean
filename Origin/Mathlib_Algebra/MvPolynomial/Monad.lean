@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Rename
 import Mathlib.Algebra.MvPolynomial.Variables
 
+noncomputable section
+
 /-!
 
 # Monad operations on `MvPolynomial`
@@ -86,10 +88,6 @@ variable (σ R)
 theorem aeval_id_eq_join₁ : aeval id = @join₁ σ R _ :=
   rfl
 
-theorem eval₂Hom_C_id_eq_join₁ (φ : MvPolynomial (MvPolynomial σ R) R) :
-    eval₂Hom C id φ = join₁ φ :=
-  rfl
-
 @[simp]
 theorem eval₂Hom_id_X_eq_join₂ : eval₂Hom (RingHom.id _) X = @join₂ σ R _ :=
   rfl
@@ -142,14 +140,6 @@ theorem aeval_id_rename (f : σ → MvPolynomial τ R) (p : MvPolynomial σ R) :
 theorem join₁_rename (f : σ → MvPolynomial τ R) (φ : MvPolynomial σ R) :
     join₁ (rename f φ) = bind₁ f φ :=
   aeval_id_rename _ _
-
-@[simp]
-theorem bind₁_id : bind₁ (@id (MvPolynomial σ R)) = join₁ :=
-  rfl
-
-@[simp]
-theorem bind₂_id : bind₂ (RingHom.id (MvPolynomial σ R)) = join₂ :=
-  rfl
 
 theorem bind₁_bind₁ {υ : Type*} (f : σ → MvPolynomial τ R) (g : τ → MvPolynomial υ R)
     (φ : MvPolynomial σ R) : (bind₁ g) (bind₁ f φ) = bind₁ (fun i => bind₁ g (f i)) φ := by

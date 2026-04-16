@@ -7,6 +7,8 @@ import Mathlib.Data.Real.ENatENNReal
 import Mathlib.Data.Set.Card
 import Mathlib.Topology.Instances.ENNReal
 
+noncomputable section
+
 /-!
 # Infinite sums of ENNReal and Set.encard
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Module.LinearMap.End
 import Mathlib.Algebra.Module.Submodule.Defs
 
+noncomputable section
+
 /-!
 
 # Linear maps involving submodules of a module
@@ -45,10 +47,6 @@ protected def subtype : S' →ₗ[R] M where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-@[simp]
-protected theorem coeSubtype : (SMulMemClass.subtype S' : S' → M) = Subtype.val :=
-  rfl
-
 end SMulMemClass
 
 namespace Submodule
@@ -69,13 +67,6 @@ protected def subtype : p →ₗ[R] M where
   toFun := Subtype.val
   map_add' := by simp [coe_smul]
   map_smul' := by simp [coe_smul]
-
-theorem subtype_apply (x : p) : p.subtype x = x :=
-  rfl
-
-@[simp]
-theorem coe_subtype : (Submodule.subtype p : p → M) = Subtype.val :=
-  rfl
 
 theorem injective_subtype : Injective p.subtype :=
   Subtype.coe_injective
@@ -123,20 +114,10 @@ variable (f : M →ₛₗ[σ₁₂] M₂) (g : M₂ →ₛₗ[σ₂₃] M₃)
 def domRestrict (f : M →ₛₗ[σ₁₂] M₂) (p : Submodule R M) : p →ₛₗ[σ₁₂] M₂ :=
   f.comp p.subtype
 
-@[simp]
-theorem domRestrict_apply (f : M →ₛₗ[σ₁₂] M₂) (p : Submodule R M) (x : p) :
-    f.domRestrict p x = f x :=
-  rfl
-
 def codRestrict (p : Submodule R₂ M₂) (f : M →ₛₗ[σ₁₂] M₂) (h : ∀ c, f c ∈ p) : M →ₛₗ[σ₁₂] p where
   toFun c := ⟨f c, h c⟩
   map_add' _ _ := by simp
   map_smul' _ _ := by simp
-
-@[simp]
-theorem codRestrict_apply (p : Submodule R₂ M₂) (f : M →ₛₗ[σ₁₂] M₂) {h} (x : M) :
-    (codRestrict p f h x : M₂) = f x :=
-  rfl
 
 @[simp]
 theorem comp_codRestrict (p : Submodule R₃ M₃) (h : ∀ b, g b ∈ p) :
@@ -177,12 +158,6 @@ lemma restrict_comp
     (g ∘ₗ f).restrict hfg = (g.restrict hg) ∘ₗ (f.restrict hf) :=
   rfl
 
-lemma restrict_smul_one
-    {R M : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M] {p : Submodule R M}
-    (μ : R) (h : ∀ x ∈ p, (μ • (1 : Module.End R M)) x ∈ p := fun _ ↦ p.smul_mem μ) :
-    (μ • 1 : Module.End R M).restrict h = μ • (1 : Module.End R p) :=
-  rfl
-
 lemma restrict_commute {f g : M →ₗ[R] M} (h : Commute f g) {p : Submodule R M}
     (hf : MapsTo f p p) (hg : MapsTo g p p) :
     Commute (f.restrict hf) (g.restrict hg) := by
@@ -190,32 +165,9 @@ lemma restrict_commute {f g : M →ₗ[R] M} (h : Commute f g) {p : Submodule R 
   conv_lhs => rw [mul_eq_comp, ← restrict_comp]; congr; rw [← mul_eq_comp, h.eq]
   rfl
 
-theorem subtype_comp_restrict {f : M →ₗ[R] M₁} {p : Submodule R M} {q : Submodule R M₁}
-    (hf : ∀ x ∈ p, f x ∈ q) : q.subtype.comp (f.restrict hf) = f.domRestrict p :=
-  rfl
-
-theorem restrict_eq_codRestrict_domRestrict {f : M →ₗ[R] M₁} {p : Submodule R M}
-    {q : Submodule R M₁} (hf : ∀ x ∈ p, f x ∈ q) :
-    f.restrict hf = (f.domRestrict p).codRestrict q fun x => hf x.1 x.2 :=
-  rfl
-
-theorem restrict_eq_domRestrict_codRestrict {f : M →ₗ[R] M₁} {p : Submodule R M}
-    {q : Submodule R M₁} (hf : ∀ x, f x ∈ q) :
-    (f.restrict fun x _ => hf x) = (f.codRestrict q hf).domRestrict p :=
-  rfl
-
 theorem sum_apply (t : Finset ι) (f : ι → M →ₛₗ[σ₁₂] M₂) (b : M) :
     (∑ d ∈ t, f d) b = ∑ d ∈ t, f d b :=
   _root_.map_sum ((AddMonoidHom.eval b).comp toAddMonoidHom') f _
-
-@[simp, norm_cast]
-theorem coeFn_sum {ι : Type*} (t : Finset ι) (f : ι → M →ₛₗ[σ₁₂] M₂) :
-    ⇑(∑ i ∈ t, f i) = ∑ i ∈ t, (f i : M → M₂) :=
-  _root_.map_sum
-    (show AddMonoidHom (M →ₛₗ[σ₁₂] M₂) (M → M₂)
-      from { toFun := DFunLike.coe,
-             map_zero' := rfl
-             map_add' := fun _ _ => rfl }) _ _
 
 theorem submodule_pow_eq_zero_of_pow_eq_zero {N : Submodule R M} {g : Module.End R N}
     {G : Module.End R M} (h : G.comp N.subtype = N.subtype.comp g) {k : ℕ} (hG : G ^ k = 0) :
@@ -260,11 +212,6 @@ def domRestrict' (p : Submodule R M) : (M →ₗ[R] M₂) →ₗ[R] p →ₗ[R] 
   map_add' := by simp [LinearMap.ext_iff]
   map_smul' := by simp [LinearMap.ext_iff]
 
-@[simp]
-theorem domRestrict'_apply (f : M →ₗ[R] M₂) (p : Submodule R M) (x : p) :
-    domRestrict' p f x = f x :=
-  rfl
-
 end CommSemiring
 
 end LinearMap
@@ -279,13 +226,6 @@ variable {R : Type*} {M : Type*} [Semiring R] [AddCommMonoid M] [Module R M] {p 
 
 def inclusion (h : p ≤ p') : p →ₗ[R] p' :=
   p.subtype.codRestrict p' fun ⟨_, hx⟩ => h hx
-
-@[simp]
-theorem coe_inclusion (h : p ≤ p') (x : p) : (inclusion h x : M) = x :=
-  rfl
-
-theorem inclusion_apply (h : p ≤ p') (x : p) : inclusion h x = ⟨x, h x.2⟩ :=
-  rfl
 
 theorem inclusion_injective (h : p ≤ p') : Function.Injective (inclusion h) := fun _ _ h =>
   Subtype.val_injective (Subtype.mk.inj h)

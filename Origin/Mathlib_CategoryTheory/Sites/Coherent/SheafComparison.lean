@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Sites.Coherent.ReflectsPreregular
 import Mathlib.CategoryTheory.Sites.DenseSubsite.InducedTopology
 import Mathlib.CategoryTheory.Sites.Whiskering
 
+noncomputable section
+
 /-!
 
 # Categories of coherent sheaves
@@ -108,7 +110,6 @@ variable {C : Type u₁} {D : Type u₂} [Category.{v₁} C] [Category.{v₂} D]
   [F.EffectivelyEnough]
 
 noncomputable
-
 def equivalence (A : Type u₃) [Category.{v₃} A] [∀ X, HasLimitsOfShape (StructuredArrow X F.op) A] :
     haveI := F.reflects_precoherent
     Sheaf (coherentTopology C) A ≌ Sheaf (coherentTopology D) A :=
@@ -127,7 +128,6 @@ variable {C : Type u₁} {D : Type u₂} [Category.{v₁} C] [Category.{v₂} D]
   [F.EffectivelyEnough]
 
 noncomputable
-
 def equivalence' (A : Type u₃) [Category.{v₃} A]
     [∀ X, HasLimitsOfShape (StructuredArrow X F.op) A] :
     haveI := F.reflects_precoherent
@@ -204,7 +204,6 @@ variable {C : Type u₁} {D : Type u₂} [Category.{v₁} C] [Category.{v₂} D]
   [F.EffectivelyEnough]
 
 noncomputable
-
 def equivalence (A : Type u₃) [Category.{v₃} A] [∀ X, HasLimitsOfShape (StructuredArrow X F.op) A] :
     haveI := F.reflects_preregular
     Sheaf (regularTopology C) A ≌ Sheaf (regularTopology D) A :=

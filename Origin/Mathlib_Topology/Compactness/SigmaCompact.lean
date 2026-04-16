@@ -5,6 +5,8 @@ Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Topology.Compactness.LocallyCompact
 
+noncomputable section
+
 /-!
 # Sigma-compactness in topological spaces
 
@@ -273,8 +275,6 @@ theorem countable_cover_nhdsWithin_of_sigmaCompact {f : X → Set X} {s : Set X}
   rcases mem_iUnion₂.1 (hsub n ⟨hn, hx⟩) with ⟨y, hyt : y ∈ t n, hyf : x ∈ s → x ∈ f y⟩
   exact ⟨y, mem_iUnion.2 ⟨n, hyt⟩, hyf hx⟩
 
-countable_cover_nhdsWithin_of_sigma_compact := countable_cover_nhdsWithin_of_sigmaCompact
-
 theorem countable_cover_nhds_of_sigmaCompact {f : X → Set X} (hf : ∀ x, f x ∈ 𝓝 x) :
     ∃ s : Set X, s.Countable ∧ ⋃ x ∈ s, f x = univ := by
   simp only [← nhdsWithin_univ] at hf
@@ -283,8 +283,6 @@ theorem countable_cover_nhds_of_sigmaCompact {f : X → Set X} (hf : ∀ x, f x 
   exact ⟨s, hsc, univ_subset_iff.1 hsU⟩
 
 end
-
-countable_cover_nhds_of_sigma_compact := countable_cover_nhds_of_sigmaCompact
 
 structure CompactExhaustion (X : Type*) [TopologicalSpace X] where
   /-- The sequence of compact sets that form a compact exhaustion. -/
@@ -308,9 +306,6 @@ instance : RelHomClass (CompactExhaustion X) LE.le HasSubset.Subset where
     (fun n ↦ (f.subset_interior_succ' n).trans interior_subset) h
 
 variable (K : CompactExhaustion X)
-
-@[simp]
-theorem toFun_eq_coe : K.toFun = K := rfl
 
 protected theorem isCompact (n : ℕ) : IsCompact (K n) :=
   K.isCompact' n

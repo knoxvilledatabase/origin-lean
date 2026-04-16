@@ -7,6 +7,8 @@ import Mathlib.Data.Multiset.Bind
 import Mathlib.Control.Traversable.Lemmas
 import Mathlib.Control.Traversable.Instances
 
+noncomputable section
+
 /-!
 # Functoriality of `Multiset`.
 -/

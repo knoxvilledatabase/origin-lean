@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Order.Filter.Ultrafilter
 
+noncomputable section
+
 /-!
 # Subsingleton filters
 

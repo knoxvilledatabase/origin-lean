@@ -8,6 +8,8 @@ import Mathlib.Topology.NhdsSet
 import Mathlib.Topology.LocallyConstant.Basic
 import Mathlib.Analysis.Normed.Module.Basic
 
+noncomputable section
+
 /-! # Germs of functions between topological spaces
 
 In this file, we prove basic properties of germs of functions between topological spaces,
@@ -114,18 +116,8 @@ namespace Filter.Germ
 def sliceLeft [TopologicalSpace Y] {p : X × Y} (P : Germ (𝓝 p) Z) : Germ (𝓝 p.1) Z :=
   P.compTendsto (Prod.mk · p.2) (Continuous.Prod.mk_left p.2).continuousAt
 
-@[simp]
-theorem sliceLeft_coe [TopologicalSpace Y] {y : Y} (f : X × Y → Z) :
-    (↑f : Germ (𝓝 (x, y)) Z).sliceLeft = fun x' ↦ f (x', y) :=
-  rfl
-
 def sliceRight [TopologicalSpace Y] {p : X × Y} (P : Germ (𝓝 p) Z) : Germ (𝓝 p.2) Z :=
   P.compTendsto (Prod.mk p.1) (Continuous.Prod.mk p.1).continuousAt
-
-@[simp]
-theorem sliceRight_coe [TopologicalSpace Y] {y : Y} (f : X × Y → Z) :
-    (↑f : Germ (𝓝 (x, y)) Z).sliceRight = fun y' ↦ f (x, y') :=
-  rfl
 
 lemma isConstant_comp_subtype {s : Set X} {f : X → Y} {x : s}
     (hf : (f : Germ (𝓝 (x : X)) Y).IsConstant) :

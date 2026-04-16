@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
 import Mathlib.Analysis.Fourier.FourierTransform
 import Mathlib.NumberTheory.DirichletCharacter.GaussSum
 
+noncomputable section
+
 /-!
 # Fourier theory on `ZMod N`
 
@@ -76,6 +78,8 @@ noncomputable def dft : (ZMod N → E) ≃ₗ[ℂ] (ZMod N → E) where
     simp only [← Pi.smul_def, auxDFT_smul, auxDFT_neg, auxDFT_auxDFT, neg_neg, ← mul_smul,
       inv_mul_cancel₀ (NeZero.ne _), one_smul]
 
+@[inherit_doc] scoped notation "𝓕" => dft
+
 scoped notation "𝓕⁻" => LinearEquiv.symm dft
 
 lemma dft_apply (Φ : ZMod N → E) (k : ZMod N) :
@@ -93,12 +97,6 @@ lemma invDFT_apply (Ψ : ZMod N → E) (k : ZMod N) :
 lemma invDFT_def (Ψ : ZMod N → E) :
     𝓕⁻ Ψ = fun k ↦ (N : ℂ)⁻¹ • ∑ j : ZMod N, stdAddChar (j * k) • Ψ j :=
   funext <| invDFT_apply Ψ
-
-lemma invDFT_apply' (Ψ : ZMod N → E) (k : ZMod N) : 𝓕⁻ Ψ k = (N : ℂ)⁻¹ • 𝓕 Ψ (-k) :=
-  rfl
-
-lemma invDFT_def' (Ψ : ZMod N → E) : 𝓕⁻ Ψ = fun k ↦ (N : ℂ)⁻¹ • 𝓕 Ψ (-k) :=
-  rfl
 
 lemma dft_apply_zero (Φ : ZMod N → E) : 𝓕 Φ 0 = ∑ j, Φ j := by
   simp only [dft_apply, mul_zero, neg_zero, map_zero_eq_one, one_smul]

@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.NCompGamma
 
+noncomputable section
+
 /-! The Dold-Kan equivalence for additive categories.
 
 This file defines `Preadditive.DoldKan.equivalence` which is the equivalence

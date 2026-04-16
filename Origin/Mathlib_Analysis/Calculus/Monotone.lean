@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Slope
 import Mathlib.MeasureTheory.Covering.OneDim
 import Mathlib.Order.Monotone.Extension
 
+noncomputable section
+
 /-!
 # Differentiability of monotone functions
 

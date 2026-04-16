@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.LineDeriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
+noncomputable section
+
 /-!
 # Quadratic forms are line (Gateaux) differentiable
 

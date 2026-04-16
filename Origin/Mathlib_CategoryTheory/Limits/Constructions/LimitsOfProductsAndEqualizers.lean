@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Equalizers
 import Mathlib.Data.Fintype.Prod
 import Mathlib.Data.Fintype.Sigma
 
+noncomputable section
+
 /-!
 # Constructing limits from products and equalizers.
 

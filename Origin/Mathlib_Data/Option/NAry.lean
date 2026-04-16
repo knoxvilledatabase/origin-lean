@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Tactic.Init
 import Mathlib.Logic.Function.Defs
 
+noncomputable section
+
 /-!
 # Binary map of options
 
@@ -42,19 +44,7 @@ theorem map₂_def {α β γ : Type u} (f : α → β → γ) (a : Option α) (b
   cases a <;> rfl
 
 @[simp]
-theorem map₂_some_some (f : α → β → γ) (a : α) (b : β) : map₂ f (some a) (some b) = f a b := rfl
-
-theorem map₂_coe_coe (f : α → β → γ) (a : α) (b : β) : map₂ f a b = f a b := rfl
-
-@[simp]
-theorem map₂_none_left (f : α → β → γ) (b : Option β) : map₂ f none b = none := rfl
-
-@[simp]
 theorem map₂_none_right (f : α → β → γ) (a : Option α) : map₂ f a none = none := by cases a <;> rfl
-
-@[simp]
-theorem map₂_coe_left (f : α → β → γ) (a : α) (b : Option β) : map₂ f a b = b.map fun b => f a b :=
-  rfl
 
 @[simp]
 theorem map₂_coe_right (f : α → β → γ) (a : Option α) (b : β) :

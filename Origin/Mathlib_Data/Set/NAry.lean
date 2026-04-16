@@ -5,6 +5,8 @@ Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Set.Prod
 
+noncomputable section
+
 /-!
 # N-ary images of sets
 
@@ -142,8 +144,6 @@ theorem image2_singleton_left : image2 f {a} t = f a '' t :=
 @[simp]
 theorem image2_singleton_right : image2 f s {b} = (fun a => f a b) '' s :=
   ext fun x => by simp
-
-theorem image2_singleton : image2 f {a} {b} = {f a b} := by simp
 
 @[simp]
 theorem image2_insert_left : image2 f (insert a s) t = (fun b => f a b) '' t ∪ image2 f s t := by

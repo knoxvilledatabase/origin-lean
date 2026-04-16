@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Monoidal
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 
+noncomputable section
+
 /-!
 # The braided and symmetric category structures on graded objects
 

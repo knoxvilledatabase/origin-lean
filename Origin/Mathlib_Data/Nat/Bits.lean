@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Bits.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 4 | Infrastructure: 10
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Basic
@@ -10,6 +10,8 @@ import Mathlib.Data.List.Defs
 import Mathlib.Tactic.Convert
 import Mathlib.Tactic.GeneralizeProofs
 import Mathlib.Tactic.Says
+
+noncomputable section
 
 /-!
 # Additional properties of binary recursion on `Nat`
@@ -43,10 +45,6 @@ def div2 (n : ℕ) : ℕ := (boddDiv2 n).2
 def bodd (n : ℕ) : Bool := (boddDiv2 n).1
 
 @[simp] lemma bodd_zero : bodd 0 = false := rfl
-
-@[simp] lemma bodd_one : bodd 1 = true := rfl
-
-lemma bodd_two : bodd 2 = false := rfl
 
 @[simp]
 lemma bodd_succ (n : ℕ) : bodd (succ n) = not (bodd n) := by
@@ -82,12 +80,6 @@ lemma mod_two_of_bodd (n : ℕ) : n % 2 = (bodd n).toNat := by
   rw [← this]
   rcases mod_two_eq_zero_or_one n with h | h <;> rw [h] <;> rfl
 
-@[simp] lemma div2_zero : div2 0 = 0 := rfl
-
-@[simp] lemma div2_one : div2 1 = 0 := rfl
-
-lemma div2_two : div2 2 = 1 := rfl
-
 @[simp]
 lemma div2_succ (n : ℕ) : div2 (n + 1) = cond (bodd n) (succ (div2 n)) (div2 n) := by
   simp only [bodd, boddDiv2, div2]
@@ -112,9 +104,6 @@ lemma div2_val (n) : div2 n = n / 2 := by
 lemma bit_decomp (n : Nat) : bit (bodd n) (div2 n) = n :=
   (bit_val _ _).trans <| (Nat.add_comm _ _).trans <| bodd_add_div2 _
 
-lemma bit_zero : bit false 0 = 0 :=
-  rfl
-
 def shiftLeft' (b : Bool) (m : ℕ) : ℕ → ℕ
   | 0 => m
   | n + 1 => bit b (shiftLeft' b m n)
@@ -127,11 +116,12 @@ lemma shiftLeft'_false : ∀ n, shiftLeft' false m n = m <<< n
       rw [Nat.mul_comm, Nat.mul_assoc, ← Nat.pow_succ]; simp
     simp [shiftLeft_eq, shiftLeft', bit_val, shiftLeft'_false, this]
 
-@[simp] lemma shiftLeft_eq' (m n : Nat) : shiftLeft m n = m <<< n := rfl
-
-@[simp] lemma shiftRight_eq (m n : Nat) : shiftRight m n = m >>> n := rfl
-
--- DISSOLVED: binaryRec_decreasing
+lemma binaryRec_decreasing (h : n ≠ 0) : div2 n < n := by
+  rw [div2_val]
+  apply (div_lt_iff_lt_mul <| succ_pos 1).2
+  have := Nat.mul_lt_mul_of_pos_left (lt_succ_self 1)
+    (lt_of_le_of_ne n.zero_le h.symm)
+  rwa [Nat.mul_one] at this
 
 def size : ℕ → ℕ :=
   binaryRec 0 fun _ _ => succ
@@ -169,7 +159,10 @@ lemma shiftLeft'_sub (b m) : ∀ {n k}, k ≤ n → shiftLeft' b m (n - k) = (sh
 lemma shiftLeft_sub : ∀ (m : Nat) {n k}, k ≤ n → m <<< (n - k) = (m <<< n) >>> k :=
   fun _ _ _ hk => by simp only [← shiftLeft'_false, shiftLeft'_sub false _ hk]
 
--- DISSOLVED: bodd_eq_one_and_ne_zero
+lemma bodd_eq_one_and_ne_zero : ∀ n, bodd n = (1 &&& n != 0)
+  | 0 => rfl
+  | 1 => rfl
+  | n + 2 => by simpa using bodd_eq_one_and_ne_zero n
 
 lemma testBit_bit_succ (m b n) : testBit (bit b n) (succ m) = testBit n m := by
   have : bodd (((bit b n) >>> 1) >>> m) = bodd (n >>> m) := by
@@ -180,9 +173,6 @@ lemma testBit_bit_succ (m b n) : testBit (bit b n) (succ m) = testBit n m := by
   exact this
 
 /-! ### `boddDiv2_eq` and `bodd` -/
-
-@[simp]
-theorem boddDiv2_eq (n : ℕ) : boddDiv2 n = (bodd n, div2 n) := rfl
 
 @[simp]
 theorem div2_bit0 (n) : div2 (2 * n) = n :=
@@ -201,7 +191,8 @@ theorem bit_add' : ∀ (b : Bool) (n m : ℕ), bit b (n + m) = bit b n + bit fal
   | true,  _, _ => by dsimp [bit]; omega
   | false, _, _ => by dsimp [bit]; omega
 
--- DISSOLVED: bit_ne_zero
+theorem bit_ne_zero (b) {n} (h : n ≠ 0) : bit b n ≠ 0 := by
+  cases b <;> dsimp [bit] <;> omega
 
 @[simp]
 theorem bitCasesOn_bit0 {motive : ℕ → Sort u} (H : ∀ b n, motive (bit b n)) (n : ℕ) :
@@ -241,7 +232,9 @@ theorem bits_append_bit (n : ℕ) (b : Bool) (hn : n = 0 → b = true) :
   rw [Nat.bits, Nat.bits, binaryRec_eq]
   simpa
 
--- DISSOLVED: bit0_bits
+@[simp]
+theorem bit0_bits (n : ℕ) (hn : n ≠ 0) : (2 * n).bits = false :: n.bits :=
+  bits_append_bit n false fun hn' => absurd hn' hn
 
 @[simp]
 theorem bit1_bits (n : ℕ) : (2 * n + 1).bits = true :: n.bits :=

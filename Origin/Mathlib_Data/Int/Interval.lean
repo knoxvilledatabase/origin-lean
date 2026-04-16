@@ -7,6 +7,8 @@ import Mathlib.Algebra.CharZero.Lemmas
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Order.Interval.Finset.Basic
 
+noncomputable section
+
 /-!
 # Finite intervals of integers
 
@@ -72,29 +74,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder ℤ where
       exact ⟨sub_lt_sub_right hb _, add_sub_cancel _ _⟩
 
 variable (a b : ℤ)
-
-theorem Icc_eq_finset_map :
-    Icc a b =
-      (Finset.range (b + 1 - a).toNat).map (Nat.castEmbedding.trans <| addLeftEmbedding a) :=
-  rfl
-
-theorem Ico_eq_finset_map :
-    Ico a b = (Finset.range (b - a).toNat).map (Nat.castEmbedding.trans <| addLeftEmbedding a) :=
-  rfl
-
-theorem Ioc_eq_finset_map :
-    Ioc a b =
-      (Finset.range (b - a).toNat).map (Nat.castEmbedding.trans <| addLeftEmbedding (a + 1)) :=
-  rfl
-
-theorem Ioo_eq_finset_map :
-    Ioo a b =
-      (Finset.range (b - a - 1).toNat).map (Nat.castEmbedding.trans <| addLeftEmbedding (a + 1)) :=
-  rfl
-
-theorem uIcc_eq_finset_map :
-    uIcc a b = (range (max a b + 1 - min a b).toNat).map
-      (Nat.castEmbedding.trans <| addLeftEmbedding <| min a b) := rfl
 
 @[simp]
 theorem card_Icc : #(Icc a b) = (b + 1 - a).toNat := (card_map _).trans <| card_range _

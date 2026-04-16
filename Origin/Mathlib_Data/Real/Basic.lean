@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.CauSeq.Completion
 import Mathlib.Algebra.Order.Field.Rat
 
+noncomputable section
+
 /-!
 # Real numbers from Cauchy sequences
 
@@ -29,11 +31,6 @@ structure Real where ofCauchy ::
 notation "ℝ" => Real
 
 namespace CauSeq.Completion
-
-@[simp]
-theorem ofRat_rat {abv : ℚ → ℚ} [IsAbsoluteValue abv] (q : ℚ) :
-    ofRat (q : ℚ) = (q : Cauchy abv) :=
-  rfl
 
 end CauSeq.Completion
 
@@ -153,12 +150,6 @@ lemma ofCauchy_nnratCast (q : ℚ≥0) : (⟨q⟩ : ℝ) = q := rfl
 lemma ofCauchy_ratCast (q : ℚ) : (⟨q⟩ : ℝ) = q := rfl
 
 lemma cauchy_natCast (n : ℕ) : (n : ℝ).cauchy = n := rfl
-
-lemma cauchy_intCast (z : ℤ) : (z : ℝ).cauchy = z := rfl
-
-lemma cauchy_nnratCast (q : ℚ≥0) : (q : ℝ).cauchy = q := rfl
-
-lemma cauchy_ratCast (q : ℚ) : (q : ℝ).cauchy = q := rfl
 
 instance commRing : CommRing ℝ where
   natCast n := ⟨n⟩

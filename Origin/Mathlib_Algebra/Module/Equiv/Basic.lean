@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Equiv/Basic.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 49
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 49
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Algebra.Module.Hom
 import Mathlib.Algebra.Module.LinearMap.End
 import Mathlib.Algebra.Module.Pi
+
+noncomputable section
 
 /-!
 # Further results on (semi)linear equivalences.
@@ -77,26 +79,9 @@ instance automorphismGroup : Group (M ≃ₗ[R] M) where
   one_mul _ := ext fun _ ↦ rfl
   inv_mul_cancel f := ext <| f.left_inv
 
-@[simp]
-lemma coe_one : ↑(1 : M ≃ₗ[R] M) = id := rfl
-
-@[simp]
-lemma coe_toLinearMap_one : (↑(1 : M ≃ₗ[R] M) : M →ₗ[R] M) = LinearMap.id := rfl
-
-@[simp]
-lemma coe_toLinearMap_mul {e₁ e₂ : M ≃ₗ[R] M} :
-    (↑(e₁ * e₂) : M →ₗ[R] M) = (e₁ : M →ₗ[R] M) * (e₂ : M →ₗ[R] M) :=
-  rfl
-
 theorem coe_pow (e : M ≃ₗ[R] M) (n : ℕ) : ⇑(e ^ n) = e^[n] := hom_coe_pow _ rfl (fun _ _ ↦ rfl) _ _
 
 theorem pow_apply (e : M ≃ₗ[R] M) (n : ℕ) (m : M) : (e ^ n) m = e^[n] m := congr_fun (coe_pow e n) m
-
-@[simps]
-def automorphismGroup.toLinearMapMonoidHom : (M ≃ₗ[R] M) →* M →ₗ[R] M where
-  toFun e := e.toLinearMap
-  map_one' := rfl
-  map_mul' _ _ := rfl
 
 instance applyDistribMulAction : DistribMulAction (M ≃ₗ[R] M) M where
   smul := (· <| ·)
@@ -104,10 +89,6 @@ instance applyDistribMulAction : DistribMulAction (M ≃ₗ[R] M) M where
   smul_add := LinearEquiv.map_add
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
-
-@[simp]
-protected theorem smul_def (f : M ≃ₗ[R] M) (a : M) : f • a = f a :=
-  rfl
 
 instance apply_faithfulSMul : FaithfulSMul (M ≃ₗ[R] M) M :=
   ⟨LinearEquiv.ext⟩
@@ -190,43 +171,13 @@ variable (e : M ≃+ M₂)
 def toLinearEquiv (h : ∀ (c : R) (x), e (c • x) = c • e x) : M ≃ₗ[R] M₂ :=
   { e with map_smul' := h }
 
-@[simp]
-theorem coe_toLinearEquiv (h : ∀ (c : R) (x), e (c • x) = c • e x) : ⇑(e.toLinearEquiv h) = e :=
-  rfl
-
-@[simp]
-theorem coe_toLinearEquiv_symm (h : ∀ (c : R) (x), e (c • x) = c • e x) :
-    ⇑(e.toLinearEquiv h).symm = e.symm :=
-  rfl
-
 def toNatLinearEquiv : M ≃ₗ[ℕ] M₂ :=
   e.toLinearEquiv fun c a ↦ by rw [map_nsmul]
-
-@[simp]
-theorem coe_toNatLinearEquiv : ⇑e.toNatLinearEquiv = e :=
-  rfl
-
-@[simp]
-theorem toNatLinearEquiv_toAddEquiv : ↑e.toNatLinearEquiv = e :=
-  rfl
 
 @[simp]
 theorem _root_.LinearEquiv.toAddEquiv_toNatLinearEquiv (e : M ≃ₗ[ℕ] M₂) :
     AddEquiv.toNatLinearEquiv ↑e = e :=
   DFunLike.coe_injective rfl
-
-@[simp]
-theorem toNatLinearEquiv_symm : e.toNatLinearEquiv.symm = e.symm.toNatLinearEquiv :=
-  rfl
-
-@[simp]
-theorem toNatLinearEquiv_refl : (AddEquiv.refl M).toNatLinearEquiv = LinearEquiv.refl ℕ M :=
-  rfl
-
-@[simp]
-theorem toNatLinearEquiv_trans (e₂ : M₂ ≃+ M₃) :
-    e.toNatLinearEquiv.trans e₂.toNatLinearEquiv = (e.trans e₂).toNatLinearEquiv :=
-  rfl
 
 end AddCommMonoid
 
@@ -240,10 +191,6 @@ def toIntLinearEquiv : M ≃ₗ[ℤ] M₂ :=
   e.toLinearEquiv fun c a ↦ e.toAddMonoidHom.map_zsmul a c
 
 @[simp]
-theorem coe_toIntLinearEquiv : ⇑e.toIntLinearEquiv = e :=
-  rfl
-
-@[simp]
 theorem toIntLinearEquiv_toAddEquiv : ↑e.toIntLinearEquiv = e := by
   ext
   rfl
@@ -252,19 +199,6 @@ theorem toIntLinearEquiv_toAddEquiv : ↑e.toIntLinearEquiv = e := by
 theorem _root_.LinearEquiv.toAddEquiv_toIntLinearEquiv (e : M ≃ₗ[ℤ] M₂) :
     AddEquiv.toIntLinearEquiv (e : M ≃+ M₂) = e :=
   DFunLike.coe_injective rfl
-
-@[simp]
-theorem toIntLinearEquiv_symm : e.toIntLinearEquiv.symm = e.symm.toIntLinearEquiv :=
-  rfl
-
-@[simp]
-theorem toIntLinearEquiv_refl : (AddEquiv.refl M).toIntLinearEquiv = LinearEquiv.refl ℤ M :=
-  rfl
-
-@[simp]
-theorem toIntLinearEquiv_trans (e₂ : M₂ ≃+ M₃) :
-    e.toIntLinearEquiv.trans e₂.toIntLinearEquiv = (e.trans e₂).toIntLinearEquiv :=
-  rfl
 
 end AddCommGroup
 
@@ -287,17 +221,6 @@ def ringLmapEquivSelf [Module S M] [SMulCommClass R S M] : (R →ₗ[R] M) ≃�
     right_inv := fun x ↦ by simp }
 
 end LinearMap
-
-@[simps]
-def addMonoidHomLequivNat {A B : Type*} (R : Type*) [Semiring R] [AddCommMonoid A]
-    [AddCommMonoid B] [Module R B] : (A →+ B) ≃ₗ[R] A →ₗ[ℕ] B
-    where
-  toFun := AddMonoidHom.toNatLinearMap
-  invFun := LinearMap.toAddMonoidHom
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 @[simps]
 def addMonoidHomLequivInt {A B : Type*} (R : Type*) [Semiring R] [AddCommGroup A] [AddCommGroup B]
@@ -342,17 +265,6 @@ instance : Zero (M ≃ₛₗ[σ₁₂] M₂) :=
       right_inv := Subsingleton.elim _
       left_inv := Subsingleton.elim _ }⟩
 
-@[simp]
-theorem zero_symm : (0 : M ≃ₛₗ[σ₁₂] M₂).symm = 0 :=
-  rfl
-
-@[simp]
-theorem coe_zero : ⇑(0 : M ≃ₛₗ[σ₁₂] M₂) = 0 :=
-  rfl
-
-theorem zero_apply (x : M) : (0 : M ≃ₛₗ[σ₁₂] M₂) x = 0 :=
-  rfl
-
 instance : Unique (M ≃ₛₗ[σ₁₂] M₂) where
   uniq _ := toLinearMap_injective (Subsingleton.elim _ _)
   default := 0
@@ -379,14 +291,6 @@ protected def curry : (V × V₂ → M) ≃ₗ[R] V → V₂ → M :=
     map_add' := fun _ _ ↦ rfl
     map_smul' := fun _ _ ↦ rfl }
 
-@[simp]
-theorem coe_curry : ⇑(LinearEquiv.curry R M V V₂) = curry :=
-  rfl
-
-@[simp]
-theorem coe_curry_symm : ⇑(LinearEquiv.curry R M V V₂).symm = uncurry :=
-  rfl
-
 end Uncurry
 
 section
@@ -409,20 +313,6 @@ def ofLinear (h₁ : f.comp g = LinearMap.id) (h₂ : g.comp f = LinearMap.id) :
     left_inv := LinearMap.ext_iff.1 h₂
     right_inv := LinearMap.ext_iff.1 h₁ }
 
-@[simp]
-theorem ofLinear_apply {h₁ h₂} (x : M) : (ofLinear f g h₁ h₂ : M ≃ₛₗ[σ₁₂] M₂) x = f x :=
-  rfl
-
-@[simp]
-theorem ofLinear_symm_apply {h₁ h₂} (x : M₂) : (ofLinear f g h₁ h₂ : M ≃ₛₗ[σ₁₂] M₂).symm x = g x :=
-  rfl
-
-@[simp]
-theorem ofLinear_toLinearMap {h₁ h₂} : (ofLinear f g h₁ h₂ : M ≃ₛₗ[σ₁₂] M₂) = f := rfl
-
-@[simp]
-theorem ofLinear_symm_toLinearMap {h₁ h₂} : (ofLinear f g h₁ h₂ : M ≃ₛₗ[σ₁₂] M₂).symm = g := rfl
-
 end
 
 end AddCommMonoid
@@ -435,16 +325,6 @@ def neg : M ≃ₗ[R] M :=
   { Equiv.neg M, (-LinearMap.id : M →ₗ[R] M) with }
 
 variable {R}
-
-@[simp]
-theorem coe_neg : ⇑(neg R : M ≃ₗ[R] M) = -id :=
-  rfl
-
-theorem neg_apply (x : M) : neg R x = -x := by simp
-
-@[simp]
-theorem symm_neg : (neg R : M ≃ₗ[R] M).symm = neg R :=
-  rfl
 
 end Neg
 
@@ -484,26 +364,12 @@ theorem arrowCongr_apply {R M₁ M₂ M₂₁ M₂₂ : Sort _} [CommSemiring R]
     (x : M₂) : arrowCongr e₁ e₂ f x = e₂ (f (e₁.symm x)) :=
   rfl
 
-@[simp]
-theorem arrowCongr_symm_apply {R M₁ M₂ M₂₁ M₂₂ : Sort _} [CommSemiring R] [AddCommMonoid M₁]
-    [AddCommMonoid M₂] [AddCommMonoid M₂₁] [AddCommMonoid M₂₂] [Module R M₁] [Module R M₂]
-    [Module R M₂₁] [Module R M₂₂] (e₁ : M₁ ≃ₗ[R] M₂) (e₂ : M₂₁ ≃ₗ[R] M₂₂) (f : M₂ →ₗ[R] M₂₂)
-    (x : M₁) : (arrowCongr e₁ e₂).symm f x = e₂.symm (f (e₁ x)) :=
-  rfl
-
 theorem arrowCongr_comp {N N₂ N₃ : Sort _} [AddCommMonoid N] [AddCommMonoid N₂] [AddCommMonoid N₃]
     [Module R N] [Module R N₂] [Module R N₃] (e₁ : M ≃ₗ[R] N) (e₂ : M₂ ≃ₗ[R] N₂) (e₃ : M₃ ≃ₗ[R] N₃)
     (f : M →ₗ[R] M₂) (g : M₂ →ₗ[R] M₃) :
     arrowCongr e₁ e₃ (g.comp f) = (arrowCongr e₂ e₃ g).comp (arrowCongr e₁ e₂ f) := by
   ext
   simp only [symm_apply_apply, arrowCongr_apply, LinearMap.comp_apply]
-
-theorem arrowCongr_trans {M₁ M₂ M₃ N₁ N₂ N₃ : Sort _} [AddCommMonoid M₁] [Module R M₁]
-    [AddCommMonoid M₂] [Module R M₂] [AddCommMonoid M₃] [Module R M₃] [AddCommMonoid N₁]
-    [Module R N₁] [AddCommMonoid N₂] [Module R N₂] [AddCommMonoid N₃] [Module R N₃]
-    (e₁ : M₁ ≃ₗ[R] M₂) (e₂ : N₁ ≃ₗ[R] N₂) (e₃ : M₂ ≃ₗ[R] M₃) (e₄ : N₂ ≃ₗ[R] N₃) :
-    (arrowCongr e₁ e₂).trans (arrowCongr e₃ e₄) = arrowCongr (e₁.trans e₃) (e₂.trans e₄) :=
-  rfl
 
 def congrRight (f : M₂ ≃ₗ[R] M₃) : (M →ₗ[R] M₂) ≃ₗ[R] M →ₗ[R] M₃ :=
   arrowCongr (LinearEquiv.refl R M) f
@@ -515,21 +381,9 @@ theorem conj_apply (e : M ≃ₗ[R] M₂) (f : Module.End R M) :
     e.conj f = ((↑e : M →ₗ[R] M₂).comp f).comp (e.symm : M₂ →ₗ[R] M) :=
   rfl
 
-theorem conj_apply_apply (e : M ≃ₗ[R] M₂) (f : Module.End R M) (x : M₂) :
-    e.conj f x = e (f (e.symm x)) :=
-  rfl
-
-theorem symm_conj_apply (e : M ≃ₗ[R] M₂) (f : Module.End R M₂) :
-    e.symm.conj f = ((↑e.symm : M₂ →ₗ[R] M).comp f).comp (e : M →ₗ[R] M₂) :=
-  rfl
-
 theorem conj_comp (e : M ≃ₗ[R] M₂) (f g : Module.End R M) :
     e.conj (g.comp f) = (e.conj g).comp (e.conj f) :=
   arrowCongr_comp e e e f g
-
-theorem conj_trans (e₁ : M ≃ₗ[R] M₂) (e₂ : M₂ ≃ₗ[R] M₃) :
-    e₁.conj.trans e₂.conj = (e₁.trans e₂).conj :=
-  rfl
 
 @[simp]
 theorem conj_id (e : M ≃ₗ[R] M₂) : e.conj LinearMap.id = LinearMap.id := by
@@ -537,15 +391,6 @@ theorem conj_id (e : M ≃ₗ[R] M₂) : e.conj LinearMap.id = LinearMap.id := b
   simp [conj_apply]
 
 variable (M) in
-
-def congrLeft {R} (S) [Semiring R] [Semiring S] [Module R M₂] [Module R M₃] [Module R M]
-    [Module S M] [SMulCommClass R S M] (e : M₂ ≃ₗ[R] M₃) : (M₂ →ₗ[R] M) ≃ₗ[S] (M₃ →ₗ[R] M) where
-  toFun f := f.comp e.symm.toLinearMap
-  invFun f := f.comp e.toLinearMap
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  left_inv f := by dsimp only; apply DFunLike.ext; exact (congr_arg f <| e.left_inv ·)
-  right_inv f := by dsimp only; apply DFunLike.ext; exact (congr_arg f <| e.right_inv ·)
 
 end CommSemiring
 
@@ -557,7 +402,9 @@ variable (K) (M)
 
 open LinearMap
 
--- DISSOLVED: smulOfNeZero
+@[simps!]
+def smulOfNeZero (a : K) (ha : a ≠ 0) : M ≃ₗ[K] M :=
+  smulOfUnit <| Units.mk0 a ha
 
 end Field
 
@@ -628,24 +475,6 @@ def funCongrLeft (e : m ≃ n) : (n → M) ≃ₗ[R] m → M :=
       funext fun i ↦ by rw [id_apply, ← funLeft_comp, Equiv.symm_comp_self, LinearMap.funLeft_id])
     (LinearMap.ext fun x ↦
       funext fun i ↦ by rw [id_apply, ← funLeft_comp, Equiv.self_comp_symm, LinearMap.funLeft_id])
-
-@[simp]
-theorem funCongrLeft_apply (e : m ≃ n) (x : n → M) : funCongrLeft R M e x = funLeft R M e x :=
-  rfl
-
-@[simp]
-theorem funCongrLeft_id : funCongrLeft R M (Equiv.refl n) = LinearEquiv.refl R (n → M) :=
-  rfl
-
-@[simp]
-theorem funCongrLeft_comp (e₁ : m ≃ n) (e₂ : n ≃ p) :
-    funCongrLeft R M (Equiv.trans e₁ e₂) =
-      LinearEquiv.trans (funCongrLeft R M e₂) (funCongrLeft R M e₁) :=
-  rfl
-
-@[simp]
-theorem funCongrLeft_symm (e : m ≃ n) : (funCongrLeft R M e).symm = funCongrLeft R M e.symm :=
-  rfl
 
 end LinearEquiv
 

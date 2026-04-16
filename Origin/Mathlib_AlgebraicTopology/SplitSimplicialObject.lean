@@ -7,6 +7,8 @@ import Mathlib.AlgebraicTopology.SimplicialObject.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.Data.Fintype.Sigma
 
+noncomputable section
+
 /-!
 
 # Split simplicial objects
@@ -62,8 +64,6 @@ def e :=
 
 instance : Epi A.e :=
   A.2.2
-
-theorem ext' : A = ⟨A.1, ⟨A.e, A.2.2⟩⟩ := rfl
 
 theorem ext (A₁ A₂ : IndexSet Δ) (h₁ : A₁.1 = A₂.1) (h₂ : A₁.e ≫ eqToHom (by rw [h₁]) = A₂.e) :
     A₁ = A₂ := by
@@ -318,24 +318,6 @@ theorem congr_F {S₁ S₂ : Split C} {Φ₁ Φ₂ : S₁ ⟶ S₂} (h : Φ₁ =
 
 theorem congr_f {S₁ S₂ : Split C} {Φ₁ Φ₂ : S₁ ⟶ S₂} (h : Φ₁ = Φ₂) (n : ℕ) : Φ₁.f n = Φ₂.f n := by
   rw [h]
-
-@[simp]
-theorem id_F (S : Split C) : (𝟙 S : S ⟶ S).F = 𝟙 S.X :=
-  rfl
-
-@[simp]
-theorem id_f (S : Split C) (n : ℕ) : (𝟙 S : S ⟶ S).f n = 𝟙 (S.s.N n) :=
-  rfl
-
-@[simp]
-theorem comp_F {S₁ S₂ S₃ : Split C} (Φ₁₂ : S₁ ⟶ S₂) (Φ₂₃ : S₂ ⟶ S₃) :
-    (Φ₁₂ ≫ Φ₂₃).F = Φ₁₂.F ≫ Φ₂₃.F :=
-  rfl
-
-@[simp]
-theorem comp_f {S₁ S₂ S₃ : Split C} (Φ₁₂ : S₁ ⟶ S₂) (Φ₂₃ : S₂ ⟶ S₃) (n : ℕ) :
-    (Φ₁₂ ≫ Φ₂₃).f n = Φ₁₂.f n ≫ Φ₂₃.f n :=
-  rfl
 
 @[reassoc (attr := simp 1100)]
 theorem cofan_inj_naturality_symm {S₁ S₂ : Split C} (Φ : S₁ ⟶ S₂) {Δ : SimplexCategoryᵒᵖ}

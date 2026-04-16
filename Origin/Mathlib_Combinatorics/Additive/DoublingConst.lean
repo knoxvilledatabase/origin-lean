@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.Additive.PluenneckeRuzsa
 import Mathlib.Data.Finset.Density
 
+noncomputable section
+
 /-!
 # Doubling and difference constants
 

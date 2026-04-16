@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/SuccPred.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Algebra.Order.SuccPred
 import Mathlib.Data.Fin.Basic
 import Mathlib.Order.SuccPred.Archimedean
+
+noncomputable section
 
 /-!
 # Successors and predecessors of naturals
@@ -64,7 +66,9 @@ instance : IsSuccArchimedean ℕ :=
 instance : IsPredArchimedean ℕ :=
   ⟨fun {a} {b} h => ⟨b - a, by rw [pred_eq_pred, Nat.pred_iterate, tsub_tsub_cancel_of_le h]⟩⟩
 
--- DISSOLVED: forall_ne_zero_iff
+lemma forall_ne_zero_iff (P : ℕ → Prop) :
+    (∀ i, i ≠ 0 → P i) ↔ (∀ i, P (i + 1)) :=
+  SuccOrder.forall_ne_bot_iff P
 
 /-! ### Covering relation -/
 

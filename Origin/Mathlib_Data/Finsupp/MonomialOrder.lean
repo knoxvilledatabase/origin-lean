@@ -7,6 +7,8 @@ import Mathlib.Data.Finsupp.Lex
 import Mathlib.Data.Finsupp.WellFounded
 import Mathlib.Data.List.TFAE
 
+noncomputable section
+
 /-! # Monomial orders
 
 ## Monomial orders
@@ -82,9 +84,6 @@ instance orderBot : OrderBot (m.syn) where
     simp [map_add, zero_add] at this
     exact this
 
-@[simp]
-theorem bot_eq_zero : (⊥ : m.syn) = 0 := rfl
-
 theorem eq_zero_iff {a : m.syn} : a = 0 ↔ a ≤ 0 := eq_bot_iff
 
 lemma toSyn_strictMono : StrictMono (m.toSyn) := by
@@ -139,11 +138,5 @@ noncomputable def MonomialOrder.lex [WellFoundedGT σ] :
   { toEquiv := toLex
     map_add' := toLex_add }
   toSyn_monotone := Finsupp.toLex_monotone
-
-theorem MonomialOrder.lex_le_iff [WellFoundedGT σ] {c d : σ →₀ ℕ} :
-    c ≼[lex] d ↔ toLex c ≤ toLex d := Iff.rfl
-
-theorem MonomialOrder.lex_lt_iff [WellFoundedGT σ] {c d : σ →₀ ℕ} :
-    c ≺[lex] d ↔ toLex c < toLex d := Iff.rfl
 
 end Lex

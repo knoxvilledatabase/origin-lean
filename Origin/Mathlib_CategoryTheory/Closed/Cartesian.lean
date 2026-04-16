@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Mates
 import Mathlib.CategoryTheory.Closed.Monoidal
 
+noncomputable section
+
 /-!
 # Cartesian closed categories
 
@@ -88,6 +90,7 @@ abbrev coev : 𝟭 C ⟶ tensorLeft A ⋙ exp A :=
   ihom.coev A
 
 set_option quotPrecheck false in
+/-- Morphisms obtained using an exponentiable object. -/
 
 notation:20 A " ⟹ " B:19 => (exp A).obj B
 
@@ -108,6 +111,7 @@ def delabPrefunctorObjExp : Delab := whenPPOption getPPNotation <| withOverApp 6
   `($A ⟹ $B)
 
 set_option quotPrecheck false in
+/-- Morphisms from an exponentiable object. -/
 
 notation:30 B " ^^ " A:30 => (exp A).obj B
 

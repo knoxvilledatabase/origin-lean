@@ -10,6 +10,8 @@ import Mathlib.Algebra.GroupWithZero.Conj
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.FieldTheory.PurelyInseparable
 
+noncomputable section
+
 /-!
 # The Jacobson-Noether theorem
 

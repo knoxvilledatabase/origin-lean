@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Equiv
 import Mathlib.Analysis.Calculus.InverseFunctionTheorem.ApproximatesLinearOn
 
+noncomputable section
+
 /-!
 # Inverse function theorem
 
@@ -111,11 +113,6 @@ def toPartialHomeomorph (hf : HasStrictFDerivAt f (f' : E →L[𝕜] F) a) : Par
     (Classical.choose_spec hf.approximates_deriv_on_open_nhds).2.1
 
 variable {f}
-
-@[simp]
-theorem toPartialHomeomorph_coe (hf : HasStrictFDerivAt f (f' : E →L[𝕜] F) a) :
-    (hf.toPartialHomeomorph f : E → F) = f :=
-  rfl
 
 theorem mem_toPartialHomeomorph_source (hf : HasStrictFDerivAt f (f' : E →L[𝕜] F) a) :
     a ∈ (hf.toPartialHomeomorph f).source :=

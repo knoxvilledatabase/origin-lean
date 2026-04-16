@@ -1,11 +1,13 @@
 /-
 Extracted from GroupTheory/FreeGroup/Reduce.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.GroupTheory.FreeGroup.Basic
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.List.Sublists
+
+noncomputable section
 
 /-!
 # The maximal reduction of a word in a free group
@@ -32,10 +34,6 @@ def reduce : (L : List (α × Bool)) -> List (α × Bool) :=
   List.rec [] fun hd1 _tl1 ih =>
     List.casesOn ih [hd1] fun hd2 tl2 =>
       if hd1.1 = hd2.1 ∧ hd1.2 = not hd2.2 then tl2 else hd1 :: hd2 :: tl2
-
-@[to_additive (attr := simp)] lemma reduce_nil : reduce ([] : List (α × Bool)) = [] := rfl
-
-@[to_additive] lemma reduce_singleton (s : α × Bool) : reduce [s] = [s] := rfl
 
 @[to_additive (attr := simp)]
 theorem reduce.cons (x) :
@@ -187,10 +185,6 @@ theorem toWord_mk : (mk L₁).toWord = reduce L₁ :=
   rfl
 
 @[to_additive (attr := simp)]
-theorem toWord_of (a : α) : (of a).toWord = [(a, true)] :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem reduce_toWord : ∀ x : FreeGroup α, reduce (toWord x) = toWord x := by
   rintro ⟨L⟩
   exact reduce.idem
@@ -276,7 +270,8 @@ end Reduce
 theorem one_ne_of (a : α) : 1 ≠ of a :=
   letI := Classical.decEq α; ne_of_apply_ne toWord <| by simp
 
--- DISSOLVED: of_ne_one
+@[to_additive (attr := simp)]
+theorem of_ne_one (a : α) : of a ≠ 1 := one_ne_of _ |>.symm
 
 @[to_additive]
 instance [Nonempty α] : Nontrivial (FreeGroup α) where
@@ -297,14 +292,6 @@ theorem norm_inv_eq {x : FreeGroup α} : norm x⁻¹ = norm x := by
 @[to_additive (attr := simp)]
 theorem norm_eq_zero {x : FreeGroup α} : norm x = 0 ↔ x = 1 := by
   simp only [norm, List.length_eq_zero, toWord_eq_nil_iff]
-
-@[to_additive (attr := simp)]
-theorem norm_one : norm (1 : FreeGroup α) = 0 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem norm_of (a : α) : norm (of a) = 1 :=
-  rfl
 
 @[to_additive]
 theorem norm_mk_le : norm (mk L₁) ≤ L₁.length :=

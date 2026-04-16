@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.Nat.Find
 
+noncomputable section
+
 /-!
 # Operation on tuples
 
@@ -94,10 +96,6 @@ variable {α : Fin (n + 1) → Sort u} (x : α 0) (q : ∀ i, α i) (p : ∀ i :
   (y : α i.succ) (z : α 0)
 
 def tail (q : ∀ i, α i) : ∀ i : Fin n, α i.succ := fun i ↦ q i.succ
-
-theorem tail_def {n : ℕ} {α : Fin (n + 1) → Sort*} {q : ∀ i, α i} :
-    (tail fun k : Fin (n + 1) ↦ q k) = fun k : Fin n ↦ q k.succ :=
-  rfl
 
 def cons (x : α 0) (p : ∀ i : Fin n, α i.succ) : ∀ i, α i := fun j ↦ Fin.cases x p j
 
@@ -397,11 +395,6 @@ def «repeat» (m : ℕ) (a : Fin n → α) : Fin (m * n) → α
   | i => a i.modNat
 
 @[simp]
-theorem repeat_apply (a : Fin n → α) (i : Fin (m * n)) :
-    Fin.repeat m a i = a i.modNat :=
-  rfl
-
-@[simp]
 theorem repeat_zero (a : Fin n → α) :
     Fin.repeat 0 a = Fin.elim0 ∘ cast (Nat.zero_mul _) :=
   funext fun x => (cast (Nat.zero_mul _) x).elim0
@@ -460,10 +453,6 @@ variable {α : Fin (n + 1) → Sort*} (x : α (last n)) (q : ∀ i, α i)
 def init (q : ∀ i, α i) (i : Fin n) : α i.castSucc :=
   q i.castSucc
 
-theorem init_def {q : ∀ i, α i} :
-    (init fun k : Fin (n + 1) ↦ q k) = fun k : Fin n ↦ q k.castSucc :=
-  rfl
-
 def snoc (p : ∀ i : Fin n, α i.castSucc) (x : α (last n)) (i : Fin (n + 1)) : α i :=
   if h : i.val < n then _root_.cast (by rw [Fin.castSucc_castLT i h]) (p (castLT i h))
   else _root_.cast (by rw [eq_last_of_not_lt h]) x
@@ -513,36 +502,6 @@ theorem snoc_cast_add {α : Fin (n + m + 1) → Sort*} (f : ∀ i : Fin (n + m),
 theorem snoc_comp_cast_add {n m : ℕ} {α : Sort*} (f : Fin (n + m) → α) (a : α) :
     (snoc f a : Fin _ → α) ∘ castAdd (m + 1) = f ∘ castAdd m :=
   funext (by unfold comp; exact snoc_cast_add _ _)
-
-@[simp]
-theorem snoc_update : snoc (update p i y) x = update (snoc p x) i.castSucc y := by
-  ext j
-  by_cases h : j.val < n
-  · rw [snoc]
-    simp only [h]
-    simp only [dif_pos]
-    by_cases h' : j = castSucc i
-    · have C1 : α i.castSucc = α j := by rw [h']
-      have E1 : update (snoc p x) i.castSucc y j = _root_.cast C1 y := by
-        have : update (snoc p x) j (_root_.cast C1 y) j = _root_.cast C1 y := by simp
-        convert this
-        · exact h'.symm
-        · exact heq_of_cast_eq (congr_arg α (Eq.symm h')) rfl
-      have C2 : α i.castSucc = α (castLT j h).castSucc := by rw [castSucc_castLT, h']
-      have E2 : update p i y (castLT j h) = _root_.cast C2 y := by
-        have : update p (castLT j h) (_root_.cast C2 y) (castLT j h) = _root_.cast C2 y := by simp
-        convert this
-        · simp [h, h']
-        · exact heq_of_cast_eq C2 rfl
-      rw [E1, E2]
-      rfl
-    · have : ¬castLT j h = i := by
-        intro E
-        apply h'
-        rw [← E, castSucc_castLT]
-      simp [h', this, snoc, h]
-  · rw [eq_last_of_not_lt h]
-    simp [Fin.ne_of_gt i.castSucc_lt_last]
 
 theorem update_snoc_last : update (snoc p x) (last n) z = snoc p z := by
   ext j
@@ -758,10 +717,6 @@ theorem insertNth_apply_succAbove (i : Fin (n + 1)) (x : α i) (p : ∀ j, α (i
     rw [pred_succAbove _ _ (Fin.not_lt.1 hlt)] at hk; cases hk
     intro; rfl
 
-@[simp]
-theorem succAbove_cases_eq_insertNth : @succAboveCases = @insertNth :=
-  rfl
-
 @[simp] lemma removeNth_insertNth (p : Fin (n + 1)) (a : α p) (f : ∀ i, α (succAbove p i)) :
     removeNth p (insertNth p a f) = f := by ext; unfold removeNth; simp
 
@@ -878,9 +833,6 @@ open Set
 
 @[simp] lemma insertNth_removeNth (p : Fin (n + 1)) (x) (f : ∀ j, α j) :
     insertNth p x (removeNth p f) = update f p x := by simp [Fin.insertNth_eq_iff]
-
-lemma insertNth_self_removeNth (p : Fin (n + 1)) (f : ∀ j, α j) :
-    insertNth p (f p) (removeNth p f) = f := by simp
 
 @[simp]
 theorem update_insertNth (p : Fin (n + 1)) (x y : α p) (f : ∀ i, α (p.succAbove i)) :

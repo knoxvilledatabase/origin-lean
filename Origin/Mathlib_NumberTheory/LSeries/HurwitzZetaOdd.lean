@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.ModularForms.JacobiTheta.Bounds
 import Mathlib.NumberTheory.LSeries.MellinEqDirichlet
 import Mathlib.NumberTheory.LSeries.Basic
 
+noncomputable section
+
 /-!
 # Odd Hurwitz zeta functions
 

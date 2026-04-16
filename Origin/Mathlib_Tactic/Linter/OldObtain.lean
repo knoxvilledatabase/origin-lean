@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Command
 import Mathlib.Tactic.Linter.Header
 
+noncomputable section
+
 /-!
 # The `oldObtain` linter, against stream-of-conciousness `obtain`
 

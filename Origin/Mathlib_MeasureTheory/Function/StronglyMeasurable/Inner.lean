@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 
+noncomputable section
+
 /-!
 # Inner products of strongly measurable functions are strongly measurable.
 

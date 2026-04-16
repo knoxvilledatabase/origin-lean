@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 import Mathlib.Algebra.Homology.SingleHomology
 import Mathlib.CategoryTheory.Preadditive.Injective
 
+noncomputable section
+
 /-!
 # Injective resolutions
 
@@ -87,10 +89,6 @@ theorem ι_f_succ (n : ℕ) : I.ι.f (n + 1) = 0 :=
 @[reassoc]
 theorem ι_f_zero_comp_complex_d :
     I.ι.f 0 ≫ I.cocomplex.d 0 1 = 0 := by
-  simp
-
-theorem complex_d_comp (n : ℕ) :
-    I.cocomplex.d n (n + 1) ≫ I.cocomplex.d (n + 1) (n + 2) = 0 := by
   simp
 
 @[simp]

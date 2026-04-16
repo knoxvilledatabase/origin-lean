@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic
 
+noncomputable section
+
 /-!
 # Univariate monomials
 

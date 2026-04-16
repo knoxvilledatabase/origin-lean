@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/MeasureSpace.lean
-Genuine: 237 | Conflates: 1 | Dissolved: 10 | Infrastructure: 51
+Genuine: 246 | Conflates: 1 | Dissolved: 1 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.NullMeasurable
@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 import Mathlib.MeasureTheory.OuterMeasure.BorelCantelli
 import Mathlib.Topology.Algebra.Order.LiminfLimsup
 import Mathlib.Order.Interval.Set.Monotone
+
+noncomputable section
 
 /-!
 # Measure spaces
@@ -593,11 +595,6 @@ theorem le_toOuterMeasure_caratheodory (μ : Measure α) : ms ≤ μ.toOuterMeas
   fun _s hs _t => (measure_inter_add_diff _ hs).symm
 
 @[simp]
-theorem toMeasure_toOuterMeasure (m : OuterMeasure α) (h : ms ≤ m.caratheodory) :
-    (m.toMeasure h).toOuterMeasure = m.trim :=
-  rfl
-
-@[simp]
 theorem toMeasure_apply (m : OuterMeasure α) (h : ms ≤ m.caratheodory) {s : Set α}
     (hs : MeasurableSet s) : m.toMeasure h s = m s :=
   m.trim_eq hs
@@ -790,16 +787,6 @@ instance instModule [Semiring R] [Module R ℝ≥0∞] [IsScalarTower R ℝ≥0�
   Injective.module R ⟨⟨toOuterMeasure, zero_toOuterMeasure⟩, add_toOuterMeasure⟩
     toOuterMeasure_injective smul_toOuterMeasure
 
-@[simp]
-theorem coe_nnreal_smul_apply {_m : MeasurableSpace α} (c : ℝ≥0) (μ : Measure α) (s : Set α) :
-    (c • μ) s = c * μ s :=
-  rfl
-
-@[simp]
-theorem nnreal_smul_coe_apply {_m : MeasurableSpace α} (c : ℝ≥0) (μ : Measure α) (s : Set α) :
-    c • μ s = c * μ s := by
-  rfl
-
 theorem ae_smul_measure {p : α → Prop} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
     (h : ∀ᵐ x ∂μ, p x) (c : R) : ∀ᵐ x ∂c • μ, p x :=
   ae_iff.2 <| by rw [smul_apply, ae_iff.1 h, ← smul_one_smul ℝ≥0∞, smul_zero]
@@ -812,9 +799,11 @@ section SMulWithZero
 variable {R : Type*} [Zero R] [SMulWithZero R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
   [NoZeroSMulDivisors R ℝ≥0∞] {c : R} {p : α → Prop}
 
--- DISSOLVED: ae_smul_measure_iff
+lemma ae_smul_measure_iff (hc : c ≠ 0) {μ : Measure α} : (∀ᵐ x ∂c • μ, p x) ↔ ∀ᵐ x ∂μ, p x := by
+  simp [ae_iff, hc]
 
--- DISSOLVED: ae_smul_measure_eq
+@[simp] lemma ae_smul_measure_eq (hc : c ≠ 0) (μ : Measure α) : ae (c • μ) = ae μ := by
+  ext; exact ae_smul_measure_iff hc
 
 end SMulWithZero
 
@@ -1008,11 +997,6 @@ theorem _root_.MeasureTheory.OuterMeasure.toMeasure_top :
   toOuterMeasure_toMeasure (μ := ⊤)
 
 @[simp]
-theorem toOuterMeasure_top {_ : MeasurableSpace α} :
-    (⊤ : Measure α).toOuterMeasure = (⊤ : OuterMeasure α) :=
-  rfl
-
-@[simp]
 theorem top_add : ⊤ + μ = ⊤ :=
   top_unique <| Measure.le_add_right le_rfl
 
@@ -1031,11 +1015,14 @@ theorem measure_univ_eq_zero : μ univ = 0 ↔ μ = 0 :=
   ⟨fun h => bot_unique fun s => (h ▸ measure_mono (subset_univ s) : μ s ≤ 0), fun h =>
     h.symm ▸ rfl⟩
 
--- DISSOLVED: measure_univ_ne_zero
+theorem measure_univ_ne_zero : μ univ ≠ 0 ↔ μ ≠ 0 :=
+  measure_univ_eq_zero.not
 
 instance [NeZero μ] : NeZero (μ univ) := ⟨measure_univ_ne_zero.2 <| NeZero.ne μ⟩
 
--- DISSOLVED: measure_univ_pos
+@[simp]
+theorem measure_univ_pos : 0 < μ univ ↔ μ ≠ 0 :=
+  pos_iff_ne_zero.trans measure_univ_ne_zero
 
 -- DISSOLVED: nonempty_of_neZero
 
@@ -1176,9 +1163,10 @@ lemma measure_preimage_of_map_eq_self {f : α → α} (hf : map f μ = μ)
     rw [map_of_not_aemeasurable hfm] at hf
     simp [← hf]
 
--- DISSOLVED: map_ne_zero_iff
+lemma map_ne_zero_iff (hf : AEMeasurable f μ) : μ.map f ≠ 0 ↔ μ ≠ 0 := (map_eq_zero_iff hf).not
 
--- DISSOLVED: mapₗ_ne_zero_iff
+lemma mapₗ_ne_zero_iff (hf : Measurable f) : Measure.mapₗ f μ ≠ 0 ↔ μ ≠ 0 :=
+  (mapₗ_eq_zero_iff hf).not
 
 @[simp]
 theorem map_id : map id μ = μ :=
@@ -1446,7 +1434,8 @@ theorem absolutelyContinuous_of_le_smul {μ' : Measure α} {c : ℝ≥0∞} (hμ
     μ' ≪ μ :=
   (Measure.absolutelyContinuous_of_le hμ'_le).trans smul_absolutelyContinuous
 
--- DISSOLVED: absolutelyContinuous_smul
+lemma absolutelyContinuous_smul {c : ℝ≥0∞} (hc : c ≠ 0) : μ ≪ c • μ := by
+  simp [AbsolutelyContinuous, hc]
 
 theorem ae_le_iff_absolutelyContinuous : ae μ ≤ ae ν ↔ μ ≪ ν :=
   ⟨fun h s => by
@@ -1610,7 +1599,22 @@ section Pointwise
 
 open Pointwise
 
--- DISSOLVED: pairwise_aedisjoint_of_aedisjoint_forall_ne_one
+@[to_additive]
+theorem pairwise_aedisjoint_of_aedisjoint_forall_ne_one {G α : Type*} [Group G] [MulAction G α]
+    {_ : MeasurableSpace α} {μ : Measure α} {s : Set α}
+    (h_ae_disjoint : ∀ g ≠ (1 : G), AEDisjoint μ (g • s) s)
+    (h_qmp : ∀ g : G, QuasiMeasurePreserving (g • ·) μ μ) :
+    Pairwise (AEDisjoint μ on fun g : G => g • s) := by
+  intro g₁ g₂ hg
+  let g := g₂⁻¹ * g₁
+  replace hg : g ≠ 1 := by
+    rw [Ne, inv_mul_eq_one]
+    exact hg.symm
+  have : (g₂⁻¹ • ·) ⁻¹' (g • s ∩ s) = g₁ • s ∩ g₂ • s := by
+    rw [preimage_eq_iff_eq_image (MulAction.bijective g₂⁻¹), image_smul, smul_set_inter, smul_smul,
+      smul_smul, inv_mul_cancel, one_smul]
+  change μ (g₁ • s ∩ g₂ • s) = 0
+  exact this ▸ (h_qmp g₂⁻¹).preimage_null (h_ae_disjoint g hg)
 
 end Pointwise
 
@@ -1624,9 +1628,6 @@ theorem mem_cofinite : s ∈ μ.cofinite ↔ μ sᶜ < ∞ :=
   Iff.rfl
 
 theorem compl_mem_cofinite : sᶜ ∈ μ.cofinite ↔ μ s < ∞ := by rw [mem_cofinite, compl_compl]
-
-theorem eventually_cofinite {p : α → Prop} : (∀ᶠ x in μ.cofinite, p x) ↔ μ { x | ¬p x } < ∞ :=
-  Iff.rfl
 
 instance cofinite.instIsMeasurablyGenerated : IsMeasurablyGenerated μ.cofinite where
   exists_measurable_subset s hs := by
@@ -1664,7 +1665,9 @@ theorem AEDisjoint.preimage {ν : Measure β} {f : α → β} {s t : Set β} (ht
 theorem ae_eq_bot : ae μ = ⊥ ↔ μ = 0 := by
   rw [← empty_mem_iff_bot, mem_ae_iff, compl_empty, measure_univ_eq_zero]
 
--- DISSOLVED: ae_neBot
+@[simp]
+theorem ae_neBot : (ae μ).NeBot ↔ μ ≠ 0 :=
+  neBot_iff.trans (not_congr ae_eq_bot)
 
 instance Measure.ae.neBot [NeZero μ] : (ae μ).NeBot := ae_neBot.2 <| NeZero.ne μ
 

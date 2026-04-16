@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Sum
 import Mathlib.Data.Sum.Order
 import Mathlib.Order.Interval.Finset.Defs
 
+noncomputable section
+
 /-!
 # Finite intervals in a disjoint union
 
@@ -218,62 +220,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder (α ⊕ β) where
 
 variable (a₁ a₂ : α) (b₁ b₂ : β)
 
-theorem Icc_inl_inl : Icc (inl a₁ : α ⊕ β) (inl a₂) = (Icc a₁ a₂).map Embedding.inl :=
-  rfl
-
-theorem Ico_inl_inl : Ico (inl a₁ : α ⊕ β) (inl a₂) = (Ico a₁ a₂).map Embedding.inl :=
-  rfl
-
-theorem Ioc_inl_inl : Ioc (inl a₁ : α ⊕ β) (inl a₂) = (Ioc a₁ a₂).map Embedding.inl :=
-  rfl
-
-theorem Ioo_inl_inl : Ioo (inl a₁ : α ⊕ β) (inl a₂) = (Ioo a₁ a₂).map Embedding.inl :=
-  rfl
-
-@[simp]
-theorem Icc_inl_inr : Icc (inl a₁) (inr b₂) = ∅ :=
-  rfl
-
-@[simp]
-theorem Ico_inl_inr : Ico (inl a₁) (inr b₂) = ∅ :=
-  rfl
-
-@[simp]
-theorem Ioc_inl_inr : Ioc (inl a₁) (inr b₂) = ∅ :=
-  rfl
-
-@[simp]
-theorem Ioo_inl_inr : Ioo (inl a₁) (inr b₂) = ∅ := by
-  rfl
-
-@[simp]
-theorem Icc_inr_inl : Icc (inr b₁) (inl a₂) = ∅ :=
-  rfl
-
-@[simp]
-theorem Ico_inr_inl : Ico (inr b₁) (inl a₂) = ∅ :=
-  rfl
-
-@[simp]
-theorem Ioc_inr_inl : Ioc (inr b₁) (inl a₂) = ∅ :=
-  rfl
-
-@[simp]
-theorem Ioo_inr_inl : Ioo (inr b₁) (inl a₂) = ∅ := by
-  rfl
-
-theorem Icc_inr_inr : Icc (inr b₁ : α ⊕ β) (inr b₂) = (Icc b₁ b₂).map Embedding.inr :=
-  rfl
-
-theorem Ico_inr_inr : Ico (inr b₁ : α ⊕ β) (inr b₂) = (Ico b₁ b₂).map Embedding.inr :=
-  rfl
-
-theorem Ioc_inr_inr : Ioc (inr b₁ : α ⊕ β) (inr b₂) = (Ioc b₁ b₂).map Embedding.inr :=
-  rfl
-
-theorem Ioo_inr_inr : Ioo (inr b₁ : α ⊕ β) (inr b₂) = (Ioo b₁ b₂).map Embedding.inr :=
-  rfl
-
 end Disjoint
 
 /-! ### Lexicographical sum of orders -/
@@ -312,62 +258,6 @@ instance locallyFiniteOrder : LocallyFiniteOrder (α ⊕ₗ β) where
   finset_mem_Ioo := by simp_lex
 
 variable (a a₁ a₂ : α) (b b₁ b₂ : β)
-
-lemma Icc_inl_inl :
-    Icc (inlₗ a₁ : α ⊕ₗ β) (inlₗ a₂) = (Icc a₁ a₂).map (Embedding.inl.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-lemma Ico_inl_inl :
-    Ico (inlₗ a₁ : α ⊕ₗ β) (inlₗ a₂) = (Ico a₁ a₂).map (Embedding.inl.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-lemma Ioc_inl_inl :
-    Ioc (inlₗ a₁ : α ⊕ₗ β) (inlₗ a₂) = (Ioc a₁ a₂).map (Embedding.inl.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-lemma Ioo_inl_inl :
-    Ioo (inlₗ a₁ : α ⊕ₗ β) (inlₗ a₂) = (Ioo a₁ a₂).map (Embedding.inl.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-@[simp]
-lemma Icc_inl_inr : Icc (inlₗ a) (inrₗ b) = ((Ici a).disjSum (Iic b)).map toLex.toEmbedding := rfl
-
-@[simp]
-lemma Ico_inl_inr : Ico (inlₗ a) (inrₗ b) = ((Ici a).disjSum (Iio b)).map toLex.toEmbedding := rfl
-
-@[simp]
-lemma Ioc_inl_inr : Ioc (inlₗ a) (inrₗ b) = ((Ioi a).disjSum (Iic b)).map toLex.toEmbedding := rfl
-
-@[simp]
-lemma Ioo_inl_inr : Ioo (inlₗ a) (inrₗ b) = ((Ioi a).disjSum (Iio b)).map toLex.toEmbedding := rfl
-
-@[simp]
-lemma Icc_inr_inl : Icc (inrₗ b) (inlₗ a) = ∅ := rfl
-
-@[simp]
-lemma Ico_inr_inl : Ico (inrₗ b) (inlₗ a) = ∅ := rfl
-
-@[simp]
-lemma Ioc_inr_inl : Ioc (inrₗ b) (inlₗ a) = ∅ := rfl
-
-@[simp]
-lemma Ioo_inr_inl : Ioo (inrₗ b) (inlₗ a) = ∅ := rfl
-
-lemma Icc_inr_inr :
-    Icc (inrₗ b₁ : α ⊕ₗ β) (inrₗ b₂) = (Icc b₁ b₂).map (Embedding.inr.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-lemma Ico_inr_inr :
-    Ico (inrₗ b₁ : α ⊕ₗ β) (inrₗ b₂) = (Ico b₁ b₂).map (Embedding.inr.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-lemma Ioc_inr_inr :
-    Ioc (inrₗ b₁ : α ⊕ₗ β) (inrₗ b₂) = (Ioc b₁ b₂).map (Embedding.inr.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
-
-lemma Ioo_inr_inr :
-    Ioo (inrₗ b₁ : α ⊕ₗ β) (inrₗ b₂) = (Ioo b₁ b₂).map (Embedding.inr.trans toLex.toEmbedding) := by
-  rw [← Finset.map_map]; rfl
 
 end Lex
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Closed.Monoidal
 import Mathlib.CategoryTheory.Functor.Currying
 import Mathlib.CategoryTheory.Monoidal.FunctorCategory
 
+noncomputable section
+
 /-!
 # Functors from a groupoid into a monoidal closed category form a monoidal closed category.
 
@@ -56,14 +58,5 @@ instance closed (F : D ⥤ C) : Closed F where
 
 @[simps! closed_adj]
 instance monoidalClosed : MonoidalClosed (D ⥤ C) where
-
-theorem ihom_map (F : D ⥤ C) {G H : D ⥤ C} (f : G ⟶ H) : (ihom F).map f = (closedIhom F).map f :=
-  rfl
-
-theorem ihom_ev_app (F G : D ⥤ C) : (ihom.ev F).app G = (closedCounit F).app G :=
-  rfl
-
-theorem ihom_coev_app (F G : D ⥤ C) : (ihom.coev F).app G = (closedUnit F).app G :=
-  rfl
 
 end CategoryTheory.Functor

@@ -13,6 +13,8 @@ import Mathlib.Tactic.Coe
 import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Choose
 
+noncomputable section
+
 /-!
 # Monotonicity
 

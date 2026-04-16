@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Coherence.PureCoherence
 import Mathlib.Tactic.CategoryTheory.Monoidal.Datatypes
 
+noncomputable section
+
 /-!
 # Coherence tactic for monoidal categories
 
@@ -264,7 +266,6 @@ def pureCoherence (mvarId : MVarId) : MetaM (List MVarId) :=
   BicategoryLike.pureCoherence Monoidal.Context `monoidal mvarId
 
 elab "monoidal_coherence" : tactic => withMainContext do
-
   replaceMainGoal <| ← Monoidal.pureCoherence <| ← getMainGoal
 
 end Mathlib.Tactic.Monoidal

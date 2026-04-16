@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.Perm.Support
 import Mathlib.Logic.Equiv.Fintype
 import Mathlib.Data.Finite.Sum
 
+noncomputable section
+
 /-!
 # Permutations on `Fintype`s
 
@@ -83,15 +85,6 @@ theorem perm_inv_on_of_perm_on_finite {f : Perm α} {p : α → Prop} [Finite { 
 abbrev subtypePermOfFintype (f : Perm α) {p : α → Prop} [Finite { x // p x }]
     (h : ∀ x, p x → p (f x)) : Perm { x // p x } :=
   f.subtypePerm fun x => ⟨h x, fun h₂ => f.inv_apply_self x ▸ perm_inv_on_of_perm_on_finite h h₂⟩
-
-@[simp]
-theorem subtypePermOfFintype_apply (f : Perm α) {p : α → Prop} [Finite { x // p x }]
-    (h : ∀ x, p x → p (f x)) (x : { x // p x }) : subtypePermOfFintype f h x = ⟨f x, h x x.2⟩ :=
-  rfl
-
-theorem subtypePermOfFintype_one (p : α → Prop) [Finite { x // p x }]
-    (h : ∀ x, p x → p ((1 : Perm α) x)) : @subtypePermOfFintype α 1 p _ h = 1 :=
-  rfl
 
 theorem perm_mapsTo_inl_iff_mapsTo_inr {m n : Type*} [Finite m] [Finite n] (σ : Perm (m ⊕ n)) :
     Set.MapsTo σ (Set.range Sum.inl) (Set.range Sum.inl) ↔

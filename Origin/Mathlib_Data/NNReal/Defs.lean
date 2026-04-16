@@ -1,11 +1,13 @@
 /-
 Extracted from Data/NNReal/Defs.lean
-Genuine: 105 | Conflates: 2 | Dissolved: 28 | Infrastructure: 58
+Genuine: 142 | Conflates: 2 | Dissolved: 0 | Infrastructure: 59
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Algebra.Order.Module.OrderedSMul
 import Mathlib.Data.Real.Archimedean
+
+noncomputable section
 
 /-!
 # Nonnegative real numbers
@@ -79,10 +81,6 @@ noncomputable instance : CanonicallyLinearOrderedSemifield ℝ≥0 :=
 
 instance : Coe ℝ≥0 ℝ := ⟨toReal⟩
 
-@[simp]
-theorem val_eq_coe (n : ℝ≥0) : n.val = n :=
-  rfl
-
 instance canLift : CanLift ℝ ℝ≥0 toReal fun r => 0 ≤ r :=
   Subtype.canLift _
 
@@ -113,8 +111,6 @@ theorem _root_.Real.le_coe_toNNReal (r : ℝ) : r ≤ Real.toNNReal r :=
   le_max_left r 0
 
 @[bound] theorem coe_nonneg (r : ℝ≥0) : (0 : ℝ) ≤ r := r.2
-
-@[simp, norm_cast] theorem coe_mk (a : ℝ) (ha) : toReal ⟨a, ha⟩ = a := rfl
 
 example : Zero ℝ≥0 := by infer_instance
 
@@ -147,10 +143,6 @@ protected theorem coe_injective : Injective ((↑) : ℝ≥0 → ℝ) := Subtype
 
 @[simp, norm_cast] lemma coe_one : ((1 : ℝ≥0) : ℝ) = 1 := rfl
 
-@[simp] lemma mk_zero : (⟨0, le_rfl⟩ : ℝ≥0) = 0 := rfl
-
-@[simp] lemma mk_one : (⟨1, zero_le_one⟩ : ℝ≥0) = 1 := rfl
-
 @[simp, norm_cast]
 protected theorem coe_add (r₁ r₂ : ℝ≥0) : ((r₁ + r₂ : ℝ≥0) : ℝ) = r₁ + r₂ :=
   rfl
@@ -164,12 +156,6 @@ protected theorem coe_inv (r : ℝ≥0) : ((r⁻¹ : ℝ≥0) : ℝ) = (r : ℝ)
   rfl
 
 @[simp, norm_cast]
-protected theorem coe_div (r₁ r₂ : ℝ≥0) : ((r₁ / r₂ : ℝ≥0) : ℝ) = (r₁ : ℝ) / r₂ :=
-  rfl
-
-protected theorem coe_two : ((2 : ℝ≥0) : ℝ) = 2 := rfl
-
-@[simp, norm_cast]
 protected theorem coe_sub {r₁ r₂ : ℝ≥0} (h : r₂ ≤ r₁) : ((r₁ - r₂ : ℝ≥0) : ℝ) = ↑r₁ - ↑r₂ :=
   max_eq_left <| le_sub_comm.2 <| by simp [show (r₂ : ℝ) ≤ r₁ from h]
 
@@ -179,9 +165,9 @@ variable {r r₁ r₂ : ℝ≥0} {x y : ℝ}
 
 @[simp, norm_cast] lemma coe_eq_one : (r : ℝ) = 1 ↔ r = 1 := by rw [← coe_one, coe_inj]
 
--- DISSOLVED: coe_ne_zero
+@[norm_cast] lemma coe_ne_zero : (r : ℝ) ≠ 0 ↔ r ≠ 0 := coe_eq_zero.not
 
--- DISSOLVED: coe_ne_one
+@[norm_cast] lemma coe_ne_one : (r : ℝ) ≠ 1 ↔ r ≠ 1 := coe_eq_one.not
 
 example : CommSemiring ℝ≥0 := by infer_instance
 
@@ -191,8 +177,6 @@ def toRealHom : ℝ≥0 →+* ℝ where
   map_mul' := NNReal.coe_mul
   map_zero' := NNReal.coe_zero
   map_add' := NNReal.coe_add
-
-@[simp] theorem coe_toRealHom : ⇑toRealHom = toReal := rfl
 
 section Actions
 
@@ -238,14 +222,7 @@ noncomputable example : CommGroupWithZero ℝ≥0 := by infer_instance
 @[simp, norm_cast]
 theorem coe_pow (r : ℝ≥0) (n : ℕ) : ((r ^ n : ℝ≥0) : ℝ) = (r : ℝ) ^ n := rfl
 
-@[simp, norm_cast]
-theorem coe_zpow (r : ℝ≥0) (n : ℤ) : ((r ^ n : ℝ≥0) : ℝ) = (r : ℝ) ^ n := rfl
-
 variable {ι : Type*} {f : ι → ℝ}
-
-@[simp, norm_cast] lemma coe_nsmul (r : ℝ≥0) (n : ℕ) : ↑(n • r) = n • (r : ℝ) := rfl
-
-@[simp, norm_cast] lemma coe_nnqsmul (q : ℚ≥0) (x : ℝ≥0) : ↑(q • x) = (q • x : ℝ) := rfl
 
 @[simp, norm_cast]
 protected theorem coe_natCast (n : ℕ) : (↑(↑n : ℝ≥0) : ℝ) = n :=
@@ -253,26 +230,30 @@ protected theorem coe_natCast (n : ℕ) : (↑(↑n : ℝ≥0) : ℝ) = n :=
 
 alias coe_nat_cast := NNReal.coe_natCast
 
-@[simp, norm_cast]
-protected theorem coe_ofNat (n : ℕ) [n.AtLeastTwo] :
-    (no_index (OfNat.ofNat n : ℝ≥0) : ℝ) = OfNat.ofNat n :=
-  rfl
-
-@[simp, norm_cast]
-protected theorem coe_ofScientific (m : ℕ) (s : Bool) (e : ℕ) :
-    ↑(OfScientific.ofScientific m s e : ℝ≥0) = (OfScientific.ofScientific m s e : ℝ) :=
-  rfl
-
-@[simp, norm_cast]
-lemma algebraMap_eq_coe : (algebraMap ℝ≥0 ℝ : ℝ≥0 → ℝ) = (↑) := rfl
-
 noncomputable example : LinearOrder ℝ≥0 := by infer_instance
 
 @[simp, norm_cast] lemma coe_le_coe : (r₁ : ℝ) ≤ r₂ ↔ r₁ ≤ r₂ := Iff.rfl
 
 @[simp, norm_cast] lemma coe_lt_coe : (r₁ : ℝ) < r₂ ↔ r₁ < r₂ := Iff.rfl
 
+@[bound] private alias ⟨_, Bound.coe_lt_coe_of_lt⟩ := coe_lt_coe
+
+@[simp, norm_cast] lemma coe_pos : (0 : ℝ) < r ↔ 0 < r := Iff.rfl
+
+@[bound] private alias ⟨_, Bound.coe_pos_of_pos⟩ := coe_pos
+
+@[simp, norm_cast] lemma one_le_coe : 1 ≤ (r : ℝ) ↔ 1 ≤ r := by rw [← coe_le_coe, coe_one]
+
+@[simp, norm_cast] lemma one_lt_coe : 1 < (r : ℝ) ↔ 1 < r := by rw [← coe_lt_coe, coe_one]
+
+@[simp, norm_cast] lemma coe_le_one : (r : ℝ) ≤ 1 ↔ r ≤ 1 := by rw [← coe_le_coe, coe_one]
+
+@[simp, norm_cast] lemma coe_lt_one : (r : ℝ) < 1 ↔ r < 1 := by rw [← coe_lt_coe, coe_one]
+
+@[mono] lemma coe_mono : Monotone ((↑) : ℝ≥0 → ℝ) := fun _ _ => NNReal.coe_le_coe.2
+
 @[gcongr] alias ⟨_, GCongr.toReal_le_toReal⟩ := coe_le_coe
+
 protected theorem _root_.Real.toNNReal_mono : Monotone Real.toNNReal := fun _ _ h =>
   max_le_max h (le_refl 0)
 
@@ -334,20 +315,6 @@ instance instPosSMulStrictMono {α} [Preorder α] [MulAction ℝ α] [PosSMulStr
 instance instSMulPosStrictMono {α} [Zero α] [Preorder α] [MulAction ℝ α] [SMulPosStrictMono ℝ α] :
     SMulPosStrictMono ℝ≥0 α where
   elim _a ha _r₁ _r₂ hr := (smul_lt_smul_of_pos_right (coe_lt_coe.2 hr) ha :)
-
-def orderIsoIccZeroCoe (a : ℝ≥0) : Set.Icc (0 : ℝ) a ≃o Set.Iic a where
-  toEquiv := Equiv.Set.sep (Set.Ici 0) fun x : ℝ => x ≤ a
-  map_rel_iff' := Iff.rfl
-
-@[simp]
-theorem orderIsoIccZeroCoe_apply_coe_coe (a : ℝ≥0) (b : Set.Icc (0 : ℝ) a) :
-    (orderIsoIccZeroCoe a b : ℝ) = b :=
-  rfl
-
-@[simp]
-theorem orderIsoIccZeroCoe_symm_apply_coe (a : ℝ≥0) (b : Set.Iic a) :
-    ((orderIsoIccZeroCoe a).symm b : ℝ) = b :=
-  rfl
 
 theorem coe_image {s : Set ℝ≥0} :
     (↑) '' s = { x : ℝ | ∃ h : 0 ≤ x, @Membership.mem ℝ≥0 _ _ s ⟨x, h⟩ } :=
@@ -458,10 +425,6 @@ namespace Real
 section ToNNReal
 
 @[simp]
-theorem coe_toNNReal' (r : ℝ) : (Real.toNNReal r : ℝ) = max r 0 :=
-  rfl
-
-@[simp]
 theorem toNNReal_zero : Real.toNNReal 0 = 0 := NNReal.eq <| coe_toNNReal _ le_rfl
 
 @[simp]
@@ -478,12 +441,16 @@ theorem toNNReal_eq_zero {r : ℝ} : Real.toNNReal r = 0 ↔ r ≤ 0 := by
 theorem toNNReal_of_nonpos {r : ℝ} : r ≤ 0 → Real.toNNReal r = 0 :=
   toNNReal_eq_zero.2
 
--- DISSOLVED: toNNReal_eq_iff_eq_coe
+lemma toNNReal_eq_iff_eq_coe {r : ℝ} {p : ℝ≥0} (hp : p ≠ 0) : r.toNNReal = p ↔ r = p :=
+  ⟨fun h ↦ h ▸ (coe_toNNReal _ <| not_lt.1 fun hlt ↦ hp <| h ▸ toNNReal_of_nonpos hlt.le).symm,
+    fun h ↦ h.symm ▸ toNNReal_coe⟩
 
 @[simp]
 lemma toNNReal_eq_one {r : ℝ} : r.toNNReal = 1 ↔ r = 1 := toNNReal_eq_iff_eq_coe one_ne_zero
 
--- DISSOLVED: toNNReal_eq_natCast
+@[simp]
+lemma toNNReal_eq_natCast {r : ℝ} {n : ℕ} (hn : n ≠ 0) : r.toNNReal = n ↔ r = n :=
+  mod_cast toNNReal_eq_iff_eq_coe <| Nat.cast_ne_zero.2 hn
 
 alias toNNReal_eq_nat_cast := toNNReal_eq_natCast
 
@@ -564,15 +531,17 @@ lemma natCastle_toNNReal' {n : ℕ} {r : ℝ} : ↑n ≤ r.toNNReal ↔ n ≤ r 
 
 alias nat_cast_le_toNNReal' := natCastle_toNNReal'
 
--- DISSOLVED: toNNReal_lt_natCast'
+@[simp]
+lemma toNNReal_lt_natCast' {n : ℕ} {r : ℝ} : r.toNNReal < n ↔ r < n ∧ n ≠ 0 := by
+  simpa [pos_iff_ne_zero] using toNNReal_lt_toNNReal_iff' (r := r) (p := n)
 
 alias toNNReal_lt_nat_cast' := toNNReal_lt_natCast'
 
--- DISSOLVED: natCast_le_toNNReal
+lemma natCast_le_toNNReal {n : ℕ} {r : ℝ} (hn : n ≠ 0) : ↑n ≤ r.toNNReal ↔ n ≤ r := by simp [hn]
 
 alias nat_cast_le_toNNReal := natCast_le_toNNReal
 
--- DISSOLVED: toNNReal_lt_natCast
+lemma toNNReal_lt_natCast {r : ℝ} {n : ℕ} (hn : n ≠ 0) : r.toNNReal < n ↔ r < n := by simp [hn]
 
 alias toNNReal_lt_nat_cast := toNNReal_lt_natCast
 
@@ -635,7 +604,8 @@ namespace NNReal
 
 section Mul
 
--- DISSOLVED: mul_eq_mul_left
+theorem mul_eq_mul_left {a b c : ℝ≥0} (h : a ≠ 0) : a * b = a * c ↔ b = c := by
+  rw [mul_eq_mul_left_iff, or_iff_left h]
 
 end Mul
 
@@ -649,9 +619,13 @@ nonrec theorem exists_pow_lt_of_lt_one {a b : ℝ≥0} (ha : 0 < a) (hb : b < 1)
   simpa only [← coe_pow, NNReal.coe_lt_coe] using
     exists_pow_lt_of_lt_one (NNReal.coe_pos.2 ha) (NNReal.coe_lt_coe.2 hb)
 
--- DISSOLVED: exists_mem_Ico_zpow
+nonrec theorem exists_mem_Ico_zpow {x : ℝ≥0} {y : ℝ≥0} (hx : x ≠ 0) (hy : 1 < y) :
+    ∃ n : ℤ, x ∈ Set.Ico (y ^ n) (y ^ (n + 1)) :=
+  exists_mem_Ico_zpow (α := ℝ) hx.bot_lt hy
 
--- DISSOLVED: exists_mem_Ioc_zpow
+nonrec theorem exists_mem_Ioc_zpow {x : ℝ≥0} {y : ℝ≥0} (hx : x ≠ 0) (hy : 1 < y) :
+    ∃ n : ℤ, x ∈ Set.Ioc (y ^ n) (y ^ (n + 1)) :=
+  exists_mem_Ioc_zpow (α := ℝ) hx.bot_lt hy
 
 end Pow
 
@@ -665,34 +639,38 @@ typeclass. For lemmas about subtraction and addition see lemmas about `OrderedSu
 `Mathlib.Algebra.Order.Sub.Basic`. See also `mul_tsub` and `tsub_mul`.
 -/
 
-theorem sub_def {r p : ℝ≥0} : r - p = Real.toNNReal (r - p) :=
-  rfl
-
-theorem coe_sub_def {r p : ℝ≥0} : ↑(r - p) = max (r - p : ℝ) 0 :=
-  rfl
-
 example : OrderedSub ℝ≥0 := by infer_instance
 
 end Sub
 
 section Inv
 
--- DISSOLVED: inv_le
+@[simp]
+theorem inv_le {r p : ℝ≥0} (h : r ≠ 0) : r⁻¹ ≤ p ↔ 1 ≤ r * p := by
+  rw [← mul_le_mul_left (pos_iff_ne_zero.2 h), mul_inv_cancel₀ h]
 
 theorem inv_le_of_le_mul {r p : ℝ≥0} (h : 1 ≤ r * p) : r⁻¹ ≤ p := by
   by_cases r = 0 <;> simp [*, inv_le]
 
--- DISSOLVED: le_inv_iff_mul_le
+@[simp]
+theorem le_inv_iff_mul_le {r p : ℝ≥0} (h : p ≠ 0) : r ≤ p⁻¹ ↔ r * p ≤ 1 := by
+  rw [← mul_le_mul_left (pos_iff_ne_zero.2 h), mul_inv_cancel₀ h, mul_comm]
 
--- DISSOLVED: lt_inv_iff_mul_lt
+@[simp]
+theorem lt_inv_iff_mul_lt {r p : ℝ≥0} (h : p ≠ 0) : r < p⁻¹ ↔ r * p < 1 := by
+  rw [← mul_lt_mul_left (pos_iff_ne_zero.2 h), mul_inv_cancel₀ h, mul_comm]
 
--- DISSOLVED: mul_le_iff_le_inv
+theorem mul_le_iff_le_inv {a b r : ℝ≥0} (hr : r ≠ 0) : r * a ≤ b ↔ a ≤ r⁻¹ * b :=
+  (le_inv_mul_iff₀ (pos_iff_ne_zero.2 hr)).symm
 
--- DISSOLVED: le_div_iff_mul_le
+theorem le_div_iff_mul_le {a b r : ℝ≥0} (hr : r ≠ 0) : a ≤ b / r ↔ a * r ≤ b :=
+  le_div_iff₀ (pos_iff_ne_zero.2 hr)
 
--- DISSOLVED: div_le_iff
+protected lemma div_le_iff {a b r : ℝ≥0} (hr : r ≠ 0) : a / r ≤ b ↔ a ≤ b * r :=
+  div_le_iff₀ (pos_iff_ne_zero.2 hr)
 
--- DISSOLVED: div_le_iff'
+protected lemma div_le_iff' {a b r : ℝ≥0} (hr : r ≠ 0) : a / r ≤ b ↔ a ≤ r * b :=
+  div_le_iff₀' (pos_iff_ne_zero.2 hr)
 
 theorem div_le_of_le_mul {a b c : ℝ≥0} (h : a ≤ b * c) : a / c ≤ b :=
   if h0 : c = 0 then by simp [h0] else (div_le_iff₀ (pos_iff_ne_zero.2 h0)).2 h
@@ -700,22 +678,25 @@ theorem div_le_of_le_mul {a b c : ℝ≥0} (h : a ≤ b * c) : a / c ≤ b :=
 theorem div_le_of_le_mul' {a b c : ℝ≥0} (h : a ≤ b * c) : a / b ≤ c :=
   div_le_of_le_mul <| mul_comm b c ▸ h
 
--- DISSOLVED: le_div_iff
+protected lemma le_div_iff {a b r : ℝ≥0} (hr : r ≠ 0) : a ≤ b / r ↔ a * r ≤ b :=
+  le_div_iff₀ hr.bot_lt
 
--- DISSOLVED: le_div_iff'
+theorem le_div_iff' {a b r : ℝ≥0} (hr : r ≠ 0) : a ≤ b / r ↔ r * a ≤ b := le_div_iff₀' hr.bot_lt
 
--- DISSOLVED: div_lt_iff
+theorem div_lt_iff {a b r : ℝ≥0} (hr : r ≠ 0) : a / r < b ↔ a < b * r := div_lt_iff₀ hr.bot_lt
 
--- DISSOLVED: div_lt_iff'
+theorem div_lt_iff' {a b r : ℝ≥0} (hr : r ≠ 0) : a / r < b ↔ a < r * b := div_lt_iff₀' hr.bot_lt
 
--- DISSOLVED: lt_div_iff
+theorem lt_div_iff {a b r : ℝ≥0} (hr : r ≠ 0) : a < b / r ↔ a * r < b := lt_div_iff₀ hr.bot_lt
 
--- DISSOLVED: lt_div_iff'
+theorem lt_div_iff' {a b r : ℝ≥0} (hr : r ≠ 0) : a < b / r ↔ r * a < b := lt_div_iff₀' hr.bot_lt
 
 theorem mul_lt_of_lt_div {a b r : ℝ≥0} (h : a < b / r) : a * r < b :=
   (lt_div_iff₀ <| pos_iff_ne_zero.2 fun hr => False.elim <| by simp [hr] at h).1 h
 
--- DISSOLVED: div_le_div_left_of_le
+theorem div_le_div_left_of_le {a b c : ℝ≥0} (c0 : c ≠ 0) (cb : c ≤ b) :
+    a / b ≤ a / c :=
+  div_le_div_of_nonneg_left (zero_le _) c0.bot_lt cb
 
 nonrec theorem div_le_div_left {a b c : ℝ≥0} (a0 : 0 < a) (b0 : 0 < b) (c0 : 0 < c) :
     a / b ≤ a / c ↔ c ≤ b :=
@@ -732,7 +713,8 @@ theorem le_of_forall_lt_one_mul_le {x y : ℝ≥0} (h : ∀ a < 1, a * x ≤ y) 
 nonrec theorem half_le_self (a : ℝ≥0) : a / 2 ≤ a :=
   half_le_self bot_le
 
--- DISSOLVED: half_lt_self
+nonrec theorem half_lt_self {a : ℝ≥0} (h : a ≠ 0) : a / 2 < a :=
+  half_lt_self h.bot_lt
 
 theorem div_lt_one_of_lt {a b : ℝ≥0} (h : a < b) : a / b < 1 := by
   rwa [div_lt_iff₀ h.bot_lt, one_mul]
@@ -751,11 +733,13 @@ theorem _root_.Real.toNNReal_div' {x y : ℝ} (hy : 0 ≤ y) :
     Real.toNNReal (x / y) = Real.toNNReal x / Real.toNNReal y := by
   rw [div_eq_inv_mul, div_eq_inv_mul, Real.toNNReal_mul (inv_nonneg.2 hy), Real.toNNReal_inv]
 
--- DISSOLVED: inv_lt_one_iff
+theorem inv_lt_one_iff {x : ℝ≥0} (hx : x ≠ 0) : x⁻¹ < 1 ↔ 1 < x := by
+  rw [← one_div, div_lt_iff₀ hx.bot_lt, one_mul]
 
--- DISSOLVED: zpow_pos
+protected theorem zpow_pos {x : ℝ≥0} (hx : x ≠ 0) (n : ℤ) : 0 < x ^ n := zpow_pos hx.bot_lt _
 
--- DISSOLVED: inv_lt_inv
+theorem inv_lt_inv {x y : ℝ≥0} (hx : x ≠ 0) (h : x < y) : y⁻¹ < x⁻¹ :=
+  inv_strictAnti₀ hx.bot_lt h
 
 end Inv
 
@@ -845,8 +829,6 @@ theorem coe_nnabs (x : ℝ) : (nnabs x : ℝ) = |x| :=
 theorem nnabs_of_nonneg {x : ℝ} (h : 0 ≤ x) : nnabs x = toNNReal x := by
   ext
   rw [coe_toNNReal x h, coe_nnabs, abs_of_nonneg h]
-
-theorem nnabs_coe (x : ℝ≥0) : nnabs x = x := by simp
 
 theorem coe_toNNReal_le (x : ℝ) : (toNNReal x : ℝ) ≤ |x| :=
   max_le (le_abs_self _) (abs_nonneg _)

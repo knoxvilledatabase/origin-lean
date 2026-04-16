@@ -1,9 +1,11 @@
 /-
 Extracted from Topology/MetricSpace/DilationEquiv.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 21
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Dilation
+
+noncomputable section
 
 /-!
 # Dilation equivalence
@@ -29,7 +31,8 @@ section Class
 
 variable (F : Type*) (X Y : outParam Type*) [PseudoEMetricSpace X] [PseudoEMetricSpace Y]
 
--- DISSOLVED: DilationEquivClass
+class DilationEquivClass [EquivLike F X Y] : Prop where
+  edist_eq' : ∀ f : F, ∃ r : ℝ≥0, r ≠ 0 ∧ ∀ x y : X, edist (f x) (f y) = r * edist x y
 
 instance (priority := 100) [EquivLike F X Y] [DilationEquivClass F X Y] : DilationClass F X Y :=
   { inferInstanceAs (FunLike F X Y), ‹DilationEquivClass F X Y› with }
@@ -91,18 +94,12 @@ def refl (X : Type*) [PseudoEMetricSpace X] : X ≃ᵈ X where
   toEquiv := .refl X
   edist_eq' := ⟨1, one_ne_zero, fun _ _ ↦ by simp⟩
 
-@[simp] theorem refl_symm : (refl X).symm = refl X := rfl
-
 @[simp] theorem ratio_refl : ratio (refl X) = 1 := Dilation.ratio_id
 
 @[simps! (config := .asFn) apply]
 def trans (e₁ : X ≃ᵈ Y) (e₂ : Y ≃ᵈ Z) : X ≃ᵈ Z where
   toEquiv := e₁.1.trans e₂.1
   __ := e₂.toDilation.comp e₁.toDilation
-
-@[simp] theorem refl_trans (e : X ≃ᵈ Y) : (refl X).trans e = e := rfl
-
-@[simp] theorem trans_refl (e : X ≃ᵈ Y) : e.trans (refl Y) = e := rfl
 
 @[simp] theorem symm_trans_self (e : X ≃ᵈ Y) : e.symm.trans e = refl Y :=
   DilationEquiv.ext e.apply_symm_apply
@@ -139,17 +136,9 @@ instance : Group (X ≃ᵈ X) where
   inv := symm
   inv_mul_cancel := self_trans_symm
 
-theorem mul_def (e e' : X ≃ᵈ X) : e * e' = e'.trans e := rfl
-
-theorem one_def : (1 : X ≃ᵈ X) = refl X := rfl
-
-theorem inv_def (e : X ≃ᵈ X) : e⁻¹ = e.symm := rfl
-
 @[simp] theorem coe_mul (e e' : X ≃ᵈ X) : ⇑(e * e') = e ∘ e' := rfl
 
 @[simp] theorem coe_one : ⇑(1 : X ≃ᵈ X) = id := rfl
-
-theorem coe_inv (e : X ≃ᵈ X) : ⇑(e⁻¹) = e.symm := rfl
 
 noncomputable def ratioHom : (X ≃ᵈ X) →* ℝ≥0 where
   toFun := Dilation.ratio
@@ -167,12 +156,6 @@ theorem ratio_pow (e : X ≃ᵈ X) (n : ℕ) : ratio (e ^ n) = ratio e ^ n :=
 theorem ratio_zpow (e : X ≃ᵈ X) (n : ℤ) : ratio (e ^ n) = ratio e ^ n :=
   ratioHom.map_zpow _ _
 
-@[simps]
-def toPerm : (X ≃ᵈ X) →* Equiv.Perm X where
-  toFun e := e.1
-  map_mul' _ _ := rfl
-  map_one' := rfl
-
 @[norm_cast]
 theorem coe_pow (e : X ≃ᵈ X) (n : ℕ) : ⇑(e ^ n) = e^[n] := by
   rw [← coe_toEquiv, ← toPerm_apply, map_pow, Equiv.Perm.coe_pow]; rfl
@@ -182,21 +165,6 @@ def _root_.IsometryEquiv.toDilationEquiv (e : X ≃ᵢ Y) : X ≃ᵈ Y where
   __ := e.toEquiv
 
 @[simp]
-lemma _root_.IsometryEquiv.toDilationEquiv_apply (e : X ≃ᵢ Y) (x : X) :
-    e.toDilationEquiv x = e x :=
-  rfl
-
-@[simp]
-lemma _root_.IsometryEquiv.toDilationEquiv_symm (e : X ≃ᵢ Y) :
-    e.toDilationEquiv.symm = e.symm.toDilationEquiv :=
-  rfl
-
-@[simp]
-lemma _root_.IsometryEquiv.toDilationEquiv_toDilation (e : X ≃ᵢ Y) :
-    (e.toDilationEquiv.toDilation : X →ᵈ Y) = e.isometry.toDilation :=
-  rfl
-
-@[simp]
 lemma _root_.IsometryEquiv.toDilationEquiv_ratio (e : X ≃ᵢ Y) : ratio e.toDilationEquiv = 1 := by
   rw [← ratio_toDilation, IsometryEquiv.toDilationEquiv_toDilation, Isometry.toDilation_ratio]
 
@@ -204,14 +172,6 @@ def toHomeomorph (e : X ≃ᵈ Y) : X ≃ₜ Y where
   continuous_toFun := Dilation.toContinuous e
   continuous_invFun := Dilation.toContinuous e.symm
   __ := e.toEquiv
-
-@[simp]
-lemma coe_toHomeomorph (e : X ≃ᵈ Y) : ⇑e.toHomeomorph = e :=
-  rfl
-
-@[simp]
-lemma toHomeomorph_symm (e : X ≃ᵈ Y) : e.toHomeomorph.symm = e.symm.toHomeomorph :=
-  rfl
 
 end PseudoEMetricSpace
 

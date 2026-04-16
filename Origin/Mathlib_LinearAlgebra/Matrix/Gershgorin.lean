@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Matrix/Gershgorin.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.LinearAlgebra.Determinant
+
+noncomputable section
 
 /-!
 # Gershgorin's circle theorem
@@ -52,6 +54,16 @@ theorem eigenvalue_mem_ball {μ : K} (hμ : Module.End.HasEigenvalue (Matrix.toL
       _ ≤ ∑ j ∈ Finset.univ.erase i, ‖A i j‖ :=
                 (Finset.sum_le_sum fun j _ => mul_le_of_le_one_right (norm_nonneg _) (h_le j))
 
--- DISSOLVED: det_ne_zero_of_sum_row_lt_diag
+theorem det_ne_zero_of_sum_row_lt_diag (h : ∀ k, ∑ j ∈ Finset.univ.erase k, ‖A k j‖ < ‖A k k‖) :
+    A.det ≠ 0 := by
+  contrapose! h
+  suffices ∃ k, 0 ∈ Metric.closedBall (A k k) (∑ j ∈ Finset.univ.erase k, ‖A k j‖) by
+    exact this.imp (fun a h ↦ by rwa [mem_closedBall_iff_norm', sub_zero] at h)
+  refine eigenvalue_mem_ball ?_
+  rw [Module.End.hasEigenvalue_iff, Module.End.eigenspace_zero, ne_comm]
+  exact ne_of_lt (LinearMap.bot_lt_ker_of_det_eq_zero (by rwa [LinearMap.det_toLin']))
 
--- DISSOLVED: det_ne_zero_of_sum_col_lt_diag
+theorem det_ne_zero_of_sum_col_lt_diag (h : ∀ k, ∑ i ∈ Finset.univ.erase k, ‖A i k‖ < ‖A k k‖) :
+    A.det ≠ 0 := by
+  rw [← Matrix.det_transpose]
+  exact det_ne_zero_of_sum_row_lt_diag (by simp_rw [Matrix.transpose_apply]; exact h)

@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Asymptotics/AsymptoticEquivalent.lean
-Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 12
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.Asymptotics
 import Mathlib.Analysis.Asymptotics.Theta
 import Mathlib.Analysis.Normed.Order.Basic
+
+noncomputable section
 
 /-!
 # Asymptotic equivalence
@@ -68,6 +70,8 @@ variable {α β : Type*} [NormedAddCommGroup β]
 def IsEquivalent (l : Filter α) (u v : α → β) :=
   (u - v) =o[l] v
 
+@[inherit_doc] scoped notation:50 u " ~[" l:50 "] " v:50 => Asymptotics.IsEquivalent l u v
+
 variable {u v w : α → β} {l : Filter α}
 
 theorem IsEquivalent.isLittleO (h : u ~[l] v) : (u - v) =o[l] v := h
@@ -116,7 +120,15 @@ theorem isEquivalent_zero_iff_isBigO_zero : u ~[l] 0 ↔ u =O[l] (0 : α → β)
   rw [isEquivalent_zero_iff_eventually_zero, eventuallyEq_iff_exists_mem]
   exact ⟨{ x : α | u x = 0 }, isBigO_zero_right_iff.mp h, fun x hx ↦ hx⟩
 
--- DISSOLVED: isEquivalent_const_iff_tendsto
+theorem isEquivalent_const_iff_tendsto {c : β} (h : c ≠ 0) :
+    u ~[l] const _ c ↔ Tendsto u l (𝓝 c) := by
+  simp (config := { unfoldPartialApp := true }) only [IsEquivalent, const, isLittleO_const_iff h]
+  constructor <;> intro h
+  · have := h.sub (tendsto_const_nhds (x := -c))
+    simp only [Pi.sub_apply, sub_neg_eq_add, sub_add_cancel, zero_add] at this
+    exact this
+  · have := h.sub (tendsto_const_nhds (x := c))
+    rwa [sub_self] at this
 
 theorem IsEquivalent.tendsto_const {c : β} (hu : u ~[l] const _ c) : Tendsto u l (𝓝 c) := by
   rcases em <| c = 0 with rfl | h
@@ -184,7 +196,18 @@ theorem isEquivalent_of_tendsto_one' (hz : ∀ x, v x = 0 → u x = 0) (huv : Te
     u ~[l] v :=
   isEquivalent_of_tendsto_one (Eventually.of_forall hz) huv
 
--- DISSOLVED: isEquivalent_iff_tendsto_one
+theorem isEquivalent_iff_tendsto_one (hz : ∀ᶠ x in l, v x ≠ 0) :
+    u ~[l] v ↔ Tendsto (u / v) l (𝓝 1) := by
+  constructor
+  · intro hequiv
+    have := hequiv.isLittleO.tendsto_div_nhds_zero
+    simp only [Pi.sub_apply, sub_div] at this
+    have key : Tendsto (fun x ↦ v x / v x) l (𝓝 1) :=
+      (tendsto_congr' <| hz.mono fun x hnz ↦ @div_self _ _ (v x) hnz).mpr tendsto_const_nhds
+    convert this.add key
+    · simp
+    · norm_num
+  · exact isEquivalent_of_tendsto_one (hz.mono fun x hnvz hz ↦ (hnvz hz).elim)
 
 end NormedField
 

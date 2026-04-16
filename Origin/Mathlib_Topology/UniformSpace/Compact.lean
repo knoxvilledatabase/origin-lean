@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.UniformSpace.Basic
 import Mathlib.Topology.Compactness.Compact
 
+noncomputable section
+
 /-!
 # Compact sets in uniform spaces
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 import Mathlib.Order.Lattice
 
+noncomputable section
+
 /-!
 # Ordered Subtraction
 

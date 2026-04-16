@@ -11,6 +11,8 @@ import Mathlib.Lean.Meta.Basic
 import Batteries.Util.Cache
 import Mathlib.Tactic.Core
 
+noncomputable section
+
 /-!
 # Propose
 
@@ -141,14 +143,14 @@ elab_rules : tactic
 
         replaceMainGoal [g]
 
+@[inherit_doc propose'] syntax "have?!" (" : " term)? " using " (colGt term),+ : tactic
+
+@[inherit_doc propose'] syntax "have!?" (" : " term)? " using " (colGt term),+ : tactic
+
 macro_rules
-
   | `(tactic| have?!%$tk $[: $type]? using $terms,*) =>
-
     `(tactic| have?%$tk ! $[: $type]? using $terms,*)
-
   | `(tactic| have!?%$tk $[: $type]? using $terms,*) =>
-
     `(tactic| have?%$tk ! $[: $type]? using $terms,*)
 
 end Mathlib.Tactic.Propose

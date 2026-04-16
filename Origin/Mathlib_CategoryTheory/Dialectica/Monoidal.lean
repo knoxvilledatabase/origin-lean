@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Subobject.Lattice
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Dialectica.Basic
 
+noncomputable section
+
 /-!
 # The Dialectica category is symmetric monoidal
 

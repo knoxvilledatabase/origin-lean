@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.Algebra.Star.SelfAdjoint
 import Mathlib.Algebra.Algebra.Spectrum
 
+noncomputable section
+
 /-!
 # Unitary elements of a star monoid
 
@@ -101,12 +103,6 @@ instance : StarMul (unitary R) :=
 
 instance : Inhabited (unitary R) :=
   ⟨1⟩
-
-theorem star_eq_inv (U : unitary R) : star U = U⁻¹ :=
-  rfl
-
-theorem star_eq_inv' : (star : unitary R → unitary R) = Inv.inv :=
-  rfl
 
 @[simps]
 def toUnits : unitary R →* Rˣ where

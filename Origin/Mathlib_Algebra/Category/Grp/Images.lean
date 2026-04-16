@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.CategoryTheory.Limits.Shapes.Images
 
+noncomputable section
+
 /-!
 # The category of commutative additive groups has images.
 

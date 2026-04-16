@@ -5,6 +5,8 @@ Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Basic
 
+noncomputable section
+
 /-!
 # Balanced Core and Balanced Hull
 

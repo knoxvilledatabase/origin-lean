@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.Monoid.Defs
 import Mathlib.Data.Set.MulAntidiagonal
 
+noncomputable section
+
 /-! # Multiplication antidiagonal as a `Finset`.
 
 We construct the `Finset` of all pairs

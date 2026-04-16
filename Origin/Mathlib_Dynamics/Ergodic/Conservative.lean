@@ -1,11 +1,13 @@
 /-
 Extracted from Dynamics/Ergodic/Conservative.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
 import Mathlib.Combinatorics.Pigeonhole
+
+noncomputable section
 
 /-!
 # Conservative systems
@@ -45,7 +47,10 @@ namespace MeasureTheory
 
 open Measure
 
--- DISSOLVED: Conservative
+structure Conservative (f : α → α) (μ : Measure α) extends QuasiMeasurePreserving f μ μ : Prop where
+  /-- If `f` is a conservative self-map and `s` is a measurable set of nonzero measure,
+  then there exists a point `x ∈ s` that returns to `s` under a non-zero iteration of `f`. -/
+  exists_mem_iterate_mem' : ∀ ⦃s⦄, MeasurableSet s → μ s ≠ 0 → ∃ x ∈ s, ∃ m ≠ 0, f^[m] x ∈ s
 
 protected theorem MeasurePreserving.conservative [IsFiniteMeasure μ] (h : MeasurePreserving f μ μ) :
     Conservative f μ :=
@@ -67,11 +72,44 @@ theorem measureRestrict (h : Conservative f μ) (hs : MapsTo f s s) :
   .of_absolutelyContinuous h (absolutelyContinuous_of_le restrict_le_self) <|
     h.toQuasiMeasurePreserving.restrict hs
 
--- DISSOLVED: exists_mem_iterate_mem
+theorem exists_mem_iterate_mem (hf : Conservative f μ)
+    (hsm : NullMeasurableSet s μ) (hs₀ : μ s ≠ 0) :
+    ∃ x ∈ s, ∃ m ≠ 0, f^[m] x ∈ s := by
+  rcases hsm.exists_measurable_subset_ae_eq with ⟨t, hsub, htm, hts⟩
+  rcases hf.exists_mem_iterate_mem' htm (by rwa [measure_congr hts]) with ⟨x, hxt, m, hm₀, hmt⟩
+  exact ⟨x, hsub hxt, m, hm₀, hsub hmt⟩
 
--- DISSOLVED: frequently_measure_inter_ne_zero
+theorem frequently_measure_inter_ne_zero (hf : Conservative f μ) (hs : NullMeasurableSet s μ)
+    (h0 : μ s ≠ 0) : ∃ᶠ m in atTop, μ (s ∩ f^[m] ⁻¹' s) ≠ 0 := by
+  set t : ℕ → Set α := fun n ↦ s ∩ f^[n] ⁻¹' s
+  -- Assume that `μ (t n) ≠ 0`, where `t n = s ∩ f^[n] ⁻¹' s`, only for finitely many `n`.
+  by_contra H
+  -- Let `N` be the maximal `n` such that `μ (t n) ≠ 0`.
+  obtain ⟨N, hN, hmax⟩ : ∃ N, μ (t N) ≠ 0 ∧ ∀ n > N, μ (t n) = 0 := by
+    rw [Nat.frequently_atTop_iff_infinite, not_infinite] at H
+    convert exists_max_image _ (·) H ⟨0, by simpa⟩ using 4
+    rw [gt_iff_lt, ← not_le, not_imp_comm, mem_setOf]
+  have htm {n : ℕ} : NullMeasurableSet (t n) μ :=
+    hs.inter <| hs.preimage <| hf.toQuasiMeasurePreserving.iterate n
+  -- Then all `t n`, `n > N`, are null sets, hence `T = t N \ ⋃ n > N, t n` has positive measure.
+  set T := t N \ ⋃ n > N, t n with hT
+  have hμT : μ T ≠ 0 := by
+    rwa [hT, measure_diff_null]
+    exact (measure_biUnion_null_iff {n | N < n}.to_countable).2 hmax
+  have hTm : NullMeasurableSet T μ := htm.diff <| .biUnion {n | N < n}.to_countable fun _ _ ↦ htm
+  -- Take `x ∈ T` and `m ≠ 0` such that `f^[m] x ∈ T`.
+  rcases hf.exists_mem_iterate_mem hTm hμT with ⟨x, hxt, m, hm₀, hmt⟩
+  -- Then `N + m > N`, `x ∈ s`, and `f^[N + m] x = f^[N] (f^[m] x) ∈ s`.
+  -- This contradicts `x ∈ T ⊆ (⋃ n > N, t n)ᶜ`.
+  refine hxt.2 <| mem_iUnion₂.2 ⟨N + m, ?_, hxt.1.1, ?_⟩
+  · simpa [pos_iff_ne_zero]
+  · simpa only [iterate_add] using hmt.1.2
 
--- DISSOLVED: exists_gt_measure_inter_ne_zero
+theorem exists_gt_measure_inter_ne_zero (hf : Conservative f μ) (hs : NullMeasurableSet s μ)
+    (h0 : μ s ≠ 0) (N : ℕ) : ∃ m > N, μ (s ∩ f^[m] ⁻¹' s) ≠ 0 :=
+  let ⟨m, hm, hmN⟩ :=
+    ((hf.frequently_measure_inter_ne_zero hs h0).and_eventually (eventually_gt_atTop N)).exists
+  ⟨m, hmN, hm⟩
 
 theorem measure_mem_forall_ge_image_not_mem_eq_zero (hf : Conservative f μ)
     (hs : NullMeasurableSet s μ) (n : ℕ) :
@@ -109,7 +147,10 @@ theorem ae_forall_image_mem_imp_frequently_image_mem (hf : Conservative f μ)
   refine (hx hk).mono fun n hn => ?_
   rwa [add_comm, iterate_add_apply]
 
--- DISSOLVED: frequently_ae_mem_and_frequently_image_mem
+theorem frequently_ae_mem_and_frequently_image_mem (hf : Conservative f μ)
+    (hs : NullMeasurableSet s μ) (h0 : μ s ≠ 0) : ∃ᵐ x ∂μ, x ∈ s ∧ ∃ᶠ n in atTop, f^[n] x ∈ s :=
+  ((frequently_ae_mem_iff.2 h0).and_eventually (hf.ae_mem_imp_frequently_image_mem hs)).mono
+    fun _ hx => ⟨hx.1, hx.2 hx.1⟩
 
 theorem ae_frequently_mem_of_mem_nhds [TopologicalSpace α] [SecondCountableTopology α]
     [OpensMeasurableSpace α] {f : α → α} {μ : Measure α} (h : Conservative f μ) :

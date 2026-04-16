@@ -1,6 +1,6 @@
 /-
 Extracted from Order/RelSeries.lean
-Genuine: 85 | Conflates: 2 | Dissolved: 6 | Infrastructure: 23
+Genuine: 89 | Conflates: 4 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Pi
 import Mathlib.Data.Fintype.Sigma
 import Mathlib.Data.Rel
+
+noncomputable section
 
 /-!
 # Series of a relation
@@ -72,9 +74,6 @@ def ofLE (x : RelSeries r) {s : Rel α α} (h : r ≤ s) : RelSeries s where
   length := x.length
   toFun := x
   step _ := h _ _ <| x.step _
-
-lemma coe_ofLE (x : RelSeries r) {s : Rel α α} (h : r ≤ s) :
-    (x.ofLE h : _ → _) = x := rfl
 
 def toList (x : RelSeries r) : List α := List.ofFn x
 
@@ -160,13 +159,22 @@ theorem subsingleton_of_length_eq_zero (hs : s.length = 0) : {x | x ∈ s}.Subsi
   congr!
   exact finCongr (by rw [hs, zero_add]) |>.injective <| Subsingleton.elim (α := Fin 1) _ _
 
--- DISSOLVED: length_ne_zero_of_nontrivial
+-- CONFLATES (assumes ground = zero): length_ne_zero_of_nontrivial
+theorem length_ne_zero_of_nontrivial (h : {x | x ∈ s}.Nontrivial) : s.length ≠ 0 :=
+  fun hs ↦ h.not_subsingleton <| subsingleton_of_length_eq_zero hs
 
 -- CONFLATES (assumes ground = zero): length_pos_of_nontrivial
 theorem length_pos_of_nontrivial (h : {x | x ∈ s}.Nontrivial) : 0 < s.length :=
   Nat.pos_iff_ne_zero.mpr <| length_ne_zero_of_nontrivial h
 
--- DISSOLVED: length_ne_zero
+-- CONFLATES (assumes ground = zero): length_ne_zero
+theorem length_ne_zero (irrefl : Irreflexive r) : s.length ≠ 0 ↔ {x | x ∈ s}.Nontrivial := by
+  refine ⟨fun h ↦ ⟨s 0, by simp [mem_def], s 1, by simp [mem_def], fun rid ↦ irrefl (s 0) ?_⟩,
+    length_ne_zero_of_nontrivial⟩
+  nth_rw 2 [rid]
+  convert s.step ⟨0, by omega⟩
+  ext
+  simpa [Nat.pos_iff_ne_zero]
 
 -- CONFLATES (assumes ground = zero): length_pos
 theorem length_pos (irrefl : Irreflexive r) : 0 < s.length ↔ {x | x ∈ s}.Nontrivial :=
@@ -178,8 +186,6 @@ lemma length_eq_zero (irrefl : Irreflexive r) : s.length = 0 ↔ {x | x ∈ s}.S
 def head (x : RelSeries r) : α := x 0
 
 def last (x : RelSeries r) : α := x <| Fin.last _
-
-lemma apply_last (x : RelSeries r) : x (Fin.last <| x.length) = x.last := rfl
 
 lemma head_mem (x : RelSeries r) : x.head ∈ x := ⟨_, rfl⟩
 
@@ -264,13 +270,6 @@ def map (p : RelSeries r) (f : r →r s) : RelSeries s where
   toFun := f.1.comp p
   step := (f.2 <| p.step ·)
 
-@[simp] lemma map_apply (p : RelSeries r) (f : r →r s) (i : Fin (p.length + 1)) :
-    p.map f i = f (p i) := rfl
-
-@[simp] lemma head_map (p : RelSeries r) (f : r →r s) : (p.map f).head = f p.head := rfl
-
-@[simp] lemma last_map (p : RelSeries r) (f : r →r s) : (p.map f).last = f p.last := rfl
-
 @[simps]
 def insertNth (p : RelSeries r) (i : Fin p.length) (a : α)
     (prev_connect : r (p (Fin.castSucc i)) a) (connect_next : r a (p i.succ)) : RelSeries r where
@@ -336,9 +335,6 @@ def reverse (p : RelSeries r) : RelSeries (fun (a b : α) ↦ r b a) where
       rw [Nat.sub_eq_iff_eq_add, add_assoc, add_comm 1 i.1, Nat.sub_add_cancel] <;>
       omega
 
-@[simp] lemma reverse_apply (p : RelSeries r) (i : Fin (p.length + 1)) :
-    p.reverse i = p i.rev := rfl
-
 @[simp] lemma last_reverse (p : RelSeries r) : p.reverse.last = p.head := by
   simp [RelSeries.last, RelSeries.head]
 
@@ -351,9 +347,6 @@ def reverse (p : RelSeries r) : RelSeries (fun (a b : α) ↦ r b a) where
 @[simps! length]
 def cons (p : RelSeries r) (newHead : α) (rel : r newHead p.head) : RelSeries r :=
   (singleton r newHead).append p rel
-
-@[simp] lemma head_cons (p : RelSeries r) (newHead : α) (rel : r newHead p.head) :
-    (p.cons newHead rel).head = newHead := rfl
 
 @[simp] lemma last_cons (p : RelSeries r) (newHead : α) (rel : r newHead p.head) :
     (p.cons newHead rel).last = p.last := by
@@ -391,11 +384,28 @@ lemma mem_snoc {p : RelSeries r} {newLast : α} {rel : r p.last newLast} {x : α
     · exact ⟨i.castSucc, Fin.append_left _ _ _⟩
     · exact ⟨Fin.last _, Fin.append_right _ _ 0⟩
 
--- DISSOLVED: tail
+@[simps]
+def tail (p : RelSeries r) (len_pos : p.length ≠ 0) : RelSeries r where
+  length := p.length - 1
+  toFun := Fin.tail p ∘ (Fin.cast <| Nat.succ_pred_eq_of_pos <| Nat.pos_of_ne_zero len_pos)
+  step i := p.step ⟨i.1 + 1, Nat.lt_pred_iff.mp i.2⟩
 
--- DISSOLVED: head_tail
+@[simp] lemma head_tail (p : RelSeries r) (len_pos : p.length ≠ 0) :
+    (p.tail len_pos).head = p 1 := by
+  show p (Fin.succ _) = p 1
+  congr
+  ext
+  show (1 : ℕ) = (1 : ℕ) % _
+  rw [Nat.mod_eq_of_lt]
+  simpa only [lt_add_iff_pos_left, Nat.pos_iff_ne_zero]
 
--- DISSOLVED: last_tail
+@[simp] lemma last_tail (p : RelSeries r) (len_pos : p.length ≠ 0) :
+    (p.tail len_pos).last = p.last := by
+  show p _ = p _
+  congr
+  ext
+  simp only [tail_length, Fin.val_succ, Fin.coe_cast, Fin.val_last]
+  exact Nat.succ_pred_eq_of_pos (by simpa [Nat.pos_iff_ne_zero] using len_pos)
 
 @[simps]
 def eraseLast (p : RelSeries r) : RelSeries r where
@@ -403,12 +413,11 @@ def eraseLast (p : RelSeries r) : RelSeries r where
   toFun i := p ⟨i, lt_of_lt_of_le i.2 (Nat.succ_le_succ tsub_le_self)⟩
   step i := p.step ⟨i, lt_of_lt_of_le i.2 tsub_le_self⟩
 
-@[simp] lemma head_eraseLast (p : RelSeries r) : p.eraseLast.head = p.head := rfl
-
-@[simp] lemma last_eraseLast (p : RelSeries r) :
-    p.eraseLast.last = p ⟨p.length.pred, Nat.lt_succ_iff.2 (Nat.pred_le _)⟩ := rfl
-
--- DISSOLVED: eraseLast_last_rel_last
+lemma eraseLast_last_rel_last (p : RelSeries r) (h : p.length ≠ 0) :
+    r p.eraseLast.last p.last := by
+  simp only [last, Fin.last, eraseLast_length, eraseLast_toFun]
+  convert p.step ⟨p.length - 1, by omega⟩
+  simp only [Nat.succ_eq_add_one, Fin.succ_mk]; omega
 
 @[simps]
 def smash (p q : RelSeries r) (connect : p.last = q.head) : RelSeries r where
@@ -602,12 +611,6 @@ def injStrictMono (n : ℕ) :
 def map (p : LTSeries α) (f : α → β) (hf : StrictMono f) : LTSeries β :=
   LTSeries.mk p.length (f.comp p) (hf.comp p.strictMono)
 
-@[simp] lemma head_map (p : LTSeries α) (f : α → β) (hf : StrictMono f) :
-  (p.map f hf).head = f p.head := rfl
-
-@[simp] lemma last_map (p : LTSeries α) (f : α → β) (hf : StrictMono f) :
-  (p.map f hf).last = f p.last := rfl
-
 @[simps!]
 noncomputable def comap (p : LTSeries β) (f : α → β)
   (comap : ∀ ⦃x y⦄, f x < f y → x < y)
@@ -619,14 +622,6 @@ def range (n : ℕ) : LTSeries ℕ where
   length := n
   toFun := fun i => i
   step i := Nat.lt_add_one i
-
-@[simp] lemma length_range (n : ℕ) : (range n).length = n := rfl
-
-@[simp] lemma range_apply (n : ℕ) (i : Fin (n+1)) : (range n) i = i := rfl
-
-@[simp] lemma head_range (n : ℕ) : (range n).head = 0 := rfl
-
-@[simp] lemma last_range (n : ℕ) : (range n).last = n := rfl
 
 lemma apply_add_index_le_apply_add_index_nat (p : LTSeries ℕ) (i j : Fin (p.length + 1))
     (hij : i ≤ j) : p i + j ≤ p j + i := by

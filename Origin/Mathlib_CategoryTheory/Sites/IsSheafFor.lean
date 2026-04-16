@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sieves
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Mono
 
+noncomputable section
+
 /-!
 # The sheaf condition for a presieve
 
@@ -90,15 +92,6 @@ def FamilyOfElements.restrict {R₁ R₂ : Presieve X} (h : R₁ ≤ R₂) :
 def FamilyOfElements.map (p : FamilyOfElements P R) (φ : P ⟶ Q) :
     FamilyOfElements Q R :=
   fun _ f hf => φ.app _ (p f hf)
-
-@[simp]
-lemma FamilyOfElements.map_apply
-    (p : FamilyOfElements P R) (φ : P ⟶ Q) {Y : C} (f : Y ⟶ X) (hf : R f) :
-    p.map φ f hf = φ.app _ (p f hf) := rfl
-
-lemma FamilyOfElements.restrict_map
-    (p : FamilyOfElements P R) (φ : P ⟶ Q) {R' : Presieve X} (h : R' ≤ R) :
-    (p.restrict h).map φ = (p.map φ).restrict h := rfl
 
 def FamilyOfElements.Compatible (x : FamilyOfElements P R) : Prop :=
   ∀ ⦃Y₁ Y₂ Z⦄ (g₁ : Z ⟶ Y₁) (g₂ : Z ⟶ Y₂) ⦃f₁ : Y₁ ⟶ X⦄ ⦃f₂ : Y₂ ⟶ X⦄ (h₁ : R f₁) (h₂ : R f₂),
@@ -238,16 +231,6 @@ end Pullback
 
 def FamilyOfElements.compPresheafMap (f : P ⟶ Q) (x : FamilyOfElements P R) :
     FamilyOfElements Q R := fun Y g hg => f.app (op Y) (x g hg)
-
-@[simp]
-theorem FamilyOfElements.compPresheafMap_id (x : FamilyOfElements P R) :
-    x.compPresheafMap (𝟙 P) = x :=
-  rfl
-
-@[simp]
-theorem FamilyOfElements.compPresheafMap_comp (x : FamilyOfElements P R) (f : P ⟶ Q)
-    (g : Q ⟶ U) : (x.compPresheafMap f).compPresheafMap g = x.compPresheafMap (f ≫ g) :=
-  rfl
 
 theorem FamilyOfElements.Compatible.compPresheafMap (f : P ⟶ Q) {x : FamilyOfElements P R}
     (h : x.Compatible) : (x.compPresheafMap f).Compatible := by
@@ -510,7 +493,6 @@ theorem exists_familyOfElements (hx : Compatible P π x) :
 variable (hx : Compatible P π x)
 
 noncomputable
-
 def familyOfElements : FamilyOfElements P (ofArrows X π) :=
   (exists_familyOfElements hx).choose
 

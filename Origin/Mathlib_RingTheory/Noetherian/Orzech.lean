@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Noetherian.Basic
 import Mathlib.RingTheory.OrzechProperty
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # Noetherian rings have the Orzech property
 

@@ -1,9 +1,11 @@
 /-
 Extracted from Data/FunLike/Equiv.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.FunLike.Embedding
+
+noncomputable section
 
 /-!
 # Typeclass for a type `F` with an injective map to `A ≃ B`
@@ -32,7 +34,6 @@ instance instEquivLike : EquivLike (MyIso A B) A B where
 
 /-- Copy of a `MyIso` with a new `toFun` equal to the old one. Useful to fix definitional
 equalities. -/
-
 protected def copy (f : MyIso A B) (f' : A → B) (f_inv : B → A)
     (h₁ : f' = f) (h₂ : f_inv = f.invFun) : MyIso A B where
   toFun := f'
@@ -42,25 +43,21 @@ protected def copy (f : MyIso A B) (f' : A → B) (f_inv : B → A)
   map_op' := h₁.symm ▸ f.map_op'
 
 end MyIso
-
 ```
 
 This file will then provide a `CoeFun` instance and various
-
 extensionality and simp lemmas.
 
 ## Isomorphism classes extending `EquivLike`
 
 The `EquivLike` design provides further benefits if you put in a bit more work.
-
 The first step is to extend `EquivLike` to create a class of those types satisfying
-
 the axioms of your new type of isomorphisms.
-
 Continuing the example above:
 
 ```
-
+/-- `MyIsoClass F A B` states that `F` is a type of `MyClass.op`-preserving morphisms.
+You should extend this class when you extend `MyIso`. -/
 class MyIsoClass (F : Type*) (A B : outParam Type*) [MyClass A] [MyClass B]
     [EquivLike F A B]
     extends MyHomClass F A B
@@ -69,19 +66,19 @@ namespace MyIso
 
 variable {A B : Type*} [MyClass A] [MyClass B]
 
+-- This goes after `MyIsoClass.instEquivLike`:
 instance : MyIsoClass (MyIso A B) A B where
   map_op := MyIso.map_op'
 
-end MyIso
+-- [Insert `ext` and `copy` here]
 
+end MyIso
 ```
 
 The second step is to add instances of your new `MyIsoClass` for all types extending `MyIso`.
-
 Typically, you can just declare a new class analogous to `MyIsoClass`:
 
 ```
-
 structure CoolerIso (A B : Type*) [CoolClass A] [CoolClass B] extends MyIso A B where
   (map_cool' : toFun CoolClass.cool = CoolClass.cool)
 
@@ -110,24 +107,20 @@ instance : CoolerIsoClass (CoolerIso A B) A B where
   map_op f := f.map_op'
   map_cool f := f.map_cool'
 
-end CoolerIso
+-- [Insert `ext` and `copy` here]
 
+end CoolerIso
 ```
 
 Then any declaration taking a specific type of morphisms as parameter can instead take the
-
 class you just defined:
-
 ```
-
+-- Compare with: lemma do_something (f : MyIso A B) : sorry := sorry
 lemma do_something {F : Type*} [EquivLike F A B] [MyIsoClass F A B] (f : F) : sorry := sorry
-
 ```
 
 This means anything set up for `MyIso`s will automatically work for `CoolerIsoClass`es,
-
 and defining `CoolerIsoClass` only takes a constant amount of effort,
-
 instead of linearly increasing the work per `MyIso`-related declaration.
 
 -/

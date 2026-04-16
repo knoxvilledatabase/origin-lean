@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Orthogonal
 import Mathlib.Analysis.Normed.Group.AddTorsor
 
+noncomputable section
+
 /-!
 # Perpendicular bisector of a segment
 
@@ -36,10 +38,6 @@ variable {c p₁ p₂ : P}
 def perpBisector (p₁ p₂ : P) : AffineSubspace ℝ P :=
   .comap ((AffineEquiv.vaddConst ℝ (midpoint ℝ p₁ p₂)).symm : P →ᵃ[ℝ] V) <|
     (LinearMap.ker (innerₛₗ ℝ (p₂ -ᵥ p₁))).toAffineSubspace
-
-theorem mem_perpBisector_iff_inner_eq_zero' :
-    c ∈ perpBisector p₁ p₂ ↔ ⟪p₂ -ᵥ p₁, c -ᵥ midpoint ℝ p₁ p₂⟫ = 0 :=
-  Iff.rfl
 
 theorem mem_perpBisector_iff_inner_eq_zero :
     c ∈ perpBisector p₁ p₂ ↔ ⟪c -ᵥ midpoint ℝ p₁ p₂, p₂ -ᵥ p₁⟫ = 0 :=

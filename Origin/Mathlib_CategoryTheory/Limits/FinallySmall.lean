@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Small.Set
 import Mathlib.CategoryTheory.Filtered.Final
 
+noncomputable section
+
 /-!
 # Finally small categories
 

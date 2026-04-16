@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Matrix.Basic
 
+noncomputable section
+
 /-!
 # Composition of matrices
 
@@ -57,11 +59,6 @@ end Semiring
 section LinearMap
 
 variable (K : Type*) [CommSemiring K] [AddCommMonoid R] [Module K R]
-
-@[simps!]
-def compLinearEquiv : Matrix I J (Matrix K L R) ≃ₗ[K] Matrix (I × K) (J × L) R where
-  __ := Matrix.compAddEquiv I J K L R
-  map_smul' _ _ := rfl
 
 end LinearMap
 

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/SetIntegral.lean
-Genuine: 135 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
+Genuine: 137 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntegrableOn
@@ -9,6 +9,8 @@ import Mathlib.MeasureTheory.Function.LocallyIntegrable
 import Mathlib.Topology.MetricSpace.ThickenedIndicator
 import Mathlib.Topology.ContinuousMap.ContinuousMapZero
 import Mathlib.Analysis.NormedSpace.HahnBanach.SeparatingDual
+
+noncomputable section
 
 /-!
 # Set integral
@@ -603,7 +605,24 @@ theorem setIntegral_pos_iff_support_of_nonneg_ae {f : X → ℝ} (hf : 0 ≤ᵐ[
 
 alias set_integral_pos_iff_support_of_nonneg_ae := setIntegral_pos_iff_support_of_nonneg_ae
 
--- DISSOLVED: setIntegral_gt_gt
+theorem setIntegral_gt_gt {R : ℝ} {f : X → ℝ} (hR : 0 ≤ R)
+    (hfint : IntegrableOn f {x | ↑R < f x} μ) (hμ : μ {x | ↑R < f x} ≠ 0) :
+    (μ {x | ↑R < f x}).toReal * R < ∫ x in {x | ↑R < f x}, f x ∂μ := by
+  have : IntegrableOn (fun _ => R) {x | ↑R < f x} μ := by
+    refine ⟨aestronglyMeasurable_const, lt_of_le_of_lt ?_ hfint.2⟩
+    refine setLIntegral_mono_ae hfint.1.ennnorm <| ae_of_all _ fun x hx => ?_
+    simp only [ENNReal.coe_le_coe, Real.nnnorm_of_nonneg hR,
+      Real.nnnorm_of_nonneg (hR.trans <| le_of_lt hx), Subtype.mk_le_mk]
+    exact le_of_lt hx
+  rw [← sub_pos, ← smul_eq_mul, ← setIntegral_const, ← integral_sub hfint this,
+    setIntegral_pos_iff_support_of_nonneg_ae]
+  · rw [← zero_lt_iff] at hμ
+    rwa [Set.inter_eq_self_of_subset_right]
+    exact fun x hx => Ne.symm (ne_of_lt <| sub_pos.2 hx)
+  · rw [Pi.zero_def, EventuallyLE, ae_restrict_iff₀]
+    · exact Eventually.of_forall fun x hx => sub_nonneg.2 <| le_of_lt hx
+    · exact nullMeasurableSet_le aemeasurable_zero (hfint.1.aemeasurable.sub aemeasurable_const)
+  · exact Integrable.sub hfint this
 
 alias set_integral_gt_gt := setIntegral_gt_gt
 
@@ -964,7 +983,11 @@ open Measure
 variable [MeasurableSpace X] [TopologicalSpace X] [OpensMeasurableSpace X]
   {μ : Measure X} [IsOpenPosMeasure μ]
 
--- DISSOLVED: Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero
+theorem Continuous.integral_pos_of_hasCompactSupport_nonneg_nonzero [IsFiniteMeasureOnCompacts μ]
+    {f : X → ℝ} {x : X} (f_cont : Continuous f) (f_comp : HasCompactSupport f) (f_nonneg : 0 ≤ f)
+    (f_x : f x ≠ 0) : 0 < ∫ x, f x ∂μ :=
+  integral_pos_of_integrable_nonneg_nonzero f_cont (f_cont.integrable_of_hasCompactSupport f_comp)
+    f_nonneg f_x
 
 end OpenPos
 
@@ -1152,23 +1175,7 @@ section ContinuousMap
 
 variable [TopologicalSpace Y] [CompactSpace Y]
 
-lemma ContinuousMap.integral_apply [NormedSpace ℝ E] [CompleteSpace E] {f : X → C(Y, E)}
-    (hf : Integrable f μ) (y : Y) : (∫ x, f x ∂μ) y = ∫ x, f x y ∂μ := by
-  calc (∫ x, f x ∂μ) y = ContinuousMap.evalCLM ℝ y (∫ x, f x ∂μ) := rfl
-    _ = ∫ x, ContinuousMap.evalCLM ℝ y (f x) ∂μ :=
-          (ContinuousLinearMap.integral_comp_comm _ hf).symm
-    _ = _ := rfl
-
 open scoped ContinuousMapZero in
-
-theorem ContinuousMapZero.integral_apply {R : Type*} [NormedCommRing R] [Zero Y]
-    [NormedAlgebra ℝ R] [CompleteSpace R] {f : X → C(Y, R)₀}
-    (hf : MeasureTheory.Integrable f μ) (y : Y) :
-    (∫ (x : X), f x ∂μ) y = ∫ (x : X), (f x) y ∂μ := by
-  calc (∫ x, f x ∂μ) y = ContinuousMapZero.evalCLM ℝ y (∫ x, f x ∂μ) := rfl
-    _ = ∫ x, ContinuousMapZero.evalCLM ℝ y (f x) ∂μ :=
-          (ContinuousLinearMap.integral_comp_comm _ hf).symm
-    _ = _ := rfl
 
 end ContinuousMap
 

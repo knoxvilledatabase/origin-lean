@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/SpecialFunctions/CompareExp.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent
 import Mathlib.Analysis.Asymptotics.SpecificAsymptotics
+
+noncomputable section
 
 /-!
 # Growth estimates on `x ^ y` for complex `x`, `y`
@@ -72,7 +74,8 @@ theorem of_boundedUnder_im (hre : Tendsto re l atTop) (him_le : IsBoundedUnder (
 ### Preliminary lemmas
 -/
 
--- DISSOLVED: eventually_ne
+theorem eventually_ne (hl : IsExpCmpFilter l) : ∀ᶠ w : ℂ in l, w ≠ 0 :=
+  hl.tendsto_re.eventually_ne_atTop' _
 
 theorem tendsto_abs_re (hl : IsExpCmpFilter l) : Tendsto (fun z : ℂ => |z.re|) l atTop :=
   tendsto_abs_atTop_atTop.comp hl.tendsto_re

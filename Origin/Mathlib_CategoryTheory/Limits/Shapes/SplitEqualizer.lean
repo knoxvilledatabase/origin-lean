@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 
+noncomputable section
+
 /-!
 # Split Equalizers
 
@@ -81,10 +83,6 @@ open Limits
 @[simps! pt]
 def IsSplitEqualizer.asFork {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) :
     Fork f g := Fork.ofι h t.condition
-
-@[simp]
-theorem IsSplitEqualizer.asFork_ι {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) :
-    t.asFork.ι = h := rfl
 
 def IsSplitEqualizer.isEqualizer {W : C} {h : W ⟶ X} (t : IsSplitEqualizer f g h) :
     IsLimit t.asFork :=

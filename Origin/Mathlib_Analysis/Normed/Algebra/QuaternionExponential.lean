@@ -7,6 +7,8 @@ import Mathlib.Analysis.Quaternion
 import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Series
 
+noncomputable section
+
 /-!
 # Lemmas about `NormedSpace.exp` on `Quaternion`s
 

@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Definitions for `String`
 

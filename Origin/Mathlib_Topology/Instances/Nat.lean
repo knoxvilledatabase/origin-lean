@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Instances.Int
 import Mathlib.Data.Nat.Lattice
 
+noncomputable section
+
 /-!
 # Topology on the natural numbers
 
@@ -21,13 +23,6 @@ namespace Nat
 noncomputable instance : Dist ℕ :=
   ⟨fun x y => dist (x : ℝ) y⟩
 
-theorem dist_eq (x y : ℕ) : dist x y = |(x : ℝ) - y| := rfl
-
-theorem dist_coe_int (x y : ℕ) : dist (x : ℤ) (y : ℤ) = dist x y := rfl
-
-@[norm_cast, simp]
-theorem dist_cast_real (x y : ℕ) : dist (x : ℝ) y = dist x y := rfl
-
 theorem pairwise_one_le_dist : Pairwise fun m n : ℕ => 1 ≤ dist m n := fun _ _ hne =>
   Int.pairwise_one_le_dist <| mod_cast hne
 
@@ -42,8 +37,6 @@ theorem isClosedEmbedding_coe_real : IsClosedEmbedding ((↑) : ℕ → ℝ) :=
 alias closedEmbedding_coe_real := isClosedEmbedding_coe_real
 
 instance : MetricSpace ℕ := Nat.isUniformEmbedding_coe_real.comapMetricSpace _
-
-theorem preimage_ball (x : ℕ) (r : ℝ) : (↑) ⁻¹' ball (x : ℝ) r = ball x r := rfl
 
 theorem preimage_closedBall (x : ℕ) (r : ℝ) : (↑) ⁻¹' closedBall (x : ℝ) r = closedBall x r := rfl
 

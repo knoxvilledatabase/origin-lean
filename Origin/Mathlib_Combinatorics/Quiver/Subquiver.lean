@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Notation
 import Mathlib.Combinatorics.Quiver.Basic
 
+noncomputable section
+
 /-!
 ## Wide subquivers
 
@@ -48,14 +50,6 @@ structure Total (V : Type u) [Quiver.{v} V] : Sort max (u + 1) v where
   right : V
   /-- an arrow -/
   hom : left ⟶ right
-
-def wideSubquiverEquivSetTotal {V} [Quiver V] :
-    WideSubquiver V ≃
-      Set (Total V) where
-  toFun H := { e | e.hom ∈ H e.left e.right }
-  invFun S a b := { e | Total.mk a b e ∈ S }
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 def Labelling (V : Type u) [Quiver V] (L : Sort*) :=
   ∀ ⦃a b : V⦄, (a ⟶ b) → L

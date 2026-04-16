@@ -5,6 +5,8 @@ Genuine: 62 | Conflates: 2 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Topology.Order.IsLUB
 
+noncomputable section
+
 /-!
 # Order topology on a densely ordered set
 -/

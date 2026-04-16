@@ -1,11 +1,13 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/Affine.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 7 | Infrastructure: 10
+Genuine: 89 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Side
 import Mathlib.Geometry.Euclidean.Angle.Oriented.Rotation
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.Affine
+
+noncomputable section
 
 /-!
 # Oriented angles.
@@ -35,6 +37,8 @@ abbrev o := @Module.Oriented.positiveOrientation
 def oangle (p₁ p₂ p₃ : P) : Real.Angle :=
   o.oangle (p₁ -ᵥ p₂) (p₃ -ᵥ p₂)
 
+@[inherit_doc] scoped notation "∡" => EuclideanGeometry.oangle
+
 theorem continuousAt_oangle {x : P × P × P} (hx12 : x.1 ≠ x.2.1) (hx32 : x.2.2 ≠ x.2.1) :
     ContinuousAt (fun y : P × P × P => ∡ y.1 y.2.1 y.2.2) x := by
   let f : P × P × P → V × V := fun y => (y.1 -ᵥ y.2.1, y.2.2 -ᵥ y.2.1)
@@ -53,11 +57,14 @@ theorem oangle_self_right (p₁ p₂ : P) : ∡ p₁ p₂ p₂ = 0 := by simp [o
 theorem oangle_self_left_right (p₁ p₂ : P) : ∡ p₁ p₂ p₁ = 0 :=
   o.oangle_self _
 
--- DISSOLVED: left_ne_of_oangle_ne_zero
+theorem left_ne_of_oangle_ne_zero {p₁ p₂ p₃ : P} (h : ∡ p₁ p₂ p₃ ≠ 0) : p₁ ≠ p₂ := by
+  rw [← @vsub_ne_zero V]; exact o.left_ne_zero_of_oangle_ne_zero h
 
--- DISSOLVED: right_ne_of_oangle_ne_zero
+theorem right_ne_of_oangle_ne_zero {p₁ p₂ p₃ : P} (h : ∡ p₁ p₂ p₃ ≠ 0) : p₃ ≠ p₂ := by
+  rw [← @vsub_ne_zero V]; exact o.right_ne_zero_of_oangle_ne_zero h
 
--- DISSOLVED: left_ne_right_of_oangle_ne_zero
+theorem left_ne_right_of_oangle_ne_zero {p₁ p₂ p₃ : P} (h : ∡ p₁ p₂ p₃ ≠ 0) : p₁ ≠ p₃ := by
+  rw [← (vsub_left_injective p₂).ne_iff]; exact o.ne_of_oangle_ne_zero h
 
 theorem left_ne_of_oangle_eq_pi {p₁ p₂ p₃ : P} (h : ∡ p₁ p₂ p₃ = π) : p₁ ≠ p₂ :=
   left_ne_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_ne_zero : ∡ p₁ p₂ p₃ ≠ 0)
@@ -90,11 +97,14 @@ theorem left_ne_right_of_oangle_eq_neg_pi_div_two {p₁ p₂ p₃ : P} (h : ∡ 
     p₁ ≠ p₃ :=
   left_ne_right_of_oangle_ne_zero (h.symm ▸ Real.Angle.neg_pi_div_two_ne_zero : ∡ p₁ p₂ p₃ ≠ 0)
 
--- DISSOLVED: left_ne_of_oangle_sign_ne_zero
+theorem left_ne_of_oangle_sign_ne_zero {p₁ p₂ p₃ : P} (h : (∡ p₁ p₂ p₃).sign ≠ 0) : p₁ ≠ p₂ :=
+  left_ne_of_oangle_ne_zero (Real.Angle.sign_ne_zero_iff.1 h).1
 
--- DISSOLVED: right_ne_of_oangle_sign_ne_zero
+theorem right_ne_of_oangle_sign_ne_zero {p₁ p₂ p₃ : P} (h : (∡ p₁ p₂ p₃).sign ≠ 0) : p₃ ≠ p₂ :=
+  right_ne_of_oangle_ne_zero (Real.Angle.sign_ne_zero_iff.1 h).1
 
--- DISSOLVED: left_ne_right_of_oangle_sign_ne_zero
+theorem left_ne_right_of_oangle_sign_ne_zero {p₁ p₂ p₃ : P} (h : (∡ p₁ p₂ p₃).sign ≠ 0) : p₁ ≠ p₃ :=
+  left_ne_right_of_oangle_ne_zero (Real.Angle.sign_ne_zero_iff.1 h).1
 
 theorem left_ne_of_oangle_sign_eq_one {p₁ p₂ p₃ : P} (h : (∡ p₁ p₂ p₃).sign = 1) : p₁ ≠ p₂ :=
   left_ne_of_oangle_sign_ne_zero (h.symm ▸ by decide : (∡ p₁ p₂ p₃).sign ≠ 0)
@@ -128,7 +138,14 @@ theorem oangle_eq_zero_iff_oangle_rev_eq_zero {p₁ p₂ p₃ : P} : ∡ p₁ p�
 theorem oangle_eq_pi_iff_oangle_rev_eq_pi {p₁ p₂ p₃ : P} : ∡ p₁ p₂ p₃ = π ↔ ∡ p₃ p₂ p₁ = π :=
   o.oangle_eq_pi_iff_oangle_rev_eq_pi
 
--- DISSOLVED: oangle_ne_zero_and_ne_pi_iff_affineIndependent
+theorem oangle_ne_zero_and_ne_pi_iff_affineIndependent {p₁ p₂ p₃ : P} :
+    ∡ p₁ p₂ p₃ ≠ 0 ∧ ∡ p₁ p₂ p₃ ≠ π ↔ AffineIndependent ℝ ![p₁, p₂, p₃] := by
+  rw [oangle, o.oangle_ne_zero_and_ne_pi_iff_linearIndependent,
+    affineIndependent_iff_linearIndependent_vsub ℝ _ (1 : Fin 3), ←
+    linearIndependent_equiv (finSuccAboveEquiv (1 : Fin 3))]
+  convert Iff.rfl
+  ext i
+  fin_cases i <;> rfl
 
 theorem oangle_eq_zero_or_eq_pi_iff_collinear {p₁ p₂ p₃ : P} :
     ∡ p₁ p₂ p₃ = 0 ∨ ∡ p₁ p₂ p₃ = π ↔ Collinear ℝ ({p₁, p₂, p₃} : Set P) := by

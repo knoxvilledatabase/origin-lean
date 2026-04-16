@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Functor
 
+noncomputable section
+
 /-!
 # The free monoidal category over a type
 
@@ -165,62 +167,6 @@ instance : MonoidalCategory (F C) where
     exact Quotient.sound (ρ_naturality _)
   pentagon _ _ _ _ := Quotient.sound pentagon
   triangle _ _ := Quotient.sound triangle
-
-@[simp]
-theorem mk_comp {X Y Z : F C} (f : X ⟶ᵐ Y) (g : Y ⟶ᵐ Z) :
-    ⟦f.comp g⟧ = @CategoryStruct.comp (F C) _ _ _ _ ⟦f⟧ ⟦g⟧ :=
-  rfl
-
-@[simp]
-theorem mk_tensor {X₁ Y₁ X₂ Y₂ : F C} (f : X₁ ⟶ᵐ Y₁) (g : X₂ ⟶ᵐ Y₂) :
-    ⟦f.tensor g⟧ = @MonoidalCategory.tensorHom (F C) _ _ _ _ _ _ ⟦f⟧ ⟦g⟧ :=
-  rfl
-
-@[simp]
-theorem mk_whiskerLeft (X : F C) {Y₁ Y₂ : F C} (f : Y₁ ⟶ᵐ Y₂) :
-    ⟦f.whiskerLeft X⟧ = MonoidalCategory.whiskerLeft (C := F C) (X := X) (f := ⟦f⟧) :=
-  rfl
-
-@[simp]
-theorem mk_whiskerRight {X₁ X₂ : F C} (f : X₁ ⟶ᵐ X₂) (Y : F C) :
-    ⟦f.whiskerRight Y⟧ = MonoidalCategory.whiskerRight (C := F C) (f := ⟦f⟧) (Y := Y) :=
-  rfl
-
-@[simp]
-theorem mk_id {X : F C} : ⟦Hom.id X⟧ = 𝟙 X :=
-  rfl
-
-@[simp]
-theorem mk_α_hom {X Y Z : F C} : ⟦Hom.α_hom X Y Z⟧ = (α_ X Y Z).hom :=
-  rfl
-
-@[simp]
-theorem mk_α_inv {X Y Z : F C} : ⟦Hom.α_inv X Y Z⟧ = (α_ X Y Z).inv :=
-  rfl
-
-@[simp]
-theorem mk_ρ_hom {X : F C} : ⟦Hom.ρ_hom X⟧ = (ρ_ X).hom :=
-  rfl
-
-@[simp]
-theorem mk_ρ_inv {X : F C} : ⟦Hom.ρ_inv X⟧ = (ρ_ X).inv :=
-  rfl
-
-@[simp]
-theorem mk_l_hom {X : F C} : ⟦Hom.l_hom X⟧ = (λ_ X).hom :=
-  rfl
-
-@[simp]
-theorem mk_l_inv {X : F C} : ⟦Hom.l_inv X⟧ = (λ_ X).inv :=
-  rfl
-
-@[simp]
-theorem tensor_eq_tensor {X Y : F C} : X.tensor Y = X ⊗ Y :=
-  rfl
-
-@[simp]
-theorem unit_eq_unit : FreeMonoidalCategory.unit = 𝟙_ (F C) :=
-  rfl
 
 abbrev homMk {X Y : F C} (f : X ⟶ᵐ Y) : X ⟶ Y := ⟦f⟧
 

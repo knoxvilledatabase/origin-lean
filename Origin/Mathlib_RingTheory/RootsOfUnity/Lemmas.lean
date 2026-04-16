@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.FieldTheory.KummerExtension
 
+noncomputable section
+
 /-!
 # More results on primitive roots of unity
 

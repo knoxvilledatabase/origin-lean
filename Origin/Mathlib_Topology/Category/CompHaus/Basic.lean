@@ -9,6 +9,8 @@ import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Topology.Category.CompHausLike.Basic
 import Mathlib.Topology.Category.TopCat.Limits.Basic
 
+noncomputable section
+
 /-!
 # The category of Compact Hausdorff Spaces
 
@@ -96,9 +98,6 @@ noncomputable def stoneCechEquivalence (X : TopCat.{u}) (Y : CompHaus.{u}) :
 
 noncomputable def topToCompHaus : TopCat.{u} ⥤ CompHaus.{u} :=
   Adjunction.leftAdjointOfEquiv stoneCechEquivalence.{u} fun _ _ _ _ _ => rfl
-
-theorem topToCompHaus_obj (X : TopCat) : ↥(topToCompHaus.obj X) = StoneCech X :=
-  rfl
 
 noncomputable instance compHausToTop.reflective : Reflective compHausToTop where
   L := topToCompHaus

@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Analysis.SpecialFunctions.PolarCoord
 import Mathlib.Analysis.Complex.Convex
 
+noncomputable section
+
 /-!
 # Gaussian integral
 

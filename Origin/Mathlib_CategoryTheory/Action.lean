@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.SingleObj
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.SemidirectProduct
 
+noncomputable section
+
 /-!
 # Actions as functors and as categories
 
@@ -48,10 +50,6 @@ def π : ActionCategory M X ⥤ SingleObj M :=
   CategoryOfElements.π _
 
 @[simp]
-theorem π_map (p q : ActionCategory M X) (f : p ⟶ q) : (π M X).map f = f.val :=
-  rfl
-
-@[simp]
 theorem π_obj (p : ActionCategory M X) : (π M X).obj p = SingleObj.star M :=
   Unit.ext _ _
 
@@ -77,9 +75,6 @@ def objEquiv : X ≃ ActionCategory M X where
   left_inv := coe_back
   right_inv := back_coe
 
-theorem hom_as_subtype (p q : ActionCategory M X) : (p ⟶ q) = { m : M // m • p.back = q.back } :=
-  rfl
-
 instance [Inhabited X] : Inhabited (ActionCategory M X) :=
   ⟨show X from default⟩
 
@@ -91,25 +86,7 @@ variable {X} (x : X)
 def stabilizerIsoEnd : stabilizerSubmonoid M x ≃* @End (ActionCategory M X) _ x :=
   MulEquiv.refl _
 
-@[simp]
-theorem stabilizerIsoEnd_apply (f : stabilizerSubmonoid M x) :
-    (stabilizerIsoEnd M x) f = f :=
-  rfl
-
-@[simp 1100]
-theorem stabilizerIsoEnd_symm_apply (f : End _) : (stabilizerIsoEnd M x).symm f = f :=
-  rfl
-
 variable {M}
-
-@[simp]
-protected theorem id_val (x : ActionCategory M X) : Subtype.val (𝟙 x) = 1 :=
-  rfl
-
-@[simp]
-protected theorem comp_val {x y z : ActionCategory M X} (f : x ⟶ y) (g : y ⟶ z) :
-    (f ≫ g).val = g.val * f.val :=
-  rfl
 
 instance [IsPretransitive M X] [Nonempty X] : IsConnected (ActionCategory M X) :=
   zigzag_isConnected fun x y =>
@@ -129,10 +106,6 @@ def endMulEquivSubgroup (H : Subgroup G) : End (objEquiv G (G ⧸ H) ↑(1 : G))
 
 def homOfPair (t : X) (g : G) : @Quiver.Hom (ActionCategory G X) _ (g⁻¹ • t :) t :=
   Subtype.mk g (smul_inv_smul g t)
-
-@[simp]
-theorem homOfPair.val (t : X) (g : G) : (homOfPair t g).val = g :=
-  rfl
 
 protected def cases {P : ∀ ⦃a b : ActionCategory G X⦄, (a ⟶ b) → Sort*}
     (hyp : ∀ t g, P (homOfPair t g)) ⦃a b⦄ (f : a ⟶ b) : P f := by

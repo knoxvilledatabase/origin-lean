@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Hom.Defs
 
+noncomputable section
+
 /-!
 # Multiplicative homomorphisms respect semiconjugation and commutation.
 -/

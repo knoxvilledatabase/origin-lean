@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Matrix.Adjugate
 import Mathlib.LinearAlgebra.Matrix.Block
 import Mathlib.RingTheory.PolynomialAlgebra
 
+noncomputable section
+
 /-!
 # Characteristic polynomials and the Cayley-Hamilton theorem
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Basic.lean
-Genuine: 156 | Conflates: 7 | Dissolved: 15 | Infrastructure: 51
+Genuine: 169 | Conflates: 8 | Dissolved: 0 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Divisibility
@@ -8,6 +8,8 @@ import Mathlib.Algebra.MonoidAlgebra.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.WithTop
 import Mathlib.Data.Finset.Sort
 import Mathlib.Order.OmegaCompletePartialOrder
+
+noncomputable section
 
 /-!
 # Theory of univariate polynomials
@@ -55,6 +57,8 @@ noncomputable section
 
 structure Polynomial (R : Type*) [Semiring R] where ofFinsupp ::
   toFinsupp : AddMonoidAlgebra R ℕ
+
+@[inherit_doc] scoped[Polynomial] notation:9000 R "[X]" => Polynomial R
 
 open AddMonoidAlgebra Finset
 
@@ -119,10 +123,6 @@ instance sub {R : Type u} [Ring R] : Sub R[X] :=
 instance mul' : Mul R[X] :=
   ⟨mul⟩
 
-@[simp] theorem add_eq_add : add p q = p + q := rfl
-
-@[simp] theorem mul_eq_mul : mul p q = p * q := rfl
-
 instance instNSMul : SMul ℕ R[X] where
   smul r p := ⟨r • p.toFinsupp⟩
 
@@ -156,11 +156,6 @@ theorem ofFinsupp_sub {R : Type u} [Ring R] {a b} : (⟨a - b⟩ : R[X]) = ⟨a�
 @[simp]
 theorem ofFinsupp_mul (a b) : (⟨a * b⟩ : R[X]) = ⟨a⟩ * ⟨b⟩ :=
   show _ = mul _ _ by rw [mul_def]
-
-@[simp]
-theorem ofFinsupp_nsmul (a : ℕ) (b) :
-    (⟨a • b⟩ : R[X]) = (a • ⟨b⟩ : R[X]) :=
-  rfl
 
 -- CONFLATES (assumes ground = zero): ofFinsupp_smul
 @[simp]
@@ -361,9 +356,8 @@ theorem support_eq_empty : p.support = ∅ ↔ p = 0 := by
   rcases p with ⟨⟩
   simp [support]
 
--- DISSOLVED: support_nonempty
-
-theorem card_support_eq_zero : #p.support = 0 ↔ p = 0 := by simp
+@[simp] lemma support_nonempty : p.support.Nonempty ↔ p ≠ 0 :=
+  Finset.nonempty_iff_ne_empty.trans support_eq_empty.not
 
 def monomial (n : ℕ) : R →ₗ[R] R[X] where
   toFun t := ⟨Finsupp.single n t⟩
@@ -430,10 +424,6 @@ def C : R →+* R[X] :=
 theorem monomial_zero_left (a : R) : monomial 0 a = C a :=
   rfl
 
-@[simp]
-theorem toFinsupp_C (a : R) : (C a).toFinsupp = single 0 a :=
-  rfl
-
 theorem C_0 : C (0 : R) = 0 := by simp
 
 theorem C_1 : C (1 : R) = 1 :=
@@ -469,16 +459,13 @@ theorem monomial_mul_C : monomial n a * C b = monomial n (a * b) := by
 def X : R[X] :=
   monomial 1 1
 
--- DISSOLVED: monomial_one_one_eq_X
+theorem monomial_one_one_eq_X : monomial 1 (1 : R) = X :=
+  rfl
 
 theorem monomial_one_right_eq_X_pow (n : ℕ) : monomial n (1 : R) = X ^ n := by
   induction n with
   | zero => simp [monomial_zero_one]
   | succ n ih => rw [pow_succ, ← ih, ← monomial_one_one_eq_X, monomial_mul_monomial, mul_one]
-
-@[simp]
-theorem toFinsupp_X : X.toFinsupp = Finsupp.single 1 (1 : R) :=
-  rfl
 
 -- CONFLATES (assumes ground = zero): X_ne_C
 theorem X_ne_C [Nontrivial R] (a : R) : X ≠ C a := by
@@ -567,15 +554,13 @@ theorem coeff_monomial_same (n : ℕ) (c : R) : (monomial n c).coeff n = c :=
 theorem coeff_monomial_of_ne {m n : ℕ} (c : R) (h : n ≠ m) : (monomial n c).coeff m = 0 :=
   Finsupp.single_eq_of_ne h
 
-@[simp]
-theorem coeff_zero (n : ℕ) : coeff (0 : R[X]) n = 0 :=
-  rfl
-
 theorem coeff_one {n : ℕ} : coeff (1 : R[X]) n = if n = 0 then 1 else 0 := by
   simp_rw [eq_comm (a := n) (b := 0)]
   exact coeff_monomial
 
--- DISSOLVED: coeff_one_zero
+@[simp]
+theorem coeff_one_zero : coeff (1 : R[X]) 0 = 1 := by
+  simp [coeff_one]
 
 @[simp]
 theorem coeff_X_one : coeff (X : R[X]) 1 = 1 :=
@@ -591,11 +576,13 @@ theorem coeff_monomial_succ : coeff (monomial (n + 1) a) 0 = 0 := by simp [coeff
 theorem coeff_X : coeff (X : R[X]) n = if 1 = n then 1 else 0 :=
   coeff_monomial
 
--- DISSOLVED: coeff_X_of_ne_one
+theorem coeff_X_of_ne_one {n : ℕ} (hn : n ≠ 1) : coeff (X : R[X]) n = 0 := by
+  rw [coeff_X, if_neg hn.symm]
 
--- DISSOLVED: mem_support_iff
-
-theorem not_mem_support_iff : n ∉ p.support ↔ p.coeff n = 0 := by simp
+@[simp]
+theorem mem_support_iff : n ∈ p.support ↔ p.coeff n ≠ 0 := by
+  rcases p with ⟨⟩
+  simp
 
 theorem coeff_C : coeff (C a) n = ite (n = 0) a 0 := by
   convert coeff_monomial (a := a) (m := n) (n := 0) using 2
@@ -605,7 +592,7 @@ theorem coeff_C : coeff (C a) n = ite (n = 0) a 0 := by
 theorem coeff_C_zero : coeff (C a) 0 = a :=
   coeff_monomial
 
--- DISSOLVED: coeff_C_ne_zero
+theorem coeff_C_ne_zero (h : n ≠ 0) : (C a).coeff n = 0 := by rw [coeff_C, if_neg h]
 
 @[simp]
 lemma coeff_C_succ {r : R} {n : ℕ} : coeff (C r) (n + 1) = 0 := by simp [coeff_C]
@@ -654,7 +641,8 @@ theorem C_inj : C a = C b ↔ a = b :=
 theorem C_eq_zero : C a = 0 ↔ a = 0 :=
   C_injective.eq_iff' (map_zero C)
 
--- DISSOLVED: C_ne_zero
+theorem C_ne_zero : C a ≠ 0 ↔ a ≠ 0 :=
+  C_eq_zero.not
 
 theorem subsingleton_iff_subsingleton : Subsingleton R[X] ↔ Subsingleton R :=
   ⟨@Injective.subsingleton _ _ _ C_injective, by
@@ -708,23 +696,28 @@ theorem eq_zero_of_eq_zero (h : (0 : R) = (1 : R)) (p : R[X]) : p = 0 := by
 
 section Fewnomials
 
--- DISSOLVED: support_monomial
+theorem support_monomial (n) {a : R} (H : a ≠ 0) : (monomial n a).support = singleton n := by
+  rw [← ofFinsupp_single, support]; exact Finsupp.support_single_ne_zero _ H
 
 theorem support_monomial' (n) (a : R) : (monomial n a).support ⊆ singleton n := by
   rw [← ofFinsupp_single, support]
   exact Finsupp.support_single_subset
 
--- DISSOLVED: support_C
+theorem support_C {a : R} (h : a ≠ 0) : (C a).support = singleton 0 :=
+  support_monomial 0 h
 
 theorem support_C_subset (a : R) : (C a).support ⊆ singleton 0 :=
   support_monomial' 0 a
 
--- DISSOLVED: support_C_mul_X
+theorem support_C_mul_X {c : R} (h : c ≠ 0) : Polynomial.support (C c * X) = singleton 1 := by
+  rw [C_mul_X_eq_monomial, support_monomial 1 h]
 
 theorem support_C_mul_X' (c : R) : Polynomial.support (C c * X) ⊆ singleton 1 := by
   simpa only [C_mul_X_eq_monomial] using support_monomial' 1 c
 
--- DISSOLVED: support_C_mul_X_pow
+theorem support_C_mul_X_pow (n : ℕ) {c : R} (h : c ≠ 0) :
+    Polynomial.support (C c * X ^ n) = singleton n := by
+  rw [C_mul_X_pow_eq_monomial, support_monomial n h]
 
 theorem support_C_mul_X_pow' (n : ℕ) (c : R) : Polynomial.support (C c * X ^ n) ⊆ singleton n := by
   simpa only [C_mul_X_pow_eq_monomial] using support_monomial' n c
@@ -775,9 +768,15 @@ theorem support_X_empty (H : (1 : R) = 0) : (X : R[X]).support = ∅ := by
 theorem support_X (H : ¬(1 : R) = 0) : (X : R[X]).support = singleton 1 := by
   rw [← pow_one X, support_X_pow H 1]
 
--- DISSOLVED: monomial_left_inj
+theorem monomial_left_inj {a : R} (ha : a ≠ 0) {i j : ℕ} :
+    monomial i a = monomial j a ↔ i = j := by
+  simp only [← ofFinsupp_single, ofFinsupp.injEq, Finsupp.single_left_inj ha]
 
--- DISSOLVED: binomial_eq_binomial
+theorem binomial_eq_binomial {k l m n : ℕ} {u v : R} (hu : u ≠ 0) (hv : v ≠ 0) :
+    C u * X ^ k + C v * X ^ l = C u * X ^ m + C v * X ^ n ↔
+      k = m ∧ l = n ∨ u = v ∧ k = n ∧ l = m ∨ u + v = 0 ∧ k = l ∧ m = n := by
+  simp_rw [C_mul_X_pow_eq_monomial, ← toFinsupp_inj, toFinsupp_add, toFinsupp_monomial]
+  exact Finsupp.single_add_single_eq_single_add_single hu hv
 
 theorem natCast_mul (n : ℕ) (p : R[X]) : (n : R[X]) * p = n • p :=
   (nsmul_eq_mul _ _).symm
@@ -963,7 +962,8 @@ theorem support_update (p : R[X]) (n : ℕ) (a : R) [Decidable (a = 0)] :
 theorem support_update_zero (p : R[X]) (n : ℕ) : support (p.update n 0) = p.support.erase n := by
   rw [update_zero_eq_erase, support_erase]
 
--- DISSOLVED: support_update_ne_zero
+theorem support_update_ne_zero (p : R[X]) (n : ℕ) {a : R} (ha : a ≠ 0) :
+    support (p.update n a) = insert n p.support := by classical rw [support_update, if_neg ha]
 
 end Update
 
@@ -985,11 +985,6 @@ variable [Ring R]
 
 instance instZSMul : SMul ℤ R[X] where
   smul r p := ⟨r • p.toFinsupp⟩
-
-@[simp]
-theorem ofFinsupp_zsmul (a : ℤ) (b) :
-    (⟨a • b⟩ : R[X]) = (a • ⟨b⟩ : R[X]) :=
-  rfl
 
 @[simp]
 theorem toFinsupp_zsmul (a : ℤ) (b : R[X]) :
@@ -1059,7 +1054,10 @@ instance nontrivial [Nontrivial R] : Nontrivial R[X] := by
   refine ⟨⟨⟨x⟩, ⟨y⟩, ?_⟩⟩
   simp [hxy]
 
--- DISSOLVED: X_ne_zero
+-- CONFLATES (assumes ground = zero): X_ne_zero
+@[simp]
+theorem X_ne_zero [Nontrivial R] : (X : R[X]) ≠ 0 :=
+  mt (congr_arg fun p => coeff p 1) (by simp)
 
 end NonzeroSemiring
 

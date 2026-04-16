@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-! Lemmas use by the congruence closure module -/
 
 namespace Mathlib.Tactic.CC

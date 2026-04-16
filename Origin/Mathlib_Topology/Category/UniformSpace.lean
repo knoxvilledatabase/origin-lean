@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Monad.Limits
 import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.Topology.UniformSpace.Completion
 
+noncomputable section
+
 /-!
 # The category of uniform spaces
 
@@ -47,23 +49,11 @@ def of (α : Type u) [UniformSpace α] : UniformSpaceCat :=
 instance : Inhabited UniformSpaceCat :=
   ⟨UniformSpaceCat.of Empty⟩
 
-@[simp]
-theorem coe_of (X : Type u) [UniformSpace X] : (of X : Type u) = X :=
-  rfl
-
 instance (X Y : UniformSpaceCat) : CoeFun (X ⟶ Y) fun _ => X → Y :=
   ⟨(forget UniformSpaceCat).map⟩
 
 @[simp]
 theorem coe_comp {X Y Z : UniformSpaceCat} (f : X ⟶ Y) (g : Y ⟶ Z) : (f ≫ g : X → Z) = g ∘ f :=
-  rfl
-
-@[simp]
-theorem coe_id (X : UniformSpaceCat) : (𝟙 X : X → X) = id :=
-  rfl
-
-theorem coe_mk {X Y : UniformSpaceCat} (f : X → Y) (hf : UniformContinuous f) :
-    ((⟨f, hf⟩ : X ⟶ Y) : X → Y) = f :=
   rfl
 
 theorem hom_ext {X Y : UniformSpaceCat} {f g : X ⟶ Y} : (f : X → Y) = g → f = g :=
@@ -104,11 +94,6 @@ instance t0Space (X : CpltSepUniformSpace) : T0Space (toUniformSpace X).α :=
 def of (X : Type u) [UniformSpace X] [CompleteSpace X] [T0Space X] : CpltSepUniformSpace :=
   ⟨X⟩
 
-@[simp]
-theorem coe_of (X : Type u) [UniformSpace X] [CompleteSpace X] [T0Space X] :
-    (of X : Type u) = X :=
-  rfl
-
 instance : Inhabited CpltSepUniformSpace :=
   ⟨CpltSepUniformSpace.of Empty⟩
 
@@ -140,10 +125,6 @@ def completionHom (X : UniformSpaceCat) :
   val := ((↑) : X → Completion X)
   property := Completion.uniformContinuous_coe X
 
-@[simp]
-theorem completionHom_val (X : UniformSpaceCat) (x) : (completionHom X) x = (x : Completion X) :=
-  rfl
-
 noncomputable def extensionHom {X : UniformSpaceCat} {Y : CpltSepUniformSpace}
     (f : X ⟶ (forget₂ CpltSepUniformSpace UniformSpaceCat).obj Y) :
     completionFunctor.obj X ⟶ Y where
@@ -154,11 +135,7 @@ instance (X : UniformSpaceCat) : UniformSpace ((forget _).obj X) :=
   show UniformSpace X from inferInstance
 
 attribute [local instance] CategoryTheory.ConcreteCategory.instFunLike in
-
 @[simp]
-theorem extensionHom_val {X : UniformSpaceCat} {Y : CpltSepUniformSpace}
-    (f : X ⟶ (forget₂ _ _).obj Y) (x) : (extensionHom f) x = Completion.extension f x :=
-  rfl
 
 @[simp]
 theorem extension_comp_coe {X : UniformSpaceCat} {Y : CpltSepUniformSpace}

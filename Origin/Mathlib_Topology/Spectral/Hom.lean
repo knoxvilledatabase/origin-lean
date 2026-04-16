@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.StacksAttribute
 import Mathlib.Topology.ContinuousMap.Basic
 
+noncomputable section
+
 /-!
 # Spectral maps
 
@@ -98,20 +100,12 @@ instance instFunLike : FunLike (SpectralMap α β) α β where
 instance : SpectralMapClass (SpectralMap α β) α β where
   map_spectral f := f.spectral'
 
-@[simp]
-theorem toFun_eq_coe {f : SpectralMap α β} : f.toFun = (f : α → β) :=
-  rfl
-
 @[ext]
 theorem ext {f g : SpectralMap α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
 protected def copy (f : SpectralMap α β) (f' : α → β) (h : f' = f) : SpectralMap α β :=
   ⟨f', h.symm.subst f.spectral'⟩
-
-@[simp]
-theorem coe_copy (f : SpectralMap α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : SpectralMap α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -124,39 +118,13 @@ protected def id : SpectralMap α α :=
 instance : Inhabited (SpectralMap α α) :=
   ⟨SpectralMap.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(SpectralMap.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : SpectralMap.id α a = a :=
-  rfl
 
 def comp (f : SpectralMap β γ) (g : SpectralMap α β) : SpectralMap α γ :=
   ⟨f.toContinuousMap.comp g.toContinuousMap, f.spectral'.comp g.spectral'⟩
 
 @[simp]
-theorem coe_comp (f : SpectralMap β γ) (g : SpectralMap α β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : SpectralMap β γ) (g : SpectralMap α β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-theorem coe_comp_continuousMap (f : SpectralMap β γ) (g : SpectralMap α β) :
-    f ∘ g = (f : ContinuousMap β γ) ∘ (g : ContinuousMap α β) :=
-   rfl
-
-@[simp]
-theorem coe_comp_continuousMap' (f : SpectralMap β γ) (g : SpectralMap α β) :
-    (f.comp g : ContinuousMap α γ) = (f : ContinuousMap β γ).comp g :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : SpectralMap γ δ) (g : SpectralMap β γ) (h : SpectralMap α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]

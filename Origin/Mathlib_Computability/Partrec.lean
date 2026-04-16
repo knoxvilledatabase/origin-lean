@@ -7,6 +7,8 @@ import Mathlib.Computability.Primrec
 import Mathlib.Data.Nat.PSub
 import Mathlib.Data.PFun
 
+noncomputable section
+
 /-!
 # The partial recursive functions
 

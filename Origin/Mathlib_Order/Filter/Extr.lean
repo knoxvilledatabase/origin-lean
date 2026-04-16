@@ -8,6 +8,8 @@ import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.Data.Finset.Lattice.Fold
 
+noncomputable section
+
 /-!
 # Minimum and maximum w.r.t. a filter and on a set
 
@@ -112,12 +114,6 @@ variable {f s a l} {t : Set α} {l' : Filter α}
 
 theorem IsExtrOn.elim {p : Prop} : IsExtrOn f s a → (IsMinOn f s a → p) → (IsMaxOn f s a → p) → p :=
   Or.elim
-
-theorem isMinOn_iff : IsMinOn f s a ↔ ∀ x ∈ s, f a ≤ f x :=
-  Iff.rfl
-
-theorem isMaxOn_iff : IsMaxOn f s a ↔ ∀ x ∈ s, f x ≤ f a :=
-  Iff.rfl
 
 theorem isMinOn_univ_iff : IsMinOn f univ a ↔ ∀ x, f a ≤ f x :=
   univ_subset_iff.trans eq_univ_iff_forall

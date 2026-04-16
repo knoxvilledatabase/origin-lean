@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Pairwise.Basic
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.SuccPred.Archimedean
 
+noncomputable section
+
 /-!
 # Intervals `Ixx (f x) (f (Order.succ x))`
 

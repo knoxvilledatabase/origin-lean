@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
 
+noncomputable section
+
 /-!
 # `forget₂ (FGModuleCat K) (ModuleCat K)` creates all finite limits.
 

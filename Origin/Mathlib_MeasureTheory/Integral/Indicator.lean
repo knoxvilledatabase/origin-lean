@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.Lebesgue
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Metrizable
 
+noncomputable section
+
 /-!
 # Results about indicator functions, their integrals, and measures
 

@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Normed.Module.Completion
 
+noncomputable section
+
 /-!
 # Liouville's theorem
 

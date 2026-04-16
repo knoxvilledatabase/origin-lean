@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Grade
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Order.Interval.Finset.Basic
 
+noncomputable section
+
 /-!
 # Intervals of finsets as finsets
 
@@ -48,18 +50,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder (Finset α) where
   finset_mem_Ioo s t u := by
     rw [mem_filter, mem_ssubsets]
     exact and_comm
-
-theorem Icc_eq_filter_powerset : Icc s t = t.powerset.filter (s ⊆ ·) :=
-  rfl
-
-theorem Ico_eq_filter_ssubsets : Ico s t = t.ssubsets.filter (s ⊆ ·) :=
-  rfl
-
-theorem Ioc_eq_filter_powerset : Ioc s t = t.powerset.filter (s ⊂ ·) :=
-  rfl
-
-theorem Ioo_eq_filter_ssubsets : Ioo s t = t.ssubsets.filter (s ⊂ ·) :=
-  rfl
 
 theorem Iic_eq_powerset : Iic s = s.powerset :=
   filter_true_of_mem fun t _ => empty_subset t

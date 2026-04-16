@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Topology.MetricSpace.Isometry
 import Mathlib.Topology.MetricSpace.Lipschitz
 
+noncomputable section
+
 /-!
 # Group actions by isometries
 
@@ -175,8 +177,6 @@ variable (G)
 def inv : G ≃ᵢ G where
   toEquiv := Equiv.inv G
   isometry_toFun := edist_inv_inv
-
-@[to_additive (attr := simp)] theorem inv_symm : (inv G).symm = inv G := rfl
 
 end IsometryEquiv
 

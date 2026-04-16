@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Additive
 import Mathlib.CategoryTheory.Idempotents.Karoubi
 
+noncomputable section
+
 /-!
 # Idempotent completeness and homological complexes
 

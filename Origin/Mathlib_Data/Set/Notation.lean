@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Util.Notation3
 import Mathlib.Lean.Expr.ExtraRecognizers
 
+noncomputable section
+
 /-!
 # Set Notation
 

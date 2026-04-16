@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Localization.Integer
 import Mathlib.RingTheory.Valuation.Integers
 import Mathlib.Tactic.FieldSimp
 
+noncomputable section
+
 /-!
 # Valuation Rings
 
@@ -226,9 +228,6 @@ noncomputable def equivInteger : A ≃+* (valuation A K).integer :=
         rw [mem_integer_iff] at ha
         obtain ⟨a, rfl⟩ := ha
         exact ⟨a, rfl⟩)
-
-@[simp]
-theorem coe_equivInteger_apply (a : A) : (equivInteger A K a : K) = algebraMap A K a := rfl
 
 theorem range_algebraMap_eq : (valuation A K).integer = (algebraMap A K).range := by
   ext; exact mem_integer_iff _ _ _

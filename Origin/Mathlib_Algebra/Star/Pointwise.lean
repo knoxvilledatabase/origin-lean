@@ -8,6 +8,8 @@ import Mathlib.Algebra.Star.Basic
 import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Algebra.Field.Defs
 
+noncomputable section
+
 /-!
 # Pointwise star operation on sets
 
@@ -31,12 +33,6 @@ variable {α : Type*} {s t : Set α} {a : α}
 protected def star [Star α] : Star (Set α) := ⟨preimage Star.star⟩
 
 scoped[Pointwise] attribute [instance] Set.star
-
-@[simp]
-theorem star_empty [Star α] : (∅ : Set α)⋆ = ∅ := rfl
-
-@[simp]
-theorem star_univ [Star α] : (univ : Set α)⋆ = univ := rfl
 
 @[simp]
 theorem nonempty_star [InvolutiveStar α] {s : Set α} : s⋆.Nonempty ↔ s.Nonempty :=

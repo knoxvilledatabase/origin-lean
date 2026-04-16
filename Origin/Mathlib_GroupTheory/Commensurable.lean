@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.GroupTheory.Index
 
+noncomputable section
+
 /-!
 # Commensurability for subgroups
 
@@ -80,14 +82,6 @@ def commensurator' (H : Subgroup G) : Subgroup (ConjAct G) where
 
 def commensurator (H : Subgroup G) : Subgroup G :=
   (commensurator' H).comap ConjAct.toConjAct.toMonoidHom
-
-@[simp]
-theorem commensurator'_mem_iff (H : Subgroup G) (g : ConjAct G) :
-    g ∈ commensurator' H ↔ Commensurable (g • H) H := Iff.rfl
-
-@[simp]
-theorem commensurator_mem_iff (H : Subgroup G) (g : G) :
-    g ∈ commensurator H ↔ Commensurable (ConjAct.toConjAct g • H) H := Iff.rfl
 
 theorem eq {H K : Subgroup G} (hk : Commensurable H K) : commensurator H = commensurator K :=
   Subgroup.ext fun x =>

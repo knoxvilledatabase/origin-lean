@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.RootSystem.Hom
 import Mathlib.CategoryTheory.Category.Basic
 
+noncomputable section
+
 /-!
 # The category of root pairings
 This file defines the category of root pairings, following the definition of category of root data

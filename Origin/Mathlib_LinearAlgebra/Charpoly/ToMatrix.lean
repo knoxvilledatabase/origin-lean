@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Charpoly.Basic
 import Mathlib.LinearAlgebra.Matrix.Basis
 import Mathlib.RingTheory.Finiteness.Prod
 
+noncomputable section
+
 /-!
 
 # Characteristic polynomial

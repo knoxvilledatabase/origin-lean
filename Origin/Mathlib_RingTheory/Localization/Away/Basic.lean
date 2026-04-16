@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Away/Basic.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 7
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.GroupTheory.MonoidLocalization.Away
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Algebra.Pi
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
+
+noncomputable section
 
 /-!
 # Localizations away from an element
@@ -177,11 +179,6 @@ noncomputable def mapₐ (f : A →ₐ[R] B) (a : A) [Away a Aₚ] [Away (f a) B
     rw [IsScalarTower.algebraMap_apply R A Aₚ, IsScalarTower.algebraMap_eq R B Bₚ]
     erw [IsLocalization.map_eq]
     simp⟩
-
-@[simp]
-lemma mapₐ_apply (f : A →ₐ[R] B) (a : A) [Away a Aₚ] [Away (f a) Bₚ] (x : Aₚ) :
-    mapₐ Aₚ Bₚ f a x = map Aₚ Bₚ f.toRingHom a x :=
-  rfl
 
 variable {Aₚ} {Bₚ}
 
@@ -518,6 +515,28 @@ variable {R : Type*} [CommRing R] (x : R) (B : Type*) [CommRing B]
 
 variable [Algebra R B] [IsLocalization.Away x B] [IsDomain R] [WfDvdMonoid R]
 
--- DISSOLVED: exists_reduced_fraction'
+theorem exists_reduced_fraction' {b : B} (hb : b ≠ 0) (hx : Irreducible x) :
+    ∃ (a : R) (n : ℤ), ¬x ∣ a ∧ selfZPow x B n * algebraMap R B a = b := by
+  obtain ⟨⟨a₀, y⟩, H⟩ := surj (Submonoid.powers x) b
+  obtain ⟨d, hy⟩ := (Submonoid.mem_powers_iff y.1 x).mp y.2
+  have ha₀ : a₀ ≠ 0 := by
+    haveI :=
+      @isDomain_of_le_nonZeroDivisors B _ R _ _ _ (Submonoid.powers x) _
+        (powers_le_nonZeroDivisors_of_noZeroDivisors hx.ne_zero)
+    simp only [map_zero, ← hy, map_pow] at H
+    apply ((injective_iff_map_eq_zero' (algebraMap R B)).mp _ a₀).mpr.mt
+    · rw [← H]
+      apply mul_ne_zero hb (pow_ne_zero _ _)
+      exact
+        IsLocalization.to_map_ne_zero_of_mem_nonZeroDivisors B
+          (powers_le_nonZeroDivisors_of_noZeroDivisors hx.ne_zero)
+          (mem_nonZeroDivisors_iff_ne_zero.mpr hx.ne_zero)
+    · exact IsLocalization.injective B (powers_le_nonZeroDivisors_of_noZeroDivisors hx.ne_zero)
+  simp only [← hy] at H
+  obtain ⟨m, a, hyp1, hyp2⟩ := WfDvdMonoid.max_power_factor ha₀ hx
+  refine ⟨a, m - d, ?_⟩
+  rw [← mk'_one (M := Submonoid.powers x) B, selfZPow_pow_sub, selfZPow_natCast, selfZPow_natCast,
+    ← map_pow _ _ d, mul_comm _ b, H, hyp2, map_mul, map_pow _ _ m]
+  exact ⟨hyp1, congr_arg _ (IsLocalization.mk'_one _ _)⟩
 
 end NumDen

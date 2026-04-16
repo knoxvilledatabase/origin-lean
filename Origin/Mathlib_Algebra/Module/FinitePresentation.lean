@@ -11,6 +11,8 @@ import Mathlib.RingTheory.Finiteness.TensorProduct
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.RingTheory.Noetherian.Basic
 
+noncomputable section
+
 /-!
 
 # Finitely Presented Modules
@@ -73,7 +75,6 @@ section Ring
 variable (R M N) [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
 
 universe u in
-
 variable (R M : Type u) [Ring R] [AddCommGroup M] [Module R M] in
 
 theorem Module.FinitePresentation.equiv_quotient [fp : Module.FinitePresentation R M] :

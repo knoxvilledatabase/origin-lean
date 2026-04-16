@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Measure/MeasureSpaceDef.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Induced
 import Mathlib.MeasureTheory.OuterMeasure.AE
 import Mathlib.Order.Filter.CountableInter
+
+noncomputable section
 
 /-!
 # Measure spaces
@@ -127,12 +129,6 @@ theorem outerMeasure_le_iff {m : OuterMeasure α} : m ≤ μ.1 ↔ ∀ s, Measur
 
 end Measure
 
-@[simp] theorem Measure.coe_toOuterMeasure (μ : Measure α) : ⇑μ.toOuterMeasure = μ := rfl
-
-theorem Measure.toOuterMeasure_apply (μ : Measure α) (s : Set α) :
-    μ.toOuterMeasure s = μ s :=
-  rfl
-
 theorem measure_eq_trim (s : Set α) : μ s = μ.toOuterMeasure.trim s := by
   rw [μ.trimmed, μ.coe_toOuterMeasure]
 
@@ -156,7 +152,8 @@ theorem measure_eq_extend (hs : MeasurableSet s) :
   rw [extend_eq]
   exact hs
 
--- DISSOLVED: nonempty_of_measure_ne_zero
+theorem nonempty_of_measure_ne_zero (h : μ s ≠ 0) : s.Nonempty :=
+  nonempty_iff_ne_empty.2 fun h' => h <| h'.symm ▸ measure_empty
 
 theorem measure_mono_top (h : s₁ ⊆ s₂) (h₁ : μ s₁ = ∞) : μ s₂ = ∞ :=
   top_unique <| h₁ ▸ measure_mono h
@@ -216,7 +213,10 @@ theorem measure_symmDiff_ne_top (hs : μ s ≠ ∞) (ht : μ t ≠ ∞) : μ (s 
 theorem measure_union_eq_top_iff : μ (s ∪ t) = ∞ ↔ μ s = ∞ ∨ μ t = ∞ :=
   not_iff_not.1 <| by simp only [← lt_top_iff_ne_top, ← Ne.eq_def, not_or, measure_union_lt_top_iff]
 
--- DISSOLVED: exists_measure_pos_of_not_measure_iUnion_null
+theorem exists_measure_pos_of_not_measure_iUnion_null [Countable ι] {s : ι → Set α}
+    (hs : μ (⋃ n, s n) ≠ 0) : ∃ n, 0 < μ (s n) := by
+  contrapose! hs
+  exact measure_iUnion_null fun n => nonpos_iff_eq_zero.1 (hs n)
 
 theorem measure_lt_top_of_subset (hst : t ⊆ s) (hs : μ s ≠ ∞) : μ t < ∞ :=
   lt_of_le_of_lt (μ.mono hst) hs.lt_top
@@ -296,7 +296,6 @@ notation3 "∃ᵐ "(...)", "r:(scoped P =>
   Filter.Frequently P <| MeasureTheory.ae MeasureTheory.MeasureSpace.volume) => r
 
 macro "volume_tac" : tactic =>
-
   `(tactic| (first | exact MeasureTheory.MeasureSpace.volume))
 
 end MeasureSpace

@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Triangulated/Functor.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Triangulated.Triangulated
 import Mathlib.CategoryTheory.ComposableArrows
 import Mathlib.CategoryTheory.Shift.CommShift
+
+noncomputable section
 
 /-!
 # Triangulated functors
@@ -88,7 +90,6 @@ attribute [local simp] map_zsmul comp_zsmul zsmul_comp
   shiftFunctorAdd'_eq_shiftFunctorAdd
 
 set_option maxHeartbeats 400000 in
-
 noncomputable instance [∀ (n : ℤ), (shiftFunctor C n).Additive]
     [∀ (n : ℤ), (shiftFunctor D n).Additive] : (F.mapTriangle).CommShift ℤ where
   iso := F.mapTriangleCommShiftIso

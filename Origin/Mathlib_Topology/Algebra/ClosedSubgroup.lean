@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.Index
 
+noncomputable section
+
 /-!
 # Closed subgroups of a topological group
 

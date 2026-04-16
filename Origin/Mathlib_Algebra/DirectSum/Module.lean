@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/DirectSum/Module.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 11
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Basic
 import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.LinearAlgebra.Basis.Defs
+
+noncomputable section
 
 /-!
 # Direct sum of modules
@@ -66,11 +68,7 @@ def lmk : ∀ s : Finset ι, (∀ i : (↑s : Set ι), M i.val) →ₗ[R] ⨁ i,
 def lof : ∀ i : ι, M i →ₗ[R] ⨁ i, M i :=
   DFinsupp.lsingle
 
-theorem lof_eq_of (i : ι) (b : M i) : lof R ι M i b = of M i b := rfl
-
 variable {ι M}
-
-theorem single_eq_lof (i : ι) (b : M i) : DFinsupp.single i b = lof R ι M i b := rfl
 
 theorem mk_smul (s : Finset ι) (c : R) (x) : mk M s (c • x) = c • mk M s x :=
   (lmk R ι M s).map_smul c x
@@ -80,7 +78,9 @@ theorem of_smul (i : ι) (c : R) (x) : of M i (c • x) = c • of M i x :=
 
 variable {R}
 
--- DISSOLVED: support_smul
+theorem support_smul [∀ (i : ι) (x : M i), Decidable (x ≠ 0)] (c : R) (v : ⨁ i, M i) :
+    (c • v).support ⊆ v.support :=
+  DFinsupp.support_smul _ _
 
 variable {N : Type u₁} [AddCommMonoid N] [Module R N]
 
@@ -90,9 +90,6 @@ variable (R ι N)
 
 def toModule : (⨁ i, M i) →ₗ[R] N :=
   DFunLike.coe (DFinsupp.lsum ℕ) φ
-
-theorem coe_toModule_eq_coe_toAddMonoid :
-    (toModule R ι N φ : (⨁ i, M i) → N) = toAddMonoid fun i ↦ (φ i).toAddMonoidHom := rfl
 
 variable {ι N φ}
 
@@ -159,8 +156,6 @@ def component (i : ι) : (⨁ i, M i) →ₗ[R] M i :=
   DFinsupp.lapply i
 
 variable {ι M}
-
-theorem apply_eq_component (f : ⨁ i, M i) (i : ι) : f i = component R ι M i f := rfl
 
 @[ext (iff := false)]
 theorem ext {f g : ⨁ i, M i} (h : ∀ i, component R ι M i f = component R ι M i g) : f = g :=
@@ -327,9 +322,6 @@ theorem IsInternal.collectedBasis_coe (h : IsInternal A) {α : ι → Type*}
     toModule]
   erw [DFinsupp.lsum_single]
   simp only [Submodule.coe_subtype]
-
-theorem IsInternal.collectedBasis_mem (h : IsInternal A) {α : ι → Type*}
-    (v : ∀ i, Basis (α i) R (A i)) (a : Σi, α i) : h.collectedBasis v a ∈ A a.1 := by simp
 
 theorem IsInternal.collectedBasis_repr_of_mem (h : IsInternal A) {α : ι → Type*}
     (v : ∀ i, Basis (α i) R (A i)) {x : M} {i : ι} {a : α i} (hx : x ∈ A i) :

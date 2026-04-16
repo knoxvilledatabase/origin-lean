@@ -5,6 +5,8 @@ Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.RingTheory.Flat.Basic
 
+noncomputable section
+
 /-!
 # Base change along flat modules preserves equalizers
 
@@ -74,19 +76,9 @@ def LinearMap.tensorKer : M ⊗[R] (LinearMap.ker f) →ₗ[S]
   AlgebraTensorModule.lift (f.tensorKerBil S M)
 
 @[simp]
-lemma LinearMap.tensorKer_tmul (m : M) (x : LinearMap.ker f) :
-    (tensorKer S M f (m ⊗ₜ[R] x) : M ⊗[R] N) = m ⊗ₜ[R] (x : N) :=
-  rfl
-
-@[simp]
 lemma LinearMap.tensorKer_coe (x : M ⊗[R] (LinearMap.ker f)) :
     (tensorKer S M f x : M ⊗[R] N) = (ker f).subtype.lTensor M x := by
   induction x <;> simp_all
-
-@[simp]
-lemma LinearMap.tensorEqLocus_tmul (m : M) (x : LinearMap.eqLocus f g) :
-    (tensorEqLocus S M f g (m ⊗ₜ[R] x) : M ⊗[R] N) = m ⊗ₜ[R] (x : N) :=
-  rfl
 
 @[simp]
 lemma LinearMap.tensorEqLocus_coe (x : M ⊗[R] (LinearMap.eqLocus f g)) :
@@ -135,11 +127,6 @@ def LinearMap.tensorKerEquiv [Module.Flat R M] :
       simp)
 
 @[simp]
-lemma LinearMap.tensorKerEquiv_apply [Module.Flat R M] (x : M ⊗[R] ker f) :
-    tensorKerEquiv S M f x = tensorKer S M f x :=
-  rfl
-
-@[simp]
 lemma LinearMap.lTensor_ker_subtype_tensorKerEquiv_symm [Module.Flat R M]
     (x : ker (AlgebraTensorModule.lTensor S M f)) :
     (lTensor M (ker f).subtype) ((tensorKerEquiv S M f).symm x) = x :=
@@ -156,11 +143,6 @@ def LinearMap.tensorEqLocusEquiv [Module.Flat R M] :
       apply (Module.Flat.lTensor_preserves_injective_linearMap (eqLocus f g).subtype
         (eqLocus f g).injective_subtype)
       simp)
-
-@[simp]
-lemma LinearMap.tensorEqLocusEquiv_apply [Module.Flat R M] (x : M ⊗[R] LinearMap.eqLocus f g) :
-    LinearMap.tensorEqLocusEquiv S M f g x = LinearMap.tensorEqLocus S M f g x :=
-  rfl
 
 @[simp]
 lemma LinearMap.lTensor_eqLocus_subtype_tensoreqLocusEquiv_symm [Module.Flat R M]
@@ -221,11 +203,5 @@ def AlgHom.tensorEqualizerEquiv [Module.Flat R T] :
         (Algebra.TensorProduct.map (AlgHom.id S T) g) :=
   AlgEquiv.ofLinearEquiv (LinearMap.tensorEqLocusEquiv S T f.toLinearMap g.toLinearMap)
     rfl (AlgHom.tensorEqualizerAux_mul S T f g)
-
-@[simp]
-lemma AlgHom.tensorEqualizerEquiv_apply [Module.Flat R T]
-    (x : T ⊗[R] AlgHom.equalizer f g) :
-    AlgHom.tensorEqualizerEquiv S T f g x = AlgHom.tensorEqualizer S T f g x :=
-  rfl
 
 end Algebra

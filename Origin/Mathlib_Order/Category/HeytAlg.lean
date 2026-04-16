@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Category.BddDistLat
 import Mathlib.Order.Heyting.Hom
 
+noncomputable section
+
 /-!
 # The category of Heyting algebras
 
@@ -29,10 +31,6 @@ instance (X : HeytAlg) : HeytingAlgebra X :=
 
 def of (α : Type*) [HeytingAlgebra α] : HeytAlg :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [HeytingAlgebra α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited HeytAlg :=
   ⟨of PUnit⟩

@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Calculus/Taylor.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Module.Basic
 import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.IteratedDeriv.Defs
 import Mathlib.Analysis.Calculus.MeanValue
+
+noncomputable section
 
 /-!
 # Taylor's theorem
@@ -189,7 +191,26 @@ theorem hasDerivWithinAt_taylorWithinEval_at_Icc {f : ℝ → E} {a b t : ℝ} (
 
 /-! ### Taylor's theorem with mean value type remainder estimate -/
 
--- DISSOLVED: taylor_mean_remainder
+theorem taylor_mean_remainder {f : ℝ → ℝ} {g g' : ℝ → ℝ} {x x₀ : ℝ} {n : ℕ} (hx : x₀ < x)
+    (hf : ContDiffOn ℝ n f (Icc x₀ x))
+    (hf' : DifferentiableOn ℝ (iteratedDerivWithin n f (Icc x₀ x)) (Ioo x₀ x))
+    (gcont : ContinuousOn g (Icc x₀ x))
+    (gdiff : ∀ x_1 : ℝ, x_1 ∈ Ioo x₀ x → HasDerivAt g (g' x_1) x_1)
+    (g'_ne : ∀ x_1 : ℝ, x_1 ∈ Ioo x₀ x → g' x_1 ≠ 0) :
+    ∃ x' ∈ Ioo x₀ x, f x - taylorWithinEval f n (Icc x₀ x) x₀ x =
+    ((x - x') ^ n / n ! * (g x - g x₀) / g' x') • iteratedDerivWithin (n + 1) f (Icc x₀ x) x' := by
+  -- We apply the mean value theorem
+  rcases exists_ratio_hasDerivAt_eq_ratio_slope (fun t => taylorWithinEval f n (Icc x₀ x) t x)
+      (fun t => ((n ! : ℝ)⁻¹ * (x - t) ^ n) • iteratedDerivWithin (n + 1) f (Icc x₀ x) t) hx
+      (continuousOn_taylorWithinEval (uniqueDiffOn_Icc hx) hf)
+      (fun _ hy => taylorWithinEval_hasDerivAt_Ioo x hx hy hf hf') g g' gcont gdiff with ⟨y, hy, h⟩
+  use y, hy
+  -- The rest is simplifications and trivial calculations
+  simp only [taylorWithinEval_self] at h
+  rw [mul_comm, ← div_left_inj' (g'_ne y hy), mul_div_cancel_right₀ _ (g'_ne y hy)] at h
+  rw [← h]
+  field_simp [g'_ne y hy]
+  ring
 
 theorem taylor_mean_remainder_lagrange {f : ℝ → ℝ} {x x₀ : ℝ} {n : ℕ} (hx : x₀ < x)
     (hf : ContDiffOn ℝ n f (Icc x₀ x))

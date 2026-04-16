@@ -5,6 +5,8 @@ Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 import Origin.Core
 import Mathlib.Data.List.Sigma
 
+noncomputable section
+
 /-!
 # Association Lists
 
@@ -88,14 +90,6 @@ instance : Inhabited (AList β) :=
 theorem not_mem_empty (a : α) : a ∉ (∅ : AList β) :=
   not_mem_nil a
 
-@[simp]
-theorem empty_entries : (∅ : AList β).entries = [] :=
-  rfl
-
-@[simp]
-theorem keys_empty : (∅ : AList β).keys = [] :=
-  rfl
-
 /-! ### singleton -/
 
 def singleton (a : α) (b : β a) : AList β :=
@@ -103,10 +97,6 @@ def singleton (a : α) (b : β a) : AList β :=
 
 @[simp]
 theorem singleton_entries (a : α) (b : β a) : (singleton a b).entries = [Sigma.mk a b] :=
-  rfl
-
-@[simp]
-theorem keys_singleton (a : α) (b : β a) : (singleton a b).keys = [a] :=
   rfl
 
 /-! ### lookup -/
@@ -117,10 +107,6 @@ variable [DecidableEq α]
 
 def lookup (a : α) (s : AList β) : Option (β a) :=
   s.entries.dlookup a
-
-@[simp]
-theorem lookup_empty (a) : lookup a (∅ : AList β) = none :=
-  rfl
 
 theorem lookup_isSome {a : α} {s : AList β} : (s.lookup a).isSome ↔ a ∈ s :=
   dlookup_isSome
@@ -226,10 +212,6 @@ theorem insert_of_neg {a} {b : β a} {s : AList β} (h : a ∉ s) :
   ext <| insert_entries_of_neg h
 
 @[simp]
-theorem insert_empty (a) (b : β a) : insert a b ∅ = singleton a b :=
-  rfl
-
-@[simp]
 theorem mem_insert {a a'} {b' : β a'} (s : AList β) : a ∈ insert a' b' s ↔ a = a' ∨ a ∈ s :=
   mem_keys_kinsert
 
@@ -275,14 +257,6 @@ theorem insert_singleton_eq {a : α} {b b' : β a} : insert a b (singleton a b')
   ext <| by
     simp only [AList.insert_entries, List.kerase_cons_eq, and_self_iff, AList.singleton_entries,
       heq_iff_eq, eq_self_iff_true]
-
-@[simp]
-theorem entries_toAList (xs : List (Sigma β)) : (List.toAList xs).entries = dedupKeys xs :=
-  rfl
-
-theorem toAList_cons (a : α) (b : β a) (xs : List (Sigma β)) :
-    List.toAList (⟨a, b⟩ :: xs) = insert a b xs.toAList :=
-  rfl
 
 theorem mk_cons_eq_insert (c : Sigma β) (l : List (Sigma β)) (h : (c :: l).NodupKeys) :
     (⟨c :: l, h⟩ : AList β) = insert c.1 c.2 ⟨l, nodupKeys_of_nodupKeys_cons h⟩ := by

@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf
 
+noncomputable section
+
 /-!
 
 # Coverages
@@ -140,9 +142,6 @@ def ofGrothendieck (J : GrothendieckTopology C) : Coverage C where
     rw [Sieve.generate_sieve]
     exact J.pullback_stable _ hS
 
-lemma ofGrothendieck_iff {X : C} {S : Presieve X} (J : GrothendieckTopology C) :
-    S ∈ ofGrothendieck _ J X ↔ Sieve.generate S ∈ J X := Iff.rfl
-
 inductive Saturate (K : Coverage C) : (X : C) → Sieve X → Prop where
   | of (X : C) (S : Presieve X) (hS : S ∈ K X) : Saturate K X (Sieve.generate S)
   | top (X : C) : Saturate K X ⊤
@@ -245,11 +244,6 @@ instance : SemilatticeSup (Coverage C) where
   le_sup_left _ _ _ := Set.subset_union_left
   le_sup_right _ _ _ := Set.subset_union_right
   sup_le _ _ _ hx hy X := Set.union_subset_iff.mpr ⟨hx X, hy X⟩
-
-@[simp]
-lemma sup_covering (x y : Coverage C) (B : C) :
-    (x ⊔ y).covering B = x.covering B ∪ y.covering B :=
-  rfl
 
 theorem mem_toGrothendieck_sieves_of_superset (K : Coverage C) {X : C} {S : Sieve X}
     {R : Presieve X} (h : R ≤ S) (hR : R ∈ K.covering X) : S ∈ (K.toGrothendieck C) X :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 
+noncomputable section
+
 /-!
 A `forget₂ C D` forgetful functor between concrete categories `C` and `D`
 whose forgetful functors both reflect isomorphisms, itself reflects isomorphisms.

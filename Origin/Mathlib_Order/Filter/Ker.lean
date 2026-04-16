@@ -5,6 +5,8 @@ Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Order.Filter.Basic
 
+noncomputable section
+
 /-!
 # Kernel of a filter
 

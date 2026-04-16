@@ -10,6 +10,8 @@ import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finite.Sigma
 import Mathlib.Data.Finite.Vector
 
+noncomputable section
+
 /-!
 # Finiteness of sets of lists
 

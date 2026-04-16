@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.Algebra.DirectSum.Module
 
+noncomputable section
+
 /-!
 # Tensor products of direct sums
 

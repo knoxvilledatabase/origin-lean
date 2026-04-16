@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Sort
 import Mathlib.Data.Fintype.Basic
 
+noncomputable section
+
 /-!
 # Sorting a finite type
 
@@ -29,13 +31,3 @@ def finSumEquivOfFinset (hm : #s = m) (hn : #sᶜ = n) : Fin m ⊕ Fin n ≃ α 
       Equiv.sumCongr (s.orderIsoOfFin hm).toEquiv <|
         (sᶜ.orderIsoOfFin hn).toEquiv.trans <| Equiv.Set.ofEq s.coe_compl
     _ ≃ α := Equiv.Set.sumCompl _
-
-@[simp]
-theorem finSumEquivOfFinset_inl (hm : #s = m) (hn : #sᶜ = n) (i : Fin m) :
-    finSumEquivOfFinset hm hn (Sum.inl i) = s.orderEmbOfFin hm i :=
-  rfl
-
-@[simp]
-theorem finSumEquivOfFinset_inr (hm : #s = m) (hn : #sᶜ = n) (i : Fin n) :
-    finSumEquivOfFinset hm hn (Sum.inr i) = sᶜ.orderEmbOfFin hn i :=
-  rfl

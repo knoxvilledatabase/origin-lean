@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.EqToHom
 import Mathlib.Order.Hom.Basic
 import Mathlib.Data.ULift
 
+noncomputable section
+
 /-!
 
 # Preorders as categories
@@ -54,48 +56,15 @@ def homOfLE {x y : X} (h : x ≤ y) : x ⟶ y :=
 @[inherit_doc homOfLE]
 abbrev _root_.LE.le.hom := @homOfLE
 
-@[simp]
-theorem homOfLE_refl {x : X} (h : x ≤ x) : h.hom = 𝟙 x :=
-  rfl
-
-@[simp]
-theorem homOfLE_comp {x y z : X} (h : x ≤ y) (k : y ≤ z) :
-    homOfLE h ≫ homOfLE k = homOfLE (h.trans k) :=
-  rfl
-
 theorem leOfHom {x y : X} (h : x ⟶ y) : x ≤ y :=
   h.down.down
 
 @[nolint defLemma, inherit_doc leOfHom]
 abbrev _root_.Quiver.Hom.le := @leOfHom
 
-@[simp]
-theorem homOfLE_leOfHom {x y : X} (h : x ⟶ y) : h.le.hom = h :=
-  rfl
-
 lemma homOfLE_isIso_of_eq {x y : X} (h : x ≤ y) (heq : x = y) :
     IsIso (homOfLE h) :=
   ⟨homOfLE (le_of_eq heq.symm), by simp⟩
-
-@[simp, reassoc]
-lemma homOfLE_comp_eqToHom {a b c : X} (hab : a ≤ b) (hbc : b = c) :
-    homOfLE hab ≫ eqToHom hbc = homOfLE (hab.trans (le_of_eq hbc)) :=
-  rfl
-
-@[simp, reassoc]
-lemma eqToHom_comp_homOfLE {a b c : X} (hab : a = b) (hbc : b ≤ c) :
-    eqToHom hab ≫ homOfLE hbc = homOfLE ((le_of_eq hab).trans hbc) :=
-  rfl
-
-@[simp, reassoc]
-lemma homOfLE_op_comp_eqToHom {a b c : X} (hab : b ≤ a) (hbc : op b = op c) :
-    (homOfLE hab).op ≫ eqToHom hbc = (homOfLE ((le_of_eq (op_injective hbc.symm)).trans hab)).op :=
-  rfl
-
-@[simp, reassoc]
-lemma eqToHom_comp_homOfLE_op {a b c : X} (hab : op a = op b) (hbc : c ≤ b) :
-    eqToHom hab ≫ (homOfLE hbc).op = (homOfLE (hbc.trans (le_of_eq (op_injective hab.symm)))).op :=
-  rfl
 
 def opHomOfLE {x y : Xᵒᵖ} (h : unop x ≤ unop y) : y ⟶ x :=
   (homOfLE h).op
@@ -136,10 +105,6 @@ def Monotone.functor {f : X → Y} (h : Monotone f) : X ⥤ Y where
   obj := f
   map g := CategoryTheory.homOfLE (h g.le)
 
-@[simp]
-theorem Monotone.functor_obj {f : X → Y} (h : Monotone f) : h.functor.obj = f :=
-  rfl
-
 instance (f : X ↪o Y) : f.monotone.functor.Full where
   map_surjective h := ⟨homOfLE (f.map_rel_iff.1 h.le), rfl⟩
 
@@ -179,15 +144,6 @@ def Equivalence.toOrderIso (e : X ≌ Y) : X ≃o Y where
     ⟨fun h =>
       ((Equivalence.unit e).app a ≫ e.inverse.map h.hom ≫ (Equivalence.unitInv e).app a').le,
       fun h : a ≤ a' => (e.functor.map h.hom).le⟩
-
-@[simp]
-theorem Equivalence.toOrderIso_apply (e : X ≌ Y) (x : X) : e.toOrderIso x = e.functor.obj x :=
-  rfl
-
-@[simp]
-theorem Equivalence.toOrderIso_symm_apply (e : X ≌ Y) (y : Y) :
-    e.toOrderIso.symm y = e.inverse.obj y :=
-  rfl
 
 end PartialOrder
 

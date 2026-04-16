@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Star
 import Mathlib.Topology.Homotopy.Contractible
 
+noncomputable section
+
 /-!
 # A convex set is contractible
 

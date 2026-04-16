@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Basic.lean
-Genuine: 212 | Conflates: 10 | Dissolved: 15 | Infrastructure: 37
+Genuine: 225 | Conflates: 11 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -11,6 +11,8 @@ import Mathlib.Data.Finsupp.Antidiagonal
 import Mathlib.Order.SymmDiff
 import Mathlib.RingTheory.Adjoin.Basic
 import Mathlib.Algebra.MonoidAlgebra.Basic
+
+noncomputable section
 
 /-!
 # Multivariate polynomials
@@ -171,9 +173,14 @@ variable {R σ}
 def X (n : σ) : MvPolynomial σ R :=
   monomial (Finsupp.single n 1) 1
 
--- DISSOLVED: monomial_left_injective
+theorem monomial_left_injective {r : R} (hr : r ≠ 0) :
+    Function.Injective fun s : σ →₀ ℕ => monomial s r :=
+  Finsupp.single_left_injective hr
 
--- DISSOLVED: monomial_left_inj
+@[simp]
+theorem monomial_left_inj {s t : σ →₀ ℕ} {r : R} (hr : r ≠ 0) :
+    monomial s r = monomial t r ↔ s = t :=
+  Finsupp.single_left_inj hr
 
 theorem C_apply : (C a : MvPolynomial σ R) = monomial 0 a :=
   rfl
@@ -220,7 +227,8 @@ theorem C_inj {σ : Type*} (R : Type*) [CommSemiring R] (r s : R) :
 
 @[simp] lemma C_eq_zero : (C a : MvPolynomial σ R) = 0 ↔ a = 0 := by rw [← map_zero C, C_inj]
 
--- DISSOLVED: C_ne_zero
+lemma C_ne_zero : (C a : MvPolynomial σ R) ≠ 0 ↔ a ≠ 0 :=
+  C_eq_zero.ne
 
 instance nontrivial_of_nontrivial (σ : Type*) (R : Type*) [CommSemiring R] [Nontrivial R] :
     Nontrivial (MvPolynomial σ R) :=
@@ -276,10 +284,6 @@ def monomialOneHom : Multiplicative (σ →₀ ℕ) →* MvPolynomial σ R :=
 
 variable {σ R}
 
-@[simp]
-theorem monomialOneHom_apply : monomialOneHom R σ s = (monomial s 1 : MvPolynomial σ R) :=
-  rfl
-
 theorem X_pow_eq_monomial : X n ^ e = monomial (Finsupp.single n e) (1 : R) := by
   simp [X, monomial_pow]
 
@@ -299,10 +303,6 @@ theorem C_mul_X_eq_monomial {s : σ} {a : R} : C a * X s = monomial (Finsupp.sin
 @[simp]
 theorem monomial_zero {s : σ →₀ ℕ} : monomial s (0 : R) = 0 :=
   Finsupp.single_zero _
-
-@[simp]
-theorem monomial_zero' : (monomial (0 : σ →₀ ℕ) : R → MvPolynomial σ R) = C :=
-  rfl
 
 @[simp]
 theorem monomial_eq_zero {s : σ →₀ ℕ} {b : R} : monomial s b = 0 ↔ b = 0 :=
@@ -364,9 +364,23 @@ theorem induction_on' {P : MvPolynomial σ R → Prop} (p : MvPolynomial σ R)
     show P (monomial 0 0) from h1 0 0)
     fun _ _ _ _ha _hb hPf => h2 _ _ (h1 _ _) hPf
 
--- DISSOLVED: induction_on'''
+theorem induction_on''' {M : MvPolynomial σ R → Prop} (p : MvPolynomial σ R) (h_C : ∀ a, M (C a))
+    (h_add_weak :
+      ∀ (a : σ →₀ ℕ) (b : R) (f : (σ →₀ ℕ) →₀ R),
+        a ∉ f.support → b ≠ 0 → M f → M ((show (σ →₀ ℕ) →₀ R from monomial a b) + f)) :
+    M p :=
+    -- Porting note: I had to add the `show ... from ...` above, a type ascription was insufficient.
+  Finsupp.induction p (C_0.rec <| h_C 0) h_add_weak
 
--- DISSOLVED: induction_on''
+theorem induction_on'' {M : MvPolynomial σ R → Prop} (p : MvPolynomial σ R) (h_C : ∀ a, M (C a))
+    (h_add_weak :
+      ∀ (a : σ →₀ ℕ) (b : R) (f : (σ →₀ ℕ) →₀ R),
+        a ∉ f.support → b ≠ 0 → M f → M (monomial a b) →
+          M ((show (σ →₀ ℕ) →₀ R from monomial a b) + f))
+    (h_X : ∀ (p : MvPolynomial σ R) (n : σ), M p → M (p * MvPolynomial.X n)) : M p :=
+    -- Porting note: I had to add the `show ... from ...` above, a type ascription was insufficient.
+  induction_on''' p h_C fun a b f ha hb hf =>
+    h_add_weak a b f ha hb hf <| induction_on_monomial h_C h_X a b
 
 @[recursor 5]
 theorem induction_on {M : MvPolynomial σ R → Prop} (p : MvPolynomial σ R) (h_C : ∀ a, M (C a))
@@ -436,9 +450,6 @@ section Support
 def support (p : MvPolynomial σ R) : Finset (σ →₀ ℕ) :=
   Finsupp.support p
 
-theorem finsupp_support_eq_support (p : MvPolynomial σ R) : Finsupp.support p = p.support :=
-  rfl
-
 theorem support_monomial [h : Decidable (a = 0)] :
     (monomial s a).support = if a = 0 then ∅ else {s} := by
   rw [← Subsingleton.elim (Classical.decEq R a 0) h]
@@ -462,10 +473,6 @@ theorem support_X_pow [Nontrivial R] (s : σ) (n : ℕ) :
   classical
     rw [X_pow_eq_monomial, support_monomial, if_neg (one_ne_zero' R)]
 
-@[simp]
-theorem support_zero : (0 : MvPolynomial σ R).support = ∅ :=
-  rfl
-
 -- CONFLATES (assumes ground = zero): support_smul
 theorem support_smul {S₁ : Type*} [SMulZeroClass S₁ R] {a : S₁} {f : MvPolynomial σ R} :
     (a • f).support ⊆ f.support :=
@@ -482,7 +489,9 @@ section Coeff
 def coeff (m : σ →₀ ℕ) (p : MvPolynomial σ R) : R :=
   @DFunLike.coe ((σ →₀ ℕ) →₀ R) _ _ _ p m
 
--- DISSOLVED: mem_support_iff
+@[simp]
+theorem mem_support_iff {p : MvPolynomial σ R} {m : σ →₀ ℕ} : m ∈ p.support ↔ p.coeff m ≠ 0 := by
+  simp [support, coeff]
 
 theorem not_mem_support_iff {p : MvPolynomial σ R} {m : σ →₀ ℕ} : m ∉ p.support ↔ p.coeff m = 0 :=
   by simp
@@ -629,7 +638,10 @@ theorem support_X_mul (s : σ) (p : MvPolynomial σ R) :
     (X s * p).support = p.support.map (addLeftEmbedding (Finsupp.single s 1)) :=
   AddMonoidAlgebra.support_single_mul p _ (by simp) _
 
--- DISSOLVED: support_smul_eq
+@[simp]
+theorem support_smul_eq {S₁ : Type*} [Semiring S₁] [Module S₁ R] [NoZeroSMulDivisors S₁ R] {a : S₁}
+    (h : a ≠ 0) (p : MvPolynomial σ R) : (a • p).support = p.support :=
+  Finsupp.support_smul_eq h
 
 theorem support_sdiff_support_subset_support_add [DecidableEq σ] (p q : MvPolynomial σ R) :
     p.support \ q.support ⊆ (p + q).support := by
@@ -683,17 +695,29 @@ theorem eq_zero_iff {p : MvPolynomial σ R} : p = 0 ↔ ∀ d, coeff d p = 0 := 
   rw [MvPolynomial.ext_iff]
   simp only [coeff_zero]
 
--- DISSOLVED: ne_zero_iff
+theorem ne_zero_iff {p : MvPolynomial σ R} : p ≠ 0 ↔ ∃ d, coeff d p ≠ 0 := by
+  rw [Ne, eq_zero_iff]
+  push_neg
+  rfl
 
--- DISSOLVED: X_ne_zero
+-- CONFLATES (assumes ground = zero): X_ne_zero
+@[simp]
+theorem X_ne_zero [Nontrivial R] (s : σ) :
+    X (R := R) s ≠ 0 := by
+  rw [ne_zero_iff]
+  use Finsupp.single s 1
+  simp only [coeff_X, ne_eq, one_ne_zero, not_false_eq_true]
 
 @[simp]
 theorem support_eq_empty {p : MvPolynomial σ R} : p.support = ∅ ↔ p = 0 :=
   Finsupp.support_eq_empty
 
--- DISSOLVED: support_nonempty
+@[simp]
+lemma support_nonempty {p : MvPolynomial σ R} : p.support.Nonempty ↔ p ≠ 0 := by
+  rw [Finset.nonempty_iff_ne_empty, ne_eq, support_eq_empty]
 
--- DISSOLVED: exists_coeff_ne_zero
+theorem exists_coeff_ne_zero {p : MvPolynomial σ R} (h : p ≠ 0) : ∃ d, coeff d p ≠ 0 :=
+  ne_zero_iff.mp h
 
 theorem C_dvd_iff_dvd_coeff (r : R) (φ : MvPolynomial σ R) : C r ∣ φ ↔ ∀ i, r ∣ φ.coeff i := by
   constructor
@@ -731,10 +755,6 @@ def coeffs (p : MvPolynomial σ R) : Finset R :=
   letI := Classical.decEq R
   Finset.image p.coeff p.support
 
-@[simp]
-lemma coeffs_zero : coeffs (0 : MvPolynomial σ R) = ∅ :=
-  rfl
-
 lemma coeffs_one : coeffs (1 : MvPolynomial σ R) ⊆ {1} := by
   classical
     rw [coeffs, Finset.image_subset_iff]
@@ -756,7 +776,10 @@ lemma mem_coeffs_iff {p : MvPolynomial σ R} {c : R} :
     c ∈ p.coeffs ↔ ∃ n ∈ p.support, c = p.coeff n := by
   simp [coeffs, eq_comm, (Finset.mem_image)]
 
--- DISSOLVED: coeff_mem_coeffs
+lemma coeff_mem_coeffs {p : MvPolynomial σ R} (m : σ →₀ ℕ)
+    (h : p.coeff m ≠ 0) : p.coeff m ∈ p.coeffs :=
+  letI := Classical.decEq R
+  Finset.mem_image_of_mem p.coeff (mem_support_iff.mpr h)
 
 lemma zero_not_mem_coeffs (p : MvPolynomial σ R) : 0 ∉ p.coeffs := by
   intro hz
@@ -969,7 +992,15 @@ theorem eval₂_eta (p : MvPolynomial σ R) : eval₂ C X p = p := by
   apply MvPolynomial.induction_on p <;>
     simp +contextual [eval₂_add, eval₂_mul]
 
--- DISSOLVED: eval₂_congr
+theorem eval₂_congr (g₁ g₂ : σ → S₁)
+    (h : ∀ {i : σ} {c : σ →₀ ℕ}, i ∈ c.support → coeff c p ≠ 0 → g₁ i = g₂ i) :
+    p.eval₂ f g₁ = p.eval₂ f g₂ := by
+  apply Finset.sum_congr rfl
+  intro C hc; dsimp; congr 1
+  apply Finset.prod_congr rfl
+  intro i hi; dsimp; congr 1
+  apply h hi
+  rwa [Finsupp.mem_support_iff] at hc
 
 theorem eval₂_sum (s : Finset S₂) (p : S₂ → MvPolynomial σ R) :
     eval₂ f g (∑ x ∈ s, p x) = ∑ x ∈ s, eval₂ f g (p x) :=
@@ -1273,16 +1304,6 @@ theorem algebraMap_apply (r : R) : algebraMap R (MvPolynomial σ S₁) r = C (al
 def aeval : MvPolynomial σ R →ₐ[R] S₁ :=
   { eval₂Hom (algebraMap R S₁) f with commutes' := fun _r => eval₂_C _ _ _ }
 
-theorem aeval_def (p : MvPolynomial σ R) : aeval f p = eval₂ (algebraMap R S₁) f p :=
-  rfl
-
-theorem aeval_eq_eval₂Hom (p : MvPolynomial σ R) : aeval f p = eval₂Hom (algebraMap R S₁) f p :=
-  rfl
-
-@[simp]
-lemma coe_aeval_eq_eval : RingHomClass.toRingHom (MvPolynomial.aeval f) = MvPolynomial.eval f :=
-  rfl
-
 @[simp]
 theorem aeval_X (s : σ) : aeval f (X s : MvPolynomial _ R) = f s :=
   eval₂_X _ _ _
@@ -1368,9 +1389,18 @@ theorem aeval_monomial (g : σ → S₁) (d : σ →₀ ℕ) (r : R) :
     aeval g (monomial d r) = algebraMap _ _ r * d.prod fun i k => g i ^ k :=
   eval₂Hom_monomial _ _ _ _
 
--- DISSOLVED: eval₂Hom_eq_zero
+theorem eval₂Hom_eq_zero (f : R →+* S₂) (g : σ → S₂) (φ : MvPolynomial σ R)
+    (h : ∀ d, φ.coeff d ≠ 0 → ∃ i ∈ d.support, g i = 0) : eval₂Hom f g φ = 0 := by
+  rw [φ.as_sum, map_sum]
+  refine Finset.sum_eq_zero fun d hd => ?_
+  obtain ⟨i, hi, hgi⟩ : ∃ i ∈ d.support, g i = 0 := h d (Finsupp.mem_support_iff.mp hd)
+  rw [eval₂Hom_monomial, Finsupp.prod, Finset.prod_eq_zero hi, mul_zero]
+  rw [hgi, zero_pow]
+  rwa [← Finsupp.mem_support_iff]
 
--- DISSOLVED: aeval_eq_zero
+theorem aeval_eq_zero [Algebra R S₂] (f : σ → S₂) (φ : MvPolynomial σ R)
+    (h : ∀ d, φ.coeff d ≠ 0 → ∃ i ∈ d.support, f i = 0) : aeval f φ = 0 :=
+  eval₂Hom_eq_zero _ _ _ h
 
 theorem aeval_sum {ι : Type*} (s : Finset ι) (φ : ι → MvPolynomial σ R) :
     aeval f (∑ i ∈ s, φ i) = ∑ i ∈ s, aeval f (φ i) :=

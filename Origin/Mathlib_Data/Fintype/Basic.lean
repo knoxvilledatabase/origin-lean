@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Image
 import Mathlib.Data.List.FinRange
 import Mathlib.Data.Finite.Defs
 
+noncomputable section
+
 /-!
 # Finite types
 
@@ -116,10 +118,6 @@ instance boundedOrder : BoundedOrder (Finset α) :=
   { inferInstanceAs (OrderBot (Finset α)) with
     top := univ
     le_top := subset_univ }
-
-@[simp]
-theorem top_eq_univ : (⊤ : Finset α) = univ :=
-  rfl
 
 theorem ssubset_univ_iff {s : Finset α} : s ⊂ univ ↔ s ≠ univ :=
   @lt_top_iff_ne_top _ _ _ s
@@ -309,9 +307,6 @@ theorem univ_filter_mem_range (f : α → β) [Fintype β] [DecidablePred fun y 
     [DecidableEq β] : (Finset.univ.filter fun y => y ∈ Set.range f) = Finset.univ.image f := by
   letI : DecidablePred (fun y => ∃ x, f x = y) := by simpa using ‹_›
   exact univ_filter_exists f
-
-theorem coe_filter_univ (p : α → Prop) [DecidablePred p] :
-    (univ.filter p : Set α) = { x | p x } := by simp
 
 end Finset
 
@@ -518,14 +513,8 @@ def ofEquiv (α : Type*) [Fintype α] (f : α ≃ β) : Fintype β :=
 def ofSubsingleton (a : α) [Subsingleton α] : Fintype α :=
   ⟨{a}, fun _ => Finset.mem_singleton.2 (Subsingleton.elim _ _)⟩
 
-theorem univ_ofSubsingleton (a : α) [Subsingleton α] : @univ _ (ofSubsingleton a) = {a} :=
-  rfl
-
 def ofIsEmpty [IsEmpty α] : Fintype α :=
   ⟨∅, isEmptyElim⟩
-
-theorem univ_ofIsEmpty [IsEmpty α] : @univ α Fintype.ofIsEmpty = ∅ :=
-  rfl
 
 instance : Fintype Empty := Fintype.ofIsEmpty
 
@@ -701,9 +690,6 @@ theorem Finset.toFinset_coe (s : Finset α) [Fintype (s : Set α)] : (s : Set α
 instance Fin.fintype (n : ℕ) : Fintype (Fin n) :=
   ⟨⟨List.finRange n, List.nodup_finRange n⟩, List.mem_finRange⟩
 
-theorem Fin.univ_def (n : ℕ) : (univ : Finset (Fin n)) = ⟨List.finRange n, List.nodup_finRange n⟩ :=
-  rfl
-
 @[simp] theorem List.toFinset_finRange (n : ℕ) : (List.finRange n).toFinset = Finset.univ := by
   ext; simp
 
@@ -755,10 +741,6 @@ theorem Fin.univ_succAbove (n : ℕ) (p : Fin (n + 1)) :
     Finset.univ.image (fun i : Fin l.length => f <| l[(i : Nat)]) = (l.map f).toFinset := by
   simp only [univ_image_def, List.ofFn_getElem_eq_map]
 
-theorem Fin.univ_image_get' [DecidableEq β] (l : List α) (f : α → β) :
-    Finset.univ.image (f <| l.get ·) = (l.map f).toFinset := by
-  simp
-
 @[instance]
 def Unique.fintype {α : Type*} [Unique α] : Fintype α :=
   Fintype.ofSubsingleton default
@@ -769,30 +751,14 @@ instance Fintype.subtypeEq (y : α) : Fintype { x // x = y } :=
 instance Fintype.subtypeEq' (y : α) : Fintype { x // y = x } :=
   Fintype.subtype {y} (by simp [eq_comm])
 
-theorem Fintype.univ_empty : @univ Empty _ = ∅ :=
-  rfl
-
-theorem Fintype.univ_pempty : @univ PEmpty _ = ∅ :=
-  rfl
-
 instance Unit.fintype : Fintype Unit :=
   Fintype.ofSubsingleton ()
-
-theorem Fintype.univ_unit : @univ Unit _ = {()} :=
-  rfl
 
 instance PUnit.fintype : Fintype PUnit :=
   Fintype.ofSubsingleton PUnit.unit
 
-theorem Fintype.univ_punit : @univ PUnit _ = {PUnit.unit} :=
-  rfl
-
 instance Bool.fintype : Fintype Bool :=
   ⟨⟨{true, false}, by simp⟩, fun x => by cases x <;> simp⟩
-
-@[simp]
-theorem Fintype.univ_bool : @univ Bool _ = {true, false} :=
-  rfl
 
 instance Additive.fintype : ∀ [Fintype α], Fintype (Additive α) :=
   Fintype.ofEquiv α Additive.ofMul
@@ -828,10 +794,6 @@ section Finset
 instance Finset.fintypeCoeSort {α : Type u} (s : Finset α) : Fintype s :=
   ⟨s.attach, s.mem_attach⟩
 
-@[simp]
-theorem Finset.univ_eq_attach {α : Type u} (s : Finset α) : (univ : Finset s) = s.attach :=
-  rfl
-
 end Finset
 
 theorem Fintype.coe_image_univ [Fintype α] [DecidableEq β] {f : α → β} :
@@ -850,9 +812,6 @@ instance Finset.Subtype.fintype (s : Finset α) : Fintype { x // x ∈ s } :=
 
 instance FinsetCoe.fintype (s : Finset α) : Fintype (↑s : Set α) :=
   Finset.Subtype.fintype s
-
-theorem Finset.attach_eq_univ {s : Finset α} : s.attach = Finset.univ :=
-  rfl
 
 instance PLift.fintypeProp (p : Prop) [Decidable p] : Fintype (PLift p) :=
   ⟨if h : p then {⟨h⟩} else ∅, fun ⟨h⟩ => by simp [h]⟩
@@ -880,10 +839,6 @@ noncomputable def finsetEquivSet : Finset α ≃ Set α where
   left_inv s := by convert Finset.toFinset_coe s
   right_inv s := by classical exact s.coe_toFinset
 
-@[simp, norm_cast] lemma coe_finsetEquivSet : ⇑finsetEquivSet = ((↑) : Finset α → Set α) := rfl
-
-@[simp] lemma finsetEquivSet_apply (s : Finset α) : finsetEquivSet s = s := rfl
-
 @[simp] lemma finsetEquivSet_symm_apply (s : Set α) [Fintype s] :
     finsetEquivSet.symm s = s.toFinset := by simp [finsetEquivSet]
 
@@ -891,12 +846,6 @@ noncomputable def finsetEquivSet : Finset α ≃ Set α where
 noncomputable def finsetOrderIsoSet : Finset α ≃o Set α where
   toEquiv := finsetEquivSet
   map_rel_iff' := Finset.coe_subset
-
-@[simp, norm_cast]
-lemma coe_finsetOrderIsoSet : ⇑finsetOrderIsoSet = ((↑) : Finset α → Set α) := rfl
-
-@[simp] lemma coe_finsetOrderIsoSet_symm :
-    ⇑(finsetOrderIsoSet : Finset α ≃o Set α).symm = ⇑finsetEquivSet.symm := rfl
 
 end Fintype
 
@@ -924,9 +873,6 @@ instance pfunFintype (p : Prop) [Decidable p] (α : p → Type*) [∀ hp, Fintyp
   if hp : p then Fintype.ofEquiv (α hp) ⟨fun a _ => a, fun f => f hp, fun _ => rfl, fun _ => rfl⟩
   else ⟨singleton fun h => (hp h).elim, fun h => mem_singleton.2
     (funext fun x => by contradiction)⟩
-
-theorem mem_image_univ_iff_mem_range {α β : Type*} [Fintype α] [DecidableEq β] {f : α → β}
-    {b : β} : b ∈ univ.image f ↔ b ∈ Set.range f := by simp
 
 namespace Fintype
 
@@ -1070,21 +1016,13 @@ theorem exists_seq_of_forall_finset_exists' {α : Type*} (P : α → Prop) (r : 
 open Batteries.ExtendedBinder Lean Meta
 
 elab (name := finsetStx) "finset% " t:term : term => do
-
   let u ← mkFreshLevelMVar
-
   let ty ← mkFreshExprMVar (mkSort (.succ u))
-
   let x ← Elab.Term.elabTerm t (mkApp (.const ``Finset [u]) ty)
-
   let xty ← whnfR (← inferType x)
-
   if xty.isAppOfArity ``Set 1 then
-
     Elab.Term.elabAppArgs (.const ``Set.toFinset [u]) #[] #[.expr x] none false false
-
   else
-
     return x
 
 open Lean.Elab.Term.Quotation in

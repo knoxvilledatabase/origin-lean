@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Shapes.Types
 import Mathlib.Topology.Category.TopCat.Limits.Products
 
+noncomputable section
+
 /-!
 
 # Yoneda presheaves on topologically concrete categories
@@ -34,8 +36,6 @@ def yonedaPresheaf : Cᵒᵖ ⥤ Type (max w w') where
 def yonedaPresheaf' : TopCat.{w}ᵒᵖ ⥤ Type (max w w') where
   obj X := C((unop X).1, Y)
   map f g := ContinuousMap.comp g f.unop
-
-theorem comp_yonedaPresheaf' : yonedaPresheaf F Y = F.op ⋙ yonedaPresheaf' Y := rfl
 
 theorem piComparison_fac {α : Type} (X : α → TopCat) :
     piComparison (yonedaPresheaf'.{w, w'} Y) (fun x ↦ op (X x)) =

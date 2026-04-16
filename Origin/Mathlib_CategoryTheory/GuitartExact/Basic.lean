@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Final
 
+noncomputable section
+
 /-!
 # Guitart exact squares
 
@@ -167,23 +169,6 @@ lemma isConnected_rightwards_iff_downwards :
 end
 
 section
-
-@[simps]
-def costructuredArrowDownwardsPrecomp
-    {X₂ X₂' : C₂} {X₃ : C₃} (g : R.obj X₂ ⟶ B.obj X₃) (g' : R.obj X₂' ⟶ B.obj X₃)
-    (γ : X₂' ⟶ X₂) (hγ : R.map γ ≫ g = g') :
-    w.CostructuredArrowDownwards g ⥤ w.CostructuredArrowDownwards g' where
-  obj A := CostructuredArrowDownwards.mk _ _ A.left.right (γ ≫ A.left.hom) A.hom.right
-    (by simpa [← hγ] using R.map γ ≫= StructuredArrow.w A.hom)
-  map {A A'} φ := CostructuredArrow.homMk (StructuredArrow.homMk φ.left.right (by
-      dsimp
-      rw [assoc, StructuredArrow.w])) (by
-    ext
-    dsimp
-    rw [← CostructuredArrow.w φ, structuredArrowDownwards_map]
-    rfl)
-  map_id _ := rfl
-  map_comp _ _ := rfl
 
 end
 

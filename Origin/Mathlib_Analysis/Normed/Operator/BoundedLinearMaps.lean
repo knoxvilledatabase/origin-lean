@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Ring.Units
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Completeness
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Mul
 
+noncomputable section
+
 /-!
 # Bounded linear maps
 
@@ -378,11 +380,6 @@ def IsBoundedBilinearMap.linearDeriv (h : IsBoundedBilinearMap 𝕜 f) (p : E ×
 
 def IsBoundedBilinearMap.deriv (h : IsBoundedBilinearMap 𝕜 f) (p : E × F) : E × F →L[𝕜] G :=
   h.toContinuousLinearMap.deriv₂ p
-
-@[simp]
-theorem IsBoundedBilinearMap.deriv_apply (h : IsBoundedBilinearMap 𝕜 f) (p q : E × F) :
-    h.deriv p q = f (p.1, q.2) + f (q.1, p.2) :=
-  rfl
 
 variable (𝕜)
 

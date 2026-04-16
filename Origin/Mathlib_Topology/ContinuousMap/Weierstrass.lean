@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Bernstein
 import Mathlib.Topology.Algebra.Algebra
 
+noncomputable section
+
 /-!
 # The Weierstrass approximation theorem for continuous functions on `[a,b]`
 

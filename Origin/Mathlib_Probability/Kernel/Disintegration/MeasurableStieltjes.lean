@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Measure.Stieltjes
 import Mathlib.Analysis.Normed.Order.Lattice
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 
+noncomputable section
+
 /-!
 # Measurable parametric Stieltjes functions
 
@@ -209,7 +211,6 @@ variable {f : α → ℚ → ℝ}
 open scoped Classical in
 
 noncomputable
-
 def toRatCDF (f : α → ℚ → ℝ) : α → ℚ → ℝ := fun a ↦
   if IsRatStieltjesPoint f a then f a else defaultRatCDF
 
@@ -423,7 +424,6 @@ section stieltjesOfMeasurableRat
 variable {f : α → ℚ → ℝ} [MeasurableSpace α]
 
 noncomputable
-
 def stieltjesOfMeasurableRat (f : α → ℚ → ℝ) (hf : Measurable f) : α → StieltjesFunction :=
   (isMeasurableRatCDF_toRatCDF hf).stieltjesFunction
 

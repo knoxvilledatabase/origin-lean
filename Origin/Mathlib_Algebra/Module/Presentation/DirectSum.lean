@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Module/Presentation/DirectSum.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Presentation.Basic
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.Data.Finsupp.ToDFinsupp
+
+noncomputable section
 
 /-!
 # Presentation of a direct sum
@@ -85,7 +87,6 @@ noncomputable def directSum.isRepresentationCore :
     exact Solution.congr_var h' ⟨i, g⟩
 
 include h in
-
 lemma directSum : (directSum solution).IsPresentation :=
   (directSum.isRepresentationCore h).isPresentation
 

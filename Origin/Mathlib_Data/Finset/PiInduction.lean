@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Max
 import Mathlib.Data.Finset.Sigma
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 # Induction principles for `∀ i, Finset (α i)`
 

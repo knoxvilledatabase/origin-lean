@@ -9,6 +9,8 @@ import Mathlib.Algebra.Module.End
 import Mathlib.Algebra.Ring.Opposite
 import Mathlib.GroupTheory.GroupAction.DomAct.Basic
 
+noncomputable section
+
 /-!
 # Bundled Hom instances for module and multiplicative actions
 
@@ -42,11 +44,6 @@ instance instDistribMulAction : DistribMulAction R (A →+ B) where
   smul_add := smul_add
   one_smul _ := ext fun _ => one_smul _ _
   mul_smul _ _ _ := ext fun _ => mul_smul _ _ _
-
-@[simp] theorem coe_smul (r : R) (f : A →+ B) : ⇑(r • f) = r • ⇑f := rfl
-
-theorem smul_apply (r : R) (f : A →+ B) (x : A) : (r • f) x = r • f x :=
-  rfl
 
 instance smulCommClass [SMulCommClass R S B] : SMulCommClass R S (A →+ B) :=
   ⟨fun _ _ _ => ext fun _ => smul_comm _ _ _⟩
@@ -94,11 +91,6 @@ variable [DistribMulAction R A] [DistribMulAction S A]
 instance instDistribMulAction : DistribMulAction R (AddMonoid.End A) :=
   AddMonoidHom.instDistribMulAction
 
-@[simp] theorem coe_smul (r : R) (f : AddMonoid.End A) : ⇑(r • f) = r • ⇑f := rfl
-
-theorem smul_apply (r : R) (f : AddMonoid.End A) (x : A) : (r • f) x = r • f x :=
-  rfl
-
 instance smulCommClass [SMulCommClass R S A] : SMulCommClass R S (AddMonoid.End A) :=
   AddMonoidHom.smulCommClass
 
@@ -130,8 +122,5 @@ protected def smulLeft [Monoid M] [AddMonoid A] [DistribMulAction M A] (c : M) :
 
 protected def smul [Semiring R] [AddCommMonoid M] [Module R M] : R →+ M →+ M :=
   (Module.toAddMonoidEnd R M).toAddMonoidHom
-
-@[simp] theorem coe_smul' [Semiring R] [AddCommMonoid M] [Module R M] :
-    ⇑(.smul : R →+ M →+ M) = AddMonoidHom.smulLeft := rfl
 
 end AddMonoidHom

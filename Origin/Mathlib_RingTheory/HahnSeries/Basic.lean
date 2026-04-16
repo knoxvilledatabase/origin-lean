@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/HahnSeries/Basic.lean
-Genuine: 55 | Conflates: 0 | Dissolved: 20 | Infrastructure: 6
+Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Support
 import Mathlib.Algebra.Order.Monoid.Unbundled.WithTop
 import Mathlib.Order.WellFoundedSet
+
+noncomputable section
 
 /-!
 # Hahn Series
@@ -69,7 +71,9 @@ theorem isPWO_support (x : HahnSeries Γ R) : x.support.IsPWO :=
 theorem isWF_support (x : HahnSeries Γ R) : x.support.IsWF :=
   x.isPWO_support.isWF
 
--- DISSOLVED: mem_support
+@[simp]
+theorem mem_support (x : HahnSeries Γ R) (a : Γ) : a ∈ x.support ↔ x.coeff a ≠ 0 :=
+  Iff.refl _
 
 instance : Zero (HahnSeries Γ R) :=
   ⟨{  coeff := 0
@@ -89,13 +93,16 @@ theorem zero_coeff {a : Γ} : (0 : HahnSeries Γ R).coeff a = 0 :=
 theorem coeff_fun_eq_zero_iff {x : HahnSeries Γ R} : x.coeff = 0 ↔ x = 0 :=
   coeff_injective.eq_iff' rfl
 
--- DISSOLVED: ne_zero_of_coeff_ne_zero
+theorem ne_zero_of_coeff_ne_zero {x : HahnSeries Γ R} {g : Γ} (h : x.coeff g ≠ 0) : x ≠ 0 :=
+  mt (fun x0 => (x0.symm ▸ zero_coeff : x.coeff g = 0)) h
 
 @[simp]
 theorem support_zero : support (0 : HahnSeries Γ R) = ∅ :=
   Function.support_zero
 
--- DISSOLVED: support_nonempty_iff
+@[simp]
+nonrec theorem support_nonempty_iff {x : HahnSeries Γ R} : x.support.Nonempty ↔ x ≠ 0 := by
+  rw [support, support_nonempty_iff, Ne, coeff_fun_eq_zero_iff]
 
 @[simp]
 theorem support_eq_empty_iff {x : HahnSeries Γ R} : x.support = ∅ ↔ x = 0 :=
@@ -172,7 +179,9 @@ open Classical in
 theorem single_coeff : (single a r).coeff b = if b = a then r else 0 := by
   split_ifs with h <;> simp [h]
 
--- DISSOLVED: support_single_of_ne
+@[simp]
+theorem support_single_of_ne (h : r ≠ 0) : support (single a r) = {a} := by
+  classical exact Pi.support_single_of_ne h
 
 theorem support_single_subset : support (single a r) ⊆ {a} := by
   classical exact Pi.support_single_subset
@@ -186,7 +195,8 @@ theorem single_eq_zero : single a (0 : R) = 0 :=
 theorem single_injective (a : Γ) : Function.Injective (single a : R → HahnSeries Γ R) :=
   fun r s rs => by rw [← single_coeff_same a r, ← single_coeff_same a s, rs]
 
--- DISSOLVED: single_ne_zero
+theorem single_ne_zero (h : r ≠ 0) : single a r ≠ 0 := fun con =>
+  h (single_injective a (con.trans single_eq_zero.symm))
 
 @[simp]
 theorem single_eq_zero_iff {a : Γ} {r : R} : single a r = 0 ↔ r = 0 :=
@@ -215,9 +225,16 @@ def orderTop (x : HahnSeries Γ R) : WithTop Γ :=
 theorem orderTop_zero : orderTop (0 : HahnSeries Γ R) = ⊤ :=
   dif_pos rfl
 
--- DISSOLVED: orderTop_of_ne
+theorem orderTop_of_ne {x : HahnSeries Γ R} (hx : x ≠ 0) :
+    orderTop x = x.isWF_support.min (support_nonempty_iff.2 hx) :=
+  dif_neg hx
 
--- DISSOLVED: ne_zero_iff_orderTop
+@[simp]
+theorem ne_zero_iff_orderTop {x : HahnSeries Γ R} : x ≠ 0 ↔ orderTop x ≠ ⊤ := by
+  constructor
+  · exact fun hx => Eq.mpr (congrArg (fun h ↦ h ≠ ⊤) (orderTop_of_ne hx)) WithTop.coe_ne_top
+  · contrapose!
+    simp_all only [orderTop_zero, implies_true]
 
 theorem orderTop_eq_top_iff {x : HahnSeries Γ R} : orderTop x = ⊤ ↔ x = 0 := by
   constructor
@@ -230,13 +247,30 @@ theorem orderTop_eq_of_le {x : HahnSeries Γ R} {g : Γ} (hg : g ∈ x.support)
   rw [orderTop_of_ne <| support_nonempty_iff.mp <| Set.nonempty_of_mem hg,
     x.isWF_support.min_eq_of_le hg hx]
 
--- DISSOLVED: untop_orderTop_of_ne_zero
+theorem untop_orderTop_of_ne_zero {x : HahnSeries Γ R} (hx : x ≠ 0) :
+    WithTop.untop x.orderTop (ne_zero_iff_orderTop.mp hx) =
+      x.isWF_support.min (support_nonempty_iff.2 hx) :=
+    WithTop.coe_inj.mp ((WithTop.coe_untop (orderTop x) (ne_zero_iff_orderTop.mp hx)).trans
+      (orderTop_of_ne hx))
 
--- DISSOLVED: coeff_orderTop_ne
+theorem coeff_orderTop_ne {x : HahnSeries Γ R} {g : Γ} (hg : x.orderTop = g) :
+    x.coeff g ≠ 0 := by
+  have h : orderTop x ≠ ⊤ := by simp_all only [ne_eq, WithTop.coe_ne_top, not_false_eq_true]
+  have hx : x ≠ 0 := ne_zero_iff_orderTop.mpr h
+  rw [orderTop_of_ne hx, WithTop.coe_eq_coe] at hg
+  rw [← hg]
+  exact x.isWF_support.min_mem (support_nonempty_iff.2 hx)
 
--- DISSOLVED: orderTop_le_of_coeff_ne_zero
+theorem orderTop_le_of_coeff_ne_zero {Γ} [LinearOrder Γ] {x : HahnSeries Γ R}
+    {g : Γ} (h : x.coeff g ≠ 0) : x.orderTop ≤ g := by
+  rw [orderTop_of_ne (ne_zero_of_coeff_ne_zero h), WithTop.coe_le_coe]
+  exact Set.IsWF.min_le _ _ ((mem_support _ _).2 h)
 
--- DISSOLVED: orderTop_single
+@[simp]
+theorem orderTop_single (h : r ≠ 0) : (single a r).orderTop = a :=
+  (orderTop_of_ne (single_ne_zero h)).trans
+    (WithTop.coe_inj.mpr (support_single_subset
+      ((single a r).isWF_support.min_mem (support_nonempty_iff.2 (single_ne_zero h)))))
 
 theorem orderTop_single_le : a ≤ (single a r).orderTop := by
   by_cases hr : r = 0
@@ -264,14 +298,17 @@ def leadingCoeff (x : HahnSeries Γ R) : R :=
 theorem leadingCoeff_zero : leadingCoeff (0 : HahnSeries Γ R) = 0 :=
   dif_pos rfl
 
--- DISSOLVED: leadingCoeff_of_ne
+theorem leadingCoeff_of_ne {x : HahnSeries Γ R} (hx : x ≠ 0) :
+    x.leadingCoeff = x.coeff (x.isWF_support.min (support_nonempty_iff.2 hx)) :=
+  dif_neg hx
 
 theorem leadingCoeff_eq_iff {x : HahnSeries Γ R} : x.leadingCoeff = 0 ↔ x = 0 := by
   refine { mp := ?_, mpr := fun hx => hx ▸ leadingCoeff_zero }
   contrapose!
   exact fun hx => (leadingCoeff_of_ne hx) ▸ coeff_orderTop_ne (orderTop_of_ne hx)
 
--- DISSOLVED: leadingCoeff_ne_iff
+theorem leadingCoeff_ne_iff {x : HahnSeries Γ R} : x.leadingCoeff ≠ 0 ↔ x ≠ 0 :=
+  leadingCoeff_eq_iff.not
 
 theorem leadingCoeff_of_single {a : Γ} {r : R} : leadingCoeff (single a r) = r := by
   simp only [leadingCoeff, single_eq_zero_iff]
@@ -288,15 +325,27 @@ def order (x : HahnSeries Γ R) : Γ :=
 theorem order_zero : order (0 : HahnSeries Γ R) = 0 :=
   dif_pos rfl
 
--- DISSOLVED: order_of_ne
+theorem order_of_ne {x : HahnSeries Γ R} (hx : x ≠ 0) :
+    order x = x.isWF_support.min (support_nonempty_iff.2 hx) :=
+  dif_neg hx
 
--- DISSOLVED: order_eq_orderTop_of_ne
+theorem order_eq_orderTop_of_ne {x : HahnSeries Γ R} (hx : x ≠ 0) : order x = orderTop x := by
+  rw [order_of_ne hx, orderTop_of_ne hx]
 
--- DISSOLVED: coeff_order_ne_zero
+theorem coeff_order_ne_zero {x : HahnSeries Γ R} (hx : x ≠ 0) : x.coeff x.order ≠ 0 := by
+  rw [order_of_ne hx]
+  exact x.isWF_support.min_mem (support_nonempty_iff.2 hx)
 
--- DISSOLVED: order_le_of_coeff_ne_zero
+theorem order_le_of_coeff_ne_zero {Γ} [AddMonoid Γ] [LinearOrder Γ] {x : HahnSeries Γ R}
+    {g : Γ} (h : x.coeff g ≠ 0) : x.order ≤ g :=
+  le_trans (le_of_eq (order_of_ne (ne_zero_of_coeff_ne_zero h)))
+    (Set.IsWF.min_le _ _ ((mem_support _ _).2 h))
 
--- DISSOLVED: order_single
+@[simp]
+theorem order_single (h : r ≠ 0) : (single a r).order = a :=
+  (order_of_ne (single_ne_zero h)).trans
+    (support_single_subset
+      ((single a r).isWF_support.min_mem (support_nonempty_iff.2 (single_ne_zero h))))
 
 theorem coeff_eq_zero_of_lt_order {x : HahnSeries Γ R} {i : Γ} (hi : i < x.order) :
     x.coeff i = 0 := by
@@ -307,7 +356,9 @@ theorem coeff_eq_zero_of_lt_order {x : HahnSeries Γ R} {i : Γ} (hi : i < x.ord
   rw [order_of_ne hx]
   exact Set.IsWF.not_lt_min _ _ hi
 
--- DISSOLVED: zero_lt_orderTop_iff
+theorem zero_lt_orderTop_iff {x : HahnSeries Γ R} (hx : x ≠ 0) :
+    0 < x.orderTop ↔ 0 < x.order := by
+  simp_all [orderTop_of_ne hx, order_of_ne hx]
 
 theorem zero_lt_orderTop_of_order {x : HahnSeries Γ R} (hx : 0 < x.order) : 0 < x.orderTop := by
   by_cases h : x = 0
@@ -426,11 +477,18 @@ def ofSuppBddBelow (f : Γ → R) (hf : BddBelow (Function.support f)) : HahnSer
   coeff := f
   isPWO_support' := suppBddBelow_supp_PWO f hf
 
-@[simp]
-theorem zero_ofSuppBddBelow [Nonempty Γ] : ofSuppBddBelow 0 BddBelow_zero = (0 : HahnSeries Γ R) :=
-  rfl
-
--- DISSOLVED: order_ofForallLtEqZero
+theorem order_ofForallLtEqZero [Zero Γ] (f : Γ → R) (hf : f ≠ 0) (n : Γ)
+    (hn : ∀(m : Γ), m < n → f m = 0) :
+    n ≤ order (ofSuppBddBelow f (forallLTEqZero_supp_BddBelow f n hn)) := by
+  dsimp only [order]
+  by_cases h : ofSuppBddBelow f (forallLTEqZero_supp_BddBelow f n hn) = 0
+  cases h
+  · exact (hf rfl).elim
+  simp_all only [dite_false]
+  rw [Set.IsWF.le_min_iff]
+  intro m hm
+  rw [HahnSeries.support, Function.mem_support, ne_eq] at hm
+  exact not_lt.mp (mt (hn m) hm)
 
 end LocallyFiniteLinearOrder
 

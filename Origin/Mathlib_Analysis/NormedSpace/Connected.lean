@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Topology
 import Mathlib.LinearAlgebra.Dimension.DivisionRing
 import Mathlib.Topology.Algebra.Module.Cardinality
 
+noncomputable section
+
 /-!
 # Connectedness of subsets of vector spaces
 

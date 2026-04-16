@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
 import Mathlib.CategoryTheory.Category.Cat
 
+noncomputable section
+
 /-!
 # The category of elements
 
@@ -76,15 +78,6 @@ theorem ext (F : C ⥤ Type w) {x y : F.Elements} (f g : x ⟶ y) (w : f.val = g
   Subtype.ext_val w
 
 @[simp]
-theorem comp_val {F : C ⥤ Type w} {p q r : F.Elements} {f : p ⟶ q} {g : q ⟶ r} :
-    (f ≫ g).val = f.val ≫ g.val :=
-  rfl
-
-@[simp]
-theorem id_val {F : C ⥤ Type w} {p : F.Elements} : (𝟙 p : p ⟶ p).val = 𝟙 p.1 :=
-  rfl
-
-@[simp]
 theorem map_snd {F : C ⥤ Type w} {p q : F.Elements} (f : p ⟶ q) : (F.map f.val) p.2 = q.2 :=
   f.property
 
@@ -134,38 +127,13 @@ def map {F₁ F₂ : C ⥤ Type w} (α : F₁ ⟶ F₂) : F₁.Elements ⥤ F₂
   obj t := ⟨t.1, α.app t.1 t.2⟩
   map {t₁ t₂} k := ⟨k.1, by simpa [map_snd] using (FunctorToTypes.naturality _ _ α k.1 t₁.2).symm⟩
 
-@[simp]
-theorem map_π {F₁ F₂ : C ⥤ Type w} (α : F₁ ⟶ F₂) : map α ⋙ π F₂ = π F₁ :=
-  rfl
-
 def toStructuredArrow : F.Elements ⥤ StructuredArrow PUnit F where
   obj X := StructuredArrow.mk fun _ => X.2
   map {X Y} f := StructuredArrow.homMk f.val (by funext; simp [f.2])
 
-@[simp]
-theorem toStructuredArrow_obj (X) :
-    (toStructuredArrow F).obj X =
-      { left := ⟨⟨⟩⟩
-        right := X.1
-        hom := fun _ => X.2 } :=
-  rfl
-
-@[simp]
-theorem to_comma_map_right {X Y} (f : X ⟶ Y) : ((toStructuredArrow F).map f).right = f.val :=
-  rfl
-
 def fromStructuredArrow : StructuredArrow PUnit F ⥤ F.Elements where
   obj X := ⟨X.right, X.hom PUnit.unit⟩
   map f := ⟨f.right, congr_fun f.w.symm PUnit.unit⟩
-
-@[simp]
-theorem fromStructuredArrow_obj (X) : (fromStructuredArrow F).obj X = ⟨X.right, X.hom PUnit.unit⟩ :=
-  rfl
-
-@[simp]
-theorem fromStructuredArrow_map {X Y} (f : X ⟶ Y) :
-    (fromStructuredArrow F).map f = ⟨f.right, congr_fun f.w.symm PUnit.unit⟩ :=
-  rfl
 
 @[simps]
 def structuredArrowEquivalence : F.Elements ≌ StructuredArrow PUnit F where
@@ -199,11 +167,6 @@ def fromCostructuredArrow (F : Cᵒᵖ ⥤ Type v) : (CostructuredArrow yoneda F
       rw [← this]
       simp only [yoneda_map_app, FunctorToTypes.comp]
       rw [Category.id_comp]⟩
-
-@[simp]
-theorem fromCostructuredArrow_obj_mk (F : Cᵒᵖ ⥤ Type v) {X : C} (f : yoneda.obj X ⟶ F) :
-    (fromCostructuredArrow F).obj (op (CostructuredArrow.mk f)) = ⟨op X, yonedaEquiv.1 f⟩ :=
-  rfl
 
 @[simps]
 def costructuredArrowYonedaEquivalence (F : Cᵒᵖ ⥤ Type v) :

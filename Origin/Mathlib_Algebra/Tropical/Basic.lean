@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Tropical/Basic.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 71
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
@@ -8,6 +8,8 @@ import Mathlib.Algebra.SMulWithZero
 import Mathlib.Order.Hom.Basic
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Algebra.Order.Monoid.Unbundled.WithTop
+
+noncomputable section
 
 /-!
 
@@ -66,10 +68,6 @@ theorem trop_injective : Function.Injective (trop : R → Tropical R) := fun _ _
 theorem untrop_injective : Function.Injective (untrop : Tropical R → R) := fun _ _ => id
 
 @[simp]
-theorem trop_inj_iff (x y : R) : trop x = trop y ↔ x = y :=
-  Iff.rfl
-
-@[simp]
 theorem untrop_inj_iff (x y : Tropical R) : untrop x = untrop y ↔ x = y :=
   Iff.rfl
 
@@ -94,14 +92,6 @@ def tropEquiv : R ≃ Tropical R where
   invFun := untrop
   left_inv := untrop_trop
   right_inv := trop_untrop
-
-@[simp]
-theorem tropEquiv_coe_fn : (tropEquiv : R → Tropical R) = trop :=
-  rfl
-
-@[simp]
-theorem tropEquiv_symm_coe_fn : (tropEquiv.symm : Tropical R → R) = untrop :=
-  rfl
 
 theorem trop_eq_iff_eq_untrop {x : R} {y} : trop x = y ↔ x = untrop y :=
   tropEquiv.apply_eq_iff_eq_symm_apply
@@ -161,14 +151,6 @@ instance instPreorderTropical [Preorder R] : Preorder (Tropical R) :=
 def tropOrderIso [Preorder R] : R ≃o Tropical R :=
   { tropEquiv with map_rel_iff' := untrop_le_iff }
 
-@[simp]
-theorem tropOrderIso_coe_fn [Preorder R] : (tropOrderIso : R → Tropical R) = trop :=
-  rfl
-
-@[simp]
-theorem tropOrderIso_symm_coe_fn [Preorder R] : (tropOrderIso.symm : Tropical R → R) = untrop :=
-  rfl
-
 theorem trop_monotone [Preorder R] : Monotone (trop : R → Tropical R) := fun _ _ => id
 
 theorem untrop_monotone [Preorder R] : Monotone (untrop : Tropical R → R) := fun _ _ => id
@@ -183,14 +165,8 @@ instance instTopTropical [Top R] : Top (Tropical R) :=
   ⟨0⟩
 
 @[simp]
-theorem untrop_zero [Top R] : untrop (0 : Tropical R) = ⊤ :=
-  rfl
-
-@[simp]
-theorem trop_top [Top R] : trop (⊤ : R) = 0 :=
-  rfl
-
--- DISSOLVED: trop_coe_ne_zero
+theorem trop_coe_ne_zero (x : R) : trop (x : WithTop R) ≠ 0 :=
+  nofun
 
 @[simp]
 theorem zero_ne_trop_coe (x : R) : (0 : Tropical (WithTop R)) ≠ trop x :=
@@ -217,14 +193,6 @@ instance instAddCommSemigroupTropical : AddCommSemigroup (Tropical R) where
 theorem untrop_add (x y : Tropical R) : untrop (x + y) = min (untrop x) (untrop y) :=
   rfl
 
-@[simp]
-theorem trop_min (x y : R) : trop (min x y) = trop x + trop y :=
-  rfl
-
-@[simp]
-theorem trop_inf (x y : R) : trop (x ⊓ y) = trop x + trop y :=
-  rfl
-
 theorem trop_add_def (x y : Tropical R) : x + y = trop (min (untrop x) (untrop y)) :=
   rfl
 
@@ -238,28 +206,6 @@ instance instLinearOrderTropical : LinearOrder (Tropical R) :=
     min := (· + ·)
     min_def := fun a b => untrop_injective (by
       simp only [untrop_add, min_def, untrop_le_iff]; split_ifs <;> simp) }
-
-@[simp]
-theorem untrop_sup (x y : Tropical R) : untrop (x ⊔ y) = untrop x ⊔ untrop y :=
-  rfl
-
-@[simp]
-theorem untrop_max (x y : Tropical R) : untrop (max x y) = max (untrop x) (untrop y) :=
-  rfl
-
-@[simp]
-theorem min_eq_add : (min : Tropical R → Tropical R → Tropical R) = (· + ·) :=
-  rfl
-
-@[simp]
-theorem inf_eq_add : ((· ⊓ ·) : Tropical R → Tropical R → Tropical R) = (· + ·) :=
-  rfl
-
-theorem trop_max_def (x y : Tropical R) : max x y = trop (max (untrop x) (untrop y)) :=
-  rfl
-
-theorem trop_sup_def (x y : Tropical R) : x ⊔ y = trop (untrop x ⊔ untrop y) :=
-  rfl
 
 @[simp]
 theorem add_eq_left ⦃x y : Tropical R⦄ (h : x ≤ y) : x + y = x :=
@@ -305,27 +251,8 @@ section Monoid
 instance [Add R] : Mul (Tropical R) :=
   ⟨fun x y => trop (untrop x + untrop y)⟩
 
-@[simp]
-theorem trop_add [Add R] (x y : R) : trop (x + y) = trop x * trop y :=
-  rfl
-
-@[simp]
-theorem untrop_mul [Add R] (x y : Tropical R) : untrop (x * y) = untrop x + untrop y :=
-  rfl
-
-theorem trop_mul_def [Add R] (x y : Tropical R) : x * y = trop (untrop x + untrop y) :=
-  rfl
-
 instance instOneTropical [Zero R] : One (Tropical R) :=
   ⟨trop 0⟩
-
-@[simp]
-theorem trop_zero [Zero R] : trop (0 : R) = 1 :=
-  rfl
-
-@[simp]
-theorem untrop_one [Zero R] : untrop (1 : Tropical R) = 0 :=
-  rfl
 
 instance instAddMonoidWithOneTropical [LinearOrder R] [OrderTop R] [Zero R] :
     AddMonoidWithOne (Tropical R) :=
@@ -340,16 +267,8 @@ instance [Zero R] : Nontrivial (Tropical (WithTop R)) :=
 instance [Neg R] : Inv (Tropical R) :=
   ⟨fun x => trop (-untrop x)⟩
 
-@[simp]
-theorem untrop_inv [Neg R] (x : Tropical R) : untrop x⁻¹ = -untrop x :=
-  rfl
-
 instance [Sub R] : Div (Tropical R) :=
   ⟨fun x y => trop (untrop x - untrop y)⟩
-
-@[simp]
-theorem untrop_div [Sub R] (x y : Tropical R) : untrop (x / y) = untrop x - untrop y :=
-  rfl
 
 instance instSemigroupTropical [AddSemigroup R] : Semigroup (Tropical R) where
   mul := (· * ·)
@@ -359,15 +278,6 @@ instance instCommSemigroupTropical [AddCommSemigroup R] : CommSemigroup (Tropica
   { instSemigroupTropical with mul_comm := fun _ _ => untrop_injective (add_comm _ _) }
 
 instance {α : Type*} [SMul α R] : Pow (Tropical R) α where pow x n := trop <| n • untrop x
-
-@[simp]
-theorem untrop_pow {α : Type*} [SMul α R] (x : Tropical R) (n : α) :
-    untrop (x ^ n) = n • untrop x :=
-  rfl
-
-@[simp]
-theorem trop_smul {α : Type*} [SMul α R] (x : R) (n : α) : trop (n • x) = trop x ^ n :=
-  rfl
 
 instance instMulOneClassTropical [AddZeroClass R] : MulOneClass (Tropical R) where
   one := 1
@@ -380,10 +290,6 @@ instance instMonoidTropical [AddMonoid R] : Monoid (Tropical R) :=
     npow := fun n x => x ^ n
     npow_zero := fun _ => untrop_injective <| by simp
     npow_succ := fun _ _ => untrop_injective <| succ_nsmul _ _ }
-
-@[simp]
-theorem trop_nsmul [AddMonoid R] (x : R) (n : ℕ) : trop (n • x) = trop x ^ n :=
-  rfl
 
 instance instCommMonoidTropical [AddCommMonoid R] : CommMonoid (Tropical R) :=
   { instMonoidTropical, instCommSemigroupTropical with }
@@ -400,14 +306,6 @@ instance instGroupTropical [AddGroup R] : Group (Tropical R) :=
 
 instance [AddCommGroup R] : CommGroup (Tropical R) :=
   { instGroupTropical with mul_comm := fun _ _ => untrop_injective (add_comm _ _) }
-
-@[simp]
-theorem untrop_zpow [AddGroup R] (x : Tropical R) (n : ℤ) : untrop (x ^ n) = n • untrop x :=
-  rfl
-
-@[simp]
-theorem trop_zsmul [AddGroup R] (x : R) (n : ℤ) : trop (n • x) = trop x ^ n :=
-  rfl
 
 end Monoid
 

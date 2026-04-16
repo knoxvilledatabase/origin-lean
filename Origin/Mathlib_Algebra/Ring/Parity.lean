@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Parity.lean
-Genuine: 86 | Conflates: 1 | Dissolved: 1 | Infrastructure: 5
+Genuine: 87 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Even
@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Cast.Basic
 import Mathlib.Data.Nat.Cast.Commute
 import Mathlib.Data.Set.Operations
 import Mathlib.Logic.Function.Iterate
+
+noncomputable section
 
 /-!
 # Even and odd elements in rings
@@ -84,7 +86,8 @@ lemma Dvd.dvd.even (hab : a ∣ b) (ha : Even a) : Even b := ha.trans_dvd hab
 
 lemma even_two_mul (a : α) : Even (2 * a) := ⟨a, two_mul _⟩
 
--- DISSOLVED: Even.pow_of_ne_zero
+lemma Even.pow_of_ne_zero (ha : Even a) : ∀ {n : ℕ}, n ≠ 0 → Even (a ^ n)
+  | n + 1, _ => by rw [pow_succ]; exact ha.mul_left _
 
 def Odd (a : α) : Prop := ∃ k, a = 2 * k + 1
 
@@ -186,8 +189,6 @@ lemma Odd.neg (hp : Odd a) : Odd (-a) := by
     ← neg_add, hk]
 
 @[simp] lemma odd_neg : Odd (-a) ↔ Odd a := ⟨fun h ↦ neg_neg a ▸ h.neg, Odd.neg⟩
-
-lemma odd_neg_one : Odd (-1 : α) := by simp
 
 lemma Odd.sub_even (ha : Odd a) (hb : Even b) : Odd (a - b) := by
   rw [sub_eq_add_neg]; exact ha.add_even hb.neg

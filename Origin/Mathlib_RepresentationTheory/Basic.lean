@@ -5,6 +5,8 @@ Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 import Origin.Core
 import Mathlib.LinearAlgebra.Contraction
 
+noncomputable section
+
 /-!
 # Monoid representations
 
@@ -51,9 +53,6 @@ variable (k : Type*) {G V : Type*} [CommSemiring k] [Monoid G] [AddCommMonoid V]
 def trivial : Representation k G V :=
   1
 
-theorem trivial_def (g : G) (v : V) : trivial k (V := V) g v = v :=
-  rfl
-
 variable {k}
 
 class IsTrivial (ρ : Representation k G V) : Prop where
@@ -83,8 +82,6 @@ theorem asAlgebraHom_def : asAlgebraHom ρ = (lift k G _) ρ :=
 theorem asAlgebraHom_single (g : G) (r : k) : asAlgebraHom ρ (Finsupp.single g r) = r • ρ g := by
   simp only [asAlgebraHom_def, MonoidAlgebra.lift_single]
 
-theorem asAlgebraHom_single_one (g : G) : asAlgebraHom ρ (Finsupp.single g 1) = ρ g := by simp
-
 theorem asAlgebraHom_of (g : G) : asAlgebraHom ρ (of k G g) = ρ g := by
   simp only [MonoidAlgebra.of_apply, asAlgebraHom_single, one_smul]
 
@@ -104,11 +101,6 @@ instance : Module k ρ.asModule := inferInstanceAs <| Module k V
 
 def asModuleEquiv : ρ.asModule ≃+ V :=
   AddEquiv.refl _
-
-@[simp]
-theorem asModuleEquiv_map_smul (r : MonoidAlgebra k G) (x : ρ.asModule) :
-    ρ.asModuleEquiv (r • x) = ρ.asAlgebraHom r (ρ.asModuleEquiv x) :=
-  rfl
 
 @[simp]
 theorem asModuleEquiv_symm_map_smul (r : k) (x : V) :
@@ -238,9 +230,6 @@ def ofDistribMulAction : Representation k G A where
 
 variable {k G A}
 
-@[simp] theorem ofDistribMulAction_apply_apply (g : G) (a : A) :
-    ofDistribMulAction k G A g a = g • a := rfl
-
 end DistribMulAction
 
 section MulDistribMulAction
@@ -250,9 +239,6 @@ variable (M G : Type*) [Monoid M] [CommGroup G] [MulDistribMulAction M G]
 def ofMulDistribMulAction : Representation ℤ M (Additive G) :=
   (addMonoidEndRingEquivInt (Additive G) : AddMonoid.End (Additive G) →* _).comp
     ((monoidEndToAdditive G : _ →* _).comp (MulDistribMulAction.toMonoidEnd M G))
-
-@[simp] theorem ofMulDistribMulAction_apply_apply (g : M) (a : Additive G) :
-    ofMulDistribMulAction M G g a = Additive.ofMul (g • a.toMul) := rfl
 
 end MulDistribMulAction
 
@@ -373,10 +359,6 @@ def linHom : Representation k G (V →ₗ[k] W) where
       dsimp -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11227):now needed
       simp_rw [mul_inv_rev, map_mul, mul_eq_comp, comp_assoc]
 
-@[simp]
-theorem linHom_apply (g : G) (f : V →ₗ[k] W) : (linHom ρV ρW) g f = ρW g ∘ₗ f ∘ₗ ρV g⁻¹ :=
-  rfl
-
 def dual : Representation k G (Module.Dual k V) where
   toFun g :=
     { toFun := fun f => f ∘ₗ ρV g⁻¹
@@ -392,10 +374,6 @@ def dual : Representation k G (Module.Dual k V) where
     ext
     dsimp -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11227):now needed
     simp only [coe_comp, Function.comp_apply, mul_inv_rev, map_mul, coe_mk, mul_apply]
-
-@[simp]
-theorem dual_apply (g : G) : (dual ρV) g = Module.Dual.transpose (R := k) (ρV g⁻¹) :=
-  rfl
 
 theorem dualTensorHom_comm (g : G) :
     dualTensorHom k V W ∘ₗ TensorProduct.map (ρV.dual g) (ρW g) =

@@ -7,6 +7,8 @@ import Mathlib.Tactic.Widget.SelectPanelUtils
 import Mathlib.Tactic.CongrM
 import Batteries.Lean.Position
 
+noncomputable section
+
 /-! # CongrM widget
 
 This file defines a `congrm?` tactic that displays a widget panel allowing to generate
@@ -44,9 +46,6 @@ def CongrMSelectionPanel : Component SelectInsertParams :=
 open scoped Json in
 
 elab stx:"congrm?" : tactic => do
-
   let some replaceRange := (← getFileMap).rangeOfStx? stx | return
-
   Widget.savePanelWidgetInfo CongrMSelectionPanel.javascriptHash
-
     (pure <| json% { replaceRange: $(replaceRange) }) stx

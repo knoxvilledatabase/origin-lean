@@ -8,6 +8,8 @@ import Mathlib.Order.UpperLower.Basic
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.Nat.Cast.Order.Basic
 
+noncomputable section
+
 /-!
 # Images of intervals under `Nat.cast : ℕ → ℤ`
 

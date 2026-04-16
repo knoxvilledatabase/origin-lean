@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Complex/Circle.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 3 | Infrastructure: 20
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Analysis.Normed.Field.UnitBall
+
+noncomputable section
 
 /-!
 # The circle
@@ -41,11 +43,13 @@ def circle : Submonoid ℂ :=
   Submonoid.unitSphere ℂ
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-07-24")]
 
 theorem mem_circle_iff_abs {z : ℂ} : z ∈ circle ↔ abs z = 1 :=
   mem_sphere_zero_iff_norm
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-07-24")]
 
 theorem mem_circle_iff_normSq {z : ℂ} : z ∈ circle ↔ normSq z = 1 := by
   simp [Complex.abs, mem_circle_iff_abs]
@@ -74,7 +78,7 @@ lemma coe_inj : (x : ℂ) = y ↔ x = y := coe_injective.eq_iff
 
 @[simp] lemma normSq_coe (z : Circle) : normSq z = 1 := by simp [normSq_eq_abs]
 
--- DISSOLVED: coe_ne_zero
+@[simp] lemma coe_ne_zero (z : Circle) : (z : ℂ) ≠ 0 := ne_zero_of_mem_unit_sphere z
 
 @[simp, norm_cast] lemma coe_one : ↑(1 : Circle) = (1 : ℂ) := rfl
 
@@ -87,8 +91,6 @@ lemma coe_inj : (x : ℂ) = y ↔ x = y := coe_injective.eq_iff
 lemma coe_inv_eq_conj (z : Circle) : ↑z⁻¹ = conj (z : ℂ) := by
   rw [coe_inv, inv_def, normSq_coe, inv_one, ofReal_one, mul_one]
 
-@[simp, norm_cast] lemma coe_div (z w : Circle) : ↑(z / w) = (z : ℂ) / w := rfl
-
 @[simps]
 def coeHom : Circle →* ℂ where
   toFun := (↑)
@@ -96,8 +98,6 @@ def coeHom : Circle →* ℂ where
   map_mul' := coe_mul
 
 def toUnits : Circle →* Units ℂ := unitSphereToUnits ℂ
-
--- DISSOLVED: toUnits_apply
 
 instance : CompactSpace Circle := Metric.sphere.compactSpace _ _
 
@@ -109,7 +109,11 @@ instance : UniformGroup Circle := by
   convert topologicalGroup_is_uniform_of_compactSpace Circle
   exact unique_uniformity_of_compact rfl rfl
 
--- DISSOLVED: ofConjDivSelf
+@[simps]
+def ofConjDivSelf (z : ℂ) (hz : z ≠ 0) : Circle where
+  val := conj z / z
+  property := mem_sphere_zero_iff_norm.2 <| by
+    rw [norm_div, RCLike.norm_conj, div_self]; exact Complex.abs.ne_zero hz
 
 def exp : C(ℝ, Circle) where
   toFun t := ⟨(t * I).exp, by simp [Submonoid.unitSphere, exp_mul_I, abs_cos_add_sin_mul_I]⟩

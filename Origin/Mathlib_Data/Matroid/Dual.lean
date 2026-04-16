@@ -5,6 +5,8 @@ Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Data.Matroid.IndepAxioms
 
+noncomputable section
+
 /-!
 # Matroid Duality
 
@@ -108,8 +110,6 @@ def dual (M : Matroid α) : Matroid α := M.dualIndepMatroid.matroid
 
 postfix:max "✶" => Matroid.dual
 
-theorem dual_indep_iff_exists' : (M✶.Indep I) ↔ I ⊆ M.E ∧ (∃ B, M.Base B ∧ Disjoint I B) := Iff.rfl
-
 @[simp] theorem dual_ground : M✶.E = M.E := rfl
 
 @[simp] theorem dual_indep_iff_exists (hI : I ⊆ M.E := by aesop_mat) :
@@ -208,8 +208,6 @@ theorem Indep.ssubset_ground [h : RkPos M✶] (hI : M.Indep I) : I ⊂ M.E := by
   obtain ⟨B, hB⟩ := hI.exists_base_superset; exact hB.2.trans_ssubset hB.1.ssubset_ground
 
 abbrev Coindep (M : Matroid α) (I : Set α) : Prop := M✶.Indep I
-
-theorem coindep_def : M.Coindep X ↔ M✶.Indep X := Iff.rfl
 
 theorem Coindep.indep (hX : M.Coindep X) : M✶.Indep X :=
   hX

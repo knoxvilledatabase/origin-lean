@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Bitwise.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 6 | Infrastructure: 5
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Even
@@ -11,6 +11,8 @@ import Mathlib.Data.Nat.Bits
 import Mathlib.Order.Basic
 import Mathlib.Tactic.AdaptationNote
 import Mathlib.Tactic.Common
+
+noncomputable section
 
 /-!
 # Bitwise operations on natural numbers
@@ -59,9 +61,23 @@ lemma bitwise_zero_right (n : Nat) : bitwise f n 0 = if f true false then n else
 lemma bitwise_zero : bitwise f 0 0 = 0 := by
   simp only [bitwise_zero_right, ite_self]
 
--- DISSOLVED: bitwise_of_ne_zero
+lemma bitwise_of_ne_zero {n m : Nat} (hn : n ≠ 0) (hm : m ≠ 0) :
+    bitwise f n m = bit (f (bodd n) (bodd m)) (bitwise f (n / 2) (m / 2)) := by
+  conv_lhs => unfold bitwise
+  have mod_two_iff_bod x : (x % 2 = 1 : Bool) = bodd x := by
+    simp only [mod_two_of_bodd, cond]; cases bodd x <;> rfl
+  simp only [hn, hm, mod_two_iff_bod, ite_false, bit, two_mul, Bool.cond_eq_ite]
+  split_ifs <;> rfl
 
--- DISSOLVED: binaryRec_of_ne_zero
+theorem binaryRec_of_ne_zero {C : Nat → Sort*} (z : C 0) (f : ∀ b n, C n → C (bit b n)) {n}
+    (h : n ≠ 0) :
+    binaryRec z f n = bit_decomp n ▸ f (bodd n) (div2 n) (binaryRec z f (div2 n)) := by
+  cases n using bitCasesOn with
+  | h b n =>
+    rw [binaryRec_eq _ _ (by right; simpa [bit_eq_zero_iff] using h)]
+    generalize_proofs h; revert h
+    rw [bodd_bit, div2_bit]
+    simp
 
 @[simp]
 lemma bitwise_bit {f : Bool → Bool → Bool} (h : f false false = false := by rfl) (a m b n) :
@@ -74,10 +90,6 @@ lemma bitwise_bit {f : Bool → Bool → Bool} (h : f false false = false := by 
   have h4 x : (x + x + 1) / 2 = x := by rw [← two_mul, add_comm]; simp [add_mul_div_left]
   cases a <;> cases b <;> simp [h2, h4] <;> split_ifs
     <;> simp_all +decide [two_mul]
-
-lemma bit_mod_two_eq_zero_iff (a x) :
-    bit a x % 2 = 0 ↔ !a := by
-  simp
 
 lemma bit_mod_two_eq_one_iff (a x) :
     bit a x % 2 = 1 ↔ a := by
@@ -123,7 +135,8 @@ theorem bit_false : bit false = (2 * ·) :=
 theorem bit_true : bit true = (2 * · + 1) :=
   rfl
 
--- DISSOLVED: bit_ne_zero_iff
+theorem bit_ne_zero_iff {n : ℕ} {b : Bool} : n.bit b ≠ 0 ↔ n = 0 → b = true := by
+  simp
 
 lemma bitwise_bit' {f : Bool → Bool → Bool} (a : Bool) (m : Nat) (b : Bool) (n : Nat)
     (ham : m = 0 → a = true) (hbn : n = 0 → b = true) :
@@ -170,7 +183,22 @@ theorem testBit_eq_inth (n i : ℕ) : n.testBit i = n.bits.getI i := by
   rw [testBit_bit_succ, ih n.div2, div2_bits_eq_tail]
   cases n.bits <;> simp
 
--- DISSOLVED: exists_most_significant_bit
+theorem exists_most_significant_bit {n : ℕ} (h : n ≠ 0) :
+    ∃ i, testBit n i = true ∧ ∀ j, i < j → testBit n j = false := by
+  induction' n using Nat.binaryRec with b n hn
+  · exact False.elim (h rfl)
+  by_cases h' : n = 0
+  · subst h'
+    rw [show b = true by
+        revert h
+        cases b <;> simp]
+    refine ⟨0, ⟨by rw [testBit_bit_zero], fun j hj => ?_⟩⟩
+    obtain ⟨j', rfl⟩ := exists_eq_succ_of_ne_zero (ne_of_gt hj)
+    rw [testBit_bit_succ, zero_testBit]
+  · obtain ⟨k, ⟨hk, hk'⟩⟩ := hn h'
+    refine ⟨k + 1, ⟨by rw [testBit_bit_succ, hk], fun j hj => ?_⟩⟩
+    obtain ⟨j', rfl⟩ := exists_eq_succ_of_ne_zero (show j ≠ 0 by intro x; subst x; simp at hj)
+    exact (testBit_bit_succ _ _ _).trans (hk' _ (lt_of_succ_lt_succ hj))
 
 theorem lt_of_testBit {n m : ℕ} (i : ℕ) (hn : testBit n i = false) (hm : testBit m i = true)
     (hnm : ∀ j, i < j → testBit n j = testBit m j) : n < m := by
@@ -238,17 +266,13 @@ lemma two_pow_and (n i : ℕ) : 2 ^ i &&& n = 2 ^ i * (n.testBit i).toNat := by
   rw [mul_comm, land_comm, and_two_pow]
 
 macro "bitwise_assoc_tac" : tactic => set_option hygiene false in `(tactic| (
-
   induction' n using Nat.binaryRec with b n hn generalizing m k
-
   · simp
-
   induction' m using Nat.binaryRec with b' m hm
-
   · simp
-
   induction' k using Nat.binaryRec with b'' k hk
-
+  -- Porting note (https://github.com/leanprover-community/mathlib4/issues/10745): was `simp [hn]`
+  -- This is necessary because these are simp lemmas in mathlib
   <;> simp [hn, Bool.or_assoc, Bool.and_assoc, Bool.bne_eq_xor]))
 
 theorem land_assoc (n m k : ℕ) : (n &&& m) &&& k = n &&& (m &&& k) := by bitwise_assoc_tac
@@ -280,9 +304,38 @@ theorem xor_left_inj {n m m' : ℕ} : m ^^^ n = m' ^^^ n ↔ m = m' :=
 theorem xor_eq_zero {n m : ℕ} : n ^^^ m = 0 ↔ n = m := by
   rw [← Nat.xor_self n, xor_right_inj, eq_comm]
 
--- DISSOLVED: xor_ne_zero
+theorem xor_ne_zero {n m : ℕ} : n ^^^ m ≠ 0 ↔ n ≠ m :=
+  xor_eq_zero.not
 
--- DISSOLVED: xor_trichotomy
+theorem xor_trichotomy {a b c : ℕ} (h : a ^^^ b ^^^ c ≠ 0) :
+    b ^^^ c < a ∨ c ^^^ a < b ∨ a ^^^ b < c := by
+  set v := a ^^^ b ^^^ c with hv
+  -- The xor of any two of `a`, `b`, `c` is the xor of `v` and the third.
+  have hab : a ^^^ b = c ^^^ v := by
+    rw [Nat.xor_comm c, xor_cancel_right]
+  have hbc : b ^^^ c = a ^^^ v := by
+    rw [← Nat.xor_assoc, xor_cancel_left]
+  have hca : c ^^^ a = b ^^^ v := by
+    rw [hv, Nat.xor_assoc, Nat.xor_comm a, ← Nat.xor_assoc, xor_cancel_left]
+  -- If `i` is the position of the most significant bit of `v`, then at least one of `a`, `b`, `c`
+  -- has a one bit at position `i`.
+  obtain ⟨i, ⟨hi, hi'⟩⟩ := exists_most_significant_bit h
+  have : testBit a i ∨ testBit b i ∨ testBit c i := by
+    contrapose! hi
+    simp_rw [Bool.eq_false_eq_not_eq_true] at hi ⊢
+    rw [testBit_xor, testBit_xor, hi.1, hi.2.1, hi.2.2]
+    rfl
+  -- If, say, `a` has a one bit at position `i`, then `a xor v` has a zero bit at position `i`, but
+  -- the same bits as `a` in positions greater than `j`, so `a xor v < a`.
+  obtain h | h | h := this
+  on_goal 1 => left; rw [hbc]
+  on_goal 2 => right; left; rw [hca]
+  on_goal 3 => right; right; rw [hab]
+  all_goals
+    refine lt_of_testBit i ?_ h fun j hj => ?_
+    · rw [testBit_xor, h, hi]
+      rfl
+    · simp only [testBit_xor, hi' _ hj, Bool.bne_false]
 
 theorem lt_xor_cases {a b c : ℕ} (h : a < b ^^^ c) : a ^^^ c < b ∨ a ^^^ b < c := by
   obtain ha | hb | hc := xor_trichotomy <| Nat.xor_assoc _ _ _ ▸ xor_ne_zero.2 h.ne

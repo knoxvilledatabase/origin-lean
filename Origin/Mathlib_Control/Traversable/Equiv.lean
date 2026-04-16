@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Traversable.Lemmas
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Transferring `Traversable` instances along isomorphisms
 

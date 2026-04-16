@@ -11,6 +11,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
 import Mathlib.Analysis.Calculus.ContDiff.Bounds
 
+noncomputable section
+
 /-!
 # Derivatives of the Fourier transform
 
@@ -311,6 +313,9 @@ lemma norm_fourierPowSMulRight_le (f : V → E) (v : V) (n : ℕ) :
       simp [Finset.prod_mul_distrib, mul_pow]; ring
 
 set_option maxSynthPendingDepth 2 in
+/-- The iterated derivative of a function multiplied by `(L v ⬝) ^ n` can be controlled in terms
+
+of the iterated derivatives of the initial function. -/
 
 lemma norm_iteratedFDeriv_fourierPowSMulRight
     {f : V → E} {K : WithTop ℕ∞} {C : ℝ} (hf : ContDiff ℝ K f) {n : ℕ} {k : ℕ} (hk : k ≤ K)

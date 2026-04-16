@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Data.Nat.SuccPred
 
+noncomputable section
+
 /-!
 # Successors and predecessors of integers
 
@@ -28,14 +30,6 @@ instance instSuccAddOrder : SuccAddOrder ℤ := ⟨fun _ => rfl⟩
   le_pred_of_lt {_ _} := le_sub_one_of_lt
 
 instance instPredSubOrder : PredSubOrder ℤ := ⟨fun _ => rfl⟩
-
-@[simp]
-theorem succ_eq_succ : Order.succ = succ :=
-  rfl
-
-@[simp]
-theorem pred_eq_pred : Order.pred = pred :=
-  rfl
 
 theorem pos_iff_one_le {a : ℤ} : 0 < a ↔ 1 ≤ a :=
   Order.succ_le_iff.symm

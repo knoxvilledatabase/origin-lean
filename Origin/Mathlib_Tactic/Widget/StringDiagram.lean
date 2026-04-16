@@ -10,6 +10,8 @@ import ProofWidgets.Component.HtmlDisplay
 import Mathlib.Tactic.CategoryTheory.Bicategory.Normalize
 import Mathlib.Tactic.CategoryTheory.Monoidal.Normalize
 
+noncomputable section
+
 /-!
 # String Diagram Widget
 
@@ -380,16 +382,6 @@ def StringDiagram : Component PanelWidgetProps :=
   mk_rpc_widget% StringDiagram.rpc
 
 open Command
-
-#string_diagram MonoidalCategory.whisker_exchange
-
-variable {C : Type u} [Category.{v} C] [MonoidalCategory C] {X Y : C} (f : 𝟙_ C ⟶ X ⊗ Y) in
-
-#string_diagram f
-
-```
-
--/
 
 syntax (name := stringDiagram) "#string_diagram " term : command
 

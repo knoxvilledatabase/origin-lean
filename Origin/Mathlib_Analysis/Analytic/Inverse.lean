@@ -7,6 +7,8 @@ import Mathlib.Analysis.Analytic.Composition
 import Mathlib.Analysis.Analytic.Linear
 import Mathlib.Tactic.Positivity
 
+noncomputable section
+
 /-!
 
 # Inverse of analytic functions

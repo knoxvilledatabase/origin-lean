@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Find
 import Mathlib.Data.PNat.Basic
 
+noncomputable section
+
 /-!
 # Explicit least witnesses to existentials on positive natural numbers
 

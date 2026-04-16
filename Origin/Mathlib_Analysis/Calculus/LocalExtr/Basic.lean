@@ -5,6 +5,8 @@ Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Add
 
+noncomputable section
+
 /-!
 # Local extrema of differentiable functions
 
@@ -92,8 +94,6 @@ theorem mem_posTangentConeAt_of_segment_subset (h : [x -[ℝ] x + y] ⊆ s) :
   apply h
   rw [segment_eq_image', add_sub_cancel_left]
   exact mem_image_of_mem _ ⟨le_of_lt ht₀, ht₁⟩
-
-alias mem_posTangentConeAt_of_segment_subset' := mem_posTangentConeAt_of_segment_subset
 
 theorem sub_mem_posTangentConeAt_of_segment_subset (h : segment ℝ x y ⊆ s) :
     y - x ∈ posTangentConeAt s x :=

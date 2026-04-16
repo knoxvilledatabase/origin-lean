@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # `ULift` creates small (co)limits
 
@@ -30,7 +32,6 @@ def sectionsEquiv {J : Type*} [Category J] (K : J ⥤ Type u) :
   right_inv _ := rfl
 
 noncomputable
-
 instance : PreservesLimitsOfSize.{w', w} uliftFunctor.{v, u} where
   preservesLimitsOfShape {J} := {
     preservesLimit := fun {K} => {

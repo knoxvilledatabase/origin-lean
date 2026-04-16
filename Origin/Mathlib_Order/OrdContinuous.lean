@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Order.RelIso.Basic
 
+noncomputable section
+
 /-!
 # Order continuity
 
@@ -86,11 +88,6 @@ def toOrderEmbedding (hf : LeftOrdContinuous f) (h : Injective f) : α ↪o β :
   ⟨⟨f, h⟩, hf.le_iff h⟩
 
 variable {f}
-
-@[simp]
-theorem coe_toOrderEmbedding (hf : LeftOrdContinuous f) (h : Injective f) :
-    ⇑(hf.toOrderEmbedding f h) = f :=
-  rfl
 
 end SemilatticeSup
 
@@ -176,11 +173,6 @@ def toOrderEmbedding (hf : RightOrdContinuous f) (h : Injective f) : α ↪o β 
   ⟨⟨f, h⟩, hf.le_iff h⟩
 
 variable {f}
-
-@[simp]
-theorem coe_toOrderEmbedding (hf : RightOrdContinuous f) (h : Injective f) :
-    ⇑(hf.toOrderEmbedding f h) = f :=
-  rfl
 
 end SemilatticeInf
 

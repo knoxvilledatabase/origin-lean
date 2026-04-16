@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Order.PartialSups
 
+noncomputable section
+
 /-!
 # Consecutive differences of sets
 
@@ -78,11 +80,6 @@ def disjointedRec {f : ℕ → α} {p : α → Sort*} (hdiff : ∀ ⦃t i⦄, p 
     · exact hdiff h
     rw [partialSups_succ, ← sdiff_sdiff_left]
     exact hdiff ih
-
-@[simp]
-theorem disjointedRec_zero {f : ℕ → α} {p : α → Sort*} (hdiff : ∀ ⦃t i⦄, p t → p (t \ f i))
-    (h₀ : p (f 0)) : disjointedRec hdiff h₀ = h₀ :=
-  rfl
 
 protected lemma Monotone.disjointed_succ {f : ℕ → α} (hf : Monotone f) (n : ℕ) :
     disjointed f (n + 1) = f (n + 1) \ f n := by rw [disjointed_succ, hf.partialSups_eq]

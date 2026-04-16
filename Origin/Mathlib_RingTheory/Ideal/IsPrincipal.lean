@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.RingTheory.PrincipalIdealDomain
 
+noncomputable section
+
 /-!
 # Principal Ideals
 
@@ -74,10 +76,6 @@ noncomputable def associatesEquivIsPrincipal :
 theorem associatesEquivIsPrincipal_apply (x : R) :
     associatesEquivIsPrincipal R (.mk x) = span {x} := rfl
 
-@[simp]
-theorem associatesEquivIsPrincipal_symm_apply {I : Ideal R} (hI : IsPrincipal I) :
-    (associatesEquivIsPrincipal R).symm ⟨I, hI⟩ = .mk hI.generator := rfl
-
 theorem associatesEquivIsPrincipal_mul (x y : Associates R) :
     (associatesEquivIsPrincipal R (x * y) : Ideal R) =
       (associatesEquivIsPrincipal R x) * (associatesEquivIsPrincipal R y) := by
@@ -116,10 +114,6 @@ noncomputable def associatesNonZeroDivisorsEquivIsPrincipal :
       Equiv.subtypeSubtypeEquivSubtypeInter (fun I ↦ IsPrincipal I) (fun I ↦ I ∈ (Ideal R)⁰)
     _ ≃ {I : Ideal R // I ∈ (Ideal R)⁰ ∧ IsPrincipal I} := Equiv.setCongr (by simp_rw [and_comm])
     _ ≃ {I : (Ideal R)⁰ // IsPrincipal I.1} := (Equiv.subtypeSubtypeEquivSubtypeInter _ _).symm
-
-@[simp]
-theorem associatesNonZeroDivisorsEquivIsPrincipal_apply (x : R⁰) :
-    associatesNonZeroDivisorsEquivIsPrincipal R (.mk x) = Ideal.span {(x : R)} := rfl
 
 theorem associatesNonZeroDivisorsEquivIsPrincipal_coe (x : Associates R⁰) :
     (associatesNonZeroDivisorsEquivIsPrincipal R x : Ideal R) =

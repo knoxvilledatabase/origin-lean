@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Sites.Coherent.ExtensiveTopology
 import Mathlib.CategoryTheory.Sites.Coherent.SheafComparison
 import Mathlib.CategoryTheory.Sites.LocallySurjective
 
+noncomputable section
+
 /-!
 
 # Locally surjective morphisms of coherent sheaves

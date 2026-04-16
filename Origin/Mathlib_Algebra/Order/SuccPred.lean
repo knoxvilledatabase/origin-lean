@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.ZeroLEOne
 import Mathlib.Data.Int.Cast.Defs
 import Mathlib.Order.SuccPred.Archimedean
 
+noncomputable section
+
 /-!
 # Interaction between successors and arithmetic
 

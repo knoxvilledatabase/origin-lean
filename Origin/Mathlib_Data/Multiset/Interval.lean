@@ -8,6 +8,8 @@ import Mathlib.Data.DFinsupp.Multiset
 import Mathlib.Order.Interval.Finset.Nat
 import Mathlib.Data.Nat.Lattice
 
+noncomputable section
+
 /-!
 # Finite intervals of multisets
 

@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/FLT/Three.lean
-Genuine: 70 | Conflates: 0 | Dissolved: 6 | Infrastructure: 4
+Genuine: 75 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.NumberTheory.FLT.Basic
 import Mathlib.NumberTheory.Cyclotomic.PID
 import Mathlib.NumberTheory.Cyclotomic.Three
 import Mathlib.Algebra.Ring.Divisibility.Lemmas
+
+noncomputable section
 
 /-!
 # Fermat Last Theorem in the case `n = 3`
@@ -51,7 +53,9 @@ section case1
 
 open ZMod
 
--- DISSOLVED: cube_of_castHom_ne_zero
+private lemma cube_of_castHom_ne_zero {n : ZMod 9} :
+    castHom (show 3 ∣ 9 by norm_num) (ZMod 3) n ≠ 0 → n ^ 3 = 1 ∨ n ^ 3 = 8 := by
+  revert n; decide
 
 private lemma cube_of_not_dvd {n : ℤ} (h : ¬ 3 ∣ n) :
     (n : ZMod 9) ^ 3 = 1 ∨ (n : ZMod 9) ^ 3 = 8 := by
@@ -72,15 +76,68 @@ end case1
 
 section case2
 
--- DISSOLVED: three_dvd_b_of_dvd_a_of_gcd_eq_one_of_case2
+private lemma three_dvd_b_of_dvd_a_of_gcd_eq_one_of_case2 {a b c : ℤ} (ha : a ≠ 0)
+    (Hgcd : Finset.gcd {a, b, c} id = 1) (h3a : 3 ∣ a) (HF : a ^ 3 + b ^ 3 + c ^ 3 = 0)
+    (H : ∀ a b c : ℤ, c ≠ 0 → ¬ 3 ∣ a → ¬ 3 ∣ b  → 3 ∣ c → IsCoprime a b → a ^ 3 + b ^ 3 ≠ c ^ 3) :
+    3 ∣ b := by
+  have hbc : IsCoprime (-b) (-c) := by
+    refine IsCoprime.neg_neg ?_
+    rw [add_comm (a ^ 3), add_assoc, add_comm (a ^ 3), ← add_assoc] at HF
+    refine isCoprime_of_gcd_eq_one_of_FLT ?_ HF
+    convert Hgcd using 2
+    rw [Finset.pair_comm, Finset.Insert.comm]
+  by_contra! h3b
+  by_cases h3c : 3 ∣ c
+  · apply h3b
+    rw [add_assoc, add_comm (b ^ 3), ← add_assoc] at HF
+    exact dvd_c_of_prime_of_dvd_a_of_dvd_b_of_FLT Int.prime_three h3a h3c HF
+  · refine H (-b) (-c) a ha (by simp [h3b]) (by simp [h3c]) h3a hbc ?_
+    rw [add_eq_zero_iff_eq_neg, ← (show Odd 3 by decide).neg_pow] at HF
+    rw [← HF]
+    ring
 
 open Finset in
 
--- DISSOLVED: fermatLastTheoremThree_of_dvd_a_of_gcd_eq_one_of_case2
+private lemma fermatLastTheoremThree_of_dvd_a_of_gcd_eq_one_of_case2 {a b c : ℤ} (ha : a ≠ 0)
+    (h3a : 3 ∣ a) (Hgcd : Finset.gcd {a, b, c} id = 1)
+    (H : ∀ a b c : ℤ, c ≠ 0 → ¬ 3 ∣ a → ¬ 3 ∣ b  → 3 ∣ c → IsCoprime a b → a ^ 3 + b ^ 3 ≠ c ^ 3) :
+    a ^ 3 + b ^ 3 + c ^ 3 ≠ 0 := by
+  intro HF
+  apply (show ¬(3 ∣ (1 : ℤ)) by decide)
+  rw [← Hgcd]
+  refine dvd_gcd (fun x hx ↦ ?_)
+  simp only [mem_insert, mem_singleton] at hx
+  have h3b : 3 ∣ b := by
+    refine three_dvd_b_of_dvd_a_of_gcd_eq_one_of_case2 ha ?_ h3a HF H
+    simp only [← Hgcd, gcd_insert, gcd_singleton, id_eq, ← Int.abs_eq_normalize, abs_neg]
+  rcases hx with hx | hx | hx
+  · exact hx ▸ h3a
+  · exact hx ▸ h3b
+  · simpa [hx] using dvd_c_of_prime_of_dvd_a_of_dvd_b_of_FLT Int.prime_three h3a h3b HF
 
 open Finset Int in
 
--- DISSOLVED: fermatLastTheoremThree_of_three_dvd_only_c
+theorem fermatLastTheoremThree_of_three_dvd_only_c
+    (H : ∀ a b c : ℤ, c ≠ 0 → ¬ 3 ∣ a → ¬ 3 ∣ b  → 3 ∣ c → IsCoprime a b → a ^ 3 + b ^ 3 ≠ c ^ 3) :
+    FermatLastTheoremFor 3 := by
+  rw [fermatLastTheoremFor_iff_int]
+  refine fermatLastTheoremWith_of_fermatLastTheoremWith_coprime (fun a b c ha hb hc Hgcd hF ↦?_)
+  by_cases h1 : 3 ∣ a * b * c
+  swap
+  · exact fermatLastTheoremThree_case_1 h1 hF
+  rw [(prime_three).dvd_mul, (prime_three).dvd_mul] at h1
+  rw [← sub_eq_zero, sub_eq_add_neg, ← (show Odd 3 by decide).neg_pow] at hF
+  rcases h1 with (h3a | h3b) | h3c
+  · refine fermatLastTheoremThree_of_dvd_a_of_gcd_eq_one_of_case2 ha h3a ?_ H hF
+    simp only [← Hgcd, Insert.comm, gcd_insert, gcd_singleton, id_eq, ← abs_eq_normalize, abs_neg]
+  · rw [add_comm (a ^ 3)] at hF
+    refine fermatLastTheoremThree_of_dvd_a_of_gcd_eq_one_of_case2 hb h3b ?_ H hF
+    simp only [← Hgcd, Insert.comm, gcd_insert, gcd_singleton, id_eq, ← abs_eq_normalize, abs_neg]
+  · rw [add_comm _ ((-c) ^ 3), ← add_assoc] at hF
+    refine fermatLastTheoremThree_of_dvd_a_of_gcd_eq_one_of_case2 (neg_ne_zero.2 hc) (by simp [h3c])
+      ?_ H hF
+    rw [Finset.Insert.comm (-c), Finset.pair_comm (-c) b]
+    simp only [← Hgcd, Insert.comm, gcd_insert, gcd_singleton, id_eq, ← abs_eq_normalize, abs_neg]
 
 section eisenstein
 
@@ -116,7 +173,17 @@ lemma FermatLastTheoremForThree_of_FermatLastTheoremThreeGen
 
 namespace FermatLastTheoremForThreeGen
 
--- DISSOLVED: Solution'
+structure Solution' where
+  a : 𝓞 K
+  b : 𝓞 K
+  c : 𝓞 K
+  u : (𝓞 K)ˣ
+  ha : ¬ λ ∣ a
+  hb : ¬ λ ∣ b
+  hc : c ≠ 0
+  coprime : IsCoprime a b
+  hcdvd : λ ∣ c
+  H : a ^ 3 + b ^ 3 = u * c ^ 3
 
 attribute [nolint docBlame] Solution'.a
 
@@ -151,7 +218,6 @@ noncomputable def Solution.multiplicity := S.toSolution'.multiplicity
 def Solution.isMinimal : Prop := ∀ (S₁ : Solution hζ), S.multiplicity ≤ S₁.multiplicity
 
 omit [NumberField K] [IsCyclotomicExtension {3} ℚ K] in
-
 include S in
 
 lemma Solution.exists_minimal : ∃ (S₁ : Solution hζ), S₁.isMinimal := by
@@ -417,7 +483,6 @@ private noncomputable def w :=
   (pow_multiplicity_dvd (hζ.toInteger - 1) S.c).choose
 
 omit [NumberField K] [IsCyclotomicExtension {3} ℚ K] in
-
 private lemma w_spec : S.c = λ ^ S.multiplicity * S.w :=
   (pow_multiplicity_dvd (hζ.toInteger - 1) S.c).choose_spec
 
@@ -515,7 +580,8 @@ private noncomputable def u₃ :=(exists_cube_associated S).2.2.choose_spec.choo
 private lemma Z_u₃_spec : S.Z ^ 3 * S.u₃ = S.z :=
   (exists_cube_associated S).2.2.choose_spec.choose_spec
 
--- DISSOLVED: X_ne_zero
+private lemma X_ne_zero : S.X ≠ 0 :=
+  fun h ↦ lambda_not_dvd_x S <| by simp [← X_u₁_spec, h]
 
 private lemma lambda_not_dvd_X : ¬ λ ∣ S.X :=
   fun h ↦ lambda_not_dvd_x S <| X_u₁_spec S ▸ dvd_mul_of_dvd_left (dvd_pow h (by decide)) _

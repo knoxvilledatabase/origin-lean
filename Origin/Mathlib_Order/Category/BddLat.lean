@@ -8,6 +8,8 @@ import Mathlib.Order.Category.BddOrd
 import Mathlib.Order.Category.Lat
 import Mathlib.Order.Category.Semilat
 
+noncomputable section
+
 /-!
 # The category of bounded lattices
 
@@ -39,10 +41,6 @@ attribute [instance] BddLat.isBoundedOrder
 def of (α : Type*) [Lattice α] [BoundedOrder α] : BddLat :=
   -- Porting note: was `⟨⟨α⟩⟩`, see https://github.com/leanprover-community/mathlib4/issues/4998
   ⟨{α := α}⟩
-
-@[simp]
-theorem coe_of (α : Type*) [Lattice α] [BoundedOrder α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited BddLat :=
   ⟨of PUnit⟩
@@ -85,39 +83,6 @@ instance hasForgetToSemilatInf : HasForget₂ BddLat SemilatInfCat where
     { obj := fun X => ⟨X⟩
       map := fun {_ _} => BoundedLatticeHom.toInfTopHom }
 
-@[simp]
-theorem coe_forget_to_bddOrd (X : BddLat) : ↥((forget₂ BddLat BddOrd).obj X) = ↥X :=
-  rfl
-
-@[simp]
-theorem coe_forget_to_lat (X : BddLat) : ↥((forget₂ BddLat Lat).obj X) = ↥X :=
-  rfl
-
-@[simp]
-theorem coe_forget_to_semilatSup (X : BddLat) :
-    ↥((forget₂ BddLat SemilatSupCat).obj X) = ↥X :=
-  rfl
-
-@[simp]
-theorem coe_forget_to_semilatInf (X : BddLat) :
-    ↥((forget₂ BddLat SemilatInfCat).obj X) = ↥X :=
-  rfl
-
-theorem forget_lat_partOrd_eq_forget_bddOrd_partOrd :
-    forget₂ BddLat Lat ⋙ forget₂ Lat PartOrd =
-      forget₂ BddLat BddOrd ⋙ forget₂ BddOrd PartOrd :=
-  rfl
-
-theorem forget_semilatSup_partOrd_eq_forget_bddOrd_partOrd :
-    forget₂ BddLat SemilatSupCat ⋙ forget₂ SemilatSupCat PartOrd =
-      forget₂ BddLat BddOrd ⋙ forget₂ BddOrd PartOrd :=
-  rfl
-
-theorem forget_semilatInf_partOrd_eq_forget_bddOrd_partOrd :
-    forget₂ BddLat SemilatInfCat ⋙ forget₂ SemilatInfCat PartOrd =
-      forget₂ BddLat BddOrd ⋙ forget₂ BddOrd PartOrd :=
-  rfl
-
 @[simps]
 def Iso.mk {α β : BddLat.{u}} (e : α ≃o β) : α ≅ β where
   hom := (e : BoundedLatticeHom _ _)
@@ -138,25 +103,6 @@ def dualEquiv : BddLat ≌ BddLat where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end BddLat
-
-theorem bddLat_dual_comp_forget_to_bddOrd :
-    BddLat.dual ⋙ forget₂ BddLat BddOrd =
-    forget₂ BddLat BddOrd ⋙ BddOrd.dual :=
-  rfl
-
-theorem bddLat_dual_comp_forget_to_lat :
-    BddLat.dual ⋙ forget₂ BddLat Lat = forget₂ BddLat Lat ⋙ Lat.dual :=
-  rfl
-
-theorem bddLat_dual_comp_forget_to_semilatSupCat :
-    BddLat.dual ⋙ forget₂ BddLat SemilatSupCat =
-    forget₂ BddLat SemilatInfCat ⋙ SemilatInfCat.dual :=
-  rfl
-
-theorem bddLat_dual_comp_forget_to_semilatInfCat :
-    BddLat.dual ⋙ forget₂ BddLat SemilatInfCat =
-    forget₂ BddLat SemilatSupCat ⋙ SemilatSupCat.dual :=
-  rfl
 
 def latToBddLat : Lat.{u} ⥤ BddLat where
   obj X := BddLat.of <| WithTop <| WithBot X

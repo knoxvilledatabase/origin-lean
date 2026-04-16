@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.BigOperators.Group.Multiset
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Matrix.Notation
 
+noncomputable section
+
 /-!
 
 # General-Valued Constraint Satisfaction Problems
@@ -128,35 +130,3 @@ lemma Function.HasMaxCutPropertyAt.rows_lt_aux
   show o (fun j => ![![a, b], ![b, a]] j 0) = o (fun j => ![![a, b], ![b, a]] j 1)
   convert symmega ![a, b] ![b, a] (by simp [List.Perm.swap]) o in_omega using 2 <;>
     simp [Matrix.const_fin1_eq]
-
-lemma Function.HasMaxCutProperty.forbids_commutativeFractionalPolymorphism
-    {f : (Fin 2 → D) → C} (mcf : f.HasMaxCutProperty)
-    {ω : FractionalOperation D 2} (valid : ω.IsValid) (symmega : ω.IsSymmetric) :
-    ¬ f.AdmitsFractional ω := by
-  intro contr
-  obtain ⟨a, b, hab, mcfab⟩ := mcf
-  specialize contr ![![a, b], ![b, a]]
-  rw [Fin.sum_univ_two', ← mcfab.left, ← two_nsmul] at contr
-  have sharp :
-    2 • ((ω.tt ![![a, b], ![b, a]]).map (fun _ => f ![a, b])).sum <
-    2 • ((ω.tt ![![a, b], ![b, a]]).map f).sum := by
-    have half_sharp :
-      ((ω.tt ![![a, b], ![b, a]]).map (fun _ => f ![a, b])).sum <
-      ((ω.tt ![![a, b], ![b, a]]).map f).sum := by
-      apply Multiset.sum_lt_sum
-      · intro r rin
-        exact le_of_lt (mcfab.rows_lt_aux hab symmega rin)
-      · obtain ⟨g, _⟩ := valid.contains
-        have : (fun i => g ((Function.swap ![![a, b], ![b, a]]) i)) ∈ ω.tt ![![a, b], ![b, a]] := by
-          simp only [FractionalOperation.tt, Multiset.mem_map]
-          use g
-        exact ⟨_, this, mcfab.rows_lt_aux hab symmega this⟩
-    rw [two_nsmul, two_nsmul]
-    exact add_lt_add half_sharp half_sharp
-  have impos : 2 • (ω.map (fun _ => f ![a, b])).sum < ω.size • 2 • f ![a, b] := by
-    convert lt_of_lt_of_le sharp contr
-    simp [FractionalOperation.tt, Multiset.map_map]
-  have rhs_swap : ω.size • 2 • f ![a, b] = 2 • ω.size • f ![a, b] := nsmul_left_comm ..
-  have distrib : (ω.map (fun _ => f ![a, b])).sum = ω.size • f ![a, b] := by simp
-  rw [rhs_swap, distrib] at impos
-  exact ne_of_lt impos rfl

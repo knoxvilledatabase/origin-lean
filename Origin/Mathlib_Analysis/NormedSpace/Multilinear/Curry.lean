@@ -5,6 +5,8 @@ Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.Multilinear.Basic
 
+noncomputable section
+
 /-!
 # Currying and uncurrying continuous multilinear maps
 
@@ -163,18 +165,6 @@ def continuousMultilinearCurryLeftEquiv :
 variable {𝕜 Ei G}
 
 @[simp]
-theorem continuousMultilinearCurryLeftEquiv_apply
-    (f : ContinuousMultilinearMap 𝕜 Ei G) (x : Ei 0) (v : Π i : Fin n, Ei i.succ) :
-    continuousMultilinearCurryLeftEquiv 𝕜 Ei G f x v = f (cons x v) :=
-  rfl
-
-@[simp]
-theorem continuousMultilinearCurryLeftEquiv_symm_apply
-    (f : Ei 0 →L[𝕜] ContinuousMultilinearMap 𝕜 (fun i : Fin n => Ei i.succ) G) (v : Π i, Ei i) :
-    (continuousMultilinearCurryLeftEquiv 𝕜 Ei G).symm f v = f (v 0) (tail v) :=
-  rfl
-
-@[simp]
 theorem ContinuousMultilinearMap.curryLeft_norm (f : ContinuousMultilinearMap 𝕜 Ei G) :
     ‖f.curryLeft‖ = ‖f‖ :=
   (continuousMultilinearCurryLeftEquiv 𝕜 Ei G).norm_map f
@@ -265,31 +255,6 @@ def continuousMultilinearCurryRightEquiv' : (G[×n.succ]→L[𝕜] G') ≃ₗᵢ
 variable {n 𝕜 G Ei G'}
 
 @[simp]
-theorem continuousMultilinearCurryRightEquiv_apply
-    (f : ContinuousMultilinearMap 𝕜 Ei G) (v : Π i : Fin n, Ei <| castSucc i) (x : Ei (last n)) :
-    continuousMultilinearCurryRightEquiv 𝕜 Ei G f v x = f (snoc v x) :=
-  rfl
-
-@[simp]
-theorem continuousMultilinearCurryRightEquiv_symm_apply
-    (f : ContinuousMultilinearMap 𝕜 (fun i : Fin n => Ei <| castSucc i) (Ei (last n) →L[𝕜] G))
-    (v : Π i, Ei i) :
-    (continuousMultilinearCurryRightEquiv 𝕜 Ei G).symm f v = f (init v) (v (last n)) :=
-  rfl
-
-@[simp]
-theorem continuousMultilinearCurryRightEquiv_apply'
-    (f : G[×n.succ]→L[𝕜] G') (v : Fin n → G) (x : G) :
-    continuousMultilinearCurryRightEquiv' 𝕜 n G G' f v x = f (snoc v x) :=
-  rfl
-
-@[simp]
-theorem continuousMultilinearCurryRightEquiv_symm_apply'
-    (f : G[×n]→L[𝕜] G →L[𝕜] G') (v : Fin (n + 1) → G) :
-    (continuousMultilinearCurryRightEquiv' 𝕜 n G G').symm f v = f (init v) (v (last n)) :=
-  rfl
-
-@[simp]
 theorem ContinuousMultilinearMap.curryRight_norm (f : ContinuousMultilinearMap 𝕜 Ei G) :
     ‖f.curryRight‖ = ‖f‖ :=
   (continuousMultilinearCurryRightEquiv 𝕜 Ei G).norm_map f
@@ -321,15 +286,6 @@ def ContinuousMultilinearMap.uncurry0 (x : G') : G[×0]→L[𝕜] G' :=
   ContinuousMultilinearMap.constOfIsEmpty 𝕜 _ x
 
 variable (𝕜) in
-
-@[simp]
-theorem ContinuousMultilinearMap.uncurry0_apply (x : G') (m : Fin 0 → G) :
-    ContinuousMultilinearMap.uncurry0 𝕜 G x m = x :=
-  rfl
-
-@[simp]
-theorem ContinuousMultilinearMap.curry0_apply (f : G[×0]→L[𝕜] G') : f.curry0 = f 0 :=
-  rfl
 
 @[simp]
 theorem ContinuousMultilinearMap.apply_zero_uncurry0 (f : G[×0]→L[𝕜] G') {x : Fin 0 → G} :
@@ -378,16 +334,6 @@ def continuousMultilinearCurryFin0 : (G[×0]→L[𝕜] G') ≃ₗᵢ[𝕜] G' wh
 
 variable {𝕜 G G'}
 
-@[simp]
-theorem continuousMultilinearCurryFin0_apply (f : G[×0]→L[𝕜] G') :
-    continuousMultilinearCurryFin0 𝕜 G G' f = f 0 :=
-  rfl
-
-@[simp]
-theorem continuousMultilinearCurryFin0_symm_apply (x : G') (v : Fin 0 → G) :
-    (continuousMultilinearCurryFin0 𝕜 G G').symm x v = x :=
-  rfl
-
 end
 
 /-! #### With 1 variable -/
@@ -399,16 +345,6 @@ def continuousMultilinearCurryFin1 : (G[×1]→L[𝕜] G') ≃ₗᵢ[𝕜] G →
     (continuousMultilinearCurryFin0 𝕜 G (G →L[𝕜] G'))
 
 variable {𝕜 G G'}
-
-@[simp]
-theorem continuousMultilinearCurryFin1_apply (f : G[×1]→L[𝕜] G') (x : G) :
-    continuousMultilinearCurryFin1 𝕜 G G' f x = f (Fin.snoc 0 x) :=
-  rfl
-
-@[simp]
-theorem continuousMultilinearCurryFin1_symm_apply (f : G →L[𝕜] G') (v : Fin 1 → G) :
-    (continuousMultilinearCurryFin1 𝕜 G G').symm f v = f (v 0) :=
-  rfl
 
 namespace ContinuousMultilinearMap
 
@@ -438,11 +374,6 @@ def currySum (f : ContinuousMultilinearMap 𝕜 (fun _ : ι ⊕ ι' => G) G') :
   MultilinearMap.mkContinuousMultilinear (MultilinearMap.currySum f.toMultilinearMap) ‖f‖
     fun m m' => by simpa [Fintype.prod_sum_type, mul_assoc] using f.le_opNorm (Sum.elim m m')
 
-@[simp]
-theorem currySum_apply (f : ContinuousMultilinearMap 𝕜 (fun _ : ι ⊕ ι' => G) G') (m : ι → G)
-    (m' : ι' → G) : f.currySum m m' = f (Sum.elim m m') :=
-  rfl
-
 def uncurrySum (f : ContinuousMultilinearMap 𝕜 (fun _ : ι => G)
     (ContinuousMultilinearMap 𝕜 (fun _ : ι' => G) G')) :
     ContinuousMultilinearMap 𝕜 (fun _ : ι ⊕ ι' => G) G' :=
@@ -450,12 +381,6 @@ def uncurrySum (f : ContinuousMultilinearMap 𝕜 (fun _ : ι => G)
     (toMultilinearMapLinear.compMultilinearMap f.toMultilinearMap).uncurrySum ‖f‖ fun m => by
     simpa [Fintype.prod_sum_type, mul_assoc] using
       (f (m ∘ Sum.inl)).le_of_opNorm_le (f.le_opNorm _) (m ∘ Sum.inr)
-
-@[simp]
-theorem uncurrySum_apply (f : ContinuousMultilinearMap 𝕜 (fun _ : ι => G)
-    (ContinuousMultilinearMap 𝕜 (fun _ : ι' => G) G'))
-    (m : ι ⊕ ι' → G) : f.uncurrySum m = f (m ∘ Sum.inl) (m ∘ Sum.inr) :=
-  rfl
 
 variable (𝕜 ι ι' G G')
 
@@ -493,30 +418,11 @@ def curryFinFinset {k l n : ℕ} {s : Finset (Fin n)} (hk : #s = k) (hl : #sᶜ 
 
 variable {𝕜 G G'}
 
-@[simp]
-theorem curryFinFinset_apply (hk : #s = k) (hl : #sᶜ = l) (f : G[×n]→L[𝕜] G')
-    (mk : Fin k → G) (ml : Fin l → G) : curryFinFinset 𝕜 G G' hk hl f mk ml =
-      f fun i => Sum.elim mk ml ((finSumEquivOfFinset hk hl).symm i) :=
-  rfl
-
-@[simp]
-theorem curryFinFinset_symm_apply (hk : #s = k) (hl : #sᶜ = l)
-    (f : G[×k]→L[𝕜] G[×l]→L[𝕜] G') (m : Fin n → G) : (curryFinFinset 𝕜 G G' hk hl).symm f m =
-      f (fun i => m <| finSumEquivOfFinset hk hl (Sum.inl i)) fun i =>
-        m <| finSumEquivOfFinset hk hl (Sum.inr i) :=
-  rfl
-
 theorem curryFinFinset_symm_apply_piecewise_const (hk : #s = k) (hl : #sᶜ = l)
     (f : G[×k]→L[𝕜] G[×l]→L[𝕜] G') (x y : G) :
     (curryFinFinset 𝕜 G G' hk hl).symm f (s.piecewise (fun _ => x) fun _ => y) =
       f (fun _ => x) fun _ => y :=
   MultilinearMap.curryFinFinset_symm_apply_piecewise_const hk hl _ x y
-
-@[simp]
-theorem curryFinFinset_symm_apply_const (hk : #s = k) (hl : #sᶜ = l)
-    (f : G[×k]→L[𝕜] G[×l]→L[𝕜] G') (x : G) :
-    ((curryFinFinset 𝕜 G G' hk hl).symm f fun _ => x) = f (fun _ => x) fun _ => x :=
-  rfl
 
 theorem curryFinFinset_apply_const (hk : #s = k) (hl : #sᶜ = l) (f : G[×n]→L[𝕜] G')
     (x y : G) : (curryFinFinset 𝕜 G G' hk hl f (fun _ => x) fun _ => y) =
@@ -572,8 +478,5 @@ noncomputable def continuousMultilinearMapOption (B : G →L[𝕜] ContinuousMul
     gcongr
     exact norm_fst_le _
   · exact (norm_le_pi_norm _ _).trans (norm_snd_le _)
-
-lemma continuousMultilinearMapOption_apply_eq_self (B : G →L[𝕜] ContinuousMultilinearMap 𝕜 E F)
-    (a : G) (v : Π i, E i) : B.continuousMultilinearMapOption (fun _ ↦ (a, v)) = B a v := rfl
 
 end ContinuousLinearMap

@@ -7,6 +7,8 @@ import Mathlib.Algebra.MvPolynomial.Counit
 import Mathlib.Algebra.MvPolynomial.Invertible
 import Mathlib.RingTheory.WittVector.Defs
 
+noncomputable section
+
 /-!
 # Witt vectors
 
@@ -74,21 +76,14 @@ theorem surjective (f : α → β) (hf : Surjective f) : Surjective (mapFun f : 
     by ext n; simp only [mapFun, coeff_mk, comp_apply, Classical.choose_spec (hf (x.coeff n))]⟩
 
 macro "map_fun_tac" : tactic => `(tactic| (
-
   ext n
-
   simp only [mapFun, mk, comp_apply, zero_coeff, map_zero,
-
+    -- Porting note: the lemmas on the next line do not have the `simp` tag in mathlib4
     add_coeff, sub_coeff, mul_coeff, neg_coeff, nsmul_coeff, zsmul_coeff, pow_coeff,
-
     peval, map_aeval, algebraMap_int_eq, coe_eval₂Hom] <;>
-
   try { cases n <;> simp <;> done } <;>  -- Porting note: this line solves `one`
-
   apply eval₂Hom_congr (RingHom.ext_int _ _) _ rfl <;>
-
   ext ⟨i, k⟩ <;>
-
     fin_cases i <;> rfl))
 
 variable [Fact p.Prime]
@@ -138,23 +133,14 @@ section Tactic
 open Lean Elab Tactic
 
 elab "ghost_fun_tac" φ:term "," fn:term : tactic => do
-
   evalTactic (← `(tactic| (
-
   ext n
-
   have := congr_fun (congr_arg (@peval R _ _) (wittStructureInt_prop p $φ n)) $fn
-
   simp only [wittZero, OfNat.ofNat, Zero.zero, wittOne, One.one,
-
     HAdd.hAdd, Add.add, HSub.hSub, Sub.sub, Neg.neg, HMul.hMul, Mul.mul,HPow.hPow, Pow.pow,
-
     wittNSMul, wittZSMul, HSMul.hSMul, SMul.smul]
-
   simpa (config := { unfoldPartialApp := true }) [WittVector.ghostFun, aeval_rename, aeval_bind₁,
-
     comp, uncurry, peval, eval] using this
-
   )))
 
 end Tactic
@@ -265,10 +251,6 @@ theorem map_injective (f : R →+* S) (hf : Injective f) : Injective (map f : �
 theorem map_surjective (f : R →+* S) (hf : Surjective f) : Surjective (map f : 𝕎 R → 𝕎 S) :=
   mapFun.surjective f hf
 
-@[simp]
-theorem map_coeff (f : R →+* S) (x : 𝕎 R) (n : ℕ) : (map f x).coeff n = f (x.coeff n) :=
-  rfl
-
 def ghostMap : 𝕎 R →+* ℕ → R where
   toFun := ghostFun
   map_zero' := ghostFun_zero
@@ -279,13 +261,6 @@ def ghostMap : 𝕎 R →+* ℕ → R where
 def ghostComponent (n : ℕ) : 𝕎 R →+* R :=
   (Pi.evalRingHom _ n).comp ghostMap
 
-theorem ghostComponent_apply (n : ℕ) (x : 𝕎 R) : ghostComponent n x = aeval x.coeff (W_ ℤ n) :=
-  rfl
-
-@[simp]
-theorem ghostMap_apply (x : 𝕎 R) (n : ℕ) : ghostMap x n = ghostComponent n x :=
-  rfl
-
 section Invertible
 
 variable (p R)
@@ -294,10 +269,6 @@ variable [Invertible (p : R)]
 
 def ghostEquiv : 𝕎 R ≃+* (ℕ → R) :=
   { (ghostMap : 𝕎 R →+* ℕ → R), ghostEquiv' p R with }
-
-@[simp]
-theorem ghostEquiv_coe : (ghostEquiv p R : 𝕎 R →+* ℕ → R) = ghostMap :=
-  rfl
 
 theorem ghostMap.bijective_of_invertible : Function.Bijective (ghostMap : 𝕎 R → ℕ → R) :=
   (ghostEquiv p R).bijective

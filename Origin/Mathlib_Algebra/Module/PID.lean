@@ -9,6 +9,8 @@ import Mathlib.Algebra.Module.Projective
 import Mathlib.Algebra.Category.ModuleCat.Biproducts
 import Mathlib.RingTheory.SimpleModule
 
+noncomputable section
+
 /-!
 # Structure of finitely generated modules over a PID
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.CommSq
 
+noncomputable section
+
 /-!
 
 # HomLift
@@ -40,7 +42,6 @@ class Functor.IsHomLift {R S : 𝒮} {a b : 𝒳} (f : R ⟶ S) (φ : a ⟶ b) :
   cond : IsHomLiftAux p f φ
 
 macro "subst_hom_lift" p:term:max f:term:max φ:term:max : tactic =>
-
   `(tactic| obtain ⟨⟩ := Functor.IsHomLift.cond (p := $p) (f := $f) (φ := $φ))
 
 @[simp]

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 
 # Galois connections between preorders are adjunctions.

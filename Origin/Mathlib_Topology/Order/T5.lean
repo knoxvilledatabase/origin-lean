@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Set.OrdConnectedComponent
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Linear order is a completely normal Hausdorff topological space
 

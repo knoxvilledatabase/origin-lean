@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Shift/Induced.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Shift.CommShift
+
+noncomputable section
 
 /-!
 # Shift induced from a category to another
@@ -53,7 +55,13 @@ lemma zero_hom_app_obj (X : C) :
     ((whiskeringLeft C D D).obj F).map_preimage _
   exact (NatTrans.congr_app h X).trans (by simp)
 
--- DISSOLVED: zero_inv_app_obj
+@[simp]
+lemma zero_inv_app_obj (X : C) :
+    (zero F s i).inv.app (F.obj X) =
+      F.map ((shiftFunctorZero C A).inv.app X) ≫ (i 0).inv.app X := by
+  have h : whiskerLeft F (zero F s i).inv = _ :=
+    ((whiskeringLeft C D D).obj F).map_preimage _
+  exact (NatTrans.congr_app h X).trans (by simp)
 
 @[simp]
 lemma add_hom_app_obj (a b : A) (X : C) :
@@ -213,10 +221,5 @@ def Functor.CommShift.ofInduced :
         erw [← Functor.map_comp_assoc, Iso.inv_hom_id_app, Functor.map_id,
           Category.id_comp, Iso.inv_hom_id_app_assoc, ← F.map_comp_assoc, Iso.hom_inv_id_app,
           F.map_id, Category.id_comp] }
-
-lemma Functor.commShiftIso_eq_ofInduced (a : A) :
-    letI := HasShift.induced F A s i
-    letI := Functor.CommShift.ofInduced F A s i
-    F.commShiftIso a = (i a).symm := rfl
 
 end CategoryTheory

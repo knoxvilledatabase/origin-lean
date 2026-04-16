@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Basic.lean
-Genuine: 7 | Conflates: 3 | Dissolved: 6 | Infrastructure: 8
+Genuine: 8 | Conflates: 3 | Dissolved: 5 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Hom.Defs
 import Mathlib.Algebra.GroupWithZero.NeZero
 import Mathlib.Algebra.Opposites
 import Mathlib.Algebra.Ring.Defs
+
+noncomputable section
 
 /-!
 # Semirings and rings
@@ -45,24 +47,10 @@ def mulLeft [NonUnitalNonAssocSemiring R] (r : R) : R →+ R where
   map_zero' := mul_zero r
   map_add' := mul_add r
 
-@[simp]
-theorem coe_mulLeft [NonUnitalNonAssocSemiring R] (r : R) :
-    (mulLeft r : R → R) = HMul.hMul r :=
-  rfl
-
 def mulRight [NonUnitalNonAssocSemiring R] (r : R) : R →+ R where
   toFun a := a * r
   map_zero' := zero_mul r
   map_add' _ _ := add_mul _ _ r
-
-@[simp]
-theorem coe_mulRight [NonUnitalNonAssocSemiring R] (r : R) :
-    (mulRight r) = (· * r) :=
-  rfl
-
-theorem mulRight_apply [NonUnitalNonAssocSemiring R] (a r : R) :
-    mulRight r a = a * r :=
-  rfl
 
 end AddMonoidHom
 
@@ -120,7 +108,16 @@ variable (α)
 
 -- DISSOLVED: IsLeftCancelMulZero.to_noZeroDivisors
 
--- DISSOLVED: IsRightCancelMulZero.to_noZeroDivisors
+lemma IsRightCancelMulZero.to_noZeroDivisors [NonUnitalNonAssocRing α] [IsRightCancelMulZero α] :
+    NoZeroDivisors α :=
+  { eq_zero_or_eq_zero_of_mul_eq_zero := fun {x y} h ↦ by
+      by_cases hy : y = 0
+      { right
+        exact hy }
+      { left
+        rw [← sub_zero (x * y), ← zero_mul y, ← sub_mul] at h
+        have := (IsRightCancelMulZero.mul_right_cancel_of_ne_zero) hy h
+        rwa [sub_zero] at this } }
 
 instance (priority := 100) NoZeroDivisors.to_isCancelMulZero
     [NonUnitalNonAssocRing α] [NoZeroDivisors α] :

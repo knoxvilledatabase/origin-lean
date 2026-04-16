@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Defs
 import Mathlib.Order.Filter.CountableInter
 import Mathlib.Topology.Basic
 
+noncomputable section
+
 /-!
 # `Gδ` sets
 

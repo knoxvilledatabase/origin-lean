@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Module.Completion
 import Mathlib.Analysis.Normed.Ring.WithAbs
 import Mathlib.NumberTheory.NumberField.Embeddings
 
+noncomputable section
+
 /-!
 # The completion of a number field at an infinite place
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.RingTheory.Kaehler.Basic
 
+noncomputable section
+
 /-!
 # The differentials of a morphism in the category of commutative rings
 

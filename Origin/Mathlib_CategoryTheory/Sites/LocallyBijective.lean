@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.LocallySurjective
 import Mathlib.CategoryTheory.Sites.Localization
 
+noncomputable section
+
 /-!
 # Locally bijective morphisms of presheaves
 

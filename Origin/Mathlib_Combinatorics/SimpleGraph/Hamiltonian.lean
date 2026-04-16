@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.List.Count
 import Mathlib.Combinatorics.SimpleGraph.Path
 
+noncomputable section
+
 /-!
 # Hamiltonian Graphs
 

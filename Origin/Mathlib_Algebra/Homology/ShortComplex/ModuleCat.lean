@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.ConcreteCategory
 import Mathlib.Algebra.Category.ModuleCat.Colimits
 
+noncomputable section
+
 /-!
 # Homology and exactness of short complexes of modules
 
@@ -129,10 +131,6 @@ def moduleCatLeftHomologyData : S.LeftHomologyData where
     rw [LinearMap.mem_range]
     apply exists_apply_eq_apply
   hπ := ModuleCat.cokernelIsColimit (ModuleCat.asHom S.moduleCatToCycles)
-
-@[simp]
-lemma moduleCatLeftHomologyData_f' :
-    S.moduleCatLeftHomologyData.f' = S.moduleCatToCycles := rfl
 
 instance : Epi S.moduleCatHomologyπ :=
   (inferInstance : Epi S.moduleCatLeftHomologyData.π)

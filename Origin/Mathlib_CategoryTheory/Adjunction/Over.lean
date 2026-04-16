@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Adjunction/Over.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Mates
 import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 import Mathlib.CategoryTheory.Monad.Products
+
+noncomputable section
 
 /-!
 # Adjunctions related to the over category

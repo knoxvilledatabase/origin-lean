@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Charpoly.ToMatrix
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.RingTheory.Finiteness.TensorProduct
 
+noncomputable section
+
 /-! # The characteristic polynomial of base change -/
 
 @[simp]

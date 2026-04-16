@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Real.Cardinality
 import Mathlib.MeasureTheory.Constructions.Polish.Basic
 
+noncomputable section
+
 /-!
 # A Polish Borel space is measurably equivalent to a set of reals
 -/
@@ -54,7 +56,6 @@ theorem exists_measurableEmbedding_real : ∃ f : α → ℝ, MeasurableEmbeddin
   exact ⟨(↑) ∘ e, (MeasurableEmbedding.subtype_coe hs).comp e.measurableEmbedding⟩
 
 noncomputable
-
 def embeddingReal (Ω : Type*) [MeasurableSpace Ω] [StandardBorelSpace Ω] : Ω → ℝ :=
   (exists_measurableEmbedding_real Ω).choose
 

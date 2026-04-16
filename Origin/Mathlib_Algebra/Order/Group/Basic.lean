@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Group/Basic.lean
-Genuine: 15 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
+Genuine: 18 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
+
+noncomputable section
 
 /-!
 # Lemmas about the interaction of power operations with order
@@ -89,11 +91,22 @@ lemma zpow_le_zpow_iff_left (hn : 0 < n) : a ^ n ≤ b ^ n ↔ a ≤ b :=
 lemma zpow_lt_zpow_iff_left (hn : 0 < n) : a ^ n < b ^ n ↔ a < b :=
   (zpow_left_strictMono α hn).lt_iff_lt
 
--- DISSOLVED: zpow_left_injective
+@[to_additive zsmul_right_injective
+"See also `smul_right_injective`. TODO: provide a `NoZeroSMulDivisors` instance. We can't do
+that here because importing that definition would create import cycles."]
+lemma zpow_left_injective (hn : n ≠ 0) : Injective ((· ^ n) : α → α) := by
+  obtain hn | hn := hn.lt_or_lt
+  · refine fun a b (hab : a ^ n = b ^ n) ↦
+      (zpow_left_strictMono _ <| Int.neg_pos_of_neg hn).injective ?_
+    rw [zpow_neg, zpow_neg, hab]
+  · exact (zpow_left_strictMono _ hn).injective
 
--- DISSOLVED: zpow_left_inj
+@[to_additive zsmul_right_inj]
+lemma zpow_left_inj (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b := (zpow_left_injective hn).eq_iff
 
--- DISSOLVED: zpow_eq_zpow_iff'
+@[to_additive "Alias of `zsmul_right_inj`, for ease of discovery alongside `zsmul_le_zsmul_iff'` and
+`zsmul_lt_zsmul_iff'`."]
+lemma zpow_eq_zpow_iff' (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b := zpow_left_inj hn
 
 variable (α) in
 

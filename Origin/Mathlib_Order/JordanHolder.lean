@@ -10,6 +10,8 @@ import Mathlib.Logic.Equiv.Functor
 import Mathlib.Data.Fintype.Card
 import Mathlib.Order.RelSeries
 
+noncomputable section
+
 /-!
 # Jordan-Hölder Theorem
 

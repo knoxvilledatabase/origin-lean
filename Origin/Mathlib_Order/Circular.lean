@@ -5,6 +5,8 @@ Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Circular order hierarchy
 

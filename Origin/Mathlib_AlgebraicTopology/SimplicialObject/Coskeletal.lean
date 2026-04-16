@@ -7,6 +7,8 @@ import Mathlib.AlgebraicTopology.SimplicialObject.Basic
 import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 import Mathlib.CategoryTheory.Functor.KanExtension.Basic
 
+noncomputable section
+
 /-!
 # Coskeletal simplicial objects
 

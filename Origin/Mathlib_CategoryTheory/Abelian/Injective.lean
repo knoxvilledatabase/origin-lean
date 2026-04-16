@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Preadditive.Yoneda.Limits
 import Mathlib.CategoryTheory.Preadditive.Yoneda.Injective
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 
+noncomputable section
+
 /-!
 # Injective objects in abelian categories
 

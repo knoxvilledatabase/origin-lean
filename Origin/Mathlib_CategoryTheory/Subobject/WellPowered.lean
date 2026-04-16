@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Basic
 import Mathlib.CategoryTheory.EssentiallySmall
 
+noncomputable section
+
 /-!
 # Well-powered categories
 

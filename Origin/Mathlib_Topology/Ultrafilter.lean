@@ -7,6 +7,8 @@ import Mathlib.Order.Filter.Lift
 import Mathlib.Topology.Basic
 import Mathlib.Order.Filter.Ultrafilter
 
+noncomputable section
+
 /-! # Characterization of basic topological properties in terms of ultrafilters -/
 
 open Set Filter Topology

@@ -10,6 +10,8 @@ import Mathlib.Algebra.Opposites
 import Mathlib.Data.Int.Cast.Defs
 import Mathlib.Tactic.Spread
 
+noncomputable section
+
 /-!
 # Group structures on the multiplicative and additive opposites
 -/
@@ -187,51 +189,13 @@ section Monoid
 
 variable [Monoid α]
 
-@[simp] lemma op_pow (x : α) (n : ℕ) : op (x ^ n) = op x ^ n := rfl
-
-@[simp] lemma unop_pow (x : αᵐᵒᵖ) (n : ℕ) : unop (x ^ n) = unop x ^ n := rfl
-
 end Monoid
 
 section DivInvMonoid
 
 variable [DivInvMonoid α]
 
-@[simp] lemma op_zpow (x : α) (z : ℤ) : op (x ^ z) = op x ^ z := rfl
-
-@[simp] lemma unop_zpow (x : αᵐᵒᵖ) (z : ℤ) : unop (x ^ z) = unop x ^ z := rfl
-
 end DivInvMonoid
-
-@[to_additive (attr := simp, norm_cast)]
-theorem op_natCast [NatCast α] (n : ℕ) : op (n : α) = n :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem op_ofNat [NatCast α] (n : ℕ) [n.AtLeastTwo] :
-    op (no_index (OfNat.ofNat n : α)) = OfNat.ofNat n :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem op_intCast [IntCast α] (n : ℤ) : op (n : α) = n :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem unop_natCast [NatCast α] (n : ℕ) : unop (n : αᵐᵒᵖ) = n :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem unop_ofNat [NatCast α] (n : ℕ) [n.AtLeastTwo] :
-    unop (no_index (OfNat.ofNat n : αᵐᵒᵖ)) = OfNat.ofNat n :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem unop_intCast [IntCast α] (n : ℤ) : unop (n : αᵐᵒᵖ) = n :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem unop_div [DivInvMonoid α] (x y : αᵐᵒᵖ) : unop (x / y) = (unop y)⁻¹ * unop x :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem op_div [DivInvMonoid α] (x y : α) : op (x / y) = (op y)⁻¹ * op x := by simp [div_eq_mul_inv]
@@ -280,9 +244,6 @@ attribute [nolint simpComm] AddOpposite.addCommute_unop
 def opAddEquiv [Add α] : α ≃+ αᵐᵒᵖ :=
   { opEquiv with map_add' := fun _ _ => rfl }
 
-@[simp]
-theorem opAddEquiv_toEquiv [Add α] : ((opAddEquiv : α ≃+ αᵐᵒᵖ) : α ≃ αᵐᵒᵖ) = opEquiv := rfl
-
 end MulOpposite
 
 /-!
@@ -306,14 +267,6 @@ instance instMulOneClass [MulOneClass α] : MulOneClass αᵃᵒᵖ :=
   unop_injective.mulOneClass _ (by exact rfl) fun _ _ => rfl
 
 instance pow {β} [Pow α β] : Pow αᵃᵒᵖ β where pow a b := op (unop a ^ b)
-
-@[simp]
-theorem op_pow {β} [Pow α β] (a : α) (b : β) : op (a ^ b) = op a ^ b :=
-  rfl
-
-@[simp]
-theorem unop_pow {β} [Pow α β] (a : αᵃᵒᵖ) (b : β) : unop (a ^ b) = unop a ^ b :=
-  rfl
 
 instance instMonoid [Monoid α] : Monoid αᵃᵒᵖ :=
   unop_injective.monoid _ (by exact rfl) (fun _ _ => rfl) fun _ _ => rfl
@@ -350,10 +303,6 @@ instance instAddCommGroupWithOne [AddCommGroupWithOne α] : AddCommGroupWithOne 
 @[simps! (config := { fullyApplied := false, simpRhs := true })]
 def opMulEquiv [Mul α] : α ≃* αᵃᵒᵖ :=
   { opEquiv with map_mul' := fun _ _ => rfl }
-
-@[simp]
-theorem opMulEquiv_toEquiv [Mul α] : ((opMulEquiv : α ≃* αᵃᵒᵖ) : α ≃ αᵃᵒᵖ) = opEquiv :=
-  rfl
 
 end AddOpposite
 

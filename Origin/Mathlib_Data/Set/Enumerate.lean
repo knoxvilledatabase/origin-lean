@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Tactic.Common
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Set enumeration
 This file allows enumeration of sets given a choice function.

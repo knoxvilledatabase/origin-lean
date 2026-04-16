@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Group.Synonym
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Algebra.Order.Monoid.Canonical.Defs
 
+noncomputable section
+
 /-!
 # Support of a function in an order
 

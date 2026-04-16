@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.PFunctor.Multivariate.Basic
 import Mathlib.Data.QPF.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # Dependent product and sum of QPFs are QPFs
 -/

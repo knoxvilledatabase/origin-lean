@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Sequences
 import Mathlib.Topology.MetricSpace.Bounded
 
+noncomputable section
+
 /-!
 # Sequential compacts in metric spaces
 

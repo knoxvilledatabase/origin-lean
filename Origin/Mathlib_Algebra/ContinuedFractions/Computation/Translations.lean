@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/ContinuedFractions/Computation/Translations.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 5 | Infrastructure: 3
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Computation.Basic
 import Mathlib.Algebra.ContinuedFractions.Translations
+
+noncomputable section
 
 /-!
 # Basic Translation Lemmas Between Structures Defined for Computing Continued Fractions
@@ -70,9 +72,16 @@ theorem succ_nth_stream_eq_none_iff :
   rw [IntFractPair.stream]
   cases IntFractPair.stream v n <;> simp [imp_false]
 
--- DISSOLVED: succ_nth_stream_eq_some_iff
+theorem succ_nth_stream_eq_some_iff {ifp_succ_n : IntFractPair K} :
+    IntFractPair.stream v (n + 1) = some ifp_succ_n ↔
+      ∃ ifp_n : IntFractPair K,
+        IntFractPair.stream v n = some ifp_n ∧
+          ifp_n.fr ≠ 0 ∧ IntFractPair.of ifp_n.fr⁻¹ = ifp_succ_n := by
+  simp [IntFractPair.stream, ite_eq_iff, Option.bind_eq_some]
 
--- DISSOLVED: stream_succ_of_some
+theorem stream_succ_of_some {p : IntFractPair K} (h : IntFractPair.stream v n = some p)
+    (h' : p.fr ≠ 0) : IntFractPair.stream v (n + 1) = some (IntFractPair.of p.fr⁻¹) :=
+  succ_nth_stream_eq_some_iff.mpr ⟨p, h, h', rfl⟩
 
 theorem stream_succ_of_int (a : ℤ) (n : ℕ) : IntFractPair.stream (a : K) (n + 1) = none := by
   induction n with
@@ -92,7 +101,22 @@ theorem exists_succ_nth_stream_of_fr_zero {ifp_succ_n : IntFractPair K}
   refine ⟨ifp_n, seq_nth_eq, ?_⟩
   simpa only [IntFractPair.of, Int.fract, sub_eq_zero] using succ_nth_fr_eq_zero
 
--- DISSOLVED: stream_succ
+theorem stream_succ (h : Int.fract v ≠ 0) (n : ℕ) :
+    IntFractPair.stream v (n + 1) = IntFractPair.stream (Int.fract v)⁻¹ n := by
+  induction n with
+  | zero =>
+    have H : (IntFractPair.of v).fr = Int.fract v := rfl
+    rw [stream_zero, stream_succ_of_some (stream_zero v) (ne_of_eq_of_ne H h), H]
+  | succ n ih =>
+    rcases eq_or_ne (IntFractPair.stream (Int.fract v)⁻¹ n) none with hnone | hsome
+    · rw [hnone] at ih
+      rw [succ_nth_stream_eq_none_iff.mpr (Or.inl hnone),
+        succ_nth_stream_eq_none_iff.mpr (Or.inl ih)]
+    · obtain ⟨p, hp⟩ := Option.ne_none_iff_exists'.mp hsome
+      rw [hp] at ih
+      rcases eq_or_ne p.fr 0 with hz | hnz
+      · rw [stream_eq_none_of_fr_eq_zero hp hz, stream_eq_none_of_fr_eq_zero ih hz]
+      · rw [stream_succ_of_some hp hnz, stream_succ_of_some ih hnz]
 
 end IntFractPair
 
@@ -105,10 +129,6 @@ Here we state some lemmas that show us that the head term of the computed contin
 value `v` is `⌊v⌋` and how this head term is moved along the structures used in the computation
 process.
 -/
-
-@[simp]
-theorem IntFractPair.seq1_fst_eq_of : (IntFractPair.seq1 v).fst = IntFractPair.of v :=
-  rfl
 
 theorem of_h_eq_intFractPair_seq1_fst_b : (of v).h = (IntFractPair.seq1 v).fst.b := by
   cases aux_seq_eq : IntFractPair.seq1 v
@@ -180,7 +200,15 @@ theorem get?_of_eq_some_of_succ_get?_intFractPair_stream {ifp_succ_n : IntFractP
   unfold of IntFractPair.seq1
   simp [Stream'.Seq.map_tail, Stream'.Seq.get?_tail, Stream'.Seq.map_get?, stream_succ_nth_eq]
 
--- DISSOLVED: get?_of_eq_some_of_get?_intFractPair_stream_fr_ne_zero
+theorem get?_of_eq_some_of_get?_intFractPair_stream_fr_ne_zero {ifp_n : IntFractPair K}
+    (stream_nth_eq : IntFractPair.stream v n = some ifp_n) (nth_fr_ne_zero : ifp_n.fr ≠ 0) :
+    (of v).s.get? n = some ⟨1, (IntFractPair.of ifp_n.fr⁻¹).b⟩ :=
+  have : IntFractPair.stream v (n + 1) = some (IntFractPair.of ifp_n.fr⁻¹) := by
+    cases ifp_n
+    simp only [IntFractPair.stream, Nat.add_eq, add_zero, stream_nth_eq, Option.some_bind,
+      ite_eq_right_iff]
+    intro; contradiction
+  get?_of_eq_some_of_succ_get?_intFractPair_stream this
 
 open Int IntFractPair
 
@@ -193,7 +221,10 @@ theorem of_s_head_aux (v : K) : (of v).s.get? 0 = (IntFractPair.stream v 1).bind
   rw [← Stream'.get_succ, Stream'.get, Option.map.eq_def]
   split <;> simp_all only [Option.some_bind, Option.none_bind, Function.comp_apply]
 
--- DISSOLVED: of_s_head
+theorem of_s_head (h : fract v ≠ 0) : (of v).s.head = some ⟨1, ⌊(fract v)⁻¹⌋⟩ := by
+  change (of v).s.get? 0 = _
+  rw [of_s_head_aux, stream_succ_of_some (stream_zero v) h, Option.bind]
+  rfl
 
 variable (K)
 

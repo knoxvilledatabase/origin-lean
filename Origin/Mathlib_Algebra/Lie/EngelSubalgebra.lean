@@ -9,6 +9,8 @@ import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Algebra.Lie.Subalgebra
 import Mathlib.Data.Finset.NatAntidiagonal
 
+noncomputable section
+
 /-!
 # Engel subalgebras
 

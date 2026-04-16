@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.RingTheory.Ideal.Defs
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # The lattice of ideals in a ring
 

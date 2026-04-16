@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Field.IsField
 import Mathlib.Algebra.GroupWithZero.Hom
 
+noncomputable section
+
 /-!
 # If a semiring is a field, any isomorphic semiring is also a field.
 

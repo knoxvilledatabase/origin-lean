@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Presheaf
 import Mathlib.CategoryTheory.Filtered.Small
 import Mathlib.CategoryTheory.ClosedUnderIsomorphisms
 
+noncomputable section
+
 /-!
 # Ind-objects
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/RingedSpace/LocallyRingedSpace/ResidueField.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
+
+noncomputable section
 
 /-!
 
@@ -54,7 +56,9 @@ lemma evaluation_eq_zero_iff_not_mem_basicOpen (x : U) (f : X.presheaf.obj (op U
   rw [X.toRingedSpace.mem_basicOpen f x.1 x.2, ← not_iff_not, not_not]
   exact (IsLocalRing.residue_ne_zero_iff_isUnit _)
 
--- DISSOLVED: evaluation_ne_zero_iff_mem_basicOpen
+lemma evaluation_ne_zero_iff_mem_basicOpen (x : U) (f : X.presheaf.obj (op U)) :
+    X.evaluation x f ≠ 0 ↔ x.val ∈ X.toRingedSpace.basicOpen f := by
+  simp
 
 lemma basicOpen_eq_bot_iff_forall_evaluation_eq_zero (f : X.presheaf.obj (op U)) :
     X.toRingedSpace.basicOpen f = ⊥ ↔ ∀ (x : U), X.evaluation x f = 0 := by
@@ -67,7 +71,9 @@ lemma Γevaluation_eq_zero_iff_not_mem_basicOpen (x : X) (f : X.presheaf.obj (op
     X.Γevaluation x f = 0 ↔ x ∉ X.toRingedSpace.basicOpen f :=
   evaluation_eq_zero_iff_not_mem_basicOpen X ⟨x, show x ∈ ⊤ by trivial⟩ f
 
--- DISSOLVED: Γevaluation_ne_zero_iff_mem_basicOpen
+lemma Γevaluation_ne_zero_iff_mem_basicOpen (x : X) (f : X.presheaf.obj (op ⊤)) :
+    X.Γevaluation x f ≠ 0 ↔ x ∈ X.toRingedSpace.basicOpen f :=
+  evaluation_ne_zero_iff_mem_basicOpen X ⟨x, show x ∈ ⊤ by trivial⟩ f
 
 variable {X Y : LocallyRingedSpace.{u}} (f : X ⟶ Y) (x : X)
 

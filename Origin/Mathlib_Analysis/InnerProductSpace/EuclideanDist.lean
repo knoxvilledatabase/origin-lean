@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/InnerProductSpace/EuclideanDist.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Calculus
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
+
+noncomputable section
 
 /-!
 # Euclidean distance on a finite dimensional space
@@ -72,7 +74,9 @@ nonrec theorem isCompact_closedBall {x : E} {r : ℝ} : IsCompact (closedBall x 
 theorem isClosed_closedBall {x : E} {r : ℝ} : IsClosed (closedBall x r) :=
   isCompact_closedBall.isClosed
 
--- DISSOLVED: closure_ball
+nonrec theorem closure_ball (x : E) {r : ℝ} (h : r ≠ 0) : closure (ball x r) = closedBall x r := by
+  rw [ball_eq_preimage, ← toEuclidean.preimage_closure, closure_ball (toEuclidean x) h,
+    closedBall_eq_preimage]
 
 nonrec theorem exists_pos_lt_subset_ball {R : ℝ} {s : Set E} {x : E} (hR : 0 < R) (hs : IsClosed s)
     (h : s ⊆ ball x R) : ∃ r ∈ Ioo 0 R, s ⊆ ball x r := by

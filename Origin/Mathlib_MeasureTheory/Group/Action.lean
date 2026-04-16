@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Group/Action.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 4 | Infrastructure: 5
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
@@ -10,6 +10,8 @@ import Mathlib.MeasureTheory.Group.MeasurableEquiv
 import Mathlib.MeasureTheory.Measure.Regular
 import Mathlib.MeasureTheory.Group.Defs
 import Mathlib.Order.Filter.EventuallyConst
+
+noncomputable section
 
 /-!
 # Measures invariant under group actions
@@ -247,8 +249,20 @@ variable (G)
 variable [TopologicalSpace α] [ContinuousConstSMul G α] [MulAction.IsMinimal G α] {K U : Set α}
 
 include G in
+/-- If measure `μ` is invariant under a group action and is nonzero on a compact set `K`, then it is
 
--- DISSOLVED: measure_isOpen_pos_of_smulInvariant_of_compact_ne_zero
+positive on any nonempty open set. In case of a regular measure, one can assume `μ ≠ 0` instead of
+
+`μ K ≠ 0`, see `MeasureTheory.measure_isOpen_pos_of_smulInvariant_of_ne_zero`. -/
+
+@[to_additive]
+theorem measure_isOpen_pos_of_smulInvariant_of_compact_ne_zero (hK : IsCompact K) (hμK : μ K ≠ 0)
+    (hU : IsOpen U) (hne : U.Nonempty) : 0 < μ U :=
+  let ⟨t, ht⟩ := hK.exists_finite_cover_smul G hU hne
+  pos_iff_ne_zero.2 fun hμU =>
+    hμK <|
+      measure_mono_null ht <|
+        (measure_biUnion_null_iff t.countable_toSet).2 fun _ _ => by rwa [measure_smul]
 
 include G
 
@@ -262,11 +276,23 @@ theorem isLocallyFiniteMeasure_of_smulInvariant (hU : IsOpen U) (hne : U.Nonempt
 
 variable [Measure.Regular μ]
 
--- DISSOLVED: measure_isOpen_pos_of_smulInvariant_of_ne_zero
+@[to_additive]
+theorem measure_isOpen_pos_of_smulInvariant_of_ne_zero (hμ : μ ≠ 0) (hU : IsOpen U)
+    (hne : U.Nonempty) : 0 < μ U :=
+  let ⟨_K, hK, hμK⟩ := Regular.exists_isCompact_not_null.mpr hμ
+  measure_isOpen_pos_of_smulInvariant_of_compact_ne_zero G hK hμK hU hne
 
--- DISSOLVED: measure_pos_iff_nonempty_of_smulInvariant
+@[to_additive]
+theorem measure_pos_iff_nonempty_of_smulInvariant (hμ : μ ≠ 0) (hU : IsOpen U) :
+    0 < μ U ↔ U.Nonempty :=
+  ⟨fun h => nonempty_of_measure_ne_zero h.ne',
+    measure_isOpen_pos_of_smulInvariant_of_ne_zero G hμ hU⟩
 
--- DISSOLVED: measure_eq_zero_iff_eq_empty_of_smulInvariant
+@[to_additive]
+theorem measure_eq_zero_iff_eq_empty_of_smulInvariant (hμ : μ ≠ 0) (hU : IsOpen U) :
+    μ U = 0 ↔ U = ∅ := by
+  rw [← not_iff_not, ← Ne, ← pos_iff_ne_zero,
+    measure_pos_iff_nonempty_of_smulInvariant G hμ hU, nonempty_iff_ne_empty]
 
 end IsMinimal
 

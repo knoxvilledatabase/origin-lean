@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.RingTheory.Localization.FractionRing
 
+noncomputable section
+
 /-!
 # Localizations of localizations
 
@@ -103,6 +105,13 @@ theorem localization_localization_isLocalization [IsLocalization N T] :
     exists_of_eq := localization_localization_exists_of_eq M N T _ _ }
 
 include M in
+/-- Given submodules `M ⊆ R` and `N ⊆ S = M⁻¹R`, with `f : R →+* S` the localization map, if
+
+`N` contains all the units of `S`, then `N ⁻¹ S = T = (f⁻¹ N) ⁻¹ R`. I.e., the localization of a
+
+localization is a localization.
+
+-/
 
 theorem localization_localization_isLocalization_of_has_all_units [IsLocalization N T]
     (H : ∀ x : S, IsUnit x → x ∈ N) : IsLocalization (N.comap (algebraMap R S)) T := by
@@ -115,6 +124,13 @@ theorem localization_localization_isLocalization_of_has_all_units [IsLocalizatio
   exact H _ (IsLocalization.map_units _ ⟨x, hx⟩)
 
 include M in
+/--
+
+Given a submodule `M ⊆ R` and a prime ideal `p` of `S = M⁻¹R`, with `f : R →+* S` the localization
+
+map, then `T = Sₚ` is the localization of `R` at `f⁻¹(p)`.
+
+-/
 
 theorem isLocalization_isLocalization_atPrime_isLocalization (p : Ideal S) [Hp : p.IsPrime]
     [IsLocalization.AtPrime T p] : IsLocalization.AtPrime T (p.comap (algebraMap R S)) := by

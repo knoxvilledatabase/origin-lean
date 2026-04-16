@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Algebra.Polynomial.Module.AEval
 import Mathlib.RingTheory.Derivation.Basic
 
+noncomputable section
+
 /-!
 # Derivations of univariate polynomials
 
@@ -38,12 +40,6 @@ variable [AddCommMonoid A] [Module R A] [Module (Polynomial R) A]
 @[simp]
 theorem derivation_C (D : Derivation R R[X] A) (a : R) : D (C a) = 0 :=
   D.map_algebraMap a
-
-@[simp]
-theorem C_smul_derivation_apply (D : Derivation R R[X] A) (a : R) (f : R[X]) :
-    C a • D f = a • D f := by
-  have : C a • D f = D (C a * f) := by simp
-  rw [this, C_mul', D.map_smul]
 
 @[ext]
 theorem derivation_ext {D₁ D₂ : Derivation R R[X] A} (h : D₁ X = D₂ X) : D₁ = D₂ :=
@@ -83,13 +79,6 @@ def mkDerivationEquiv : A ≃ₗ[R] Derivation R R[X] A :=
       left_inv := fun _ => derivation_ext <| mkDerivation_X _ _
       right_inv := fun _ => mkDerivation_X _ _ }
 
-@[simp] lemma mkDerivationEquiv_apply (a : A) :
-    mkDerivationEquiv R a = mkDerivation R a := by
-  rfl
-
-@[simp] lemma mkDerivationEquiv_symm_apply (D : Derivation R R[X] A) :
-    (mkDerivationEquiv R).symm D = D X := rfl
-
 end CommSemiring
 
 end Polynomial
@@ -115,11 +104,5 @@ theorem compAEval_eq (d : Derivation R A M) (f : R[X]) :
   congr
   apply derivation_ext
   simp
-
-theorem comp_aeval_eq (d : Derivation R A M) (f : R[X]) :
-    d (aeval a f) = aeval a (derivative f) • d a :=
-  calc
-    _ = (AEval.of R M a).symm (d.compAEval a f) := rfl
-    _ = _ := by simp [-compAEval_apply, compAEval_eq]
 
 end Derivation

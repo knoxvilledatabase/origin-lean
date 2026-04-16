@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Adjunction.Reflective
 import Mathlib.CategoryTheory.Sites.Sheaf
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 
+noncomputable section
+
 /-!
 
 # Sheafification
@@ -78,10 +80,6 @@ noncomputable abbrev sheafify (P : Cᵒᵖ ⥤ D) : Cᵒᵖ ⥤ D :=
 noncomputable abbrev toSheafify (P : Cᵒᵖ ⥤ D) : P ⟶ sheafify J P :=
   sheafificationAdjunction J D |>.unit.app P
 
-@[simp]
-theorem sheafificationAdjunction_unit_app (P : Cᵒᵖ ⥤ D) :
-    (sheafificationAdjunction J D).unit.app P = toSheafify J P := rfl
-
 noncomputable abbrev sheafifyMap {P Q : Cᵒᵖ ⥤ D} (η : P ⟶ Q) : sheafify J P ⟶ sheafify J Q :=
   presheafToSheaf J D |>.map η |>.val
 
@@ -104,18 +102,8 @@ variable (D)
 noncomputable abbrev sheafification : (Cᵒᵖ ⥤ D) ⥤ Cᵒᵖ ⥤ D :=
   presheafToSheaf J D ⋙ sheafToPresheaf J D
 
-theorem sheafification_obj (P : Cᵒᵖ ⥤ D) : (sheafification J D).obj P = sheafify J P :=
-  rfl
-
-theorem sheafification_map {P Q : Cᵒᵖ ⥤ D} (η : P ⟶ Q) :
-    (sheafification J D).map η = sheafifyMap J η :=
-  rfl
-
 noncomputable abbrev toSheafification : 𝟭 _ ⟶ sheafification J D :=
   sheafificationAdjunction J D |>.unit
-
-theorem toSheafification_app (P : Cᵒᵖ ⥤ D) : (toSheafification J D).app P = toSheafify J P :=
-  rfl
 
 variable {D}
 
@@ -132,11 +120,6 @@ theorem isIso_toSheafify {P : Cᵒᵖ ⥤ D} (hP : Presheaf.IsSheaf J P) : IsIso
 noncomputable def isoSheafify {P : Cᵒᵖ ⥤ D} (hP : Presheaf.IsSheaf J P) : P ≅ sheafify J P :=
   letI := isIso_toSheafify J hP
   asIso (toSheafify J P)
-
-@[simp]
-theorem isoSheafify_hom {P : Cᵒᵖ ⥤ D} (hP : Presheaf.IsSheaf J P) :
-    (isoSheafify J hP).hom = toSheafify J P :=
-  rfl
 
 noncomputable def sheafifyLift {P Q : Cᵒᵖ ⥤ D} (η : P ⟶ Q) (hQ : Presheaf.IsSheaf J Q) :
     sheafify J P ⟶ Q :=

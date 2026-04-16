@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Measure/Typeclasses.lean
-Genuine: 170 | Conflates: 0 | Dissolved: 6 | Infrastructure: 57
+Genuine: 175 | Conflates: 0 | Dissolved: 0 | Infrastructure: 58
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Restrict
+
+noncomputable section
 
 /-!
 # Classes of measures
@@ -86,10 +88,6 @@ instance (priority := 50) isFiniteMeasureOfIsEmpty [IsEmpty α] : IsFiniteMeasur
   rw [eq_zero_of_isEmpty μ]
   infer_instance
 
-@[simp]
-theorem measureUnivNNReal_zero : measureUnivNNReal (0 : Measure α) = 0 :=
-  rfl
-
 instance isFiniteMeasureAdd [IsFiniteMeasure μ] [IsFiniteMeasure ν] : IsFiniteMeasure (μ + ν) where
   measure_univ_lt_top := by
     rw [Measure.coe_add, Pi.add_apply, ENNReal.add_lt_top]
@@ -134,7 +132,9 @@ theorem measureUnivNNReal_eq_zero [IsFiniteMeasure μ] : measureUnivNNReal μ = 
   rw [← MeasureTheory.Measure.measure_univ_eq_zero, ← coe_measureUnivNNReal]
   norm_cast
 
--- DISSOLVED: measureUnivNNReal_pos
+theorem measureUnivNNReal_pos [IsFiniteMeasure μ] (hμ : μ ≠ 0) : 0 < measureUnivNNReal μ := by
+  contrapose! hμ
+  simpa [measureUnivNNReal_eq_zero, Nat.le_zero] using hμ
 
 theorem Measure.le_of_add_le_add_left [IsFiniteMeasure μ] (A2 : μ + ν₁ ≤ μ + ν₂) : ν₁ ≤ ν₂ :=
   fun S => ENNReal.le_of_add_le_add_left (MeasureTheory.measure_ne_top μ S) (A2 S)
@@ -252,7 +252,8 @@ instance (priority := 100) (μ : Measure α) [IsProbabilityMeasure μ] :
     IsZeroOrProbabilityMeasure μ :=
   ⟨Or.inr measure_univ⟩
 
--- DISSOLVED: IsProbabilityMeasure.ne_zero
+theorem IsProbabilityMeasure.ne_zero (μ : Measure α) [IsProbabilityMeasure μ] : μ ≠ 0 :=
+  mt measure_univ_eq_zero.2 <| by simp [measure_univ]
 
 instance (priority := 100) IsProbabilityMeasure.neZero (μ : Measure α) [IsProbabilityMeasure μ] :
     NeZero μ := ⟨IsProbabilityMeasure.ne_zero μ⟩
@@ -532,6 +533,7 @@ instance isFiniteMeasure_sfiniteSeq [h : SFinite μ] (n : ℕ) : IsFiniteMeasure
   h.1.choose_spec.1 n
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-10-11")]
 
 instance isFiniteMeasure_sFiniteSeq [SFinite μ] (n : ℕ) : IsFiniteMeasure (sFiniteSeq μ n) :=
   isFiniteMeasure_sfiniteSeq n
@@ -713,8 +715,6 @@ theorem finite_const_le_meas_of_disjoint_iUnion {ι : Type*} [MeasurableSpace α
     Set.Finite { i : ι | ε ≤ μ (As i) } :=
   finite_const_le_meas_of_disjoint_iUnion₀ μ ε_pos (fun i ↦ (As_mble i).nullMeasurableSet)
     (fun _ _ h ↦ Disjoint.aedisjoint (As_disj h)) Union_As_finite
-
--- DISSOLVED: _root_.Set.Infinite.meas_eq_top
 
 theorem countable_meas_pos_of_disjoint_of_meas_iUnion_ne_top₀ {ι : Type*} {_ : MeasurableSpace α}
     (μ : Measure α) {As : ι → Set α} (As_mble : ∀ i : ι, NullMeasurableSet (As i) μ)
@@ -1175,11 +1175,19 @@ instance (priority := 100) isLocallyFiniteMeasure_of_isFiniteMeasureOnCompacts [
     let ⟨K, K_compact, K_mem⟩ := exists_compact_mem_nhds x
     ⟨K, K_mem, K_compact.measure_lt_top⟩⟩
 
--- DISSOLVED: exists_pos_measure_of_cover
+theorem exists_pos_measure_of_cover [Countable ι] {U : ι → Set α} (hU : ⋃ i, U i = univ)
+    (hμ : μ ≠ 0) : ∃ i, 0 < μ (U i) := by
+  contrapose! hμ with H
+  rw [← measure_univ_eq_zero, ← hU]
+  exact measure_iUnion_null fun i => nonpos_iff_eq_zero.1 (H i)
 
--- DISSOLVED: exists_pos_preimage_ball
+theorem exists_pos_preimage_ball [PseudoMetricSpace δ] (f : α → δ) (x : δ) (hμ : μ ≠ 0) :
+    ∃ n : ℕ, 0 < μ (f ⁻¹' Metric.ball x n) :=
+  exists_pos_measure_of_cover (by rw [← preimage_iUnion, Metric.iUnion_ball_nat, preimage_univ]) hμ
 
--- DISSOLVED: exists_pos_ball
+theorem exists_pos_ball [PseudoMetricSpace α] (x : α) (hμ : μ ≠ 0) :
+    ∃ n : ℕ, 0 < μ (Metric.ball x n) :=
+  exists_pos_preimage_ball id x hμ
 
 alias null_of_locally_null := measure_null_of_locally_null
 
@@ -1229,10 +1237,6 @@ protected def FiniteSpanningSetsIn.disjointed {μ : Measure α}
   ⟨disjointed S.set, MeasurableSet.disjointed S.set_mem, fun n =>
     lt_of_le_of_lt (measure_mono (disjointed_subset S.set n)) (S.finite _),
     S.spanning ▸ iUnion_disjointed⟩
-
-theorem FiniteSpanningSetsIn.disjointed_set_eq {μ : Measure α}
-    (S : μ.FiniteSpanningSetsIn { s | MeasurableSet s }) : S.disjointed.set = disjointed S.set :=
-  rfl
 
 theorem exists_eq_disjoint_finiteSpanningSetsIn (μ ν : Measure α) [SigmaFinite μ] [SigmaFinite ν] :
     ∃ (S : μ.FiniteSpanningSetsIn { s | MeasurableSet s })

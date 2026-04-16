@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Groupoid
 import Mathlib.CategoryTheory.PathCategory.Basic
 
+noncomputable section
+
 /-!
 # Free groupoid on a quiver
 

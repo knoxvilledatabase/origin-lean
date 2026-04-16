@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Density.lean
-Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Basic
@@ -11,6 +11,8 @@ import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 # Edge density
@@ -274,10 +276,6 @@ lemma interedges_def (s t : Finset α) : G.interedges s t = {e ∈ s ×ˢ t | G.
 
 lemma edgeDensity_def (s t : Finset α) : G.edgeDensity s t = #(G.interedges s t) / (#s * #t) := rfl
 
-theorem card_interedges_div_card (s t : Finset α) :
-    (#(G.interedges s t) : ℚ) / (#s * #t) = G.edgeDensity s t :=
-  rfl
-
 theorem mem_interedges_iff {x : α × α} : x ∈ G.interedges s t ↔ x.1 ∈ s ∧ x.2 ∈ t ∧ G.Adj x.1 x.2 :=
   Rel.mem_interedges_iff
 
@@ -363,19 +361,3 @@ theorem edgeDensity_comm (s t : Finset α) : G.edgeDensity s t = G.edgeDensity t
   Rel.edgeDensity_comm G.symm s t
 
 end SimpleGraph
-
-@[positivity]
-unsafe def positivity_edge_density : expr → tactic strictness
-  | q(Rel.edgeDensity $(r) $(s) $(t)) =>
-    nonnegative <$> mk_mapp `` Rel.edgeDensity_nonneg [none, none, r, none, s, t]
-  | q(SimpleGraph.edgeDensity $(G) $(s) $(t)) =>
-    nonnegative <$> mk_mapp `` SimpleGraph.edgeDensity_nonneg [none, G, none, s, t]
-  | e =>
-    pp e >>=
-      fail ∘
-        format.bracket "The expression `"
-          "` isn't of the form `Rel.edgeDensity r s t` nor `SimpleGraph.edgeDensity G s t`"
-
-end Tactic
-
--/

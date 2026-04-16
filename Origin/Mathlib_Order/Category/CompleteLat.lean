@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Category.BddLat
 import Mathlib.Order.Hom.CompleteLattice
 
+noncomputable section
+
 /-!
 # The category of complete lattices
 
@@ -29,10 +31,6 @@ instance (X : CompleteLat) : CompleteLattice X :=
 
 def of (α : Type*) [CompleteLattice α] : CompleteLat :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [CompleteLattice α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited CompleteLat :=
   ⟨of PUnit⟩
@@ -74,8 +72,3 @@ def dualEquiv : CompleteLat ≌ CompleteLat where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end CompleteLat
-
-theorem completeLat_dual_comp_forget_to_bddLat :
-    CompleteLat.dual ⋙ forget₂ CompleteLat BddLat =
-    forget₂ CompleteLat BddLat ⋙ BddLat.dual :=
-  rfl

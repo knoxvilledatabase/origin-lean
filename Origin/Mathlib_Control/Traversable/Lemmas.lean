@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Applicative
 import Mathlib.Control.Traversable.Basic
 
+noncomputable section
+
 /-!
 # Traversing collections
 
@@ -54,10 +56,6 @@ def PureTransformation :
   preserves_seq' f x := by
     simp only [map_pure, seq_pure]
     rfl
-
-@[simp]
-theorem pureTransformation_apply {α} (x : id α) : PureTransformation F x = pure x :=
-  rfl
 
 variable {F G}
 

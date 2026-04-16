@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Ideal.Lattice
 import Mathlib.RingTheory.TwoSidedIdeal.Operations
 import Mathlib.RingTheory.JacobsonIdeal
 
+noncomputable section
+
 /-!
 # Ideals in a matrix ring
 

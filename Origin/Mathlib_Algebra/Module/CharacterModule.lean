@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Module/CharacterModule.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 7
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.Category.Grp.Injective
 import Mathlib.Topology.Instances.AddCircle
 import Mathlib.LinearAlgebra.Isomorphisms
+
+noncomputable section
 
 /-!
 # Character module of a module
@@ -64,8 +66,6 @@ instance : Module R (CharacterModule A) :=
   Module.compHom (A →+ _) (RingEquiv.toOpposite _ |>.toRingHom : R →+* Rᵈᵐᵃ)
 
 variable {R A B}
-
-@[simp] lemma smul_apply (c : CharacterModule A) (r : R) (a : A) : (r • c) a = c (r • a) := rfl
 
 @[simps] def dual (f : A →ₗ[R] B) : CharacterModule B →ₗ[R] CharacterModule A where
   toFun L := L.comp f.toAddMonoidHom
@@ -163,7 +163,10 @@ lemma eq_zero_of_ofSpanSingleton_apply_self (a : A)
     · norm_num
     · exact Nat.pos_of_ne_zero h
 
--- DISSOLVED: exists_character_apply_ne_zero_of_ne_zero
+lemma exists_character_apply_ne_zero_of_ne_zero {a : A} (ne_zero : a ≠ 0) :
+    ∃ (c : CharacterModule A), c a ≠ 0 :=
+  have ⟨c, hc⟩ := dual_surjective_of_injective _ (Submodule.injective_subtype _) (ofSpanSingleton a)
+  ⟨c, fun h ↦ ne_zero <| eq_zero_of_ofSpanSingleton_apply_self a <| by rwa [← hc]⟩
 
 lemma eq_zero_of_character_apply {a : A} (h : ∀ c : CharacterModule A, c a = 0) : a = 0 := by
   contrapose! h; exact exists_character_apply_ne_zero_of_ne_zero h

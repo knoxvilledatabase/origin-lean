@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Topology.Instances.EReal
 
+noncomputable section
+
 /-!
 # Half-planes in ℂ are open
 

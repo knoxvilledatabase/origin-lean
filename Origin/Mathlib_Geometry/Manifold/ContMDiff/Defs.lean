@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
 import Mathlib.Geometry.Manifold.LocalInvariantProperties
 
+noncomputable section
+
 /-!
 # Smooth functions between smooth manifolds
 
@@ -79,11 +81,6 @@ theorem contDiffWithinAtProp_self_source {f : E → H'} {s : Set E} {x : E} :
 theorem contDiffWithinAtProp_self {f : E → E'} {s : Set E} {x : E} :
     ContDiffWithinAtProp 𝓘(𝕜, E) 𝓘(𝕜, E') n f s x ↔ ContDiffWithinAt 𝕜 n f s x :=
   contDiffWithinAtProp_self_source
-
-theorem contDiffWithinAtProp_self_target {f : H → E'} {s : Set H} {x : H} :
-    ContDiffWithinAtProp I 𝓘(𝕜, E') n f s x ↔
-      ContDiffWithinAt 𝕜 n (f ∘ I.symm) (I.symm ⁻¹' s ∩ range I) (I x) :=
-  Iff.rfl
 
 theorem contDiffWithinAt_localInvariantProp (n : ℕ∞) :
     (contDiffGroupoid ∞ I).LocalInvariantProp (contDiffGroupoid ∞ I')

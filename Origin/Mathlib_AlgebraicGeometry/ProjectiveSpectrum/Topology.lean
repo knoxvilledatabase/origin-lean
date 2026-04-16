@@ -8,6 +8,8 @@ import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Projective spectrum of a graded ring
 
@@ -390,11 +392,6 @@ instance : PartialOrder (ProjectiveSpectrum 𝒜) :=
 @[simp]
 theorem as_ideal_le_as_ideal (x y : ProjectiveSpectrum 𝒜) :
     x.asHomogeneousIdeal ≤ y.asHomogeneousIdeal ↔ x ≤ y :=
-  Iff.rfl
-
-@[simp]
-theorem as_ideal_lt_as_ideal (x y : ProjectiveSpectrum 𝒜) :
-    x.asHomogeneousIdeal < y.asHomogeneousIdeal ↔ x < y :=
   Iff.rfl
 
 theorem le_iff_mem_closure (x y : ProjectiveSpectrum 𝒜) :

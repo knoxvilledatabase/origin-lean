@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.ShortExact
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
 
+noncomputable section
+
 /-!
 # The distinguished triangle attached to a short exact sequence of cochain complexes
 

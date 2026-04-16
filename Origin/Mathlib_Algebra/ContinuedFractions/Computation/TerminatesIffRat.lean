@@ -7,6 +7,8 @@ import Mathlib.Algebra.ContinuedFractions.Computation.Approximations
 import Mathlib.Algebra.ContinuedFractions.Computation.CorrectnessTerminating
 import Mathlib.Data.Rat.Floor
 
+noncomputable section
+
 /-!
 # Termination of Continued Fraction Computations (`GenContFract.of`)
 

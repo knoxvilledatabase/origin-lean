@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Kernel.MeasurableIntegral
 import Mathlib.MeasureTheory.Integral.SetIntegral
 
+noncomputable section
+
 /-!
 # With Density
 

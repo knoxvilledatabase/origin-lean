@@ -8,6 +8,8 @@ import Mathlib.Data.Prod.Lex
 import Mathlib.Data.Set.Finite.Range
 import Mathlib.Order.Estimator
 
+noncomputable section
+
 /-!
 # Best first search
 
@@ -101,7 +103,6 @@ instance [Ord ω] [Ord α] : Ord (BestFirstNode prio ε) where
       (compareOn BestFirstNode.key)
 
 set_option linter.unusedVariables false in
-
 variable (prio ε m β) [Ord ω] [Ord α] in
 
 @[nolint unusedArguments]

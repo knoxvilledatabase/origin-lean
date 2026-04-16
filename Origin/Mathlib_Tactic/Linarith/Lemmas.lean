@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Linarith/Lemmas.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Batteries.Tactic.Lint.Basic
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.ZeroLEOne
 import Mathlib.Data.Nat.Cast.Order.Ring
 import Mathlib.Data.Int.Order.Basic
 import Mathlib.Data.Ineq
+
+noncomputable section
 
 /-!
 # Lemmas for `linarith`.
@@ -86,9 +88,15 @@ theorem sub_neg_of_lt {α : Type*} [OrderedRing α] {a b : α} : a < b → a - b
 lemma eq_of_not_lt_of_not_gt {α} [LinearOrder α] (a b : α) (h1 : ¬ a < b) (h2 : ¬ b < a) : a = b :=
   le_antisymm (le_of_not_gt h2) (le_of_not_gt h1)
 
--- DISSOLVED: mul_zero_eq
+@[nolint unusedArguments]
+lemma mul_zero_eq {α} {R : α → α → Prop} [Semiring α] {a b : α} (_ : R a 0) (h : b = 0) :
+    a * b = 0 := by
+  simp [h]
 
--- DISSOLVED: zero_mul_eq
+@[nolint unusedArguments]
+lemma zero_mul_eq {α} {R : α → α → Prop} [Semiring α] {a b : α} (h : a = 0) (_ : R b 0) :
+    a * b = 0 := by
+  simp [h]
 
 lemma natCast_nonneg (α : Type u) [OrderedSemiring α] (n : ℕ) : (0 : α) ≤ n := Nat.cast_nonneg n
 

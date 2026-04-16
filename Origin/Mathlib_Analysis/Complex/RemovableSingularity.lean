@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Asymptotics.SpecificAsymptotics
 import Mathlib.Analysis.Complex.CauchyIntegral
 
+noncomputable section
+
 /-!
 # Removable singularity theorem
 

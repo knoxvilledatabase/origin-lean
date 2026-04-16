@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Conformal.NormedSpace
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.Basic
 
+noncomputable section
+
 /-!
 # Angles and conformal maps
 

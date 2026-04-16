@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Group.Action
 import Mathlib.GroupTheory.GroupAction.DomAct.Basic
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Lemmas
 
+noncomputable section
+
 /-!
 # Action of `DomMulAct` and `DomAddAct` on `α →ₘ[μ] β`
 
@@ -48,11 +50,6 @@ theorem smul_aeeqFun_aeeq (c : Mᵈᵐᵃ) (f : α →ₘ[μ] β) :
 theorem mk_smul_mk_aeeqFun (c : M) (f : α → β) (hf : AEStronglyMeasurable f μ) :
     mk c • AEEqFun.mk f hf = AEEqFun.mk (f <| c • ·)
       (hf.comp_measurePreserving (measurePreserving_smul _ _)) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem smul_aeeqFun_const (c : Mᵈᵐᵃ) (b : β) :
-    c • (AEEqFun.const α b : α →ₘ[μ] β) = AEEqFun.const α b :=
   rfl
 
 instance [SMul N β] [ContinuousConstSMul N β] : SMulCommClass Mᵈᵐᵃ N (α →ₘ[μ] β) where

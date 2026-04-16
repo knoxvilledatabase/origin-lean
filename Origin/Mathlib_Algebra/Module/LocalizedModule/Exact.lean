@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Exact
 import Mathlib.Algebra.Module.LocalizedModule.Basic
 
+noncomputable section
+
 /-!
 # Localization of modules is an exact functor
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Ring/Int/Parity.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Algebra.Ring.Int.Defs
+
+noncomputable section
 
 /-!
 # Basic parity lemmas for the ring `ℤ`
@@ -71,7 +73,7 @@ lemma Odd.of_mul_right (h : Odd (m * n)) : Odd n := (odd_mul.mp h).2
 @[parity_simps] lemma odd_pow {n : ℕ} : Odd (m ^ n) ↔ Odd m ∨ n = 0 := by
   rw [← not_iff_not, not_odd_iff_even, not_or, not_odd_iff_even, even_pow]
 
--- DISSOLVED: odd_pow'
+lemma odd_pow' {n : ℕ} (h : n ≠ 0) : Odd (m ^ n) ↔ Odd m := odd_pow.trans <| or_iff_left h
 
 @[parity_simps] lemma odd_add : Odd (m + n) ↔ (Odd m ↔ Even n) := by
   rw [← not_even_iff_odd, even_add, not_iff, ← not_even_iff_odd]

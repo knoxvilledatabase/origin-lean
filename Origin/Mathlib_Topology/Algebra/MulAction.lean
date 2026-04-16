@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Constructions
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.Topology.Algebra.ConstMulAction
 
+noncomputable section
+
 /-!
 # Continuous monoid action
 
@@ -266,6 +268,9 @@ variable (G : Type*) (P : Type*) [AddGroup G] [AddTorsor G P] [TopologicalSpace 
 variable [PreconnectedSpace G] [TopologicalSpace P] [ContinuousVAdd G P]
 
 include G in
+/-- An `AddTorsor` for a connected space is a connected space. This is not an instance because
+
+it loops for a group as a torsor over itself. -/
 
 protected theorem AddTorsor.connectedSpace : ConnectedSpace P :=
   { isPreconnected_univ := by

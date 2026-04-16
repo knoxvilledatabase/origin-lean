@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Powerset
 import Mathlib.Order.Antichain
 import Mathlib.Order.Interval.Finset.Nat
 
+noncomputable section
+
 /-!
 # `r`-sets and slice
 

@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/GradedObject.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Int
 import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.Shift.Basic
 import Mathlib.Data.Set.Subsingleton
+
+noncomputable section
 
 /-!
 # The category of graded objects
@@ -183,24 +185,8 @@ instance hasShift {β : Type*} [AddCommGroup β] (s : β) : HasShift (GradedObje
       add := fun m n => comapEq C (by ext; dsimp; rw [add_comm m n, add_zsmul, add_assoc]) ≪≫
           (Pi.comapComp _ _ _).symm }
 
-@[simp]
-theorem shiftFunctor_obj_apply {β : Type*} [AddCommGroup β] (s : β) (X : β → C) (t : β) (n : ℤ) :
-    (shiftFunctor (GradedObjectWithShift s C) n).obj X t = X (t + n • s) :=
-  rfl
-
-@[simp]
-theorem shiftFunctor_map_apply {β : Type*} [AddCommGroup β] (s : β)
-    {X Y : GradedObjectWithShift s C} (f : X ⟶ Y) (t : β) (n : ℤ) :
-    (shiftFunctor (GradedObjectWithShift s C) n).map f t = f (t + n • s) :=
-  rfl
-
 instance [HasZeroMorphisms C] (β : Type w) (X Y : GradedObject β C) :
   Zero (X ⟶ Y) := ⟨fun _ => 0⟩
-
-@[simp, nolint simpNF]
-theorem zero_apply [HasZeroMorphisms C] (β : Type w) (X Y : GradedObject β C) (b : β) :
-    (0 : X ⟶ Y) b = 0 :=
-  rfl
 
 instance hasZeroMorphisms [HasZeroMorphisms C] (β : Type w) :
     HasZeroMorphisms.{max w v} (GradedObject β C) where
@@ -423,7 +409,6 @@ def isColimitCofanMapObjComp :
       rw [assoc])
 
 include hpqr in
-
 lemma hasMap_comp [(X.mapObj p).HasMap q] : X.HasMap r :=
   fun k => ⟨_, isColimitCofanMapObjComp X p q r hpqr k _
     (fun j _ => X.isColimitCofanMapObj p j) _ ((X.mapObj p).isColimitCofanMapObj q k)⟩

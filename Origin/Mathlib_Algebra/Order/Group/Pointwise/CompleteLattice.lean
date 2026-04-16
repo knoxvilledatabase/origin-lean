@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.Pointwise.Bounds
 import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 
+noncomputable section
+
 /-!
 # Infima/suprema in ordered monoids and groups
 

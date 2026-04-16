@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Topology.ContinuousMap.Basic
 
+noncomputable section
+
 /-!
 # Continuous open maps
 
@@ -77,10 +79,6 @@ theorem ext {f g : α →CO β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : α →CO β) (f' : α → β) (h : f' = f) : α →CO β :=
   ⟨f.toContinuousMap.copy f' <| h, h.symm.subst f.map_open'⟩
 
-@[simp]
-theorem coe_copy (f : α →CO β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : α →CO β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -92,30 +90,13 @@ protected def id : α →CO α :=
 instance : Inhabited (α →CO α) :=
   ⟨ContinuousOpenMap.id _⟩
 
-@[simp]
-theorem coe_id : ⇑(ContinuousOpenMap.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : ContinuousOpenMap.id α a = a :=
-  rfl
 
 def comp (f : β →CO γ) (g : α →CO β) : ContinuousOpenMap α γ :=
   ⟨f.toContinuousMap.comp g.toContinuousMap, f.map_open'.comp g.map_open'⟩
 
 @[simp]
-theorem coe_comp (f : β →CO γ) (g : α →CO β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : β →CO γ) (g : α →CO β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : γ →CO δ) (g : β →CO γ) (h : α →CO β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]

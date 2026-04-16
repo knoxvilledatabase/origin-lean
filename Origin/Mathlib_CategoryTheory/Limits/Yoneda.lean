@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-!
 # Limit properties relating to the (co)yoneda embedding.
 

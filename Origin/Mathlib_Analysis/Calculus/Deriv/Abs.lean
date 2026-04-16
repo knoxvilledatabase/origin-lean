@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Abs.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 20 | Infrastructure: 0
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Analysis.InnerProductSpace.Calculus
+
+noncomputable section
 
 /-!
 # Derivative of the absolute value
@@ -24,19 +26,26 @@ variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
 variable {n : ℕ∞} {f : E → ℝ} {f' : E →L[ℝ] ℝ} {s : Set E} {x : E}
 
--- DISSOLVED: contDiffAt_abs
+theorem contDiffAt_abs {x : ℝ} (hx : x ≠ 0) : ContDiffAt ℝ n (|·|) x := contDiffAt_norm ℝ hx
 
--- DISSOLVED: ContDiffAt.abs
+theorem ContDiffAt.abs (hf : ContDiffAt ℝ n f x) (h₀ : f x ≠ 0) :
+    ContDiffAt ℝ n (fun x ↦ |f x|) x := hf.norm ℝ h₀
 
--- DISSOLVED: contDiffWithinAt_abs
+theorem contDiffWithinAt_abs {x : ℝ} (hx : x ≠ 0) (s : Set ℝ) :
+    ContDiffWithinAt ℝ n (|·|) s x := (contDiffAt_abs hx).contDiffWithinAt
 
--- DISSOLVED: ContDiffWithinAt.abs
+theorem ContDiffWithinAt.abs (hf : ContDiffWithinAt ℝ n f s x) (h₀ : f x ≠ 0) :
+    ContDiffWithinAt ℝ n (fun y ↦ |f y|) s x :=
+  (contDiffAt_abs h₀).comp_contDiffWithinAt x hf
 
--- DISSOLVED: contDiffOn_abs
+theorem contDiffOn_abs {s : Set ℝ} (hs : ∀ x ∈ s, x ≠ 0) :
+    ContDiffOn ℝ n (|·|) s := fun x hx ↦ contDiffWithinAt_abs (hs x hx) s
 
--- DISSOLVED: ContDiffOn.abs
+theorem ContDiffOn.abs (hf : ContDiffOn ℝ n f s) (h₀ : ∀ x ∈ s, f x ≠ 0) :
+    ContDiffOn ℝ n (fun y ↦ |f y|) s := fun x hx ↦ (hf x hx).abs (h₀ x hx)
 
--- DISSOLVED: ContDiff.abs
+theorem ContDiff.abs (hf : ContDiff ℝ n f) (h₀ : ∀ x, f x ≠ 0) : ContDiff ℝ n fun y ↦ |f y| :=
+  contDiff_iff_contDiffAt.2 fun x ↦ hf.contDiffAt.abs (h₀ x)
 
 theorem hasStrictDerivAt_abs_neg {x : ℝ} (hx : x < 0) :
     HasStrictDerivAt (|·|) (-1) x :=
@@ -54,9 +63,14 @@ theorem hasStrictDerivAt_abs_pos {x : ℝ} (hx : 0 < x) :
 theorem hasDerivAt_abs_pos {x : ℝ} (hx : 0 < x) :
     HasDerivAt (|·|) 1 x := (hasStrictDerivAt_abs_pos hx).hasDerivAt
 
--- DISSOLVED: hasStrictDerivAt_abs
+theorem hasStrictDerivAt_abs {x : ℝ} (hx : x ≠ 0) :
+    HasStrictDerivAt (|·|) (SignType.sign x : ℝ) x := by
+  obtain hx | hx := hx.lt_or_lt
+  · simpa [hx] using hasStrictDerivAt_abs_neg hx
+  · simpa [hx] using hasStrictDerivAt_abs_pos hx
 
--- DISSOLVED: hasDerivAt_abs
+theorem hasDerivAt_abs {x : ℝ} (hx : x ≠ 0) :
+    HasDerivAt (|·|) (SignType.sign x : ℝ) x := (hasStrictDerivAt_abs hx).hasDerivAt
 
 theorem HasStrictFDerivAt.abs_of_neg (hf : HasStrictFDerivAt f f' x)
     (h₀ : f x < 0) : HasStrictFDerivAt (fun x ↦ |f x|) (-f') x := by
@@ -82,9 +96,17 @@ theorem HasFDerivAt.abs_of_pos (hf : HasFDerivAt f f' x)
   ext y
   simp
 
--- DISSOLVED: HasStrictFDerivAt.abs
+theorem HasStrictFDerivAt.abs (hf : HasStrictFDerivAt f f' x)
+    (h₀ : f x ≠ 0) : HasStrictFDerivAt (fun x ↦ |f x|) ((SignType.sign (f x) : ℝ) • f') x := by
+  convert (hasStrictDerivAt_abs h₀).hasStrictFDerivAt.comp x hf using 1
+  ext y
+  simp [mul_comm]
 
--- DISSOLVED: HasFDerivAt.abs
+theorem HasFDerivAt.abs (hf : HasFDerivAt f f' x)
+    (h₀ : f x ≠ 0) : HasFDerivAt (fun x ↦ |f x|) ((SignType.sign (f x) : ℝ) • f') x := by
+  convert (hasDerivAt_abs h₀).hasFDerivAt.comp x hf using 1
+  ext y
+  simp [mul_comm]
 
 theorem hasDerivWithinAt_abs_neg (s : Set ℝ) {x : ℝ} (hx : x < 0) :
     HasDerivWithinAt (|·|) (-1) s x := (hasDerivAt_abs_neg hx).hasDerivWithinAt
@@ -92,7 +114,8 @@ theorem hasDerivWithinAt_abs_neg (s : Set ℝ) {x : ℝ} (hx : x < 0) :
 theorem hasDerivWithinAt_abs_pos (s : Set ℝ) {x : ℝ} (hx : 0 < x) :
     HasDerivWithinAt (|·|) 1 s x := (hasDerivAt_abs_pos hx).hasDerivWithinAt
 
--- DISSOLVED: hasDerivWithinAt_abs
+theorem hasDerivWithinAt_abs (s : Set ℝ) {x : ℝ} (hx : x ≠ 0) :
+    HasDerivWithinAt (|·|) (SignType.sign x : ℝ) s x := (hasDerivAt_abs hx).hasDerivWithinAt
 
 theorem HasFDerivWithinAt.abs_of_neg (hf : HasFDerivWithinAt f f' s x)
     (h₀ : f x < 0) : HasFDerivWithinAt (fun x ↦ |f x|) (-f') s x := by
@@ -104,7 +127,9 @@ theorem HasFDerivWithinAt.abs_of_pos (hf : HasFDerivWithinAt f f' s x)
   convert (hasDerivAt_abs_pos h₀).comp_hasFDerivWithinAt x hf using 1
   simp
 
--- DISSOLVED: HasFDerivWithinAt.abs
+theorem HasFDerivWithinAt.abs (hf : HasFDerivWithinAt f f' s x)
+    (h₀ : f x ≠ 0) : HasFDerivWithinAt (fun x ↦ |f x|) ((SignType.sign (f x) : ℝ) • f') s x :=
+  (hasDerivAt_abs h₀).comp_hasFDerivWithinAt x hf
 
 theorem differentiableAt_abs_neg {x : ℝ} (hx : x < 0) :
     DifferentiableAt ℝ (|·|) x := (hasDerivAt_abs_neg hx).differentiableAt
@@ -112,7 +137,8 @@ theorem differentiableAt_abs_neg {x : ℝ} (hx : x < 0) :
 theorem differentiableAt_abs_pos {x : ℝ} (hx : 0 < x) :
     DifferentiableAt ℝ (|·|) x := (hasDerivAt_abs_pos hx).differentiableAt
 
--- DISSOLVED: differentiableAt_abs
+theorem differentiableAt_abs {x : ℝ} (hx : x ≠ 0) :
+    DifferentiableAt ℝ (|·|) x := (hasDerivAt_abs hx).differentiableAt
 
 theorem DifferentiableAt.abs_of_neg (hf : DifferentiableAt ℝ f x) (h₀ : f x < 0) :
     DifferentiableAt ℝ (fun x ↦ |f x|) x := (differentiableAt_abs_neg h₀).comp x hf
@@ -120,7 +146,8 @@ theorem DifferentiableAt.abs_of_neg (hf : DifferentiableAt ℝ f x) (h₀ : f x 
 theorem DifferentiableAt.abs_of_pos (hf : DifferentiableAt ℝ f x) (h₀ : 0 < f x) :
     DifferentiableAt ℝ (fun x ↦ |f x|) x := (differentiableAt_abs_pos h₀).comp x hf
 
--- DISSOLVED: DifferentiableAt.abs
+theorem DifferentiableAt.abs (hf : DifferentiableAt ℝ f x) (h₀ : f x ≠ 0) :
+    DifferentiableAt ℝ (fun x ↦ |f x|) x := (differentiableAt_abs h₀).comp x hf
 
 theorem differentiableWithinAt_abs_neg (s : Set ℝ) {x : ℝ} (hx : x < 0) :
     DifferentiableWithinAt ℝ (|·|) s x := (differentiableAt_abs_neg hx).differentiableWithinAt
@@ -128,7 +155,8 @@ theorem differentiableWithinAt_abs_neg (s : Set ℝ) {x : ℝ} (hx : x < 0) :
 theorem differentiableWithinAt_abs_pos (s : Set ℝ) {x : ℝ} (hx : 0 < x) :
     DifferentiableWithinAt ℝ (|·|) s x := (differentiableAt_abs_pos hx).differentiableWithinAt
 
--- DISSOLVED: differentiableWithinAt_abs
+theorem differentiableWithinAt_abs (s : Set ℝ) {x : ℝ} (hx : x ≠ 0) :
+    DifferentiableWithinAt ℝ (|·|) s x := (differentiableAt_abs hx).differentiableWithinAt
 
 theorem DifferentiableWithinAt.abs_of_neg (hf : DifferentiableWithinAt ℝ f s x) (h₀ : f x < 0) :
     DifferentiableWithinAt ℝ (fun x ↦ |f x|) s x :=
@@ -138,13 +166,19 @@ theorem DifferentiableWithinAt.abs_of_pos (hf : DifferentiableWithinAt ℝ f s x
     DifferentiableWithinAt ℝ (fun x ↦ |f x|) s x :=
   (differentiableAt_abs_pos h₀).comp_differentiableWithinAt x hf
 
--- DISSOLVED: DifferentiableWithinAt.abs
+theorem DifferentiableWithinAt.abs (hf : DifferentiableWithinAt ℝ f s x) (h₀ : f x ≠ 0) :
+    DifferentiableWithinAt ℝ (fun x ↦ |f x|) s x :=
+  (differentiableAt_abs h₀).comp_differentiableWithinAt x hf
 
--- DISSOLVED: differentiableOn_abs
+theorem differentiableOn_abs {s : Set ℝ} (hs : ∀ x ∈ s, x ≠ 0) : DifferentiableOn ℝ (|·|) s :=
+  fun x hx ↦ differentiableWithinAt_abs s (hs x hx)
 
--- DISSOLVED: DifferentiableOn.abs
+theorem DifferentiableOn.abs (hf : DifferentiableOn ℝ f s) (h₀ : ∀ x ∈ s, f x ≠ 0) :
+    DifferentiableOn ℝ (fun x ↦ |f x|) s :=
+  fun x hx ↦ (hf x hx).abs (h₀ x hx)
 
--- DISSOLVED: Differentiable.abs
+theorem Differentiable.abs (hf : Differentiable ℝ f) (h₀ : ∀ x, f x ≠ 0) :
+    Differentiable ℝ (fun x ↦ |f x|) := fun x ↦ (hf x).abs (h₀ x)
 
 theorem not_differentiableAt_abs_zero : ¬ DifferentiableAt ℝ (abs : ℝ → ℝ) 0 := by
   intro h

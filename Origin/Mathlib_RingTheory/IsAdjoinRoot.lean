@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/IsAdjoinRoot.lean
-Genuine: 64 | Conflates: 3 | Dissolved: 1 | Infrastructure: 13
+Genuine: 64 | Conflates: 4 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
 import Mathlib.RingTheory.PowerBasis
+
+noncomputable section
 
 /-!
 # A predicate on adjoining roots of polynomial
@@ -205,10 +207,6 @@ def liftHom (h : IsAdjoinRoot S f) : S →ₐ[R] T :=
 
 variable {x}
 
-@[simp]
-theorem coe_liftHom (h : IsAdjoinRoot S f) :
-    (h.liftHom x hx' : S →+* T) = h.lift (algebraMap R T) x hx' := rfl
-
 theorem lift_algebraMap_apply (h : IsAdjoinRoot S f) (z : S) :
     h.lift (algebraMap R T) x hx' z = h.liftHom x hx' z := rfl
 
@@ -375,7 +373,9 @@ theorem deg_pos [Nontrivial S] (h : IsAdjoinRootMonic S f) : 0 < natDegree f := 
   rcases h.basis.index_nonempty with ⟨⟨i, hi⟩⟩
   exact (Nat.zero_le _).trans_lt hi
 
--- DISSOLVED: deg_ne_zero
+-- CONFLATES (assumes ground = zero): deg_ne_zero
+theorem deg_ne_zero [Nontrivial S] (h : IsAdjoinRootMonic S f) : natDegree f ≠ 0 :=
+  h.deg_pos.ne'
 
 @[simps! gen dim basis]
 def powerBasis (h : IsAdjoinRootMonic S f) : PowerBasis R S where
@@ -560,9 +560,6 @@ def ofEquiv (h : IsAdjoinRoot S f) (e : S ≃ₐ[R] T) : IsAdjoinRoot T f where
     ext
     simp only [AlgEquiv.commutes, RingHom.comp_apply, AlgEquiv.coe_ringEquiv,
       RingEquiv.coe_toRingHom, ← h.algebraMap_apply]
-
-@[simp]
-theorem ofEquiv_root (h : IsAdjoinRoot S f) (e : S ≃ₐ[R] T) : (h.ofEquiv e).root = e h.root := rfl
 
 @[simp]
 theorem aequiv_ofEquiv {U : Type*} [CommRing U] [Algebra R U] (h : IsAdjoinRoot S f)

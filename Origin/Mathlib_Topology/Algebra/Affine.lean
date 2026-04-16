@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/Affine.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineMap
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.Algebra.MulAction
+
+noncomputable section
 
 /-!
 # Topological properties of affine spaces and maps
@@ -66,7 +68,9 @@ section Field
 
 variable [Field R] [Module R F] [ContinuousConstSMul R F]
 
--- DISSOLVED: homothety_isOpenMap
+theorem homothety_isOpenMap (x : F) (t : R) (ht : t ≠ 0) : IsOpenMap <| homothety x t := by
+  apply IsOpenMap.of_inverse (homothety_continuous x t⁻¹) <;> intro e <;>
+    simp [← AffineMap.comp_apply, ← homothety_mul, ht]
 
 end Field
 

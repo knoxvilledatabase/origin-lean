@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Chain
 import Mathlib.Order.Minimal
 
+noncomputable section
+
 /-!
 # Zorn's lemmas
 

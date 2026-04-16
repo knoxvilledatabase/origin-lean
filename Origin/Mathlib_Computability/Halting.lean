@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Computability.PartrecCode
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Computability theory and the halting problem
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Exception
 
+noncomputable section
+
 /-!
 # Additional methods for working with `Exception`s
 

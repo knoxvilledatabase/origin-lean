@@ -6,6 +6,8 @@ import Origin.Core
 import Qq
 import Mathlib.Tactic.FunProp.Mor
 
+noncomputable section
+
 /-!
 ## `funProp` data structure holding information about a function
 

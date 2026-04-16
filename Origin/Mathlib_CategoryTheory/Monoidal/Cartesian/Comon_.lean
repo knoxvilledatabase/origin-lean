@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Comon_
 import Mathlib.CategoryTheory.Monoidal.OfHasFiniteProducts
 
+noncomputable section
+
 /-!
 # Comonoid objects in a cartesian monoidal category.
 

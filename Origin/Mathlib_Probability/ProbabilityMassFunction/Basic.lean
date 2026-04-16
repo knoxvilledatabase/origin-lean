@@ -1,10 +1,12 @@
 /-
 Extracted from Probability/ProbabilityMassFunction/Basic.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Instances.ENNReal
 import Mathlib.MeasureTheory.Measure.Dirac
+
+noncomputable section
 
 /-!
 # Probability mass functions
@@ -66,12 +68,15 @@ theorem tsum_coe_indicator_ne_top (p : PMF α) (s : Set α) : ∑' a, s.indicato
       ENNReal.summable)
     (lt_of_le_of_ne le_top p.tsum_coe_ne_top))
 
--- DISSOLVED: coe_ne_zero
+@[simp]
+theorem coe_ne_zero (p : PMF α) : ⇑p ≠ 0 := fun hp =>
+  zero_ne_one ((tsum_zero.symm.trans (tsum_congr fun x => symm (congr_fun hp x))).trans p.tsum_coe)
 
 def support (p : PMF α) : Set α :=
   Function.support p
 
--- DISSOLVED: mem_support_iff
+@[simp]
+theorem mem_support_iff (p : PMF α) (a : α) : a ∈ p.support ↔ p a ≠ 0 := Iff.rfl
 
 @[simp]
 theorem support_nonempty (p : PMF α) : p.support.Nonempty :=

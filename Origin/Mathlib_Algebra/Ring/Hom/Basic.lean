@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.InjSurj
 import Mathlib.Algebra.Ring.Hom.Defs
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Additional lemmas about homomorphisms of semirings and rings
 

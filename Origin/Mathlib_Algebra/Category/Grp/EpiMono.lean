@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 import Mathlib.GroupTheory.Coset.Basic
 import Mathlib.GroupTheory.QuotientGroup.Defs
 
+noncomputable section
+
 /-!
 # Monomorphisms and epimorphisms in `Group`
 In this file, we prove monomorphisms in the category of groups are injective homomorphisms and
@@ -86,7 +88,6 @@ theorem mono_iff_injective : Mono f ↔ Function.Injective f :=
 namespace SurjectiveOfEpiAuxs
 
 set_option quotPrecheck false in
-
 local notation "X" => Set.range (· • (f.range : Set B) : B → Set B)
 
 inductive XWithInfinity

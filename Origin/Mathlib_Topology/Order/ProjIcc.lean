@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Set.ProjIcc
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Projection onto a closed interval
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finite.Prod
 import Mathlib.MeasureTheory.SetSemiring
 
+noncomputable section
+
 /-!
 # Algebra of sets
 

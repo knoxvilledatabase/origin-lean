@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/Biproducts.lean
-Genuine: 85 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Ext
@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Biproducts
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Products
 import Mathlib.CategoryTheory.Preadditive.Basic
 import Mathlib.Tactic.Abel
+
+noncomputable section
 
 /-!
 # Basic facts about biproducts in preadditive categories.
@@ -514,9 +516,6 @@ variable {X Y : C} (f g : X ⟶ Y)
 theorem biprod.add_eq_lift_id_desc [HasBinaryBiproduct X X] :
     f + g = biprod.lift (𝟙 X) (𝟙 X) ≫ biprod.desc f g := by simp
 
-theorem biprod.add_eq_lift_desc_id [HasBinaryBiproduct Y Y] :
-    f + g = biprod.lift f g ≫ biprod.desc (𝟙 Y) (𝟙 Y) := by simp
-
 end
 
 end Limits
@@ -637,7 +636,31 @@ def Biprod.isoElim (f : X₁ ⊞ X₂ ≅ Y₁ ⊞ Y₂) [IsIso (biprod.inl ≫ 
   Biprod.isoElim' (biprod.inl ≫ f.hom ≫ biprod.fst) (biprod.inl ≫ f.hom ≫ biprod.snd)
     (biprod.inr ≫ f.hom ≫ biprod.fst) (biprod.inr ≫ f.hom ≫ biprod.snd)
 
--- DISSOLVED: Biprod.column_nonzero_of_iso
+theorem Biprod.column_nonzero_of_iso {W X Y Z : C} (f : W ⊞ X ⟶ Y ⊞ Z) [IsIso f] :
+    𝟙 W = 0 ∨ biprod.inl ≫ f ≫ biprod.fst ≠ 0 ∨ biprod.inl ≫ f ≫ biprod.snd ≠ 0 := by
+  by_contra! h
+  rcases h with ⟨nz, a₁, a₂⟩
+  set x := biprod.inl ≫ f ≫ inv f ≫ biprod.fst
+  have h₁ : x = 𝟙 W := by simp [x]
+  have h₀ : x = 0 := by
+    dsimp [x]
+    rw [← Category.id_comp (inv f), Category.assoc, ← biprod.total]
+    conv_lhs =>
+      slice 2 3
+      rw [comp_add]
+    simp only [Category.assoc]
+    rw [comp_add_assoc, add_comp]
+    conv_lhs =>
+      congr
+      next => skip
+      slice 1 3
+      rw [a₂]
+    simp only [zero_comp, add_zero]
+    conv_lhs =>
+      slice 1 3
+      rw [a₁]
+    simp only [zero_comp]
+  exact nz (h₁.symm.trans h₀)
 
 end
 
@@ -666,7 +689,15 @@ theorem Biproduct.column_nonzero_of_iso' {σ τ : Type} [Finite τ] {S : σ → 
     simp
   exact h₁.symm.trans h₀
 
--- DISSOLVED: Biproduct.columnNonzeroOfIso
+def Biproduct.columnNonzeroOfIso {σ τ : Type} [Fintype τ] {S : σ → C} [HasBiproduct S] {T : τ → C}
+    [HasBiproduct T] (s : σ) (nz : 𝟙 (S s) ≠ 0) (f : ⨁ S ⟶ ⨁ T) [IsIso f] :
+    Trunc (Σ't : τ, biproduct.ι S s ≫ f ≫ biproduct.π T t ≠ 0) := by
+  classical
+    apply truncSigmaOfExists
+    have t := Biproduct.column_nonzero_of_iso'.{v} s f
+    by_contra h
+    simp only [not_exists_not] at h
+    exact nz (t h)
 
 section Preadditive
 

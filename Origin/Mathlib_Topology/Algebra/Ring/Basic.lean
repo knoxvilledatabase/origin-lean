@@ -8,6 +8,8 @@ import Mathlib.Algebra.Ring.Prod
 import Mathlib.Algebra.Ring.Subring.Basic
 import Mathlib.Topology.Algebra.Group.Basic
 
+noncomputable section
+
 /-!
 
 # Topological (semi)rings
@@ -70,11 +72,6 @@ def topologicalClosure (s : NonUnitalSubsemiring α) : NonUnitalSubsemiring α :
   { s.toSubsemigroup.topologicalClosure, s.toAddSubmonoid.topologicalClosure with
     carrier := _root_.closure (s : Set α) }
 
-@[simp]
-theorem topologicalClosure_coe (s : NonUnitalSubsemiring α) :
-    (s.topologicalClosure : Set α) = _root_.closure (s : Set α) :=
-  rfl
-
 theorem le_topologicalClosure (s : NonUnitalSubsemiring α) : s ≤ s.topologicalClosure :=
   _root_.subset_closure
 
@@ -106,11 +103,6 @@ end Subsemiring
 def Subsemiring.topologicalClosure (s : Subsemiring α) : Subsemiring α :=
   { s.toSubmonoid.topologicalClosure, s.toAddSubmonoid.topologicalClosure with
     carrier := _root_.closure (s : Set α) }
-
-@[simp]
-theorem Subsemiring.topologicalClosure_coe (s : Subsemiring α) :
-    (s.topologicalClosure : Set α) = _root_.closure (s : Set α) :=
-  rfl
 
 theorem Subsemiring.le_topologicalClosure (s : Subsemiring α) : s ≤ s.topologicalClosure :=
   _root_.subset_closure

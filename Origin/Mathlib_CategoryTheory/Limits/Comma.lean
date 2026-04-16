@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Limits.Unit
 
+noncomputable section
+
 /-!
 # Limits and colimits in comma categories
 

@@ -8,6 +8,8 @@ import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
 import Mathlib.Topology.ShrinkingLemma
 
+noncomputable section
+
 /-!
 # Shrinking lemma in a proper metric space
 

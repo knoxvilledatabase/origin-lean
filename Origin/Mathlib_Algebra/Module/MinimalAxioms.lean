@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Module.Defs
 
+noncomputable section
+
 /-!
 # Minimal Axioms for a Module
 

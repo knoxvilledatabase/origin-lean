@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Pi
 import Mathlib.Data.Set.Pointwise.SMul
 
+noncomputable section
+
 /-!
 # Pointwise actions on sets in Pi types
 

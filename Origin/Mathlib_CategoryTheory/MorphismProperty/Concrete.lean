@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 import Mathlib.CategoryTheory.MorphismProperty.Factorization
 
+noncomputable section
+
 /-!
 # Morphism properties defined in concrete categories
 
@@ -38,10 +40,6 @@ protected def injective : MorphismProperty C := fun _ _ f => Injective f
 protected def surjective : MorphismProperty C := fun _ _ f => Surjective f
 
 protected def bijective : MorphismProperty C := fun _ _ f => Bijective f
-
-theorem bijective_eq_sup :
-    MorphismProperty.bijective C = MorphismProperty.injective C ⊓ MorphismProperty.surjective C :=
-  rfl
 
 instance : (MorphismProperty.injective C).IsMultiplicative where
   id_mem X := by

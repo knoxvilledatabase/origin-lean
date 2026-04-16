@@ -1,10 +1,12 @@
 /-
 Extracted from FieldTheory/Extension.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Order
 import Mathlib.FieldTheory.Adjoin
+
+noncomputable section
 
 /-!
 # Extension of field embeddings
@@ -231,7 +233,6 @@ variable {L : Type*} [Field L] [Algebra F L] [Algebra L E] [IsScalarTower F L E]
   (f : L →ₐ[F] K) (hK : ∀ s ∈ S, IsIntegral L s ∧ (minpoly L s).Splits f.toRingHom)
 
 include hK in
-
 theorem exists_algHom_adjoin_of_splits' :
     ∃ φ : adjoin L S →ₐ[F] K, φ.restrictDomain L = f := by
   let L' := (IsScalarTower.toAlgHom F L E).fieldRange
@@ -249,7 +250,6 @@ theorem exists_algHom_adjoin_of_splits' :
   convert (hK s hs).2; ext; exact congr_arg f (AlgEquiv.symm_apply_apply _ _)
 
 include hK in
-
 theorem exists_algHom_of_adjoin_splits' (hS : adjoin L S = ⊤) :
     ∃ φ : E →ₐ[F] K, φ.restrictDomain L = f :=
   have ⟨φ, hφ⟩ := exists_algHom_adjoin_of_splits' f hK
@@ -283,13 +283,11 @@ theorem nonempty_algHom_adjoin_of_splits : Nonempty (adjoin F S →ₐ[F] K) :=
 variable (hS : adjoin F S = ⊤)
 
 include hS in
-
 theorem exists_algHom_of_adjoin_splits : ∃ φ : E →ₐ[F] K, φ.comp L.val = f :=
   have ⟨φ, hφ⟩ := exists_algHom_adjoin_of_splits hK f (hS.symm ▸ le_top)
   ⟨φ.comp ((equivOfEq hS).trans topEquiv).symm.toAlgHom, hφ⟩
 
 include hS in
-
 theorem nonempty_algHom_of_adjoin_splits : Nonempty (E →ₐ[F] K) :=
   have ⟨φ, _⟩ := exists_algHom_of_adjoin_splits hK (⊥ : Lifts F E K).emb hS; ⟨φ⟩
 
@@ -307,7 +305,6 @@ theorem exists_algHom_adjoin_of_splits_of_aeval : ∃ φ : adjoin F S →ₐ[F] 
     algHomAdjoinIntegralEquiv_symm_apply_gen F ix _⟩
 
 include hS in
-
 theorem exists_algHom_of_adjoin_splits_of_aeval : ∃ φ : E →ₐ[F] K, φ x = y :=
   have ⟨φ, hφ⟩ := exists_algHom_adjoin_of_splits_of_aeval hK (hS ▸ mem_top) hy
   ⟨φ.comp ((equivOfEq hS).trans topEquiv).symm.toAlgHom, hφ⟩

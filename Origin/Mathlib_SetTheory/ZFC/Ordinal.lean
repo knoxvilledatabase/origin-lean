@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.RelIso.Set
 import Mathlib.SetTheory.ZFC.Basic
 
+noncomputable section
+
 /-!
 # Von Neumann ordinals
 

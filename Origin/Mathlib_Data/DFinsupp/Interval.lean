@@ -9,6 +9,8 @@ import Mathlib.Data.DFinsupp.BigOperators
 import Mathlib.Data.DFinsupp.Order
 import Mathlib.Order.Interval.Finset.Basic
 
+noncomputable section
+
 /-!
 # Finite intervals of finitely supported functions
 
@@ -147,8 +149,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder (Π₀ i, α i) :=
       rfl)
 
 variable (f g : Π₀ i, α i)
-
-theorem Icc_eq : Icc f g = (f.support ∪ g.support).dfinsupp (f.rangeIcc g) := rfl
 
 lemma card_Icc : #(Icc f g) = ∏ i ∈ f.support ∪ g.support, #(Icc (f i) (g i)) :=
   card_dfinsupp _ _

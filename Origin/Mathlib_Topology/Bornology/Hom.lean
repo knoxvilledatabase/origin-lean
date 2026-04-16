@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Topology.Bornology.Basic
 
+noncomputable section
+
 /-!
 # Locally bounded maps
 
@@ -82,24 +84,12 @@ theorem ext {f g : LocallyBoundedMap α β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : LocallyBoundedMap α β) (f' : α → β) (h : f' = f) : LocallyBoundedMap α β :=
   ⟨f', h.symm ▸ f.comap_cobounded_le'⟩
 
-@[simp]
-theorem coe_copy (f : LocallyBoundedMap α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : LocallyBoundedMap α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
 def ofMapBounded (f : α → β) (h : ∀ ⦃s : Set α⦄, IsBounded s → IsBounded (f '' s)) :
     LocallyBoundedMap α β :=
   ⟨f, comap_cobounded_le_iff.2 h⟩
-
-@[simp]
-theorem coe_ofMapBounded (f : α → β) {h} : ⇑(ofMapBounded f h) = f :=
-  rfl
-
-@[simp]
-theorem ofMapBounded_apply (f : α → β) {h} (a : α) : ofMapBounded f h a = f a :=
-  rfl
 
 variable (α)
 
@@ -109,15 +99,7 @@ protected def id : LocallyBoundedMap α α :=
 instance : Inhabited (LocallyBoundedMap α α) :=
   ⟨LocallyBoundedMap.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(LocallyBoundedMap.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : LocallyBoundedMap.id α a = a :=
-  rfl
 
 def comp (f : LocallyBoundedMap β γ) (g : LocallyBoundedMap α β) : LocallyBoundedMap α γ where
   toFun := f ∘ g
@@ -125,17 +107,8 @@ def comp (f : LocallyBoundedMap β γ) (g : LocallyBoundedMap α β) : LocallyBo
     comap_comap.ge.trans <| (comap_mono f.comap_cobounded_le').trans g.comap_cobounded_le'
 
 @[simp]
-theorem coe_comp (f : LocallyBoundedMap β γ) (g : LocallyBoundedMap α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : LocallyBoundedMap β γ) (g : LocallyBoundedMap α β) (a : α) :
     f.comp g a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : LocallyBoundedMap γ δ) (g : LocallyBoundedMap β γ)
-    (h : LocallyBoundedMap α β) : (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]

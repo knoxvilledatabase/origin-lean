@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.ModelTheory.ElementarySubstructures
 import Mathlib.CategoryTheory.ConcreteCategory.Bundled
 
+noncomputable section
+
 /-!
 # Bundled First-Order Structures
 
@@ -78,10 +80,6 @@ instance instCoeSort : CoeSort T.ModelType (Type w) :=
 
 def of (M : Type w) [L.Structure M] [M ⊨ T] [Nonempty M] : T.ModelType :=
   ⟨M⟩
-
-@[simp]
-theorem coe_of (M : Type w) [L.Structure M] [M ⊨ T] [Nonempty M] : (of T M : Type w) = M :=
-  rfl
 
 instance instNonempty (M : T.ModelType) : Nonempty M :=
   inferInstance
@@ -156,10 +154,6 @@ variable {T}
 
 def Model.bundled {M : Type w} [LM : L.Structure M] [ne : Nonempty M] (h : M ⊨ T) : T.ModelType :=
   @ModelType.of L T M LM h ne
-
-@[simp]
-theorem coe_of {M : Type w} [L.Structure M] [Nonempty M] (h : M ⊨ T) : (h.bundled : Type w) = M :=
-  rfl
 
 end Theory
 

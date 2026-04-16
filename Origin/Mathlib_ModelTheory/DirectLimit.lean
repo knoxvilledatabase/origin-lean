@@ -9,6 +9,8 @@ import Mathlib.ModelTheory.FinitelyGenerated
 import Mathlib.ModelTheory.Quotients
 import Mathlib.Order.DirectedInverseSystem
 
+noncomputable section
+
 /-!
 # Direct Limits of First-Order Structures
 
@@ -74,6 +76,7 @@ instance natLERec.directedSystem : DirectedSystem G' fun i j h => natLERec f' i 
 end DirectedSystem
 
 set_option linter.unusedVariables false in
+/-- Alias for `Σ i, G i`. -/
 
 @[nolint unusedArguments]
 protected abbrev Structure.Sigma (f : ∀ i j, i ≤ j → G i ↪[L] G j) := Σ i, G i
@@ -378,9 +381,6 @@ noncomputable def equiv_lift (H_commuting : ∀ i j hij x, g j (f i j hij x) = f
 
 variable (H_commuting : ∀ i j hij x, g j (f i j hij x) = f' i j hij (g i x))
 
-theorem equiv_lift_of {i : ι} (x : G i) :
-    equiv_lift L ι G f G' f' g H_commuting (of L ι G f i x) = of L ι G' f' i (g i x) := rfl
-
 variable {L ι G f}
 
 theorem cg {ι : Type*} [Countable ι] [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
@@ -424,10 +424,6 @@ def liftInclusion :
   DirectLimit.lift L ι (fun i ↦ S i) (fun _ _ h ↦ Substructure.inclusion (S.monotone h))
     (fun _ ↦ Substructure.subtype _) (fun _ _ _ _ ↦ rfl)
 
-theorem liftInclusion_of {i : ι} (x : S i) :
-    (liftInclusion S) (of L ι _ (fun _ _ h ↦ Substructure.inclusion (S.monotone h)) i x)
-    = Substructure.subtype (S i) x := rfl
-
 lemma rangeLiftInclusion : (liftInclusion S).toHom.range = ⨆ i, S i := by
   simp_rw [liftInclusion, range_lift, Substructure.range_subtype]
 
@@ -444,10 +440,6 @@ noncomputable def Equiv_iSup :
     rcases hm with ⟨a, _⟩; use a
     simpa only [F, Embedding.codRestrict_apply', Subtype.mk.injEq]
   exact ⟨Equiv.ofBijective F ⟨F.injective, F_surj⟩, F.map_fun', F.map_rel'⟩
-
-theorem Equiv_isup_of_apply {i : ι} (x : S i) :
-    Equiv_iSup S (of L ι _ (fun _ _ h ↦ Substructure.inclusion (S.monotone h)) i x)
-    = Substructure.inclusion (le_iSup _ _) x := rfl
 
 theorem Equiv_isup_symm_inclusion_apply {i : ι} (x : S i) :
     (Equiv_iSup S).symm (Substructure.inclusion (le_iSup _ _) x)

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Functor.Pseudofunctor
 import Mathlib.CategoryTheory.Bicategory.NaturalTransformation.Oplax
 
+noncomputable section
+
 /-!
 # Strong natural transformations
 
@@ -99,10 +101,6 @@ variable (F : OplaxFunctor B C)
 @[simps!]
 def id : StrongOplaxNatTrans F F :=
   mkOfOplax (OplaxNatTrans.id F) { naturality := fun f ↦ (ρ_ (F.map f)) ≪≫ (λ_ (F.map f)).symm }
-
-@[simp]
-lemma id.toOplax : (id F).toOplax = OplaxNatTrans.id F :=
-  rfl
 
 instance : Inhabited (StrongOplaxNatTrans F F) :=
   ⟨id F⟩

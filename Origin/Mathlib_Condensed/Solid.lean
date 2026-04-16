@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.KanExtension.Pointwise
 import Mathlib.Condensed.Functors
 import Mathlib.Condensed.Limits
 
+noncomputable section
+
 /-!
 
 # Solid modules

@@ -7,6 +7,8 @@ import Mathlib.Topology.Gluing
 import Mathlib.Geometry.RingedSpace.OpenImmersion
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace.HasColimits
 
+noncomputable section
+
 /-!
 # Gluing Structured spaces
 
@@ -307,6 +309,9 @@ def ιInvAppπApp {i : D.J} (U : Opens (D.U i).carrier) (j) :
   · exact D.opensImagePreimageMap i j U
 
 set_option maxHeartbeats 600000 in
+/-- (Implementation) The natural map `Γ(𝒪_{U_i}, U) ⟶ Γ(𝒪_X, 𝖣.ι i '' U)`.
+
+This forms the inverse of `(𝖣.ι i).c.app (op U)`. -/
 
 def ιInvApp {i : D.J} (U : Opens (D.U i).carrier) :
     (D.U i).presheaf.obj (op U) ⟶ limit (D.diagramOverOpen U) :=

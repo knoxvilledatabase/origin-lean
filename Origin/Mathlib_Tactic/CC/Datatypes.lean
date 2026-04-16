@@ -9,6 +9,8 @@ import Batteries.Data.RBMap.Basic
 import Mathlib.Lean.Meta.Basic
 import Std.Data.HashMap.Basic
 
+noncomputable section
+
 /-!
 # Datatypes for `cc`
 

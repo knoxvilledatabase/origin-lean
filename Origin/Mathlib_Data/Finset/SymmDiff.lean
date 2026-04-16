@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.SDiff
 import Mathlib.Data.Set.SymmDiff
 
+noncomputable section
+
 /-!
 # Symmetric difference of finite sets
 

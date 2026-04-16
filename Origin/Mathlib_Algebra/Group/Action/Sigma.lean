@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful
 
+noncomputable section
+
 /-!
 # Sigma instances for additive and multiplicative actions
 
@@ -29,10 +31,6 @@ variable [∀ i, SMul M (α i)] [∀ i, SMul N (α i)] (a : M) (i : ι) (b : α 
 @[to_additive Sigma.VAdd]
 instance : SMul M (Σi, α i) :=
   ⟨fun a => (Sigma.map id) fun _ => (a • ·)⟩
-
-@[to_additive]
-theorem smul_def : a • x = x.map id fun _ => (a • ·) :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem smul_mk : a • mk i b = ⟨i, a • b⟩ :=

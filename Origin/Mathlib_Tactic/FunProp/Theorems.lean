@@ -9,6 +9,8 @@ import Mathlib.Tactic.FunProp.FunctionData
 import Mathlib.Tactic.FunProp.RefinedDiscrTree
 import Batteries.Data.RBMap.Alter
 
+noncomputable section
+
 /-!
 ## `fun_prop` environment extensions storing theorems for `fun_prop`
 -/

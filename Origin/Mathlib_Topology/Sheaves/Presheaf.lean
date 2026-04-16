@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 import Mathlib.Topology.Sheaves.Init
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Presheaves on a topological space
 
@@ -47,10 +49,6 @@ variable {C}
 
 namespace Presheaf
 
-@[simp] theorem comp_app {X : TopCat} {U : (Opens X)ᵒᵖ} {P Q R : Presheaf C X}
-    (f : P ⟶ Q) (g : Q ⟶ R) :
-    (f ≫ g).app U = f.app U ≫ g.app U := rfl
-
 @[ext]
 lemma ext {X : TopCat} {P Q : Presheaf C X} {f g : P ⟶ Q}
     (w : ∀ U : Opens X, f.app (op U) = g.app (op U)) :
@@ -64,7 +62,6 @@ attribute [local instance] CategoryTheory.ConcreteCategory.hasCoeToSort
   CategoryTheory.ConcreteCategory.instFunLike
 
 macro "sheaf_restrict" : attr =>
-
   `(attr|aesop safe 50 apply (rule_sets := [$(Lean.mkIdent `Restrict):ident]))
 
 attribute [sheaf_restrict] bot_le le_top le_refl inf_le_left inf_le_right
@@ -155,42 +152,14 @@ scoped[AlgebraicGeometry] notation f:80 " _* " P:81 =>
 
   Prefunctor.obj (Functor.toPrefunctor (TopCat.Presheaf.pushforward _ f)) P
 
-@[simp]
-theorem pushforward_map_app' {X Y : TopCat.{w}} (f : X ⟶ Y) {ℱ 𝒢 : X.Presheaf C} (α : ℱ ⟶ 𝒢)
-    {U : (Opens Y)ᵒᵖ} : ((pushforward C f).map α).app U = α.app (op <| (Opens.map f).obj U.unop) :=
-  rfl
-
-lemma id_pushforward (X : TopCat.{w}) : pushforward C (𝟙 X) = 𝟭 (X.Presheaf C) := rfl
-
 variable {C}
 
 namespace Pushforward
 
 def id {X : TopCat.{w}} (ℱ : X.Presheaf C) : 𝟙 X _* ℱ ≅ ℱ := Iso.refl _
 
-@[simp]
-theorem id_hom_app {X : TopCat.{w}} (ℱ : X.Presheaf C) (U) : (id ℱ).hom.app U = 𝟙 _ := rfl
-
-@[simp]
-theorem id_inv_app {X : TopCat.{w}} (ℱ : X.Presheaf C) (U) :
-    (id ℱ).inv.app U = 𝟙 _ := rfl
-
-theorem id_eq {X : TopCat.{w}} (ℱ : X.Presheaf C) : 𝟙 X _* ℱ = ℱ := rfl
-
 def comp {X Y Z : TopCat.{w}} (f : X ⟶ Y) (g : Y ⟶ Z) (ℱ : X.Presheaf C) :
     (f ≫ g) _* ℱ ≅ g _* (f _* ℱ) := Iso.refl _
-
-theorem comp_eq {X Y Z : TopCat.{w}} (f : X ⟶ Y) (g : Y ⟶ Z) (ℱ : X.Presheaf C) :
-    (f ≫ g) _* ℱ = g _* (f _* ℱ) :=
-  rfl
-
-@[simp]
-theorem comp_hom_app {X Y Z : TopCat.{w}} (f : X ⟶ Y) (g : Y ⟶ Z) (ℱ : X.Presheaf C) (U) :
-    (comp f g ℱ).hom.app U = 𝟙 _ := rfl
-
-@[simp]
-theorem comp_inv_app {X Y Z : TopCat.{w}} (f : X ⟶ Y) (g : Y ⟶ Z) (ℱ : X.Presheaf C) (U) :
-    (comp f g ℱ).inv.app U = 𝟙 _ := rfl
 
 end Pushforward
 

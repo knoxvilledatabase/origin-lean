@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.MorphismProperty.IsInvertedBy
 import Mathlib.CategoryTheory.Quotient.Linear
 import Mathlib.CategoryTheory.Quotient.Preadditive
 
+noncomputable section
+
 /-!
 # The homotopy category
 
@@ -84,9 +86,6 @@ instance {D : Type*} [Category D] : ((whiskeringLeft _ _ D).obj (quotient V c)).
   Quotient.faithful_whiskeringLeft_functor _ _
 
 variable {V c}
-
-theorem quotient_obj_as (C : HomologicalComplex V c) : ((quotient V c).obj C).as = C :=
-  rfl
 
 @[simp]
 theorem quotient_map_out {C D : HomotopyCategory V c} (f : C ⟶ D) : (quotient V c).map f.out = f :=

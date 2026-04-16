@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Trace/Basic.lean
-Genuine: 27 | Conflates: 2 | Dissolved: 3 | Infrastructure: 3
+Genuine: 30 | Conflates: 2 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Galois.Basic
@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Determinant
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.RingTheory.Trace.Defs
+
+noncomputable section
 
 /-!
 # Trace for (finite) ring extensions.
@@ -348,11 +350,6 @@ variable (A)
 def embeddingsMatrix (b : κ → B) : Matrix κ (B →ₐ[A] C) C :=
   of fun i (σ : B →ₐ[A] C) => σ (b i)
 
-@[simp]
-theorem embeddingsMatrix_apply (b : κ → B) (i) (σ : B →ₐ[A] C) :
-    embeddingsMatrix A C b i σ = σ (b i) :=
-  rfl
-
 def embeddingsMatrixReindex (b : κ → B) (e : κ ≃ (B →ₐ[A] C)) :=
   reindex (Equiv.refl κ) e.symm (embeddingsMatrix A C b)
 
@@ -392,9 +389,41 @@ open Algebra
 
 variable (pb : PowerBasis K L)
 
--- DISSOLVED: det_traceMatrix_ne_zero'
+theorem det_traceMatrix_ne_zero' [Algebra.IsSeparable K L] : det (traceMatrix K pb.basis) ≠ 0 := by
+  suffices algebraMap K (AlgebraicClosure L) (det (traceMatrix K pb.basis)) ≠ 0 by
+    refine mt (fun ht => ?_) this
+    rw [ht, RingHom.map_zero]
+  haveI : FiniteDimensional K L := pb.finite
+  let e : Fin pb.dim ≃ (L →ₐ[K] AlgebraicClosure L) := (Fintype.equivFinOfCardEq ?_).symm
+  · rw [RingHom.map_det, RingHom.mapMatrix_apply,
+      traceMatrix_eq_embeddingsMatrixReindex_mul_trans K _ _ e,
+      embeddingsMatrixReindex_eq_vandermonde, det_mul, det_transpose]
+    refine mt mul_self_eq_zero.mp ?_
+    simp only [det_vandermonde, Finset.prod_eq_zero_iff, not_exists, sub_eq_zero]
+    rintro i ⟨_, j, hij, h⟩
+    exact (Finset.mem_Ioi.mp hij).ne' (e.injective <| pb.algHom_ext h)
+  · rw [AlgHom.card, pb.finrank]
 
--- DISSOLVED: det_traceForm_ne_zero
+theorem det_traceForm_ne_zero [Algebra.IsSeparable K L] [DecidableEq ι] (b : Basis ι K L) :
+    det (BilinForm.toMatrix b (traceForm K L)) ≠ 0 := by
+  haveI : FiniteDimensional K L := FiniteDimensional.of_fintype_basis b
+  let pb : PowerBasis K L := Field.powerBasisOfFiniteOfSeparable _ _
+  rw [← BilinForm.toMatrix_mul_basis_toMatrix pb.basis b, ←
+    det_comm' (pb.basis.toMatrix_mul_toMatrix_flip b) _, ← Matrix.mul_assoc, det_mul]
+  swap; · apply Basis.toMatrix_mul_toMatrix_flip
+  refine
+    mul_ne_zero
+      (isUnit_of_mul_eq_one _ ((b.toMatrix pb.basis)ᵀ * b.toMatrix pb.basis).det ?_).ne_zero ?_
+  · calc
+      (pb.basis.toMatrix b * (pb.basis.toMatrix b)ᵀ).det *
+            ((b.toMatrix pb.basis)ᵀ * b.toMatrix pb.basis).det =
+          (pb.basis.toMatrix b * (b.toMatrix pb.basis * pb.basis.toMatrix b)ᵀ *
+              b.toMatrix pb.basis).det := by
+        simp only [← det_mul, Matrix.mul_assoc, Matrix.transpose_mul]
+      _ = 1 := by
+        simp only [Basis.toMatrix_mul_toMatrix_flip, Matrix.transpose_one, Matrix.mul_one,
+          Matrix.det_one]
+  simpa only [traceMatrix_of_basis] using det_traceMatrix_ne_zero' pb
 
 variable (K L)
 
@@ -404,7 +433,14 @@ theorem traceForm_nondegenerate [FiniteDimensional K L] [Algebra.IsSeparable K L
   BilinForm.nondegenerate_of_det_ne_zero (traceForm K L) _
     (det_traceForm_ne_zero (Module.finBasis K L))
 
--- DISSOLVED: Algebra.trace_ne_zero
+theorem Algebra.trace_ne_zero [FiniteDimensional K L] [Algebra.IsSeparable K L] :
+    Algebra.trace K L ≠ 0 := by
+  intro e
+  let pb : PowerBasis K L := Field.powerBasisOfFiniteOfSeparable _ _
+  apply det_traceMatrix_ne_zero' pb
+  rw [show traceMatrix K pb.basis = 0 by ext; simp [e], Matrix.det_zero]
+  rw [← pb.finrank, ← Fin.pos_iff_nonempty]
+  exact finrank_pos
 
 theorem Algebra.trace_surjective [FiniteDimensional K L] [Algebra.IsSeparable K L] :
     Function.Surjective (Algebra.trace K L) := by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.QuadraticForm.IsometryEquiv
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
 
+noncomputable section
+
 /-!
 # Quadratic forms over the complex numbers
 

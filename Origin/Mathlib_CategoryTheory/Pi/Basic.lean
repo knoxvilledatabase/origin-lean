@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.NatIso
 import Mathlib.CategoryTheory.Products.Basic
 
+noncomputable section
+
 /-!
 # Categories of indexed families of objects.
 
@@ -129,19 +131,6 @@ variable {C}
 def isoApp {X Y : ∀ i, C i} (f : X ≅ Y) (i : I) : X i ≅ Y i :=
   ⟨f.hom i, f.inv i,
     by rw [← comp_apply, Iso.hom_inv_id, id_apply], by rw [← comp_apply, Iso.inv_hom_id, id_apply]⟩
-
-@[simp]
-theorem isoApp_refl (X : ∀ i, C i) (i : I) : isoApp (Iso.refl X) i = Iso.refl (X i) :=
-  rfl
-
-@[simp]
-theorem isoApp_symm {X Y : ∀ i, C i} (f : X ≅ Y) (i : I) : isoApp f.symm i = (isoApp f i).symm :=
-  rfl
-
-@[simp]
-theorem isoApp_trans {X Y Z : ∀ i, C i} (f : X ≅ Y) (g : Y ≅ Z) (i : I) :
-    isoApp (f ≪≫ g) i = isoApp f i ≪≫ isoApp g i :=
-  rfl
 
 end Pi
 

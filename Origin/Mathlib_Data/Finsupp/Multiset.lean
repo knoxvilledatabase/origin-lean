@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Data.Finsupp.Order
 
+noncomputable section
+
 /-!
 # Equivalence between `Multiset` and `ℕ`-valued finitely supported functions
 
@@ -131,9 +133,6 @@ def toFinsupp : Multiset α ≃+ (α →₀ ℕ) where
     Multiset.toFinset_sum_count_nsmul_eq]
 
 @[simp]
-theorem toFinsupp_support (s : Multiset α) : s.toFinsupp.support = s.toFinset := rfl
-
-@[simp]
 theorem toFinsupp_apply (s : Multiset α) (a : α) : toFinsupp s a = s.count a := rfl
 
 theorem toFinsupp_zero : toFinsupp (0 : Multiset α) = 0 := _root_.map_zero _
@@ -184,15 +183,6 @@ def orderIsoMultiset [DecidableEq ι] : (ι →₀ ℕ) ≃o Multiset ι where
   toEquiv := Multiset.toFinsupp.symm.toEquiv
   map_rel_iff' {f g} := by simp [le_def, Multiset.le_iff_count]
 
-@[simp]
-theorem coe_orderIsoMultiset [DecidableEq ι] : ⇑(@orderIsoMultiset ι _) = toMultiset :=
-  rfl
-
-@[simp]
-theorem coe_orderIsoMultiset_symm [DecidableEq ι] :
-    ⇑(@orderIsoMultiset ι).symm = Multiset.toFinsupp :=
-  rfl
-
 theorem toMultiset_strictMono : StrictMono (@toMultiset ι) := by
   classical exact (@orderIsoMultiset ι _).strictMono
 
@@ -225,21 +215,9 @@ def equivNatSum :
     Sym α n ≃ {P : α →₀ ℕ // P.sum (fun _ ↦ id) = n} :=
   Multiset.toFinsupp.toEquiv.subtypeEquiv <| by simp
 
-@[simp] lemma coe_equivNatSum_apply_apply (s : Sym α n) (a : α) :
-    (equivNatSum α n s : α →₀ ℕ) a = (s : Multiset α).count a :=
-  rfl
-
-@[simp] lemma coe_equivNatSum_symm_apply (P : {P : α →₀ ℕ // P.sum (fun _ ↦ id) = n}) :
-    ((equivNatSum α n).symm P : Multiset α) = Finsupp.toMultiset P :=
-  rfl
-
 noncomputable def equivNatSumOfFintype [Fintype α] :
     Sym α n ≃ {P : α → ℕ // ∑ i, P i = n} :=
   (equivNatSum α n).trans <| Finsupp.equivFunOnFinite.subtypeEquiv <| by simp [Finsupp.sum_fintype]
-
-@[simp] lemma coe_equivNatSumOfFintype_apply_apply [Fintype α] (s : Sym α n) (a : α) :
-    (equivNatSumOfFintype α n s : α → ℕ) a = (s : Multiset α).count a :=
-  rfl
 
 @[simp] lemma coe_equivNatSumOfFintype_symm_apply [Fintype α] (P : {P : α → ℕ // ∑ i, P i = n}) :
     ((equivNatSumOfFintype α n).symm P : Multiset α) = ∑ a, ((P : α → ℕ) a) • {a} := by

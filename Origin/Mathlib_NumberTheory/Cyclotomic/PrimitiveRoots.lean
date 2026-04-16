@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Cyclotomic/PrimitiveRoots.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.PNat.Prime
@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Adjoin.PowerBasis
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
 import Mathlib.RingTheory.Norm.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
+
+noncomputable section
 
 /-!
 # Primitive roots in cyclotomic fields
@@ -145,12 +147,6 @@ noncomputable def embeddingsEquivPrimitiveRoots (C : Type*) [CommRing C] [IsDoma
       left_inv := fun _ => Subtype.ext rfl
       right_inv := fun _ => Subtype.ext rfl }
 
-@[simp]
-theorem embeddingsEquivPrimitiveRoots_apply_coe (C : Type*) [CommRing C] [IsDomain C] [Algebra K C]
-    (hirr : Irreducible (cyclotomic n K)) (φ' : L →ₐ[K] C) :
-    (hζ.embeddingsEquivPrimitiveRoots C hirr φ' : C) = φ' ζ :=
-  rfl
-
 end IsPrimitiveRoot
 
 namespace IsCyclotomicExtension
@@ -194,7 +190,28 @@ variable {K} [Field K] [NumberField K]
 
 variable (n) in
 
--- DISSOLVED: dvd_of_isCyclotomicExtension
+theorem dvd_of_isCyclotomicExtension [IsCyclotomicExtension {n} ℚ K] {ζ : K}
+    {l : ℕ} (hζ : IsPrimitiveRoot ζ l) (hl : l ≠ 0) : l ∣ 2 * n := by
+  have hl : NeZero l := ⟨hl⟩
+  have hroot := IsCyclotomicExtension.zeta_spec n ℚ K
+  have key := IsPrimitiveRoot.lcm_totient_le_finrank hζ hroot
+    (cyclotomic.irreducible_rat <| Nat.lcm_pos (Nat.pos_of_ne_zero hl.1) n.2)
+  rw [IsCyclotomicExtension.finrank K (cyclotomic.irreducible_rat n.2)] at key
+  rcases _root_.dvd_lcm_right l n with ⟨r, hr⟩
+  have ineq := Nat.totient_super_multiplicative n r
+  rw [← hr] at ineq
+  replace key := (mul_le_iff_le_one_right (Nat.totient_pos.2 n.2)).mp (le_trans ineq key)
+  have rpos : 0 < r := by
+    refine Nat.pos_of_ne_zero (fun h ↦ ?_)
+    simp only [h, mul_zero, _root_.lcm_eq_zero_iff, PNat.ne_zero, or_false] at hr
+    exact hl.1 hr
+  replace key := (Nat.dvd_prime Nat.prime_two).1 (Nat.dvd_two_of_totient_le_one rpos key)
+  rcases key with (key | key)
+  · rw [key, mul_one] at hr
+    rw [← hr]
+    exact dvd_mul_of_dvd_right (_root_.dvd_lcm_left l ↑n) 2
+  · rw [key, mul_comm] at hr
+    simpa [← hr] using _root_.dvd_lcm_left _ _
 
 theorem exists_neg_pow_of_isOfFinOrder [IsCyclotomicExtension {n} ℚ K]
     (hno : Odd (n : ℕ)) {ζ x : K} (hζ : IsPrimitiveRoot ζ n) (hx : IsOfFinOrder x) :
@@ -483,7 +500,25 @@ theorem norm_sub_one_two {k : ℕ} (hζ : IsPrimitiveRoot ζ (2 ^ k)) (hk : 2 �
 
   simpa [hk₁, show ((2 : ℕ+) : ℕ) = 2 from rfl] using sub_one_norm_eq_eval_cyclotomic hζ this hirr
 
--- DISSOLVED: norm_pow_sub_one_eq_prime_pow_of_ne_zero
+theorem norm_pow_sub_one_eq_prime_pow_of_ne_zero {k s : ℕ} (hζ : IsPrimitiveRoot ζ ↑(p ^ (k + 1)))
+    [hpri : Fact (p : ℕ).Prime] [hcycl : IsCyclotomicExtension {p ^ (k + 1)} K L]
+    (hirr : Irreducible (cyclotomic (↑(p ^ (k + 1)) : ℕ) K)) (hs : s ≤ k) (hk : k ≠ 0) :
+    norm K (ζ ^ (p : ℕ) ^ s - 1) = (p : K) ^ (p : ℕ) ^ s := by
+  by_cases htwo : p ^ (k - s + 1) = 2
+  · have hp : p = 2 := by
+      rw [← PNat.coe_inj, PNat.pow_coe, ← pow_one 2] at htwo
+      replace htwo :=
+        eq_of_prime_pow_eq (prime_iff.1 hpri.out) (prime_iff.1 Nat.prime_two) (succ_pos _) htwo
+      rwa [show 2 = ((2 : ℕ+) : ℕ) by decide, PNat.coe_inj] at htwo
+    replace hs : s = k := by
+      rw [hp, ← PNat.coe_inj, PNat.pow_coe] at htwo
+      nth_rw 2 [← pow_one 2] at htwo
+      replace htwo := Nat.pow_right_injective rfl.le htwo
+      rw [add_left_eq_self, Nat.sub_eq_zero_iff_le] at htwo
+      exact le_antisymm hs htwo
+    simp only [hs, hp, one_coe, cast_one, pow_coe, show ((2 : ℕ+) : ℕ) = 2 from rfl]
+      at hζ hirr hcycl ⊢
+    obtain ⟨k₁, hk₁⟩ := Nat.exists_eq_succ_of_ne_zero hk
 
     rw [hζ.norm_pow_sub_one_two hirr, hk₁, _root_.pow_succ', pow_mul, neg_eq_neg_one_mul,
 

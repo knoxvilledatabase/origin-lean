@@ -9,6 +9,8 @@ import Mathlib.Topology.Maps.Basic
 import Mathlib.Topology.NhdsSet
 import Mathlib.Order.Filter.Cofinite
 
+noncomputable section
+
 /-!
 # Constructions of new topological spaces from old ones
 
@@ -113,14 +115,6 @@ theorem isClosedMap_ofAdd : IsClosedMap (ofAdd : X → Multiplicative X) := IsCl
 
 theorem isClosedMap_toAdd : IsClosedMap (toAdd : Multiplicative X → X) := IsClosedMap.id
 
-theorem nhds_ofMul (x : X) : 𝓝 (ofMul x) = map ofMul (𝓝 x) := rfl
-
-theorem nhds_ofAdd (x : X) : 𝓝 (ofAdd x) = map ofAdd (𝓝 x) := rfl
-
-theorem nhds_toMul (x : Additive X) : 𝓝 x.toMul = map toMul (𝓝 x) := rfl
-
-theorem nhds_toAdd (x : Multiplicative X) : 𝓝 x.toAdd = map toAdd (𝓝 x) := rfl
-
 end
 
 /-!
@@ -150,10 +144,6 @@ theorem isOpenMap_ofDual : IsOpenMap (ofDual : Xᵒᵈ → X) := IsOpenMap.id
 theorem isClosedMap_toDual : IsClosedMap (toDual : X → Xᵒᵈ) := IsClosedMap.id
 
 theorem isClosedMap_ofDual : IsClosedMap (ofDual : Xᵒᵈ → X) := IsClosedMap.id
-
-theorem nhds_toDual (x : X) : 𝓝 (toDual x) = map toDual (𝓝 x) := rfl
-
-theorem nhds_ofDual (x : X) : 𝓝 (ofDual x) = map ofDual (𝓝 x) := rfl
 
 variable [Preorder X] {x : X}
 

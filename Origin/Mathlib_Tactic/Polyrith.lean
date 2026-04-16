@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.Tactic.LinearCombination
 
+noncomputable section
+
 /-!
 
 # polyrith Tactic
@@ -123,6 +125,7 @@ def Poly.toSyntax : Poly → Unhygienic Syntax.Term
   | .neg p => do `(-$(← p.toSyntax))
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- Reifies a ring expression of type `α` as a `Poly`. -/
 
 partial def parse {u : Level} {α : Q(Type u)} (sα : Q(CommSemiring $α))
     (c : Ring.Cache sα) (e : Q($α)) : AtomM Poly := do

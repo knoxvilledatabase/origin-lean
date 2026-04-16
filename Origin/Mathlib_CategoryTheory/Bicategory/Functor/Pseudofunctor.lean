@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Functor.Oplax
 import Mathlib.CategoryTheory.Bicategory.Functor.Lax
 
+noncomputable section
+
 /-!
 # Pseudofunctors
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.Topology.ContinuousMap.Compact
 
+noncomputable section
+
 /-!
 # Continuous maps sending zero to zero
 
@@ -47,9 +49,6 @@ instance instZeroHomClass : ZeroHomClass C(X, R)₀ X R where
 @[ext]
 lemma ext {f g : C(X, R)₀} (h : ∀ x, f x = g x) : f = g := DFunLike.ext f g h
 
-@[simp]
-lemma coe_mk {f : C(X, R)} {h0 : f 0 = 0} : ⇑(mk f h0) = f := rfl
-
 lemma toContinuousMap_injective : Injective ((↑) : C(X, R)₀ → C(X, R)) :=
   fun _ _ h ↦ congr(.mk $(h) _)
 
@@ -60,13 +59,8 @@ def comp (g : C(Y, R)₀) (f : C(X, Y)₀) : C(X, R)₀ where
   toContinuousMap := (g : C(Y, R)).comp (f : C(X, Y))
   map_zero' := show g (f 0) = 0 from map_zero f ▸ map_zero g
 
-@[simp]
-lemma comp_apply (g : C(Y, R)₀) (f : C(X, Y)₀) (x : X) : g.comp f x = g (f x) := rfl
-
 instance instPartialOrder [PartialOrder R] : PartialOrder C(X, R)₀ :=
   .lift _ DFunLike.coe_injective'
-
-lemma le_def [PartialOrder R] (f g : C(X, R)₀) : f ≤ g ↔ ∀ x, f x ≤ g x := Iff.rfl
 
 protected instance instTopologicalSpace : TopologicalSpace C(X, R)₀ :=
   TopologicalSpace.induced ((↑) : C(X, R)₀ → C(X, R)) inferInstance
@@ -118,11 +112,6 @@ lemma continuous_comp_left {X Y Z : Type*} [TopologicalSpace X]
 protected def id {s : Set R} [Zero s] (h0 : ((0 : s) : R) = 0) : C(s, R)₀ :=
   ⟨.restrict s (.id R), h0⟩
 
-@[simp]
-lemma toContinuousMap_id {s : Set R} [Zero s] (h0 : ((0 : s) : R) = 0) :
-    (ContinuousMapZero.id h0 : C(s, R)) = .restrict s (.id R) :=
-  rfl
-
 end Basic
 
 section Algebra
@@ -138,8 +127,6 @@ instance instZero [Zero R] : Zero C(X, R)₀ where
 
 instance instAdd [AddZeroClass R] [ContinuousAdd R] : Add C(X, R)₀ where
   add f g := ⟨f + g, by simp⟩
-
-@[simp] lemma coe_add [AddZeroClass R] [ContinuousAdd R] (f g : C(X, R)₀) : ⇑(f + g) = f + g := rfl
 
 instance instMul [MulZeroClass R] [ContinuousMul R] : Mul C(X, R)₀ where
   mul f g := ⟨f * g, by simp⟩
@@ -196,26 +183,11 @@ instance instStarModule [StarRing R] {M : Type*} [SMulZeroClass M R] [Continuous
     [Star M] [StarModule M R] [ContinuousStar R] : StarModule M C(X, R)₀ where
   star_smul r f := ext fun x ↦ star_smul r (f x)
 
-@[simp] lemma coe_star [StarRing R] [ContinuousStar R] (f : C(X, R)₀) : ⇑(star f) = star ⇑f := rfl
-
 instance [StarRing R] [ContinuousStar R] [TrivialStar R] : TrivialStar C(X, R)₀ where
   star_trivial _ := DFunLike.ext _ _ fun _ ↦ star_trivial _
 
 instance instCanLift : CanLift C(X, R) C(X, R)₀ (↑) (fun f ↦ f 0 = 0) where
   prf f hf := ⟨⟨f, hf⟩, rfl⟩
-
-@[simps]
-def toContinuousMapHom [StarRing R] [ContinuousStar R] : C(X, R)₀ →⋆ₙₐ[R] C(X, R) where
-  toFun f := f
-  map_smul' _ _ := rfl
-  map_zero' := rfl
-  map_add' _ _ := rfl
-  map_mul' _ _ := rfl
-  map_star' _ := rfl
-
-lemma coe_toContinuousMapHom [StarRing R] [ContinuousStar R] :
-    ⇑(toContinuousMapHom (X := X) (R := R)) = (↑) :=
-  rfl
 
 @[simps]
 def toContinuousMapCLM (M : Type*) [Semiring M] [Module M R] [ContinuousConstSMul M R] :
@@ -227,10 +199,6 @@ def toContinuousMapCLM (M : Type*) [Semiring M] [Module M R] [ContinuousConstSMu
 def evalCLM (𝕜 : Type*) {R : Type*} [CompactSpace X] [NormedField 𝕜] [NormedCommRing R]
     [NormedSpace 𝕜 R] (x : X) : C(X, R)₀ →L[𝕜] R :=
   (ContinuousMap.evalCLM 𝕜 x).comp (toContinuousMapCLM 𝕜 : C(X, R)₀ →L[𝕜] C(X, R))
-
-@[simp]
-lemma evalCLM_apply {𝕜 : Type*} {R : Type*} [CompactSpace X] [NormedField 𝕜] [NormedCommRing R]
-    [NormedSpace 𝕜 R] (x : X) (f : C(X, R)₀) : evalCLM 𝕜 x f = f x := rfl
 
 def coeFnAddMonoidHom : C(X, R)₀ →+ X → R where
   toFun f := f
@@ -258,9 +226,6 @@ instance instNeg : Neg C(X, R)₀ where
 instance instNonUnitalCommRing : NonUnitalCommRing C(X, R)₀ :=
   toContinuousMap_injective.nonUnitalCommRing _ rfl
   (fun _ _ ↦ rfl) (fun _ _ ↦ rfl) (fun _ ↦ rfl) (fun _ _ ↦ rfl) (fun _ _ ↦ rfl) (fun _ _ ↦ rfl)
-
-@[simp]
-lemma coe_neg (f : C(X, R)₀) : ⇑(-f) = -⇑f := rfl
 
 instance : ContinuousNeg C(X, R)₀ where
   continuous_neg := by
@@ -323,15 +288,6 @@ variable {X Y M R S : Type*} [Zero X] [Zero Y] [CommSemiring M]
 
 variable (R) in
 
-@[simps]
-def nonUnitalStarAlgHom_precomp (f : C(X, Y)₀) : C(Y, R)₀ →⋆ₙₐ[R] C(X, R)₀ where
-  toFun g := g.comp f
-  map_zero' := rfl
-  map_add' _ _ := rfl
-  map_mul' _ _ := rfl
-  map_star' _ := rfl
-  map_smul' _ _ := rfl
-
 variable (X) in
 
 @[simps apply]
@@ -355,9 +311,6 @@ noncomputable instance [MetricSpace R] [Zero R]: MetricSpace C(α, R)₀ :=
 
 noncomputable instance [NormedAddCommGroup R] : Norm C(α, R)₀ where
   norm f := ‖(f : C(α, R))‖
-
-lemma norm_def [NormedAddCommGroup R] (f : C(α, R)₀) : ‖f‖ = ‖(f : C(α, R))‖ :=
-  rfl
 
 noncomputable instance [NormedCommRing R] : NonUnitalNormedCommRing C(α, R)₀ where
   dist_eq f g := NormedAddGroup.dist_eq (f : C(α, R)) g

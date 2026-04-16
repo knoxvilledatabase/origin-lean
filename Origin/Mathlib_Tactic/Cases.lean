@@ -8,6 +8,8 @@ import Batteries.Tactic.OpenPrivate
 import Mathlib.Lean.Expr.Basic
 import Batteries.Data.List.Basic
 
+noncomputable section
+
 /-!
 # Backward compatible implementation of lean 3 `cases` tactic
 
@@ -71,47 +73,26 @@ def ElimApp.evalNames (elimInfo : ElimInfo) (alts : Array ElimApp.Alt) (withArg 
 open private getElimNameInfo generalizeTargets generalizeVars from Lean.Elab.Tactic.Induction
 
 elab (name := induction') "induction' " tgts:(Parser.Tactic.casesTarget,+)
-
     usingArg:((" using " ident)?)
-
     withArg:((" with" (ppSpace colGt binderIdent)+)?)
-
     genArg:((" generalizing" (ppSpace colGt ident)+)?) : tactic => do
-
   let (targets, toTag) ← elabCasesTargets tgts.1.getSepArgs
-
   let g :: gs ← getUnsolvedGoals | throwNoGoalsToBeSolved
-
   g.withContext do
-
     let elimInfo ← getElimNameInfo usingArg targets (induction := true)
-
     let targets ← addImplicitTargets elimInfo targets
-
     evalInduction.checkTargets targets
-
     let targetFVarIds := targets.map (·.fvarId!)
-
     g.withContext do
-
       let genArgs ← if genArg.1.isNone then pure #[] else getFVarIds genArg.1[1].getArgs
-
       let forbidden ← mkGeneralizationForbiddenSet targets
-
       let mut s ← getFVarSetToGeneralize targets forbidden
-
       for v in genArgs do
-
         if forbidden.contains v then
-
           throwError "variable cannot be generalized \
-
             because target depends on it{indentExpr (mkFVar v)}"
-
         if s.contains v then
-
           throwError "unnecessary 'generalizing' argument, \
-
             variable '{mkFVar v}' is generalized automatically"
         s := s.insert v
       let (fvarIds, g) ← g.revert (← sortFVarIds s.toArray)
@@ -125,41 +106,23 @@ elab (name := induction') "induction' " tgts:(Parser.Tactic.casesTarget,+)
         setGoals <| (subgoals ++ result.others).toList ++ gs
 
 elab (name := cases') "cases' " tgts:(Parser.Tactic.casesTarget,+) usingArg:((" using " ident)?)
-
   withArg:((" with" (ppSpace colGt binderIdent)+)?) : tactic => do
-
   let (targets, toTag) ← elabCasesTargets tgts.1.getSepArgs
-
   let g :: gs ← getUnsolvedGoals | throwNoGoalsToBeSolved
-
   g.withContext do
-
     let elimInfo ← getElimNameInfo usingArg targets (induction := false)
-
     let targets ← addImplicitTargets elimInfo targets
-
     let result ← withRef tgts <| ElimApp.mkElimApp elimInfo targets (← g.getTag)
-
     let elimArgs := result.elimApp.getAppArgs
-
     let targets ← elimInfo.targetsPos.mapM (instantiateMVars elimArgs[·]!)
-
     let motive := elimArgs[elimInfo.motivePos]!
-
     let g ← generalizeTargetsEq g (← inferType motive) targets
-
     let (targetsNew, g) ← g.introN targets.size
-
     g.withContext do
-
       ElimApp.setMotiveArg g motive.mvarId! targetsNew
-
       g.assign result.elimApp
-
       let subgoals ← ElimApp.evalNames elimInfo result.alts withArg
-
          (numEqs := targets.size) (toClear := targetsNew) (toTag := toTag)
-
       setGoals <| subgoals.toList ++ gs
 
 end Mathlib.Tactic

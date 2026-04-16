@@ -10,6 +10,8 @@ import Mathlib.Order.Interval.Finset.Defs
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.Finset.Max
 
+noncomputable section
+
 /-!
 # Linear locally finite orders
 

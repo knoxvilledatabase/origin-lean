@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.FullyFaithful
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 
+noncomputable section
+
 /-!
 # Wide subcategories
 
@@ -80,24 +82,8 @@ structure WideSubcategory (_P : MorphismProperty C) [IsMultiplicative _P] where
 instance WideSubcategory.category : Category.{v₁} (WideSubcategory P) :=
   InducedWideCategory.category WideSubcategory.obj P
 
-@[simp]
-lemma WideSubcategory.id_def (X : WideSubcategory P) : (CategoryStruct.id X).1 = 𝟙 X.obj := rfl
-
-@[simp]
-lemma WideSubcategory.comp_def {X Y Z : WideSubcategory P} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).1 = (f.1 ≫ g.1 : X.obj ⟶ Z.obj) := rfl
-
 def wideSubcategoryInclusion : WideSubcategory P ⥤ C :=
   wideInducedFunctor WideSubcategory.obj P
-
-@[simp]
-theorem wideSubcategoryInclusion.obj (X) : (wideSubcategoryInclusion P).obj X = X.obj :=
-  rfl
-
-@[simp]
-theorem wideSubcategoryInclusion.map {X Y} {f : X ⟶ Y} :
-    (wideSubcategoryInclusion P).map f = f.1 :=
-  rfl
 
 instance wideSubcategory.faithful : (wideSubcategoryInclusion P).Faithful :=
   inferInstanceAs (wideInducedFunctor WideSubcategory.obj P).Faithful

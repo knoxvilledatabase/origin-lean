@@ -10,6 +10,8 @@ import Mathlib.Data.Setoid.Partition
 import Mathlib.Order.Antichain
 import Mathlib.Data.Nat.Cast.Order.Ring
 
+noncomputable section
+
 /-!
 # Graph Coloring
 
@@ -79,8 +81,6 @@ def Coloring.colorClass (c : α) : Set V := { v : V | C v = c }
 
 def Coloring.colorClasses : Set (Set V) := (Setoid.ker C).classes
 
-theorem Coloring.mem_colorClass (v : V) : v ∈ C.colorClass (C v) := rfl
-
 theorem Coloring.colorClasses_isPartition : Setoid.IsPartition C.colorClasses :=
   Setoid.isPartition_classes (Setoid.ker C)
 
@@ -128,9 +128,6 @@ def selfColoring : G.Coloring V := Coloring.mk id fun {_ _} => G.ne_of_adj
 
 noncomputable def chromaticNumber : ℕ∞ := ⨅ n ∈ setOf G.Colorable, (n : ℕ∞)
 
-lemma chromaticNumber_eq_biInf {G : SimpleGraph V} :
-    G.chromaticNumber = ⨅ n ∈ setOf G.Colorable, (n : ℕ∞) := rfl
-
 lemma chromaticNumber_eq_iInf {G : SimpleGraph V} :
     G.chromaticNumber = ⨅ n : {m | G.Colorable m}, (n : ℕ∞) := by
   rw [chromaticNumber, iInf_subtype]
@@ -151,9 +148,6 @@ def recolorOfEmbedding {α β : Type*} (f : α ↪ β) : G.Coloring α ↪ G.Col
     rw [h]
     rfl
 
-@[simp] lemma coe_recolorOfEmbedding (f : α ↪ β) :
-    ⇑(G.recolorOfEmbedding f) = (Embedding.completeGraph f).toHom.comp := rfl
-
 def recolorOfEquiv {α β : Type*} (f : α ≃ β) : G.Coloring α ≃ G.Coloring β where
   toFun := G.recolorOfEmbedding f.toEmbedding
   invFun := G.recolorOfEmbedding f.symm.toEmbedding
@@ -164,16 +158,9 @@ def recolorOfEquiv {α β : Type*} (f : α ≃ β) : G.Coloring α ≃ G.Colorin
     ext v
     apply Equiv.apply_symm_apply
 
-@[simp] lemma coe_recolorOfEquiv (f : α ≃ β) :
-    ⇑(G.recolorOfEquiv f) = (Embedding.completeGraph f).toHom.comp := rfl
-
 noncomputable def recolorOfCardLE {α β : Type*} [Fintype α] [Fintype β]
     (hn : Fintype.card α ≤ Fintype.card β) : G.Coloring α ↪ G.Coloring β :=
   G.recolorOfEmbedding <| (Function.Embedding.nonempty_of_card_le hn).some
-
-@[simp] lemma coe_recolorOfCardLE [Fintype α] [Fintype β] (hαβ : card α ≤ card β) :
-    ⇑(G.recolorOfCardLE hαβ) =
-      (Embedding.completeGraph (Embedding.nonempty_of_card_le hαβ).some).toHom.comp := rfl
 
 variable {G}
 
@@ -369,20 +356,6 @@ def CompleteBipartiteGraph.bicoloring (V W : Type*) : (completeBipartiteGraph V 
     (by
       intro v w
       cases v <;> cases w <;> simp)
-
-theorem CompleteBipartiteGraph.chromaticNumber {V W : Type*} [Nonempty V] [Nonempty W] :
-    (completeBipartiteGraph V W).chromaticNumber = 2 := by
-  rw [← Nat.cast_two, chromaticNumber_eq_iff_forall_surjective
-    (by simpa using (CompleteBipartiteGraph.bicoloring V W).colorable)]
-  intro C b
-  have v := Classical.arbitrary V
-  have w := Classical.arbitrary W
-  have h : (completeBipartiteGraph V W).Adj (Sum.inl v) (Sum.inr w) := by simp
-  by_cases he : C (Sum.inl v) = b
-  · exact ⟨_, he⟩
-  by_cases he' : C (Sum.inr w) = b
-  · exact ⟨_, he'⟩
-  · simpa using two_lt_card_iff.2 ⟨_, _, _, C.valid h, he, he'⟩
 
 /-! ### Cliques -/
 

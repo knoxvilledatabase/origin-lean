@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/Dirichlet.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 44 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.DirichletCharacter.Bounds
@@ -9,6 +9,8 @@ import Mathlib.NumberTheory.LSeries.Deriv
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.NumberTheory.SumPrimeReciprocals
 import Mathlib.NumberTheory.VonMangoldt
+
+noncomputable section
 
 /-!
 # L-series of Dirichlet characters and arithmetic functions
@@ -84,7 +86,9 @@ open Nat
 
 open scoped ArithmeticFunction.zeta in
 
--- DISSOLVED: ArithmeticFunction.const_one_eq_zeta
+lemma ArithmeticFunction.const_one_eq_zeta {R : Type*} [Semiring R] {n : ℕ} (hn : n ≠ 0) :
+    (1 : ℕ → R) n = (ζ ·) n := by
+  simp only [Pi.one_apply, zeta_apply, hn, ↓reduceIte, cast_one]
 
 lemma LSeries.one_convolution_eq_zeta_convolution {R : Type*} [Semiring R] (f : ℕ → R) :
     (1 : ℕ → R) ⍟ f = ((ArithmeticFunction.zeta ·) : ℕ → R) ⍟ f :=
@@ -108,7 +112,10 @@ lemma isMultiplicative_toArithmeticFunction {N : ℕ} {R : Type*} [CommMonoidWit
   · simp only [toArithmeticFunction, coe_mk, mul_eq_zero, hm, hn, false_or, Nat.cast_mul, map_mul,
       if_false]
 
--- DISSOLVED: apply_eq_toArithmeticFunction_apply
+lemma apply_eq_toArithmeticFunction_apply {N : ℕ} {R : Type*} [CommMonoidWithZero R]
+    (χ : DirichletCharacter R N) {n : ℕ} (hn : n ≠ 0) :
+    χ n = toArithmeticFunction (χ ·) n := by
+  simp only [toArithmeticFunction, ArithmeticFunction.coe_mk, hn, ↓reduceIte]
 
 open LSeries Nat Complex
 
@@ -153,15 +160,31 @@ lemma modOne_eq_one {R : Type*} [CommSemiring R] {χ : DirichletCharacter R 1} :
 lemma LSeries_modOne_eq : L ↗χ₁ = L 1 :=
   congr_arg L modOne_eq_one
 
--- DISSOLVED: not_LSeriesSummable_at_one
+lemma not_LSeriesSummable_at_one {N : ℕ} (hN : N ≠ 0) (χ : DirichletCharacter ℂ N) :
+    ¬ LSeriesSummable ↗χ 1 := by
+  refine fun h ↦ (Real.not_summable_indicator_one_div_natCast hN 1) ?_
+  refine h.norm.of_nonneg_of_le (fun m ↦ Set.indicator_apply_nonneg (fun _ ↦ by positivity))
+    (fun n ↦ ?_)
+  rw [norm_term_eq, one_re, Real.rpow_one, Set.indicator]
+  split_ifs with h₁ h₂
+  · rw [h₂, cast_zero, div_zero]
+  · rw [h₁, χ.map_one, norm_one]
+  all_goals positivity
 
 lemma LSeriesSummable_of_one_lt_re {N : ℕ} (χ : DirichletCharacter ℂ N) {s : ℂ} (hs : 1 < s.re) :
     LSeriesSummable ↗χ s :=
   LSeriesSummable_of_bounded_of_one_lt_re (fun _ _ ↦ χ.norm_le_one _) hs
 
--- DISSOLVED: LSeriesSummable_iff
+lemma LSeriesSummable_iff {N : ℕ} (hN : N ≠ 0) (χ : DirichletCharacter ℂ N) {s : ℂ} :
+    LSeriesSummable ↗χ s ↔ 1 < s.re := by
+  refine ⟨fun H ↦ ?_, LSeriesSummable_of_one_lt_re χ⟩
+  by_contra! h
+  exact not_LSeriesSummable_at_one hN χ <| LSeriesSummable.of_re_le_re (by simp only [one_re, h]) H
 
--- DISSOLVED: absicssaOfAbsConv_eq_one
+lemma absicssaOfAbsConv_eq_one {N : ℕ} (hn : N ≠ 0) (χ : DirichletCharacter ℂ N) :
+    abscissaOfAbsConv ↗χ = 1 := by
+  simpa only [abscissaOfAbsConv, LSeriesSummable_iff hn χ, ofReal_re, Set.Ioi_def,
+    EReal.image_coe_Ioi, EReal.coe_one] using csInf_Ioo <| EReal.coe_lt_top _
 
 lemma LSeriesSummable_mul {N : ℕ} (χ : DirichletCharacter ℂ N) {f : ℕ → ℂ} {s : ℂ}
     (h : LSeriesSummable f s) :
@@ -182,7 +205,9 @@ lemma LSeries.mul_mu_eq_one {N : ℕ} (χ : DirichletCharacter ℂ N) {s : ℂ}
 ### L-series of Dirichlet characters do not vanish on re s > 1
 -/
 
--- DISSOLVED: LSeries_ne_zero_of_one_lt_re
+lemma LSeries_ne_zero_of_one_lt_re {N : ℕ} (χ : DirichletCharacter ℂ N) {s : ℂ} (hs : 1 < s.re) :
+    L ↗χ s ≠ 0 :=
+  fun h ↦ by simpa only [h, zero_mul, zero_ne_one] using LSeries.mul_mu_eq_one χ hs
 
 end DirichletCharacter
 
@@ -235,7 +260,8 @@ lemma LSeries_zeta_mul_Lseries_moebius {s : ℂ} (hs : 1 < s.re) : L ↗ζ s * L
   simp only [← natCoe_apply, ← intCoe_apply, coe_mul, coe_zeta_mul_coe_moebius, one_eq_delta,
     LSeries_delta, Pi.one_apply]
 
--- DISSOLVED: LSeries_zeta_ne_zero_of_one_lt_re
+lemma LSeries_zeta_ne_zero_of_one_lt_re {s : ℂ} (hs : 1 < s.re) : L ↗ζ s ≠ 0 :=
+  fun h ↦ by simpa only [h, zero_mul, zero_ne_one] using LSeries_zeta_mul_Lseries_moebius hs
 
 end ArithmeticFunction
 
@@ -250,9 +276,12 @@ lemma LSeriesHasSum_one {s : ℂ} (hs : 1 < s.re) : LSeriesHasSum 1 s (riemannZe
 lemma LSeries_one_mul_Lseries_moebius {s : ℂ} (hs : 1 < s.re) : L 1 s * L ↗μ s = 1 :=
   LSeries_zeta_eq ▸ LSeries_zeta_mul_Lseries_moebius hs
 
--- DISSOLVED: LSeries_one_ne_zero_of_one_lt_re
+-- CONFLATES (assumes ground = zero): LSeries_one_ne_zero_of_one_lt_re
+lemma LSeries_one_ne_zero_of_one_lt_re {s : ℂ} (hs : 1 < s.re) : L 1 s ≠ 0 :=
+  LSeries_zeta_eq ▸ LSeries_zeta_ne_zero_of_one_lt_re hs
 
--- DISSOLVED: riemannZeta_ne_zero_of_one_lt_re
+lemma riemannZeta_ne_zero_of_one_lt_re {s : ℂ} (hs : 1 < s.re) : riemannZeta s ≠ 0 :=
+  LSeries_one_eq_riemannZeta hs ▸ LSeries_one_ne_zero_of_one_lt_re hs
 
 end zeta
 

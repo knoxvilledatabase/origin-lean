@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Fourier/RiemannLebesgueLemma.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Fourier.FourierTransform
@@ -12,6 +12,8 @@ import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Topology.EMetricSpace.Paracompact
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.Topology.Algebra.Module.WeakDual
+
+noncomputable section
 
 /-!
 # The Riemann-Lebesgue Lemma
@@ -58,9 +60,41 @@ variable [NormedAddCommGroup V] [MeasurableSpace V] [BorelSpace V] [InnerProduct
 
 local notation3 "i" => fun (w : V) => (1 / (2 * ‖w‖ ^ 2) : ℝ) • w
 
--- DISSOLVED: fourierIntegral_half_period_translate
+theorem fourierIntegral_half_period_translate {w : V} (hw : w ≠ 0) :
+    (∫ v : V, 𝐞 (-⟪v, w⟫) • f (v + i w)) = -∫ v : V, 𝐞 (-⟪v, w⟫) • f v := by
+  have hiw : ⟪i w, w⟫ = 1 / 2 := by
+    rw [inner_smul_left, inner_self_eq_norm_sq_to_K, RCLike.ofReal_real_eq_id, id,
+      RCLike.conj_to_real, ← div_div, div_mul_cancel₀]
+    rwa [Ne, sq_eq_zero_iff, norm_eq_zero]
+  have :
+    (fun v : V => 𝐞 (-⟪v, w⟫) • f (v + i w)) =
+      fun v : V => (fun x : V => -(𝐞 (-⟪x, w⟫) • f x)) (v + i w) := by
+    ext1 v
+    simp_rw [inner_add_left, hiw, Circle.smul_def, Real.fourierChar_apply, neg_add, mul_add,
+      ofReal_add, add_mul, exp_add]
+    have : 2 * π * -(1 / 2) = -π := by field_simp; ring
+    rw [this, ofReal_neg, neg_mul, exp_neg, exp_pi_mul_I, inv_neg, inv_one, mul_neg_one, neg_smul,
+      neg_neg]
+  rw [this]
+  -- Porting note:
+  -- The next three lines had just been
+  -- rw [integral_add_right_eq_self (fun (x : V) ↦ -(𝐞[-⟪x, w⟫]) • f x)
+  --       ((fun w ↦ (1 / (2 * ‖w‖ ^ (2 : ℕ))) • w) w)]
+  -- Unfortunately now we need to specify `volume`.
+  have := integral_add_right_eq_self (μ := volume) (fun (x : V) ↦ -(𝐞 (-⟪x, w⟫) • f x))
+    ((fun w ↦ (1 / (2 * ‖w‖ ^ (2 : ℕ))) • w) w)
+  rw [this]
+  simp only [neg_smul, integral_neg]
 
--- DISSOLVED: fourierIntegral_eq_half_sub_half_period_translate
+theorem fourierIntegral_eq_half_sub_half_period_translate {w : V} (hw : w ≠ 0)
+    (hf : Integrable f) :
+    ∫ v : V, 𝐞 (-⟪v, w⟫) • f v = (1 / (2 : ℂ)) • ∫ v : V, 𝐞 (-⟪v, w⟫) • (f v - f (v + i w)) := by
+  simp_rw [smul_sub]
+  rw [integral_sub, fourierIntegral_half_period_translate hw, sub_eq_add_neg, neg_neg, ←
+    two_smul ℂ _, ← @smul_assoc _ _ _ _ _ _ (IsScalarTower.left ℂ), smul_eq_mul]
+  · norm_num
+  exacts [(Real.fourierIntegral_convergent_iff w).2 hf,
+    (Real.fourierIntegral_convergent_iff w).2 (hf.comp_add_right _)]
 
 theorem tendsto_integral_exp_inner_smul_cocompact_of_continuous_compact_support (hf1 : Continuous f)
     (hf2 : HasCompactSupport f) :

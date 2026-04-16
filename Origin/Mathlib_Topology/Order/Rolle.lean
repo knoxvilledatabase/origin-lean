@@ -8,6 +8,8 @@ import Mathlib.Topology.Order.Compact
 import Mathlib.Topology.Order.LocalExtr
 import Mathlib.Topology.Order.T5
 
+noncomputable section
+
 /-!
 # Rolle's Theorem (topological part)
 

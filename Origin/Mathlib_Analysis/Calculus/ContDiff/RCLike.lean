@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Defs
 import Mathlib.Analysis.Calculus.MeanValue
 
+noncomputable section
+
 /-!
 # Higher differentiability over `ℝ` or `ℂ`
 -/

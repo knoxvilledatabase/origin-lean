@@ -1,12 +1,14 @@
 /-
 Extracted from AlgebraicGeometry/Pullbacks.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Gluing
 import Mathlib.CategoryTheory.Limits.Opposites
 import Mathlib.AlgebraicGeometry.AffineScheme
 import Mathlib.CategoryTheory.Limits.Shapes.Diagonal
+
+noncomputable section
 
 /-!
 # Fibred products of schemes
@@ -380,7 +382,6 @@ def gluedIsLimit : IsLimit (PullbackCone.mk _ _ (p_comm 𝒰 f g)) := by
       pullbackRightPullbackFstIso_hom_fst_assoc, ← pullback.condition_assoc, h₂]
 
 include 𝒰 in
-
 theorem hasPullback_of_cover : HasPullback f g :=
   ⟨⟨⟨_, gluedIsLimit 𝒰 f g⟩⟩⟩
 
@@ -497,13 +498,11 @@ def openCoverOfBase (𝒰 : OpenCover Z) (f : X ⟶ Z) (g : Y ⟶ Z) : OpenCover
 variable (f : X ⟶ Y) (𝒰 : Y.OpenCover) (𝒱 : ∀ i, ((𝒰.pullbackCover f).obj i).OpenCover)
 
 noncomputable
-
 def diagonalCover : (pullback.diagonalObj f).OpenCover :=
   (openCoverOfBase 𝒰 f f).bind
     fun i ↦ openCoverOfLeftRight (𝒱 i) (𝒱 i) (𝒰.pullbackHom _ _) (𝒰.pullbackHom _ _)
 
 noncomputable
-
 def diagonalCoverDiagonalRange : (pullback.diagonalObj f).Opens :=
   ⨆ i : Σ i, (𝒱 i).J, ((diagonalCover f 𝒰 𝒱).map ⟨i.1, i.2, i.2⟩).opensRange
 
@@ -515,7 +514,6 @@ lemma diagonalCover_map (I) : (diagonalCover f 𝒰 𝒱).map I =
   ext1 <;> simp [diagonalCover, Cover.pullbackHom]
 
 noncomputable
-
 def diagonalRestrictIsoDiagonal (i j) :
     Arrow.mk (pullback.diagonal f ∣_ ((diagonalCover f 𝒰 𝒱).map ⟨i, j, j⟩).opensRange) ≅
     Arrow.mk (pullback.diagonal ((𝒱 i).map j ≫ pullback.snd _ _)) := by
@@ -567,7 +565,6 @@ variable (R S T : Type u) [CommRing R] [CommRing S] [CommRing T] [Algebra R S] [
 open TensorProduct Algebra.TensorProduct CommRingCat RingHomClass
 
 noncomputable
-
 def pullbackSpecIso :
     pullback (Spec.map (CommRingCat.ofHom (algebraMap R S)))
       (Spec.map (CommRingCat.ofHom (algebraMap R T))) ≅ Spec (.of <| S ⊗[R] T) :=

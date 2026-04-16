@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Final
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Shapes.KernelPair
 
+noncomputable section
+
 /-!
 # Reflexive coequalizers
 
@@ -217,21 +219,11 @@ instance category : SmallCategory WalkingReflexivePair where
 
 open Hom
 
-@[simp]
-lemma Hom.id_eq (X : WalkingReflexivePair) :
-    Hom.id X = 𝟙 X := by rfl
-
 @[reassoc (attr := simp)]
 lemma reflexion_comp_left : reflexion ≫ left = 𝟙 zero := rfl
 
 @[reassoc (attr := simp)]
 lemma reflexion_comp_right : reflexion ≫ right = 𝟙 zero := rfl
-
-@[simp]
-lemma leftCompReflexion_eq : leftCompReflexion = (left ≫ reflexion : one ⟶ one) := rfl
-
-@[simp]
-lemma rightCompReflexion_eq : rightCompReflexion = (right ≫ reflexion : one ⟶ one) := rfl
 
 section FunctorsOutOfWalkingReflexivePair
 
@@ -334,10 +326,6 @@ variable {A B : C}
 
 variable (f g : A ⟶ B) (s : B ⟶ A) {sl : s ≫ f = 𝟙 B} {sr : s ≫ g = 𝟙 B}
 
-@[simp] lemma reflexivePair_obj_zero : (reflexivePair f g s sl sr).obj zero = B := rfl
-
-@[simp] lemma reflexivePair_obj_one : (reflexivePair f g s sl sr).obj one = A := rfl
-
 @[simp] lemma reflexivePair_map_right : (reflexivePair f g s sl sr).map .left = f := rfl
 
 @[simp] lemma reflexivePair_map_left : (reflexivePair f g s sl sr).map .right = g := rfl
@@ -348,14 +336,6 @@ end
 
 noncomputable def ofIsReflexivePair (f g : A ⟶ B) [IsReflexivePair f g] :
     WalkingReflexivePair ⥤ C := reflexivePair f g (commonSection f g)
-
-@[simp]
-lemma ofIsReflexivePair_map_left (f g : A ⟶ B) [IsReflexivePair f g] :
-    (ofIsReflexivePair f g).map .left = f := rfl
-
-@[simp]
-lemma ofIsReflexivePair_map_right (f g : A ⟶ B) [IsReflexivePair f g] :
-    (ofIsReflexivePair f g).map .right = g := rfl
 
 noncomputable def inclusionWalkingReflexivePairOfIsReflexivePairIso
     (f g : A ⟶ B) [IsReflexivePair f g] :
@@ -395,12 +375,6 @@ def mkNatTrans : F ⟶ G where
         Functor.map_comp, h₁, h₂, h₃, reassoc_of% h₁, reassoc_of% h₂,
         reflexivePair_map_reflexion, reflexivePair_map_left, reflexivePair_map_right,
         Category.assoc]
-
-@[simp]
-lemma mkNatTrans_app_zero : (mkNatTrans e₀ e₁ h₁ h₂ h₃).app zero = e₀ := rfl
-
-@[simp]
-lemma mkNatTrans_app_one : (mkNatTrans e₀ e₁ h₁ h₂ h₃).app one = e₁ := rfl
 
 end NatTrans
 
@@ -479,15 +453,8 @@ def mk {X : C} (π : F.obj zero ⟶ X) (h : F.map left ≫ π = F.map right ≫ 
   pt := X
   ι := reflexivePair.mkNatTrans π (F.map left ≫ π)
 
-@[simp]
-lemma mk_π {X : C} (π : F.obj zero ⟶ X) (h : F.map left ≫ π = F.map right ≫ π) :
-    (mk π h).π = π := rfl
-
 lemma condition (G : ReflexiveCofork F) : F.map left ≫ G.π = F.map right ≫ G.π := by
   rw [Cocone.w G left, Cocone.w G right]
-
-@[simp]
-lemma app_one_eq_π (G : ReflexiveCofork F) : G.ι.app zero = G.π := rfl
 
 abbrev toCofork (G : ReflexiveCofork F) : Cofork (F.map left) (F.map right) :=
   Cofork.ofπ G.π (by simp)

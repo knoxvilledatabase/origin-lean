@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Coeff
 import Mathlib.Data.Nat.Choose.Basic
 
+noncomputable section
+
 /-!
 
 # Vandermonde's identity

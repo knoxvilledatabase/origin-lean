@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Field.Defs
 import Mathlib.Algebra.Ring.Int.Parity
 
+noncomputable section
+
 /-!
 # Results about powers in fields or division rings.
 

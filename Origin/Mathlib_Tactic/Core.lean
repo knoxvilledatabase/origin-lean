@@ -10,6 +10,8 @@ import Lean.Meta.Tactic.Intro
 import Mathlib.Lean.Expr.Basic
 import Batteries.Tactic.OpenPrivate
 
+noncomputable section
+
 /-!
 # Generally useful tactics.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.LocalRing.Defs
 import Mathlib.RingTheory.Ideal.Nonunits
 
+noncomputable section
+
 /-!
 
 # Local rings

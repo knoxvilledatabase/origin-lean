@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.FintypeCat
 import Mathlib.Topology.Category.TopCat.Basic
 
+noncomputable section
+
 /-!
 # Category of finite topological spaces
 
@@ -48,11 +50,6 @@ instance (X : FinTopCat) : Fintype ((forget FinTopCat).obj X) :=
 def of (X : Type u) [Fintype X] [TopologicalSpace X] : FinTopCat where
   toTop := TopCat.of X
   fintype := ‹_›
-
-@[simp]
-theorem coe_of (X : Type u) [Fintype X] [TopologicalSpace X] :
-    (of X : Type u) = X :=
-  rfl
 
 instance : HasForget₂ FinTopCat FintypeCat :=
   HasForget₂.mk' (fun X ↦ FintypeCat.of X) (fun _ ↦ rfl) (fun f ↦ f.toFun) HEq.rfl

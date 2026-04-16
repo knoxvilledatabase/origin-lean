@@ -7,6 +7,8 @@ import Mathlib.Dynamics.Newton
 import Mathlib.LinearAlgebra.Semisimple
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 
+noncomputable section
+
 /-!
 # Jordan-Chevalley-Dunford decomposition
 

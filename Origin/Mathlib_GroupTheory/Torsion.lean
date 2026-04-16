@@ -5,6 +5,8 @@ Genuine: 32 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.GroupTheory.PGroup
 
+noncomputable section
+
 /-!
 # Torsion groups
 
@@ -208,16 +210,6 @@ theorem torsion_eq_top (tG : IsTorsion G) : torsion G = ⊤ := by ext; tauto
 @[to_additive "An additive torsion monoid is isomorphic to its torsion submonoid."]
 def torsionMulEquiv (tG : IsTorsion G) : torsion G ≃* G :=
   (MulEquiv.submonoidCongr tG.torsion_eq_top).trans Submonoid.topEquiv
-
-@[to_additive]
-theorem torsionMulEquiv_apply (tG : IsTorsion G) (a : torsion G) :
-    tG.torsionMulEquiv a = MulEquiv.submonoidCongr tG.torsion_eq_top a :=
-  rfl
-
-@[to_additive]
-theorem torsionMulEquiv_symm_apply_coe (tG : IsTorsion G) (a : G) :
-    tG.torsionMulEquiv.symm a = ⟨Submonoid.topEquiv.symm a, tG _⟩ :=
-  rfl
 
 end Monoid.IsTorsion
 

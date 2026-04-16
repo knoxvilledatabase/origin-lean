@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Dynamics.Ergodic.Ergodic
 import Mathlib.MeasureTheory.Function.AEEqFun
 
+noncomputable section
+
 /-!
 # Functions invariant under (quasi)ergodic map
 

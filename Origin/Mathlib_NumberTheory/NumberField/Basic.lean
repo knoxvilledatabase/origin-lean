@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/NumberField/Basic.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 1 | Infrastructure: 41
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Rat
 import Mathlib.Algebra.Ring.Int.Parity
 import Mathlib.Algebra.Ring.Int.Units
 import Mathlib.RingTheory.DedekindDomain.IntegralClosure
+
+noncomputable section
 
 /-!
 # Number fields
@@ -76,6 +78,8 @@ theorem of_tower [NumberField K] [NumberField L] [Algebra K L] (E : Type*) [Fiel
 def RingOfIntegers : Type _ :=
   integralClosure ℤ K
 
+@[inherit_doc] scoped notation "𝓞" => NumberField.RingOfIntegers
+
 namespace RingOfIntegers
 
 instance : CommRing (𝓞 K) :=
@@ -109,8 +113,6 @@ abbrev val (x : 𝓞 K) : K := algebraMap _ _ x
 
 instance : CoeHead (𝓞 K) K := ⟨val⟩
 
-lemma coe_eq_algebraMap (x : 𝓞 K) : (x : K) = algebraMap _ _ x := rfl
-
 @[ext] theorem ext {x y : 𝓞 K} (h : (x : K) = (y : K)) : x = y :=
   Subtype.ext h
 
@@ -119,10 +121,6 @@ theorem eq_iff {x y : 𝓞 K} : (x : K) = (y : K) ↔ x = y :=
   NumberField.RingOfIntegers.ext_iff.symm
 
 @[simp] lemma map_mk (x : K) (hx) : algebraMap (𝓞 K) K ⟨x, hx⟩ = x := rfl
-
-lemma coe_mk {x : K} (hx) : ((⟨x, hx⟩ : 𝓞 K) : K) = x := rfl
-
-lemma mk_eq_mk (x y : K) (hx hy) : (⟨x, hx⟩ : 𝓞 K) = ⟨y, hy⟩ ↔ x = y := by simp
 
 @[simp] lemma mk_one : (⟨1, one_mem _⟩ : 𝓞 K) = 1 :=
   rfl
@@ -134,12 +132,6 @@ lemma mk_eq_mk (x y : K) (hx hy) : (⟨x, hx⟩ : 𝓞 K) = ⟨y, hy⟩ ↔ x = 
   rfl
 
 @[simp] lemma mk_mul_mk (x y : K) (hx hy) : (⟨x, hx⟩ : 𝓞 K) * ⟨y, hy⟩ = ⟨x * y, mul_mem hx hy⟩ :=
-  rfl
-
-@[simp] lemma mk_sub_mk (x y : K) (hx hy) : (⟨x, hx⟩ : 𝓞 K) - ⟨y, hy⟩ = ⟨x - y, sub_mem hx hy⟩ :=
-  rfl
-
-@[simp] lemma neg_mk (x : K) (hx) : (-⟨x, hx⟩ : 𝓞 K) = ⟨-x, neg_mem hx⟩ :=
   rfl
 
 def mapRingHom {K L F : Type*} [Field K] [Field L] [FunLike F K L]
@@ -189,7 +181,8 @@ lemma coe_injective : Function.Injective (algebraMap (𝓞 K) K) :=
 lemma coe_eq_zero_iff {x : 𝓞 K} : algebraMap _ K x = 0 ↔ x = 0 :=
   map_eq_zero_iff _ coe_injective
 
--- DISSOLVED: coe_ne_zero_iff
+lemma coe_ne_zero_iff {x : 𝓞 K} : algebraMap _ K x ≠ 0 ↔ x ≠ 0 :=
+  map_ne_zero_iff _ coe_injective
 
 theorem isIntegral_coe (x : 𝓞 K) : IsIntegral ℤ (algebraMap _ K x) :=
   x.2

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/FunProp/ContDiff.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas
@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Tactic.FunProp
 import Mathlib.Tactic.FunProp.Differentiable
+
+noncomputable section
 
 /-!
 ## `funProp` minimal setup for ContDiff(At/On)
@@ -62,7 +64,9 @@ variable {E : Type*} [NormedAddCommGroup E] [NormedSpace K E]
 
 variable {s}
 
--- DISSOLVED: ContDiffOn.div'
+theorem ContDiffOn.div' {f g : E → K} {n} (hf : ContDiffOn K n f s)
+    (hg : ContDiffOn K n g s) (h₀ : ∀ x ∈ s, g x ≠ 0) : ContDiffOn K n (fun x => f x / g x) s :=
+  ContDiffOn.div hf hg h₀
 
 end div
 

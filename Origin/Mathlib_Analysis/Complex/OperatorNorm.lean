@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Data.Complex.Determinant
 
+noncomputable section
+
 /-! # The basic continuous linear maps associated to `ℂ`
 
 The continuous linear maps `Complex.reCLM` (real part), `Complex.imCLM` (imaginary part),

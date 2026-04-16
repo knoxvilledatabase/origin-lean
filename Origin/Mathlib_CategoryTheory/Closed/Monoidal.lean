@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.Functor
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Mates
 
+noncomputable section
+
 /-!
 # Closed monoidal categories
 
@@ -61,14 +63,6 @@ def ev : ihom A ⋙ tensorLeft A ⟶ 𝟭 C :=
 def coev : 𝟭 C ⟶ tensorLeft A ⋙ ihom A :=
   (ihom.adjunction A).unit
 
-@[simp]
-theorem ihom_adjunction_counit : (ihom.adjunction A).counit = ev A :=
-  rfl
-
-@[simp]
-theorem ihom_adjunction_unit : (ihom.adjunction A).unit = coev A :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem ev_naturality {X Y : C} (f : X ⟶ Y) :
     A ◁ (ihom A).map f ≫ (ev A).app Y = (ev A).app X ≫ f :=
@@ -80,6 +74,7 @@ theorem coev_naturality {X Y : C} (f : X ⟶ Y) :
   (coev A).naturality f
 
 set_option quotPrecheck false in
+/-- `A ⟶[C] B` denotes the internal hom from `A` to `B` -/
 
 notation A " ⟶[" C "] " B:10 => (@ihom C _ _ A _).obj B
 
@@ -208,9 +203,6 @@ theorem pre_id (A : C) [Closed A] : pre (𝟙 A) = 𝟙 _ := by
 theorem pre_map {A₁ A₂ A₃ : C} [Closed A₁] [Closed A₂] [Closed A₃] (f : A₁ ⟶ A₂) (g : A₂ ⟶ A₃) :
     pre (f ≫ g) = pre g ≫ pre f := by
   rw [pre, pre, pre, conjugateEquiv_comp, (tensoringLeft C).map_comp]
-
-theorem pre_comm_ihom_map {W X Y Z : C} [Closed W] [Closed X] (f : W ⟶ X) (g : Y ⟶ Z) :
-    (pre f).app Y ≫ (ihom W).map g = (ihom X).map g ≫ (pre f).app Z := by simp
 
 end Pre
 

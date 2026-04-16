@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Module/Submodule/Map.lean
-Genuine: 75 | Conflates: 0 | Dissolved: 4 | Infrastructure: 18
+Genuine: 79 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Map
 import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Algebra.Module.Submodule.LinearMap
+
+noncomputable section
 
 /-!
 # `map` and `comap` for `Submodule`s
@@ -70,22 +72,6 @@ theorem map_toAddSubmonoid (f : M →ₛₗ[σ₁₂] M₂) (p : Submodule R M) 
 theorem map_toAddSubmonoid' (f : M →ₛₗ[σ₁₂] M₂) (p : Submodule R M) :
     (p.map f).toAddSubmonoid = p.toAddSubmonoid.map f :=
   SetLike.coe_injective rfl
-
-@[simp]
-theorem _root_.AddMonoidHom.coe_toIntLinearMap_map {A A₂ : Type*} [AddCommGroup A] [AddCommGroup A₂]
-    (f : A →+ A₂) (s : AddSubgroup A) :
-    (AddSubgroup.toIntSubmodule s).map f.toIntLinearMap =
-      AddSubgroup.toIntSubmodule (s.map f) := rfl
-
-@[simp]
-theorem _root_.MonoidHom.coe_toAdditive_map {G G₂ : Type*} [Group G] [Group G₂] (f : G →* G₂)
-    (s : Subgroup G) :
-    s.toAddSubgroup.map (MonoidHom.toAdditive f) = Subgroup.toAddSubgroup (s.map f) := rfl
-
-@[simp]
-theorem _root_.AddMonoidHom.coe_toMultiplicative_map {G G₂ : Type*} [AddGroup G] [AddGroup G₂]
-    (f : G →+ G₂) (s : AddSubgroup G) :
-    s.toSubgroup.map (AddMonoidHom.toMultiplicative f) = AddSubgroup.toSubgroup (s.map f) := rfl
 
 @[simp]
 theorem mem_map {f : F} {p : Submodule R M} {x : M₂} : x ∈ map f p ↔ ∃ y, y ∈ p ∧ f y = x :=
@@ -173,16 +159,6 @@ def comap [SemilinearMapClass F σ₁₂ M M₂] (f : F) (p : Submodule R₂ M�
     smul_mem' := fun a x h => by simp [p.smul_mem (σ₁₂ a) h, map_smulₛₗ _] }
 
 @[simp]
-theorem comap_coe (f : F) (p : Submodule R₂ M₂) : (comap f p : Set M) = f ⁻¹' p :=
-  rfl
-
-@[simp]
-theorem AddMonoidHom.coe_toIntLinearMap_comap {A A₂ : Type*} [AddCommGroup A] [AddCommGroup A₂]
-    (f : A →+ A₂) (s : AddSubgroup A₂) :
-    (AddSubgroup.toIntSubmodule s).comap f.toIntLinearMap =
-      AddSubgroup.toIntSubmodule (s.comap f) := rfl
-
-@[simp]
 theorem mem_comap {f : F} {p : Submodule R₂ M₂} : x ∈ comap f p ↔ f x ∈ p :=
   Iff.rfl
 
@@ -229,14 +205,6 @@ theorem map_iSup {ι : Sort*} (f : F) (p : ι → Submodule R M) :
   (gc_map_comap f : GaloisConnection (map f) (comap f)).l_iSup
 
 end
-
-@[simp]
-theorem comap_top (f : F) : comap f ⊤ = ⊤ :=
-  rfl
-
-@[simp]
-theorem comap_inf (f : F) : comap f (q ⊓ q') = comap f q ⊓ comap f q' :=
-  rfl
 
 @[simp]
 theorem comap_iInf [RingHomSurjective σ₁₂] {ι : Sort*} (f : F) (p : ι → Submodule R₂ M₂) :
@@ -423,10 +391,6 @@ lemma comap_neg {f : M →ₗ[R] M₂} {p : Submodule R M₂} :
     p.comap (-f) = p.comap f := by
   ext; simp
 
-lemma map_toAddSubgroup (f : M →ₗ[R] M₂) (p : Submodule R M) :
-    (p.map f).toAddSubgroup = p.toAddSubgroup.map (f : M →+ M₂) :=
-  rfl
-
 end AddCommGroup
 
 end Submodule
@@ -441,13 +405,22 @@ variable [AddCommMonoid V] [Module K V]
 
 variable [AddCommMonoid V₂] [Module K V₂]
 
--- DISSOLVED: comap_smul
+theorem comap_smul (f : V →ₗ[K] V₂) (p : Submodule K V₂) (a : K) (h : a ≠ 0) :
+    p.comap (a • f) = p.comap f := by
+  ext b; simp only [Submodule.mem_comap, p.smul_mem_iff h, LinearMap.smul_apply]
 
--- DISSOLVED: map_smul
+protected theorem map_smul (f : V →ₗ[K] V₂) (p : Submodule K V) (a : K) (h : a ≠ 0) :
+    p.map (a • f) = p.map f :=
+  le_antisymm (by rw [map_le_iff_le_comap, comap_smul f _ a h, ← map_le_iff_le_comap])
+    (by rw [map_le_iff_le_comap, ← comap_smul f _ a h, ← map_le_iff_le_comap])
 
--- DISSOLVED: comap_smul'
+theorem comap_smul' (f : V →ₗ[K] V₂) (p : Submodule K V₂) (a : K) :
+    p.comap (a • f) = ⨅ _ : a ≠ 0, p.comap f := by
+  classical by_cases h : a = 0 <;> simp [h, comap_smul]
 
--- DISSOLVED: map_smul'
+theorem map_smul' (f : V →ₗ[K] V₂) (p : Submodule K V) (a : K) :
+    p.map (a • f) = ⨆ _ : a ≠ 0, map f p := by
+  classical by_cases h : a = 0 <;> simp [h, Submodule.map_smul]
 
 end Submodule
 
@@ -456,21 +429,6 @@ namespace Submodule
 section Module
 
 variable [Semiring R] [AddCommMonoid M] [Module R M]
-
-@[simps symm_apply]
-def comapSubtypeEquivOfLe {p q : Submodule R M} (hpq : p ≤ q) : comap q.subtype p ≃ₗ[R] p where
-  toFun x := ⟨x, x.2⟩
-  invFun x := ⟨⟨x, hpq x.2⟩, x.2⟩
-  left_inv x := by simp only [coe_mk, SetLike.eta, LinearEquiv.coe_coe]
-  right_inv x := by simp only [Subtype.coe_mk, SetLike.eta, LinearEquiv.coe_coe]
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-@[simp]
-theorem comapSubtypeEquivOfLe_apply_coe {p q : Submodule R M} (hpq : p ≤ q)
-    (x : comap q.subtype p) :
-    (comapSubtypeEquivOfLe hpq x : M) = (x : M) :=
-  rfl
 
 end Module
 
@@ -583,10 +541,6 @@ variable [Semiring R] [AddCommMonoid M] [AddCommMonoid M₁] [Module R M] [Modul
 def submoduleMap (f : M →ₗ[R] M₁) (p : Submodule R M) : p →ₗ[R] p.map f :=
   f.restrict fun x hx ↦ Submodule.mem_map.mpr ⟨x, hx, rfl⟩
 
-@[simp]
-theorem submoduleMap_coe_apply (f : M →ₗ[R] M₁) {p : Submodule R M} (x : p) :
-    ↑(f.submoduleMap p x) = f x := rfl
-
 theorem submoduleMap_surjective (f : M →ₗ[R] M₁) (p : Submodule R M) :
     Function.Surjective (f.submoduleMap p) := f.toAddMonoidHom.addSubmonoidMap_surjective _
 
@@ -647,15 +601,6 @@ def submoduleMap (p : Submodule R M) : p ≃ₛₗ[σ₁₂] ↥(p.map (e : M �
       apply SetCoe.ext
       simp only [LinearMap.domRestrict_apply, LinearMap.codRestrict_apply, LinearMap.toFun_eq_coe,
         LinearEquiv.coe_coe, LinearEquiv.apply_symm_apply] }
-
-@[simp]
-theorem submoduleMap_apply (p : Submodule R M) (x : p) : ↑(e.submoduleMap p x) = e x :=
-  rfl
-
-@[simp]
-theorem submoduleMap_symm_apply (p : Submodule R M)
-    (x : (p.map (e : M →ₛₗ[σ₁₂] M₂) : Submodule R₂ M₂)) : ↑((e.submoduleMap p).symm x) = e.symm x :=
-  rfl
 
 end
 

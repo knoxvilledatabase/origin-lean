@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Lattice
 import Mathlib.GroupTheory.GroupAction.FixedPoints
 
+noncomputable section
+
 /-!
 
 # Fixing submonoid, fixing subgroup of an action

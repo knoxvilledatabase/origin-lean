@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicGeometry/ProjectiveSpectrum/Basic.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Scheme
 import Mathlib.AlgebraicGeometry.AffineScheme
+
+noncomputable section
 
 /-!
 
@@ -88,7 +90,6 @@ def awayToSection : CommRingCat.of (Away 𝒜 f) ⟶ Γ(Proj 𝒜, basicOpen �
   ProjectiveSpectrum.Proj.awayToSection ..
 
 noncomputable
-
 def basicOpenToSpec : (basicOpen 𝒜 f).toScheme ⟶ Spec (.of (Away 𝒜 f)) :=
   (basicOpen 𝒜 f).toSpecΓ ≫ Spec.map (awayToSection 𝒜 f)
 
@@ -102,16 +103,14 @@ lemma basicOpenToSpec_app_top :
   simp
 
 noncomputable
-
 def toSpecZero : Proj 𝒜 ⟶ Spec (.of (𝒜 0)) :=
   (Scheme.topIso _).inv ≫ (Scheme.isoOfEq _ (basicOpen_one _)).inv ≫
     basicOpenToSpec 𝒜 1 ≫ Spec.map (fromZeroRingHom 𝒜 _)
 
 variable {m} (f_deg : f ∈ 𝒜 m) (hm : 0 < m)
 
-noncomputable
-
 @[simps! (config := .lemmasOnly) hom]
+noncomputable
 def basicOpenIsoSpec : (basicOpen 𝒜 f).toScheme ≅ Spec (.of (Away 𝒜 f)) :=
   have : IsIso (basicOpenToSpec 𝒜 f) := by
     apply (isIso_iff_of_reflects_iso _ Scheme.forgetToLocallyRingedSpace).mp ?_
@@ -122,9 +121,8 @@ def basicOpenIsoSpec : (basicOpen 𝒜 f).toScheme ≅ Spec (.of (Away 𝒜 f)) 
     rfl
   asIso (basicOpenToSpec 𝒜 f)
 
-noncomputable
-
 @[simps! (config := .lemmasOnly) hom]
+noncomputable
 def basicOpenIsoAway : CommRingCat.of (Away 𝒜 f) ≅ Γ(Proj 𝒜, basicOpen 𝒜 f) :=
   have : IsIso (awayToSection 𝒜 f) := by
     have := basicOpenToSpec_app_top 𝒜 f
@@ -134,7 +132,6 @@ def basicOpenIsoAway : CommRingCat.of (Away 𝒜 f) ≅ Γ(Proj 𝒜, basicOpen 
   asIso (awayToSection 𝒜 f)
 
 noncomputable
-
 def awayι : Spec (.of (Away 𝒜 f)) ⟶ Proj 𝒜 :=
   (basicOpenIsoSpec 𝒜 f f_deg hm).inv ≫ (Proj.basicOpen 𝒜 f).ι
 
@@ -146,7 +143,6 @@ lemma opensRange_awayι :
   (Scheme.Hom.opensRange_comp_of_isIso _ _).trans (basicOpen 𝒜 f).opensRange_ι
 
 include f_deg hm in
-
 lemma isAffineOpen_basicOpen : IsAffineOpen (basicOpen 𝒜 f) := by
   rw [← opensRange_awayι 𝒜 f f_deg hm]
   exact isAffineOpen_opensRange (awayι _ _ _ _)
@@ -203,7 +199,6 @@ lemma SpecMap_awayMap_awayι :
   ← basicOpenIsoSpec_hom _ _ f_deg hm, Iso.hom_inv_id_assoc, Scheme.homOfLE_ι]
 
 noncomputable
-
 def pullbackAwayιIso :
     Limits.pullback (awayι 𝒜 f f_deg hm) (awayι 𝒜 g g_deg hm') ≅
       Spec (CommRingCat.of (Away 𝒜 x)) :=
@@ -252,7 +247,6 @@ lemma pullbackAwayιIso_inv_snd :
 open TopologicalSpace.Opens in
 
 noncomputable
-
 def openCoverOfISupEqTop {ι : Type*} (f : ι → A) {m : ι → ℕ}
     (f_deg : ∀ i, f i ∈ 𝒜 (m i)) (hm : ∀ i, 0 < m i)
     (hf : (HomogeneousIdeal.irrelevant 𝒜).toIdeal ≤ Ideal.span (Set.range f)) :
@@ -267,7 +261,6 @@ def openCoverOfISupEqTop {ι : Type*} (f : ι → A) {m : ι → ℕ}
     exact (mem_iSup.mp ((iSup_basicOpen_eq_top 𝒜 f hf).ge (Set.mem_univ x))).choose_spec
 
 noncomputable
-
 def affineOpenCover : (Proj 𝒜).AffineOpenCover :=
   openCoverOfISupEqTop 𝒜 (ι := Σ i : PNat, 𝒜 i) (m := fun i ↦ i.1) (fun i ↦ i.2) (fun i ↦ i.2.2)
     (fun i ↦ i.1.2) <| by
@@ -285,7 +278,6 @@ end basicOpen
 section stalk
 
 noncomputable
-
 def stalkIso (x : Proj 𝒜) :
     (Proj 𝒜).presheaf.stalk x ≅ .of (AtPrime 𝒜 x.asHomogeneousIdeal.toIdeal) :=
   (stalkIso' 𝒜 x).toCommRingCatIso

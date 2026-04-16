@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
 import Mathlib.MeasureTheory.Measure.Prod
 
+noncomputable section
+
 /-!
 # Products of finite measures and probability measures
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Category/ModuleCat/Presheaf/Sheafify.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 7
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Sheaf.ChangeOfRings
 import Mathlib.CategoryTheory.Sites.LocallySurjective
+
+noncomputable section
 
 /-!
 # The associated sheaf of a presheaf of modules
@@ -85,7 +87,6 @@ variable (hr₀ : (r₀.map (whiskerRight α (forget _))).IsAmalgamation r)
   (hm₀ : (m₀.map (whiskerRight φ (forget _))).IsAmalgamation m)
 
 include hr₀ hm₀ in
-
 lemma isCompatible_map_smul : ((r₀.smul m₀).map (whiskerRight φ (forget _))).Compatible := by
   intro Y₁ Y₂ Z g₁ g₂ f₁ f₂ h₁ h₂ fac
   let a₁ := r₀ f₁ h₁
@@ -219,7 +220,11 @@ protected lemma zero_smul : smul α φ 0 m = 0 := by
   rw [map_smul_eq α φ 0 m f.op 0 (by simp) m₀ hm₀, zero_smul, map_zero,
     (A.val.map f.op).map_zero]
 
--- DISSOLVED: smul_zero
+protected lemma smul_zero : smul α φ r 0 = 0 := by
+  apply A.isSeparated _ _ (Presheaf.imageSieve_mem J α r)
+  rintro Y f ⟨r₀, hr₀⟩
+  rw [(A.val.map f.op).map_zero, map_smul_eq α φ r 0 f.op r₀ hr₀ 0 (by simp),
+    smul_zero, map_zero]
 
 protected lemma smul_add : smul α φ r (m + m') = smul α φ r m + smul α φ r m' := by
   let S := Presheaf.imageSieve α r ⊓ Presheaf.imageSieve φ m ⊓ Presheaf.imageSieve φ m'
@@ -292,11 +297,6 @@ def toSheafify : M₀ ⟶ (restrictScalars α).obj (sheafify α φ).val :=
   homMk φ (fun X r₀ m₀ ↦ by
     simpa using (Sheafify.map_smul_eq α φ (α.app _ r₀) (φ.app _ m₀) (𝟙 _)
       r₀ (by aesop) m₀ (by simp)).symm)
-
-@[simp]
-lemma toSheafify_app_apply (X : Cᵒᵖ) (x : M₀.obj X) :
-    DFunLike.coe (α := M₀.obj X) (β := fun _ ↦ A.val.obj X)
-      ((toSheafify α φ).app X) x = φ.app X x := rfl
 
 @[simp]
 lemma toPresheaf_map_toSheafify : (toPresheaf R₀).map (toSheafify α φ) = φ := rfl

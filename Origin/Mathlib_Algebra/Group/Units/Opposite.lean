@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Opposite
 import Mathlib.Algebra.Group.Units.Defs
 
+noncomputable section
+
 /-!
 # Units in multiplicative and additive opposites
 -/
@@ -23,16 +25,6 @@ def Units.opEquiv {M} [Monoid M] : Mᵐᵒᵖˣ ≃* Mˣᵐᵒᵖ where
   map_mul' _ _ := unop_injective <| Units.ext <| rfl
   left_inv x := Units.ext <| by simp
   right_inv x := unop_injective <| Units.ext <| by rfl
-
-@[to_additive (attr := simp)]
-theorem Units.coe_unop_opEquiv {M} [Monoid M] (u : Mᵐᵒᵖˣ) :
-    ((Units.opEquiv u).unop : M) = unop (u : Mᵐᵒᵖ) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem Units.coe_opEquiv_symm {M} [Monoid M] (u : Mˣᵐᵒᵖ) :
-    (Units.opEquiv.symm u : Mᵐᵒᵖ) = op (u.unop : M) :=
-  rfl
 
 @[to_additive]
 nonrec theorem IsUnit.op {M} [Monoid M] {m : M} (h : IsUnit m) : IsUnit (op m) :=

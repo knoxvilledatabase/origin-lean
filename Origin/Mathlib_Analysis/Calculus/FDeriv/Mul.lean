@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Mul.lean
-Genuine: 124 | Conflates: 0 | Dissolved: 11 | Infrastructure: 0
+Genuine: 135 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Calculus.FDeriv.Bilinear
+
+noncomputable section
 
 /-!
 # Multiplicative operations on derivatives
@@ -832,33 +834,59 @@ variable {R : Type*} [NormedDivisionRing R] [NormedAlgebra 𝕜 R]
 
 open NormedRing ContinuousLinearMap Ring
 
--- DISSOLVED: hasStrictFDerivAt_inv'
+theorem hasStrictFDerivAt_inv' {x : R} (hx : x ≠ 0) :
+    HasStrictFDerivAt Inv.inv (-mulLeftRight 𝕜 R x⁻¹ x⁻¹) x := by
+  simpa using hasStrictFDerivAt_ring_inverse (Units.mk0 _ hx)
 
--- DISSOLVED: hasFDerivAt_inv'
+@[fun_prop]
+theorem hasFDerivAt_inv' {x : R} (hx : x ≠ 0) :
+    HasFDerivAt Inv.inv (-mulLeftRight 𝕜 R x⁻¹ x⁻¹) x := by
+  simpa using hasFDerivAt_ring_inverse (Units.mk0 _ hx)
 
--- DISSOLVED: differentiableAt_inv
+@[fun_prop]
+theorem differentiableAt_inv {x : R} (hx : x ≠ 0) : DifferentiableAt 𝕜 Inv.inv x :=
+  (hasFDerivAt_inv' hx).differentiableAt
 
--- DISSOLVED: differentiableWithinAt_inv
+@[fun_prop]
+theorem differentiableWithinAt_inv {x : R} (hx : x ≠ 0) (s : Set R) :
+    DifferentiableWithinAt 𝕜 (fun x => x⁻¹) s x :=
+  (differentiableAt_inv hx).differentiableWithinAt
 
 alias differentiableWithinAt_inv' := differentiableWithinAt_inv
 
--- DISSOLVED: differentiableOn_inv
+@[fun_prop]
+theorem differentiableOn_inv : DifferentiableOn 𝕜 (fun x : R => x⁻¹) {x | x ≠ 0} := fun _x hx =>
+  differentiableWithinAt_inv hx _
 
--- DISSOLVED: fderiv_inv'
+theorem fderiv_inv' {x : R} (hx : x ≠ 0) : fderiv 𝕜 Inv.inv x = -mulLeftRight 𝕜 R x⁻¹ x⁻¹ :=
+  (hasFDerivAt_inv' hx).fderiv
 
--- DISSOLVED: fderivWithin_inv'
+theorem fderivWithin_inv' {s : Set R} {x : R} (hx : x ≠ 0) (hxs : UniqueDiffWithinAt 𝕜 s x) :
+    fderivWithin 𝕜 (fun x => x⁻¹) s x = -mulLeftRight 𝕜 R x⁻¹ x⁻¹ := by
+  rw [DifferentiableAt.fderivWithin (differentiableAt_inv hx) hxs]
+  exact fderiv_inv' hx
 
 variable {h : E → R} {z : E} {S : Set E}
 
--- DISSOLVED: DifferentiableWithinAt.inv
+@[fun_prop]
+theorem DifferentiableWithinAt.inv (hf : DifferentiableWithinAt 𝕜 h S z) (hz : h z ≠ 0) :
+    DifferentiableWithinAt 𝕜 (fun x => (h x)⁻¹) S z :=
+  (differentiableAt_inv hz).comp_differentiableWithinAt z hf
 
 alias DifferentiableWithinAt.inv' := DifferentiableWithinAt.inv
 
--- DISSOLVED: DifferentiableAt.inv
+@[simp, fun_prop]
+theorem DifferentiableAt.inv (hf : DifferentiableAt 𝕜 h z) (hz : h z ≠ 0) :
+    DifferentiableAt 𝕜 (fun x => (h x)⁻¹) z :=
+  (differentiableAt_inv hz).comp z hf
 
--- DISSOLVED: DifferentiableOn.inv
+@[fun_prop]
+theorem DifferentiableOn.inv (hf : DifferentiableOn 𝕜 h S) (hz : ∀ x ∈ S, h x ≠ 0) :
+    DifferentiableOn 𝕜 (fun x => (h x)⁻¹) S := fun x h => (hf x h).inv (hz x h)
 
--- DISSOLVED: Differentiable.inv
+@[simp, fun_prop]
+theorem Differentiable.inv (hf : Differentiable 𝕜 h) (hz : ∀ x, h x ≠ 0) :
+    Differentiable 𝕜 fun x => (h x)⁻¹ := fun x => (hf x).inv (hz x)
 
 end DivisionRingInverse
 

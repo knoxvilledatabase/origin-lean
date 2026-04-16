@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Core
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Generating "proxy types"
 

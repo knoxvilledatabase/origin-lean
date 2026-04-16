@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Order.Filter.Cofinite
 
+noncomputable section
+
 /-!
 # Fermat Pseudoprimes
 

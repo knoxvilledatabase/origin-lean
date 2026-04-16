@@ -9,6 +9,8 @@ import Mathlib.Analysis.InnerProductSpace.NormPow
 import Mathlib.Data.Finset.Interval
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
+noncomputable section
+
 /-!
 # Gagliardo-Nirenberg-Sobolev inequality
 

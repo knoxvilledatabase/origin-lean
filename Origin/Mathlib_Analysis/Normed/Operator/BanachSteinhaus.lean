@@ -7,6 +7,8 @@ import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Analysis.LocallyConvex.Barrelled
 import Mathlib.Topology.Baire.CompleteMetrizable
 
+noncomputable section
+
 /-!
 # The Banach-Steinhaus theorem: Uniform Boundedness Principle
 

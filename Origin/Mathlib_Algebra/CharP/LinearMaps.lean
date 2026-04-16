@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.CharP.Algebra
 
+noncomputable section
+
 /-!
 # Characteristic of the ring of linear Maps
 

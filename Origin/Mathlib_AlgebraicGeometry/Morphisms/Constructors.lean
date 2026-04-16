@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Basic
 import Mathlib.RingTheory.RingHomProperties
 
+noncomputable section
+
 /-!
 
 # Constructors for properties of morphisms between schemes

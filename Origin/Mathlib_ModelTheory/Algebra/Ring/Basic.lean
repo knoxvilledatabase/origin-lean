@@ -7,6 +7,8 @@ import Mathlib.ModelTheory.Syntax
 import Mathlib.ModelTheory.Semantics
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # First Order Language of Rings
 
@@ -121,11 +123,6 @@ instance : Fintype Language.ring.Symbols :=
     rcases x with ⟨_, f⟩ | ⟨_, f⟩
     · cases f <;> decide
     · cases f ⟩
-
-@[simp]
-theorem card_ring : card Language.ring = 5 := by
-  have : Fintype.card Language.ring.Symbols = 5 := rfl
-  simp [Language.card, this]
 
 open Language Structure
 

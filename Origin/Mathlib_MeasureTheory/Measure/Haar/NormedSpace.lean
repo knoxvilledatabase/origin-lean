@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/NormedSpace.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 9 | Infrastructure: 1
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.MeasureTheory.Integral.SetIntegral
+
+noncomputable section
 
 /-!
 # Basic properties of Haar measures on real vector spaces
@@ -79,7 +81,20 @@ theorem integral_comp_inv_smul_of_nonneg (f : E → F) {R : ℝ} (hR : 0 ≤ R) 
     ∫ x, f (R⁻¹ • x) ∂μ = R ^ finrank ℝ E • ∫ x, f x ∂μ := by
   rw [integral_comp_inv_smul μ f R, abs_of_nonneg (pow_nonneg hR _)]
 
--- DISSOLVED: setIntegral_comp_smul
+theorem setIntegral_comp_smul (f : E → F) {R : ℝ} (s : Set E) (hR : R ≠ 0) :
+    ∫ x in s, f (R • x) ∂μ = |(R ^ finrank ℝ E)⁻¹| • ∫ x in R • s, f x ∂μ := by
+  let e : E ≃ᵐ E := (Homeomorph.smul (Units.mk0 R hR)).toMeasurableEquiv
+  calc
+  ∫ x in s, f (R • x) ∂μ
+    = ∫ x in e ⁻¹' (e.symm ⁻¹' s), f (e x) ∂μ := by simp [← preimage_comp]; rfl
+  _ = ∫ y in e.symm ⁻¹' s, f y ∂map (fun x ↦ R • x) μ := (setIntegral_map_equiv _ _ _).symm
+  _ = |(R ^ finrank ℝ E)⁻¹| • ∫ y in e.symm ⁻¹' s, f y ∂μ := by
+    simp [map_addHaar_smul μ hR, integral_smul_measure, ENNReal.toReal_ofReal, abs_nonneg]
+  _ = |(R ^ finrank ℝ E)⁻¹| • ∫ x in R • s, f x ∂μ := by
+    congr
+    ext y
+    rw [mem_smul_set_iff_inv_smul_mem₀ hR]
+    rfl
 
 alias set_integral_comp_smul := setIntegral_comp_smul
 
@@ -112,21 +127,50 @@ end Measure
 
 variable {F : Type*} [NormedAddCommGroup F]
 
--- DISSOLVED: integrable_comp_smul_iff
+theorem integrable_comp_smul_iff {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [MeasurableSpace E] [BorelSpace E] [FiniteDimensional ℝ E] (μ : Measure E) [IsAddHaarMeasure μ]
+    (f : E → F) {R : ℝ} (hR : R ≠ 0) : Integrable (fun x => f (R • x)) μ ↔ Integrable f μ := by
+  -- reduce to one-way implication
+  suffices
+    ∀ {g : E → F} (_ : Integrable g μ) {S : ℝ} (_ : S ≠ 0), Integrable (fun x => g (S • x)) μ by
+    refine ⟨fun hf => ?_, fun hf => this hf hR⟩
+    convert this hf (inv_ne_zero hR)
+    rw [← mul_smul, mul_inv_cancel₀ hR, one_smul]
+  -- now prove
+  intro g hg S hS
+  let t := ((Homeomorph.smul (isUnit_iff_ne_zero.2 hS).unit).toMeasurableEquiv : E ≃ᵐ E)
+  refine (integrable_map_equiv t g).mp (?_ : Integrable g (map (S • ·) μ))
+  rwa [map_addHaar_smul μ hS, integrable_smul_measure _ ENNReal.ofReal_ne_top]
+  simpa only [Ne, ENNReal.ofReal_eq_zero, not_le, abs_pos] using inv_ne_zero (pow_ne_zero _ hS)
 
--- DISSOLVED: Integrable.comp_smul
+theorem Integrable.comp_smul {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    [MeasurableSpace E] [BorelSpace E] [FiniteDimensional ℝ E] {μ : Measure E} [IsAddHaarMeasure μ]
+    {f : E → F} (hf : Integrable f μ) {R : ℝ} (hR : R ≠ 0) : Integrable (fun x => f (R • x)) μ :=
+  (integrable_comp_smul_iff μ f hR).2 hf
 
--- DISSOLVED: integrable_comp_mul_left_iff
+theorem integrable_comp_mul_left_iff (g : ℝ → F) {R : ℝ} (hR : R ≠ 0) :
+    (Integrable fun x => g (R * x)) ↔ Integrable g := by
+  simpa only [smul_eq_mul] using integrable_comp_smul_iff volume g hR
 
--- DISSOLVED: Integrable.comp_mul_left'
+theorem Integrable.comp_mul_left' {g : ℝ → F} (hg : Integrable g) {R : ℝ} (hR : R ≠ 0) :
+    Integrable fun x => g (R * x) :=
+  (integrable_comp_mul_left_iff g hR).2 hg
 
--- DISSOLVED: integrable_comp_mul_right_iff
+theorem integrable_comp_mul_right_iff (g : ℝ → F) {R : ℝ} (hR : R ≠ 0) :
+    (Integrable fun x => g (x * R)) ↔ Integrable g := by
+  simpa only [mul_comm] using integrable_comp_mul_left_iff g hR
 
--- DISSOLVED: Integrable.comp_mul_right'
+theorem Integrable.comp_mul_right' {g : ℝ → F} (hg : Integrable g) {R : ℝ} (hR : R ≠ 0) :
+    Integrable fun x => g (x * R) :=
+  (integrable_comp_mul_right_iff g hR).2 hg
 
--- DISSOLVED: integrable_comp_div_iff
+theorem integrable_comp_div_iff (g : ℝ → F) {R : ℝ} (hR : R ≠ 0) :
+    (Integrable fun x => g (x / R)) ↔ Integrable g :=
+  integrable_comp_mul_right_iff g (inv_ne_zero hR)
 
--- DISSOLVED: Integrable.comp_div
+theorem Integrable.comp_div {g : ℝ → F} (hg : Integrable g) {R : ℝ} (hR : R ≠ 0) :
+    Integrable fun x => g (x / R) :=
+  (integrable_comp_div_iff g hR).2 hg
 
 section InnerProductSpace
 

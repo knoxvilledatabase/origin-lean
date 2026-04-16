@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/GradedAlgebra/HomogeneousLocalization.lean
-Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 58
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 58
 -/
 import Origin.Core
 import Mathlib.Order.Filter.AtTopBot
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.RingTheory.GradedAlgebra.Basic
 import Mathlib.RingTheory.Localization.Away.Basic
+
+noncomputable section
 
 /-!
 # Homogeneous Localization
@@ -113,10 +115,6 @@ instance : Neg (NumDenSameDeg 𝒜 x) where
   neg c := ⟨c.deg, ⟨-c.num, neg_mem c.num.2⟩, c.den, c.den_mem⟩
 
 @[simp]
-theorem deg_neg (c : NumDenSameDeg 𝒜 x) : (-c).deg = c.deg :=
-  rfl
-
-@[simp]
 theorem num_neg (c : NumDenSameDeg 𝒜 x) : ((-c).num : A) = -c.num :=
   rfl
 
@@ -130,10 +128,6 @@ variable {α : Type*} [SMul α R] [SMul α A] [IsScalarTower α R A]
 
 instance : SMul α (NumDenSameDeg 𝒜 x) where
   smul m c := ⟨c.deg, m • c.num, c.den, c.den_mem⟩
-
-@[simp]
-theorem deg_smul (c : NumDenSameDeg 𝒜 x) (m : α) : (m • c).deg = c.deg :=
-  rfl
 
 @[simp]
 theorem num_smul (c : NumDenSameDeg 𝒜 x) (m : α) : ((m • c).num : A) = m • c.num :=
@@ -154,10 +148,6 @@ instance : One (NumDenSameDeg 𝒜 x) where
       num := ⟨1, GradedOne.one_mem⟩
       den := ⟨1, GradedOne.one_mem⟩
       den_mem := Submonoid.one_mem _ }
-
-@[simp]
-theorem deg_one : (1 : NumDenSameDeg 𝒜 x).deg = 0 :=
-  rfl
 
 @[simp]
 theorem num_one : ((1 : NumDenSameDeg 𝒜 x).num : A) = 1 :=
@@ -191,10 +181,6 @@ instance : Mul (NumDenSameDeg 𝒜 x) where
       den_mem := Submonoid.mul_mem _ p.den_mem q.den_mem }
 
 @[simp]
-theorem deg_mul (c1 c2 : NumDenSameDeg 𝒜 x) : (c1 * c2).deg = c1.deg + c2.deg :=
-  rfl
-
-@[simp]
 theorem num_mul (c1 c2 : NumDenSameDeg 𝒜 x) : ((c1 * c2).num : A) = c1.num * c2.num :=
   rfl
 
@@ -210,10 +196,6 @@ instance : Add (NumDenSameDeg 𝒜 x) where
           (add_comm c2.deg c1.deg ▸ GradedMul.mul_mem c2.den.2 c1.num.2)⟩
       den := ⟨c1.den * c2.den, GradedMul.mul_mem c1.den.2 c2.den.2⟩
       den_mem := Submonoid.mul_mem _ c1.den_mem c2.den_mem }
-
-@[simp]
-theorem deg_add (c1 c2 : NumDenSameDeg 𝒜 x) : (c1 + c2).deg = c1.deg + c2.deg :=
-  rfl
 
 @[simp]
 theorem num_add (c1 c2 : NumDenSameDeg 𝒜 x) :
@@ -239,10 +221,6 @@ instance : Pow (NumDenSameDeg 𝒜 x) ℕ where
         induction' n with n ih
         · simpa only [coe_gnpow, pow_zero] using Submonoid.one_mem _
         · simpa only [pow_succ, coe_gnpow] using x.mul_mem ih c.den_mem⟩
-
-@[simp]
-theorem deg_pow (c : NumDenSameDeg 𝒜 x) (n : ℕ) : (c ^ n).deg = n • c.deg :=
-  rfl
 
 @[simp]
 theorem num_pow (c : NumDenSameDeg 𝒜 x) (n : ℕ) : ((c ^ n).num : A) = (c.num : A) ^ n :=
@@ -379,12 +357,6 @@ instance : Zero (HomogeneousLocalization 𝒜 x) where zero := Quotient.mk'' 0
 
 @[simp] lemma mk_zero : mk (0 : NumDenSameDeg 𝒜 x) = 0 := rfl
 
-theorem zero_eq : (0 : HomogeneousLocalization 𝒜 x) = Quotient.mk'' 0 :=
-  rfl
-
-theorem one_eq : (1 : HomogeneousLocalization 𝒜 x) = Quotient.mk'' 1 :=
-  rfl
-
 variable {x}
 
 @[simp]
@@ -440,9 +412,6 @@ instance homogeneousLocalizationAlgebra :
   commutes' _ _ := mul_comm _ _
   smul_def' _ _ := rfl
 
-@[simp] lemma algebraMap_apply (y) :
-    algebraMap (HomogeneousLocalization 𝒜 x) (Localization x) y = y.val := rfl
-
 lemma mk_eq_zero_of_num (f : NumDenSameDeg 𝒜 x) (h : f.num = 0) : mk f = 0 := by
   apply val_injective
   simp only [val_mk, val_zero, h, ZeroMemClass.coe_zero, Localization.mk_zero]
@@ -462,8 +431,6 @@ def fromZeroRingHom : 𝒜 0 →+* HomogeneousLocalization 𝒜 x where
 
 instance : Algebra (𝒜 0) (HomogeneousLocalization 𝒜 x) :=
   (fromZeroRingHom 𝒜 x).toAlgebra
-
-lemma algebraMap_eq : algebraMap (𝒜 0) (HomogeneousLocalization 𝒜 x) = fromZeroRingHom 𝒜 x := rfl
 
 end HomogeneousLocalization
 
@@ -636,7 +603,6 @@ lemma awayMapAux_mk (n a i hi) :
   rfl
 
 include hg in
-
 lemma range_awayMapAux_subset :
     Set.range (awayMapAux 𝒜 (f := f) ⟨_, hx⟩) ⊆ Set.range (val (𝒜 := 𝒜)) := by
   rintro _ ⟨z, rfl⟩
@@ -683,8 +649,6 @@ lemma val_awayMap_mk (n a i hi) : (awayMap 𝒜 hg hx (mk ⟨n, a, ⟨f ^ i, hi�
 def awayMapₐ : Away 𝒜 f →ₐ[𝒜 0] Away 𝒜 x where
   __ := awayMap 𝒜 hg hx
   commutes' _ := awayMap_fromZeroRingHom ..
-
-@[simp] lemma awayMapₐ_apply (a) : awayMapₐ 𝒜 hg hx a = awayMap 𝒜 hg hx a := rfl
 
 end mapAway
 

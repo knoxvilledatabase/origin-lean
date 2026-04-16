@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/RootSystem/Finite/Nondegenerate.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Basic
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Dimension.Localization
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import Mathlib.LinearAlgebra.RootSystem.Finite.CanonicalBilinear
 import Mathlib.LinearAlgebra.RootSystem.RootPositive
+
+noncomputable section
 
 /-!
 # Nondegeneracy of the polarization on a finite root pairing
@@ -115,7 +117,11 @@ lemma _root_.RootSystem.rootForm_anisotropic (P : RootSystem ι R M N) :
   fun x ↦ P.eq_zero_of_mem_rootSpan_of_rootForm_self_eq_zero <| by
     simpa only [rootSpan, P.span_eq_top] using Submodule.mem_top
 
--- DISSOLVED: rootForm_pos_of_nonzero
+lemma rootForm_pos_of_nonzero {x : M} (hx : x ∈ P.rootSpan) (h : x ≠ 0) :
+    0 < P.RootForm x x := by
+  apply (P.rootForm_self_non_neg x).lt_of_ne
+  contrapose! h
+  exact eq_zero_of_mem_rootSpan_of_rootForm_self_eq_zero P hx h.symm
 
 lemma rootForm_restrict_nondegenerate :
     (P.RootForm.restrict P.rootSpan).Nondegenerate :=

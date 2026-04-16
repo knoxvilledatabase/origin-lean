@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/NormedSpace/Pointwise.lean
-Genuine: 41 | Conflates: 2 | Dissolved: 6 | Infrastructure: 0
+Genuine: 47 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Pointwise
 import Mathlib.Analysis.NormedSpace.Real
+
+noncomputable section
 
 /-!
 # Properties of pointwise scalar multiplication of sets in normed spaces.
@@ -50,9 +52,21 @@ theorem ediam_smul₀ (c : 𝕜) (s : Set E) : EMetric.diam (c • s) = ‖c‖�
 theorem diam_smul₀ (c : 𝕜) (x : Set E) : diam (c • x) = ‖c‖ * diam x := by
   simp_rw [diam, ediam_smul₀, ENNReal.toReal_smul, NNReal.smul_def, coe_nnnorm, smul_eq_mul]
 
--- DISSOLVED: infEdist_smul₀
+theorem infEdist_smul₀ {c : 𝕜} (hc : c ≠ 0) (s : Set E) (x : E) :
+    EMetric.infEdist (c • x) (c • s) = ‖c‖₊ • EMetric.infEdist x s := by
+  simp_rw [EMetric.infEdist]
+  have : Function.Surjective ((c • ·) : E → E) :=
+    Function.RightInverse.surjective (smul_inv_smul₀ hc)
+  trans ⨅ (y) (_ : y ∈ s), ‖c‖₊ • edist x y
+  · refine (this.iInf_congr _ fun y => ?_).symm
+    simp_rw [smul_mem_smul_set_iff₀ hc, edist_smul₀]
+  · have : (‖c‖₊ : ENNReal) ≠ 0 := by simp [hc]
+    simp_rw [ENNReal.smul_def, smul_eq_mul, ENNReal.mul_iInf_of_ne this ENNReal.coe_ne_top]
 
--- DISSOLVED: infDist_smul₀
+theorem infDist_smul₀ {c : 𝕜} (hc : c ≠ 0) (s : Set E) (x : E) :
+    Metric.infDist (c • x) (c • s) = ‖c‖ * Metric.infDist x s := by
+  simp_rw [Metric.infDist, infEdist_smul₀ hc s, ENNReal.toReal_smul, NNReal.smul_def, coe_nnnorm,
+    smul_eq_mul]
 
 end DivisionRing
 
@@ -62,13 +76,26 @@ section SeminormedAddCommGroup
 
 variable [SeminormedAddCommGroup E] [NormedSpace 𝕜 E]
 
--- DISSOLVED: smul_ball
+theorem smul_ball {c : 𝕜} (hc : c ≠ 0) (x : E) (r : ℝ) : c • ball x r = ball (c • x) (‖c‖ * r) := by
+  ext y
+  rw [mem_smul_set_iff_inv_smul_mem₀ hc]
+  conv_lhs => rw [← inv_smul_smul₀ hc x]
+  simp [← div_eq_inv_mul, div_lt_iff₀ (norm_pos_iff.2 hc), mul_comm _ r, dist_smul₀]
 
--- DISSOLVED: smul_unitBall
+theorem smul_unitBall {c : 𝕜} (hc : c ≠ 0) : c • ball (0 : E) (1 : ℝ) = ball (0 : E) ‖c‖ := by
+  rw [_root_.smul_ball hc, smul_zero, mul_one]
 
--- DISSOLVED: smul_sphere'
+theorem smul_sphere' {c : 𝕜} (hc : c ≠ 0) (x : E) (r : ℝ) :
+    c • sphere x r = sphere (c • x) (‖c‖ * r) := by
+  ext y
+  rw [mem_smul_set_iff_inv_smul_mem₀ hc]
+  conv_lhs => rw [← inv_smul_smul₀ hc x]
+  simp only [mem_sphere, dist_smul₀, norm_inv, ← div_eq_inv_mul, div_eq_iff (norm_pos_iff.2 hc).ne',
+    mul_comm r]
 
--- DISSOLVED: smul_closedBall'
+theorem smul_closedBall' {c : 𝕜} (hc : c ≠ 0) (x : E) (r : ℝ) :
+    c • closedBall x r = closedBall (c • x) (‖c‖ * r) := by
+  simp only [← ball_union_sphere, Set.smul_set_union, _root_.smul_ball hc, smul_sphere' hc]
 
 theorem set_smul_sphere_zero {s : Set 𝕜} (hs : 0 ∉ s) (r : ℝ) :
     s • sphere (0 : E) r = (‖·‖) ⁻¹' ((‖·‖ * r) '' s) :=

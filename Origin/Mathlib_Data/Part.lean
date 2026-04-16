@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Subsingleton
 import Mathlib.Logic.Equiv.Defs
 import Mathlib.Algebra.Group.Operations
 
+noncomputable section
+
 /-!
 # Partial values of a type
 This file defines `Part α`, the partial values of a type.
@@ -87,10 +89,6 @@ theorem dom_iff_mem : ∀ {o : Part α}, o.Dom ↔ ∃ y, y ∈ o
 theorem get_mem {o : Part α} (h) : get o h ∈ o :=
   ⟨_, rfl⟩
 
-@[simp]
-theorem mem_mk_iff {p : Prop} {o : p → α} {a : α} : a ∈ Part.mk p o ↔ ∃ h, o h = a :=
-  Iff.rfl
-
 @[ext]
 theorem ext {o p : Part α} (H : ∀ a, a ∈ o ↔ a ∈ p) : o = p :=
   (ext' ⟨fun h => ((H _).1 ⟨h, rfl⟩).fst, fun h => ((H _).2 ⟨h, rfl⟩).fst⟩) fun _ _ =>
@@ -123,10 +121,6 @@ theorem get_eq_of_mem {o : Part α} {a} (h : a ∈ o) (h') : get o h' = a :=
 
 protected theorem subsingleton (o : Part α) : Set.Subsingleton { a | a ∈ o } := fun _ ha _ hb =>
   mem_unique ha hb
-
-@[simp]
-theorem get_some {a : α} (ha : (some a).Dom) : get (some a) ha = a :=
-  rfl
 
 theorem mem_some (a : α) : a ∈ some a :=
   ⟨trivial, rfl⟩
@@ -275,14 +269,6 @@ instance : Coe (Option α) (Part α) :=
 
 theorem mem_coe {a : α} {o : Option α} : a ∈ (o : Part α) ↔ a ∈ o :=
   mem_ofOption
-
-@[simp]
-theorem coe_none : (@Option.none α : Part α) = none :=
-  rfl
-
-@[simp]
-theorem coe_some (a : α) : (Option.some a : Part α) = some a :=
-  rfl
 
 @[elab_as_elim]
 protected theorem induction_on {P : Part α → Prop} (a : Part α) (hnone : P none)
@@ -475,18 +461,6 @@ theorem bind_some_right (x : Part α) : x.bind some = x := by
   erw [bind_some_eq_map]; simp [map_id']
 
 @[simp]
-theorem pure_eq_some (a : α) : pure a = some a :=
-  rfl
-
-@[simp]
-theorem ret_eq_some (a : α) : (return a : Part α) = some a :=
-  rfl
-
-@[simp]
-theorem map_eq_map {α β} (f : α → β) (o : Part α) : f <$> o = map f o :=
-  rfl
-
-@[simp]
 theorem bind_eq_bind {α β} (f : Part α) (g : α → Part β) : f >>= g = f.bind g :=
   rfl
 
@@ -523,10 +497,6 @@ theorem bind_defined {f : Part α} {g : α → Part β} :
     ∀ h : f.Dom, (g (f.get h)).Dom → (f.bind g).Dom :=
   assert_defined
 
-@[simp]
-theorem bind_dom {f : Part α} {g : α → Part β} : (f.bind g).Dom ↔ ∃ h : f.Dom, (g (f.get h)).Dom :=
-  Iff.rfl
-
 section Instances
 
 /-!
@@ -561,8 +531,6 @@ section
 
 theorem mul_def [Mul α] (a b : Part α) : a * b = bind a fun y ↦ map (y * ·) b := rfl
 
-theorem one_def [One α] : (1 : Part α) = some 1 := rfl
-
 theorem inv_def [Inv α] (a : Part α) : a⁻¹ = Part.map (· ⁻¹) a := rfl
 
 theorem div_def [Div α] (a b : Part α) : a / b = bind a fun y => map (y / ·) b := rfl
@@ -593,20 +561,12 @@ theorem left_dom_of_mul_dom [Mul α] {a b : Part α} (hab : Dom (a * b)) : a.Dom
 @[to_additive]
 theorem right_dom_of_mul_dom [Mul α] {a b : Part α} (hab : Dom (a * b)) : b.Dom := hab.2
 
-@[to_additive (attr := simp)]
-theorem mul_get_eq [Mul α] (a b : Part α) (hab : Dom (a * b)) :
-    (a * b).get hab = a.get (left_dom_of_mul_dom hab) * b.get (right_dom_of_mul_dom hab) := rfl
-
 @[to_additive]
 theorem some_mul_some [Mul α] (a b : α) : some a * some b = some (a * b) := by simp [mul_def]
 
 @[to_additive]
 theorem inv_mem_inv [Inv α] (a : Part α) (ma : α) (ha : ma ∈ a) : ma⁻¹ ∈ a⁻¹ := by
   simp [inv_def]; aesop
-
-@[to_additive]
-theorem inv_some [Inv α] (a : α) : (some a)⁻¹ = some a⁻¹ :=
-  rfl
 
 @[to_additive]
 theorem div_mem_div [Div α] (a b : Part α) (ma mb : α) (ha : ma ∈ a) (hb : mb ∈ b) :

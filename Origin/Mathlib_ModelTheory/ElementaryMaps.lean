@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Basic
 import Mathlib.ModelTheory.Substructures
 
+noncomputable section
+
 /-!
 # Elementary Maps Between First-Order Structures
 
@@ -143,18 +145,6 @@ def toHom (f : M ↪ₑ[L] N) : M →[L] N where
   map_fun' {_} f x := by aesop
   map_rel' {_} R x := by aesop
 
-@[simp]
-theorem toEmbedding_toHom (f : M ↪ₑ[L] N) : f.toEmbedding.toHom = f.toHom :=
-  rfl
-
-@[simp]
-theorem coe_toHom {f : M ↪ₑ[L] N} : (f.toHom : M → N) = (f : M → N) :=
-  rfl
-
-@[simp]
-theorem coe_toEmbedding (f : M ↪ₑ[L] N) : (f.toEmbedding : M → N) = (f : M → N) :=
-  rfl
-
 theorem coe_injective : @Function.Injective (M ↪ₑ[L] N) (M → N) (↑) :=
   DFunLike.coe_injective
 
@@ -171,10 +161,6 @@ variable {L} {M}
 
 instance : Inhabited (M ↪ₑ[L] M) :=
   ⟨refl L M⟩
-
-@[simp]
-theorem refl_apply (x : M) : refl L M x = x :=
-  rfl
 
 @[trans]
 def comp (hnp : N ↪ₑ[L] P) (hmn : M ↪ₑ[L] N) : M ↪ₑ[L] P where
@@ -268,16 +254,6 @@ namespace Equiv
 def toElementaryEmbedding (f : M ≃[L] N) : M ↪ₑ[L] N where
   toFun := f
   map_formula' n φ x := by aesop
-
-@[simp]
-theorem toElementaryEmbedding_toEmbedding (f : M ≃[L] N) :
-    f.toElementaryEmbedding.toEmbedding = f.toEmbedding :=
-  rfl
-
-@[simp]
-theorem coe_toElementaryEmbedding (f : M ≃[L] N) :
-    (f.toElementaryEmbedding : M → N) = (f : M → N) :=
-  rfl
 
 end Equiv
 

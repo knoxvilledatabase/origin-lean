@@ -14,6 +14,8 @@ import Mathlib.CategoryTheory.Sites.Abelian
 import Mathlib.CategoryTheory.Sites.Adjunction
 import Mathlib.CategoryTheory.Sites.Sheafification
 
+noncomputable section
+
 /-!
 # Mayer-Vietoris squares
 

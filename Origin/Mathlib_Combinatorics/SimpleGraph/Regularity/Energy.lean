@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Combinatorics.SimpleGraph.Density
 import Mathlib.Data.Rat.BigOperators
 
+noncomputable section
+
 /-!
 # Energy of a partition
 

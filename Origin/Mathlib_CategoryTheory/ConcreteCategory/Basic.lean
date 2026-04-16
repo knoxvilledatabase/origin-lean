@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.CategoryTheory.Types
 
+noncomputable section
+
 /-!
 # Concrete categories
 
@@ -76,8 +78,6 @@ theorem ConcreteCategory.hom_ext {X Y : C} (f g : X ⟶ Y) (w : ∀ x : X, f x =
   funext x
   exact w x
 
-theorem forget_map_eq_coe {X Y : C} (f : X ⟶ Y) : (forget C).map f = f := rfl
-
 theorem congr_hom {X Y : C} {f g : X ⟶ Y} (h : f = g) (x : X) : f x = g x :=
   congrFun (congrArg (fun k : X ⟶ Y => (k : X → Y)) h) x
 
@@ -101,9 +101,6 @@ theorem ConcreteCategory.congr_hom {X Y : C} {f g : X ⟶ Y} (h : f = g) (x : X)
 
 theorem ConcreteCategory.congr_arg {X Y : C} (f : X ⟶ Y) {x x' : X} (h : x = x') : f x = f x' :=
   congrArg (f : X → Y) h
-
-@[simp]
-theorem ConcreteCategory.hasCoeToFun_Type {X Y : Type u} (f : X ⟶ Y) : CoeFun.coe f = f := rfl
 
 end
 

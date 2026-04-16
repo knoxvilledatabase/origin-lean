@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Congruence.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 import Mathlib.RingTheory.Ideal.Span
 
+noncomputable section
+
 /-!
 # Quotients of non-commutative rings
 
@@ -40,11 +42,6 @@ instance (c : RingCon A) : Algebra S c.Quotient where
   toRingHom := c.mk'.comp (algebraMap S A)
   commutes' _ := Quotient.ind' fun _ ↦ congr_arg Quotient.mk'' <| Algebra.commutes _ _
   smul_def' _ := Quotient.ind' fun _ ↦ congr_arg Quotient.mk'' <| Algebra.smul_def _ _
-
-@[simp, norm_cast]
-theorem coe_algebraMap (c : RingCon A) (s : S) :
-    (algebraMap S A s : c.Quotient) = algebraMap S _ s :=
-  rfl
 
 end RingCon
 
@@ -490,11 +487,6 @@ def idealQuotientToRingQuot (r : B → B → Prop) : B ⧸ Ideal.ofRel r →+* R
         simp [ha, hb]
       · intro a x _ hx
         simp [hx])
-
-@[simp]
-theorem idealQuotientToRingQuot_apply (r : B → B → Prop) (x : B) :
-    idealQuotientToRingQuot r (Ideal.Quotient.mk _ x) = mkRingHom r x :=
-  rfl
 
 def ringQuotEquivIdealQuotient (r : B → B → Prop) : RingQuot r ≃+* B ⧸ Ideal.ofRel r :=
   RingEquiv.ofHomInv (ringQuotToIdealQuotient r) (idealQuotientToRingQuot r)

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Submodule.Range
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.LinearAlgebra.Quotient.Basic
 
+noncomputable section
+
 /-! # Exactness of a pair
 
 * For two maps `f : M → N` and `g : N → P`, with `Zero P`,
@@ -257,7 +259,6 @@ variable {f : M →ₗ[R] N} {g : N →ₗ[R] P}
 open LinearMap
 
 noncomputable
-
 def Exact.splitSurjectiveEquiv (h : Function.Exact f g) (hf : Function.Injective f) :
     { l // g ∘ₗ l = .id } ≃
       { e : N ≃ₗ[R] M × P // f = e.symm ∘ₗ inl R M P ∧ g = snd R M P ∘ₗ e } := by
@@ -292,7 +293,6 @@ def Exact.splitSurjectiveEquiv (h : Function.Exact f g) (hf : Function.Injective
     ext <;> simp
 
 noncomputable
-
 def Exact.splitInjectiveEquiv
     {R M N P} [Semiring R] [AddCommGroup M] [AddCommGroup N]
     [AddCommGroup P] [Module R M] [Module R N] [Module R P] {f : M →ₗ[R] N} {g : N →ₗ[R] P}

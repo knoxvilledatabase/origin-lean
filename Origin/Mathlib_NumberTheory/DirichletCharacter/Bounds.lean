@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.NumberTheory.DirichletCharacter.Basic
 
+noncomputable section
+
 /-!
 # Bounds for values of Dirichlet characters
 

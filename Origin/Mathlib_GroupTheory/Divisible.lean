@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Divisible.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 7 | Infrastructure: 5
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.ULift
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Module.NatInt
 import Mathlib.GroupTheory.QuotientGroup.Defs
 import Mathlib.Tactic.NormNum.Eq
+
+noncomputable section
 
 /-!
 # Divisible Group and rootable group
@@ -73,7 +75,10 @@ section AddMonoid
 
 variable (A α : Type*) [AddMonoid A] [SMul α A] [Zero α]
 
--- DISSOLVED: DivisibleBy
+class DivisibleBy where
+  div : A → α → A
+  div_zero : ∀ a, div a 0 = 0
+  div_cancel : ∀ {n : α} (a : A), n ≠ 0 → n • div a n = a
 
 end AddMonoid
 
@@ -81,11 +86,28 @@ section Monoid
 
 variable (A α : Type*) [Monoid A] [Pow A α] [Zero α]
 
--- DISSOLVED: RootableBy
+@[to_additive]
+class RootableBy where
+  root : A → α → A
+  root_zero : ∀ a, root a 0 = 1
+  root_cancel : ∀ {n : α} (a : A), n ≠ 0 → root a n ^ n = a
 
--- DISSOLVED: pow_left_surj_of_rootableBy
+@[to_additive smul_right_surj_of_divisibleBy]
+theorem pow_left_surj_of_rootableBy [RootableBy A α] {n : α} (hn : n ≠ 0) :
+    Function.Surjective (fun a => a ^ n : A → A) := fun x =>
+  ⟨RootableBy.root x n, RootableBy.root_cancel _ hn⟩
 
--- DISSOLVED: rootableByOfPowLeftSurj
+@[to_additive divisibleByOfSMulRightSurj
+      "An `AddMonoid A` is `α`-divisible iff `n • _` is a surjective function, i.e. the constructive
+      version implies the textbook approach."]
+noncomputable def rootableByOfPowLeftSurj
+    (H : ∀ {n : α}, n ≠ 0 → Function.Surjective (fun a => a ^ n : A → A)) : RootableBy A α where
+  root a n := @dite _ (n = 0) (Classical.dec _) (fun _ => (1 : A)) fun hn => (H hn a).choose
+  root_zero _ := by classical exact dif_pos rfl
+  root_cancel a hn := by
+    dsimp only
+    rw [dif_neg hn]
+    exact (H hn a).choose_spec
 
 section Pi
 
@@ -131,9 +153,19 @@ namespace AddCommGroup
 
 variable (A : Type*) [AddCommGroup A]
 
--- DISSOLVED: smul_top_eq_top_of_divisibleBy_int
+theorem smul_top_eq_top_of_divisibleBy_int [DivisibleBy A ℤ] {n : ℤ} (hn : n ≠ 0) :
+    n • (⊤ : AddSubgroup A) = ⊤ :=
+  AddSubgroup.map_top_of_surjective _ fun a => ⟨DivisibleBy.div a n, DivisibleBy.div_cancel _ hn⟩
 
--- DISSOLVED: divisibleByIntOfSMulTopEqTop
+noncomputable def divisibleByIntOfSMulTopEqTop
+    (H : ∀ {n : ℤ} (_hn : n ≠ 0), n • (⊤ : AddSubgroup A) = ⊤) : DivisibleBy A ℤ where
+  div a n :=
+    if hn : n = 0 then 0 else (show a ∈ n • (⊤ : AddSubgroup A) by rw [H hn]; trivial).choose
+  div_zero _ := dif_pos rfl
+  div_cancel a hn := by
+    simp_rw [dif_neg hn]
+    generalize_proofs h1
+    exact h1.choose_spec.2
 
 end AddCommGroup
 
@@ -197,7 +229,10 @@ noncomputable def Function.Surjective.rootableBy (hf : Function.Surjective f)
     ⟨f <| RootableBy.root y n,
       (by rw [← hpow (RootableBy.root y n) n, RootableBy.root_cancel _ hn, hy] : _ ^ n = x)⟩
 
--- DISSOLVED: RootableBy.surjective_pow
+@[to_additive DivisibleBy.surjective_smul]
+theorem RootableBy.surjective_pow (A α : Type*) [Monoid A] [Pow A α] [Zero α] [RootableBy A α]
+    {n : α} (hn : n ≠ 0) : Function.Surjective fun a : A => a ^ n := fun a =>
+  ⟨RootableBy.root a n, RootableBy.root_cancel a hn⟩
 
 end Hom
 

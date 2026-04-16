@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Quotient
 import Mathlib.ModelTheory.Semantics
 
+noncomputable section
+
 /-!
 # Quotients of First-Order Structures
 

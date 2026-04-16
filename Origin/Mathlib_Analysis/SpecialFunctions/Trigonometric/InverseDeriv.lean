@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
 
+noncomputable section
+
 /-!
 # derivatives of the inverse trigonometric functions
 

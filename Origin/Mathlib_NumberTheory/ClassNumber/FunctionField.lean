@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.ClassNumber.AdmissibleCardPowDegree
 import Mathlib.NumberTheory.ClassNumber.Finite
 import Mathlib.NumberTheory.FunctionField
 
+noncomputable section
+
 /-!
 # Class numbers of function fields
 

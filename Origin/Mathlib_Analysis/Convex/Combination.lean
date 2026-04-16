@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Convex/Combination.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Analysis.Convex.Hull
 import Mathlib.LinearAlgebra.AffineSpace.Basis
+
+noncomputable section
 
 /-!
 # Convex combinations
@@ -54,14 +56,26 @@ theorem Finset.centerMass_pair (hne : i ≠ j) :
 
 variable {w}
 
--- DISSOLVED: Finset.centerMass_insert
+theorem Finset.centerMass_insert (ha : i ∉ t) (hw : ∑ j ∈ t, w j ≠ 0) :
+    (insert i t).centerMass w z =
+      (w i / (w i + ∑ j ∈ t, w j)) • z i +
+        ((∑ j ∈ t, w j) / (w i + ∑ j ∈ t, w j)) • t.centerMass w z := by
+  simp only [centerMass, sum_insert ha, smul_add, (mul_smul _ _ _).symm, ← div_eq_inv_mul]
+  congr 2
+  rw [div_mul_eq_mul_div, mul_inv_cancel₀ hw, one_div]
 
--- DISSOLVED: Finset.centerMass_singleton
+theorem Finset.centerMass_singleton (hw : w i ≠ 0) : ({i} : Finset ι).centerMass w z = z i := by
+  rw [centerMass, sum_singleton, sum_singleton]
+  match_scalars
+  field_simp
 
 @[simp] lemma Finset.centerMass_neg_left : t.centerMass (-w) z = t.centerMass w z := by
   simp [centerMass, inv_neg]
 
--- DISSOLVED: Finset.centerMass_smul_left
+lemma Finset.centerMass_smul_left {c : R'} [Module R' R] [Module R' E] [SMulCommClass R' R R]
+    [IsScalarTower R' R R] [SMulCommClass R R' E] [IsScalarTower R' R E] (hc : c ≠ 0) :
+    t.centerMass (c • w) z = t.centerMass w z := by
+  simp [centerMass, -smul_assoc, smul_assoc c, ← smul_sum, smul_inv₀, smul_smul_smul_comm, hc]
 
 theorem Finset.centerMass_eq_of_sum_1 (hw : ∑ i ∈ t, w i = 1) :
     t.centerMass w z = ∑ i ∈ t, w i • z i := by
@@ -107,7 +121,9 @@ theorem Finset.centerMass_subset {t' : Finset ι} (ht : t ⊆ t') (h : ∀ i ∈
   intro i hit' hit
   rw [h i hit' hit, zero_smul, smul_zero]
 
--- DISSOLVED: Finset.centerMass_filter_ne_zero
+theorem Finset.centerMass_filter_ne_zero : {i ∈ t | w i ≠ 0}.centerMass w z = t.centerMass w z :=
+  Finset.centerMass_subset z (filter_subset _ _) fun i hit hit' => by
+    simpa only [hit, mem_filter, true_and, Ne, Classical.not_not] using hit'
 
 namespace Finset
 
@@ -158,7 +174,19 @@ theorem Convex.sum_mem (hs : Convex R s) (h₀ : ∀ i ∈ t, 0 ≤ w i) (h₁ :
   simpa only [h₁, centerMass, inv_one, one_smul] using
     hs.centerMass_mem h₀ (h₁.symm ▸ zero_lt_one) hz
 
--- DISSOLVED: Convex.finsum_mem
+theorem Convex.finsum_mem {ι : Sort*} {w : ι → R} {z : ι → E} {s : Set E} (hs : Convex R s)
+    (h₀ : ∀ i, 0 ≤ w i) (h₁ : ∑ᶠ i, w i = 1) (hz : ∀ i, w i ≠ 0 → z i ∈ s) :
+    (∑ᶠ i, w i • z i) ∈ s := by
+  have hfin_w : (support (w ∘ PLift.down)).Finite := by
+    by_contra H
+    rw [finsum, dif_neg H] at h₁
+    exact zero_ne_one h₁
+  have hsub : support ((fun i => w i • z i) ∘ PLift.down) ⊆ hfin_w.toFinset :=
+    (support_smul_subset_left _ _).trans hfin_w.coe_toFinset.ge
+  rw [finsum_eq_sum_plift_of_support_subset hsub]
+  refine hs.sum_mem (fun _ _ => h₀ _) ?_ fun i hi => hz _ ?_
+  · rwa [finsum, dif_pos hfin_w] at h₁
+  · rwa [hfin_w.mem_toFinset] at hi
 
 theorem convex_iff_sum_mem : Convex R s ↔ ∀ (t : Finset E) (w : E → R),
     (∀ i ∈ t, 0 ≤ w i) → ∑ i ∈ t, w i = 1 → (∀ x ∈ t, x ∈ s) → (∑ x ∈ t, w x • x) ∈ s := by

@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Probability.ProbabilityMassFunction.Basic
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 
+noncomputable section
+
 /-! # Poisson distributions over ℕ
 
 Define the Poisson measure over the natural numbers
@@ -29,7 +31,6 @@ namespace ProbabilityTheory
 section PoissonPMF
 
 noncomputable
-
 def poissonPMFReal (r : ℝ≥0) (n : ℕ) : ℝ := exp (- r) * r ^ n / n !
 
 lemma poissonPMFRealSum (r : ℝ≥0) : HasSum (fun n ↦ poissonPMFReal r n) 1 := by
@@ -53,7 +54,6 @@ lemma poissonPMFReal_nonneg {r : ℝ≥0} {n : ℕ} : 0 ≤ poissonPMFReal r n :
   positivity
 
 noncomputable
-
 def poissonPMF (r : ℝ≥0) : PMF ℕ := by
   refine ⟨fun n ↦ ENNReal.ofReal (poissonPMFReal r n), ?_⟩
   apply ENNReal.hasSum_coe.mpr
@@ -70,7 +70,6 @@ lemma stronglyMeasurable_poissonPMFReal (r : ℝ≥0) : StronglyMeasurable (pois
 end PoissonPMF
 
 noncomputable
-
 def poissonMeasure (r : ℝ≥0) : Measure ℕ := (poissonPMF r).toMeasure
 
 instance isProbabilityMeasurePoisson (r : ℝ≥0) :

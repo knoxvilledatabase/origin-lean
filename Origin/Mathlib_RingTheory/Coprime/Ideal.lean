@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.RingTheory.Ideal.BigOperators
 import Mathlib.RingTheory.Ideal.Operations
 
+noncomputable section
+
 /-!
 # An additional lemma about coprime ideals
 

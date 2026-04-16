@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Category/Pairwise.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Order.CompleteLattice
 import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.CategoryTheory.Limits.IsLimit
+
+noncomputable section
 
 /-!
 # The category of "pairwise intersections".
@@ -72,7 +74,6 @@ def pairwiseCases : TacticM Unit := do
   evalTactic (← `(tactic| casesm* (_ : Pairwise _) ⟶ (_ : Pairwise _)))
 
 attribute [local aesop safe tactic (rule_sets := [CategoryTheory])] pairwiseCases in
-
 instance : Category (Pairwise ι) where
   Hom := Hom
   id := id

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.Category.ModuleCat.Limits
 import Mathlib.Algebra.Category.Ring.Limits
 
+noncomputable section
+
 /-!
 # The category of R-algebras has all limits
 

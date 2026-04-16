@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.Cyclotomic.Discriminant
 import Mathlib.RingTheory.Polynomial.Eisenstein.IsIntegral
 import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 
+noncomputable section
+
 /-!
 # Ring of integers of `p ^ n`-th cyclotomic fields
 We gather results about cyclotomic extensions of `ℚ`. In particular, we compute the ring of
@@ -195,8 +197,6 @@ abbrev toInteger {k : ℕ+} (hζ : IsPrimitiveRoot ζ k) : 𝓞 K := ⟨ζ, hζ.
 
 end CharZero
 
-lemma coe_toInteger {k : ℕ+} (hζ : IsPrimitiveRoot ζ k) : hζ.toInteger.1 = ζ := rfl
-
 lemma finite_quotient_toInteger_sub_one [NumberField K] {k : ℕ+} (hk : 1 < k)
     (hζ : IsPrimitiveRoot ζ k) : Finite (𝓞 K ⧸ Ideal.span {hζ.toInteger - 1}) := by
   refine (finite_iff_nonempty_fintype _).2 ⟨?_⟩
@@ -228,8 +228,8 @@ theorem integralPowerBasis_gen [hcycl : IsCyclotomicExtension {p ^ k} ℚ K]
     rfl
 
 set_option linter.unusedVariables false in
-
 @[simp]
+
 theorem integralPowerBasis_dim [hcycl : IsCyclotomicExtension {p ^ k} ℚ K]
     (hζ : IsPrimitiveRoot ζ ↑(p ^ k)) : hζ.integralPowerBasis.dim = φ (p ^ k) := by
   simp [integralPowerBasis, ← cyclotomic_eq_minpoly hζ, natDegree_cyclotomic]

@@ -8,6 +8,8 @@ import Mathlib.Data.List.MinMax
 import Mathlib.Algebra.Tropical.Basic
 import Mathlib.Order.ConditionallyCompleteLattice.Finset
 
+noncomputable section
+
 /-!
 
 # Tropicalization of finitary operations

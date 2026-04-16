@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Sites.Whiskering
 import Mathlib.Geometry.Manifold.Algebra.SmoothFunctions
 import Mathlib.Geometry.Manifold.Sheaf.Basic
 
+noncomputable section
+
 /-! # The sheaf of smooth functions on a manifold
 
 The sheaf of `𝕜`-smooth functions from a manifold `M` to a manifold `N` can be defined as a sheaf of
@@ -94,9 +96,6 @@ instance smoothSheaf.coeFun (U : (Opens (TopCat.of M))ᵒᵖ) :
   (contDiffWithinAt_localInvariantProp ⊤).sheafHasCoeToFun _ _ _
 
 open Manifold in
-
-lemma smoothSheaf.obj_eq (U : (Opens (TopCat.of M))ᵒᵖ) :
-    (smoothSheaf IM I M N).presheaf.obj U = C^∞⟮IM, (unop U : Opens M); I, N⟯ := rfl
 
 def smoothSheaf.eval (x : M) : (smoothSheaf IM I M N).presheaf.stalk x → N :=
   TopCat.stalkToFiber (StructureGroupoid.LocalInvariantProp.localPredicate M N _) x

@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Polynomial.Bernstein
 import Mathlib.Topology.ContinuousMap.Polynomial
 import Mathlib.Topology.ContinuousMap.Compact
 
+noncomputable section
+
 /-!
 # Bernstein approximations and Weierstrass' theorem
 
@@ -184,70 +186,3 @@ open BoundedContinuousFunction
 open Filter
 
 open scoped Topology
-
-theorem bernsteinApproximation_uniform (f : C(I, ℝ)) :
-    Tendsto (fun n : ℕ => bernsteinApproximation n f) atTop (𝓝 f) := by
-  simp only [Metric.nhds_basis_ball.tendsto_right_iff, Metric.mem_ball, dist_eq_norm]
-  intro ε h
-  let δ := δ f ε h
-  have nhds_zero := tendsto_const_div_atTop_nhds_zero_nat (2 * ‖f‖ * δ ^ (-2 : ℤ))
-  filter_upwards [nhds_zero.eventually (gt_mem_nhds (half_pos h)), eventually_gt_atTop 0] with n nh
-    npos'
-  have npos : 0 < (n : ℝ) := by positivity
-  -- As `[0,1]` is compact, it suffices to check the inequality pointwise.
-  rw [ContinuousMap.norm_lt_iff _ h]
-  intro x
-  -- The idea is to split up the sum over `k` into two sets,
-  -- `S`, where `x - k/n < δ`, and its complement.
-  let S := S f ε h n x
-  calc
-    |(bernsteinApproximation n f - f) x| = |bernsteinApproximation n f x - f x| := rfl
-    _ = |bernsteinApproximation n f x - f x * 1| := by rw [mul_one]
-    _ = |bernsteinApproximation n f x - f x * ∑ k : Fin (n + 1), bernstein n k x| := by
-      rw [bernstein.probability]
-    _ = |∑ k : Fin (n + 1), (f k/ₙ - f x) * bernstein n k x| := by
-      simp [bernsteinApproximation, Finset.mul_sum, sub_mul]
-    _ ≤ ∑ k : Fin (n + 1), |(f k/ₙ - f x) * bernstein n k x| := Finset.abs_sum_le_sum_abs _ _
-    _ = ∑ k : Fin (n + 1), |f k/ₙ - f x| * bernstein n k x := by
-      simp_rw [abs_mul, abs_eq_self.mpr bernstein_nonneg]
-    _ = (∑ k ∈ S, |f k/ₙ - f x| * bernstein n k x) + ∑ k ∈ Sᶜ, |f k/ₙ - f x| * bernstein n k x :=
-      (S.sum_add_sum_compl _).symm
-    -- We'll now deal with the terms in `S` and the terms in `Sᶜ` in separate calc blocks.
-    _ < ε / 2 + ε / 2 :=
-      (add_lt_add_of_le_of_lt ?_ ?_)
-    _ = ε := add_halves ε
-  · -- We now work on the terms in `S`: uniform continuity and `bernstein.probability`
-    -- quickly give us a bound.
-    calc
-      ∑ k ∈ S, |f k/ₙ - f x| * bernstein n k x ≤ ∑ k ∈ S, ε / 2 * bernstein n k x := by
-        gcongr with _ m
-        exact le_of_lt (lt_of_mem_S m)
-      _ = ε / 2 * ∑ k ∈ S, bernstein n k x := by rw [Finset.mul_sum]
-      -- In this step we increase the sum over `S` back to a sum over all of `Fin (n+1)`,
-      -- so that we can use `bernstein.probability`.
-      _ ≤ ε / 2 * ∑ k : Fin (n + 1), bernstein n k x := by gcongr; exact S.subset_univ
-      _ = ε / 2 := by rw [bernstein.probability, mul_one]
-  · -- We now turn to working on `Sᶜ`: we control the difference term just using `‖f‖`,
-    -- and then insert a `δ^(-2) * (x - k/n)^2` factor
-    -- (which is at least one because we are not in `S`).
-    calc
-      ∑ k ∈ Sᶜ, |f k/ₙ - f x| * bernstein n k x ≤ ∑ k ∈ Sᶜ, 2 * ‖f‖ * bernstein n k x := by
-        gcongr
-        apply f.dist_le_two_norm
-      _ = 2 * ‖f‖ * ∑ k ∈ Sᶜ, bernstein n k x := by rw [Finset.mul_sum]
-      _ ≤ 2 * ‖f‖ * ∑ k ∈ Sᶜ, δ ^ (-2 : ℤ) * ((x : ℝ) - k/ₙ) ^ 2 * bernstein n k x := by
-        gcongr with _ m
-        conv_lhs => rw [← one_mul (bernstein _ _ _)]
-        gcongr
-        exact le_of_mem_S_compl m
-      -- Again enlarging the sum from `Sᶜ` to all of `Fin (n+1)`
-      _ ≤ 2 * ‖f‖ * ∑ k : Fin (n + 1), δ ^ (-2 : ℤ) * ((x : ℝ) - k/ₙ) ^ 2 * bernstein n k x := by
-        gcongr; exact Sᶜ.subset_univ
-      _ = 2 * ‖f‖ * δ ^ (-2 : ℤ) * ∑ k : Fin (n + 1), ((x : ℝ) - k/ₙ) ^ 2 * bernstein n k x := by
-        conv_rhs =>
-          rw [mul_assoc, Finset.mul_sum]
-          simp only [← mul_assoc]
-      -- `bernstein.variance` and `x ∈ [0,1]` gives the uniform bound
-      _ = 2 * ‖f‖ * δ ^ (-2 : ℤ) * x * (1 - x) / n := by rw [variance npos]; ring
-      _ ≤ 2 * ‖f‖ * δ ^ (-2 : ℤ) * 1 * 1 / n := by gcongr <;> unit_interval
-      _ < ε / 2 := by simp only [mul_one]; exact nh

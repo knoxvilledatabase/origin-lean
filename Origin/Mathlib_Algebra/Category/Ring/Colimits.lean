@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # The category of commutative rings has all colimits.
 
@@ -136,30 +138,9 @@ instance : Ring (ColimitType.{v} F) :=
       exact Quot.sound (Relation.right_distrib _ _ _) }
 
 @[simp]
-theorem quot_zero : Quot.mk Setoid.r zero = (0 : ColimitType F) :=
-  rfl
-
-@[simp]
-theorem quot_one : Quot.mk Setoid.r one = (1 : ColimitType F) :=
-  rfl
-
-@[simp]
-theorem quot_neg (x : Prequotient F) :
-    -- Porting note: Lean can't see `Quot.mk Setoid.r x` is a `ColimitType F` even with type
-    -- annotation unless we use `by exact` to change the elaboration order.
-    (by exact Quot.mk Setoid.r (neg x) : ColimitType F) = -(by exact Quot.mk Setoid.r x) :=
-  rfl
-
-@[simp]
 theorem quot_add (x y) :
     (by exact Quot.mk Setoid.r (add x y) : ColimitType F) =
       (by exact Quot.mk _ x) + (by exact Quot.mk _ y) :=
-  rfl
-
-@[simp]
-theorem quot_mul (x y) :
-    (by exact Quot.mk Setoid.r (mul x y) : ColimitType F) =
-      (by exact Quot.mk _ x) * (by exact Quot.mk _ y) :=
   rfl
 
 def colimit : RingCat :=
@@ -383,30 +364,9 @@ instance : CommRing (ColimitType.{v} F) :=
       exact Quot.sound (Relation.right_distrib _ _ _) }
 
 @[simp]
-theorem quot_zero : Quot.mk Setoid.r zero = (0 : ColimitType F) :=
-  rfl
-
-@[simp]
-theorem quot_one : Quot.mk Setoid.r one = (1 : ColimitType F) :=
-  rfl
-
-@[simp]
-theorem quot_neg (x : Prequotient F) :
-    -- Porting note: Lean can't see `Quot.mk Setoid.r x` is a `ColimitType F` even with type
-    -- annotation unless we use `by exact` to change the elaboration order.
-    (by exact Quot.mk Setoid.r (neg x) : ColimitType F) = -(by exact Quot.mk Setoid.r x) :=
-  rfl
-
-@[simp]
 theorem quot_add (x y) :
     (by exact Quot.mk Setoid.r (add x y) : ColimitType F) =
       (by exact Quot.mk _ x) + (by exact Quot.mk _ y) :=
-  rfl
-
-@[simp]
-theorem quot_mul (x y) :
-    (by exact Quot.mk Setoid.r (mul x y) : ColimitType F) =
-      (by exact Quot.mk _ x) * (by exact Quot.mk _ y) :=
   rfl
 
 def colimit : CommRingCat :=

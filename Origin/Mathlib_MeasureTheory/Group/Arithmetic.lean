@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Group/Arithmetic.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 4 | Infrastructure: 40
+Genuine: 84 | Conflates: 0 | Dissolved: 2 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.AEMeasurable
+
+noncomputable section
 
 /-!
 # Typeclasses for measurability of operations
@@ -639,9 +641,13 @@ nonrec theorem IsUnit.aemeasurable_const_smul_iff {c : M} (hc : IsUnit c) :
 variable {G₀ : Type*} [GroupWithZero G₀] [MeasurableSpace G₀] [MulAction G₀ β]
   [MeasurableSMul G₀ β]
 
--- DISSOLVED: measurable_const_smul_iff₀
+theorem measurable_const_smul_iff₀ {c : G₀} (hc : c ≠ 0) :
+    (Measurable fun x => c • f x) ↔ Measurable f :=
+  (IsUnit.mk0 c hc).measurable_const_smul_iff
 
--- DISSOLVED: aemeasurable_const_smul_iff₀
+theorem aemeasurable_const_smul_iff₀ {c : G₀} (hc : c ≠ 0) :
+    AEMeasurable (fun x => c • f x) μ ↔ AEMeasurable f μ :=
+  (IsUnit.mk0 c hc).aemeasurable_const_smul_iff
 
 end MulAction
 

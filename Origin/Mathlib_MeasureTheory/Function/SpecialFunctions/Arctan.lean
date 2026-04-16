@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
+noncomputable section
+
 /-!
 # Measurability of arctan
 

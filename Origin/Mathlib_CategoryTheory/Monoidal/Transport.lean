@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.NaturalTransformation
 
+noncomputable section
+
 /-!
 # Transport a monoidal structure along an equivalence.
 
@@ -136,6 +138,9 @@ def transportStruct (e : C ≌ D) : MonoidalCategoryStruct.{v₂} D where
       e.counitIso.app _
 
 attribute [local simp] transportStruct in
+/-- Transport a monoidal structure along an equivalence of (plain) categories.
+
+-/
 
 def transport (e : C ≌ D) : MonoidalCategory.{v₂} D :=
   letI : MonoidalCategoryStruct.{v₂} D := transportStruct e

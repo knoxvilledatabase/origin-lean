@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 3 | Dissolved: 0 | Infrastructure: 10
 import Origin.Core
 import Mathlib.Data.Finsupp.Basic
 
+noncomputable section
+
 /-!
 # Skew monoid algebras
 
@@ -42,9 +44,6 @@ variable {k G : Type*}
 section AddCommMonoid
 
 variable [AddCommMonoid k]
-
-@[simp]
-theorem eta (f : SkewMonoidAlgebra k G) : ofFinsupp f.toFinsupp = f := rfl
 
 @[irreducible]
 private def add :
@@ -147,9 +146,6 @@ theorem support_ofFinsupp (p) : support (⟨p⟩ : SkewMonoidAlgebra k G) = p.su
 
 theorem support_toFinsupp (p : SkewMonoidAlgebra k G) : p.toFinsupp.support = p.support := by
   rw [support]
-
-@[simp]
-theorem support_zero : (0 : SkewMonoidAlgebra k G).support = ∅ := rfl
 
 @[simp]
 theorem support_eq_empty {p} : p.support = ∅ ↔ (p : SkewMonoidAlgebra k G) = 0 := by

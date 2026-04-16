@@ -7,6 +7,8 @@ import Mathlib.Data.Prod.PProd
 import Mathlib.Data.Set.Countable
 import Mathlib.Order.Filter.Finite
 
+noncomputable section
+
 /-!
 # Filter bases
 
@@ -94,8 +96,6 @@ instance FilterBasis.nonempty_sets (B : FilterBasis α) : Nonempty B.sets :=
 
 instance {α : Type*} : Membership (Set α) (FilterBasis α) :=
   ⟨fun B U => U ∈ B.sets⟩
-
-@[simp] theorem FilterBasis.mem_sets {s : Set α} {B : FilterBasis α} : s ∈ B.sets ↔ s ∈ B := Iff.rfl
 
 instance : Inhabited (FilterBasis ℕ) :=
   ⟨{  sets := range Ici

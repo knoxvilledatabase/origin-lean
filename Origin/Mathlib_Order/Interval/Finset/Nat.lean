@@ -1,9 +1,11 @@
 /-
 Extracted from Order/Interval/Finset/Nat.lean
-Genuine: 44 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Multiset
+
+noncomputable section
 
 /-!
 # Finite intervals of naturals
@@ -33,21 +35,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder ℕ where
   finset_mem_Ioc a b x := by rw [Finset.mem_mk, Multiset.mem_coe, List.mem_range'_1]; omega
   finset_mem_Ioo a b x := by rw [Finset.mem_mk, Multiset.mem_coe, List.mem_range'_1]; omega
 
-theorem Icc_eq_range' : Icc a b = ⟨List.range' a (b + 1 - a), List.nodup_range' _ _⟩ :=
-  rfl
-
-theorem Ico_eq_range' : Ico a b = ⟨List.range' a (b - a), List.nodup_range' _ _⟩ :=
-  rfl
-
-theorem Ioc_eq_range' : Ioc a b = ⟨List.range' (a + 1) (b - a), List.nodup_range' _ _⟩ :=
-  rfl
-
-theorem Ioo_eq_range' : Ioo a b = ⟨List.range' (a + 1) (b - a - 1), List.nodup_range' _ _⟩ :=
-  rfl
-
-theorem uIcc_eq_range' :
-    uIcc a b = ⟨List.range' (min a b) (max a b + 1 - min a b), List.nodup_range' _ _⟩ := rfl
-
 theorem Iio_eq_range : Iio = range := by
   ext b x
   rw [mem_Iio, mem_range]
@@ -55,7 +42,10 @@ theorem Iio_eq_range : Iio = range := by
 @[simp]
 theorem Ico_zero_eq_range : Ico 0 = range := by rw [← Nat.bot_eq_zero, ← Iio_eq_Ico, Iio_eq_range]
 
--- DISSOLVED: range_eq_Icc_zero_sub_one
+lemma range_eq_Icc_zero_sub_one (n : ℕ) (hn : n ≠ 0) : range n = Icc 0 (n - 1) := by
+  ext b
+  simp_all only [mem_Icc, zero_le, true_and, mem_range]
+  exact lt_iff_le_pred (zero_lt_of_ne_zero hn)
 
 theorem _root_.Finset.range_eq_Ico : range = Ico 0 :=
   Ico_zero_eq_range.symm

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.BooleanAlgebra
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Co-Heyting boundary
 
@@ -34,9 +36,6 @@ def boundary (a : α) : α :=
 scoped[Heyting] prefix:120 "∂ " => Coheyting.boundary
 
 open Heyting
-
-theorem inf_hnot_self (a : α) : a ⊓ ￢a = ∂ a :=
-  rfl
 
 theorem boundary_le : ∂ a ≤ a :=
   inf_le_left

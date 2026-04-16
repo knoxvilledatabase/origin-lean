@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.RegularMono
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
+noncomputable section
+
 /-!
 # Definitions and basic properties of normal monomorphisms and epimorphisms.
 

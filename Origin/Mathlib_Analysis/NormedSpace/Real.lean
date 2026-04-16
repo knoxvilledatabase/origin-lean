@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/NormedSpace/Real.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 6 | Infrastructure: 1
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.Topology.Algebra.Module.Basic
+
+noncomputable section
 
 /-!
 # Basic facts about real (semi)normed spaces
@@ -53,17 +55,52 @@ theorem dist_smul_add_one_sub_smul_le {r : ℝ} {x y : E} (h : r ∈ Icc 0 1) :
     _ ≤ (1 - 0) * dist y x := by gcongr; exact h.1
     _ = dist y x := by rw [sub_zero, one_mul]
 
--- DISSOLVED: closure_ball
+theorem closure_ball (x : E) {r : ℝ} (hr : r ≠ 0) : closure (ball x r) = closedBall x r := by
+  refine Subset.antisymm closure_ball_subset_closedBall fun y hy => ?_
+  have : ContinuousWithinAt (fun c : ℝ => c • (y - x) + x) (Ico 0 1) 1 :=
+    ((continuous_id.smul continuous_const).add continuous_const).continuousWithinAt
+  convert this.mem_closure _ _
+  · rw [one_smul, sub_add_cancel]
+  · simp [closure_Ico zero_ne_one, zero_le_one]
+  · rintro c ⟨hc0, hc1⟩
+    rw [mem_ball, dist_eq_norm, add_sub_cancel_right, norm_smul, Real.norm_eq_abs,
+      abs_of_nonneg hc0, mul_comm, ← mul_one r]
+    rw [mem_closedBall, dist_eq_norm] at hy
+    replace hr : 0 < r := ((norm_nonneg _).trans hy).lt_of_ne hr.symm
+    apply mul_lt_mul' <;> assumption
 
--- DISSOLVED: frontier_ball
+theorem frontier_ball (x : E) {r : ℝ} (hr : r ≠ 0) :
+    frontier (ball x r) = sphere x r := by
+  rw [frontier, closure_ball x hr, isOpen_ball.interior_eq, closedBall_diff_ball]
 
--- DISSOLVED: interior_closedBall
+theorem interior_closedBall (x : E) {r : ℝ} (hr : r ≠ 0) :
+    interior (closedBall x r) = ball x r := by
+  cases' hr.lt_or_lt with hr hr
+  · rw [closedBall_eq_empty.2 hr, ball_eq_empty.2 hr.le, interior_empty]
+  refine Subset.antisymm ?_ ball_subset_interior_closedBall
+  intro y hy
+  rcases (mem_closedBall.1 <| interior_subset hy).lt_or_eq with (hr | rfl)
+  · exact hr
+  set f : ℝ → E := fun c : ℝ => c • (y - x) + x
+  suffices f ⁻¹' closedBall x (dist y x) ⊆ Icc (-1) 1 by
+    have hfc : Continuous f := (continuous_id.smul continuous_const).add continuous_const
+    have hf1 : (1 : ℝ) ∈ f ⁻¹' interior (closedBall x <| dist y x) := by simpa [f]
+    have h1 : (1 : ℝ) ∈ interior (Icc (-1 : ℝ) 1) :=
+      interior_mono this (preimage_interior_subset_interior_preimage hfc hf1)
+    simp at h1
+  intro c hc
+  rw [mem_Icc, ← abs_le, ← Real.norm_eq_abs, ← mul_le_mul_right hr]
+  simpa [f, dist_eq_norm, norm_smul] using hc
 
--- DISSOLVED: frontier_closedBall
+theorem frontier_closedBall (x : E) {r : ℝ} (hr : r ≠ 0) :
+    frontier (closedBall x r) = sphere x r := by
+  rw [frontier, closure_closedBall, interior_closedBall x hr, closedBall_diff_ball]
 
--- DISSOLVED: interior_sphere
+theorem interior_sphere (x : E) {r : ℝ} (hr : r ≠ 0) : interior (sphere x r) = ∅ := by
+  rw [← frontier_closedBall x hr, interior_frontier isClosed_ball]
 
--- DISSOLVED: frontier_sphere
+theorem frontier_sphere (x : E) {r : ℝ} (hr : r ≠ 0) : frontier (sphere x r) = sphere x r := by
+  rw [isClosed_sphere.frontier_eq, interior_sphere x hr, diff_empty]
 
 end Seminormed
 

@@ -10,6 +10,8 @@ import Mathlib.Algebra.Category.MonCat.Basic
 import Mathlib.Combinatorics.Quiver.SingleObj
 import Mathlib.Algebra.Group.Units.Equiv
 
+noncomputable section
+
 /-!
 # Single-object category
 
@@ -83,9 +85,6 @@ abbrev star : SingleObj M :=
 def toEnd : M ≃* End (SingleObj.star M) :=
   { Equiv.refl M with map_mul' := fun _ _ => rfl }
 
-theorem toEnd_def (x : M) : toEnd M x = x :=
-  rfl
-
 variable (N : Type v) [Monoid N]
 
 def mapHom : (M →* N) ≃ SingleObj M ⥤ SingleObj N where
@@ -101,14 +100,7 @@ def mapHom : (M →* N) ≃ SingleObj M ⥤ SingleObj N where
   left_inv := by aesop_cat
   right_inv := by aesop_cat
 
-theorem mapHom_id : mapHom M M (MonoidHom.id M) = 𝟭 _ :=
-  rfl
-
 variable {M N G}
-
-theorem mapHom_comp (f : M →* N) {P : Type w} [Monoid P] (g : N →* P) :
-    mapHom M P (g.comp f) = mapHom M N f ⋙ mapHom N P g :=
-  rfl
 
 variable {C : Type v} [Category.{w} C]
 
@@ -189,14 +181,6 @@ variable (M : Type u) [Monoid M]
 def toAut : Mˣ ≃* Aut (SingleObj.star M) :=
   MulEquiv.trans (Units.mapEquiv (SingleObj.toEnd M))
     (Aut.unitsEndEquivAut (SingleObj.star M))
-
-@[simp]
-theorem toAut_hom (x : Mˣ) : (toAut M x).hom = SingleObj.toEnd M x :=
-  rfl
-
-@[simp]
-theorem toAut_inv (x : Mˣ) : (toAut M x).inv = SingleObj.toEnd M (x⁻¹ : Mˣ) :=
-  rfl
 
 end Units
 

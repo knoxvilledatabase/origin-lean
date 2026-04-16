@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Order
 import Mathlib.Algebra.Order.Archimedean.Basic
 
+noncomputable section
+
 /-!
 # Archimedean groups
 

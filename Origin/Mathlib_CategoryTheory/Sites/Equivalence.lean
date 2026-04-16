@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Sites/Equivalence.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.DenseSubsite.InducedTopology
 import Mathlib.CategoryTheory.Sites.LocallyBijective
 import Mathlib.CategoryTheory.Sites.PreservesLocallyBijective
 import Mathlib.CategoryTheory.Sites.Whiskering
+
+noncomputable section
 
 /-!
 # Equivalences of sheaf categories
@@ -125,19 +127,16 @@ def sheafCongr : Sheaf J A ≌ Sheaf K A where
 variable [HasSheafify K A]
 
 noncomputable
-
 def transportAndSheafify : (Cᵒᵖ ⥤ A) ⥤ Sheaf J A :=
   e.op.congrLeft.functor ⋙ presheafToSheaf _ _ ⋙ (e.sheafCongr J K A).inverse
 
 noncomputable
-
 def transportIsoSheafToPresheaf : (e.sheafCongr J K A).functor ⋙
     sheafToPresheaf K A ⋙ e.op.congrLeft.inverse ≅ sheafToPresheaf J A :=
   NatIso.ofComponents (fun F ↦ isoWhiskerRight e.op.unitIso.symm F.val)
     (by intros; ext; simp [Equivalence.sheafCongr])
 
 noncomputable
-
 def transportSheafificationAdjunction : transportAndSheafify J K e A ⊣ sheafToPresheaf J A :=
   ((e.op.congrLeft.toAdjunction.comp (sheafificationAdjunction _ _)).comp
     (e.sheafCongr J K A).symm.toAdjunction).ofNatIsoRight
@@ -147,6 +146,7 @@ noncomputable instance : PreservesFiniteLimits <| transportAndSheafify J K e A w
   preservesFiniteLimits _ := comp_preservesLimitsOfShape _ _
 
 include K e in
+/-- Transport `HasSheafify` along an equivalence of sites. -/
 
 theorem hasSheafify : HasSheafify J A :=
   HasSheafify.mk' J A (transportSheafificationAdjunction J K e A)
@@ -155,7 +155,6 @@ variable {A : Type*} [Category A] {B : Type*} [Category B] (F : A ⥤ B)
   [K.HasSheafCompose F]
 
 include K e in
-
 theorem hasSheafCompose : J.HasSheafCompose F where
   isSheaf P hP := by
     have hP' : Presheaf.IsSheaf K (e.inverse.op ⋙ P ⋙ F) := by
@@ -179,12 +178,10 @@ variable [HasSheafify ((equivSmallModel C).inverse.inducedTopology J) A]
 variable [((equivSmallModel C).inverse.inducedTopology J).HasSheafCompose F]
 
 noncomputable
-
 def smallSheafify : (Cᵒᵖ ⥤ A) ⥤ Sheaf J A := (equivSmallModel C).transportAndSheafify J
   ((equivSmallModel C).inverse.inducedTopology J) A
 
 noncomputable
-
 def smallSheafificationAdjunction : smallSheafify J A ⊣ sheafToPresheaf J A :=
   (equivSmallModel C).transportSheafificationAdjunction J _ A
 

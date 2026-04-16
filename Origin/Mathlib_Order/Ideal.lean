@@ -9,6 +9,8 @@ import Mathlib.Order.Chain
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Order ideals, cofinal sets, and the Rasiowa–Sikorski lemma
 
@@ -98,10 +100,6 @@ theorem ext {s t : Ideal P} : (s : Set P) = t → s = t :=
 theorem carrier_eq_coe (s : Ideal P) : s.carrier = s :=
   rfl
 
-@[simp]
-theorem coe_toLowerSet (s : Ideal P) : (s.toLowerSet : Set P) = s :=
-  rfl
-
 protected theorem lower (s : Ideal P) : IsLowerSet (s : Set P) :=
   s.lower'
 
@@ -121,9 +119,6 @@ instance instPartialOrderIdeal : PartialOrder (Ideal P) :=
   PartialOrder.lift SetLike.coe SetLike.coe_injective
 
 theorem coe_subset_coe : (s : Set P) ⊆ t ↔ s ≤ t :=
-  Iff.rfl
-
-theorem coe_ssubset_coe : (s : Set P) ⊂ t ↔ s < t :=
   Iff.rfl
 
 @[trans]
@@ -161,14 +156,6 @@ variable [IsDirected P (· ≤ ·)] [Nonempty P] {I : Ideal P}
 instance : OrderTop (Ideal P) where
   top := ⟨⊤, univ_nonempty, directedOn_univ⟩
   le_top _ _ _ := LowerSet.mem_top
-
-@[simp]
-theorem top_toLowerSet : (⊤ : Ideal P).toLowerSet = ⊤ :=
-  rfl
-
-@[simp]
-theorem coe_top : ((⊤ : Ideal P) : Set P) = univ :=
-  rfl
 
 theorem isProper_of_ne_top (ne_top : I ≠ ⊤) : IsProper I :=
   ⟨fun h ↦ ne_top <| ext h⟩
@@ -258,10 +245,6 @@ instance : OrderBot (Ideal P) where
   bot := principal ⊥
   bot_le := by simp
 
-@[simp]
-theorem principal_bot : principal (⊥ : P) = ⊥ :=
-  rfl
-
 end OrderBot
 
 section OrderTop
@@ -333,22 +316,6 @@ instance : Lattice (Ideal P) :=
     inf_le_left := fun _ _ ↦ inter_subset_left
     inf_le_right := fun _ _ ↦ inter_subset_right
     le_inf := fun _ _ _ ↦ subset_inter }
-
-@[simp]
-theorem coe_sup : ↑(s ⊔ t) = { x | ∃ a ∈ s, ∃ b ∈ t, x ≤ a ⊔ b } :=
-  rfl
-
-@[simp]
-theorem coe_inf : (↑(s ⊓ t) : Set P) = ↑s ∩ ↑t :=
-  rfl
-
-@[simp]
-theorem mem_inf : x ∈ I ⊓ J ↔ x ∈ I ∧ x ∈ J :=
-  Iff.rfl
-
-@[simp]
-theorem mem_sup : x ∈ I ⊔ J ↔ ∃ i ∈ I, ∃ j ∈ J, x ≤ i ⊔ j :=
-  Iff.rfl
 
 theorem lt_sup_principal_of_not_mem (hx : x ∉ I) : I < I ⊔ principal x :=
   le_sup_left.lt_of_ne fun h ↦ hx <| by simpa only [left_eq_sup, principal_le_iff] using h

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Euclidean.Angle.Oriented.RightAngle
 import Mathlib.Geometry.Euclidean.Circumcenter
 
+noncomputable section
+
 /-!
 # Angles in circles and sphere.
 

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Reflexive
 import Mathlib.CategoryTheory.Monad.Equalizer
 import Mathlib.CategoryTheory.Monad.Limits
 
+noncomputable section
+
 /-!
 # Comonadicity theorems
 
@@ -130,12 +132,6 @@ def counitFork (A : adj.toComonad.Coalgebra)
     (by
       change _ = F.map _ ≫ _
       rw [← F.map_comp, equalizer.condition, F.map_comp])
-
-@[simp]
-theorem unitFork_ι (A : adj.toComonad.Coalgebra)
-    [HasEqualizer (G.map A.a) (adj.unit.app (G.obj A.A))] :
-    (counitFork A).ι = F.map (equalizer.ι (G.map A.a) (adj.unit.app (G.obj A.A))) :=
-  rfl
 
 theorem comparisonAdjunction_counit_f
     [∀ A : adj.toComonad.Coalgebra, HasEqualizer (G.map A.a)

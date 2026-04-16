@@ -1,12 +1,14 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Finite.lean
-Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Data.Finset.Max
 import Mathlib.Data.Sym.Card
+
+noncomputable section
 
 /-!
 # Definitions for finite and locally finite graphs
@@ -69,6 +71,8 @@ theorem edgeFinset_inj : G₁.edgeFinset = G₂.edgeFinset ↔ G₁ = G₂ := by
 theorem edgeFinset_subset_edgeFinset : G₁.edgeFinset ⊆ G₂.edgeFinset ↔ G₁ ≤ G₂ := by simp
 
 theorem edgeFinset_ssubset_edgeFinset : G₁.edgeFinset ⊂ G₂.edgeFinset ↔ G₁ < G₂ := by simp
+
+@[gcongr] alias ⟨_, edgeFinset_mono⟩ := edgeFinset_subset_edgeFinset
 
 alias ⟨_, edgeFinset_strict_mono⟩ := edgeFinset_ssubset_edgeFinset
 
@@ -176,9 +180,6 @@ variable (v) [Fintype (G.neighborSet v)]
 def neighborFinset : Finset V :=
   (G.neighborSet v).toFinset
 
-theorem neighborFinset_def : G.neighborFinset v = (G.neighborSet v).toFinset :=
-  rfl
-
 @[simp]
 theorem mem_neighborFinset (w : V) : w ∈ G.neighborFinset v ↔ G.Adj v w :=
   Set.mem_toFinset
@@ -192,9 +193,6 @@ theorem singleton_disjoint_neighborFinset : Disjoint {v} (G.neighborFinset v) :=
   Finset.disjoint_singleton_left.mpr <| not_mem_neighborFinset_self _ _
 
 def degree : ℕ := #(G.neighborFinset v)
-
-@[simp]
-theorem card_neighborFinset_eq_degree : #(G.neighborFinset v) = G.degree v := rfl
 
 @[simp]
 theorem card_neighborSet_eq_degree : Fintype.card (G.neighborSet v) = G.degree v :=

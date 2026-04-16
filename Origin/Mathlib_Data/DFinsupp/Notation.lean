@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.Finsupp.Notation
 
+noncomputable section
+
 /-!
 # Notation for `DFinsupp`
 

@@ -9,6 +9,8 @@ import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.Tactic.Basic
 import Mathlib.Tactic.Zify
 
+noncomputable section
+
 /-!
 # `qify` tactic
 
@@ -22,11 +24,8 @@ example (a b c x y z : ℕ) (h : ¬ x*y*z < 0) : c < a + 3*b := by
   h : ¬↑x * ↑y * ↑z < 0
   ⊢ ↑c < ↑a + 3 * ↑b
   -/
-
   sorry
-
 ```
-
 -/
 
 namespace Mathlib.Tactic.Qify
@@ -38,26 +37,6 @@ open Lean.Meta
 open Lean.Parser.Tactic
 
 open Lean.Elab.Tactic
-
-  sorry
-
-```
-
-`qify` can be given extra lemmas to use in simplification. This is especially useful in the
-
-presence of nat subtraction: passing `≤` arguments will allow `push_cast` to do more work.
-
-```
-
-example (a b c : ℤ) (h : a / b = c) (hab : b ∣ a) (hb : b ≠ 0) : a = c * b := by
-  qify [hab] at h hb ⊢
-  exact (div_eq_iff hb).1 h
-
-```
-
-`qify` makes use of the `@[zify_simps]` and `@[qify_simps]` attributes to move propositions,
-
-and the `push_cast` tactic to simplify the `ℚ`-valued expressions. -/
 
 syntax (name := qify) "qify" (simpArgs)? (location)? : tactic
 

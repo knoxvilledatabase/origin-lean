@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Quotient/Basic.lean
-Genuine: 12 | Conflates: 1 | Dissolved: 3 | Infrastructure: 7
+Genuine: 14 | Conflates: 2 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.GroupTheory.QuotientGroup.Finite
@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Congruence.Basic
 import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 import Mathlib.Tactic.FinCases
+
+noncomputable section
 
 /-!
 # Ideal quotients
@@ -60,7 +62,9 @@ lemma mk_singleton_self (x : R) : mk (Ideal.span {x}) x = 0 := by
 theorem zero_eq_one_iff {I : Ideal R} : (0 : R ⧸ I) = 1 ↔ I = ⊤ :=
   eq_comm.trans <| eq_zero_iff_mem.trans (eq_top_iff_one _).symm
 
--- DISSOLVED: zero_ne_one_iff
+-- CONFLATES (assumes ground = zero): zero_ne_one_iff
+theorem zero_ne_one_iff {I : Ideal R} : (0 : R ⧸ I) ≠ 1 ↔ I ≠ ⊤ :=
+  not_congr zero_eq_one_iff
 
 -- CONFLATES (assumes ground = zero): nontrivial
 protected theorem nontrivial {I : Ideal R} (hI : I ≠ ⊤) : Nontrivial (R ⧸ I) :=
@@ -90,11 +94,24 @@ theorem isDomain_iff_prime (I : Ideal R) : IsDomain (R ⧸ I) ↔ I.IsPrime := b
     haveI := @IsDomain.to_noZeroDivisors (R ⧸ I) _ H
     exact eq_zero_or_eq_zero_of_mul_eq_zero h
 
--- DISSOLVED: exists_inv
+theorem exists_inv {I : Ideal R} [hI : I.IsMaximal] :
+    ∀ {a : R ⧸ I}, a ≠ 0 → ∃ b : R ⧸ I, a * b = 1 := by
+  rintro ⟨a⟩ h
+  rcases hI.exists_inv (mt eq_zero_iff_mem.2 h) with ⟨b, c, hc, abc⟩
+  rw [mul_comm] at abc
+  refine ⟨mk _ b, Quot.sound ?_⟩
+  simp only [Submodule.quotientRel_def]
+  rw [← eq_sub_iff_add_eq'] at abc
+  rwa [abc, ← neg_mem_iff (G := R) (H := I), neg_sub] at hc
 
 open Classical in
 
--- DISSOLVED: groupWithZero
+protected noncomputable abbrev groupWithZero (I : Ideal R) [hI : I.IsMaximal] :
+    GroupWithZero (R ⧸ I) :=
+  { inv := fun a => if ha : a = 0 then 0 else Classical.choose (exists_inv ha)
+    mul_inv_cancel := fun a (ha : a ≠ 0) =>
+      show a * dite _ _ _ = _ by rw [dif_neg ha]; exact Classical.choose_spec (exists_inv ha)
+    inv_zero := dif_pos rfl }
 
 protected noncomputable abbrev field (I : Ideal R) [I.IsMaximal] : Field (R ⧸ I) where
   __ := commRing _

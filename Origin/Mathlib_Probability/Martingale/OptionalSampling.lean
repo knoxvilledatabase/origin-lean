@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.SuccPred.LinearLocallyFinite
 import Mathlib.Probability.Martingale.Basic
 
+noncomputable section
+
 /-!
 # Optional sampling theorem
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.Data.Set.Function
 
+noncomputable section
+
 /-!
 # Comparing sums and integrals
 

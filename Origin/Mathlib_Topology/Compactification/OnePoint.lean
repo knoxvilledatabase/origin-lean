@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Option
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # The OnePoint Compactification
 
@@ -105,10 +107,6 @@ protected def rec {C : OnePoint X → Sort*} (infty : C ∞) (coe : ∀ x : X, C
   | (x : X) => coe x
 
 @[inline] protected def elim : OnePoint X → Y → (X → Y) → Y := Option.elim
-
-@[simp] theorem elim_infty (y : Y) (f : X → Y) : ∞.elim y f = y := rfl
-
-@[simp] theorem elim_some (y : Y) (f : X → Y) (x : X) : (some x).elim y f = f x := rfl
 
 theorem isCompl_range_coe_infty : IsCompl (range ((↑) : X → OnePoint X)) {∞} :=
   isCompl_range_some_none X
@@ -558,16 +556,6 @@ noncomputable def equivOfIsEmbeddingOfRangeEq :
         · have hq' : q ∈ range f := by simpa [hy]
           simpa [hq] using hq'.choose_spec }
   Continuous.homeoOfEquivCompactToT2 <| (continuous_iff e).mpr ⟨this, hf.continuous⟩
-
-@[simp]
-lemma equivOfIsEmbeddingOfRangeEq_apply_coe (x : X) :
-    equivOfIsEmbeddingOfRangeEq y f hf hy x = f x :=
-  rfl
-
-@[simp]
-lemma equivOfIsEmbeddingOfRangeEq_apply_infty :
-    equivOfIsEmbeddingOfRangeEq y f hf hy ∞ = y :=
-  rfl
 
 end Uniqueness
 

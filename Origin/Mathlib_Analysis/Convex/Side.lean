@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Between
 import Mathlib.Analysis.Convex.Normed
 import Mathlib.Analysis.Normed.Group.AddTorsor
 
+noncomputable section
+
 /-!
 # Sides of affine subspaces
 

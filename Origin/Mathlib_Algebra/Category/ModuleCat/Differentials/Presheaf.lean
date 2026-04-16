@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf
 import Mathlib.Algebra.Category.ModuleCat.Differentials.Basic
 
+noncomputable section
+
 /-!
 # The presheaf of differentials of a presheaf of modules
 
@@ -136,9 +138,6 @@ def mk (d_map : ∀ ⦃X Y : Dᵒᵖ⦄ (f : X ⟶ Y) (x : R.obj X),
 
 variable (d_map : ∀ ⦃X Y : Dᵒᵖ⦄ (f : X ⟶ Y) (x : R.obj X),
       (d Y).d ((R.map f) x) = (M.map f) ((d X).d x))
-
-@[simp]
-lemma mk_app (X : Dᵒᵖ) : (mk d d_map).app X = d X := rfl
 
 def Universal.mk {d : M.Derivation' φ'}
     (desc : ∀ {M' : PresheafOfModules (R ⋙ forget₂ _ _)}

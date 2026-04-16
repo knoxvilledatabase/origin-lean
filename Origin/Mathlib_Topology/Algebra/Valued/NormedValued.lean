@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Group.Ultra
 import Mathlib.RingTheory.Valuation.RankOne
 import Mathlib.Topology.Algebra.Valued.ValuationTopology
 
+noncomputable section
+
 /-!
 # Correspondence between nontrivial nonarchimedean norms and rank one valuations
 
@@ -149,8 +151,6 @@ instance : IsUltrametricDist L :=
     refine (Valued.norm_add_le (x - y) (y - z)).trans_eq' ?_
     simp only [sub_add_sub_cancel]
     rfl ⟩
-
-lemma coe_valuation_eq_rankOne_hom_comp_valuation : ⇑NormedField.valuation = hv.hom ∘ val.v := rfl
 
 end NormedField
 

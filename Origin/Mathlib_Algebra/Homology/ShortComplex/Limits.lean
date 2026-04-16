@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 
+noncomputable section
+
 /-!
 # Limits and colimits in the category of short complexes
 

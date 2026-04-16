@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.Basic
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Counting in lists
 

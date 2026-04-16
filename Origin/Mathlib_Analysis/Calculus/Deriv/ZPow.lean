@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/Deriv/ZPow.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.Deriv.Inv
+
+noncomputable section
 
 /-!
 # Derivatives of `x ^ m`, `m : ℤ`
@@ -39,15 +41,42 @@ variable {m : ℤ}
 
 /-! ### Derivative of `x ↦ x^m` for `m : ℤ` -/
 
--- DISSOLVED: hasStrictDerivAt_zpow
+theorem hasStrictDerivAt_zpow (m : ℤ) (x : 𝕜) (h : x ≠ 0 ∨ 0 ≤ m) :
+    HasStrictDerivAt (fun x => x ^ m) ((m : 𝕜) * x ^ (m - 1)) x := by
+  have : ∀ m : ℤ, 0 < m → HasStrictDerivAt (· ^ m) ((m : 𝕜) * x ^ (m - 1)) x := fun m hm ↦ by
+    lift m to ℕ using hm.le
+    simp only [zpow_natCast, Int.cast_natCast]
+    convert hasStrictDerivAt_pow m x using 2
+    rw [← Int.ofNat_one, ← Int.ofNat_sub, zpow_natCast]
+    norm_cast at hm
+  rcases lt_trichotomy m 0 with (hm | hm | hm)
+  · have hx : x ≠ 0 := h.resolve_right hm.not_le
+    have := (hasStrictDerivAt_inv ?_).scomp _ (this (-m) (neg_pos.2 hm)) <;>
+      [skip; exact zpow_ne_zero _ hx]
+    simp only [Function.comp_def, zpow_neg, one_div, inv_inv, smul_eq_mul] at this
+    convert this using 1
+    rw [sq, mul_inv, inv_inv, Int.cast_neg, neg_mul, neg_mul_neg, ← zpow_add₀ hx, mul_assoc, ←
+      zpow_add₀ hx]
+    congr
+    abel
+  · simp only [hm, zpow_zero, Int.cast_zero, zero_mul, hasStrictDerivAt_const]
+  · exact this m hm
 
--- DISSOLVED: hasDerivAt_zpow
+theorem hasDerivAt_zpow (m : ℤ) (x : 𝕜) (h : x ≠ 0 ∨ 0 ≤ m) :
+    HasDerivAt (fun x => x ^ m) ((m : 𝕜) * x ^ (m - 1)) x :=
+  (hasStrictDerivAt_zpow m x h).hasDerivAt
 
--- DISSOLVED: hasDerivWithinAt_zpow
+theorem hasDerivWithinAt_zpow (m : ℤ) (x : 𝕜) (h : x ≠ 0 ∨ 0 ≤ m) (s : Set 𝕜) :
+    HasDerivWithinAt (fun x => x ^ m) ((m : 𝕜) * x ^ (m - 1)) s x :=
+  (hasDerivAt_zpow m x h).hasDerivWithinAt
 
--- DISSOLVED: differentiableAt_zpow
+theorem differentiableAt_zpow : DifferentiableAt 𝕜 (fun x => x ^ m) x ↔ x ≠ 0 ∨ 0 ≤ m :=
+  ⟨fun H => NormedField.continuousAt_zpow.1 H.continuousAt, fun H =>
+    (hasDerivAt_zpow m x H).differentiableAt⟩
 
--- DISSOLVED: differentiableWithinAt_zpow
+theorem differentiableWithinAt_zpow (m : ℤ) (x : 𝕜) (h : x ≠ 0 ∨ 0 ≤ m) :
+    DifferentiableWithinAt 𝕜 (fun x => x ^ m) s x :=
+  (differentiableAt_zpow.mpr h).differentiableWithinAt
 
 theorem differentiableOn_zpow (m : ℤ) (s : Set 𝕜) (h : (0 : 𝕜) ∉ s ∨ 0 ≤ m) :
     DifferentiableOn 𝕜 (fun x => x ^ m) s := fun x hxs =>
@@ -65,7 +94,9 @@ theorem deriv_zpow (m : ℤ) (x : 𝕜) : deriv (fun x => x ^ m) x = m * x ^ (m 
 theorem deriv_zpow' (m : ℤ) : (deriv fun x : 𝕜 => x ^ m) = fun x => (m : 𝕜) * x ^ (m - 1) :=
   funext <| deriv_zpow m
 
--- DISSOLVED: derivWithin_zpow
+theorem derivWithin_zpow (hxs : UniqueDiffWithinAt 𝕜 s x) (h : x ≠ 0 ∨ 0 ≤ m) :
+    derivWithin (fun x => x ^ m) s x = (m : 𝕜) * x ^ (m - 1) :=
+  (hasDerivWithinAt_zpow m x h s).derivWithin hxs
 
 @[simp]
 theorem iter_deriv_zpow' (m : ℤ) (k : ℕ) :
@@ -107,10 +138,17 @@ theorem iter_deriv_inv' (k : ℕ) :
 
 variable {f : E → 𝕜} {t : Set E} {a : E}
 
--- DISSOLVED: DifferentiableWithinAt.zpow
+theorem DifferentiableWithinAt.zpow (hf : DifferentiableWithinAt 𝕜 f t a) (h : f a ≠ 0 ∨ 0 ≤ m) :
+    DifferentiableWithinAt 𝕜 (fun x => f x ^ m) t a :=
+  (differentiableAt_zpow.2 h).comp_differentiableWithinAt a hf
 
--- DISSOLVED: DifferentiableAt.zpow
+theorem DifferentiableAt.zpow (hf : DifferentiableAt 𝕜 f a) (h : f a ≠ 0 ∨ 0 ≤ m) :
+    DifferentiableAt 𝕜 (fun x => f x ^ m) a :=
+  (differentiableAt_zpow.2 h).comp a hf
 
--- DISSOLVED: DifferentiableOn.zpow
+theorem DifferentiableOn.zpow (hf : DifferentiableOn 𝕜 f t) (h : (∀ x ∈ t, f x ≠ 0) ∨ 0 ≤ m) :
+    DifferentiableOn 𝕜 (fun x => f x ^ m) t := fun x hx =>
+  (hf x hx).zpow <| h.imp_left fun h => h x hx
 
--- DISSOLVED: Differentiable.zpow
+theorem Differentiable.zpow (hf : Differentiable 𝕜 f) (h : (∀ x, f x ≠ 0) ∨ 0 ≤ m) :
+    Differentiable 𝕜 fun x => f x ^ m := fun x => (hf x).zpow <| h.imp_left fun h => h x

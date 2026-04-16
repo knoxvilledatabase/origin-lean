@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.Group.Action.End
 
+noncomputable section
+
 /-!
 # Faithful group actions
 

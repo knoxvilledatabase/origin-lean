@@ -1,6 +1,6 @@
 /-
 Extracted from Order/LiminfLimsup.lean
-Genuine: 265 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
+Genuine: 264 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Algebra.Order.GroupWithZero.Unbundled
 import Mathlib.Order.Filter.Cofinite
 import Mathlib.Order.Hom.CompleteLattice
+
+noncomputable section
 
 /-!
 # liminfs and limsups of functions and filters
@@ -511,17 +513,11 @@ theorem isBoundedUnder_le_abs [LinearOrderedAddCommGroup α] {f : Filter β} {u 
   isBoundedUnder_le_sup.trans <| and_congr Iff.rfl isBoundedUnder_le_neg
 
 macro "isBoundedDefault" : tactic =>
-
   `(tactic| first
-
     | apply isCobounded_le_of_bot
-
     | apply isCobounded_ge_of_top
-
     | apply isBounded_le_of_top
-
     | apply isBounded_ge_of_bot
-
     | assumption)
 
 section ConditionallyCompleteLattice
@@ -561,12 +557,6 @@ theorem blimsup_eq : blimsup u f p = sInf { a | ∀ᶠ x in f, p x → u x ≤ a
 
 theorem bliminf_eq : bliminf u f p = sSup { a | ∀ᶠ x in f, p x → a ≤ u x } :=
   rfl
-
-lemma liminf_comp (u : β → α) (v : γ → β) (f : Filter γ) :
-    liminf (u ∘ v) f = liminf u (map v f) := rfl
-
-lemma limsup_comp (u : β → α) (v : γ → β) (f : Filter γ) :
-    limsup (u ∘ v) f = limsup u (map v f) := rfl
 
 end
 
@@ -1317,7 +1307,6 @@ theorem liminf_le_iff {α β} [ConditionallyCompleteLinearOrder β] {f : Filter 
 variable [ConditionallyCompleteLinearOrder α] {f : Filter α} {b : α}
 
 set_option linter.unusedVariables false in
-
 theorem lt_mem_sets_of_limsSup_lt (h : f.IsBounded (· ≤ ·)) (l : f.limsSup < b) :
     ∀ᶠ a in f, a < b :=
   let ⟨c, (h : ∀ᶠ a in f, a ≤ c), hcb⟩ := exists_lt_of_csInf_lt h l

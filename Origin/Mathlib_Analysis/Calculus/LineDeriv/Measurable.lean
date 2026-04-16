@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.LineDeriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Measurable
 
+noncomputable section
+
 /-! # Measurability of the line derivative
 
 We prove in `measurable_lineDeriv` that the line derivative of a function (with respect to a

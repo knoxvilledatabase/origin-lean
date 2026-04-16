@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Logic.Function.Defs
 
+noncomputable section
+
 /-!
 # Propositional typeclasses on several maps
 

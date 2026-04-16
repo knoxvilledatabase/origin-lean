@@ -7,6 +7,8 @@ import Mathlib.Data.Finsupp.Lex
 import Mathlib.Data.Finsupp.Multiset
 import Mathlib.Order.GameAdd
 
+noncomputable section
+
 /-!
 # Termination of a hydra game
 

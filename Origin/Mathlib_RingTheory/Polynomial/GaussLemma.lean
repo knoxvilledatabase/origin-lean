@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/GaussLemma.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.SplittingField.Construction
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Int.Basic
 import Mathlib.RingTheory.Localization.Integral
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Polynomial.Content
+
+noncomputable section
 
 /-!
 # Gauss's Lemma
@@ -209,7 +211,22 @@ section NormalizedGCDMonoid
 
 variable [IsDomain R] [NormalizedGCDMonoid R]
 
--- DISSOLVED: isUnit_or_eq_zero_of_isUnit_integerNormalization_primPart
+theorem isUnit_or_eq_zero_of_isUnit_integerNormalization_primPart {p : K[X]} (h0 : p ≠ 0)
+    (h : IsUnit (integerNormalization R⁰ p).primPart) : IsUnit p := by
+  rcases isUnit_iff.1 h with ⟨_, ⟨u, rfl⟩, hu⟩
+  obtain ⟨⟨c, c0⟩, hc⟩ := integerNormalization_map_to_map R⁰ p
+  rw [Subtype.coe_mk, Algebra.smul_def, algebraMap_apply] at hc
+  apply isUnit_of_mul_isUnit_right
+  rw [← hc, (integerNormalization R⁰ p).eq_C_content_mul_primPart, ← hu, ← RingHom.map_mul,
+    isUnit_iff]
+  refine
+    ⟨algebraMap R K ((integerNormalization R⁰ p).content * ↑u), isUnit_iff_ne_zero.2 fun con => ?_,
+      by simp⟩
+  replace con := (injective_iff_map_eq_zero (algebraMap R K)).1 (IsFractionRing.injective _ _) _ con
+  rw [mul_eq_zero, content_eq_zero_iff, IsFractionRing.integerNormalization_eq_zero_iff] at con
+  rcases con with (con | con)
+  · apply h0 con
+  · apply Units.ne_zero _ con
 
 theorem IsPrimitive.irreducible_iff_irreducible_map_fraction_map {p : R[X]} (hp : p.IsPrimitive) :
     Irreducible p ↔ Irreducible (p.map (algebraMap R K)) := by

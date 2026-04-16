@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Dvr
 import Mathlib.RingTheory.DedekindDomain.Ideal
 
+noncomputable section
+
 /-!
 # Criteria under which a Dedekind domain is a PID
 

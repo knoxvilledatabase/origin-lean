@@ -9,6 +9,8 @@ import Mathlib.Topology.Connected.PathConnected
 import Mathlib.Topology.Homotopy.Path
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.Basic
 
+noncomputable section
+
 /-!
 # Fundamental group of a space
 

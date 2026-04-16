@@ -9,6 +9,8 @@ import Mathlib.Data.List.Flatten
 import Mathlib.Data.Set.Lattice
 import Mathlib.Tactic.DeriveFintype
 
+noncomputable section
+
 /-!
 # Languages
 
@@ -69,9 +71,6 @@ theorem mul_def (l m : Language α) : l * m = image2 (· ++ ·) l m :=
 
 instance : KStar (Language α) := ⟨fun l ↦ {x | ∃ L : List (List α), x = L.flatten ∧ ∀ y ∈ L, y ∈ l}⟩
 
-lemma kstar_def (l : Language α) : l∗ = {x | ∃ L : List (List α), x = L.flatten ∧ ∀ y ∈ L, y ∈ l} :=
-  rfl
-
 @[ext]
 theorem ext {l m : Language α} (h : ∀ (x : List α), x ∈ l ↔ x ∈ m) : l = m :=
   Set.ext h
@@ -85,9 +84,6 @@ theorem mem_one (x : List α) : x ∈ (1 : Language α) ↔ x = [] := by rfl
 
 theorem nil_mem_one : [] ∈ (1 : Language α) :=
   Set.mem_singleton _
-
-theorem mem_add (l m : Language α) (x : List α) : x ∈ l + m ↔ x ∈ l ∨ x ∈ m :=
-  Iff.rfl
 
 theorem mem_mul : x ∈ l * m ↔ ∃ a ∈ l, ∃ b ∈ m, a ++ b = x :=
   mem_image2
@@ -266,9 +262,6 @@ lemma reverse_mem_reverse : a.reverse ∈ l.reverse ↔ a ∈ l := by
 
 lemma reverse_eq_image (l : Language α) : l.reverse = List.reverse '' l :=
   ((List.reverse_involutive.toPerm _).image_eq_preimage _).symm
-
-@[simp]
-lemma reverse_zero : (0 : Language α).reverse = 0 := rfl
 
 @[simp]
 lemma reverse_one : (1 : Language α).reverse = 1 := by

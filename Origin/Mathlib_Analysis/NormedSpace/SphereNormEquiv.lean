@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 
+noncomputable section
+
 /-!
 # Homeomorphism between a normed space and sphere times `(0, +∞)`
 

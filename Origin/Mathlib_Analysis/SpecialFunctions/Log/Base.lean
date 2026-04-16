@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Log/Base.lean
-Genuine: 77 | Conflates: 0 | Dissolved: 19 | Infrastructure: 1
+Genuine: 96 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Int.Log
+
+noncomputable section
 
 /-!
 # Real logarithm base `b`
@@ -56,7 +58,8 @@ theorem logb_one_left : logb 1 x = 0 := by simp only [← log_div_log, log_one, 
 lemma logb_self_eq_one (hb : 1 < b) : logb b b = 1 :=
   div_self (log_pos hb).ne'
 
--- DISSOLVED: logb_self_eq_one_iff
+lemma logb_self_eq_one_iff : logb b b = 1 ↔ b ≠ 0 ∧ b ≠ 1 ∧ b ≠ -1 :=
+  Iff.trans ⟨fun h h' => by simp [logb, h'] at h, div_self⟩ log_ne_zero
 
 @[simp]
 theorem logb_abs (x : ℝ) : logb b |x| = logb b x := by rw [logb, logb, log_abs]
@@ -65,26 +68,39 @@ theorem logb_abs (x : ℝ) : logb b |x| = logb b x := by rw [logb, logb, log_abs
 theorem logb_neg_eq_logb (x : ℝ) : logb b (-x) = logb b x := by
   rw [← logb_abs x, ← logb_abs (-x), abs_neg]
 
--- DISSOLVED: logb_mul
+theorem logb_mul (hx : x ≠ 0) (hy : y ≠ 0) : logb b (x * y) = logb b x + logb b y := by
+  simp_rw [logb, log_mul hx hy, add_div]
 
--- DISSOLVED: logb_div
+theorem logb_div (hx : x ≠ 0) (hy : y ≠ 0) : logb b (x / y) = logb b x - logb b y := by
+  simp_rw [logb, log_div hx hy, sub_div]
 
 @[simp]
 theorem logb_inv (x : ℝ) : logb b x⁻¹ = -logb b x := by simp [logb, neg_div]
 
 theorem inv_logb (a b : ℝ) : (logb a b)⁻¹ = logb b a := by simp_rw [logb, inv_div]
 
--- DISSOLVED: inv_logb_mul_base
+theorem inv_logb_mul_base {a b : ℝ} (h₁ : a ≠ 0) (h₂ : b ≠ 0) (c : ℝ) :
+    (logb (a * b) c)⁻¹ = (logb a c)⁻¹ + (logb b c)⁻¹ := by
+  simp_rw [inv_logb]; exact logb_mul h₁ h₂
 
--- DISSOLVED: inv_logb_div_base
+theorem inv_logb_div_base {a b : ℝ} (h₁ : a ≠ 0) (h₂ : b ≠ 0) (c : ℝ) :
+    (logb (a / b) c)⁻¹ = (logb a c)⁻¹ - (logb b c)⁻¹ := by
+  simp_rw [inv_logb]; exact logb_div h₁ h₂
 
--- DISSOLVED: logb_mul_base
+theorem logb_mul_base {a b : ℝ} (h₁ : a ≠ 0) (h₂ : b ≠ 0) (c : ℝ) :
+    logb (a * b) c = ((logb a c)⁻¹ + (logb b c)⁻¹)⁻¹ := by rw [← inv_logb_mul_base h₁ h₂ c, inv_inv]
 
--- DISSOLVED: logb_div_base
+theorem logb_div_base {a b : ℝ} (h₁ : a ≠ 0) (h₂ : b ≠ 0) (c : ℝ) :
+    logb (a / b) c = ((logb a c)⁻¹ - (logb b c)⁻¹)⁻¹ := by rw [← inv_logb_div_base h₁ h₂ c, inv_inv]
 
--- DISSOLVED: mul_logb
+theorem mul_logb {a b c : ℝ} (h₁ : b ≠ 0) (h₂ : b ≠ 1) (h₃ : b ≠ -1) :
+    logb a b * logb b c = logb a c := by
+  unfold logb
+  rw [mul_comm, div_mul_div_cancel₀ (log_ne_zero.mpr ⟨h₁, h₂, h₃⟩)]
 
--- DISSOLVED: div_logb
+theorem div_logb {a b c : ℝ} (h₁ : c ≠ 0) (h₂ : c ≠ 1) (h₃ : c ≠ -1) :
+    logb a c / logb b c = logb a b :=
+  div_div_div_cancel_left' _ _ <| log_ne_zero.mpr ⟨h₁, h₂, h₃⟩
 
 theorem logb_rpow_eq_mul_logb_of_pos (hx : 0 < x) : logb b (x ^ y) = y * logb b x := by
   rw [logb, log_rpow hx, logb, mul_div_assoc]
@@ -98,14 +114,23 @@ variable (b_pos : 0 < b) (b_ne_one : b ≠ 1)
 
 include b_pos b_ne_one
 
--- DISSOLVED: log_b_ne_zero
+private theorem log_b_ne_zero : log b ≠ 0 := by
+  have b_ne_zero : b ≠ 0 := by linarith
+  have b_ne_minus_one : b ≠ -1 := by linarith
+  simp [b_ne_one, b_ne_zero, b_ne_minus_one]
 
 @[simp]
 theorem logb_rpow : logb b (b ^ x) = x := by
   rw [logb, div_eq_iff, log_rpow b_pos]
   exact log_b_ne_zero b_pos b_ne_one
 
--- DISSOLVED: rpow_logb_eq_abs
+theorem rpow_logb_eq_abs (hx : x ≠ 0) : b ^ logb b x = |x| := by
+  apply log_injOn_pos
+  · simp only [Set.mem_Ioi]
+    apply rpow_pos_of_pos b_pos
+  · simp only [abs_pos, mem_Ioi, Ne, hx, not_false_iff]
+  rw [log_rpow b_pos, logb, log_abs]
+  field_simp [log_b_ne_zero b_pos b_ne_one]
 
 @[simp]
 theorem rpow_logb (hx : 0 < x) : b ^ logb b x = x := by
@@ -148,7 +173,7 @@ include hb
 
 private theorem b_pos : 0 < b := by linarith
 
--- DISSOLVED: b_ne_one'
+private theorem b_ne_one' : b ≠ 1 := by linarith
 
 @[simp]
 theorem logb_le_logb (h : 0 < x) (h₁ : 0 < y) : logb b x ≤ logb b y ↔ x ≤ y := by
@@ -227,7 +252,8 @@ theorem logb_injOn_pos : Set.InjOn (logb b) (Set.Ioi 0) :=
 theorem eq_one_of_pos_of_logb_eq_zero (h₁ : 0 < x) (h₂ : logb b x = 0) : x = 1 :=
   logb_injOn_pos hb (Set.mem_Ioi.2 h₁) (Set.mem_Ioi.2 zero_lt_one) (h₂.trans Real.logb_one.symm)
 
--- DISSOLVED: logb_ne_zero_of_pos_of_ne_one
+theorem logb_ne_zero_of_pos_of_ne_one (hx_pos : 0 < x) (hx : x ≠ 1) : logb b x ≠ 0 :=
+  mt (eq_one_of_pos_of_logb_eq_zero hb hx_pos) hx
 
 theorem tendsto_logb_atTop : Tendsto (logb b) atTop atTop :=
   Tendsto.atTop_div_const (log_pos hb) tendsto_log_atTop
@@ -240,7 +266,7 @@ variable (b_pos : 0 < b) (b_lt_one : b < 1)
 
 include b_lt_one
 
--- DISSOLVED: b_ne_one
+private theorem b_ne_one : b ≠ 1 := by linarith
 
 include b_pos
 
@@ -309,7 +335,8 @@ theorem eq_one_of_pos_of_logb_eq_zero_of_base_lt_one (h₁ : 0 < x) (h₂ : logb
   logb_injOn_pos_of_base_lt_one b_pos b_lt_one (Set.mem_Ioi.2 h₁) (Set.mem_Ioi.2 zero_lt_one)
     (h₂.trans Real.logb_one.symm)
 
--- DISSOLVED: logb_ne_zero_of_pos_of_ne_one_of_base_lt_one
+theorem logb_ne_zero_of_pos_of_ne_one_of_base_lt_one (hx_pos : 0 < x) (hx : x ≠ 1) : logb b x ≠ 0 :=
+  mt (eq_one_of_pos_of_logb_eq_zero_of_base_lt_one b_pos b_lt_one hx_pos) hx
 
 theorem tendsto_logb_atTop_of_base_lt_one : Tendsto (logb b) atTop atBot := by
   rw [tendsto_atTop_atBot]
@@ -388,17 +415,36 @@ lemma tendsto_logb_nhdsWithin_zero_right_of_base_lt_one (hb₀ : 0 < b) (hb : b 
 
 theorem continuousOn_logb : ContinuousOn (logb b) {0}ᶜ := continuousOn_log.div_const _
 
--- DISSOLVED: continuous_logb
+@[fun_prop]
+theorem continuous_logb : Continuous fun x : { x : ℝ // x ≠ 0 } => logb b x :=
+  continuous_log.div_const _
 
 @[fun_prop]
 theorem continuous_logb' : Continuous fun x : { x : ℝ // 0 < x } => logb b x :=
   continuous_log'.div_const _
 
--- DISSOLVED: continuousAt_logb
+theorem continuousAt_logb (hx : x ≠ 0) : ContinuousAt (logb b) x :=
+  (continuousAt_log hx).div_const _
 
--- DISSOLVED: continuousAt_logb_iff
+@[simp]
+theorem continuousAt_logb_iff (hb₀ : 0 < b) (hb : b ≠ 1) : ContinuousAt (logb b) x ↔ x ≠ 0 := by
+  refine ⟨?_, continuousAt_logb⟩
+  rintro h rfl
+  cases lt_or_gt_of_ne hb with
+  | inl hb₁ =>
+      exact not_tendsto_nhds_of_tendsto_atTop (tendsto_logb_nhdsWithin_zero_of_base_lt_one hb₀ hb₁)
+        _ (h.tendsto.mono_left inf_le_left)
+  | inr hb₁ =>
+      exact not_tendsto_nhds_of_tendsto_atBot (tendsto_logb_nhdsWithin_zero hb₁)
+        _ (h.tendsto.mono_left inf_le_left)
 
--- DISSOLVED: logb_prod
+theorem logb_prod {α : Type*} (s : Finset α) (f : α → ℝ) (hf : ∀ x ∈ s, f x ≠ 0) :
+    logb b (∏ i ∈ s, f i) = ∑ i ∈ s, logb b (f i) := by
+  classical
+    induction' s using Finset.induction_on with a s ha ih
+    · simp
+    simp only [Finset.mem_insert, forall_eq_or_imp] at hf
+    simp [ha, ih hf.2, logb_mul hf.1 (Finset.prod_ne_zero_iff.2 hf.2)]
 
 protected theorem _root_.Finsupp.logb_prod {α β : Type*} [Zero β] (f : α →₀ β) (g : α → β → ℝ)
     (hg : ∀ a, g a (f a) = 0 → f a = 0) : logb b (f.prod g) = f.sum fun a c ↦ logb b (g a c) :=

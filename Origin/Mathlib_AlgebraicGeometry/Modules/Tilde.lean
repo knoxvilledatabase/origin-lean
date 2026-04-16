@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/Modules/Tilde.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 11
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Basic
@@ -9,6 +9,8 @@ import Mathlib.AlgebraicGeometry.Modules.Sheaf
 import Mathlib.Algebra.Category.ModuleCat.Sheaf
 import Mathlib.Algebra.Category.ModuleCat.FilteredColimits
 import Mathlib.CategoryTheory.Limits.ConcreteCategory.WithAlgebraicStructures
+
+noncomputable section
 
 /-!
 
@@ -152,11 +154,14 @@ theorem res_apply (U V : Opens (PrimeSpectrum.Top R)) (i : V ⟶ U)
     ((tildeInModuleCat M).map i.op s).1 x = (s.1 (i x) : _) :=
   rfl
 
-lemma smul_section_apply (r : R) (U : Opens (PrimeSpectrum.Top R))
-    (s : (tildeInModuleCat M).1.obj (op U)) (x : U) :
-    (r • s).1 x = r • (s.1 x) := rfl
-
--- DISSOLVED: smul_stalk_no_nonzero_divisor
+lemma smul_stalk_no_nonzero_divisor {x : PrimeSpectrum R}
+    (r : x.asIdeal.primeCompl) (st : (tildeInModuleCat M).stalk x) (hst : r.1 • st = 0) :
+    st = 0 := by
+  refine Limits.Concrete.colimit_no_zero_smul_divisor
+    _ _ _ ⟨op ⟨PrimeSpectrum.basicOpen r.1, r.2⟩, fun U i s hs ↦ Subtype.eq <| funext fun pt ↦ ?_⟩
+    _ hst
+  apply LocalizedModule.eq_zero_of_smul_eq_zero _ (i.unop pt).2 _
+    (congr_fun (Subtype.ext_iff.1 hs) pt)
 
 def toOpen (U : Opens (PrimeSpectrum.Top R)) :
     ModuleCat.of R M ⟶ (tildeInModuleCat M).1.obj (op U) where
@@ -278,11 +283,6 @@ theorem exists_const (U) (s : (tildeInModuleCat M).obj (op U)) (x : PrimeSpectru
         rw [LocalizedModule.smul'_mk, LocalizedModule.mk_eq] at h2
         obtain ⟨c, hc⟩ := h2
         exact LocalizedModule.mk_eq.mpr ⟨c, by simpa using hc.symm⟩⟩
-
-@[simp]
-theorem res_const (f : M) (g : R) (U hu V hv i) :
-    (tildeInModuleCat M).map i (const M f g U hu) = const M f g V hv :=
-  rfl
 
 @[simp]
 theorem localizationToStalk_mk (x : PrimeSpectrum.Top R) (f : M) (s : x.asIdeal.primeCompl) :

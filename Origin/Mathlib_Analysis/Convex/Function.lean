@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Basic
 import Mathlib.Order.Filter.Extr
 import Mathlib.Tactic.NormNum
 
+noncomputable section
+
 /-!
 # Convex and concave functions
 
@@ -873,14 +875,6 @@ variable [OrderedAddCommMonoid β]
 section Module
 
 variable [Module 𝕜 E] [Module 𝕜 F] [SMul 𝕜 β]
-
-theorem ConvexOn.comp_affineMap {f : F → β} (g : E →ᵃ[𝕜] F) {s : Set F} (hf : ConvexOn 𝕜 s f) :
-    ConvexOn 𝕜 (g ⁻¹' s) (f ∘ g) :=
-  ⟨hf.1.affine_preimage _, fun x hx y hy a b ha hb hab =>
-    calc
-      (f ∘ g) (a • x + b • y) = f (g (a • x + b • y)) := rfl
-      _ = f (a • g x + b • g y) := by rw [Convex.combo_affine_apply hab]
-      _ ≤ a • f (g x) + b • f (g y) := hf.2 hx hy ha hb hab⟩
 
 theorem ConcaveOn.comp_affineMap {f : F → β} (g : E →ᵃ[𝕜] F) {s : Set F} (hf : ConcaveOn 𝕜 s f) :
     ConcaveOn 𝕜 (g ⁻¹' s) (f ∘ g) :=

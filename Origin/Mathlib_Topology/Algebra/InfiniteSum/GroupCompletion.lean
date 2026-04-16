@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.GroupCompletion
 import Mathlib.Topology.Algebra.InfiniteSum.Group
 
+noncomputable section
+
 /-!
 # Infinite sums in the completion of a topological group
 -/

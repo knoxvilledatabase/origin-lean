@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/MetricSpace/HausdorffDimension.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.RCLike
 import Mathlib.MeasureTheory.Measure.Hausdorff
+
+noncomputable section
 
 /-!
 # Hausdorff dimension
@@ -128,9 +130,12 @@ theorem measure_zero_of_dimH_lt {μ : Measure X} {d : ℝ≥0} (h : μ ≪ μH[d
     (hd : dimH s < d) : μ s = 0 :=
   h <| hausdorffMeasure_of_dimH_lt hd
 
--- DISSOLVED: le_dimH_of_hausdorffMeasure_ne_zero
+theorem le_dimH_of_hausdorffMeasure_ne_zero {s : Set X} {d : ℝ≥0} (h : μH[d] s ≠ 0) : ↑d ≤ dimH s :=
+  le_of_not_lt <| mt hausdorffMeasure_of_dimH_lt h
 
--- DISSOLVED: dimH_of_hausdorffMeasure_ne_zero_ne_top
+theorem dimH_of_hausdorffMeasure_ne_zero_ne_top {d : ℝ≥0} {s : Set X} (h : μH[d] s ≠ 0)
+    (h' : μH[d] s ≠ ∞) : dimH s = d :=
+  le_antisymm (dimH_le_of_hausdorffMeasure_ne_top h') (le_dimH_of_hausdorffMeasure_ne_zero h)
 
 end Measurable
 

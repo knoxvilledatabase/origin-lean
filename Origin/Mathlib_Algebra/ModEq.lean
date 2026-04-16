@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/ModEq.lean
-Genuine: 48 | Conflates: 0 | Dissolved: 5 | Infrastructure: 3
+Genuine: 57 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Data.Int.ModEq
 import Mathlib.GroupTheory.QuotientGroup.Defs
 import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
+
+noncomputable section
 
 /-!
 # Equality modulo an element
@@ -131,9 +133,15 @@ protected theorem nsmul : a ≡ b [PMOD p] → n • a ≡ n • b [PMOD n • p
 
 end ModEq
 
--- DISSOLVED: zsmul_modEq_zsmul
+@[simp]
+theorem zsmul_modEq_zsmul [NoZeroSMulDivisors ℤ α] (hn : z ≠ 0) :
+    z • a ≡ z • b [PMOD z • p] ↔ a ≡ b [PMOD p] :=
+  exists_congr fun m => by rw [← smul_sub, smul_comm, smul_right_inj hn]
 
--- DISSOLVED: nsmul_modEq_nsmul
+@[simp]
+theorem nsmul_modEq_nsmul [NoZeroSMulDivisors ℕ α] (hn : n ≠ 0) :
+    n • a ≡ n • b [PMOD n • p] ↔ a ≡ b [PMOD p] :=
+  exists_congr fun m => by rw [← smul_sub, smul_comm, smul_right_inj hn]
 
 alias ⟨ModEq.zsmul_cancel, _⟩ := zsmul_modEq_zsmul
 
@@ -264,9 +272,11 @@ section DivisionRing
 
 variable [DivisionRing α] {a b c p : α}
 
--- DISSOLVED: div_modEq_div
+@[simp] lemma div_modEq_div (hc : c ≠ 0) : a / c ≡ b / c [PMOD p] ↔ a ≡ b [PMOD (p * c)] := by
+  simp [ModEq, ← sub_div, div_eq_iff hc, mul_assoc]
 
--- DISSOLVED: mul_modEq_mul_right
+@[simp] lemma mul_modEq_mul_right (hc : c ≠ 0) : a * c ≡ b * c [PMOD p] ↔ a ≡ b [PMOD (p / c)] := by
+  rw [div_eq_mul_inv, ← div_modEq_div (inv_ne_zero hc), div_inv_eq_mul, div_inv_eq_mul]
 
 end DivisionRing
 
@@ -274,7 +284,8 @@ section Field
 
 variable [Field α] {a b c p : α}
 
--- DISSOLVED: mul_modEq_mul_left
+@[simp] lemma mul_modEq_mul_left (hc : c ≠ 0) : c * a ≡ c * b [PMOD p] ↔ a ≡ b [PMOD (p / c)] := by
+  simp [mul_comm c, hc]
 
 end Field
 

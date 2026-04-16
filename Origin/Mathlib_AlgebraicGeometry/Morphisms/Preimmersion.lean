@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.UnderlyingMap
 import Mathlib.AlgebraicGeometry.Morphisms.SurjectiveOnStalks
 
+noncomputable section
+
 /-!
 
 # Preimmersions of schemes

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Order.MinMax
 
+noncomputable section
+
 /-!
 # Splitting a list to chunks of specified lengths
 
@@ -25,9 +27,6 @@ def splitLengths : List ℕ → List α → List (List α)
 @[simp]
 theorem length_splitLengths : (sz.splitLengths l).length = sz.length := by
   induction sz generalizing l <;> simp [splitLengths, *]
-
-@[simp]
-lemma splitLengths_nil : [].splitLengths l = [] := rfl
 
 @[simp]
 lemma splitLengths_cons (n : ℕ) :

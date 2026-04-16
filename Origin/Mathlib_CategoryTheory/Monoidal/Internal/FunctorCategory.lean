@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.CommMon_
 import Mathlib.CategoryTheory.Monoidal.Comon_
 import Mathlib.CategoryTheory.Monoidal.FunctorCategory
 
+noncomputable section
+
 /-!
 # `Mon_ (C ⥤ D) ≌ C ⥤ Mon_ D`
 

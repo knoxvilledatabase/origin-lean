@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Log.lean
-Genuine: 47 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Defs
@@ -8,6 +8,8 @@ import Mathlib.Order.Monotone.Basic
 import Mathlib.Tactic.Bound.Attribute
 import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Monotonicity.Attr
+
+noncomputable section
 
 /-!
 # Natural number logarithms
@@ -73,24 +75,45 @@ theorem log_one_left : ∀ n, log 1 n = 0 :=
 theorem log_one_right (b : ℕ) : log b 1 = 0 :=
   log_eq_zero_iff.2 (lt_or_le _ _)
 
--- DISSOLVED: pow_le_iff_le_log
+theorem pow_le_iff_le_log {b : ℕ} (hb : 1 < b) {x y : ℕ} (hy : y ≠ 0) :
+    b ^ x ≤ y ↔ x ≤ log b y := by
+  induction y using Nat.strong_induction_on generalizing x with | h y ih => ?_
+  cases x with
+  | zero => dsimp; omega
+  | succ x =>
+    rw [log]; split_ifs with h
+    · have b_pos : 0 < b := lt_of_succ_lt hb
+      rw [Nat.add_le_add_iff_right, ← ih (y / b) (div_lt_self
+        (Nat.pos_iff_ne_zero.2 hy) hb) (Nat.div_pos h.1 b_pos).ne', le_div_iff_mul_le b_pos,
+        pow_succ', Nat.mul_comm]
+    · exact iff_of_false (fun hby => h ⟨(le_self_pow x.succ_ne_zero _).trans hby, hb⟩)
+        (not_succ_le_zero _)
 
--- DISSOLVED: lt_pow_iff_log_lt
+theorem lt_pow_iff_log_lt {b : ℕ} (hb : 1 < b) {x y : ℕ} (hy : y ≠ 0) : y < b ^ x ↔ log b y < x :=
+  lt_iff_lt_of_le_iff_le (pow_le_iff_le_log hb hy)
 
--- DISSOLVED: pow_le_of_le_log
+theorem pow_le_of_le_log {b x y : ℕ} (hy : y ≠ 0) (h : x ≤ log b y) : b ^ x ≤ y := by
+  refine (le_or_lt b 1).elim (fun hb => ?_) fun hb => (pow_le_iff_le_log hb hy).2 h
+  rw [log_of_left_le_one hb, Nat.le_zero] at h
+  rwa [h, Nat.pow_zero, one_le_iff_ne_zero]
 
 theorem le_log_of_pow_le {b x y : ℕ} (hb : 1 < b) (h : b ^ x ≤ y) : x ≤ log b y := by
   rcases ne_or_eq y 0 with (hy | rfl)
   exacts [(pow_le_iff_le_log hb hy).1 h, (h.not_lt (Nat.pow_pos (Nat.zero_lt_one.trans hb))).elim]
 
--- DISSOLVED: pow_log_le_self
+theorem pow_log_le_self (b : ℕ) {x : ℕ} (hx : x ≠ 0) : b ^ log b x ≤ x :=
+  pow_le_of_le_log hx le_rfl
 
--- DISSOLVED: log_lt_of_lt_pow
+theorem log_lt_of_lt_pow {b x y : ℕ} (hy : y ≠ 0) : y < b ^ x → log b y < x :=
+  lt_imp_lt_of_le_imp_le (pow_le_of_le_log hy)
 
 theorem lt_pow_of_log_lt {b x y : ℕ} (hb : 1 < b) : log b y < x → y < b ^ x :=
   lt_imp_lt_of_le_imp_le (le_log_of_pow_le hb)
 
--- DISSOLVED: log_lt_self
+lemma log_lt_self (b : ℕ) {x : ℕ} (hx : x ≠ 0) : log b x < x :=
+  match le_or_lt b 1 with
+  | .inl h => log_of_left_le_one h x ▸ Nat.pos_iff_ne_zero.2 hx
+  | .inr h => log_lt_of_lt_pow hx <| lt_pow_self h _
 
 lemma log_le_self (b x : ℕ) : log b x ≤ x :=
   if hx : x = 0 then by simp [hx]
@@ -99,7 +122,20 @@ lemma log_le_self (b x : ℕ) : log b x ≤ x :=
 theorem lt_pow_succ_log_self {b : ℕ} (hb : 1 < b) (x : ℕ) : x < b ^ (log b x).succ :=
   lt_pow_of_log_lt hb (lt_succ_self _)
 
--- DISSOLVED: log_eq_iff
+theorem log_eq_iff {b m n : ℕ} (h : m ≠ 0 ∨ 1 < b ∧ n ≠ 0) :
+    log b n = m ↔ b ^ m ≤ n ∧ n < b ^ (m + 1) := by
+  rcases em (1 < b ∧ n ≠ 0) with (⟨hb, hn⟩ | hbn)
+  · rw [le_antisymm_iff, ← Nat.lt_succ_iff, ← pow_le_iff_le_log, ← lt_pow_iff_log_lt,
+      and_comm] <;> assumption
+  have hm : m ≠ 0 := h.resolve_right hbn
+  rw [not_and_or, not_lt, Ne, not_not] at hbn
+  rcases hbn with (hb | rfl)
+  · obtain rfl | rfl := le_one_iff_eq_zero_or_eq_one.1 hb
+    any_goals
+      simp only [ne_eq, zero_eq, reduceSucc, lt_self_iff_false,  not_lt_zero, false_and, or_false]
+        at h
+      simp [h, eq_comm (a := 0), Nat.zero_pow (Nat.pos_iff_ne_zero.2 _)] <;> omega
+  · simp [@eq_comm _ 0, hm]
 
 theorem log_eq_of_pow_le_of_lt_pow {b m n : ℕ} (h₁ : b ^ m ≤ n) (h₂ : n < b ^ (m + 1)) :
     log b n = m := by
@@ -118,9 +154,14 @@ theorem log_eq_one_iff {b n : ℕ} : log b n = 1 ↔ n < b * b ∧ 1 < b ∧ b �
   log_eq_one_iff'.trans
     ⟨fun h => ⟨h.2, lt_mul_self_iff.1 (h.1.trans_lt h.2), h.1⟩, fun h => ⟨h.2.2, h.1⟩⟩
 
--- DISSOLVED: log_mul_base
+theorem log_mul_base {b n : ℕ} (hb : 1 < b) (hn : n ≠ 0) : log b (n * b) = log b n + 1 := by
+  apply log_eq_of_pow_le_of_lt_pow <;> rw [pow_succ', Nat.mul_comm b]
+  exacts [Nat.mul_le_mul_right _ (pow_log_le_self _ hn),
+    (Nat.mul_lt_mul_right (Nat.zero_lt_one.trans hb)).2 (lt_pow_succ_log_self hb _)]
 
--- DISSOLVED: pow_log_le_add_one
+theorem pow_log_le_add_one (b : ℕ) : ∀ x, b ^ log b x ≤ x + 1
+  | 0 => by rw [log_zero_right, Nat.pow_zero]
+  | x + 1 => (pow_log_le_self b x.succ_ne_zero).trans (x + 1).le_succ
 
 theorem log_monotone {b : ℕ} : Monotone (log b) := by
   refine monotone_nat_of_le_succ fun n => ?_

@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 28
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
+noncomputable section
+
 /-!
 # The pullback of an isomorphism
 
@@ -30,24 +32,6 @@ variable (f : X ⟶ Z) (g : Y ⟶ Z) [IsIso f]
 
 def pullbackConeOfLeftIso : PullbackCone f g :=
   PullbackCone.mk (g ≫ inv f) (𝟙 _) <| by simp
-
-@[simp]
-theorem pullbackConeOfLeftIso_x : (pullbackConeOfLeftIso f g).pt = Y := rfl
-
-@[simp]
-theorem pullbackConeOfLeftIso_fst : (pullbackConeOfLeftIso f g).fst = g ≫ inv f := rfl
-
-@[simp]
-theorem pullbackConeOfLeftIso_snd : (pullbackConeOfLeftIso f g).snd = 𝟙 _ := rfl
-
-theorem pullbackConeOfLeftIso_π_app_none : (pullbackConeOfLeftIso f g).π.app none = g := by simp
-
-@[simp]
-theorem pullbackConeOfLeftIso_π_app_left : (pullbackConeOfLeftIso f g).π.app left = g ≫ inv f :=
-  rfl
-
-@[simp]
-theorem pullbackConeOfLeftIso_π_app_right : (pullbackConeOfLeftIso f g).π.app right = 𝟙 _ := rfl
 
 def pullbackConeOfLeftIsoIsLimit : IsLimit (pullbackConeOfLeftIso f g) :=
   PullbackCone.isLimitAux' _ fun s => ⟨s.snd, by simp [← s.condition_assoc]⟩
@@ -79,25 +63,6 @@ variable (f : X ⟶ Z) (g : Y ⟶ Z) [IsIso g]
 def pullbackConeOfRightIso : PullbackCone f g :=
   PullbackCone.mk (𝟙 _) (f ≫ inv g) <| by simp
 
-@[simp]
-theorem pullbackConeOfRightIso_x : (pullbackConeOfRightIso f g).pt = X := rfl
-
-@[simp]
-theorem pullbackConeOfRightIso_fst : (pullbackConeOfRightIso f g).fst = 𝟙 _ := rfl
-
-@[simp]
-theorem pullbackConeOfRightIso_snd : (pullbackConeOfRightIso f g).snd = f ≫ inv g := rfl
-
-theorem pullbackConeOfRightIso_π_app_none : (pullbackConeOfRightIso f g).π.app none = f := by simp
-
-@[simp]
-theorem pullbackConeOfRightIso_π_app_left : (pullbackConeOfRightIso f g).π.app left = 𝟙 _ :=
-  rfl
-
-@[simp]
-theorem pullbackConeOfRightIso_π_app_right : (pullbackConeOfRightIso f g).π.app right = f ≫ inv g :=
-  rfl
-
 def pullbackConeOfRightIsoIsLimit : IsLimit (pullbackConeOfRightIso f g) :=
   PullbackCone.isLimitAux' _ fun s => ⟨s.fst, by simp [s.condition_assoc]⟩
 
@@ -128,25 +93,6 @@ variable (f : X ⟶ Y) (g : X ⟶ Z) [IsIso f]
 def pushoutCoconeOfLeftIso : PushoutCocone f g :=
   PushoutCocone.mk (inv f ≫ g) (𝟙 _) <| by simp
 
-@[simp]
-theorem pushoutCoconeOfLeftIso_x : (pushoutCoconeOfLeftIso f g).pt = Z := rfl
-
-@[simp]
-theorem pushoutCoconeOfLeftIso_inl : (pushoutCoconeOfLeftIso f g).inl = inv f ≫ g := rfl
-
-@[simp]
-theorem pushoutCoconeOfLeftIso_inr : (pushoutCoconeOfLeftIso f g).inr = 𝟙 _ := rfl
-
-theorem pushoutCoconeOfLeftIso_ι_app_none : (pushoutCoconeOfLeftIso f g).ι.app none = g := by
-  simp
-
-@[simp]
-theorem pushoutCoconeOfLeftIso_ι_app_left : (pushoutCoconeOfLeftIso f g).ι.app left = inv f ≫ g :=
-  rfl
-
-@[simp]
-theorem pushoutCoconeOfLeftIso_ι_app_right : (pushoutCoconeOfLeftIso f g).ι.app right = 𝟙 _ := rfl
-
 def pushoutCoconeOfLeftIsoIsLimit : IsColimit (pushoutCoconeOfLeftIso f g) :=
   PushoutCocone.isColimitAux' _ fun s => ⟨s.inr, by simp [← s.condition]⟩
 
@@ -176,25 +122,6 @@ variable (f : X ⟶ Y) (g : X ⟶ Z) [IsIso g]
 
 def pushoutCoconeOfRightIso : PushoutCocone f g :=
   PushoutCocone.mk (𝟙 _) (inv g ≫ f) <| by simp
-
-@[simp]
-theorem pushoutCoconeOfRightIso_x : (pushoutCoconeOfRightIso f g).pt = Y := rfl
-
-@[simp]
-theorem pushoutCoconeOfRightIso_inl : (pushoutCoconeOfRightIso f g).inl = 𝟙 _ := rfl
-
-@[simp]
-theorem pushoutCoconeOfRightIso_inr : (pushoutCoconeOfRightIso f g).inr = inv g ≫ f := rfl
-
-theorem pushoutCoconeOfRightIso_ι_app_none : (pushoutCoconeOfRightIso f g).ι.app none = f := by
-  simp
-
-@[simp]
-theorem pushoutCoconeOfRightIso_ι_app_left : (pushoutCoconeOfRightIso f g).ι.app left = 𝟙 _ := rfl
-
-@[simp]
-theorem pushoutCoconeOfRightIso_ι_app_right :
-    (pushoutCoconeOfRightIso f g).ι.app right = inv g ≫ f := rfl
 
 def pushoutCoconeOfRightIsoIsLimit : IsColimit (pushoutCoconeOfRightIso f g) :=
   PushoutCocone.isColimitAux' _ fun s => ⟨s.inl, by simp [← s.condition]⟩

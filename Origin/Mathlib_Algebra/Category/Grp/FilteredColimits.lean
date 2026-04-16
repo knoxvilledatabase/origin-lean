@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.Algebra.Category.MonCat.FilteredColimits
 
+noncomputable section
+
 /-!
 # The forgetful functor from (commutative) (additive) groups preserves filtered colimits.
 

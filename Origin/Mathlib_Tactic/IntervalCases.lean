@@ -7,6 +7,8 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.FinCases
 import Mathlib.Control.Basic
 
+noncomputable section
+
 /-!
 # Case bash on variables in finite intervals
 
@@ -252,7 +254,6 @@ end IntervalCases
 open IntervalCases
 
 syntax (name := intervalCases) "interval_cases" (ppSpace colGt atomic(binderIdent " : ")? term)?
-
   (" using " term ", " term)? : tactic
 
 elab_rules : tactic

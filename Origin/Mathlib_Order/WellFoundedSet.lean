@@ -10,6 +10,8 @@ import Mathlib.Order.OrderIsoNat
 import Mathlib.Order.WellFounded
 import Mathlib.Tactic.TFAE
 
+noncomputable section
+
 /-!
 # Well-founded sets
 

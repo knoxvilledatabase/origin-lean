@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.CompHausLike.Limits
 import Mathlib.Topology.Category.Stonean.Basic
 
+noncomputable section
+
 /-!
 
 # Explicit limits and colimits

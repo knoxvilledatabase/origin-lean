@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.Shift
 import Mathlib.CategoryTheory.Shift.SingleFunctors
 
+noncomputable section
+
 /-!
 # Single functors from the homotopy category
 

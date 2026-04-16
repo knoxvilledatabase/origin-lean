@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.LinearAlgebra.Semisimple
 
+noncomputable section
+
 /-!
 # Semisimple operators on inner product spaces
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Algebra.Order.Monoid.Defs
 
+noncomputable section
+
 /-!
 # Ordered scalar multiplication and vector addition
 This file defines ordered scalar multiplication and vector addition, and proves some properties.

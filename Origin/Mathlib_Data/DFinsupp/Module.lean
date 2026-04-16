@@ -1,12 +1,14 @@
 /-
 Extracted from Data/DFinsupp/Module.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Prod
 import Mathlib.Algebra.GroupWithZero.Action.Pi
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.Data.DFinsupp.Defs
+
+noncomputable section
 
 /-!
 # Group actions on `DFinsupp`
@@ -122,7 +124,10 @@ theorem single_smul {i : ι} (c : γ) (x : β i) : single i (c • x) = c • si
 
 end
 
--- DISSOLVED: support_smul
+theorem support_smul {γ : Type w} [Semiring γ] [∀ i, AddCommMonoid (β i)] [∀ i, Module γ (β i)]
+    [∀ (i : ι) (x : β i), Decidable (x ≠ 0)] (b : γ) (v : Π₀ i, β i) :
+    (b • v).support ⊆ v.support :=
+  support_mapRange
 
 end DecidableEq
 

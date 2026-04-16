@@ -9,6 +9,8 @@ import Mathlib.ModelTheory.Complexity
 import Mathlib.ModelTheory.Fraisse
 import Mathlib.Order.CountableDenseLinearOrder
 
+noncomputable section
+
 /-!
 # Ordered First-Ordered Structures
 

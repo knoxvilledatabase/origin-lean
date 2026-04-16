@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.MetricSpace.IsometricSMul
 
+noncomputable section
+
 /-!
 # Hausdorff distance
 
@@ -327,21 +329,8 @@ theorem hausdorffEdist_self_closure : hausdorffEdist s (closure s) = 0 := by
   rw [hausdorffEdist_zero_iff_closure_eq_closure, closure_closure]
 
 @[simp]
-theorem hausdorffEdist_closure₁ : hausdorffEdist (closure s) t = hausdorffEdist s t := by
-  refine le_antisymm ?_ ?_
-  · calc
-      _ ≤ hausdorffEdist (closure s) s + hausdorffEdist s t := hausdorffEdist_triangle
-      _ = hausdorffEdist s t := by simp [hausdorffEdist_comm]
-  · calc
-      _ ≤ hausdorffEdist s (closure s) + hausdorffEdist (closure s) t := hausdorffEdist_triangle
-      _ = hausdorffEdist (closure s) t := by simp
-
-@[simp]
 theorem hausdorffEdist_closure₂ : hausdorffEdist s (closure t) = hausdorffEdist s t := by
   simp [@hausdorffEdist_comm _ _ s _]
-
-theorem hausdorffEdist_closure : hausdorffEdist (closure s) (closure t) = hausdorffEdist s t := by
-  simp
 
 theorem hausdorffEdist_zero_iff_eq_of_closed (hs : IsClosed s) (ht : IsClosed t) :
     hausdorffEdist s t = 0 ↔ s = t := by
@@ -524,10 +513,6 @@ theorem exists_mem_closure_infDist_eq_dist [ProperSpace α] (hne : s.Nonempty) (
 
 def infNndist (x : α) (s : Set α) : ℝ≥0 :=
   ENNReal.toNNReal (infEdist x s)
-
-@[simp]
-theorem coe_infNndist : (infNndist x s : ℝ) = infDist x s :=
-  rfl
 
 theorem lipschitz_infNndist_pt (s : Set α) : LipschitzWith 1 fun x => infNndist x s :=
   LipschitzWith.of_le_add fun _ _ => infDist_le_infDist_add_dist

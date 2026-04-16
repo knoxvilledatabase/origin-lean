@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Pi.Basic
 import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.GroupTheory.GroupAction.DomAct.Basic
 
+noncomputable section
+
 /-!
 # Translation operator
 
@@ -34,9 +36,9 @@ variable {ι α β M G H : Type*} [AddCommGroup G]
 
 def translate (a : G) (f : G → α) : G → α := fun x ↦ f (x - a)
 
-open scoped translate
+@[inherit_doc] scoped[translate] notation "τ " => translate
 
-@[simp] lemma translate_apply (a : G) (f : G → α) (x : G) : τ a f x = f (x - a) := rfl
+open scoped translate
 
 @[simp] lemma translate_zero (f : G → α) : τ 0 f = f := by ext; simp
 
@@ -51,21 +53,8 @@ lemma translate_add' (a b : G) (f : G → α) : τ (a + b) f = τ b (τ a f) := 
 lemma translate_comm (a b : G) (f : G → α) : τ a (τ b f) = τ b (τ a f) := by
   rw [← translate_add, translate_add']
 
-@[simp] lemma comp_translate (a : G) (f : G → α) (g : α → β) : g ∘ τ a f = τ a (g ∘ f) := rfl
-
 lemma translate_eq_domAddActMk_vadd (a : G) (f : G → α) : τ a f = DomAddAct.mk (-a) +ᵥ f := by
   ext; simp [DomAddAct.vadd_apply, sub_eq_neg_add]
-
-@[simp]
-lemma translate_smul_right [SMul H α] (a : G) (f : G → α) (c : H) : τ a (c • f) = c • τ a f := rfl
-
-@[simp] lemma translate_zero_right [Zero α] (a : G) : τ a (0 : G → α) = 0 := rfl
-
-lemma translate_add_right [Add α] (a : G) (f g : G → α) : τ a (f + g) = τ a f + τ a g := rfl
-
-lemma translate_sub_right [Sub α] (a : G) (f g : G → α) : τ a (f - g) = τ a f - τ a g := rfl
-
-lemma translate_neg_right [Neg α] (a : G) (f : G → α) : τ a (-f) = -τ a f := rfl
 
 section AddCommMonoid
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.Group
 import Mathlib.NumberTheory.EllipticDivisibilitySequence
 
+noncomputable section
+
 /-!
 # Division polynomials of Weierstrass curves
 
@@ -128,9 +130,6 @@ lemma ψ₂_sq : W.ψ₂ ^ 2 = C W.Ψ₂Sq + 4 * W.toAffine.polynomial := by
 
 lemma Affine.CoordinateRing.mk_ψ₂_sq : mk W W.ψ₂ ^ 2 = mk W (C W.Ψ₂Sq) := by
   rw [C_Ψ₂Sq, map_sub, map_mul, AdjoinRoot.mk_self, mul_zero, sub_zero, map_pow]
-
-lemma Ψ₂Sq_eq : W.Ψ₂Sq = W.twoTorsionPolynomial.toPoly :=
-  rfl
 
 end Ψ₂Sq
 

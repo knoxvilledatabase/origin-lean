@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Norm/Basic.lean
-Genuine: 17 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
+Genuine: 19 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Norm.Defs
@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Matrix.Charpoly.Minpoly
 import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.FieldTheory.Galois.Basic
+
+noncomputable section
 
 /-!
 # Norm for (finite) ring extensions
@@ -107,7 +109,8 @@ theorem norm_eq_zero_iff [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Fin
       apply b.equivFun.symm.injective
       rw [b.equivFun_symm_apply, sum_eq, LinearEquiv.map_zero]
 
--- DISSOLVED: norm_ne_zero_iff
+theorem norm_ne_zero_iff [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Finite R S] {x : S} :
+    norm R x ≠ 0 ↔ x ≠ 0 := not_iff_not.mpr norm_eq_zero_iff
 
 @[simp]
 theorem norm_eq_zero_iff' [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Finite R S] {x : S} :
@@ -119,7 +122,9 @@ theorem norm_eq_zero_iff_of_basis [IsDomain R] [IsDomain S] (b : Basis ι R S) {
   haveI : Module.Finite R S := Module.Finite.of_basis b
   exact norm_eq_zero_iff
 
--- DISSOLVED: norm_ne_zero_iff_of_basis
+theorem norm_ne_zero_iff_of_basis [IsDomain R] [IsDomain S] (b : Basis ι R S) {x : S} :
+    Algebra.norm R x ≠ 0 ↔ x ≠ 0 :=
+  not_iff_not.mpr (norm_eq_zero_iff_of_basis b)
 
 end EqZeroIff
 

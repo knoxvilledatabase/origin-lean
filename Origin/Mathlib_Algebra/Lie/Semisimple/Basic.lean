@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.Semisimple.Defs
 import Mathlib.Order.BooleanGenerators
 
+noncomputable section
+
 /-!
 # Semisimple Lie algebras
 
@@ -188,7 +190,6 @@ lemma isSimple_of_isAtom (I : LieIdeal R L) (hI : IsAtom I) : IsSimple R I where
     exact hy
 
 private
-
 lemma finitelyAtomistic : ∀ s : Finset (LieIdeal R L), ↑s ⊆ {I : LieIdeal R L | IsAtom I} →
     ∀ I : LieIdeal R L, I ≤ s.sup id → ∃ t ⊆ s, I = t.sup id := by
   intro s hs I hI
@@ -267,7 +268,6 @@ instance (priority := 100) instDistribLattice : DistribLattice (LieIdeal R L) :=
   (booleanGenerators R L).distribLattice_of_sSup_eq_top sSup_atoms_eq_top
 
 noncomputable
-
 instance (priority := 100) instBooleanAlgebra : BooleanAlgebra (LieIdeal R L) :=
   (booleanGenerators R L).booleanAlgebra_of_sSup_eq_top sSup_atoms_eq_top
 
@@ -313,7 +313,5 @@ theorem abelian_radical_iff_solvable_is_abelian [IsNoetherian R L] :
     rw [LieIdeal.solvable_iff_le_radical] at h₂
     exact (LieIdeal.inclusion_injective h₂).isLieAbelian h₁
   · intro h; apply h; infer_instance
-
-theorem ad_ker_eq_bot_of_hasTrivialRadical [HasTrivialRadical R L] : (ad R L).ker = ⊥ := by simp
 
 end LieAlgebra

@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/Basic.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 12 | Infrastructure: 0
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
+
+noncomputable section
 
 /-!
 # Legendre symbol
@@ -52,9 +54,25 @@ theorem euler_criterion_units (x : (ZMod p)ˣ) : (∃ y : (ZMod p)ˣ, y ^ 2 = x)
     rw [hs]
     rwa [card p] at h₀
 
--- DISSOLVED: euler_criterion
+theorem euler_criterion {a : ZMod p} (ha : a ≠ 0) : IsSquare (a : ZMod p) ↔ a ^ (p / 2) = 1 := by
+  apply (iff_congr _ (by simp [Units.ext_iff])).mp (euler_criterion_units p (Units.mk0 a ha))
+  simp only [Units.ext_iff, sq, Units.val_mk0, Units.val_mul]
+  constructor
+  · rintro ⟨y, hy⟩; exact ⟨y, hy.symm⟩
+  · rintro ⟨y, rfl⟩
+    have hy : y ≠ 0 := by
+      rintro rfl
+      simp [zero_pow, mul_zero, ne_eq, not_true] at ha
+    refine ⟨Units.mk0 y hy, ?_⟩; simp
 
--- DISSOLVED: pow_div_two_eq_neg_one_or_one
+theorem pow_div_two_eq_neg_one_or_one {a : ZMod p} (ha : a ≠ 0) :
+    a ^ (p / 2) = 1 ∨ a ^ (p / 2) = -1 := by
+  cases' Prime.eq_two_or_odd (@Fact.out p.Prime _) with hp2 hp_odd
+  · subst p; revert a ha; intro a; fin_cases a
+    · tauto
+    · simp
+  rw [← mul_self_eq_one_iff, ← pow_add, ← two_mul, two_mul_odd_div_two hp_odd]
+  exact pow_card_sub_one_eq_one ha
 
 end ZMod
 
@@ -93,9 +111,13 @@ theorem eq_pow (a : ℤ) : (legendreSym p a : ZMod p) = (a : ZMod p) ^ (p / 2) :
   · convert quadraticChar_eq_pow_of_char_ne_two' hc (a : ZMod p)
     exact (card p).symm
 
--- DISSOLVED: eq_one_or_neg_one
+theorem eq_one_or_neg_one {a : ℤ} (ha : (a : ZMod p) ≠ 0) :
+    legendreSym p a = 1 ∨ legendreSym p a = -1 :=
+  quadraticChar_dichotomy ha
 
--- DISSOLVED: eq_neg_one_iff_not_one
+theorem eq_neg_one_iff_not_one {a : ℤ} (ha : (a : ZMod p) ≠ 0) :
+    legendreSym p a = -1 ↔ ¬legendreSym p a = 1 :=
+  quadraticChar_eq_neg_one_iff_not_one ha
 
 theorem eq_zero_iff (a : ℤ) : legendreSym p a = 0 ↔ (a : ZMod p) = 0 :=
   quadraticChar_eq_zero_iff
@@ -116,16 +138,25 @@ def hom : ℤ →*₀ ℤ where
   map_one' := at_one p
   map_mul' := legendreSym.mul p
 
--- DISSOLVED: sq_one
+theorem sq_one {a : ℤ} (ha : (a : ZMod p) ≠ 0) : legendreSym p a ^ 2 = 1 :=
+  quadraticChar_sq_one ha
 
--- DISSOLVED: sq_one'
+theorem sq_one' {a : ℤ} (ha : (a : ZMod p) ≠ 0) : legendreSym p (a ^ 2) = 1 := by
+  dsimp only [legendreSym]
+  rw [Int.cast_pow]
+  exact quadraticChar_sq_one' ha
 
 protected theorem mod (a : ℤ) : legendreSym p a = legendreSym p (a % p) := by
   simp only [legendreSym, intCast_mod]
 
--- DISSOLVED: eq_one_iff
+theorem eq_one_iff {a : ℤ} (ha0 : (a : ZMod p) ≠ 0) : legendreSym p a = 1 ↔ IsSquare (a : ZMod p) :=
+  quadraticChar_one_iff_isSquare ha0
 
--- DISSOLVED: eq_one_iff'
+theorem eq_one_iff' {a : ℕ} (ha0 : (a : ZMod p) ≠ 0) :
+    legendreSym p a = 1 ↔ IsSquare (a : ZMod p) := by
+      rw [eq_one_iff]
+      · norm_cast
+      · exact mod_cast ha0
 
 theorem eq_neg_one_iff {a : ℤ} : legendreSym p a = -1 ↔ ¬IsSquare (a : ZMod p) :=
   quadraticChar_neg_one_iff_not_isSquare
@@ -149,9 +180,21 @@ section QuadraticForm
 
 namespace legendreSym
 
--- DISSOLVED: eq_one_of_sq_sub_mul_sq_eq_zero
+theorem eq_one_of_sq_sub_mul_sq_eq_zero {p : ℕ} [Fact p.Prime] {a : ℤ} (ha : (a : ZMod p) ≠ 0)
+    {x y : ZMod p} (hy : y ≠ 0) (hxy : x ^ 2 - a * y ^ 2 = 0) : legendreSym p a = 1 := by
+  apply_fun (· * y⁻¹ ^ 2) at hxy
+  simp only [zero_mul] at hxy
+  rw [(by ring : (x ^ 2 - ↑a * y ^ 2) * y⁻¹ ^ 2 = (x * y⁻¹) ^ 2 - a * (y * y⁻¹) ^ 2),
+    mul_inv_cancel₀ hy, one_pow, mul_one, sub_eq_zero, pow_two] at hxy
+  exact (eq_one_iff p ha).mpr ⟨x * y⁻¹, hxy.symm⟩
 
--- DISSOLVED: eq_one_of_sq_sub_mul_sq_eq_zero'
+theorem eq_one_of_sq_sub_mul_sq_eq_zero' {p : ℕ} [Fact p.Prime] {a : ℤ} (ha : (a : ZMod p) ≠ 0)
+    {x y : ZMod p} (hx : x ≠ 0) (hxy : x ^ 2 - a * y ^ 2 = 0) : legendreSym p a = 1 := by
+  haveI hy : y ≠ 0 := by
+    rintro rfl
+    rw [zero_pow two_ne_zero, mul_zero, sub_zero, sq_eq_zero_iff] at hxy
+    exact hx hxy
+  exact eq_one_of_sq_sub_mul_sq_eq_zero ha hy hxy
 
 theorem eq_zero_mod_of_eq_neg_one {p : ℕ} [Fact p.Prime] {a : ℤ} (h : legendreSym p a = -1)
     {x y : ZMod p} (hxy : x ^ 2 - a * y ^ 2 = 0) : x = 0 ∧ y = 0 := by
@@ -200,9 +243,16 @@ theorem exists_sq_eq_neg_one_iff : IsSquare (-1 : ZMod p) ↔ p % 4 ≠ 3 := by
 theorem mod_four_ne_three_of_sq_eq_neg_one {y : ZMod p} (hy : y ^ 2 = -1) : p % 4 ≠ 3 :=
   exists_sq_eq_neg_one_iff.1 ⟨y, hy ▸ pow_two y⟩
 
--- DISSOLVED: mod_four_ne_three_of_sq_eq_neg_sq'
+theorem mod_four_ne_three_of_sq_eq_neg_sq' {x y : ZMod p} (hy : y ≠ 0) (hxy : x ^ 2 = -y ^ 2) :
+    p % 4 ≠ 3 :=
+  @mod_four_ne_three_of_sq_eq_neg_one p _ (x / y)
+    (by
+      apply_fun fun z => z / y ^ 2 at hxy
+      rwa [neg_div, ← div_pow, ← div_pow, div_self hy, one_pow] at hxy)
 
--- DISSOLVED: mod_four_ne_three_of_sq_eq_neg_sq
+theorem mod_four_ne_three_of_sq_eq_neg_sq {x y : ZMod p} (hx : x ≠ 0) (hxy : x ^ 2 = -y ^ 2) :
+    p % 4 ≠ 3 :=
+  mod_four_ne_three_of_sq_eq_neg_sq' hx (neg_eq_iff_eq_neg.mpr hxy).symm
 
 end ZMod
 

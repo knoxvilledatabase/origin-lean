@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Prod
 import Mathlib.Analysis.Calculus.FDeriv.Equiv
 import Mathlib.Analysis.Normed.Lp.PiLp
 
+noncomputable section
+
 /-!
 # Derivatives on `WithLp`
 -/

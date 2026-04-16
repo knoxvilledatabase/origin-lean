@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Semiconj.Defs
 import Mathlib.Algebra.Ring.Defs
 
+noncomputable section
+
 /-!
 # Semirings and rings
 
@@ -59,10 +61,6 @@ end
 section
 
 variable [MulOneClass R] [HasDistribNeg R]
-
-theorem neg_one_right (a : R) : SemiconjBy a (-1) (-1) := by simp
-
-theorem neg_one_left (x : R) : SemiconjBy (-1) x x := by simp
 
 end
 

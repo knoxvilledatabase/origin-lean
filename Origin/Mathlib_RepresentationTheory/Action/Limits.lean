@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Linear.FunctorCategory
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.RepresentationTheory.Action.Basic
 
+noncomputable section
+
 /-!
 # Categorical properties of `Action V G`
 
@@ -191,10 +193,6 @@ variable [HasZeroMorphisms V]
 
 instance {X Y : Action V G} : Zero (X ⟶ Y) := ⟨0, by aesop_cat⟩
 
-@[simp]
-theorem zero_hom {X Y : Action V G} : (0 : X ⟶ Y).hom = 0 :=
-  rfl
-
 instance : HasZeroMorphisms (Action V G) where
 
 instance forget_preservesZeroMorphisms : Functor.PreservesZeroMorphisms (forget V G) where
@@ -237,14 +235,6 @@ instance functorCategoryEquivalence_additive :
     Functor.Additive (functorCategoryEquivalence V G).functor where
 
 @[simp]
-theorem neg_hom {X Y : Action V G} (f : X ⟶ Y) : (-f).hom = -f.hom :=
-  rfl
-
-@[simp]
-theorem add_hom {X Y : Action V G} (f g : X ⟶ Y) : (f + g).hom = f.hom + g.hom :=
-  rfl
-
-@[simp]
 theorem sum_hom {X Y : Action V G} {ι : Type*} (f : ι → (X ⟶ Y)) (s : Finset ι) :
     (s.sum f).hom = s.sum fun i => (f i).hom :=
   (forget V G).map_sum f s
@@ -273,10 +263,6 @@ instance forget₂_linear [ConcreteCategory V] : Functor.Linear R (forget₂ (Ac
 
 instance functorCategoryEquivalence_linear :
     Functor.Linear R (functorCategoryEquivalence V G).functor where
-
-@[simp]
-theorem smul_hom {X Y : Action V G} (r : R) (f : X ⟶ Y) : (r • f).hom = r • f.hom :=
-  rfl
 
 variable {H : MonCat.{u}} (f : G ⟶ H)
 

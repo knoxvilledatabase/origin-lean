@@ -8,6 +8,8 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 
+noncomputable section
+
 /-!
 # Congruence subgroups
 
@@ -37,8 +39,7 @@ namespace CongruenceSubgroup
 def Gamma : Subgroup SL(2, ℤ) :=
   SLMOD(N).ker
 
-theorem Gamma_mem' {N} {γ : SL(2, ℤ)} : γ ∈ Gamma N ↔ SLMOD(N) γ = 1 :=
-  Iff.rfl
+@[inherit_doc] scoped notation  "Γ(" n ")"  => Gamma n
 
 @[simp]
 theorem Gamma_mem {N} {γ : SL(2, ℤ)} : γ ∈ Gamma N ↔ (γ 0 0 : ZMod N) = 1 ∧
@@ -112,10 +113,6 @@ def Gamma0Map (N : ℕ) : Gamma0 N →* ZMod N where
 
 def Gamma1' (N : ℕ) : Subgroup (Gamma0 N) :=
   (Gamma0Map N).ker
-
-@[simp]
-theorem Gamma1_mem' {N} {γ : Gamma0 N} : γ ∈ Gamma1' N ↔ Gamma0Map N γ = 1 :=
-  Iff.rfl
 
 theorem Gamma1_to_Gamma0_mem {N} (A : Gamma0 N) :
     A ∈ Gamma1' N ↔

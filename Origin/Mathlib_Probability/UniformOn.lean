@@ -1,10 +1,12 @@
 /-
 Extracted from Probability/UniformOn.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Probability.ConditionalProbability
 import Mathlib.MeasureTheory.Measure.Count
+
+noncomputable section
 
 /-!
 # Classical probability
@@ -66,7 +68,9 @@ alias condCount_empty := uniformOn_empty
 @[simp] lemma uniformOn_eq_zero [MeasurableSingletonClass Ω] :
     uniformOn s = 0 ↔ s.Infinite ∨ s = ∅ := by simp [uniformOn]
 
--- DISSOLVED: finite_of_uniformOn_ne_zero
+theorem finite_of_uniformOn_ne_zero {s t : Set Ω} (h : uniformOn s t ≠ 0) : s.Finite := by
+  by_contra hs'
+  simp [uniformOn, cond, Measure.count_apply_infinite hs'] at h
 
 alias finite_of_condCount_ne_zero := finite_of_uniformOn_ne_zero
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Center
 import Mathlib.Algebra.Ring.Defs
 
+noncomputable section
+
 /-!
 # Centralizers of rings
 -/

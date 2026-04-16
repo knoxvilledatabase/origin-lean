@@ -1,9 +1,11 @@
 /-
 Extracted from Order/Booleanisation.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Order.Hom.Lattice
+
+noncomputable section
 
 /-!
 # Adding complements to a generalized Boolean algebra
@@ -46,10 +48,6 @@ instance instCompl : HasCompl (Booleanisation α) where
   compl x := match x with
     | lift a => comp a
     | comp a => lift a
-
-@[simp] lemma compl_lift (a : α) : (lift a)ᶜ = comp a := rfl
-
-@[simp] lemma compl_comp (a : α) : (comp a)ᶜ = lift a := rfl
 
 variable [GeneralizedBooleanAlgebra α] {a b : α}
 
@@ -114,34 +112,6 @@ instance instSDiff : SDiff (Booleanisation α) where
 
 @[simp] lemma not_comp_lt_lift : ¬ comp a < lift b := fun h ↦ nomatch h
 
-@[simp] lemma lift_sup_lift (a b : α) : lift a ⊔ lift b = lift (a ⊔ b) := rfl
-
-@[simp] lemma lift_sup_comp (a b : α) : lift a ⊔ comp b = comp (b \ a) := rfl
-
-@[simp] lemma comp_sup_lift (a b : α) : comp a ⊔ lift b = comp (a \ b) := rfl
-
-@[simp] lemma comp_sup_comp (a b : α) : comp a ⊔ comp b = comp (a ⊓ b) := rfl
-
-@[simp] lemma lift_inf_lift (a b : α) : lift a ⊓ lift b = lift (a ⊓ b) := rfl
-
-@[simp] lemma lift_inf_comp (a b : α) : lift a ⊓ comp b = lift (a \ b) := rfl
-
-@[simp] lemma comp_inf_lift (a b : α) : comp a ⊓ lift b = lift (b \ a) := rfl
-
-@[simp] lemma comp_inf_comp (a b : α) : comp a ⊓ comp b = comp (a ⊔ b) := rfl
-
-@[simp] lemma lift_bot : lift (⊥ : α) = ⊥ := rfl
-
-@[simp] lemma comp_bot : comp (⊥ : α) = ⊤ := rfl
-
-@[simp] lemma lift_sdiff_lift (a b : α) : lift a \ lift b = lift (a \ b) := rfl
-
-@[simp] lemma lift_sdiff_comp (a b : α) : lift a \ comp b = lift (a ⊓ b) := rfl
-
-@[simp] lemma comp_sdiff_lift (a b : α) : comp a \ lift b = comp (a ⊔ b) := rfl
-
-@[simp] lemma comp_sdiff_comp (a b : α) : comp a \ comp b = lift (b \ a) := rfl
-
 instance instPreorder : Preorder (Booleanisation α) where
   lt := (· < ·)
   lt_iff_le_not_le x y := match x, y with
@@ -164,7 +134,6 @@ instance instPartialOrder : PartialOrder (Booleanisation α) where
     | comp a, comp b, LE.comp hab, LE.comp hba => by rw [hab.antisymm hba]
 
 set_option linter.unusedVariables false in
-
 instance instSemilatticeSup : SemilatticeSup (Booleanisation α) where
   sup x y := max x y
   le_sup_left x y := match x, y with
@@ -185,7 +154,6 @@ instance instSemilatticeSup : SemilatticeSup (Booleanisation α) where
     | comp a, comp b, comp c, LE.comp hca, LE.comp hcb => LE.comp <| le_inf hca hcb
 
 set_option linter.unusedVariables false in
-
 instance instSemilatticeInf : SemilatticeInf (Booleanisation α) where
   inf x y := min x y
   inf_le_left x y := match x, y with
@@ -221,7 +189,6 @@ instance instDistribLattice : DistribLattice (Booleanisation α) where
     | comp _, comp _, comp _ => LE.comp (inf_sup_left _ _ _).le
 
 set_option linter.unusedVariables false in
-
 instance instBoundedOrder : BoundedOrder (Booleanisation α) where
   le_top x := match x with
     | lift a => LE.sep disjoint_bot_right

@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.Perm.Cycle.Basic
 import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Positivity
 
+noncomputable section
+
 /-!
 # Chebyshev's sum inequality
 

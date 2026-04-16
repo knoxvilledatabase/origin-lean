@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 import Mathlib.Probability.Kernel.Composition
 import Mathlib.Probability.Kernel.Disintegration.MeasurableStieltjes
 
+noncomputable section
+
 /-!
 # Building a Markov kernel from a conditional cumulative distribution function
 
@@ -480,7 +482,6 @@ lemma StieltjesFunction.measurable_measure {f : α → StieltjesFunction}
     exact Measurable.ennreal_tsum hf_cd_meas
 
 noncomputable
-
 def IsCondKernelCDF.toKernel (f : α × β → StieltjesFunction) (hf : IsCondKernelCDF f κ ν) :
     Kernel (α × β) ℝ where
   toFun p := (f p).measure

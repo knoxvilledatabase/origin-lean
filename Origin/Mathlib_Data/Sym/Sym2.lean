@@ -8,6 +8,8 @@ import Mathlib.Data.Sym.Basic
 import Mathlib.Data.Sym.Sym2.Init
 import Mathlib.Data.SetLike.Basic
 
+noncomputable section
+
 /-!
 # The symmetric square
 
@@ -165,16 +167,6 @@ def lift : { f : α → α → β // ∀ a₁ a₂, f a₁ a₂ = f a₂ a₁ } 
   left_inv _ := Subtype.ext rfl
   right_inv _ := funext <| Sym2.ind fun _ _ => rfl
 
-@[simp]
-theorem lift_mk (f : { f : α → α → β // ∀ a₁ a₂, f a₁ a₂ = f a₂ a₁ }) (a₁ a₂ : α) :
-    lift f s(a₁, a₂) = (f : α → α → β) a₁ a₂ :=
-  rfl
-
-@[simp]
-theorem coe_lift_symm_apply (F : Sym2 α → β) (a₁ a₂ : α) :
-    (lift.symm F : α → α → β) a₁ a₂ = F s(a₁, a₂) :=
-  rfl
-
 def lift₂ :
     { f : α → α → β → β → γ //
         ∀ a₁ a₂ b₁ b₂, f a₁ a₂ b₁ b₂ = f a₂ a₁ b₁ b₂ ∧ f a₁ a₂ b₁ b₂ = f a₁ a₂ b₂ b₁ } ≃
@@ -191,19 +183,6 @@ def lift₂ :
       exacts [congr_arg₂ F eq_swap rfl, congr_arg₂ F rfl eq_swap]⟩
   left_inv _ := Subtype.ext rfl
   right_inv _ := funext₂ fun a b => Sym2.inductionOn₂ a b fun _ _ _ _ => rfl
-
-@[simp]
-theorem lift₂_mk
-    (f :
-    { f : α → α → β → β → γ //
-      ∀ a₁ a₂ b₁ b₂, f a₁ a₂ b₁ b₂ = f a₂ a₁ b₁ b₂ ∧ f a₁ a₂ b₁ b₂ = f a₁ a₂ b₂ b₁ })
-    (a₁ a₂ : α) (b₁ b₂ : β) : lift₂ f s(a₁, a₂) s(b₁, b₂) = (f : α → α → β → β → γ) a₁ a₂ b₁ b₂ :=
-  rfl
-
-@[simp]
-theorem coe_lift₂_symm_apply (F : Sym2 α → Sym2 β → γ) (a₁ a₂ : α) (b₁ b₂ : β) :
-    (lift₂.symm F : α → α → β → β → γ) a₁ a₂ b₁ b₂ = F s(a₁, a₂) s(b₁, b₂) :=
-  rfl
 
 def map (f : α → β) : Sym2 α → Sym2 β :=
   Quot.map (Prod.map f f)
@@ -270,13 +249,6 @@ instance : SetLike (Sym2 α) α where
     have hx := h x; have hy := h y; have hx' := h x'; have hy' := h y'
     simp only [mem_iff', eq_self_iff_true] at hx hy hx' hy'
     aesop
-
-@[simp]
-theorem mem_iff_mem {x : α} {z : Sym2 α} : Sym2.Mem x z ↔ x ∈ z :=
-  Iff.rfl
-
-theorem mem_iff_exists {x : α} {z : Sym2 α} : x ∈ z ↔ ∃ y : α, z = s(x, y) :=
-  Iff.rfl
 
 @[ext]
 theorem ext {p q : Sym2 α} (h : ∀ x, x ∈ p ↔ x ∈ q) : p = q :=
@@ -367,9 +339,6 @@ def pmap {P : α → Prop} (f : ∀ a, P a → β) (s : Sym2 α) : (∀ a ∈ s,
 
 theorem forall_mem_pair {P : α → Prop} {a b : α} : (∀ x ∈ s(a, b), P x) ↔ P a ∧ P b := by
   simp only [mem_iff, forall_eq_or_imp, forall_eq]
-
-lemma pair_eq_pmap {P : α → Prop} (f : ∀ a, P a → β) (a b : α) (h : P a) (h' : P b) :
-    s(f a h, f b h') = pmap f s(a, b) (forall_mem_pair.mpr ⟨h, h'⟩) := rfl
 
 lemma pmap_pair {P : α → Prop} (f : ∀ a, P a → β) (a b : α) (h : ∀ x ∈ s(a, b), P x) :
     pmap f s(a, b) h = s(f a (h a (mem_mk_left a b)), f b (h b (mem_mk_right a b))) := rfl
@@ -475,10 +444,6 @@ variable {r : α → α → Prop}
 def fromRel (sym : Symmetric r) : Set (Sym2 α) :=
   setOf (lift ⟨r, fun _ _ => propext ⟨(sym ·), (sym ·)⟩⟩)
 
-@[simp]
-theorem fromRel_proj_prop {sym : Symmetric r} {z : α × α} : Sym2.mk z ∈ fromRel sym ↔ r z.1 z.2 :=
-  Iff.rfl
-
 theorem fromRel_prop {sym : Symmetric r} {a b : α} : s(a, b) ∈ fromRel sym ↔ r a b :=
   Iff.rfl
 
@@ -510,14 +475,7 @@ instance fromRel.decidablePred (sym : Symmetric r) [h : DecidableRel r] :
 def ToRel (s : Set (Sym2 α)) (x y : α) : Prop :=
   s(x, y) ∈ s
 
-@[simp]
-theorem toRel_prop (s : Set (Sym2 α)) (x y : α) : ToRel s x y ↔ s(x, y) ∈ s :=
-  Iff.rfl
-
 theorem toRel_symmetric (s : Set (Sym2 α)) : Symmetric (ToRel s) := fun x y => by simp [eq_swap]
-
-theorem toRel_fromRel (sym : Symmetric r) : ToRel (fromRel sym) = r :=
-  rfl
 
 theorem fromRel_toRel (s : Set (Sym2 α)) : fromRel (toRel_symmetric s) = s :=
   Set.ext fun z => Sym2.ind (fun _ _ => Iff.rfl) z

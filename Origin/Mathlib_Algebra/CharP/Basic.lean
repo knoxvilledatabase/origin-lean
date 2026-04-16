@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/Basic.lean
-Genuine: 2 | Conflates: 5 | Dissolved: 4 | Infrastructure: 8
+Genuine: 2 | Conflates: 9 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.CharP.Defs
 import Mathlib.Algebra.Group.Fin.Basic
 import Mathlib.Algebra.Group.ULift
 import Mathlib.Data.Nat.Cast.Prod
+
+noncomputable section
 
 /-!
 # Characteristic of semirings
@@ -65,7 +67,14 @@ variable {R} [NonAssocSemiring R]
 
 variable (R) in
 
--- DISSOLVED: cast_ne_zero_of_ne_of_prime
+-- CONFLATES (assumes ground = zero): cast_ne_zero_of_ne_of_prime
+lemma cast_ne_zero_of_ne_of_prime [Nontrivial R]
+    {p q : ℕ} [CharP R p] (hq : q.Prime) (hneq : p ≠ q) : (q : R) ≠ 0 := fun h ↦ by
+  rw [cast_eq_zero_iff R p q] at h
+  rcases hq.eq_one_or_self_of_dvd _ h with h | h
+  · subst h
+    exact false_of_nontrivial_of_char_one (R := R)
+  · exact hneq h
 
 -- CONFLATES (assumes ground = zero): ringChar_of_prime_eq_zero
 lemma ringChar_of_prime_eq_zero [Nontrivial R] {p : ℕ} (hprime : Nat.Prime p)
@@ -84,9 +93,16 @@ end CharP
 
 section
 
--- DISSOLVED: Ring.two_ne_zero
+-- CONFLATES (assumes ground = zero): Ring.two_ne_zero
+protected lemma Ring.two_ne_zero {R : Type*} [NonAssocSemiring R] [Nontrivial R]
+    (hR : ringChar R ≠ 2) : (2 : R) ≠ 0 := by
+  rw [Ne, (by norm_cast : (2 : R) = (2 : ℕ)), ringChar.spec, Nat.dvd_prime Nat.prime_two]
+  exact mt (or_iff_left hR).mp CharP.ringChar_ne_one
 
--- DISSOLVED: Ring.neg_one_ne_one_of_char_ne_two
+-- CONFLATES (assumes ground = zero): Ring.neg_one_ne_one_of_char_ne_two
+lemma Ring.neg_one_ne_one_of_char_ne_two {R : Type*} [NonAssocRing R] [Nontrivial R]
+    (hR : ringChar R ≠ 2) : (-1 : R) ≠ 1 := fun h =>
+  Ring.two_ne_zero hR (one_add_one_eq_two (R := R) ▸ neg_eq_iff_add_eq_zero.mp h)
 
 -- CONFLATES (assumes ground = zero): Ring.eq_self_iff_eq_zero_of_char_ne_two
 lemma Ring.eq_self_iff_eq_zero_of_char_ne_two {R : Type*} [NonAssocRing R] [Nontrivial R]
@@ -138,7 +154,14 @@ end
 
 namespace CharZero
 
--- DISSOLVED: charZero_iff_forall_prime_ne_zero
+-- CONFLATES (assumes ground = zero): charZero_iff_forall_prime_ne_zero
+lemma charZero_iff_forall_prime_ne_zero [NonAssocRing R] [NoZeroDivisors R] [Nontrivial R] :
+    CharZero R ↔ ∀ p : ℕ, p.Prime → (p : R) ≠ 0 := by
+  refine ⟨fun h p hp => by simp [hp.ne_zero], fun h => ?_⟩
+  let p := ringChar R
+  cases CharP.char_is_prime_or_zero R p with
+  | inl hp => simpa using h p hp
+  | inr h => have : CharP R 0 := h ▸ inferInstance; exact CharP.charP_to_charZero R
 
 end CharZero
 

@@ -7,6 +7,8 @@ import Batteries.Data.DList.Lemmas
 import Mathlib.Control.Traversable.Equiv
 import Mathlib.Control.Traversable.Instances
 
+noncomputable section
+
 /-!
 # Traversable instance for DLists
 

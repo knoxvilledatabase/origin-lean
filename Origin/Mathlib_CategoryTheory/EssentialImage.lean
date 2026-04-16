@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.NatIso
 import Mathlib.CategoryTheory.FullSubcategory
 
+noncomputable section
+
 /-!
 # Essential image of a functor
 

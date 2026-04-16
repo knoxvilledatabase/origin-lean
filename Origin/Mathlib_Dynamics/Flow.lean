@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Logic.Function.Iterate
 
+noncomputable section
+
 /-!
 # Flows and invariant sets
 
@@ -105,12 +107,6 @@ theorem map_add (t₁ t₂ : τ) (x : α) : ϕ (t₁ + t₂) x = ϕ t₁ (ϕ t�
 theorem map_zero : ϕ 0 = id := funext ϕ.map_zero'
 
 theorem map_zero_apply (x : α) : ϕ 0 x = x := ϕ.map_zero' x
-
-def fromIter {g : α → α} (h : Continuous g) : Flow ℕ α where
-  toFun n x := g^[n] x
-  cont' := continuous_prod_of_discrete_left.mpr (Continuous.iterate h)
-  map_add' := iterate_add_apply _
-  map_zero' _x := rfl
 
 def restrict {s : Set α} (h : IsInvariant ϕ s) : Flow τ (↥s) where
   toFun t := (h t).restrict _ _ _

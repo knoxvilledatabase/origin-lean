@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Analysis.Asymptotics.Asymptotics
 
+noncomputable section
+
 /-!
 # Asymptotic statements about the operator norm
 

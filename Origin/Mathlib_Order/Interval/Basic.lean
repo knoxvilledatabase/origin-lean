@@ -7,6 +7,8 @@ import Mathlib.Order.Interval.Set.Basic
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.SetLike.Basic
 
+noncomputable section
+
 /-!
 # Order intervals
 
@@ -56,28 +58,11 @@ instance [Subsingleton α] : Subsingleton (NonemptyInterval α) :=
 instance le : LE (NonemptyInterval α) :=
   ⟨fun s t => t.fst ≤ s.fst ∧ s.snd ≤ t.snd⟩
 
-theorem le_def : s ≤ t ↔ t.fst ≤ s.fst ∧ s.snd ≤ t.snd :=
-  Iff.rfl
-
-@[simps]
-def toDualProdHom : NonemptyInterval α ↪o αᵒᵈ × α where
-  toFun := toDualProd
-  inj' := toDualProd_injective
-  map_rel_iff' := Iff.rfl
-
 def dual : NonemptyInterval α ≃ NonemptyInterval αᵒᵈ where
   toFun s := ⟨s.toProd.swap, s.fst_le_snd⟩
   invFun s := ⟨s.toProd.swap, s.fst_le_snd⟩
   left_inv _ := rfl
   right_inv _ := rfl
-
-@[simp]
-theorem fst_dual (s : NonemptyInterval α) : s.dual.fst = toDual s.snd :=
-  rfl
-
-@[simp]
-theorem snd_dual (s : NonemptyInterval α) : s.dual.snd = toDual s.fst :=
-  rfl
 
 end LE
 
@@ -93,10 +78,6 @@ instance : Coe (NonemptyInterval α) (Set α) :=
 
 instance (priority := 100) : Membership α (NonemptyInterval α) :=
   ⟨fun s a => a ∈ (s : Set α)⟩
-
-@[simp]
-theorem mem_mk {hx : x.1 ≤ x.2} : a ∈ mk x hx ↔ x.1 ≤ a ∧ a ≤ x.2 :=
-  Iff.rfl
 
 theorem mem_def : a ∈ s ↔ s.fst ≤ a ∧ a ≤ s.snd :=
   Iff.rfl
@@ -114,10 +95,6 @@ theorem mem_pure_self (a : α) : a ∈ pure a :=
 theorem pure_injective : Injective (pure : α → NonemptyInterval α) := fun _ _ =>
   congr_arg <| Prod.fst ∘ toProd
 
-@[simp]
-theorem dual_pure (a : α) : dual (pure a) = pure (toDual a) :=
-  rfl
-
 instance [Inhabited α] : Inhabited (NonemptyInterval α) :=
   ⟨pure default⟩
 
@@ -131,46 +108,16 @@ instance [Nontrivial α] : Nontrivial (NonemptyInterval α) :=
 def map (f : α →o β) (a : NonemptyInterval α) : NonemptyInterval β :=
   ⟨a.toProd.map f f, f.mono a.fst_le_snd⟩
 
-@[simp]
-theorem map_pure (f : α →o β) (a : α) : (pure a).map f = pure (f a) :=
-  rfl
-
-@[simp]
-theorem map_map (g : β →o γ) (f : α →o β) (a : NonemptyInterval α) :
-    (a.map f).map g = a.map (g.comp f) :=
-  rfl
-
-@[simp]
-theorem dual_map (f : α →o β) (a : NonemptyInterval α) :
-    dual (a.map f) = a.dual.map f.dual :=
-  rfl
-
 @[simps]
 def map₂ (f : α → β → γ) (h₀ : ∀ b, Monotone fun a => f a b) (h₁ : ∀ a, Monotone (f a)) :
     NonemptyInterval α → NonemptyInterval β → NonemptyInterval γ := fun s t =>
   ⟨(f s.fst t.fst, f s.snd t.snd), (h₀ _ s.fst_le_snd).trans <| h₁ _ t.fst_le_snd⟩
-
-@[simp]
-theorem map₂_pure (f : α → β → γ) (h₀ h₁) (a : α) (b : β) :
-    map₂ f h₀ h₁ (pure a) (pure b) = pure (f a b) :=
-  rfl
-
-@[simp]
-theorem dual_map₂ (f : α → β → γ) (h₀ h₁ s t) :
-    dual (map₂ f h₀ h₁ s t) =
-      map₂ (fun a b => toDual <| f (ofDual a) <| ofDual b) (fun _ => (h₀ _).dual)
-        (fun _ => (h₁ _).dual) (dual s) (dual t) :=
-  rfl
 
 variable [BoundedOrder α]
 
 instance : OrderTop (NonemptyInterval α) where
   top := ⟨⟨⊥, ⊤⟩, bot_le⟩
   le_top _ := ⟨bot_le, le_top⟩
-
-@[simp]
-theorem dual_top : dual (⊤ : NonemptyInterval α) = ⊤ :=
-  rfl
 
 end Preorder
 
@@ -195,10 +142,6 @@ theorem coe_subset_coe : (s : Set α) ⊆ t ↔ (s : NonemptyInterval α) ≤ t 
 @[norm_cast] -- @[simp, norm_cast] -- Porting note: not in simpNF
 theorem coe_ssubset_coe : (s : Set α) ⊂ t ↔ s < t :=
   (@coeHom α _).lt_iff_lt
-
-@[simp]
-theorem coe_coeHom : (coeHom : NonemptyInterval α → Set α) = ((↑) : NonemptyInterval α → Set α) :=
-  rfl
 
 theorem coe_def (s : NonemptyInterval α) : (s : Set α) = Set.Icc s.toProd.1 s.toProd.2 := rfl
 
@@ -232,14 +175,6 @@ instance : Max (NonemptyInterval α) :=
 
 instance : SemilatticeSup (NonemptyInterval α) :=
   toDualProd_injective.semilatticeSup _ fun _ _ => rfl
-
-@[simp]
-theorem fst_sup (s t : NonemptyInterval α) : (s ⊔ t).fst = s.fst ⊓ t.fst :=
-  rfl
-
-@[simp]
-theorem snd_sup (s t : NonemptyInterval α) : (s ⊔ t).snd = s.snd ⊔ t.snd :=
-  rfl
 
 end Lattice
 
@@ -279,12 +214,10 @@ theorem coe_inj {s t : NonemptyInterval α} : (s : Interval α) = t ↔ s = t :=
   WithBot.coe_inj
 
 protected
-
 theorem «forall» {p : Interval α → Prop} : (∀ s, p s) ↔ p ⊥ ∧ ∀ s : NonemptyInterval α, p s :=
   Option.forall
 
 protected
-
 theorem «exists» {p : Interval α → Prop} : (∃ s, p s) ↔ p ⊥ ∨ ∃ s : NonemptyInterval α, p s :=
   Option.exists
 
@@ -310,14 +243,6 @@ theorem pure_injective : Injective (pure : α → Interval α) :=
   coe_injective.comp NonemptyInterval.pure_injective
 
 @[simp]
-theorem dual_pure (a : α) : dual (pure a) = pure (toDual a) :=
-  rfl
-
-@[simp]
-theorem dual_bot : dual (⊥ : Interval α) = ⊥ :=
-  rfl
-
-@[simp]
 theorem pure_ne_bot {a : α} : pure a ≠ ⊥ :=
   WithBot.coe_ne_bot
 
@@ -331,28 +256,10 @@ instance [Nonempty α] : Nontrivial (Interval α) :=
 def map (f : α →o β) : Interval α → Interval β :=
   WithBot.map (NonemptyInterval.map f)
 
-@[simp]
-theorem map_pure (f : α →o β) (a : α) : (pure a).map f = pure (f a) :=
-  rfl
-
-@[simp]
-theorem map_map (g : β →o γ) (f : α →o β) (s : Interval α) : (s.map f).map g = s.map (g.comp f) :=
-  Option.map_map _ _ _
-
-@[simp]
-theorem dual_map (f : α →o β) (s : Interval α) : dual (s.map f) = s.dual.map f.dual := by
-  cases s
-  · rfl
-  · exact WithBot.map_comm rfl _
-
 variable [BoundedOrder α]
 
 instance boundedOrder : BoundedOrder (Interval α) :=
   WithBot.instBoundedOrder
-
-@[simp]
-theorem dual_top : dual (⊤ : Interval α) = ⊤ :=
-  rfl
 
 end Preorder
 
@@ -394,10 +301,6 @@ theorem coe_pure (a : α) : (pure a : Set α) = {a} :=
 
 @[simp, norm_cast]
 theorem coe_coe (s : NonemptyInterval α) : ((s : Interval α) : Set α) = s :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_bot : ((⊥ : Interval α) : Set α) = ∅ :=
   rfl
 
 @[simp, norm_cast]
@@ -530,21 +433,7 @@ theorem coe_pure_interval (a : α) : (pure a : Interval α) = Interval.pure a :=
 theorem coe_eq_pure : (s : Interval α) = Interval.pure a ↔ s = pure a := by
   rw [← Interval.coe_inj, coe_pure_interval]
 
-@[simp, norm_cast]
-theorem coe_top_interval [BoundedOrder α] : ((⊤ : NonemptyInterval α) : Interval α) = ⊤ :=
-  rfl
-
 end Preorder
-
-@[simp, norm_cast]
-theorem mem_coe_interval [PartialOrder α] {s : NonemptyInterval α} {x : α} :
-    x ∈ (s : Interval α) ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_sup_interval [Lattice α] (s t : NonemptyInterval α) :
-    (↑(s ⊔ t) : Interval α) = ↑s ⊔ ↑t :=
-  rfl
 
 end NonemptyInterval
 

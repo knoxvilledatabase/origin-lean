@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.MeasureTheory.Measure.Prod
 
+noncomputable section
+
 /-!
 # The multiplicative and additive convolution of measures
 

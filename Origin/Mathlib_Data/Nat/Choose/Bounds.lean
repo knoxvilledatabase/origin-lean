@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Data.Nat.Cast.Order.Basic
 import Mathlib.Data.Nat.Choose.Basic
 
+noncomputable section
+
 /-!
 # Inequalities for binomial coefficients
 

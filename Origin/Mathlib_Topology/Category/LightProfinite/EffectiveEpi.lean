@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.CompHausLike.EffectiveEpi
 import Mathlib.Topology.Category.LightProfinite.Limits
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms in `LightProfinite`

@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Basic.lean
-Genuine: 350 | Conflates: 1 | Dissolved: 0 | Infrastructure: 91
+Genuine: 351 | Conflates: 1 | Dissolved: 0 | Infrastructure: 91
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Pi.Basic
 import Mathlib.Control.Basic
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.Filter.Defs
+
+noncomputable section
 
 /-!
 # Theory of filters on sets
@@ -246,8 +248,6 @@ theorem neBot_of_le {f g : Filter α} [hf : NeBot f] (hg : f ≤ g) : NeBot g :=
 
 theorem not_disjoint_self_iff : ¬Disjoint f f ↔ f.NeBot := by rw [disjoint_self, neBot_iff]
 
-theorem bot_sets_eq : (⊥ : Filter α).sets = univ := rfl
-
 theorem eq_or_neBot (f : Filter α) : f = ⊥ ∨ NeBot f := (eq_or_ne f ⊥).imp_right NeBot.mk
 
 theorem sup_sets_eq {f g : Filter α} : (f ⊔ g).sets = f.sets ∩ g.sets :=
@@ -305,6 +305,7 @@ theorem principal_mono {s t : Set α} : 𝓟 s ≤ 𝓟 t ↔ s ⊆ t := by
   simp only [le_principal_iff, mem_principal]
 
 @[gcongr] alias ⟨_, _root_.GCongr.filter_principal_mono⟩ := principal_mono
+
 @[mono]
 theorem monotone_principal : Monotone (𝓟 : Set α → Filter α) := fun _ _ => principal_mono.2
 
@@ -544,13 +545,6 @@ theorem join_mono {f₁ f₂ : Filter (Filter α)} (h : f₁ ≤ f₂) : join f�
 
 /-! ### Eventually -/
 
-theorem eventually_iff {f : Filter α} {P : α → Prop} : (∀ᶠ x in f, P x) ↔ { x | P x } ∈ f :=
-  Iff.rfl
-
-@[simp]
-theorem eventually_mem_set {s : Set α} {l : Filter α} : (∀ᶠ x in l, x ∈ s) ↔ s ∈ l :=
-  Iff.rfl
-
 protected theorem ext' {f₁ f₂ : Filter α}
     (h : ∀ p : α → Prop, (∀ᶠ x in f₁, p x) ↔ ∀ᶠ x in f₂, p x) : f₁ = f₂ :=
   Filter.ext h
@@ -630,10 +624,6 @@ theorem eventually_imp_distrib_left {f : Filter α} {p : Prop} {q : α → Prop}
 @[simp]
 theorem eventually_bot {p : α → Prop} : ∀ᶠ x in ⊥, p x :=
   ⟨⟩
-
-@[simp]
-theorem eventually_top {p : α → Prop} : (∀ᶠ x in ⊤, p x) ↔ ∀ x, p x :=
-  Iff.rfl
 
 @[simp]
 theorem eventually_sup {p : α → Prop} {f g : Filter α} :
@@ -745,9 +735,6 @@ theorem frequently_true_iff_neBot (f : Filter α) : (∃ᶠ _ in f, True) ↔ Ne
   simp [frequently_iff_neBot]
 
 @[simp]
-theorem frequently_false (f : Filter α) : ¬∃ᶠ _ in f, False := by simp
-
-@[simp]
 theorem frequently_const {f : Filter α} [NeBot f] {p : Prop} : (∃ᶠ _ in f, p) ↔ p := by
   by_cases p <;> simp [*]
 
@@ -755,12 +742,6 @@ theorem frequently_const {f : Filter α} [NeBot f] {p : Prop} : (∃ᶠ _ in f, 
 theorem frequently_or_distrib {f : Filter α} {p q : α → Prop} :
     (∃ᶠ x in f, p x ∨ q x) ↔ (∃ᶠ x in f, p x) ∨ ∃ᶠ x in f, q x := by
   simp only [Filter.Frequently, ← not_and_or, not_or, eventually_and]
-
-theorem frequently_or_distrib_left {f : Filter α} [NeBot f] {p : Prop} {q : α → Prop} :
-    (∃ᶠ x in f, p ∨ q x) ↔ p ∨ ∃ᶠ x in f, q x := by simp
-
-theorem frequently_or_distrib_right {f : Filter α} [NeBot f] {p : α → Prop} {q : Prop} :
-    (∃ᶠ x in f, p x ∨ q) ↔ (∃ᶠ x in f, p x) ∨ q := by simp
 
 theorem frequently_imp_distrib {f : Filter α} {p q : α → Prop} :
     (∃ᶠ x in f, p x → q x) ↔ (∀ᶠ x in f, p x) → ∃ᶠ x in f, q x := by
@@ -786,9 +767,6 @@ theorem frequently_and_distrib_left {f : Filter α} {p : Prop} {q : α → Prop}
 theorem frequently_and_distrib_right {f : Filter α} {p : α → Prop} {q : Prop} :
     (∃ᶠ x in f, p x ∧ q) ↔ (∃ᶠ x in f, p x) ∧ q := by
   simp only [@and_comm _ q, frequently_and_distrib_left]
-
-@[simp]
-theorem frequently_bot {p : α → Prop} : ¬∃ᶠ x in ⊥, p x := by simp
 
 @[simp]
 theorem frequently_top {p : α → Prop} : (∃ᶠ x in ⊤, p x) ↔ ∃ x, p x := by simp [Filter.Frequently]
@@ -1156,14 +1134,7 @@ theorem eventually_map {P : β → Prop} : (∀ᶠ b in map m f, P b) ↔ ∀ᶠ
   Iff.rfl
 
 @[simp]
-theorem frequently_map {P : β → Prop} : (∃ᶠ b in map m f, P b) ↔ ∃ᶠ a in f, P (m a) :=
-  Iff.rfl
-
-@[simp]
 theorem mem_map : t ∈ map m f ↔ m ⁻¹' t ∈ f :=
-  Iff.rfl
-
-theorem mem_map' : t ∈ map m f ↔ { x | m x ∈ t } ∈ f :=
   Iff.rfl
 
 theorem image_mem_map (hs : s ∈ f) : m '' s ∈ map m f :=
@@ -1265,13 +1236,6 @@ instance : LawfulFunctor (Filter : Type u → Type u) where
   comp_map _ _ _ := map_map.symm
   map_const := rfl
 
-theorem pure_sets (a : α) : (pure a : Filter α).sets = { s | a ∈ s } :=
-  rfl
-
-@[simp]
-theorem eventually_pure {a : α} {p : α → Prop} : (∀ᶠ x in pure a, p x) ↔ p a :=
-  Iff.rfl
-
 @[simp]
 theorem principal_singleton (a : α) : 𝓟 {a} = pure a :=
   Filter.ext fun s => by simp only [mem_pure, mem_principal, singleton_subset_iff]
@@ -1289,14 +1253,6 @@ theorem pure_le_principal {s : Set α} (a : α) : pure a ≤ 𝓟 s ↔ a ∈ s 
 theorem pure_bind (a : α) (m : α → Filter β) : bind (pure a) m = m a := by
   simp only [Bind.bind, bind, map_pure, join_pure]
 
-theorem map_bind {α β} (m : β → γ) (f : Filter α) (g : α → Filter β) :
-    map m (bind f g) = bind f (map m ∘ g) :=
-  rfl
-
-theorem bind_map {α β} (m : α → β) (f : Filter α) (g : β → Filter γ) :
-    (bind (map m f) g) = bind f (g ∘ m) :=
-  rfl
-
 /-!
 ### `Filter` as a `Monad`
 
@@ -1311,31 +1267,12 @@ protected def monad : Monad Filter where map := @Filter.map
 
 attribute [local instance] Filter.monad
 
-protected theorem lawfulMonad : LawfulMonad Filter where
-  map_const := rfl
-  id_map _ := rfl
-  seqLeft_eq _ _ := rfl
-  seqRight_eq _ _ := rfl
-  pure_seq _ _ := rfl
-  bind_pure_comp _ _ := rfl
-  bind_map _ _ := rfl
-  pure_bind _ _ := rfl
-  bind_assoc _ _ _ := rfl
-
 end
 
 instance : Alternative Filter where
   seq := fun x y => x.seq (y ())
   failure := ⊥
   orElse x y := x ⊔ y ()
-
-@[simp]
-theorem map_def {α β} (m : α → β) (f : Filter α) : m <$> f = map m f :=
-  rfl
-
-@[simp]
-theorem bind_def {α β} (f : Filter α) (m : α → Filter β) : f >>= m = bind f m :=
-  rfl
 
 /-! #### `map` and `comap` equations -/
 
@@ -1525,9 +1462,6 @@ theorem neBot_of_comap (h : (comap m g).NeBot) : g.NeBot := by
   contrapose! h
   rw [h]
   exact comap_bot
-
-theorem comap_inf_principal_range : comap m (g ⊓ 𝓟 (range m)) = comap m g := by
-  simp
 
 theorem disjoint_comap (h : Disjoint g₁ g₂) : Disjoint (comap m g₁) (comap m g₂) := by
   simp only [disjoint_iff, ← comap_inf, h.eq_bot, comap_bot]
@@ -1932,10 +1866,6 @@ theorem prod_map_seq_comm (f : Filter α) (g : Filter β) :
     rw [Set.prod_image_seq_comm]
     exact seq_mem_seq (image_mem_map ht) hu
 
-theorem seq_eq_filter_seq {α β : Type u} (f : Filter (α → β)) (g : Filter α) :
-    f <*> g = seq f g :=
-  rfl
-
 instance : LawfulApplicative (Filter : Type u → Type u) where
   map_pure := map_pure
   seqLeft_eq _ _ := rfl
@@ -1952,25 +1882,6 @@ end Applicative
 /-! #### `bind` equations -/
 
 section Bind
-
-@[simp]
-theorem eventually_bind {f : Filter α} {m : α → Filter β} {p : β → Prop} :
-    (∀ᶠ y in bind f m, p y) ↔ ∀ᶠ x in f, ∀ᶠ y in m x, p y :=
-  Iff.rfl
-
-@[simp]
-theorem eventuallyEq_bind {f : Filter α} {m : α → Filter β} {g₁ g₂ : β → γ} :
-    g₁ =ᶠ[bind f m] g₂ ↔ ∀ᶠ x in f, g₁ =ᶠ[m x] g₂ :=
-  Iff.rfl
-
-@[simp]
-theorem eventuallyLE_bind [LE γ] {f : Filter α} {m : α → Filter β} {g₁ g₂ : β → γ} :
-    g₁ ≤ᶠ[bind f m] g₂ ↔ ∀ᶠ x in f, g₁ ≤ᶠ[m x] g₂ :=
-  Iff.rfl
-
-theorem mem_bind' {s : Set β} {f : Filter α} {m : α → Filter β} :
-    s ∈ bind f m ↔ { a | s ∈ m a } ∈ f :=
-  Iff.rfl
 
 @[simp]
 theorem mem_bind {s : Set β} {f : Filter α} {m : α → Filter β} :
@@ -1994,8 +1905,6 @@ theorem bind_mono {f₁ f₂ : Filter α} {g₁ g₂ : α → Filter β} (hf : f
 theorem bind_inf_principal {f : Filter α} {g : α → Filter β} {s : Set β} :
     (f.bind fun x => g x ⊓ 𝓟 s) = f.bind g ⊓ 𝓟 s :=
   Filter.ext fun s => by simp only [mem_bind, mem_inf_principal]
-
-theorem sup_bind {f g : Filter α} {h : α → Filter β} : bind (f ⊔ g) h = bind f h ⊔ bind g h := rfl
 
 theorem principal_bind {s : Set α} {f : α → Filter β} : bind (𝓟 s) f = ⨆ x ∈ s, f x :=
   show join (map f (𝓟 s)) = ⨆ x ∈ s, f x by
@@ -2044,10 +1953,6 @@ theorem Filter.filter_injOn_Iic_iff_injOn {s : Set α} {m : α → β} :
 alias ⟨_, Set.InjOn.filter_map_Iic⟩ := Filter.filter_injOn_Iic_iff_injOn
 
 namespace Filter
-
-lemma compl_mem_comk {p : Set α → Prop} {he hmono hunion s} :
-    sᶜ ∈ comk p he hmono hunion ↔ p s := by
-  simp
 
 end Filter
 

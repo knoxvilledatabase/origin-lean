@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Shift.Pullback
 import Mathlib.CategoryTheory.Triangulated.HomologicalFunctor
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # The (pre)triangulated structure on the opposite category
 

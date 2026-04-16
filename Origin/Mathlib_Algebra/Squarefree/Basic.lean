@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Squarefree/Basic.lean
-Genuine: 24 | Conflates: 1 | Dissolved: 9 | Infrastructure: 1
+Genuine: 32 | Conflates: 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Nilpotent.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.GCDMonoid
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
+
+noncomputable section
 
 /-!
 # Squarefree elements of monoids
@@ -49,7 +51,11 @@ theorem not_squarefree_zero [MonoidWithZero R] [Nontrivial R] : ¬Squarefree (0 
   erw [not_forall]
   exact ⟨0, by simp⟩
 
--- DISSOLVED: Squarefree.ne_zero
+-- CONFLATES (assumes ground = zero): Squarefree.ne_zero
+theorem Squarefree.ne_zero [MonoidWithZero R] [Nontrivial R] {m : R} (hm : Squarefree (m : R)) :
+    m ≠ 0 := by
+  rintro rfl
+  exact not_squarefree_zero hm
 
 @[simp]
 theorem Irreducible.squarefree [CommMonoid R] {x : R} (h : Irreducible x) : Squarefree x := by
@@ -118,7 +124,8 @@ section CancelCommMonoidWithZero
 
 variable [CancelCommMonoidWithZero R] [WfDvdMonoid R]
 
--- DISSOLVED: finite_prime_left
+theorem finite_prime_left {a b : R} (ha : Prime a) (hb : b ≠ 0) : multiplicity.Finite a b :=
+  finite_of_not_isUnit ha.not_unit hb
 
 end CancelCommMonoidWithZero
 
@@ -128,7 +135,12 @@ section Irreducible
 
 variable [CommMonoidWithZero R] [WfDvdMonoid R]
 
--- DISSOLVED: squarefree_iff_no_irreducibles
+theorem squarefree_iff_no_irreducibles {x : R} (hx₀ : x ≠ 0) :
+    Squarefree x ↔ ∀ p, Irreducible p → ¬ (p * p ∣ x) := by
+  refine ⟨fun h p hp hp' ↦ hp.not_unit (h p hp'), fun h d hd ↦ by_contra fun hdu ↦ ?_⟩
+  have hd₀ : d ≠ 0 := ne_zero_of_dvd_ne_zero (ne_zero_of_dvd_ne_zero hx₀ hd) (dvd_mul_left d d)
+  obtain ⟨p, irr, dvd⟩ := WfDvdMonoid.exists_irreducible_factor hdu hd₀
+  exact h p irr ((mul_dvd_mul dvd dvd).trans hd)
 
 theorem irreducible_sq_not_dvd_iff_eq_zero_and_no_irreducibles_or_squarefree (r : R) :
     (∀ x : R, Irreducible x → ¬x * x ∣ r) ↔ (r = 0 ∧ ∀ x : R, ¬Irreducible x) ∨ Squarefree r := by
@@ -141,7 +153,9 @@ theorem irreducible_sq_not_dvd_iff_eq_zero_and_no_irreducibles_or_squarefree (r 
     intro x hx t
     exact hx.not_unit (h x t)
 
--- DISSOLVED: squarefree_iff_irreducible_sq_not_dvd_of_ne_zero
+theorem squarefree_iff_irreducible_sq_not_dvd_of_ne_zero {r : R} (hr : r ≠ 0) :
+    Squarefree r ↔ ∀ x : R, Irreducible x → ¬x * x ∣ r := by
+  simpa [hr] using (irreducible_sq_not_dvd_iff_eq_zero_and_no_irreducibles_or_squarefree r).symm
 
 theorem squarefree_iff_irreducible_sq_not_dvd_of_exists_irreducible {r : R}
     (hr : ∃ x : R, Irreducible x) : Squarefree r ↔ ∀ x : R, Irreducible x → ¬x * x ∣ r := by
@@ -161,7 +175,8 @@ theorem Squarefree.isRadical {x : R} (hx : Squarefree x) : IsRadical x :=
     obtain ⟨a, b, ha, hb, rfl⟩ := exists_dvd_and_dvd_of_dvd_mul (sq y ▸ hy)
     exact (IsRelPrime.of_squarefree_mul hx).mul_dvd ha hb
 
--- DISSOLVED: Squarefree.dvd_pow_iff_dvd
+theorem Squarefree.dvd_pow_iff_dvd {x y : R} {n : ℕ} (hsq : Squarefree x) (h0 : n ≠ 0) :
+    x ∣ y ^ n ↔ x ∣ y := ⟨hsq.isRadical n y, (·.pow h0)⟩
 
 alias UniqueFactorizationMonoid.dvd_pow_iff_dvd_of_squarefree := Squarefree.dvd_pow_iff_dvd
 
@@ -169,7 +184,11 @@ end
 
 variable [CancelCommMonoidWithZero R] {x y p d : R}
 
--- DISSOLVED: IsRadical.squarefree
+theorem IsRadical.squarefree (h0 : x ≠ 0) (h : IsRadical x) : Squarefree x := by
+  rintro z ⟨w, rfl⟩
+  specialize h 2 (z * w) ⟨w, by simp_rw [pow_two, mul_left_comm, ← mul_assoc]⟩
+  rwa [← one_mul (z * w), mul_assoc, mul_dvd_mul_iff_right, ← isUnit_iff_dvd_one] at h
+  rw [mul_assoc, mul_ne_zero_iff] at h0; exact h0.2
 
 namespace Squarefree
 
@@ -220,7 +239,8 @@ theorem isRadical_iff_squarefree_or_zero : IsRadical x ↔ Squarefree x ∨ x = 
       rw [zero_isRadical_iff]
       infer_instance⟩
 
--- DISSOLVED: isRadical_iff_squarefree_of_ne_zero
+theorem isRadical_iff_squarefree_of_ne_zero (h : x ≠ 0) : IsRadical x ↔ Squarefree x :=
+  ⟨IsRadical.squarefree h, Squarefree.isRadical⟩
 
 end IsRadical
 
@@ -228,9 +248,44 @@ namespace UniqueFactorizationMonoid
 
 variable [CancelCommMonoidWithZero R] [UniqueFactorizationMonoid R]
 
--- DISSOLVED: _root_.exists_squarefree_dvd_pow_of_ne_zero
+lemma _root_.exists_squarefree_dvd_pow_of_ne_zero {x : R} (hx : x ≠ 0) :
+    ∃ (y : R) (n : ℕ), Squarefree y ∧ y ∣ x ∧ x ∣ y ^ n := by
+  induction' x using WfDvdMonoid.induction_on_irreducible with u hu z p hz hp ih
+  · contradiction
+  · exact ⟨1, 0, squarefree_one, one_dvd u, hu.dvd⟩
+  · obtain ⟨y, n, hy, hyx, hy'⟩ := ih hz
+    rcases n.eq_zero_or_pos with rfl | hn
+    · exact ⟨p, 1, hp.squarefree, dvd_mul_right p z, by simp [isUnit_of_dvd_one (pow_zero y ▸ hy')]⟩
+    by_cases hp' : p ∣ y
+    · exact ⟨y, n + 1, hy, dvd_mul_of_dvd_right hyx _,
+        mul_comm p z ▸ pow_succ y n ▸ mul_dvd_mul hy' hp'⟩
+    · suffices Squarefree (p * y) from ⟨p * y, n, this,
+        mul_dvd_mul_left p hyx, mul_pow p y n ▸ mul_dvd_mul (dvd_pow_self p hn.ne') hy'⟩
+      exact squarefree_mul_iff.mpr ⟨hp.isRelPrime_iff_not_dvd.mpr hp', hp.squarefree, hy⟩
 
--- DISSOLVED: squarefree_iff_nodup_normalizedFactors
+theorem squarefree_iff_nodup_normalizedFactors [NormalizationMonoid R] {x : R}
+    (x0 : x ≠ 0) : Squarefree x ↔ Multiset.Nodup (normalizedFactors x) := by
+  classical
+  rw [multiplicity.squarefree_iff_emultiplicity_le_one, Multiset.nodup_iff_count_le_one]
+  haveI := nontrivial_of_ne x 0 x0
+  constructor <;> intro h a
+  · by_cases hmem : a ∈ normalizedFactors x
+    · have ha := irreducible_of_normalized_factor _ hmem
+      rcases h a with (h | h)
+      · rw [← normalize_normalized_factor _ hmem]
+        rw [emultiplicity_eq_count_normalizedFactors ha x0] at h
+        assumption_mod_cast
+      · have := ha.1
+        contradiction
+    · simp [Multiset.count_eq_zero_of_not_mem hmem]
+  · rw [or_iff_not_imp_right]
+    intro hu
+    rcases eq_or_ne a 0 with rfl | h0
+    · simp [x0]
+    rcases WfDvdMonoid.exists_irreducible_factor hu h0 with ⟨b, hib, hdvd⟩
+    apply le_trans (emultiplicity_le_emultiplicity_of_dvd_left hdvd)
+    rw [emultiplicity_eq_count_normalizedFactors hib x0]
+    exact_mod_cast h (normalize b)
 
 end UniqueFactorizationMonoid
 

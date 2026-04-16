@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/CanonicalEmbedding/Basic.lean
-Genuine: 93 | Conflates: 0 | Dissolved: 3 | Infrastructure: 26
+Genuine: 95 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ZLattice.Basic
@@ -8,6 +8,8 @@ import Mathlib.Analysis.InnerProductSpace.ProdL2
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 import Mathlib.NumberTheory.NumberField.FractionalIdeal
 import Mathlib.NumberTheory.NumberField.Units.Basic
+
+noncomputable section
 
 /-!
 # Canonical embedding of a number field
@@ -360,7 +362,10 @@ theorem forall_normAtPlace_eq_zero_iff {x : mixedSpace K} :
     · exact norm_eq_zero.mp (normAtPlace_apply_isComplex w.prop _ ▸ h w.1)
   · simp_rw [h, map_zero, implies_true]
 
--- DISSOLVED: exists_normAtPlace_ne_zero_iff
+@[simp]
+theorem exists_normAtPlace_ne_zero_iff {x : mixedSpace K} :
+    (∃ w, normAtPlace w x ≠ 0) ↔ x ≠ 0 := by
+  rw [ne_eq, ← forall_normAtPlace_eq_zero_iff, not_forall]
 
 variable [NumberField K]
 
@@ -402,7 +407,10 @@ protected theorem norm_eq_zero_iff {x : mixedSpace K} :
   simp_rw [mixedEmbedding.norm, MonoidWithZeroHom.coe_mk, ZeroHom.coe_mk, prod_eq_zero_iff,
     mem_univ, true_and, pow_eq_zero_iff mult_ne_zero]
 
--- DISSOLVED: norm_ne_zero_iff
+protected theorem norm_ne_zero_iff {x : mixedSpace K} :
+    mixedEmbedding.norm x ≠ 0 ↔ ∀ w, normAtPlace w x ≠ 0 := by
+  rw [← not_iff_not]
+  simp_rw [ne_eq, mixedEmbedding.norm_eq_zero_iff, not_not, not_forall, not_not]
 
 theorem norm_eq_of_normAtPlace_eq {x y : mixedSpace K}
     (h : ∀ w, normAtPlace w x = normAtPlace w y) :
@@ -907,10 +915,6 @@ theorem negAt_signSet_apply_of_isReal (x : mixedSpace K) (w : {w // IsReal w}) :
   · rw [negAt_apply_of_isReal_and_mem _ hw, abs_of_nonpos hw]
   · rw [negAt_apply_of_isReal_and_not_mem _ hw, abs_of_pos (lt_of_not_ge hw)]
 
-@[simp]
-theorem negAt_signSet_apply_of_isComplex (x : mixedSpace K) (w : {w // IsComplex w}) :
-    (negAt (signSet x) x).2 w = x.2 w := rfl
-
 variable (A : Set (mixedSpace K)) {x : mixedSpace K}
 
 variable (s) in
@@ -948,10 +952,23 @@ theorem neg_of_mem_negA_plusPart (hx : x ∈ negAt s '' (plusPart A)) {w : {w //
 variable  (hA : ∀ x, x ∈ A ↔ (fun w ↦ |x.1 w|, x.2) ∈ A)
 
 include hA in
-
--- DISSOLVED: mem_negAt_plusPart_of_mem
+theorem mem_negAt_plusPart_of_mem (hx₁ : x ∈ A) (hx₂ : ∀ w, x.1 w ≠ 0) :
+    x ∈ negAt s '' (plusPart A) ↔ (∀ w, w ∈ s → x.1 w < 0) ∧ (∀ w, w ∉ s → x.1 w > 0) := by
+  refine ⟨fun hx ↦ ⟨fun _ hw ↦ neg_of_mem_negA_plusPart A hx hw,
+      fun _ hw ↦ pos_of_not_mem_negAt_plusPart A hx hw⟩,
+      fun ⟨h₁, h₂⟩ ↦ ⟨(fun w ↦ |x.1 w|, x.2), ⟨(hA x).mp hx₁, fun w ↦ abs_pos.mpr (hx₂ w)⟩, ?_⟩⟩
+  ext w
+  · by_cases hw : w ∈ s
+    · simp only [negAt_apply_of_isReal_and_mem _ hw, abs_of_neg (h₁ w hw), neg_neg]
+    · simp only [negAt_apply_of_isReal_and_not_mem _ hw, abs_of_pos (h₂ w hw)]
+  · rfl
 
 include hA in
+/-- Assume that `A`  is symmetric at real places then, the union of the images of `plusPart`
+
+by `negAt` and of the set of elements of `A` that are zero at at least one real place
+
+is equal to `A`. -/
 
 theorem iUnion_negAt_plusPart_union :
     (⋃ s, negAt s '' (plusPart A)) ∪ (A ∩ (⋃ w, {x | x.1 w = 0})) = A := by
@@ -974,7 +991,6 @@ open MeasureTheory
 variable [NumberField K]
 
 include hA in
-
 open Classical in
 
 theorem iUnion_negAt_plusPart_ae :
@@ -1007,7 +1023,6 @@ theorem volume_negAt_plusPart (hm : MeasurableSet A) :
     volume_preserving_negAt.measure_preimage (measurableSet_plusPart hm).nullMeasurableSet]
 
 include hA in
-
 open Classical in
 
 theorem volume_eq_two_pow_mul_volume_plusPart (hm : MeasurableSet A) :

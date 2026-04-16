@@ -1,12 +1,14 @@
 /-
 Extracted from Probability/Distributions/Uniform.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 5 | Infrastructure: 5
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Probability.Notation
 import Mathlib.Probability.Density
 import Mathlib.Probability.ConditionalProbability
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
+
+noncomputable section
 
 /-!
 # Uniform distributions and probability mass functions
@@ -60,14 +62,32 @@ def IsUniform (X : Ω → E) (s : Set E) (ℙ : Measure Ω) (μ : Measure E := b
 
 namespace IsUniform
 
--- DISSOLVED: aemeasurable
+theorem aemeasurable {X : Ω → E} {s : Set E} (hns : μ s ≠ 0) (hnt : μ s ≠ ∞)
+    (hu : IsUniform X s ℙ μ) : AEMeasurable X ℙ := by
+  dsimp [IsUniform, ProbabilityTheory.cond] at hu
+  by_contra h
+  rw [map_of_not_aemeasurable h] at hu
+  apply zero_ne_one' ℝ≥0∞
+  calc
+    0 = (0 : Measure E) Set.univ := rfl
+    _ = _ := by rw [hu, smul_apply, restrict_apply MeasurableSet.univ,
+      Set.univ_inter, smul_eq_mul, ENNReal.inv_mul_cancel hns hnt]
 
 theorem absolutelyContinuous {X : Ω → E} {s : Set E} (hu : IsUniform X s ℙ μ) : map X ℙ ≪ μ := by
   rw [hu]; exact ProbabilityTheory.cond_absolutelyContinuous
 
--- DISSOLVED: measure_preimage
+theorem measure_preimage {X : Ω → E} {s : Set E} (hns : μ s ≠ 0) (hnt : μ s ≠ ∞)
+    (hu : IsUniform X s ℙ μ) {A : Set E} (hA : MeasurableSet A) :
+    ℙ (X ⁻¹' A) = μ (s ∩ A) / μ s := by
+  rwa [← map_apply_of_aemeasurable (hu.aemeasurable hns hnt) hA, hu, ProbabilityTheory.cond_apply',
+    ENNReal.div_eq_inv_mul]
 
--- DISSOLVED: isProbabilityMeasure
+theorem isProbabilityMeasure {X : Ω → E} {s : Set E} (hns : μ s ≠ 0) (hnt : μ s ≠ ∞)
+    (hu : IsUniform X s ℙ μ) : IsProbabilityMeasure ℙ :=
+  ⟨by
+    have : X ⁻¹' Set.univ = Set.univ := Set.preimage_univ
+    rw [← this, hu.measure_preimage hns hnt MeasurableSet.univ, Set.inter_univ,
+      ENNReal.div_self hns hnt]⟩
 
 theorem toMeasurable_iff {X : Ω → E} {s : Set E} :
     IsUniform X (toMeasurable μ s) ℙ μ ↔ IsUniform X s ℙ μ := by
@@ -79,7 +99,13 @@ protected theorem toMeasurable {X : Ω → E} {s : Set E} (hu : IsUniform X s �
   unfold IsUniform at *
   rwa [ProbabilityTheory.cond_toMeasurable_eq]
 
--- DISSOLVED: hasPDF
+theorem hasPDF {X : Ω → E} {s : Set E} (hns : μ s ≠ 0) (hnt : μ s ≠ ∞)
+    (hu : IsUniform X s ℙ μ) : HasPDF X ℙ μ := by
+  let t := toMeasurable μ s
+  apply hasPDF_of_map_eq_withDensity (hu.aemeasurable hns hnt) (t.indicator ((μ t)⁻¹ • 1)) <|
+    (measurable_one.aemeasurable.const_smul (μ t)⁻¹).indicator (measurableSet_toMeasurable μ s)
+  rw [hu, withDensity_indicator (measurableSet_toMeasurable μ s), withDensity_smul _ measurable_one,
+    withDensity_one, restrict_toMeasurable hnt, measure_toMeasurable, ProbabilityTheory.cond]
 
 theorem pdf_eq_zero_of_measure_eq_zero_or_top {X : Ω → E} {s : Set E}
     (hu : IsUniform X s ℙ μ) (hμs : μ s = 0 ∨ μ s = ∞) : pdf X ℙ μ =ᵐ[μ] 0 := by
@@ -112,28 +138,6 @@ theorem pdf_toReal_ae_eq {X : Ω → E} {s : Set E} (hms : MeasurableSet s)
   Filter.EventuallyEq.fun_comp (pdf_eq hms hX) ENNReal.toReal
 
 variable {X : Ω → ℝ} {s : Set ℝ}
-
-theorem mul_pdf_integrable (hcs : IsCompact s) (huX : IsUniform X s ℙ) :
-    Integrable fun x : ℝ => x * (pdf X ℙ volume x).toReal := by
-  by_cases hnt : volume s = 0 ∨ volume s = ∞
-  · have I : Integrable (fun x ↦ x * ENNReal.toReal (0)) := by simp
-    apply I.congr
-    filter_upwards [pdf_eq_zero_of_measure_eq_zero_or_top huX hnt] with x hx
-    simp [hx]
-  simp only [not_or] at hnt
-  have : IsProbabilityMeasure ℙ := isProbabilityMeasure hnt.1 hnt.2 huX
-  constructor
-  · exact aestronglyMeasurable_id.mul
-      (measurable_pdf X ℙ).aemeasurable.ennreal_toReal.aestronglyMeasurable
-  refine hasFiniteIntegral_mul (pdf_eq hcs.measurableSet huX) ?_
-  set ind := (volume s)⁻¹ • (1 : ℝ → ℝ≥0∞)
-  have : ∀ x, ↑‖x‖₊ * s.indicator ind x = s.indicator (fun x => ‖x‖₊ * ind x) x := fun x =>
-    (s.indicator_mul_right (fun x => ↑‖x‖₊) ind).symm
-  simp only [ind, this, lintegral_indicator hcs.measurableSet, mul_one, Algebra.id.smul_eq_mul,
-    Pi.one_apply, Pi.smul_apply]
-  rw [lintegral_mul_const _ measurable_nnnorm.coe_nnreal_ennreal]
-  exact ENNReal.mul_ne_top (setLIntegral_lt_top_of_isCompact hnt.2 hcs continuous_nnnorm).ne
-    (ENNReal.inv_lt_top.2 (pos_iff_ne_zero.mpr hnt.1)).ne
 
 theorem integral_eq (huX : IsUniform X s ℙ) :
     ∫ x, X x ∂ℙ = (volume s)⁻¹.toReal * ∫ x in s, x := by
@@ -208,9 +212,6 @@ theorem support_uniformOfFinset : (uniformOfFinset s hs).support = s :=
       let ⟨a, ha⟩ := hs
       simp [mem_support_iff, Finset.ne_empty_of_mem ha])
 
-theorem mem_support_uniformOfFinset_iff (a : α) : a ∈ (uniformOfFinset s hs).support ↔ a ∈ s := by
-  simp
-
 section Measure
 
 variable (t : Set α)
@@ -257,8 +258,6 @@ theorem support_uniformOfFintype (α : Type*) [Fintype α] [Nonempty α] :
     (uniformOfFintype α).support = ⊤ :=
   Set.ext fun x => by simp [mem_support_iff]
 
-theorem mem_support_uniformOfFintype (a : α) : a ∈ (uniformOfFintype α).support := by simp
-
 section Measure
 
 variable (s : Set α)
@@ -278,7 +277,22 @@ end UniformOfFintype
 
 section OfMultiset
 
--- DISSOLVED: ofMultiset
+def ofMultiset (s : Multiset α) (hs : s ≠ 0) : PMF α :=
+  ⟨fun a => s.count a / (Multiset.card s),
+    ENNReal.summable.hasSum_iff.2
+      (calc
+        (∑' b : α, (s.count b : ℝ≥0∞) / (Multiset.card s))
+          = (Multiset.card s : ℝ≥0∞)⁻¹ * ∑' b, (s.count b : ℝ≥0∞) := by
+            simp_rw [ENNReal.div_eq_inv_mul, ENNReal.tsum_mul_left]
+        _ = (Multiset.card s : ℝ≥0∞)⁻¹ * ∑ b ∈ s.toFinset, (s.count b : ℝ≥0∞) :=
+          (congr_arg (fun x => (Multiset.card s : ℝ≥0∞)⁻¹ * x)
+            (tsum_eq_sum fun a ha =>
+              Nat.cast_eq_zero.2 <| by rwa [Multiset.count_eq_zero, ← Multiset.mem_toFinset]))
+        _ = 1 := by
+          rw [← Nat.cast_sum, Multiset.toFinset_sum_count_eq s,
+            ENNReal.inv_mul_cancel (Nat.cast_ne_zero.2 (hs ∘ Multiset.card_eq_zero.1))
+              (ENNReal.natCast_ne_top _)]
+        )⟩
 
 variable {s : Multiset α} (hs : s ≠ 0)
 
@@ -289,9 +303,6 @@ theorem ofMultiset_apply (a : α) : ofMultiset s hs a = s.count a / (Multiset.ca
 @[simp]
 theorem support_ofMultiset : (ofMultiset s hs).support = s.toFinset :=
   Set.ext (by simp [mem_support_iff, hs])
-
-theorem mem_support_ofMultiset_iff (a : α) : a ∈ (ofMultiset s hs).support ↔ a ∈ s.toFinset := by
-  simp
 
 theorem ofMultiset_apply_of_not_mem {a : α} (ha : a ∉ s) : ofMultiset s hs a = 0 := by
   simpa only [ofMultiset_apply, ENNReal.div_eq_zero_iff, Nat.cast_eq_zero, Multiset.count_eq_zero,

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
 
+noncomputable section
+
 /-!
 # Category of types with an omega complete partial order
 
@@ -49,10 +51,6 @@ instance : CoeSort ωCPO Type* :=
 
 def of (α : Type*) [OmegaCompletePartialOrder α] : ωCPO :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [OmegaCompletePartialOrder α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited ωCPO :=
   ⟨of PUnit⟩

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.RingTheory.Finiteness.Defs
 
+noncomputable section
+
 /-!
 # Finitely generated product (sub)modules
 

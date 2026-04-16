@@ -8,6 +8,8 @@ import Mathlib.Lean.Meta
 import Mathlib.Tactic.CategoryTheory.BicategoryCoherence
 import Mathlib.Tactic.CategoryTheory.MonoidalComp
 
+noncomputable section
+
 /-!
 # A `coherence` tactic for monoidal categories
 
@@ -130,9 +132,7 @@ elab "monoidal_coherence" : tactic => do monoidal_coherence (← getMainGoal)
 open Mathlib.Tactic.BicategoryCoherence
 
 elab (name := pure_coherence) "pure_coherence" : tactic => do
-
   let g ← getMainGoal
-
   monoidal_coherence g <|> bicategory_coherence g
 
 @[nolint unusedArguments]
@@ -142,27 +142,16 @@ lemma assoc_liftHom {W X Y Z : C} [LiftObj W] [LiftObj X] [LiftObj Y]
   (Category.assoc _ _ _).symm
 
 elab (name := liftable_prefixes) "liftable_prefixes" : tactic => do
-
   withOptions (fun opts => synthInstance.maxSize.set opts
-
     (max 256 (synthInstance.maxSize.get opts))) do
-
   evalTactic (← `(tactic|
-
     (simp (config := {failIfUnchanged := false}) only
-
       [monoidalComp, bicategoricalComp, Category.assoc, BicategoricalCoherence.iso,
-
       MonoidalCoherence.iso, Iso.trans, Iso.symm, Iso.refl,
-
       MonoidalCategory.whiskerRightIso, MonoidalCategory.whiskerLeftIso,
-
       Bicategory.whiskerRightIso, Bicategory.whiskerLeftIso]) <;>
-
     (apply (cancel_epi (𝟙 _)).1 <;> try infer_instance) <;>
-
     (simp (config := {failIfUnchanged := false}) only
-
       [assoc_liftHom, Mathlib.Tactic.BicategoryCoherence.assoc_liftHom₂])))
 
 lemma insert_id_lhs {C : Type*} [Category C] {X Y : C} (f g : X ⟶ Y) (w : f ≫ 𝟙 _ = g) :

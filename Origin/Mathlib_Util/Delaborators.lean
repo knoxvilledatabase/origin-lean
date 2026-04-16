@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.PrettyPrinter.Delaborator.Builtins
 
+noncomputable section
+
 /-! # Pi type notation
 
 Provides the `Π x : α, β x` notation as an alternative to Lean 4's built-in
@@ -30,9 +32,7 @@ def piNotation := leading_parser:leadPrec
 syntax "Π " binderIdent binderPred ", " term : term
 
 macro_rules
-
   | `(Π $x:ident $pred:binderPred, $p) => `(Π $x:ident, satisfies_binder_pred% $x $pred → $p)
-
   | `(Π _ $pred:binderPred, $p) => `(Π x, satisfies_binder_pred% x $pred → $p)
 
 @[macro PiNotation.piNotation] def replacePiNotation : Lean.Macro

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/DirectSum/Ring.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 3 | Infrastructure: 30
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.GradedMonoid
 import Mathlib.Algebra.DirectSum.Basic
+
+noncomputable section
 
 /-!
 # Additively-graded multiplicative structures on `⨁ i, A i`
@@ -144,8 +146,6 @@ variable [Zero ι] [GradedMonoid.GOne A] [∀ i, AddCommMonoid (A i)]
 
 instance : One (⨁ i, A i) where one := DirectSum.of A 0 GradedMonoid.GOne.one
 
-theorem one_def : 1 = DirectSum.of A 0 GradedMonoid.GOne.one := rfl
-
 end One
 
 section Mul
@@ -267,9 +267,29 @@ theorem list_prod_ofFn_of_eq_dProd (n : ℕ) (fι : Fin n → ι) (fA : ∀ a, A
     (List.ofFn fun a => of A (fι a) (fA a)).prod = of A _ ((List.finRange n).dProd fι fA) := by
   rw [List.ofFn_eq_map, ofList_dProd]
 
--- DISSOLVED: mul_eq_dfinsupp_sum
+theorem mul_eq_dfinsupp_sum [∀ (i : ι) (x : A i), Decidable (x ≠ 0)] (a a' : ⨁ i, A i) :
+    a * a'
+      = a.sum fun _ ai => a'.sum fun _ aj => DirectSum.of _ _ <| GradedMonoid.GMul.mul ai aj := by
+  change mulHom _ a a' = _
+  -- Porting note: I have no idea how the proof from ml3 worked it used to be
+  -- simpa only [mul_hom, to_add_monoid, dfinsupp.lift_add_hom_apply, dfinsupp.sum_add_hom_apply,
+  -- add_monoid_hom.dfinsupp_sum_apply, flip_apply, add_monoid_hom.dfinsupp_sum_add_hom_apply],
+  rw [mulHom, toAddMonoid, DFinsupp.liftAddHom_apply]
+  -- This used to be `rw`, but we need `erw` after https://github.com/leanprover/lean4/pull/2644
+  erw [DFinsupp.sumAddHom_apply]
+  rw [AddMonoidHom.dfinsupp_sum_apply]
+  apply congrArg _
+  funext x
+  simp_rw [flip_apply]
+  erw [DFinsupp.sumAddHom_apply]
+  simp only [gMulHom, AddMonoidHom.dfinsupp_sum_apply, flip_apply, coe_comp, AddMonoidHom.coe_mk,
+  ZeroHom.coe_mk, Function.comp_apply, AddMonoidHom.compHom_apply_apply]
 
--- DISSOLVED: mul_eq_sum_support_ghas_mul
+theorem mul_eq_sum_support_ghas_mul [∀ (i : ι) (x : A i), Decidable (x ≠ 0)] (a a' : ⨁ i, A i) :
+    a * a' =
+      ∑ ij ∈ DFinsupp.support a ×ˢ DFinsupp.support a',
+        DirectSum.of _ _ (GradedMonoid.GMul.mul (a ij.fst) (a' ij.snd)) := by
+  simp only [mul_eq_dfinsupp_sum, DFinsupp.sum, Finset.sum_product]
 
 end Semiring
 
@@ -350,7 +370,9 @@ variable [AddZeroClass ι] [∀ i, AddCommMonoid (A i)] [GNonUnitalNonAssocSemir
 theorem of_zero_smul {i} (a : A 0) (b : A i) : of _ _ (a • b) = of _ _ a * of _ _ b :=
   (of_eq_of_gradedMonoid_eq (GradedMonoid.mk_zero_smul a b)).trans (of_mul_of _ _).symm
 
--- DISSOLVED: of_zero_mul
+@[simp]
+theorem of_zero_mul (a b : A 0) : of _ 0 (a * b) = of _ 0 a * of _ 0 b :=
+  of_zero_smul A a b
 
 instance GradeZero.nonUnitalNonAssocSemiring : NonUnitalNonAssocSemiring (A 0) :=
   Function.Injective.nonUnitalNonAssocSemiring (of A 0) DFinsupp.single_injective (of A 0).map_zero

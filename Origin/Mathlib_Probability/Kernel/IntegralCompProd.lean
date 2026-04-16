@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Kernel.Composition
 import Mathlib.MeasureTheory.Integral.SetIntegral
 
+noncomputable section
+
 /-!
 # Bochner integral of a function against the composition-product of two kernels
 

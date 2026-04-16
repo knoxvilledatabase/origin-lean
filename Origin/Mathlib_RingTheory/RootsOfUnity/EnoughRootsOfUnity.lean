@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/RootsOfUnity/EnoughRootsOfUnity.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+
+noncomputable section
 
 /-!
 # Commutative monoids with enough roots of unity
@@ -43,7 +45,20 @@ instance finite_rootsOfUnity (M : Type*) [CommMonoid M] (n : ℕ) [NeZero n]
   refine ⟨k, ?_⟩
   simpa only [ZMod.natCast_val, ← hk, f, ZMod.coe_intCast] using (zpow_eq_zpow_emod' k hg').symm
 
--- DISSOLVED: natCard_rootsOfUnity
+lemma natCard_rootsOfUnity (M : Type*) [CommMonoid M] (n : ℕ) [NeZero n]
+    [HasEnoughRootsOfUnity M n] :
+    Nat.card (rootsOfUnity n M) = n := by
+  obtain ⟨ζ, h⟩ := exists_primitiveRoot M n
+  rw [← IsCyclic.exponent_eq_card]
+  refine dvd_antisymm ?_ ?_
+  · exact Monoid.exponent_dvd_of_forall_pow_eq_one fun g ↦ OneMemClass.coe_eq_one.mp g.prop
+  · nth_rewrite 1 [h.eq_orderOf]
+    rw [← (h.isUnit <| NeZero.pos n).unit_spec, orderOf_units]
+    let ζ' : rootsOfUnity n M := ⟨(h.isUnit <| NeZero.pos n).unit, ?_⟩
+    · rw [← Subgroup.orderOf_mk]
+      exact Monoid.order_dvd_exponent ζ'
+    simp only [mem_rootsOfUnity, PNat.mk_coe]
+    rw [← Units.eq_iff, Units.val_pow_eq_pow_val, IsUnit.unit_spec, h.pow_eq_one, Units.val_one]
 
 end HasEnoughRootsOfUnity
 

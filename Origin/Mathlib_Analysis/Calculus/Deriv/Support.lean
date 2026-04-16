@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 
+noncomputable section
+
 /-!
 # Support of the derivative of a function
 

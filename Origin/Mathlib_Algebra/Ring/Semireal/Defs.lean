@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Algebra.Ring.SumsOfSquares
 
+noncomputable section
+
 /-!
 # Semireal rings
 

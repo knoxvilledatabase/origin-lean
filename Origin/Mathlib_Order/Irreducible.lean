@@ -1,9 +1,11 @@
 /-
 Extracted from Order/Irreducible.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold
+
+noncomputable section
 
 /-!
 # Irreducible and prime elements in an order

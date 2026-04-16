@@ -1,10 +1,12 @@
 /-
 Extracted from Order/Filter/AtTopBot/Ring.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Order.Filter.AtTopBot.Group
+
+noncomputable section
 
 /-!
 # Convergence to ±infinity in ordered rings
@@ -27,7 +29,8 @@ theorem Tendsto.atTop_mul_atTop (hf : Tendsto f l atTop) (hg : Tendsto g l atTop
 theorem tendsto_mul_self_atTop : Tendsto (fun x : α => x * x) atTop atTop :=
   tendsto_id.atTop_mul_atTop tendsto_id
 
--- DISSOLVED: tendsto_pow_atTop
+theorem tendsto_pow_atTop {n : ℕ} (hn : n ≠ 0) : Tendsto (fun x : α => x ^ n) atTop atTop :=
+  tendsto_atTop_mono' _ ((eventually_ge_atTop 1).mono fun _x hx => le_self_pow₀ hx hn) tendsto_id
 
 end OrderedSemiring
 
@@ -74,11 +77,16 @@ theorem Tendsto.atTop_of_mul_const {c : α} (hc : 0 < c) (hf : Tendsto (fun x =>
   tendsto_atTop.2 fun b => (tendsto_atTop.1 hf (b * c)).mono
     fun _x hx => le_of_mul_le_mul_right hx hc
 
--- DISSOLVED: tendsto_pow_atTop_iff
+@[simp]
+theorem tendsto_pow_atTop_iff {n : ℕ} : Tendsto (fun x : α => x ^ n) atTop atTop ↔ n ≠ 0 :=
+  ⟨fun h hn => by simp only [hn, pow_zero, not_tendsto_const_atTop] at h, tendsto_pow_atTop⟩
 
 end LinearOrderedSemiring
 
--- DISSOLVED: not_tendsto_pow_atTop_atBot
+theorem not_tendsto_pow_atTop_atBot [LinearOrderedRing α] :
+    ∀ {n : ℕ}, ¬Tendsto (fun x : α => x ^ n) atTop atBot
+  | 0 => by simp [not_tendsto_const_atBot]
+  | n + 1 => (tendsto_pow_atTop n.succ_ne_zero).not_tendsto disjoint_atTop_atBot
 
 end Filter
 

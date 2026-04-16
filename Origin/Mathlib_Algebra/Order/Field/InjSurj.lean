@@ -7,6 +7,8 @@ import Mathlib.Algebra.Field.Basic
 import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Algebra.Order.Ring.InjSurj
 
+noncomputable section
+
 /-!
 # Pulling back linearly ordered fields along injective maps
 -/

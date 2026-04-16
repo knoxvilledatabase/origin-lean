@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Colimits
 import Mathlib.Algebra.Category.ModuleCat.Limits
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Change Of Rings
 
@@ -90,40 +92,12 @@ theorem restrictScalars.map_apply {R : Type u₁} {S : Type u₂} [Ring R] [Ring
     {M M' : ModuleCat.{v} S} (g : M ⟶ M') (x) : (restrictScalars f).map g x = g x :=
   rfl
 
-@[simp]
-theorem restrictScalars.smul_def {R : Type u₁} {S : Type u₂} [Ring R] [Ring S] (f : R →+* S)
-    {M : ModuleCat.{v} S} (r : R) (m : (restrictScalars f).obj M) : r • m = (f r • m : M) :=
-  rfl
-
-theorem restrictScalars.smul_def' {R : Type u₁} {S : Type u₂} [Ring R] [Ring S] (f : R →+* S)
-    {M : ModuleCat.{v} S} (r : R) (m : M) :
-    -- Porting note: clumsy way to coerce
-    let m' : (restrictScalars f).obj M := m
-    (r • m' : (restrictScalars f).obj M) = (f r • m : M) :=
-  rfl
-
 instance (priority := 100) sMulCommClass_mk {R : Type u₁} {S : Type u₂} [Ring R] [CommRing S]
     (f : R →+* S) (M : Type v) [I : AddCommGroup M] [Module S M] :
     haveI : SMul R M := (RestrictScalars.obj' f (ModuleCat.mk M)).isModule.toSMul
     SMulCommClass R S M :=
   @SMulCommClass.mk R S M (_) _
    fun r s m => (by simp [← mul_smul, mul_comm] : f r • s • m = s • f r • m)
-
-@[simps]
-def semilinearMapAddEquiv {R : Type u₁} {S : Type u₂} [Ring R] [Ring S] (f : R →+* S)
-    (M : ModuleCat.{v} R) (N : ModuleCat.{v} S) :
-    (M →ₛₗ[f] N) ≃+ (M ⟶ (ModuleCat.restrictScalars f).obj N) where
-  toFun g :=
-    { toFun := g
-      map_add' := by simp
-      map_smul' := by simp }
-  invFun g :=
-    { toFun := g
-      map_add' := by simp
-      map_smul' := g.map_smul }
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_add' _ _ := rfl
 
 section
 
@@ -136,14 +110,6 @@ def restrictScalarsId'App (hf : f = RingHom.id R) (M : ModuleCat R) :
       (by rfl) (fun r x ↦ by subst hf; rfl)
 
 variable (hf : f = RingHom.id R)
-
-@[simp] lemma restrictScalarsId'App_hom_apply (M : ModuleCat R) (x : M) :
-    (restrictScalarsId'App f hf M).hom x = x :=
-  rfl
-
-@[simp] lemma restrictScalarsId'App_inv_apply (M : ModuleCat R) (x : M) :
-    (restrictScalarsId'App f hf M).inv x = x :=
-  rfl
 
 @[simps! hom_app inv_app]
 def restrictScalarsId' : ModuleCat.restrictScalars.{v} f ≅ 𝟭 _ :=
@@ -177,14 +143,6 @@ def restrictScalarsComp'App (hgf : gf = g.comp f) (M : ModuleCat R₃) :
   (AddEquiv.toLinearEquiv (by rfl) (fun r x ↦ by subst hgf; rfl)).toModuleIso'
 
 variable (hgf : gf = g.comp f)
-
-@[simp] lemma restrictScalarsComp'App_hom_apply (M : ModuleCat R₃) (x : M) :
-    (restrictScalarsComp'App f g gf hgf M).hom x = x :=
-  rfl
-
-@[simp] lemma restrictScalarsComp'App_inv_apply (M : ModuleCat R₃) (x : M) :
-    (restrictScalarsComp'App f g gf hgf M).inv x = x :=
-  rfl
 
 @[simps! hom_app inv_app]
 def restrictScalarsComp' :
@@ -316,11 +274,6 @@ instance hasSMul : SMul S <| (restrictScalars f).obj ⟨S⟩ →ₗ[R] M where
         dsimp
         rw [← LinearMap.map_smul]
         erw [smul_eq_mul, smul_eq_mul, mul_assoc] }
-
-@[simp]
-theorem smul_apply' (s : S) (g : (restrictScalars f).obj ⟨S⟩ →ₗ[R] M) (s' : S) :
-    (s • g) s' = g (s' * s : S) :=
-  rfl
 
 instance mulAction : MulAction S <| (restrictScalars f).obj ⟨S⟩ →ₗ[R] M :=
   { CoextendScalars.hasSMul f _ with

@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Ker
 
+noncomputable section
+
 /-!
 
 # Iterate maps and comaps of submodules

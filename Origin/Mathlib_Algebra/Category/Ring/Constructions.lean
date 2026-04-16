@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 import Mathlib.CategoryTheory.Limits.Shapes.StrictInitial
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Constructions of (co)limits in `CommRingCat`
 

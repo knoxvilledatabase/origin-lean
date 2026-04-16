@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Sites.Canonical
 import Mathlib.CategoryTheory.Sites.Coherent.Basic
 import Mathlib.CategoryTheory.Sites.EffectiveEpimorphic
 
+noncomputable section
+
 /-!
 
 # Sheaves for the regular topology

@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/LSeries/Nonvanishing.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
+Genuine: 22 | Conflates: 2 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.Harmonic.ZetaAsymp
 import Mathlib.NumberTheory.LSeries.Dirichlet
 import Mathlib.NumberTheory.LSeries.DirichletContinuation
 import Mathlib.NumberTheory.LSeries.Positivity
+
+noncomputable section
 
 /-!
 # The L-function of a Dirichlet character does not vanish on Re(s) ≥ 1
@@ -97,7 +99,12 @@ lemma zetaMul_nonneg {χ : DirichletCharacter ℂ N} (hχ : χ ^ 2 = 1) (n : ℕ
       Finset.prod_nonneg
         fun p hp ↦ zetaMul_prime_pow_nonneg hχ (Nat.prime_of_mem_primeFactors hp) _
 
--- DISSOLVED: BadChar
+private structure BadChar (N : ℕ) [NeZero N] where
+  /-- The character we want to show cannot exist. -/
+  χ : DirichletCharacter ℂ N
+  χ_ne : χ ≠ 1
+  χ_sq : χ ^ 2 = 1
+  hχ : χ.LFunction 1 = 0
 
 variable [NeZero N]
 
@@ -158,7 +165,19 @@ private lemma F_neg_two (B : BadChar N) : B.F (-2 : ℝ) = 0 := by
 
 end BadChar
 
--- DISSOLVED: LFunction_apply_one_ne_zero_of_quadratic
+-- CONFLATES (assumes ground = zero): LFunction_apply_one_ne_zero_of_quadratic
+private theorem LFunction_apply_one_ne_zero_of_quadratic {χ : DirichletCharacter ℂ N}
+    (hχ : χ ^ 2 = 1) (χ_ne : χ ≠ 1) :
+    χ.LFunction 1 ≠ 0 := by
+  intro hL
+  -- construct a "bad character" and put together a contradiction.
+  let B : BadChar N := {χ := χ, χ_sq := hχ, hχ := hL, χ_ne := χ_ne}
+  refine B.F_neg_two.not_gt ?_
+  refine ArithmeticFunction.LSeries_positive_of_differentiable_of_eqOn (zetaMul_nonneg hχ)
+    (χ.isMultiplicative_zetaMul.map_one ▸ zero_lt_one) B.F_differentiable ?_
+    (fun _ ↦ B.F_eq_LSeries) _
+  exact LSeries.abscissaOfAbsConv_le_of_forall_lt_LSeriesSummable
+    fun _ a ↦ χ.LSeriesSummable_zetaMul a
 
 end quadratic
 
@@ -272,24 +291,86 @@ lemma LFunctionTrivChar_isBigO_near_one_horizontal :
   exact (isBigO_comp_ofReal_nhds_ne this).mono <| nhds_right'_le_nhds_ne 0
 
 omit [NeZero N] in
+private lemma one_add_I_mul_ne_one_or {y : ℝ} (hy : y ≠ 0 ∨ χ ≠ 1) :
+    1 + I * y ≠ 1 ∨ χ ≠ 1:= by
+  simpa only [ne_eq, add_right_eq_self, _root_.mul_eq_zero, I_ne_zero, ofReal_eq_zero, false_or]
+    using hy
 
--- DISSOLVED: one_add_I_mul_ne_one_or
+lemma LFunction_isBigO_horizontal {y : ℝ} (hy : y ≠ 0 ∨ χ ≠ 1) :
+    (fun x : ℝ ↦ LFunction χ (1 + x + I * y)) =O[𝓝[>] 0] fun _ ↦ (1 : ℂ) := by
+  refine IsBigO.mono ?_ nhdsWithin_le_nhds
+  simp_rw [add_comm (1 : ℂ), add_assoc]
+  have := (χ.differentiableAt_LFunction _ <| one_add_I_mul_ne_one_or χ hy).continuousAt
+  rw [← zero_add (1 + _)] at this
+  exact this.comp (f := fun x : ℝ ↦ x + (1 + I * y)) (x := 0) (by fun_prop) |>.tendsto.isBigO_one ℂ
 
--- DISSOLVED: LFunction_isBigO_horizontal
+private lemma LFunction_isBigO_horizontal_of_eq_zero {y : ℝ} (hy : y ≠ 0 ∨ χ ≠ 1)
+    (h : LFunction χ (1 + I * y) = 0) :
+    (fun x : ℝ ↦ LFunction χ (1 + x + I * y)) =O[𝓝[>] 0] fun x : ℝ ↦ (x : ℂ) := by
+  simp_rw [add_comm (1 : ℂ), add_assoc]
+  have := (χ.differentiableAt_LFunction _ <| one_add_I_mul_ne_one_or χ hy).hasDerivAt
+  rw [← zero_add (1 + _)] at this
+  simpa only [zero_add, h, sub_zero]
+    using (Complex.isBigO_comp_ofReal_nhds
+      (this.comp_add_const 0 _).differentiableAt.isBigO_sub) |>.mono nhdsWithin_le_nhds
 
--- DISSOLVED: LFunction_isBigO_horizontal_of_eq_zero
+private lemma LFunction_ne_zero_of_not_quadratic_or_ne_one {t : ℝ} (h : χ ^ 2 ≠ 1 ∨ t ≠ 0) :
+    LFunction χ (1 + I * t) ≠ 0 := by
+  intro Hz
+  have hz₁ : t ≠ 0 ∨ χ ≠ 1 := by
+    refine h.symm.imp_right (fun h H ↦ ?_)
+    simp only [H, one_pow, ne_eq, not_true_eq_false] at h
+  have hz₂ : 2 * t ≠ 0 ∨ χ ^ 2 ≠ 1 :=
+    h.symm.imp_left <| mul_ne_zero two_ne_zero
+  have help (x : ℝ) : ((1 / x) ^ 3 * x ^ 4 * 1 : ℂ) = x := by
+    rcases eq_or_ne x 0 with rfl | h
+    · rw [ofReal_zero, zero_pow (by omega), mul_zero, mul_one]
+    · rw [one_div, inv_pow, pow_succ _ 3, ← mul_assoc,
+        inv_mul_cancel₀ <| pow_ne_zero 3 (ofReal_ne_zero.mpr h), one_mul, mul_one]
+  -- put together the various `IsBigO` statements and `norm_LFunction_product_ge_one`
+  -- to derive a contradiction
+  have H₀ : (fun _ : ℝ ↦ (1 : ℝ)) =O[𝓝[>] 0]
+      fun x ↦ LFunctionTrivChar N (1 + x) ^ 3 * LFunction χ (1 + x + I * t) ^ 4 *
+                   LFunction (χ ^ 2) (1 + x + 2 * I * t) :=
+    IsBigO.of_bound' <| eventually_nhdsWithin_of_forall
+      fun _ hx ↦ (norm_one (α := ℝ)).symm ▸ (χ.norm_LFunction_product_ge_one hx t).le
+  have H := (LFunctionTrivChar_isBigO_near_one_horizontal (N := N)).pow 3 |>.mul <|
+    (χ.LFunction_isBigO_horizontal_of_eq_zero hz₁ Hz).pow 4 |>.mul <|
+    LFunction_isBigO_horizontal _ hz₂
+  simp only [ofReal_mul, ofReal_ofNat, mul_left_comm I, ← mul_assoc, help] at H
+  -- go via absolute value to translate into a statement over `ℝ`
+  replace H := (H₀.trans H).norm_right
+  simp only [norm_eq_abs, abs_ofReal] at H
+  exact isLittleO_irrefl (.of_forall (fun _ ↦ one_ne_zero)) <| H.of_norm_right.trans_isLittleO
+    <| isLittleO_id_one.mono nhdsWithin_le_nhds
 
--- DISSOLVED: LFunction_ne_zero_of_not_quadratic_or_ne_one
+theorem LFunction_ne_zero_of_re_eq_one {s : ℂ} (hs : s.re = 1) (hχs : χ ≠ 1 ∨ s ≠ 1) :
+    LFunction χ s ≠ 0 := by
+  by_cases h : χ ^ 2 = 1 ∧ s = 1
+  · exact h.2 ▸ LFunction_apply_one_ne_zero_of_quadratic h.1 <| hχs.neg_resolve_right h.2
+  · have hs' : s = 1 + I * s.im := by
+      conv_lhs => rw [← re_add_im s, hs, ofReal_one, mul_comm]
+    rw [not_and_or, ← ne_eq, ← ne_eq, hs', add_right_ne_self] at h
+    replace h : χ ^ 2 ≠ 1 ∨ s.im ≠ 0 :=
+      h.imp_right (fun H ↦ by exact_mod_cast right_ne_zero_of_mul H)
+    exact hs'.symm ▸ χ.LFunction_ne_zero_of_not_quadratic_or_ne_one h
 
--- DISSOLVED: LFunction_ne_zero_of_re_eq_one
-
--- DISSOLVED: LFunction_ne_zero_of_one_le_re
+theorem LFunction_ne_zero_of_one_le_re ⦃s : ℂ⦄ (hχs : χ ≠ 1 ∨ s ≠ 1) (hs : 1 ≤ s.re) :
+    LFunction χ s ≠ 0 :=
+  hs.eq_or_lt.casesOn (fun hs ↦ LFunction_ne_zero_of_re_eq_one χ hs.symm hχs)
+    fun hs ↦ LFunction_eq_LSeries χ hs ▸ LSeries_ne_zero_of_one_lt_re χ hs
 
 variable {χ} in
 
--- DISSOLVED: LFunction_apply_one_ne_zero
+-- CONFLATES (assumes ground = zero): LFunction_apply_one_ne_zero
+theorem LFunction_apply_one_ne_zero (hχ : χ ≠ 1) : LFunction χ 1 ≠ 0 :=
+  LFunction_ne_zero_of_one_le_re χ (.inl hχ) <| one_re ▸ le_rfl
 
--- DISSOLVED: _root_.riemannZeta_ne_zero_of_one_le_re
+lemma _root_.riemannZeta_ne_zero_of_one_le_re ⦃s : ℂ⦄ (hs : 1 ≤ s.re) :
+    riemannZeta s ≠ 0 := by
+  rcases eq_or_ne s 1 with rfl | hs₀
+  · exact riemannZeta_one_ne_zero
+  · exact LFunction_modOne_eq (χ := 1) ▸ LFunction_ne_zero_of_one_le_re _ (.inr hs₀) hs
 
 end nonvanishing
 

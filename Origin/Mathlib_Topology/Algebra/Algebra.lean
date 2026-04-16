@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.RingTheory.Adjoin.Basic
 
+noncomputable section
+
 /-!
 # Topological (sub)algebras
 
@@ -64,12 +66,6 @@ def algebraMapCLM : R →L[R] A :=
     toFun := algebraMap R A
     cont := continuous_algebraMap R A }
 
-theorem algebraMapCLM_coe : ⇑(algebraMapCLM R A) = algebraMap R A :=
-  rfl
-
-theorem algebraMapCLM_toLinearMap : (algebraMapCLM R A).toLinearMap = Algebra.linearMap R A :=
-  rfl
-
 end
 
 theorem DiscreteTopology.instContinuousSMul [TopologicalSemiring A] [DiscreteTopology R] :
@@ -116,18 +112,9 @@ instance : AlgHomClass (A →A[R] B) R A B where
   map_zero f       := map_zero f.toAlgHom
   commutes f r     := f.toAlgHom.commutes r
 
-@[simp]
-theorem toAlgHom_eq_coe (f : A →A[R] B) : f.toAlgHom = f := rfl
-
 @[simp, norm_cast]
 theorem coe_inj {f g : A →A[R] B} : (f : A →ₐ[R] B) = g ↔ f = g :=   by
   cases f; cases g; simp only [mk.injEq]; exact Eq.congr_right rfl
-
-@[simp]
-theorem coe_mk (f : A →ₐ[R] B) (h) : (mk f h : A →ₐ[R] B) = f := rfl
-
-@[simp]
-theorem coe_mk' (f : A →ₐ[R] B) (h) : (mk f h : A → B) = f := rfl
 
 @[simp, norm_cast]
 theorem coe_coe (f : A →A[R] B) : ⇑(f : A →ₐ[R] B) = f := rfl
@@ -212,11 +199,6 @@ theorem _root_.Subalgebra.topologicalClosure_map
     s.topologicalClosure.map f ≤ (s.map f.toAlgHom).topologicalClosure :=
   image_closure_subset_closure_image f.continuous
 
-@[simp]
-theorem _root_.Subalgebra.topologicalClosure_coe
-    (s : Subalgebra R A) :
-  (s.topologicalClosure : Set A) = closure ↑s := rfl
-
 theorem _root_.DenseRange.topologicalClosure_map_subalgebra
     [TopologicalSemiring B] {f : A →A[R] B} (hf' : DenseRange f) {s : Subalgebra R A}
     (hs : s.topologicalClosure = ⊤) : (s.map (f : A →ₐ[R] B)).topologicalClosure = ⊤ := by
@@ -237,23 +219,13 @@ protected def id : A →A[R] A := ⟨AlgHom.id R A, continuous_id⟩
 
 instance : One (A →A[R] A) := ⟨ContinuousAlgHom.id R A⟩
 
-theorem one_def : (1 : A →A[R] A) = ContinuousAlgHom.id R A := rfl
-
-theorem id_apply (x : A) : ContinuousAlgHom.id R A x = x := rfl
-
 @[simp, norm_cast]
 theorem coe_id : ((ContinuousAlgHom.id R A) : A →ₐ[R] A) = AlgHom.id R A:= rfl
-
-@[simp, norm_cast]
-theorem coe_id' : ⇑(ContinuousAlgHom.id R A ) = _root_.id := rfl
 
 @[simp, norm_cast]
 theorem coe_eq_id {f : A →A[R] A} :
     (f : A →ₐ[R] A) = AlgHom.id R A ↔ f = ContinuousAlgHom.id R A:= by
   rw [← coe_id, coe_inj]
-
-@[simp]
-theorem one_apply (x : A) : (1 : A →A[R] A) x = x := rfl
 
 end id
 
@@ -269,15 +241,6 @@ variable {B : Type*} [Semiring B] [TopologicalSpace B] [Algebra R A] [Algebra R 
 def comp (g : B →A[R] C) (f : A →A[R] B) : A →A[R] C :=
   ⟨(g : B →ₐ[R] C).comp (f : A →ₐ[R] B), g.2.comp f.2⟩
 
-@[simp, norm_cast]
-theorem coe_comp (h : B →A[R] C) (f : A →A[R] B) :
-    (h.comp f : A →ₐ[R] C) = (h : B →ₐ[R] C).comp (f : A →ₐ[R] B) := rfl
-
-@[simp, norm_cast]
-theorem coe_comp' (h : B →A[R] C) (f : A →A[R] B) : ⇑(h.comp f) = h ∘ f := rfl
-
-theorem comp_apply (g : B →A[R] C) (f : A →A[R] B) (x : A) : (g.comp f) x = g (f x) := rfl
-
 @[simp]
 theorem comp_id (f : A →A[R] B) : f.comp (ContinuousAlgHom.id R A) = f :=
   ext fun _x => rfl
@@ -286,18 +249,7 @@ theorem comp_id (f : A →A[R] B) : f.comp (ContinuousAlgHom.id R A) = f :=
 theorem id_comp (f : A →A[R] B) : (ContinuousAlgHom.id R B).comp f = f :=
   ext fun _x => rfl
 
-theorem comp_assoc {D : Type*} [Semiring D] [Algebra R D] [TopologicalSpace D] (h : C →A[R] D)
-    (g : B →A[R] C) (f : A →A[R] B) : (h.comp g).comp f = h.comp (g.comp f) :=
-  rfl
-
 instance : Mul (A →A[R] A) := ⟨comp⟩
-
-theorem mul_def (f g : A →A[R] A) : f * g = f.comp g := rfl
-
-@[simp]
-theorem coe_mul (f g : A →A[R] A) : ⇑(f * g) = f ∘ g := rfl
-
-theorem mul_apply (f g : A →A[R] A) (x : A) : (f * g) x = f (g x) := rfl
 
 instance : Monoid (A →A[R] A) where
   mul_one _ := ext fun _ => rfl
@@ -306,12 +258,6 @@ instance : Monoid (A →A[R] A) where
 
 theorem coe_pow (f : A →A[R] A) (n : ℕ) : ⇑(f ^ n) = f^[n] :=
   hom_coe_pow _ rfl (fun _ _ ↦ rfl) _ _
-
-@[simps]
-def toAlgHomMonoidHom : (A →A[R] A) →* A →ₐ[R] A where
-  toFun        := (↑)
-  map_one'     := rfl
-  map_mul' _ _ := rfl
 
 end comp
 
@@ -327,16 +273,6 @@ variable {B : Type*} [Semiring B] [TopologicalSpace B] [Algebra R A] [Algebra R 
 protected def prod (f₁ : A →A[R] B) (f₂ : A →A[R] C) :
     A →A[R] B × C :=
   ⟨(f₁ : A →ₐ[R] B).prod f₂, f₁.2.prod_mk f₂.2⟩
-
-@[simp, norm_cast]
-theorem coe_prod (f₁ : A →A[R] B) (f₂ : A →A[R] C) :
-    (f₁.prod f₂ : A →ₐ[R] B × C) = AlgHom.prod f₁ f₂ :=
-  rfl
-
-@[simp, norm_cast]
-theorem prod_apply (f₁ : A →A[R] B) (f₂ : A →A[R] C) (x : A) :
-    f₁.prod f₂ x = (f₁ x, f₂ x) :=
-  rfl
 
 variable {F : Type*}
 
@@ -358,22 +294,6 @@ def snd : A × B →A[R] B where
 
 variable {R A B}
 
-@[simp, norm_cast]
-theorem coe_fst : ↑(fst R A B) = AlgHom.fst R A B :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_fst' : ⇑(fst R A B) = Prod.fst :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_snd : ↑(snd R A B) = AlgHom.snd R A B :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_snd' : ⇑(snd R A B) = Prod.snd :=
-  rfl
-
 @[simp]
 theorem fst_prod_snd  : (fst R A B).prod (snd R A B) = ContinuousAlgHom.id R (A × B) :=
   ext fun ⟨_x, _y⟩ => rfl
@@ -391,17 +311,6 @@ theorem snd_comp_prod (f : A →A[R] B) (g : A →A[R] C) :
 def prodMap {D : Type*} [Semiring D] [TopologicalSpace D] [Algebra R D] (f₁ : A →A[R] B)
     (f₂ : C →A[R] D) : A × C →A[R] B × D :=
   (f₁.comp (fst R A C)).prod (f₂.comp (snd R A C))
-
-@[simp, norm_cast]
-theorem coe_prodMap {D : Type*} [Semiring D] [TopologicalSpace D] [Algebra R D] (f₁ : A →A[R] B)
-    (f₂ : C →A[R] D) :
-    (f₁.prodMap f₂ : A × C →ₐ[R] B × D) = (f₁ : A →ₐ[R] B).prodMap (f₂ : C →ₐ[R] D) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_prodMap' {D : Type*} [Semiring D] [TopologicalSpace D] [Algebra R D] (f₁ : A →A[R] B)
-    (f₂ : C →A[R] D) : ⇑(f₁.prodMap f₂) = Prod.map f₁ f₂ :=
-  rfl
 
 @[simps apply]
 def prodEquiv : (A →A[R] B) × (A →A[R] C) ≃ (A →A[R] B × C) where
@@ -424,42 +333,13 @@ def codRestrict (f : A →A[R] B) (p : Subalgebra R B) (h : ∀ x, f x ∈ p) : 
   cont     := f.continuous.subtype_mk _
   toAlgHom := (f : A →ₐ[R] B).codRestrict p h
 
-@[norm_cast]
-theorem coe_codRestrict (f : A →A[R] B) (p : Subalgebra R B) (h : ∀ x, f x ∈ p) :
-    (f.codRestrict p h : A →ₐ[R] p) = (f : A →ₐ[R] B).codRestrict p h :=
-  rfl
-
-@[simp]
-theorem coe_codRestrict_apply (f : A →A[R] B) (p : Subalgebra R B) (h : ∀ x, f x ∈ p) (x) :
-    (f.codRestrict p h x : B) = f x :=
-  rfl
-
 @[reducible]
 def rangeRestrict (f : A →A[R] B) :=
   f.codRestrict (@AlgHom.range R A B  _ _ _ _ _ f) (@AlgHom.mem_range_self R A B  _ _ _ _ _ f)
 
-@[simp]
-theorem coe_rangeRestrict (f : A →A[R] B) :
-    (f.rangeRestrict : A →ₐ[R] (@AlgHom.range R A B  _ _ _ _ _ f)) =
-      (f : A →ₐ[R] B).rangeRestrict :=
-  rfl
-
 def _root_.Subalgebra.valA (p : Subalgebra R A) : p →A[R] A where
   cont := continuous_subtype_val
   toAlgHom := p.val
-
-@[simp, norm_cast]
-theorem _root_.Subalgebra.coe_valA (p : Subalgebra R A) :
-    (p.valA : p →ₐ[R] A) = p.subtype :=
-  rfl
-
-@[simp]
-theorem _root_.Subalgebra.coe_valA' (p : Subalgebra R A) : ⇑p.valA = p.subtype :=
-  rfl
-
-@[simp]
-theorem _root_.Subalgebra.valA_apply (p : Subalgebra R A) (x : p) : p.valA x = x :=
-  rfl
 
 @[simp]
 theorem _root_.Submodule.range_valA (p : Subalgebra R A) :
@@ -489,15 +369,6 @@ def restrictScalars (f : B →A[S] C) : B →A[R] C :=
   ⟨(f : B →ₐ[S] C).restrictScalars R, f.continuous⟩
 
 variable {R}
-
-@[simp]
-theorem coe_restrictScalars (f : B →A[S] C) :
-    (f.restrictScalars R : B →ₐ[R] C) = (f : B →ₐ[S] C).restrictScalars R :=
-  rfl
-
-@[simp]
-theorem coe_restrictScalars' (f : B →A[S] C) : ⇑(f.restrictScalars R) = f :=
-  rfl
 
 end RestrictScalars
 
@@ -579,11 +450,6 @@ instance {A : Type*} [UniformSpace A] [CompleteSpace A] [Semiring A]
     [TopologicalSemiring A] [Algebra R A] (x : A) :
     CompleteSpace (elemental R x) :=
   isClosed_closure.completeSpace_coe
-
-theorem isClosedEmbedding_coe (x : A) : IsClosedEmbedding ((↑) : elemental R x → A) where
-  eq_induced := rfl
-  injective := Subtype.coe_injective
-  isClosed_range := by simpa using isClosed R x
 
 end Algebra.elemental
 

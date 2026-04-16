@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.Currying
 import Mathlib.CategoryTheory.Localization.Predicate
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 
+noncomputable section
+
 /-!
 # Localization of product categories
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Real/Hyperreal.lean
-Genuine: 146 | Conflates: 0 | Dissolved: 12 | Infrastructure: 15
+Genuine: 157 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Order.Filter.FilterProduct
 import Mathlib.Analysis.SpecificLimits.Basic
+
+noncomputable section
 
 /-!
 # Construction of the hyperreal numbers as an ultraproduct of real sequences.
@@ -18,6 +20,8 @@ def Hyperreal : Type :=
   Germ (hyperfilter ℕ : Filter ℕ) ℝ deriving Inhabited
 
 namespace Hyperreal
+
+@[inherit_doc] notation "ℝ*" => Hyperreal
 
 noncomputable instance : LinearOrderedField ℝ* :=
   inferInstanceAs (LinearOrderedField (Germ _ _))
@@ -41,20 +45,16 @@ theorem coe_eq_zero {x : ℝ} : (x : ℝ*) = 0 ↔ x = 0 :=
 theorem coe_eq_one {x : ℝ} : (x : ℝ*) = 1 ↔ x = 1 :=
   coe_eq_coe
 
--- DISSOLVED: coe_ne_zero
+@[norm_cast]
+theorem coe_ne_zero {x : ℝ} : (x : ℝ*) ≠ 0 ↔ x ≠ 0 :=
+  coe_ne_coe
 
--- DISSOLVED: coe_ne_one
-
-@[simp, norm_cast]
-theorem coe_one : ↑(1 : ℝ) = (1 : ℝ*) :=
-  rfl
+@[norm_cast]
+theorem coe_ne_one {x : ℝ} : (x : ℝ*) ≠ 1 ↔ x ≠ 1 :=
+  coe_ne_coe
 
 @[simp, norm_cast]
 theorem coe_zero : ↑(0 : ℝ) = (0 : ℝ*) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inv (x : ℝ) : ↑x⁻¹ = (x⁻¹ : ℝ*) :=
   rfl
 
 @[simp, norm_cast]
@@ -62,24 +62,7 @@ theorem coe_neg (x : ℝ) : ↑(-x) = (-x : ℝ*) :=
   rfl
 
 @[simp, norm_cast]
-theorem coe_add (x y : ℝ) : ↑(x + y) = (x + y : ℝ*) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_ofNat (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n : ℝ)) : ℝ*) = OfNat.ofNat n :=
-  rfl
-
-@[simp, norm_cast]
 theorem coe_mul (x y : ℝ) : ↑(x * y) = (x * y : ℝ*) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_div (x y : ℝ) : ↑(x / y) = (x / y : ℝ*) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_sub (x y : ℝ) : ↑(x - y) = (x - y : ℝ*) :=
   rfl
 
 @[simp, norm_cast]
@@ -122,9 +105,9 @@ noncomputable def epsilon : ℝ* :=
 
 noncomputable def omega : ℝ* := ofSeq Nat.cast
 
-@[simp]
-theorem inv_omega : ω⁻¹ = ε :=
-  rfl
+@[inherit_doc] scoped notation "ε" => Hyperreal.epsilon
+
+@[inherit_doc] scoped notation "ω" => Hyperreal.omega
 
 @[simp]
 theorem inv_epsilon : ε⁻¹ = ω :=
@@ -137,9 +120,11 @@ theorem omega_pos : 0 < ω :=
 theorem epsilon_pos : 0 < ε :=
   inv_pos_of_pos omega_pos
 
--- DISSOLVED: epsilon_ne_zero
+theorem epsilon_ne_zero : ε ≠ 0 :=
+  epsilon_pos.ne'
 
--- DISSOLVED: omega_ne_zero
+theorem omega_ne_zero : ω ≠ 0 :=
+  omega_pos.ne'
 
 theorem epsilon_mul_omega : ε * ω = 1 :=
   @inv_mul_cancel₀ _ _ ω omega_ne_zero
@@ -269,7 +254,8 @@ theorem isSt_st_of_exists_st {x : ℝ*} (hx : ∃ r : ℝ, IsSt x r) : IsSt x (s
 theorem isSt_st' {x : ℝ*} (hx : ¬Infinite x) : IsSt x (st x) :=
   (isSt_sSup hx).isSt_st
 
--- DISSOLVED: isSt_st
+theorem isSt_st {x : ℝ*} (hx : st x ≠ 0) : IsSt x (st x) :=
+  isSt_st' <| mt Infinite.st_eq hx
 
 theorem isSt_refl_real (r : ℝ) : IsSt r r := isSt_ofSeq_iff_tendsto.2 tendsto_const_nhds
 
@@ -327,15 +313,12 @@ theorem lt_of_st_lt {x y : ℝ*} (hix : ¬Infinite x) (hiy : ¬Infinite y) : st 
 ### Basic lemmas about infinite
 -/
 
-theorem infinitePos_def {x : ℝ*} : InfinitePos x ↔ ∀ r : ℝ, ↑r < x := Iff.rfl
-
-theorem infiniteNeg_def {x : ℝ*} : InfiniteNeg x ↔ ∀ r : ℝ, x < r := Iff.rfl
-
 theorem InfinitePos.pos {x : ℝ*} (hip : InfinitePos x) : 0 < x := hip 0
 
 theorem InfiniteNeg.lt_zero {x : ℝ*} : InfiniteNeg x → x < 0 := fun hin => hin 0
 
--- DISSOLVED: Infinite.ne_zero
+theorem Infinite.ne_zero {x : ℝ*} (hI : Infinite x) : x ≠ 0 :=
+  hI.elim (fun hip => hip.pos.ne') fun hin => hin.lt_zero.ne
 
 theorem not_infinite_zero : ¬Infinite 0 := fun hI => hI.ne_zero rfl
 
@@ -518,7 +501,9 @@ theorem lt_neg_of_pos_of_infinitesimal {x : ℝ*} : Infinitesimal x → ∀ r : 
 theorem gt_of_neg_of_infinitesimal {x : ℝ*} (hi : Infinitesimal x) (r : ℝ) (hr : r < 0) : ↑r < x :=
   neg_neg r ▸ (infinitesimal_def.1 hi (-r) (neg_pos.2 hr)).1
 
--- DISSOLVED: abs_lt_real_iff_infinitesimal
+theorem abs_lt_real_iff_infinitesimal {x : ℝ*} : Infinitesimal x ↔ ∀ r : ℝ, r ≠ 0 → |x| < |↑r| :=
+  ⟨fun hi r hr ↦ abs_lt.mpr (coe_abs r ▸ infinitesimal_def.mp hi |r| (abs_pos.2 hr)), fun hR ↦
+    infinitesimal_def.mpr fun r hr => abs_lt.mp <| (abs_of_pos <| coe_pos.2 hr) ▸ hR r <| hr.ne'⟩
 
 theorem infinitesimal_zero : Infinitesimal 0 := isSt_refl_real 0
 
@@ -546,7 +531,9 @@ theorem infinitesimal_of_tendsto_zero {f : ℕ → ℝ} (h : Tendsto f atTop (�
 theorem infinitesimal_epsilon : Infinitesimal ε :=
   infinitesimal_of_tendsto_zero tendsto_inverse_atTop_nhds_zero_nat
 
--- DISSOLVED: not_real_of_infinitesimal_ne_zero
+theorem not_real_of_infinitesimal_ne_zero (x : ℝ*) : Infinitesimal x → x ≠ 0 → ∀ r : ℝ, x ≠ r :=
+  fun hi hx r hr =>
+  hx <| hr.trans <| coe_eq_zero.2 <| IsSt.unique (hr.symm ▸ isSt_refl_real r : IsSt x r) hi
 
 theorem IsSt.infinitesimal_sub {x : ℝ*} {r : ℝ} (hxr : IsSt x r) : Infinitesimal (x - ↑r) := by
   simpa only [sub_self] using hxr.sub (isSt_refl_real r)
@@ -575,9 +562,14 @@ theorem infinitesimal_inv_of_infinite {x : ℝ*} : Infinite x → Infinitesimal 
   Or.casesOn hi (fun hip => (infinitePos_iff_infinitesimal_inv_pos.mp hip).1) fun hin =>
     (infiniteNeg_iff_infinitesimal_inv_neg.mp hin).1
 
--- DISSOLVED: infinite_of_infinitesimal_inv
+theorem infinite_of_infinitesimal_inv {x : ℝ*} (h0 : x ≠ 0) (hi : Infinitesimal x⁻¹) :
+    Infinite x := by
+  cases' lt_or_gt_of_ne h0 with hn hp
+  · exact Or.inr (infiniteNeg_iff_infinitesimal_inv_neg.mpr ⟨hi, inv_lt_zero.mpr hn⟩)
+  · exact Or.inl (infinitePos_iff_infinitesimal_inv_pos.mpr ⟨hi, inv_pos.mpr hp⟩)
 
--- DISSOLVED: infinite_iff_infinitesimal_inv
+theorem infinite_iff_infinitesimal_inv {x : ℝ*} (h0 : x ≠ 0) : Infinite x ↔ Infinitesimal x⁻¹ :=
+  ⟨infinitesimal_inv_of_infinite, infinite_of_infinitesimal_inv h0⟩
 
 theorem infinitesimal_pos_iff_infinitePos_inv {x : ℝ*} :
     InfinitePos x⁻¹ ↔ Infinitesimal x ∧ 0 < x :=
@@ -587,7 +579,8 @@ theorem infinitesimal_neg_iff_infiniteNeg_inv {x : ℝ*} :
     InfiniteNeg x⁻¹ ↔ Infinitesimal x ∧ x < 0 :=
   infiniteNeg_iff_infinitesimal_inv_neg.trans <| by rw [inv_inv]
 
--- DISSOLVED: infinitesimal_iff_infinite_inv
+theorem infinitesimal_iff_infinite_inv {x : ℝ*} (h : x ≠ 0) : Infinitesimal x ↔ Infinite x⁻¹ :=
+  Iff.trans (by rw [inv_inv]) (infinite_iff_infinitesimal_inv (inv_ne_zero h)).symm
 
 /-!
 ### `Hyperreal.st` stuff that requires infinitesimal machinery
@@ -690,9 +683,3 @@ theorem Infinite.mul {x y : ℝ*} : Infinite x → Infinite y → Infinite (x * 
   infinite_mul_of_infinite_not_infinitesimal hx hy.not_infinitesimal
 
 end Hyperreal
-
--- DISSOLVED: positivity_coe_real_hyperreal
-
-end Tactic
-
--/

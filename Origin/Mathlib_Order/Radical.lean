@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.CompleteLattice
 import Mathlib.Order.Atoms
 
+noncomputable section
+
 /-!
 # The radical of a lattice
 

@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Probability.Kernel.Composition
 
+noncomputable section
+
 /-!
 # Invariance of measures along a kernel
 

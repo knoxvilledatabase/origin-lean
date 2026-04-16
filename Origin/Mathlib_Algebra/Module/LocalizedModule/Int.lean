@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Basic
 import Mathlib.Algebra.Module.Submodule.Pointwise
 
+noncomputable section
+
 /-!
 
 # Integer elements of a localized module

@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/LSeries/DirichletContinuation.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
+Genuine: 29 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.ZMod
 import Mathlib.NumberTheory.DirichletCharacter.Basic
 import Mathlib.NumberTheory.EulerProduct.DirichletLSeries
+
+noncomputable section
 
 /-!
 # Analytic continuation of Dirichlet L-functions
@@ -91,15 +93,47 @@ lemma Even.LFunction_neg_two_mul_nat_add_one {χ : DirichletCharacter ℂ N} (h�
 ### Results on changing levels
 -/
 
--- DISSOLVED: LFunction_changeLevel_aux
+private lemma LFunction_changeLevel_aux {M N : ℕ} [NeZero M] [NeZero N] (hMN : M ∣ N)
+    (χ : DirichletCharacter ℂ M) {s : ℂ} (hs : s ≠ 1) :
+    LFunction (changeLevel hMN χ) s =
+      LFunction χ s * ∏ p ∈ N.primeFactors, (1 - χ p * p ^ (-s)) := by
+  have hpc : IsPreconnected ({1}ᶜ : Set ℂ) :=
+    (isConnected_compl_singleton_of_one_lt_rank (rank_real_complex ▸ Nat.one_lt_ofNat) _)
+      |>.isPreconnected
+  have hne : 2 ∈ ({1}ᶜ : Set ℂ) := by norm_num
+  refine AnalyticOnNhd.eqOn_of_preconnected_of_eventuallyEq (𝕜 := ℂ)
+    (g := fun s ↦ LFunction χ s * ∏ p ∈ N.primeFactors, (1 - χ p * p ^ (-s))) ?_ ?_ hpc hne ?_ hs
+  · refine DifferentiableOn.analyticOnNhd (fun s hs ↦ ?_) isOpen_compl_singleton
+    exact (differentiableAt_LFunction _ _ (.inl hs)).differentiableWithinAt
+  · refine DifferentiableOn.analyticOnNhd (fun s hs ↦ ?_) isOpen_compl_singleton
+    refine ((differentiableAt_LFunction _ _ (.inl hs)).mul ?_).differentiableWithinAt
+    refine .finset_prod fun i h ↦ ?_
+    have : NeZero i := ⟨(Nat.pos_of_mem_primeFactors h).ne'⟩
+    fun_prop
+  · refine eventually_of_mem ?_  (fun t (ht : 1 < t.re) ↦ ?_)
+    · exact (continuous_re.isOpen_preimage _ isOpen_Ioi).mem_nhds (by norm_num : 1 < (2 : ℂ).re)
+    · simpa only [LFunction_eq_LSeries _ ht] using LSeries_changeLevel hMN χ ht
 
--- DISSOLVED: LFunction_changeLevel
+lemma LFunction_changeLevel {M N : ℕ} [NeZero M] [NeZero N] (hMN : M ∣ N)
+    (χ : DirichletCharacter ℂ M) {s : ℂ} (h : χ ≠ 1 ∨ s ≠ 1) :
+    LFunction (changeLevel hMN χ) s =
+      LFunction χ s * ∏ p ∈ N.primeFactors, (1 - χ p * p ^ (-s)) := by
+  rcases h with h | h
+  · have hχ : changeLevel hMN χ ≠ 1 := h ∘ (changeLevel_eq_one_iff hMN).mp
+    have h' : Continuous fun s ↦ LFunction χ s * ∏ p ∈ N.primeFactors, (1 - χ p * ↑p ^ (-s)) :=
+      (differentiable_LFunction h).continuous.mul <| continuous_finset_prod _ fun p hp ↦ by
+        have : NeZero p := ⟨(Nat.prime_of_mem_primeFactors hp).ne_zero⟩
+        fun_prop
+    exact congrFun ((differentiable_LFunction hχ).continuous.ext_on
+      (dense_compl_singleton 1) h' (fun _ h ↦ LFunction_changeLevel_aux hMN χ h)) s
+  · exact LFunction_changeLevel_aux hMN χ h
 
 /-!
 ### The `L`-function of the trivial character mod `N`
 -/
 
--- DISSOLVED: LFunctionTrivChar
+noncomputable abbrev LFunctionTrivChar (N : ℕ) [NeZero N] :=
+  (1 : DirichletCharacter ℂ N).LFunction
 
 lemma LFunctionTrivChar_eq_mul_riemannZeta {s : ℂ} (hs : s ≠ 1) :
     LFunctionTrivChar N s = (∏ p ∈ N.primeFactors, (1 - (p : ℂ) ^ (-s))) * riemannZeta s := by
@@ -150,14 +184,23 @@ lemma completedLFunction_modOne_eq {χ : DirichletCharacter ℂ 1} :
     completedLFunction χ = completedRiemannZeta := by
   ext; rw [completedLFunction, ZMod.completedLFunction_modOne_eq, map_one, one_mul]
 
--- DISSOLVED: differentiableAt_completedLFunction
+lemma differentiableAt_completedLFunction (χ : DirichletCharacter ℂ N) (s : ℂ)
+    (hs₀ : s ≠ 0 ∨ N ≠ 1) (hs₁ : s ≠ 1 ∨ χ ≠ 1) :
+    DifferentiableAt ℂ (completedLFunction χ) s :=
+  ZMod.differentiableAt_completedLFunction _ _ (by have := χ.map_zero'; tauto)
+    (by have := χ.sum_eq_zero_of_ne_one; tauto)
 
 lemma differentiable_completedLFunction {χ : DirichletCharacter ℂ N} (hχ : χ ≠ 1) :
     Differentiable ℂ (completedLFunction χ) := by
   refine fun s ↦ differentiableAt_completedLFunction _ _ (Or.inr ?_) (Or.inr hχ)
   exact hχ ∘ level_one' _
 
--- DISSOLVED: LFunction_eq_completed_div_gammaFactor
+lemma LFunction_eq_completed_div_gammaFactor (χ : DirichletCharacter ℂ N) (s : ℂ)
+    (h : s ≠ 0 ∨ N ≠ 1) : LFunction χ s = completedLFunction χ s / gammaFactor χ s := by
+  rcases χ.even_or_odd with hχ | hχ <;>
+  rw [hχ.gammaFactor_def]
+  · exact LFunction_eq_completed_div_gammaFactor_even hχ.to_fun _ (h.imp_right χ.map_zero')
+  · apply LFunction_eq_completed_div_gammaFactor_odd hχ.to_fun
 
 noncomputable def rootNumber (χ : DirichletCharacter ℂ N) : ℂ :=
   gaussSum χ stdAddChar / I ^ (if χ.Even then 0 else 1) / N ^ (1 / 2 : ℂ)
@@ -224,7 +267,12 @@ noncomputable abbrev LFunctionTrivChar₁ : ℂ → ℂ :=
   Function.update (fun s ↦ (s - 1) * LFunctionTrivChar n s) 1
     (∏ p ∈ n.primeFactors, (1 - (p : ℂ)⁻¹))
 
--- DISSOLVED: LFunctionTrivChar₁_apply_one_ne_zero
+-- CONFLATES (assumes ground = zero): LFunctionTrivChar₁_apply_one_ne_zero
+lemma LFunctionTrivChar₁_apply_one_ne_zero : LFunctionTrivChar₁ n 1 ≠ 0 := by
+  simp only [Function.update_same]
+  refine Finset.prod_ne_zero_iff.mpr fun p hp ↦ ?_
+  simpa only [ne_eq, sub_ne_zero, one_eq_inv, Nat.cast_eq_one]
+    using (Nat.prime_of_mem_primeFactors hp).ne_one
 
 lemma differentiable_LFunctionTrivChar₁ : Differentiable ℂ (LFunctionTrivChar₁ n) := by
   rw [← differentiableOn_univ,
@@ -236,9 +284,27 @@ lemma differentiable_LFunctionTrivChar₁ : Differentiable ℂ (LFunctionTrivCha
   simpa only [continuousWithinAt_compl_self, continuousAt_update_same]
     using LFunctionTrivChar_residue_one
 
--- DISSOLVED: deriv_LFunctionTrivChar₁_apply_of_ne_one
+lemma deriv_LFunctionTrivChar₁_apply_of_ne_one {s : ℂ} (hs : s ≠ 1) :
+    deriv (LFunctionTrivChar₁ n) s =
+      (s - 1) * deriv (LFunctionTrivChar n) s + LFunctionTrivChar n s := by
+  have H : deriv (LFunctionTrivChar₁ n) s =
+      deriv (fun w ↦ (w - 1) * LFunctionTrivChar n w) s := by
+    refine eventuallyEq_iff_exists_mem.mpr ?_ |>.deriv_eq
+    exact ⟨_, isOpen_ne.mem_nhds hs, fun _ hw ↦ Function.update_noteq (Set.mem_setOf.mp hw) ..⟩
+  rw [H, deriv_mul (by fun_prop) (differentiableAt_LFunction _ s (.inl hs)), deriv_sub_const,
+    deriv_id'', one_mul, add_comm]
 
--- DISSOLVED: continuousOn_neg_logDeriv_LFunctionTrivChar₁
+lemma continuousOn_neg_logDeriv_LFunctionTrivChar₁ :
+    ContinuousOn (fun s ↦ -deriv (LFunctionTrivChar₁ n) s / LFunctionTrivChar₁ n s)
+      {s | s = 1 ∨ LFunctionTrivChar n s ≠ 0} := by
+  simp_rw [neg_div]
+  have h := differentiable_LFunctionTrivChar₁ n
+  refine ((h.contDiff.continuous_deriv le_rfl).continuousOn.div
+    h.continuous.continuousOn fun w hw ↦ ?_).neg
+  rcases eq_or_ne w 1 with rfl | hw'
+  · exact LFunctionTrivChar₁_apply_one_ne_zero _
+  · rw [LFunctionTrivChar₁, Function.update_noteq hw', mul_ne_zero_iff]
+    exact ⟨sub_ne_zero_of_ne hw', (Set.mem_setOf.mp hw).resolve_left hw'⟩
 
 end trivial
 
@@ -246,7 +312,12 @@ section nontrivial
 
 variable {n : ℕ} [NeZero n] {χ : DirichletCharacter ℂ n}
 
--- DISSOLVED: continuousOn_neg_logDeriv_LFunction_of_nontriv
+lemma continuousOn_neg_logDeriv_LFunction_of_nontriv (hχ : χ ≠ 1) :
+    ContinuousOn (fun s ↦ -deriv (LFunction χ) s / LFunction χ s) {s | LFunction χ s ≠ 0} := by
+  simp only [neg_div]
+  have h := differentiable_LFunction hχ
+  exact ((h.contDiff.continuous_deriv le_rfl).continuousOn.div
+    h.continuous.continuousOn fun _ hw ↦ hw).neg
 
 end nontrivial
 

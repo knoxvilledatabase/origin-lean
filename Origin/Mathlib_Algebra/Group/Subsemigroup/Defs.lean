@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Hom.Defs
 import Mathlib.Algebra.Group.InjSurj
 import Mathlib.Data.SetLike.Basic
 
+noncomputable section
+
 /-!
 # Subsemigroups: definition
 
@@ -93,22 +95,6 @@ initialize_simps_projections Subsemigroup (carrier → coe)
 
 initialize_simps_projections AddSubsemigroup (carrier → coe)
 
-@[to_additive (attr := simp)]
-theorem mem_carrier {s : Subsemigroup M} {x : M} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive (attr := simp)]
-theorem mem_mk {s : Set M} {x : M} (h_mul) : x ∈ mk s h_mul ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_set_mk (s : Set M) (h_mul) : (mk s h_mul : Set M) = s :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_le_mk {s t : Set M} (h_mul) (h_mul') : mk s h_mul ≤ mk t h_mul' ↔ s ⊆ t :=
-  Iff.rfl
-
 @[to_additive (attr := ext) "Two `AddSubsemigroup`s are equal if they have the same elements."]
 theorem ext {S T : Subsemigroup M} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -120,10 +106,6 @@ protected def copy (S : Subsemigroup M) (s : Set M) (hs : s = S) :
   mul_mem' := hs.symm ▸ S.mul_mem'
 
 variable {S : Subsemigroup M}
-
-@[to_additive (attr := simp)]
-theorem coe_copy {s : Set M} (hs : s = S) : (S.copy s hs : Set M) = s :=
-  rfl
 
 @[to_additive]
 theorem copy_eq {s : Set M} (hs : s = S) : S.copy s hs = S :=
@@ -157,27 +139,11 @@ theorem not_mem_bot {x : M} : x ∉ (⊥ : Subsemigroup M) :=
 theorem mem_top (x : M) : x ∈ (⊤ : Subsemigroup M) :=
   Set.mem_univ x
 
-@[to_additive (attr := simp)]
-theorem coe_top : ((⊤ : Subsemigroup M) : Set M) = Set.univ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_bot : ((⊥ : Subsemigroup M) : Set M) = ∅ :=
-  rfl
-
 @[to_additive "The inf of two `AddSubsemigroup`s is their intersection."]
 instance : Min (Subsemigroup M) :=
   ⟨fun S₁ S₂ =>
     { carrier := S₁ ∩ S₂
       mul_mem' := fun ⟨hx, hx'⟩ ⟨hy, hy'⟩ => ⟨S₁.mul_mem hx hy, S₂.mul_mem hx' hy'⟩ }⟩
-
-@[to_additive (attr := simp)]
-theorem coe_inf (p p' : Subsemigroup M) : ((p ⊓ p' : Subsemigroup M) : Set M) = (p : Set M) ∩ p' :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mem_inf {p p' : Subsemigroup M} {x : M} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
 
 @[to_additive]
 theorem subsingleton_of_subsingleton [Subsingleton (Subsemigroup M)] : Subsingleton M := by
@@ -221,19 +187,6 @@ variable {A : Type*} [Mul M] [SetLike A M] [hA : MulMemClass A M] (S' : A)
 instance (priority := 900) mul : Mul S' :=
   ⟨fun a b => ⟨a.1 * b.1, mul_mem a.2 b.2⟩⟩
 
-@[to_additive (attr := simp low, norm_cast)]
-theorem coe_mul (x y : S') : (↑(x * y) : M) = ↑x * ↑y :=
-  rfl
-
-@[to_additive (attr := simp low)]
-theorem mk_mul_mk (x y : M) (hx : x ∈ S') (hy : y ∈ S') :
-    (⟨x, hx⟩ : S') * ⟨y, hy⟩ = ⟨x * y, mul_mem hx hy⟩ :=
-  rfl
-
-@[to_additive]
-theorem mul_def (x y : S') : x * y = ⟨x * y, mul_mem x.2 y.2⟩ :=
-  rfl
-
 @[to_additive "An `AddSubsemigroup` of an `AddSemigroup` inherits an `AddSemigroup` structure."]
 instance toSemigroup {M : Type*} [Semigroup M] {A : Type*} [SetLike A M] [MulMemClass A M]
     (S : A) : Semigroup S :=
@@ -248,9 +201,5 @@ instance toCommSemigroup {M} [CommSemigroup M] {A : Type*} [SetLike A M] [MulMem
 `AddSubsemigroup` `M` to `M`."]
 def subtype : S' →ₙ* M where
   toFun := Subtype.val; map_mul' := fun _ _ => rfl
-
-@[to_additive (attr := simp)]
-theorem coe_subtype : (MulMemClass.subtype S' : S' → M) = Subtype.val :=
-  rfl
 
 end MulMemClass

@@ -13,6 +13,8 @@ import Mathlib.Order.Basic
 import Mathlib.Tactic.ApplyFun
 import Mathlib.Data.List.GetD
 
+noncomputable section
+
 /-!
 # Turing machines
 
@@ -177,11 +179,6 @@ def ListBlank.head {Γ} [Inhabited Γ] (l : ListBlank Γ) : Γ := by
   · cases i <;> rfl
   rfl
 
-@[simp]
-theorem ListBlank.head_mk {Γ} [Inhabited Γ] (l : List Γ) :
-    ListBlank.head (ListBlank.mk l) = l.headI :=
-  rfl
-
 def ListBlank.tail {Γ} [Inhabited Γ] (l : ListBlank Γ) : ListBlank Γ := by
   apply l.liftOn (fun l ↦ ListBlank.mk l.tail)
   rintro a _ ⟨i, rfl⟩
@@ -189,11 +186,6 @@ def ListBlank.tail {Γ} [Inhabited Γ] (l : ListBlank Γ) : ListBlank Γ := by
   cases a
   · cases' i with i <;> [exact ⟨0, rfl⟩; exact ⟨i, rfl⟩]
   exact ⟨i, rfl⟩
-
-@[simp]
-theorem ListBlank.tail_mk {Γ} [Inhabited Γ] (l : List Γ) :
-    ListBlank.tail (ListBlank.mk l) = ListBlank.mk l.tail :=
-  rfl
 
 def ListBlank.cons {Γ} [Inhabited Γ] (a : Γ) (l : ListBlank Γ) : ListBlank Γ := by
   apply l.liftOn (fun l ↦ ListBlank.mk (List.cons a l))
@@ -452,10 +444,6 @@ theorem Tape.mk'_head {Γ} [Inhabited Γ] (L R : ListBlank Γ) : (Tape.mk' L R).
   rfl
 
 @[simp]
-theorem Tape.mk'_right {Γ} [Inhabited Γ] (L R : ListBlank Γ) : (Tape.mk' L R).right = R.tail :=
-  rfl
-
-@[simp]
 theorem Tape.mk'_right₀ {Γ} [Inhabited Γ] (L R : ListBlank Γ) : (Tape.mk' L R).right₀ = R :=
   ListBlank.cons_head_tail _
 
@@ -490,10 +478,6 @@ def Tape.nth {Γ} [Inhabited Γ] (T : Tape Γ) : ℤ → Γ
   | 0 => T.head
   | (n + 1 : ℕ) => T.right.nth n
   | -(n + 1 : ℕ) => T.left.nth n
-
-@[simp]
-theorem Tape.nth_zero {Γ} [Inhabited Γ] (T : Tape Γ) : T.nth 0 = T.1 :=
-  rfl
 
 theorem Tape.right₀_nth {Γ} [Inhabited Γ] (T : Tape Γ) (n : ℕ) : T.right₀.nth n = T.nth n := by
   cases n <;> simp only [Tape.nth, Tape.right₀, Int.ofNat_zero, ListBlank.nth_zero,
@@ -1148,6 +1132,15 @@ local notation "Stmt₀" => TM0.Stmt Γ
 variable (M : Λ → TM1.Stmt Γ Λ σ)  -- Porting note: Unfolded `Stmt₁`.
 
 set_option linter.unusedVariables false in
+/-- The base machine state space is a pair of an `Option Stmt₁` representing the current program
+
+to be executed, or `none` for the halt state, and a `σ` which is the local state (stored in the TM,
+
+not the tape). Because there are an infinite number of programs, this state space is infinite, but
+
+for a finitely supported TM1 machine and a finite type `σ`, only finitely many of these states are
+
+reachable. -/
 
 @[nolint unusedArguments] -- We need the M assumption
 def Λ' (M : Λ → TM1.Stmt Γ Λ σ) :=

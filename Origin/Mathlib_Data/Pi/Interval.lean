@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Finset.Basic
 import Mathlib.Data.Fintype.BigOperators
 
+noncomputable section
+
 /-!
 # Intervals in a pi type
 
@@ -32,9 +34,6 @@ instance instLocallyFiniteOrder : LocallyFiniteOrder (∀ i, α i) :=
     simp_rw [mem_piFinset, mem_Icc, le_def, forall_and]
 
 variable (a b : ∀ i, α i)
-
-theorem Icc_eq : Icc a b = piFinset fun i => Icc (a i) (b i) :=
-  rfl
 
 theorem card_Icc : #(Icc a b) = ∏ i, #(Icc (a i) (b i)) :=
   card_piFinset _
@@ -83,8 +82,6 @@ end PartialOrder
 section Lattice
 
 variable [∀ i, Lattice (α i)] [∀ i, LocallyFiniteOrder (α i)] (a b : ∀ i, α i)
-
-theorem uIcc_eq : uIcc a b = piFinset fun i => uIcc (a i) (b i) := rfl
 
 theorem card_uIcc : #(uIcc a b) = ∏ i, #(uIcc (a i) (b i)) := card_Icc _ _
 

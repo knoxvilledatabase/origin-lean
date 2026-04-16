@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/BoxIntegral/Partition/Basic.lean
-Genuine: 86 | Conflates: 0 | Dissolved: 7 | Infrastructure: 19
+Genuine: 93 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Option
 import Mathlib.Analysis.BoxIntegral.Box.Basic
 import Mathlib.Data.Set.Pairwise.Lattice
+
+noncomputable section
 
 /-!
 # Partitions of rectangular boxes in `ℝⁿ`
@@ -63,9 +65,6 @@ instance : Membership (Box ι) (Prepartition I) :=
 
 @[simp]
 theorem mem_boxes : J ∈ π.boxes ↔ J ∈ π := Iff.rfl
-
-@[simp]
-theorem mem_mk {s h₁ h₂} : J ∈ (mk s h₁ h₂ : Prepartition I) ↔ J ∈ s := Iff.rfl
 
 theorem disjoint_coe_of_mem (h₁ : J₁ ∈ π) (h₂ : J₂ ∈ π) (h : J₁ ≠ J₂) :
     Disjoint (J₁ : Set (ι → ℝ)) J₂ :=
@@ -143,14 +142,8 @@ theorem mem_top : J ∈ (⊤ : Prepartition I) ↔ J = I :=
   mem_singleton
 
 @[simp]
-theorem top_boxes : (⊤ : Prepartition I).boxes = {I} := rfl
-
-@[simp]
 theorem not_mem_bot : J ∉ (⊥ : Prepartition I) :=
   Finset.not_mem_empty _
-
-@[simp]
-theorem bot_boxes : (⊥ : Prepartition I).boxes = ∅ := rfl
 
 theorem injOn_setOf_mem_Icc_setOf_lower_eq (x : ι → ℝ) :
     InjOn (fun J : Box ι => { i | J.lower i = x i }) { J | J ∈ π ∧ x ∈ Box.Icc J } := by
@@ -180,8 +173,6 @@ protected def iUnion : Set (ι → ℝ) :=
   ⋃ J ∈ π, ↑J
 
 theorem iUnion_def : π.iUnion = ⋃ J ∈ π, ↑J := rfl
-
-theorem iUnion_def' : π.iUnion = ⋃ J ∈ π.boxes, ↑J := rfl
 
 @[simp]
 theorem mem_iUnion : x ∈ π.iUnion ↔ ∃ J ∈ π, x ∈ J := by
@@ -328,19 +319,67 @@ theorem biUnion_assoc (πi : ∀ J, Prepartition J) (πi' : Box ι → ∀ J : B
     refine ⟨J₂, hJ₂, J₁, hJ₁, ?_⟩
     rwa [π.biUnionIndex_of_mem hJ₂ hJ₁] at hJ
 
--- DISSOLVED: ofWithBot
+def ofWithBot (boxes : Finset (WithBot (Box ι)))
+    (le_of_mem : ∀ J ∈ boxes, (J : WithBot (Box ι)) ≤ I)
+    (pairwise_disjoint : Set.Pairwise (boxes : Set (WithBot (Box ι))) Disjoint) :
+    Prepartition I where
+  boxes := Finset.eraseNone boxes
+  le_of_mem' J hJ := by
+    rw [mem_eraseNone] at hJ
+    simpa only [WithBot.some_eq_coe, WithBot.coe_le_coe] using le_of_mem _ hJ
+  pairwiseDisjoint J₁ h₁ J₂ h₂ hne := by
+    simp only [mem_coe, mem_eraseNone] at h₁ h₂
+    exact Box.disjoint_coe.1 (pairwise_disjoint h₁ h₂ (mt Option.some_inj.1 hne))
 
--- DISSOLVED: mem_ofWithBot
+@[simp]
+theorem mem_ofWithBot {boxes : Finset (WithBot (Box ι))} {h₁ h₂} :
+    J ∈ (ofWithBot boxes h₁ h₂ : Prepartition I) ↔ (J : WithBot (Box ι)) ∈ boxes :=
+  mem_eraseNone
 
--- DISSOLVED: iUnion_ofWithBot
+@[simp]
+theorem iUnion_ofWithBot (boxes : Finset (WithBot (Box ι)))
+    (le_of_mem : ∀ J ∈ boxes, (J : WithBot (Box ι)) ≤ I)
+    (pairwise_disjoint : Set.Pairwise (boxes : Set (WithBot (Box ι))) Disjoint) :
+    (ofWithBot boxes le_of_mem pairwise_disjoint).iUnion = ⋃ J ∈ boxes, ↑J := by
+  suffices ⋃ (J : Box ι) (_ : ↑J ∈ boxes), ↑J = ⋃ J ∈ boxes, (J : Set (ι → ℝ)) by
+    simpa [ofWithBot, Prepartition.iUnion]
+  simp only [← Box.biUnion_coe_eq_coe, @iUnion_comm _ _ (Box ι), @iUnion_comm _ _ (@Eq _ _ _),
+    iUnion_iUnion_eq_right]
 
--- DISSOLVED: ofWithBot_le
+theorem ofWithBot_le {boxes : Finset (WithBot (Box ι))}
+    {le_of_mem : ∀ J ∈ boxes, (J : WithBot (Box ι)) ≤ I}
+    {pairwise_disjoint : Set.Pairwise (boxes : Set (WithBot (Box ι))) Disjoint}
+    (H : ∀ J ∈ boxes, J ≠ ⊥ → ∃ J' ∈ π, J ≤ ↑J') :
+    ofWithBot boxes le_of_mem pairwise_disjoint ≤ π := by
+  have : ∀ J : Box ι, ↑J ∈ boxes → ∃ J' ∈ π, J ≤ J' := fun J hJ => by
+    simpa only [WithBot.coe_le_coe] using H J hJ WithBot.coe_ne_bot
+  simpa [ofWithBot, le_def]
 
--- DISSOLVED: le_ofWithBot
+theorem le_ofWithBot {boxes : Finset (WithBot (Box ι))}
+    {le_of_mem : ∀ J ∈ boxes, (J : WithBot (Box ι)) ≤ I}
+    {pairwise_disjoint : Set.Pairwise (boxes : Set (WithBot (Box ι))) Disjoint}
+    (H : ∀ J ∈ π, ∃ J' ∈ boxes, ↑J ≤ J') : π ≤ ofWithBot boxes le_of_mem pairwise_disjoint := by
+  intro J hJ
+  rcases H J hJ with ⟨J', J'mem, hle⟩
+  lift J' to Box ι using ne_bot_of_le_ne_bot WithBot.coe_ne_bot hle
+  exact ⟨J', mem_ofWithBot.2 J'mem, WithBot.coe_le_coe.1 hle⟩
 
--- DISSOLVED: ofWithBot_mono
+theorem ofWithBot_mono {boxes₁ : Finset (WithBot (Box ι))}
+    {le_of_mem₁ : ∀ J ∈ boxes₁, (J : WithBot (Box ι)) ≤ I}
+    {pairwise_disjoint₁ : Set.Pairwise (boxes₁ : Set (WithBot (Box ι))) Disjoint}
+    {boxes₂ : Finset (WithBot (Box ι))} {le_of_mem₂ : ∀ J ∈ boxes₂, (J : WithBot (Box ι)) ≤ I}
+    {pairwise_disjoint₂ : Set.Pairwise (boxes₂ : Set (WithBot (Box ι))) Disjoint}
+    (H : ∀ J ∈ boxes₁, J ≠ ⊥ → ∃ J' ∈ boxes₂, J ≤ J') :
+    ofWithBot boxes₁ le_of_mem₁ pairwise_disjoint₁ ≤
+      ofWithBot boxes₂ le_of_mem₂ pairwise_disjoint₂ :=
+  le_ofWithBot _ fun J hJ => H J (mem_ofWithBot.1 hJ) WithBot.coe_ne_bot
 
--- DISSOLVED: sum_ofWithBot
+theorem sum_ofWithBot {M : Type*} [AddCommMonoid M] (boxes : Finset (WithBot (Box ι)))
+    (le_of_mem : ∀ J ∈ boxes, (J : WithBot (Box ι)) ≤ I)
+    (pairwise_disjoint : Set.Pairwise (boxes : Set (WithBot (Box ι))) Disjoint) (f : Box ι → M) :
+    (∑ J ∈ (ofWithBot boxes le_of_mem pairwise_disjoint).boxes, f J) =
+      ∑ J ∈ boxes, Option.elim' 0 f J :=
+  Finset.sum_eraseNone _ _
 
 def restrict (π : Prepartition I) (J : Box ι) : Prepartition J :=
   ofWithBot (π.boxes.image fun J' : Box ι => J ⊓ J')

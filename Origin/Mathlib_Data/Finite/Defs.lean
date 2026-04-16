@@ -8,6 +8,8 @@ import Mathlib.Logic.Equiv.Defs
 import Mathlib.Tactic.Set
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-!
 # Definition of the `Finite` typeclass
 

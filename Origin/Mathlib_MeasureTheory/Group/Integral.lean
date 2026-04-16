@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.Bochner
 import Mathlib.MeasureTheory.Group.Measure
 
+noncomputable section
+
 /-!
 # Bochner Integration on Groups
 

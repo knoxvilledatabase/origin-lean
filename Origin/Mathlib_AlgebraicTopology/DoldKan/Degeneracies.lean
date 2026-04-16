@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.Decomposition
 import Mathlib.Tactic.FinCases
 
+noncomputable section
+
 /-!
 
 # Behaviour of P_infty with respect to degeneracies

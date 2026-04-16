@@ -7,6 +7,8 @@ import Mathlib.Tactic.Core
 import Mathlib.Lean.Expr.Basic
 import Mathlib.Data.Fintype.Basic
 
+noncomputable section
+
 /-!
 # The `fin_cases` tactic.
 

@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Lie/Weights/Linear.lean
-Genuine: 10 | Conflates: 1 | Dissolved: 2 | Infrastructure: 9
+Genuine: 11 | Conflates: 1 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.Weights.Basic
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.FreeModule.PID
+
+noncomputable section
 
 /-!
 # Lie modules with linear weights
@@ -79,8 +81,6 @@ lemma apply_lie (x y : L) :
 
 @[simp] lemma coe_toLinear_eq_zero_iff : (χ : L →ₗ[R] R) = 0 ↔ χ.IsZero :=
   ⟨fun h ↦ funext fun x ↦ LinearMap.congr_fun h x, fun h ↦ by ext; simp [h.eq]⟩
-
--- DISSOLVED: coe_toLinear_ne_zero_iff
 
 abbrev ker := LinearMap.ker (χ : L →ₗ[R] R)
 
@@ -217,6 +217,17 @@ end shiftedGenWeightSpace
 
 open shiftedGenWeightSpace in
 
--- DISSOLVED: exists_forall_lie_eq_smul
+lemma exists_forall_lie_eq_smul [LinearWeights R L M] [IsNoetherian R M] (χ : Weight R L M) :
+    ∃ m : M, m ≠ 0 ∧ ∀ x : L, ⁅x, m⁆ = χ x • m := by
+  replace hχ : Nontrivial (shiftedGenWeightSpace R L M χ) :=
+    (LieSubmodule.nontrivial_iff_ne_bot R L M).mpr χ.genWeightSpace_ne_bot
+  obtain ⟨⟨⟨m, _⟩, hm₁⟩, hm₂⟩ :=
+    @exists_ne _ (nontrivial_max_triv_of_isNilpotent R L (shiftedGenWeightSpace R L M χ)) 0
+  simp_rw [mem_maxTrivSubmodule, Subtype.ext_iff,
+    ZeroMemClass.coe_zero] at hm₁
+  refine ⟨m, by simpa [LieSubmodule.mk_eq_zero] using hm₂, ?_⟩
+  intro x
+  have := hm₁ x
+  rwa [coe_lie_shiftedGenWeightSpace_apply, sub_eq_zero] at this
 
 end LieModule

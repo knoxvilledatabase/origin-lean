@@ -5,6 +5,8 @@ Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Functor
 
+noncomputable section
+
 /-!
 # Endofunctors as a monoidal category.
 
@@ -39,47 +41,8 @@ open CategoryTheory.MonoidalCategory
 
 attribute [local instance] endofunctorMonoidalCategory
 
-@[simp] theorem endofunctorMonoidalCategory_tensorUnit_obj (X : C) :
-    (𝟙_ (C ⥤ C)).obj X = X := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_tensorUnit_map {X Y : C} (f : X ⟶ Y) :
-    (𝟙_ (C ⥤ C)).map f = f := rfl
-
 @[simp] theorem endofunctorMonoidalCategory_tensorObj_obj (F G : C ⥤ C) (X : C) :
     (F ⊗ G).obj X = G.obj (F.obj X) := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_tensorObj_map (F G : C ⥤ C) {X Y : C} (f : X ⟶ Y) :
-    (F ⊗ G).map f = G.map (F.map f) := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_tensorMap_app
-    {F G H K : C ⥤ C} {α : F ⟶ G} {β : H ⟶ K} (X : C) :
-    (α ⊗ β).app X = β.app (F.obj X) ≫ K.map (α.app X) := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_whiskerLeft_app
-    {F H K : C ⥤ C} {β : H ⟶ K} (X : C) :
-    (F ◁ β).app X = β.app (F.obj X) := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_whiskerRight_app
-    {F G H : C ⥤ C} {α : F ⟶ G} (X : C) :
-    (α ▷ H).app X = H.map (α.app X) := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_associator_hom_app (F G H : C ⥤ C) (X : C) :
-  (α_ F G H).hom.app X = 𝟙 _ := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_associator_inv_app (F G H : C ⥤ C) (X : C) :
-  (α_ F G H).inv.app X = 𝟙 _ := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_leftUnitor_hom_app (F : C ⥤ C) (X : C) :
-  (λ_ F).hom.app X = 𝟙 _ := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_leftUnitor_inv_app (F : C ⥤ C) (X : C) :
-  (λ_ F).inv.app X = 𝟙 _ := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_rightUnitor_hom_app (F : C ⥤ C) (X : C) :
-  (ρ_ F).hom.app X = 𝟙 _ := rfl
-
-@[simp] theorem endofunctorMonoidalCategory_rightUnitor_inv_app (F : C ⥤ C) (X : C) :
-  (ρ_ F).inv.app X = 𝟙 _ := rfl
 
 namespace MonoidalCategory
 
@@ -90,18 +53,6 @@ instance : (tensoringRight C).Monoidal :=
     { εIso := (rightUnitorNatIso C).symm
       μIso := fun X Y => (isoWhiskerRight (curriedAssociatorNatIso C)
       ((evaluation C (C ⥤ C)).obj X ⋙ (evaluation C C).obj Y)) }
-
-@[simp] lemma tensoringRight_ε :
-    ε (tensoringRight C) = (rightUnitorNatIso C).inv := rfl
-
-@[simp] lemma tensoringRight_η :
-    η (tensoringRight C) = (rightUnitorNatIso C).hom := rfl
-
-@[simp] lemma tensoringRight_μ (X Y : C) (Z : C) :
-    (μ (tensoringRight C) X Y).app Z = (α_ Z X Y).hom := rfl
-
-@[simp] lemma tensoringRight_δ (X Y : C) (Z : C) :
-    (δ (tensoringRight C) X Y).app Z = (α_ Z X Y).inv := rfl
 
 end MonoidalCategory
 
@@ -141,11 +92,6 @@ theorem η_naturality {X Y : C} (f : X ⟶ Y) [F.OplaxMonoidal]:
 theorem μ_naturality {m n : M} {X Y : C} (f : X ⟶ Y) [F.LaxMonoidal] :
     (F.obj n).map ((F.obj m).map f) ≫ (μ F m n).app Y = (μ F m n).app X ≫ (F.obj _).map f :=
   (μ F m n).naturality f
-
-@[reassoc]
-theorem δ_naturality {m n : M} {X Y : C} (f : X ⟶ Y) [F.OplaxMonoidal]:
-    (δ F m n).app X ≫ (F.obj n).map ((F.obj m).map f) =
-      (F.obj _).map f ≫ (δ F m n).app Y := by simp
 
 @[reassoc]
 theorem μ_naturality₂ {m n m' n' : M} (f : m ⟶ m') (g : n ⟶ n') (X : C) [F.LaxMonoidal] :

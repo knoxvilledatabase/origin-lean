@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Defs
 
+noncomputable section
+
 /-!
 
 # (Left) Ore sets

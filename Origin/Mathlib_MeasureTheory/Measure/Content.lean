@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Measure/Content.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 6 | Infrastructure: 5
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.MeasureTheory.Measure.Regular
 import Mathlib.Topology.Sets.Compacts
+
+noncomputable section
 
 /-!
 # Contents
@@ -133,7 +135,16 @@ theorem innerContent_mono ⦃U V : Set G⦄ (hU : IsOpen U) (hV : IsOpen V) (h2 
     μ.innerContent ⟨U, hU⟩ ≤ μ.innerContent ⟨V, hV⟩ :=
   biSup_mono fun _ hK => hK.trans h2
 
--- DISSOLVED: innerContent_exists_compact
+theorem innerContent_exists_compact {U : Opens G} (hU : μ.innerContent U ≠ ∞) {ε : ℝ≥0}
+    (hε : ε ≠ 0) : ∃ K : Compacts G, (K : Set G) ⊆ U ∧ μ.innerContent U ≤ μ K + ε := by
+  have h'ε := ENNReal.coe_ne_zero.2 hε
+  rcases le_or_lt (μ.innerContent U) ε with h | h
+  · exact ⟨⊥, empty_subset _, le_add_left h⟩
+  have h₂ := ENNReal.sub_lt_self hU h.ne_bot h'ε
+  conv at h₂ => rhs; rw [innerContent]
+  simp only [lt_iSup_iff] at h₂
+  rcases h₂ with ⟨U, h1U, h2U⟩; refine ⟨U, h1U, ?_⟩
+  rw [← tsub_le_iff_right]; exact le_of_lt h2U
 
 theorem innerContent_iSup_nat [R1Space G] (U : ℕ → Opens G) :
     μ.innerContent (⨆ i : ℕ, U i) ≤ ∑' i : ℕ, μ.innerContent (U i) := by
@@ -180,7 +191,20 @@ theorem is_mul_left_invariant_innerContent [Group G] [TopologicalGroup G]
     μ.innerContent (Opens.comap (Homeomorph.mulLeft g) U) = μ.innerContent U := by
   convert μ.innerContent_comap (Homeomorph.mulLeft g) (fun K => h g) U
 
--- DISSOLVED: innerContent_pos_of_is_mul_left_invariant
+@[to_additive]
+theorem innerContent_pos_of_is_mul_left_invariant [Group G] [TopologicalGroup G]
+    (h3 : ∀ (g : G) {K : Compacts G}, μ (K.map _ <| continuous_mul_left g) = μ K) (K : Compacts G)
+    (hK : μ K ≠ 0) (U : Opens G) (hU : (U : Set G).Nonempty) : 0 < μ.innerContent U := by
+  have : (interior (U : Set G)).Nonempty := by rwa [U.isOpen.interior_eq]
+  rcases compact_covered_by_mul_left_translates K.2 this with ⟨s, hs⟩
+  suffices μ K ≤ s.card * μ.innerContent U by
+    exact (ENNReal.mul_pos_iff.mp <| hK.bot_lt.trans_le this).2
+  have : (K : Set G) ⊆ ↑(⨆ g ∈ s, Opens.comap (Homeomorph.mulLeft g : C(G, G)) U) := by
+    simpa only [Opens.iSup_def, Opens.coe_comap, Subtype.coe_mk]
+  refine (μ.le_innerContent _ _ this).trans ?_
+  refine
+    (rel_iSup_sum μ.innerContent μ.innerContent_bot (· ≤ ·) μ.innerContent_iSup_nat _ _).trans ?_
+  simp only [μ.is_mul_left_invariant_innerContent h3, Finset.sum_const, nsmul_eq_mul, le_refl]
 
 theorem innerContent_mono' ⦃U V : Set G⦄ (hU : IsOpen U) (hV : IsOpen V) (h2 : U ⊆ V) :
     μ.innerContent ⟨U, hU⟩ ≤ μ.innerContent ⟨V, hV⟩ :=
@@ -218,9 +242,18 @@ theorem outerMeasure_eq_iInf (A : Set G) :
 theorem outerMeasure_interior_compacts (K : Compacts G) : μ.outerMeasure (interior K) ≤ μ K :=
   (μ.outerMeasure_opens <| Opens.interior K).le.trans <| μ.innerContent_le _ _ interior_subset
 
--- DISSOLVED: outerMeasure_exists_compact
+theorem outerMeasure_exists_compact {U : Opens G} (hU : μ.outerMeasure U ≠ ∞) {ε : ℝ≥0}
+    (hε : ε ≠ 0) : ∃ K : Compacts G, (K : Set G) ⊆ U ∧ μ.outerMeasure U ≤ μ.outerMeasure K + ε := by
+  rw [μ.outerMeasure_opens] at hU ⊢
+  rcases μ.innerContent_exists_compact hU hε with ⟨K, h1K, h2K⟩
+  exact ⟨K, h1K, le_trans h2K <| add_le_add_right (μ.le_outerMeasure_compacts K) _⟩
 
--- DISSOLVED: outerMeasure_exists_open
+theorem outerMeasure_exists_open {A : Set G} (hA : μ.outerMeasure A ≠ ∞) {ε : ℝ≥0} (hε : ε ≠ 0) :
+    ∃ U : Opens G, A ⊆ U ∧ μ.outerMeasure U ≤ μ.outerMeasure A + ε := by
+  rcases inducedOuterMeasure_exists_set _ μ.innerContent_iUnion_nat μ.innerContent_mono hA
+      (ENNReal.coe_ne_zero.2 hε) with
+    ⟨U, hU, h2U, h3U⟩
+  exact ⟨⟨U, hU⟩, h2U, h3U⟩
 
 theorem outerMeasure_preimage (f : G ≃ₜ G) (h : ∀ ⦃K : Compacts G⦄, μ (K.map f f.continuous) = μ K)
     (A : Set G) : μ.outerMeasure (f ⁻¹' A) = μ.outerMeasure A := by
@@ -253,7 +286,12 @@ theorem outerMeasure_caratheodory (A : Set G) :
   · apply innerContent_iUnion_nat
   · apply innerContent_mono'
 
--- DISSOLVED: outerMeasure_pos_of_is_mul_left_invariant
+@[to_additive]
+theorem outerMeasure_pos_of_is_mul_left_invariant [Group G] [TopologicalGroup G]
+    (h3 : ∀ (g : G) {K : Compacts G}, μ (K.map _ <| continuous_mul_left g) = μ K) (K : Compacts G)
+    (hK : μ K ≠ 0) {U : Set G} (h1U : IsOpen U) (h2U : U.Nonempty) : 0 < μ.outerMeasure U := by
+  convert μ.innerContent_pos_of_is_mul_left_invariant h3 K hK ⟨U, h1U⟩ h2U
+  exact μ.outerMeasure_opens ⟨U, h1U⟩
 
 variable [S : MeasurableSpace G] [BorelSpace G]
 
@@ -334,7 +372,17 @@ def ContentRegular :=
   ∀ ⦃K : TopologicalSpace.Compacts G⦄,
     μ K = ⨅ (K' : TopologicalSpace.Compacts G) (_ : (K : Set G) ⊆ interior (K' : Set G)), μ K'
 
--- DISSOLVED: contentRegular_exists_compact
+theorem contentRegular_exists_compact (H : ContentRegular μ) (K : TopologicalSpace.Compacts G)
+    {ε : NNReal} (hε : ε ≠ 0) :
+    ∃ K' : TopologicalSpace.Compacts G, K.carrier ⊆ interior K'.carrier ∧ μ K' ≤ μ K + ε := by
+  by_contra hc
+  simp only [not_exists, not_and, not_le] at hc
+  have lower_bound_iInf : μ K + ε ≤
+      ⨅ (K' : TopologicalSpace.Compacts G) (_ : (K : Set G) ⊆ interior (K' : Set G)), μ K' :=
+    le_iInf fun K' => le_iInf fun K'_hyp => le_of_lt (hc K' K'_hyp)
+  rw [← H] at lower_bound_iInf
+  exact (lt_self_iff_false (μ K)).mp (lt_of_le_of_lt' lower_bound_iInf
+    (ENNReal.lt_add_right (ne_top_of_lt (μ.lt_top K)) (ENNReal.coe_ne_zero.mpr hε)))
 
 variable [MeasurableSpace G] [R1Space G] [BorelSpace G]
 

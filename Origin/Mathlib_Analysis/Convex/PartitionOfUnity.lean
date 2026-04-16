@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Convex/PartitionOfUnity.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.PartitionOfUnity
 import Mathlib.Analysis.Convex.Combination
+
+noncomputable section
 
 /-!
 # Partition of unity and convex sets
@@ -30,7 +32,10 @@ open Topology
 
 variable {ι X E : Type*} [TopologicalSpace X] [AddCommGroup E] [Module ℝ E]
 
--- DISSOLVED: PartitionOfUnity.finsum_smul_mem_convex
+theorem PartitionOfUnity.finsum_smul_mem_convex {s : Set X} (f : PartitionOfUnity ι X s)
+    {g : ι → X → E} {t : Set E} {x : X} (hx : x ∈ s) (hg : ∀ i, f i x ≠ 0 → g i x ∈ t)
+    (ht : Convex ℝ t) : (∑ᶠ i, f i x • g i x) ∈ t :=
+  ht.finsum_mem (fun _ => f.nonneg _ _) (f.sum_eq_one hx) hg
 
 variable [NormalSpace X] [ParacompactSpace X] [TopologicalSpace E] [ContinuousAdd E]
   [ContinuousSMul ℝ E] {t : X → Set E}

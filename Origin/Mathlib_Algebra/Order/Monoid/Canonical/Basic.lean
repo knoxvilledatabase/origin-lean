@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Canonical.Defs
 import Mathlib.Data.Finset.Lattice.Fold
 
+noncomputable section
+
 /-!
 # Extra lemmas about canonically ordered monoids
 -/

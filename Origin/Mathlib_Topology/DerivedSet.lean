@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Perfect
 import Mathlib.Tactic.Peel
 
+noncomputable section
+
 /-!
 # Derived set
 

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/AdicValuation.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 6 | Infrastructure: 21
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Ideal
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Valuation.ExtendToLocalization
 import Mathlib.RingTheory.Valuation.ValuationSubring
 import Mathlib.Topology.Algebra.Valued.ValuedField
 import Mathlib.Algebra.Order.Group.TypeTags
+
+noncomputable section
 
 /-!
 # Adic valuations on Dedekind domains
@@ -81,13 +83,20 @@ theorem intValuationDef_if_pos {r : R} (hr : r = 0) : v.intValuationDef r = 0 :=
 theorem intValuationDef_zero : v.intValuationDef 0 = 0 :=
   if_pos rfl
 
--- DISSOLVED: intValuationDef_if_neg
+theorem intValuationDef_if_neg {r : R} (hr : r ≠ 0) :
+    v.intValuationDef r =
+      Multiplicative.ofAdd
+        (-(Associates.mk v.asIdeal).count (Associates.mk (Ideal.span {r} : Ideal R)).factors : ℤ) :=
+  if_neg hr
 
--- DISSOLVED: intValuation_ne_zero
+theorem intValuation_ne_zero (x : R) (hx : x ≠ 0) : v.intValuationDef x ≠ 0 := by
+  rw [intValuationDef, if_neg hx]
+  exact WithZero.coe_ne_zero
 
 alias int_valuation_ne_zero := intValuation_ne_zero
 
--- DISSOLVED: intValuation_ne_zero'
+theorem intValuation_ne_zero' (x : nonZeroDivisors R) : v.intValuationDef x ≠ 0 :=
+  v.intValuation_ne_zero x (nonZeroDivisors.coe_ne_zero x)
 
 alias int_valuation_ne_zero' := intValuation_ne_zero'
 
@@ -242,7 +251,11 @@ theorem intValuation_exists_uniformizer :
 
 alias int_valuation_exists_uniformizer := intValuation_exists_uniformizer
 
--- DISSOLVED: intValuation_singleton
+theorem intValuation_singleton {r : R} (hr : r ≠ 0) (hv : v.asIdeal = Ideal.span {r}) :
+    v.intValuation r = Multiplicative.ofAdd (-1 : ℤ) := by
+  rw [intValuation_apply, v.intValuationDef_if_neg hr, ← hv, Associates.count_self, Int.ofNat_one,
+    ofAdd_neg, WithZero.coe_inv]
+  apply v.associates_irreducible
 
 /-! ### Adic valuations on the field of fractions `K` -/
 
@@ -250,7 +263,11 @@ def valuation (v : HeightOneSpectrum R) : Valuation K ℤₘ₀ :=
   v.intValuation.extendToLocalization
     (fun r hr => Set.mem_compl <| v.intValuation_ne_zero' ⟨r, hr⟩) K
 
--- DISSOLVED: valuation_def
+theorem valuation_def (x : K) :
+    v.valuation x =
+      v.intValuation.extendToLocalization
+        (fun r hr => Set.mem_compl (v.intValuation_ne_zero' ⟨r, hr⟩)) K x :=
+  rfl
 
 theorem valuation_of_mk' {r : R} {s : nonZeroDivisors R} :
     v.valuation (IsLocalization.mk' K r s) = v.intValuation r / v.intValuation s := by
@@ -283,7 +300,9 @@ theorem valuation_exists_uniformizer : ∃ π : K, v.valuation π = Multiplicati
   rw [valuation_def, Valuation.extendToLocalization_apply_map_apply]
   exact hr
 
--- DISSOLVED: valuation_uniformizer_ne_zero
+theorem valuation_uniformizer_ne_zero : Classical.choose (v.valuation_exists_uniformizer K) ≠ 0 :=
+  haveI hu := Classical.choose_spec (v.valuation_exists_uniformizer K)
+  (Valuation.ne_zero_iff _).mp (ne_of_eq_of_ne hu WithZero.coe_ne_zero)
 
 /-! ### Completions with respect to adic valuations
 
@@ -295,9 +314,6 @@ variable {K}
 
 def adicValued : Valued K ℤₘ₀ :=
   Valued.mk' v.valuation
-
-theorem adicValued_apply {x : K} : (v.adicValued.v : _) x = v.valuation x :=
-  rfl
 
 variable (K)
 
@@ -313,10 +329,6 @@ instance : Inhabited (v.adicCompletion K) :=
 
 instance valuedAdicCompletion : Valued (v.adicCompletion K) ℤₘ₀ :=
   @Valued.valuedCompletion _ _ _ _ v.adicValued
-
-theorem valuedAdicCompletion_def {x : v.adicCompletion K} :
-    Valued.v x = @Valued.extension K _ _ _ (adicValued v) x :=
-  rfl
 
 instance adicCompletion_completeSpace : CompleteSpace (v.adicCompletion K) :=
   @UniformSpace.Completion.completeSpace K v.adicValued.toUniformSpace
@@ -361,14 +373,6 @@ theorem coe_smul_adicCompletion (r : R) (x : K) :
 
 instance : Algebra K (v.adicCompletion K) :=
   @UniformSpace.Completion.algebra' K _ v.adicValued.toUniformSpace _ _
-
-theorem algebraMap_adicCompletion' :
-    ⇑(algebraMap R <| v.adicCompletion K) = (↑) ∘ algebraMap R K :=
-  rfl
-
-theorem algebraMap_adicCompletion :
-    ⇑(algebraMap K <| v.adicCompletion K) = ((↑) : K → adicCompletion K v) :=
-  rfl
 
 instance : IsScalarTower R K (v.adicCompletion K) :=
   @UniformSpace.Completion.instIsScalarTower R K K v.adicValued.toUniformSpace _ _ _
@@ -426,11 +430,6 @@ lemma coe_mem_adicCompletionIntegers (r : R) :
     (r : adicCompletion K v) ∈ adicCompletionIntegers K v := by
   rw [mem_adicCompletionIntegers, valuedAdicCompletion_eq_valuation, valuation_eq_intValuationDef]
   exact intValuation_le_one v r
-
-@[simp]
-theorem coe_smul_adicCompletionIntegers (r : R) (x : v.adicCompletionIntegers K) :
-    (↑(r • x) : v.adicCompletion K) = r • (x : v.adicCompletion K) :=
-  rfl
 
 instance : NoZeroSMulDivisors R (v.adicCompletionIntegers K) where
   eq_zero_or_eq_zero_of_smul_eq_zero {c x} hcx := by

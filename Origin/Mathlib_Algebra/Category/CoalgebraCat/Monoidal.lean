@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.RingTheory.Coalgebra.TensorProduct
 
+noncomputable section
+
 /-!
 # The monoidal category structure on `R`-coalgebras
 

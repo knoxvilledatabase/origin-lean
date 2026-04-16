@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/Perm/Support.lean
-Genuine: 80 | Conflates: 0 | Dissolved: 4 | Infrastructure: 9
+Genuine: 84 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Basic
 import Mathlib.Data.Finset.NoncommProd
 import Mathlib.Data.Fintype.Card
 import Mathlib.GroupTheory.Perm.Basic
+
+noncomputable section
 
 /-!
 # support of a permutation
@@ -237,9 +239,6 @@ theorem set_support_inv_eq : { x | p⁻¹ x ≠ x } = { x | p x ≠ x } := by
   ext x
   simp only [Set.mem_setOf_eq, Ne]
   rw [inv_def, symm_apply_eq, eq_comm]
-
-theorem set_support_apply_mem {p : Perm α} {a : α} :
-    p a ∈ { x | p x ≠ x } ↔ a ∈ { x | p x ≠ x } := by simp
 
 theorem set_support_zpow_subset (n : ℤ) : { x | (p ^ n) x ≠ x } ⊆ { x | p x ≠ x } := by
   intro x
@@ -548,9 +547,6 @@ theorem support_extend_domain (f : α ≃ Subtype p) {g : Perm α} :
     rintro a _ rfl
     exact pb (Subtype.prop _)
 
-theorem card_support_extend_domain (f : α ≃ Subtype p) {g : Perm α} :
-    #(g.extendDomain f).support = #g.support := by simp
-
 end ExtendDomain
 
 section Card
@@ -558,16 +554,25 @@ section Card
 theorem card_support_eq_zero {f : Perm α} : #f.support = 0 ↔ f = 1 := by
   rw [Finset.card_eq_zero, support_eq_empty_iff]
 
--- DISSOLVED: one_lt_card_support_of_ne_one
+theorem one_lt_card_support_of_ne_one {f : Perm α} (h : f ≠ 1) : 1 < #f.support := by
+  simp_rw [one_lt_card_iff, mem_support, ← not_or]
+  contrapose! h
+  ext a
+  specialize h (f a) a
+  rwa [apply_eq_iff_eq, or_self_iff, or_self_iff] at h
 
--- DISSOLVED: card_support_ne_one
+theorem card_support_ne_one (f : Perm α) : #f.support ≠ 1 := by
+  by_cases h : f = 1
+  · exact ne_of_eq_of_ne (card_support_eq_zero.mpr h) zero_ne_one
+  · exact ne_of_gt (one_lt_card_support_of_ne_one h)
 
 @[simp]
 theorem card_support_le_one {f : Perm α} : #f.support ≤ 1 ↔ f = 1 := by
   rw [le_iff_lt_or_eq, Nat.lt_succ_iff, Nat.le_zero, card_support_eq_zero, or_iff_not_imp_right,
     imp_iff_right f.card_support_ne_one]
 
--- DISSOLVED: two_le_card_support_of_ne_one
+theorem two_le_card_support_of_ne_one {f : Perm α} (h : f ≠ 1) : 2 ≤ #f.support :=
+  one_lt_card_support_of_ne_one h
 
 theorem card_support_swap_mul {f : Perm α} {x : α} (hx : f x ≠ x) :
     #(swap x (f x) * f).support < #f.support :=
@@ -635,7 +640,10 @@ namespace Equiv.Perm
 
 variable {α : Type*}
 
--- DISSOLVED: fixed_point_card_lt_of_ne_one
+theorem fixed_point_card_lt_of_ne_one [DecidableEq α] [Fintype α] {σ : Perm α} (h : σ ≠ 1) :
+    #{x | σ x = x} < Fintype.card α - 1 := by
+  rw [Nat.lt_sub_iff_add_lt, ← Nat.lt_sub_iff_add_lt', ← Finset.card_compl, Finset.compl_filter]
+  exact one_lt_card_support_of_ne_one h
 
 end Equiv.Perm
 
@@ -652,8 +660,6 @@ theorem support_conj : (σ * τ * σ⁻¹).support = τ.support.map σ.toEmbeddi
   ext
   simp only [mem_map_equiv, Perm.coe_mul, Function.comp_apply, Ne, Perm.mem_support,
     Equiv.eq_symm_apply, inv_def]
-
-theorem card_support_conj : #(σ * τ * σ⁻¹).support = #τ.support := by simp
 
 end Equiv.Perm
 

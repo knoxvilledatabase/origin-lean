@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Defs.lean
-Genuine: 131 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
+Genuine: 126 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Data.Int.Notation
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Group.Operations
 import Mathlib.Logic.Function.Defs
 import Mathlib.Tactic.Simps.Basic
 import Batteries.Logic
+
+noncomputable section
 
 /-!
 # Typeclasses for (semi)groups and monoids
@@ -189,18 +191,6 @@ end CommMagma
 class LeftCancelSemigroup (G : Type u) extends Semigroup G where
   protected mul_left_cancel : ∀ a b c : G, a * b = a * c → b = c
 
-library_note "lower cancel priority" /--
-
-We lower the priority of inheriting from cancellative structures.
-
-This attempts to avoid expensive checks involving bundling and unbundling with the `IsDomain` class.
-
-since `IsDomain` already depends on `Semiring`, we can synthesize that one first.
-
-Zulip discussion: https://leanprover.zulipchat.com/#narrow/stream/113488-general/topic/Why.20is.20.60simpNF.60.20complaining.20here.3F
-
--/
-
 attribute [instance 75] LeftCancelSemigroup.toSemigroup -- See note [lower cancel priority]
 
 @[ext]
@@ -302,92 +292,6 @@ include hn ha
 
 end
 
-library_note "forgetful inheritance"/--
-
-Suppose that one can put two mathematical structures on a type, a rich one `R` and a poor one
-
-`P`, and that one can deduce the poor structure from the rich structure through a map `F` (called a
-
-forgetful functor) (think `R = MetricSpace` and `P = TopologicalSpace`). A possible
-
-implementation would be to have a type class `rich` containing a field `R`, a type class `poor`
-
-containing a field `P`, and an instance from `rich` to `poor`. However, this creates diamond
-
-problems, and a better approach is to let `rich` extend `poor` and have a field saying that
-
-`F R = P`.
-
-To illustrate this, consider the pair `MetricSpace` / `TopologicalSpace`. Consider the topology
-
-on a product of two metric spaces. With the first approach, it could be obtained by going first from
-
-each metric space to its topology, and then taking the product topology. But it could also be
-
-obtained by considering the product metric space (with its sup distance) and then the topology
-
-coming from this distance. These would be the same topology, but not definitionally, which means
-
-that from the point of view of Lean's kernel, there would be two different `TopologicalSpace`
-
-instances on the product. This is not compatible with the way instances are designed and used:
-
-there should be at most one instance of a kind on each type. This approach has created an instance
-
-diamond that does not commute definitionally.
-
-The second approach solves this issue. Now, a metric space contains both a distance, a topology, and
-
-a proof that the topology coincides with the one coming from the distance. When one defines the
-
-product of two metric spaces, one uses the sup distance and the product topology, and one has to
-
-give the proof that the sup distance induces the product topology. Following both sides of the
-
-instance diamond then gives rise (definitionally) to the product topology on the product space.
-
-Another approach would be to have the rich type class take the poor type class as an instance
-
-parameter. It would solve the diamond problem, but it would lead to a blow up of the number
-
-of type classes one would need to declare to work with complicated classes, say a real inner
-
-product space, and would create exponential complexity when working with products of
-
-such complicated spaces, that are avoided by bundling things carefully as above.
-
-Note that this description of this specific case of the product of metric spaces is oversimplified
-
-compared to mathlib, as there is an intermediate typeclass between `MetricSpace` and
-
-`TopologicalSpace` called `UniformSpace`. The above scheme is used at both levels, embedding a
-
-topology in the uniform space structure, and a uniform structure in the metric space structure.
-
-Note also that, when `P` is a proposition, there is no such issue as any two proofs of `P` are
-
-definitionally equivalent in Lean.
-
-To avoid boilerplate, there are some designs that can automatically fill the poor fields when
-
-creating a rich structure if one doesn't want to do something special about them. For instance,
-
-in the definition of metric spaces, default tactics fill the uniform space fields if they are
-
-not given explicitly. One can also have a helper function creating the rich structure from a
-
-structure with fewer fields, where the helper function fills the remaining fields. See for instance
-
-`UniformSpace.ofCore` or `RealInnerProduct.ofCore`.
-
-For more details on this question, called the forgetful inheritance pattern, see [Competing
-
-inheritance paths in dependent type theory: a case study in functional
-
-analysis](https://hal.inria.fr/hal-02463336).
-
--/
-
 /-!
 ### Design note on `AddMonoid` and `Monoid`
 
@@ -436,7 +340,11 @@ def nsmulRec' {M : Type*} [Zero M] [Add M] : ℕ → M → M
 
 attribute [to_additive existing] npowRec'
 
--- DISSOLVED: npowRec'_succ
+@[to_additive]
+theorem npowRec'_succ {M : Type*} [Semigroup M] [One M] {k : ℕ} (_ : k ≠ 0) (m : M) :
+    npowRec' (k + 1) m = npowRec' k m * m :=
+  match k with
+  | _ + 1 => rfl
 
 @[to_additive]
 theorem npowRec'_two_mul {M : Type*} [Semigroup M] [One M] (k : ℕ) (m : M) :
@@ -448,7 +356,14 @@ theorem npowRec'_two_mul {M : Type*} [Semigroup M] [One M] (k : ℕ) (m : M) :
     | 1 => simp [npowRec']
     | k + 2 => simp [npowRec', ← mul_assoc, ← ih]
 
--- DISSOLVED: npowRec'_mul_comm
+@[to_additive]
+theorem npowRec'_mul_comm {M : Type*} [Semigroup M] [One M] {k : ℕ} (k0 : k ≠ 0) (m : M) :
+    m * npowRec' k m = npowRec' k m * m := by
+  induction k using Nat.strongRecOn with
+  | ind k' ih =>
+    match k' with
+    | 1 => simp [npowRec', mul_assoc]
+    | k + 2 => simp [npowRec', ← mul_assoc, ih]
 
 @[to_additive]
 theorem npowRec_eq {M : Type*} [Semigroup M] [One M] (k : ℕ) (m : M) :
@@ -535,10 +450,6 @@ section Monoid
 
 variable {M : Type*} [Monoid M] {a b c : M}
 
-@[to_additive (attr := simp) nsmul_eq_smul]
-theorem npow_eq_pow (n : ℕ) (x : M) : Monoid.npow n x = x ^ n :=
-  rfl
-
 @[to_additive] lemma left_inv_eq_right_inv (hba : b * a = 1) (hac : a * c = 1) : b = c := by
   rw [← one_mul c, ← hba, mul_assoc, hac, mul_one b]
 
@@ -563,6 +474,7 @@ lemma pow_mul_comm' (a : M) (n : ℕ) : a ^ n * a = a * a ^ n := by rw [← pow_
 @[to_additive two_nsmul] lemma pow_two (a : M) : a ^ 2 = a * a := by rw [pow_succ, pow_one]
 
 @[to_additive existing two_nsmul] alias sq := pow_two
+
 @[to_additive three'_nsmul]
 lemma pow_three' (a : M) : a ^ 3 = a * a * a := by rw [pow_succ, pow_two]
 
@@ -781,10 +693,6 @@ theorem exists_zpow_surjective (G : Type*) [Pow G ℤ] [IsCyclic G] :
 section DivInvMonoid
 
 variable [DivInvMonoid G]
-
-@[to_additive (attr := simp) zsmul_eq_smul] theorem zpow_eq_pow (n : ℤ) (x : G) :
-    DivInvMonoid.zpow n x = x ^ n :=
-  rfl
 
 @[to_additive (attr := simp) zero_zsmul] theorem zpow_zero (a : G) : a ^ (0 : ℤ) = 1 :=
   DivInvMonoid.zpow_zero' a

@@ -8,6 +8,8 @@ import Mathlib.Tactic.NormNum.Result
 import Mathlib.Util.Qq
 import Lean.Elab.Tactic.Location
 
+noncomputable section
+
 /-!
 ## `norm_num` core functionality
 
@@ -293,33 +295,30 @@ namespace Tactic
 open Lean.Parser.Tactic Meta.NormNum
 
 elab (name := normNum)
-
     "norm_num" cfg:optConfig only:&" only"? args:(simpArgs ?) loc:(location ?) : tactic =>
-
   elabNormNum cfg args loc (simpOnly := only.isSome) (useSimp := true)
 
 elab (name := normNum1) "norm_num1" loc:(location ?) : tactic =>
-
   elabNormNum mkNullNode mkNullNode loc (simpOnly := true) (useSimp := false)
 
 open Lean Elab Tactic
 
 @[inherit_doc normNum1] syntax (name := normNum1Conv) "norm_num1" : conv
+
 @[tactic normNum1Conv] def elabNormNum1Conv : Tactic := fun _ ↦ withMainContext do
   let ctx ← getSimpContext mkNullNode mkNullNode true
   Conv.applySimpResult (← deriveSimp ctx (← instantiateMVars (← Conv.getLhs)) (useSimp := false))
 
+@[inherit_doc normNum] syntax (name := normNumConv)
+
     "norm_num" optConfig &" only"? (simpArgs)? : conv
 
-@[inherit_doc normNum] syntax (name := normNumConv)
 @[tactic normNumConv] def elabNormNumConv : Tactic := fun stx ↦ withMainContext do
   let ctx ← getSimpContext stx[1] stx[3] !stx[2].isNone
   Conv.applySimpResult (← deriveSimp ctx (← instantiateMVars (← Conv.getLhs)) (useSimp := true))
 
 macro (name := normNumCmd) "#norm_num" cfg:optConfig o:(&" only")?
-
     args:(Parser.Tactic.simpArgs)? " :"? ppSpace e:term : command =>
-
   `(command| #conv norm_num $cfg:optConfig $[only%$o]? $(args)? => $e)
 
 end Mathlib.Tactic

@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/ConditionalExpectation/AEMeasurable.lean
-Genuine: 54 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Lp
@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Integral.Bochner
 import Mathlib.Order.Filter.IndicatorFunction
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Inner
 import Mathlib.MeasureTheory.Function.LpSeminorm.Trim
+
+noncomputable section
 
 /-! # Functions a.e. measurable with respect to a sub-σ-algebra
 
@@ -433,7 +435,12 @@ section StronglyMeasurable
 
 variable {m m0 : MeasurableSpace α} {μ : Measure α}
 
--- DISSOLVED: lpMeas.ae_fin_strongly_measurable'
+theorem lpMeas.ae_fin_strongly_measurable' (hm : m ≤ m0) (f : lpMeas F 𝕜 m p μ) (hp_ne_zero : p ≠ 0)
+    (hp_ne_top : p ≠ ∞) :
+    -- Porting note: changed `f` to `f.1` in the next line. Not certain this is okay.
+    ∃ g, FinStronglyMeasurable g (μ.trim hm) ∧ f.1 =ᵐ[μ] g :=
+  ⟨lpMeasSubgroupToLpTrim F p μ hm f, Lp.finStronglyMeasurable _ hp_ne_zero hp_ne_top,
+    (lpMeasSubgroupToLpTrim_ae_eq hm f).symm⟩
 
 theorem lpMeasToLpTrimLie_symm_indicator [one_le_p : Fact (1 ≤ p)] [NormedSpace ℝ F] {hm : m ≤ m0}
     {s : Set α} {μ : Measure α} (hs : MeasurableSet[m] s) (hμs : μ.trim hm s ≠ ∞) (c : F) :

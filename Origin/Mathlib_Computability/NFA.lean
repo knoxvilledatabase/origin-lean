@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Computability.DFA
 import Mathlib.Data.Fintype.Powerset
 
+noncomputable section
+
 /-!
 # Nondeterministic Finite Automata
 This file contains the definition of a Nondeterministic Finite Automaton (NFA), a state machine
@@ -48,28 +50,12 @@ def evalFrom (start : Set σ) : List α → Set σ :=
   List.foldl M.stepSet start
 
 @[simp]
-theorem evalFrom_nil (S : Set σ) : M.evalFrom S [] = S :=
-  rfl
-
-@[simp]
-theorem evalFrom_singleton (S : Set σ) (a : α) : M.evalFrom S [a] = M.stepSet S a :=
-  rfl
-
-@[simp]
 theorem evalFrom_append_singleton (S : Set σ) (x : List α) (a : α) :
     M.evalFrom S (x ++ [a]) = M.stepSet (M.evalFrom S x) a := by
   simp only [evalFrom, List.foldl_append, List.foldl_cons, List.foldl_nil]
 
 def eval : List α → Set σ :=
   M.evalFrom M.start
-
-@[simp]
-theorem eval_nil : M.eval [] = M.start :=
-  rfl
-
-@[simp]
-theorem eval_singleton (a : α) : M.eval [a] = M.stepSet M.start a :=
-  rfl
 
 @[simp]
 theorem eval_append_singleton (x : List α) (a : α) : M.eval (x ++ [a]) = M.stepSet (M.eval x) a :=

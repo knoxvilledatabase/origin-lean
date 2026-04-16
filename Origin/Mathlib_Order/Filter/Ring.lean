@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Germ.OrderedMonoid
 import Mathlib.Algebra.Order.Ring.Defs
 
+noncomputable section
+
 /-!
 # Lemmas about filters and ordered rings.
 -/

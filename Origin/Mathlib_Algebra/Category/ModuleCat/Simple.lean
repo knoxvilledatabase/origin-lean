@@ -9,6 +9,8 @@ import Mathlib.Algebra.Category.ModuleCat.Algebra
 import Mathlib.RingTheory.SimpleModule
 import Mathlib.LinearAlgebra.FiniteDimensional
 
+noncomputable section
+
 /-!
 # Simple objects in the category of `R`-modules
 

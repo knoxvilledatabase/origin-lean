@@ -10,6 +10,8 @@ import Mathlib.Algebra.Group.Units.Hom
 import Mathlib.CategoryTheory.Groupoid
 import Mathlib.CategoryTheory.Opposites
 
+noncomputable section
+
 /-!
 # Endomorphisms
 
@@ -72,12 +74,6 @@ instance mulActionLeft {X : Cᵒᵖ} {Y : C} : MulAction (End X) (unop X ⟶ Y) 
   one_smul := Category.id_comp
   mul_smul _ _ _ := Category.assoc _ _ _
 
-theorem smul_right {X Y : C} {r : End Y} {f : X ⟶ Y} : r • f = f ≫ r :=
-  rfl
-
-theorem smul_left {X : Cᵒᵖ} {Y : C} {r : End X} {f : unop X ⟶ Y} : r • f = r.unop ≫ f :=
-  rfl
-
 end MulAction
 
 instance group {C : Type u} [Groupoid.{v} C] (X : C) : Group (End X) where
@@ -113,8 +109,6 @@ instance : Group (Aut X) where
   inv_mul_cancel := Iso.self_symm_id
 
 theorem Aut_mul_def (f g : Aut X) : f * g = g.trans f := rfl
-
-theorem Aut_inv_def (f : Aut X) : f⁻¹ = f.symm := rfl
 
 def unitsEndEquivAut : (End X)ˣ ≃* Aut X where
   toFun f := ⟨f.1, f.2, f.4, f.3⟩

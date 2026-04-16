@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Hom/Basic.lean
-Genuine: 138 | Conflates: 0 | Dissolved: 14 | Infrastructure: 71
+Genuine: 154 | Conflates: 0 | Dissolved: 0 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Logic.Equiv.Option
@@ -9,6 +9,8 @@ import Mathlib.Order.Disjoint
 import Mathlib.Order.WithBot
 import Mathlib.Tactic.Monotonicity.Attr
 import Mathlib.Util.AssertExists
+
+noncomputable section
 
 /-!
 # Order homomorphisms
@@ -152,10 +154,6 @@ theorem map_inv_le_iff (f : F) {a : α} {b : β} : EquivLike.inv f b ≤ a ↔ b
   convert (map_le_map_iff f (a := EquivLike.inv f b) (b := a)).symm
   exact (EquivLike.right_inv f _).symm
 
-theorem map_inv_le_map_inv_iff (f : F) {a b : β} :
-    EquivLike.inv f b ≤ EquivLike.inv f a ↔ b ≤ a := by
-  simp
-
 @[simp]
 theorem le_map_inv_iff (f : F) {a : α} {b : β} : a ≤ EquivLike.inv f b ↔ f a ≤ b := by
   convert (map_le_map_iff f (a := a) (b := EquivLike.inv f b)).symm
@@ -195,8 +193,6 @@ instance : FunLike (α →o β) α β where
 instance : OrderHomClass (α →o β) α β where
   map_rel f _ _ h := f.monotone' h
 
-@[simp] theorem coe_mk (f : α → β) (hf : Monotone f) : ⇑(mk f hf) = f := rfl
-
 protected theorem monotone (f : α →o β) : Monotone f :=
   f.monotone'
 
@@ -207,27 +203,15 @@ def Simps.coe (f : α →o β) : α → β := f
 
 initialize_simps_projections OrderHom (toFun → coe)
 
-@[simp] theorem toFun_eq_coe (f : α →o β) : f.toFun = f := rfl
-
 @[ext]
 theorem ext (f g : α →o β) (h : (f : α → β) = g) : f = g :=
   DFunLike.coe_injective h
-
-@[simp] theorem coe_eq (f : α →o β) : OrderHomClass.toOrderHom f = f := rfl
-
-@[simp] theorem _root_.OrderHomClass.coe_coe {F} [FunLike F α β] [OrderHomClass F α β] (f : F) :
-    ⇑(f : α →o β) = f :=
-  rfl
 
 protected instance canLift : CanLift (α → β) (α →o β) (↑) Monotone where
   prf f h := ⟨⟨f, h⟩, rfl⟩
 
 protected def copy (f : α →o β) (f' : α → β) (h : f' = f) : α →o β :=
   ⟨f', h.symm.subst f.monotone'⟩
-
-@[simp]
-theorem coe_copy (f : α →o β) (f' : α → β) (h : f' = f) : (f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : α →o β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -252,10 +236,6 @@ theorem le_def {f g : α →o β} : f ≤ g ↔ ∀ x, f x ≤ g x :=
 theorem coe_le_coe {f g : α →o β} : (f : α → β) ≤ g ↔ f ≤ g :=
   Iff.rfl
 
-@[simp]
-theorem mk_le_mk {f g : α → β} {hf hg} : mk f hf ≤ mk g hg ↔ f ≤ g :=
-  Iff.rfl
-
 @[mono]
 theorem apply_mono {f g : α →o β} {x y : α} (h₁ : f ≤ g) (h₂ : x ≤ y) : f x ≤ g y :=
   (h₁ x).trans <| g.mono h₂
@@ -268,14 +248,6 @@ def curry : (α × β →o γ) ≃o (α →o β →o γ) where
   right_inv _ := rfl
   map_rel_iff' := by simp [le_def]
 
-@[simp]
-theorem curry_apply (f : α × β →o γ) (x : α) (y : β) : curry f x y = f (x, y) :=
-  rfl
-
-@[simp]
-theorem curry_symm_apply (f : α →o β →o γ) (x : α × β) : curry.symm f x = f x.1 x.2 :=
-  rfl
-
 @[simps (config := .asFn)]
 def comp (g : β →o γ) (f : α →o β) : α →o γ :=
   ⟨g ∘ f, g.mono.comp f.mono⟩
@@ -283,9 +255,6 @@ def comp (g : β →o γ) (f : α →o β) : α →o γ :=
 @[mono]
 theorem comp_mono ⦃g₁ g₂ : β →o γ⦄ (hg : g₁ ≤ g₂) ⦃f₁ f₂ : α →o β⦄ (hf : f₁ ≤ f₂) :
     g₁.comp f₁ ≤ g₂.comp f₂ := fun _ => (hg _).trans (g₂.mono <| hf _)
-
-@[simp] lemma mk_comp_mk (g : β → γ) (f : α → β) (hg hf) :
-    comp ⟨g, hg⟩ ⟨f, hf⟩ = ⟨g ∘ f, hg.comp hf⟩ := rfl
 
 @[simps! (config := .asFn)]
 def compₘ : (β →o γ) →o (α →o β) →o α →o γ :=
@@ -306,15 +275,6 @@ def const (α : Type*) [Preorder α] {β : Type*} [Preorder β] : β →o α →
   toFun b := ⟨Function.const α b, fun _ _ _ => le_rfl⟩
   monotone' _ _ h _ := h
 
-@[simp]
-theorem const_comp (f : α →o β) (c : γ) : (const β c).comp f = const α c :=
-  rfl
-
-@[simp]
-theorem comp_const (γ : Type*) [Preorder γ] (f : α →o β) (c : α) :
-    f.comp (const γ c) = const γ (f c) :=
-  rfl
-
 @[simps]
 protected def prod (f : α →o β) (g : α →o γ) : α →o β × γ :=
   ⟨fun x => (f x, g x), fun _ _ h => ⟨f.mono h, g.mono h⟩⟩
@@ -322,10 +282,6 @@ protected def prod (f : α →o β) (g : α →o γ) : α →o β × γ :=
 @[mono]
 theorem prod_mono {f₁ f₂ : α →o β} (hf : f₁ ≤ f₂) {g₁ g₂ : α →o γ} (hg : g₁ ≤ g₂) :
     f₁.prod g₁ ≤ f₂.prod g₂ := fun _ => Prod.le_def.2 ⟨hf _, hg _⟩
-
-theorem comp_prod_comp_same (f₁ f₂ : β →o γ) (g : α →o β) :
-    (f₁.comp g).prod (f₂.comp g) = (f₁.prod f₂).comp g :=
-  rfl
 
 @[simps!]
 def prodₘ : (α →o β) →o (α →o γ) →o α →o β × γ :=
@@ -361,14 +317,6 @@ theorem snd_comp_prod (f : α →o β) (g : α →o γ) : snd.comp (f.prod g) = 
   ext _ _ rfl
 
 @[simps]
-def prodIso : (α →o β × γ) ≃o (α →o β) × (α →o γ) where
-  toFun f := (fst.comp f, snd.comp f)
-  invFun f := f.1.prod f.2
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_rel_iff' := forall_and.symm
-
-@[simps]
 def prodMap (f : α →o β) (g : γ →o δ) : α × γ →o β × δ :=
   ⟨Prod.map f g, fun _ _ h => ⟨f.mono h.1, g.mono h.2⟩⟩
 
@@ -390,14 +338,6 @@ def apply (x : α) : (α →o β) →o β :=
 @[simps]
 def pi (f : ∀ i, α →o π i) : α →o ∀ i, π i :=
   ⟨fun x i => f i x, fun _ _ h i => (f i).mono h⟩
-
-@[simps]
-def piIso : (α →o ∀ i, π i) ≃o ∀ i, α →o π i where
-  toFun f i := (Pi.evalOrderHom i).comp f
-  invFun := pi
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_rel_iff' := forall_swap
 
 @[simps (config := .asFn)]
 def Subtype.val (p : α → Prop) : Subtype p →o α :=
@@ -424,31 +364,13 @@ protected def dual : (α →o β) ≃ (αᵒᵈ →o βᵒᵈ) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-@[simp]
-theorem dual_id : (OrderHom.id : α →o α).dual = OrderHom.id :=
-  rfl
+@[simps (config := .asFn)]
+protected def withBotMap (f : α →o β) : WithBot α →o WithBot β :=
+  ⟨WithBot.map f, f.mono.withBot_map⟩
 
-@[simp]
-theorem dual_comp (g : β →o γ) (f : α →o β) :
-    (g.comp f).dual = g.dual.comp f.dual :=
-  rfl
-
-@[simp]
-theorem symm_dual_id : OrderHom.dual.symm OrderHom.id = (OrderHom.id : α →o α) :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : βᵒᵈ →o γᵒᵈ) (f : αᵒᵈ →o βᵒᵈ) :
-    OrderHom.dual.symm (g.comp f) = (OrderHom.dual.symm g).comp (OrderHom.dual.symm f) :=
-  rfl
-
-def dualIso (α β : Type*) [Preorder α] [Preorder β] : (α →o β) ≃o (αᵒᵈ →o βᵒᵈ)ᵒᵈ where
-  toEquiv := OrderHom.dual.trans OrderDual.toDual
-  map_rel_iff' := Iff.rfl
-
--- DISSOLVED: withBotMap
-
--- DISSOLVED: withTopMap
+@[simps (config := .asFn)]
+protected def withTopMap (f : α →o β) : WithTop α →o WithTop β :=
+  ⟨WithTop.map f, f.mono.withTop_map⟩
 
 end OrderHom
 
@@ -459,22 +381,12 @@ def RelEmbedding.orderEmbeddingOfLTEmbedding [PartialOrder α] [PartialOrder β]
       intros
       simp [le_iff_lt_or_eq, f.map_rel_iff, f.injective.eq_iff] }
 
-@[simp]
-theorem RelEmbedding.orderEmbeddingOfLTEmbedding_apply [PartialOrder α] [PartialOrder β]
-    {f : ((· < ·) : α → α → Prop) ↪r ((· < ·) : β → β → Prop)} {x : α} :
-    RelEmbedding.orderEmbeddingOfLTEmbedding f x = f x :=
-  rfl
-
 namespace OrderEmbedding
 
 variable [Preorder α] [Preorder β] (f : α ↪o β)
 
 def ltEmbedding : ((· < ·) : α → α → Prop) ↪r ((· < ·) : β → β → Prop) :=
   { f with map_rel_iff' := by intros; simp [lt_iff_le_not_le, f.map_rel_iff] }
-
-@[simp]
-theorem ltEmbedding_apply (x : α) : f.ltEmbedding x = f x :=
-  rfl
 
 @[simp]
 theorem le_iff_le {a b} : f a ≤ f b ↔ a ≤ b :=
@@ -511,30 +423,32 @@ protected theorem wellFoundedLT [WellFoundedLT β] (f : α ↪o β) : WellFounde
 protected theorem wellFoundedGT [WellFoundedGT β] (f : α ↪o β) : WellFoundedGT α :=
   @OrderEmbedding.wellFoundedLT αᵒᵈ _ _ _ _ f.dual
 
--- DISSOLVED: withBotMap
+@[simps (config := .asFn)]
+protected def withBotMap (f : α ↪o β) : WithBot α ↪o WithBot β :=
+  { f.toEmbedding.optionMap with
+    toFun := WithBot.map f,
+    map_rel_iff' := @fun a b => WithBot.map_le_iff f f.map_rel_iff a b }
 
--- DISSOLVED: withTopMap
+@[simps (config := .asFn)]
+protected def withTopMap (f : α ↪o β) : WithTop α ↪o WithTop β :=
+  { f.dual.withBotMap.dual with toFun := WithTop.map f }
 
--- DISSOLVED: withBotCoe
+@[simps (config := .asFn)]
+protected def withBotCoe : α ↪o WithBot α where
+  toFun := .some
+  inj' := Option.some_injective _
+  map_rel_iff' := WithBot.coe_le_coe
 
--- DISSOLVED: withTopCoe
+@[simps (config := .asFn)]
+protected def withTopCoe : α ↪o WithTop α :=
+  { (OrderEmbedding.withBotCoe (α := αᵒᵈ)).dual with toFun := .some }
 
 def ofMapLEIff {α β} [PartialOrder α] [Preorder β] (f : α → β) (hf : ∀ a b, f a ≤ f b ↔ a ≤ b) :
     α ↪o β :=
   RelEmbedding.ofMapRelIff f hf
 
-@[simp]
-theorem coe_ofMapLEIff {α β} [PartialOrder α] [Preorder β] {f : α → β} (h) :
-    ⇑(ofMapLEIff f h) = f :=
-  rfl
-
 def ofStrictMono {α β} [LinearOrder α] [Preorder β] (f : α → β) (h : StrictMono f) : α ↪o β :=
   ofMapLEIff f fun _ _ => h.le_iff_le
-
-@[simp]
-theorem coe_ofStrictMono {α β} [LinearOrder α] [Preorder β] {f : α → β} (h : StrictMono f) :
-    ⇑(ofStrictMono f h) = f :=
-  rfl
 
 @[simps! (config := .asFn)]
 def subtype (p : α → Prop) : Subtype p ↪o α :=
@@ -549,9 +463,6 @@ def toOrderHom {X Y : Type*} [Preorder X] [Preorder Y] (f : X ↪o Y) : X →o Y
   toFun := isEmptyElim
   inj' := isEmptyElim
   map_rel_iff' {a} := isEmptyElim a
-
-@[simp, norm_cast]
-lemma coe_ofIsEmpty [IsEmpty α] : (ofIsEmpty : α ↪o β) = (isEmptyElim : α → β) := rfl
 
 end OrderEmbedding
 
@@ -618,20 +529,12 @@ instance : EquivLike (α ≃o β) α β where
 instance : OrderIsoClass (α ≃o β) α β where
   map_le_map_iff f _ _ := f.map_rel_iff'
 
-@[simp]
-theorem toFun_eq_coe {f : α ≃o β} : f.toFun = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : α ≃o β} (h : (f : α → β) = g) : f = g :=
   DFunLike.coe_injective h
 
 def toOrderEmbedding (e : α ≃o β) : α ↪o β :=
   e.toRelEmbedding
-
-@[simp]
-theorem coe_toOrderEmbedding (e : α ≃o β) : ⇑e.toOrderEmbedding = e :=
-  rfl
 
 protected theorem bijective (e : α ≃o β) : Function.Bijective e :=
   e.toEquiv.bijective
@@ -652,14 +555,6 @@ def refl (α : Type*) [LE α] : α ≃o α :=
 theorem coe_refl : ⇑(refl α) = id :=
   rfl
 
-@[simp]
-theorem refl_apply (x : α) : refl α x = x :=
-  rfl
-
-@[simp]
-theorem refl_toEquiv : (refl α).toEquiv = Equiv.refl α :=
-  rfl
-
 def symm (e : α ≃o β) : β ≃o α := RelIso.symm e
 
 @[simp]
@@ -669,10 +564,6 @@ theorem apply_symm_apply (e : α ≃o β) (x : β) : e (e.symm x) = x :=
 @[simp]
 theorem symm_apply_apply (e : α ≃o β) (x : α) : e.symm (e x) = x :=
   e.toEquiv.symm_apply_apply x
-
-@[simp]
-theorem symm_refl (α : Type*) [LE α] : (refl α).symm = refl α :=
-  rfl
 
 theorem apply_eq_iff_eq_symm_apply (e : α ≃o β) (x : α) (y : β) : e x = y ↔ x = e.symm y :=
   e.toEquiv.apply_eq_iff_eq_symm_apply
@@ -689,20 +580,12 @@ theorem symm_bijective : Function.Bijective (OrderIso.symm : (α ≃o β) → β
 theorem symm_injective : Function.Injective (symm : α ≃o β → β ≃o α) :=
   symm_bijective.injective
 
-@[simp]
-theorem toEquiv_symm (e : α ≃o β) : e.toEquiv.symm = e.symm.toEquiv :=
-  rfl
-
 @[trans]
 def trans (e : α ≃o β) (e' : β ≃o γ) : α ≃o γ :=
   RelIso.trans e e'
 
 @[simp]
 theorem coe_trans (e : α ≃o β) (e' : β ≃o γ) : ⇑(e.trans e') = e' ∘ e :=
-  rfl
-
-@[simp]
-theorem trans_apply (e : α ≃o β) (e' : β ≃o γ) (x : α) : e.trans e' x = e' (e x) :=
   rfl
 
 @[simp]
@@ -713,14 +596,6 @@ theorem refl_trans (e : α ≃o β) : (refl α).trans e = e := by
 @[simp]
 theorem trans_refl (e : α ≃o β) : e.trans (refl β) = e := by
   ext x
-  rfl
-
-@[simp]
-theorem symm_trans_apply (e₁ : α ≃o β) (e₂ : β ≃o γ) (c : γ) :
-    (e₁.trans e₂).symm c = e₁.symm (e₂.symm c) :=
-  rfl
-
-theorem symm_trans (e₁ : α ≃o β) (e₂ : β ≃o γ) : (e₁.trans e₂).symm = e₂.symm.trans e₁.symm :=
   rfl
 
 @[simp]
@@ -757,36 +632,12 @@ def prodComm : α × β ≃o β × α where
   toEquiv := Equiv.prodComm α β
   map_rel_iff' := Prod.swap_le_swap
 
-@[simp]
-theorem coe_prodComm : ⇑(prodComm : α × β ≃o β × α) = Prod.swap :=
-  rfl
-
-@[simp]
-theorem prodComm_symm : (prodComm : α × β ≃o β × α).symm = prodComm :=
-  rfl
-
 variable (α)
 
 def dualDual : α ≃o αᵒᵈᵒᵈ :=
   refl α
 
-@[simp]
-theorem coe_dualDual : ⇑(dualDual α) = toDual ∘ toDual :=
-  rfl
-
-@[simp]
-theorem coe_dualDual_symm : ⇑(dualDual α).symm = ofDual ∘ ofDual :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem dualDual_apply (a : α) : dualDual α a = toDual (toDual a) :=
-  rfl
-
-@[simp]
-theorem dualDual_symm_apply (a : αᵒᵈᵒᵈ) : (dualDual α).symm a = ofDual (ofDual a) :=
-  rfl
 
 end LE
 
@@ -800,6 +651,7 @@ theorem le_iff_le (e : α ≃o β) {x y : α} : e x ≤ e y ↔ x ≤ y :=
   e.map_rel_iff
 
 @[gcongr] protected alias ⟨_, GCongr.orderIso_apply_le_apply⟩ := le_iff_le
+
 theorem le_symm_apply (e : α ≃o β) {x : α} {y : β} : x ≤ e.symm y ↔ e x ≤ y :=
   e.rel_symm_apply
 
@@ -821,31 +673,13 @@ theorem lt_iff_lt (e : α ≃o β) {x y : α} : e x < e y ↔ x < y :=
   e.toOrderEmbedding.lt_iff_lt
 
 @[gcongr] protected alias ⟨_, GCongr.orderIso_apply_lt_apply⟩ := lt_iff_lt
+
 def toRelIsoLT (e : α ≃o β) : ((· < ·) : α → α → Prop) ≃r ((· < ·) : β → β → Prop) :=
   ⟨e.toEquiv, lt_iff_lt e⟩
-
-@[simp]
-theorem toRelIsoLT_apply (e : α ≃o β) (x : α) : e.toRelIsoLT x = e x :=
-  rfl
-
-@[simp]
-theorem toRelIsoLT_symm (e : α ≃o β) : e.toRelIsoLT.symm = e.symm.toRelIsoLT :=
-  rfl
 
 def ofRelIsoLT {α β} [PartialOrder α] [PartialOrder β]
     (e : ((· < ·) : α → α → Prop) ≃r ((· < ·) : β → β → Prop)) : α ≃o β :=
   ⟨e.toEquiv, by simp [le_iff_eq_or_lt, e.map_rel_iff, e.injective.eq_iff]⟩
-
-@[simp]
-theorem ofRelIsoLT_apply {α β} [PartialOrder α] [PartialOrder β]
-    (e : ((· < ·) : α → α → Prop) ≃r ((· < ·) : β → β → Prop)) (x : α) : ofRelIsoLT e x = e x :=
-  rfl
-
-@[simp]
-theorem ofRelIsoLT_symm {α β} [PartialOrder α] [PartialOrder β]
-    (e : ((· < ·) : α → α → Prop) ≃r ((· < ·) : β → β → Prop)) :
-    (ofRelIsoLT e).symm = ofRelIsoLT e.symm :=
-  rfl
 
 @[simp]
 theorem ofRelIsoLT_toRelIsoLT {α β} [PartialOrder α] [PartialOrder β] (e : α ≃o β) :
@@ -895,11 +729,6 @@ def funUnique (α β : Type*) [Unique α] [Preorder β] : (α → β) ≃o β wh
   toEquiv := Equiv.funUnique α β
   map_rel_iff' := by simp [Pi.le_def, Unique.forall_iff]
 
-@[simp]
-theorem funUnique_symm_apply {α β : Type*} [Unique α] [Preorder β] :
-    ((funUnique α β).symm : β → α → β) = Function.const α :=
-  rfl
-
 end OrderIso
 
 namespace Equiv
@@ -908,16 +737,6 @@ variable [Preorder α] [Preorder β]
 
 def toOrderIso (e : α ≃ β) (h₁ : Monotone e) (h₂ : Monotone e.symm) : α ≃o β :=
   ⟨e, ⟨fun h => by simpa only [e.symm_apply_apply] using h₂ h, fun h => h₁ h⟩⟩
-
-@[simp]
-theorem coe_toOrderIso (e : α ≃ β) (h₁ : Monotone e) (h₂ : Monotone e.symm) :
-    ⇑(e.toOrderIso h₁ h₂) = e :=
-  rfl
-
-@[simp]
-theorem toOrderIso_toEquiv (e : α ≃ β) (h₁ : Monotone e) (h₂ : Monotone e.symm) :
-    (e.toOrderIso h₁ h₂).toEquiv = e :=
-  rfl
 
 end Equiv
 
@@ -1015,24 +834,6 @@ namespace WithBot
 protected def toDualTopEquiv [LE α] : WithBot αᵒᵈ ≃o (WithTop α)ᵒᵈ :=
   OrderIso.refl _
 
-@[simp]
-theorem toDualTopEquiv_coe [LE α] (a : α) :
-    WithBot.toDualTopEquiv ↑(toDual a) = toDual (a : WithTop α) :=
-  rfl
-
-@[simp]
-theorem toDualTopEquiv_symm_coe [LE α] (a : α) :
-    WithBot.toDualTopEquiv.symm (toDual (a : WithTop α)) = ↑(toDual a) :=
-  rfl
-
-@[simp]
-theorem toDualTopEquiv_bot [LE α] : WithBot.toDualTopEquiv (⊥ : WithBot αᵒᵈ) = ⊥ :=
-  rfl
-
-@[simp]
-theorem toDualTopEquiv_symm_bot [LE α] : WithBot.toDualTopEquiv.symm (⊥ : (WithTop α)ᵒᵈ) = ⊥ :=
-  rfl
-
 theorem coe_toDualTopEquiv_eq [LE α] :
     (WithBot.toDualTopEquiv : WithBot αᵒᵈ → (WithTop α)ᵒᵈ) = toDual ∘ WithBot.ofDual :=
   funext fun _ => rfl
@@ -1050,24 +851,6 @@ namespace WithTop
 protected def toDualBotEquiv [LE α] : WithTop αᵒᵈ ≃o (WithBot α)ᵒᵈ :=
   OrderIso.refl _
 
-@[simp]
-theorem toDualBotEquiv_coe [LE α] (a : α) :
-    WithTop.toDualBotEquiv ↑(toDual a) = toDual (a : WithBot α) :=
-  rfl
-
-@[simp]
-theorem toDualBotEquiv_symm_coe [LE α] (a : α) :
-    WithTop.toDualBotEquiv.symm (toDual (a : WithBot α)) = ↑(toDual a) :=
-  rfl
-
-@[simp]
-theorem toDualBotEquiv_top [LE α] : WithTop.toDualBotEquiv (⊤ : WithTop αᵒᵈ) = ⊤ :=
-  rfl
-
-@[simp]
-theorem toDualBotEquiv_symm_top [LE α] : WithTop.toDualBotEquiv.symm (⊤ : (WithBot α)ᵒᵈ) = ⊤ :=
-  rfl
-
 theorem coe_toDualBotEquiv [LE α] :
     (WithTop.toDualBotEquiv : WithTop αᵒᵈ → (WithBot α)ᵒᵈ) = toDual ∘ WithTop.ofDual :=
   funext fun _ => rfl
@@ -1084,21 +867,40 @@ namespace OrderIso
 
 variable [PartialOrder α] [PartialOrder β] [PartialOrder γ]
 
--- DISSOLVED: withTopCongr
+@[simps! apply]
+def withTopCongr (e : α ≃o β) : WithTop α ≃o WithTop β :=
+  { e.toOrderEmbedding.withTopMap with
+    toEquiv := e.toEquiv.optionCongr }
 
--- DISSOLVED: withTopCongr_refl
+@[simp]
+theorem withTopCongr_refl : (OrderIso.refl α).withTopCongr = OrderIso.refl _ :=
+  RelIso.toEquiv_injective Equiv.optionCongr_refl
 
--- DISSOLVED: withTopCongr_symm
+@[simp]
+theorem withTopCongr_symm (e : α ≃o β) : e.withTopCongr.symm = e.symm.withTopCongr :=
+  RelIso.toEquiv_injective e.toEquiv.optionCongr_symm
 
--- DISSOLVED: withTopCongr_trans
+@[simp]
+theorem withTopCongr_trans (e₁ : α ≃o β) (e₂ : β ≃o γ) :
+    e₁.withTopCongr.trans e₂.withTopCongr = (e₁.trans e₂).withTopCongr :=
+  RelIso.toEquiv_injective <| e₁.toEquiv.optionCongr_trans e₂.toEquiv
 
--- DISSOLVED: withBotCongr
+@[simps! apply]
+def withBotCongr (e : α ≃o β) : WithBot α ≃o WithBot β :=
+  { e.toOrderEmbedding.withBotMap with toEquiv := e.toEquiv.optionCongr }
 
--- DISSOLVED: withBotCongr_refl
+@[simp]
+theorem withBotCongr_refl : (OrderIso.refl α).withBotCongr = OrderIso.refl _ :=
+  RelIso.toEquiv_injective Equiv.optionCongr_refl
 
--- DISSOLVED: withBotCongr_symm
+@[simp]
+theorem withBotCongr_symm (e : α ≃o β) : e.withBotCongr.symm = e.symm.withBotCongr :=
+  RelIso.toEquiv_injective e.toEquiv.optionCongr_symm
 
--- DISSOLVED: withBotCongr_trans
+@[simp]
+theorem withBotCongr_trans (e₁ : α ≃o β) (e₂ : β ≃o γ) :
+    e₁.withBotCongr.trans e₂.withBotCongr = (e₁.trans e₂).withBotCongr :=
+  RelIso.toEquiv_injective <| e₁.toEquiv.optionCongr_trans e₂.toEquiv
 
 end OrderIso
 

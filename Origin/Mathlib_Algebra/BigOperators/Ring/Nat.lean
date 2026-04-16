@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Ring.Parity
 
+noncomputable section
+
 /-!
 # Big operators on a finset in the natural numbers
 

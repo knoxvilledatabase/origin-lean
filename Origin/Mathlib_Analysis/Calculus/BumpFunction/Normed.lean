@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.BumpFunction.Basic
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
+noncomputable section
+
 /-!
 # Normed bump function
 
@@ -109,16 +111,6 @@ theorem normed_le_div_measure_closedBall_rIn [μ.IsOpenPosMeasure] (x : E) :
   · exact ENNReal.toReal_pos (measure_closedBall_pos _ _ f.rIn_pos).ne' measure_closedBall_lt_top.ne
   · exact f.le_one
   · exact f.measure_closedBall_le_integral μ
-
-theorem integral_le_measure_closedBall : ∫ x, f x ∂μ ≤ (μ (closedBall c f.rOut)).toReal := by calc
-  ∫ x, f x ∂μ = ∫ x in closedBall c f.rOut, f x ∂μ := by
-    apply (setIntegral_eq_integral_of_forall_compl_eq_zero (fun x hx ↦ ?_)).symm
-    apply f.zero_of_le_dist (le_of_lt _)
-    simpa using hx
-  _ ≤ ∫ x in closedBall c f.rOut, 1 ∂μ := by
-    apply setIntegral_mono f.integrable.integrableOn _ (fun x ↦ f.le_one)
-    simp [measure_closedBall_lt_top]
-  _ = (μ (closedBall c f.rOut)).toReal := by simp
 
 theorem measure_closedBall_div_le_integral [IsAddHaarMeasure μ] (K : ℝ) (h : f.rOut ≤ K * f.rIn) :
     (μ (closedBall c f.rOut)).toReal / K ^ finrank ℝ E ≤ ∫ x, f x ∂μ := by

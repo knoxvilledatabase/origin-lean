@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # The `A`-module structure on `M ⊗[R] N`
 
@@ -79,18 +81,11 @@ variable [IsScalarTower R A P'] [IsScalarTower R B P'] [SMulCommClass A B P']
 
 variable [AddCommMonoid Q'] [Module R Q']
 
-theorem smul_eq_lsmul_rTensor (a : A) (x : M ⊗[R] N) : a • x = (lsmul R R M a).rTensor N x :=
-  rfl
-
 @[simps]
 nonrec def curry (f : M ⊗[R] N →ₗ[A] P) : M →ₗ[A] N →ₗ[R] P :=
   { curry (f.restrictScalars R) with
     toFun := curry (f.restrictScalars R)
     map_smul' := fun c x => LinearMap.ext fun y => f.map_smul c (x ⊗ₜ y) }
-
-theorem restrictScalars_curry (f : M ⊗[R] N →ₗ[A] P) :
-    restrictScalars R (curry f) = TensorProduct.curry (f.restrictScalars R) :=
-  rfl
 
 @[ext high]
 nonrec theorem curry_injective : Function.Injective (curry : (M ⊗ N →ₗ[A] P) → M →ₗ[A] N →ₗ[R] P) :=
@@ -113,11 +108,6 @@ nonrec def lift (f : M →ₗ[A] N →ₗ[R] P) : M ⊗[R] N →ₗ[A] P :=
           TensorProduct.ext' fun x y => by
             simp only [comp_apply, Algebra.lsmul_coe, smul_tmul', lift.tmul,
               coe_restrictScalars, f.map_smul, smul_apply] }
-
-@[simp]
-theorem lift_apply (f : M →ₗ[A] N →ₗ[R] P) (a : M ⊗[R] N) :
-    AlgebraTensorModule.lift f a = TensorProduct.lift (LinearMap.restrictScalars R f) a :=
-  rfl
 
 @[simp]
 theorem lift_tmul (f : M →ₗ[A] N →ₗ[R] P) (x : M) (y : N) : lift f (x ⊗ₜ y) = f x y :=
@@ -205,18 +195,6 @@ def lTensor : (N →ₗ[R] Q) →ₗ[R] M ⊗[R] N →ₗ[A] M ⊗[R] Q where
   map_add' f₁ f₂ := map_add_right _ f₁ f₂
   map_smul' _ _ := map_smul_right _ _ _
 
-@[simp]
-lemma coe_lTensor (f : N →ₗ[R] Q) :
-    (lTensor A M f : M ⊗[R] N → M ⊗[R] Q) = f.lTensor M := rfl
-
-@[simp]
-lemma restrictScalars_lTensor (f : N →ₗ[R] Q) :
-    LinearMap.restrictScalars R (lTensor A M f) = f.lTensor M := rfl
-
-@[simp] lemma lTensor_tmul (f : N →ₗ[R] Q) (m : M) (n : N) :
-    lTensor A M f (m ⊗ₜ[R] n) = m ⊗ₜ f n :=
-  rfl
-
 @[simp] lemma lTensor_id : lTensor A M (id : N →ₗ[R] N) = .id :=
   ext fun _ _ => rfl
 
@@ -237,21 +215,12 @@ def mapBilinear : (M →ₗ[A] P) →ₗ[B] (N →ₗ[R] Q) →ₗ[R] (M ⊗[R] 
 
 variable {R A B M N P Q}
 
-@[simp]
-theorem mapBilinear_apply (f : M →ₗ[A] P) (g : N →ₗ[R] Q) :
-    mapBilinear R A B M N P Q f g = map f g :=
-  rfl
-
 variable (R A B M N P Q)
 
 def homTensorHomMap : ((M →ₗ[A] P) ⊗[R] (N →ₗ[R] Q)) →ₗ[B] (M ⊗[R] N →ₗ[A] P ⊗[R] Q) :=
   lift <| mapBilinear R A B M N P Q
 
 variable {R A B M N P Q}
-
-@[simp] theorem homTensorHomMap_apply (f : M →ₗ[A] P) (g : N →ₗ[R] Q) :
-    homTensorHomMap R A B M N P Q (f ⊗ₜ g) = map f g :=
-  rfl
 
 def congr (f : M ≃ₗ[A] P) (g : N ≃ₗ[R] Q) : (M ⊗[R] N) ≃ₗ[A] (P ⊗[R] Q) :=
   LinearEquiv.ofLinear (map f g) (map f.symm g.symm)
@@ -266,21 +235,11 @@ theorem congr_trans (f₁ : M ≃ₗ[A] P) (f₂ : P ≃ₗ[A] P') (g₁ : N ≃
     congr (f₁.trans f₂) (g₁.trans g₂) = (congr f₁ g₁).trans (congr f₂ g₂) :=
   LinearEquiv.toLinearMap_injective <| map_comp _ _ _ _
 
-theorem congr_symm (f : M ≃ₗ[A] P) (g : N ≃ₗ[R] Q) : congr f.symm g.symm = (congr f g).symm := rfl
-
 @[simp]
 theorem congr_one : congr (1 : M ≃ₗ[A] M) (1 : N ≃ₗ[R] N) = 1 := congr_refl
 
 theorem congr_mul (f₁ f₂ : M ≃ₗ[A] M) (g₁ g₂ : N ≃ₗ[R] N) :
     congr (f₁ * f₂) (g₁ * g₂) = congr f₁ g₁ * congr f₂ g₂ := congr_trans _ _ _ _
-
-@[simp] theorem congr_tmul (f : M ≃ₗ[A] P) (g : N ≃ₗ[R] Q) (m : M) (n : N) :
-    congr f g (m ⊗ₜ n) = f m ⊗ₜ g n :=
-  rfl
-
-@[simp] theorem congr_symm_tmul (f : M ≃ₗ[A] P) (g : N ≃ₗ[R] Q) (p : P) (q : Q) :
-    (congr f g).symm (p ⊗ₜ q) = f.symm p ⊗ₜ g.symm q :=
-  rfl
 
 variable (R A M)
 
@@ -296,13 +255,7 @@ theorem rid_eq_rid : AlgebraTensorModule.rid R R M = TensorProduct.rid R M :=
 
 variable {R M} in
 
-@[simp]
-theorem rid_tmul (r : R) (m : M) : AlgebraTensorModule.rid R A M (m ⊗ₜ r) = r • m := rfl
-
 variable {M} in
-
-@[simp]
-theorem rid_symm_apply (m : M) : (AlgebraTensorModule.rid R A M).symm m = m ⊗ₜ 1 := rfl
 
 end
 
@@ -343,16 +296,6 @@ def assoc : (M ⊗[A] P) ⊗[R] Q ≃ₗ[B] M ⊗[A] (P ⊗[R] Q) :=
 
 variable {M P N Q}
 
-@[simp]
-theorem assoc_tmul (m : M) (p : P) (q : Q) :
-    assoc R A B M P Q ((m ⊗ₜ p) ⊗ₜ q) = m ⊗ₜ (p ⊗ₜ q) :=
-  rfl
-
-@[simp]
-theorem assoc_symm_tmul (m : M) (p : P) (q : Q) :
-    (assoc R A B M P Q).symm (m ⊗ₜ (p ⊗ₜ q)) = (m ⊗ₜ p) ⊗ₜ q :=
-  rfl
-
 theorem rTensor_tensor [Module R P'] [IsScalarTower R A P'] (g : P →ₗ[A] P') :
     rTensor (M ⊗[R] N) g =
       assoc R A A P' M N ∘ₗ map (rTensor M g) id ∘ₗ (assoc R A A P M N).symm.toLinearMap :=
@@ -373,16 +316,6 @@ def distribBaseChange : A ⊗[R] (M ⊗[R] N) ≃ₗ[A] (A ⊗[R] M) ⊗[A] (A �
 
 variable {M P N Q}
 
-@[simp]
-theorem cancelBaseChange_tmul (m : M) (n : N) (a : A) :
-    cancelBaseChange R A B M N (m ⊗ₜ (a ⊗ₜ n)) = (a • m) ⊗ₜ n :=
-  rfl
-
-@[simp]
-theorem cancelBaseChange_symm_tmul (m : M) (n : N) :
-    (cancelBaseChange R A B M N).symm (m ⊗ₜ n) = m ⊗ₜ (1 ⊗ₜ n) :=
-  rfl
-
 end cancelBaseChange
 
 section leftComm
@@ -396,16 +329,6 @@ def leftComm : M ⊗[A] (P ⊗[R] Q) ≃ₗ[A] P ⊗[A] (M ⊗[R] Q) :=
   e₁ ≪≫ₗ e₂ ≪≫ₗ e₃
 
 variable {M N P Q}
-
-@[simp]
-theorem leftComm_tmul (m : M) (p : P) (q : Q) :
-    leftComm R A M P Q (m ⊗ₜ (p ⊗ₜ q)) = p ⊗ₜ (m ⊗ₜ q) :=
-  rfl
-
-@[simp]
-theorem leftComm_symm_tmul (m : M) (p : P) (q : Q) :
-    (leftComm R A M P Q).symm (p ⊗ₜ (m ⊗ₜ q)) = m ⊗ₜ (p ⊗ₜ q) :=
-  rfl
 
 end leftComm
 
@@ -427,16 +350,6 @@ def rightComm : (M ⊗[A] P) ⊗[R] Q ≃ₗ[A] (M ⊗[R] Q) ⊗[A] P :=
 
 variable {M N P Q}
 
-@[simp]
-theorem rightComm_tmul (m : M) (p : P) (q : Q) :
-    rightComm R A M P Q ((m ⊗ₜ p) ⊗ₜ q) = (m ⊗ₜ q) ⊗ₜ p :=
-  rfl
-
-@[simp]
-theorem rightComm_symm_tmul (m : M) (p : P) (q : Q) :
-    (rightComm R A M P Q).symm ((m ⊗ₜ q) ⊗ₜ p) = (m ⊗ₜ p) ⊗ₜ q :=
-  rfl
-
 end rightComm
 
 section tensorTensorTensorComm
@@ -453,16 +366,6 @@ def tensorTensorTensorComm :
   ≪≫ₗ assoc R _ _ (M ⊗[A] P) N Q
 
 variable {M N P Q}
-
-@[simp]
-theorem tensorTensorTensorComm_tmul (m : M) (n : N) (p : P) (q : Q) :
-    tensorTensorTensorComm R A M N P Q ((m ⊗ₜ n) ⊗ₜ (p ⊗ₜ q)) = (m ⊗ₜ p) ⊗ₜ (n ⊗ₜ q) :=
-  rfl
-
-@[simp]
-theorem tensorTensorTensorComm_symm_tmul (m : M) (n : N) (p : P) (q : Q) :
-    (tensorTensorTensorComm R A M N P Q).symm ((m ⊗ₜ p) ⊗ₜ (n ⊗ₜ q)) = (m ⊗ₜ n) ⊗ₜ (p ⊗ₜ q) :=
-  rfl
 
 end tensorTensorTensorComm
 

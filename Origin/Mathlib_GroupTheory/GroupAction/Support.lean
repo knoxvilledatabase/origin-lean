@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Basic
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 
+noncomputable section
+
 /-!
 # Support of an element under an action action
 

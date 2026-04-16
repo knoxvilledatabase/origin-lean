@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Normed/Module/Ray.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Ray
 import Mathlib.Analysis.NormedSpace.Real
+
+noncomputable section
 
 /-!
 # Rays in a real normed vector space
@@ -48,16 +50,26 @@ end SameRay
 
 variable {x y : F}
 
--- DISSOLVED: norm_injOn_ray_left
+theorem norm_injOn_ray_left (hx : x ≠ 0) : { y | SameRay ℝ x y }.InjOn norm := by
+  rintro y hy z hz h
+  rcases hy.exists_nonneg_left hx with ⟨r, hr, rfl⟩
+  rcases hz.exists_nonneg_left hx with ⟨s, hs, rfl⟩
+  rw [norm_smul, norm_smul, mul_left_inj' (norm_ne_zero_iff.2 hx), norm_of_nonneg hr,
+    norm_of_nonneg hs] at h
+  rw [h]
 
--- DISSOLVED: norm_injOn_ray_right
+theorem norm_injOn_ray_right (hy : y ≠ 0) : { x | SameRay ℝ x y }.InjOn norm := by
+  simpa only [SameRay.sameRay_comm] using norm_injOn_ray_left hy
 
 theorem sameRay_iff_norm_smul_eq : SameRay ℝ x y ↔ ‖x‖ • y = ‖y‖ • x :=
   ⟨SameRay.norm_smul_eq, fun h =>
     or_iff_not_imp_left.2 fun hx =>
       or_iff_not_imp_left.2 fun hy => ⟨‖y‖, ‖x‖, norm_pos_iff.2 hy, norm_pos_iff.2 hx, h.symm⟩⟩
 
--- DISSOLVED: sameRay_iff_inv_norm_smul_eq_of_ne
+theorem sameRay_iff_inv_norm_smul_eq_of_ne (hx : x ≠ 0) (hy : y ≠ 0) :
+    SameRay ℝ x y ↔ ‖x‖⁻¹ • x = ‖y‖⁻¹ • y := by
+  rw [inv_smul_eq_iff₀, smul_comm, eq_comm, inv_smul_eq_iff₀, sameRay_iff_norm_smul_eq] <;>
+    rwa [norm_ne_zero_iff]
 
 alias ⟨SameRay.inv_norm_smul_eq, _⟩ := sameRay_iff_inv_norm_smul_eq_of_ne
 

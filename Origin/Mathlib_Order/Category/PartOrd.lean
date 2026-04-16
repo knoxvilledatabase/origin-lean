@@ -7,6 +7,8 @@ import Mathlib.Order.Antisymmetrization
 import Mathlib.Order.Category.Preord
 import Mathlib.CategoryTheory.Adjunction.Basic
 
+noncomputable section
+
 /-!
 # Category of partial orders
 
@@ -35,10 +37,6 @@ instance : CoeSort PartOrd Type* :=
 
 def of (α : Type*) [PartialOrder α] : PartOrd :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [PartialOrder α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited PartOrd :=
   ⟨of PUnit⟩
@@ -73,11 +71,6 @@ def dualEquiv : PartOrd ≌ PartOrd where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end PartOrd
-
-theorem partOrd_dual_comp_forget_to_preord :
-    PartOrd.dual ⋙ forget₂ PartOrd Preord =
-      forget₂ PartOrd Preord ⋙ Preord.dual :=
-  rfl
 
 def preordToPartOrd : Preord.{u} ⥤ PartOrd where
   obj X := PartOrd.of (Antisymmetrization X (· ≤ ·))

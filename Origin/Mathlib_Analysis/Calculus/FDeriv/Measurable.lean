@@ -10,6 +10,8 @@ import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.MeasureTheory.Constructions.BorelSpace.ContinuousLinearMap
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 
+noncomputable section
+
 /-!
 # Derivative is measurable
 

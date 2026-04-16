@@ -11,6 +11,8 @@ import Batteries.Tactic.Init
 import Mathlib.Order.Defs.PartialOrder
 import Mathlib.Order.Defs.Unbundled
 
+noncomputable section
+
 /-!
 # Miscellaneous function constructions and lemmas
 -/
@@ -27,12 +29,6 @@ variable {α β γ : Sort*} {f : α → β}
 
 @[reducible, simp] def eval {β : α → Sort*} (x : α) (f : ∀ x, β x) : β x := f x
 
-theorem eval_apply {β : α → Sort*} (x : α) (f : ∀ x, β x) : eval x f = f x :=
-  rfl
-
-theorem const_def {y : β} : (fun _ : α ↦ y) = const α y :=
-  rfl
-
 theorem const_injective [Nonempty α] : Injective (const α : β → α → β) := fun _ _ h ↦
   let ⟨x⟩ := ‹Nonempty α›
   congr_fun h x
@@ -40,9 +36,6 @@ theorem const_injective [Nonempty α] : Injective (const α : β → α → β) 
 @[simp]
 theorem const_inj [Nonempty α] {y₁ y₂ : β} : const α y₁ = const α y₂ ↔ y₁ = y₂ :=
   ⟨fun h ↦ const_injective h, fun h ↦ h ▸ rfl⟩
-
-theorem onFun_apply (f : β → β → γ) (g : α → β) (a b : α) : onFun f g a b = f (g a) (g b) :=
-  rfl
 
 lemma hfunext {α α' : Sort u} {β : α → Sort v} {β' : α' → Sort v} {f : ∀a, β a} {f' : ∀a, β' a}
     (hα : α = α') (h : ∀a a', HEq a a' → HEq (f a) (f' a')) : HEq f f' := by
@@ -62,14 +55,6 @@ lemma funext_iff_of_subsingleton [Subsingleton α] {g : α → β} (x y : α) :
   refine ⟨fun h ↦ funext fun z ↦ ?_, fun h ↦ ?_⟩
   · rwa [Subsingleton.elim x z, Subsingleton.elim y z] at h
   · rw [h, Subsingleton.elim x y]
-
-theorem swap_lt {α} [Preorder α] : swap (· < · : α → α → _) = (· > ·) := rfl
-
-theorem swap_le {α} [Preorder α] : swap (· ≤ · : α → α → _) = (· ≥ ·) := rfl
-
-theorem swap_gt {α} [Preorder α] : swap (· > · : α → α → _) = (· < ·) := rfl
-
-theorem swap_ge {α} [Preorder α] : swap (· ≥ · : α → α → _) = (· ≤ ·) := rfl
 
 protected theorem Bijective.injective {f : α → β} (hf : Bijective f) : Injective f := hf.1
 
@@ -672,9 +657,6 @@ theorem comp_right {α β γ δ : Sort*} {f : α → β} {g : α → γ} (h : Fa
 
 end FactorsThrough
 
-theorem uncurry_def {α β γ} (f : α → β → γ) : uncurry f = fun p ↦ f p.1 p.2 :=
-  rfl
-
 section Bicomp
 
 variable {α β γ δ ε : Type*}
@@ -687,13 +669,6 @@ def bicompr (f : γ → δ) (g : α → β → γ) (a b) :=
 
 local notation f " ∘₂ " g => bicompr f g
 
-theorem uncurry_bicompr (f : α → β → γ) (g : γ → δ) : uncurry (g ∘₂ f) = g ∘ uncurry f :=
-  rfl
-
-theorem uncurry_bicompl (f : γ → δ → ε) (g : α → γ) (h : β → δ) :
-    uncurry (bicompl f g h) = uncurry f ∘ Prod.map g h :=
-  rfl
-
 end Bicomp
 
 section Uncurry
@@ -705,6 +680,8 @@ class HasUncurry (α : Type*) (β : outParam Type*) (γ : outParam Type*) where
   `f : α → β → γ → δ` will be turned into `↿f : α × β × γ → δ`. One can also add instances
   for bundled maps. -/
   uncurry : α → β → γ
+
+@[inherit_doc] notation:arg "↿" x:arg => HasUncurry.uncurry x
 
 instance hasUncurryBase : HasUncurry (α → β) α β :=
   ⟨id⟩

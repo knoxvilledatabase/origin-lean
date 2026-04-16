@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SetFamily.Compression.UV
 import Mathlib.Combinatorics.SetFamily.Intersecting
 import Mathlib.Data.Finset.Fin
 
+noncomputable section
+
 /-!
 # Kruskal-Katona theorem
 

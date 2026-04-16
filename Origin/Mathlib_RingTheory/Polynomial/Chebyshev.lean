@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Tactic.LinearCombination
 
+noncomputable section
+
 /-!
 # Chebyshev polynomials
 
@@ -88,9 +90,6 @@ theorem T_sub_one (n : ℤ) : T R (n - 1) = 2 * X * T R n - T R (n + 1) := by
 
 theorem T_eq (n : ℤ) : T R n = 2 * X * T R (n - 1) - T R (n - 2) := by
   linear_combination (norm := ring_nf) T_add_two R (n - 2)
-
-@[simp]
-theorem T_zero : T R 0 = 1 := rfl
 
 @[simp]
 theorem T_one : T R 1 = X := rfl

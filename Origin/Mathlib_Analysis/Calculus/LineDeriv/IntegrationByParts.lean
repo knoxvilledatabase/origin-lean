@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.LineDeriv.Basic
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
+noncomputable section
+
 /-!
 # Integration by parts for line derivatives
 

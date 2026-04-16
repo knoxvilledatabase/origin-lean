@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Functor
 import Mathlib.Order.Sublattice
 import Mathlib.Order.Hom.CompleteLattice
 
+noncomputable section
+
 /-!
 # Complete Sublattices
 
@@ -99,10 +101,6 @@ def subtype (L : CompleteSublattice α) : CompleteLatticeHom L α where
   map_sInf' _ := rfl
   map_sSup' _ := rfl
 
-@[simp, norm_cast] lemma coe_subtype (L : CompleteSublattice α) : L.subtype = ((↑) : L → α) := rfl
-
-lemma subtype_apply (L : Sublattice α) (a : L) : L.subtype a = a := rfl
-
 lemma subtype_injective (L : CompleteSublattice α) :
     Injective <| subtype L := Subtype.coe_injective
 
@@ -119,8 +117,6 @@ lemma subtype_injective (L : CompleteSublattice α) :
     rw [← map_sInf]
     exact mem_image_of_mem f (sInfClosed ht)
 
-@[simp] theorem mem_map {b : β} : b ∈ L.map f ↔ ∃ a ∈ L, f a = b := Iff.rfl
-
 @[simps] def comap (L : CompleteSublattice β) : CompleteSublattice α where
   carrier := f ⁻¹' L
   supClosed' := L.supClosed.preimage f
@@ -129,8 +125,6 @@ lemma subtype_injective (L : CompleteSublattice α) :
     simpa only [mem_preimage, map_sSup, SetLike.mem_coe] using sSupClosed <| mapsTo'.mp hs
   sInfClosed' s hs := by
     simpa only [mem_preimage, map_sInf, SetLike.mem_coe] using sInfClosed <| mapsTo'.mp hs
-
-@[simp] theorem mem_comap {L : CompleteSublattice β} {a : α} : a ∈ L.comap f ↔ f a ∈ L := Iff.rfl
 
 protected lemma disjoint_iff {a b : L} :
     Disjoint a b ↔ Disjoint (a : α) (b : α) := by
@@ -160,8 +154,6 @@ variable (L)
 protected def copy (s : Set α) (hs : s = L) : CompleteSublattice α :=
   mk' s (hs ▸ L.sSupClosed') (hs ▸ L.sInfClosed')
 
-@[simp, norm_cast] lemma coe_copy (s : Set α) (hs) : L.copy s hs = s := rfl
-
 lemma copy_eq (s : Set α) (hs) : L.copy s hs = L := SetLike.coe_injective hs
 
 end CompleteSublattice
@@ -170,8 +162,6 @@ namespace CompleteLatticeHom
 
 protected def range : CompleteSublattice β :=
   (CompleteSublattice.map f ⊤).copy (range f) image_univ.symm
-
-theorem range_coe : (f.range : Set β) = range f := rfl
 
 @[simps! apply] noncomputable def toOrderIsoRangeOfInjective (hf : Injective f) : α ≃o f.range :=
   (orderEmbeddingOfInjective f hf).orderIso

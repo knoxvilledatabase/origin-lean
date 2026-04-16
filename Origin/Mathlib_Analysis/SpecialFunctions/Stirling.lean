@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/SpecialFunctions/Stirling.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.PSeries
 import Mathlib.Data.Real.Pi.Wallis
 import Mathlib.Tactic.AdaptationNote
+
+noncomputable section
 
 /-!
 # Stirling's formula
@@ -174,9 +176,26 @@ theorem tendsto_self_div_two_mul_self_add_one :
     ((add_zero (2 : ℝ)).symm ▸ two_ne_zero)).congr' (eventually_atTop.mpr ⟨1, fun n hn => ?_⟩)
   rw [add_div' (1 : ℝ) 2 n (cast_ne_zero.mpr (one_le_iff_ne_zero.mp hn)), inv_div]
 
--- DISSOLVED: stirlingSeq_pow_four_div_stirlingSeq_pow_two_eq
+theorem stirlingSeq_pow_four_div_stirlingSeq_pow_two_eq (n : ℕ) (hn : n ≠ 0) :
+    stirlingSeq n ^ 4 / stirlingSeq (2 * n) ^ 2 * (n / (2 * n + 1)) = Wallis.W n := by
+  have : 4 = 2 * 2 := by rfl
+  rw [stirlingSeq, this, pow_mul, stirlingSeq, Wallis.W_eq_factorial_ratio]
+  simp_rw [div_pow, mul_pow]
+  rw [sq_sqrt, sq_sqrt]
+  any_goals positivity
+  field_simp [← exp_nsmul]
+  ring_nf
 
--- DISSOLVED: second_wallis_limit
+theorem second_wallis_limit (a : ℝ) (hane : a ≠ 0) (ha : Tendsto stirlingSeq atTop (𝓝 a)) :
+    Tendsto Wallis.W atTop (𝓝 (a ^ 2 / 2)) := by
+  refine Tendsto.congr' (eventually_atTop.mpr ⟨1, fun n hn =>
+    stirlingSeq_pow_four_div_stirlingSeq_pow_two_eq n (one_le_iff_ne_zero.mp hn)⟩) ?_
+  have h : a ^ 2 / 2 = a ^ 4 / a ^ 2 * (1 / 2) := by
+    rw [mul_one_div, ← mul_one_div (a ^ 4) (a ^ 2), one_div, ← pow_sub_of_lt a]
+    norm_num
+  rw [h]
+  exact ((ha.pow 4).div ((ha.comp (tendsto_id.const_mul_atTop' two_pos)).pow 2)
+    (pow_ne_zero 2 hane)).mul tendsto_self_div_two_mul_self_add_one
 
 theorem tendsto_stirlingSeq_sqrt_pi : Tendsto stirlingSeq atTop (𝓝 (√π)) := by
   obtain ⟨a, hapos, halimit⟩ := stirlingSeq_has_pos_limit_a

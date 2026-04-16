@@ -11,6 +11,8 @@ import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.RingTheory.Localization.Cardinality
 import Mathlib.SetTheory.Cardinal.Divisibility
 
+noncomputable section
+
 /-!
 # Cardinality of Fields
 

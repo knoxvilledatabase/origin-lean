@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.Data.Set.Card
 
+noncomputable section
+
 /-!
 # Measurability of `Set.encard` and `Set.ncard`
 

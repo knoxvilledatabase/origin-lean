@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.End
 import Mathlib.Algebra.Ring.Hom.Defs
 
+noncomputable section
+
 /-!
 # Group action on rings
 
@@ -61,10 +63,6 @@ instance RingHom.applyMulSemiringAction : MulSemiringAction (R →+* R) R where
   smul_add := RingHom.map_add
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
-
-@[simp]
-protected theorem RingHom.smul_def (f : R →+* R) (a : R) : f • a = f a :=
-  rfl
 
 instance RingHom.applyFaithfulSMul : FaithfulSMul (R →+* R) R :=
   ⟨fun {_ _} h => RingHom.ext h⟩

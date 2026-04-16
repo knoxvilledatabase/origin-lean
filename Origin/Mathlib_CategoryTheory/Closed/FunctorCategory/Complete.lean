@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Groupoid.Discrete
 import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
 import Mathlib.CategoryTheory.Monad.Comonadicity
 
+noncomputable section
+
 /-!
 
 # Functors into a complete monoidal closed category form a monoidal closed category.

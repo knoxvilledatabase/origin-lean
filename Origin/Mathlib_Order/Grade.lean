@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Int.SuccPred
 import Mathlib.Order.Fin.Basic
 
+noncomputable section
+
 /-!
 # Graded orders
 
@@ -201,10 +203,6 @@ instance Preorder.toGradeBoundedOrder : GradeBoundedOrder α α where
   grade_strictMono := strictMono_id
   covBy_grade _ _ := id
 
-@[simp]
-theorem grade_self (a : α) : grade α a = a :=
-  rfl
-
 /-! #### Dual -/
 
 instance OrderDual.gradeOrder [GradeOrder 𝕆 α] : GradeOrder 𝕆ᵒᵈ αᵒᵈ where
@@ -220,14 +218,6 @@ instance OrderDual.gradeMaxOrder [GradeMinOrder 𝕆 α] : GradeMaxOrder 𝕆ᵒ
 
 instance [GradeBoundedOrder 𝕆 α] : GradeBoundedOrder 𝕆ᵒᵈ αᵒᵈ :=
   { OrderDual.gradeMinOrder, OrderDual.gradeMaxOrder with }
-
-@[simp]
-theorem grade_toDual [GradeOrder 𝕆 α] (a : α) : grade 𝕆ᵒᵈ (toDual a) = toDual (grade 𝕆 a) :=
-  rfl
-
-@[simp]
-theorem grade_ofDual [GradeOrder 𝕆 α] (a : αᵒᵈ) : grade 𝕆 (ofDual a) = ofDual (grade 𝕆ᵒᵈ a) :=
-  rfl
 
 /-! #### Lifting a graded order -/
 

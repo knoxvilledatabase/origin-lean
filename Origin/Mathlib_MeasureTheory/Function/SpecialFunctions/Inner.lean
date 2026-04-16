@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Complex
 
+noncomputable section
+
 /-!
 # Measurability of scalar products
 -/
@@ -44,8 +46,8 @@ theorem AEMeasurable.inner {m : MeasurableSpace α} [MeasurableSpace E] [OpensMe
   congr
 
 set_option linter.unusedVariables false in
-
 @[measurability]
+
 theorem AEMeasurable.const_inner {m : MeasurableSpace α} [MeasurableSpace E]
     [OpensMeasurableSpace E] [SecondCountableTopology E]
     {μ : MeasureTheory.Measure α} {f : α → E} {c : E} (hf : AEMeasurable f μ) :
@@ -53,8 +55,8 @@ theorem AEMeasurable.const_inner {m : MeasurableSpace α} [MeasurableSpace E]
   AEMeasurable.inner aemeasurable_const hf
 
 set_option linter.unusedVariables false in
-
 @[measurability]
+
 theorem AEMeasurable.inner_const {m : MeasurableSpace α} [MeasurableSpace E]
     [OpensMeasurableSpace E] [SecondCountableTopology E]
     {μ : MeasureTheory.Measure α} {f : α → E} {c : E} (hf : AEMeasurable f μ) :

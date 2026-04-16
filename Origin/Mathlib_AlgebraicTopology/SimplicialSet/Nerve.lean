@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.SimplicialSet.Basic
 import Mathlib.CategoryTheory.ComposableArrows
 
+noncomputable section
+
 /-!
 
 # The nerve of a category
@@ -42,8 +44,6 @@ def nerveFunctor : Cat ⥤ SSet where
 namespace Nerve
 
 variable {C : Type*} [Category C] {n : ℕ}
-
-lemma δ₀_eq {x : nerve C _[n + 1]} : (nerve C).δ (0 : Fin (n + 2)) x = x.δ₀ := rfl
 
 end Nerve
 

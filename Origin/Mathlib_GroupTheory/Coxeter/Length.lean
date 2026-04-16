@@ -1,11 +1,13 @@
 /-
 Extracted from GroupTheory/Coxeter/Length.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.Coxeter.Basic
 import Mathlib.Tactic.Zify
+
+noncomputable section
 
 /-!
 # The length function, reduced words, and descents
@@ -227,7 +229,32 @@ theorem isReduced_take {ω : List B} (hω : cs.IsReduced ω) (j : ℕ) : cs.IsRe
 theorem isReduced_drop {ω : List B} (hω : cs.IsReduced ω) (j : ℕ) : cs.IsReduced (ω.drop j) :=
   (isReduced_take_and_drop _ hω _).2
 
--- DISSOLVED: not_isReduced_alternatingWord
+theorem not_isReduced_alternatingWord (i i' : B) {m : ℕ} (hM : M i i' ≠ 0) (hm : m > M i i') :
+    ¬cs.IsReduced (alternatingWord i i' m) := by
+  induction' hm with m _ ih
+  · -- Base case; m = M i i' + 1
+    suffices h : ℓ (π (alternatingWord i i' (M i i' + 1))) < M i i' + 1 by
+      unfold IsReduced
+      rw [Nat.succ_eq_add_one, length_alternatingWord]
+      linarith
+    have : M i i' + 1 ≤ M i i' * 2 := by linarith [Nat.one_le_iff_ne_zero.mpr hM]
+    rw [cs.prod_alternatingWord_eq_prod_alternatingWord_sub i i' _ this]
+    have : M i i' * 2 - (M i i' + 1) = M i i' - 1 := by
+      apply (Nat.sub_eq_iff_eq_add' this).mpr
+      rw [add_assoc, add_comm 1, Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hM)]
+      exact mul_two _
+    rw [this]
+    calc
+      ℓ (π (alternatingWord i' i (M i i' - 1)))
+      _ ≤ (alternatingWord i' i (M i i' - 1)).length  := cs.length_wordProd_le _
+      _ = M i i' - 1                                  := length_alternatingWord _ _ _
+      _ ≤ M i i'                                      := Nat.sub_le _ _
+      _ < M i i' + 1                                  := Nat.lt_succ_self _
+  · -- Inductive step
+    contrapose! ih
+    rw [alternatingWord_succ'] at ih
+    apply isReduced_drop (j := 1) at ih
+    simpa using ih
 
 /-! ### Descents -/
 
@@ -249,9 +276,20 @@ theorem isRightDescent_inv_iff {w : W} {i : B} :
     cs.IsRightDescent w⁻¹ i ↔ cs.IsLeftDescent w i := by
   simpa using (cs.isLeftDescent_inv_iff (w := w⁻¹)).symm
 
--- DISSOLVED: exists_leftDescent_of_ne_one
+theorem exists_leftDescent_of_ne_one {w : W} (hw : w ≠ 1) : ∃ i : B, cs.IsLeftDescent w i := by
+  rcases cs.exists_reduced_word w with ⟨ω, h, rfl⟩
+  have h₁ : ω ≠ [] := by rintro rfl; simp at hw
+  rcases List.exists_cons_of_ne_nil h₁ with ⟨i, ω', rfl⟩
+  use i
+  rw [IsLeftDescent, ← h, wordProd_cons, simple_mul_simple_cancel_left]
+  calc
+    ℓ (π ω') ≤ ω'.length                := cs.length_wordProd_le ω'
+    _        < (i :: ω').length         := by simp
 
--- DISSOLVED: exists_rightDescent_of_ne_one
+theorem exists_rightDescent_of_ne_one {w : W} (hw : w ≠ 1) : ∃ i : B, cs.IsRightDescent w i := by
+  simp only [← isLeftDescent_inv_iff]
+  apply exists_leftDescent_of_ne_one
+  simpa
 
 theorem isLeftDescent_iff {w : W} {i : B} :
     cs.IsLeftDescent w i ↔ ℓ (s i * w) + 1 = ℓ w := by

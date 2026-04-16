@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Homeomorph
 import Mathlib.Topology.Filter
 
+noncomputable section
+
 /-!
 # Proper maps between topological spaces
 

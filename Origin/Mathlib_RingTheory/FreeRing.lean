@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/FreeRing.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.GroupTheory.FreeAbelianGroup
+
+noncomputable section
 
 /-!
 # Free rings
@@ -51,12 +53,14 @@ def of (x : α) : FreeRing α :=
 theorem of_injective : Function.Injective (of : α → FreeRing α) :=
   FreeAbelianGroup.of_injective.comp FreeMonoid.of_injective
 
--- DISSOLVED: of_ne_zero
+@[simp]
+theorem of_ne_zero (x : α) : of x ≠ 0 := FreeAbelianGroup.of_ne_zero _
 
 @[simp]
 theorem zero_ne_of (x : α) : 0 ≠ of x := FreeAbelianGroup.zero_ne_of _
 
--- DISSOLVED: of_ne_one
+@[simp]
+theorem of_ne_one (x : α) : of x ≠ 1 := FreeAbelianGroup.of_injective.ne <| FreeMonoid.of_ne_one _
 
 @[simp]
 theorem one_ne_of (x : α) : 1 ≠ of x := FreeAbelianGroup.of_injective.ne <| FreeMonoid.one_ne_of _

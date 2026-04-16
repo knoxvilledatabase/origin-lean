@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Finset/Insert.lean
-Genuine: 100 | Conflates: 9 | Dissolved: 2 | Infrastructure: 19
+Genuine: 102 | Conflates: 9 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Attr
 import Mathlib.Data.Finset.Dedup
 import Mathlib.Data.Finset.Empty
 import Mathlib.Data.Multiset.FinsetOps
+
+noncomputable section
 
 /-!
 # Constructing finite sets by adding one element
@@ -50,10 +52,6 @@ variable {s : Finset α} {a b : α}
 
 instance : Singleton α (Finset α) :=
   ⟨fun a => ⟨{a}, nodup_singleton a⟩⟩
-
-@[simp]
-theorem singleton_val (a : α) : ({a} : Finset α).1 = {a} :=
-  rfl
 
 @[simp]
 theorem mem_singleton {a b : α} : b ∈ ({a} : Finset α) ↔ b = a :=
@@ -146,8 +144,6 @@ theorem singleton_subset_iff {s : Finset α} {a : α} : {a} ⊆ s ↔ a ∈ s :=
 theorem subset_singleton_iff {s : Finset α} {a : α} : s ⊆ {a} ↔ s = ∅ ∨ s = {a} := by
   rw [← coe_subset, coe_singleton, Set.subset_singleton_iff_eq, coe_eq_empty, coe_eq_singleton]
 
-theorem singleton_subset_singleton : ({a} : Finset α) ⊆ {b} ↔ a = b := by simp
-
 protected theorem Nonempty.subset_singleton_iff {s : Finset α} {a : α} (h : s.Nonempty) :
     s ⊆ {a} ↔ s = {a} :=
   subset_singleton_iff.trans <| or_iff_right h.ne_empty
@@ -206,9 +202,6 @@ instance (i : α) : Unique ({i} : Finset α) where
   default := ⟨i, mem_singleton_self i⟩
   uniq j := Subtype.ext <| mem_singleton.mp j.2
 
-@[simp]
-lemma default_singleton (i : α) : ((default : ({i} : Finset α)) : α) = i := rfl
-
 end Singleton
 
 /-! ### cons -/
@@ -229,10 +222,6 @@ theorem mem_cons_of_mem {a b : α} {s : Finset α} {hb : b ∉ s} (ha : a ∈ s)
 
 theorem mem_cons_self (a : α) (s : Finset α) {h} : a ∈ cons a s h :=
   Multiset.mem_cons_self _ _
-
-@[simp]
-theorem cons_val (h : a ∉ s) : (cons a s h).1 = a ::ₘ s.1 :=
-  rfl
 
 theorem eq_of_mem_cons_of_not_mem (has : a ∉ s) (h : b ∈ cons a s has) (hb : b ∉ s) : b = a :=
   (mem_cons.1 h).resolve_right hb
@@ -263,7 +252,9 @@ theorem cons_nonempty (h : a ∉ s) : (cons a s h).Nonempty :=
 
 @[simp] theorem cons_ne_empty (h : a ∉ s) : cons a s h ≠ ∅ := (cons_nonempty _).ne_empty
 
--- DISSOLVED: nonempty_mk
+@[simp]
+theorem nonempty_mk {m : Multiset α} {hm} : (⟨m, hm⟩ : Finset α).Nonempty ↔ m ≠ 0 := by
+  induction m using Multiset.induction_on <;> simp
 
 @[simp]
 theorem coe_cons {a s h} : (@cons α a s h : Set α) = insert a (s : Set α) := by
@@ -331,9 +322,6 @@ variable [DecidableEq α] {s t : Finset α} {a b : α} {f : α → β}
 instance : Insert α (Finset α) :=
   ⟨fun a s => ⟨_, s.2.ndinsert a⟩⟩
 
-theorem insert_def (a : α) (s : Finset α) : insert a s = ⟨_, s.2.ndinsert a⟩ :=
-  rfl
-
 @[simp]
 theorem insert_val (a : α) (s : Finset α) : (insert a s).1 = ndinsert a s.1 :=
   rfl
@@ -360,8 +348,6 @@ theorem mem_of_mem_insert_of_ne (h : b ∈ insert a s) : b ≠ a → b ∈ s :=
 theorem eq_of_mem_insert_of_not_mem (ha : b ∈ insert a s) (hb : b ∉ s) : b = a :=
   (mem_insert.1 ha).resolve_right hb
 
-@[simp] lemma insert_empty : insert a (∅ : Finset α) = {a} := rfl
-
 @[simp]
 theorem cons_eq_insert (a s h) : @cons α a s h = insert a s :=
   ext fun a => by simp
@@ -369,9 +355,6 @@ theorem cons_eq_insert (a s h) : @cons α a s h = insert a s :=
 @[simp, norm_cast]
 theorem coe_insert (a : α) (s : Finset α) : ↑(insert a s) = (insert a s : Set α) :=
   Set.ext fun x => by simp only [mem_coe, mem_insert, Set.mem_insert_iff]
-
-theorem mem_insert_coe {s : Finset α} {x y : α} : x ∈ insert y s ↔ x ∈ insert y (s : Set α) := by
-  simp
 
 instance : LawfulSingleton α (Finset α) :=
   ⟨fun a => by ext; simp⟩
@@ -579,14 +562,13 @@ namespace List
 variable [DecidableEq α] {l : List α} {a : α}
 
 @[simp]
-theorem toFinset_nil : toFinset (@nil α) = ∅ :=
-  rfl
-
-@[simp]
 theorem toFinset_cons : toFinset (a :: l) = insert a (toFinset l) :=
   Finset.eq_of_veq <| by by_cases h : a ∈ l <;> simp [Finset.insert_val', Multiset.dedup_cons, h]
 
--- DISSOLVED: toFinset_replicate_of_ne_zero
+theorem toFinset_replicate_of_ne_zero {n : ℕ} (hn : n ≠ 0) :
+    (List.replicate n a).toFinset = {a} := by
+  ext x
+  simp [hn, List.mem_replicate]
 
 @[simp]
 theorem toFinset_eq_empty_iff (l : List α) : l.toFinset = ∅ ↔ l = nil := by

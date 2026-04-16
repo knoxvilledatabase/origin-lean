@@ -10,6 +10,8 @@ import Mathlib.Data.Fintype.Pi
 import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 
+noncomputable section
+
 /-!
 # Multivariate polynomials over commutative rings
 
@@ -120,11 +122,6 @@ theorem restrictTotalDegree_le_restrictDegree (m : ℕ) :
 def basisMonomials : Basis (σ →₀ ℕ) R (MvPolynomial σ R) :=
   Finsupp.basisSingleOne
 
-@[simp]
-theorem coe_basisMonomials :
-    (basisMonomials σ R : (σ →₀ ℕ) → MvPolynomial σ R) = fun s => monomial s 1 :=
-  rfl
-
 instance : Module.Free R (MvPolynomial σ R) :=
   Module.Free.of_basis (MvPolynomial.basisMonomials σ R)
 
@@ -159,11 +156,6 @@ noncomputable def algebraMvPolynomial : Algebra (MvPolynomial σ R) (MvPolynomia
 
 attribute [local instance] algebraMvPolynomial
 
-@[simp]
-lemma algebraMap_def :
-    algebraMap (MvPolynomial σ R) (MvPolynomial σ S) = MvPolynomial.map (algebraMap R S) :=
-  rfl
-
 instance : IsScalarTower R (MvPolynomial σ R) (MvPolynomial σ S) :=
   IsScalarTower.of_algebraMap_eq' (by ext; simp)
 
@@ -175,9 +167,5 @@ namespace Polynomial
 
 noncomputable def basisMonomials : Basis ℕ R R[X] :=
   Basis.ofRepr (toFinsuppIsoAlg R).toLinearEquiv
-
-@[simp]
-theorem coe_basisMonomials : (basisMonomials R : ℕ → R[X]) = fun s => monomial s 1 :=
-  funext fun _ => ofFinsupp_single _ _
 
 end Polynomial

@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.SpreadingOut
 import Mathlib.AlgebraicGeometry.FunctionField
 import Mathlib.AlgebraicGeometry.Morphisms.Separated
 
+noncomputable section
+
 /-!
 
 # Rational maps between schemes
@@ -68,9 +70,8 @@ lemma ext (f g : X.PartialMap Y) (e : f.domain = g.domain)
   rw [ext_iff]
   exact ⟨e, H⟩
 
-noncomputable
-
 @[simps hom domain]
+noncomputable
 def restrict (f : X.PartialMap Y) (U : X.Opens)
     (hU : Dense (U : Set X)) (hU' : U ≤ f.domain) : X.PartialMap Y where
   domain := U
@@ -81,22 +82,12 @@ def restrict (f : X.PartialMap Y) (U : X.Opens)
 lemma restrict_id (f : X.PartialMap Y) : f.restrict f.domain f.dense_domain le_rfl = f := by
   ext1 <;> simp [restrict_domain]
 
-lemma restrict_id_hom (f : X.PartialMap Y) :
-    (f.restrict f.domain f.dense_domain le_rfl).hom = f.hom := by
-  simp
-
 @[simp]
 lemma restrict_restrict (f : X.PartialMap Y)
     (U : X.Opens) (hU : Dense (U : Set X)) (hU' : U ≤ f.domain)
     (V : X.Opens) (hV : Dense (V : Set X)) (hV' : V ≤ U) :
     (f.restrict U hU hU').restrict V hV hV' = f.restrict V hV (hV'.trans hU') := by
   ext1 <;> simp [restrict_domain]
-
-lemma restrict_restrict_hom (f : X.PartialMap Y)
-    (U : X.Opens) (hU : Dense (U : Set X)) (hU' : U ≤ f.domain)
-    (V : X.Opens) (hV : Dense (V : Set X)) (hV' : V ≤ U) :
-    ((f.restrict U hU hU').restrict V hV hV').hom = (f.restrict V hV (hV'.trans hU')).hom := by
-  simp
 
 instance [X.Over S] [Y.Over S] (f : X.PartialMap Y) [f.IsOver S]
     (U : X.Opens) (hU : Dense (U : Set X)) (hU' : U ≤ f.domain) :
@@ -126,13 +117,11 @@ lemma isOver_iff_eq_restrict [X.Over S] [Y.Over S] {f : X.PartialMap Y} :
   simp [isOver_iff, PartialMap.ext_iff]
 
 noncomputable
-
 def fromSpecStalkOfMem (f : X.PartialMap Y) {x} (hx : x ∈ f.domain) :
     Spec (X.presheaf.stalk x) ⟶ Y :=
   f.domain.fromSpecStalkOfMem x hx ≫ f.hom
 
 noncomputable
-
 abbrev fromFunctionField [IrreducibleSpace X] (f : X.PartialMap Y) :
     Spec X.functionField ⟶ Y :=
   f.fromSpecStalkOfMem
@@ -161,7 +150,6 @@ lemma fromFunctionField_restrict (f : X.PartialMap Y) [IrreducibleSpace X]
   fromSpecStalkOfMem_restrict f _ _ _
 
 noncomputable
-
 def ofFromSpecStalk [IrreducibleSpace X] [LocallyOfFiniteType sY] {x : X} [X.IsGermInjectiveAt x]
     (φ : Spec (X.presheaf.stalk x) ⟶ Y) (h : φ ≫ sY = X.fromSpecStalk x ≫ sX) : X.PartialMap Y where
   hom := (spread_out_of_isGermInjective' sX sY φ h).choose_spec.choose_spec.choose
@@ -339,10 +327,6 @@ def RationalMap.compHom (f : X ⤏ Y) (g : Y ⟶ Z) : X ⤏ Z := by
     PartialMap.compHom_hom] at e ⊢
   rw [reassoc_of% e]
 
-@[simp]
-lemma RationalMap.compHom_toRationalMap (f : X.PartialMap Y) (g : Y ⟶ Z) :
-    (f.compHom g).toRationalMap = f.toRationalMap.compHom g := rfl
-
 instance [X.Over S] [Y.Over S] [Z.Over S] (f : X ⤏ Y) (g : Y ⟶ Z)
     [f.IsOver S] [g.IsOver S] : (f.compHom g).IsOver S where
   exists_partialMap_over := by
@@ -381,7 +365,6 @@ lemma PartialMap.isOver_toRationalMap_iff_of_isSeparated [X.Over S] [Y.Over S] [
 section functionField
 
 noncomputable
-
 def RationalMap.fromFunctionField [IrreducibleSpace X] (f : X ⤏ Y) :
     Spec X.functionField ⟶ Y := by
   refine Quotient.lift PartialMap.fromFunctionField ?_ f
@@ -389,12 +372,7 @@ def RationalMap.fromFunctionField [IrreducibleSpace X] (f : X ⤏ Y) :
   have : f.restrict W hW hWl = g.restrict W hW hWr := by ext1; rfl; rw [e]; simp
   rw [← f.fromFunctionField_restrict hW hWl, this, g.fromFunctionField_restrict]
 
-@[simp]
-lemma RationalMap.fromFunctionField_toRationalMap [IrreducibleSpace X] (f : X.PartialMap Y) :
-    f.toRationalMap.fromFunctionField = f.fromFunctionField := rfl
-
 noncomputable
-
 def RationalMap.ofFunctionField [IsIntegral X] [LocallyOfFiniteType sY]
     (f : Spec X.functionField ⟶ Y) (h : f ≫ sY = X.fromSpecStalk _ ≫ sX) : X ⤏ Y :=
   (PartialMap.ofFromSpecStalk sX sY f h).toRationalMap
@@ -412,7 +390,6 @@ lemma RationalMap.eq_of_fromFunctionField_eq [IsIntegral X] (f g : X.RationalMap
     exact PartialMap.equiv_of_fromSpecStalkOfMem_eq _ _ _ _ H
 
 noncomputable
-
 def RationalMap.equivFunctionField [IsIntegral X] [LocallyOfFiniteType sY] :
     { f : Spec X.functionField ⟶ Y // f ≫ sY = X.fromSpecStalk _ ≫ sX } ≃
       { f : X ⤏ Y // f.compHom sY = sX.toRationalMap } where
@@ -428,7 +405,6 @@ def RationalMap.equivFunctionField [IsIntegral X] [LocallyOfFiniteType sY] :
       (RationalMap.fromFunctionField_ofFunctionField _ _ _ _))
 
 noncomputable
-
 def RationalMap.equivFunctionFieldOver [X.Over S] [Y.Over S] [IsIntegral X]
     [LocallyOfFiniteType (Y ↘ S)] :
     { f : Spec X.functionField ⟶ Y // f.IsOver S } ≃ { f : X ⤏ Y // f.IsOver S } :=
@@ -455,7 +431,6 @@ lemma RationalMap.dense_domain (f : X ⤏ Y) : Dense (X := X) f.domain :=
   f.inductionOn (fun g ↦ g.dense_domain.mono g.le_domain_toRationalMap)
 
 noncomputable
-
 def RationalMap.openCoverDomain (f : X ⤏ Y) : f.domain.toScheme.OpenCover where
   J := { PartialMap.domain g | (g) (_ : g.toRationalMap = f) }
   obj U := U.1.toScheme
@@ -464,7 +439,6 @@ def RationalMap.openCoverDomain (f : X ⤏ Y) : f.domain.toScheme.OpenCover wher
   covers x := ⟨⟨x.1, (TopologicalSpace.Opens.mem_sSup.mp x.2).choose_spec.2⟩, Subtype.ext (by simp)⟩
 
 noncomputable
-
 def RationalMap.toPartialMap [IsReduced X] [Y.IsSeparated] (f : X ⤏ Y) : X.PartialMap Y := by
   refine ⟨f.domain, f.dense_domain, f.openCoverDomain.glueMorphisms
     (fun x ↦ (X.isoOfEq x.2.choose_spec.2).inv ≫ x.2.choose.hom) ?_⟩

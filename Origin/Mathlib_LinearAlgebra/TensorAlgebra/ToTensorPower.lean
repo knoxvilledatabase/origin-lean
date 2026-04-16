@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
 import Mathlib.LinearAlgebra.TensorPower
 
+noncomputable section
+
 /-!
 # Tensor algebras as direct sums of tensor powers
 

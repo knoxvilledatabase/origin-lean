@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Measure/Count.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Dirac
+
+noncomputable section
 
 /-!
 # Counting measure
@@ -26,7 +28,7 @@ namespace MeasureTheory.Measure
 def count : Measure α :=
   sum dirac
 
--- DISSOLVED: count_ne_zero''
+@[simp] lemma count_ne_zero'' [Nonempty α] : (count : Measure α) ≠ 0 := by simp [count]
 
 theorem le_count_apply : ∑' _ : s, (1 : ℝ≥0∞) ≤ count s :=
   calc
@@ -38,14 +40,6 @@ theorem count_apply (hs : MeasurableSet s) : count s = ∑' _ : s, 1 := by
   simp only [count, sum_apply, hs, dirac_apply', ← tsum_subtype s (1 : α → ℝ≥0∞), Pi.one_apply]
 
 theorem count_empty : count (∅ : Set α) = 0 := by rw [count_apply MeasurableSet.empty, tsum_empty]
-
-@[simp]
-theorem count_apply_finset' {s : Finset α} (s_mble : MeasurableSet (s : Set α)) :
-    count (↑s : Set α) = s.card :=
-  calc
-    count (↑s : Set α) = ∑' _ : (↑s : Set α), 1 := count_apply s_mble
-    _ = ∑ _ ∈ s, 1 := s.tsum_subtype 1
-    _ = s.card := by simp
 
 @[simp]
 theorem count_apply_finset [MeasurableSingletonClass α] (s : Finset α) :
@@ -103,7 +97,8 @@ theorem count_eq_zero_iff : count s = 0 ↔ s = ∅ where
     simpa [hx] using ((ENNReal.le_tsum x).trans <| le_sum_apply _ _).trans_eq h
   mpr := by rintro rfl; exact count_empty
 
--- DISSOLVED: count_ne_zero_iff
+lemma count_ne_zero_iff : count s ≠ 0 ↔ s.Nonempty :=
+  count_eq_zero_iff.not.trans nonempty_iff_ne_empty.symm
 
 alias ⟨_, count_ne_zero⟩ := count_ne_zero_iff
 

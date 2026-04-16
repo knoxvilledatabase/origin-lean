@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.MayerVietorisSquare
 import Mathlib.CategoryTheory.Sites.Spaces
 
+noncomputable section
+
 /-!
 # Mayer-Vietoris squares
 

@@ -7,6 +7,8 @@ import Mathlib.Topology.Homotopy.Basic
 import Mathlib.Topology.Connected.PathConnected
 import Mathlib.Analysis.Convex.Basic
 
+noncomputable section
+
 /-!
 # Homotopy between paths
 
@@ -154,22 +156,6 @@ theorem hcomp_half (F : Homotopy p₀ q₀) (G : Homotopy p₁ q₁) (t : I) :
 
 end
 
-def reparam (p : Path x₀ x₁) (f : I → I) (hf : Continuous f) (hf₀ : f 0 = 0) (hf₁ : f 1 = 1) :
-    Homotopy p (p.reparam f hf hf₀ hf₁) where
-  toFun x := p ⟨σ x.1 * x.2 + x.1 * f x.2,
-    show (σ x.1 : ℝ) • (x.2 : ℝ) + (x.1 : ℝ) • (f x.2 : ℝ) ∈ I from
-      convex_Icc _ _ x.2.2 (f x.2).2 (by unit_interval) (by unit_interval) (by simp)⟩
-  map_zero_left x := by norm_num
-  map_one_left x := by norm_num
-  prop' t x hx := by
-    cases' hx with hx hx
-    · rw [hx]
-      simp [hf₀]
-    · rw [Set.mem_singleton_iff] at hx
-      rw [hx]
-      simp [hf₁]
-  continuous_toFun := by fun_prop
-
 @[simps]
 def symm₂ {p q : Path x₀ x₁} (F : p.Homotopy q) : p.symm.Homotopy q.symm where
   toFun x := F ⟨x.1, σ x.2⟩
@@ -241,15 +227,9 @@ def Quotient.comp (P₀ : Path.Homotopic.Quotient x₀ x₁) (P₁ : Path.Homoto
     Path.Homotopic.Quotient x₀ x₂ :=
   Quotient.map₂ Path.trans (fun (_ : Path x₀ x₁) _ hp (_ : Path x₁ x₂) _ hq => hcomp hp hq) P₀ P₁
 
-theorem comp_lift (P₀ : Path x₀ x₁) (P₁ : Path x₁ x₂) : ⟦P₀.trans P₁⟧ = Quotient.comp ⟦P₀⟧ ⟦P₁⟧ :=
-  rfl
-
 def Quotient.mapFn (P₀ : Path.Homotopic.Quotient x₀ x₁) (f : C(X, Y)) :
     Path.Homotopic.Quotient (f x₀) (f x₁) :=
   Quotient.map (fun q : Path x₀ x₁ => q.map f.continuous) (fun _ _ h => Path.Homotopic.map h f) P₀
-
-theorem map_lift (P₀ : Path x₀ x₁) (f : C(X, Y)) : ⟦P₀.map f.continuous⟧ = Quotient.mapFn ⟦P₀⟧ f :=
-  rfl
 
 theorem hpath_hext {p₁ : Path x₀ x₁} {p₂ : Path x₂ x₃} (hp : ∀ t, p₁ t = p₂ t) :
     @HEq (Path.Homotopic.Quotient _ _) ⟦p₁⟧ (Path.Homotopic.Quotient _ _) ⟦p₂⟧ := by

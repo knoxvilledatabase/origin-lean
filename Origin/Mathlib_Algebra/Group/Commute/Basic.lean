@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Group/Commute/Basic.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Semiconj.Basic
+
+noncomputable section
 
 /-!
 # Additional lemmas about commuting pairs of elements in monoids
@@ -53,10 +55,12 @@ variable [Group G] {a b : G}
 lemma inv_left_iff : Commute a⁻¹ b ↔ Commute a b := SemiconjBy.inv_symm_left_iff
 
 @[to_additive] alias ⟨_, inv_left⟩ := inv_left_iff
+
 @[to_additive (attr := simp)]
 lemma inv_right_iff : Commute a b⁻¹ ↔ Commute a b := SemiconjBy.inv_right_iff
 
 @[to_additive] alias ⟨_, inv_right⟩ := inv_right_iff
+
 @[to_additive]
 protected lemma inv_mul_cancel (h : Commute a b) : a⁻¹ * b * a = b := by
   rw [h.inv_left.eq, inv_mul_cancel_right]

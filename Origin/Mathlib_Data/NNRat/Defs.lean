@@ -1,12 +1,14 @@
 /-
 Extracted from Data/NNRat/Defs.lean
-Genuine: 65 | Conflates: 0 | Dissolved: 8 | Infrastructure: 40
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Int
 import Mathlib.Algebra.Order.Ring.Unbundled.Nonneg
 import Mathlib.Algebra.Order.Ring.Unbundled.Rat
 import Mathlib.Algebra.Ring.Rat
+
+noncomputable section
 
 /-!
 # Nonnegative rationals
@@ -30,24 +32,6 @@ of `x` with `↑x`. This tactic also works for a function `f : α → ℚ` with 
 
 Whenever you state a lemma about the coercion `ℚ≥0 → ℚ`, check that Lean inserts `NNRat.cast`, not
 `Subtype.val`. Else your lemma will never apply.
--/
-
-library_note "specialised high priority simp lemma" /--
-
-It sometimes happens that a `@[simp]` lemma declared early in the library can be proved by `simp`
-
-using later, more general simp lemmas. In that case, the following reasons might be arguments for
-
-the early lemma to be tagged `@[simp high]` (rather than `@[simp, nolint simpNF]` or
-
-un``@[simp]``ed):
-
-1. There is a significant portion of the library which needs the early lemma to be available via
-  `simp` and which doesn't have access to the more general lemmas.
-
-2. The more general lemmas have more complicated typeclass assumptions, causing rewrites with them
-  to be slower.
-
 -/
 
 open Function
@@ -78,8 +62,6 @@ instance instOrderBot : OrderBot ℚ≥0 where
   bot := 0
   bot_le q := q.2
 
-@[simp] lemma val_eq_cast (q : ℚ≥0) : q.1 = q := rfl
-
 instance instCharZero : CharZero ℚ≥0 where
   cast_injective a b hab := by simpa using congr_arg num hab
 
@@ -99,8 +81,6 @@ theorem coe_inj : (p : ℚ) = q ↔ p = q :=
 
 theorem ne_iff {x y : ℚ≥0} : (x : ℚ) ≠ (y : ℚ) ↔ x ≠ y :=
   NNRat.coe_inj.not
-
-@[simp, norm_cast] lemma coe_mk (q : ℚ) (hq) : NNRat.cast ⟨q, hq⟩ = q := rfl
 
 lemma «forall» {p : ℚ≥0 → Prop} : (∀ q, p q) ↔ ∀ q hq, p ⟨q, hq⟩ := Subtype.forall
 
@@ -123,15 +103,7 @@ theorem coe_nonneg (q : ℚ≥0) : (0 : ℚ) ≤ q :=
 
 @[simp, norm_cast] lemma coe_zero : ((0 : ℚ≥0) : ℚ) = 0 := rfl
 
-@[simp] lemma num_zero : num 0 = 0 := rfl
-
-@[simp] lemma den_zero : den 0 = 1 := rfl
-
 @[simp, norm_cast] lemma coe_one : ((1 : ℚ≥0) : ℚ) = 1 := rfl
-
-@[simp] lemma num_one : num 1 = 1 := rfl
-
-@[simp] lemma den_one : den 1 = 1 := rfl
 
 @[simp, norm_cast]
 theorem coe_add (p q : ℚ≥0) : ((p + q : ℚ≥0) : ℚ) = p + q :=
@@ -141,12 +113,7 @@ theorem coe_add (p q : ℚ≥0) : ((p + q : ℚ≥0) : ℚ) = p + q :=
 theorem coe_mul (p q : ℚ≥0) : ((p * q : ℚ≥0) : ℚ) = p * q :=
   rfl
 
-@[simp, norm_cast] lemma coe_pow (q : ℚ≥0) (n : ℕ) : (↑(q ^ n) : ℚ) = (q : ℚ) ^ n :=
-  rfl
-
 @[simp] lemma num_pow (q : ℚ≥0) (n : ℕ) : (q ^ n).num = q.num ^ n := by simp [num, Int.natAbs_pow]
-
-@[simp] lemma den_pow (q : ℚ≥0) (n : ℕ) : (q ^ n).den = q.den ^ n := rfl
 
 @[simp, norm_cast]
 theorem coe_sub (h : q ≤ p) : ((p - q : ℚ≥0) : ℚ) = p - q :=
@@ -155,7 +122,8 @@ theorem coe_sub (h : q ≤ p) : ((p - q : ℚ≥0) : ℚ) = p - q :=
 @[simp high]
 theorem coe_eq_zero : (q : ℚ) = 0 ↔ q = 0 := by norm_cast
 
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero : (q : ℚ) ≠ 0 ↔ q ≠ 0 :=
+  coe_eq_zero.not
 
 @[norm_cast]
 theorem coe_le_coe : (p : ℚ) ≤ q ↔ p ≤ q :=
@@ -163,10 +131,6 @@ theorem coe_le_coe : (p : ℚ) ≤ q ↔ p ≤ q :=
 
 @[norm_cast]
 theorem coe_lt_coe : (p : ℚ) < q ↔ p < q :=
-  Iff.rfl
-
-@[simp, norm_cast, nolint simpNF]
-theorem coe_pos : (0 : ℚ) < q ↔ 0 < q :=
   Iff.rfl
 
 theorem coe_mono : Monotone ((↑) : ℚ≥0 → ℚ) :=
@@ -193,16 +157,6 @@ def coeHom : ℚ≥0 →+* ℚ where
   map_zero' := coe_zero
   map_add' := coe_add
 
-@[simp, norm_cast] lemma coe_natCast (n : ℕ) : (↑(↑n : ℚ≥0) : ℚ) = n := rfl
-
-@[simp]
-theorem mk_natCast (n : ℕ) : @Eq ℚ≥0 (⟨(n : ℚ), Nat.cast_nonneg' n⟩ : ℚ≥0) n :=
-  rfl
-
-@[simp]
-theorem coe_coeHom : ⇑coeHom = ((↑) : ℚ≥0 → ℚ) :=
-  rfl
-
 @[norm_cast]
 theorem nsmul_coe (q : ℚ≥0) (n : ℕ) : ↑(n • q) = n • (q : ℚ) :=
   coeHom.toAddMonoidHom.map_nsmul _ _
@@ -224,9 +178,6 @@ theorem coe_max (x y : ℚ≥0) : ((max x y : ℚ≥0) : ℚ) = max (x : ℚ) (y
 theorem coe_min (x y : ℚ≥0) : ((min x y : ℚ≥0) : ℚ) = min (x : ℚ) (y : ℚ) :=
   coe_mono.map_min
 
-theorem sub_def (p q : ℚ≥0) : p - q = toNNRat (p - q) :=
-  rfl
-
 @[simp]
 theorem abs_coe (q : ℚ≥0) : |(q : ℚ)| = q :=
   abs_of_nonneg q.2
@@ -242,12 +193,6 @@ open NNRat
 namespace Rat
 
 variable {p q : ℚ}
-
-@[simp]
-theorem toNNRat_zero : toNNRat 0 = 0 := rfl
-
-@[simp]
-theorem toNNRat_one : toNNRat 1 = 1 := rfl
 
 @[simp]
 theorem toNNRat_pos : 0 < toNNRat q ↔ 0 < q := by simp [toNNRat, ← coe_lt_coe]
@@ -307,9 +252,6 @@ end Rat
 def Rat.nnabs (x : ℚ) : ℚ≥0 :=
   ⟨abs x, abs_nonneg x⟩
 
-@[norm_cast, simp]
-theorem Rat.coe_nnabs (x : ℚ) : (Rat.nnabs x : ℚ) = abs x := rfl
-
 /-! ### Numerator and denominator -/
 
 namespace NNRat
@@ -319,29 +261,18 @@ variable {p q : ℚ≥0}
 @[norm_cast] lemma num_coe (q : ℚ≥0) : (q : ℚ).num = q.num := by
   simp only [num, Int.natCast_natAbs, Rat.num_nonneg, coe_nonneg, abs_of_nonneg]
 
-theorem natAbs_num_coe : (q : ℚ).num.natAbs = q.num := rfl
-
 @[norm_cast] lemma den_coe : (q : ℚ).den = q.den := rfl
 
--- DISSOLVED: num_ne_zero
+@[simp] lemma num_ne_zero : q.num ≠ 0 ↔ q ≠ 0 := by simp [num]
 
 @[simp] lemma num_pos : 0 < q.num ↔ 0 < q := by
   simpa [num, -nonpos_iff_eq_zero] using nonpos_iff_eq_zero _ |>.not.symm
 
 @[simp] lemma den_pos (q : ℚ≥0) : 0 < q.den := Rat.den_pos _
 
--- DISSOLVED: den_ne_zero
+@[simp] lemma den_ne_zero (q : ℚ≥0) : q.den ≠ 0 := Rat.den_ne_zero _
 
 lemma coprime_num_den (q : ℚ≥0) : q.num.Coprime q.den := by simpa [num, den] using Rat.reduced _
-
-@[simp, norm_cast] lemma num_natCast (n : ℕ) : num n = n := rfl
-
-@[simp, norm_cast] lemma den_natCast (n : ℕ) : den n = 1 := rfl
-
-@[simp] lemma num_ofNat (n : ℕ) [n.AtLeastTwo] : num (no_index (OfNat.ofNat n)) = OfNat.ofNat n :=
-  rfl
-
-@[simp] lemma den_ofNat (n : ℕ) [n.AtLeastTwo] : den (no_index (OfNat.ofNat n)) = 1 := rfl
 
 theorem ext_num_den (hn : p.num = q.num) (hd : p.den = q.den) : p = q := by
   refine ext <| Rat.ext ?_ hd
@@ -355,12 +286,8 @@ def divNat (n d : ℕ) : ℚ≥0 :=
 
 variable {n₁ n₂ d₁ d₂ : ℕ}
 
-@[simp, norm_cast] lemma coe_divNat (n d : ℕ) : (divNat n d : ℚ) = .divInt n d := rfl
-
-lemma mk_divInt (n d : ℕ) :
-    ⟨.divInt n d, Rat.divInt_nonneg (Int.ofNat_zero_le n) (Int.ofNat_zero_le d)⟩ = divNat n d := rfl
-
--- DISSOLVED: divNat_inj
+lemma divNat_inj (h₁ : d₁ ≠ 0) (h₂ : d₂ ≠ 0) : divNat n₁ d₁ = divNat n₂ d₂ ↔ n₁ * d₂ = n₂ * d₁ := by
+  rw [← coe_inj]; simp [Rat.mkRat_eq_iff, h₁, h₂]; norm_cast
 
 @[simp] lemma divNat_zero (n : ℕ) : divNat n 0 = 0 := by simp [divNat]; rfl
 
@@ -369,11 +296,15 @@ lemma mk_divInt (n d : ℕ) :
 
 lemma natCast_eq_divNat (n : ℕ) : (n : ℚ≥0) = divNat n 1 := (num_divNat_den _).symm
 
--- DISSOLVED: divNat_mul_divNat
+lemma divNat_mul_divNat (n₁ n₂ : ℕ) {d₁ d₂} (hd₁ : d₁ ≠ 0) (hd₂ : d₂ ≠ 0) :
+    divNat n₁ d₁ * divNat n₂ d₂ = divNat (n₁ * n₂) (d₁ * d₂) := by
+  ext; push_cast; exact Rat.divInt_mul_divInt _ _ (mod_cast hd₁) (mod_cast hd₂)
 
--- DISSOLVED: divNat_mul_left
+lemma divNat_mul_left {a : ℕ} (ha : a ≠ 0) (n d : ℕ) : divNat (a * n) (a * d) = divNat n d := by
+  ext; push_cast; exact Rat.divInt_mul_left (mod_cast ha)
 
--- DISSOLVED: divNat_mul_right
+lemma divNat_mul_right {a : ℕ} (ha : a ≠ 0) (n d : ℕ) : divNat (n * a) (d * a) = divNat n d := by
+  ext; push_cast; exact Rat.divInt_mul_right (mod_cast ha)
 
 @[simp] lemma mul_den_eq_num (q : ℚ≥0) : q * q.den = q.num := by
   ext
@@ -383,7 +314,9 @@ lemma natCast_eq_divNat (n : ℕ) : (n : ℚ≥0) = divNat n 1 := (num_divNat_de
 
 @[simp] lemma den_mul_eq_num (q : ℚ≥0) : q.den * q = q.num := by rw [mul_comm, mul_den_eq_num]
 
--- DISSOLVED: numDenCasesOn.{u}
+@[elab_as_elim]
+def numDenCasesOn.{u} {C : ℚ≥0 → Sort u} (q) (H : ∀ n d, d ≠ 0 → n.Coprime d → C (divNat n d)) :
+    C q := by rw [← q.num_divNat_den]; exact H _ _ q.den_ne_zero q.coprime_num_den
 
 lemma add_def (q r : ℚ≥0) : q + r = divNat (q.num * r.den + r.num * q.den) (q.den * r.den) := by
   ext; simp [Rat.add_def', Rat.mkRat_eq_divInt, num_coe, den_coe]

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Topology.Sets.Compacts
 
+noncomputable section
+
 /-!
 # The Kuratowski embedding
 

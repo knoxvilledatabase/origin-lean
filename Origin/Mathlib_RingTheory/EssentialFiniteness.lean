@@ -7,6 +7,8 @@ import Mathlib.RingTheory.FiniteType
 import Mathlib.RingTheory.Localization.Defs
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Essentially of finite type algebras
 
@@ -31,11 +33,9 @@ class EssFiniteType : Prop where
     IsLocalization ((IsUnit.submonoid S).comap (algebraMap (adjoin R (s : Set S)) S)) S
 
 noncomputable
-
 def EssFiniteType.finset [h : EssFiniteType R S] : Finset S := h.cond.choose
 
 noncomputable
-
 abbrev EssFiniteType.subalgebra [EssFiniteType R S] : Subalgebra R S :=
   Algebra.adjoin R (finset R S : Set S)
 
@@ -48,7 +48,6 @@ instance [EssFiniteType R S] : Algebra.FiniteType R (EssFiniteType.subalgebra R 
   exact ⟨_, rfl⟩
 
 noncomputable
-
 def EssFiniteType.submonoid [EssFiniteType R S] : Submonoid (EssFiniteType.subalgebra R S) :=
   ((IsUnit.submonoid S).comap (algebraMap (EssFiniteType.subalgebra R S) S))
 

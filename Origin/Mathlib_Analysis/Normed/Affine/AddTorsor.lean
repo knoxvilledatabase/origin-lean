@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Affine/AddTorsor.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Invertible
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.Normed.Group.AddTorsor
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
 import Mathlib.Topology.Instances.RealVectorSpace
+
+noncomputable section
 
 /-!
 # Torsors of normed space actions.
@@ -267,10 +269,24 @@ variable {𝕜 E : Type*} [NormedDivisionRing 𝕜] [SeminormedAddCommGroup E]
 
 variable [Module 𝕜 E] [BoundedSMul 𝕜 E] {P : Type*} [PseudoMetricSpace P] [NormedAddTorsor E P]
 
--- DISSOLVED: DilationEquiv.smulTorsor
+@[simps]
+def DilationEquiv.smulTorsor (c : P) {k : 𝕜} (hk : k ≠ 0) : E ≃ᵈ P where
+  toFun := (k • · +ᵥ c)
+  invFun := k⁻¹ • (· -ᵥ c)
+  left_inv x := by simp [inv_smul_smul₀ hk]
+  right_inv p := by simp [smul_inv_smul₀ hk]
+  edist_eq' := ⟨‖k‖₊, nnnorm_ne_zero_iff.mpr hk, fun x y ↦ by
+    rw [show edist (k • x +ᵥ c) (k • y +ᵥ c) = _ from (IsometryEquiv.vaddConst c).isometry ..]
+    exact edist_smul₀ ..⟩
 
--- DISSOLVED: DilationEquiv.smulTorsor_ratio
+@[simp]
+lemma DilationEquiv.smulTorsor_ratio {c : P} {k : 𝕜} (hk : k ≠ 0) {x y : E}
+    (h : dist x y ≠ 0) : ratio (smulTorsor c hk) = ‖k‖₊ :=
+  Eq.symm <| ratio_unique_of_dist_ne_zero h <| by simp [dist_eq_norm, ← smul_sub, norm_smul]
 
--- DISSOLVED: DilationEquiv.smulTorsor_preimage_ball
+@[simp]
+lemma DilationEquiv.smulTorsor_preimage_ball {c : P} {k : 𝕜} (hk : k ≠ 0) :
+    smulTorsor c hk ⁻¹' (Metric.ball c ‖k‖) = Metric.ball (0 : E) 1 := by
+  aesop (add simp norm_smul)
 
 end

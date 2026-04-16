@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.InjSurj
 import Mathlib.Algebra.Group.Units.Defs
 import Mathlib.Data.Setoid.Basic
 
+noncomputable section
+
 /-!
 # Congruence relations
 
@@ -117,10 +119,6 @@ protected theorem trans {x y z} : c x y → c y z → c x z := c.toSetoid.trans'
 @[to_additive "Additive congruence relations preserve addition."]
 protected theorem mul {w x y z} : c w x → c y z → c (w * y) (x * z) := c.mul'
 
-@[to_additive (attr := simp)]
-theorem rel_mk {s : Setoid M} {h a b} : Con.mk s h a b ↔ r a b :=
-  Iff.rfl
-
 @[to_additive "Given a type `M` with an addition, `x, y ∈ M`, and an additive congruence relation
 `c` on `M`, `(x, y) ∈ M × M` iff `x` is related to `y` by `c`."]
 instance : Membership (M × M) (Con M) :=
@@ -176,10 +174,6 @@ instance (priority := 10) : CoeTC M c.Quotient :=
 instance (priority := 500) [∀ a b, Decidable (c a b)] : DecidableEq c.Quotient :=
   inferInstanceAs (DecidableEq (Quotient c.toSetoid))
 
-@[to_additive (attr := simp)]
-theorem quot_mk_eq_coe {M : Type*} [Mul M] (c : Con M) (x : M) : Quot.mk c x = (x : c.Quotient) :=
-  rfl
-
 @[to_additive "The function on the quotient by a congruence relation `c`
 induced by a function that is constant on `c`'s equivalence classes."]
 protected def liftOn {β} {c : Con M} (q : c.Quotient) (f : M → β) (h : ∀ a b, c a b → f a = f b) :
@@ -197,13 +191,6 @@ protected def hrecOn₂ {cM : Con M} {cN : Con N} {φ : cM.Quotient → cN.Quoti
     (a : cM.Quotient) (b : cN.Quotient) (f : ∀ (x : M) (y : N), φ x y)
     (h : ∀ x y x' y', cM x x' → cN y y' → HEq (f x y) (f x' y')) : φ a b :=
   Quotient.hrecOn₂' a b f h
-
-@[to_additive (attr := simp)]
-theorem hrec_on₂_coe {cM : Con M} {cN : Con N} {φ : cM.Quotient → cN.Quotient → Sort*} (a : M)
-    (b : N) (f : ∀ (x : M) (y : N), φ x y)
-    (h : ∀ x y x' y', cM x x' → cN y y' → HEq (f x y) (f x' y')) :
-    Con.hrecOn₂ (↑a) (↑b) f h = f a b :=
-  rfl
 
 variable {c}
 
@@ -427,11 +414,6 @@ defined by '`x ≈ y` iff `f(x)` is related to `f(y)` by `c`.' "]
 def comap (f : M → N) (H : ∀ x y, f (x * y) = f x * f y) (c : Con N) : Con M :=
   { c.toSetoid.comap f with
     mul' := @fun w x y z h1 h2 => show c (f (w * y)) (f (x * z)) by rw [H, H]; exact c.mul h1 h2 }
-
-@[to_additive (attr := simp)]
-theorem comap_rel {f : M → N} (H : ∀ x y, f (x * y) = f x * f y) {c : Con N} {x y : M} :
-    comap f H c x y ↔ c (f x) (f y) :=
-  Iff.rfl
 
 section
 
@@ -657,13 +639,6 @@ def liftOnUnits (u : Units c.Quotient) (f : ∀ x y : M, c (x * y) 1 → c (y * 
     · rw [c.eq.2 hx, c.eq.2 hy]
     · rintro Hyx Hyx' -
       exact heq_of_eq (Hf _ _ _ _ _ _ _ _ hx hy)
-
-@[to_additive (attr := simp)]
-theorem liftOnUnits_mk (f : ∀ x y : M, c (x * y) 1 → c (y * x) 1 → α)
-    (Hf : ∀ x y hxy hyx x' y' hxy' hyx', c x x' → c y y' → f x y hxy hyx = f x' y' hxy' hyx')
-    (x y : M) (hxy hyx) :
-    liftOnUnits ⟨(x : c.Quotient), y, hxy, hyx⟩ f Hf = f x y (c.eq.1 hxy) (c.eq.1 hyx) :=
-  rfl
 
 @[to_additive (attr := elab_as_elim)]
 theorem induction_on_units {p : Units c.Quotient → Prop} (u : Units c.Quotient)

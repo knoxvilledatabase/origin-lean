@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Ideal.Colon
 import Mathlib.RingTheory.Ideal.IsPrimary
 import Mathlib.RingTheory.Noetherian.Defs
 
+noncomputable section
+
 /-!
 # Lasker ring
 

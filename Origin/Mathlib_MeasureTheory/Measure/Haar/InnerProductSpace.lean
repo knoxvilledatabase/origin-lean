@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Orientation
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
+noncomputable section
+
 /-!
 # Volume forms and measures on inner product spaces
 
@@ -32,10 +34,6 @@ def toMeasureEquiv : E ≃ᵐ F where
   toEquiv := f
   measurable_toFun := f.continuous.measurable
   measurable_invFun := f.symm.continuous.measurable
-
-@[simp] theorem coe_toMeasureEquiv : (f.toMeasureEquiv : E → F) = f := rfl
-
-theorem toMeasureEquiv_symm : f.toMeasureEquiv.symm = f.symm.toMeasureEquiv := rfl
 
 end LinearIsometryEquiv
 

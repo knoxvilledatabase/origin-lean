@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
 import Mathlib.LinearAlgebra.FreeAlgebra
 
+noncomputable section
+
 /-!
 # A basis for `TensorAlgebra R M`
 

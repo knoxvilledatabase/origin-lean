@@ -7,6 +7,8 @@ import Mathlib.Dynamics.FixedPoints.Basic
 import Mathlib.Order.Hom.Order
 import Mathlib.Order.OmegaCompletePartialOrder
 
+noncomputable section
+
 /-!
 # Fixed point construction on complete lattices
 

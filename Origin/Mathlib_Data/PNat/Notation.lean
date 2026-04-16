@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.Nat.Notation
 
+noncomputable section
+
 /-! # Definition and notation for positive natural numbers -/
 
 def PNat := { n : ℕ // 0 < n } deriving DecidableEq

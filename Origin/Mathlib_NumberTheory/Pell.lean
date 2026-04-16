@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/Pell.lean
-Genuine: 40 | Conflates: 1 | Dissolved: 5 | Infrastructure: 17
+Genuine: 45 | Conflates: 1 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Tactic.Qify
 import Mathlib.Data.ZMod.Basic
 import Mathlib.NumberTheory.DiophantineApproximation
 import Mathlib.NumberTheory.Zsqrtd.Basic
+
+noncomputable section
 
 /-!
 # Pell's Equation
@@ -167,9 +169,17 @@ theorem eq_zero_of_d_neg (h₀ : d < 0) (a : Solution₁ d) : a.x = 0 ∨ a.y = 
   have h2 := sq_pos_of_ne_zero h.2
   nlinarith
 
--- DISSOLVED: x_ne_zero
+theorem x_ne_zero (h₀ : 0 ≤ d) (a : Solution₁ d) : a.x ≠ 0 := by
+  intro hx
+  have h : 0 ≤ d * a.y ^ 2 := mul_nonneg h₀ (sq_nonneg _)
+  rw [a.prop_y, hx, sq, zero_mul, zero_sub] at h
+  exact not_le.mpr (neg_one_lt_zero : (-1 : ℤ) < 0) h
 
--- DISSOLVED: y_ne_zero_of_one_lt_x
+theorem y_ne_zero_of_one_lt_x {a : Solution₁ d} (ha : 1 < a.x) : a.y ≠ 0 := by
+  intro hy
+  have prop := a.prop
+  rw [hy, sq (0 : ℤ), zero_mul, mul_zero, sub_zero] at prop
+  exact lt_irrefl _ (((one_lt_sq_iff₀ <| zero_le_one.trans ha.le).mpr ha).trans_eq prop)
 
 theorem d_pos_of_one_lt_x {a : Solution₁ d} (ha : 1 < a.x) : 0 < d := by
   refine pos_of_mul_pos_left ?_ (sq_nonneg a.y)
@@ -182,7 +192,10 @@ theorem d_nonsquare_of_one_lt_x {a : Solution₁ d} (ha : 1 < a.x) : ¬IsSquare 
   simp_rw [← sq, ← mul_pow, sq_sub_sq, Int.mul_eq_one_iff_eq_one_or_neg_one] at hp
   rcases hp with (⟨hp₁, hp₂⟩ | ⟨hp₁, hp₂⟩) <;> omega
 
--- DISSOLVED: eq_one_of_x_eq_one
+theorem eq_one_of_x_eq_one (h₀ : d ≠ 0) {a : Solution₁ d} (ha : a.x = 1) : a = 1 := by
+  have prop := a.prop_y
+  rw [ha, one_pow, sub_self, mul_eq_zero, or_iff_right h₀, sq_eq_zero_iff] at prop
+  exact ext ha prop
 
 theorem eq_one_or_neg_one_iff_y_eq_zero {a : Solution₁ d} : a = 1 ∨ a = -1 ↔ a.y = 0 := by
   refine ⟨fun H => H.elim (fun h => by simp [h]) fun h => by simp [h], fun H => ?_⟩
@@ -270,9 +283,82 @@ variable {d : ℤ}
 
 open Set Real
 
--- DISSOLVED: exists_of_not_isSquare
+theorem exists_of_not_isSquare (h₀ : 0 < d) (hd : ¬IsSquare d) :
+    ∃ x y : ℤ, x ^ 2 - d * y ^ 2 = 1 ∧ y ≠ 0 := by
+  let ξ : ℝ := √d
+  have hξ : Irrational ξ := by
+    refine irrational_nrt_of_notint_nrt 2 d (sq_sqrt <| Int.cast_nonneg.mpr h₀.le) ?_ two_pos
+    rintro ⟨x, hx⟩
+    refine hd ⟨x, @Int.cast_injective ℝ _ _ d (x * x) ?_⟩
+    rw [← sq_sqrt <| Int.cast_nonneg.mpr h₀.le, Int.cast_mul, ← hx, sq]
+  obtain ⟨M, hM₁⟩ := exists_int_gt (2 * |ξ| + 1)
+  have hM : {q : ℚ | |q.1 ^ 2 - d * (q.2 : ℤ) ^ 2| < M}.Infinite := by
+    refine Infinite.mono (fun q h => ?_) (infinite_rat_abs_sub_lt_one_div_den_sq_of_irrational hξ)
+    have h0 : 0 < (q.2 : ℝ) ^ 2 := pow_pos (Nat.cast_pos.mpr q.pos) 2
+    have h1 : (q.num : ℝ) / (q.den : ℝ) = q := mod_cast q.num_div_den
+    rw [mem_setOf, abs_sub_comm, ← @Int.cast_lt ℝ,
+      ← div_lt_div_iff_of_pos_right (abs_pos_of_pos h0)]
+    push_cast
+    rw [← abs_div, abs_sq, sub_div, mul_div_cancel_right₀ _ h0.ne', ← div_pow, h1, ←
+      sq_sqrt (Int.cast_pos.mpr h₀).le, sq_sub_sq, abs_mul, ← mul_one_div]
+    refine mul_lt_mul'' (((abs_add ξ q).trans ?_).trans_lt hM₁) h (abs_nonneg _) (abs_nonneg _)
+    rw [two_mul, add_assoc, add_le_add_iff_left, ← sub_le_iff_le_add']
+    rw [mem_setOf, abs_sub_comm] at h
+    refine (abs_sub_abs_le_abs_sub (q : ℝ) ξ).trans (h.le.trans ?_)
+    rw [div_le_one h0, one_le_sq_iff_one_le_abs, Nat.abs_cast, Nat.one_le_cast]
+    exact q.pos
+  obtain ⟨m, hm⟩ : ∃ m : ℤ, {q : ℚ | q.1 ^ 2 - d * (q.den : ℤ) ^ 2 = m}.Infinite := by
+    contrapose! hM
+    simp only [not_infinite] at hM ⊢
+    refine (congr_arg _ (ext fun x => ?_)).mp (Finite.biUnion (finite_Ioo (-M) M) fun m _ => hM m)
+    simp only [abs_lt, mem_setOf, mem_Ioo, mem_iUnion, exists_prop, exists_eq_right']
+  have hm₀ : m ≠ 0 := by
+    rintro rfl
+    obtain ⟨q, hq⟩ := hm.nonempty
+    rw [mem_setOf, sub_eq_zero, mul_comm] at hq
+    obtain ⟨a, ha⟩ := (Int.pow_dvd_pow_iff two_ne_zero).mp ⟨d, hq⟩
+    rw [ha, mul_pow, mul_right_inj' (pow_pos (Int.natCast_pos.mpr q.pos) 2).ne'] at hq
+    exact hd ⟨a, sq a ▸ hq.symm⟩
+  haveI := neZero_iff.mpr (Int.natAbs_ne_zero.mpr hm₀)
+  let f : ℚ → ZMod m.natAbs × ZMod m.natAbs := fun q => (q.num, q.den)
+  obtain ⟨q₁, h₁ : q₁.num ^ 2 - d * (q₁.den : ℤ) ^ 2 = m,
+      q₂, h₂ : q₂.num ^ 2 - d * (q₂.den : ℤ) ^ 2 = m, hne, hqf⟩ :=
+    hm.exists_ne_map_eq_of_mapsTo (mapsTo_univ f _) finite_univ
+  obtain ⟨hq1 : (q₁.num : ZMod m.natAbs) = q₂.num, hq2 : (q₁.den : ZMod m.natAbs) = q₂.den⟩ :=
+    Prod.ext_iff.mp hqf
+  have hd₁ : m ∣ q₁.num * q₂.num - d * (q₁.den * q₂.den) := by
+    rw [← Int.natAbs_dvd, ← ZMod.intCast_zmod_eq_zero_iff_dvd]
+    push_cast
+    rw [hq1, hq2, ← sq, ← sq]
+    norm_cast
+    rw [ZMod.intCast_zmod_eq_zero_iff_dvd, Int.natAbs_dvd, Nat.cast_pow, ← h₂]
+  have hd₂ : m ∣ q₁.num * q₂.den - q₂.num * q₁.den := by
+    rw [← Int.natAbs_dvd, ← ZMod.intCast_eq_intCast_iff_dvd_sub]
+    push_cast
+    rw [hq1, hq2]
+  replace hm₀ : (m : ℚ) ≠ 0 := Int.cast_ne_zero.mpr hm₀
+  refine ⟨(q₁.num * q₂.num - d * (q₁.den * q₂.den)) / m, (q₁.num * q₂.den - q₂.num * q₁.den) / m,
+      ?_, ?_⟩
+  · qify [hd₁, hd₂]
+    field_simp [hm₀]
+    norm_cast
+    conv_rhs =>
+      rw [sq]
+      congr
+      · rw [← h₁]
+      · rw [← h₂]
+    push_cast
+    ring
+  · qify [hd₂]
+    refine div_ne_zero_iff.mpr ⟨?_, hm₀⟩
+    exact mod_cast mt sub_eq_zero.mp (mt Rat.eq_iff_mul_eq_mul.mpr hne)
 
--- DISSOLVED: exists_iff_not_isSquare
+theorem exists_iff_not_isSquare (h₀ : 0 < d) :
+    (∃ x y : ℤ, x ^ 2 - d * y ^ 2 = 1 ∧ y ≠ 0) ↔ ¬IsSquare d := by
+  refine ⟨?_, exists_of_not_isSquare h₀⟩
+  rintro ⟨x, y, hxy, hy⟩ ⟨a, rfl⟩
+  rw [← sq, ← mul_pow, sq_sub_sq] at hxy
+  simpa [hy, mul_self_pos.mp h₀, sub_eq_add_neg, eq_neg_self_iff] using Int.eq_of_mul_eq_one hxy
 
 namespace Solution₁
 

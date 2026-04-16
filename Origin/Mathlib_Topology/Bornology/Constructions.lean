@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.Topology.Bornology.Basic
 
+noncomputable section
+
 /-!
 # Bornology structure on products and subtypes
 

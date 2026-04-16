@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Polynomial/Laurent.lean
-Genuine: 53 | Conflates: 1 | Dissolved: 4 | Infrastructure: 17
+Genuine: 57 | Conflates: 1 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Algebra.Polynomial.Reverse
 import Mathlib.Algebra.Polynomial.Inductions
 import Mathlib.RingTheory.Localization.Defs
+
+noncomputable section
 
 /-!  # Laurent polynomials
 
@@ -89,19 +91,8 @@ theorem LaurentPolynomial.ext [Semiring R] {p q : R[T;T⁻¹]} (h : ∀ a, p a =
 def Polynomial.toLaurent [Semiring R] : R[X] →+* R[T;T⁻¹] :=
   (mapDomainRingHom R Int.ofNatHom).comp (toFinsuppIso R)
 
-theorem Polynomial.toLaurent_apply [Semiring R] (p : R[X]) :
-    toLaurent p = p.toFinsupp.mapDomain (↑) :=
-  rfl
-
 def Polynomial.toLaurentAlg [CommSemiring R] : R[X] →ₐ[R] R[T;T⁻¹] :=
   (mapDomainAlgHom R R Int.ofNatHom).comp (toFinsuppIsoAlg R).toAlgHom
-
-@[simp] lemma Polynomial.coe_toLaurentAlg [CommSemiring R] :
-    (toLaurentAlg : R[X] → R[T;T⁻¹]) = toLaurent :=
-  rfl
-
-theorem Polynomial.toLaurentAlg_apply [CommSemiring R] (f : R[X]) : toLaurentAlg f = toLaurent f :=
-  rfl
 
 namespace LaurentPolynomial
 
@@ -109,20 +100,10 @@ section Semiring
 
 variable [Semiring R]
 
-theorem single_zero_one_eq_one : (Finsupp.single 0 1 : R[T;T⁻¹]) = (1 : R[T;T⁻¹]) :=
-  rfl
-
 /-!  ### The functions `C` and `T`. -/
 
 def C : R →+* R[T;T⁻¹] :=
   singleZeroRingHom
-
-theorem algebraMap_apply {R A : Type*} [CommSemiring R] [Semiring A] [Algebra R A] (r : R) :
-    algebraMap R (LaurentPolynomial A) r = C (algebraMap R A r) :=
-  rfl
-
-theorem C_eq_algebraMap {R : Type*} [CommSemiring R] (r : R) : C r = algebraMap R R[T;T⁻¹] r :=
-  rfl
 
 theorem single_eq_C (r : R) : Finsupp.single 0 r = C r := rfl
 
@@ -200,10 +181,6 @@ instance invertibleT (n : ℤ) : Invertible (T n : R[T;T⁻¹]) where
   invOf := T (-n)
   invOf_mul_self := by rw [← T_add, neg_add_cancel, T_zero]
   mul_invOf_self := by rw [← T_add, add_neg_cancel, T_zero]
-
-@[simp]
-theorem invOf_T (n : ℤ) : ⅟ (T n : R[T;T⁻¹]) = T (-n) :=
-  rfl
 
 theorem isUnit_T (n : ℤ) : IsUnit (T n : R[T;T⁻¹]) :=
   isUnit_of_invertible _
@@ -299,7 +276,8 @@ theorem _root_.Polynomial.toLaurent_injective :
 theorem _root_.Polynomial.toLaurent_inj (f g : R[X]) : toLaurent f = toLaurent g ↔ f = g :=
   ⟨fun h => Polynomial.toLaurent_injective h, congr_arg _⟩
 
--- DISSOLVED: _root_.Polynomial.toLaurent_ne_zero
+theorem _root_.Polynomial.toLaurent_ne_zero {f : R[X]} : toLaurent f ≠ 0 ↔ f ≠ 0 :=
+  map_ne_zero_iff _ Polynomial.toLaurent_injective
 
 @[simp]
 theorem _root_.Polynomial.toLaurent_eq_zero {f : R[X]} : toLaurent f = 0 ↔ f = 0 :=
@@ -340,7 +318,10 @@ theorem support_C_mul_T (a : R) (n : ℤ) : Finsupp.support (C a * T n) ⊆ {n} 
   rw [← single_eq_C_mul_T]
   exact support_single_subset
 
--- DISSOLVED: support_C_mul_T_of_ne_zero
+theorem support_C_mul_T_of_ne_zero {a : R} (a0 : a ≠ 0) (n : ℤ) :
+    Finsupp.support (C a * T n) = {n} := by
+  rw [← single_eq_C_mul_T]
+  exact support_single_ne_zero _ a0
 
 theorem toLaurent_support (f : R[X]) : f.toLaurent.support = f.support.map Nat.castEmbedding := by
   generalize hd : f.support = s
@@ -382,7 +363,10 @@ theorem degree_eq_bot_iff {f : R[T;T⁻¹]} : f.degree = ⊥ ↔ f = 0 := by
 
 section ExactDegrees
 
--- DISSOLVED: degree_C_mul_T
+@[simp]
+theorem degree_C_mul_T (n : ℤ) (a : R) (a0 : a ≠ 0) : degree (C a * T n) = n := by
+  rw [degree, support_C_mul_T_of_ne_zero a0 n]
+  exact Finset.max_singleton
 
 theorem degree_C_mul_T_ite [DecidableEq R] (n : ℤ) (a : R) :
     degree (C a * T n) = if a = 0 then ⊥ else ↑n := by
@@ -396,7 +380,9 @@ theorem degree_T [Nontrivial R] (n : ℤ) : (T n : R[T;T⁻¹]).degree = n := by
   rw [← one_mul (T n), ← map_one C]
   exact degree_C_mul_T n 1 (one_ne_zero : (1 : R) ≠ 0)
 
--- DISSOLVED: degree_C
+theorem degree_C {a : R} (a0 : a ≠ 0) : (C a).degree = 0 := by
+  rw [← mul_one (C a), ← T_zero]
+  exact degree_C_mul_T 0 a a0
 
 theorem degree_C_ite [DecidableEq R] (a : R) : (C a).degree = if a = 0 then ⊥ else 0 := by
   split_ifs with h <;> simp only [h, map_zero, degree_zero, degree_C, Ne, not_false_iff]
@@ -471,15 +457,11 @@ def invert : R[T;T⁻¹] ≃ₐ[R] R[T;T⁻¹] := AddMonoidAlgebra.domCongr R R 
 @[simp] lemma invert_T (n : ℤ) : invert (T n : R[T;T⁻¹]) = T (-n) :=
   AddMonoidAlgebra.domCongr_single _ _ _ _ _
 
-@[simp] lemma invert_apply (f : R[T;T⁻¹]) (n : ℤ) : invert f n = f (-n) := rfl
-
 @[simp] lemma invert_comp_C : invert ∘ (@C R _) = C := by ext; simp
 
 @[simp] lemma invert_C (t : R) : invert (C t) = C t := by ext; simp
 
 lemma involutive_invert : Involutive (invert (R := R)) := fun _ ↦ by ext; simp
-
-@[simp] lemma invert_symm : (invert (R := R)).symm = invert := rfl
 
 lemma toLaurent_reverse (p : R[X]) :
     toLaurent p.reverse = invert (toLaurent p) * (T p.natDegree) := by

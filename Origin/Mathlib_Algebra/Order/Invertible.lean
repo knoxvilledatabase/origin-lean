@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Ring.Invertible
 import Mathlib.Data.Nat.Cast.Order.Ring
 
+noncomputable section
+
 /-!
 # Lemmas about `invOf` in ordered (semi)rings.
 -/

@@ -9,6 +9,8 @@ import Mathlib.Analysis.CStarAlgebra.Spectrum
 import Mathlib.Analysis.CStarAlgebra.Unitization
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unique
 
+noncomputable section
+
 /-! # Instances of the continuous functional calculus
 
 ## Main theorems
@@ -112,7 +114,6 @@ lemma cfcₙAux_mem_range_inr (f : C(σₙ 𝕜 a, 𝕜)₀) :
 variable [CStarRing A]
 
 include hp₁ in
-
 open Unitization NonUnitalStarAlgHom in
 
 theorem RCLike.nonUnitalContinuousFunctionalCalculus :

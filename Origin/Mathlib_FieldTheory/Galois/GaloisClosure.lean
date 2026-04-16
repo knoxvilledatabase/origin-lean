@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.FieldTheory.NormalClosure
 import Mathlib.FieldTheory.SeparableClosure
 
+noncomputable section
+
 /-!
 
 # Main definitions and results

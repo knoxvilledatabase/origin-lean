@@ -11,6 +11,8 @@ import Mathlib.Data.Set.Lattice
 import Mathlib.Order.Hom.Lattice
 import Mathlib.Order.Nat
 
+noncomputable section
+
 /-!
 # Lattice operations on finsets
 
@@ -410,26 +412,6 @@ protected theorem inf_eq_top_iff (f : β → α) (S : Finset β) : S.inf f = ⊤
 
 end Inf
 
-@[simp]
-theorem toDual_sup [SemilatticeSup α] [OrderBot α] (s : Finset β) (f : β → α) :
-    toDual (s.sup f) = s.inf (toDual ∘ f) :=
-  rfl
-
-@[simp]
-theorem toDual_inf [SemilatticeInf α] [OrderTop α] (s : Finset β) (f : β → α) :
-    toDual (s.inf f) = s.sup (toDual ∘ f) :=
-  rfl
-
-@[simp]
-theorem ofDual_sup [SemilatticeInf α] [OrderTop α] (s : Finset β) (f : β → αᵒᵈ) :
-    ofDual (s.sup f) = s.inf (ofDual ∘ f) :=
-  rfl
-
-@[simp]
-theorem ofDual_inf [SemilatticeSup α] [OrderBot α] (s : Finset β) (f : β → αᵒᵈ) :
-    ofDual (s.inf f) = s.sup (ofDual ∘ f) :=
-  rfl
-
 section DistribLattice
 
 variable [DistribLattice α]
@@ -704,10 +686,6 @@ theorem sup'_insert [DecidableEq β] {b : β} :
   simp [WithBot.coe_sup]
 
 @[simp]
-theorem sup'_singleton {b : β} : ({b} : Finset β).sup' (singleton_nonempty _) f = f b :=
-  rfl
-
-@[simp]
 theorem sup'_le_iff {a : α} : s.sup' H f ≤ a ↔ ∀ b ∈ s, f b ≤ a := by
   simp_rw [← @WithBot.coe_le_coe α, coe_sup', Finset.sup_le_iff]; rfl
 
@@ -859,10 +837,6 @@ theorem inf'_cons {b : β} {hb : b ∉ s} :
 theorem inf'_insert [DecidableEq β] {b : β} :
     (insert b s).inf' (insert_nonempty _ _) f = f b ⊓ s.inf' H f :=
   @sup'_insert αᵒᵈ _ _ _ H f _ _
-
-@[simp]
-theorem inf'_singleton {b : β} : ({b} : Finset β).inf' (singleton_nonempty _) f = f b :=
-  rfl
 
 @[simp]
 theorem le_inf'_iff {a : α} : a ≤ s.inf' H f ↔ ∀ b ∈ s, a ≤ f b :=
@@ -1018,26 +992,6 @@ protected theorem inf'_apply {C : β → Type*} [∀ b : β, SemilatticeInf (C b
     s.inf' H f b = s.inf' H fun a => f a b :=
   Finset.sup'_apply (C := fun b => (C b)ᵒᵈ) H f b
 
-@[simp]
-theorem toDual_sup' [SemilatticeSup α] {s : Finset ι} (hs : s.Nonempty) (f : ι → α) :
-    toDual (s.sup' hs f) = s.inf' hs (toDual ∘ f) :=
-  rfl
-
-@[simp]
-theorem toDual_inf' [SemilatticeInf α] {s : Finset ι} (hs : s.Nonempty) (f : ι → α) :
-    toDual (s.inf' hs f) = s.sup' hs (toDual ∘ f) :=
-  rfl
-
-@[simp]
-theorem ofDual_sup' [SemilatticeInf α] {s : Finset ι} (hs : s.Nonempty) (f : ι → αᵒᵈ) :
-    ofDual (s.sup' hs f) = s.inf' hs (ofDual ∘ f) :=
-  rfl
-
-@[simp]
-theorem ofDual_inf' [SemilatticeSup α] {s : Finset ι} (hs : s.Nonempty) (f : ι → αᵒᵈ) :
-    ofDual (s.inf' hs f) = s.sup' hs (ofDual ∘ f) :=
-  rfl
-
 section DistribLattice
 
 variable [DistribLattice α] {s : Finset ι} {t : Finset κ} (hs : s.Nonempty) (ht : t.Nonempty)
@@ -1155,12 +1109,10 @@ namespace Finset
 variable [DecidableEq α] {s : Finset ι} {f : ι → Finset α} {a : α}
 
 set_option linter.docPrime false in
-
 @[simp] lemma mem_sup' (hs) : a ∈ s.sup' hs f ↔ ∃ i ∈ s, a ∈ f i := by
   induction' hs using Nonempty.cons_induction <;> simp [*]
 
 set_option linter.docPrime false in
-
 @[simp] lemma mem_inf' (hs) : a ∈ s.inf' hs f ↔ ∀ i ∈ s, a ∈ f i := by
   induction' hs using Nonempty.cons_induction <;> simp [*]
 

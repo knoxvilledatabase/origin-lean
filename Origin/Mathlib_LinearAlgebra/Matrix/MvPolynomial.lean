@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Matrix/MvPolynomial.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 4 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.Algebra.MvPolynomial.CommRing
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+
+noncomputable section
 
 /-!
 # Matrices of multivariate polynomials
@@ -28,11 +30,6 @@ variable (m n R)
 noncomputable def mvPolynomialX [CommSemiring R] : Matrix m n (MvPolynomial (m × n) R) :=
   of fun i j => MvPolynomial.X (i, j)
 
-@[simp]
-theorem mvPolynomialX_apply [CommSemiring R] (i j) :
-    mvPolynomialX m n R i j = MvPolynomial.X (i, j) :=
-  rfl
-
 variable {m n R}
 
 theorem mvPolynomialX_map_eval₂ [CommSemiring R] [CommSemiring S] (f : R →+* S) (A : Matrix m n S) :
@@ -53,6 +50,12 @@ theorem mvPolynomialX_mapMatrix_aeval [Fintype m] [DecidableEq m] [CommSemiring 
 
 variable (m)
 
--- DISSOLVED: det_mvPolynomialX_ne_zero
+-- CONFLATES (assumes ground = zero): det_mvPolynomialX_ne_zero
+theorem det_mvPolynomialX_ne_zero [DecidableEq m] [Fintype m] [CommRing R] [Nontrivial R] :
+    det (mvPolynomialX m m R) ≠ 0 := by
+  intro h_det
+  have := congr_arg Matrix.det (mvPolynomialX_mapMatrix_eval (1 : Matrix m m R))
+  rw [det_one, ← RingHom.map_det, h_det, RingHom.map_zero] at this
+  exact zero_ne_one this
 
 end Matrix

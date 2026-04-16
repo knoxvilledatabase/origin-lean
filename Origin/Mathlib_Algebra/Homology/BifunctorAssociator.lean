@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.GradedObject.Associator
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 import Mathlib.Algebra.Homology.Bifunctor
 
+noncomputable section
+
 /-!
 # The associator for actions of bifunctors on homological complexes
 

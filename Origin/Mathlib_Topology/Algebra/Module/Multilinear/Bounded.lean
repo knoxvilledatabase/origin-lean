@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Bounded
 import Mathlib.Topology.Algebra.Module.Multilinear.Basic
 
+noncomputable section
+
 /-!
 # Images of (von Neumann) bounded sets under continuous multilinear maps
 

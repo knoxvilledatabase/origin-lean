@@ -7,6 +7,8 @@ import Mathlib.Topology.Homotopy.Equiv
 import Mathlib.CategoryTheory.Equivalence
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.Product
 
+noncomputable section
+
 /-!
 # Homotopic maps induce naturally isomorphic functors
 
@@ -43,11 +45,6 @@ open scoped unitInterval
 
 namespace unitInterval
 
-def path01 : Path (0 : I) 1 where
-  toFun := id
-  source' := rfl
-  target' := rfl
-
 def upath01 : Path (ULift.up 0 : ULift.{u} I) (ULift.up 1) where
   toFun := ULift.up
   source' := rfl
@@ -70,11 +67,6 @@ section Casts
 
 abbrev hcast {X : TopCat} {x₀ x₁ : X} (hx : x₀ = x₁) : fromTop x₀ ⟶ fromTop x₁ :=
   eqToHom <| FundamentalGroupoid.ext hx
-
-@[simp]
-theorem hcast_def {X : TopCat} {x₀ x₁ : X} (hx₀ : x₀ = x₁) :
-    hcast hx₀ = eqToHom (FundamentalGroupoid.ext hx₀) :=
-  rfl
 
 variable {X₁ X₂ Y : TopCat.{u}} {f : C(X₁, Y)} {g : C(X₂, Y)} {x₀ x₁ : X₁} {x₂ x₃ : X₂}
   {p : Path x₀ x₁} {q : Path x₂ x₃} (hfg : ∀ t, f (p t) = g (q t))

@@ -7,6 +7,8 @@ import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.RingTheory.Localization.Away.Lemmas
 
+noncomputable section
+
 /-!
 # Target local closure of ring homomorphism properties
 
@@ -240,6 +242,7 @@ lemma locally_StableUnderCompositionWithLocalizationAwaySource
   exact hPa _ r _ (hs t ht)
 
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in
+/-- If `P` is stable under base change, then so is `Locally P`. -/
 
 lemma locally_isStableUnderBaseChange (hPi : RespectsIso P) (hPb : IsStableUnderBaseChange P) :
     IsStableUnderBaseChange (Locally P) := by

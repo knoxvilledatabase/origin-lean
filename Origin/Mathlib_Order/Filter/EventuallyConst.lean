@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Indicator
 import Mathlib.Order.Filter.AtTopBot
 import Mathlib.Order.Filter.Subsingleton
 
+noncomputable section
+
 /-!
 # Functions that are eventually constant along a filter
 
@@ -78,8 +80,6 @@ theorem eventuallyConst_preimage {s : Set β} {f : α → β} :
 theorem EventuallyEq.eventuallyConst_iff {g : α → β} (h : f =ᶠ[l] g) :
     EventuallyConst f l ↔ EventuallyConst g l := by
   simp only [EventuallyConst, map_congr h]
-
-@[simp] theorem eventuallyConst_id : EventuallyConst id l ↔ l.Subsingleton := Iff.rfl
 
 namespace EventuallyConst
 

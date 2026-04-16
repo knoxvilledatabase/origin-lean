@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Limits.Types
 
+noncomputable section
+
 /-!
 # Concrete description of (co)limits in functor categories
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.DirectSum.Basic
 import Mathlib.Algebra.Group.AddChar
 
+noncomputable section
+
 /-!
 # Direct sum of additive characters
 

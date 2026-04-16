@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Sites/Coherent/CoherentSheaves.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Canonical
 import Mathlib.CategoryTheory.Sites.Coherent.Basic
 import Mathlib.CategoryTheory.Sites.EffectiveEpimorphic
+
+noncomputable section
 
 /-!
 
@@ -25,7 +27,6 @@ namespace CategoryTheory
 variable {C : Type*} [Category C] [Precoherent C]
 
 universe w in
-
 lemma isSheaf_coherent (P : Cᵒᵖ ⥤ Type w) :
     Presieve.IsSheaf (coherentTopology C) P ↔
     (∀ (B : C) (α : Type) [Finite α] (X : α → C) (π : (a : α) → (X a ⟶ B)),

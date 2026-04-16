@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 import Mathlib.CategoryTheory.Limits.Comma
 
+noncomputable section
+
 /-!
 # Subobjects in the category of structured arrows
 

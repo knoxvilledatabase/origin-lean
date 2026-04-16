@@ -13,6 +13,8 @@ import Mathlib.Algebra.Ring.Defs
 import Mathlib.Tactic.Tauto
 import Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE
 
+noncomputable section
+
 /-!
 # Ordered rings and semirings
 

@@ -9,6 +9,8 @@ import Mathlib.Logic.Equiv.Fin
 import Mathlib.Order.Partition.Finpartition
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Finite equipartitions
 

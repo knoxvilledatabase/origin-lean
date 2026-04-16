@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Elab.Tactic.Basic
 import Qq
 
+noncomputable section
+
 /-!
 # `SynthesizeUsing`
 

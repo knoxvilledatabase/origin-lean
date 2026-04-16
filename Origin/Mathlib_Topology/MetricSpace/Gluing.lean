@@ -5,6 +5,8 @@ Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Isometry
 
+noncomputable section
+
 /-!
 # Metric space gluing
 
@@ -260,8 +262,6 @@ def metricSpaceSum : MetricSpace (X ⊕ Y) where
   uniformity_dist := uniformity_dist_of_mem_uniformity _ _ Sum.mem_uniformity
 
 attribute [local instance] metricSpaceSum
-
-theorem Sum.dist_eq {x y : X ⊕ Y} : dist x y = Sum.dist x y := rfl
 
 theorem isometry_inl : Isometry (Sum.inl : X → X ⊕ Y) :=
   Isometry.of_dist_eq fun _ _ => rfl

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
 
+noncomputable section
+
 /-!
 # Analytic manifolds (possibly with boundary or corners)
 

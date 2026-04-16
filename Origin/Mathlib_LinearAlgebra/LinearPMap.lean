@@ -1,9 +1,11 @@
 /-
 Extracted from LinearAlgebra/LinearPMap.lean
-Genuine: 75 | Conflates: 0 | Dissolved: 2 | Infrastructure: 53
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Prod
+
+noncomputable section
 
 /-!
 # Partially defined linear maps
@@ -35,6 +37,8 @@ structure LinearPMap (R : Type u) [Ring R] (E : Type v) [AddCommGroup E] [Module
   domain : Submodule R E
   toFun : domain →ₗ[R] F
 
+@[inherit_doc] notation:25 E " →ₗ.[" R:25 "] " F:0 => LinearPMap R E F
+
 variable {R : Type*} [Ring R] {E : Type*} [AddCommGroup E] [Module R E] {F : Type*}
   [AddCommGroup F] [Module R F] {G : Type*} [AddCommGroup G] [Module R G]
 
@@ -47,10 +51,6 @@ def toFun' (f : E →ₗ.[R] F) : f.domain → F := f.toFun
 
 instance : CoeFun (E →ₗ.[R] F) fun f : E →ₗ.[R] F => f.domain → F :=
   ⟨toFun'⟩
-
-@[simp]
-theorem toFun_eq_coe (f : E →ₗ.[R] F) (x : f.domain) : f.toFun x = f x :=
-  rfl
 
 @[ext (iff := false)]
 theorem ext {f g : E →ₗ.[R] F} (h : f.domain = g.domain)
@@ -122,11 +122,6 @@ noncomputable def mkSpanSingleton' (x : E) (y : F) (H : ∀ c : R, c • x = 0 �
         apply coe_smul }
 
 @[simp]
-theorem domain_mkSpanSingleton (x : E) (y : F) (H : ∀ c : R, c • x = 0 → c • y = 0) :
-    (mkSpanSingleton' x y H).domain = R ∙ x :=
-  rfl
-
-@[simp]
 theorem mkSpanSingleton'_apply (x : E) (y : F) (H : ∀ c : R, c • x = 0 → c • y = 0) (c : R) (h) :
     mkSpanSingleton' x y H ⟨c • x, h⟩ = c • y := by
   dsimp [mkSpanSingleton']
@@ -142,9 +137,16 @@ theorem mkSpanSingleton'_apply_self (x : E) (y : F) (H : ∀ c : R, c • x = 0 
   have := by refine mkSpanSingleton'_apply x y H 1 ?_; rwa [one_smul]
   convert this <;> rw [one_smul]
 
--- DISSOLVED: mkSpanSingleton
+noncomputable abbrev mkSpanSingleton {K E F : Type*} [DivisionRing K] [AddCommGroup E] [Module K E]
+    [AddCommGroup F] [Module K F] (x : E) (y : F) (hx : x ≠ 0) : E →ₗ.[K] F :=
+  mkSpanSingleton' x y fun c hc =>
+    (smul_eq_zero.1 hc).elim (fun hc => by rw [hc, zero_smul]) fun hx' => absurd hx' hx
 
--- DISSOLVED: mkSpanSingleton_apply
+theorem mkSpanSingleton_apply (K : Type*) {E F : Type*} [DivisionRing K] [AddCommGroup E]
+    [Module K E] [AddCommGroup F] [Module K F] {x : E} (hx : x ≠ 0) (y : F) :
+    mkSpanSingleton x y hx ⟨x, (Submodule.mem_span_singleton_self x : x ∈ Submodule.span K {x})⟩ =
+      y :=
+  LinearPMap.mkSpanSingleton'_apply_self _ _ _ _
 
 protected def fst (p : Submodule R E) (p' : Submodule R F) : E × F →ₗ.[R] E where
   domain := p.prod p'
@@ -158,11 +160,6 @@ theorem fst_apply (p : Submodule R E) (p' : Submodule R F) (x : p.prod p') :
 protected def snd (p : Submodule R E) (p' : Submodule R F) : E × F →ₗ.[R] F where
   domain := p.prod p'
   toFun := (LinearMap.snd R E F).comp (p.prod p').subtype
-
-@[simp]
-theorem snd_apply (p : Submodule R E) (p' : Submodule R F) (x : p.prod p') :
-    LinearPMap.snd p p' x = (x : E × F).2 :=
-  rfl
 
 instance le : LE (E →ₗ.[R] F) :=
   ⟨fun f g => f.domain ≤ g.domain ∧ ∀ ⦃x : f.domain⦄ ⦃y : g.domain⦄ (_h : (x : E) = y), f x = g y⟩
@@ -267,12 +264,6 @@ protected noncomputable def sup (f g : E →ₗ.[R] F)
     (h : ∀ (x : f.domain) (y : g.domain), (x : E) = y → f x = g y) : E →ₗ.[R] F :=
   ⟨_, Classical.choose (sup_aux f g h)⟩
 
-@[simp]
-theorem domain_sup (f g : E →ₗ.[R] F)
-    (h : ∀ (x : f.domain) (y : g.domain), (x : E) = y → f x = g y) :
-    (f.sup g h).domain = f.domain ⊔ g.domain :=
-  rfl
-
 theorem sup_apply {f g : E →ₗ.[R] F} (H : ∀ (x : f.domain) (y : g.domain), (x : E) = y → f x = g y)
     (x : f.domain) (y : g.domain) (z : ↥(f.domain ⊔ g.domain)) (hz : (↑x : E) + ↑y = ↑z) :
     f.sup g H z = f x + g y :=
@@ -330,10 +321,6 @@ instance instSMul : SMul M (E →ₗ.[R] F) :=
   ⟨fun a f =>
     { domain := f.domain
       toFun := a • f.toFun }⟩
-
-@[simp]
-theorem smul_domain (a : M) (f : E →ₗ.[R] F) : (a • f).domain = f.domain :=
-  rfl
 
 theorem smul_apply (a : M) (f : E →ₗ.[R] F) (x : (a • f).domain) : (a • f) x = a • f x :=
   rfl
@@ -424,18 +411,6 @@ instance instVAdd : VAdd (E →ₗ[R] F) (E →ₗ.[R] F) :=
     { domain := g.domain
       toFun := f.comp g.domain.subtype + g.toFun }⟩
 
-@[simp]
-theorem vadd_domain (f : E →ₗ[R] F) (g : E →ₗ.[R] F) : (f +ᵥ g).domain = g.domain :=
-  rfl
-
-theorem vadd_apply (f : E →ₗ[R] F) (g : E →ₗ.[R] F) (x : (f +ᵥ g).domain) :
-    (f +ᵥ g) x = f x + g x :=
-  rfl
-
-@[simp]
-theorem coe_vadd (f : E →ₗ[R] F) (g : E →ₗ.[R] F) : ⇑(f +ᵥ g) = ⇑(f.comp g.domain.subtype) + ⇑g :=
-  rfl
-
 instance instAddAction : AddAction (E →ₗ[R] F) (E →ₗ.[R] F) where
   vadd := (· +ᵥ ·)
   zero_vadd := fun ⟨_s, _f⟩ => ext' <| zero_add _
@@ -495,11 +470,6 @@ noncomputable def supSpanSingleton (f : E →ₗ.[K] F) (x : E) (y : F) (hx : x 
   -- Porting note: `simpa [..]` → `simp [..]; exact ..`
   f.sup (mkSpanSingleton x y fun h₀ => hx <| h₀.symm ▸ f.domain.zero_mem) <|
     sup_h_of_disjoint _ _ <| by simpa [disjoint_span_singleton] using fun h ↦ False.elim <| hx h
-
-@[simp]
-theorem domain_supSpanSingleton (f : E →ₗ.[K] F) (x : E) (y : F) (hx : x ∉ f.domain) :
-    (f.supSpanSingleton x y hx).domain = f.domain ⊔ K ∙ x :=
-  rfl
 
 @[simp]
 theorem supSpanSingleton_apply_mk (f : E →ₗ.[K] F) (x : E) (y : F) (hx : x ∉ f.domain) (x' : E)
@@ -579,21 +549,9 @@ namespace LinearMap
 def toPMap (f : E →ₗ[R] F) (p : Submodule R E) : E →ₗ.[R] F :=
   ⟨p, f.comp p.subtype⟩
 
-@[simp]
-theorem toPMap_apply (f : E →ₗ[R] F) (p : Submodule R E) (x : p) : f.toPMap p x = f x :=
-  rfl
-
-@[simp]
-theorem toPMap_domain (f : E →ₗ[R] F) (p : Submodule R E) : (f.toPMap p).domain = p :=
-  rfl
-
 def compPMap (g : F →ₗ[R] G) (f : E →ₗ.[R] F) : E →ₗ.[R] G where
   domain := f.domain
   toFun := g.comp f.toFun
-
-@[simp]
-theorem compPMap_apply (g : F →ₗ[R] G) (f : E →ₗ.[R] F) (x) : g.compPMap f x = g (f x) :=
-  rfl
 
 end LinearMap
 
@@ -618,18 +576,8 @@ def coprod (f : E →ₗ.[R] G) (g : F →ₗ.[R] G) : E × F →ₗ.[R] G where
       (f.comp (LinearPMap.fst f.domain g.domain) fun x => x.2.1).toFun
       (g.comp (LinearPMap.snd f.domain g.domain) fun x => x.2.2).toFun
 
-@[simp]
-theorem coprod_apply (f : E →ₗ.[R] G) (g : F →ₗ.[R] G) (x) :
-    f.coprod g x = f ⟨(x : E × F).1, x.2.1⟩ + g ⟨(x : E × F).2, x.2.2⟩ :=
-  rfl
-
 def domRestrict (f : E →ₗ.[R] F) (S : Submodule R E) : E →ₗ.[R] F :=
   ⟨S ⊓ f.domain, f.toFun.comp (Submodule.inclusion (by simp))⟩
-
-@[simp]
-theorem domRestrict_domain (f : E →ₗ.[R] F) {S : Submodule R E} :
-    (f.domRestrict S).domain = S ⊓ f.domain :=
-  rfl
 
 theorem domRestrict_apply {f : E →ₗ.[R] F} {S : Submodule R E} ⦃x : ↥(S ⊓ f.domain)⦄ ⦃y : f.domain⦄
     (h : (x : E) = y) : f.domRestrict S x = f y := by

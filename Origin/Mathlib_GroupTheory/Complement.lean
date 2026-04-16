@@ -5,6 +5,8 @@ Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 import Origin.Core
 import Mathlib.Data.ZMod.Quotient
 
+noncomputable section
+
 /-!
 # Complements
 
@@ -308,8 +310,6 @@ noncomputable def equiv {S T : Set G} (hST : IsComplement S T) : G ≃ S × T :=
   (Equiv.ofBijective (fun x : S × T => x.1.1 * x.2.1) hST).symm
 
 variable (hST : IsComplement S T) (hHT : IsComplement H T) (hSK : IsComplement S K)
-
-@[simp] theorem equiv_symm_apply (x : S × T) : (hST.equiv.symm x : G) = x.1.1 * x.2.1 := rfl
 
 @[simp]
 theorem equiv_fst_mul_equiv_snd (g : G) : ↑(hST.equiv g).fst * (hST.equiv g).snd = g :=

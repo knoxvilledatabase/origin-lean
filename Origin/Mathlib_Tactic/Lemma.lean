@@ -1,10 +1,12 @@
 /-
 Extracted from Tactic/Lemma.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Init
 import Lean.Parser.Command
+
+noncomputable section
 
 /-!
 # Support for `lemma` as a synonym for `theorem`.
@@ -13,7 +15,6 @@ import Lean.Parser.Command
 open Lean
 
 syntax (name := lemma) (priority := default + 1) declModifiers
-
   group("lemma " declId ppIndent(declSig) declVal) : command
 
 @[macro «lemma»] def expandLemma : Macro := fun stx =>

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Defs
 import Mathlib.Tactic.NormNum
 
+noncomputable section
+
 /-! # `norm_num` extension for `Nat.sqrt`
 
 This module defines a `norm_num` extension for `Nat.sqrt`.

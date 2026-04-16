@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/BigOperators/Associated.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 18 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.Algebra.BigOperators.Finsupp
+
+noncomputable section
 
 /-!
 # Products of associated, prime, and irreducible elements.
@@ -199,7 +201,10 @@ end Associates
 
 namespace Multiset
 
--- DISSOLVED: prod_ne_zero_of_prime
+-- CONFLATES (assumes ground = zero): prod_ne_zero_of_prime
+theorem prod_ne_zero_of_prime [CancelCommMonoidWithZero α] [Nontrivial α] (s : Multiset α)
+    (h : ∀ x ∈ s, Prime x) : s.prod ≠ 0 :=
+  Multiset.prod_ne_zero fun h0 => Prime.ne_zero (h 0 h0) rfl
 
 end Multiset
 

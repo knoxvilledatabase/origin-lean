@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 import Origin.Core
 import Mathlib.RingTheory.Coalgebra.Hom
 
+noncomputable section
+
 /-!
 # Isomorphisms of `R`-coalgebras
 
@@ -100,10 +102,6 @@ instance : CoalgEquivClass (A ≃ₗc[R] B) R A B where
 theorem toCoalgHom_inj {e₁ e₂ : A ≃ₗc[R] B} : (↑e₁ : A →ₗc[R] B) = e₂ ↔ e₁ = e₂ :=
   toCoalgHom_injective.eq_iff
 
-@[simp]
-theorem coe_mk {f h h₀ h₁ h₂ h₃ h₄ h₅} :
-    (⟨⟨⟨⟨f, h⟩, h₀⟩, h₁, h₂⟩, h₃, h₄, h₅⟩ : A ≃ₗc[R] B) = f := rfl
-
 end
 
 section
@@ -125,19 +123,7 @@ theorem coe_coe : ⇑(e : A →ₗc[R] B) = e :=
   rfl
 
 @[simp]
-theorem toLinearEquiv_eq_coe (f : A ≃ₗc[R] B) : f.toLinearEquiv = f :=
-  rfl
-
-@[simp]
 theorem toCoalgHom_eq_coe (f : A ≃ₗc[R] B) : f.toCoalgHom = f :=
-  rfl
-
-@[simp]
-theorem coe_toLinearEquiv : ⇑(e : A ≃ₗ[R] B) = e :=
-  rfl
-
-@[simp]
-theorem coe_toCoalgHom : ⇑(e : A →ₗc[R] B) = e :=
   rfl
 
 theorem toLinearEquiv_toLinearMap : ((e : A ≃ₗ[R] B) : A →ₗ[R] B) = (e : A →ₗc[R] B) :=
@@ -169,13 +155,6 @@ def refl : A ≃ₗc[R] A :=
 
 end
 
-@[simp]
-theorem refl_toLinearEquiv : refl R A = LinearEquiv.refl R A := rfl
-
-@[simp]
-theorem refl_toCoalgHom : refl R A = CoalgHom.id R A :=
-  rfl
-
 @[symm]
 def symm (e : A ≃ₗc[R] B) : B ≃ₗc[R] A :=
   { (e : A ≃ₗ[R] B).symm with
@@ -188,16 +167,8 @@ def symm (e : A ≃ₗc[R] B) : B ≃ₗc[R] A :=
         LinearEquiv.ofLinear_toLinearMap, ← LinearMap.comp_assoc, CoalgHomClass.map_comp_comul,
         LinearEquiv.eq_comp_toLinearMap_symm] }
 
-@[simp]
-theorem symm_toLinearEquiv (e : A ≃ₗc[R] B) :
-    e.symm = (e : A ≃ₗ[R] B).symm := rfl
-
 theorem coe_symm_toLinearEquiv (e : A ≃ₗc[R] B) :
     ⇑(e : A ≃ₗ[R] B).symm = e.symm := rfl
-
-@[simp]
-theorem symm_toCoalgHom (e : A ≃ₗc[R] B) :
-    ((e.symm : B →ₗc[R] A) : B →ₗ[R] A) = (e : A ≃ₗ[R] B).symm := rfl
 
 @[simp]
 theorem symm_apply_apply (e : A ≃ₗc[R] B) (x) :
@@ -217,30 +188,11 @@ def Simps.symm_apply {R : Type*} [CommSemiring R]
 
 initialize_simps_projections CoalgEquiv (invFun → symm_apply)
 
-@[simp]
-theorem invFun_eq_symm : e.invFun = e.symm :=
-  rfl
-
-@[simp]
-theorem coe_toEquiv_symm : e.toEquiv.symm = e.symm :=
-  rfl
-
 variable {e₁₂ : A ≃ₗc[R] B} {e₂₃ : B ≃ₗc[R] C}
 
 @[trans, simps!]
 def trans (e₁₂ : A ≃ₗc[R] B) (e₂₃ : B ≃ₗc[R] C) : A ≃ₗc[R] C :=
   { (e₂₃ : B →ₗc[R] C).comp (e₁₂ : A →ₗc[R] B), e₁₂.toLinearEquiv ≪≫ₗ e₂₃.toLinearEquiv with }
-
-theorem trans_toLinearEquiv :
-    (e₁₂.trans e₂₃ : A ≃ₗ[R] C) = (e₁₂ : A ≃ₗ[R] B) ≪≫ₗ e₂₃ := rfl
-
-@[simp]
-theorem trans_toCoalgHom :
-    (e₁₂.trans e₂₃ : A →ₗc[R] C) = e₂₃.comp e₁₂ := rfl
-
-@[simp]
-theorem coe_toEquiv_trans : (e₁₂ : A ≃ B).trans e₂₃ = (e₁₂.trans e₂₃ : A ≃ C) :=
-  rfl
 
 end
 

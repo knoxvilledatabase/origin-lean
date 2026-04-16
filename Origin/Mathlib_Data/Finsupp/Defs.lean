@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Defs.lean
-Genuine: 122 | Conflates: 0 | Dissolved: 29 | Infrastructure: 36
+Genuine: 150 | Conflates: 0 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Indicator
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Submonoid.Basic
 import Mathlib.Data.Finset.Max
 import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Algebra.Group.TypeTags.Hom
+
+noncomputable section
 
 /-!
 # Type of functions with finite support
@@ -87,7 +89,14 @@ open Finset Function
 
 variable {α β γ ι M M' N P G H R S : Type*}
 
--- DISSOLVED: Finsupp
+structure Finsupp (α : Type*) (M : Type*) [Zero M] where
+  /-- The support of a finitely supported function (aka `Finsupp`). -/
+  support : Finset α
+  /-- The underlying function of a bundled finitely supported function (aka `Finsupp`). -/
+  toFun : α → M
+  /-- The witness that the support of a `Finsupp` is indeed the exact locus where its
+  underlying function is nonzero. -/
+  mem_support_toFun : ∀ a, a ∈ support ↔ toFun a ≠ 0
 
 infixr:25 " →₀ " => Finsupp
 
@@ -112,7 +121,9 @@ theorem ext {f g : α →₀ M} (h : ∀ a, f a = g a) : f = g :=
 
 lemma ne_iff {f g : α →₀ M} : f ≠ g ↔ ∃ a, f a ≠ g a := DFunLike.ne_iff
 
--- DISSOLVED: coe_mk
+@[simp, norm_cast]
+theorem coe_mk (f : α → M) (s : Finset α) (h : ∀ a, a ∈ s ↔ f a ≠ 0) : ⇑(⟨s, f, h⟩ : α →₀ M) = f :=
+  rfl
 
 instance instZero : Zero (α →₀ M) :=
   ⟨⟨∅, 0, fun _ => ⟨fun h ↦ (not_mem_empty _ h).elim, fun H => (H rfl).elim⟩⟩⟩
@@ -129,7 +140,9 @@ theorem support_zero : (0 : α →₀ M).support = ∅ :=
 instance instInhabited : Inhabited (α →₀ M) :=
   ⟨0⟩
 
--- DISSOLVED: mem_support_iff
+@[simp]
+theorem mem_support_iff {f : α →₀ M} : ∀ {a : α}, a ∈ f.support ↔ f a ≠ 0 :=
+  @(f.mem_support_toFun)
 
 @[simp, norm_cast]
 theorem fun_support_eq (f : α →₀ M) : Function.support f = f.support :=
@@ -154,9 +167,8 @@ theorem ext_iff' {f g : α →₀ M} : f = g ↔ f.support = g.support ∧ ∀ x
 theorem support_eq_empty {f : α →₀ M} : f.support = ∅ ↔ f = 0 :=
   mod_cast @Function.support_eq_empty_iff _ _ _ f
 
--- DISSOLVED: support_nonempty_iff
-
-theorem card_support_eq_zero {f : α →₀ M} : #f.support = 0 ↔ f = 0 := by simp
+theorem support_nonempty_iff {f : α →₀ M} : f.support.Nonempty ↔ f ≠ 0 := by
+  simp only [Finsupp.support_eq_empty, Finset.nonempty_iff_ne_empty, Ne]
 
 instance instDecidableEq [DecidableEq α] [DecidableEq M] : DecidableEq (α →₀ M) := fun f g =>
   decidable_of_iff (f.support = g.support ∧ ∀ a ∈ f.support, f a = g a) ext_iff'.symm
@@ -253,7 +265,8 @@ theorem single_of_single_apply (a a' : α) (b : M) :
   · rw [h]
   · rw [zero_apply, single_apply, ite_self]
 
--- DISSOLVED: support_single_ne_zero
+theorem support_single_ne_zero (a : α) (hb : b ≠ 0) : (single a b).support = {a} :=
+  if_neg hb
 
 theorem support_single_subset : (single a b).support ⊆ {a} := by
   classical show ite _ _ _ ⊆ _; split_ifs <;> [exact empty_subset _; exact Subset.refl _]
@@ -271,9 +284,11 @@ theorem single_injective (a : α) : Function.Injective (single a : M → α →�
 theorem single_apply_eq_zero {a x : α} {b : M} : single a b x = 0 ↔ x = a → b = 0 := by
   simp [single_eq_set_indicator]
 
--- DISSOLVED: single_apply_ne_zero
+theorem single_apply_ne_zero {a x : α} {b : M} : single a b x ≠ 0 ↔ x = a ∧ b ≠ 0 := by
+  simp [single_apply_eq_zero]
 
--- DISSOLVED: mem_support_single
+theorem mem_support_single (a a' : α) (b : M) : a ∈ (single a' b).support ↔ a = a' ∧ b ≠ 0 := by
+  simp [single_apply_eq_zero, not_or]
 
 theorem eq_single_iff {f : α →₀ M} {a b} : f = single a b ↔ f.support ⊆ {a} ∧ f a = b := by
   refine ⟨fun h => h.symm ▸ ⟨support_single_subset, single_eq_same⟩, ?_⟩
@@ -298,13 +313,18 @@ theorem single_eq_single_iff (a₁ a₂ : α) (b₁ b₂ : M) :
     · rfl
     · rw [single_zero, single_zero]
 
--- DISSOLVED: single_left_injective
+theorem single_left_injective (h : b ≠ 0) : Function.Injective fun a : α => single a b :=
+  fun _a _a' H => (((single_eq_single_iff _ _ _ _).mp H).resolve_right fun hb => h hb.1).left
 
--- DISSOLVED: single_left_inj
+theorem single_left_inj (h : b ≠ 0) : single a b = single a' b ↔ a = a' :=
+  (single_left_injective h).eq_iff
 
--- DISSOLVED: support_single_ne_bot
+theorem support_single_ne_bot (i : α) (h : b ≠ 0) : (single i b).support ≠ ⊥ := by
+  simpa only [support_single_ne_zero _ h] using singleton_ne_empty _
 
--- DISSOLVED: support_single_disjoint
+theorem support_single_disjoint {b' : M} (hb : b ≠ 0) (hb' : b' ≠ 0) {i j : α} :
+    Disjoint (single i b).support (single j b').support ↔ i ≠ j := by
+  rw [support_single_ne_zero _ hb, support_single_ne_zero _ hb', disjoint_singleton]
 
 @[simp]
 theorem single_eq_zero : single a b = 0 ↔ b = 0 := by
@@ -339,13 +359,27 @@ lemma apply_single [Zero N] [Zero P] {F : Type*} [FunLike F N P] [ZeroHomClass F
     e ((single a n) b) = single a (e n) b :=
   apply_single' e (map_zero e) a n b
 
--- DISSOLVED: support_eq_singleton
+theorem support_eq_singleton {f : α →₀ M} {a : α} :
+    f.support = {a} ↔ f a ≠ 0 ∧ f = single a (f a) :=
+  ⟨fun h =>
+    ⟨mem_support_iff.1 <| h.symm ▸ Finset.mem_singleton_self a,
+      eq_single_iff.2 ⟨subset_of_eq h, rfl⟩⟩,
+    fun h => h.2.symm ▸ support_single_ne_zero _ h.1⟩
 
--- DISSOLVED: support_eq_singleton'
+theorem support_eq_singleton' {f : α →₀ M} {a : α} :
+    f.support = {a} ↔ ∃ b ≠ 0, f = single a b :=
+  ⟨fun h =>
+    let h := support_eq_singleton.1 h
+    ⟨_, h.1, h.2⟩,
+    fun ⟨_b, hb, hf⟩ => hf.symm ▸ support_single_ne_zero _ hb⟩
 
--- DISSOLVED: card_support_eq_one
+theorem card_support_eq_one {f : α →₀ M} :
+    #f.support = 1 ↔ ∃ a, f a ≠ 0 ∧ f = single a (f a) := by
+  simp only [card_eq_one, support_eq_singleton]
 
--- DISSOLVED: card_support_eq_one'
+theorem card_support_eq_one' {f : α →₀ M} :
+    #f.support = 1 ↔ ∃ a, ∃ b ≠ 0, f = single a b := by
+  simp only [card_eq_one, support_eq_singleton']
 
 theorem support_subset_singleton {f : α →₀ M} {a : α} : f.support ⊆ {a} ↔ f = single a (f a) :=
   ⟨fun h => eq_single_iff.mpr ⟨h, rfl⟩, fun h => (eq_single_iff.mp h).left⟩
@@ -437,7 +471,11 @@ theorem support_update_zero [DecidableEq α] : support (f.update a 0) = f.suppor
 
 variable {b}
 
--- DISSOLVED: support_update_ne_zero
+theorem support_update_ne_zero [DecidableEq α] (h : b ≠ 0) :
+    support (f.update a b) = insert a f.support := by
+  classical
+  simp only [update, h, ite_false, mem_support_iff, ne_eq]
+  congr!
 
 theorem support_update_subset [DecidableEq α] :
     support (f.update a b) ⊆ insert a f.support := by
@@ -550,9 +588,12 @@ section OnFinset
 
 variable [Zero M]
 
--- DISSOLVED: onFinset
-
-@[simp, norm_cast] lemma coe_onFinset (s : Finset α) (f : α → M) (hf) : onFinset s f hf = f := rfl
+def onFinset (s : Finset α) (f : α → M) (hf : ∀ a, f a ≠ 0 → a ∈ s) : α →₀ M where
+  support :=
+    haveI := Classical.decEq M
+    {a ∈ s | f a ≠ 0}
+  toFun := f
+  mem_support_toFun := by classical simpa
 
 @[simp]
 theorem onFinset_apply {s : Finset α} {f : α → M} {hf a} : (onFinset s f hf : α →₀ M) a = f a :=
@@ -563,9 +604,14 @@ theorem support_onFinset_subset {s : Finset α} {f : α → M} {hf} :
     (onFinset s f hf).support ⊆ s := by
   classical convert filter_subset (f · ≠ 0) s
 
--- DISSOLVED: mem_support_onFinset
+theorem mem_support_onFinset {s : Finset α} {f : α → M} (hf : ∀ a : α, f a ≠ 0 → a ∈ s) {a : α} :
+    a ∈ (Finsupp.onFinset s f hf).support ↔ f a ≠ 0 := by
+  rw [Finsupp.mem_support_iff, Finsupp.onFinset_apply]
 
--- DISSOLVED: support_onFinset
+theorem support_onFinset [DecidableEq M] {s : Finset α} {f : α → M}
+    (hf : ∀ a : α, f a ≠ 0 → a ∈ s) :
+    (Finsupp.onFinset s f hf).support = {a ∈ s | f a ≠ 0} := by
+  dsimp [onFinset]; congr
 
 end OnFinset
 
@@ -577,10 +623,6 @@ noncomputable def ofSupportFinite (f : α → M) (hf : (Function.support f).Fini
   support := hf.toFinset
   toFun := f
   mem_support_toFun _ := hf.mem_toFinset
-
-theorem ofSupportFinite_coe {f : α → M} {hf : (Function.support f).Finite} :
-    (ofSupportFinite f hf : α → M) = f :=
-  rfl
 
 instance instCanLift : CanLift (α → M) (α →₀ M) (⇑) fun f => (Function.support f).Finite where
   prf f hf := ⟨ofSupportFinite f hf, rfl⟩
@@ -730,7 +772,23 @@ theorem embDomain_mapRange (f : α ↪ β) (g : M → N) (p : α →₀ M) (hg :
     rw [mapRange_apply, embDomain_apply, embDomain_apply, mapRange_apply]
   · rw [mapRange_apply, embDomain_notin_range, embDomain_notin_range, ← hg] <;> assumption
 
--- DISSOLVED: single_of_embDomain_single
+theorem single_of_embDomain_single (l : α →₀ M) (f : α ↪ β) (a : β) (b : M) (hb : b ≠ 0)
+    (h : l.embDomain f = single a b) : ∃ x, l = single x b ∧ f x = a := by
+  classical
+    have h_map_support : Finset.map f l.support = {a} := by
+      rw [← support_embDomain, h, support_single_ne_zero _ hb]
+    have ha : a ∈ Finset.map f l.support := by simp only [h_map_support, Finset.mem_singleton]
+    rcases Finset.mem_map.1 ha with ⟨c, _hc₁, hc₂⟩
+    use c
+    constructor
+    · ext d
+      rw [← embDomain_apply f l, h]
+      by_cases h_cases : c = d
+      · simp only [Eq.symm h_cases, hc₂, single_eq_same]
+      · rw [single_apply, single_apply, if_neg, if_neg h_cases]
+        by_contra hfd
+        exact h_cases (f.injective (hc₂.trans hfd))
+    · exact hc₂
 
 @[simp]
 theorem embDomain_single (f : α ↪ β) (a : α) (m : M) :
@@ -815,25 +873,25 @@ theorem support_add_eq [DecidableEq α] {g₁ g₂ : α →₀ M} (h : Disjoint 
 theorem single_add (a : α) (b₁ b₂ : M) : single a (b₁ + b₂) = single a b₁ + single a b₂ :=
   (zipWith_single_single _ _ _ _ _).symm
 
--- DISSOLVED: support_single_add
+theorem support_single_add {a : α} {b : M} {f : α →₀ M} (ha : a ∉ f.support) (hb : b ≠ 0) :
+    support (single a b + f) = cons a f.support ha := by
+  classical
+  have H := support_single_ne_zero a hb
+  rw [support_add_eq, H, cons_eq_insert, insert_eq]
+  rwa [H, disjoint_singleton_left]
 
--- DISSOLVED: support_add_single
+theorem support_add_single {a : α} {b : M} {f : α →₀ M} (ha : a ∉ f.support) (hb : b ≠ 0) :
+    support (f + single a b) = cons a f.support ha := by
+  classical
+  have H := support_single_ne_zero a hb
+  rw [support_add_eq, H, union_comm, cons_eq_insert, insert_eq]
+  rwa [H, disjoint_singleton_right]
 
 instance instAddZeroClass : AddZeroClass (α →₀ M) :=
   DFunLike.coe_injective.addZeroClass _ coe_zero coe_add
 
 instance instIsLeftCancelAdd [IsLeftCancelAdd M] : IsLeftCancelAdd (α →₀ M) where
   add_left_cancel _ _ _ h := ext fun x => add_left_cancel <| DFunLike.congr_fun h x
-
-noncomputable def addEquivFunOnFinite {ι : Type*} [Finite ι] :
-    (ι →₀ M) ≃+ (ι → M) where
-  __ := Finsupp.equivFunOnFinite
-  map_add' _ _ := rfl
-
-noncomputable def _root_.AddEquiv.finsuppUnique {ι : Type*} [Unique ι] :
-    (ι →₀ M) ≃+ M where
-  __ := Equiv.finsuppUnique
-  map_add' _ _ := rfl
 
 lemma _root_.AddEquiv.finsuppUnique_symm {M : Type*} [AddZeroClass M] (d : M) :
     AddEquiv.finsuppUnique.symm d = single () d := by
@@ -897,9 +955,36 @@ def eraseAddHom (a : α) : (α →₀ M) →+ α →₀ M where
   map_zero' := erase_zero a
   map_add' := erase_add a
 
--- DISSOLVED: induction
+@[elab_as_elim]
+protected theorem induction {p : (α →₀ M) → Prop} (f : α →₀ M) (h0 : p 0)
+    (ha : ∀ (a b) (f : α →₀ M), a ∉ f.support → b ≠ 0 → p f → p (single a b + f)) : p f :=
+  suffices ∀ (s) (f : α →₀ M), f.support = s → p f from this _ _ rfl
+  fun s =>
+  Finset.cons_induction_on s (fun f hf => by rwa [support_eq_empty.1 hf]) fun a s has ih f hf => by
+    suffices p (single a (f a) + f.erase a) by rwa [single_add_erase] at this
+    classical
+      apply ha
+      · rw [support_erase, mem_erase]
+        exact fun H => H.1 rfl
+      · rw [← mem_support_iff, hf]
+        exact mem_cons_self _ _
+      · apply ih _ _
+        rw [support_erase, hf, Finset.erase_cons]
 
--- DISSOLVED: induction₂
+theorem induction₂ {p : (α →₀ M) → Prop} (f : α →₀ M) (h0 : p 0)
+    (ha : ∀ (a b) (f : α →₀ M), a ∉ f.support → b ≠ 0 → p f → p (f + single a b)) : p f :=
+  suffices ∀ (s) (f : α →₀ M), f.support = s → p f from this _ _ rfl
+  fun s =>
+  Finset.cons_induction_on s (fun f hf => by rwa [support_eq_empty.1 hf]) fun a s has ih f hf => by
+    suffices p (f.erase a + single a (f a)) by rwa [erase_add_single] at this
+    classical
+      apply ha
+      · rw [support_erase, mem_erase]
+        exact fun H => H.1 rfl
+      · rw [← mem_support_iff, hf]
+        exact mem_cons_self _ _
+      · apply ih _ _
+        rw [support_erase, hf, Finset.erase_cons]
 
 theorem induction_linear {p : (α →₀ M) → Prop} (f : α →₀ M) (h0 : p 0)
     (hadd : ∀ f g : α →₀ M, p f → p g → p (f + g)) (hsingle : ∀ a b, p (single a b)) : p f :=
@@ -909,13 +994,41 @@ section LinearOrder
 
 variable [LinearOrder α] {p : (α →₀ M) → Prop}
 
--- DISSOLVED: induction_on_max
+theorem induction_on_max (f : α →₀ M) (h0 : p 0)
+    (ha : ∀ (a b) (f : α →₀ M), (∀ c ∈ f.support, c < a) → b ≠ 0 → p f → p (single a b + f)) :
+    p f := by
+  suffices ∀ (s) (f : α →₀ M), f.support = s → p f from this _ _ rfl
+  refine fun s => s.induction_on_max (fun f h => ?_) (fun a s hm hf f hs => ?_)
+  · rwa [support_eq_empty.1 h]
+  · have hs' : (erase a f).support = s := by
+      rw [support_erase, hs, erase_insert (fun ha => (hm a ha).false)]
+    rw [← single_add_erase a f]
+    refine ha _ _ _ (fun c hc => hm _ <| hs'.symm ▸ hc) ?_ (hf _ hs')
+    rw [← mem_support_iff, hs]
+    exact mem_insert_self a s
 
--- DISSOLVED: induction_on_min
+theorem induction_on_min (f : α →₀ M) (h0 : p 0)
+    (ha : ∀ (a b) (f : α →₀ M), (∀ c ∈ f.support, a < c) → b ≠ 0 → p f → p (single a b + f)) :
+    p f :=
+  induction_on_max (α := αᵒᵈ) f h0 ha
 
--- DISSOLVED: induction_on_max₂
+theorem induction_on_max₂ (f : α →₀ M) (h0 : p 0)
+    (ha : ∀ (a b) (f : α →₀ M), (∀ c ∈ f.support, c < a) → b ≠ 0 → p f → p (f + single a b)) :
+    p f := by
+  suffices ∀ (s) (f : α →₀ M), f.support = s → p f from this _ _ rfl
+  refine fun s => s.induction_on_max (fun f h => ?_) (fun a s hm hf f hs => ?_)
+  · rwa [support_eq_empty.1 h]
+  · have hs' : (erase a f).support = s := by
+      rw [support_erase, hs, erase_insert (fun ha => (hm a ha).false)]
+    rw [← erase_add_single a f]
+    refine ha _ _ _ (fun c hc => hm _ <| hs'.symm ▸ hc) ?_ (hf _ hs')
+    rw [← mem_support_iff, hs]
+    exact mem_insert_self a s
 
--- DISSOLVED: induction_on_min₂
+theorem induction_on_min₂ (f : α →₀ M) (h0 : p 0)
+    (ha : ∀ (a b) (f : α →₀ M), (∀ c ∈ f.support, a < c) → b ≠ 0 → p f → p (f + single a b)) :
+    p f :=
+  induction_on_max₂ (α := αᵒᵈ) f h0 ha
 
 end LinearOrder
 
@@ -1051,7 +1164,13 @@ instance instAddCommGroup [AddCommGroup G] : AddCommGroup (α →₀ G) :=
       (fun _ _ => rfl) fun _ _ => rfl with
     toAddGroup := Finsupp.instAddGroup }
 
--- DISSOLVED: single_add_single_eq_single_add_single
+theorem single_add_single_eq_single_add_single [AddCommMonoid M] {k l m n : α} {u v : M}
+    (hu : u ≠ 0) (hv : v ≠ 0) :
+    single k u + single l v = single m u + single n v ↔
+      (k = m ∧ l = n) ∨ (u = v ∧ k = n ∧ l = m) ∨ (u + v = 0 ∧ k = l ∧ m = n) := by
+  classical
+    simp_rw [DFunLike.ext_iff, coe_add, single_eq_pi_single, ← funext_iff]
+    exact Pi.single_add_single_eq_single_add_single hu hv
 
 @[simp]
 theorem support_neg [AddGroup G] (f : α →₀ G) : support (-f) = support f :=

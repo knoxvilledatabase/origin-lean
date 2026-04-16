@@ -8,6 +8,8 @@ import Mathlib.Order.Closure
 import Mathlib.ModelTheory.Semantics
 import Mathlib.ModelTheory.Encoding
 
+noncomputable section
+
 /-!
 # First-Order Substructures
 
@@ -130,10 +132,6 @@ theorem Term.realize_mem {α : Type*} (t : L.Term α) (xs : α → M) (h : ∀ a
 
 namespace Substructure
 
-@[simp]
-theorem coe_copy {s : Set M} (hs : s = S) : (S.copy s hs : Set M) = s :=
-  rfl
-
 theorem copy_eq {s : Set M} (hs : s = S) : S.copy s hs = S :=
   SetLike.coe_injective hs
 
@@ -159,15 +157,6 @@ instance instInf : Min (L.Substructure M) :=
   ⟨fun S₁ S₂ =>
     { carrier := (S₁ : Set M) ∩ (S₂ : Set M)
       fun_mem := fun {_} f => (S₁.fun_mem f).inf (S₂.fun_mem f) }⟩
-
-@[simp]
-theorem coe_inf (p p' : L.Substructure M) :
-    ((p ⊓ p' : L.Substructure M) : Set M) = (p : Set M) ∩ (p' : Set M) :=
-  rfl
-
-@[simp]
-theorem mem_inf {p p' : L.Substructure M} {x : M} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
 
 instance instInfSet : InfSet (L.Substructure M) :=
   ⟨fun s =>
@@ -406,10 +395,6 @@ def comap (φ : M →[L] N) (S : L.Substructure N) : L.Substructure M where
 theorem mem_comap {S : L.Substructure N} {f : M →[L] N} {x : M} : x ∈ S.comap f ↔ f x ∈ S :=
   Iff.rfl
 
-theorem comap_comap (S : L.Substructure P) (g : N →[L] P) (f : M →[L] N) :
-    (S.comap g).comap f = S.comap (g.comp f) :=
-  rfl
-
 @[simp]
 theorem comap_id (S : L.Substructure P) : S.comap (Hom.id _ _) = S :=
   ext (by simp)
@@ -613,11 +598,6 @@ def topEquiv : (⊤ : L.Substructure M) ≃[L] M where
   right_inv _ := rfl
 
 @[simp]
-theorem coe_topEquiv :
-    ⇑(topEquiv : (⊤ : L.Substructure M) ≃[L] M) = ((↑) : (⊤ : L.Substructure M) → M) :=
-  rfl
-
-@[simp]
 theorem realize_boundedFormula_top {α : Type*} {n : ℕ} {φ : L.BoundedFormula α n}
     {v : α → (⊤ : L.Substructure M)} {xs : Fin n → (⊤ : L.Substructure M)} :
     φ.Realize v xs ↔ φ.Realize (((↑) : _ → M) ∘ v) ((↑) ∘ xs) := by
@@ -662,11 +642,6 @@ def substructureReduct (φ : L →ᴸ L') [φ.IsExpansionOn M] :
 variable (φ : L →ᴸ L') [φ.IsExpansionOn M]
 
 @[simp]
-theorem mem_substructureReduct {x : M} {S : L'.Substructure M} :
-    x ∈ φ.substructureReduct S ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
 theorem coe_substructureReduct {S : L'.Substructure M} : (φ.substructureReduct S : Set M) = ↑S :=
   rfl
 
@@ -684,14 +659,6 @@ def withConstants (S : L.Substructure M) {A : Set M} (h : A ⊆ S) : L[[A]].Subs
       · exact isEmptyElim f
 
 variable {A : Set M} {s : Set M} (h : A ⊆ S)
-
-@[simp]
-theorem mem_withConstants {x : M} : x ∈ S.withConstants h ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
-theorem coe_withConstants : (S.withConstants h : Set M) = ↑S :=
-  rfl
 
 @[simp]
 theorem reduct_withConstants :
@@ -802,10 +769,6 @@ namespace Embedding
 def domRestrict (f : M ↪[L] N) (p : L.Substructure M) : p ↪[L] N :=
   f.comp p.subtype
 
-@[simp]
-theorem domRestrict_apply (f : M ↪[L] N) (p : L.Substructure M) (x : p) : f.domRestrict p x = f x :=
-  rfl
-
 def codRestrict (p : L.Substructure N) (f : M ↪[L] N) (h : ∀ c, f c ∈ p) : M ↪[L] p where
   toFun := f.toHom.codRestrict p h
   inj' _ _ ab := f.injective (Subtype.mk_eq_mk.1 ab)
@@ -816,16 +779,6 @@ def codRestrict (p : L.Substructure N) (f : M ↪[L] N) (h : ∀ c, f c ∈ p) :
     change RelMap r (Hom.comp p.subtype.toHom (f.toHom.codRestrict p h) ∘ x) ↔ _
     rw [Hom.subtype_comp_codRestrict, ← f.map_rel]
     rfl
-
-@[simp]
-theorem codRestrict_apply (p : L.Substructure N) (f : M ↪[L] N) {h} (x : M) :
-    (codRestrict p f h x : N) = f x :=
-  rfl
-
-@[simp]
-theorem codRestrict_apply' (p : L.Substructure N) (f : M ↪[L] N) {h} (x : M) :
-    codRestrict p f h x = ⟨f x, h x⟩ :=
-  rfl
 
 @[simp]
 theorem comp_codRestrict (f : M ↪[L] N) (g : N ↪[L] P) (p : L.Substructure P) (h : ∀ b, g b ∈ p) :
@@ -852,11 +805,6 @@ noncomputable def substructureEquivMap (f : M ↪[L] N) (s : L.Substructure M) :
   map_rel' {n} R x := by aesop
 
 @[simp]
-theorem substructureEquivMap_apply (f : M ↪[L] N) (p : L.Substructure M) (x : p) :
-    (f.substructureEquivMap p x : N) = f x :=
-  rfl
-
-@[simp]
 theorem subtype_substructureEquivMap (f : M ↪[L] N) (s : L.Substructure M) :
     (subtype _).comp (f.substructureEquivMap s).toEmbedding = f.comp (subtype _) := by
   ext; rfl
@@ -869,10 +817,6 @@ theorem subtype_substructureEquivMap (f : M ↪[L] N) (s : L.Substructure M) :
   right_inv := fun ⟨_, hn⟩ => Subtype.mk_eq_mk.2 (Classical.choose_spec hn)
   map_fun' {n} f x := by aesop
   map_rel' {n} R x := by aesop
-
-@[simp]
-theorem equivRange_apply (f : M ↪[L] N) (x : M) : (f.equivRange x : N) = f x :=
-  rfl
 
 @[simp]
 theorem subtype_equivRange (f : M ↪[L] N) : (subtype _).comp f.equivRange.toEmbedding = f := by
@@ -894,24 +838,12 @@ namespace Substructure
 def inclusion {S T : L.Substructure M} (h : S ≤ T) : S ↪[L] T :=
   S.subtype.codRestrict _ fun x => h x.2
 
-@[simp]
-theorem inclusion_self (S : L.Substructure M) : inclusion (le_refl S) = Embedding.refl L S := rfl
-
-@[simp]
-theorem coe_inclusion {S T : L.Substructure M} (h : S ≤ T) :
-    (inclusion h : S → T) = Set.inclusion h :=
-  rfl
-
 theorem range_subtype (S : L.Substructure M) : S.subtype.toHom.range = S := by
   ext x
   simp only [Hom.mem_range, Embedding.coe_toHom, coeSubtype]
   refine ⟨?_, fun h => ⟨⟨x, h⟩, rfl⟩⟩
   rintro ⟨⟨y, hy⟩, rfl⟩
   exact hy
-
-@[simp]
-lemma subtype_comp_inclusion {S T : L.Substructure M} (h : S ≤ T) :
-    T.subtype.comp (inclusion h) = S.subtype := rfl
 
 end Substructure
 

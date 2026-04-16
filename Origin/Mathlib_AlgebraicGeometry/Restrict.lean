@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicGeometry/Restrict.lean
-Genuine: 81 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
+Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Cover.Open
 import Mathlib.AlgebraicGeometry.Over
+
+noncomputable section
 
 /-!
 # Restriction of Schemes and Morphisms
@@ -66,11 +68,6 @@ lemma ι_app (V) : U.ι.app V = X.presheaf.map
   rfl
 
 @[simp]
-lemma ι_appTop :
-    U.ι.appTop = X.presheaf.map (homOfLE (x := U.ι ''ᵁ ⊤) le_top).op :=
-  rfl
-
-@[simp]
 lemma ι_appLE (V W e) :
     U.ι.appLE V W e =
       X.presheaf.map (homOfLE (x := U.ι ''ᵁ W) (Set.image_subset_iff.mpr ‹_›)).op := by
@@ -107,18 +104,13 @@ instance ι_appLE_isIso :
   show IsIso (X.presheaf.map (eqToIso U.ι_image_top).hom.op)
   infer_instance
 
-lemma ι_app_self : U.ι.app U = X.presheaf.map (eqToHom (X := U.ι ''ᵁ _) (by simp)).op := rfl
-
-lemma eq_presheaf_map_eqToHom {V W : Opens U} (e : U.ι ''ᵁ V = U.ι ''ᵁ W) :
-    X.presheaf.map (eqToHom e).op =
-      U.toScheme.presheaf.map (eqToHom <| U.isOpenEmbedding.functor_obj_injective e).op := rfl
-
 @[simp]
 lemma nonempty_iff : Nonempty U.toScheme ↔ (U : Set X).Nonempty := by
   simp only [toScheme_carrier, SetLike.coe_sort_coe, nonempty_subtype]
   rfl
 
 attribute [-simp] eqToHom_op in
+/-- The global sections of the restriction is isomorphic to the sections on the open set. -/
 
 @[simps!]
 def topIso : Γ(U, ⊤) ≅ Γ(X, U) :=
@@ -261,16 +253,6 @@ def Scheme.restrictFunctor : X.Opens ⥤ Over X where
     ext1
     exact (X.homOfLE_homOfLE i.le j.le).symm
 
-@[simp] lemma Scheme.restrictFunctor_obj_left (U : X.Opens) :
-  (X.restrictFunctor.obj U).left = U := rfl
-
-@[simp] lemma Scheme.restrictFunctor_obj_hom (U : X.Opens) :
-  (X.restrictFunctor.obj U).hom = U.ι := rfl
-
-@[simp]
-lemma Scheme.restrictFunctor_map_left {U V : X.Opens} (i : U ⟶ V) :
-    (X.restrictFunctor.map i).left = (X.homOfLE i.le) := rfl
-
 alias Scheme.restrictFunctor_map_ofRestrict := Scheme.homOfLE_ι
 
 alias Scheme.restrictFunctor_map_ofRestrict_assoc := Scheme.homOfLE_ι_assoc
@@ -292,14 +274,12 @@ def Scheme.restrictFunctorΓ : X.restrictFunctor.op ⋙ (Over.forget X).op ⋙ S
       congr 1)
 
 noncomputable
-
 def Scheme.restrictRestrictComm (X : Scheme.{u}) (U V : X.Opens) :
     (U.ι ⁻¹ᵁ V).toScheme ≅ V.ι ⁻¹ᵁ U :=
   IsOpenImmersion.isoOfRangeEq (Opens.ι _ ≫ U.ι) (Opens.ι _ ≫ V.ι) <| by
     simp [Set.image_preimage_eq_inter_range, Set.inter_comm (U : Set X), Set.range_comp]
 
 noncomputable
-
 def Scheme.Hom.isoImage
     {X Y : Scheme.{u}} (f : X.Hom Y) [IsOpenImmersion f] (U : X.Opens) :
     U.toScheme ≅ f ''ᵁ U :=
@@ -343,7 +323,6 @@ lemma Scheme.ι_toIso_inv (X : Scheme.{u}) : Opens.ι _ ≫ X.topIso.inv = 𝟙 
   X.topIso.hom_inv_id
 
 noncomputable
-
 def Scheme.isoOfEq (X : Scheme.{u}) {U V : X.Opens} (e : U = V) :
     (U : Scheme.{u}) ≅ V :=
   IsOpenImmersion.isoOfRangeEq U.ι V.ι (by rw [e])
@@ -679,9 +658,8 @@ noncomputable def arrowResLEAppIso (f : X ⟶ Y) (U : Y.Opens) (V : X.Opens) (e 
 
 end MorphismRestrict
 
-noncomputable
-
 @[simps! J obj map]
+noncomputable
 def Scheme.OpenCover.restrict {X : Scheme.{u}} (𝒰 : X.OpenCover) (U : Opens X) :
     U.toScheme.OpenCover := by
   refine Cover.copy (𝒰.pullbackCover U.ι) 𝒰.J _ (𝒰.map · ∣_ U) (Equiv.refl _)

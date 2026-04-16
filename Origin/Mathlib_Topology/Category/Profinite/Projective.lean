@@ -8,6 +8,8 @@ import Mathlib.Topology.StoneCech
 import Mathlib.CategoryTheory.Preadditive.Projective
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono
 
+noncomputable section
+
 /-!
 # Profinite sets have enough projectives
 

@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Order.SuccPred.Archimedean
 
+noncomputable section
+
 /-!
 # Relations on types with a `SuccOrder`
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Analytic/Constructions.lean
-Genuine: 104 | Conflates: 8 | Dissolved: 11 | Infrastructure: 1
+Genuine: 115 | Conflates: 8 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Composition
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Analytic.Linear
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Mul
 import Mathlib.Analysis.Normed.Ring.Units
 import Mathlib.Analysis.Analytic.OfScalars
+
+noncomputable section
 
 /-!
 # Various ways to combine analytic functions
@@ -767,31 +769,58 @@ lemma analyticAt_inv_one_sub (𝕝 : Type*) [NontriviallyNormedField 𝕝] [Norm
     AnalyticAt 𝕜 (fun x : 𝕝 ↦ (1 - x)⁻¹) 0 :=
   ⟨_, ⟨_, hasFPowerSeriesOnBall_inv_one_sub 𝕜 𝕝⟩⟩
 
--- DISSOLVED: analyticAt_inv
+lemma analyticAt_inv {z : 𝕝} (hz : z ≠ 0) : AnalyticAt 𝕜 Inv.inv z := by
+  convert analyticAt_inverse (𝕜 := 𝕜) (Units.mk0 _ hz)
+  exact Ring.inverse_eq_inv'.symm
 
--- DISSOLVED: analyticOnNhd_inv
+lemma analyticOnNhd_inv : AnalyticOnNhd 𝕜 (fun z ↦ z⁻¹) {z : 𝕝 | z ≠ 0} := by
+  intro z m; exact analyticAt_inv m
 
--- DISSOLVED: analyticOn_inv
+lemma analyticOn_inv : AnalyticOn 𝕜 (fun z ↦ z⁻¹) {z : 𝕝 | z ≠ 0} :=
+  analyticOnNhd_inv.analyticOn
 
--- DISSOLVED: AnalyticWithinAt.inv
+theorem AnalyticWithinAt.inv {f : E → 𝕝} {x : E} {s : Set E}
+    (fa : AnalyticWithinAt 𝕜 f s x) (f0 : f x ≠ 0) :
+    AnalyticWithinAt 𝕜 (fun x ↦ (f x)⁻¹) s x :=
+  (analyticAt_inv f0).comp_analyticWithinAt fa
 
--- DISSOLVED: AnalyticAt.inv
+theorem AnalyticAt.inv {f : E → 𝕝} {x : E} (fa : AnalyticAt 𝕜 f x) (f0 : f x ≠ 0) :
+    AnalyticAt 𝕜 (fun x ↦ (f x)⁻¹) x :=
+  (analyticAt_inv f0).comp fa
 
--- DISSOLVED: AnalyticOn.inv
+theorem AnalyticOn.inv {f : E → 𝕝} {s : Set E}
+    (fa : AnalyticOn 𝕜 f s) (f0 : ∀ x ∈ s, f x ≠ 0) :
+    AnalyticOn 𝕜 (fun x ↦ (f x)⁻¹) s :=
+  fun x m ↦ (fa x m).inv (f0 x m)
 
 alias AnalyticWithinOn.inv := AnalyticOn.inv
 
--- DISSOLVED: AnalyticOnNhd.inv
+theorem AnalyticOnNhd.inv {f : E → 𝕝} {s : Set E}
+    (fa : AnalyticOnNhd 𝕜 f s) (f0 : ∀ x ∈ s, f x ≠ 0) :
+    AnalyticOnNhd 𝕜 (fun x ↦ (f x)⁻¹) s :=
+  fun x m ↦ (fa x m).inv (f0 x m)
 
--- DISSOLVED: AnalyticWithinAt.div
+theorem AnalyticWithinAt.div {f g : E → 𝕝} {s : Set E} {x : E}
+    (fa : AnalyticWithinAt 𝕜 f s x) (ga : AnalyticWithinAt 𝕜 g s x) (g0 : g x ≠ 0) :
+    AnalyticWithinAt 𝕜 (fun x ↦ f x / g x) s x := by
+  simp_rw [div_eq_mul_inv]; exact fa.mul (ga.inv g0)
 
--- DISSOLVED: AnalyticAt.div
+theorem AnalyticAt.div {f g : E → 𝕝} {x : E}
+    (fa : AnalyticAt 𝕜 f x) (ga : AnalyticAt 𝕜 g x) (g0 : g x ≠ 0) :
+    AnalyticAt 𝕜 (fun x ↦ f x / g x) x := by
+  simp_rw [div_eq_mul_inv]; exact fa.mul (ga.inv g0)
 
--- DISSOLVED: AnalyticOn.div
+theorem AnalyticOn.div {f g : E → 𝕝} {s : Set E}
+    (fa : AnalyticOn 𝕜 f s) (ga : AnalyticOn 𝕜 g s) (g0 : ∀ x ∈ s, g x ≠ 0) :
+    AnalyticOn 𝕜 (fun x ↦ f x / g x) s := fun x m ↦
+  (fa x m).div (ga x m) (g0 x m)
 
 alias AnalyticWithinOn.div := AnalyticOn.div
 
--- DISSOLVED: AnalyticOnNhd.div
+theorem AnalyticOnNhd.div {f g : E → 𝕝} {s : Set E}
+    (fa : AnalyticOnNhd 𝕜 f s) (ga : AnalyticOnNhd 𝕜 g s) (g0 : ∀ x ∈ s, g x ≠ 0) :
+    AnalyticOnNhd 𝕜 (fun x ↦ f x / g x) s := fun x m ↦
+  (fa x m).div (ga x m) (g0 x m)
 
 /-!
 ### Finite sums and products of analytic functions

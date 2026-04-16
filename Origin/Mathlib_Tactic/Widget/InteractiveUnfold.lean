@@ -9,6 +9,8 @@ import Mathlib.Lean.GoalsLocation
 import Mathlib.Lean.Meta.KAbstractPositions
 import Lean.Util.FoldConsts
 
+noncomputable section
+
 /-!
 
 # Interactive unfolding
@@ -185,11 +187,8 @@ def UnfoldComponent : Component SelectInsertParams :=
   mk_rpc_widget% InteractiveUnfold.rpc
 
 elab stx:"unfold?" : tactic => do
-
   let some range := (← getFileMap).rangeOfStx? stx | return
-
   Widget.savePanelWidgetInfo (hash UnfoldComponent.javascript)
-
     (pure <| json% { replaceRange : $range }) stx
 
 syntax (name := unfoldCommand) "#unfold? " term : command

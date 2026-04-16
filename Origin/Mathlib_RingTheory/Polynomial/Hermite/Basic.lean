@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Data.Nat.Factorial.DoubleFactorial
 
+noncomputable section
+
 /-!
 # Hermite polynomials
 

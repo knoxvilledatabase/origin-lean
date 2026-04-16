@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Calculus
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 
+noncomputable section
+
 /-!
 # Properties about the powers of the norm
 

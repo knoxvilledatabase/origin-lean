@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Maps.Proper.Basic
 import Mathlib.Topology.StoneCech
 
+noncomputable section
+
 /-!
 # A map is proper iff it is continuous and universally closed
 -/

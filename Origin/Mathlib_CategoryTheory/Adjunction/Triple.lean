@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Unique
 import Mathlib.CategoryTheory.Monad.Adjunction
 
+noncomputable section
+
 /-!
 
 # Adjoint triples

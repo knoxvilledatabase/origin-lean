@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matrix.Notation
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 
+noncomputable section
+
 /-!
 # Coxeter matrices
 
@@ -85,41 +87,7 @@ protected def reindex : CoxeterMatrix B' where
   diagonal i := M.diagonal (e.symm i)
   off_diagonal i i' h := M.off_diagonal (e.symm i) (e.symm i') (e.symm.injective.ne h)
 
-theorem reindex_apply (i i' : B') : M.reindex e i i' = M (e.symm i) (e.symm i') := rfl
-
 variable (n : ℕ)
-
-def Aₙ : CoxeterMatrix (Fin n) where
-  M := Matrix.of fun i j : Fin n ↦
-    if i = j then 1
-      else (if (j : ℕ) + 1 = i ∨ (i : ℕ) + 1 = j then 3 else 2)
-  isSymm := by unfold Matrix.IsSymm; aesop
-  diagonal := by simp
-  off_diagonal := by aesop
-
-def Bₙ : CoxeterMatrix (Fin n) where
-  M := Matrix.of fun i j : Fin n ↦
-    if i = j then 1
-      else (if i = n - 1 ∧ j = n - 2 ∨ j = n - 1 ∧ i = n - 2 then 4
-        else (if (j : ℕ) + 1 = i ∨ (i : ℕ) + 1 = j then 3 else 2))
-  isSymm := by unfold Matrix.IsSymm; aesop
-  diagonal := by simp
-  off_diagonal := by aesop
-
-def Dₙ : CoxeterMatrix (Fin n) where
-  M := Matrix.of fun i j : Fin n ↦
-    if i = j then 1
-      else (if i = n - 1 ∧ j = n - 3 ∨ j = n - 1 ∧ i = n - 3 then 3
-        else (if (j : ℕ) + 1 = i ∨ (i : ℕ) + 1 = j then 3 else 2))
-  isSymm := by unfold Matrix.IsSymm; aesop
-  diagonal := by simp
-  off_diagonal := by aesop
-
-def I₂ₘ (m : ℕ) : CoxeterMatrix (Fin 2) where
-  M := Matrix.of fun i j => if i = j then 1 else m + 2
-  isSymm := by unfold Matrix.IsSymm; aesop
-  diagonal := by simp
-  off_diagonal := by simp
 
 def E₆ : CoxeterMatrix (Fin 6) where
   M := !![1, 2, 3, 2, 2, 2;

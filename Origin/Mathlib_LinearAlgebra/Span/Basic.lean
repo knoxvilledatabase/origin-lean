@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Span/Basic.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 3 | Infrastructure: 7
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Prod
@@ -13,6 +13,8 @@ import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.LinearAlgebra.Span.Defs
 import Mathlib.Order.CompactlyGenerated.Basic
 import Mathlib.Order.OmegaCompletePartialOrder
+
+noncomputable section
 
 /-!
 # The span of a set of vectors, as a submodule
@@ -54,12 +56,14 @@ theorem span_coe_eq_restrictScalars [Semiring S] [SMul S R] [Module S M] [IsScal
   span_eq (p.restrictScalars S)
 
 include σ₁₂ in
+/-- A version of `Submodule.map_span_le` that does not require the `RingHomSurjective`
+
+assumption. -/
 
 theorem image_span_subset (f : F) (s : Set M) (N : Submodule R₂ M₂) :
     f '' span R s ⊆ N ↔ ∀ m ∈ s, f m ∈ N := image_subset_iff.trans <| span_le (p := N.comap f)
 
 include σ₁₂ in
-
 theorem image_span_subset_span (f : F) (s : Set M) : f '' span R s ⊆ span R₂ (f '' s) :=
   (image_span_subset f s _).2 fun x hx ↦ subset_span ⟨x, hx, rfl⟩
 
@@ -104,7 +108,9 @@ theorem disjoint_span_singleton {K E : Type*} [DivisionRing K] [AddCommGroup E] 
   · rw [s.smul_mem_iff hc] at hy
     rw [H hy, smul_zero]
 
--- DISSOLVED: disjoint_span_singleton'
+theorem disjoint_span_singleton' {K E : Type*} [DivisionRing K] [AddCommGroup E] [Module K E]
+    {p : Submodule K E} {x : E} (x0 : x ≠ 0) : Disjoint p (K ∙ x) ↔ x ∉ p :=
+  disjoint_span_singleton.trans ⟨fun h₁ h₂ => x0 (h₁ h₂), fun h₁ h₂ => (h₁ h₂).elim⟩
 
 variable (R S s)
 
@@ -241,10 +247,6 @@ def prod : Submodule R (M × M') :=
     smul_mem' := by rintro a ⟨x, y⟩ ⟨hx, hy⟩; exact ⟨smul_mem _ a hx, smul_mem _ a hy⟩ }
 
 @[simp]
-theorem prod_coe : (prod p q₁ : Set (M × M')) = (p : Set M) ×ˢ (q₁ : Set M') :=
-  rfl
-
-@[simp]
 theorem mem_prod {p : Submodule R M} {q : Submodule R M'} {x : M × M'} :
     x ∈ prod p q ↔ x.1 ∈ p ∧ x.2 ∈ q :=
   Set.mem_prod
@@ -280,13 +282,6 @@ end AddCommMonoid
 section AddCommGroup
 
 variable [Ring R] [AddCommGroup M] [Module R M]
-
-@[simp]
-theorem span_neg (s : Set M) : span R (-s) = span R s :=
-  calc
-    span R (-s) = span R ((-LinearMap.id : M →ₗ[R] M) '' s) := by simp
-    _ = map (-LinearMap.id) (span R s) := (map_span (-LinearMap.id) _).symm
-    _ = span R s := by simp
 
 instance : IsModularLattice (Submodule R M) :=
   ⟨fun y z xz a ha => by
@@ -506,7 +501,8 @@ variable (R M)
 
 variable [Ring R] [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M]
 
--- DISSOLVED: ker_toSpanSingleton
+theorem ker_toSpanSingleton {x : M} (h : x ≠ 0) : LinearMap.ker (toSpanSingleton R M x) = ⊥ :=
+  SetLike.ext fun _ => smul_eq_zero.trans <| or_iff_left_of_imp fun h' => (h h').elim
 
 end NoZeroDivisors
 
@@ -514,7 +510,12 @@ section Field
 
 variable [Field K] [AddCommGroup V] [Module K V]
 
--- DISSOLVED: span_singleton_sup_ker_eq_top
+theorem span_singleton_sup_ker_eq_top (f : V →ₗ[K] K) {x : V} (hx : f x ≠ 0) :
+    (K ∙ x) ⊔ ker f = ⊤ :=
+  top_unique fun y _ =>
+    Submodule.mem_sup.2
+      ⟨(f y * (f x)⁻¹) • x, Submodule.mem_span_singleton.2 ⟨f y * (f x)⁻¹, rfl⟩,
+        ⟨y - (f y * (f x)⁻¹) • x, by simp [hx]⟩⟩
 
 end Field
 
@@ -529,24 +530,17 @@ variable (R M)
 variable [Ring R] [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M] (x : M) (h : x ≠ 0)
 
 noncomputable
-
 def toSpanNonzeroSingleton : R ≃ₗ[R] R ∙ x :=
   LinearEquiv.trans
     (LinearEquiv.ofInjective (LinearMap.toSpanSingleton R M x)
       (ker_eq_bot.1 <| ker_toSpanSingleton R M h))
     (LinearEquiv.ofEq (range <| toSpanSingleton R M x) (R ∙ x) (span_singleton_eq_range R M x).symm)
 
-@[simp] theorem toSpanNonzeroSingleton_apply (t : R) :
-    LinearEquiv.toSpanNonzeroSingleton R M x h t =
-      (⟨t • x, Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self x)⟩ : R ∙ x) := by
-  rfl
-
 theorem toSpanNonzeroSingleton_one :
     LinearEquiv.toSpanNonzeroSingleton R M x h 1 =
       (⟨x, Submodule.mem_span_singleton_self x⟩ : R ∙ x) := by simp
 
 noncomputable
-
 abbrev coord : (R ∙ x) ≃ₗ[R] R :=
   (toSpanNonzeroSingleton R M x h).symm
 

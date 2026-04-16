@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Fintype/Card.lean
-Genuine: 138 | Conflates: 3 | Dissolved: 1 | Infrastructure: 45
+Genuine: 139 | Conflates: 3 | Dissolved: 0 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic
@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.Card
 import Mathlib.Data.List.NodupEquivFin
 import Mathlib.Data.Set.Image
 import Mathlib.Order.WellFounded
+
+noncomputable section
 
 /-!
 # Cardinalities of finite types
@@ -146,10 +148,6 @@ theorem card_ofSubsingleton (a : α) [Subsingleton α] : @Fintype.card _ (ofSubs
 theorem card_unique [Unique α] [h : Fintype α] : Fintype.card α = 1 :=
   Subsingleton.elim (ofSubsingleton default) h ▸ card_ofSubsingleton _
 
-@[simp]
-theorem card_ofIsEmpty [IsEmpty α] : @Fintype.card α Fintype.ofIsEmpty = 0 :=
-  rfl
-
 end Fintype
 
 namespace Set
@@ -223,8 +221,6 @@ theorem Fintype.card_fin_lt_of_le {m n : ℕ} (h : m ≤ n) :
           left_inv := fun i ↦ rfl
           right_inv := fun i ↦ rfl }
 
-theorem Finset.card_fin (n : ℕ) : #(univ : Finset (Fin n)) = n := by simp
-
 theorem fin_injective : Function.Injective Fin := fun m n h =>
   (Fintype.card_fin m).symm.trans <| (Fintype.card_congr <| Equiv.cast h).trans (Fintype.card_fin n)
 
@@ -248,23 +244,6 @@ theorem Fintype.card_subtype_eq' (y : α) [Fintype { x // y = x }] :
     Fintype.card { x // y = x } = 1 :=
   Fintype.card_unique
 
-theorem Fintype.card_empty : Fintype.card Empty = 0 :=
-  rfl
-
-theorem Fintype.card_pempty : Fintype.card PEmpty = 0 :=
-  rfl
-
-theorem Fintype.card_unit : Fintype.card Unit = 1 :=
-  rfl
-
-@[simp]
-theorem Fintype.card_punit : Fintype.card PUnit = 1 :=
-  rfl
-
-@[simp]
-theorem Fintype.card_bool : Fintype.card Bool = 2 :=
-  rfl
-
 @[simp]
 theorem Fintype.card_ulift (α : Type*) [Fintype α] : Fintype.card (ULift α) = Fintype.card α :=
   Fintype.ofEquiv_card _
@@ -272,14 +251,6 @@ theorem Fintype.card_ulift (α : Type*) [Fintype α] : Fintype.card (ULift α) =
 @[simp]
 theorem Fintype.card_plift (α : Type*) [Fintype α] : Fintype.card (PLift α) = Fintype.card α :=
   Fintype.ofEquiv_card _
-
-@[simp]
-theorem Fintype.card_orderDual (α : Type*) [Fintype α] : Fintype.card αᵒᵈ = Fintype.card α :=
-  rfl
-
-@[simp]
-theorem Fintype.card_lex (α : Type*) [Fintype α] : Fintype.card (Lex α) = Fintype.card α :=
-  rfl
 
 @[simp] lemma Fintype.card_multiplicative (α : Type*) [Fintype α] :
     card (Multiplicative α) = card α := Finset.card_map _
@@ -420,7 +391,9 @@ theorem card_pos_iff : 0 < card α ↔ Nonempty α :=
 theorem card_pos [h : Nonempty α] : 0 < card α :=
   card_pos_iff.mpr h
 
--- DISSOLVED: card_ne_zero
+@[simp]
+theorem card_ne_zero [Nonempty α] : card α ≠ 0 :=
+  _root_.ne_of_gt card_pos
 
 instance [Nonempty α] : NeZero (card α) := ⟨card_ne_zero⟩
 
@@ -599,10 +572,6 @@ theorem Finset.card_eq_of_equiv {s : Finset α} {t : Finset β} (i : s ≃ t) : 
 lemma Finset.exists_superset_card_eq [Fintype α] {n : ℕ} {s : Finset α} (hsn : #s ≤ n)
     (hnα : n ≤ Fintype.card α) :
     ∃ t, s ⊆ t ∧ #t = n := by simpa using exists_subsuperset_card_eq s.subset_univ hsn hnα
-
-@[simp]
-theorem Fintype.card_prop : Fintype.card Prop = 2 :=
-  rfl
 
 theorem set_fintype_card_le_univ [Fintype α] (s : Set α) [Fintype s] :
     Fintype.card s ≤ Fintype.card α :=

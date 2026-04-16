@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.FieldTheory.Minpoly.Field
 
+noncomputable section
+
 /-!
 # Eigenvalues are the roots of the minimal polynomial.
 

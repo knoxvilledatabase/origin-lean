@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.BoundedOrder.Basic
 import Mathlib.Order.Monotone.Basic
 
+noncomputable section
+
 /-!
 # Monotone functions on bounded orders
 

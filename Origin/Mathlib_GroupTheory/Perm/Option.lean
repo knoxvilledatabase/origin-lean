@@ -9,6 +9,8 @@ import Mathlib.Data.Fintype.Prod
 import Mathlib.GroupTheory.Perm.Sign
 import Mathlib.Logic.Equiv.Option
 
+noncomputable section
+
 /-!
 # Permutations of `Option α`
 -/
@@ -61,12 +63,6 @@ def Equiv.Perm.decomposeOption {α : Type*} [DecidableEq α] :
     have : removeNone (swap none x * σ.optionCongr) = σ :=
       Equiv.optionCongr_injective (by simp [← mul_assoc])
     simp [← Perm.eq_inv_iff_eq, this]
-
-theorem Equiv.Perm.decomposeOption_symm_of_none_apply {α : Type*} [DecidableEq α] (e : Perm α)
-    (i : Option α) : Equiv.Perm.decomposeOption.symm (none, e) i = i.map e := by simp
-
-theorem Equiv.Perm.decomposeOption_symm_sign {α : Type*} [DecidableEq α] [Fintype α] (e : Perm α) :
-    Perm.sign (Equiv.Perm.decomposeOption.symm (none, e)) = Perm.sign e := by simp
 
 theorem Finset.univ_perm_option {α : Type*} [DecidableEq α] [Fintype α] :
     @Finset.univ (Perm <| Option α) _ =

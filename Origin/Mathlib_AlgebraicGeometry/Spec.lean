@@ -10,6 +10,8 @@ import Mathlib.Topology.Sheaves.SheafCondition.Sites
 import Mathlib.Topology.Sheaves.Functors
 import Mathlib.Algebra.Module.LocalizedModule.Basic
 
+noncomputable section
+
 /-!
 # $Spec$ as a functor to locally ringed spaces.
 
@@ -48,9 +50,6 @@ open Spec (structureSheaf)
 
 def Spec.topObj (R : CommRingCat.{u}) : TopCat :=
   TopCat.of (PrimeSpectrum R)
-
-@[simp] theorem Spec.topObj_forget {R} : (forget TopCat).obj (Spec.topObj R) = PrimeSpectrum R :=
-  rfl
 
 def Spec.topMap {R S : CommRingCat.{u}} (f : R ⟶ S) : Spec.topObj S ⟶ Spec.topObj R :=
   PrimeSpectrum.comap f
@@ -112,24 +111,6 @@ def Spec.toSheafedSpace : CommRingCat.{u}ᵒᵖ ⥤ SheafedSpace CommRingCat whe
 def Spec.toPresheafedSpace : CommRingCat.{u}ᵒᵖ ⥤ PresheafedSpace CommRingCat :=
   Spec.toSheafedSpace ⋙ SheafedSpace.forgetToPresheafedSpace
 
-@[simp]
-theorem Spec.toPresheafedSpace_obj (R : CommRingCat.{u}ᵒᵖ) :
-    Spec.toPresheafedSpace.obj R = (Spec.sheafedSpaceObj (unop R)).toPresheafedSpace :=
-  rfl
-
-theorem Spec.toPresheafedSpace_obj_op (R : CommRingCat.{u}) :
-    Spec.toPresheafedSpace.obj (op R) = (Spec.sheafedSpaceObj R).toPresheafedSpace :=
-  rfl
-
-@[simp]
-theorem Spec.toPresheafedSpace_map (R S : CommRingCat.{u}ᵒᵖ) (f : R ⟶ S) :
-    Spec.toPresheafedSpace.map f = Spec.sheafedSpaceMap f.unop :=
-  rfl
-
-theorem Spec.toPresheafedSpace_map_op (R S : CommRingCat.{u}) (f : R ⟶ S) :
-    Spec.toPresheafedSpace.map f.op = Spec.sheafedSpaceMap f :=
-  rfl
-
 theorem Spec.basicOpen_hom_ext {X : RingedSpace.{u}} {R : CommRingCat.{u}}
     {α β : X ⟶ Spec.sheafedSpaceObj R} (w : α.base = β.base)
     (h : ∀ r : R,
@@ -151,23 +132,6 @@ def Spec.locallyRingedSpaceObj (R : CommRingCat.{u}) : LocallyRingedSpace :=
     isLocalRing := fun x =>
       RingEquiv.isLocalRing (A := Localization.AtPrime x.asIdeal)
         (Iso.commRingCatIsoToRingEquiv <| stalkIso R x).symm }
-
-lemma Spec.locallyRingedSpaceObj_sheaf (R : CommRingCat.{u}) :
-    (Spec.locallyRingedSpaceObj R).sheaf = structureSheaf R := rfl
-
-lemma Spec.locallyRingedSpaceObj_sheaf' (R : Type u) [CommRing R] :
-    (Spec.locallyRingedSpaceObj <| CommRingCat.of R).sheaf = structureSheaf R := rfl
-
-lemma Spec.locallyRingedSpaceObj_presheaf_map (R : CommRingCat.{u}) {U V} (i : U ⟶ V) :
-    (Spec.locallyRingedSpaceObj R).presheaf.map i =
-    (structureSheaf R).1.map i := rfl
-
-lemma Spec.locallyRingedSpaceObj_presheaf' (R : Type u) [CommRing R] :
-    (Spec.locallyRingedSpaceObj <| CommRingCat.of R).presheaf = (structureSheaf R).1 := rfl
-
-lemma Spec.locallyRingedSpaceObj_presheaf_map' (R : Type u) [CommRing R] {U V} (i : U ⟶ V) :
-    (Spec.locallyRingedSpaceObj <| CommRingCat.of R).presheaf.map i =
-    (structureSheaf R).1.map i := rfl
 
 @[elementwise]
 theorem stalkMap_toStalk {R S : CommRingCat.{u}} (f : R ⟶ S) (p : PrimeSpectrum S) :

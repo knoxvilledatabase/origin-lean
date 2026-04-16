@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.RingTheory.LocalProperties.Submodule
 
+noncomputable section
+
 /-!
 
 # Being projective is a local property
@@ -38,6 +40,13 @@ theorem Module.free_of_isLocalizedModule {Rₛ Mₛ} [AddCommGroup Mₛ] [Module
     Free.of_equiv (IsLocalizedModule.isBaseChange S Rₛ f).equiv
 
 universe uR' uM' in
+/--
+
+Also see `IsLocalizedModule.lift_rank_eq` for a version for non-free modules,
+
+but requires `S` to not contain any zero-divisors.
+
+-/
 
 -- CONFLATES (assumes ground = zero): Module.lift_rank_of_isLocalizedModule_of_free
 theorem Module.lift_rank_of_isLocalizedModule_of_free
@@ -150,7 +159,6 @@ variable
   [inst : ∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f P)]
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
-
 include f in
 
 theorem Module.projective_of_localization_maximal'

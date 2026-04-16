@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.Congruence.Hom
 import Mathlib.GroupTheory.Coset.Basic
 import Mathlib.GroupTheory.QuotientGroup.Defs
 
+noncomputable section
+
 /-!
 # Quotients of groups by normal subgroups
 
@@ -132,23 +134,12 @@ def quotientMulEquivOfEq {M N : Subgroup G} [M.Normal] [N.Normal] (h : M = N) : 
   { Subgroup.quotientEquivOfEq h with
     map_mul' := fun q r => Quotient.inductionOn₂' q r fun _g _h => rfl }
 
-@[to_additive (attr := simp)]
-theorem quotientMulEquivOfEq_mk {M N : Subgroup G} [M.Normal] [N.Normal] (h : M = N) (x : G) :
-    QuotientGroup.quotientMulEquivOfEq h (QuotientGroup.mk x) = QuotientGroup.mk x :=
-  rfl
-
 @[to_additive "Let `A', A, B', B` be subgroups of `G`. If `A' ≤ B'` and `A ≤ B`, then there is a map
 `A / (A' ⊓ A) →+ B / (B' ⊓ B)` induced by the inclusions."]
 def quotientMapSubgroupOfOfLe {A' A B' B : Subgroup G} [_hAN : (A'.subgroupOf A).Normal]
     [_hBN : (B'.subgroupOf B).Normal] (h' : A' ≤ B') (h : A ≤ B) :
     A ⧸ A'.subgroupOf A →* B ⧸ B'.subgroupOf B :=
   map _ _ (Subgroup.inclusion h) <| Subgroup.comap_mono h'
-
-@[to_additive (attr := simp)]
-theorem quotientMapSubgroupOfOfLe_mk {A' A B' B : Subgroup G} [_hAN : (A'.subgroupOf A).Normal]
-    [_hBN : (B'.subgroupOf B).Normal] (h' : A' ≤ B') (h : A ≤ B) (x : A) :
-    quotientMapSubgroupOfOfLe h' h x = ↑(Subgroup.inclusion h x : B) :=
-  rfl
 
 @[to_additive "Let `A', A, B', B` be subgroups of `G`. If `A' = B'` and `A = B`, then the quotients
 `A / (A' ⊓ A)` and `B / (B' ⊓ B)` are isomorphic. Applying this equiv is nicer than rewriting along
@@ -204,11 +195,6 @@ theorem equivQuotientZPowOfEquiv_refl :
       equivQuotientZPowOfEquiv (MulEquiv.refl A) n := by
   ext x
   rw [← Quotient.out_eq' x]
-  rfl
-
-@[to_additive (attr := simp)]
-theorem equivQuotientZPowOfEquiv_symm :
-    (equivQuotientZPowOfEquiv e n).symm = equivQuotientZPowOfEquiv e.symm n :=
   rfl
 
 @[to_additive (attr := simp)]

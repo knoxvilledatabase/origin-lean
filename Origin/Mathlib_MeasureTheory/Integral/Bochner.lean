@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Integral/Bochner.lean
-Genuine: 187 | Conflates: 0 | Dissolved: 6 | Infrastructure: 6
+Genuine: 191 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntegrableOn
 import Mathlib.MeasureTheory.Integral.SetToL1
+
+noncomputable section
 
 /-!
 # Bochner integral
@@ -284,9 +286,23 @@ theorem integral_eq {m : MeasurableSpace α} (μ : Measure α) (f : α →ₛ F)
     f.integral μ = ∑ x ∈ f.range, (μ (f ⁻¹' {x})).toReal • x := by
   simp [integral, setToSimpleFunc, weightedSMul_apply]
 
--- DISSOLVED: integral_eq_sum_filter
+theorem integral_eq_sum_filter [DecidablePred fun x : F => x ≠ 0] {m : MeasurableSpace α}
+    (f : α →ₛ F) (μ : Measure α) :
+    f.integral μ = ∑ x ∈ {x ∈ f.range | x ≠ 0}, (μ (f ⁻¹' {x})).toReal • x := by
+  simp_rw [integral_def, setToSimpleFunc_eq_sum_filter, weightedSMul_apply]
 
--- DISSOLVED: integral_eq_sum_of_subset
+theorem integral_eq_sum_of_subset [DecidablePred fun x : F => x ≠ 0] {f : α →ₛ F} {s : Finset F}
+    (hs : {x ∈ f.range | x ≠ 0} ⊆ s) :
+    f.integral μ = ∑ x ∈ s, (μ (f ⁻¹' {x})).toReal • x := by
+  rw [SimpleFunc.integral_eq_sum_filter, Finset.sum_subset hs]
+  rintro x - hx; rw [Finset.mem_filter, not_and_or, Ne, Classical.not_not] at hx
+  -- Porting note: reordered for clarity
+  rcases hx.symm with (rfl | hx)
+  · simp
+  rw [SimpleFunc.mem_range] at hx
+  -- Porting note: added
+  simp only [Set.mem_range, not_exists] at hx
+  rw [preimage_eq_empty] <;> simp [Set.disjoint_singleton_left, hx]
 
 @[simp]
 theorem integral_const {m : MeasurableSpace α} (μ : Measure α) (y : F) :
@@ -415,9 +431,6 @@ def negPart (f : α →₁ₛ[μ] ℝ) : α →₁ₛ[μ] ℝ :=
 @[norm_cast]
 theorem coe_posPart (f : α →₁ₛ[μ] ℝ) : (posPart f : α →₁[μ] ℝ) = Lp.posPart (f : α →₁[μ] ℝ) := rfl
 
-@[norm_cast]
-theorem coe_negPart (f : α →₁ₛ[μ] ℝ) : (negPart f : α →₁[μ] ℝ) = Lp.negPart (f : α →₁[μ] ℝ) := rfl
-
 end PosPart
 
 section SimpleFuncIntegral
@@ -440,8 +453,6 @@ theorem integral_eq_integral (f : α →₁ₛ[μ] E) : integral f = (toSimpleFu
 nonrec theorem integral_eq_lintegral {f : α →₁ₛ[μ] ℝ} (h_pos : 0 ≤ᵐ[μ] toSimpleFunc f) :
     integral f = ENNReal.toReal (∫⁻ a, ENNReal.ofReal ((toSimpleFunc f) a) ∂μ) := by
   rw [integral, SimpleFunc.integral_eq_lintegral (SimpleFunc.integrable f) h_pos]
-
-theorem integral_eq_setToL1S (f : α →₁ₛ[μ] E) : integral f = setToL1S (weightedSMul μ) f := rfl
 
 nonrec theorem integral_congr {f g : α →₁ₛ[μ] E} (h : toSimpleFunc f =ᵐ[μ] toSimpleFunc g) :
     integral f = integral g :=
@@ -702,7 +713,8 @@ theorem integral_undef {f : α → G} (h : ¬Integrable f μ) : ∫ a, f a ∂μ
   · simp [integral, hG, h]
   · simp [integral, hG]
 
--- DISSOLVED: Integrable.of_integral_ne_zero
+theorem Integrable.of_integral_ne_zero {f : α → G} (h : ∫ a, f a ∂μ ≠ 0) : Integrable f μ :=
+  Not.imp_symm integral_undef h
 
 theorem integral_non_aestronglyMeasurable {f : α → G} (h : ¬AEStronglyMeasurable f μ) :
     ∫ a, f a ∂μ = 0 :=
@@ -1237,7 +1249,17 @@ theorem L1.norm_of_fun_eq_integral_norm {f : α → H} (hf : Integrable f μ) :
   rw [L1.norm_eq_integral_norm]
   exact integral_congr_ae <| hf.coeFn_toL1.fun_comp _
 
--- DISSOLVED: Memℒp.eLpNorm_eq_integral_rpow_norm
+theorem Memℒp.eLpNorm_eq_integral_rpow_norm {f : α → H} {p : ℝ≥0∞} (hp1 : p ≠ 0) (hp2 : p ≠ ∞)
+    (hf : Memℒp f p μ) :
+    eLpNorm f p μ = ENNReal.ofReal ((∫ a, ‖f a‖ ^ p.toReal ∂μ) ^ p.toReal⁻¹) := by
+  have A : ∫⁻ a : α, ENNReal.ofReal (‖f a‖ ^ p.toReal) ∂μ = ∫⁻ a : α, ‖f a‖₊ ^ p.toReal ∂μ := by
+    simp_rw [← ofReal_rpow_of_nonneg (norm_nonneg _) toReal_nonneg, ofReal_norm_eq_coe_nnnorm]
+  simp only [eLpNorm_eq_lintegral_rpow_nnnorm hp1 hp2, one_div]
+  rw [integral_eq_lintegral_of_nonneg_ae]; rotate_left
+  · exact ae_of_all _ fun x => by positivity
+  · exact (hf.aestronglyMeasurable.norm.aemeasurable.pow_const _).aestronglyMeasurable
+  rw [A, ← ofReal_rpow_of_nonneg toReal_nonneg (inv_nonneg.2 toReal_nonneg), ofReal_toReal]
+  exact (lintegral_rpow_nnnorm_lt_top_of_eLpNorm_lt_top hp1 hp2 hf.2).ne
 
 alias Memℒp.snorm_eq_integral_rpow_norm := Memℒp.eLpNorm_eq_integral_rpow_norm
 
@@ -1514,7 +1536,6 @@ theorem integral_subtype_comap {α} [MeasurableSpace α] {μ : Measure α} {s : 
   exact ((MeasurableEmbedding.subtype_coe hs).integral_map _).symm
 
 attribute [local instance] Measure.Subtype.measureSpace in
-
 theorem integral_subtype {α} [MeasureSpace α] {s : Set α} (hs : MeasurableSet s) (f : α → G) :
     ∫ x : s, f x = ∫ x in s, f x := integral_subtype_comap hs f
 
@@ -1681,7 +1702,11 @@ theorem integral_unique [Unique α] (f : α → E) : ∫ x, f x ∂μ = (μ univ
     ∫ x, f x ∂μ = ∫ _, f default ∂μ := by congr with x; congr; exact Unique.uniq _ x
     _ = (μ univ).toReal • f default := by rw [integral_const]
 
--- DISSOLVED: integral_pos_of_integrable_nonneg_nonzero
+theorem integral_pos_of_integrable_nonneg_nonzero [TopologicalSpace α] [Measure.IsOpenPosMeasure μ]
+    {f : α → ℝ} {x : α} (f_cont : Continuous f) (f_int : Integrable f μ) (f_nonneg : 0 ≤ f)
+    (f_x : f x ≠ 0) : 0 < ∫ x, f x ∂μ :=
+  (integral_pos_iff_support_of_nonneg f_nonneg f_int).2
+    (IsOpen.measure_pos μ f_cont.isOpen_support ⟨x, f_x⟩)
 
 end Properties
 
@@ -1844,6 +1869,11 @@ namespace Mathlib.Meta.Positivity
 open Qq Lean Meta MeasureTheory
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- Positivity extension for integrals.
+
+This extension only proves non-negativity, strict positivity is more delicate for integration and
+
+requires more assumptions. -/
 
 @[positivity MeasureTheory.integral _ _]
 def evalIntegral : PositivityExt where eval {u α} zα pα e := do

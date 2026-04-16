@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Nat/Size.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Data.Nat.Bits
+
+noncomputable section
 
 /-! Lemmas about `size`. -/
 
@@ -24,16 +26,25 @@ theorem shiftLeft'_tt_eq_mul_pow (m) : ∀ n, shiftLeft' true m n + 1 = (m + 1) 
 
 end
 
--- DISSOLVED: shiftLeft'_ne_zero_left
+theorem shiftLeft'_ne_zero_left (b) {m} (h : m ≠ 0) (n) : shiftLeft' b m n ≠ 0 := by
+  induction n <;> simp [bit_ne_zero, shiftLeft', *]
 
--- DISSOLVED: shiftLeft'_tt_ne_zero
+theorem shiftLeft'_tt_ne_zero (m) : ∀ {n}, (n ≠ 0) → shiftLeft' true m n ≠ 0
+  | 0, h => absurd rfl h
+  | succ _, _ => by dsimp [shiftLeft', bit]; omega
 
 /-! ### `size` -/
 
 @[simp]
 theorem size_zero : size 0 = 0 := by simp [size]
 
--- DISSOLVED: size_bit
+@[simp]
+theorem size_bit {b n} (h : bit b n ≠ 0) : size (bit b n) = succ (size n) := by
+  unfold size
+  conv =>
+    lhs
+    rw [binaryRec]
+    simp [h]
 
 section
 
@@ -43,9 +54,28 @@ theorem size_one : size 1 = 1 :=
 
 end
 
--- DISSOLVED: size_shiftLeft'
+@[simp]
+theorem size_shiftLeft' {b m n} (h : shiftLeft' b m n ≠ 0) :
+    size (shiftLeft' b m n) = size m + n := by
+  induction n with
+  | zero => simp [shiftLeft']
+  | succ n IH =>
+    simp only [shiftLeft', ne_eq] at h ⊢
+    rw [size_bit h, Nat.add_succ]
+    by_cases s0 : shiftLeft' b m n = 0
+    case neg => rw [IH s0]
+    rw [s0] at h ⊢
+    cases b; · exact absurd rfl h
+    have : shiftLeft' true m n + 1 = 1 := congr_arg (· + 1) s0
+    rw [shiftLeft'_tt_eq_mul_pow] at this
+    obtain rfl := succ.inj (eq_one_of_dvd_one ⟨_, this.symm⟩)
+    simp only [zero_add, one_mul] at this
+    obtain rfl : n = 0 := not_ne_iff.1 fun hn ↦ ne_of_gt (Nat.one_lt_pow hn (by decide)) this
+    rw [add_zero]
 
--- DISSOLVED: size_shiftLeft
+@[simp, nolint simpNF]
+theorem size_shiftLeft {m} (h : m ≠ 0) (n) : size (m <<< n) = size m + n := by
+  simp only [size_shiftLeft' (shiftLeft'_ne_zero_left _ h _), ← shiftLeft'_false]
 
 theorem lt_size_self (n : ℕ) : n < 2 ^ size n := by
   rw [← one_shiftLeft]

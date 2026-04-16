@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/InnerProductSpace/Projection.lean
-Genuine: 97 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
+Genuine: 98 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Basic
@@ -9,6 +9,8 @@ import Mathlib.Analysis.InnerProductSpace.Symmetric
 import Mathlib.Analysis.NormedSpace.RCLike
 import Mathlib.Analysis.RCLike.Lemmas
 import Mathlib.Algebra.DirectSum.Decomposition
+
+noncomputable section
 
 /-!
 # The orthogonal projection
@@ -426,11 +428,6 @@ def orthogonalProjection : E →L[𝕜] K :=
 variable {K}
 
 @[simp]
-theorem orthogonalProjectionFn_eq (v : E) :
-    orthogonalProjectionFn K v = (orthogonalProjection K v : E) :=
-  rfl
-
-@[simp]
 theorem orthogonalProjection_inner_eq_zero (v : E) :
     ∀ w ∈ K, ⟪v - orthogonalProjection K v, w⟫ = 0 :=
   orthogonalProjectionFn_inner_eq_zero v
@@ -587,14 +584,6 @@ def reflection : E ≃ₗᵢ[𝕜] E :=
 variable {K}
 
 theorem reflection_apply (p : E) : reflection K p = 2 • (orthogonalProjection K p : E) - p :=
-  rfl
-
-@[simp]
-theorem reflection_symm : (reflection K).symm = reflection K :=
-  rfl
-
-@[simp]
-theorem reflection_inv : (reflection K)⁻¹ = reflection K :=
   rfl
 
 variable (K)
@@ -973,7 +962,11 @@ theorem Submodule.finrank_add_finrank_orthogonal' [FiniteDimensional 𝕜 E] {K 
   rw [← add_right_inj (finrank 𝕜 K)]
   simp [Submodule.finrank_add_finrank_orthogonal, h_dim]
 
--- DISSOLVED: finrank_orthogonal_span_singleton
+theorem finrank_orthogonal_span_singleton {n : ℕ} [_i : Fact (finrank 𝕜 E = n + 1)] {v : E}
+    (hv : v ≠ 0) : finrank 𝕜 (𝕜 ∙ v)ᗮ = n := by
+  haveI : FiniteDimensional 𝕜 E := .of_fact_finrank_eq_succ n
+  exact Submodule.finrank_add_finrank_orthogonal' <| by
+    simp [finrank_span_singleton hv, _i.elim, add_comm]
 
 theorem LinearIsometryEquiv.reflections_generate_dim_aux [FiniteDimensional ℝ F] {n : ℕ}
     (φ : F ≃ₗᵢ[ℝ] F) (hn : finrank ℝ (ker (ContinuousLinearMap.id ℝ F - φ))ᗮ ≤ n) :
@@ -1209,17 +1202,5 @@ theorem maximal_orthonormal_iff_orthogonalComplement_eq_bot (hv : Orthonormal �
     exact hu.inner_finsupp_eq_zero hxv' hl
 
 variable [FiniteDimensional 𝕜 E]
-
-theorem maximal_orthonormal_iff_basis_of_finiteDimensional (hv : Orthonormal 𝕜 ((↑) : v → E)) :
-    (∀ u ⊇ v, Orthonormal 𝕜 ((↑) : u → E) → u = v) ↔ ∃ b : Basis v 𝕜 E, ⇑b = ((↑) : v → E) := by
-  haveI := FiniteDimensional.proper_rclike 𝕜 (span 𝕜 v)
-  rw [maximal_orthonormal_iff_orthogonalComplement_eq_bot hv]
-  rw [Submodule.orthogonal_eq_bot_iff]
-  have hv_coe : range ((↑) : v → E) = v := by simp
-  constructor
-  · refine fun h => ⟨Basis.mk hv.linearIndependent _, Basis.coe_mk _ ?_⟩
-    convert h.ge
-  · rintro ⟨h, coe_h⟩
-    rw [← h.span_eq, coe_h, hv_coe]
 
 end OrthonormalBasis

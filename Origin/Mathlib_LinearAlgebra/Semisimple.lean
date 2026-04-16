@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Semisimple.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Perfect
@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.RingTheory.Artinian
 import Mathlib.RingTheory.Ideal.Quotient.Nilpotent
 import Mathlib.RingTheory.SimpleModule
+
+noncomputable section
 
 /-!
 # Semisimple linear endomorphisms
@@ -79,11 +81,6 @@ lemma isSemisimple_restrict_iff (p) (hp : p ∈ invtSubmodule f) :
     Subtype.exists, Subtype.mk_le_mk, Sublattice.mk_inf_mk, Sublattice.mk_sup_mk, Subtype.mk.injEq,
     exists_and_left, exists_and_right, invtSubmodule.mk_eq_bot_iff, exists_prop, and_assoc]
   rfl
-
-lemma isFinitelySemisimple_iff' :
-    f.IsFinitelySemisimple ↔ ∀ p (hp : p ∈ invtSubmodule f),
-      Module.Finite R p → IsSemisimple (LinearMap.restrict f hp) :=
-  Iff.rfl
 
 lemma isFinitelySemisimple_iff :
     f.IsFinitelySemisimple ↔ ∀ p ∈ invtSubmodule f, Module.Finite R p → ∀ q ∈ invtSubmodule f,
@@ -191,7 +188,9 @@ section field
 
 variable {K : Type*} [Field K] [Module K M] {f g : End K M}
 
--- DISSOLVED: IsSemisimple_smul_iff
+lemma IsSemisimple_smul_iff {t : K} (ht : t ≠ 0) :
+    (t • f).IsSemisimple ↔ f.IsSemisimple := by
+  simp [isSemisimple_iff, mem_invtSubmodule, Submodule.comap_smul f (h := ht)]
 
 lemma IsSemisimple_smul (t : K) (h : f.IsSemisimple) :
     (t • f).IsSemisimple := by
@@ -253,7 +252,6 @@ variable [PerfectField K] (comm : Commute f g) (hf : f.IsSemisimple) (hg : g.IsS
 include comm hf hg
 
 attribute [local simp] Submodule.Quotient.quot_mk_eq_mk in
-
 theorem IsSemisimple.of_mem_adjoin_pair {a : End K M} (ha : a ∈ Algebra.adjoin K {f, g}) :
     a.IsSemisimple := by
   let R := K[X] ⧸ Ideal.span {minpoly K f}
@@ -268,7 +266,9 @@ theorem IsSemisimple.of_mem_adjoin_pair {a : End K M} (ha : a ∈ Algebra.adjoin
   to specify the `(S := R)` argument, or use `set_option maxSynthPendingDepth 2 in`.
 
   In either case this step is too slow!
+
   -/
+
   set_option maxSynthPendingDepth 2 in
   have : IsScalarTower K R S := .of_algebraMap_eq fun _ ↦ rfl
   have : Module.Finite K S := .trans R S

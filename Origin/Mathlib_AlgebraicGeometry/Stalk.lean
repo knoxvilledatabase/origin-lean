@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.AffineScheme
 import Mathlib.AlgebraicGeometry.Morphisms.Preimmersion
 
+noncomputable section
+
 /-!
 # Stalks of a Scheme
 
@@ -160,7 +162,6 @@ lemma range_fromSpecStalk {x : X} :
     exact ⟨_, this⟩
 
 noncomputable
-
 def Opens.fromSpecStalkOfMem {X : Scheme.{u}} (U : X.Opens) (x : X) (hxU : x ∈ U) :
     Spec (X.presheaf.stalk x) ⟶ U :=
   Spec.map (inv (U.ι.stalkMap ⟨x, hxU⟩)) ≫ U.toScheme.fromSpecStalk ⟨x, hxU⟩
@@ -201,7 +202,6 @@ variable (R : CommRingCat.{u}) [IsLocalRing R]
 section stalkClosedPointIso
 
 noncomputable
-
 def stalkClosedPointIso :
     (Spec R).presheaf.stalk (closedPoint R) ≅ R :=
   StructureSheaf.stalkIso _ _ ≪≫ (IsLocalization.atUnits R
@@ -237,7 +237,6 @@ variable {R} (f : Spec R ⟶ X)
 namespace Scheme
 
 noncomputable
-
 def stalkClosedPointTo :
     X.presheaf.stalk (f.base (closedPoint R)) ⟶ R :=
   f.stalkMap (closedPoint R) ≫ (stalkClosedPointIso R).hom
@@ -290,14 +289,6 @@ lemma germ_stalkClosedPointTo_Spec_fromSpecStalk
   simp_rw [← Opens.map_top (Spec.map f).base]
   rw [← (Spec.map f).app_eq_appLE, ΓSpecIso_naturality, Iso.inv_hom_id_assoc]
 
-lemma stalkClosedPointTo_fromSpecStalk (x : X) :
-    stalkClosedPointTo (X.fromSpecStalk x) =
-      (X.presheaf.stalkCongr (by rw [fromSpecStalk_closedPoint]; rfl)).hom := by
-  refine TopCat.Presheaf.stalk_hom_ext _ fun U hxU ↦ ?_
-  simp only [TopCat.Presheaf.stalkCongr_hom, TopCat.Presheaf.germ_stalkSpecializes, id_eq]
-  have : X.fromSpecStalk x = Spec.map (𝟙 (X.presheaf.stalk x)) ≫ X.fromSpecStalk x := by simp
-  convert germ_stalkClosedPointTo_Spec_fromSpecStalk (𝟙 (X.presheaf.stalk x)) U hxU
-
 @[reassoc]
 lemma Spec_stalkClosedPointTo_fromSpecStalk :
     Spec.map (stalkClosedPointTo f) ≫ X.fromSpecStalk _ = f := by
@@ -318,6 +309,7 @@ end stalkClosedPointTo
 variable {R}
 
 omit [IsLocalRing R] in
+/-- useful lemma for applications of `SpecToEquivOfLocalRing` -/
 
 lemma SpecToEquivOfLocalRing_eq_iff
     {f₁ f₂ : Σ x, { f : X.presheaf.stalk x ⟶ R // IsLocalHom f }} :
@@ -332,9 +324,8 @@ lemma SpecToEquivOfLocalRing_eq_iff
 
 variable (X R)
 
-noncomputable
-
 @[simps]
+noncomputable
 def SpecToEquivOfLocalRing :
     (Spec R ⟶ X) ≃ Σ x, { f : X.presheaf.stalk x ⟶ R // IsLocalHom f } where
   toFun f := ⟨f.base (closedPoint R), Scheme.stalkClosedPointTo f, inferInstance⟩

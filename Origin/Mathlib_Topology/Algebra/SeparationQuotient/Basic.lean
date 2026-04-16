@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 70
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Algebraic operations on `SeparationQuotient`
 
@@ -264,11 +266,6 @@ instance instNatCast [NatCast R] : NatCast (SeparationQuotient R) where
 @[simp, norm_cast]
 theorem mk_natCast [NatCast R] (n : ℕ) : mk (n : R) = n := rfl
 
-@[simp]
-theorem mk_ofNat [NatCast R] (n : ℕ) [n.AtLeastTwo] :
-    mk (no_index (OfNat.ofNat n) : R) = OfNat.ofNat n :=
-  rfl
-
 instance instIntCast [IntCast R] : IntCast (SeparationQuotient R) where
   intCast n := mk n
 
@@ -386,10 +383,6 @@ instance instAlgebra : Algebra R (SeparationQuotient A) where
   toRingHom := mkRingHom.comp (algebraMap R A)
   commutes' r := Quotient.ind fun a => congrArg _ <| Algebra.commutes r a
   smul_def' r := Quotient.ind fun a => congrArg _ <| Algebra.smul_def r a
-
-@[simp]
-theorem mk_algebraMap (r : R) : mk (algebraMap R A r) = algebraMap R (SeparationQuotient A) r :=
-  rfl
 
 end Algebra
 

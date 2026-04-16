@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Finiteness.Cardinality
 import Mathlib.RingTheory.Finiteness.Finsupp
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-!
 # Noetherian rings and modules
 

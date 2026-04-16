@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Int/Order/Units.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Abs
+
+noncomputable section
 
 /-!
 # Lemmas about units in `ℤ`, which interact with the order structure.
@@ -35,11 +37,14 @@ theorem units_div_eq_mul (u₁ u₂ : ℤˣ) : u₁ / u₂ = u₁ * u₂ := by
 theorem units_coe_mul_self (u : ℤˣ) : (u * u : ℤ) = 1 := by
   rw [← Units.val_mul, units_mul_self, Units.val_one]
 
--- DISSOLVED: neg_one_pow_ne_zero
+theorem sq_eq_one_of_sq_lt_four {x : ℤ} (h1 : x ^ 2 < 4) (h2 : x ≠ 0) : x ^ 2 = 1 :=
+  sq_eq_one_iff.mpr
+    ((abs_eq (zero_le_one' ℤ)).mp
+      (le_antisymm (lt_add_one_iff.mp (abs_lt_of_sq_lt_sq h1 zero_le_two))
+        (sub_one_lt_iff.mp (abs_pos.mpr h2))))
 
--- DISSOLVED: sq_eq_one_of_sq_lt_four
-
--- DISSOLVED: sq_eq_one_of_sq_le_three
+theorem sq_eq_one_of_sq_le_three {x : ℤ} (h1 : x ^ 2 ≤ 3) (h2 : x ≠ 0) : x ^ 2 = 1 :=
+  sq_eq_one_of_sq_lt_four (lt_of_le_of_lt h1 (lt_add_one (3 : ℤ))) h2
 
 theorem units_pow_eq_pow_mod_two (u : ℤˣ) (n : ℕ) : u ^ n = u ^ (n % 2) := by
   conv =>

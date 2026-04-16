@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.Defs
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
+noncomputable section
+
 /-!
 # Results about `CovariantClass G α HSMul.hSMul LE.le`
 

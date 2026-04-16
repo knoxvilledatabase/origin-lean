@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/Finite/GaloisField.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 2 | Infrastructure: 10
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.FieldTheory.Galois.Basic
+
+noncomputable section
 
 /-!
 # Galois fields
@@ -79,9 +81,61 @@ instance : FiniteDimensional (ZMod p) (GaloisField p n) := by
 instance : Finite (GaloisField p n) :=
   Module.finite_of_finite (ZMod p)
 
--- DISSOLVED: finrank
+theorem finrank {n} (h : n ≠ 0) : Module.finrank (ZMod p) (GaloisField p n) = n := by
+  haveI : Fintype (GaloisField p n) := Fintype.ofFinite (GaloisField p n)
+  set g_poly := (X ^ p ^ n - X : (ZMod p)[X])
+  have hp : 1 < p := h_prime.out.one_lt
+  have aux : g_poly ≠ 0 := FiniteField.X_pow_card_pow_sub_X_ne_zero _ h hp
+  -- Porting note: in the statement of `key`, replaced `g_poly` by its value otherwise the
+  -- proof fails
+  have key : Fintype.card (g_poly.rootSet (GaloisField p n)) = g_poly.natDegree :=
+    card_rootSet_eq_natDegree (galois_poly_separable p _ (dvd_pow (dvd_refl p) h))
+      (SplittingField.splits (X ^ p ^ n - X : (ZMod p)[X]))
+  have nat_degree_eq : g_poly.natDegree = p ^ n :=
+    FiniteField.X_pow_card_pow_sub_X_natDegree_eq _ h hp
+  rw [nat_degree_eq] at key
+  suffices g_poly.rootSet (GaloisField p n) = Set.univ by
+    simp_rw [this, ← Fintype.ofEquiv_card (Equiv.Set.univ _)] at key
+    -- Porting note: prevents `card_eq_pow_finrank` from using a wrong instance for `Fintype`
+    rw [@card_eq_pow_finrank (ZMod p) _ _ _ _ _ (_), ZMod.card] at key
+    exact Nat.pow_right_injective (Nat.Prime.one_lt' p).out key
+  rw [Set.eq_univ_iff_forall]
+  suffices ∀ (x) (hx : x ∈ (⊤ : Subalgebra (ZMod p) (GaloisField p n))),
+      x ∈ (X ^ p ^ n - X : (ZMod p)[X]).rootSet (GaloisField p n)
+    by simpa
+  rw [← SplittingField.adjoin_rootSet]
+  simp_rw [Algebra.mem_adjoin_iff]
+  intro x hx
+  -- We discharge the `p = 0` separately, to avoid typeclass issues on `ZMod p`.
+  cases p; cases hp
+  refine Subring.closure_induction ?_ ?_ ?_ ?_ ?_ ?_ hx <;> simp_rw [mem_rootSet_of_ne aux]
+  · rintro x (⟨r, rfl⟩ | hx)
+    · simp only [g_poly, map_sub, map_pow, aeval_X]
+      rw [← map_pow, ZMod.pow_card_pow, sub_self]
+    · dsimp only [GaloisField] at hx
+      rwa [mem_rootSet_of_ne aux] at hx
+  · rw [← coeff_zero_eq_aeval_zero']
+    simp only [g_poly, coeff_X_pow, coeff_X_zero, sub_zero, _root_.map_eq_zero, ite_eq_right_iff,
+      one_ne_zero, coeff_sub]
+    intro hn
+    exact Nat.not_lt_zero 1 (pow_eq_zero hn.symm ▸ hp)
+  · simp [g_poly]
+  · simp only [g_poly, aeval_X_pow, aeval_X, map_sub, add_pow_char_pow, sub_eq_zero]
+    intro x y _ _ hx hy
+    rw [hx, hy]
+  · intro x _ hx
+    simp only [g_poly, sub_eq_zero, aeval_X_pow, aeval_X, map_sub, sub_neg_eq_add] at *
+    rw [neg_pow, hx, neg_one_pow_char_pow]
+    simp
+  · simp only [g_poly, aeval_X_pow, aeval_X, map_sub, mul_pow, sub_eq_zero]
+    intro x y _ _ hx hy
+    rw [hx, hy]
 
--- DISSOLVED: card
+theorem card (h : n ≠ 0) : Nat.card (GaloisField p n) = p ^ n := by
+  let b := IsNoetherian.finsetBasis (ZMod p) (GaloisField p n)
+  haveI : Fintype (GaloisField p n) := Fintype.ofFinite (GaloisField p n)
+  rw [Nat.card_eq_fintype_card, Module.card_fintype b, ← Module.finrank_eq_card_basis b,
+    ZMod.card, finrank p h]
 
 theorem splits_zmod_X_pow_sub_X : Splits (RingHom.id (ZMod p)) (X ^ p - X) := by
   have hp : 1 < p := h_prime.out.one_lt

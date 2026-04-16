@@ -8,6 +8,8 @@ import Mathlib.Logic.Function.Defs
 import Mathlib.Tactic.CasesM
 import Mathlib.Tactic.Attr.Core
 
+noncomputable section
+
 /-!
 Extends the theory on functors, applicatives and monads.
 -/

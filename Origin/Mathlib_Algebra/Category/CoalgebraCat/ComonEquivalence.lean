@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Monoidal.Symmetric
 import Mathlib.CategoryTheory.Monoidal.Comon_
 import Mathlib.Algebra.Category.CoalgebraCat.Basic
 
+noncomputable section
+
 /-!
 # The category equivalence between `R`-coalgebras and comonoid objects in `R-Mod`
 
@@ -110,10 +112,6 @@ theorem tensorObj_comul (K L : CoalgebraCat R) :
     tensorμ_eq_tensorTensorTensorComm]
   rfl
 
-theorem tensorHom_toLinearMap (f : M →ₗc[R] N) (g : P →ₗc[R] Q) :
-    (CoalgebraCat.ofHom f ⊗ CoalgebraCat.ofHom g).1.toLinearMap
-      = TensorProduct.map f.toLinearMap g.toLinearMap := rfl
-
 theorem associator_hom_toLinearMap :
     (α_ (CoalgebraCat.of R M) (CoalgebraCat.of R N) (CoalgebraCat.of R P)).hom.1.toLinearMap
       = (TensorProduct.assoc R M N P).toLinearMap :=
@@ -169,11 +167,6 @@ theorem comul_tensorObj_tensorObj_left :
   simp only [instMonoidalCategoryStruct_tensorObj, ModuleCat.MonoidalCategory.tensorObj,
     ModuleCat.coe_of, Comon_.monoidal_tensorObj_comul, toComonObj_X, of_carrier, of_isAddCommGroup,
     of_isModule, toComonObj_comul, of_instCoalgebra, tensorμ_eq_tensorTensorTensorComm]
-  rfl
-
-theorem counit_tensorObj :
-    Coalgebra.counit (R := R) (A := (CoalgebraCat.of R M ⊗ CoalgebraCat.of R N : CoalgebraCat R))
-      = Coalgebra.counit (A := M ⊗[R] N) := by
   rfl
 
 theorem counit_tensorObj_tensorObj_right :

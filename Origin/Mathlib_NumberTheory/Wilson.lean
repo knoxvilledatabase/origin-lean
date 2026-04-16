@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.FieldTheory.Finite.Basic
 
+noncomputable section
+
 /-!
 # Wilson's theorem.
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.DirectSum.Finsupp
 import Mathlib.LinearAlgebra.DirectSum.TensorProduct
 import Mathlib.LinearAlgebra.Finsupp.SumProd
 
+noncomputable section
+
 /-!
 # Results on finitely supported functions.
 
@@ -161,9 +163,6 @@ noncomputable def finsuppLeft' :
   map_smul' := finsuppLeft_smul'
 
 variable {R M N ι S}
-
-lemma finsuppLeft'_apply (x : (ι →₀ M) ⊗[R] N) :
-    finsuppLeft' R M N ι S x = finsuppLeft R M N ι x := rfl
 
 variable (R M N ι)
 
@@ -341,9 +340,6 @@ theorem finsuppTensorFinsupp'_symm_single_eq_tmul_single_one (i : ι × κ) (r :
       Finsupp.single i.1 r ⊗ₜ Finsupp.single i.2 1 := by
   nth_rw 1 [← mul_one r]
   exact finsuppTensorFinsupp'_symm_single_mul R ι κ i _ _
-
-theorem finsuppTensorFinsuppLid_self :
-    finsuppTensorFinsuppLid R R ι κ = finsuppTensorFinsupp' R ι κ := rfl
 
 theorem finsuppTensorFinsuppRid_self :
     finsuppTensorFinsuppRid R R ι κ = finsuppTensorFinsupp' R ι κ := by

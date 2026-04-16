@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MvPolynomial/Equiv.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin
@@ -9,6 +9,8 @@ import Mathlib.Algebra.MvPolynomial.Degrees
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Data.Finsupp.Fin
 import Mathlib.Logic.Equiv.Fin
+
+noncomputable section
 
 /-!
 # Equivalences between polynomial rings
@@ -97,11 +99,6 @@ theorem mapEquiv_refl : mapEquiv σ (RingEquiv.refl R) = RingEquiv.refl _ :=
   RingEquiv.ext map_id
 
 @[simp]
-theorem mapEquiv_symm [CommSemiring S₁] [CommSemiring S₂] (e : S₁ ≃+* S₂) :
-    (mapEquiv σ e).symm = mapEquiv σ e.symm :=
-  rfl
-
-@[simp]
 theorem mapEquiv_trans [CommSemiring S₁] [CommSemiring S₂] [CommSemiring S₃] (e : S₁ ≃+* S₂)
     (f : S₂ ≃+* S₃) : (mapEquiv σ e).trans (mapEquiv σ f) = mapEquiv σ (e.trans f) :=
   RingEquiv.ext fun p => by
@@ -119,10 +116,6 @@ def mapAlgEquiv (e : A₁ ≃ₐ[R] A₂) : MvPolynomial σ A₁ ≃ₐ[R] MvPol
 @[simp]
 theorem mapAlgEquiv_refl : mapAlgEquiv σ (AlgEquiv.refl : A₁ ≃ₐ[R] A₁) = AlgEquiv.refl :=
   AlgEquiv.ext map_id
-
-@[simp]
-theorem mapAlgEquiv_symm (e : A₁ ≃ₐ[R] A₂) : (mapAlgEquiv σ e).symm = mapAlgEquiv σ e.symm :=
-  rfl
 
 @[simp]
 theorem mapAlgEquiv_trans (e : A₁ ≃ₐ[R] A₂) (f : A₂ ≃ₐ[R] A₃) :
@@ -379,7 +372,21 @@ theorem support_coeff_finSuccEquiv {f : MvPolynomial (Fin (n + 1)) R} {i : ℕ} 
   · intro h
     simpa [mem_support_iff, ← finSuccEquiv_coeff_coeff m f i] using h
 
--- DISSOLVED: totalDegree_coeff_finSuccEquiv_add_le
+lemma totalDegree_coeff_finSuccEquiv_add_le (f : MvPolynomial (Fin (n + 1)) R) (i : ℕ)
+    (hi : (finSuccEquiv R n f).coeff i ≠ 0) :
+    totalDegree ((finSuccEquiv R n f).coeff i) + i ≤ totalDegree f := by
+  have hf'_sup : ((finSuccEquiv R n f).coeff i).support.Nonempty := by
+    rw [Finset.nonempty_iff_ne_empty, ne_eq, support_eq_empty]
+    exact hi
+  -- Let σ be a monomial index of ((finSuccEquiv R n p).coeff i) of maximal total degree
+  have ⟨σ, hσ1, hσ2⟩ := Finset.exists_mem_eq_sup (support _) hf'_sup
+                          (fun s => Finsupp.sum s fun _ e => e)
+  -- Then cons i σ is a monomial index of p with total degree equal to the desired bound
+  let σ' : Fin (n+1) →₀ ℕ := cons i σ
+  convert le_totalDegree (s := σ') _
+  · rw [totalDegree, hσ2, sum_cons, add_comm]
+  · rw [← support_coeff_finSuccEquiv]
+    exact hσ1
 
 theorem support_finSuccEquiv (f : MvPolynomial (Fin (n + 1)) R) :
     (finSuccEquiv R n f).support = Finset.image (fun m : Fin (n + 1) →₀ ℕ => m 0) f.support := by
@@ -426,9 +433,21 @@ lemma mem_support_coeff_finSuccEquiv {f : MvPolynomial (Fin (n + 1)) R} {i : ℕ
     image_support_finSuccEquiv]
   simp only [Finset.mem_filter, mem_support_iff, ne_eq, cons_zero, and_true]
 
--- DISSOLVED: support_finSuccEquiv_nonempty
+theorem support_finSuccEquiv_nonempty {f : MvPolynomial (Fin (n + 1)) R} (h : f ≠ 0) :
+    (finSuccEquiv R n f).support.Nonempty := by
+  rwa [Polynomial.support_nonempty, EmbeddingLike.map_ne_zero_iff]
 
--- DISSOLVED: degree_finSuccEquiv
+theorem degree_finSuccEquiv {f : MvPolynomial (Fin (n + 1)) R} (h : f ≠ 0) :
+    (finSuccEquiv R n f).degree = degreeOf 0 f := by
+  -- TODO: these should be lemmas
+  have h₀ : ∀ {α β : Type _} (f : α → β), (fun x => x) ∘ f = f := fun f => rfl
+  have h₁ : ∀ {α β : Type _} (f : α → β), f ∘ (fun x => x) = f := fun f => rfl
+  have h₂ : WithBot.some = Nat.cast := rfl
+
+  have h' : ((finSuccEquiv R n f).support.sup fun x => x) = degreeOf 0 f := by
+    rw [degreeOf_eq_sup, support_finSuccEquiv, Finset.sup_image, h₀]
+  rw [Polynomial.degree, ← h', ← h₂, Finset.coe_sup_of_nonempty (support_finSuccEquiv_nonempty h),
+    Finset.max_eq_sup_coe, h₁]
 
 theorem natDegree_finSuccEquiv (f : MvPolynomial (Fin (n + 1)) R) :
     (finSuccEquiv R n f).natDegree = degreeOf 0 f := by

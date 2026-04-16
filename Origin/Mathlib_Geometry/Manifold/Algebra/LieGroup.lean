@@ -1,9 +1,11 @@
 /-
 Extracted from Geometry/Manifold/Algebra/LieGroup.lean
-Genuine: 12 | Conflates: 2 | Dissolved: 10 | Infrastructure: 4
+Genuine: 21 | Conflates: 3 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.Monoid
+
+noncomputable section
 
 /-!
 # Lie groups
@@ -91,6 +93,9 @@ theorem contMDiff_inv : ContMDiff I I ⊤ fun x : G => x⁻¹ :=
   LieGroup.smooth_inv
 
 include I in
+/-- A Lie group is a topological group. This is not an instance for technical reasons,
+
+see note [Design choices about smooth algebraic structures]. -/
 
 @[to_additive "An additive Lie group is an additive topological group. This is not an instance for
 
@@ -170,7 +175,12 @@ Point-wise inversion is smooth when the function/denominator is non-zero. -/
 
 section SmoothInv₀
 
--- DISSOLVED: SmoothInv₀
+-- CONFLATES (assumes ground = zero): SmoothInv₀
+class SmoothInv₀ {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H]
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] (I : ModelWithCorners 𝕜 E H) (G : Type*)
+    [Inv G] [Zero G] [TopologicalSpace G] [ChartedSpace H G] : Prop where
+  /-- Inversion is smooth away from `0`. -/
+  smoothAt_inv₀ : ∀ ⦃x : G⦄, x ≠ 0 → ContMDiffAt I I ⊤ (fun y ↦ y⁻¹) x
 
 instance {𝕜 : Type*} [NontriviallyNormedField 𝕜] : SmoothInv₀ 𝓘(𝕜) 𝕜 where
   smoothAt_inv₀ x hx := by
@@ -185,9 +195,15 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalS
   {I' : ModelWithCorners 𝕜 E' H'} {M : Type*} [TopologicalSpace M] [ChartedSpace H' M]
   {n : ℕ∞} {f : M → G}
 
--- DISSOLVED: contMDiffAt_inv₀
+theorem contMDiffAt_inv₀ {x : G} (hx : x ≠ 0) : ContMDiffAt I I ⊤ (fun y ↦ y⁻¹) x :=
+  SmoothInv₀.smoothAt_inv₀ hx
 
 include I in
+/-- In a manifold with smooth inverse away from `0`, the inverse is continuous away from `0`.
+
+This is not an instance for technical reasons, see
+
+note [Design choices about smooth algebraic structures]. -/
 
 theorem hasContinuousInv₀_of_hasSmoothInv₀ : HasContinuousInv₀ G :=
   { continuousAt_inv₀ := fun _ hx ↦ (contMDiffAt_inv₀ I hx).continuousAt }
@@ -197,13 +213,21 @@ theorem contMDiffOn_inv₀ : ContMDiffOn I I ⊤ (Inv.inv : G → G) {0}ᶜ := f
 
 variable {I} {s : Set M} {a : M}
 
--- DISSOLVED: ContMDiffWithinAt.inv₀
+theorem ContMDiffWithinAt.inv₀ (hf : ContMDiffWithinAt I' I n f s a) (ha : f a ≠ 0) :
+    ContMDiffWithinAt I' I n (fun x => (f x)⁻¹) s a :=
+  ((contMDiffAt_inv₀ I ha).of_le le_top).comp_contMDiffWithinAt a hf
 
--- DISSOLVED: ContMDiffAt.inv₀
+theorem ContMDiffAt.inv₀ (hf : ContMDiffAt I' I n f a) (ha : f a ≠ 0) :
+    ContMDiffAt I' I n (fun x ↦ (f x)⁻¹) a :=
+  ((contMDiffAt_inv₀ I ha).of_le le_top).comp a hf
 
--- DISSOLVED: ContMDiff.inv₀
+theorem ContMDiff.inv₀ (hf : ContMDiff I' I n f) (h0 : ∀ x, f x ≠ 0) :
+    ContMDiff I' I n (fun x ↦ (f x)⁻¹) :=
+  fun x ↦ ContMDiffAt.inv₀ (hf x) (h0 x)
 
--- DISSOLVED: ContMDiffOn.inv₀
+theorem ContMDiffOn.inv₀ (hf : ContMDiffOn I' I n f s) (h0 : ∀ x ∈ s, f x ≠ 0) :
+    ContMDiffOn I' I n (fun x => (f x)⁻¹) s :=
+  fun x hx ↦ ContMDiffWithinAt.inv₀ (hf x hx) (h0 x hx)
 
 end SmoothInv₀
 
@@ -222,12 +246,20 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalS
   {I' : ModelWithCorners 𝕜 E' H'} {M : Type*} [TopologicalSpace M] [ChartedSpace H' M]
   {f g : M → G} {s : Set M} {a : M} {n : ℕ∞}
 
--- DISSOLVED: ContMDiffWithinAt.div₀
+theorem ContMDiffWithinAt.div₀
+    (hf : ContMDiffWithinAt I' I n f s a) (hg : ContMDiffWithinAt I' I n g s a) (h₀ : g a ≠ 0) :
+    ContMDiffWithinAt I' I n (f / g) s a := by
+  simpa [div_eq_mul_inv] using hf.mul (hg.inv₀ h₀)
 
--- DISSOLVED: ContMDiffOn.div₀
+theorem ContMDiffOn.div₀ (hf : ContMDiffOn I' I n f s) (hg : ContMDiffOn I' I n g s)
+    (h₀ : ∀ x ∈ s, g x ≠ 0) : ContMDiffOn I' I n (f / g) s := by
+  simpa [div_eq_mul_inv] using hf.mul (hg.inv₀ h₀)
 
--- DISSOLVED: ContMDiffAt.div₀
+theorem ContMDiffAt.div₀ (hf : ContMDiffAt I' I n f a) (hg : ContMDiffAt I' I n g a)
+    (h₀ : g a ≠ 0) : ContMDiffAt I' I n (f / g) a := by
+  simpa [div_eq_mul_inv] using hf.mul (hg.inv₀ h₀)
 
--- DISSOLVED: ContMDiff.div₀
+theorem ContMDiff.div₀ (hf : ContMDiff I' I n f) (hg : ContMDiff I' I n g) (h₀ : ∀ x, g x ≠ 0) :
+    ContMDiff I' I n (f / g) := by simpa only [div_eq_mul_inv] using hf.mul (hg.inv₀ h₀)
 
 end Div

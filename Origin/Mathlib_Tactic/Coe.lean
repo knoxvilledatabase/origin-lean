@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.ElabRules
 
+noncomputable section
+
 /-!
 # Additional coercion notation
 
@@ -37,41 +39,25 @@ def elabPartiallyAppliedCoe (sym : String) (expectedType : Expr)
   return f.etaExpanded?.getD f
 
 elab "(" "↑" ")" : term <= expectedType =>
-
   elabPartiallyAppliedCoe "↑" expectedType fun b x => do
-
     if b.hasExprMVar then tryPostpone
-
     if let .some e ← coerce? x b then
-
       return e
-
     else
-
       throwError "cannot coerce{indentExpr x}\nto type{indentExpr b}"
 
 elab "(" "⇑" ")" : term <= expectedType =>
-
   elabPartiallyAppliedCoe "⇑" expectedType fun b x => do
-
     if let some ty ← coerceToFunction? x then
-
       ensureHasType b ty
-
     else
-
       throwError "cannot coerce to function{indentExpr x}"
 
 elab "(" "↥" ")" : term <= expectedType =>
-
   elabPartiallyAppliedCoe "↥" expectedType fun b x => do
-
     if let some ty ← coerceToSort? x then
-
       ensureHasType b ty
-
     else
-
       throwError "cannot coerce to sort{indentExpr x}"
 
 end Lean.Elab.Term.CoeImpl

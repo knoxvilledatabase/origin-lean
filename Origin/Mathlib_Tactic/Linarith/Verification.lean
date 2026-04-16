@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Linarith.Parsing
 import Mathlib.Util.Qq
 
+noncomputable section
+
 /-!
 # Deriving a proof of false
 

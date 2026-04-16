@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/Functor/Derived/RightDerived.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.KanExtension.Basic
 import Mathlib.CategoryTheory.Localization.Predicate
+
+noncomputable section
 
 /-!
 # Right derived functors
@@ -87,7 +89,6 @@ lemma rightDerived_fac_app (G : D ⥤ H) (β : F ⟶ L ⋙ G) (X : C) :
   RF.descOfIsLeftKanExtension_fac_app α G β X
 
 include W in
-
 lemma rightDerived_ext (G : D ⥤ H) (γ₁ γ₂ : RF ⟶ G)
     (hγ : α ≫ whiskerLeft L γ₁ = α ≫ whiskerLeft L γ₂) : γ₁ = γ₂ :=
   have := IsRightDerivedFunctor.isLeftKanExtension RF α W
@@ -157,7 +158,6 @@ lemma hasRightDerivedFunctor_iff :
 variable {F}
 
 include e in
-
 lemma hasRightDerivedFunctor_iff_of_iso :
     HasRightDerivedFunctor F W ↔ HasRightDerivedFunctor F' W := by
   rw [hasRightDerivedFunctor_iff F W.Q W, hasRightDerivedFunctor_iff F' W.Q W,

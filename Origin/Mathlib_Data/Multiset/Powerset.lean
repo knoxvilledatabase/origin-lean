@@ -7,6 +7,8 @@ import Mathlib.Data.List.Sublists
 import Mathlib.Data.List.Zip
 import Mathlib.Data.Multiset.Bind
 
+noncomputable section
+
 /-!
 # The powerset of a multiset
 -/
@@ -34,10 +36,6 @@ def powersetAux' (l : List α) : List (Multiset α) :=
 
 theorem powersetAux_perm_powersetAux' {l : List α} : powersetAux l ~ powersetAux' l := by
   rw [powersetAux_eq_map_coe]; exact (sublists_perm_sublists' _).map _
-
-@[simp]
-theorem powersetAux'_nil : powersetAux' (@nil α) = [0] :=
-  rfl
 
 @[simp]
 theorem powersetAux'_cons (a : α) (l : List α) :
@@ -73,10 +71,6 @@ theorem powerset_coe (l : List α) : @powerset α l = ((sublists l).map (↑) : 
 @[simp]
 theorem powerset_coe' (l : List α) : @powerset α l = ((sublists' l).map (↑) : List (Multiset α)) :=
   Quot.sound powersetAux_perm_powersetAux'
-
-@[simp]
-theorem powerset_zero : @powerset α 0 = {0} :=
-  rfl
 
 @[simp]
 theorem powerset_cons (a : α) (s) : powerset (a ::ₘ s) = powerset s + map (cons a) (powerset s) :=
@@ -158,10 +152,6 @@ theorem powersetCardAux_zero (l : List α) : powersetCardAux 0 l = [0] := by
   simp [powersetCardAux_eq_map_coe]
 
 @[simp]
-theorem powersetCardAux_nil (n : ℕ) : powersetCardAux (n + 1) (@nil α) = [] :=
-  rfl
-
-@[simp]
 theorem powersetCardAux_cons (n : ℕ) (a : α) (l : List α) :
     powersetCardAux (n + 1) (a :: l) =
       powersetCardAux (n + 1) l ++ List.map (cons a) (powersetCardAux n l) := by
@@ -190,9 +180,6 @@ theorem powersetCardAux_perm {n} {l₁ l₂ : List α} (p : l₁ ~ l₂) :
 def powersetCard (n : ℕ) (s : Multiset α) : Multiset (Multiset α) :=
   Quot.liftOn s (fun l => (powersetCardAux n l : Multiset (Multiset α))) fun _ _ h =>
     Quot.sound (powersetCardAux_perm h)
-
-theorem powersetCard_coe' (n) (l : List α) : @powersetCard α n l = powersetCardAux n l :=
-  rfl
 
 theorem powersetCard_coe (n) (l : List α) :
     @powersetCard α n l = ((sublistsLen n l).map (↑) : List (Multiset α)) :=

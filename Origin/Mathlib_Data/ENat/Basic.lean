@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ENat/Basic.lean
-Genuine: 53 | Conflates: 0 | Dissolved: 10 | Infrastructure: 33
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas
@@ -10,6 +10,8 @@ import Mathlib.Data.ENat.Defs
 import Mathlib.Data.Nat.Cast.Order.Basic
 import Mathlib.Data.Nat.SuccPred
 import Mathlib.Order.Nat
+
+noncomputable section
 
 /-!
 # Definition and basic properties of extended natural numbers
@@ -56,31 +58,18 @@ instance : CharZero ℕ∞ := inferInstanceAs (CharZero (WithTop ℕ))
 
 variable {a b c m n : ℕ∞}
 
-@[simp] theorem some_eq_coe : (WithTop.some : ℕ → ℕ∞) = Nat.cast := rfl
-
 theorem coe_inj {a b : ℕ} : (a : ℕ∞) = b ↔ a = b := WithTop.coe_inj
 
 instance : SuccAddOrder ℕ∞ where
   succ_eq_add_one x := by cases x <;> simp [SuccOrder.succ]
 
-theorem coe_zero : ((0 : ℕ) : ℕ∞) = 0 :=
-  rfl
-
-theorem coe_one : ((1 : ℕ) : ℕ∞) = 1 :=
-  rfl
-
-theorem coe_add (m n : ℕ) : ↑(m + n) = (m + n : ℕ∞) :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_sub (m n : ℕ) : ↑(m - n) = (m - n : ℕ∞) :=
   rfl
 
-@[simp] lemma coe_mul (m n : ℕ) : ↑(m * n) = (m * n : ℕ∞) := rfl
+@[simp] theorem mul_top (hm : m ≠ 0) : m * ⊤ = ⊤ := WithTop.mul_top hm
 
--- DISSOLVED: mul_top
-
--- DISSOLVED: top_mul
+@[simp] theorem top_mul (hm : m ≠ 0) : ⊤ * m = ⊤ := WithTop.top_mul hm
 
 theorem top_pow {n : ℕ} (n_pos : 0 < n) : (⊤ : ℕ∞) ^ n = ⊤ := WithTop.top_pow n_pos
 
@@ -89,8 +78,6 @@ def lift (x : ℕ∞) (h : x < ⊤) : ℕ := WithTop.untop x (WithTop.lt_top_iff
 @[simp] theorem coe_lift (x : ℕ∞) (h : x < ⊤) : (lift x h : ℕ∞) = x :=
   WithTop.coe_untop x (WithTop.lt_top_iff_ne_top.mp h)
 
-@[simp] theorem lift_coe (n : ℕ) : lift (n : ℕ∞) (WithTop.coe_lt_top n) = n := rfl
-
 @[simp] theorem lift_lt_iff {x : ℕ∞} {h} {n : ℕ} : lift x h < n ↔ x < n := WithTop.untop_lt_iff _
 
 @[simp] theorem lift_le_iff {x : ℕ∞} {h} {n : ℕ} : lift x h ≤ n ↔ x ≤ n := WithTop.untop_le_iff _
@@ -98,13 +85,6 @@ def lift (x : ℕ∞) (h : x < ⊤) : ℕ := WithTop.untop x (WithTop.lt_top_iff
 @[simp] theorem lt_lift_iff {x : ℕ} {n : ℕ∞} {h} : x < lift n h ↔ x < n := WithTop.lt_untop_iff _
 
 @[simp] theorem le_lift_iff {x : ℕ} {n : ℕ∞} {h} : x ≤ lift n h ↔ x ≤ n := WithTop.le_untop_iff _
-
-@[simp] theorem lift_zero : lift 0 (WithTop.coe_lt_top 0) = 0 := rfl
-
-@[simp] theorem lift_one : lift 1 (WithTop.coe_lt_top 1) = 1 := rfl
-
-@[simp] theorem lift_ofNat (n : ℕ) [n.AtLeastTwo] :
-    lift (no_index (OfNat.ofNat n)) (WithTop.coe_lt_top n) = OfNat.ofNat n := rfl
 
 @[simp] theorem add_lt_top {a b : ℕ∞} : a + b < ⊤ ↔ a < ⊤ ∧ b < ⊤ := WithTop.add_lt_top
 
@@ -121,30 +101,8 @@ instance : WellFoundedRelation ℕ∞ where
 
 def toNat : ℕ∞ → ℕ := WithTop.untop' 0
 
-def toNatHom : MonoidWithZeroHom ℕ∞ ℕ where
-  toFun := toNat
-  map_one' := rfl
-  map_zero' := rfl
-  map_mul' := WithTop.untop'_zero_mul
-
-@[simp, norm_cast] lemma coe_toNatHom : toNatHom = toNat := rfl
-
-lemma toNatHom_apply (n : ℕ) : toNatHom n = toNat n := rfl
-
 @[simp]
 theorem toNat_coe (n : ℕ) : toNat n = n :=
-  rfl
-
-@[simp]
-theorem toNat_zero : toNat 0 = 0 :=
-  rfl
-
-@[simp]
-theorem toNat_one : toNat 1 = 1 :=
-  rfl
-
-@[simp]
-theorem toNat_ofNat (n : ℕ) [n.AtLeastTwo] : toNat (no_index (OfNat.ofNat n)) = n :=
   rfl
 
 @[simp]
@@ -154,19 +112,6 @@ theorem toNat_top : toNat ⊤ = 0 :=
 @[simp] theorem toNat_eq_zero : toNat n = 0 ↔ n = 0 ∨ n = ⊤ := WithTop.untop'_eq_self_iff
 
 @[simp]
-theorem recTopCoe_zero {C : ℕ∞ → Sort*} (d : C ⊤) (f : ∀ a : ℕ, C a) : @recTopCoe C d f 0 = f 0 :=
-  rfl
-
-@[simp]
-theorem recTopCoe_one {C : ℕ∞ → Sort*} (d : C ⊤) (f : ∀ a : ℕ, C a) : @recTopCoe C d f 1 = f 1 :=
-  rfl
-
-@[simp]
-theorem recTopCoe_ofNat {C : ℕ∞ → Sort*} (d : C ⊤) (f : ∀ a : ℕ, C a) (x : ℕ) [x.AtLeastTwo] :
-    @recTopCoe C d f (no_index (OfNat.ofNat x)) = f (OfNat.ofNat x) :=
-  rfl
-
-@[simp]
 theorem top_ne_coe (a : ℕ) : ⊤ ≠ (a : ℕ∞) :=
   nofun
 
@@ -174,9 +119,9 @@ theorem top_ne_coe (a : ℕ) : ⊤ ≠ (a : ℕ∞) :=
 theorem top_ne_ofNat (a : ℕ) [a.AtLeastTwo] : ⊤ ≠ (no_index (OfNat.ofNat a : ℕ∞)) :=
   nofun
 
--- DISSOLVED: top_ne_zero
+@[simp] lemma top_ne_zero : (⊤ : ℕ∞) ≠ 0 := nofun
 
--- DISSOLVED: top_ne_one
+@[simp] lemma top_ne_one : (⊤ : ℕ∞) ≠ 1 := nofun
 
 @[simp]
 theorem coe_ne_top (a : ℕ) : (a : ℕ∞) ≠ ⊤ :=
@@ -231,7 +176,8 @@ theorem toNat_sub {n : ℕ∞} (hn : n ≠ ⊤) (m : ℕ∞) : toNat (m - n) = t
   · rw [top_sub_coe, toNat_top, zero_tsub]
   · rw [← coe_sub, toNat_coe, toNat_coe, toNat_coe]
 
--- DISSOLVED: toNat_eq_iff
+theorem toNat_eq_iff {m : ℕ∞} {n : ℕ} (hn : n ≠ 0) : toNat m = n ↔ m = n := by
+  induction m <;> simp [hn.symm]
 
 lemma toNat_le_of_le_coe {m : ℕ∞} {n : ℕ} (h : m ≤ n) : toNat m ≤ n := by
   lift m to ℕ using ne_top_of_le_ne_top (coe_ne_top n) h
@@ -254,7 +200,8 @@ theorem add_one_le_iff (hm : m ≠ ⊤) : m + 1 ≤ n ↔ m < n :=
 theorem one_le_iff_pos : 1 ≤ n ↔ 0 < n :=
   Order.one_le_iff_pos
 
--- DISSOLVED: one_le_iff_ne_zero
+theorem one_le_iff_ne_zero : 1 ≤ n ↔ n ≠ 0 :=
+  Order.one_le_iff_pos.trans pos_iff_ne_zero
 
 lemma lt_one_iff_eq_zero : n < 1 ↔ n = 0 :=
   not_le.symm.trans one_le_iff_ne_zero.not_left
@@ -275,8 +222,6 @@ lemma not_lt_zero (n : ℕ∞) : ¬ n < 0 := by
 @[simp]
 lemma coe_lt_top (n : ℕ) : (n : ℕ∞) < ⊤ :=
   WithTop.coe_lt_top n
-
-lemma coe_lt_coe {n m : ℕ} : (n : ℕ∞) < (m : ℕ∞) ↔ n < m := by simp
 
 lemma coe_le_coe {n m : ℕ} : (n : ℕ∞) ≤ (m : ℕ∞) ↔ n ≤ m := by simp
 
@@ -318,9 +263,11 @@ protected lemma sub_sub_cancel (h : a ≠ ⊤) (h2 : b ≤ a) : a - (a - b) = b 
 
 section withTop_enat
 
--- DISSOLVED: add_one_natCast_le_withTop_of_lt
-
-@[simp] lemma coe_top_add_one : ((⊤ : ℕ∞) : WithTop ℕ∞) + 1 = (⊤ : ℕ∞) := rfl
+lemma add_one_natCast_le_withTop_of_lt {m : ℕ} {n : WithTop ℕ∞} (h : m < n) : (m + 1 : ℕ) ≤ n := by
+  match n with
+  | ⊤ => exact le_top
+  | (⊤ : ℕ∞) => exact WithTop.coe_le_coe.2 (OrderTop.le_top _)
+  | (n : ℕ) => simpa only [Nat.cast_le, ge_iff_le, Nat.cast_lt] using h
 
 @[simp] lemma add_one_eq_coe_top_iff {n : WithTop ℕ∞} : n + 1 = (⊤ : ℕ∞) ↔ n = (⊤ : ℕ∞) := by
   match n with
@@ -332,11 +279,15 @@ section withTop_enat
 
 alias nat_ne_coe_top := natCast_ne_coe_top
 
--- DISSOLVED: one_le_iff_ne_zero_withTop
+lemma one_le_iff_ne_zero_withTop {n : WithTop ℕ∞} : 1 ≤ n ↔ n ≠ 0 :=
+  ⟨fun h ↦ (zero_lt_one.trans_le h).ne',
+    fun h ↦ add_one_natCast_le_withTop_of_lt (pos_iff_ne_zero.mpr h)⟩
 
--- DISSOLVED: natCast_le_of_coe_top_le_withTop
+lemma natCast_le_of_coe_top_le_withTop {N : WithTop ℕ∞} (hN : (⊤ : ℕ∞) ≤ N) (n : ℕ) : n ≤ N :=
+  le_trans (mod_cast le_top) hN
 
--- DISSOLVED: natCast_lt_of_coe_top_le_withTop
+lemma natCast_lt_of_coe_top_le_withTop {N : WithTop ℕ∞} (hN : (⊤ : ℕ∞) ≤ N) (n : ℕ) : n < N :=
+  lt_of_lt_of_le (mod_cast lt_add_one n) (natCast_le_of_coe_top_le_withTop hN (n + 1))
 
 end withTop_enat
 

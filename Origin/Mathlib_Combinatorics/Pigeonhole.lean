@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.BigOperators
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.Nat.ModEq
 
+noncomputable section
+
 /-!
 # Pigeonhole principles
 

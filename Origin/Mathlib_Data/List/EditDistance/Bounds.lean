@@ -8,6 +8,8 @@ import Mathlib.Data.List.Infix
 import Mathlib.Data.List.MinMax
 import Mathlib.Data.List.EditDistance.Defs
 
+noncomputable section
+
 /-!
 # Lower bounds for Levenshtein distances
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Ring.Basic
 import Mathlib.Tactic.NormNum.Ineq
 
+noncomputable section
+
 /-!
 # Automation for proving inequalities in commutative (semi)rings
 
@@ -184,6 +186,9 @@ theorem lt_congr {α : Type*} [LT α] {a b c d : α} (h1 : a = b) (h2 : b < c) (
   rwa [h1, h3]
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- Prove goals of the form `A ≤ B` in an ordered commutative semiring, if the ring-normal forms of
+
+`A` and `B` differ by a nonnegative (additive) constant. -/
 
 def proveLE (g : MVarId) : MetaM Unit := do
   let some (α, e₁, e₂) := (← whnfR <|← instantiateMVars <|← g.getType).le?
@@ -207,6 +212,9 @@ def proveLE (g : MVarId) : MetaM Unit := do
     | tooSmall => throwError "comparison failed, LHS is larger\n{g'.mvarId!}"
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- Prove goals of the form `A < B` in an ordered commutative semiring, if the ring-normal forms of
+
+`A` and `B` differ by a positive (additive) constant. -/
 
 def proveLT (g : MVarId) : MetaM Unit := do
   let some (α, e₁, e₂) := (← whnfR <|← instantiateMVars <|← g.getType).lt?

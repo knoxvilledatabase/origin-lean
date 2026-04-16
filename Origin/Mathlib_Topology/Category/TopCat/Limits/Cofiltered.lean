@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.TopCat.Limits.Basic
 import Mathlib.CategoryTheory.Filtered.Basic
 
+noncomputable section
+
 /-!
 # Cofiltered limits in the category of topological spaces
 

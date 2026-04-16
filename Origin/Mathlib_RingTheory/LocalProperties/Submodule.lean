@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/LocalProperties/Submodule.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Submodule
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.RingTheory.Localization.Away.Basic
+
+noncomputable section
 
 /-!
 # Local properties of modules and submodules
@@ -96,7 +98,6 @@ theorem LinearMap.eq_of_localization_maximal (g g' : M →ₗ[R] M₁)
     simpa only [IsLocalizedModule.map_apply] using DFunLike.congr_fun (h P) (f P x)
 
 include f in
-
 theorem Module.subsingleton_of_localization_maximal
     (h : ∀ (P : Ideal R) [P.IsMaximal], Subsingleton (Mₚ P)) :
     Subsingleton M := by

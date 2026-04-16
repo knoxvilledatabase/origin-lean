@@ -9,6 +9,8 @@ import Mathlib.Tactic.Lemma
 import Mathlib.Tactic.SplitIfs
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Orders
 

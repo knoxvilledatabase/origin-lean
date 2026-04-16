@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import Mathlib.RingTheory.LocalProperties.IntegrallyClosed
 
+noncomputable section
+
 /-!
 # Dedekind domains
 

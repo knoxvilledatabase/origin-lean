@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Basic
 import Mathlib.Data.Multiset.Bind
 import Mathlib.Order.SetNotation
 
+noncomputable section
+
 /-!
 # Unions of finite sets
 
@@ -39,8 +41,6 @@ def disjiUnion (s : Finset α) (t : α → Finset β) (hf : (s : Set α).Pairwis
 @[simp]
 lemma disjiUnion_val (s : Finset α) (t : α → Finset β) (h) :
     (s.disjiUnion t h).1 = s.1.bind fun a ↦ (t a).1 := rfl
-
-@[simp] lemma disjiUnion_empty (t : α → Finset β) : disjiUnion ∅ t (by simp) = ∅ := rfl
 
 @[simp] lemma mem_disjiUnion {b : β} {h} : b ∈ s.disjiUnion t h ↔ ∃ a ∈ s, b ∈ t a := by
   simp only [mem_def, disjiUnion_val, Multiset.mem_bind, exists_prop]

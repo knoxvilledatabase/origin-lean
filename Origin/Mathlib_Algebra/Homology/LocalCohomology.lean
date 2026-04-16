@@ -11,6 +11,8 @@ import Mathlib.RingTheory.Finiteness.Ideal
 import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.Noetherian.Defs
 
+noncomputable section
+
 /-!
 # Local cohomology.
 

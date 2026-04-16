@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Archimedean
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Topology on archimedean groups and fields
 

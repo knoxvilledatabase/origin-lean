@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Basis.Cardinality
 import Mathlib.LinearAlgebra.Dual
 import Mathlib.Data.Fin.FlagRange
 
+noncomputable section
+
 /-!
 # Flag of submodules defined by a basis
 
@@ -106,10 +108,6 @@ theorem flag_wcovBy (b : Basis (Fin n) K V) (i : Fin n) :
 @[simps!]
 def toFlag (b : Basis (Fin n) K V) : Flag (Submodule K V) :=
   .rangeFin b.flag b.flag_zero b.flag_last b.flag_wcovBy
-
-@[simp]
-theorem mem_toFlag (b : Basis (Fin n) K V) {p : Submodule K V} : p ∈ b.toFlag ↔ ∃ k, b.flag k = p :=
-  Iff.rfl
 
 theorem isMaxChain_range_flag (b : Basis (Fin n) K V) : IsMaxChain (· ≤ ·) (range b.flag) :=
   b.toFlag.maxChain

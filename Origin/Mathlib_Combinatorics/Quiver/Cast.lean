@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.Quiver.Basic
 import Mathlib.Combinatorics.Quiver.Path
 
+noncomputable section
+
 /-!
 
 # Rewriting arrows and paths along vertex equalities
@@ -31,10 +33,6 @@ def Hom.cast {u v u' v' : U} (hu : u = u') (hv : v = v') (e : u ⟶ v) : u' ⟶ 
 theorem Hom.cast_eq_cast {u v u' v' : U} (hu : u = u') (hv : v = v') (e : u ⟶ v) :
     e.cast hu hv = _root_.cast (by {rw [hu, hv]}) e := by
   subst_vars
-  rfl
-
-@[simp]
-theorem Hom.cast_rfl_rfl {u v : U} (e : u ⟶ v) : e.cast rfl rfl = e :=
   rfl
 
 @[simp]
@@ -71,10 +69,6 @@ def Path.cast {u v u' v' : U} (hu : u = u') (hv : v = v') (p : Path u v) : Path 
 theorem Path.cast_eq_cast {u v u' v' : U} (hu : u = u') (hv : v = v') (p : Path u v) :
     p.cast hu hv = _root_.cast (by rw [hu, hv]) p := by
   subst_vars
-  rfl
-
-@[simp]
-theorem Path.cast_rfl_rfl {u v : U} (p : Path u v) : p.cast rfl rfl = p :=
   rfl
 
 @[simp]

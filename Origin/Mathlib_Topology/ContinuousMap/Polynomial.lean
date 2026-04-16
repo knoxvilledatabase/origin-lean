@@ -8,6 +8,8 @@ import Mathlib.Topology.ContinuousMap.Star
 import Mathlib.Topology.UnitInterval
 import Mathlib.Algebra.Star.Subalgebra
 
+noncomputable section
+
 /-!
 # Constructions relating polynomial functions and continuous functions.
 

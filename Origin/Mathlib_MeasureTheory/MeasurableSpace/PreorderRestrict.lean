@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Restriction
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 
+noncomputable section
+
 /-!
 # Measurability of the restriction function for functions indexed by a preorder
 

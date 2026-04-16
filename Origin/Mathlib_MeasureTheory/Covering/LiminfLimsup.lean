@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.Covering.DensityTheorem
 
+noncomputable section
+
 /-!
 # Liminf, limsup, and uniformly locally doubling measures.
 

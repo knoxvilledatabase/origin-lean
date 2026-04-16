@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Coalgebra.Basic
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Bialgebras
 
@@ -139,7 +141,6 @@ variable (R : Type u) [CommSemiring R]
 open Bialgebra
 
 noncomputable
-
 instance toBialgebra : Bialgebra R R where
   mul_compr₂_counit := by ext; simp
   counit_one := rfl

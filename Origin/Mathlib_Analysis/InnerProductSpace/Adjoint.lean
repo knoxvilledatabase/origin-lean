@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.InnerProductSpace.PiL2
 
+noncomputable section
+
 /-!
 # Adjoint of operators on Hilbert spaces
 
@@ -180,9 +182,6 @@ instance : StarModule 𝕜 (E →L[𝕜] E) :=
 theorem star_eq_adjoint (A : E →L[𝕜] E) : star A = A† :=
   rfl
 
-theorem isSelfAdjoint_iff' {A : E →L[𝕜] E} : IsSelfAdjoint A ↔ ContinuousLinearMap.adjoint A = A :=
-  Iff.rfl
-
 theorem norm_adjoint_comp_self (A : E →L[𝕜] F) :
     ‖ContinuousLinearMap.adjoint A ∘L A‖ = ‖A‖ * ‖A‖ := by
   refine le_antisymm ?_ ?_
@@ -272,13 +271,6 @@ variable {T : E →ₗ[𝕜] E}
 def IsSymmetric.toSelfAdjoint (hT : IsSymmetric T) : selfAdjoint (E →L[𝕜] E) :=
   ⟨⟨T, hT.continuous⟩, ContinuousLinearMap.isSelfAdjoint_iff_isSymmetric.mpr hT⟩
 
-theorem IsSymmetric.coe_toSelfAdjoint (hT : IsSymmetric T) : (hT.toSelfAdjoint : E →ₗ[𝕜] E) = T :=
-  rfl
-
-theorem IsSymmetric.toSelfAdjoint_apply (hT : IsSymmetric T) {x : E} :
-    (hT.toSelfAdjoint : E → E) x = T x :=
-  rfl
-
 end LinearMap
 
 namespace LinearMap
@@ -300,13 +292,6 @@ def adjoint : (E →ₗ[𝕜] F) ≃ₗ⋆[𝕜] F →ₗ[𝕜] E :=
   ((LinearMap.toContinuousLinearMap : (E →ₗ[𝕜] F) ≃ₗ[𝕜] E →L[𝕜] F).trans
       ContinuousLinearMap.adjoint.toLinearEquiv).trans
     LinearMap.toContinuousLinearMap.symm
-
-theorem adjoint_toContinuousLinearMap (A : E →ₗ[𝕜] F) :
-    haveI := FiniteDimensional.complete 𝕜 E
-    haveI := FiniteDimensional.complete 𝕜 F
-    LinearMap.toContinuousLinearMap (LinearMap.adjoint A) =
-      ContinuousLinearMap.adjoint (LinearMap.toContinuousLinearMap A) :=
-  rfl
 
 theorem adjoint_eq_toCLM_adjoint (A : E →ₗ[𝕜] F) :
     haveI := FiniteDimensional.complete 𝕜 E
@@ -380,9 +365,6 @@ instance : StarModule 𝕜 (E →ₗ[𝕜] E) :=
 
 theorem star_eq_adjoint (A : E →ₗ[𝕜] E) : star A = LinearMap.adjoint A :=
   rfl
-
-theorem isSelfAdjoint_iff' {A : E →ₗ[𝕜] E} : IsSelfAdjoint A ↔ LinearMap.adjoint A = A :=
-  Iff.rfl
 
 theorem isSymmetric_iff_isSelfAdjoint (A : E →ₗ[𝕜] E) : IsSymmetric A ↔ IsSelfAdjoint A := by
   rw [isSelfAdjoint_iff', IsSymmetric, ← LinearMap.eq_adjoint_iff]
@@ -492,16 +474,6 @@ noncomputable def linearIsometryEquiv : unitary (H →L[𝕜] H) ≃* (H ≃ₗ�
   left_inv _ := Subtype.ext rfl
   right_inv _ := LinearIsometryEquiv.ext fun _ ↦ rfl
   map_mul' u v := by ext; rfl
-
-@[simp]
-lemma linearIsometryEquiv_coe_apply (u : unitary (H →L[𝕜] H)) :
-    linearIsometryEquiv u = (u : H →L[𝕜] H) :=
-  rfl
-
-@[simp]
-lemma linearIsometryEquiv_coe_symm_apply (e : H ≃ₗᵢ[𝕜] H) :
-    linearIsometryEquiv.symm e = (e : H →L[𝕜] H) :=
-  rfl
 
 end unitary
 

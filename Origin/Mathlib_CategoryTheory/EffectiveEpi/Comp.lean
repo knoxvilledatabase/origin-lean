@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.CategoryTheory.EffectiveEpi.Basic
 
+noncomputable section
+
 /-!
 
 # Composition of effective epimorphisms
@@ -20,7 +22,6 @@ open Limits Category
 variable {C : Type*} [Category C]
 
 noncomputable
-
 def effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi' {α : Type*} {B : C} {X Y : α → C}
     (f : (a : α) → X a ⟶ B) (g : (a : α) → Y a ⟶ X a) (i : (a : α) → X a ⟶ Y a)
     (hi : ∀ a, i a ≫ g a = 𝟙 _) [EffectiveEpiFamily _ f] :
@@ -43,7 +44,6 @@ def effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi' {α : Type*} {B : C} {X 
     rw [← hm a, ← Category.assoc, ← Category.assoc, hi, Category.id_comp]
 
 noncomputable
-
 def effectiveEpiFamilyStructCompOfEffectiveEpiSplitEpi {α : Type*} {B : C} {X Y : α → C}
     (f : (a : α) → X a ⟶ B) (g : (a : α) → Y a ⟶ X a) [∀ a, IsSplitEpi (g a)]
     [EffectiveEpiFamily _ f] : EffectiveEpiFamilyStruct _ (fun a ↦ g a ≫ f a) :=
@@ -106,7 +106,6 @@ theorem effectiveEpiFamilyStructCompIso_aux
 variable [EffectiveEpiFamily X π] [IsIso i]
 
 noncomputable
-
 def effectiveEpiFamilyStructCompIso : EffectiveEpiFamilyStruct X (fun a ↦ π a ≫ i) where
   desc e h := inv i ≫ EffectiveEpiFamily.desc X π e (effectiveEpiFamilyStructCompIso_aux X π i e h)
   fac _ _ _ := by simp

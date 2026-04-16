@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE
 import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.Order.Filter.Tendsto
 
+noncomputable section
+
 /-!
 # Germ of a function at a filter
 
@@ -120,15 +122,6 @@ lemma isConstant_comp {l : Filter α} {f : α → β} {g : β → γ}
   obtain ⟨b, hb⟩ := h
   exact ⟨g b, hb.fun_comp g⟩
 
-@[simp]
-theorem quot_mk_eq_coe (l : Filter α) (f : α → β) : Quot.mk _ f = (f : Germ l β) :=
-  rfl
-
-@[simp]
-theorem mk'_eq_coe (l : Filter α) (f : α → β) :
-    @Quotient.mk' _ (germSetoid _ _) f = (f : Germ l β) :=
-  rfl
-
 @[elab_as_elim]
 theorem inductionOn (f : Germ l β) {p : Germ l β → Prop} (h : ∀ f : α → β, p f) : p f :=
   Quotient.inductionOn' f h
@@ -152,11 +145,6 @@ def liftOn {γ : Sort*} (f : Germ l β) (F : (α → β) → γ) (hF : (l.Eventu
     γ :=
   Quotient.liftOn' f F hF
 
-@[simp]
-theorem map'_coe {lc : Filter γ} (F : (α → β) → γ → δ) (hF : (l.EventuallyEq ⇒ lc.EventuallyEq) F F)
-    (f : α → β) : map' F hF f = F f :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_eq : (f : Germ l β) = g ↔ f =ᶠ[l] g :=
   Quotient.eq''
@@ -165,10 +153,6 @@ alias ⟨_, _root_.Filter.EventuallyEq.germ_eq⟩ := coe_eq
 
 def map (op : β → γ) : Germ l β → Germ l γ :=
   map' (op ∘ ·) fun _ _ H => H.mono fun _ H => congr_arg op H
-
-@[simp]
-theorem map_coe (op : β → γ) (f : α → β) : map op (f : Germ l β) = op ∘ f :=
-  rfl
 
 @[simp]
 theorem map_id : map id = (id : Germ l β → Germ l β) := by
@@ -183,11 +167,6 @@ def map₂ (op : β → γ → δ) : Germ l β → Germ l γ → Germ l δ :=
   Quotient.map₂' (fun f g x => op (f x) (g x)) fun f f' Hf g g' Hg =>
     Hg.mp <| Hf.mono fun x Hf Hg => by simp only [Hf, Hg]
 
-@[simp]
-theorem map₂_coe (op : β → γ → δ) (f : α → β) (g : α → γ) :
-    map₂ op (f : Germ l β) g = fun x => op (f x) (g x) :=
-  rfl
-
 protected def Tendsto (f : Germ l β) (lb : Filter β) : Prop :=
   liftOn f (fun f => Tendsto f l lb) fun _f _g H => propext (tendsto_congr' H)
 
@@ -201,23 +180,8 @@ def compTendsto' (f : Germ l β) {lc : Filter γ} (g : Germ lc α) (hg : g.Tends
   liftOn f (fun f => g.map f) fun _f₁ _f₂ hF =>
     inductionOn g (fun _g hg => coe_eq.2 <| hg.eventually hF) hg
 
-@[simp]
-theorem coe_compTendsto' (f : α → β) {lc : Filter γ} {g : Germ lc α} (hg : g.Tendsto l) :
-    (f : Germ l β).compTendsto' g hg = g.map f :=
-  rfl
-
 def compTendsto (f : Germ l β) {lc : Filter γ} (g : γ → α) (hg : Tendsto g lc l) : Germ lc β :=
   f.compTendsto' _ hg.germ_tendsto
-
-@[simp]
-theorem coe_compTendsto (f : α → β) {lc : Filter γ} {g : γ → α} (hg : Tendsto g lc l) :
-    (f : Germ l β).compTendsto g hg = f ∘ g :=
-  rfl
-
-@[simp, nolint simpNF]
-theorem compTendsto'_coe (f : Germ l β) {lc : Filter γ} {g : γ → α} (hg : Tendsto g lc l) :
-    f.compTendsto' _ hg.germ_tendsto = f.compTendsto g hg :=
-  rfl
 
 theorem Filter.Tendsto.congr_germ {f g : β → γ} {l : Filter α} {l' : Filter β} (h : f =ᶠ[l'] g)
     {φ : α → β} (hφ : Tendsto φ l l') : (f ∘ φ : Germ l γ) = g ∘ φ :=
@@ -238,15 +202,6 @@ theorem const_inj [NeBot l] {a b : β} : (↑a : Germ l β) = ↑b ↔ a = b :=
   coe_eq.trans const_eventuallyEq
 
 @[simp]
-theorem map_const (l : Filter α) (a : β) (f : β → γ) : (↑a : Germ l β).map f = ↑(f a) :=
-  rfl
-
-@[simp]
-theorem map₂_const (l : Filter α) (b : β) (c : γ) (f : β → γ → δ) :
-    map₂ f (↑b : Germ l β) ↑c = ↑(f b c) :=
-  rfl
-
-@[simp]
 theorem const_compTendsto {l : Filter α} (b : β) {lc : Filter γ} {g : γ → α} (hg : Tendsto g lc l) :
     (↑b : Germ l β).compTendsto g hg = ↑b :=
   rfl
@@ -260,10 +215,6 @@ def LiftPred (p : β → Prop) (f : Germ l β) : Prop :=
   liftOn f (fun f => ∀ᶠ x in l, p (f x)) fun _f _g H =>
     propext <| eventually_congr <| H.mono fun _x hx => hx ▸ Iff.rfl
 
-@[simp]
-theorem liftPred_coe {p : β → Prop} {f : α → β} : LiftPred p (f : Germ l β) ↔ ∀ᶠ x in l, p (f x) :=
-  Iff.rfl
-
 theorem liftPred_const {p : β → Prop} {x : β} (hx : p x) : LiftPred p (↑x : Germ l β) :=
   Eventually.of_forall fun _y => hx
 
@@ -274,11 +225,6 @@ theorem liftPred_const_iff [NeBot l] {p : β → Prop} {x : β} : LiftPred p (�
 def LiftRel (r : β → γ → Prop) (f : Germ l β) (g : Germ l γ) : Prop :=
   Quotient.liftOn₂' f g (fun f g => ∀ᶠ x in l, r (f x) (g x)) fun _f _g _f' _g' Hf Hg =>
     propext <| eventually_congr <| Hg.mp <| Hf.mono fun _x hf hg => hf ▸ hg ▸ Iff.rfl
-
-@[simp]
-theorem liftRel_coe {r : β → γ → Prop} {f : α → β} {g : α → γ} :
-    LiftRel r (f : Germ l β) g ↔ ∀ᶠ x in l, r (f x) (g x) :=
-  Iff.rfl
 
 theorem liftRel_const {r : β → γ → Prop} {x : β} {y : γ} (h : r x y) :
     LiftRel r (↑x : Germ l β) ↑y :=
@@ -296,10 +242,6 @@ section Monoid
 variable {M : Type*} {G : Type*}
 
 @[to_additive] instance instMul [Mul M] : Mul (Germ l M) := ⟨map₂ (· * ·)⟩
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_mul [Mul M] (f g : α → M) : ↑(f * g) = (f * g : Germ l M) :=
-  rfl
 
 @[to_additive] instance instOne [One M] : One (Germ l M) := ⟨↑(1 : M)⟩
 
@@ -354,18 +296,6 @@ instance instPow [Pow G M] : Pow (Germ l G) M where pow f n := map (· ^ n) f
 theorem coe_smul [SMul M G] (n : M) (f : α → G) : ↑(n • f) = n • (f : Germ l G) :=
   rfl
 
-@[to_additive (attr := simp, norm_cast)]
-theorem const_smul [SMul M G] (n : M) (a : G) : (↑(n • a) : Germ l G) = n • (↑a : Germ l G) :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_pow [Pow G M] (f : α → G) (n : M) : ↑(f ^ n) = (f : Germ l G) ^ n :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem const_pow [Pow G M] (a : G) (n : M) : (↑(a ^ n) : Germ l G) = (↑a : Germ l G) ^ n :=
-  rfl
-
 @[to_additive]
 instance instMonoid [Monoid M] : Monoid (Germ l M) :=
   { Function.Surjective.monoid ofFun Quot.mk_surjective (by rfl)
@@ -378,36 +308,13 @@ instance instMonoid [Monoid M] : Monoid (Germ l M) :=
 def coeMulHom [Monoid M] (l : Filter α) : (α → M) →* Germ l M where
   toFun := ofFun; map_one' := rfl; map_mul' _ _ := rfl
 
-@[to_additive (attr := simp)]
-theorem coe_coeMulHom [Monoid M] : (coeMulHom l : (α → M) → Germ l M) = ofFun :=
-  rfl
-
 @[to_additive]
 instance instCommMonoid [CommMonoid M] : CommMonoid (Germ l M) :=
   { mul_comm := mul_comm }
 
 instance instNatCast [NatCast M] : NatCast (Germ l M) where natCast n := (n : α → M)
 
-@[simp]
-theorem natCast_def [NatCast M] (n : ℕ) : ((fun _ ↦ n : α → M) : Germ l M) = n := rfl
-
-@[simp, norm_cast]
-theorem const_nat [NatCast M] (n : ℕ) : ((n : M) : Germ l M) = n := rfl
-
-@[simp, norm_cast]
-theorem coe_ofNat [NatCast M] (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n : α → M)) : Germ l M) = OfNat.ofNat n :=
-  rfl
-
-@[simp, norm_cast]
-theorem const_ofNat [NatCast M] (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n : M)) : Germ l M) = OfNat.ofNat n :=
-  rfl
-
 instance instIntCast [IntCast M] : IntCast (Germ l M) where intCast n := (n : α → M)
-
-@[simp]
-theorem intCast_def [IntCast M] (n : ℤ) : ((fun _ ↦ n : α → M) : Germ l M) = n := rfl
 
 instance instAddMonoidWithOne [AddMonoidWithOne M] : AddMonoidWithOne (Germ l M) where
   natCast_zero := congrArg ofFun <| by simp; rfl
@@ -418,23 +325,7 @@ instance instAddCommMonoidWithOne [AddCommMonoidWithOne M] : AddCommMonoidWithOn
 
 @[to_additive] instance instInv [Inv G] : Inv (Germ l G) := ⟨map Inv.inv⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_inv [Inv G] (f : α → G) : ↑f⁻¹ = (f⁻¹ : Germ l G) :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem const_inv [Inv G] (a : G) : (↑(a⁻¹) : Germ l G) = (↑a)⁻¹ :=
-  rfl
-
 @[to_additive] instance instDiv [Div M] : Div (Germ l M) := ⟨map₂ (· / ·)⟩
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_div [Div M] (f g : α → M) : ↑(f / g) = (f / g : Germ l M) :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem const_div [Div M] (a b : M) : (↑(a / b) : Germ l M) = ↑a / ↑b :=
-  rfl
 
 @[to_additive]
 instance instInvolutiveInv [InvolutiveInv G] : InvolutiveInv (Germ l G) :=
@@ -560,10 +451,6 @@ instance instCommRing [CommRing R] : CommRing (Germ l R) :=
 def coeRingHom [Semiring R] (l : Filter α) : (α → R) →+* Germ l R :=
   { (coeMulHom l : _ →* Germ l R), (coeAddHom l : _ →+ Germ l R) with toFun := ofFun }
 
-@[simp]
-theorem coe_coeRingHom [Semiring R] : (coeRingHom l : (α → R) → Germ l R) = ofFun :=
-  rfl
-
 end Ring
 
 section Module
@@ -573,10 +460,6 @@ variable {M N R : Type*}
 @[to_additive]
 instance instSMul' [SMul M β] : SMul (Germ l M) (Germ l β) :=
   ⟨map₂ (· • ·)⟩
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_smul' [SMul M β] (c : α → M) (f : α → β) : ↑(c • f) = (c : Germ l M) • (f : Germ l β) :=
-  rfl
 
 @[to_additive]
 instance instMulAction [Monoid M] [MulAction M β] : MulAction M (Germ l β) where
@@ -635,16 +518,6 @@ end Module
 
 instance instLE [LE β] : LE (Germ l β) := ⟨LiftRel (· ≤ ·)⟩
 
-theorem le_def [LE β] : ((· ≤ ·) : Germ l β → Germ l β → Prop) = LiftRel (· ≤ ·) :=
-  rfl
-
-@[simp]
-theorem coe_le [LE β] : (f : Germ l β) ≤ g ↔ f ≤ᶠ[l] g :=
-  Iff.rfl
-
-theorem coe_nonneg [LE β] [Zero β] {f : α → β} : 0 ≤ (f : Germ l β) ↔ ∀ᶠ x in l, 0 ≤ f x :=
-  Iff.rfl
-
 theorem const_le [LE β] {x y : β} : x ≤ y → (↑x : Germ l β) ≤ ↑y :=
   liftRel_const
 
@@ -664,14 +537,6 @@ instance instBot [Bot β] : Bot (Germ l β) := ⟨↑(⊥ : β)⟩
 
 instance instTop [Top β] : Top (Germ l β) := ⟨↑(⊤ : β)⟩
 
-@[simp, norm_cast]
-theorem const_bot [Bot β] : (↑(⊥ : β) : Germ l β) = ⊥ :=
-  rfl
-
-@[simp, norm_cast]
-theorem const_top [Top β] : (↑(⊤ : β) : Germ l β) = ⊤ :=
-  rfl
-
 instance instOrderBot [LE β] [OrderBot β] : OrderBot (Germ l β) where
   bot_le f := inductionOn f fun _ => Eventually.of_forall fun _ => bot_le
 
@@ -685,14 +550,6 @@ instance instBoundedOrder [LE β] [BoundedOrder β] : BoundedOrder (Germ l β) w
 instance instSup [Max β] : Max (Germ l β) := ⟨map₂ (· ⊔ ·)⟩
 
 instance instInf [Min β] : Min (Germ l β) := ⟨map₂ (· ⊓ ·)⟩
-
-@[simp, norm_cast]
-theorem const_sup [Max β] (a b : β) : ↑(a ⊔ b) = (↑a ⊔ ↑b : Germ l β) :=
-  rfl
-
-@[simp, norm_cast]
-theorem const_inf [Min β] (a b : β) : ↑(a ⊓ b) = (↑a ⊓ ↑b : Germ l β) :=
-  rfl
 
 instance instSemilatticeSup [SemilatticeSup β] : SemilatticeSup (Germ l β) where
   sup := max

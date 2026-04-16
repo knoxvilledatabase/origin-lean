@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Functor.Pseudofunctor
 import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
 
+noncomputable section
+
 /-!
 # Pseudofunctors from locally discrete bicategories
 

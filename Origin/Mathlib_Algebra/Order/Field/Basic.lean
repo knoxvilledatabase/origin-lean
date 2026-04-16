@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Field/Basic.lean
-Genuine: 186 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 190 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Ring.Abs
 import Mathlib.Order.Bounds.OrderIso
 import Mathlib.Tactic.Positivity.Core
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
+
+noncomputable section
 
 /-!
 # Lemmas about linear ordered (semi)fields
@@ -631,9 +633,13 @@ theorem IsLUB.mul_right {s : Set α} (ha : 0 ≤ a) (hs : IsLUB s b) :
 
 /-! ### Miscellaneous lemmas -/
 
--- DISSOLVED: mul_sub_mul_div_mul_neg_iff
+theorem mul_sub_mul_div_mul_neg_iff (hc : c ≠ 0) (hd : d ≠ 0) :
+    (a * d - b * c) / (c * d) < 0 ↔ a / c < b / d := by
+  rw [mul_comm b c, ← div_sub_div _ _ hc hd, sub_lt_zero]
 
--- DISSOLVED: mul_sub_mul_div_mul_nonpos_iff
+theorem mul_sub_mul_div_mul_nonpos_iff (hc : c ≠ 0) (hd : d ≠ 0) :
+    (a * d - b * c) / (c * d) ≤ 0 ↔ a / c ≤ b / d := by
+  rw [mul_comm b c, ← div_sub_div _ _ hc hd, sub_nonpos]
 
 alias ⟨div_lt_div_of_mul_sub_mul_div_neg, mul_sub_mul_div_mul_neg⟩ := mul_sub_mul_div_mul_neg_iff
 
@@ -726,9 +732,11 @@ private lemma div_nonneg_of_pos_of_nonneg (ha : 0 < a) (hb : 0 ≤ b) : 0 ≤ a 
 private lemma div_nonneg_of_nonneg_of_pos (ha : 0 ≤ a) (hb : 0 < b) : 0 ≤ a / b :=
   div_nonneg ha hb.le
 
--- DISSOLVED: div_ne_zero_of_pos_of_ne_zero
+private lemma div_ne_zero_of_pos_of_ne_zero (ha : 0 < a) (hb : b ≠ 0) : a / b ≠ 0 :=
+  div_ne_zero ha.ne' hb
 
--- DISSOLVED: div_ne_zero_of_ne_zero_of_pos
+private lemma div_ne_zero_of_ne_zero_of_pos (ha : a ≠ 0) (hb : 0 < b) : a / b ≠ 0 :=
+  div_ne_zero ha hb.ne'
 
 private lemma zpow_zero_pos (a : α) : 0 < a ^ (0 : ℤ) := zero_lt_one.trans_eq (zpow_zero a).symm
 

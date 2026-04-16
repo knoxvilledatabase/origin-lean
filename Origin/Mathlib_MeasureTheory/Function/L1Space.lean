@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Function/L1Space.lean
-Genuine: 191 | Conflates: 2 | Dissolved: 5 | Infrastructure: 17
+Genuine: 196 | Conflates: 2 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.LpOrder
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Lemmas
+
+noncomputable section
 
 /-!
 # Integrable functions and `L¹` space
@@ -77,8 +79,6 @@ theorem lintegral_edist_triangle {f g h : α → β} (hf : AEStronglyMeasurable 
   refine lintegral_mono fun a => ?_
   apply edist_triangle_right
 
-theorem lintegral_nnnorm_zero : (∫⁻ _ : α, ‖(0 : β)‖₊ ∂μ) = 0 := by simp
-
 theorem lintegral_nnnorm_add_left {f : α → β} (hf : AEStronglyMeasurable f μ) (g : α → γ) :
     ∫⁻ a, ‖f a‖₊ + ‖g a‖₊ ∂μ = (∫⁻ a, ‖f a‖₊ ∂μ) + ∫⁻ a, ‖g a‖₊ ∂μ :=
   lintegral_add_left' hf.ennnorm _
@@ -94,10 +94,6 @@ theorem lintegral_nnnorm_neg {f : α → β} : (∫⁻ a, ‖(-f) a‖₊ ∂μ)
 
 def HasFiniteIntegral {_ : MeasurableSpace α} (f : α → β) (μ : Measure α := by volume_tac) : Prop :=
   (∫⁻ a, ‖f a‖₊ ∂μ) < ∞
-
-theorem hasFiniteIntegral_def {_ : MeasurableSpace α} (f : α → β) (μ : Measure α) :
-    HasFiniteIntegral f μ ↔ ((∫⁻ a, ‖f a‖₊ ∂μ) < ∞) :=
-  Iff.rfl
 
 theorem hasFiniteIntegral_iff_norm (f : α → β) :
     HasFiniteIntegral f μ ↔ (∫⁻ a, ENNReal.ofReal ‖f a‖ ∂μ) < ∞ := by
@@ -446,7 +442,10 @@ lemma Integrable.of_finite [Finite α] [MeasurableSingletonClass α] [IsFiniteMe
 
 lemma Integrable.of_isEmpty [IsEmpty α] {f : α → β} : Integrable f μ := .of_finite
 
--- DISSOLVED: Memℒp.integrable_norm_rpow
+theorem Memℒp.integrable_norm_rpow {f : α → β} {p : ℝ≥0∞} (hf : Memℒp f p μ) (hp_ne_zero : p ≠ 0)
+    (hp_ne_top : p ≠ ∞) : Integrable (fun x : α => ‖f x‖ ^ p.toReal) μ := by
+  rw [← memℒp_one_iff_integrable]
+  exact hf.norm_rpow hp_ne_zero hp_ne_top
 
 theorem Memℒp.integrable_norm_rpow' [IsFiniteMeasure μ] {f : α → β} {p : ℝ≥0∞} (hf : Memℒp f p μ) :
     Integrable (fun x : α => ‖f x‖ ^ p.toReal) μ := by
@@ -504,9 +503,16 @@ theorem Integrable.smul_measure_nnreal {f : α → β} (h : Integrable f μ) {c 
   apply h.smul_measure
   simp
 
--- DISSOLVED: integrable_smul_measure
+theorem integrable_smul_measure {f : α → β} {c : ℝ≥0∞} (h₁ : c ≠ 0) (h₂ : c ≠ ∞) :
+    Integrable f (c • μ) ↔ Integrable f μ :=
+  ⟨fun h => by
+    simpa only [smul_smul, ENNReal.inv_mul_cancel h₁ h₂, one_smul] using
+      h.smul_measure (ENNReal.inv_ne_top.2 h₁),
+    fun h => h.smul_measure h₂⟩
 
--- DISSOLVED: integrable_inv_smul_measure
+theorem integrable_inv_smul_measure {f : α → β} {c : ℝ≥0∞} (h₁ : c ≠ 0) (h₂ : c ≠ ∞) :
+    Integrable f (c⁻¹ • μ) ↔ Integrable f μ :=
+  integrable_smul_measure (by simpa using h₂) (by simpa using h₁)
 
 theorem Integrable.to_average {f : α → β} (h : Integrable f μ) : Integrable f ((μ univ)⁻¹ • μ) := by
   rcases eq_or_ne μ 0 with (rfl | hne)
@@ -697,33 +703,6 @@ theorem Integrable.bdd_mul {F : Type*} [NormedDivisionRing F] {f g : α → F} (
     simp only [ENNReal.coe_mul]
     rw [lintegral_const_mul' _ _ ENNReal.coe_ne_top]
     exact ENNReal.mul_lt_top ENNReal.coe_lt_top hint.2
-
-theorem Integrable.essSup_smul {𝕜 : Type*} [NormedField 𝕜] [NormedSpace 𝕜 β] {f : α → β}
-    (hf : Integrable f μ) {g : α → 𝕜} (g_aestronglyMeasurable : AEStronglyMeasurable g μ)
-    (ess_sup_g : essSup (fun x => (‖g x‖₊ : ℝ≥0∞)) μ ≠ ∞) :
-    Integrable (fun x : α => g x • f x) μ := by
-  rw [← memℒp_one_iff_integrable] at *
-  refine ⟨g_aestronglyMeasurable.smul hf.1, ?_⟩
-  have h : (1 : ℝ≥0∞) / 1 = 1 / ∞ + 1 / 1 := by norm_num
-  have hg' : eLpNorm g ∞ μ ≠ ∞ := by rwa [eLpNorm_exponent_top]
-  calc
-    eLpNorm (fun x : α => g x • f x) 1 μ ≤ _ := by
-      simpa using MeasureTheory.eLpNorm_smul_le_mul_eLpNorm hf.1 g_aestronglyMeasurable h
-    _ < ∞ := ENNReal.mul_lt_top hg'.lt_top hf.2
-
-theorem Integrable.smul_essSup {𝕜 : Type*} [NormedRing 𝕜] [Module 𝕜 β] [BoundedSMul 𝕜 β]
-    {f : α → 𝕜} (hf : Integrable f μ) {g : α → β}
-    (g_aestronglyMeasurable : AEStronglyMeasurable g μ)
-    (ess_sup_g : essSup (fun x => (‖g x‖₊ : ℝ≥0∞)) μ ≠ ∞) :
-    Integrable (fun x : α => f x • g x) μ := by
-  rw [← memℒp_one_iff_integrable] at *
-  refine ⟨hf.1.smul g_aestronglyMeasurable, ?_⟩
-  have h : (1 : ℝ≥0∞) / 1 = 1 / 1 + 1 / ∞ := by norm_num
-  have hg' : eLpNorm g ∞ μ ≠ ∞ := by rwa [eLpNorm_exponent_top]
-  calc
-    eLpNorm (fun x : α => f x • g x) 1 μ ≤ _ := by
-      simpa using MeasureTheory.eLpNorm_smul_le_mul_eLpNorm g_aestronglyMeasurable hf.1 h
-    _ < ∞ := ENNReal.mul_lt_top hf.2 hg'.lt_top
 
 theorem integrable_norm_iff {f : α → β} (hf : AEStronglyMeasurable f μ) :
     Integrable (fun a => ‖f a‖) μ ↔ Integrable f μ := by
@@ -989,13 +968,6 @@ noncomputable def withDensitySMulLI {f : α → ℝ≥0} (f_meas : Measurable f)
     change (‖(f x : ℝ) • u x‖₊ : ℝ≥0∞) = (f x : ℝ≥0∞) * (‖u x‖₊ : ℝ≥0∞)
     simp only [nnnorm_smul, NNReal.nnnorm_eq, ENNReal.coe_mul]
 
-@[simp]
-theorem withDensitySMulLI_apply {f : α → ℝ≥0} (f_meas : Measurable f)
-    (u : Lp E 1 (μ.withDensity fun x => f x)) :
-    withDensitySMulLI μ (E := E) f_meas u =
-      (memℒ1_smul_of_L1_withDensity f_meas u).toLp fun x => f x • u x :=
-  rfl
-
 end
 
 section ENNReal
@@ -1051,7 +1023,9 @@ theorem _root_.IsUnit.integrable_smul_iff [NormedRing 𝕜] [Module 𝕜 β] [Bo
     (hc : IsUnit c) (f : α → β) : Integrable (c • f) μ ↔ Integrable f μ :=
   and_congr hc.aestronglyMeasurable_const_smul_iff (hasFiniteIntegral_smul_iff hc f)
 
--- DISSOLVED: integrable_smul_iff
+theorem integrable_smul_iff [NormedDivisionRing 𝕜] [Module 𝕜 β] [BoundedSMul 𝕜 β] {c : 𝕜}
+    (hc : c ≠ 0) (f : α → β) : Integrable (c • f) μ ↔ Integrable f μ :=
+  (IsUnit.mk0 _ hc).integrable_smul_iff f
 
 variable [NormedRing 𝕜] [Module 𝕜 β] [BoundedSMul 𝕜 β]
 
@@ -1076,8 +1050,6 @@ section NormedSpaceOverCompleteField
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] [CompleteSpace 𝕜]
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
-
--- DISSOLVED: integrable_smul_const
 
 end NormedSpaceOverCompleteField
 
@@ -1319,10 +1291,6 @@ theorem coeFn_toL1 {f : α → β} (hf : Integrable f μ) : hf.toL1 f =ᵐ[μ] f
   AEEqFun.coeFn_mk _ _
 
 @[simp]
-theorem toL1_zero (h : Integrable (0 : α → β) μ) : h.toL1 0 = 0 :=
-  rfl
-
-@[simp]
 theorem toL1_eq_mk (f : α → β) (hf : Integrable f μ) :
     (hf.toL1 f : α →ₘ[μ] β) = AEEqFun.mk f hf.aestronglyMeasurable :=
   rfl
@@ -1331,17 +1299,6 @@ theorem toL1_eq_mk (f : α → β) (hf : Integrable f μ) :
 theorem toL1_eq_toL1_iff (f g : α → β) (hf : Integrable f μ) (hg : Integrable g μ) :
     toL1 f hf = toL1 g hg ↔ f =ᵐ[μ] g :=
   Memℒp.toLp_eq_toLp_iff _ _
-
-theorem toL1_add (f g : α → β) (hf : Integrable f μ) (hg : Integrable g μ) :
-    toL1 (f + g) (hf.add hg) = toL1 f hf + toL1 g hg :=
-  rfl
-
-theorem toL1_neg (f : α → β) (hf : Integrable f μ) : toL1 (-f) (Integrable.neg hf) = -toL1 f hf :=
-  rfl
-
-theorem toL1_sub (f g : α → β) (hf : Integrable f μ) (hg : Integrable g μ) :
-    toL1 (f - g) (hf.sub hg) = toL1 f hf - toL1 g hg :=
-  rfl
 
 theorem norm_toL1 (f : α → β) (hf : Integrable f μ) :
     ‖hf.toL1 f‖ = ENNReal.toReal (∫⁻ a, edist (f a) 0 ∂μ) := by
@@ -1370,14 +1327,6 @@ theorem edist_toL1_zero (f : α → β) (hf : Integrable f μ) :
   apply eLpNorm_one_eq_lintegral_nnnorm
 
 variable {𝕜 : Type*} [NormedRing 𝕜] [Module 𝕜 β] [BoundedSMul 𝕜 β]
-
-theorem toL1_smul (f : α → β) (hf : Integrable f μ) (k : 𝕜) :
-    toL1 (fun a => k • f a) (hf.smul k) = k • toL1 f hf :=
-  rfl
-
-theorem toL1_smul' (f : α → β) (hf : Integrable f μ) (k : 𝕜) :
-    toL1 (k • f) (hf.smul k) = k • toL1 f hf :=
-  rfl
 
 end Integrable
 

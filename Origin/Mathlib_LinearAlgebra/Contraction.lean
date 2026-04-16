@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Dual
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
+noncomputable section
+
 /-!
 # Contractions
 
@@ -52,14 +54,6 @@ def dualTensorHom : Module.Dual R M ⊗[R] N →ₗ[R] M →ₗ[R] N :=
   (uncurry R M' N (M →ₗ[R] N) : _ → M' ⊗ N →ₗ[R] M →ₗ[R] N) LinearMap.smulRightₗ
 
 variable {R M N P Q}
-
-@[simp]
-theorem contractLeft_apply (f : Module.Dual R M) (m : M) : contractLeft R M (f ⊗ₜ m) = f m :=
-  rfl
-
-@[simp]
-theorem contractRight_apply (f : Module.Dual R M) (m : M) : contractRight R M (m ⊗ₜ f) = f m :=
-  rfl
 
 @[simp]
 theorem dualTensorHom_apply (f : Module.Dual R M) (m : M) (n : N) :
@@ -150,12 +144,6 @@ theorem dualTensorHomEquivOfBasis_apply (x : Module.Dual R M ⊗[R] N) :
     (dualTensorHomEquivOfBasis (N := N) b :
     Module.Dual R M ⊗[R] N → (M →ₗ[R] N)) x = (dualTensorHom R M N) x := by
   ext; rfl
-
-@[simp]
-theorem dualTensorHomEquivOfBasis_toLinearMap :
-    (dualTensorHomEquivOfBasis b : Module.Dual R M ⊗[R] N ≃ₗ[R] M →ₗ[R] N).toLinearMap =
-      dualTensorHom R M N :=
-  rfl
 
 @[simp]
 theorem dualTensorHomEquivOfBasis_symm_cancel_left (x : Module.Dual R M ⊗[R] N) :

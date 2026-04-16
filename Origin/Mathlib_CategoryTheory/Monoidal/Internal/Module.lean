@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 import Mathlib.Algebra.Category.AlgebraCat.Basic
 import Mathlib.CategoryTheory.Monoidal.Mon_
 
+noncomputable section
+
 /-!
 # `Mon_ (ModuleCat R) ≌ AlgebraCat R`
 
@@ -70,10 +72,6 @@ instance Algebra_of_Mon_ (A : Mon_ (ModuleCat.{u} R)) : Algebra R A.X :=
       have h₂ := LinearMap.congr_fun A.mul_one (a ⊗ₜ r)
       exact h₁.trans h₂.symm
     smul_def' := fun r a => (LinearMap.congr_fun A.one_mul (r ⊗ₜ a)).symm }
-
-@[simp]
-theorem algebraMap (A : Mon_ (ModuleCat.{u} R)) (r : R) : algebraMap R A.X r = A.one r :=
-  rfl
 
 @[simps!]
 def functor : Mon_ (ModuleCat.{u} R) ⥤ AlgebraCat R where
@@ -145,50 +143,11 @@ end MonModuleEquivalenceAlgebra
 open MonModuleEquivalenceAlgebra
 
 set_option maxHeartbeats 400000 in
+/-- The category of internal monoid objects in `ModuleCat R`
 
-def monModuleEquivalenceAlgebra : Mon_ (ModuleCat.{u} R) ≌ AlgebraCat R where
-  functor := functor
-  inverse := inverse
-  unitIso :=
-    NatIso.ofComponents
-      (fun A =>
-        { hom :=
-            { hom :=
-                { toFun := _root_.id
-                  map_add' := fun _ _ => rfl
-                  map_smul' := fun _ _ => rfl }
-              mul_hom := by
-                -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11041): `ext` did not pick up `TensorProduct.ext`
-                refine TensorProduct.ext ?_
-                dsimp at *
-                rfl }
-          inv :=
-            { hom :=
-                { toFun := _root_.id
-                  map_add' := fun _ _ => rfl
-                  map_smul' := fun _ _ => rfl }
-              mul_hom := by
-                -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11041): `ext` did not pick up `TensorProduct.ext`
-                refine TensorProduct.ext ?_
-                dsimp at *
-                rfl } })
-  counitIso :=
-    NatIso.ofComponents
-      (fun A =>
-        { hom := AlgebraCat.ofHom
-            { toFun := _root_.id
-              map_zero' := rfl
-              map_add' := fun _ _ => rfl
-              map_one' := (algebraMap R A).map_one
-              map_mul' := fun x y => @LinearMap.mul'_apply R _ _ _ _ _ _ x y
-              commutes' := fun _ => rfl }
-          inv := AlgebraCat.ofHom
-            { toFun := _root_.id
-              map_zero' := rfl
-              map_add' := fun _ _ => rfl
-              map_one' := (algebraMap R A).map_one.symm
-              map_mul' := fun x y => (@LinearMap.mul'_apply R _ _ _ _ _ _ x y).symm
-              commutes' := fun _ => rfl } })
+is equivalent to the category of "native" bundled `R`-algebras.
+
+-/
 
 def monModuleEquivalenceAlgebraForget :
     MonModuleEquivalenceAlgebra.functor ⋙ forget₂ (AlgebraCat.{u} R) (ModuleCat.{u} R) ≅

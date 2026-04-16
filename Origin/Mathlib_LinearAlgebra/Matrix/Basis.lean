@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Reindex
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
+noncomputable section
+
 /-!
 # Bases and matrices
 
@@ -93,9 +95,6 @@ theorem toMatrix_unitsSMul [DecidableEq ι] (e : Basis ι R₂ M₂) (w : ι →
 theorem toMatrix_isUnitSMul [DecidableEq ι] (e : Basis ι R₂ M₂) {w : ι → R₂}
     (hw : ∀ i, IsUnit (w i)) : e.toMatrix (e.isUnitSMul hw) = diagonal w :=
   e.toMatrix_unitsSMul _
-
-theorem toMatrix_smul_left {G} [Group G] [DistribMulAction G M] [SMulCommClass G R M] (g : G) :
-    (g • e).toMatrix v = e.toMatrix (g⁻¹ • v) := rfl
 
 @[simp]
 theorem sum_toMatrix_smul_self [Fintype ι] : ∑ i : ι, e.toMatrix v i j • e i = v j := by

@@ -7,6 +7,8 @@ import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Order.Cover
 import Mathlib.Order.Iterate
 
+noncomputable section
+
 /-!
 # Successor and predecessor
 
@@ -1018,10 +1020,6 @@ theorem succ_coe_of_isMax {a : α} (h : IsMax a) : succ ↑a = (⊤ : WithTop α
 theorem succ_coe_of_not_isMax {a : α} (h : ¬ IsMax a) : succ (↑a : WithTop α) = ↑(succ a) :=
   dif_neg (succ_eq_iff_isMax.not.2 h)
 
-@[simp]
-theorem succ_coe [NoMaxOrder α] {a : α} : succ (↑a : WithTop α) = ↑(succ a) :=
-  succ_coe_of_not_isMax <| not_isMax a
-
 end Succ
 
 section Pred
@@ -1047,14 +1045,6 @@ instance : PredOrder (WithTop α) where
     cases b
     · exact coe_le_coe.2 le_top
     exact coe_le_coe.2 (le_pred_of_lt <| coe_lt_coe.1 h)
-
-@[simp]
-theorem pred_top : pred (⊤ : WithTop α) = ↑(⊤ : α) :=
-  rfl
-
-@[simp]
-theorem pred_coe (a : α) : pred (↑a : WithTop α) = ↑(pred a) :=
-  rfl
 
 @[simp]
 theorem pred_untop :
@@ -1111,14 +1101,6 @@ instance : SuccOrder (WithBot α) where
     · exact coe_le_coe.2 (succ_le_of_lt <| coe_lt_coe.1 h)
 
 @[simp]
-theorem succ_bot : succ (⊥ : WithBot α) = ↑(⊥ : α) :=
-  rfl
-
-@[simp]
-theorem succ_coe (a : α) : succ (↑a : WithBot α) = ↑(succ a) :=
-  rfl
-
-@[simp]
 theorem succ_unbot :
     ∀ (a : WithBot α) (ha : a ≠ ⊥),
       succ (a.unbot ha) = (succ a).unbot (by induction a <;> simp)
@@ -1169,9 +1151,6 @@ theorem pred_coe_of_isMin {a : α} (h : IsMin a) : pred ↑a = (⊥ : WithBot α
 
 theorem pred_coe_of_not_isMin {a : α} (h : ¬ IsMin a) : pred (↑a : WithBot α) = ↑(pred a) :=
   dif_neg (pred_eq_iff_isMin.not.2 h)
-
-theorem pred_coe [NoMinOrder α] {a : α} : pred (↑a : WithBot α) = ↑(pred a) :=
-  pred_coe_of_not_isMin <| not_isMin a
 
 end Pred
 

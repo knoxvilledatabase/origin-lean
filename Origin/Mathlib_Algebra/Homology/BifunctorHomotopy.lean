@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Bifunctor
 import Mathlib.Algebra.Homology.Homotopy
 
+noncomputable section
+
 /-!
 # The action of a bifunctor on homological complexes factors through homotopies
 

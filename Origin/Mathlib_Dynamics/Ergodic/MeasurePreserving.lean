@@ -1,10 +1,12 @@
 /-
 Extracted from Dynamics/Ergodic/MeasurePreserving.lean
-Genuine: 25 | Conflates: 1 | Dissolved: 1 | Infrastructure: 1
+Genuine: 26 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.AEMeasurable
 import Mathlib.Order.Filter.EventuallyConst
+
+noncomputable section
 
 /-!
 # Measure preserving maps
@@ -184,7 +186,11 @@ theorem exists_mem_iterate_mem_of_measure_univ_lt_mul_measure (hf : MeasurePrese
 alias exists_mem_iterate_mem_of_volume_lt_mul_volume :=
   exists_mem_iterate_mem_of_measure_univ_lt_mul_measure
 
--- DISSOLVED: exists_mem_iterate_mem
+theorem exists_mem_iterate_mem [IsFiniteMeasure μ] (hf : MeasurePreserving f μ μ)
+    (hs : NullMeasurableSet s μ) (hs' : μ s ≠ 0) : ∃ x ∈ s, ∃ m ≠ 0, f^[m] x ∈ s := by
+  rcases ENNReal.exists_nat_mul_gt hs' (measure_ne_top μ (Set.univ : Set α)) with ⟨N, hN⟩
+  rcases hf.exists_mem_iterate_mem_of_measure_univ_lt_mul_measure hs hN with ⟨x, hx, m, hm, hmx⟩
+  exact ⟨x, hx, m, hm.1.ne', hmx⟩
 
 end MeasurePreserving
 

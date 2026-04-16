@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Summation by parts
 -/

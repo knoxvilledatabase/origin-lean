@@ -5,6 +5,8 @@ Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Topology.Sets.Closeds
 
+noncomputable section
+
 /-!
 # Sober spaces
 
@@ -249,7 +251,6 @@ lemma component_injective [T0Space α] : Function.Injective (component (α := α
   fun x y e ↦ Subtype.ext ((isGenericPoint x).eq (e ▸ isGenericPoint y))
 
 noncomputable
-
 def ofComponent [QuasiSober α] (x : irreducibleComponents α) : genericPoints α :=
   ⟨x.2.1.genericPoint, show _ ∈ irreducibleComponents α from
     (x.2.1.isGenericPoint_genericPoint (isClosed_of_mem_irreducibleComponents x.1 x.2)).symm ▸ x.2⟩
@@ -274,9 +275,8 @@ lemma component_surjective [QuasiSober α] : Function.Surjective (component (α 
 lemma finite [T0Space α] (h : (irreducibleComponents α).Finite) : (genericPoints α).Finite :=
   @Finite.of_injective _ _ h _ component_injective
 
-noncomputable
-
 @[simps]
+noncomputable
 def equiv [T0Space α] [QuasiSober α] : genericPoints α ≃ irreducibleComponents α :=
   ⟨component, ofComponent, ofComponent_component, component_ofComponent⟩
 

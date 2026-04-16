@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LaurentSeries.lean
-Genuine: 90 | Conflates: 0 | Dissolved: 2 | Infrastructure: 22
+Genuine: 92 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Data.Int.Interval
@@ -12,6 +12,8 @@ import Mathlib.RingTheory.PowerSeries.Inverse
 import Mathlib.RingTheory.PowerSeries.Trunc
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.Topology.UniformSpace.Cauchy
+
+noncomputable section
 
 /-!
 # Laurent Series
@@ -374,16 +376,13 @@ theorem coe_def : (f : F⸨X⸩) = coeAlgHom F f :=
   rfl
 
 attribute [-instance] RatFunc.instCoePolynomial in
+-- avoids a diamond, see https://leanprover.zulipchat.com/#narrow/stream/287929-mathlib4/topic/compiling.20behaviour.20within.20one.20file
 
 theorem coe_num_denom : (f : F⸨X⸩) = f.num / f.denom :=
   liftAlgHom_apply _ _ f
 
 theorem coe_injective : Function.Injective ((↑) : RatFunc F → F⸨X⸩) :=
   liftAlgHom_injective _ (Polynomial.algebraMap_hahnSeries_injective _)
-
-@[simp]
-theorem coe_apply : coeAlgHom F f = f :=
-  rfl
 
 theorem coe_coe (P : Polynomial F) : ((P : F⟦X⟧) : F⸨X⸩) = (P : RatFunc F) := by
   simp only [coePolynomial, coe_def, AlgHom.commutes, algebraMap_hahnSeries_apply]
@@ -392,7 +391,8 @@ theorem coe_coe (P : Polynomial F) : ((P : F⟦X⟧) : F⸨X⸩) = (P : RatFunc 
 theorem coe_zero : ((0 : RatFunc F) : F⸨X⸩) = 0 :=
   map_zero (coeAlgHom F)
 
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero {f : Polynomial F} (hf : f ≠ 0) : (↑f : F⟦X⟧) ≠ 0 := by
+  simp only [ne_eq, Polynomial.coe_eq_zero_iff, hf, not_false_eq_true]
 
 @[simp, norm_cast]
 theorem coe_one : ((1 : RatFunc F) : F⸨X⸩) = 1 :=
@@ -447,7 +447,10 @@ theorem single_one_eq_pow {R : Type _} [Ring R] (n : ℕ) :
   · rw [← Int.ofNat_add_one_out, pow_succ', ← h_ind, HahnSeries.single_mul_single, one_mul,
       add_comm]
 
--- DISSOLVED: single_inv
+theorem single_inv (d : ℤ) {α : F} (hα : α ≠ 0) :
+    single (-d) (α⁻¹ : F) = (single (d : ℤ) (α : F))⁻¹ := by
+  apply eq_inv_of_mul_eq_one_right
+  simp [hα]
 
 theorem single_zpow (n : ℤ) :
     single (n : ℤ) (1 : F) = single (1 : ℤ) 1 ^ n := by
@@ -978,10 +981,6 @@ abbrev ratfuncAdicComplRingEquiv : RatFuncAdicCompl K ≃+* K⸨X⸩ :=
 
 abbrev LaurentSeriesRingEquiv : K⸨X⸩ ≃+* RatFuncAdicCompl K :=
   (ratfuncAdicComplRingEquiv K).symm
-
-@[simp]
-theorem ratfuncAdicComplRingEquiv_apply (x : RatFuncAdicCompl K) :
-    ratfuncAdicComplRingEquiv K x = ratfuncAdicComplPkg.compare (LaurentSeriesPkg K) x := rfl
 
 theorem coe_X_compare :
     (ratfuncAdicComplRingEquiv K) ((RatFunc.X : RatFunc K) : RatFuncAdicCompl K) =

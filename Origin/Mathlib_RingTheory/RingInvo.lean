@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Equiv
 import Mathlib.Algebra.Ring.Opposite
 
+noncomputable section
+
 /-!
 # Ring involutions
 
@@ -74,10 +76,6 @@ def mk' (f : R →+* Rᵐᵒᵖ) (involution : ∀ r, (f (f r).unop).unop = r) :
 @[simp]
 theorem involution (f : RingInvo R) (x : R) : (f (f x).unop).unop = x :=
   f.involution' x
-
-@[norm_cast]
-theorem coe_ringEquiv (f : RingInvo R) (a : R) : (f : R ≃+* Rᵐᵒᵖ) a = f a :=
-  rfl
 
 theorem map_eq_zero_iff (f : RingInvo R) {x : R} : f x = 0 ↔ x = 0 :=
   f.toRingEquiv.map_eq_zero_iff

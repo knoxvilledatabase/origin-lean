@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Order.Interval.Finset.Basic
 
+noncomputable section
+
 /-!
 # Big operators indexed by intervals
 

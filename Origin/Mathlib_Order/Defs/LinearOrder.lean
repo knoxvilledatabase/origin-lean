@@ -12,6 +12,8 @@ import Mathlib.Tactic.SplitIfs
 import Mathlib.Tactic.TypeStar
 import Mathlib.Order.Defs.PartialOrder
 
+noncomputable section
+
 /-!
 # Orders
 
@@ -33,11 +35,8 @@ def minDefault [LE α] [DecidableRel ((· ≤ ·) : α → α → Prop)] (a b : 
   if a ≤ b then a else b
 
 macro "compareOfLessAndEq_rfl" : tactic =>
-
   `(tactic| (intros a b; first | rfl |
-
     (simp only [compare, compareOfLessAndEq]; split_ifs <;> rfl) |
-
     (induction a <;> induction b <;> simp +decide only)))
 
 class LinearOrder (α : Type*) extends PartialOrder α, Min α, Max α, Ord α where
@@ -130,6 +129,7 @@ protected def ltGeByCases {a b : Nat} {C : Sort*} (h₁ : a < b → C) (h₂ : b
   Decidable.byCases h₁ fun h => h₂ (Or.elim (Nat.lt_or_ge a b) (fun a => absurd a h) fun a => a)
 
 set_option linter.deprecated false in
+@[deprecated ltByCases (since := "2024-08-23")]
 
 protected def ltByCases {a b : Nat} {C : Sort*} (h₁ : a < b → C) (h₂ : a = b → C)
     (h₃ : b < a → C) : C :=

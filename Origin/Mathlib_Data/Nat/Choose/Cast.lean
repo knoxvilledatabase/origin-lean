@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Factorial.Cast
 
+noncomputable section
+
 /-!
 # Cast of binomial coefficients
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Comma.Arrow
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
+noncomputable section
+
 /-!
 # The Factorisation Category of a Category
 

@@ -8,6 +8,8 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Algebra.Module.LinearMap.Rat
 import Mathlib.Tactic.Module
 
+noncomputable section
+
 /-!
 # Inner product space derived from a norm
 

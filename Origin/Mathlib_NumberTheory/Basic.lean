@@ -7,6 +7,8 @@ import Mathlib.Algebra.GeomSum
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 import Mathlib.RingTheory.Ideal.Span
 
+noncomputable section
+
 /-!
 # Basic results in number theory
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Relation
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # Equivalence relations
 
@@ -41,11 +43,13 @@ def Setoid.Rel (r : Setoid α) : α → α → Prop :=
   @Setoid.r _ r
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided."  (since := "2024-10-09")]
 
 instance Setoid.decidableRel (r : Setoid α) [h : DecidableRel r.r] : DecidableRel r.Rel :=
   h
 
 set_option linter.deprecated false in
+/-- A version of `Quotient.eq'` compatible with `Setoid.Rel`, to make rewriting possible. -/
 
 theorem Quotient.eq_rel {r : Setoid α} {x y} :
     (Quotient.mk' x : Quotient r) = Quotient.mk' y ↔ r.Rel x y :=
@@ -56,11 +60,13 @@ namespace Setoid
 attribute [ext] ext
 
 set_option linter.deprecated false in
+@[deprecated Setoid.ext (since := "2024-10-09")]
 
 theorem ext' {r s : Setoid α} (H : ∀ a b, r.Rel a b ↔ s.Rel a b) : r = s :=
   ext H
 
 set_option linter.deprecated false in
+@[deprecated Setoid.ext_iff (since := "2024-10-09")]
 
 theorem ext'_iff {r s : Setoid α} : r = s ↔ ∀ a b, r.Rel a b ↔ s.Rel a b :=
   ⟨fun h _ _ => h ▸ Iff.rfl, ext'⟩
@@ -97,6 +103,7 @@ theorem ker_apply_mk_out {f : α → β} (a : α) : f (⟦a⟧ : Quotient (Setoi
   @Quotient.mk_out _ (Setoid.ker f) a
 
 set_option linter.deprecated false in
+@[deprecated ker_apply_mk_out (since := "2024-10-19")]
 
 theorem ker_apply_mk_out' {f : α → β} (a : α) :
     f (Quotient.mk _ a : Quotient <| Setoid.ker f).out' = f a :=
@@ -111,14 +118,6 @@ protected def prod (r : Setoid α) (s : Setoid β) :
   iseqv :=
     ⟨fun x => ⟨r.refl' x.1, s.refl' x.2⟩, fun h => ⟨r.symm' h.1, s.symm' h.2⟩,
       fun h₁ h₂ => ⟨r.trans' h₁.1 h₂.1, s.trans' h₁.2 h₂.2⟩⟩
-
-lemma prod_apply {r : Setoid α} {s : Setoid β} {x₁ x₂ : α} {y₁ y₂ : β} :
-    @Setoid.r _ (r.prod s) (x₁, y₁) (x₂, y₂) ↔ (@Setoid.r _ r x₁ x₂ ∧ @Setoid.r _ s y₁ y₂) :=
-  Iff.rfl
-
-lemma piSetoid_apply {ι : Sort*} {α : ι → Sort*} {r : ∀ i, Setoid (α i)} {x y : ∀ i, α i} :
-    @Setoid.r _ (@piSetoid _ _ r) x y ↔ ∀ i, @Setoid.r _ (r i) (x i) (y i) :=
-  Iff.rfl
 
 @[simps]
 def prodQuotientEquiv (r : Setoid α) (s : Setoid β) :
@@ -157,12 +156,6 @@ instance : Min (Setoid α) :=
       ⟨fun x => ⟨r.refl' x, s.refl' x⟩, fun h => ⟨r.symm' h.1, s.symm' h.2⟩, fun h1 h2 =>
         ⟨r.trans' h1.1 h2.1, s.trans' h1.2 h2.2⟩⟩⟩⟩
 
-theorem inf_def {r s : Setoid α} : ⇑(r ⊓ s) = ⇑r ⊓ ⇑s :=
-  rfl
-
-theorem inf_iff_and {r s : Setoid α} {x y} : (r ⊓ s) x y ↔ r x y ∧ s x y :=
-  Iff.rfl
-
 instance : InfSet (Setoid α) :=
   ⟨fun S =>
     { r := fun x y => ∀ r ∈ S, r x y
@@ -198,17 +191,9 @@ instance completeLattice : CompleteLattice (Setoid α) :=
 theorem top_def : ⇑(⊤ : Setoid α) = ⊤ :=
   rfl
 
-@[simp]
-theorem bot_def : ⇑(⊥ : Setoid α) = (· = ·) :=
-  rfl
-
 theorem eq_top_iff {s : Setoid α} : s = (⊤ : Setoid α) ↔ ∀ x y : α, s x y := by
   rw [_root_.eq_top_iff, Setoid.le_def, Setoid.top_def]
   simp only [Pi.top_apply, Prop.top_eq_true, forall_true_left]
-
-lemma sInf_equiv {S : Set (Setoid α)} {x y : α} :
-    letI := sInf S
-    x ≈ y ↔ ∀ s ∈ S, s x y := Iff.rfl
 
 lemma sInf_iff {S : Set (Setoid α)} {x y : α} :
     sInf S x y ↔ ∀ s ∈ S, s x y := Iff.rfl
@@ -272,21 +257,12 @@ theorem eqvGen_mono {r s : α → α → Prop} (h : ∀ x y, r x y → s x y) :
     EqvGen.setoid r ≤ EqvGen.setoid s :=
   eqvGen_le fun _ _ hr => EqvGen.rel _ _ <| h _ _ hr
 
-def gi : @GaloisInsertion (α → α → Prop) (Setoid α) _ _ EqvGen.setoid (⇑) where
-  choice r _ := EqvGen.setoid r
-  gc _ s := ⟨fun H _ _ h => H <| EqvGen.rel _ _ h, fun H => eqvGen_of_setoid s ▸ eqvGen_mono H⟩
-  le_l_u x := (eqvGen_of_setoid x).symm ▸ le_refl x
-  choice_eq _ _ := rfl
-
 end EqvGen
 
 open Function
 
 theorem injective_iff_ker_bot (f : α → β) : Injective f ↔ ker f = ⊥ :=
   (@eq_bot_iff (Setoid α) _ _ (ker f)).symm
-
-theorem ker_iff_mem_preimage {f : α → β} {x y} : ker f x y ↔ x ∈ f ⁻¹' {f y} :=
-  Iff.rfl
 
 def liftEquiv (r : Setoid α) : { f : α → β // r ≤ ker f } ≃ (Quotient r → β) where
   toFun f := Quotient.lift (f : α → β) f.2
@@ -352,9 +328,6 @@ theorem mapOfSurjective_eq_map (h : ker f ≤ r) (hf : Surjective f) :
 abbrev comap (f : α → β) (r : Setoid β) : Setoid α :=
   ⟨r on f, r.iseqv.comap _⟩
 
-theorem comap_rel (f : α → β) (r : Setoid β) (x y : α) : comap f r x y ↔ r (f x) (f y) :=
-  Iff.rfl
-
 theorem comap_eq {f : α → β} {r : Setoid β} : comap f r = ker (@Quotient.mk'' _ r ∘ f) :=
   ext fun x y => show _ ↔ ⟦_⟧ = ⟦_⟧ by rw [Quotient.eq]; rfl
 
@@ -381,18 +354,6 @@ def quotientQuotientEquivQuotient (s : Setoid α) (h : r ≤ s) :
 variable {r f}
 
 open Quotient
-
-def correspondence (r : Setoid α) : { s // r ≤ s } ≃o Setoid (Quotient r) where
-  toFun s := ⟨Quotient.lift₂ s.1.1 fun _ _ _ _ h₁ h₂ ↦ Eq.propIntro
-      (fun h ↦ s.1.trans' (s.1.trans' (s.1.symm' (s.2 h₁)) h) (s.2 h₂))
-      (fun h ↦ s.1.trans' (s.1.trans' (s.2 h₁) h) (s.1.symm' (s.2 h₂))),
-    ⟨Quotient.ind s.1.2.1, @fun x y ↦ Quotient.inductionOn₂ x y fun _ _ ↦ s.1.2.2,
-      @fun x y z ↦ Quotient.inductionOn₃ x y z fun _ _ _ ↦ s.1.2.3⟩⟩
-  invFun s := ⟨comap Quotient.mk' s, fun x y h => by rw [comap_rel, Quotient.eq'.2 h]⟩
-  left_inv _ := rfl
-  right_inv _ := ext fun x y ↦ Quotient.inductionOn₂ x y fun _ _ ↦ Iff.rfl
-  map_rel_iff' :=
-    ⟨fun h x y hs ↦ @h ⟦x⟧ ⟦y⟧ hs, fun h x y ↦ Quotient.inductionOn₂ x y fun _ _ hs ↦ h hs⟩
 
 def sigmaQuotientEquivOfLe {r s : Setoid α} (hle : r ≤ s) :
     (Σ q : Quotient s, Quotient (r.comap (Subtype.val : Quotient.mk s ⁻¹' {q} → α))) ≃

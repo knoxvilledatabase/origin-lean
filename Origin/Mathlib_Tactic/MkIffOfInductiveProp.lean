@@ -9,6 +9,8 @@ import Mathlib.Lean.Meta
 import Mathlib.Lean.Name
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # mk_iff_of_inductive_prop
 

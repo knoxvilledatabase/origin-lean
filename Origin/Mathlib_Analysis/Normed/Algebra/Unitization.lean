@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Unitization
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Mul
 
+noncomputable section
+
 /-!
 # Unitization norms
 
@@ -111,9 +113,6 @@ noncomputable abbrev normedAlgebraAux : NormedAlgebra 𝕜 (Unitization 𝕜 A) 
 attribute [local instance] Unitization.normedAlgebraAux
 
 theorem norm_def (x : Unitization 𝕜 A) : ‖x‖ = ‖splitMul 𝕜 A x‖ :=
-  rfl
-
-theorem nnnorm_def (x : Unitization 𝕜 A) : ‖x‖₊ = ‖splitMul 𝕜 A x‖₊ :=
   rfl
 
 theorem norm_eq_sup (x : Unitization 𝕜 A) :

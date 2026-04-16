@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Ring.Int.Parity
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # The integers form a linear ordered ring
 

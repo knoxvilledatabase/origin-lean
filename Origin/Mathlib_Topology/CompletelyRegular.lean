@@ -7,6 +7,8 @@ import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Topology.UnitInterval
 import Mathlib.Topology.StoneCech
 
+noncomputable section
+
 /-!
 # Completely regular topological spaces.
 

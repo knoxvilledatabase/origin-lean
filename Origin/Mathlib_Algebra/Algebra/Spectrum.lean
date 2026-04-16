@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Algebra/Spectrum.lean
-Genuine: 44 | Conflates: 5 | Dissolved: 2 | Infrastructure: 3
+Genuine: 47 | Conflates: 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Star.Subalgebra
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Ideal.Nonunits
 import Mathlib.Tactic.NoncommRing
+
+noncomputable section
 
 /-!
 # Spectrum of an element in an algebra
@@ -184,7 +186,8 @@ theorem inv_mem_iff {r : Rˣ} {a : Aˣ} : (r : R) ∈ σ (a : A) ↔ (↑r⁻¹ 
 theorem zero_mem_resolventSet_of_unit (a : Aˣ) : 0 ∈ resolventSet R (a : A) := by
   simpa only [mem_resolventSet_iff, ← not_mem_iff, zero_not_mem_iff] using a.isUnit
 
--- DISSOLVED: ne_zero_of_mem_of_unit
+theorem ne_zero_of_mem_of_unit {a : Aˣ} {r : R} (hr : r ∈ σ (a : A)) : r ≠ 0 := fun hn =>
+  (hn ▸ hr) (zero_mem_resolventSet_of_unit a)
 
 theorem add_mem_iff {a : A} {r s : R} : r + s ∈ σ a ↔ r ∈ σ (-↑ₐ s + a) := by
   simp only [mem_iff, sub_neg_eq_add, ← sub_sub, map_add]
@@ -346,7 +349,12 @@ theorem smul_eq_smul [Nontrivial A] (k : 𝕜) (a : A) (ha : (σ a).Nonempty) :
   · simpa [ha, zero_smul_set] using (show {(0 : 𝕜)} = (0 : Set 𝕜) from rfl)
   · exact unit_smul_eq_smul a (Units.mk0 k h)
 
--- DISSOLVED: nonzero_mul_eq_swap_mul
+theorem nonzero_mul_eq_swap_mul (a b : A) : σ (a * b) \ {0} = σ (b * a) \ {0} := by
+  suffices h : ∀ x y : A, σ (x * y) \ {0} ⊆ σ (y * x) \ {0} from
+    Set.eq_of_subset_of_subset (h a b) (h b a)
+  rintro _ _ k ⟨k_mem, k_neq⟩
+  change ((Units.mk0 k k_neq) : 𝕜) ∈ _ at k_mem
+  exact ⟨unit_mem_mul_iff_mem_swap_mul.mp k_mem, k_neq⟩
 
 protected theorem map_inv (a : Aˣ) : (σ (a : A))⁻¹ = σ (↑a⁻¹ : A) := by
   refine Set.eq_of_subset_of_subset (fun k hk => ?_) fun k hk => ?_

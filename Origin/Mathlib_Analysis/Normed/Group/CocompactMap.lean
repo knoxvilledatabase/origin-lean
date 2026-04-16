@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Topology.ContinuousMap.CocompactMap
 import Mathlib.Topology.MetricSpace.Bounded
 
+noncomputable section
+
 /-!
 # Cocompact maps in normed groups
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Commute.Hom
 import Mathlib.Algebra.Group.Prod
 
+noncomputable section
+
 /-!
 # Canonical homomorphism from a pair of monoids
 

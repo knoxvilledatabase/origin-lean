@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Torsion
 import Mathlib.LinearAlgebra.Dimension.Constructions
 
+noncomputable section
+
 /-!
 # Rank and torsion
 

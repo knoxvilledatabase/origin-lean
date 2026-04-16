@@ -1,6 +1,6 @@
 /-
 Extracted from Data/List/Basic.lean
-Genuine: 288 | Conflates: 0 | Dissolved: 4 | Infrastructure: 55
+Genuine: 292 | Conflates: 0 | Dissolved: 0 | Infrastructure: 55
 -/
 import Origin.Core
 import Mathlib.Control.Basic
@@ -13,6 +13,8 @@ import Mathlib.Logic.OpClass
 import Mathlib.Logic.Unique
 import Mathlib.Order.Basic
 import Mathlib.Tactic.Common
+
+noncomputable section
 
 /-!
 # Basic properties of lists
@@ -82,7 +84,9 @@ alias ⟨_, length_pos_of_ne_nil⟩ := length_pos
 theorem length_pos_iff_ne_nil {l : List α} : 0 < length l ↔ l ≠ [] :=
   ⟨ne_nil_of_length_pos, length_pos_of_ne_nil⟩
 
--- DISSOLVED: exists_of_length_succ
+theorem exists_of_length_succ {n} : ∀ l : List α, l.length = n + 1 → ∃ h t, l = h :: t
+  | [], H => absurd H.symm <| succ_ne_zero n
+  | h :: t, _ => ⟨h, t, rfl⟩
 
 @[simp] lemma length_injective_iff : Injective (List.length : List α → ℕ) ↔ Subsingleton α := by
   constructor
@@ -172,9 +176,6 @@ theorem map_subset_iff {l₁ l₂ : List α} (f : α → β) (h : Injective f) :
 
 /-! ### append -/
 
-theorem append_eq_has_append {L₁ L₂ : List α} : List.append L₁ L₂ = L₁ ++ L₂ :=
-  rfl
-
 theorem append_right_injective (s : List α) : Injective fun t ↦ s ++ t :=
   fun _ _ ↦ append_cancel_left
 
@@ -199,11 +200,17 @@ theorem replicate_subset_singleton (n) (a : α) : replicate n a ⊆ [a] := fun _
 theorem subset_singleton_iff {a : α} {L : List α} : L ⊆ [a] ↔ ∃ n, L = replicate n a := by
   simp only [eq_replicate_iff, subset_def, mem_singleton, exists_eq_left']
 
--- DISSOLVED: replicate_right_injective
+theorem replicate_right_injective {n : ℕ} (hn : n ≠ 0) : Injective (@replicate α n) :=
+  fun _ _ h => (eq_replicate_iff.1 h).2 _ <| mem_replicate.2 ⟨hn, rfl⟩
 
--- DISSOLVED: replicate_right_inj
+theorem replicate_right_inj {a b : α} {n : ℕ} (hn : n ≠ 0) :
+    replicate n a = replicate n b ↔ a = b :=
+  (replicate_right_injective hn).eq_iff
 
--- DISSOLVED: replicate_right_inj'
+theorem replicate_right_inj' {a b : α} : ∀ {n},
+    replicate n a = replicate n b ↔ n = 0 ∨ a = b
+  | 0 => by simp
+  | n + 1 => (replicate_right_inj n.succ_ne_zero).trans <| by simp only [n.succ_ne_zero, false_or]
 
 theorem replicate_left_injective (a : α) : Injective (replicate · a) :=
   LeftInverse.injective (length_replicate · a)
@@ -213,13 +220,7 @@ theorem replicate_left_inj {a : α} {n m : ℕ} : replicate n a = replicate m a 
 
 /-! ### pure -/
 
-theorem mem_pure (x y : α) : x ∈ (pure y : List α) ↔ x = y := by simp
-
 /-! ### bind -/
-
-@[simp]
-theorem bind_eq_flatMap {α β} (f : α → List β) (l : List α) : l >>= f = l.flatMap f :=
-  rfl
 
 /-! ### concat -/
 
@@ -230,10 +231,6 @@ theorem reverse_cons' (a : α) (l : List α) : reverse (a :: l) = concat (revers
 
 theorem reverse_concat' (l : List α) (a : α) : (l ++ [a]).reverse = a :: l.reverse := by
   rw [reverse_append]; rfl
-
-@[simp]
-theorem reverse_singleton (a : α) : reverse [a] = [a] :=
-  rfl
 
 @[simp]
 theorem reverse_involutive : Involutive (@reverse α) :=
@@ -269,12 +266,6 @@ theorem getLast_append' (l₁ l₂ : List α) (h : l₂ ≠ []) :
   induction l₁ with
   | nil => simp
   | cons _ _ ih => simp only [cons_append]; rw [List.getLast_cons]; exact ih
-
-theorem getLast_concat' {a : α} (l : List α) : getLast (concat l a) (concat_ne_nil a l) = a := by
-  simp
-
-@[simp]
-theorem getLast_singleton' (a : α) : getLast [a] (cons_ne_nil a []) = a := rfl
 
 @[simp]
 theorem getLast_cons_cons (a₁ a₂ : α) (l : List α) :
@@ -368,9 +359,6 @@ theorem mem_getLast?_append_of_mem_getLast? {l₁ l₂ : List α} {x : α} (h : 
 
 /-! ### head(!?) and tail -/
 
-@[simp]
-theorem head!_nil [Inhabited α] : ([] : List α).head! = default := rfl
-
 @[simp] theorem head_cons_tail (x : List α) (h : x ≠ []) : x.head h :: x.tail = x := by
   cases x <;> simp at h ⊢
 
@@ -394,8 +382,6 @@ theorem eq_cons_of_mem_head? {x : α} : ∀ {l : List α}, x ∈ l.head? → l =
   | a :: l, h => by
     simp only [head?, Option.mem_def, Option.some_inj] at h
     exact h ▸ rfl
-
-@[simp] theorem head!_cons [Inhabited α] (a : α) (l : List α) : head! (a :: l) = a := rfl
 
 @[simp]
 theorem head!_append [Inhabited α] (t : List α) {s : List α} (h : s ≠ []) :
@@ -436,10 +422,6 @@ theorem cons_head!_tail [Inhabited α] {l : List α} (h : l ≠ []) : head! l ::
 theorem head!_mem_self [Inhabited α] {l : List α} (h : l ≠ nil) : l.head! ∈ l := by
   have h' := mem_cons_self l.head! l.tail
   rwa [cons_head!_tail h] at h'
-
-theorem get_eq_get? (l : List α) (i : Fin l.length) :
-    l.get i = (l.get? i).get (by simp [getElem?_eq_getElem]) := by
-  simp
 
 theorem exists_mem_iff_getElem {l : List α} {p : α → Prop} :
     (∃ x ∈ l, p x) ↔ ∃ (i : ℕ) (_ : i < l.length), p l[i] := by
@@ -818,6 +800,7 @@ theorem flatMap_pure_eq_map (f : α → β) (l : List α) : l.flatMap (pure ∘ 
   .symm <| map_eq_flatMap ..
 
 set_option linter.deprecated false in
+@[deprecated flatMap_pure_eq_map (since := "2024-03-24")]
 
 theorem bind_ret_eq_map (f : α → β) (l : List α) : l.bind (List.ret ∘ f) = map f l :=
   bind_pure_eq_map f l
@@ -829,10 +812,6 @@ theorem flatMap_congr {l : List α} {f g : α → List β} (h : ∀ x ∈ l, f x
 theorem infix_flatMap_of_mem {a : α} {as : List α} (h : a ∈ as) (f : α → List α) :
     f a <:+: as.flatMap f :=
   List.infix_of_mem_flatten (List.mem_map_of_mem f h)
-
-@[simp]
-theorem map_eq_map {α β} (f : α → β) (l : List α) : f <$> l = map f l :=
-  rfl
 
 theorem comp_map (h : β → γ) (g : α → β) (l : List α) : map (h ∘ g) l = map h (map g l) :=
   (map_map _ _ _).symm
@@ -1157,10 +1136,6 @@ theorem get_succ_scanl {i : ℕ} {h : i + 1 < (scanl f b l).length} :
 end Scanl
 
 @[simp]
-theorem scanr_nil (f : α → β → β) (b : β) : scanr f b [] = [b] :=
-  rfl
-
-@[simp]
 theorem scanr_cons (f : α → β → β) (b : β) (a : α) (l : List α) :
     scanr f b (a :: l) = foldr f b (a :: l) :: scanr f b l := by
   simp only [scanr, foldr, cons.injEq, and_true]
@@ -1273,10 +1248,6 @@ end FoldlMFoldrM
 /-! ### intersperse -/
 
 @[simp]
-theorem intersperse_singleton (a b : α) : intersperse a [b] = [b] :=
-  rfl
-
-@[simp]
 theorem intersperse_cons_cons (a b c : α) (tl : List α) :
     intersperse a (b :: c :: tl) = b :: a :: intersperse a (c :: tl) :=
   rfl
@@ -1288,10 +1259,6 @@ section SplitAtOn
 variable (p : α → Bool) (xs : List α) (ls : List (List α))
 
 attribute [simp] splitAt_eq
-
-@[simp]
-theorem splitOn_nil [DecidableEq α] (a : α) : [].splitOn a = [[]] :=
-  rfl
 
 @[simp]
 theorem splitOnP_nil : [].splitOnP p = [[]] :=
@@ -1470,10 +1437,6 @@ theorem lookmap.go_append (l : List α) (acc : Array α) :
     | some a => rfl
 
 @[simp]
-theorem lookmap_nil : [].lookmap f = [] :=
-  rfl
-
-@[simp]
 theorem lookmap_cons_none {a : α} (l : List α) (h : f a = none) :
     (a :: l).lookmap f = a :: l.lookmap f := by
   simp only [lookmap, lookmap.go, Array.toListAppend_eq, Array.toList_toArray, nil_append]
@@ -1567,9 +1530,6 @@ theorem filterMap_eq_map_iff_forall_eq_some {f : α → Option β} {g : α → �
 section Filter
 
 variable {p : α → Bool}
-
-theorem filter_singleton {a : α} : [a].filter p = bif p a then [a] else [] :=
-  rfl
 
 theorem filter_eq_foldr (p : α → Bool) (l : List α) :
     filter p l = foldr (fun a out => bif p a then a :: out else out) [] l := by
@@ -1860,21 +1820,6 @@ variable (f : Option α → β → γ) (a : α) (as : List α) (b : β) (bs : Li
 @[simp]
 theorem map₂Right'_nil_left : map₂Right' f [] bs = (bs.map (f none), []) := by cases bs <;> rfl
 
-@[simp]
-theorem map₂Right'_nil_right : map₂Right' f as [] = ([], as) :=
-  rfl
-
-@[simp]
-theorem map₂Right'_nil_cons : map₂Right' f [] (b :: bs) = (f none b :: bs.map (f none), []) :=
-  rfl
-
-@[simp]
-theorem map₂Right'_cons_cons :
-    map₂Right' f (a :: as) (b :: bs) =
-      let r := map₂Right' f as bs
-      (f (some a) b :: r.fst, r.snd) :=
-  rfl
-
 end Map₂Right'
 
 /-! ### zipLeft' -/
@@ -1887,22 +1832,6 @@ variable (a : α) (as : List α) (b : β) (bs : List β)
 theorem zipLeft'_nil_right : zipLeft' as ([] : List β) = (as.map fun a => (a, none), []) := by
   cases as <;> rfl
 
-@[simp]
-theorem zipLeft'_nil_left : zipLeft' ([] : List α) bs = ([], bs) :=
-  rfl
-
-@[simp]
-theorem zipLeft'_cons_nil :
-    zipLeft' (a :: as) ([] : List β) = ((a, none) :: as.map fun a => (a, none), []) :=
-  rfl
-
-@[simp]
-theorem zipLeft'_cons_cons :
-    zipLeft' (a :: as) (b :: bs) =
-      let r := zipLeft' as bs
-      ((a, some b) :: r.fst, r.snd) :=
-  rfl
-
 end ZipLeft'
 
 /-! ### zipRight' -/
@@ -1914,22 +1843,6 @@ variable (a : α) (as : List α) (b : β) (bs : List β)
 @[simp]
 theorem zipRight'_nil_left : zipRight' ([] : List α) bs = (bs.map fun b => (none, b), []) := by
   cases bs <;> rfl
-
-@[simp]
-theorem zipRight'_nil_right : zipRight' as ([] : List β) = ([], as) :=
-  rfl
-
-@[simp]
-theorem zipRight'_nil_cons :
-    zipRight' ([] : List α) (b :: bs) = ((none, b) :: bs.map fun b => (none, b), []) :=
-  rfl
-
-@[simp]
-theorem zipRight'_cons_cons :
-    zipRight' (a :: as) (b :: bs) =
-      let r := zipRight' as bs
-      ((some a, b) :: r.fst, r.snd) :=
-  rfl
 
 end ZipRight'
 
@@ -1968,26 +1881,8 @@ variable (f : Option α → β → γ) (a : α) (as : List α) (b : β) (bs : Li
 @[simp]
 theorem map₂Right_nil_left : map₂Right f [] bs = bs.map (f none) := by cases bs <;> rfl
 
-@[simp]
-theorem map₂Right_nil_right : map₂Right f as [] = [] :=
-  rfl
-
-@[simp]
-theorem map₂Right_nil_cons : map₂Right f [] (b :: bs) = f none b :: bs.map (f none) :=
-  rfl
-
-@[simp]
-theorem map₂Right_cons_cons :
-    map₂Right f (a :: as) (b :: bs) = f (some a) b :: map₂Right f as bs :=
-  rfl
-
 theorem map₂Right_eq_map₂Right' : map₂Right f as bs = (map₂Right' f as bs).fst := by
   simp only [map₂Right, map₂Right', map₂Left_eq_map₂Left']
-
-theorem map₂Right_eq_zipWith (h : length bs ≤ length as) :
-    map₂Right f as bs = zipWith (fun a b => f (some a) b) as bs := by
-  have : (fun a b => flip f a (some b)) = flip fun a b => f (some a) b := rfl
-  simp only [map₂Right, map₂Left_eq_zipWith, zipWith_flip, *]
 
 end Map₂Right
 
@@ -2000,19 +1895,6 @@ variable (a : α) (as : List α) (b : β) (bs : List β)
 @[simp]
 theorem zipLeft_nil_right : zipLeft as ([] : List β) = as.map fun a => (a, none) := by
   cases as <;> rfl
-
-@[simp]
-theorem zipLeft_nil_left : zipLeft ([] : List α) bs = [] :=
-  rfl
-
-@[simp]
-theorem zipLeft_cons_nil :
-    zipLeft (a :: as) ([] : List β) = (a, none) :: as.map fun a => (a, none) :=
-  rfl
-
-@[simp]
-theorem zipLeft_cons_cons : zipLeft (a :: as) (b :: bs) = (a, some b) :: zipLeft as bs :=
-  rfl
 
 theorem zipLeft_eq_zipLeft' (as : List α) (bs : List β) : zipLeft as bs = (zipLeft' as bs).fst := by
   rw [zipLeft, zipLeft']
@@ -2036,19 +1918,6 @@ variable (a : α) (as : List α) (b : β) (bs : List β)
 @[simp]
 theorem zipRight_nil_left : zipRight ([] : List α) bs = bs.map fun b => (none, b) := by
   cases bs <;> rfl
-
-@[simp]
-theorem zipRight_nil_right : zipRight as ([] : List β) = [] :=
-  rfl
-
-@[simp]
-theorem zipRight_nil_cons :
-    zipRight ([] : List α) (b :: bs) = (none, b) :: bs.map fun b => (none, b) :=
-  rfl
-
-@[simp]
-theorem zipRight_cons_cons : zipRight (a :: as) (b :: bs) = (some a, b) :: zipRight as bs :=
-  rfl
 
 theorem zipRight_eq_zipRight' : zipRight as bs = (zipRight' as bs).fst := by
   induction as generalizing bs <;> cases bs <;> simp [*]
@@ -2088,9 +1957,6 @@ end Forall
 
 /-! ### Miscellaneous lemmas -/
 
-theorem get_attach (L : List α) (i) :
-    (L.attach.get i).1 = L.get ⟨i, length_attach (L := L) ▸ i.2⟩ := by simp
-
 @[simp 1100]
 theorem mem_map_swap (x : α) (y : β) (xs : List (α × β)) :
     (y, x) ∈ map Prod.swap xs ↔ (x, y) ∈ xs := by
@@ -2121,6 +1987,7 @@ theorem length_dropSlice_lt (i j : ℕ) (hj : 0 < j) (xs : List α) (hi : i < xs
   simp; omega
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-07-25")]
 
 theorem sizeOf_dropSlice_lt [SizeOf α] (i j : ℕ) (hj : 0 < j) (xs : List α) (hi : i < xs.length) :
     SizeOf.sizeOf (List.dropSlice i j xs) < SizeOf.sizeOf xs := by

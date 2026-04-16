@@ -9,6 +9,8 @@ import Mathlib.Logic.Relation
 import Mathlib.Logic.Small.Defs
 import Mathlib.Order.GameAdd
 
+noncomputable section
+
 /-!
 # Combinatorial (pre-)games.
 
@@ -144,35 +146,11 @@ theorem moveRight_mk {xl xr xL xR} : (⟨xl, xr, xL, xR⟩ : PGame).moveRight = 
 def ofLists (L R : List PGame.{u}) : PGame.{u} :=
   mk (ULift (Fin L.length)) (ULift (Fin R.length)) (fun i => L[i.down.1]) fun j ↦ R[j.down.1]
 
-theorem leftMoves_ofLists (L R : List PGame) : (ofLists L R).LeftMoves = ULift (Fin L.length) :=
-  rfl
-
-theorem rightMoves_ofLists (L R : List PGame) : (ofLists L R).RightMoves = ULift (Fin R.length) :=
-  rfl
-
 abbrev toOfListsLeftMoves {L R : List PGame} : Fin L.length ≃ (ofLists L R).LeftMoves :=
   Equiv.ulift.symm
 
 abbrev toOfListsRightMoves {L R : List PGame} : Fin R.length ≃ (ofLists L R).RightMoves :=
   Equiv.ulift.symm
-
-@[simp]
-theorem ofLists_moveLeft' {L R : List PGame} (i : (ofLists L R).LeftMoves) :
-    (ofLists L R).moveLeft i = L[i.down.val] :=
-  rfl
-
-theorem ofLists_moveLeft {L R : List PGame} (i : Fin L.length) :
-    (ofLists L R).moveLeft (ULift.up i) = L[i] :=
-  rfl
-
-@[simp]
-theorem ofLists_moveRight' {L R : List PGame} (i : (ofLists L R).RightMoves) :
-    (ofLists L R).moveRight i = R[i.down.val] :=
-  rfl
-
-theorem ofLists_moveRight {L R : List PGame} (i : Fin R.length) :
-    (ofLists L R).moveRight (ULift.up i) = R[i] :=
-  rfl
 
 @[elab_as_elim]
 def moveRecOn {C : PGame → Sort*} (x : PGame)
@@ -235,13 +213,9 @@ theorem Subsequent.mk_right {xl xr} (xL : xl → PGame) (xR : xr → PGame) (j :
   @Subsequent.moveRight (mk _ _ _ _) j
 
 macro "pgame_wf_tac" : tactic =>
-
   `(tactic| solve_by_elim (config := { maxDepth := 8 })
-
     [Prod.Lex.left, Prod.Lex.right, PSigma.Lex.left, PSigma.Lex.right,
-
     Subsequent.moveLeft, Subsequent.moveRight, Subsequent.mk_left, Subsequent.mk_right,
-
     Subsequent.trans] )
 
 variable {xl xr : Type u}
@@ -272,14 +246,6 @@ theorem Subsequent.mk_right' (xL : xl → PGame) (xR : xr → PGame) (j : RightM
 instance : Zero PGame :=
   ⟨⟨PEmpty, PEmpty, PEmpty.elim, PEmpty.elim⟩⟩
 
-@[simp]
-theorem zero_leftMoves : LeftMoves 0 = PEmpty :=
-  rfl
-
-@[simp]
-theorem zero_rightMoves : RightMoves 0 = PEmpty :=
-  rfl
-
 instance isEmpty_zero_leftMoves : IsEmpty (LeftMoves 0) :=
   instIsEmptyPEmpty
 
@@ -291,18 +257,6 @@ instance : Inhabited PGame :=
 
 instance instOnePGame : One PGame :=
   ⟨⟨PUnit, PEmpty, fun _ => 0, PEmpty.elim⟩⟩
-
-@[simp]
-theorem one_leftMoves : LeftMoves 1 = PUnit :=
-  rfl
-
-@[simp]
-theorem one_moveLeft (x) : moveLeft 1 x = 0 :=
-  rfl
-
-@[simp]
-theorem one_rightMoves : RightMoves 1 = PEmpty :=
-  rfl
 
 instance uniqueOneLeftMoves : Unique (LeftMoves 1) :=
   PUnit.unique
@@ -316,6 +270,8 @@ def Identical : PGame.{u} → PGame.{u} → Prop
   | mk _ _ xL xR, mk _ _ yL yR =>
     Relator.BiTotal (fun i j ↦ Identical (xL i) (yL j)) ∧
       Relator.BiTotal (fun i j ↦ Identical (xR i) (yR j))
+
+@[inherit_doc] scoped infix:50 " ≡ " => PGame.Identical
 
 theorem identical_iff : ∀ {x y : PGame}, x ≡ y ↔
     Relator.BiTotal (x.moveLeft · ≡ y.moveLeft ·) ∧ Relator.BiTotal (x.moveRight · ≡ y.moveRight ·)
@@ -339,6 +295,10 @@ theorem identical_comm {x y} : x ≡ y ↔ y ≡ x :=
 def memₗ (x y : PGame.{u}) : Prop := ∃ b, x ≡ y.moveLeft b
 
 def memᵣ (x y : PGame.{u}) : Prop := ∃ b, x ≡ y.moveRight b
+
+@[inherit_doc] scoped infix:50 " ∈ₗ " => PGame.memₗ
+
+@[inherit_doc] scoped infix:50 " ∈ᵣ " => PGame.memᵣ
 
 @[inherit_doc PGame.memₗ] binder_predicate x " ∈ₗ " y:term => `($x ∈ₗ $y)
 @[inherit_doc PGame.memᵣ] binder_predicate x " ∈ᵣ " y:term => `($x ∈ᵣ $y)
@@ -995,26 +955,8 @@ def mk' (L : y.LeftMoves ≃ x.LeftMoves) (R : y.RightMoves ≃ x.RightMoves)
 def leftMovesEquiv : x ≡r y → x.LeftMoves ≃ y.LeftMoves
   | ⟨L,_, _,_⟩ => L
 
-@[simp]
-theorem mk_leftMovesEquiv {x y L R hL hR} : (@Relabelling.mk x y L R hL hR).leftMovesEquiv = L :=
-  rfl
-
-@[simp]
-theorem mk'_leftMovesEquiv {x y L R hL hR} :
-    (@Relabelling.mk' x y L R hL hR).leftMovesEquiv = L.symm :=
-  rfl
-
 def rightMovesEquiv : x ≡r y → x.RightMoves ≃ y.RightMoves
   | ⟨_, R, _, _⟩ => R
-
-@[simp]
-theorem mk_rightMovesEquiv {x y L R hL hR} : (@Relabelling.mk x y L R hL hR).rightMovesEquiv = R :=
-  rfl
-
-@[simp]
-theorem mk'_rightMovesEquiv {x y L R hL hR} :
-    (@Relabelling.mk' x y L R hL hR).rightMovesEquiv = R.symm :=
-  rfl
 
 def moveLeft : ∀ (r : x ≡r y) (i : x.LeftMoves), x.moveLeft i ≡r y.moveLeft (r.leftMovesEquiv i)
   | ⟨_, _, hL, _⟩ => hL
@@ -1075,22 +1017,6 @@ instance {x y : PGame} : Coe (x ≡r y) (x ≈ y) :=
 
 def relabel {x : PGame} {xl' xr'} (el : xl' ≃ x.LeftMoves) (er : xr' ≃ x.RightMoves) : PGame :=
   ⟨xl', xr', x.moveLeft ∘ el, x.moveRight ∘ er⟩
-
-@[simp]
-theorem relabel_moveLeft' {x : PGame} {xl' xr'} (el : xl' ≃ x.LeftMoves) (er : xr' ≃ x.RightMoves)
-    (i : xl') : moveLeft (relabel el er) i = x.moveLeft (el i) :=
-  rfl
-
-theorem relabel_moveLeft {x : PGame} {xl' xr'} (el : xl' ≃ x.LeftMoves) (er : xr' ≃ x.RightMoves)
-    (i : x.LeftMoves) : moveLeft (relabel el er) (el.symm i) = x.moveLeft i := by simp
-
-@[simp]
-theorem relabel_moveRight' {x : PGame} {xl' xr'} (el : xl' ≃ x.LeftMoves) (er : xr' ≃ x.RightMoves)
-    (j : xr') : moveRight (relabel el er) j = x.moveRight (er j) :=
-  rfl
-
-theorem relabel_moveRight {x : PGame} {xl' xr'} (el : xl' ≃ x.LeftMoves) (er : xr' ≃ x.RightMoves)
-    (j : x.RightMoves) : moveRight (relabel el er) (er.symm j) = x.moveRight j := by simp
 
 def relabelRelabelling {x : PGame} {xl' xr'} (el : xl' ≃ x.LeftMoves) (er : xr' ≃ x.RightMoves) :
     x ≡r relabel el er :=
@@ -1184,18 +1110,6 @@ theorem moveRight_neg' {x : PGame} (i) :
     (-x).moveRight i = -x.moveLeft (toRightMovesNeg.symm i) := by
   cases x
   rfl
-
-theorem moveLeft_neg_symm {x : PGame} (i) :
-    x.moveLeft (toRightMovesNeg.symm i) = -(-x).moveRight i := by simp
-
-theorem moveLeft_neg_symm' {x : PGame} (i) :
-    x.moveLeft i = -(-x).moveRight (toRightMovesNeg i) := by simp
-
-theorem moveRight_neg_symm {x : PGame} (i) :
-    x.moveRight (toLeftMovesNeg.symm i) = -(-x).moveLeft i := by simp
-
-theorem moveRight_neg_symm' {x : PGame} (i) :
-    x.moveRight i = -(-x).moveLeft (toLeftMovesNeg i) := by simp
 
 def Relabelling.negCongr : ∀ {x y : PGame}, x ≡r y → -x ≡r -y
   | ⟨_, _, _, _⟩, ⟨_, _, _, _⟩, ⟨L, R, hL, hR⟩ =>
@@ -1346,22 +1260,10 @@ def toRightMovesAdd {x y : PGame} : x.RightMoves ⊕ y.RightMoves ≃ (x + y).Ri
   Equiv.cast (rightMoves_add x y).symm
 
 @[simp]
-theorem mk_add_moveLeft_inl {xl xr yl yr} {xL xR yL yR} {i} :
-    (mk xl xr xL xR + mk yl yr yL yR).moveLeft (Sum.inl i) =
-      (mk xl xr xL xR).moveLeft i + mk yl yr yL yR :=
-  rfl
-
-@[simp]
 theorem add_moveLeft_inl {x : PGame} (y : PGame) (i) :
     (x + y).moveLeft (toLeftMovesAdd (Sum.inl i)) = x.moveLeft i + y := by
   cases x
   cases y
-  rfl
-
-@[simp]
-theorem mk_add_moveRight_inl {xl xr yl yr} {xL xR yL yR} {i} :
-    (mk xl xr xL xR + mk yl yr yL yR).moveRight (Sum.inl i) =
-      (mk xl xr xL xR).moveRight i + mk yl yr yL yR :=
   rfl
 
 @[simp]
@@ -1372,22 +1274,10 @@ theorem add_moveRight_inl {x : PGame} (y : PGame) (i) :
   rfl
 
 @[simp]
-theorem mk_add_moveLeft_inr {xl xr yl yr} {xL xR yL yR} {i} :
-    (mk xl xr xL xR + mk yl yr yL yR).moveLeft (Sum.inr i) =
-      mk xl xr xL xR + (mk yl yr yL yR).moveLeft i :=
-  rfl
-
-@[simp]
 theorem add_moveLeft_inr (x : PGame) {y : PGame} (i) :
     (x + y).moveLeft (toLeftMovesAdd (Sum.inr i)) = x + y.moveLeft i := by
   cases x
   cases y
-  rfl
-
-@[simp]
-theorem mk_add_moveRight_inr {xl xr yl yr} {xL xR yL yR} {i} :
-    (mk xl xr xL xR + mk yl yr yL yR).moveRight (Sum.inr i) =
-      mk xl xr xL xR + (mk yl yr yL yR).moveRight i :=
   rfl
 
 @[simp]
@@ -1701,22 +1591,6 @@ theorem insertRight_insertLeft {x x' x'' : PGame} :
 
 def star : PGame.{u} :=
   ⟨PUnit, PUnit, fun _ => 0, fun _ => 0⟩
-
-@[simp]
-theorem star_leftMoves : star.LeftMoves = PUnit :=
-  rfl
-
-@[simp]
-theorem star_rightMoves : star.RightMoves = PUnit :=
-  rfl
-
-@[simp]
-theorem star_moveLeft (x) : star.moveLeft x = 0 :=
-  rfl
-
-@[simp]
-theorem star_moveRight (x) : star.moveRight x = 0 :=
-  rfl
 
 instance uniqueStarLeftMoves : Unique star.LeftMoves :=
   PUnit.unique

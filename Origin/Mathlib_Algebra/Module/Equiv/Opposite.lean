@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Algebra.Module.Opposite
 
+noncomputable section
+
 /-!
 # Module operations on `Mᵐᵒᵖ`
 
@@ -39,38 +41,5 @@ variable (R : Type u) {M : Type v} [Semiring R] [AddCommMonoid M] [Module R M]
 
 def opLinearEquiv : M ≃ₗ[R] Mᵐᵒᵖ :=
   { opAddEquiv with map_smul' := MulOpposite.op_smul }
-
-@[simp]
-theorem coe_opLinearEquiv : (opLinearEquiv R : M → Mᵐᵒᵖ) = op :=
-  rfl
-
-@[simp]
-theorem coe_opLinearEquiv_symm : ((opLinearEquiv R).symm : Mᵐᵒᵖ → M) = unop :=
-  rfl
-
-@[simp]
-theorem coe_opLinearEquiv_toLinearMap : ((opLinearEquiv R).toLinearMap : M → Mᵐᵒᵖ) = op :=
-  rfl
-
-@[simp]
-theorem coe_opLinearEquiv_symm_toLinearMap :
-    ((opLinearEquiv R).symm.toLinearMap : Mᵐᵒᵖ → M) = unop :=
-  rfl
-
-theorem opLinearEquiv_toAddEquiv : (opLinearEquiv R : M ≃ₗ[R] Mᵐᵒᵖ).toAddEquiv = opAddEquiv :=
-  rfl
-
-@[simp]
-theorem coe_opLinearEquiv_addEquiv : ((opLinearEquiv R : M ≃ₗ[R] Mᵐᵒᵖ) : M ≃+ Mᵐᵒᵖ) = opAddEquiv :=
-  rfl
-
-theorem opLinearEquiv_symm_toAddEquiv :
-    (opLinearEquiv R : M ≃ₗ[R] Mᵐᵒᵖ).symm.toAddEquiv = opAddEquiv.symm :=
-  rfl
-
-@[simp]
-theorem coe_opLinearEquiv_symm_addEquiv :
-    ((opLinearEquiv R : M ≃ₗ[R] Mᵐᵒᵖ).symm : Mᵐᵒᵖ ≃+ M) = opAddEquiv.symm :=
-  rfl
 
 end MulOpposite

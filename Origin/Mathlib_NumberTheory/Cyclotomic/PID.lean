@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.NumberField.ClassNumber
 import Mathlib.NumberTheory.Cyclotomic.Rat
 import Mathlib.NumberTheory.Cyclotomic.Embeddings
 
+noncomputable section
+
 /-!
 # Cyclotomic fields whose ring of integers is a PID.
 We prove that `ℤ [ζₚ]` is a PID for specific values of `p`. The result holds for `p ≤ 19`,

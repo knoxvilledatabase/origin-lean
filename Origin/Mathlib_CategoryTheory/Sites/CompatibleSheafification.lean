@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.CompatiblePlus
 import Mathlib.CategoryTheory.Sites.ConcreteSheafification
 
+noncomputable section
+
 /-!
 
 In this file, we prove that sheafification is compatible with functors which

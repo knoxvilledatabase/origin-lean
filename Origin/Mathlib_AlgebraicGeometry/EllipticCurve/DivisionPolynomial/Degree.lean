@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/DivisionPolynomial/Degree.lean
-Genuine: 22 | Conflates: 2 | Dissolved: 34 | Infrastructure: 0
+Genuine: 51 | Conflates: 7 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Basic
 import Mathlib.Tactic.ComputeDegree
+
+noncomputable section
 
 /-!
 # Division polynomials of Weierstrass curves
@@ -66,15 +68,22 @@ lemma coeff_Ψ₂Sq : W.Ψ₂Sq.coeff 3 = 4 := by
   rw [Ψ₂Sq]
   compute_degree!
 
--- DISSOLVED: coeff_Ψ₂Sq_ne_zero
+lemma coeff_Ψ₂Sq_ne_zero (h : (4 : R) ≠ 0) : W.Ψ₂Sq.coeff 3 ≠ 0 := by
+  rwa [coeff_Ψ₂Sq]
 
--- DISSOLVED: natDegree_Ψ₂Sq
+@[simp]
+lemma natDegree_Ψ₂Sq (h : (4 : R) ≠ 0) : W.Ψ₂Sq.natDegree = 3 :=
+  natDegree_eq_of_le_of_coeff_ne_zero W.natDegree_Ψ₂Sq_le <| W.coeff_Ψ₂Sq_ne_zero h
 
--- DISSOLVED: natDegree_Ψ₂Sq_pos
+lemma natDegree_Ψ₂Sq_pos (h : (4 : R) ≠ 0) : 0 < W.Ψ₂Sq.natDegree :=
+  W.natDegree_Ψ₂Sq h ▸ three_pos
 
--- DISSOLVED: leadingCoeff_Ψ₂Sq
+@[simp]
+lemma leadingCoeff_Ψ₂Sq (h : (4 : R) ≠ 0) : W.Ψ₂Sq.leadingCoeff = 4 := by
+  rw [leadingCoeff, W.natDegree_Ψ₂Sq h, coeff_Ψ₂Sq]
 
--- DISSOLVED: Ψ₂Sq_ne_zero
+lemma Ψ₂Sq_ne_zero (h : (4 : R) ≠ 0) : W.Ψ₂Sq ≠ 0 :=
+  ne_zero_of_natDegree_gt <| W.natDegree_Ψ₂Sq_pos h
 
 end Ψ₂Sq
 
@@ -89,15 +98,22 @@ lemma coeff_Ψ₃ : W.Ψ₃.coeff 4 = 3 := by
   rw [Ψ₃]
   compute_degree!
 
--- DISSOLVED: coeff_Ψ₃_ne_zero
+lemma coeff_Ψ₃_ne_zero (h : (3 : R) ≠ 0) : W.Ψ₃.coeff 4 ≠ 0 := by
+  rwa [coeff_Ψ₃]
 
--- DISSOLVED: natDegree_Ψ₃
+@[simp]
+lemma natDegree_Ψ₃ (h : (3 : R) ≠ 0) : W.Ψ₃.natDegree = 4 :=
+  natDegree_eq_of_le_of_coeff_ne_zero W.natDegree_Ψ₃_le <| W.coeff_Ψ₃_ne_zero h
 
--- DISSOLVED: natDegree_Ψ₃_pos
+lemma natDegree_Ψ₃_pos (h : (3 : R) ≠ 0) : 0 < W.Ψ₃.natDegree :=
+  W.natDegree_Ψ₃ h ▸ four_pos
 
--- DISSOLVED: leadingCoeff_Ψ₃
+@[simp]
+lemma leadingCoeff_Ψ₃ (h : (3 : R) ≠ 0) : W.Ψ₃.leadingCoeff = 3 := by
+  rw [leadingCoeff, W.natDegree_Ψ₃ h, coeff_Ψ₃]
 
--- DISSOLVED: Ψ₃_ne_zero
+lemma Ψ₃_ne_zero (h : (3 : R) ≠ 0) : W.Ψ₃ ≠ 0 :=
+  ne_zero_of_natDegree_gt <| W.natDegree_Ψ₃_pos h
 
 end Ψ₃
 
@@ -112,15 +128,22 @@ lemma coeff_preΨ₄ : W.preΨ₄.coeff 6 = 2 := by
   rw [preΨ₄]
   compute_degree!
 
--- DISSOLVED: coeff_preΨ₄_ne_zero
+lemma coeff_preΨ₄_ne_zero (h : (2 : R) ≠ 0) : W.preΨ₄.coeff 6 ≠ 0 := by
+  rwa [coeff_preΨ₄]
 
--- DISSOLVED: natDegree_preΨ₄
+@[simp]
+lemma natDegree_preΨ₄ (h : (2 : R) ≠ 0) : W.preΨ₄.natDegree = 6 :=
+  natDegree_eq_of_le_of_coeff_ne_zero W.natDegree_preΨ₄_le <| W.coeff_preΨ₄_ne_zero h
 
--- DISSOLVED: natDegree_preΨ₄_pos
+lemma natDegree_preΨ₄_pos (h : (2 : R) ≠ 0) : 0 < W.preΨ₄.natDegree := by
+  linarith only [W.natDegree_preΨ₄ h]
 
--- DISSOLVED: leadingCoeff_preΨ₄
+@[simp]
+lemma leadingCoeff_preΨ₄ (h : (2 : R) ≠ 0) : W.preΨ₄.leadingCoeff = 2 := by
+  rw [leadingCoeff, W.natDegree_preΨ₄ h, coeff_preΨ₄]
 
--- DISSOLVED: preΨ₄_ne_zero
+lemma preΨ₄_ne_zero (h : (2 : R) ≠ 0) : W.preΨ₄ ≠ 0 :=
+  ne_zero_of_natDegree_gt <| W.natDegree_preΨ₄_pos h
 
 end preΨ₄
 
@@ -129,7 +152,17 @@ section preΨ'
 private def expDegree (n : ℕ) : ℕ :=
   (n ^ 2 - if Even n then 4 else 1) / 2
 
--- DISSOLVED: expDegree_cast
+private lemma expDegree_cast {n : ℕ} (hn : n ≠ 0) :
+    2 * (expDegree n : ℤ) = n ^ 2 - if Even n then 4 else 1 := by
+  rcases n.even_or_odd' with ⟨n, rfl | rfl⟩
+  · rcases n with _ | n
+    · contradiction
+    push_cast [expDegree, show (2 * (n + 1)) ^ 2 = 2 * (2 * n * (n + 2)) + 4 by ring1, even_two_mul,
+      Nat.add_sub_cancel, Nat.mul_div_cancel_left _ two_pos]
+    ring1
+  · push_cast [expDegree, show (2 * n + 1) ^ 2 = 2 * (2 * n * (n + 1)) + 1 by ring1,
+      n.not_even_two_mul_add_one, Nat.add_sub_cancel, Nat.mul_div_cancel_left _ two_pos]
+    ring1
 
 private lemma expDegree_rec (m : ℕ) :
     (expDegree (2 * (m + 3)) = 2 * expDegree (m + 2) + expDegree (m + 3) + expDegree (m + 5) ∧
@@ -205,15 +238,33 @@ lemma coeff_preΨ' (n : ℕ) : (W.preΨ' n).coeff ((n ^ 2 - if Even n then 4 els
   convert (W.natDegree_coeff_preΨ' n).right using 1
   rcases n.even_or_odd' with ⟨n, rfl | rfl⟩ <;> simp [expCoeff, n.not_even_two_mul_add_one]
 
--- DISSOLVED: coeff_preΨ'_ne_zero
+lemma coeff_preΨ'_ne_zero {n : ℕ} (h : (n : R) ≠ 0) :
+    (W.preΨ' n).coeff ((n ^ 2 - if Even n then 4 else 1) / 2) ≠ 0 := by
+  rcases n.even_or_odd' with ⟨n, rfl | rfl⟩
+  · rw [coeff_preΨ', if_pos <| even_two_mul n, n.mul_div_cancel_left two_pos]
+    exact right_ne_zero_of_mul <| by rwa [← Nat.cast_mul]
+  · rwa [coeff_preΨ', if_neg n.not_even_two_mul_add_one]
 
--- DISSOLVED: natDegree_preΨ'
+@[simp]
+lemma natDegree_preΨ' {n : ℕ} (h : (n : R) ≠ 0) :
+    (W.preΨ' n).natDegree = (n ^ 2 - if Even n then 4 else 1) / 2 :=
+  natDegree_eq_of_le_of_coeff_ne_zero (W.natDegree_preΨ'_le n) <| W.coeff_preΨ'_ne_zero h
 
--- DISSOLVED: natDegree_preΨ'_pos
+lemma natDegree_preΨ'_pos {n : ℕ} (hn : 2 < n) (h : (n : R) ≠ 0) : 0 < (W.preΨ' n).natDegree := by
+  rw [W.natDegree_preΨ' h, Nat.div_pos_iff two_ne_zero]
+  split_ifs <;>
+    exact Nat.AtLeastTwo.prop.trans <| Nat.sub_le_sub_right (Nat.pow_le_pow_of_le_left hn 2) _
 
--- DISSOLVED: leadingCoeff_preΨ'
+@[simp]
+lemma leadingCoeff_preΨ' {n : ℕ} (h : (n : R) ≠ 0) :
+    (W.preΨ' n).leadingCoeff = if Even n then n / 2 else n := by
+  rw [leadingCoeff, W.natDegree_preΨ' h, coeff_preΨ']
 
--- DISSOLVED: preΨ'_ne_zero
+-- CONFLATES (assumes ground = zero): preΨ'_ne_zero
+lemma preΨ'_ne_zero [Nontrivial R] {n : ℕ} (h : (n : R) ≠ 0) : W.preΨ' n ≠ 0 := by
+  by_cases hn : 2 < n
+  · exact ne_zero_of_natDegree_gt <| W.natDegree_preΨ'_pos hn h
+  · rcases n with _ | _ | _ <;> aesop
 
 end preΨ'
 
@@ -236,15 +287,37 @@ lemma coeff_preΨ (n : ℤ) : (W.preΨ n).coeff ((n.natAbs ^ 2 - if Even n then 
       push_cast [even_two_mul, Int.not_even_two_mul_add_one, Int.neg_ediv_of_dvd ⟨n, rfl⟩] at * <;>
       rw [ih]
 
--- DISSOLVED: coeff_preΨ_ne_zero
+lemma coeff_preΨ_ne_zero {n : ℤ} (h : (n : R) ≠ 0) :
+    (W.preΨ n).coeff ((n.natAbs ^ 2 - if Even n then 4 else 1) / 2) ≠ 0 := by
+  induction n using Int.negInduction with
+  | nat n => simpa only [preΨ_ofNat, Int.even_coe_nat]
+      using W.coeff_preΨ'_ne_zero <| by exact_mod_cast h
+  | neg ih n => simpa only [preΨ_neg, coeff_neg, neg_ne_zero, Int.natAbs_neg, even_neg]
+        using ih n <| neg_ne_zero.mp <| by exact_mod_cast h
 
--- DISSOLVED: natDegree_preΨ
+@[simp]
+lemma natDegree_preΨ {n : ℤ} (h : (n : R) ≠ 0) :
+    (W.preΨ n).natDegree = (n.natAbs ^ 2 - if Even n then 4 else 1) / 2 :=
+  natDegree_eq_of_le_of_coeff_ne_zero (W.natDegree_preΨ_le n) <| W.coeff_preΨ_ne_zero h
 
--- DISSOLVED: natDegree_preΨ_pos
+lemma natDegree_preΨ_pos {n : ℤ} (hn : 2 < n.natAbs) (h : (n : R) ≠ 0) :
+    0 < (W.preΨ n).natDegree := by
+  induction n using Int.negInduction with
+  | nat n => simpa only [preΨ_ofNat] using W.natDegree_preΨ'_pos hn <| by exact_mod_cast h
+  | neg ih n => simpa only [preΨ_neg, natDegree_neg]
+        using ih n (by rwa [← Int.natAbs_neg]) <| neg_ne_zero.mp <| by exact_mod_cast h
 
--- DISSOLVED: leadingCoeff_preΨ
+@[simp]
+lemma leadingCoeff_preΨ {n : ℤ} (h : (n : R) ≠ 0) :
+    (W.preΨ n).leadingCoeff = if Even n then n / 2 else n := by
+  rw [leadingCoeff, W.natDegree_preΨ h, coeff_preΨ]
 
--- DISSOLVED: preΨ_ne_zero
+-- CONFLATES (assumes ground = zero): preΨ_ne_zero
+lemma preΨ_ne_zero [Nontrivial R] {n : ℤ} (h : (n : R) ≠ 0) : W.preΨ n ≠ 0 := by
+  induction n using Int.negInduction with
+  | nat n => simpa only [preΨ_ofNat] using W.preΨ'_ne_zero <| by exact_mod_cast h
+  | neg ih n => simpa only [preΨ_neg, neg_ne_zero]
+        using ih n <| neg_ne_zero.mp <| by exact_mod_cast h
 
 end preΨ
 
@@ -282,15 +355,33 @@ lemma coeff_ΨSq (n : ℤ) : (W.ΨSq n).coeff (n.natAbs ^ 2 - 1) = n ^ 2 := by
   | nat n => exact_mod_cast (W.natDegree_coeff_ΨSq_ofNat n).right
   | neg ih => simp_rw [ΨSq_neg, Int.natAbs_neg, ← Int.cast_pow, neg_sq, Int.cast_pow, ih]
 
--- DISSOLVED: coeff_ΨSq_ne_zero
+lemma coeff_ΨSq_ne_zero [NoZeroDivisors R] {n : ℤ} (h : (n : R) ≠ 0) :
+    (W.ΨSq n).coeff (n.natAbs ^ 2 - 1) ≠ 0 := by
+  rwa [coeff_ΨSq, pow_ne_zero_iff two_ne_zero]
 
--- DISSOLVED: natDegree_ΨSq
+@[simp]
+lemma natDegree_ΨSq [NoZeroDivisors R] {n : ℤ} (h : (n : R) ≠ 0) :
+    (W.ΨSq n).natDegree = n.natAbs ^ 2 - 1 :=
+  natDegree_eq_of_le_of_coeff_ne_zero (W.natDegree_ΨSq_le n) <| W.coeff_ΨSq_ne_zero h
 
--- DISSOLVED: natDegree_ΨSq_pos
+lemma natDegree_ΨSq_pos [NoZeroDivisors R] {n : ℤ} (hn : 1 < n.natAbs) (h : (n : R) ≠ 0) :
+    0 < (W.ΨSq n).natDegree := by
+  rwa [W.natDegree_ΨSq h, Nat.sub_pos_iff_lt, Nat.one_lt_pow_iff two_ne_zero]
 
--- DISSOLVED: leadingCoeff_ΨSq
+@[simp]
+lemma leadingCoeff_ΨSq [NoZeroDivisors R] {n : ℤ} (h : (n : R) ≠ 0) :
+    (W.ΨSq n).leadingCoeff = n ^ 2 := by
+  rw [leadingCoeff, W.natDegree_ΨSq h, coeff_ΨSq]
 
--- DISSOLVED: ΨSq_ne_zero
+lemma ΨSq_ne_zero [NoZeroDivisors R] {n : ℤ} (h : (n : R) ≠ 0) : W.ΨSq n ≠ 0 := by
+  by_cases hn : 1 < n.natAbs
+  · exact ne_zero_of_natDegree_gt <| W.natDegree_ΨSq_pos hn h
+  · rcases hm : n.natAbs with _ | m
+    · push_cast [Int.natAbs_eq_zero.mp hm, ne_self_iff_false] at h
+    · rcases Int.natAbs_eq_iff.mp hm with rfl | rfl <;>
+        rw [hm, Nat.lt_add_left_iff_pos, Nat.not_lt_eq, Nat.le_zero] at hn <;>
+        push_cast [hn, ΨSq_neg, ΨSq_one] <;>
+        exact fun h' => h <| C_injective <| by push_cast [hn, C_neg, C_1, h', neg_zero, C_0]; rfl
 
 end ΨSq
 
@@ -341,21 +432,29 @@ lemma coeff_Φ (n : ℤ) : (W.Φ n).coeff (n.natAbs ^ 2) = 1 := by
   | nat n => exact (W.natDegree_coeff_Φ_ofNat n).right
   | neg ih => simp only [Φ_neg, Int.natAbs_neg, ih]
 
--- DISSOLVED: coeff_Φ_ne_zero
+-- CONFLATES (assumes ground = zero): coeff_Φ_ne_zero
+lemma coeff_Φ_ne_zero [Nontrivial R] (n : ℤ) : (W.Φ n).coeff (n.natAbs ^ 2) ≠ 0 :=
+  W.coeff_Φ n ▸ one_ne_zero
 
 -- CONFLATES (assumes ground = zero): natDegree_Φ
 @[simp]
 lemma natDegree_Φ [Nontrivial R] (n : ℤ) : (W.Φ n).natDegree = n.natAbs ^ 2 :=
   natDegree_eq_of_le_of_coeff_ne_zero (W.natDegree_Φ_le n) <| W.coeff_Φ_ne_zero n
 
--- DISSOLVED: natDegree_Φ_pos
+-- CONFLATES (assumes ground = zero): natDegree_Φ_pos
+lemma natDegree_Φ_pos [Nontrivial R] {n : ℤ} (hn : n ≠ 0) : 0 < (W.Φ n).natDegree := by
+  rwa [natDegree_Φ, pow_pos_iff two_ne_zero, Int.natAbs_pos]
 
 -- CONFLATES (assumes ground = zero): leadingCoeff_Φ
 @[simp]
 lemma leadingCoeff_Φ [Nontrivial R] (n : ℤ) : (W.Φ n).leadingCoeff = 1 := by
   rw [leadingCoeff, natDegree_Φ, coeff_Φ]
 
--- DISSOLVED: Φ_ne_zero
+-- CONFLATES (assumes ground = zero): Φ_ne_zero
+lemma Φ_ne_zero [Nontrivial R] (n : ℤ) : W.Φ n ≠ 0 := by
+  by_cases hn : n = 0
+  · simpa only [hn, Φ_zero] using one_ne_zero
+  · exact ne_zero_of_natDegree_gt <| W.natDegree_Φ_pos hn
 
 end Φ
 

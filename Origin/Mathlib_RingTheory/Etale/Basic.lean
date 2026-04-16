@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Ideal.Quotient.Nilpotent
 import Mathlib.RingTheory.Smooth.Basic
 import Mathlib.RingTheory.Unramified.Basic
 
+noncomputable section
+
 /-!
 
 # Etale morphisms

@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Opposites
 
+noncomputable section
+
 /-!
 # Simplicial objects in a category.
 
@@ -44,6 +46,7 @@ instance : Category (SimplicialObject C) := by
 namespace SimplicialObject
 
 set_option quotPrecheck false in
+/-- `X _[n]` denotes the `n`th-term of the simplicial object X -/
 
 scoped[Simplicial]
 
@@ -427,9 +430,6 @@ def augment (X : SimplicialObject C) (X₀ : C) (f : X _[0] ⟶ X₀)
         rw [← g.op_unop]
         simpa only [← X.map_comp, ← Category.assoc, Category.comp_id, ← op_comp] using w _ _ _ }
 
-theorem augment_hom_zero (X : SimplicialObject C) (X₀ : C) (f : X _[0] ⟶ X₀) (w) :
-    (X.augment X₀ f w).hom.app (op [0]) = f := by simp
-
 end SimplicialObject
 
 def CosimplicialObject :=
@@ -443,6 +443,7 @@ instance : Category (CosimplicialObject C) := by
 namespace CosimplicialObject
 
 set_option quotPrecheck false in
+/-- `X _[n]` denotes the `n`th-term of the cosimplicial object X -/
 
 scoped[Simplicial]
 
@@ -727,9 +728,6 @@ def augment (X : CosimplicialObject C) (X₀ : C) (f : X₀ ⟶ X.obj [0])
         intro i j g
         dsimp
         rw [Category.id_comp, Category.assoc, ← X.map_comp, w] }
-
-theorem augment_hom_zero (X : CosimplicialObject C) (X₀ : C) (f : X₀ ⟶ X.obj [0]) (w) :
-    (X.augment X₀ f w).hom.app [0] = f := by simp
 
 end CosimplicialObject
 

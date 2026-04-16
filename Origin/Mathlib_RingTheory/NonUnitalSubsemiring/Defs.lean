@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Hom.Defs
 import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.Algebra.Group.Submonoid.Defs
 
+noncomputable section
+
 /-!
 # Bundled non-unital subsemirings
 
@@ -43,10 +45,6 @@ instance noZeroDivisors [NoZeroDivisors R] : NoZeroDivisors s :=
 def subtype : s →ₙ+* R :=
   { AddSubmonoidClass.subtype s, MulMemClass.subtype s with toFun := (↑) }
 
-@[simp]
-theorem coeSubtype : (subtype s : s → R) = ((↑) : s → R) :=
-  rfl
-
 instance toNonUnitalSemiring {R} [NonUnitalSemiring R] [SetLike S R]
     [NonUnitalSubsemiringClass S R] : NonUnitalSemiring s :=
   Subtype.coe_injective.nonUnitalSemiring Subtype.val rfl (by simp) (fun _ _ => rfl) fun _ _ => rfl
@@ -74,9 +72,6 @@ instance : NonUnitalSubsemiringClass (NonUnitalSubsemiring R) R where
   add_mem {s} := AddSubsemigroup.add_mem' s.toAddSubmonoid.toAddSubsemigroup
   mul_mem {s} := mul_mem' s
 
-theorem mem_carrier {s : NonUnitalSubsemiring R} {x : R} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
 @[ext]
 theorem ext {S T : NonUnitalSubsemiring R} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -84,11 +79,6 @@ theorem ext {S T : NonUnitalSubsemiring R} (h : ∀ x, x ∈ S ↔ x ∈ T) : S 
 protected def copy (S : NonUnitalSubsemiring R) (s : Set R) (hs : s = ↑S) :
     NonUnitalSubsemiring R :=
   { S.toAddSubmonoid.copy s hs, S.toSubsemigroup.copy s hs with carrier := s }
-
-@[simp]
-theorem coe_copy (S : NonUnitalSubsemiring R) (s : Set R) (hs : s = ↑S) :
-    (S.copy s hs : Set R) = s :=
-  rfl
 
 theorem copy_eq (S : NonUnitalSubsemiring R) (s : Set R) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs
@@ -109,16 +99,6 @@ protected def mk' (s : Set R) (sg : Subsemigroup R) (hg : ↑sg = s) (sa : AddSu
   mul_mem' := by subst hg; exact sg.mul_mem
 
 @[simp]
-theorem coe_mk' {s : Set R} {sg : Subsemigroup R} (hg : ↑sg = s) {sa : AddSubmonoid R}
-    (ha : ↑sa = s) : (NonUnitalSubsemiring.mk' s sg hg sa ha : Set R) = s :=
-  rfl
-
-@[simp]
-theorem mem_mk' {s : Set R} {sg : Subsemigroup R} (hg : ↑sg = s) {sa : AddSubmonoid R}
-    (ha : ↑sa = s) {x : R} : x ∈ NonUnitalSubsemiring.mk' s sg hg sa ha ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
 theorem mk'_toSubsemigroup {s : Set R} {sg : Subsemigroup R} (hg : ↑sg = s) {sa : AddSubmonoid R}
     (ha : ↑sa = s) : (NonUnitalSubsemiring.mk' s sg hg sa ha).toSubsemigroup = sg :=
   SetLike.coe_injective hg.symm
@@ -136,35 +116,7 @@ variable [NonUnitalNonAssocSemiring S]
 
 variable {F : Type*} [FunLike F R S] [NonUnitalRingHomClass F R S] (s : NonUnitalSubsemiring R)
 
-@[simp, norm_cast]
-theorem coe_zero : ((0 : s) : R) = (0 : R) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_add (x y : s) : ((x + y : s) : R) = (x + y : R) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_mul (x y : s) : ((x * y : s) : R) = (x * y : R) :=
-  rfl
-
 /-! Note: currently, there are no ordered versions of non-unital rings. -/
-
-@[simp high]
-theorem mem_toSubsemigroup {s : NonUnitalSubsemiring R} {x : R} : x ∈ s.toSubsemigroup ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp high]
-theorem coe_toSubsemigroup (s : NonUnitalSubsemiring R) : (s.toSubsemigroup : Set R) = s :=
-  rfl
-
-@[simp]
-theorem mem_toAddSubmonoid {s : NonUnitalSubsemiring R} {x : R} : x ∈ s.toAddSubmonoid ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toAddSubmonoid (s : NonUnitalSubsemiring R) : (s.toAddSubmonoid : Set R) = s :=
-  rfl
 
 instance : Top (NonUnitalSubsemiring R) :=
   ⟨{ (⊤ : Subsemigroup R), (⊤ : AddSubmonoid R) with }⟩
@@ -172,10 +124,6 @@ instance : Top (NonUnitalSubsemiring R) :=
 @[simp]
 theorem mem_top (x : R) : x ∈ (⊤ : NonUnitalSubsemiring R) :=
   Set.mem_univ x
-
-@[simp]
-theorem coe_top : ((⊤ : NonUnitalSubsemiring R) : Set R) = Set.univ :=
-  rfl
 
 end NonUnitalSubsemiring
 
@@ -202,9 +150,6 @@ instance : Bot (NonUnitalSubsemiring R) :=
 instance : Inhabited (NonUnitalSubsemiring R) :=
   ⟨⊥⟩
 
-theorem coe_bot : ((⊥ : NonUnitalSubsemiring R) : Set R) = {0} :=
-  rfl
-
 theorem mem_bot {x : R} : x ∈ (⊥ : NonUnitalSubsemiring R) ↔ x = 0 :=
   Set.mem_singleton_iff
 
@@ -212,15 +157,6 @@ instance : Min (NonUnitalSubsemiring R) :=
   ⟨fun s t =>
     { s.toSubsemigroup ⊓ t.toSubsemigroup, s.toAddSubmonoid ⊓ t.toAddSubmonoid with
       carrier := s ∩ t }⟩
-
-@[simp]
-theorem coe_inf (p p' : NonUnitalSubsemiring R) :
-    ((p ⊓ p' : NonUnitalSubsemiring R) : Set R) = (p : Set R) ∩ p' :=
-  rfl
-
-@[simp]
-theorem mem_inf {p p' : NonUnitalSubsemiring R} {x : R} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
 
 end NonUnitalSubsemiring
 

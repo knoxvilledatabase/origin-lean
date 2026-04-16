@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Category.Bipointed
 import Mathlib.Data.TwoPointing
 
+noncomputable section
+
 /-!
 # The category of two-pointed types
 
@@ -37,10 +39,6 @@ instance : CoeSort TwoP Type* :=
 def of {X : Type*} (toTwoPointing : TwoPointing X) : TwoP :=
   ⟨X, toTwoPointing⟩
 
-@[simp]
-theorem coe_of {X : Type*} (toTwoPointing : TwoPointing X) : ↥(of toTwoPointing) = X :=
-  rfl
-
 alias _root_.TwoPointing.TwoP := of
 
 instance : Inhabited TwoP :=
@@ -48,10 +46,6 @@ instance : Inhabited TwoP :=
 
 noncomputable def toBipointed (X : TwoP) : Bipointed :=
   X.toTwoPointing.toProd.Bipointed
-
-@[simp]
-theorem coe_toBipointed (X : TwoP) : ↥X.toBipointed = ↥X :=
-  rfl
 
 noncomputable instance largeCategory : LargeCategory TwoP :=
   InducedCategory.category toBipointed
@@ -74,16 +68,7 @@ noncomputable def swapEquiv : TwoP ≌ TwoP where
   unitIso := Iso.refl _
   counitIso := Iso.refl _
 
-@[simp]
-theorem swapEquiv_symm : swapEquiv.symm = swapEquiv :=
-  rfl
-
 end TwoP
-
-@[simp]
-theorem TwoP_swap_comp_forget_to_Bipointed :
-    TwoP.swap ⋙ forget₂ TwoP Bipointed = forget₂ TwoP Bipointed ⋙ Bipointed.swap :=
-  rfl
 
 @[simps]
 noncomputable def pointedToTwoPFst : Pointed.{u} ⥤ TwoP where
@@ -98,24 +83,6 @@ noncomputable def pointedToTwoPSnd : Pointed.{u} ⥤ TwoP where
   map f := ⟨Option.map f.toFun, rfl, congr_arg _ f.map_point⟩
   map_id _ := Bipointed.Hom.ext Option.map_id
   map_comp f g := Bipointed.Hom.ext (Option.map_comp_map f.1 g.1).symm
-
-@[simp]
-theorem pointedToTwoPFst_comp_swap : pointedToTwoPFst ⋙ TwoP.swap = pointedToTwoPSnd :=
-  rfl
-
-@[simp]
-theorem pointedToTwoPSnd_comp_swap : pointedToTwoPSnd ⋙ TwoP.swap = pointedToTwoPFst :=
-  rfl
-
-@[simp]
-theorem pointedToTwoPFst_comp_forget_to_bipointed :
-    pointedToTwoPFst ⋙ forget₂ TwoP Bipointed = pointedToBipointedFst :=
-  rfl
-
-@[simp]
-theorem pointedToTwoPSnd_comp_forget_to_bipointed :
-    pointedToTwoPSnd ⋙ forget₂ TwoP Bipointed = pointedToBipointedSnd :=
-  rfl
 
 noncomputable def pointedToTwoPFstForgetCompBipointedToPointedFstAdjunction :
     pointedToTwoPFst ⊣ forget₂ TwoP Bipointed ⋙ bipointedToPointedFst :=

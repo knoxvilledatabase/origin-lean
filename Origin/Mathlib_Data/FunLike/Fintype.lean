@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.FunLike.Basic
 import Mathlib.Data.Finite.Prod
 
+noncomputable section
+
 /-!
 # Finiteness of `DFunLike` types
 

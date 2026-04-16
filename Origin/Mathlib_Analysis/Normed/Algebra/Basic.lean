@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Module.CharacterSpace
 import Mathlib.Analysis.Normed.Module.WeakDual
 import Mathlib.Analysis.Normed.Algebra.Spectrum
 
+noncomputable section
+
 /-!
 # Normed algebras
 

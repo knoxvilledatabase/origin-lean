@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.OpenImmersion
 import Mathlib.Topology.IsLocalHomeomorph
 
+noncomputable section
+
 /-!
 
 # Being an isomorphism is local at the target

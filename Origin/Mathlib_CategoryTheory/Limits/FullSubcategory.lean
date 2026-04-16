@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.ClosedUnderIsomorphisms
 
+noncomputable section
+
 /-!
 # Limits in full subcategories
 

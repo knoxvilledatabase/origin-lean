@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Units
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # Some facts about finite rings
 -/

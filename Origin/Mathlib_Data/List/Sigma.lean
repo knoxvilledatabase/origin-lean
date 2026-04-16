@@ -7,6 +7,8 @@ import Mathlib.Data.List.Pairwise
 import Mathlib.Data.List.Perm.Basic
 import Mathlib.Data.List.Nodup
 
+noncomputable section
+
 /-!
 # Utilities for lists of sigmas
 
@@ -37,10 +39,6 @@ variable {α : Type u} {α' : Type u'} {β : α → Type v} {β' : α' → Type 
 
 def keys : List (Sigma β) → List α :=
   map Sigma.fst
-
-@[simp]
-theorem keys_nil : @keys α β [] = [] :=
-  rfl
 
 @[simp]
 theorem keys_cons {s} {l : List (Sigma β)} : (s :: l).keys = s.1 :: l.keys :=
@@ -221,10 +219,6 @@ theorem dlookup_map₂ {γ δ : α → Type*} {l : List (Σ a, γ a)} {f : ∀ a
 def lookupAll (a : α) : List (Sigma β) → List (β a)
   | [] => []
   | ⟨a', b⟩ :: l => if h : a' = a then Eq.recOn h b :: lookupAll a l else lookupAll a l
-
-@[simp]
-theorem lookupAll_nil (a : α) : lookupAll a [] = @nil (β a) :=
-  rfl
 
 @[simp]
 theorem lookupAll_cons_eq (l) (a : α) (b : β a) : lookupAll a (⟨a, b⟩ :: l) = b :: lookupAll a l :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.FunProp.Decl
 import Mathlib.Tactic.FunProp.Theorems
 
+noncomputable section
+
 /-!
 ## `funProp` attribute
 -/

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Matrix/Spectrum.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Spectrum
@@ -8,6 +8,8 @@ import Mathlib.Data.Matrix.Rank
 import Mathlib.LinearAlgebra.Matrix.Diagonal
 import Mathlib.LinearAlgebra.Matrix.Hermitian
 import Mathlib.Topology.Algebra.Module.FiniteDimension
+
+noncomputable section
 
 /-! # Spectral theory of hermitian matrices
 
@@ -63,12 +65,6 @@ noncomputable def eigenvectorUnitary {𝕜 : Type*} [RCLike 𝕜] {n : Type*}
   ⟨(EuclideanSpace.basisFun n 𝕜).toBasis.toMatrix (hA.eigenvectorBasis).toBasis,
     (EuclideanSpace.basisFun n 𝕜).toMatrix_orthonormalBasis_mem_unitary (eigenvectorBasis hA)⟩
 
-lemma eigenvectorUnitary_coe {𝕜 : Type*} [RCLike 𝕜] {n : Type*} [Fintype n]
-    {A : Matrix n n 𝕜} [DecidableEq n] (hA : Matrix.IsHermitian A) :
-    eigenvectorUnitary hA =
-      (EuclideanSpace.basisFun n 𝕜).toBasis.toMatrix (hA.eigenvectorBasis).toBasis :=
-  rfl
-
 @[simp]
 theorem eigenvectorUnitary_apply (i j : n) :
     eigenvectorUnitary hA i j = ⇑(hA.eigenvectorBasis j) i :=
@@ -120,11 +116,21 @@ lemma rank_eq_rank_diagonal : A.rank = (Matrix.diagonal hA.eigenvalues).rank := 
   conv_lhs => rw [hA.spectral_theorem, ← unitary.coe_star]
   simp [-isUnit_iff_ne_zero, -unitary.coe_star, rank_diagonal]
 
--- DISSOLVED: rank_eq_card_non_zero_eigs
+lemma rank_eq_card_non_zero_eigs : A.rank = Fintype.card {i // hA.eigenvalues i ≠ 0} := by
+  rw [rank_eq_rank_diagonal hA, Matrix.rank_diagonal]
 
 end DecidableEq
 
--- DISSOLVED: exists_eigenvector_of_ne_zero
+lemma exists_eigenvector_of_ne_zero (hA : IsHermitian A) (h_ne : A ≠ 0) :
+    ∃ (v : n → 𝕜) (t : ℝ), t ≠ 0 ∧ v ≠ 0 ∧ A *ᵥ v = t • v := by
+  classical
+  have : hA.eigenvalues ≠ 0 := by
+    contrapose! h_ne
+    have := hA.spectral_theorem
+    rwa [h_ne, Pi.comp_zero, RCLike.ofReal_zero, (by rfl : Function.const n (0 : 𝕜) = fun _ ↦ 0),
+      diagonal_zero, mul_zero, zero_mul] at this
+  obtain ⟨i, hi⟩ := Function.ne_iff.mp this
+  exact ⟨_, _, hi, hA.eigenvectorBasis.orthonormal.ne_zero i, hA.mulVec_eigenvectorBasis i⟩
 
 end IsHermitian
 

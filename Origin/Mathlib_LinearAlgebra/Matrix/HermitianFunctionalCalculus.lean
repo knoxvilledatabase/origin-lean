@@ -10,6 +10,8 @@ import Mathlib.Topology.ContinuousMap.Units
 import Mathlib.Analysis.Matrix
 import Mathlib.Topology.UniformSpace.Matrix
 
+noncomputable section
+
 /-!
 # Continuous Functional Calculus for Hermitian Matrices
 

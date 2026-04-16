@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.Flat
 import Mathlib.CategoryTheory.Sites.Continuous
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Cover-preserving functors between sites.
 

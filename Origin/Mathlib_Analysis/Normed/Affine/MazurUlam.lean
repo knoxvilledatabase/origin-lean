@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Instances.RealVectorSpace
 import Mathlib.Analysis.Normed.Affine.Isometry
 
+noncomputable section
+
 /-!
 # Mazur-Ulam Theorem
 
@@ -96,16 +98,6 @@ def toRealLinearIsometryEquivOfMapZero (f : E ≃ᵢ F) (h0 : f 0 = 0) : E ≃�
   { (AddMonoidHom.ofMapMidpoint ℝ ℝ f h0 f.map_midpoint).toRealLinearMap f.continuous, f with
     norm_map' := fun x => show ‖f x‖ = ‖x‖ by simp only [← dist_zero_right, ← h0, f.dist_eq] }
 
-@[simp]
-theorem coe_toRealLinearIsometryEquivOfMapZero (f : E ≃ᵢ F) (h0 : f 0 = 0) :
-    ⇑(f.toRealLinearIsometryEquivOfMapZero h0) = f :=
-  rfl
-
-@[simp]
-theorem coe_toRealLinearIsometryEquivOfMapZero_symm (f : E ≃ᵢ F) (h0 : f 0 = 0) :
-    ⇑(f.toRealLinearIsometryEquivOfMapZero h0).symm = f.symm :=
-  rfl
-
 def toRealLinearIsometryEquiv (f : E ≃ᵢ F) : E ≃ₗᵢ[ℝ] F :=
   (f.trans (IsometryEquiv.addRight (f 0)).symm).toRealLinearIsometryEquivOfMapZero
     (by simpa only [sub_eq_add_neg] using sub_self (f 0))
@@ -115,20 +107,11 @@ theorem toRealLinearIsometryEquiv_apply (f : E ≃ᵢ F) (x : E) :
     (f.toRealLinearIsometryEquiv : E → F) x = f x - f 0 :=
   (sub_eq_add_neg (f x) (f 0)).symm
 
-@[simp]
-theorem toRealLinearIsometryEquiv_symm_apply (f : E ≃ᵢ F) (y : F) :
-    (f.toRealLinearIsometryEquiv.symm : F → E) y = f.symm (y + f 0) :=
-  rfl
-
 def toRealAffineIsometryEquiv (f : PE ≃ᵢ PF) : PE ≃ᵃⁱ[ℝ] PF :=
   AffineIsometryEquiv.mk' f
     ((vaddConst (Classical.arbitrary PE)).trans <|
         f.trans (vaddConst (f <| Classical.arbitrary PE)).symm).toRealLinearIsometryEquiv
     (Classical.arbitrary PE) fun p => by simp
-
-@[simp]
-theorem coeFn_toRealAffineIsometryEquiv (f : PE ≃ᵢ PF) : ⇑f.toRealAffineIsometryEquiv = f :=
-  rfl
 
 @[simp]
 theorem coe_toRealAffineIsometryEquiv (f : PE ≃ᵢ PF) :

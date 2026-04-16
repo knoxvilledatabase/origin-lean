@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/Blocks.lean
-Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 57 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Pointwise.Stabilizer
@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.GroupAction.Pointwise
 import Mathlib.GroupTheory.GroupAction.SubMulAction
 import Mathlib.GroupTheory.Index
 import Mathlib.Tactic.IntervalCases
+
+noncomputable section
 
 /-! # Blocks
 
@@ -161,6 +163,14 @@ lemma isBlock_iff_smul_eq_or_disjoint :
 lemma isBlock_iff_smul_eq_of_mem :
     IsBlock G B ↔ ∀ ⦃g : G⦄ ⦃a : X⦄, a ∈ B → g • a ∈ B → g • B = B := by
   simp [isBlock_iff_smul_eq_of_nonempty, Set.Nonempty, mem_smul_set]
+
+@[to_additive] alias ⟨IsBlock.disjoint_smul_of_ne, _⟩ := isBlock_iff_disjoint_smul_of_ne
+
+@[to_additive] alias ⟨IsBlock.smul_eq_of_nonempty, _⟩ := isBlock_iff_smul_eq_of_nonempty
+
+@[to_additive] alias ⟨IsBlock.smul_eq_or_disjoint, _⟩ := isBlock_iff_smul_eq_or_disjoint
+
+@[to_additive] alias ⟨IsBlock.smul_eq_of_mem, _⟩ := isBlock_iff_smul_eq_of_mem
 
 @[to_additive
 "If `B` is a `G`-block, then it is also a `H`-block for any subgroup `H` of `G`."]

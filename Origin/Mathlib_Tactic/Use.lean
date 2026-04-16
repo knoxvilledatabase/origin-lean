@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Meta.Tactic.Util
 import Lean.Elab.Tactic.Basic
 
+noncomputable section
+
 /-!
 # The `use` tactic
 
@@ -139,13 +141,10 @@ def mkUseDischarger (discharger? : Option (TSyntax ``Parser.Tactic.discharger)) 
   return evalTactic discharger
 
 elab (name := useSyntax)
-
     "use" discharger?:(Parser.Tactic.discharger)? ppSpace args:term,+ : tactic => do
-
   runUse false (← mkUseDischarger discharger?) args.getElems.toList
 
 elab "use!" discharger?:(Parser.Tactic.discharger)? ppSpace args:term,+ : tactic => do
-
   runUse true (← mkUseDischarger discharger?) args.getElems.toList
 
 end Mathlib.Tactic

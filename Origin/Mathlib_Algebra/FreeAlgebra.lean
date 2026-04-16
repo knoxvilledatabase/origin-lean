@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/FreeAlgebra.lean
-Genuine: 32 | Conflates: 3 | Dissolved: 2 | Infrastructure: 19
+Genuine: 32 | Conflates: 5 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Algebra.MonoidAlgebra.NoZeroDivisors
 import Mathlib.RingTheory.Adjoin.Basic
 import Mathlib.Algebra.MonoidAlgebra.Basic
+
+noncomputable section
 
 /-!
 # Free Algebras
@@ -466,9 +468,15 @@ theorem ι_ne_algebraMap [Nontrivial R] (x : X) (r : R) : ι R x ≠ algebraMap 
   rw [h, f1.commutes, Algebra.id.map_eq_self] at hf1
   exact zero_ne_one (hf0.symm.trans hf1)
 
--- DISSOLVED: ι_ne_zero
+-- CONFLATES (assumes ground = zero): ι_ne_zero
+@[simp]
+theorem ι_ne_zero [Nontrivial R] (x : X) : ι R x ≠ 0 :=
+  ι_ne_algebraMap x 0
 
--- DISSOLVED: ι_ne_one
+-- CONFLATES (assumes ground = zero): ι_ne_one
+@[simp]
+theorem ι_ne_one [Nontrivial R] (x : X) : ι R x ≠ 1 :=
+  ι_ne_algebraMap x 1
 
 end
 

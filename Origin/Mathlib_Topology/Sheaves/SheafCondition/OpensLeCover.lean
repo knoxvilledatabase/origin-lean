@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Sheaves.SheafCondition.Sites
 
+noncomputable section
+
 /-!
 # Another version of the sheaf condition.
 

@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Tactic.Linarith.Datatypes
 
+noncomputable section
+
 /-!
 # Parsing input expressions into linear form
 

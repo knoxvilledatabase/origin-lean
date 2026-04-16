@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/Minpoly/IsConjRoot.lean
-Genuine: 27 | Conflates: 5 | Dissolved: 2 | Infrastructure: 3
+Genuine: 28 | Conflates: 6 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Basic
 import Mathlib.FieldTheory.Adjoin
 import Mathlib.FieldTheory.Normal
+
+noncomputable section
 
 /-!
 # Conjugate roots
@@ -203,9 +205,13 @@ theorem isConjRoot_zero_iff_eq_zero' {x : S} : IsConjRoot K x 0 ↔ x = 0 :=
 
 namespace IsConjRoot
 
--- DISSOLVED: ne_zero_of_injective
+-- CONFLATES (assumes ground = zero): ne_zero_of_injective
+theorem ne_zero_of_injective [Nontrivial R] [NoZeroSMulDivisors R S] {x y : S} (hx : x ≠ 0)
+    (h : IsConjRoot R x y) (hf : Function.Injective (algebraMap R S)) : y ≠ 0 :=
+  fun g => hx (eq_zero_of_injective (g ▸ h.symm) hf)
 
--- DISSOLVED: ne_zero
+theorem ne_zero {x y : S} (hx : x ≠ 0) (h : IsConjRoot K x y) : y ≠ 0 :=
+  ne_zero_of_injective hx h (algebraMap K S).injective
 
 end IsConjRoot
 

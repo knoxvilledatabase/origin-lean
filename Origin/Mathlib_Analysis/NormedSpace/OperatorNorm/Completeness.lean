@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Bilinear
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NNNorm
 
+noncomputable section
+
 /-!
 # Operators on complete normed spaces
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.Additive
 import Mathlib.Algebra.Homology.ImageToKernel
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 
+noncomputable section
+
 /-!
 # Opposite categories of complexes
 Given a preadditive category `V`, the opposite of its category of chain complexes is equivalent to

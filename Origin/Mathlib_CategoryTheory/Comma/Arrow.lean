@@ -5,6 +5,8 @@ Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.Basic
 
+noncomputable section
+
 /-!
 # The category of arrows
 

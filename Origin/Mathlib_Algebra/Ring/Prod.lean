@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.Prod
 import Mathlib.Algebra.Ring.CompTypeclasses
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # Semiring, ring etc structures on `R × S`
 
@@ -141,17 +143,6 @@ variable (f : R →ₙ+* R') (g : S →ₙ+* S')
 def prodMap : R × S →ₙ+* R' × S' :=
   (f.comp (fst R S)).prod (g.comp (snd R S))
 
-theorem prodMap_def : prodMap f g = (f.comp (fst R S)).prod (g.comp (snd R S)) :=
-  rfl
-
-@[simp]
-theorem coe_prodMap : ⇑(prodMap f g) = Prod.map f g :=
-  rfl
-
-theorem prod_comp_prodMap (f : T →ₙ+* R) (g : T →ₙ+* S) (f' : R →ₙ+* R') (g' : S →ₙ+* S') :
-    (f'.prodMap g').comp (f.prod g) = (f'.comp f).prod (g'.comp g) :=
-  rfl
-
 end prodMap
 
 end NonUnitalRingHom
@@ -214,17 +205,6 @@ variable (f : R →+* R') (g : S →+* S')
 def prodMap : R × S →+* R' × S' :=
   (f.comp (fst R S)).prod (g.comp (snd R S))
 
-theorem prodMap_def : prodMap f g = (f.comp (fst R S)).prod (g.comp (snd R S)) :=
-  rfl
-
-@[simp]
-theorem coe_prodMap : ⇑(prodMap f g) = Prod.map f g :=
-  rfl
-
-theorem prod_comp_prodMap (f : T →+* R) (g : T →+* S) (f' : R →+* R') (g' : S →+* S') :
-    (f'.prodMap g').comp (f.prod g) = (f'.comp f).prod (g'.comp g) :=
-  rfl
-
 end prodMap
 
 end RingHom
@@ -235,14 +215,6 @@ variable [NonAssocSemiring R] [NonAssocSemiring S] [NonAssocSemiring R'] [NonAss
 
 def prodComm : R × S ≃+* S × R :=
   { AddEquiv.prodComm, MulEquiv.prodComm with }
-
-@[simp]
-theorem coe_prodComm : ⇑(prodComm : R × S ≃+* S × R) = Prod.swap :=
-  rfl
-
-@[simp]
-theorem coe_prodComm_symm : ⇑(prodComm : R × S ≃+* S × R).symm = Prod.swap :=
-  rfl
 
 @[simp]
 theorem fst_comp_coe_prodComm :
@@ -264,46 +236,9 @@ def prodProdProdComm : (R × R') × S × S' ≃+* (R × S) × R' × S' :=
     toFun := fun rrss => ((rrss.1.1, rrss.2.1), (rrss.1.2, rrss.2.2))
     invFun := fun rsrs => ((rsrs.1.1, rsrs.2.1), (rsrs.1.2, rsrs.2.2)) }
 
-@[simp]
-theorem prodProdProdComm_symm : (prodProdProdComm R R' S S').symm = prodProdProdComm R S R' S' :=
-  rfl
-
-@[simp]
-theorem prodProdProdComm_toAddEquiv :
-    (prodProdProdComm R R' S S' : _ ≃+ _) = AddEquiv.prodProdProdComm R R' S S' :=
-  rfl
-
-@[simp]
-theorem prodProdProdComm_toMulEquiv :
-    (prodProdProdComm R R' S S' : _ ≃* _) = MulEquiv.prodProdProdComm R R' S S' :=
-  rfl
-
-@[simp]
-theorem prodProdProdComm_toEquiv :
-    (prodProdProdComm R R' S S' : _ ≃ _) = Equiv.prodProdProdComm R R' S S' :=
-  rfl
-
 end
 
 variable (R S) [Subsingleton S]
-
-@[simps]
-def prodZeroRing : R ≃+* R × S where
-  toFun x := (x, 0)
-  invFun := Prod.fst
-  map_add' := by simp
-  map_mul' := by simp
-  left_inv _ := rfl
-  right_inv x := by cases x; simp [eq_iff_true_of_subsingleton]
-
-@[simps]
-def zeroRingProd : R ≃+* S × R where
-  toFun x := (0, x)
-  invFun := Prod.snd
-  map_add' := by simp
-  map_mul' := by simp
-  left_inv _ := rfl
-  right_inv x := by cases x; simp [eq_iff_true_of_subsingleton]
 
 end RingEquiv
 

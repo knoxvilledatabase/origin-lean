@@ -1,11 +1,13 @@
 /-
 Extracted from Data/List/Dedup.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.List.Nodup
 import Mathlib.Data.List.Lattice
 import Batteries.Data.List.Pairwise
+
+noncomputable section
 
 /-!
 # Erasure of duplicates in a list
@@ -24,10 +26,6 @@ universe u
 namespace List
 
 variable {α β : Type*} [DecidableEq α]
-
-@[simp]
-theorem dedup_nil : dedup [] = ([] : List α) :=
-  rfl
 
 theorem dedup_cons_of_mem' {a : α} {l : List α} (h : a ∈ dedup l) : dedup (a :: l) = dedup l :=
   pwFilter_cons_of_neg <| by simpa only [forall_mem_ne, not_not] using h
@@ -148,7 +146,12 @@ theorem Disjoint.dedup_append {xs ys : List α} (h : Disjoint xs ys) :
   intro a hx hy
   exact h hx (mem_dedup.mp hy)
 
--- DISSOLVED: replicate_dedup
+theorem replicate_dedup {x : α} : ∀ {k}, k ≠ 0 → (replicate k x).dedup = [x]
+  | 0, h => (h rfl).elim
+  | 1, _ => rfl
+  | n + 2, _ => by
+    rw [replicate_succ, dedup_cons_of_mem (mem_replicate.2 ⟨n.succ_ne_zero, rfl⟩),
+      replicate_dedup n.succ_ne_zero]
 
 theorem count_dedup (l : List α) (a : α) : l.dedup.count a = if a ∈ l then 1 else 0 := by
   simp_rw [count_eq_of_nodup <| nodup_dedup l, mem_dedup]

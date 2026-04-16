@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Nat/Factorization/Induction.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Factorization.Defs
+
+noncomputable section
 
 /-!
 # Induction principles involving factorizations
@@ -86,7 +88,22 @@ lemma prime_composite_induction {P : ℕ → Prop} (zero : P 0) (one : P 1)
 
 /-! ## Lemmas on multiplicative functions -/
 
--- DISSOLVED: multiplicative_factorization
+theorem multiplicative_factorization {β : Type*} [CommMonoid β] (f : ℕ → β)
+    (h_mult : ∀ x y : ℕ, Coprime x y → f (x * y) = f x * f y) (hf : f 1 = 1) :
+    ∀ {n : ℕ}, n ≠ 0 → f n = n.factorization.prod fun p k => f (p ^ k) := by
+  apply Nat.recOnPosPrimePosCoprime
+  · rintro p k hp - -
+    -- Porting note: replaced `simp` with `rw`
+    rw [Prime.factorization_pow hp, Finsupp.prod_single_index _]
+    rwa [pow_zero]
+  · simp
+  · rintro -
+    rw [factorization_one, hf]
+    simp
+  · intro a b _ _ hab ha hb hab_pos
+    rw [h_mult a b hab, ha (left_ne_zero_of_mul hab_pos), hb (right_ne_zero_of_mul hab_pos),
+      factorization_mul_of_coprime hab, ← prod_add_index_of_disjoint]
+    exact hab.disjoint_primeFactors
 
 theorem multiplicative_factorization' {β : Type*} [CommMonoid β] (f : ℕ → β)
     (h_mult : ∀ x y : ℕ, Coprime x y → f (x * y) = f x * f y) (hf0 : f 0 = 1) (hf1 : f 1 = 1) :

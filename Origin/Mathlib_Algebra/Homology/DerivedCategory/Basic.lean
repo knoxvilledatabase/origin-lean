@@ -9,6 +9,8 @@ import Mathlib.Algebra.Homology.HomotopyCategory.SingleFunctors
 import Mathlib.Algebra.Homology.HomotopyCategory.Triangulated
 import Mathlib.Algebra.Homology.Localization
 
+noncomputable section
+
 /-! # The derived category of an abelian category
 
 In this file, we construct the derived category `DerivedCategory C` of an

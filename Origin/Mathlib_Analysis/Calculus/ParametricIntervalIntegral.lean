@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.ParametricIntegral
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 
+noncomputable section
+
 /-!
 # Derivatives of interval integrals depending on parameters
 

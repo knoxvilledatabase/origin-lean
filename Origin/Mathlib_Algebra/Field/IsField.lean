@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Field/IsField.lean
-Genuine: 4 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
+Genuine: 6 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
 import Mathlib.Tactic.Common
+
+noncomputable section
 
 /-!
 # `IsField` predicate
@@ -20,7 +22,13 @@ universe u
 
 section IsField
 
--- DISSOLVED: IsField
+structure IsField (R : Type u) [Semiring R] : Prop where
+  /-- For a semiring to be a field, it must have two distinct elements. -/
+  exists_pair_ne : ∃ x y : R, x ≠ y
+  /-- Fields are commutative. -/
+  mul_comm : ∀ x y : R, x * y = y * x
+  /-- Nonzero elements have multiplicative inverses. -/
+  mul_inv_cancel : ∀ {a : R}, a ≠ 0 → ∃ b, a * b = 1
 
 theorem Semifield.toIsField (R : Type u) [Semifield R] : IsField R where
   __ := ‹Semifield R›
@@ -56,6 +64,15 @@ noncomputable def IsField.toField {R : Type u} [Ring R] (h : IsField R) : Field 
     qsmul := _
     qsmul_def := fun _ _ => rfl }
 
--- DISSOLVED: uniq_inv_of_isField
+theorem uniq_inv_of_isField (R : Type u) [Ring R] (hf : IsField R) :
+    ∀ x : R, x ≠ 0 → ∃! y : R, x * y = 1 := by
+  intro x hx
+  apply exists_unique_of_exists_of_unique
+  · exact hf.mul_inv_cancel hx
+  · intro y z hxy hxz
+    calc
+      y = y * (x * z) := by rw [hxz, mul_one]
+      _ = x * y * z := by rw [← mul_assoc, hf.mul_comm y x]
+      _ = z := by rw [hxy, one_mul]
 
 end IsField

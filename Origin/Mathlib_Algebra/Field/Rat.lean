@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Field/Rat.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
 import Mathlib.Data.NNRat.Defs
+
+noncomputable section
 
 /-!
 # The rational numbers form a field
@@ -63,20 +65,21 @@ instance instDiv : Div ℚ≥0 where
 instance instZPow : Pow ℚ≥0 ℤ where
   pow x n := ⟨x ^ n, Rat.zpow_nonneg x.2 n⟩
 
-@[simp, norm_cast] lemma coe_inv (q : ℚ≥0) : ((q⁻¹ : ℚ≥0) : ℚ) = (q : ℚ)⁻¹ := rfl
-
 @[simp, norm_cast] lemma coe_div (p q : ℚ≥0) : ((p / q : ℚ≥0) : ℚ) = p / q := rfl
-
-@[simp, norm_cast] lemma coe_zpow (p : ℚ≥0) (n : ℤ) : ((p ^ n : ℚ≥0) : ℚ) = p ^ n := rfl
 
 lemma inv_def (q : ℚ≥0) : q⁻¹ = divNat q.den q.num := by ext; simp [Rat.inv_def', num_coe, den_coe]
 
 lemma div_def (p q : ℚ≥0) : p / q = divNat (p.num * q.den) (p.den * q.num) := by
   ext; simp [Rat.div_def', num_coe, den_coe]
 
--- DISSOLVED: num_inv_of_ne_zero
+lemma num_inv_of_ne_zero {q : ℚ≥0} (hq : q ≠ 0) : q⁻¹.num = q.den := by
+  rw [inv_def, divNat, num, coe_mk, Rat.divInt_ofNat, ← Rat.mk_eq_mkRat _ _ (num_ne_zero.mpr hq),
+    Int.natAbs_ofNat]
+  simpa using q.coprime_num_den.symm
 
--- DISSOLVED: den_inv_of_ne_zero
+lemma den_inv_of_ne_zero {q : ℚ≥0} (hq : q ≠ 0) : q⁻¹.den = q.num := by
+  rw [inv_def, divNat, den, coe_mk, Rat.divInt_ofNat, ← Rat.mk_eq_mkRat _ _ (num_ne_zero.mpr hq)]
+  simpa using q.coprime_num_den.symm
 
 @[simp]
 lemma num_div_den (q : ℚ≥0) : (q.num : ℚ≥0) / q.den = q := by

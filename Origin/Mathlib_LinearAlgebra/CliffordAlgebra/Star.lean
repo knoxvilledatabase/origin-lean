@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Conjugation
 
+noncomputable section
+
 /-!
 # Star structure on `CliffordAlgebra`
 

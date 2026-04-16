@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Archimedean.Basic
 import Mathlib.Tactic.GCongr
 import Mathlib.Topology.Order.LeftRightNhds
 
+noncomputable section
+
 /-!
 # Corollaries From Approximation Lemmas (`Algebra.ContinuedFractions.Computation.Approximations`)
 

@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/WittVector/Domain.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Identities
+
+noncomputable section
 
 /-!
 
@@ -72,7 +74,17 @@ theorem eq_iterate_verschiebung {x : 𝕎 R} {n : ℕ} (h : ∀ i < n, x.coeff i
     · exact ih fun i hi => h _ (hi.trans (Nat.lt_succ_self _))
     · exact h
 
--- DISSOLVED: verschiebung_nonzero
+theorem verschiebung_nonzero {x : 𝕎 R} (hx : x ≠ 0) :
+    ∃ n : ℕ, ∃ x' : 𝕎 R, x'.coeff 0 ≠ 0 ∧ x = verschiebung^[n] x' := by
+  have hex : ∃ k : ℕ, x.coeff k ≠ 0 := by
+    by_contra! hall
+    apply hx
+    ext i
+    simp only [hall, zero_coeff]
+  let n := Nat.find hex
+  use n, x.shift n
+  refine ⟨Nat.find_spec hex, eq_iterate_verschiebung fun i hi => not_not.mp ?_⟩
+  exact Nat.find_min hex hi
 
 /-!
 ## Witt vectors over a domain

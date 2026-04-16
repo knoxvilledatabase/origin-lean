@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.WidePullbacks
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 import Mathlib.Data.Fintype.Option
 
+noncomputable section
+
 /-!
 # Categories with finite limits.
 

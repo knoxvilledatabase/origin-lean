@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-!
 # More operations on subalgebras
 

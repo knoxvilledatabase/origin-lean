@@ -5,6 +5,8 @@ Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
+noncomputable section
+
 /-!
 # The Symplectic Group
 
@@ -98,9 +100,6 @@ def symJ : symplecticGroup l R :=
   ⟨J l R, J_mem l R⟩
 
 variable {l} {R}
-
-@[simp]
-theorem coe_J : ↑(symJ l R) = J l R := rfl
 
 end SymplecticJ
 

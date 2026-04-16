@@ -1,9 +1,11 @@
 /-
 Extracted from Topology/MetricSpace/Ultra/Basic.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
+
+noncomputable section
 
 /-!
 ## Ultrametric spaces
@@ -150,14 +152,32 @@ lemma closedBall_eq_or_disjoint :
   have h₂ := closedBall_eq_of_mem <| Set.inter_subset_right h.some_mem
   exact h₁.trans h₂.symm
 
--- DISSOLVED: isOpen_closedBall
+lemma isOpen_closedBall {r : ℝ} (hr : r ≠ 0) : IsOpen (closedBall x r) := by
+  cases lt_or_gt_of_ne hr with
+  | inl h =>
+    simp [closedBall_eq_empty.mpr h]
+  | inr h =>
+    rw [isOpen_iff]
+    simp only [Set.mem_compl_iff, not_lt, gt_iff_lt]
+    intro y hy
+    cases closedBall_eq_or_disjoint x y r with
+    | inl hd =>
+      use r
+      simp [h, hd, ball_subset_closedBall]
+    | inr hd =>
+      simp [closedBall_eq_of_mem hy, h.not_lt] at hd
 
--- DISSOLVED: isClopen_closedBall
+lemma isClopen_closedBall {r : ℝ} (hr : r ≠ 0) : IsClopen (closedBall x r) :=
+  ⟨Metric.isClosed_ball, isOpen_closedBall x hr⟩
 
--- DISSOLVED: frontier_closedBall_eq_empty
+lemma frontier_closedBall_eq_empty {r : ℝ} (hr : r ≠ 0) : frontier (closedBall x r) = ∅ :=
+  isClopen_iff_frontier_eq_empty.mp (isClopen_closedBall x hr)
 
--- DISSOLVED: isOpen_sphere
+lemma isOpen_sphere {r : ℝ} (hr : r ≠ 0) : IsOpen (sphere x r) := by
+  rw [← closedBall_diff_ball, sdiff_eq]
+  exact (isOpen_closedBall x hr).inter (isClosed_ball x r).isOpen_compl
 
--- DISSOLVED: isClopen_sphere
+lemma isClopen_sphere {r : ℝ} (hr : r ≠ 0) : IsClopen (sphere x r) :=
+  ⟨Metric.isClosed_sphere, isOpen_sphere x hr⟩
 
 end IsUltrametricDist

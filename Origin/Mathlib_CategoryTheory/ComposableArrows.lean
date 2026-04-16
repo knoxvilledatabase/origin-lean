@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/ComposableArrows.lean
-Genuine: 80 | Conflates: 0 | Dissolved: 1 | Infrastructure: 32
+Genuine: 80 | Conflates: 0 | Dissolved: 0 | Infrastructure: 33
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Preorder
@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Functor.Const
 import Mathlib.Order.Fin.Basic
 import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.SuppressCompilation
+
+noncomputable section
 
 /-!
 # Composable arrows
@@ -68,7 +70,6 @@ variable {C} {n m : ℕ}
 variable (F G : ComposableArrows C n)
 
 macro "valid" : tactic =>
-
   `(tactic| first | assumption | apply zero_le | apply le_rfl | transitivity <;> assumption | omega)
 
 @[simp]
@@ -276,15 +277,6 @@ def obj : Fin (n + 1 + 1) → C
   | ⟨0, _⟩ => X
   | ⟨i + 1, hi⟩ => F.obj' i
 
-@[simp]
-lemma obj_zero : obj F X 0 = X := rfl
-
-@[simp]
-lemma obj_one : obj F X 1 = F.obj' 0 := rfl
-
-@[simp]
-lemma obj_succ (i : ℕ) (hi : i + 1 < n + 1 + 1) : obj F X ⟨i + 1, hi⟩ = F.obj' i := rfl
-
 variable {X} (f : X ⟶ F.left)
 
 def map : ∀ (i j : Fin (n + 1 + 1)) (_ : i ≤ j), obj F X i ⟶ obj F X j
@@ -292,30 +284,6 @@ def map : ∀ (i j : Fin (n + 1 + 1)) (_ : i ≤ j), obj F X i ⟶ obj F X j
   | ⟨0, _⟩, ⟨1, _⟩, _ => f
   | ⟨0, _⟩, ⟨j + 2, hj⟩, _ => f ≫ F.map' 0 (j + 1)
   | ⟨i + 1, hi⟩, ⟨j + 1, hj⟩, hij => F.map' i j (by simpa using hij)
-
-@[simp]
-lemma map_zero_zero : map F f 0 0 (by simp) = 𝟙 X := rfl
-
--- DISSOLVED: map_one_one
-
-@[simp]
-lemma map_zero_one : map F f 0 1 (by simp) = f := rfl
-
-@[simp]
-lemma map_zero_one' : map F f 0 ⟨0 + 1, by simp⟩ (by simp) = f := rfl
-
-@[simp]
-lemma map_zero_succ_succ (j : ℕ) (hj : j + 2 < n + 1 + 1) :
-    map F f 0 ⟨j + 2, hj⟩ (by simp) = f ≫ F.map' 0 (j+1) := rfl
-
-@[simp]
-lemma map_succ_succ (i j : ℕ) (hi : i + 1 < n + 1 + 1) (hj : j + 1 < n + 1 + 1)
-    (hij : i + 1 ≤ j + 1) :
-    map F f ⟨i + 1, hi⟩ ⟨j + 1, hj⟩ hij = F.map' i j := rfl
-
-@[simp]
-lemma map_one_succ (j : ℕ) (hj : j + 1 < n + 1 + 1) :
-    map F f 1 ⟨j + 1, hj⟩ (by simp [Fin.le_def]) = F.map' 0 j := rfl
 
 lemma map_id (i : Fin (n + 1 + 1)) : map F f i i (by simp) = 𝟙 _ := by
   obtain ⟨i, hi⟩ := i
@@ -435,9 +403,6 @@ def δ₀Functor : ComposableArrows C (n + 1) ⥤ ComposableArrows C n :=
 
 abbrev δ₀ (F : ComposableArrows C (n + 1)) := δ₀Functor.obj F
 
-@[simp]
-lemma precomp_δ₀ {X : C} (f : X ⟶ F.left) : (F.precomp f).δ₀ = F := rfl
-
 @[simps]
 def _root_.Fin.castSuccFunctor (n : ℕ) : Fin n ⥤ Fin (n + 1) where
   obj i := i.castSucc
@@ -536,15 +501,6 @@ variable
 
 def homMk₂ : f ⟶ g := homMkSucc app₀ (homMk₁ app₁ app₂ w₁) w₀
 
-@[simp]
-lemma homMk₂_app_zero : (homMk₂ app₀ app₁ app₂ w₀ w₁).app 0 = app₀ := rfl
-
-@[simp]
-lemma homMk₂_app_one : (homMk₂ app₀ app₁ app₂ w₀ w₁).app 1 = app₁ := rfl
-
-@[simp]
-lemma homMk₂_app_two : (homMk₂ app₀ app₁ app₂ w₀ w₁).app ⟨2, by valid⟩ = app₂ := rfl
-
 end
 
 @[ext]
@@ -586,20 +542,6 @@ variable
   (w₂ : f.map' 2 3 ≫ app₃ = app₂ ≫ g.map' 2 3)
 
 def homMk₃ : f ⟶ g := homMkSucc app₀ (homMk₂ app₁ app₂ app₃ w₁ w₂) w₀
-
-@[simp]
-lemma homMk₃_app_zero : (homMk₃ app₀ app₁ app₂ app₃ w₀ w₁ w₂).app 0 = app₀ := rfl
-
-@[simp]
-lemma homMk₃_app_one : (homMk₃ app₀ app₁ app₂ app₃ w₀ w₁ w₂).app 1 = app₁ := rfl
-
-@[simp]
-lemma homMk₃_app_two : (homMk₃ app₀ app₁ app₂ app₃ w₀ w₁ w₂).app ⟨2, by valid⟩ = app₂ :=
-  rfl
-
-@[simp]
-lemma homMk₃_app_three : (homMk₃ app₀ app₁ app₂ app₃ w₀ w₁ w₂).app ⟨3, by valid⟩ = app₃ :=
-  rfl
 
 end
 
@@ -651,24 +593,6 @@ variable
   (w₃ : f.map' 3 4 ≫ app₄ = app₃ ≫ g.map' 3 4)
 
 def homMk₄ : f ⟶ g := homMkSucc app₀ (homMk₃ app₁ app₂ app₃ app₄ w₁ w₂ w₃) w₀
-
-@[simp]
-lemma homMk₄_app_zero : (homMk₄ app₀ app₁ app₂ app₃ app₄ w₀ w₁ w₂ w₃).app 0 = app₀ := rfl
-
-@[simp]
-lemma homMk₄_app_one : (homMk₄ app₀ app₁ app₂ app₃ app₄ w₀ w₁ w₂ w₃).app 1 = app₁ := rfl
-
-@[simp]
-lemma homMk₄_app_two :
-    (homMk₄ app₀ app₁ app₂ app₃ app₄ w₀ w₁ w₂ w₃).app ⟨2, by valid⟩ = app₂ := rfl
-
-@[simp]
-lemma homMk₄_app_three :
-    (homMk₄ app₀ app₁ app₂ app₃ app₄ w₀ w₁ w₂ w₃).app ⟨3, by valid⟩ = app₃ := rfl
-
-@[simp]
-lemma homMk₄_app_four :
-    (homMk₄ app₀ app₁ app₂ app₃ app₄ w₀ w₁ w₂ w₃).app ⟨4, by valid⟩ = app₄ := rfl
 
 end
 
@@ -730,28 +654,6 @@ variable
   (w₄ : f.map' 4 5 ≫ app₅ = app₄ ≫ g.map' 4 5)
 
 def homMk₅ : f ⟶ g := homMkSucc app₀ (homMk₄ app₁ app₂ app₃ app₄ app₅ w₁ w₂ w₃ w₄) w₀
-
-@[simp]
-lemma homMk₅_app_zero : (homMk₅ app₀ app₁ app₂ app₃ app₄ app₅ w₀ w₁ w₂ w₃ w₄).app 0 = app₀ := rfl
-
-@[simp]
-lemma homMk₅_app_one : (homMk₅ app₀ app₁ app₂ app₃ app₄ app₅ w₀ w₁ w₂ w₃ w₄).app 1 = app₁ := rfl
-
-@[simp]
-lemma homMk₅_app_two :
-    (homMk₅ app₀ app₁ app₂ app₃ app₄ app₅ w₀ w₁ w₂ w₃ w₄).app ⟨2, by valid⟩ = app₂ := rfl
-
-@[simp]
-lemma homMk₅_app_three :
-    (homMk₅ app₀ app₁ app₂ app₃ app₄ app₅ w₀ w₁ w₂ w₃ w₄).app ⟨3, by valid⟩ = app₃ := rfl
-
-@[simp]
-lemma homMk₅_app_four :
-    (homMk₅ app₀ app₁ app₂ app₃ app₄ app₅ w₀ w₁ w₂ w₃ w₄).app ⟨4, by valid⟩ = app₄ := rfl
-
-@[simp]
-lemma homMk₅_app_five :
-    (homMk₅ app₀ app₁ app₂ app₃ app₄ app₅ w₀ w₁ w₂ w₃ w₄).app ⟨5, by valid⟩ = app₅ := rfl
 
 end
 
@@ -825,10 +727,6 @@ lemma mkOfObjOfMapSucc_exists : ∃ (F : ComposableArrows C n) (e : ∀ i, F.obj
 noncomputable def mkOfObjOfMapSucc : ComposableArrows C n :=
   (mkOfObjOfMapSucc_exists obj mapSucc).choose.copyObj obj
     (mkOfObjOfMapSucc_exists obj mapSucc).choose_spec.choose
-
-@[simp]
-lemma mkOfObjOfMapSucc_obj (i : Fin (n + 1)) :
-    (mkOfObjOfMapSucc obj mapSucc).obj i = obj i := rfl
 
 lemma mkOfObjOfMapSucc_map_succ (i : ℕ) (hi : i < n := by valid) :
     (mkOfObjOfMapSucc obj mapSucc).map' i (i + 1) = mapSucc ⟨i, hi⟩ :=

@@ -1,11 +1,13 @@
 /-
 Extracted from Data/List/Pairwise.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Batteries.Data.List.Pairwise
 import Mathlib.Logic.Pairwise
 import Mathlib.Logic.Relation
+
+noncomputable section
 
 /-!
 # Pairwise relations on a list

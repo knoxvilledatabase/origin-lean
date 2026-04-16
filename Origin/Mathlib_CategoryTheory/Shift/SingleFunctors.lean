@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Shift/SingleFunctors.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Shift.CommShift
+
+noncomputable section
 
 /-!
 # Functors from a category to a category with a shift
@@ -95,7 +97,11 @@ lemma shiftIso_zero_hom_app (a : A) (X : C) :
   rw [shiftIso_zero]
   rfl
 
--- DISSOLVED: shiftIso_zero_inv_app
+@[simp]
+lemma shiftIso_zero_inv_app (a : A) (X : C) :
+    (F.shiftIso 0 a a (zero_add a)).inv.app X = (shiftFunctorZero D A).inv.app _ := by
+  rw [shiftIso_zero]
+  rfl
 
 @[ext]
 structure Hom where

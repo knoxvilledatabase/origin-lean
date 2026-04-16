@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/Padics/PadicVal/Defs.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Multiplicity
 import Mathlib.Data.Nat.Factors
+
+noncomputable section
 
 /-!
 # `p`-adic Valuation
@@ -64,12 +66,22 @@ end padicValNat
 
 open List
 
--- DISSOLVED: le_emultiplicity_iff_replicate_subperm_primeFactorsList
+theorem le_emultiplicity_iff_replicate_subperm_primeFactorsList {a b : ℕ} {n : ℕ} (ha : a.Prime)
+    (hb : b ≠ 0) :
+    ↑n ≤ emultiplicity a b ↔ replicate n a <+~ b.primeFactorsList :=
+  (replicate_subperm_primeFactorsList_iff ha hb).trans
+    pow_dvd_iff_le_emultiplicity |>.symm
 
 alias le_multiplicity_iff_replicate_subperm_factors :=
   le_emultiplicity_iff_replicate_subperm_primeFactorsList
 
--- DISSOLVED: le_padicValNat_iff_replicate_subperm_primeFactorsList
+theorem le_padicValNat_iff_replicate_subperm_primeFactorsList {a b : ℕ} {n : ℕ} (ha : a.Prime)
+    (hb : b ≠ 0) :
+    n ≤ padicValNat a b ↔ replicate n a <+~ b.primeFactorsList := by
+  rw [← le_emultiplicity_iff_replicate_subperm_primeFactorsList ha hb,
+    Nat.multiplicity_finite_iff.2 ⟨ha.ne_one, Nat.pos_of_ne_zero hb⟩
+      |>.emultiplicity_eq_multiplicity,     ← padicValNat_def' ha.ne_one (Nat.pos_of_ne_zero hb),
+      Nat.cast_le]
 
 alias le_padicValNat_iff_replicate_subperm_factors :=
   le_padicValNat_iff_replicate_subperm_primeFactorsList

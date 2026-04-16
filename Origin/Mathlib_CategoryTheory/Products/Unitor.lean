@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Products.Basic
 import Mathlib.CategoryTheory.DiscreteCategory
 
+noncomputable section
+
 /-!
 # The left/right unitor equivalences `1 × C ≌ C` and `C × 1 ≌ C`.
 -/

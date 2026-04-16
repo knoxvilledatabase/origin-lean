@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.SemidirectProduct
 
+noncomputable section
+
 /-!
 # Group Extensions
 
@@ -175,11 +177,6 @@ def toGroupExtension : GroupExtension N (N ⋊[φ] G) G where
   inl_injective := inl_injective
   range_inl_eq_ker_rightHom := range_inl_eq_ker_rightHom
   rightHom_surjective := rightHom_surjective
-
-theorem toGroupExtension_inl : (toGroupExtension φ).inl = SemidirectProduct.inl := rfl
-
-theorem toGroupExtension_rightHom : (toGroupExtension φ).rightHom = SemidirectProduct.rightHom :=
-  rfl
 
 def inr_splitting : (toGroupExtension φ).Splitting where
   sectionHom := inr

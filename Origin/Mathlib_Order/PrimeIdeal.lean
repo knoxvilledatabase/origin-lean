@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Ideal
 import Mathlib.Order.PFilter
 
+noncomputable section
+
 /-!
 # Prime ideals
 

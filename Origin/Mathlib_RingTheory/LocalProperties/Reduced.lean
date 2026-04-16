@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.RingTheory.LocalProperties.Basic
 
+noncomputable section
+
 /-!
 # `IsReduced` is a local property
 

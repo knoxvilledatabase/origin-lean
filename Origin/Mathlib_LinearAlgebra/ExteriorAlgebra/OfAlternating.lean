@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Fold
 import Mathlib.LinearAlgebra.ExteriorAlgebra.Basic
 
+noncomputable section
+
 /-!
 # Extending an alternating map to the exterior algebra
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.PathCategory.Basic
 import Mathlib.CategoryTheory.MorphismProperty.Basic
 
+noncomputable section
+
 /-!
 # Properties of morphisms in a path category.
 

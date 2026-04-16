@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/EMetricSpace/Lipschitz.lean
-Genuine: 69 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Topology.EMetricSpace.Diam
 import Mathlib.Tactic.GCongr
+
+noncomputable section
 
 /-!
 # Lipschitz continuous functions
@@ -130,12 +132,15 @@ theorem edist_le_mul_of_le (h : LipschitzWith K f) (hr : edist x y ≤ r) :
     edist (f x) (f y) ≤ K * r :=
   (h x y).trans <| mul_left_mono hr
 
--- DISSOLVED: edist_lt_mul_of_lt
+theorem edist_lt_mul_of_lt (h : LipschitzWith K f) (hK : K ≠ 0) (hr : edist x y < r) :
+    edist (f x) (f y) < K * r :=
+  (h x y).trans_lt <| (ENNReal.mul_lt_mul_left (ENNReal.coe_ne_zero.2 hK) ENNReal.coe_ne_top).2 hr
 
 theorem mapsTo_emetric_closedBall (h : LipschitzWith K f) (x : α) (r : ℝ≥0∞) :
     MapsTo f (closedBall x r) (closedBall (f x) (K * r)) := fun _y hy => h.edist_le_mul_of_le hy
 
--- DISSOLVED: mapsTo_emetric_ball
+theorem mapsTo_emetric_ball (h : LipschitzWith K f) (hK : K ≠ 0) (x : α) (r : ℝ≥0∞) :
+    MapsTo f (ball x r) (ball (f x) (K * r)) := fun _y hy => h.edist_lt_mul_of_lt hK hy
 
 theorem edist_lt_top (hf : LipschitzWith K f) {x y : α} (h : edist x y ≠ ⊤) :
     edist (f x) (f y) < ⊤ :=

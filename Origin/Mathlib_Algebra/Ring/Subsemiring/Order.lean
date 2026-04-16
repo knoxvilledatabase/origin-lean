@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Ring.InjSurj
 import Mathlib.Algebra.Ring.Subsemiring.Defs
 import Mathlib.Order.Interval.Set.Defs
 
+noncomputable section
+
 /-!
 # `Order`ed instances for `SubsemiringClass` and `Subsemiring`.
 -/

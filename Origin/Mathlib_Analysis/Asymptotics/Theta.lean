@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Asymptotics/Theta.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 6 | Infrastructure: 14
+Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Analysis.Asymptotics.Asymptotics
 import Mathlib.Analysis.Normed.Module.Basic
+
+noncomputable section
 
 /-!
 # Asymptotic equivalence up to a constant
@@ -220,7 +222,9 @@ theorem IsTheta.zpow {f : α → 𝕜} {g : α → 𝕜'} (h : f =Θ[l] g) (n : 
   · simpa only [Int.ofNat_eq_coe, zpow_natCast] using h.pow _
   · simpa only [zpow_negSucc] using (h.pow _).inv
 
--- DISSOLVED: isTheta_const_const
+theorem isTheta_const_const {c₁ : E''} {c₂ : F''} (h₁ : c₁ ≠ 0) (h₂ : c₂ ≠ 0) :
+    (fun _ : α ↦ c₁) =Θ[l] fun _ ↦ c₂ :=
+  ⟨isBigO_const_const _ h₂ _, isBigO_const_const _ h₁ _⟩
 
 @[simp]
 theorem isTheta_const_const_iff [NeBot l] {c₁ : E''} {c₂ : F''} :
@@ -235,19 +239,27 @@ theorem isTheta_zero_left : (fun _ ↦ (0 : E')) =Θ[l] g'' ↔ g'' =ᶠ[l] 0 :=
 theorem isTheta_zero_right : (f'' =Θ[l] fun _ ↦ (0 : F')) ↔ f'' =ᶠ[l] 0 :=
   isTheta_comm.trans isTheta_zero_left
 
--- DISSOLVED: isTheta_const_smul_left
+theorem isTheta_const_smul_left [NormedSpace 𝕜 E'] {c : 𝕜} (hc : c ≠ 0) :
+    (fun x ↦ c • f' x) =Θ[l] g ↔ f' =Θ[l] g :=
+  and_congr (isBigO_const_smul_left hc) (isBigO_const_smul_right hc)
 
 alias ⟨IsTheta.of_const_smul_left, IsTheta.const_smul_left⟩ := isTheta_const_smul_left
 
--- DISSOLVED: isTheta_const_smul_right
+theorem isTheta_const_smul_right [NormedSpace 𝕜 F'] {c : 𝕜} (hc : c ≠ 0) :
+    (f =Θ[l] fun x ↦ c • g' x) ↔ f =Θ[l] g' :=
+  and_congr (isBigO_const_smul_right hc) (isBigO_const_smul_left hc)
 
 alias ⟨IsTheta.of_const_smul_right, IsTheta.const_smul_right⟩ := isTheta_const_smul_right
 
--- DISSOLVED: isTheta_const_mul_left
+theorem isTheta_const_mul_left {c : 𝕜} {f : α → 𝕜} (hc : c ≠ 0) :
+    (fun x ↦ c * f x) =Θ[l] g ↔ f =Θ[l] g := by
+  simpa only [← smul_eq_mul] using isTheta_const_smul_left hc
 
 alias ⟨IsTheta.of_const_mul_left, IsTheta.const_mul_left⟩ := isTheta_const_mul_left
 
--- DISSOLVED: isTheta_const_mul_right
+theorem isTheta_const_mul_right {c : 𝕜} {g : α → 𝕜} (hc : c ≠ 0) :
+    (f =Θ[l] fun x ↦ c * g x) ↔ f =Θ[l] g := by
+  simpa only [← smul_eq_mul] using isTheta_const_smul_right hc
 
 alias ⟨IsTheta.of_const_mul_right, IsTheta.const_mul_right⟩ := isTheta_const_mul_right
 
@@ -304,6 +316,9 @@ namespace ContinuousOn
 variable {α E F : Type*} [NormedAddGroup E] [SeminormedAddGroup F] [TopologicalSpace α]
   {s : Set α} {f : α → E} {c : F}
 
--- DISSOLVED: isTheta_principal
+protected theorem isTheta_principal
+    (hf : ContinuousOn f s) (hs : IsCompact s) (hc : ‖c‖ ≠ 0) (hC : ∀ i ∈ s, f i ≠ 0) :
+    f =Θ[𝓟 s] fun _ => c :=
+  ⟨hf.isBigO_principal hs hc, hf.isBigO_rev_principal hs hC c⟩
 
 end ContinuousOn

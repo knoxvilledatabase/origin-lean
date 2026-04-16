@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dual.lean
-Genuine: 174 | Conflates: 1 | Dissolved: 8 | Infrastructure: 53
+Genuine: 181 | Conflates: 1 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional
@@ -11,6 +11,8 @@ import Mathlib.LinearAlgebra.SesquilinearForm
 import Mathlib.RingTheory.Finiteness.Projective
 import Mathlib.RingTheory.LocalRing.Basic
 import Mathlib.RingTheory.TensorProduct.Basic
+
+noncomputable section
 
 /-!
 # Dual vector spaces
@@ -133,14 +135,7 @@ variable [AddCommMonoid M'] [Module R M']
 def transpose : (M →ₗ[R] M') →ₗ[R] Dual R M' →ₗ[R] Dual R M :=
   (LinearMap.llcomp R M M' R).flip
 
-theorem transpose_apply (u : M →ₗ[R] M') (l : Dual R M') : transpose (R := R) u l = l.comp u :=
-  rfl
-
 variable {M'' : Type uM''} [AddCommMonoid M''] [Module R M'']
-
-theorem transpose_comp (u : M' →ₗ[R] M'') (v : M →ₗ[R] M') :
-    transpose (R := R) (u.comp v) = (transpose (R := R) v).comp (transpose (R := R) u) :=
-  rfl
 
 end Dual
 
@@ -151,11 +146,6 @@ variable (M' : Type uM') [AddCommMonoid M'] [Module R M']
 @[simps!]
 def dualProdDualEquivDual : (Module.Dual R M × Module.Dual R M') ≃ₗ[R] Module.Dual R (M × M') :=
   LinearMap.coprodEquiv R
-
-@[simp]
-theorem dualProdDualEquivDual_apply (φ : Module.Dual R M) (ψ : Module.Dual R M') :
-    dualProdDualEquivDual R M M' (φ, ψ) = φ.coprod ψ :=
-  rfl
 
 end Prod
 
@@ -175,26 +165,9 @@ def LinearMap.dualMap (f : M₁ →ₗ[R] M₂) : Dual R M₂ →ₗ[R] Dual R M
 
   Module.Dual.transpose (R := R) f
 
-lemma LinearMap.dualMap_eq_lcomp (f : M₁ →ₗ[R] M₂) : f.dualMap = f.lcomp R R := rfl
-
-theorem LinearMap.dualMap_def (f : M₁ →ₗ[R] M₂) : f.dualMap = Module.Dual.transpose (R := R) f :=
-  rfl
-
-theorem LinearMap.dualMap_apply' (f : M₁ →ₗ[R] M₂) (g : Dual R M₂) : f.dualMap g = g.comp f :=
-  rfl
-
-@[simp]
-theorem LinearMap.dualMap_apply (f : M₁ →ₗ[R] M₂) (g : Dual R M₂) (x : M₁) :
-    f.dualMap g x = g (f x) :=
-  rfl
-
 @[simp]
 theorem LinearMap.dualMap_id : (LinearMap.id : M₁ →ₗ[R] M₁).dualMap = LinearMap.id := by
   ext
-  rfl
-
-theorem LinearMap.dualMap_comp_dualMap {M₃ : Type*} [AddCommGroup M₃] [Module R M₃]
-    (f : M₁ →ₗ[R] M₂) (g : M₂ →ₗ[R] M₃) : f.dualMap.comp g.dualMap = (g.comp f).dualMap :=
   rfl
 
 theorem LinearMap.dualMap_injective_of_surjective {f : M₁ →ₗ[R] M₂} (hf : Function.Surjective f) :
@@ -211,11 +184,6 @@ def LinearEquiv.dualMap (f : M₁ ≃ₗ[R] M₂) : Dual R M₂ ≃ₗ[R] Dual R
   right_inv φ := LinearMap.ext fun x ↦ congr_arg φ (f.left_inv x)
 
 @[simp]
-theorem LinearEquiv.dualMap_apply (f : M₁ ≃ₗ[R] M₂) (g : Dual R M₂) (x : M₁) :
-    f.dualMap g x = g (f x) :=
-  rfl
-
-@[simp]
 theorem LinearEquiv.dualMap_refl :
     (LinearEquiv.refl R M₁).dualMap = LinearEquiv.refl R (Dual R M₁) := by
   ext
@@ -224,14 +192,6 @@ theorem LinearEquiv.dualMap_refl :
 @[simp]
 theorem LinearEquiv.dualMap_symm {f : M₁ ≃ₗ[R] M₂} :
     (LinearEquiv.dualMap f).symm = LinearEquiv.dualMap f.symm :=
-  rfl
-
-theorem LinearEquiv.dualMap_trans {M₃ : Type*} [AddCommGroup M₃] [Module R M₃] (f : M₁ ≃ₗ[R] M₂)
-    (g : M₂ ≃ₗ[R] M₃) : g.dualMap.trans f.dualMap = (f.trans g).dualMap :=
-  rfl
-
-theorem Module.Dual.eval_naturality (f : M₁ →ₗ[R] M₂) :
-    f.dualMap.dualMap ∘ₗ eval R M₁ = eval R M₂ ∘ₗ f := by
   rfl
 
 @[simp]
@@ -306,9 +266,6 @@ theorem coe_toDual_self (i : ι) : b.toDual (b i) = b.coord i := by
 def toDualFlip (m : M) : M →ₗ[R] R :=
   b.toDual.flip m
 
-theorem toDualFlip_apply (m₁ m₂ : M) : b.toDualFlip m₁ m₂ = b.toDual m₂ m₁ :=
-  rfl
-
 theorem toDual_eq_repr (m : M) (i : ι) : b.toDual m (b i) = b.repr m i :=
   b.toDual_apply_left m i
 
@@ -360,10 +317,6 @@ variable [Finite ι]
 
 def toDualEquiv : M ≃ₗ[R] Dual R M :=
   .ofBijective b.toDual ⟨ker_eq_bot.mp b.toDual_ker, range_eq_top.mp b.toDual_range⟩
-
-@[simp]
-theorem toDualEquiv_apply (m : M) : b.toDualEquiv m = b.toDual m :=
-  rfl
 
 theorem linearEquiv_dual_iff_finiteDimensional [Field K] [AddCommGroup V] [Module K V] :
     Nonempty (V ≃ₗ[K] Dual K V) ↔ FiniteDimensional K V := by
@@ -522,7 +475,6 @@ instance instNontrivialDual [Nontrivial V] : Nontrivial (Dual K V) :=
   (nontrivial_dual_iff K).mpr inferInstance
 
 omit [Projective K V] in
-
 theorem finite_dual_iff [Free K V] : Module.Finite K (Dual K V) ↔ Module.Finite K V := by
   constructor <;> intro h
   · obtain ⟨⟨ι, b⟩⟩ := Free.exists_basis (R := K) (M := V)
@@ -624,11 +576,6 @@ def mapEvalEquiv : Submodule R M ≃o Submodule R (Dual R (Dual R M)) :=
   Submodule.orderIsoMapComap (evalEquiv R M)
 
 @[simp]
-theorem mapEvalEquiv_apply (W : Submodule R M) :
-    mapEvalEquiv R M W = W.map (Dual.eval R M) :=
-  rfl
-
-@[simp]
 theorem mapEvalEquiv_symm_apply (W'' : Submodule R (Dual R (Dual R M))) :
     (mapEvalEquiv R M).symm W'' = W''.comap (Dual.eval R M) :=
   rfl
@@ -700,11 +647,30 @@ open Module
 
 variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] {p : Submodule R M}
 
--- DISSOLVED: exists_dual_map_eq_bot_of_nmem
+theorem exists_dual_map_eq_bot_of_nmem {x : M} (hx : x ∉ p) (hp' : Free R (M ⧸ p)) :
+    ∃ f : Dual R M, f x ≠ 0 ∧ p.map f = ⊥ := by
+  suffices ∃ f : Dual R (M ⧸ p), f (p.mkQ x) ≠ 0 by
+    obtain ⟨f, hf⟩ := this; exact ⟨f.comp p.mkQ, hf, by simp [Submodule.map_comp]⟩
+  rwa [← Submodule.Quotient.mk_eq_zero, ← Submodule.mkQ_apply,
+    ← forall_dual_apply_eq_zero_iff (K := R), not_forall] at hx
 
--- DISSOLVED: exists_dual_map_eq_bot_of_lt_top
+theorem exists_dual_map_eq_bot_of_lt_top (hp : p < ⊤) (hp' : Free R (M ⧸ p)) :
+    ∃ f : Dual R M, f ≠ 0 ∧ p.map f = ⊥ := by
+  obtain ⟨x, hx⟩ : ∃ x : M, x ∉ p := by rw [lt_top_iff_ne_top] at hp; contrapose! hp; ext; simp [hp]
+  obtain ⟨f, hf, hf'⟩ := p.exists_dual_map_eq_bot_of_nmem hx hp'
+  exact ⟨f, by aesop, hf'⟩
 
--- DISSOLVED: span_eq_top_of_ne_zero
+theorem span_eq_top_of_ne_zero [IsReflexive R M]
+    {s : Set (M →ₗ[R] R)} [Free R ((M →ₗ[R] R) ⧸ (span R s))]
+    (h : ∀ z ≠ 0, ∃ f ∈ s, f z ≠ 0) : span R s = ⊤ := by
+  by_contra! hn
+  obtain ⟨φ, φne, hφ⟩ := exists_dual_map_eq_bot_of_lt_top hn.lt_top inferInstance
+  let φs := (evalEquiv R M).symm φ
+  have this f (hf : f ∈ s) : f φs = 0 := by
+    rw [← mem_bot R, ← hφ, mem_map]
+    exact ⟨f, subset_span hf, (apply_evalEquiv_symm_apply R M f φ).symm⟩
+  obtain ⟨x, xs, hx⟩ := h φs (by simp [φne, φs])
+  exact hx <| this x xs
 
 variable {ι 𝕜 E : Type*} [Field 𝕜] [AddCommGroup E] [Module 𝕜 E]
 
@@ -761,7 +727,11 @@ def evalUseFiniteInstance : TacticM Unit := do
 
 elab "use_finite_instance" : tactic => evalUseFiniteInstance
 
--- DISSOLVED: Module.DualBases
+structure Module.DualBases (e : ι → M) (ε : ι → Dual R M) : Prop where
+  eval_same : ∀ i, ε i (e i) = 1
+  eval_of_ne : Pairwise fun i j ↦ ε i (e j) = 0
+  protected total : ∀ {m : M}, (∀ i, ε i m = 0) → m = 0
+  protected finite : ∀ m : M, {i | ε i m ≠ 0}.Finite := by use_finite_instance
 
 end DualBases
 
@@ -838,7 +808,12 @@ theorem coe_basis : ⇑h.basis = e := by
   · simp [h.eval_same]
   · simp [hne, h.eval_of_ne hne.symm]
 
--- DISSOLVED: mem_of_mem_span
+theorem mem_of_mem_span {H : Set ι} {x : M} (hmem : x ∈ Submodule.span R (e '' H)) :
+    ∀ i : ι, ε i x ≠ 0 → i ∈ H := by
+  intro i hi
+  rcases (Finsupp.mem_span_image_iff_linearCombination _).mp hmem with ⟨l, supp_l, rfl⟩
+  apply not_imp_comm.mp ((Finsupp.mem_supported' _ _).mp supp_l i)
+  rwa [← lc_def, h.dual_lc] at hi
 
 theorem coe_dualBasis [DecidableEq ι] [_root_.Finite ι] : ⇑h.basis.dualBasis = ε :=
   funext fun i => h.basis.ext fun j => by simp
@@ -855,9 +830,6 @@ variable {W : Submodule R M}
 
 def dualRestrict (W : Submodule R M) : Module.Dual R M →ₗ[R] Module.Dual R W :=
   LinearMap.domRestrict' W
-
-theorem dualRestrict_def (W : Submodule R M) : W.dualRestrict = W.subtype.dualMap :=
-  rfl
 
 @[simp]
 theorem dualRestrict_apply (W : Submodule R M) (φ : Module.Dual R M) (x : W) :
@@ -991,14 +963,6 @@ lemma coe_dualAnnihilator_span (s : Set M) :
   simp only [SetLike.mem_coe, mem_dualAnnihilator, Set.mem_setOf_eq, ← LinearMap.mem_ker]
   exact span_le
 
-@[simp]
-lemma coe_dualCoannihilator_span (s : Set (Module.Dual R M)) :
-    ((span R s).dualCoannihilator : Set M) = {x | ∀ f ∈ s, f x = 0} := by
-  ext x
-  have (φ) : x ∈ LinearMap.ker φ ↔ φ ∈ LinearMap.ker (Module.Dual.eval R M x) := by simp
-  simp only [SetLike.mem_coe, mem_dualCoannihilator, Set.mem_setOf_eq, ← LinearMap.mem_ker, this]
-  exact span_le
-
 end Submodule
 
 namespace Subspace
@@ -1101,15 +1065,6 @@ theorem quotAnnihilatorEquiv_apply (W : Subspace K V) (φ : Module.Dual K V) :
 noncomputable def dualEquivDual (W : Subspace K V) :
     Module.Dual K W ≃ₗ[K] LinearMap.range W.dualLift :=
   LinearEquiv.ofInjective _ dualLift_injective
-
-theorem dualEquivDual_def (W : Subspace K V) :
-    W.dualEquivDual.toLinearMap = W.dualLift.rangeRestrict :=
-  rfl
-
-@[simp]
-theorem dualEquivDual_apply (φ : Module.Dual K W) :
-    W.dualEquivDual φ = ⟨W.dualLift φ, mem_range.2 ⟨φ, rfl⟩⟩ :=
-  rfl
 
 section
 
@@ -1255,18 +1210,8 @@ def dualQuotEquivDualAnnihilator (W : Submodule R M) :
 
     W.dualCopairing (by ext; rfl) (by ext; rfl)
 
-@[simp]
-theorem dualQuotEquivDualAnnihilator_apply (W : Submodule R M) (φ : Module.Dual R (M ⧸ W)) (x : M) :
-    dualQuotEquivDualAnnihilator W φ x = φ (Quotient.mk x) :=
-  rfl
-
 theorem dualCopairing_eq (W : Submodule R M) :
     W.dualCopairing = (dualQuotEquivDualAnnihilator W).symm.toLinearMap :=
-  rfl
-
-@[simp]
-theorem dualQuotEquivDualAnnihilator_symm_apply_mk (W : Submodule R M) (φ : W.dualAnnihilator)
-    (x : M) : (dualQuotEquivDualAnnihilator W).symm φ (Quotient.mk x) = φ x :=
   rfl
 
 theorem finite_dualAnnihilator_iff {W : Submodule R M} [Free R (M ⧸ W)] :
@@ -1278,10 +1223,6 @@ open LinearMap in
 def quotDualCoannihilatorToDual (W : Submodule R (Dual R M)) :
     M ⧸ W.dualCoannihilator →ₗ[R] Dual R W :=
   liftQ _ (flip <| Submodule.subtype _) le_rfl
-
-@[simp]
-theorem quotDualCoannihilatorToDual_apply (W : Submodule R (Dual R M)) (m : M) (w : W) :
-    W.quotDualCoannihilatorToDual (Quotient.mk m) w = w.1 m := rfl
 
 theorem quotDualCoannihilatorToDual_injective (W : Submodule R (Dual R M)) :
     Function.Injective W.quotDualCoannihilatorToDual :=
@@ -1357,11 +1298,20 @@ variable (hf : f ≠ 0)
 
 include hf
 
--- DISSOLVED: range_eq_top_of_ne_zero
+lemma range_eq_top_of_ne_zero :
+    LinearMap.range f = ⊤ := by
+  obtain ⟨v, hv⟩ : ∃ v, f v ≠ 0 := by contrapose! hf; ext v; simpa using hf v
+  rw [eq_top_iff]
+  exact fun x _ ↦ ⟨x • (f v)⁻¹ • v, by simp [inv_mul_cancel₀ hv]⟩
 
 variable [FiniteDimensional K V₁]
 
--- DISSOLVED: finrank_ker_add_one_of_ne_zero
+lemma finrank_ker_add_one_of_ne_zero :
+    finrank K (LinearMap.ker f) + 1 = finrank K V₁ := by
+  suffices finrank K (LinearMap.range f) = 1 by
+    rw [← (LinearMap.ker f).finrank_quotient_add_finrank, add_comm, add_left_inj,
+    f.quotKerEquivRange.finrank_eq, this]
+  rw [range_eq_top_of_ne_zero hf, finrank_top, finrank_self]
 
 lemma isCompl_ker_of_disjoint_of_ne_bot {p : Submodule K V₁}
     (hpf : Disjoint (LinearMap.ker f) p) (hp : p ≠ ⊥) :
@@ -1374,7 +1324,26 @@ lemma isCompl_ker_of_disjoint_of_ne_bot {p : Submodule K V₁}
 
 end
 
--- DISSOLVED: eq_of_ker_eq_of_apply_eq
+lemma eq_of_ker_eq_of_apply_eq [FiniteDimensional K V₁] {f g : Module.Dual K V₁} (x : V₁)
+    (h : LinearMap.ker f = LinearMap.ker g) (h' : f x = g x) (hx : f x ≠ 0) :
+    f = g := by
+  let p := K ∙ x
+  have hp : p ≠ ⊥ := by aesop
+  have hpf : Disjoint (LinearMap.ker f) p := by
+    rw [disjoint_iff, Submodule.eq_bot_iff]
+    rintro y ⟨hfy : f y = 0, hpy : y ∈ p⟩
+    obtain ⟨t, rfl⟩ := Submodule.mem_span_singleton.mp hpy
+    have ht : t = 0 := by simpa [hx] using hfy
+    simp [ht]
+  have hf : f ≠ 0 := by aesop
+  ext v
+  obtain ⟨y, hy, z, hz, rfl⟩ : ∃ᵉ (y ∈ LinearMap.ker f) (z ∈ p), y + z = v := by
+    have : v ∈ (⊤ : Submodule K V₁) := Submodule.mem_top
+    rwa [← (isCompl_ker_of_disjoint_of_ne_bot hf hpf hp).sup_eq_top, Submodule.mem_sup] at this
+  have hy' : g y = 0 := by rwa [← LinearMap.mem_ker, ← h]
+  replace hy : f y = 0 := by rwa [LinearMap.mem_ker] at hy
+  obtain ⟨t, rfl⟩ := Submodule.mem_span_singleton.mp hz
+  simp [h', hy, hy']
 
 end Module.Dual
 

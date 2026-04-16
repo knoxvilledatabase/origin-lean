@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Order.DenselyOrdered
 import Mathlib.Topology.MetricSpace.Pseudo.Constructions
 
+noncomputable section
+
 /-!
 # Extra lemmas about pseudo-metric spaces
 -/

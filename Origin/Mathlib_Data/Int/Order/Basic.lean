@@ -7,6 +7,8 @@ import Mathlib.Data.Int.Notation
 import Mathlib.Data.Nat.Notation
 import Mathlib.Order.Defs.LinearOrder
 
+noncomputable section
+
 /-!
 # The order relation on the integers
 -/

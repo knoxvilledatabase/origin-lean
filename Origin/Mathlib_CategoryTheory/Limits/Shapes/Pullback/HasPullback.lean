@@ -5,6 +5,8 @@ Genuine: 66 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.PullbackCone
 
+noncomputable section
+
 /-!
 # HasPullback
 `HasPullback f g` and `pullback f g` provides API for `HasLimit` and `limit` in the case of
@@ -121,20 +123,6 @@ abbrev pullback.isLimit {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) [HasPullback f g
 abbrev pushout.isColimit {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z) [HasPushout f g] :
     IsColimit (pushout.cocone f g) :=
   colimit.isColimit (span f g)
-
-@[simp]
-theorem PullbackCone.fst_limit_cone {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) [HasLimit (cospan f g)] :
-    PullbackCone.fst (limit.cone (cospan f g)) = pullback.fst f g := rfl
-
-@[simp]
-theorem PullbackCone.snd_limit_cone {X Y Z : C} (f : X ⟶ Z) (g : Y ⟶ Z) [HasLimit (cospan f g)] :
-    PullbackCone.snd (limit.cone (cospan f g)) = pullback.snd f g := rfl
-
-theorem PushoutCocone.inl_colimit_cocone {X Y Z : C} (f : Z ⟶ X) (g : Z ⟶ Y)
-    [HasColimit (span f g)] : PushoutCocone.inl (colimit.cocone (span f g)) = pushout.inl _ _ := rfl
-
-theorem PushoutCocone.inr_colimit_cocone {X Y Z : C} (f : Z ⟶ X) (g : Z ⟶ Y)
-    [HasColimit (span f g)] : PushoutCocone.inr (colimit.cocone (span f g)) = pushout.inr _ _ := rfl
 
 @[reassoc]
 theorem pullback.lift_fst {W X Y Z : C} {f : X ⟶ Z} {g : Y ⟶ Z} [HasPullback f g] (h : W ⟶ X)

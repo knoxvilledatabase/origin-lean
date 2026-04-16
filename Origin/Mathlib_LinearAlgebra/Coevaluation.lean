@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.LinearAlgebra.Contraction
 
+noncomputable section
+
 /-!
 # The coevaluation map on finite dimensional vector spaces
 

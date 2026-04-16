@@ -8,6 +8,8 @@ import Mathlib.Order.Filter.Ultrafilter
 import Mathlib.Data.Set.Lattice
 import Mathlib.Topology.Defs.Filter
 
+noncomputable section
+
 /-!
 # Limit of an ultrafilter.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Operations
 import Mathlib.Analysis.SpecificLimits.Basic
 
+noncomputable section
+
 /-!
 # Outer measures from functions
 

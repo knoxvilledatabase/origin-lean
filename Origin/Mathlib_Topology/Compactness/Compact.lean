@@ -11,6 +11,8 @@ import Mathlib.Topology.LocallyFinite
 import Mathlib.Topology.Ultrafilter
 import Mathlib.Topology.Defs.Ultrafilter
 
+noncomputable section
+
 /-!
 # Compact sets and compact spaces
 
@@ -455,17 +457,6 @@ lemma eq_finite_iUnion_of_isTopologicalBasis_of_isCompact_open (b : ι → Set X
     obtain ⟨j, -, rfl⟩ := Finset.mem_image.mp hi
     rw [e]
     exact Set.subset_iUnion (b ∘ f') j
-
-lemma eq_sUnion_finset_of_isTopologicalBasis_of_isCompact_open (b : Set (Set X))
-    (hb : IsTopologicalBasis b) (U : Set X) (hUc : IsCompact U) (hUo : IsOpen U) :
-    ∃ s : Finset b, U = s.toSet.sUnion := by
-  have hb' : b = range (fun i ↦ i : b → Set X) := by simp
-  rw [hb'] at hb
-  choose s hs hU using eq_finite_iUnion_of_isTopologicalBasis_of_isCompact_open _ hb U hUc hUo
-  have : Finite s := hs
-  let _ : Fintype s := Fintype.ofFinite _
-  use s.toFinset
-  simp [hU]
 
 theorem isCompact_open_iff_eq_finite_iUnion_of_isTopologicalBasis (b : ι → Set X)
     (hb : IsTopologicalBasis (Set.range b)) (hb' : ∀ i, IsCompact (b i)) (U : Set X) :

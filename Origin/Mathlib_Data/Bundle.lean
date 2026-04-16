@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Bundle
 Basic data structure to implement fiber bundles, vector bundles (maybe fibrations?), etc. This file
@@ -72,8 +74,6 @@ theorem TotalSpace.mk_injective (b : B) : Injective (mk b : E b → TotalSpace F
 instance {x : B} : CoeTC (E x) (TotalSpace F E) :=
   ⟨TotalSpace.mk x⟩
 
-theorem TotalSpace.eta (z : TotalSpace F E) : TotalSpace.mk z.proj z.2 = z := rfl
-
 @[simp]
 theorem TotalSpace.exists {p : TotalSpace F E → Prop} : (∃ x, p x) ↔ ∃ b y, p ⟨b, y⟩ :=
   ⟨fun ⟨x, hx⟩ ↦ ⟨x.1, x.2, hx⟩, fun ⟨b, y, h⟩ ↦ ⟨⟨b, y⟩, h⟩⟩
@@ -118,11 +118,6 @@ def pullbackTotalSpaceEmbedding (f : B' → B) : TotalSpace F (f *ᵖ E) → B' 
 
 @[simps (config := { attrs := [`mfld_simps] })]
 def Pullback.lift (f : B' → B) : TotalSpace F (f *ᵖ E) → TotalSpace F E := fun z => ⟨f z.proj, z.2⟩
-
-@[simp, mfld_simps]
-theorem Pullback.lift_mk (f : B' → B) (x : B') (y : E (f x)) :
-    Pullback.lift f (.mk' F x y) = ⟨f x, y⟩ :=
-  rfl
 
 end Pullback
 

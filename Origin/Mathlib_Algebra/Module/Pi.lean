@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Regular.SMul
 import Mathlib.Algebra.Ring.Pi
 
+noncomputable section
+
 /-!
 # Pi instances for modules
 

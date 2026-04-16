@@ -5,6 +5,8 @@ Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Computability.Language
 
+noncomputable section
+
 /-!
 # Context-Free Grammars
 
@@ -22,6 +24,7 @@ nonterminal symbol on the left-hand side of each rule.
 open Function
 
 universe uT uN in
+/-- Rule that rewrites a single nonterminal to any string (a list of symbols). -/
 
 @[ext]
 structure ContextFreeRule (T : Type uT) (N : Type uN) where
@@ -110,11 +113,6 @@ def Generates (g : ContextFreeGrammar.{uN} T) (s : List (Symbol T g.NT)) : Prop 
 
 def language (g : ContextFreeGrammar.{uN} T) : Language T :=
   { w | g.Generates (List.map Symbol.terminal w) }
-
-@[simp]
-lemma mem_language_iff (g : ContextFreeGrammar.{uN} T) (w : List T) :
-    w ∈ g.language ↔ g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w) := by
-  rfl
 
 variable {g : ContextFreeGrammar.{uN} T}
 

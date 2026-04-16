@@ -1,9 +1,11 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/VariableChange.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
+
+noncomputable section
 
 /-!
 # Change of variables of Weierstrass curves
@@ -199,23 +201,20 @@ instance : (W.variableChange C).IsElliptic := by
   exact (C.u⁻¹.isUnit.pow 12).mul W.isUnit_Δ
 
 set_option linter.docPrime false in
-
 @[simp]
+
 lemma variableChange_Δ' : (W.variableChange C).Δ' = C.u⁻¹ ^ 12 * W.Δ' := by
   simp_rw [Units.ext_iff, Units.val_mul, coe_Δ', variableChange_Δ, Units.val_pow_eq_pow_val]
 
 set_option linter.docPrime false in
-
 lemma coe_variableChange_Δ' : ((W.variableChange C).Δ' : R) = C.u⁻¹ ^ 12 * W.Δ' := by
   simp_rw [coe_Δ', variableChange_Δ]
 
 set_option linter.docPrime false in
-
 lemma inv_variableChange_Δ' : (W.variableChange C).Δ'⁻¹ = C.u ^ 12 * W.Δ'⁻¹ := by
   rw [variableChange_Δ', mul_inv, inv_pow, inv_inv]
 
 set_option linter.docPrime false in
-
 lemma coe_inv_variableChange_Δ' : (↑(W.variableChange C).Δ'⁻¹ : R) = C.u ^ 12 * W.Δ'⁻¹ := by
   rw [inv_variableChange_Δ', Units.val_mul, Units.val_pow_eq_pow_val]
 
@@ -246,14 +245,6 @@ abbrev baseChange [Algebra R A] : VariableChange A :=
   C.map <| algebraMap R A
 
 variable {A}
-
-@[simp]
-lemma map_id : C.map (RingHom.id R) = C :=
-  rfl
-
-lemma map_map {A : Type v} [CommRing A] (φ : R →+* A) {B : Type w} [CommRing B] (ψ : A →+* B) :
-    (C.map φ).map ψ = C.map (ψ.comp φ) :=
-  rfl
 
 @[simp]
 lemma map_baseChange {S : Type s} [CommRing S] [Algebra R S] {A : Type v} [CommRing A] [Algebra R A]

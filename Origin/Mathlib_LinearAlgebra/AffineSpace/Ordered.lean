@@ -12,6 +12,8 @@ import Mathlib.LinearAlgebra.AffineSpace.Slope
 import Mathlib.LinearAlgebra.AffineSpace.Midpoint
 import Mathlib.Tactic.FieldSimp
 
+noncomputable section
+
 /-!
 # Ordered modules as affine spaces
 

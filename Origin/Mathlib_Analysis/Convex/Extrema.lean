@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Affine
 import Mathlib.Topology.Order.LocalExtr
 import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 
+noncomputable section
+
 /-!
 # Minima and maxima of convex functions
 

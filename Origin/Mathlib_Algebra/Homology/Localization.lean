@@ -9,6 +9,8 @@ import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.CategoryTheory.Localization.Composition
 import Mathlib.CategoryTheory.Localization.HasLocalization
 
+noncomputable section
+
 /-! The category of homological complexes up to quasi-isomorphisms
 
 Given a category `C` with homology and any complex shape `c`, we define
@@ -198,17 +200,6 @@ variable {ι : Type*} (c : ComplexShape ι) (hc : ∀ j, ∃ i, c.Rel i j)
   (C : Type*) [Category C] [Preadditive C] [HasBinaryBiproducts C]
 
 include hc
-
-def ComplexShape.strictUniversalPropertyFixedTargetQuotient (E : Type*) [Category E] :
-    Localization.StrictUniversalPropertyFixedTarget (HomotopyCategory.quotient C c)
-      (HomologicalComplex.homotopyEquivalences C c) E where
-  inverts := HomotopyCategory.quotient_inverts_homotopyEquivalences C c
-  lift F hF := CategoryTheory.Quotient.lift _ F (by
-    intro K L f g ⟨h⟩
-    have : DecidableRel c.Rel := by classical infer_instance
-    exact h.map_eq_of_inverts_homotopyEquivalences hc F hF)
-  fac _ _ := rfl
-  uniq _ _ h := Quotient.lift_unique' _ _ _ h
 
 lemma ComplexShape.quotient_isLocalization :
     (HomotopyCategory.quotient C c).IsLocalization

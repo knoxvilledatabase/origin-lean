@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Ideal
 import Mathlib.Data.Finset.Max
 
+noncomputable section
+
 /-!
 # The back and forth method and countable dense linear orders
 

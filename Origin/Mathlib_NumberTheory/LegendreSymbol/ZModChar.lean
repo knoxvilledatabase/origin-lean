@@ -7,6 +7,8 @@ import Mathlib.Data.Int.Range
 import Mathlib.Data.ZMod.Basic
 import Mathlib.NumberTheory.MulChar.Basic
 
+noncomputable section
+
 /-!
 # Quadratic characters on ℤ/nℤ
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Galois.Basic
 import Mathlib.RepresentationTheory.Action.Concrete
 import Mathlib.RepresentationTheory.Action.Limits
 
+noncomputable section
+
 /-!
 # Examples of Galois categories and fiber functors
 

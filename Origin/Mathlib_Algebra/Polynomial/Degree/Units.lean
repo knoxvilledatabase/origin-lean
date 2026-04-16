@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Units.lean
-Genuine: 9 | Conflates: 2 | Dissolved: 1 | Infrastructure: 1
+Genuine: 9 | Conflates: 3 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Domain
 import Mathlib.Algebra.Polynomial.Degree.SmallDegree
+
+noncomputable section
 
 /-!
 # Degree of polynomials that are units
@@ -61,7 +63,11 @@ lemma not_isUnit_of_natDegree_pos (p : R[X]) (hpl : 0 < p.natDegree) : ¬ IsUnit
   nontriviality R
   exact natDegree_eq_of_degree_eq_some (degree_coe_units u)
 
--- DISSOLVED: coeff_coe_units_zero_ne_zero
+-- CONFLATES (assumes ground = zero): coeff_coe_units_zero_ne_zero
+theorem coeff_coe_units_zero_ne_zero [Nontrivial R] (u : R[X]ˣ) : coeff (u : R[X]) 0 ≠ 0 := by
+  conv in 0 => rw [← natDegree_coe_units u]
+  rw [← leadingCoeff, Ne, leadingCoeff_eq_zero]
+  exact Units.ne_zero _
 
 end Semiring
 

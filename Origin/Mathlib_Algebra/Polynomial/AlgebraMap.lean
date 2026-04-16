@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/AlgebraMap.lean
-Genuine: 84 | Conflates: 1 | Dissolved: 2 | Infrastructure: 16
+Genuine: 86 | Conflates: 1 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Pi
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Polynomial.Eval.Algebra
 import Mathlib.Algebra.Polynomial.Eval.Degree
 import Mathlib.Algebra.Polynomial.Monomial
 import Mathlib.RingTheory.Adjoin.Basic
+
+noncomputable section
 
 /-!
 # Theory of univariate polynomials
@@ -62,10 +64,6 @@ theorem ofFinsupp_algebraMap (r : R) : (⟨algebraMap R _ r⟩ : A[X]) = algebra
   toFinsupp_injective (toFinsupp_algebraMap _).symm
 
 theorem C_eq_algebraMap (r : R) : C r = algebraMap R R[X] r :=
-  rfl
-
-@[simp]
-theorem algebraMap_eq : algebraMap R R[X] = C :=
   rfl
 
 @[simps! apply]
@@ -143,17 +141,8 @@ def mapAlgHom (f : A →ₐ[R] B) : Polynomial A →ₐ[R] Polynomial B where
   commutes' := by simp
 
 @[simp]
-theorem coe_mapAlgHom (f : A →ₐ[R] B) : ⇑(mapAlgHom f) = map f :=
-  rfl
-
-@[simp]
 theorem mapAlgHom_id : mapAlgHom (AlgHom.id R A) = AlgHom.id R (Polynomial A) :=
   AlgHom.ext fun _x => map_id
-
-@[simp]
-theorem mapAlgHom_coe_ringHom (f : A →ₐ[R] B) :
-    ↑(mapAlgHom f : _ →ₐ[R] Polynomial B) = (mapRingHom ↑f : Polynomial A →+* Polynomial B) :=
-  rfl
 
 @[simp]
 theorem mapAlgHom_comp (C : Type z) [Semiring C] [Algebra R C] (f : B →ₐ[R] C) (g : A →ₐ[R] B) :
@@ -173,17 +162,8 @@ def mapAlgEquiv (f : A ≃ₐ[R] B) : Polynomial A ≃ₐ[R] Polynomial B :=
   AlgEquiv.ofAlgHom (mapAlgHom f.toAlgHom) (mapAlgHom f.symm.toAlgHom) (by simp) (by simp)
 
 @[simp]
-theorem coe_mapAlgEquiv (f : A ≃ₐ[R] B) : ⇑(mapAlgEquiv f) = map f :=
-  rfl
-
-@[simp]
 theorem mapAlgEquiv_id : mapAlgEquiv (@AlgEquiv.refl R A _ _ _) = AlgEquiv.refl :=
   AlgEquiv.ext fun _x => map_id
-
-@[simp]
-theorem mapAlgEquiv_coe_ringHom (f : A ≃ₐ[R] B) :
-    ↑(mapAlgEquiv f : _ ≃ₐ[R] Polynomial B) = (mapRingHom ↑f : Polynomial A →+* Polynomial B) :=
-  rfl
 
 @[simp]
 theorem mapAlgEquiv_comp (C : Type z) [Semiring C] [Algebra R C] (f : A ≃ₐ[R] B) (g : B ≃ₐ[R] C) :
@@ -272,10 +252,6 @@ theorem algEquivOfCompEqX_eq_iff (p q p' q' : R[X])
     algEquivOfCompEqX p q hpq hqp = algEquivOfCompEqX p' q' hpq' hqp' ↔ p = p' :=
   ⟨fun h ↦ by simpa using congr($h X), fun h ↦ by ext1; simp [h]⟩
 
-@[simp]
-theorem algEquivOfCompEqX_symm (p q : R[X]) (hpq : p.comp q = X) (hqp : q.comp p = X) :
-    (algEquivOfCompEqX p q hpq hqp).symm = algEquivOfCompEqX q p hqp hpq := rfl
-
 @[simps!]
 def algEquivCMulXAddC {R : Type*} [CommRing R] (a b : R) [Invertible a] : R[X] ≃ₐ[R] R[X] :=
   algEquivOfCompEqX (C a * X + C b) (C ⅟ a * (X - C b))
@@ -345,11 +321,6 @@ theorem aeval_algebraMap_apply_eq_algebraMap_eval (x : R) (p : R[X]) :
 
 @[simp]
 theorem coe_aeval_eq_eval (r : R) : (aeval r : R[X] → R) = eval r :=
-  rfl
-
-@[simp]
-theorem coe_aeval_eq_evalRingHom (x : R) :
-    ((aeval x : R[X] →ₐ[R] R) : R[X] →+* R) = evalRingHom x :=
   rfl
 
 @[simp]
@@ -551,7 +522,7 @@ lemma X_sub_C_pow_dvd_iff {n : ℕ} : (X - C t) ^ n ∣ p ↔ X ^ n ∣ p.comp (
 lemma comp_X_add_C_eq_zero_iff : p.comp (X + C t) = 0 ↔ p = 0 :=
   EmbeddingLike.map_eq_zero_iff (f := algEquivAevalXAddC t)
 
--- DISSOLVED: comp_X_add_C_ne_zero_iff
+lemma comp_X_add_C_ne_zero_iff : p.comp (X + C t) ≠ 0 ↔ p ≠ 0 := comp_X_add_C_eq_zero_iff.not
 
 lemma dvd_comp_C_mul_X_add_C_iff (p q : R[X]) (a b : R) [Invertible a] :
     p ∣ q.comp (C a * X + C b) ↔ p.comp (C ⅟ a * (X - C b)) ∣ q := by
@@ -641,7 +612,13 @@ termination_by Q => Q.natDegree
 
 open nonZeroDivisors in
 
--- DISSOLVED: nmem_nonZeroDivisors_iff
+theorem nmem_nonZeroDivisors_iff {P : R[X]} : P ∉ R[X]⁰ ↔ ∃ a : R, a ≠ 0 ∧ a • P = 0 := by
+  refine ⟨fun hP ↦ ?_, fun ⟨a, ha, h⟩ h1 ↦ ha <| C_eq_zero.1 <| (h1 _) <| smul_eq_C_mul a ▸ h⟩
+  by_contra! h
+  obtain ⟨Q, hQ⟩ := _root_.nmem_nonZeroDivisors_iff.1 hP
+  refine hQ.2 (eq_zero_of_mul_eq_zero_of_smul P (fun a ha ↦ ?_) Q (mul_comm P _ ▸ hQ.1))
+  contrapose! ha
+  exact h a ha
 
 open nonZeroDivisors in
 

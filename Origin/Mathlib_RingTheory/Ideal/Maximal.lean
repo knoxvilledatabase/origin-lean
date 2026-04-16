@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Ideal/Maximal.lean
-Genuine: 17 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
+Genuine: 18 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Prime
 import Mathlib.RingTheory.Ideal.Span
+
+noncomputable section
 
 /-!
 
@@ -133,7 +135,8 @@ namespace Ideal
 
 variable [CommSemiring α] (I : Ideal α)
 
--- DISSOLVED: span_singleton_prime
+theorem span_singleton_prime {p : α} (hp : p ≠ 0) : IsPrime (span ({p} : Set α)) ↔ Prime p := by
+  simp [isPrime_iff, Prime, span_singleton_eq_top, hp, mem_span_singleton]
 
 theorem IsMaximal.isPrime {I : Ideal α} (H : I.IsMaximal) : I.IsPrime :=
   ⟨H.1.1, @fun x y hxy =>

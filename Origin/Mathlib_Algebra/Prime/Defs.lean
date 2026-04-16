@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Prime/Defs.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Divisibility
+
+noncomputable section
 
 /-!
 # Prime and irreducible elements.
@@ -39,7 +41,8 @@ variable {p : M} (hp : Prime p)
 
 include hp
 
--- DISSOLVED: ne_zero
+theorem ne_zero : p ≠ 0 :=
+  hp.1
 
 theorem not_unit : ¬IsUnit p :=
   hp.2.1
@@ -47,7 +50,7 @@ theorem not_unit : ¬IsUnit p :=
 theorem not_dvd_one : ¬p ∣ 1 :=
   mt (isUnit_of_dvd_one ·) hp.not_unit
 
--- DISSOLVED: ne_one
+theorem ne_one : p ≠ 1 := fun h => hp.2.1 (h.symm ▸ isUnit_one)
 
 theorem dvd_or_dvd {a b : M} (h : p ∣ a * b) : p ∣ a ∨ p ∣ b :=
   hp.2.2 a b h
@@ -74,7 +77,8 @@ theorem dvd_of_dvd_pow {a : M} {n : ℕ} (h : p ∣ a ^ n) : p ∣ a := by
     · assumption
     · exact ih dvd_pow
 
--- DISSOLVED: dvd_pow_iff_dvd
+theorem dvd_pow_iff_dvd {a : M} {n : ℕ} (hn : n ≠ 0) : p ∣ a ^ n ↔ p ∣ a :=
+  ⟨hp.dvd_of_dvd_pow, (dvd_pow · hn)⟩
 
 end Prime
 
@@ -110,7 +114,8 @@ theorem irreducible_iff [Monoid M] {p : M} :
 @[simp]
 theorem not_irreducible_one [Monoid M] : ¬Irreducible (1 : M) := by simp [irreducible_iff]
 
--- DISSOLVED: Irreducible.ne_one
+theorem Irreducible.ne_one [Monoid M] : ∀ {p : M}, Irreducible p → p ≠ 1
+  | _, hp, rfl => not_irreducible_one hp
 
 @[simp]
 theorem not_irreducible_zero [MonoidWithZero M] : ¬Irreducible (0 : M)
@@ -118,7 +123,8 @@ theorem not_irreducible_zero [MonoidWithZero M] : ¬Irreducible (0 : M)
     have : IsUnit (0 : M) ∨ IsUnit (0 : M) := h 0 0 (mul_zero 0).symm
     this.elim hn0 hn0
 
--- DISSOLVED: Irreducible.ne_zero
+theorem Irreducible.ne_zero [MonoidWithZero M] : ∀ {p : M}, Irreducible p → p ≠ 0
+  | _, hp, rfl => not_irreducible_zero hp
 
 theorem of_irreducible_mul {M} [Monoid M] {x y : M} : Irreducible (x * y) → IsUnit x ∨ IsUnit y
   | ⟨_, h⟩ => h _ _ rfl

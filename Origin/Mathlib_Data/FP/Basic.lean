@@ -7,6 +7,8 @@ import Mathlib.Data.Semiquot
 import Mathlib.Data.Nat.Size
 import Mathlib.Tactic.Ring.RingNF
 
+noncomputable section
+
 /-!
 # Implementation of floating-point numbers (experimental).
 -/
@@ -135,8 +137,8 @@ unsafe def ofPosRatDn (n : ℕ+) (d : ℕ+) : Float × Bool := by
   exact lcProof
 
 set_option linter.unusedVariables false in
-
 @[nolint docBlame]
+
 unsafe def nextUpPos (e m) (v : ValidFinite e m) : Float :=
   let m' := m.succ
   if ss : m'.size = m.size then
@@ -144,8 +146,8 @@ unsafe def nextUpPos (e m) (v : ValidFinite e m) : Float :=
   else if h : e = emax then Float.inf false else Float.finite false e.succ (Nat.div2 m') lcProof
 
 set_option linter.unusedVariables false in
-
 @[nolint docBlame]
+
 unsafe def nextDnPos (e m) (v : ValidFinite e m) : Float :=
   match m with
   | 0 => nextUpPos _ _ Float.Zero.valid

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Unbundled/Basic.lean
-Genuine: 95 | Conflates: 0 | Dissolved: 11 | Infrastructure: 0
+Genuine: 96 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic
@@ -13,6 +13,8 @@ import Mathlib.Algebra.Order.Monoid.NatCast
 import Mathlib.Algebra.Order.Monoid.Unbundled.MinMax
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Tactic.Tauto
+
+noncomputable section
 
 /-!
 # Basic facts for ordered rings and semirings
@@ -597,7 +599,17 @@ theorem cmp_mul_neg_right [ExistsAddOfLE α] [MulPosStrictMono α]
     {a : α} (ha : a < 0) (b c : α) : cmp (b * a) (c * a) = cmp c b :=
   (strictAnti_mul_right ha).cmp_map_eq b c
 
--- DISSOLVED: mul_self_pos
+@[simp]
+theorem mul_self_pos [ExistsAddOfLE α] [PosMulStrictMono α] [MulPosStrictMono α]
+    [AddLeftStrictMono α] [AddLeftReflectLT α]
+    {a : α} : 0 < a * a ↔ a ≠ 0 := by
+  constructor
+  · rintro h rfl
+    rw [mul_zero] at h
+    exact h.false
+  · intro h
+    rcases h.lt_or_lt with h | h
+    exacts [mul_pos_of_neg_of_neg h h, mul_pos h h]
 
 theorem nonneg_of_mul_nonpos_left [ExistsAddOfLE α] [MulPosStrictMono α]
     [AddRightMono α] [AddRightReflectLE α]

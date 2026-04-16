@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Flat.Basic
 import Mathlib.LinearAlgebra.TensorProduct.Vanishing
 import Mathlib.Algebra.Module.FinitePresentation
 
+noncomputable section
+
 /-! # The equational criterion for flatness
 
 Let $M$ be a module over a commutative ring $R$. Let us say that a relation

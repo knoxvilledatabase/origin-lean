@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Convex/Strict.lean
-Genuine: 46 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
+Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Basic
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.Order.Basic
+
+noncomputable section
 
 /-!
 # Strictly convex sets
@@ -296,9 +298,16 @@ theorem StrictConvex.eq_of_openSegment_subset_frontier [Nontrivial 𝕜] [Densel
       (h ⟨a, 1 - a, ha₀, sub_pos_of_lt ha₁, add_sub_cancel _ _, rfl⟩).2
         (hs hx hy hxy ha₀ (sub_pos_of_lt ha₁) <| add_sub_cancel _ _)
 
--- DISSOLVED: StrictConvex.add_smul_mem
+theorem StrictConvex.add_smul_mem (hs : StrictConvex 𝕜 s) (hx : x ∈ s) (hxy : x + y ∈ s)
+    (hy : y ≠ 0) {t : 𝕜} (ht₀ : 0 < t) (ht₁ : t < 1) : x + t • y ∈ interior s := by
+  have h : x + t • y = (1 - t) • x + t • (x + y) := by match_scalars <;> field_simp
+  rw [h]
+  exact hs hx hxy (fun h => hy <| add_left_cancel (a := x) (by rw [← h, add_zero]))
+    (sub_pos_of_lt ht₁) ht₀ (sub_add_cancel 1 t)
 
--- DISSOLVED: StrictConvex.smul_mem_of_zero_mem
+theorem StrictConvex.smul_mem_of_zero_mem (hs : StrictConvex 𝕜 s) (zero_mem : (0 : E) ∈ s)
+    (hx : x ∈ s) (hx₀ : x ≠ 0) {t : 𝕜} (ht₀ : 0 < t) (ht₁ : t < 1) : t • x ∈ interior s := by
+  simpa using hs.add_smul_mem zero_mem (by simpa using hx) hx₀ ht₀ ht₁
 
 theorem StrictConvex.add_smul_sub_mem (h : StrictConvex 𝕜 s) (hx : x ∈ s) (hy : y ∈ s) (hxy : x ≠ y)
     {t : 𝕜} (ht₀ : 0 < t) (ht₁ : t < 1) : x + t • (y - x) ∈ interior s := by
@@ -348,7 +357,10 @@ theorem strictConvex_iff_div :
     fun h x hx y hy hxy a b ha hb hab ↦ by
     convert h hx hy hxy ha hb <;> rw [hab, div_one]⟩
 
--- DISSOLVED: StrictConvex.mem_smul_of_zero_mem
+theorem StrictConvex.mem_smul_of_zero_mem (hs : StrictConvex 𝕜 s) (zero_mem : (0 : E) ∈ s)
+    (hx : x ∈ s) (hx₀ : x ≠ 0) {t : 𝕜} (ht : 1 < t) : x ∈ t • interior s := by
+  rw [mem_smul_set_iff_inv_smul_mem₀ (by positivity)]
+  exact hs.smul_mem_of_zero_mem zero_mem hx hx₀ (by positivity) (inv_lt_one_of_one_lt₀ ht)
 
 end AddCommGroup
 

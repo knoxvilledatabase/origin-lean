@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.EpiMono
 import Mathlib.CategoryTheory.Limits.Shapes.StrongEpi
 import Mathlib.CategoryTheory.LiftingProperties.Adjunction
 
+noncomputable section
+
 /-!
 # Preservation and reflection of monomorphisms and epimorphisms
 

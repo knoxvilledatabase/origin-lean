@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.GroupCompletion
 import Mathlib.Topology.Algebra.Ring.Ideal
 import Mathlib.Topology.Algebra.UniformGroup.Basic
 
+noncomputable section
+
 /-!
 # Completion of topological rings:
 
@@ -194,10 +196,6 @@ instance algebra : Algebra R (Completion A) :=
         fun a => by
         simpa only [coe_mul] using congr_arg ((↑) : A → Completion A) (Algebra.commutes r a)
     smul_def' := fun r x => congr_fun (map_smul_eq_mul_coe A R r) x }
-
-theorem algebraMap_def (r : R) :
-    algebraMap R (Completion A) r = (algebraMap R A r : Completion A) :=
-  rfl
 
 end Algebra
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Dynamics.Ergodic.AddCircle
 import Mathlib.MeasureTheory.Covering.LiminfLimsup
 
+noncomputable section
+
 /-!
 # Well-approximable numbers and Gallagher's ergodic theorem
 
@@ -77,12 +79,6 @@ distances `δ₁, δ₂, ...`, `addWellApproximable A δ` is the limsup as `n �
 `approxAddOrderOf A n δₙ`."]
 def wellApproximable (A : Type*) [SeminormedGroup A] (δ : ℕ → ℝ) : Set A :=
   blimsup (fun n => approxOrderOf A n (δ n)) atTop fun n => 0 < n
-
-@[to_additive mem_add_wellApproximable_iff]
-theorem mem_wellApproximable_iff {A : Type*} [SeminormedGroup A] {δ : ℕ → ℝ} {a : A} :
-    a ∈ wellApproximable A δ ↔
-      a ∈ blimsup (fun n => approxOrderOf A n (δ n)) atTop fun n => 0 < n :=
-  Iff.rfl
 
 namespace approxOrderOf
 

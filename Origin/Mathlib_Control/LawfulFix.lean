@@ -8,6 +8,8 @@ import Mathlib.Tactic.ApplyFun
 import Mathlib.Control.Fix
 import Mathlib.Order.OmegaCompletePartialOrder
 
+noncomputable section
+
 /-!
 # Lawful fixed point operators
 
@@ -174,6 +176,7 @@ theorem fix_eq_of_ωScottContinuous (hc : ωScottContinuous g) :
 variable {f}
 
 set_option linter.deprecated false in
+@[deprecated fix_eq_of_ωScottContinuous (since := "2024-08-26")]
 
 theorem fix_eq (hc : Continuous f) : Part.fix f = f (Part.fix f) := by
   rw [fix_eq_ωSup f, hc]
@@ -204,6 +207,7 @@ theorem ωScottContinuous_toUnitMono (f : Part α → Part α) (hc : ωScottCont
   erw [hc.map_ωSup, Chain.map_comp]; rfl
 
 set_option linter.deprecated false in
+@[deprecated ωScottContinuous_toUnitMono (since := "2024-08-26")]
 
 theorem to_unit_cont (f : Part α →o Part α) (hc : Continuous f) : Continuous (toUnitMono f)
   | _ => by
@@ -255,6 +259,7 @@ theorem ωScottContinuous_curry :
     rfl
 
 set_option linter.deprecated false in
+@[deprecated ωScottContinuous_curry (since := "2024-08-26")]
 
 theorem continuous_curry : Continuous <| monotoneCurry α β γ := fun c ↦ by
   ext x y
@@ -271,6 +276,7 @@ theorem ωScottContinuous_uncurry :
   rfl
 
 set_option linter.deprecated false in
+@[deprecated ωScottContinuous_uncurry  (since := "2024-08-26")]
 
 theorem continuous_uncurry : Continuous <| monotoneUncurry α β γ := fun c ↦ by
   ext ⟨x, y⟩
@@ -298,6 +304,7 @@ theorem uncurry_curry_ωScottContinuous (hc : ωScottContinuous f) :
   (ωScottContinuous_uncurry _ _ _).comp (hc.comp (ωScottContinuous_curry _ _ _))
 
 set_option linter.deprecated false in
+@[deprecated uncurry_curry_ωScottContinuous  (since := "2024-08-26")]
 
 theorem uncurry_curry_continuous {f : ((x : _) → (y : β x) → γ x y) →o (x : _) → (y : β x) → γ x y}
     (hc : Continuous f) :

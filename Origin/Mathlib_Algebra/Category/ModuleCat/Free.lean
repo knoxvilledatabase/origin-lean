@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 
+noncomputable section
+
 /-!
 # Exact sequences with free modules
 
@@ -53,6 +55,27 @@ theorem disjoint_span_sum : Disjoint (span R (range (u ∘ Sum.inl)))
   exact range_ker_disjoint hw
 
 include hv hm in
+/-- In the commutative diagram
+
+```
+
+             f     g
+
+    0 --→ X₁ --→ X₂ --→ X₃
+
+          ↑      ↑      ↑
+
+         v|     u|     w|
+
+          ι  → ι ⊕ ι' ← ι'
+
+```
+
+where the top row is an exact sequence of modules and the maps on the bottom are `Sum.inl` and
+
+`Sum.inr`. If `u` is injective and `v` and `w` are linearly independent, then `u` is linearly
+
+independent. -/
 
 theorem linearIndependent_leftExact : LinearIndependent R u := by
   rw [linearIndependent_sum]
@@ -65,6 +88,8 @@ theorem linearIndependent_leftExact : LinearIndependent R u := by
 end
 
 include hS' hv in
+/-- Given a short exact sequence `0 ⟶ X₁ ⟶ X₂ ⟶ X₃ ⟶ 0` of `R`-modules and linearly independent
+    families `v : ι → N` and `w : ι' → P`, we get a linearly independent family `ι ⊕ ι' → M` -/
 
 theorem linearIndependent_shortExact {w : ι' → S.X₃} (hw : LinearIndependent R w) :
     LinearIndependent R (Sum.elim (S.f ∘ v) (S.g.toFun.invFun ∘ w)) := by
@@ -79,6 +104,25 @@ end LinearIndependent
 section Span
 
 include hS in
+/-- In the commutative diagram
+
+```
+
+    f     g
+
+ X₁ --→ X₂ --→ X₃
+
+ ↑      ↑      ↑
+
+v|     u|     w|
+
+ ι  → ι ⊕ ι' ← ι'
+
+```
+
+where the top row is an exact sequence of modules and the maps on the bottom are `Sum.inl` and
+
+`Sum.inr`. If `v` spans `X₁` and `w` spans `X₃`, then `u` spans `X₂`. -/
 
 theorem span_exact {β : Type*} {u : ι ⊕ β → S.X₂} (huv : u ∘ Sum.inl = S.f ∘ v)
     (hv : ⊤ ≤ span R (range v))
@@ -114,6 +158,8 @@ theorem span_exact {β : Type*} {u : ι ⊕ β → S.X₂} (huv : u ∘ Sum.inl 
     rw [Finsupp.sum_mapDomain_index_inj Sum.inr_injective]
 
 include hS in
+/-- Given an exact sequence `X₁ ⟶ X₂ ⟶ X₃ ⟶ 0` of `R`-modules and spanning
+    families `v : ι → X₁` and `w : ι' → X₃`, we get a spanning family `ι ⊕ ι' → X₂` -/
 
 theorem span_rightExact {w : ι' → S.X₃} (hv : ⊤ ≤ span R (range v))
     (hw : ⊤ ≤ span R (range w)) (hE : Epi S.g) :
@@ -129,7 +175,6 @@ theorem span_rightExact {w : ι' → S.X₃} (hv : ⊤ ≤ span R (range v))
 end Span
 
 noncomputable
-
 def Basis.ofShortExact
     (bN : Basis ι R S.X₁) (bP : Basis ι' R S.X₃) : Basis (ι ⊕ ι') R S.X₂ :=
   Basis.mk (linearIndependent_shortExact hS' bN.linearIndependent bP.linearIndependent)

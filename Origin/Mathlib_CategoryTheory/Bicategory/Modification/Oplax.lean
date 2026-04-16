@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.NaturalTransformation.Oplax
 
+noncomputable section
+
 /-!
 # Modifications between oplax transformations
 
@@ -95,15 +97,6 @@ lemma ext {F G : OplaxFunctor B C} {α β : F ⟶ G} {m n : α ⟶ β} (w : ∀ 
   apply Modification.ext
   ext
   apply w
-
-@[simp]
-lemma Modification.id_app' {X : B} {F G : OplaxFunctor B C} (α : F ⟶ G) :
-    Modification.app (𝟙 α) X = 𝟙 (α.app X) := rfl
-
-@[simp]
-lemma Modification.comp_app' {X : B} {F G : OplaxFunctor B C} {α β γ : F ⟶ G}
-    (m : α ⟶ β) (n : β ⟶ γ) : (m ≫ n).app X = m.app X ≫ n.app X :=
-  rfl
 
 @[simps]
 def ModificationIso.ofComponents (app : ∀ a, η.app a ≅ θ.app a)

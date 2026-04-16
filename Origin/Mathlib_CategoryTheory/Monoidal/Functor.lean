@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.Category
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful
 import Mathlib.CategoryTheory.Products.Basic
 
+noncomputable section
+
 /-!
 # (Lax) monoidal functors
 
@@ -177,25 +179,11 @@ def ofTensorHom : F.LaxMonoidal where
   right_unitality' := fun X => by
     simp_rw [← id_tensorHom, right_unitality']
 
-lemma ofTensorHom_ε :
-    letI := (ofTensorHom ε' μ' μ'_natural associativity' left_unitality' right_unitality')
-    ε F = ε' := rfl
-
-lemma ofTensorHom_μ :
-    letI := (ofTensorHom ε' μ' μ'_natural associativity' left_unitality' right_unitality')
-    μ F = μ' := rfl
-
 end
 
 instance id : (𝟭 C).LaxMonoidal where
   ε' := 𝟙 _
   μ' _ _ := 𝟙 _
-
-@[simp]
-lemma id_ε : ε (𝟭 C) = 𝟙 _ := rfl
-
-@[simp]
-lemma id_μ (X Y : C) : μ (𝟭 C) X Y = 𝟙 _ := rfl
 
 section
 
@@ -212,12 +200,6 @@ instance comp : (F ⋙ G).LaxMonoidal where
     dsimp
     simp_rw [comp_whiskerRight, assoc, μ_natural_left_assoc, MonoidalCategory.whiskerLeft_comp,
       assoc, μ_natural_right_assoc, ← associativity_assoc, ← G.map_comp, associativity]
-
-@[simp]
-lemma comp_ε : ε (F ⋙ G) = ε G ≫ G.map (ε F) := rfl
-
-@[simp]
-lemma comp_μ (X Y : C) : μ (F ⋙ G) X Y = μ G _ _ ≫ G.map (μ F X Y) := rfl
 
 end
 
@@ -316,12 +298,6 @@ instance id : (𝟭 C).OplaxMonoidal where
   η' := 𝟙 _
   δ' _ _ := 𝟙 _
 
-@[simp]
-lemma id_η : η (𝟭 C) = 𝟙 _ := rfl
-
-@[simp]
-lemma id_δ (X Y : C) : δ (𝟭 C) X Y = 𝟙 _ := rfl
-
 section
 
 variable [F.OplaxMonoidal] [G.OplaxMonoidal]
@@ -340,12 +316,6 @@ instance comp : (F ⋙ G).OplaxMonoidal where
     rw [comp_whiskerRight, assoc, assoc, assoc, δ_natural_left_assoc, associativity,
       ← G.map_comp_assoc, ← G.map_comp_assoc, assoc, associativity, map_comp, map_comp,
       assoc, assoc, MonoidalCategory.whiskerLeft_comp, δ_natural_right_assoc]
-
-@[simp]
-lemma comp_η : η (F ⋙ G) = G.map (η F) ≫ η G := rfl
-
-@[simp]
-lemma comp_δ (X Y : C) : δ (F ⋙ G) X Y = G.map (δ F X Y) ≫ δ G _ _ := rfl
 
 end
 
@@ -434,18 +404,6 @@ lemma whiskerLeft_δ_μ (X Y : C) (T : D) : T ◁ δ F X Y ≫ T ◁ μ F X Y = 
   rw [← MonoidalCategory.whiskerLeft_comp, δ_μ, MonoidalCategory.whiskerLeft_id]
 
 @[reassoc]
-theorem map_tensor {X Y X' Y' : C} (f : X ⟶ Y) (g : X' ⟶ Y') :
-    F.map (f ⊗ g) = δ F X X' ≫ (F.map f ⊗ F.map g) ≫ μ F Y Y' := by simp
-
-@[reassoc]
-theorem map_whiskerLeft (X : C) {Y Z : C} (f : Y ⟶ Z) :
-    F.map (X ◁ f) = δ F X Y ≫ F.obj X ◁ F.map f ≫ μ F X Z := by simp
-
-@[reassoc]
-theorem map_whiskerRight {X Y : C} (f : X ⟶ Y) (Z : C) :
-    F.map (f ▷ Z) = δ F X Z ≫ F.map f ▷ F.obj Z ≫ μ F Y Z := by simp
-
-@[reassoc]
 theorem map_associator (X Y Z : C) :
     F.map (α_ X Y Z).hom =
       δ F (X ⊗ Y) Z ≫ δ F X Y ▷ F.obj Z ≫
@@ -461,22 +419,6 @@ theorem map_associator_inv (X Y Z : C) :
     assoc, assoc, assoc, assoc, OplaxMonoidal.associativity_inv_assoc,
     whiskerRight_δ_μ_assoc, δ_μ, comp_id, LaxMonoidal.associativity_inv,
     Iso.hom_inv_id_assoc, whiskerRight_δ_μ_assoc, δ_μ]
-
-@[reassoc]
-theorem map_leftUnitor (X : C) :
-    F.map (λ_ X).hom = δ F (𝟙_ C) X ≫ η F ▷ F.obj X ≫ (λ_ (F.obj X)).hom := by simp
-
-@[reassoc]
-theorem map_leftUnitor_inv (X : C) :
-    F.map (λ_ X).inv = (λ_ (F.obj X)).inv ≫ ε F ▷ F.obj X ≫ μ F (𝟙_ C) X  := by simp
-
-@[reassoc]
-theorem map_rightUnitor (X : C) :
-    F.map (ρ_ X).hom = δ F X (𝟙_ C) ≫ F.obj X ◁ η F ≫ (ρ_ (F.obj X)).hom := by simp
-
-@[reassoc]
-theorem map_rightUnitor_inv (X : C) :
-    F.map (ρ_ X).inv = (ρ_ (F.obj X)).inv ≫ F.obj X ◁ ε F  ≫ μ F X (𝟙_ C):= by simp
 
 @[simps!]
 noncomputable def μNatIso :
@@ -587,6 +529,7 @@ lemma toOplaxMonoidal_δ  (X Y : C) :
     OplaxMonoidal.δ F X Y = (h.μIso X Y).inv := rfl
 
 attribute [local simp] toLaxMonoidal_ε toLaxMonoidal_μ toOplaxMonoidal_η toOplaxMonoidal_δ in
+/-- The monoidal functor structure induced by a `Functor.CoreMonoidal` structure. -/
 
 @[simps! toLaxMonoidal toOplaxMonoidal]
 def toMonoidal : F.Monoidal where
@@ -659,14 +602,6 @@ instance : (prod F G).LaxMonoidal where
         prodMonoidal_rightUnitor_hom_fst, LaxMonoidal.right_unitality, prodMonoidal_whiskerLeft,
         prod_map, prodMonoidal_rightUnitor_hom_snd, prod_comp]
 
-@[simp] lemma prod_ε_fst : (ε (prod F G)).1 = ε F := rfl
-
-@[simp] lemma prod_ε_snd : (ε (prod F G)).2 = ε G := rfl
-
-@[simp] lemma prod_μ_fst (X Y : C × E) : (μ (prod F G) X Y).1 = μ F _ _ := rfl
-
-@[simp] lemma prod_μ_snd (X Y : C × E) : (μ (prod F G) X Y).2 = μ G _ _ := rfl
-
 end
 
 section
@@ -676,14 +611,6 @@ variable [F.OplaxMonoidal] [G.OplaxMonoidal]
 instance : (prod F G).OplaxMonoidal where
   η' := (η F, η G)
   δ' X Y := (δ F _ _, δ G _ _)
-
-@[simp] lemma prod_η_fst : (η (prod F G)).1 = η F := rfl
-
-@[simp] lemma prod_η_snd : (η (prod F G)).2 = η G := rfl
-
-@[simp] lemma prod_δ_fst (X Y : C × E) : (δ (prod F G) X Y).1 = δ F _ _ := rfl
-
-@[simp] lemma prod_δ_snd (X Y : C × E) : (δ (prod F G) X Y).2 = δ G _ _ := rfl
 
 end
 
@@ -699,14 +626,6 @@ instance : (diag C).Monoidal :=
   CoreMonoidal.toMonoidal
     { εIso := Iso.refl _
       μIso := fun _ _ ↦ Iso.refl _ }
-
-@[simp] lemma diag_ε : ε (diag C) = 𝟙 _ := rfl
-
-@[simp] lemma diag_η : η (diag C) = 𝟙 _ := rfl
-
-@[simp] lemma diag_μ (X Y : C) : μ (diag C) X Y = 𝟙 _ := rfl
-
-@[simp] lemma diag_δ (X Y : C) : δ (diag C) X Y = 𝟙 _ := rfl
 
 section Prod'
 

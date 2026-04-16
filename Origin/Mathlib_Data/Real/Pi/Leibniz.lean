@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.AbelLimit
 import Mathlib.Analysis.SpecialFunctions.Complex.Arctan
 
+noncomputable section
+
 /-! ### Leibniz's series for `π` -/
 
 namespace Real

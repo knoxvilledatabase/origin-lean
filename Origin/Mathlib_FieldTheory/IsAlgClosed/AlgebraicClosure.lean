@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/AlgebraicClosure.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 29
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectLimit
@@ -8,6 +8,8 @@ import Mathlib.Algebra.CharP.Algebra
 import Mathlib.Algebra.Polynomial.Eval.Irreducible
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.FieldTheory.SplittingField.Construction
+
+noncomputable section
 
 /-!
 # Algebraic Closure
@@ -129,12 +131,8 @@ def stepAux (n : ℕ) : Σ α : Type u, Field α :=
 def Step (n : ℕ) : Type u :=
   (stepAux k n).1
 
-theorem Step.zero : Step k 0 = k := rfl
-
 instance Step.field (n : ℕ) : Field (Step k n) :=
   (stepAux k n).2
-
-theorem Step.succ (n : ℕ) : Step k (n + 1) = AdjoinMonic (Step k n) := rfl
 
 instance Step.inhabited (n) : Inhabited (Step k n) :=
   ⟨37⟩
@@ -183,11 +181,6 @@ def toStepOfLE (m n : ℕ) (h : m ≤ n) : Step k m →+* Step k n where
     induction' h with a h ih
     · simp_rw [toStepOfLE', Nat.leRecOn_self]
     · simp [toStepOfLE'.succ k m a h, ih]
-
-@[simp]
-theorem coe_toStepOfLE (m n : ℕ) (h : m ≤ n) :
-    (toStepOfLE k m n h : Step k m → Step k n) = Nat.leRecOn h @fun n => toStepSucc k n :=
-  rfl
 
 instance Step.algebra (n) : Algebra k (Step k n) :=
   (toStepOfLE k 0 n n.zero_le).toAlgebra
@@ -381,4 +374,25 @@ instance {L : Type*} [Field k] [Field L] [Algebra k L] [Algebra.IsAlgebraic k L]
 
 end AlgebraicClosure
 
--- DISSOLVED: Polynomial.isRoot_of_isRoot_iff_dvd_derivative_mul
+theorem Polynomial.isRoot_of_isRoot_iff_dvd_derivative_mul {K : Type*} [Field K]
+    [IsAlgClosed K] [CharZero K] {f g : K[X]} (hf0 : f ≠ 0) :
+    (∀ x, IsRoot f x → IsRoot g x) ↔ f ∣ f.derivative * g := by
+  refine ⟨?_, isRoot_of_isRoot_of_dvd_derivative_mul hf0⟩
+  by_cases hg0 : g = 0
+  · simp [hg0]
+  by_cases hdf0 : derivative f = 0
+  · rw [eq_C_of_derivative_eq_zero hdf0]
+    simp only [eval_C, derivative_C, zero_mul, dvd_zero, implies_true]
+  have hdg :  f.derivative * g ≠ 0 := mul_ne_zero hdf0 hg0
+  classical rw [Splits.dvd_iff_roots_le_roots (IsAlgClosed.splits f) hf0 hdg, Multiset.le_iff_count]
+  simp only [count_roots, rootMultiplicity_mul hdg]
+  refine forall_imp fun a => ?_
+  by_cases haf : f.eval a = 0
+  · have h0 : 0 < f.rootMultiplicity a := (rootMultiplicity_pos hf0).2 haf
+    rw [derivative_rootMultiplicity_of_root haf]
+    intro h
+    calc rootMultiplicity a f
+        = rootMultiplicity a f - 1 + 1 := (Nat.sub_add_cancel (Nat.succ_le_iff.1 h0)).symm
+      _ ≤ rootMultiplicity a f - 1 + rootMultiplicity a g := add_le_add le_rfl (Nat.succ_le_iff.1
+        ((rootMultiplicity_pos hg0).2 (h haf)))
+  · simp [haf, rootMultiplicity_eq_zero haf]

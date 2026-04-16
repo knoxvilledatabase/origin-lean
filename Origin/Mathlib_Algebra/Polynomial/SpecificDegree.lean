@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Tactic.IntervalCases
 
+noncomputable section
+
 /-!
 # Polynomials of specific degree
 

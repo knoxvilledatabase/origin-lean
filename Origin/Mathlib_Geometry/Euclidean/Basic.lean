@@ -1,11 +1,13 @@
 /-
 Extracted from Geometry/Euclidean/Basic.lean
-Genuine: 41 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Geometry.Euclidean.PerpBisector
 import Mathlib.Algebra.QuadraticDiscriminant
+
+noncomputable section
 
 /-!
 # Euclidean spaces
@@ -98,7 +100,20 @@ theorem dist_smul_vadd_sq (r : ℝ) (v : V) (p₁ p₂ : P) :
     real_inner_add_add_self, real_inner_smul_left, real_inner_smul_left, real_inner_smul_right]
   ring
 
--- DISSOLVED: dist_smul_vadd_eq_dist
+theorem dist_smul_vadd_eq_dist {v : V} (p₁ p₂ : P) (hv : v ≠ 0) (r : ℝ) :
+    dist (r • v +ᵥ p₁) p₂ = dist p₁ p₂ ↔ r = 0 ∨ r = -2 * ⟪v, p₁ -ᵥ p₂⟫ / ⟪v, v⟫ := by
+  conv_lhs =>
+    rw [← mul_self_inj_of_nonneg dist_nonneg dist_nonneg, dist_smul_vadd_sq, mul_assoc,
+      ← sub_eq_zero, add_sub_assoc, dist_eq_norm_vsub V p₁ p₂, ← real_inner_self_eq_norm_mul_norm,
+      sub_self]
+  have hvi : ⟪v, v⟫ ≠ 0 := by simpa using hv
+  have hd : discrim ⟪v, v⟫ (2 * ⟪v, p₁ -ᵥ p₂⟫) 0 = 2 * ⟪v, p₁ -ᵥ p₂⟫ * (2 * ⟪v, p₁ -ᵥ p₂⟫) := by
+    rw [discrim]
+    ring
+  rw [quadratic_eq_zero_iff hvi hd, neg_add_cancel, zero_div, neg_mul_eq_neg_mul, ←
+    mul_sub_right_distrib, sub_eq_add_neg, ← mul_two, mul_assoc, mul_div_assoc, mul_div_mul_left,
+    mul_div_assoc]
+  norm_num
 
 open AffineSubspace Module
 
@@ -300,7 +315,10 @@ theorem dist_orthogonalProjection_eq_zero_iff {s : AffineSubspace ℝ P} [Nonemp
     dist p (orthogonalProjection s p) = 0 ↔ p ∈ s := by
   rw [dist_comm, dist_eq_zero, orthogonalProjection_eq_self_iff]
 
--- DISSOLVED: dist_orthogonalProjection_ne_zero_of_not_mem
+theorem dist_orthogonalProjection_ne_zero_of_not_mem {s : AffineSubspace ℝ P} [Nonempty s]
+    [HasOrthogonalProjection s.direction] {p : P} (hp : p ∉ s) :
+    dist p (orthogonalProjection s p) ≠ 0 :=
+  mt dist_orthogonalProjection_eq_zero_iff.mp hp
 
 theorem orthogonalProjection_vsub_mem_direction_orthogonal (s : AffineSubspace ℝ P) [Nonempty s]
     [HasOrthogonalProjection s.direction] (p : P) :

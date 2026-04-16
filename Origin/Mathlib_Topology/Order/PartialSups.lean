@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Order.Lattice
 import Mathlib.Order.PartialSups
 
+noncomputable section
+
 /-!
 # Continuity of `partialSups`
 

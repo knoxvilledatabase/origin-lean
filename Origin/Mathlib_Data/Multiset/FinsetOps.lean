@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Multiset.Dedup
 import Mathlib.Data.List.Infix
 
+noncomputable section
+
 /-!
 # Preparations for defining operations on `Finset`.
 
@@ -23,14 +25,6 @@ variable {α : Type*} [DecidableEq α] {s : Multiset α}
 
 def ndinsert (a : α) (s : Multiset α) : Multiset α :=
   Quot.liftOn s (fun l => (l.insert a : Multiset α)) fun _ _ p => Quot.sound (p.insert a)
-
-@[simp]
-theorem coe_ndinsert (a : α) (l : List α) : ndinsert a l = (insert a l : List α) :=
-  rfl
-
-@[simp]
-theorem ndinsert_zero (a : α) : ndinsert a 0 = {a} :=
-  rfl
 
 @[simp]
 theorem ndinsert_of_mem {a : α} {s : Multiset α} : a ∈ s → ndinsert a s = s :=
@@ -111,10 +105,6 @@ def ndunion (s t : Multiset α) : Multiset α :=
   (Quotient.liftOn₂ s t fun l₁ l₂ => (l₁.union l₂ : Multiset α)) fun _ _ _ _ p₁ p₂ =>
     Quot.sound <| p₁.union p₂
 
-@[simp]
-theorem coe_ndunion (l₁ l₂ : List α) : @ndunion α _ l₁ l₂ = (l₁ ∪ l₂ : List α) :=
-  rfl
-
 theorem zero_ndunion (s : Multiset α) : ndunion 0 s = s :=
   Quot.inductionOn s fun _ => rfl
 
@@ -178,10 +168,6 @@ def ndinter (s t : Multiset α) : Multiset α :=
 theorem coe_ndinter (l₁ l₂ : List α) : @ndinter α _ l₁ l₂ = (l₁ ∩ l₂ : List α) := by
   simp only [ndinter, mem_coe, filter_coe, coe_eq_coe, ← elem_eq_mem]
   apply Perm.refl
-
-@[simp]
-theorem zero_ndinter (s : Multiset α) : ndinter 0 s = 0 :=
-  rfl
 
 @[simp]
 theorem cons_ndinter_of_mem {a : α} (s : Multiset α) {t : Multiset α} (h : a ∈ t) :

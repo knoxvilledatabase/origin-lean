@@ -7,6 +7,8 @@ import Mathlib.Algebra.GeomSum
 import Mathlib.LinearAlgebra.SModEq
 import Mathlib.RingTheory.JacobsonIdeal
 
+noncomputable section
+
 /-!
 # Completion of a module with respect to an ideal.
 
@@ -207,40 +209,15 @@ instance : Module R (AdicCompletion I M) :=
     { toFun := Subtype.val, map_zero' := rfl, map_add' := fun _ _ ↦ rfl }
   Subtype.val_injective.module R f (fun _ _ ↦ rfl)
 
-@[simps]
-def incl : AdicCompletion I M →ₗ[R] (∀ n, M ⧸ (I ^ n • ⊤ : Submodule R M)) where
-  toFun x := x.val
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
 def of : M →ₗ[R] AdicCompletion I M where
   toFun x := ⟨fun n => mkQ (I ^ n • ⊤ : Submodule R M) x, fun _ => rfl⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-@[simp]
-theorem of_apply (x : M) (n : ℕ) : (of I M x).1 n = mkQ (I ^ n • ⊤ : Submodule R M) x :=
-  rfl
-
 def eval (n : ℕ) : AdicCompletion I M →ₗ[R] M ⧸ (I ^ n • ⊤ : Submodule R M) where
   toFun f := f.1 n
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
-
-@[simp]
-theorem coe_eval (n : ℕ) :
-    (eval I M n : AdicCompletion I M → M ⧸ (I ^ n • ⊤ : Submodule R M)) = fun f => f.1 n :=
-  rfl
-
-theorem eval_apply (n : ℕ) (f : AdicCompletion I M) : eval I M n f = f.1 n :=
-  rfl
-
-theorem eval_of (n : ℕ) (x : M) : eval I M n (of I M x) = mkQ (I ^ n • ⊤ : Submodule R M) x :=
-  rfl
-
-@[simp]
-theorem eval_comp_of (n : ℕ) : (eval I M n).comp (of I M) = mkQ _ :=
-  rfl
 
 theorem eval_surjective (n : ℕ) : Function.Surjective (eval I M n) := fun x ↦
   Quotient.inductionOn' x fun x ↦ ⟨of I M x, rfl⟩
@@ -257,10 +234,6 @@ variable {I M}
 
 @[simp]
 theorem val_add (n : ℕ) (f g : AdicCompletion I M) : (f + g).val n = f.val n + g.val n :=
-  rfl
-
-@[simp]
-theorem val_sub (n : ℕ) (f g : AdicCompletion I M) : (f - g).val n = f.val n - g.val n :=
   rfl
 
 @[simp]
@@ -385,10 +358,6 @@ theorem add_apply (n : ℕ) (f g : AdicCauchySequence I M) : (f + g) n = f n + g
   rfl
 
 @[simp]
-theorem sub_apply (n : ℕ) (f g : AdicCauchySequence I M) : (f - g) n = f n - g n :=
-  rfl
-
-@[simp]
 theorem smul_apply (n : ℕ) (r : R) (f : AdicCauchySequence I M) : (r • f) n = r • f n :=
   rfl
 
@@ -467,18 +436,6 @@ def lift (f : ∀ (n : ℕ), M →ₗ[R] N ⧸ (I ^ n • ⊤ : Submodule R N))
   map_smul' r x := by
     simp only [LinearMapClass.map_smul, RingHom.id_apply]
     rfl
-
-@[simp]
-lemma eval_lift (f : ∀ (n : ℕ), M →ₗ[R] N ⧸ (I ^ n • ⊤ : Submodule R N))
-    (h : ∀ {m n : ℕ} (hle : m ≤ n), transitionMap I N hle ∘ₗ f n = f m)
-    (n : ℕ) : eval I N n ∘ₗ lift I f h = f n :=
-  rfl
-
-@[simp]
-lemma eval_lift_apply (f : ∀ (n : ℕ), M →ₗ[R] N ⧸ (I ^ n • ⊤ : Submodule R N))
-    (h : ∀ {m n : ℕ} (hle : m ≤ n), transitionMap I N hle ∘ₗ f n = f m)
-    (n : ℕ) (x : M) : (lift I f h x).val n = f n x :=
-  rfl
 
 end AdicCompletion
 

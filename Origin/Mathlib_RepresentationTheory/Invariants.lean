@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.FDRep
 
+noncomputable section
+
 /-!
 # Subspace of invariants a group representation
 

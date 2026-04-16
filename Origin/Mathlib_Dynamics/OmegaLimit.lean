@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Dynamics.Flow
 import Mathlib.Tactic.Monotonicity
 
+noncomputable section
+
 /-!
 # ω-limits
 

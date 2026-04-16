@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Coset.Basic
 import Mathlib.GroupTheory.Finiteness
 
+noncomputable section
+
 /-!
 # The abelianization of a group
 
@@ -101,10 +103,6 @@ def of : G →* Abelianization G where
   map_one' := rfl
   map_mul' _ _ := rfl
 
-@[simp]
-theorem mk_eq_of (a : G) : Quot.mk _ a = of a :=
-  rfl
-
 section lift
 
 variable {A : Type v} [CommGroup A] (f : G →* A)
@@ -119,10 +117,6 @@ def lift : (G →* A) ≃ (Abelianization G →* A) where
   invFun F := F.comp of
   left_inv _ := MonoidHom.ext fun _ => rfl
   right_inv _ := MonoidHom.ext fun x => QuotientGroup.induction_on x fun _ => rfl
-
-@[simp]
-theorem lift.of (x : G) : lift f (of x) = f x :=
-  rfl
 
 theorem lift.unique (φ : Abelianization G →* A)
     -- hφ : φ agrees with f on the image of G in Gᵃᵇ
@@ -148,13 +142,6 @@ variable {H : Type v} [Group H] (f : G →* H)
 
 def map : Abelianization G →* Abelianization H :=
   lift (of.comp f)
-
-@[simp] theorem lift_of_comp :
-    Abelianization.lift (Abelianization.of.comp f) = Abelianization.map f := rfl
-
-@[simp]
-theorem map_of (x : G) : map f (of x) = of (f x) :=
-  rfl
 
 @[simp]
 theorem map_id : map (MonoidHom.id G) = MonoidHom.id (Abelianization G) :=
@@ -189,19 +176,9 @@ def MulEquiv.abelianizationCongr (e : G ≃* H) : Abelianization G ≃* Abeliani
   map_mul' := MonoidHom.map_mul _
 
 @[simp]
-theorem abelianizationCongr_of (e : G ≃* H) (x : G) :
-    e.abelianizationCongr (Abelianization.of x) = Abelianization.of (e x) :=
-  rfl
-
-@[simp]
 theorem abelianizationCongr_refl :
     (MulEquiv.refl G).abelianizationCongr = MulEquiv.refl (Abelianization G) :=
   MulEquiv.toMonoidHom_injective Abelianization.lift_of
-
-@[simp]
-theorem abelianizationCongr_symm (e : G ≃* H) :
-    e.abelianizationCongr.symm = e.symm.abelianizationCongr :=
-  rfl
 
 @[simp]
 theorem abelianizationCongr_trans {I : Type v} [Group I] (e : G ≃* H) (e₂ : H ≃* I) :

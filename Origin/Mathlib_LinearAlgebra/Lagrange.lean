@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Lagrange.lean
-Genuine: 64 | Conflates: 2 | Dissolved: 6 | Infrastructure: 3
+Genuine: 68 | Conflates: 4 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.RingTheory.Polynomial.Basic
+
+noncomputable section
 
 /-!
 # Lagrange interpolation
@@ -150,7 +152,8 @@ theorem basisDivisor_inj (hxy : basisDivisor x y = 0) : x = y := by
 theorem basisDivisor_eq_zero_iff : basisDivisor x y = 0 ↔ x = y :=
   ⟨basisDivisor_inj, fun H => H ▸ basisDivisor_self⟩
 
--- DISSOLVED: basisDivisor_ne_zero_iff
+theorem basisDivisor_ne_zero_iff : basisDivisor x y ≠ 0 ↔ x ≠ y := by
+  rw [Ne, basisDivisor_eq_zero_iff]
 
 theorem degree_basisDivisor_of_ne (hxy : x ≠ y) : (basisDivisor x y).degree = 1 := by
   rw [basisDivisor, degree_mul, degree_X_sub_C, degree_C, zero_add]
@@ -188,10 +191,6 @@ protected def basis (s : Finset ι) (v : ι → F) (i : ι) : F[X] :=
   ∏ j ∈ s.erase i, basisDivisor (v i) (v j)
 
 @[simp]
-theorem basis_empty : Lagrange.basis ∅ v i = 1 :=
-  rfl
-
-@[simp]
 theorem basis_singleton (i : ι) : Lagrange.basis {i} v i = 1 := by
   rw [Lagrange.basis, erase_singleton, prod_empty]
 
@@ -205,7 +204,11 @@ theorem basis_pair_right (hij : i ≠ j) : Lagrange.basis {i, j} v j = basisDivi
   rw [pair_comm]
   exact basis_pair_left hij.symm
 
--- DISSOLVED: basis_ne_zero
+theorem basis_ne_zero (hvs : Set.InjOn v s) (hi : i ∈ s) : Lagrange.basis s v i ≠ 0 := by
+  simp_rw [Lagrange.basis, prod_ne_zero_iff, Ne, mem_erase]
+  rintro j ⟨hij, hj⟩
+  rw [basisDivisor_eq_zero_iff, hvs.eq_iff hi hj]
+  exact hij.symm
 
 @[simp]
 theorem eval_basis_self (hvs : Set.InjOn v s) (hi : i ∈ s) :
@@ -432,9 +435,6 @@ open Finset Polynomial
 def nodal (s : Finset ι) (v : ι → R) : R[X] :=
   ∏ i ∈ s, (X - C (v i))
 
-theorem nodal_eq (s : Finset ι) (v : ι → R) : nodal s v = ∏ i ∈ s, (X - C (v i)) :=
-  rfl
-
 @[simp]
 theorem nodal_empty : nodal ∅ v = 1 := by
   rfl
@@ -445,7 +445,8 @@ theorem natDegree_nodal [Nontrivial R] : (nodal s v).natDegree = #s := by
   simp_rw [nodal, natDegree_prod_of_monic (h := fun i _ => monic_X_sub_C (v i)),
     natDegree_X_sub_C, sum_const, smul_eq_mul, mul_one]
 
--- DISSOLVED: nodal_ne_zero
+-- CONFLATES (assumes ground = zero): nodal_ne_zero
+theorem nodal_ne_zero [Nontrivial R] : nodal s v ≠ 0 := by
 
 rcases s.eq_empty_or_nonempty with (rfl | h)
 
@@ -470,7 +471,11 @@ theorem eval_nodal_at_node {i : ι} (hi : i ∈ s) : eval (v i) (nodal s v) = 0 
   rw [eval_nodal]
   exact s.prod_eq_zero hi (sub_self (v i))
 
--- DISSOLVED: eval_nodal_not_at_node
+-- CONFLATES (assumes ground = zero): eval_nodal_not_at_node
+theorem eval_nodal_not_at_node [Nontrivial R] [NoZeroDivisors R] {x : R}
+    (hx : ∀ i ∈ s, x ≠ v i) : eval x (nodal s v) ≠ 0 := by
+  simp_rw [nodal, eval_prod, prod_ne_zero_iff, eval_sub, eval_X, eval_C, sub_ne_zero]
+  exact hx
 
 theorem nodal_eq_mul_nodal_erase [DecidableEq ι] {i : ι} (hi : i ∈ s) :
     nodal s v = (X - C (v i)) * nodal (s.erase i) v := by
@@ -542,7 +547,11 @@ theorem nodalWeight_eq_eval_nodal_derative (hi : i ∈ s) :
     nodalWeight s v i = (eval (v i) (Polynomial.derivative (nodal s v)))⁻¹ := by
   rw [eval_nodal_derivative_eval_node_eq hi, nodalWeight_eq_eval_nodal_erase_inv]
 
--- DISSOLVED: nodalWeight_ne_zero
+theorem nodalWeight_ne_zero (hvs : Set.InjOn v s) (hi : i ∈ s) : nodalWeight s v i ≠ 0 := by
+  rw [nodalWeight, prod_ne_zero_iff]
+  intro j hj
+  rcases mem_erase.mp hj with ⟨hij, hj⟩
+  exact inv_ne_zero (sub_ne_zero_of_ne (mt (hvs.eq_iff hi hj).mp hij.symm))
 
 end NodalWeight
 
@@ -576,7 +585,11 @@ theorem eval_interpolate_not_at_node (hx : ∀ i ∈ s, x ≠ v i) :
   refine sum_congr rfl fun i hi => ?_
   rw [← mul_assoc, mul_comm, eval_basis_not_at_node hi (hx _ hi)]
 
--- DISSOLVED: sum_nodalWeight_mul_inv_sub_ne_zero
+theorem sum_nodalWeight_mul_inv_sub_ne_zero (hvs : Set.InjOn v s) (hx : ∀ i ∈ s, x ≠ v i)
+    (hs : s.Nonempty) : (∑ i ∈ s, nodalWeight s v i * (x - v i)⁻¹) ≠ 0 :=
+  @right_ne_zero_of_mul_eq_one _ _ _ (eval x (nodal s v)) _ <| by
+    simpa only [Pi.one_apply, interpolate_one hvs hs, eval_one, mul_one] using
+      (eval_interpolate_not_at_node 1 hx).symm
 
 theorem eval_interpolate_not_at_node' (hvs : Set.InjOn v s) (hs : s.Nonempty)
     (hx : ∀ i ∈ s, x ≠ v i) :

@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Kaehler/TensorProduct.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.RingTheory.Kaehler.Basic
 import Mathlib.RingTheory.Localization.BaseChange
+
+noncomputable section
 
 /-!
 # Kaehler differential module under base change
@@ -29,7 +31,6 @@ attribute [local instance] SMulCommClass.of_commMonoid
 namespace KaehlerDifferential
 
 noncomputable
-
 abbrev mulActionBaseChange :
   MulAction A (S ⊗[R] Ω[A⁄R]) := (TensorProduct.comm R S (Ω[A⁄R])).toEquiv.mulAction A
 
@@ -39,7 +40,10 @@ attribute [local instance] mulActionBaseChange
 lemma mulActionBaseChange_smul_tmul (a : A) (s : S) (x : Ω[A⁄R]) :
     a • (s ⊗ₜ[R] x) = s ⊗ₜ (a • x) := rfl
 
--- DISSOLVED: mulActionBaseChange_smul_zero
+@[local simp]
+lemma mulActionBaseChange_smul_zero (a : A) :
+    a • (0 : S ⊗[R] Ω[A⁄R]) = 0 := by
+  rw [← zero_tmul _ (0 : Ω[A⁄R]), mulActionBaseChange_smul_tmul, smul_zero]
 
 @[local simp]
 lemma mulActionBaseChange_smul_add (a : A) (x y : S ⊗[R] Ω[A⁄R]) :
@@ -49,7 +53,6 @@ lemma mulActionBaseChange_smul_add (a : A) (x y : S ⊗[R] Ω[A⁄R]) :
   rfl
 
 noncomputable
-
 abbrev moduleBaseChange :
     Module A (S ⊗[R] Ω[A⁄R]) where
   __ := (TensorProduct.comm R S (Ω[A⁄R])).toEquiv.mulAction A
@@ -118,7 +121,6 @@ lemma map_liftBaseChange_smul [h : Algebra.IsPushout R S A B] (b : B) (x) :
     · simp only [map_add, smul_add, *]
 
 noncomputable
-
 def derivationTensorProduct [h : Algebra.IsPushout R S A B] :
     Derivation S B (S ⊗[R] Ω[A⁄R]) where
   __ := h.out.lift ((TensorProduct.mk R S (Ω[A⁄R]) 1).comp (D R A).toLinearMap)

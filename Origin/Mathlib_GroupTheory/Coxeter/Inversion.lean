@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Coxeter.Length
 import Mathlib.Data.List.GetD
 
+noncomputable section
+
 /-!
 # Reflections, inversions, and inversion sequences
 
@@ -189,13 +191,7 @@ local prefix:100 "ris" => cs.rightInvSeq
 
 local prefix:100 "lis" => cs.leftInvSeq
 
-@[simp] theorem rightInvSeq_nil : ris [] = [] := rfl
-
-@[simp] theorem leftInvSeq_nil : lis [] = [] := rfl
-
 @[simp] theorem rightInvSeq_singleton (i : B) : ris [i] = [s i] := by simp [rightInvSeq]
-
-@[simp] theorem leftInvSeq_singleton (i : B) : lis [i] = [s i] := rfl
 
 theorem rightInvSeq_concat (ω : List B) (i : B) :
     ris (ω.concat i) = (List.map (MulAut.conj (s i)) (ris ω)).concat (s i) := by

@@ -13,6 +13,8 @@ import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Analysis.Normed.Algebra.UnitizationL1
 import Mathlib.Tactic.ContinuousFunctionalCalculus
 
+noncomputable section
+
 /-!
 # The spectrum of elements in a complete normed algebra
 
@@ -538,14 +540,6 @@ def equivAlgHom : characterSpace 𝕜 A ≃ (A →ₐ[𝕜] 𝕜) where
   left_inv _ := Subtype.ext <| ContinuousLinearMap.ext fun _ => rfl
   right_inv _ := AlgHom.ext fun _ => rfl
 
-@[simp]
-theorem equivAlgHom_coe (f : characterSpace 𝕜 A) : ⇑(equivAlgHom f) = f :=
-  rfl
-
-@[simp]
-theorem equivAlgHom_symm_coe (f : A →ₐ[𝕜] 𝕜) : ⇑(equivAlgHom.symm f) = f :=
-  rfl
-
 end CharacterSpace
 
 end WeakDual
@@ -567,6 +561,11 @@ variable (S : SA) [hS : IsClosed (S : Set A)] (x : S)
 open SubalgebraClass in
 
 include instSMulMem in
+/-- Let `S` be a closed subalgebra of a Banach algebra `A`. If `a : S` is invertible in `A`,
+
+and for all `x : S` sufficiently close to `a` within some filter `l`, `x` is invertible in `S`,
+
+then `a` is invertible in `S` as well. -/
 
 lemma _root_.Subalgebra.isUnit_of_isUnit_val_of_eventually {l : Filter S} {a : S}
     (ha : IsUnit (a : A)) (hla : l ≤ 𝓝 a) (hl : ∀ᶠ x in l, IsUnit x) (hl' : l.NeBot) :

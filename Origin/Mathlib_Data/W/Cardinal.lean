@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.W.Basic
 import Mathlib.SetTheory.Cardinal.Arithmetic
 
+noncomputable section
+
 /-!
 # Cardinality of W-types
 

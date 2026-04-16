@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Rat/Lemmas.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Algebra.Ring.Rat
 import Mathlib.Algebra.Ring.Int.Parity
 import Mathlib.Data.PNat.Defs
+
+noncomputable section
 
 /-!
 # Further lemmas for the Rational Numbers
@@ -15,7 +17,13 @@ import Mathlib.Data.PNat.Defs
 
 namespace Rat
 
--- DISSOLVED: num_dvd
+theorem num_dvd (a) {b : ℤ} (b0 : b ≠ 0) : (a /. b).num ∣ a := by
+  cases' e : a /. b with n d h c
+  rw [Rat.mk'_eq_divInt, divInt_eq_iff b0 (mod_cast h)] at e
+  refine Int.natAbs_dvd.1 <| Int.dvd_natAbs.1 <| Int.natCast_dvd_natCast.2 <|
+    c.dvd_of_dvd_mul_right ?_
+  have := congr_arg Int.natAbs e
+  simp only [Int.natAbs_mul, Int.natAbs_ofNat] at this; simp [this]
 
 theorem den_dvd (a b : ℤ) : ((a /. b).den : ℤ) ∣ b := by
   by_cases b0 : b = 0; · simp [b0]
@@ -24,7 +32,22 @@ theorem den_dvd (a b : ℤ) : ((a /. b).den : ℤ) ∣ b := by
   refine Int.dvd_natAbs.1 <| Int.natCast_dvd_natCast.2 <| c.symm.dvd_of_dvd_mul_left ?_
   rw [← Int.natAbs_mul, ← Int.natCast_dvd_natCast, Int.dvd_natAbs, ← e]; simp
 
--- DISSOLVED: num_den_mk
+theorem num_den_mk {q : ℚ} {n d : ℤ} (hd : d ≠ 0) (qdf : q = n /. d) :
+    ∃ c : ℤ, n = c * q.num ∧ d = c * q.den := by
+  obtain rfl | hn := eq_or_ne n 0
+  · simp [qdf]
+  have : q.num * d = n * ↑q.den := by
+    refine (divInt_eq_iff ?_ hd).mp ?_
+    · exact Int.natCast_ne_zero.mpr (Rat.den_nz _)
+    · rwa [num_divInt_den]
+  have hqdn : q.num ∣ n := by
+    rw [qdf]
+    exact Rat.num_dvd _ hd
+  refine ⟨n / q.num, ?_, ?_⟩
+  · rw [Int.ediv_mul_cancel hqdn]
+  · refine Int.eq_mul_div_of_mul_eq_mul_of_dvd_left ?_ hqdn this
+    rw [qdf]
+    exact Rat.num_ne_zero.2 ((divInt_ne_zero hd).mpr hn)
 
 theorem num_mk (n d : ℤ) : (n /. d).num = d.sign * n / n.gcd d := by
   have (m : ℕ) : Int.natAbs (m + 1) = m + 1 := by
@@ -99,7 +122,10 @@ theorem isSquare_ofNat_iff {n : ℕ} :
 
 section Casts
 
--- DISSOLVED: exists_eq_mul_div_num_and_eq_mul_div_den
+theorem exists_eq_mul_div_num_and_eq_mul_div_den (n : ℤ) {d : ℤ} (d_ne_zero : d ≠ 0) :
+    ∃ c : ℤ, n = c * ((n : ℚ) / d).num ∧ (d : ℤ) = c * ((n : ℚ) / d).den :=
+  haveI : (n : ℚ) / d = Rat.divInt n d := by rw [← Rat.divInt_eq_div]
+  Rat.num_den_mk d_ne_zero this
 
 theorem mul_num_den' (q r : ℚ) :
     (q * r).num * q.den * r.den = q.num * r.num * (q * r).den := by
@@ -183,9 +209,15 @@ theorem intCast_div (a b : ℤ) (h : b ∣ a) : ((a / b : ℤ) : ℚ) = a / b :=
 theorem natCast_div (a b : ℕ) (h : b ∣ a) : ((a / b : ℕ) : ℚ) = a / b :=
   intCast_div a b (Int.ofNat_dvd.mpr h)
 
--- DISSOLVED: den_div_intCast_eq_one_iff
+theorem den_div_intCast_eq_one_iff (m n : ℤ) (hn : n ≠ 0) : ((m : ℚ) / n).den = 1 ↔ n ∣ m := by
+  replace hn : (n : ℚ) ≠ 0 := num_ne_zero.mp hn
+  constructor
+  · rw [Rat.den_eq_one_iff, eq_div_iff hn]
+    exact mod_cast (Dvd.intro_left _)
+  · exact (intCast_div _ _ · ▸ rfl)
 
--- DISSOLVED: den_div_natCast_eq_one_iff
+theorem den_div_natCast_eq_one_iff (m n : ℕ) (hn : n ≠ 0) : ((m : ℚ) / n).den = 1 ↔ n ∣ m :=
+  (den_div_intCast_eq_one_iff m n (Int.ofNat_ne_zero.mpr hn)).trans Int.ofNat_dvd
 
 theorem inv_intCast_num_of_pos {a : ℤ} (ha0 : 0 < a) : (a : ℚ)⁻¹.num = 1 := by
   rw [← ofInt_eq_cast, ofInt, mk_eq_divInt, Rat.inv_divInt', divInt_eq_div, Nat.cast_one]
@@ -264,20 +296,8 @@ section PNatDen
 def pnatDen (x : ℚ) : ℕ+ :=
   ⟨x.den, x.pos⟩
 
-@[simp]
-theorem coe_pnatDen (x : ℚ) : (x.pnatDen : ℕ) = x.den :=
-  rfl
-
 theorem pnatDen_eq_iff_den_eq {x : ℚ} {n : ℕ+} : x.pnatDen = n ↔ x.den = ↑n :=
   Subtype.ext_iff
-
-@[simp]
-theorem pnatDen_one : (1 : ℚ).pnatDen = 1 :=
-  rfl
-
-@[simp]
-theorem pnatDen_zero : (0 : ℚ).pnatDen = 1 :=
-  rfl
 
 end PNatDen
 

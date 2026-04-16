@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.NatPowAssoc
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Algebra.Polynomial.Eval.SMul
 
+noncomputable section
+
 /-!
 # Scalar-multiple polynomial evaluation
 

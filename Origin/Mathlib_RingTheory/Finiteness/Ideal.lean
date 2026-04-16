@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Finiteness.Finsupp
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-!
 # Finitely generated ideals
 

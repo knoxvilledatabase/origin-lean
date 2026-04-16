@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 import Mathlib.CategoryTheory.Preadditive.Biproducts
 
+noncomputable section
+
 /-!
 # Relation between pullback/pushout squares and kernel/cokernel sequences
 

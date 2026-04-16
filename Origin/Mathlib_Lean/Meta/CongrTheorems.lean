@@ -7,6 +7,8 @@ import Lean.Meta.Tactic.Cleanup
 import Lean.Meta.Tactic.Refl
 import Mathlib.Logic.IsEmpty
 
+noncomputable section
+
 /-!
 # Additions to `Lean.Meta.CongrTheorems`
 -/

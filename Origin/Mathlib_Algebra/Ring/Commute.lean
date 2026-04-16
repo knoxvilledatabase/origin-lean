@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Ring/Commute.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Semiconj
 import Mathlib.Algebra.Ring.Units
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Data.Bracket
+
+noncomputable section
 
 /-!
 # Semirings and rings
@@ -159,7 +161,7 @@ variable [NoZeroDivisors R]
 @[simp] lemma sq_eq_one_iff : a ^ 2 = 1 ↔ a = 1 ∨ a = -1 := by
   rw [← (Commute.one_right a).sq_eq_sq_iff_eq_or_eq_neg, one_pow]
 
--- DISSOLVED: sq_ne_one_iff
+lemma sq_ne_one_iff : a ^ 2 ≠ 1 ↔ a ≠ 1 ∧ a ≠ -1 := sq_eq_one_iff.not.trans not_or
 
 end Ring
 
@@ -230,8 +232,6 @@ variable [NonUnitalNonAssocRing R]
 namespace Ring
 
 instance (priority := 100) instBracket : Bracket R R := ⟨fun x y => x * y - y * x⟩
-
-theorem lie_def (x y : R) : ⁅x, y⁆ = x * y - y * x := rfl
 
 end Ring
 

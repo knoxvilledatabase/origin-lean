@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Defs
 import Mathlib.Algebra.Opposites
 import Mathlib.Algebra.GroupWithZero.InjSurj
 
+noncomputable section
+
 /-!
 # Pulling back rings along injective maps, and pushing them forward along surjective maps
 -/

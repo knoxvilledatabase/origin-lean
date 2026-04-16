@@ -1,11 +1,13 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Affine.lean
-Genuine: 104 | Conflates: 3 | Dissolved: 7 | Infrastructure: 13
+Genuine: 110 | Conflates: 4 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Bivariate
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
 import Mathlib.AlgebraicGeometry.EllipticCurve.VariableChange
+
+noncomputable section
 
 /-!
 # Affine coordinates for Weierstrass curves
@@ -128,7 +130,10 @@ lemma polynomial_eq : W.polynomial =
   C_simp
   ring1
 
--- DISSOLVED: polynomial_ne_zero
+-- CONFLATES (assumes ground = zero): polynomial_ne_zero
+lemma polynomial_ne_zero [Nontrivial R] : W.polynomial ≠ 0 := by
+  rw [polynomial_eq]
+  exact Cubic.ne_zero_of_b_ne_zero one_ne_zero
 
 -- CONFLATES (assumes ground = zero): degree_polynomial
 @[simp]
@@ -224,7 +229,9 @@ lemma evalEval_polynomialY_zero : W.polynomialY.evalEval 0 0 = W.a₃ := by
 def Nonsingular (x y : R) : Prop :=
   W.Equation x y ∧ (W.polynomialX.evalEval x y ≠ 0 ∨ W.polynomialY.evalEval x y ≠ 0)
 
--- DISSOLVED: nonsingular_iff'
+lemma nonsingular_iff' (x y : R) : W.Nonsingular x y ↔ W.Equation x y ∧
+    (W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄) ≠ 0 ∨ 2 * y + W.a₁ * x + W.a₃ ≠ 0) := by
+  rw [Nonsingular, equation_iff', evalEval_polynomialX, evalEval_polynomialY]
 
 lemma nonsingular_iff (x y : R) : W.Nonsingular x y ↔
     W.Equation x y ∧ (W.a₁ * y ≠ 3 * x ^ 2 + 2 * W.a₂ * x + W.a₄ ∨ y ≠ -y - W.a₁ * x - W.a₃) := by
@@ -232,7 +239,10 @@ lemma nonsingular_iff (x y : R) : W.Nonsingular x y ↔
   congr! 3
   ring1
 
--- DISSOLVED: nonsingular_zero
+@[simp]
+lemma nonsingular_zero : W.Nonsingular 0 0 ↔ W.a₆ = 0 ∧ (W.a₃ ≠ 0 ∨ W.a₄ ≠ 0) := by
+  rw [Nonsingular, equation_zero, evalEval_polynomialX_zero, neg_ne_zero, evalEval_polynomialY_zero,
+    or_comm]
 
 lemma nonsingular_iff_variableChange (x y : R) :
     W.Nonsingular x y ↔ (W.variableChange ⟨1, x, 0, y⟩).toAffine.Nonsingular 0 0 := by
@@ -241,9 +251,16 @@ lemma nonsingular_iff_variableChange (x y : R) :
   simp only [variableChange]
   congr! 3 <;> ring1
 
--- DISSOLVED: nonsingular_zero_of_Δ_ne_zero
+lemma nonsingular_zero_of_Δ_ne_zero (h : W.Equation 0 0) (hΔ : W.Δ ≠ 0) : W.Nonsingular 0 0 := by
+  simp only [equation_zero, nonsingular_zero] at *
+  contrapose! hΔ
+  simp only [b₂, b₄, b₆, b₈, Δ, h, hΔ]
+  ring1
 
--- DISSOLVED: nonsingular_of_Δ_ne_zero
+lemma nonsingular_of_Δ_ne_zero {x y : R} (h : W.Equation x y) (hΔ : W.Δ ≠ 0) : W.Nonsingular x y :=
+  (W.nonsingular_iff_variableChange x y).mpr <|
+    nonsingular_zero_of_Δ_ne_zero _ ((W.equation_iff_variableChange x y).mp h) <| by
+      rwa [variableChange_Δ, inv_one, Units.val_one, one_pow, one_mul]
 
 end Nonsingular
 
@@ -337,7 +354,19 @@ lemma nonsingular_neg_of {x y : R} (h : W.Nonsingular x <| W.negY x y) : W.Nonsi
 lemma nonsingular_neg {x y : R} (h : W.Nonsingular x y) : W.Nonsingular x <| W.negY x y :=
   (W.nonsingular_neg_iff ..).mpr h
 
--- DISSOLVED: nonsingular_negAdd_of_eval_derivative_ne_zero
+lemma nonsingular_negAdd_of_eval_derivative_ne_zero {x₁ x₂ y₁ L : R}
+    (hx' : W.Equation (W.addX x₁ x₂ L) (W.negAddY x₁ x₂ y₁ L))
+    (hx : (W.addPolynomial x₁ y₁ L).derivative.eval (W.addX x₁ x₂ L) ≠ 0) :
+    W.Nonsingular (W.addX x₁ x₂ L) (W.negAddY x₁ x₂ y₁ L) := by
+  rw [Nonsingular, and_iff_right hx', negAddY, polynomialX, polynomialY]
+  eval_simp
+  contrapose! hx
+  rw [addPolynomial, linePolynomial, polynomial]
+  eval_simp
+  derivative_simp
+  simp only [zero_add, add_zero, sub_zero, zero_mul, mul_one]
+  eval_simp
+  linear_combination (norm := (norm_num1; ring1)) hx.left + L * hx.right
 
 end Ring
 
@@ -507,7 +536,7 @@ instance : Zero W.Point :=
 lemma zero_def : (zero : W.Point) = 0 :=
   rfl
 
--- DISSOLVED: some_ne_zero
+lemma some_ne_zero {x y : R} (h : W.Nonsingular x y) : some h ≠ 0 := by rintro (_|_)
 
 def neg : W.Point → W.Point
   | 0 => 0
@@ -515,17 +544,6 @@ def neg : W.Point → W.Point
 
 instance : Neg W.Point :=
   ⟨neg⟩
-
-lemma neg_def (P : W.Point) : P.neg = -P :=
-  rfl
-
-@[simp]
-lemma neg_zero : (-0 : W.Point) = 0 :=
-  rfl
-
-@[simp]
-lemma neg_some {x y : R} (h : W.Nonsingular x y) : -some h = some (nonsingular_neg h) :=
-  rfl
 
 instance : InvolutiveNeg W.Point :=
   ⟨by rintro (_ | _) <;> simp [zero_def]; ring1⟩
@@ -787,10 +805,6 @@ def map : W⟮F⟯ →+ W⟮K⟯ where
       · push_neg at h; rwa [baseChange_negY, inj.eq_iff, inj.ne_iff]
 
 lemma map_zero : map W f (0 : W⟮F⟯) = 0 :=
-  rfl
-
-lemma map_some {x y : F} (h : (W.baseChange F).toAffine.Nonsingular x y) :
-    map W f (some h) = some ((W.baseChange_nonsingular f.injective ..).mpr h) :=
   rfl
 
 lemma map_id (P : W⟮F⟯) : map W (Algebra.ofId F F) P = P := by

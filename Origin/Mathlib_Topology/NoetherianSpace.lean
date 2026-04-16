@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Topology.Sets.Closeds
 
+noncomputable section
+
 /-!
 # Noetherian space
 

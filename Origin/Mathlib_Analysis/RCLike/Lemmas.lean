@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/RCLike/Lemmas.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Analysis.RCLike.Basic
+
+noncomputable section
 
 /-! # Further lemmas about `RCLike` -/
 
@@ -22,12 +24,6 @@ namespace FiniteDimensional
 open scoped Classical
 
 open RCLike
-
-library_note "RCLike instance"/--
-
-This instance generates a type-class problem with a metavariable `?m` that should satisfy
-
-`RCLike ?m`. Since this can only be satisfied by `ℝ` or `ℂ`, this does not cause problems. -/
 
 instance rclike_to_real : FiniteDimensional ℝ K :=
   ⟨{1, I}, by

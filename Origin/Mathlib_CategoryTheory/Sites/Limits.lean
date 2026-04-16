@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Sites.Sheafification
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 
+noncomputable section
+
 /-!
 
 # Limits and colimits of sheaves

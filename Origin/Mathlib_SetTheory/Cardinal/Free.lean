@@ -10,6 +10,8 @@ import Mathlib.RingTheory.FreeCommRing
 import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.SetTheory.Cardinal.Finsupp
 
+noncomputable section
+
 /-!
 # Cardinalities of free constructions
 

@@ -1,9 +1,11 @@
 /-
 Extracted from LinearAlgebra/Matrix/Diagonal.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.LinearMap
+
+noncomputable section
 
 /-!
 # Diagonal matrices
@@ -37,6 +39,7 @@ theorem diagonal_comp_single (w : n → R) (i : n) :
   LinearMap.ext fun x => (diagonal_mulVec_single w _ _).trans (Pi.single_smul' i (w i) x)
 
 set_option linter.deprecated false in
+@[deprecated diagonal_comp_single (since := "2024-08-09")]
 
 theorem diagonal_comp_stdBasis (w : n → R) (i : n) :
     (diagonal w).toLin'.comp (LinearMap.stdBasis R (fun _ : n => R) i) =
@@ -63,7 +66,13 @@ theorem ker_diagonal_toLin' [DecidableEq m] (w : m → K) :
   exact (iSup_range_single_eq_iInf_ker_proj K (fun _ : m => K) disjoint_compl_right this
     (Set.toFinite _)).symm
 
--- DISSOLVED: range_diagonal
+theorem range_diagonal [DecidableEq m] (w : m → K) :
+    LinearMap.range (toLin' (diagonal w)) =
+      ⨆ i ∈ { i | w i ≠ 0 }, LinearMap.range (LinearMap.single K (fun _ => K) i) := by
+  dsimp only [mem_setOf_eq]
+  rw [← Submodule.map_top, ← iSup_range_single, Submodule.map_iSup]
+  congr; funext i
+  rw [← LinearMap.range_comp, diagonal_comp_single, ← range_smul']
 
 end Semifield
 
@@ -75,7 +84,15 @@ section Field
 
 variable {m : Type*} [Fintype m] {K : Type u} [Field K]
 
--- DISSOLVED: rank_diagonal
+theorem rank_diagonal [DecidableEq m] [DecidableEq K] (w : m → K) :
+    LinearMap.rank (toLin' (diagonal w)) = Fintype.card { i // w i ≠ 0 } := by
+  have hu : univ ⊆ { i : m | w i = 0 }ᶜ ∪ { i : m | w i = 0 } := by rw [Set.compl_union_self]
+  have hd : Disjoint { i : m | w i ≠ 0 } { i : m | w i = 0 } := disjoint_compl_left
+  have B₁ := iSup_range_single_eq_iInf_ker_proj K (fun _ : m => K) hd hu (Set.toFinite _)
+  have B₂ := iInfKerProjEquiv K (fun _ ↦ K) hd hu
+  rw [LinearMap.rank, range_diagonal, B₁, ← @rank_fun' K]
+  apply LinearEquiv.rank_eq
+  apply B₂
 
 end Field
 

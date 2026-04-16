@@ -1,12 +1,14 @@
 /-
 Extracted from Data/FinEnum.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 1 | Infrastructure: 25
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.List.ProdSigma
 import Mathlib.Data.List.Pi
+
+noncomputable section
 
 /-!
 Type class for finitely enumerable types. The property is stronger
@@ -82,14 +84,6 @@ theorem card_ulift [FinEnum (ULift α)] [FinEnum α] : card (ULift α) = card α
 section ULift
 
 variable [FinEnum α] (a : α) (a' : ULift α) (i : Fin (card α))
-
-@[simp] lemma equiv_up : equiv (ULift.up a) = equiv a := rfl
-
-@[simp] lemma equiv_down : equiv a'.down = equiv a' := rfl
-
-@[simp] lemma up_equiv_symm : ULift.up (equiv.symm i) = (equiv (α := ULift α)).symm i := rfl
-
-@[simp] lemma down_equiv_symm : ((equiv (α := ULift α)).symm i).down = equiv.symm i := rfl
 
 end ULift
 
@@ -192,7 +186,7 @@ theorem card_pos_iff {α : Type u} [FinEnum α] : 0 < card α ↔ Nonempty α :=
 lemma card_pos {α : Type*} [FinEnum α] [Nonempty α] : 0 < card α :=
   card_pos_iff.mpr ‹_›
 
--- DISSOLVED: card_ne_zero
+lemma card_ne_zero {α : Type*} [FinEnum α] [Nonempty α] : card α ≠ 0 := card_pos.ne'
 
 theorem card_eq_one (α : Type u) [FinEnum α] [Unique α] : card α = 1 :=
   card_eq_fintypeCard.trans <| Fintype.card_eq_one_iff_nonempty_unique.mpr ⟨‹_›⟩

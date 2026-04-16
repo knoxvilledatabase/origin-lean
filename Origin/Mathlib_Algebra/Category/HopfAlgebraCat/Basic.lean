@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.BialgebraCat.Basic
 import Mathlib.RingTheory.HopfAlgebra
 
+noncomputable section
+
 /-!
 # The category of Hopf algebras over a commutative ring
 
@@ -46,14 +48,6 @@ def of (X : Type v) [Ring X] [HopfAlgebra R X] :
 
 variable {R}
 
-@[simp]
-lemma of_comul {X : Type v} [Ring X] [HopfAlgebra R X] :
-    Coalgebra.comul (A := of R X) = Coalgebra.comul (R := R) (A := X) := rfl
-
-@[simp]
-lemma of_counit {X : Type v} [Ring X] [HopfAlgebra R X] :
-    Coalgebra.counit (A := of R X) = Coalgebra.counit (R := R) (A := X) := rfl
-
 @[ext]
 structure Hom (V W : HopfAlgebraCat.{v} R) where
   /-- The underlying `BialgHom`. -/
@@ -78,14 +72,6 @@ abbrev ofHom {X Y : Type v} [Ring X] [Ring Y]
     of R X ⟶ of R Y :=
   ⟨f⟩
 
-@[simp] theorem toBialgHom_comp {X Y Z : HopfAlgebraCat.{v} R} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).toBialgHom = g.toBialgHom.comp f.toBialgHom :=
-  rfl
-
-@[simp] theorem toBialgHom_id {M : HopfAlgebraCat.{v} R} :
-    Hom.toBialgHom (𝟙 M) = BialgHom.id _ _ :=
-  rfl
-
 instance concreteCategory : ConcreteCategory.{v} (HopfAlgebraCat.{v} R) where
   forget :=
     { obj := fun M => M
@@ -97,16 +83,6 @@ instance hasForgetToBialgebra : HasForget₂ (HopfAlgebraCat R) (BialgebraCat R)
   forget₂ :=
     { obj := fun X => BialgebraCat.of R X
       map := fun {_ _} f => BialgebraCat.ofHom f.toBialgHom }
-
-@[simp]
-theorem forget₂_bialgebra_obj (X : HopfAlgebraCat R) :
-    (forget₂ (HopfAlgebraCat R) (BialgebraCat R)).obj X = BialgebraCat.of R X :=
-  rfl
-
-@[simp]
-theorem forget₂_bialgebra_map (X Y : HopfAlgebraCat R) (f : X ⟶ Y) :
-    (forget₂ (HopfAlgebraCat R) (BialgebraCat R)).map f = BialgebraCat.ofHom f.toBialgHom :=
-  rfl
 
 end HopfAlgebraCat
 
@@ -127,18 +103,6 @@ def toHopfAlgebraCatIso (e : X ≃ₐc[R] Y) : HopfAlgebraCat.of R X ≅ HopfAlg
   hom_inv_id := Hom.ext <| DFunLike.ext _ _ e.left_inv
   inv_hom_id := Hom.ext <| DFunLike.ext _ _ e.right_inv
 
-@[simp] theorem toHopfAlgebraCatIso_refl :
-    toHopfAlgebraCatIso (BialgEquiv.refl R X) = .refl _ :=
-  rfl
-
-@[simp] theorem toHopfAlgebraCatIso_symm (e : X ≃ₐc[R] Y) :
-    toHopfAlgebraCatIso e.symm = (toHopfAlgebraCatIso e).symm :=
-  rfl
-
-@[simp] theorem toHopfAlgebraCatIso_trans (e : X ≃ₐc[R] Y) (f : Y ≃ₐc[R] Z) :
-    toHopfAlgebraCatIso (e.trans f) = toHopfAlgebraCatIso e ≪≫ toHopfAlgebraCatIso f :=
-  rfl
-
 end BialgEquiv
 
 namespace CategoryTheory.Iso
@@ -152,20 +116,6 @@ def toHopfAlgEquiv (i : X ≅ Y) : X ≃ₐc[R] Y :=
     invFun := i.inv.toBialgHom
     left_inv := fun x => BialgHom.congr_fun (congr_arg HopfAlgebraCat.Hom.toBialgHom i.3) x
     right_inv := fun x => BialgHom.congr_fun (congr_arg HopfAlgebraCat.Hom.toBialgHom i.4) x }
-
-@[simp] theorem toHopfAlgEquiv_toBialgHom (i : X ≅ Y) :
-    (i.toHopfAlgEquiv : X →ₐc[R] Y) = i.hom.1 := rfl
-
-@[simp] theorem toHopfAlgEquiv_refl : toHopfAlgEquiv (.refl X) = .refl _ _ :=
-  rfl
-
-@[simp] theorem toHopfAlgEquiv_symm (e : X ≅ Y) :
-    toHopfAlgEquiv e.symm = (toHopfAlgEquiv e).symm :=
-  rfl
-
-@[simp] theorem toHopfAlgEquiv_trans (e : X ≅ Y) (f : Y ≅ Z) :
-    toHopfAlgEquiv (e ≪≫ f) = e.toHopfAlgEquiv.trans f.toHopfAlgEquiv :=
-  rfl
 
 end CategoryTheory.Iso
 

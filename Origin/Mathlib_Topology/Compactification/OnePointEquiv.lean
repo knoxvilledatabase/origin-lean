@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Compactification/OnePointEquiv.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Projectivization.Basic
 import Mathlib.Topology.Compactification.OnePoint
+
+noncomputable section
 
 /-!
 # One-point compactification and projectivization
@@ -54,15 +56,8 @@ def equivProjectivization :
     · exact ⟨y⁻¹, rfl, inv_mul_cancel₀ h₀⟩
 
 @[simp]
-lemma equivProjectivization_apply_infinity :
-    equivProjectivization K ∞ = mk K ⟨1, 0⟩ (by simp) :=
-  rfl
-
-@[simp]
-lemma equivProjectivization_apply_coe (t : K) :
-    equivProjectivization K t = mk K ⟨t, 1⟩ (by simp) :=
-  rfl
-
--- DISSOLVED: equivProjectivization_symm_apply_mk
+lemma equivProjectivization_symm_apply_mk (x y : K) (h : (x, y) ≠ 0) :
+    (equivProjectivization K).symm (mk K ⟨x, y⟩ h) = if y = 0 then ∞ else y⁻¹ * x := by
+  simp [equivProjectivization]
 
 end OnePoint

@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.LinearAlgebra.Matrix.ZPow
 import Mathlib.Data.Matrix.ConjTranspose
 
+noncomputable section
+
 /-! # Hermitian matrices
 
 This file defines hermitian matrices and some basic results about them.

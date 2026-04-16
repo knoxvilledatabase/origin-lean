@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/SiegelsLemma.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Matrix
 import Mathlib.Data.Pi.Interval
 import Mathlib.Tactic.Rify
+
+noncomputable section
 
 /-!
 # Siegel's Lemma
@@ -104,7 +106,16 @@ private lemma card_S_eq [DecidableEq α] : #(Finset.Icc N P) = ∏ i : α, (P i 
   rw [Int.card_Icc_of_le (N i) (P i) (N_le_P_add_one A i)]
   exact add_sub_right_comm (P i) 1 (N i)
 
--- DISSOLVED: one_le_norm_A_of_ne_zero
+lemma one_le_norm_A_of_ne_zero (hA : A ≠ 0) : 1 ≤ ‖A‖ := by
+  by_contra! h
+  apply hA
+  ext i j
+  simp only [zero_apply]
+  rw [norm_lt_iff Real.zero_lt_one] at h
+  specialize h i j
+  rw [Int.norm_eq_abs] at h
+  norm_cast at h
+  exact Int.abs_lt_one_iff.1 h
 
 open Real Nat
 
@@ -149,8 +160,44 @@ private lemma card_S_lt_card_T [DecidableEq α] [DecidableEq β]
 
 end preparation
 
--- DISSOLVED: exists_ne_zero_int_vec_norm_le
+theorem exists_ne_zero_int_vec_norm_le
+    (hn : Fintype.card α < Fintype.card β) (hm : 0 < Fintype.card α) : ∃ t : β → ℤ, t ≠ 0 ∧
+    A *ᵥ t = 0 ∧ ‖t‖ ≤ (n * max 1 ‖A‖) ^ ((m : ℝ) / (n - m)) := by
+  classical
+  -- Pigeonhole
+  rcases Finset.exists_ne_map_eq_of_card_lt_of_maps_to
+    (card_S_lt_card_T A hn hm) (image_T_subset_S A)
+    with ⟨x, hxT, y, hyT, hneq, hfeq⟩
+  -- Proofs that x - y ≠ 0 and x - y is a solution
+  refine ⟨x - y, sub_ne_zero.mpr hneq, by simp only [mulVec_sub, sub_eq_zero, hfeq], ?_⟩
+  -- Inequality
+  have n_mul_norm_A_pow_e_nonneg : 0 ≤ (n * max 1 ‖A‖) ^ e := by positivity
+  rw [← norm_col (ι := Unit), norm_le_iff n_mul_norm_A_pow_e_nonneg]
+  intro i j
+  simp only [col_apply, Pi.sub_apply]
+  rw [Int.norm_eq_abs, ← Int.cast_abs]
+  refine le_trans ?_ (Nat.floor_le n_mul_norm_A_pow_e_nonneg)
+  norm_cast
+  rw [abs_le]
+  rw [Finset.mem_Icc] at hxT hyT
+  constructor
+  · simp only [neg_le_sub_iff_le_add]
+    apply le_trans (hyT.2 i)
+    norm_cast
+    simp only [le_add_iff_nonneg_left]
+    exact hxT.1 i
+  · simp only [tsub_le_iff_right]
+    apply le_trans (hxT.2 i)
+    norm_cast
+    simp only [le_add_iff_nonneg_right]
+    exact hyT.1 i
 
--- DISSOLVED: exists_ne_zero_int_vec_norm_le'
+theorem exists_ne_zero_int_vec_norm_le'
+    (hn : Fintype.card α < Fintype.card β) (hm : 0 < Fintype.card α) (hA : A ≠ 0) :
+    ∃ t : β → ℤ, t ≠ 0 ∧
+    A *ᵥ t = 0 ∧ ‖t‖ ≤ (n * ‖A‖) ^ ((m : ℝ) / (n - m)) := by
+  have := exists_ne_zero_int_vec_norm_le A hn hm
+  rwa [max_eq_right] at this
+  exact Int.Matrix.one_le_norm_A_of_ne_zero _ hA
 
 end Int.Matrix

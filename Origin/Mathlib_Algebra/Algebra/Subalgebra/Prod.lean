@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Prod
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 
+noncomputable section
+
 /-!
 # Products of subalgebras
 
@@ -29,13 +31,7 @@ def prod : Subalgebra R (A × B) :=
     carrier := S ×ˢ S₁
     algebraMap_mem' := fun _ => ⟨algebraMap_mem _ _, algebraMap_mem _ _⟩ }
 
-@[simp]
-theorem coe_prod : (prod S S₁ : Set (A × B)) = (S : Set A) ×ˢ (S₁ : Set B) :=
-  rfl
-
 open Subalgebra in
-
-theorem prod_toSubmodule : toSubmodule (S.prod S₁) = (toSubmodule S).prod (toSubmodule S₁) := rfl
 
 @[simp]
 theorem mem_prod {S : Subalgebra R A} {S₁ : Subalgebra R B} {x : A × B} :

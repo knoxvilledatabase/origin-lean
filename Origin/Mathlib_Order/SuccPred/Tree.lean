@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Find
 import Mathlib.Order.Atoms
 import Mathlib.Data.SetLike.Basic
 
+noncomputable section
+
 /-!
 # Rooted trees
 
@@ -116,12 +118,6 @@ def SubRootedTree (t : RootedTree) : Type* := t
 def SubRootedTree.root {t : RootedTree} (v : SubRootedTree t) : t := v
 
 def RootedTree.subtree (t : RootedTree) (r : t) : SubRootedTree t := r
-
-@[simp]
-lemma RootedTree.root_subtree (t : RootedTree) (r : t) : (t.subtree r).root = r := rfl
-
-@[simp]
-lemma RootedTree.subtree_root (t : RootedTree) (v : SubRootedTree t) : t.subtree v.root = v := rfl
 
 @[ext]
 lemma SubRootedTree.ext {t : RootedTree} {v₁ v₂ : SubRootedTree t}

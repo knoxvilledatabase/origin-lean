@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.CategoryTheory.Triangulated.Basic
 
+noncomputable section
+
 /-!
 # Rotate
 

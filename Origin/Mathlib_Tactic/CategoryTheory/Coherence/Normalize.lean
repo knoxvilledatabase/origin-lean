@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Meta.AppBuilder
 import Mathlib.Tactic.CategoryTheory.Coherence.Datatypes
 
+noncomputable section
+
 /-!
 # Normalization of 2-morphisms in bicategories
 

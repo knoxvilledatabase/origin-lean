@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.LinearAlgebra.SesquilinearForm
 
+noncomputable section
+
 /-!
 # Orthogonal complements of submodules
 
@@ -165,11 +167,6 @@ theorem orthogonalFamily_self :
   | false, false => absurd rfl
 
 end Submodule
-
-@[simp]
-theorem bilinFormOfRealInner_orthogonal {E} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    (K : Submodule ℝ E) : K.orthogonalBilin bilinFormOfRealInner = Kᗮ :=
-  rfl
 
 /-!
 ### Orthogonality of submodules

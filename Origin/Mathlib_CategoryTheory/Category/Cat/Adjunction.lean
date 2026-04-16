@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.ConnectedComponents
 
+noncomputable section
+
 /-!
 # Adjunctions related to Cat, the category of categories
 

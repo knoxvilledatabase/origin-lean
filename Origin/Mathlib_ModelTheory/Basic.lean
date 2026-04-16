@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.SetTheory.Cardinal.Basic
 
+noncomputable section
+
 /-!
 # Basics on First-Order Structures
 
@@ -247,10 +249,6 @@ instance homClass : HomClass L (M →[L] N) M N where
 instance [L.IsAlgebraic] : StrongHomClass L (M →[L] N) M N :=
   HomClass.strongHomClassOfIsAlgebraic
 
-@[simp]
-theorem toFun_eq_coe {f : M →[L] N} : f.toFun = (f : M → N) :=
-  rfl
-
 @[ext]
 theorem ext ⦃f g : M →[L] N⦄ (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext f g h
@@ -280,10 +278,6 @@ variable {L} {M}
 instance : Inhabited (M →[L] M) :=
   ⟨id L M⟩
 
-@[simp]
-theorem id_apply (x : M) : id L M x = x :=
-  rfl
-
 @[trans]
 def comp (hnp : N →[L] P) (hmn : M →[L] N) : M →[L] P where
   toFun := hnp ∘ hmn
@@ -298,10 +292,6 @@ theorem comp_apply (g : N →[L] P) (f : M →[L] N) (x : M) : g.comp f x = g (f
 
 theorem comp_assoc (f : M →[L] N) (g : N →[L] P) (h : P →[L] Q) :
     (h.comp g).comp f = h.comp (g.comp f) :=
-  rfl
-
-@[simp]
-theorem comp_id (f : M →[L] N) : f.comp (id L M) = f :=
   rfl
 
 @[simp]
@@ -349,10 +339,6 @@ theorem map_rel (φ : M ↪[L] N) {n : ℕ} (r : L.Relations n) (x : Fin n → M
 def toHom : (M ↪[L] N) → M →[L] N :=
   HomClass.toHom
 
-@[simp]
-theorem coe_toHom {f : M ↪[L] N} : (f.toHom : M → N) = f :=
-  rfl
-
 theorem coe_injective : @Function.Injective (M ↪[L] N) (M → N) (↑)
   | f, g, h => by
     cases f
@@ -382,11 +368,6 @@ def ofInjective [L.IsAlgebraic] {f : M →[L] N} (hf : Function.Injective f) : M
   { f with
     inj' := hf
     map_rel' := fun {_} r x => StrongHomClass.map_rel f r x }
-
-@[simp]
-theorem coeFn_ofInjective [L.IsAlgebraic] {f : M →[L] N} (hf : Function.Injective f) :
-    (ofInjective hf : M → N) = f :=
-  rfl
 
 @[simp]
 theorem ofInjective_toHom [L.IsAlgebraic] {f : M →[L] N} (hf : Function.Injective f) :
@@ -451,9 +432,6 @@ theorem comp_toHom (hnp : N ↪[L] P) (hmn : M ↪[L] N) :
 theorem comp_refl (f : M ↪[L] N) : f.comp (refl L M) = f := DFunLike.coe_injective rfl
 
 @[simp]
-theorem refl_comp (f : M ↪[L] N) : (refl L N).comp f = f := DFunLike.coe_injective rfl
-
-@[simp]
 theorem refl_toHom : (refl L M).toHom = Hom.id L M :=
   rfl
 
@@ -495,11 +473,6 @@ def symm (f : M ≃[L] N) : N ≃[L] M :=
       rw [← Function.comp_assoc, Equiv.toFun_as_coe, Equiv.self_comp_symm, Function.id_comp] }
 
 @[simp]
-theorem symm_symm (f : M ≃[L] N) :
-    f.symm.symm = f :=
-  rfl
-
-@[simp]
 theorem apply_symm_apply (f : M ≃[L] N) (a : N) : f (f.symm a) = a :=
   f.toEquiv.apply_symm_apply a
 
@@ -526,18 +499,6 @@ def toEmbedding : (M ≃[L] N) → M ↪[L] N :=
 
 def toHom : (M ≃[L] N) → M →[L] N :=
   HomClass.toHom
-
-@[simp]
-theorem toEmbedding_toHom (f : M ≃[L] N) : f.toEmbedding.toHom = f.toHom :=
-  rfl
-
-@[simp]
-theorem coe_toHom {f : M ≃[L] N} : (f.toHom : M → N) = (f : M → N) :=
-  rfl
-
-@[simp]
-theorem coe_toEmbedding (f : M ≃[L] N) : (f.toEmbedding : M → N) = (f : M → N) :=
-  rfl
 
 theorem injective_toEmbedding : Function.Injective (toEmbedding : (M ≃[L] N) → M ↪[L] N) := by
   intro _ _ h; apply DFunLike.coe_injective; exact congr_arg (DFunLike.coe ∘ Embedding.toHom) h
@@ -586,10 +547,6 @@ theorem comp_apply (g : N ≃[L] P) (f : M ≃[L] N) (x : M) : g.comp f x = g (f
 
 @[simp]
 theorem comp_refl (g : M ≃[L] N) : g.comp (refl L M) = g :=
-  rfl
-
-@[simp]
-theorem refl_comp (g : M ≃[L] N) : (refl L N).comp g = g :=
   rfl
 
 @[simp]
@@ -647,10 +604,6 @@ theorem self_comp_symm_toHom (f : M ≃[L] N) :
     f.toHom.comp f.symm.toHom = Hom.id L N := by
   rw [← comp_toHom, self_comp_symm, refl_toHom]
 
-@[simp]
-theorem comp_symm (f : M ≃[L] N) (g : N ≃[L] P) : (g.comp f).symm = f.symm.comp g.symm :=
-  rfl
-
 theorem comp_right_injective (h : M ≃[L] N) :
     Function.Injective (fun f ↦ f.comp h : (N ≃[L] P) → (M ≃[L] P)) := by
   intro f g hfg
@@ -677,26 +630,6 @@ instance sumStructure : (L₁.sum L₂).Structure S where
   RelMap := Sum.elim RelMap RelMap
 
 variable {L₁ L₂ S}
-
-@[simp]
-theorem funMap_sum_inl {n : ℕ} (f : L₁.Functions n) :
-    @funMap (L₁.sum L₂) S _ n (Sum.inl f) = funMap f :=
-  rfl
-
-@[simp]
-theorem funMap_sum_inr {n : ℕ} (f : L₂.Functions n) :
-    @funMap (L₁.sum L₂) S _ n (Sum.inr f) = funMap f :=
-  rfl
-
-@[simp]
-theorem relMap_sum_inl {n : ℕ} (R : L₁.Relations n) :
-    @RelMap (L₁.sum L₂) S _ n (Sum.inl R) = RelMap R :=
-  rfl
-
-@[simp]
-theorem relMap_sum_inr {n : ℕ} (R : L₂.Relations n) :
-    @RelMap (L₁.sum L₂) S _ n (Sum.inr R) = RelMap R :=
-  rfl
 
 end SumStructure
 
@@ -753,22 +686,5 @@ def inducedStructureEquiv (e : M ≃ N) : @Language.Equiv L M N _ (inducedStruct
   { e with
     map_fun' := @fun n f x => by simp [← Function.comp_assoc e.symm e x]
     map_rel' := @fun n r x => by simp [← Function.comp_assoc e.symm e x] }
-
-@[simp]
-theorem toEquiv_inducedStructureEquiv (e : M ≃ N) :
-    @Language.Equiv.toEquiv L M N _ (inducedStructure e) (inducedStructureEquiv e) = e :=
-  rfl
-
-@[simp]
-theorem toFun_inducedStructureEquiv (e : M ≃ N) :
-    DFunLike.coe (@inducedStructureEquiv L M N _ e) = e :=
-  rfl
-
-@[simp]
-theorem toFun_inducedStructureEquiv_Symm (e : M ≃ N) :
-    (by
-    letI : L.Structure N := inducedStructure e
-    exact DFunLike.coe (@inducedStructureEquiv L M N _ e).symm) = (e.symm : N → M) :=
-  rfl
 
 end Equiv

@@ -1,11 +1,13 @@
 /-
 Extracted from Geometry/Euclidean/Triangle.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Angle.Oriented.Affine
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.Affine
 import Mathlib.Tactic.IntervalCases
+
+noncomputable section
 
 /-!
 # Triangles
@@ -90,15 +92,133 @@ theorem norm_eq_of_angle_sub_eq_angle_sub_rev_of_angle_ne_pi {x y : V}
         rw [real_inner_div_norm_mul_norm_eq_neg_one_iff, ← angle_eq_pi_iff] at h
         exact hpi h
 
--- DISSOLVED: cos_angle_sub_add_angle_sub_rev_eq_neg_cos_angle
+theorem cos_angle_sub_add_angle_sub_rev_eq_neg_cos_angle {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.cos (angle x (x - y) + angle y (y - x)) = -Real.cos (angle x y) := by
+  by_cases hxy : x = y
+  · rw [hxy, angle_self hy]
+    simp
+  · rw [Real.cos_add, cos_angle, cos_angle, cos_angle]
+    have hxn : ‖x‖ ≠ 0 := fun h => hx (norm_eq_zero.1 h)
+    have hyn : ‖y‖ ≠ 0 := fun h => hy (norm_eq_zero.1 h)
+    have hxyn : ‖x - y‖ ≠ 0 := fun h => hxy (eq_of_sub_eq_zero (norm_eq_zero.1 h))
+    apply mul_right_cancel₀ hxn
+    apply mul_right_cancel₀ hyn
+    apply mul_right_cancel₀ hxyn
+    apply mul_right_cancel₀ hxyn
+    have H1 :
+      Real.sin (angle x (x - y)) * Real.sin (angle y (y - x)) * ‖x‖ * ‖y‖ * ‖x - y‖ * ‖x - y‖ =
+        Real.sin (angle x (x - y)) * (‖x‖ * ‖x - y‖) *
+          (Real.sin (angle y (y - x)) * (‖y‖ * ‖x - y‖)) := by
+      ring
+    have H2 :
+      ⟪x, x⟫ * (⟪x, x⟫ - ⟪x, y⟫ - (⟪x, y⟫ - ⟪y, y⟫)) - (⟪x, x⟫ - ⟪x, y⟫) * (⟪x, x⟫ - ⟪x, y⟫) =
+        ⟪x, x⟫ * ⟪y, y⟫ - ⟪x, y⟫ * ⟪x, y⟫ := by
+      ring
+    have H3 :
+      ⟪y, y⟫ * (⟪y, y⟫ - ⟪x, y⟫ - (⟪x, y⟫ - ⟪x, x⟫)) - (⟪y, y⟫ - ⟪x, y⟫) * (⟪y, y⟫ - ⟪x, y⟫) =
+        ⟪x, x⟫ * ⟪y, y⟫ - ⟪x, y⟫ * ⟪x, y⟫ := by
+      ring
+    rw [mul_sub_right_distrib, mul_sub_right_distrib, mul_sub_right_distrib, mul_sub_right_distrib,
+      H1, sin_angle_mul_norm_mul_norm, norm_sub_rev x y, sin_angle_mul_norm_mul_norm,
+      norm_sub_rev y x, inner_sub_left, inner_sub_left, inner_sub_right, inner_sub_right,
+      inner_sub_right, inner_sub_right, real_inner_comm x y, H2, H3,
+      Real.mul_self_sqrt (sub_nonneg_of_le (real_inner_mul_inner_self_le x y)),
+      real_inner_self_eq_norm_mul_norm, real_inner_self_eq_norm_mul_norm,
+      real_inner_eq_norm_mul_self_add_norm_mul_self_sub_norm_sub_mul_self_div_two]
+    -- TODO(https://github.com/leanprover-community/mathlib4/issues/15486): used to be `field_simp [hxn, hyn, hxyn]`, but was really slow
+    -- replaced by `simp only ...` to speed up. Reinstate `field_simp` once it is faster.
+    simp (disch := field_simp_discharge) only [sub_div', div_div, mul_div_assoc',
+      div_mul_eq_mul_div, div_sub', neg_div', neg_sub, eq_div_iff, div_eq_iff]
+    ring
 
--- DISSOLVED: sin_angle_sub_add_angle_sub_rev_eq_sin_angle
+theorem sin_angle_sub_add_angle_sub_rev_eq_sin_angle {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.sin (angle x (x - y) + angle y (y - x)) = Real.sin (angle x y) := by
+  by_cases hxy : x = y
+  · rw [hxy, angle_self hy]
+    simp
+  · rw [Real.sin_add, cos_angle, cos_angle]
+    have hxn : ‖x‖ ≠ 0 := fun h => hx (norm_eq_zero.1 h)
+    have hyn : ‖y‖ ≠ 0 := fun h => hy (norm_eq_zero.1 h)
+    have hxyn : ‖x - y‖ ≠ 0 := fun h => hxy (eq_of_sub_eq_zero (norm_eq_zero.1 h))
+    apply mul_right_cancel₀ hxn
+    apply mul_right_cancel₀ hyn
+    apply mul_right_cancel₀ hxyn
+    apply mul_right_cancel₀ hxyn
+    have H1 :
+      Real.sin (angle x (x - y)) * (⟪y, y - x⟫ / (‖y‖ * ‖y - x‖)) * ‖x‖ * ‖y‖ * ‖x - y‖ =
+        Real.sin (angle x (x - y)) * (‖x‖ * ‖x - y‖) * (⟪y, y - x⟫ / (‖y‖ * ‖y - x‖)) * ‖y‖ := by
+      ring
+    have H2 :
+      ⟪x, x - y⟫ / (‖x‖ * ‖y - x‖) * Real.sin (angle y (y - x)) * ‖x‖ * ‖y‖ * ‖y - x‖ =
+        ⟪x, x - y⟫ / (‖x‖ * ‖y - x‖) * (Real.sin (angle y (y - x)) * (‖y‖ * ‖y - x‖)) * ‖x‖ := by
+      ring
+    have H3 :
+      ⟪x, x⟫ * (⟪x, x⟫ - ⟪x, y⟫ - (⟪x, y⟫ - ⟪y, y⟫)) - (⟪x, x⟫ - ⟪x, y⟫) * (⟪x, x⟫ - ⟪x, y⟫) =
+        ⟪x, x⟫ * ⟪y, y⟫ - ⟪x, y⟫ * ⟪x, y⟫ := by
+      ring
+    have H4 :
+      ⟪y, y⟫ * (⟪y, y⟫ - ⟪x, y⟫ - (⟪x, y⟫ - ⟪x, x⟫)) - (⟪y, y⟫ - ⟪x, y⟫) * (⟪y, y⟫ - ⟪x, y⟫) =
+        ⟪x, x⟫ * ⟪y, y⟫ - ⟪x, y⟫ * ⟪x, y⟫ := by
+      ring
+    rw [right_distrib, right_distrib, right_distrib, right_distrib, H1, sin_angle_mul_norm_mul_norm,
+      norm_sub_rev x y, H2, sin_angle_mul_norm_mul_norm, norm_sub_rev y x,
+      mul_assoc (Real.sin (angle x y)), sin_angle_mul_norm_mul_norm, inner_sub_left, inner_sub_left,
+      inner_sub_right, inner_sub_right, inner_sub_right, inner_sub_right, real_inner_comm x y, H3,
+      H4, real_inner_self_eq_norm_mul_norm, real_inner_self_eq_norm_mul_norm,
+      real_inner_eq_norm_mul_self_add_norm_mul_self_sub_norm_sub_mul_self_div_two]
+    -- TODO(https://github.com/leanprover-community/mathlib4/issues/15486): used to be `field_simp [hxn, hyn, hxyn]`, but was really slow
+    -- replaced by `simp only ...` to speed up. Reinstate `field_simp` once it is faster.
+    simp (disch := field_simp_discharge) only [mul_div_assoc', div_mul_eq_mul_div, div_div,
+      sub_div', Real.sqrt_div', Real.sqrt_mul_self, add_div', div_add', eq_div_iff, div_eq_iff]
+    ring
 
--- DISSOLVED: cos_angle_add_angle_sub_add_angle_sub_eq_neg_one
+theorem cos_angle_add_angle_sub_add_angle_sub_eq_neg_one {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.cos (angle x y + angle x (x - y) + angle y (y - x)) = -1 := by
+  rw [add_assoc, Real.cos_add, cos_angle_sub_add_angle_sub_rev_eq_neg_cos_angle hx hy,
+    sin_angle_sub_add_angle_sub_rev_eq_sin_angle hx hy, mul_neg, ← neg_add', add_comm, ← sq, ← sq,
+    Real.sin_sq_add_cos_sq]
 
--- DISSOLVED: sin_angle_add_angle_sub_add_angle_sub_eq_zero
+theorem sin_angle_add_angle_sub_add_angle_sub_eq_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.sin (angle x y + angle x (x - y) + angle y (y - x)) = 0 := by
+  rw [add_assoc, Real.sin_add, cos_angle_sub_add_angle_sub_rev_eq_neg_cos_angle hx hy,
+    sin_angle_sub_add_angle_sub_rev_eq_sin_angle hx hy]
+  ring
 
--- DISSOLVED: angle_add_angle_sub_add_angle_sub_eq_pi
+theorem angle_add_angle_sub_add_angle_sub_eq_pi {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    angle x y + angle x (x - y) + angle y (y - x) = π := by
+  have hcos := cos_angle_add_angle_sub_add_angle_sub_eq_neg_one hx hy
+  have hsin := sin_angle_add_angle_sub_add_angle_sub_eq_zero hx hy
+  rw [Real.sin_eq_zero_iff] at hsin
+  cases' hsin with n hn
+  symm at hn
+  have h0 : 0 ≤ angle x y + angle x (x - y) + angle y (y - x) :=
+    add_nonneg (add_nonneg (angle_nonneg _ _) (angle_nonneg _ _)) (angle_nonneg _ _)
+  have h3lt : angle x y + angle x (x - y) + angle y (y - x) < π + π + π := by
+    by_contra hnlt
+    have hxy : angle x y = π := by
+      by_contra hxy
+      exact hnlt (add_lt_add_of_lt_of_le (add_lt_add_of_lt_of_le (lt_of_le_of_ne
+        (angle_le_pi _ _) hxy) (angle_le_pi _ _)) (angle_le_pi _ _))
+    rw [hxy] at hnlt
+    rw [angle_eq_pi_iff] at hxy
+    rcases hxy with ⟨hx, ⟨r, ⟨hr, hxr⟩⟩⟩
+    rw [hxr, ← one_smul ℝ x, ← mul_smul, mul_one, ← sub_smul, one_smul, sub_eq_add_neg,
+      angle_smul_right_of_pos _ _ (add_pos zero_lt_one (neg_pos_of_neg hr)), angle_self hx,
+      add_zero] at hnlt
+    apply hnlt
+    rw [add_assoc]
+    exact add_lt_add_left (lt_of_le_of_lt (angle_le_pi _ _) (lt_add_of_pos_right π Real.pi_pos)) _
+  have hn0 : 0 ≤ n := by
+    rw [hn, mul_nonneg_iff_left_nonneg_of_pos Real.pi_pos] at h0
+    norm_cast at h0
+  have hn3 : n < 3 := by
+    rw [hn, show π + π + π = 3 * π by ring] at h3lt
+    replace h3lt := lt_of_mul_lt_mul_right h3lt (le_of_lt Real.pi_pos)
+    norm_cast at h3lt
+  interval_cases n
+  · simp [hn] at hcos
+  · norm_num [hn]
+  · simp [hn] at hcos
 
 end InnerProductGeometry
 

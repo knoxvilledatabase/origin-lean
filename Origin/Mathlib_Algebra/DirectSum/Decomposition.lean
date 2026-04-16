@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/DirectSum/Decomposition.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 2 | Infrastructure: 7
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.Algebra.Module.Submodule.Basic
+
+noncomputable section
 
 /-!
 # Decompositions of additive monoids, groups, and modules into direct sums
@@ -92,9 +94,6 @@ protected theorem Decomposition.inductionOn {p : M → Prop} (h_zero : p 0)
     (fun i m h ↦ h_homogeneous ⟨m, h⟩) h_zero h_add
 
 @[simp]
-theorem Decomposition.decompose'_eq : Decomposition.decompose' = decompose ℳ := rfl
-
-@[simp]
 theorem decompose_symm_of {i : ι} (x : ℳ i) : (decompose ℳ).symm (DirectSum.of _ i x) = x :=
   DirectSum.coeAddMonoidHom_of ℳ _ _
 
@@ -113,18 +112,12 @@ theorem decompose_of_mem_ne {x : M} {i j : ι} (hx : x ∈ ℳ i) (hij : i ≠ j
     (decompose ℳ x j : M) = 0 := by
   rw [decompose_of_mem _ hx, DirectSum.of_eq_of_ne _ _ _ hij, ZeroMemClass.coe_zero]
 
--- DISSOLVED: degree_eq_of_mem_mem
+theorem degree_eq_of_mem_mem {x : M} {i j : ι} (hxi : x ∈ ℳ i) (hxj : x ∈ ℳ j) (hx : x ≠ 0) :
+    i = j := by
+  contrapose! hx; rw [← decompose_of_mem_same ℳ hxj, decompose_of_mem_ne ℳ hxi hx]
 
 def decomposeAddEquiv : M ≃+ ⨁ i, ℳ i :=
   AddEquiv.symm { (decompose ℳ).symm with map_add' := map_add (DirectSum.coeAddMonoidHom ℳ) }
-
-@[simp]
-lemma decomposeAddEquiv_apply (a : M) :
-    decomposeAddEquiv ℳ a = decompose ℳ a := rfl
-
-@[simp]
-lemma decomposeAddEquiv_symm_apply (a : ⨁ i, ℳ i) :
-    (decomposeAddEquiv ℳ).symm a = (decompose ℳ).symm a := rfl
 
 @[simp]
 theorem decompose_zero : decompose ℳ (0 : M) = 0 :=
@@ -153,7 +146,12 @@ theorem decompose_symm_sum {ι'} (s : Finset ι') (f : ι' → ⨁ i, ℳ i) :
     (decompose ℳ).symm (∑ i ∈ s, f i) = ∑ i ∈ s, (decompose ℳ).symm (f i) :=
   map_sum (decomposeAddEquiv ℳ).symm f s
 
--- DISSOLVED: sum_support_decompose
+theorem sum_support_decompose [∀ (i) (x : ℳ i), Decidable (x ≠ 0)] (r : M) :
+    (∑ i ∈ (decompose ℳ r).support, (decompose ℳ r i : M)) = r := by
+  conv_rhs =>
+    rw [← (decompose ℳ).symm_apply_apply r, ← sum_support_of (decompose ℳ r)]
+  rw [decompose_symm_sum]
+  simp_rw [decompose_symm_of]
 
 end AddCommMonoid
 
@@ -205,12 +203,6 @@ variable [Decomposition ℳ]
 def decomposeLinearEquiv : M ≃ₗ[R] ⨁ i, ℳ i :=
   LinearEquiv.symm
     { (decomposeAddEquiv ℳ).symm with map_smul' := map_smul (DirectSum.coeLinearMap ℳ) }
-
-@[simp] theorem decomposeLinearEquiv_apply (m : M) :
-    decomposeLinearEquiv ℳ m = decompose ℳ m := rfl
-
-@[simp] theorem decomposeLinearEquiv_symm_apply (m : ⨁ i, ℳ i) :
-    (decomposeLinearEquiv ℳ).symm m = (decompose ℳ).symm m := rfl
 
 @[simp]
 theorem decompose_smul (r : R) (x : M) : decompose ℳ (r • x) = r • decompose ℳ x :=

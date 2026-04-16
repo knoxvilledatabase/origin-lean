@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Ring/List.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List
@@ -9,6 +9,8 @@ import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Algebra.Ring.Basic
 import Mathlib.Algebra.Ring.Divisibility.Basic
 import Mathlib.Algebra.Ring.Commute
+
+noncomputable section
 
 /-!
 # Big operators on a list in rings
@@ -66,7 +68,7 @@ variable [Nontrivial M₀] [NoZeroDivisors M₀]
   | [] => by simp
   | a :: l => by rw [prod_cons, mul_eq_zero, prod_eq_zero_iff, mem_cons, eq_comm]
 
--- DISSOLVED: prod_ne_zero
+lemma prod_ne_zero (hL : (0 : M₀) ∉ l) : l.prod ≠ 0 := mt prod_eq_zero_iff.1 hL
 
 end MonoidWithZero
 

@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
 import Mathlib.LinearAlgebra.AffineSpace.Midpoint
 import Mathlib.Topology.MetricSpace.IsometricSMul
 
+noncomputable section
+
 /-!
 # Torsors of additive normed group actions.
 
@@ -147,27 +149,6 @@ theorem edist_vsub_vsub_le (p₁ p₂ p₃ p₄ : P) :
   simp only [edist_nndist]
   norm_cast  -- Porting note: was apply_mod_cast
   apply dist_vsub_vsub_le
-
-def pseudoMetricSpaceOfNormedAddCommGroupOfAddTorsor (V P : Type*) [SeminormedAddCommGroup V]
-    [AddTorsor V P] : PseudoMetricSpace P where
-  dist x y := ‖(x -ᵥ y : V)‖
-  dist_self x := by simp
-  dist_comm x y := by simp only [← neg_vsub_eq_vsub_rev y x, norm_neg]
-  dist_triangle x y z := by
-    change ‖x -ᵥ z‖ ≤ ‖x -ᵥ y‖ + ‖y -ᵥ z‖
-    rw [← vsub_add_vsub_cancel]
-    apply norm_add_le
-
-def metricSpaceOfNormedAddCommGroupOfAddTorsor (V P : Type*) [NormedAddCommGroup V]
-    [AddTorsor V P] : MetricSpace P where
-  dist x y := ‖(x -ᵥ y : V)‖
-  dist_self x := by simp
-  eq_of_dist_eq_zero h := by simpa using h
-  dist_comm x y := by simp only [← neg_vsub_eq_vsub_rev y x, norm_neg]
-  dist_triangle x y z := by
-    change ‖x -ᵥ z‖ ≤ ‖x -ᵥ y‖ + ‖y -ᵥ z‖
-    rw [← vsub_add_vsub_cancel]
-    apply norm_add_le
 
 theorem LipschitzWith.vadd [PseudoEMetricSpace α] {f : α → V} {g : α → P} {Kf Kg : ℝ≥0}
     (hf : LipschitzWith Kf f) (hg : LipschitzWith Kg g) : LipschitzWith (Kf + Kg) (f +ᵥ g) :=

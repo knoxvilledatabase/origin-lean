@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/NumberField/Units/Basic.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.NumberTheory.NumberField.Embeddings
 import Mathlib.RingTheory.LocalRing.RingHom.Basic
+
+noncomputable section
 
 /-!
 # Units of a number field
@@ -68,10 +70,6 @@ theorem coe_injective : Function.Injective ((↑) : (𝓞 K)ˣ → K) :=
 
 variable {K}
 
-theorem coe_coe (u : (𝓞 K)ˣ) : ((u : 𝓞 K) : K) = (u : K) := rfl
-
-theorem coe_mul (x y : (𝓞 K)ˣ) : ((x * y : (𝓞 K)ˣ) : K) = (x : K) * (y : K) := rfl
-
 theorem coe_pow (x : (𝓞 K)ˣ) (n : ℕ) : ((x ^ n : (𝓞 K)ˣ) : K) = (x : K) ^ n := by
   rw [← map_pow, ← val_pow_eq_pow_val]
 
@@ -81,9 +79,8 @@ theorem coe_zpow (x : (𝓞 K)ˣ) (n : ℤ) : (↑(x ^ n) : K) = (x : K) ^ n := 
 
 theorem coe_one : ((1 : (𝓞 K)ˣ) : K) = (1 : K) := rfl
 
-theorem coe_neg_one : ((-1 : (𝓞 K)ˣ) : K) = (-1 : K) := rfl
-
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero (x : (𝓞 K)ˣ) : (x : K) ≠ 0 :=
+  Subtype.coe_injective.ne_iff.mpr (_root_.Units.ne_zero x)
 
 end coe
 

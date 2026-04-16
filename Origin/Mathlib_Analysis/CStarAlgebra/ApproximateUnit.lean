@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ApproximateUnit.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
@@ -8,6 +8,8 @@ import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Isometric
 import Mathlib.Analysis.CStarAlgebra.SpecialFunctions.PosPart
 import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow
 import Mathlib.Topology.ApproximateUnit
+
+noncomputable section
 
 /-! # Nonnegative contractions in a C⋆-algebra form an approximate unit
 
@@ -83,7 +85,6 @@ lemma norm_cfcₙ_one_sub_one_add_inv_lt_one (a : A) :
   nnnorm_cfcₙ_nnreal_lt fun x _ ↦ tsub_lt_self zero_lt_one (by positivity)
 
 set_option linter.style.multiGoal false in
-
 lemma CStarAlgebra.directedOn_nonneg_ball :
     DirectedOn (· ≤ ·) ({x : A | 0 ≤ x} ∩ Metric.ball 0 1) := by
   let f : ℝ≥0 → ℝ≥0 := fun x => 1 - (1 + x)⁻¹
@@ -125,7 +126,6 @@ structure Filter.IsIncreasingApproximateUnit (l : Filter A) extends l.IsApproxim
 namespace Filter.IsIncreasingApproximateUnit
 
 omit [StarOrderedRing A] in
-
 lemma eventually_nnnorm {l : Filter A} (hl : l.IsIncreasingApproximateUnit) :
     ∀ᶠ x in l, ‖x‖₊ ≤ 1 :=
   hl.eventually_norm
@@ -156,6 +156,9 @@ lemma tendsto_mul_right_of_forall_nonneg_tendsto {l : Filter A}
   exact tendsto_const_nhds.smul <| h (x i) (x i).2.1 <| by simpa using (x i).2.2
 
 omit [PartialOrder A] in
+/-- Multiplication on the left by `m` tends to `𝓝 m` if and only if multiplication on the right
+
+does, provided the elements are eventually selfadjoint along the filter `l`. -/
 
 lemma tendsto_mul_left_iff_tendsto_mul_right {l : Filter A} (hl : ∀ᶠ x in l, IsSelfAdjoint x) :
     (∀ m, Tendsto (m * ·) l (𝓝 m)) ↔ (∀ m, Tendsto (· * m) l (𝓝 m)) := by

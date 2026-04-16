@@ -11,6 +11,8 @@ import Mathlib.Order.Category.NonemptyFinLinOrd
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
+noncomputable section
+
 /-! # The simplex category
 
 We construct a skeletal model of the simplex category, with objects `ℕ` and the
@@ -63,10 +65,6 @@ open Simplicial
 theorem len_mk (n : ℕ) : [n].len = n :=
   rfl
 
-@[simp]
-theorem mk_len (n : SimplexCategory) : ([n.len] : SimplexCategory) = n :=
-  rfl
-
 protected def rec {F : SimplexCategory → Sort*} (h : ∀ n : ℕ, F [n]) : ∀ X, F X := fun n =>
   h n.len
 
@@ -89,16 +87,8 @@ theorem ext' {a b : SimplexCategory} (f g : SimplexCategory.Hom a b) :
 attribute [irreducible] SimplexCategory.Hom
 
 @[simp]
-theorem mk_toOrderHom {a b : SimplexCategory} (f : SimplexCategory.Hom a b) : mk f.toOrderHom = f :=
-  rfl
-
-@[simp]
 theorem toOrderHom_mk {a b : SimplexCategory} (f : Fin (a.len + 1) →o Fin (b.len + 1)) :
     (mk f).toOrderHom = f :=
-  rfl
-
-theorem mk_toOrderHom_apply {a b : SimplexCategory} (f : Fin (a.len + 1) →o Fin (b.len + 1))
-    (i : Fin (a.len + 1)) : (mk f).toOrderHom i = f i :=
   rfl
 
 @[simp]
@@ -118,10 +108,6 @@ instance smallCategory : SmallCategory.{0} SimplexCategory where
   comp f g := SimplexCategory.Hom.comp g f
 
 @[simp]
-lemma id_toOrderHom (a : SimplexCategory) :
-    Hom.toOrderHom (𝟙 a) = OrderHom.id := rfl
-
-@[simp]
 lemma comp_toOrderHom {a b c : SimplexCategory} (f : a ⟶ b) (g : b ⟶ c) :
     (f ≫ g).toOrderHom = g.toOrderHom.comp f.toOrderHom := rfl
 
@@ -135,10 +121,6 @@ def const (x y : SimplexCategory) (i : Fin (y.len + 1)) : x ⟶ y :=
 
 @[simp]
 lemma const_eq_id : const [0] [0] 0 = 𝟙 _ := by aesop
-
-@[simp]
-lemma const_apply (x y : SimplexCategory) (i : Fin (y.len + 1)) (a : Fin (x.len + 1)) :
-    (const x y i).toOrderHom a = i := rfl
 
 @[simp]
 theorem const_comp (x : SimplexCategory) {y z : SimplexCategory}
@@ -598,10 +580,6 @@ section Skeleton
 def skeletalFunctor : SimplexCategory ⥤ NonemptyFinLinOrd where
   obj a := NonemptyFinLinOrd.of (Fin (a.len + 1))
   map f := f.toOrderHom
-
-theorem skeletalFunctor.coe_map {Δ₁ Δ₂ : SimplexCategory} (f : Δ₁ ⟶ Δ₂) :
-    ↑(skeletalFunctor.map f) = f.toOrderHom :=
-  rfl
 
 theorem skeletal : Skeletal SimplexCategory := fun X Y ⟨I⟩ => by
   suffices Fintype.card (Fin (X.len + 1)) = Fintype.card (Fin (Y.len + 1)) by

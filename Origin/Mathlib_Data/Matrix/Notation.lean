@@ -9,6 +9,8 @@ import Mathlib.Data.Fin.VecNotation
 import Mathlib.Tactic.FinCases
 import Mathlib.Algebra.BigOperators.Fin
 
+noncomputable section
+
 /-!
 # Matrix and vector notation
 
@@ -68,7 +70,6 @@ section Parser
 open Lean Meta Elab Term Macro TSyntax PrettyPrinter.Delaborator SubExpr
 
 syntax (name := matrixNotation)
-
   "!![" ppRealGroup(sepBy1(ppGroup(term,+,?), ";", "; ", allowTrailingSep)) "]" : term
 
 syntax (name := matrixNotationRx0) "!![" ";"+ "]" : term
@@ -76,35 +77,20 @@ syntax (name := matrixNotationRx0) "!![" ";"+ "]" : term
 syntax (name := matrixNotation0xC) "!![" ","* "]" : term
 
 macro_rules
-
   | `(!![$[$[$rows],*];*]) => do
-
     let m := rows.size
-
     let n := if h : 0 < m then rows[0].size else 0
-
     let rowVecs ← rows.mapM fun row : Array Term => do
-
       unless row.size = n do
-
         Macro.throwErrorAt (mkNullNode row) s!"\
-
           Rows must be of equal length; this row has {row.size} items, \
-
           the previous rows have {n}"
-
       `(![$row,*])
-
     `(@Matrix.of (Fin $(quote m)) (Fin $(quote n)) _ ![$rowVecs,*])
-
   | `(!![$[;%$semicolons]*]) => do
-
     let emptyVec ← `(![])
-
     let emptyVecs := semicolons.map (fun _ => emptyVec)
-
     `(@Matrix.of (Fin $(quote semicolons.size)) (Fin 0) _ ![$emptyVecs,*])
-
   | `(!![$[,%$commas]*]) => `(@Matrix.of (Fin 0) (Fin $(quote commas.size)) _ ![])
 
 @[delab app.DFunLike.coe]
@@ -144,14 +130,6 @@ instance repr [Repr α] : Repr (Matrix (Fin m) (Fin n) α) where
 theorem cons_val' (v : n' → α) (B : Fin m → n' → α) (i j) :
     vecCons v B i j = vecCons (v j) (fun i => B i j) i := by refine Fin.cases ?_ ?_ i <;> simp
 
-@[simp]
-theorem head_val' (B : Fin m.succ → n' → α) (j : n') : (vecHead fun i => B i j) = vecHead B j :=
-  rfl
-
-@[simp]
-theorem tail_val' (B : Fin m.succ → n' → α) (j : n') :
-    (vecTail fun i => B i j) = fun i => vecTail B i j := rfl
-
 section DotProduct
 
 variable [AddCommMonoid α] [Mul α]
@@ -189,13 +167,6 @@ theorem col_cons (x : α) (u : Fin m → α) :
   ext i j
   refine Fin.cases ?_ ?_ i <;> simp [vecHead, vecTail]
 
-@[simp]
-theorem row_empty : row ι (vecEmpty : Fin 0 → α) = of fun _ => vecEmpty := rfl
-
-@[simp]
-theorem row_cons (x : α) (u : Fin m → α) : row ι (vecCons x u) = of fun _ => vecCons x u :=
-  rfl
-
 end ColRow
 
 section Transpose
@@ -215,11 +186,6 @@ theorem cons_transpose (v : n' → α) (A : Matrix (Fin m) n' α) :
   refine Fin.cases ?_ ?_ j <;> simp
 
 @[simp]
-theorem head_transpose (A : Matrix m' (Fin n.succ) α) :
-    vecHead (of.symm Aᵀ) = vecHead ∘ of.symm A :=
-  rfl
-
-@[simp]
 theorem tail_transpose (A : Matrix m' (Fin n.succ) α) : vecTail (of.symm Aᵀ) = (vecTail ∘ A)ᵀ := by
   ext i j
   rfl
@@ -233,10 +199,6 @@ variable [NonUnitalNonAssocSemiring α]
 @[simp]
 theorem empty_mul [Fintype n'] (A : Matrix (Fin 0) n' α) (B : Matrix n' o' α) : A * B = of ![] :=
   empty_eq _
-
-@[simp]
-theorem empty_mul_empty (A : Matrix m' (Fin 0) α) (B : Matrix (Fin 0) o' α) : A * B = 0 :=
-  rfl
 
 @[simp]
 theorem mul_empty [Fintype n'] (A : Matrix m' n' α) (B : Matrix n' (Fin 0) α) :
@@ -262,10 +224,6 @@ section VecMul
 variable [NonUnitalNonAssocSemiring α]
 
 @[simp]
-theorem empty_vecMul (v : Fin 0 → α) (B : Matrix (Fin 0) o' α) : v ᵥ* B = 0 :=
-  rfl
-
-@[simp]
 theorem vecMul_empty [Fintype n'] (v : n' → α) (B : Matrix n' (Fin 0) α) : v ᵥ* B = ![] :=
   empty_eq _
 
@@ -281,9 +239,6 @@ theorem vecMul_cons (v : Fin n.succ → α) (w : o' → α) (B : Fin n → o' �
   ext i
   simp [vecMul]
 
-theorem cons_vecMul_cons (x : α) (v : Fin n → α) (w : o' → α) (B : Fin n → o' → α) :
-    vecCons x v ᵥ* of (vecCons w B) = x • w + v ᵥ* of B := by simp
-
 end VecMul
 
 section MulVec
@@ -293,10 +248,6 @@ variable [NonUnitalNonAssocSemiring α]
 @[simp]
 theorem empty_mulVec [Fintype n'] (A : Matrix (Fin 0) n' α) (v : n' → α) : A *ᵥ v = ![] :=
   empty_eq _
-
-@[simp]
-theorem mulVec_empty (A : Matrix m' (Fin 0) α) (v : Fin 0 → α) : A *ᵥ v = 0 :=
-  rfl
 
 @[simp]
 theorem cons_mulVec [Fintype n'] (v : n' → α) (A : Fin m → n' → α) (w : n' → α) :
@@ -329,10 +280,6 @@ theorem cons_vecMulVec (x : α) (v : Fin m → α) (w : n' → α) :
     vecMulVec (vecCons x v) w = vecCons (x • w) (vecMulVec v w) := by
   ext i
   refine Fin.cases ?_ ?_ i <;> simp [vecMulVec]
-
-@[simp]
-theorem vecMulVec_cons (v : m' → α) (x : α) (w : Fin n → α) :
-    vecMulVec v (vecCons x w) = of fun i => v i • vecCons x w := rfl
 
 end VecMulVec
 

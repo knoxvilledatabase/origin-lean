@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/DenseEmbedding.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.Bases
 import Mathlib.Topology.Separation.Basic
+
+noncomputable section
 
 /-!
 # Dense embeddings

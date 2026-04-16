@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.Diffeomorph
 import Mathlib.Topology.IsLocalHomeomorph
 
+noncomputable section
+
 /-!
 # Local diffeomorphisms between manifolds
 
@@ -131,13 +133,7 @@ def IsLocalDiffeomorph (f : M → N) : Prop :=
 
 variable {I J n} in
 
-lemma isLocalDiffeomorphOn_iff {f : M → N} (s : Set M) :
-    IsLocalDiffeomorphOn I J n f s ↔ ∀ x : s, IsLocalDiffeomorphAt I J n f x := by rfl
-
 variable {I J n} in
-
-lemma isLocalDiffeomorph_iff {f : M → N} :
-    IsLocalDiffeomorph I J n f ↔ ∀ x : M, IsLocalDiffeomorphAt I J n f x := by rfl
 
 variable {I J n} in
 
@@ -208,9 +204,6 @@ lemma IsLocalDiffeomorph.isOpen_range (hf : IsLocalDiffeomorph I J n f) : IsOpen
 
 def IsLocalDiffeomorph.image (hf : IsLocalDiffeomorph I J n f) : Opens N :=
   ⟨range f, hf.isOpen_range⟩
-
-lemma IsLocalDiffeomorph.image_coe (hf : IsLocalDiffeomorph I J n f) : hf.image.1 = range f :=
-  rfl
 
 noncomputable def IslocalDiffeomorph.diffeomorph_of_bijective
     (hf : IsLocalDiffeomorph I J n f) (hf' : Function.Bijective f) : Diffeomorph I J M N n := by

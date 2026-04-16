@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 
+noncomputable section
+
 /-!
 # Subcategories of comma categories defined by morphism properties
 
@@ -68,15 +70,6 @@ structure Hom (X Y : P.Comma L R Q W) extends CommaMorphism X.toComma Y.toComma 
 abbrev Hom.hom {X Y : P.Comma L R Q W} (f : Comma.Hom X Y) : X.toComma ⟶ Y.toComma :=
   f.toCommaMorphism
 
-@[simp, nolint simpVarHead]
-lemma Hom.hom_mk {X Y : P.Comma L R Q W}
-    (f : CommaMorphism X.toComma Y.toComma) (hf) (hg) :
-  Comma.Hom.hom ⟨f, hf, hg⟩ = f := rfl
-
-lemma Hom.hom_left {X Y : P.Comma L R Q W} (f : Comma.Hom X Y) : f.hom.left = f.left := rfl
-
-lemma Hom.hom_right {X Y : P.Comma L R Q W} (f : Comma.Hom X Y) : f.hom.right = f.right := rfl
-
 def Hom.Simps.hom {X Y : P.Comma L R Q W} (f : X.Hom Y) :
     X.toComma ⟶ Y.toComma :=
   f.hom
@@ -107,8 +100,6 @@ instance : Category (P.Comma L R Q W) where
   id X := X.id
   comp f g := f.comp g
 
-lemma toCommaMorphism_eq_hom {X Y : P.Comma L R Q W} (f : X ⟶ Y) : f.toCommaMorphism = f.hom := rfl
-
 @[ext]
 lemma Hom.ext' {X Y : P.Comma L R Q W} {f g : X ⟶ Y} (h : f.hom = g.hom) :
     f = g := Comma.Hom.ext
@@ -121,14 +112,6 @@ lemma id_hom (X : P.Comma L R Q W) : (𝟙 X : X ⟶ X).hom = 𝟙 X.toComma := 
 @[simp]
 lemma comp_hom {X Y Z : P.Comma L R Q W} (f : X ⟶ Y) (g : Y ⟶ Z) :
     (f ≫ g).hom = f.hom ≫ g.hom := rfl
-
-@[reassoc]
-lemma comp_left {X Y Z : P.Comma L R Q W} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).left = f.left ≫ g.left := rfl
-
-@[reassoc]
-lemma comp_right {X Y Z : P.Comma L R Q W} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).right = f.right ≫ g.right := rfl
 
 @[simps hom]
 def homFromCommaOfIsIso [Q.RespectsIso] [W.RespectsIso] {X Y : P.Comma L R Q W}
@@ -303,11 +286,6 @@ lemma Over.Hom.ext {A B : P.Over Q X} {f g : A ⟶ B} (h : f.left = g.left) : f 
   · exact h
   · simp
 
-@[reassoc]
-lemma Over.w {A B : P.Over Q X} (f : A ⟶ B) :
-    f.left ≫ B.hom = A.hom := by
-  simp
-
 end Over
 
 section Under
@@ -358,11 +336,6 @@ lemma Under.Hom.ext {A B : P.Under Q X} {f g : A ⟶ B} (h : f.right = g.right) 
   ext
   · simp
   · exact h
-
-@[reassoc]
-lemma Under.w {A B : P.Under Q X} (f : A ⟶ B) :
-    A.hom ≫ f.right = B.hom := by
-  simp
 
 end Under
 

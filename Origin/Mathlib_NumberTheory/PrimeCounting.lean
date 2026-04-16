@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Totient
 import Mathlib.NumberTheory.SmoothNumbers
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # The Prime Counting Function
 
@@ -42,6 +44,10 @@ def primeCounting' : ℕ → ℕ :=
 
 def primeCounting (n : ℕ) : ℕ :=
   primeCounting' (n + 1)
+
+@[inherit_doc] scoped[Nat.Prime] notation "π" => Nat.primeCounting
+
+@[inherit_doc] scoped[Nat.Prime] notation "π'" => Nat.primeCounting'
 
 open scoped Nat.Prime
 

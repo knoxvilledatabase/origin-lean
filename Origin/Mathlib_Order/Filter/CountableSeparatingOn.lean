@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Order.Filter.CountableInter
 
+noncomputable section
+
 /-!
 # Filters with countable intersections and countable separating families
 

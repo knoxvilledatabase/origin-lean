@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matroid.Constructions
 import Mathlib.Data.Set.Notation
 
+noncomputable section
+
 /-!
 # Maps between matroids
 
@@ -307,9 +309,6 @@ def mapSetEmbedding (M : Matroid α) (f : M.E ↪ β) : Matroid β := Matroid.of
     exact (invFunOn_injOn_image f univ) (image_subset f (subset_univ I) hx)
       (image_subset f (subset_univ I) hy) )
 
-@[simp] lemma mapSetEmbedding_ground (M : Matroid α) (f : M.E ↪ β) :
-    (M.mapSetEmbedding f).E = range f := rfl
-
 @[simp] lemma mapSetEmbedding_indep_iff {f : M.E ↪ β} {I : Set β} :
     (M.mapSetEmbedding f).Indep I ↔ M.Indep ↑(f ⁻¹' I) ∧ I ⊆ range f := Iff.rfl
 
@@ -497,20 +496,11 @@ def mapSetEquiv (M : Matroid α) {E : Set β} (e : M.E ≃ E) : Matroid β :=
     have hrw : ∀ I : Set β, Subtype.val ∘ ⇑e ⁻¹' I = ⇑e.symm '' E ↓∩ I := fun I ↦ by ext; simp
     simp [Equiv.toEmbedding, Embedding.subtype, Embedding.trans, hrw]⟩
 
-@[simp] lemma mapSetEquiv_indep_iff (M : Matroid α) {E : Set β} (e : M.E ≃ E) {I : Set β} :
-    (M.mapSetEquiv e).Indep I ↔ M.Indep ↑(e.symm '' (E ↓∩ I)) ∧ I ⊆ E := Iff.rfl
-
-@[simp] lemma mapSetEquiv.ground (M : Matroid α) {E : Set β} (e : M.E ≃ E) :
-    (M.mapSetEquiv e).E = E := rfl
-
 end mapSetEquiv
 
 section mapEmbedding
 
 def mapEmbedding (M : Matroid α) (f : α ↪ β) : Matroid β := M.map f f.injective.injOn
-
-@[simp] lemma mapEmbedding_ground_eq (M : Matroid α) (f : α ↪ β) :
-    (M.mapEmbedding f).E = f '' M.E := rfl
 
 @[simp] lemma mapEmbedding_indep_iff {f : α ↪ β} {I : Set β} :
     (M.mapEmbedding f).Indep I ↔ M.Indep (f ⁻¹' I) ∧ I ⊆ range f := by
@@ -572,9 +562,6 @@ section mapEquiv
 variable {f : α ≃ β}
 
 def mapEquiv (M : Matroid α) (f : α ≃ β) : Matroid β := M.mapEmbedding f.toEmbedding
-
-@[simp] lemma mapEquiv_ground_eq (M : Matroid α) (f : α ≃ β) :
-    (M.mapEquiv f).E = f '' M.E := rfl
 
 lemma mapEquiv_eq_map (f : α ≃ β) : M.mapEquiv f = M.map f f.injective.injOn := rfl
 
@@ -671,10 +658,6 @@ lemma restrictSubtype_dual' (hM : M.E = E) : (M.restrictSubtype E)✶ = M✶.res
 @[simp] lemma map_val_restrictSubtype_eq (M : Matroid α) (X : Set α) :
     (M.restrictSubtype X).map (↑) Subtype.val_injective.injOn = M ↾ X := by
   simp [restrictSubtype, map_comap, Subset.rfl]
-
-lemma map_val_restrictSubtype_ground_eq (M : Matroid α) :
-    (M.restrictSubtype M.E).map (↑) Subtype.val_injective.injOn = M := by
-  simp
 
 instance [M.Finitary] {X : Set α} : (M.restrictSubtype X).Finitary := by
   rw [restrictSubtype]; infer_instance

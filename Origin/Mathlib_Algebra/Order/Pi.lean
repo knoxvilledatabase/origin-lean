@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Order/Pi.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Canonical.Defs
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Ring.Pi
+
+noncomputable section
 
 /-!
 # Pi instances for ordered groups and monoids
@@ -137,6 +139,7 @@ lemma mulSingle_le_mulSingle : mulSingle i a ≤ mulSingle i b ↔ a ≤ b := by
   simp [mulSingle, update_le_update_iff]
 
 @[to_additive (attr := gcongr)] alias ⟨_, GCongr.mulSingle_mono⟩ := mulSingle_le_mulSingle
+
 @[to_additive (attr := simp) single_nonneg]
 lemma one_le_mulSingle : 1 ≤ mulSingle i a ↔ 1 ≤ a := by simp [mulSingle]
 

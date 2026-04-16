@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/MellinTransform.lean
-Genuine: 29 | Conflates: 2 | Dissolved: 1 | Infrastructure: 0
+Genuine: 30 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
 import Mathlib.Analysis.Calculus.ParametricIntegral
 import Mathlib.MeasureTheory.Measure.Haar.NormedSpace
+
+noncomputable section
 
 /-! # The Mellin transform
 
@@ -68,7 +70,16 @@ theorem MellinConvergent.comp_mul_left {f : ℝ → E} {s : ℂ} {a : ℝ} (ha :
   rw [MellinConvergent, MellinConvergent, ← this, integrableOn_congr_fun h1 measurableSet_Ioi,
     IntegrableOn, IntegrableOn, integrable_smul_iff h2]
 
--- DISSOLVED: MellinConvergent.comp_rpow
+theorem MellinConvergent.comp_rpow {f : ℝ → E} {s : ℂ} {a : ℝ} (ha : a ≠ 0) :
+    MellinConvergent (fun t => f (t ^ a)) s ↔ MellinConvergent f (s / a) := by
+  refine Iff.trans ?_ (integrableOn_Ioi_comp_rpow_iff' _ ha)
+  rw [MellinConvergent]
+  refine integrableOn_congr_fun (fun t ht => ?_) measurableSet_Ioi
+  dsimp only [Pi.smul_apply]
+  rw [← Complex.coe_smul (t ^ (a - 1)), ← mul_smul, ← cpow_mul_ofReal_nonneg (le_of_lt ht),
+    ofReal_cpow (le_of_lt ht), ← cpow_add _ _ (ofReal_ne_zero.mpr (ne_of_gt ht)), ofReal_sub,
+    ofReal_one, mul_sub, mul_div_cancel₀ _ (ofReal_ne_zero.mpr ha), mul_one, add_comm, ←
+    add_sub_assoc, sub_add_cancel]
 
 def Complex.VerticalIntegrable (f : ℂ → E) (σ : ℝ) (μ : Measure ℝ := by volume_tac) : Prop :=
   Integrable (fun (y : ℝ) ↦ f (σ + y * I)) μ

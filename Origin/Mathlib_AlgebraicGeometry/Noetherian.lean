@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.QuasiSeparated
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Noetherian
 import Mathlib.RingTheory.Localization.Submodule
 
+noncomputable section
+
 /-!
 # Noetherian and Locally Noetherian Schemes
 
@@ -58,6 +60,11 @@ variable {R : Type u} [CommRing R] (S : Finset R) (hS : Ideal.span (α := R) S =
   (hN : ∀ s : S, IsNoetherianRing (Away (M := R) s))
 
 include hS hN in
+/-- Let `R` be a ring, and `f i` a finite collection of elements of `R` generating the unit ideal.
+
+If the localization of `R` at each `f i` is noetherian, so is `R`.
+
+We follow the proof given in [Har77], Proposition II.3.2 -/
 
 theorem isNoetherianRing_of_away : IsNoetherianRing R := by
   apply monotone_stabilizes_iff_noetherian.mp

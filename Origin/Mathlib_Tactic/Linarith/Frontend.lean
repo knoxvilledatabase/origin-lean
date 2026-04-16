@@ -9,6 +9,8 @@ import Mathlib.Tactic.Linarith.Preprocessing
 import Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm
 import Mathlib.Tactic.Ring.Basic
 
+noncomputable section
+
 /-!
 # `linarith`: solving linear arithmetic goals
 
@@ -292,13 +294,16 @@ syntax linarithArgsRest := optConfig (&" only")? (" [" term,* "]")?
 
 syntax (name := linarith) "linarith" "!"? linarithArgsRest : tactic
 
+@[inherit_doc linarith] macro "linarith!" rest:linarithArgsRest : tactic =>
+
   `(tactic| linarith ! $rest:linarithArgsRest)
 
 syntax (name := nlinarith) "nlinarith" "!"? linarithArgsRest : tactic
 
+@[inherit_doc nlinarith] macro "nlinarith!" rest:linarithArgsRest : tactic =>
+
   `(tactic| nlinarith ! $rest:linarithArgsRest)
 
-@[inherit_doc nlinarith] macro "nlinarith!" rest:linarithArgsRest : tactic =>
 def elabLinarithArg (tactic : Name) (t : Term) : TacticM Expr := Term.withoutErrToSorry do
   let (e, mvars) ← elabTermWithHoles t none tactic
   unless mvars.isEmpty do

@@ -7,6 +7,8 @@ import Mathlib.Algebra.CharP.ExpChar
 import Mathlib.Algebra.CharP.IntermediateField
 import Mathlib.FieldTheory.SeparableClosure
 
+noncomputable section
+
 /-!
 
 # Purely inseparable extension and relative perfect closure

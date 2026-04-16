@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/GCD/Basic.lean
-Genuine: 56 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Batteries.Data.Nat.Gcd
 import Mathlib.Algebra.Group.Nat.Units
 import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Algebra.GroupWithZero.Nat
+
+noncomputable section
 
 /-!
 # Properties of `Nat.gcd`, `Nat.lcm`, and `Nat.Coprime`
@@ -219,8 +221,6 @@ theorem coprime_pow_right_iff {n : ℕ} (hn : 0 < n) (a b : ℕ) :
     Nat.Coprime a (b ^ n) ↔ Nat.Coprime a b := by
   rw [Nat.coprime_comm, coprime_pow_left_iff hn, Nat.coprime_comm]
 
-theorem not_coprime_zero_zero : ¬Coprime 0 0 := by simp
-
 theorem coprime_one_left_iff (n : ℕ) : Coprime 1 n ↔ True := by simp [Coprime]
 
 theorem coprime_one_right_iff (n : ℕ) : Coprime n 1 ↔ True := by simp [Coprime]
@@ -261,7 +261,16 @@ theorem dvd_mul {x m n : ℕ} : x ∣ m * n ↔ ∃ y z, y ∣ m ∧ z ∣ n ∧
   · rintro ⟨y, z, hy, hz, rfl⟩
     exact mul_dvd_mul hy hz
 
--- DISSOLVED: pow_dvd_pow_iff
+theorem pow_dvd_pow_iff {a b n : ℕ} (n0 : n ≠ 0) : a ^ n ∣ b ^ n ↔ a ∣ b := by
+  refine ⟨fun h => ?_, fun h => pow_dvd_pow_of_dvd h _⟩
+  rcases Nat.eq_zero_or_pos (gcd a b) with g0 | g0
+  · simp [eq_zero_of_gcd_eq_zero_right g0]
+  rcases exists_coprime' g0 with ⟨g, a', b', g0', co, rfl, rfl⟩
+  rw [mul_pow, mul_pow] at h
+  replace h := Nat.dvd_of_mul_dvd_mul_right (Nat.pow_pos g0') h
+  have := pow_dvd_pow a' <| Nat.pos_of_ne_zero n0
+  rw [pow_one, (co.pow n n).eq_one_of_dvd h] at this
+  simp [eq_one_of_dvd_one this]
 
 theorem coprime_iff_isRelPrime {m n : ℕ} : m.Coprime n ↔ IsRelPrime m n := by
   simp_rw [coprime_iff_gcd_eq_one, IsRelPrime, ← and_imp, ← dvd_gcd_iff, isUnit_iff_dvd_one]
@@ -271,7 +280,20 @@ theorem eq_one_of_dvd_coprimes {a b k : ℕ} (h_ab_coprime : Coprime a b) (hka :
     (hkb : k ∣ b) : k = 1 :=
   dvd_one.mp (isUnit_iff_dvd_one.mp <| coprime_iff_isRelPrime.mp h_ab_coprime hka hkb)
 
--- DISSOLVED: Coprime.mul_add_mul_ne_mul
+theorem Coprime.mul_add_mul_ne_mul {m n a b : ℕ} (cop : Coprime m n) (ha : a ≠ 0) (hb : b ≠ 0) :
+    a * m + b * n ≠ m * n := by
+  intro h
+  obtain ⟨x, rfl⟩ : n ∣ a :=
+    cop.symm.dvd_of_dvd_mul_right
+      ((Nat.dvd_add_iff_left (Nat.dvd_mul_left n b)).mpr
+        ((congr_arg _ h).mpr (Nat.dvd_mul_left n m)))
+  obtain ⟨y, rfl⟩ : m ∣ b :=
+    cop.dvd_of_dvd_mul_right
+      ((Nat.dvd_add_iff_right (Nat.dvd_mul_left m (n * x))).mpr
+        ((congr_arg _ h).mpr (Nat.dvd_mul_right m n)))
+  rw [mul_comm, mul_ne_zero_iff, ← one_le_iff_ne_zero] at ha hb
+  refine mul_ne_zero hb.2 ha.2 (eq_zero_of_mul_eq_self_left (ne_of_gt (add_le_add ha.1 hb.1)) ?_)
+  rw [← mul_assoc, ← h, Nat.add_mul, Nat.add_mul, mul_comm _ n, ← mul_assoc, mul_comm y]
 
 variable {x n m : ℕ}
 

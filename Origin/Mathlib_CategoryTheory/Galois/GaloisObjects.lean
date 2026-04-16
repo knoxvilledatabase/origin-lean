@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.SingleObj
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.Logic.Equiv.TransferInstance
 
+noncomputable section
+
 /-!
 # Galois objects in Galois categories
 
@@ -109,11 +111,6 @@ theorem evaluation_aut_bijective_of_isGalois (A : C) [IsGalois A] (a : F.obj A) 
 
 noncomputable def evaluationEquivOfIsGalois (A : C) [IsGalois A] (a : F.obj A) : Aut A ≃ F.obj A :=
   Equiv.ofBijective _ (evaluation_aut_bijective_of_isGalois F A a)
-
-@[simp]
-lemma evaluationEquivOfIsGalois_apply (A : C) [IsGalois A] (a : F.obj A) (φ : Aut A) :
-    evaluationEquivOfIsGalois F A a φ = F.map φ.hom a :=
-  rfl
 
 @[simp]
 lemma evaluationEquivOfIsGalois_symm_fiber (A : C) [IsGalois A] (a b : F.obj A) :

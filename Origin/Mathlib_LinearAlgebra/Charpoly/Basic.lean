@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Charpoly/Basic.lean
-Genuine: 7 | Conflates: 1 | Dissolved: 1 | Infrastructure: 1
+Genuine: 7 | Conflates: 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.FieldTheory.Minpoly.Field
+
+noncomputable section
 
 /-!
 
@@ -82,7 +84,24 @@ theorem pow_eq_aeval_mod_charpoly (k : ℕ) : f ^ k = aeval f (X ^ k %ₘ f.char
 
 variable {f}
 
--- DISSOLVED: minpoly_coeff_zero_of_injective
+-- CONFLATES (assumes ground = zero): minpoly_coeff_zero_of_injective
+theorem minpoly_coeff_zero_of_injective [Nontrivial R] (hf : Function.Injective f) :
+    (minpoly R f).coeff 0 ≠ 0 := by
+  intro h
+  obtain ⟨P, hP⟩ := X_dvd_iff.2 h
+  have hdegP : P.degree < (minpoly R f).degree := by
+    rw [hP, mul_comm]
+    refine degree_lt_degree_mul_X fun h => ?_
+    rw [h, mul_zero] at hP
+    exact minpoly.ne_zero (isIntegral f) hP
+  have hPmonic : P.Monic := by
+    suffices (minpoly R f).Monic by
+      rwa [Monic.def, hP, mul_comm, leadingCoeff_mul_X, ← Monic.def] at this
+    exact minpoly.monic (isIntegral f)
+  have hzero : aeval f (minpoly R f) = 0 := minpoly.aeval _ _
+  simp only [hP, mul_eq_comp, LinearMap.ext_iff, hf, aeval_X, map_eq_zero_iff, coe_comp,
+    _root_.map_mul, zero_apply, Function.comp_apply] at hzero
+  exact not_le.2 hdegP (minpoly.min _ _ hPmonic (LinearMap.ext hzero))
 
 end CayleyHamilton
 

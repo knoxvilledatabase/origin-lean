@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Group.Hom
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 
+noncomputable section
+
 /-!
 # Quotients of seminormed groups
 
@@ -286,11 +288,6 @@ noncomputable def lift {N : Type*} [SeminormedAddCommGroup N] (S : AddSubgroup M
     (f : NormedAddGroupHom M N) (hf : ∀ s ∈ S, f s = 0) : NormedAddGroupHom (M ⧸ S) N :=
   { QuotientAddGroup.lift S f.toAddMonoidHom hf with
     bound' := ⟨‖f‖, norm_lift_apply_le f hf⟩ }
-
-theorem lift_mk {N : Type*} [SeminormedAddCommGroup N] (S : AddSubgroup M)
-    (f : NormedAddGroupHom M N) (hf : ∀ s ∈ S, f s = 0) (m : M) :
-    lift S f hf (S.normedMk m) = f m :=
-  rfl
 
 theorem lift_unique {N : Type*} [SeminormedAddCommGroup N] (S : AddSubgroup M)
     (f : NormedAddGroupHom M N) (hf : ∀ s ∈ S, f s = 0) (g : NormedAddGroupHom (M ⧸ S) N)

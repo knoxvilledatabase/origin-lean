@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Galois.Topology
 import Mathlib.CategoryTheory.Galois.Prorepresentability
 import Mathlib.Topology.Algebra.OpenSubgroup
 
+noncomputable section
+
 /-!
 
 # Universal property of fundamental group
@@ -259,12 +261,6 @@ lemma toAutMulEquiv_isHomeomorph : IsHomeomorph (toAutMulEquiv F G) :=
 noncomputable def toAutHomeo : G ≃ₜ Aut F := (toAut_isHomeomorph F G).homeomorph
 
 variable {G}
-
-@[simp]
-lemma toAutMulEquiv_apply (g : G) : toAutMulEquiv F G g = toAut F G g := rfl
-
-@[simp]
-lemma toAutHomeo_apply (g : G) : toAutHomeo F G g = toAut F G g := rfl
 
 end
 

@@ -7,6 +7,8 @@ import Mathlib.Data.Int.Defs
 import Mathlib.Data.Nat.Sqrt
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Square root of integers
 

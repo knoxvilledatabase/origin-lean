@@ -14,6 +14,8 @@ import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.RingTheory.Finiteness.TensorProduct
 
+noncomputable section
+
 /-!
 # Flat modules
 

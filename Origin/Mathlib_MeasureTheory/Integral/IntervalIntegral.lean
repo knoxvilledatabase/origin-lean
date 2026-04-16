@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Integral/IntervalIntegral.lean
-Genuine: 142 | Conflates: 1 | Dissolved: 14 | Infrastructure: 6
+Genuine: 156 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Disjoint
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+
+noncomputable section
 
 /-!
 # Integral over an interval
@@ -274,7 +276,10 @@ theorem comp_mul_left (hf : IntervalIntegrable f volume a b) (c : ℝ) :
   · ext; simp only [comp_apply]; congr 1; field_simp
   · rw [preimage_mul_const_uIcc (inv_ne_zero hc)]; field_simp [hc]
 
--- DISSOLVED: comp_mul_left_iff
+theorem comp_mul_left_iff {c : ℝ} (hc : c ≠ 0) :
+    IntervalIntegrable (fun x ↦ f (c * x)) volume (a / c) (b / c) ↔
+      IntervalIntegrable f volume a b :=
+  ⟨fun h ↦ by simpa [hc] using h.comp_mul_left c⁻¹, (comp_mul_left · c)⟩
 
 theorem comp_mul_right (hf : IntervalIntegrable f volume a b) (c : ℝ) :
     IntervalIntegrable (fun x => f (x * c)) volume (a / c) (b / c) := by
@@ -434,7 +439,9 @@ nonrec theorem integral_undef (h : ¬IntervalIntegrable f μ a b) : ∫ x in a..
   rw [intervalIntegrable_iff] at h
   rw [intervalIntegral_eq_integral_uIoc, integral_undef h, smul_zero]
 
--- DISSOLVED: intervalIntegrable_of_integral_ne_zero
+theorem intervalIntegrable_of_integral_ne_zero {a b : ℝ} {f : ℝ → E} {μ : Measure ℝ}
+    (h : (∫ x in a..b, f x ∂μ) ≠ 0) : IntervalIntegrable f μ a b :=
+  not_imp_comm.1 integral_undef h
 
 nonrec theorem integral_non_aestronglyMeasurable
     (hf : ¬AEStronglyMeasurable f (μ.restrict (Ι a b))) :
@@ -590,21 +597,38 @@ section Comp
 
 variable {a b c d : ℝ} (f : ℝ → E)
 
--- DISSOLVED: integral_comp_mul_right
+@[simp]
+theorem integral_comp_mul_right (hc : c ≠ 0) :
+    (∫ x in a..b, f (x * c)) = c⁻¹ • ∫ x in a * c..b * c, f x := by
+  have A : MeasurableEmbedding fun x => x * c :=
+    (Homeomorph.mulRight₀ c hc).isClosedEmbedding.measurableEmbedding
+  conv_rhs => rw [← Real.smul_map_volume_mul_right hc]
+  simp_rw [integral_smul_measure, intervalIntegral, A.setIntegral_map,
+    ENNReal.toReal_ofReal (abs_nonneg c)]
+  cases' hc.lt_or_lt with h h
+  · simp [h, mul_div_cancel_right₀, hc, abs_of_neg,
+      Measure.restrict_congr_set (α := ℝ) (μ := volume) Ico_ae_eq_Ioc]
+  · simp [h, mul_div_cancel_right₀, hc, abs_of_pos]
 
 @[simp]
 theorem smul_integral_comp_mul_right (c) :
     (c • ∫ x in a..b, f (x * c)) = ∫ x in a * c..b * c, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_mul_right]
 
--- DISSOLVED: integral_comp_mul_left
+@[simp]
+theorem integral_comp_mul_left (hc : c ≠ 0) :
+    (∫ x in a..b, f (c * x)) = c⁻¹ • ∫ x in c * a..c * b, f x := by
+  simpa only [mul_comm c] using integral_comp_mul_right f hc
 
 @[simp]
 theorem smul_integral_comp_mul_left (c) :
     (c • ∫ x in a..b, f (c * x)) = ∫ x in c * a..c * b, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_mul_left]
 
--- DISSOLVED: integral_comp_div
+@[simp]
+theorem integral_comp_div (hc : c ≠ 0) :
+    (∫ x in a..b, f (x / c)) = c • ∫ x in a / c..b / c, f x := by
+  simpa only [inv_inv] using integral_comp_mul_right f (inv_ne_zero hc)
 
 @[simp]
 theorem inv_smul_integral_comp_div (c) :
@@ -625,56 +649,82 @@ nonrec theorem integral_comp_add_left (d) :
     (∫ x in a..b, f (d + x)) = ∫ x in d + a..d + b, f x := by
   simpa only [add_comm d] using integral_comp_add_right f d
 
--- DISSOLVED: integral_comp_mul_add
+@[simp]
+theorem integral_comp_mul_add (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (c * x + d)) = c⁻¹ • ∫ x in c * a + d..c * b + d, f x := by
+  rw [← integral_comp_add_right, ← integral_comp_mul_left _ hc]
 
 @[simp]
 theorem smul_integral_comp_mul_add (c d) :
     (c • ∫ x in a..b, f (c * x + d)) = ∫ x in c * a + d..c * b + d, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_mul_add]
 
--- DISSOLVED: integral_comp_add_mul
+@[simp]
+theorem integral_comp_add_mul (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (d + c * x)) = c⁻¹ • ∫ x in d + c * a..d + c * b, f x := by
+  rw [← integral_comp_add_left, ← integral_comp_mul_left _ hc]
 
 @[simp]
 theorem smul_integral_comp_add_mul (c d) :
     (c • ∫ x in a..b, f (d + c * x)) = ∫ x in d + c * a..d + c * b, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_add_mul]
 
--- DISSOLVED: integral_comp_div_add
+@[simp]
+theorem integral_comp_div_add (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (x / c + d)) = c • ∫ x in a / c + d..b / c + d, f x := by
+  simpa only [div_eq_inv_mul, inv_inv] using integral_comp_mul_add f (inv_ne_zero hc) d
 
 @[simp]
 theorem inv_smul_integral_comp_div_add (c d) :
     (c⁻¹ • ∫ x in a..b, f (x / c + d)) = ∫ x in a / c + d..b / c + d, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_div_add]
 
--- DISSOLVED: integral_comp_add_div
+@[simp]
+theorem integral_comp_add_div (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (d + x / c)) = c • ∫ x in d + a / c..d + b / c, f x := by
+  simpa only [div_eq_inv_mul, inv_inv] using integral_comp_add_mul f (inv_ne_zero hc) d
 
 @[simp]
 theorem inv_smul_integral_comp_add_div (c d) :
     (c⁻¹ • ∫ x in a..b, f (d + x / c)) = ∫ x in d + a / c..d + b / c, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_add_div]
 
--- DISSOLVED: integral_comp_mul_sub
+@[simp]
+theorem integral_comp_mul_sub (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (c * x - d)) = c⁻¹ • ∫ x in c * a - d..c * b - d, f x := by
+  simpa only [sub_eq_add_neg] using integral_comp_mul_add f hc (-d)
 
 @[simp]
 theorem smul_integral_comp_mul_sub (c d) :
     (c • ∫ x in a..b, f (c * x - d)) = ∫ x in c * a - d..c * b - d, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_mul_sub]
 
--- DISSOLVED: integral_comp_sub_mul
+@[simp]
+theorem integral_comp_sub_mul (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (d - c * x)) = c⁻¹ • ∫ x in d - c * b..d - c * a, f x := by
+  simp only [sub_eq_add_neg, neg_mul_eq_neg_mul]
+  rw [integral_comp_add_mul f (neg_ne_zero.mpr hc) d, integral_symm]
+  simp only [inv_neg, smul_neg, neg_neg, neg_smul]
 
 @[simp]
 theorem smul_integral_comp_sub_mul (c d) :
     (c • ∫ x in a..b, f (d - c * x)) = ∫ x in d - c * b..d - c * a, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_sub_mul]
 
--- DISSOLVED: integral_comp_div_sub
+@[simp]
+theorem integral_comp_div_sub (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (x / c - d)) = c • ∫ x in a / c - d..b / c - d, f x := by
+  simpa only [div_eq_inv_mul, inv_inv] using integral_comp_mul_sub f (inv_ne_zero hc) d
 
 @[simp]
 theorem inv_smul_integral_comp_div_sub (c d) :
     (c⁻¹ • ∫ x in a..b, f (x / c - d)) = ∫ x in a / c - d..b / c - d, f x := by
   by_cases hc : c = 0 <;> simp [hc, integral_comp_div_sub]
 
--- DISSOLVED: integral_comp_sub_div
+@[simp]
+theorem integral_comp_sub_div (hc : c ≠ 0) (d) :
+    (∫ x in a..b, f (d - x / c)) = c • ∫ x in d - b / c..d - a / c, f x := by
+  simpa only [div_eq_inv_mul, inv_inv] using integral_comp_sub_mul f (inv_ne_zero hc) d
 
 @[simp]
 theorem inv_smul_integral_comp_sub_div (c d) :
@@ -886,7 +936,15 @@ theorem intervalIntegral_pos_of_pos {f : ℝ → ℝ} {a b : ℝ}
     0 < ∫ x in a..b, f x :=
   intervalIntegral_pos_of_pos_on hfi (fun x _ => hpos x) hab
 
--- DISSOLVED: integral_lt_integral_of_ae_le_of_measure_setOf_lt_ne_zero
+theorem integral_lt_integral_of_ae_le_of_measure_setOf_lt_ne_zero (hab : a ≤ b)
+    (hfi : IntervalIntegrable f μ a b) (hgi : IntervalIntegrable g μ a b)
+    (hle : f ≤ᵐ[μ.restrict (Ioc a b)] g) (hlt : μ.restrict (Ioc a b) {x | f x < g x} ≠ 0) :
+    (∫ x in a..b, f x ∂μ) < ∫ x in a..b, g x ∂μ := by
+  rw [← sub_pos, ← integral_sub hgi hfi, integral_of_le hab,
+    MeasureTheory.integral_pos_iff_support_of_nonneg_ae]
+  · refine pos_iff_ne_zero.2 (mt (measure_mono_null ?_) hlt)
+    exact fun x hx => (sub_pos.2 hx.out).ne'
+  exacts [hle.mono fun x => sub_nonneg.2, hgi.1.sub hfi.1]
 
 theorem integral_lt_integral_of_continuousOn_of_le_of_exists_lt {f g : ℝ → ℝ} {a b : ℝ}
     (hab : a < b) (hfc : ContinuousOn f (Icc a b)) (hgc : ContinuousOn g (Icc a b))

@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.QPF.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # The quotient of QPF is itself a QPF
 

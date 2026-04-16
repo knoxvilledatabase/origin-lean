@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.ModelTheory.ElementarySubstructures
 
+noncomputable section
+
 /-!
 # Skolem Functions and Downward Löwenheim–Skolem
 

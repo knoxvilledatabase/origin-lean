@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Transcendental/Liouville/Basic.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.DenomsClearable
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Data.Real.Irrational
 import Mathlib.Topology.Algebra.Polynomial
+
+noncomputable section
 
 /-!
 
@@ -93,7 +95,57 @@ theorem exists_one_le_pow_mul_dist {Z N R : Type*} [PseudoMetricSpace R] {d : N 
     refine mul_le_mul_of_nonneg_left ((B this).trans ?_) (zero_le_one.trans (d0 a))
     exact mul_le_mul_of_nonneg_left (le_max_right _ M) dist_nonneg
 
--- DISSOLVED: exists_pos_real_of_irrational_root
+theorem exists_pos_real_of_irrational_root {α : ℝ} (ha : Irrational α) {f : ℤ[X]} (f0 : f ≠ 0)
+    (fa : eval α (map (algebraMap ℤ ℝ) f) = 0) :
+    ∃ A : ℝ, 0 < A ∧ ∀ a : ℤ, ∀ b : ℕ,
+      (1 : ℝ) ≤ ((b : ℝ) + 1) ^ f.natDegree * (|α - a / (b + 1)| * A) := by
+  -- `fR` is `f` viewed as a polynomial with `ℝ` coefficients.
+  set fR : ℝ[X] := map (algebraMap ℤ ℝ) f
+  -- `fR` is non-zero, since `f` is non-zero.
+  obtain fR0 : fR ≠ 0 := fun fR0 =>
+    (map_injective (algebraMap ℤ ℝ) fun _ _ A => Int.cast_inj.mp A).ne f0
+      (fR0.trans (Polynomial.map_zero _).symm)
+  -- reformulating assumption `fa`: `α` is a root of `fR`.
+  have ar : α ∈ (fR.roots.toFinset : Set ℝ) :=
+    Finset.mem_coe.mpr (Multiset.mem_toFinset.mpr ((mem_roots fR0).mpr (IsRoot.def.mpr fa)))
+  -- Since the polynomial `fR` has finitely many roots, there is a closed interval centered at `α`
+  -- such that `α` is the only root of `fR` in the interval.
+  obtain ⟨ζ, z0, U⟩ : ∃ ζ > 0, closedBall α ζ ∩ fR.roots.toFinset = {α} :=
+    @exists_closedBall_inter_eq_singleton_of_discrete _ _ _ Finite.instDiscreteTopology _ ar
+  -- Since `fR` is continuous, it is bounded on the interval above.
+  obtain ⟨xm, -, hM⟩ : ∃ xm : ℝ, xm ∈ Icc (α - ζ) (α + ζ) ∧
+      IsMaxOn (|fR.derivative.eval ·|) (Icc (α - ζ) (α + ζ)) xm :=
+    IsCompact.exists_isMaxOn isCompact_Icc
+      ⟨α, (sub_lt_self α z0).le, (lt_add_of_pos_right α z0).le⟩
+      (continuous_abs.comp fR.derivative.continuous_aeval).continuousOn
+  -- Use the key lemma `exists_one_le_pow_mul_dist`: we are left to show that ...
+  refine
+    @exists_one_le_pow_mul_dist ℤ ℕ ℝ _ _ _ (fun y => fR.eval y) α ζ |fR.derivative.eval xm| ?_ z0
+      (fun y hy => ?_) fun z a hq => ?_
+  -- 1: the denominators are positive -- essentially by definition;
+  · exact fun a => one_le_pow₀ ((le_add_iff_nonneg_left 1).mpr a.cast_nonneg)
+  -- 2: the polynomial `fR` is Lipschitz at `α` -- as its derivative continuous;
+  · rw [mul_comm]
+    rw [Real.closedBall_eq_Icc] at hy
+    -- apply the Mean Value Theorem: the bound on the derivative comes from differentiability.
+    refine
+      Convex.norm_image_sub_le_of_norm_deriv_le (fun _ _ => fR.differentiableAt)
+        (fun y h => by rw [fR.deriv]; exact hM h) (convex_Icc _ _) hy (mem_Icc_iff_abs_le.mp ?_)
+    exact @mem_closedBall_self ℝ _ α ζ (le_of_lt z0)
+  -- 3: the weird inequality of Liouville type with powers of the denominators.
+  · show 1 ≤ (a + 1 : ℝ) ^ f.natDegree * |eval α fR - eval ((z : ℝ) / (a + 1)) fR|
+    rw [fa, zero_sub, abs_neg]
+    rw [show (a + 1 : ℝ) = ((a + 1 : ℕ) : ℤ) by norm_cast] at hq ⊢
+    -- key observation: the right-hand side of the inequality is an *integer*.  Therefore,
+    -- if its absolute value is not at least one, then it vanishes.  Proceed by contradiction
+    refine one_le_pow_mul_abs_eval_div (Int.natCast_succ_pos a) fun hy => ?_
+    -- As the evaluation of the polynomial vanishes, we found a root of `fR` that is rational.
+    -- We know that `α` is the only root of `fR` in our interval, and `α` is irrational:
+    -- follow your nose.
+    refine (irrational_iff_ne_rational α).mp ha z (a + 1) (mem_singleton_iff.mp ?_).symm
+    refine U.subset ?_
+    refine ⟨hq, Finset.mem_coe.mp (Multiset.mem_toFinset.mpr ?_)⟩
+    exact (mem_roots fR0).mpr (IsRoot.def.mpr hy)
 
 protected theorem transcendental {x : ℝ} (lx : Liouville x) : Transcendental ℤ x := by
   -- Proceed by contradiction: if `x` is algebraic, then `x` is the root (`ef0`) of a

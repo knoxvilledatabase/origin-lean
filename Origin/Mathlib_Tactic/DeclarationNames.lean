@@ -7,6 +7,8 @@ import Lean.DeclarationRange
 import Lean.ResolveName
 import Mathlib.Tactic.Linter.Header
 
+noncomputable section
+
 /-!
 This file contains functions that are used by multiple linters.
 -/

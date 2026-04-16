@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.Quiver.Cast
 import Mathlib.Combinatorics.Quiver.Symmetric
 
+noncomputable section
+
 /-!
 # Single-object quiver
 
@@ -66,13 +68,6 @@ def toPrefunctor : (α → β) ≃ SingleObj α ⥤q SingleObj β where
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem toPrefunctor_id : toPrefunctor id = 𝟭q (SingleObj α) :=
-  rfl
-
-@[simp]
-theorem toPrefunctor_symm_id : toPrefunctor.symm (𝟭q (SingleObj α)) = id :=
-  rfl
-
 theorem toPrefunctor_comp (f : α → β) (g : β → γ) :
     toPrefunctor (g ∘ f) = toPrefunctor f ⋙q toPrefunctor g :=
   rfl
@@ -104,24 +99,6 @@ theorem pathToList_listToPath (l : List α) : pathToList (listToPath l) = l := b
 
 def pathEquivList : Path (star α) (star α) ≃ List α :=
   ⟨pathToList, listToPath, fun p => listToPath_pathToList p, pathToList_listToPath⟩
-
-@[simp]
-theorem pathEquivList_nil : pathEquivList Path.nil = ([] : List α) :=
-  rfl
-
-@[simp]
-theorem pathEquivList_cons (p : Path (star α) (star α)) (a : star α ⟶ star α) :
-    pathEquivList (Path.cons p a) = a :: pathToList p :=
-  rfl
-
-@[simp]
-theorem pathEquivList_symm_nil : pathEquivList.symm ([] : List α) = Path.nil :=
-  rfl
-
-@[simp]
-theorem pathEquivList_symm_cons (l : List α) (a : α) :
-    pathEquivList.symm (a :: l) = Path.cons (pathEquivList.symm l) a :=
-  rfl
 
 end SingleObj
 

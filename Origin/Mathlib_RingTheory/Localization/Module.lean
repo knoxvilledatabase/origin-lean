@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.Localization.Integer
 import Mathlib.LinearAlgebra.Basis.Basic
 
+noncomputable section
+
 /-!
 # Modules / vector spaces over localizations / fraction fields
 
@@ -213,15 +215,6 @@ def LinearMap.extendScalarsOfIsLocalization (f : M →ₗ[R] N) : M →ₗ[A] N 
   map_add' := f.map_add
   map_smul' := (IsLocalization.linearMap_compatibleSMul S A M N).map_smul _
 
-@[simp] lemma LinearMap.restrictScalars_extendScalarsOfIsLocalization (f : M →ₗ[R] N) :
-    (f.extendScalarsOfIsLocalization S A).restrictScalars R = f := rfl
-
-@[simp] lemma LinearMap.extendScalarsOfIsLocalization_apply (f : M →ₗ[A] N) :
-    f.extendScalarsOfIsLocalization S A = f := rfl
-
-@[simp] lemma LinearMap.extendScalarsOfIsLocalization_apply' (f : M →ₗ[R] N) (x : M) :
-    (f.extendScalarsOfIsLocalization S A) x = f x := rfl
-
 @[simps]
 def LinearMap.extendScalarsOfIsLocalizationEquiv : (M →ₗ[R] N) ≃ₗ[A] (M →ₗ[A] N) where
   toFun := LinearMap.extendScalarsOfIsLocalization S A
@@ -253,9 +246,8 @@ variable (Rₛ) [CommSemiring Rₛ] [Algebra R Rₛ] [Module Rₛ M'] [Module R�
 
 variable [IsScalarTower R Rₛ M'] [IsScalarTower R Rₛ N'] [IsLocalization S Rₛ]
 
-noncomputable
-
 @[simps!]
+noncomputable
 def mapExtendScalars : (M →ₗ[R] N) →ₗ[R] (M' →ₗ[Rₛ] N') :=
   ((LinearMap.extendScalarsOfIsLocalizationEquiv S Rₛ).restrictScalars R).toLinearMap ∘ₗ map S f g
 
@@ -270,7 +262,6 @@ variable {M : Type*} [AddCommMonoid M] [Module R M]
 variable {N} [AddCommMonoid N] [Module R N]
 
 noncomputable
-
 def LocalizedModule.map :
     (M →ₗ[R] N) →ₗ[R] (LocalizedModule S M →ₗ[Localization S] LocalizedModule S N) :=
   IsLocalizedModule.mapExtendScalars S (LocalizedModule.mkLinearMap S M)

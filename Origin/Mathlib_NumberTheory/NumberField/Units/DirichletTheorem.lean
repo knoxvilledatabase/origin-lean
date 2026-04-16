@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/NumberField/Units/DirichletTheorem.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 3 | Infrastructure: 9
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Gershgorin
 import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.ConvexBody
 import Mathlib.NumberTheory.NumberField.Units.Basic
+
+noncomputable section
 
 /-!
 # Dirichlet theorem on the group of units of a number field
@@ -207,12 +209,41 @@ open NumberField.mixedEmbedding NNReal
 variable (w₁ : InfinitePlace K) {B : ℕ} (hB : minkowskiBound K 1 < (convexBodyLTFactor K) * B)
 
 include hB in
+/-- This result shows that there always exists a next term in the sequence. -/
 
--- DISSOLVED: seq_next
+theorem seq_next {x : 𝓞 K} (hx : x ≠ 0) :
+    ∃ y : 𝓞 K, y ≠ 0 ∧
+      (∀ w, w ≠ w₁ → w y < w x) ∧
+      |Algebra.norm ℚ (y : K)| ≤ B := by
+  have hx' := RingOfIntegers.coe_ne_zero_iff.mpr hx
+  let f : InfinitePlace K → ℝ≥0 :=
+    fun w => ⟨(w x) / 2, div_nonneg (AbsoluteValue.nonneg _ _) (by norm_num)⟩
+  suffices ∀ w, w ≠ w₁ → f w ≠ 0 by
+    obtain ⟨g, h_geqf, h_gprod⟩ := adjust_f K B this
+    obtain ⟨y, h_ynz, h_yle⟩ := exists_ne_zero_mem_ringOfIntegers_lt K (f := g)
+      (by rw [convexBodyLT_volume]; convert hB; exact congr_arg ((↑) : NNReal → ENNReal) h_gprod)
+    refine ⟨y, h_ynz, fun w hw => (h_geqf w hw ▸ h_yle w).trans ?_, ?_⟩
+    · rw [← Rat.cast_le (K := ℝ), Rat.cast_natCast]
+      calc
+        _ = ∏ w : InfinitePlace K, w (algebraMap _ K y) ^ mult w :=
+          (prod_eq_abs_norm (algebraMap _ K y)).symm
+        _ ≤ ∏ w : InfinitePlace K, (g w : ℝ) ^ mult w := by gcongr with w; exact (h_yle w).le
+        _ ≤ (B : ℝ) := by
+          simp_rw [← NNReal.coe_pow, ← NNReal.coe_prod]
+          exact le_of_eq (congr_arg toReal h_gprod)
+    · refine div_lt_self ?_ (by norm_num)
+      exact pos_iff.mpr hx'
+  intro _ _
+  rw [ne_eq, Nonneg.mk_eq_zero, div_eq_zero_iff, map_eq_zero, not_or]
+  exact ⟨hx', by norm_num⟩
 
--- DISSOLVED: seq
+def seq : ℕ → { x : 𝓞 K // x ≠ 0 }
+  | 0 => ⟨1, by norm_num⟩
+  | n + 1 =>
+    ⟨(seq_next K w₁ hB (seq n).prop).choose, (seq_next K w₁ hB (seq n).prop).choose_spec.1⟩
 
--- DISSOLVED: seq_ne_zero
+theorem seq_ne_zero (n : ℕ) : algebraMap (𝓞 K) K (seq K w₁ hB n) ≠ 0 :=
+  RingOfIntegers.coe_ne_zero_iff.mpr (seq K w₁ hB n).prop
 
 theorem seq_decreasing {n m : ℕ} (h : n < m) (w : InfinitePlace K) (hw : w ≠ w₁) :
     w (algebraMap (𝓞 K) K (seq K w₁ hB m)) < w (algebraMap (𝓞 K) K (seq K w₁ hB n)) := by

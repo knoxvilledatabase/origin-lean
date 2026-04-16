@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Process.HittingTime
 import Mathlib.Probability.Martingale.Basic
 
+noncomputable section
+
 /-! # Optional stopping theorem (fair game theorem)
 
 The optional stopping theorem states that an adapted integrable process `f` is a submartingale if

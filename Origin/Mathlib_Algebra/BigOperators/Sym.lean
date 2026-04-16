@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.Finset.Sym
 import Mathlib.Data.Sym.Sym2.Order
 
+noncomputable section
+
 /-!
 # Lemmas on `Finset.sum` and `Finset.prod` involving `Finset.sym2`
 -/

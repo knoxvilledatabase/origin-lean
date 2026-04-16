@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Data.Fintype.Prod
 import Mathlib.Data.Fintype.Vector
 
+noncomputable section
+
 /-!
 # Finiteness of products
 -/

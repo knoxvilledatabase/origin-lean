@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Algebra.Ring.NegOnePow
 
+noncomputable section
+
 /-!
 # Miscellaneous results about determinant
 

@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Images
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
 import Mathlib.CategoryTheory.Abelian.NonPreadditive
 
+noncomputable section
+
 /-!
 # Abelian categories
 

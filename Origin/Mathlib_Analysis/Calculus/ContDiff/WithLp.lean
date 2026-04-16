@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Normed.Lp.PiLp
 
+noncomputable section
+
 /-!
 # Derivatives on `WithLp`
 -/

@@ -9,6 +9,8 @@ import Mathlib.Tactic.PushNeg
 import Mathlib.Tactic.Finiteness.Attr
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-!
 # ⊤ and ⊥, bounded lattices and variants
 
@@ -199,22 +201,6 @@ instance instOrderBot [LE α] [OrderTop α] : OrderBot αᵒᵈ where
   __ := inferInstanceAs (Bot αᵒᵈ)
   bot_le := @le_top α _ _
 
-@[simp]
-theorem ofDual_bot [Top α] : ofDual ⊥ = (⊤ : α) :=
-  rfl
-
-@[simp]
-theorem ofDual_top [Bot α] : ofDual ⊤ = (⊥ : α) :=
-  rfl
-
-@[simp]
-theorem toDual_bot [Bot α] : toDual (⊥ : α) = ⊤ :=
-  rfl
-
-@[simp]
-theorem toDual_top [Top α] : toDual (⊤ : α) = ⊥ :=
-  rfl
-
 end OrderDual
 
 section Preorder
@@ -345,22 +331,8 @@ variable {ι : Type*} {α' : ι → Type*}
 instance [∀ i, Bot (α' i)] : Bot (∀ i, α' i) :=
   ⟨fun _ => ⊥⟩
 
-@[simp]
-theorem bot_apply [∀ i, Bot (α' i)] (i : ι) : (⊥ : ∀ i, α' i) i = ⊥ :=
-  rfl
-
-theorem bot_def [∀ i, Bot (α' i)] : (⊥ : ∀ i, α' i) = fun _ => ⊥ :=
-  rfl
-
 instance [∀ i, Top (α' i)] : Top (∀ i, α' i) :=
   ⟨fun _ => ⊤⟩
-
-@[simp]
-theorem top_apply [∀ i, Top (α' i)] (i : ι) : (⊤ : ∀ i, α' i) i = ⊤ :=
-  rfl
-
-theorem top_def [∀ i, Top (α' i)] : (⊤ : ∀ i, α' i) = fun _ => ⊤ :=
-  rfl
 
 instance instOrderTop [∀ i, LE (α' i)] [∀ i, OrderTop (α' i)] : OrderTop (∀ i, α' i) where
   le_top _ := fun _ => le_top
@@ -490,14 +462,6 @@ instance instTop [Top α] [Top β] : Top (α × β) :=
 instance instBot [Bot α] [Bot β] : Bot (α × β) :=
   ⟨⟨⊥, ⊥⟩⟩
 
-theorem fst_top [Top α] [Top β] : (⊤ : α × β).fst = ⊤ := rfl
-
-theorem snd_top [Top α] [Top β] : (⊤ : α × β).snd = ⊤ := rfl
-
-theorem fst_bot [Bot α] [Bot β] : (⊥ : α × β).fst = ⊥ := rfl
-
-theorem snd_bot [Bot α] [Bot β] : (⊥ : α × β).snd = ⊥ := rfl
-
 instance instOrderTop [LE α] [LE β] [OrderTop α] [OrderTop β] : OrderTop (α × β) where
   __ := inferInstanceAs (Top (α × β))
   le_top _ := ⟨le_top, le_top⟩
@@ -517,13 +481,9 @@ namespace ULift
 
 instance [Top α] : Top (ULift.{v} α) where top := up ⊤
 
-@[simp] theorem up_top [Top α] : up (⊤ : α) = ⊤ := rfl
-
 @[simp] theorem down_top [Top α] : down (⊤ : ULift α) = ⊤ := rfl
 
 instance [Bot α] : Bot (ULift.{v} α) where bot := up ⊥
-
-@[simp] theorem up_bot [Bot α] : up (⊥ : α) = ⊥ := rfl
 
 @[simp] theorem down_bot [Bot α] : down (⊥ : ULift α) = ⊥ := rfl
 
@@ -563,13 +523,5 @@ instance Bool.instBoundedOrder : BoundedOrder Bool where
   le_top := Bool.le_true
   bot := false
   bot_le := Bool.false_le
-
-@[simp]
-theorem top_eq_true : ⊤ = true :=
-  rfl
-
-@[simp]
-theorem bot_eq_false : ⊥ = false :=
-  rfl
 
 end Bool

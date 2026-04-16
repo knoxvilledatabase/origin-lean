@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Presentation.Basic
 import Mathlib.Algebra.Module.FinitePresentation
 
+noncomputable section
+
 /-!
 # Characterization of finitely presented modules
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Galois.Full
 import Mathlib.CategoryTheory.Galois.Topology
 import Mathlib.Topology.Algebra.OpenSubgroup
 
+noncomputable section
+
 /-!
 
 # Essential surjectivity of fiber functors

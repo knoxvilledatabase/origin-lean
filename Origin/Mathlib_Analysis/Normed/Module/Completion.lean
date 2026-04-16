@@ -8,6 +8,8 @@ import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Topology.Algebra.UniformRing
 import Mathlib.Topology.Algebra.UniformField
 
+noncomputable section
+
 /-!
 # Normed space structure on the completion of a normed space
 
@@ -44,16 +46,8 @@ def toComplₗᵢ : E →ₗᵢ[𝕜] Completion E :=
     map_smul' := coe_smul
     norm_map' := norm_coe }
 
-@[simp]
-theorem coe_toComplₗᵢ : ⇑(toComplₗᵢ : E →ₗᵢ[𝕜] Completion E) = ((↑) : E → Completion E) :=
-  rfl
-
 def toComplL : E →L[𝕜] Completion E :=
   toComplₗᵢ.toContinuousLinearMap
-
-@[simp]
-theorem coe_toComplL : ⇑(toComplL : E →L[𝕜] Completion E) = ((↑) : E → Completion E) :=
-  rfl
 
 -- CONFLATES (assumes ground = zero): norm_toComplL
 @[simp]

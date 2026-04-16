@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.ModelTheory.Algebra.Ring.Basic
 import Mathlib.RingTheory.FreeCommRing
 
+noncomputable section
+
 /-!
 # Making a term in the language of rings from an element of the FreeCommRing
 

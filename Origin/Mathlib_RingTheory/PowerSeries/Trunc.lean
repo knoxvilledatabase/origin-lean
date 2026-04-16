@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Coeff
 import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.RingTheory.PowerSeries.Basic
 
+noncomputable section
+
 /-!
 
 # Formal power series in one variable - Truncation
@@ -84,8 +86,6 @@ theorem natDegree_trunc_lt (f : R⟦X⟧) (n) : (trunc (n + 1) f).natDegree < n 
   · rw [lt_succ, ← not_lt] at h
     contradiction
   · rfl
-
-@[simp] lemma trunc_zero' {f : R⟦X⟧} : trunc 0 f = 0 := rfl
 
 theorem degree_trunc_lt (f : R⟦X⟧) (n) : (trunc n f).degree < n := by
   rw [degree_lt_iff_coeff_zero]

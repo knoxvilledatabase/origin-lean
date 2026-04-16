@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Opposites
 import Mathlib.CategoryTheory.Subobject.Lattice
 import Mathlib.Data.Set.Opposite
 
+noncomputable section
+
 /-!
 # Separating and detecting sets
 

@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.LinearAlgebra.Finsupp.Pi
 
+noncomputable section
+
 /-!
 # Results on bases of tensor products
 

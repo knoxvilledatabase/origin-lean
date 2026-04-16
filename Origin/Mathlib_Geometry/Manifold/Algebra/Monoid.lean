@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiffMap
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 
+noncomputable section
+
 /-!
 # Smooth monoid
 A smooth monoid is a monoid that is also a smooth manifold, in which multiplication is a smooth map
@@ -19,36 +21,6 @@ semigroups.
 open scoped Manifold
 
 local notation "∞" => (⊤ : ℕ∞)
-
-library_note "Design choices about smooth algebraic structures"/--
-
-1. All smooth algebraic structures on `G` are `Prop`-valued classes that extend
-
-`SmoothManifoldWithCorners I G`. This way we save users from adding both
-
-`[SmoothManifoldWithCorners I G]` and `[SmoothMul I G]` to the assumptions. While many API
-
-lemmas hold true without the `SmoothManifoldWithCorners I G` assumption, we're not aware of a
-
-mathematically interesting monoid on a topological manifold such that (a) the space is not a
-
-`SmoothManifoldWithCorners`; (b) the multiplication is smooth at `(a, b)` in the charts
-
-`extChartAt I a`, `extChartAt I b`, `extChartAt I (a * b)`.
-
-2. Because of `ModelProd` we can't assume, e.g., that a `LieGroup` is modelled on `𝓘(𝕜, E)`. So,
-
-we formulate the definitions and lemmas for any model.
-
-3. While smoothness of an operation implies its continuity, lemmas like
-
-`continuousMul_of_smooth` can't be instances becausen otherwise Lean would have to search for
-
-`SmoothMul I G` with unknown `𝕜`, `E`, `H`, and `I : ModelWithCorners 𝕜 E H`. If users needs
-
-`[ContinuousMul G]` in a proof about a smooth monoid, then they need to either add
-
-`[ContinuousMul G]` as an assumption (worse) or use `haveI` in the proof (better). -/
 
 -- CONFLATES (assumes ground = zero): SmoothAdd
 class SmoothAdd {𝕜 : Type*} [NontriviallyNormedField 𝕜] {H : Type*} [TopologicalSpace H]
@@ -82,6 +54,9 @@ theorem contMDiff_mul : ContMDiff (I.prod I) I ⊤ fun p : G × G => p.1 * p.2 :
   SmoothMul.smooth_mul
 
 include I in
+/-- If the multiplication is smooth, then it is continuous. This is not an instance for technical
+
+reasons, see note [Design choices about smooth algebraic structures]. -/
 
 @[to_additive "If the addition is smooth, then it is continuous. This is not an instance for
 

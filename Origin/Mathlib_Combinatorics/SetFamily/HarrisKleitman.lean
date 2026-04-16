@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SetFamily.Compression.Down
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Data.Fintype.Powerset
 
+noncomputable section
+
 /-!
 # Harris-Kleitman inequality
 

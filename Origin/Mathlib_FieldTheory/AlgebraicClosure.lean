@@ -7,6 +7,8 @@ import Mathlib.FieldTheory.NormalClosure
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.FieldTheory.IntermediateField.Algebraic
 
+noncomputable section
+
 /-!
 # Relative Algebraic Closure
 
@@ -32,9 +34,6 @@ def algebraicClosure : IntermediateField F E :=
   Algebra.IsAlgebraic.toIntermediateField (integralClosure F E)
 
 variable {F E}
-
-theorem mem_algebraicClosure_iff' {x : E} :
-    x ∈ algebraicClosure F E ↔ IsIntegral F x := Iff.rfl
 
 theorem mem_algebraicClosure_iff {x : E} :
     x ∈ algebraicClosure F E ↔ IsAlgebraic F x := isAlgebraic_iff_isIntegral.symm

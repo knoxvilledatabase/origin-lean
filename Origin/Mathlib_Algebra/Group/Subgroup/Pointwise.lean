@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Subgroup/Pointwise.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 12 | Infrastructure: 12
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.MulOppositeLemmas
 import Mathlib.Algebra.Group.Submonoid.Pointwise
 import Mathlib.GroupTheory.GroupAction.ConjAct
+
+noncomputable section
 
 /-! # Pointwise instances on `Subgroup` and `AddSubgroup`s
 
@@ -303,19 +305,6 @@ protected def pointwiseMulAction : MulAction α (Subgroup G) where
 
 scoped[Pointwise] attribute [instance] Subgroup.pointwiseMulAction
 
-theorem pointwise_smul_def {a : α} (S : Subgroup G) :
-    a • S = S.map (MulDistribMulAction.toMonoidEnd _ _ a) :=
-  rfl
-
-@[simp]
-theorem coe_pointwise_smul (a : α) (S : Subgroup G) : ↑(a • S) = a • (S : Set G) :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toSubmonoid (a : α) (S : Subgroup G) :
-    (a • S).toSubmonoid = a • S.toSubmonoid :=
-  rfl
-
 theorem smul_mem_pointwise_smul (m : G) (a : α) (S : Subgroup G) : m ∈ S → a • m ∈ a • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ a • (S : Set G))
 
@@ -425,17 +414,29 @@ section GroupWithZero
 
 variable [GroupWithZero α] [MulDistribMulAction α G]
 
--- DISSOLVED: smul_mem_pointwise_smul_iff₀
+@[simp]
+theorem smul_mem_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : Subgroup G) (x : G) :
+    a • x ∈ a • S ↔ x ∈ S :=
+  smul_mem_smul_set_iff₀ ha (S : Set G) x
 
--- DISSOLVED: mem_pointwise_smul_iff_inv_smul_mem₀
+theorem mem_pointwise_smul_iff_inv_smul_mem₀ {a : α} (ha : a ≠ 0) (S : Subgroup G) (x : G) :
+    x ∈ a • S ↔ a⁻¹ • x ∈ S :=
+  mem_smul_set_iff_inv_smul_mem₀ ha (S : Set G) x
 
--- DISSOLVED: mem_inv_pointwise_smul_iff₀
+theorem mem_inv_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : Subgroup G) (x : G) :
+    x ∈ a⁻¹ • S ↔ a • x ∈ S :=
+  mem_inv_smul_set_iff₀ ha (S : Set G) x
 
--- DISSOLVED: pointwise_smul_le_pointwise_smul_iff₀
+@[simp]
+theorem pointwise_smul_le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : Subgroup G} :
+    a • S ≤ a • T ↔ S ≤ T :=
+  set_smul_subset_set_smul_iff₀ ha
 
--- DISSOLVED: pointwise_smul_le_iff₀
+theorem pointwise_smul_le_iff₀ {a : α} (ha : a ≠ 0) {S T : Subgroup G} : a • S ≤ T ↔ S ≤ a⁻¹ • T :=
+  set_smul_subset_iff₀ ha
 
--- DISSOLVED: le_pointwise_smul_iff₀
+theorem le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : Subgroup G} : S ≤ a • T ↔ a⁻¹ • S ≤ T :=
+  subset_set_smul_iff₀ ha
 
 end GroupWithZero
 
@@ -457,19 +458,6 @@ protected def pointwiseMulAction : MulAction α (AddSubgroup A) where
       (S.map_map _ _).symm
 
 scoped[Pointwise] attribute [instance] AddSubgroup.pointwiseMulAction
-
-theorem pointwise_smul_def {a : α} (S : AddSubgroup A) :
-    a • S = S.map (DistribMulAction.toAddMonoidEnd _ _ a) :=
-  rfl
-
-@[simp]
-theorem coe_pointwise_smul (a : α) (S : AddSubgroup A) : ↑(a • S) = a • (S : Set A) :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toAddSubmonoid (a : α) (S : AddSubgroup A) :
-    (a • S).toAddSubmonoid = a • S.toAddSubmonoid :=
-  rfl
 
 theorem smul_mem_pointwise_smul (m : A) (a : α) (S : AddSubgroup A) : m ∈ S → a • m ∈ a • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ a • (S : Set A))
@@ -520,17 +508,31 @@ variable [GroupWithZero α] [DistribMulAction α A]
 
 open Pointwise
 
--- DISSOLVED: smul_mem_pointwise_smul_iff₀
+@[simp]
+theorem smul_mem_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : AddSubgroup A) (x : A) :
+    a • x ∈ a • S ↔ x ∈ S :=
+  smul_mem_smul_set_iff₀ ha (S : Set A) x
 
--- DISSOLVED: mem_pointwise_smul_iff_inv_smul_mem₀
+theorem mem_pointwise_smul_iff_inv_smul_mem₀ {a : α} (ha : a ≠ 0) (S : AddSubgroup A) (x : A) :
+    x ∈ a • S ↔ a⁻¹ • x ∈ S :=
+  mem_smul_set_iff_inv_smul_mem₀ ha (S : Set A) x
 
--- DISSOLVED: mem_inv_pointwise_smul_iff₀
+theorem mem_inv_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : AddSubgroup A) (x : A) :
+    x ∈ a⁻¹ • S ↔ a • x ∈ S :=
+  mem_inv_smul_set_iff₀ ha (S : Set A) x
 
--- DISSOLVED: pointwise_smul_le_pointwise_smul_iff₀
+@[simp]
+theorem pointwise_smul_le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : AddSubgroup A} :
+    a • S ≤ a • T ↔ S ≤ T :=
+  set_smul_subset_set_smul_iff₀ ha
 
--- DISSOLVED: pointwise_smul_le_iff₀
+theorem pointwise_smul_le_iff₀ {a : α} (ha : a ≠ 0) {S T : AddSubgroup A} :
+    a • S ≤ T ↔ S ≤ a⁻¹ • T :=
+  set_smul_subset_iff₀ ha
 
--- DISSOLVED: le_pointwise_smul_iff₀
+theorem le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : AddSubgroup A} :
+    S ≤ a • T ↔ a⁻¹ • S ≤ T :=
+  subset_set_smul_iff₀ ha
 
 end GroupWithZero
 
@@ -546,9 +548,6 @@ protected def mul : Mul (AddSubgroup R) where
       fun r₁ r₂ h₁ h₂ ↦ by rw [neg_add]; exact (M.1 * N.1).add_mem h₁ h₂ }
 
 scoped[Pointwise] attribute [instance] AddSubgroup.mul
-
-theorem mul_toAddSubmonoid (M N : AddSubgroup R) :
-    (M * N).toAddSubmonoid = M.toAddSubmonoid * N.toAddSubmonoid := rfl
 
 end Mul
 

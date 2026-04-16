@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/RCLike/Basic.lean
-Genuine: 194 | Conflates: 0 | Dissolved: 4 | Infrastructure: 30
+Genuine: 198 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Field
@@ -11,6 +11,8 @@ import Mathlib.Analysis.CStarAlgebra.Basic
 import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
 import Mathlib.Data.Real.Sqrt
 import Mathlib.LinearAlgebra.Basis.VectorSpace
+
+noncomputable section
 
 /-!
 # `RCLike`: a typeclass for ℝ or ℂ
@@ -98,9 +100,6 @@ theorem real_smul_eq_coe_mul (r : ℝ) (z : K) : r • z = (r : K) * z :=
 theorem real_smul_eq_coe_smul [AddCommGroup E] [Module K E] [Module ℝ E] [IsScalarTower ℝ K E]
     (r : ℝ) (x : E) : r • x = (r : K) • x := by rw [RCLike.ofReal_alg, smul_one_smul]
 
-theorem algebraMap_eq_ofReal : ⇑(algebraMap ℝ K) = ofReal :=
-  rfl
-
 @[simp, rclike_simps]
 theorem re_add_im (z : K) : (re z : K) + im z * I = z :=
   RCLike.re_add_im_ax z
@@ -155,7 +154,8 @@ theorem ofReal_inj {z w : ℝ} : (z : K) = (w : K) ↔ z = w :=
 theorem ofReal_eq_zero {x : ℝ} : (x : K) = 0 ↔ x = 0 :=
   algebraMap.lift_map_eq_zero_iff x
 
--- DISSOLVED: ofReal_ne_zero
+theorem ofReal_ne_zero {x : ℝ} : (x : K) ≠ 0 ↔ x ≠ 0 :=
+  ofReal_eq_zero.not
 
 @[rclike_simps, norm_cast]
 theorem ofReal_add (r s : ℝ) : ((r + s : ℝ) : K) = r + s :=
@@ -338,10 +338,6 @@ theorem conj_eq_iff_re {z : K} : conj z = z ↔ (re z : K) = z :=
 theorem conj_eq_iff_im {z : K} : conj z = z ↔ im z = 0 :=
   (is_real_TFAE z).out 0 3
 
-@[simp]
-theorem star_def : (Star.star : K → K) = conj :=
-  rfl
-
 variable (K)
 
 abbrev conjToRingEquiv : K ≃+* Kᵐᵒᵖ :=
@@ -381,7 +377,9 @@ theorem normSq_nonneg (z : K) : 0 ≤ normSq z :=
 theorem normSq_eq_zero {z : K} : normSq z = 0 ↔ z = 0 :=
   map_eq_zero _
 
--- DISSOLVED: normSq_pos
+@[simp, rclike_simps]
+theorem normSq_pos {z : K} : 0 < normSq z ↔ z ≠ 0 := by
+  rw [lt_iff_le_and_ne, Ne, eq_comm]; simp [normSq_nonneg]
 
 @[simp, rclike_simps]
 theorem normSq_neg (z : K) : normSq (-z) = normSq z := by simp only [normSq_eq_def', norm_neg]
@@ -474,7 +472,8 @@ theorem div_re_ofReal {z : K} {r : ℝ} : re (z / r) = re z / r := by
 theorem ofReal_zpow (r : ℝ) (n : ℤ) : ((r ^ n : ℝ) : K) = (r : K) ^ n :=
   map_zpow₀ (algebraMap ℝ K) r n
 
--- DISSOLVED: I_mul_I_of_nonzero
+theorem I_mul_I_of_nonzero : (I : K) ≠ 0 → (I : K) * I = -1 :=
+  I_mul_I_ax.resolve_left
 
 @[simp, rclike_simps]
 theorem inv_I : (I : K)⁻¹ = -I := by
@@ -661,7 +660,9 @@ theorem abs_im_div_norm_le_one (z : K) : |im z / ‖z‖| ≤ 1 := by
   rw [abs_div, abs_norm]
   exact div_le_one_of_le₀ (abs_im_le_norm _) (norm_nonneg _)
 
--- DISSOLVED: norm_I_of_ne_zero
+theorem norm_I_of_ne_zero (hI : (I : K) ≠ 0) : ‖(I : K)‖ = 1 := by
+  rw [← mul_self_inj_of_nonneg (norm_nonneg I) zero_le_one, one_mul, ← norm_mul,
+    I_mul_I_of_nonzero hI, norm_neg, norm_one]
 
 theorem re_eq_norm_of_mul_conj (x : K) : re (x * conj x) = ‖x * conj x‖ := by
   rw [mul_conj, ← ofReal_pow]; simp [-map_pow]
@@ -870,27 +871,7 @@ local notation "IR" => @RCLike.I ℝ _
 local notation "normSqR" => @RCLike.normSq ℝ _
 
 @[simp, rclike_simps]
-theorem re_to_real {x : ℝ} : reR x = x :=
-  rfl
-
-@[simp, rclike_simps]
-theorem im_to_real {x : ℝ} : imR x = 0 :=
-  rfl
-
-@[rclike_simps]
-theorem conj_to_real {x : ℝ} : conj x = x :=
-  rfl
-
-@[simp, rclike_simps]
-theorem I_to_real : IR = 0 :=
-  rfl
-
-@[simp, rclike_simps]
 theorem normSq_to_real {x : ℝ} : normSq x = x * x := by simp [RCLike.normSq]
-
-@[simp]
-theorem ofReal_real_eq_id : @ofReal ℝ _ = id :=
-  rfl
 
 end CleanupLemmas
 
@@ -899,22 +880,10 @@ section LinearMaps
 def reLm : K →ₗ[ℝ] ℝ :=
   { re with map_smul' := smul_re }
 
-@[simp, rclike_simps]
-theorem reLm_coe : (reLm : K → ℝ) = re :=
-  rfl
-
 noncomputable def reCLM : K →L[ℝ] ℝ :=
   reLm.mkContinuous 1 fun x => by
     rw [one_mul]
     exact abs_re_le_norm x
-
-@[simp, rclike_simps, norm_cast]
-theorem reCLM_coe : ((reCLM : K →L[ℝ] ℝ) : K →ₗ[ℝ] ℝ) = reLm :=
-  rfl
-
-@[simp, rclike_simps]
-theorem reCLM_apply : ((reCLM : K →L[ℝ] ℝ) : K → ℝ) = re :=
-  rfl
 
 @[continuity, fun_prop]
 theorem continuous_re : Continuous (re : K → ℝ) :=
@@ -923,22 +892,10 @@ theorem continuous_re : Continuous (re : K → ℝ) :=
 def imLm : K →ₗ[ℝ] ℝ :=
   { im with map_smul' := smul_im }
 
-@[simp, rclike_simps]
-theorem imLm_coe : (imLm : K → ℝ) = im :=
-  rfl
-
 noncomputable def imCLM : K →L[ℝ] ℝ :=
   imLm.mkContinuous 1 fun x => by
     rw [one_mul]
     exact abs_im_le_norm x
-
-@[simp, rclike_simps, norm_cast]
-theorem imCLM_coe : ((imCLM : K →L[ℝ] ℝ) : K →ₗ[ℝ] ℝ) = imLm :=
-  rfl
-
-@[simp, rclike_simps]
-theorem imCLM_apply : ((imCLM : K →L[ℝ] ℝ) : K → ℝ) = im :=
-  rfl
 
 @[continuity, fun_prop]
 theorem continuous_im : Continuous (im : K → ℝ) :=
@@ -951,27 +908,11 @@ def conjAe : K ≃ₐ[ℝ] K :=
     right_inv := conj_conj
     commutes' := conj_ofReal }
 
-@[simp, rclike_simps]
-theorem conjAe_coe : (conjAe : K → K) = conj :=
-  rfl
-
 noncomputable def conjLIE : K ≃ₗᵢ[ℝ] K :=
   ⟨conjAe.toLinearEquiv, norm_conj⟩
 
-@[simp, rclike_simps]
-theorem conjLIE_apply : (conjLIE : K → K) = conj :=
-  rfl
-
 noncomputable def conjCLE : K ≃L[ℝ] K :=
   @conjLIE K _
-
-@[simp, rclike_simps]
-theorem conjCLE_coe : (@conjCLE K _).toLinearEquiv = conjAe.toLinearEquiv :=
-  rfl
-
-@[simp, rclike_simps]
-theorem conjCLE_apply : (conjCLE : K → K) = conj :=
-  rfl
 
 instance (priority := 100) : ContinuousStar K :=
   ⟨conjLIE.continuous⟩
@@ -983,28 +924,12 @@ theorem continuous_conj : Continuous (conj : K → K) :=
 noncomputable def ofRealAm : ℝ →ₐ[ℝ] K :=
   Algebra.ofId ℝ K
 
-@[simp, rclike_simps]
-theorem ofRealAm_coe : (ofRealAm : ℝ → K) = ofReal :=
-  rfl
-
 noncomputable def ofRealLI : ℝ →ₗᵢ[ℝ] K where
   toLinearMap := ofRealAm.toLinearMap
   norm_map' := norm_ofReal
 
-@[simp, rclike_simps]
-theorem ofRealLI_apply : (ofRealLI : ℝ → K) = ofReal :=
-  rfl
-
 noncomputable def ofRealCLM : ℝ →L[ℝ] K :=
   ofRealLI.toContinuousLinearMap
-
-@[simp, rclike_simps]
-theorem ofRealCLM_coe : (@ofRealCLM K _ : ℝ →ₗ[ℝ] K) = ofRealAm.toLinearMap :=
-  rfl
-
-@[simp, rclike_simps]
-theorem ofRealCLM_apply : (ofRealCLM : ℝ → K) = ofReal :=
-  rfl
 
 @[continuity, fun_prop]
 theorem continuous_ofReal : Continuous (ofReal : ℝ → K) :=

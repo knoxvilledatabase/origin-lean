@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.CategoryTheory.Adjunction.Basic
 
+noncomputable section
+
 /-!
 # Adjunctions regarding the category of topological spaces
 

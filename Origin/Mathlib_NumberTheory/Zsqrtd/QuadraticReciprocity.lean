@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.Zsqrtd.GaussianInt
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Analysis.Normed.Field.Lemmas
 
+noncomputable section
+
 /-!
 # Facts about the gaussian integers relying on quadratic reciprocity.
 

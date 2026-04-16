@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.SmallObject.Iteration.ExtendToSucc
 
+noncomputable section
+
 /-!
 # Existence of objects in the category of iterations of functors
 

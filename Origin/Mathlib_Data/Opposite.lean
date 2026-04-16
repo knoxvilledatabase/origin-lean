@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Opposites
 
@@ -65,14 +67,6 @@ def equivToOpposite : α ≃ αᵒᵖ where
 theorem op_surjective : Function.Surjective (op : α → αᵒᵖ) := equivToOpposite.surjective
 
 theorem unop_surjective : Function.Surjective (unop : αᵒᵖ → α) := equivToOpposite.symm.surjective
-
-@[simp]
-theorem equivToOpposite_coe : (equivToOpposite : α → αᵒᵖ) = op :=
-  rfl
-
-@[simp]
-theorem equivToOpposite_symm_coe : (equivToOpposite.symm : αᵒᵖ → α) = unop :=
-  rfl
 
 theorem op_eq_iff_eq_unop {x : α} {y} : op x = y ↔ x = unop y :=
   equivToOpposite.apply_eq_iff_eq_symm_apply

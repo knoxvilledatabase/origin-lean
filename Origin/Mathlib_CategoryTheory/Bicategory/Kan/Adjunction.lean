@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Bicategory.Kan.HasKan
 import Mathlib.CategoryTheory.Bicategory.Adjunction
 import Mathlib.Tactic.TFAE
 
+noncomputable section
+
 /-!
 # Adjunctions as Kan extensions
 

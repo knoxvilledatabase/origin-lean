@@ -10,6 +10,8 @@ import Mathlib.Data.PNat.Interval
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.IntervalCases
 
+noncomputable section
+
 /-!
 # The inequality `p⁻¹ + q⁻¹ + r⁻¹ > 1`
 

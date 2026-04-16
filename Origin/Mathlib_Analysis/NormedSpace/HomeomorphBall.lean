@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Group.AddTorsor
 import Mathlib.Analysis.NormedSpace.Pointwise
 import Mathlib.Data.Real.Sqrt
 
+noncomputable section
+
 /-!
 # (Local) homeomorphism between a normed space and a ball
 
@@ -120,11 +122,6 @@ theorem ball_subset_univBall_target (c : P) (r : ℝ) : ball c r ⊆ (univBall c
 @[simp]
 theorem univBall_apply_zero (c : P) (r : ℝ) : univBall c r 0 = c := by
   unfold univBall; split_ifs <;> simp
-
-@[simp]
-theorem univBall_symm_apply_center (c : P) (r : ℝ) : (univBall c r).symm c = 0 := by
-  have : 0 ∈ (univBall c r).source := by simp
-  simpa only [univBall_apply_zero] using (univBall c r).left_inv this
 
 @[continuity]
 theorem continuous_univBall (c : P) (r : ℝ) : Continuous (univBall c r) := by

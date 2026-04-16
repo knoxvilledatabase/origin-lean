@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/MulChar/Lemmas.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 15 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.NumberTheory.MulChar.Basic
 import Mathlib.RingTheory.RootsOfUnity.Complex
+
+noncomputable section
 
 /-!
 # Further Results on multiplicative characters
@@ -152,15 +154,34 @@ variable {F : Type*} [Field F] [Finite F]
 
 variable {R : Type*} [CommRing R]
 
--- DISSOLVED: apply_mem_rootsOfUnity_orderOf
+lemma apply_mem_rootsOfUnity_orderOf (χ : MulChar F R) {a : F} (ha : a ≠ 0) :
+    ∃ ζ ∈ rootsOfUnity (orderOf χ) R, ζ = χ a := by
+  have hu : IsUnit (χ a) := ha.isUnit.map χ
+  refine ⟨hu.unit, ?_, hu.unit_spec⟩
+  rw [mem_rootsOfUnity, Units.ext_iff, Units.val_pow_eq_pow_val, Units.val_one,
+    IsUnit.unit_spec, ← χ.pow_apply' χ.orderOf_pos.ne', pow_orderOf_eq_one,
+    show a = (isUnit_iff_ne_zero.mpr ha).unit by simp only [IsUnit.unit_spec],
+    MulChar.one_apply_coe]
 
--- DISSOLVED: apply_mem_rootsOfUnity_of_pow_eq_one
+lemma apply_mem_rootsOfUnity_of_pow_eq_one {χ : MulChar F R} {n : ℕ} (hχ : χ ^ n = 1)
+    {a : F} (ha : a ≠ 0) :
+    ∃ ζ ∈ rootsOfUnity n R, ζ = χ a := by
+  obtain ⟨μ, hμ₁, hμ₂⟩ := χ.apply_mem_rootsOfUnity_orderOf ha
+  exact ⟨μ, rootsOfUnity_le_of_dvd (orderOf_dvd_of_pow_eq_one hχ) hμ₁, hμ₂⟩
 
 variable [IsDomain R]
 
 -- DISSOLVED: exists_apply_eq_pow
 
--- DISSOLVED: apply_mem_algebraAdjoin_of_pow_eq_one
+lemma apply_mem_algebraAdjoin_of_pow_eq_one {χ : MulChar F R} {n : ℕ} [NeZero n] (hχ : χ ^ n = 1)
+    {μ : R} (hμ : IsPrimitiveRoot μ n) (a : F) :
+    χ a ∈ Algebra.adjoin ℤ {μ} := by
+  rcases eq_or_ne a 0 with rfl | h
+  · exact χ.map_zero ▸ Subalgebra.zero_mem _
+  · obtain ⟨ζ, hζ₁, hζ₂⟩ := apply_mem_rootsOfUnity_of_pow_eq_one hχ h
+    rw [mem_rootsOfUnity, Units.ext_iff, Units.val_pow_eq_pow_val] at hζ₁
+    obtain ⟨k, _, hk⟩ := IsPrimitiveRoot.eq_pow_of_pow_eq_one hμ hζ₁
+    exact hζ₂ ▸ hk ▸ Subalgebra.pow_mem _ (Algebra.self_mem_adjoin_singleton ℤ μ) k
 
 lemma apply_mem_algebraAdjoin {χ : MulChar F R} {μ : R} (hμ : IsPrimitiveRoot μ (orderOf χ))
     (a : F) :

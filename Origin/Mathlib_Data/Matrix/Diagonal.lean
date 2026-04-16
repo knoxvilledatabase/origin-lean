@@ -7,6 +7,8 @@ import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.Data.Matrix.Defs
 import Mathlib.Data.Nat.Cast.Basic
 
+noncomputable section
+
 /-!
 # Diagonal matrices
 
@@ -100,26 +102,8 @@ theorem diagonal_sub [SubNegZeroMonoid α] (d₁ d₂ : n → α) :
 instance [Zero α] [NatCast α] : NatCast (Matrix n n α) where
   natCast m := diagonal fun _ => m
 
-@[norm_cast]
-theorem diagonal_natCast [Zero α] [NatCast α] (m : ℕ) : diagonal (fun _ : n => (m : α)) = m := rfl
-
-@[norm_cast]
-theorem diagonal_natCast' [Zero α] [NatCast α] (m : ℕ) : diagonal ((m : n → α)) = m := rfl
-
-theorem diagonal_ofNat [Zero α] [NatCast α] (m : ℕ) [m.AtLeastTwo] :
-    diagonal (fun _ : n => no_index (OfNat.ofNat m : α)) = OfNat.ofNat m := rfl
-
-theorem diagonal_ofNat' [Zero α] [NatCast α] (m : ℕ) [m.AtLeastTwo] :
-    diagonal (no_index (OfNat.ofNat m : n → α)) = OfNat.ofNat m := rfl
-
 instance [Zero α] [IntCast α] : IntCast (Matrix n n α) where
   intCast m := diagonal fun _ => m
-
-@[norm_cast]
-theorem diagonal_intCast [Zero α] [IntCast α] (m : ℤ) : diagonal (fun _ : n => (m : α)) = m := rfl
-
-@[norm_cast]
-theorem diagonal_intCast' [Zero α] [IntCast α] (m : ℤ) : diagonal ((m : n → α)) = m := rfl
 
 @[simp]
 theorem diagonal_map [Zero α] [Zero β] {f : α → β} (h : f 0 = 0) {d : n → α} :
@@ -217,43 +201,12 @@ def diag (A : Matrix n n α) (i : n) : α :=
   A i i
 
 @[simp]
-theorem diag_apply (A : Matrix n n α) (i) : diag A i = A i i :=
-  rfl
-
-@[simp]
 theorem diag_diagonal [DecidableEq n] [Zero α] (a : n → α) : diag (diagonal a) = a :=
   funext <| @diagonal_apply_eq _ _ _ _ a
 
 @[simp]
-theorem diag_transpose (A : Matrix n n α) : diag Aᵀ = diag A :=
-  rfl
-
-@[simp]
-theorem diag_zero [Zero α] : diag (0 : Matrix n n α) = 0 :=
-  rfl
-
-@[simp]
-theorem diag_add [Add α] (A B : Matrix n n α) : diag (A + B) = diag A + diag B :=
-  rfl
-
-@[simp]
-theorem diag_sub [Sub α] (A B : Matrix n n α) : diag (A - B) = diag A - diag B :=
-  rfl
-
-@[simp]
-theorem diag_neg [Neg α] (A : Matrix n n α) : diag (-A) = -diag A :=
-  rfl
-
-@[simp]
-theorem diag_smul [SMul R α] (r : R) (A : Matrix n n α) : diag (r • A) = r • diag A :=
-  rfl
-
-@[simp]
 theorem diag_one [DecidableEq n] [Zero α] [One α] : diag (1 : Matrix n n α) = 1 :=
   diag_diagonal _
-
-theorem diag_map {f : α → β} {A : Matrix n n α} : diag (A.map f) = f ∘ diag A :=
-  rfl
 
 end Diag
 
@@ -327,9 +280,6 @@ theorem submatrix_diagonal [Zero α] [DecidableEq m] [DecidableEq l] (d : m → 
 theorem submatrix_one [Zero α] [One α] [DecidableEq m] [DecidableEq l] (e : l → m)
     (he : Function.Injective e) : (1 : Matrix m m α).submatrix e e = 1 :=
   submatrix_diagonal _ e he
-
-theorem diag_submatrix (A : Matrix m m α) (e : l → m) : diag (A.submatrix e e) = A.diag ∘ e :=
-  rfl
 
 /-! `simp` lemmas for `Matrix.submatrix`s interaction with `Matrix.diagonal`, `1`, and `Matrix.mul`
 for when the mappings are bundled. -/

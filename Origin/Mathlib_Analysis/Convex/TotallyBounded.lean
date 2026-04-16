@@ -8,6 +8,8 @@ import Mathlib.Analysis.Convex.Hull
 import Mathlib.Topology.Algebra.UniformGroup.Basic
 import Mathlib.Topology.Algebra.Module.LocallyConvex
 
+noncomputable section
+
 /-!
 # Totally Bounded sets and Convex Hulls
 

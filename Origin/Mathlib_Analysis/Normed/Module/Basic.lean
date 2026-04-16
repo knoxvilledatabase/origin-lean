@@ -11,6 +11,8 @@ import Mathlib.Algebra.Module.Rat
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Analysis.Normed.MulAction
 
+noncomputable section
+
 /-!
 # Normed spaces
 

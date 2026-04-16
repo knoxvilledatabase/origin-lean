@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Notation
 import Mathlib.Tactic.TypeStar
 import Mathlib.Util.CompileInductive
 
+noncomputable section
+
 /-!
 # Binary tree
 

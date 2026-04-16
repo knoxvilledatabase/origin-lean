@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Sheaves.Sheaf
 
+noncomputable section
+
 /-!
 # Checking the sheaf condition on the underlying presheaf of types.
 

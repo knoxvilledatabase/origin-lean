@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/PeriodicPts.lean
-Genuine: 96 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
+Genuine: 98 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom
@@ -11,6 +11,8 @@ import Mathlib.Data.Nat.GCD.Basic
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.PNat.Basic
 import Mathlib.Dynamics.FixedPoints.Basic
+
+noncomputable section
 
 /-!
 # Periodic points
@@ -159,10 +161,6 @@ end IsPeriodicPt
 
 def ptsOfPeriod (f : α → α) (n : ℕ) : Set α :=
   { x : α | IsPeriodicPt f n x }
-
-@[simp]
-theorem mem_ptsOfPeriod : x ∈ ptsOfPeriod f n ↔ IsPeriodicPt f n x :=
-  Iff.rfl
 
 theorem Semiconj.mapsTo_ptsOfPeriod {g : α → β} (h : Semiconj g fa fb) (n : ℕ) :
     MapsTo g (ptsOfPeriod fa n) (ptsOfPeriod fb n) :=
@@ -316,7 +314,10 @@ theorem IsPeriodicPt.eq_zero_of_lt_minimalPeriod (hx : IsPeriodicPt f n x)
   Eq.symm <|
     (eq_or_lt_of_le <| n.zero_le).resolve_right fun hn0 => not_lt.2 (hx.minimalPeriod_le hn0) hn
 
--- DISSOLVED: not_isPeriodicPt_of_pos_of_lt_minimalPeriod
+theorem not_isPeriodicPt_of_pos_of_lt_minimalPeriod :
+    ∀ {n : ℕ} (_ : n ≠ 0) (_ : n < minimalPeriod f x), ¬IsPeriodicPt f n x
+  | 0, n0, _ => (n0 rfl).elim
+  | _ + 1, _, hn => fun hp => Nat.succ_ne_zero _ (hp.eq_zero_of_lt_minimalPeriod hn)
 
 theorem IsPeriodicPt.minimalPeriod_dvd (hx : IsPeriodicPt f n x) : minimalPeriod f x ∣ n :=
   (eq_or_lt_of_le <| n.zero_le).elim (fun hn0 => hn0 ▸ dvd_zero _) fun hn0 =>
@@ -383,7 +384,9 @@ private theorem minimalPeriod_iterate_eq_div_gcd_aux (h : 0 < gcd (minimalPeriod
     rw [IsPeriodicPt, IsFixedPt, iterate_mul]
     exact isPeriodicPt_minimalPeriod _ _
 
--- DISSOLVED: minimalPeriod_iterate_eq_div_gcd
+theorem minimalPeriod_iterate_eq_div_gcd (h : n ≠ 0) :
+    minimalPeriod f^[n] x = minimalPeriod f x / Nat.gcd (minimalPeriod f x) n :=
+  minimalPeriod_iterate_eq_div_gcd_aux <| gcd_pos_of_pos_right _ (Nat.pos_of_ne_zero h)
 
 theorem minimalPeriod_iterate_eq_div_gcd' (h : x ∈ periodicPts f) :
     minimalPeriod f^[n] x = minimalPeriod f x / Nat.gcd (minimalPeriod f x) n :=
@@ -392,14 +395,6 @@ theorem minimalPeriod_iterate_eq_div_gcd' (h : x ∈ periodicPts f) :
 
 def periodicOrbit (f : α → α) (x : α) : Cycle α :=
   (List.range (minimalPeriod f x)).map fun n => f^[n] x
-
-theorem periodicOrbit_def (f : α → α) (x : α) :
-    periodicOrbit f x = (List.range (minimalPeriod f x)).map fun n => f^[n] x :=
-  rfl
-
-theorem periodicOrbit_eq_cycle_map (f : α → α) (x : α) :
-    periodicOrbit f x = (List.range (minimalPeriod f x) : Cycle ℕ).map fun n => f^[n] x :=
-  rfl
 
 @[simp]
 theorem periodicOrbit_length : (periodicOrbit f x).length = minimalPeriod f x := by

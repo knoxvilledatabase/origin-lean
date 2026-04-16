@@ -1,12 +1,14 @@
 /-
 Extracted from Topology/UniformSpace/Cauchy.lean
-Genuine: 106 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
+Genuine: 107 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Constructions
 import Mathlib.Topology.Bases
 import Mathlib.Algebra.Order.Group.Nat
 import Mathlib.Topology.UniformSpace.Basic
+
+noncomputable section
 
 /-!
 # Theory of Cauchy filters in uniform spaces. Complete uniform spaces. Totally bounded subsets.

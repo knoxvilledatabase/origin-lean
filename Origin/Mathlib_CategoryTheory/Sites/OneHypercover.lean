@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf
 
+noncomputable section
+
 /-!
 # 1-hypercovers
 
@@ -215,12 +217,6 @@ lemma preOneHypercover_sieve₁ (f₁ f₂ : S.Arrow) {W : C} (p₁ : W ⟶ f₁
   ext Y f
   simp only [Sieve.top_apply, iff_true]
   exact ⟨{ w := w}, f, rfl, rfl⟩
-
-@[simps toPreOneHypercover]
-def oneHypercover : J.OneHypercover X where
-  toPreOneHypercover := S.preOneHypercover
-  mem₀ := by simp
-  mem₁ f₁ f₂ _ p₁ p₂ w := by simp [S.preOneHypercover_sieve₁ f₁ f₂ p₁ p₂ w]
 
 end Cover
 

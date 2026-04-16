@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/GradedObject/Unitor.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Associator
 import Mathlib.CategoryTheory.GradedObject.Single
+
+noncomputable section
 
 /-!
 # The left and right unitors
@@ -40,7 +42,9 @@ noncomputable def mapBifunctorObjSingle₀ObjIso (a : I × J) (ha : a.1 = 0) :
     ((mapBifunctor F I J).obj ((single₀ I).obj X)).obj Y a ≅ Y a.2 :=
   (F.mapIso (singleObjApplyIsoOfEq _ X _ ha)).app _ ≪≫ e.app (Y a.2)
 
--- DISSOLVED: mapBifunctorObjSingle₀ObjIsInitial
+noncomputable def mapBifunctorObjSingle₀ObjIsInitial (a : I × J) (ha : a.1 ≠ 0) :
+    IsInitial (((mapBifunctor F I J).obj ((single₀ I).obj X)).obj Y a) :=
+  IsInitial.isInitialObj (F.flip.obj (Y a.2)) _ (isInitialSingleObjApply _ _ _ ha)
 
 noncomputable def mapBifunctorLeftUnitorCofan (hp : ∀ (j : J), p ⟨0, j⟩ = j) (Y) (j : J) :
     (((mapBifunctor F I J).obj ((single₀ I).obj X)).obj Y).CofanMapObjFun p j :=
@@ -73,7 +77,6 @@ noncomputable def mapBifunctorLeftUnitorCofanIsColimit (j : J) :
     (fun s m hm => by simp [← hm ⟨⟨0, j⟩, hp j⟩])
 
 include e hp in
-
 lemma mapBifunctorLeftUnitor_hasMap :
     HasMap (((mapBifunctor F I J).obj ((single₀ I).obj X)).obj Y) p :=
   CofanMapObjFun.hasMap _ _ _ (mapBifunctorLeftUnitorCofanIsColimit F X e p hp Y)
@@ -137,7 +140,9 @@ noncomputable def mapBifunctorObjObjSingle₀Iso (a : J × I) (ha : a.2 = 0) :
     ((mapBifunctor F J I).obj X).obj ((single₀ I).obj Y) a ≅ X a.1 :=
   Functor.mapIso _ (singleObjApplyIsoOfEq _ Y _ ha) ≪≫ e.app (X a.1)
 
--- DISSOLVED: mapBifunctorObjObjSingle₀IsInitial
+noncomputable def mapBifunctorObjObjSingle₀IsInitial (a : J × I) (ha : a.2 ≠ 0) :
+    IsInitial (((mapBifunctor F J I).obj X).obj ((single₀ I).obj Y) a) :=
+  IsInitial.isInitialObj (F.obj (X a.1)) _ (isInitialSingleObjApply _ _ _ ha)
 
 noncomputable def mapBifunctorRightUnitorCofan (hp : ∀ (j : J), p ⟨j, 0⟩ = j) (X) (j : J) :
     (((mapBifunctor F J I).obj X).obj ((single₀ I).obj Y)).CofanMapObjFun p j :=
@@ -175,7 +180,6 @@ noncomputable def mapBifunctorRightUnitorCofanIsColimit (j : J) :
         Iso.inv_hom_id, Functor.map_id, id_comp, Iso.inv_hom_id_app_assoc])
 
 include e hp in
-
 lemma mapBifunctorRightUnitor_hasMap :
     HasMap (((mapBifunctor F J I).obj X).obj ((single₀ I).obj Y)) p :=
   CofanMapObjFun.hasMap _ _ _ (mapBifunctorRightUnitorCofanIsColimit F Y e p hp X)

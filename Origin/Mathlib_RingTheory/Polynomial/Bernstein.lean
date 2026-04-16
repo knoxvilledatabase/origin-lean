@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Bernstein.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.PDeriv
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Polynomial.Eval.SMul
 import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.LinearAlgebra.LinearIndependent
 import Mathlib.RingTheory.Polynomial.Pochhammer
+
+noncomputable section
 
 /-!
 # Bernstein polynomials
@@ -174,7 +176,16 @@ theorem iterate_derivative_at_0 (n ν : ℕ) :
     rw [tsub_eq_zero_iff_le.mpr (Nat.le_sub_one_of_lt h), eq_zero_of_lt R h]
     simp [pos_iff_ne_zero.mp (pos_of_gt h)]
 
--- DISSOLVED: iterate_derivative_at_0_ne_zero
+theorem iterate_derivative_at_0_ne_zero [CharZero R] (n ν : ℕ) (h : ν ≤ n) :
+    (Polynomial.derivative^[ν] (bernsteinPolynomial R n ν)).eval 0 ≠ 0 := by
+  simp only [Int.natCast_eq_zero, bernsteinPolynomial.iterate_derivative_at_0, Ne, Nat.cast_eq_zero]
+  simp only [← ascPochhammer_eval_cast]
+  norm_cast
+  apply ne_of_gt
+  obtain rfl | h' := Nat.eq_zero_or_pos ν
+  · simp
+  · rw [← Nat.succ_pred_eq_of_pos h'] at h
+    exact ascPochhammer_pos _ _ (tsub_pos_of_lt (Nat.lt_of_succ_le h))
 
 /-!
 Rather than redoing the work of evaluating the derivatives at 1,
@@ -199,7 +210,11 @@ theorem iterate_derivative_at_1 (n ν : ℕ) (h : ν ≤ n) :
     congr
     omega
 
--- DISSOLVED: iterate_derivative_at_1_ne_zero
+theorem iterate_derivative_at_1_ne_zero [CharZero R] (n ν : ℕ) (h : ν ≤ n) :
+    (Polynomial.derivative^[n - ν] (bernsteinPolynomial R n ν)).eval 1 ≠ 0 := by
+  rw [bernsteinPolynomial.iterate_derivative_at_1 _ _ _ h, Ne, neg_one_pow_mul_eq_zero_iff, ←
+    Nat.cast_succ, ← ascPochhammer_eval_cast, ← Nat.cast_zero, Nat.cast_inj]
+  exact (ascPochhammer_pos _ _ (Nat.succ_pos ν)).ne'
 
 open Submodule
 
@@ -328,33 +343,5 @@ theorem sum_mul_smul (n : ℕ) :
       mul_one, Derivation.map_smul_of_tower, map_nsmul, map_pow, map_add, Bool.cond_true,
       Bool.cond_false, MvPolynomial.aeval_X, add_sub_cancel, one_pow, smul_smul,
       smul_one_mul]
-
-theorem variance (n : ℕ) :
-    (∑ ν ∈ Finset.range (n + 1), (n • Polynomial.X - (ν : R[X])) ^ 2 * bernsteinPolynomial R n ν) =
-      n • Polynomial.X * ((1 : R[X]) - Polynomial.X) := by
-  have p : ((((Finset.range (n + 1)).sum fun ν => (ν * (ν - 1)) • bernsteinPolynomial R n ν) +
-      (1 - (2 * n) • Polynomial.X) * (Finset.range (n + 1)).sum fun ν =>
-        ν • bernsteinPolynomial R n ν) + n ^ 2 • X ^ 2 *
-          (Finset.range (n + 1)).sum fun ν => bernsteinPolynomial R n ν) = _ :=
-    rfl
-  conv at p =>
-    lhs
-    rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
-    simp only [← natCast_mul]
-    simp only [← mul_assoc]
-    simp only [← add_mul]
-  conv at p =>
-    rhs
-    rw [sum, sum_smul, sum_mul_smul, ← natCast_mul]
-  calc
-    _ = _ := Finset.sum_congr rfl fun k m => ?_
-    _ = _ := p
-    _ = _ := ?_
-  · congr 1; simp only [← natCast_mul, push_cast]
-    cases k <;> · simp; ring
-  · simp only [← natCast_mul, push_cast]
-    cases n
-    · simp
-    · simp; ring
 
 end bernsteinPolynomial

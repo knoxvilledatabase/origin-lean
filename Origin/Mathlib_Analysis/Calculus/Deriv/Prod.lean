@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Prod
 
+noncomputable section
+
 /-!
 # Derivatives of functions taking values in product types
 

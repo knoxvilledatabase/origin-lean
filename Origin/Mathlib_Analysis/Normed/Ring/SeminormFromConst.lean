@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Normed/Ring/SeminormFromConst.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Ring.Seminorm
+
+noncomputable section
 
 /-!
 # SeminormFromConst
@@ -244,8 +246,9 @@ section Field
 
 variable {K : Type _} [Field K]
 
--- DISSOLVED: normFromConst
-
--- DISSOLVED: seminormFromConstRingNormOfField_def
+def normFromConst {k : K} {g : RingSeminorm K} (hg1 : g 1 ≤ 1) (hg_k : g k ≠ 0)
+    (hg_pm : IsPowMul g) : RingNorm K :=
+  (seminormFromConst hg1 hg_k hg_pm).toRingNorm (RingSeminorm.ne_zero_iff.mpr
+      ⟨k, by simpa [seminormFromConst_def, seminormFromConst_apply_c] using hg_k⟩)
 
 end Field

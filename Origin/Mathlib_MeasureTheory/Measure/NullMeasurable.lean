@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Constructions.EventuallyMeasurable
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.MeasureTheory.Measure.AEDisjoint
 
+noncomputable section
+
 /-!
 # Null measurable sets and complete measures
 
@@ -418,17 +420,6 @@ def completion {_ : MeasurableSpace α} (μ : Measure α) :
 
 instance completion.isComplete {_m : MeasurableSpace α} (μ : Measure α) : μ.completion.IsComplete :=
   ⟨fun _z hz => NullMeasurableSet.of_null hz⟩
-
-@[simp]
-theorem coe_completion {_ : MeasurableSpace α} (μ : Measure α) : ⇑μ.completion = μ :=
-  rfl
-
-theorem completion_apply {_ : MeasurableSpace α} (μ : Measure α) (s : Set α) :
-    μ.completion s = μ s :=
-  rfl
-
-@[simp]
-theorem ae_completion {_ : MeasurableSpace α} (μ : Measure α) : ae μ.completion = ae μ := rfl
 
 end Measure
 

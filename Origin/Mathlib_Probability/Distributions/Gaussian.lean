@@ -1,11 +1,13 @@
 /-
 Extracted from Probability/Distributions/Gaussian.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 14 | Infrastructure: 3
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 import Mathlib.Probability.Notation
 import Mathlib.MeasureTheory.Decomposition.Lebesgue
+
+noncomputable section
 
 /-!
 # Gaussian distributions over ℝ
@@ -40,7 +42,6 @@ namespace ProbabilityTheory
 section GaussianPDF
 
 noncomputable
-
 def gaussianPDFReal (μ : ℝ) (v : ℝ≥0) (x : ℝ) : ℝ :=
   (√(2 * π * v))⁻¹ * rexp (- (x - μ)^2 / (2 * v))
 
@@ -53,7 +54,9 @@ lemma gaussianPDFReal_zero_var (m : ℝ) : gaussianPDFReal m 0 = 0 := by
   ext1 x
   simp [gaussianPDFReal]
 
--- DISSOLVED: gaussianPDFReal_pos
+lemma gaussianPDFReal_pos (μ : ℝ) (v : ℝ≥0) (x : ℝ) (hv : v ≠ 0) : 0 < gaussianPDFReal μ v x := by
+  rw [gaussianPDFReal]
+  positivity
 
 lemma gaussianPDFReal_nonneg (μ : ℝ) (v : ℝ≥0) (x : ℝ) : 0 ≤ gaussianPDFReal μ v x := by
   rw [gaussianPDFReal]
@@ -87,9 +90,30 @@ lemma integrable_gaussianPDFReal (μ : ℝ) (v : ℝ≥0) :
     field_simp
   exact Integrable.comp_sub_right hg μ
 
--- DISSOLVED: lintegral_gaussianPDFReal_eq_one
+lemma lintegral_gaussianPDFReal_eq_one (μ : ℝ) {v : ℝ≥0} (h : v ≠ 0) :
+    ∫⁻ x, ENNReal.ofReal (gaussianPDFReal μ v x) = 1 := by
+  rw [← ENNReal.toReal_eq_one_iff]
+  have hfm : AEStronglyMeasurable (gaussianPDFReal μ v) volume :=
+    (stronglyMeasurable_gaussianPDFReal μ v).aestronglyMeasurable
+  have hf : 0 ≤ₐₛ gaussianPDFReal μ v := ae_of_all _ (gaussianPDFReal_nonneg μ v)
+  rw [← integral_eq_lintegral_of_nonneg_ae hf hfm]
+  simp only [gaussianPDFReal, zero_lt_two, mul_nonneg_iff_of_pos_right, one_div,
+    Nat.cast_ofNat, integral_mul_left]
+  rw [integral_sub_right_eq_self (μ := volume) (fun a ↦ rexp (-a ^ 2 / ((2 : ℝ) * v))) μ]
+  simp only [zero_lt_two, mul_nonneg_iff_of_pos_right, div_eq_inv_mul, mul_inv_rev,
+    mul_neg]
+  simp_rw [← neg_mul]
+  rw [neg_mul, integral_gaussian, ← Real.sqrt_inv, ← Real.sqrt_mul]
+  · field_simp
+    ring
+  · positivity
 
--- DISSOLVED: integral_gaussianPDFReal_eq_one
+lemma integral_gaussianPDFReal_eq_one (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) :
+    ∫ x, gaussianPDFReal μ v x = 1 := by
+  have h := lintegral_gaussianPDFReal_eq_one μ hv
+  rw [← ofReal_integral_eq_lintegral_ofReal (integrable_gaussianPDFReal _ _)
+    (ae_of_all _ (gaussianPDFReal_nonneg _ _)), ← ENNReal.ofReal_one] at h
+  rwa [← ENNReal.ofReal_eq_ofReal_iff (integral_nonneg (gaussianPDFReal_nonneg _ _)) zero_le_one]
 
 lemma gaussianPDFReal_sub {μ : ℝ} {v : ℝ≥0} (x y : ℝ) :
     gaussianPDFReal μ v (x - y) = gaussianPDFReal (μ + y) v x := by
@@ -100,12 +124,32 @@ lemma gaussianPDFReal_add {μ : ℝ} {v : ℝ≥0} (x y : ℝ) :
     gaussianPDFReal μ v (x + y) = gaussianPDFReal (μ - y) v x := by
   rw [sub_eq_add_neg, ← gaussianPDFReal_sub, sub_eq_add_neg, neg_neg]
 
--- DISSOLVED: gaussianPDFReal_inv_mul
+lemma gaussianPDFReal_inv_mul {μ : ℝ} {v : ℝ≥0} {c : ℝ} (hc : c ≠ 0) (x : ℝ) :
+    gaussianPDFReal μ v (c⁻¹ * x) = |c| * gaussianPDFReal (c * μ) (⟨c^2, sq_nonneg _⟩ * v) x := by
+  simp only [gaussianPDFReal.eq_1, zero_lt_two, mul_nonneg_iff_of_pos_left, NNReal.zero_le_coe,
+    Real.sqrt_mul', one_div, mul_inv_rev, NNReal.coe_mul, NNReal.coe_mk, NNReal.coe_pos]
+  rw [← mul_assoc]
+  refine congr_arg₂ _ ?_ ?_
+  · field_simp
+    rw [Real.sqrt_sq_eq_abs]
+    ring_nf
+    calc (Real.sqrt ↑v)⁻¹ * (Real.sqrt 2)⁻¹ * (Real.sqrt π)⁻¹
+      = (Real.sqrt ↑v)⁻¹ * (Real.sqrt 2)⁻¹ * (Real.sqrt π)⁻¹ * (|c| * |c|⁻¹) := by
+          rw [mul_inv_cancel₀, mul_one]
+          simp only [ne_eq, abs_eq_zero, hc, not_false_eq_true]
+    _ = (Real.sqrt ↑v)⁻¹ * (Real.sqrt 2)⁻¹ * (Real.sqrt π)⁻¹ * |c| * |c|⁻¹ := by ring
+  · congr 1
+    field_simp
+    congr 1
+    ring
 
--- DISSOLVED: gaussianPDFReal_mul
+lemma gaussianPDFReal_mul {μ : ℝ} {v : ℝ≥0} {c : ℝ} (hc : c ≠ 0) (x : ℝ) :
+    gaussianPDFReal μ v (c * x)
+      = |c⁻¹| * gaussianPDFReal (c⁻¹ * μ) (⟨(c^2)⁻¹, inv_nonneg.mpr (sq_nonneg _)⟩ * v) x := by
+  conv_lhs => rw [← inv_inv c, gaussianPDFReal_inv_mul (inv_ne_zero hc)]
+  simp
 
 noncomputable
-
 def gaussianPDF (μ : ℝ) (v : ℝ≥0) (x : ℝ) : ℝ≥0∞ := ENNReal.ofReal (gaussianPDFReal μ v x)
 
 lemma gaussianPDF_def (μ : ℝ) (v : ℝ≥0) :
@@ -116,24 +160,29 @@ lemma gaussianPDF_zero_var (μ : ℝ) : gaussianPDF μ 0 = 0 := by
   ext
   simp [gaussianPDF]
 
--- DISSOLVED: gaussianPDF_pos
+lemma gaussianPDF_pos (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) (x : ℝ) : 0 < gaussianPDF μ v x := by
+  rw [gaussianPDF, ENNReal.ofReal_pos]
+  exact gaussianPDFReal_pos _ _ _ hv
 
 @[measurability]
 lemma measurable_gaussianPDF (μ : ℝ) (v : ℝ≥0) : Measurable (gaussianPDF μ v) :=
   (measurable_gaussianPDFReal _ _).ennreal_ofReal
 
--- DISSOLVED: lintegral_gaussianPDF_eq_one
+@[simp]
+lemma lintegral_gaussianPDF_eq_one (μ : ℝ) {v : ℝ≥0} (h : v ≠ 0) :
+    ∫⁻ x, gaussianPDF μ v x = 1 :=
+  lintegral_gaussianPDFReal_eq_one μ h
 
 end GaussianPDF
 
 section GaussianReal
 
 noncomputable
-
 def gaussianReal (μ : ℝ) (v : ℝ≥0) : Measure ℝ :=
   if v = 0 then Measure.dirac μ else volume.withDensity (gaussianPDF μ v)
 
--- DISSOLVED: gaussianReal_of_var_ne_zero
+lemma gaussianReal_of_var_ne_zero (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) :
+    gaussianReal μ v = volume.withDensity (gaussianPDF μ v) := if_neg hv
 
 @[simp]
 lemma gaussianReal_zero_var (μ : ℝ) : gaussianReal μ 0 = Measure.dirac μ := if_pos rfl
@@ -142,13 +191,28 @@ instance instIsProbabilityMeasureGaussianReal (μ : ℝ) (v : ℝ≥0) :
     IsProbabilityMeasure (gaussianReal μ v) where
   measure_univ := by by_cases h : v = 0 <;> simp [gaussianReal_of_var_ne_zero, h]
 
--- DISSOLVED: gaussianReal_apply
+lemma gaussianReal_apply (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) (s : Set ℝ) :
+    gaussianReal μ v s = ∫⁻ x in s, gaussianPDF μ v x := by
+  rw [gaussianReal_of_var_ne_zero _ hv, withDensity_apply' _ s]
 
--- DISSOLVED: gaussianReal_apply_eq_integral
+lemma gaussianReal_apply_eq_integral (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) (s : Set ℝ) :
+    gaussianReal μ v s = ENNReal.ofReal (∫ x in s, gaussianPDFReal μ v x) := by
+  rw [gaussianReal_apply _ hv s, ofReal_integral_eq_lintegral_ofReal]
+  · rfl
+  · exact (integrable_gaussianPDFReal _ _).restrict
+  · exact ae_of_all _ (gaussianPDFReal_nonneg _ _)
 
--- DISSOLVED: gaussianReal_absolutelyContinuous
+lemma gaussianReal_absolutelyContinuous (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) :
+    gaussianReal μ v ≪ volume := by
+  rw [gaussianReal_of_var_ne_zero _ hv]
+  exact withDensity_absolutelyContinuous _ _
 
--- DISSOLVED: gaussianReal_absolutelyContinuous'
+lemma gaussianReal_absolutelyContinuous' (μ : ℝ) {v : ℝ≥0} (hv : v ≠ 0) :
+    volume ≪ gaussianReal μ v := by
+  rw [gaussianReal_of_var_ne_zero _ hv]
+  refine withDensity_absolutelyContinuous' ?_ ?_
+  · exact (measurable_gaussianPDF _ _).aemeasurable
+  · exact ae_of_all _ (fun _ ↦ (gaussianPDF_pos _ hv _).ne')
 
 lemma rnDeriv_gaussianReal (μ : ℝ) (v : ℝ≥0) :
     ∂(gaussianReal μ v)/∂volume =ₐₛ gaussianPDF μ v := by
@@ -163,9 +227,22 @@ section Transformations
 
 variable {μ : ℝ} {v : ℝ≥0}
 
--- DISSOLVED: _root_.MeasurableEmbedding.gaussianReal_comap_apply
+lemma _root_.MeasurableEmbedding.gaussianReal_comap_apply (hv : v ≠ 0)
+    {f : ℝ → ℝ} (hf : MeasurableEmbedding f)
+    {f' : ℝ → ℝ} (h_deriv : ∀ x, HasDerivAt f (f' x) x) {s : Set ℝ} (hs : MeasurableSet s) :
+    (gaussianReal μ v).comap f s
+      = ENNReal.ofReal (∫ x in s, |f' x| * gaussianPDFReal μ v (f x)) := by
+  rw [gaussianReal_of_var_ne_zero _ hv, gaussianPDF_def]
+  exact hf.withDensity_ofReal_comap_apply_eq_integral_abs_deriv_mul' hs h_deriv
+    (ae_of_all _ (gaussianPDFReal_nonneg _ _)) (integrable_gaussianPDFReal _ _)
 
--- DISSOLVED: _root_.MeasurableEquiv.gaussianReal_map_symm_apply
+lemma _root_.MeasurableEquiv.gaussianReal_map_symm_apply (hv : v ≠ 0) (f : ℝ ≃ᵐ ℝ) {f' : ℝ → ℝ}
+    (h_deriv : ∀ x, HasDerivAt f (f' x) x) {s : Set ℝ} (hs : MeasurableSet s) :
+    (gaussianReal μ v).map f.symm s
+      = ENNReal.ofReal (∫ x in s, |f' x| * gaussianPDFReal μ v (f x)) := by
+  rw [gaussianReal_of_var_ne_zero _ hv, gaussianPDF_def]
+  exact f.withDensity_ofReal_map_symm_apply_eq_integral_abs_deriv_mul' hs h_deriv
+    (ae_of_all _ (gaussianPDFReal_nonneg _ _)) (integrable_gaussianPDFReal _ _)
 
 lemma gaussianReal_map_add_const (y : ℝ) :
     (gaussianReal μ v).map (· + y) = gaussianReal (μ + y) v := by

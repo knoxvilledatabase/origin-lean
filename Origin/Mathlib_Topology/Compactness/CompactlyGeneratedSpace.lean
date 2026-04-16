@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.CompHaus.Basic
 import Mathlib.Topology.Compactification.OnePoint
 
+noncomputable section
+
 /-!
 # Compactly generated topological spaces
 
@@ -78,6 +80,11 @@ instance (X : Type v) [t : TopologicalSpace X] [DiscreteTopology X] :
     exact bot_le
 
 set_option linter.unusedVariables false in
+/-- Let `f : X → Y`. Suppose that to prove that `f` is continuous, it suffices to show that
+
+for every compact Hausdorff space `K` and every continuous map `g : K → X`, `f ∘ g` is continuous.
+
+Then `X` is compactly generated. -/
 
 lemma uCompactlyGeneratedSpace_of_continuous_maps [t : TopologicalSpace X]
     (h : ∀ {Y : Type w} [tY : TopologicalSpace Y] (f : X → Y),

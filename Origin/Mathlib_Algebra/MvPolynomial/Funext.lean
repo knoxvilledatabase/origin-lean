@@ -9,6 +9,8 @@ import Mathlib.Algebra.MvPolynomial.Polynomial
 import Mathlib.Algebra.MvPolynomial.Rename
 import Mathlib.RingTheory.Polynomial.Basic
 
+noncomputable section
+
 /-!
 ## Function extensionality for multivariate polynomials
 

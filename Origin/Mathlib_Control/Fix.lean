@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Upto
 import Mathlib.Data.Stream.Defs
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Fixed point
 

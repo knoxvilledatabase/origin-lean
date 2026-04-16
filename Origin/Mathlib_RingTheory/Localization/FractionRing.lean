@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/FractionRing.lean
-Genuine: 39 | Conflates: 2 | Dissolved: 3 | Infrastructure: 15
+Genuine: 40 | Conflates: 3 | Dissolved: 1 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Equiv
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Field.Rat
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.RingTheory.SimpleRing.Basic
+
+noncomputable section
 
 /-!
 # Fraction ring / fraction field Frac(R) as localization
@@ -87,11 +89,17 @@ theorem coe_inj {a b : R} : (Algebra.cast a : K) = Algebra.cast b ↔ a = b :=
 instance (priority := 100) [NoZeroDivisors K] : NoZeroSMulDivisors R K :=
   NoZeroSMulDivisors.of_algebraMap_injective <| IsFractionRing.injective R K
 
--- DISSOLVED: to_map_ne_zero_of_mem_nonZeroDivisors
+-- CONFLATES (assumes ground = zero): to_map_ne_zero_of_mem_nonZeroDivisors
+protected theorem to_map_ne_zero_of_mem_nonZeroDivisors [Nontrivial R] {x : R}
+    (hx : x ∈ nonZeroDivisors R) : algebraMap R K x ≠ 0 :=
+  IsLocalization.to_map_ne_zero_of_mem_nonZeroDivisors _ le_rfl hx
 
 variable (A) [IsDomain A]
 
 include A in
+/-- A `CommRing` `K` which is the localization of an integral domain `R` at `R - {0}` is an
+
+integral domain. -/
 
 protected theorem isDomain : IsDomain K :=
   isDomain_of_le_nonZeroDivisors _ (le_refl (nonZeroDivisors A))
@@ -104,7 +112,16 @@ protected noncomputable irreducible_def inv (z : K) : K := open scoped Classical
         mem_nonZeroDivisors_iff_ne_zero.2 fun h0 =>
           h <| eq_zero_of_fst_eq_zero (sec_spec (nonZeroDivisors A) z) h0⟩
 
--- DISSOLVED: mul_inv_cancel
+protected theorem mul_inv_cancel (x : K) (hx : x ≠ 0) : x * IsFractionRing.inv A x = 1 := by
+  rw [IsFractionRing.inv, dif_neg hx, ←
+    IsUnit.mul_left_inj
+      (map_units K
+        ⟨(sec _ x).1,
+          mem_nonZeroDivisors_iff_ne_zero.2 fun h0 =>
+            hx <| eq_zero_of_fst_eq_zero (sec_spec (nonZeroDivisors A) x) h0⟩),
+    one_mul, mul_assoc]
+  rw [mk'_spec, ← eq_mk'_iff_mul_eq]
+  exact (mk'_sec _ x).symm
 
 @[stacks 09FJ]
 noncomputable abbrev toField : Field K where
@@ -204,13 +221,6 @@ include hg
 noncomputable def liftAlgHom : K →ₐ[R] L :=
   IsLocalization.liftAlgHom fun y : nonZeroDivisors A => isUnit_map_of_injective hg y
 
-theorem liftAlgHom_toRingHom : (liftAlgHom hg : K →ₐ[R] L).toRingHom = lift hg := rfl
-
-@[simp]
-theorem coe_liftAlgHom : ⇑(liftAlgHom hg : K →ₐ[R] L) = lift hg := rfl
-
-theorem liftAlgHom_apply : liftAlgHom hg x = lift hg x := rfl
-
 end liftAlgHom
 
 @[simp]
@@ -254,10 +264,6 @@ lemma ringEquivOfRingEquiv_algebraMap
 
 alias fieldEquivOfRingEquiv_algebraMap := ringEquivOfRingEquiv_algebraMap
 
-@[simp]
-lemma ringEquivOfRingEquiv_symm :
-    (ringEquivOfRingEquiv h : K ≃+* L).symm = ringEquivOfRingEquiv h.symm := rfl
-
 end ringEquivOfRingEquiv
 
 section algEquivOfAlgEquiv
@@ -274,10 +280,6 @@ noncomputable def algEquivOfAlgEquiv : K ≃ₐ[R] L :=
 lemma algEquivOfAlgEquiv_algebraMap
     (a : A) : algEquivOfAlgEquiv h (algebraMap A K a) = algebraMap B L (h a) := by
   simp [algEquivOfAlgEquiv]
-
-@[simp]
-lemma algEquivOfAlgEquiv_symm :
-    (algEquivOfAlgEquiv h : K ≃ₐ[R] L).symm = algEquivOfAlgEquiv h.symm := rfl
 
 end algEquivOfAlgEquiv
 
@@ -341,11 +343,6 @@ noncomputable def fieldEquivOfAlgEquivHom : (B ≃ₐ[A] B) →* (L ≃ₐ[K] L)
   toFun := fieldEquivOfAlgEquiv K L L
   map_one' := fieldEquivOfAlgEquiv_refl A B K L
   map_mul' f g := fieldEquivOfAlgEquiv_trans K L L L g f
-
-@[simp]
-lemma fieldEquivOfAlgEquivHom_apply (f : B ≃ₐ[A] B) :
-    fieldEquivOfAlgEquivHom K L f = fieldEquivOfAlgEquiv K L L f :=
-  rfl
 
 variable (A B)
 

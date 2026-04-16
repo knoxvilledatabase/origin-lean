@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
 import Mathlib.Data.Complex.FiniteDimensional
 import Mathlib.NumberTheory.EulerProduct.Basic
 
+noncomputable section
+
 /-!
 # Logarithms of Euler Products
 

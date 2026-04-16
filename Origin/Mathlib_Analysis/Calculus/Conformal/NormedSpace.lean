@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/Conformal/NormedSpace.lean
-Genuine: 9 | Conflates: 1 | Dissolved: 4 | Infrastructure: 2
+Genuine: 13 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.ConformalLinearMap
 import Mathlib.Analysis.Calculus.FDeriv.Add
+
+noncomputable section
 
 /-!
 # Conformal Maps
@@ -54,7 +56,8 @@ def ConformalAt (f : X → Y) (x : X) :=
 theorem conformalAt_id (x : X) : ConformalAt _root_.id x :=
   ⟨id ℝ X, hasFDerivAt_id _, isConformalMap_id⟩
 
--- DISSOLVED: conformalAt_const_smul
+theorem conformalAt_const_smul {c : ℝ} (h : c ≠ 0) (x : X) : ConformalAt (fun x' : X => c • x') x :=
+  ⟨c • ContinuousLinearMap.id ℝ X, (hasFDerivAt_id x).const_smul c, isConformalMap_const_smul h⟩
 
 -- CONFLATES (assumes ground = zero): Subsingleton.conformalAt
 @[nontriviality]
@@ -89,7 +92,9 @@ theorem comp {f : X → Y} {g : Y → Z} (x : X) (hg : ConformalAt g (f x)) (hf 
   rcases hg with ⟨g', hg₁, cg⟩
   exact ⟨g'.comp f', hg₁.comp x hf₁, cg.comp cf⟩
 
--- DISSOLVED: const_smul
+theorem const_smul {f : X → Y} {x : X} {c : ℝ} (hc : c ≠ 0) (hf : ConformalAt f x) :
+    ConformalAt (c • f) x :=
+  (conformalAt_const_smul hc <| f x).comp x hf
 
 end ConformalAt
 
@@ -102,7 +107,8 @@ def Conformal (f : X → Y) :=
 
 theorem conformal_id : Conformal (id : X → X) := fun x => conformalAt_id x
 
--- DISSOLVED: conformal_const_smul
+theorem conformal_const_smul {c : ℝ} (h : c ≠ 0) : Conformal fun x : X => c • x := fun x =>
+  conformalAt_const_smul h x
 
 namespace Conformal
 
@@ -115,7 +121,8 @@ theorem differentiable {f : X → Y} (h : Conformal f) : Differentiable ℝ f :=
 theorem comp {f : X → Y} {g : Y → Z} (hf : Conformal f) (hg : Conformal g) : Conformal (g ∘ f) :=
   fun x => (hg <| f x).comp x (hf x)
 
--- DISSOLVED: const_smul
+theorem const_smul {f : X → Y} (hf : Conformal f) {c : ℝ} (hc : c ≠ 0) : Conformal (c • f) :=
+  fun x => (hf x).const_smul hc
 
 end Conformal
 

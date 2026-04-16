@@ -13,6 +13,8 @@ import Mathlib.Algebra.Star.Pi
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Matrix.Mul
 
+noncomputable section
+
 /-!
 # Matrices over star rings.
 
@@ -50,11 +52,6 @@ theorem diagonal_conjTranspose [AddMonoid α] [StarAddMonoid α] (v : n → α) 
 end Diagonal
 
 section Diag
-
-@[simp]
-theorem diag_conjTranspose [AddMonoid α] [StarAddMonoid α] (A : Matrix n n α) :
-    diag Aᴴ = star (diag A) :=
-  rfl
 
 end Diag
 
@@ -101,11 +98,6 @@ end NonUnitalSemiring
 section ConjTranspose
 
 open Matrix
-
-@[simp]
-theorem conjTranspose_apply [Star α] (M : Matrix m n α) (i j) :
-    M.conjTranspose j i = star (M i j) :=
-  rfl
 
 @[simp]
 theorem conjTranspose_conjTranspose [InvolutiveStar α] (M : Matrix m n α) : Mᴴᴴ = M :=
@@ -282,11 +274,6 @@ def conjTransposeAddEquiv [AddMonoid α] [StarAddMonoid α] : Matrix m n α ≃+
   right_inv := conjTranspose_conjTranspose
   map_add' := conjTranspose_add
 
-@[simp]
-theorem conjTransposeAddEquiv_symm [AddMonoid α] [StarAddMonoid α] :
-    (conjTransposeAddEquiv m n α).symm = conjTransposeAddEquiv n m α :=
-  rfl
-
 variable {m n α}
 
 theorem conjTranspose_list_sum [AddMonoid α] [StarAddMonoid α] (l : List (Matrix m n α)) :
@@ -307,12 +294,6 @@ variable (m n R α)
 def conjTransposeLinearEquiv [CommSemiring R] [StarRing R] [AddCommMonoid α] [StarAddMonoid α]
     [Module R α] [StarModule R α] : Matrix m n α ≃ₗ⋆[R] Matrix n m α :=
   { conjTransposeAddEquiv m n α with map_smul' := conjTranspose_smul }
-
-@[simp]
-theorem conjTransposeLinearEquiv_symm [CommSemiring R] [StarRing R] [AddCommMonoid α]
-    [StarAddMonoid α] [Module R α] [StarModule R α] :
-    (conjTransposeLinearEquiv m n R α).symm = conjTransposeLinearEquiv n m R α :=
-  rfl
 
 variable {m n R α}
 
@@ -344,13 +325,6 @@ section Star
 
 instance [Star α] : Star (Matrix n n α) where star := conjTranspose
 
-theorem star_eq_conjTranspose [Star α] (M : Matrix m m α) : star M = Mᴴ :=
-  rfl
-
-@[simp]
-theorem star_apply [Star α] (M : Matrix n n α) (i j) : (star M) i j = star (M j i) :=
-  rfl
-
 instance [InvolutiveStar α] : InvolutiveStar (Matrix n n α) where
   star_involutive := conjTranspose_conjTranspose
 
@@ -374,9 +348,5 @@ end Star
 theorem conjTranspose_submatrix [Star α] (A : Matrix m n α) (r_reindex : l → m)
     (c_reindex : o → n) : (A.submatrix r_reindex c_reindex)ᴴ = Aᴴ.submatrix c_reindex r_reindex :=
   ext fun _ _ => rfl
-
-theorem conjTranspose_reindex [Star α] (eₘ : m ≃ l) (eₙ : n ≃ o) (M : Matrix m n α) :
-    (reindex eₘ eₙ M)ᴴ = reindex eₙ eₘ Mᴴ :=
-  rfl
 
 end Matrix

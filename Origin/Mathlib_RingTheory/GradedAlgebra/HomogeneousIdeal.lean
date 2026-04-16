@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.Ideal.BigOperators
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-!
 # Homogeneous ideals of a graded algebra
 
@@ -96,10 +98,6 @@ theorem HomogeneousIdeal.ext' {I J : HomogeneousIdeal 𝒜} (h : ∀ i, ∀ x �
   apply forall_congr'
   exact fun i ↦ h i _ (decompose 𝒜 _ i).2
 
-@[simp]
-theorem HomogeneousIdeal.mem_iff {I : HomogeneousIdeal 𝒜} {x : A} : x ∈ I.toIdeal ↔ x ∈ I :=
-  Iff.rfl
-
 end HomogeneousDef
 
 section HomogeneousCore
@@ -130,10 +128,6 @@ variable [SetLike σ A] [AddSubmonoidClass σ A] (𝒜 : ι → σ)
 variable [DecidableEq ι] [AddMonoid ι] [GradedRing 𝒜]
 
 variable (I : Ideal A)
-
-theorem Ideal.isHomogeneous_iff_forall_subset :
-    I.IsHomogeneous 𝒜 ↔ ∀ i, (I : Set A) ⊆ GradedRing.proj 𝒜 i ⁻¹' I :=
-  Iff.rfl
 
 theorem Ideal.isHomogeneous_iff_subset_iInter :
     I.IsHomogeneous 𝒜 ↔ (I : Set A) ⊆ ⋂ i, GradedRing.proj 𝒜 i ⁻¹' ↑I :=
@@ -310,20 +304,8 @@ instance : InfSet (HomogeneousIdeal 𝒜) :=
   ⟨fun S => ⟨⨅ s ∈ S, toIdeal s, Ideal.IsHomogeneous.iInf₂ fun s _ => s.isHomogeneous⟩⟩
 
 @[simp]
-theorem coe_top : ((⊤ : HomogeneousIdeal 𝒜) : Set A) = univ :=
-  rfl
-
-@[simp]
-theorem coe_bot : ((⊥ : HomogeneousIdeal 𝒜) : Set A) = 0 :=
-  rfl
-
-@[simp]
 theorem coe_sup (I J : HomogeneousIdeal 𝒜) : ↑(I ⊔ J) = (I + J : Set A) :=
   Submodule.coe_sup _ _
-
-@[simp]
-theorem coe_inf (I J : HomogeneousIdeal 𝒜) : (↑(I ⊓ J) : Set A) = ↑I ∩ ↑J :=
-  rfl
 
 @[simp]
 theorem toIdeal_top : (⊤ : HomogeneousIdeal 𝒜).toIdeal = (⊤ : Ideal A) :=
@@ -382,10 +364,6 @@ instance completeLattice : CompleteLattice (HomogeneousIdeal 𝒜) :=
 instance : Add (HomogeneousIdeal 𝒜) :=
   ⟨(· ⊔ ·)⟩
 
-@[simp]
-theorem toIdeal_add (I J : HomogeneousIdeal 𝒜) : (I + J).toIdeal = I.toIdeal + J.toIdeal :=
-  rfl
-
 instance : Inhabited (HomogeneousIdeal 𝒜) where default := ⊥
 
 end HomogeneousIdeal
@@ -411,11 +389,6 @@ theorem Ideal.IsHomogeneous.mul {I J : Ideal A} (HI : I.IsHomogeneous 𝒜) (HJ 
 
 instance : Mul (HomogeneousIdeal 𝒜) where
   mul I J := ⟨I.toIdeal * J.toIdeal, I.isHomogeneous.mul J.isHomogeneous⟩
-
-@[simp]
-theorem HomogeneousIdeal.toIdeal_mul (I J : HomogeneousIdeal 𝒜) :
-    (I * J).toIdeal = I.toIdeal * J.toIdeal :=
-  rfl
 
 end CommSemiring
 
@@ -575,15 +548,5 @@ def HomogeneousIdeal.irrelevant : HomogeneousIdeal 𝒜 :=
     by_cases h : i = 0
     · rw [h, hr, decompose_zero, zero_apply, ZeroMemClass.coe_zero]
     · rw [decompose_of_mem_ne 𝒜 (SetLike.coe_mem _) h]⟩
-
-@[simp]
-theorem HomogeneousIdeal.mem_irrelevant_iff (a : A) :
-    a ∈ HomogeneousIdeal.irrelevant 𝒜 ↔ proj 𝒜 0 a = 0 :=
-  Iff.rfl
-
-@[simp]
-theorem HomogeneousIdeal.toIdeal_irrelevant :
-    (HomogeneousIdeal.irrelevant 𝒜).toIdeal = RingHom.ker (GradedRing.projZeroRingHom 𝒜) :=
-  rfl
 
 end IrrelevantIdeal

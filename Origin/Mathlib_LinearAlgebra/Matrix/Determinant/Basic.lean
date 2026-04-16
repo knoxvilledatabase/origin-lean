@@ -11,6 +11,8 @@ import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.GroupTheory.Perm.Fin
 import Mathlib.LinearAlgebra.Alternating.Basic
 
+noncomputable section
+
 /-!
 # Determinant of a matrix
 
@@ -154,10 +156,6 @@ def detMonoidHom : Matrix n n R →* R where
   toFun := det
   map_one' := det_one
   map_mul' := det_mul
-
-@[simp]
-theorem coe_detMonoidHom : (detMonoidHom : Matrix n n R → R) = det :=
-  rfl
 
 theorem det_mul_comm (M N : Matrix m m R) : det (M * N) = det (N * M) := by
   rw [det_mul, det_mul, mul_comm]

@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Nimber/Field.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Two
 import Mathlib.SetTheory.Nimber.Basic
 import Mathlib.Tactic.Abel
+
+noncomputable section
 
 /-!
 # Nimber multiplication
@@ -155,7 +157,9 @@ termination_by (a, b, c)
 protected theorem add_mul (a b c : Nimber) : (a + b) * c = a * c + b * c := by
   rw [Nimber.mul_comm, Nimber.mul_add, Nimber.mul_comm, Nimber.mul_comm b]
 
--- DISSOLVED: add_ne_zero_of_lt
+private theorem add_ne_zero_of_lt {a b : Nimber} (h : b < a) : a + b ≠ 0 := by
+  rw [add_ne_zero_iff]
+  exact h.ne'
 
 protected theorem mul_assoc (a b c : Nimber) : a * b * c = a * (b * c) := by
   apply le_antisymm <;> refine mul_le_of_forall_ne fun x hx y hy ↦ ?_

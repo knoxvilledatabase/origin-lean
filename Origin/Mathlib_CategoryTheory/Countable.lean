@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.EssentiallySmall
 import Mathlib.CategoryTheory.FinCategory.Basic
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 # Countable categories
 

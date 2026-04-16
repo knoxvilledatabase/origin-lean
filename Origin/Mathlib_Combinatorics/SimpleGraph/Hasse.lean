@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.SuccPred
 import Mathlib.Order.SuccPred.Relation
 import Mathlib.Tactic.FinCases
 
+noncomputable section
+
 /-!
 # The Hasse diagram as a graph
 
@@ -44,14 +46,6 @@ theorem hasse_adj : (hasse α).Adj a b ↔ a ⋖ b ∨ b ⋖ a :=
 
 def hasseDualIso : hasse αᵒᵈ ≃g hasse α :=
   { ofDual with map_rel_iff' := by simp [or_comm] }
-
-@[simp]
-theorem hasseDualIso_apply (a : αᵒᵈ) : hasseDualIso a = ofDual a :=
-  rfl
-
-@[simp]
-theorem hasseDualIso_symm_apply (a : α) : hasseDualIso.symm a = toDual a :=
-  rfl
 
 end Preorder
 

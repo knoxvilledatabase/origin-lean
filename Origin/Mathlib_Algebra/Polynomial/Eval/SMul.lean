@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Support
 import Mathlib.Algebra.Polynomial.Eval.Defs
 
+noncomputable section
+
 /-!
 # Evaluating polynomials and scalar multiplication
 

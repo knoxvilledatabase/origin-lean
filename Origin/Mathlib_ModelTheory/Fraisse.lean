@@ -8,6 +8,8 @@ import Mathlib.ModelTheory.PartialEquiv
 import Mathlib.ModelTheory.Bundled
 import Mathlib.Algebra.Order.Archimedean.Basic
 
+noncomputable section
+
 /-!
 # Fraïssé Classes and Fraïssé Limits
 

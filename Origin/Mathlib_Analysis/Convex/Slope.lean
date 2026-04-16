@@ -8,6 +8,8 @@ import Mathlib.Tactic.AdaptationNote
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # Slopes of convex functions
 

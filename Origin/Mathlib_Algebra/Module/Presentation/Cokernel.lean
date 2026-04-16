@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Module/Presentation/Cokernel.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Presentation.Basic
+
+noncomputable section
 
 /-!
 # Presentation of a cokernel
@@ -104,7 +106,6 @@ noncomputable def isPresentationCore :
     exact Relations.Solution.congr_var h g
 
 include hg₁ in
-
 lemma isPresentation : (pres₂.cokernelSolution data).IsPresentation :=
   (isPresentationCore pres₂ data hg₁).isPresentation
 

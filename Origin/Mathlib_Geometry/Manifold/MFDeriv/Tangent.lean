@@ -7,6 +7,8 @@ import Mathlib.Geometry.Manifold.MFDeriv.Atlas
 import Mathlib.Geometry.Manifold.MFDeriv.UniqueDifferential
 import Mathlib.Geometry.Manifold.VectorBundle.Tangent
 
+noncomputable section
+
 /-!
 # Derivatives of maps in the tangent bundle
 

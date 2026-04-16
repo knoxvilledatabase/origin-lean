@@ -9,6 +9,8 @@ import Mathlib.Tactic.CategoryTheory.Elementwise
 import Mathlib.CategoryTheory.Adhesive
 import Mathlib.CategoryTheory.Sites.ConcreteSheafification
 
+noncomputable section
+
 /-!
 
 # Subsheaf of types
@@ -303,10 +305,6 @@ def imagePresheaf (f : F' ⟶ F) : Subpresheaf F where
     rintro U V i _ ⟨x, rfl⟩
     have := elementwise_of% f.naturality
     exact ⟨_, this i x⟩
-
-@[simp]
-theorem top_subpresheaf_obj (U) : (⊤ : Subpresheaf F).obj U = ⊤ :=
-  rfl
 
 @[simp]
 theorem imagePresheaf_id : imagePresheaf (𝟙 F) = ⊤ := by

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/BigOperators/Group/Finset.lean
-Genuine: 68 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.BigOperators.Group.Multiset
 import Mathlib.Algebra.Order.Group.Nat
 import Mathlib.Data.Multiset.OrderedMonoid
 import Mathlib.Tactic.Bound.Attribute
+
+noncomputable section
 
 /-!
 # Big operators on a finset in ordered groups
@@ -305,7 +307,17 @@ theorem prod_le_prod_of_subset' (h : s ⊆ t) : ∏ x ∈ s, f x ≤ ∏ x ∈ t
 theorem prod_mono_set' (f : ι → M) : Monotone fun s ↦ ∏ x ∈ s, f x := fun _ _ hs ↦
   prod_le_prod_of_subset' hs
 
--- DISSOLVED: prod_le_prod_of_ne_one'
+@[to_additive sum_le_sum_of_ne_zero]
+theorem prod_le_prod_of_ne_one' (h : ∀ x ∈ s, f x ≠ 1 → x ∈ t) :
+    ∏ x ∈ s, f x ≤ ∏ x ∈ t, f x := by
+  classical calc
+    ∏ x ∈ s, f x = (∏ x ∈ s with f x = 1, f x) * ∏ x ∈ s with f x ≠ 1, f x := by
+      rw [← prod_union, filter_union_filter_neg_eq]
+      exact disjoint_filter.2 fun _ _ h n_h ↦ n_h h
+    _ ≤ ∏ x ∈ t, f x :=
+      mul_le_of_le_one_of_le
+        (prod_le_one' <| by simp only [mem_filter, and_imp]; exact fun _ _ ↦ le_of_eq)
+        (prod_le_prod_of_subset' <| by simpa only [subset_iff, mem_filter, and_imp] )
 
 end CanonicallyOrderedCommMonoid
 
@@ -406,7 +418,15 @@ theorem exists_le_of_prod_le' (hs : s.Nonempty) (Hle : ∏ i ∈ s, f i ≤ ∏ 
   contrapose! Hle with Hlt
   exact prod_lt_prod_of_nonempty' hs Hlt
 
--- DISSOLVED: exists_one_lt_of_prod_one_of_exists_ne_one'
+@[to_additive exists_pos_of_sum_zero_of_exists_nonzero]
+theorem exists_one_lt_of_prod_one_of_exists_ne_one' (f : ι → M) (h₁ : ∏ i ∈ s, f i = 1)
+    (h₂ : ∃ i ∈ s, f i ≠ 1) : ∃ i ∈ s, 1 < f i := by
+  contrapose! h₁
+  obtain ⟨i, m, i_ne⟩ : ∃ i ∈ s, f i ≠ 1 := h₂
+  apply ne_of_lt
+  calc
+    ∏ j ∈ s, f j < ∏ j ∈ s, 1 := prod_lt_prod' h₁ ⟨i, m, (h₁ i m).lt_of_ne i_ne⟩
+    _ = 1 := prod_const_one
 
 end LinearOrderedCancelCommMonoid
 

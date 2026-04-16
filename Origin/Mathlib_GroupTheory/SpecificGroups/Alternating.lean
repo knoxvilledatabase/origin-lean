@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.Subgroup.Simple
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Data.Fintype.Units
 
+noncomputable section
+
 /-!
 # Alternating Groups
 
@@ -55,9 +57,6 @@ instance [Subsingleton α] : Unique (alternatingGroup α) :=
   ⟨⟨1⟩, fun ⟨p, _⟩ => Subtype.eq (Subsingleton.elim p _)⟩
 
 variable {α}
-
-theorem alternatingGroup_eq_sign_ker : alternatingGroup α = sign.ker :=
-  rfl
 
 namespace Equiv.Perm
 

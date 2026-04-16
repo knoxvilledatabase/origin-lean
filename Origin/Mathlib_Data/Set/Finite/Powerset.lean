@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Set.Finite.Basic
 
+noncomputable section
+
 /-!
 # Finiteness of the powerset of a finite set
 

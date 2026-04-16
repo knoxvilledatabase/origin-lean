@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Bifunctor
 import Mathlib.Algebra.Homology.TotalComplexSymmetry
 
+noncomputable section
+
 /-!
 # Action of the flip of a bifunctor on homological complexes
 

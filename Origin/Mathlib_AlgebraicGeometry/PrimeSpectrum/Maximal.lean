@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 import Mathlib.RingTheory.MaximalSpectrum
 
+noncomputable section
+
 /-!
 # Maximal spectrum of a commutative ring
 

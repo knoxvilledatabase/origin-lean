@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.GaussSum
 
+noncomputable section
+
 /-!
 # Quadratic reciprocity.
 

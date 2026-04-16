@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.EpiMono
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # Equalizers and coequalizers
 
@@ -78,10 +80,6 @@ def WalkingParallelPairHom.comp :
   | _, _, _, left, id one => left
   | _, _, _, right, id one => right
 
-theorem WalkingParallelPairHom.id_comp
-    {X Y : WalkingParallelPair} (g : WalkingParallelPairHom X Y) : comp (id X) g = g :=
-  rfl
-
 theorem WalkingParallelPairHom.comp_id
     {X Y : WalkingParallelPair} (f : WalkingParallelPairHom X Y) : comp f (id Y) = f := by
   cases f <;> rfl
@@ -100,10 +98,6 @@ instance walkingParallelPairHomCategory : SmallCategory WalkingParallelPair wher
   assoc := assoc
 
 @[simp]
-theorem walkingParallelPairHom_id (X : WalkingParallelPair) : WalkingParallelPairHom.id X = 𝟙 X :=
-  rfl
-
-@[simp]
 theorem WalkingParallelPairHom.id.sizeOf_spec' (X : WalkingParallelPair) :
     (WalkingParallelPairHom._sizeOf_inst X X).sizeOf (𝟙 X) = 1 + sizeOf X := by cases X <;> rfl
 
@@ -113,57 +107,6 @@ def walkingParallelPairOp : WalkingParallelPair ⥤ WalkingParallelPairᵒᵖ wh
     cases f <;> apply Quiver.Hom.op
     exacts [left, right, WalkingParallelPairHom.id _]
   map_comp := by rintro _ _ _ (_|_|_) g <;> cases g <;> rfl
-
-@[simp]
-theorem walkingParallelPairOp_zero : walkingParallelPairOp.obj zero = op one := rfl
-
-@[simp]
-theorem walkingParallelPairOp_one : walkingParallelPairOp.obj one = op zero := rfl
-
-@[simp]
-theorem walkingParallelPairOp_left :
-    walkingParallelPairOp.map left = @Quiver.Hom.op _ _ zero one left := rfl
-
-@[simp]
-theorem walkingParallelPairOp_right :
-    walkingParallelPairOp.map right = @Quiver.Hom.op _ _ zero one right := rfl
-
-@[simps functor inverse]
-def walkingParallelPairOpEquiv : WalkingParallelPair ≌ WalkingParallelPairᵒᵖ where
-  functor := walkingParallelPairOp
-  inverse := walkingParallelPairOp.leftOp
-  unitIso :=
-    NatIso.ofComponents (fun j => eqToIso (by cases j <;> rfl))
-      (by rintro _ _ (_ | _ | _) <;> simp)
-  counitIso :=
-    NatIso.ofComponents (fun j => eqToIso (by
-            induction' j with X
-            cases X <;> rfl))
-      (fun {i} {j} f => by
-      induction' i with i
-      induction' j with j
-      let g := f.unop
-      have : f = g.op := rfl
-      rw [this]
-      cases i <;> cases j <;> cases g <;> rfl)
-  functor_unitIso_comp := fun j => by cases j <;> rfl
-
-@[simp]
-theorem walkingParallelPairOpEquiv_unitIso_zero :
-    walkingParallelPairOpEquiv.unitIso.app zero = Iso.refl zero := rfl
-
-@[simp]
-theorem walkingParallelPairOpEquiv_unitIso_one :
-    walkingParallelPairOpEquiv.unitIso.app one = Iso.refl one := rfl
-
-@[simp]
-theorem walkingParallelPairOpEquiv_counitIso_zero :
-    walkingParallelPairOpEquiv.counitIso.app (op zero) = Iso.refl (op zero) := rfl
-
-@[simp]
-theorem walkingParallelPairOpEquiv_counitIso_one :
-    walkingParallelPairOpEquiv.counitIso.app (op one) = Iso.refl (op one) :=
-  rfl
 
 variable {C : Type u} [Category.{v} C]
 
@@ -182,12 +125,6 @@ def parallelPair (f g : X ⟶ Y) : WalkingParallelPair ⥤ C where
   -- `sorry` can cope with this, but it's too slow:
   map_comp := by
     rintro _ _ _ ⟨⟩ g <;> cases g <;> {dsimp; simp}
-
-@[simp]
-theorem parallelPair_obj_zero (f g : X ⟶ Y) : (parallelPair f g).obj zero = X := rfl
-
-@[simp]
-theorem parallelPair_obj_one (f g : X ⟶ Y) : (parallelPair f g).obj one = Y := rfl
 
 @[simp]
 theorem parallelPair_map_left (f g : X ⟶ Y) : (parallelPair f g).map left = f := rfl
@@ -212,12 +149,6 @@ def parallelPairHom {X' Y' : C} (f g : X ⟶ Y) (f' g' : X' ⟶ Y') (p : X ⟶ X
     | one => q
   naturality := by
     rintro _ _ ⟨⟩ <;> {dsimp; simp [wf,wg]}
-
-@[simp]
-theorem parallelPairHom_app_zero {X' Y' : C} (f g : X ⟶ Y) (f' g' : X' ⟶ Y') (p : X ⟶ X')
-    (q : Y ⟶ Y') (wf : f ≫ q = p ≫ f') (wg : g ≫ q = p ≫ g') :
-    (parallelPairHom f g f' g' p q wf wg).app zero = p :=
-  rfl
 
 @[simp]
 theorem parallelPairHom_app_one {X' Y' : C} (f g : X ⟶ Y) (f' g' : X' ⟶ Y') (p : X ⟶ X')
@@ -251,16 +182,8 @@ variable {f g : X ⟶ Y}
 def Fork.ι (t : Fork f g) :=
   t.π.app zero
 
-@[simp]
-theorem Fork.app_zero_eq_ι (t : Fork f g) : t.π.app zero = t.ι :=
-  rfl
-
 def Cofork.π (t : Cofork f g) :=
   t.ι.app one
-
-@[simp]
-theorem Cofork.app_one_eq_π (t : Cofork f g) : t.ι.app one = t.π :=
-  rfl
 
 @[simp]
 theorem Fork.app_one_eq_ι_comp_left (s : Fork f g) : s.π.app one = s.ι ≫ f := by
@@ -456,14 +379,6 @@ def Cocone.ofCofork {F : WalkingParallelPair ⥤ C} (t : Cofork (F.map left) (F.
     { app := fun X => eqToHom (by aesop) ≫ t.ι.app X
       naturality := by rintro _ _ (_|_|_) <;> {dsimp; simp [t.condition]}}
 
-@[simp]
-theorem Cone.ofFork_π {F : WalkingParallelPair ⥤ C} (t : Fork (F.map left) (F.map right)) (j) :
-    (Cone.ofFork t).π.app j = t.π.app j ≫ eqToHom (by aesop) := rfl
-
-@[simp]
-theorem Cocone.ofCofork_ι {F : WalkingParallelPair ⥤ C} (t : Cofork (F.map left) (F.map right))
-    (j) : (Cocone.ofCofork t).ι.app j = eqToHom (by aesop) ≫ t.ι.app j := rfl
-
 def Fork.ofCone {F : WalkingParallelPair ⥤ C} (t : Cone F) : Fork (F.map left) (F.map right) where
   pt := t.pt
   π := { app := fun X => t.π.app X ≫ eqToHom (by aesop)
@@ -474,24 +389,6 @@ def Cofork.ofCocone {F : WalkingParallelPair ⥤ C} (t : Cocone F) :
   pt := t.pt
   ι := { app := fun X => eqToHom (by aesop) ≫ t.ι.app X
          naturality := by rintro _ _ (_|_|_) <;> {dsimp; simp}}
-
-@[simp]
-theorem Fork.ofCone_π {F : WalkingParallelPair ⥤ C} (t : Cone F) (j) :
-    (Fork.ofCone t).π.app j = t.π.app j ≫ eqToHom (by aesop) := rfl
-
-@[simp]
-theorem Cofork.ofCocone_ι {F : WalkingParallelPair ⥤ C} (t : Cocone F) (j) :
-    (Cofork.ofCocone t).ι.app j = eqToHom (by aesop) ≫ t.ι.app j := rfl
-
-@[simp]
-theorem Fork.ι_postcompose {f' g' : X ⟶ Y} {α : parallelPair f g ⟶ parallelPair f' g'}
-    {c : Fork f g} : Fork.ι ((Cones.postcompose α).obj c) = c.ι ≫ α.app _ :=
-  rfl
-
-@[simp]
-theorem Cofork.π_precompose {f' g' : X ⟶ Y} {α : parallelPair f g ⟶ parallelPair f' g'}
-    {c : Cofork f' g'} : Cofork.π ((Cocones.precompose α).obj c) = α.app _ ≫ c.π :=
-  rfl
 
 @[simps]
 def Fork.mkHom {s t : Fork f g} (k : s.pt ⟶ t.pt) (w : k ≫ t.ι = s.ι) : s ⟶ t where
@@ -566,14 +463,6 @@ noncomputable abbrev equalizer.ι : equalizer f g ⟶ X :=
 
 noncomputable abbrev equalizer.fork : Fork f g :=
   limit.cone (parallelPair f g)
-
-@[simp]
-theorem equalizer.fork_ι : (equalizer.fork f g).ι = equalizer.ι f g :=
-  rfl
-
-@[simp]
-theorem equalizer.fork_π_app_zero : (equalizer.fork f g).π.app zero = equalizer.ι f g :=
-  rfl
 
 @[reassoc]
 theorem equalizer.condition : equalizer.ι f g ≫ f = equalizer.ι f g ≫ g :=
@@ -665,10 +554,6 @@ noncomputable def equalizer.isoSourceOfSelf : equalizer f f ≅ X :=
   asIso (equalizer.ι f f)
 
 @[simp]
-theorem equalizer.isoSourceOfSelf_hom : (equalizer.isoSourceOfSelf f).hom = equalizer.ι f f :=
-  rfl
-
-@[simp]
 theorem equalizer.isoSourceOfSelf_inv :
     (equalizer.isoSourceOfSelf f).inv = equalizer.lift (𝟙 X) (by simp) := by
   ext
@@ -689,13 +574,6 @@ noncomputable abbrev coequalizer.π : Y ⟶ coequalizer f g :=
 
 noncomputable abbrev coequalizer.cofork : Cofork f g :=
   colimit.cocone (parallelPair f g)
-
-@[simp]
-theorem coequalizer.cofork_π : (coequalizer.cofork f g).π = coequalizer.π f g :=
-  rfl
-
-theorem coequalizer.cofork_ι_app_one : (coequalizer.cofork f g).ι.app one = coequalizer.π f g :=
-  rfl
 
 @[reassoc]
 theorem coequalizer.condition : f ≫ coequalizer.π f g = g ≫ coequalizer.π f g :=
@@ -801,10 +679,6 @@ theorem coequalizer.isoTargetOfSelf_hom :
   ext
   simp [coequalizer.isoTargetOfSelf]
 
-@[simp]
-theorem coequalizer.isoTargetOfSelf_inv : (coequalizer.isoTargetOfSelf f).inv = coequalizer.π f f :=
-  rfl
-
 section Comparison
 
 variable {D : Type u₂} [Category.{v₂} D] (G : C ⥤ D)
@@ -871,10 +745,6 @@ variable {C} [IsSplitMono f]
 noncomputable def coneOfIsSplitMono : Fork (𝟙 Y) (retraction f ≫ f) :=
   Fork.ofι f (by simp)
 
-@[simp]
-theorem coneOfIsSplitMono_ι : (coneOfIsSplitMono f).ι = f :=
-  rfl
-
 noncomputable def isSplitMonoEqualizes {X Y : C} (f : X ⟶ Y) [IsSplitMono f] :
     IsLimit (coneOfIsSplitMono f) :=
   Fork.IsLimit.mk' _ fun s =>
@@ -932,10 +802,6 @@ variable {C} [IsSplitEpi f]
 @[simps!]
 noncomputable def coconeOfIsSplitEpi : Cofork (𝟙 X) (f ≫ section_ f) :=
   Cofork.ofπ f (by simp)
-
-@[simp]
-theorem coconeOfIsSplitEpi_π : (coconeOfIsSplitEpi f).π = f :=
-  rfl
 
 noncomputable def isSplitEpiCoequalizes {X Y : C} (f : X ⟶ Y) [IsSplitEpi f] :
     IsColimit (coconeOfIsSplitEpi f) :=

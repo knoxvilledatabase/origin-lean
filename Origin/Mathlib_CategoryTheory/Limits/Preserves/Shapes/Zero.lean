@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms
 
+noncomputable section
+
 /-!
 # Preservation of zero objects and zero morphisms
 

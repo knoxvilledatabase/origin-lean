@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Category.Cat.AsSmall
 import Mathlib.CategoryTheory.Elements
 import Mathlib.CategoryTheory.Comma.Over
 
+noncomputable section
+
 /-!
 # The Grothendieck construction
 
@@ -168,9 +170,6 @@ def map (α : F ⟶ G) : Grothendieck F ⥤ Grothendieck G where
     simp only [Cat.eqToHom_app, Cat.comp_obj, eqToHom_trans, eqToHom_map, Category.assoc]
     erw [Functor.congr_hom (α.naturality g.base).symm f.fiber]
     simp
-
-theorem map_obj {α : F ⟶ G} (X : Grothendieck F) :
-    (Grothendieck.map α).obj X = ⟨X.base, (α.app X.base).obj X.fiber⟩ := rfl
 
 theorem map_map {α : F ⟶ G} {X Y : Grothendieck F} {f : X ⟶ Y} :
     (Grothendieck.map α).map f =

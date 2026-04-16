@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Order.Disjoint
 
+noncomputable section
+
 /-!
 
 # The order on `Prop`
@@ -30,28 +32,12 @@ instance Prop.instBoundedOrder : BoundedOrder Prop where
   bot := False
   bot_le := @False.elim
 
-@[simp]
-theorem Prop.bot_eq_false : (⊥ : Prop) = False :=
-  rfl
-
-@[simp]
-theorem Prop.top_eq_true : (⊤ : Prop) = True :=
-  rfl
-
 instance Prop.le_isTotal : IsTotal Prop (· ≤ ·) :=
   ⟨fun p q => by by_cases h : q <;> simp [h]⟩
 
 noncomputable instance Prop.linearOrder : LinearOrder Prop := by
   classical
   exact Lattice.toLinearOrder Prop
-
-@[simp]
-theorem sup_Prop_eq : (· ⊔ ·) = (· ∨ ·) :=
-  rfl
-
-@[simp]
-theorem inf_Prop_eq : (· ⊓ ·) = (· ∧ ·) :=
-  rfl
 
 namespace Pi
 

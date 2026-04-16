@@ -1,10 +1,12 @@
 /-
 Extracted from Data/PNat/Prime.lean
-Genuine: 46 | Conflates: 0 | Dissolved: 1 | Infrastructure: 8
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.PNat.Basic
+
+noncomputable section
 
 /-!
 # Primality and GCD on pnat
@@ -20,10 +22,6 @@ namespace Nat.Primes
 
 instance coePNat : Coe Nat.Primes ℕ+ :=
   ⟨toPNat⟩
-
-@[norm_cast]
-theorem coe_pnat_nat (p : Nat.Primes) : ((p : ℕ+) : ℕ) = p :=
-  rfl
 
 theorem coe_pnat_injective : Function.Injective ((↑) : Nat.Primes → ℕ+) := fun p q h =>
   Subtype.ext (by injection h)
@@ -49,10 +47,6 @@ def lcm (n m : ℕ+) : ℕ+ :=
 
 @[simp, norm_cast]
 theorem gcd_coe (n m : ℕ+) : (gcd n m : ℕ) = Nat.gcd n m :=
-  rfl
-
-@[simp, norm_cast]
-theorem lcm_coe (n m : ℕ+) : (lcm n m : ℕ) = Nat.lcm n m :=
   rfl
 
 theorem gcd_dvd_left (n m : ℕ+) : gcd n m ∣ n :=
@@ -116,7 +110,12 @@ theorem dvd_prime {p m : ℕ+} (pp : p.Prime) : m ∣ p ↔ m = 1 ∨ m = p := b
   rw [Nat.dvd_prime pp]
   simp
 
--- DISSOLVED: Prime.ne_one
+theorem Prime.ne_one {p : ℕ+} : p.Prime → p ≠ 1 := by
+  intro pp
+  intro contra
+  apply Nat.Prime.ne_one pp
+  rw [PNat.coe_eq_one_iff]
+  apply contra
 
 @[simp]
 theorem not_prime_one : ¬(1 : ℕ+).Prime :=

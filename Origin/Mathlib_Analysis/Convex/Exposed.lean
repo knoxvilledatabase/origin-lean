@@ -8,6 +8,8 @@ import Mathlib.Analysis.Convex.Function
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.Topology.Order.OrderClosed
 
+noncomputable section
+
 /-!
 # Exposed sets
 
@@ -169,10 +171,6 @@ def Set.exposedPoints (A : Set E) : Set E :=
   { x ∈ A | ∃ l : E →L[𝕜] 𝕜, ∀ y ∈ A, l y ≤ l x ∧ (l x ≤ l y → y = x) }
 
 variable {𝕜}
-
-theorem exposed_point_def :
-    x ∈ A.exposedPoints 𝕜 ↔ x ∈ A ∧ ∃ l : E →L[𝕜] 𝕜, ∀ y ∈ A, l y ≤ l x ∧ (l x ≤ l y → y = x) :=
-  Iff.rfl
 
 theorem exposedPoints_subset : A.exposedPoints 𝕜 ⊆ A := fun _ hx => hx.1
 

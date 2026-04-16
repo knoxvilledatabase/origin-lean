@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Topology.Algebra.GroupCompletion
 import Mathlib.Topology.MetricSpace.Completion
 
+noncomputable section
+
 /-!
 # Completion of a normed group
 

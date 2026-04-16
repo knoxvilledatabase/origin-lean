@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/ContinuedFractions/Translations.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Basic
 import Mathlib.Algebra.GroupWithZero.Basic
+
+noncomputable section
 
 /-!
 # Basic Translation Lemmas Between Functions Defined for Continued Fractions
@@ -27,8 +29,6 @@ us to access the numerators and denominators of a continued fraction.
 -/
 
 variable {α : Type*} {g : GenContFract α} {n : ℕ}
-
-theorem terminatedAt_iff_s_terminatedAt : g.TerminatedAt n ↔ g.s.TerminatedAt n := by rfl
 
 theorem terminatedAt_iff_s_none : g.TerminatedAt n ↔ g.s.get? n = none := by rfl
 
@@ -84,33 +84,11 @@ theorem den_eq_conts_b : g.dens n = (g.conts n).b :=
 theorem conv_eq_num_div_den : g.convs n = g.nums n / g.dens n :=
   rfl
 
-theorem conv_eq_conts_a_div_conts_b :
-    g.convs n = (g.conts n).a / (g.conts n).b :=
-  rfl
-
 theorem exists_conts_a_of_num {A : K} (nth_num_eq : g.nums n = A) :
     ∃ conts, g.conts n = conts ∧ conts.a = A := by simpa
 
 theorem exists_conts_b_of_den {B : K} (nth_denom_eq : g.dens n = B) :
     ∃ conts, g.conts n = conts ∧ conts.b = B := by simpa
-
--- DISSOLVED: zeroth_contAux_eq_one_zero
-
-@[simp]
-theorem first_contAux_eq_h_one : g.contsAux 1 = ⟨g.h, 1⟩ :=
-  rfl
-
-@[simp]
-theorem zeroth_cont_eq_h_one : g.conts 0 = ⟨g.h, 1⟩ :=
-  rfl
-
-@[simp]
-theorem zeroth_num_eq_h : g.nums 0 = g.h :=
-  rfl
-
-@[simp]
-theorem zeroth_den_eq_one : g.dens 0 = 1 :=
-  rfl
 
 @[simp]
 theorem zeroth_conv_eq_h : g.convs 0 = g.h := by
@@ -132,11 +110,6 @@ theorem first_num_eq {gp : Pair K} (zeroth_s_eq : g.s.get? 0 = some gp) :
 
 theorem first_den_eq {gp : Pair K} (zeroth_s_eq : g.s.get? 0 = some gp) :
     g.dens 1 = gp.b := by simp [den_eq_conts_b, first_cont_eq zeroth_s_eq]
-
-@[simp]
-theorem zeroth_conv'Aux_eq_zero {s : Stream'.Seq <| Pair K} :
-    convs'Aux s 0 = (0 : K) :=
-  rfl
 
 @[simp]
 theorem zeroth_conv'_eq_h : g.convs' 0 = g.h := by simp [convs']

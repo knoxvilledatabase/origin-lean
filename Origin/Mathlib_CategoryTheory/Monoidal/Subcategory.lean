@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 import Mathlib.CategoryTheory.Closed.Monoidal
 
+noncomputable section
+
 /-!
 # Full monoidal subcategories
 
@@ -67,16 +69,6 @@ instance fullSubcategoryInclusionMonoidal : (fullSubcategoryInclusion P).Monoida
 
 open Functor.LaxMonoidal Functor.OplaxMonoidal
 
-@[simp] lemma fullSubcategoryInclusion_ε : ε (fullSubcategoryInclusion P) = 𝟙 _ := rfl
-
-@[simp] lemma fullSubcategoryInclusion_η : ε (fullSubcategoryInclusion P) = 𝟙 _ := rfl
-
-@[simp] lemma fullSubcategoryInclusion_μ (X Y : FullSubcategory P) :
-    μ (fullSubcategoryInclusion P) X Y = 𝟙 _ := rfl
-
-@[simp] lemma fullSubcategoryInclusion_δ (X Y : FullSubcategory P) :
-    δ (fullSubcategoryInclusion P) X Y = 𝟙 _ := rfl
-
 section
 
 variable [Preadditive C]
@@ -99,16 +91,6 @@ instance  : (FullSubcategory.map h).Monoidal :=
   Functor.CoreMonoidal.toMonoidal
     { εIso := Iso.refl _
       μIso := fun _ _ ↦ Iso.refl _ }
-
-@[simp] lemma fullSubcategory_map_ε : ε (FullSubcategory.map h) = 𝟙 _ := rfl
-
-@[simp] lemma fullSubcategory_map_η : η (FullSubcategory.map h) = 𝟙 _ := rfl
-
-@[simp] lemma fullSubcategory_map_μ (X Y : FullSubcategory P) :
-    μ (FullSubcategory.map h) X Y = 𝟙 _ := rfl
-
-@[simp] lemma fullSubcategory_map_δ (X Y : FullSubcategory P) :
-    δ (FullSubcategory.map h) X Y = 𝟙 _ := rfl
 
 end
 
@@ -166,16 +148,6 @@ instance fullMonoidalClosedSubcategory : MonoidalClosed (FullSubcategory P) wher
             by simp [FullSubcategory.comp_def, FullSubcategory.id_def]
           right_triangle_components := fun Y ↦
             by simp [FullSubcategory.comp_def, FullSubcategory.id_def] } }
-
-@[simp]
-theorem fullMonoidalClosedSubcategory_ihom_obj (X Y : FullSubcategory P) :
-    ((ihom X).obj Y).obj = (ihom X.obj).obj Y.obj :=
-  rfl
-
-@[simp]
-theorem fullMonoidalClosedSubcategory_ihom_map (X : FullSubcategory P) {Y Z : FullSubcategory P}
-    (f : Y ⟶ Z) : (ihom X).map f = (ihom X.obj).map f :=
-  rfl
 
 end Closed
 

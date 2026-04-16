@@ -11,6 +11,8 @@ import Mathlib.Algebra.Order.Monoid.Prod
 import Mathlib.Algebra.Order.Pi
 import Mathlib.Tactic.GCongr.CoreAttrs
 
+noncomputable section
+
 /-!
 # Ordered scalar product
 

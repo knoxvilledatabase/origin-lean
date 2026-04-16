@@ -13,6 +13,8 @@ import Mathlib.Topology.Algebra.Algebra
 import Mathlib.Topology.ContinuousMap.Ideals
 import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
+noncomputable section
+
 /-!
 # Gelfand Duality
 
@@ -222,15 +224,3 @@ end WeakDual
 end Functoriality
 
 open CharacterSpace in
-
-theorem gelfandStarTransform_naturality {A B : Type*} [CommCStarAlgebra A] [CommCStarAlgebra B]
-    (φ : A →⋆ₐ[ℂ] B) :
-    (gelfandStarTransform B : _ →⋆ₐ[ℂ] _).comp φ =
-      (compContinuousMap φ |>.compStarAlgHom' ℂ ℂ).comp (gelfandStarTransform A : _ →⋆ₐ[ℂ] _) := by
-  rfl
-
-lemma WeakDual.CharacterSpace.homeoEval_naturality {X Y 𝕜 : Type*} [RCLike 𝕜] [TopologicalSpace X]
-    [CompactSpace X] [T2Space X] [TopologicalSpace Y] [CompactSpace Y] [T2Space Y] (f : C(X, Y)) :
-    (homeoEval Y 𝕜 : C(_, _)).comp f =
-      (f.compStarAlgHom' 𝕜 𝕜 |> compContinuousMap).comp (homeoEval X 𝕜 : C(_, _)) :=
-  rfl

@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.ENNReal.Basic
 import Mathlib.MeasureTheory.SetSemiring
 
+noncomputable section
+
 /-!
 # Additive Contents
 

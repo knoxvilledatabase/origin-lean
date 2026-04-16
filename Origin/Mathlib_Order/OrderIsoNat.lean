@@ -9,6 +9,8 @@ import Mathlib.Logic.Function.Iterate
 import Mathlib.Order.Hom.Basic
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Relation embeddings from the naturals
 
@@ -33,17 +35,9 @@ variable {r : α → α → Prop} [IsStrictOrder α r]
 def natLT (f : ℕ → α) (H : ∀ n : ℕ, r (f n) (f (n + 1))) : ((· < ·) : ℕ → ℕ → Prop) ↪r r :=
   ofMonotone f <| Nat.rel_of_forall_rel_succ_of_lt r H
 
-@[simp]
-theorem coe_natLT {f : ℕ → α} {H : ∀ n : ℕ, r (f n) (f (n + 1))} : ⇑(natLT f H) = f :=
-  rfl
-
 def natGT (f : ℕ → α) (H : ∀ n : ℕ, r (f (n + 1)) (f n)) : ((· > ·) : ℕ → ℕ → Prop) ↪r r :=
   haveI := IsStrictOrder.swap r
   RelEmbedding.swap (natLT f H)
-
-@[simp]
-theorem coe_natGT {f : ℕ → α} {H : ∀ n : ℕ, r (f (n + 1)) (f n)} : ⇑(natGT f H) = f :=
-  rfl
 
 theorem exists_not_acc_lt_of_not_acc {a : α} {r} (h : ¬Acc r a) : ∃ b, ¬Acc r b ∧ r b a := by
   contrapose! h
@@ -104,15 +98,6 @@ noncomputable def Subtype.orderIsoOfNat : ℕ ≃o s := by
       Nat.Subtype.ofNat_surjective
 
 variable {s}
-
-@[simp]
-theorem coe_orderEmbeddingOfSet [DecidablePred (· ∈ s)] :
-    ⇑(orderEmbeddingOfSet s) = (↑) ∘ Subtype.ofNat s :=
-  rfl
-
-theorem orderEmbeddingOfSet_apply [DecidablePred (· ∈ s)] {n : ℕ} :
-    orderEmbeddingOfSet s n = Subtype.ofNat s n :=
-  rfl
 
 @[simp]
 theorem Subtype.orderIsoOfNat_apply [dP : DecidablePred (· ∈ s)] {n : ℕ} :

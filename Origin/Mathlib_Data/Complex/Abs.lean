@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Complex/Abs.lean
-Genuine: 54 | Conflates: 0 | Dissolved: 4 | Infrastructure: 4
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Sqrt
+
+noncomputable section
 
 /-!
 # Absolute values of complex numbers
@@ -140,9 +142,14 @@ theorem re_le_abs (z : ℂ) : z.re ≤ Complex.abs z :=
 theorem im_le_abs (z : ℂ) : z.im ≤ Complex.abs z :=
   (abs_le.1 (abs_im_le_abs _)).2
 
--- DISSOLVED: abs_re_lt_abs
+@[simp]
+theorem abs_re_lt_abs {z : ℂ} : |z.re| < Complex.abs z ↔ z.im ≠ 0 := by
+  rw [Complex.abs, AbsoluteValue.coe_mk, MulHom.coe_mk, Real.lt_sqrt (abs_nonneg _), normSq_apply,
+    _root_.sq_abs, ← sq, lt_add_iff_pos_right, mul_self_pos]
 
--- DISSOLVED: abs_im_lt_abs
+@[simp]
+theorem abs_im_lt_abs {z : ℂ} : |z.im| < Complex.abs z ↔ z.re ≠ 0 := by
+  simpa using @abs_re_lt_abs (z * I)
 
 @[simp]
 lemma abs_re_eq_abs {z : ℂ} : |z.re| = abs z ↔ z.im = 0 :=
@@ -278,8 +285,10 @@ theorem lim_abs (f : CauSeq ℂ Complex.abs) : lim (cauSeqAbs f) = Complex.abs (
     let ⟨i, hi⟩ := equiv_lim f ε ε0
     ⟨i, fun j hj => lt_of_le_of_lt (Complex.abs.abs_abv_sub_le_abv_sub _ _) (hi j hj)⟩
 
--- DISSOLVED: ne_zero_of_one_lt_re
+lemma ne_zero_of_one_lt_re {s : ℂ} (hs : 1 < s.re) : s ≠ 0 :=
+  fun h ↦ ((zero_re ▸ h ▸ hs).trans zero_lt_one).false
 
--- DISSOLVED: re_neg_ne_zero_of_one_lt_re
+lemma re_neg_ne_zero_of_one_lt_re {s : ℂ} (hs : 1 < s.re) : (-s).re ≠ 0 :=
+  ne_iff_lt_or_gt.mpr <| Or.inl <| neg_re s ▸ by linarith
 
 end Complex

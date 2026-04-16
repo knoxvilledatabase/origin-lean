@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Category.Profinite.Basic
 
+noncomputable section
+
 /-!
 # Compact subsets of products as limits in `Profinite`
 
@@ -80,14 +82,12 @@ variable {C}
 open CategoryTheory Limits Opposite IndexFunctor
 
 noncomputable
-
 def indexFunctor (hC : IsCompact C) : (Finset ι)ᵒᵖ ⥤ Profinite.{u} where
   obj J := @Profinite.of (obj C (· ∈ (unop J))) _
     (by rw [← isCompact_iff_compactSpace]; exact hC.image (Pi.continuous_precomp' _)) _ _
   map h := map C (leOfHom h.unop)
 
 noncomputable
-
 def indexCone (hC : IsCompact C) : Cone (indexFunctor hC) where
   pt := @Profinite.of C _ (by rwa [← isCompact_iff_compactSpace]) _ _
   π := { app := fun J ↦ π_app C (· ∈ unop J) }
@@ -130,19 +130,16 @@ instance isIso_indexCone_lift :
         exact ⟨x, Set.mem_iInter.1 hx⟩)
 
 noncomputable
-
 def isoindexConeLift :
     @Profinite.of C _ (by rwa [← isCompact_iff_compactSpace]) _ _ ≅
     (Profinite.limitCone.{u, u} (indexFunctor hC)).pt :=
   asIso <| (Profinite.limitConeIsLimit.{u, u} _).lift (indexCone hC)
 
 noncomputable
-
 def asLimitindexConeIso : indexCone hC ≅ Profinite.limitCone.{u, u} _ :=
   Limits.Cones.ext (isoindexConeLift hC) fun _ => rfl
 
 noncomputable
-
 def indexCone_isLimit : CategoryTheory.Limits.IsLimit (indexCone hC) :=
   Limits.IsLimit.ofIsoLimit (Profinite.limitConeIsLimit _) (asLimitindexConeIso hC).symm
 

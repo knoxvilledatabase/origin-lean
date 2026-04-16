@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/CharP/Defs.lean
-Genuine: 40 | Conflates: 2 | Dissolved: 13 | Infrastructure: 8
+Genuine: 47 | Conflates: 5 | Dissolved: 3 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Data.Int.ModEq
@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Cast.Defs
 import Mathlib.Data.Nat.Find
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Tactic.NormNum.Basic
+
+noncomputable section
 
 /-!
 # Characteristic of semirings
@@ -92,9 +94,11 @@ lemma intCast_eq_intCast : (a : R) = b ↔ a ≡ b [ZMOD p] := by
 lemma intCast_eq_intCast_mod : (a : R) = a % (p : ℤ) :=
   (CharP.intCast_eq_intCast R p).mpr (Int.mod_modEq a p).symm
 
--- DISSOLVED: charP_to_charZero
+lemma charP_to_charZero [CharP R 0] : CharZero R :=
+  charZero_of_inj_zero fun n h0 => eq_zero_of_zero_dvd ((cast_eq_zero_iff R 0 n).mp h0)
 
--- DISSOLVED: charP_zero_iff_charZero
+lemma charP_zero_iff_charZero : CharP R 0 ↔ CharZero R :=
+  ⟨fun _ ↦ charP_to_charZero R, fun _ ↦ ofCharZero R⟩
 
 end AddGroupWithOne
 
@@ -171,7 +175,20 @@ lemma Nat.cast_ringChar : (ringChar R : R) = 0 := by rw [ringChar.spec]
 
 end ringChar
 
--- DISSOLVED: CharP.neg_one_ne_one
+lemma CharP.neg_one_ne_one [Ring R] (p : ℕ) [CharP R p] [Fact (2 < p)] : (-1 : R) ≠ (1 : R) := by
+  suffices (2 : R) ≠ 0 by
+    intro h
+    symm at h
+    rw [← sub_eq_zero, sub_neg_eq_add] at h
+    norm_num at h
+    exact this h
+    -- Porting note: this could probably be golfed
+  intro h
+  rw [show (2 : R) = (2 : ℕ) by norm_cast] at h
+  have := (CharP.cast_eq_zero_iff R p 2).mp h
+  have := Nat.le_of_dvd (by decide) this
+  rw [fact_iff] at *
+  omega
 
 namespace CharP
 
@@ -184,7 +201,8 @@ lemma cast_eq_mod (p : ℕ) [CharP R p] (k : ℕ) : (k : R) = (k % p : ℕ) :=
     (k : R) = ↑(k % p + p * (k / p)) := by rw [Nat.mod_add_div]
     _ = ↑(k % p) := by simp [cast_eq_zero]
 
--- DISSOLVED: ringChar_zero_iff_CharZero
+lemma ringChar_zero_iff_CharZero : ringChar R = 0 ↔ CharZero R := by
+  rw [ringChar.eq_iff, charP_zero_iff_charZero]
 
 end
 
@@ -192,7 +210,10 @@ section Semiring
 
 variable [NonAssocSemiring R]
 
--- DISSOLVED: char_ne_one
+-- CONFLATES (assumes ground = zero): char_ne_one
+lemma char_ne_one [Nontrivial R] (p : ℕ) [hc : CharP R p] : p ≠ 1 := fun hp : p = 1 =>
+  have : (1 : R) = 0 := by simpa using (cast_eq_zero_iff R p 1).mpr (hp ▸ dvd_refl p)
+  absurd this one_ne_zero
 
 section NoZeroDivisors
 
@@ -226,7 +247,8 @@ lemma char_is_prime_or_zero (p : ℕ) [hc : CharP R p] : Nat.Prime p ∨ p = 0 :
   | 1, hc => absurd (Eq.refl (1 : ℕ)) (@char_ne_one R _ _ (1 : ℕ) hc)
   | m + 2, hc => Or.inl (@char_is_prime_of_two_le R _ _ (m + 2) hc (Nat.le_add_left 2 m))
 
--- DISSOLVED: char_prime_of_ne_zero
+lemma char_prime_of_ne_zero {p : ℕ} [CharP R p] (hp : p ≠ 0) : p.Prime :=
+  (CharP.char_is_prime_or_zero R p).resolve_right hp
 
 -- CONFLATES (assumes ground = zero): exists'
 lemma exists' (R : Type*) [NonAssocRing R] [NoZeroDivisors R] [Nontrivial R] :
@@ -262,9 +284,17 @@ lemma false_of_nontrivial_of_char_one [Nontrivial R] [CharP R 1] : False := by
   have : Subsingleton R := CharOne.subsingleton
   exact false_of_nontrivial_of_subsingleton R
 
--- DISSOLVED: ringChar_ne_one
+-- CONFLATES (assumes ground = zero): ringChar_ne_one
+lemma ringChar_ne_one [Nontrivial R] : ringChar R ≠ 1 := by
+  intro h
+  apply zero_ne_one' R
+  symm
+  rw [← Nat.cast_one, ringChar.spec, h]
 
--- DISSOLVED: nontrivial_of_char_ne_one
+-- CONFLATES (assumes ground = zero): nontrivial_of_char_ne_one
+lemma nontrivial_of_char_ne_one {v : ℕ} (hv : v ≠ 1) [hr : CharP R v] : Nontrivial R :=
+  ⟨⟨(1 : ℕ), 0, fun h =>
+      hv <| by rwa [CharP.cast_eq_zero_iff _ v, Nat.dvd_one] at h⟩⟩
 
 end NonAssocSemiring
 
@@ -304,7 +334,10 @@ instance expChar_prime (p) [CharP R p] [Fact p.Prime] : ExpChar R p := ExpChar.p
 
 instance expChar_one [CharZero R] : ExpChar R 1 := ExpChar.zero
 
--- DISSOLVED: expChar_ne_zero
+lemma expChar_ne_zero (p : ℕ) [hR : ExpChar R p] : p ≠ 0 := by
+  cases hR
+  · exact one_ne_zero
+  · exact ‹p.Prime›.ne_zero
 
 variable {R} in
 
@@ -368,7 +401,10 @@ lemma char_zero_of_expChar_one (p : ℕ) [hp : CharP R p] [hq : ExpChar R 1] : p
   · exact CharP.eq R hp inferInstance
   · exact False.elim (CharP.char_ne_one R 1 rfl)
 
--- DISSOLVED: charZero_of_expChar_one'
+lemma charZero_of_expChar_one' [hq : ExpChar R 1] : CharZero R := by
+  cases hq
+  · assumption
+  · exact False.elim (CharP.char_ne_one R 1 rfl)
 
 lemma expChar_one_iff_char_zero (p q : ℕ) [CharP R p] [ExpChar R q] : q = 1 ↔ p = 0 := by
   constructor

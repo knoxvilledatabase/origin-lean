@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Operator.Banach
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Topology.PartialHomeomorph
 
+noncomputable section
+
 /-!
 # Non-linear maps close to affine maps
 
@@ -372,18 +374,6 @@ def toPartialHomeomorph (hf : ApproximatesLinearOn f (f' : E →L[𝕜] F) s c)
     rwa [f'.toEquiv.subsingleton_congr] at hc
   continuousOn_toFun := hf.continuousOn
   continuousOn_invFun := hf.inverse_continuousOn hc
-
-@[simp]
-theorem toPartialHomeomorph_coe (hf : ApproximatesLinearOn f (f' : E →L[𝕜] F) s c)
-    (hc : Subsingleton E ∨ c < N⁻¹) (hs : IsOpen s) :
-    (hf.toPartialHomeomorph f s hc hs : E → F) = f :=
-  rfl
-
-@[simp]
-theorem toPartialHomeomorph_source (hf : ApproximatesLinearOn f (f' : E →L[𝕜] F) s c)
-    (hc : Subsingleton E ∨ c < N⁻¹) (hs : IsOpen s) :
-    (hf.toPartialHomeomorph f s hc hs).source = s :=
-  rfl
 
 @[simp]
 theorem toPartialHomeomorph_target (hf : ApproximatesLinearOn f (f' : E →L[𝕜] F) s c)

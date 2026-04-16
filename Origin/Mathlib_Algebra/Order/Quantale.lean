@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 import Mathlib.Order.CompleteLattice
 
+noncomputable section
+
 /-!
 # Theory of quantales
 

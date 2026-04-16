@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Basic
 import Mathlib.LinearAlgebra.AffineSpace.AffineEquiv
 
+noncomputable section
+
 /-!
 # Midpoint of a segment
 
@@ -222,11 +224,5 @@ def ofMapMidpoint (f : E → F) (h0 : f 0 = 0)
         (midpoint_add_self _ _ _).symm
       _ = f (midpoint R x y) + f (midpoint R x y) := by rw [← hm, midpoint_zero_add]
       _ = f x + f y := by rw [hm, midpoint_add_self]
-
-@[simp]
-theorem coe_ofMapMidpoint (f : E → F) (h0 : f 0 = 0)
-    (hm : ∀ x y, f (midpoint R x y) = midpoint R' (f x) (f y)) :
-    ⇑(ofMapMidpoint R R' f h0 hm) = f :=
-  rfl
 
 end AddMonoidHom

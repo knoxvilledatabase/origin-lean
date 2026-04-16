@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/Choose/Central.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.GCD.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
+
+noncomputable section
 
 /-!
 # Central binomial coefficients
@@ -35,7 +37,8 @@ theorem centralBinom_eq_two_mul_choose (n : ℕ) : centralBinom n = (2 * n).choo
 theorem centralBinom_pos (n : ℕ) : 0 < centralBinom n :=
   choose_pos (Nat.le_mul_of_pos_left _ zero_lt_two)
 
--- DISSOLVED: centralBinom_ne_zero
+theorem centralBinom_ne_zero (n : ℕ) : centralBinom n ≠ 0 :=
+  (centralBinom_pos n).ne'
 
 @[simp]
 theorem centralBinom_zero : centralBinom 0 = 1 :=

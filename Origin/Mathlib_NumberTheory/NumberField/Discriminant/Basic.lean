@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Discriminant/Basic.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ZLattice.Covolume
@@ -8,6 +8,8 @@ import Mathlib.Data.Real.Pi.Bounds
 import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.ConvexBody
 import Mathlib.Tactic.Rify
 import Mathlib.NumberTheory.NumberField.Discriminant.Defs
+
+noncomputable section
 
 /-!
 # Number field discriminant
@@ -89,9 +91,63 @@ theorem _root_.NumberField.mixedEmbedding.covolume_idealLattice (I : (Fractional
     ENNReal.coe_toReal, Real.coe_sqrt, coe_nnnorm, Int.norm_eq_abs,
     ENNReal.toReal_ofReal (Rat.cast_nonneg.mpr (FractionalIdeal.absNorm_nonneg I.val)), mul_assoc]
 
--- DISSOLVED: exists_ne_zero_mem_ideal_of_norm_le_mul_sqrt_discr
+theorem exists_ne_zero_mem_ideal_of_norm_le_mul_sqrt_discr (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
+    ∃ a ∈ (I : FractionalIdeal (𝓞 K)⁰ K), a ≠ 0 ∧
+      |Algebra.norm ℚ (a : K)| ≤ FractionalIdeal.absNorm I.1 * (4 / π) ^ nrComplexPlaces K *
+        (finrank ℚ K).factorial / (finrank ℚ K) ^ (finrank ℚ K) * Real.sqrt |discr K| := by
+  -- The smallest possible value for `exists_ne_zero_mem_ideal_of_norm_le`
+  let B := (minkowskiBound K I * (convexBodySumFactor K)⁻¹).toReal ^ (1 / (finrank ℚ K : ℝ))
+  have h_le : (minkowskiBound K I) ≤ volume (convexBodySum K B) := by
+    refine le_of_eq ?_
+    rw [convexBodySum_volume, ← ENNReal.ofReal_pow (by positivity), ← Real.rpow_natCast,
+      ← Real.rpow_mul toReal_nonneg, div_mul_cancel₀, Real.rpow_one, ofReal_toReal, mul_comm,
+      mul_assoc, ← coe_mul, inv_mul_cancel₀ (convexBodySumFactor_ne_zero K), ENNReal.coe_one,
+      mul_one]
+    · exact mul_ne_top (ne_of_lt (minkowskiBound_lt_top K I)) coe_ne_top
+    · exact (Nat.cast_ne_zero.mpr (ne_of_gt finrank_pos))
+  convert exists_ne_zero_mem_ideal_of_norm_le K I h_le
+  rw [div_pow B, ← Real.rpow_natCast B, ← Real.rpow_mul (by positivity), div_mul_cancel₀ _
+    (Nat.cast_ne_zero.mpr <| ne_of_gt finrank_pos), Real.rpow_one, mul_comm_div, mul_div_assoc']
+  congr 1
+  rw [eq_comm]
+  calc
+    _ = FractionalIdeal.absNorm I.1 * (2 : ℝ)⁻¹ ^ nrComplexPlaces K * sqrt ‖discr K‖₊ *
+          (2 : ℝ) ^ finrank ℚ K * ((2 : ℝ) ^ nrRealPlaces K * (π / 2) ^ nrComplexPlaces K /
+            (Nat.factorial (finrank ℚ K)))⁻¹ := by
+      simp_rw [minkowskiBound, convexBodySumFactor,
+        volume_fundamentalDomain_fractionalIdealLatticeBasis,
+        volume_fundamentalDomain_latticeBasis, toReal_mul, toReal_pow, toReal_inv, coe_toReal,
+        toReal_ofNat, mixedEmbedding.finrank, mul_assoc]
+      rw [ENNReal.toReal_ofReal (Rat.cast_nonneg.mpr (FractionalIdeal.absNorm_nonneg I.1))]
+      simp_rw [NNReal.coe_inv, NNReal.coe_div, NNReal.coe_mul, NNReal.coe_pow, NNReal.coe_div,
+        coe_real_pi, NNReal.coe_ofNat, NNReal.coe_natCast]
+    _ = FractionalIdeal.absNorm I.1 * (2 : ℝ) ^ (finrank ℚ K - nrComplexPlaces K - nrRealPlaces K +
+          nrComplexPlaces K : ℤ) * Real.sqrt ‖discr K‖ * Nat.factorial (finrank ℚ K) *
+            π⁻¹ ^ (nrComplexPlaces K) := by
+      simp_rw [inv_div, div_eq_mul_inv, mul_inv, ← zpow_neg_one, ← zpow_natCast, mul_zpow,
+        ← zpow_mul, neg_one_mul, mul_neg_one, neg_neg, Real.coe_sqrt, coe_nnnorm, sub_eq_add_neg,
+        zpow_add₀ (two_ne_zero : (2 : ℝ) ≠ 0)]
+      ring
+    _ = FractionalIdeal.absNorm I.1 * (2 : ℝ) ^ (2 * nrComplexPlaces K : ℤ) * Real.sqrt ‖discr K‖ *
+          Nat.factorial (finrank ℚ K) * π⁻¹ ^ (nrComplexPlaces K) := by
+      congr
+      rw [← card_add_two_mul_card_eq_rank, Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
+      ring
+    _ = FractionalIdeal.absNorm I.1 * (4 / π) ^ nrComplexPlaces K * (finrank ℚ K).factorial *
+          Real.sqrt |discr K| := by
+      rw [Int.norm_eq_abs, zpow_mul, show (2 : ℝ) ^ (2 : ℤ) = 4 by norm_cast, div_pow,
+        inv_eq_one_div, div_pow, one_pow, zpow_natCast]
+      ring
 
--- DISSOLVED: exists_ne_zero_mem_ringOfIntegers_of_norm_le_mul_sqrt_discr
+theorem exists_ne_zero_mem_ringOfIntegers_of_norm_le_mul_sqrt_discr :
+    ∃ (a : 𝓞 K), a ≠ 0 ∧
+      |Algebra.norm ℚ (a : K)| ≤ (4 / π) ^ nrComplexPlaces K *
+        (finrank ℚ K).factorial / (finrank ℚ K) ^ (finrank ℚ K) * Real.sqrt |discr K| := by
+  obtain ⟨_, h_mem, h_nz, h_nm⟩ := exists_ne_zero_mem_ideal_of_norm_le_mul_sqrt_discr K ↑1
+  obtain ⟨a, rfl⟩ := (FractionalIdeal.mem_one_iff _).mp h_mem
+  refine ⟨a, ne_zero_of_map h_nz, ?_⟩
+  simp_rw [Units.val_one, FractionalIdeal.absNorm_one, Rat.cast_one, one_mul] at h_nm
+  exact h_nm
 
 variable {K}
 
@@ -197,6 +253,7 @@ noncomputable abbrev boundOfDiscBdd : ℝ≥0 := sqrt N * (2 : ℝ≥0) ^ rankOf
 variable {N} (hK : |discr K| ≤ N)
 
 include hK in
+/-- If `|discr K| ≤ N` then the degree of `K` is at most `rankOfDiscrBdd`. -/
 
 theorem rank_le_rankOfDiscrBdd :
     finrank ℚ K ≤ rankOfDiscrBdd N := by
@@ -224,6 +281,7 @@ theorem rank_le_rankOfDiscrBdd :
   · exact le_max_of_le_left h
 
 include hK in
+/-- If `|discr K| ≤ N` then the Minkowski bound of `K` is less than `boundOfDiscrBdd`. -/
 
 theorem minkowskiBound_lt_boundOfDiscBdd : minkowskiBound K ↑1 < boundOfDiscBdd N := by
   have : boundOfDiscBdd N - 1 < boundOfDiscBdd N := by
@@ -241,7 +299,6 @@ theorem minkowskiBound_lt_boundOfDiscBdd : minkowskiBound K ↑1 < boundOfDiscBd
   · exact rank_le_rankOfDiscrBdd hK
 
 include hK in
-
 theorem natDegree_le_rankOfDiscrBdd (a : 𝓞 K) (h : ℚ⟮(a : K)⟯ = ⊤) :
     natDegree (minpoly ℤ (a : K)) ≤ rankOfDiscrBdd N := by
   rw [Field.primitive_element_iff_minpoly_natDegree_eq,

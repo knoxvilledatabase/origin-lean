@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.OrderIso
 import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 
+noncomputable section
+
 /-!
 # Distributivity of group operations over supremum/infimum
 -/

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 import Mathlib.CategoryTheory.ConcreteCategory.Elementwise
 import Mathlib.GroupTheory.QuotientGroup.Defs
 
+noncomputable section
+
 /-!
 # The category of additive commutative groups has all colimits.
 

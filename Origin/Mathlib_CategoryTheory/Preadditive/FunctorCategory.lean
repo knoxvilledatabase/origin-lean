@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.Basic
 
+noncomputable section
+
 /-!
 # Preadditive structure on functor categories
 
@@ -82,22 +84,6 @@ def appHom (X : C) : (F ⟶ G) →+ (F.obj X ⟶ G.obj X) where
   toFun α := α.app X
   map_zero' := rfl
   map_add' _ _ := rfl
-
-@[simp]
-theorem app_zero (X : C) : (0 : F ⟶ G).app X = 0 :=
-  rfl
-
-@[simp]
-theorem app_add (X : C) (α β : F ⟶ G) : (α + β).app X = α.app X + β.app X :=
-  rfl
-
-@[simp]
-theorem app_sub (X : C) (α β : F ⟶ G) : (α - β).app X = α.app X - β.app X :=
-  rfl
-
-@[simp]
-theorem app_neg (X : C) (α : F ⟶ G) : (-α).app X = -α.app X :=
-  rfl
 
 @[simp]
 theorem app_nsmul (X : C) (α : F ⟶ G) (n : ℕ) : (n • α).app X = n • α.app X :=

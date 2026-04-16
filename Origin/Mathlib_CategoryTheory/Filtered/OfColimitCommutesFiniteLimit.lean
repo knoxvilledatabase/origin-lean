@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Filtered
 import Mathlib.CategoryTheory.Limits.Yoneda
 
+noncomputable section
+
 /-!
 # If colimits of shape `K` commute with finite limits, then `K` is filtered.
 -/

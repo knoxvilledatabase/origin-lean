@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Basic
 import Mathlib.Tactic.Contrapose
 import Mathlib.Order.Bounds.Defs
 
+noncomputable section
+
 /-!
 # Cofinal sets
 

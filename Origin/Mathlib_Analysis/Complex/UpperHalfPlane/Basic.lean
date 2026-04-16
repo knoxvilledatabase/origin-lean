@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Complex/UpperHalfPlane/Basic.lean
-Genuine: 43 | Conflates: 0 | Dissolved: 7 | Infrastructure: 31
+Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Data.Fintype.Parity
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
+
+noncomputable section
 
 /-!
 # The upper half plane and its automorphisms
@@ -27,6 +29,8 @@ open scoped MatrixGroups
 
 def UpperHalfPlane :=
   { point : ℂ // 0 < point.im }
+
+@[inherit_doc] scoped[UpperHalfPlane] notation "ℍ" => UpperHalfPlane
 
 open UpperHalfPlane
 
@@ -75,24 +79,7 @@ theorem coe_re (z : ℍ) : (z : ℂ).re = z.re :=
   rfl
 
 @[simp]
-theorem mk_re (z : ℂ) (h : 0 < z.im) : (mk z h).re = z.re :=
-  rfl
-
-@[simp]
-theorem mk_im (z : ℂ) (h : 0 < z.im) : (mk z h).im = z.im :=
-  rfl
-
-@[simp]
 theorem coe_mk (z : ℂ) (h : 0 < z.im) : (mk z h : ℂ) = z :=
-  rfl
-
-@[simp]
-lemma coe_mk_subtype {z : ℂ} (hz : 0 < z.im) :
-    UpperHalfPlane.coe ⟨z, hz⟩ = z := by
-  rfl
-
-@[simp]
-theorem mk_coe (z : ℍ) (h : 0 < (z : ℂ).im := z.2) : mk z h = z :=
   rfl
 
 theorem re_add_im (z : ℍ) : (z.re + z.im * Complex.I : ℂ) = z :=
@@ -101,20 +88,13 @@ theorem re_add_im (z : ℍ) : (z.re + z.im * Complex.I : ℂ) = z :=
 theorem im_pos (z : ℍ) : 0 < z.im :=
   z.2
 
--- DISSOLVED: im_ne_zero
+theorem im_ne_zero (z : ℍ) : z.im ≠ 0 :=
+  z.im_pos.ne'
 
--- DISSOLVED: ne_zero
+theorem ne_zero (z : ℍ) : (z : ℂ) ≠ 0 :=
+  mt (congr_arg Complex.im) z.im_ne_zero
 
 def I : ℍ := ⟨Complex.I, by simp⟩
-
-@[simp]
-lemma I_im : I.im = 1 := rfl
-
-@[simp]
-lemma I_re : I.re = 0 := rfl
-
-@[simp, norm_cast]
-lemma coe_I : I = Complex.I := rfl
 
 end UpperHalfPlane
 
@@ -145,7 +125,8 @@ namespace UpperHalfPlane
 theorem normSq_pos (z : ℍ) : 0 < Complex.normSq (z : ℂ) := by
   rw [Complex.normSq_pos]; exact z.ne_zero
 
--- DISSOLVED: normSq_ne_zero
+theorem normSq_ne_zero (z : ℍ) : Complex.normSq (z : ℂ) ≠ 0 :=
+  (normSq_pos z).ne'
 
 theorem im_inv_neg_coe_pos (z : ℍ) : 0 < (-z : ℂ)⁻¹.im := by
   simpa using div_pos z.property (normSq_pos z)
@@ -164,14 +145,32 @@ def num (g : GL(2, ℝ)⁺) (z : ℍ) : ℂ := g 0 0 * z + g 0 1
 
 def denom (g : GL(2, ℝ)⁺) (z : ℍ) : ℂ := g 1 0 * z + g 1 1
 
--- DISSOLVED: linear_ne_zero
+theorem linear_ne_zero (cd : Fin 2 → ℝ) (z : ℍ) (h : cd ≠ 0) : (cd 0 : ℂ) * z + cd 1 ≠ 0 := by
+  contrapose! h
+  have : cd 0 = 0 := by
+    -- we will need this twice
+    apply_fun Complex.im at h
+    simpa only [z.im_ne_zero, Complex.add_im, add_zero, coe_im, zero_mul, or_false,
+      Complex.ofReal_im, Complex.zero_im, Complex.mul_im, mul_eq_zero] using h
+  simp only [this, zero_mul, Complex.ofReal_zero, zero_add, Complex.ofReal_eq_zero]
+    at h
+  ext i
+  fin_cases i <;> assumption
 
--- DISSOLVED: denom_ne_zero
+theorem denom_ne_zero (g : GL(2, ℝ)⁺) (z : ℍ) : denom g z ≠ 0 := by
+  intro H
+  have DET := (mem_glpos _).1 g.prop
+  simp only [GeneralLinearGroup.val_det_apply] at DET
+  obtain hg | hz : g 1 0 = 0 ∨ z.im = 0 := by simpa [num, denom] using congr_arg Complex.im H
+  · simp only [hg, Complex.ofReal_zero, denom, zero_mul, zero_add, Complex.ofReal_eq_zero] at H
+    simp only [Matrix.det_fin_two g.1.1, H, hg, mul_zero, sub_zero, lt_self_iff_false] at DET
+  · exact z.prop.ne' hz
 
 theorem normSq_denom_pos (g : GL(2, ℝ)⁺) (z : ℍ) : 0 < Complex.normSq (denom g z) :=
   Complex.normSq_pos.mpr (denom_ne_zero g z)
 
--- DISSOLVED: normSq_denom_ne_zero
+theorem normSq_denom_ne_zero (g : GL(2, ℝ)⁺) (z : ℍ) : Complex.normSq (denom g z) ≠ 0 :=
+  ne_of_gt (normSq_denom_pos g z)
 
 def smulAux' (g : GL(2, ℝ)⁺) (z : ℍ) : ℂ :=
   num g z / denom g z
@@ -232,17 +231,6 @@ theorem specialLinearGroup_apply {R : Type*} [CommRing R] [Algebra R ℝ] (g : S
 
 variable (g : GL(2, ℝ)⁺) (z : ℍ)
 
-@[simp]
-theorem coe_smul : ↑(g • z) = num g z / denom g z :=
-  rfl
-
-@[simp]
-theorem re_smul : (g • z).re = (num g z / denom g z).re :=
-  rfl
-
-theorem im_smul : (g • z).im = (num g z / denom g z).im :=
-  rfl
-
 theorem im_smul_eq_div_normSq : (g • z).im = det ↑ₘg * z.im / Complex.normSq (denom g z) :=
   smulAux'_im g z
 
@@ -301,10 +289,6 @@ theorem coe_vadd : ↑(x +ᵥ z) = (x + z : ℂ) :=
   rfl
 
 @[simp]
-theorem vadd_re : (x +ᵥ z).re = x + z.re :=
-  rfl
-
-@[simp]
 theorem vadd_im : (x +ᵥ z).im = z.im :=
   zero_add _
 
@@ -333,7 +317,28 @@ theorem exists_SL2_smul_eq_of_apply_zero_one_eq_zero (g : SL(2, ℝ)) (hc : g 1 
     simpa [toGL, specialLinearGroup_apply, add_mul]
   ring
 
--- DISSOLVED: exists_SL2_smul_eq_of_apply_zero_one_ne_zero
+-- CONFLATES (assumes ground = zero): exists_SL2_smul_eq_of_apply_zero_one_ne_zero
+theorem exists_SL2_smul_eq_of_apply_zero_one_ne_zero (g : SL(2, ℝ)) (hc : g 1 0 ≠ 0) :
+    ∃ (u : { x : ℝ // 0 < x }) (v w : ℝ),
+      (g • · : ℍ → ℍ) =
+        (w +ᵥ ·) ∘ (ModularGroup.S • · : ℍ → ℍ) ∘ (v +ᵥ · : ℍ → ℍ) ∘ (u • · : ℍ → ℍ) := by
+  have h_denom := denom_ne_zero g
+  induction' g using Matrix.SpecialLinearGroup.fin_two_induction with a b c d h
+  replace hc : c ≠ 0 := by simpa using hc
+  refine ⟨⟨_, mul_self_pos.mpr hc⟩, c * d, a / c, ?_⟩
+  ext1 ⟨z, hz⟩; ext1
+  suffices (↑a * z + b) / (↑c * z + d) = a / c - (c * d + ↑c * ↑c * z)⁻¹ by
+    -- Porting note: golfed broken proof
+    simpa only [modular_S_smul, inv_neg, Function.comp_apply, coe_vadd, Complex.ofReal_mul,
+      coe_pos_real_smul, Complex.real_smul, Complex.ofReal_div, coe_mk]
+  replace hc : (c : ℂ) ≠ 0 := by norm_cast
+  replace h_denom : ↑c * z + d ≠ 0 := by simpa using h_denom ⟨z, hz⟩
+  have h_aux : (c : ℂ) * d + ↑c * ↑c * z ≠ 0 := by
+    rw [mul_assoc, ← mul_add, add_comm]
+    exact mul_ne_zero hc h_denom
+  replace h : (a * d - b * c : ℂ) = (1 : ℂ) := by norm_cast
+  field_simp
+  linear_combination (-(z * (c : ℂ) ^ 2) - c * d) * h
 
 end UpperHalfPlane
 
@@ -346,11 +351,6 @@ def coe (g : SL(2, ℤ)) : GL(2, ℝ)⁺ := ((g : SL(2, ℝ)) : GL(2, ℝ)⁺)
 
 instance : Coe SL(2, ℤ) GL(2, ℝ)⁺ :=
   ⟨coe⟩
-
-@[simp]
-theorem coe_apply_complex {g : SL(2, ℤ)} {i j : Fin 2} :
-    (Units.val <| Subtype.val <| coe g) i j = (Subtype.val g i j : ℂ) :=
-  rfl
 
 @[simp]
 theorem det_coe {g : SL(2, ℤ)} : det (Units.val <| Subtype.val <| coe g) = 1 := by

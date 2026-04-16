@@ -8,6 +8,8 @@ import Mathlib.Tactic.TypeStar
 import Mathlib.Tactic.ToAdditive
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-!
 # Typeclasses for algebraic operations
 
@@ -60,6 +62,12 @@ class SMul (M : Type u) (α : Type v) where
   but it is intended to be used for left actions. -/
   smul : M → α → α
 
+@[inherit_doc] infixr:65 " +ᵥ " => HVAdd.hVAdd
+
+@[inherit_doc] infixl:65 " -ᵥ " => VSub.vsub
+
+@[inherit_doc] infixr:73 " • " => HSMul.hSMul
+
 /-!
 We have a macro to make `x • y` notation participate in the expression tree elaborator,
 like other arithmetic expressions such as `+`, `*`, `/`, `^`, `=`, inequalities, etc.
@@ -107,9 +115,6 @@ attribute [to_additive existing (reorder := 1 2, 4 5) smul] Pow.pow
 @[to_additive (attr := default_instance)]
 instance instHSMul {α β} [SMul α β] : HSMul α β β where
   hSMul := SMul.smul
-
-@[to_additive]
-theorem SMul.smul_eq_hSMul {α β} [SMul α β] : (SMul.smul : α → β → β) = HSMul.hSMul := rfl
 
 attribute [to_additive existing (reorder := 1 2)] instHPow
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.HomotopyCategory.MappingCone
 import Mathlib.Algebra.Homology.HomotopyCategory.HomComplexShift
 import Mathlib.CategoryTheory.Triangulated.Functor
 
+noncomputable section
+
 /-! The pretriangulated structure on the homotopy category of complexes
 
 In this file, we define the pretriangulated structure on the homotopy

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Algebra.Group.Prod
 import Mathlib.Algebra.Group.TypeTags.Hom
 
+noncomputable section
+
 /-!
 # Additive and multiplicative equivalences associated to `Multiplicative` and `Additive`.
 -/
@@ -144,25 +146,5 @@ def AddEquiv.additiveMultiplicative [AddZeroClass G] : Additive (Multiplicative 
 @[simps!]
 def MulEquiv.multiplicativeAdditive [MulOneClass H] : Multiplicative (Additive H) ≃* H :=
   AddEquiv.toMultiplicative'' (AddEquiv.refl (Additive H))
-
-@[simps]
-def MulEquiv.prodMultiplicative [Add G] [Add H] :
-    Multiplicative (G × H) ≃* Multiplicative G × Multiplicative H where
-  toFun x := (Multiplicative.ofAdd x.toAdd.1,
-    Multiplicative.ofAdd x.toAdd.2)
-  invFun := fun (x, y) ↦ Multiplicative.ofAdd (x.toAdd, y.toAdd)
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_mul' _ _ := rfl
-
-@[simps]
-def AddEquiv.prodAdditive [Mul G] [Mul H] :
-    Additive (G × H) ≃+ Additive G × Additive H where
-  toFun x := (Additive.ofMul x.toMul.1,
-    Additive.ofMul x.toMul.2)
-  invFun := fun (x, y) ↦ Additive.ofMul (x.toMul, y.toMul)
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_add' _ _ := rfl
 
 end

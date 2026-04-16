@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.ChineseRemainder
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.Nat.Pairing
 
+noncomputable section
+
 /-!
 # Gödel's Beta Function Lemma
 

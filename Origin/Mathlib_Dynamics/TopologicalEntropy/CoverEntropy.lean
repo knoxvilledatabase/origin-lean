@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
 import Mathlib.Data.Real.ENatENNReal
 import Mathlib.Dynamics.TopologicalEntropy.DynamicalEntourage
 
+noncomputable section
+
 /-!
 # Topological entropy via covers
 We implement Bowen-Dinaburg's definitions of the topological entropy, via covers.

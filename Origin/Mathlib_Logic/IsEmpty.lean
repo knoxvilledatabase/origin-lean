@@ -5,6 +5,8 @@ Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 import Origin.Core
 import Mathlib.Logic.Function.Basic
 
+noncomputable section
+
 /-!
 # Types that are empty
 
@@ -94,6 +96,7 @@ namespace IsEmpty
 open Function
 
 universe u in
+/-- Eliminate out of a type that `IsEmpty` (using projection notation). -/
 
 @[elab_as_elim]
 protected def elim {α : Sort u} (_ : IsEmpty α) {p : α → Sort*} (a : α) : p a :=

@@ -8,6 +8,8 @@ import Mathlib.Order.Hom.CompleteLattice
 import Mathlib.Topology.Category.CompHaus.Basic
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # The category of frames
 
@@ -35,9 +37,6 @@ instance (X : Frm) : Frame X :=
 
 def of (α : Type*) [Frame α] : Frm :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [Frame α] : ↥(of α) = α := rfl
 
 instance : Inhabited Frm :=
   ⟨of PUnit⟩

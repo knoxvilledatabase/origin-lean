@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.SuccPred.Limit
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Definition of direct systems, inverse systems, and cardinalities in specific inverse systems
 

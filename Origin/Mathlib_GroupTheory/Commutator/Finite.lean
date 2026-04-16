@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.GroupTheory.Commutator.Basic
 
+noncomputable section
+
 /-!
 The commutator of a finite direct product is contained in the direct product of the commutators.
 -/

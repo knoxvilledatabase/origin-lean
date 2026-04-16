@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs
 import Mathlib.RingTheory.NonUnitalSubsemiring.Defs
 
+noncomputable section
+
 /-!
 # `NonUnitalSubring`s
 
@@ -73,10 +75,6 @@ def subtype (s : S) : s →ₙ+* R :=
     AddSubgroupClass.subtype s with
     toFun := Subtype.val }
 
-@[simp]
-theorem coe_subtype : (subtype s : s → R) = Subtype.val :=
-  rfl
-
 end NonUnitalSubringClass
 
 end NonUnitalSubringClass
@@ -99,24 +97,6 @@ instance : NonUnitalSubringClass (NonUnitalSubring R) R where
   mul_mem {s} := s.mul_mem'
   neg_mem {s} := s.neg_mem'
 
-theorem mem_carrier {s : NonUnitalSubring R} {x : R} : x ∈ s.toNonUnitalSubsemiring ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem mem_mk {S : NonUnitalSubsemiring R} {x : R} (h) :
-    x ∈ (⟨S, h⟩ : NonUnitalSubring R) ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
-theorem coe_set_mk (S : NonUnitalSubsemiring R) (h) :
-    ((⟨S, h⟩ : NonUnitalSubring R) : Set R) = S :=
-  rfl
-
-@[simp]
-theorem mk_le_mk {S S' : NonUnitalSubsemiring R} (h h') :
-    (⟨S, h⟩ : NonUnitalSubring R) ≤ (⟨S', h'⟩ : NonUnitalSubring R) ↔ S ≤ S' :=
-  Iff.rfl
-
 @[ext]
 theorem ext {S T : NonUnitalSubring R} (h : ∀ x, x ∈ S ↔ x ∈ T) : S = T :=
   SetLike.ext h
@@ -125,10 +105,6 @@ protected def copy (S : NonUnitalSubring R) (s : Set R) (hs : s = ↑S) : NonUni
   { S.toNonUnitalSubsemiring.copy s hs with
     carrier := s
     neg_mem' := hs.symm ▸ S.neg_mem' }
-
-@[simp]
-theorem coe_copy (S : NonUnitalSubring R) (s : Set R) (hs : s = ↑S) : (S.copy s hs : Set R) = s :=
-  rfl
 
 theorem copy_eq (S : NonUnitalSubring R) (s : Set R) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs
@@ -176,16 +152,6 @@ protected def mk' (s : Set R) (sm : Subsemigroup R) (sa : AddSubgroup R) (hm : �
   { sm.copy s hm.symm, sa.copy s ha.symm with }
 
 @[simp]
-theorem coe_mk' {s : Set R} {sm : Subsemigroup R} (hm : ↑sm = s) {sa : AddSubgroup R}
-    (ha : ↑sa = s) : (NonUnitalSubring.mk' s sm sa hm ha : Set R) = s :=
-  rfl
-
-@[simp]
-theorem mem_mk' {s : Set R} {sm : Subsemigroup R} (hm : ↑sm = s) {sa : AddSubgroup R} (ha : ↑sa = s)
-    {x : R} : x ∈ NonUnitalSubring.mk' s sm sa hm ha ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
 theorem mk'_toSubsemigroup {s : Set R} {sm : Subsemigroup R} (hm : ↑sm = s) {sa : AddSubgroup R}
     (ha : ↑sa = s) : (NonUnitalSubring.mk' s sm sa hm ha).toSubsemigroup = sm :=
   SetLike.coe_injective hm.symm
@@ -224,57 +190,12 @@ instance toNonUnitalRing {R : Type*} [NonUnitalRing R] (s : NonUnitalSubring R) 
 protected theorem zsmul_mem {x : R} (hx : x ∈ s) (n : ℤ) : n • x ∈ s :=
   zsmul_mem hx n
 
-@[simp, norm_cast]
-theorem val_add (x y : s) : (↑(x + y) : R) = ↑x + ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem val_neg (x : s) : (↑(-x) : R) = -↑x :=
-  rfl
-
-@[simp, norm_cast]
-theorem val_mul (x y : s) : (↑(x * y) : R) = ↑x * ↑y :=
-  rfl
-
-@[simp, norm_cast]
-theorem val_zero : ((0 : s) : R) = 0 :=
-  rfl
-
-theorem coe_eq_zero_iff {x : s} : (x : R) = 0 ↔ x = 0 := by
-  simp
-
 instance toNonUnitalCommRing {R} [NonUnitalCommRing R] (s : NonUnitalSubring R) :
     NonUnitalCommRing s :=
   Subtype.coe_injective.nonUnitalCommRing _ rfl (fun _ _ => rfl) (fun _ _ => rfl) (fun _ => rfl)
     (fun _ _ => rfl) (fun _ _ => rfl) fun _ _ => rfl
 
 /-! ## Partial order -/
-
-@[simp]
-theorem mem_toSubsemigroup {s : NonUnitalSubring R} {x : R} : x ∈ s.toSubsemigroup ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toSubsemigroup (s : NonUnitalSubring R) : (s.toSubsemigroup : Set R) = s :=
-  rfl
-
-@[simp]
-theorem mem_toAddSubgroup {s : NonUnitalSubring R} {x : R} : x ∈ s.toAddSubgroup ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toAddSubgroup (s : NonUnitalSubring R) : (s.toAddSubgroup : Set R) = s :=
-  rfl
-
-@[simp]
-theorem mem_toNonUnitalSubsemiring {s : NonUnitalSubring R} {x : R} :
-    x ∈ s.toNonUnitalSubsemiring ↔ x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_toNonUnitalSubsemiring (s : NonUnitalSubring R) :
-    (s.toNonUnitalSubsemiring : Set R) = s :=
-  rfl
 
 end NonUnitalSubring
 

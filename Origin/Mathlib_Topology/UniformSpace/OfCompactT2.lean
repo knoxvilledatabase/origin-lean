@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Separation.Basic
 import Mathlib.Topology.UniformSpace.Basic
 
+noncomputable section
+
 /-!
 # Compact separated uniform spaces
 

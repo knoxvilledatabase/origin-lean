@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 
+noncomputable section
+
 /-!
 # Matrices with fixed determinant
 

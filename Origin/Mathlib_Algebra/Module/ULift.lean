@@ -8,6 +8,8 @@ import Mathlib.Algebra.Ring.ULift
 import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Data.ULift
 
+noncomputable section
+
 /-!
 # `ULift` instances for module and multiplicative actions
 
@@ -27,10 +29,6 @@ variable {R : Type u} {M : Type v} {N : Type w}
 @[to_additive]
 instance smulLeft [SMul R M] : SMul (ULift R) M :=
   ⟨fun s x => s.down • x⟩
-
-@[to_additive (attr := simp)]
-theorem smul_def [SMul R M] (s : ULift R) (x : M) : s • x = s.down • x :=
-  rfl
 
 instance isScalarTower [SMul R M] [SMul M N] [SMul R N] [IsScalarTower R M N] :
     IsScalarTower (ULift R) M N :=
@@ -132,12 +130,5 @@ instance module' [Semiring R] [AddCommMonoid M] [Module R M] : Module R (ULift M
     one_smul := one_smul _
     mul_smul := mul_smul
     smul_add := smul_add }
-
-@[simps apply symm_apply]
-def moduleEquiv [Semiring R] [AddCommMonoid M] [Module R M] : ULift.{w} M ≃ₗ[R] M where
-  toFun := ULift.down
-  invFun := ULift.up
-  map_smul' _ _ := rfl
-  __ := AddEquiv.ulift
 
 end ULift

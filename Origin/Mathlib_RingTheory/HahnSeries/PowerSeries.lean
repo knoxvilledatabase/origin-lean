@@ -8,6 +8,8 @@ import Mathlib.RingTheory.PowerSeries.Basic
 import Mathlib.RingTheory.MvPowerSeries.NoZeroDivisors
 import Mathlib.Data.Finsupp.PWO
 
+noncomputable section
+
 /-!
 # Comparison between Hahn series and power series
 If `Γ` is ordered and `R` has zero, then `HahnSeries Γ R` consists of formal series over `Γ` with
@@ -73,10 +75,6 @@ theorem coeff_toPowerSeries {f : HahnSeries ℕ R} {n : ℕ} :
     PowerSeries.coeff R n (toPowerSeries f) = f.coeff n :=
   PowerSeries.coeff_mk _ _
 
-theorem coeff_toPowerSeries_symm {f : PowerSeries R} {n : ℕ} :
-    (HahnSeries.toPowerSeries.symm f).coeff n = PowerSeries.coeff R n f :=
-  rfl
-
 variable (Γ R) [StrictOrderedSemiring Γ]
 
 def ofPowerSeries : PowerSeries R →+* HahnSeries Γ R :=
@@ -128,10 +126,6 @@ theorem ofPowerSeries_X : ofPowerSeries Γ R PowerSeries.X = single 1 1 := by
     intro
     simp +contextual [Ne.symm hn]
 
-theorem ofPowerSeries_X_pow {R} [Semiring R] (n : ℕ) :
-    ofPowerSeries Γ R (PowerSeries.X ^ n) = single (n : Γ) 1 := by
-  simp
-
 @[simps]
 def toMvPowerSeries {σ : Type*} [Finite σ] : HahnSeries (σ →₀ ℕ) R ≃+* MvPowerSeries σ R where
   toFun f := f.coeff
@@ -164,14 +158,6 @@ variable {σ : Type*} [Finite σ]
 instance [NoZeroDivisors R] : NoZeroDivisors (HahnSeries (σ →₀ ℕ) R) :=
   toMvPowerSeries.toMulEquiv.noZeroDivisors (A := HahnSeries (σ →₀ ℕ) R) (MvPowerSeries σ R)
 
-theorem coeff_toMvPowerSeries {f : HahnSeries (σ →₀ ℕ) R} {n : σ →₀ ℕ} :
-    MvPowerSeries.coeff R n (toMvPowerSeries f) = f.coeff n :=
-  rfl
-
-theorem coeff_toMvPowerSeries_symm {f : MvPowerSeries σ R} {n : σ →₀ ℕ} :
-    (HahnSeries.toMvPowerSeries.symm f).coeff n = MvPowerSeries.coeff R n f :=
-  rfl
-
 end Semiring
 
 section Algebra
@@ -200,15 +186,6 @@ instance powerSeriesAlgebra {S : Type*} [CommSemiring S] [Algebra S (PowerSeries
 variable {R}
 
 variable {S : Type*} [CommSemiring S] [Algebra S (PowerSeries R)]
-
-theorem algebraMap_apply' (x : S) :
-    algebraMap S (HahnSeries Γ R) x = ofPowerSeries Γ R (algebraMap S (PowerSeries R) x) :=
-  rfl
-
-@[simp]
-theorem _root_.Polynomial.algebraMap_hahnSeries_apply (f : R[X]) :
-    algebraMap R[X] (HahnSeries Γ R) f = ofPowerSeries Γ R f :=
-  rfl
 
 theorem _root_.Polynomial.algebraMap_hahnSeries_injective :
     Function.Injective (algebraMap R[X] (HahnSeries Γ R)) :=

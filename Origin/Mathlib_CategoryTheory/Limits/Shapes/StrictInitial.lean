@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 
+noncomputable section
+
 /-!
 # Strict initial objects
 
@@ -69,7 +71,6 @@ theorem IsInitial.subsingleton_to (hI : IsInitial I) {A : C} : Subsingleton (A �
   ⟨hI.strict_hom_ext⟩
 
 noncomputable
-
 def IsInitial.ofStrict {X Y : C} (f : X ⟶ Y)
     (hY : IsInitial Y) : IsInitial X :=
   letI := hY.isIso_to f
@@ -156,7 +157,6 @@ theorem IsTerminal.strict_hom_ext (hI : IsTerminal I) {A : C} (f g : I ⟶ A) : 
   exact eq_of_inv_eq_inv (hI.hom_ext (inv f) (inv g))
 
 noncomputable
-
 def IsTerminal.ofStrict {X Y : C} (f : X ⟶ Y)
     (hY : IsTerminal X) : IsTerminal Y :=
   letI := hY.isIso_from f

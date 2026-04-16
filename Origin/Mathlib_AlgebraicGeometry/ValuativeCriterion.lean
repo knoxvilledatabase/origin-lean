@@ -8,6 +8,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.Proper
 import Mathlib.RingTheory.RingHom.Injective
 import Mathlib.RingTheory.Valuation.LocalSubring
 
+noncomputable section
+
 /-!
 # Valuative criterion
 

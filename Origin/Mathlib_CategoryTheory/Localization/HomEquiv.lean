@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Localization.LocalizerMorphism
 import Mathlib.CategoryTheory.HomCongr
 
+noncomputable section
+
 /-!
 # Bijections between morphisms in two localized categories
 
@@ -118,10 +120,6 @@ noncomputable def homEquiv :
   right_inv g := by
     rw [LocalizerMorphism.homMap_homMap]
     apply LocalizerMorphism.id_homMap
-
-@[simp]
-lemma homEquiv_symm_apply (g : L₂.obj X ⟶ L₂.obj Y) :
-    (homEquiv W L₁ L₂).symm g = homEquiv W L₂ L₁ g := rfl
 
 lemma homEquiv_eq (G : D₁ ⥤ D₂) (e : L₁ ⋙ G ≅ L₂) (f : L₁.obj X ⟶ L₁.obj Y) :
     homEquiv W L₁ L₂ f = e.inv.app X ≫ G.map f ≫ e.hom.app Y := by

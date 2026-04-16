@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.WellFounded
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Lexicographic order on Pi types
 
@@ -37,10 +39,6 @@ notation3 (prettyPrint := false) "Πₗ "(...)", "r:(scoped p => Lex (∀ i, p i
 
 @[simp]
 theorem toLex_apply (x : ∀ i, β i) (i : ι) : toLex x i = x i :=
-  rfl
-
-@[simp]
-theorem ofLex_apply (x : Lex (∀ i, β i)) (i : ι) : ofLex x i = x i :=
   rfl
 
 theorem lex_lt_of_lt_of_preorder [∀ i, Preorder (β i)] {r} (hwf : WellFounded r) {x y : ∀ i, β i}

@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.Topology.Algebra.Nonarchimedean.Bases
 import Mathlib.Topology.Algebra.UniformRing
 
+noncomputable section
+
 /-!
 # Adic topology
 

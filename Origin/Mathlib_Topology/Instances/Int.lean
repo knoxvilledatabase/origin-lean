@@ -11,6 +11,8 @@ import Mathlib.Topology.MetricSpace.Bounded
 import Mathlib.Order.Filter.AtTopBot.Archimedean
 import Mathlib.Topology.MetricSpace.Basic
 
+noncomputable section
+
 /-!
 # Topology on the integers
 
@@ -29,10 +31,6 @@ instance : Dist ℤ :=
 theorem dist_eq (x y : ℤ) : dist x y = |(x : ℝ) - y| := rfl
 
 theorem dist_eq' (m n : ℤ) : dist m n = |m - n| := by rw [dist_eq]; norm_cast
-
-@[norm_cast, simp]
-theorem dist_cast_real (x y : ℤ) : dist (x : ℝ) y = dist x y :=
-  rfl
 
 theorem pairwise_one_le_dist : Pairwise fun m n : ℤ => 1 ≤ dist m n := by
   intro m n hne

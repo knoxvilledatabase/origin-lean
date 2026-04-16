@@ -8,6 +8,8 @@ import Mathlib.Topology.Bornology.Constructions
 import Mathlib.Topology.EMetricSpace.Pi
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
 
+noncomputable section
+
 /-!
 # Product of pseudometric spaces
 
@@ -43,8 +45,6 @@ instance pseudoMetricSpacePi : PseudoMetricSpace (∀ b, π b) := by
   simpa only using Finset.sup_le_iff.1 (NNReal.coe_le_coe.1 <| H hx hy) b (Finset.mem_univ b)
 
 lemma nndist_pi_def (f g : ∀ b, π b) : nndist f g = sup univ fun b => nndist (f b) (g b) := rfl
-
-lemma dist_pi_def (f g : ∀ b, π b) : dist f g = (sup univ fun b => nndist (f b) (g b) : ℝ≥0) := rfl
 
 lemma nndist_pi_le_iff {f g : ∀ b, π b} {r : ℝ≥0} :
     nndist f g ≤ r ↔ ∀ b, nndist (f b) (g b) ≤ r := by simp [nndist_pi_def]

@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Adjoin.Tower
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Noetherian.Orzech
 
+noncomputable section
+
 /-!
 # Finiteness conditions in commutative algebra
 

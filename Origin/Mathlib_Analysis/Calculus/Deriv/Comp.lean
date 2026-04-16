@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Comp
 import Mathlib.Analysis.Calculus.FDeriv.RestrictScalars
 
+noncomputable section
+
 /-!
 # One-dimensional derivatives of compositions of functions
 

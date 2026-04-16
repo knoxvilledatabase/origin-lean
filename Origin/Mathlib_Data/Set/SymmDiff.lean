@@ -14,6 +14,8 @@ import Mathlib.Util.Delaborators
 import Mathlib.Order.SymmDiff
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-! # Symmetric differences of sets -/
 
 namespace Set
@@ -23,12 +25,6 @@ universe u
 variable {α : Type u} {a : α} {s t u : Set α}
 
 open scoped symmDiff
-
-theorem mem_symmDiff : a ∈ s ∆ t ↔ a ∈ s ∧ a ∉ t ∨ a ∈ t ∧ a ∉ s :=
-  Iff.rfl
-
-protected theorem symmDiff_def (s t : Set α) : s ∆ t = s \ t ∪ t \ s :=
-  rfl
 
 theorem symmDiff_subset_union : s ∆ t ⊆ s ∪ t :=
   @symmDiff_le_sup (Set α) _ _ _

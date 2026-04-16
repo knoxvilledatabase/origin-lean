@@ -9,6 +9,8 @@ import Mathlib.Data.Set.Function
 import Mathlib.Data.Set.Monotone
 import Mathlib.Order.Interval.Set.Defs
 
+noncomputable section
+
 /-!
 # Miscellaneous lemmas about the integers
 

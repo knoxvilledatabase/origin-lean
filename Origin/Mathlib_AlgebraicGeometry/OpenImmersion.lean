@@ -8,6 +8,8 @@ import Mathlib.AlgebraicGeometry.Scheme
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 import Mathlib.CategoryTheory.MorphismProperty.Limits
 
+noncomputable section
+
 /-!
 # Open immersions of schemes
 
@@ -260,17 +262,8 @@ def toScheme : Scheme := by
   · rw [LocallyRingedSpace.IsOpenImmersion.lift_range]; exact h₁
   · delta LocallyRingedSpace.IsOpenImmersion.lift; infer_instance
 
-@[simp]
-theorem toScheme_toLocallyRingedSpace :
-    (toScheme Y f).toLocallyRingedSpace = toLocallyRingedSpace Y.1 f :=
-  rfl
-
 def toSchemeHom : toScheme Y f ⟶ Y :=
   ⟨toLocallyRingedSpaceHom _ f⟩
-
-@[simp]
-theorem toSchemeHom_toPshHom : (toSchemeHom Y f).toPshHom = f :=
-  rfl
 
 instance toSchemeHom_isOpenImmersion : AlgebraicGeometry.IsOpenImmersion (toSchemeHom Y f) :=
   H
@@ -297,9 +290,6 @@ def Scheme.restrict : Scheme :=
   { PresheafedSpace.IsOpenImmersion.toScheme X (X.toPresheafedSpace.ofRestrict h) with
     toPresheafedSpace := X.toPresheafedSpace.restrict h }
 
-lemma Scheme.restrict_toPresheafedSpace :
-    (X.restrict h).toPresheafedSpace = X.toPresheafedSpace.restrict h := rfl
-
 @[simps! toLRSHom_base, simps! (config := .lemmasOnly) toLRSHom_c_app]
 def Scheme.ofRestrict : X.restrict h ⟶ X :=
   ⟨X.toLocallyRingedSpace.ofRestrict h⟩
@@ -325,11 +315,6 @@ lemma Scheme.ofRestrict_appIso (U) :
   ext1
   simp only [restrict_presheaf_obj, Hom.appIso_hom', ofRestrict_appLE, homOfLE_refl, op_id,
     CategoryTheory.Functor.map_id, Iso.refl_hom]
-
-@[simp]
-lemma Scheme.restrict_presheaf_map (V W) (i : V ⟶ W) :
-    (X.restrict h).presheaf.map i = X.presheaf.map (homOfLE (show X.ofRestrict h ''ᵁ W.unop ≤
-      X.ofRestrict h ''ᵁ V.unop from Set.image_subset _ i.unop.le)).op := rfl
 
 end Restrict
 
@@ -582,7 +567,6 @@ theorem lift_app {X Y U : Scheme.{u}} (f : U ⟶ Y) (g : X ⟶ Y) [IsOpenImmersi
   IsOpenImmersion.app_eq_appIso_inv_app_of_comp_eq _ _ _ (lift_fac _ _ _).symm _
 
 noncomputable
-
 def ΓIso {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f] (U : Y.Opens) :
     Γ(X, f⁻¹ᵁ U) ≅ Γ(Y, f.opensRange ⊓ U) :=
   (f.appIso (f⁻¹ᵁ U)).symm ≪≫
@@ -607,7 +591,6 @@ lemma ΓIso_hom_map {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f] (U : Y.
   simp [-ΓIso_inv]
 
 noncomputable
-
 def ΓIsoTop {X Y : Scheme.{u}} (f : X ⟶ Y) [IsOpenImmersion f] :
     Γ(X, ⊤) ≅ Γ(Y, f.opensRange) :=
   (f.appIso ⊤).symm ≪≫ Y.presheaf.mapIso (eqToIso f.image_top_eq_opensRange.symm).op

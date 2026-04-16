@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.ClosedSubgroup
 import Mathlib.Topology.Algebra.ContinuousMonoidHom
 import Mathlib.Topology.Category.Profinite.Basic
 
+noncomputable section
+
 /-!
 
 # Category of Profinite Groups
@@ -102,19 +104,6 @@ def of (G : Type u) [Group G] [TopologicalSpace G] [TopologicalGroup G]
   toProfinite := .of G
   group := ‹_›
   topologicalGroup := ‹_›
-
-@[to_additive (attr := simp)]
-theorem coe_of (X : ProfiniteGrp) : (of X : Type _) = X :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_id (X : ProfiniteGrp) : (𝟙 ((forget ProfiniteGrp).obj X)) = id :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_comp {X Y Z : ProfiniteGrp} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    ((forget ProfiniteGrp).map f ≫ (forget ProfiniteGrp).map g) = g ∘ f :=
-  rfl
 
 @[to_additive "Construct a term of `ProfiniteAddGrp` from a type endowed with the structure of a
 

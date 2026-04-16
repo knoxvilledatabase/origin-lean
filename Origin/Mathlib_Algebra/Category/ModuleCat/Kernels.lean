@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.EpiMono
 import Mathlib.CategoryTheory.ConcreteCategory.Elementwise
 
+noncomputable section
+
 /-!
 # The concrete (co)kernels in the category of modules are (co)kernels in the categorical sense.
 -/

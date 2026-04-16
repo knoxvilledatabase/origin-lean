@@ -1,9 +1,11 @@
 /-
 Extracted from InformationTheory/Hamming.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 3 | Infrastructure: 41
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 41
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Basic
+
+noncomputable section
 
 /-!
 # Hamming spaces
@@ -82,7 +84,8 @@ theorem hammingDist_eq_zero {x y : ∀ i, β i} : hammingDist x y = 0 ↔ x = y 
 theorem hamming_zero_eq_dist {x y : ∀ i, β i} : 0 = hammingDist x y ↔ x = y := by
   rw [eq_comm, hammingDist_eq_zero]
 
--- DISSOLVED: hammingDist_ne_zero
+theorem hammingDist_ne_zero {x y : ∀ i, β i} : hammingDist x y ≠ 0 ↔ x ≠ y :=
+  hammingDist_eq_zero.not
 
 @[simp]
 theorem hammingDist_pos {x y : ∀ i, β i} : 0 < hammingDist x y ↔ x ≠ y := by
@@ -136,9 +139,12 @@ theorem hammingNorm_zero : hammingNorm (0 : ∀ i, β i) = 0 :=
 theorem hammingNorm_eq_zero {x : ∀ i, β i} : hammingNorm x = 0 ↔ x = 0 :=
   hammingDist_eq_zero
 
--- DISSOLVED: hammingNorm_ne_zero_iff
+theorem hammingNorm_ne_zero_iff {x : ∀ i, β i} : hammingNorm x ≠ 0 ↔ x ≠ 0 :=
+  hammingNorm_eq_zero.not
 
--- DISSOLVED: hammingNorm_pos_iff
+@[simp]
+theorem hammingNorm_pos_iff {x : ∀ i, β i} : 0 < hammingNorm x ↔ x ≠ 0 :=
+  hammingDist_pos
 
 theorem hammingNorm_lt_one {x : ∀ i, β i} : hammingNorm x < 1 ↔ x = 0 :=
   hammingDist_lt_one
@@ -234,73 +240,8 @@ def toHamming : (∀ i, β i) ≃ Hamming β :=
 def ofHamming : Hamming β ≃ ∀ i, β i :=
   Equiv.refl _
 
-@[simp]
-theorem toHamming_symm_eq : (@toHamming _ β).symm = ofHamming :=
-  rfl
-
-@[simp]
-theorem ofHamming_symm_eq : (@ofHamming _ β).symm = toHamming :=
-  rfl
-
-@[simp]
-theorem toHamming_ofHamming (x : Hamming β) : toHamming (ofHamming x) = x :=
-  rfl
-
-@[simp]
-theorem ofHamming_toHamming (x : ∀ i, β i) : ofHamming (toHamming x) = x :=
-  rfl
-
-theorem toHamming_inj {x y : ∀ i, β i} : toHamming x = toHamming y ↔ x = y :=
-  Iff.rfl
-
 theorem ofHamming_inj {x y : Hamming β} : ofHamming x = ofHamming y ↔ x = y :=
   Iff.rfl
-
-@[simp]
-theorem toHamming_zero [∀ i, Zero (β i)] : toHamming (0 : ∀ i, β i) = 0 :=
-  rfl
-
-@[simp]
-theorem ofHamming_zero [∀ i, Zero (β i)] : ofHamming (0 : Hamming β) = 0 :=
-  rfl
-
-@[simp]
-theorem toHamming_neg [∀ i, Neg (β i)] {x : ∀ i, β i} : toHamming (-x) = -toHamming x :=
-  rfl
-
-@[simp]
-theorem ofHamming_neg [∀ i, Neg (β i)] {x : Hamming β} : ofHamming (-x) = -ofHamming x :=
-  rfl
-
-@[simp]
-theorem toHamming_add [∀ i, Add (β i)] {x y : ∀ i, β i} :
-    toHamming (x + y) = toHamming x + toHamming y :=
-  rfl
-
-@[simp]
-theorem ofHamming_add [∀ i, Add (β i)] {x y : Hamming β} :
-    ofHamming (x + y) = ofHamming x + ofHamming y :=
-  rfl
-
-@[simp]
-theorem toHamming_sub [∀ i, Sub (β i)] {x y : ∀ i, β i} :
-    toHamming (x - y) = toHamming x - toHamming y :=
-  rfl
-
-@[simp]
-theorem ofHamming_sub [∀ i, Sub (β i)] {x y : Hamming β} :
-    ofHamming (x - y) = ofHamming x - ofHamming y :=
-  rfl
-
-@[simp]
-theorem toHamming_smul [∀ i, SMul α (β i)] {r : α} {x : ∀ i, β i} :
-    toHamming (r • x) = r • toHamming x :=
-  rfl
-
-@[simp]
-theorem ofHamming_smul [∀ i, SMul α (β i)] {r : α} {x : Hamming β} :
-    ofHamming (r • x) = r • ofHamming x :=
-  rfl
 
 section
 
@@ -310,11 +251,6 @@ variable [Fintype ι] [∀ i, DecidableEq (β i)]
 
 instance : Dist (Hamming β) :=
   ⟨fun x y => hammingDist (ofHamming x) (ofHamming y)⟩
-
-@[simp, push_cast]
-theorem dist_eq_hammingDist (x y : Hamming β) :
-    dist x y = hammingDist (ofHamming x) (ofHamming y) :=
-  rfl
 
 instance : PseudoMetricSpace (Hamming β) where
   dist_self := by
@@ -346,11 +282,6 @@ instance : PseudoMetricSpace (Hamming β) where
     refine iff_of_true (Filter.mem_sets.mpr Filter.mem_bot) ⟨Fintype.card ι, fun _ _ _ _ => ?_⟩
     exact mod_cast hammingDist_le_card_fintype
 
-@[simp, push_cast]
-theorem nndist_eq_hammingDist (x y : Hamming β) :
-    nndist x y = hammingDist (ofHamming x) (ofHamming y) :=
-  rfl
-
 instance : DiscreteTopology (Hamming β) := ⟨rfl⟩
 
 instance : MetricSpace (Hamming β) := .ofT0PseudoMetricSpace _
@@ -358,17 +289,8 @@ instance : MetricSpace (Hamming β) := .ofT0PseudoMetricSpace _
 instance [∀ i, Zero (β i)] : Norm (Hamming β) :=
   ⟨fun x => hammingNorm (ofHamming x)⟩
 
-@[simp, push_cast]
-theorem norm_eq_hammingNorm [∀ i, Zero (β i)] (x : Hamming β) : ‖x‖ = hammingNorm (ofHamming x) :=
-  rfl
-
 instance [∀ i, AddCommGroup (β i)] : NormedAddCommGroup (Hamming β) where
   dist_eq := by push_cast; exact mod_cast hammingDist_eq_hammingNorm
-
-@[simp, push_cast]
-theorem nnnorm_eq_hammingNorm [∀ i, AddCommGroup (β i)] (x : Hamming β) :
-    ‖x‖₊ = hammingNorm (ofHamming x) :=
-  rfl
 
 end
 

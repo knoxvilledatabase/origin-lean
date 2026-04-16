@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Equiv/Basic.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 1 | Infrastructure: 22
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Basic
 import Mathlib.Data.FunLike.Equiv
 import Mathlib.Logic.Equiv.Basic
+
+noncomputable section
 
 /-!
 # Multiplicative and additive equivs
@@ -39,7 +41,10 @@ theorem map_eq_one_iff {f : F} {x : M} :
     f x = 1 ↔ x = 1 :=
   _root_.map_eq_one_iff f (EmbeddingLike.injective f)
 
--- DISSOLVED: map_ne_one_iff
+@[to_additive]
+theorem map_ne_one_iff {f : F} {x : M} :
+    f x ≠ 1 ↔ x ≠ 1 :=
+  map_eq_one_iff.not
 
 end EmbeddingLike
 
@@ -177,25 +182,8 @@ protected theorem congr_fun {f g : MulEquiv M N} (h : f = g) (x : M) : f x = g x
   DFunLike.congr_fun h x
 
 @[to_additive (attr := simp)]
-theorem coe_mk (f : M ≃ N) (hf : ∀ x y, f (x * y) = f x * f y) : (mk f hf : M → N) = f := rfl
-
-@[to_additive (attr := simp)]
 theorem mk_coe (e : M ≃* N) (e' h₁ h₂ h₃) : (⟨⟨e, e', h₁, h₂⟩, h₃⟩ : M ≃* N) = e :=
   ext fun _ => rfl
-
-@[to_additive (attr := simp)]
-theorem toEquiv_eq_coe (f : M ≃* N) : f.toEquiv = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem toMulHom_eq_coe (f : M ≃* N) : f.toMulHom = ↑f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_toEquiv (f : M ≃* N) : ⇑(f : M ≃ N) = f := rfl
-
-@[to_additive (attr := simp 1100)]
-theorem coe_toMulHom {f : M ≃* N} : (f.toMulHom : M → N) = f := rfl
 
 @[to_additive "Makes an additive isomorphism from a bijection which preserves addition."]
 def mk' (f : M ≃ N) (h : ∀ x y, f (x * y) = f x * f y) : M ≃* N := ⟨f, h⟩
@@ -243,12 +231,6 @@ def refl (M : Type*) [Mul M] : M ≃* M :=
 @[to_additive]
 instance : Inhabited (M ≃* M) := ⟨refl M⟩
 
-@[to_additive (attr := simp)]
-theorem coe_refl : ↑(refl M) = id := rfl
-
-@[to_additive (attr := simp)]
-theorem refl_apply (m : M) : refl M m = m := rfl
-
 end refl
 
 section symm
@@ -266,15 +248,6 @@ def symm {M N : Type*} [Mul M] [Mul N] (h : M ≃* N) : N ≃* M :=
 theorem invFun_eq_symm {f : M ≃* N} : f.invFun = f.symm := rfl
 
 @[to_additive (attr := simp)]
-theorem coe_toEquiv_symm (f : M ≃* N) : ((f : M ≃ N).symm : N → M) = f.symm := rfl
-
-@[to_additive (attr := simp)]
-theorem equivLike_inv_eq_symm (f : M ≃* N) : EquivLike.inv f = f.symm := rfl
-
-@[to_additive (attr := simp)]
-theorem toEquiv_symm (f : M ≃* N) : (f.symm : N ≃ M) = (f : M ≃ N).symm := rfl
-
-@[to_additive (attr := simp)]
 theorem symm_symm (f : M ≃* N) : f.symm.symm = f := rfl
 
 @[to_additive]
@@ -284,13 +257,6 @@ theorem symm_bijective : Function.Bijective (symm : (M ≃* N) → N ≃* M) :=
 @[to_additive (attr := simp)]
 theorem mk_coe' (e : M ≃* N) (f h₁ h₂ h₃) : (MulEquiv.mk ⟨f, e, h₁, h₂⟩ h₃ : N ≃* M) = e.symm :=
   symm_bijective.injective <| ext fun _ => rfl
-
-@[to_additive (attr := simp)]
-theorem symm_mk (f : M ≃ N) (h) :
-    (MulEquiv.mk f h).symm = ⟨f.symm, (MulEquiv.mk f h).symm_map_mul⟩ := rfl
-
-@[to_additive (attr := simp)]
-theorem refl_symm : (refl M).symm = refl M := rfl
 
 @[to_additive (attr := simp) "`e.symm` is a right inverse of `e`, written as `e (e.symm y) = y`."]
 theorem apply_symm_apply (e : M ≃* N) (y : N) : e (e.symm y) = y :=

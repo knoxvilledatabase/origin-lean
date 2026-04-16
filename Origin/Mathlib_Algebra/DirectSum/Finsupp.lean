@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.Data.Finsupp.ToDFinsupp
 
+noncomputable section
+
 /-!
 # Results on direct sums and finitely supported functions.
 

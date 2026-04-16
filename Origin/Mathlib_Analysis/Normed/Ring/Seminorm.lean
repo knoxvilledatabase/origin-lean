@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Normed/Ring/Seminorm.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 4 | Infrastructure: 26
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Real.IsNonarchimedean
+
+noncomputable section
 
 /-!
 # Seminorms and norms on rings
@@ -94,7 +96,7 @@ instance : Zero (RingSeminorm R) :=
 theorem eq_zero_iff {p : RingSeminorm R} : p = 0 ↔ ∀ x, p x = 0 :=
   DFunLike.ext_iff
 
--- DISSOLVED: ne_zero_iff
+theorem ne_zero_iff {p : RingSeminorm R} : p ≠ 0 ↔ ∃ x, p x ≠ 0 := by simp [eq_zero_iff]
 
 instance : Inhabited (RingSeminorm R) :=
   ⟨0⟩
@@ -111,17 +113,26 @@ instance [DecidableEq R] : One (RingSeminorm R) :=
           simp only [if_false, h, left_ne_zero_of_mul h, right_ne_zero_of_mul h, mul_one,
             le_refl] }⟩
 
-@[simp]
-theorem apply_one [DecidableEq R] (x : R) : (1 : RingSeminorm R) x = if x = 0 then 0 else 1 :=
-  rfl
-
 end NonUnitalRing
 
 section Ring
 
 variable [Ring R] (p : RingSeminorm R)
 
--- DISSOLVED: seminorm_one_eq_one_iff_ne_zero
+theorem seminorm_one_eq_one_iff_ne_zero (hp : p 1 ≤ 1) : p 1 = 1 ↔ p ≠ 0 := by
+  refine
+    ⟨fun h =>
+      ne_zero_iff.mpr
+        ⟨1, by
+          rw [h]
+          exact one_ne_zero⟩,
+      fun h => ?_⟩
+  obtain hp0 | hp0 := (apply_nonneg p (1 : R)).eq_or_gt
+  · exfalso
+    refine h (ext fun x => (apply_nonneg _ _).antisymm' ?_)
+    simpa only [hp0, mul_one, mul_zero] using map_mul_le_mul p x 1
+  · refine hp.antisymm ((le_mul_iff_one_le_left hp0).1 ?_)
+    simpa only [one_mul] using map_mul_le_mul p (1 : R) _
 
 end Ring
 
@@ -139,7 +150,15 @@ end CommRing
 
 end RingSeminorm
 
--- DISSOLVED: map_pow_le_pow
+theorem map_pow_le_pow {F α : Type*} [Ring α] [FunLike F α ℝ] [RingSeminormClass F α ℝ] (f : F)
+    (a : α) : ∀ {n : ℕ}, n ≠ 0 → f (a ^ n) ≤ f a ^ n
+  | 0, h => absurd rfl h
+  | 1, _ => by simp only [pow_one, le_refl]
+  | n + 2, _ => by
+    simp only [pow_succ _ (n + 1)];
+      exact
+        le_trans (map_mul_le_mul f _ a)
+          (mul_le_mul_of_nonneg_right (map_pow_le_pow _ _ n.succ_ne_zero) (apply_nonneg f a))
 
 theorem map_pow_le_pow' {F α : Type*} [Ring α] [FunLike F α ℝ] [RingSeminormClass F α ℝ] {f : F}
     (hf1 : f 1 ≤ 1) (a : α) : ∀ n : ℕ, f (a ^ n) ≤ f a ^ n
@@ -211,10 +230,6 @@ variable (R)
 instance [DecidableEq R] : One (RingNorm R) :=
   ⟨{ (1 : RingSeminorm R), (1 : AddGroupNorm R) with }⟩
 
-@[simp]
-theorem apply_one [DecidableEq R] (x : R) : (1 : RingNorm R) x = if x = 0 then 0 else 1 :=
-  rfl
-
 instance [DecidableEq R] : Inhabited (RingNorm R) :=
   ⟨1⟩
 
@@ -260,10 +275,6 @@ instance : One (MulRingSeminorm R) :=
         · simp
         · simp [hx, hy] }⟩
 
-@[simp]
-theorem apply_one (x : R) : (1 : MulRingSeminorm R) x = if x = 0 then 0 else 1 :=
-  rfl
-
 instance : Inhabited (MulRingSeminorm R) :=
   ⟨1⟩
 
@@ -303,10 +314,6 @@ variable [DecidableEq R] [NoZeroDivisors R] [Nontrivial R]
 instance : One (MulRingNorm R) :=
   ⟨{ (1 : MulRingSeminorm R), (1 : AddGroupNorm R) with }⟩
 
-@[simp]
-theorem apply_one (x : R) : (1 : MulRingNorm R) x = if x = 0 then 0 else 1 :=
-  rfl
-
 instance : Inhabited (MulRingNorm R) :=
   ⟨1⟩
 
@@ -336,7 +343,21 @@ lemma equiv_trans {f g k : MulRingNorm R} (hfg : equiv f g) (hgk : equiv g k) :
 
 end MulRingNorm
 
--- DISSOLVED: RingSeminorm.toRingNorm
+def RingSeminorm.toRingNorm {K : Type*} [Field K] (f : RingSeminorm K) (hnt : f ≠ 0) :
+    RingNorm K :=
+  { f with
+    eq_zero_of_map_eq_zero' := fun x hx => by
+      obtain ⟨c, hc⟩ := RingSeminorm.ne_zero_iff.mp hnt
+      by_contra hn0
+      have hc0 : f c = 0 := by
+        rw [← mul_one c, ← mul_inv_cancel₀ hn0, ← mul_assoc, mul_comm c, mul_assoc]
+        exact
+          le_antisymm
+            (le_trans (map_mul_le_mul f _ _)
+              (by rw [← RingSeminorm.toFun_eq_coe, ← AddGroupSeminorm.toFun_eq_coe, hx,
+                zero_mul]))
+            (apply_nonneg f _)
+      exact hc hc0 }
 
 @[simps!]
 def normRingNorm (R : Type*) [NonUnitalNormedRing R] : RingNorm R :=
@@ -374,11 +395,6 @@ def NormedRing.toRingNorm (R : Type*) [NormedRing R] : RingNorm R where
   mul_le'   := norm_mul_le
   neg'      := norm_neg
   eq_zero_of_map_eq_zero' x hx := by rw [← norm_eq_zero]; exact hx
-
-@[simp]
-theorem NormedRing.toRingNorm_apply (R : Type*) [NormedRing R] (x : R) :
-    (NormedRing.toRingNorm R) x = ‖x‖ :=
-  rfl
 
 def NormedField.toMulRingNorm (R : Type*) [NormedField R] : MulRingNorm R where
   toFun     := norm

@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupWithZero.Action.End
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Ring.Hom.Defs
 
+noncomputable section
+
 /-!
 # Composing modules with a ring hom
 

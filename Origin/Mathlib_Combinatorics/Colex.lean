@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.BitIndices
 import Mathlib.Order.SupClosed
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Colexigraphic order
 
@@ -73,10 +75,6 @@ structure Colex (α) where
 open Colex
 
 instance : Inhabited (Colex α) := ⟨⟨∅⟩⟩
-
-@[simp] lemma toColex_ofColex (s : Colex α) : toColex (ofColex s) = s := rfl
-
-lemma ofColex_toColex (s : Finset α) : ofColex (toColex s) = s := rfl
 
 lemma toColex_inj {s t : Finset α} : toColex s = toColex t ↔ s = t := by simp
 
@@ -157,10 +155,6 @@ lemma toColex_lt_toColex_of_ssubset (h : s ⊂ t) : toColex s < toColex t := toC
 instance instOrderBot : OrderBot (Colex α) where
   bot := toColex ∅
   bot_le s a ha := by cases ha
-
-@[simp] lemma toColex_empty : toColex (∅ : Finset α) = ⊥ := rfl
-
-@[simp] lemma ofColex_bot : ofColex (⊥ : Colex α) = ∅ := rfl
 
 lemma forall_le_mono (hst : toColex s ≤ toColex t) (ht : ∀ b ∈ t, b ≤ a) : ∀ b ∈ s, b ≤ a := by
   rintro b hb
@@ -406,10 +400,6 @@ variable [Fintype α]
 instance instBoundedOrder : BoundedOrder (Colex α) where
   top := toColex univ
   le_top _x := toColex_le_toColex_of_subset <| subset_univ _
-
-@[simp] lemma toColex_univ : toColex (univ : Finset α) = ⊤ := rfl
-
-@[simp] lemma ofColex_top : ofColex (⊤ : Colex α) = univ := rfl
 
 end Fintype
 

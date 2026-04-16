@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 import Mathlib.Topology.EMetricSpace.Basic
 
+noncomputable section
+
 /-!
 ## Cauchy sequences in (pseudo-)metric spaces
 

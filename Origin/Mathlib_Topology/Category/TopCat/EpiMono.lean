@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.TopCat.Adjunctions
 import Mathlib.CategoryTheory.Functor.EpiMono
 
+noncomputable section
+
 /-!
 # Epi- and monomorphisms in `Top`
 

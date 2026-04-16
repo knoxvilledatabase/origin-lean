@@ -8,6 +8,8 @@ import Lean.Meta.Tactic.SplitIf
 import Lean.Elab.Tactic.Simp
 import Mathlib.Tactic.Core
 
+noncomputable section
+
 /-!
 Tactic to split if-then-else expressions.
 -/

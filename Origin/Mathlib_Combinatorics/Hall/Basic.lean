@@ -7,6 +7,8 @@ import Mathlib.Combinatorics.Hall.Finite
 import Mathlib.CategoryTheory.CofilteredSystem
 import Mathlib.Data.Rel
 
+noncomputable section
+
 /-!
 # Hall's Marriage Theorem
 

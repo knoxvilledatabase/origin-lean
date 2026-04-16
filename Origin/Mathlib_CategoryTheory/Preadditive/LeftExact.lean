@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 
+noncomputable section
+
 /-!
 # Left exactness of functors between preadditive categories
 

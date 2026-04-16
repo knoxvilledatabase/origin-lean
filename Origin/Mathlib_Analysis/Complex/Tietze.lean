@@ -9,6 +9,8 @@ import Mathlib.Topology.TietzeExtension
 import Mathlib.Analysis.NormedSpace.HomeomorphBall
 import Mathlib.Analysis.NormedSpace.RCLike
 
+noncomputable section
+
 /-!
 # Finite dimensional topological vector spaces over `ℝ` satisfy the Tietze extension property
 
@@ -102,6 +104,13 @@ variable {E : Type w} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [FiniteDimensi
 namespace BoundedContinuousFunction
 
 include 𝕜 hs in
+/-- **Tietze extension theorem** for real-valued bounded continuous maps, a version with a closed
+
+embedding and bundled composition. If `e : C(X, Y)` is a closed embedding of a topological space
+
+into a normal topological space and `f : X →ᵇ ℝ` is a bounded continuous function, then there exists
+
+a bounded continuous function `g : Y →ᵇ ℝ` of the same norm such that `g ∘ e = f`. -/
 
 theorem exists_norm_eq_restrict_eq (f : s →ᵇ E) :
     ∃ g : X →ᵇ E, ‖g‖ = ‖f‖ ∧ g.restrict s = f := by

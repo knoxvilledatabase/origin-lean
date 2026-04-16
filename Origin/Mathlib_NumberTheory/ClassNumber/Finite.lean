@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ClassNumber/Finite.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
@@ -10,6 +10,8 @@ import Mathlib.NumberTheory.ClassNumber.AdmissibleAbsoluteValue
 import Mathlib.RingTheory.ClassGroup
 import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 import Mathlib.RingTheory.Norm.Basic
+
+noncomputable section
 
 /-!
 # Class numbers of global fields
@@ -109,7 +111,23 @@ theorem norm_lt {T : Type*} [LinearOrderedRing T] (a : S) {y : T}
   · exact pow_nonneg (Int.cast_nonneg.mpr y'_nonneg) _
   · exact Int.cast_pos.mpr (normBound_pos abv bS)
 
--- DISSOLVED: exists_min
+theorem exists_min (I : (Ideal S)⁰) :
+    ∃ b ∈ (I : Ideal S),
+      b ≠ 0 ∧ ∀ c ∈ (I : Ideal S), abv (Algebra.norm R c) < abv (Algebra.norm R b) → c =
+      (0 : S) := by
+  obtain ⟨_, ⟨b, b_mem, b_ne_zero, rfl⟩, min⟩ := @Int.exists_least_of_bdd
+      (fun a => ∃ b ∈ (I : Ideal S), b ≠ (0 : S) ∧ abv (Algebra.norm R b) = a)
+    (by
+      use 0
+      rintro _ ⟨b, _, _, rfl⟩
+      apply abv.nonneg)
+    (by
+      obtain ⟨b, b_mem, b_ne_zero⟩ := (I : Ideal S).ne_bot_iff.mp (nonZeroDivisors.coe_ne_zero I)
+      exact ⟨_, ⟨b, b_mem, b_ne_zero, rfl⟩⟩)
+  refine ⟨b, b_mem, b_ne_zero, ?_⟩
+  intro c hc lt
+  contrapose! lt with c_ne_zero
+  exact min _ ⟨c, hc, c_ne_zero, rfl⟩
 
 section IsAdmissible
 
@@ -226,11 +244,29 @@ theorem exists_mem_finsetApprox (a : S) {b} (hb : b ≠ (0 : R)) :
 
   · exact mod_cast ε_le
 
--- DISSOLVED: exists_mem_finset_approx'
+theorem exists_mem_finset_approx' [Algebra.IsAlgebraic R S] (a : S) {b : S} (hb : b ≠ 0) :
+    ∃ q : S,
+      ∃ r ∈ finsetApprox bS adm, abv (Algebra.norm R (r • a - q * b)) < abv (Algebra.norm R b) := by
+  obtain ⟨a', b', hb', h⟩ := Algebra.IsAlgebraic.exists_smul_eq_mul R a hb
+  obtain ⟨q, r, hr, hqr⟩ := exists_mem_finsetApprox bS adm a' hb'
+  refine ⟨q, r, hr, ?_⟩
+  refine
+    lt_of_mul_lt_mul_left ?_ (show 0 ≤ abv (Algebra.norm R (algebraMap R S b')) from abv.nonneg _)
+  refine
+    lt_of_le_of_lt (le_of_eq ?_)
+      (mul_lt_mul hqr le_rfl (abv.pos ((Algebra.norm_ne_zero_iff_of_basis bS).mpr hb))
+        (abv.nonneg _))
+  rw [← abv.map_mul, ← MonoidHom.map_mul, ← abv.map_mul, ← MonoidHom.map_mul, ← Algebra.smul_def,
+    smul_sub b', sub_mul, smul_comm, h, mul_comm b a', Algebra.smul_mul_assoc r a' b,
+    Algebra.smul_mul_assoc b' q b]
 
 end Real
 
--- DISSOLVED: prod_finsetApprox_ne_zero
+theorem prod_finsetApprox_ne_zero : algebraMap R S (∏ m ∈ finsetApprox bS adm, m) ≠ 0 := by
+  refine mt ((injective_iff_map_eq_zero _).mp bS.algebraMap_injective _) ?_
+  simp only [Finset.prod_eq_zero_iff, not_exists]
+  rintro x ⟨hx, rfl⟩
+  exact finsetApprox.zero_not_mem bS adm hx
 
 theorem ne_bot_of_prod_finsetApprox_mem (J : Ideal S)
     (h : algebraMap _ _ (∏ m ∈ finsetApprox bS adm, m) ∈ J) : J ≠ ⊥ :=

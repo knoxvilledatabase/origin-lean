@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Between
 import Mathlib.Analysis.Convex.StrictConvexSpace
 import Mathlib.Analysis.Normed.Affine.Isometry
 
+noncomputable section
+
 /-!
 # Betweenness in affine spaces for strictly convex spaces
 
@@ -134,11 +136,5 @@ noncomputable def affineIsometryOfStrictConvexSpace (hi : Isometry f) : PF →�
           simp only [dist_midpoint_right, Real.norm_of_nonneg zero_le_two, div_eq_inv_mul])
       hi.continuous with
     norm_map := fun x => by simp [AffineMap.ofMapMidpoint, ← dist_eq_norm_vsub E, hi.dist_eq] }
-
-@[simp] lemma coe_affineIsometryOfStrictConvexSpace (hi : Isometry f) :
-    ⇑hi.affineIsometryOfStrictConvexSpace = f := rfl
-
-@[simp] lemma affineIsometryOfStrictConvexSpace_apply (hi : Isometry f) (p : PF) :
-    hi.affineIsometryOfStrictConvexSpace p = f p := rfl
 
 end Isometry

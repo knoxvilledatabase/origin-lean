@@ -7,6 +7,8 @@ import Mathlib.RingTheory.FractionalIdeal.Basic
 import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 import Mathlib.RingTheory.Localization.NormTrace
 
+noncomputable section
+
 /-!
 
 # Fractional ideal norms

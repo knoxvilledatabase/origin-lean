@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matrix.Mul
 import Mathlib.Data.PEquiv
 
+noncomputable section
+
 /-!
 # partial equivalences for matrices
 

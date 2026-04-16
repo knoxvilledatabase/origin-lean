@@ -8,6 +8,8 @@ import Mathlib.Topology.MetricSpace.ProperSpace
 import Mathlib.Topology.MetricSpace.Cauchy
 import Mathlib.Topology.EMetricSpace.Diam
 
+noncomputable section
+
 /-!
 ## Boundedness in (pseudo)-metric spaces
 

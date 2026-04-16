@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Measure/Dirac.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses
 import Mathlib.MeasureTheory.Measure.MutuallySingular
 import Mathlib.MeasureTheory.MeasurableSpace.CountablyGenerated
+
+noncomputable section
 
 /-!
 # Dirac measure
@@ -54,7 +56,8 @@ theorem dirac_apply [MeasurableSingletonClass α] (a : α) (s : Set α) :
     dirac a s ≤ dirac a {a}ᶜ := measure_mono (subset_compl_comm.1 <| singleton_subset_iff.2 h)
     _ = 0 := by simp [dirac_apply' _ (measurableSet_singleton _).compl]
 
--- DISSOLVED: dirac_ne_zero
+@[simp] lemma dirac_ne_zero : dirac a ≠ 0 :=
+  fun h ↦ by simpa [h] using dirac_apply_of_mem (mem_univ a)
 
 theorem map_dirac {f : α → β} (hf : Measurable f) (a : α) : (dirac a).map f = dirac (f a) := by
   classical

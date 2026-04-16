@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Condensed.Light.Basic
 import Mathlib.Condensed.TopComparison
 
+noncomputable section
+
 /-!
 
 # The functor from topological spaces to light condensed sets

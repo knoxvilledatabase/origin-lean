@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Gamma.Deligne
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.NumberTheory.Harmonic.EulerMascheroni
 
+noncomputable section
+
 /-!
 # Derivative of Γ at positive integers
 

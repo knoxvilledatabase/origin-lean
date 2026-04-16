@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Nilpotent.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Nilpotent.Basic
 import Mathlib.RingTheory.Nilpotent.Lemmas
 import Mathlib.RingTheory.Polynomial.Tower
+
+noncomputable section
 
 /-!
 # Nilpotency in polynomial rings.
@@ -101,18 +103,49 @@ protected lemma isNilpotent_iff :
     IsNilpotent P.reverse ↔ IsNilpotent P :=
   isNilpotent_reflect_iff (le_refl _)
 
--- DISSOLVED: isUnit_of_coeff_isUnit_isNilpotent
+theorem isUnit_of_coeff_isUnit_isNilpotent (hunit : IsUnit (P.coeff 0))
+    (hnil : ∀ i, i ≠ 0 → IsNilpotent (P.coeff i)) : IsUnit P := by
+  induction' h : P.natDegree using Nat.strong_induction_on with k hind generalizing P
+  by_cases hdeg : P.natDegree = 0
+  { rw [eq_C_of_natDegree_eq_zero hdeg]
+    exact hunit.map C }
+  set P₁ := P.eraseLead with hP₁
+  suffices IsUnit P₁ by
+    rw [← eraseLead_add_monomial_natDegree_leadingCoeff P, ← C_mul_X_pow_eq_monomial, ← hP₁]
+    refine IsNilpotent.isUnit_add_left_of_commute ?_ this (Commute.all _ _)
+    exact isNilpotent_C_mul_pow_X_of_isNilpotent _ (hnil _ hdeg)
+  have hdeg₂ := lt_of_le_of_lt P.eraseLead_natDegree_le (Nat.sub_lt
+    (Nat.pos_of_ne_zero hdeg) zero_lt_one)
+  refine hind P₁.natDegree ?_ ?_ (fun i hi => ?_) rfl
+  · simp_rw [← h, hdeg₂]
+  · simp_rw [eraseLead_coeff_of_ne _ (Ne.symm hdeg), hunit]
+  · by_cases H : i ≤ P₁.natDegree
+    · simp_rw [eraseLead_coeff_of_ne _ (ne_of_lt (lt_of_le_of_lt H hdeg₂)), hnil i hi]
+    · simp_rw [coeff_eq_zero_of_natDegree_lt (lt_of_not_ge H), IsNilpotent.zero]
 
--- DISSOLVED: coeff_isUnit_isNilpotent_of_isUnit
+theorem coeff_isUnit_isNilpotent_of_isUnit (hunit : IsUnit P) :
+    IsUnit (P.coeff 0) ∧ (∀ i, i ≠ 0 → IsNilpotent (P.coeff i)) := by
+  obtain ⟨Q, hQ⟩ := IsUnit.exists_right_inv hunit
+  constructor
+  · refine isUnit_of_mul_eq_one _ (Q.coeff 0) ?_
+    have h := (mul_coeff_zero P Q).symm
+    rwa [hQ, coeff_one_zero] at h
+  · intros n hn
+    rw [nilpotent_iff_mem_prime]
+    intros I hI
+    let f := mapRingHom (Ideal.Quotient.mk I)
+    have hPQ : degree (f P) = 0 ∧ degree (f Q) = 0 := by
+      rw [← Nat.WithBot.add_eq_zero_iff, ← degree_mul, ← _root_.map_mul, hQ, map_one, degree_one]
+    have hcoeff : (f P).coeff n = 0 := by
+      refine coeff_eq_zero_of_degree_lt ?_
+      rw [hPQ.1]
+      exact WithBot.coe_pos.2 hn.bot_lt
+    rw [coe_mapRingHom, coeff_map, ← RingHom.mem_ker, Ideal.mk_ker] at hcoeff
+    exact hcoeff
 
--- DISSOLVED: isUnit_iff_coeff_isUnit_isNilpotent
-
-@[simp] lemma isUnit_C_add_X_mul_iff :
-    IsUnit (C r + X * P) ↔ IsUnit r ∧ IsNilpotent P := by
-  have : ∀ i, coeff (C r + X * P) (i + 1) = coeff P i := by simp
-  simp_rw [isUnit_iff_coeff_isUnit_isNilpotent, Nat.forall_ne_zero_iff, this]
-  simp only [coeff_add, coeff_C_zero, mul_coeff_zero, coeff_X_zero, zero_mul, add_zero,
-    and_congr_right_iff, ← Polynomial.isNilpotent_iff]
+theorem isUnit_iff_coeff_isUnit_isNilpotent :
+    IsUnit P ↔ IsUnit (P.coeff 0) ∧ (∀ i, i ≠ 0 → IsNilpotent (P.coeff i)) :=
+  ⟨coeff_isUnit_isNilpotent_of_isUnit, fun H => isUnit_of_coeff_isUnit_isNilpotent H.1 H.2⟩
 
 lemma isUnit_iff' :
     IsUnit P ↔ IsUnit (eval 0 P) ∧ IsNilpotent (P /ₘ X)  := by

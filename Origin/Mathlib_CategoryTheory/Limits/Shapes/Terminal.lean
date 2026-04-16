@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.IsTerminal
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # Initial and terminal objects in a category.
 

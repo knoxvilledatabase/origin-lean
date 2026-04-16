@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Final
 
+noncomputable section
+
 /-!
 # Sifted categories
 

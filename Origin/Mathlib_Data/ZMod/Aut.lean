@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.AddAut
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # Automorphism Group of `ZMod`.
 -/

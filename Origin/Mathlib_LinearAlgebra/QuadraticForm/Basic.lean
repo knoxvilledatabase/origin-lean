@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/QuadraticForm/Basic.lean
-Genuine: 118 | Conflates: 0 | Dissolved: 4 | Infrastructure: 47
+Genuine: 122 | Conflates: 0 | Dissolved: 0 | Infrastructure: 47
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional
@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Matrix.SesquilinearForm
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Data.Finset.Sym
 import Mathlib.LinearAlgebra.BilinearMap
+
+noncomputable section
 
 /-!
 # Quadratic maps
@@ -156,10 +158,6 @@ instance instFunLike : FunLike (QuadraticMap R M N) M N where
 
 variable (Q)
 
-@[simp]
-theorem toFun_eq_coe : Q.toFun = ⇑Q :=
-  rfl
-
 initialize_simps_projections QuadraticMap (toFun → apply)
 
 variable {Q}
@@ -175,10 +173,6 @@ protected def copy (Q : QuadraticMap R M N) (Q' : M → N) (h : Q' = ⇑Q) : Qua
   toFun := Q'
   toFun_smul := h.symm ▸ Q.toFun_smul
   exists_companion' := h.symm ▸ Q.exists_companion'
-
-@[simp]
-theorem coe_copy (Q : QuadraticMap R M N) (Q' : M → N) (h : Q' = ⇑Q) : ⇑(Q.copy Q' h) = Q' :=
-  rfl
 
 theorem copy_eq (Q : QuadraticMap R M N) (Q' : M → N) (h : Q' = ⇑Q) : Q.copy Q' h = Q :=
   DFunLike.ext' h
@@ -491,10 +485,6 @@ instance : Sub (QuadraticMap R M N) :=
 theorem coeFn_sub (Q Q' : QuadraticMap R M N) : ⇑(Q - Q') = Q - Q' :=
   rfl
 
-@[simp]
-theorem sub_apply (Q Q' : QuadraticMap R M N) (x : M) : (Q - Q') x = Q x - Q' x :=
-  rfl
-
 instance : AddCommGroup (QuadraticMap R M N) :=
   DFunLike.coe_injective.addCommGroup _ coeFn_zero coeFn_add coeFn_neg coeFn_sub
     (fun _ _ => coeFn_smul _ _) fun _ _ => coeFn_smul _ _
@@ -562,14 +552,6 @@ def _root_.LinearEquiv.congrQuadraticMap (e : N ≃ₗ[R] P) :
   map_add' _ _ := ext fun _ => map_add e _ _
   map_smul' _ _ := ext fun _ => _root_.map_smul e _ _
 
-@[simp]
-theorem _root_.LinearEquiv.congrQuadraticMap_refl :
-    LinearEquiv.congrQuadraticMap (.refl R N) = .refl R (QuadraticMap R M N) := rfl
-
-@[simp]
-theorem _root_.LinearEquiv.congrQuadraticMap_symm (e : N ≃ₗ[R] P) :
-    (LinearEquiv.congrQuadraticMap e (M := M)).symm = e.symm.congrQuadraticMap := rfl
-
 end Comp
 
 section NonUnitalNonAssocSemiring
@@ -603,11 +585,6 @@ theorem linMulLin_add (f g h : M →ₗ[R] A) : linMulLin f (g + h) = linMulLin 
 
 variable {N' : Type*} [AddCommMonoid N'] [Module R N']
 
-@[simp]
-theorem linMulLin_comp (f g : M →ₗ[R] A) (h : N' →ₗ[R] M) :
-    (linMulLin f g).comp h = linMulLin (f.comp h) (g.comp h) :=
-  rfl
-
 variable {n : Type*}
 
 @[simps!]
@@ -616,10 +593,6 @@ def sq : QuadraticMap R A A :=
 
 def proj (i j : n) : QuadraticMap R (n → A) A :=
   linMulLin (@LinearMap.proj _ _ _ (fun _ => A) _ _ i) (@LinearMap.proj _ _ _ (fun _ => A) _ _ j)
-
-@[simp]
-theorem proj_apply (i j : n) (x : n → A) : proj (R := R) i j x = x i * x j :=
-  rfl
 
 end NonUnitalNonAssocSemiring
 
@@ -662,9 +635,6 @@ def toQuadraticMap (B : BilinMap R M N) : QuadraticMap R M N where
 @[simp]
 theorem toQuadraticMap_apply (B : BilinMap R M N) (x : M) : B.toQuadraticMap x = B x x :=
   rfl
-
-theorem toQuadraticMap_comp_same (B : BilinMap R M N) (f : N' →ₗ[R] M) :
-    BilinMap.toQuadraticMap (B.compl₁₂ f f) = B.toQuadraticMap.comp f := rfl
 
 section
 
@@ -733,15 +703,6 @@ section Ring
 variable [CommRing R] [AddCommGroup M] [AddCommGroup N] [Module R M] [Module R N]
 
 variable {B : BilinMap R M N}
-
-@[simp]
-theorem toQuadraticMap_neg (B : BilinMap R M N) : (-B).toQuadraticMap = -B.toQuadraticMap :=
-  rfl
-
-@[simp]
-theorem toQuadraticMap_sub (B₁ B₂ : BilinMap R M N) :
-    (B₁ - B₂).toQuadraticMap = B₁.toQuadraticMap - B₂.toQuadraticMap :=
-  rfl
 
 theorem polar_toQuadraticMap (x y : M) : polar (toQuadraticMap B) x y = B x y + B y x := by
   simp only [polar, toQuadraticMap_apply, map_add, add_apply, add_assoc, add_comm (B y x) _,
@@ -913,7 +874,14 @@ instance canLift' :
     CanLift (BilinMap R M N) (QuadraticMap R M N) (associatedHom ℕ) fun B ↦ B.flip = B where
   prf B hB := ⟨B.toQuadraticMap, associated_left_inverse' _ hB⟩
 
--- DISSOLVED: exists_quadraticMap_ne_zero
+theorem exists_quadraticMap_ne_zero {Q : QuadraticMap R M N}
+    -- Porting note: added implicit argument
+    (hB₁ : associated' (R := R) (N := N) Q ≠ 0) :
+    ∃ x, Q x ≠ 0 := by
+  rw [← not_forall]
+  intro h
+  apply hB₁
+  rw [(QuadraticMap.ext h : Q = 0), LinearMap.map_zero]
 
 end AssociatedHom
 
@@ -929,10 +897,6 @@ abbrev associated : QuadraticMap R M N →ₗ[R] BilinMap R M N :=
   associatedHom R
 
 variable (S) in
-
-theorem coe_associatedHom :
-    ⇑(associatedHom S : QuadraticMap R M N →ₗ[S] BilinMap R M N) = associated :=
-  rfl
 
 open LinearMap in
 
@@ -977,7 +941,9 @@ theorem IsOrtho.zero_left (x : M) : IsOrtho Q (0 : M) x := by simp [isOrtho_def]
 
 theorem IsOrtho.zero_right (x : M) : IsOrtho Q x (0 : M) := by simp [isOrtho_def]
 
--- DISSOLVED: ne_zero_of_not_isOrtho_self
+theorem ne_zero_of_not_isOrtho_self {Q : QuadraticMap R M N} (x : M) (hx₁ : ¬Q.IsOrtho x x) :
+    x ≠ 0 :=
+  fun hx₂ => hx₁ (hx₂.symm ▸ .zero_left _)
 
 theorem isOrtho_comm {x y : M} : IsOrtho Q x y ↔ IsOrtho Q y x := by simp_rw [isOrtho_def, add_comm]
 
@@ -1024,7 +990,9 @@ variable [CommSemiring R] [AddCommMonoid M] [AddCommMonoid N] [Module R M] [Modu
 def Anisotropic (Q : QuadraticMap R M N) : Prop :=
   ∀ x, Q x = 0 → x = 0
 
--- DISSOLVED: not_anisotropic_iff_exists
+theorem not_anisotropic_iff_exists (Q : QuadraticMap R M N) :
+    ¬Anisotropic Q ↔ ∃ x, x ≠ 0 ∧ Q x = 0 := by
+  simp only [Anisotropic, not_forall, exists_prop, and_comm]
 
 theorem Anisotropic.eq_zero_iff {Q : QuadraticMap R M N} (h : Anisotropic Q) {x : M} :
     Q x = 0 ↔ x = 0 :=
@@ -1187,7 +1155,11 @@ end Semiring
 
 variable [CommRing R] [AddCommGroup M] [Module R M]
 
--- DISSOLVED: exists_bilinForm_self_ne_zero
+theorem exists_bilinForm_self_ne_zero [htwo : Invertible (2 : R)] {B : BilinForm R M}
+    (hB₁ : B ≠ 0) (hB₂ : B.IsSymm) : ∃ x, ¬B.IsOrtho x x := by
+  lift B to QuadraticForm R M using hB₂ with Q
+  obtain ⟨x, hx⟩ := QuadraticMap.exists_quadraticMap_ne_zero hB₁
+  exact ⟨x, fun h => hx (Q.associated_eq_self_apply ℕ x ▸ h)⟩
 
 open Module
 

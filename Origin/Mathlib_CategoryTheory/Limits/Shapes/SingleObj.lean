@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.SingleObj
 import Mathlib.Data.Setoid.Basic
 import Mathlib.GroupTheory.GroupAction.Defs
 
+noncomputable section
+
 /-!
 # (Co)limits of functors out of `SingleObj M`
 

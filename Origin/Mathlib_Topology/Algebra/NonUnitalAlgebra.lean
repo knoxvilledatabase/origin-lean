@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalSubalgebra
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Non-unital topological (sub)algebras
 
@@ -125,11 +127,6 @@ instance {A : Type*} [UniformSpace A] [CompleteSpace A] [NonUnitalSemiring A]
     [SMulCommClass R A A] [ContinuousConstSMul R A] (x : A) :
     CompleteSpace (elemental R x) :=
   isClosed_closure.completeSpace_coe
-
-theorem isClosedEmbedding_coe (x : A) : Topology.IsClosedEmbedding ((↑) : elemental R x → A) where
-  eq_induced := rfl
-  injective := Subtype.coe_injective
-  isClosed_range := by simpa using isClosed R x
 
 end elemental
 

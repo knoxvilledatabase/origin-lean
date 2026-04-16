@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Order/Monoid/NatCast.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 13 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 import Mathlib.Algebra.Order.ZeroLEOne
 import Mathlib.Data.Nat.Cast.Defs
+
+noncomputable section
 
 /-!
 # Order of numerals in an `AddMonoidWithOne`.
@@ -15,7 +17,9 @@ variable {α : Type*}
 
 open Function
 
--- DISSOLVED: lt_add_one
+lemma lt_add_one [One α] [AddZeroClass α] [PartialOrder α] [ZeroLEOneClass α]
+    [NeZero (1 : α)] [AddLeftStrictMono α] (a : α) : a < a + 1 :=
+  lt_add_of_pos_right _ zero_lt_one
 
 -- DISSOLVED: lt_one_add
 

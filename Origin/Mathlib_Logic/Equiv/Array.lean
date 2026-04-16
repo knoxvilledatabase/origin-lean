@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Vector.Basic
 import Mathlib.Logic.Equiv.List
 
+noncomputable section
+
 /-!
 # Equivalences involving `Array`
 -/

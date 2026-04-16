@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Topology.Instances.ENNReal
 
+noncomputable section
+
 /-!
 # Continuity of series of functions
 

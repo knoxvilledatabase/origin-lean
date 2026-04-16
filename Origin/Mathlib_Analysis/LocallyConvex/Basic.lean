@@ -8,6 +8,8 @@ import Mathlib.Analysis.Convex.Hull
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Topology.Bornology.Absorbs
 
+noncomputable section
+
 /-!
 # Local convexity
 

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.HasLimits
 import Mathlib.CategoryTheory.Yoneda
 import Mathlib.Order.CompleteLattice
 
+noncomputable section
+
 /-!
 # Domain of definition of the partial left adjoint
 

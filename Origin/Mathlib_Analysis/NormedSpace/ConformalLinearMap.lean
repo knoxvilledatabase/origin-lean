@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/NormedSpace/ConformalLinearMap.lean
-Genuine: 5 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
+Genuine: 7 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Analysis.Normed.Operator.LinearIsometry
 import Mathlib.LinearAlgebra.Basis.VectorSpace
+
+noncomputable section
 
 /-!
 # Conformal Linear Maps
@@ -52,9 +54,13 @@ variable {R M N G M' : Type*} [NormedField R] [SeminormedAddCommGroup M] [Semino
 theorem isConformalMap_id : IsConformalMap (id R M) :=
   ⟨1, one_ne_zero, id, by simp⟩
 
--- DISSOLVED: IsConformalMap.smul
+theorem IsConformalMap.smul (hf : IsConformalMap f) {c : R} (hc : c ≠ 0) :
+    IsConformalMap (c • f) := by
+  rcases hf with ⟨c', hc', li, rfl⟩
+  exact ⟨c * c', mul_ne_zero hc hc', li, smul_smul _ _ _⟩
 
--- DISSOLVED: isConformalMap_const_smul
+theorem isConformalMap_const_smul (hc : c ≠ 0) : IsConformalMap (c • id R M) :=
+  isConformalMap_id.smul hc
 
 protected theorem LinearIsometry.isConformalMap (f' : M →ₗᵢ[R] N) :
     IsConformalMap f'.toContinuousLinearMap :=

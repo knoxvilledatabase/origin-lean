@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Data.Finset.Prod
 import Mathlib.Data.Fintype.Prod
 
+noncomputable section
+
 /-!
 # Additive energy
 

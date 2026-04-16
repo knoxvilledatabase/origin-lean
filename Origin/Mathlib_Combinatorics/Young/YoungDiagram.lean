@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Data.Finset.Preimage
 
+noncomputable section
+
 /-!
 # Young diagrams
 
@@ -81,24 +83,12 @@ theorem up_left_mem (μ : YoungDiagram) {i1 i2 j1 j2 : ℕ} (hi : i1 ≤ i2) (hj
 
 section DistribLattice
 
-@[simp]
-theorem cells_subset_iff {μ ν : YoungDiagram} : μ.cells ⊆ ν.cells ↔ μ ≤ ν :=
-  Iff.rfl
-
-@[simp]
-theorem cells_ssubset_iff {μ ν : YoungDiagram} : μ.cells ⊂ ν.cells ↔ μ < ν :=
-  Iff.rfl
-
 instance : Max YoungDiagram where
   max μ ν :=
     { cells := μ.cells ∪ ν.cells
       isLowerSet := by
         rw [Finset.coe_union]
         exact μ.isLowerSet.union ν.isLowerSet }
-
-@[simp]
-theorem cells_sup (μ ν : YoungDiagram) : (μ ⊔ ν).cells = μ.cells ∪ ν.cells :=
-  rfl
 
 @[simp, norm_cast]
 theorem coe_sup (μ ν : YoungDiagram) : ↑(μ ⊔ ν) = (μ ∪ ν : Set (ℕ × ℕ)) :=
@@ -114,10 +104,6 @@ instance : Min YoungDiagram where
       isLowerSet := by
         rw [Finset.coe_inter]
         exact μ.isLowerSet.inter ν.isLowerSet }
-
-@[simp]
-theorem cells_inf (μ ν : YoungDiagram) : (μ ⊓ ν).cells = μ.cells ∩ ν.cells :=
-  rfl
 
 @[simp, norm_cast]
 theorem coe_inf (μ ν : YoungDiagram) : ↑(μ ⊓ ν) = (μ ∩ ν : Set (ℕ × ℕ)) :=

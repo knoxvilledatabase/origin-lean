@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Basic.lean
-Genuine: 102 | Conflates: 3 | Dissolved: 3 | Infrastructure: 7
+Genuine: 107 | Conflates: 3 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Attach
@@ -13,6 +13,8 @@ import Mathlib.Logic.Equiv.Set
 import Mathlib.Order.Directed
 import Mathlib.Order.Interval.Set.Defs
 import Mathlib.Data.Set.SymmDiff
+
+noncomputable section
 
 /-!
 # Basic lemmas on finite sets
@@ -97,10 +99,6 @@ instance isDirected_subset : IsDirected (Finset α) (· ⊆ ·) := isDirected_le
 section Erase
 
 variable [DecidableEq α] {s t u v : Finset α} {a b : α}
-
-@[simp]
-theorem erase_empty (a : α) : erase ∅ a = ∅ :=
-  rfl
 
 -- CONFLATES (assumes ground = zero): Nontrivial.erase_nonempty
 protected lemma Nontrivial.erase_nonempty (hs : s.Nontrivial) : (s.erase a).Nonempty :=
@@ -298,13 +296,10 @@ end Sdiff
 /-! ### attach -/
 
 @[simp]
-theorem attach_empty : attach (∅ : Finset α) = ∅ :=
-  rfl
-
-@[simp]
 theorem attach_nonempty_iff {s : Finset α} : s.attach.Nonempty ↔ s.Nonempty := by
   simp [Finset.Nonempty]
 
+@[aesop safe apply (rule_sets := [finsetNonempty])]
 protected alias ⟨_, Nonempty.attach⟩ := attach_nonempty_iff
 
 @[simp]
@@ -496,9 +491,28 @@ variable [DecidableEq α] {s t : Multiset α}
 theorem toFinset_add (s t : Multiset α) : toFinset (s + t) = toFinset s ∪ toFinset t :=
   Finset.ext <| by simp
 
--- DISSOLVED: toFinset_nsmul
+@[simp]
+theorem toFinset_nsmul (s : Multiset α) : ∀ n ≠ 0, (n • s).toFinset = s.toFinset
+  | 0, h => by contradiction
+  | n + 1, _ => by
+    by_cases h : n = 0
+    · rw [h, zero_add, one_nsmul]
+    · rw [add_nsmul, toFinset_add, one_nsmul, toFinset_nsmul s n h, Finset.union_idempotent]
 
--- DISSOLVED: toFinset_eq_singleton_iff
+theorem toFinset_eq_singleton_iff (s : Multiset α) (a : α) :
+    s.toFinset = {a} ↔ card s ≠ 0 ∧ s = card s • {a} := by
+  refine ⟨fun H ↦ ⟨fun h ↦ ?_, ext' fun x ↦ ?_⟩, fun H ↦ ?_⟩
+  · rw [card_eq_zero.1 h, toFinset_zero] at H
+    exact Finset.singleton_ne_empty _ H.symm
+  · rw [count_nsmul, count_singleton]
+    by_cases hx : x = a
+    · simp_rw [hx, ite_true, mul_one, count_eq_card]
+      intro y hy
+      rw [← mem_toFinset, H, Finset.mem_singleton] at hy
+      exact hy.symm
+    have hx' : x ∉ s := fun h' ↦ hx <| by rwa [← mem_toFinset, H, Finset.mem_singleton] at h'
+    simp_rw [count_eq_zero_of_not_mem hx', hx, ite_false, Nat.mul_zero]
+  simpa only [toFinset_nsmul _ _ H.1, toFinset_singleton] using congr($(H.2).toFinset)
 
 @[simp]
 theorem toFinset_inter (s t : Multiset α) : toFinset (s ∩ t) = toFinset s ∩ toFinset t :=
@@ -512,8 +526,11 @@ theorem toFinset_union (s t : Multiset α) : (s ∪ t).toFinset = s.toFinset ∪
 theorem toFinset_eq_empty {m : Multiset α} : m.toFinset = ∅ ↔ m = 0 :=
   Finset.val_inj.symm.trans Multiset.dedup_eq_zero
 
--- DISSOLVED: toFinset_nonempty
+@[simp]
+theorem toFinset_nonempty : s.toFinset.Nonempty ↔ s ≠ 0 := by
+  simp only [toFinset_eq_empty, Ne, Finset.nonempty_iff_ne_empty]
 
+@[aesop safe apply (rule_sets := [finsetNonempty])]
 protected alias ⟨_, Aesop.toFinset_nonempty_of_ne⟩ := toFinset_nonempty
 
 @[simp]
@@ -603,16 +620,6 @@ open Finset
 def Finset.union (s t : Finset α) (h : Disjoint s t) :
     s ⊕ t ≃ (s ∪ t : Finset α) :=
   Equiv.Set.ofEq (coe_union _ _) |>.trans (Equiv.Set.union (disjoint_coe.mpr h)) |>.symm
-
-@[simp]
-theorem Finset.union_symm_inl (h : Disjoint s t) (x : s) :
-    Equiv.Finset.union s t h (Sum.inl x) = ⟨x, Finset.mem_union.mpr <| Or.inl x.2⟩ :=
-  rfl
-
-@[simp]
-theorem Finset.union_symm_inr (h : Disjoint s t) (y : t) :
-    Equiv.Finset.union s t h (Sum.inr y) = ⟨y, Finset.mem_union.mpr <| Or.inr y.2⟩ :=
-  rfl
 
 def piFinsetUnion {ι} [DecidableEq ι] (α : ι → Type*) {s t : Finset ι} (h : Disjoint s t) :
     ((∀ i : s, α i) × ∀ i : t, α i) ≃ ∀ i : (s ∪ t : Finset ι), α i :=

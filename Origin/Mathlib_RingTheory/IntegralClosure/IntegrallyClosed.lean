@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/IntegralClosure/IntegrallyClosed.lean
-Genuine: 23 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
+Genuine: 24 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.Integral
 import Mathlib.RingTheory.Localization.LocalizationLocalization
+
+noncomputable section
 
 /-!
 # Integrally closed rings
@@ -214,7 +216,25 @@ theorem integralClosure_eq_bot_iff : integralClosure R K = ⊥ ↔ IsIntegrallyC
   (IsIntegrallyClosedIn.integralClosure_eq_bot_iff _ (IsFractionRing.injective _ _)).trans
     (isIntegrallyClosed_iff_isIntegrallyClosedIn _).symm
 
--- DISSOLVED: pow_dvd_pow_iff
+@[simp]
+theorem pow_dvd_pow_iff [IsDomain R] [IsIntegrallyClosed R]
+    {n : ℕ} (hn : n ≠ 0) {a b : R} : a ^ n ∣ b ^ n ↔ a ∣ b := by
+  refine ⟨fun ⟨x, hx⟩ ↦ ?_, fun h ↦ pow_dvd_pow_of_dvd h n⟩
+  by_cases ha : a = 0
+  · simpa [ha, hn] using hx
+  let K := FractionRing R
+  replace ha : algebraMap R K a ≠ 0 := fun h ↦
+    ha <| (injective_iff_map_eq_zero _).1 (IsFractionRing.injective R K) _ h
+  let y := (algebraMap R K b) / (algebraMap R K a)
+  have hy : IsIntegral R y := by
+    refine ⟨X ^ n - C x, monic_X_pow_sub_C _ hn, ?_⟩
+    simp only [y, map_pow, eval₂_sub, eval₂_X_pow, div_pow, eval₂_pow', eval₂_C]
+    replace hx := congr_arg (algebraMap R K) hx
+    rw [map_pow] at hx
+    field_simp [hx, ha]
+  obtain ⟨k, hk⟩ := algebraMap_eq_of_integral hy
+  refine ⟨k, IsFractionRing.injective R K ?_⟩
+  rw [map_mul, hk, mul_div_cancel₀ _ ha]
 
 variable (R)
 

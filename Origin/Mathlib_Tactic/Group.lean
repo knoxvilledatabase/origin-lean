@@ -7,6 +7,8 @@ import Mathlib.Tactic.Ring
 import Mathlib.Tactic.FailIfNoProgress
 import Mathlib.Algebra.Group.Commutator
 
+noncomputable section
+
 /-!
 # `group` tactic
 

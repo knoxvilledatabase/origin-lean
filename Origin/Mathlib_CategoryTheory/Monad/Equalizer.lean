@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Reflexive
 import Mathlib.CategoryTheory.Limits.Shapes.SplitEqualizer
 import Mathlib.CategoryTheory.Monad.Algebra
 
+noncomputable section
+
 /-!
 # Special equalizers associated to a comonad
 
@@ -100,17 +102,8 @@ def beckSplitEqualizer : IsSplitEqualizer (T.map X.a) (T.δ.app _) X.a :=
 def beckFork : Fork (T.map X.a) (T.δ.app _) :=
   (beckSplitEqualizer X).asFork
 
-@[simp]
-theorem beckFork_ι : (beckFork X).ι = X.a :=
-  rfl
-
 def beckEqualizer : IsLimit (beckFork X) :=
   (beckSplitEqualizer X).isEqualizer
-
-@[simp]
-theorem beckEqualizer_lift (s : Fork (T.toFunctor.map X.a) (T.δ.app X.A)) :
-    (beckEqualizer X).lift s = s.ι ≫ T.ε.app _ :=
-  rfl
 
 end Comonad
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Complex/Arg.lean
-Genuine: 79 | Conflates: 0 | Dissolved: 10 | Infrastructure: 0
+Genuine: 89 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Angle
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
+
+noncomputable section
 
 /-!
 # The argument of a complex number.
@@ -32,7 +34,17 @@ theorem sin_arg (x : ℂ) : Real.sin (arg x) = x.im / abs x := by
       Real.sin_arcsin (abs_le.1 (abs_im_div_abs_le_one x)).1 (abs_le.1 (abs_im_div_abs_le_one x)).2,
       Real.sin_add, neg_div, Real.arcsin_neg, Real.sin_neg]
 
--- DISSOLVED: cos_arg
+theorem cos_arg {x : ℂ} (hx : x ≠ 0) : Real.cos (arg x) = x.re / abs x := by
+  rw [arg]
+  split_ifs with h₁ h₂
+  · rw [Real.cos_arcsin]
+    field_simp [Real.sqrt_sq, (abs.pos hx).le, *]
+  · rw [Real.cos_add_pi, Real.cos_arcsin]
+    field_simp [Real.sqrt_div (sq_nonneg _), Real.sqrt_sq_eq_abs,
+      _root_.abs_of_neg (not_le.1 h₁), *]
+  · rw [Real.cos_sub_pi, Real.cos_arcsin]
+    field_simp [Real.sqrt_div (sq_nonneg _), Real.sqrt_sq_eq_abs,
+      _root_.abs_of_neg (not_le.1 h₁), *]
 
 @[simp]
 theorem abs_mul_exp_arg_mul_I (x : ℂ) : ↑(abs x) * exp (arg x * I) = x := by
@@ -158,7 +170,12 @@ theorem arg_real_mul (x : ℂ) {r : ℝ} (hr : 0 < r) : arg (r * x) = arg x := b
 theorem arg_mul_real {r : ℝ} (hr : 0 < r) (x : ℂ) : arg (x * r) = arg x :=
   mul_comm x r ▸ arg_real_mul x hr
 
--- DISSOLVED: arg_eq_arg_iff
+theorem arg_eq_arg_iff {x y : ℂ} (hx : x ≠ 0) (hy : y ≠ 0) :
+    arg x = arg y ↔ (abs y / abs x : ℂ) * x = y := by
+  simp only [ext_abs_arg_iff, map_mul, map_div₀, abs_ofReal, abs_abs,
+    div_mul_cancel₀ _ (abs.ne_zero hx), eq_self_iff_true, true_and]
+  rw [← ofReal_div, arg_real_mul]
+  exact div_pos (abs.pos hy) (abs.pos hx)
 
 @[simp]
 theorem arg_one : arg 1 = 0 := by simp [arg, zero_le_one]
@@ -217,7 +234,8 @@ open ComplexOrder in
 
 lemma arg_eq_pi_iff_lt_zero {z : ℂ} : arg z = π ↔ z < 0 := arg_eq_pi_iff
 
--- DISSOLVED: arg_lt_pi_iff
+theorem arg_lt_pi_iff {z : ℂ} : arg z < π ↔ 0 ≤ z.re ∨ z.im ≠ 0 := by
+  rw [(arg_le_pi z).lt_iff_ne, not_iff_comm, not_or, not_le, Classical.not_not, arg_eq_pi_iff]
 
 theorem arg_ofReal_of_neg {x : ℝ} (hx : x < 0) : arg x = π :=
   arg_eq_pi_iff.2 ⟨hx, rfl⟩
@@ -254,7 +272,9 @@ theorem arg_of_re_neg_of_im_neg {x : ℂ} (hx_re : x.re < 0) (hx_im : x.im < 0) 
     arg x = Real.arcsin ((-x).im / abs x) - π := by
   simp only [arg, hx_re.not_le, hx_im.not_le, if_false]
 
--- DISSOLVED: arg_of_im_nonneg_of_ne_zero
+theorem arg_of_im_nonneg_of_ne_zero {z : ℂ} (h₁ : 0 ≤ z.im) (h₂ : z ≠ 0) :
+    arg z = Real.arccos (z.re / abs z) := by
+  rw [← cos_arg h₂, Real.arccos_cos (arg_nonneg_iff.2 h₁) (arg_le_pi _)]
 
 theorem arg_of_im_pos {z : ℂ} (hz : 0 < z.im) : arg z = Real.arccos (z.re / abs z) :=
   arg_of_im_nonneg_of_ne_zero hz.le fun h => hz.ne' <| h.symm ▸ rfl
@@ -402,7 +422,17 @@ theorem arg_neg_eq_arg_add_pi_iff {x : ℂ} :
   · simp [hi, hi.ne.symm, hi.not_lt, arg_neg_eq_arg_sub_pi_of_im_pos, sub_eq_add_neg, ←
       add_eq_zero_iff_neg_eq, Real.pi_ne_zero]
 
--- DISSOLVED: arg_neg_coe_angle
+theorem arg_neg_coe_angle {x : ℂ} (hx : x ≠ 0) : (arg (-x) : Real.Angle) = arg x + π := by
+  rcases lt_trichotomy x.im 0 with (hi | hi | hi)
+  · rw [arg_neg_eq_arg_add_pi_of_im_neg hi, Real.Angle.coe_add]
+  · rw [(ext rfl hi : x = x.re)]
+    rcases lt_trichotomy x.re 0 with (hr | hr | hr)
+    · rw [arg_ofReal_of_neg hr, ← ofReal_neg, arg_ofReal_of_nonneg (Left.neg_pos_iff.2 hr).le, ←
+        Real.Angle.coe_add, ← two_mul, Real.Angle.coe_two_pi, Real.Angle.coe_zero]
+    · exact False.elim (hx (ext hr hi))
+    · rw [arg_ofReal_of_nonneg hr.le, ← ofReal_neg, arg_ofReal_of_neg (Left.neg_neg_iff.2 hr),
+        Real.Angle.coe_zero, zero_add]
+  · rw [arg_neg_eq_arg_sub_pi_of_im_pos hi, Real.Angle.coe_sub, Real.Angle.sub_coe_pi_eq_add_coe_pi]
 
 theorem arg_mul_cos_add_sin_mul_I_eq_toIocMod {r : ℝ} (hr : 0 < r) (θ : ℝ) :
     arg (r * (cos θ + sin θ * I)) = toIocMod Real.two_pi_pos (-π) θ := by
@@ -437,9 +467,19 @@ theorem arg_cos_add_sin_mul_I_coe_angle (θ : Real.Angle) :
     (arg (Real.Angle.cos θ + Real.Angle.sin θ * I) : Real.Angle) = θ := by
   rw [← one_mul (_ + _), ← ofReal_one, arg_mul_cos_add_sin_mul_I_coe_angle zero_lt_one]
 
--- DISSOLVED: arg_mul_coe_angle
+theorem arg_mul_coe_angle {x y : ℂ} (hx : x ≠ 0) (hy : y ≠ 0) :
+    (arg (x * y) : Real.Angle) = arg x + arg y := by
+  convert arg_mul_cos_add_sin_mul_I_coe_angle (mul_pos (abs.pos hx) (abs.pos hy))
+      (arg x + arg y : Real.Angle) using
+    3
+  simp_rw [← Real.Angle.coe_add, Real.Angle.sin_coe, Real.Angle.cos_coe, ofReal_cos, ofReal_sin,
+    cos_add_sin_I, ofReal_add, add_mul, exp_add, ofReal_mul]
+  rw [mul_assoc, mul_comm (exp _), ← mul_assoc (abs y : ℂ), abs_mul_exp_arg_mul_I, mul_comm y, ←
+    mul_assoc, abs_mul_exp_arg_mul_I]
 
--- DISSOLVED: arg_div_coe_angle
+theorem arg_div_coe_angle {x y : ℂ} (hx : x ≠ 0) (hy : y ≠ 0) :
+    (arg (x / y) : Real.Angle) = arg x - arg y := by
+  rw [div_eq_mul_inv, arg_mul_coe_angle hx (inv_ne_zero hy), arg_inv_coe_angle, sub_eq_add_neg]
 
 @[simp]
 theorem arg_coe_angle_toReal_eq_arg (z : ℂ) : (arg z : Real.Angle).toReal = arg z := by
@@ -454,7 +494,10 @@ theorem arg_coe_angle_eq_iff_eq_toReal {z : ℂ} {θ : Real.Angle} :
 theorem arg_coe_angle_eq_iff {x y : ℂ} : (arg x : Real.Angle) = arg y ↔ arg x = arg y := by
   simp_rw [← Real.Angle.toReal_inj, arg_coe_angle_toReal_eq_arg]
 
--- DISSOLVED: arg_mul_eq_add_arg_iff
+lemma arg_mul_eq_add_arg_iff {x y : ℂ} (hx₀ : x ≠ 0) (hy₀ : y ≠ 0) :
+    (x * y).arg = x.arg + y.arg ↔ arg x + arg y ∈ Set.Ioc (-π) π := by
+  rw [← arg_coe_angle_toReal_eq_arg, arg_mul_coe_angle hx₀ hy₀, ← Real.Angle.coe_add,
+      Real.Angle.toReal_coe_eq_self_iff_mem_Ioc]
 
 alias ⟨_, arg_mul⟩ := arg_mul_eq_add_arg_iff
 
@@ -462,7 +505,8 @@ section slitPlane
 
 open ComplexOrder in
 
--- DISSOLVED: mem_slitPlane_iff_arg
+lemma mem_slitPlane_iff_arg {z : ℂ} : z ∈ slitPlane ↔ z.arg ≠ π ∧ z ≠ 0 := by
+  simp only [mem_slitPlane_iff_not_le_zero, le_iff_lt_or_eq, ne_eq, arg_eq_pi_iff_lt_zero, not_or]
 
 lemma slitPlane_arg_ne_pi {z : ℂ} (hz : z ∈ slitPlane) : z.arg ≠ Real.pi :=
   (mem_slitPlane_iff_arg.mp hz).1
@@ -550,7 +594,28 @@ theorem tendsto_arg_nhdsWithin_im_nonneg_of_re_neg_of_im_zero {z : ℂ} (hre : z
   simpa only [arg_eq_pi_iff.2 ⟨hre, him⟩] using
     (continuousWithinAt_arg_of_re_neg_of_im_zero hre him).tendsto
 
--- DISSOLVED: continuousAt_arg_coe_angle
+theorem continuousAt_arg_coe_angle (h : x ≠ 0) : ContinuousAt ((↑) ∘ arg : ℂ → Real.Angle) x := by
+  by_cases hs : x ∈ slitPlane
+  · exact Real.Angle.continuous_coe.continuousAt.comp (continuousAt_arg hs)
+  · rw [← Function.comp_id (((↑) : ℝ → Real.Angle) ∘ arg),
+      (funext_iff.2 fun _ => (neg_neg _).symm : (id : ℂ → ℂ) = Neg.neg ∘ Neg.neg), ←
+      Function.comp_assoc]
+    refine ContinuousAt.comp ?_ continuous_neg.continuousAt
+    suffices ContinuousAt (Function.update (((↑) ∘ arg) ∘ Neg.neg : ℂ → Real.Angle) 0 π) (-x) by
+      rwa [continuousAt_update_of_ne (neg_ne_zero.2 h)] at this
+    have ha :
+      Function.update (((↑) ∘ arg) ∘ Neg.neg : ℂ → Real.Angle) 0 π = fun z =>
+        (arg z : Real.Angle) + π := by
+      rw [Function.update_eq_iff]
+      exact ⟨by simp, fun z hz => arg_neg_coe_angle hz⟩
+    rw [ha]
+    replace hs := mem_slitPlane_iff.mpr.mt hs
+    push_neg at hs
+    refine
+      (Real.Angle.continuous_coe.continuousAt.comp (continuousAt_arg (Or.inl ?_))).add
+        continuousAt_const
+    rw [neg_re, neg_pos]
+    exact hs.1.lt_of_ne fun h0 => h (Complex.ext_iff.2 ⟨h0, hs.2⟩)
 
 end Continuity
 

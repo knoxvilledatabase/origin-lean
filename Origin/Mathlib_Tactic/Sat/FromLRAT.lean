@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Nat.Basic
 import Mathlib.Tactic.ByContra
 
+noncomputable section
+
 /-!
 # `lrat_proof` command
 
@@ -460,25 +462,15 @@ def fromLRAT (cnf lrat : String) (name : Name) : MetaM Unit := do
 open Elab Term
 
 elab "lrat_proof " n:(ident <|> "example")
-
     ppSpace cnf:term:max ppSpace lrat:term:max : command => do
-
   let name := (← getCurrNamespace) ++ if n.1.isIdent then n.1.getId else `_example
-
   Command.liftTermElabM do
-
     let cnf ← unsafe evalTerm String (mkConst ``String) cnf
-
     let lrat ← unsafe evalTerm String (mkConst ``String) lrat
-
     let go := do
-
       fromLRAT cnf lrat name
-
       withSaveInfoContext do
-
         Term.addTermInfo' n (mkConst name) (isBinder := true)
-
     if n.1.isIdent then go else withoutModifyingEnv go
 
 lrat_proof example
@@ -504,15 +496,10 @@ lrat_proof example
    7 0 5 2 6 0"
 
 elab "from_lrat " cnf:term:max ppSpace lrat:term:max : term => do
-
   let cnf ← unsafe evalTerm String (mkConst ``String) cnf
-
   let lrat ← unsafe evalTerm String (mkConst ``String) lrat
-
   let name ← mkAuxName `lrat
-
   fromLRAT cnf lrat name
-
   return mkConst name
 
 example : ∀ (a b : Prop), (¬a ∧ ¬b ∨ a ∧ ¬b) ∨ ¬a ∧ b ∨ a ∧ b := from_lrat

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Vandermonde.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin
@@ -8,6 +8,8 @@ import Mathlib.Algebra.GeomSum
 import Mathlib.LinearAlgebra.Matrix.Block
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.Nondegenerate
+
+noncomputable section
 
 /-!
 # Vandermonde matrix
@@ -138,7 +140,10 @@ theorem det_vandermonde_eq_zero_iff [IsDomain R] {n : ℕ} {v : Fin n → R} :
     refine fun i j h₁ h₂ => Matrix.det_zero_of_row_eq h₂ (funext fun k => ?_)
     rw [vandermonde_apply, vandermonde_apply, h₁]
 
--- DISSOLVED: det_vandermonde_ne_zero_iff
+theorem det_vandermonde_ne_zero_iff [IsDomain R] {n : ℕ} {v : Fin n → R} :
+    det (vandermonde v) ≠ 0 ↔ Function.Injective v := by
+  unfold Function.Injective
+  simp only [det_vandermonde_eq_zero_iff, Ne, not_exists, not_and, Classical.not_not]
 
 @[simp]
 theorem det_vandermonde_add {n : ℕ} (v : Fin n → R) (a : R) :

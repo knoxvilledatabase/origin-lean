@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FunctionField.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 3 | Infrastructure: 12
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.TypeTags
@@ -8,6 +8,8 @@ import Mathlib.FieldTheory.RatFunc.Degree
 import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.Topology.Algebra.Valued.ValuedField
+
+noncomputable section
 
 /-!
 # Function fields
@@ -163,7 +165,10 @@ theorem InftyValuation.map_add_le_max' (x y : RatFunc Fq) :
           Multiplicative.ofAdd_le, ← le_max_iff]
         exact RatFunc.intDegree_add_le hy hxy
 
--- DISSOLVED: inftyValuation_of_nonzero
+@[simp]
+theorem inftyValuation_of_nonzero {x : RatFunc Fq} (hx : x ≠ 0) :
+    inftyValuationDef Fq x = Multiplicative.ofAdd x.intDegree := by
+  rw [inftyValuationDef, if_neg hx]
 
 def inftyValuation : Valuation (RatFunc Fq) ℤₘ₀ where
   toFun := inftyValuationDef Fq
@@ -173,23 +178,25 @@ def inftyValuation : Valuation (RatFunc Fq) ℤₘ₀ where
   map_add_le_max' := InftyValuation.map_add_le_max' Fq
 
 @[simp]
-theorem inftyValuation_apply {x : RatFunc Fq} : inftyValuation Fq x = inftyValuationDef Fq x :=
-  rfl
-
--- DISSOLVED: inftyValuation.C
+theorem inftyValuation.C {k : Fq} (hk : k ≠ 0) :
+    inftyValuationDef Fq (RatFunc.C k) = Multiplicative.ofAdd (0 : ℤ) := by
+  have hCk : RatFunc.C k ≠ 0 := (map_ne_zero _).mpr hk
+  rw [inftyValuationDef, if_neg hCk, RatFunc.intDegree_C]
 
 @[simp]
 theorem inftyValuation.X : inftyValuationDef Fq RatFunc.X = Multiplicative.ofAdd (1 : ℤ) := by
   rw [inftyValuationDef, if_neg RatFunc.X_ne_zero, RatFunc.intDegree_X]
 
--- DISSOLVED: inftyValuation.polynomial
+@[simp]
+theorem inftyValuation.polynomial {p : Fq[X]} (hp : p ≠ 0) :
+    inftyValuationDef Fq (algebraMap Fq[X] (RatFunc Fq) p) =
+      Multiplicative.ofAdd (p.natDegree : ℤ) := by
+  have hp' : algebraMap Fq[X] (RatFunc Fq) p ≠ 0 := by
+    rw [Ne, NoZeroSMulDivisors.algebraMap_eq_zero_iff]; exact hp
+  rw [inftyValuationDef, if_neg hp', RatFunc.intDegree_polynomial]
 
 def inftyValuedFqt : Valued (RatFunc Fq) ℤₘ₀ :=
   Valued.mk' <| inftyValuation Fq
-
-theorem inftyValuedFqt.def {x : RatFunc Fq} :
-    @Valued.v (RatFunc Fq) _ _ _ (inftyValuedFqt Fq) x = inftyValuationDef Fq x :=
-  rfl
 
 def FqtInfty :=
   @UniformSpace.Completion (RatFunc Fq) <| (inftyValuedFqt Fq).toUniformSpace
@@ -203,10 +210,6 @@ instance : Inhabited (FqtInfty Fq) :=
 
 instance valuedFqtInfty : Valued (FqtInfty Fq) ℤₘ₀ :=
   @Valued.valuedCompletion _ _ _ _ (inftyValuedFqt Fq)
-
-theorem valuedFqtInfty.def {x : FqtInfty Fq} :
-    Valued.v x = @Valued.extension (RatFunc Fq) _ _ _ (inftyValuedFqt Fq) x :=
-  rfl
 
 end InftyValuation
 

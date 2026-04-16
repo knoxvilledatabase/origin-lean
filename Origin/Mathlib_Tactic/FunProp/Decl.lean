@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 ## `funProp` environment extension that stores all registered function properties
 -/

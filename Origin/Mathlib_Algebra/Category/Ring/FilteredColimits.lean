@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Algebra.Category.Grp.FilteredColimits
 
+noncomputable section
+
 /-!
 # The forgetful functor from (commutative) (semi-) rings preserves filtered colimits.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Topology.Instances.NNReal
 
+noncomputable section
+
 /-!
 # Further lemmas about normed groups
 

@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/RootSystem/Defs.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 2 | Infrastructure: 14
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.PerfectPairing
 import Mathlib.LinearAlgebra.Reflection
+
+noncomputable section
 
 /-!
 # Root data and root systems
@@ -108,9 +110,11 @@ variable {ι R M N}
 
 variable (P : RootPairing ι R M N) (i j : ι)
 
--- DISSOLVED: ne_zero
+lemma ne_zero [CharZero R] : (P.root i : M) ≠ 0 :=
+  fun h ↦ by simpa [h, map_zero] using P.root_coroot_two i
 
--- DISSOLVED: ne_zero'
+lemma ne_zero' [CharZero R] : (P.coroot i : N) ≠ 0 :=
+  fun h ↦ by simpa [h] using P.root_coroot_two i
 
 @[simp]
 lemma toLin_toPerfectPairing (x : M) (y : N) : P.toLin x y = P.toPerfectPairing x y :=
@@ -125,10 +129,6 @@ protected def flip : RootPairing ι R N M :=
     reflection_perm_root := P.reflection_perm_coroot
     reflection_perm_coroot := P.reflection_perm_root }
 
-@[simp]
-lemma flip_flip : P.flip.flip = P :=
-  rfl
-
 abbrev root' (i : ι) : Dual R N := P.toPerfectPairing (P.root i)
 
 abbrev coroot' (i : ι) : Dual R M := P.toPerfectPairing.flip (P.coroot i)
@@ -142,13 +142,6 @@ lemma root_coroot_eq_pairing : P.toPerfectPairing (P.root i) (P.coroot j) = P.pa
 @[simp]
 lemma root'_coroot_eq_pairing : P.root' i (P.coroot j) = P.pairing i j :=
   rfl
-
-@[simp]
-lemma root_coroot'_eq_pairing : P.coroot' i (P.root j) = P.pairing j i :=
-  rfl
-
-lemma coroot_root_eq_pairing : P.toLin.flip (P.coroot i) (P.root j) = P.pairing j i := by
-  simp
 
 @[simp]
 lemma pairing_same : P.pairing i i = 2 := P.root_coroot_two i
@@ -263,11 +256,6 @@ lemma coreflection_same (x : N) :
   Module.involutive_reflection (P.flip.coroot_root_two i) x
 
 @[simp]
-lemma coreflection_inv :
-    (P.coreflection i)⁻¹ = P.coreflection i :=
-  rfl
-
-@[simp]
 lemma coreflection_sq :
     P.coreflection i ^ 2 = 1 :=
   mul_eq_one_iff_eq_inv.mpr rfl
@@ -279,10 +267,6 @@ lemma bijOn_coreflection_coroot : BijOn (P.coreflection i) (range P.coroot) (ran
 lemma coreflection_image_eq :
     P.coreflection i '' (range P.coroot) = range P.coroot :=
   (P.bijOn_coreflection_coroot i).image_eq
-
-lemma coreflection_eq_flip_reflection :
-    P.coreflection i = P.flip.reflection i :=
-  rfl
 
 lemma reflection_dualMap_eq_coreflection :
     (P.reflection i).dualMap ∘ₗ P.toLin.flip = P.toLin.flip ∘ₗ P.coreflection i := by

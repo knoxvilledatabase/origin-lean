@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ShortComplex.QuasiIso
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 
+noncomputable section
+
 /-!
 # Functors which preserves homology
 
@@ -80,6 +82,9 @@ noncomputable instance isPreservedBy_of_preservesHomology [F.PreservesHomology] 
 variable [h.IsPreservedBy F]
 
 include h in
+/-- When a left homology data is preserved by a functor `F`, this functor
+
+preserves the kernel of `S.g : S.X₂ ⟶ S.X₃`. -/
 
 lemma IsPreservedBy.hg : PreservesLimit (parallelPair S.g 0) F :=
   @IsPreservedBy.g _ _ _ _ _ _ _ h F _ _
@@ -150,6 +155,9 @@ noncomputable instance isPreservedBy_of_preservesHomology [F.PreservesHomology] 
 variable [h.IsPreservedBy F]
 
 include h in
+/-- When a right homology data is preserved by a functor `F`, this functor
+
+preserves the cokernel of `S.f : S.X₁ ⟶ S.X₂`. -/
 
 lemma IsPreservedBy.hf : PreservesColimit (parallelPair S.f 0) F :=
   @IsPreservedBy.f _ _ _ _ _ _ _ h F _ _

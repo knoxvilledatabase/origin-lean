@@ -8,6 +8,8 @@ import Mathlib.Data.Complex.Exponential
 import Mathlib.Data.Complex.Module
 import Mathlib.RingTheory.Polynomial.Chebyshev
 
+noncomputable section
+
 /-!
 # Multiple angle formulas in terms of Chebyshev polynomials
 

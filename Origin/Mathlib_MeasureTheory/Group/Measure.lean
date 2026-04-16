@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Group/Measure.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 6 | Infrastructure: 30
+Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Action
 import Mathlib.MeasureTheory.Measure.Prod
 import Mathlib.Topology.ContinuousMap.CocompactMap
+
+noncomputable section
 
 /-!
 # Measures on Groups
@@ -275,9 +277,6 @@ section Inv
 
 variable [Inv G]
 
-@[to_additive]
-theorem inv_def (μ : Measure G) : μ.inv = Measure.map inv μ := rfl
-
 @[to_additive (attr := simp)]
 theorem inv_eq_self (μ : Measure G) [IsInvInvariant μ] : μ.inv = μ :=
   IsInvInvariant.inv_eq_self
@@ -428,7 +427,20 @@ theorem regular_inv_iff : μ.inv.Regular ↔ μ.Regular :=
 theorem innerRegular_inv_iff : μ.inv.InnerRegular ↔ μ.InnerRegular :=
   InnerRegular.map_iff (Homeomorph.inv G)
 
--- DISSOLVED: eventually_nhds_one_measure_smul_diff_lt
+@[to_additive]
+lemma eventually_nhds_one_measure_smul_diff_lt [LocallyCompactSpace G]
+    [IsFiniteMeasureOnCompacts μ] [InnerRegularCompactLTTop μ] {k : Set G}
+    (hk : IsCompact k) (h'k : IsClosed k) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∀ᶠ g in 𝓝 (1 : G), μ (g • k \ k) < ε := by
+  obtain ⟨U, hUk, hU, hμUk⟩ : ∃ (U : Set G), k ⊆ U ∧ IsOpen U ∧ μ U < μ k + ε :=
+    hk.exists_isOpen_lt_add hε
+  obtain ⟨V, hV1, hVkU⟩ : ∃ V ∈ 𝓝 (1 : G), V * k ⊆ U := compact_open_separated_mul_left hk hU hUk
+  filter_upwards [hV1] with g hg
+  calc
+    μ (g • k \ k) ≤ μ (U \ k) := by
+      gcongr
+      exact (smul_set_subset_smul hg).trans hVkU
+    _ < ε := measure_diff_lt_of_lt_add h'k.nullMeasurableSet hUk hk.measure_lt_top.ne hμUk
 
 @[to_additive]
 lemma tendsto_measure_smul_diff_isCompact_isClosed [LocallyCompactSpace G]
@@ -442,7 +454,21 @@ section IsMulLeftInvariant
 
 variable [IsMulLeftInvariant μ]
 
--- DISSOLVED: isOpenPosMeasure_of_mulLeftInvariant_of_compact
+@[to_additive
+"If a left-invariant measure gives positive mass to a compact set, then it gives positive mass to
+any open set."]
+theorem isOpenPosMeasure_of_mulLeftInvariant_of_compact (K : Set G) (hK : IsCompact K)
+    (h : μ K ≠ 0) : IsOpenPosMeasure μ := by
+  refine ⟨fun U hU hne => ?_⟩
+  contrapose! h
+  rw [← nonpos_iff_eq_zero]
+  rw [← hU.interior_eq] at hne
+  obtain ⟨t, hKt⟩ : ∃ t : Finset G, K ⊆ ⋃ (g : G) (_ : g ∈ t), (fun h : G => g * h) ⁻¹' U :=
+    compact_covered_by_mul_left_translates hK hne
+  calc
+    μ K ≤ μ (⋃ (g : G) (_ : g ∈ t), (fun h : G => g * h) ⁻¹' U) := measure_mono hKt
+    _ ≤ ∑ g ∈ t, μ ((fun h : G => g * h) ⁻¹' U) := measure_biUnion_finset_le _ _
+    _ = 0 := by simp [measure_preimage_mul, h]
 
 @[to_additive "A nonzero left-invariant regular measure gives positive mass to any open set."]
 instance (priority := 80) isOpenPosMeasure_of_mulLeftInvariant_of_regular [Regular μ] [NeZero μ] :
@@ -464,9 +490,15 @@ theorem null_iff_of_isMulLeftInvariant [Regular μ] {s : Set G} (hs : IsOpen s) 
   · simp
   · simp only [or_false, hs.measure_eq_zero_iff μ, NeZero.ne μ]
 
--- DISSOLVED: measure_ne_zero_iff_nonempty_of_isMulLeftInvariant
+@[to_additive]
+theorem measure_ne_zero_iff_nonempty_of_isMulLeftInvariant [Regular μ] (hμ : μ ≠ 0) {s : Set G}
+    (hs : IsOpen s) : μ s ≠ 0 ↔ s.Nonempty := by
+  simpa [null_iff_of_isMulLeftInvariant (μ := μ) hs, hμ] using nonempty_iff_ne_empty.symm
 
--- DISSOLVED: measure_pos_iff_nonempty_of_isMulLeftInvariant
+@[to_additive]
+theorem measure_pos_iff_nonempty_of_isMulLeftInvariant [Regular μ] (h3μ : μ ≠ 0) {s : Set G}
+    (hs : IsOpen s) : 0 < μ s ↔ s.Nonempty :=
+  pos_iff_ne_zero.trans <| measure_ne_zero_iff_nonempty_of_isMulLeftInvariant h3μ hs
 
 @[to_additive
 "If a left-invariant measure gives finite mass to a nonempty open set, then it gives finite mass to
@@ -601,9 +633,20 @@ theorem haar_singleton [TopologicalGroup G] [BorelSpace G] (g : G) : μ {g} = μ
   convert measure_preimage_mul μ g⁻¹ _
   simp only [mul_one, preimage_mul_left_singleton, inv_inv]
 
--- DISSOLVED: IsHaarMeasure.smul
+@[to_additive IsAddHaarMeasure.smul]
+theorem IsHaarMeasure.smul {c : ℝ≥0∞} (cpos : c ≠ 0) (ctop : c ≠ ∞) : IsHaarMeasure (c • μ) :=
+  { lt_top_of_isCompact := fun _K hK => ENNReal.mul_lt_top ctop.lt_top hK.measure_lt_top
+    toIsOpenPosMeasure := isOpenPosMeasure_smul μ cpos }
 
--- DISSOLVED: isHaarMeasure_of_isCompact_nonempty_interior
+@[to_additive
+"If a left-invariant measure gives positive mass to some compact set with nonempty interior, then
+it is an additive Haar measure."]
+theorem isHaarMeasure_of_isCompact_nonempty_interior [TopologicalGroup G] [BorelSpace G]
+    (μ : Measure G) [IsMulLeftInvariant μ] (K : Set G) (hK : IsCompact K)
+    (h'K : (interior K).Nonempty) (h : μ K ≠ 0) (h' : μ K ≠ ∞) : IsHaarMeasure μ :=
+  { lt_top_of_isCompact := fun _L hL =>
+      measure_lt_top_of_isCompact_of_isMulLeftInvariant' h'K h' hL
+    toIsOpenPosMeasure := isOpenPosMeasure_of_mulLeftInvariant_of_compact K hK h }
 
 @[to_additive
 "The image of an additive Haar measure under a continuous surjective proper additive group

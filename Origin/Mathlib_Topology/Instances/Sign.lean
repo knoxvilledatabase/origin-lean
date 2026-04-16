@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Instances/Sign.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Sign
 import Mathlib.Topology.Order.Basic
+
+noncomputable section
 
 /-!
 # Topology on `SignType`
@@ -42,6 +44,9 @@ section LinearOrder
 
 variable [LinearOrder α] [OrderTopology α]
 
--- DISSOLVED: continuousAt_sign_of_ne_zero
+theorem continuousAt_sign_of_ne_zero {a : α} (h : a ≠ 0) : ContinuousAt SignType.sign a := by
+  rcases h.lt_or_lt with (h_neg | h_pos)
+  · exact continuousAt_sign_of_neg h_neg
+  · exact continuousAt_sign_of_pos h_pos
 
 end LinearOrder

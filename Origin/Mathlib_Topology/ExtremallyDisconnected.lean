@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Homeomorph
 import Mathlib.Topology.StoneCech
 
+noncomputable section
+
 /-!
 # Extremally disconnected spaces
 

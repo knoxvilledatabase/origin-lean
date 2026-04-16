@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Data.Nat.Cast.Order.Basic
 
+noncomputable section
+
 /-!
 # Cast of natural numbers: lemmas about bundled ordered semirings
 

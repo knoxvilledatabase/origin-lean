@@ -8,6 +8,8 @@ import Mathlib.Topology.Sequences
 import Mathlib.Topology.Instances.Discrete
 import Mathlib.Topology.Category.TopCat.Basic
 
+noncomputable section
+
 /-!
 
 # The category of sequential topological spaces

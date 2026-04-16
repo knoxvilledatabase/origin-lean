@@ -7,6 +7,8 @@ import Mathlib.AlgebraicTopology.DoldKan.Projections
 import Mathlib.CategoryTheory.Idempotents.FunctorCategories
 import Mathlib.CategoryTheory.Idempotents.FunctorExtension
 
+noncomputable section
+
 /-!
 
 # Construction of the projection `PInfty` for the Dold-Kan correspondence
@@ -52,10 +54,6 @@ noncomputable def PInfty : K[X] ⟶ K[X] :=
 noncomputable def QInfty : K[X] ⟶ K[X] :=
   𝟙 _ - PInfty
 
-@[simp]
-theorem PInfty_f_0 : (PInfty.f 0 : X _[0] ⟶ X _[0]) = 𝟙 _ :=
-  rfl
-
 theorem PInfty_f (n : ℕ) : (PInfty.f n : X _[n] ⟶ X _[n]) = (P n).f n :=
   rfl
 
@@ -63,9 +61,6 @@ theorem PInfty_f (n : ℕ) : (PInfty.f n : X _[n] ⟶ X _[n]) = (P n).f n :=
 theorem QInfty_f_0 : (QInfty.f 0 : X _[0] ⟶ X _[0]) = 0 := by
   dsimp [QInfty]
   simp only [sub_self]
-
-theorem QInfty_f (n : ℕ) : (QInfty.f n : X _[n] ⟶ X _[n]) = (Q n).f n :=
-  rfl
 
 @[reassoc (attr := simp)]
 theorem PInfty_f_naturality (n : ℕ) {X Y : SimplicialObject C} (f : X ⟶ Y) :

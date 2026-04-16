@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.KanExtension.Pointwise
 import Mathlib.CategoryTheory.Limits.Shapes.Grothendieck
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Functor
 
+noncomputable section
+
 /-! # The Kan extension functor
 
 Given a functor `L : C ⥤ D`, we define the left Kan extension functor

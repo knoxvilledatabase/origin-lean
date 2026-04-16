@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Metric
 import Mathlib.Topology.CountableSeparatingOn
 import Mathlib.Topology.MetricSpace.Perfect
 
+noncomputable section
+
 /-!
 # The Borel sigma-algebra on Polish spaces
 
@@ -72,7 +74,6 @@ class UpgradedStandardBorel extends MeasurableSpace α, TopologicalSpace α,
   BorelSpace α, PolishSpace α
 
 noncomputable
-
 def upgradeStandardBorel [MeasurableSpace α] [h : StandardBorelSpace α] :
     UpgradedStandardBorel α := by
   choose τ hb hp using h.polish

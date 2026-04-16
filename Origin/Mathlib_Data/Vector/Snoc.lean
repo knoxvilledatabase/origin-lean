@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Data.Vector.Basic
 
+noncomputable section
+
 /-!
   This file establishes a `snoc : Vector α n → α → Vector α (n+1)` operation, that appends a single
   element to the back of a vector.
@@ -33,10 +35,6 @@ variable {y : α}
 
 @[simp]
 theorem snoc_cons : (x ::ᵥ xs).snoc y = x ::ᵥ (xs.snoc y) :=
-  rfl
-
-@[simp]
-theorem snoc_nil : (nil.snoc x) = x ::ᵥ nil :=
   rfl
 
 @[simp]
@@ -111,10 +109,6 @@ theorem map_snoc {f : α → β} : map f (xs.snoc x) = (map f xs).snoc (f x) := 
   induction xs <;> simp_all
 
 @[simp]
-theorem mapAccumr_nil {f : α → σ → σ × β} {s : σ} : mapAccumr f Vector.nil s = (s, Vector.nil) :=
-  rfl
-
-@[simp]
 theorem mapAccumr_snoc {f : α → σ → σ × β} {s : σ} :
     mapAccumr f (xs.snoc x) s
     = let q := f x s
@@ -130,11 +124,6 @@ variable (ys : Vector β n)
 theorem map₂_snoc {f : α → β → σ} {y : β} :
     map₂ f (xs.snoc x) (ys.snoc y) = (map₂ f xs ys).snoc (f x y) := by
   induction xs, ys using Vector.inductionOn₂ <;> simp_all
-
-@[simp]
-theorem mapAccumr₂_nil {f : α → β → σ → σ × φ} :
-    mapAccumr₂ f Vector.nil Vector.nil s = (s, Vector.nil) :=
-  rfl
 
 @[simp]
 theorem mapAccumr₂_snoc (f : α → β → σ → σ × φ) (x : α) (y : β) :

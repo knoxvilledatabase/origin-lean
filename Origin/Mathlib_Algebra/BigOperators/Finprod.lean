@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Finprod.lean
-Genuine: 118 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 120 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Data.Set.Subsingleton
+
+noncomputable section
 
 /-!
 # Finite products and sums over types and sets
@@ -474,7 +476,12 @@ theorem finprod_mem_of_eqOn_one (hf : s.EqOn f 1) : ∏ᶠ i ∈ s, f i = 1 := b
   rw [← finprod_mem_one s]
   exact finprod_mem_congr rfl hf
 
--- DISSOLVED: exists_ne_one_of_finprod_mem_ne_one
+@[to_additive
+      "If the product of `f i` over `i ∈ s` is not equal to `0`, then there is some `x ∈ s`
+      such that `f x ≠ 0`."]
+theorem exists_ne_one_of_finprod_mem_ne_one (h : ∏ᶠ i ∈ s, f i ≠ 1) : ∃ x ∈ s, f x ≠ 1 := by
+  by_contra! h'
+  exact h (finprod_mem_of_eqOn_one h')
 
 @[to_additive
       "Given a finite set `s`, the sum of `f i + g i` over `i ∈ s` equals the sum of `f i`
@@ -540,7 +547,9 @@ theorem finprod_mem_div_distrib [DivisionCommMonoid G] (f g : α → G) (hs : s.
 @[to_additive "The sum of any function over an empty set is `0`."]
 theorem finprod_mem_empty : (∏ᶠ i ∈ (∅ : Set α), f i) = 1 := by simp
 
--- DISSOLVED: nonempty_of_finprod_mem_ne_one
+@[to_additive "A set `s` is nonempty if the sum of some function over `s` is not equal to `0`."]
+theorem nonempty_of_finprod_mem_ne_one (h : ∏ᶠ i ∈ s, f i ≠ 1) : s.Nonempty :=
+  nonempty_iff_ne_empty.2 fun h' => h <| h'.symm ▸ finprod_mem_empty
 
 @[to_additive
       "Given finite sets `s` and `t`, the sum of `f i` over `i ∈ s ∪ t` plus the sum of

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/WittVector/Frobenius.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod
@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Multiplicity
 import Mathlib.FieldTheory.Perfect
 import Mathlib.RingTheory.WittVector.Basic
 import Mathlib.RingTheory.WittVector.IsPoly
+
+noncomputable section
 
 /-!
 ## The Frobenius operator
@@ -76,7 +78,6 @@ noncomputable def frobeniusPolyAux : ℕ → MvPolynomial ℕ ℤ
           * ↑p ^ (j - v p (j + 1)) : ℕ) : ℤ)
 
 omit hp in
-
 theorem frobeniusPolyAux_eq (n : ℕ) :
     frobeniusPolyAux p n =
       X (n + 1) - ∑ i ∈ range n,
@@ -175,7 +176,6 @@ def frobeniusFun (x : 𝕎 R) : 𝕎 R :=
   mk p fun n => MvPolynomial.aeval x.coeff (frobeniusPoly p n)
 
 omit hp in
-
 theorem coeff_frobeniusFun (x : 𝕎 R) (n : ℕ) :
     coeff (frobeniusFun x) n = MvPolynomial.aeval x.coeff (frobeniusPoly p n) := by
   rw [frobeniusFun, coeff_mk]

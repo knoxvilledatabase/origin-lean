@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.SimplicialSet.Monoidal
 import Mathlib.CategoryTheory.Enriched.Ordinary
 
+noncomputable section
+
 /-!
 # Simplicial categories
 

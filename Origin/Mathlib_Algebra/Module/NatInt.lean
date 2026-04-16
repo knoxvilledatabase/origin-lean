@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Data.Int.Cast.Lemmas
 
+noncomputable section
+
 /-!
 # Modules over `ℕ` and `ℤ`
 

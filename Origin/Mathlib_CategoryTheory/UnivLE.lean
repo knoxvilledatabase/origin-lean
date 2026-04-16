@@ -7,6 +7,8 @@ import Mathlib.Logic.UnivLE
 import Mathlib.CategoryTheory.EssentialImage
 import Mathlib.CategoryTheory.Types
 
+noncomputable section
+
 /-!
 # Universe inequalities and essential surjectivity of `uliftFunctor`.
 

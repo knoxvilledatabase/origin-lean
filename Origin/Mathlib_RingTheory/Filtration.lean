@@ -12,6 +12,8 @@ import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 import Mathlib.RingTheory.Noetherian.Orzech
 import Mathlib.RingTheory.ReesAlgebra
 
+noncomputable section
+
 /-!
 
 # `I`-filtrations of modules
@@ -125,15 +127,7 @@ theorem sup_N : (F ⊔ F').N = F.N ⊔ F'.N :=
   rfl
 
 @[simp]
-theorem sSup_N (S : Set (I.Filtration M)) : (sSup S).N = sSup (Ideal.Filtration.N '' S) :=
-  rfl
-
-@[simp]
 theorem inf_N : (F ⊓ F').N = F.N ⊓ F'.N :=
-  rfl
-
-@[simp]
-theorem sInf_N (S : Set (I.Filtration M)) : (sInf S).N = sInf (Ideal.Filtration.N '' S) :=
   rfl
 
 @[simp]
@@ -235,10 +229,6 @@ protected def submodule : Submodule (reesAlgebra I) (PolynomialModule R M) where
     rw [Finset.mem_antidiagonal] at e
     subst e
     exact F.pow_smul_le j k (Submodule.smul_mem_smul (r.2 j) (hf k))
-
-@[simp]
-theorem mem_submodule (f : PolynomialModule R M) : f ∈ F.submodule ↔ ∀ i, f i ∈ F.N i :=
-  Iff.rfl
 
 theorem inf_submodule : (F ⊓ F').submodule = F.submodule ⊓ F'.submodule := by
   ext

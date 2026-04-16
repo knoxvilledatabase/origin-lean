@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 import Mathlib.Algebra.Category.ModuleCat.Presheaf
 
+noncomputable section
+
 /-!
 # Change of presheaf of rings
 

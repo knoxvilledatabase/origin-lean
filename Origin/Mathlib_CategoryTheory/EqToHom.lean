@@ -5,6 +5,8 @@ Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.CategoryTheory.Opposites
 
+noncomputable section
+
 /-!
 # Morphisms from equations between objects.
 
@@ -144,18 +146,6 @@ theorem congrArg_mpr_hom_right {X Y Z : C} (p : X ⟶ Y) (q : Z = Y) :
 
 def eqToIso {X Y : C} (p : X = Y) : X ≅ Y :=
   ⟨eqToHom p, eqToHom p.symm, by simp, by simp⟩
-
-@[simp]
-theorem eqToIso.hom {X Y : C} (p : X = Y) : (eqToIso p).hom = eqToHom p :=
-  rfl
-
-@[simp]
-theorem eqToIso.inv {X Y : C} (p : X = Y) : (eqToIso p).inv = eqToHom p.symm :=
-  rfl
-
-@[simp]
-theorem eqToIso_refl {X : C} (p : X = X) : eqToIso p = Iso.refl X :=
-  rfl
 
 @[simp]
 theorem eqToIso_trans {X Y Z : C} (p : X = Y) (q : Y = Z) :

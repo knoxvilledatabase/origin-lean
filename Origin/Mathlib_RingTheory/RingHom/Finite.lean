@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Finiteness.TensorProduct
 import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.RingTheory.Localization.Integer
 
+noncomputable section
+
 /-!
 
 # The meta properties of finite ring homomorphisms.

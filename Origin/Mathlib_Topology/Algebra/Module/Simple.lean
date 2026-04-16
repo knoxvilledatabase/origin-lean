@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.SimpleModule
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # The kernel of a linear function is closed or dense
 

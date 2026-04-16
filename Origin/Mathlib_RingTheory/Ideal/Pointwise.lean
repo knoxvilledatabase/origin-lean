@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Aut
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-! # Pointwise instances on `Ideal`s
 
 This file provides the action `Ideal.pointwiseMulAction` which morally matches the action of

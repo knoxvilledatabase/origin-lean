@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Submodule
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.LinearAlgebra.Isomorphisms
 
+noncomputable section
+
 /-!
 # Quotients of Lie algebras and Lie modules
 
@@ -183,10 +185,6 @@ theorem map_mk'_eq_bot_le : map (mk' N) N' = ⊥ ↔ N' ≤ N := by
 @[ext]
 theorem lieModuleHom_ext ⦃f g : M ⧸ N →ₗ⁅R,L⁆ M⦄ (h : f.comp (mk' N) = g.comp (mk' N)) : f = g :=
   LieModuleHom.ext fun x => Quotient.inductionOn' x <| LieModuleHom.congr_fun h
-
-lemma toEnd_comp_mk' (x : L) :
-    LieModule.toEnd R L (M ⧸ N) x ∘ₗ mk' N = mk' N ∘ₗ LieModule.toEnd R L M x :=
-  rfl
 
 end Quotient
 

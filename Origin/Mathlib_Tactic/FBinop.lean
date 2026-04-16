@@ -7,6 +7,8 @@ import Lean.Elab.App
 import Lean.Elab.BuiltinNotation
 import Mathlib.Tactic.ToExpr
 
+noncomputable section
+
 /-! # Elaborator for functorial binary operators
 
 `fbinop% f x y` elaborates `f x y` for `x : S α` and `y : S' β`, taking into account

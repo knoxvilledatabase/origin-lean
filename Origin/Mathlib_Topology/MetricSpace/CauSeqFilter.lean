@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Topology.MetricSpace.Cauchy
 
+noncomputable section
+
 /-!
 # Completeness in terms of `Cauchy` filters vs `isCauSeq` sequences
 

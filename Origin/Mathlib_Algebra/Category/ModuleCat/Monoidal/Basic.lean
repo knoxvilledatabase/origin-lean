@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import Mathlib.CategoryTheory.Monoidal.Linear
 
+noncomputable section
+
 /-!
 # The monoidal category structure on R-modules
 
@@ -188,11 +190,6 @@ instance : CommRing ((𝟙_ (ModuleCat.{u} R) : ModuleCat.{u} R) : Type u) :=
 namespace MonoidalCategory
 
 @[simp]
-theorem tensorHom_tmul {K L M N : ModuleCat.{u} R} (f : K ⟶ L) (g : M ⟶ N) (k : K) (m : M) :
-    (f ⊗ g) (k ⊗ₜ m) = f k ⊗ₜ g m :=
-  rfl
-
-@[simp]
 theorem whiskerLeft_apply (L : ModuleCat.{u} R) {M N : ModuleCat.{u} R} (f : M ⟶ N)
     (l : L) (m : M) :
     (L ◁ f) (l ⊗ₜ m) = l ⊗ₜ f m :=
@@ -224,16 +221,6 @@ theorem rightUnitor_inv_apply {M : ModuleCat.{u} R} (m : M) :
     ((ρ_ M).inv : M ⟶ M ⊗ 𝟙_ (ModuleCat.{u} R)) m = m ⊗ₜ[R] 1 :=
   TensorProduct.rid_symm_apply m
 
-@[simp]
-theorem associator_hom_apply {M N K : ModuleCat.{u} R} (m : M) (n : N) (k : K) :
-    ((α_ M N K).hom : (M ⊗ N) ⊗ K ⟶ M ⊗ N ⊗ K) (m ⊗ₜ n ⊗ₜ k) = m ⊗ₜ (n ⊗ₜ k) :=
-  rfl
-
-@[simp]
-theorem associator_inv_apply {M N K : ModuleCat.{u} R} (m : M) (n : N) (k : K) :
-    ((α_ M N K).inv : M ⊗ N ⊗ K ⟶ (M ⊗ N) ⊗ K) (m ⊗ₜ (n ⊗ₜ k)) = m ⊗ₜ n ⊗ₜ k :=
-  rfl
-
 variable {M₁ M₂ M₃ M₄ : ModuleCat.{u} R}
 
 section
@@ -245,10 +232,6 @@ variable (f : M₁ → M₂ → M₃) (h₁ : ∀ m₁ m₂ n, f (m₁ + m₂) n
 
 noncomputable def tensorLift : M₁ ⊗ M₂ ⟶ M₃ :=
   TensorProduct.lift (LinearMap.mk₂ R f h₁ h₂ h₃ h₄)
-
-@[simp]
-lemma tensorLift_tmul (m : M₁) (n : M₂) :
-    tensorLift f h₁ h₂ h₃ h₄ (m ⊗ₜ n) = f m n := rfl
 
 end
 

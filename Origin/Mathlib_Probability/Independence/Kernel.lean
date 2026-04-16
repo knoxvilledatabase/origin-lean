@@ -1,12 +1,14 @@
 /-
 Extracted from Probability/Independence/Kernel.lean
-Genuine: 103 | Conflates: 1 | Dissolved: 1 | Infrastructure: 7
+Genuine: 103 | Conflates: 1 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.Probability.ConditionalProbability
 import Mathlib.Probability.Kernel.Basic
 import Mathlib.Tactic.Peel
+
+noncomputable section
 
 /-!
 # Independence with respect to a kernel and a measure
@@ -1041,32 +1043,6 @@ theorem iIndepFun.indepFun_finset (S T : Finset ι) (hST : Disjoint S T)
   · refine Finset.prod_congr rfl fun i hi => ?_
     rw [h_sets_s'_univ hi, Set.univ_inter]
 
-theorem iIndepFun.indepFun_prod_mk (hf_Indep : iIndepFun m f κ μ)
-    (hf_meas : ∀ i, Measurable (f i)) (i j k : ι) (hik : i ≠ k) (hjk : j ≠ k) :
-    IndepFun (fun a => (f i a, f j a)) (f k) κ μ := by
-  classical
-  have h_right : f k =
-    (fun p : ∀ j : ({k} : Finset ι), β j => p ⟨k, Finset.mem_singleton_self k⟩) ∘
-    fun a (j : ({k} : Finset ι)) => f j a := rfl
-  have h_meas_right :  Measurable fun p : ∀ j : ({k} : Finset ι),
-    β j => p ⟨k, Finset.mem_singleton_self k⟩ := measurable_pi_apply _
-  let s : Finset ι := {i, j}
-  have h_left : (fun ω => (f i ω, f j ω)) = (fun p : ∀ l : s, β l =>
-    (p ⟨i, Finset.mem_insert_self i _⟩,
-    p ⟨j, Finset.mem_insert_of_mem (Finset.mem_singleton_self _)⟩)) ∘ fun a (j : s) => f j a := by
-    ext1 a
-    simp only [Prod.mk.inj_iff]
-    constructor
-  have h_meas_left : Measurable fun p : ∀ l : s, β l =>
-    (p ⟨i, Finset.mem_insert_self i _⟩,
-    p ⟨j, Finset.mem_insert_of_mem (Finset.mem_singleton_self _)⟩) :=
-      Measurable.prod (measurable_pi_apply _) (measurable_pi_apply _)
-  rw [h_left, h_right]
-  refine (hf_Indep.indepFun_finset s {k} ?_ hf_meas).comp h_meas_left h_meas_right
-  rw [Finset.disjoint_singleton_right]
-  simp only [s, Finset.mem_insert, Finset.mem_singleton, not_or]
-  exact ⟨hik.symm, hjk.symm⟩
-
 open Finset in
 
 lemma iIndepFun.indepFun_prod_mk_prod_mk (hf_indep : iIndepFun m f κ μ)
@@ -1142,28 +1118,6 @@ section CommMonoid
 variable {β : Type*} {m : MeasurableSpace β} [CommMonoid β] [MeasurableMul₂ β] {f : ι → Ω → β}
 
 @[to_additive]
-theorem iIndepFun.indepFun_finset_prod_of_not_mem (hf_Indep : iIndepFun (fun _ ↦ m) f κ μ)
-    (hf_meas : ∀ i, Measurable (f i)) {s : Finset ι} {i : ι} (hi : i ∉ s) :
-    IndepFun (∏ j ∈ s, f j) (f i) κ μ := by
-  classical
-  have h_right : f i =
-    (fun p : ({i} : Finset ι) → β => p ⟨i, Finset.mem_singleton_self i⟩) ∘
-    fun a (j : ({i} : Finset ι)) => f j a := rfl
-  have h_meas_right : Measurable fun p : ({i} : Finset ι) → β =>
-      p ⟨i, Finset.mem_singleton_self i⟩ := measurable_pi_apply _
-  have h_left : ∏ j ∈ s, f j = (fun p : s → β => ∏ j, p j) ∘ fun a (j : s) => f j a := by
-    ext1 a
-    simp only [Function.comp_apply]
-    have : (∏ j : ↥s, f (↑j) a) = (∏ j : ↥s, f ↑j) a := by rw [Finset.prod_apply]
-    rw [this, Finset.prod_coe_sort]
-  have h_meas_left : Measurable fun p : s → β => ∏ j, p j :=
-    Finset.univ.measurable_prod fun (j : ↥s) (_H : j ∈ Finset.univ) => measurable_pi_apply j
-  rw [h_left, h_right]
-  exact
-    (hf_Indep.indepFun_finset s {i} (Finset.disjoint_singleton_left.mpr hi).symm hf_meas).comp
-      h_meas_left h_meas_right
-
-@[to_additive]
 theorem iIndepFun.indepFun_prod_range_succ {f : ℕ → Ω → β}
     (hf_Indep : iIndepFun (fun _ => m) f κ μ) (hf_meas : ∀ i, Measurable (f i)) (n : ℕ) :
     IndepFun (∏ j ∈ Finset.range n, f j) (f n) κ μ :=
@@ -1192,7 +1146,5 @@ end IndepFun
 variable {ι Ω α β : Type*} {mΩ : MeasurableSpace Ω} {mα : MeasurableSpace α}
   {mβ : MeasurableSpace β} {κ : Kernel α Ω} {μ : Measure α} {X : ι → Ω → α} {Y : ι → Ω → β}
   {f : _ → Set Ω} {t : ι → Set β} {s : Finset ι}
-
--- DISSOLVED: iIndepFun.cond_iInter
 
 end ProbabilityTheory.Kernel

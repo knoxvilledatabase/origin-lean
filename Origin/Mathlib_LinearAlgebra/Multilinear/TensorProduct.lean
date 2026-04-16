@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Multilinear.Basic
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Constructions relating multilinear maps and tensor products.
 -/
@@ -57,17 +59,6 @@ def domCoprod' :
       fun c m n => by
       ext
       simp only [domCoprod_apply, TensorProduct.tmul_smul, smul_apply]
-
-@[simp]
-theorem domCoprod'_apply (a : MultilinearMap R (fun _ : ι₁ => N) N₁)
-    (b : MultilinearMap R (fun _ : ι₂ => N) N₂) : domCoprod' (a ⊗ₜ[R] b) = domCoprod a b :=
-  rfl
-
-theorem domCoprod_domDomCongr_sumCongr (a : MultilinearMap R (fun _ : ι₁ => N) N₁)
-    (b : MultilinearMap R (fun _ : ι₂ => N) N₂) (σa : ι₁ ≃ ι₃) (σb : ι₂ ≃ ι₄) :
-    (a.domCoprod b).domDomCongr (σa.sumCongr σb) =
-      (a.domDomCongr σa).domCoprod (b.domDomCongr σb) :=
-  rfl
 
 end DomCoprod
 

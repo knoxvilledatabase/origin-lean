@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 
+noncomputable section
+
 /-!
 # (Co)products in functor categories
 

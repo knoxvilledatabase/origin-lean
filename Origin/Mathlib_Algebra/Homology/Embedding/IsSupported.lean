@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.Embedding.Basic
 import Mathlib.Algebra.Homology.Opposite
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 
+noncomputable section
+
 /-! # Support of homological complexes
 
 Given an embedding `e : c.Embedding c'` of complex shapes, we say
@@ -43,7 +45,6 @@ lemma isZero_X_of_isStrictlySupported [K.IsStrictlySupported e]
   IsStrictlySupported.isZero i' hi'
 
 include e' in
-
 variable {K L} in
 
 lemma isStrictlySupported_of_iso [K.IsStrictlySupported e] : L.IsStrictlySupported e where
@@ -58,7 +59,6 @@ lemma exactAt_of_isSupported [K.IsSupported e] (i' : ι') (hi' : ∀ i, e.f i �
   IsSupported.exactAt i' hi'
 
 include e' in
-
 variable {K L} in
 
 lemma isSupported_of_iso [K.IsSupported e] : L.IsSupported e where

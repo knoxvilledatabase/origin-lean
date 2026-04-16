@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.ContDiff.Defs
 
+noncomputable section
+
 /-!
 # One-dimensional iterated derivatives
 

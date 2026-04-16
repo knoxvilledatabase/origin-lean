@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.OreLocalization.Cardinality
 import Mathlib.RingTheory.OreLocalization.Ring
 
+noncomputable section
+
 /-!
 # Cardinality of Ore localizations of rings
 

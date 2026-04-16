@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Pi
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Affine maps
 
@@ -73,14 +75,6 @@ def toAffineMap : V₁ →ᵃ[k] V₂ where
   linear := f
   map_vadd' p v := f.map_add v p
 
-@[simp]
-theorem coe_toAffineMap : ⇑f.toAffineMap = f :=
-  rfl
-
-@[simp]
-theorem toAffineMap_linear : f.toAffineMap.linear = f :=
-  rfl
-
 end LinearMap
 
 namespace AffineMap
@@ -89,10 +83,6 @@ variable {k : Type*} {V1 : Type*} {P1 : Type*} {V2 : Type*} {P2 : Type*} {V3 : T
   {P3 : Type*} {V4 : Type*} {P4 : Type*} [Ring k] [AddCommGroup V1] [Module k V1]
   [AffineSpace V1 P1] [AddCommGroup V2] [Module k V2] [AffineSpace V2 P2] [AddCommGroup V3]
   [Module k V3] [AffineSpace V3 P3] [AddCommGroup V4] [Module k V4] [AffineSpace V4 P4]
-
-@[simp]
-theorem coe_mk (f : P1 → P2) (linear add) : ((mk f linear add : P1 →ᵃ[k] P2) : P1 → P2) = f :=
-  rfl
 
 @[simp]
 theorem toFun_eq_coe (f : P1 →ᵃ[k] P2) : f.toFun = ⇑f :=
@@ -172,14 +162,6 @@ def mk' (f : P1 → P2) (f' : V1 →ₗ[k] V2) (p : P1) (h : ∀ p' : P1, f p' =
   linear := f'
   map_vadd' p' v := by rw [h, h p', vadd_vsub_assoc, f'.map_add, vadd_vadd]
 
-@[simp]
-theorem coe_mk' (f : P1 → P2) (f' : V1 →ₗ[k] V2) (p h) : ⇑(mk' f f' p h) = f :=
-  rfl
-
-@[simp]
-theorem mk'_linear (f : P1 → P2) (f' : V1 →ₗ[k] V2) (p h) : (mk' f f' p h).linear = f' :=
-  rfl
-
 section SMul
 
 variable {R : Type*} [Monoid R] [DistribMulAction R V2] [SMulCommClass k R V2]
@@ -192,10 +174,6 @@ instance mulAction : MulAction R (P1 →ᵃ[k] V2) where
 
 @[simp, norm_cast]
 theorem coe_smul (c : R) (f : P1 →ᵃ[k] V2) : ⇑(c • f) = c • ⇑f :=
-  rfl
-
-@[simp]
-theorem smul_linear (t : R) (f : P1 →ᵃ[k] V2) : (t • f).linear = t • f.linear :=
   rfl
 
 instance isCentralScalar [DistribMulAction Rᵐᵒᵖ V2] [IsCentralScalar R V2] :
@@ -231,22 +209,6 @@ theorem coe_neg (f : P1 →ᵃ[k] V2) : ⇑(-f) = -f :=
 theorem coe_sub (f g : P1 →ᵃ[k] V2) : ⇑(f - g) = f - g :=
   rfl
 
-@[simp]
-theorem zero_linear : (0 : P1 →ᵃ[k] V2).linear = 0 :=
-  rfl
-
-@[simp]
-theorem add_linear (f g : P1 →ᵃ[k] V2) : (f + g).linear = f.linear + g.linear :=
-  rfl
-
-@[simp]
-theorem sub_linear (f g : P1 →ᵃ[k] V2) : (f - g).linear = f.linear - g.linear :=
-  rfl
-
-@[simp]
-theorem neg_linear (f : P1 →ᵃ[k] V2) : (-f).linear = -f.linear :=
-  rfl
-
 instance : AddCommGroup (P1 →ᵃ[k] V2) :=
   coeFn_injective.addCommGroup _ coe_zero coe_add coe_neg coe_sub (fun _ _ => coe_smul _ _)
     fun _ _ => coe_smul _ _
@@ -263,39 +225,15 @@ instance : AffineSpace (P1 →ᵃ[k] V2) (P1 →ᵃ[k] P2) where
   vsub_vadd' f g := ext fun p => vsub_vadd (f p) (g p)
   vadd_vsub' f g := ext fun p => vadd_vsub (f p) (g p)
 
-@[simp]
-theorem vadd_apply (f : P1 →ᵃ[k] V2) (g : P1 →ᵃ[k] P2) (p : P1) : (f +ᵥ g) p = f p +ᵥ g p :=
-  rfl
-
-@[simp]
-theorem vsub_apply (f g : P1 →ᵃ[k] P2) (p : P1) : (f -ᵥ g : P1 →ᵃ[k] V2) p = f p -ᵥ g p :=
-  rfl
-
 def fst : P1 × P2 →ᵃ[k] P1 where
   toFun := Prod.fst
   linear := LinearMap.fst k V1 V2
   map_vadd' _ _ := rfl
 
-@[simp]
-theorem coe_fst : ⇑(fst : P1 × P2 →ᵃ[k] P1) = Prod.fst :=
-  rfl
-
-@[simp]
-theorem fst_linear : (fst : P1 × P2 →ᵃ[k] P1).linear = LinearMap.fst k V1 V2 :=
-  rfl
-
 def snd : P1 × P2 →ᵃ[k] P2 where
   toFun := Prod.snd
   linear := LinearMap.snd k V1 V2
   map_vadd' _ _ := rfl
-
-@[simp]
-theorem coe_snd : ⇑(snd : P1 × P2 →ᵃ[k] P2) = Prod.snd :=
-  rfl
-
-@[simp]
-theorem snd_linear : (snd : P1 × P2 →ᵃ[k] P2).linear = LinearMap.snd k V1 V2 :=
-  rfl
 
 variable (k P1)
 
@@ -304,18 +242,7 @@ nonrec def id : P1 →ᵃ[k] P1 where
   linear := LinearMap.id
   map_vadd' _ _ := rfl
 
-@[simp]
-theorem coe_id : ⇑(id k P1) = _root_.id :=
-  rfl
-
-@[simp]
-theorem id_linear : (id k P1).linear = LinearMap.id :=
-  rfl
-
 variable {P1}
-
-theorem id_apply (p : P1) : id k P1 p = p :=
-  rfl
 
 variable {k}
 
@@ -329,10 +256,6 @@ def comp (f : P2 →ᵃ[k] P3) (g : P1 →ᵃ[k] P2) : P1 →ᵃ[k] P3 where
     intro p v
     rw [Function.comp_apply, g.map_vadd, f.map_vadd]
     rfl
-
-@[simp]
-theorem coe_comp (f : P2 →ᵃ[k] P3) (g : P1 →ᵃ[k] P2) : ⇑(f.comp g) = f ∘ g :=
-  rfl
 
 theorem comp_apply (f : P2 →ᵃ[k] P3) (g : P1 →ᵃ[k] P2) (p : P1) : f.comp g p = f (g p) :=
   rfl
@@ -355,20 +278,6 @@ instance : Monoid (P1 →ᵃ[k] P1) where
   one_mul := id_comp
   mul_one := comp_id
   mul_assoc := comp_assoc
-
-@[simp]
-theorem coe_mul (f g : P1 →ᵃ[k] P1) : ⇑(f * g) = f ∘ g :=
-  rfl
-
-@[simp]
-theorem coe_one : ⇑(1 : P1 →ᵃ[k] P1) = _root_.id :=
-  rfl
-
-@[simps]
-def linearHom : (P1 →ᵃ[k] P1) →* V1 →ₗ[k] V1 where
-  toFun := linear
-  map_one' := rfl
-  map_mul' _ _ := rfl
 
 @[simp]
 theorem linear_injective_iff (f : P1 →ᵃ[k] P2) :
@@ -410,20 +319,11 @@ theorem image_vsub_image {s t : Set P1} (f : P1 →ᵃ[k] P2) :
 def lineMap (p₀ p₁ : P1) : k →ᵃ[k] P1 :=
   ((LinearMap.id : k →ₗ[k] k).smulRight (p₁ -ᵥ p₀)).toAffineMap +ᵥ const k k p₀
 
-theorem coe_lineMap (p₀ p₁ : P1) : (lineMap p₀ p₁ : k → P1) = fun c => c • (p₁ -ᵥ p₀) +ᵥ p₀ :=
-  rfl
-
 theorem lineMap_apply (p₀ p₁ : P1) (c : k) : lineMap p₀ p₁ c = c • (p₁ -ᵥ p₀) +ᵥ p₀ :=
-  rfl
-
-theorem lineMap_apply_module' (p₀ p₁ : V1) (c : k) : lineMap p₀ p₁ c = c • (p₁ - p₀) + p₀ :=
   rfl
 
 theorem lineMap_apply_module (p₀ p₁ : V1) (c : k) : lineMap p₀ p₁ c = (1 - c) • p₀ + c • p₁ := by
   simp [lineMap_apply_module', smul_sub, sub_smul]; abel
-
-theorem lineMap_apply_ring' (a b c : k) : lineMap a b c = c * (b - a) + a :=
-  rfl
 
 theorem lineMap_apply_ring (a b c : k) : lineMap a b c = (1 - c) * a + c * b :=
   lineMap_apply_module a b c
@@ -564,14 +464,6 @@ def proj (i : ι) : (∀ i : ι, P i) →ᵃ[k] P i where
   linear := @LinearMap.proj k ι _ V _ _ i
   map_vadd' _ _ := rfl
 
-@[simp]
-theorem proj_apply (i : ι) (f : ∀ i, P i) : @proj k _ ι V P _ _ _ i f = f i :=
-  rfl
-
-@[simp]
-theorem proj_linear (i : ι) : (@proj k _ ι V P _ _ _ i).linear = @LinearMap.proj k ι _ V _ _ i :=
-  rfl
-
 theorem pi_lineMap_apply (f g : ∀ i, P i) (c : k) (i : ι) :
     lineMap f g c i = lineMap (f i) (g i) c :=
   (proj i : (∀ i, P i) →ᵃ[k] P i).apply_lineMap f g c
@@ -611,20 +503,6 @@ instance : Module R (P1 →ᵃ[k] V2) :=
 
 variable (R)
 
-@[simps]
-def toConstProdLinearMap : (V1 →ᵃ[k] V2) ≃ₗ[R] V2 × (V1 →ₗ[k] V2) where
-  toFun f := ⟨f 0, f.linear⟩
-  invFun p := p.2.toAffineMap + const k V1 p.1
-  left_inv f := by
-    ext
-    rw [f.decomp]
-    simp [const_apply _ _]  -- Porting note: `simp` needs `_`s to use this lemma
-  right_inv := by
-    rintro ⟨v, f⟩
-    ext <;> simp [const_apply _ _, const_linear _ _]  -- Porting note: `simp` needs `_`s
-  map_add' := by simp
-  map_smul' := by simp
-
 end Module
 
 section Pi
@@ -642,9 +520,6 @@ variable (fp : (i : ι) → (P1 →ᵃ[k] φp i)) (fv : (i : ι) → (P1 →ᵃ[
 
 @[simp]
 theorem pi_apply (c : P1) (i : ι) : pi fp c i = fp i c :=
-  rfl
-
-theorem pi_comp (g : P3 →ᵃ[k] P1) : (pi fp).comp g = pi (fun i => (fp i).comp g) :=
   rfl
 
 theorem pi_eq_zero : pi fv = 0 ↔ ∀ i, fv i = 0 := by
@@ -710,9 +585,6 @@ theorem homothety_def (c : P1) (r : k) :
 theorem homothety_apply (c : P1) (r : k) (p : P1) : homothety c r p = r • (p -ᵥ c : V1) +ᵥ c :=
   rfl
 
-theorem homothety_eq_lineMap (c : P1) (r : k) (p : P1) : homothety c r p = lineMap c p r :=
-  rfl
-
 @[simp]
 theorem homothety_one (c : P1) : homothety c (1 : k) = id k P1 := by
   ext p
@@ -745,17 +617,9 @@ def homothetyHom (c : P1) : k →* P1 →ᵃ[k] P1 where
   map_one' := homothety_one c
   map_mul' := homothety_mul c
 
-@[simp]
-theorem coe_homothetyHom (c : P1) : ⇑(homothetyHom c : k →* _) = homothety c :=
-  rfl
-
 def homothetyAffine (c : P1) : k →ᵃ[k] P1 →ᵃ[k] P1 :=
   ⟨homothety c, (LinearMap.lsmul k _).flip (id k P1 -ᵥ const k P1 c),
     Function.swap (homothety_add c)⟩
-
-@[simp]
-theorem coe_homothetyAffine (c : P1) : ⇑(homothetyAffine c : k →ᵃ[k] _) = homothety c :=
-  rfl
 
 end CommRing
 

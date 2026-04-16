@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Normed.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Between
@@ -9,6 +9,8 @@ import Mathlib.Analysis.Convex.Topology
 import Mathlib.Analysis.Normed.Group.Pointwise
 import Mathlib.Analysis.Normed.Affine.AddTorsor
 import Mathlib.Analysis.Normed.Affine.AddTorsorBases
+
+noncomputable section
 
 /-!
 # Topological and metric properties of convex sets in normed spaces
@@ -121,7 +123,10 @@ theorem isConnected_setOf_sameRay (x : E) : IsConnected { y | SameRay ℝ x y } 
   simp_rw [← exists_nonneg_left_iff_sameRay hx]
   exact isConnected_Ici.image _ (continuous_id.smul continuous_const).continuousOn
 
--- DISSOLVED: isConnected_setOf_sameRay_and_ne_zero
+theorem isConnected_setOf_sameRay_and_ne_zero {x : E} (hx : x ≠ 0) :
+    IsConnected { y | SameRay ℝ x y ∧ y ≠ 0 } := by
+  simp_rw [← exists_pos_left_iff_sameRay_and_ne_zero hx]
+  exact isConnected_Ioi.image _ (continuous_id.smul continuous_const).continuousOn
 
 end SeminormedAddCommGroup
 

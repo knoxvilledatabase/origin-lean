@@ -7,6 +7,8 @@ import Mathlib.AlgebraicTopology.SimplexCategory
 import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.Topology.Instances.NNReal
 
+noncomputable section
+
 /-!
 # Topological simplices
 

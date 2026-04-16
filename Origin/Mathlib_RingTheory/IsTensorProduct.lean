@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.Algebra.Module.ULift
 
+noncomputable section
+
 /-!
 # The characteristic predicate of tensor product
 
@@ -68,11 +70,6 @@ variable {R M N}
 @[simps! apply]
 noncomputable def IsTensorProduct.equiv (h : IsTensorProduct f) : M₁ ⊗[R] M₂ ≃ₗ[R] M :=
   LinearEquiv.ofBijective _ h
-
-@[simp]
-theorem IsTensorProduct.equiv_toLinearMap (h : IsTensorProduct f) :
-    h.equiv.toLinearMap = TensorProduct.lift f :=
-  rfl
 
 @[simp]
 theorem IsTensorProduct.equiv_symm_apply (h : IsTensorProduct f) (x₁ : M₁) (x₂ : M₂) :

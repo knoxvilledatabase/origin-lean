@@ -1,11 +1,13 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Bound.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Chebyshev
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Order.Partition.Equipartition
+
+noncomputable section
 
 /-!
 # Numerical bounds for Szemerédi Regularity Lemma
@@ -174,7 +176,11 @@ theorem bound_pos : 0 < bound ε l :=
 
 variable {ι 𝕜 : Type*} [LinearOrderedField 𝕜] {s t : Finset ι} {x : 𝕜}
 
--- DISSOLVED: mul_sq_le_sum_sq
+theorem mul_sq_le_sum_sq (hst : s ⊆ t) (f : ι → 𝕜) (hs : x ^ 2 ≤ ((∑ i ∈ s, f i) / #s) ^ 2)
+    (hs' : (#s : 𝕜) ≠ 0) : (#s : 𝕜) * x ^ 2 ≤ ∑ i ∈ t, f i ^ 2 :=
+  (mul_le_mul_of_nonneg_left (hs.trans sum_div_card_sq_le_sum_sq_div_card) <|
+    Nat.cast_nonneg _).trans <| (mul_div_cancel₀ _ hs').le.trans <|
+      sum_le_sum_of_subset_of_nonneg hst fun _ _ _ => sq_nonneg _
 
 theorem add_div_le_sum_sq_div_card (hst : s ⊆ t) (f : ι → 𝕜) (d : 𝕜) (hx : 0 ≤ x)
     (hs : x ≤ |(∑ i ∈ s, f i) / #s - (∑ i ∈ t, f i) / #t|) (ht : d ≤ ((∑ i ∈ t, f i) / #t) ^ 2) :

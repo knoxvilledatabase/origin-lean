@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/PSeries.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 import Mathlib.Analysis.SumOverResidueClass
+
+noncomputable section
 
 /-!
 # Convergence of `p`-series
@@ -179,7 +181,23 @@ open Finset
 
 open ENNReal in
 
--- DISSOLVED: summable_schlomilch_iff
+theorem summable_schlomilch_iff {C : ℕ} {u : ℕ → ℕ} {f : ℕ → ℝ≥0}
+    (hf : ∀ ⦃m n⦄, 0 < m → m ≤ n → f n ≤ f m)
+    (h_pos : ∀ n, 0 < u n) (hu_strict : StrictMono u)
+    (hC_nonzero : C ≠ 0) (h_succ_diff : SuccDiffBounded C u) :
+    (Summable fun k : ℕ => (u (k + 1) - (u k : ℝ≥0)) * f (u k)) ↔ Summable f := by
+  simp only [← tsum_coe_ne_top_iff_summable, Ne, not_iff_not, ENNReal.coe_mul]
+  constructor <;> intro h
+  · replace hf : ∀ m n, 1 < m → m ≤ n → (f n : ℝ≥0∞) ≤ f m := fun m n hm hmn =>
+      ENNReal.coe_le_coe.2 (hf (zero_lt_one.trans hm) hmn)
+    have h_nonneg : ∀ n, 0 ≤ (f n : ℝ≥0∞) := fun n =>
+      ENNReal.coe_le_coe.2 (f n).2
+    obtain hC := tsum_schlomilch_le hf h_pos h_nonneg hu_strict.monotone h_succ_diff
+    simpa [add_eq_top, mul_ne_top, mul_eq_top, hC_nonzero] using eq_top_mono hC h
+  · replace hf : ∀ m n, 0 < m → m ≤ n → (f n : ℝ≥0∞) ≤ f m := fun m n hm hmn =>
+      ENNReal.coe_le_coe.2 (hf hm hmn)
+    have : ∑ k ∈ range (u 0), (f k : ℝ≥0∞) ≠ ∞ := sum_ne_top.2 fun a _ => coe_ne_top
+    simpa [h, add_eq_top, this] using le_tsum_schlomilch hf h_pos hu_strict
 
 open ENNReal in
 
@@ -196,7 +214,17 @@ end NNReal
 
 open NNReal in
 
--- DISSOLVED: summable_schlomilch_iff_of_nonneg
+theorem summable_schlomilch_iff_of_nonneg {C : ℕ} {u : ℕ → ℕ} {f : ℕ → ℝ} (h_nonneg : ∀ n, 0 ≤ f n)
+    (hf : ∀ ⦃m n⦄, 0 < m → m ≤ n → f n ≤ f m) (h_pos : ∀ n, 0 < u n)
+    (hu_strict : StrictMono u) (hC_nonzero : C ≠ 0) (h_succ_diff : SuccDiffBounded C u) :
+    (Summable fun k : ℕ => (u (k + 1) - (u k : ℝ)) * f (u k)) ↔ Summable f := by
+  lift f to ℕ → ℝ≥0 using h_nonneg
+  simp only [NNReal.coe_le_coe] at *
+  have (k : ℕ) : (u (k + 1) - (u k : ℝ)) = ((u (k + 1) : ℝ≥0) - (u k : ℝ≥0) : ℝ≥0) := by
+    have := Nat.cast_le (α := ℝ≥0).mpr <| (hu_strict k.lt_succ_self).le
+    simp [NNReal.coe_sub this]
+  simp_rw [this]
+  exact_mod_cast NNReal.summable_schlomilch_iff hf h_pos hu_strict hC_nonzero h_succ_diff
 
 theorem summable_condensed_iff_of_nonneg {f : ℕ → ℝ} (h_nonneg : ∀ n, 0 ≤ f n)
     (h_mono : ∀ ⦃m n⦄, 0 < m → m ≤ n → f n ≤ f m) :
@@ -318,10 +346,6 @@ theorem summable_rpow_inv {p : ℝ} :
 theorem summable_rpow {p : ℝ} : Summable (fun n => (n : ℝ≥0) ^ p : ℕ → ℝ≥0) ↔ p < -1 := by
   simp [← NNReal.summable_coe]
 
-theorem summable_one_div_rpow {p : ℝ} :
-    Summable (fun n => 1 / (n : ℝ≥0) ^ p : ℕ → ℝ≥0) ↔ 1 < p := by
-  simp
-
 end NNReal
 
 end p_series
@@ -332,7 +356,20 @@ open Finset
 
 variable {α : Type*} [LinearOrderedField α]
 
--- DISSOLVED: sum_Ioc_inv_sq_le_sub
+theorem sum_Ioc_inv_sq_le_sub {k n : ℕ} (hk : k ≠ 0) (h : k ≤ n) :
+    (∑ i ∈ Ioc k n, ((i : α) ^ 2)⁻¹) ≤ (k : α)⁻¹ - (n : α)⁻¹ := by
+  refine Nat.le_induction ?_ ?_ n h
+  · simp only [Ioc_self, sum_empty, sub_self, le_refl]
+  intro n hn IH
+  rw [sum_Ioc_succ_top hn]
+  apply (add_le_add IH le_rfl).trans
+  simp only [sub_eq_add_neg, add_assoc, Nat.cast_add, Nat.cast_one, le_add_neg_iff_add_le,
+    add_le_iff_nonpos_right, neg_add_le_iff_le_add, add_zero]
+  have A : 0 < (n : α) := by simpa using hk.bot_lt.trans_le hn
+  field_simp
+  rw [div_le_div_iff₀ _ A]
+  · linarith
+  · positivity
 
 theorem sum_Ioo_inv_sq_le (k n : ℕ) : (∑ i ∈ Ioo k n, (i ^ 2 : α)⁻¹) ≤ 2 / (k + 1) :=
   calc
@@ -362,7 +399,16 @@ end
 
 open Set Nat in
 
--- DISSOLVED: Real.not_summable_indicator_one_div_natCast
+lemma Real.not_summable_indicator_one_div_natCast {m : ℕ} (hm : m ≠ 0) (k : ZMod m) :
+    ¬ Summable ({n : ℕ | (n : ZMod m) = k}.indicator fun n : ℕ ↦ (1 / n : ℝ)) := by
+  have : NeZero m := ⟨hm⟩ -- instance is needed below
+  rw [← summable_nat_add_iff 1] -- shift by one to avoid non-monotonicity at zero
+  have h (n : ℕ) : {n : ℕ | (n : ZMod m) = k - 1}.indicator (fun n : ℕ ↦ (1 / (n + 1 :) : ℝ)) n =
+      if (n : ZMod m) = k - 1 then (1 / (n + 1) : ℝ) else (0 : ℝ) := by
+    simp only [indicator_apply, mem_setOf_eq, cast_add, cast_one]
+  simp_rw [indicator_apply, mem_setOf, cast_add, cast_one, ← eq_sub_iff_add_eq, ← h]
+  rw [summable_indicator_mod_iff (fun n₁ n₂ h ↦ by gcongr) (k - 1)]
+  exact mt (summable_nat_add_iff (f := fun n : ℕ ↦ 1 / (n : ℝ)) 1).mp not_summable_one_div_natCast
 
 /-!
 ## Translating the `p`-series by a real number

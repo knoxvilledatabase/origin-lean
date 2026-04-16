@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Defs.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 22 | Infrastructure: 35
+Genuine: 71 | Conflates: 1 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
@@ -9,6 +9,8 @@ import Mathlib.Data.Rat.Init
 import Mathlib.Order.Basic
 import Mathlib.Tactic.Common
 import Batteries.Data.Rat.Lemmas
+
+noncomputable section
 
 /-!
 # Basics for the Rational Numbers
@@ -39,20 +41,6 @@ theorem pos (a : ℚ) : 0 < a.den := Nat.pos_of_ne_zero a.den_nz
 
 lemma mk'_num_den (q : ℚ) : mk' q.num q.den q.den_nz q.reduced = q := rfl
 
-@[simp]
-theorem ofInt_eq_cast (n : ℤ) : ofInt n = Int.cast n :=
-  rfl
-
-@[simp] lemma num_ofNat (n : ℕ) : num (no_index (OfNat.ofNat n)) = OfNat.ofNat n := rfl
-
-@[simp] lemma den_ofNat (n : ℕ) : den (no_index (OfNat.ofNat n)) = 1 := rfl
-
-@[simp, norm_cast] lemma num_natCast (n : ℕ) : num n = n := rfl
-
-@[simp, norm_cast] lemma den_natCast (n : ℕ) : den n = 1 := rfl
-
-@[simp, norm_cast] lemma num_intCast (n : ℤ) : (n : ℚ).num = n := rfl
-
 @[simp, norm_cast] lemma den_intCast (n : ℤ) : (n : ℚ).den = 1 := rfl
 
 lemma intCast_injective : Injective (Int.cast : ℤ → ℚ) := fun _ _ ↦ congr_arg num
@@ -73,7 +61,7 @@ lemma natCast_injective : Injective (Nat.cast : ℕ → ℚ) :=
 
 lemma mkRat_eq_divInt (n d) : mkRat n d = n /. d := rfl
 
--- DISSOLVED: mk'_zero
+@[simp] lemma mk'_zero (d) (h : d ≠ 0) (w) : mk' 0 d h w = 0 := by congr; simp_all
 
 @[simp]
 lemma num_eq_zero {q : ℚ} : q.num = 0 ↔ q = 0 := by
@@ -83,42 +71,71 @@ lemma num_eq_zero {q : ℚ} : q.num = 0 ↔ q = 0 := by
     exact mk'_zero _ _ _
   · exact congr_arg num
 
--- DISSOLVED: num_ne_zero
+lemma num_ne_zero {q : ℚ} : q.num ≠ 0 ↔ q ≠ 0 := num_eq_zero.not
 
--- DISSOLVED: den_ne_zero
+@[simp] lemma den_ne_zero (q : ℚ) : q.den ≠ 0 := q.den_pos.ne'
 
 @[simp] lemma num_nonneg : 0 ≤ q.num ↔ 0 ≤ q := by
   simp [Int.le_iff_lt_or_eq, instLE, Rat.blt, Int.not_lt]; tauto
 
--- DISSOLVED: divInt_eq_zero
+@[simp]
+theorem divInt_eq_zero {a b : ℤ} (b0 : b ≠ 0) : a /. b = 0 ↔ a = 0 := by
+  rw [← zero_divInt b, divInt_eq_iff b0 b0, Int.zero_mul, Int.mul_eq_zero, or_iff_left b0]
 
--- DISSOLVED: divInt_ne_zero
+theorem divInt_ne_zero {a b : ℤ} (b0 : b ≠ 0) : a /. b ≠ 0 ↔ a ≠ 0 :=
+  (divInt_eq_zero b0).not
 
--- DISSOLVED: normalize_eq_mk'
+theorem normalize_eq_mk' (n : Int) (d : Nat) (h : d ≠ 0) (c : Nat.gcd (Int.natAbs n) d = 1) :
+    normalize n d h = mk' n d h c := (mk_eq_normalize ..).symm
 
 @[simp] alias mkRat_num_den' := mkRat_self
+
 lemma num_divInt_den (q : ℚ) : q.num /. q.den = q := divInt_self _
 
 lemma mk'_eq_divInt {n d h c} : (⟨n, d, h, c⟩ : ℚ) = n /. d := (num_divInt_den _).symm
 
 theorem intCast_eq_divInt (z : ℤ) : (z : ℚ) = z /. 1 := mk'_eq_divInt
 
--- DISSOLVED: divInt_self'
+@[simp] lemma divInt_self' {n : ℤ} (hn : n ≠ 0) : n /. n = 1 := by
+  simpa using divInt_mul_right (n := 1) (d := 1) hn
 
--- DISSOLVED: numDenCasesOn.{u}
+@[elab_as_elim]
+def numDenCasesOn.{u} {C : ℚ → Sort u} :
+    ∀ (a : ℚ) (_ : ∀ n d, 0 < d → (Int.natAbs n).Coprime d → C (n /. d)), C a
+  | ⟨n, d, h, c⟩, H => by rw [mk'_eq_divInt]; exact H n d (Nat.pos_of_ne_zero h) c
 
--- DISSOLVED: numDenCasesOn'.{u}
+@[elab_as_elim]
+def numDenCasesOn'.{u} {C : ℚ → Sort u} (a : ℚ) (H : ∀ (n : ℤ) (d : ℕ), d ≠ 0 → C (n /. d)) :
+    C a :=
+  numDenCasesOn a fun n d h _ => H n d h.ne'
 
 @[elab_as_elim]
 def numDenCasesOn''.{u} {C : ℚ → Sort u} (a : ℚ)
     (H : ∀ (n : ℤ) (d : ℕ) (nz red), C (mk' n d nz red)) : C a :=
   numDenCasesOn a fun n d h h' ↦ by rw [← mk_eq_divInt _ _ h.ne' h']; exact H n d h.ne' _
 
--- DISSOLVED: lift_binop_eq
+theorem lift_binop_eq (f : ℚ → ℚ → ℚ) (f₁ : ℤ → ℤ → ℤ → ℤ → ℤ) (f₂ : ℤ → ℤ → ℤ → ℤ → ℤ)
+    (fv :
+      ∀ {n₁ d₁ h₁ c₁ n₂ d₂ h₂ c₂},
+        f ⟨n₁, d₁, h₁, c₁⟩ ⟨n₂, d₂, h₂, c₂⟩ = f₁ n₁ d₁ n₂ d₂ /. f₂ n₁ d₁ n₂ d₂)
+    (f0 : ∀ {n₁ d₁ n₂ d₂}, d₁ ≠ 0 → d₂ ≠ 0 → f₂ n₁ d₁ n₂ d₂ ≠ 0) (a b c d : ℤ)
+    (b0 : b ≠ 0) (d0 : d ≠ 0)
+    (H :
+      ∀ {n₁ d₁ n₂ d₂}, a * d₁ = n₁ * b → c * d₂ = n₂ * d →
+        f₁ n₁ d₁ n₂ d₂ * f₂ a b c d = f₁ a b c d * f₂ n₁ d₁ n₂ d₂) :
+    f (a /. b) (c /. d) = f₁ a b c d /. f₂ a b c d := by
+  generalize ha : a /. b = x; cases' x with n₁ d₁ h₁ c₁; rw [mk'_eq_divInt] at ha
+  generalize hc : c /. d = x; cases' x with n₂ d₂ h₂ c₂; rw [mk'_eq_divInt] at hc
+  rw [fv]
+  have d₁0 := Int.ofNat_ne_zero.2 h₁
+  have d₂0 := Int.ofNat_ne_zero.2 h₂
+  exact (divInt_eq_iff (f0 d₁0 d₂0) (f0 b0 d0)).2
+    (H ((divInt_eq_iff b0 d₁0).1 ha) ((divInt_eq_iff d0 d₂0).1 hc))
 
 attribute [simp] divInt_add_divInt
 
--- DISSOLVED: add_def''
+theorem add_def'' {a b c d : ℤ} (b0 : b ≠ 0) (d0 : d ≠ 0) :
+    a /. b + c /. d = (a * d + c * b) /. (b * d) := divInt_add_divInt _ _ b0 d0
 
 attribute [simp] neg_divInt
 
@@ -128,7 +145,8 @@ lemma neg_def (q : ℚ) : -q = -q.num /. q.den := by rw [← neg_divInt, num_div
 
 attribute [simp] divInt_sub_divInt
 
--- DISSOLVED: sub_def''
+lemma sub_def'' {a b c d : ℤ} (b0 : b ≠ 0) (d0 : d ≠ 0) :
+    a /. b - c /. d = (a * d - c * b) /. (b * d) := divInt_sub_divInt _ _ b0 d0
 
 @[simp]
 lemma divInt_mul_divInt' (n₁ d₁ n₂ d₂ : ℤ) : (n₁ /. d₁) * (n₂ /. d₂) = (n₁ * n₂) /. (d₁ * d₂) := by
@@ -140,7 +158,11 @@ lemma divInt_mul_divInt' (n₁ d₁ n₂ d₂ : ℤ) : (n₁ /. d₁) * (n₂ /.
 
 attribute [simp] mkRat_mul_mkRat
 
--- DISSOLVED: mk'_mul_mk'
+lemma mk'_mul_mk' (n₁ n₂ : ℤ) (d₁ d₂ : ℕ) (hd₁ hd₂ hnd₁ hnd₂) (h₁₂ : n₁.natAbs.Coprime d₂)
+    (h₂₁ : n₂.natAbs.Coprime d₁) :
+    mk' n₁ d₁ hd₁ hnd₁ * mk' n₂ d₂ hd₂ hnd₂ = mk' (n₁ * n₂) (d₁ * d₂) (Nat.mul_ne_zero hd₁ hd₂) (by
+      rw [Int.natAbs_mul]; exact (hnd₁.mul h₂₁).mul_right (h₁₂.mul hnd₂)) := by
+  rw [mul_def]; dsimp; simp [mk_eq_normalize]
 
 lemma mul_eq_mkRat (q r : ℚ) : q * r = mkRat (q.num * r.num) (q.den * r.den) := by
   rw [mul_def, normalize_eq_mkRat]
@@ -161,10 +183,6 @@ lemma pow_eq_mkRat (q : ℚ) (n : ℕ) : q ^ n = mkRat (q.num ^ n) (q.den ^ n) :
 
 lemma pow_eq_divInt (q : ℚ) (n : ℕ) : q ^ n = q.num ^ n /. q.den ^ n := by
   rw [pow_def, mk_eq_divInt, Int.natCast_pow]
-
-@[simp] lemma num_pow (q : ℚ) (n : ℕ) : (q ^ n).num = q.num ^ n := rfl
-
-@[simp] lemma den_pow (q : ℚ) (n : ℕ) : (q ^ n).den = q.den ^ n := rfl
 
 @[simp] lemma mk'_pow (num : ℤ) (den : ℕ) (hd hdn) (n : ℕ) :
     mk' num den hd hdn ^ n = mk' (num ^ n) (den ^ n)
@@ -213,9 +231,9 @@ lemma divInt_zero_one : 0 /. 1 = 0 := zero_divInt _
 
 @[simp] lemma mkRat_one (n : ℤ) : mkRat n 1 = n := by simp [mkRat_eq_divInt]
 
--- DISSOLVED: divInt_one_one
+lemma divInt_one_one : 1 /. 1 = 1 := by rw [divInt_one, intCast_one]
 
--- DISSOLVED: divInt_neg_one_one
+lemma divInt_neg_one_one : -1 /. 1 = -1 := by rw [divInt_one, intCast_neg, intCast_one]
 
 protected theorem mul_assoc : a * b * c = a * (b * c) :=
   numDenCasesOn' a fun n₁ d₁ h₁ =>
@@ -233,13 +251,19 @@ protected theorem add_mul : (a + b) * c = a * c + b * c :=
 protected theorem mul_add : a * (b + c) = a * b + a * c := by
   rw [Rat.mul_comm, Rat.add_mul, Rat.mul_comm, Rat.mul_comm c a]
 
--- DISSOLVED: zero_ne_one
+-- CONFLATES (assumes ground = zero): zero_ne_one
+protected theorem zero_ne_one : 0 ≠ (1 : ℚ) := by
+  rw [ne_comm, ← divInt_one_one, divInt_ne_zero] <;> omega
 
 attribute [simp] mkRat_eq_zero
 
--- DISSOLVED: mul_inv_cancel
+protected theorem mul_inv_cancel : a ≠ 0 → a * a⁻¹ = 1 :=
+  numDenCasesOn' a fun n d hd hn ↦ by
+    simp only [divInt_ofNat, ne_eq, hd, not_false_eq_true, mkRat_eq_zero] at hn
+    simp [-divInt_ofNat, mkRat_eq_divInt, Int.mul_comm, Int.mul_ne_zero hn (Int.ofNat_ne_zero.2 hd)]
 
--- DISSOLVED: inv_mul_cancel
+protected theorem inv_mul_cancel (h : a ≠ 0) : a⁻¹ * a = 1 :=
+  Eq.trans (Rat.mul_comm _ _) (Rat.mul_inv_cancel _ h)
 
 instance nontrivial : Nontrivial ℚ where exists_pair_ne := ⟨1, 0, by decide⟩
 
@@ -305,19 +329,7 @@ theorem eq_iff_mul_eq_mul {p q : ℚ} : p = q ↔ p.num * q.den = q.num * p.den 
       apply den_nz
 
 @[simp]
-theorem den_neg_eq_den (q : ℚ) : (-q).den = q.den :=
-  rfl
-
-@[simp]
 theorem num_neg_eq_neg_num (q : ℚ) : (-q).num = -q.num :=
-  rfl
-
-@[simp]
-theorem num_zero : Rat.num 0 = 0 :=
-  rfl
-
-@[simp]
-theorem den_zero : Rat.den 0 = 1 :=
   rfl
 
 lemma zero_of_num_zero {q : ℚ} (hq : q.num = 0) : q = 0 := by simpa [hq] using q.num_divInt_den.symm
@@ -325,19 +337,14 @@ lemma zero_of_num_zero {q : ℚ} (hq : q.num = 0) : q = 0 := by simpa [hq] using
 theorem zero_iff_num_zero {q : ℚ} : q = 0 ↔ q.num = 0 :=
   ⟨fun _ => by simp [*], zero_of_num_zero⟩
 
-@[simp]
-theorem num_one : (1 : ℚ).num = 1 :=
-  rfl
+theorem mk_num_ne_zero_of_ne_zero {q : ℚ} {n d : ℤ} (hq : q ≠ 0) (hqnd : q = n /. d) : n ≠ 0 :=
+  fun this => hq <| by simpa [this] using hqnd
 
-@[simp]
-theorem den_one : (1 : ℚ).den = 1 :=
-  rfl
+theorem mk_denom_ne_zero_of_ne_zero {q : ℚ} {n d : ℤ} (hq : q ≠ 0) (hqnd : q = n /. d) : d ≠ 0 :=
+  fun this => hq <| by simpa [this] using hqnd
 
--- DISSOLVED: mk_num_ne_zero_of_ne_zero
-
--- DISSOLVED: mk_denom_ne_zero_of_ne_zero
-
--- DISSOLVED: divInt_ne_zero_of_ne_zero
+theorem divInt_ne_zero_of_ne_zero {n d : ℤ} (h : n ≠ 0) (hd : d ≠ 0) : n /. d ≠ 0 :=
+  (divInt_ne_zero hd).mpr h
 
 protected lemma nonneg_antisymm : 0 ≤ q → 0 ≤ -q → q = 0 := by
   simp_rw [← num_eq_zero, Int.le_antisymm_iff, ← num_nonneg, num_neg_eq_neg_num, Int.neg_nonneg]
@@ -360,7 +367,11 @@ lemma intCast_div_eq_divInt (n d : ℤ) : (n : ℚ) / (d) = n /. d := by rw [div
 
 theorem natCast_div_eq_divInt (n d : ℕ) : (n : ℚ) / d = n /. d := Rat.intCast_div_eq_divInt n d
 
--- DISSOLVED: divInt_mul_divInt_cancel
+theorem divInt_mul_divInt_cancel {x : ℤ} (hx : x ≠ 0) (n d : ℤ) : n /. x * (x /. d) = n /. d := by
+  by_cases hd : d = 0
+  · rw [hd]
+    simp
+  rw [divInt_mul_divInt _ _ hx hd, x.mul_comm, divInt_mul_right hx]
 
 theorem coe_int_num_of_den_eq_one {q : ℚ} (hq : q.den = 1) : (q.num : ℚ) = q := by
   conv_rhs => rw [← num_divInt_den q, hq]

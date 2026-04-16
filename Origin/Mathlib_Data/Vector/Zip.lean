@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Vector.Basic
 
+noncomputable section
+
 /-!
 # The `zipWith` operation on vectors.
 -/
@@ -18,11 +20,6 @@ section ZipWith
 variable {α β γ : Type*} {n : ℕ} (f : α → β → γ)
 
 def zipWith : Vector α n → Vector β n → Vector γ n := fun x y => ⟨List.zipWith f x.1 y.1, by simp⟩
-
-@[simp]
-theorem zipWith_toList (x : Vector α n) (y : Vector β n) :
-    (Vector.zipWith f x y).toList = List.zipWith f x.toList y.toList :=
-  rfl
 
 @[simp]
 theorem zipWith_get (x : Vector α n) (y : Vector β n) (i) :

@@ -7,6 +7,8 @@ import Mathlib.Lean.Name
 import Mathlib.Lean.Expr.Basic
 import Lean.Elab.Command
 
+noncomputable section
+
 /-!
 # Commands `#long_names` and `#long_instances`
 
@@ -23,27 +25,16 @@ def printNameHashMap (h : Std.HashMap Name (Array Name)) : IO Unit :=
       IO.println n
 
 elab "#long_names " N:(num)? : command =>
-
   Command.runTermElabM fun _ => do
-
     let N := N.map TSyntax.getNat |>.getD 50
-
     let namesByModule ← allNamesByModule (fun n => n.toString.length > N)
-
     let namesByModule := namesByModule.filter fun m _ => m.getRoot.toString = "Mathlib"
-
     printNameHashMap namesByModule
 
 elab "#long_instances " N:(num)?: command =>
-
   Command.runTermElabM fun _ => do
-
     let N := N.map TSyntax.getNat |>.getD 50
-
     let namesByModule ← allNamesByModule
-
       (fun n => n.lastComponentAsString.startsWith "inst" && n.lastComponentAsString.length > N)
-
     let namesByModule := namesByModule.filter fun m _ => m.getRoot.toString = "Mathlib"
-
     printNameHashMap namesByModule

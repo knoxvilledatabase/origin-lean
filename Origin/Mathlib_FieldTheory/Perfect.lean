@@ -7,6 +7,8 @@ import Mathlib.FieldTheory.Separable
 import Mathlib.FieldTheory.SplittingField.Construction
 import Mathlib.Algebra.CharP.Reduced
 
+noncomputable section
+
 /-!
 
 # Perfect fields and rings
@@ -67,11 +69,6 @@ theorem surjective_frobenius : Surjective (frobenius R p) := (bijective_frobeniu
 @[simps! apply]
 noncomputable def frobeniusEquiv : R ≃+* R :=
   RingEquiv.ofBijective (frobenius R p) PerfectRing.bijective_frobenius
-
-@[simp]
-theorem coe_frobeniusEquiv : ⇑(frobeniusEquiv R p) = frobenius R p := rfl
-
-theorem frobeniusEquiv_def (x : R) : frobeniusEquiv R p x = x ^ p := rfl
 
 @[simps! apply]
 noncomputable def iterateFrobeniusEquiv : R ≃+* R :=
@@ -339,9 +336,6 @@ noncomputable def rootsExpandToRoots : (expand R p f).roots.toFinset ↪ f.roots
   toFun x := ⟨x ^ p, roots_expand_image_frobenius_subset p f (Finset.mem_image_of_mem _ x.2)⟩
   inj' _ _ h := Subtype.ext (frobenius_inj R p <| Subtype.ext_iff.1 h)
 
-@[simp]
-theorem rootsExpandToRoots_apply (x) : (rootsExpandToRoots p f x : R) = x ^ p := rfl
-
 open scoped Classical in
 
 noncomputable def rootsExpandPowToRoots :
@@ -349,9 +343,6 @@ noncomputable def rootsExpandPowToRoots :
   toFun x := ⟨x ^ p ^ n,
     roots_expand_pow_image_iterateFrobenius_subset p n f (Finset.mem_image_of_mem _ x.2)⟩
   inj' _ _ h := Subtype.ext (iterateFrobenius_inj R p n <| Subtype.ext_iff.1 h)
-
-@[simp]
-theorem rootsExpandPowToRoots_apply (x) : (rootsExpandPowToRoots p n f x : R) = x ^ p ^ n := rfl
 
 variable [PerfectRing R p]
 
@@ -361,9 +352,6 @@ noncomputable def rootsExpandEquivRoots : (expand R p f).roots.toFinset ≃ f.ro
       Finset.setOf_mem, Finset.coe_image, RingEquiv.toEquiv_eq_coe, EquivLike.coe_coe,
       frobeniusEquiv_apply]
 
-@[simp]
-theorem rootsExpandEquivRoots_apply (x) : (rootsExpandEquivRoots p f x : R) = x ^ p := rfl
-
 noncomputable def rootsExpandPowEquivRoots (n : ℕ) :
     (expand R (p ^ n) f).roots.toFinset ≃ f.roots.toFinset :=
   ((iterateFrobeniusEquiv R p n).image _).trans <|
@@ -371,9 +359,5 @@ noncomputable def rootsExpandPowEquivRoots (n : ℕ) :
     classical simp_rw [← roots_expand_image_iterateFrobenius (p := p) (f := f) (n := n),
       Finset.mem_val, Finset.setOf_mem, Finset.coe_image, RingEquiv.toEquiv_eq_coe,
       EquivLike.coe_coe, iterateFrobeniusEquiv_apply]
-
-@[simp]
-theorem rootsExpandPowEquivRoots_apply (n : ℕ) (x) :
-    (rootsExpandPowEquivRoots p f n x : R) = x ^ p ^ n := rfl
 
 end Polynomial

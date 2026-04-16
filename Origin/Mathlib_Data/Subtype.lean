@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.Basic
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Subtypes
 
@@ -62,9 +64,6 @@ theorem ext_iff_val {a1 a2 : { x // p x }} : a1 = a2 ↔ a1.1 = a2.1 :=
 theorem coe_eta (a : { a // p a }) (h : p a) : mk (↑a) h = a :=
   Subtype.ext rfl
 
-theorem coe_mk (a h) : (@mk α p a h : α) = a :=
-  rfl
-
 theorem mk_eq_mk {a h a' h'} : @mk α p a h = @mk α p a' h' ↔ a = a' :=
   Subtype.ext_iff
 
@@ -100,13 +99,6 @@ theorem _root_.exists_subtype_mk_eq_iff {a : Subtype p} {b : α} :
 def restrict {α} {β : α → Type*} (p : α → Prop) (f : ∀ x, β x) (x : Subtype p) : β x.1 :=
   f x
 
-theorem restrict_apply {α} {β : α → Type*} (f : ∀ x, β x) (p : α → Prop) (x : Subtype p) :
-    restrict p f x = f x.1 := by
-  rfl
-
-theorem restrict_def {α β} (f : α → β) (p : α → Prop) :
-    restrict p f = f ∘ (fun (a : Subtype p) ↦ a) := rfl
-
 theorem restrict_injective {α β} {f : α → β} (p : α → Prop) (h : Injective f) :
     Injective (restrict p f) :=
   h.comp coe_injective
@@ -138,15 +130,6 @@ def map {p : α → Prop} {q : β → Prop} (f : α → β) (h : ∀ a, p a → 
     Subtype p → Subtype q :=
   fun x ↦ ⟨f x, h x x.prop⟩
 
-theorem map_def {p : α → Prop} {q : β → Prop} (f : α → β) (h : ∀ a, p a → q (f a)) :
-    map f h = fun x ↦ ⟨f x, h x x.prop⟩ :=
-  rfl
-
-theorem map_comp {p : α → Prop} {q : β → Prop} {r : γ → Prop} {x : Subtype p}
-    (f : α → β) (h : ∀ a, p a → q (f a)) (g : β → γ) (l : ∀ a, q a → r (g a)) :
-    map g l (map f h x) = map (g ∘ f) (fun a ha ↦ l (f a) <| h a ha) x :=
-  rfl
-
 theorem map_id {p : α → Prop} {h : ∀ a, p a → p (id a)} : map (@id α) h = id :=
   funext fun _ ↦ rfl
 
@@ -160,9 +143,6 @@ theorem map_involutive {p : α → Prop} {f : α → α} (h : ∀ a, p a → p (
 
 instance [HasEquiv α] (p : α → Prop) : HasEquiv (Subtype p) :=
   ⟨fun s t ↦ (s : α) ≈ (t : α)⟩
-
-theorem equiv_iff [HasEquiv α] {p : α → Prop} {s t : Subtype p} : s ≈ t ↔ (s : α) ≈ (t : α) :=
-  Iff.rfl
 
 variable [Setoid α]
 

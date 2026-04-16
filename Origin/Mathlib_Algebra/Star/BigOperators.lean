@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Star.Basic
 
+noncomputable section
+
 /-! # Big-operators lemmas about `star` algebraic operations
 
 These results are kept separate from `Algebra.Star.Basic` to avoid it needing to import `Finset`.

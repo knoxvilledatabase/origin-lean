@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Grp.EpiMono
 import Mathlib.Algebra.Category.Grp.Preadditive
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 
+noncomputable section
+
 /-!
 # The concrete (co)kernels in the category of abelian groups are categorical (co)kernels.
 -/

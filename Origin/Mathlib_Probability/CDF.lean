@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Probability.Kernel.Disintegration.CondCDF
 
+noncomputable section
+
 /-!
 # Cumulative distribution function of a real probability measure
 
@@ -45,7 +47,6 @@ open scoped Topology
 namespace ProbabilityTheory
 
 noncomputable
-
 def cdf (μ : Measure ℝ) : StieltjesFunction :=
   condCDF ((Measure.dirac Unit.unit).prod μ) Unit.unit
 

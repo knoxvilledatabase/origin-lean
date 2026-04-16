@@ -10,6 +10,8 @@ import Mathlib.Algebra.Star.NonUnitalSubalgebra
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Unitization of a non-unital algebra
 
@@ -217,22 +219,6 @@ theorem fst_add [Add R] [Add A] (x₁ x₂ : Unitization R A) : (x₁ + x₂).fs
 
 @[simp]
 theorem snd_add [Add R] [Add A] (x₁ x₂ : Unitization R A) : (x₁ + x₂).snd = x₁.snd + x₂.snd :=
-  rfl
-
-@[simp]
-theorem fst_neg [Neg R] [Neg A] (x : Unitization R A) : (-x).fst = -x.fst :=
-  rfl
-
-@[simp]
-theorem snd_neg [Neg R] [Neg A] (x : Unitization R A) : (-x).snd = -x.snd :=
-  rfl
-
-@[simp]
-theorem fst_smul [SMul S R] [SMul S A] (s : S) (x : Unitization R A) : (s • x).fst = s • x.fst :=
-  rfl
-
-@[simp]
-theorem snd_smul [SMul S R] [SMul S A] (s : S) (x : Unitization R A) : (s • x).snd = s • x.snd :=
   rfl
 
 section
@@ -551,17 +537,7 @@ instance instAlgebra : Algebra S (Unitization R A) :=
         rw [mul_add, smul_add,Algebra.algebraMap_eq_smul_one, inl_mul_inl, inl_mul_inr,
           smul_one_mul, inl_smul, inr_smul, smul_one_smul] }
 
-theorem algebraMap_eq_inl_comp : ⇑(algebraMap S (Unitization R A)) = inl ∘ algebraMap S R :=
-  rfl
-
-theorem algebraMap_eq_inlRingHom_comp :
-    algebraMap S (Unitization R A) = (inlRingHom R A).comp (algebraMap S R) :=
-  rfl
-
 theorem algebraMap_eq_inl : ⇑(algebraMap R (Unitization R A)) = inl :=
-  rfl
-
-theorem algebraMap_eq_inlRingHom : algebraMap R (Unitization R A) = inlRingHom R A :=
   rfl
 
 @[simps]
@@ -662,10 +638,6 @@ def lift : (A →ₙₐ[R] C) ≃ (Unitization R A →ₐ[R] C) where
   left_inv φ := by ext; simp [NonUnitalAlgHomClass.toNonUnitalAlgHom]
   right_inv φ := by ext; simp [NonUnitalAlgHomClass.toNonUnitalAlgHom]
 
-theorem lift_symm_apply_apply (φ : Unitization R A →ₐ[R] C) (a : A) :
-    Unitization.lift.symm φ a = φ a :=
-  rfl
-
 @[simp]
 lemma _root_.NonUnitalAlgHom.toAlgHom_zero :
     ⇑(0 : A →ₙₐ[R] R).toAlgHom = Unitization.fst := by
@@ -712,11 +684,6 @@ def starLift : (A →⋆ₙₐ[R] C) ≃ (Unitization R A →⋆ₐ[R] C) :=
 
     simp }
 
-@[simp high]
-theorem starLift_symm_apply_apply (φ : Unitization R A →⋆ₐ[R] C) (a : A) :
-    Unitization.starLift.symm φ a = φ a :=
-  rfl
-
 end StarAlgHom
 
 section StarMap
@@ -734,16 +701,6 @@ variable [StarModule R B] [StarModule R C]
 @[simps!]
 def starMap (φ : A →⋆ₙₐ[R] B) : Unitization R A →⋆ₐ[R] Unitization R B :=
   Unitization.starLift <| (Unitization.inrNonUnitalStarAlgHom R B).comp φ
-
-@[simp high]
-lemma starMap_inr (φ : A →⋆ₙₐ[R] B) (a : A) :
-    starMap φ (inr a) = inr (φ a) := by
-  simp
-
-@[simp high]
-lemma starMap_inl (φ : A →⋆ₙₐ[R] B) (r : R) :
-    starMap φ (inl r) = algebraMap R (Unitization R B) r := by
-  simp
 
 lemma starMap_injective {φ : A →⋆ₙₐ[R] B} (hφ : Function.Injective φ) :
     Function.Injective (starMap φ) := by

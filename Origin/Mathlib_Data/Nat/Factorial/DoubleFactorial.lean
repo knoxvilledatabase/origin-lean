@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Positivity.Core
 
+noncomputable section
+
 /-!
 # Double factorials
 
@@ -28,6 +30,8 @@ def doubleFactorial : ℕ → ℕ
   | 0 => 1
   | 1 => 1
   | k + 2 => (k + 2) * doubleFactorial k
+
+@[inherit_doc] scoped notation:10000 n "‼" => Nat.doubleFactorial n
 
 lemma doubleFactorial_pos : ∀ n, 0 < n‼
   | 0 | 1 => zero_lt_one

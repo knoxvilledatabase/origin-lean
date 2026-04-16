@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Eigenspace/Basic.lean
-Genuine: 102 | Conflates: 0 | Dissolved: 6 | Infrastructure: 7
+Genuine: 106 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Spectrum
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.LinearMap.Basic
 import Mathlib.LinearAlgebra.GeneralLinearGroup
 import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.RingTheory.Nilpotent.Basic
+
+noncomputable section
 
 /-!
 # Eigenvectors and eigenvalues
@@ -192,7 +194,14 @@ lemma hasUnifEigenvalue_iff_mem_spectrum [FiniteDimensional K V] {f : End K V} {
 
 alias ⟨_, HasUnifEigenvalue.of_mem_spectrum⟩ := hasUnifEigenvalue_iff_mem_spectrum
 
--- DISSOLVED: genEigenspace_div
+lemma genEigenspace_div (f : End K V) (a b : K) (hb : b ≠ 0) :
+    genEigenspace f (a / b) 1 = LinearMap.ker (b • f - a • 1) :=
+  calc
+    genEigenspace f (a / b) 1 = genEigenspace f (b⁻¹ * a) 1 := by rw [div_eq_mul_inv, mul_comm]
+    _ = LinearMap.ker (f - (b⁻¹ * a) • 1)     := by rw [genEigenspace_one]
+    _ = LinearMap.ker (f - b⁻¹ • a • 1)       := by rw [smul_smul]
+    _ = LinearMap.ker (b • (f - b⁻¹ • a • 1)) := by rw [LinearMap.ker_smul _ b hb]
+    _ = LinearMap.ker (b • f - a • 1)         := by rw [smul_sub, smul_inv_smul₀ hb]
 
 def genEigenrange (f : End R M) (μ : R) (k : ℕ∞) : Submodule R M :=
   ⨅ l : ℕ, ⨅ (_ : l ≤ k), LinearMap.range ((f - μ • 1) ^ l)
@@ -209,7 +218,10 @@ lemma genEigenrange_nat {f : End R M} {μ : R} {k : ℕ} :
     rw [this, pow_add]
     exact ⟨_, rfl⟩
 
--- DISSOLVED: HasUnifEigenvalue.exp_ne_zero
+lemma HasUnifEigenvalue.exp_ne_zero {f : End R M} {μ : R} {k : ℕ}
+    (h : f.HasUnifEigenvalue μ k) : k ≠ 0 := by
+  rintro rfl
+  simp [HasUnifEigenvalue, Nat.cast_zero, genEigenspace_zero] at h
 
 noncomputable def maxUnifEigenspaceIndex (f : End R M) (μ : R) :=
   monotonicSequenceLimitIndex <| (f.genEigenspace μ).comp <| WithTop.coeOrderHom.toOrderHom
@@ -338,13 +350,8 @@ theorem eigenspace_zero (f : End R M) : f.eigenspace 0 = LinearMap.ker f := by
 abbrev HasEigenvector (f : End R M) (μ : R) (x : M) : Prop :=
   HasUnifEigenvector f μ 1 x
 
--- DISSOLVED: hasEigenvector_iff
-
 abbrev HasEigenvalue (f : End R M) (a : R) : Prop :=
   HasUnifEigenvalue f a 1
-
-lemma hasEigenvalue_iff {f : End R M} {μ : R} :
-    f.HasEigenvalue μ ↔ f.eigenspace μ ≠ ⊥ := Iff.rfl
 
 abbrev Eigenvalues (f : End R M) : Type _ :=
   UnifEigenvalues f 1
@@ -400,7 +407,9 @@ theorem hasEigenvalue_iff_mem_spectrum [FiniteDimensional K V] {f : End K V} {μ
 
 alias ⟨_, HasEigenvalue.of_mem_spectrum⟩ := hasEigenvalue_iff_mem_spectrum
 
--- DISSOLVED: eigenspace_div
+theorem eigenspace_div (f : End K V) (a b : K) (hb : b ≠ 0) :
+    eigenspace f (a / b) = LinearMap.ker (b • f - algebraMap K (End K V) a) :=
+  genEigenspace_div f a b hb
 
 lemma genEigenspace_def (f : End R M) (μ : R) (k : ℕ) :
     f.genEigenspace μ k = LinearMap.ker ((f - μ • 1) ^ k) :=
@@ -409,19 +418,16 @@ lemma genEigenspace_def (f : End R M) (μ : R) (k : ℕ) :
 abbrev HasGenEigenvector (f : End R M) (μ : R) (k : ℕ) (x : M) : Prop :=
   HasUnifEigenvector f μ k x
 
--- DISSOLVED: hasGenEigenvector_iff
-
 abbrev HasGenEigenvalue (f : End R M) (μ : R) (k : ℕ) : Prop :=
   HasUnifEigenvalue f μ k
-
-lemma hasGenEigenvalue_iff {f : End R M} {μ : R} {k : ℕ} :
-    f.HasGenEigenvalue μ k ↔ f.genEigenspace μ k ≠ ⊥ := Iff.rfl
 
 lemma genEigenrange_def {f : End R M} {μ : R} {k : ℕ} :
     f.genEigenrange μ k = LinearMap.range ((f - μ • 1) ^ k) :=
   genEigenrange_nat
 
--- DISSOLVED: exp_ne_zero_of_hasGenEigenvalue
+theorem exp_ne_zero_of_hasGenEigenvalue {f : End R M} {μ : R} {k : ℕ}
+    (h : f.HasGenEigenvalue μ k) : k ≠ 0 :=
+  HasUnifEigenvalue.exp_ne_zero h
 
 abbrev maxGenEigenspace (f : End R M) (μ : R) : Submodule R M :=
   genEigenspace f μ ⊤
@@ -505,6 +511,7 @@ lemma isNilpotent_restrict_maxGenEigenspace_sub_algebraMap [IsNoetherian R M] (f
   rw [maxGenEigenspace_eq]
 
 set_option linter.deprecated false in
+/-- The restriction of `f - μ • 1` to the generalized `μ`-eigenspace is nilpotent. -/
 
 lemma isNilpotent_restrict_iSup_sub_algebraMap [IsNoetherian R M] (f : End R M) (μ : R)
     (h : MapsTo (f - algebraMap R (End R M) μ)

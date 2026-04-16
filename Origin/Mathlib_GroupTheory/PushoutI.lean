@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.CoprodI
 import Mathlib.GroupTheory.Coprod.Basic
 import Mathlib.GroupTheory.Complement
 
+noncomputable section
+
 /-!
 
 ## Pushouts of Monoids and Groups
@@ -241,9 +243,6 @@ instance baseAction : MulAction H (NormalWord d) :=
     one_smul := by simp [instHSMul]
     mul_smul := by simp [instHSMul, mul_assoc] }
 
-theorem base_smul_def' (h : H) (w : NormalWord d) :
-    h • w = { w with head := h * w.head } := rfl
-
 def prod (w : NormalWord d) : PushoutI φ :=
   base φ w.head * ofCoprodI (w.toWord).prod
 
@@ -390,11 +389,6 @@ noncomputable instance summandAction (i : ι) : MulAction (G i) (NormalWord d) :
     mul_smul := fun _ _ _ => by
       dsimp [instHSMul]
       simp [mul_assoc, Equiv.apply_symm_apply, Function.End.mul_def] }
-
-theorem summand_smul_def' {i : ι} (g : G i) (w : NormalWord d) :
-    g • w = (equivPair i).symm
-      { equivPair i w with
-        head := g * (equivPair i w).head } := rfl
 
 noncomputable instance mulAction : MulAction (PushoutI φ) (NormalWord d) :=
   MulAction.ofEndHom <|

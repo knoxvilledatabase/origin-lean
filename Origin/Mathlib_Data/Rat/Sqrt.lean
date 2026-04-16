@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Ring.Rat
 import Mathlib.Data.Rat.Lemmas
 import Mathlib.Data.Int.Sqrt
 
+noncomputable section
+
 /-!
 # Square root on rational numbers
 

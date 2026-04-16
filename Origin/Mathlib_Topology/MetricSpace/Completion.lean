@@ -10,6 +10,8 @@ import Mathlib.Topology.MetricSpace.Algebra
 import Mathlib.Topology.Algebra.GroupCompletion
 import Mathlib.Topology.Instances.Real
 
+noncomputable section
+
 /-!
 # The completion of a metric space
 

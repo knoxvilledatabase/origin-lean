@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Shift.CommShift
 import Mathlib.CategoryTheory.Shift.Induced
 import Mathlib.CategoryTheory.Quotient
 
+noncomputable section
+
 /-!
 # The shift on a quotient category
 

@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.Multiset.Basic
 
+noncomputable section
+
 /-! # `Multiset.range n` gives `{0, 1, ..., n-1}` as a multiset. -/
 
 open List Nat
@@ -13,13 +15,6 @@ namespace Multiset
 
 def range (n : ℕ) : Multiset ℕ :=
   List.range n
-
-theorem coe_range (n : ℕ) : ↑(List.range n) = range n :=
-  rfl
-
-@[simp]
-theorem range_zero : range 0 = 0 :=
-  rfl
 
 @[simp]
 theorem range_succ (n : ℕ) : range (succ n) = n ::ₘ range n := by

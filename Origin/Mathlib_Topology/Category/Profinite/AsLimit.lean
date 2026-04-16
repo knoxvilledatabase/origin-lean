@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.Profinite.Basic
 import Mathlib.Topology.DiscreteQuotient
 
+noncomputable section
+
 /-!
 # Profinite sets as limits of finite sets.
 

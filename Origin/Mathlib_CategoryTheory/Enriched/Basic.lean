@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Monoidal.Types.Coyoneda
 import Mathlib.CategoryTheory.Monoidal.Center
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Enriched categories
 
@@ -161,15 +163,6 @@ def ForgetEnrichment.of (X : C) : ForgetEnrichment W C :=
 def ForgetEnrichment.to (X : ForgetEnrichment W C) : C :=
   X
 
-@[simp]
-theorem ForgetEnrichment.to_of (X : C) : ForgetEnrichment.to W (ForgetEnrichment.of W X) = X :=
-  rfl
-
-@[simp]
-theorem ForgetEnrichment.of_to (X : ForgetEnrichment W C) :
-    ForgetEnrichment.of W (ForgetEnrichment.to W X) = X :=
-  rfl
-
 instance categoryForgetEnrichment : Category (ForgetEnrichment W C) :=
   enrichedCategoryTypeEquivCategory C (inferInstanceAs (EnrichedCategory (Type w)
       (TransportEnrichment (coyoneda.obj (op (𝟙_ W))) C)))
@@ -189,11 +182,6 @@ def ForgetEnrichment.homTo {X Y : ForgetEnrichment W C} (f : X ⟶ Y) :
 @[simp]
 theorem ForgetEnrichment.homTo_homOf {X Y : C} (f : 𝟙_ W ⟶ X ⟶[W] Y) :
     ForgetEnrichment.homTo W (ForgetEnrichment.homOf W f) = f :=
-  rfl
-
-@[simp]
-theorem ForgetEnrichment.homOf_homTo {X Y : ForgetEnrichment W C} (f : X ⟶ Y) :
-    ForgetEnrichment.homOf W (ForgetEnrichment.homTo W f) = f :=
   rfl
 
 @[simp]

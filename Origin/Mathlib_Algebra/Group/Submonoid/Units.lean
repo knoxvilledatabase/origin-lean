@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.Algebra.Group.Submonoid.Pointwise
 import Mathlib.Algebra.Group.Subgroup.Lattice
 
+noncomputable section
+
 /-!
 
 # Submonoid of units
@@ -210,10 +212,6 @@ noncomputable def unit_of_mem_ofUnits (S : Subgroup Mˣ) {x : M} (h : x ∈ S.of
 @[to_additive]
 lemma unit_of_mem_ofUnits_spec_eq_of_val_mem (S : Subgroup Mˣ) {x : Mˣ} (h : (x : M) ∈ S.ofUnits) :
     S.unit_of_mem_ofUnits h = x := Units.ext rfl
-
-@[to_additive]
-lemma unit_of_mem_ofUnits_spec_val_eq_of_mem (S : Subgroup Mˣ) {x : M} (h : x ∈ S.ofUnits) :
-    S.unit_of_mem_ofUnits h = x := rfl
 
 @[to_additive]
 lemma unit_of_mem_ofUnits_spec_mem (S : Subgroup Mˣ) {x : M} {h : x ∈ S.ofUnits} :

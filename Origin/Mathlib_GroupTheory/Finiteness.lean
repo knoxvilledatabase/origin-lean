@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.GroupTheory.QuotientGroup.Defs
 import Mathlib.SetTheory.Cardinal.Finite
 
+noncomputable section
+
 /-!
 # Finitely generated monoids and groups
 

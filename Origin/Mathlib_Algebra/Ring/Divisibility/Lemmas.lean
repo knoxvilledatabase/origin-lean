@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.Algebra.GCDMonoid.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about divisibility in rings
 

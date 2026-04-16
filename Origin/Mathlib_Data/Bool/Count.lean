@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.List.Chain
 
+noncomputable section
+
 /-!
 # List of booleans
 

@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Measure.Complex
 import Mathlib.MeasureTheory.Decomposition.Jordan
 import Mathlib.MeasureTheory.VectorMeasure.WithDensity
 
+noncomputable section
+
 /-!
 # Lebesgue decomposition
 

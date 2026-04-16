@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Geometry.Manifold.IntegralCurve.ExistUnique
 
+noncomputable section
+
 /-!
 # Uniform time lemma for the global existence of integral curves
 

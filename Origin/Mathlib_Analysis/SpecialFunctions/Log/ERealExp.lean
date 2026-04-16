@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Complex.Exponential
 import Mathlib.Data.Real.EReal
 
+noncomputable section
+
 /-!
 # Extended Nonnegative Real Exponential
 
@@ -34,7 +36,6 @@ open scoped ENNReal
 section Definition
 
 noncomputable
-
 def exp : EReal → ℝ≥0∞
   | ⊥ => 0
   | ⊤ => ∞

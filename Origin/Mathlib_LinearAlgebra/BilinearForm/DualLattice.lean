@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Properties
 
+noncomputable section
+
 /-!
 
 # Dual submodule with respect to a bilinear form.
@@ -48,7 +50,6 @@ lemma le_flip_dualSubmodule {N₁ N₂ : Submodule R M} :
   exact forall₂_swap
 
 noncomputable
-
 def dualSubmoduleParing {N : Submodule R M} (x : B.dualSubmodule N) (y : N) : R :=
   (Submodule.mem_one.mp <| x.prop y y.prop).choose
 
@@ -57,9 +58,8 @@ lemma dualSubmoduleParing_spec {N : Submodule R M} (x : B.dualSubmodule N) (y : 
     algebraMap R S (B.dualSubmoduleParing x y) = B x y :=
   (Submodule.mem_one.mp <| x.prop y y.prop).choose_spec
 
-noncomputable
-
 @[simps]
+noncomputable
 def dualSubmoduleToDual [NoZeroSMulDivisors R S] (N : Submodule R M) :
     B.dualSubmodule N →ₗ[R] Module.Dual R N :=
   { toFun := fun x ↦

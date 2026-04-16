@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Linear
 import Mathlib.Analysis.Calculus.FDeriv.Comp
 
+noncomputable section
+
 /-!
 # Additive operations on derivatives
 

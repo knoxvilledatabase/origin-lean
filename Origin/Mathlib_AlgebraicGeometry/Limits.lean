@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Pullbacks
 import Mathlib.AlgebraicGeometry.AffineScheme
 
+noncomputable section
+
 /-!
 # (Co)Limits of Schemes
 
@@ -71,10 +73,6 @@ instance Scheme.hom_unique_of_empty_source (X : Scheme.{u}) : Unique (∅ ⟶ X)
 def emptyIsInitial : IsInitial (∅ : Scheme.{u}) :=
   IsInitial.ofUnique _
 
-@[simp]
-theorem emptyIsInitial_to : emptyIsInitial.to = Scheme.emptyTo :=
-  rfl
-
 instance : IsEmpty (∅ : Scheme.{u}) :=
   show IsEmpty PEmpty by infer_instance
 
@@ -122,9 +120,8 @@ section Coproduct
 
 variable {ι : Type u} (f : ι → Scheme.{u})
 
-noncomputable
-
 @[simps]
+noncomputable
 def disjointGlueData' : GlueData' Scheme where
   J := ι
   U := f
@@ -137,9 +134,8 @@ def disjointGlueData' : GlueData' Scheme where
   cocycle _ _ _ _ _ _ := (emptyIsInitial.ofStrict (pullback.fst _ _)).hom_ext _ _
   f_mono _ _ := by dsimp only; infer_instance
 
-noncomputable
-
 @[simps! J V U f t]
+noncomputable
 def disjointGlueData : Scheme.GlueData where
   __ := GlueData.ofGlueData' (disjointGlueData' f)
   f_open i j := by
@@ -147,13 +143,11 @@ def disjointGlueData : Scheme.GlueData where
     split <;> infer_instance
 
 noncomputable
-
 def toLocallyRingedSpaceCoproductCofan : Cofan (Scheme.toLocallyRingedSpace ∘ f) :=
   Cofan.mk (disjointGlueData f).toLocallyRingedSpaceGlueData.glued
     (disjointGlueData f).toLocallyRingedSpaceGlueData.ι
 
 noncomputable
-
 def toLocallyRingedSpaceCoproductCofanIsColimit :
     IsColimit (toLocallyRingedSpaceCoproductCofan f) := by
   fapply mkCofanColimit
@@ -179,7 +173,6 @@ def toLocallyRingedSpaceCoproductCofanIsColimit :
     exact h j
 
 noncomputable
-
 instance : CreatesColimit (Discrete.functor f) Scheme.forgetToLocallyRingedSpace :=
   createsColimitOfFullyFaithfulOfIso (disjointGlueData f).gluedScheme <|
     let F : Discrete.functor f ⋙ Scheme.forgetToLocallyRingedSpace ≅
@@ -188,7 +181,6 @@ instance : CreatesColimit (Discrete.functor f) Scheme.forgetToLocallyRingedSpace
     (colimit.isoColimitCocone ⟨_, this⟩).symm
 
 noncomputable
-
 instance : CreatesColimitsOfShape (Discrete ι) Scheme.forgetToLocallyRingedSpace := by
   constructor
   intro K
@@ -204,20 +196,17 @@ instance : HasCoproducts.{u} Scheme.{u} :=
 instance : HasCoproducts.{0} Scheme.{u} := has_smallest_coproducts_of_hasCoproducts
 
 noncomputable
-
 instance {ι : Type} : PreservesColimitsOfShape (Discrete ι) Scheme.forgetToTop.{u} :=
   preservesColimitsOfShape_of_equiv
     (Discrete.equivalence Equiv.ulift : Discrete (ULift.{u} ι) ≌ _) _
 
 noncomputable
-
 instance {ι : Type} :
     PreservesColimitsOfShape (Discrete ι) Scheme.forgetToLocallyRingedSpace.{u} :=
   preservesColimitsOfShape_of_equiv
     (Discrete.equivalence Equiv.ulift : Discrete (ULift.{u} ι) ≌ _) _
 
 noncomputable
-
 def sigmaIsoGlued : ∐ f ≅ (disjointGlueData f).glued :=
   Scheme.fullyFaithfulForgetToLocallyRingedSpace.preimageIso
     (PreservesCoproduct.iso _ _ ≪≫
@@ -278,9 +267,8 @@ lemma exists_sigmaι_eq (x : (∐ f : _)) : ∃ i y, (Sigma.ι f i).base y = x :
 lemma iSup_opensRange_sigmaι : ⨆ i, (Sigma.ι f i).opensRange = ⊤ :=
   eq_top_iff.mpr fun x ↦ by simpa using exists_sigmaι_eq f x
 
-noncomputable
-
 @[simps obj map]
+noncomputable
 def sigmaOpenCover : (∐ f).OpenCover where
   J := ι
   obj := f
@@ -289,7 +277,6 @@ def sigmaOpenCover : (∐ f).OpenCover where
   covers x := (exists_sigmaι_eq f x).choose_spec
 
 noncomputable
-
 def sigmaMk : (Σ i, f i) ≃ₜ (∐ f : _) :=
   TopCat.homeoOfIso ((colimit.isoColimitCocone ⟨_, TopCat.sigmaCofanIsColimit _⟩).symm ≪≫
     (PreservesCoproduct.iso Scheme.forgetToTop f).symm)
@@ -307,7 +294,6 @@ lemma sigmaMk_mk (i) (x : f i) :
 variable (X Y : Scheme.{u})
 
 noncomputable
-
 def coprodIsoSigma : X ⨿ Y ≅ ∐ fun i : ULift.{u} WalkingPair ↦ i.1.casesOn X Y :=
   Sigma.whiskerEquiv Equiv.ulift.symm (fun _ ↦ by exact Iso.refl _)
 
@@ -336,7 +322,6 @@ lemma isCompl_opensRange_inl_inr :
   rfl
 
 noncomputable
-
 def coprodMk : X ⊕ Y ≃ₜ (X ⨿ Y : Scheme.{u}) :=
   TopCat.homeoOfIso ((colimit.isoColimitCocone ⟨_, TopCat.binaryCofanIsColimit _ _⟩).symm ≪≫
     PreservesColimitPair.iso Scheme.forgetToTop X Y)
@@ -362,7 +347,6 @@ lemma coprodMk_inr (x : Y) :
   exact coprodComparison_inr Scheme.forgetToTop
 
 noncomputable
-
 def coprodOpenCover.{w} : (X ⨿ Y).OpenCover where
   J := PUnit.{w + 1} ⊕ PUnit.{w + 1}
   obj x := x.elim (fun _ ↦ X) (fun _ ↦ Y)
@@ -380,7 +364,6 @@ def coprodOpenCover.{w} : (X ⨿ Y).OpenCover where
 variable (R S : Type u) [CommRing R] [CommRing S]
 
 noncomputable
-
 def coprodSpec : Spec (.of R) ⨿ Spec (.of S) ⟶ Spec (.of (R × S)) :=
   coprod.desc (Spec.map (CommRingCat.ofHom <| RingHom.fst _ _))
     (Spec.map (CommRingCat.ofHom <| RingHom.snd _ _))
@@ -457,14 +440,12 @@ instance (R S : CommRingCatᵒᵖ) : IsIso (coprodComparison Scheme.Spec R S) :=
   infer_instance
 
 noncomputable
-
 instance : PreservesColimitsOfShape (Discrete WalkingPair) Scheme.Spec :=
   ⟨fun {_} ↦
     have (X Y : CommRingCatᵒᵖ) := PreservesColimitPair.of_iso_coprod_comparison Scheme.Spec X Y
     preservesColimit_of_iso_diagram _ (diagramIsoPair _).symm⟩
 
 noncomputable
-
 instance : PreservesColimitsOfShape (Discrete PEmpty.{1}) Scheme.Spec := by
   have : IsEmpty (Scheme.Spec.obj (⊥_ CommRingCatᵒᵖ)) :=
     @Function.isEmpty _ _ spec_punit_isEmpty (Scheme.Spec.mapIso
@@ -473,18 +454,15 @@ instance : PreservesColimitsOfShape (Discrete PEmpty.{1}) Scheme.Spec := by
   exact preservesColimitsOfShape_pempty_of_preservesInitial _
 
 noncomputable
-
 instance {J} [Fintype J] : PreservesColimitsOfShape (Discrete J) Scheme.Spec :=
   preservesFiniteCoproductsOfPreservesBinaryAndInitial _ _
 
 noncomputable
-
 instance {J : Type*} [Finite J] : PreservesColimitsOfShape (Discrete J) Scheme.Spec :=
   letI := (nonempty_fintype J).some
   preservesColimitsOfShape_of_equiv (Discrete.equivalence (Fintype.equivFin _).symm) _
 
 noncomputable
-
 def sigmaSpec (R : ι → CommRingCat) : (∐ fun i ↦ Spec (R i)) ⟶ Spec (.of (Π i, R i)) :=
   Sigma.desc (fun i ↦ Spec.map (CommRingCat.ofHom (Pi.evalRingHom _ i)))
 

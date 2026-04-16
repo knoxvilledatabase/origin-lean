@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Rat/Cast/Lemmas.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Nonneg.Field
 import Mathlib.Data.Rat.Cast.Defs
 import Mathlib.Tactic.Positivity.Basic
+
+noncomputable section
 
 /-!
 # Some exiled lemmas about casting
@@ -64,11 +66,14 @@ theorem cast_pow {K} [DivisionSemiring K] (q : ℚ≥0) (n : ℕ) :
   rw [cast_def, cast_def, den_pow, num_pow, Nat.cast_pow, Nat.cast_pow, div_eq_mul_inv, ← inv_pow,
     ← (Nat.cast_commute _ _).mul_pow, ← div_eq_mul_inv]
 
--- DISSOLVED: cast_zpow_of_ne_zero
+theorem cast_zpow_of_ne_zero {K} [DivisionSemiring K] (q : ℚ≥0) (z : ℤ) (hq : (q.num : K) ≠ 0) :
+    NNRat.cast (q ^ z) = (NNRat.cast q : K) ^ z := by
+  obtain ⟨n, rfl | rfl⟩ := z.eq_nat_or_neg
+  · simp
+  · simp_rw [zpow_neg, zpow_natCast, ← inv_pow, NNRat.cast_pow]
+    congr
+    rw [cast_inv_of_ne_zero hq]
 
 open OfScientific in
-
-theorem Nonneg.coe_ofScientific {K} [LinearOrderedField K] (m : ℕ) (s : Bool) (e : ℕ) :
-    (ofScientific m s e : {x : K // 0 ≤ x}).val = ofScientific m s e := rfl
 
 end NNRat

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Topology.Sets.Closeds
 
+noncomputable section
+
 /-!
 # Clopen upper sets
 
@@ -48,10 +50,6 @@ def toUpperSet (s : ClopenUpperSet α) : UpperSet α :=
 protected theorem ext {s t : ClopenUpperSet α} (h : (s : Set α) = t) : s = t :=
   SetLike.ext' h
 
-@[simp]
-theorem coe_mk (s : Clopens α) (h) : (mk s h : Set α) = s :=
-  rfl
-
 instance : Max (ClopenUpperSet α) :=
   ⟨fun s t => ⟨s.toClopens ⊔ t.toClopens, s.upper.union t.upper⟩⟩
 
@@ -69,22 +67,6 @@ instance : Lattice (ClopenUpperSet α) :=
 
 instance : BoundedOrder (ClopenUpperSet α) :=
   BoundedOrder.lift ((↑) : _ → Set α) (fun _ _ => id) rfl rfl
-
-@[simp]
-theorem coe_sup (s t : ClopenUpperSet α) : (↑(s ⊔ t) : Set α) = ↑s ∪ ↑t :=
-  rfl
-
-@[simp]
-theorem coe_inf (s t : ClopenUpperSet α) : (↑(s ⊓ t) : Set α) = ↑s ∩ ↑t :=
-  rfl
-
-@[simp]
-theorem coe_top : (↑(⊤ : ClopenUpperSet α) : Set α) = univ :=
-  rfl
-
-@[simp]
-theorem coe_bot : (↑(⊥ : ClopenUpperSet α) : Set α) = ∅ :=
-  rfl
 
 instance : Inhabited (ClopenUpperSet α) :=
   ⟨⊥⟩

@@ -11,6 +11,8 @@ import Mathlib.RingTheory.Ideal.Basis
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.Data.ZMod.Quotient
 
+noncomputable section
+
 /-! # Ideals in free modules over PIDs
 
 ## Main results

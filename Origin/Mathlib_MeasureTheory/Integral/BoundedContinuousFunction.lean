@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.Bochner
 
+noncomputable section
+
 /-!
 # Integration of bounded continuous functions
 

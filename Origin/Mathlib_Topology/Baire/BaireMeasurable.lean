@@ -8,6 +8,8 @@ import Mathlib.Topology.LocallyClosed
 import Mathlib.MeasureTheory.Constructions.EventuallyMeasurable
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
+noncomputable section
+
 /-!
 # Baire category and Baire measurable sets
 

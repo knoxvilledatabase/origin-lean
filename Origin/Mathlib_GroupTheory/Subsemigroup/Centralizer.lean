@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Center
 import Mathlib.Algebra.Group.Subsemigroup.Basic
 import Mathlib.GroupTheory.Subsemigroup.Center
 
+noncomputable section
+
 /-!
 # Centralizers in semigroups, as subsemigroups.
 
@@ -31,10 +33,6 @@ variable [Semigroup M] (S)
 def centralizer : Subsemigroup M where
   carrier := S.centralizer
   mul_mem' := Set.mul_mem_centralizer
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_centralizer : ↑(centralizer S) = S.centralizer :=
-  rfl
 
 variable {S}
 

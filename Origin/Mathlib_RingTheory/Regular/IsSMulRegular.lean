@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Flat.Basic
 import Mathlib.RingTheory.Ideal.AssociatedPrime
 import Mathlib.RingTheory.QuotSMulTop
 
+noncomputable section
+
 /-!
 # Lemmas about the `IsSMulRegular` Predicate
 

@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Adjoin.Basic
 import Mathlib.RingTheory.PowerBasis
 import Mathlib.LinearAlgebra.Matrix.Basis
 
+noncomputable section
+
 /-!
 # Power basis for `Algebra.adjoin R {x}`
 

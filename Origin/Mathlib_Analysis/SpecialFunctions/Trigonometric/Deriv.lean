@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Deriv.lean
-Genuine: 223 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 228 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.Monotone.Odd
 import Mathlib.Analysis.Calculus.LogDeriv
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+
+noncomputable section
 
 /-!
 # Differentiability of trigonometric functions
@@ -562,7 +564,7 @@ theorem sinh_lt_sinh : sinh x < sinh y ↔ x < y :=
 
 @[simp] lemma sinh_eq_zero : sinh x = 0 ↔ x = 0 := by rw [← @sinh_inj x, sinh_zero]
 
--- DISSOLVED: sinh_ne_zero
+lemma sinh_ne_zero : sinh x ≠ 0 ↔ x ≠ 0 := sinh_eq_zero.not
 
 @[simp]
 theorem sinh_pos_iff : 0 < sinh x ↔ 0 < x := by simpa only [sinh_zero] using @sinh_lt_sinh 0 x
@@ -595,7 +597,9 @@ theorem cosh_lt_cosh : cosh x < cosh y ↔ |x| < |y| :=
 theorem one_le_cosh (x : ℝ) : 1 ≤ cosh x :=
   cosh_zero ▸ cosh_le_cosh.2 (by simp only [_root_.abs_zero, _root_.abs_nonneg])
 
--- DISSOLVED: one_lt_cosh
+@[simp]
+theorem one_lt_cosh : 1 < cosh x ↔ x ≠ 0 :=
+  cosh_zero ▸ cosh_lt_cosh.trans (by simp only [_root_.abs_zero, abs_pos])
 
 theorem sinh_sub_id_strictMono : StrictMono fun x => sinh x - x := by
   -- Porting note: `by simp; abel` was just `by simp` in mathlib3.

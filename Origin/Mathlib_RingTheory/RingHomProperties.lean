@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Iso
 import Mathlib.RingTheory.Localization.Away.Basic
 import Mathlib.RingTheory.IsTensorProduct
 
+noncomputable section
+
 /-!
 # Properties of ring homomorphisms
 

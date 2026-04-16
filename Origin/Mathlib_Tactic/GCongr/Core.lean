@@ -10,6 +10,8 @@ import Mathlib.Tactic.Core
 import Mathlib.Tactic.GCongr.ForwardAttr
 import Mathlib.Order.Defs.PartialOrder
 
+noncomputable section
+
 /-!
 # The `gcongr` ("generalized congruence") tactic
 
@@ -431,31 +433,21 @@ partial def _root_.Lean.MVarId.gcongr
   throw e
 
 elab "gcongr" template:(colGt term)?
-
     withArg:((" with " (colGt binderIdent)+)?) : tactic => do
-
   let g ← getMainGoal
-
   g.withContext do
-
   let .app (.app _rel lhs) _rhs ← withReducible g.getType'
-
     | throwError "gcongr failed, not a relation"
-
+  -- Elaborate the template (e.g. `x * ?_ + _`), if the user gave one
   let template ← template.mapM fun e => do
-
     Term.elabTerm e (← inferType lhs)
-
+  -- Get the names from the `with x y z` list
   let names := (withArg.raw[1].getArgs.map TSyntax.mk).toList
-
+  -- Time to actually run the core tactic `Lean.MVarId.gcongr`!
   let (progress, _, unsolvedGoalStates) ← g.gcongr template names
-
   if progress then
-
     replaceMainGoal unsolvedGoalStates.toList
-
   else
-
     throwError "gcongr did not make progress"
 
 syntax "rel" " [" term,* "]" : tactic

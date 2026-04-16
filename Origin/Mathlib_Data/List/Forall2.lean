@@ -5,6 +5,8 @@ Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Data.List.Basic
 
+noncomputable section
+
 /-!
 # Double universal quantification on a list
 

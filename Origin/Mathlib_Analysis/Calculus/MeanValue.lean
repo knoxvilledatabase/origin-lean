@@ -11,6 +11,8 @@ import Mathlib.Analysis.Calculus.LocalExtr.Rolle
 import Mathlib.Analysis.Convex.Normed
 import Mathlib.Analysis.RCLike.Basic
 
+noncomputable section
+
 /-!
 # The mean value inequality and equalities
 
@@ -382,21 +384,6 @@ theorem _root_.lipschitzWith_of_nnnorm_fderiv_le
   rw [← lipschitzOnWith_univ]
   exact lipschitzOnWith_of_nnnorm_fderiv_le (fun x _ ↦ hf x) (fun x _ ↦ bound x) convex_univ
 
-theorem norm_image_sub_le_of_norm_hasFDerivWithin_le'
-    (hf : ∀ x ∈ s, HasFDerivWithinAt f (f' x) s x) (bound : ∀ x ∈ s, ‖f' x - φ‖ ≤ C)
-    (hs : Convex ℝ s) (xs : x ∈ s) (ys : y ∈ s) : ‖f y - f x - φ (y - x)‖ ≤ C * ‖y - x‖ := by
-  /- We subtract `φ` to define a new function `g` for which `g' = 0`, for which the previous theorem
-    applies, `Convex.norm_image_sub_le_of_norm_hasFDerivWithin_le`. Then, we just need to glue
-    together the pieces, expressing back `f` in terms of `g`. -/
-  let g y := f y - φ y
-  have hg : ∀ x ∈ s, HasFDerivWithinAt g (f' x - φ) s x := fun x xs =>
-    (hf x xs).sub φ.hasFDerivWithinAt
-  calc
-    ‖f y - f x - φ (y - x)‖ = ‖f y - f x - (φ y - φ x)‖ := by simp
-    _ = ‖f y - φ y - (f x - φ x)‖ := by congr 1; abel
-    _ = ‖g y - g x‖ := by simp
-    _ ≤ C * ‖y - x‖ := Convex.norm_image_sub_le_of_norm_hasFDerivWithin_le hg bound hs xs ys
-
 theorem norm_image_sub_le_of_norm_fderivWithin_le' (hf : DifferentiableOn 𝕜 f s)
     (bound : ∀ x ∈ s, ‖fderivWithin 𝕜 f s x - φ‖ ≤ C) (hs : Convex ℝ s) (xs : x ∈ s) (ys : y ∈ s) :
     ‖f y - f x - φ (y - x)‖ ≤ C * ‖y - x‖ :=
@@ -507,6 +494,7 @@ variable (f f' : ℝ → ℝ) {a b : ℝ} (hab : a < b) (hfc : ContinuousOn f (I
   (hgd : DifferentiableOn ℝ g (Ioo a b))
 
 include hab hfc hff' hgc hgg' in
+/-- Cauchy's **Mean Value Theorem**, `HasDerivAt` version. -/
 
 theorem exists_ratio_hasDerivAt_eq_ratio_slope :
     ∃ c ∈ Ioo a b, (g b - g a) * f' c = (f b - f a) * g' c := by
@@ -521,6 +509,7 @@ theorem exists_ratio_hasDerivAt_eq_ratio_slope :
   exact ⟨c, cmem, sub_eq_zero.1 hc⟩
 
 include hab in
+/-- Cauchy's **Mean Value Theorem**, extended `HasDerivAt` version. -/
 
 theorem exists_ratio_hasDerivAt_eq_ratio_slope' {lfa lga lfb lgb : ℝ}
     (hff' : ∀ x ∈ Ioo a b, HasDerivAt f (f' x) x) (hgg' : ∀ x ∈ Ioo a b, HasDerivAt g (g' x) x)
@@ -546,6 +535,7 @@ theorem exists_ratio_hasDerivAt_eq_ratio_slope' {lfa lga lfb lgb : ℝ}
   exact ⟨c, cmem, sub_eq_zero.1 hc⟩
 
 include hab hfc hff' in
+/-- Lagrange's Mean Value Theorem, `HasDerivAt` version -/
 
 theorem exists_hasDerivAt_eq_slope : ∃ c ∈ Ioo a b, f' c = (f b - f a) / (b - a) := by
   obtain ⟨c, cmem, hc⟩ : ∃ c ∈ Ioo a b, (b - a) * f' c = (f b - f a) * 1 :=
@@ -555,6 +545,7 @@ theorem exists_hasDerivAt_eq_slope : ∃ c ∈ Ioo a b, f' c = (f b - f a) / (b 
   rwa [mul_one, mul_comm, ← eq_div_iff (sub_ne_zero.2 hab.ne')] at hc
 
 include hab hfc hgc hgd hfd in
+/-- Cauchy's Mean Value Theorem, `deriv` version. -/
 
 theorem exists_ratio_deriv_eq_ratio_slope :
     ∃ c ∈ Ioo a b, (g b - g a) * deriv f c = (f b - f a) * deriv g c :=
@@ -564,6 +555,7 @@ theorem exists_ratio_deriv_eq_ratio_slope :
     ((hgd x hx).differentiableAt <| IsOpen.mem_nhds isOpen_Ioo hx).hasDerivAt
 
 include hab in
+/-- Cauchy's Mean Value Theorem, extended `deriv` version. -/
 
 theorem exists_ratio_deriv_eq_ratio_slope' {lfa lga lfb lgb : ℝ}
     (hdf : DifferentiableOn ℝ f <| Ioo a b) (hdg : DifferentiableOn ℝ g <| Ioo a b)
@@ -575,12 +567,14 @@ theorem exists_ratio_deriv_eq_ratio_slope' {lfa lga lfb lgb : ℝ}
     (fun x hx => ((hdg x hx).differentiableAt <| Ioo_mem_nhds hx.1 hx.2).hasDerivAt) hfa hga hfb hgb
 
 include hab hfc hfd in
+/-- Lagrange's **Mean Value Theorem**, `deriv` version. -/
 
 theorem exists_deriv_eq_slope : ∃ c ∈ Ioo a b, deriv f c = (f b - f a) / (b - a) :=
   exists_hasDerivAt_eq_slope f (deriv f) hab hfc fun x hx =>
     ((hfd x hx).differentiableAt <| IsOpen.mem_nhds isOpen_Ioo hx).hasDerivAt
 
 include hab hfc hfd in
+/-- Lagrange's **Mean Value Theorem**, `deriv` version. -/
 
 theorem exists_deriv_eq_slope' : ∃ c ∈ Ioo a b, deriv f c = slope f a b := by
   rw [slope_def_field]

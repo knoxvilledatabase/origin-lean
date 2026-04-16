@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Data.Nat.Choose.Dvd
 import Mathlib.Data.Nat.Prime.Basic
 
+noncomputable section
+
 /-!
 # Primorial
 

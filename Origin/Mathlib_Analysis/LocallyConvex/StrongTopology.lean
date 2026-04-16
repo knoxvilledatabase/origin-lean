@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.Module.StrongTopology
 import Mathlib.Topology.Algebra.Module.LocallyConvex
 
+noncomputable section
+
 /-!
 # Local convexity of the strong topology
 

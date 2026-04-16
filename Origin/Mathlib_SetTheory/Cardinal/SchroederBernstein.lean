@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.FixedPoints
 import Mathlib.Order.Zorn
 
+noncomputable section
+
 /-!
 # Schröder-Bernstein theorem, well-ordering of cardinals
 

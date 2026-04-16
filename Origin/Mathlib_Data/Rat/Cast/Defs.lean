@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Rat/Cast/Defs.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 12 | Infrastructure: 6
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic
@@ -10,6 +10,8 @@ import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.Data.Rat.Lemmas
 import Mathlib.Order.Nat
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
+
+noncomputable section
 
 /-!
 # Casts for Rational Numbers
@@ -46,15 +48,59 @@ lemma commute_cast (a : α) (q : ℚ≥0) : Commute a q := (cast_commute ..).sym
 
 lemma cast_comm (q : ℚ≥0) (a : α) : q * a = a * q := cast_commute _ _
 
--- DISSOLVED: cast_divNat_of_ne_zero
+@[norm_cast] lemma cast_divNat_of_ne_zero (a : ℕ) {b : ℕ} (hb : (b : α) ≠ 0) :
+    divNat a b = (a / b : α) := by
+  rcases e : divNat a b with ⟨⟨n, d, h, c⟩, hn⟩
+  rw [← Rat.num_nonneg] at hn
+  lift n to ℕ using hn
+  have hd : (d : α) ≠ 0 := by
+    refine fun hd ↦ hb ?_
+    have : Rat.divInt a b = _ := congr_arg NNRat.cast e
+    obtain ⟨k, rfl⟩ : d ∣ b := by simpa [Int.natCast_dvd_natCast, this] using Rat.den_dvd a b
+    simp [*]
+  have hb' : b ≠ 0 := by rintro rfl; exact hb Nat.cast_zero
+  have hd' : d ≠ 0 := by rintro rfl; exact hd Nat.cast_zero
+  simp_rw [Rat.mk'_eq_divInt, mk_divInt, divNat_inj hb' hd'] at e
+  rw [cast_def]
+  dsimp
+  rw [Commute.div_eq_div_iff _ hd hb]
+  · norm_cast
+    rw [e]
+  exact b.commute_cast _
 
--- DISSOLVED: cast_add_of_ne_zero
+@[norm_cast]
+lemma cast_add_of_ne_zero (hq : (q.den : α) ≠ 0) (hr : (r.den : α) ≠ 0) :
+    ↑(q + r) = (q + r : α) := by
+  rw [add_def, cast_divNat_of_ne_zero, cast_def, cast_def, mul_comm _ q.den,
+    (Nat.commute_cast _ _).div_add_div (Nat.commute_cast _ _) hq hr]
+  · push_cast
+    rfl
+  · push_cast
+    exact mul_ne_zero hq hr
 
--- DISSOLVED: cast_mul_of_ne_zero
+@[norm_cast]
+lemma cast_mul_of_ne_zero (hq : (q.den : α) ≠ 0) (hr : (r.den : α) ≠ 0) :
+    ↑(q * r) = (q * r : α) := by
+  rw [mul_def, cast_divNat_of_ne_zero, cast_def, cast_def,
+    (Nat.commute_cast _ _).div_mul_div_comm (Nat.commute_cast _ _)]
+  · push_cast
+    rfl
+  · push_cast
+    exact mul_ne_zero hq hr
 
--- DISSOLVED: cast_inv_of_ne_zero
+@[norm_cast]
+lemma cast_inv_of_ne_zero (hq : (q.num : α) ≠ 0) : (q⁻¹ : ℚ≥0) = (q⁻¹ : α) := by
+  rw [inv_def, cast_divNat_of_ne_zero _ hq, cast_def, inv_div]
 
--- DISSOLVED: cast_div_of_ne_zero
+@[norm_cast]
+lemma cast_div_of_ne_zero (hq : (q.den : α) ≠ 0) (hr : (r.num : α) ≠ 0) :
+    ↑(q / r) = (q / r : α) := by
+  rw [div_def, cast_divNat_of_ne_zero, cast_def, cast_def, div_eq_mul_inv (_ / _),
+    inv_div, (Nat.commute_cast _ _).div_mul_div_comm (Nat.commute_cast _ _)]
+  · push_cast
+    rfl
+  · push_cast
+    exact mul_ne_zero hq hr
 
 end NNRat
 
@@ -91,21 +137,66 @@ theorem cast_comm (r : ℚ) (a : α) : (r : α) * a = a * r :=
 theorem commute_cast (a : α) (r : ℚ) : Commute a r :=
   (r.cast_commute a).symm
 
--- DISSOLVED: cast_divInt_of_ne_zero
+@[norm_cast]
+lemma cast_divInt_of_ne_zero (a : ℤ) {b : ℤ} (b0 : (b : α) ≠ 0) : (a /. b : α) = a / b := by
+  have b0' : b ≠ 0 := by
+    refine mt ?_ b0
+    simp +contextual
+  cases' e : a /. b with n d h c
+  have d0 : (d : α) ≠ 0 := by
+    intro d0
+    have dd := den_dvd a b
+    cases' show (d : ℤ) ∣ b by rwa [e] at dd with k ke
+    have : (b : α) = (d : α) * (k : α) := by rw [ke, Int.cast_mul, Int.cast_natCast]
+    rw [d0, zero_mul] at this
+    contradiction
+  rw [mk'_eq_divInt] at e
+  have := congr_arg ((↑) : ℤ → α)
+    ((divInt_eq_iff b0' <| ne_of_gt <| Int.natCast_pos.2 h.bot_lt).1 e)
+  rw [Int.cast_mul, Int.cast_mul, Int.cast_natCast] at this
+  rw [eq_comm, cast_def, div_eq_mul_inv, eq_div_iff_mul_eq d0, mul_assoc, (d.commute_cast _).eq,
+    ← mul_assoc, this, mul_assoc, mul_inv_cancel₀ b0, mul_one]
 
--- DISSOLVED: cast_mkRat_of_ne_zero
+@[norm_cast]
+lemma cast_mkRat_of_ne_zero (a : ℤ) {b : ℕ} (hb : (b : α) ≠ 0) : (mkRat a b : α) = a / b := by
+  rw [Rat.mkRat_eq_divInt, cast_divInt_of_ne_zero, Int.cast_natCast]; rwa [Int.cast_natCast]
 
--- DISSOLVED: cast_add_of_ne_zero
+@[norm_cast]
+lemma cast_add_of_ne_zero {q r : ℚ} (hq : (q.den : α) ≠ 0) (hr : (r.den : α) ≠ 0) :
+    (q + r : ℚ) = (q + r : α) := by
+  rw [add_def', cast_mkRat_of_ne_zero, cast_def, cast_def, mul_comm r.num,
+    (Nat.cast_commute _ _).div_add_div (Nat.commute_cast _ _) hq hr]
+  · push_cast
+    rfl
+  · push_cast
+    exact mul_ne_zero hq hr
 
 @[simp, norm_cast] lemma cast_neg (q : ℚ) : ↑(-q) = (-q : α) := by simp [cast_def, neg_div]
 
--- DISSOLVED: cast_sub_of_ne_zero
+@[norm_cast] lemma cast_sub_of_ne_zero (hp : (p.den : α) ≠ 0) (hq : (q.den : α) ≠ 0) :
+    ↑(p - q) = (p - q : α) := by simp [sub_eq_add_neg, cast_add_of_ne_zero, hp, hq]
 
--- DISSOLVED: cast_mul_of_ne_zero
+@[norm_cast] lemma cast_mul_of_ne_zero (hp : (p.den : α) ≠ 0) (hq : (q.den : α) ≠ 0) :
+    ↑(p * q) = (p * q : α) := by
+  rw [mul_eq_mkRat, cast_mkRat_of_ne_zero, cast_def, cast_def,
+    (Nat.commute_cast _ _).div_mul_div_comm (Int.commute_cast _ _)]
+  · push_cast
+    rfl
+  · push_cast
+    exact mul_ne_zero hp hq
 
--- DISSOLVED: cast_inv_of_ne_zero
+@[norm_cast]
+lemma cast_inv_of_ne_zero (hq : (q.num : α) ≠ 0) : ↑(q⁻¹) = (q⁻¹ : α) := by
+  rw [inv_def', cast_divInt_of_ne_zero _ hq, cast_def, inv_div, Int.cast_natCast]
 
--- DISSOLVED: cast_div_of_ne_zero
+@[norm_cast] lemma cast_div_of_ne_zero (hp : (p.den : α) ≠ 0) (hq : (q.num : α) ≠ 0) :
+    ↑(p / q) = (p / q : α) := by
+  rw [div_def', cast_divInt_of_ne_zero, cast_def, cast_def, div_eq_mul_inv (_ / _), inv_div,
+    (Int.commute_cast _ _).div_mul_div_comm (Nat.commute_cast _ _)]
+  · push_cast
+    rfl
+  · push_cast
+    exact mul_ne_zero hp hq
 
 end Rat
 

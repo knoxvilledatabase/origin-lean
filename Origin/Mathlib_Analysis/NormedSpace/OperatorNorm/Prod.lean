@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 2 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Bilinear
 
+noncomputable section
+
 /-!
 # Operator norm: Cartesian products
 
@@ -93,11 +95,6 @@ def prodMapL : (M₁ →L[𝕜] M₂) × (M₃ →L[𝕜] M₄) →L[𝕜] M₁ 
       simp)
 
 variable {M₁ M₂ M₃ M₄}
-
-@[simp]
-theorem prodMapL_apply (p : (M₁ →L[𝕜] M₂) × (M₃ →L[𝕜] M₄)) :
-    ContinuousLinearMap.prodMapL 𝕜 M₁ M₂ M₃ M₄ p = p.1.prodMap p.2 :=
-  rfl
 
 variable {X : Type*} [TopologicalSpace X]
 

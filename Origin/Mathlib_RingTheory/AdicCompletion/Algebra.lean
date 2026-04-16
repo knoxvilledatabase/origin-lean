@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.AdicCompletion.Basic
 import Mathlib.Algebra.Module.Torsion
 
+noncomputable section
+
 /-!
 # Algebra instance on adic completion
 
@@ -30,16 +32,6 @@ variable {M : Type*} [AddCommGroup M] [Module R M]
 namespace AdicCompletion
 
 attribute [-simp] smul_eq_mul Algebra.id.smul_eq_mul
-
-@[local simp]
-theorem transitionMap_ideal_mk {m n : ℕ} (hmn : m ≤ n) (x : R) :
-    transitionMap I R hmn (Ideal.Quotient.mk (I ^ n • ⊤ : Ideal R) x) =
-      Ideal.Quotient.mk (I ^ m • ⊤ : Ideal R) x :=
-  rfl
-
-@[local simp]
-theorem transitionMap_map_one {m n : ℕ} (hmn : m ≤ n) : transitionMap I R hmn 1 = 1 :=
-  rfl
 
 @[local simp]
 theorem transitionMap_map_mul {m n : ℕ} (hmn : m ≤ n) (x y : R ⧸ (I ^ n • ⊤ : Ideal R)) :
@@ -150,10 +142,6 @@ instance : Algebra R (AdicCauchySequence I R) where
   map_add' x y := Subtype.ext <| map_add _ x y
   commutes' r x := Subtype.ext <| Algebra.commutes' r x.val
   smul_def' r x := Subtype.ext <| Algebra.smul_def' r x.val
-
-@[simp]
-theorem one_apply (n : ℕ) : (1 : AdicCauchySequence I R) n = 1 :=
-  rfl
 
 @[simp]
 theorem mul_apply (n : ℕ) (f g : AdicCauchySequence I R) : (f * g) n = f n * g n :=

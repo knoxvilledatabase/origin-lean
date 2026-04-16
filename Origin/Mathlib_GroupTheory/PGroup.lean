@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Perm.Cycle.Type
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
+noncomputable section
+
 /-!
 # p-groups
 
@@ -93,10 +95,6 @@ noncomputable def powEquiv {n : ℕ} (hn : p.Coprime n) : G ≃ G :=
           ⟨g, _, Subtype.ext_iff.1 <| (powCoprime (h g)).left_inv ⟨g, Subgroup.mem_zpowers g⟩⟩
     right_inv := fun g =>
       Subtype.ext_iff.1 <| (powCoprime (h g)).right_inv ⟨g, Subgroup.mem_zpowers g⟩ }
-
-@[simp]
-theorem powEquiv_apply {n : ℕ} (hn : p.Coprime n) (g : G) : hG.powEquiv hn g = g ^ n :=
-  rfl
 
 @[simp]
 theorem powEquiv_symm_apply {n : ℕ} (hn : p.Coprime n) (g : G) :

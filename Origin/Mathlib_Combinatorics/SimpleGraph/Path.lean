@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Walk
 import Mathlib.Combinatorics.SimpleGraph.Subgraph
 
+noncomputable section
+
 /-!
 
 # Trail, Path, and Cycle
@@ -818,12 +820,6 @@ protected def lift {β : Sort*} (f : V → β)
     (h : ∀ (v w : V) (p : G.Walk v w), p.IsPath → f v = f w) : G.ConnectedComponent → β :=
   Quot.lift f fun v w (h' : G.Reachable v w) => h'.elim_path fun hp => h v w hp hp.2
 
-@[simp]
-protected theorem lift_mk {β : Sort*} {f : V → β}
-    {h : ∀ (v w : V) (p : G.Walk v w), p.IsPath → f v = f w} {v : V} :
-    ConnectedComponent.lift f h (G.connectedComponentMk v) = f v :=
-  rfl
-
 protected theorem «exists» {p : G.ConnectedComponent → Prop} :
     (∃ c : G.ConnectedComponent, p c) ↔ ∃ v, p (G.connectedComponentMk v) :=
   Quot.mk_surjective.exists
@@ -942,9 +938,6 @@ instance : SetLike G.ConnectedComponent V where
 theorem mem_supp_iff (C : G.ConnectedComponent) (v : V) :
     v ∈ C.supp ↔ G.connectedComponentMk v = C :=
   Iff.rfl
-
-theorem connectedComponentMk_mem {v : V} : v ∈ G.connectedComponentMk v :=
-  rfl
 
 def isoEquivSupp (φ : G ≃g G') (C : G.ConnectedComponent) :
     C.supp ≃ (φ.connectedComponentEquiv C).supp where

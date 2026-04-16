@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Combination
 import Mathlib.LinearAlgebra.AffineSpace.Independent
 import Mathlib.Tactic.FieldSimp
 
+noncomputable section
+
 /-!
 # Carathéodory's convexity theorem
 

@@ -7,6 +7,8 @@ import Mathlib.Data.Finsupp.Order
 import Mathlib.Data.DFinsupp.Lex
 import Mathlib.Data.Finsupp.ToDFinsupp
 
+noncomputable section
+
 /-!
 # Lexicographic order on finitely supported functions
 
@@ -23,18 +25,6 @@ variable [Zero N]
 
 protected def Lex (r : α → α → Prop) (s : N → N → Prop) (x y : α →₀ N) : Prop :=
   Pi.Lex r s x y
-
-theorem _root_.Pi.lex_eq_finsupp_lex {r : α → α → Prop} {s : N → N → Prop} (a b : α →₀ N) :
-    Pi.Lex r s a b = Finsupp.Lex r s a b :=
-  rfl
-
-theorem lex_def {r : α → α → Prop} {s : N → N → Prop} {a b : α →₀ N} :
-    Finsupp.Lex r s a b ↔ ∃ j, (∀ d, r d j → a d = b d) ∧ s (a j) (b j) :=
-  Iff.rfl
-
-theorem lex_eq_invImage_dfinsupp_lex (r : α → α → Prop) (s : N → N → Prop) :
-    Finsupp.Lex r s = InvImage (DFinsupp.Lex r fun _ ↦ s) toDFinsupp :=
-  rfl
 
 instance [LT α] [LT N] : LT (Lex (α →₀ N)) :=
   ⟨fun f g ↦ Finsupp.Lex (· < ·) (· < ·) (ofLex f) (ofLex g)⟩

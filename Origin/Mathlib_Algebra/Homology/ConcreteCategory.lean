@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomologySequence
 import Mathlib.Algebra.Homology.ShortComplex.ConcreteCategory
 
+noncomputable section
+
 /-!
 # Homology of complexes in concrete categories
 

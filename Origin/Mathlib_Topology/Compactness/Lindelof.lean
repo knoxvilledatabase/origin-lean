@@ -7,6 +7,8 @@ import Mathlib.Topology.Bases
 import Mathlib.Order.Filter.CountableInter
 import Mathlib.Topology.Compactness.SigmaCompact
 
+noncomputable section
+
 /-!
 # Lindelöf sets and Lindelöf spaces
 

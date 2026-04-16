@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/AbsoluteValue.lean
-Genuine: 37 | Conflates: 3 | Dissolved: 7 | Infrastructure: 14
+Genuine: 43 | Conflates: 3 | Dissolved: 1 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Units.Lemmas
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Hom.Basic
 import Mathlib.Algebra.Order.Ring.Abs
 import Mathlib.Algebra.Regular.Basic
 import Mathlib.Tactic.Bound.Attribute
+
+noncomputable section
 
 /-!
 # Absolute values
@@ -61,10 +63,6 @@ instance nonnegHomClass : NonnegHomClass (AbsoluteValue R S) R S :=
 instance subadditiveHomClass : SubadditiveHomClass (AbsoluteValue R S) R S :=
   { AbsoluteValue.zeroHomClass (R := R) (S := S) with map_add_le_add := fun f => f.add_le' }
 
-@[simp]
-theorem coe_mk (f : R →ₙ* S) {h₁ h₂ h₃} : (AbsoluteValue.mk f h₁ h₂ h₃ : R → S) = f :=
-  rfl
-
 @[ext]
 theorem ext ⦃f g : AbsoluteValue R S⦄ : (∀ x, f x = g x) → f = g :=
   DFunLike.ext _ _
@@ -73,10 +71,6 @@ def Simps.apply (f : AbsoluteValue R S) : R → S :=
   f
 
 initialize_simps_projections AbsoluteValue (toMulHom_toFun → apply)
-
-@[simp]
-theorem coe_toMulHom : ⇑abv.toMulHom = abv :=
-  rfl
 
 @[bound]
 protected theorem nonneg (x : R) : 0 ≤ abv x :=
@@ -94,13 +88,18 @@ protected theorem add_le (x y : R) : abv (x + y) ≤ abv x + abv y :=
 protected theorem map_mul (x y : R) : abv (x * y) = abv x * abv y :=
   abv.map_mul' x y
 
--- DISSOLVED: ne_zero_iff
+protected theorem ne_zero_iff {x : R} : abv x ≠ 0 ↔ x ≠ 0 :=
+  abv.eq_zero.not
 
--- DISSOLVED: pos
+protected theorem pos {x : R} (hx : x ≠ 0) : 0 < abv x :=
+  lt_of_le_of_ne (abv.nonneg x) (Ne.symm <| mt abv.eq_zero.mp hx)
 
--- DISSOLVED: pos_iff
+@[simp]
+protected theorem pos_iff {x : R} : 0 < abv x ↔ x ≠ 0 :=
+  ⟨fun h₁ => mt abv.eq_zero.mpr h₁.ne', abv.pos⟩
 
--- DISSOLVED: ne_zero
+protected theorem ne_zero {x : R} (hx : x ≠ 0) : abv x ≠ 0 :=
+  (abv.pos hx).ne'
 
 theorem map_one_of_isLeftRegular (h : IsLeftRegular (abv 1)) : abv 1 = 1 :=
   h <| by simp [← abv.map_mul]
@@ -145,16 +144,13 @@ instance monoidWithZeroHomClass : MonoidWithZeroHomClass (AbsoluteValue R S) R S
     map_zero := fun f => f.map_zero
     map_one := fun f => f.map_one }
 
--- DISSOLVED: toMonoidWithZeroHom
+def toMonoidWithZeroHom : R →*₀ S :=
+  abv
 
 -- DISSOLVED: coe_toMonoidWithZeroHom
 
 def toMonoidHom : R →* S :=
   abv
-
-@[simp]
-theorem coe_toMonoidHom : ⇑abv.toMonoidHom = abv :=
-  rfl
 
 @[simp]
 protected theorem map_pow (a : R) (n : ℕ) : abv (a ^ n) = abv a ^ n :=
@@ -287,7 +283,8 @@ def toAbsoluteValue : AbsoluteValue R S where
 theorem abv_zero : abv 0 = 0 :=
   (toAbsoluteValue abv).map_zero
 
--- DISSOLVED: abv_pos
+theorem abv_pos {a : R} : 0 < abv a ↔ a ≠ 0 :=
+  (toAbsoluteValue abv).pos_iff
 
 end OrderedSemiring
 

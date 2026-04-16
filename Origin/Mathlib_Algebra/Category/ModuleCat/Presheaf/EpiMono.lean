@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Colimits
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.Limits
 
+noncomputable section
+
 /-!
 # Epimorphisms and monomorphisms in the category of presheaves of modules
 

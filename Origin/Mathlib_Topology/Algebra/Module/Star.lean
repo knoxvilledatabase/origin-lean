@@ -7,6 +7,8 @@ import Mathlib.Algebra.Star.Module
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.Topology.Algebra.Star
 
+noncomputable section
+
 /-!
 # The star operation, bundled as a continuous star-linear equiv
 -/

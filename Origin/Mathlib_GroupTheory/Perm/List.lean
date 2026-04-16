@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.Nat
 import Mathlib.Data.List.Rotate
 import Mathlib.GroupTheory.Perm.Support
 
+noncomputable section
+
 /-!
 # Permutations from a list
 
@@ -41,10 +43,6 @@ def formPerm : Equiv.Perm α :=
   (zipWith Equiv.swap l l.tail).prod
 
 @[simp]
-theorem formPerm_nil : formPerm ([] : List α) = 1 :=
-  rfl
-
-@[simp]
 theorem formPerm_singleton (x : α) : formPerm [x] = 1 :=
   rfl
 
@@ -52,9 +50,6 @@ theorem formPerm_singleton (x : α) : formPerm [x] = 1 :=
 theorem formPerm_cons_cons (x y : α) (l : List α) :
     formPerm (x :: y :: l) = swap x y * formPerm (y :: l) :=
   prod_cons
-
-theorem formPerm_pair (x y : α) : formPerm [x, y] = swap x y :=
-  rfl
 
 theorem mem_or_mem_of_zipWith_swap_prod_ne : ∀ {l l' : List α} {x : α},
     (zipWith swap l l').prod x ≠ x → x ∈ l ∨ x ∈ l'

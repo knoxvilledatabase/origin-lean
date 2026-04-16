@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Decomposition/Exhaustion.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses
+
+noncomputable section
 
 /-!
 # Method of exhaustion
@@ -150,38 +152,6 @@ lemma measurableSet_sigmaFiniteSetWRT' [IsFiniteMeasure ν] :
     MeasurableSet (μ.sigmaFiniteSetWRT' ν) :=
   MeasurableSet.iUnion measurableSet_sigmaFiniteSetGE
 
-lemma sigmaFinite_restrict_sigmaFiniteSetWRT' (μ ν : Measure α) [IsFiniteMeasure ν] :
-    SigmaFinite (μ.restrict (μ.sigmaFiniteSetWRT' ν)) := by
-  have := sigmaFinite_restrict_sigmaFiniteSetGE μ ν
-  let f : ℕ × ℕ → Set α := fun p : ℕ × ℕ ↦ (μ.sigmaFiniteSetWRT' ν)ᶜ
-    ∪ (spanningSets (μ.restrict (μ.sigmaFiniteSetGE ν p.1)) p.2 ∩ (μ.sigmaFiniteSetGE ν p.1))
-  suffices (μ.restrict (μ.sigmaFiniteSetWRT' ν)).FiniteSpanningSetsIn (Set.range f) from
-    this.sigmaFinite
-  let e : ℕ ≃ ℕ × ℕ := Nat.pairEquiv.symm
-  refine ⟨fun n ↦ f (e n), fun _ ↦ by simp, fun n ↦ ?_, ?_⟩
-  · simp only [Nat.pairEquiv_symm_apply, gt_iff_lt, measure_union_lt_top_iff, f, e]
-    rw [Measure.restrict_apply' measurableSet_sigmaFiniteSetWRT', Set.compl_inter_self,
-      Measure.restrict_apply' measurableSet_sigmaFiniteSetWRT']
-    simp only [measure_empty, ENNReal.zero_lt_top, true_and]
-    refine (measure_mono Set.inter_subset_left).trans_lt ?_
-    rw [← Measure.restrict_apply' (measurableSet_sigmaFiniteSetGE _)]
-    exact measure_spanningSets_lt_top _ _
-  · simp only [Nat.pairEquiv_symm_apply, f, e]
-    rw [← Set.union_iUnion]
-    suffices ⋃ n, (spanningSets (μ.restrict (μ.sigmaFiniteSetGE ν (Nat.unpair n).1)) n.unpair.2
-        ∩ μ.sigmaFiniteSetGE ν n.unpair.1) = μ.sigmaFiniteSetWRT' ν by
-      rw [this, Set.compl_union_self]
-    calc ⋃ n, (spanningSets (μ.restrict (μ.sigmaFiniteSetGE ν (Nat.unpair n).1)) n.unpair.2
-        ∩ μ.sigmaFiniteSetGE ν n.unpair.1)
-      = ⋃ n, ⋃ m, (spanningSets (μ.restrict (μ.sigmaFiniteSetGE ν n)) m
-            ∩ μ.sigmaFiniteSetGE ν n) :=
-          Set.iUnion_unpair (fun n m ↦ spanningSets (μ.restrict (μ.sigmaFiniteSetGE ν n)) m
-            ∩ μ.sigmaFiniteSetGE ν n)
-    _ = ⋃ n, μ.sigmaFiniteSetGE ν n := by
-        refine Set.iUnion_congr (fun n ↦ ?_)
-        rw [← Set.iUnion_inter, iUnion_spanningSets, Set.univ_inter]
-    _ = μ.sigmaFiniteSetWRT' ν := rfl
-
 lemma measure_sigmaFiniteSetWRT' (μ ν : Measure α) [IsFiniteMeasure ν] :
     ν (μ.sigmaFiniteSetWRT' ν)
       = ⨆ (s) (_ : MeasurableSet s) (_ : SigmaFinite (μ.restrict s)), ν s := by
@@ -193,15 +163,60 @@ lemma measure_sigmaFiniteSetWRT' (μ ν : Measure α) [IsFiniteMeasure ν] :
   · exact le_of_tendsto' (tendsto_measure_sigmaFiniteSetGE μ ν)
       (fun _ ↦ measure_mono (Set.subset_iUnion _ _))
 
--- DISSOLVED: measure_eq_top_of_subset_compl_sigmaFiniteSetWRT'_of_measurableSet
+lemma measure_eq_top_of_subset_compl_sigmaFiniteSetWRT'_of_measurableSet [IsFiniteMeasure ν]
+    (hs : MeasurableSet s) (hs_subset : s ⊆ (μ.sigmaFiniteSetWRT' ν)ᶜ) (hνs : ν s ≠ 0) :
+    μ s = ∞ := by
+  suffices ¬ SigmaFinite (μ.restrict s) by
+    by_contra h
+    have h_lt_top : Fact (μ s < ∞) := ⟨Ne.lt_top h⟩
+    exact this inferInstance
+  intro hsσ
+  have h_lt : ν (μ.sigmaFiniteSetWRT' ν) < ν (μ.sigmaFiniteSetWRT' ν ∪ s) := by
+    rw [measure_union _ hs]
+    · exact ENNReal.lt_add_right (measure_ne_top _ _) hνs
+    · exact disjoint_compl_right.mono_right hs_subset
+  have h_le : ν (μ.sigmaFiniteSetWRT' ν ∪ s) ≤ ν (μ.sigmaFiniteSetWRT' ν) := by
+    conv_rhs => rw [measure_sigmaFiniteSetWRT']
+    refine (le_iSup
+      (f := fun (_ : SigmaFinite (μ.restrict (μ.sigmaFiniteSetWRT' ν ∪ s))) ↦ _) ?_).trans ?_
+    · have := sigmaFinite_restrict_sigmaFiniteSetWRT' μ ν
+      infer_instance
+    · exact le_iSup₂ (f := fun s _ ↦ ⨆ (_ : SigmaFinite (μ.restrict _)), ν s)
+        (μ.sigmaFiniteSetWRT' ν ∪ s) (measurableSet_sigmaFiniteSetWRT'.union hs)
+  exact h_lt.not_le h_le
 
--- DISSOLVED: measure_eq_top_of_subset_compl_sigmaFiniteSetWRT'
+lemma measure_eq_top_of_subset_compl_sigmaFiniteSetWRT' [IsFiniteMeasure ν]
+    (hs_subset : s ⊆ (μ.sigmaFiniteSetWRT' ν)ᶜ) (hνs : ν s ≠ 0) :
+    μ s = ∞ := by
+  rw [measure_eq_iInf]
+  simp_rw [iInf_eq_top]
+  suffices ∀ t, t ⊆ (μ.sigmaFiniteSetWRT' ν)ᶜ → s ⊆ t → MeasurableSet t → μ t = ∞ by
+    intro t hts ht
+    suffices μ (t ∩ (μ.sigmaFiniteSetWRT' ν)ᶜ) = ∞ from
+      measure_mono_top Set.inter_subset_left this
+    have hs_subset_t : s ⊆ t ∩ (μ.sigmaFiniteSetWRT' ν)ᶜ := Set.subset_inter hts hs_subset
+    exact this (t ∩ (μ.sigmaFiniteSetWRT' ν)ᶜ) Set.inter_subset_right hs_subset_t
+      (ht.inter measurableSet_sigmaFiniteSetWRT'.compl)
+  intro t ht_subset hst ht
+  refine measure_eq_top_of_subset_compl_sigmaFiniteSetWRT'_of_measurableSet ht ht_subset ?_
+  exact fun hνt ↦ hνs (measure_mono_null hst hνt)
 
 end IsFiniteMeasure
 
 section SFinite
 
--- DISSOLVED: measure_eq_top_of_subset_compl_sigmaFiniteSetWRT
+lemma measure_eq_top_of_subset_compl_sigmaFiniteSetWRT [SFinite ν]
+    (hs_subset : s ⊆ (μ.sigmaFiniteSetWRT ν)ᶜ) (hνs : ν s ≠ 0) :
+    μ s = ∞ := by
+  have ⟨ν', hν', hνν', _⟩ := exists_isFiniteMeasure_absolutelyContinuous ν
+  have h : ∃ s : Set α, MeasurableSet s ∧ SigmaFinite (μ.restrict s)
+      ∧ (∀ t ⊆ sᶜ, ν t ≠ 0 → μ t = ∞) := by
+    refine ⟨μ.sigmaFiniteSetWRT' ν', measurableSet_sigmaFiniteSetWRT',
+      sigmaFinite_restrict_sigmaFiniteSetWRT' _ _,
+      fun t ht_subset hνt ↦ measure_eq_top_of_subset_compl_sigmaFiniteSetWRT' ht_subset ?_⟩
+    exact fun hν't ↦ hνt (hνν' hν't)
+  rw [Measure.sigmaFiniteSetWRT, dif_pos h] at hs_subset
+  exact h.choose_spec.2.2 s hs_subset hνs
 
 lemma restrict_compl_sigmaFiniteSetWRT [SFinite ν] (hμν : μ ≪ ν) :
     μ.restrict (μ.sigmaFiniteSetWRT ν)ᶜ = ∞ • ν.restrict (μ.sigmaFiniteSetWRT ν)ᶜ := by

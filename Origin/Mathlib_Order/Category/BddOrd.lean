@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Category.Bipointed
 import Mathlib.Order.Category.PartOrd
 import Mathlib.Order.Hom.Bounded
 
+noncomputable section
+
 /-!
 # The category of bounded orders
 
@@ -35,10 +37,6 @@ attribute [instance] BddOrd.isBoundedOrder
 def of (α : Type*) [PartialOrder α] [BoundedOrder α] : BddOrd :=
   -- Porting note: was ⟨⟨α⟩⟩, see https://github.com/leanprover-community/mathlib4/issues/4998
   ⟨{ α := α }⟩
-
-@[simp]
-theorem coe_of (α : Type*) [PartialOrder α] [BoundedOrder α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited BddOrd :=
   ⟨of PUnit⟩
@@ -91,13 +89,3 @@ def dualEquiv : BddOrd ≌ BddOrd where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end BddOrd
-
-theorem bddOrd_dual_comp_forget_to_partOrd :
-    BddOrd.dual ⋙ forget₂ BddOrd PartOrd =
-    forget₂ BddOrd PartOrd ⋙ PartOrd.dual :=
-  rfl
-
-theorem bddOrd_dual_comp_forget_to_bipointed :
-    BddOrd.dual ⋙ forget₂ BddOrd Bipointed =
-    forget₂ BddOrd Bipointed ⋙ Bipointed.swap :=
-  rfl

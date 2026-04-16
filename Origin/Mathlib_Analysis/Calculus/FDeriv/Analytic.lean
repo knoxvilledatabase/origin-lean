@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Analytic.lean
-Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.CPolynomial
@@ -11,6 +11,8 @@ import Mathlib.Analysis.Calculus.ContDiff.FTaylorSeries
 import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.Calculus.FDeriv.Prod
 import Mathlib.Analysis.Normed.Module.Completion
+
+noncomputable section
 
 /-!
 # Frechet derivatives of analytic functions.
@@ -571,20 +573,6 @@ theorem _root_.HasFDerivAt.multilinear_comp
   ext v
   simp [linearDeriv]
 
-private lemma _root_.Equiv.succ_embeddingFinSucc_fst_symm_apply {ι : Type*} [DecidableEq ι]
-    {n : ℕ} (e : Fin (n+1) ↪ ι) {k : ι}
-    (h'k : k ∈ Set.range (Equiv.embeddingFinSucc n ι e).1) (hk : k ∈ Set.range e) :
-    Fin.succ ((Equiv.embeddingFinSucc n ι e).1.toEquivRange.symm ⟨k, h'k⟩)
-      = e.toEquivRange.symm ⟨k, hk⟩ := by
-  rcases hk with ⟨j, rfl⟩
-  have hj : j ≠ 0 := by
-    rintro rfl
-    simp at h'k
-  simp only [Function.Embedding.toEquivRange_symm_apply_self]
-  have : e j = (Equiv.embeddingFinSucc n ι e).1 (Fin.pred j hj) := by simp
-  simp_rw [this]
-  simp [-Equiv.embeddingFinSucc_fst]
-
 theorem hasFTaylorSeriesUpTo_iteratedFDeriv :
     HasFTaylorSeriesUpTo ⊤ f (fun v n ↦ f.iteratedFDeriv n v) := by
   classical
@@ -681,7 +669,6 @@ variable {p : FormalMultilinearSeries 𝕜 E F} {f : E → F} {x : E} {r : ℝ�
   (h : HasFPowerSeriesOnBall f p x r) (y : E)
 
 include h in
-
 theorem iteratedFDeriv_zero_apply_diag : iteratedFDeriv 𝕜 0 f x = p 0 := by
   ext
   convert (h.hasSum <| EMetric.mem_ball_self h.r_pos).tsum_eq.symm

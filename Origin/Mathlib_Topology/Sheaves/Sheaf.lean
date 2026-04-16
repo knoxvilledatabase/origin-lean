@@ -7,6 +7,8 @@ import Mathlib.Topology.Sheaves.Presheaf
 import Mathlib.CategoryTheory.Sites.Sheaf
 import Mathlib.CategoryTheory.Sites.Spaces
 
+noncomputable section
+
 /-!
 # Sheaves
 
@@ -81,13 +83,6 @@ instance forget_full : (forget C X).Full where
 
 instance forgetFaithful : (forget C X).Faithful where
   map_injective := Sheaf.Hom.ext
-
-theorem id_app (F : Sheaf C X) (t) : (𝟙 F : F ⟶ F).1.app t = 𝟙 _ :=
-  rfl
-
-theorem comp_app {F G H : Sheaf C X} (f : F ⟶ G) (g : G ⟶ H) (t) :
-    (f ≫ g).1.app t = f.1.app t ≫ g.1.app t :=
-  rfl
 
 end Sheaf
 

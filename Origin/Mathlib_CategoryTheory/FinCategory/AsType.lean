@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Card
 import Mathlib.CategoryTheory.FinCategory.Basic
 
+noncomputable section
+
 /-!
 # Finite categories are equivalent to category in `Type 0`.
 -/

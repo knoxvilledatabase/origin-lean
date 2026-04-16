@@ -7,6 +7,8 @@ import Mathlib.Data.SetLike.Basic
 import Mathlib.Data.Finset.Preimage
 import Mathlib.ModelTheory.Semantics
 
+noncomputable section
+
 /-!
 # Definable Sets
 
@@ -312,9 +314,6 @@ noncomputable instance instHImp : HImp (L.DefinableSet A α) where
 instance instInhabited : Inhabited (L.DefinableSet A α) :=
   ⟨⊥⟩
 
-theorem le_iff : s ≤ t ↔ (s : Set (α → M)) ≤ (t : Set (α → M)) :=
-  Iff.rfl
-
 @[simp]
 theorem mem_top : x ∈ (⊤ : L.DefinableSet A α) :=
   mem_univ x
@@ -322,22 +321,6 @@ theorem mem_top : x ∈ (⊤ : L.DefinableSet A α) :=
 @[simp]
 theorem not_mem_bot {x : α → M} : ¬x ∈ (⊥ : L.DefinableSet A α) :=
   not_mem_empty x
-
-@[simp]
-theorem mem_sup : x ∈ s ⊔ t ↔ x ∈ s ∨ x ∈ t :=
-  Iff.rfl
-
-@[simp]
-theorem mem_inf : x ∈ s ⊓ t ↔ x ∈ s ∧ x ∈ t :=
-  Iff.rfl
-
-@[simp]
-theorem mem_compl : x ∈ sᶜ ↔ ¬x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem mem_sdiff : x ∈ s \ t ↔ x ∈ s ∧ ¬x ∈ t :=
-  Iff.rfl
 
 @[simp, norm_cast]
 theorem coe_top : ((⊤ : L.DefinableSet A α) : Set (α → M)) = univ :=

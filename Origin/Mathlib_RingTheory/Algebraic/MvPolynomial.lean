@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Supported
 import Mathlib.RingTheory.Algebraic.Basic
 
+noncomputable section
+
 /-!
 # Transcendental elements in `MvPolynomial`
 

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Sites.CoverPreserving
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful
 import Mathlib.CategoryTheory.Sites.LocallyFullyFaithful
 
+noncomputable section
+
 /-!
 # Dense subsites
 

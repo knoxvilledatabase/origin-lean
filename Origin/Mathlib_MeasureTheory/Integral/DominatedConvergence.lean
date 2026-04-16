@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.Order.Filter.IndicatorFunction
 
+noncomputable section
+
 /-!
 # The dominated convergence theorem
 

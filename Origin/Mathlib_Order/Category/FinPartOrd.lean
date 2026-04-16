@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.FintypeCat
 import Mathlib.Order.Category.PartOrd
 
+noncomputable section
+
 /-!
 # The category of finite partial orders
 
@@ -39,9 +41,6 @@ attribute [instance] FinPartOrd.isFintype
 
 def of (α : Type*) [PartialOrder α] [Fintype α] : FinPartOrd :=
   ⟨⟨α, inferInstance⟩⟩
-
-@[simp]
-theorem coe_of (α : Type*) [PartialOrder α] [Fintype α] : ↥(of α) = α := rfl
 
 instance : Inhabited FinPartOrd :=
   ⟨of PUnit⟩
@@ -85,7 +84,3 @@ def dualEquiv : FinPartOrd ≌ FinPartOrd where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end FinPartOrd
-
-theorem FinPartOrd_dual_comp_forget_to_partOrd :
-    FinPartOrd.dual ⋙ forget₂ FinPartOrd PartOrd =
-      forget₂ FinPartOrd PartOrd ⋙ PartOrd.dual := rfl

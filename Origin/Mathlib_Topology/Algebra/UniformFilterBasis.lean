@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Algebra.FilterBasis
 
+noncomputable section
+
 /-!
 # Uniform properties of neighborhood bases in topological algebra
 

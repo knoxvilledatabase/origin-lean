@@ -5,6 +5,8 @@ Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.CondexpL2
 
+noncomputable section
+
 /-! # Conditional expectation in L1
 
 This file contains two more steps of the construction of the conditional expectation, which is

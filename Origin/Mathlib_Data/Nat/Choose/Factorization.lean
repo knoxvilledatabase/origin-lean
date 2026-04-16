@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Choose.Central
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Data.Nat.Multiplicity
 
+noncomputable section
+
 /-!
 # Factorization of Binomial Coefficients
 

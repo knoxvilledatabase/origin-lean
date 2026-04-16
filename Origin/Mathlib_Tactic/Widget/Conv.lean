@@ -8,6 +8,8 @@ import Mathlib.Data.String.Defs
 import Batteries.Tactic.Lint
 import Batteries.Lean.Position
 
+noncomputable section
+
 /-! # Conv widget
 
 This is a slightly improved version of one of the examples in the ProofWidget library.
@@ -133,9 +135,6 @@ def ConvSelectionPanel : Component SelectInsertParams :=
 open scoped Json in
 
 elab stx:"conv?" : tactic => do
-
   let some replaceRange := (← getFileMap).rangeOfStx? stx | return
-
   Widget.savePanelWidgetInfo ConvSelectionPanel.javascriptHash
-
    (pure <| json% { replaceRange: $(replaceRange) }) stx

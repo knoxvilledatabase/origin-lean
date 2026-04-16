@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.Topology.Algebra.Ring.Basic
 
+noncomputable section
+
 /-!
 # Category of topological commutative rings
 
@@ -55,10 +57,6 @@ instance : ConcreteCategory TopCommRingCat.{u} where
 
 def of (X : Type u) [CommRing X] [TopologicalSpace X] [TopologicalRing X] : TopCommRingCat :=
   ⟨X⟩
-
-@[simp]
-theorem coe_of (X : Type u) [CommRing X] [TopologicalSpace X] [TopologicalRing X] :
-    (of X : Type u) = X := rfl
 
 instance forgetTopologicalSpace (R : TopCommRingCat) :
     TopologicalSpace ((forget TopCommRingCat).obj R) :=

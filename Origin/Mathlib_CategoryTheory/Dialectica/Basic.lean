@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 
+noncomputable section
+
 /-!
 # Dialectica category
 

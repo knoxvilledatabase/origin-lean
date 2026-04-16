@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/CStarAlgebra/Module/Defs.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
+
+noncomputable section
 
 /-!
 # Hilbert C⋆-modules
@@ -169,7 +171,11 @@ include A
 
 protected lemma norm_nonneg {x : E} : 0 ≤ ‖x‖ := by simp [norm_eq_sqrt_norm_inner_self]
 
--- DISSOLVED: norm_pos
+protected lemma norm_pos {x : E} (hx : x ≠ 0) : 0 < ‖x‖ := by
+  simp only [norm_eq_sqrt_norm_inner_self, Real.sqrt_pos, norm_pos_iff]
+  intro H
+  rw [inner_self] at H
+  exact hx H
 
 protected lemma norm_zero : ‖(0 : E)‖ = 0 := by simp [norm_eq_sqrt_norm_inner_self]
 
@@ -229,7 +235,6 @@ lemma norm_inner_le {x y : E} : ‖⟪x, y⟫‖ ≤ ‖x‖ * ‖y‖ := by
   exact mul_nonneg CStarModule.norm_nonneg CStarModule.norm_nonneg
 
 include A in
-
 protected lemma norm_triangle (x y : E) : ‖x + y‖ ≤ ‖x‖ + ‖y‖ := by
   have h : ‖x + y‖ ^ 2 ≤ (‖x‖ + ‖y‖) ^ 2 := by
     calc _ ≤ ‖⟪x, x⟫ + ⟪y, x⟫‖ + ‖⟪x, y⟫‖ + ‖⟪y, y⟫‖ := by
@@ -245,6 +250,9 @@ protected lemma norm_triangle (x y : E) : ‖x + y‖ ≤ ‖x‖ + ‖y‖ := b
   exact add_nonneg CStarModule.norm_nonneg CStarModule.norm_nonneg
 
 include A in
+/-- This allows us to get `NormedAddCommGroup` and `NormedSpace` instances on `E` via
+
+`NormedAddCommGroup.ofCore` and `NormedSpace.ofCore`. -/
 
 lemma normedSpaceCore : NormedSpace.Core ℂ E where
   norm_nonneg _ := CStarModule.norm_nonneg
@@ -256,18 +264,6 @@ abbrev normedAddCommGroup : NormedAddCommGroup E :=
   NormedAddCommGroup.ofCore CStarModule.normedSpaceCore
 
 open scoped InnerProductSpace in
-
-lemma norm_eq_csSup (v : E) :
-    ‖v‖ = sSup { ‖⟪w, v⟫_A‖ | (w : E) (_ : ‖w‖ ≤ 1) } := by
-  let instNACG : NormedAddCommGroup E := NormedAddCommGroup.ofCore normedSpaceCore
-  let instNS : NormedSpace ℂ E := .ofCore normedSpaceCore
-  refine Eq.symm <| IsGreatest.csSup_eq ⟨⟨‖v‖⁻¹ • v, ?_, ?_⟩, ?_⟩
-  · simpa only [norm_smul, norm_inv, norm_norm] using inv_mul_le_one_of_le₀ le_rfl (by positivity)
-  · simp [norm_smul, ← norm_sq_eq, pow_two, ← mul_assoc]
-  · rintro - ⟨w, hw, rfl⟩
-    calc _ ≤ ‖w‖ * ‖v‖ := norm_inner_le E
-      _ ≤ 1 * ‖v‖ := by gcongr
-      _ = ‖v‖ := by simp
 
 end norm
 

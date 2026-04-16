@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Algebra.MvPolynomial.CommRing
 
+noncomputable section
+
 /-!
 Multivariable polynomials on a type is the left adjoint of the
 forgetful functor from commutative rings to types.
@@ -28,14 +30,6 @@ def free : Type u ⥤ CommRingCat.{u} where
   -- generates are too slow.
   map_id _ := RingHom.ext <| rename_id
   map_comp f g := RingHom.ext fun p => (rename_rename f g p).symm
-
-@[simp]
-theorem free_obj_coe {α : Type u} : (free.obj α : Type u) = MvPolynomial α ℤ :=
-  rfl
-
-@[simp, nolint simpNF]
-theorem free_map_coe {α β : Type u} {f : α → β} : ⇑(free.map f) = ⇑(rename f) :=
-  rfl
 
 def adj : free ⊣ forget CommRingCat.{u} :=
   Adjunction.mkOfHomEquiv

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiffMap
 import Mathlib.Geometry.Manifold.MFDeriv.UniqueDifferential
 
+noncomputable section
+
 /-!
 # Diffeomorphisms
 This file implements diffeomorphisms.
@@ -75,13 +77,11 @@ scoped[Manifold] notation M " ≃ₘ⟮" I ", " J "⟯ " N => Diffeomorph I J M 
 scoped[Manifold]
 
   notation E " ≃ₘ^" n:1000 "[" 𝕜 "] " E' =>
-
     Diffeomorph (modelWithCornersSelf 𝕜 E) (modelWithCornersSelf 𝕜 E') E E' n
 
 scoped[Manifold]
 
   notation E " ≃ₘ[" 𝕜 "] " E' =>
-
     Diffeomorph (modelWithCornersSelf 𝕜 E) (modelWithCornersSelf 𝕜 E') E E' ⊤
 
 namespace Diffeomorph
@@ -130,10 +130,6 @@ protected theorem mdifferentiableOn (h : M ≃ₘ^n⟮I, I'⟯ M') (s : Set M) (
 theorem coe_toEquiv (h : M ≃ₘ^n⟮I, I'⟯ M') : ⇑h.toEquiv = h :=
   rfl
 
-@[simp, norm_cast]
-theorem coe_coe (h : M ≃ₘ^n⟮I, I'⟯ M') : ⇑(h : C^n⟮I, M; I', M'⟯) = h :=
-  rfl
-
 @[simp]
 theorem toEquiv_inj {h h' : M ≃ₘ^n⟮I, I'⟯ M'} : h.toEquiv = h'.toEquiv ↔ h = h' :=
   toEquiv_injective.eq_iff
@@ -158,10 +154,6 @@ protected def refl : M ≃ₘ^n⟮I, I⟯ M where
   toEquiv := Equiv.refl M
 
 @[simp]
-theorem refl_toEquiv : (Diffeomorph.refl I M n).toEquiv = Equiv.refl _ :=
-  rfl
-
-@[simp]
 theorem coe_refl : ⇑(Diffeomorph.refl I M n) = id :=
   rfl
 
@@ -180,10 +172,6 @@ theorem trans_refl (h : M ≃ₘ^n⟮I, I'⟯ M') : h.trans (Diffeomorph.refl I'
 @[simp]
 theorem refl_trans (h : M ≃ₘ^n⟮I, I'⟯ M') : (Diffeomorph.refl I M n).trans h = h :=
   ext fun _ => rfl
-
-@[simp]
-theorem coe_trans (h₁ : M ≃ₘ^n⟮I, I'⟯ M') (h₂ : M' ≃ₘ^n⟮I', J⟯ N) : ⇑(h₁.trans h₂) = h₂ ∘ h₁ :=
-  rfl
 
 @[symm]
 protected def symm (h : M ≃ₘ^n⟮I, J⟯ N) : N ≃ₘ^n⟮J, I⟯ M where
@@ -211,15 +199,6 @@ theorem self_trans_symm (h : M ≃ₘ^n⟮I, J⟯ N) : h.trans h.symm = Diffeomo
 theorem symm_trans_self (h : M ≃ₘ^n⟮I, J⟯ N) : h.symm.trans h = Diffeomorph.refl J N n :=
   ext h.apply_symm_apply
 
-@[simp]
-theorem symm_trans' (h₁ : M ≃ₘ^n⟮I, I'⟯ M') (h₂ : M' ≃ₘ^n⟮I', J⟯ N) :
-    (h₁.trans h₂).symm = h₂.symm.trans h₁.symm :=
-  rfl
-
-@[simp]
-theorem symm_toEquiv (h : M ≃ₘ^n⟮I, J⟯ N) : h.symm.toEquiv = h.toEquiv.symm :=
-  rfl
-
 @[simp, mfld_simps]
 theorem toEquiv_coe_symm (h : M ≃ₘ^n⟮I, J⟯ N) : ⇑h.toEquiv.symm = h.symm :=
   rfl
@@ -245,22 +224,6 @@ theorem symm_image_image (h : M ≃ₘ^n⟮I, J⟯ N) (s : Set M) : h.symm '' (h
 
 def toHomeomorph (h : M ≃ₘ^n⟮I, J⟯ N) : M ≃ₜ N :=
   ⟨h.toEquiv, h.continuous, h.symm.continuous⟩
-
-@[simp]
-theorem toHomeomorph_toEquiv (h : M ≃ₘ^n⟮I, J⟯ N) : h.toHomeomorph.toEquiv = h.toEquiv :=
-  rfl
-
-@[simp]
-theorem symm_toHomeomorph (h : M ≃ₘ^n⟮I, J⟯ N) : h.symm.toHomeomorph = h.toHomeomorph.symm :=
-  rfl
-
-@[simp]
-theorem coe_toHomeomorph (h : M ≃ₘ^n⟮I, J⟯ N) : ⇑h.toHomeomorph = h :=
-  rfl
-
-@[simp]
-theorem coe_toHomeomorph_symm (h : M ≃ₘ^n⟮I, J⟯ N) : ⇑h.toHomeomorph.symm = h.symm :=
-  rfl
 
 @[simp]
 theorem contMDiffWithinAt_comp_diffeomorph_iff {m} (h : M ≃ₘ^n⟮I, J⟯ N) {f : N → M'} {s x}
@@ -327,16 +290,6 @@ def prodCongr (h₁ : M ≃ₘ^n⟮I, I'⟯ M') (h₂ : N ≃ₘ^n⟮J, J'⟯ N'
     (h₁.symm.contMDiff.comp contMDiff_fst).prod_mk (h₂.symm.contMDiff.comp contMDiff_snd)
   toEquiv := h₁.toEquiv.prodCongr h₂.toEquiv
 
-@[simp]
-theorem prodCongr_symm (h₁ : M ≃ₘ^n⟮I, I'⟯ M') (h₂ : N ≃ₘ^n⟮J, J'⟯ N') :
-    (h₁.prodCongr h₂).symm = h₁.symm.prodCongr h₂.symm :=
-  rfl
-
-@[simp]
-theorem coe_prodCongr (h₁ : M ≃ₘ^n⟮I, I'⟯ M') (h₂ : N ≃ₘ^n⟮J, J'⟯ N') :
-    ⇑(h₁.prodCongr h₂) = Prod.map h₁ h₂ :=
-  rfl
-
 section
 
 variable (I J J' M N N' n)
@@ -345,14 +298,6 @@ def prodComm : (M × N) ≃ₘ^n⟮I.prod J, J.prod I⟯ N × M where
   contMDiff_toFun := contMDiff_snd.prod_mk contMDiff_fst
   contMDiff_invFun := contMDiff_snd.prod_mk contMDiff_fst
   toEquiv := Equiv.prodComm M N
-
-@[simp]
-theorem prodComm_symm : (prodComm I J M N n).symm = prodComm J I N M n :=
-  rfl
-
-@[simp]
-theorem coe_prodComm : ⇑(prodComm I J M N n) = Prod.swap :=
-  rfl
 
 def prodAssoc : ((M × N) × N') ≃ₘ^n⟮(I.prod J).prod J', I.prod (J.prod J')⟯ M × N × N' where
   contMDiff_toFun :=
@@ -404,18 +349,6 @@ def toDiffeomorph : E ≃ₘ[𝕜] E' where
   contMDiff_invFun := e.symm.contDiff.contMDiff
   toEquiv := e.toLinearEquiv.toEquiv
 
-@[simp]
-theorem coe_toDiffeomorph : ⇑e.toDiffeomorph = e :=
-  rfl
-
-@[simp]
-theorem symm_toDiffeomorph : e.symm.toDiffeomorph = e.toDiffeomorph.symm :=
-  rfl
-
-@[simp]
-theorem coe_toDiffeomorph_symm : ⇑e.toDiffeomorph.symm = e.symm :=
-  rfl
-
 end ContinuousLinearEquiv
 
 namespace ModelWithCorners
@@ -437,14 +370,6 @@ def transDiffeomorph (I : ModelWithCorners 𝕜 E H) (e : E ≃ₘ[𝕜] E') : M
     exact preimage_mono I.range_subset_closure_interior
   continuous_toFun := e.continuous.comp I.continuous
   continuous_invFun := I.continuous_symm.comp e.symm.continuous
-
-@[simp, mfld_simps]
-theorem coe_transDiffeomorph : ⇑(I.transDiffeomorph e) = e ∘ I :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_transDiffeomorph_symm : ⇑(I.transDiffeomorph e).symm = I.symm ∘ e.symm :=
-  rfl
 
 theorem transDiffeomorph_range : range (I.transDiffeomorph e) = e '' range I :=
   range_comp e I

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Basis/Basic.lean
-Genuine: 41 | Conflates: 1 | Dissolved: 2 | Infrastructure: 5
+Genuine: 42 | Conflates: 2 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finprod
@@ -9,6 +9,8 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.LinearAlgebra.Basis.Defs
 import Mathlib.LinearAlgebra.Finsupp.SumProd
 import Mathlib.LinearAlgebra.LinearIndependent
+
+noncomputable section
 
 /-!
 # Bases
@@ -48,7 +50,8 @@ protected theorem linearIndependent : LinearIndependent R b :=
   fun x y hxy => by
     rw [← b.repr_linearCombination x, hxy, b.repr_linearCombination y]
 
--- DISSOLVED: ne_zero
+protected theorem ne_zero [Nontrivial R] (i) : b i ≠ 0 :=
+  b.linearIndependent.ne_zero i
 
 section Prod
 
@@ -56,14 +59,6 @@ variable (b' : Basis ι' R M')
 
 protected def prod : Basis (ι ⊕ ι') R (M × M') :=
   ofRepr ((b.repr.prod b'.repr).trans (Finsupp.sumFinsuppLEquivProdFinsupp R).symm)
-
-@[simp]
-theorem prod_repr_inl (x) (i) : (b.prod b').repr x (Sum.inl i) = b.repr x.1 i :=
-  rfl
-
-@[simp]
-theorem prod_repr_inr (x) (i) : (b.prod b').repr x (Sum.inr i) = b'.repr x.2 i :=
-  rfl
 
 theorem prod_apply_inl_fst (i) : (b.prod b' (Sum.inl i)).1 = b i :=
   b.repr.injective <| by
@@ -128,7 +123,30 @@ end NoZeroSMulDivisors
 
 section Singleton
 
--- DISSOLVED: basis_singleton_iff
+-- CONFLATES (assumes ground = zero): basis_singleton_iff
+theorem basis_singleton_iff {R M : Type*} [Ring R] [Nontrivial R] [AddCommGroup M] [Module R M]
+    [NoZeroSMulDivisors R M] (ι : Type*) [Unique ι] :
+    Nonempty (Basis ι R M) ↔ ∃ x ≠ 0, ∀ y : M, ∃ r : R, r • x = y := by
+  constructor
+  · rintro ⟨b⟩
+    refine ⟨b default, b.linearIndependent.ne_zero _, ?_⟩
+    simpa [span_singleton_eq_top_iff, Set.range_unique] using b.span_eq
+  · rintro ⟨x, nz, w⟩
+    refine ⟨ofRepr <| LinearEquiv.symm
+      { toFun := fun f => f default • x
+        invFun := fun y => Finsupp.single default (w y).choose
+        left_inv := fun f => Finsupp.unique_ext ?_
+        right_inv := fun y => ?_
+        map_add' := fun y z => ?_
+        map_smul' := fun c y => ?_ }⟩
+    · simp [Finsupp.add_apply, add_smul]
+    · simp only [Finsupp.coe_smul, Pi.smul_apply, RingHom.id_apply]
+      rw [← smul_assoc]
+    · refine smul_left_injective _ nz ?_
+      simp only [Finsupp.single_eq_same]
+      exact (w (f default • x)).choose_spec
+    · simp only [Finsupp.single_eq_same]
+      exact (w y).choose_spec
 
 end Singleton
 
@@ -201,10 +219,6 @@ protected noncomputable def mk : Basis ι R M :=
       invFun := Finsupp.linearCombination _ v
       left_inv := fun x => hli.linearCombination_repr ⟨x, _⟩
       right_inv := fun _ => hli.repr_eq rfl }
-
-@[simp]
-theorem mk_repr : (Basis.mk hli hsp).repr x = hli.repr ⟨x, hsp Submodule.mem_top⟩ :=
-  rfl
 
 theorem mk_apply (i : ι) : Basis.mk hli hsp i = v i :=
   show Finsupp.linearCombination _ v _ = v i by simp
@@ -371,11 +385,6 @@ theorem finTwoProd_zero (R : Type*) [Semiring R] : Basis.finTwoProd R 0 = (1, 0)
 @[simp]
 theorem finTwoProd_one (R : Type*) [Semiring R] : Basis.finTwoProd R 1 = (0, 1) := by
   simp [Basis.finTwoProd, LinearEquiv.finTwoArrow]
-
-@[simp]
-theorem coe_finTwoProd_repr {R : Type*} [Semiring R] (x : R × R) :
-    ⇑((Basis.finTwoProd R).repr x) = ![x.fst, x.snd] :=
-  rfl
 
 end Fin
 

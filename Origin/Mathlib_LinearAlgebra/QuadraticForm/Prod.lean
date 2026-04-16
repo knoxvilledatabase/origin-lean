@@ -5,6 +5,8 @@ Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.LinearAlgebra.QuadraticForm.IsometryEquiv
 
+noncomputable section
+
 /-! # Quadratic form on product and pi types
 
 ## Main definitions
@@ -60,29 +62,9 @@ def IsometryEquiv.prod
   map_app' x := congr_arg₂ (· + ·) (e₁.map_app x.1) (e₂.map_app x.2)
   toLinearEquiv := LinearEquiv.prod e₁.toLinearEquiv e₂.toLinearEquiv
 
-@[simps!]
-def Isometry.inl (Q₁ : QuadraticMap R M₁ P) (Q₂ : QuadraticMap R M₂ P) : Q₁ →qᵢ (Q₁.prod Q₂) where
-  toLinearMap := LinearMap.inl R _ _
-  map_app' m₁ := by simp
-
-@[simps!]
-def Isometry.inr (Q₁ : QuadraticMap R M₁ P) (Q₂ : QuadraticMap R M₂ P) : Q₂ →qᵢ (Q₁.prod Q₂) where
-  toLinearMap := LinearMap.inr R _ _
-  map_app' m₁ := by simp
-
 variable (M₂) in
 
-@[simps!]
-def Isometry.fst (Q₁ : QuadraticMap R M₁ P) : (Q₁.prod (0 : QuadraticMap R M₂ P)) →qᵢ Q₁ where
-  toLinearMap := LinearMap.fst R _ _
-  map_app' m₁ := by simp
-
 variable (M₁) in
-
-@[simps!]
-def Isometry.snd (Q₂ : QuadraticMap R M₂ P) : ((0 : QuadraticMap R M₁ P).prod Q₂) →qᵢ Q₂ where
-  toLinearMap := LinearMap.snd R _ _
-  map_app' m₁ := by simp
 
 @[simp]
 lemma Isometry.fst_comp_inl (Q₁ : QuadraticMap R M₁ P) :

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Filter
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Topology on filters of a space with order topology
 

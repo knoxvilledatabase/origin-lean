@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Fin/Tuple.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 10
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Group.Pi.Basic
 import Mathlib.Data.Fin.VecNotation
+
+noncomputable section
 
 /-!
 # Algebraic properties of tuples
@@ -66,13 +68,6 @@ variable [Add α]
     v + vecCons y w = vecCons (vecHead v + y) (vecTail v + w) := by
   ext i; refine i.cases ?_ ?_ <;> simp [vecHead, vecTail]
 
-lemma cons_add_cons (x : α) (v : Fin n → α) (y : α) (w : Fin n → α) :
-    vecCons x v + vecCons y w = vecCons (x + y) (v + w) := by simp
-
-@[simp] lemma head_add (a b : Fin n.succ → α) : vecHead (a + b) = vecHead a + vecHead b := rfl
-
-@[simp] lemma tail_add (a b : Fin n.succ → α) : vecTail (a + b) = vecTail a + vecTail b := rfl
-
 end Add
 
 section Sub
@@ -89,13 +84,6 @@ variable [Sub α]
     v - vecCons y w = vecCons (vecHead v - y) (vecTail v - w) := by
   ext i; refine i.cases ?_ ?_ <;> simp [vecHead, vecTail]
 
-lemma cons_sub_cons (x : α) (v : Fin n → α) (y : α) (w : Fin n → α) :
-    vecCons x v - vecCons y w = vecCons (x - y) (v - w) := by simp
-
-@[simp] lemma head_sub (a b : Fin n.succ → α) : vecHead (a - b) = vecHead a - vecHead b := rfl
-
-@[simp] lemma tail_sub (a b : Fin n.succ → α) : vecTail (a - b) = vecTail a - vecTail b := rfl
-
 end Sub
 
 section Zero
@@ -107,15 +95,13 @@ variable [Zero α]
 @[simp] lemma cons_zero_zero : vecCons (0 : α) (0 : Fin n → α) = 0 := by
   ext i; exact i.cases rfl (by simp)
 
-@[simp] lemma head_zero : vecHead (0 : Fin n.succ → α) = 0 := rfl
-
-@[simp] lemma tail_zero : vecTail (0 : Fin n.succ → α) = 0 := rfl
-
 @[simp] lemma cons_eq_zero_iff {v : Fin n → α} {x : α} : vecCons x v = 0 ↔ x = 0 ∧ v = 0 where
   mp h := ⟨congr_fun h 0, by convert congr_arg vecTail h⟩
   mpr := fun ⟨hx, hv⟩ ↦ by simp [hx, hv]
 
--- DISSOLVED: cons_nonzero_iff
+lemma cons_nonzero_iff {v : Fin n → α} {x : α} : vecCons x v ≠ 0 ↔ x ≠ 0 ∨ v ≠ 0 where
+  mp h := not_and_or.mp (h ∘ cons_eq_zero_iff.mpr)
+  mpr h := mt cons_eq_zero_iff.mp (not_and_or.mpr h)
 
 end Zero
 
@@ -127,10 +113,6 @@ variable [Neg α]
 
 @[simp] lemma neg_cons (x : α) (v : Fin n → α) : -vecCons x v = vecCons (-x) (-v) := by
   ext i; refine i.cases ?_ ?_ <;> simp
-
-@[simp] lemma head_neg (a : Fin n.succ → α) : vecHead (-a) = -vecHead a := rfl
-
-@[simp] lemma tail_neg (a : Fin n.succ → α) : vecTail (-a) = -vecTail a := rfl
 
 end Neg
 

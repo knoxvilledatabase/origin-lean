@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.CategoryTheory.Equivalence
 
+noncomputable section
+
 /-! Tools for compatibilities between Dold-Kan equivalences
 
 The purpose of this file is to introduce tools which will enable the
@@ -59,9 +61,6 @@ variable {eA} {e'}
 @[simps! functor]
 def equivalence₁ : A ≌ B' := (equivalence₀ eA e').changeFunctor hF
 
-theorem equivalence₁_inverse : (equivalence₁ hF).inverse = e'.inverse ⋙ eA.inverse :=
-  rfl
-
 @[simps!]
 def equivalence₁CounitIso : (e'.inverse ⋙ eA.inverse) ⋙ F ≅ 𝟭 B' :=
   calc
@@ -93,10 +92,6 @@ theorem equivalence₁UnitIso_eq : (equivalence₁ hF).unitIso = equivalence₁U
 @[simps! functor]
 def equivalence₂ : A ≌ B :=
   (equivalence₁ hF).trans eB.symm
-
-theorem equivalence₂_inverse :
-    (equivalence₂ eB hF).inverse = eB.functor ⋙ e'.inverse ⋙ eA.inverse :=
-  rfl
 
 @[simps!]
 def equivalence₂CounitIso : (eB.functor ⋙ e'.inverse ⋙ eA.inverse) ⋙ F ⋙ eB.inverse ≅ 𝟭 B :=
@@ -142,9 +137,6 @@ def equivalence : A ≌ B :=
     _ ≅ (G ⋙ eA.functor) ⋙ eA.inverse := isoWhiskerRight hG _
     _ ≅ G ⋙ 𝟭 A := isoWhiskerLeft _ eA.unitIso.symm
     _ ≅ G := G.rightUnitor))
-
-theorem equivalence_functor : (equivalence hF hG).functor = F ⋙ eB.inverse :=
-  rfl
 
 @[simps! hom_app]
 def τ₀ : eB.functor ⋙ e'.inverse ⋙ e'.functor ≅ eB.functor :=

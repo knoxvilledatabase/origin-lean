@@ -7,6 +7,8 @@ import Mathlib.Data.FunLike.Basic
 import Mathlib.Logic.Embedding.Basic
 import Mathlib.Order.RelClasses
 
+noncomputable section
+
 /-!
 # Relation homomorphisms, embeddings, isomorphisms
 
@@ -100,10 +102,6 @@ initialize_simps_projections RelHom (toFun → apply)
 protected theorem map_rel (f : r →r s) {a b} : r a b → s (f a) (f b) :=
   f.map_rel'
 
-@[simp]
-theorem coe_fn_toFun (f : r →r s) : f.toFun = (f : α → β) :=
-  rfl
-
 theorem coe_fn_injective : Injective fun (f : r →r s) => (f : α → β) :=
   DFunLike.coe_injective
 
@@ -191,14 +189,6 @@ initialize_simps_projections RelEmbedding (toFun → apply)
 instance : EmbeddingLike (r ↪r s) α β where
   injective' f := f.inj'
 
-@[simp]
-theorem coe_toEmbedding {f : r ↪r s} : ((f : r ↪r s).toEmbedding : α → β) = f :=
-  rfl
-
-@[simp]
-theorem coe_toRelHom {f : r ↪r s} : ((f : r ↪r s).toRelHom : α → β) = f :=
-  rfl
-
 theorem toEmbedding_injective : Injective (toEmbedding : r ↪r s → (α ↪ β)) := by
   rintro ⟨f, -⟩ ⟨g, -⟩; simp
 
@@ -213,10 +203,6 @@ theorem inj (f : r ↪r s) {a b} : f a = f b ↔ a = b := f.injective.eq_iff
 
 theorem map_rel_iff (f : r ↪r s) {a b} : s (f a) (f b) ↔ r a b :=
   f.map_rel_iff'
-
-@[simp]
-theorem coe_mk {f} {h} : ⇑(⟨f, h⟩ : r ↪r s) = f :=
-  rfl
 
 theorem coe_fn_injective : Injective fun f : r ↪r s => (f : α → β) :=
   DFunLike.coe_injective
@@ -234,13 +220,6 @@ protected def trans (f : r ↪r s) (g : s ↪r t) : r ↪r t :=
 
 instance (r : α → α → Prop) : Inhabited (r ↪r r) :=
   ⟨RelEmbedding.refl _⟩
-
-theorem trans_apply (f : r ↪r s) (g : s ↪r t) (a : α) : (f.trans g) a = g (f a) :=
-  rfl
-
-@[simp]
-theorem coe_trans (f : r ↪r s) (g : s ↪r t) : (f.trans g) = g ∘ f :=
-  rfl
 
 protected def swap (f : r ↪r s) : swap r ↪r swap s :=
   ⟨f.toEmbedding, f.map_rel_iff⟩
@@ -331,6 +310,7 @@ noncomputable def Quotient.outRelEmbedding {_ : Setoid α} {r : α → α → Pr
     apply iff_iff_eq.2 (H _ _ _ _ _ _) <;> apply Quotient.mk_out⟩
 
 set_option linter.deprecated false in
+/-- `Quotient.out'` as a relation embedding between the lift of a relation and the relation. -/
 
 noncomputable def Quotient.out'RelEmbedding {_ : Setoid α} {r : α → α → Prop}
     (H : ∀ (a₁ b₁ a₂ b₂ : α), a₁ ≈ a₂ → b₁ ≈ b₂ → r a₁ b₁ = r a₂ b₂) :
@@ -384,12 +364,6 @@ def ofMapRelIff (f : α → β) [IsAntisymm α r] [IsRefl β s] (hf : ∀ a b, s
   inj' _ _ h := antisymm ((hf _ _).1 (h ▸ refl _)) ((hf _ _).1 (h ▸ refl _))
   map_rel_iff' := hf _ _
 
-@[simp]
-theorem ofMapRelIff_coe (f : α → β) [IsAntisymm α r] [IsRefl β s]
-    (hf : ∀ a b, s (f a) (f b) ↔ r a b) :
-    (ofMapRelIff f hf : r ↪r s) = f :=
-  rfl
-
 def ofMonotone [IsTrichotomous α r] [IsAsymm β s] (f : α → β) (H : ∀ a b, r a b → s (f a) (f b)) :
     r ↪r s := by
   haveI := @IsAsymm.isIrrefl β s _
@@ -401,11 +375,6 @@ def ofMonotone [IsTrichotomous α r] [IsAsymm β s] (f : α → β) (H : ∀ a b
     · subst e
       exact irrefl _ h
     · exact asymm (H _ _ h') h
-
-@[simp]
-theorem ofMonotone_coe [IsTrichotomous α r] [IsAsymm β s] (f : α → β) (H) :
-    (@ofMonotone _ _ r s _ _ f H : α → β) = f :=
-  rfl
 
 def ofIsEmpty (r : α → α → Prop) (s : β → β → Prop) [IsEmpty α] : r ↪r s :=
   ⟨Embedding.ofIsEmpty, @fun a => isEmptyElim a⟩
@@ -497,25 +466,8 @@ instance : EquivLike (r ≃r s) α β where
   right_inv f := f.right_inv
   coe_injective' _ _ hf _ := DFunLike.ext' hf
 
-@[simp]
-theorem coe_toRelEmbedding (f : r ≃r s) : (f.toRelEmbedding : α → β) = f :=
-  rfl
-
-@[simp]
-theorem coe_toEmbedding (f : r ≃r s) : (f.toEmbedding : α → β) = f :=
-  rfl
-
 theorem map_rel_iff (f : r ≃r s) {a b} : s (f a) (f b) ↔ r a b :=
   f.map_rel_iff'
-
-@[simp]
-theorem coe_fn_mk (f : α ≃ β) (o : ∀ ⦃a b⦄, s (f a) (f b) ↔ r a b) :
-    (RelIso.mk f @o : α → β) = f :=
-  rfl
-
-@[simp]
-theorem coe_fn_toEquiv (f : r ≃r s) : (f.toEquiv : α → β) = f :=
-  rfl
 
 theorem coe_fn_injective : Injective fun f : r ≃r s => (f : α → β) :=
   DFunLike.coe_injective
@@ -546,10 +498,6 @@ protected def trans (f₁ : r ≃r s) (f₂ : s ≃r t) : r ≃r t :=
 instance (r : α → α → Prop) : Inhabited (r ≃r r) :=
   ⟨RelIso.refl _⟩
 
-@[simp]
-theorem default_def (r : α → α → Prop) : default = RelIso.refl r :=
-  rfl
-
 @[simps! toEquiv apply]
 protected def cast {α β : Type u} {r : α → α → Prop} {s : β → β → Prop} (h₁ : α = β)
     (h₂ : HEq r s) : r ≃r s :=
@@ -557,16 +505,6 @@ protected def cast {α β : Type u} {r : α → α → Prop} {s : β → β → 
     subst h₁
     rw [eq_of_heq h₂]
     rfl⟩
-
-@[simp]
-protected theorem cast_symm {α β : Type u} {r : α → α → Prop} {s : β → β → Prop} (h₁ : α = β)
-    (h₂ : HEq r s) : (RelIso.cast h₁ h₂).symm = RelIso.cast h₁.symm h₂.symm :=
-  rfl
-
-@[simp]
-protected theorem cast_refl {α : Type u} {r : α → α → Prop} (h₁ : α = α := rfl)
-    (h₂ : HEq r r := HEq.rfl) : RelIso.cast h₁ h₂ = RelIso.refl r :=
-  rfl
 
 @[simp]
 protected theorem cast_trans {α β γ : Type u} {r : α → α → Prop} {s : β → β → Prop}
@@ -580,10 +518,6 @@ protected def swap (f : r ≃r s) : swap r ≃r swap s :=
 @[simps!]
 protected def compl (f : r ≃r s) : rᶜ ≃r sᶜ :=
   ⟨f, f.map_rel_iff.not⟩
-
-@[simp]
-theorem coe_fn_symm_mk (f o) : ((@RelIso.mk _ _ r s f @o).symm : β → α) = f.symm :=
-  rfl
 
 @[simp]
 theorem apply_symm_apply (e : r ≃r s) (x : β) : e (e.symm x) = x :=

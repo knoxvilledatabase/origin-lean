@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/LSeries/Convolution.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.Normed.Field.InfiniteSum
 import Mathlib.NumberTheory.ArithmeticFunction
 import Mathlib.NumberTheory.LSeries.Convergence
+
+noncomputable section
 
 /-!
 # Dirichlet convolution of sequences and products of L-series
@@ -35,7 +37,13 @@ def toArithmeticFunction {R : Type*} [Zero R] (f : ℕ → R) : ArithmeticFuncti
   toFun n := if n = 0 then 0 else f n
   map_zero' := rfl
 
--- DISSOLVED: toArithmeticFunction_congr
+lemma toArithmeticFunction_congr {R : Type*} [Zero R] {f f' : ℕ → R}
+    (h : ∀ {n}, n ≠ 0 → f n = f' n) :
+    toArithmeticFunction f = toArithmeticFunction f' := by
+  ext ⟨- | _⟩
+  · simp only [zero_eq, ArithmeticFunction.map_zero]
+  · simp only [toArithmeticFunction, ArithmeticFunction.coe_mk, succ_ne_zero, ↓reduceIte,
+      ne_eq, not_false_eq_true, h]
 
 @[simp]
 lemma ArithmeticFunction.toArithmeticFunction_eq_self {R : Type*} [Zero R]
@@ -49,7 +57,10 @@ noncomputable def LSeries.convolution {R : Type*} [Semiring R] (f g : ℕ → R)
 
 scoped[LSeries.notation] infixl:70 " ⍟ " => LSeries.convolution
 
--- DISSOLVED: LSeries.convolution_congr
+lemma LSeries.convolution_congr {R : Type*} [Semiring R] {f f' g g' : ℕ → R}
+    (hf : ∀ {n}, n ≠ 0 → f n = f' n) (hg : ∀ {n}, n ≠ 0 → g n = g' n) :
+    f ⍟ g = f' ⍟ g' := by
+  simp only [convolution, toArithmeticFunction_congr hf, toArithmeticFunction_congr hg]
 
 lemma ArithmeticFunction.coe_mul {R : Type*} [Semiring R] (f g : ArithmeticFunction R) :
     f ⍟ g = ⇑(f * g) := by

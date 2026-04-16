@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.RadonNikodym
 import Mathlib.Probability.ConditionalProbability
 
+noncomputable section
+
 /-!
 # s-finite measures can be written as `withDensity` of a finite measure
 
@@ -79,9 +81,6 @@ lemma toFinite_apply_eq_zero_iff [SFinite μ] {s : Set α} : μ.toFinite s = 0 �
 lemma toFinite_eq_zero_iff [SFinite μ] : μ.toFinite = 0 ↔ μ = 0 := by
   simp_rw [← Measure.measure_univ_eq_zero, toFinite_apply_eq_zero_iff]
 
-@[simp]
-lemma toFinite_zero : Measure.toFinite (0 : Measure α) = 0 := by simp
-
 lemma toFinite_eq_self [IsProbabilityMeasure μ] : μ.toFinite = μ := by
   rw [Measure.toFinite, Measure.toFiniteAux, if_pos, ProbabilityTheory.cond_univ]
   infer_instance
@@ -110,29 +109,30 @@ noncomputable def Measure.densityToFinite (μ : Measure α) [SFinite μ] (a : α
   μ.rnDeriv μ.toFinite a
 
 set_option linter.deprecated false in
-
-lemma densityToFinite_def (μ : Measure α) [SFinite μ] :
-    μ.densityToFinite = μ.rnDeriv μ.toFinite :=
-  rfl
+@[deprecated "No deprecation message was provided." (since := "2024-10-04")]
 
 set_option linter.deprecated false in
+@[deprecated Measure.measurable_rnDeriv (since := "2024-10-04")]
 
 lemma measurable_densityToFinite (μ : Measure α) [SFinite μ] : Measurable μ.densityToFinite :=
   Measure.measurable_rnDeriv _ _
 
 set_option linter.deprecated false in
+@[deprecated Measure.withDensity_rnDeriv_eq (since := "2024-10-04")]
 
 theorem withDensity_densitytoFinite (μ : Measure α) [SFinite μ] :
     μ.toFinite.withDensity μ.densityToFinite = μ :=
   Measure.withDensity_rnDeriv_eq _ _ (absolutelyContinuous_toFinite _)
 
 set_option linter.deprecated false in
+@[deprecated Measure.rnDeriv_lt_top (since := "2024-10-04")]
 
 lemma densityToFinite_ae_lt_top (μ : Measure α) [SigmaFinite μ] :
     ∀ᵐ x ∂μ, μ.densityToFinite x < ∞ :=
   (absolutelyContinuous_toFinite μ).ae_le <| Measure.rnDeriv_lt_top _ _
 
 set_option linter.deprecated false in
+@[deprecated Measure.rnDeriv_ne_top (since := "2024-10-04")]
 
 lemma densityToFinite_ae_ne_top (μ : Measure α) [SigmaFinite μ] :
     ∀ᵐ x ∂μ, μ.densityToFinite x ≠ ∞ :=

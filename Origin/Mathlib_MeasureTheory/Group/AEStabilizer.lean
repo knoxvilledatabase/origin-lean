@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Group.Action
 import Mathlib.Order.Filter.EventuallyConst
 
+noncomputable section
+
 /-!
 # A.e. stabilizer of a set
 

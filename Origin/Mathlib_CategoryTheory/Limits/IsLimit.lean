@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.Limits.Cones
 import Batteries.Tactic.Congr
 
+noncomputable section
+
 /-!
 # Limits and colimits
 
@@ -135,26 +137,11 @@ def ofIsoLimit {r t : Cone F} (P : IsLimit r) (i : r ≅ t) : IsLimit t :=
   IsLimit.mkConeMorphism (fun s => P.liftConeMorphism s ≫ i.hom) fun s m => by
     rw [← i.comp_inv_eq]; apply P.uniq_cone_morphism
 
-@[simp]
-theorem ofIsoLimit_lift {r t : Cone F} (P : IsLimit r) (i : r ≅ t) (s) :
-    (P.ofIsoLimit i).lift s = P.lift s ≫ i.hom.hom :=
-  rfl
-
 def equivIsoLimit {r t : Cone F} (i : r ≅ t) : IsLimit r ≃ IsLimit t where
   toFun h := h.ofIsoLimit i
   invFun h := h.ofIsoLimit i.symm
   left_inv := by aesop_cat
   right_inv := by aesop_cat
-
-@[simp]
-theorem equivIsoLimit_apply {r t : Cone F} (i : r ≅ t) (P : IsLimit r) :
-    equivIsoLimit i P = P.ofIsoLimit i :=
-  rfl
-
-@[simp]
-theorem equivIsoLimit_symm_apply {r t : Cone F} (i : r ≅ t) (P : IsLimit t) :
-    (equivIsoLimit i).symm P = P.ofIsoLimit i.symm :=
-  rfl
 
 def ofPointIso {r t : Cone F} (P : IsLimit r) [i : IsIso (P.lift t)] : IsLimit t :=
   ofIsoLimit P (by
@@ -187,21 +174,6 @@ def ofConeEquiv {D : Type u₄} [Category.{v₄} D] {G : K ⥤ D} (h : Cone G �
   left_inv := by aesop_cat
   right_inv := by aesop_cat
 
-@[simp]
-theorem ofConeEquiv_apply_desc {D : Type u₄} [Category.{v₄} D] {G : K ⥤ D} (h : Cone G ≌ Cone F)
-    {c : Cone G} (P : IsLimit (h.functor.obj c)) (s) :
-    (ofConeEquiv h P).lift s =
-      ((h.unitIso.hom.app s).hom ≫ (h.inverse.map (P.liftConeMorphism (h.functor.obj s))).hom) ≫
-        (h.unitIso.inv.app c).hom :=
-  rfl
-
-@[simp]
-theorem ofConeEquiv_symm_apply_desc {D : Type u₄} [Category.{v₄} D] {G : K ⥤ D}
-    (h : Cone G ≌ Cone F) {c : Cone G} (P : IsLimit c) (s) :
-    ((ofConeEquiv h).symm P).lift s =
-      (h.counitIso.inv.app s).hom ≫ (h.functor.map (P.liftConeMorphism (h.inverse.obj s))).hom :=
-  rfl
-
 def postcomposeHomEquiv {F G : J ⥤ C} (α : F ≅ G) (c : Cone F) :
     IsLimit ((Cones.postcompose α.hom).obj c) ≃ IsLimit c :=
   ofConeEquiv (Cones.postcomposeEquivalence α)
@@ -221,16 +193,6 @@ def conePointsIsoOfNatIso {F G : J ⥤ C} {s : Cone F} {t : Cone G} (P : IsLimit
   inv := P.map t w.inv
   hom_inv_id := P.hom_ext (by aesop_cat)
   inv_hom_id := Q.hom_ext (by aesop_cat)
-
-@[reassoc]
-theorem conePointsIsoOfNatIso_hom_comp {F G : J ⥤ C} {s : Cone F} {t : Cone G} (P : IsLimit s)
-    (Q : IsLimit t) (w : F ≅ G) (j : J) :
-    (conePointsIsoOfNatIso P Q w).hom ≫ t.π.app j = s.π.app j ≫ w.hom.app j := by simp
-
-@[reassoc]
-theorem conePointsIsoOfNatIso_inv_comp {F G : J ⥤ C} {s : Cone F} {t : Cone G} (P : IsLimit s)
-    (Q : IsLimit t) (w : F ≅ G) (j : J) :
-    (conePointsIsoOfNatIso P Q w).inv ≫ s.π.app j = t.π.app j ≫ w.inv.app j := by simp
 
 @[reassoc]
 theorem lift_comp_conePointsIsoOfNatIso_hom {F G : J ⥤ C} {r s : Cone F} {t : Cone G}
@@ -298,11 +260,6 @@ def homIso (h : IsLimit t) (W : C) : ULift.{u₁} (W ⟶ t.pt : Type v₃) ≅ (
   hom_inv_id := by
     funext f; apply ULift.ext
     apply h.hom_ext; intro j; simp
-
-@[simp]
-theorem homIso_hom (h : IsLimit t) {W : C} (f : ULift.{u₁} (W ⟶ t.pt)) :
-    (IsLimit.homIso h W).hom f = (t.extend f.down).π :=
-  rfl
 
 def natIso (h : IsLimit t) : yoneda.obj t.pt ⋙ uliftFunctor.{u₁} ≅ F.cones :=
   NatIso.ofComponents fun W => IsLimit.homIso h (unop W)
@@ -497,26 +454,11 @@ def ofIsoColimit {r t : Cocone F} (P : IsColimit r) (i : r ≅ t) : IsColimit t 
   IsColimit.mkCoconeMorphism (fun s => i.inv ≫ P.descCoconeMorphism s) fun s m => by
     rw [i.eq_inv_comp]; apply P.uniq_cocone_morphism
 
-@[simp]
-theorem ofIsoColimit_desc {r t : Cocone F} (P : IsColimit r) (i : r ≅ t) (s) :
-    (P.ofIsoColimit i).desc s = i.inv.hom ≫ P.desc s :=
-  rfl
-
 def equivIsoColimit {r t : Cocone F} (i : r ≅ t) : IsColimit r ≃ IsColimit t where
   toFun h := h.ofIsoColimit i
   invFun h := h.ofIsoColimit i.symm
   left_inv := by aesop_cat
   right_inv := by aesop_cat
-
-@[simp]
-theorem equivIsoColimit_apply {r t : Cocone F} (i : r ≅ t) (P : IsColimit r) :
-    equivIsoColimit i P = P.ofIsoColimit i :=
-  rfl
-
-@[simp]
-theorem equivIsoColimit_symm_apply {r t : Cocone F} (i : r ≅ t) (P : IsColimit t) :
-    (equivIsoColimit i).symm P = P.ofIsoColimit i.symm :=
-  rfl
 
 def ofPointIso {r t : Cocone F} (P : IsColimit r) [i : IsIso (P.desc t)] : IsColimit t :=
   ofIsoColimit P (by
@@ -558,21 +500,6 @@ def ofCoconeEquiv {D : Type u₄} [Category.{v₄} D] {G : K ⥤ D} (h : Cocone 
   left_inv := by aesop_cat
   right_inv := by aesop_cat
 
-@[simp]
-theorem ofCoconeEquiv_apply_desc {D : Type u₄} [Category.{v₄} D] {G : K ⥤ D}
-    (h : Cocone G ≌ Cocone F) {c : Cocone G} (P : IsColimit (h.functor.obj c)) (s) :
-    (ofCoconeEquiv h P).desc s =
-      (h.unit.app c).hom ≫
-        (h.inverse.map (P.descCoconeMorphism (h.functor.obj s))).hom ≫ (h.unitInv.app s).hom :=
-  rfl
-
-@[simp]
-theorem ofCoconeEquiv_symm_apply_desc {D : Type u₄} [Category.{v₄} D] {G : K ⥤ D}
-    (h : Cocone G ≌ Cocone F) {c : Cocone G} (P : IsColimit c) (s) :
-    ((ofCoconeEquiv h).symm P).desc s =
-      (h.functor.map (P.descCoconeMorphism (h.inverse.obj s))).hom ≫ (h.counit.app s).hom :=
-  rfl
-
 def precomposeHomEquiv {F G : J ⥤ C} (α : F ≅ G) (c : Cocone G) :
     IsColimit ((Cocones.precompose α.hom).obj c) ≃ IsColimit c :=
   ofCoconeEquiv (Cocones.precomposeEquivalence α)
@@ -592,16 +519,6 @@ def coconePointsIsoOfNatIso {F G : J ⥤ C} {s : Cocone F} {t : Cocone G} (P : I
   inv := Q.map s w.inv
   hom_inv_id := P.hom_ext (by aesop_cat)
   inv_hom_id := Q.hom_ext (by aesop_cat)
-
-@[reassoc]
-theorem comp_coconePointsIsoOfNatIso_hom {F G : J ⥤ C} {s : Cocone F} {t : Cocone G}
-    (P : IsColimit s) (Q : IsColimit t) (w : F ≅ G) (j : J) :
-    s.ι.app j ≫ (coconePointsIsoOfNatIso P Q w).hom = w.hom.app j ≫ t.ι.app j := by simp
-
-@[reassoc]
-theorem comp_coconePointsIsoOfNatIso_inv {F G : J ⥤ C} {s : Cocone F} {t : Cocone G}
-    (P : IsColimit s) (Q : IsColimit t) (w : F ≅ G) (j : J) :
-    t.ι.app j ≫ (coconePointsIsoOfNatIso P Q w).inv = w.inv.app j ≫ s.ι.app j := by simp
 
 @[reassoc]
 theorem coconePointsIsoOfNatIso_hom_desc {F G : J ⥤ C} {s : Cocone F} {r t : Cocone G}
@@ -672,17 +589,8 @@ def homEquiv (h : IsColimit t) (W : C) : (t.pt ⟶ W) ≃ (F ⟶ (const J).obj W
   left_inv f := h.hom_ext (by simp)
   right_inv ι := by aesop_cat
 
-@[simp]
-lemma homEquiv_apply (h : IsColimit t) {W : C} (f : t.pt ⟶ W) :
-    h.homEquiv W f = (t.extend f).ι := rfl
-
 def homIso (h : IsColimit t) (W : C) : ULift.{u₁} (t.pt ⟶ W : Type v₃) ≅ F ⟶ (const J).obj W :=
   Equiv.toIso (Equiv.ulift.trans (h.homEquiv W))
-
-@[simp]
-theorem homIso_hom (h : IsColimit t) {W : C} (f : ULift (t.pt ⟶ W)) :
-    (IsColimit.homIso h W).hom f = (t.extend f.down).ι :=
-  rfl
 
 def natIso (h : IsColimit t) : coyoneda.obj (op t.pt) ⋙ uliftFunctor.{u₁} ≅ F.cocones :=
   NatIso.ofComponents (IsColimit.homIso h)

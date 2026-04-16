@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/PrimeSpectrum.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 1 | Infrastructure: 12
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.SumProd
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Ideal.Prod
 import Mathlib.RingTheory.Localization.Ideal
 import Mathlib.RingTheory.Nilpotent.Lemmas
 import Mathlib.RingTheory.Noetherian.Basic
+
+noncomputable section
 
 /-!
 # Prime spectrum of a commutative (semi)ring as a type
@@ -71,13 +73,6 @@ instance [Subsingleton R] : IsEmpty (PrimeSpectrum R) :=
   ⟨fun x ↦ x.isPrime.ne_top <| SetLike.ext' <| Subsingleton.eq_univ_of_nonempty x.asIdeal.nonempty⟩
 
 variable (R S)
-
-@[simps]
-def equivSubtype : PrimeSpectrum R ≃ {I : Ideal R // I.IsPrime} where
-  toFun I := ⟨I.asIdeal, I.2⟩
-  invFun I := ⟨I, I.2⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 @[simp]
 def primeSpectrumProdOfSum : PrimeSpectrum R ⊕ PrimeSpectrum S → PrimeSpectrum (R × S)
@@ -318,7 +313,10 @@ theorem zeroLocus_singleton_mul (f g : R) :
     zeroLocus ({f * g} : Set R) = zeroLocus {f} ∪ zeroLocus {g} :=
   Set.ext fun x => by simpa using x.2.mul_mem_iff_mem_or_mem
 
--- DISSOLVED: zeroLocus_pow
+@[simp]
+theorem zeroLocus_pow (I : Ideal R) {n : ℕ} (hn : n ≠ 0) :
+    zeroLocus ((I ^ n : Ideal R) : Set R) = zeroLocus I :=
+  zeroLocus_radical (I ^ n) ▸ (I.radical_pow hn).symm ▸ zeroLocus_radical I
 
 @[simp]
 theorem zeroLocus_singleton_pow (f : R) (n : ℕ) (hn : 0 < n) :
@@ -349,14 +347,6 @@ See the corresponding section at `Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic`
 
 instance : PartialOrder (PrimeSpectrum R) :=
   PartialOrder.lift asIdeal (@PrimeSpectrum.ext _ _)
-
-@[simp]
-theorem asIdeal_le_asIdeal (x y : PrimeSpectrum R) : x.asIdeal ≤ y.asIdeal ↔ x ≤ y :=
-  Iff.rfl
-
-@[simp]
-theorem asIdeal_lt_asIdeal (x y : PrimeSpectrum R) : x.asIdeal < y.asIdeal ↔ x < y :=
-  Iff.rfl
 
 instance [IsDomain R] : OrderBot (PrimeSpectrum R) where
   bot := ⟨⊥, Ideal.bot_prime⟩
@@ -472,19 +462,6 @@ variable (f : R →+* S)
 @[simp]
 theorem specComap_asIdeal (y : PrimeSpectrum S) :
     (f.specComap y).asIdeal = Ideal.comap f y.asIdeal :=
-  rfl
-
-@[simp]
-theorem specComap_id : (RingHom.id R).specComap = fun x => x :=
-  rfl
-
-@[simp]
-theorem specComap_comp (f : R →+* S) (g : S →+* S') :
-    (g.comp f).specComap = f.specComap.comp g.specComap :=
-  rfl
-
-theorem specComap_comp_apply (f : R →+* S) (g : S →+* S') (x : PrimeSpectrum S') :
-    (g.comp f).specComap x = f.specComap (g.specComap x) :=
   rfl
 
 @[simp]

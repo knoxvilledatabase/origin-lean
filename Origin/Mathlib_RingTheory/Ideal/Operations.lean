@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Operations.lean
-Genuine: 157 | Conflates: 0 | Dissolved: 12 | Infrastructure: 21
+Genuine: 167 | Conflates: 0 | Dissolved: 2 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Operations
@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Lattice
 import Mathlib.RingTheory.Coprime.Lemmas
 import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.NonUnitalSubsemiring.Basic
+
+noncomputable section
 
 /-!
 # More operations on modules and ideals
@@ -31,9 +33,6 @@ instance : SMul (Ideal R) (Submodule R M) where
     smul_mem' := fun r m hm ↦ AddSubmonoid.smul_induction_on hm
       (fun m hm n ↦ by rw [smul_smul]; exact AddSubmonoid.smul_mem_smul <| I.smul_mem _ hm)
       fun m₁ m₂ h₁ h₂ ↦ by rw [smul_add]; exact (I.1 • N.1).add_mem h₁ h₂ }
-
-protected theorem _root_.Ideal.smul_eq_mul (I J : Ideal R) : I • J = I * J :=
-  rfl
 
 variable {I J : Ideal R} {N P : Submodule R M}
 
@@ -358,7 +357,10 @@ theorem pow_le_pow_right {m n : ℕ} (h : m ≤ n) : I ^ n ≤ I ^ m := by
   simp_rw [add_comm, (· ^ ·), Pow.pow, npowRec_add _ _ m.succ_ne_zero _ I.one_mul]
   exact mul_le_left
 
--- DISSOLVED: pow_le_self
+theorem pow_le_self {n : ℕ} (hn : n ≠ 0) : I ^ n ≤ I :=
+  calc
+    I ^ n ≤ I ^ 1 := pow_le_pow_right (Nat.pos_of_ne_zero hn)
+    _ = I := Submodule.pow_one _
 
 theorem pow_right_mono (e : I ≤ J) (n : ℕ) : I ^ n ≤ J ^ n := by
   induction' n with _ hn
@@ -477,17 +479,30 @@ theorem span_singleton_mul_le_span_singleton_mul {x y : R} {I J : Ideal R} :
     span {x} * I ≤ span {y} * J ↔ ∀ zI ∈ I, ∃ zJ ∈ J, x * zI = y * zJ := by
   simp only [span_singleton_mul_le_iff, mem_span_singleton_mul, eq_comm]
 
--- DISSOLVED: span_singleton_mul_right_mono
+theorem span_singleton_mul_right_mono [IsDomain R] {x : R} (hx : x ≠ 0) :
+    span {x} * I ≤ span {x} * J ↔ I ≤ J := by
+  simp_rw [span_singleton_mul_le_span_singleton_mul, mul_right_inj' hx,
+    exists_eq_right', SetLike.le_def]
 
--- DISSOLVED: span_singleton_mul_left_mono
+theorem span_singleton_mul_left_mono [IsDomain R] {x : R} (hx : x ≠ 0) :
+    I * span {x} ≤ J * span {x} ↔ I ≤ J := by
+  simpa only [mul_comm I, mul_comm J] using span_singleton_mul_right_mono hx
 
--- DISSOLVED: span_singleton_mul_right_inj
+theorem span_singleton_mul_right_inj [IsDomain R] {x : R} (hx : x ≠ 0) :
+    span {x} * I = span {x} * J ↔ I = J := by
+  simp only [le_antisymm_iff, span_singleton_mul_right_mono hx]
 
--- DISSOLVED: span_singleton_mul_left_inj
+theorem span_singleton_mul_left_inj [IsDomain R] {x : R} (hx : x ≠ 0) :
+    I * span {x} = J * span {x} ↔ I = J := by
+  simp only [le_antisymm_iff, span_singleton_mul_left_mono hx]
 
--- DISSOLVED: span_singleton_mul_right_injective
+theorem span_singleton_mul_right_injective [IsDomain R] {x : R} (hx : x ≠ 0) :
+    Function.Injective ((span {x} : Ideal R) * ·) := fun _ _ =>
+  (span_singleton_mul_right_inj hx).mp
 
--- DISSOLVED: span_singleton_mul_left_injective
+theorem span_singleton_mul_left_injective [IsDomain R] {x : R} (hx : x ≠ 0) :
+    Function.Injective fun I : Ideal R => I * span {x} := fun _ _ =>
+  (span_singleton_mul_left_inj hx).mp
 
 theorem eq_span_singleton_mul {x : R} (I J : Ideal R) :
     I = span {x} * J ↔ (∀ zI ∈ I, ∃ zJ ∈ J, x * zJ = zI) ∧ ∀ z ∈ J, x * z ∈ I := by
@@ -708,8 +723,6 @@ def radical (I : Ideal R) : Ideal R where
     ⟨m + n - 1, add_pow_add_pred_mem_of_pow_mem I hxmi hyni⟩
   smul_mem' {r s} := fun ⟨n, h⟩ ↦ ⟨n, (mul_pow r s n).symm ▸ I.mul_mem_left (r ^ n) h⟩
 
-theorem mem_radical_iff {r : R} : r ∈ I.radical ↔ ∃ n : ℕ, r ^ n ∈ I := Iff.rfl
-
 def IsRadical (I : Ideal R) : Prop :=
   I.radical ≤ I
 
@@ -875,7 +888,9 @@ theorem top_pow (n : ℕ) : (⊤ ^ n : Ideal R) = ⊤ :=
 
 variable (I)
 
--- DISSOLVED: radical_pow
+lemma radical_pow : ∀ {n}, n ≠ 0 → radical (I ^ n) = radical I
+  | 1, _ => by simp
+  | n + 2, _ => by rw [pow_succ, radical_mul, radical_pow n.succ_ne_zero, inf_idem]
 
 theorem IsPrime.mul_le {I J P : Ideal R} (hp : IsPrime P) : I * J ≤ P ↔ I ≤ P ∨ J ≤ P := by
   rw [or_comm, Ideal.mul_le]
@@ -896,7 +911,12 @@ theorem IsPrime.multiset_prod_mem_iff_exists_mem {I : Ideal R} (hI : I.IsPrime) 
     s.prod ∈ I ↔ ∃ p ∈ s, p ∈ I := by
   simpa [span_singleton_le_iff_mem] using (hI.multiset_prod_map_le (span {·}))
 
--- DISSOLVED: IsPrime.pow_le_iff
+theorem IsPrime.pow_le_iff {I P : Ideal R} [hP : P.IsPrime] {n : ℕ} (hn : n ≠ 0) :
+    I ^ n ≤ P ↔ I ≤ P := by
+  have h : (Multiset.replicate n I).prod ≤ P ↔ _ := hP.multiset_prod_le
+  simp_rw [Multiset.prod_replicate, Multiset.mem_replicate, ne_eq, hn, not_false_eq_true,
+    true_and, exists_eq_left] at h
+  exact h
 
 theorem IsPrime.le_of_pow_le {I P : Ideal R} [hP : P.IsPrime] {n : ℕ} (h : I ^ n ≤ P) :
     I ≤ P := by
@@ -1165,7 +1185,9 @@ theorem mem_ideal_span_range_iff_exists_fun [Fintype α] {x : R} {v : α → R} 
 
 end span_range
 
--- DISSOLVED: Associates.mk_ne_zero'
+theorem Associates.mk_ne_zero' {R : Type*} [CommSemiring R] {r : R} :
+    Associates.mk (Ideal.span {r} : Ideal R) ≠ 0 ↔ r ≠ 0 := by
+  rw [Associates.mk_ne_zero, Ideal.zero_eq_bot, Ne, Ideal.span_singleton_eq_bot]
 
 open scoped nonZeroDivisors in
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Algebra.Group.Hom.Defs
 
+noncomputable section
+
 /-!
 # Endomorphisms, homomorphisms and group actions
 
@@ -56,12 +58,6 @@ abbrev compHom [Monoid N] (g : N →* M) : MulAction N α where
   -- Porting note: was `by simp [g.map_mul, MulAction.mul_smul]`
   mul_smul _ _ _ := by simpa [(· • ·)] using MulAction.mul_smul ..
 
-@[to_additive]
-lemma compHom_smul_def
-    {E F G : Type*} [Monoid E] [Monoid F] [MulAction F G] (f : E →* F) (a : E) (x : G) :
-    letI : MulAction E G := MulAction.compHom _ f
-    a • x = (f a) • x := rfl
-
 end MulAction
 
 end
@@ -110,12 +106,6 @@ instance Function.End.applyMulAction : MulAction (Function.End α) α where
   smul := (· <| ·)
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
-
-@[simp] lemma Function.End.smul_def (f : Function.End α) (a : α) : f • a = f a := rfl
-
-lemma Function.End.mul_def (f g : Function.End α) : (f * g) = f ∘ g := rfl
-
-lemma Function.End.one_def : (1 : Function.End α) = id := rfl
 
 def MulAction.toEndHom [Monoid M] [MulAction M α] : M →* Function.End α where
   toFun := (· • ·)

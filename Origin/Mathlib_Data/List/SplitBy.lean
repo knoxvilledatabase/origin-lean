@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.List.Chain
 
+noncomputable section
+
 /-!
 # Split a list into contiguous runs of elements which pairwise satisfy a relation.
 
@@ -22,10 +24,6 @@ The main results are the following:
 namespace List
 
 variable {α : Type*} {m : List α}
-
-@[simp]
-theorem splitBy_nil (r : α → α → Bool) : splitBy r [] = [] :=
-  rfl
 
 private theorem splitByLoop_eq_append {r : α → α → Bool} {l : List α} {a : α} {g : List α}
     (gs : List (List α)) : splitBy.loop r l a g gs = gs.reverse ++ splitBy.loop r l a g [] := by

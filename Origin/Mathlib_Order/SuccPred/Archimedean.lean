@@ -5,6 +5,8 @@ Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Order.SuccPred.Basic
 
+noncomputable section
+
 /-!
 # Archimedean successor and predecessor
 

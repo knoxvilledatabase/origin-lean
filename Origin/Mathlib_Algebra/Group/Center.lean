@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Invertible.Basic
 import Mathlib.Logic.Basic
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # Centers of magmas and semigroups
 

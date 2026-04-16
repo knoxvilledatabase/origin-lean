@@ -8,6 +8,8 @@ import Mathlib.Control.Traversable.Basic
 import Mathlib.Data.List.Forall2
 import Mathlib.Data.Set.Functor
 
+noncomputable section
+
 /-!
 # LawfulTraversable instances
 
@@ -99,15 +101,6 @@ end
 section Traverse
 
 variable {α' β' : Type u} (f : α' → F β')
-
-@[simp]
-theorem traverse_nil : traverse f ([] : List α') = (pure [] : F (List β')) :=
-  rfl
-
-@[simp]
-theorem traverse_cons (a : α') (l : List α') :
-    traverse f (a :: l) = (· :: ·) <$> f a <*> traverse f l :=
-  rfl
 
 variable [LawfulApplicative F]
 

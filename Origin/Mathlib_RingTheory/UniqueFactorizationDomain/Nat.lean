@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Nat.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.ENat.Basic
 import Mathlib.Data.Nat.Factors
 import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
+
+noncomputable section
 
 /-!
 # Unique factorization of natural numbers
@@ -38,7 +40,16 @@ instance instUniqueFactorizationMonoid : UniqueFactorizationMonoid ℕ where
 
 open UniqueFactorizationMonoid
 
--- DISSOLVED: factors_eq
+lemma factors_eq : ∀ n : ℕ, normalizedFactors n = n.primeFactorsList
+  | 0 => by simp
+  | n + 1 => by
+    rw [← Multiset.rel_eq, ← associated_eq_eq]
+    apply UniqueFactorizationMonoid.factors_unique irreducible_of_normalized_factor _
+    · rw [Multiset.prod_coe, Nat.prod_primeFactorsList n.succ_ne_zero]
+      exact normalizedFactors_prod n.succ_ne_zero
+    · intro x hx
+      rw [Nat.irreducible_iff_prime, ← Nat.prime_iff]
+      exact Nat.prime_of_mem_primeFactorsList hx
 
 lemma factors_multiset_prod_of_irreducible {s : Multiset ℕ} (h : ∀ x : ℕ, x ∈ s → Irreducible x) :
     normalizedFactors s.prod = s := by

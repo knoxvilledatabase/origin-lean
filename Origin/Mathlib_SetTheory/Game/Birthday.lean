@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.OrderIso
 import Mathlib.SetTheory.Game.Ordinal
 import Mathlib.SetTheory.Ordinal.NaturalOps
 
+noncomputable section
+
 /-!
 # Birthdays of games
 

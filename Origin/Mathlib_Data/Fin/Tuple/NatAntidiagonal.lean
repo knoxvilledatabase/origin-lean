@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Fin.Tuple
 import Mathlib.Data.Finset.NatAntidiagonal
 import Mathlib.Order.Fin.Tuple
 
+noncomputable section
+
 /-!
 # Collections of tuples of naturals with the same sum
 
@@ -49,10 +51,6 @@ def antidiagonalTuple : ∀ k, ℕ → List (Fin k → ℕ)
   | k + 1, n =>
     (List.Nat.antidiagonal n).flatMap fun ni =>
       (antidiagonalTuple k ni.2).map fun x => Fin.cons ni.1 x
-
-@[simp]
-theorem antidiagonalTuple_zero_zero : antidiagonalTuple 0 0 = [![]] :=
-  rfl
 
 @[simp]
 theorem antidiagonalTuple_zero_succ (n : ℕ) : antidiagonalTuple 0 (n + 1) = [] :=
@@ -154,10 +152,6 @@ def antidiagonalTuple (k n : ℕ) : Multiset (Fin k → ℕ) :=
   List.Nat.antidiagonalTuple k n
 
 @[simp]
-theorem antidiagonalTuple_zero_zero : antidiagonalTuple 0 0 = {![]} :=
-  rfl
-
-@[simp]
 theorem antidiagonalTuple_zero_succ (n : ℕ) : antidiagonalTuple 0 n.succ = 0 :=
   rfl
 
@@ -189,10 +183,6 @@ def antidiagonalTuple (k n : ℕ) : Finset (Fin k → ℕ) :=
   ⟨Multiset.Nat.antidiagonalTuple k n, Multiset.Nat.nodup_antidiagonalTuple k n⟩
 
 @[simp]
-theorem antidiagonalTuple_zero_zero : antidiagonalTuple 0 0 = {![]} :=
-  rfl
-
-@[simp]
 theorem antidiagonalTuple_zero_succ (n : ℕ) : antidiagonalTuple 0 n.succ = ∅ :=
   rfl
 
@@ -212,13 +202,6 @@ theorem antidiagonalTuple_two (n : ℕ) :
   Finset.eq_of_veq (Multiset.Nat.antidiagonalTuple_two n)
 
 section EquivProd
-
-@[simps]
-def sigmaAntidiagonalTupleEquivTuple (k : ℕ) : (Σ n, antidiagonalTuple k n) ≃ (Fin k → ℕ) where
-  toFun x := x.2
-  invFun x := ⟨∑ i, x i, x, mem_antidiagonalTuple.mpr rfl⟩
-  left_inv := fun ⟨_, _, h⟩ => Sigma.subtype_ext (mem_antidiagonalTuple.mp h) rfl
-  right_inv _ := rfl
 
 end EquivProd
 

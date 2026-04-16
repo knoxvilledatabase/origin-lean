@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Basic.lean
-Genuine: 47 | Conflates: 0 | Dissolved: 6 | Infrastructure: 16
+Genuine: 48 | Conflates: 0 | Dissolved: 5 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Data.PNat.Equiv
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Algebra.Order.Positive.Ring
 import Mathlib.Order.Hom.Basic
+
+noncomputable section
 
 /-!
 # The positive natural numbers
@@ -119,10 +121,6 @@ def _root_.OrderIso.pnatIsoNat : ℕ+ ≃o ℕ where
   toEquiv := Equiv.pnatEquivNat
   map_rel_iff' := natPred_le_natPred
 
-@[simp]
-theorem _root_.OrderIso.pnatIsoNat_symm_apply : OrderIso.pnatIsoNat.symm = Nat.succPNat :=
-  rfl
-
 theorem lt_add_one_iff : ∀ {a b : ℕ+}, a < b + 1 ↔ a ≤ b := Nat.lt_add_one_iff
 
 theorem add_one_le_iff : ∀ {a b : ℕ+}, a + 1 ≤ b ↔ a < b := Nat.add_one_le_iff
@@ -130,10 +128,6 @@ theorem add_one_le_iff : ∀ {a b : ℕ+}, a + 1 ≤ b ↔ a < b := Nat.add_one_
 instance instOrderBot : OrderBot ℕ+ where
   bot := 1
   bot_le a := a.property
-
-@[simp]
-theorem bot_eq_one : (⊥ : ℕ+) = 1 :=
-  rfl
 
 def caseStrongInductionOn {p : ℕ+ → Sort*} (a : ℕ+) (hz : p 1)
     (hi : ∀ n, (∀ m, m ≤ n → p m) → p (n + 1)) : p a := by
@@ -153,10 +147,6 @@ def recOn (n : ℕ+) {p : ℕ+ → Sort*} (p1 : p 1) (hp : ∀ n, p n → p (n +
   · cases' n with n
     · exact p1
     · exact hp _ (IH n.succ_pos)
-
-@[simp]
-theorem recOn_one {p} (p1 hp) : @PNat.recOn 1 p p1 hp = p1 :=
-  rfl
 
 @[simp]
 theorem recOn_succ (n : ℕ+) {p : ℕ+ → Sort*} (p1 hp) :
@@ -180,10 +170,6 @@ def coeMonoidHom : ℕ+ →* ℕ where
   map_mul' := mul_coe
 
 @[simp]
-theorem coe_coeMonoidHom : (coeMonoidHom : ℕ+ → ℕ) = Coe.coe :=
-  rfl
-
-@[simp]
 theorem le_one_iff {n : ℕ+} : n ≤ 1 ↔ n = 1 :=
   le_bot_iff
 
@@ -193,13 +179,7 @@ theorem lt_add_left (n m : ℕ+) : n < m + n :=
 theorem lt_add_right (n m : ℕ+) : n < n + m :=
   (lt_add_left n m).trans_eq (add_comm _ _)
 
-@[simp, norm_cast]
-theorem pow_coe (m : ℕ+) (n : ℕ) : ↑(m ^ n) = (m : ℕ) ^ n :=
-  rfl
-
 theorem one_lt_of_lt {a b : ℕ+} (hab : a < b) : 1 < b := bot_le.trans_lt hab
-
-theorem add_one (a : ℕ+) : a + 1 = succPNat a := rfl
 
 theorem lt_succ_self (a : ℕ+) : a < succPNat a := lt.base a
 
@@ -238,7 +218,9 @@ theorem sub_add_of_lt {a b : ℕ+} (h : b < a) : a - b + b = a := by
 theorem add_sub {a b : ℕ+} : a + b - b = a :=
   add_right_cancel (sub_add_of_lt (lt_add_left _ _))
 
--- DISSOLVED: exists_eq_succ_of_ne_one
+theorem exists_eq_succ_of_ne_one : ∀ {n : ℕ+} (_ : n ≠ 1), ∃ k : ℕ+, n = k + 1
+  | ⟨1, _⟩, h₁ => False.elim <| h₁ rfl
+  | ⟨n + 2, _⟩, _ => ⟨⟨n + 1, by simp⟩, rfl⟩
 
 theorem modDivAux_spec :
     ∀ (k : ℕ+) (r q : ℕ) (_ : ¬(r = 0 ∧ q = 0)),

@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.Pi
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Set.Finite.Basic
 
+noncomputable section
+
 /-!
 # Fintype instances for pi types
 -/
@@ -47,9 +49,6 @@ theorem piFinset_subset (t₁ t₂ : ∀ a, Finset (δ a)) (h : ∀ a, t₁ a �
 
 @[simp]
 theorem piFinset_eq_empty : piFinset s = ∅ ↔ ∃ i, s i = ∅ := by simp [piFinset]
-
-@[simp]
-theorem piFinset_empty [Nonempty α] : piFinset (fun _ => ∅ : ∀ i, Finset (δ i)) = ∅ := by simp
 
 @[simp]
 lemma piFinset_nonempty : (piFinset s).Nonempty ↔ ∀ a, (s a).Nonempty := by simp [piFinset]
@@ -130,13 +129,6 @@ end Fintype
 instance Pi.fintype {α : Type*} {β : α → Type*} [DecidableEq α] [Fintype α]
     [∀ a, Fintype (β a)] : Fintype (∀ a, β a) :=
   ⟨Fintype.piFinset fun _ => univ, by simp⟩
-
-@[simp]
-theorem Fintype.piFinset_univ {α : Type*} {β : α → Type*} [DecidableEq α] [Fintype α]
-    [∀ a, Fintype (β a)] :
-    (Fintype.piFinset fun a : α => (Finset.univ : Finset (β a))) =
-      (Finset.univ : Finset (∀ a, β a)) :=
-  rfl
 
 noncomputable instance _root_.Function.Embedding.fintype {α β} [Fintype α] [Fintype β] :
   Fintype (α ↪ β) := by

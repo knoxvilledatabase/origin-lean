@@ -9,6 +9,8 @@ import Mathlib.Data.Int.Notation
 import Mathlib.Data.Nat.BinaryRec
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Binary representation of integers using inductive types
 

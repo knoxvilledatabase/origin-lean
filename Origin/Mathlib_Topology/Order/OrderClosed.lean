@@ -1,9 +1,11 @@
 /-
 Extracted from Topology/Order/OrderClosed.lean
-Genuine: 156 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
+Genuine: 158 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Topology.Separation.Basic
+
+noncomputable section
 
 /-!
 # Order-closed topologies

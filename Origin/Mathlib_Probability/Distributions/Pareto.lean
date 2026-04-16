@@ -7,6 +7,8 @@ import Mathlib.Probability.Notation
 import Mathlib.Probability.CDF
 import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
 
+noncomputable section
+
 /-! # Pareto distributions over ℝ
 
 Define the Pareto measure over the reals.

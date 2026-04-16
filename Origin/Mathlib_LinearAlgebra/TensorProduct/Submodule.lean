@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/TensorProduct/Submodule.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.DirectSum.Finsupp
 import Mathlib.Algebra.Algebra.Operations
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
+
+noncomputable section
 
 /-!
 
@@ -106,9 +108,6 @@ def mulMap' : M ⊗[R] N →ₗ[R] ↥(M * N) :=
 
 variable {M N} in
 
-@[simp]
-theorem val_mulMap'_tmul (m : M) (n : N) : (mulMap' M N (m ⊗ₜ[R] n) : S) = m.1 * n.1 := rfl
-
 theorem mulMap'_surjective : Function.Surjective (mulMap' M N) := by
   simp_rw [mulMap', LinearMap.coe_comp, LinearEquiv.coe_coe, EquivLike.comp_surjective,
     LinearMap.surjective_rangeRestrict]
@@ -149,12 +148,11 @@ theorem lTensorOne_tmul (y : R) (n : N) : N.lTensorOne (algebraMap R _ y ⊗ₜ[
 
 variable {N} in
 
--- DISSOLVED: lTensorOne_one_tmul
+@[simp]
+theorem lTensorOne_one_tmul (n : N) : N.lTensorOne (1 ⊗ₜ[R] n) = n :=
+  N.lTensorOne'_one_tmul n
 
 variable {N} in
-
-@[simp]
-theorem lTensorOne_symm_apply (n : N) : N.lTensorOne.symm n = 1 ⊗ₜ[R] n := rfl
 
 theorem mulMap_one_left_eq :
     mulMap (Subalgebra.toSubmodule ⊥) N = N.subtype ∘ₗ N.lTensorOne.toLinearMap :=
@@ -202,9 +200,6 @@ theorem rTensorOne_tmul_one (m : M) : M.rTensorOne (m ⊗ₜ[R] 1) = m :=
   M.rTensorOne'_tmul_one m
 
 variable {M} in
-
-@[simp]
-theorem rTensorOne_symm_apply (m : M) : M.rTensorOne.symm m = m ⊗ₜ[R] 1 := rfl
 
 theorem mulMap_one_right_eq :
     mulMap M (Subalgebra.toSubmodule ⊥) = M.subtype ∘ₗ M.rTensorOne.toLinearMap :=

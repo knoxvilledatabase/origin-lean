@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Support
 import Mathlib.Topology.Connected.LocallyConnected
 import Mathlib.Topology.DenseEmbedding
 
+noncomputable section
+
 /-!
 # Homeomorphisms
 
@@ -55,9 +57,6 @@ instance : EquivLike (X ≃ₜ Y) X Y where
   right_inv h := h.right_inv
   coe_injective' _ _ H _ := toEquiv_injective <| DFunLike.ext' H
 
-@[simp] theorem homeomorph_mk_coe (a : X ≃ Y) (b c) : (Homeomorph.mk a b c : X → Y) = a :=
-  rfl
-
 protected def empty [IsEmpty X] [IsEmpty Y] : X ≃ₜ Y where
   __ := Equiv.equivOfIsEmpty X Y
 
@@ -77,14 +76,6 @@ def Simps.symm_apply (h : X ≃ₜ Y) : Y → X :=
 
 initialize_simps_projections Homeomorph (toFun → apply, invFun → symm_apply)
 
-@[simp]
-theorem coe_toEquiv (h : X ≃ₜ Y) : ⇑h.toEquiv = h :=
-  rfl
-
-@[simp]
-theorem coe_symm_toEquiv (h : X ≃ₜ Y) : ⇑h.toEquiv.symm = h.symm :=
-  rfl
-
 @[ext]
 theorem ext {h h' : X ≃ₜ Y} (H : ∀ x, h x = h' x) : h = h' :=
   DFunLike.ext _ _ H
@@ -100,23 +91,6 @@ protected def trans (h₁ : X ≃ₜ Y) (h₂ : Y ≃ₜ Z) : X ≃ₜ Z where
   continuous_toFun := h₂.continuous_toFun.comp h₁.continuous_toFun
   continuous_invFun := h₁.continuous_invFun.comp h₂.continuous_invFun
   toEquiv := Equiv.trans h₁.toEquiv h₂.toEquiv
-
-@[simp]
-theorem trans_apply (h₁ : X ≃ₜ Y) (h₂ : Y ≃ₜ Z) (x : X) : h₁.trans h₂ x = h₂ (h₁ x) :=
-  rfl
-
-@[simp]
-theorem symm_trans_apply (f : X ≃ₜ Y) (g : Y ≃ₜ Z) (z : Z) :
-    (f.trans g).symm z = f.symm (g.symm z) := rfl
-
-@[simp]
-theorem homeomorph_mk_coe_symm (a : X ≃ Y) (b c) :
-    ((Homeomorph.mk a b c).symm : Y → X) = a.symm :=
-  rfl
-
-@[simp]
-theorem refl_symm : (Homeomorph.refl X).symm = Homeomorph.refl X :=
-  rfl
 
 @[continuity, fun_prop]
 protected theorem continuous (h : X ≃ₜ Y) : Continuous h :=
@@ -417,14 +391,6 @@ def homeomorphOfContinuousClosed (e : X ≃ Y) (h₁ : Continuous e) (h₂ : IsC
   toEquiv := e
 
 @[simp]
-theorem homeomorphOfContinuousOpen_apply (e : X ≃ Y) (h₁ : Continuous e) (h₂ : IsOpenMap e) :
-    ⇑(homeomorphOfContinuousOpen e h₁ h₂) = e := rfl
-
-@[simp]
-theorem homeomorphOfContinuousOpen_symm_apply (e : X ≃ Y) (h₁ : Continuous e) (h₂ : IsOpenMap e) :
-    ⇑(homeomorphOfContinuousOpen e h₁ h₂).symm = e.symm := rfl
-
-@[simp]
 theorem comp_continuousOn_iff (h : X ≃ₜ Y) (f : Z → X) (s : Set Z) :
     ContinuousOn (h ∘ f) s ↔ ContinuousOn f s :=
   h.isInducing.continuousOn_iff.symm
@@ -471,11 +437,6 @@ def subtype {p : X → Prop} {q : Y → Prop} (h : X ≃ₜ Y) (h_iff : ∀ x, p
     h.symm.continuous.subtype_map _
   __ := h.subtypeEquiv h_iff
 
-@[simp]
-lemma subtype_toEquiv {p : X → Prop} {q : Y → Prop} (h : X ≃ₜ Y) (h_iff : ∀ x, p x ↔ q (h x)) :
-    (h.subtype h_iff).toEquiv = h.toEquiv.subtypeEquiv h_iff :=
-  rfl
-
 abbrev sets {s : Set X} {t : Set Y} (h : X ≃ₜ Y) (h_eq : s = h ⁻¹' t) : s ≃ₜ t :=
   h.subtype <| Set.ext_iff.mp h_eq
 
@@ -492,15 +453,6 @@ def sumCongr (h₁ : X ≃ₜ X') (h₂ : Y ≃ₜ Y') : X ⊕ Y ≃ₜ X' ⊕ Y
 def prodCongr (h₁ : X ≃ₜ X') (h₂ : Y ≃ₜ Y') : X × Y ≃ₜ X' × Y' where
   toEquiv := h₁.toEquiv.prodCongr h₂.toEquiv
 
-@[simp]
-theorem prodCongr_symm (h₁ : X ≃ₜ X') (h₂ : Y ≃ₜ Y') :
-    (h₁.prodCongr h₂).symm = h₁.symm.prodCongr h₂.symm :=
-  rfl
-
-@[simp]
-theorem coe_prodCongr (h₁ : X ≃ₜ X') (h₂ : Y ≃ₜ Y') : ⇑(h₁.prodCongr h₂) = Prod.map h₁ h₂ :=
-  rfl
-
 section sum
 
 variable (X Y W Z)
@@ -509,14 +461,6 @@ def sumComm : X ⊕ Y ≃ₜ Y ⊕ X where
   toEquiv := Equiv.sumComm X Y
   continuous_toFun := continuous_sum_swap
   continuous_invFun := continuous_sum_swap
-
-@[simp]
-theorem sumComm_symm : (sumComm X Y).symm = sumComm Y X :=
-  rfl
-
-@[simp]
-theorem coe_sumComm : ⇑(sumComm X Y) = Sum.swap :=
-  rfl
 
 @[continuity, fun_prop]
 lemma continuous_sumAssoc : Continuous (Equiv.sumAssoc X Y Z) :=
@@ -531,9 +475,6 @@ def sumAssoc : (X ⊕ Y) ⊕ Z ≃ₜ X ⊕ Y ⊕ Z where
   continuous_toFun := continuous_sumAssoc X Y Z
   continuous_invFun := continuous_sumAssoc_symm X Y Z
 
-@[simp]
-lemma sumAssoc_toEquiv : (sumAssoc X Y Z).toEquiv = Equiv.sumAssoc X Y Z := rfl
-
 def sumSumSumComm : (X ⊕ Y) ⊕ W ⊕ Z ≃ₜ (X ⊕ W) ⊕ Y ⊕ Z where
   toEquiv := Equiv.sumSumSumComm X Y W Z
   continuous_toFun := by
@@ -547,12 +488,6 @@ def sumSumSumComm : (X ⊕ Y) ⊕ W ⊕ Z ≃ₜ (X ⊕ W) ⊕ Y ⊕ Z where
     have : Continuous (Sum.map (Sum.map (@id X) (Equiv.sumComm Y W).symm) (@id Z)) := by continuity
     fun_prop
 
-@[simp]
-lemma sumSumSumComm_toEquiv : (sumSumSumComm X Y W Z).toEquiv = (Equiv.sumSumSumComm X Y W Z) := rfl
-
-@[simp]
-lemma sumSumSumComm_symm : (sumSumSumComm X Y W Z).symm = (sumSumSumComm X W Y Z) := rfl
-
 @[simps! (config := .asFn) apply]
 def sumEmpty [IsEmpty Y] : X ⊕ Y ≃ₜ X where
   toEquiv := Equiv.sumEmpty X Y
@@ -560,8 +495,6 @@ def sumEmpty [IsEmpty Y] : X ⊕ Y ≃ₜ X where
   continuous_invFun := continuous_inl
 
 def emptySum [IsEmpty Y] : Y ⊕ X ≃ₜ X := (sumComm Y X).trans (sumEmpty X Y)
-
-@[simp] theorem coe_emptySum [IsEmpty Y] : (emptySum X Y).toEquiv = Equiv.emptySum Y X := rfl
 
 end sum
 
@@ -574,21 +507,10 @@ def prodComm : X × Y ≃ₜ Y × X where
   continuous_invFun := continuous_snd.prod_mk continuous_fst
   toEquiv := Equiv.prodComm X Y
 
-@[simp]
-theorem prodComm_symm : (prodComm X Y).symm = prodComm Y X :=
-  rfl
-
-@[simp]
-theorem coe_prodComm : ⇑(prodComm X Y) = Prod.swap :=
-  rfl
-
 def prodAssoc : (X × Y) × Z ≃ₜ X × Y × Z where
   continuous_toFun := continuous_fst.fst.prod_mk (continuous_fst.snd.prod_mk continuous_snd)
   continuous_invFun := (continuous_fst.prod_mk continuous_snd.fst).prod_mk continuous_snd.snd
   toEquiv := Equiv.prodAssoc X Y Z
-
-@[simp]
-lemma prodAssoc_toEquiv : (prodAssoc X Y Z).toEquiv = Equiv.prodAssoc X Y Z := rfl
 
 def prodProdProdComm : (X × Y) × W × Z ≃ₜ (X × W) × Y × Z where
   toEquiv := Equiv.prodProdProdComm X Y W Z
@@ -601,10 +523,6 @@ def prodProdProdComm : (X × Y) × W × Z ≃ₜ (X × W) × Y × Z where
     dsimp only
     fun_prop
 
-@[simp]
-theorem prodProdProdComm_symm : (prodProdProdComm X Y W Z).symm = prodProdProdComm X W Y Z :=
-  rfl
-
 @[simps! (config := .asFn) apply]
 def prodPUnit : X × PUnit ≃ₜ X where
   toEquiv := Equiv.prodPUnit X
@@ -613,8 +531,6 @@ def prodPUnit : X × PUnit ≃ₜ X where
 
 def punitProd : PUnit × X ≃ₜ X :=
   (prodComm _ _).trans (prodPUnit _)
-
-@[simp] theorem coe_punitProd : ⇑(punitProd X) = Prod.snd := rfl
 
 @[simps!]
 def homeomorphOfUnique [Unique X] [Unique Y] : X ≃ₜ Y :=
@@ -638,12 +554,6 @@ def piCongrRight {ι : Type*} {Y₁ Y₂ : ι → Type*} [∀ i, TopologicalSpac
   continuous_toFun := Pi.continuous_postcomp' fun i ↦ (F i).continuous
   continuous_invFun := Pi.continuous_postcomp' fun i ↦ (F i).symm.continuous
   toEquiv := Equiv.piCongrRight fun i => (F i).toEquiv
-
-@[simp]
-theorem piCongrRight_symm {ι : Type*} {Y₁ Y₂ : ι → Type*} [∀ i, TopologicalSpace (Y₁ i)]
-    [∀ i, TopologicalSpace (Y₂ i)] (F : ∀ i, Y₁ i ≃ₜ Y₂ i) :
-    (piCongrRight F).symm = piCongrRight fun i => (F i).symm :=
-  rfl
 
 @[simps! apply toEquiv]
 def piCongr {ι₁ ι₂ : Type*} {Y₁ : ι₁ → Type*} {Y₂ : ι₂ → Type*}
@@ -689,11 +599,6 @@ def _root_.Fin.appendHomeomorph (m n : ℕ) : (Fin m → X) × (Fin n → X) ≃
   continuous_invFun := by
     rw [Fin.appendEquiv_eq_Homeomorph]
     exact Homeomorph.continuous_invFun _
-
-@[simp]
-theorem _root_.Fin.appendHomeomorph_toEquiv (m n : ℕ) :
-    (Fin.appendHomeomorph (X := X) m n).toEquiv = Fin.appendEquiv m n :=
-  rfl
 
 section Distrib
 
@@ -805,20 +710,6 @@ def toHomeomorph (e : X ≃ Y) (he : ∀ s, IsOpen (e ⁻¹' s) ↔ IsOpen s) : 
   toEquiv := e
   continuous_toFun := continuous_def.2 fun _ ↦ (he _).2
   continuous_invFun := continuous_def.2 fun s ↦ by convert (he _).1; simp
-
-@[simp] lemma coe_toHomeomorph (e : X ≃ Y) (he) : ⇑(e.toHomeomorph he) = e := rfl
-
-lemma toHomeomorph_apply (e : X ≃ Y) (he) (x : X) : e.toHomeomorph he x = e x := rfl
-
-@[simp] lemma toHomeomorph_refl :
-  (Equiv.refl X).toHomeomorph (fun _s ↦ Iff.rfl) = Homeomorph.refl _ := rfl
-
-@[simp] lemma toHomeomorph_symm (e : X ≃ Y) (he) :
-  (e.toHomeomorph he).symm = e.symm.toHomeomorph fun s ↦ by convert (he _).symm; simp := rfl
-
-lemma toHomeomorph_trans (e : X ≃ Y) (f : Y ≃ Z) (he hf) :
-    (e.trans f).toHomeomorph (fun _s ↦ (he _).trans (hf _)) =
-    (e.toHomeomorph he).trans (f.toHomeomorph hf) := rfl
 
 @[simps toEquiv] -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11215): TODO: was `@[simps]`
 def toHomeomorphOfIsInducing (f : X ≃ Y) (hf : IsInducing f) : X ≃ₜ Y :=

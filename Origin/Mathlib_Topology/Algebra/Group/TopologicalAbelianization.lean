@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Abelianization
 import Mathlib.Topology.Algebra.Group.Basic
 
+noncomputable section
+
 /-!
 # The topological abelianization of a group.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful
 import Mathlib.Algebra.Group.Prod
 
+noncomputable section
+
 /-!
 # Prod instances for additive and multiplicative actions
 
@@ -68,9 +70,6 @@ lemma pow_snd (p : α × β) (c : E) : (p ^ c).snd = p.snd ^ c := rfl
 
 @[to_additive existing (attr := simp) (reorder := 6 7) smul_mk]
 lemma pow_mk (c : E) (a : α) (b : β) : Prod.mk a b ^ c = Prod.mk (a ^ c) (b ^ c) := rfl
-
-@[to_additive existing (reorder := 6 7) smul_def]
-lemma pow_def (p : α × β) (c : E) : p ^ c = (p.1 ^ c, p.2 ^ c) := rfl
 
 @[to_additive existing (attr := simp) (reorder := 6 7) smul_swap]
 lemma pow_swap (p : α × β) (c : E) : (p ^ c).swap = p.swap ^ c := rfl

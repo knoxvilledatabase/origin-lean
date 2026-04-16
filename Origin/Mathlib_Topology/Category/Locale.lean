@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Order.Category.Frm
 
+noncomputable section
+
 /-!
 # The category of locales
 
@@ -28,10 +30,6 @@ instance (X : Locale) : Frame X :=
 
 def of (α : Type*) [Frame α] : Locale :=
   op <| Frm.of α
-
-@[simp]
-theorem coe_of (α : Type*) [Frame α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited Locale :=
   ⟨of PUnit⟩

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Set.Basic
 import Mathlib.Data.Set.Function
 
+noncomputable section
+
 /-!
 # Monotone surjective functions are surjective on intervals
 

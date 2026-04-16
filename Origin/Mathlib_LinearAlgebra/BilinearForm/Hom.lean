@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.BilinearForm.Basic
 import Mathlib.Algebra.Algebra.Bilinear
 import Mathlib.LinearAlgebra.Basis.Defs
 
+noncomputable section
+
 /-!
 # Bilinear form and linear maps
 
@@ -65,9 +67,7 @@ def toLinHomAux₂ (A : BilinForm R M) : M →ₗ[R] M →ₗ[R] R := A
 def toLinHom : BilinForm R M →ₗ[R] M →ₗ[R] M →ₗ[R] R := LinearMap.id
 
 set_option linter.deprecated false in
-
-theorem toLin'_apply (A : BilinForm R M) (x : M) : toLinHom (M := M) A x = A x :=
-  rfl
+@[deprecated "No deprecation message was provided." (since := "2024-04-26")]
 
 variable (B)
 
@@ -89,9 +89,6 @@ variable {B}
 def toLinHomFlip : BilinForm R M →ₗ[R] M →ₗ[R] M →ₗ[R] R :=
   flipHom.toLinearMap
 
-theorem toLin'Flip_apply (A : BilinForm R M) (x : M) : toLinHomFlip (M := M) A x = fun y => A y x :=
-  rfl
-
 end ToLin'
 
 end BilinForm
@@ -103,6 +100,7 @@ section EquivLin
 def LinearMap.toBilinAux (f : M →ₗ[R] M →ₗ[R] R) : BilinForm R M := f
 
 set_option linter.deprecated false in
+/-- Bilinear forms are linearly equivalent to maps with two arguments that are linear in both. -/
 
 def LinearMap.BilinForm.toLin : BilinForm R M ≃ₗ[R] M →ₗ[R] M →ₗ[R] R :=
   { BilinForm.toLinHom with
@@ -111,36 +109,26 @@ def LinearMap.BilinForm.toLin : BilinForm R M ≃ₗ[R] M →ₗ[R] M →ₗ[R] 
     right_inv := fun _ => rfl }
 
 set_option linter.deprecated false in
+/-- A map with two arguments that is linear in both is linearly equivalent to bilinear form. -/
 
 def LinearMap.toBilin : (M →ₗ[R] M →ₗ[R] R) ≃ₗ[R] BilinForm R M :=
   BilinForm.toLin.symm
 
-theorem LinearMap.toBilinAux_eq (f : M →ₗ[R] M →ₗ[R] R) :
-    LinearMap.toBilinAux f = f :=
-  rfl
+set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-04-26")]
 
 set_option linter.deprecated false in
-
-theorem LinearMap.toBilin_symm :
-    (LinearMap.toBilin.symm : BilinForm R M ≃ₗ[R] _) = BilinForm.toLin :=
-  rfl
-
-set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-04-26")]
 
 theorem BilinForm.toLin_symm :
     (BilinForm.toLin.symm : _ ≃ₗ[R] BilinForm R M) = LinearMap.toBilin :=
   LinearMap.toBilin.symm_symm
 
 set_option linter.deprecated false in
-
-theorem LinearMap.toBilin_apply (f : M →ₗ[R] M →ₗ[R] R) (x y : M) :
-    toBilin f x y = f x y :=
-  rfl
+@[deprecated "No deprecation message was provided." (since := "2024-04-26")]
 
 set_option linter.deprecated false in
-
-theorem BilinForm.toLin_apply (x : M) : BilinForm.toLin B x = B x :=
-  rfl
+@[deprecated "No deprecation message was provided." (since := "2024-04-26")]
 
 end EquivLin
 
@@ -170,31 +158,8 @@ def compLeft (B : BilinForm R M) (f : M →ₗ[R] M) : BilinForm R M :=
 def compRight (B : BilinForm R M) (f : M →ₗ[R] M) : BilinForm R M :=
   B.comp LinearMap.id f
 
-theorem comp_comp {M'' : Type*} [AddCommMonoid M''] [Module R M''] (B : BilinForm R M'')
-    (l r : M →ₗ[R] M') (l' r' : M' →ₗ[R] M'') :
-    (B.comp l' r').comp l r = B.comp (l'.comp l) (r'.comp r) :=
-  rfl
-
-@[simp]
-theorem compLeft_compRight (B : BilinForm R M) (l r : M →ₗ[R] M) :
-    (B.compLeft l).compRight r = B.comp l r :=
-  rfl
-
-@[simp]
-theorem compRight_compLeft (B : BilinForm R M) (l r : M →ₗ[R] M) :
-    (B.compRight r).compLeft l = B.comp l r :=
-  rfl
-
 @[simp]
 theorem comp_apply (B : BilinForm R M') (l r : M →ₗ[R] M') (v w) : B.comp l r v w = B (l v) (r w) :=
-  rfl
-
-@[simp]
-theorem compLeft_apply (B : BilinForm R M) (f : M →ₗ[R] M) (v w) : B.compLeft f v w = B (f v) w :=
-  rfl
-
-@[simp]
-theorem compRight_apply (B : BilinForm R M) (f : M →ₗ[R] M) (v w) : B.compRight f v w = B v (f w) :=
   rfl
 
 @[simp]
@@ -263,25 +228,6 @@ theorem congr_symm (e : M ≃ₗ[R] M') : (congr e).symm = congr e.symm := by
 theorem congr_refl : congr (LinearEquiv.refl R M) = LinearEquiv.refl R _ :=
   LinearEquiv.ext fun _ => ext₂ fun _ _ => rfl
 
-theorem congr_trans (e : M ≃ₗ[R] M') (f : M' ≃ₗ[R] M'') :
-    (congr e).trans (congr f) = congr (e.trans f) :=
-  rfl
-
-theorem congr_congr (e : M' ≃ₗ[R] M'') (f : M ≃ₗ[R] M') (B : BilinForm R M) :
-    congr e (congr f B) = congr (f.trans e) B :=
-  rfl
-
-theorem congr_comp (e : M ≃ₗ[R] M') (B : BilinForm R M) (l r : M'' →ₗ[R] M') :
-    (congr e B).comp l r =
-      B.comp (LinearMap.comp (e.symm : M' →ₗ[R] M) l)
-        (LinearMap.comp (e.symm : M' →ₗ[R] M) r) :=
-  rfl
-
-theorem comp_congr (e : M' ≃ₗ[R] M'') (B : BilinForm R M) (l r : M' →ₗ[R] M) :
-    congr e (B.comp l r) =
-      B.comp (l.comp (e.symm : M'' →ₗ[R] M')) (r.comp (e.symm : M'' →ₗ[R] M')) :=
-  rfl
-
 end congr
 
 section congrRight₂
@@ -295,24 +241,6 @@ variable [Module R N₁] [Module R N₂] [Module R N₃]
 def _root_.LinearEquiv.congrRight₂ (e : N₁ ≃ₗ[R] N₂) : BilinMap R M N₁ ≃ₗ[R] BilinMap R M N₂ :=
   LinearEquiv.congrRight (LinearEquiv.congrRight e)
 
-@[simp]
-theorem _root_.LinearEquiv.congrRight₂_apply (e : N₁ ≃ₗ[R] N₂) (B : BilinMap R M N₁) :
-    LinearEquiv.congrRight₂ e B = compr₂ B e := rfl
-
-@[simp]
-theorem _root_.LinearEquiv.congrRight₂_refl :
-    LinearEquiv.congrRight₂ (.refl R N₁) = .refl R (BilinMap R M N₁) := rfl
-
-@[simp]
-theorem _root_.LinearEquiv.congrRight_symm (e : N₁ ≃ₗ[R] N₂) :
-    (LinearEquiv.congrRight₂ e (M := M)).symm = LinearEquiv.congrRight₂ e.symm :=
-  rfl
-
-theorem _root_.LinearEquiv.congrRight₂_trans (e₁₂ : N₁ ≃ₗ[R] N₂) (e₂₃ : N₂ ≃ₗ[R] N₃) :
-    LinearEquiv.congrRight₂ (M := M) (e₁₂ ≪≫ₗ e₂₃) =
-    LinearEquiv.congrRight₂ e₁₂ ≪≫ₗ LinearEquiv.congrRight₂ e₂₃ :=
-  rfl
-
 end congrRight₂
 
 section LinMulLin
@@ -320,25 +248,6 @@ section LinMulLin
 def linMulLin (f g : M →ₗ[R] R) : BilinForm R M := (LinearMap.mul R R).compl₁₂ f g
 
 variable {f g : M →ₗ[R] R}
-
-@[simp]
-theorem linMulLin_apply (x y) : linMulLin f g x y = f x * g y :=
-  rfl
-
-@[simp]
-theorem linMulLin_comp (l r : M' →ₗ[R] M) :
-    (linMulLin f g).comp l r = linMulLin (f.comp l) (g.comp r) :=
-  rfl
-
-@[simp]
-theorem linMulLin_compLeft (l : M →ₗ[R] M) :
-    (linMulLin f g).compLeft l = linMulLin (f.comp l) g :=
-  rfl
-
-@[simp]
-theorem linMulLin_compRight (r : M →ₗ[R] M) :
-    (linMulLin f g).compRight r = linMulLin f (g.comp r) :=
-  rfl
 
 end LinMulLin
 

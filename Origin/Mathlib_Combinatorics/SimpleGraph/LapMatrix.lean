@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.AdjMatrix
 import Mathlib.LinearAlgebra.Matrix.PosDef
 
+noncomputable section
+
 /-!
 # Laplacian Matrix
 

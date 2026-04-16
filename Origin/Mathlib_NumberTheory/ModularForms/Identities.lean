@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.ModularForms.SlashInvariantForms
 import Mathlib.NumberTheory.ModularForms.CongruenceSubgroups
 
+noncomputable section
+
 /-!
 # Identities of ModularForms and SlashInvariantForms
 

@@ -9,6 +9,8 @@ import Mathlib.Order.Filter.CountableInter
 import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.SetTheory.Cardinal.Cofinality
 
+noncomputable section
+
 /-!
 # Filters with a cardinal intersection property
 
@@ -170,12 +172,6 @@ instance cardinalInter_ofCardinalInter (l : Set (Set α)) (hc : 2 < c)
     CardinalInterFilter (Filter.ofCardinalInter l hc hl h_mono) c :=
   ⟨hl⟩
 
-@[simp]
-theorem mem_ofCardinalInter {l : Set (Set α)} (hc : 2 < c)
-    (hl : ∀ S : Set (Set α), (#S < c) → S ⊆ l → ⋂₀ S ∈ l) (h_mono : ∀ s t, s ∈ l → s ⊆ t → t ∈ l)
-    {s : Set α} : s ∈ Filter.ofCardinalInter l hc hl h_mono ↔ s ∈ l :=
-  Iff.rfl
-
 def ofCardinalUnion (l : Set (Set α)) (hc : 2 < c)
     (hUnion : ∀ S : Set (Set α), (#S < c) → (∀ s ∈ S, s ∈ l) → ⋃₀ S ∈ l)
     (hmono : ∀ t ∈ l, ∀ s ⊆ t, s ∈ l) : Filter α := by
@@ -193,11 +189,6 @@ def ofCardinalUnion (l : Set (Set α)) (hc : 2 < c)
 instance cardinalInter_ofCardinalUnion (l : Set (Set α)) (hc : 2 < c) (h₁ h₂) :
     CardinalInterFilter (Filter.ofCardinalUnion l hc h₁ h₂) c :=
   cardinalInter_ofCardinalInter ..
-
-@[simp]
-theorem mem_ofCardinalUnion {l : Set (Set α)} (hc : 2 < c) {hunion hmono s} :
-    s ∈ ofCardinalUnion l hc hunion hmono ↔ l sᶜ :=
-  Iff.rfl
 
 instance cardinalInterFilter_principal (s : Set α) : CardinalInterFilter (𝓟 s) c :=
   ⟨fun _ _ hS => subset_sInter hS⟩

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/ContinuousMap/Ideals.lean
-Genuine: 22 | Conflates: 1 | Dissolved: 2 | Infrastructure: 2
+Genuine: 24 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Algebra
@@ -9,6 +9,8 @@ import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Analysis.Normed.Ring.Units
 import Mathlib.Topology.Algebra.Module.CharacterSpace
+
+noncomputable section
 
 /-!
 # Ideals of continuous functions
@@ -99,7 +101,8 @@ theorem mem_idealOfSet {s : Set X} {f : C(X, R)} :
     f ∈ idealOfSet R s ↔ ∀ ⦃x : X⦄, x ∈ sᶜ → f x = 0 := by
   convert Iff.rfl
 
--- DISSOLVED: not_mem_idealOfSet
+theorem not_mem_idealOfSet {s : Set X} {f : C(X, R)} : f ∉ idealOfSet R s ↔ ∃ x ∈ sᶜ, f x ≠ 0 := by
+  simp_rw [mem_idealOfSet]; push_neg; rfl
 
 def setOfIdeal (I : Ideal C(X, R)) : Set X :=
   {x : X | ∀ f ∈ I, (f : C(X, R)) x = 0}ᶜ
@@ -108,7 +111,9 @@ theorem not_mem_setOfIdeal {I : Ideal C(X, R)} {x : X} :
     x ∉ setOfIdeal I ↔ ∀ ⦃f : C(X, R)⦄, f ∈ I → f x = 0 := by
   rw [← Set.mem_compl_iff, setOfIdeal, compl_compl, Set.mem_setOf]
 
--- DISSOLVED: mem_setOfIdeal
+theorem mem_setOfIdeal {I : Ideal C(X, R)} {x : X} :
+    x ∈ setOfIdeal I ↔ ∃ f ∈ I, (f : C(X, R)) x ≠ 0 := by
+  simp_rw [setOfIdeal, Set.mem_compl_iff, Set.mem_setOf]; push_neg; rfl
 
 theorem setOfIdeal_open [T2Space R] (I : Ideal C(X, R)) : IsOpen (setOfIdeal I) := by
   simp only [setOfIdeal, Set.setOf_forall, isOpen_compl_iff]

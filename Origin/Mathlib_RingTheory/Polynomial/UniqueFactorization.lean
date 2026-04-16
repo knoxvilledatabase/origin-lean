@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/UniqueFactorization.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Polynomial.Basic
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Polynomial.Content
 import Mathlib.RingTheory.UniqueFactorizationDomain.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Finite
 import Mathlib.RingTheory.UniqueFactorizationDomain.GCDMonoid
+
+noncomputable section
 
 /-!
 # Unique factorization for univariate and multivariate polynomials
@@ -70,7 +72,9 @@ theorem exists_irreducible_of_natDegree_pos (hf : 0 < f.natDegree) : ∃ g, Irre
     contrapose! hf
     exact natDegree_le_of_degree_le hf
 
--- DISSOLVED: exists_irreducible_of_natDegree_ne_zero
+theorem exists_irreducible_of_natDegree_ne_zero (hf : f.natDegree ≠ 0) :
+    ∃ g, Irreducible g ∧ g ∣ f :=
+  exists_irreducible_of_natDegree_pos <| Nat.pos_of_ne_zero hf
 
 end Polynomial
 
@@ -86,7 +90,17 @@ instance (priority := 100) uniqueFactorizationMonoid : UniqueFactorizationMonoid
   letI := Classical.arbitrary (NormalizedGCDMonoid D)
   exact ufm_of_decomposition_of_wfDvdMonoid
 
--- DISSOLVED: fintypeSubtypeMonicDvd
+noncomputable def fintypeSubtypeMonicDvd (f : D[X]) (hf : f ≠ 0) :
+    Fintype { g : D[X] // g.Monic ∧ g ∣ f } := by
+  set G := { g : D[X] // g.Monic ∧ g ∣ f }
+  let y : Associates D[X] := Associates.mk f
+  have hy : y ≠ 0 := Associates.mk_ne_zero.mpr hf
+  let H := { x : Associates D[X] // x ∣ y }
+  let hfin : Fintype H := UniqueFactorizationMonoid.fintypeSubtypeDvd y hy
+  let i : G → H := fun x ↦ ⟨Associates.mk x.1, Associates.mk_dvd_mk.2 x.2.2⟩
+  refine Fintype.ofInjective i fun x y heq ↦ ?_
+  rw [Subtype.mk.injEq] at heq ⊢
+  exact eq_of_monic_of_associated x.2.1 y.2.1 (Associates.mk_eq_mk_iff_associated.mp heq)
 
 end Polynomial
 

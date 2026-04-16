@@ -9,6 +9,8 @@ import Mathlib.Data.Setoid.Basic
 import Mathlib.Order.Atoms
 import Mathlib.Order.SupIndep
 
+noncomputable section
+
 /-!
 # Finite partitions
 
@@ -117,10 +119,6 @@ def map {β : Type*} [Lattice β] [OrderBot β] {a : α} (e : α ≃o β) (P : F
     convert P.not_bot_mem
     exact e.symm.map_bot
 
-@[simp]
-theorem parts_map {β : Type*} [Lattice β] [OrderBot β] {a : α} {e : α ≃o β} {P : Finpartition a} :
-    (P.map e).parts = P.parts.map e := rfl
-
 variable (α)
 
 @[simps]
@@ -132,10 +130,6 @@ protected def empty : Finpartition (⊥ : α) where
 
 instance : Inhabited (Finpartition (⊥ : α)) :=
   ⟨Finpartition.empty α⟩
-
-@[simp]
-theorem default_eq_empty : (default : Finpartition (⊥ : α)) = Finpartition.empty α :=
-  rfl
 
 variable {α} {a : α}
 
@@ -282,11 +276,6 @@ instance : Min (Finpartition a) :=
         · simp_rw [Finset.sup_inf_distrib_right, Finset.sup_inf_distrib_left]
           rfl
         · rw [P.sup_parts, Q.sup_parts, inf_idem])⟩
-
-@[simp]
-theorem parts_inf (P Q : Finpartition a) :
-    (P ⊓ Q).parts = ((P.parts ×ˢ Q.parts).image fun bc : α × α ↦ bc.1 ⊓ bc.2).erase ⊥ :=
-  rfl
 
 instance : SemilatticeInf (Finpartition a) :=
   { inf := Min.min
@@ -502,11 +491,6 @@ instance (s : Finset α) : Bot (Finpartition s) :=
             exact Finset.pairwiseDisjoint_range_singleton.subset (Set.image_subset_range _ _))
       sup_parts := by rw [sup_map, id_comp, Embedding.coeFn_mk, Finset.sup_singleton']
       not_bot_mem := by simp }⟩
-
-@[simp]
-theorem parts_bot (s : Finset α) :
-    (⊥ : Finpartition s).parts = s.map ⟨singleton, singleton_injective⟩ :=
-  rfl
 
 theorem card_bot (s : Finset α) : #(⊥ : Finpartition s).parts = #s := Finset.card_map _
 

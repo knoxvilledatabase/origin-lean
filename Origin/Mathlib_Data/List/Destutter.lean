@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Data.List.Chain
 
+noncomputable section
+
 /-!
 # Destuttering of Lists
 
@@ -28,14 +30,6 @@ adjacent, chain, duplicates, remove, list, stutter, destutter
 variable {α : Type*} (l : List α) (R : α → α → Prop) [DecidableRel R] {a b : α}
 
 namespace List
-
-@[simp]
-theorem destutter'_nil : destutter' R a [] = [a] :=
-  rfl
-
-theorem destutter'_cons :
-    (b :: l).destutter' R a = if R a b then a :: destutter' R b l else destutter' R a l :=
-  rfl
 
 variable {R}
 
@@ -103,19 +97,8 @@ theorem destutter'_eq_self_iff (a) : l.destutter' R a = a :: l ↔ l.Chain R a :
 theorem destutter'_ne_nil : l.destutter' R a ≠ [] :=
   ne_nil_of_mem <| l.mem_destutter' R a
 
-@[simp]
-theorem destutter_nil : ([] : List α).destutter R = [] :=
-  rfl
-
-theorem destutter_cons' : (a :: l).destutter R = destutter' R a l :=
-  rfl
-
 theorem destutter_cons_cons :
     (a :: b :: l).destutter R = if R a b then a :: destutter' R b l else destutter' R a l :=
-  rfl
-
-@[simp]
-theorem destutter_singleton : destutter R [a] = [a] :=
   rfl
 
 @[simp]

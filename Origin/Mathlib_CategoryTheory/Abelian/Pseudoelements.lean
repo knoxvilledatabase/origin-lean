@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Abelian.Exact
 import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.Algebra.Category.ModuleCat.EpiMono
 
+noncomputable section
+
 /-!
 # Pseudoelements in abelian categories
 
@@ -152,8 +154,6 @@ def homToFun {P Q : C} : CoeFun (P ⟶ Q) fun _ => P → Q :=
 attribute [local instance] homToFun
 
 scoped[Pseudoelement] attribute [instance] CategoryTheory.Abelian.Pseudoelement.homToFun
-
-theorem pseudoApply_mk' {P Q : C} (f : P ⟶ Q) (a : Over P) : f ⟦a⟧ = ⟦↑(a.hom ≫ f)⟧ := rfl
 
 theorem comp_apply {P Q R : C} (f : P ⟶ Q) (g : Q ⟶ R) (a : P) : (f ≫ g) a = g (f a) :=
   Quotient.inductionOn a fun x =>

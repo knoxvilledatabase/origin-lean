@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Algebra.Lie.IdealOperations
 
+noncomputable section
+
 /-!
 # Trivial Lie modules and Abelian Lie algebras
 
@@ -154,11 +156,6 @@ def maxTrivHom (f : M →ₗ⁅R,L⁆ N) : maxTrivSubmodule R L M →ₗ⁅R,L�
   map_smul' t m := by simp [Function.comp_apply]; rfl -- these two were `by simpa`
   map_lie' {x m} := by simp
 
-@[norm_cast, simp]
-theorem coe_maxTrivHom_apply (f : M →ₗ⁅R,L⁆ N) (m : maxTrivSubmodule R L M) :
-    (maxTrivHom f m : N) = f m :=
-  rfl
-
 def maxTrivEquiv (e : M ≃ₗ⁅R,L⁆ N) : maxTrivSubmodule R L M ≃ₗ⁅R,L⁆ maxTrivSubmodule R L N :=
   { maxTrivHom (e : M →ₗ⁅R,L⁆ N) with
     toFun := maxTrivHom (e : M →ₗ⁅R,L⁆ N)
@@ -175,11 +172,6 @@ theorem coe_maxTrivEquiv_apply (e : M ≃ₗ⁅R,L⁆ N) (m : maxTrivSubmodule R
 theorem maxTrivEquiv_of_refl_eq_refl :
     maxTrivEquiv (LieModuleEquiv.refl : M ≃ₗ⁅R,L⁆ M) = LieModuleEquiv.refl := by
   ext; simp only [coe_maxTrivEquiv_apply, LieModuleEquiv.refl_apply]
-
-@[simp]
-theorem maxTrivEquiv_of_equiv_symm_eq_symm (e : M ≃ₗ⁅R,L⁆ N) :
-    (maxTrivEquiv e).symm = maxTrivEquiv e.symm :=
-  rfl
 
 def maxTrivLinearMapEquivLieModuleHom : maxTrivSubmodule R L (M →ₗ[R] N) ≃ₗ[R] M →ₗ⁅R,L⁆ N where
   toFun f :=
@@ -198,19 +190,9 @@ theorem coe_maxTrivLinearMapEquivLieModuleHom (f : maxTrivSubmodule R L (M →�
     (maxTrivLinearMapEquivLieModuleHom (M := M) (N := N) f : M → N) = f := by ext; rfl
 
 @[simp]
-theorem coe_maxTrivLinearMapEquivLieModuleHom_symm (f : M →ₗ⁅R,L⁆ N) :
-    (maxTrivLinearMapEquivLieModuleHom (M := M) (N := N) |>.symm f : M → N) = f :=
-  rfl
-
-@[simp]
 theorem coe_linearMap_maxTrivLinearMapEquivLieModuleHom (f : maxTrivSubmodule R L (M →ₗ[R] N)) :
     (maxTrivLinearMapEquivLieModuleHom (M := M) (N := N) f : M →ₗ[R] N) = (f : M →ₗ[R] N) := by
   ext; rfl
-
-@[simp]
-theorem coe_linearMap_maxTrivLinearMapEquivLieModuleHom_symm (f : M →ₗ⁅R,L⁆ N) :
-    (maxTrivLinearMapEquivLieModuleHom (M := M) (N := N) |>.symm f : M →ₗ[R] N) = (f : M →ₗ[R] N) :=
-  rfl
 
 end LieModule
 
@@ -221,10 +203,6 @@ abbrev center : LieIdeal R L :=
 
 instance : IsLieAbelian (center R L) :=
   inferInstance
-
-@[simp]
-theorem ad_ker_eq_self_module_ker : (ad R L).ker = LieModule.ker R L L :=
-  rfl
 
 @[simp]
 theorem self_module_ker_eq_center : LieModule.ker R L L = center R L := by

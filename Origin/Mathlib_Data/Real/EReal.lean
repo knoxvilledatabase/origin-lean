@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Real/EReal.lean
-Genuine: 240 | Conflates: 0 | Dissolved: 15 | Infrastructure: 67
+Genuine: 252 | Conflates: 0 | Dissolved: 1 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.ENNReal.Real
 import Mathlib.Data.Sign
+
+noncomputable section
 
 /-!
 # The extended reals [-∞, ∞].
@@ -203,7 +205,10 @@ protected theorem one_mul : ∀ x : EReal, 1 * x = x
   | ⊥ => if_pos one_pos
   | (x : ℝ) => congr_arg Real.toEReal (one_mul x)
 
--- DISSOLVED: zero_mul
+protected theorem zero_mul : ∀ x : EReal, 0 * x = 0
+  | ⊤ => (if_neg (lt_irrefl _)).trans (if_pos rfl)
+  | ⊥ => (if_neg (lt_irrefl _)).trans (if_pos rfl)
+  | (x : ℝ) => congr_arg Real.toEReal (zero_mul x)
 
 instance : MulZeroOneClass EReal where
   one_mul := EReal.one_mul
@@ -224,26 +229,6 @@ def toReal : EReal → ℝ
   | ⊥ => 0
   | ⊤ => 0
   | (x : ℝ) => x
-
-@[simp]
-theorem toReal_top : toReal ⊤ = 0 :=
-  rfl
-
-@[simp]
-theorem toReal_bot : toReal ⊥ = 0 :=
-  rfl
-
-@[simp]
-theorem toReal_zero : toReal 0 = 0 :=
-  rfl
-
-@[simp]
-theorem toReal_one : toReal 1 = 1 :=
-  rfl
-
-@[simp]
-theorem toReal_coe (x : ℝ) : toReal (x : EReal) = x :=
-  rfl
 
 @[simp]
 theorem bot_lt_coe (x : ℝ) : (⊥ : EReal) < x :=
@@ -273,7 +258,9 @@ theorem top_ne_coe (x : ℝ) : (⊤ : EReal) ≠ x :=
 theorem bot_lt_zero : (⊥ : EReal) < 0 :=
   bot_lt_coe 0
 
--- DISSOLVED: bot_ne_zero
+@[simp]
+theorem bot_ne_zero : (⊥ : EReal) ≠ 0 :=
+  (coe_ne_bot 0).symm
 
 @[simp]
 theorem zero_ne_bot : (0 : EReal) ≠ ⊥ :=
@@ -287,7 +274,9 @@ theorem zero_lt_top : (0 : EReal) < ⊤ :=
 theorem zero_ne_top : (0 : EReal) ≠ ⊤ :=
   coe_ne_top 0
 
--- DISSOLVED: top_ne_zero
+@[simp]
+theorem top_ne_zero : (⊤ : EReal) ≠ 0 :=
+  (coe_ne_top 0).symm
 
 theorem range_coe : range Real.toEReal = {⊥, ⊤}ᶜ := by
   ext x
@@ -313,9 +302,11 @@ theorem coe_eq_zero {x : ℝ} : (x : EReal) = 0 ↔ x = 0 :=
 theorem coe_eq_one {x : ℝ} : (x : EReal) = 1 ↔ x = 1 :=
   EReal.coe_eq_coe_iff
 
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero {x : ℝ} : (x : EReal) ≠ 0 ↔ x ≠ 0 :=
+  EReal.coe_ne_coe_iff
 
--- DISSOLVED: coe_ne_one
+theorem coe_ne_one {x : ℝ} : (x : EReal) ≠ 1 ↔ x ≠ 1 :=
+  EReal.coe_ne_coe_iff
 
 @[simp, norm_cast]
 protected theorem coe_nonneg {x : ℝ} : (0 : EReal) ≤ x ↔ 0 ≤ x :=
@@ -571,9 +562,13 @@ theorem coe_ennreal_eq_zero {x : ℝ≥0∞} : (x : EReal) = 0 ↔ x = 0 := by
 theorem coe_ennreal_eq_one {x : ℝ≥0∞} : (x : EReal) = 1 ↔ x = 1 := by
   rw [← coe_ennreal_eq_coe_ennreal_iff, coe_ennreal_one]
 
--- DISSOLVED: coe_ennreal_ne_zero
+@[norm_cast]
+theorem coe_ennreal_ne_zero {x : ℝ≥0∞} : (x : EReal) ≠ 0 ↔ x ≠ 0 :=
+  coe_ennreal_eq_zero.not
 
--- DISSOLVED: coe_ennreal_ne_one
+@[norm_cast]
+theorem coe_ennreal_ne_one {x : ℝ≥0∞} : (x : EReal) ≠ 1 ↔ x ≠ 1 :=
+  coe_ennreal_eq_one.not
 
 theorem coe_ennreal_nonneg (x : ℝ≥0∞) : (0 : EReal) ≤ x :=
   coe_ennreal_le_coe_ennreal_iff.2 (zero_le x)
@@ -674,15 +669,6 @@ theorem lt_iff_exists_real_btwn {a b : EReal} : a < b ↔ ∃ x : ℝ, a < x ∧
     let ⟨x, ax, xb⟩ := exists_rat_btwn_of_lt hab
     ⟨(x : ℝ), ax, xb⟩,
     fun ⟨_x, ax, xb⟩ => ax.trans xb⟩
-
-def neTopBotEquivReal : ({⊥, ⊤}ᶜ : Set EReal) ≃ ℝ where
-  toFun x := EReal.toReal x
-  invFun x := ⟨x, by simp⟩
-  left_inv := fun ⟨x, hx⟩ => by
-    lift x to ℝ
-    · simpa [not_or, and_comm] using hx
-    · simp
-  right_inv x := by simp
 
 /-! ### Addition -/
 
@@ -1056,14 +1042,6 @@ lemma _root_.ENNReal.toEReal_sub {x y : ℝ≥0∞} (hy_top : y ≠ ∞) (h_le :
 
 /-! ### Multiplication -/
 
-@[simp] lemma top_mul_top : (⊤ : EReal) * ⊤ = ⊤ := rfl
-
-@[simp] lemma top_mul_bot : (⊤ : EReal) * ⊥ = ⊥ := rfl
-
-@[simp] lemma bot_mul_top : (⊥ : EReal) * ⊤ = ⊥ := rfl
-
-@[simp] lemma bot_mul_bot : (⊥ : EReal) * ⊥ = ⊤ := rfl
-
 lemma coe_mul_top_of_pos {x : ℝ} (h : 0 < x) : (x : EReal) * ⊤ = ⊤ :=
   if_pos h
 
@@ -1284,8 +1262,6 @@ open SignType (sign)
 
 theorem sign_top : sign (⊤ : EReal) = 1 := rfl
 
-theorem sign_bot : sign (⊥ : EReal) = -1 := rfl
-
 @[simp]
 theorem sign_coe (x : ℝ) : sign (x : EReal) = sign x := by
   simp only [sign, OrderHom.coe_mk, EReal.coe_pos, EReal.coe_neg']
@@ -1397,7 +1373,10 @@ lemma inv_top : (⊤ : EReal)⁻¹ = 0 := rfl
 
 lemma coe_inv (x : ℝ) : (x⁻¹ : ℝ) = (x : EReal)⁻¹ := rfl
 
--- DISSOLVED: inv_zero
+@[simp]
+lemma inv_zero : (0 : EReal)⁻¹ = 0 := by
+  change (0 : ℝ)⁻¹ = (0 : EReal)
+  rw [GroupWithZero.inv_zero, coe_zero]
 
 noncomputable instance : DivInvOneMonoid EReal where
   inv_one := by nth_rw 1 [← coe_one, ← coe_inv 1, _root_.inv_one, coe_one]
@@ -1497,7 +1476,8 @@ lemma div_top {a : EReal} : a / ⊤ = 0 := inv_top ▸ mul_zero a
 
 -- DISSOLVED: div_zero
 
--- DISSOLVED: zero_div
+@[simp]
+lemma zero_div {a : EReal} : 0 / a = 0 := zero_mul a⁻¹
 
 lemma top_div_of_pos_ne_top {a : EReal} (h : 0 < a) (h' : a ≠ ⊤) : ⊤ / a = ⊤ :=
   top_mul_of_pos (inv_pos_of_pos_ne_top h h')
@@ -1513,7 +1493,9 @@ lemma bot_div_of_neg_ne_bot {a : EReal} (h : a < 0) (h' : a ≠ ⊥) : ⊥ / a =
 
 /-! #### Division and Multiplication -/
 
--- DISSOLVED: div_self
+lemma div_self {a : EReal} (h₁ : a ≠ ⊥) (h₂ : a ≠ ⊤) (h₃ : a ≠ 0) : a / a = 1 := by
+  rw [← coe_toReal h₂ h₁] at h₃ ⊢
+  rw [← coe_div, _root_.div_self (coe_ne_zero.1 h₃), coe_one]
 
 lemma mul_div (a b c : EReal) : a * (b / c) = (a * b) / c := by
   change a * (b * c⁻¹) = (a * b) * c⁻¹
@@ -1526,11 +1508,21 @@ lemma div_div (a b c : EReal) : a / b / c = a / (b * c) := by
   change (a * b⁻¹) * c⁻¹ = a * (b * c)⁻¹
   rw [mul_assoc a b⁻¹, mul_inv]
 
--- DISSOLVED: div_mul_cancel
+lemma div_mul_cancel {a b : EReal} (h₁ : b ≠ ⊥) (h₂ : b ≠ ⊤) (h₃ : b ≠ 0) : (a / b) * b = a := by
+  change (a * b⁻¹) * b = a
+  rw [mul_assoc, mul_comm b⁻¹ b]
+  change a * (b / b) = a
+  rw [div_self h₁ h₂ h₃, mul_one]
 
--- DISSOLVED: mul_div_cancel
+lemma mul_div_cancel {a b : EReal} (h₁ : b ≠ ⊥) (h₂ : b ≠ ⊤) (h₃ : b ≠ 0) : b * (a / b) = a := by
+  rw [mul_comm, div_mul_cancel h₁ h₂ h₃]
 
--- DISSOLVED: mul_div_mul_cancel
+lemma mul_div_mul_cancel {a b c : EReal} (h₁ : c ≠ ⊥) (h₂ : c ≠ ⊤) (h₃ : c ≠ 0) :
+    (a * c) / (b * c) = a / b := by
+  change (a * c) * (b * c)⁻¹ = a * b⁻¹
+  rw [mul_assoc, mul_inv b c]
+  congr
+  exact mul_div_cancel h₁ h₂ h₃
 
 /-! #### Division Distributivity -/
 
@@ -1611,23 +1603,5 @@ lemma div_nonneg_of_nonpos_of_nonpos {a b : EReal} (h : a ≤ 0) (h' : b ≤ 0) 
   le_of_eq_of_le (Eq.symm zero_div) (div_le_div_right_of_nonpos h' h)
 
 end EReal
-
--- DISSOLVED: positivity_coe_real_ereal
-
-@[positivity]
-unsafe def positivity_coe_ennreal_ereal : expr → tactic strictness
-  | q(@coe _ _ $(inst) $(a)) => do
-    unify inst q(@coeToLift _ _ <| @coeBase _ _ EReal.hasCoeENNReal)
-    let strictness_a ← core a
-    match strictness_a with
-      | positive p => positive <$> mk_app `` ereal_coe_ennreal_pos [p]
-      | _ => nonnegative <$> mk_mapp `ereal.coe_ennreal_nonneg [a]
-  | e =>
-    pp e >>=
-      fail ∘ format.bracket "The expression " " is not of the form `(r : ereal)` for `r : ℝ≥0∞`"
-
-end Tactic
-
--/
 
 set_option linter.style.longFile 1800

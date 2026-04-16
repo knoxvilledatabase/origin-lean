@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.Unique
 import Mathlib.MeasureTheory.Function.L2Space
 
+noncomputable section
+
 /-! # Conditional expectation in L2
 
 This file contains one step of the construction of the conditional expectation, which is completed

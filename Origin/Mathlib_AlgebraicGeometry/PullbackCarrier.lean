@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Ring.LinearAlgebra
 import Mathlib.AlgebraicGeometry.ResidueField
 
+noncomputable section
+
 /-!
 # Underlying topological space of fibre product of schemes
 
@@ -50,14 +52,6 @@ namespace Triplet
 protected lemma ext {t₁ t₂ : Triplet f g} (ex : t₁.x = t₂.x) (ey : t₁.y = t₂.y) : t₁ = t₂ := by
   cases t₁; cases t₂; simp; aesop
 
-@[simps]
-def mk' (x : X) (y : Y) (h : f.base x = g.base y) : Triplet f g where
-  x := x
-  y := y
-  s := g.base y
-  hx := h
-  hy := rfl
-
 def tensor (T : Triplet f g) : CommRingCat :=
   pushout ((S.residueFieldCongr T.hx).inv ≫ f.residueFieldMap T.x)
     ((S.residueFieldCongr T.hy).inv ≫ g.residueFieldMap T.y)
@@ -85,10 +79,6 @@ def tensorCongr {T₁ T₂ : Triplet f g} (e : T₁ = T₂) :
 @[simp]
 lemma tensorCongr_refl {x : Triplet f g} :
     tensorCongr (refl x) = Iso.refl _ := rfl
-
-@[simp]
-lemma tensorCongr_symm {x y : Triplet f g} (e : x = y) :
-    (tensorCongr e).symm = tensorCongr e.symm := rfl
 
 @[simp]
 lemma tensorCongr_inv {x y : Triplet f g} (e : x = y) :

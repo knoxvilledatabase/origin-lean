@@ -1,12 +1,14 @@
 /-
 Extracted from Data/ZMod/Units.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Associated
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Data.Nat.PrimeFin
 import Mathlib.RingTheory.Coprime.Lemmas
+
+noncomputable section
 
 /-!
 # Lemmas about units in `ZMod`.
@@ -33,7 +35,32 @@ lemma unitsMap_self (n : ℕ) : unitsMap (dvd_refl n) = MonoidHom.id _ := by
 lemma IsUnit_cast_of_dvd (hm : n ∣ m) (a : Units (ZMod m)) : IsUnit (cast (a : ZMod m) : ZMod n) :=
   Units.isUnit (unitsMap hm a)
 
--- DISSOLVED: unitsMap_surjective
+theorem unitsMap_surjective [hm : NeZero m] (h : n ∣ m) :
+    Function.Surjective (unitsMap h) := by
+  suffices ∀ x : ℕ, x.Coprime n → ∃ k : ℕ, (x + k * n).Coprime m by
+    intro x
+    have ⟨k, hk⟩ := this x.val.val (val_coe_unit_coprime x)
+    refine ⟨unitOfCoprime _ hk, Units.ext ?_⟩
+    have : NeZero n := ⟨fun hn ↦ hm.out (eq_zero_of_zero_dvd (hn ▸ h))⟩
+    simp [unitsMap_def, - castHom_apply]
+  intro x hx
+  let ps := m.primeFactors.filter (fun p ↦ ¬p ∣ x)
+  use ps.prod id
+  apply Nat.coprime_of_dvd
+  intro p pp hp hpn
+  by_cases hpx : p ∣ x
+  · have h := Nat.dvd_sub' hp hpx
+    rw [add_comm, Nat.add_sub_cancel] at h
+    rcases pp.dvd_mul.mp h with h | h
+    · have ⟨q, hq, hq'⟩ := (pp.prime.dvd_finset_prod_iff id).mp h
+      rw [Finset.mem_filter, Nat.mem_primeFactors,
+        ← (Nat.prime_dvd_prime_iff_eq pp hq.1.1).mp hq'] at hq
+      exact hq.2 hpx
+    · exact Nat.Prime.not_coprime_iff_dvd.mpr ⟨p, pp, hpx, h⟩ hx
+  · have pps : p ∈ ps := Finset.mem_filter.mpr ⟨Nat.mem_primeFactors.mpr ⟨pp, hpn, hm.out⟩, hpx⟩
+    have h := Nat.dvd_sub' hp ((Finset.dvd_prod_of_mem id pps).mul_right n)
+    rw [Nat.add_sub_cancel] at h
+    contradiction
 
 open Nat in
 

@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.Data.Nat.GCD.BigOperators
 import Mathlib.Order.SupIndep
 
+noncomputable section
+
 /-!
 # Canonical homomorphism from a finite family of monoids
 

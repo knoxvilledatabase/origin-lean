@@ -8,6 +8,8 @@ import Mathlib.Algebra.NoZeroSMulDivisors.Basic
 import Mathlib.Algebra.Field.Rat
 import Mathlib.Algebra.Order.Field.Rat
 
+noncomputable section
+
 /-!
 # Basic results about modules over the rationals.
 -/

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.Pi
 import Mathlib.Algebra.Module.Prod
 import Mathlib.Data.Finsupp.Basic
 
+noncomputable section
+
 /-!
 # Finsupps and sum/product types
 
@@ -49,22 +51,6 @@ def sumFinsuppLEquivProdFinsupp {α β : Type*} : (α ⊕ β →₀ M) ≃ₗ[R]
           snd_sumFinsuppAddEquivProdFinsupp, fst_sumFinsuppAddEquivProdFinsupp,
           RingHom.id_apply] }
 
-theorem fst_sumFinsuppLEquivProdFinsupp {α β : Type*} (f : α ⊕ β →₀ M) (x : α) :
-    (sumFinsuppLEquivProdFinsupp R f).1 x = f (Sum.inl x) :=
-  rfl
-
-theorem snd_sumFinsuppLEquivProdFinsupp {α β : Type*} (f : α ⊕ β →₀ M) (y : β) :
-    (sumFinsuppLEquivProdFinsupp R f).2 y = f (Sum.inr y) :=
-  rfl
-
-theorem sumFinsuppLEquivProdFinsupp_symm_inl {α β : Type*} (fg : (α →₀ M) × (β →₀ M)) (x : α) :
-    ((sumFinsuppLEquivProdFinsupp R).symm fg) (Sum.inl x) = fg.1 x :=
-  rfl
-
-theorem sumFinsuppLEquivProdFinsupp_symm_inr {α β : Type*} (fg : (α →₀ M) × (β →₀ M)) (y : β) :
-    ((sumFinsuppLEquivProdFinsupp R).symm fg) (Sum.inr y) = fg.2 y :=
-  rfl
-
 end Sum
 
 section Sigma
@@ -80,17 +66,6 @@ noncomputable def sigmaFinsuppLEquivPiFinsupp {M : Type*} {ιs : η → Type*} [
     map_smul' := fun c f => by
       ext
       simp }
-
-@[simp]
-theorem sigmaFinsuppLEquivPiFinsupp_apply {M : Type*} {ιs : η → Type*} [AddCommMonoid M]
-    [Module R M] (f : (Σj, ιs j) →₀ M) (j i) : sigmaFinsuppLEquivPiFinsupp R f j i = f ⟨j, i⟩ :=
-  rfl
-
-@[simp]
-theorem sigmaFinsuppLEquivPiFinsupp_symm_apply {M : Type*} {ιs : η → Type*} [AddCommMonoid M]
-    [Module R M] (f : (j : _) → (ιs j →₀ M)) (ji) :
-    (Finsupp.sigmaFinsuppLEquivPiFinsupp R).symm f ji = f ji.1 ji.2 :=
-  rfl
 
 end Sigma
 

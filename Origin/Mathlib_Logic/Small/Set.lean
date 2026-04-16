@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Lattice
 import Mathlib.Logic.Small.Basic
 
+noncomputable section
+
 /-!
 # Results about `Small` on coerced sets
 -/

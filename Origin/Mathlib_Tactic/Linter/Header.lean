@@ -5,8 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Lean.Elab.Command
 import Lean.Elab.ParseImportsFast
-import statements*
-import statements*
+
+noncomputable section
 
 /-!
 #  The "header" linter
@@ -19,50 +19,34 @@ Apache ...
 Authors ...
 -/
 
+import statements*
+module doc-string*
 remaining file
-
 ```
-
 It emits a warning if
-
 * the copyright statement is malformed;
-
 * `Mathlib.Tactic` is imported;
-
 * any import in `Lake` is present;
-
 * the first non-`import` command is not a module doc-string.
 
 The linter allows `import`-only files and does not require a copyright statement in `Mathlib.Init`.
 
 ## Implementation
-
 The strategy used by the linter is as follows.
-
 The linter computes the end position of the first module doc-string of the file,
-
 resorting to the end of the file, if there is no module doc-string.
-
 Next, the linter tries to parse the file up to the position determined above.
 
 If the parsing is successful, the linter checks the resulting `Syntax` and behaves accordingly.
 
 If the parsing is not successful, this already means there is some "problematic" command
-
 after the imports. In particular, there is a command that is not a module doc-string
-
 immediately following the last import: the file should be flagged by the linter.
-
 Hence, the linter then falls back to parsing the header of the file, adding a spurious `section`
-
 after it.
-
 This makes it possible for the linter to check the entire header of the file, emit warnings that
-
 could arise from this part and also flag that the file should contain a module doc-string after
-
 the `import` statements.
-
 -/
 
 open Lean Elab Command
@@ -111,16 +95,6 @@ def authorsLineChecks (line : String) (offset : String.Pos) : Array (Syntax × S
       (toSyntax line "." offset,
        s!"Please, do not end the authors' line with a period.")
   return stxs
-
-* the first line is begins with `Copyright (c) 20` and ends with `. All rights reserved.`;
-
-* the second line is `Released under Apache 2.0 license as described in the file LICENSE.`;
-
-* the remainder of the string begins with `Authors: `, does not end with `.` and
-
-  contains no ` and ` nor a double space, except possibly after a line break.
-
--/
 
 def copyrightHeaderChecks (copyright : String) : Array (Syntax × String) := Id.run do
   -- First, we merge lines ending in `,`: two spaces after the line-break are ok,
@@ -188,24 +162,6 @@ def isInMathlib (modName : Name) : IO Bool := do
   else return false
 
 initialize inMathlibRef : IO.Ref (Option Bool) ← IO.mkRef none
-
-remaining file
-
-```
-
-It emits a warning if
-
-* the copyright statement is malformed;
-
-* `Mathlib.Tactic` is imported;
-
-* any import in `Lake` is present;
-
-* the first non-`import` command is not a module doc-string.
-
-The linter allows `import`-only files and does not require a copyright statement in `Mathlib.Init`.
-
--/
 
 register_option linter.style.header : Bool := {
 

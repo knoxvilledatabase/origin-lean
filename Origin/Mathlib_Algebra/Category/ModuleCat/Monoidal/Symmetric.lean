@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 
+noncomputable section
+
 /-!
 # The symmetric monoidal structure on `Module R`.
 -/
@@ -73,25 +75,10 @@ instance symmetricCategory : SymmetricCategory (ModuleCat.{u} R) where
     apply TensorProduct.ext'
     aesop_cat
 
-@[simp]
-theorem braiding_hom_apply {M N : ModuleCat.{u} R} (m : M) (n : N) :
-    ((β_ M N).hom : M ⊗ N ⟶ N ⊗ M) (m ⊗ₜ n) = n ⊗ₜ m :=
-  rfl
-
-@[simp]
-theorem braiding_inv_apply {M N : ModuleCat.{u} R} (m : M) (n : N) :
-    ((β_ M N).inv : N ⊗ M ⟶ M ⊗ N) (n ⊗ₜ m) = m ⊗ₜ n :=
-  rfl
-
 theorem tensorμ_eq_tensorTensorTensorComm {A B C D : ModuleCat R} :
     tensorμ A B C D = (TensorProduct.tensorTensorTensorComm R A B C D).toLinearMap :=
   TensorProduct.ext <| TensorProduct.ext <| LinearMap.ext₂ fun _ _ =>
     TensorProduct.ext <| LinearMap.ext₂ fun _ _ => rfl
-
-@[simp]
-theorem tensorμ_apply
-    {A B C D : ModuleCat R} (x : A) (y : B) (z : C) (w : D) :
-    tensorμ A B C D ((x ⊗ₜ y) ⊗ₜ (z ⊗ₜ w)) = (x ⊗ₜ z) ⊗ₜ (y ⊗ₜ w) := rfl
 
 end MonoidalCategory
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.EssentiallySmall
 import Mathlib.CategoryTheory.Filtered.Basic
 
+noncomputable section
+
 /-!
 # A functor from a small category to a filtered category factors through a small filtered category
 

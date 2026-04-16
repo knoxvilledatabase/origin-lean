@@ -5,6 +5,8 @@ Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Module.AEval
 
+noncomputable section
+
 /-!
 # Polynomial module
 
@@ -191,10 +193,6 @@ noncomputable def equivPolynomialSelf : PolynomialModule R R ≃ₗ[R[X]] R[X] :
 noncomputable def equivPolynomial {S : Type*} [CommRing S] [Algebra R S] :
     PolynomialModule R S ≃ₗ[R] S[X] :=
   { (Polynomial.toFinsuppIso S).symm with map_smul' := fun _ _ => rfl }
-
-@[simp]
-lemma equivPolynomialSelf_apply_eq (p : PolynomialModule R R) :
-    equivPolynomialSelf p = equivPolynomial p := rfl
 
 @[simp]
 lemma equivPolynomial_single {S : Type*} [CommRing S] [Algebra R S] (n : ℕ) (x : S) :

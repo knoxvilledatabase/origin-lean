@@ -1,9 +1,11 @@
 /-
 Extracted from Data/List/Cycle.lean
-Genuine: 89 | Conflates: 6 | Dissolved: 0 | Infrastructure: 35
+Genuine: 88 | Conflates: 6 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.List
+
+noncomputable section
 
 /-!
 # Cycles of a list
@@ -29,14 +31,6 @@ def nextOr : ∀ (_ : List α) (_ _ : α), α
   | [_], _, default => default
   -- Handles the not-found and the wraparound case
   | y :: z :: xs, x, default => if x = y then z else nextOr (z :: xs) x default
-
-@[simp]
-theorem nextOr_nil (x d : α) : nextOr [] x d = d :=
-  rfl
-
-@[simp]
-theorem nextOr_singleton (x y d : α) : nextOr [y] x d = d :=
-  rfl
 
 @[simp]
 theorem nextOr_self_cons_cons (xs : List α) (x y d : α) : nextOr (x :: y :: xs) x d = y :=
@@ -102,14 +96,6 @@ def prev : ∀ l : List α, ∀ x ∈ l, α
     else if x = z then y else prev (z :: xs) x (by simpa [hx] using h)
 
 variable (l : List α) (x : α)
-
-@[simp]
-theorem next_singleton (x y : α) (h : x ∈ [y]) : next [y] x h = y :=
-  rfl
-
-@[simp]
-theorem prev_singleton (x y : α) (h : x ∈ [y]) : prev [y] x h = y :=
-  rfl
 
 theorem next_cons_cons_eq' (y z : α) (h : x ∈ y :: z :: l) (hx : x = y) :
     next (y :: z :: l) x h = z := by rw [next, nextOr, if_pos hx]
@@ -249,7 +235,6 @@ theorem next_get (l : List α) (h : Nodup l) (i : Fin l.length) :
       · rw [get_cons_succ]; exact get_mem _ _ _
 
 set_option linter.unusedVariables false in
-
 theorem prev_get (l : List α) (h : Nodup l) (i : Fin l.length) :
     prev l (l.get i) (get_mem _ _ _) =
       l.get ⟨(i + (l.length - 1)) % l.length, Nat.mod_lt _ i.pos⟩ :=
@@ -406,10 +391,6 @@ theorem coe_eq_nil (l : List α) : (l : Cycle α) = nil ↔ l = [] :=
 instance : EmptyCollection (Cycle α) :=
   ⟨nil⟩
 
-@[simp]
-theorem empty_eq : ∅ = @nil α :=
-  rfl
-
 instance : Inhabited (Cycle α) :=
   ⟨nil⟩
 
@@ -444,10 +425,6 @@ nonrec def reverse (s : Cycle α) : Cycle α :=
   Quot.map reverse (fun _ _ => IsRotated.reverse) s
 
 @[simp]
-theorem reverse_coe (l : List α) : (l : Cycle α).reverse = l.reverse :=
-  rfl
-
-@[simp]
 theorem mem_reverse_iff {a : α} {s : Cycle α} : a ∈ s.reverse ↔ a ∈ s :=
   Quot.inductionOn s fun _ => mem_reverse
 
@@ -455,19 +432,11 @@ theorem mem_reverse_iff {a : α} {s : Cycle α} : a ∈ s.reverse ↔ a ∈ s :=
 theorem reverse_reverse (s : Cycle α) : s.reverse.reverse = s :=
   Quot.inductionOn s fun _ => by simp
 
-@[simp]
-theorem reverse_nil : nil.reverse = @nil α :=
-  rfl
-
 def length (s : Cycle α) : ℕ :=
   Quot.liftOn s List.length fun _ _ e => e.perm.length_eq
 
 @[simp]
 theorem length_coe (l : List α) : length (l : Cycle α) = l.length :=
-  rfl
-
-@[simp]
-theorem length_nil : length (@nil α) = 0 :=
   rfl
 
 @[simp]
@@ -559,14 +528,6 @@ def toMultiset (s : Cycle α) : Multiset α :=
   Quotient.liftOn' s (↑) fun _ _ h => Multiset.coe_eq_coe.mpr h.perm
 
 @[simp]
-theorem coe_toMultiset (l : List α) : (l : Cycle α).toMultiset = l :=
-  rfl
-
-@[simp]
-theorem nil_toMultiset : nil.toMultiset = (0 : Multiset α) :=
-  rfl
-
-@[simp]
 theorem card_toMultiset (s : Cycle α) : Multiset.card s.toMultiset = s.length :=
   Quotient.inductionOn' s (by simp)
 
@@ -576,14 +537,6 @@ theorem toMultiset_eq_nil {s : Cycle α} : s.toMultiset = 0 ↔ s = Cycle.nil :=
 
 def map {β : Type*} (f : α → β) : Cycle α → Cycle β :=
   Quotient.map' (List.map f) fun _ _ h => h.map _
-
-@[simp]
-theorem map_nil {β : Type*} (f : α → β) : map f nil = nil :=
-  rfl
-
-@[simp]
-theorem map_coe {β : Type*} (f : α → β) (l : List α) : map f ↑l = List.map f l :=
-  rfl
 
 @[simp]
 theorem map_eq_nil {β : Type*} (f : α → β) (s : Cycle α) : map f s = nil ↔ s = nil :=
@@ -647,18 +600,6 @@ instance fintypeNodupNontrivialCycle [Fintype α] :
 
 def toFinset (s : Cycle α) : Finset α :=
   s.toMultiset.toFinset
-
-@[simp]
-theorem toFinset_toMultiset (s : Cycle α) : s.toMultiset.toFinset = s.toFinset :=
-  rfl
-
-@[simp]
-theorem coe_toFinset (l : List α) : (l : Cycle α).toFinset = l.toFinset :=
-  rfl
-
-@[simp]
-theorem nil_toFinset : (@nil α).toFinset = ∅ :=
-  rfl
 
 @[simp]
 theorem toFinset_eq_nil {s : Cycle α} : s.toFinset = ∅ ↔ s = Cycle.nil :=

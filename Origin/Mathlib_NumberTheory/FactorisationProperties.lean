@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FactorisationProperties.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum
@@ -8,6 +8,8 @@ import Mathlib.Algebra.IsPrimePow
 import Mathlib.NumberTheory.Divisors
 import Mathlib.Tactic.FinCases
 import Mathlib.Tactic.NormNum.Prime
+
+noncomputable section
 
 /-!
 # Factorisation properties of natural numbers
@@ -76,7 +78,6 @@ theorem abundant_twelve : Abundant 12 := by
   norm_num
 
 set_option maxRecDepth 1730 in
-
 theorem weird_seventy : Weird 70 := by
   rw [Weird, Abundant, not_pseudoperfect_iff_forall]
   have h : properDivisors 70 = {1, 2, 5, 7, 10, 14, 35} := by rfl
@@ -89,7 +90,10 @@ theorem weird_seventy : Weird 70 := by
     have hs' := mem_powerset.mpr hs
     fin_cases hs' <;> decide
 
--- DISSOLVED: deficient_iff_not_abundant_and_not_perfect
+lemma deficient_iff_not_abundant_and_not_perfect (hn : n ≠ 0) :
+    Deficient n ↔ ¬ Abundant n ∧ ¬ Perfect n := by
+  dsimp only [Perfect, Abundant, Deficient]
+  omega
 
 lemma perfect_iff_not_abundant_and_not_deficient (hn : 0 ≠ n) :
     Perfect n ↔ ¬ Abundant n ∧ ¬ Deficient n := by

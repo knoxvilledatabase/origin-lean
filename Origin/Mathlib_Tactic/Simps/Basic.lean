@@ -1,12 +1,14 @@
 /-
 Extracted from Tactic/Simps/Basic.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Lean.Elab.Tactic.Simp
 import Lean.Elab.App
 import Mathlib.Tactic.Simps.NotationClass
 import Mathlib.Lean.Expr.Basic
+
+noncomputable section
 
 /-!
 # Simps attribute
@@ -139,6 +141,14 @@ syntax simpsArgsRest := Tactic.optConfig (ppSpace ident)*
 
 syntax (name := simps) "simps" "!"? "?"? simpsArgsRest : attr
 
+@[inherit_doc simps] macro "simps?"  rest:simpsArgsRest : attr => `(attr| simps   ? $rest)
+
+@[inherit_doc simps] macro "simps!"  rest:simpsArgsRest : attr => `(attr| simps !   $rest)
+
+@[inherit_doc simps] macro "simps!?" rest:simpsArgsRest : attr => `(attr| simps ! ? $rest)
+
+@[inherit_doc simps] macro "simps?!" rest:simpsArgsRest : attr => `(attr| simps ! ? $rest)
+
 end Attr
 
 register_option linter.simpsNoConstructor : Bool := {
@@ -168,11 +178,9 @@ syntax simpsRule := simpsRule.prefix <|> simpsRule.rename <|> simpsRule.erase <|
 syntax simpsProj := ppSpace ident (" (" simpsRule,+ ")")?
 
 syntax (name := initialize_simps_projections)
-
   "initialize_simps_projections" "?"? simpsProj : command
 
 macro "initialize_simps_projections?" rest:simpsProj : command =>
-
   `(initialize_simps_projections ? $rest)
 
 end Command
@@ -539,38 +547,6 @@ def getRawProjections (stx : Syntax) (str : Name) (traceIfExists : Bool := false
   structureExt.add str (rawLevels, projs)
   trace[simps.debug] "Generated raw projection data:{indentD <| toMessageData (rawLevels, projs)}"
   pure (rawLevels, projs)
-
-library_note "custom simps projection"/--
-
-You can specify custom projections for the `@[simps]` attribute.
-
-To do this for the projection `MyStructure.originalProjection` by adding a declaration
-
-`MyStructure.Simps.myProjection` that is definitionally equal to
-
-`MyStructure.originalProjection` but has the projection in the desired (simp-normal) form.
-
-Then you can call
-
-```
-
-initialize_simps_projections (originalProjection → myProjection, ...)
-
-```
-
-to register this projection. See `elabInitializeSimpsProjections` for more information.
-
-You can also specify custom projections that are definitionally equal to a composite of multiple
-
-projections. This is often desirable when extending structures (without `oldStructureCmd`).
-
-`CoeFun` and notation class (like `Mul`) instances will be automatically used, if they
-
-are definitionally equal to a projection of the structure (but not when they are equal to the
-
-composite of multiple projections).
-
--/
 
 def elabSimpsRule : Syntax → CommandElabM ProjectionRule
   | `(simpsRule| $id1 → $id2)   => return .rename id1.getId id1.raw id2.getId id2.raw

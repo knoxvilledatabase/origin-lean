@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Algebra.SMulWithZero
 
+noncomputable section
+
 /-!
 # Pointwise operations on ordered algebraic objects
 

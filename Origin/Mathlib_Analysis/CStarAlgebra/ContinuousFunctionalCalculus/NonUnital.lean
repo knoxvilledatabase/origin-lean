@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/CStarAlgebra/ContinuousFunctionalCalculus/NonUnital.lean
-Genuine: 67 | Conflates: 4 | Dissolved: 0 | Infrastructure: 7
+Genuine: 58 | Conflates: 4 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Quasispectrum
@@ -8,6 +8,8 @@ import Mathlib.Topology.ContinuousMap.Compact
 import Mathlib.Topology.ContinuousMap.ContinuousMapZero
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unital
 import Mathlib.Topology.UniformSpace.CompactConvergence
+
+noncomputable section
 
 /-!
 # The continuous functional calculus for non-unital algebras
@@ -87,7 +89,6 @@ variable [TopologicalSpace A] [Module R A] [IsScalarTower R A A] [SMulCommClass 
 variable [instCFCₙ : NonUnitalContinuousFunctionalCalculus R p]
 
 include instCFCₙ in
-
 lemma NonUnitalContinuousFunctionalCalculus.isCompact_quasispectrum (a : A) :
     IsCompact (σₙ R a) :=
   isCompact_iff_compactSpace.mpr inferInstance
@@ -245,17 +246,16 @@ lemma cfcₙ_commute_cfcₙ (f g : R → R) (a : A) : Commute (cfcₙ f a) (cfc�
 variable (R) in
 
 include ha in
-
 lemma cfcₙ_id : cfcₙ (id : R → R) a = a :=
   cfcₙ_apply (id : R → R) a ▸ cfcₙHom_id (p := p) ha
 
 variable (R) in
 
 include ha in
-
 lemma cfcₙ_id' : cfcₙ (fun x : R ↦ x) a = a := cfcₙ_id R a
 
 include ha hf hf0 in
+/-- The **spectral mapping theorem** for the non-unital continuous functional calculus. -/
 
 lemma cfcₙ_map_quasispectrum : σₙ R (cfcₙ f a) = f '' σₙ R a := by
   simp [cfcₙ_apply f a, cfcₙHom_map_quasispectrum (p := p)]
@@ -263,7 +263,6 @@ lemma cfcₙ_map_quasispectrum : σₙ R (cfcₙ f a) = f '' σₙ R a := by
 variable (R) in
 
 include R in
-
 lemma cfcₙ_predicate_zero : p 0 :=
   NonUnitalContinuousFunctionalCalculus.predicate_zero (R := R)
 
@@ -314,7 +313,6 @@ lemma cfcₙ_const_zero : cfcₙ (fun _ : R ↦ 0) a = 0 := cfcₙ_zero R a
 variable {R}
 
 include hf hf0 hg hg0 in
-
 lemma cfcₙ_mul : cfcₙ (fun x ↦ f x * g x) a = cfcₙ f a * cfcₙ g a := by
   by_cases ha : p a
   · rw [cfcₙ_apply f a, cfcₙ_apply g a, ← map_mul, cfcₙ_apply _ a]
@@ -322,7 +320,6 @@ lemma cfcₙ_mul : cfcₙ (fun x ↦ f x * g x) a = cfcₙ f a * cfcₙ g a := b
   · simp [cfcₙ_apply_of_not_predicate a ha]
 
 include hf hf0 hg hg0 in
-
 lemma cfcₙ_add : cfcₙ (fun x ↦ f x + g x) a = cfcₙ f a + cfcₙ g a := by
   by_cases ha : p a
   · rw [cfcₙ_apply f a, cfcₙ_apply g a, cfcₙ_apply _ a]
@@ -397,7 +394,6 @@ lemma cfcₙ_const_mul_id (r : R) (a : A) (ha : p a := by cfc_tac) : cfcₙ (r *
   cfcₙ_smul_id r a
 
 include ha in
-
 lemma cfcₙ_star_id : cfcₙ (star · : R → R) a = star a := by
   rw [cfcₙ_star _ a, cfcₙ_id' R a]
 
@@ -457,7 +453,6 @@ lemma CFC.eq_zero_of_quasispectrum_eq_zero (h_spec : σₙ R a ⊆ {0}) (ha : p 
   simpa [cfcₙ_id R a] using cfcₙ_congr (a := a) (f := id) (g := fun _ : R ↦ 0) fun x ↦ by simp_all
 
 include instCFCₙ in
-
 lemma CFC.quasispectrum_zero_eq : σₙ R (0 : A) = {0} := by
   refine Set.eq_singleton_iff_unique_mem.mpr ⟨quasispectrum.zero_mem R 0, fun x hx ↦ ?_⟩
   rw [← cfcₙ_zero R (0 : A),
@@ -513,7 +508,6 @@ variable (hf : ContinuousOn f (σₙ R a) := by cfc_cont_tac) (hf0 : f 0 = 0 := 
 variable (hg : ContinuousOn g (σₙ R a) := by cfc_cont_tac) (hg0 : g 0 = 0 := by cfc_zero_tac)
 
 include hf hf0 hg hg0 in
-
 lemma cfcₙ_sub : cfcₙ (fun x ↦ f x - g x) a = cfcₙ f a - cfcₙ g a := by
   by_cases ha : p a
   · rw [cfcₙ_apply f a, cfcₙ_apply g a, ← map_sub, cfcₙ_apply ..]

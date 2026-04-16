@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.Fintype.Pi
 
+noncomputable section
+
 /-!
 # Finiteness and infiniteness of the `DFinsupp` type
 

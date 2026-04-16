@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.PolarCoord
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 
+noncomputable section
+
 /-!
 # Integrals involving the Gamma function
 

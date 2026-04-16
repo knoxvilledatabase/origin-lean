@@ -9,6 +9,8 @@ import Mathlib.Order.Filter.CardinalInter
 import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.SetTheory.Cardinal.Cofinality
 
+noncomputable section
+
 /-!
 # The cocardinal filter
 

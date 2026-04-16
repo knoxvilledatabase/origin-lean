@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
 
+noncomputable section
+
 /-!
 # Minimal Axioms for a Group
 

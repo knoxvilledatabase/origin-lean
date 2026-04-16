@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/Coset/Defs.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Quotient
 import Mathlib.Algebra.Group.Action.Opposite
 import Mathlib.Algebra.Group.Subgroup.MulOpposite
 import Mathlib.GroupTheory.GroupAction.Defs
+
+noncomputable section
 
 /-!
 # Cosets
@@ -164,15 +166,13 @@ theorem induction_on {C : α ⧸ s → Prop} (x : α ⧸ s) (H : ∀ z, C (Quoti
 instance : Coe α (α ⧸ s) :=
   ⟨mk⟩
 
+@[to_additive] alias induction_on' := induction_on
+
 attribute [deprecated induction_on (since := "2024-08-04")] induction_on'
 
 attribute [deprecated QuotientAddGroup.induction_on (since := "2024-08-04")]
 
 QuotientAddGroup.induction_on'
-
-@[to_additive (attr := simp)]
-theorem quotient_liftOn_mk {β} (f : α → β) (h) (x : α) : Quotient.liftOn' (x : α ⧸ s) f h = f x :=
-  rfl
 
 @[to_additive]
 theorem forall_mk {C : α ⧸ s → Prop} : (∀ x : α ⧸ s, C x) ↔ ∀ x : α, C x :=
@@ -256,9 +256,5 @@ def quotientEquivOfEq (h : s = t) : α ⧸ s ≃ α ⧸ t where
   invFun := Quotient.map' id fun _a _b h' => h.symm ▸ h'
   left_inv q := induction_on q fun _g => rfl
   right_inv q := induction_on q fun _g => rfl
-
-theorem quotientEquivOfEq_mk (h : s = t) (a : α) :
-    quotientEquivOfEq h (QuotientGroup.mk a) = QuotientGroup.mk a :=
-  rfl
 
 end Subgroup

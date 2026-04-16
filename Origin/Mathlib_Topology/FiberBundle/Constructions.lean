@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.Topology.FiberBundle.Basic
 
+noncomputable section
+
 /-!
 # Standard constructions on fiber bundles
 
@@ -55,12 +57,6 @@ def trivialization : Trivialization F (π F (Bundle.Trivial B F)) where
   source_eq := rfl
   target_eq := univ_prod_univ.symm
   proj_toFun _ _ := rfl
-
-@[simp]
-theorem trivialization_source : (trivialization B F).source = univ := rfl
-
-@[simp]
-theorem trivialization_target : (trivialization B F).target = univ := rfl
 
 instance fiberBundle : FiberBundle F (Bundle.Trivial B F) where
   trivializationAtlas' := {trivialization B F}
@@ -192,12 +188,6 @@ noncomputable def prod : Trivialization (F₁ × F₂) (π (F₁ × F₂) (E₁ 
   target_eq := rfl
   proj_toFun _ _ := rfl
 
-@[simp]
-theorem baseSet_prod : (prod e₁ e₂).baseSet = e₁.baseSet ∩ e₂.baseSet := rfl
-
-theorem prod_symm_apply (x : B) (w₁ : F₁) (w₂ : F₂) :
-    (prod e₁ e₂).toPartialEquiv.symm (x, w₁, w₂) = ⟨x, e₁.symm x w₁, e₂.symm x w₂⟩ := rfl
-
 end Trivialization
 
 open Trivialization
@@ -274,49 +264,6 @@ theorem Pullback.continuous_totalSpaceMk [∀ x, TopologicalSpace (E x)] [FiberB
 variable {E F}
 
 variable [∀ _b, Zero (E _b)] {K : Type U} [FunLike K B' B] [ContinuousMapClass K B' B]
-
-noncomputable def Trivialization.pullback (e : Trivialization F (π F E)) (f : K) :
-    Trivialization F (π F ((f : B' → B) *ᵖ E)) where
-  toFun z := (z.proj, (e (Pullback.lift f z)).2)
-  invFun y := @TotalSpace.mk _ F (f *ᵖ E) y.1 (e.symm (f y.1) y.2)
-  source := Pullback.lift f ⁻¹' e.source
-  baseSet := f ⁻¹' e.baseSet
-  target := (f ⁻¹' e.baseSet) ×ˢ univ
-  map_source' x h := by
-    simp_rw [e.source_eq, mem_preimage, Pullback.lift_proj] at h
-    simp_rw [prod_mk_mem_set_prod_eq, mem_univ, and_true, mem_preimage, h]
-  map_target' y h := by
-    rw [mem_prod, mem_preimage] at h
-    simp_rw [e.source_eq, mem_preimage, Pullback.lift_proj, h.1]
-  left_inv' x h := by
-    simp_rw [mem_preimage, e.mem_source, Pullback.lift_proj] at h
-    simp_rw [Pullback.lift, e.symm_apply_apply_mk h]
-  right_inv' x h := by
-    simp_rw [mem_prod, mem_preimage, mem_univ, and_true] at h
-    simp_rw [Pullback.lift_mk, e.apply_mk_symm h]
-  open_source := by
-    simp_rw [e.source_eq, ← preimage_comp]
-    exact e.open_baseSet.preimage ((map_continuous f).comp <| Pullback.continuous_proj F E f)
-  open_target := ((map_continuous f).isOpen_preimage _ e.open_baseSet).prod isOpen_univ
-  open_baseSet := (map_continuous f).isOpen_preimage _ e.open_baseSet
-  continuousOn_toFun :=
-    (Pullback.continuous_proj F E f).continuousOn.prod
-      (continuous_snd.comp_continuousOn <|
-        e.continuousOn.comp (Pullback.continuous_lift F E f).continuousOn Subset.rfl)
-  continuousOn_invFun := by
-    dsimp only
-    simp_rw [(inducing_pullbackTotalSpaceEmbedding F E f).continuousOn_iff, Function.comp_def,
-      pullbackTotalSpaceEmbedding]
-    refine
-      continuousOn_fst.prod
-        (e.continuousOn_symm.comp ((map_continuous f).prodMap continuous_id).continuousOn
-          Subset.rfl)
-  source_eq := by
-    dsimp only
-    rw [e.source_eq]
-    rfl
-  target_eq := rfl
-  proj_toFun _ _ := rfl
 
 noncomputable instance FiberBundle.pullback [∀ x, TopologicalSpace (E x)] [FiberBundle F E]
     (f : K) : FiberBundle F ((f : B' → B) *ᵖ E) where

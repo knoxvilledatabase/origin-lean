@@ -7,6 +7,8 @@ import Mathlib.Algebra.DualNumber
 import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
 
+noncomputable section
+
 /-!
 # Algebraic properties of dual numbers
 

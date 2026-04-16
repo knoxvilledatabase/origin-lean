@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Vector/Basic.lean
-Genuine: 79 | Conflates: 0 | Dissolved: 1 | Infrastructure: 24
+Genuine: 80 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List
@@ -10,6 +10,8 @@ import Mathlib.Data.List.OfFn
 import Mathlib.Data.List.InsertIdx
 import Mathlib.Control.Applicative
 import Mathlib.Control.Traversable.Basic
+
+noncomputable section
 
 /-!
 # Additional theorems and definitions about the `Vector` type
@@ -79,10 +81,6 @@ theorem pmap_cons {p : α → Prop} (f : (a : α) → p a → β) (a : α) (v : 
         simp only [Nat.succ_eq_add_one, toList_cons, List.mem_cons, forall_eq_or_imp] at hp
         exact hp.2)) := rfl
 
-theorem pmap_cons' {p : α → Prop} (f : (a : α) → p a → β) (a : α) (v : Vector α n)
-    (ha : p a) (hp : ∀ x ∈ v.toList, p x) :
-    cons (f a ha) (v.pmap f hp) = (cons a v).pmap f (by simpa [ha]) := rfl
-
 @[simp]
 theorem toList_map {β : Type*} (v : Vector α n) (f : α → β) :
     (v.map f).toList = v.toList.map f := by cases v; rfl
@@ -144,10 +142,6 @@ theorem get_map {β : Type*} (v : Vector α n) (f : α → β) (i : Fin n) :
   cases v; simp [Vector.map, get_eq_get]
 
 @[simp]
-theorem map₂_nil (f : α → β → γ) : Vector.map₂ f nil nil = nil :=
-  rfl
-
-@[simp]
 theorem map₂_cons (hd₁ : α) (tl₁ : Vector α n) (hd₂ : β) (tl₂ : Vector β n) (f : α → β → γ) :
     Vector.map₂ f (hd₁ ::ᵥ tl₁) (hd₂ ::ᵥ tl₂) = f hd₁ hd₂ ::ᵥ (Vector.map₂ f tl₁ tl₂) :=
   rfl
@@ -182,10 +176,6 @@ theorem get_tail_succ : ∀ (v : Vector α n.succ) (i : Fin n), get (tail v) i =
 @[simp]
 theorem tail_val : ∀ v : Vector α n.succ, v.tail.val = v.val.tail
   | ⟨_ :: _, _⟩ => rfl
-
-@[simp]
-theorem tail_nil : (@nil α).tail = nil :=
-  rfl
 
 @[simp]
 theorem singleton_tail : ∀ (v : Vector α 1), v.tail = Vector.nil
@@ -352,10 +342,6 @@ def mmap {m} [Monad m] {α} {β : Type u} (f : α → m β) : ∀ {n}, Vector α
     pure (h' ::ᵥ t')
 
 @[simp]
-theorem mmap_nil {m} [Monad m] {α β} (f : α → m β) : mmap f nil = pure nil :=
-  rfl
-
-@[simp]
 theorem mmap_cons {m} [Monad m] {α β} (f : α → m β) (a) :
     ∀ {n} (v : Vector α n),
       mmap f (a ::ᵥ v) = do
@@ -374,18 +360,6 @@ def inductionOn {C : ∀ {n : ℕ}, Vector α n → Sort*} {n : ℕ} (v : Vector
   · rcases v with ⟨_ | ⟨a, v⟩, v_property⟩
     cases v_property
     exact cons (ih ⟨v, (add_left_inj 1).mp v_property⟩)
-
-@[simp]
-theorem inductionOn_nil {C : ∀ {n : ℕ}, Vector α n → Sort*}
-    (nil : C nil) (cons : ∀ {n : ℕ} {x : α} {w : Vector α n}, C w → C (x ::ᵥ w)) :
-    Vector.nil.inductionOn nil cons = nil :=
-  rfl
-
-@[simp]
-theorem inductionOn_cons {C : ∀ {n : ℕ}, Vector α n → Sort*} {n : ℕ} (x : α) (v : Vector α n)
-    (nil : C nil) (cons : ∀ {n : ℕ} {x : α} {w : Vector α n}, C w → C (x ::ᵥ w)) :
-    (x ::ᵥ v).inductionOn nil cons = cons (v.inductionOn nil cons : C v) :=
-  rfl
 
 variable {β γ : Type*}
 
@@ -473,7 +447,25 @@ theorem eraseIdx_insertIdx {v : Vector α n} {i : Fin (n + 1)} :
     eraseIdx i (insertIdx a i v) = v :=
   Subtype.eq <| List.eraseIdx_insertIdx i.1 v.1
 
--- DISSOLVED: eraseIdx_insertIdx'
+theorem eraseIdx_insertIdx' {v : Vector α (n + 1)} :
+    ∀ {i : Fin (n + 1)} {j : Fin (n + 2)},
+      eraseIdx (j.succAbove i) (insertIdx a j v) = insertIdx a (i.predAbove j) (eraseIdx i v)
+  | ⟨i, hi⟩, ⟨j, hj⟩ => by
+    dsimp [insertIdx, eraseIdx, Fin.succAbove, Fin.predAbove]
+    rw [Subtype.mk_eq_mk]
+    simp only [Fin.lt_iff_val_lt_val]
+    split_ifs with hij
+    · rcases Nat.exists_eq_succ_of_ne_zero
+        (Nat.pos_iff_ne_zero.1 (lt_of_le_of_lt (Nat.zero_le _) hij)) with ⟨j, rfl⟩
+      rw [← List.insertIdx_eraseIdx_of_ge]
+      · simp; rfl
+      · simpa
+      · simpa [Nat.lt_succ_iff] using hij
+    · dsimp
+      rw [← List.insertIdx_eraseIdx_of_le i j _ _ _]
+      · rfl
+      · simpa
+      · simpa [not_lt] using hij
 
 theorem insertIdx_comm (a b : α) (i j : Fin (n + 1)) (h : i ≤ j) :
     ∀ v : Vector α n,
@@ -614,21 +606,9 @@ section Simp
 
 variable {x : α} {y : β} {s : σ} (xs : Vector α n)
 
-@[simp]
-theorem replicate_succ (val : α) :
-    replicate (n+1) val = val ::ᵥ (replicate n val) :=
-  rfl
-
 section Append
 
 variable (ys : Vector α m)
-
-@[simp] lemma get_append_cons_zero : get (append (x ::ᵥ xs) ys) ⟨0, by omega⟩ = x := rfl
-
-@[simp]
-theorem get_append_cons_succ {i : Fin (n + m)} {h} :
-    get (append (x ::ᵥ xs) ys) ⟨i+1, h⟩ = get (append xs ys) i :=
-  rfl
 
 @[simp]
 theorem append_nil : append xs nil = xs := by
@@ -650,22 +630,6 @@ theorem get_map₂ (v₁ : Vector α n) (v₂ : Vector β n) (f : α → β → 
     cases i using Fin.cases
     · simp only [get_zero, head_cons]
     · simp only [get_cons_succ, ih]
-
-@[simp]
-theorem mapAccumr_cons {f : α → σ → σ × β} :
-    mapAccumr f (x ::ᵥ xs) s
-    = let r := mapAccumr f xs s
-      let q := f x r.1
-      (q.1, q.2 ::ᵥ r.2) :=
-  rfl
-
-@[simp]
-theorem mapAccumr₂_cons {f : α → β → σ → σ × φ} :
-    mapAccumr₂ f (x ::ᵥ xs) (y ::ᵥ ys) s
-    = let r := mapAccumr₂ f xs ys s
-      let q := f x y r.1
-      (q.1, q.2 ::ᵥ r.2) :=
-  rfl
 
 end Simp
 

@@ -1,9 +1,11 @@
 /-
 Extracted from Data/List/InsertIdx.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.List.Basic
+
+noncomputable section
 
 /-!
 # insertIdx
@@ -27,10 +29,6 @@ variable {a : α}
 
 @[simp]
 theorem insertIdx_zero (s : List α) (x : α) : insertIdx 0 x s = x :: s :=
-  rfl
-
-@[simp]
-theorem insertIdx_succ_nil (n : ℕ) (a : α) : insertIdx (n + 1) a [] = [] :=
   rfl
 
 @[simp]
@@ -166,7 +164,6 @@ theorem get_insertIdx_add_succ (l : List α) (x : α) (n k : ℕ) (hk' : n + k <
   simp [getElem_insertIdx_add_succ, hk, hk']
 
 set_option linter.unnecessarySimpa false in
-
 theorem insertIdx_injective (n : ℕ) (x : α) : Function.Injective (insertIdx n x) := by
   induction' n with n IH
   · have : insertIdx 0 x = cons x := funext fun _ => rfl

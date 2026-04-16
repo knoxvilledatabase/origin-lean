@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Category
 
+noncomputable section
+
 /-!
 # Monoidal composition `⊗≫` (composition up to associators)
 

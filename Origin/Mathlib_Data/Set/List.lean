@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Image
 import Mathlib.Data.List.Defs
 
+noncomputable section
+
 /-!
 # Lemmas about `List`s and `Set.range`
 

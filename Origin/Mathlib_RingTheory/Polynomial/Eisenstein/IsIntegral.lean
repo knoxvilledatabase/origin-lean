@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Polynomial/Eisenstein/IsIntegral.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Dvd
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Norm.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Expand
+
+noncomputable section
 
 /-!
 # Eisenstein polynomials
@@ -204,7 +206,22 @@ theorem dvd_coeff_zero_of_aeval_eq_prime_smul_of_minpoly_isEisensteinAt {B : Pow
       Finset.add_sum_erase (range (Q.natDegree + 1)) fun i => Q.coeff i • B.gen ^ i]
     simp
 
--- DISSOLVED: mem_adjoin_of_dvd_coeff_of_dvd_aeval
+theorem mem_adjoin_of_dvd_coeff_of_dvd_aeval {A B : Type*} [CommSemiring A] [CommRing B]
+    [Algebra A B] [NoZeroSMulDivisors A B] {Q : A[X]} {p : A} {x z : B} (hp : p ≠ 0)
+    (hQ : ∀ i ∈ range (Q.natDegree + 1), p ∣ Q.coeff i) (hz : aeval x Q = p • z) :
+    z ∈ adjoin A ({x} : Set B) := by
+  choose! f hf using hQ
+  rw [aeval_eq_sum_range, sum_range] at hz
+  conv_lhs at hz =>
+    congr
+    next => skip
+    ext i
+    rw [hf i (mem_range.2 (Fin.is_lt i)), ← smul_smul]
+  rw [← smul_sum] at hz
+  rw [← smul_right_injective _ hp hz]
+  exact
+    Subalgebra.sum_mem _ fun _ _ =>
+      Subalgebra.smul_mem _ (Subalgebra.pow_mem _ (subset_adjoin (Set.mem_singleton _)) _) _
 
 theorem mem_adjoin_of_smul_prime_smul_of_minpoly_isEisensteinAt {B : PowerBasis K L}
     (hp : Prime p) (hBint : IsIntegral R B.gen) {z : L} (hzint : IsIntegral R z)

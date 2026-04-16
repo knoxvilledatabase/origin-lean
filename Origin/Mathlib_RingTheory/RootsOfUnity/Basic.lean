@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.CharP.Reduced
 import Mathlib.RingTheory.IntegralDomain
 
+noncomputable section
+
 /-!
 # Roots of unity
 
@@ -130,16 +132,6 @@ nonrec def MulEquiv.restrictRootsOfUnity (σ : R ≃* S) (n : ℕ) :
   right_inv ξ := by ext; exact σ.apply_symm_apply _
   map_mul' := (restrictRootsOfUnity _ n).map_mul
 
-@[simp]
-theorem MulEquiv.restrictRootsOfUnity_coe_apply (σ : R ≃* S) (ζ : rootsOfUnity k R) :
-    (σ.restrictRootsOfUnity k ζ : Sˣ) = σ (ζ : Rˣ) :=
-  rfl
-
-@[simp]
-theorem MulEquiv.restrictRootsOfUnity_symm (σ : R ≃* S) :
-    (σ.restrictRootsOfUnity k).symm = σ.symm.restrictRootsOfUnity k :=
-  rfl
-
 end CommMonoid
 
 section IsDomain
@@ -165,16 +157,6 @@ def rootsOfUnityEquivNthRoots : rootsOfUnity k R ≃ { x // x ∈ nthRoots k (1 
   right_inv := by rintro ⟨x, hx⟩; ext; rfl
 
 variable {k R}
-
-@[simp]
-theorem rootsOfUnityEquivNthRoots_apply (x : rootsOfUnity k R) :
-    (rootsOfUnityEquivNthRoots R k x : R) = ((x : Rˣ) : R) :=
-  rfl
-
-@[simp]
-theorem rootsOfUnityEquivNthRoots_symm_apply (x : { x // x ∈ nthRoots k (1 : R) }) :
-    (((rootsOfUnityEquivNthRoots R k).symm x : Rˣ) : R) = (x : R) :=
-  rfl
 
 variable (k R)
 
@@ -227,7 +209,6 @@ section cyclic
 namespace IsCyclic
 
 noncomputable
-
 def monoidHomMulEquivRootsOfUnityOfGenerator {G : Type*} [CommGroup G] {g : G}
     (hg : ∀ (x : G), x ∈ Subgroup.zpowers g) (G' : Type*) [CommGroup G'] :
     (G →* G') ≃* rootsOfUnity (Nat.card G) G' where

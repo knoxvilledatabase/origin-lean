@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Ordering.Basic
 import Mathlib.Order.Synonym
 
+noncomputable section
+
 /-!
 # Comparison
 
@@ -97,10 +99,12 @@ theorem compares_iff_of_compares_impl [LinearOrder α] [Preorder β] {a b : α} 
     rwa [ho.inj (h hab)]
 
 set_option linter.deprecated false in
+@[deprecated swap_then (since := "2024-09-13")]
 
 theorem swap_orElse (o₁ o₂) : (orElse o₁ o₂).swap = orElse o₁.swap o₂.swap := swap_then ..
 
 set_option linter.deprecated false in
+@[deprecated then_eq_lt (since := "2024-09-13")]
 
 theorem orElse_eq_lt (o₁ o₂) : orElse o₁ o₂ = lt ↔ o₁ = lt ∨ o₁ = eq ∧ o₂ = lt := then_eq_lt ..
 
@@ -132,26 +136,6 @@ theorem cmp_swap [Preorder α] [@DecidableRel α (· < ·)] (a b : α) : (cmp a 
   unfold cmp cmpUsing
   by_cases h : a < b <;> by_cases h₂ : b < a <;> simp [h, h₂, Ordering.swap]
   exact lt_asymm h h₂
-
-@[simp]
-theorem cmpLE_toDual [LE α] [@DecidableRel α (· ≤ ·)] (x y : α) :
-    cmpLE (toDual x) (toDual y) = cmpLE y x :=
-  rfl
-
-@[simp]
-theorem cmpLE_ofDual [LE α] [@DecidableRel α (· ≤ ·)] (x y : αᵒᵈ) :
-    cmpLE (ofDual x) (ofDual y) = cmpLE y x :=
-  rfl
-
-@[simp]
-theorem cmp_toDual [LT α] [@DecidableRel α (· < ·)] (x y : α) :
-    cmp (toDual x) (toDual y) = cmp y x :=
-  rfl
-
-@[simp]
-theorem cmp_ofDual [LT α] [@DecidableRel α (· < ·)] (x y : αᵒᵈ) :
-    cmp (ofDual x) (ofDual y) = cmp y x :=
-  rfl
 
 def linearOrderOfCompares [Preorder α] (cmp : α → α → Ordering)
     (h : ∀ a b, (cmp a b).Compares a b) : LinearOrder α :=

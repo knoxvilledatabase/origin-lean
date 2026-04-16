@@ -7,6 +7,8 @@ import Mathlib.Order.Interval.Finset.Nat
 import Mathlib.Order.OmegaCompletePartialOrder
 import Mathlib.Topology.UniformSpace.Basic
 
+noncomputable section
+
 /-!
 # Dynamical entourages
 Bowen-Dinaburg's definition of topological entropy of a transformation `T` in a metric space

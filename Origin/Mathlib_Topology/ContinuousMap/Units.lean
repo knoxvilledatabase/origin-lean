@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/ContinuousMap/Units.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Ring.Units
 import Mathlib.Algebra.Algebra.Spectrum
 import Mathlib.Topology.ContinuousMap.Algebra
+
+noncomputable section
 
 /-!
 # Units of continuous functions
@@ -40,16 +42,6 @@ def unitsLift : C(X, Mˣ) ≃ C(X, M)ˣ where
         MulOpposite.continuous_op.comp (↑f⁻¹ : C(X, M)).continuous }
   left_inv f := by ext; rfl
   right_inv f := by ext; rfl
-
-@[to_additive (attr := simp)]
-lemma unitsLift_apply_inv_apply (f : C(X, Mˣ)) (x : X) :
-    (↑(ContinuousMap.unitsLift f)⁻¹ : C(X, M)) x = (f x)⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma unitsLift_symm_apply_apply_inv' (f : C(X, M)ˣ) (x : X) :
-    (ContinuousMap.unitsLift.symm f x)⁻¹ = (↑f⁻¹ : C(X, M)) x := by
-  rfl
 
 end Monoid
 
@@ -88,7 +80,8 @@ section NormedField
 
 variable [NormedField 𝕜] [NormedDivisionRing R] [Algebra 𝕜 R] [CompleteSpace R]
 
--- DISSOLVED: isUnit_iff_forall_ne_zero
+theorem isUnit_iff_forall_ne_zero (f : C(X, R)) : IsUnit f ↔ ∀ x, f x ≠ 0 := by
+  simp_rw [f.isUnit_iff_forall_isUnit, isUnit_iff_ne_zero]
 
 theorem spectrum_eq_preimage_range (f : C(X, R)) :
     spectrum 𝕜 f = algebraMap _ _ ⁻¹' Set.range f := by

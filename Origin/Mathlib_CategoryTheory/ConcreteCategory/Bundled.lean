@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Batteries.Tactic.Lint.Misc
 
+noncomputable section
+
 /-!
 # Bundled types
 
@@ -35,15 +37,13 @@ namespace Bundled
 attribute [coe] α
 
 set_option checkBinderAnnotations false in
+-- Usually explicit instances will provide their own version of this, e.g. `MonCat.of` and
 
 def of {c : Type u → Type v} (α : Type u) [str : c α] : Bundled c :=
   ⟨α, str⟩
 
 instance coeSort : CoeSort (Bundled c) (Type u) :=
   ⟨Bundled.α⟩
-
-theorem coe_mk (α) (str) : (@Bundled.mk c α str : Type u) = α :=
-  rfl
 
 abbrev map (f : ∀ {α}, c α → d α) (b : Bundled c) : Bundled d :=
   ⟨b, f b.str⟩

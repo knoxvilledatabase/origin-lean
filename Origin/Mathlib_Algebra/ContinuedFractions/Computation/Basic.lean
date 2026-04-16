@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Floor
 import Mathlib.Algebra.ContinuedFractions.Basic
 
+noncomputable section
+
 /-!
 # Computable Continued Fractions
 
@@ -92,11 +94,6 @@ def coeFn : IntFractPair K → IntFractPair β := mapFr (↑)
 
 instance coe : Coe (IntFractPair K) (IntFractPair β) where
   coe := coeFn
-
-@[simp, norm_cast]
-theorem coe_to_intFractPair {b : ℤ} {fr : K} :
-    (↑(IntFractPair.mk b fr) : IntFractPair β) = IntFractPair.mk b (↑fr : β) :=
-  rfl
 
 end coe
 

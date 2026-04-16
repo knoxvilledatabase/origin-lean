@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Bornology/Absorbs.lean
-Genuine: 34 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
+Genuine: 40 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Topology.Bornology.Basic
+
+noncomputable section
 
 /-!
 # Absorption of sets

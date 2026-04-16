@@ -10,6 +10,8 @@ import Lean.Meta.Tactic.Assert
 import Lean.Meta.Tactic.Clear
 import Batteries.CodeAction -- to enable the hole code action
 
+noncomputable section
+
 /-! ## Additional utilities in `Lean.MVarId` -/
 
 open Lean Meta

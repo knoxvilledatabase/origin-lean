@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/AtTopBot.lean
-Genuine: 224 | Conflates: 4 | Dissolved: 1 | Infrastructure: 10
+Genuine: 225 | Conflates: 4 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Preimage
@@ -10,6 +10,8 @@ import Mathlib.Data.Set.Finite.Lemmas
 import Mathlib.Order.Filter.Prod
 import Mathlib.Order.Interval.Set.Disjoint
 import Mathlib.Order.Interval.Set.OrderIso
+
+noncomputable section
 
 /-!
 # `Filter.atTop` and `Filter.atBot` filters on preorders, monoids and groups.
@@ -465,7 +467,16 @@ theorem extraction_forall_of_eventually' {P : ℕ → ℕ → Prop} (h : ∀ n, 
     ∃ φ : ℕ → ℕ, StrictMono φ ∧ ∀ n, P n (φ n) :=
   extraction_forall_of_eventually (by simp [eventually_atTop, h])
 
--- DISSOLVED: Eventually.atTop_of_arithmetic
+theorem Eventually.atTop_of_arithmetic {p : ℕ → Prop} {n : ℕ} (hn : n ≠ 0)
+    (hp : ∀ k < n, ∀ᶠ a in atTop, p (n * a + k)) : ∀ᶠ a in atTop, p a := by
+  simp only [eventually_atTop] at hp ⊢
+  choose! N hN using hp
+  refine ⟨(Finset.range n).sup (n * N ·), fun b hb => ?_⟩
+  rw [← Nat.div_add_mod b n]
+  have hlt := Nat.mod_lt b hn.bot_lt
+  refine hN _ hlt _ ?_
+  rw [ge_iff_le, Nat.le_div_iff_mul_le hn.bot_lt, mul_comm]
+  exact (Finset.le_sup (f := (n * N ·)) (Finset.mem_range.2 hlt)).trans hb
 
 section IsDirected
 

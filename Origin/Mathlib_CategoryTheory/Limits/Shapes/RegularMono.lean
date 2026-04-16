@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.StrongEpi
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.Lean.Expr.Basic
 
+noncomputable section
+
 /-!
 # Definitions and basic properties of regular monomorphisms and epimorphisms.
 

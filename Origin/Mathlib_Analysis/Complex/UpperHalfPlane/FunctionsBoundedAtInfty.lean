@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Topology
 import Mathlib.Order.Filter.ZeroAndBoundedAtFilter
 
+noncomputable section
+
 /-!
 # Bounded at infinity
 

@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Matrix/GeneralLinearGroup/Defs.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 2 | Infrastructure: 18
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 import Mathlib.LinearAlgebra.GeneralLinearGroup
 import Mathlib.Algebra.Ring.Subring.Units
+
+noncomputable section
 
 /-!
 # The General Linear group $GL(n, R)$
@@ -39,6 +41,8 @@ abbrev GeneralLinearGroup (n : Type u) (R : Type v) [DecidableEq n] [Fintype n] 
     Type _ :=
   (Matrix n n R)ˣ
 
+@[inherit_doc] notation "GL" => GeneralLinearGroup
+
 namespace GeneralLinearGroup
 
 variable {n : Type u} [DecidableEq n] [Fintype n] {R : Type v} [CommRing R]
@@ -69,7 +73,8 @@ def mk' (A : Matrix n n R) (_ : Invertible (Matrix.det A)) : GL n R :=
 noncomputable def mk'' (A : Matrix n n R) (h : IsUnit (Matrix.det A)) : GL n R :=
   nonsingInvUnit A h
 
--- DISSOLVED: mkOfDetNeZero
+def mkOfDetNeZero {K : Type*} [Field K] (A : Matrix n n K) (h : Matrix.det A ≠ 0) : GL n K :=
+  mk' A (invertibleOfNonzero h)
 
 theorem ext_iff (A B : GL n R) : A = B ↔ ∀ i j, (A : Matrix n n R) i j = (B : Matrix n n R) i j :=
   Units.ext_iff.trans Matrix.ext_iff.symm
@@ -85,45 +90,15 @@ variable (A B : GL n R)
 theorem coe_mul : ↑(A * B) = (↑A : Matrix n n R) * (↑B : Matrix n n R) :=
   rfl
 
-@[simp]
-theorem coe_one : ↑(1 : GL n R) = (1 : Matrix n n R) :=
-  rfl
-
 theorem coe_inv : ↑A⁻¹ = (↑A : Matrix n n R)⁻¹ :=
   letI := A.invertible
   invOf_eq_nonsing_inv (↑A : Matrix n n R)
-
-@[simp]
-theorem coe_toLin : (@toLin n ‹_› ‹_› _ _ A : (n → R) →ₗ[R] n → R) = Matrix.mulVecLin A :=
-  rfl
-
-@[simp]
-theorem toLin_apply (v : n → R) : (toLin A).toLinearEquiv v = Matrix.mulVecLin (↑A) v :=
-  rfl
 
 end CoeLemmas
 
 variable {S T : Type*} [CommRing S] [CommRing T]
 
 def map (f : R →+* S) : GL n R →* GL n S := Units.map <| (RingHom.mapMatrix f).toMonoidHom
-
-@[simp]
-theorem map_id : map (RingHom.id R) = MonoidHom.id (GL n R) :=
-  rfl
-
-@[simp]
-protected lemma map_apply (f : R →+* S) (i j : n) (g : GL n R) : map f g i j = f (g i j) := by
-  rfl
-
-@[simp]
-theorem map_comp (f : T →+* R) (g : R →+* S) :
-    map (g.comp f) = (map g).comp (map (n := n) f) :=
-  rfl
-
-@[simp]
-theorem map_comp_apply (f : T →+* R) (g : R →+* S) (x : GL n T) :
-    (map g).comp (map f) x = map g (map f x) :=
-  rfl
 
 variable (f : R →+* S)
 
@@ -195,13 +170,16 @@ variable (n R)
 def GLPos : Subgroup (GL n R) :=
   (Units.posSubgroup R).comap GeneralLinearGroup.det
 
+@[inherit_doc] scoped[MatrixGroups] notation "GL(" n ", " R ")" "⁺" => GLPos (Fin n) R
+
 end
 
 @[simp]
 theorem mem_glpos (A : GL n R) : A ∈ GLPos n R ↔ 0 < (Matrix.GeneralLinearGroup.det A : R) :=
   Iff.rfl
 
--- DISSOLVED: GLPos.det_ne_zero
+theorem GLPos.det_ne_zero (A : GLPos n R) : ((A : GL n R) : Matrix n n R).det ≠ 0 :=
+  ne_of_gt A.prop
 
 end
 
@@ -219,15 +197,6 @@ instance : Neg (GLPos n R) :=
 
 @[simp]
 theorem GLPos.coe_neg_GL (g : GLPos n R) : ↑(-g) = -(g : GL n R) :=
-  rfl
-
-@[simp]
-theorem GLPos.coe_neg (g : GLPos n R) : (↑(-g) : GL n R) = -((g : GL n R) : Matrix n n R) :=
-  rfl
-
-@[simp]
-theorem GLPos.coe_neg_apply (g : GLPos n R) (i j : n) :
-    ((↑(-g) : GL n R) : Matrix n n R) i j = -((g : GL n R) : Matrix n n R) i j :=
   rfl
 
 instance : HasDistribNeg (GLPos n R) :=
@@ -254,11 +223,6 @@ theorem toGLPos_injective : Function.Injective (toGLPos : SpecialLinearGroup n R
     (f := fun (A : GLPos n R) ↦ ((A : GL n R) : Matrix n n R))
     (show Function.Injective (_ ∘ (toGLPos : SpecialLinearGroup n R → GLPos n R))
       from Subtype.coe_injective)
-
-@[simp]
-theorem coe_GLPos_coe_GL_coe_matrix (g : SpecialLinearGroup n R) :
-    (↑(↑(↑g : GLPos n R) : GL n R) : Matrix n n R) = ↑g :=
-  rfl
 
 @[simp]
 theorem coe_to_GLPos_to_GL_det (g : SpecialLinearGroup n R) :

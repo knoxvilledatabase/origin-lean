@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/WittVector/DiscreteValuationRing.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Domain
 import Mathlib.RingTheory.WittVector.MulCoeff
 import Mathlib.RingTheory.DiscreteValuationRing.Basic
 import Mathlib.Tactic.LinearCombination
+
+noncomputable section
 
 /-!
 
@@ -60,17 +62,16 @@ def mkUnit {a : Units k} {A : 𝕎 k} (hA : A.coeff 0 = a) : Units (𝕎 k) :=
       one_coeff_eq_of_pos, Nat.succ_pos', ha_inv, ha, inv_pow]
     ring!)
 
-@[simp]
-theorem coe_mkUnit {a : Units k} {A : 𝕎 k} (hA : A.coeff 0 = a) : (mkUnit hA : 𝕎 k) = A :=
-  rfl
-
 end CommRing
 
 section Field
 
 variable {k : Type*} [Field k] [CharP k p]
 
--- DISSOLVED: isUnit_of_coeff_zero_ne_zero
+theorem isUnit_of_coeff_zero_ne_zero (x : 𝕎 k) (hx : x.coeff 0 ≠ 0) : IsUnit x := by
+  let y : kˣ := Units.mk0 (x.coeff 0) hx
+  have hy : x.coeff 0 = y := rfl
+  exact (mkUnit hy).isUnit
 
 variable (p)
 
@@ -98,15 +99,27 @@ section PerfectRing
 
 variable {k : Type*} [CommRing k] [CharP k p] [PerfectRing k p]
 
--- DISSOLVED: exists_eq_pow_p_mul
+theorem exists_eq_pow_p_mul (a : 𝕎 k) (ha : a ≠ 0) :
+    ∃ (m : ℕ) (b : 𝕎 k), b.coeff 0 ≠ 0 ∧ a = (p : 𝕎 k) ^ m * b := by
+  obtain ⟨m, c, hc, hcm⟩ := WittVector.verschiebung_nonzero ha
+  obtain ⟨b, rfl⟩ := (frobenius_bijective p k).surjective.iterate m c
+  rw [WittVector.iterate_frobenius_coeff] at hc
+  have := congr_fun (WittVector.verschiebung_frobenius_comm.comp_iterate m) b
+  simp only [Function.comp_apply] at this
+  rw [← this] at hcm
+  refine ⟨m, b, ?_, ?_⟩
+  · contrapose! hc
+    simp [hc, zero_pow <| pow_ne_zero _ hp.out.ne_zero]
+  · simp_rw [← mul_left_iterate (p : 𝕎 k) m]
+    convert hcm using 2
+    ext1 x
+    rw [mul_comm, ← WittVector.verschiebung_frobenius x]; rfl
 
 end PerfectRing
 
 section PerfectField
 
 variable {k : Type*} [Field k] [CharP k p] [PerfectRing k p]
-
--- DISSOLVED: exists_eq_pow_p_mul'
 
 theorem discreteValuationRing : DiscreteValuationRing (𝕎 k) :=
   DiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization (by

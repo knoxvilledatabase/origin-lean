@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Batteries.Data.List.Basic
 
+noncomputable section
+
 /-!
 # Levenshtein distances
 
@@ -135,10 +137,6 @@ theorem suffixLevenshtein_length (xs : List α) (ys : List β) :
     rw [impl_length]
     exact ih
 
-theorem suffixLevenshtein_eq (xs : List α) (y ys) :
-    impl C xs y (suffixLevenshtein C xs ys) = suffixLevenshtein C xs (y :: ys) := by
-  rfl
-
 variable (C)
 
 def levenshtein (xs : List α) (ys : List β) : δ :=
@@ -146,9 +144,6 @@ def levenshtein (xs : List α) (ys : List β) : δ :=
   r[0]
 
 variable {C}
-
-theorem suffixLevenshtein_nil_nil : (suffixLevenshtein C [] []).1 = [0] := by
-  rfl
 
 theorem List.eq_of_length_one (x : List α) (w : x.length = 1) :
     have : 0 < x.length := lt_of_lt_of_eq Nat.zero_lt_one w.symm
@@ -229,11 +224,6 @@ theorem levenshtein_nil_cons (y) (ys) :
   congr
   rw [show (List.length _) = 1 from _]
   induction ys <;> simp
-
-@[simp]
-theorem levenshtein_cons_nil (x : α) (xs : List α) :
-    levenshtein C (x :: xs) [] = C.delete x + levenshtein C xs [] :=
-  rfl
 
 @[simp]
 theorem levenshtein_cons_cons

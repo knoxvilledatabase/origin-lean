@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/NormalForms.lean
-Genuine: 54 | Conflates: 0 | Dissolved: 42 | Infrastructure: 15
+Genuine: 91 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.VariableChange
 import Mathlib.Algebra.CharP.Defs
+
+noncomputable section
 
 /-!
 
@@ -188,15 +190,9 @@ theorem a₂_of_isShortNF : W.a₂ = 0 := IsShortNF.a₂
 
 theorem a₃_of_isShortNF : W.a₃ = 0 := IsShortNF.a₃
 
-theorem b₂_of_isShortNF : W.b₂ = 0 := by
-  simp
-
 theorem b₄_of_isShortNF : W.b₄ = 2 * W.a₄ := W.b₄_of_isCharNeTwoNF
 
 theorem b₆_of_isShortNF : W.b₆ = 4 * W.a₆ := W.b₆_of_isCharNeTwoNF
-
-theorem b₈_of_isShortNF : W.b₈ = -W.a₄ ^ 2 := by
-  simp
 
 theorem c₄_of_isShortNF : W.c₄ = -48 * W.a₄ := by
   simp
@@ -264,7 +260,11 @@ end VariableChange
 
 /-! ### Normal forms of characteristic = 3 and j ≠ 0 -/
 
--- DISSOLVED: IsCharThreeJNeZeroNF
+@[mk_iff]
+class IsCharThreeJNeZeroNF : Prop where
+  a₁ : W.a₁ = 0
+  a₃ : W.a₃ = 0
+  a₄ : W.a₄ = 0
 
 section Quantity
 
@@ -273,51 +273,78 @@ variable [W.IsCharThreeJNeZeroNF]
 instance isCharNeTwoNF_of_isCharThreeJNeZeroNF : W.IsCharNeTwoNF :=
   ⟨IsCharThreeJNeZeroNF.a₁, IsCharThreeJNeZeroNF.a₃⟩
 
--- DISSOLVED: a₁_of_isCharThreeJNeZeroNF
+theorem a₁_of_isCharThreeJNeZeroNF : W.a₁ = 0 := IsCharThreeJNeZeroNF.a₁
 
--- DISSOLVED: a₃_of_isCharThreeJNeZeroNF
+theorem a₃_of_isCharThreeJNeZeroNF : W.a₃ = 0 := IsCharThreeJNeZeroNF.a₃
 
--- DISSOLVED: a₄_of_isCharThreeJNeZeroNF
+@[simp]
+theorem a₄_of_isCharThreeJNeZeroNF : W.a₄ = 0 := IsCharThreeJNeZeroNF.a₄
 
--- DISSOLVED: b₂_of_isCharThreeJNeZeroNF
+theorem b₂_of_isCharThreeJNeZeroNF : W.b₂ = 4 * W.a₂ := W.b₂_of_isCharNeTwoNF
 
--- DISSOLVED: b₄_of_isCharThreeJNeZeroNF
+theorem b₆_of_isCharThreeJNeZeroNF : W.b₆ = 4 * W.a₆ := W.b₆_of_isCharNeTwoNF
 
--- DISSOLVED: b₆_of_isCharThreeJNeZeroNF
+theorem b₈_of_isCharThreeJNeZeroNF : W.b₈ = 4 * W.a₂ * W.a₆ := by
+  simp
 
--- DISSOLVED: b₈_of_isCharThreeJNeZeroNF
+theorem c₄_of_isCharThreeJNeZeroNF : W.c₄ = 16 * W.a₂ ^ 2 := by
+  simp
 
--- DISSOLVED: c₄_of_isCharThreeJNeZeroNF
+theorem c₆_of_isCharThreeJNeZeroNF : W.c₆ = -64 * W.a₂ ^ 3 - 864 * W.a₆ := by
+  simp
 
--- DISSOLVED: c₆_of_isCharThreeJNeZeroNF
-
--- DISSOLVED: Δ_of_isCharThreeJNeZeroNF
+theorem Δ_of_isCharThreeJNeZeroNF : W.Δ = -64 * W.a₂ ^ 3 * W.a₆ - 432 * W.a₆ ^ 2 := by
+  simp
 
 variable [CharP R 3]
 
--- DISSOLVED: b₂_of_isCharThreeJNeZeroNF_of_char_three
+theorem b₂_of_isCharThreeJNeZeroNF_of_char_three : W.b₂ = W.a₂ := by
+  rw [b₂_of_isCharThreeJNeZeroNF]
+  linear_combination W.a₂ * CharP.cast_eq_zero R 3
 
--- DISSOLVED: b₆_of_isCharThreeJNeZeroNF_of_char_three
+theorem b₆_of_isCharThreeJNeZeroNF_of_char_three : W.b₆ = W.a₆ := by
+  rw [b₆_of_isCharThreeJNeZeroNF]
+  linear_combination W.a₆ * CharP.cast_eq_zero R 3
 
--- DISSOLVED: b₈_of_isCharThreeJNeZeroNF_of_char_three
+theorem b₈_of_isCharThreeJNeZeroNF_of_char_three : W.b₈ = W.a₂ * W.a₆ := by
+  rw [b₈_of_isCharThreeJNeZeroNF]
+  linear_combination W.a₂ * W.a₆ * CharP.cast_eq_zero R 3
 
--- DISSOLVED: c₄_of_isCharThreeJNeZeroNF_of_char_three
+theorem c₄_of_isCharThreeJNeZeroNF_of_char_three : W.c₄ = W.a₂ ^ 2 := by
+  rw [c₄_of_isCharThreeJNeZeroNF]
+  linear_combination 5 * W.a₂ ^ 2 * CharP.cast_eq_zero R 3
 
--- DISSOLVED: c₆_of_isCharThreeJNeZeroNF_of_char_three
+theorem c₆_of_isCharThreeJNeZeroNF_of_char_three : W.c₆ = -W.a₂ ^ 3 := by
+  rw [c₆_of_isCharThreeJNeZeroNF]
+  linear_combination (-21 * W.a₂ ^ 3 - 288 * W.a₆) * CharP.cast_eq_zero R 3
 
--- DISSOLVED: Δ_of_isCharThreeJNeZeroNF_of_char_three
+theorem Δ_of_isCharThreeJNeZeroNF_of_char_three : W.Δ = -W.a₂ ^ 3 * W.a₆ := by
+  rw [Δ_of_isCharThreeJNeZeroNF]
+  linear_combination (-21 * W.a₂ ^ 3 * W.a₆ - 144 * W.a₆ ^ 2) * CharP.cast_eq_zero R 3
 
 variable (W : WeierstrassCurve F) [W.IsElliptic] [W.IsCharThreeJNeZeroNF] [CharP F 3]
 
--- DISSOLVED: j_of_isCharThreeJNeZeroNF_of_char_three
+@[simp]
+theorem j_of_isCharThreeJNeZeroNF_of_char_three : W.j = -W.a₂ ^ 3 / W.a₆ := by
+  have h := W.Δ'.ne_zero
+  rw [coe_Δ', Δ_of_isCharThreeJNeZeroNF_of_char_three] at h
+  rw [j, Units.val_inv_eq_inv_val, ← div_eq_inv_mul, coe_Δ',
+    c₄_of_isCharThreeJNeZeroNF_of_char_three, Δ_of_isCharThreeJNeZeroNF_of_char_three,
+    div_eq_div_iff h (right_ne_zero_of_mul h)]
+  ring1
 
--- DISSOLVED: j_ne_zero_of_isCharThreeJNeZeroNF_of_char_three
+theorem j_ne_zero_of_isCharThreeJNeZeroNF_of_char_three : W.j ≠ 0 := by
+  rw [j_of_isCharThreeJNeZeroNF_of_char_three, div_ne_zero_iff]
+  have h := W.Δ'.ne_zero
+  rwa [coe_Δ', Δ_of_isCharThreeJNeZeroNF_of_char_three, mul_ne_zero_iff] at h
 
 end Quantity
 
 /-! ### Normal forms of characteristic = 3 -/
 
--- DISSOLVED: inductive
+class inductive IsCharThreeNF : Prop
+| of_j_ne_zero [W.IsCharThreeJNeZeroNF] : IsCharThreeNF
+| of_j_eq_zero [W.IsShortNF] : IsCharThreeNF
 
 instance isCharThreeNF_of_isCharThreeJNeZeroNF [W.IsCharThreeJNeZeroNF] : W.IsCharThreeNF :=
   IsCharThreeNF.of_j_ne_zero
@@ -354,7 +381,18 @@ def toCharThreeNF : VariableChange F :=
   .comp ⟨1, (W.variableChange W.toShortNFOfCharThree).a₄ /
     (W.variableChange W.toShortNFOfCharThree).a₂, 0, 0⟩ W.toShortNFOfCharThree
 
--- DISSOLVED: toCharThreeNF_spec_of_b₂_ne_zero
+theorem toCharThreeNF_spec_of_b₂_ne_zero (hb₂ : W.b₂ ≠ 0) :
+    (W.variableChange W.toCharThreeNF).IsCharThreeJNeZeroNF := by
+  have h : (2 : F) * 2 = 1 := by linear_combination CharP.cast_eq_zero F 3
+  letI : Invertible (2 : F) := ⟨2, h, h⟩
+  rw [toCharThreeNF, variableChange_comp]
+  set W' := W.variableChange W.toShortNFOfCharThree
+  haveI : W'.IsCharNeTwoNF := W.toCharNeTwoNF_spec
+  constructor
+  · simp
+  · simp
+  · field_simp [W.toShortNFOfCharThree_a₂ ▸ hb₂]
+    linear_combination (W'.a₄ * W'.a₂ ^ 2 + W'.a₄ ^ 2) * CharP.cast_eq_zero F 3
 
 theorem toCharThreeNF_spec_of_b₂_eq_zero (hb₂ : W.b₂ = 0) :
     (W.variableChange W.toCharThreeNF).IsShortNF := by
@@ -377,49 +415,95 @@ end VariableChange
 
 /-! ### Normal forms of characteristic = 2 and j ≠ 0 -/
 
--- DISSOLVED: IsCharTwoJNeZeroNF
+@[mk_iff]
+class IsCharTwoJNeZeroNF : Prop where
+  a₁ : W.a₁ = 1
+  a₃ : W.a₃ = 0
+  a₄ : W.a₄ = 0
 
 section Quantity
 
 variable [W.IsCharTwoJNeZeroNF]
 
--- DISSOLVED: a₁_of_isCharTwoJNeZeroNF
+@[simp]
+theorem a₁_of_isCharTwoJNeZeroNF : W.a₁ = 1 := IsCharTwoJNeZeroNF.a₁
 
--- DISSOLVED: a₃_of_isCharTwoJNeZeroNF
+@[simp]
+theorem a₃_of_isCharTwoJNeZeroNF : W.a₃ = 0 := IsCharTwoJNeZeroNF.a₃
 
--- DISSOLVED: a₄_of_isCharTwoJNeZeroNF
+@[simp]
+theorem a₄_of_isCharTwoJNeZeroNF : W.a₄ = 0 := IsCharTwoJNeZeroNF.a₄
 
--- DISSOLVED: b₂_of_isCharTwoJNeZeroNF
+@[simp]
+theorem b₂_of_isCharTwoJNeZeroNF : W.b₂ = 1 + 4 * W.a₂ := by
+  rw [b₂, a₁_of_isCharTwoJNeZeroNF]
+  ring1
 
--- DISSOLVED: b₄_of_isCharTwoJNeZeroNF
+@[simp]
+theorem b₄_of_isCharTwoJNeZeroNF : W.b₄ = 0 := by
+  rw [b₄, a₃_of_isCharTwoJNeZeroNF, a₄_of_isCharTwoJNeZeroNF]
+  ring1
 
--- DISSOLVED: b₆_of_isCharTwoJNeZeroNF
+@[simp]
+theorem b₆_of_isCharTwoJNeZeroNF : W.b₆ = 4 * W.a₆ := by
+  rw [b₆, a₃_of_isCharTwoJNeZeroNF]
+  ring1
 
--- DISSOLVED: b₈_of_isCharTwoJNeZeroNF
+@[simp]
+theorem b₈_of_isCharTwoJNeZeroNF : W.b₈ = W.a₆ + 4 * W.a₂ * W.a₆ := by
+  rw [b₈, a₁_of_isCharTwoJNeZeroNF, a₃_of_isCharTwoJNeZeroNF, a₄_of_isCharTwoJNeZeroNF]
+  ring1
 
--- DISSOLVED: c₄_of_isCharTwoJNeZeroNF
+@[simp]
+theorem c₄_of_isCharTwoJNeZeroNF : W.c₄ = W.b₂ ^ 2 := by
+  rw [c₄, b₄_of_isCharTwoJNeZeroNF]
+  ring1
 
--- DISSOLVED: c₆_of_isCharTwoJNeZeroNF
+@[simp]
+theorem c₆_of_isCharTwoJNeZeroNF : W.c₆ = -W.b₂ ^ 3 - 864 * W.a₆ := by
+  rw [c₆, b₄_of_isCharTwoJNeZeroNF, b₆_of_isCharTwoJNeZeroNF]
+  ring1
 
 variable [CharP R 2]
 
--- DISSOLVED: b₂_of_isCharTwoJNeZeroNF_of_char_two
+theorem b₂_of_isCharTwoJNeZeroNF_of_char_two : W.b₂ = 1 := by
+  rw [b₂_of_isCharTwoJNeZeroNF]
+  linear_combination 2 * W.a₂ * CharP.cast_eq_zero R 2
 
--- DISSOLVED: b₆_of_isCharTwoJNeZeroNF_of_char_two
+theorem b₆_of_isCharTwoJNeZeroNF_of_char_two : W.b₆ = 0 := by
+  rw [b₆_of_isCharTwoJNeZeroNF]
+  linear_combination 2 * W.a₆ * CharP.cast_eq_zero R 2
 
--- DISSOLVED: b₈_of_isCharTwoJNeZeroNF_of_char_two
+theorem b₈_of_isCharTwoJNeZeroNF_of_char_two : W.b₈ = W.a₆ := by
+  rw [b₈_of_isCharTwoJNeZeroNF]
+  linear_combination 2 * W.a₂ * W.a₆ * CharP.cast_eq_zero R 2
 
--- DISSOLVED: c₄_of_isCharTwoJNeZeroNF_of_char_two
+theorem c₄_of_isCharTwoJNeZeroNF_of_char_two : W.c₄ = 1 := by
+  rw [c₄_of_isCharTwoJNeZeroNF, b₂_of_isCharTwoJNeZeroNF_of_char_two]
+  ring1
 
--- DISSOLVED: c₆_of_isCharTwoJNeZeroNF_of_char_two
+theorem c₆_of_isCharTwoJNeZeroNF_of_char_two : W.c₆ = 1 := by
+  rw [c₆_of_isCharTwoJNeZeroNF, b₂_of_isCharTwoJNeZeroNF_of_char_two]
+  linear_combination (-1 - 432 * W.a₆) * CharP.cast_eq_zero R 2
 
--- DISSOLVED: Δ_of_isCharTwoJNeZeroNF_of_char_two
+@[simp]
+theorem Δ_of_isCharTwoJNeZeroNF_of_char_two : W.Δ = W.a₆ := by
+  rw [Δ, b₂_of_isCharTwoJNeZeroNF_of_char_two, b₄_of_isCharTwoJNeZeroNF,
+    b₆_of_isCharTwoJNeZeroNF_of_char_two, b₈_of_isCharTwoJNeZeroNF_of_char_two]
+  linear_combination -W.a₆ * CharP.cast_eq_zero R 2
 
 variable (W : WeierstrassCurve F) [W.IsElliptic] [W.IsCharTwoJNeZeroNF] [CharP F 2]
 
--- DISSOLVED: j_of_isCharTwoJNeZeroNF_of_char_two
+@[simp]
+theorem j_of_isCharTwoJNeZeroNF_of_char_two : W.j = 1 / W.a₆ := by
+  rw [j, Units.val_inv_eq_inv_val, ← div_eq_inv_mul, coe_Δ',
+    c₄_of_isCharTwoJNeZeroNF_of_char_two, Δ_of_isCharTwoJNeZeroNF_of_char_two, one_pow]
 
--- DISSOLVED: j_ne_zero_of_isCharTwoJNeZeroNF_of_char_two
+theorem j_ne_zero_of_isCharTwoJNeZeroNF_of_char_two : W.j ≠ 0 := by
+  rw [j_of_isCharTwoJNeZeroNF_of_char_two, div_ne_zero_iff]
+  have h := W.Δ'.ne_zero
+  rw [coe_Δ', Δ_of_isCharTwoJNeZeroNF_of_char_two] at h
+  exact ⟨one_ne_zero, h⟩
 
 end Quantity
 
@@ -509,7 +593,9 @@ end Quantity
 
 /-! ### Normal forms of characteristic = 2 -/
 
--- DISSOLVED: inductive
+class inductive IsCharTwoNF : Prop
+| of_j_ne_zero [W.IsCharTwoJNeZeroNF] : IsCharTwoNF
+| of_j_eq_zero [W.IsCharTwoJEqZeroNF] : IsCharTwoNF
 
 instance isCharTwoNF_of_isCharTwoJNeZeroNF [W.IsCharTwoJNeZeroNF] : W.IsCharTwoNF :=
   IsCharTwoNF.of_j_ne_zero
@@ -532,9 +618,17 @@ theorem toCharTwoJEqZeroNF_spec (ha₁ : W.a₁ = 0) :
 
 variable (W : WeierstrassCurve F)
 
--- DISSOLVED: toCharTwoJNeZeroNF
+def toCharTwoJNeZeroNF (W : WeierstrassCurve F) (ha₁ : W.a₁ ≠ 0) : VariableChange F :=
+  ⟨Units.mk0 _ ha₁, W.a₃ / W.a₁, 0, (W.a₁ ^ 2 * W.a₄ + W.a₃ ^ 2) / W.a₁ ^ 3⟩
 
--- DISSOLVED: toCharTwoJNeZeroNF_spec
+theorem toCharTwoJNeZeroNF_spec (ha₁ : W.a₁ ≠ 0) :
+    (W.variableChange (W.toCharTwoJNeZeroNF ha₁)).IsCharTwoJNeZeroNF := by
+  constructor
+  · simp [toCharTwoJNeZeroNF, ha₁]
+  · field_simp [toCharTwoJNeZeroNF]
+    linear_combination (W.a₃ * W.a₁ ^ 3 + W.a₁ ^ 2 * W.a₄ + W.a₃ ^ 2) * CharP.cast_eq_zero F 2
+  · field_simp [toCharTwoJNeZeroNF]
+    linear_combination (W.a₁ ^ 4 * W.a₃ ^ 2 + W.a₁ ^ 5 * W.a₃ * W.a₂) * CharP.cast_eq_zero F 2
 
 def toCharTwoNF [DecidableEq F] : VariableChange F :=
   if ha₁ : W.a₁ = 0 then W.toCharTwoJEqZeroNF else W.toCharTwoJNeZeroNF ha₁

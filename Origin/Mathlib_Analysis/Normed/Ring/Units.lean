@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecificLimits.Normed
 import Mathlib.Topology.Algebra.Ring.Ideal
 import Mathlib.RingTheory.Ideal.Nonunits
 
+noncomputable section
+
 /-!
 # The group of units of a complete normed ring
 

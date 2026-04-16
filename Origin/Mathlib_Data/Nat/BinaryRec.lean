@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Nat/BinaryRec.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Batteries.Tactic.Alias
 import Mathlib.Init
+
+noncomputable section
 
 /-!
 # Binary recursion on `Nat`
@@ -67,7 +69,16 @@ def binaryRec' {motive : Nat → Sort u} (z : motive 0)
         cases n <;> cases b <;> simp at h ⊢
       congrArg motive this ▸ z
 
--- DISSOLVED: binaryRecFromOne
+@[elab_as_elim, specialize]
+def binaryRecFromOne {motive : Nat → Sort u} (z₀ : motive 0) (z₁ : motive 1)
+    (f : ∀ b n, n ≠ 0 → motive n → motive (bit b n)) :
+    ∀ n, motive n :=
+  binaryRec' z₀ fun b n h ih =>
+    if h' : n = 0 then
+      have : bit b n = bit true 0 := by
+        rw [h', h h']
+      congrArg motive this ▸ z₁
+    else f b n h' ih
 
 theorem bit_val (b n) : bit b n = 2 * n + b.toNat := by
   cases b <;> rfl

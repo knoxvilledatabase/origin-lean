@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Util.Tactic
 import Mathlib.Logic.Function.Basic
 
+noncomputable section
+
 /-!
 # `choose` tactic
 Performs Skolemization, that is, given `h : ∀ a:α, ∃ b:β, p a b |- G` produces
@@ -152,7 +154,6 @@ elab_rules : tactic
 syntax "choose!" (ppSpace colGt binderIdent)+ (" using " term)? : tactic
 
 macro_rules
-
   | `(tactic| choose! $[$ids]* $[using $h]?) => `(tactic| choose ! $[$ids]* $[using $h]?)
 
 end Mathlib.Tactic.Choose

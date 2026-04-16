@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Analysis.Convex.Topology
 
+noncomputable section
+
 /-!
 # Locally convex topological modules
 

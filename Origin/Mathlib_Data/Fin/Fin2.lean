@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Notation
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Logic.Function.Basic
 
+noncomputable section
+
 /-!
 # Inductive type variant of `Fin`
 
@@ -116,6 +118,8 @@ def rev {n : Nat} : Fin2 n → Fin2 n
   induction i <;> simp_all [rev]
 
 theorem rev_involutive {n} : Function.Involutive (@rev n) := rev_rev
+
+@[inherit_doc] local prefix:arg "&" => ofNat'
 
 instance : Inhabited (Fin2 1) :=
   ⟨fz⟩

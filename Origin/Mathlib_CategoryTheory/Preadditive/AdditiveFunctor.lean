@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Preadditive/AdditiveFunctor.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.ExactFunctor
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Preadditive.Biproducts
 import Mathlib.CategoryTheory.Preadditive.FunctorCategory
+
+noncomputable section
 
 /-!
 # Additive Functors
@@ -53,9 +55,6 @@ theorem map_add {X Y : C} {f g : X ⟶ Y} : F.map (f + g) = F.map f + F.map g :=
 @[simps!]
 def mapAddHom {X Y : C} : (X ⟶ Y) →+ (F.obj X ⟶ F.obj Y) :=
   AddMonoidHom.mk' (fun f => F.map f) fun _ _ => F.map_add
-
-theorem coe_mapAddHom {X Y : C} : ⇑(F.mapAddHom : (X ⟶ Y) →+ _) = F.map :=
-  rfl
 
 instance (priority := 100) preservesZeroMorphisms_of_additive : PreservesZeroMorphisms F where
   map_zero _ _ := F.mapAddHom.map_zero
@@ -119,7 +118,6 @@ lemma additive_of_comp_faithful
 open ZeroObject Limits in
 
 include F in
-
 lemma hasZeroObject_of_additive [HasZeroObject C] :
     HasZeroObject D where
   zero := ⟨F.obj 0, by rw [IsZero.iff_id_eq_zero, ← F.map_id, id_zero, F.map_zero]⟩
@@ -212,23 +210,6 @@ variable {C D}
 def AdditiveFunctor.of (F : C ⥤ D) [F.Additive] : C ⥤+ D :=
   ⟨F, inferInstance⟩
 
-@[simp]
-theorem AdditiveFunctor.of_fst (F : C ⥤ D) [F.Additive] : (AdditiveFunctor.of F).1 = F :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.forget_obj (F : C ⥤+ D) : (AdditiveFunctor.forget C D).obj F = F.1 :=
-  rfl
-
-theorem AdditiveFunctor.forget_obj_of (F : C ⥤ D) [F.Additive] :
-    (AdditiveFunctor.forget C D).obj (AdditiveFunctor.of F) = F :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.forget_map (F G : C ⥤+ D) (α : F ⟶ G) :
-    (AdditiveFunctor.forget C D).map α = α :=
-  rfl
-
 instance : Functor.Additive (AdditiveFunctor.forget C D) where map_add := rfl
 
 instance (F : C ⥤+ D) : Functor.Additive F.1 :=
@@ -277,36 +258,6 @@ instance : (AdditiveFunctor.ofExact C D).Faithful := FullSubcategory.faithful_ma
 end
 
 variable {C D}
-
-@[simp]
-theorem AdditiveFunctor.ofLeftExact_obj_fst (F : C ⥤ₗ D) :
-    ((AdditiveFunctor.ofLeftExact C D).obj F).obj = F.obj :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.ofRightExact_obj_fst (F : C ⥤ᵣ D) :
-    ((AdditiveFunctor.ofRightExact C D).obj F).obj = F.obj :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.ofExact_obj_fst (F : C ⥤ₑ D) :
-    ((AdditiveFunctor.ofExact C D).obj F).obj = F.obj :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.ofLeftExact_map {F G : C ⥤ₗ D} (α : F ⟶ G) :
-    (AdditiveFunctor.ofLeftExact C D).map α = α :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.ofRightExact_map {F G : C ⥤ᵣ D} (α : F ⟶ G) :
-    (AdditiveFunctor.ofRightExact C D).map α = α :=
-  rfl
-
-@[simp]
-theorem AdditiveFunctor.ofExact_map {F G : C ⥤ₑ D} (α : F ⟶ G) :
-    (AdditiveFunctor.ofExact C D).map α = α :=
-  rfl
 
 end Exact
 

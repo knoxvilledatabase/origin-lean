@@ -1,9 +1,11 @@
 /-
 Extracted from Geometry/Euclidean/Sphere/SecondInter.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Sphere.Basic
+
+noncomputable section
 
 /-!
 # Second intersection of a sphere and a line
@@ -78,7 +80,13 @@ theorem Sphere.eq_or_eq_secondInter_of_mem_mk'_span_singleton_iff_mem {s : Spher
     rw [← hp, dist_smul_vadd_eq_dist _ _ hv] at h
     rcases h with (h | h) <;> simp [h]
 
--- DISSOLVED: Sphere.secondInter_smul
+@[simp]
+theorem Sphere.secondInter_smul (s : Sphere P) (p : P) (v : V) {r : ℝ} (hr : r ≠ 0) :
+    s.secondInter p (r • v) = s.secondInter p v := by
+  simp_rw [Sphere.secondInter, real_inner_smul_left, inner_smul_right, smul_smul,
+    div_mul_eq_div_div]
+  rw [mul_comm, ← mul_div_assoc, ← mul_div_assoc, mul_div_cancel_left₀ _ hr, mul_comm, mul_assoc,
+    mul_div_cancel_left₀ _ hr, mul_comm]
 
 @[simp]
 theorem Sphere.secondInter_neg (s : Sphere P) (p : P) (v : V) :
@@ -96,11 +104,6 @@ theorem Sphere.secondInter_secondInter (s : Sphere P) (p : P) (v : V) :
   convert zero_smul ℝ (M := V) _
   convert zero_div (G₀ := ℝ) _
   ring
-
-theorem Sphere.secondInter_eq_lineMap (s : Sphere P) (p p' : P) :
-    s.secondInter p (p' -ᵥ p) =
-      AffineMap.lineMap p p' (-2 * ⟪p' -ᵥ p, p -ᵥ s.center⟫ / ⟪p' -ᵥ p, p' -ᵥ p⟫) :=
-  rfl
 
 theorem Sphere.secondInter_vsub_mem_affineSpan (s : Sphere P) (p₁ p₂ : P) :
     s.secondInter p₁ (p₂ -ᵥ p₁) ∈ line[ℝ, p₁, p₂] :=

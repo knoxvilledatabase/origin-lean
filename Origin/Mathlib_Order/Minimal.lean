@@ -7,6 +7,8 @@ import Mathlib.Order.Antichain
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Order.Interval.Set.Basic
 
+noncomputable section
+
 /-!
 # Minimality and Maximality
 
@@ -278,12 +280,6 @@ theorem minimal_subset_iff : Minimal P s ↔ P s ∧ ∀ ⦃t⦄, P t → t ⊆ 
 
 theorem maximal_subset_iff : Maximal P s ↔ P s ∧ ∀ ⦃t⦄, P t → s ⊆ t → s = t :=
   _root_.maximal_iff
-
-theorem minimal_subset_iff' : Minimal P s ↔ P s ∧ ∀ ⦃t⦄, P t → t ⊆ s → s ⊆ t :=
-  Iff.rfl
-
-theorem maximal_subset_iff' : Maximal P s ↔ P s ∧ ∀ ⦃t⦄, P t → s ⊆ t → t ⊆ s :=
-  Iff.rfl
 
 theorem not_minimal_subset_iff (hs : P s) : ¬ Minimal P s ↔ ∃ t, t ⊂ s ∧ P t :=
   not_minimal_iff_exists_lt hs

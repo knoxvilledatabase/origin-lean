@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FLT/Basic.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Int
@@ -8,6 +8,8 @@ import Mathlib.Algebra.GCDMonoid.Finset
 import Mathlib.Algebra.GCDMonoid.Nat
 import Mathlib.Algebra.Order.Ring.Abs
 import Mathlib.RingTheory.PrincipalIdealDomain
+
+noncomputable section
 
 /-!
 # Statement of Fermat's Last Theorem
@@ -130,9 +132,6 @@ lemma fermatLastTheoremWith_nat_int_rat_tfae (n : ℕ) :
   | h, a, b, c => mod_cast h a b c
   tfae_finish
 
-lemma fermatLastTheoremFor_iff_nat {n : ℕ} : FermatLastTheoremFor n ↔ FermatLastTheoremWith ℕ n :=
-  Iff.rfl
-
 lemma fermatLastTheoremFor_iff_int {n : ℕ} : FermatLastTheoremFor n ↔ FermatLastTheoremWith ℤ n :=
   (fermatLastTheoremWith_nat_int_rat_tfae n).out 0 1
 
@@ -190,7 +189,24 @@ lemma fermatLastTheoremWith'_nat_int_tfae (n : ℕ) :
 
 open Finset in
 
--- DISSOLVED: fermatLastTheoremWith_of_fermatLastTheoremWith_coprime
+lemma fermatLastTheoremWith_of_fermatLastTheoremWith_coprime {n : ℕ} {R : Type*} [CommSemiring R]
+    [IsDomain R] [DecidableEq R] [NormalizedGCDMonoid R]
+    (hn : ∀ a b c : R, a ≠ 0 → b ≠ 0 → c ≠ 0 → ({a, b, c} : Finset R).gcd id = 1 →
+      a ^ n + b ^ n ≠ c ^ n) :
+    FermatLastTheoremWith R n := by
+  intro a b c ha hb hc habc
+  let s : Finset R := {a, b, c}; let d := s.gcd id
+  obtain ⟨A, hA⟩ : d ∣ a := gcd_dvd (by simp [s])
+  obtain ⟨B, hB⟩ : d ∣ b := gcd_dvd (by simp [s])
+  obtain ⟨C, hC⟩ : d ∣ c := gcd_dvd (by simp [s])
+  simp only [hA, hB, hC, mul_ne_zero_iff, mul_pow] at ha hb hc habc
+  rw [← mul_add, mul_right_inj' (pow_ne_zero n ha.1)] at habc
+  refine hn A B C ha.2 hb.2 hc.2 ?_ habc
+  rw [← Finset.normalize_gcd, normalize_eq_one]
+  obtain ⟨u, hu⟩ := normalize_associated d
+  refine ⟨u, mul_left_cancel₀ (mt normalize_eq_zero.mp ha.1) (hu.symm ▸ ?_)⟩
+  rw [← Finset.gcd_mul_left, gcd_eq_gcd_image, image_insert, image_insert, image_singleton,
+      id_eq, id_eq, id_eq, ← hA, ← hB, ← hC]
 
 lemma dvd_c_of_prime_of_dvd_a_of_dvd_b_of_FLT {n : ℕ} {p : ℤ} (hp : Prime p) {a b c : ℤ}
     (hpa : p ∣ a) (hpb : p ∣ b) (HF : a ^ n + b ^ n + c ^ n = 0) : p ∣ c := by

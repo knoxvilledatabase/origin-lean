@@ -9,6 +9,8 @@ import Mathlib.Algebra.Category.Grp.EnoughInjectives
 import Mathlib.Algebra.Category.Grp.ZModuleEquivalence
 import Mathlib.Logic.Equiv.TransferInstance
 
+noncomputable section
+
 /-!
 # Category of $R$-modules has enough injectives
 

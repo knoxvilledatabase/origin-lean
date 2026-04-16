@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.DirectLimit
 
+noncomputable section
+
 /-!
 # Tensor product and direct limits commute with each other.
 

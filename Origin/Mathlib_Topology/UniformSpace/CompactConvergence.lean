@@ -9,6 +9,8 @@ import Mathlib.Topology.Maps.Proper.Basic
 import Mathlib.Topology.UniformSpace.UniformConvergenceTopology
 import Mathlib.Topology.UniformSpace.Compact
 
+noncomputable section
+
 /-!
 # Compact convergence (uniform convergence on compact sets)
 
@@ -139,14 +141,8 @@ theorem tendsto_iff_forall_isCompact_tendstoUniformlyOn
     -- maps `K` to `U` as well
     filter_upwards [h K hK V hV] with g hg x hx using hVf _ (mem_image_of_mem f hx) (hg x hx)
 
-tendsto_iff_forall_compact_tendstoUniformlyOn := tendsto_iff_forall_isCompact_tendstoUniformlyOn
-
 def toUniformOnFunIsCompact (f : C(α, β)) : α →ᵤ[{K | IsCompact K}] β :=
   UniformOnFun.ofFun {K | IsCompact K} f
-
-@[simp]
-theorem toUniformOnFun_toFun (f : C(α, β)) :
-    UniformOnFun.toFun _ f.toUniformOnFunIsCompact = f := rfl
 
 theorem range_toUniformOnFunIsCompact :
     range (toUniformOnFunIsCompact) = {f : UniformOnFun α β {K | IsCompact K} | Continuous f} :=

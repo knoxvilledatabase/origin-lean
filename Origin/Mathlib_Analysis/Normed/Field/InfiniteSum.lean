@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 import Mathlib.Topology.Algebra.InfiniteSum.Real
 
+noncomputable section
+
 /-! # Multiplying two infinite sums in a normed ring
 
 In this file, we prove various results about `(∑' x : ι, f x) * (∑' y : ι', g y)` in a normed

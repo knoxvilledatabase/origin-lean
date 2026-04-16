@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.Submodule.LinearMap
 import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Forward difference operators and Newton series
 
@@ -31,6 +33,8 @@ open Finset Nat Function
 variable {M G : Type*} [AddCommMonoid M] [AddCommGroup G] (h : M)
 
 def fwdDiff (h : M) (f : M → G) : M → G := fun n ↦ f (n + h) - f n
+
+@[inherit_doc] scoped[fwdDiff] notation "Δ_[" h "]" => fwdDiff h
 
 open fwdDiff
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
 import Mathlib.NumberTheory.GaussSum
 
+noncomputable section
+
 /-!
 # Quadratic characters of finite fields
 

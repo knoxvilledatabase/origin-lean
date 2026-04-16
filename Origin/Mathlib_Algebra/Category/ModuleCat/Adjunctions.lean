@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Monoidal.Types.Basic
 import Mathlib.LinearAlgebra.DirectSum.Finsupp
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 
+noncomputable section
+
 /-!
 The functor of forming finitely supported functions on a type with values in a `[Ring R]`
 is the left adjoint of
@@ -107,9 +109,6 @@ def εIso : 𝟙_ (ModuleCat R) ≅ (free R).obj (𝟙_ (Type u)) where
     rw [Finsupp.single_eq_same]
 
 @[simp]
-lemma εIso_hom_one : (εIso R).hom 1 = freeMk PUnit.unit := rfl
-
-@[simp]
 lemma εIso_inv_freeMk (x : PUnit) : (εIso R).inv (freeMk x) = 1 := by
   dsimp [εIso, freeMk]
   erw [Finsupp.lapply_apply]
@@ -164,9 +163,6 @@ instance : (free R).Monoidal :=
         aesop }
 
 open Functor.LaxMonoidal Functor.OplaxMonoidal
-
-@[simp]
-lemma free_ε_one : ε (free R) 1 = freeMk PUnit.unit := rfl
 
 @[simp]
 lemma free_η_freeMk (x : PUnit) : η (free R) (freeMk x) = 1 := by
@@ -293,9 +289,6 @@ def lift (F : C ⥤ D) : Free R C ⥤ D where
       · intro g' s
         rw [single_comp_single _ _ f' g' r s]
         simp [mul_comm r s, mul_smul]
-
-theorem lift_map_single (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) (r : R) :
-    (lift R F).map (single f r) = r • F.map f := by simp
 
 instance lift_additive (F : C ⥤ D) : (lift R F).Additive where
   map_add {X Y} f g := by

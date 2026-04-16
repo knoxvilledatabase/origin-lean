@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Game/Short.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Basic
 import Mathlib.SetTheory.Cardinal.Cofinality
 import Mathlib.SetTheory.Game.Birthday
+
+noncomputable section
 
 /-!
 # Short games
@@ -42,7 +44,6 @@ instance subsingleton_short (x : PGame) : Subsingleton (Short x) := by
     congr!
 
 attribute [-instance] subsingleton_short in
-
 theorem subsingleton_short_example : ∀ x : PGame, Subsingleton (Short x)
   | mk xl xr xL xR =>
     ⟨fun a b => by

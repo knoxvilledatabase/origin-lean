@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.SignedHahn
 import Mathlib.MeasureTheory.Measure.MutuallySingular
 
+noncomputable section
+
 /-!
 # Jordan decomposition
 

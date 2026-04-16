@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/LocalRing/ResidueField/Basic.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 14
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 import Mathlib.RingTheory.LocalRing.RingHom.Basic
+
+noncomputable section
 
 /-!
 
@@ -30,7 +32,8 @@ lemma ker_residue : RingHom.ker (residue R) = maximalIdeal R :=
 lemma residue_eq_zero_iff (x : R) : residue R x = 0 ↔ x ∈ maximalIdeal R := by
   rw [← RingHom.mem_ker, ker_residue]
 
--- DISSOLVED: residue_ne_zero_iff_isUnit
+lemma residue_ne_zero_iff_isUnit (x : R) : residue R x ≠ 0 ↔ IsUnit x := by
+  simp
 
 lemma residue_surjective :
     Function.Surjective (IsLocalRing.residue R) :=
@@ -167,7 +170,6 @@ instance finiteDimensional_of_noetherian [IsNoetherian R S] :
   exact Algebra.algebra_ext _ _ (fun r => rfl)
 
 set_option linter.unusedVariables false in
-
 lemma finite_of_finite [IsNoetherian R S] (hfin : Finite (ResidueField R)) :
     Finite (ResidueField S) := Module.finite_of_finite (ResidueField R)
 

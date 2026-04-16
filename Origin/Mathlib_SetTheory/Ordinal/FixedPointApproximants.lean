@@ -5,6 +5,8 @@ Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic
 
+noncomputable section
+
 /-!
 # Ordinal Approximants for the Fixed points on complete lattices
 
@@ -69,6 +71,11 @@ variable [CompleteLattice α] (f : α →o α) (x : α)
 open Function fixedPoints Cardinal Order OrderHom
 
 set_option linter.unusedVariables false in
+/-- The ordinal-indexed sequence approximating the least fixed point greater than
+
+an initial value `x`. It is defined in such a way that we have `lfpApprox 0 x = x` and
+
+`lfpApprox a x = ⨆ b < a, f (lfpApprox b x)`. -/
 
 def lfpApprox (a : Ordinal.{u}) : α :=
   sSup ({ f (lfpApprox b) | (b : Ordinal) (h : b < a) } ∪ {x})
@@ -236,6 +243,11 @@ theorem lfp_mem_range_lfpApprox : f.lfp ∈ Set.range (lfpApprox f ⊥) := by
   exact lfpApprox_ord_eq_lfp f
 
 set_option linter.unusedVariables false in
+/-- The ordinal-indexed sequence approximating the greatest fixed point greater than
+
+an initial value `x`. It is defined in such a way that we have `gfpApprox 0 x = x` and
+
+`gfpApprox a x = ⨅ b < a, f (lfpApprox b x)`. -/
 
 def gfpApprox (a : Ordinal.{u}) : α :=
   sInf ({ f (gfpApprox b) | (b : Ordinal) (h : b < a) } ∪ {x})

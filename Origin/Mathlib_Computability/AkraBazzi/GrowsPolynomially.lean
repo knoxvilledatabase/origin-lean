@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Algebra.Order.ToIntervalMod
 import Mathlib.Analysis.SpecialFunctions.Log.Base
 
+noncomputable section
+
 /-!
 # Akra-Bazzi theorem: The polynomial growth condition
 
@@ -627,35 +629,6 @@ lemma growsPolynomially_pow (p : ℕ) : GrowsPolynomially fun x => x ^ p :=
 
 lemma growsPolynomially_zpow (p : ℤ) : GrowsPolynomially fun x => x ^ p :=
   (growsPolynomially_id).zpow p (eventually_ge_atTop 0)
-
-lemma growsPolynomially_log : GrowsPolynomially Real.log := by
-  intro b hb
-  have hb₀ : 0 < b := hb.1
-  refine ⟨1 / 2, by norm_num, ?_⟩
-  refine ⟨1, by norm_num, ?_⟩
-  have h_tendsto : Tendsto (fun x => 1 / 2 * Real.log x) atTop atTop :=
-    Tendsto.const_mul_atTop (by norm_num) Real.tendsto_log_atTop
-  filter_upwards [eventually_gt_atTop 1,
-                  (tendsto_id.const_mul_atTop hb.1).eventually_forall_ge_atTop
-                    <| h_tendsto.eventually (eventually_gt_atTop (-Real.log b)) ] with x hx_pos hx
-  intro u hu
-  refine ⟨?lb, ?ub⟩
-  case lb => calc
-    1 / 2 * Real.log x = Real.log x + (-1 / 2) * Real.log x := by ring
-      _ ≤ Real.log x + Real.log b := by
-              gcongr
-              rw [neg_div, neg_mul, ← neg_le]
-              refine le_of_lt (hx x ?_)
-              calc b * x ≤ 1 * x := by gcongr; exact le_of_lt hb.2
-                       _ = x := by rw [one_mul]
-      _ = Real.log (b * x) := by rw [← Real.log_mul (by positivity) (by positivity), mul_comm]
-      _ ≤ Real.log u := by gcongr; exact hu.1
-  case ub =>
-    rw [one_mul]
-    gcongr
-    · calc 0 < b * x := by positivity
-         _ ≤ u := by exact hu.1
-    · exact hu.2
 
 lemma GrowsPolynomially.of_isTheta {f g : ℝ → ℝ} (hg : GrowsPolynomially g) (hf : f =Θ[atTop] g)
     (hf' : ∀ᶠ x in atTop, 0 ≤ f x) : GrowsPolynomially f := by

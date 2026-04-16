@@ -1,12 +1,14 @@
 /-
 Extracted from Geometry/Manifold/PartitionOfUnity.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.Structures
 import Mathlib.Geometry.Manifold.BumpFunction
 import Mathlib.Topology.MetricSpace.PartitionOfUnity
 import Mathlib.Topology.ShrinkingLemma
+
+noncomputable section
 
 /-!
 # Smooth partition of unity
@@ -151,7 +153,9 @@ theorem le_one (i : ι) (x : M) : f i x ≤ 1 :=
 theorem sum_nonneg (x : M) : 0 ≤ ∑ᶠ i, f i x :=
   f.toPartitionOfUnity.sum_nonneg x
 
--- DISSOLVED: finsum_smul_mem_convex
+theorem finsum_smul_mem_convex {g : ι → M → F} {t : Set F} {x : M} (hx : x ∈ s)
+    (hg : ∀ i, f i x ≠ 0 → g i x ∈ t) (ht : Convex ℝ t) : ∑ᶠ i, f i x • g i x ∈ t :=
+  ht.finsum_mem (fun _ => f.nonneg _ _) (f.sum_eq_one hx) hg
 
 theorem contMDiff_smul {g : M → F} {i} (hg : ∀ x ∈ tsupport (f i), ContMDiffAt I 𝓘(ℝ, F) n g x) :
     ContMDiff I 𝓘(ℝ, F) n fun x => f i x • g x :=
@@ -276,17 +280,6 @@ def toSmoothPartitionOfUnity (f : BumpCovering ι M s) (hf : ∀ i, ContMDiff I 
   { f.toPartitionOfUnity with
     toFun := fun i => ⟨f.toPartitionOfUnity i, f.contMDiff_toPartitionOfUnity hf i⟩ }
 
-@[simp]
-theorem toSmoothPartitionOfUnity_toPartitionOfUnity (f : BumpCovering ι M s)
-    (hf : ∀ i, ContMDiff I 𝓘(ℝ) ⊤ (f i)) :
-    (f.toSmoothPartitionOfUnity hf).toPartitionOfUnity = f.toPartitionOfUnity :=
-  rfl
-
-@[simp]
-theorem coe_toSmoothPartitionOfUnity (f : BumpCovering ι M s) (hf : ∀ i, ContMDiff I 𝓘(ℝ) ⊤ (f i))
-    (i : ι) : ⇑(f.toSmoothPartitionOfUnity hf i) = f.toPartitionOfUnity i :=
-  rfl
-
 theorem IsSubordinate.toSmoothPartitionOfUnity {f : BumpCovering ι M s} {U : ι → Set M}
     (h : f.IsSubordinate U) (hf : ∀ i, ContMDiff I 𝓘(ℝ) ⊤ (f i)) :
     (f.toSmoothPartitionOfUnity hf).IsSubordinate U :=
@@ -337,7 +330,8 @@ theorem exists_isSubordinate [T2Space M] [SigmaCompactSpace M] (hs : IsClosed s)
 protected theorem locallyFinite : LocallyFinite fun i => support (fs i) :=
   fs.locallyFinite'
 
--- DISSOLVED: point_finite
+protected theorem point_finite (x : M) : {i | fs i x ≠ 0}.Finite :=
+  fs.locallyFinite.point_finite x
 
 def ind (x : M) (hx : x ∈ s) : ι :=
   (fs.eventuallyEq_one' x hx).choose
@@ -390,13 +384,13 @@ alias ⟨_, IsSubordinate.toBumpCovering⟩ := isSubordinate_toBumpCovering
 def toSmoothPartitionOfUnity : SmoothPartitionOfUnity ι I M s :=
   fs.toBumpCovering.toSmoothPartitionOfUnity fun i => (fs i).contMDiff
 
-theorem toSmoothPartitionOfUnity_apply (i : ι) (x : M) :
-    fs.toSmoothPartitionOfUnity i x = fs i x * ∏ᶠ (j) (_ : WellOrderingRel j i), (1 - fs j x) :=
-  rfl
-
 open Classical in
 
--- DISSOLVED: toSmoothPartitionOfUnity_eq_mul_prod
+theorem toSmoothPartitionOfUnity_eq_mul_prod (i : ι) (x : M) (t : Finset ι)
+    (ht : ∀ j, WellOrderingRel j i → fs j x ≠ 0 → j ∈ t) :
+    fs.toSmoothPartitionOfUnity i x =
+      fs i x * ∏ j ∈ t.filter fun j => WellOrderingRel j i, (1 - fs j x) :=
+  fs.toBumpCovering.toPartitionOfUnity_eq_mul_prod i x t ht
 
 open Classical in
 

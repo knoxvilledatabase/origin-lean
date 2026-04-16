@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Sheaves.Presheaf
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful
 
+noncomputable section
+
 /-!
 # Presheafed spaces
 
@@ -37,11 +39,6 @@ instance coeCarrier : CoeOut (PresheafedSpace C) TopCat where coe X := X.carrier
 attribute [coe] PresheafedSpace.carrier
 
 instance : CoeSort (PresheafedSpace C) Type* where coe X := X.carrier
-
-theorem mk_coe (carrier) (presheaf) :
-    (({ carrier
-        presheaf } : PresheafedSpace C) : TopCat) = carrier :=
-  rfl
 
 instance (X : PresheafedSpace C) : TopologicalSpace X :=
   X.carrier.str
@@ -123,10 +120,6 @@ end
 variable {C}
 
 attribute [local simp] eqToHom_map
-
-@[simp]
-theorem id_base (X : PresheafedSpace C) : (𝟙 X : X ⟶ X).base = 𝟙 (X : TopCat) :=
-  rfl
 
 theorem id_c (X : PresheafedSpace C) :
     (𝟙 X : X ⟶ X).c = 𝟙 X.presheaf :=
@@ -321,12 +314,6 @@ def Γ : (PresheafedSpace C)ᵒᵖ ⥤ C where
   obj X := (unop X).presheaf.obj (op ⊤)
   map f := f.unop.c.app (op ⊤)
 
-theorem Γ_obj_op (X : PresheafedSpace C) : Γ.obj (op X) = X.presheaf.obj (op ⊤) :=
-  rfl
-
-theorem Γ_map_op {X Y : PresheafedSpace C} (f : X ⟶ Y) : Γ.map f.op = f.c.app (op ⊤) :=
-  rfl
-
 end PresheafedSpace
 
 end AlgebraicGeometry
@@ -357,26 +344,6 @@ def mapPresheaf (F : C ⥤ D) : PresheafedSpace C ⥤ PresheafedSpace D where
     ext U
     · rfl
     · simp
-
-@[simp]
-theorem mapPresheaf_obj_X (F : C ⥤ D) (X : PresheafedSpace C) :
-    (F.mapPresheaf.obj X : TopCat) = (X : TopCat) :=
-  rfl
-
-@[simp]
-theorem mapPresheaf_obj_presheaf (F : C ⥤ D) (X : PresheafedSpace C) :
-    (F.mapPresheaf.obj X).presheaf = X.presheaf ⋙ F :=
-  rfl
-
-@[simp]
-theorem mapPresheaf_map_f (F : C ⥤ D) {X Y : PresheafedSpace C} (f : X ⟶ Y) :
-    (F.mapPresheaf.map f).base = f.base :=
-  rfl
-
-@[simp]
-theorem mapPresheaf_map_c (F : C ⥤ D) {X Y : PresheafedSpace C} (f : X ⟶ Y) :
-    (F.mapPresheaf.map f).c = whiskerRight f.c F :=
-  rfl
 
 end Functor
 

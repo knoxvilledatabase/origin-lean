@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Find
 import Mathlib.Data.Stream.Init
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Coinductive formalization of unbounded computations.
 
@@ -103,28 +105,12 @@ theorem destruct_empty : destruct (empty α) = Sum.inr (empty α) :=
   rfl
 
 @[simp]
-theorem head_pure (a : α) : head (pure a) = some a :=
-  rfl
-
-@[simp]
-theorem head_think (s : Computation α) : head (think s) = none :=
-  rfl
-
-@[simp]
-theorem head_empty : head (empty α) = none :=
-  rfl
-
-@[simp]
 theorem tail_pure (a : α) : tail (pure a) = pure a :=
   rfl
 
 @[simp]
 theorem tail_think (s : Computation α) : tail (think s) = s := by
   cases' s with f al; apply Subtype.eq; dsimp [tail, think]
-
-@[simp]
-theorem tail_empty : tail (empty α) = empty α :=
-  rfl
 
 theorem think_empty : empty α = think (empty α) :=
   destruct_eq_think destruct_empty
@@ -502,9 +488,6 @@ def bind (c : Computation α) (f : α → Computation β) : Computation β :=
 instance : Bind Computation :=
   ⟨@bind⟩
 
-theorem has_bind_eq_bind {β} (c : Computation α) (f : α → Computation β) : c >>= f = bind c f :=
-  rfl
-
 def join (c : Computation (Computation α)) : Computation α :=
   c >>= id
 
@@ -663,13 +646,6 @@ instance : LawfulMonad Computation := LawfulMonad.mk'
   (bind_pure_comp := @bind_pure)
   (pure_bind := @ret_bind)
   (bind_assoc := @bind_assoc)
-
-theorem has_map_eq_map {β} (f : α → β) (c : Computation α) : f <$> c = map f c :=
-  rfl
-
-@[simp]
-theorem pure_def (a) : (return a : Computation α) = pure a :=
-  rfl
 
 @[simp]
 theorem map_pure' {α β} : ∀ (f : α → β) (a), f <$> pure a = pure (f a) :=
@@ -969,21 +945,6 @@ def LiftRelAux (R : α → β → Prop) (C : Computation α → Computation β �
   | Sum.inr ca, Sum.inr cb => C ca cb
 
 variable {R : α → β → Prop} {C : Computation α → Computation β → Prop}
-
-@[simp] lemma liftRelAux_inl_inl {a : α} {b : β} :
-  LiftRelAux R C (Sum.inl a) (Sum.inl b) = R a b := rfl
-
-@[simp] lemma liftRelAux_inl_inr {a : α} {cb} :
-    LiftRelAux R C (Sum.inl a) (Sum.inr cb) = ∃ b, b ∈ cb ∧ R a b :=
-  rfl
-
-@[simp] lemma liftRelAux_inr_inl {b : β} {ca} :
-    LiftRelAux R C (Sum.inr ca) (Sum.inl b) = ∃ a, a ∈ ca ∧ R a b :=
-  rfl
-
-@[simp] lemma liftRelAux_inr_inr {ca cb} :
-    LiftRelAux R C (Sum.inr ca) (Sum.inr cb) = C ca cb :=
-  rfl
 
 @[simp]
 theorem LiftRelAux.ret_left (R : α → β → Prop) (C : Computation α → Computation β → Prop) (a cb) :

@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Linarith/Preprocessing.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.Linarith.Datatypes
@@ -9,6 +9,8 @@ import Mathlib.Tactic.CancelDenoms.Core
 import Batteries.Data.RBMap.Basic
 import Mathlib.Control.Basic
 import Mathlib.Util.AtomM
+
+noncomputable section
 
 /-!
 # Linarith preprocessing
@@ -173,7 +175,9 @@ partial def rearrangeComparison (e : Expr) : MetaM (Option Expr) := do
   | (Ineq.lt, _) => try? <| mkAppM ``Linarith.sub_neg_of_lt #[e]
   | (Ineq.eq, _) => try? <| mkAppM ``sub_eq_zero_of_eq #[e]
 
--- DISSOLVED: compWithZero
+def compWithZero : Preprocessor where
+  name := "make comparisons with zero"
+  transform e := return (← rearrangeComparison e).toList
 
 end compWithZero
 

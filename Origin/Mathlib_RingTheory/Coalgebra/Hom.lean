@@ -5,6 +5,8 @@ Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 import Origin.Core
 import Mathlib.RingTheory.Coalgebra.Basic
 
+noncomputable section
+
 /-!
 # Homomorphisms of `R`-coalgebras
 
@@ -107,32 +109,11 @@ def Simps.apply {R α β : Type*} [CommSemiring R]
 initialize_simps_projections CoalgHom (toFun → apply)
 
 @[simp]
-protected theorem coe_coe {F : Type*} [FunLike F A B] [CoalgHomClass F R A B] (f : F) :
-    ⇑(f : A →ₗc[R] B) = f :=
-  rfl
-
-@[simp]
-theorem coe_mk {f : A →ₗ[R] B} (h h₁) : ((⟨f, h, h₁⟩ : A →ₗc[R] B) : A → B) = f :=
-  rfl
-
-@[norm_cast]
-theorem coe_mks {f : A → B} (h₁ h₂ h₃ h₄) : ⇑(⟨⟨⟨f, h₁⟩, h₂⟩, h₃, h₄⟩ : A →ₗc[R] B) = f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_linearMap_mk {f : A →ₗ[R] B} (h h₁) : ((⟨f, h, h₁⟩ : A →ₗc[R] B) : A →ₗ[R] B) = f :=
-  rfl
-
-@[simp]
 theorem toLinearMap_eq_coe (f : A →ₗc[R] B) : f.toLinearMap = f :=
   rfl
 
 @[simp, norm_cast]
 theorem coe_toLinearMap (f : A →ₗc[R] B) : ⇑(f : A →ₗ[R] B) = f :=
-  rfl
-
-@[norm_cast]
-theorem coe_toAddMonoidHom (f : A →ₗc[R] B) : ⇑(f : A →+ B) = f :=
   rfl
 
 theorem coe_fn_injective : @Function.Injective (A →ₗc[R] B) (A → B) (↑) :=
@@ -172,10 +153,6 @@ protected def copy (f : A →ₗc[R] B) (f' : A → B) (h : f' = ⇑f) : A →�
     map_comp_comul := by simp only [(f : A →ₗ[R] B).copy_eq f' h,
       CoalgHomClass.map_comp_comul] }
 
-@[simp]
-theorem coe_copy (f : A →ₗc[R] B) (f' : A → B) (h : f' = ⇑f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : A →ₗc[R] B) (f' : A → B) (h : f' = ⇑f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -188,13 +165,6 @@ variable (R A)
 
 variable {R A}
 
-@[simp]
-theorem coe_id : ⇑(CoalgHom.id R A) = id :=
-  rfl
-
-@[simp]
-theorem id_toLinearMap : (CoalgHom.id R A : A →ₗ[R] A) = LinearMap.id := rfl
-
 @[simps!] def comp (φ₁ : B →ₗc[R] C) (φ₂ : A →ₗc[R] B) : A →ₗc[R] C :=
   { (φ₁ : B →ₗ[R] C) ∘ₗ (φ₂ : A →ₗ[R] B) with
     counit_comp := by ext; simp
@@ -202,10 +172,6 @@ theorem id_toLinearMap : (CoalgHom.id R A : A →ₗ[R] A) = LinearMap.id := rfl
 
 @[simp]
 theorem coe_comp (φ₁ : B →ₗc[R] C) (φ₂ : A →ₗc[R] B) : ⇑(φ₁.comp φ₂) = φ₁ ∘ φ₂ := rfl
-
-@[simp]
-theorem comp_toLinearMap (φ₁ : B →ₗc[R] C) (φ₂ : A →ₗc[R] B) :
-    φ₁.comp φ₂ = (φ₁ : B →ₗ[R] C) ∘ₗ (φ₂ : A →ₗ[R] B) := rfl
 
 variable (φ : A →ₗc[R] B)
 
@@ -233,14 +199,6 @@ instance End : Monoid (A →ₗc[R] A) where
   one_mul _ := ext fun _ => rfl
   mul_one _ := ext fun _ => rfl
 
-@[simp]
-theorem one_apply (x : A) : (1 : A →ₗc[R] A) x = x :=
-  rfl
-
-@[simp]
-theorem mul_apply (φ ψ : A →ₗc[R] A) (x : A) : (φ * ψ) x = φ (ψ x) :=
-  rfl
-
 end
 
 end CoalgHom
@@ -260,14 +218,6 @@ def counitCoalgHom : A →ₗc[R] R :=
       ext
       simp only [LinearMap.coe_comp, Function.comp_apply, CommSemiring.comul_apply,
         ← LinearMap.lTensor_comp_rTensor, rTensor_counit_comul, LinearMap.lTensor_tmul] }
-
-@[simp]
-theorem counitCoalgHom_apply (x : A) :
-    counitCoalgHom R A x = counit x := rfl
-
-@[simp]
-theorem counitCoalgHom_toLinearMap :
-    counitCoalgHom R A = counit (R := R) (A := A) := rfl
 
 variable {R}
 

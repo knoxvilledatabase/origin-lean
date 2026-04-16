@@ -10,6 +10,8 @@ import Mathlib.Analysis.Distribution.FourierSchwartz
 import Mathlib.MeasureTheory.Measure.Lebesgue.Integral
 import Mathlib.Topology.ContinuousMap.Periodic
 
+noncomputable section
+
 /-!
 # Poisson's summation formula
 

@@ -9,6 +9,8 @@ import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Normed.Module.Completion
 import Mathlib.Analysis.Analytic.ChangeOrigin
 
+noncomputable section
+
 /-!
 # Uniqueness principle for analytic functions
 

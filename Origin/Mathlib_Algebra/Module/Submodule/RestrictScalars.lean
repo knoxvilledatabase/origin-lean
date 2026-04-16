@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Order.Hom.CompleteLattice
 
+noncomputable section
+
 /-!
 
 # Restriction of scalars for submodules
@@ -29,15 +31,6 @@ def restrictScalars (V : Submodule R M) : Submodule S M where
   zero_mem' := V.zero_mem
   smul_mem' c _ h := V.smul_of_tower_mem c h
   add_mem' hx hy := V.add_mem hx hy
-
-@[simp]
-theorem coe_restrictScalars (V : Submodule R M) : (V.restrictScalars S : Set M) = V :=
-  rfl
-
-@[simp]
-theorem toAddSubmonoid_restrictScalars (V : Submodule R M) :
-    (V.restrictScalars S).toAddSubmonoid = V.toAddSubmonoid :=
-  rfl
 
 @[simp]
 theorem restrictScalars_mem (V : Submodule R M) (m : M) : m ∈ V.restrictScalars S ↔ m ∈ V :=
@@ -77,16 +70,8 @@ def restrictScalarsEquiv (p : Submodule R M) : p.restrictScalars S ≃ₗ[R] p :
     map_smul' := fun _ _ => rfl }
 
 @[simp]
-theorem restrictScalars_bot : restrictScalars S (⊥ : Submodule R M) = ⊥ :=
-  rfl
-
-@[simp]
 theorem restrictScalars_eq_bot_iff {p : Submodule R M} : restrictScalars S p = ⊥ ↔ p = ⊥ := by
   simp [SetLike.ext_iff]
-
-@[simp]
-theorem restrictScalars_top : restrictScalars S (⊤ : Submodule R M) = ⊤ :=
-  rfl
 
 @[simp]
 theorem restrictScalars_eq_top_iff {p : Submodule R M} : restrictScalars S p = ⊤ ↔ p = ⊤ := by

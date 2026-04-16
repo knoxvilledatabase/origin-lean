@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Measure/Regular.lean
-Genuine: 53 | Conflates: 0 | Dissolved: 15 | Infrastructure: 23
+Genuine: 68 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
+
+noncomputable section
 
 /-!
 # Regular measures
@@ -211,7 +213,13 @@ theorem measure_eq_iSup (H : InnerRegularWRT μ p q) (hU : q U) :
     le_antisymm (le_of_forall_lt fun r hr => ?_) (iSup₂_le fun K hK => iSup_le fun _ => μ.mono hK)
   simpa only [lt_iSup_iff, exists_prop] using H hU r hr
 
--- DISSOLVED: exists_subset_lt_add
+theorem exists_subset_lt_add (H : InnerRegularWRT μ p q) (h0 : p ∅) (hU : q U) (hμU : μ U ≠ ∞)
+    (hε : ε ≠ 0) : ∃ K, K ⊆ U ∧ p K ∧ μ U < μ K + ε := by
+  rcases eq_or_ne (μ U) 0 with h₀ | h₀
+  · refine ⟨∅, empty_subset _, h0, ?_⟩
+    rwa [measure_empty, h₀, zero_add, pos_iff_ne_zero]
+  · rcases H hU _ (ENNReal.sub_lt_self hμU h₀ hε) with ⟨K, hKU, hKc, hrK⟩
+    exact ⟨K, hKU, hKc, ENNReal.lt_add_of_sub_lt_right (Or.inl hμU) hrK⟩
 
 protected theorem map {α β} [MeasurableSpace α] [MeasurableSpace β]
     {μ : Measure α} {pa qa : Set α → Prop}
@@ -309,11 +317,23 @@ theorem _root_.Set.measure_eq_iInf_isOpen (A : Set α) (μ : Measure α) [OuterR
   refine le_of_forall_lt' fun r hr => ?_
   simpa only [iInf_lt_iff, exists_prop] using A.exists_isOpen_lt_of_lt r hr
 
--- DISSOLVED: _root_.Set.exists_isOpen_lt_add
+theorem _root_.Set.exists_isOpen_lt_add [OuterRegular μ] (A : Set α) (hA : μ A ≠ ∞) {ε : ℝ≥0∞}
+    (hε : ε ≠ 0) : ∃ U, U ⊇ A ∧ IsOpen U ∧ μ U < μ A + ε :=
+  A.exists_isOpen_lt_of_lt _ (ENNReal.lt_add_right hA hε)
 
--- DISSOLVED: _root_.Set.exists_isOpen_le_add
+theorem _root_.Set.exists_isOpen_le_add (A : Set α) (μ : Measure α) [OuterRegular μ] {ε : ℝ≥0∞}
+    (hε : ε ≠ 0) : ∃ U, U ⊇ A ∧ IsOpen U ∧ μ U ≤ μ A + ε := by
+  rcases eq_or_ne (μ A) ∞ with (H | H)
+  · exact ⟨univ, subset_univ _, isOpen_univ, by simp only [H, _root_.top_add, le_top]⟩
+  · rcases A.exists_isOpen_lt_add H hε with ⟨U, AU, U_open, hU⟩
+    exact ⟨U, AU, U_open, hU.le⟩
 
--- DISSOLVED: _root_.MeasurableSet.exists_isOpen_diff_lt
+theorem _root_.MeasurableSet.exists_isOpen_diff_lt [OuterRegular μ] {A : Set α}
+    (hA : MeasurableSet A) (hA' : μ A ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ U, U ⊇ A ∧ IsOpen U ∧ μ U < ∞ ∧ μ (U \ A) < ε := by
+  rcases A.exists_isOpen_lt_add hA' hε with ⟨U, hAU, hUo, hU⟩
+  use U, hAU, hUo, hU.trans_le le_top
+  exact measure_diff_lt_of_lt_add hA.nullMeasurableSet hAU hA' hU
 
 protected theorem map [OpensMeasurableSpace α] [MeasurableSpace β] [TopologicalSpace β]
     [BorelSpace β] (f : α ≃ₜ β) (μ : Measure α) [OuterRegular μ] :
@@ -591,7 +611,9 @@ lemma innerRegularWRT_isClosed_isOpen [R1Space α] [OpensMeasurableSpace α] [h 
   exact ⟨closure K, K_comp.closure_subset_of_isOpen hU KU, isClosed_closure,
     hK.trans_le (measure_mono subset_closure)⟩
 
--- DISSOLVED: exists_isCompact_not_null
+theorem exists_isCompact_not_null [InnerRegular μ] : (∃ K, IsCompact K ∧ μ K ≠ 0) ↔ μ ≠ 0 := by
+  simp_rw [Ne, ← measure_univ_eq_zero, MeasurableSet.univ.measure_eq_iSup_isCompact,
+    ENNReal.iSup_eq_zero, not_forall, exists_prop, subset_univ, true_and]
 
 theorem _root_.MeasurableSet.exists_lt_isCompact [InnerRegular μ] ⦃A : Set α⦄
     (hA : MeasurableSet A) {r : ℝ≥0∞} (hr : r < μ A) :
@@ -622,13 +644,34 @@ namespace InnerRegularCompactLTTop
 
 variable [TopologicalSpace α]
 
--- DISSOLVED: _root_.MeasurableSet.exists_isCompact_lt_add
+theorem _root_.MeasurableSet.exists_isCompact_lt_add [InnerRegularCompactLTTop μ]
+    ⦃A : Set α⦄ (hA : MeasurableSet A) (h'A : μ A ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ K, K ⊆ A ∧ IsCompact K ∧ μ A < μ K + ε :=
+  InnerRegularCompactLTTop.innerRegular.exists_subset_lt_add isCompact_empty ⟨hA, h'A⟩ h'A hε
 
--- DISSOLVED: _root_.MeasurableSet.exists_isCompact_isClosed_lt_add
+theorem _root_.MeasurableSet.exists_isCompact_isClosed_lt_add
+    [InnerRegularCompactLTTop μ] [R1Space α] [BorelSpace α]
+    ⦃A : Set α⦄ (hA : MeasurableSet A) (h'A : μ A ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ K, K ⊆ A ∧ IsCompact K ∧ IsClosed K ∧ μ A < μ K + ε :=
+  let ⟨K, hKA, hK, hμK⟩ := hA.exists_isCompact_lt_add h'A hε
+  ⟨closure K, hK.closure_subset_measurableSet hA hKA, hK.closure, isClosed_closure,
+    by rwa [hK.measure_closure]⟩
 
--- DISSOLVED: _root_.MeasurableSet.exists_isCompact_diff_lt
+theorem _root_.MeasurableSet.exists_isCompact_diff_lt [OpensMeasurableSpace α] [T2Space α]
+    [InnerRegularCompactLTTop μ]  ⦃A : Set α⦄ (hA : MeasurableSet A) (h'A : μ A ≠ ∞)
+    {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ K, K ⊆ A ∧ IsCompact K ∧ μ (A \ K) < ε := by
+  rcases hA.exists_isCompact_lt_add h'A hε with ⟨K, hKA, hKc, hK⟩
+  exact ⟨K, hKA, hKc, measure_diff_lt_of_lt_add hKc.nullMeasurableSet hKA
+    (ne_top_of_le_ne_top h'A <| measure_mono hKA) hK⟩
 
--- DISSOLVED: _root_.MeasurableSet.exists_isCompact_isClosed_diff_lt
+theorem _root_.MeasurableSet.exists_isCompact_isClosed_diff_lt [BorelSpace α] [R1Space α]
+    [InnerRegularCompactLTTop μ] ⦃A : Set α⦄ (hA : MeasurableSet A) (h'A : μ A ≠ ∞)
+    {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ K, K ⊆ A ∧ IsCompact K ∧ IsClosed K ∧ μ (A \ K) < ε := by
+  rcases hA.exists_isCompact_isClosed_lt_add h'A hε with ⟨K, hKA, hKco, hKcl, hK⟩
+  exact ⟨K, hKA, hKco, hKcl, measure_diff_lt_of_lt_add hKcl.nullMeasurableSet hKA
+    (ne_top_of_le_ne_top h'A <| measure_mono hKA) hK⟩
 
 theorem _root_.MeasurableSet.exists_lt_isCompact_of_ne_top [InnerRegularCompactLTTop μ] ⦃A : Set α⦄
     (hA : MeasurableSet A) (h'A : μ A ≠ ∞) {r : ℝ≥0∞} (hr : r < μ A) :
@@ -679,11 +722,37 @@ protected lemma _root_.IsCompact.measure_eq_iInf_isOpen [InnerRegularCompactLTTo
   · apply le_of_forall_lt'
     simpa only [iInf_lt_iff, exists_prop, exists_and_left] using hK.exists_isOpen_lt_of_lt
 
--- DISSOLVED: _root_.IsCompact.exists_isOpen_lt_add
+protected theorem _root_.IsCompact.exists_isOpen_lt_add [InnerRegularCompactLTTop μ]
+    [IsLocallyFiniteMeasure μ] [R1Space α] [BorelSpace α]
+    {K : Set α} (hK : IsCompact K) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ U, K ⊆ U ∧ IsOpen U ∧ μ U < μ K + ε :=
+  hK.exists_isOpen_lt_of_lt _ (ENNReal.lt_add_right hK.measure_lt_top.ne hε)
 
--- DISSOLVED: _root_.MeasurableSet.exists_isOpen_symmDiff_lt
+protected theorem _root_.MeasurableSet.exists_isOpen_symmDiff_lt [InnerRegularCompactLTTop μ]
+    [IsLocallyFiniteMeasure μ] [R1Space α] [BorelSpace α]
+    {s : Set α} (hs : MeasurableSet s) (hμs : μ s ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ U, IsOpen U ∧ μ U < ∞ ∧ μ (U ∆ s) < ε := by
+  have : ε / 2 ≠ 0 := (ENNReal.half_pos hε).ne'
+  rcases hs.exists_isCompact_isClosed_diff_lt hμs this with ⟨K, hKs, hKco, hKcl, hμK⟩
+  rcases hKco.exists_isOpen_lt_add (μ := μ) this with ⟨U, hKU, hUo, hμU⟩
+  refine ⟨U, hUo, hμU.trans_le le_top, ?_⟩
+  rw [← ENNReal.add_halves ε, measure_symmDiff_eq hUo.nullMeasurableSet hs.nullMeasurableSet]
+  gcongr
+  · calc
+      μ (U \ s) ≤ μ (U \ K) := by gcongr
+      _ < ε / 2 := by
+        apply measure_diff_lt_of_lt_add hKcl.nullMeasurableSet hKU _ hμU
+        exact ne_top_of_le_ne_top hμs (by gcongr)
+  · exact lt_of_le_of_lt (by gcongr) hμK
 
--- DISSOLVED: _root_.MeasureTheory.NullMeasurableSet.exists_isOpen_symmDiff_lt
+protected theorem _root_.MeasureTheory.NullMeasurableSet.exists_isOpen_symmDiff_lt
+    [InnerRegularCompactLTTop μ] [IsLocallyFiniteMeasure μ] [R1Space α] [BorelSpace α]
+    {s : Set α} (hs : NullMeasurableSet s μ) (hμs : μ s ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ U, IsOpen U ∧ μ U < ∞ ∧ μ (U ∆ s) < ε := by
+  rcases hs with ⟨t, htm, hst⟩
+  rcases htm.exists_isOpen_symmDiff_lt (by rwa [← measure_congr hst]) hε with ⟨U, hUo, hμU, hUs⟩
+  refine ⟨U, hUo, hμU, ?_⟩
+  rwa [measure_congr <| (ae_eq_refl _).symmDiff hst]
 
 instance smul [h : InnerRegularCompactLTTop μ] (c : ℝ≥0∞) : InnerRegularCompactLTTop (c • μ) := by
   by_cases hc : c = 0
@@ -739,9 +808,17 @@ theorem innerRegular_measurable [WeaklyRegular μ] :
     InnerRegularWRT μ IsClosed fun s => MeasurableSet s ∧ μ s ≠ ∞ :=
   WeaklyRegular.innerRegular.measurableSet_of_isOpen (fun _ _ h₁ h₂ ↦ h₁.inter h₂.isClosed_compl)
 
--- DISSOLVED: _root_.MeasurableSet.exists_isClosed_lt_add
+theorem _root_.MeasurableSet.exists_isClosed_lt_add [WeaklyRegular μ] {s : Set α}
+    (hs : MeasurableSet s) (hμs : μ s ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ K, K ⊆ s ∧ IsClosed K ∧ μ s < μ K + ε :=
+  innerRegular_measurable.exists_subset_lt_add isClosed_empty ⟨hs, hμs⟩ hμs hε
 
--- DISSOLVED: _root_.MeasurableSet.exists_isClosed_diff_lt
+theorem _root_.MeasurableSet.exists_isClosed_diff_lt [OpensMeasurableSpace α] [WeaklyRegular μ]
+    ⦃A : Set α⦄ (hA : MeasurableSet A) (h'A : μ A ≠ ∞) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ F, F ⊆ A ∧ IsClosed F ∧ μ (A \ F) < ε := by
+  rcases hA.exists_isClosed_lt_add h'A hε with ⟨F, hFA, hFc, hF⟩
+  exact ⟨F, hFA, hFc, measure_diff_lt_of_lt_add hFc.nullMeasurableSet hFA
+    (ne_top_of_le_ne_top h'A <| measure_mono hFA) hF⟩
 
 theorem _root_.MeasurableSet.exists_lt_isClosed_of_ne_top [WeaklyRegular μ] ⦃A : Set α⦄
     (hA : MeasurableSet A) (h'A : μ A ≠ ∞) {r : ℝ≥0∞} (hr : r < μ A) :
@@ -799,7 +876,9 @@ theorem _root_.IsOpen.measure_eq_iSup_isCompact ⦃U : Set α⦄ (hU : IsOpen U)
     [Regular μ] : μ U = ⨆ (K : Set α) (_ : K ⊆ U) (_ : IsCompact K), μ K :=
   Regular.innerRegular.measure_eq_iSup hU
 
--- DISSOLVED: exists_isCompact_not_null
+theorem exists_isCompact_not_null [Regular μ] : (∃ K, IsCompact K ∧ μ K ≠ 0) ↔ μ ≠ 0 := by
+  simp_rw [Ne, ← measure_univ_eq_zero, isOpen_univ.measure_eq_iSup_isCompact,
+    ENNReal.iSup_eq_zero, not_forall, exists_prop, subset_univ, true_and]
 
 instance (priority := 100) [Regular μ] : InnerRegularCompactLTTop μ :=
   ⟨Regular.innerRegular.measurableSet_of_isOpen (fun _ _ hs hU ↦ hs.diff hU)⟩

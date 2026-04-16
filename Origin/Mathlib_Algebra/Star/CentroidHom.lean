@@ -8,6 +8,8 @@ import Mathlib.Algebra.Star.StarRingHom
 import Mathlib.Algebra.Star.Subsemiring
 import Mathlib.Algebra.Star.Basic
 
+noncomputable section
+
 /-!
 # Centroid homomorphisms on Star Rings
 
@@ -121,14 +123,6 @@ def starCenterIsoCentroid : StarSubsemiring.center α ≃⋆+* CentroidHom α wh
     starCenterToCentroid_apply, mul_one]
   right_inv T := CentroidHom.ext <| fun _ => by
     simp [starCenterToCentroid_apply, ← map_mul_right]
-
-@[simp]
-lemma starCenterIsoCentroid_apply (a : ↥(NonUnitalStarSubsemiring.center α)) :
-    CentroidHom.starCenterIsoCentroid a = CentroidHom.starCenterToCentroid a := rfl
-
-@[simp]
-lemma starCenterIsoCentroid_symm_apply_coe (T : CentroidHom α) :
-    ↑(CentroidHom.starCenterIsoCentroid.symm T) = T 1 := rfl
 
 end NonAssocStarSemiring
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Polynomial.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Inductions
 import Mathlib.Algebra.Polynomial.Splits
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.RingTheory.Polynomial.Vieta
+
+noncomputable section
 
 /-!
 # Polynomials and limits
@@ -88,7 +90,22 @@ protected theorem continuousOn_aeval {s} : ContinuousOn (fun x : A => aeval x p)
 
 end TopologicalAlgebra
 
--- DISSOLVED: tendsto_abv_eval₂_atTop
+theorem tendsto_abv_eval₂_atTop {R S k α : Type*} [Semiring R] [Ring S] [LinearOrderedField k]
+    (f : R →+* S) (abv : S → k) [IsAbsoluteValue abv] (p : R[X]) (hd : 0 < degree p)
+    (hf : f p.leadingCoeff ≠ 0) {l : Filter α} {z : α → S} (hz : Tendsto (abv ∘ z) l atTop) :
+    Tendsto (fun x => abv (p.eval₂ f (z x))) l atTop := by
+  revert hf; refine degree_pos_induction_on p hd ?_ ?_ ?_ <;> clear hd p
+  · rintro _ - hc
+    rw [leadingCoeff_mul_X, leadingCoeff_C] at hc
+    simpa [abv_mul abv] using hz.const_mul_atTop ((abv_pos abv).2 hc)
+  · intro _ _ ihp hf
+    rw [leadingCoeff_mul_X] at hf
+    simpa [abv_mul abv] using (ihp hf).atTop_mul_atTop hz
+  · intro _ a hd ihp hf
+    rw [add_comm, leadingCoeff_add_of_degree_lt (degree_C_le.trans_lt hd)] at hf
+    refine tendsto_atTop_of_add_const_right (abv (-f a)) ?_
+    refine tendsto_atTop_mono (fun _ => abv_add abv _ _) ?_
+    simpa using ihp hf
 
 theorem tendsto_abv_atTop {R k α : Type*} [Ring R] [LinearOrderedField k] (abv : R → k)
     [IsAbsoluteValue abv] (p : R[X]) (h : 0 < degree p) {l : Filter α} {z : α → R}
@@ -96,7 +113,11 @@ theorem tendsto_abv_atTop {R k α : Type*} [Ring R] [LinearOrderedField k] (abv 
   apply tendsto_abv_eval₂_atTop _ _ _ h _ hz
   exact mt leadingCoeff_eq_zero.1 (ne_zero_of_degree_gt h)
 
--- DISSOLVED: tendsto_abv_aeval_atTop
+theorem tendsto_abv_aeval_atTop {R A k α : Type*} [CommSemiring R] [Ring A] [Algebra R A]
+    [LinearOrderedField k] (abv : A → k) [IsAbsoluteValue abv] (p : R[X]) (hd : 0 < degree p)
+    (h₀ : algebraMap R A p.leadingCoeff ≠ 0) {l : Filter α} {z : α → A}
+    (hz : Tendsto (abv ∘ z) l atTop) : Tendsto (fun x => abv (aeval (z x) p)) l atTop :=
+  tendsto_abv_eval₂_atTop _ abv p hd h₀ hz
 
 variable {α R : Type*} [NormedRing R] [IsAbsoluteValue (norm : R → ℝ)]
 

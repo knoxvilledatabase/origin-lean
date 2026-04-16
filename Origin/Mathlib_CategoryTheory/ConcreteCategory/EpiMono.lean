@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Types
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
+noncomputable section
+
 /-!
 # Epi and mono in concrete categories
 
@@ -34,6 +36,7 @@ namespace ConcreteCategory
 section
 
 attribute [local instance] ConcreteCategory.instFunLike in
+/-- In any concrete category, injective morphisms are monomorphisms. -/
 
 theorem mono_of_injective {X Y : C} (f : X ⟶ Y) (i : Function.Injective f) :
     Mono f :=

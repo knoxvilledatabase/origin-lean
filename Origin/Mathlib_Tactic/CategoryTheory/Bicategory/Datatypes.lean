@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Coherence.Datatypes
 import Mathlib.Tactic.CategoryTheory.BicategoricalComp
 
+noncomputable section
+
 /-!
 # Expressions for bicategories
 

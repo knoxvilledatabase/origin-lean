@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Algebra/UniformGroup/Defs.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.UniformSpace.Basic
+
+noncomputable section
 
 /-!
 # Uniform structure on topological groups
@@ -361,10 +363,6 @@ def TopologicalGroup.toUniformSpace : UniformSpace G where
 
 attribute [local instance] TopologicalGroup.toUniformSpace
 
-@[to_additive]
-theorem uniformity_eq_comap_nhds_one' : 𝓤 G = comap (fun p : G × G => p.2 / p.1) (𝓝 (1 : G)) :=
-  rfl
-
 end TopologicalGroup
 
 section TopologicalCommGroup
@@ -457,7 +455,6 @@ variable {W' : Set G} (W'_nhd : W' ∈ 𝓝 (0 : G))
 include de hφ
 
 include W'_nhd in
-
 private theorem extend_Z_bilin_aux (x₀ : α) (y₁ : δ) : ∃ U₂ ∈ comap e (𝓝 x₀), ∀ x ∈ U₂, ∀ x' ∈ U₂,
     (fun p : β × δ => φ p.1 p.2) (x' - x, y₁) ∈ W' := by
   let Nx := 𝓝 x₀
@@ -478,7 +475,6 @@ private theorem extend_Z_bilin_aux (x₀ : α) (y₁ : δ) : ∃ U₂ ∈ comap 
 variable [UniformAddGroup G]
 
 include df W'_nhd in
-
 private theorem extend_Z_bilin_key (x₀ : α) (y₀ : γ) : ∃ U ∈ comap e (𝓝 x₀), ∃ V ∈ comap f (𝓝 y₀),
     ∀ x ∈ U, ∀ x' ∈ U, ∀ (y) (_ : y ∈ V) (y') (_ : y' ∈ V),
     (fun p : β × δ => φ p.1 p.2) (x', y') - (fun p : β × δ => φ p.1 p.2) (x, y) ∈ W' := by

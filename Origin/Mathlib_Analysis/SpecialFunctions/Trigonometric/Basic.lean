@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Basic.lean
-Genuine: 261 | Conflates: 0 | Dissolved: 3 | Infrastructure: 8
+Genuine: 264 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.QuadraticDiscriminant
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Tactic.Positivity.Core
 import Mathlib.Algebra.Ring.NegOnePow
+
+noncomputable section
 
 /-!
 # Trigonometric functions
@@ -151,7 +153,8 @@ theorem pi_pos : 0 < π :=
 theorem pi_nonneg : 0 ≤ π :=
   pi_pos.le
 
--- DISSOLVED: pi_ne_zero
+theorem pi_ne_zero : π ≠ 0 :=
+  pi_pos.ne'
 
 theorem pi_div_two_pos : 0 < π / 2 :=
   half_pos pi_pos
@@ -183,13 +186,10 @@ open Real NNReal
 noncomputable def pi : ℝ≥0 :=
   ⟨π, Real.pi_pos.le⟩
 
-@[simp]
-theorem coe_real_pi : (pi : ℝ) = π :=
-  rfl
-
 theorem pi_pos : 0 < pi := mod_cast Real.pi_pos
 
--- DISSOLVED: pi_ne_zero
+theorem pi_ne_zero : pi ≠ 0 :=
+  pi_pos.ne'
 
 end NNReal
 
@@ -492,7 +492,8 @@ theorem sin_eq_zero_iff {x : ℝ} : sin x = 0 ↔ ∃ n : ℤ, (n : ℝ) * π = 
               (by simp [sub_eq_add_neg, sin_add, h, sin_int_mul_pi]))⟩,
     fun ⟨_, hn⟩ => hn ▸ sin_int_mul_pi _⟩
 
--- DISSOLVED: sin_ne_zero_iff
+theorem sin_ne_zero_iff {x : ℝ} : sin x ≠ 0 ↔ ∀ n : ℤ, (n : ℝ) * π ≠ x := by
+  rw [← not_exists, not_iff_not, sin_eq_zero_iff]
 
 theorem sin_eq_zero_iff_cos_eq {x : ℝ} : sin x = 0 ↔ cos x = 1 ∨ cos x = -1 := by
   rw [← mul_self_eq_one_iff, ← sin_sq_add_cos_sq x, sq, sq, ← sub_eq_iff_eq_add, sub_self]
@@ -606,12 +607,6 @@ variable (x : ℝ)
 noncomputable def sqrtTwoAddSeries (x : ℝ) : ℕ → ℝ
   | 0 => x
   | n + 1 => √(2 + sqrtTwoAddSeries x n)
-
-theorem sqrtTwoAddSeries_zero : sqrtTwoAddSeries x 0 = x := by simp
-
-theorem sqrtTwoAddSeries_one : sqrtTwoAddSeries 0 1 = √2 := by simp
-
-theorem sqrtTwoAddSeries_two : sqrtTwoAddSeries 0 2 = √(2 + √2) := by simp
 
 theorem sqrtTwoAddSeries_zero_nonneg : ∀ n : ℕ, 0 ≤ sqrtTwoAddSeries 0 n
   | 0 => le_refl 0
@@ -818,13 +813,6 @@ end CosDivSq
 
 def sinOrderIso : Icc (-(π / 2)) (π / 2) ≃o Icc (-1 : ℝ) 1 :=
   (strictMonoOn_sin.orderIso _ _).trans <| OrderIso.setCongr _ _ bijOn_sin.image_eq
-
-@[simp]
-theorem coe_sinOrderIso_apply (x : Icc (-(π / 2)) (π / 2)) : (sinOrderIso x : ℝ) = sin x :=
-  rfl
-
-theorem sinOrderIso_apply (x : Icc (-(π / 2)) (π / 2)) : sinOrderIso x = ⟨sin x, sin_mem_Icc x⟩ :=
-  rfl
 
 @[simp]
 theorem tan_pi_div_four : tan (π / 4) = 1 := by

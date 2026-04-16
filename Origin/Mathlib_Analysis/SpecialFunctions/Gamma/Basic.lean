@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/Basic.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
 import Mathlib.MeasureTheory.Integral.ExpDecay
+
+noncomputable section
 
 /-!
 # The Gamma function
@@ -284,7 +286,12 @@ theorem Gamma_eq_GammaAux (s : ℂ) (n : ℕ) (h1 : -s.re < ↑n) : Gamma s = Ga
     · omega
     · linarith
 
--- DISSOLVED: Gamma_add_one
+theorem Gamma_add_one (s : ℂ) (h2 : s ≠ 0) : Gamma (s + 1) = s * Gamma s := by
+  let n := ⌊1 - s.re⌋₊
+  have t1 : -s.re < n := by simpa only [sub_sub_cancel_left] using Nat.sub_one_lt_floor (1 - s.re)
+  have t2 : -(s + 1).re < n := by rw [add_re, one_re]; linarith
+  rw [Gamma_eq_GammaAux s n t1, Gamma_eq_GammaAux (s + 1) n t2, GammaAux_recurrence1 s n t1]
+  field_simp
 
 theorem Gamma_eq_integral {s : ℂ} (hs : 0 < s.re) : Gamma s = GammaIntegral s :=
   Gamma_eq_GammaAux s 0 (by norm_cast; linarith)
@@ -383,7 +390,10 @@ theorem Gamma_eq_integral {s : ℝ} (hs : 0 < s) :
   rw [Complex.ofReal_cpow (le_of_lt hx)]
   push_cast; rfl
 
--- DISSOLVED: Gamma_add_one
+theorem Gamma_add_one {s : ℝ} (hs : s ≠ 0) : Gamma (s + 1) = s * Gamma s := by
+  simp_rw [Gamma]
+  rw [Complex.ofReal_add, Complex.ofReal_one, Complex.Gamma_add_one, Complex.re_ofReal_mul]
+  rwa [Complex.ofReal_ne_zero]
 
 @[simp]
 theorem Gamma_one : Gamma 1 = 1 := by
@@ -455,7 +465,35 @@ def _root_.Mathlib.Meta.Positivity.evalGamma : PositivityExt where eval {u α} _
     | _ => pure .none
   | _, _, _ => throwError "failed to match on Gamma application"
 
--- DISSOLVED: Gamma_ne_zero
+theorem Gamma_ne_zero {s : ℝ} (hs : ∀ m : ℕ, s ≠ -m) : Gamma s ≠ 0 := by
+  suffices ∀ {n : ℕ}, -(n : ℝ) < s → Gamma s ≠ 0 by
+    apply this
+    swap
+    · exact ⌊-s⌋₊ + 1
+    rw [neg_lt, Nat.cast_add, Nat.cast_one]
+    exact Nat.lt_floor_add_one _
+  intro n
+  induction n generalizing s with
+  | zero =>
+    intro hs
+    refine (Gamma_pos_of_pos ?_).ne'
+    rwa [Nat.cast_zero, neg_zero] at hs
+  | succ _ n_ih =>
+    intro hs'
+    have : Gamma (s + 1) ≠ 0 := by
+      apply n_ih
+      · intro m
+        specialize hs (1 + m)
+        contrapose! hs
+        rw [← eq_sub_iff_add_eq] at hs
+        rw [hs]
+        push_cast
+        ring
+      · rw [Nat.cast_add, Nat.cast_one, neg_add] at hs'
+        linarith
+    rw [Gamma_add_one, mul_ne_zero_iff] at this
+    · exact this.2
+    · simpa using hs 0
 
 theorem Gamma_eq_zero_iff (s : ℝ) : Gamma s = 0 ↔ ∃ m : ℕ, s = -m :=
   ⟨by contrapose!; exact Gamma_ne_zero, by rintro ⟨m, rfl⟩; exact Gamma_neg_nat_eq_zero m⟩

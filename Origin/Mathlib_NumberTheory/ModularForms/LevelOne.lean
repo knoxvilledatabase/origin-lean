@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.Modular
 import Mathlib.NumberTheory.ModularForms.SlashInvariantForms
 
+noncomputable section
+
 /-!
 # Level one modular forms
 

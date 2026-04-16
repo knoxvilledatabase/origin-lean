@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Multilinear.Basic
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 
+noncomputable section
+
 /-! # Multilinear maps over finite dimensional spaces
 
 The main results are that multilinear maps over finitely-generated, free modules are

@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Function/StronglyMeasurable/Basic.lean
-Genuine: 202 | Conflates: 1 | Dissolved: 2 | Infrastructure: 4
+Genuine: 204 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.MeasureTheory.Function.SimpleFuncDense
+
+noncomputable section
 
 /-!
 # Strongly measurable and finitely strongly measurable functions
@@ -470,7 +472,9 @@ nonrec theorem _root_.IsUnit.stronglyMeasurable_const_smul_iff {_ : MeasurableSp
   let ⟨u, hu⟩ := hc
   hu ▸ stronglyMeasurable_const_smul_iff u
 
--- DISSOLVED: _root_.stronglyMeasurable_const_smul_iff₀
+theorem _root_.stronglyMeasurable_const_smul_iff₀ {_ : MeasurableSpace α} {c : G₀} (hc : c ≠ 0) :
+    (StronglyMeasurable fun x => c • f x) ↔ StronglyMeasurable f :=
+  (IsUnit.mk0 _ hc).stronglyMeasurable_const_smul_iff
 
 end MulAction
 
@@ -1574,7 +1578,9 @@ nonrec theorem _root_.IsUnit.aestronglyMeasurable_const_smul_iff {c : M} (hc : I
   let ⟨u, hu⟩ := hc
   hu ▸ aestronglyMeasurable_const_smul_iff u
 
--- DISSOLVED: _root_.aestronglyMeasurable_const_smul_iff₀
+theorem _root_.aestronglyMeasurable_const_smul_iff₀ {c : G₀} (hc : c ≠ 0) :
+    AEStronglyMeasurable (fun x => c • f x) μ ↔ AEStronglyMeasurable f μ :=
+  (IsUnit.mk0 _ hc).aestronglyMeasurable_const_smul_iff
 
 end MulAction
 
@@ -1711,76 +1717,6 @@ theorem aefinStronglyMeasurable_of_aemeasurable {_m0 : MeasurableSpace α} (μ :
   (aefinStronglyMeasurable_iff_aemeasurable μ).mpr hf
 
 end SecondCountableTopology
-
-theorem measurable_uncurry_of_continuous_of_measurable {α β ι : Type*} [TopologicalSpace ι]
-    [MetrizableSpace ι] [MeasurableSpace ι] [SecondCountableTopology ι] [OpensMeasurableSpace ι]
-    {mβ : MeasurableSpace β} [TopologicalSpace β] [PseudoMetrizableSpace β] [BorelSpace β]
-    {m : MeasurableSpace α} {u : ι → α → β} (hu_cont : ∀ x, Continuous fun i => u i x)
-    (h : ∀ i, Measurable (u i)) : Measurable (Function.uncurry u) := by
-  obtain ⟨t_sf, ht_sf⟩ :
-    ∃ t : ℕ → SimpleFunc ι ι, ∀ j x, Tendsto (fun n => u (t n j) x) atTop (𝓝 <| u j x) := by
-    have h_str_meas : StronglyMeasurable (id : ι → ι) := stronglyMeasurable_id
-    refine ⟨h_str_meas.approx, fun j x => ?_⟩
-    exact ((hu_cont x).tendsto j).comp (h_str_meas.tendsto_approx j)
-  let U (n : ℕ) (p : ι × α) := u (t_sf n p.fst) p.snd
-  have h_tendsto : Tendsto U atTop (𝓝 fun p => u p.fst p.snd) := by
-    rw [tendsto_pi_nhds]
-    exact fun p => ht_sf p.fst p.snd
-  refine measurable_of_tendsto_metrizable (fun n => ?_) h_tendsto
-  have h_meas : Measurable fun p : (t_sf n).range × α => u (↑p.fst) p.snd := by
-    have :
-      (fun p : ↥(t_sf n).range × α => u (↑p.fst) p.snd) =
-        (fun p : α × (t_sf n).range => u (↑p.snd) p.fst) ∘ Prod.swap :=
-      rfl
-    rw [this, @measurable_swap_iff α (↥(t_sf n).range) β m]
-    exact measurable_from_prod_countable fun j => h j
-  have :
-    (fun p : ι × α => u (t_sf n p.fst) p.snd) =
-      (fun p : ↥(t_sf n).range × α => u p.fst p.snd) ∘ fun p : ι × α =>
-        (⟨t_sf n p.fst, SimpleFunc.mem_range_self _ _⟩, p.snd) :=
-    rfl
-  simp_rw [U, this]
-  refine h_meas.comp (Measurable.prod_mk ?_ measurable_snd)
-  exact ((t_sf n).measurable.comp measurable_fst).subtype_mk
-
-theorem stronglyMeasurable_uncurry_of_continuous_of_stronglyMeasurable {α β ι : Type*}
-    [TopologicalSpace ι] [MetrizableSpace ι] [MeasurableSpace ι] [SecondCountableTopology ι]
-    [OpensMeasurableSpace ι] [TopologicalSpace β] [PseudoMetrizableSpace β] [MeasurableSpace α]
-    {u : ι → α → β} (hu_cont : ∀ x, Continuous fun i => u i x) (h : ∀ i, StronglyMeasurable (u i)) :
-    StronglyMeasurable (Function.uncurry u) := by
-  borelize β
-  obtain ⟨t_sf, ht_sf⟩ :
-    ∃ t : ℕ → SimpleFunc ι ι, ∀ j x, Tendsto (fun n => u (t n j) x) atTop (𝓝 <| u j x) := by
-    have h_str_meas : StronglyMeasurable (id : ι → ι) := stronglyMeasurable_id
-    refine ⟨h_str_meas.approx, fun j x => ?_⟩
-    exact ((hu_cont x).tendsto j).comp (h_str_meas.tendsto_approx j)
-  let U (n : ℕ) (p : ι × α) := u (t_sf n p.fst) p.snd
-  have h_tendsto : Tendsto U atTop (𝓝 fun p => u p.fst p.snd) := by
-    rw [tendsto_pi_nhds]
-    exact fun p => ht_sf p.fst p.snd
-  refine stronglyMeasurable_of_tendsto _ (fun n => ?_) h_tendsto
-  have h_str_meas : StronglyMeasurable fun p : (t_sf n).range × α => u (↑p.fst) p.snd := by
-    refine stronglyMeasurable_iff_measurable_separable.2 ⟨?_, ?_⟩
-    · have :
-        (fun p : ↥(t_sf n).range × α => u (↑p.fst) p.snd) =
-          (fun p : α × (t_sf n).range => u (↑p.snd) p.fst) ∘ Prod.swap :=
-        rfl
-      rw [this, measurable_swap_iff]
-      exact measurable_from_prod_countable fun j => (h j).measurable
-    · have : IsSeparable (⋃ i : (t_sf n).range, range (u i)) :=
-        .iUnion fun i => (h i).isSeparable_range
-      apply this.mono
-      rintro _ ⟨⟨i, x⟩, rfl⟩
-      simp only [mem_iUnion, mem_range]
-      exact ⟨i, x, rfl⟩
-  have :
-    (fun p : ι × α => u (t_sf n p.fst) p.snd) =
-      (fun p : ↥(t_sf n).range × α => u p.fst p.snd) ∘ fun p : ι × α =>
-        (⟨t_sf n p.fst, SimpleFunc.mem_range_self _ _⟩, p.snd) :=
-    rfl
-  simp_rw [U, this]
-  refine h_str_meas.comp_measurable (Measurable.prod_mk ?_ measurable_snd)
-  exact ((t_sf n).measurable.comp measurable_fst).subtype_mk
 
 end MeasureTheory
 

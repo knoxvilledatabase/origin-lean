@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Module/Submodule/EqLocus.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Ker
+
+noncomputable section
 
 /-!
 # The submodule of elements `x : M` such that `f x = g x`
@@ -49,14 +51,6 @@ def eqLocus (f g : F) : Submodule R M :=
       simpa only [map_smulₛₗ _] using congr_arg (τ₁₂ r • ·) hx }
 
 @[simp]
-theorem mem_eqLocus {x : M} {f g : F} : x ∈ eqLocus f g ↔ f x = g x :=
-  Iff.rfl
-
-theorem eqLocus_toAddSubmonoid (f g : F) :
-    (eqLocus f g).toAddSubmonoid = (f : M →+ M₂).eqLocusM g :=
-  rfl
-
-@[simp]
 theorem eqLocus_eq_top {f g : F} : eqLocus f g = ⊤ ↔ f = g := by
   simp [SetLike.ext_iff, DFunLike.ext_iff]
 
@@ -66,14 +60,12 @@ theorem eqLocus_same (f : F) : eqLocus f f = ⊤ := eqLocus_eq_top.2 rfl
 theorem le_eqLocus {f g : F} {S : Submodule R M} : S ≤ eqLocus f g ↔ Set.EqOn f g S := Iff.rfl
 
 include τ₁₂ in
-
 theorem eqOn_sup {f g : F} {S T : Submodule R M} (hS : Set.EqOn f g S) (hT : Set.EqOn f g T) :
     Set.EqOn f g ↑(S ⊔ T) := by
   rw [← le_eqLocus] at hS hT ⊢
   exact sup_le hS hT
 
 include τ₁₂ in
-
 theorem ext_on_codisjoint {f g : F} {S T : Submodule R M} (hST : Codisjoint S T)
     (hS : Set.EqOn f g S) (hT : Set.EqOn f g T) : f = g :=
   DFunLike.ext _ _ fun _ ↦ eqOn_sup hS hT <| hST.eq_top.symm ▸ trivial

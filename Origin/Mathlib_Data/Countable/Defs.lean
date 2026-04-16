@@ -8,6 +8,8 @@ import Mathlib.Data.Bool.Basic
 import Mathlib.Data.Subtype
 import Mathlib.Tactic.MkIffOfInductiveProp
 
+noncomputable section
+
 /-!
 # Countable and uncountable types
 

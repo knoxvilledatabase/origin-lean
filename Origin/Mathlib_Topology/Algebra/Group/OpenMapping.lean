@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Baire.Lemmas
 import Mathlib.Topology.Algebra.Group.Basic
 
+noncomputable section
+
 /-! # Open mapping theorem for morphisms of topological groups
 
 We prove that a continuous surjective group morphism from a sigma-compact group to a locally compact

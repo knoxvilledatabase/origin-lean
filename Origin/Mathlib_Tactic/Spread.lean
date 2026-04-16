@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.Binders
 
+noncomputable section
+
 /-!
 # Macro for spread syntax (`__ := instSomething`) in structures.
 -/

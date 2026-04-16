@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.Multiset.Powerset
 
+noncomputable section
+
 /-!
 # The antidiagonal on a multiset.
 

@@ -7,6 +7,8 @@ import Mathlib.Data.Num.Lemmas
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # Primality for binary natural numbers
 

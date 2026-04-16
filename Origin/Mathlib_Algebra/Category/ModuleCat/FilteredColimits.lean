@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Grp.FilteredColimits
 import Mathlib.Algebra.Category.ModuleCat.Colimits
 
+noncomputable section
+
 /-!
 # The forgetful functor from `R`-modules preserves filtered colimits.
 

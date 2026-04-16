@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Field.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Subfield.Basic
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Group.Pointwise.Interval
 import Mathlib.Topology.Algebra.GroupWithZero
 import Mathlib.Topology.Algebra.Ring.Basic
 import Mathlib.Topology.Order.LocalExtr
+
+noncomputable section
 
 /-!
 # Topological fields
@@ -20,9 +22,13 @@ non-zero element.
 
 variable {K : Type*} [DivisionRing K] [TopologicalSpace K]
 
--- DISSOLVED: Filter.tendsto_cocompact_mul_left₀
+theorem Filter.tendsto_cocompact_mul_left₀ [ContinuousMul K] {a : K} (ha : a ≠ 0) :
+    Filter.Tendsto (fun x : K => a * x) (Filter.cocompact K) (Filter.cocompact K) :=
+  Filter.tendsto_cocompact_mul_left (inv_mul_cancel₀ ha)
 
--- DISSOLVED: Filter.tendsto_cocompact_mul_right₀
+theorem Filter.tendsto_cocompact_mul_right₀ [ContinuousMul K] {a : K} (ha : a ≠ 0) :
+    Filter.Tendsto (fun x : K => x * a) (Filter.cocompact K) (Filter.cocompact K) :=
+  Filter.tendsto_cocompact_mul_right (mul_inv_cancel₀ ha)
 
 variable (K)
 
@@ -66,7 +72,14 @@ happens to be a field is enough.
 
 variable {𝕜 : Type*} [Field 𝕜] [TopologicalSpace 𝕜] [TopologicalRing 𝕜]
 
--- DISSOLVED: affineHomeomorph
+@[simps]
+def affineHomeomorph (a b : 𝕜) (h : a ≠ 0) : 𝕜 ≃ₜ 𝕜 where
+  toFun x := a * x + b
+  invFun y := (y - b) / a
+  left_inv x := by
+    simp only [add_sub_cancel_right]
+    exact mul_div_cancel_left₀ x h
+  right_inv y := by simp [mul_div_cancel₀ _ h]
 
 theorem affineHomeomorph_image_Icc {𝕜 : Type*} [LinearOrderedField 𝕜] [TopologicalSpace 𝕜]
     [TopologicalRing 𝕜] (a b c d : 𝕜) (h : 0 < a) :
@@ -119,8 +132,22 @@ theorem IsPreconnected.eq_one_or_eq_neg_one_of_sq_eq [Ring 𝕜] [NoZeroDivisors
     simpa only [EqOn, Pi.one_apply, Pi.pow_apply, sq_eq_one_iff] using hsq
   simpa using hS.eqOn_const_of_mapsTo hf hmaps
 
--- DISSOLVED: IsPreconnected.eq_or_eq_neg_of_sq_eq
+theorem IsPreconnected.eq_or_eq_neg_of_sq_eq [Field 𝕜] [HasContinuousInv₀ 𝕜] [ContinuousMul 𝕜]
+    (hS : IsPreconnected S) (hf : ContinuousOn f S) (hg : ContinuousOn g S)
+    (hsq : EqOn (f ^ 2) (g ^ 2) S) (hg_ne : ∀ {x : α}, x ∈ S → g x ≠ 0) :
+    EqOn f g S ∨ EqOn f (-g) S := by
+  have hsq : EqOn ((f / g) ^ 2) 1 S := fun x hx => by
+    simpa [div_eq_one_iff_eq (pow_ne_zero _ (hg_ne hx)), div_pow] using hsq hx
+  simpa (config := { contextual := true }) [EqOn, div_eq_iff (hg_ne _)]
+    using hS.eq_one_or_eq_neg_one_of_sq_eq (hf.div hg fun z => hg_ne) hsq
 
--- DISSOLVED: IsPreconnected.eq_of_sq_eq
+theorem IsPreconnected.eq_of_sq_eq [Field 𝕜] [HasContinuousInv₀ 𝕜] [ContinuousMul 𝕜]
+    (hS : IsPreconnected S) (hf : ContinuousOn f S) (hg : ContinuousOn g S)
+    (hsq : EqOn (f ^ 2) (g ^ 2) S) (hg_ne : ∀ {x : α}, x ∈ S → g x ≠ 0) {y : α} (hy : y ∈ S)
+    (hy' : f y = g y) : EqOn f g S := fun x hx => by
+  rcases hS.eq_or_eq_neg_of_sq_eq hf hg @hsq @hg_ne with (h | h)
+  · exact h hx
+  · rw [h _, Pi.neg_apply, neg_eq_iff_add_eq_zero, ← two_mul, mul_eq_zero,
+      (iff_of_eq (iff_false _)).2 (hg_ne _)] at hy' ⊢ <;> assumption
 
 end Preconnected

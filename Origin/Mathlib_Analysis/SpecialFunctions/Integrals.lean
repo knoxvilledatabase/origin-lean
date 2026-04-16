@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/SpecialFunctions/Integrals.lean
-Genuine: 71 | Conflates: 0 | Dissolved: 5 | Infrastructure: 3
+Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
 import Mathlib.Analysis.SpecialFunctions.NonIntegrable
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
+
+noncomputable section
 
 /-!
 # Integration of specific interval integrals
@@ -197,15 +199,24 @@ theorem intervalIntegrable_id : IntervalIntegrable (fun x => x) μ a b :=
 theorem intervalIntegrable_const : IntervalIntegrable (fun _ => c) μ a b :=
   continuous_const.intervalIntegrable a b
 
--- DISSOLVED: intervalIntegrable_one_div
+theorem intervalIntegrable_one_div (h : ∀ x : ℝ, x ∈ [[a, b]] → f x ≠ 0)
+    (hf : ContinuousOn f [[a, b]]) : IntervalIntegrable (fun x => 1 / f x) μ a b :=
+  (continuousOn_const.div hf h).intervalIntegrable
 
--- DISSOLVED: intervalIntegrable_inv
+@[simp]
+theorem intervalIntegrable_inv (h : ∀ x : ℝ, x ∈ [[a, b]] → f x ≠ 0)
+    (hf : ContinuousOn f [[a, b]]) : IntervalIntegrable (fun x => (f x)⁻¹) μ a b := by
+  simpa only [one_div] using intervalIntegrable_one_div h hf
 
 @[simp]
 theorem intervalIntegrable_exp : IntervalIntegrable exp μ a b :=
   continuous_exp.intervalIntegrable a b
 
--- DISSOLVED: _root_.IntervalIntegrable.log
+@[simp]
+theorem _root_.IntervalIntegrable.log (hf : ContinuousOn f [[a, b]])
+    (h : ∀ x : ℝ, x ∈ [[a, b]] → f x ≠ 0) :
+    IntervalIntegrable (fun x => log (f x)) μ a b :=
+  (ContinuousOn.log hf h).intervalIntegrable
 
 @[simp]
 theorem intervalIntegrable_log (h : (0 : ℝ) ∉ [[a, b]]) : IntervalIntegrable log μ a b :=
@@ -388,8 +399,6 @@ theorem integral_id : ∫ x in a..b, x = (b ^ 2 - a ^ 2) / 2 := by
 theorem integral_one : (∫ _ in a..b, (1 : ℝ)) = b - a := by
   simp only [mul_one, smul_eq_mul, integral_const]
 
-theorem integral_const_on_unit_interval : ∫ _ in a..a + 1, b = b := by simp
-
 @[simp]
 theorem integral_inv (h : (0 : ℝ) ∉ [[a, b]]) : ∫ x in a..b, x⁻¹ = log (b / a) := by
   have h' := fun x (hx : x ∈ [[a, b]]) => ne_of_mem_of_not_mem hx h
@@ -421,7 +430,17 @@ theorem integral_exp : ∫ x in a..b, exp x = exp b - exp a := by
   · exact fun _ _ => differentiableAt_exp
   · exact continuousOn_exp
 
--- DISSOLVED: integral_exp_mul_complex
+theorem integral_exp_mul_complex {c : ℂ} (hc : c ≠ 0) :
+    (∫ x in a..b, Complex.exp (c * x)) = (Complex.exp (c * b) - Complex.exp (c * a)) / c := by
+  have D : ∀ x : ℝ, HasDerivAt (fun y : ℝ => Complex.exp (c * y) / c) (Complex.exp (c * x)) x := by
+    intro x
+    conv => congr
+    rw [← mul_div_cancel_right₀ (Complex.exp (c * x)) hc]
+    apply ((Complex.hasDerivAt_exp _).comp x _).div_const c
+    simpa only [mul_one] using ((hasDerivAt_id (x : ℂ)).const_mul _).comp_ofReal
+  rw [integral_deriv_eq_sub' _ (funext fun x => (D x).deriv) fun x _ => (D x).differentiableAt]
+  · ring
+  · fun_prop
 
 @[simp]
 theorem integral_log (h : (0 : ℝ) ∉ [[a, b]]) :
@@ -459,7 +478,21 @@ theorem integral_cos : ∫ x in a..b, cos x = sin b - sin a := by
   · simp only [differentiableAt_sin, implies_true]
   · exact continuousOn_cos
 
--- DISSOLVED: integral_cos_mul_complex
+theorem integral_cos_mul_complex {z : ℂ} (hz : z ≠ 0) (a b : ℝ) :
+    (∫ x in a..b, Complex.cos (z * x)) = Complex.sin (z * b) / z - Complex.sin (z * a) / z := by
+  apply integral_eq_sub_of_hasDerivAt
+  swap
+  · apply Continuous.intervalIntegrable
+    exact Complex.continuous_cos.comp (continuous_const.mul Complex.continuous_ofReal)
+  intro x _
+  have a := Complex.hasDerivAt_sin (↑x * z)
+  have b : HasDerivAt (fun y => y * z : ℂ → ℂ) z ↑x := hasDerivAt_mul_const _
+  have c : HasDerivAt (Complex.sin ∘ fun y : ℂ => (y * z)) _ ↑x := HasDerivAt.comp (𝕜 := ℂ) x a b
+  have d := HasDerivAt.comp_ofReal (c.div_const z)
+  simp only [mul_comm] at d
+  convert d using 1
+  conv_rhs => arg 1; rw [mul_comm]
+  rw [mul_div_cancel_right₀ _ hz]
 
 theorem integral_cos_sq_sub_sin_sq :
     ∫ x in a..b, cos x ^ 2 - sin x ^ 2 = sin b * cos b - sin a * cos a := by
@@ -713,15 +746,3 @@ theorem integral_sin_sq_mul_cos_sq :
   ring
 
 /-! ### Integral of miscellaneous functions -/
-
-theorem integral_sqrt_one_sub_sq : ∫ x in (-1 : ℝ)..1, √(1 - x ^ 2 : ℝ) = π / 2 :=
-  calc
-    _ = ∫ x in sin (-(π / 2)).. sin (π / 2), √(1 - x ^ 2 : ℝ) := by rw [sin_neg, sin_pi_div_two]
-    _ = ∫ x in (-(π / 2))..(π / 2), √(1 - sin x ^ 2 : ℝ) * cos x :=
-          (integral_comp_mul_deriv (fun x _ => hasDerivAt_sin x) continuousOn_cos
-            (by fun_prop)).symm
-    _ = ∫ x in (-(π / 2))..(π / 2), cos x ^ 2 := by
-          refine integral_congr_ae (MeasureTheory.ae_of_all _ fun _ h => ?_)
-          rw [uIoc_of_le (neg_le_self (le_of_lt (half_pos Real.pi_pos))), Set.mem_Ioc] at h
-          rw [← Real.cos_eq_sqrt_one_sub_sin_sq (le_of_lt h.1) h.2, pow_two]
-    _ = π / 2 := by simp

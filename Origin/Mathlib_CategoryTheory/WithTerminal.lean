@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.IsTerminal
 import Mathlib.CategoryTheory.Bicategory.Functor.Pseudofunctor
 
+noncomputable section
+
 /-!
 
 # `WithInitial` and `WithTerminal`
@@ -102,10 +104,6 @@ instance : Category.{v} (WithTerminal C) where
 def down {X Y : C} (f : of X ⟶ of Y) : X ⟶ Y := f
 
 @[simp] lemma down_id {X : C} : down (𝟙 (of X)) = 𝟙 X := rfl
-
-@[simp] lemma down_comp {X Y Z : C} (f : of X ⟶ of Y) (g : of Y ⟶ of Z) :
-    down (f ≫ g) = down f ≫ down g :=
-  rfl
 
 @[aesop safe destruct (rule_sets := [CategoryTheory])]
 lemma false_of_from_star {X : C} (f : star ⟶ of X) : False := (f : PEmpty).elim
@@ -385,10 +383,6 @@ instance : Category.{v} (WithInitial C) where
 def down {X Y : C} (f : of X ⟶ of Y) : X ⟶ Y := f
 
 @[simp] lemma down_id {X : C} : down (𝟙 (of X)) = 𝟙 X := rfl
-
-@[simp] lemma down_comp {X Y Z : C} (f : of X ⟶ of Y) (g : of Y ⟶ of Z) :
-    down (f ≫ g) = down f ≫ down g :=
-  rfl
 
 @[aesop safe destruct (rule_sets := [CategoryTheory])]
 lemma false_of_to_star {X : C} (f : of X ⟶ star) : False := (f : PEmpty).elim

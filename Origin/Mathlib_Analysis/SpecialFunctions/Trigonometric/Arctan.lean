@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Arctan.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Complex
+
+noncomputable section
 
 /-!
 # The `arctan` function.
@@ -46,9 +48,15 @@ theorem tan_two_mul {x : ℝ} : tan (2 * x) = 2 * tan x / (1 - tan x ^ 2) := by
 theorem tan_int_mul_pi_div_two (n : ℤ) : tan (n * π / 2) = 0 :=
   tan_eq_zero_iff.mpr (by use n)
 
--- DISSOLVED: continuousOn_tan
+theorem continuousOn_tan : ContinuousOn tan {x | cos x ≠ 0} := by
+  suffices ContinuousOn (fun x => sin x / cos x) {x | cos x ≠ 0} by
+    have h_eq : (fun x => sin x / cos x) = tan := by ext1 x; rw [tan_eq_sin_div_cos]
+    rwa [h_eq] at this
+  exact continuousOn_sin.div continuousOn_cos fun x => id
 
--- DISSOLVED: continuous_tan
+@[continuity]
+theorem continuous_tan : Continuous fun x : {x | cos x ≠ 0} => tan x :=
+  continuousOn_iff_continuous_restrict.1 continuousOn_tan
 
 theorem continuousOn_tan_Ioo : ContinuousOn tan (Ioo (-(π / 2)) (π / 2)) := by
   refine ContinuousOn.mono continuousOn_tan fun x => ?_
@@ -279,13 +287,5 @@ def tanPartialHomeomorph : PartialHomeomorph ℝ ℝ where
   open_target := isOpen_univ
   continuousOn_toFun := continuousOn_tan_Ioo
   continuousOn_invFun := continuous_arctan.continuousOn
-
-@[simp]
-theorem coe_tanPartialHomeomorph : ⇑tanPartialHomeomorph = tan :=
-  rfl
-
-@[simp]
-theorem coe_tanPartialHomeomorph_symm : ⇑tanPartialHomeomorph.symm = arctan :=
-  rfl
 
 end Real

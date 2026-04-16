@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Monoidal.Mon_
 
+noncomputable section
+
 /-!
 # The category of commutative monoids in a braided monoidal category.
 -/
@@ -37,25 +39,9 @@ variable {M : CommMon_ C}
 instance : Category (CommMon_ C) :=
   InducedCategory.category CommMon_.toMon_
 
-@[simp]
-theorem id_hom (A : CommMon_ C) : Mon_.Hom.hom (𝟙 A) = 𝟙 A.X :=
-  rfl
-
-@[simp]
-theorem comp_hom {R S T : CommMon_ C} (f : R ⟶ S) (g : S ⟶ T) :
-    Mon_.Hom.hom (f ≫ g) = f.hom ≫ g.hom :=
-  rfl
-
 @[ext]
 lemma hom_ext {A B : CommMon_ C} (f g : A ⟶ B) (h : f.hom = g.hom) : f = g :=
   Mon_.Hom.ext h
-
-@[simp]
-lemma id' (A : CommMon_ C) : (𝟙 A : A.toMon_ ⟶ A.toMon_) = 𝟙 (A.toMon_) := rfl
-
-@[simp]
-lemma comp' {A₁ A₂ A₃ : CommMon_ C} (f : A₁ ⟶ A₂) (g : A₂ ⟶ A₃) :
-    ((f ≫ g : A₁ ⟶ A₃) : A₁.toMon_ ⟶ A₃.toMon_) = @CategoryStruct.comp (Mon_ C) _ _ _ _ f g := rfl
 
 section
 
@@ -71,18 +57,6 @@ instance : (forget₂Mon_ C).Full := InducedCategory.full _
 
 instance : (forget₂Mon_ C).Faithful := InducedCategory.faithful _
 
-@[simp]
-theorem forget₂_Mon_obj_one (A : CommMon_ C) : ((forget₂Mon_ C).obj A).one = A.one :=
-  rfl
-
-@[simp]
-theorem forget₂_Mon_obj_mul (A : CommMon_ C) : ((forget₂Mon_ C).obj A).mul = A.mul :=
-  rfl
-
-@[simp]
-theorem forget₂_Mon_map_hom {A B : CommMon_ C} (f : A ⟶ B) : ((forget₂Mon_ C).map f).hom = f.hom :=
-  rfl
-
 end
 
 section
@@ -92,10 +66,6 @@ variable {M N : CommMon_ C} (f : M.X ≅ N.X) (one_f : M.one ≫ f.hom = N.one :
 
 def mkIso : M ≅ N :=
   (fullyFaithfulForget₂Mon_ C).preimageIso (Mon_.mkIso f one_f mul_f)
-
-@[simp] lemma mkIso_hom_hom : (mkIso f one_f mul_f).hom.hom = f.hom := rfl
-
-@[simp] lemma mkIso_inv_hom : (mkIso f one_f mul_f).inv.hom = f.inv := rfl
 
 end
 
@@ -154,14 +124,6 @@ instance (A : CommMon_ C) : (commMonToLaxBraidedObj A).LaxMonoidal where
   μ' := fun _ _ => A.mul
 
 open Functor.LaxMonoidal
-
-@[simp]
-lemma commMonToLaxBraidedObj_ε (A : CommMon_ C) :
-    ε (commMonToLaxBraidedObj A) = A.one := rfl
-
-@[simp]
-lemma commMonToLaxBraidedObj_μ (A : CommMon_ C) (X Y) :
-    μ (commMonToLaxBraidedObj A) X Y = A.mul := rfl
 
 instance (A : CommMon_ C) : (commMonToLaxBraidedObj A).LaxBraided where
 

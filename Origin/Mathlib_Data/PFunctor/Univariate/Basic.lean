@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.Data.W.Basic
 
+noncomputable section
+
 /-!
 # Polynomial functors
 

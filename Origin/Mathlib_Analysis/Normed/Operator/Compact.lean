@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Bounded
 import Mathlib.Topology.Algebra.Module.StrongTopology
 
+noncomputable section
+
 /-!
 # Compact operators
 
@@ -312,17 +314,6 @@ theorem IsCompactOperator.continuous {f : M₁ →ₛₗ[σ₁₂] M₂} (hf : I
 def ContinuousLinearMap.mkOfIsCompactOperator {f : M₁ →ₛₗ[σ₁₂] M₂} (hf : IsCompactOperator f) :
     M₁ →SL[σ₁₂] M₂ :=
   ⟨f, hf.continuous⟩
-
-@[simp]
-theorem ContinuousLinearMap.mkOfIsCompactOperator_to_linearMap {f : M₁ →ₛₗ[σ₁₂] M₂}
-    (hf : IsCompactOperator f) :
-    (ContinuousLinearMap.mkOfIsCompactOperator hf : M₁ →ₛₗ[σ₁₂] M₂) = f :=
-  rfl
-
-@[simp]
-theorem ContinuousLinearMap.coe_mkOfIsCompactOperator {f : M₁ →ₛₗ[σ₁₂] M₂}
-    (hf : IsCompactOperator f) : (ContinuousLinearMap.mkOfIsCompactOperator hf : M₁ → M₂) = f :=
-  rfl
 
 theorem ContinuousLinearMap.mkOfIsCompactOperator_mem_compactOperator {f : M₁ →ₛₗ[σ₁₂] M₂}
     (hf : IsCompactOperator f) :

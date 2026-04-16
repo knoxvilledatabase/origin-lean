@@ -10,6 +10,8 @@ import Mathlib.Data.Prod.Lex
 import Mathlib.GroupTheory.Perm.Basic
 import Mathlib.Order.Interval.Finset.Fin
 
+noncomputable section
+
 /-!
 
 # Sorting tuples by their values
@@ -57,10 +59,6 @@ def graphEquiv₁ (f : Fin n → α) : Fin n ≃ graph f where
     obtain ⟨i', hi'⟩ := h
     obtain ⟨-, rfl⟩ := Prod.mk.inj_iff.mp hi'
     simpa
-
-@[simp]
-theorem proj_equiv₁' (f : Fin n → α) : graph.proj ∘ graphEquiv₁ f = f :=
-  rfl
 
 def graphEquiv₂ (f : Fin n → α) : Fin n ≃o graph f :=
   Finset.orderIsoOfFin _ (by simp)

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.MorphismProperty.Limits
 import Mathlib.CategoryTheory.Square
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 
+noncomputable section
+
 /-!
 # Commutative squares that are pushout or pullback squares
 

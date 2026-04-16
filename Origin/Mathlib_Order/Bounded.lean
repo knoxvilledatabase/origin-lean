@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.RelClasses
 import Mathlib.Order.Interval.Set.Basic
 
+noncomputable section
+
 /-!
 # Bounded and unbounded sets
 We prove miscellaneous lemmas about bounded and unbounded sets. Many of these are just variations on

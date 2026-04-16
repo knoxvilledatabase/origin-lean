@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Analysis.NormedSpace.HahnBanach.SeparatingDual
 
+noncomputable section
+
 /-!
 # Derivatives of integrals depending on parameters
 

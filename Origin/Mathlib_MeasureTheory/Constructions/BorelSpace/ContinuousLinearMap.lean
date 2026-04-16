@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Constructions/BorelSpace/ContinuousLinearMap.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Topology.Algebra.Module.FiniteDimension
+
+noncomputable section
 
 /-!
 # Measurable functions in normed spaces
@@ -91,8 +93,12 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] [CompleteSpace 𝕜] [Mea
 variable [BorelSpace 𝕜] {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [MeasurableSpace E]
   [BorelSpace E]
 
--- DISSOLVED: measurable_smul_const
+theorem measurable_smul_const {f : α → 𝕜} {c : E} (hc : c ≠ 0) :
+    (Measurable fun x => f x • c) ↔ Measurable f :=
+  (isClosedEmbedding_smul_left hc).measurableEmbedding.measurable_comp_iff
 
--- DISSOLVED: aemeasurable_smul_const
+theorem aemeasurable_smul_const {f : α → 𝕜} {μ : Measure α} {c : E} (hc : c ≠ 0) :
+    AEMeasurable (fun x => f x • c) μ ↔ AEMeasurable f μ :=
+  (isClosedEmbedding_smul_left hc).measurableEmbedding.aemeasurable_comp_iff
 
 end NormedSpace

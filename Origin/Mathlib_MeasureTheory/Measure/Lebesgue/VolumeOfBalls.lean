@@ -9,6 +9,8 @@ import Mathlib.MeasureTheory.Constructions.HaarToSphere
 import Mathlib.MeasureTheory.Integral.Gamma
 import Mathlib.MeasureTheory.Integral.Pi
 
+noncomputable section
+
 /-!
 # Volume of balls
 
@@ -72,50 +74,6 @@ variable {E : Type*} [AddCommGroup E] [Module ℝ E] [FiniteDimensional ℝ E] [
   (h5 : ∀ r x, g (r • x) ≤ |r| * (g x))
 
 include h1 h2 h3 h4 h5
-
-theorem MeasureTheory.measure_lt_one_eq_integral_div_gamma {p : ℝ} (hp : 0 < p) :
-    μ {x : E | g x < 1} =
-      .ofReal ((∫ (x : E), Real.exp (- (g x) ^ p) ∂μ) / Real.Gamma (finrank ℝ E / p + 1)) := by
-  -- We copy `E` to a new type `F` on which we will put the norm defined by `g`
-  letI F : Type _ := E
-  letI : NormedAddCommGroup F :=
-  { norm := g
-    dist := fun x y => g (x - y)
-    dist_self := by simp only [_root_.sub_self, h1, forall_const]
-    dist_comm := fun _ _ => by dsimp [dist]; rw [← h2, neg_sub]
-    dist_triangle := fun x y z => by convert h3 (x - y) (y - z) using 1; abel_nf
-    edist := fun x y => .ofReal (g (x - y))
-    edist_dist := fun _ _ => rfl
-    eq_of_dist_eq_zero := by convert fun _ _ h => eq_of_sub_eq_zero (h4 h) }
-  letI : NormedSpace ℝ F :=
-  { norm_smul_le := fun _ _ ↦ h5 _ _ }
-  -- We put the new topology on F
-  letI : TopologicalSpace F := UniformSpace.toTopologicalSpace
-  letI : MeasurableSpace F := borel F
-  have : BorelSpace F := { measurable_eq := rfl }
-  -- The map between `E` and `F` as a continuous linear equivalence
-  let φ := @LinearEquiv.toContinuousLinearEquiv ℝ _ E _ _ tE _ _ F _ _ _ _ _ _ _ _ _
-    (LinearEquiv.refl ℝ E : E ≃ₗ[ℝ] F)
-  -- The measure `ν` is the measure on `F` defined by `μ`
-  -- Since we have two different topologies, it is necessary to specify the topology of E
-  let ν : Measure F := @Measure.map E F mE _ φ μ
-  have : IsAddHaarMeasure ν :=
-    @ContinuousLinearEquiv.isAddHaarMeasure_map E F ℝ ℝ _ _ _ _ _ _ tE _ _ _ _ _ _ _ mE _ _ _ φ μ _
-  convert (measure_unitBall_eq_integral_div_gamma ν hp) using 1
-  · rw [@Measure.map_apply E F mE _ μ φ _ _ measurableSet_ball]
-    · congr!
-      simp_rw [Metric.ball, dist_zero_right]
-      rfl
-    · refine @Continuous.measurable E F tE mE _ _ _ _ φ ?_
-      exact @ContinuousLinearEquiv.continuous ℝ ℝ _ _ _ _ _ _ E tE _ F _ _ _ _ φ
-  · -- The map between `E` and `F` as a measurable equivalence
-    let ψ := @Homeomorph.toMeasurableEquiv E F tE mE _ _ _ _
-      (@ContinuousLinearEquiv.toHomeomorph ℝ ℝ _ _ _ _ _ _ E tE _ F _ _ _ _ φ)
-    -- The map `ψ` is measure preserving by construction
-    have : @MeasurePreserving E F mE _ ψ μ ν :=
-      @Measurable.measurePreserving E F mE _ ψ (@MeasurableEquiv.measurable E F mE _ ψ) _
-    rw [← this.integral_comp']
-    rfl
 
 -- CONFLATES (assumes ground = zero): MeasureTheory.measure_le_eq_lt
 theorem MeasureTheory.measure_le_eq_lt [Nontrivial E] (r : ℝ) :

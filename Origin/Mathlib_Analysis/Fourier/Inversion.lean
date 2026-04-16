@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.PeakFunction
 import Mathlib.Analysis.SpecialFunctions.Gaussian.FourierTransform
 
+noncomputable section
+
 /-!
 # Fourier inversion formula
 

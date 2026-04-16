@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SetFamily.HarrisKleitman
 import Mathlib.Combinatorics.SetFamily.Intersecting
 
+noncomputable section
+
 /-!
 # Kleitman's bound on the size of intersecting families
 

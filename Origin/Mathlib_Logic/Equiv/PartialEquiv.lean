@@ -8,6 +8,8 @@ import Mathlib.Logic.Equiv.Defs
 import Mathlib.Tactic.Core
 import Mathlib.Tactic.Attr.Core
 
+noncomputable section
+
 /-!
 # Partial equivalences
 
@@ -83,37 +85,21 @@ def mfld_cfg : Simps.Config where
 namespace Tactic.MfldSetTac
 
 elab (name := mfldSetTac) "mfld_set_tac" : tactic => withMainContext do
-
   let g ← getMainGoal
-
   let goalTy := (← instantiateMVars (← g.getDecl).type).getAppFnArgs
-
   match goalTy with
-
   | (``Eq, #[_ty, _e₁, _e₂]) =>
-
     evalTactic (← `(tactic| (
-
       apply Set.ext; intro my_y
-
       constructor <;>
-
         · intro h_my_y
-
           try simp only [*, mfld_simps] at h_my_y
-
           try simp only [*, mfld_simps])))
-
   | (``Subset, #[_ty, _inst, _e₁, _e₂]) =>
-
     evalTactic (← `(tactic| (
-
       intro my_y h_my_y
-
       try simp only [*, mfld_simps] at h_my_y
-
       try simp only [*, mfld_simps])))
-
   | _ => throwError "goal should be an equality or an inclusion"
 
 attribute [mfld_simps] and_true eq_self_iff_true Function.comp_apply
@@ -171,15 +157,6 @@ def Simps.symm_apply (e : PartialEquiv α β) : β → α :=
   e.symm
 
 initialize_simps_projections PartialEquiv (toFun → apply, invFun → symm_apply)
-
-@[simp, mfld_simps]
-theorem coe_symm_mk (f : α → β) (g s t ml mr il ir) :
-    ((PartialEquiv.mk f g s t ml mr il ir).symm : β → α) = g :=
-  rfl
-
-@[simp, mfld_simps]
-theorem invFun_as_coe : e.invFun = e.symm :=
-  rfl
 
 @[simp, mfld_simps]
 theorem map_source {x : α} (h : x ∈ e.source) : e x ∈ e.target :=
@@ -275,10 +252,6 @@ protected def toEquiv : e.source ≃ e.target where
 
 @[simp, mfld_simps]
 theorem symm_source : e.symm.source = e.target :=
-  rfl
-
-@[simp, mfld_simps]
-theorem symm_target : e.symm.target = e.source :=
   rfl
 
 @[simp, mfld_simps]
@@ -465,19 +438,7 @@ protected def restr (s : Set α) : PartialEquiv α β :=
   (@IsImage.of_symm_preimage_eq α β e s (e.symm ⁻¹' s) rfl).restr
 
 @[simp, mfld_simps]
-theorem restr_coe (s : Set α) : (e.restr s : α → β) = e :=
-  rfl
-
-@[simp, mfld_simps]
-theorem restr_coe_symm (s : Set α) : ((e.restr s).symm : β → α) = e.symm :=
-  rfl
-
-@[simp, mfld_simps]
 theorem restr_source (s : Set α) : (e.restr s).source = e.source ∩ s :=
-  rfl
-
-@[simp, mfld_simps]
-theorem restr_target (s : Set α) : (e.restr s).target = e.target ∩ e.symm ⁻¹' s :=
   rfl
 
 theorem restr_eq_of_source_subset {e : PartialEquiv α β} {s : Set α} (h : e.source ⊆ s) :
@@ -494,21 +455,6 @@ protected def refl (α : Type*) : PartialEquiv α α :=
 @[simp, mfld_simps]
 theorem refl_source : (PartialEquiv.refl α).source = univ :=
   rfl
-
-@[simp, mfld_simps]
-theorem refl_target : (PartialEquiv.refl α).target = univ :=
-  rfl
-
-@[simp, mfld_simps]
-theorem refl_coe : (PartialEquiv.refl α : α → α) = id :=
-  rfl
-
-@[simp, mfld_simps]
-theorem refl_symm : (PartialEquiv.refl α).symm = PartialEquiv.refl α :=
-  rfl
-
-@[mfld_simps]
-theorem refl_restr_source (s : Set α) : ((PartialEquiv.refl α).restr s).source = s := by simp
 
 @[mfld_simps]
 theorem refl_restr_target (s : Set α) : ((PartialEquiv.refl α).restr s).target = s := by
@@ -529,18 +475,6 @@ def ofSet (s : Set α) : PartialEquiv α α where
 theorem ofSet_source (s : Set α) : (PartialEquiv.ofSet s).source = s :=
   rfl
 
-@[simp, mfld_simps]
-theorem ofSet_target (s : Set α) : (PartialEquiv.ofSet s).target = s :=
-  rfl
-
-@[simp, mfld_simps]
-theorem ofSet_coe (s : Set α) : (PartialEquiv.ofSet s : α → α) = id :=
-  rfl
-
-@[simp, mfld_simps]
-theorem ofSet_symm (s : Set α) : (PartialEquiv.ofSet s).symm = PartialEquiv.ofSet s :=
-  rfl
-
 @[simps]
 protected def trans' (e' : PartialEquiv β γ) (h : e.target = e'.source) : PartialEquiv α γ where
   toFun := e' ∘ e
@@ -558,13 +492,6 @@ protected def trans : PartialEquiv α γ :=
 
 @[simp, mfld_simps]
 theorem coe_trans : (e.trans e' : α → γ) = e' ∘ e :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_trans_symm : ((e.trans e').symm : γ → α) = e.symm ∘ e'.symm :=
-  rfl
-
-theorem trans_apply {x : α} : (e.trans e') x = e' (e x) :=
   rfl
 
 theorem trans_symm_eq_symm_trans_symm : (e.trans e').symm = e'.symm.trans e.symm := by
@@ -710,21 +637,6 @@ def prod (e : PartialEquiv α β) (e' : PartialEquiv γ δ) : PartialEquiv (α �
   left_inv' p hp   := by simp_all
   right_inv' p hp  := by simp_all
 
-@[simp, mfld_simps]
-theorem prod_source (e : PartialEquiv α β) (e' : PartialEquiv γ δ) :
-    (e.prod e').source = e.source ×ˢ e'.source :=
-  rfl
-
-@[simp, mfld_simps]
-theorem prod_target (e : PartialEquiv α β) (e' : PartialEquiv γ δ) :
-    (e.prod e').target = e.target ×ˢ e'.target :=
-  rfl
-
-@[simp, mfld_simps]
-theorem prod_coe (e : PartialEquiv α β) (e' : PartialEquiv γ δ) :
-    (e.prod e' : α × γ → β × δ) = fun p => (e p.1, e' p.2) :=
-  rfl
-
 theorem prod_coe_symm (e : PartialEquiv α β) (e' : PartialEquiv γ δ) :
     ((e.prod e').symm : β × δ → α × γ) = fun p => (e.symm p.1, e'.symm p.2) :=
   rfl
@@ -761,11 +673,6 @@ def piecewise (e e' : PartialEquiv α β) (s : Set α) (t : Set β) [∀ x, Deci
   left_inv' := H.leftInvOn_piecewise H'
   right_inv' := H.symm.leftInvOn_piecewise H'.symm
 
-theorem symm_piecewise (e e' : PartialEquiv α β) {s : Set α} {t : Set β} [∀ x, Decidable (x ∈ s)]
-    [∀ y, Decidable (y ∈ t)] (H : e.IsImage s t) (H' : e'.IsImage s t) :
-    (e.piecewise e' s t H H').symm = e.symm.piecewise e'.symm t s H.symm H'.symm :=
-  rfl
-
 @[simps! (config := .asFn)]
 def disjointUnion (e e' : PartialEquiv α β) (hs : Disjoint e.source e'.source)
     (ht : Disjoint e.target e'.target) [∀ x, Decidable (x ∈ e.source)]
@@ -796,15 +703,6 @@ protected def pi (ei : ∀ i, PartialEquiv (αi i) (βi i)) : PartialEquiv (∀ 
   map_target' _ hf i hi := (ei i).map_target (hf i hi)
   left_inv' _ hf := funext fun i => (ei i).left_inv (hf i trivial)
   right_inv' _ hf := funext fun i => (ei i).right_inv (hf i trivial)
-
-@[simp, mfld_simps]
-theorem pi_symm (ei : ∀ i, PartialEquiv (αi i) (βi i)) :
-    (PartialEquiv.pi ei).symm = .pi fun i ↦ (ei i).symm :=
-  rfl
-
-theorem pi_symm_apply (ei : ∀ i, PartialEquiv (αi i) (βi i)) :
-    ⇑(PartialEquiv.pi ei).symm = fun f i ↦ (ei i).symm (f i) :=
-  rfl
 
 @[simp, mfld_simps]
 theorem pi_refl : (PartialEquiv.pi fun i ↦ PartialEquiv.refl (αi i)) = .refl (∀ i, αi i) := by
@@ -843,14 +741,6 @@ end Set
 namespace Equiv
 
 variable (e : α ≃ β) (e' : β ≃ γ)
-
-@[simp, mfld_simps]
-theorem refl_toPartialEquiv : (Equiv.refl α).toPartialEquiv = PartialEquiv.refl α :=
-  rfl
-
-@[simp, mfld_simps]
-theorem symm_toPartialEquiv : e.symm.toPartialEquiv = e.toPartialEquiv.symm :=
-  rfl
 
 @[simp, mfld_simps]
 theorem trans_toPartialEquiv :

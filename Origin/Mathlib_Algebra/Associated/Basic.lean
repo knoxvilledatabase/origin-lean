@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Associated/Basic.lean
-Genuine: 91 | Conflates: 1 | Dissolved: 7 | Infrastructure: 48
+Genuine: 96 | Conflates: 1 | Dissolved: 0 | Infrastructure: 50
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Even
@@ -11,6 +11,8 @@ import Mathlib.Algebra.Group.Units.Equiv
 import Mathlib.Algebra.Ring.Units
 import Mathlib.Algebra.Prime.Lemmas
 import Mathlib.Order.BoundedOrder.Basic
+
+noncomputable section
 
 /-!
 # Associated elements.
@@ -208,7 +210,8 @@ theorem Associated.eq_zero_iff [MonoidWithZero M] {a b : M} (h : a ~ᵤ b) : a =
   obtain ⟨u, rfl⟩ := h
   rw [← Units.eq_mul_inv_iff_mul_eq, zero_mul]
 
--- DISSOLVED: Associated.ne_zero_iff
+theorem Associated.ne_zero_iff [MonoidWithZero M] {a b : M} (h : a ~ᵤ b) : a ≠ 0 ↔ b ≠ 0 :=
+  not_congr h.eq_zero_iff
 
 theorem Associated.neg_left [Monoid M] [HasDistribNeg M] {a b : M} (h : Associated a b) :
     Associated (-a) b :=
@@ -300,25 +303,23 @@ theorem Irreducible.isUnit_iff_not_associated_of_dvd [Monoid M]
     {x y : M} (hx : Irreducible x) (hy : y ∣ x) : IsUnit y ↔ ¬ Associated x y :=
   ⟨fun hy hxy => hx.1 (hxy.symm.isUnit hy), (hx.dvd_iff.mp hy).resolve_right⟩
 
-protected theorem Associated.irreducible [Monoid M] {p q : M} (h : p ~ᵤ q) (hp : Irreducible p) :
-    Irreducible q :=
-  ⟨mt h.symm.isUnit hp.1,
-    let ⟨u, hu⟩ := h
-    fun a b hab =>
-    have hpab : p = a * (b * (u⁻¹ : Mˣ)) :=
-      calc
-        p = p * u * (u⁻¹ : Mˣ) := by simp
-        _ = _ := by rw [hu]; simp [hab, mul_assoc]
-
-    (hp.isUnit_or_isUnit hpab).elim Or.inl fun ⟨v, hv⟩ => Or.inr ⟨v * u, by simp [hv]⟩⟩
-
 protected theorem Associated.irreducible_iff [Monoid M] {p q : M} (h : p ~ᵤ q) :
     Irreducible p ↔ Irreducible q :=
   ⟨h.irreducible, h.symm.irreducible⟩
 
--- DISSOLVED: Associated.of_mul_left
+theorem Associated.of_mul_left [CancelCommMonoidWithZero M] {a b c d : M} (h : a * b ~ᵤ c * d)
+    (h₁ : a ~ᵤ c) (ha : a ≠ 0) : b ~ᵤ d :=
+  let ⟨u, hu⟩ := h
+  let ⟨v, hv⟩ := Associated.symm h₁
+  ⟨u * (v : Mˣ),
+    mul_left_cancel₀ ha
+      (by
+        rw [← hv, mul_assoc c (v : M) d, mul_left_comm c, ← hu]
+        simp [hv.symm, mul_assoc, mul_comm, mul_left_comm])⟩
 
--- DISSOLVED: Associated.of_mul_right
+theorem Associated.of_mul_right [CancelCommMonoidWithZero M] {a b c d : M} :
+    a * b ~ᵤ c * d → b ~ᵤ d → b ≠ 0 → a ~ᵤ c := by
+  rw [mul_comm a, mul_comm c]; exact Associated.of_mul_left
 
 theorem Associated.of_pow_associated_of_prime [CancelCommMonoidWithZero M] {p₁ p₂ : M} {k₁ k₂ : ℕ}
     (hp₁ : Prime p₁) (hp₂ : Prime p₂) (hk₁ : 0 < k₁) (h : p₁ ^ k₁ ~ᵤ p₂ ^ k₂) : p₁ ~ᵤ p₂ := by
@@ -394,9 +395,6 @@ instance [Monoid M] : Inhabited (Associates M) :=
 
 theorem mk_eq_mk_iff_associated [Monoid M] {a b : M} : Associates.mk a = Associates.mk b ↔ a ~ᵤ b :=
   Iff.intro Quotient.exact Quot.sound
-
-theorem quotient_mk_eq_mk [Monoid M] (a : M) : ⟦a⟧ = Associates.mk a :=
-  rfl
 
 theorem quot_mk_eq_mk [Monoid M] (a : M) : Quot.mk Setoid.r a = Associates.mk a :=
   rfl
@@ -477,19 +475,12 @@ protected def mkMonoidHom : M →* Associates M where
   map_one' := mk_one
   map_mul' _ _ := mk_mul_mk
 
-@[simp]
-theorem mkMonoidHom_apply (a : M) : Associates.mkMonoidHom a = Associates.mk a :=
-  rfl
-
 theorem associated_map_mk {f : Associates M →* M} (hinv : Function.RightInverse f Associates.mk)
     (a : M) : a ~ᵤ f (Associates.mk a) :=
   Associates.mk_eq_mk_iff_associated.1 (hinv (Associates.mk a)).symm
 
 theorem mk_pow (a : M) (n : ℕ) : Associates.mk (a ^ n) = Associates.mk a ^ n := by
   induction n <;> simp [*, pow_succ, Associates.mk_mul_mk.symm]
-
-theorem dvd_eq_le : ((· ∣ ·) : Associates M → Associates M → Prop) = (· ≤ ·) :=
-  rfl
 
 instance uniqueUnits : Unique (Associates M)ˣ where
   uniq := by
@@ -594,12 +585,14 @@ theorem mk_eq_zero {a : M} : Associates.mk a = 0 ↔ a = 0 :=
 @[simp]
 theorem quot_out_zero : Quot.out (0 : Associates M) = 0 := by rw [← mk_eq_zero, quot_out]
 
--- DISSOLVED: mk_ne_zero
+theorem mk_ne_zero {a : M} : Associates.mk a ≠ 0 ↔ a ≠ 0 :=
+  not_congr mk_eq_zero
 
 instance [Nontrivial M] : Nontrivial (Associates M) :=
   ⟨⟨1, 0, mk_ne_zero.2 one_ne_zero⟩⟩
 
--- DISSOLVED: exists_non_zero_rep
+theorem exists_non_zero_rep {a : Associates M} : a ≠ 0 → ∃ a0 : M, a0 ≠ 0 ∧ Associates.mk a0 = a :=
+  Quotient.inductionOn a fun b nz => ⟨b, mt (congr_arg Quotient.mk'') nz, rfl⟩
 
 end MonoidWithZero
 
@@ -694,7 +687,8 @@ theorem _root_.associates_irreducible_iff_prime [DecompositionMonoid M] {p : Ass
 
 instance : NoZeroDivisors (Associates M) := by infer_instance
 
--- DISSOLVED: le_of_mul_le_mul_left
+theorem le_of_mul_le_mul_left (a b c : Associates M) (ha : a ≠ 0) : a * b ≤ a * c → b ≤ c
+  | ⟨d, hd⟩ => ⟨d, mul_left_cancel₀ ha <| by rwa [← mul_assoc]⟩
 
 theorem one_or_eq_of_le_of_prime {p m : Associates M} (hp : Prime p) (hle : m ≤ p) :
     m = 1 ∨ m = p := by
@@ -726,7 +720,11 @@ end CommMonoidWithZero
 
 section CancelCommMonoidWithZero
 
--- DISSOLVED: isUnit_of_associated_mul
+theorem isUnit_of_associated_mul [CancelCommMonoidWithZero M] {p b : M} (h : Associated (p * b) p)
+    (hp : p ≠ 0) : IsUnit b := by
+  obtain ⟨a, ha⟩ := h
+  refine isUnit_of_mul_eq_one b a ((mul_right_inj' hp).mp ?_)
+  rwa [← mul_assoc, mul_one]
 
 theorem DvdNotUnit.not_associated [CancelCommMonoidWithZero M] {p q : M} (h : DvdNotUnit p q) :
     ¬Associated p q := by

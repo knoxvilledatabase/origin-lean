@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Data.List.Lemmas
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # The Following Are Equivalent
 

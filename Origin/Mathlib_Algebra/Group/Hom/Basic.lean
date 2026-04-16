@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Group.Hom.Defs
 
+noncomputable section
+
 /-!
 # Additional lemmas about monoid and group homomorphisms
 
@@ -50,12 +52,6 @@ def invMonoidHom : α →* α where
   map_one' := inv_one
   map_mul' := mul_inv
 
-@[simp]
-theorem coe_invMonoidHom : (invMonoidHom : α → α) = Inv.inv := rfl
-
-@[simp]
-theorem invMonoidHom_apply (a : α) : invMonoidHom a = a⁻¹ := rfl
-
 end DivisionCommMonoid
 
 namespace MulHom
@@ -72,10 +68,6 @@ instance [Mul M] [CommSemigroup N] : Mul (M →ₙ* N) :=
 @[to_additive (attr := simp)]
 theorem mul_apply {M N} [Mul M] [CommSemigroup N] (f g : M →ₙ* N) (x : M) :
     (f * g) x = f x * g x := rfl
-
-@[to_additive]
-theorem mul_comp [Mul M] [Mul N] [CommSemigroup P] (g₁ g₂ : N →ₙ* P) (f : M →ₙ* N) :
-    (g₁ * g₂).comp f = g₁.comp f * g₂.comp f := rfl
 
 @[to_additive]
 theorem comp_mul [Mul M] [CommSemigroup N] [CommSemigroup P] (g : N →ₙ* P) (f₁ f₂ : M →ₙ* N) :
@@ -125,18 +117,9 @@ def ofMapMulInv {H : Type*} [Group H] (f : G → H)
         { simp only [map_div]
           simp only [mul_inv_cancel, one_mul, inv_inv] }
 
-@[to_additive (attr := simp)]
-theorem coe_of_map_mul_inv {H : Type*} [Group H] (f : G → H)
-    (map_div : ∀ a b : G, f (a * b⁻¹) = f a * (f b)⁻¹) :
-  ↑(ofMapMulInv f map_div) = f := rfl
-
 @[to_additive "Define a morphism of additive groups given a map which respects difference."]
 def ofMapDiv {H : Type*} [Group H] (f : G → H) (hf : ∀ x y, f (x / y) = f x / f y) : G →* H :=
   ofMapMulInv f (by simpa only [div_eq_mul_inv] using hf)
-
-@[to_additive (attr := simp)]
-theorem coe_of_map_div {H : Type*} [Group H] (f : G → H) (hf : ∀ x y, f (x / y) = f x / f y) :
-    ↑(ofMapDiv f hf) = f := rfl
 
 end Group
 
@@ -154,10 +137,6 @@ instance mul : Mul (M →* N) :=
         rw [f.map_mul, g.map_mul, ← mul_assoc, ← mul_assoc, mul_right_comm (f x)] }⟩
 
 @[to_additive (attr := simp)] lemma mul_apply (f g : M →* N) (x : M) : (f * g) x = f x * g x := rfl
-
-@[to_additive]
-lemma mul_comp [MulOneClass P] (g₁ g₂ : M →* N) (f : P →* M) :
-    (g₁ * g₂).comp f = g₁.comp f * g₂.comp f := rfl
 
 @[to_additive]
 lemma comp_mul [CommMonoid P] (g : N →* P) (f₁ f₂ : M →* N) :
@@ -178,9 +157,6 @@ instance : Inv (M →* G) where
 @[to_additive (attr := simp)] lemma inv_apply (f : M →* G) (x : M) : f⁻¹ x = (f x)⁻¹ := rfl
 
 @[to_additive (attr := simp)]
-theorem inv_comp (φ : N →* G) (ψ : M →* N) : φ⁻¹.comp ψ = (φ.comp ψ)⁻¹ := rfl
-
-@[to_additive (attr := simp)]
 theorem comp_inv (φ : G →* H) (ψ : M →* G) : φ.comp ψ⁻¹ = (φ.comp ψ)⁻¹ := by
   ext
   simp only [Function.comp_apply, inv_apply, map_inv, coe_comp]
@@ -192,9 +168,6 @@ instance : Div (M →* G) where
     simp [div_eq_mul_inv, mul_assoc, mul_left_comm, mul_comm]
 
 @[to_additive (attr := simp)] lemma div_apply (f g : M →* G) (x : M) : (f / g) x = f x / g x := rfl
-
-@[to_additive (attr := simp)]
-lemma div_comp (f g : N →* G) (h : M →* N) : (f / g).comp h = f.comp h / g.comp h := rfl
 
 @[to_additive (attr := simp)]
 lemma comp_div (f : G →* H) (g h : M →* G) : f.comp (g / h) = f.comp g / f.comp h := by

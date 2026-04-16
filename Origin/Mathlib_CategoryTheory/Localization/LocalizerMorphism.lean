@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Equivalence
 
+noncomputable section
+
 /-!
 # Morphisms of localizers
 

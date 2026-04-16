@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Logic.Equiv.List
 import Mathlib.Logic.Function.Iterate
 
+noncomputable section
+
 /-!
 # The primitive recursive functions
 

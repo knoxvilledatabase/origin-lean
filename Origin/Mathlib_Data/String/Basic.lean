@@ -8,6 +8,8 @@ import Mathlib.Data.List.Lex
 import Mathlib.Data.Char
 import Mathlib.Algebra.Order.Group.Nat
 
+noncomputable section
+
 /-!
 # Strings
 
@@ -15,8 +17,6 @@ Supplementary theorems about the `String` type.
 -/
 
 namespace String
-
-@[simp] theorem endPos_empty : "".endPos = 0 := rfl
 
 def ltb (s₁ s₂ : Iterator) : Bool :=
   if s₂.hasNext then
@@ -109,13 +109,6 @@ theorem le_iff_toList_le {s₁ s₂ : String} : s₁ ≤ s₂ ↔ s₁.toList �
 theorem toList_inj {s₁ s₂ : String} : s₁.toList = s₂.toList ↔ s₁ = s₂ :=
   ⟨congr_arg mk, congr_arg toList⟩
 
-theorem asString_nil : [].asString = "" :=
-  rfl
-
-@[simp]
-theorem toList_empty : "".toList = [] :=
-  rfl
-
 theorem asString_toList (s : String) : s.toList.asString = s :=
   rfl
 
@@ -126,10 +119,6 @@ theorem toList_nonempty : ∀ {s : String}, s ≠ "" → s.toList = s.head :: (s
     | cons c cs =>
       simp only [toList, data_drop, List.drop_succ_cons, List.drop_zero, List.cons.injEq, and_true]
       rfl
-
-@[simp]
-theorem head_empty : "".data.head! = default :=
-  rfl
 
 instance : LinearOrder String where
   le_refl _ := le_iff_toList_le.mpr le_rfl
@@ -161,10 +150,6 @@ theorem toList_asString (l : List Char) : l.asString.toList = l :=
   rfl
 
 @[simp]
-theorem length_asString (l : List Char) : l.asString.length = l.length :=
-  rfl
-
-@[simp]
 theorem asString_inj {l l' : List Char} : l.asString = l'.asString ↔ l = l' :=
   ⟨fun h ↦ by rw [← toList_asString l, ← toList_asString l', toList_inj, h],
    fun h ↦ h ▸ rfl⟩
@@ -173,7 +158,3 @@ theorem asString_eq {l : List Char} {s : String} : l.asString = s ↔ l = s.toLi
   rw [← asString_toList s, asString_inj, asString_toList s]
 
 end List
-
-@[simp]
-theorem String.length_data (s : String) : s.data.length = s.length :=
-  rfl

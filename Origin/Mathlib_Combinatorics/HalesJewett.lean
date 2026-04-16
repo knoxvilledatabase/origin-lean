@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/HalesJewett.lean
-Genuine: 35 | Conflates: 4 | Dissolved: 0 | Infrastructure: 11
+Genuine: 37 | Conflates: 4 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Option
 import Mathlib.Data.Fintype.Shrink
 import Mathlib.Data.Fintype.Sum
 import Mathlib.Data.Finite.Prod
+
+noncomputable section
 
 /-!
 # The Hales-Jewett theorem

@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Combinatorics.Quiver.Prefunctor
 
+noncomputable section
+
 /-!
 
 # Pushing a quiver structure along a map
@@ -39,10 +41,6 @@ def of : V ⥤q Push σ where
   obj := σ
   map f := PushQuiver.arrow f
 
-@[simp]
-theorem of_obj : (of σ).obj = σ :=
-  rfl
-
 variable {W' : Type*} [Quiver W'] (φ : V ⥤q W') (τ : W → W') (h : ∀ x, φ.obj x = τ (σ x))
 
 noncomputable def lift : Push σ ⥤q W' where
@@ -52,9 +50,6 @@ noncomputable def lift : Push σ ⥤q W' where
       dsimp only
       rw [← h X, ← h Y]
       exact φ.map f
-
-theorem lift_obj : (lift σ φ τ h).obj = τ :=
-  rfl
 
 theorem lift_comp : (of σ ⋙q lift σ φ τ h) = φ := by
   fapply Prefunctor.ext

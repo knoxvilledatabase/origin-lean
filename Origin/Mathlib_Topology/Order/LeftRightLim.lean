@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Order.LeftRight
 import Mathlib.Topology.Order.Monotone
 
+noncomputable section
+
 /-!
 # Left and right limits
 

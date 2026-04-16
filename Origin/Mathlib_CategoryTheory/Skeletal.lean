@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Category.Preorder
 import Mathlib.CategoryTheory.IsomorphismClasses
 import Mathlib.CategoryTheory.Thin
 
+noncomputable section
+
 /-!
 # Skeleton of a category
 
@@ -172,9 +174,6 @@ variable {C} {D}
 def map (F : C ⥤ D) : ThinSkeleton C ⥤ ThinSkeleton D where
   obj := Quotient.map F.obj fun _ _ ⟨hX⟩ => ⟨F.mapIso hX⟩
   map {X} {Y} := Quotient.recOnSubsingleton₂ X Y fun _ _ k => homOfLE (k.le.elim fun t => ⟨F.map t⟩)
-
-theorem comp_toThinSkeleton (F : C ⥤ D) : F ⋙ toThinSkeleton D = toThinSkeleton C ⋙ map F :=
-  rfl
 
 def mapNatTrans {F₁ F₂ : C ⥤ D} (k : F₁ ⟶ F₂) : map F₁ ⟶ map F₂ where
   app X := Quotient.recOnSubsingleton X fun x => ⟨⟨⟨k.app x⟩⟩⟩

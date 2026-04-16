@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Splits
 import Mathlib.RingTheory.Adjoin.Basic
 import Mathlib.RingTheory.AdjoinRoot
 
+noncomputable section
+
 /-!
 # Adjoining elements to a field
 

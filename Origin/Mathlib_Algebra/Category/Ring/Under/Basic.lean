@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Ring.Colimits
 import Mathlib.Algebra.Category.Ring.Constructions
 import Mathlib.CategoryTheory.Adjunction.Over
 
+noncomputable section
+
 /-!
 # Under `CommRingCat`
 
@@ -36,18 +38,6 @@ def toAlgHom {A B : Under R} (f : A ⟶ B) : A →ₐ[R] B where
     have : (A.hom ≫ f.right) a = B.hom a := by simp
     simpa only [Functor.const_obj_obj, Functor.id_obj, CommRingCat.comp_apply] using this
 
-@[simp]
-lemma toAlgHom_id (A : Under R) : toAlgHom (𝟙 A) = AlgHom.id R A := rfl
-
-@[simp]
-lemma toAlgHom_comp {A B C : Under R} (f : A ⟶ B) (g : B ⟶ C) :
-    toAlgHom (f ≫ g) = (toAlgHom g).comp (toAlgHom f) := rfl
-
-@[simp]
-lemma toAlgHom_apply {A B : Under R} (f : A ⟶ B) (a : A) :
-    toAlgHom f a = f.right a :=
-  rfl
-
 variable (R) in
 
 @[simps! hom, simps! (config := .lemmasOnly) right]
@@ -71,18 +61,6 @@ def toUnder {A B : Type u} [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
     ext a
     exact f.commutes' a
 
-@[simp]
-lemma toUnder_right {A B : Type u} [CommRing A] [CommRing B] [Algebra R A]
-    [Algebra R B] (f : A →ₐ[R] B) (a : A) :
-    f.toUnder.right a = f a :=
-  rfl
-
-@[simp]
-lemma toUnder_comp {A B C : Type u} [CommRing A] [CommRing B] [CommRing C]
-    [Algebra R A] [Algebra R B] [Algebra R C] (f : A →ₐ[R] B) (g : B →ₐ[R] C) :
-    (g.comp f).toUnder = f.toUnder ≫ g.toUnder :=
-  rfl
-
 end AlgHom
 
 namespace AlgEquiv
@@ -98,22 +76,6 @@ def toUnder {A B : Type u} [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
   inv_hom_id := by
     ext a
     simp
-
-@[simp]
-lemma toUnder_hom_right_apply {A B : Type u} [CommRing A] [CommRing B] [Algebra R A]
-    [Algebra R B] (f : A ≃ₐ[R] B) (a : A) :
-    f.toUnder.hom.right a = f a := rfl
-
-@[simp]
-lemma toUnder_inv_right_apply {A B : Type u} [CommRing A] [CommRing B] [Algebra R A]
-    [Algebra R B] (f : A ≃ₐ[R] B) (b : B) :
-    f.toUnder.inv.right b = f.symm b := rfl
-
-@[simp]
-lemma toUnder_trans {A B C : Type u} [CommRing A] [CommRing B] [CommRing C]
-    [Algebra R A] [Algebra R B] [Algebra R C] (f : A ≃ₐ[R] B) (g : B ≃ₐ[R] C) :
-    (f.trans g).toUnder = f.toUnder ≪≫ g.toUnder :=
-  rfl
 
 end AlgEquiv
 
@@ -166,10 +128,5 @@ def tensorProdIsoPushout : tensorProd R S ≅ Under.pushout (algebraMap R S) :=
     · rw [← cancel_mono (tensorProdObjIsoPushoutObj S B).inv.right]
       ext (x : S)
       simp [mkUnder_right]
-
-@[simp]
-lemma tensorProdIsoPushout_app (A : Under R) :
-    (tensorProdIsoPushout R S).app A = tensorProdObjIsoPushoutObj S A :=
-  rfl
 
 end CommRingCat

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Ring.Pointwise.Set
 
+noncomputable section
+
 /-!
 # Pointwise operations of sets in a ring
 

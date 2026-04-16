@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Data.RBMap.Basic
 import Mathlib.Data.Tree.Basic
 
+noncomputable section
+
 /-!
 # Binary tree and RBMaps
 

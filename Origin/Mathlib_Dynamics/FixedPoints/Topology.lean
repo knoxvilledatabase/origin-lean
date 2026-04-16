@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Dynamics.FixedPoints.Basic
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Topological properties of fixed points
 

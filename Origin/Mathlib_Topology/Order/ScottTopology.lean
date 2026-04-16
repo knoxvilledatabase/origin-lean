@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.ScottContinuity
 import Mathlib.Topology.Order.UpperLowerSetTopology
 
+noncomputable section
+
 /-!
 # Scott topology
 
@@ -355,18 +357,6 @@ namespace WithScott
 
 @[match_pattern] def ofScott : WithScott α ≃ α := Equiv.refl _
 
-@[simp] lemma toScott_symm_eq : (@toScott α).symm = ofScott := rfl
-
-@[simp] lemma ofScott_symm_eq : (@ofScott α).symm = toScott := rfl
-
-@[simp] lemma toScott_ofScott (a : WithScott α) : toScott (ofScott a) = a := rfl
-
-@[simp] lemma ofScott_toScott (a : α) : ofScott (toScott a) = a := rfl
-
-lemma toScott_inj {a b : α} : toScott a = toScott b ↔ a = b := Iff.rfl
-
-lemma ofScott_inj {a b : WithScott α} : ofScott a = ofScott b ↔ a = b := Iff.rfl
-
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : WithScott α → Sort _}
     (h : ∀ a, β (toScott a)) : ∀ a, β a := fun a ↦ h (ofScott a)
@@ -382,9 +372,6 @@ instance : Preorder (WithScott α) := ‹Preorder α›
 instance : TopologicalSpace (WithScott α) := scott α univ
 
 instance : IsScott (WithScott α) univ := ⟨rfl⟩
-
-lemma isOpen_iff_isUpperSet_and_scottHausdorff_open' {u : Set α} :
-    IsOpen (WithScott.ofScott ⁻¹' u) ↔ IsUpperSet u ∧ (scottHausdorff α univ).IsOpen u := Iff.rfl
 
 end WithScott
 

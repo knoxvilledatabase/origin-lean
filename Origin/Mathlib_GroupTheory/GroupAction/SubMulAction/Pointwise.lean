@@ -1,9 +1,11 @@
 /-
 Extracted from GroupTheory/GroupAction/SubMulAction/Pointwise.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.GroupTheory.GroupAction.SubMulAction
+
+noncomputable section
 
 /-!
 # Pointwise monoid structures on SubMulAction
@@ -29,9 +31,6 @@ instance : One (SubMulAction R M) where
   one :=
     { carrier := Set.range fun r : R => r • (1 : M)
       smul_mem' := fun r _ ⟨r', hr'⟩ => hr' ▸ ⟨r * r', mul_smul _ _ _⟩ }
-
-theorem coe_one : ↑(1 : SubMulAction R M) = Set.range fun r : R => r • (1 : M) :=
-  rfl
 
 @[simp]
 theorem mem_one {x : M} : x ∈ (1 : SubMulAction R M) ↔ ∃ r : R, r • (1 : M) = x :=
@@ -103,9 +102,17 @@ instance : Monoid (SubMulAction R M) :=
   { SubMulAction.semiGroup,
     SubMulAction.mulOneClass with }
 
--- DISSOLVED: coe_pow
+theorem coe_pow (p : SubMulAction R M) : ∀ {n : ℕ} (_ : n ≠ 0), ↑(p ^ n) = (p : Set M) ^ n
+  | 0, hn => (hn rfl).elim
+  | 1, _ => by rw [pow_one, pow_one]
+  | n + 2, _ => by
+    rw [pow_succ _ (n + 1), pow_succ _ (n + 1), coe_mul, coe_pow _ n.succ_ne_zero]
 
--- DISSOLVED: subset_coe_pow
+theorem subset_coe_pow (p : SubMulAction R M) : ∀ {n : ℕ}, (p : Set M) ^ n ⊆ ↑(p ^ n)
+  | 0 => by
+    rw [pow_zero, pow_zero]
+    exact subset_coe_one
+  | n + 1 => by rw [← Nat.succ_eq_add_one, coe_pow _ n.succ_ne_zero]
 
 end Monoid
 

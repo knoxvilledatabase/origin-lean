@@ -5,6 +5,8 @@ Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-! # Semiquotients
 
 A data type for semiquotients, which are classically equivalent to
@@ -65,10 +67,6 @@ def blur (s : Set α) (q : Semiquot α) : Semiquot α :=
 theorem blur_eq_blur' (q : Semiquot α) (s : Set α) (h : q.s ⊆ s) : blur s q = blur' q h := by
   unfold blur; congr; exact Set.union_eq_self_of_subset_right h
 
-@[simp]
-theorem mem_blur' (q : Semiquot α) {s : Set α} (h : q.s ⊆ s) {a : α} : a ∈ blur' q h ↔ a ∈ s :=
-  Iff.rfl
-
 def ofTrunc (q : Trunc α) : Semiquot α :=
   ⟨Set.univ, q.map fun a => ⟨a, trivial⟩⟩
 
@@ -100,10 +98,6 @@ instance : Monad Semiquot where
   pure := @Semiquot.pure
   map := @Semiquot.map
   bind := @Semiquot.bind
-
-@[simp]
-theorem map_def {β} : ((· <$> ·) : (α → β) → Semiquot α → Semiquot β) = map :=
-  rfl
 
 @[simp]
 theorem bind_def {β} : ((· >>= ·) : Semiquot α → (α → Semiquot β) → Semiquot β) = bind :=

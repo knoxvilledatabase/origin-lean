@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.Product
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Prod
 
+noncomputable section
+
 /-! ## Equivalence of smoothness with the basic definition for functions between vector spaces
 
 * `contMDiff_iff_contDiff`: for functions between vector spaces,

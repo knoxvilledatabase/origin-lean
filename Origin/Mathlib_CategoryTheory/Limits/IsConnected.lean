@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.IsConnected
 import Mathlib.CategoryTheory.Limits.Final
 import Mathlib.CategoryTheory.HomCongr
 
+noncomputable section
+
 /-!
 # Colimits of connected index categories
 

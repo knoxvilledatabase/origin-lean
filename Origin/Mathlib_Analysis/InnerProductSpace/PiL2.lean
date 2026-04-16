@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/InnerProductSpace/PiL2.lean
-Genuine: 89 | Conflates: 0 | Dissolved: 1 | Infrastructure: 27
+Genuine: 90 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Analysis.Normed.Lp.PiLp
 import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.LinearAlgebra.UnitaryGroup
+
+noncomputable section
 
 /-!
 # `L²` inner product space structure on finite products of inner product spaces
@@ -141,13 +143,6 @@ variable [Fintype ι]
 theorem finrank_euclideanSpace :
     Module.finrank 𝕜 (EuclideanSpace 𝕜 ι) = Fintype.card ι := by
   simp [EuclideanSpace, PiLp, WithLp]
-
-theorem finrank_euclideanSpace_fin {n : ℕ} :
-    Module.finrank 𝕜 (EuclideanSpace 𝕜 (Fin n)) = n := by simp
-
-theorem EuclideanSpace.inner_eq_star_dotProduct (x y : EuclideanSpace 𝕜 ι) :
-    ⟪x, y⟫ = Matrix.dotProduct (star <| WithLp.equiv _ _ x) (WithLp.equiv _ _ y) :=
-  rfl
 
 theorem EuclideanSpace.inner_piLp_equiv_symm (x y : ι → 𝕜) :
     ⟪(WithLp.equiv 2 _).symm x, (WithLp.equiv 2 _).symm y⟫ = Matrix.dotProduct (star x) y :=
@@ -393,12 +388,6 @@ protected theorem map_apply {G : Type*} [NormedAddCommGroup G] [InnerProductSpac
     (b : OrthonormalBasis ι 𝕜 E) (L : E ≃ₗᵢ[𝕜] G) (i : ι) : b.map L i = L (b i) :=
   rfl
 
-@[simp]
-protected theorem toBasis_map {G : Type*} [NormedAddCommGroup G] [InnerProductSpace 𝕜 G]
-    (b : OrthonormalBasis ι 𝕜 E) (L : E ≃ₗᵢ[𝕜] G) :
-    (b.map L).toBasis = b.toBasis.map L.toLinearEquiv :=
-  rfl
-
 def _root_.Basis.toOrthonormalBasis (v : Basis ι 𝕜 E) (hv : Orthonormal 𝕜 v) :
     OrthonormalBasis ι 𝕜 E :=
   OrthonormalBasis.ofRepr <|
@@ -412,16 +401,6 @@ def _root_.Basis.toOrthonormalBasis (v : Basis ι 𝕜 E) (hv : Orthonormal 𝕜
         convert key
         · rw [← v.equivFun.symm_apply_apply x, v.equivFun_symm_apply]
         · rw [← v.equivFun.symm_apply_apply y, v.equivFun_symm_apply])
-
-@[simp]
-theorem _root_.Basis.coe_toOrthonormalBasis_repr (v : Basis ι 𝕜 E) (hv : Orthonormal 𝕜 v) :
-    ((v.toOrthonormalBasis hv).repr : E → EuclideanSpace 𝕜 ι) = v.equivFun :=
-  rfl
-
-@[simp]
-theorem _root_.Basis.coe_toOrthonormalBasis_repr_symm (v : Basis ι 𝕜 E) (hv : Orthonormal 𝕜 v) :
-    ((v.toOrthonormalBasis hv).repr.symm : EuclideanSpace 𝕜 ι → E) = v.equivFun.symm :=
-  rfl
 
 @[simp]
 theorem _root_.Basis.toBasis_toOrthonormalBasis (v : Basis ι 𝕜 E) (hv : Orthonormal 𝕜 v) :
@@ -467,13 +446,6 @@ theorem _root_.Pi.orthonormalBasis_apply {η : Type*} [Fintype η] [DecidableEq 
   obtain rfl | hi := Decidable.eq_or_ne i k
   · simp only [Pi.single_eq_same, WithLp.equiv_symm_single, OrthonormalBasis.repr_symm_single]
   · simp only [Pi.single_eq_of_ne' hi, WithLp.equiv_symm_zero, _root_.map_zero]
-
-@[simp]
-theorem _root_.Pi.orthonormalBasis_repr {η : Type*} [Fintype η] {ι : η → Type*}
-    [∀ i, Fintype (ι i)] {𝕜 : Type*} [RCLike 𝕜] {E : η → Type*} [∀ i, NormedAddCommGroup (E i)]
-    [∀ i, InnerProductSpace 𝕜 (E i)] (B : ∀ i, OrthonormalBasis (ι i) 𝕜 (E i)) (x : (i : η ) → E i)
-    (j : (i : η) × (ι i)) :
-    (Pi.orthonormalBasis B).repr x j = (B j.fst).repr (x j.fst) j.snd := rfl
 
 variable {v : ι → E}
 
@@ -570,11 +542,6 @@ noncomputable def basisFun : OrthonormalBasis ι 𝕜 (EuclideanSpace 𝕜 ι) :
 theorem basisFun_apply [DecidableEq ι] (i : ι) : basisFun ι 𝕜 i = EuclideanSpace.single i 1 :=
   PiLp.basisFun_apply _ _ _ _
 
-@[simp]
-theorem basisFun_repr (x : EuclideanSpace 𝕜 ι) (i : ι) : (basisFun ι 𝕜).repr x i = x i := rfl
-
-theorem basisFun_toBasis : (basisFun ι 𝕜).toBasis = PiLp.basisFun _ 𝕜 ι := rfl
-
 end EuclideanSpace
 
 instance OrthonormalBasis.instInhabited : Inhabited (OrthonormalBasis ι 𝕜 (EuclideanSpace 𝕜 ι)) :=
@@ -587,16 +554,6 @@ def Complex.orthonormalBasisOneI : OrthonormalBasis (Fin 2) ℝ ℂ :=
     (by
       rw [orthonormal_iff_ite]
       intro i; fin_cases i <;> intro j <;> fin_cases j <;> simp [real_inner_eq_re_inner])
-
-@[simp]
-theorem Complex.orthonormalBasisOneI_repr_apply (z : ℂ) :
-    Complex.orthonormalBasisOneI.repr z = ![z.re, z.im] :=
-  rfl
-
-@[simp]
-theorem Complex.orthonormalBasisOneI_repr_symm_apply (x : EuclideanSpace ℝ (Fin 2)) :
-    Complex.orthonormalBasisOneI.repr.symm x = x 0 + x 1 * I :=
-  rfl
 
 @[simp]
 theorem Complex.toBasis_orthonormalBasisOneI :
@@ -809,7 +766,11 @@ end SubordinateOrthonormalBasis
 
 end FiniteDimensional
 
--- DISSOLVED: OrthonormalBasis.fromOrthogonalSpanSingleton
+def OrthonormalBasis.fromOrthogonalSpanSingleton (n : ℕ) [Fact (finrank 𝕜 E = n + 1)] {v : E}
+    (hv : v ≠ 0) : OrthonormalBasis (Fin n) 𝕜 (𝕜 ∙ v)ᗮ :=
+  -- Porting note: was `attribute [local instance] FiniteDimensional.of_fact_finrank_eq_succ`
+  haveI : FiniteDimensional 𝕜 E := .of_fact_finrank_eq_succ (K := 𝕜) (V := E) n
+  (stdOrthonormalBasis _ _).reindex <| finCongr <| finrank_orthogonal_span_singleton hv
 
 section LinearIsometry
 
@@ -897,41 +858,7 @@ def toEuclideanLin : Matrix m n 𝕜 ≃ₗ[𝕜] EuclideanSpace 𝕜 n →ₗ[�
     LinearEquiv.arrowCongr (WithLp.linearEquiv _ 𝕜 (n → 𝕜)).symm
       (WithLp.linearEquiv _ 𝕜 (m → 𝕜)).symm
 
-@[simp]
-theorem toEuclideanLin_piLp_equiv_symm (A : Matrix m n 𝕜) (x : n → 𝕜) :
-    Matrix.toEuclideanLin A ((WithLp.equiv _ _).symm x) =
-      (WithLp.equiv _ _).symm (Matrix.toLin' A x) :=
-  rfl
-
-@[simp]
-theorem piLp_equiv_toEuclideanLin (A : Matrix m n 𝕜) (x : EuclideanSpace 𝕜 n) :
-    WithLp.equiv _ _ (Matrix.toEuclideanLin A x) = Matrix.toLin' A (WithLp.equiv _ _ x) :=
-  rfl
-
-theorem toEuclideanLin_apply (M : Matrix m n 𝕜) (v : EuclideanSpace 𝕜 n) :
-    toEuclideanLin M v = (WithLp.equiv 2 (m → 𝕜)).symm (M *ᵥ (WithLp.equiv 2 (n → 𝕜)) v) :=
-  rfl
-
-@[simp]
-theorem piLp_equiv_toEuclideanLin_apply (M : Matrix m n 𝕜) (v : EuclideanSpace 𝕜 n) :
-    WithLp.equiv 2 (m → 𝕜) (toEuclideanLin M v) = M *ᵥ WithLp.equiv 2 (n → 𝕜) v :=
-  rfl
-
-@[simp]
-theorem toEuclideanLin_apply_piLp_equiv_symm (M : Matrix m n 𝕜) (v : n → 𝕜) :
-    toEuclideanLin M ((WithLp.equiv 2 (n→ 𝕜)).symm v) = (WithLp.equiv 2 (m → 𝕜)).symm (M *ᵥ v) :=
-  rfl
-
-theorem toEuclideanLin_eq_toLin [Finite m] :
-    (toEuclideanLin : Matrix m n 𝕜 ≃ₗ[𝕜] _) =
-      Matrix.toLin (PiLp.basisFun _ _ _) (PiLp.basisFun _ _ _) :=
-  rfl
-
 open EuclideanSpace in
-
-lemma toEuclideanLin_eq_toLin_orthonormal [Fintype m] :
-    toEuclideanLin = toLin (basisFun n 𝕜).toBasis (basisFun m 𝕜).toBasis :=
-  rfl
 
 end Matrix
 
@@ -942,9 +869,5 @@ theorem inner_matrix_row_row [Fintype n] (A B : Matrix m n 𝕜) (i j : m) :
     ⟪A i, B j⟫ₑ = (B * Aᴴ) j i := by
   simp_rw [EuclideanSpace.inner_piLp_equiv_symm, Matrix.mul_apply', Matrix.dotProduct_comm,
     Matrix.conjTranspose_apply, Pi.star_def]
-
-theorem inner_matrix_col_col [Fintype m] (A B : Matrix m n 𝕜) (i j : n) :
-    ⟪Aᵀ i, Bᵀ j⟫ₑ = (Aᴴ * B) i j :=
-  rfl
 
 end Matrix

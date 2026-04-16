@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Matrix/Mul.lean
-Genuine: 125 | Conflates: 0 | Dissolved: 3 | Infrastructure: 17
+Genuine: 128 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Matrix.Diagonal
+
+noncomputable section
 
 /-!
 # Matrix multiplication
@@ -238,10 +240,6 @@ theorem mul_apply [Fintype m] [Mul α] [AddCommMonoid α] {M : Matrix l m α} {N
 
 instance [Fintype n] [Mul α] [AddCommMonoid α] : Mul (Matrix n n α) where mul M N := M * N
 
-theorem mul_apply' [Fintype m] [Mul α] [AddCommMonoid α] {M : Matrix l m α} {N : Matrix m n α}
-    {i k} : (M * N) i k = (fun j => M i j) ⬝ᵥ fun j => N j k :=
-  rfl
-
 theorem two_mul_expl {R : Type*} [CommRing R] (A B : Matrix (Fin 2) (Fin 2) R) :
     (A * B) 0 0 = A 0 0 * B 0 0 + A 0 1 * B 1 0 ∧
     (A * B) 0 1 = A 0 0 * B 0 1 + A 0 1 * B 1 1 ∧
@@ -273,9 +271,15 @@ section NonUnitalNonAssocSemiring
 
 variable [NonUnitalNonAssocSemiring α]
 
--- DISSOLVED: mul_zero
+@[simp]
+protected theorem mul_zero [Fintype n] (M : Matrix m n α) : M * (0 : Matrix n o α) = 0 := by
+  ext
+  apply dotProduct_zero
 
--- DISSOLVED: zero_mul
+@[simp]
+protected theorem zero_mul [Fintype m] (M : Matrix m n α) : (0 : Matrix l m α) * M = 0 := by
+  ext
+  apply zero_dotProduct
 
 protected theorem mul_add [Fintype n] (L : Matrix m n α) (M N : Matrix n o α) :
     L * (M + N) = L * M + L * N := by
@@ -492,9 +496,6 @@ namespace Matrix
 def vecMulVec [Mul α] (w : m → α) (v : n → α) : Matrix m n α :=
   of fun x y => w x * v y
 
-theorem vecMulVec_apply [Mul α] (w : m → α) (v : n → α) (i j) : vecMulVec w v i j = w i * v j :=
-  rfl
-
 section NonUnitalNonAssocSemiring
 
 variable [NonUnitalNonAssocSemiring α]
@@ -519,10 +520,6 @@ def mulVec.addMonoidHomLeft [Fintype n] (v : n → α) : Matrix m n α →+ m �
     ext m
     apply add_dotProduct
 
-theorem mul_apply_eq_vecMul [Fintype n] (A : Matrix m n α) (B : Matrix n o α) (i : m) :
-    (A * B) i = A i ᵥ* B :=
-  rfl
-
 theorem mulVec_diagonal [Fintype m] [DecidableEq m] (v w : m → α) (x : m) :
     (diagonal v *ᵥ w) x = v x * w x :=
   diagonal_dotProduct v w x
@@ -546,7 +543,10 @@ theorem zero_vecMul [Fintype m] (A : Matrix m n α) : 0 ᵥ* A = 0 := by
   ext
   simp [vecMul]
 
--- DISSOLVED: zero_mulVec
+@[simp]
+theorem zero_mulVec [Fintype n] (v : n → α) : (0 : Matrix m n α) *ᵥ v = 0 := by
+  ext
+  simp [mulVec]
 
 @[simp]
 theorem vecMul_zero [Fintype m] (v : m → α) : v ᵥ* (0 : Matrix m n α) = 0 := by
@@ -603,10 +603,6 @@ theorem single_vecMul [Fintype m] [DecidableEq m] [NonUnitalNonAssocSemiring R] 
 theorem mulVec_single_one [Fintype n] [DecidableEq n] [NonAssocSemiring R]
     (M : Matrix m n R) (j : n) :
     M *ᵥ Pi.single j 1 = Mᵀ j := by ext; simp
-
-theorem single_one_vecMul [Fintype m] [DecidableEq m] [NonAssocSemiring R]
-    (i : m) (M : Matrix m n R) :
-    Pi.single i 1 ᵥ* M = M i := by simp
 
 theorem diagonal_mulVec_single [Fintype n] [DecidableEq n] [NonUnitalNonAssocSemiring R] (v : n → R)
     (j : n) (x : R) : diagonal v *ᵥ Pi.single j x = Pi.single j (v j * x) := by

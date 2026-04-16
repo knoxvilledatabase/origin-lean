@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Linear
 import Mathlib.Analysis.Calculus.FDeriv.Comp
 
+noncomputable section
+
 /-!
 # Derivative of the cartesian product of functions
 
@@ -413,15 +415,6 @@ theorem hasFDerivWithinAt_pi' :
 theorem hasFDerivWithinAt_pi''
     (hφ : ∀ i, HasFDerivWithinAt (fun x => Φ x i) ((proj i).comp Φ') s x) :
     HasFDerivWithinAt Φ Φ' s x := hasFDerivWithinAt_pi'.2 hφ
-
-@[fun_prop]
-theorem hasFDerivWithinAt_apply (i : ι) (f : ∀ i, F' i) (s' : Set (∀ i, F' i)) :
-    HasFDerivWithinAt (𝕜 := 𝕜) (fun f : ∀ i, F' i => f i) (proj i) s' f := by
-  let id' := ContinuousLinearMap.id 𝕜 (∀ i, F' i)
-  have h := ((hasFDerivWithinAt_pi'
-             (Φ := fun (f : ∀ i, F' i) (i' : ι) => f i') (Φ' := id') (x := f) (s := s'))).1
-  have h' : comp (proj i) id' = proj i := by rfl
-  rw [← h']; apply h; apply hasFDerivWithinAt_id
 
 theorem hasFDerivWithinAt_pi :
     HasFDerivWithinAt (fun x i => φ i x) (ContinuousLinearMap.pi φ') s x ↔

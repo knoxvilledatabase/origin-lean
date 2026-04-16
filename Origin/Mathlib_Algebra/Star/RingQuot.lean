@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.RingQuot
 import Mathlib.Algebra.Star.Basic
 
+noncomputable section
+
 /-!
 # The *-ring structure on suitable quotients of a *-ring.
 -/

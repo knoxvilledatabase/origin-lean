@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Combinatorics.Derangements.Finite
 import Mathlib.Order.Filter.Tendsto
 
+noncomputable section
+
 /-!
 # Derangement exponential series
 

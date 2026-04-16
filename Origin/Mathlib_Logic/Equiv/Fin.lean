@@ -8,6 +8,8 @@ import Mathlib.Data.Fin.VecNotation
 import Mathlib.Logic.Embedding.Set
 import Mathlib.Logic.Equiv.Option
 
+noncomputable section
+
 /-!
 # Equivalences for `Fin n`
 -/
@@ -67,11 +69,6 @@ theorem finSuccEquiv'_above {i : Fin (n + 1)} {m : Fin n} (h : i ≤ Fin.castSuc
 theorem finSuccEquiv'_symm_none (i : Fin (n + 1)) : (finSuccEquiv' i).symm none = i :=
   rfl
 
-@[simp]
-theorem finSuccEquiv'_symm_some (i : Fin (n + 1)) (j : Fin n) :
-    (finSuccEquiv' i).symm (some j) = i.succAbove j :=
-  rfl
-
 theorem finSuccEquiv'_symm_some_below {i : Fin (n + 1)} {m : Fin n} (h : Fin.castSucc m < i) :
     (finSuccEquiv' i).symm (some m) = Fin.castSucc m :=
   Fin.succAbove_of_castSucc_lt i m h
@@ -92,10 +89,6 @@ def finSuccEquiv (n : ℕ) : Fin (n + 1) ≃ Option (Fin n) :=
   finSuccEquiv' 0
 
 @[simp]
-theorem finSuccEquiv_zero : (finSuccEquiv n) 0 = none :=
-  rfl
-
-@[simp]
 theorem finSuccEquiv_succ (m : Fin n) : (finSuccEquiv n) m.succ = some m :=
   finSuccEquiv'_above (Fin.zero_le _)
 
@@ -106,9 +99,6 @@ theorem finSuccEquiv_symm_none : (finSuccEquiv n).symm none = 0 :=
 @[simp]
 theorem finSuccEquiv_symm_some (m : Fin n) : (finSuccEquiv n).symm (some m) = m.succ :=
   congr_fun Fin.succAbove_zero m
-
-theorem finSuccEquiv'_zero : finSuccEquiv' (0 : Fin (n + 1)) = finSuccEquiv n :=
-  rfl
 
 theorem finSuccEquiv'_last_apply_castSucc (i : Fin n) :
     finSuccEquiv' (Fin.last n) (Fin.castSucc i) = i := by
@@ -128,10 +118,6 @@ theorem finSuccEquiv'_ne_last_apply {i j : Fin (n + 1)} (hi : i ≠ Fin.last n) 
 
 def finSuccAboveEquiv (p : Fin (n + 1)) : Fin n ≃ { x : Fin (n + 1) // x ≠ p } :=
   .optionSubtype p ⟨(finSuccEquiv' p).symm, rfl⟩
-
-theorem finSuccAboveEquiv_apply (p : Fin (n + 1)) (i : Fin n) :
-    finSuccAboveEquiv p i = ⟨p.succAbove i, p.succAbove_ne i⟩ :=
-  rfl
 
 theorem finSuccAboveEquiv_symm_apply_last (x : { x : Fin (n + 1) // x ≠ Fin.last n }) :
     (finSuccAboveEquiv (Fin.last n)).symm x = Fin.castLT x.1 (Fin.val_lt_last x.2) := by
@@ -180,12 +166,6 @@ def Equiv.embeddingFinSucc (n : ℕ) (ι : Type*) :
   ((finSuccEquiv n).embeddingCongr (Equiv.refl ι)).trans
     (Function.Embedding.optionEmbeddingEquiv (Fin n) ι)
 
-@[simp] lemma Equiv.embeddingFinSucc_fst {n : ℕ} {ι : Type*} (e : Fin (n+1) ↪ ι) :
-    ((Equiv.embeddingFinSucc n ι e).1 : Fin n → ι) = e ∘ Fin.succ := rfl
-
-@[simp] lemma Equiv.embeddingFinSucc_snd {n : ℕ} {ι : Type*} (e : Fin (n+1) ↪ ι) :
-    ((Equiv.embeddingFinSucc n ι e).2 : ι) = e 0 := rfl
-
 @[simp] lemma Equiv.coe_embeddingFinSucc_symm {n : ℕ} {ι : Type*}
     (f : Σ (e : Fin n ↪ ι), {i // i ∉ Set.range e}) :
     ((Equiv.embeddingFinSucc n ι).symm f : Fin (n + 1) → ι) = Fin.cons f.2.1 f.1 := by
@@ -201,16 +181,6 @@ def finSumFinEquiv : Fin m ⊕ Fin n ≃ Fin (m + n) where
   invFun i := @Fin.addCases m n (fun _ => Fin m ⊕ Fin n) Sum.inl Sum.inr i
   left_inv x := by cases' x with y y <;> dsimp <;> simp
   right_inv x := by refine Fin.addCases (fun i => ?_) (fun i => ?_) x <;> simp
-
-@[simp]
-theorem finSumFinEquiv_apply_left (i : Fin m) :
-    (finSumFinEquiv (Sum.inl i) : Fin (m + n)) = Fin.castAdd n i :=
-  rfl
-
-@[simp]
-theorem finSumFinEquiv_apply_right (i : Fin n) :
-    (finSumFinEquiv (Sum.inr i) : Fin (m + n)) = Fin.natAdd m i :=
-  rfl
 
 @[simp]
 theorem finSumFinEquiv_symm_apply_castAdd (x : Fin m) :
@@ -252,8 +222,6 @@ theorem finAddFlip_apply_mk_right {k : ℕ} (h₁ : m ≤ k) (h₂ : k < m + n) 
 def finRotate : ∀ n, Equiv.Perm (Fin n)
   | 0 => Equiv.refl _
   | n + 1 => finAddFlip.trans (finCongr (Nat.add_comm 1 n))
-
-@[simp] lemma finRotate_zero : finRotate 0 = Equiv.refl _ := rfl
 
 lemma finRotate_succ (n : ℕ) :
     finRotate (n + 1) = finAddFlip.trans (finCongr (Nat.add_comm 1 n)) := rfl
@@ -342,23 +310,8 @@ def finProdFinEquiv : Fin m × Fin n ≃ Fin (m * n) where
 
 -- DISSOLVED: Int.divModEquiv
 
-@[simps apply symm_apply]
-def Fin.castLEquiv {n m : ℕ} (h : n ≤ m) : Fin n ≃ { i : Fin m // (i : ℕ) < n } where
-  toFun i := ⟨Fin.castLE h i, by simp⟩
-  invFun i := ⟨i, i.prop⟩
-  left_inv _ := by simp
-  right_inv _ := by simp
-
 instance subsingleton_fin_zero : Subsingleton (Fin 0) :=
   finZeroEquiv.subsingleton
 
 instance subsingleton_fin_one : Subsingleton (Fin 1) :=
   finOneEquiv.subsingleton
-
-@[simps]
-def Fin.appendEquiv {α : Type*} (m n : ℕ) :
-    (Fin m → α) × (Fin n → α) ≃ (Fin (m + n) → α) where
-  toFun fg := Fin.append fg.1 fg.2
-  invFun f := ⟨fun i ↦ f (Fin.castAdd n i), fun i ↦ f (Fin.natAdd m i)⟩
-  left_inv fg := by simp
-  right_inv f := by simp [Fin.append_castAdd_natAdd]

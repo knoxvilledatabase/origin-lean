@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Connected/PathConnected.lean
-Genuine: 141 | Conflates: 0 | Dissolved: 1 | Infrastructure: 40
+Genuine: 142 | Conflates: 0 | Dissolved: 0 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Topology.Order.ProjIcc
 import Mathlib.Topology.CompactOpen
 import Mathlib.Topology.UnitInterval
+
+noncomputable section
 
 /-!
 # Path connectedness
@@ -111,10 +113,6 @@ def simps.apply : I → X :=
   γ
 
 initialize_simps_projections Path (toFun → simps.apply, -toContinuousMap)
-
-@[simp]
-theorem coe_toContinuousMap : ⇑γ.toContinuousMap = γ :=
-  rfl
 
 @[simp]
 theorem coe_mk : ⇑(γ : C(I, X)) = γ :=
@@ -320,12 +318,6 @@ theorem trans_range {a b c : X} (γ₁ : Path a b) (γ₂ : Path b c) :
         ring_nf
         rwa [γ₂.extend_extends]
 
-def map' (γ : Path x y) {f : X → Y} (h : ContinuousOn f (range γ)) : Path (f x) (f y) where
-  toFun := f ∘ γ
-  continuous_toFun := h.comp_continuous γ.continuous (fun x ↦ mem_range_self x)
-  source' := by simp
-  target' := by simp
-
 def map (γ : Path x y) {f : X → Y} (h : Continuous f) :
     Path (f x) (f y) := γ.map' h.continuousOn
 
@@ -333,11 +325,6 @@ def map (γ : Path x y) {f : X → Y} (h : Continuous f) :
 theorem map_coe (γ : Path x y) {f : X → Y} (h : Continuous f) :
     (γ.map h : I → Y) = f ∘ γ := by
   ext t
-  rfl
-
-@[simp]
-theorem map_symm (γ : Path x y) {f : X → Y} (h : Continuous f) :
-    (γ.map h).symm = γ.symm.map h :=
   rfl
 
 @[simp]
@@ -364,17 +351,6 @@ def cast (γ : Path x y) {x' y'} (hx : x' = x) (hy : y' = y) : Path x' y' where
   continuous_toFun := γ.continuous
   source' := by simp [hx]
   target' := by simp [hy]
-
-@[simp]
-theorem symm_cast {a₁ a₂ b₁ b₂ : X} (γ : Path a₂ b₂) (ha : a₁ = a₂) (hb : b₁ = b₂) :
-    (γ.cast ha hb).symm = γ.symm.cast hb ha :=
-  rfl
-
-@[simp]
-theorem trans_cast {a₁ a₂ b₁ b₂ c₁ c₂ : X} (γ : Path a₂ b₂)
-    (γ' : Path b₂ c₂) (ha : a₁ = a₂) (hb : b₁ = b₂) (hc : c₁ = c₂) :
-    (γ.cast ha hb).trans (γ'.cast hb hc) = (γ.trans γ').cast ha hc :=
-  rfl
 
 @[simp]
 theorem cast_coe (γ : Path x y) {x' y'} (hx : x' = x) (hy : y' = y) : (γ.cast hx hy : I → X) = γ :=
@@ -484,11 +460,6 @@ protected def mul [Mul X] [ContinuousMul X] {a₁ b₁ a₂ b₂ : X} (γ₁ : P
     Path (a₁ * a₂) (b₁ * b₂) :=
   (γ₁.prod γ₂).map continuous_mul
 
-@[to_additive]
-protected theorem mul_apply [Mul X] [ContinuousMul X] {a₁ b₁ a₂ b₂ : X} (γ₁ : Path a₁ b₁)
-    (γ₂ : Path a₂ b₂) (t : unitInterval) : (γ₁.mul γ₂) t = γ₁ t * γ₂ t :=
-  rfl
-
 /-! #### Truncating a path -/
 
 def truncate {X : Type*} [TopologicalSpace X] {a b : X} (γ : Path a b) (t₀ t₁ : ℝ) :
@@ -553,7 +524,10 @@ theorem truncate_zero_zero {a b : X} (γ : Path a b) :
     γ.truncate 0 0 = (Path.refl a).cast (by rw [min_self, γ.extend_zero]) γ.extend_zero := by
   convert γ.truncate_self 0
 
--- DISSOLVED: truncate_one_one
+@[simp 1001] -- Porting note: increase `simp` priority so left-hand side doesn't simplify
+theorem truncate_one_one {a b : X} (γ : Path a b) :
+    γ.truncate 1 1 = (Path.refl b).cast (by rw [min_self, γ.extend_one]) γ.extend_one := by
+  convert γ.truncate_self 1
 
 @[simp]
 theorem truncate_zero_one {a b : X} (γ : Path a b) :
@@ -571,11 +545,6 @@ def reparam (γ : Path x y) (f : I → I) (hfcont : Continuous f) (hf₀ : f 0 =
   continuous_toFun := by fun_prop
   source' := by simp [hf₀]
   target' := by simp [hf₁]
-
-@[simp]
-theorem coe_reparam (γ : Path x y) {f : I → I} (hfcont : Continuous f) (hf₀ : f 0 = 0)
-    (hf₁ : f 1 = 1) : ⇑(γ.reparam f hfcont hf₀ hf₁) = γ ∘ f :=
-  rfl
 
 @[simp]
 theorem reparam_id (γ : Path x y) : γ.reparam id continuous_id rfl rfl = γ := by
@@ -660,13 +629,6 @@ def JoinedIn.somePath (h : JoinedIn F x y) : Path x y :=
 
 theorem JoinedIn.somePath_mem (h : JoinedIn F x y) (t : I) : h.somePath t ∈ F :=
   Classical.choose_spec h t
-
-theorem JoinedIn.joined_subtype (h : JoinedIn F x y) :
-    Joined (⟨x, h.source_mem⟩ : F) (⟨y, h.target_mem⟩ : F) :=
-  ⟨{  toFun := fun t => ⟨h.somePath t, h.somePath_mem t⟩
-      continuous_toFun := by fun_prop
-      source' := by simp
-      target' := by simp }⟩
 
 theorem JoinedIn.ofLine {f : ℝ → X} (hf : ContinuousOn f I) (h₀ : f 0 = x) (h₁ : f 1 = y)
     (hF : f '' I ⊆ F) : JoinedIn F x y :=

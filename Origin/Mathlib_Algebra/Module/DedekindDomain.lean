@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Torsion
 import Mathlib.RingTheory.DedekindDomain.Ideal
 
+noncomputable section
+
 /-!
 # Modules over a Dedekind domain
 

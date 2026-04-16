@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Constructions
 
+noncomputable section
+
 /-!
 # Bundled morphisms with continuous evaluation at a point
 

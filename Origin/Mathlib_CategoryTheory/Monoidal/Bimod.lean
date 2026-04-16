@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Bicategory.Basic
 import Mathlib.CategoryTheory.Monoidal.Mon_
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Equalizers
 
+noncomputable section
+
 /-!
 # The category of bimodule objects over a pair of monoid objects.
 -/
@@ -118,15 +120,6 @@ instance : Category (Bimod A B) where
 @[ext]
 lemma hom_ext {M N : Bimod A B} (f g : M ⟶ N) (h : f.hom = g.hom) : f = g :=
   Hom.ext h
-
-@[simp]
-theorem id_hom' (M : Bimod A B) : (𝟙 M : Hom M M).hom = 𝟙 M.X :=
-  rfl
-
-@[simp]
-theorem comp_hom' {M N K : Bimod A B} (f : M ⟶ N) (g : N ⟶ K) :
-    (f ≫ g : Hom M K).hom = f.hom ≫ g.hom :=
-  rfl
 
 @[simps]
 def isoOfIso {X Y : Mon_ C} {P Q : Bimod X Y} (f : P.X ≅ Q.X)

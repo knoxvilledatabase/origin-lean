@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.Tactic.NormNum.Basic
 
+noncomputable section
+
 /-!
 ## `norm_num` plugin for `^`.
 -/
@@ -151,6 +153,9 @@ theorem isRat_pow {α} [Ring α] {f : α → ℕ → α} {a : α} {an cn : ℤ} 
   use this; simp [invOf_pow, Commute.mul_pow]
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a ^ b`,
+
+such that `norm_num` successfully recognises both `a` and `b`, with `b : ℕ`. -/
 
 @[norm_num _ ^ (_ : ℕ)]
 def evalPow : NormNumExt where eval {u α} e := do

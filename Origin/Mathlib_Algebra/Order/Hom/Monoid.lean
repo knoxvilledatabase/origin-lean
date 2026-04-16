@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Hom/Monoid.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 7 | Infrastructure: 71
+Genuine: 53 | Conflates: 0 | Dissolved: 5 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Hom
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Instances
 import Mathlib.Algebra.Order.GroupWithZero.Canonical
 import Mathlib.Algebra.Order.Monoid.Units
 import Mathlib.Order.Hom.Basic
+
+noncomputable section
 
 /-!
 # Ordered monoid and group homomorphisms
@@ -141,7 +143,10 @@ section MonoidWithZero
 
 variable [Preorder α] [Preorder β] [MulZeroOneClass α] [MulZeroOneClass β]
 
--- DISSOLVED: OrderMonoidWithZeroHom
+structure OrderMonoidWithZeroHom (α β : Type*) [Preorder α] [Preorder β] [MulZeroOneClass α]
+  [MulZeroOneClass β] extends α →*₀ β where
+  /-- An `OrderMonoidWithZeroHom` is a monotone function. -/
+  monotone' : Monotone toFun
 
 infixr:25 " →*₀o " => OrderMonoidWithZeroHom
 
@@ -149,7 +154,9 @@ section
 
 variable [FunLike F α β]
 
--- DISSOLVED: OrderMonoidWithZeroHomClass.toOrderMonoidWithZeroHom
+@[coe]
+def OrderMonoidWithZeroHomClass.toOrderMonoidWithZeroHom [OrderHomClass F α β]
+    [MonoidWithZeroHomClass F α β] (f : F) : α →*₀o β :=
 
 { (f : α →*₀ β) with monotone' := OrderHomClass.monotone f }
 
@@ -253,30 +260,9 @@ instance : MonoidHomClass (α →*o β) α β where
 theorem ext (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
-@[to_additive]
-theorem toFun_eq_coe (f : α →*o β) : f.toFun = (f : α → β) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_mk (f : α →* β) (h) : (OrderMonoidHom.mk f h : α → β) = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_coe (f : α →*o β) (h) : OrderMonoidHom.mk (f : α →* β) h = f := by
-  ext
-  rfl
-
 @[to_additive "Reinterpret an ordered additive monoid homomorphism as an order homomorphism."]
 def toOrderHom (f : α →*o β) : α →o β :=
   { f with }
-
-@[to_additive (attr := simp)]
-theorem coe_monoidHom (f : α →*o β) : ((f : α →* β) : α → β) = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_orderHom (f : α →*o β) : ((f : α →o β) : α → β) = f :=
-  rfl
 
 @[to_additive]
 theorem toMonoidHom_injective : Injective (toMonoidHom : _ → α →* β) := fun f g h =>
@@ -291,10 +277,6 @@ definitional equalities."]
 protected def copy (f : α →*o β) (f' : α → β) (h : f' = f) : α →*o β :=
   { f.toMonoidHom.copy f' h with toFun := f', monotone' := h.symm.subst f.monotone' }
 
-@[to_additive (attr := simp)]
-theorem coe_copy (f : α →*o β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 @[to_additive]
 theorem copy_eq (f : α →*o β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -304,10 +286,6 @@ variable (α)
 @[to_additive "The identity map as an ordered additive monoid homomorphism."]
 protected def id : α →*o α :=
   { MonoidHom.id α, OrderHom.id with }
-
-@[to_additive (attr := simp)]
-theorem coe_id : ⇑(OrderMonoidHom.id α) = id :=
-  rfl
 
 @[to_additive]
 instance : Inhabited (α →*o α) :=
@@ -320,34 +298,7 @@ def comp (f : β →*o γ) (g : α →*o β) : α →*o γ :=
   { f.toMonoidHom.comp (g : α →* β), f.toOrderHom.comp (g : α →o β) with }
 
 @[to_additive (attr := simp)]
-theorem coe_comp (f : β →*o γ) (g : α →*o β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem comp_apply (f : β →*o γ) (g : α →*o β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[to_additive]
-theorem coe_comp_monoidHom (f : β →*o γ) (g : α →*o β) :
-    (f.comp g : α →* γ) = (f : β →* γ).comp g :=
-  rfl
-
-@[to_additive]
-theorem coe_comp_orderHom (f : β →*o γ) (g : α →*o β) :
-    (f.comp g : α →o γ) = (f : β →o γ).comp g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem comp_assoc (f : γ →*o δ) (g : β →*o γ) (h : α →*o β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem comp_id (f : α →*o β) : f.comp (OrderMonoidHom.id α) = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem id_comp (f : α →*o β) : (OrderMonoidHom.id β).comp f = f :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -365,18 +316,6 @@ instance : One (α →*o β) :=
   ⟨{ (1 : α →* β) with monotone' := monotone_const }⟩
 
 @[to_additive (attr := simp)]
-theorem coe_one : ⇑(1 : α →*o β) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem one_apply (a : α) : (1 : α →*o β) a = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem one_comp (f : α →*o β) : (1 : β →*o γ).comp f = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem comp_one (f : β →*o γ) : f.comp (1 : α →*o β) = 1 :=
   ext fun _ => map_one f
 
@@ -391,18 +330,6 @@ additive monoid morphism sending `a` to `f a + g a`."]
 instance : Mul (α →*o β) :=
   ⟨fun f g => { (f * g : α →* β) with monotone' := f.monotone'.mul' g.monotone' }⟩
 
-@[to_additive (attr := simp)]
-theorem coe_mul (f g : α →*o β) : ⇑(f * g) = f * g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mul_apply (f g : α →*o β) (a : α) : (f * g) a = f a * g a :=
-  rfl
-
-@[to_additive]
-theorem mul_comp (g₁ g₂ : β →*o γ) (f : α →*o β) : (g₁ * g₂).comp f = g₁.comp f * g₂.comp f :=
-  rfl
-
 @[to_additive]
 theorem comp_mul (g : β →*o γ) (f₁ f₂ : α →*o β) : g.comp (f₁ * f₂) = g.comp f₁ * g.comp f₂ :=
   ext fun _ => map_mul g _ _
@@ -412,14 +339,6 @@ end Mul
 section OrderedCommMonoid
 
 variable {hα : OrderedCommMonoid α} {hβ : OrderedCommMonoid β}
-
-@[to_additive (attr := simp)]
-theorem toMonoidHom_eq_coe (f : α →*o β) : f.toMonoidHom = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem toOrderHom_eq_coe (f : α →*o β) : f.toOrderHom = f :=
-  rfl
 
 end OrderedCommMonoid
 
@@ -467,29 +386,10 @@ instance : MulEquivClass (α ≃*o β) α β where
 theorem ext (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
-@[to_additive]
-theorem toFun_eq_coe (f : α ≃*o β) : f.toFun = (f : α → β) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_mk (f : α ≃* β) (h) : (OrderMonoidIso.mk f h : α → β) = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_coe (f : α ≃*o β) (h) : OrderMonoidIso.mk (f : α ≃* β) h = f := rfl
-
 @[to_additive "Reinterpret an ordered additive monoid isomomorphism as an order isomomorphism."]
 def toOrderIso (f : α ≃*o β) : α ≃o β :=
   { f with
     map_rel_iff' := map_le_map_iff f }
-
-@[to_additive (attr := simp)]
-theorem coe_mulEquiv (f : α ≃*o β) : ((f : α ≃* β) : α → β) = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_orderIso (f : α ≃*o β) : ((f : α →o β) : α → β) = f :=
-  rfl
 
 @[to_additive]
 theorem toMulEquiv_injective : Injective (toMulEquiv : _ → α ≃* β) := fun f g h =>
@@ -505,10 +405,6 @@ variable (α)
 protected def refl : α ≃*o α :=
   { MulEquiv.refl α with map_le_map_iff' := by simp }
 
-@[to_additive (attr := simp)]
-theorem coe_refl : ⇑(OrderMonoidIso.refl α) = id :=
-  rfl
-
 @[to_additive]
 instance : Inhabited (α ≃*o α) :=
   ⟨OrderMonoidIso.refl α⟩
@@ -520,34 +416,7 @@ def trans (f : α ≃*o β) (g : β ≃*o γ) : α ≃*o γ :=
   { (f : α ≃* β).trans g with map_le_map_iff' := by simp }
 
 @[to_additive (attr := simp)]
-theorem coe_trans (f : α ≃*o β) (g : β ≃*o γ) : (f.trans g : α → γ) = g ∘ f :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem trans_apply (f : α ≃*o β) (g : β ≃*o γ) (a : α) : (f.trans g) a = g (f a) :=
-  rfl
-
-@[to_additive]
-theorem coe_trans_mulEquiv (f : α ≃*o β) (g : β ≃*o γ) :
-    (f.trans g : α ≃* γ) = (f : α ≃* β).trans g :=
-  rfl
-
-@[to_additive]
-theorem coe_trans_orderIso (f : α ≃*o β) (g : β ≃*o γ) :
-    (f.trans g : α ≃o γ) = (f : α ≃o β).trans g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem trans_assoc (f : α ≃*o β) (g : β ≃*o γ) (h : γ ≃*o δ) :
-    (f.trans g).trans h = f.trans (g.trans h) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem trans_refl (f : α ≃*o β) : f.trans (OrderMonoidIso.refl β) = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem refl_trans (f : α ≃*o β) : (OrderMonoidIso.refl α).trans f = f :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -559,14 +428,6 @@ theorem cancel_right {g₁ g₂ : α ≃*o β} {f : β ≃*o γ} (hf : Function.
 theorem cancel_left {g : α ≃*o β} {f₁ f₂ : β ≃*o γ} (hg : Function.Surjective g) :
     g.trans f₁ = g.trans f₂ ↔ f₁ = f₂ :=
   ⟨fun h => ext <| hg.forall.2 <| DFunLike.ext_iff.1 h, fun _ => by congr⟩
-
-@[to_additive (attr := simp)]
-theorem toMulEquiv_eq_coe (f : α ≃*o β) : f.toMulEquiv = f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem toOrderIso_eq_coe (f : α ≃*o β) : f.toOrderIso = f :=
-  rfl
 
 variable (f)
 
@@ -624,24 +485,10 @@ instance : OrderHomClass (α →*₀o β) α β where
 theorem ext (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
-theorem toFun_eq_coe (f : α →*₀o β) : f.toFun = (f : α → β) :=
-  rfl
-
-@[simp]
-theorem coe_mk (f : α →*₀ β) (h) : (OrderMonoidWithZeroHom.mk f h : α → β) = f :=
-  rfl
-
-@[simp]
-theorem mk_coe (f : α →*₀o β) (h) : OrderMonoidWithZeroHom.mk (f : α →*₀ β) h = f := rfl
-
 def toOrderMonoidHom (f : α →*₀o β) : α →*o β :=
   { f with }
 
 -- DISSOLVED: coe_monoidWithZeroHom
-
-@[simp]
-theorem coe_orderMonoidHom (f : α →*₀o β) : ⇑(f : α →*o β) = f :=
-  rfl
 
 theorem toOrderMonoidHom_injective : Injective (toOrderMonoidHom : _ → α →*o β) := fun f g h =>
   ext <| by convert DFunLike.ext_iff.1 h using 0
@@ -651,10 +498,6 @@ theorem toOrderMonoidHom_injective : Injective (toOrderMonoidHom : _ → α →*
 protected def copy (f : α →*₀o β) (f' : α → β) (h : f' = f) : α →*o β :=
   { f.toOrderMonoidHom.copy f' h, f.toMonoidWithZeroHom.copy f' h with toFun := f' }
 
-@[simp]
-theorem coe_copy (f : α →*₀o β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : α →*₀o β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -662,10 +505,6 @@ variable (α)
 
 protected def id : α →*₀o α :=
   { MonoidWithZeroHom.id α, OrderHom.id with }
-
-@[simp]
-theorem coe_id : ⇑(OrderMonoidWithZeroHom.id α) = id :=
-  rfl
 
 instance : Inhabited (α →*₀o α) :=
   ⟨OrderMonoidWithZeroHom.id α⟩
@@ -676,29 +515,10 @@ def comp (f : β →*₀o γ) (g : α →*₀o β) : α →*₀o γ :=
   { f.toMonoidWithZeroHom.comp (g : α →*₀ β), f.toOrderMonoidHom.comp (g : α →*o β) with }
 
 @[simp]
-theorem coe_comp (f : β →*₀o γ) (g : α →*₀o β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : β →*₀o γ) (g : α →*₀o β) (a : α) : (f.comp g) a = f (g a) :=
   rfl
 
 -- DISSOLVED: coe_comp_monoidWithZeroHom
-
-theorem coe_comp_orderMonoidHom (f : β →*₀o γ) (g : α →*₀o β) :
-    (f.comp g : α →*o γ) = (f : β →*o γ).comp g :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : γ →*₀o δ) (g : β →*₀o γ) (h : α →*₀o β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
-  rfl
-
-@[simp]
-theorem comp_id (f : α →*₀o β) : f.comp (OrderMonoidWithZeroHom.id α) = f := rfl
-
-@[simp]
-theorem id_comp (f : α →*₀o β) : (OrderMonoidWithZeroHom.id β).comp f = f := rfl
 
 @[simp]
 theorem cancel_right {g₁ g₂ : β →*₀o γ} {f : α →*₀o β} (hf : Function.Surjective f) :
@@ -720,17 +540,6 @@ variable [LinearOrderedCommMonoidWithZero α] [LinearOrderedCommMonoidWithZero �
 instance : Mul (α →*₀o β) :=
   ⟨fun f g => { (f * g : α →*₀ β) with monotone' := f.monotone'.mul' g.monotone' }⟩
 
-@[simp]
-theorem coe_mul (f g : α →*₀o β) : ⇑(f * g) = f * g :=
-  rfl
-
-@[simp]
-theorem mul_apply (f g : α →*₀o β) (a : α) : (f * g) a = f a * g a :=
-  rfl
-
-theorem mul_comp (g₁ g₂ : β →*₀o γ) (f : α →*₀o β) : (g₁ * g₂).comp f = g₁.comp f * g₂.comp f :=
-  rfl
-
 theorem comp_mul (g : β →*₀o γ) (f₁ f₂ : α →*₀o β) : g.comp (f₁ * f₂) = g.comp f₁ * g.comp f₂ :=
   ext fun _ => map_mul g _ _
 
@@ -741,10 +550,6 @@ section LinearOrderedCommMonoidWithZero
 variable {hα : Preorder α} {hα' : MulZeroOneClass α} {hβ : Preorder β} {hβ' : MulZeroOneClass β}
 
 -- DISSOLVED: toMonoidWithZeroHom_eq_coe
-
-@[simp]
-theorem toOrderMonoidHom_eq_coe (f : α →*₀o β) : f.toOrderMonoidHom = f :=
-  rfl
 
 end LinearOrderedCommMonoidWithZero
 

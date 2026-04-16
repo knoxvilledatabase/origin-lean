@@ -5,6 +5,8 @@ Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Cospan
 
+noncomputable section
+
 /-!
 # PullbackCone
 
@@ -89,12 +91,6 @@ abbrev snd (t : PullbackCone f g) : t.pt ⟶ Y :=
   t.π.app WalkingCospan.right
 
 @[simp]
-theorem π_app_left (c : PullbackCone f g) : c.π.app WalkingCospan.left = c.fst := rfl
-
-@[simp]
-theorem π_app_right (c : PullbackCone f g) : c.π.app WalkingCospan.right = c.snd := rfl
-
-@[simp]
 theorem condition_one (t : PullbackCone f g) : t.π.app WalkingCospan.one = t.fst ≫ f := by
   have w := t.π.naturality WalkingCospan.Hom.inl
   dsimp at w; simpa using w
@@ -104,26 +100,6 @@ def mk {W : C} (fst : W ⟶ X) (snd : W ⟶ Y) (eq : fst ≫ f = snd ≫ g) : Pu
   pt := W
   π := { app := fun j => Option.casesOn j (fst ≫ f) fun j' => WalkingPair.casesOn j' fst snd
          naturality := by rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) j <;> cases j <;> dsimp <;> simp [eq] }
-
-@[simp]
-theorem mk_π_app_left {W : C} (fst : W ⟶ X) (snd : W ⟶ Y) (eq : fst ≫ f = snd ≫ g) :
-    (mk fst snd eq).π.app WalkingCospan.left = fst := rfl
-
-@[simp]
-theorem mk_π_app_right {W : C} (fst : W ⟶ X) (snd : W ⟶ Y) (eq : fst ≫ f = snd ≫ g) :
-    (mk fst snd eq).π.app WalkingCospan.right = snd := rfl
-
-@[simp]
-theorem mk_π_app_one {W : C} (fst : W ⟶ X) (snd : W ⟶ Y) (eq : fst ≫ f = snd ≫ g) :
-    (mk fst snd eq).π.app WalkingCospan.one = fst ≫ f := rfl
-
-@[simp]
-theorem mk_fst {W : C} (fst : W ⟶ X) (snd : W ⟶ Y) (eq : fst ≫ f = snd ≫ g) :
-    (mk fst snd eq).fst = fst := rfl
-
-@[simp]
-theorem mk_snd {W : C} (fst : W ⟶ X) (snd : W ⟶ Y) (eq : fst ≫ f = snd ≫ g) :
-    (mk fst snd eq).snd = snd := rfl
 
 @[reassoc]
 theorem condition (t : PullbackCone f g) : fst t ≫ f = snd t ≫ g :=
@@ -207,12 +183,6 @@ variable (t : PullbackCone f g)
 
 def flip : PullbackCone g f := PullbackCone.mk _ _ t.condition.symm
 
-@[simp] lemma flip_pt : t.flip.pt = t.pt := rfl
-
-@[simp] lemma flip_fst : t.flip.fst = t.snd := rfl
-
-@[simp] lemma flip_snd : t.flip.snd = t.fst := rfl
-
 def flipFlipIso : t.flip.flip ≅ t := PullbackCone.ext (Iso.refl _) (by simp) (by simp)
 
 variable {t}
@@ -264,12 +234,6 @@ abbrev inr (t : PushoutCocone f g) : Z ⟶ t.pt :=
   t.ι.app WalkingSpan.right
 
 @[simp]
-theorem ι_app_left (c : PushoutCocone f g) : c.ι.app WalkingSpan.left = c.inl := rfl
-
-@[simp]
-theorem ι_app_right (c : PushoutCocone f g) : c.ι.app WalkingSpan.right = c.inr := rfl
-
-@[simp]
 theorem condition_zero (t : PushoutCocone f g) : t.ι.app WalkingSpan.zero = f ≫ t.inl := by
   have w := t.ι.naturality WalkingSpan.Hom.fst
   dsimp at w; simpa using w.symm
@@ -280,26 +244,6 @@ def mk {W : C} (inl : Y ⟶ W) (inr : Z ⟶ W) (eq : f ≫ inl = g ≫ inr) : Pu
   ι := { app := fun j => Option.casesOn j (f ≫ inl) fun j' => WalkingPair.casesOn j' inl inr
          naturality := by
           rintro (⟨⟩|⟨⟨⟩⟩) (⟨⟩|⟨⟨⟩⟩) <;> intro f <;> cases f <;> dsimp <;> aesop }
-
-@[simp]
-theorem mk_ι_app_left {W : C} (inl : Y ⟶ W) (inr : Z ⟶ W) (eq : f ≫ inl = g ≫ inr) :
-    (mk inl inr eq).ι.app WalkingSpan.left = inl := rfl
-
-@[simp]
-theorem mk_ι_app_right {W : C} (inl : Y ⟶ W) (inr : Z ⟶ W) (eq : f ≫ inl = g ≫ inr) :
-    (mk inl inr eq).ι.app WalkingSpan.right = inr := rfl
-
-@[simp]
-theorem mk_ι_app_zero {W : C} (inl : Y ⟶ W) (inr : Z ⟶ W) (eq : f ≫ inl = g ≫ inr) :
-    (mk inl inr eq).ι.app WalkingSpan.zero = f ≫ inl := rfl
-
-@[simp]
-theorem mk_inl {W : C} (inl : Y ⟶ W) (inr : Z ⟶ W) (eq : f ≫ inl = g ≫ inr) :
-    (mk inl inr eq).inl = inl := rfl
-
-@[simp]
-theorem mk_inr {W : C} (inl : Y ⟶ W) (inr : Z ⟶ W) (eq : f ≫ inl = g ≫ inr) :
-    (mk inl inr eq).inr = inr := rfl
 
 @[reassoc]
 theorem condition (t : PushoutCocone f g) : f ≫ inl t = g ≫ inr t :=
@@ -383,12 +327,6 @@ section Flip
 variable (t : PushoutCocone f g)
 
 def flip : PushoutCocone g f := PushoutCocone.mk _ _ t.condition.symm
-
-@[simp] lemma flip_pt : t.flip.pt = t.pt := rfl
-
-@[simp] lemma flip_inl : t.flip.inl = t.inr := rfl
-
-@[simp] lemma flip_inr : t.flip.inr = t.inl := rfl
 
 def flipFlipIso : t.flip.flip ≅ t := PushoutCocone.ext (Iso.refl _) (by simp) (by simp)
 

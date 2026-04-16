@@ -10,6 +10,8 @@ import Mathlib.Data.Ordmap.Ordnode
 import Mathlib.Tactic.Abel
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # Verification of the `Ordnode α` datatype
 
@@ -207,9 +209,6 @@ theorem rotateL_node (l : Ordnode α) (x : α) (sz : ℕ) (m : Ordnode α) (y : 
       if size m < ratio * size r then node3L l x m y r else node4L l x m y r :=
   rfl
 
-theorem rotateL_nil (l : Ordnode α) (x : α) : rotateL l x nil = node' l x nil :=
-  rfl
-
 def rotateR : Ordnode α → α → Ordnode α → Ordnode α
   | node _ l x m, y, r => if size m < ratio * size l then node3R l x m y r else node4R l x m y r
   | nil, y, r => node' nil y r
@@ -217,9 +216,6 @@ def rotateR : Ordnode α → α → Ordnode α → Ordnode α
 theorem rotateR_node (sz : ℕ) (l : Ordnode α) (x : α) (m : Ordnode α) (y : α) (r : Ordnode α) :
     rotateR (node sz l x m) y r =
       if size m < ratio * size l then node3R l x m y r else node4R l x m y r :=
-  rfl
-
-theorem rotateR_nil (y : α) (r : Ordnode α) : rotateR nil y r = node' nil y r :=
   rfl
 
 def balanceL' (l : Ordnode α) (x : α) (r : Ordnode α) : Ordnode α :=
@@ -385,9 +381,6 @@ theorem any_iff_exists {P : α → Prop} : ∀ {t}, Any P t ↔ ∃ x, Emem x t 
 theorem emem_iff_all {x : α} {t} : Emem x t ↔ ∀ P, All P t → P x :=
   ⟨fun h _ al => all_iff_forall.1 al _ h, fun H => H _ <| all_iff_forall.2 fun _ => id⟩
 
-theorem all_node' {P l x r} : @All α P (node' l x r) ↔ All P l ∧ P x ∧ All P r :=
-  Iff.rfl
-
 theorem all_node3L {P l x m y r} :
     @All α P (node3L l x m y r) ↔ All P l ∧ P x ∧ All P m ∧ P y ∧ All P r := by
   simp [node3L, all_node', and_assoc]
@@ -421,10 +414,6 @@ theorem foldr_cons_eq_toList : ∀ (t : Ordnode α) (r : List α), t.foldr List.
   | node _ l x r, r' => by
     rw [foldr, foldr_cons_eq_toList l, foldr_cons_eq_toList r, ← List.cons_append,
         ← List.append_assoc, ← foldr_cons_eq_toList l]; rfl
-
-@[simp]
-theorem toList_nil : toList (@nil α) = [] :=
-  rfl
 
 @[simp]
 theorem toList_node (s l x r) : toList (@node α s l x r) = toList l ++ x :: toList r := by
@@ -504,10 +493,6 @@ theorem findMax'_all {P : α → Prop} : ∀ (x : α) (t), P x → All P t → P
 theorem merge_nil_left (t : Ordnode α) : merge t nil = t := by cases t <;> rfl
 
 @[simp]
-theorem merge_nil_right (t : Ordnode α) : merge nil t = t :=
-  rfl
-
-@[simp]
 theorem merge_node {ls ll lx lr rs rl rx rr} :
     merge (@node α ls ll lx lr) (node rs rl rx rr) =
       if delta * ls < rs then balanceL (merge (node ls ll lx lr) rl) rx rr
@@ -516,15 +501,6 @@ theorem merge_node {ls ll lx lr rs rl rx rr} :
   rfl
 
 /-! ### `insert` -/
-
-theorem dual_insert [Preorder α] [IsTotal α (· ≤ ·)] [@DecidableRel α (· ≤ ·)] (x : α) :
-    ∀ t : Ordnode α, dual (Ordnode.insert x t) = @Ordnode.insert αᵒᵈ _ _ x (dual t)
-  | nil => rfl
-  | node _ l y r => by
-    have : @cmpLE αᵒᵈ _ _ x y = cmpLE y x := rfl
-    rw [Ordnode.insert, dual, Ordnode.insert, this, ← cmpLE_swap x y]
-    cases cmpLE x y <;>
-      simp [Ordering.swap, Ordnode.insert, dual_balanceL, dual_balanceR, dual_insert]
 
 /-! ### `balance` properties -/
 

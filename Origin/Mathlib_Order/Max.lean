@@ -5,6 +5,8 @@ Genuine: 54 | Conflates: 4 | Dissolved: 0 | Infrastructure: 30
 import Origin.Core
 import Mathlib.Order.Synonym
 
+noncomputable section
+
 /-!
 # Minimal/maximal and bottom/top elements
 

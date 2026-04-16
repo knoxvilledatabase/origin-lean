@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Homology
 import Mathlib.CategoryTheory.Abelian.Basic
 
+noncomputable section
+
 /-!
 # Abelian categories have homology
 

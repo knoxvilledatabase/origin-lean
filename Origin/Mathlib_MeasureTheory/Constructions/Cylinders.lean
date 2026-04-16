@@ -8,6 +8,8 @@ import Mathlib.Order.OmegaCompletePartialOrder
 import Mathlib.Topology.Constructions
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 
+noncomputable section
+
 /-!
 # π-systems of cylinders and square cylinders
 

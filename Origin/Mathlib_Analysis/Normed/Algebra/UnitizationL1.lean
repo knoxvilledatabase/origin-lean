@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Unitization
 import Mathlib.Analysis.Normed.Lp.ProdLp
 
+noncomputable section
+
 /-! # Unitization equipped with the $L^1$ norm
 
 In another file, the `Unitization 𝕜 A` of a non-unital normed `𝕜`-algebra `A` is equipped with the
@@ -91,12 +93,6 @@ lemma unitization_mul (x y : WithLp 1 (Unitization 𝕜 A)) :
 instance {R : Type*} [CommSemiring R] [Algebra R 𝕜] [DistribMulAction R A] [IsScalarTower R 𝕜 A] :
     Algebra R (WithLp 1 (Unitization 𝕜 A)) :=
   inferInstanceAs (Algebra R (Unitization 𝕜 A))
-
-@[simp]
-lemma unitization_algebraMap (r : 𝕜) :
-    WithLp.equiv 1 _ (algebraMap 𝕜 (WithLp 1 (Unitization 𝕜 A)) r) =
-      algebraMap 𝕜 (Unitization 𝕜 A) r :=
-  rfl
 
 @[simps!]
 def unitizationAlgEquiv (R : Type*) [CommSemiring R] [Algebra R 𝕜] [DistribMulAction R A]

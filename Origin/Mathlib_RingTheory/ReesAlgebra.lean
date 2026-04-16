@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Ideal.BigOperators
 import Mathlib.RingTheory.FiniteType
 
+noncomputable section
+
 /-!
 
 # Rees algebra
@@ -53,9 +55,6 @@ def reesAlgebra : Subalgebra R R[X] where
     · subst h
       simp
     · simp
-
-theorem mem_reesAlgebra_iff (f : R[X]) : f ∈ reesAlgebra I ↔ ∀ i, f.coeff i ∈ I ^ i :=
-  Iff.rfl
 
 theorem mem_reesAlgebra_iff_support (f : R[X]) :
     f ∈ reesAlgebra I ↔ ∀ i ∈ f.support, f.coeff i ∈ I ^ i := by

@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Convex/Cone/InnerDual.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Cone.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection
+
+noncomputable section
 
 /-!
 # Convex cones in inner product spaces
@@ -58,7 +60,9 @@ theorem mem_innerDualCone (y : H) (s : Set H) : y ∈ s.innerDualCone ↔ ∀ x 
 theorem innerDualCone_empty : (∅ : Set H).innerDualCone = ⊤ :=
   eq_top_iff.mpr fun _ _ _ => False.elim
 
--- DISSOLVED: innerDualCone_zero
+@[simp]
+theorem innerDualCone_zero : (0 : Set H).innerDualCone = ⊤ :=
+  eq_top_iff.mpr fun _ _ y (hy : y = 0) => hy.symm ▸ (inner_zero_left _).ge
 
 @[simp]
 theorem innerDualCone_univ : (univ : Set H).innerDualCone = 0 := by

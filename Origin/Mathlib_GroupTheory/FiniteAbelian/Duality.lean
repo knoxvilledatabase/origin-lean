@@ -1,10 +1,12 @@
 /-
 Extracted from GroupTheory/FiniteAbelian/Duality.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.GroupTheory.FiniteAbelian.Basic
 import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+
+noncomputable section
 
 /-!
 # Duality for finite abelian groups
@@ -21,7 +23,6 @@ namespace CommGroup
 open MonoidHom
 
 private
-
 lemma dvd_exponent {ι G : Type*} [Finite ι] [CommGroup G] {n : ι → ℕ}
     (e : G ≃* ((i : ι) → Multiplicative (ZMod (n i)))) (i : ι) :
   n i ∣ Monoid.exponent G := by
@@ -34,12 +35,29 @@ lemma dvd_exponent {ι G : Type*} [Finite ι] [CommGroup G] {n : ι → ℕ}
 variable (G M : Type*) [CommGroup G] [Finite G] [CommMonoid M]
 
 private
-
--- DISSOLVED: exists_apply_ne_one_aux
+lemma exists_apply_ne_one_aux (H : ∀ n : ℕ, n ∣ Monoid.exponent G → ∀ a : ZMod n, a ≠ 0 →
+    ∃ φ : Multiplicative (ZMod n) →* M, φ (.ofAdd a) ≠ 1)
+    {a : G} (ha : a ≠ 1) :
+    ∃ φ : G →* M, φ a ≠ 1 := by
+  obtain ⟨ι, _, n, _, h⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite G
+  let e := h.some
+  obtain ⟨i, hi⟩ : ∃ i : ι, e a i ≠ 1 := by
+    contrapose! ha
+    exact (MulEquiv.map_eq_one_iff e).mp <| funext ha
+  have hi : (e a i).toAdd ≠ 0 := by
+    simp only [ne_eq, toAdd_eq_zero, hi, not_false_eq_true]
+  obtain ⟨φi, hφi⟩ := H (n i) (dvd_exponent e i) ((e a i).toAdd) hi
+  use (φi.comp (Pi.evalMonoidHom (fun (i : ι) ↦ Multiplicative (ZMod (n i))) i)).comp e
+  simpa only [coe_comp, coe_coe, Function.comp_apply, Pi.evalMonoidHom_apply, ne_eq] using hφi
 
 variable [HasEnoughRootsOfUnity M (Monoid.exponent G)]
 
--- DISSOLVED: exists_apply_ne_one_of_hasEnoughRootsOfUnity
+theorem exists_apply_ne_one_of_hasEnoughRootsOfUnity {a : G} (ha : a ≠ 1) :
+    ∃ φ : G →* Mˣ, φ a ≠ 1 := by
+  refine exists_apply_ne_one_aux G Mˣ (fun n hn a ha₀ ↦ ?_) ha
+  have : NeZero n := ⟨fun H ↦ NeZero.ne _ <| Nat.eq_zero_of_zero_dvd (H ▸ hn)⟩
+  have := HasEnoughRootsOfUnity.of_dvd M hn
+  exact ZMod.exists_monoidHom_apply_ne_one (HasEnoughRootsOfUnity.exists_primitiveRoot M n) ha₀
 
 theorem monoidHom_mulEquiv_of_hasEnoughRootsOfUnity : Nonempty ((G →* Mˣ) ≃* G) := by
   classical -- to get `DecidableEq ι`

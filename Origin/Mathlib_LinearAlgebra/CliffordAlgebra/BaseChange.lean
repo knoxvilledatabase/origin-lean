@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.CliffordAlgebra.Conjugation
 import Mathlib.LinearAlgebra.TensorProduct.Opposite
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # The base change of a clifford algebra
 

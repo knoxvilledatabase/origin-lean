@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Affine
 import Mathlib.AlgebraicGeometry.Morphisms.RingHomProperties
 
+noncomputable section
+
 /-!
 # Affine morphisms with additional ring hom property
 

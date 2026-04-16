@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Inverse.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Comp
 import Mathlib.Analysis.Calculus.FDeriv.Equiv
+
+noncomputable section
 
 /-!
 # Inverse function theorem - the easy half
@@ -37,21 +39,44 @@ variable {f' : F}
 
 variable {x : 𝕜}
 
--- DISSOLVED: HasStrictDerivAt.hasStrictFDerivAt_equiv
+theorem HasStrictDerivAt.hasStrictFDerivAt_equiv {f : 𝕜 → 𝕜} {f' x : 𝕜}
+    (hf : HasStrictDerivAt f f' x) (hf' : f' ≠ 0) :
+    HasStrictFDerivAt f (ContinuousLinearEquiv.unitsEquivAut 𝕜 (Units.mk0 f' hf') : 𝕜 →L[𝕜] 𝕜) x :=
+  hf
 
--- DISSOLVED: HasDerivAt.hasFDerivAt_equiv
+theorem HasDerivAt.hasFDerivAt_equiv {f : 𝕜 → 𝕜} {f' x : 𝕜} (hf : HasDerivAt f f' x)
+    (hf' : f' ≠ 0) :
+    HasFDerivAt f (ContinuousLinearEquiv.unitsEquivAut 𝕜 (Units.mk0 f' hf') : 𝕜 →L[𝕜] 𝕜) x :=
+  hf
 
--- DISSOLVED: HasStrictDerivAt.of_local_left_inverse
+theorem HasStrictDerivAt.of_local_left_inverse {f g : 𝕜 → 𝕜} {f' a : 𝕜} (hg : ContinuousAt g a)
+    (hf : HasStrictDerivAt f f' (g a)) (hf' : f' ≠ 0) (hfg : ∀ᶠ y in 𝓝 a, f (g y) = y) :
+    HasStrictDerivAt g f'⁻¹ a :=
+  (hf.hasStrictFDerivAt_equiv hf').of_local_left_inverse hg hfg
 
--- DISSOLVED: PartialHomeomorph.hasStrictDerivAt_symm
+theorem PartialHomeomorph.hasStrictDerivAt_symm (f : PartialHomeomorph 𝕜 𝕜) {a f' : 𝕜}
+    (ha : a ∈ f.target) (hf' : f' ≠ 0) (htff' : HasStrictDerivAt f f' (f.symm a)) :
+    HasStrictDerivAt f.symm f'⁻¹ a :=
+  htff'.of_local_left_inverse (f.symm.continuousAt ha) hf' (f.eventually_right_inverse ha)
 
--- DISSOLVED: HasDerivAt.of_local_left_inverse
+theorem HasDerivAt.of_local_left_inverse {f g : 𝕜 → 𝕜} {f' a : 𝕜} (hg : ContinuousAt g a)
+    (hf : HasDerivAt f f' (g a)) (hf' : f' ≠ 0) (hfg : ∀ᶠ y in 𝓝 a, f (g y) = y) :
+    HasDerivAt g f'⁻¹ a :=
+  (hf.hasFDerivAt_equiv hf').of_local_left_inverse hg hfg
 
--- DISSOLVED: PartialHomeomorph.hasDerivAt_symm
+theorem PartialHomeomorph.hasDerivAt_symm (f : PartialHomeomorph 𝕜 𝕜) {a f' : 𝕜} (ha : a ∈ f.target)
+    (hf' : f' ≠ 0) (htff' : HasDerivAt f f' (f.symm a)) : HasDerivAt f.symm f'⁻¹ a :=
+  htff'.of_local_left_inverse (f.symm.continuousAt ha) hf' (f.eventually_right_inverse ha)
 
--- DISSOLVED: HasDerivAt.eventually_ne
+theorem HasDerivAt.eventually_ne (h : HasDerivAt f f' x) (hf' : f' ≠ 0) :
+    ∀ᶠ z in 𝓝[≠] x, f z ≠ f x :=
+  (hasDerivAt_iff_hasFDerivAt.1 h).eventually_ne
+    ⟨‖f'‖⁻¹, fun z => by field_simp [norm_smul, mt norm_eq_zero.1 hf']⟩
 
--- DISSOLVED: HasDerivAt.tendsto_punctured_nhds
+theorem HasDerivAt.tendsto_punctured_nhds (h : HasDerivAt f f' x) (hf' : f' ≠ 0) :
+    Tendsto f (𝓝[≠] x) (𝓝[≠] f x) :=
+  tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _ h.continuousAt.continuousWithinAt
+    (h.eventually_ne hf')
 
 theorem not_differentiableWithinAt_of_local_left_inverse_hasDerivWithinAt_zero {f g : 𝕜 → 𝕜} {a : 𝕜}
     {s t : Set 𝕜} (ha : a ∈ s) (hsu : UniqueDiffWithinAt 𝕜 s a) (hf : HasDerivWithinAt f 0 t (g a))

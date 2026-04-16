@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.EvenOddRec
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.LinearCombination
 
+noncomputable section
+
 /-!
 # Elliptic divisibility sequences
 

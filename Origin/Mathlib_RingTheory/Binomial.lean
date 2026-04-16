@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Binomial.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Smeval
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Floor
 import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.RingTheory.Polynomial.Pochhammer
 import Mathlib.Tactic.FieldSimp
+
+noncomputable section
 
 /-!
 # Binomial rings
@@ -62,19 +64,23 @@ section Multichoose
 
 open Function Polynomial
 
--- DISSOLVED: BinomialRing
+class BinomialRing (R : Type*) [AddCommMonoid R] [Pow R ℕ] where
+  /-- Scalar multiplication by positive integers is injective -/
+  nsmul_right_injective (n : ℕ) (h : n ≠ 0) : Injective (n • · : R → R)
+  /-- A multichoose function, giving the quotient of Pochhammer evaluations by factorials. -/
+  multichoose : R → ℕ → R
+  /-- The `n`th ascending Pochhammer polynomial evaluated at any element is divisible by `n!` -/
+  factorial_nsmul_multichoose (r : R) (n : ℕ) :
+    n.factorial • multichoose r n = (ascPochhammer ℕ n).smeval r
 
 namespace Ring
 
 variable {R : Type*} [AddCommMonoid R] [Pow R ℕ] [BinomialRing R]
 
--- DISSOLVED: nsmul_right_injective
+theorem nsmul_right_injective (n : ℕ) (h : n ≠ 0) :
+    Injective (n • · : R → R) := BinomialRing.nsmul_right_injective n h
 
 def multichoose (r : R) (n : ℕ) : R := BinomialRing.multichoose r n
-
-@[simp]
-theorem multichoose_eq_multichoose (r : R) (n : ℕ) :
-    BinomialRing.multichoose r n = multichoose r n := rfl
 
 theorem factorial_nsmul_multichoose_eq_ascPochhammer (r : R) (n : ℕ) :
     n.factorial • multichoose r n = (ascPochhammer ℕ n).smeval r :=

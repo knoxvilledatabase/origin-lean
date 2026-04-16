@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Polynomial/Derivative.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
+Genuine: 85 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Degree.Domain
 import Mathlib.Algebra.Polynomial.Degree.Support
 import Mathlib.Algebra.Polynomial.Eval.Coeff
 import Mathlib.GroupTheory.GroupAction.Ring
+
+noncomputable section
 
 /-!
 # The derivative map on polynomials
@@ -154,13 +156,22 @@ theorem of_mem_support_derivative {p : R[X]} {n : ℕ} (h : n ∈ p.derivative.s
   mem_support_iff.2 fun h1 : p.coeff (n + 1) = 0 =>
     mem_support_iff.1 h <| show p.derivative.coeff n = 0 by rw [coeff_derivative, h1, zero_mul]
 
--- DISSOLVED: degree_derivative_lt
+theorem degree_derivative_lt {p : R[X]} (hp : p ≠ 0) : p.derivative.degree < p.degree :=
+  (Finset.sup_lt_iff <| bot_lt_iff_ne_bot.2 <| mt degree_eq_bot.1 hp).2 fun n hp =>
+    lt_of_lt_of_le (WithBot.coe_lt_coe.2 n.lt_succ_self) <|
+      Finset.le_sup <| of_mem_support_derivative hp
 
 theorem degree_derivative_le {p : R[X]} : p.derivative.degree ≤ p.degree :=
   letI := Classical.decEq R
   if H : p = 0 then le_of_eq <| by rw [H, derivative_zero] else (degree_derivative_lt H).le
 
--- DISSOLVED: natDegree_derivative_lt
+theorem natDegree_derivative_lt {p : R[X]} (hp : p.natDegree ≠ 0) :
+    p.derivative.natDegree < p.natDegree := by
+  rcases eq_or_ne (derivative p) 0 with hp' | hp'
+  · rw [hp', Polynomial.natDegree_zero]
+    exact hp.bot_lt
+  · rw [natDegree_lt_natDegree_iff hp']
+    exact degree_derivative_lt fun h => hp (h.symm ▸ natDegree_zero)
 
 theorem natDegree_derivative_le (p : R[X]) : p.derivative.natDegree ≤ p.natDegree - 1 := by
   by_cases p0 : p.natDegree = 0
@@ -463,7 +474,12 @@ theorem pow_sub_dvd_iterate_derivative_of_pow_dvd {p q : R[X]} {n : ℕ} (m : �
 theorem pow_sub_dvd_iterate_derivative_pow (p : R[X]) (n m : ℕ) :
     p ^ (n - m) ∣ derivative^[m] (p ^ n) := pow_sub_dvd_iterate_derivative_of_pow_dvd m dvd_rfl
 
--- DISSOLVED: dvd_iterate_derivative_pow
+theorem dvd_iterate_derivative_pow (f : R[X]) (n : ℕ) {m : ℕ} (c : R) (hm : m ≠ 0) :
+    (n : R) ∣ eval c (derivative^[m] (f ^ n)) := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hm
+  rw [Function.iterate_succ_apply, derivative_pow, mul_assoc, C_eq_natCast,
+    iterate_derivative_natCast_mul, eval_mul, eval_natCast]
+  exact dvd_mul_right _ _
 
 theorem iterate_derivative_X_pow_eq_natCast_mul (n k : ℕ) :
     derivative^[k] (X ^ n : R[X]) = ↑(Nat.descFactorial n k : R[X]) * X ^ (n - k) := by

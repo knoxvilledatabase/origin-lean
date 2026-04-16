@@ -8,6 +8,8 @@ import Mathlib.Data.PFunctor.Multivariate.Basic
 import Mathlib.Data.PFunctor.Multivariate.M
 import Mathlib.Data.QPF.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # The final co-algebra of a multivariate qpf is again a qpf.
 

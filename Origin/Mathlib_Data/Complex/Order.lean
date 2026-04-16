@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Complex/Order.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Complex.Abs
+
+noncomputable section
 
 /-!
 # The partial order on the complex numbers
@@ -85,9 +87,11 @@ theorem not_le_iff {z w : ℂ} : ¬z ≤ w ↔ w.re < z.re ∨ z.im ≠ w.im := 
 theorem not_lt_iff {z w : ℂ} : ¬z < w ↔ w.re ≤ z.re ∨ z.im ≠ w.im := by
   rw [lt_def, not_and_or, not_lt]
 
--- DISSOLVED: not_le_zero_iff
+theorem not_le_zero_iff {z : ℂ} : ¬z ≤ 0 ↔ 0 < z.re ∨ z.im ≠ 0 :=
+  not_le_iff
 
--- DISSOLVED: not_lt_zero_iff
+theorem not_lt_zero_iff {z : ℂ} : ¬z < 0 ↔ 0 ≤ z.re ∨ z.im ≠ 0 :=
+  not_lt_iff
 
 theorem eq_re_of_ofReal_le {r : ℝ} {z : ℂ} (hz : (r : ℂ) ≤ z) : z = z.re := by
   rw [eq_comm, ← conj_eq_iff_re, conj_eq_iff_im, ← (Complex.le_def.1 hz).2, Complex.ofReal_im]

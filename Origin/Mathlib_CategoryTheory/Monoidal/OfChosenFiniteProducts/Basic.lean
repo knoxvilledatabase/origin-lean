@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.Category
 import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.PEmpty
 
+noncomputable section
+
 /-!
 # The monoidal structure on a category with chosen finite products.
 
@@ -40,14 +42,6 @@ variable {C}
 def BinaryFan.swap {P Q : C} (t : BinaryFan P Q) : BinaryFan Q P :=
   BinaryFan.mk t.snd t.fst
 
-@[simp]
-theorem BinaryFan.swap_fst {P Q : C} (t : BinaryFan P Q) : t.swap.fst = t.snd :=
-  rfl
-
-@[simp]
-theorem BinaryFan.swap_snd {P Q : C} (t : BinaryFan P Q) : t.swap.snd = t.fst :=
-  rfl
-
 @[simps]
 def IsLimit.swapBinaryFan {P Q : C} {t : BinaryFan P Q} (I : IsLimit t) : IsLimit t.swap where
   lift s := I.lift (BinaryFan.swap s)
@@ -71,11 +65,6 @@ def BinaryFan.assoc {X Y Z : C} {sXY : BinaryFan X Y} {sYZ : BinaryFan Y Z} (Q :
   BinaryFan.mk (s.fst ≫ sXY.fst) (Q.lift (BinaryFan.mk (s.fst ≫ sXY.snd) s.snd))
 
 @[simp]
-theorem BinaryFan.assoc_fst {X Y Z : C} {sXY : BinaryFan X Y} {sYZ : BinaryFan Y Z}
-    (Q : IsLimit sYZ) (s : BinaryFan sXY.pt Z) : (BinaryFan.assoc Q s).fst = s.fst ≫ sXY.fst :=
-  rfl
-
-@[simp]
 theorem BinaryFan.assoc_snd {X Y Z : C} {sXY : BinaryFan X Y} {sYZ : BinaryFan Y Z}
     (Q : IsLimit sYZ) (s : BinaryFan sXY.pt Z) :
     (BinaryFan.assoc Q s).snd = Q.lift (BinaryFan.mk (s.fst ≫ sXY.snd) s.snd) :=
@@ -84,18 +73,6 @@ theorem BinaryFan.assoc_snd {X Y Z : C} {sXY : BinaryFan X Y} {sYZ : BinaryFan Y
 def BinaryFan.assocInv {X Y Z : C} {sXY : BinaryFan X Y} (P : IsLimit sXY) {sYZ : BinaryFan Y Z}
     (s : BinaryFan X sYZ.pt) : BinaryFan sXY.pt Z :=
   BinaryFan.mk (P.lift (BinaryFan.mk s.fst (s.snd ≫ sYZ.fst))) (s.snd ≫ sYZ.snd)
-
-@[simp]
-theorem BinaryFan.assocInv_fst {X Y Z : C} {sXY : BinaryFan X Y} (P : IsLimit sXY)
-    {sYZ : BinaryFan Y Z} (s : BinaryFan X sYZ.pt) :
-    (BinaryFan.assocInv P s).fst = P.lift (BinaryFan.mk s.fst (s.snd ≫ sYZ.fst)) :=
-  rfl
-
-@[simp]
-theorem BinaryFan.assocInv_snd {X Y Z : C} {sXY : BinaryFan X Y} (P : IsLimit sXY)
-    {sYZ : BinaryFan Y Z} (s : BinaryFan X sYZ.pt) :
-    (BinaryFan.assocInv P s).snd = s.snd ≫ sYZ.snd :=
-  rfl
 
 @[simps]
 def IsLimit.assoc {X Y Z : C} {sXY : BinaryFan X Y} (P : IsLimit sXY) {sYZ : BinaryFan Y Z}

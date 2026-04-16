@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 import Origin.Core
 import Mathlib.LinearAlgebra.RootSystem.Defs
 
+noncomputable section
+
 /-!
 # Root pairings made from bilinear forms
 A common construction of root systems is given by taking the set of all vectors in an integral

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf.Limits
 import Mathlib.Algebra.Category.ModuleCat.Sheaf
 import Mathlib.CategoryTheory.Sites.Limits
 
+noncomputable section
+
 /-! # Limits in categories of sheaves of modules
 
 In this file, it is shown that under suitable assumptions,

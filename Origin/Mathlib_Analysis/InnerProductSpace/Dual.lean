@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.Normed.Group.NullSubmodule
 
+noncomputable section
+
 /-!
 # The Fréchet-Riesz representation theorem
 

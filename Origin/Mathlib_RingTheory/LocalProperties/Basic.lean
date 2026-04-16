@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Localization.Submodule
 import Mathlib.RingTheory.LocalProperties.Submodule
 import Mathlib.RingTheory.RingHomProperties
 
+noncomputable section
+
 /-!
 # Local properties of commutative rings
 
@@ -227,15 +229,6 @@ theorem RingHom.LocalizationPreserves.away (H : RingHom.LocalizationPreserves @P
   have : IsLocalization ((Submonoid.powers r).map f) S' := by rw [Submonoid.map_powers]; assumption
   exact H f (Submonoid.powers r) R' S' hf
 
-lemma RingHom.PropertyIsLocal.HoldsForLocalizationAway (hP : RingHom.PropertyIsLocal @P)
-    (hPi : ContainsIdentities P) :
-    RingHom.HoldsForLocalizationAway @P := by
-  introv R _
-  have : algebraMap R S = (algebraMap R S).comp (RingHom.id R) := by simp
-  rw [this]
-  apply hP.StableUnderCompositionWithLocalizationAwayTarget S r
-  apply hPi
-
 theorem RingHom.OfLocalizationSpanTarget.ofLocalizationSpan
     (hP : RingHom.OfLocalizationSpanTarget @P)
     (hP' : RingHom.StableUnderCompositionWithLocalizationAwaySource @P) :
@@ -358,13 +351,6 @@ theorem Ideal.localized'_eq_map (I : Ideal R) :
 theorem Ideal.localized₀_eq_restrictScalars_map (I : Ideal R) :
     Submodule.localized₀ p (Algebra.linearMap R S) I = (I.map (algebraMap R S)).restrictScalars R :=
   congr(Submodule.restrictScalars R $(localized'_eq_map S p I))
-
-theorem Algebra.idealMap_eq_ofEq_comp_toLocalized₀ (I : Ideal R) :
-    haveI := (isLocalizedModule_iff_isLocalization' p S).mpr inferInstance
-    Algebra.idealMap S I =
-      (LinearEquiv.ofEq _ _ <| Ideal.localized₀_eq_restrictScalars_map S p I).toLinearMap ∘ₗ
-      Submodule.toLocalized₀ p (Algebra.linearMap R S) I :=
-  rfl
 
 theorem Ideal.mem_of_localization_maximal {r : R} {J : Ideal R}
     (h : ∀ (P : Ideal R) (_ : P.IsMaximal),

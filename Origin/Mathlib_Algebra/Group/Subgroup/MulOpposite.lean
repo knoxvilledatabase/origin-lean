@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Defs
 import Mathlib.Algebra.Group.Submonoid.MulOpposite
 
+noncomputable section
+
 /-!
 # Mul-opposite subgroups
 
@@ -26,13 +28,6 @@ protected def op (H : Subgroup G) : Subgroup Gᵐᵒᵖ where
   mul_mem' ha hb := H.mul_mem hb ha
   inv_mem' := H.inv_mem
 
-@[to_additive (attr := simp)]
-theorem mem_op {x : Gᵐᵒᵖ} {S : Subgroup G} : x ∈ S.op ↔ x.unop ∈ S := Iff.rfl
-
-@[to_additive (attr := simp)] lemma op_toSubmonoid (H : Subgroup G) :
-    H.op.toSubmonoid = H.toSubmonoid.op :=
-  rfl
-
 @[to_additive (attr := simps)
 "Pull an opposite additive subgroup back to an additive subgroup along `AddOpposite.op`"]
 protected def unop (H : Subgroup Gᵐᵒᵖ) : Subgroup G where
@@ -40,13 +35,6 @@ protected def unop (H : Subgroup Gᵐᵒᵖ) : Subgroup G where
   one_mem' := H.one_mem
   mul_mem' := fun ha hb => H.mul_mem hb ha
   inv_mem' := H.inv_mem
-
-@[to_additive (attr := simp)]
-theorem mem_unop {x : G} {S : Subgroup Gᵐᵒᵖ} : x ∈ S.unop ↔ MulOpposite.op x ∈ S := Iff.rfl
-
-@[to_additive (attr := simp)] lemma unop_toSubmonoid (H : Subgroup Gᵐᵒᵖ) :
-    H.unop.toSubmonoid = H.toSubmonoid.unop :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem unop_op (S : Subgroup G) : S.op.unop = S := rfl

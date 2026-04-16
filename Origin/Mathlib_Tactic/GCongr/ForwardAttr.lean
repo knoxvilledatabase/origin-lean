@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Batteries.Tactic.Basic
 
+noncomputable section
+
 /-!
 # Environment extension for the forward-reasoning part of the `gcongr` tactic
 -/

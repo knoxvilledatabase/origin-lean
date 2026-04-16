@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Localization/Submodule.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.Localization.Ideal
 import Mathlib.RingTheory.Noetherian.Defs
+
+noncomputable section
 
 /-!
 # Submodules in localizations of commutative rings
@@ -70,7 +72,6 @@ theorem coeSubmodule_span_singleton (x : R) :
 variable [IsLocalization M S]
 
 include M in
-
 theorem isNoetherianRing (h : IsNoetherianRing R) : IsNoetherianRing S := by
   rw [isNoetherianRing_iff, isNoetherian_iff] at h ⊢
   exact OrderEmbedding.wellFounded (IsLocalization.orderEmbedding M S).dual h

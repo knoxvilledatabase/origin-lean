@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.Topology.Algebra.Module.WeakBilin
 
+noncomputable section
+
 /-!
 # Weak dual topology
 
@@ -58,11 +60,6 @@ variable {α 𝕜 𝕝 E F : Type*}
 def topDualPairing (𝕜 E) [CommSemiring 𝕜] [TopologicalSpace 𝕜] [ContinuousAdd 𝕜] [AddCommMonoid E]
     [Module 𝕜 E] [TopologicalSpace E] [ContinuousConstSMul 𝕜 𝕜] : (E →L[𝕜] 𝕜) →ₗ[𝕜] E →ₗ[𝕜] 𝕜 :=
   ContinuousLinearMap.coeLM 𝕜
-
-theorem topDualPairing_apply [CommSemiring 𝕜] [TopologicalSpace 𝕜] [ContinuousAdd 𝕜]
-    [AddCommMonoid E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousConstSMul 𝕜 𝕜] (v : E →L[𝕜] 𝕜)
-    (x : E) : topDualPairing 𝕜 E v x = v x :=
-  rfl
 
 def WeakDual (𝕜 E : Type*) [CommSemiring 𝕜] [TopologicalSpace 𝕜] [ContinuousAdd 𝕜]
     [ContinuousConstSMul 𝕜 𝕜] [AddCommMonoid E] [Module 𝕜 E] [TopologicalSpace E] :=
@@ -192,13 +189,6 @@ def map (f : E →L[𝕜] F) : WeakSpace 𝕜 E →L[𝕜] WeakSpace 𝕜 F :=
     cont :=
       WeakBilin.continuous_of_continuous_eval _ fun l => WeakBilin.eval_continuous _ (l ∘L f) }
 
-theorem map_apply (f : E →L[𝕜] F) (x : E) : WeakSpace.map f x = f x :=
-  rfl
-
-@[simp]
-theorem coe_map (f : E →L[𝕜] F) : (WeakSpace.map f : E → F) = f :=
-  rfl
-
 end WeakSpace
 
 variable (𝕜 E) in
@@ -214,10 +204,6 @@ def toWeakSpaceCLM : E →L[𝕜] WeakSpace 𝕜 E where
     exact ContinuousLinearMap.continuous
 
 variable (𝕜 E) in
-
-@[simp]
-theorem toWeakSpaceCLM_eq_toWeakSpace (x : E) :
-    toWeakSpaceCLM 𝕜 E x = toWeakSpace 𝕜 E x := by rfl
 
 theorem toWeakSpaceCLM_bijective :
     Function.Bijective (toWeakSpaceCLM 𝕜 E) :=

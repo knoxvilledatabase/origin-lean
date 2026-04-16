@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about `min` and `max` in an ordered monoid.
 -/

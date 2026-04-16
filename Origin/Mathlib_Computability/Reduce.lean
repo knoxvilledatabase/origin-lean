@@ -5,6 +5,8 @@ Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Computability.Halting
 
+noncomputable section
+
 /-!
 # Strong reducibility and degrees.
 
@@ -296,11 +298,6 @@ protected abbrev liftOn {φ} (d : ManyOneDegree) (f : Set ℕ → φ)
     (h : ∀ p q, ManyOneEquiv p q → f p = f q) : φ :=
   Quotient.liftOn' d f h
 
-@[simp]
-protected theorem liftOn_eq {φ} (p : Set ℕ) (f : Set ℕ → φ)
-    (h : ∀ p q, ManyOneEquiv p q → f p = f q) : (of p).liftOn f h = f p :=
-  rfl
-
 @[reducible, simp]
 protected def liftOn₂ {φ} (d₁ d₂ : ManyOneDegree) (f : Set ℕ → Set ℕ → φ)
     (h : ∀ p₁ p₂ q₁ q₂, ManyOneEquiv p₁ p₂ → ManyOneEquiv q₁ q₂ → f p₁ q₁ = f p₂ q₂) : φ :=
@@ -311,12 +308,6 @@ protected def liftOn₂ {φ} (d₁ d₂ : ManyOneDegree) (f : Set ℕ → Set �
       apply h
       · assumption
       · rfl)
-
-@[simp]
-protected theorem liftOn₂_eq {φ} (p q : Set ℕ) (f : Set ℕ → Set ℕ → φ)
-    (h : ∀ p₁ p₂ q₁ q₂, ManyOneEquiv p₁ p₂ → ManyOneEquiv q₁ q₂ → f p₁ q₁ = f p₂ q₂) :
-    (of p).liftOn₂ (of q) f h = f p q :=
-  rfl
 
 @[simp]
 theorem of_eq_of {p : α → Prop} {q : β → Prop} : of p = of q ↔ ManyOneEquiv p q := by

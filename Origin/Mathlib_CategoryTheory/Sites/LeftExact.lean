@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.FilteredColimitCommutesFiniteLimit
 import Mathlib.CategoryTheory.Adhesive
 import Mathlib.CategoryTheory.Sites.ConcreteSheafification
 
+noncomputable section
+
 /-!
 # Left exactness of sheafification
 In this file we show that sheafification commutes with finite limits.

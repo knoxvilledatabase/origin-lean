@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Types.lean
-Genuine: 95 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
+Genuine: 94 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Types
@@ -12,6 +12,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.Tactic.CategoryTheory.Elementwise
 import Mathlib.Data.Set.Subsingleton
 import Mathlib.Logic.Relation
+
+noncomputable section
 
 /-!
 # Special shapes for limits in `Type`.
@@ -58,20 +60,11 @@ theorem pi_lift_π_apply {β : Type v} [Small.{u} β] (f : β → Type u) {P : T
     (Pi.π f b : (piObj f) → f b) (@Pi.lift β _ _ f _ P s x) = s b x :=
   congr_fun (limit.lift_π (Fan.mk P s) ⟨b⟩) x
 
-theorem pi_lift_π_apply' {β : Type v} (f : β → Type v) {P : Type v}
-    (s : ∀ b, P ⟶ f b) (b : β) (x : P) :
-    (Pi.π f b : (piObj f) → f b) (@Pi.lift β _ _ f _ P s x) = s b x := by
-  simp
-
 @[simp 1001]
 theorem pi_map_π_apply {β : Type v} [Small.{u} β] {f g : β → Type u}
     (α : ∀ j, f j ⟶ g j) (b : β) (x) :
     (Pi.π g b : ∏ᶜ g → g b) (Pi.map α x) = α b ((Pi.π f b : ∏ᶜ f → f b) x) :=
   Limit.map_π_apply.{v, u} _ _ _
-
-theorem pi_map_π_apply' {β : Type v} {f g : β → Type v} (α : ∀ j, f j ⟶ g j) (b : β) (x) :
-    (Pi.π g b : ∏ᶜ g → g b) (Pi.map α x) = α b ((Pi.π f b : ∏ᶜ f → f b) x) := by
-  simp
 
 def terminalLimitCone : Limits.LimitCone (Functor.empty (Type u)) where
   -- Porting note: tidy was able to fill the structure automatically
@@ -139,14 +132,6 @@ open CategoryTheory.Limits.WalkingPair
 @[simps! pt]
 def binaryProductCone (X Y : Type u) : BinaryFan X Y :=
   BinaryFan.mk _root_.Prod.fst _root_.Prod.snd
-
-@[simp]
-theorem binaryProductCone_fst (X Y : Type u) : (binaryProductCone X Y).fst = _root_.Prod.fst :=
-  rfl
-
-@[simp]
-theorem binaryProductCone_snd (X Y : Type u) : (binaryProductCone X Y).snd = _root_.Prod.snd :=
-  rfl
 
 @[simps]
 def binaryProductLimit (X Y : Type u) : IsLimit (binaryProductCone X Y) where
@@ -305,16 +290,6 @@ def productLimitCone {J : Type v} (F : J → TypeMax.{v, u}) :
 noncomputable def productIso {J : Type v} (F : J → TypeMax.{v, u}) : ∏ᶜ F ≅ ∀ j, F j :=
   limit.isoLimitCone (productLimitCone.{v, u} F)
 
-@[simp]
-theorem productIso_hom_comp_eval {J : Type v} (F : J → TypeMax.{v, u}) (j : J) :
-    ((productIso.{v, u} F).hom ≫ fun f => f j) = Pi.π F j :=
-  rfl
-
-@[simp]
-theorem productIso_hom_comp_eval_apply {J : Type v} (F : J → TypeMax.{v, u}) (j : J) (x) :
-    ((productIso.{v, u} F).hom x) j = Pi.π F j x :=
-  rfl
-
 @[elementwise (attr := simp)]
 theorem productIso_inv_comp_π {J : Type v} (F : J → TypeMax.{v, u}) (j : J) :
     (productIso.{v, u} F).inv ≫ Pi.π F j = fun f => f j :=
@@ -338,16 +313,6 @@ noncomputable def productLimitCone :
 noncomputable def productIso :
     (∏ᶜ F : Type u) ≅ Shrink.{u} (∀ j, F j) :=
   limit.isoLimitCone (productLimitCone.{v, u} F)
-
-@[simp]
-theorem productIso_hom_comp_eval (j : J) :
-    ((productIso.{v, u} F).hom ≫ fun f => (equivShrink (∀ j, F j)).symm f j) = Pi.π F j :=
-  limit.isoLimitCone_hom_π (productLimitCone.{v, u} F) ⟨j⟩
-
-@[simp]
-theorem productIso_hom_comp_eval_apply (j : J) (x) :
-    (equivShrink (∀ j, F j)).symm ((productIso F).hom x) j = Pi.π F j x :=
-  congr_fun (productIso_hom_comp_eval F j) x
 
 @[elementwise (attr := simp)]
 theorem productIso_inv_comp_π (j : J) :
@@ -374,10 +339,6 @@ noncomputable def coproductIso {J : Type v} (F : J → TypeMax.{v, u}) : ∐ F �
 theorem coproductIso_ι_comp_hom {J : Type v} (F : J → TypeMax.{v, u}) (j : J) :
     Sigma.ι F j ≫ (coproductIso F).hom = fun x : F j => (⟨j, x⟩ : Σj, F j) :=
   colimit.isoColimitCocone_ι_hom (coproductColimitCocone F) ⟨j⟩
-
-theorem coproductIso_mk_comp_inv {J : Type v} (F : J → TypeMax.{v, u}) (j : J) :
-    (↾fun x : F j => (⟨j, x⟩ : Σj, F j)) ≫ (coproductIso F).inv = Sigma.ι F j :=
-  rfl
 
 section Fork
 
@@ -423,10 +384,6 @@ variable (g h)
 
 noncomputable def equalizerIso : equalizer g h ≅ { x : Y // g x = h x } :=
   limit.isoLimitCone equalizerLimit
-
-@[simp]
-theorem equalizerIso_hom_comp_subtype : (equalizerIso g h).hom ≫ Subtype.val = equalizer.ι g h := by
-  rfl
 
 @[elementwise (attr := simp)]
 theorem equalizerIso_inv_comp_ι : (equalizerIso g h).inv ≫ equalizer.ι g h = Subtype.val :=
@@ -486,11 +443,6 @@ noncomputable def coequalizerIso : coequalizer f g ≅ _root_.Quot (CoequalizerR
 theorem coequalizerIso_π_comp_hom :
     coequalizer.π f g ≫ (coequalizerIso f g).hom = Quot.mk (CoequalizerRel f g) :=
   colimit.isoColimitCocone_ι_hom (coequalizerColimit f g) WalkingParallelPair.one
-
-@[simp]
-theorem coequalizerIso_quot_comp_inv :
-    ↾Quot.mk (CoequalizerRel f g) ≫ (coequalizerIso f g).inv = coequalizer.π f g :=
-  rfl
 
 end Cofork
 
@@ -568,7 +520,6 @@ lemma equivPullbackObj_symm_apply_snd (x : Types.PullbackObj f g) :
   simp
 
 include hc in
-
 lemma type_ext {x y : c.pt} (h₁ : c.fst x = c.fst y) (h₂ : c.snd x = c.snd y) : x = y :=
   (equivPullbackObj hc).injective (by ext <;> assumption)
 
@@ -579,14 +530,6 @@ variable (c)
 @[simps coe_fst coe_snd]
 def toPullbackObj (x : c.pt) : Types.PullbackObj f g :=
   ⟨⟨c.fst x, c.snd x⟩, congr_fun c.condition x⟩
-
-noncomputable def isLimitEquivBijective :
-    IsLimit c ≃ Function.Bijective c.toPullbackObj where
-  toFun h := (IsLimit.equivPullbackObj h).bijective
-  invFun h := IsLimit.ofIsoLimit (Types.pullbackLimitCone f g).isLimit
-    (Iso.symm (PullbackCone.ext (Equiv.ofBijective _ h).toIso))
-  left_inv _ := Subsingleton.elim _ _
-  right_inv _ := rfl
 
 end PullbackCone
 
@@ -835,27 +778,6 @@ structure MulticospanIndex.sections where
   val (i : I.L) : I.left i
   property (r : I.R) : I.fst r (val _) = I.snd r (val _)
 
-@[simps]
-def MulticospanIndex.sectionsEquiv :
-    I.sections ≃ I.multicospan.sections where
-  toFun s :=
-    { val := fun i ↦ match i with
-        | .left i => s.val i
-        | .right j => I.fst j (s.val _)
-      property := by
-        rintro _ _ (_|_|r)
-        · rfl
-        · rfl
-        · exact (s.property r).symm }
-  invFun s :=
-    { val := fun i ↦ s.val (.left i)
-      property := fun r ↦ (s.property (.fst r)).trans (s.property (.snd r)).symm }
-  left_inv _ := rfl
-  right_inv s := by
-    ext (_|r)
-    · rfl
-    · exact s.property (.fst r)
-
 namespace Multifork
 
 variable {I}
@@ -880,10 +802,6 @@ variable (hc : IsLimit c)
 
 noncomputable def sectionsEquiv : I.sections ≃ c.pt :=
   (Equiv.ofBijective _ (c.isLimit_types_iff.1 ⟨hc⟩)).symm
-
-@[simp]
-lemma sectionsEquiv_symm_apply_val (x : c.pt) (i : I.L) :
-    ((sectionsEquiv hc).symm x).val i = c.ι i x := rfl
 
 @[simp]
 lemma sectionsEquiv_apply_val (s : I.sections) (i : I.L) :

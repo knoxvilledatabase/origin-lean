@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Indicator
 import Mathlib.Data.ENNReal.Basic
 import Mathlib.Data.Finset.Lattice.Fold
 
+noncomputable section
+
 /-!
 # Some lemmas on extended non-negative reals
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/Deriv/Basic.lean
-Genuine: 111 | Conflates: 0 | Dissolved: 3 | Infrastructure: 15
+Genuine: 114 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Basic
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
+
+noncomputable section
 
 /-!
 
@@ -189,14 +191,17 @@ theorem derivWithin_zero_of_isolated (h : 𝓝[s \ {x}] x = ⊥) : derivWithin f
 theorem derivWithin_zero_of_nmem_closure (h : x ∉ closure s) : derivWithin f s x = 0 := by
   rw [derivWithin, fderivWithin_zero_of_nmem_closure h, ContinuousLinearMap.zero_apply]
 
--- DISSOLVED: differentiableWithinAt_of_derivWithin_ne_zero
+theorem differentiableWithinAt_of_derivWithin_ne_zero (h : derivWithin f s x ≠ 0) :
+    DifferentiableWithinAt 𝕜 f s x :=
+  not_imp_comm.1 derivWithin_zero_of_not_differentiableWithinAt h
 
 theorem deriv_zero_of_not_differentiableAt (h : ¬DifferentiableAt 𝕜 f x) : deriv f x = 0 := by
   unfold deriv
   rw [fderiv_zero_of_not_differentiableAt h]
   simp
 
--- DISSOLVED: differentiableAt_of_deriv_ne_zero
+theorem differentiableAt_of_deriv_ne_zero (h : deriv f x ≠ 0) : DifferentiableAt 𝕜 f x :=
+  not_imp_comm.1 deriv_zero_of_not_differentiableAt h
 
 theorem UniqueDiffWithinAt.eq_deriv (s : Set 𝕜) (H : UniqueDiffWithinAt 𝕜 s x)
     (h : HasDerivWithinAt f f' s x) (h₁ : HasDerivWithinAt f f₁' s x) : f' = f₁' :=
@@ -233,7 +238,11 @@ theorem HasDerivAtFilter.isBigO_sub (h : HasDerivAtFilter f f' x L) :
     (fun x' => f x' - f x) =O[L] fun x' => x' - x :=
   HasFDerivAtFilter.isBigO_sub h
 
--- DISSOLVED: HasDerivAtFilter.isBigO_sub_rev
+nonrec theorem HasDerivAtFilter.isBigO_sub_rev (hf : HasDerivAtFilter f f' x L) (hf' : f' ≠ 0) :
+    (fun x' => x' - x) =O[L] fun x' => f x' - f x :=
+  suffices AntilipschitzWith ‖f'‖₊⁻¹ (smulRight (1 : 𝕜 →L[𝕜] 𝕜) f') from hf.isBigO_sub_rev this
+  AddMonoidHomClass.antilipschitz_of_bound (smulRight (1 : 𝕜 →L[𝕜] 𝕜) f') fun x => by
+    simp [norm_smul, ← div_eq_inv_mul, mul_div_cancel_right₀ _ (mt norm_eq_zero.1 hf')]
 
 theorem HasStrictDerivAt.hasDerivAt (h : HasStrictDerivAt f f' x) : HasDerivAt f f' x :=
   h.hasFDerivAt
@@ -357,9 +366,6 @@ theorem deriv_eq {f' : 𝕜 → F} (h : ∀ x, HasDerivAt f (f' x) x) : deriv f 
 theorem HasDerivWithinAt.derivWithin (h : HasDerivWithinAt f f' s x)
     (hxs : UniqueDiffWithinAt 𝕜 s x) : derivWithin f s x = f' :=
   hxs.eq_deriv _ h.differentiableWithinAt.hasDerivWithinAt h
-
-theorem fderivWithin_derivWithin : (fderivWithin 𝕜 f s x : 𝕜 → F) 1 = derivWithin f s x :=
-  rfl
 
 theorem derivWithin_fderivWithin :
     smulRight (1 : 𝕜 →L[𝕜] 𝕜) (derivWithin f s x) = fderivWithin 𝕜 f s x := by simp [derivWithin]

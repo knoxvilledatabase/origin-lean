@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Basic
 import Mathlib.Algebra.Group.Pi.Basic
 
+noncomputable section
+
 /-!
 # Interaction between `Sum.elim`, `≤`, and `0` or `1`
 

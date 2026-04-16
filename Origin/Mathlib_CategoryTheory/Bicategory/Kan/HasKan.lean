@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 import Mathlib.CategoryTheory.Bicategory.Kan.IsKan
 
+noncomputable section
+
 /-!
 # Existence of Kan extensions and Kan lifts in bicategories
 
@@ -65,16 +67,8 @@ def lan (f : a ⟶ b) (g : a ⟶ c) [HasLeftKanExtension f g] : b ⟶ c :=
 
 scoped infixr:90 "⁺ " => lan
 
-@[simp]
-theorem lanLeftExtension_extension (f : a ⟶ b) (g : a ⟶ c) [HasLeftKanExtension f g] :
-    (lanLeftExtension f g).extension = f⁺ g := rfl
-
 def lanUnit (f : a ⟶ b) (g : a ⟶ c) [HasLeftKanExtension f g] : g ⟶ f ≫ f⁺ g :=
   (lanLeftExtension f g).unit
-
-@[simp]
-theorem lanLeftExtension_unit (f : a ⟶ b) (g : a ⟶ c) [HasLeftKanExtension f g] :
-    (lanLeftExtension f g).unit = lanUnit f g := rfl
 
 def lanIsKan (f : a ⟶ b) (g : a ⟶ c) [HasLeftKanExtension f g] : (lanLeftExtension f g).IsKan :=
   initialIsInitial
@@ -89,11 +83,6 @@ def lanDesc [HasLeftKanExtension f g] (s : LeftExtension f g) :
 theorem lanUnit_desc [HasLeftKanExtension f g] (s : LeftExtension f g) :
     lanUnit f g ≫ f ◁ lanDesc s = s.unit :=
   (lanIsKan f g).fac s
-
-@[simp]
-theorem lanIsKan_desc [HasLeftKanExtension f g] (s : LeftExtension f g) :
-    (lanIsKan f g).desc s = lanDesc s :=
-  rfl
 
 theorem Lan.existsUnique [HasLeftKanExtension f g] (s : LeftExtension f g) :
     ∃! τ, lanUnit f g ≫ f ◁ τ = s.unit :=
@@ -133,16 +122,6 @@ def isKanWhisker
 
 def lanCompIsoWhisker : lanLeftExtension f (g ≫ h) ≅ (lanLeftExtension f g).whisker h :=
   IsKan.uniqueUpToIso (lanIsKan f (g ≫ h)) (Lan.CommuteWith.isKan f g h)
-
-@[simp]
-theorem lanCompIsoWhisker_hom_right :
-    (lanCompIsoWhisker f g h).hom.right = lanDesc ((lanLeftExtension f g).whisker h) :=
-  rfl
-
-@[simp]
-theorem lanCompIsoWhisker_inv_right :
-    (lanCompIsoWhisker f g h).inv.right = (isKan f g h).desc (lanLeftExtension f (g ≫ h)) :=
-  rfl
 
 @[simps!]
 def lanCompIso : f⁺ (g ≫ h) ≅ f⁺ g ≫ h := Comma.rightIso <| lanCompIsoWhisker f g h
@@ -184,16 +163,8 @@ def lanLift (f : b ⟶ a) (g : c ⟶ a) [HasLeftKanLift f g] : c ⟶ b :=
 
 scoped infixr:90 "₊ " => lanLift
 
-@[simp]
-theorem lanLiftLeftLift_lift (f : b ⟶ a) (g : c ⟶ a) [HasLeftKanLift f g] :
-    (lanLiftLeftLift f g).lift = f₊ g := rfl
-
 def lanLiftUnit (f : b ⟶ a) (g : c ⟶ a) [HasLeftKanLift f g] : g ⟶ f₊ g ≫ f :=
   (lanLiftLeftLift f g).unit
-
-@[simp]
-theorem lanLiftLeftLift_unit (f : b ⟶ a) (g : c ⟶ a) [HasLeftKanLift f g] :
-    (lanLiftLeftLift f g).unit = lanLiftUnit f g := rfl
 
 def lanLiftIsKan (f : b ⟶ a) (g : c ⟶ a) [HasLeftKanLift f g] : (lanLiftLeftLift f g).IsKan :=
   initialIsInitial
@@ -208,11 +179,6 @@ def lanLiftDesc [HasLeftKanLift f g] (s : LeftLift f g) :
 theorem lanLiftUnit_desc [HasLeftKanLift f g] (s : LeftLift f g) :
     lanLiftUnit f g ≫ lanLiftDesc s ▷ f = s.unit :=
   (lanLiftIsKan f g).fac s
-
-@[simp]
-theorem lanLiftIsKan_desc [HasLeftKanLift f g] (s : LeftLift f g) :
-    (lanLiftIsKan f g).desc s = lanLiftDesc s :=
-  rfl
 
 theorem LanLift.existsUnique [HasLeftKanLift f g] (s : LeftLift f g) :
     ∃! τ, lanLiftUnit f g ≫ τ ▷ f = s.unit :=
@@ -254,16 +220,6 @@ def isKanWhisker
 def lanLiftCompIsoWhisker :
     lanLiftLeftLift f (h ≫ g) ≅ (lanLiftLeftLift f g).whisker h :=
   IsKan.uniqueUpToIso (lanLiftIsKan f (h ≫ g)) (LanLift.CommuteWith.isKan f g h)
-
-@[simp]
-theorem lanLiftCompIsoWhisker_hom_right :
-    (lanLiftCompIsoWhisker f g h).hom.right = lanLiftDesc ((lanLiftLeftLift f g).whisker h) :=
-  rfl
-
-@[simp]
-theorem lanLiftCompIsoWhisker_inv_right :
-    (lanLiftCompIsoWhisker f g h).inv.right = (isKan f g h).desc (lanLiftLeftLift f (h ≫ g)) :=
-  rfl
 
 @[simps!]
 def lanLiftCompIso : f₊ (h ≫ g) ≅ h ≫ f₊ g := Comma.rightIso <| lanLiftCompIsoWhisker f g h

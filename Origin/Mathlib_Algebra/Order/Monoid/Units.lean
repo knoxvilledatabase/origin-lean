@@ -7,6 +7,8 @@ import Mathlib.Order.Hom.Basic
 import Mathlib.Order.MinMax
 import Mathlib.Algebra.Group.Units.Defs
 
+noncomputable section
+
 /-!
 # Units in ordered monoids
 -/
@@ -18,14 +20,6 @@ variable {α : Type*}
 @[to_additive]
 instance [Monoid α] [Preorder α] : Preorder αˣ :=
   Preorder.lift val
-
-@[to_additive (attr := simp, norm_cast)]
-theorem val_le_val [Monoid α] [Preorder α] {a b : αˣ} : (a : α) ≤ b ↔ a ≤ b :=
-  Iff.rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem val_lt_val [Monoid α] [Preorder α] {a b : αˣ} : (a : α) < b ↔ a < b :=
-  Iff.rfl
 
 @[to_additive]
 instance instPartialOrderUnits [Monoid α] [PartialOrder α] : PartialOrder αˣ :=

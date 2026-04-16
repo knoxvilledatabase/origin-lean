@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Real/IsNonarchimedean.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Hom.Ultra
 import Mathlib.Analysis.Normed.Group.Ultra
 import Mathlib.Data.Nat.Choose.Sum
+
+noncomputable section
 
 /-!
 # Nonarchimedean functions
@@ -62,9 +64,21 @@ theorem finset_image_add_of_nonempty {F α β : Type*} [AddCommGroup α] [FunLik
   obtain ⟨b, hbt, hbf⟩ := finset_image_add hna g t
   exact ⟨b, hbt ht, hbf⟩
 
--- DISSOLVED: multiset_image_add
+theorem multiset_image_add {F α β : Type*} [AddCommGroup α] [FunLike F α ℝ]
+    [AddGroupSeminormClass F α ℝ] [Nonempty β] {f : F} (hna : IsNonarchimedean f)
+    (g : β → α) (s : Multiset β) :
+    ∃ b : β, (s ≠ 0 → b ∈ s) ∧ f (Multiset.map g s).sum ≤ f (g b) := by
+  let _ := AddGroupSeminormClass.toSeminormedAddCommGroup f
+  have := AddGroupSeminormClass.isUltrametricDist hna
+  simp only [← AddGroupSeminormClass.toSeminormedAddCommGroup_norm_eq]
+  apply exists_norm_multiset_sum_le
 
--- DISSOLVED: multiset_image_add_of_nonempty
+theorem multiset_image_add_of_nonempty {F α β : Type*} [AddCommGroup α] [FunLike F α ℝ]
+    [AddGroupSeminormClass F α ℝ] [Nonempty β] {f : F} (hna : IsNonarchimedean f)
+    (g : β → α) {s : Multiset β} (hs : s ≠ 0) :
+    ∃ b : β, (b ∈ s) ∧ f (Multiset.map g s).sum ≤ f (g b) := by
+  obtain ⟨b, hbs, hbf⟩ := multiset_image_add hna g s
+  exact ⟨b, hbs hs, hbf⟩
 
 theorem add_pow_le {F α : Type*} [CommRing α] [FunLike F α ℝ]
     [RingSeminormClass F α ℝ] {f : F} (hna : IsNonarchimedean f) (n : ℕ) (a b : α) :

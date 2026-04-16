@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Card
 import Mathlib.Data.Multiset.Pi
 
+noncomputable section
+
 /-!
 # The cartesian product of finsets
 
@@ -41,10 +43,6 @@ def pi (s : Finset α) (t : ∀ a, Finset (β a)) : Finset (∀ a ∈ s, β a) :
   ⟨s.1.pi fun a => (t a).1, s.nodup.pi fun a _ => (t a).nodup⟩
 
 @[simp]
-theorem pi_val (s : Finset α) (t : ∀ a, Finset (β a)) : (s.pi t).1 = s.1.pi fun a => (t a).1 :=
-  rfl
-
-@[simp]
 theorem mem_pi {s : Finset α} {t : ∀ a, Finset (β a)} {f : ∀ a ∈ s, β a} :
     f ∈ s.pi t ↔ ∀ (a) (h : a ∈ s), f a h ∈ t a :=
   Multiset.mem_pi _ _ _
@@ -72,10 +70,6 @@ theorem Pi.cons_injective {a : α} {b : δ a} {s : Finset α} (hs : a ∉ s) :
             Pi.cons s a b e₂ e (by simpa only [Multiset.mem_cons, mem_insert] using h) := by
           rw [eq]
         this
-
-@[simp]
-theorem pi_empty {t : ∀ a : α, Finset (β a)} : pi (∅ : Finset α) t = singleton (Pi.empty β) :=
-  rfl
 
 @[simp]
 lemma pi_nonempty : (s.pi t).Nonempty ↔ ∀ a ∈ s, (t a).Nonempty := by
@@ -149,20 +143,9 @@ variable {π : ι → Type*}
 @[simp]
 def restrict (s : Finset ι) (f : (i : ι) → π i) : (i : s) → π i := fun x ↦ f x
 
-theorem restrict_def (s : Finset ι) : s.restrict (π := π) = fun f x ↦ f x := rfl
-
 @[simp]
 def restrict₂ {s t : Finset ι} (hst : s ⊆ t) (f : (i : t) → π i) : (i : s) → π i :=
   fun x ↦ f ⟨x.1, hst x.2⟩
-
-theorem restrict₂_def {s t : Finset ι} (hst : s ⊆ t) :
-    restrict₂ (π := π) hst = fun f x ↦ f ⟨x.1, hst x.2⟩ := rfl
-
-theorem restrict₂_comp_restrict {s t : Finset ι} (hst : s ⊆ t) :
-    (restrict₂ (π := π) hst) ∘ t.restrict = s.restrict := rfl
-
-theorem restrict₂_comp_restrict₂ {s t u : Finset ι} (hst : s ⊆ t) (htu : t ⊆ u) :
-    (restrict₂ (π := π) hst) ∘ (restrict₂ htu) = restrict₂ (hst.trans htu) := rfl
 
 end Pi
 

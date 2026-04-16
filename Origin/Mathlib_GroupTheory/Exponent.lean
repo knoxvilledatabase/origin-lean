@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/Exponent.lean
-Genuine: 51 | Conflates: 2 | Dissolved: 5 | Infrastructure: 6
+Genuine: 58 | Conflates: 2 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.GroupTheory.OrderOfElement
@@ -9,6 +9,8 @@ import Mathlib.Algebra.GCDMonoid.Nat
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Tactic.Peel
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+
+noncomputable section
 
 /-!
 # Exponent of a group
@@ -68,14 +70,6 @@ noncomputable def exponent :=
 
 variable {G}
 
-@[simp]
-theorem _root_.AddMonoid.exponent_additive :
-    AddMonoid.exponent (Additive G) = exponent G := rfl
-
-@[simp]
-theorem exponent_multiplicative {G : Type*} [AddMonoid G] :
-    exponent (Multiplicative G) = AddMonoid.exponent G := rfl
-
 open MulOpposite in
 
 @[to_additive (attr := simp)]
@@ -92,14 +86,22 @@ theorem ExponentExists.isOfFinOrder (h : ExponentExists G) {g : G} : IsOfFinOrde
 theorem ExponentExists.orderOf_pos (h : ExponentExists G) (g : G) : 0 < orderOf g :=
   h.isOfFinOrder.orderOf_pos
 
--- DISSOLVED: exponent_ne_zero
+@[to_additive]
+theorem exponent_ne_zero : exponent G ≠ 0 ↔ ExponentExists G := by
+  rw [exponent]
+  split_ifs with h
+  · simp [h, @not_lt_zero' ℕ]
+  --if this isn't done this way, `to_additive` freaks
+  · tauto
 
+@[to_additive]
 protected alias ⟨_, ExponentExists.exponent_ne_zero⟩ := exponent_ne_zero
 
 @[to_additive]
 theorem exponent_pos : 0 < exponent G ↔ ExponentExists G :=
   pos_iff_ne_zero.trans exponent_ne_zero
 
+@[to_additive]
 protected alias ⟨_, ExponentExists.exponent_pos⟩ := exponent_pos
 
 @[to_additive]
@@ -110,7 +112,12 @@ theorem exponent_eq_zero_iff : exponent G = 0 ↔ ¬ExponentExists G :=
 theorem exponent_eq_zero_of_order_zero {g : G} (hg : orderOf g = 0) : exponent G = 0 :=
   exponent_eq_zero_iff.mpr fun h ↦ h.orderOf_pos g |>.ne' hg
 
--- DISSOLVED: exponent_eq_zero_iff_forall
+@[to_additive "The exponent is zero iff for all nonzero `n`, one can find a `g` such that
+`n • g ≠ 0`."]
+theorem exponent_eq_zero_iff_forall : exponent G = 0 ↔ ∀ n > 0, ∃ g : G, g ^ n ≠ 1 := by
+  rw [exponent_eq_zero_iff, ExponentExists]
+  push_neg
+  rfl
 
 @[to_additive exponent_nsmul_eq_zero]
 theorem pow_exponent_eq_one (g : G) : g ^ exponent G = 1 := by
@@ -230,7 +237,19 @@ variable {G} in
 
 open Nat in
 
--- DISSOLVED: _root_.Commute.orderOf_mul_pow_eq_lcm
+@[to_additive "If two commuting elements `x` and `y` of an additive monoid have order `n` and `m`,
+there is an element of order `lcm n m`. The result actually gives an explicit (computable) element,
+written as the sum of a multiple of `x` and a multiple of `y`. See also the result below if you
+don't need the explicit formula."]
+lemma _root_.Commute.orderOf_mul_pow_eq_lcm {x y : G} (h : Commute x y) (hx : orderOf x ≠ 0)
+    (hy : orderOf y ≠ 0) :
+    orderOf (x ^ (orderOf x / (factorizationLCMLeft (orderOf x) (orderOf y))) *
+      y ^ (orderOf y / factorizationLCMRight (orderOf x) (orderOf y))) =
+      Nat.lcm (orderOf x) (orderOf y) := by
+  rw [(h.pow_pow _ _).orderOf_mul_eq_mul_orderOf_of_coprime]
+  all_goals iterate 2 rw [orderOf_pow_orderOf_div]; try rw [Coprime]
+  all_goals simp [factorizationLCMLeft_mul_factorizationLCMRight, factorizationLCMLeft_dvd_left,
+    factorizationLCMRight_dvd_right, coprime_factorizationLCMLeft_factorizationLCMRight, hx, hy]
 
 open Submonoid in
 
@@ -263,7 +282,28 @@ lemma exponent_eq_prime_iff {G : Type*} [Monoid G] [Nontrivial G] {p : ℕ} (hp 
 
 variable {G}
 
--- DISSOLVED: exponent_ne_zero_iff_range_orderOf_finite
+@[to_additive]
+theorem exponent_ne_zero_iff_range_orderOf_finite (h : ∀ g : G, 0 < orderOf g) :
+    exponent G ≠ 0 ↔ (Set.range (orderOf : G → ℕ)).Finite := by
+  refine ⟨fun he => ?_, fun he => ?_⟩
+  · by_contra h
+    obtain ⟨m, ⟨t, rfl⟩, het⟩ := Set.Infinite.exists_gt h (exponent G)
+    exact pow_ne_one_of_lt_orderOf he het (pow_exponent_eq_one t)
+  · lift Set.range (orderOf (G := G)) to Finset ℕ using he with t ht
+    have htpos : 0 < t.prod id := by
+      refine Finset.prod_pos fun a ha => ?_
+      rw [← Finset.mem_coe, ht] at ha
+      obtain ⟨k, rfl⟩ := ha
+      exact h k
+    suffices exponent G ∣ t.prod id by
+      intro h
+      rw [h, zero_dvd_iff] at this
+      exact htpos.ne' this
+    rw [exponent_dvd]
+    intro g
+    apply Finset.dvd_prod_of_mem id (?_ : orderOf g ∈ _)
+    rw [← Finset.mem_coe, ht]
+    exact Set.mem_range_self g
 
 @[to_additive]
 theorem exponent_eq_zero_iff_range_orderOf_infinite (h : ∀ g : G, 0 < orderOf g) :
@@ -327,7 +367,9 @@ theorem ExponentExists.of_finite : ExponentExists G := by
   · rw [← orderOf_dvd_iff_pow_eq_one, lcm_orderOf_eq_exponent]
     exact order_dvd_exponent g
 
--- DISSOLVED: exponent_ne_zero_of_finite
+@[to_additive]
+theorem exponent_ne_zero_of_finite : exponent G ≠ 0 :=
+  ExponentExists.of_finite.exponent_ne_zero
 
 -- CONFLATES (assumes ground = zero): one_lt_exponent
 @[to_additive AddMonoid.one_lt_exponent]

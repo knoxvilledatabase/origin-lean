@@ -5,6 +5,8 @@ Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Data.PFunctor.Univariate.M
 
+noncomputable section
+
 /-!
 
 # Quotients of Polynomial Functors
@@ -136,10 +138,6 @@ def recF {α : Type _} (g : F α → α) : q.P.W → α
 theorem recF_eq {α : Type _} (g : F α → α) (x : q.P.W) :
     recF g x = g (abs (q.P.map (recF g) x.dest)) := by
   cases x
-  rfl
-
-theorem recF_eq' {α : Type _} (g : F α → α) (a : q.P.A) (f : q.P.B a → q.P.W) :
-    recF g ⟨a, f⟩ = g (abs (q.P.map (recF g) ⟨a, f⟩)) :=
   rfl
 
 inductive Wequiv : q.P.W → q.P.W → Prop

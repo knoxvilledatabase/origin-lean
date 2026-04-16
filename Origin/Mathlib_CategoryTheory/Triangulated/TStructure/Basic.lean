@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Shift.Predicate
 import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 
+noncomputable section
+
 /-!
 # t-structures on triangulated categories
 

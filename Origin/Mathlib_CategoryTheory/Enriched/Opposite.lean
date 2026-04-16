@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Enriched.Ordinary
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 
+noncomputable section
+
 /-!
 
 # The opposite category of an enriched category

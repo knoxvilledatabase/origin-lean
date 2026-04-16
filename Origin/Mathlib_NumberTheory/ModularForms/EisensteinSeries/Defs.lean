@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.ModularForms.SlashInvariantForms
 import Mathlib.NumberTheory.ModularForms.CongruenceSubgroups
 
+noncomputable section
+
 /-!
 # Eisenstein Series
 
@@ -111,8 +113,5 @@ def eisensteinSeries_SIF (k : ℤ) : SlashInvariantForm (Gamma N) k where
   toFun := eisensteinSeries a k
   slash_action_eq' A hA := by simp only [eisensteinSeries_slash_apply, Gamma_mem'.mp hA,
     SpecialLinearGroup.coe_one, vecMul_one]
-
-lemma eisensteinSeries_SIF_apply (k : ℤ) (z : ℍ) :
-    eisensteinSeries_SIF a k z = eisensteinSeries a k z := rfl
 
 end EisensteinSeries

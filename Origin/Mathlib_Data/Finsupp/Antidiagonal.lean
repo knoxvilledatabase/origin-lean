@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.NatAntidiagonal
 import Mathlib.Data.Finsupp.Multiset
 import Mathlib.Data.Multiset.Antidiagonal
 
+noncomputable section
+
 /-!
 # The `Finsupp` counterpart of `Multiset.antidiagonal`.
 
@@ -32,9 +34,6 @@ instance instHasAntidiagonal : HasAntidiagonal (α →₀ ℕ) where
     rcases p with ⟨p₁, p₂⟩
     simp [antidiagonal', ← and_assoc, Multiset.toFinsupp_eq_iff,
     ← Multiset.toFinsupp_eq_iff (f := f)]
-
-@[simp]
-theorem antidiagonal_zero : antidiagonal (0 : α →₀ ℕ) = singleton (0, 0) := rfl
 
 @[to_additive]
 theorem prod_antidiagonal_swap {M : Type*} [CommMonoid M] (n : α →₀ ℕ)

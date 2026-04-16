@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Category.KleisliCat
 import Mathlib.CategoryTheory.Types
 import Mathlib.Control.Basic -- Porting note: Needed for `joinM_map_map`, etc.
 
+noncomputable section
+
 /-!
 
 # Convert from `Monad` (i.e. Lean's `Type`-based monads) to `CategoryTheory.Monad`

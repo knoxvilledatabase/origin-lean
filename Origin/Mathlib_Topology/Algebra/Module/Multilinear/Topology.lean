@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Module.UniformConvergence
 import Mathlib.Topology.Algebra.SeparationQuotient.Section
 import Mathlib.Topology.Hom.ContinuousEvalConst
 
+noncomputable section
+
 /-!
 # Topology on continuous multilinear maps
 
@@ -48,11 +50,6 @@ lemma range_toUniformOnFun [DecidableEq ι] [TopologicalSpace F] :
     exact ⟨f.cont, f.map_update_add, f.map_update_smul⟩
   · rintro ⟨hcont, hadd, hsmul⟩
     exact ⟨⟨⟨f, by intro; convert hadd, by intro; convert hsmul⟩, hcont⟩, rfl⟩
-
-@[simp]
-lemma toUniformOnFun_toFun [TopologicalSpace F] (f : ContinuousMultilinearMap 𝕜 E F) :
-    UniformOnFun.toFun _ f.toUniformOnFun = f :=
-  rfl
 
 instance instTopologicalSpace [TopologicalSpace F] [TopologicalAddGroup F] :
     TopologicalSpace (ContinuousMultilinearMap 𝕜 E F) :=
@@ -250,28 +247,11 @@ theorem continuous_restrictScalars :
 
 variable (𝕜') in
 
-@[simps (config := .asFn) apply]
-def restrictScalarsLinear [ContinuousConstSMul 𝕜' F] :
-    ContinuousMultilinearMap 𝕜 E F →L[𝕜'] ContinuousMultilinearMap 𝕜' E F where
-  toFun := restrictScalars 𝕜'
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
 end RestrictScalars
 
 variable (𝕜 E F)
 
-def apply [ContinuousConstSMul 𝕜 F] (m : Π i, E i) : ContinuousMultilinearMap 𝕜 E F →L[𝕜] F where
-  toFun c := c m
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  cont := continuous_eval_const m
-
 variable {𝕜 E F}
-
-@[simp]
-lemma apply_apply [ContinuousConstSMul 𝕜 F] {m : Π i, E i} {c : ContinuousMultilinearMap 𝕜 E F} :
-    apply 𝕜 E F m c = c m := rfl
 
 theorem hasSum_eval {α : Type*} {p : α → ContinuousMultilinearMap 𝕜 E F}
     {q : ContinuousMultilinearMap 𝕜 E F} (h : HasSum p q) (m : Π i, E i) :

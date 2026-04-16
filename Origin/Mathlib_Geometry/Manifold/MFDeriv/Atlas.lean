@@ -5,6 +5,8 @@ Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Geometry.Manifold.MFDeriv.SpecificFunctions
 
+noncomputable section
+
 /-!
 # Differentiability of models with corners and (extended) charts
 

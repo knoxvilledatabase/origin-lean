@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Topology.FiberBundle.IsHomeomorphicTrivialBundle
 
+noncomputable section
+
 /-!
 # Closure, interior, and frontier of preimages under `re` and `im`
 

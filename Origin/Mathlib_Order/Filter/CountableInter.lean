@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Curry
 import Mathlib.Data.Set.Countable
 
+noncomputable section
+
 /-!
 # Filters with countable intersection property
 
@@ -124,12 +126,6 @@ instance Filter.countableInter_ofCountableInter (l : Set (Set α))
     CountableInterFilter (Filter.ofCountableInter l hl h_mono) :=
   ⟨hl⟩
 
-@[simp]
-theorem Filter.mem_ofCountableInter {l : Set (Set α)}
-    (hl : ∀ S : Set (Set α), S.Countable → S ⊆ l → ⋂₀ S ∈ l) (h_mono : ∀ s t, s ∈ l → s ⊆ t → t ∈ l)
-    {s : Set α} : s ∈ Filter.ofCountableInter l hl h_mono ↔ s ∈ l :=
-  Iff.rfl
-
 def Filter.ofCountableUnion (l : Set (Set α))
     (hUnion : ∀ S : Set (Set α), S.Countable → (∀ s ∈ S, s ∈ l) → ⋃₀ S ∈ l)
     (hmono : ∀ t ∈ l, ∀ s ⊆ t, s ∈ l) : Filter α := by
@@ -147,11 +143,6 @@ def Filter.ofCountableUnion (l : Set (Set α))
 instance Filter.countableInter_ofCountableUnion (l : Set (Set α)) (h₁ h₂) :
     CountableInterFilter (Filter.ofCountableUnion l h₁ h₂) :=
   countableInter_ofCountableInter ..
-
-@[simp]
-theorem Filter.mem_ofCountableUnion {l : Set (Set α)} {hunion hmono s} :
-    s ∈ ofCountableUnion l hunion hmono ↔ l sᶜ :=
-  Iff.rfl
 
 instance countableInterFilter_principal (s : Set α) : CountableInterFilter (𝓟 s) :=
   ⟨fun _ _ hS => subset_sInter hS⟩

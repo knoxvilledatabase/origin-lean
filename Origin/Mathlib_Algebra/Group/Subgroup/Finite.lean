@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Algebra.Group.Submonoid.Membership
 import Mathlib.Data.Finite.Card
 
+noncomputable section
+
 /-!
 # Subgroups
 

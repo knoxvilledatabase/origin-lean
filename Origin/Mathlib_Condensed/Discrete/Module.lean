@@ -9,6 +9,8 @@ import Mathlib.Condensed.Light.Module
 import Mathlib.Condensed.Module
 import Mathlib.Topology.LocallyConstant.Algebra
 
+noncomputable section
+
 /-!
 
 # Discrete condensed `R`-modules

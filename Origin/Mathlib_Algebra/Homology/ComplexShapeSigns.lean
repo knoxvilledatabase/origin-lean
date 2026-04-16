@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ComplexShape
 import Mathlib.Algebra.Ring.NegOnePow
 import Mathlib.CategoryTheory.GradedObject.Trifunctor
 
+noncomputable section
+
 /-! Signs in constructions on homological complexes
 
 In this file, we shall introduce various typeclasses which will allow
@@ -155,9 +157,6 @@ instance : TensorSigns (ComplexShape.down ℕ) where
     dsimp
     rw [pow_add, pow_one, mul_neg, mul_one, neg_neg]
 
-@[simp]
-lemma ε_down_ℕ (n : ℕ) : (ComplexShape.down ℕ).ε n = (-1 : ℤˣ) ^ n := rfl
-
 instance : TensorSigns (ComplexShape.up ℤ) where
   ε' := MonoidHom.mk' Int.negOnePow Int.negOnePow_add
   rel_add p q r (hpq : p + 1 = q) := by dsimp; omega
@@ -166,9 +165,6 @@ instance : TensorSigns (ComplexShape.up ℤ) where
     rintro p _ rfl
     dsimp
     rw [Int.negOnePow_succ]
-
-@[simp]
-lemma ε_up_ℤ (n : ℤ) : (ComplexShape.up ℤ).ε n = n.negOnePow := rfl
 
 end
 
@@ -217,13 +213,6 @@ def r : I₁ × I₂ × I₃ → J := fun ⟨i₁, i₂, i₃⟩ ↦ π c₁₂ 
 open CategoryTheory
 
 @[reducible]
-def ρ₁₂ : GradedObject.BifunctorComp₁₂IndexData (r c₁ c₂ c₃ c₁₂ c) where
-  I₁₂ := I₁₂
-  p := π c₁ c₂ c₁₂
-  q := π c₁₂ c₃ c
-  hpq _ := rfl
-
-@[reducible]
 def ρ₂₃ : GradedObject.BifunctorComp₂₃IndexData (r c₁ c₂ c₃ c₁₂ c) where
   I₂₃ := I₂₃
   p := π c₂ c₃ c₂₃
@@ -260,14 +249,6 @@ abbrev σ (i₁ : I₁) (i₂ : I₂) : ℤˣ := TotalComplexShapeSymmetry.σ c�
 lemma π_symm (i₁ : I₁) (i₂ : I₂) :
     π c₂ c₁ c₁₂ ⟨i₂, i₁⟩ = π c₁ c₂ c₁₂ ⟨i₁, i₂⟩ := by
   apply TotalComplexShapeSymmetry.symm
-
-@[simps]
-def symmetryEquiv (j : I₁₂) :
-    (π c₂ c₁ c₁₂ ⁻¹' {j}) ≃ (π c₁ c₂ c₁₂ ⁻¹' {j}) where
-  toFun := fun ⟨⟨i₂, i₁⟩, h⟩ => ⟨⟨i₁, i₂⟩, by simpa [π_symm] using h⟩
-  invFun := fun ⟨⟨i₁, i₂⟩, h⟩ => ⟨⟨i₂, i₁⟩, by simpa [π_symm] using h⟩
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 variable {c₁}
 

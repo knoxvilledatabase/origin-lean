@@ -8,6 +8,8 @@ import Mathlib.Algebra.Star.Prod
 import Mathlib.Topology.Algebra.Constructions
 import Mathlib.Topology.ContinuousMap.Defs
 
+noncomputable section
+
 /-!
 # Continuity of `star`
 

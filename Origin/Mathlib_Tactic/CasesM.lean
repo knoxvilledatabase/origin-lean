@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.Tactic.Conv.Pattern
 
+noncomputable section
+
 /-!
 # `casesm`, `cases_type`, `constructorm` tactics
 
@@ -70,9 +72,7 @@ def matchPatterns (pats : Array AbstractMVarsResult) (e : Expr) : MetaM Bool := 
   pats.anyM fun p ↦ return (← Conv.matchPattern? p e) matches some (_, #[])
 
 elab (name := casesM) "casesm" recursive:"*"? ppSpace pats:term,+ : tactic => do
-
   let pats ← elabPatterns pats.getElems
-
   liftMetaTactic (casesMatching (matchPatterns pats) recursive.isSome)
 
 def elabCasesType (heads : Array Ident)
@@ -81,11 +81,9 @@ def elabCasesType (heads : Array Ident)
   liftMetaTactic (casesType heads recursive allowSplit)
 
 elab (name := casesType) "cases_type" recursive:"*"? heads:(ppSpace colGt ident)+ : tactic =>
-
   elabCasesType heads recursive.isSome true
 
 elab (name := casesType!) "cases_type!" recursive:"*"? heads:(ppSpace colGt ident)+ : tactic =>
-
   elabCasesType heads recursive.isSome false
 
 @[inherit_doc casesType]
@@ -114,9 +112,7 @@ where
       return (acc.push g)
 
 elab (name := constructorM) "constructorm" recursive:"*"? ppSpace pats:term,+ : tactic => do
-
   let pats ← elabPatterns pats.getElems
-
   liftMetaTactic (constructorMatching · (matchPatterns pats) recursive.isSome)
 
 end Mathlib.Tactic

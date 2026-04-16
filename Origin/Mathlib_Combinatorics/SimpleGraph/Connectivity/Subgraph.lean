@@ -5,6 +5,8 @@ Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Path
 
+noncomputable section
+
 /-!
 # Connectivity of subgraphs and induced graphs
 
@@ -110,9 +112,6 @@ variable {u v w : V}
 protected def toSubgraph {u v : V} : G.Walk u v → G.Subgraph
   | nil => G.singletonSubgraph u
   | cons h p => G.subgraphOfAdj h ⊔ p.toSubgraph
-
-theorem toSubgraph_cons_nil_eq_subgraphOfAdj (h : G.Adj u v) :
-    (cons h nil).toSubgraph = G.subgraphOfAdj h := by simp
 
 theorem mem_verts_toSubgraph (p : G.Walk u v) : w ∈ p.toSubgraph.verts ↔ w ∈ p.support := by
   induction' p with _ x y z h p' ih

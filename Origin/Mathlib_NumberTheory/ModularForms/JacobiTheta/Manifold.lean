@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.UpperHalfPlane.Manifold
 import Mathlib.Geometry.Manifold.MFDeriv.FDeriv
 import Mathlib.NumberTheory.ModularForms.JacobiTheta.OneVariable
 
+noncomputable section
+
 /-!
 # Manifold differentiability of the Jacobi theta function
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Qq.Macro
 
+noncomputable section
+
 /-!
 # The `eval%` term elaborator
 

@@ -1,12 +1,14 @@
 /-
 Extracted from Topology/Algebra/ContinuousMonoidHom.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Equicontinuity
 import Mathlib.Topology.Algebra.Group.Compact
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.Topology.UniformSpace.Ascoli
+
+noncomputable section
 
 /-!
 
@@ -80,7 +82,6 @@ theorem toContinuousMap_injective : Injective (toContinuousMap : _ → C(A, B)) 
 protected alias _root_.ContinuousAddMonoidHom.mk' := ContinuousAddMonoidHom.mk
 
 set_option linter.existingAttributeWarning false in
-
 attribute [to_additive existing] ContinuousMonoidHom.mk'
 
 @[to_additive (attr := simps!) "Composition of two continuous homomorphisms."]
@@ -101,7 +102,6 @@ def prodMap (f : ContinuousMonoidHom A C) (g : ContinuousMonoidHom B D) :
 alias _root_.ContinuousAddMonoidHom.sum_map := ContinuousAddMonoidHom.prodMap
 
 set_option linter.existingAttributeWarning false in
-
 attribute [to_additive existing] prod_map
 
 variable (A B C D E)

@@ -7,6 +7,8 @@ import Mathlib.Geometry.Manifold.MFDeriv.Tangent
 import Mathlib.Geometry.Manifold.ContMDiffMap
 import Mathlib.Geometry.Manifold.VectorBundle.Hom
 
+noncomputable section
+
 /-!
 ### Interactions between differentiability, smoothness and manifold derivatives
 

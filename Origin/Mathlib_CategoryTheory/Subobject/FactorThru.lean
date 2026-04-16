@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Basic
 import Mathlib.CategoryTheory.Preadditive.Basic
 
+noncomputable section
+
 /-!
 # Factoring through subobjects
 
@@ -53,11 +55,6 @@ def Factors {X Y : C} (P : Subobject Y) (f : X ⟶ Y) : Prop :=
         exact ⟨i ≫ h.hom.left, by erw [Category.assoc, Over.w h.hom, w]⟩
       · rintro ⟨i, w⟩
         exact ⟨i ≫ h.inv.left, by erw [Category.assoc, Over.w h.inv, w]⟩)
-
-@[simp]
-theorem mk_factors_iff {X Y Z : C} (f : Y ⟶ X) [Mono f] (g : Z ⟶ X) :
-    (Subobject.mk f).Factors g ↔ (MonoOver.mk' f).Factors g :=
-  Iff.rfl
 
 theorem mk_factors_self (f : X ⟶ Y) [Mono f] : (mk f).Factors f :=
   ⟨𝟙 _, by simp⟩
@@ -126,10 +123,6 @@ theorem factorThru_right {X Y Z : C} {P : Subobject Z} (f : X ⟶ Y) (g : Y ⟶ 
     f ≫ P.factorThru g h = P.factorThru (f ≫ g) (factors_of_factors_right f h) := by
   apply (cancel_mono P.arrow).mp
   simp
-
-@[simp]
-theorem factorThru_zero [HasZeroMorphisms C] {X Y : C} {P : Subobject Y}
-    (h : P.Factors (0 : X ⟶ Y)) : P.factorThru 0 h = 0 := by simp
 
 theorem factorThru_ofLE {Y Z : C} {P Q : Subobject Y} {f : Z ⟶ Y} (h : P ≤ Q) (w : P.Factors f) :
     Q.factorThru f (factors_of_le f h w) = P.factorThru f w ≫ ofLE P Q h := by

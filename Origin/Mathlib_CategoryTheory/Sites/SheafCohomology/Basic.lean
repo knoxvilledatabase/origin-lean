@@ -9,6 +9,8 @@ import Mathlib.Algebra.Homology.DerivedCategory.Ext.Basic
 import Mathlib.CategoryTheory.Sites.Abelian
 import Mathlib.CategoryTheory.Sites.ConstantSheaf
 
+noncomputable section
+
 /-!
 # Sheaf cohomology
 

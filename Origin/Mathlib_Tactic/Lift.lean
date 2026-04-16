@@ -7,6 +7,8 @@ import Mathlib.Tactic.Basic
 import Batteries.Lean.Expr
 import Batteries.Lean.Meta.UnusedNames
 
+noncomputable section
+
 /-!
 # lift tactic
 
@@ -55,7 +57,6 @@ namespace Mathlib.Tactic
 open Lean Parser Tactic Elab Tactic Meta
 
 syntax (name := lift) "lift " term " to " term (" using " term)?
-
   (" with " ident (ppSpace colGt ident)? (ppSpace colGt ident)?)? : tactic
 
 def Lift.getInst (old_tp new_tp : Expr) : MetaM (Expr × Expr × Expr) := do

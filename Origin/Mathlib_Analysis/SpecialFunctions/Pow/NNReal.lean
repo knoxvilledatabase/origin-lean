@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/SpecialFunctions/Pow/NNReal.lean
-Genuine: 144 | Conflates: 0 | Dissolved: 47 | Infrastructure: 9
+Genuine: 191 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+noncomputable section
 
 /-!
 # Power function on `ℝ≥0` and `ℝ≥0∞`
@@ -33,10 +35,6 @@ noncomputable def rpow (x : ℝ≥0) (y : ℝ) : ℝ≥0 :=
 noncomputable instance : Pow ℝ≥0 ℝ :=
   ⟨rpow⟩
 
-@[simp]
-theorem rpow_eq_pow (x : ℝ≥0) (y : ℝ) : rpow x y = x ^ y :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_rpow (x : ℝ≥0) (y : ℝ) : ((x ^ y : ℝ≥0) : ℝ) = (x : ℝ) ^ y :=
   rfl
@@ -45,11 +43,16 @@ theorem coe_rpow (x : ℝ≥0) (y : ℝ) : ((x ^ y : ℝ≥0) : ℝ) = (x : ℝ)
 theorem rpow_zero (x : ℝ≥0) : x ^ (0 : ℝ) = 1 :=
   NNReal.eq <| Real.rpow_zero _
 
--- DISSOLVED: rpow_eq_zero_iff
+@[simp]
+theorem rpow_eq_zero_iff {x : ℝ≥0} {y : ℝ} : x ^ y = 0 ↔ x = 0 ∧ y ≠ 0 := by
+  rw [← NNReal.coe_inj, coe_rpow, ← NNReal.coe_eq_zero]
+  exact Real.rpow_eq_zero_iff_of_nonneg x.2
 
--- DISSOLVED: rpow_eq_zero
+lemma rpow_eq_zero (hy : y ≠ 0) : x ^ y = 0 ↔ x = 0 := by simp [hy]
 
--- DISSOLVED: zero_rpow
+@[simp]
+theorem zero_rpow {x : ℝ} (h : x ≠ 0) : (0 : ℝ≥0) ^ x = 0 :=
+  NNReal.eq <| Real.zero_rpow h
 
 @[simp]
 theorem rpow_one (x : ℝ≥0) : x ^ (1 : ℝ) = x :=
@@ -71,39 +74,54 @@ lemma rpow_intCast (x : ℝ≥0) (n : ℤ) : x ^ (n : ℝ) = x ^ n := by
 theorem one_rpow (x : ℝ) : (1 : ℝ≥0) ^ x = 1 :=
   NNReal.eq <| Real.one_rpow _
 
--- DISSOLVED: rpow_add
+theorem rpow_add {x : ℝ≥0} (hx : x ≠ 0) (y z : ℝ) : x ^ (y + z) = x ^ y * x ^ z :=
+  NNReal.eq <| Real.rpow_add ((NNReal.coe_pos.trans pos_iff_ne_zero).mpr hx) _ _
 
--- DISSOLVED: rpow_add'
+theorem rpow_add' (h : y + z ≠ 0) (x : ℝ≥0) : x ^ (y + z) = x ^ y * x ^ z :=
+  NNReal.eq <| Real.rpow_add' x.2 h
 
--- DISSOLVED: rpow_add_intCast
+lemma rpow_add_intCast (hx : x ≠ 0) (y : ℝ) (n : ℤ) : x ^ (y + n) = x ^ y * x ^ n := by
+  ext; exact Real.rpow_add_intCast (mod_cast hx) _ _
 
--- DISSOLVED: rpow_add_natCast
+lemma rpow_add_natCast (hx : x ≠ 0) (y : ℝ) (n : ℕ) : x ^ (y + n) = x ^ y * x ^ n := by
+  ext; exact Real.rpow_add_natCast (mod_cast hx) _ _
 
--- DISSOLVED: rpow_sub_intCast
+lemma rpow_sub_intCast (hx : x ≠ 0) (y : ℝ) (n : ℕ) : x ^ (y - n) = x ^ y / x ^ n := by
+  ext; exact Real.rpow_sub_intCast (mod_cast hx) _ _
 
--- DISSOLVED: rpow_sub_natCast
+lemma rpow_sub_natCast (hx : x ≠ 0) (y : ℝ) (n : ℕ) : x ^ (y - n) = x ^ y / x ^ n := by
+  ext; exact Real.rpow_sub_natCast (mod_cast hx) _ _
 
--- DISSOLVED: rpow_add_intCast'
+lemma rpow_add_intCast' {n : ℤ} (h : y + n ≠ 0) (x : ℝ≥0) : x ^ (y + n) = x ^ y * x ^ n := by
+  ext; exact Real.rpow_add_intCast' (mod_cast x.2) h
 
--- DISSOLVED: rpow_add_natCast'
+lemma rpow_add_natCast' {n : ℕ} (h : y + n ≠ 0) (x : ℝ≥0) : x ^ (y + n) = x ^ y * x ^ n := by
+  ext; exact Real.rpow_add_natCast' (mod_cast x.2) h
 
--- DISSOLVED: rpow_sub_intCast'
+lemma rpow_sub_intCast' {n : ℤ} (h : y - n ≠ 0) (x : ℝ≥0) : x ^ (y - n) = x ^ y / x ^ n := by
+  ext; exact Real.rpow_sub_intCast' (mod_cast x.2) h
 
--- DISSOLVED: rpow_sub_natCast'
+lemma rpow_sub_natCast' {n : ℕ} (h : y - n ≠ 0) (x : ℝ≥0) : x ^ (y - n) = x ^ y / x ^ n := by
+  ext; exact Real.rpow_sub_natCast' (mod_cast x.2) h
 
--- DISSOLVED: rpow_add_one
+lemma rpow_add_one (hx : x ≠ 0) (y : ℝ) : x ^ (y + 1) = x ^ y * x := by
+  simpa using rpow_add_natCast hx y 1
 
--- DISSOLVED: rpow_sub_one
+lemma rpow_sub_one (hx : x ≠ 0) (y : ℝ) : x ^ (y - 1) = x ^ y / x := by
+  simpa using rpow_sub_natCast hx y 1
 
--- DISSOLVED: rpow_add_one'
+lemma rpow_add_one' (h : y + 1 ≠ 0) (x : ℝ≥0) : x ^ (y + 1) = x ^ y * x := by
+  rw [rpow_add' h, rpow_one]
 
--- DISSOLVED: rpow_one_add'
+lemma rpow_one_add' (h : 1 + y ≠ 0) (x : ℝ≥0) : x ^ (1 + y) = x * x ^ y := by
+  rw [rpow_add' h, rpow_one]
 
 theorem rpow_add_of_nonneg (x : ℝ≥0) {y z : ℝ} (hy : 0 ≤ y) (hz : 0 ≤ z) :
     x ^ (y + z) = x ^ y * x ^ z := by
   ext; exact Real.rpow_add_of_nonneg x.2 hy hz
 
--- DISSOLVED: rpow_of_add_eq
+lemma rpow_of_add_eq (x : ℝ≥0) (hw : w ≠ 0) (h : y + z = w) : x ^ w = x ^ y * x ^ z := by
+  rw [← h, rpow_add']; rwa [h]
 
 theorem rpow_mul (x : ℝ≥0) (y z : ℝ) : x ^ (y * z) = (x ^ y) ^ z :=
   NNReal.eq <| Real.rpow_mul x.2 y z
@@ -122,17 +140,23 @@ lemma rpow_mul_intCast (x : ℝ≥0) (y : ℝ) (n : ℤ) : x ^ (y * n) = (x ^ y)
 
 theorem rpow_neg_one (x : ℝ≥0) : x ^ (-1 : ℝ) = x⁻¹ := by simp [rpow_neg]
 
--- DISSOLVED: rpow_sub
+theorem rpow_sub {x : ℝ≥0} (hx : x ≠ 0) (y z : ℝ) : x ^ (y - z) = x ^ y / x ^ z :=
+  NNReal.eq <| Real.rpow_sub ((NNReal.coe_pos.trans pos_iff_ne_zero).mpr hx) y z
 
--- DISSOLVED: rpow_sub'
+theorem rpow_sub' (h : y - z ≠ 0) (x : ℝ≥0) : x ^ (y - z) = x ^ y / x ^ z :=
+  NNReal.eq <| Real.rpow_sub' x.2 h
 
--- DISSOLVED: rpow_sub_one'
+lemma rpow_sub_one' (h : y - 1 ≠ 0) (x : ℝ≥0) : x ^ (y - 1) = x ^ y / x := by
+  rw [rpow_sub' h, rpow_one]
 
--- DISSOLVED: rpow_one_sub'
+lemma rpow_one_sub' (h : 1 - y ≠ 0) (x : ℝ≥0) : x ^ (1 - y) = x / x ^ y := by
+  rw [rpow_sub' h, rpow_one]
 
--- DISSOLVED: rpow_inv_rpow_self
+theorem rpow_inv_rpow_self {y : ℝ} (hy : y ≠ 0) (x : ℝ≥0) : (x ^ y) ^ (1 / y) = x := by
+  field_simp [← rpow_mul]
 
--- DISSOLVED: rpow_self_rpow_inv
+theorem rpow_self_rpow_inv {y : ℝ} (hy : y ≠ 0) (x : ℝ≥0) : (x ^ (1 / y)) ^ y = x := by
+  field_simp [← rpow_mul]
 
 theorem inv_rpow (x : ℝ≥0) (y : ℝ) : x⁻¹ ^ y = (x ^ y)⁻¹ :=
   NNReal.eq <| Real.inv_rpow x.2 y
@@ -341,29 +365,43 @@ theorem rpow_le_self_of_le_one {x : ℝ≥0} {z : ℝ} (hx : x ≤ 1) (h_one_le 
   nth_rw 2 [← NNReal.rpow_one x]
   exact NNReal.rpow_le_rpow_of_exponent_ge h hx h_one_le
 
--- DISSOLVED: rpow_left_injective
+theorem rpow_left_injective {x : ℝ} (hx : x ≠ 0) : Function.Injective fun y : ℝ≥0 => y ^ x :=
+  fun y z hyz => by simpa only [rpow_inv_rpow_self hx] using congr_arg (fun y => y ^ (1 / x)) hyz
 
--- DISSOLVED: rpow_eq_rpow_iff
+theorem rpow_eq_rpow_iff {x y : ℝ≥0} {z : ℝ} (hz : z ≠ 0) : x ^ z = y ^ z ↔ x = y :=
+  (rpow_left_injective hz).eq_iff
 
--- DISSOLVED: rpow_left_surjective
+theorem rpow_left_surjective {x : ℝ} (hx : x ≠ 0) : Function.Surjective fun y : ℝ≥0 => y ^ x :=
+  fun y => ⟨y ^ x⁻¹, by simp_rw [← rpow_mul, inv_mul_cancel₀ hx, rpow_one]⟩
 
--- DISSOLVED: rpow_left_bijective
+theorem rpow_left_bijective {x : ℝ} (hx : x ≠ 0) : Function.Bijective fun y : ℝ≥0 => y ^ x :=
+  ⟨rpow_left_injective hx, rpow_left_surjective hx⟩
 
--- DISSOLVED: eq_rpow_inv_iff
+theorem eq_rpow_inv_iff {x y : ℝ≥0} {z : ℝ} (hz : z ≠ 0) : x = y ^ z⁻¹ ↔ x ^ z = y := by
+  rw [← rpow_eq_rpow_iff hz, ← one_div, rpow_self_rpow_inv hz]
 
--- DISSOLVED: eq_rpow_one_div_iff
+theorem eq_rpow_one_div_iff {x y : ℝ≥0} {z : ℝ} (hz : z ≠ 0) : x = y ^ (1 / z) ↔ x ^ z = y := by
+  rw [← rpow_eq_rpow_iff hz, rpow_self_rpow_inv hz]
 
--- DISSOLVED: rpow_inv_eq_iff
+theorem rpow_inv_eq_iff {x y : ℝ≥0} {z : ℝ} (hz : z ≠ 0) : x ^ z⁻¹ = y ↔ x = y ^ z := by
+  rw [← rpow_eq_rpow_iff hz, ← one_div, rpow_self_rpow_inv hz]
 
--- DISSOLVED: rpow_one_div_eq_iff
+theorem rpow_one_div_eq_iff {x y : ℝ≥0} {z : ℝ} (hz : z ≠ 0) : x ^ (1 / z) = y ↔ x = y ^ z := by
+  rw [← rpow_eq_rpow_iff hz, rpow_self_rpow_inv hz]
 
--- DISSOLVED: rpow_rpow_inv
+@[simp] lemma rpow_rpow_inv {y : ℝ} (hy : y ≠ 0) (x : ℝ≥0) : (x ^ y) ^ y⁻¹ = x := by
+  rw [← rpow_mul, mul_inv_cancel₀ hy, rpow_one]
 
--- DISSOLVED: rpow_inv_rpow
+@[simp] lemma rpow_inv_rpow {y : ℝ} (hy : y ≠ 0) (x : ℝ≥0) : (x ^ y⁻¹) ^ y = x := by
+  rw [← rpow_mul, inv_mul_cancel₀ hy, rpow_one]
 
--- DISSOLVED: pow_rpow_inv_natCast
+theorem pow_rpow_inv_natCast (x : ℝ≥0) {n : ℕ} (hn : n ≠ 0) : (x ^ n) ^ (n⁻¹ : ℝ) = x := by
+  rw [← NNReal.coe_inj, coe_rpow, NNReal.coe_pow]
+  exact Real.pow_rpow_inv_natCast x.2 hn
 
--- DISSOLVED: rpow_inv_natCast_pow
+theorem rpow_inv_natCast_pow (x : ℝ≥0) {n : ℕ} (hn : n ≠ 0) : (x ^ (n⁻¹ : ℝ)) ^ n = x := by
+  rw [← NNReal.coe_inj, NNReal.coe_pow, coe_rpow]
+  exact Real.rpow_inv_natCast_pow x.2 hn
 
 theorem _root_.Real.toNNReal_rpow_of_nonneg {x y : ℝ} (hx : 0 ≤ x) :
     Real.toNNReal (x ^ y) = Real.toNNReal x ^ y := by
@@ -401,10 +439,6 @@ noncomputable def rpow : ℝ≥0∞ → ℝ → ℝ≥0∞
 
 noncomputable instance : Pow ℝ≥0∞ ℝ :=
   ⟨rpow⟩
-
-@[simp]
-theorem rpow_eq_pow (x : ℝ≥0∞) (y : ℝ) : rpow x y = x ^ y :=
-  rfl
 
 @[simp]
 theorem rpow_zero {x : ℝ≥0∞} : x ^ (0 : ℝ) = 1 := by
@@ -446,7 +480,11 @@ theorem zero_rpow_mul_self (y : ℝ) : (0 : ℝ≥0∞) ^ y * (0 : ℝ≥0∞) ^
   split_ifs
   exacts [zero_mul _, one_mul _, top_mul_top]
 
--- DISSOLVED: coe_rpow_of_ne_zero
+@[norm_cast]
+theorem coe_rpow_of_ne_zero {x : ℝ≥0} (h : x ≠ 0) (y : ℝ) : (↑(x ^ y) : ℝ≥0∞) = x ^ y := by
+  rw [← ENNReal.some_eq_coe]
+  dsimp only [(· ^ ·), Pow.pow, rpow]
+  simp [h]
 
 @[norm_cast]
 theorem coe_rpow_of_nonneg (x : ℝ≥0) {y : ℝ} (h : 0 ≤ y) : ↑(x ^ y) = (x : ℝ≥0∞) ^ y := by
@@ -455,10 +493,6 @@ theorem coe_rpow_of_nonneg (x : ℝ≥0) {y : ℝ} (h : 0 ≤ y) : ↑(x ^ y) = 
     · simp [hx, H.symm]
     · simp [hx, zero_rpow_of_pos H, NNReal.zero_rpow (ne_of_gt H)]
   · exact coe_rpow_of_ne_zero hx _
-
-theorem coe_rpow_def (x : ℝ≥0) (y : ℝ) :
-    (x : ℝ≥0∞) ^ y = if x = 0 ∧ y < 0 then ⊤ else ↑(x ^ y) :=
-  rfl
 
 @[simp]
 theorem rpow_one (x : ℝ≥0∞) : x ^ (1 : ℝ) = x := by
@@ -516,7 +550,11 @@ theorem rpow_ne_top_of_nonneg {x : ℝ≥0∞} {y : ℝ} (hy0 : 0 ≤ y) (h : x 
 theorem rpow_lt_top_of_nonneg {x : ℝ≥0∞} {y : ℝ} (hy0 : 0 ≤ y) (h : x ≠ ⊤) : x ^ y < ⊤ :=
   lt_top_iff_ne_top.mpr (ENNReal.rpow_ne_top_of_nonneg hy0 h)
 
--- DISSOLVED: rpow_add
+theorem rpow_add {x : ℝ≥0∞} (y z : ℝ) (hx : x ≠ 0) (h'x : x ≠ ⊤) : x ^ (y + z) = x ^ y * x ^ z := by
+  cases' x with x
+  · exact (h'x rfl).elim
+  have : x ≠ 0 := fun h => by simp [h] at hx
+  simp [← coe_rpow_of_ne_zero this, NNReal.rpow_add this]
 
 theorem rpow_add_of_nonneg {x : ℝ≥0∞} (y z : ℝ) (hy : 0 ≤ y) (hz : 0 ≤ z) :
     x ^ (y + z) = x ^ y * x ^ z := by
@@ -538,7 +576,8 @@ theorem rpow_neg (x : ℝ≥0∞) (y : ℝ) : x ^ (-y) = (x ^ y)⁻¹ := by
     · have A : x ^ y ≠ 0 := by simp [h]
       simp [← coe_rpow_of_ne_zero h, ← coe_inv A, NNReal.rpow_neg]
 
--- DISSOLVED: rpow_sub
+theorem rpow_sub {x : ℝ≥0∞} (y z : ℝ) (hx : x ≠ 0) (h'x : x ≠ ⊤) : x ^ (y - z) = x ^ y / x ^ z := by
+  rw [sub_eq_add_neg, rpow_add _ _ hx h'x, rpow_neg, div_eq_mul_inv]
 
 theorem rpow_neg_one (x : ℝ≥0∞) : x ^ (-1 : ℝ) = x⁻¹ := by simp [rpow_neg]
 
@@ -611,7 +650,8 @@ theorem prod_coe_rpow {ι} (s : Finset ι) (f : ι → ℝ≥0) (r : ℝ) :
   | empty => simp
   | insert hi ih => simp_rw [prod_insert hi, ih, ← coe_mul_rpow, coe_mul]
 
--- DISSOLVED: mul_rpow_of_ne_zero
+theorem mul_rpow_of_ne_zero {x y : ℝ≥0∞} (hx : x ≠ 0) (hy : y ≠ 0) (z : ℝ) :
+    (x * y) ^ z = x ^ z * y ^ z := by simp [*, mul_rpow_eq_ite]
 
 theorem mul_rpow_of_nonneg (x y : ℝ≥0∞) {z : ℝ} (hz : 0 ≤ z) : (x * y) ^ z = x ^ z * y ^ z := by
   simp [hz.not_lt, mul_rpow_eq_ite]
@@ -851,13 +891,17 @@ theorem ofReal_rpow_of_nonneg {x p : ℝ} (hx_nonneg : 0 ≤ x) (hp_nonneg : 0 �
   rw [← Ne] at hx0
   exact ofReal_rpow_of_pos (hx_nonneg.lt_of_ne hx0.symm)
 
--- DISSOLVED: rpow_rpow_inv
+@[simp] lemma rpow_rpow_inv {y : ℝ} (hy : y ≠ 0) (x : ℝ≥0∞) : (x ^ y) ^ y⁻¹ = x := by
+  rw [← rpow_mul, mul_inv_cancel₀ hy, rpow_one]
 
--- DISSOLVED: rpow_inv_rpow
+@[simp] lemma rpow_inv_rpow {y : ℝ} (hy : y ≠ 0) (x : ℝ≥0∞) : (x ^ y⁻¹) ^ y = x := by
+  rw [← rpow_mul, inv_mul_cancel₀ hy, rpow_one]
 
--- DISSOLVED: pow_rpow_inv_natCast
+lemma pow_rpow_inv_natCast {n : ℕ} (hn : n ≠ 0) (x : ℝ≥0∞) : (x ^ n) ^ (n⁻¹ : ℝ) = x := by
+  rw [← rpow_natCast, ← rpow_mul, mul_inv_cancel₀ (by positivity), rpow_one]
 
--- DISSOLVED: rpow_inv_natCast_pow
+lemma rpow_inv_natCast_pow {n : ℕ} (hn : n ≠ 0) (x : ℝ≥0∞) : (x ^ (n⁻¹ : ℝ)) ^ n = x := by
+  rw [← rpow_natCast, ← rpow_mul, inv_mul_cancel₀ (by positivity), rpow_one]
 
 lemma rpow_natCast_mul (x : ℝ≥0∞) (n : ℕ) (z : ℝ) : x ^ (n * z) = (x ^ n) ^ z := by
   rw [rpow_mul, rpow_natCast]
@@ -871,10 +915,13 @@ lemma rpow_intCast_mul (x : ℝ≥0∞) (n : ℤ) (z : ℝ) : x ^ (n * z) = (x ^
 lemma rpow_mul_intCast (x : ℝ≥0∞) (y : ℝ) (n : ℤ) : x ^ (y * n) = (x ^ y) ^ n := by
   rw [rpow_mul, rpow_intCast]
 
--- DISSOLVED: rpow_left_injective
+lemma rpow_left_injective {x : ℝ} (hx : x ≠ 0) : Injective fun y : ℝ≥0∞ ↦ y ^ x :=
+  HasLeftInverse.injective ⟨fun y ↦ y ^ x⁻¹, rpow_rpow_inv hx⟩
 
--- DISSOLVED: rpow_left_surjective
+theorem rpow_left_surjective {x : ℝ} (hx : x ≠ 0) : Function.Surjective fun y : ℝ≥0∞ => y ^ x :=
+  HasRightInverse.surjective ⟨fun y ↦ y ^ x⁻¹, rpow_inv_rpow hx⟩
 
--- DISSOLVED: rpow_left_bijective
+theorem rpow_left_bijective {x : ℝ} (hx : x ≠ 0) : Function.Bijective fun y : ℝ≥0∞ => y ^ x :=
+  ⟨rpow_left_injective hx, rpow_left_surjective hx⟩
 
 end ENNReal

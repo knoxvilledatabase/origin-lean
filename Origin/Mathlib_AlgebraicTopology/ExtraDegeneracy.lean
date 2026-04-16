@@ -9,6 +9,8 @@ import Mathlib.AlgebraicTopology.CechNerve
 import Mathlib.Algebra.Homology.Homotopy
 import Mathlib.Tactic.FinCases
 
+noncomputable section
+
 /-!
 
 # Augmented simplicial objects with an extra degeneracy

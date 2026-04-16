@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.Affine
 import Mathlib.Geometry.Euclidean.Sphere.Basic
 
+noncomputable section
+
 /-!
 # Power of a point (intersecting chords and secants)
 

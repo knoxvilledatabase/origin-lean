@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Data.Nat.Gcd
 import Mathlib.Algebra.BigOperators.Group.Finset
 
+noncomputable section
+
 /-! # Lemmas about coprimality with big products.
 
 These lemmas are kept separate from `Data.Nat.GCD.Basic` in order to minimize imports.

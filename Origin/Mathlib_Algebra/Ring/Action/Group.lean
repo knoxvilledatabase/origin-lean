@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupWithZero.Action.Basic
 import Mathlib.Algebra.Ring.Action.Basic
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # If a group acts multiplicatively on a semiring, each group element acts by a ring automorphism.
 

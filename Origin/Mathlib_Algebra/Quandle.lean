@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Aut
 import Mathlib.Data.ZMod.Defs
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # Racks and Quandles
 
@@ -154,18 +156,6 @@ def act' (x : R) : R ≃ R where
   right_inv := right_inv x
 
 @[simp]
-theorem act'_apply (x y : R) : act' x y = x ◃ y :=
-  rfl
-
-@[simp]
-theorem act'_symm_apply (x y : R) : (act' x).symm y = x ◃⁻¹ y :=
-  rfl
-
-@[simp]
-theorem invAct_apply (x y : R) : (act' x)⁻¹ y = x ◃⁻¹ y :=
-  rfl
-
-@[simp]
 theorem invAct_act_eq (x y : R) : x ◃⁻¹ x ◃ y = y :=
   left_inv x y
 
@@ -207,14 +197,6 @@ instance oppositeRack : Rack Rᵐᵒᵖ where
   right_inv := MulOpposite.rec' fun x => MulOpposite.rec' fun y => by simp
 
 @[simp]
-theorem op_act_op_eq {x y : R} : op x ◃ op y = op (x ◃⁻¹ y) :=
-  rfl
-
-@[simp]
-theorem op_invAct_op_eq {x y : R} : op x ◃⁻¹ op y = op (x ◃ y) :=
-  rfl
-
-@[simp]
 theorem self_act_act_eq {x y : R} : (x ◃ x) ◃ y = x ◃ y := by rw [← right_inv x y, ← self_distrib]
 
 @[simp]
@@ -246,12 +228,6 @@ theorem self_invAct_eq_iff_eq {x y : R} : x ◃⁻¹ x = y ◃⁻¹ y ↔ x = y 
   have h := @self_act_eq_iff_eq _ _ (op x) (op y)
   simpa using h
 
-def selfApplyEquiv (R : Type*) [Rack R] : R ≃ R where
-  toFun x := x ◃ x
-  invFun x := x ◃⁻¹ x
-  left_inv x := by simp
-  right_inv x := by simp
-
 def IsInvolutory (R : Type*) [Rack R] : Prop :=
   ∀ x : R, Function.Involutive (Shelf.act x)
 
@@ -276,8 +252,6 @@ instance : FunLike (S₁ →◃ S₂) S₁ S₂ where
   coe := toFun
   coe_injective' | ⟨_, _⟩, ⟨_, _⟩, rfl => rfl
 
-@[simp] theorem toFun_eq_coe (f : S₁ →◃ S₂) : f.toFun = f := rfl
-
 @[simp]
 theorem map_act (f : S₁ →◃ S₂) {x y : S₁} : f (x ◃ y) = f x ◃ f y :=
   map_act' f
@@ -292,10 +266,6 @@ instance inhabited (S : Type*) [Shelf S] : Inhabited (S →◃ S) :=
 def comp (g : S₂ →◃ S₃) (f : S₁ →◃ S₂) : S₁ →◃ S₃ where
   toFun := g.toFun ∘ f.toFun
   map_act' := by simp
-
-@[simp]
-theorem comp_apply (g : S₂ →◃ S₃) (f : S₁ →◃ S₂) (x : S₁) : (g.comp f) x = g (f x) :=
-  rfl
 
 end ShelfHom
 
@@ -336,11 +306,6 @@ instance Conj.quandle (G : Type*) [Group G] : Quandle (Conj G) where
   right_inv x y := by
     simp [act', mul_assoc]
   fix := by simp
-
-@[simp]
-theorem conj_act_eq_conj {G : Type*} [Group G] (x y : Conj G) :
-    x ◃ y = ((x : G) * (y : G) * (x : G)⁻¹ : G) :=
-  rfl
 
 theorem conj_swap {G : Type*} [Group G] (x y : Conj G) : x ◃ y = y ↔ y ◃ x = x := by
   dsimp [Conj] at *; constructor
@@ -603,11 +568,6 @@ theorem toEnvelGroup.univ_uniq (R : Type*) [Rack R] (G : Type*) [Group G]
 
 def envelAction {R : Type*} [Rack R] : EnvelGroup R →* R ≃ R :=
   toEnvelGroup.map (toConj R)
-
-@[simp]
-theorem envelAction_prop {R : Type*} [Rack R] (x y : R) :
-    envelAction (toEnvelGroup R x) y = x ◃ y :=
-  rfl
 
 end EnvelGroup
 

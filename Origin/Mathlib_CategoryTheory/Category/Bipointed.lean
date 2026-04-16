@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 import Origin.Core
 import Mathlib.CategoryTheory.Category.Pointed
 
+noncomputable section
+
 /-!
 # The category of bipointed types
 
@@ -31,10 +33,6 @@ instance : CoeSort Bipointed Type* := ⟨Bipointed.X⟩
 
 def of {X : Type*} (to_prod : X × X) : Bipointed :=
   ⟨X, to_prod⟩
-
-@[simp]
-theorem coe_of {X : Type*} (to_prod : X × X) : ↥(of to_prod) = X :=
-  rfl
 
 alias _root_.Prod.Bipointed := of
 
@@ -88,10 +86,6 @@ def swapEquiv : Bipointed ≌ Bipointed where
   unitIso := Iso.refl _
   counitIso := Iso.refl _
 
-@[simp]
-theorem swapEquiv_symm : swapEquiv.symm = swapEquiv :=
-  rfl
-
 end Bipointed
 
 def bipointedToPointedFst : Bipointed ⥤ Pointed where
@@ -101,26 +95,6 @@ def bipointedToPointedFst : Bipointed ⥤ Pointed where
 def bipointedToPointedSnd : Bipointed ⥤ Pointed where
   obj X := ⟨X, X.toProd.2⟩
   map f := ⟨f.toFun, f.map_snd⟩
-
-@[simp]
-theorem bipointedToPointedFst_comp_forget :
-    bipointedToPointedFst ⋙ forget Pointed = forget Bipointed :=
-  rfl
-
-@[simp]
-theorem bipointedToPointedSnd_comp_forget :
-    bipointedToPointedSnd ⋙ forget Pointed = forget Bipointed :=
-  rfl
-
-@[simp]
-theorem swap_comp_bipointedToPointedFst :
-    Bipointed.swap ⋙ bipointedToPointedFst = bipointedToPointedSnd :=
-  rfl
-
-@[simp]
-theorem swap_comp_bipointedToPointedSnd :
-    Bipointed.swap ⋙ bipointedToPointedSnd = bipointedToPointedFst :=
-  rfl
 
 def pointedToBipointed : Pointed.{u} ⥤ Bipointed where
   obj X := ⟨X, X.point, X.point⟩
@@ -137,16 +111,6 @@ def pointedToBipointedSnd : Pointed.{u} ⥤ Bipointed where
   map f := ⟨Option.map f.toFun, rfl, congr_arg _ f.map_point⟩
   map_id _ := Bipointed.Hom.ext Option.map_id
   map_comp f g := Bipointed.Hom.ext (Option.map_comp_map f.1 g.1).symm
-
-@[simp]
-theorem pointedToBipointedFst_comp_swap :
-    pointedToBipointedFst ⋙ Bipointed.swap = pointedToBipointedSnd :=
-  rfl
-
-@[simp]
-theorem pointedToBipointedSnd_comp_swap :
-    pointedToBipointedSnd ⋙ Bipointed.swap = pointedToBipointedFst :=
-  rfl
 
 @[simps!]
 def pointedToBipointedCompBipointedToPointedFst :

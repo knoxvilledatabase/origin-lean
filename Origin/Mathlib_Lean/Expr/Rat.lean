@@ -7,6 +7,8 @@ import Mathlib.Init
 import Batteries.Data.Rat.Basic
 import Batteries.Tactic.Alias
 
+noncomputable section
+
 /-!
 # Additional operations on Expr and rational numbers
 

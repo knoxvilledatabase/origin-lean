@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.NormedSpace.RCLike
 import Mathlib.Order.Filter.Curry
 
+noncomputable section
+
 /-!
 # Swapping limits and derivatives via uniform convergence
 

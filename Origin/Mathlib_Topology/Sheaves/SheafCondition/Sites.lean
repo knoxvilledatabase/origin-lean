@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Sites.Spaces
 import Mathlib.Topology.Sheaves.Sheaf
 import Mathlib.CategoryTheory.Sites.DenseSubsite.Basic
 
+noncomputable section
+
 /-!
 
 # Coverings and sieves; from sheaves on sites and sheaves on spaces
@@ -33,10 +35,6 @@ variable {X : TopCat.{w}}
 
 def coveringOfPresieve (U : Opens X) (R : Presieve U) : (ΣV, { f : V ⟶ U // R f }) → Opens X :=
   fun f => f.1
-
-@[simp]
-theorem coveringOfPresieve_apply (U : Opens X) (R : Presieve U) (f : ΣV, { f : V ⟶ U // R f }) :
-    coveringOfPresieve U R f = f.1 := rfl
 
 namespace coveringOfPresieve
 

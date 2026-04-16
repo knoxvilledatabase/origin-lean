@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/GradedAlgebra/Basic.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Algebra
 import Mathlib.Algebra.DirectSum.Decomposition
 import Mathlib.Algebra.DirectSum.Internal
 import Mathlib.Algebra.DirectSum.Ring
+
+noncomputable section
 
 /-!
 # Internally-graded rings and algebras
@@ -95,7 +97,9 @@ theorem GradedRing.proj_recompose (a : ⨁ i, 𝒜 i) (i : ι) :
     GradedRing.proj 𝒜 i ((decompose 𝒜).symm a) = (decompose 𝒜).symm (DirectSum.of _ i (a i)) := by
   rw [GradedRing.proj_apply, decompose_symm_of, Equiv.apply_symm_apply]
 
--- DISSOLVED: GradedRing.mem_support_iff
+theorem GradedRing.mem_support_iff [∀ (i) (x : 𝒜 i), Decidable (x ≠ 0)] (r : A) (i : ι) :
+    i ∈ (decompose 𝒜 r).support ↔ GradedRing.proj 𝒜 i r ≠ 0 :=
+  DFinsupp.mem_support_iff.trans ZeroMemClass.coe_eq_zero.not.symm
 
 end GradedRing
 
@@ -164,14 +168,6 @@ def decomposeAlgEquiv : A ≃ₐ[R] ⨁ i, 𝒜 i :=
       commutes' := (coeAlgHom 𝒜).commutes }
 
 @[simp]
-lemma decomposeAlgEquiv_apply (a : A) :
-    decomposeAlgEquiv 𝒜 a = decompose 𝒜 a := rfl
-
-@[simp]
-lemma decomposeAlgEquiv_symm_apply (a : ⨁ i, 𝒜 i) :
-    (decomposeAlgEquiv 𝒜).symm a = (decompose 𝒜).symm a := rfl
-
-@[simp]
 lemma decompose_algebraMap (r : R) :
     decompose 𝒜 (algebraMap R A r) = algebraMap R (⨁ i, 𝒜 i) r :=
   (decomposeAlgEquiv 𝒜).commutes r
@@ -197,7 +193,9 @@ theorem GradedAlgebra.proj_recompose (a : ⨁ i, 𝒜 i) (i : ι) :
     GradedAlgebra.proj 𝒜 i ((decompose 𝒜).symm a) = (decompose 𝒜).symm (of _ i (a i)) := by
   rw [GradedAlgebra.proj_apply, decompose_symm_of, Equiv.apply_symm_apply]
 
--- DISSOLVED: GradedAlgebra.mem_support_iff
+theorem GradedAlgebra.mem_support_iff [DecidableEq A] (r : A) (i : ι) :
+    i ∈ (decompose 𝒜 r).support ↔ GradedAlgebra.proj 𝒜 i r ≠ 0 :=
+  DFinsupp.mem_support_iff.trans Submodule.coe_eq_zero.not.symm
 
 end GradedAlgebra
 
@@ -254,9 +252,6 @@ section GradeZero
 def GradedRing.projZeroRingHom' : A →+* 𝒜 0 :=
   ((GradedRing.projZeroRingHom 𝒜).codRestrict _ fun _x => SetLike.coe_mem _ :
   A →+* SetLike.GradeZero.subsemiring 𝒜)
-
-@[simp] lemma GradedRing.coe_projZeroRingHom'_apply (a : A) :
-    (GradedRing.projZeroRingHom' 𝒜 a : A) = GradedRing.projZeroRingHom 𝒜 a := rfl
 
 @[simp] lemma GradedRing.projZeroRingHom'_apply_coe (a : 𝒜 0) :
     GradedRing.projZeroRingHom' 𝒜 a = a := by

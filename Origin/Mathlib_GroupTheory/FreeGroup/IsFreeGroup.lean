@@ -5,6 +5,8 @@ Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.GroupTheory.FreeGroup.Basic
 
+noncomputable section
+
 /-!
 # Free groups structures on arbitrary types
 
@@ -71,21 +73,11 @@ instance instFunLike : FunLike (FreeGroupBasis ι G) ι G where
 
 def ofFreeGroup (X : Type*) : FreeGroupBasis X (FreeGroup X) := ofRepr (MulEquiv.refl _)
 
-@[simp] lemma ofFreeGroup_apply {X : Type*} (x : X) :
-    FreeGroupBasis.ofFreeGroup X x = FreeGroup.of x :=
-  rfl
-
 protected def reindex (b : FreeGroupBasis ι G) (e : ι ≃ ι') : FreeGroupBasis ι' G :=
   ofRepr (b.repr.trans (FreeGroup.freeGroupCongr e))
 
-@[simp] lemma reindex_apply (b : FreeGroupBasis ι G) (e : ι ≃ ι') (x : ι') :
-    b.reindex e x = b (e.symm x) := rfl
-
 protected def map (b : FreeGroupBasis ι G) (e : G ≃* H) : FreeGroupBasis ι H :=
   ofRepr (e.symm.trans b.repr)
-
-@[simp] lemma map_apply (b : FreeGroupBasis ι G) (e : G ≃* H) (x : ι) :
-    b.map e x = e (b x) := rfl
 
 protected lemma injective (b : FreeGroupBasis ι G) : Injective b :=
   b.repr.symm.injective.comp FreeGroup.of_injective
@@ -169,10 +161,6 @@ def lift : (Generators G → H) ≃ (G →* H) :=
 @[simp]
 theorem lift_of (f : Generators G → H) (a : Generators G) : lift f (of a) = f a :=
   congr_fun (lift.symm_apply_apply f) a
-
-@[simp]
-theorem lift_symm_apply (f : G →* H) (a : Generators G) : (lift.symm f) a = f (of a) :=
-  rfl
 
 theorem ext_hom ⦃f g : G →* H⦄ (h : ∀ a : Generators G, f (of a) = g (of a)) : f = g :=
   lift.symm.injective (funext h)

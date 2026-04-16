@@ -7,6 +7,8 @@ import Mathlib.RingTheory.PowerSeries.Trunc
 import Mathlib.RingTheory.PowerSeries.Inverse
 import Mathlib.RingTheory.Derivation.Basic
 
+noncomputable section
+
 /-!
 # Definitions
 

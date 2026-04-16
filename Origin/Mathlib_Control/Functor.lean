@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Defs
 import Mathlib.Tactic.TypeStar
 import Batteries.Tactic.Lint
 
+noncomputable section
+
 /-!
 # Functors
 
@@ -140,15 +142,6 @@ protected def map {α β : Type v} (h : α → β) : Comp F G α → Comp F G β
 
 instance functor : Functor (Comp F G) where map := @Comp.map F G _ _
 
-@[functor_norm]
-theorem map_mk {α β} (h : α → β) (x : F (G α)) : h <$> Comp.mk x = Comp.mk ((h <$> ·) <$> x) :=
-  rfl
-
-@[simp]
-protected theorem run_map {α β} (h : α → β) (x : Comp F G α) :
-    (h <$> x).run = (h <$> ·) <$> x.run :=
-  rfl
-
 variable [LawfulFunctor F] [LawfulFunctor G]
 
 variable {α β γ : Type v}
@@ -199,11 +192,6 @@ instance : Seq (Comp F G) :=
 @[simp]
 protected theorem run_pure {α : Type v} : ∀ x : α, (pure x : Comp F G α).run = pure (pure x)
   | _ => rfl
-
-@[simp]
-protected theorem run_seq {α β : Type v} (f : Comp F G (α → β)) (x : Comp F G α) :
-    (f <*> x).run = (· <*> ·) <$> f.run <*> x.run :=
-  rfl
 
 instance instApplicativeComp : Applicative (Comp F G) :=
   { map := @Comp.map F G _ _, seq := @Comp.seq F G _ _ }

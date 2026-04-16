@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Compactification.OnePoint
 import Mathlib.Topology.Category.LightProfinite.Basic
 
+noncomputable section
+
 /-!
 
 # The light profinite set classifying convergent sequences

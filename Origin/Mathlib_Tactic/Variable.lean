@@ -1,10 +1,12 @@
 /-
 Extracted from Tactic/Variable.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Init
 import Lean.Meta.Tactic.TryThis
+
+noncomputable section
 
 /-!
 # The `variable?` command
@@ -51,7 +53,6 @@ def bracketedBinderType : Syntax → Option Term
   | _                                                => none
 
 syntax (name := «variable?»)
-
   "variable?" (ppSpace bracketedBinder)* (" =>" (ppSpace bracketedBinder)*)? : command
 
 initialize variableAliasAttr : TagAttribute ←

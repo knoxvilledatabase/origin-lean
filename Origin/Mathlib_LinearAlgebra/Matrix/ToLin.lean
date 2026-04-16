@@ -10,6 +10,8 @@ import Mathlib.Data.Matrix.Notation
 import Mathlib.LinearAlgebra.Matrix.StdBasis
 import Mathlib.RingTheory.AlgebraTower
 
+noncomputable section
+
 /-!
 # Linear maps and matrices
 
@@ -79,14 +81,11 @@ def Matrix.vecMulLinear [Fintype m] (M : Matrix m n R) : (m → R) →ₗ[R] n �
 @[simp] theorem Matrix.vecMulLinear_apply [Fintype m] (M : Matrix m n R) (x : m → R) :
     M.vecMulLinear x = x ᵥ* M := rfl
 
-theorem Matrix.coe_vecMulLinear [Fintype m] (M : Matrix m n R) :
-    (M.vecMulLinear : _ → _) = M.vecMul := rfl
-
 variable [Fintype m]
 
 set_option linter.deprecated false in
-
 @[simp, deprecated Matrix.single_one_vecMul (since := "2024-08-09")]
+
 theorem Matrix.vecMul_stdBasis [DecidableEq m] (M : Matrix m n R) (i j) :
     (LinearMap.stdBasis R (fun _ ↦ R) i 1 ᵥ* M) j = M i j :=
   congr_fun (Matrix.single_one_vecMul ..) j
@@ -137,10 +136,6 @@ def LinearMap.toMatrixRight' : ((m → R) →ₗ[R] n → R) ≃ₗ[Rᵐᵒᵖ] 
 
 abbrev Matrix.toLinearMapRight' [DecidableEq m] : Matrix m n R ≃ₗ[Rᵐᵒᵖ] (m → R) →ₗ[R] n → R :=
   LinearEquiv.symm LinearMap.toMatrixRight'
-
-@[simp]
-theorem Matrix.toLinearMapRight'_apply (M : Matrix m n R) (v : m → R) :
-    (Matrix.toLinearMapRight') M v = v ᵥ* M := rfl
 
 @[simp]
 theorem Matrix.toLinearMapRight'_mul [Fintype l] [DecidableEq l] (M : Matrix l m R)
@@ -194,9 +189,6 @@ def Matrix.mulVecLin [Fintype n] (M : Matrix m n R) : (n → R) →ₗ[R] m → 
   map_add' _ _ := funext fun _ ↦ dotProduct_add _ _ _
   map_smul' _ _ := funext fun _ ↦ dotProduct_smul _ _ _
 
-theorem Matrix.coe_mulVecLin [Fintype n] (M : Matrix m n R) :
-    (M.mulVecLin : _ → _) = M.mulVec := rfl
-
 @[simp]
 theorem Matrix.mulVecLin_apply [Fintype n] (M : Matrix m n R) (v : n → R) :
     M.mulVecLin v = M *ᵥ v :=
@@ -248,14 +240,15 @@ theorem Matrix.ker_mulVecLin_eq_bot_iff {M : Matrix m n R} :
   simp only [Submodule.eq_bot_iff, LinearMap.mem_ker, Matrix.mulVecLin_apply]
 
 set_option linter.deprecated false in
+@[deprecated Matrix.mulVec_single_one (since := "2024-08-09")]
 
 theorem Matrix.mulVec_stdBasis [DecidableEq n] (M : Matrix m n R) (i j) :
     (M *ᵥ LinearMap.stdBasis R (fun _ ↦ R) j 1) i = M i j :=
   congr_fun (Matrix.mulVec_single_one ..) i
 
 set_option linter.deprecated false in
-
 @[simp, deprecated Matrix.mulVec_single_one (since := "2024-08-09")]
+
 theorem Matrix.mulVec_stdBasis_apply [DecidableEq n] (M : Matrix m n R) (j) :
     M *ᵥ LinearMap.stdBasis R (fun _ ↦ R) j 1 = Mᵀ j :=
   Matrix.mulVec_single_one ..
@@ -297,19 +290,6 @@ def LinearMap.toMatrix' : ((n → R) →ₗ[R] m → R) ≃ₗ[R] Matrix m n R w
 
 def Matrix.toLin' : Matrix m n R ≃ₗ[R] (n → R) →ₗ[R] m → R :=
   LinearMap.toMatrix'.symm
-
-theorem Matrix.toLin'_apply' (M : Matrix m n R) : Matrix.toLin' M = M.mulVecLin :=
-  rfl
-
-@[simp]
-theorem LinearMap.toMatrix'_symm :
-    (LinearMap.toMatrix'.symm : Matrix m n R ≃ₗ[R] _) = Matrix.toLin' :=
-  rfl
-
-@[simp]
-theorem Matrix.toLin'_symm :
-    (Matrix.toLin'.symm : ((n → R) →ₗ[R] m → R) ≃ₗ[R] _) = LinearMap.toMatrix' :=
-  rfl
 
 @[simp]
 theorem LinearMap.toMatrix'_toLin' (M : Matrix m n R) : LinearMap.toMatrix' (Matrix.toLin' M) = M :=
@@ -413,16 +393,6 @@ def Matrix.toLinAlgEquiv' : Matrix n n R ≃ₐ[R] (n → R) →ₗ[R] n → R :
   LinearMap.toMatrixAlgEquiv'.symm
 
 @[simp]
-theorem LinearMap.toMatrixAlgEquiv'_symm :
-    (LinearMap.toMatrixAlgEquiv'.symm : Matrix n n R ≃ₐ[R] _) = Matrix.toLinAlgEquiv' :=
-  rfl
-
-@[simp]
-theorem Matrix.toLinAlgEquiv'_symm :
-    (Matrix.toLinAlgEquiv'.symm : ((n → R) →ₗ[R] n → R) ≃ₐ[R] _) = LinearMap.toMatrixAlgEquiv' :=
-  rfl
-
-@[simp]
 theorem LinearMap.toMatrixAlgEquiv'_toLinAlgEquiv' (M : Matrix n n R) :
     LinearMap.toMatrixAlgEquiv' (Matrix.toLinAlgEquiv' M) = M :=
   LinearMap.toMatrixAlgEquiv'.apply_symm_apply M
@@ -477,19 +447,8 @@ variable (v₁ : Basis n R M₁) (v₂ : Basis m R M₂)
 def LinearMap.toMatrix : (M₁ →ₗ[R] M₂) ≃ₗ[R] Matrix m n R :=
   LinearEquiv.trans (LinearEquiv.arrowCongr v₁.equivFun v₂.equivFun) LinearMap.toMatrix'
 
-theorem LinearMap.toMatrix_eq_toMatrix' :
-    LinearMap.toMatrix (Pi.basisFun R n) (Pi.basisFun R n) = LinearMap.toMatrix' :=
-  rfl
-
 def Matrix.toLin : Matrix m n R ≃ₗ[R] M₁ →ₗ[R] M₂ :=
   (LinearMap.toMatrix v₁ v₂).symm
-
-theorem Matrix.toLin_eq_toLin' : Matrix.toLin (Pi.basisFun R n) (Pi.basisFun R m) = Matrix.toLin' :=
-  rfl
-
-@[simp]
-theorem LinearMap.toMatrix_symm : (LinearMap.toMatrix v₁ v₂).symm = Matrix.toLin v₁ v₂ :=
-  rfl
 
 @[simp]
 theorem Matrix.toLin_symm : (Matrix.toLin v₁ v₂).symm = LinearMap.toMatrix v₁ v₂ :=
@@ -657,11 +616,6 @@ def Matrix.toLinAlgEquiv : Matrix n n R ≃ₐ[R] M₁ →ₗ[R] M₁ :=
   (LinearMap.toMatrixAlgEquiv v₁).symm
 
 @[simp]
-theorem LinearMap.toMatrixAlgEquiv_symm :
-    (LinearMap.toMatrixAlgEquiv v₁).symm = Matrix.toLinAlgEquiv v₁ :=
-  rfl
-
-@[simp]
 theorem Matrix.toLinAlgEquiv_symm :
     (Matrix.toLinAlgEquiv v₁).symm = LinearMap.toMatrixAlgEquiv v₁ :=
   rfl
@@ -807,11 +761,6 @@ theorem leftMulMatrix_mulVec_repr (x y : S) :
     leftMulMatrix b x *ᵥ b.repr y = b.repr (x * y) :=
   (LinearMap.mulLeft R x).toMatrix_mulVec_repr b b y
 
-@[simp]
-theorem toMatrix_lmul_eq (x : S) :
-    LinearMap.toMatrix b b (LinearMap.mulLeft R x) = leftMulMatrix b x :=
-  rfl
-
 theorem leftMulMatrix_injective : Function.Injective (leftMulMatrix b) := fun x x' h ↦
   calc
     x = Algebra.lmul R S x 1 := (mul_one x).symm
@@ -904,9 +853,8 @@ variable [DecidableEq ι] [DecidableEq ι₁]
 
 variable (b : Basis ι R M) (b₁ : Basis ι₁ R M₁) (b₂ : Basis ι₂ R M₂)
 
-noncomputable
-
 @[simps! (config := .lemmasOnly) repr_apply repr_symm_apply]
+noncomputable
 def linearMap (b₁ : Basis ι₁ R M₁) (b₂ : Basis ι₂ R M₂) :
     Basis (ι₂ × ι₁) R (M₁ →ₗ[R] M₂) :=
   (Matrix.stdBasis R ι₂ ι₁).map (LinearMap.toMatrix b₁ b₂).symm
@@ -924,9 +872,8 @@ lemma linearMap_apply_apply (ij : ι₂ × ι₁) (k : ι₁) :
   dsimp only [Matrix.stdBasisMatrix, of_apply]
   simp_rw [ite_smul, one_smul, zero_smul, ite_and, Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
-noncomputable
-
 @[simps! (config := .lemmasOnly) repr_apply repr_symm_apply]
+noncomputable
 abbrev _root_.Basis.end (b : Basis ι R M) : Basis (ι × ι) R (Module.End R M) :=
   b.linearMap b
 

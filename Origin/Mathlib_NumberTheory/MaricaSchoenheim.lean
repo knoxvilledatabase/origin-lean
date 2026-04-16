@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SetFamily.FourFunctions
 import Mathlib.Data.Nat.Squarefree
 
+noncomputable section
+
 /-!
 # The Marica-Schönheim special case of Graham's conjecture
 

@@ -9,6 +9,8 @@ import Mathlib.Algebra.Ring.Subring.Defs
 import Mathlib.Algebra.Ring.Subsemiring.Basic
 import Mathlib.RingTheory.NonUnitalSubring.Defs
 
+noncomputable section
+
 /-!
 # Subrings
 
@@ -146,26 +148,14 @@ def comap {R : Type u} {S : Type v} [Ring R] [Ring S] (f : R →+* S) (s : Subri
     carrier := f ⁻¹' s.carrier }
 
 @[simp]
-theorem coe_comap (s : Subring S) (f : R →+* S) : (s.comap f : Set R) = f ⁻¹' s :=
-  rfl
-
-@[simp]
 theorem mem_comap {s : Subring S} {f : R →+* S} {x : R} : x ∈ s.comap f ↔ f x ∈ s :=
   Iff.rfl
-
-theorem comap_comap (s : Subring T) (g : S →+* T) (f : R →+* S) :
-    (s.comap g).comap f = s.comap (g.comp f) :=
-  rfl
 
 /-! ## map -/
 
 def map {R : Type u} {S : Type v} [Ring R] [Ring S] (f : R →+* S) (s : Subring R) : Subring S :=
   { s.toSubmonoid.map (f : R →* S), s.toAddSubgroup.map (f : R →+ S) with
     carrier := f '' s.carrier }
-
-@[simp]
-theorem coe_map (f : R →+* S) (s : Subring R) : (s.map f : Set S) = f '' s :=
-  rfl
 
 @[simp]
 theorem mem_map {f : R →+* S} {s : Subring R} {y : S} : y ∈ s.map f ↔ ∃ x ∈ s, f x = y := Iff.rfl
@@ -188,11 +178,6 @@ noncomputable def equivMapOfInjective (f : R →+* S) (hf : Function.Injective f
   { Equiv.Set.image f s hf with
     map_mul' := fun _ _ => Subtype.ext (f.map_mul _ _)
     map_add' := fun _ _ => Subtype.ext (f.map_add _ _) }
-
-@[simp]
-theorem coe_equivMapOfInjective_apply (f : R →+* S) (hf : Function.Injective f) (x : s) :
-    (equivMapOfInjective s f hf x : S) = f x :=
-  rfl
 
 end Subring
 
@@ -249,14 +234,6 @@ theorem mem_bot {x : R} : x ∈ (⊥ : Subring R) ↔ ∃ n : ℤ, ↑n = x :=
 instance : Min (Subring R) :=
   ⟨fun s t =>
     { s.toSubmonoid ⊓ t.toSubmonoid, s.toAddSubgroup ⊓ t.toAddSubgroup with carrier := s ∩ t }⟩
-
-@[simp]
-theorem coe_inf (p p' : Subring R) : ((p ⊓ p' : Subring R) : Set R) = (p : Set R) ∩ p' :=
-  rfl
-
-@[simp]
-theorem mem_inf {p p' : Subring R} {x : R} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=
-  Iff.rfl
 
 instance : InfSet (Subring R) :=
   ⟨fun s =>
@@ -315,13 +292,6 @@ def center : Subring R :=
     carrier := Set.center R
     neg_mem' := Set.neg_mem_center }
 
-theorem coe_center : ↑(center R) = Set.center R :=
-  rfl
-
-@[simp]
-theorem center_toSubsemiring : (center R).toSubsemiring = Subsemiring.center R :=
-  rfl
-
 variable {R}
 
 theorem mem_center_iff {z : R} : z ∈ center R ↔ ∀ g, g * z = z * g :=
@@ -355,35 +325,12 @@ instance instField : Field (center K) where
   qsmul := _
   qsmul_def := fun _ _ => rfl
 
-@[simp]
-theorem center.coe_inv (a : center K) : ((a⁻¹ : center K) : K) = (a : K)⁻¹ :=
-  rfl
-
-@[simp]
-theorem center.coe_div (a b : center K) : ((a / b : center K) : K) = (a : K) / (b : K) :=
-  rfl
-
 end DivisionRing
 
 section Centralizer
 
 def centralizer (s : Set R) : Subring R :=
   { Subsemiring.centralizer s with neg_mem' := Set.neg_mem_centralizer }
-
-@[simp, norm_cast]
-theorem coe_centralizer (s : Set R) : (centralizer s : Set R) = s.centralizer :=
-  rfl
-
-theorem centralizer_toSubmonoid (s : Set R) :
-    (centralizer s).toSubmonoid = Submonoid.centralizer s :=
-  rfl
-
-theorem centralizer_toSubsemiring (s : Set R) :
-    (centralizer s).toSubsemiring = Subsemiring.centralizer s :=
-  rfl
-
-theorem mem_centralizer_iff {s : Set R} {z : R} : z ∈ centralizer s ↔ ∀ g ∈ s, g * z = z * g :=
-  Iff.rfl
 
 theorem center_le_centralizer (s) : center R ≤ centralizer s :=
   s.center_subset_centralizer
@@ -597,11 +544,6 @@ theorem comap_top (f : R →+* S) : (⊤ : Subring S).comap f = ⊤ :=
 def prod (s : Subring R) (t : Subring S) : Subring (R × S) :=
   { s.toSubmonoid.prod t.toSubmonoid, s.toAddSubgroup.prod t.toAddSubgroup with carrier := s ×ˢ t }
 
-@[norm_cast]
-theorem coe_prod (s : Subring R) (t : Subring S) :
-    (s.prod t : Set (R × S)) = (s : Set R) ×ˢ (t : Set S) :=
-  rfl
-
 theorem mem_prod {s : Subring R} {t : Subring S} {p : R × S} : p ∈ s.prod t ↔ p.1 ∈ s ∧ p.2 ∈ t :=
   Iff.rfl
 
@@ -676,10 +618,6 @@ open Subring
 
 def rangeRestrict (f : R →+* S) : R →+* f.range :=
   f.codRestrict f.range fun x => ⟨x, rfl⟩
-
-@[simp]
-theorem coe_rangeRestrict (f : R →+* S) (x : R) : (f.rangeRestrict x : S) = f x :=
-  rfl
 
 theorem rangeRestrict_surjective (f : R →+* S) : Function.Surjective f.rangeRestrict :=
   fun ⟨_y, hy⟩ =>
@@ -774,16 +712,6 @@ def ofLeftInverse {g : S → R} {f : R →+* S} (h : Function.LeftInverse g f) :
         let ⟨x', hx'⟩ := RingHom.mem_range.mp x.prop
         show f (g x) = x by rw [← hx', h x'] }
 
-@[simp]
-theorem ofLeftInverse_apply {g : S → R} {f : R →+* S} (h : Function.LeftInverse g f) (x : R) :
-    ↑(ofLeftInverse h x) = f x :=
-  rfl
-
-@[simp]
-theorem ofLeftInverse_symm_apply {g : S → R} {f : R →+* S} (h : Function.LeftInverse g f)
-    (x : f.range) : (ofLeftInverse h).symm x = g x :=
-  rfl
-
 @[simps!]
 def subringMap (e : R ≃+* S) : s ≃+* s.map e.toRingHom :=
   e.subsemiringMap s.toSubsemiring
@@ -863,9 +791,6 @@ variable {α β : Type*}
 
 instance [SMul R α] (S : Subring R) : SMul S α :=
   inferInstanceAs (SMul S.toSubsemiring α)
-
-theorem smul_def [SMul R α] {S : Subring R} (g : S) (m : α) : g • m = (g : R) • m :=
-  rfl
 
 instance smulCommClass_left [SMul R β] [SMul α β] [SMulCommClass R α β] (S : Subring R) :
     SMulCommClass S α β :=

@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.LocalExtr.Rolle
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Topology.Algebra.Polynomial
 
+noncomputable section
+
 /-!
 # Rolle's Theorem for polynomials
 

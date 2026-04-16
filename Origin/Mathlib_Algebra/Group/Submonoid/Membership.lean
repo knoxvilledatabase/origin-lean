@@ -13,6 +13,8 @@ import Mathlib.Data.Finset.NoncommProd
 import Mathlib.Data.Nat.Cast.Basic
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-!
 # Submonoids: membership criteria
 
@@ -441,9 +443,6 @@ abbrev groupPowers {x : M} {n : ℕ} (hpos : 0 < n) (hx : x ^ n = 1) : Group (po
 @[simps!]
 def pow (n : M) (m : ℕ) : powers n :=
   (powersHom M n).mrangeRestrict (Multiplicative.ofAdd m)
-
-theorem pow_apply (n : M) (m : ℕ) : Submonoid.pow n m = ⟨n ^ m, m, rfl⟩ :=
-  rfl
 
 def log [DecidableEq M] {n : M} (p : powers n) : ℕ :=
   Nat.find <| (mem_powers_iff p.val n).mp p.prop

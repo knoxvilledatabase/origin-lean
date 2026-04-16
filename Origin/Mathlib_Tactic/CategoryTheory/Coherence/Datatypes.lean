@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Meta.Basic
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Datatypes for bicategory like structures
 

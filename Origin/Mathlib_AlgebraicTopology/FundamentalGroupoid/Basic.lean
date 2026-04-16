@@ -9,6 +9,8 @@ import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.Topology.Homotopy.Path
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Fundamental groupoid of a space
 
@@ -312,8 +314,6 @@ instance : CategoryTheory.Groupoid (FundamentalGroupoid X) where
 
 theorem comp_eq (x y z : FundamentalGroupoid X) (p : x ⟶ y) (q : y ⟶ z) : p ≫ q = p.comp q := rfl
 
-theorem id_eq_path_refl (x : FundamentalGroupoid X) : 𝟙 x = ⟦Path.refl x.as⟧ := rfl
-
 def fundamentalGroupoidFunctor : TopCat ⥤ CategoryTheory.Grpd where
   obj X := { α := FundamentalGroupoid X }
   map f :=
@@ -340,12 +340,11 @@ def fundamentalGroupoidFunctor : TopCat ⥤ CategoryTheory.Grpd where
     simp only [Quotient.map_mk, Path.map_map, Quotient.eq']
     rfl
 
+@[inherit_doc] scoped notation "π" => FundamentalGroupoid.fundamentalGroupoidFunctor
+
 scoped notation "πₓ" => FundamentalGroupoid.fundamentalGroupoidFunctor.obj
 
 scoped notation "πₘ" => FundamentalGroupoid.fundamentalGroupoidFunctor.map
-
-theorem map_eq {X Y : TopCat} {x₀ x₁ : X} (f : C(X, Y)) (p : Path.Homotopic.Quotient x₀ x₁) :
-    (πₘ f).map p = p.mapFn f := rfl
 
 abbrev toTop {X : TopCat} (x : πₓ X) : X := x.as
 

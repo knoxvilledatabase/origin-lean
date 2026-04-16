@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs
 
+noncomputable section
+
 /-!
 # Dependent-typed matrices
 -/
@@ -35,10 +37,6 @@ end Ext
 
 def map (M : DMatrix m n α) {β : m → n → Type w} (f : ∀ ⦃i j⦄, α i j → β i j) : DMatrix m n β :=
   fun i j => f (M i j)
-
-@[simp]
-theorem map_apply {M : DMatrix m n α} {β : m → n → Type w} {f : ∀ ⦃i j⦄, α i j → β i j} {i : m}
-    {j : n} : M.map f i j = f (M i j) := rfl
 
 @[simp]
 theorem map_map {M : DMatrix m n α} {β : m → n → Type w} {γ : m → n → Type z}
@@ -95,20 +93,6 @@ instance [∀ i j, Unique (α i j)] : Unique (DMatrix m n α) :=
 instance [∀ i j, Subsingleton (α i j)] : Subsingleton (DMatrix m n α) :=
   inferInstanceAs <| Subsingleton <| ∀ i j, α i j
 
-@[simp, nolint simpNF]
-theorem zero_apply [∀ i j, Zero (α i j)] (i j) : (0 : DMatrix m n α) i j = 0 := rfl
-
-@[simp]
-theorem neg_apply [∀ i j, Neg (α i j)] (M : DMatrix m n α) (i j) : (-M) i j = -M i j := rfl
-
-@[simp]
-theorem add_apply [∀ i j, Add (α i j)] (M N : DMatrix m n α) (i j) : (M + N) i j = M i j + N i j :=
-  rfl
-
-@[simp]
-theorem sub_apply [∀ i j, Sub (α i j)] (M N : DMatrix m n α) (i j) : (M - N) i j = M i j - N i j :=
-  rfl
-
 @[simp]
 theorem map_zero [∀ i j, Zero (α i j)] {β : m → n → Type w} [∀ i j, Zero (β i j)]
     {f : ∀ ⦃i j⦄, α i j → β i j} (h : ∀ i j, f (0 : α i j) = 0) :
@@ -133,14 +117,3 @@ instance subsingleton_of_empty_right [IsEmpty n] : Subsingleton (DMatrix m n α)
   ⟨fun M N => by ext i j; exact isEmptyElim j⟩
 
 end DMatrix
-
-def AddMonoidHom.mapDMatrix [∀ i j, AddMonoid (α i j)] {β : m → n → Type w}
-    [∀ i j, AddMonoid (β i j)] (f : ∀ ⦃i j⦄, α i j →+ β i j) : DMatrix m n α →+ DMatrix m n β where
-  toFun M := M.map fun i j => @f i j
-  map_zero' := by simp
-  map_add' := DMatrix.map_add f
-
-@[simp]
-theorem AddMonoidHom.mapDMatrix_apply [∀ i j, AddMonoid (α i j)] {β : m → n → Type w}
-    [∀ i j, AddMonoid (β i j)] (f : ∀ ⦃i j⦄, α i j →+ β i j) (M : DMatrix m n α) :
-    AddMonoidHom.mapDMatrix f M = M.map fun i j => @f i j := rfl

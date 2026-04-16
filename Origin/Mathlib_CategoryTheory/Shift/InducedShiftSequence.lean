@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Shift.CommShift
 import Mathlib.CategoryTheory.Shift.ShiftSequence
 
+noncomputable section
+
 /-! # Induced shift sequences
 
 When `G : C ⥤ A` is a functor from a category equipped with a shift by a

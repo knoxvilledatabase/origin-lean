@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 
+noncomputable section
+
 /-! # The groupoid of smooth, fiberwise-linear maps
 
 This file contains preliminaries for the definition of a smooth vector bundle: an associated

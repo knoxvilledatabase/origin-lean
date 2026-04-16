@@ -1,9 +1,11 @@
 /-
 Extracted from SetTheory/Game/State.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 4 | Infrastructure: 4
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.SetTheory.Game.Short
+
+noncomputable section
 
 /-!
 # Games described via "the state of the board".
@@ -38,9 +40,17 @@ open State
 
 variable {S : Type u} [State S]
 
--- DISSOLVED: turnBound_ne_zero_of_left_move
+theorem turnBound_ne_zero_of_left_move {s t : S} (m : t ∈ l s) : turnBound s ≠ 0 := by
+  intro h
+  have t := left_bound m
+  rw [h] at t
+  exact Nat.not_succ_le_zero _ t
 
--- DISSOLVED: turnBound_ne_zero_of_right_move
+theorem turnBound_ne_zero_of_right_move {s t : S} (m : t ∈ r s) : turnBound s ≠ 0 := by
+  intro h
+  have t := right_bound m
+  rw [h] at t
+  exact Nat.not_succ_le_zero _ t
 
 theorem turnBound_of_left {s t : S} (m : t ∈ l s) (n : ℕ) (h : turnBound s ≤ n + 1) :
     turnBound t ≤ n :=
@@ -50,9 +60,55 @@ theorem turnBound_of_right {s t : S} (m : t ∈ r s) (n : ℕ) (h : turnBound s 
     turnBound t ≤ n :=
   Nat.le_of_lt_succ (Nat.lt_of_lt_of_le (right_bound m) h)
 
--- DISSOLVED: ofStateAux
+def ofStateAux : ∀ (n : ℕ) (s : S), turnBound s ≤ n → PGame
+  | 0, s, h =>
+    PGame.mk { t // t ∈ l s } { t // t ∈ r s }
+      (fun t => by exfalso; exact turnBound_ne_zero_of_left_move t.2 (nonpos_iff_eq_zero.mp h))
+      fun t => by exfalso; exact turnBound_ne_zero_of_right_move t.2 (nonpos_iff_eq_zero.mp h)
+  | n + 1, s, h =>
+    PGame.mk { t // t ∈ l s } { t // t ∈ r s }
+      (fun t => ofStateAux n t (turnBound_of_left t.2 n h)) fun t =>
+      ofStateAux n t (turnBound_of_right t.2 n h)
 
--- DISSOLVED: ofStateAuxRelabelling
+def ofStateAuxRelabelling :
+    ∀ (s : S) (n m : ℕ) (hn : turnBound s ≤ n) (hm : turnBound s ≤ m),
+      Relabelling (ofStateAux n s hn) (ofStateAux m s hm)
+  | s, 0, 0, hn, hm => by
+    dsimp [PGame.ofStateAux]
+    fconstructor
+    · rfl
+    · rfl
+    · intro i; dsimp at i; exfalso
+      exact turnBound_ne_zero_of_left_move i.2 (nonpos_iff_eq_zero.mp hn)
+    · intro j; dsimp at j; exfalso
+      exact turnBound_ne_zero_of_right_move j.2 (nonpos_iff_eq_zero.mp hm)
+  | s, 0, m + 1, hn, hm => by
+    dsimp [PGame.ofStateAux]
+    fconstructor
+    · rfl
+    · rfl
+    · intro i; dsimp at i; exfalso
+      exact turnBound_ne_zero_of_left_move i.2 (nonpos_iff_eq_zero.mp hn)
+    · intro j; dsimp at j; exfalso
+      exact turnBound_ne_zero_of_right_move j.2 (nonpos_iff_eq_zero.mp hn)
+  | s, n + 1, 0, hn, hm => by
+    dsimp [PGame.ofStateAux]
+    fconstructor
+    · rfl
+    · rfl
+    · intro i; dsimp at i; exfalso
+      exact turnBound_ne_zero_of_left_move i.2 (nonpos_iff_eq_zero.mp hm)
+    · intro j; dsimp at j; exfalso
+      exact turnBound_ne_zero_of_right_move j.2 (nonpos_iff_eq_zero.mp hm)
+  | s, n + 1, m + 1, hn, hm => by
+    dsimp [PGame.ofStateAux]
+    fconstructor
+    · rfl
+    · rfl
+    · intro i
+      apply ofStateAuxRelabelling
+    · intro j
+      apply ofStateAuxRelabelling
 
 def ofState (s : S) : PGame :=
   ofStateAux (turnBound s) s (refl _)

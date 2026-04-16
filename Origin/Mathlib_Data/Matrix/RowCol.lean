@@ -5,6 +5,8 @@ Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.Data.Matrix.ConjTranspose
 
+noncomputable section
+
 /-!
 # Row and column matrices
 
@@ -30,18 +32,10 @@ namespace Matrix
 def col (ι : Type*) (w : m → α) : Matrix m ι α :=
   of fun x _ => w x
 
-@[simp]
-theorem col_apply {ι : Type*} (w : m → α) (i) (j : ι) : col ι w i j = w i :=
-  rfl
-
 def row (ι : Type*) (v : n → α) : Matrix ι n α :=
   of fun _ y => v y
 
 variable {ι : Type*}
-
-@[simp]
-theorem row_apply (v : n → α) (i : ι) (j) : row ι v i j = v j :=
-  rfl
 
 theorem col_injective [Nonempty ι] : Function.Injective (col ι : (m → α) → Matrix m ι α) := by
   inhabit ι
@@ -49,8 +43,6 @@ theorem col_injective [Nonempty ι] : Function.Injective (col ι : (m → α) �
 
 @[simp] theorem col_inj [Nonempty ι] {v w : m → α} : col ι v = col ι w ↔ v = w :=
   col_injective.eq_iff
-
-@[simp] theorem col_zero [Zero α] : col ι (0 : m → α) = 0 := rfl
 
 @[simp] theorem col_eq_zero [Zero α] [Nonempty ι] (v : m → α) : col ι v = 0 ↔ v = 0 := col_inj
 
@@ -70,8 +62,6 @@ theorem row_injective [Nonempty ι] : Function.Injective (row ι : (n → α) �
 
 @[simp] theorem row_inj [Nonempty ι] {v w : n → α} : row ι v = row ι w ↔ v = w :=
   row_injective.eq_iff
-
-@[simp] theorem row_zero [Zero α] : row ι (0 : n → α) = 0 := rfl
 
 @[simp] theorem row_eq_zero [Zero α] [Nonempty ι] (v : n → α) : row ι v = 0 ↔ v = 0 := row_inj
 
@@ -123,21 +113,6 @@ theorem col_mulVec [Fintype n] [NonUnitalNonAssocSemiring α] (M : Matrix m n α
 theorem row_mulVec [Fintype n] [NonUnitalNonAssocSemiring α] (M : Matrix m n α) (v : n → α) :
     Matrix.row ι (M *ᵥ v) = (M * Matrix.col ι v)ᵀ := by
   ext
-  rfl
-
-theorem row_mulVec_eq_const [Fintype m] [NonUnitalNonAssocSemiring α]  (v w : m → α) :
-    Matrix.row ι v *ᵥ w = Function.const _ (v ⬝ᵥ w) := rfl
-
-theorem mulVec_col_eq_const [Fintype m] [NonUnitalNonAssocSemiring α] (v w : m → α) :
-    v ᵥ* Matrix.col ι w = Function.const _ (v ⬝ᵥ w) := rfl
-
-theorem row_mul_col [Fintype m] [Mul α] [AddCommMonoid α] (v w : m → α) :
-    row ι v * col ι w = of fun _ _ => v ⬝ᵥ w :=
-  rfl
-
-@[simp]
-theorem row_mul_col_apply [Fintype m] [Mul α] [AddCommMonoid α] (v w : m → α) (i j) :
-    (row ι v * col ι w) i j = v ⬝ᵥ w :=
   rfl
 
 @[simp]

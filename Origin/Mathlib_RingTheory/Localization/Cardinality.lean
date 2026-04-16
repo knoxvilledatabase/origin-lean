@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.GroupTheory.MonoidLocalization.Cardinality
 import Mathlib.RingTheory.OreLocalization.Cardinality
 
+noncomputable section
+
 /-!
 # Cardinality of localizations
 

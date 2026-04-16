@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Balance
 import Mathlib.Data.Complex.Basic
 
+noncomputable section
+
 /-!
 # Finite sums and products of complex numbers
 -/

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.Order.Radical
 
+noncomputable section
+
 /-!
 # The Frattini subgroup
 

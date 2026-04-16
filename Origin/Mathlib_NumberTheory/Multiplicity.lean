@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Multiplicity.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum
@@ -11,6 +11,8 @@ import Mathlib.Data.Nat.Prime.Int
 import Mathlib.NumberTheory.Padics.PadicVal.Defs
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 import Mathlib.RingTheory.Ideal.Span
+
+noncomputable section
 
 /-!
 # Multiplicity in Number Theory
@@ -357,13 +359,30 @@ namespace padicValNat
 
 variable {x y : ℕ}
 
--- DISSOLVED: pow_two_sub_pow
+theorem pow_two_sub_pow (hyx : y < x) (hxy : 2 ∣ x - y) (hx : ¬2 ∣ x) {n : ℕ} (hn : n ≠ 0)
+    (hneven : Even n) :
+    padicValNat 2 (x ^ n - y ^ n) + 1 =
+      padicValNat 2 (x + y) + padicValNat 2 (x - y) + padicValNat 2 n := by
+  simp only [← Nat.cast_inj (R := ℕ∞), Nat.cast_add]
+  iterate 4 rw [padicValNat_eq_emultiplicity]
+  · exact Nat.two_pow_sub_pow hxy hx hneven
+  · exact hn.bot_lt
+  · exact Nat.sub_pos_of_lt hyx
+  · omega
+  · simp only [tsub_pos_iff_lt, Nat.pow_lt_pow_left hyx hn]
 
 variable {p : ℕ} [hp : Fact p.Prime] (hp1 : Odd p)
 
 include hp hp1
 
--- DISSOLVED: pow_sub_pow
+theorem pow_sub_pow (hyx : y < x) (hxy : p ∣ x - y) (hx : ¬p ∣ x) {n : ℕ} (hn : n ≠ 0) :
+    padicValNat p (x ^ n - y ^ n) = padicValNat p (x - y) + padicValNat p n := by
+  rw [← Nat.cast_inj (R := ℕ∞), Nat.cast_add]
+  iterate 3 rw [padicValNat_eq_emultiplicity]
+  · exact multiplicity.Nat.pow_sub_pow hp.out hp1 hxy hx n
+  · exact hn.bot_lt
+  · exact Nat.sub_pos_of_lt hyx
+  · exact Nat.sub_pos_of_lt (Nat.pow_lt_pow_left hyx hn)
 
 theorem pow_add_pow (hxy : p ∣ x + y) (hx : ¬p ∣ x) {n : ℕ} (hn : Odd n) :
     padicValNat p (x ^ n + y ^ n) = padicValNat p (x + y) + padicValNat p n := by

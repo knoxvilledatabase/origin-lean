@@ -8,6 +8,8 @@ import Lean.PrettyPrinter
 import Mathlib.Tactic.Explode.Datatypes
 import Mathlib.Tactic.Explode.Pretty
 
+noncomputable section
+
 /-!
 # Explode command
 
@@ -137,35 +139,21 @@ def explode (e : Expr) (filterProofs : Bool := true) : MetaM Entries := do
 open Elab in
 
 elab "#explode " stx:term : command => withoutModifyingEnv <| Command.runTermElabM fun _ => do
-
   let (heading, e) ← try
-
+    -- Adapted from `#check` implementation
     let theoremName : Name ← realizeGlobalConstNoOverloadWithInfo stx
-
     addCompletionInfo <| .id stx theoremName (danglingDot := false) {} none
-
     let decl ← getConstInfo theoremName
-
     let c : Expr := .const theoremName (decl.levelParams.map mkLevelParam)
-
     pure (m!"{MessageData.ofConst c} : {decl.type}", decl.value!)
-
   catch _ =>
-
     let e ← Term.elabTerm stx none
-
     Term.synthesizeSyntheticMVarsNoPostponing
-
     let e ← Term.levelMVarToParam (← instantiateMVars e)
-
     pure (m!"{e} : {← Meta.inferType e}", e)
-
   unless e.isSyntheticSorry do
-
     let entries ← explode e
-
     let fitchTable : MessageData ← entriesToMessageData entries
-
     logInfo <|← addMessageContext m!"{heading}\n\n{fitchTable}\n"
 
 end Explode

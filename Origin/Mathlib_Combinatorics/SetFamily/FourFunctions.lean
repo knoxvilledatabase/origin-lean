@@ -12,6 +12,8 @@ import Mathlib.Order.Sublattice
 import Mathlib.Tactic.Positivity.Basic
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # The four functions theorem and corollaries
 

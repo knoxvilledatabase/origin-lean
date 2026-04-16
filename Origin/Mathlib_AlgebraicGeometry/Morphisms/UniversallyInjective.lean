@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.PullbackCarrier
 import Mathlib.Topology.LocalAtTarget
 
+noncomputable section
+
 /-!
 # Universally injective morphism
 

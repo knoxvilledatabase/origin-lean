@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/GeomSum.lean
-Genuine: 65 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
+Genuine: 72 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Algebra.Ring.Opposite
 import Mathlib.Tactic.Abel
 import Mathlib.Algebra.Ring.Regular
+
+noncomputable section
 
 /-!
 # Partial sums of geometric series
@@ -47,9 +49,6 @@ theorem geom_sum_succ' {x : α} {n : ℕ} :
     ∑ i ∈ range (n + 1), x ^ i = x ^ n + ∑ i ∈ range n, x ^ i :=
   (sum_range_succ _ _).trans (add_comm _ _)
 
-theorem geom_sum_zero (x : α) : ∑ i ∈ range 0, x ^ i = 0 :=
-  rfl
-
 theorem geom_sum_one (x : α) : ∑ i ∈ range 1, x ^ i = 1 := by simp [geom_sum_succ']
 
 @[simp]
@@ -62,11 +61,6 @@ theorem zero_geom_sum : ∀ {n}, ∑ i ∈ range n, (0 : α) ^ i = if n = 0 then
   | n + 2 => by
     rw [geom_sum_succ']
     simp [zero_geom_sum]
-
-theorem one_geom_sum (n : ℕ) : ∑ i ∈ range n, (1 : α) ^ i = n := by simp
-
-theorem op_geom_sum (x : α) (n : ℕ) : op (∑ i ∈ range n, x ^ i) = ∑ i ∈ range n, op x ^ i := by
-  simp
 
 @[simp]
 theorem op_geom_sum₂ (x y : α) (n : ℕ) : ∑ i ∈ range n, op y ^ (n - 1 - i) * op x ^ i =
@@ -385,7 +379,20 @@ theorem geom_sum_Ico_le_of_lt_one [LinearOrderedField α] {x : α} (hx : 0 ≤ x
       simpa using h'x.le
     · simpa using hmn.le
 
--- DISSOLVED: geom_sum_inv
+theorem geom_sum_inv [DivisionRing α] {x : α} (hx1 : x ≠ 1) (hx0 : x ≠ 0) (n : ℕ) :
+    ∑ i ∈ range n, x⁻¹ ^ i = (x - 1)⁻¹ * (x - x⁻¹ ^ n * x) := by
+  have h₁ : x⁻¹ ≠ 1 := by rwa [inv_eq_one_div, Ne, div_eq_iff_mul_eq hx0, one_mul]
+  have h₂ : x⁻¹ - 1 ≠ 0 := mt sub_eq_zero.1 h₁
+  have h₃ : x - 1 ≠ 0 := mt sub_eq_zero.1 hx1
+  have h₄ : x * (x ^ n)⁻¹ = (x ^ n)⁻¹ * x :=
+    Nat.recOn n (by simp) fun n h => by
+      rw [pow_succ', mul_inv_rev, ← mul_assoc, h, mul_assoc, mul_inv_cancel₀ hx0, mul_assoc,
+        inv_mul_cancel₀ hx0]
+  rw [geom_sum_eq h₁, div_eq_iff_mul_eq h₂, ← mul_right_inj' h₃, ← mul_assoc, ← mul_assoc,
+    mul_inv_cancel₀ h₃]
+  simp [mul_add, add_mul, mul_inv_cancel₀ hx0, mul_assoc, h₄, sub_eq_add_neg, add_comm,
+    add_left_comm]
+  rw [add_comm _ (-x), add_assoc, add_assoc _ _ 1]
 
 variable {β : Type*}
 
@@ -442,7 +449,9 @@ section Order
 
 variable {n : ℕ} {x : α}
 
--- DISSOLVED: geom_sum_pos
+theorem geom_sum_pos [StrictOrderedSemiring α] (hx : 0 ≤ x) (hn : n ≠ 0) :
+    0 < ∑ i ∈ range n, x ^ i :=
+  sum_pos' (fun _ _ => pow_nonneg hx _) ⟨0, mem_range.2 hn.bot_lt, by simp⟩
 
 theorem geom_sum_pos_and_lt_one [StrictOrderedRing α] (hx : x < 0) (hx' : 0 < x + 1) (hn : 1 < n) :
     (0 < ∑ i ∈ range n, x ^ i) ∧ ∑ i ∈ range n, x ^ i < 1 := by
@@ -491,7 +500,14 @@ theorem geom_sum_alternating_of_lt_neg_one [StrictOrderedRing α] (hx : x + 1 < 
     rw [mul_one] at this
     exact this.trans hx
 
--- DISSOLVED: geom_sum_pos'
+theorem geom_sum_pos' [LinearOrderedRing α] (hx : 0 < x + 1) (hn : n ≠ 0) :
+    0 < ∑ i ∈ range n, x ^ i := by
+  obtain _ | _ | n := n
+  · cases hn rfl
+  · simp only [zero_add, range_one, sum_singleton, pow_zero, zero_lt_one]
+  obtain hx' | hx' := lt_or_le x 0
+  · exact (geom_sum_pos_and_lt_one hx' hx n.one_lt_succ_succ).1
+  · exact geom_sum_pos hx' (by simp only [Nat.succ_ne_zero, Ne, not_false_iff])
 
 theorem Odd.geom_sum_pos [LinearOrderedRing α] (h : Odd n) : 0 < ∑ i ∈ range n, x ^ i := by
   rcases n with (_ | _ | k)
@@ -505,13 +521,45 @@ theorem Odd.geom_sum_pos [LinearOrderedRing α] (h : Odd n) : 0 < ∑ i ∈ rang
   · simp only [eq_neg_of_add_eq_zero_left hx, h, neg_one_geom_sum, if_false, zero_lt_one]
   · exact geom_sum_pos' hx k.succ.succ_ne_zero
 
--- DISSOLVED: geom_sum_pos_iff
+theorem geom_sum_pos_iff [LinearOrderedRing α] (hn : n ≠ 0) :
+    (0 < ∑ i ∈ range n, x ^ i) ↔ Odd n ∨ 0 < x + 1 := by
+  refine ⟨fun h => ?_, ?_⟩
+  · rw [or_iff_not_imp_left, ← not_le, Nat.not_odd_iff_even]
+    refine fun hn hx => h.not_le ?_
+    simpa [if_pos hn] using geom_sum_alternating_of_le_neg_one hx n
+  · rintro (hn | hx')
+    · exact hn.geom_sum_pos
+    · exact geom_sum_pos' hx' hn
 
--- DISSOLVED: geom_sum_ne_zero
+theorem geom_sum_ne_zero [LinearOrderedRing α] (hx : x ≠ -1) (hn : n ≠ 0) :
+    ∑ i ∈ range n, x ^ i ≠ 0 := by
+  obtain _ | _ | n := n
+  · cases hn rfl
+  · simp only [zero_add, range_one, sum_singleton, pow_zero, ne_eq, one_ne_zero, not_false_eq_true]
+  rw [Ne, eq_neg_iff_add_eq_zero, ← Ne] at hx
+  obtain h | h := hx.lt_or_lt
+  · have := geom_sum_alternating_of_lt_neg_one h n.one_lt_succ_succ
+    split_ifs at this
+    · exact this.ne
+    · exact (zero_lt_one.trans this).ne'
+  · exact (geom_sum_pos' h n.succ.succ_ne_zero).ne'
 
--- DISSOLVED: geom_sum_eq_zero_iff_neg_one
+theorem geom_sum_eq_zero_iff_neg_one [LinearOrderedRing α] (hn : n ≠ 0) :
+    ∑ i ∈ range n, x ^ i = 0 ↔ x = -1 ∧ Even n := by
+  refine ⟨fun h => ?_, @fun ⟨h, hn⟩ => by simp only [h, hn, neg_one_geom_sum, if_true]⟩
+  contrapose! h
+  have hx := eq_or_ne x (-1)
+  rcases hx with hx | hx
+  · rw [hx, neg_one_geom_sum]
+    simp only [h hx, ite_false, ne_eq, one_ne_zero, not_false_eq_true]
+  · exact geom_sum_ne_zero hx hn
 
--- DISSOLVED: geom_sum_neg_iff
+theorem geom_sum_neg_iff [LinearOrderedRing α] (hn : n ≠ 0) :
+    ∑ i ∈ range n, x ^ i < 0 ↔ Even n ∧ x + 1 < 0 := by
+  rw [← not_iff_not, not_lt, le_iff_lt_or_eq, eq_comm,
+    or_congr (geom_sum_pos_iff hn) (geom_sum_eq_zero_iff_neg_one hn), ← Nat.not_even_iff_odd, ←
+    add_eq_zero_iff_eq_neg, not_and, not_lt, le_iff_lt_or_eq, eq_comm, ← imp_iff_not_or, or_comm,
+    and_comm, Decidable.and_or_imp, or_comm]
 
 end Order
 

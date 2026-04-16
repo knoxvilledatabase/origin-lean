@@ -10,6 +10,8 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Topology.Order.LeftRight
 import Mathlib.Topology.Order.OrderClosed
 
+noncomputable section
+
 /-!
 # Theory of topology on ordered spaces
 

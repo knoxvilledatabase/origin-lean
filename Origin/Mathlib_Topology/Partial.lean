@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Partial
 import Mathlib.Topology.Basic
 
+noncomputable section
+
 /-!
 # Partial functions and topological spaces
 

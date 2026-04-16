@@ -8,6 +8,8 @@ import Batteries.Linter.UnreachableTactic
 import Batteries.Control.Nondet.Basic
 import Mathlib.Tactic.FailIfNoProgress
 
+noncomputable section
+
 /-!
 # The `hint` tactic.
 
@@ -43,9 +45,8 @@ def getHints : CoreM (List (TSyntax `tactic)) := return hintExtension.getState (
 open Lean.Elab.Command in
 
 elab (name := registerHintStx) "register_hint" tac:tactic : command => liftTermElabM do
-
+  -- remove comments
   let tac : TSyntax `tactic := ⟨tac.raw.copyHeadTailInfoFrom .missing⟩
-
   addHint tac
 
 initialize

@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf.ChangeOfRings
 
+noncomputable section
+
 /-!
 # Pushforward of presheaves of modules
 
@@ -50,6 +52,9 @@ variable {F}
 variable {R : Dᵒᵖ ⥤ RingCat.{u}} {S : Cᵒᵖ ⥤ RingCat.{u}} (φ : S ⟶ F.op ⋙ R)
 
 attribute [local simp] pushforward₀ in
+/-- The pushforward functor `PresheafOfModules R ⥤ PresheafOfModules S` induced by
+
+a morphism of presheaves of rings `S ⟶ F.op ⋙ R`. -/
 
 @[simps! obj_obj]
 noncomputable def pushforward : PresheafOfModules.{v} R ⥤ PresheafOfModules.{v} S :=
@@ -58,23 +63,5 @@ noncomputable def pushforward : PresheafOfModules.{v} R ⥤ PresheafOfModules.{v
 noncomputable def pushforwardCompToPresheaf :
     pushforward.{v} φ ⋙ toPresheaf _ ≅ toPresheaf _ ⋙ (whiskeringLeft _ _ _).obj F.op :=
   Iso.refl _
-
-@[simp]
-lemma pushforward_obj_map_apply (M : PresheafOfModules.{v} R) {X Y : Cᵒᵖ} (f : X ⟶ Y)
-    (m : (ModuleCat.restrictScalars (φ.app X)).obj (M.obj (Opposite.op (F.obj X.unop)))) :
-      DFunLike.coe
-        (α := (ModuleCat.restrictScalars (φ.app X)).obj (M.obj (Opposite.op (F.obj X.unop))))
-        (β := fun _ ↦ (ModuleCat.restrictScalars (φ.app Y)).obj
-          (M.obj (Opposite.op (F.obj Y.unop)))) (((pushforward φ).obj M).map f) m =
-        M.map (F.map f.unop).op m := rfl
-
-@[simp]
-lemma pushforward_map_app_apply {M N : PresheafOfModules.{v} R} (α : M ⟶ N) (X : Cᵒᵖ)
-    (m : (ModuleCat.restrictScalars (φ.app X)).obj (M.obj (Opposite.op (F.obj X.unop)))) :
-    DFunLike.coe
-      (α := (ModuleCat.restrictScalars (φ.app X)).obj (M.obj (Opposite.op (F.obj X.unop))))
-      (β := fun _ ↦ (ModuleCat.restrictScalars (φ.app X)).obj
-        (N.obj (Opposite.op (F.obj X.unop))))
-      (((pushforward φ).map α).app X) m = α.app (Opposite.op (F.obj X.unop)) m := rfl
 
 end PresheafOfModules

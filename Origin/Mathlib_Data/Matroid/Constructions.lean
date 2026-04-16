@@ -5,6 +5,8 @@ Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Data.Matroid.Restrict
 
+noncomputable section
+
 /-!
 # Some constructions of matroids
 
@@ -46,10 +48,6 @@ def emptyOn (α : Type*) : Matroid α where
   base_exchange := by rintro _ _ rfl; simp
   maximality := by rintro _ _ _ rfl -; exact ⟨∅, by simp [Maximal]⟩
   subset_ground := by simp
-
-@[simp] theorem emptyOn_ground : (emptyOn α).E = ∅ := rfl
-
-@[simp] theorem emptyOn_base_iff : (emptyOn α).Base B ↔ B = ∅ := Iff.rfl
 
 @[simp] theorem emptyOn_indep_iff : (emptyOn α).Indep I ↔ I = ∅ := Iff.rfl
 

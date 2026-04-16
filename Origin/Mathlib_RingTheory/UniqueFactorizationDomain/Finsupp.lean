@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Finsupp.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Multiset
 import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
+
+noncomputable section
 
 /-!
 # Factors as finsupp
@@ -42,12 +44,18 @@ theorem support_factorization {n : α} :
     (factorization n).support = (normalizedFactors n).toFinset := by
   simp [factorization, Multiset.toFinsupp_support]
 
--- DISSOLVED: factorization_mul
+@[simp]
+theorem factorization_mul {a b : α} (ha : a ≠ 0) (hb : b ≠ 0) :
+    factorization (a * b) = factorization a + factorization b := by
+  simp [factorization, normalizedFactors_mul ha hb]
 
 theorem factorization_pow {x : α} {n : ℕ} : factorization (x ^ n) = n • factorization x := by
   ext
   simp [factorization]
 
--- DISSOLVED: associated_of_factorization_eq
+theorem associated_of_factorization_eq (a b : α) (ha : a ≠ 0) (hb : b ≠ 0)
+    (h : factorization a = factorization b) : Associated a b := by
+  simp_rw [factorization, AddEquiv.apply_eq_iff_eq] at h
+  rwa [associated_iff_normalizedFactors_eq_normalizedFactors ha hb]
 
 end Finsupp

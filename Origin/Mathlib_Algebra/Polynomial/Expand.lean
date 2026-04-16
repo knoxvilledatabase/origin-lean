@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Polynomial/Expand.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 7 | Infrastructure: 2
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Lemmas
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Algebra.Polynomial.RingDivision
 import Mathlib.RingTheory.Polynomial.Basic
+
+noncomputable section
 
 /-!
 # Expand a polynomial by a factor of p, so `∑ aₙ xⁿ` becomes `∑ aₙ xⁿᵖ`.
@@ -118,7 +120,8 @@ theorem expand_inj {p : ℕ} (hp : 0 < p) {f g : R[X]} : expand R p f = expand R
 theorem expand_eq_zero {p : ℕ} (hp : 0 < p) {f : R[X]} : expand R p f = 0 ↔ f = 0 :=
   (expand_injective hp).eq_iff' (map_zero _)
 
--- DISSOLVED: expand_ne_zero
+theorem expand_ne_zero {p : ℕ} (hp : 0 < p) {f : R[X]} : expand R p f ≠ 0 ↔ f ≠ 0 :=
+  (expand_eq_zero hp).not
 
 theorem expand_eq_C {p : ℕ} (hp : 0 < p) {f : R[X]} {r : R} : expand R p f = C r ↔ f = C r := by
   rw [← expand_C, expand_inj hp, expand_C]
@@ -175,18 +178,45 @@ theorem expand_aeval {A : Type*} [Semiring A] [Algebra R A] (p : ℕ) (P : R[X])
 noncomputable def contract (p : ℕ) (f : R[X]) : R[X] :=
   ∑ n ∈ range (f.natDegree + 1), monomial n (f.coeff (n * p))
 
--- DISSOLVED: coeff_contract
+theorem coeff_contract {p : ℕ} (hp : p ≠ 0) (f : R[X]) (n : ℕ) :
+    (contract p f).coeff n = f.coeff (n * p) := by
+  simp only [contract, coeff_monomial, sum_ite_eq', finset_sum_coeff, mem_range, not_lt,
+    ite_eq_left_iff]
+  intro hn
+  apply (coeff_eq_zero_of_natDegree_lt _).symm
+  calc
+    f.natDegree < f.natDegree + 1 := Nat.lt_succ_self _
+    _ ≤ n * 1 := by simpa only [mul_one] using hn
+    _ ≤ n * p := mul_le_mul_of_nonneg_left (show 1 ≤ p from hp.bot_lt) (zero_le n)
 
--- DISSOLVED: map_contract
+theorem map_contract {p : ℕ} (hp : p ≠ 0) {f : R →+* S} {q : R[X]} :
+    (q.contract p).map f = (q.map f).contract p := ext fun n ↦ by
+  simp only [coeff_map, coeff_contract hp]
 
--- DISSOLVED: contract_expand
+theorem contract_expand {f : R[X]} (hp : p ≠ 0) : contract p (expand R p f) = f := by
+  ext
+  simp [coeff_contract hp, coeff_expand hp.bot_lt, Nat.mul_div_cancel _ hp.bot_lt]
 
 theorem contract_one {f : R[X]} : contract 1 f = f :=
   ext fun n ↦ by rw [coeff_contract one_ne_zero, mul_one]
 
 section ExpChar
 
--- DISSOLVED: expand_contract
+theorem expand_contract [CharP R p] [NoZeroDivisors R] {f : R[X]} (hf : Polynomial.derivative f = 0)
+    (hp : p ≠ 0) : expand R p (contract p f) = f := by
+  ext n
+  rw [coeff_expand hp.bot_lt, coeff_contract hp]
+  split_ifs with h
+  · rw [Nat.div_mul_cancel h]
+  · cases' n with n
+    · exact absurd (dvd_zero p) h
+    have := coeff_derivative f n
+    rw [hf, coeff_zero, zero_eq_mul] at this
+    cases' this with h'
+    · rw [h']
+    rename_i _ _ _ h'
+    rw [← Nat.cast_succ, CharP.cast_eq_zero_iff R p] at h'
+    exact absurd h' h
 
 variable [ExpChar R p]
 
@@ -249,9 +279,17 @@ alias isLocalRingHom_expand := isLocalHom_expand
 
 variable {R}
 
--- DISSOLVED: of_irreducible_expand
+theorem of_irreducible_expand {p : ℕ} (hp : p ≠ 0) {f : R[X]} (hf : Irreducible (expand R p f)) :
+    Irreducible f :=
+  let _ := isLocalHom_expand R hp.bot_lt
+  hf.of_map
 
--- DISSOLVED: of_irreducible_expand_pow
+theorem of_irreducible_expand_pow {p : ℕ} (hp : p ≠ 0) {f : R[X]} {n : ℕ} :
+    Irreducible (expand R (p ^ n) f) → Irreducible f :=
+  Nat.recOn n (fun hf => by rwa [pow_zero, expand_one] at hf) fun n ih hf =>
+    ih <| of_irreducible_expand hp <| by
+      rw [pow_succ'] at hf
+      rwa [expand_expand]
 
 end IsDomain
 

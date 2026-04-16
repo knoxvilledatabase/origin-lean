@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Contraction
 
+noncomputable section
+
 /-! # Results about inverses in Clifford algebras
 
 This contains some basic results about the inversion of vectors, related to the fact that

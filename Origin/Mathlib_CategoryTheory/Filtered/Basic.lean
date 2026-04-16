@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Filtered/Basic.lean
-Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
+
+noncomputable section
 
 /-!
 # Filtered categories
@@ -701,7 +703,6 @@ instance [∀ i, IsFilteredOrEmpty (I i)] : IsFilteredOrEmpty (∀ i, I i) where
     funext fun s => by simp [coeq_condition (f s) (g s)]⟩
 
 attribute [local instance] IsFiltered.nonempty in
-
 instance [∀ i, IsFiltered (I i)] : IsFiltered (∀ i, I i) where
 
 open IsCofiltered in
@@ -713,7 +714,6 @@ instance [∀ i, IsCofilteredOrEmpty (I i)] : IsCofilteredOrEmpty (∀ i, I i) w
     funext fun s => by simp [eq_condition (f s) (g s)]⟩
 
 attribute [local instance] IsCofiltered.nonempty in
-
 instance [∀ i, IsCofiltered (I i)] : IsCofiltered (∀ i, I i) where
 
 end Pi
@@ -731,7 +731,6 @@ instance [IsFilteredOrEmpty C] [IsFilteredOrEmpty D] : IsFilteredOrEmpty (C × D
     by simp [coeq_condition]⟩
 
 attribute [local instance] IsFiltered.nonempty in
-
 instance [IsFiltered C] [IsFiltered D] : IsFiltered (C × D) where
 
 open IsCofiltered in
@@ -743,7 +742,6 @@ instance [IsCofilteredOrEmpty C] [IsCofilteredOrEmpty D] : IsCofilteredOrEmpty (
     by simp [eq_condition]⟩
 
 attribute [local instance] IsCofiltered.nonempty in
-
 instance [IsCofiltered C] [IsCofiltered D] : IsCofiltered (C × D) where
 
 end Prod

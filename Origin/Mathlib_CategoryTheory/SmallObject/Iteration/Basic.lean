@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.IsLimit
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Order.SuccPred.Limit
 
+noncomputable section
+
 /-! # Transfinite iterations of a functor
 
 In this file, given a functor `Φ : C ⥤ C` and a natural transformation
@@ -54,14 +56,6 @@ variable {i : J} (hi : i ≤ j)
 def restrictionLT : Set.Iio i ⥤ C :=
   (monotone_inclusion_lt_le_of_le hi).functor ⋙ F
 
-@[simp]
-lemma restrictionLT_obj (k : J) (hk : k < i) :
-    (restrictionLT F hi).obj ⟨k, hk⟩ = F.obj ⟨k, hk.le.trans hi⟩ := rfl
-
-@[simp]
-lemma restrictionLT_map {k₁ k₂ : Set.Iio i} (φ : k₁ ⟶ k₂) :
-    (restrictionLT F hi).map φ = F.map (homOfLE (by simpa using leOfHom φ)) := rfl
-
 @[simps]
 def coconeOfLE : Cocone (restrictionLT F hi) where
   pt := F.obj ⟨i, hi⟩
@@ -72,14 +66,6 @@ def coconeOfLE : Cocone (restrictionLT F hi) where
 
 def restrictionLE : Set.Iic i ⥤ C :=
   (monotone_inclusion_le_le_of_le hi).functor ⋙ F
-
-@[simp]
-lemma restrictionLE_obj (k : J) (hk : k ≤ i) :
-    (restrictionLE F hi).obj ⟨k, hk⟩ = F.obj ⟨k, hk.trans hi⟩ := rfl
-
-@[simp]
-lemma restrictionLE_map {k₁ k₂ : Set.Iic i} (φ : k₁ ⟶ k₂) :
-    (restrictionLE F hi).map φ = F.map (homOfLE (by simpa using leOfHom φ)) := rfl
 
 end Iteration
 
@@ -184,14 +170,7 @@ instance {J} {j : J} [PartialOrder J] [OrderBot J] [WellFoundedLT J] [SuccOrder 
 
 end Hom
 
-@[simp]
-lemma natTrans_id : Hom.natTrans (𝟙 iter₁) = 𝟙 _ := rfl
-
 variable {iter₁ iter₂}
-
-@[simp, reassoc]
-lemma natTrans_comp {iter₃ : Iteration ε j} (φ : iter₁ ⟶ iter₂) (ψ : iter₂ ⟶ iter₃) :
-    (φ ≫ ψ).natTrans = φ.natTrans ≫ ψ.natTrans := rfl
 
 @[reassoc]
 lemma natTrans_naturality (φ : iter₁ ⟶ iter₂) (i₁ i₂ : J) (h : i₁ ≤ i₂) (h' : i₂ ≤ j) :
@@ -222,12 +201,6 @@ def truncFunctor {i : J} (hi : i ≤ j) : Iteration ε j ⥤ Iteration ε i wher
   map {iter₁ iter₂} φ :=
     { natTrans := whiskerLeft _ φ.natTrans
       natTrans_app_succ := fun k hk => φ.natTrans_app_succ k (lt_of_lt_of_le hk hi) }
-
-@[simp]
-lemma truncFunctor_map_natTrans_app
-    (φ : iter₁ ⟶ iter₂) {i : J} (hi : i ≤ j) (k : J) (hk : k ≤ i) :
-    ((truncFunctor ε hi).map φ).natTrans.app ⟨k, hk⟩ =
-      φ.natTrans.app ⟨k, hk.trans hi⟩ := rfl
 
 end
 

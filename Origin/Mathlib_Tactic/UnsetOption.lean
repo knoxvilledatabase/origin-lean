@@ -8,6 +8,8 @@ import Lean.Parser.Term
 import Lean.Parser.Do
 import Lean.Elab.Command
 
+noncomputable section
+
 /-!
 # The `unset_option` command
 
@@ -35,11 +37,8 @@ where
 namespace Command
 
 elab (name := unsetOption) "unset_option " opt:ident : command => do
-
   let options ← Elab.elabUnsetOption opt
-
   modify fun s ↦ { s with maxRecDepth := maxRecDepth.get options }
-
   modifyScope fun scope ↦ { scope with opts := options }
 
 end Command

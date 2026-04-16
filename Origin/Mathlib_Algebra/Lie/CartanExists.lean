@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.CartanSubalgebra
 import Mathlib.Algebra.Lie.Rank
 
+noncomputable section
+
 /-!
 # Existence of Cartan subalgebras
 
@@ -123,6 +125,15 @@ variable {K L : Type*} [Field K] [LieRing L] [LieAlgebra K L] [Module.Finite K L
 open Module LieSubalgebra LieSubmodule Polynomial Cardinal LieModule engel_isBot_of_isMin
 
 set_option linter.unusedVariables false in
+/-- Let `L` be a Lie algebra of dimension `n` over a field `K` with at least `n` elements.
+
+Given a Lie subalgebra `U` of `L`, and an element `x ∈ U` such that `U ≤ engel K x`.
+
+Suppose that `engel K x` is minimal amongst the Engel subalgebras `engel K y` for `y ∈ U`.
+
+Then `engel K x ≤ engel K y` for all `y ∈ U`.
+
+Lemma 2 in [barnes1967]. -/
 
 lemma engel_isBot_of_isMin (hLK : finrank K L ≤ #K) (U : LieSubalgebra K L)
     (E : {engel K x | x ∈ U}) (hUle : U ≤ E) (hmin : IsMin E) :

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Submodule.Map
 import Mathlib.Algebra.Polynomial.Eval.Defs
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 
+noncomputable section
+
 /-!
 # modular equivalence for submodule
 -/

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Polynomial/Reverse.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.TrailingDegree
 import Mathlib.Algebra.Polynomial.EraseLead
+
+noncomputable section
 
 /-!
 # Reverse of a univariate polynomial
@@ -45,10 +47,6 @@ theorem revAtFun_inj {N : ℕ} : Function.Injective (revAtFun N) := by
 def revAt (N : ℕ) : Function.Embedding ℕ ℕ where
   toFun i := ite (i ≤ N) (N - i) i
   inj' := revAtFun_inj
-
-@[simp]
-theorem revAtFun_eq (N i : ℕ) : revAtFun N i = revAt N i :=
-  rfl
 
 @[simp]
 theorem revAt_invol {N i : ℕ} : (revAt N) (revAt N i) = i :=
@@ -259,7 +257,10 @@ theorem natTrailingDegree_reverse (f : R[X]) : f.reverse.natTrailingDegree = 0 :
 theorem reverse_trailingCoeff (f : R[X]) : f.reverse.trailingCoeff = f.leadingCoeff := by
   rw [trailingCoeff, natTrailingDegree_reverse, coeff_zero_reverse]
 
--- DISSOLVED: reverse_mul
+theorem reverse_mul {f g : R[X]} (fg : f.leadingCoeff * g.leadingCoeff ≠ 0) :
+    reverse (f * g) = reverse f * reverse g := by
+  unfold reverse
+  rw [natDegree_mul' fg, reflect_mul f g rfl.le rfl.le]
 
 @[simp]
 theorem reverse_mul_of_domain {R : Type*} [Ring R] [NoZeroDivisors R] (f g : R[X]) :

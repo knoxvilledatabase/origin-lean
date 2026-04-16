@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Orientation.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Ray
 import Mathlib.LinearAlgebra.Determinant
+
+noncomputable section
 
 /-!
 # Orientations of modules
@@ -56,15 +58,15 @@ variable {R M}
 def Orientation.map (e : M ≃ₗ[R] N) : Orientation R M ι ≃ Orientation R N ι :=
   Module.Ray.map <| AlternatingMap.domLCongr R R ι R e
 
--- DISSOLVED: Orientation.map_apply
+@[simp]
+theorem Orientation.map_apply (e : M ≃ₗ[R] N) (v : M [⋀^ι]→ₗ[R] R) (hv : v ≠ 0) :
+    Orientation.map ι e (rayOfNeZero _ v hv) =
+      rayOfNeZero _ (v.compLinearMap e.symm) (mt (v.compLinearEquiv_eq_zero_iff e.symm).mp hv) :=
+  rfl
 
 @[simp]
 theorem Orientation.map_refl : (Orientation.map ι <| LinearEquiv.refl R M) = Equiv.refl _ := by
   rw [Orientation.map, AlternatingMap.domLCongr_refl, Module.Ray.map_refl]
-
-@[simp]
-theorem Orientation.map_symm (e : M ≃ₗ[R] N) :
-    (Orientation.map ι e).symm = Orientation.map ι e.symm := rfl
 
 section Reindex
 
@@ -73,16 +75,15 @@ variable (R M) {ι ι'}
 def Orientation.reindex (e : ι ≃ ι') : Orientation R M ι ≃ Orientation R M ι' :=
   Module.Ray.map <| AlternatingMap.domDomCongrₗ R e
 
--- DISSOLVED: Orientation.reindex_apply
+@[simp]
+theorem Orientation.reindex_apply (e : ι ≃ ι') (v : M [⋀^ι]→ₗ[R] R) (hv : v ≠ 0) :
+    Orientation.reindex R M e (rayOfNeZero _ v hv) =
+      rayOfNeZero _ (v.domDomCongr e) (mt (v.domDomCongr_eq_zero_iff e).mp hv) :=
+  rfl
 
 @[simp]
 theorem Orientation.reindex_refl : (Orientation.reindex R M <| Equiv.refl ι) = Equiv.refl _ := by
   rw [Orientation.reindex, AlternatingMap.domDomCongrₗ_refl, Module.Ray.map_refl]
-
-@[simp]
-theorem Orientation.reindex_symm (e : ι ≃ ι') :
-    (Orientation.reindex R M e).symm = Orientation.reindex R M e.symm :=
-  rfl
 
 end Reindex
 
@@ -90,10 +91,6 @@ instance (priority := 100) IsEmpty.oriented [IsEmpty ι] : Module.Oriented R M �
   positiveOrientation :=
     rayOfNeZero R (AlternatingMap.constLinearEquivOfIsEmpty 1) <|
       AlternatingMap.constLinearEquivOfIsEmpty.injective.ne (by exact one_ne_zero)
-
-@[simp]
-theorem Orientation.map_positiveOrientation_of_isEmpty [IsEmpty ι] (f : M ≃ₗ[R] N) :
-    Orientation.map ι f positiveOrientation = positiveOrientation := rfl
 
 @[simp]
 theorem Orientation.map_of_isEmpty [IsEmpty ι] (x : Orientation R M ι) (f : M ≃ₗ[R] M) :

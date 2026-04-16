@@ -1,11 +1,13 @@
 /-
 Extracted from Combinatorics/Enumerative/Composition.lean
-Genuine: 102 | Conflates: 0 | Dissolved: 1 | Infrastructure: 14
+Genuine: 103 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Finset.Sort
+
+noncomputable section
 
 /-!
 # Compositions
@@ -425,7 +427,10 @@ theorem eq_ones_iff {c : Composition n} : c = ones n ↔ ∀ i ∈ c.blocks, i =
       simp
     rw [A, this, ones_blocks]
 
--- DISSOLVED: ne_ones_iff
+theorem ne_ones_iff {c : Composition n} : c ≠ ones n ↔ ∃ i ∈ c.blocks, 1 < i := by
+  refine (not_congr eq_ones_iff).trans ?_
+  have : ∀ j ∈ c.blocks, j = 1 ↔ j ≤ 1 := fun j hj => by simp [le_antisymm_iff, c.one_le_blocks hj]
+  simp +contextual [this]
 
 theorem eq_ones_iff_length {c : Composition n} : c = ones n ↔ c.length = n := by
   constructor
@@ -831,34 +836,6 @@ theorem CompositionAsSet.toComposition_length (c : CompositionAsSet n) :
   simp [CompositionAsSet.toComposition, Composition.length, Composition.blocks]
 
 @[simp]
-theorem Composition.toCompositionAsSet_blocks (c : Composition n) :
-    c.toCompositionAsSet.blocks = c.blocks := by
-  let d := c.toCompositionAsSet
-  change d.blocks = c.blocks
-  have length_eq : d.blocks.length = c.blocks.length := by simp [d, blocks_length]
-  suffices H : ∀ i ≤ d.blocks.length, (d.blocks.take i).sum = (c.blocks.take i).sum from
-    eq_of_sum_take_eq length_eq H
-  intro i hi
-  have i_lt : i < d.boundaries.card := by
-    -- Porting note: relied on `convert` unfolding definitions, switched to using a `simpa`
-    simpa [CompositionAsSet.blocks, length_ofFn,
-      d.card_boundaries_eq_succ_length] using Nat.lt_succ_iff.2 hi
-  have i_lt' : i < c.boundaries.card := i_lt
-  have i_lt'' : i < c.length + 1 := by rwa [c.card_boundaries_eq_succ_length] at i_lt'
-  have A :
-    d.boundaries.orderEmbOfFin rfl ⟨i, i_lt⟩ =
-      c.boundaries.orderEmbOfFin c.card_boundaries_eq_succ_length ⟨i, i_lt''⟩ :=
-    rfl
-  have B : c.sizeUpTo i = c.boundary ⟨i, i_lt''⟩ := rfl
-  rw [d.blocks_partial_sum i_lt, CompositionAsSet.boundary, ← Composition.sizeUpTo, B, A,
-    c.orderEmbOfFin_boundaries]
-
-@[simp]
-theorem CompositionAsSet.toComposition_blocks (c : CompositionAsSet n) :
-    c.toComposition.blocks = c.blocks :=
-  rfl
-
-@[simp]
 theorem CompositionAsSet.toComposition_boundaries (c : CompositionAsSet n) :
     c.toComposition.boundaries = c.boundaries := by
   ext j
@@ -872,11 +849,6 @@ theorem CompositionAsSet.toComposition_boundaries (c : CompositionAsSet n) :
     refine ⟨i, by simp, ?_⟩
     rw [c.card_boundaries_eq_succ_length] at i_lt
     simp [Composition.boundary, Nat.mod_eq_of_lt i_lt, Composition.sizeUpTo, hi]
-
-@[simp]
-theorem Composition.toCompositionAsSet_boundaries (c : Composition n) :
-    c.toCompositionAsSet.boundaries = c.boundaries :=
-  rfl
 
 def compositionEquiv (n : ℕ) : Composition n ≃ CompositionAsSet n where
   toFun c := c.toCompositionAsSet

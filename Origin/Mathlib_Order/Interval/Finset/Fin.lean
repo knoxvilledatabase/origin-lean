@@ -5,6 +5,8 @@ Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.Order.Interval.Finset.Nat
 
+noncomputable section
+
 /-!
 # Finite intervals in `Fin n`
 
@@ -15,18 +17,6 @@ intervals as Finsets and Fintypes.
 namespace Fin
 
 variable {n : ℕ} (a b : Fin n)
-
-@[simp, norm_cast]
-theorem coe_sup : ↑(a ⊔ b) = (a ⊔ b : ℕ) := rfl
-
-@[simp, norm_cast]
-theorem coe_inf : ↑(a ⊓ b) = (a ⊓ b : ℕ) := rfl
-
-@[simp, norm_cast]
-theorem coe_max : ↑(max a b) = (max a b : ℕ) := rfl
-
-@[simp, norm_cast]
-theorem coe_min : ↑(min a b) = (min a b : ℕ) := rfl
 
 end Fin
 
@@ -59,8 +49,6 @@ theorem Ioc_eq_finset_subtype : Ioc a b = (Ioc (a : ℕ) b).fin n :=
 
 theorem Ioo_eq_finset_subtype : Ioo a b = (Ioo (a : ℕ) b).fin n :=
   rfl
-
-theorem uIcc_eq_finset_subtype : uIcc a b = (uIcc (a : ℕ) b).fin n := rfl
 
 @[simp]
 theorem map_valEmbedding_Icc : (Icc a b).map Fin.valEmbedding = Icc ↑a ↑b := by

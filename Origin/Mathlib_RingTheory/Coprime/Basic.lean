@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Coprime/Basic.lean
-Genuine: 89 | Conflates: 1 | Dissolved: 3 | Infrastructure: 6
+Genuine: 90 | Conflates: 3 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Action.Units
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Ring.Divisibility.Basic
 import Mathlib.Algebra.Ring.Hom.Defs
 import Mathlib.Logic.Basic
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 # Coprime elements of a ring or monoid
@@ -68,9 +70,16 @@ lemma IsCoprime.intCast {R : Type*} [CommRing R] {a b : ℤ} (h : IsCoprime a b)
   rw_mod_cast [H]
   exact Int.cast_one
 
--- DISSOLVED: IsCoprime.ne_zero
+-- CONFLATES (assumes ground = zero): IsCoprime.ne_zero
+theorem IsCoprime.ne_zero [Nontrivial R] {p : Fin 2 → R} (h : IsCoprime (p 0) (p 1)) : p ≠ 0 := by
+  rintro rfl
+  exact not_isCoprime_zero_zero h
 
--- DISSOLVED: IsCoprime.ne_zero_or_ne_zero
+-- CONFLATES (assumes ground = zero): IsCoprime.ne_zero_or_ne_zero
+theorem IsCoprime.ne_zero_or_ne_zero [Nontrivial R] (h : IsCoprime x y) : x ≠ 0 ∨ y ≠ 0 := by
+  apply not_or_of_imp
+  rintro rfl rfl
+  exact not_isCoprime_zero_zero h
 
 theorem isCoprime_one_left : IsCoprime 1 x :=
   ⟨1, 0, by rw [one_mul, zero_mul, add_zero]⟩
@@ -348,7 +357,13 @@ theorem neg_neg_iff (x y : R) : IsCoprime (-x) (-y) ↔ IsCoprime x y :=
 
 end CommRing
 
--- DISSOLVED: sq_add_sq_ne_zero
+theorem sq_add_sq_ne_zero {R : Type*} [LinearOrderedCommRing R] {a b : R} (h : IsCoprime a b) :
+    a ^ 2 + b ^ 2 ≠ 0 := by
+  intro h'
+  obtain ⟨ha, hb⟩ := (add_eq_zero_iff_of_nonneg (sq_nonneg _) (sq_nonneg _)).mp h'
+  obtain rfl := pow_eq_zero ha
+  obtain rfl := pow_eq_zero hb
+  exact not_isCoprime_zero_zero h
 
 end IsCoprime
 

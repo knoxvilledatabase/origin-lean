@@ -10,6 +10,8 @@ import Mathlib.Data.Set.Image
 import Mathlib.Order.WellFounded
 import Mathlib.Order.Interval.Set.Defs
 
+noncomputable section
+
 /-!
 # Order homomorphisms and sets
 -/
@@ -100,10 +102,6 @@ noncomputable def orderIsoOfSurjective : α ≃o β :=
     (OrderIso.setCongr _ _ h_surj.range_eq).trans OrderIso.Set.univ
 
 @[simp]
-theorem coe_orderIsoOfSurjective : (orderIsoOfSurjective f h_mono h_surj : α → β) = f :=
-  rfl
-
-@[simp]
 theorem orderIsoOfSurjective_symm_apply_self (a : α) :
     (orderIsoOfSurjective f h_mono h_surj).symm (f a) = a :=
   (orderIsoOfSurjective f h_mono h_surj).symm_apply_apply _
@@ -147,30 +145,6 @@ instance subsingleton_of_wellFoundedGT' [LinearOrder β] [WellFoundedGT β] [Pre
   rw [Subsingleton.elim f.dual]
 
 instance unique_of_wellFoundedGT [LinearOrder α] [WellFoundedGT α] : Unique (α ≃o α) := Unique.mk' _
-
-protected def Iic [Lattice α] [Lattice β] (e : α ≃o β) (x : α) :
-    Iic x ≃o Iic (e x) where
-  toFun y := ⟨e y, (map_le_map_iff _).mpr y.property⟩
-  invFun y := ⟨e.symm y, e.symm_apply_le.mpr y.property⟩
-  left_inv y := by simp
-  right_inv y := by simp
-  map_rel_iff' := by simp
-
-protected def Ici [Lattice α] [Lattice β] (e : α ≃o β) (x : α) :
-    Ici x ≃o Ici (e x) where
-  toFun y := ⟨e y, (map_le_map_iff _).mpr y.property⟩
-  invFun y := ⟨e.symm y, e.le_symm_apply.mpr y.property⟩
-  left_inv y := by simp
-  right_inv y := by simp
-  map_rel_iff' := by simp
-
-protected def Icc [Lattice α] [Lattice β] (e : α ≃o β) (x y : α) :
-    Icc x y ≃o Icc (e x) (e y) where
-  toFun z := ⟨e z, by simp only [mem_Icc, map_le_map_iff]; exact z.property⟩
-  invFun z := ⟨e.symm z, by simp only [mem_Icc, e.le_symm_apply, e.symm_apply_le]; exact z.property⟩
-  left_inv y := by simp
-  right_inv y := by simp
-  map_rel_iff' := by simp
 
 end OrderIso
 

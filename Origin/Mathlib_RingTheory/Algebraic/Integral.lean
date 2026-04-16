@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Algebraic.Basic
 import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
 
+noncomputable section
+
 /-!
 # Algebraic elements and integral elements
 

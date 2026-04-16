@@ -7,6 +7,8 @@ import Mathlib.Tactic.CategoryTheory.Coherence.Basic
 import Mathlib.Tactic.CategoryTheory.Monoidal.Normalize
 import Mathlib.Tactic.CategoryTheory.Monoidal.PureCoherence
 
+noncomputable section
+
 /-!
 # `monoidal` tactic
 
@@ -32,7 +34,6 @@ def monoidalNf (mvarId : MVarId) : MetaM (List MVarId) := do
   BicategoryLike.normalForm Monoidal.Context `monoidal mvarId
 
 elab "monoidal_nf" : tactic => withMainContext do
-
   replaceMainGoal (← monoidalNf (← getMainGoal))
 
 @[inherit_doc monoidalNf]
@@ -40,7 +41,6 @@ def monoidal (mvarId : MVarId) : MetaM (List MVarId) :=
   BicategoryLike.main Monoidal.Context `monoidal mvarId
 
 elab "monoidal" : tactic => withMainContext do
-
   replaceMainGoal <| ← monoidal <| ← getMainGoal
 
 end Mathlib.Tactic.Monoidal

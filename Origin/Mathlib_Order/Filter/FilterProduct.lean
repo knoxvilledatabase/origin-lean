@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Order.Filter.Ring
 import Mathlib.Order.Filter.Ultrafilter
 
+noncomputable section
+
 /-!
 # Ultraproducts
 

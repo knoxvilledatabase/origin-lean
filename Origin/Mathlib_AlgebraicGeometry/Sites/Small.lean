@@ -8,6 +8,8 @@ import Mathlib.AlgebraicGeometry.Sites.MorphismProperty
 import Mathlib.CategoryTheory.Sites.DenseSubsite.InducedTopology
 import Mathlib.CategoryTheory.Sites.Over
 
+noncomputable section
+
 /-!
 # Small sites
 

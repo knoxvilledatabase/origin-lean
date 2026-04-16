@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.Pi
 import Mathlib.Algebra.Ring.CompTypeclasses
 import Mathlib.Algebra.Ring.Hom.Defs
 
+noncomputable section
+
 /-!
 # Pi instances for ring
 

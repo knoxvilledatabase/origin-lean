@@ -7,6 +7,8 @@ import Batteries.Data.MLList.Basic
 import Mathlib.Control.Combinators
 import Std.Data.HashSet.Basic
 
+noncomputable section
+
 /-!
 # Depth first search
 

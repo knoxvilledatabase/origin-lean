@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Ring.Equiv
 import Mathlib.Algebra.Ring.Opposite
 
+noncomputable section
+
 /-!
 # Results about mapping big operators across ring equivalences
 -/

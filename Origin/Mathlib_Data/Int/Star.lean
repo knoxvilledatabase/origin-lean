@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Algebra.Order.Star.Basic
 
+noncomputable section
+
 /-!
 # Star ordered ring structure on `ℤ`
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Lie.NonUnitalNonAssocAlgebra
 import Mathlib.Algebra.Lie.UniversalEnveloping
 import Mathlib.GroupTheory.GroupAction.Ring
 
+noncomputable section
+
 /-!
 # Free Lie algebras
 

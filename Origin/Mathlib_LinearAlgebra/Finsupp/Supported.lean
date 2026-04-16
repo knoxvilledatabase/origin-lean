@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Submodule.Range
 import Mathlib.LinearAlgebra.Finsupp.LSum
 import Mathlib.LinearAlgebra.Span.Defs
 
+noncomputable section
+
 /-!
 # `Finsupp`s supported on a given submodule
 

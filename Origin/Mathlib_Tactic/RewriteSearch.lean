@@ -10,6 +10,8 @@ import Mathlib.Data.MLList.BestFirst
 import Mathlib.Order.Interval.Finset.Nat
 import Batteries.Data.MLList.Heartbeats
 
+noncomputable section
+
 /-!
 # The `rw_search` tactic
 

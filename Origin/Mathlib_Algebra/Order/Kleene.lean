@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Kleene.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 19
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Canonical.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.Algebra.Ring.Pi
 import Mathlib.Algebra.Ring.Prod
 import Mathlib.Tactic.Monotonicity.Attr
+
+noncomputable section
 
 /-!
 # Kleene Algebras
@@ -69,6 +71,8 @@ class KStar (α : Type*) where
   /-- The Kleene star operator on a Kleene algebra -/
   protected kstar : α → α
 
+@[inherit_doc] scoped[Computability] postfix:1024 "∗" => KStar.kstar
+
 open Computability
 
 class KleeneAlgebra (α : Type*) extends IdemSemiring α, KStar α where
@@ -113,7 +117,10 @@ scoped[Computability] attribute [simp] add_eq_sup
 
 theorem add_idem (a : α) : a + a = a := by simp
 
--- DISSOLVED: nsmul_eq_self
+theorem nsmul_eq_self : ∀ {n : ℕ} (_ : n ≠ 0) (a : α), n • a = a
+  | 0, h => (h rfl).elim
+  | 1, _ => one_nsmul
+  | n + 2, _ => fun a ↦ by rw [succ_nsmul, nsmul_eq_self n.succ_ne_zero, add_idem]
 
 theorem add_eq_left_iff_le : a + b = a ↔ b ≤ a := by simp
 
@@ -239,17 +246,6 @@ instance : KleeneAlgebra (α × β) :=
     mul_kstar_le_self := fun _ _ ↦ And.imp mul_kstar_le_self mul_kstar_le_self
     kstar_mul_le_self := fun _ _ ↦ And.imp kstar_mul_le_self kstar_mul_le_self }
 
-theorem kstar_def (a : α × β) : a∗ = (a.1∗, a.2∗) :=
-  rfl
-
-@[simp]
-theorem fst_kstar (a : α × β) : a∗.1 = a.1∗ :=
-  rfl
-
-@[simp]
-theorem snd_kstar (a : α × β) : a∗.2 = a.2∗ :=
-  rfl
-
 end Prod
 
 namespace Pi
@@ -271,13 +267,6 @@ instance : KleeneAlgebra (∀ i, π i) :=
     kstar_mul_le_kstar := fun _ _ ↦ kstar_mul_le_kstar
     mul_kstar_le_self := fun _ _ h _ ↦ mul_kstar_le_self <| h _
     kstar_mul_le_self := fun _ _ h _ ↦ kstar_mul_le_self <| h _ }
-
-theorem kstar_def (a : ∀ i, π i) : a∗ = fun i ↦ (a i)∗ :=
-  rfl
-
-@[simp]
-theorem kstar_apply (a : ∀ i, π i) (i : ι) : a∗ i = (a i)∗ :=
-  rfl
 
 end Pi
 

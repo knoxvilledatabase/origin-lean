@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecificLimits/Basic.lean
-Genuine: 77 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 82 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GeomSum
@@ -9,6 +9,8 @@ import Mathlib.Order.Iterate
 import Mathlib.Topology.Algebra.Algebra
 import Mathlib.Topology.Algebra.InfiniteSum.Real
 import Mathlib.Topology.Instances.EReal
+
+noncomputable section
 
 /-!
 # A collection of specific limit computations
@@ -376,6 +378,9 @@ variable [PseudoEMetricSpace α] (r C : ℝ≥0∞) (hr : r < 1) (hC : C ≠ ⊤
   (hu : ∀ n, edist (f n) (f (n + 1)) ≤ C * r ^ n)
 
 include hr hC hu in
+/-- If `edist (f n) (f (n+1))` is bounded by `C * r^n`, `C ≠ ∞`, `r < 1`,
+
+then `f` is a Cauchy sequence. -/
 
 theorem cauchySeq_of_edist_le_geometric : CauchySeq f := by
   refine cauchySeq_of_edist_le_of_tsum_ne_top _ hu ?_
@@ -384,6 +389,9 @@ theorem cauchySeq_of_edist_le_geometric : CauchySeq f := by
   exact (tsub_pos_iff_lt.2 hr).ne'
 
 include hu in
+/-- If `edist (f n) (f (n+1))` is bounded by `C * r^n`, then the distance from
+
+`f n` to the limit of `f` is bounded above by `C * r^n / (1 - r)`. -/
 
 theorem edist_le_of_edist_le_geometric_of_tendsto {a : α} (ha : Tendsto f atTop (𝓝 a)) (n : ℕ) :
     edist (f n) a ≤ C * r ^ n / (1 - r) := by
@@ -391,6 +399,9 @@ theorem edist_le_of_edist_le_geometric_of_tendsto {a : α} (ha : Tendsto f atTop
   simp only [pow_add, ENNReal.tsum_mul_left, ENNReal.tsum_geometric, div_eq_mul_inv, mul_assoc]
 
 include hu in
+/-- If `edist (f n) (f (n+1))` is bounded by `C * r^n`, then the distance from
+
+`f 0` to the limit of `f` is bounded above by `C / (1 - r)`. -/
 
 theorem edist_le_of_edist_le_geometric_of_tendsto₀ {a : α} (ha : Tendsto f atTop (𝓝 a)) :
     edist (f 0) a ≤ C / (1 - r) := by
@@ -404,6 +415,7 @@ variable [PseudoEMetricSpace α] (C : ℝ≥0∞) (hC : C ≠ ⊤) {f : ℕ → 
   (hu : ∀ n, edist (f n) (f (n + 1)) ≤ C / 2 ^ n) {a : α} (ha : Tendsto f atTop (𝓝 a))
 
 include hC hu in
+/-- If `edist (f n) (f (n+1))` is bounded by `C * 2^-n`, then `f` is a Cauchy sequence. -/
 
 theorem cauchySeq_of_edist_le_geometric_two : CauchySeq f := by
   simp only [div_eq_mul_inv, ENNReal.inv_pow] at hu
@@ -411,6 +423,9 @@ theorem cauchySeq_of_edist_le_geometric_two : CauchySeq f := by
   simp [ENNReal.one_lt_two]
 
 include hu ha in
+/-- If `edist (f n) (f (n+1))` is bounded by `C * 2^-n`, then the distance from
+
+`f n` to the limit of `f` is bounded above by `2 * C * 2^-n`. -/
 
 theorem edist_le_of_edist_le_geometric_two_of_tendsto (n : ℕ) : edist (f n) a ≤ 2 * C / 2 ^ n := by
   simp only [div_eq_mul_inv, ENNReal.inv_pow] at *
@@ -419,6 +434,9 @@ theorem edist_le_of_edist_le_geometric_two_of_tendsto (n : ℕ) : edist (f n) a 
   rw [ENNReal.one_sub_inv_two, div_eq_mul_inv, inv_inv]
 
 include hu ha in
+/-- If `edist (f n) (f (n+1))` is bounded by `C * 2^-n`, then the distance from
+
+`f 0` to the limit of `f` is bounded above by `2 * C`. -/
 
 theorem edist_le_of_edist_le_geometric_two_of_tendsto₀ : edist (f 0) a ≤ 2 * C := by
   simpa only [_root_.pow_zero, div_eq_mul_inv, inv_one, mul_one] using
@@ -529,17 +547,42 @@ theorem Set.Countable.exists_pos_forall_sum_le {ι : Type*} {s : Set ι} (hs : s
 
 namespace NNReal
 
--- DISSOLVED: exists_pos_sum_of_countable
+theorem exists_pos_sum_of_countable {ε : ℝ≥0} (hε : ε ≠ 0) (ι) [Countable ι] :
+    ∃ ε' : ι → ℝ≥0, (∀ i, 0 < ε' i) ∧ ∃ c, HasSum ε' c ∧ c < ε := by
+  cases nonempty_encodable ι
+  obtain ⟨a, a0, aε⟩ := exists_between (pos_iff_ne_zero.2 hε)
+  obtain ⟨ε', hε', c, hc, hcε⟩ := posSumOfEncodable a0 ι
+  exact
+    ⟨fun i ↦ ⟨ε' i, (hε' i).le⟩, fun i ↦ NNReal.coe_lt_coe.1 <| hε' i,
+      ⟨c, hasSum_le (fun i ↦ (hε' i).le) hasSum_zero hc⟩, NNReal.hasSum_coe.1 hc,
+      aε.trans_le' <| NNReal.coe_le_coe.1 hcε⟩
 
 end NNReal
 
 namespace ENNReal
 
--- DISSOLVED: exists_pos_sum_of_countable
+theorem exists_pos_sum_of_countable {ε : ℝ≥0∞} (hε : ε ≠ 0) (ι) [Countable ι] :
+    ∃ ε' : ι → ℝ≥0, (∀ i, 0 < ε' i) ∧ (∑' i, (ε' i : ℝ≥0∞)) < ε := by
+  rcases exists_between (pos_iff_ne_zero.2 hε) with ⟨r, h0r, hrε⟩
+  rcases lt_iff_exists_coe.1 hrε with ⟨x, rfl, _⟩
+  rcases NNReal.exists_pos_sum_of_countable (coe_pos.1 h0r).ne' ι with ⟨ε', hp, c, hc, hcr⟩
+  exact ⟨ε', hp, (ENNReal.tsum_coe_eq hc).symm ▸ lt_trans (coe_lt_coe.2 hcr) hrε⟩
 
--- DISSOLVED: exists_pos_sum_of_countable'
+theorem exists_pos_sum_of_countable' {ε : ℝ≥0∞} (hε : ε ≠ 0) (ι) [Countable ι] :
+    ∃ ε' : ι → ℝ≥0∞, (∀ i, 0 < ε' i) ∧ ∑' i, ε' i < ε :=
+  let ⟨δ, δpos, hδ⟩ := exists_pos_sum_of_countable hε ι
+  ⟨fun i ↦ δ i, fun i ↦ ENNReal.coe_pos.2 (δpos i), hδ⟩
 
--- DISSOLVED: exists_pos_tsum_mul_lt_of_countable
+theorem exists_pos_tsum_mul_lt_of_countable {ε : ℝ≥0∞} (hε : ε ≠ 0) {ι} [Countable ι] (w : ι → ℝ≥0∞)
+    (hw : ∀ i, w i ≠ ∞) : ∃ δ : ι → ℝ≥0, (∀ i, 0 < δ i) ∧ (∑' i, (w i * δ i : ℝ≥0∞)) < ε := by
+  lift w to ι → ℝ≥0 using hw
+  rcases exists_pos_sum_of_countable hε ι with ⟨δ', Hpos, Hsum⟩
+  have : ∀ i, 0 < max 1 (w i) := fun i ↦ zero_lt_one.trans_le (le_max_left _ _)
+  refine ⟨fun i ↦ δ' i / max 1 (w i), fun i ↦ div_pos (Hpos _) (this i), ?_⟩
+  refine lt_of_le_of_lt (ENNReal.tsum_le_tsum fun i ↦ ?_) Hsum
+  rw [coe_div (this i).ne']
+  refine mul_le_of_le_div' (mul_le_mul_left' (ENNReal.inv_le_inv.2 ?_) _)
+  exact coe_le_coe.2 (le_max_right _ _)
 
 end ENNReal
 
@@ -629,6 +672,7 @@ theorem tendsto_nat_ceil_mul_div_atTop {a : R} (ha : 0 ≤ a) :
 theorem tendsto_nat_ceil_div_atTop : Tendsto (fun x ↦ (⌈x⌉₊ : R) / x) atTop (𝓝 1) := by
   simpa using tendsto_nat_ceil_mul_div_atTop (zero_le_one' R)
 
--- DISSOLVED: Nat.tendsto_div_const_atTop
+lemma Nat.tendsto_div_const_atTop {n : ℕ} (hn : n ≠ 0) : Tendsto (· / n) atTop atTop := by
+  rw [Tendsto, map_div_atTop_eq_nat n hn.bot_lt]
 
 end

@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Triangulated/HomologicalFunctor.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Exact
@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Shift.ShiftSequence
 import Mathlib.CategoryTheory.Triangulated.Functor
 import Mathlib.CategoryTheory.Triangulated.Subcategory
 import Mathlib.Algebra.Homology.ExactSequence
+
+noncomputable section
 
 /-! # Homological functors
 
@@ -266,7 +268,6 @@ open ComposableArrows
     (F.homologySequenceδ T n₀ n₁ h) ((F.shift n₁).map T.mor₁) ((F.shift n₁).map T.mor₂)
 
 include hT in
-
 lemma homologySequenceComposableArrows₅_exact :
     (F.homologySequenceComposableArrows₅ T n₀ n₁ h).Exact :=
   exact_of_δ₀ (F.homologySequence_exact₂ T hT n₀).exact_toComposableArrows

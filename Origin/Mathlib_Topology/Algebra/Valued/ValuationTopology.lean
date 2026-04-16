@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/Valued/ValuationTopology.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Nonarchimedean.Bases
 import Mathlib.Topology.Algebra.UniformFilterBasis
 import Mathlib.RingTheory.Valuation.ValuationSubring
+
+noncomputable section
 
 /-!
 # The topology on a valued ring
@@ -78,7 +80,10 @@ theorem subgroups_basis : RingSubgroupsBasis fun γ : Γ₀ˣ => (v.ltAddSubgrou
 
 end Valuation
 
--- DISSOLVED: Valued
+class Valued (R : Type u) [Ring R] (Γ₀ : outParam (Type v))
+  [LinearOrderedCommGroupWithZero Γ₀] extends UniformSpace R, UniformAddGroup R where
+  v : Valuation R Γ₀
+  is_topological_valuation : ∀ s, s ∈ 𝓝 (0 : R) ↔ ∃ γ : Γ₀ˣ, { x : R | v x < γ } ⊆ s
 
 namespace Valued
 
@@ -119,7 +124,12 @@ theorem mem_nhds {s : Set R} {x : R} : s ∈ 𝓝 x ↔ ∃ γ : Γ₀ˣ, { y | 
 theorem mem_nhds_zero {s : Set R} : s ∈ 𝓝 (0 : R) ↔ ∃ γ : Γ₀ˣ, { x | v x < (γ : Γ₀) } ⊆ s := by
   simp only [mem_nhds, sub_zero]
 
--- DISSOLVED: loc_const
+theorem loc_const {x : R} (h : (v x : Γ₀) ≠ 0) : { y : R | v y = v x } ∈ 𝓝 x := by
+  rw [mem_nhds]
+  use Units.mk0 _ h
+  rw [Units.val_mk0]
+  intro y y_in
+  exact Valuation.map_eq_of_sub_lt _ y_in
 
 instance (priority := 100) : TopologicalRing R :=
   (toUniformSpace_eq R Γ₀).symm ▸ v.subgroups_basis.toRingFilterBasis.isTopologicalRing

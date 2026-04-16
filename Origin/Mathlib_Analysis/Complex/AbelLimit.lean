@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecificLimits.Normed
 import Mathlib.Tactic.Peel
 import Mathlib.Tactic.Positivity
 
+noncomputable section
+
 /-!
 # Abel's limit theorem
 

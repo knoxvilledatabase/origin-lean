@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Tactic.Simp
 import Mathlib.Init
 
+noncomputable section
+
 /-! # `simp_intro` tactic -/
 
 namespace Mathlib.Tactic
@@ -42,27 +44,16 @@ partial def simpIntroCore (g : MVarId) (ctx : Simp.Context) (simprocs : Simp.Sim
 open Parser.Tactic
 
 elab "simp_intro" cfg:optConfig disch:(discharger)?
-
     ids:(ppSpace colGt binderIdent)* more:" .."? only:(&" only")? args:(simpArgs)? : tactic => do
-
   let args := args.map fun args ↦ ⟨args.raw[1].getArgs⟩
-
   let stx ← `(tactic| simp $cfg:optConfig $(disch)? $[only%$only]? $[[$args,*]]?)
-
   let { ctx, simprocs, dischargeWrapper } ←
-
     withMainContext <| mkSimpContext stx (eraseLocal := false)
-
   dischargeWrapper.with fun discharge? ↦ do
-
     let g ← getMainGoal
-
     g.checkNotAssigned `simp_intro
-
     g.withContext do
-
       let g? ← simpIntroCore g ctx (simprocs := simprocs) discharge? more.isSome ids.toList
-
       replaceMainGoal <| if let some g := g? then [g] else []
 
 end Mathlib.Tactic

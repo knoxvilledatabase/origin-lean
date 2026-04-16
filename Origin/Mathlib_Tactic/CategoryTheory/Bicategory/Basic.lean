@@ -7,6 +7,8 @@ import Mathlib.Tactic.CategoryTheory.Coherence.Basic
 import Mathlib.Tactic.CategoryTheory.Bicategory.Normalize
 import Mathlib.Tactic.CategoryTheory.Bicategory.PureCoherence
 
+noncomputable section
+
 /-!
 # `bicategory` tactic
 
@@ -32,7 +34,6 @@ def bicategoryNf (mvarId : MVarId) : MetaM (List MVarId) := do
   BicategoryLike.normalForm Bicategory.Context `bicategory mvarId
 
 elab "bicategory_nf" : tactic => withMainContext do
-
   replaceMainGoal (← bicategoryNf (← getMainGoal))
 
 @[inherit_doc bicategoryNf]
@@ -40,7 +41,6 @@ def bicategory (mvarId : MVarId) : MetaM (List MVarId) :=
   BicategoryLike.main  Bicategory.Context `bicategory mvarId
 
 elab "bicategory" : tactic => withMainContext do
-
   replaceMainGoal <| ← bicategory <| ← getMainGoal
 
 end Mathlib.Tactic.Bicategory

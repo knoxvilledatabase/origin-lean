@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Girth.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Acyclic
 import Mathlib.Data.ENat.Lattice
+
+noncomputable section
 
 /-!
 # Girth of a simple graph
@@ -51,8 +53,6 @@ lemma three_le_egirth : 3 ≤ G.egirth := by
   · rw [← exists_egirth_eq_length] at h
     have ⟨_, _, _⟩ := h
     simp_all only [Nat.cast_inj, Nat.ofNat_le_cast, Walk.IsCycle.three_le_length]
-
-@[simp] lemma egirth_bot : egirth (⊥ : SimpleGraph α) = ⊤ := by simp
 
 end egirth
 

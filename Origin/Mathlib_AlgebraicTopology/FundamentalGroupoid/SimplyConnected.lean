@@ -8,6 +8,8 @@ import Mathlib.Topology.Homotopy.Contractible
 import Mathlib.CategoryTheory.PUnit
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.PUnit
 
+noncomputable section
+
 /-!
 # Simply connected spaces
 This file defines simply connected spaces.

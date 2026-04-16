@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/HahnSeries/Multiplication.lean
-Genuine: 40 | Conflates: 10 | Dissolved: 4 | Infrastructure: 38
+Genuine: 44 | Conflates: 10 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.MulAntidiagonal
 import Mathlib.Data.Finset.SMulAntidiagonal
 import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.RingTheory.HahnSeries.Addition
+
+noncomputable section
 
 /-!
 # Multiplicative properties of Hahn series
@@ -119,10 +121,6 @@ instance instAddCommMonoid : AddCommMonoid (HahnModule Γ R V) :=
 instance instBaseSMul {V} [Monoid R] [AddMonoid V] [DistribMulAction R V] :
     SMul R (HahnModule Γ R V) :=
   inferInstanceAs <| SMul R (HahnSeries Γ V)
-
-@[simp] theorem of_zero : of R (0 : HahnSeries Γ V) = 0 := rfl
-
-@[simp] theorem of_add (x y : HahnSeries Γ V) : of R (x + y) = of R x + of R y := rfl
 
 @[simp] theorem of_symm_zero : (of R).symm (0 : HahnModule Γ R V) = 0 := rfl
 
@@ -435,9 +433,15 @@ theorem mul_single_coeff_add [NonUnitalNonAssocSemiring R] {r : R} {x : HahnSeri
 theorem mul_single_zero_coeff [NonUnitalNonAssocSemiring R] {r : R} {x : HahnSeries Γ R} {a : Γ} :
     (x * single 0 r).coeff a = x.coeff a * r := by rw [← add_zero a, mul_single_coeff_add, add_zero]
 
--- DISSOLVED: single_zero_mul_coeff
+theorem single_zero_mul_coeff [NonUnitalNonAssocSemiring R] {r : R} {x : HahnSeries Γ R} {a : Γ} :
+    ((single 0 r : HahnSeries Γ R) * x).coeff a = r * x.coeff a := by
+  rw [← add_zero a, single_mul_coeff_add, add_zero]
 
--- DISSOLVED: single_zero_mul_eq_smul
+@[simp]
+theorem single_zero_mul_eq_smul [Semiring R] {r : R} {x : HahnSeries Γ R} :
+    single 0 r * x = r • x := by
+  ext
+  exact single_zero_mul_coeff
 
 theorem support_mul_subset_add_support [NonUnitalNonAssocSemiring R] {x y : HahnSeries Γ R} :
     support (x * y) ⊆ support x + support y := by
@@ -590,7 +594,16 @@ theorem orderTop_add_orderTop_le_orderTop_mul {Γ} [LinearOrderedCancelAddCommMo
     WithTop.coe_le_coe, ← Set.IsWF.min_add]
   exact Set.IsWF.min_le_min_of_subset support_mul_subset_add_support
 
--- DISSOLVED: order_mul
+@[simp]
+theorem order_mul {Γ} [LinearOrderedCancelAddCommMonoid Γ] [NonUnitalNonAssocSemiring R]
+    [NoZeroDivisors R] {x y : HahnSeries Γ R} (hx : x ≠ 0) (hy : y ≠ 0) :
+    (x * y).order = x.order + y.order := by
+  apply le_antisymm
+  · apply order_le_of_coeff_ne_zero
+    rw [mul_coeff_order_add_order x y]
+    exact mul_ne_zero (leadingCoeff_ne_iff.mpr hx) (leadingCoeff_ne_iff.mpr hy)
+  · rw [order_of_ne hx, order_of_ne hy, order_of_ne (mul_ne_zero hx hy), ← Set.IsWF.min_add]
+    exact Set.IsWF.min_le_min_of_subset support_mul_subset_add_support
 
 @[simp]
 theorem order_pow {Γ} [LinearOrderedCancelAddCommMonoid Γ] [Semiring R] [NoZeroDivisors R]
@@ -663,7 +676,10 @@ theorem C_injective : Function.Injective (C : R → HahnSeries Γ R) := by
   have h := rs 0
   rwa [C_apply, single_coeff_same, C_apply, single_coeff_same] at h
 
--- DISSOLVED: C_ne_zero
+theorem C_ne_zero {r : R} (h : r ≠ 0) : (C r : HahnSeries Γ R) ≠ 0 := by
+  contrapose! h
+  rw [← C_zero] at h
+  exact C_injective h
 
 theorem order_C {r : R} : order (C r : HahnSeries Γ R) = 0 := by
   by_cases h : r = 0
@@ -753,9 +769,6 @@ instance : Algebra R (HahnSeries Γ A) where
     simp only [smul_coeff, single_zero_mul_eq_smul, RingHom.coe_comp, RingHom.toFun_eq_coe, C_apply,
       Function.comp_apply, algebraMap_smul, mul_single_zero_coeff]
     rw [← Algebra.commutes, Algebra.smul_def]
-
-theorem C_eq_algebraMap : C = algebraMap R (HahnSeries Γ R) :=
-  rfl
 
 theorem algebraMap_apply {r : R} : algebraMap R (HahnSeries Γ A) r = C (algebraMap R A r) :=
   rfl

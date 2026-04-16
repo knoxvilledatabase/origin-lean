@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Complex.Module
 import Mathlib.LinearAlgebra.Orientation
 
+noncomputable section
+
 /-!
 # The standard orientation on `ℂ`.
 

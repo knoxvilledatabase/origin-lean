@@ -5,6 +5,8 @@ Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.Basic
 
+noncomputable section
+
 /-!
 ## Smoothness of charts and local structomorphisms
 
@@ -159,96 +161,5 @@ theorem isLocalStructomorphOn_contDiffGroupoid_iff_aux {f : PartialHomeomorph M 
       _ = c'.symm (e (c y)) := by rw [← he' hy₃]; rfl
   refine (H₁.congr H₂).mono ?_
   mfld_set_tac
-
-theorem isLocalStructomorphOn_contDiffGroupoid_iff (f : PartialHomeomorph M M') :
-    LiftPropOn (contDiffGroupoid ∞ I).IsLocalStructomorphWithinAt f f.source ↔
-      ContMDiffOn I I ⊤ f f.source ∧ ContMDiffOn I I ⊤ f.symm f.target := by
-  constructor
-  · intro h
-    refine ⟨isLocalStructomorphOn_contDiffGroupoid_iff_aux h,
-      isLocalStructomorphOn_contDiffGroupoid_iff_aux ?_⟩
-    -- todo: we can generalize this part of the proof to a lemma
-    intro X hX
-    let x := f.symm X
-    have hx : x ∈ f.source := f.symm.mapsTo hX
-    let c := chartAt H x
-    let c' := chartAt H X
-    obtain ⟨-, hxf⟩ := h x hx
-    refine ⟨(f.symm.continuousAt hX).continuousWithinAt, fun h2x => ?_⟩
-    obtain ⟨e, he, h2e, hef, hex⟩ :
-      ∃ e : PartialHomeomorph H H,
-        e ∈ contDiffGroupoid ∞ I ∧
-          e.source ⊆ (c.symm ≫ₕ f ≫ₕ c').source ∧
-            EqOn (c' ∘ f ∘ c.symm) e e.source ∧ c x ∈ e.source := by
-      have h1 : c' = chartAt H (f x) := by simp only [f.right_inv hX]
-      have h2 : c' ∘ f ∘ c.symm = ⇑(c.symm ≫ₕ f ≫ₕ c') := rfl
-      have hcx : c x ∈ c.symm ⁻¹' f.source := by simp only [c, hx, mfld_simps]
-      rw [h2]
-      rw [← h1, h2, PartialHomeomorph.isLocalStructomorphWithinAt_iff'] at hxf
-      · exact hxf hcx
-      · mfld_set_tac
-      · apply Or.inl
-        simp only [c, hx, h1, mfld_simps]
-    have h2X : c' X = e (c (f.symm X)) := by
-      rw [← hef hex]
-      dsimp only [Function.comp_def]
-      have hfX : f.symm X ∈ c.source := by simp only [c, hX, mfld_simps]
-      rw [c.left_inv hfX, f.right_inv hX]
-    have h3e : EqOn (c ∘ f.symm ∘ c'.symm) e.symm (c'.symm ⁻¹' f.target ∩ e.target) := by
-      have h1 : EqOn (c.symm ≫ₕ f ≫ₕ c').symm e.symm (e.target ∩ e.target) := by
-        apply EqOn.symm
-        refine e.isImage_source_target.symm_eqOn_of_inter_eq_of_eqOn ?_ ?_
-        · rw [inter_self, inter_eq_right.mpr h2e]
-        · rw [inter_self]; exact hef.symm
-      have h2 : e.target ⊆ (c.symm ≫ₕ f ≫ₕ c').target := by
-        intro x hx; rw [← e.right_inv hx, ← hef (e.symm.mapsTo hx)]
-        exact PartialHomeomorph.mapsTo _ (h2e <| e.symm.mapsTo hx)
-      rw [inter_self] at h1
-      rwa [inter_eq_right.mpr]
-      refine h2.trans ?_
-      mfld_set_tac
-    refine ⟨e.symm, StructureGroupoid.symm _ he, h3e, ?_⟩
-    rw [h2X]; exact e.mapsTo hex
-  · -- We now show the converse: a partial homeomorphism `f : M → M'` which is smooth in both
-    -- directions is a local structomorphism.  We do this by proposing
-    -- `((chart_at H x).symm.trans f).trans (chart_at H (f x))` as a candidate for a structomorphism
-    -- of `H`.
-    rintro ⟨h₁, h₂⟩ x hx
-    refine ⟨(h₁ x hx).continuousWithinAt, ?_⟩
-    let c := chartAt H x
-    let c' := chartAt H (f x)
-    rintro (hx' : c x ∈ c.symm ⁻¹' f.source)
-    -- propose `(c.symm.trans f).trans c'` as a candidate for a local structomorphism of `H`
-    refine ⟨(c.symm.trans f).trans c', ⟨?_, ?_⟩, (?_ : EqOn (c' ∘ f ∘ c.symm) _ _), ?_⟩
-    · -- smoothness of the candidate local structomorphism in the forward direction
-      intro y hy
-      simp only [mfld_simps] at hy
-      have H : ContMDiffWithinAt I I ⊤ f (f ≫ₕ c').source ((extChartAt I x).symm y) := by
-        refine (h₁ ((extChartAt I x).symm y) ?_).mono ?_
-        · simp only [hy, mfld_simps]
-        · mfld_set_tac
-      have hy' : (extChartAt I x).symm y ∈ c.source := by simp only [hy, mfld_simps]
-      have hy'' : f ((extChartAt I x).symm y) ∈ c'.source := by simp only [hy, mfld_simps]
-      rw [contMDiffWithinAt_iff_of_mem_source hy' hy''] at H
-      convert H.2.mono _
-      · simp only [hy, mfld_simps]
-      · mfld_set_tac
-    · -- smoothness of the candidate local structomorphism in the reverse direction
-      intro y hy
-      simp only [mfld_simps] at hy
-      have H : ContMDiffWithinAt I I ⊤ f.symm (f.symm ≫ₕ c).source
-          ((extChartAt I (f x)).symm y) := by
-        refine (h₂ ((extChartAt I (f x)).symm y) ?_).mono ?_
-        · simp only [hy, mfld_simps]
-        · mfld_set_tac
-      have hy' : (extChartAt I (f x)).symm y ∈ c'.source := by simp only [hy, mfld_simps]
-      have hy'' : f.symm ((extChartAt I (f x)).symm y) ∈ c.source := by simp only [hy, mfld_simps]
-      rw [contMDiffWithinAt_iff_of_mem_source hy' hy''] at H
-      convert H.2.mono _
-      · simp only [hy, mfld_simps]
-      · mfld_set_tac
-    -- now check the candidate local structomorphism agrees with `f` where it is supposed to
-    · simp only [mfld_simps]; apply eqOn_refl
-    · simp only [c, c', hx', mfld_simps]
 
 end IsLocalStructomorph

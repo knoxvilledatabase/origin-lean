@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finset/Density.lean
-Genuine: 35 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Rat
@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Card
 import Mathlib.Data.NNRat.Order
 import Mathlib.Data.Rat.Cast.CharZero
 import Mathlib.Tactic.Positivity.Basic
+
+noncomputable section
 
 /-!
 # Density of a finite set
@@ -55,8 +57,6 @@ variable {s t : Finset α} {a b : α}
 
 def dens (s : Finset α) : ℚ≥0 := s.card / Fintype.card α
 
-lemma dens_eq_card_div_card (s : Finset α) : dens s = s.card / Fintype.card α := rfl
-
 @[simp] lemma dens_empty : dens (∅ : Finset α) = 0 := by simp [dens]
 
 @[simp] lemma dens_singleton (a : α) : dens ({a} : Finset α) = (Fintype.card α : ℚ≥0)⁻¹ := by
@@ -71,7 +71,7 @@ lemma dens_eq_card_div_card (s : Finset α) : dens s = s.card / Fintype.card α 
 @[simp] lemma dens_eq_zero : dens s = 0 ↔ s = ∅ := by
   simp +contextual [dens, Fintype.card_eq_zero_iff, eq_empty_of_isEmpty]
 
--- DISSOLVED: dens_ne_zero
+lemma dens_ne_zero : dens s ≠ 0 ↔ s.Nonempty := dens_eq_zero.not.trans nonempty_iff_ne_empty.symm
 
 @[simp] lemma dens_pos : 0 < dens s ↔ s.Nonempty := pos_iff_ne_zero.trans dens_ne_zero
 
@@ -141,7 +141,7 @@ variable [Nonempty α]
 @[simp] lemma dens_eq_one : dens s = 1 ↔ s = univ := by
   simp [dens, div_eq_one_iff_eq, card_eq_iff_eq_univ]
 
--- DISSOLVED: dens_ne_one
+lemma dens_ne_one : dens s ≠ 1 ↔ s ≠ univ := dens_eq_one.not
 
 end Nonempty
 

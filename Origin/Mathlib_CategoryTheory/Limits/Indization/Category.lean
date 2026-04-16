@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.FullSubcategory
 import Mathlib.CategoryTheory.Limits.Indization.LocallySmall
 import Mathlib.CategoryTheory.Limits.Indization.FilteredColimits
 
+noncomputable section
+
 /-!
 # The category of Ind-objects
 

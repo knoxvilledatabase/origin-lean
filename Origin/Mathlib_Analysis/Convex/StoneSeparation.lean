@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Combination
 import Mathlib.Analysis.Convex.Join
 
+noncomputable section
+
 /-!
 # Stone's separation theorem
 

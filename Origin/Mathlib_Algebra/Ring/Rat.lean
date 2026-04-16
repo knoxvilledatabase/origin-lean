@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Ring/Rat.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Units.Basic
 import Mathlib.Algebra.Ring.Basic
 import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Data.Rat.Defs
+
+noncomputable section
 
 /-!
 # The rational numbers are a commutative ring
@@ -64,9 +66,13 @@ instance semiring     : Semiring ℚ     := by infer_instance
 lemma mkRat_eq_div (n : ℤ) (d : ℕ) : mkRat n d = n / d := by
   simp only [mkRat_eq_divInt, divInt_eq_div, Int.cast_natCast]
 
--- DISSOLVED: divInt_div_divInt_cancel_left
+lemma divInt_div_divInt_cancel_left {x : ℤ} (hx : x ≠ 0) (n d : ℤ) :
+    n /. x / (d /. x) = n /. d := by
+  rw [div_eq_mul_inv, inv_divInt', divInt_mul_divInt_cancel hx]
 
--- DISSOLVED: divInt_div_divInt_cancel_right
+lemma divInt_div_divInt_cancel_right {x : ℤ} (hx : x ≠ 0) (n d : ℤ) :
+    x /. n / (x /. d) = d /. n := by
+  rw [div_eq_mul_inv, inv_divInt', mul_comm, divInt_mul_divInt_cancel hx]
 
 lemma num_div_den (r : ℚ) : (r.num : ℚ) / (r.den : ℚ) = r := by
   rw [← Int.cast_natCast, ← divInt_eq_div, num_divInt_den]

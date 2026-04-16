@@ -7,6 +7,8 @@ import Mathlib.Order.Cover
 import Mathlib.Order.LatticeIntervals
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # Modular Lattices
 

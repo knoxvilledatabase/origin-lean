@@ -8,6 +8,8 @@ import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unital
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.NonUnital
 import Mathlib.MeasureTheory.Integral.SetIntegral
 
+noncomputable section
+
 /-!
 # Integrals and the continuous functional calculus
 

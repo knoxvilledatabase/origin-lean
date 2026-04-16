@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/NatInt.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Group
 import Mathlib.Logic.Encodable.Lattice
+
+noncomputable section
 
 /-!
 # Infinite sums and products over `ℕ` and `ℤ`
@@ -57,7 +59,10 @@ theorem prod_range_mul {f : ℕ → M} {k : ℕ} (h : HasProd (fun n ↦ f (n + 
   refine ((range k).hasProd f).mul_compl ?_
   rwa [← (notMemRangeEquiv k).symm.hasProd_iff]
 
--- DISSOLVED: zero_mul
+@[to_additive]
+theorem zero_mul {f : ℕ → M} (h : HasProd (fun n ↦ f (n + 1)) m) :
+    HasProd f (f 0 * m) := by
+  simpa only [prod_range_one] using h.prod_range_mul
 
 @[to_additive]
 theorem even_mul_odd {f : ℕ → M} (he : HasProd (fun k ↦ f (2 * k)) m)
@@ -168,7 +173,11 @@ theorem prod_mul_tprod_nat_mul'
     ((∏ i ∈ range k, f i) * ∏' i, f (i + k)) = ∏' i, f i :=
   h.hasProd.prod_range_mul.tprod_eq.symm
 
--- DISSOLVED: tprod_eq_zero_mul'
+@[to_additive]
+theorem tprod_eq_zero_mul'
+    {f : ℕ → M} (hf : Multipliable (fun n ↦ f (n + 1))) :
+    ∏' b, f b = f 0 * ∏' b, f (b + 1) := by
+  simpa only [prod_range_one] using (prod_mul_tprod_nat_mul' hf).symm
 
 @[to_additive]
 theorem tprod_even_mul_odd {f : ℕ → M} (he : Multipliable fun k ↦ f (2 * k))
@@ -209,7 +218,10 @@ theorem prod_mul_tprod_nat_add [T2Space G] {f : ℕ → G} (k : ℕ) (h : Multip
     ((∏ i ∈ range k, f i) * ∏' i, f (i + k)) = ∏' i, f i :=
   prod_mul_tprod_nat_mul' <| (multipliable_nat_add_iff k).2 h
 
--- DISSOLVED: tprod_eq_zero_mul
+@[to_additive]
+theorem tprod_eq_zero_mul [T2Space G] {f : ℕ → G} (hf : Multipliable f) :
+    ∏' b, f b = f 0 * ∏' b, f (b + 1) :=
+  tprod_eq_zero_mul' <| (multipliable_nat_add_iff 1).2 hf
 
 @[to_additive "For `f : ℕ → G`, the sum `∑' k, f (k + i)` tends to zero. This does not require a
 summability assumption on `f`, as otherwise all such sums are zero."]

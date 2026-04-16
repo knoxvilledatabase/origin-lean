@@ -12,6 +12,8 @@ import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Integral.VitaliCaratheodory
 
+noncomputable section
+
 /-!
 # Fundamental Theorem of Calculus
 
@@ -608,9 +610,7 @@ theorem integral_hasFDerivWithinAt (hf : IntervalIntegrable f volume a b)
     (hb.mono_left inf_le_left)
 
 macro "uniqueDiffWithinAt_Ici_Iic_univ" : tactic =>
-
   `(tactic| (first | exact uniqueDiffOn_Ici _ _ left_mem_Ici |
-
     exact uniqueDiffOn_Iic _ _ right_mem_Iic | exact uniqueDiffWithinAt_univ (𝕜 := ℝ) (E := ℝ)))
 
 theorem fderivWithin_integral_of_tendsto_ae (hf : IntervalIntegrable f volume a b)

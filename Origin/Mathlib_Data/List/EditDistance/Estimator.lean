@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.List.EditDistance.Bounds
 import Mathlib.Order.Estimator
 
+noncomputable section
+
 /-!
 # `Estimator` for Levenshtein distance.
 

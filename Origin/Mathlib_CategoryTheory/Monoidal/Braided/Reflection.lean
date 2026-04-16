@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Monad.Adjunction
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.Tactic.TFAE
 
+noncomputable section
+
 /-!
 
 # Day's reflection theorem

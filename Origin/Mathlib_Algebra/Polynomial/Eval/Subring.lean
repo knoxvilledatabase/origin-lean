@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Degree.Support
 import Mathlib.Algebra.Polynomial.Eval.Coeff
 import Mathlib.Algebra.Ring.Subring.Basic
 
+noncomputable section
+
 /-!
 # Evaluation of polynomials in subrings
 

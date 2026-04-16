@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/Padics/PadicIntegers.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 9 | Infrastructure: 43
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Padics.PadicNumbers
 import Mathlib.RingTheory.DiscreteValuationRing.Basic
+
+noncomputable section
 
 /-!
 # p-adic integers
@@ -76,9 +78,6 @@ def subring : Subring ℚ_[p] where
   mul_mem' hx hy := (padicNormE.mul _ _).trans_le <| mul_le_one₀ hx (norm_nonneg _) hy
   neg_mem' hx := (norm_neg _).trans_le hx
 
-@[simp]
-theorem mem_subring_iff {x : ℚ_[p]} : x ∈ subring p ↔ ‖x‖ ≤ 1 := Iff.rfl
-
 variable {p}
 
 instance : Add ℤ_[p] := (by infer_instance : Add (subring p))
@@ -95,20 +94,8 @@ instance : Inhabited ℤ_[p] := ⟨0⟩
 
 instance : One ℤ_[p] := ⟨⟨1, by norm_num⟩⟩
 
-@[simp]
-theorem mk_zero {h} : (⟨0, h⟩ : ℤ_[p]) = (0 : ℤ_[p]) := rfl
-
-@[simp, norm_cast]
-theorem coe_add (z1 z2 : ℤ_[p]) : ((z1 + z2 : ℤ_[p]) : ℚ_[p]) = z1 + z2 := rfl
-
 @[simp, norm_cast]
 theorem coe_mul (z1 z2 : ℤ_[p]) : ((z1 * z2 : ℤ_[p]) : ℚ_[p]) = z1 * z2 := rfl
-
-@[simp, norm_cast]
-theorem coe_neg (z1 : ℤ_[p]) : ((-z1 : ℤ_[p]) : ℚ_[p]) = -z1 := rfl
-
-@[simp, norm_cast]
-theorem coe_sub (z1 z2 : ℤ_[p]) : ((z1 - z2 : ℤ_[p]) : ℚ_[p]) = z1 - z2 := rfl
 
 @[simp, norm_cast]
 theorem coe_one : ((1 : ℤ_[p]) : ℚ_[p]) = 1 := rfl
@@ -118,7 +105,7 @@ theorem coe_zero : ((0 : ℤ_[p]) : ℚ_[p]) = 0 := rfl
 
 theorem coe_eq_zero (z : ℤ_[p]) : (z : ℚ_[p]) = 0 ↔ z = 0 := by rw [← coe_zero, Subtype.coe_inj]
 
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero (z : ℤ_[p]) : (z : ℚ_[p]) ≠ 0 ↔ z ≠ 0 := z.coe_eq_zero.not
 
 instance : AddCommGroup ℤ_[p] := (by infer_instance : AddCommGroup (subring p))
 
@@ -139,17 +126,12 @@ def Coe.ringHom : ℤ_[p] →+* ℚ_[p] := (subring p).subtype
 @[simp, norm_cast]
 theorem coe_pow (x : ℤ_[p]) (n : ℕ) : (↑(x ^ n) : ℚ_[p]) = (↑x : ℚ_[p]) ^ n := rfl
 
-theorem mk_coe (k : ℤ_[p]) : (⟨k, k.2⟩ : ℤ_[p]) = k := by simp
-
 def inv : ℤ_[p] → ℤ_[p]
   | ⟨k, _⟩ => if h : ‖k‖ = 1 then ⟨k⁻¹, by simp [h]⟩ else 0
 
 instance : CharZero ℤ_[p] where
   cast_injective m n h :=
     Nat.cast_injective (R := ℚ_[p]) (by rw [Subtype.ext_iff] at h; norm_cast at h)
-
-@[norm_cast]
-theorem intCast_eq (z1 z2 : ℤ) : (z1 : ℤ_[p]) = z2 ↔ z1 = z2 := by simp
 
 def ofIntSeq (seq : ℕ → ℤ) (h : IsCauSeq (padicNorm p) fun n => seq n) : ℤ_[p] :=
   ⟨⟦⟨_, h⟩⟧,
@@ -309,7 +291,10 @@ theorem norm_int_le_pow_iff_dvd {k : ℤ} {n : ℕ} :
 def valuation (x : ℤ_[p]) :=
   Padic.valuation (x : ℚ_[p])
 
--- DISSOLVED: norm_eq_pow_val
+theorem norm_eq_pow_val {x : ℤ_[p]} (hx : x ≠ 0) : ‖x‖ = (p : ℝ) ^ (-x.valuation) := by
+  refine @Padic.norm_eq_pow_val p hp x ?_
+  contrapose! hx
+  exact Subtype.val_injective hx
 
 @[simp]
 theorem valuation_zero : valuation (0 : ℤ_[p]) = 0 := Padic.valuation_zero
@@ -329,13 +314,36 @@ theorem valuation_nonneg (x : ℤ_[p]) : 0 ≤ x.valuation := by
   rw [← norm_eq_pow_val hx]
   simpa using x.property
 
--- DISSOLVED: valuation_p_pow_mul
+@[simp]
+theorem valuation_p_pow_mul (n : ℕ) (c : ℤ_[p]) (hc : c ≠ 0) :
+    ((p : ℤ_[p]) ^ n * c).valuation = n + c.valuation := by
+  have : ‖(p : ℤ_[p]) ^ n * c‖ = ‖(p : ℤ_[p]) ^ n‖ * ‖c‖ := norm_mul _ _
+  have aux : (p : ℤ_[p]) ^ n * c ≠ 0 := by
+    contrapose! hc
+    rw [mul_eq_zero] at hc
+    cases' hc with hc hc
+    · refine (hp.1.ne_zero ?_).elim
+      exact_mod_cast pow_eq_zero hc
+    · exact hc
+  rwa [norm_eq_pow_val aux, norm_p_pow, norm_eq_pow_val hc, ← zpow_add₀, ← neg_add,
+    zpow_right_inj₀, neg_inj] at this
+  · exact mod_cast hp.1.pos
+  · exact mod_cast hp.1.ne_one
+  · exact mod_cast hp.1.ne_zero
 
 section Units
 
 /-! ### Units of `ℤ_[p]` -/
 
--- DISSOLVED: mul_inv
+theorem mul_inv : ∀ {z : ℤ_[p]}, ‖z‖ = 1 → z * z.inv = 1
+  | ⟨k, _⟩, h => by
+    have hk : k ≠ 0 := fun h' => zero_ne_one' ℚ_[p] (by simp [h'] at h)
+    unfold PadicInt.inv
+    rw [norm_eq_padic_norm] at h
+    dsimp only
+    rw [dif_pos h]
+    apply Subtype.ext_iff_val.2
+    simp [mul_inv_cancel₀ hk]
 
 theorem inv_mul {z : ℤ_[p]} (hz : ‖z‖ = 1) : z.inv * z = 1 := by rw [mul_comm, mul_inv hz]
 
@@ -350,11 +358,6 @@ theorem isUnit_iff {z : ℤ_[p]} : IsUnit z ↔ ‖z‖ = 1 :=
 theorem norm_lt_one_add {z1 z2 : ℤ_[p]} (hz1 : ‖z1‖ < 1) (hz2 : ‖z2‖ < 1) : ‖z1 + z2‖ < 1 :=
   lt_of_le_of_lt (nonarchimedean _ _) (max_lt hz1 hz2)
 
-theorem norm_lt_one_mul {z1 z2 : ℤ_[p]} (hz2 : ‖z2‖ < 1) : ‖z1 * z2‖ < 1 :=
-  calc
-    ‖z1 * z2‖ = ‖z1‖ * ‖z2‖ := by simp
-    _ < 1 := mul_lt_one_of_nonneg_of_lt_one_right (norm_le_one _) (norm_nonneg _) hz2
-
 theorem mem_nonunits {z : ℤ_[p]} : z ∈ nonunits ℤ_[p] ↔ ‖z‖ < 1 := by
   rw [lt_iff_le_and_ne]; simp [norm_le_one z, nonunits, isUnit_iff]
 
@@ -366,16 +369,28 @@ def mkUnits {u : ℚ_[p]} (h : ‖u‖ = 1) : ℤ_[p]ˣ :=
   ⟨z, z.inv, mul_inv h, inv_mul h⟩
 
 @[simp]
-theorem mkUnits_eq {u : ℚ_[p]} (h : ‖u‖ = 1) : ((mkUnits h : ℤ_[p]) : ℚ_[p]) = u := rfl
-
-@[simp]
 theorem norm_units (u : ℤ_[p]ˣ) : ‖(u : ℤ_[p])‖ = 1 := isUnit_iff.mp <| by simp
 
--- DISSOLVED: unitCoeff
+def unitCoeff {x : ℤ_[p]} (hx : x ≠ 0) : ℤ_[p]ˣ :=
+  let u : ℚ_[p] := x * (p : ℚ_[p]) ^ (-x.valuation)
+  have hu : ‖u‖ = 1 := by
+    simp [u, hx, zpow_ne_zero (G₀ := ℝ) _ (Nat.cast_ne_zero.2 hp.1.pos.ne'), norm_eq_pow_val]
+  mkUnits hu
 
--- DISSOLVED: unitCoeff_coe
+@[simp]
+theorem unitCoeff_coe {x : ℤ_[p]} (hx : x ≠ 0) :
+    (unitCoeff hx : ℚ_[p]) = x * (p : ℚ_[p]) ^ (-x.valuation) := rfl
 
--- DISSOLVED: unitCoeff_spec
+theorem unitCoeff_spec {x : ℤ_[p]} (hx : x ≠ 0) :
+    x = (unitCoeff hx : ℤ_[p]) * (p : ℤ_[p]) ^ Int.natAbs (valuation x) := by
+  apply Subtype.coe_injective
+  push_cast
+  have repr : (x : ℚ_[p]) = unitCoeff hx * (p : ℚ_[p]) ^ x.valuation := by
+    rw [unitCoeff_coe, mul_assoc, ← zpow_add₀]
+    · simp
+    · exact mod_cast hp.1.ne_zero
+  convert repr using 2
+  rw [← zpow_natCast, Int.natAbs_of_nonneg (valuation_nonneg x)]
 
 end Units
 
@@ -383,9 +398,36 @@ section NormLeIff
 
 /-! ### Various characterizations of open unit balls -/
 
--- DISSOLVED: norm_le_pow_iff_le_valuation
+theorem norm_le_pow_iff_le_valuation (x : ℤ_[p]) (hx : x ≠ 0) (n : ℕ) :
+    ‖x‖ ≤ (p : ℝ) ^ (-n : ℤ) ↔ ↑n ≤ x.valuation := by
+  rw [norm_eq_pow_val hx]
+  lift x.valuation to ℕ using x.valuation_nonneg with k
+  simp only [Int.ofNat_le, zpow_neg, zpow_natCast]
+  have aux : ∀ m : ℕ, 0 < (p : ℝ) ^ m := by
+    intro m
+    refine pow_pos ?_ m
+    exact mod_cast hp.1.pos
+  rw [inv_le_inv₀ (aux _) (aux _)]
+  have : p ^ n ≤ p ^ k ↔ n ≤ k := (pow_right_strictMono₀ hp.1.one_lt).le_iff_le
+  rw [← this]
+  norm_cast
 
--- DISSOLVED: mem_span_pow_iff_le_valuation
+theorem mem_span_pow_iff_le_valuation (x : ℤ_[p]) (hx : x ≠ 0) (n : ℕ) :
+    x ∈ (Ideal.span {(p : ℤ_[p]) ^ n} : Ideal ℤ_[p]) ↔ ↑n ≤ x.valuation := by
+  rw [Ideal.mem_span_singleton]
+  constructor
+  · rintro ⟨c, rfl⟩
+    suffices c ≠ 0 by
+      rw [valuation_p_pow_mul _ _ this, le_add_iff_nonneg_right]
+      apply valuation_nonneg
+    contrapose! hx
+    rw [hx, mul_zero]
+  · nth_rewrite 2 [unitCoeff_spec hx]
+    lift x.valuation to ℕ using x.valuation_nonneg with k
+    simp only [Int.natAbs_ofNat, Units.isUnit, IsUnit.dvd_mul_left, Int.ofNat_le]
+    intro H
+    obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le H
+    simp only [pow_add, dvd_mul_right]
 
 theorem norm_le_pow_iff_mem_span_pow (x : ℤ_[p]) (n : ℕ) :
     ‖x‖ ≤ (p : ℝ) ^ (-n : ℤ) ↔ x ∈ (Ideal.span {(p : ℤ_[p]) ^ n} : Ideal ℤ_[p]) := by

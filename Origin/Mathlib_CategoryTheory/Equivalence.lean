@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Whiskering
 import Mathlib.CategoryTheory.EssentialImage
 import Mathlib.Tactic.CategoryTheory.Slice
 
+noncomputable section
+
 /-!
 # Equivalence of categories
 
@@ -94,26 +96,6 @@ abbrev unitInv (e : C ≌ D) : e.functor ⋙ e.inverse ⟶ 𝟭 C :=
 
 abbrev counitInv (e : C ≌ D) : 𝟭 D ⟶ e.inverse ⋙ e.functor :=
   e.counitIso.inv
-
-@[simp]
-theorem Equivalence_mk'_unit (functor inverse unit_iso counit_iso f) :
-    (⟨functor, inverse, unit_iso, counit_iso, f⟩ : C ≌ D).unit = unit_iso.hom :=
-  rfl
-
-@[simp]
-theorem Equivalence_mk'_counit (functor inverse unit_iso counit_iso f) :
-    (⟨functor, inverse, unit_iso, counit_iso, f⟩ : C ≌ D).counit = counit_iso.hom :=
-  rfl
-
-@[simp]
-theorem Equivalence_mk'_unitInv (functor inverse unit_iso counit_iso f) :
-    (⟨functor, inverse, unit_iso, counit_iso, f⟩ : C ≌ D).unitInv = unit_iso.inv :=
-  rfl
-
-@[simp]
-theorem Equivalence_mk'_counitInv (functor inverse unit_iso counit_iso f) :
-    (⟨functor, inverse, unit_iso, counit_iso, f⟩ : C ≌ D).counitInv = counit_iso.inv :=
-  rfl
 
 @[reassoc (attr := simp)]
 theorem functor_unit_comp (e : C ≌ D) (X : C) :
@@ -360,18 +342,6 @@ def pow (e : C ≌ C) : ℤ → (C ≌ C)
 
 instance : Pow (C ≌ C) ℤ :=
   ⟨pow⟩
-
-@[simp]
-theorem pow_zero (e : C ≌ C) : e ^ (0 : ℤ) = Equivalence.refl :=
-  rfl
-
-@[simp]
-theorem pow_one (e : C ≌ C) : e ^ (1 : ℤ) = e :=
-  rfl
-
-@[simp]
-theorem pow_neg_one (e : C ≌ C) : e ^ (-1 : ℤ) = e.symm :=
-  rfl
 
 end
 

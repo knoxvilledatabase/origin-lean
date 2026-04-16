@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Logic.Function.Defs
 
+noncomputable section
+
 /-!
 # Extra facts about `PProd`
 -/
@@ -18,10 +20,6 @@ namespace PProd
 def mk.injArrow {α : Type*} {β : Type*} {x₁ : α} {y₁ : β} {x₂ : α} {y₂ : β} :
     (x₁, y₁) = (x₂, y₂) → ∀ ⦃P : Sort*⦄, (x₁ = x₂ → y₁ = y₂ → P) → P :=
   fun h₁ _ h₂ ↦ Prod.noConfusion h₁ h₂
-
-@[simp]
-theorem mk.eta {p : PProd α β} : PProd.mk p.1 p.2 = p :=
-  rfl
 
 @[simp]
 theorem «forall» {p : PProd α β → Prop} : (∀ x, p x) ↔ ∀ a b, p ⟨a, b⟩ :=

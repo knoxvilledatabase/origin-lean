@@ -7,6 +7,8 @@ import Mathlib.Data.Prod.Basic
 import Mathlib.Order.Lattice
 import Mathlib.Order.BoundedOrder.Basic
 
+noncomputable section
+
 /-!
 # Lexicographic order
 
@@ -35,6 +37,8 @@ variable {α β : Type*}
 namespace Prod.Lex
 
 open Batteries
+
+@[inherit_doc] notation:35 α " ×ₗ " β:34 => Lex (Prod α β)
 
 instance instLE (α β : Type*) [LT α] [LE β] : LE (α ×ₗ β) where le := Prod.Lex (· < ·) (· ≤ ·)
 
@@ -124,10 +128,6 @@ instance instOrdLexProd [Ord α] [Ord β] : Ord (α ×ₗ β) := lexOrd
 
 theorem compare_def [Ord α] [Ord β] : @compare (α ×ₗ β) _ =
     compareLex (compareOn fun x => (ofLex x).1) (compareOn fun x => (ofLex x).2) := rfl
-
-theorem _root_.lexOrd_eq [Ord α] [Ord β] : @lexOrd α β _ _ = instOrdLexProd := rfl
-
-theorem _root_.Ord.lex_eq [oα : Ord α] [oβ : Ord β] : Ord.lex oα oβ = instOrdLexProd := rfl
 
 instance [Ord α] [Ord β] [OrientedOrd α] [OrientedOrd β] : OrientedOrd (α ×ₗ β) :=
   inferInstanceAs (OrientedCmp (compareLex _ _))

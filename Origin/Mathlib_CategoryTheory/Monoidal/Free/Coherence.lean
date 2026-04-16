@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Free.Basic
 import Mathlib.CategoryTheory.DiscreteCategory
 
+noncomputable section
+
 /-!
 # The monoidal coherence theorem
 
@@ -87,10 +89,6 @@ def normalizeObj : F C → NormalMonoidalObject C → NormalMonoidalObject C
   | tensor X Y, n => normalizeObj Y (normalizeObj X n)
 
 @[simp]
-theorem normalizeObj_unitor (n : NormalMonoidalObject C) : normalizeObj (𝟙_ (F C)) n = n :=
-  rfl
-
-@[simp]
 theorem normalizeObj_tensor (X Y : F C) (n : NormalMonoidalObject C) :
     normalizeObj (X ⊗ Y) n = normalizeObj Y (normalizeObj X n) :=
   rfl
@@ -143,9 +141,6 @@ def tensorFunc : F C ⥤ N C ⥤ F C where
   obj X := Discrete.functor fun n => inclusion.obj ⟨n⟩ ⊗ X
   map f := Discrete.natTrans (fun _ => _ ◁ f)
 
-theorem tensorFunc_map_app {X Y : F C} (f : X ⟶ Y) (n) : ((tensorFunc C).map f).app n = _ ◁ f :=
-  rfl
-
 theorem tensorFunc_obj_map (Z : F C) {n n' : N C} (f : n ⟶ n') :
     ((tensorFunc C).obj Z).map f = inclusion.map f ▷ Z := by
   cases n
@@ -180,16 +175,6 @@ theorem normalizeIsoApp_eq :
       rw [normalizeIsoApp_eq X n]
       rw [normalizeIsoApp_eq Y ⟨normalizeObj X n.as⟩]
       rfl
-
-@[simp]
-theorem normalizeIsoApp_tensor (X Y : F C) (n : N C) :
-    normalizeIsoApp C (X ⊗ Y) n =
-      (α_ _ _ _).symm ≪≫ whiskerRightIso (normalizeIsoApp C X n) Y ≪≫ normalizeIsoApp _ _ _ :=
-  rfl
-
-@[simp]
-theorem normalizeIsoApp_unitor (n : N C) : normalizeIsoApp C (𝟙_ (F C)) n = ρ_ _ :=
-  rfl
 
 @[simp]
 def normalizeIsoAux (X : F C) : (tensorFunc C).obj X ≅ (normalize' C).obj X :=
@@ -244,6 +229,9 @@ theorem normalize_naturality (n : NormalMonoidalObject C) {X Y : F C} (f : X ⟶
 end
 
 set_option tactic.skipAssignedInstances false in
+/-- The isomorphism between `n ⊗ X` and `normalize X n` is natural (in both `X` and `n`, but
+    naturality in `n` is trivial and was "proved" in `normalizeIsoAux`). This is the real heart
+    of our proof of the coherence theorem. -/
 
 def normalizeIso : tensorFunc C ≅ normalize' C :=
   NatIso.ofComponents (normalizeIsoAux C) <| by

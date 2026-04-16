@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Discriminant.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Trace.Basic
 import Mathlib.RingTheory.Norm.Basic
+
+noncomputable section
 
 /-!
 # Discriminant of a family of vectors
@@ -116,7 +118,10 @@ variable [Algebra K L] [Algebra K E]
 
 variable [Module.Finite K L] [IsAlgClosed E]
 
--- DISSOLVED: discr_not_zero_of_basis
+theorem discr_not_zero_of_basis [Algebra.IsSeparable K L] (b : Basis ι K L) :
+    discr K b ≠ 0 := by
+  rw [discr_def, traceMatrix_of_basis, ← LinearMap.BilinForm.nondegenerate_iff_det_ne_zero]
+  exact traceForm_nondegenerate _ _
 
 theorem discr_isUnit_of_basis [Algebra.IsSeparable K L] (b : Basis ι K L) : IsUnit (discr K b) :=
   IsUnit.mk0 _ (discr_not_zero_of_basis _ _)
@@ -145,36 +150,6 @@ theorem discr_powerBasis_eq_prod' [Algebra.IsSeparable K L] (e : Fin pb.dim ≃ 
   ring
 
 local notation "n" => finrank K L
-
-theorem discr_powerBasis_eq_prod'' [Algebra.IsSeparable K L] (e : Fin pb.dim ≃ (L →ₐ[K] E)) :
-    algebraMap K E (discr K pb.basis) =
-      (-1) ^ (n * (n - 1) / 2) *
-        ∏ i : Fin pb.dim, ∏ j ∈ Ioi i, (e j pb.gen - e i pb.gen) * (e i pb.gen - e j pb.gen) := by
-  rw [discr_powerBasis_eq_prod' _ _ _ e]
-  simp_rw [fun i j => neg_eq_neg_one_mul ((e j pb.gen - e i pb.gen) * (e i pb.gen - e j pb.gen)),
-    prod_mul_distrib]
-  congr
-  simp only [prod_pow_eq_pow_sum, prod_const]
-  congr
-  rw [← @Nat.cast_inj ℚ, Nat.cast_sum]
-  have : ∀ x : Fin pb.dim, ↑x + 1 ≤ pb.dim := by simp [Nat.succ_le_iff, Fin.is_lt]
-  simp_rw [Fin.card_Ioi, Nat.sub_sub, add_comm 1]
-  simp only [Nat.cast_sub, this, Finset.card_fin, nsmul_eq_mul, sum_const, sum_sub_distrib,
-    Nat.cast_add, Nat.cast_one, sum_add_distrib, mul_one]
-  rw [← Nat.cast_sum, ← @Finset.sum_range ℕ _ pb.dim fun i => i, sum_range_id]
-  have hn : n = pb.dim := by
-    rw [← AlgHom.card K L E, ← Fintype.card_fin pb.dim]
-    -- FIXME: Without the `Fintype` namespace, why does it complain about `Finset.card_congr` being
-    -- deprecated?
-    exact Fintype.card_congr e.symm
-  have h₂ : 2 ∣ pb.dim * (pb.dim - 1) := pb.dim.even_mul_pred_self.two_dvd
-  have hne : ((2 : ℕ) : ℚ) ≠ 0 := by simp
-  have hle : 1 ≤ pb.dim := by
-    rw [← hn, Nat.one_le_iff_ne_zero, ← zero_lt_iff, Module.finrank_pos_iff]
-    infer_instance
-  rw [hn, Nat.cast_div h₂ hne, Nat.cast_mul, Nat.cast_sub hle]
-  field_simp
-  ring
 
 theorem discr_powerBasis_eq_norm [Algebra.IsSeparable K L] :
     discr K pb.basis =

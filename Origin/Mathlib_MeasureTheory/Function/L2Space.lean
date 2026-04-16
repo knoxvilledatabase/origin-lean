@@ -7,6 +7,8 @@ import Mathlib.Analysis.RCLike.Lemmas
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Inner
 import Mathlib.MeasureTheory.Integral.SetIntegral
 
+noncomputable section
+
 /-! # `L^2` space
 
 If `E` is an inner product space over `𝕜` (`ℝ` or `ℂ`), then `Lp E 2 μ`
@@ -152,17 +154,6 @@ theorem integral_inner_eq_sq_eLpNorm (f : α →₂[μ] E) :
   norm_cast
 
 alias integral_inner_eq_sq_snorm := integral_inner_eq_sq_eLpNorm
-
-private theorem norm_sq_eq_inner' (f : α →₂[μ] E) : ‖f‖ ^ 2 = RCLike.re ⟪f, f⟫ := by
-  have h_two : (2 : ℝ≥0∞).toReal = 2 := by simp
-  rw [inner_def, integral_inner_eq_sq_eLpNorm, norm_def, ← ENNReal.toReal_pow, RCLike.ofReal_re,
-    ENNReal.toReal_eq_toReal (ENNReal.pow_ne_top (Lp.eLpNorm_ne_top f)) _]
-  · rw [← ENNReal.rpow_natCast, eLpNorm_eq_eLpNorm' two_ne_zero ENNReal.two_ne_top, eLpNorm', ←
-      ENNReal.rpow_mul, one_div, h_two]
-    simp
-  · refine (lintegral_rpow_nnnorm_lt_top_of_eLpNorm'_lt_top zero_lt_two ?_).ne
-    rw [← h_two, ← eLpNorm_eq_eLpNorm' two_ne_zero ENNReal.two_ne_top]
-    exact Lp.eLpNorm_lt_top f
 
 theorem mem_L1_inner (f g : α →₂[μ] E) :
     AEEqFun.mk (fun x => ⟪f x, g x⟫)

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.FullyFaithful
 import Mathlib.CategoryTheory.Monoidal.Functor
 import Mathlib.CategoryTheory.FullSubcategory
 
+noncomputable section
+
 /-!
 # Monoidal natural transformations
 
@@ -163,13 +165,6 @@ instance : Category (LaxMonoidalFunctor C D) where
   Hom := Hom
   comp α β := ⟨α.1 ≫ β.1, by have := α.2; have := β.2; infer_instance⟩
   id _ := ⟨𝟙 _, inferInstance⟩
-
-@[simp]
-lemma id_hom (F : LaxMonoidalFunctor C D) : Hom.hom (𝟙 F) = 𝟙 _ := rfl
-
-@[reassoc, simp]
-lemma comp_hom {F G H : LaxMonoidalFunctor C D} (α : F ⟶ G) (β : G ⟶ H) :
-    (α ≫ β).hom = α.hom ≫ β.hom := rfl
 
 @[ext]
 lemma hom_ext {F G : LaxMonoidalFunctor C D} {α β : F ⟶ G} (h : α.hom = β.hom) : α = β := by

@@ -1,9 +1,11 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Independence.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Projectivization.Basic
+
+noncomputable section
 
 /-!
 # Independence in Projective Space
@@ -34,7 +36,9 @@ variable {ι K V : Type*} [DivisionRing K] [AddCommGroup V] [Module K V] {f : ι
 
 namespace Projectivization
 
--- DISSOLVED: Independent
+inductive Independent : (ι → ℙ K V) → Prop
+  | mk (f : ι → V) (hf : ∀ i : ι, f i ≠ 0) (hl : LinearIndependent K f) :
+    Independent fun i => mk K (f i) (hf i)
 
 theorem independent_iff : Independent f ↔ LinearIndependent K (Projectivization.rep ∘ f) := by
   refine ⟨?_, fun h => ?_⟩
@@ -60,7 +64,9 @@ theorem independent_iff_iSupIndep : Independent f ↔ iSupIndep fun i => (f i).s
 
 alias independent_iff_completeLattice_independent := independent_iff_iSupIndep
 
--- DISSOLVED: Dependent
+inductive Dependent : (ι → ℙ K V) → Prop
+  | mk (f : ι → V) (hf : ∀ i : ι, f i ≠ 0) (h : ¬LinearIndependent K f) :
+    Dependent fun i => mk K (f i) (hf i)
 
 theorem dependent_iff : Dependent f ↔ ¬LinearIndependent K (Projectivization.rep ∘ f) := by
   refine ⟨?_, fun h => ?_⟩

@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/GaussSum.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 14 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
 import Mathlib.NumberTheory.LegendreSymbol.ZModChar
 import Mathlib.Algebra.CharP.CharAndCard
+
+noncomputable section
 
 /-!
 # Gauss sums
@@ -141,7 +143,11 @@ lemma gaussSum_mul_gaussSum_pow_orderOf_sub_one {χ : MulChar R R'} {ψ : AddCha
   rw [h, ← mul_gaussSum_inv_eq_gaussSum χ⁻¹, mul_left_comm, gaussSum_mul_gaussSum_eq_card hχ hψ,
     MulChar.inv_apply', inv_neg_one]
 
--- DISSOLVED: gaussSum_ne_zero_of_nontrivial
+-- CONFLATES (assumes ground = zero): gaussSum_ne_zero_of_nontrivial
+lemma gaussSum_ne_zero_of_nontrivial (h : (Fintype.card R : R') ≠ 0) {χ : MulChar R R'}
+    (hχ : χ ≠ 1) {ψ : AddChar R R'} (hψ : ψ.IsPrimitive) :
+    gaussSum χ ψ ≠ 0 :=
+  fun H ↦ h.symm <| zero_mul (gaussSum χ⁻¹ _) ▸ H ▸ gaussSum_mul_gaussSum_eq_card hχ hψ
 
 theorem gaussSum_sq {χ : MulChar R R'} (hχ₁ : χ ≠ 1) (hχ₂ : IsQuadratic χ)
     {ψ : AddChar R R'} (hψ : IsPrimitive ψ) :

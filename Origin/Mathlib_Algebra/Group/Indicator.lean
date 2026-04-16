@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Indicator.lean
-Genuine: 63 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Lemmas
 import Mathlib.Algebra.Group.Support
 import Mathlib.Data.Set.SymmDiff
+
+noncomputable section
 
 /-!
 # Indicator function
@@ -99,14 +101,20 @@ theorem mulIndicator_eq_one : (mulIndicator s f = fun _ => 1) ↔ Disjoint (mulS
 theorem mulIndicator_eq_one' : mulIndicator s f = 1 ↔ Disjoint (mulSupport f) s :=
   mulIndicator_eq_one
 
--- DISSOLVED: mulIndicator_apply_ne_one
+@[to_additive]
+theorem mulIndicator_apply_ne_one {a : α} : s.mulIndicator f a ≠ 1 ↔ a ∈ s ∩ mulSupport f := by
+  simp only [Ne, mulIndicator_apply_eq_one, Classical.not_imp, mem_inter_iff, mem_mulSupport]
 
 @[to_additive (attr := simp)]
 theorem mulSupport_mulIndicator :
     Function.mulSupport (s.mulIndicator f) = s ∩ Function.mulSupport f :=
   ext fun x => by simp [Function.mem_mulSupport, mulIndicator_apply_eq_one]
 
--- DISSOLVED: mem_of_mulIndicator_ne_one
+@[to_additive
+      "If an additive indicator function is not equal to `0` at a point, then that point is
+      in the set."]
+theorem mem_of_mulIndicator_ne_one (h : mulIndicator s f a ≠ 1) : a ∈ s :=
+  not_imp_comm.1 (fun hn => mulIndicator_of_not_mem hn f) h
 
 @[to_additive]
 theorem eqOn_mulIndicator : EqOn (mulIndicator s f) f s := fun _ hx => mulIndicator_of_mem hx f

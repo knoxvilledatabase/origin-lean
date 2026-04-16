@@ -8,6 +8,8 @@ import Mathlib.Logic.Function.Basic
 import Mathlib.Data.Int.Cast.Basic
 import Mathlib.Tactic.Spread
 
+noncomputable section
+
 /-!
 # Lifting algebraic data classes along injective/surjective maps
 

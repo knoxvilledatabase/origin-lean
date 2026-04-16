@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
 import Mathlib.NumberTheory.NumberField.Completion
 import Mathlib.RingTheory.DedekindDomain.FiniteAdeleRing
 
+noncomputable section
+
 /-!
 # The adele ring of a number field
 
@@ -125,14 +127,6 @@ instance : TopologicalSpace (AdeleRing K) := instTopologicalSpaceProd
 instance : TopologicalRing (AdeleRing K) := instTopologicalRingProd
 
 instance : Algebra K (AdeleRing K) := Prod.algebra _ _ _
-
-@[simp]
-theorem algebraMap_fst_apply (x : K) (v : InfinitePlace K) :
-    (algebraMap K (AdeleRing K) x).1 v = x := rfl
-
-@[simp]
-theorem algebraMap_snd_apply (x : K) (v : HeightOneSpectrum (𝓞 K)) :
-    (algebraMap K (AdeleRing K) x).2 v = x := rfl
 
 theorem algebraMap_injective : Function.Injective (algebraMap K (AdeleRing K)) :=
   fun _ _ hxy => (algebraMap K _).injective (Prod.ext_iff.1 hxy).1

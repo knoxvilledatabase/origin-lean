@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Defs
 import Mathlib.Control.Basic
 import Mathlib.Data.Set.Notation
 
+noncomputable section
+
 /-!
 # Functoriality of `Set`
 
@@ -34,18 +36,6 @@ attribute [local instance] Set.monad
 
 @[simp]
 theorem bind_def : s >>= f = ⋃ i ∈ s, f i :=
-  rfl
-
-@[simp]
-theorem fmap_eq_image (f : α → β) : f <$> s = f '' s :=
-  rfl
-
-@[simp]
-theorem seq_eq_set_seq (s : Set (α → β)) (t : Set α) : s <*> t = s.seq t :=
-  rfl
-
-@[simp]
-theorem pure_def (a : α) : (pure a : Set α) = {a} :=
   rfl
 
 theorem image2_def {α β γ : Type u} (f : α → β → γ) (s : Set α) (t : Set β) :

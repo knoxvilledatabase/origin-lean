@@ -8,6 +8,8 @@ import Mathlib.Order.Interval.Set.Basic
 import Mathlib.Order.Interval.Set.UnorderedInterval
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Intervals in `pi`-space
 

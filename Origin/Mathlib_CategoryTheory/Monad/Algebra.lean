@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monad.Basic
 import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.Functor.EpiMono
 
+noncomputable section
+
 /-!
 # Eilenberg-Moore (co)algebras for a (co)monad
 
@@ -74,23 +76,6 @@ instance : CategoryStruct (Algebra T) where
 
 @[ext]
 lemma Hom.ext' (X Y : Algebra T) (f g : X ⟶ Y) (h : f.f = g.f) : f = g := Hom.ext h
-
-@[simp]
-theorem comp_eq_comp {A A' A'' : Algebra T} (f : A ⟶ A') (g : A' ⟶ A'') :
-    Algebra.Hom.comp f g = f ≫ g :=
-  rfl
-
-@[simp]
-theorem id_eq_id (A : Algebra T) : Algebra.Hom.id A = 𝟙 A :=
-  rfl
-
-@[simp]
-theorem id_f (A : Algebra T) : (𝟙 A : A ⟶ A).f = 𝟙 A.A :=
-  rfl
-
-@[simp]
-theorem comp_f {A A' A'' : Algebra T} (f : A ⟶ A') (g : A' ⟶ A'') : (f ≫ g).f = f.f ≫ g.f :=
-  rfl
 
 instance eilenbergMoore : Category (Algebra T) where
 
@@ -205,11 +190,6 @@ def algebraEquivOfIsoMonads {T₁ T₂ : Monad C} (h : T₁ ≅ T₂) : Algebra 
     (algebraFunctorOfMonadHomComp _ _).symm ≪≫
       algebraFunctorOfMonadHomEq (by simp) ≪≫ algebraFunctorOfMonadHomId
 
-@[simp]
-theorem algebra_equiv_of_iso_monads_comp_forget {T₁ T₂ : Monad C} (h : T₁ ⟶ T₂) :
-    algebraFunctorOfMonadHom h ⋙ forget _ = forget _ :=
-  rfl
-
 end Monad
 
 namespace Comonad
@@ -254,23 +234,6 @@ instance : CategoryStruct (Coalgebra G) where
 
 @[ext]
 lemma Hom.ext' (X Y : Coalgebra G) (f g : X ⟶ Y) (h : f.f = g.f) : f = g := Hom.ext h
-
-@[simp]
-theorem comp_eq_comp {A A' A'' : Coalgebra G} (f : A ⟶ A') (g : A' ⟶ A'') :
-    Coalgebra.Hom.comp f g = f ≫ g :=
-  rfl
-
-@[simp]
-theorem id_eq_id (A : Coalgebra G) : Coalgebra.Hom.id A = 𝟙 A :=
-  rfl
-
-@[simp]
-theorem id_f (A : Coalgebra G) : (𝟙 A : A ⟶ A).f = 𝟙 A.A :=
-  rfl
-
-@[simp]
-theorem comp_f {A A' A'' : Coalgebra G} (f : A ⟶ A') (g : A' ⟶ A'') : (f ≫ g).f = f.f ≫ g.f :=
-  rfl
 
 instance eilenbergMoore : Category (Coalgebra G) where
 

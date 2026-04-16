@@ -5,6 +5,8 @@ Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplex
 
+noncomputable section
+
 /-!
 # Homological complexes supported in a single degree
 
@@ -185,19 +187,11 @@ noncomputable abbrev single₀ : V ⥤ ChainComplex V ℕ :=
 variable {V}
 
 @[simp]
-lemma single₀_obj_zero (A : V) :
-    ((single₀ V).obj A).X 0 = A := rfl
-
-@[simp]
 lemma single₀_map_f_zero {A B : V} (f : A ⟶ B) :
     ((single₀ V).map f).f 0 = f := by
   rw [HomologicalComplex.single_map_f_self]
   dsimp [HomologicalComplex.singleObjXSelf, HomologicalComplex.singleObjXIsoOfEq]
   rw [comp_id, id_comp]
-
-@[simp]
-lemma single₀ObjXSelf (X : V) :
-    HomologicalComplex.singleObjXSelf (ComplexShape.down ℕ) 0 X = Iso.refl _ := rfl
 
 @[simps apply_coe]
 noncomputable def toSingle₀Equiv (C : ChainComplex V ℕ) (X : V) :
@@ -229,11 +223,6 @@ lemma fromSingle₀Equiv_symm_apply_f_zero
     ((fromSingle₀Equiv C X).symm f).f 0 = f := by
   simp [fromSingle₀Equiv]
 
-@[simp]
-lemma fromSingle₀Equiv_symm_apply_f_succ
-    {C : ChainComplex V ℕ} {X : V} (f : X ⟶ C.X 0) (n : ℕ) :
-    ((fromSingle₀Equiv C X).symm f).f (n + 1) = 0 := rfl
-
 end ChainComplex
 
 namespace CochainComplex
@@ -244,19 +233,11 @@ noncomputable abbrev single₀ : V ⥤ CochainComplex V ℕ :=
 variable {V}
 
 @[simp]
-lemma single₀_obj_zero (A : V) :
-    ((single₀ V).obj A).X 0 = A := rfl
-
-@[simp]
 lemma single₀_map_f_zero {A B : V} (f : A ⟶ B) :
     ((single₀ V).map f).f 0 = f := by
   rw [HomologicalComplex.single_map_f_self]
   dsimp [HomologicalComplex.singleObjXSelf, HomologicalComplex.singleObjXIsoOfEq]
   rw [comp_id, id_comp]
-
-@[simp]
-lemma single₀ObjXSelf (X : V) :
-    HomologicalComplex.singleObjXSelf (ComplexShape.up ℕ) 0 X = Iso.refl _ := rfl
 
 @[simps apply_coe]
 noncomputable def fromSingle₀Equiv (C : CochainComplex V ℕ) (X : V) :
@@ -287,11 +268,5 @@ lemma toSingle₀Equiv_symm_apply_f_zero
     {C : CochainComplex V ℕ} {X : V} (f : C.X 0 ⟶ X) :
     ((toSingle₀Equiv C X).symm f).f 0 = f := by
   simp [toSingle₀Equiv]
-
-@[simp]
-lemma toSingle₀Equiv_symm_apply_f_succ
-    {C : CochainComplex V ℕ} {X : V} (f : C.X 0 ⟶ X) (n : ℕ) :
-    ((toSingle₀Equiv C X).symm f).f (n + 1) = 0 := by
-  rfl
 
 end CochainComplex

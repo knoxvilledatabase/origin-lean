@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Interval/Set/Basic.lean
-Genuine: 313 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
+Genuine: 315 | Conflates: 0 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.Defs
@@ -8,6 +8,8 @@ import Mathlib.Order.MinMax
 import Mathlib.Data.Set.Subsingleton
 import Mathlib.Tactic.Says
 import Mathlib.Tactic.Contrapose
+
+noncomputable section
 
 /-!
 # Intervals
@@ -77,22 +79,6 @@ theorem right_mem_Icc : b ∈ Icc a b ↔ a ≤ b := by simp [le_refl]
 theorem right_mem_Ioc : b ∈ Ioc a b ↔ a < b := by simp [le_refl]
 
 theorem right_mem_Iic : a ∈ Iic a := by simp
-
-@[simp]
-theorem dual_Ici : Ici (toDual a) = ofDual ⁻¹' Iic a :=
-  rfl
-
-@[simp]
-theorem dual_Iic : Iic (toDual a) = ofDual ⁻¹' Ici a :=
-  rfl
-
-@[simp]
-theorem dual_Ioi : Ioi (toDual a) = ofDual ⁻¹' Iio a :=
-  rfl
-
-@[simp]
-theorem dual_Iio : Iio (toDual a) = ofDual ⁻¹' Ioi a :=
-  rfl
 
 @[simp]
 theorem dual_Icc : Icc (toDual a) (toDual b) = ofDual ⁻¹' Icc b a :=
@@ -227,10 +213,12 @@ theorem Ici_subset_Ici : Ici a ⊆ Ici b ↔ b ≤ a :=
   ⟨fun h => h <| left_mem_Ici, fun h _ hx => h.trans hx⟩
 
 @[gcongr] alias ⟨_, _root_.GCongr.Ici_subset_Ici_of_le⟩ := Ici_subset_Ici
+
 theorem Iic_subset_Iic : Iic a ⊆ Iic b ↔ a ≤ b :=
   @Ici_subset_Ici αᵒᵈ _ _ _
 
 @[gcongr] alias ⟨_, _root_.GCongr.Iic_subset_Iic_of_le⟩ := Iic_subset_Iic
+
 theorem Ici_subset_Ioi : Ici a ⊆ Ioi b ↔ b < a :=
   ⟨fun h => h left_mem_Ici, fun h _ hx => h.trans_le hx⟩
 
@@ -728,8 +716,6 @@ theorem Icc_bot : Icc ⊥ a = Iic a := by simp [← Ici_inter_Iic]
 theorem Ico_bot : Ico ⊥ a = Iio a := by simp [← Ici_inter_Iio]
 
 end OrderBot
-
-theorem Icc_bot_top [PartialOrder α] [BoundedOrder α] : Icc (⊥ : α) ⊤ = univ := by simp
 
 section LinearOrder
 
@@ -1451,25 +1437,9 @@ section Prod
 variable [Preorder α] [Preorder β]
 
 @[simp]
-theorem Iic_prod_Iic (a : α) (b : β) : Iic a ×ˢ Iic b = Iic (a, b) :=
-  rfl
-
-@[simp]
-theorem Ici_prod_Ici (a : α) (b : β) : Ici a ×ˢ Ici b = Ici (a, b) :=
-  rfl
-
-theorem Ici_prod_eq (a : α × β) : Ici a = Ici a.1 ×ˢ Ici a.2 :=
-  rfl
-
-theorem Iic_prod_eq (a : α × β) : Iic a = Iic a.1 ×ˢ Iic a.2 :=
-  rfl
-
-@[simp]
 theorem Icc_prod_Icc (a₁ a₂ : α) (b₁ b₂ : β) : Icc a₁ a₂ ×ˢ Icc b₁ b₂ = Icc (a₁, b₁) (a₂, b₂) := by
   ext ⟨x, y⟩
   simp [and_assoc, and_comm, and_left_comm]
-
-theorem Icc_prod_eq (a b : α × β) : Icc a b = Icc a.1 b.1 ×ˢ Icc a.2 b.2 := by simp
 
 end Prod
 

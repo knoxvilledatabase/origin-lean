@@ -8,6 +8,8 @@ import Mathlib.Data.SetLike.Basic
 import Mathlib.Order.GaloisConnection
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # Closure operators between preorders
 
@@ -340,9 +342,6 @@ section Preorder
 variable [Preorder α] [Preorder β] {u : β → α} (l : LowerAdjoint u)
 
 def closed : Set α := {x | u (l x) = x}
-
-theorem mem_closed_iff (x : α) : x ∈ l.closed ↔ u (l x) = x :=
-  Iff.rfl
 
 theorem closure_eq_self_of_mem_closed {x : α} (h : x ∈ l.closed) : u (l x) = x :=
   h

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Data.Rat.Cast.Lemmas
 
+noncomputable section
+
 /-!
 ## `norm_num` plugin for scientific notation.
 -/

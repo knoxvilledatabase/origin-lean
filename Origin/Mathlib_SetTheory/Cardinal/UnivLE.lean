@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.UnivLE
 import Mathlib.SetTheory.Ordinal.Basic
 
+noncomputable section
+
 /-!
 # UnivLE and cardinals
 -/

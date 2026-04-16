@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf
 import Mathlib.Algebra.Category.ModuleCat.Adjunctions
 
+noncomputable section
+
 /-!
 # The free presheaf of modules on a presheaf of sets
 
@@ -98,10 +100,6 @@ lemma freeAdjunction_homEquiv : (freeAdjunction R).homEquiv F G = freeHomEquiv :
   simp [freeAdjunction, Adjunction.mkOfHomEquiv_homEquiv]
 
 variable (R F) in
-
-@[simp]
-lemma freeAdjunction_unit_app :
-    (freeAdjunction R).unit.app F = freeAdjunctionUnit R F := rfl
 
 end
 

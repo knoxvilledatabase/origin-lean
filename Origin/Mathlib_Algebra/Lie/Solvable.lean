@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Abelian
 import Mathlib.Algebra.Lie.IdealOperations
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # Solvable Lie algebras
 

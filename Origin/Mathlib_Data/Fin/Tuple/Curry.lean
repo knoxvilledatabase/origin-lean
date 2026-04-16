@@ -7,6 +7,8 @@ import Mathlib.Data.Fin.Tuple.Basic
 import Mathlib.Logic.Equiv.Fin
 import Mathlib.Logic.Function.OfArity
 
+noncomputable section
+
 /-!
 # Currying and uncurrying of n-ary functions
 
@@ -52,16 +54,6 @@ theorem uncurry_apply_succ {n : ℕ} {p : Fin (n + 1) → Type u} {τ : Type u}
     uncurry f args = uncurry (f (args 0)) (Fin.tail args) :=
   @uncurry_apply_cons n (p 0) (vecTail p) τ f (args 0) (Fin.tail args)
 
-@[simp]
-theorem curry_apply_cons {n : ℕ} {α} {p : Fin n → Type u} {τ : Type u}
-    (f : ((i : Fin (n + 1)) → (vecCons α p) i) → τ) (a : α) :
-    curry f a = @curry _ p _ (f ∘' Fin.cons a) := rfl
-
-@[simp low]
-theorem curry_apply_succ {n : ℕ} {p : Fin (n + 1) → Type u} {τ : Type u}
-    (f : ((i : Fin (n + 1)) → p i) → τ) (a : p 0) :
-    curry f a = curry (f ∘ Fin.cons a) := rfl
-
 variable {n : ℕ} {p : Fin n → Type u} {τ : Type u}
 
 @[simp]
@@ -85,14 +77,6 @@ def curryEquiv (p : Fin n → Type u) : (((i : Fin n) → p i) → τ) ≃ FromT
   left_inv := uncurry_curry
   right_inv := curry_uncurry
 
-lemma curry_two_eq_curry {p : Fin 2 → Type u} {τ : Type u}
-    (f : ((i : Fin 2) → p i) → τ) :
-    curry f = Function.curry (f ∘ (piFinTwoEquiv p).symm) := rfl
-
-lemma uncurry_two_eq_uncurry (p : Fin 2 → Type u) (τ : Type u)
-    (f : Function.FromTypes p τ) :
-    uncurry f = Function.uncurry f ∘ piFinTwoEquiv p := rfl
-
 end Function.FromTypes
 
 namespace Function.OfArity
@@ -114,13 +98,5 @@ theorem uncurry_curry {n} (f : (Fin n → α) → β) :
 @[simps!]
 def curryEquiv (n : ℕ) : ((Fin n → α) → β) ≃ OfArity α β n :=
   FromTypes.curryEquiv _
-
-lemma curry_two_eq_curry {α β : Type u} (f : ((i : Fin 2) → α) → β) :
-    curry f = Function.curry (f ∘ (finTwoArrowEquiv α).symm) :=
-  FromTypes.curry_two_eq_curry f
-
-lemma uncurry_two_eq_uncurry {α β : Type u} (f : OfArity α β 2) :
-    uncurry f = Function.uncurry f ∘ (finTwoArrowEquiv α) :=
-  FromTypes.uncurry_two_eq_uncurry _ _ f
 
 end Function.OfArity

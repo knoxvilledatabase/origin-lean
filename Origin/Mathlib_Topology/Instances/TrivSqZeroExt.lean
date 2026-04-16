@@ -7,6 +7,8 @@ import Mathlib.Algebra.TrivSqZeroExt
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Topology on `TrivSqZeroExt R M`
 
@@ -159,11 +161,6 @@ instance [AddGroup R] [AddGroup M] [UniformAddGroup R] [UniformAddGroup M] :
   inferInstanceAs <| UniformAddGroup (R × M)
 
 open Uniformity
-
-theorem uniformity_def :
-    𝓤 (tsze R M) =
-      ((𝓤 R).comap fun p => (p.1.fst, p.2.fst)) ⊓ ((𝓤 M).comap fun p => (p.1.snd, p.2.snd)) :=
-  rfl
 
 nonrec theorem uniformContinuous_fst : UniformContinuous (fst : tsze R M → R) :=
   uniformContinuous_fst

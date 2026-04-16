@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.CatCommSq
 import Mathlib.CategoryTheory.GuitartExact.Basic
 
+noncomputable section
+
 /-!
 # Vertical composition of Guitart exact squares
 

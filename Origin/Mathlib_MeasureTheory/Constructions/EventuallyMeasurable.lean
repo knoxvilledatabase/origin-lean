@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Defs
 import Mathlib.Order.Filter.CountableInter
 
+noncomputable section
+
 /-!
 # Measurability modulo a filter
 

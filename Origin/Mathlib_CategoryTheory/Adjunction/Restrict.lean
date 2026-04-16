@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.HomCongr
 
+noncomputable section
+
 /-!
 
 # Restricting adjunctions

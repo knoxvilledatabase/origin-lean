@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.CountablyGenerated
 import Mathlib.Probability.Process.Filtration
 
+noncomputable section
+
 /-!
 # Filtration built from the finite partitions of a countably generated measurable space
 

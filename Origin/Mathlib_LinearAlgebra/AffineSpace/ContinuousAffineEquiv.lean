@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineEquiv
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Continuous affine equivalences
 
@@ -81,14 +83,6 @@ instance instFunLike : FunLike (P₁ ≃ᵃL[k] P₂) P₁ P₂ where
   coe f := f.toAffineEquiv
   coe_injective' _ _ h := coe_injective (DFunLike.coe_injective h)
 
-@[simp, norm_cast]
-theorem coe_coe (e : P₁ ≃ᵃL[k] P₂) : ⇑(e : P₁ ≃ᵃ[k] P₂) = e :=
-  rfl
-
-@[simp]
-theorem coe_toEquiv (e : P₁ ≃ᵃL[k] P₂) : ⇑e.toEquiv = e :=
-  rfl
-
 def Simps.apply (e : P₁ ≃ᵃL[k] P₂) : P₁ → P₂ :=
   e
 
@@ -116,34 +110,11 @@ def refl : P₁ ≃ᵃL[k] P₁ where
   linear := LinearEquiv.refl k V₁
   map_vadd' _ _ := rfl
 
-@[simp]
-theorem coe_refl : ⇑(refl k P₁) = id :=
-  rfl
-
-@[simp]
-theorem refl_apply (x : P₁) : refl k P₁ x = x :=
-  rfl
-
-@[simp]
-theorem toAffineEquiv_refl : (refl k P₁).toAffineEquiv = AffineEquiv.refl k P₁ :=
-  rfl
-
-@[simp]
-theorem toEquiv_refl : (refl k P₁).toEquiv = Equiv.refl P₁ :=
-  rfl
-
 @[symm]
 def symm (e : P₁ ≃ᵃL[k] P₂) : P₂ ≃ᵃL[k] P₁ where
   toAffineEquiv := e.toAffineEquiv.symm
   continuous_toFun := e.continuous_invFun
   continuous_invFun := e.continuous_toFun
-
-@[simp]
-theorem symm_toAffineEquiv (e : P₁ ≃ᵃL[k] P₂) : e.toAffineEquiv.symm = e.symm.toAffineEquiv :=
-  rfl
-
-@[simp]
-theorem symm_toEquiv (e : P₁ ≃ᵃL[k] P₂) : e.toEquiv.symm = e.symm.toEquiv := rfl
 
 @[simp]
 theorem apply_symm_apply (e : P₁ ≃ᵃL[k] P₂) (p : P₂) : e (e.symm p) = p :=
@@ -161,9 +132,6 @@ theorem apply_eq_iff_eq (e : P₁ ≃ᵃL[k] P₂) {p₁ p₂ : P₁} : e p₁ =
 
 @[simp]
 theorem symm_symm (e : P₁ ≃ᵃL[k] P₂) : e.symm.symm = e := rfl
-
-theorem symm_symm_apply (e : P₁ ≃ᵃL[k] P₂) (x : P₁) : e.symm.symm x = e x :=
-  rfl
 
 theorem symm_apply_eq (e : P₁ ≃ᵃL[k] P₂) {x y} : e.symm x = y ↔ x = e y :=
   e.toAffineEquiv.symm_apply_eq
@@ -209,27 +177,11 @@ theorem symm_image_image (e : P₁ ≃ᵃL[k] P₂) (s : Set P₁) : e.symm '' (
 theorem image_symm_image (e : P₁ ≃ᵃL[k] P₂) (s : Set P₂) : e '' (e.symm '' s) = s :=
   e.symm.symm_image_image s
 
-@[simp]
-theorem refl_symm : (refl k P₁).symm = refl k P₁ :=
-  rfl
-
-@[simp]
-theorem symm_refl : (refl k P₁).symm = refl k P₁ :=
-  rfl
-
 @[trans]
 def trans (e : P₁ ≃ᵃL[k] P₂) (e' : P₂ ≃ᵃL[k] P₃) : P₁ ≃ᵃL[k] P₃ where
   toAffineEquiv := e.toAffineEquiv.trans e'.toAffineEquiv
   continuous_toFun := e'.continuous_toFun.comp (e.continuous_toFun)
   continuous_invFun := e.continuous_invFun.comp (e'.continuous_invFun)
-
-@[simp]
-theorem coe_trans (e : P₁ ≃ᵃL[k] P₂) (e' : P₂ ≃ᵃL[k] P₃) : ⇑(e.trans e') = e' ∘ e :=
-  rfl
-
-@[simp]
-theorem trans_apply (e : P₁ ≃ᵃL[k] P₂) (e' : P₂ ≃ᵃL[k] P₃) (p : P₁) : e.trans e' p = e' (e p) :=
-  rfl
 
 theorem trans_assoc (e₁ : P₁ ≃ᵃL[k] P₂) (e₂ : P₂ ≃ᵃL[k] P₃) (e₃ : P₃ ≃ᵃL[k] P₄) :
     (e₁.trans e₂).trans e₃ = e₁.trans (e₂.trans e₃) :=
@@ -263,20 +215,12 @@ def _root_.ContinuousLinearEquiv.toContinuousAffineEquiv (L : E ≃L[k] F) : E �
   continuous_toFun := L.continuous_toFun
   continuous_invFun := L.continuous_invFun
 
-@[simp]
-theorem _root_.ContinuousLinearEquiv.coe_toContinuousAffineEquiv (e : E ≃L[k] F) :
-    ⇑e.toContinuousAffineEquiv = e :=
-  rfl
-
 variable (k P₁) in
 
 def constVAdd [ContinuousConstVAdd V₁ P₁] (v : V₁) : P₁ ≃ᵃL[k] P₁ where
   toAffineEquiv := AffineEquiv.constVAdd k P₁ v
   continuous_toFun := continuous_const_vadd v
   continuous_invFun := continuous_const_vadd (-v)
-
-lemma constVAdd_coe [ContinuousConstVAdd V₁ P₁] (v : V₁) :
-    (constVAdd k P₁ v).toAffineEquiv = .constVAdd k P₁ v := rfl
 
 end
 

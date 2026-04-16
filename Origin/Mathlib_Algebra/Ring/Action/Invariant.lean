@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.GroupAction.Hom
 import Mathlib.Algebra.Ring.Subring.Defs
 
+noncomputable section
+
 /-! # Subrings invariant under an action -/
 
 section Ring
@@ -43,13 +45,5 @@ variable (U : Subring R') [IsInvariantSubring M U]
 
 def IsInvariantSubring.subtypeHom : U →+*[M] R' :=
   { U.subtype with map_smul' := fun _ _ ↦ rfl }
-
-@[simp]
-theorem IsInvariantSubring.coe_subtypeHom :
-    (IsInvariantSubring.subtypeHom M U : U → R') = Subtype.val := rfl
-
-@[simp]
-theorem IsInvariantSubring.coe_subtypeHom' :
-    ((IsInvariantSubring.subtypeHom M U).toRingHom : U →+* R') = U.subtype := rfl
 
 end

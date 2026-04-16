@@ -1,12 +1,14 @@
 /-
 Extracted from FieldTheory/Minpoly/Field.lean
-Genuine: 23 | Conflates: 4 | Dissolved: 3 | Infrastructure: 1
+Genuine: 26 | Conflates: 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.FieldDivision
 import Mathlib.FieldTheory.Minpoly.Basic
 import Mathlib.RingTheory.Algebraic.Integral
 import Mathlib.RingTheory.LocalRing.Basic
+
+noncomputable section
 
 /-!
 # Minimal polynomials on an algebra over a field
@@ -31,9 +33,15 @@ section Ring
 
 variable [Ring B] [Algebra A B] (x : B)
 
--- DISSOLVED: degree_le_of_ne_zero
+theorem degree_le_of_ne_zero {p : A[X]} (pnz : p ≠ 0) (hp : Polynomial.aeval x p = 0) :
+    degree (minpoly A x) ≤ degree p :=
+  calc
+    degree (minpoly A x) ≤ degree (p * C (leadingCoeff p)⁻¹) :=
+      min A x (monic_mul_leadingCoeff_inv pnz) (by simp [hp])
+    _ = degree p := degree_mul_leadingCoeff_inv p pnz
 
--- DISSOLVED: ne_zero_of_finite
+theorem ne_zero_of_finite (e : B) [FiniteDimensional A B] : minpoly A e ≠ 0 :=
+  minpoly.ne_zero <| .of_finite A _
 
 theorem unique {p : A[X]} (pmonic : p.Monic) (hp : Polynomial.aeval x p = 0)
     (pmin : ∀ q : A[X], q.Monic → Polynomial.aeval x q = 0 → degree p ≤ degree q) :
@@ -249,7 +257,9 @@ theorem coeff_zero_eq_zero (hx : IsIntegral A x) : coeff (minpoly A x) 0 = 0 ↔
   · rintro rfl
     simp
 
--- DISSOLVED: coeff_zero_ne_zero
+theorem coeff_zero_ne_zero (hx : IsIntegral A x) (h : x ≠ 0) : coeff (minpoly A x) 0 ≠ 0 := by
+  contrapose! h
+  simpa only [hx, coeff_zero_eq_zero] using h
 
 end IsDomain
 

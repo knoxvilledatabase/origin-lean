@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Bilinear
 import Mathlib.Algebra.Module.LocalizedModule.Basic
 
+noncomputable section
+
 /-!
 # Equivalence between `IsLocalizedModule` and `IsLocalization`
 -/

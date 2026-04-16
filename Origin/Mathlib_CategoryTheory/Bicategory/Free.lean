@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Functor.Pseudofunctor
 
+noncomputable section
+
 /-!
 # Free bicategories
 
@@ -204,53 +206,7 @@ variable {a b c d : FreeBicategory B}
 abbrev Hom₂.mk {f g : a ⟶ b} (η : Hom₂ f g) : f ⟶ g :=
   Quot.mk Rel η
 
-@[simp]
-theorem mk_vcomp {f g h : a ⟶ b} (η : Hom₂ f g) (θ : Hom₂ g h) :
-    (η.vcomp θ).mk = (η.mk ≫ θ.mk : f ⟶ h) :=
-  rfl
-
-@[simp]
-theorem mk_whisker_left (f : a ⟶ b) {g h : b ⟶ c} (η : Hom₂ g h) :
-    (Hom₂.whisker_left f η).mk = (f ◁ η.mk : f ≫ g ⟶ f ≫ h) :=
-  rfl
-
-@[simp]
-theorem mk_whisker_right {f g : a ⟶ b} (η : Hom₂ f g) (h : b ⟶ c) :
-    (Hom₂.whisker_right h η).mk = (η.mk ▷ h : f ≫ h ⟶ g ≫ h) :=
-  rfl
-
 variable (f : a ⟶ b) (g : b ⟶ c) (h : c ⟶ d)
-
-theorem comp_def : Hom.comp f g = f ≫ g :=
-  rfl
-
-@[simp]
-theorem mk_id : Quot.mk _ (Hom₂.id f) = 𝟙 f :=
-  rfl
-
-@[simp]
-theorem mk_associator_hom : Quot.mk _ (Hom₂.associator f g h) = (α_ f g h).hom :=
-  rfl
-
-@[simp]
-theorem mk_associator_inv : Quot.mk _ (Hom₂.associator_inv f g h) = (α_ f g h).inv :=
-  rfl
-
-@[simp]
-theorem mk_left_unitor_hom : Quot.mk _ (Hom₂.left_unitor f) = (λ_ f).hom :=
-  rfl
-
-@[simp]
-theorem mk_left_unitor_inv : Quot.mk _ (Hom₂.left_unitor_inv f) = (λ_ f).inv :=
-  rfl
-
-@[simp]
-theorem mk_right_unitor_hom : Quot.mk _ (Hom₂.right_unitor f) = (ρ_ f).hom :=
-  rfl
-
-@[simp]
-theorem mk_right_unitor_inv : Quot.mk _ (Hom₂.right_unitor_inv f) = (ρ_ f).inv :=
-  rfl
 
 @[simps]
 def of : Prefunctor B (FreeBicategory B) where
@@ -270,15 +226,6 @@ def liftHom : ∀ {a b : FreeBicategory B}, (a ⟶ b) → (F.obj a ⟶ F.obj b)
   | _, _, Hom.of f => F.map f
   | _, _, Hom.id a => 𝟙 (F.obj a)
   | _, _, Hom.comp f g => liftHom f ≫ liftHom g
-
-@[simp]
-theorem liftHom_id (a : FreeBicategory B) : liftHom F (𝟙 a) = 𝟙 (F.obj a) :=
-  rfl
-
-@[simp]
-theorem liftHom_comp {a b c : FreeBicategory B} (f : a ⟶ b) (g : b ⟶ c) :
-    liftHom F (f ≫ g) = liftHom F f ≫ liftHom F g :=
-  rfl
 
 end
 

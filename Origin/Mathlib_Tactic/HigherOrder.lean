@@ -11,6 +11,8 @@ import Lean.Meta.Tactic.Intro
 import Lean.Elab.DeclarationRange
 import Mathlib.Tactic.Attr.Register
 
+noncomputable section
+
 /-!
 # HigherOrder attribute
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
 import Mathlib.Topology.ContinuousMap.Basic
 
+noncomputable section
+
 /-!
 # Category instance for topological spaces
 
@@ -48,18 +50,6 @@ instance instContinuousMapClass (X Y : TopCat) : ContinuousMapClass (X ⟶ Y) X 
   inferInstanceAs <| ContinuousMapClass C(X, Y) X Y
 
 @[simp]
-theorem id_app (X : TopCat.{u}) (x : ↑X) : (𝟙 X : X ⟶ X) x = x := rfl
-
-@[simp]
-theorem comp_app {X Y Z : TopCat.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) (x : X) :
-    (f ≫ g : X → Z) x = g (f x) := rfl
-
-@[simp] theorem coe_id (X : TopCat.{u}) : (𝟙 X : X → X) = id := rfl
-
-@[simp] theorem coe_comp {X Y Z : TopCat.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g : X → Z) = g ∘ f := rfl
-
-@[simp]
 lemma hom_inv_id_apply {X Y : TopCat} (f : X ≅ Y) (x : X) : f.inv (f.hom x) = x :=
   DFunLike.congr_fun f.hom_inv_id x
 
@@ -78,23 +68,8 @@ instance topologicalSpace_coe (X : TopCat) : TopologicalSpace X :=
     (X : TopCat) : TopologicalSpace <| (forget TopCat).obj X :=
   X.str
 
-@[simp]
-theorem coe_of (X : Type u) [TopologicalSpace X] : (of X : Type u) = X := rfl
-
-@[simp] theorem coe_of_of {X Y : Type u} [TopologicalSpace X] [TopologicalSpace Y]
-    {f : C(X, Y)} {x} :
-    @DFunLike.coe (TopCat.of X ⟶ TopCat.of Y) ((CategoryTheory.forget TopCat).obj (TopCat.of X))
-      (fun _ ↦ (CategoryTheory.forget TopCat).obj (TopCat.of Y)) ConcreteCategory.instFunLike
-      f x =
-    @DFunLike.coe C(X, Y) X
-      (fun _ ↦ Y) _
-      f x :=
-  rfl
-
 instance inhabited : Inhabited TopCat :=
   ⟨TopCat.of Empty⟩
-
-lemma hom_apply {X Y : TopCat} (f : X ⟶ Y) (x : X) : f x = ContinuousMap.toFun f x := rfl
 
 def discrete : Type u ⥤ TopCat.{u} where
   obj X := ⟨X , ⊥⟩

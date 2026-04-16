@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.UnbundledHom
 import Mathlib.CategoryTheory.Monad.Algebra
 import Mathlib.Topology.Category.TopCat.Basic
 
+noncomputable section
+
 /-!
 # The category of measurable spaces
 
@@ -47,10 +49,6 @@ instance (X : MeasCat) : MeasurableSpace X :=
 
 def of (α : Type u) [ms : MeasurableSpace α] : MeasCat :=
   ⟨α, ms⟩
-
-@[simp]
-theorem coe_of (X : Type u) [MeasurableSpace X] : (of X : Type u) = X :=
-  rfl
 
 instance unbundledHom : UnbundledHom @Measurable :=
   ⟨@measurable_id, @Measurable.comp⟩

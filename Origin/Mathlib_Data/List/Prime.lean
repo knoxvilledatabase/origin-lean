@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.Algebra.BigOperators.Group.List
 
+noncomputable section
+
 /-!
 # Products of lists of prime elements.
 

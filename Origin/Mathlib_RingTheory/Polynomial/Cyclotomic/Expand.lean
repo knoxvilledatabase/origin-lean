@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Polynomial/Cyclotomic/Expand.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
+
+noncomputable section
 
 /-!
 # Cyclotomic polynomials and `expand`.
@@ -99,7 +101,10 @@ theorem cyclotomic_irreducible_pow_of_irreducible_pow {p : ℕ} (hp : Nat.Prime 
   rw [Nat.add_succ, pow_succ, ← cyclotomic_expand_eq_cyclotomic hp <| dvd_pow_self p this] at h
   exact hk (by omega) (of_irreducible_expand hp.ne_zero h)
 
--- DISSOLVED: cyclotomic_irreducible_of_irreducible_pow
+theorem cyclotomic_irreducible_of_irreducible_pow {p : ℕ} (hp : Nat.Prime p) {R} [CommRing R]
+    [IsDomain R] {n : ℕ} (hn : n ≠ 0) (h : Irreducible (cyclotomic (p ^ n) R)) :
+    Irreducible (cyclotomic p R) :=
+  pow_one p ▸ cyclotomic_irreducible_pow_of_irreducible_pow hp hn.bot_lt h
 
 section CharP
 

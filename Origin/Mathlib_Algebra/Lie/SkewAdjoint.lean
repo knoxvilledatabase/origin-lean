@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Matrix
 import Mathlib.LinearAlgebra.Matrix.SesquilinearForm
 import Mathlib.Tactic.NoncommRing
 
+noncomputable section
+
 /-!
 # Lie algebras of skew-adjoint endomorphisms of a bilinear form
 
@@ -102,11 +104,6 @@ def skewAdjointMatricesLieSubalgebra : LieSubalgebra R (Matrix n n R) :=
   { skewAdjointMatricesSubmodule J with
     lie_mem' := J.isSkewAdjoint_bracket }
 
-@[simp]
-theorem mem_skewAdjointMatricesLieSubalgebra (A : Matrix n n R) :
-    A ∈ skewAdjointMatricesLieSubalgebra J ↔ A ∈ skewAdjointMatricesSubmodule J :=
-  Iff.rfl
-
 def skewAdjointMatricesLieSubalgebraEquiv (P : Matrix n n R) (h : Invertible P) :
     skewAdjointMatricesLieSubalgebra J ≃ₗ⁅R⁆ skewAdjointMatricesLieSubalgebra (Pᵀ * J * P) :=
   LieEquiv.ofSubalgebras _ _ (P.lieConj h).symm <| by
@@ -133,13 +130,6 @@ def skewAdjointMatricesLieSubalgebraEquivTranspose {m : Type w} [DecidableEq m] 
       simpa [- LieSubalgebra.mem_map, LieSubalgebra.mem_map_submodule]
     simp only [Matrix.IsSkewAdjoint, Matrix.IsAdjointPair, ← h,
       ← Function.Injective.eq_iff e.injective, map_mul, AlgEquiv.apply_symm_apply, map_neg]
-
-@[simp]
-theorem skewAdjointMatricesLieSubalgebraEquivTranspose_apply {m : Type w} [DecidableEq m]
-    [Fintype m] (e : Matrix n n R ≃ₐ[R] Matrix m m R) (h : ∀ A, (e A)ᵀ = e Aᵀ)
-    (A : skewAdjointMatricesLieSubalgebra J) :
-    (skewAdjointMatricesLieSubalgebraEquivTranspose J e h A : Matrix m m R) = e A :=
-  rfl
 
 theorem mem_skewAdjointMatricesLieSubalgebra_unit_smul (u : Rˣ) (J A : Matrix n n R) :
     A ∈ skewAdjointMatricesLieSubalgebra (u • J) ↔ A ∈ skewAdjointMatricesLieSubalgebra J := by

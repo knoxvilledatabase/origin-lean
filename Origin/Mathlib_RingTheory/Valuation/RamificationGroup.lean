@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 import Mathlib.RingTheory.Valuation.ValuationSubring
 
+noncomputable section
+
 /-!
 # Ramification groups
 

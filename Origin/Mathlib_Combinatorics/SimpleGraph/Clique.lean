@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Clique.lean
-Genuine: 81 | Conflates: 2 | Dissolved: 1 | Infrastructure: 8
+Genuine: 84 | Conflates: 2 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Path
@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SimpleGraph.Operations
 import Mathlib.Data.Finset.Pairwise
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Nat.Lattice
+
+noncomputable section
 
 /-!
 # Graph cliques
@@ -62,10 +64,6 @@ instance [DecidableEq α] [DecidableRel G.Adj] {s : Finset α} : Decidable (G.Is
   decidable_of_iff' _ G.isClique_iff
 
 variable {G H} {a b : α}
-
-lemma isClique_empty : G.IsClique ∅ := by simp
-
-lemma isClique_singleton (a : α) : G.IsClique {a} := by simp
 
 theorem IsClique.of_subsingleton {G : SimpleGraph α} (hs : s.Subsingleton) : G.IsClique s :=
   hs.pairwise G.Adj
@@ -419,7 +417,9 @@ theorem CliqueFreeOn.mono (hmn : m ≤ n) (hG : G.CliqueFreeOn s m) : G.CliqueFr
 theorem CliqueFreeOn.anti (hGH : G ≤ H) (hH : H.CliqueFreeOn s n) : G.CliqueFreeOn s n :=
   fun _t hts ht => hH hts <| ht.mono hGH
 
--- DISSOLVED: cliqueFreeOn_empty
+@[simp]
+theorem cliqueFreeOn_empty : G.CliqueFreeOn ∅ n ↔ n ≠ 0 := by
+  simp [CliqueFreeOn, Set.subset_empty_iff]
 
 @[simp]
 theorem cliqueFreeOn_singleton : G.CliqueFreeOn {a} n ↔ 1 < n := by
@@ -553,10 +553,6 @@ structure IsMaximumClique [Fintype α] (G : SimpleGraph α) (s : Finset α) : Pr
 theorem isMaximumClique_iff [Fintype α] {s : Finset α} :
     G.IsMaximumClique s ↔ G.IsClique s ∧ ∀ t : Finset α, G.IsClique t → #t ≤ #s :=
   ⟨fun h ↦ ⟨h.1, h.2⟩, fun h ↦ ⟨h.1, h.2⟩⟩
-
-theorem isMaximalClique_iff {s : Set α} :
-    Maximal G.IsClique s ↔ G.IsClique s ∧ ∀ t : Set α, G.IsClique t → s ⊆ t → t ⊆ s :=
-  Iff.rfl
 
 lemma IsMaximumClique.isMaximalClique [Fintype α] (s : Finset α) (M : G.IsMaximumClique s) :
     Maximal G.IsClique s :=

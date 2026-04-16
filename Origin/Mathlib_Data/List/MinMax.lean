@@ -8,6 +8,8 @@ import Mathlib.Order.MinMax
 import Mathlib.Order.WithBot
 import Mathlib.Order.BoundedOrder.Lattice
 
+noncomputable section
+
 /-!
 # Minimum and maximum of lists
 
@@ -95,22 +97,6 @@ def argmax (f : α → β) (l : List α) : Option α :=
 
 def argmin (f : α → β) (l : List α) :=
   l.foldl (argAux fun b c => f b < f c) none
-
-@[simp]
-theorem argmax_nil (f : α → β) : argmax f [] = none :=
-  rfl
-
-@[simp]
-theorem argmin_nil (f : α → β) : argmin f [] = none :=
-  rfl
-
-@[simp]
-theorem argmax_singleton {f : α → β} {a : α} : argmax f [a] = a :=
-  rfl
-
-@[simp]
-theorem argmin_singleton {f : α → β} {a : α} : argmin f [a] = a :=
-  rfl
 
 theorem not_lt_of_mem_argmax : a ∈ l → m ∈ argmax f l → ¬f m < f a :=
   not_of_mem_foldl_argAux _ (fun x h => lt_irrefl (f x) h)
@@ -243,22 +229,6 @@ def maximum (l : List α) : WithBot α :=
 
 def minimum (l : List α) : WithTop α :=
   argmin id l
-
-@[simp]
-theorem maximum_nil : maximum ([] : List α) = ⊥ :=
-  rfl
-
-@[simp]
-theorem minimum_nil : minimum ([] : List α) = ⊤ :=
-  rfl
-
-@[simp]
-theorem maximum_singleton (a : α) : maximum [a] = a :=
-  rfl
-
-@[simp]
-theorem minimum_singleton (a : α) : minimum [a] = a :=
-  rfl
 
 theorem maximum_mem {l : List α} {m : α} : (maximum l : WithTop α) = m → m ∈ l :=
   argmax_mem

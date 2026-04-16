@@ -9,6 +9,8 @@ import Mathlib.MeasureTheory.Order.Lattice
 import Mathlib.Topology.Order.Lattice
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 
+noncomputable section
+
 /-!
 # Borel sigma algebras on spaces with orders
 
@@ -818,57 +820,6 @@ theorem AEMeasurable.biInf {ι} {μ : Measure δ} (s : Set ι) {f : ι → δ �
   .biSup (α := αᵒᵈ) s hs hf
 
 alias aemeasurable_biInf := AEMeasurable.biInf
-
-theorem Measurable.liminf' {ι ι'} {f : ι → δ → α} {v : Filter ι} (hf : ∀ i, Measurable (f i))
-    {p : ι' → Prop} {s : ι' → Set ι} (hv : v.HasCountableBasis p s) (hs : ∀ j, (s j).Countable) :
-    Measurable fun x => liminf (f · x) v := by
-  classical
-  /- We would like to write the liminf as `⨆ (j : Subtype p), ⨅ (i : s j), f i x`, as the
-  measurability would follow from the measurability of infs and sups. Unfortunately, this is not
-  true in general conditionally complete linear orders because of issues with empty sets or sets
-  which are not bounded above or below. A slightly more complicated expression for the liminf,
-  valid in general, is given in `Filter.HasBasis.liminf_eq_ite`. This expression, built from
-  `if ... then ... else` and infs and sups, can be readily checked to be measurable. -/
-  have : Countable (Subtype p) := hv.countable
-  rcases isEmpty_or_nonempty (Subtype p) with hp|hp
-  · simp [hv.liminf_eq_sSup_iUnion_iInter]
-  by_cases H : ∃ (j : Subtype p), s j = ∅
-  · simp_rw [hv.liminf_eq_ite, if_pos H, measurable_const]
-  simp_rw [hv.liminf_eq_ite, if_neg H]
-  have : ∀ i, Countable (s i) := fun i ↦ countable_coe_iff.2 (hs i)
-  let m : Subtype p → Set δ := fun j ↦ {x | BddBelow (range (fun (i : s j) ↦ f i x))}
-  have m_meas : ∀ j, MeasurableSet (m j) :=
-    fun j ↦ measurableSet_bddBelow_range (fun (i : s j) ↦ hf i)
-  have mc_meas : MeasurableSet {x | ∀ (j : Subtype p), x ∉ m j} := by
-    rw [setOf_forall]
-    exact MeasurableSet.iInter (fun j ↦ (m_meas j).compl)
-  refine measurable_const.piecewise mc_meas <| .iSup fun j ↦ ?_
-  let reparam : δ → Subtype p → Subtype p := fun x ↦ liminf_reparam (fun i ↦ f i x) s p
-  let F0 : Subtype p → δ → α := fun j x ↦ ⨅ (i : s j), f i x
-  have F0_meas : ∀ j, Measurable (F0 j) := fun j ↦ .iInf (fun (i : s j) ↦ hf i)
-  set F1 : δ → α := fun x ↦ F0 (reparam x j) x with hF1
-  change Measurable F1
-  let g : ℕ → Subtype p := Classical.choose (exists_surjective_nat (Subtype p))
-  have Z : ∀ x, ∃ n, x ∈ m (g n) ∨ ∀ k, x ∉ m k := by
-    intro x
-    by_cases H : ∃ k, x ∈ m k
-    · rcases H with ⟨k, hk⟩
-      rcases Classical.choose_spec (exists_surjective_nat (Subtype p)) k with ⟨n, rfl⟩
-      exact ⟨n, Or.inl hk⟩
-    · push_neg at H
-      exact ⟨0, Or.inr H⟩
-  have : F1 = fun x ↦ if x ∈ m j then F0 j x else F0 (g (Nat.find (Z x))) x := by
-    ext x
-    have A : reparam x j = if x ∈ m j then j else g (Nat.find (Z x)) := rfl
-    split_ifs with hjx
-    · have : reparam x j = j := by rw [A, if_pos hjx]
-      simp only [hF1, this]
-    · have : reparam x j = g (Nat.find (Z x)) := by rw [A, if_neg hjx]
-      simp only [hF1, this]
-  rw [this]
-  apply Measurable.piecewise (m_meas j) (F0_meas j)
-  apply Measurable.find (fun n ↦ F0_meas (g n)) (fun n ↦ ?_)
-  exact (m_meas (g n)).union mc_meas
 
 alias measurable_liminf' := Measurable.liminf'
 

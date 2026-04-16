@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.IsLimit
 import Mathlib.CategoryTheory.EpiMono
 import Mathlib.CategoryTheory.Category.Preorder
 
+noncomputable section
+
 /-!
 # Initial and terminal objects in a category.
 

@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.Algebra.Module.LocalizedModule.Basic
 
+noncomputable section
+
 /-!
 # Flatness is stable under composition and base change
 
@@ -85,16 +87,6 @@ private lemma auxLTensor_eq [Flat R S] {I : Ideal R} :
   intro m x
   erw [TensorProduct.rid_tmul]
   simp
-
-theorem trans [Flat R S] [Flat S M] : Flat R M := by
-  rw [Flat.iff_lTensor_injective']
-  intro I
-  rw [← EquivLike.comp_injective _ (TensorProduct.rid R M)]
-  haveI h : TensorProduct.rid R M ∘ lTensor M I.subtype =
-    TensorProduct.rid R M ∘ₗ lTensor M I.subtype := rfl
-  simp only [h, ← auxLTensor_eq R S M, LinearMap.coe_restrictScalars, LinearMap.coe_comp,
-    LinearEquiv.coe_coe, EquivLike.comp_injective, EquivLike.injective_comp]
-  exact (Flat.iff_lTensor_injective' S M).mp inferInstance _
 
 end Composition
 

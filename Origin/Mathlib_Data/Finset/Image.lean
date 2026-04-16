@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Finset/Image.lean
-Genuine: 125 | Conflates: 1 | Dissolved: 0 | Infrastructure: 11
+Genuine: 128 | Conflates: 1 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Embedding
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.Finset.SymmDiff
 import Mathlib.Data.Finset.Union
+
+noncomputable section
 
 /-! # Image and map operations on finite sets
 
@@ -135,6 +137,7 @@ theorem map_subset_map {s₁ s₂ : Finset α} : s₁.map f ⊆ s₂.map f ↔ s
    fun h => by simp [subset_def, Multiset.map_subset_map h]⟩
 
 @[gcongr] alias ⟨_, _root_.GCongr.finsetMap_subset⟩ := map_subset_map
+
 theorem subset_map_symm {t : Finset β} {f : α ≃ β} : s ⊆ t.map f.symm ↔ s.map f ⊆ t := by
   constructor <;> intro h x hx
   · simp only [mem_map_equiv, Equiv.symm_symm] at hx
@@ -159,9 +162,6 @@ theorem map_injective (f : α ↪ β) : Injective (map f) :=
 theorem map_ssubset_map {s t : Finset α} : s.map f ⊂ t.map f ↔ s ⊂ t := (mapEmbedding f).lt_iff_lt
 
 @[gcongr] alias ⟨_, _root_.GCongr.finsetMap_ssubset⟩ := map_ssubset_map
-@[simp]
-theorem mapEmbedding_apply : mapEmbedding f s = map f s :=
-  rfl
 
 theorem filter_map {p : β → Prop} [DecidablePred p] :
     (s.map f).filter p = (s.filter (p ∘ f)).map f :=
@@ -229,6 +229,7 @@ theorem map_eq_empty : s.map f = ∅ ↔ s = ∅ := (map_injective f).eq_iff' (m
 theorem map_nonempty : (s.map f).Nonempty ↔ s.Nonempty :=
   mod_cast Set.image_nonempty (f := f) (s := s)
 
+@[aesop safe apply (rule_sets := [finsetNonempty])]
 protected alias ⟨_, Nonempty.map⟩ := map_nonempty
 
 -- CONFLATES (assumes ground = zero): map_nontrivial
@@ -278,10 +279,6 @@ def image (f : α → β) (s : Finset α) : Finset β :=
 
 @[simp]
 theorem image_val (f : α → β) (s : Finset α) : (image f s).1 = (s.1.map f).dedup :=
-  rfl
-
-@[simp]
-theorem image_empty (f : α → β) : (∅ : Finset α).image f = ∅ :=
   rfl
 
 variable {f g : α → β} {s : Finset α} {t : Finset β} {a : α} {b c : β}
@@ -559,12 +556,6 @@ variable (f : α → Option β) (s' : Finset α) {s t : Finset α}
   {f_inj : ∀ a a' b, b ∈ f a → b ∈ f a' → a = a'}
 
 @[simp]
-theorem filterMap_val : (filterMap f s' f_inj).1 = s'.1.filterMap f := rfl
-
-@[simp]
-theorem filterMap_empty : (∅ : Finset α).filterMap f f_inj = ∅ := rfl
-
-@[simp]
 theorem mem_filterMap {b : β} : b ∈ s.filterMap f f_inj ↔ ∃ a ∈ s, f a = some b :=
   s.val.mem_filterMap f
 
@@ -687,26 +678,14 @@ protected def finsetCongr (e : α ≃ β) : Finset α ≃ Finset β where
   right_inv s := by simp [Finset.map_map]
 
 @[simp]
-theorem finsetCongr_apply (e : α ≃ β) (s : Finset α) : e.finsetCongr s = s.map e.toEmbedding :=
-  rfl
-
-@[simp]
 theorem finsetCongr_refl : (Equiv.refl α).finsetCongr = Equiv.refl _ := by
   ext
   simp
-
-@[simp]
-theorem finsetCongr_symm (e : α ≃ β) : e.finsetCongr.symm = e.symm.finsetCongr :=
-  rfl
 
 @[simp]
 theorem finsetCongr_trans (e : α ≃ β) (e' : β ≃ γ) :
     e.finsetCongr.trans e'.finsetCongr = (e.trans e').finsetCongr := by
   ext
   simp [-Finset.mem_map, -Equiv.trans_toEmbedding]
-
-theorem finsetCongr_toEmbedding (e : α ≃ β) :
-    e.finsetCongr.toEmbedding = (Finset.mapEmbedding e.toEmbedding).toEmbedding :=
-  rfl
 
 end Equiv

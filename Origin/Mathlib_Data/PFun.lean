@@ -7,6 +7,8 @@ import Mathlib.Data.Part
 import Mathlib.Data.Rel
 import Batteries.WF
 
+noncomputable section
+
 /-!
 # Partial functions
 
@@ -70,19 +72,11 @@ def Dom (f : α →. β) : Set α :=
 @[simp]
 theorem mem_dom (f : α →. β) (x : α) : x ∈ Dom f ↔ ∃ y, y ∈ f x := by simp [Dom, Part.dom_iff_mem]
 
-@[simp]
-theorem dom_mk (p : α → Prop) (f : ∀ a, p a → β) : (PFun.Dom fun x => ⟨p x, f x⟩) = { x | p x } :=
-  rfl
-
 theorem dom_eq (f : α →. β) : Dom f = { x | ∃ y, y ∈ f x } :=
   Set.ext (mem_dom f)
 
 def fn (f : α →. β) (a : α) : Dom f a → β :=
   (f a).get
-
-@[simp]
-theorem fn_apply (f : α →. β) (a : α) : f.fn a = (f a).get :=
-  rfl
 
 def evalOpt (f : α →. β) [D : DecidablePred (· ∈ Dom f)] (x : α) : Option β :=
   @Part.toOption _ _ (D x)
@@ -115,10 +109,6 @@ instance coe : Coe (α → β) (α →. β) :=
 theorem coe_val (f : α → β) (a : α) : (f : α →. β) a = Part.some (f a) :=
   rfl
 
-@[simp]
-theorem dom_coe (f : α → β) : (f : α →. β).Dom = Set.univ :=
-  rfl
-
 theorem lift_injective : Injective (PFun.lift : (α → β) → α →. β) := fun _ _ h =>
   funext fun a => Part.some_injective <| congr_fun h a
 
@@ -143,9 +133,6 @@ def res (f : α → β) (s : Set α) : α →. β :=
 theorem mem_res (f : α → β) (s : Set α) (a : α) (b : β) : b ∈ res f s a ↔ a ∈ s ∧ f a = b := by
   simp [res, @eq_comm _ b]
 
-theorem res_univ (f : α → β) : PFun.res f Set.univ = f :=
-  rfl
-
 theorem dom_iff_graph (f : α →. β) (x : α) : x ∈ f.Dom ↔ ∃ y, (x, y) ∈ f.graph :=
   Part.dom_iff_mem
 
@@ -155,10 +142,6 @@ theorem lift_graph {f : α → β} {a b} : (a, b) ∈ (f : α →. β).graph ↔
 protected def pure (x : β) : α →. β := fun _ => Part.some x
 
 def bind (f : α →. β) (g : β → α →. γ) : α →. γ := fun a => (f a).bind fun b => g b a
-
-@[simp]
-theorem bind_apply (f : α →. β) (g : β → α →. γ) (a : α) : f.bind g a = (f a).bind fun b => g b a :=
-  rfl
 
 def map (f : β → γ) (g : α →. β) : α →. γ := fun a => (g a).map f
 
@@ -308,12 +291,6 @@ variable (f : α →. β)
 def image (s : Set α) : Set β :=
   f.graph'.image s
 
-theorem image_def (s : Set α) : f.image s = { y | ∃ x ∈ s, y ∈ f x } :=
-  rfl
-
-theorem mem_image (y : β) (s : Set α) : y ∈ f.image s ↔ ∃ x ∈ s, y ∈ f x :=
-  Iff.rfl
-
 theorem image_mono {s t : Set α} (h : s ⊆ t) : f.image s ⊆ f.image t :=
   Rel.image_mono _ h
 
@@ -325,9 +302,6 @@ theorem image_union (s t : Set α) : f.image (s ∪ t) = f.image s ∪ f.image t
 
 def preimage (s : Set β) : Set α :=
   Rel.image (fun x y => x ∈ f y) s
-
-theorem Preimage_def (s : Set β) : f.preimage s = { x | ∃ y ∈ s, y ∈ f x } :=
-  rfl
 
 @[simp]
 theorem mem_preimage (s : Set β) (x : α) : x ∈ f.preimage s ↔ ∃ y ∈ s, y ∈ f x :=
@@ -408,17 +382,9 @@ theorem preimage_asSubtype (f : α →. β) (s : Set β) :
 def toSubtype (p : β → Prop) (f : α → β) : α →. Subtype p := fun a => ⟨p (f a), Subtype.mk _⟩
 
 @[simp]
-theorem dom_toSubtype (p : β → Prop) (f : α → β) : (toSubtype p f).Dom = { a | p (f a) } :=
-  rfl
-
-@[simp]
 theorem toSubtype_apply (p : β → Prop) (f : α → β) (a : α) :
     toSubtype p f a = ⟨p (f a), Subtype.mk _⟩ :=
   rfl
-
-theorem dom_toSubtype_apply_iff {p : β → Prop} {f : α → β} {a : α} :
-    (toSubtype p f a).Dom ↔ p (f a) :=
-  Iff.rfl
 
 theorem mem_toSubtype_iff {p : β → Prop} {f : α → β} {a : α} {b : Subtype p} :
     b ∈ toSubtype p f a ↔ ↑b = f a := by
@@ -426,14 +392,6 @@ theorem mem_toSubtype_iff {p : β → Prop} {f : α → β} {a : α} {b : Subtyp
 
 protected def id (α : Type*) : α →. α :=
   Part.some
-
-@[simp]
-theorem coe_id (α : Type*) : ((id : α → α) : α →. α) = PFun.id α :=
-  rfl
-
-@[simp]
-theorem id_apply (a : α) : PFun.id α a = Part.some a :=
-  rfl
 
 def comp (f : β →. γ) (g : α →. β) : α →. γ := fun a => (g a).bind f
 
@@ -482,20 +440,6 @@ theorem coe_comp (g : β → γ) (f : α → β) : ((g ∘ f : α → γ) : α �
 def prodLift (f : α →. β) (g : α →. γ) : α →. β × γ := fun x =>
   ⟨(f x).Dom ∧ (g x).Dom, fun h => ((f x).get h.1, (g x).get h.2)⟩
 
-@[simp]
-theorem dom_prodLift (f : α →. β) (g : α →. γ) :
-    (f.prodLift g).Dom = { x | (f x).Dom ∧ (g x).Dom } :=
-  rfl
-
-theorem get_prodLift (f : α →. β) (g : α →. γ) (x : α) (h) :
-    (f.prodLift g x).get h = ((f x).get h.1, (g x).get h.2) :=
-  rfl
-
-@[simp]
-theorem prodLift_apply (f : α →. β) (g : α →. γ) (x : α) :
-    f.prodLift g x = ⟨(f x).Dom ∧ (g x).Dom, fun h => ((f x).get h.1, (g x).get h.2)⟩ :=
-  rfl
-
 theorem mem_prodLift {f : α →. β} {g : α →. γ} {x : α} {y : β × γ} :
     y ∈ f.prodLift g x ↔ y.1 ∈ f x ∧ y.2 ∈ g x := by
   trans ∃ hp hq, (f x).get hp = y.1 ∧ (g x).get hq = y.2
@@ -505,20 +449,6 @@ theorem mem_prodLift {f : α →. β} {g : α →. γ} {x : α} {y : β × γ} :
 
 def prodMap (f : α →. γ) (g : β →. δ) : α × β →. γ × δ := fun x =>
   ⟨(f x.1).Dom ∧ (g x.2).Dom, fun h => ((f x.1).get h.1, (g x.2).get h.2)⟩
-
-@[simp]
-theorem dom_prodMap (f : α →. γ) (g : β →. δ) :
-    (f.prodMap g).Dom = { x | (f x.1).Dom ∧ (g x.2).Dom } :=
-  rfl
-
-theorem get_prodMap (f : α →. γ) (g : β →. δ) (x : α × β) (h) :
-    (f.prodMap g x).get h = ((f x.1).get h.1, (g x.2).get h.2) :=
-  rfl
-
-@[simp]
-theorem prodMap_apply (f : α →. γ) (g : β →. δ) (x : α × β) :
-    f.prodMap g x = ⟨(f x.1).Dom ∧ (g x.2).Dom, fun h => ((f x.1).get h.1, (g x.2).get h.2)⟩ :=
-  rfl
 
 theorem mem_prodMap {f : α →. γ} {g : β →. δ} {x : α × β} {y : γ × δ} :
     y ∈ f.prodMap g x ↔ y.1 ∈ f x.1 ∧ y.2 ∈ g x.2 := by

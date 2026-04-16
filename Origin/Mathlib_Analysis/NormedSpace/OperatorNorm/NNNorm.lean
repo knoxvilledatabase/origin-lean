@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/NNNorm.lean
-Genuine: 15 | Conflates: 6 | Dissolved: 1 | Infrastructure: 0
+Genuine: 16 | Conflates: 6 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
+
+noncomputable section
 
 /-!
 # Operator norm as an `NNNorm`
@@ -54,7 +56,9 @@ theorem nnnorm_def (f : E →SL[σ₁₂] F) : ‖f‖₊ = sInf { c | ∀ x, �
 theorem opNNNorm_le_bound (f : E →SL[σ₁₂] F) (M : ℝ≥0) (hM : ∀ x, ‖f x‖₊ ≤ M * ‖x‖₊) : ‖f‖₊ ≤ M :=
   opNorm_le_bound f (zero_le M) hM
 
--- DISSOLVED: opNNNorm_le_bound'
+theorem opNNNorm_le_bound' (f : E →SL[σ₁₂] F) (M : ℝ≥0) (hM : ∀ x, ‖x‖₊ ≠ 0 → ‖f x‖₊ ≤ M * ‖x‖₊) :
+    ‖f‖₊ ≤ M :=
+  opNorm_le_bound' f (zero_le M) fun x hx => hM x <| by rwa [← NNReal.coe_ne_zero]
 
 theorem opNNNorm_le_of_unit_nnnorm [NormedSpace ℝ E] [NormedSpace ℝ F] {f : E →L[ℝ] F} {C : ℝ≥0}
     (hf : ∀ x, ‖x‖₊ = 1 → ‖f x‖₊ ≤ C) : ‖f‖₊ ≤ C :=

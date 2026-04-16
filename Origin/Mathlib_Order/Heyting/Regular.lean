@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 import Origin.Core
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # Heyting regular elements
 
@@ -130,14 +132,6 @@ theorem coe_bot : ((⊥ : Regular α) : α) = ⊥ :=
 theorem coe_inf (a b : Regular α) : (↑(a ⊓ b) : α) = (a : α) ⊓ b :=
   rfl
 
-@[simp, norm_cast]
-theorem coe_himp (a b : Regular α) : (↑(a ⇨ b) : α) = (a : α) ⇨ b :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_compl (a : Regular α) : (↑aᶜ : α) = (a : α)ᶜ :=
-  rfl
-
 instance : Inhabited (Regular α) :=
   ⟨⊥⟩
 
@@ -151,17 +145,9 @@ instance boundedOrder : BoundedOrder (Regular α) :=
 theorem coe_le_coe {a b : Regular α} : (a : α) ≤ b ↔ a ≤ b :=
   Iff.rfl
 
-@[simp, norm_cast]
-theorem coe_lt_coe {a b : Regular α} : (a : α) < b ↔ a < b :=
-  Iff.rfl
-
 def toRegular : α →o Regular α :=
   ⟨fun a => ⟨aᶜᶜ, isRegular_compl _⟩, fun _ _ h =>
     coe_le_coe.1 <| compl_le_compl <| compl_le_compl h⟩
-
-@[simp, norm_cast]
-theorem coe_toRegular (a : α) : (toRegular a : α) = aᶜᶜ :=
-  rfl
 
 @[simp]
 theorem toRegular_coe (a : Regular α) : toRegular (a : α) = a :=
@@ -177,10 +163,6 @@ def gi : GaloisInsertion toRegular ((↑) : Regular α → α) where
 
 instance lattice : Lattice (Regular α) :=
   gi.liftLattice
-
-@[simp, norm_cast]
-theorem coe_sup (a b : Regular α) : (↑(a ⊔ b) : α) = ((a : α) ⊔ b)ᶜᶜ :=
-  rfl
 
 instance : BooleanAlgebra (Regular α) :=
   { Regular.lattice, Regular.boundedOrder, Regular.himp,
@@ -202,10 +184,6 @@ instance : BooleanAlgebra (Regular α) :=
           refine eq_of_forall_le_iff fun c => le_himp_iff.trans ?_
           rw [le_compl_iff_disjoint_right, disjoint_left_comm]
           rw [b.prop.disjoint_compl_left_iff]) }
-
-@[simp, norm_cast]
-theorem coe_sdiff (a b : Regular α) : (↑(a \ b) : α) = (a : α) ⊓ bᶜ :=
-  rfl
 
 end Regular
 

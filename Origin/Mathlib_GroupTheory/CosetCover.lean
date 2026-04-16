@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Complement
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 
+noncomputable section
+
 /-! # Lemma of B. H. Neumann on coverings of a group by cosets.
 
 Let the group $G$ be the union of finitely many, let us say $n$, left cosets

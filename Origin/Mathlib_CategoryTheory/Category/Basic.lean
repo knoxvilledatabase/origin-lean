@@ -9,6 +9,8 @@ import Mathlib.Tactic.PPWithUniv
 import Mathlib.Tactic.Common
 import Mathlib.Tactic.StacksAttribute
 
+noncomputable section
+
 /-!
 # Categories
 
@@ -29,8 +31,6 @@ local notation g ` ⊚ `:80 f:80 := category.comp f g    -- type as \oo
 ## Porting note
 I am experimenting with using the `aesop` tactic as a replacement for `tidy`.
 -/
-
-library_note "CategoryTheory universes"
 
 universe v u
 
@@ -81,11 +81,8 @@ macro (name := aesop_cat?) "aesop_cat?" c:Aesop.tactic_clause* : tactic =>
              (rule_sets := [$(Lean.mkIdent `CategoryTheory):ident]))
 
 macro (name := aesop_cat_nonterminal) "aesop_cat_nonterminal" c:Aesop.tactic_clause* : tactic =>
-
   `(tactic|
-
     aesop $c* (config := { introsTransparency? := some .default, warnOnNonterminal := false })
-
               (rule_sets := [$(Lean.mkIdent `CategoryTheory):ident]))
 
 attribute [aesop safe (rule_sets := [CategoryTheory])] Subsingleton.elim
@@ -253,5 +250,3 @@ example (D : Type u) [SmallCategory D] : LargeCategory (ULift.{u + 1} D) := by i
 end
 
 end CategoryTheory
-
-library_note "dsimp, simp"

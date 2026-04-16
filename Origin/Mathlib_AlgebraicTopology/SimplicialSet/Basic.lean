@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Yoneda
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Tactic.FinCases
 
+noncomputable section
+
 /-!
 # Simplicial sets
 
@@ -88,28 +90,14 @@ abbrev objMk {n : SimplexCategory} {m : SimplexCategoryᵒᵖ}
     (standardSimplex.{u}.obj n).obj m :=
   (objEquiv _ _).symm (Hom.mk f)
 
-lemma map_apply {m₁ m₂ : SimplexCategoryᵒᵖ} (f : m₁ ⟶ m₂) {n : SimplexCategory}
-    (x : (standardSimplex.{u}.obj n).obj m₁) :
-    (standardSimplex.{u}.obj n).map f x = (objEquiv _ _).symm (f.unop ≫ (objEquiv _ _) x) := by
-  rfl
-
 def _root_.SSet.yonedaEquiv (X : SSet.{u}) (n : SimplexCategory) :
     (standardSimplex.obj n ⟶ X) ≃ X.obj (op n) :=
   yonedaCompUliftFunctorEquiv X n
 
 def id (n : ℕ) : Δ[n] _[n] := yonedaEquiv Δ[n] [n] (𝟙 Δ[n])
 
-lemma id_eq_objEquiv_symm (n : ℕ) : id n = (objEquiv _ _).symm (𝟙 _) := rfl
-
-lemma objEquiv_id (n : ℕ) : objEquiv _ _ (id n) = 𝟙 _ := rfl
-
 def const (n : ℕ) (k : Fin (n+1)) (m : SimplexCategoryᵒᵖ) : Δ[n].obj m :=
   objMk (OrderHom.const _ k )
-
-@[simp]
-lemma const_down_toOrderHom (n : ℕ) (k : Fin (n+1)) (m : SimplexCategoryᵒᵖ) :
-    (const n k m).down.toOrderHom = OrderHom.const _ k :=
-  rfl
 
 def edge (n : ℕ) (a b : Fin (n+1)) (hab : a ≤ b) : Δ[n] _[1] := by
   refine objMk ⟨![a, b], ?_⟩
@@ -117,20 +105,12 @@ def edge (n : ℕ) (a b : Fin (n+1)) (hab : a ≤ b) : Δ[n] _[1] := by
   simp only [unop_op, len_mk, Fin.forall_fin_one]
   apply Fin.mk_le_mk.mpr hab
 
-lemma coe_edge_down_toOrderHom (n : ℕ) (a b : Fin (n+1)) (hab : a ≤ b) :
-    ↑(edge n a b hab).down.toOrderHom = ![a, b] :=
-  rfl
-
 def triangle {n : ℕ} (a b c : Fin (n+1)) (hab : a ≤ b) (hbc : b ≤ c) : Δ[n] _[2] := by
   refine objMk ⟨![a, b, c], ?_⟩
   rw [Fin.monotone_iff_le_succ]
   simp only [unop_op, len_mk, Fin.forall_fin_two]
   dsimp
   simp only [*, Matrix.tail_cons, Matrix.head_cons, true_and]
-
-lemma coe_triangle_down_toOrderHom {n : ℕ} (a b c : Fin (n+1)) (hab : a ≤ b) (hbc : b ≤ c) :
-    ↑(triangle a b c hab hbc).down.toOrderHom = ![a, b, c] :=
-  rfl
 
 end standardSimplex
 
@@ -152,6 +132,7 @@ def boundary (n : ℕ) : SSet.{u} where
 scoped[Simplicial] notation3 "∂Δ[" n "]" => SSet.boundary n
 
 set_option linter.unusedVariables false in
+/-- The inclusion of the boundary of the `n`-th standard simplex into that standard simplex. -/
 
 def boundaryInclusion (n : ℕ) : ∂Δ[n] ⟶ Δ[n] where app m (α : { α : Δ[n].obj m // _ }) := α
 
@@ -168,6 +149,7 @@ def horn (n : ℕ) (i : Fin (n + 1)) : SSet where
 scoped[Simplicial] notation3 "Λ[" n ", " i "]" => SSet.horn (n : ℕ) i
 
 set_option linter.unusedVariables false in
+/-- The inclusion of the `i`-th horn of the `n`-th standard simplex into that standard simplex. -/
 
 def hornInclusion (n : ℕ) (i : Fin (n + 1)) : Λ[n, i] ⟶ Δ[n] where
   app m (α : { α : Δ[n].obj m // _ }) := α
@@ -252,7 +234,6 @@ def face {n : ℕ} (i j : Fin (n+2)) (h : j ≠ i) : Λ[n+1, i] _[n] :=
       standardSimplex.objEquiv, asOrderHom, Equiv.ulift]⟩
 
 protected
-
 lemma hom_ext {n : ℕ} {i : Fin (n+2)} {S : SSet} (σ₁ σ₂ : Λ[n+1, i] ⟶ S)
     (h : ∀ (j) (h : j ≠ i), σ₁.app _ (face i j h) = σ₂.app _ (face i j h)) :
     σ₁ = σ₂ := by

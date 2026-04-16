@@ -8,6 +8,8 @@ import Mathlib.Topology.Compactness.Paracompact
 import Mathlib.Topology.EMetricSpace.Basic
 import Mathlib.SetTheory.Cardinal.Basic
 
+noncomputable section
+
 /-!
 # (Extended) metric spaces are paracompact
 

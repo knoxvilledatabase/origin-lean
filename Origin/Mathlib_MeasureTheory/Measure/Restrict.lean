@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Measure/Restrict.lean
-Genuine: 146 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
+Genuine: 148 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Comap
+
+noncomputable section
 
 /-!
 # Restricting a measure to a subset or a subtype
@@ -356,7 +358,10 @@ theorem restrict_sInf_eq_sInf_restrict {m0 : MeasurableSpace α} {m : Set (Measu
     Set.image_image _ toOuterMeasure, ← OuterMeasure.restrict_sInf_eq_sInf_restrict _ (hm.image _),
     OuterMeasure.restrict_apply]
 
--- DISSOLVED: exists_mem_of_measure_ne_zero_of_ae
+theorem exists_mem_of_measure_ne_zero_of_ae (hs : μ s ≠ 0) {p : α → Prop}
+    (hp : ∀ᵐ x ∂μ.restrict s, p x) : ∃ x, x ∈ s ∧ p x := by
+  rw [← μ.restrict_apply_self, ← frequently_ae_mem_iff] at hs
+  exact (hs.and_eventually hp).exists
 
 theorem QuasiMeasurePreserving.restrict {ν : Measure β} {f : α → β}
     (hf : QuasiMeasurePreserving f μ ν) {t : Set β} (hmaps : MapsTo f s t) :
@@ -474,12 +479,6 @@ theorem ae_restrict_biUnion_eq (s : ι → Set α) {t : Set ι} (ht : t.Countabl
 theorem ae_restrict_biUnion_finset_eq (s : ι → Set α) (t : Finset ι) :
     ae (μ.restrict (⋃ i ∈ t, s i)) = ⨆ i ∈ t, ae (μ.restrict (s i)) :=
   ae_restrict_biUnion_eq s t.countable_toSet
-
-theorem ae_restrict_iUnion_iff [Countable ι] (s : ι → Set α) (p : α → Prop) :
-    (∀ᵐ x ∂μ.restrict (⋃ i, s i), p x) ↔ ∀ i, ∀ᵐ x ∂μ.restrict (s i), p x := by simp
-
-theorem ae_restrict_union_iff (s t : Set α) (p : α → Prop) :
-    (∀ᵐ x ∂μ.restrict (s ∪ t), p x) ↔ (∀ᵐ x ∂μ.restrict s, p x) ∧ ∀ᵐ x ∂μ.restrict t, p x := by simp
 
 theorem ae_restrict_biUnion_iff (s : ι → Set α) {t : Set ι} (ht : t.Countable) (p : α → Prop) :
     (∀ᵐ x ∂μ.restrict (⋃ i ∈ t, s i), p x) ↔ ∀ i ∈ t, ∀ᵐ x ∂μ.restrict (s i), p x := by
@@ -617,7 +616,8 @@ lemma ae_restrict_le (hs : MeasurableSet s) : ae (μ.restrict s) ≤ ae μ :=
 theorem ae_restrict_eq_bot {s} : ae (μ.restrict s) = ⊥ ↔ μ s = 0 :=
   ae_eq_bot.trans restrict_eq_zero
 
--- DISSOLVED: ae_restrict_neBot
+theorem ae_restrict_neBot {s} : (ae <| μ.restrict s).NeBot ↔ μ s ≠ 0 :=
+  neBot_iff.trans ae_restrict_eq_bot.not
 
 theorem self_mem_ae_restrict {s} (hs : MeasurableSet s) : s ∈ ae (μ.restrict s) := by
   simp only [ae_restrict_eq hs, exists_prop, mem_principal, mem_inf_iff]

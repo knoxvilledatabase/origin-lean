@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Small.Defs
 import Mathlib.Logic.Equiv.TransferInstance
 
+noncomputable section
+
 /-!
 # Transfer group structures from `α` to `Shrink α`.
 -/

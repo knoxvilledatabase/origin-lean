@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Aut
 import Mathlib.Algebra.Group.Subgroup.Ker
 
+noncomputable section
+
 /-!
 # Semidirect product
 
@@ -54,8 +56,6 @@ variable {φ : G →* MulAut N}
 instance : Mul (SemidirectProduct N G φ) where
   mul a b := ⟨a.1 * φ a.2 b.1, a.2 * b.2⟩
 
-lemma mul_def (a b : SemidirectProduct N G φ) : a * b = ⟨a.1 * φ a.2 b.1, a.2 * b.2⟩ := rfl
-
 @[simp]
 theorem mul_left (a b : N ⋊[φ] G) : (a * b).left = a.left * φ a.right b.left := rfl
 
@@ -64,20 +64,8 @@ theorem mul_right (a b : N ⋊[φ] G) : (a * b).right = a.right * b.right := rfl
 
 instance : One (SemidirectProduct N G φ) where one := ⟨1, 1⟩
 
-@[simp]
-theorem one_left : (1 : N ⋊[φ] G).left = 1 := rfl
-
-@[simp]
-theorem one_right : (1 : N ⋊[φ] G).right = 1 := rfl
-
 instance : Inv (SemidirectProduct N G φ) where
   inv x := ⟨φ x.2⁻¹ x.1⁻¹, x.2⁻¹⟩
-
-@[simp]
-theorem inv_left (a : N ⋊[φ] G) : a⁻¹.left = φ a.right⁻¹ a.left⁻¹ := rfl
-
-@[simp]
-theorem inv_right (a : N ⋊[φ] G) : a⁻¹.right = a.right⁻¹ := rfl
 
 instance : Group (N ⋊[φ] G) where
   mul_assoc a b c := SemidirectProduct.ext (by simp [mul_assoc]) (by simp [mul_assoc])
@@ -96,9 +84,6 @@ def inl : N →* N ⋊[φ] G where
 @[simp]
 theorem left_inl (n : N) : (inl n : N ⋊[φ] G).left = n := rfl
 
-@[simp]
-theorem right_inl (n : N) : (inl n : N ⋊[φ] G).right = 1 := rfl
-
 theorem inl_injective : Function.Injective (inl : N → N ⋊[φ] G) :=
   Function.injective_iff_hasLeftInverse.2 ⟨left, left_inl⟩
 
@@ -110,9 +95,6 @@ def inr : G →* N ⋊[φ] G where
   toFun g := ⟨1, g⟩
   map_one' := rfl
   map_mul' := by intros; ext <;> simp
-
-@[simp]
-theorem left_inr (g : G) : (inr g : N ⋊[φ] G).left = 1 := rfl
 
 @[simp]
 theorem right_inr (g : G) : (inr g : N ⋊[φ] G).right = g := rfl
@@ -140,9 +122,6 @@ def rightHom : N ⋊[φ] G →* G where
   toFun := SemidirectProduct.right
   map_one' := rfl
   map_mul' _ _ := rfl
-
-@[simp]
-theorem rightHom_eq_right : (rightHom : N ⋊[φ] G → G) = right := rfl
 
 @[simp]
 theorem rightHom_comp_inl : (rightHom : N ⋊[φ] G →* G).comp inl = 1 := by ext; simp [rightHom]
@@ -219,15 +198,6 @@ def map (f₁ : N →* N₁) (f₂ : G →* G₁)
 
 variable (f₁ : N →* N₁) (f₂ : G →* G₁)
   (h : ∀ g : G, f₁.comp (φ g).toMonoidHom = (φ₁ (f₂ g)).toMonoidHom.comp f₁)
-
-@[simp]
-theorem map_left (g : N ⋊[φ] G) : (map f₁ f₂ h g).left = f₁ g.left := rfl
-
-@[simp]
-theorem map_right (g : N ⋊[φ] G) : (map f₁ f₂ h g).right = f₂ g.right := rfl
-
-@[simp]
-theorem rightHom_comp_map : rightHom.comp (map f₁ f₂ h) = f₂.comp rightHom := rfl
 
 @[simp]
 theorem map_inl (n : N) : map f₁ f₂ h (inl n) = inl (f₁ n) := by simp [map]

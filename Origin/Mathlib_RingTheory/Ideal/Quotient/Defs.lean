@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Quotient.Defs
 import Mathlib.RingTheory.Congruence.Defs
 import Mathlib.RingTheory.Ideal.Defs
 
+noncomputable section
+
 /-!
 # Ideal quotients
 
@@ -80,9 +82,6 @@ instance inhabited : Inhabited (R ⧸ I) :=
 protected theorem eq : mk I x = mk I y ↔ x - y ∈ I :=
   Submodule.Quotient.eq I
 
-@[simp]
-theorem mk_eq_mk (x : R) : (Submodule.Quotient.mk x : R ⧸ I) = mk I x := rfl
-
 theorem eq_zero_iff_mem {I : Ideal R} : mk I a = 0 ↔ a ∈ I :=
   Submodule.Quotient.mk_eq_zero _
 
@@ -141,11 +140,6 @@ def quotEquivOfEq {R : Type*} [CommRing R] {I J : Ideal R} (h : I = J) : R ⧸ I
     map_mul' := by
       rintro ⟨x⟩ ⟨y⟩
       rfl }
-
-@[simp]
-theorem quotEquivOfEq_mk {R : Type*} [CommRing R] {I J : Ideal R} (h : I = J) (x : R) :
-    quotEquivOfEq h (Ideal.Quotient.mk I x) = Ideal.Quotient.mk J x :=
-  rfl
 
 @[simp]
 theorem quotEquivOfEq_symm {R : Type*} [CommRing R] {I J : Ideal R} (h : I = J) :

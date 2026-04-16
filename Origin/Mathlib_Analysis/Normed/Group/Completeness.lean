@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Analysis.SpecificLimits.Basic
 
+noncomputable section
+
 /-!
 # Completeness of normed groups
 

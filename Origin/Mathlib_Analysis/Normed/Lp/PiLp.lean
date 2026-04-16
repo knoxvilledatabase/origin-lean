@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Normed/Lp/PiLp.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 3 | Infrastructure: 34
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Analysis.MeanInequalities
 import Mathlib.Data.Fintype.Order
 import Mathlib.LinearAlgebra.Matrix.Basis
 import Mathlib.Analysis.Normed.Lp.WithLp
+
+noncomputable section
 
 /-!
 # `L^p` distance on finite products of metric spaces
@@ -91,24 +93,12 @@ variable [∀ i, Module 𝕜 (β i)] (c : 𝕜)
 
 variable (x y : PiLp p β) (i : ι)
 
-@[simp, nolint simpNF]
-theorem zero_apply : (0 : PiLp p β) i = 0 :=
-  rfl
-
-@[simp]
-theorem add_apply : (x + y) i = x i + y i :=
-  rfl
-
 @[simp]
 theorem sub_apply : (x - y) i = x i - y i :=
   rfl
 
 @[simp]
 theorem smul_apply : (c • x) i = c • x i :=
-  rfl
-
-@[simp]
-theorem neg_apply : (-x) i = -x i :=
   rfl
 
 variable (p) in
@@ -121,15 +111,6 @@ end
 
 /-! Note that the unapplied versions of these lemmas are deliberately omitted, as they break
 the use of the type synonym. -/
-
-@[simp]
-theorem _root_.WithLp.equiv_pi_apply (x : PiLp p α) (i : ι) : WithLp.equiv p _ x i = x i :=
-  rfl
-
-@[simp]
-theorem  _root_.WithLp.equiv_symm_pi_apply (x : ∀ i, α i) (i : ι) :
-    (WithLp.equiv p _).symm x i = x i :=
-  rfl
 
 section DistNorm
 
@@ -155,7 +136,9 @@ instance : EDist (PiLp p β) where
 
 variable {β}
 
--- DISSOLVED: edist_eq_card
+theorem edist_eq_card (f g : PiLp 0 β) :
+    edist f g = {i | edist (f i) (g i) ≠ 0}.toFinite.toFinset.card :=
+  if_pos rfl
 
 theorem edist_eq_sum {p : ℝ≥0∞} (hp : 0 < p.toReal) (f g : PiLp p β) :
     edist f g = (∑ i, edist (f i) (g i) ^ p.toReal) ^ (1 / p.toReal) :=
@@ -198,7 +181,9 @@ instance : Dist (PiLp p α) where
 
 variable {α}
 
--- DISSOLVED: dist_eq_card
+theorem dist_eq_card (f g : PiLp 0 α) :
+    dist f g = {i | dist (f i) (g i) ≠ 0}.toFinite.toFinset.card :=
+  if_pos rfl
 
 theorem dist_eq_sum {p : ℝ≥0∞} (hp : 0 < p.toReal) (f g : PiLp p α) :
     dist f g = (∑ i, dist (f i) (g i) ^ p.toReal) ^ (1 / p.toReal) :=
@@ -220,7 +205,8 @@ instance instNorm : Norm (PiLp p β) where
 
 variable {p β}
 
--- DISSOLVED: norm_eq_card
+theorem norm_eq_card (f : PiLp 0 β) : ‖f‖ = {i | ‖f i‖ ≠ 0}.toFinite.toFinset.card :=
+  if_pos rfl
 
 theorem norm_eq_ciSup (f : PiLp ∞ β) : ‖f‖ = ⨆ i, ‖f i‖ := rfl
 
@@ -597,11 +583,6 @@ def _root_.LinearIsometryEquiv.piLpCongrLeft (e : ι ≃ ι') :
 variable {p 𝕜 E}
 
 @[simp]
-theorem _root_.LinearIsometryEquiv.piLpCongrLeft_apply (e : ι ≃ ι') (v : PiLp p fun _ : ι => E) :
-    LinearIsometryEquiv.piLpCongrLeft p 𝕜 E e v = Equiv.piCongrLeft' (fun _ : ι => E) e v :=
-  rfl
-
-@[simp]
 theorem _root_.LinearIsometryEquiv.piLpCongrLeft_symm (e : ι ≃ ι') :
     (LinearIsometryEquiv.piLpCongrLeft p 𝕜 E e).symm =
       LinearIsometryEquiv.piLpCongrLeft p 𝕜 E e.symm :=
@@ -641,23 +622,6 @@ protected def _root_.LinearIsometryEquiv.piLpCongrRight (e : ∀ i, α i ≃ₗ�
       simp only [PiLp.norm_eq_sum this, WithLp.equiv_symm_pi_apply, LinearEquiv.piCongrRight_apply,
         LinearIsometryEquiv.coe_toLinearEquiv, LinearIsometryEquiv.norm_map]
 
-@[simp]
-theorem _root_.LinearIsometryEquiv.piLpCongrRight_apply (e : ∀ i, α i ≃ₗᵢ[𝕜] β i) (x : PiLp p α) :
-    LinearIsometryEquiv.piLpCongrRight p e x =
-      (WithLp.equiv p _).symm (fun i => e i (x i)) :=
-  rfl
-
-@[simp]
-theorem _root_.LinearIsometryEquiv.piLpCongrRight_refl :
-    LinearIsometryEquiv.piLpCongrRight p (fun i => .refl 𝕜 (α i)) = .refl _ _ :=
-  rfl
-
-@[simp]
-theorem _root_.LinearIsometryEquiv.piLpCongrRight_symm (e : ∀ i, α i ≃ₗᵢ[𝕜] β i) :
-    (LinearIsometryEquiv.piLpCongrRight p e).symm =
-      LinearIsometryEquiv.piLpCongrRight p (fun i => (e i).symm) :=
-  rfl
-
 @[simp high]
 theorem _root_.LinearIsometryEquiv.piLpCongrRight_single (e : ∀ i, α i ≃ₗᵢ[𝕜] β i) [DecidableEq ι]
     (i : ι) (v : α i) :
@@ -692,19 +656,6 @@ def _root_.LinearIsometryEquiv.piLpCurry :
       simp_rw [PiLp.nnnorm_eq_sum hp, WithLp.equiv_symm_pi_apply]
       dsimp [Sigma.curry]
       simp_rw [one_div, NNReal.rpow_inv_rpow this.ne', ← Finset.univ_sigma_univ, Finset.sum_sigma]
-
-@[simp] theorem _root_.LinearIsometryEquiv.piLpCurry_apply
-    (f : PiLp p (fun i : Sigma κ => α i.1 i.2)) :
-    _root_.LinearIsometryEquiv.piLpCurry 𝕜 p α f =
-      (WithLp.equiv _ _).symm (fun i => (WithLp.equiv _ _).symm <|
-        Sigma.curry (WithLp.equiv _ _ f) i) :=
-  rfl
-
-@[simp] theorem _root_.LinearIsometryEquiv.piLpCurry_symm_apply
-    (f : PiLp p (fun i => PiLp p (α i))) :
-    (_root_.LinearIsometryEquiv.piLpCurry 𝕜 p α).symm f =
-      (WithLp.equiv _ _).symm (Sigma.uncurry fun i j => f i j) :=
-  rfl
 
 end piLpCurry
 
@@ -838,16 +789,8 @@ theorem basisFun_apply [DecidableEq ι] (i) :
   simp_rw [basisFun, Basis.coe_ofEquivFun, WithLp.linearEquiv_symm_apply]
 
 @[simp]
-theorem basisFun_repr (x : PiLp p fun _ : ι => 𝕜) (i : ι) : (basisFun p 𝕜 ι).repr x i = x i :=
-  rfl
-
-@[simp]
 theorem basisFun_equivFun : (basisFun p 𝕜 ι).equivFun = WithLp.linearEquiv p 𝕜 (ι → 𝕜) :=
   Basis.equivFun_ofEquivFun _
-
-theorem basisFun_eq_pi_basisFun :
-    basisFun p 𝕜 ι = (Pi.basisFun 𝕜 ι).map (WithLp.linearEquiv p 𝕜 (ι → 𝕜)).symm :=
-  rfl
 
 @[simp]
 theorem basisFun_map :

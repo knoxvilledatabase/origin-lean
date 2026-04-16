@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Projective
 import Mathlib.LinearAlgebra.Dimension.DivisionRing
 import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 
+noncomputable section
+
 /-!
 # The rank of a linear map
 

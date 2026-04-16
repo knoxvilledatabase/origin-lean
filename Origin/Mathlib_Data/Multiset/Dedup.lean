@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Multiset/Dedup.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.List.Dedup
 import Mathlib.Data.Multiset.Nodup
+
+noncomputable section
 
 /-!
 # Erasing duplicates in a multiset.
@@ -101,7 +103,10 @@ theorem dedup_map_dedup_eq [DecidableEq β] (f : α → β) (s : Multiset α) :
     dedup (map f (dedup s)) = dedup (map f s) := by
   simp [dedup_ext]
 
--- DISSOLVED: dedup_nsmul
+@[simp]
+theorem dedup_nsmul {s : Multiset α} {n : ℕ} (h0 : n ≠ 0) : (n • s).dedup = s.dedup := by
+  ext a
+  by_cases h : a ∈ s <;> simp [h, h0]
 
 theorem Nodup.le_dedup_iff_le {s t : Multiset α} (hno : s.Nodup) : s ≤ t.dedup ↔ s ≤ t := by
   simp [le_dedup, hno]
@@ -126,4 +131,8 @@ theorem _root_.List.Subset.dedup_append_left {s t : List α} (h : t ⊆ s) :
 
 end Multiset
 
--- DISSOLVED: Multiset.Nodup.le_nsmul_iff_le
+theorem Multiset.Nodup.le_nsmul_iff_le {α : Type*} {s t : Multiset α} {n : ℕ} (h : s.Nodup)
+    (hn : n ≠ 0) : s ≤ n • t ↔ s ≤ t := by
+  classical
+    rw [← h.le_dedup_iff_le, Iff.comm, ← h.le_dedup_iff_le]
+    simp [hn]

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.Sylow
 
+noncomputable section
+
 /-!
 # The Transfer Homomorphism
 
@@ -169,11 +171,6 @@ noncomputable def transferCenterPow [FiniteIndex (center G)] : G →* center G w
   map_mul' a b := by simp_rw [← show ∀ _, (_ : center G) = _ from transfer_center_eq_pow, map_mul]
 
 variable {G}
-
-@[simp]
-theorem transferCenterPow_apply [FiniteIndex (center G)] (g : G) :
-    ↑(transferCenterPow G g) = g ^ (center G).index :=
-  rfl
 
 section BurnsideTransfer
 

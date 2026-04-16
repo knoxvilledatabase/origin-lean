@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Function
 import Mathlib.Data.Set.Functor
 
+noncomputable section
+
 /-!
 # Sets in subtypes
 

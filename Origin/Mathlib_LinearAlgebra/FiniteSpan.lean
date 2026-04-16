@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.LinearAlgebra.Span.Defs
 import Mathlib.Algebra.Module.Equiv.Basic
 
+noncomputable section
+
 /-!
 
 # Additional results about finite spanning sets in linear algebra

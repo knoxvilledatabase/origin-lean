@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.ENat.Basic
 import Mathlib.Data.ENNReal.Basic
 
+noncomputable section
+
 /-!
 # Coercion from `ℕ∞` to `ℝ≥0∞`
 
@@ -26,10 +28,6 @@ variable {m n : ℕ∞}
 
 instance hasCoeENNReal : CoeTC ℕ∞ ℝ≥0∞ := ⟨toENNReal⟩
 
-@[simp]
-theorem map_coe_nnreal : WithTop.map ((↑) : ℕ → ℝ≥0) = ((↑) : ℕ∞ → ℝ≥0∞) :=
-  rfl
-
 @[simps! (config := .asFn)]
 def toENNRealOrderEmbedding : ℕ∞ ↪o ℝ≥0∞ :=
   Nat.castOrderEmbedding.withTopMap
@@ -37,19 +35,6 @@ def toENNRealOrderEmbedding : ℕ∞ ↪o ℝ≥0∞ :=
 @[simps! (config := .asFn)]
 def toENNRealRingHom : ℕ∞ →+* ℝ≥0∞ :=
   .withTopMap (Nat.castRingHom ℝ≥0) Nat.cast_injective
-
-@[simp, norm_cast]
-theorem toENNReal_top : ((⊤ : ℕ∞) : ℝ≥0∞) = ⊤ :=
-  rfl
-
-@[simp, norm_cast]
-theorem toENNReal_coe (n : ℕ) : ((n : ℕ∞) : ℝ≥0∞) = n :=
-  rfl
-
-@[simp, norm_cast]
-theorem toENNReal_ofNat (n : ℕ) [n.AtLeastTwo] :
-    ((no_index (OfNat.ofNat n : ℕ∞)) : ℝ≥0∞) = OfNat.ofNat n :=
-  rfl
 
 @[simp, norm_cast]
 theorem toENNReal_coe_eq_iff : (m : ℝ≥0∞) = (n : ℝ≥0∞) ↔ m = n :=

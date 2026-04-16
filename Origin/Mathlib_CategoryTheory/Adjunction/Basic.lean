@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Equivalence
 import Mathlib.CategoryTheory.Yoneda
 
+noncomputable section
+
 /-!
 # Adjunctions between functors
 
@@ -161,10 +163,6 @@ instance (L : C ⥤ D) [L.IsLeftAdjoint] : L.rightAdjoint.IsRightAdjoint :=
   (ofIsLeftAdjoint L).isRightAdjoint
 
 variable {X' X : C} {Y Y' : D}
-
-theorem homEquiv_id (X : C) : adj.homEquiv X _ (𝟙 _) = adj.unit.app X := by simp
-
-theorem homEquiv_symm_id (X : D) : (adj.homEquiv _ X).symm (𝟙 _) = adj.counit.app X := by simp
 
 theorem homEquiv_naturality_left_symm (f : X' ⟶ X) (g : X ⟶ G.obj Y) :
     (adj.homEquiv X' Y).symm (f ≫ g) = F.map f ≫ (adj.homEquiv X Y).symm g := by

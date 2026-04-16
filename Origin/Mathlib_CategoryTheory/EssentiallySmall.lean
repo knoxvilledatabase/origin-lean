@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Skeletal
 import Mathlib.Logic.UnivLE
 import Mathlib.Logic.Small.Basic
 
+noncomputable section
+
 /-!
 # Essentially small categories.
 
@@ -113,14 +115,6 @@ def toShrinkHoms {C' : Type*} (X : C') : ShrinkHoms C' :=
 
 def fromShrinkHoms {C' : Type*} (X : ShrinkHoms C') : C' :=
   X
-
-@[simp]
-theorem to_from (X : C') : fromShrinkHoms (toShrinkHoms X) = X :=
-  rfl
-
-@[simp]
-theorem from_to (X : ShrinkHoms C') : toShrinkHoms (fromShrinkHoms X) = X :=
-  rfl
 
 end
 

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Endomorphism
 import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.GroupTheory.Perm.Basic
 
+noncomputable section
+
 /-!
 # Category instances for Group, AddGroup, CommGroup, and AddCommGroup.
 
@@ -58,17 +60,6 @@ instance {X Y : Grp} : CoeFun (X ⟶ Y) fun _ => X → Y where
 instance instFunLike (X Y : Grp) : FunLike (X ⟶ Y) X Y :=
   show FunLike (X →* Y) X Y from inferInstance
 
-@[to_additive (attr := simp)]
-lemma coe_id {X : Grp} : (𝟙 X : X → X) = id := rfl
-
-@[to_additive (attr := simp)]
-lemma coe_comp {X Y Z : Grp} {f : X ⟶ Y} {g : Y ⟶ Z} : (f ≫ g : X → Z) = g ∘ f := rfl
-
-@[to_additive]
-lemma comp_def {X Y Z : Grp} {f : X ⟶ Y} {g : Y ⟶ Z} : f ≫ g = g.comp f := rfl
-
-@[simp] lemma forget_map {X Y : Grp} (f : X ⟶ Y) : (forget Grp).map f = (f : X → Y) := rfl
-
 @[to_additive (attr := ext)]
 lemma ext {X Y : Grp} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
   MonoidHom.ext w
@@ -76,22 +67,6 @@ lemma ext {X Y : Grp} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
 @[to_additive]
 def of (X : Type u) [Group X] : Grp :=
   Bundled.of X
-
-@[to_additive (attr := simp)]
-theorem coe_of (R : Type u) [Group R] : ↑(Grp.of R) = R :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_comp' {G H K : Type _} [Group G] [Group H] [Group K] (f : G →* H) (g : H →* K) :
-    @DFunLike.coe (G →* K) G (fun _ ↦ K) MonoidHom.instFunLike (CategoryStruct.comp
-      (X := Grp.of G) (Y := Grp.of H) (Z := Grp.of K) f g) = g ∘ f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_id' {G : Type _} [Group G] :
-    @DFunLike.coe (G →* G) G (fun _ ↦ G) MonoidHom.instFunLike
-      (CategoryStruct.id (X := Grp.of G)) = id :=
-  rfl
 
 @[to_additive]
 instance : Inhabited Grp :=
@@ -107,18 +82,9 @@ instance : Coe Grp.{u} MonCat.{u} where coe := (forget₂ Grp MonCat).obj
 @[to_additive]
 instance (G H : Grp) : One (G ⟶ H) := (inferInstance : One (MonoidHom G H))
 
-@[to_additive (attr := simp)]
-theorem one_apply (G H : Grp) (g : G) : ((1 : G ⟶ H) : G → H) g = 1 :=
-  rfl
-
 @[to_additive]
 def ofHom {X Y : Type u} [Group X] [Group Y] (f : X →* Y) : of X ⟶ of Y :=
   f
-
-@[to_additive]
-theorem ofHom_apply {X Y : Type _} [Group X] [Group Y] (f : X →* Y) (x : X) :
-    (ofHom f) x = f x :=
-  rfl
 
 @[to_additive]
 instance ofUnique (G : Type*) [Group G] [i : Unique G] : Unique (Grp.of G) := i
@@ -171,20 +137,6 @@ instance {X Y : CommGrp} : CoeFun (X ⟶ Y) fun _ => X → Y where
 instance instFunLike (X Y : CommGrp) : FunLike (X ⟶ Y) X Y :=
   show FunLike (X →* Y) X Y from inferInstance
 
-@[to_additive (attr := simp)]
-lemma coe_id {X : CommGrp} : (𝟙 X : X → X) = id := rfl
-
-@[to_additive (attr := simp)]
-lemma coe_comp {X Y Z : CommGrp} {f : X ⟶ Y} {g : Y ⟶ Z} : (f ≫ g : X → Z) = g ∘ f := rfl
-
-@[to_additive]
-lemma comp_def {X Y Z : CommGrp} {f : X ⟶ Y} {g : Y ⟶ Z} : f ≫ g = g.comp f := rfl
-
-@[to_additive (attr := simp)]
-lemma forget_map {X Y : CommGrp} (f : X ⟶ Y) :
-    (forget CommGrp).map f = (f : X → Y) :=
-  rfl
-
 @[to_additive (attr := ext)]
 lemma ext {X Y : CommGrp} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
   MonoidHom.ext w
@@ -196,23 +148,6 @@ def of (G : Type u) [CommGroup G] : CommGrp :=
 @[to_additive]
 instance : Inhabited CommGrp :=
   ⟨CommGrp.of PUnit⟩
-
-@[to_additive (attr := simp)]
-theorem coe_of (R : Type u) [CommGroup R] : (CommGrp.of R : Type u) = R :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_comp' {G H K : Type _} [CommGroup G] [CommGroup H] [CommGroup K]
-    (f : G →* H) (g : H →* K) :
-    @DFunLike.coe (G →* K) G (fun _ ↦ K) MonoidHom.instFunLike (CategoryStruct.comp
-      (X := CommGrp.of G) (Y := CommGrp.of H) (Z := CommGrp.of K) f g) = g ∘ f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coe_id' {G : Type _} [CommGroup G] :
-    @DFunLike.coe (G →* G) G (fun _ ↦ G) MonoidHom.instFunLike
-      (CategoryStruct.id (X := CommGrp.of G)) = id :=
-  rfl
 
 @[to_additive]
 instance ofUnique (G : Type*) [CommGroup G] [i : Unique G] : Unique (CommGrp.of G) :=
@@ -235,18 +170,9 @@ instance : Coe CommGrp.{u} CommMonCat.{u} where coe := (forget₂ CommGrp CommMo
 @[to_additive]
 instance (G H : CommGrp) : One (G ⟶ H) := (inferInstance : One (MonoidHom G H))
 
-@[to_additive (attr := simp)]
-theorem one_apply (G H : CommGrp) (g : G) : ((1 : G ⟶ H) : G → H) g = 1 :=
-  rfl
-
 @[to_additive]
 def ofHom {X Y : Type u} [CommGroup X] [CommGroup Y] (f : X →* Y) : of X ⟶ of Y :=
   f
-
-@[to_additive (attr := simp)]
-theorem ofHom_apply {X Y : Type _} [CommGroup X] [CommGroup Y] (f : X →* Y) (x : X) :
-    @DFunLike.coe (X →* Y) X (fun _ ↦ Y) _ (ofHom f) x = f x :=
-  rfl
 
 example {R S : CommGrp} (i : R ⟶ S) (r : R) (h : r = 1) : i r = 1 := by simp [h]
 
@@ -265,11 +191,6 @@ namespace AddCommGrp
 
 def asHom {G : AddCommGrp.{0}} (g : G) : AddCommGrp.of ℤ ⟶ G :=
   zmultiplesHom G g
-
-@[simp]
-theorem asHom_apply {G : AddCommGrp.{0}} (g : G) (i : ℤ) :
-    @DFunLike.coe (ℤ →+ ↑G) ℤ (fun _ ↦ ↑G) _ (asHom g) i = i • g :=
-  rfl
 
 theorem asHom_injective {G : AddCommGrp.{0}} : Function.Injective (@asHom G) := fun h k w => by
   convert congr_arg (fun k : AddCommGrp.of ℤ ⟶ G => (k : ℤ → G) (1 : ℤ)) w <;> simp

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.Algebra.Group.ULift
 import Mathlib.CategoryTheory.Yoneda
 
+noncomputable section
+
 /-!
 # The forget functor is corepresentable
 

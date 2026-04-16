@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Functor/KanExtension/Basic.lean
-Genuine: 74 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.Equivalence
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
+
+noncomputable section
 
 /-!
 # Kan extensions
@@ -406,7 +408,6 @@ def rightExtensionEquivalenceOfIso₁ : RightExtension L F ≌ RightExtension L'
   CostructuredArrow.mapNatIso ((whiskeringLeft C D H).mapIso iso₁)
 
 include iso₁ in
-
 lemma hasRightExtension_iff_of_iso₁ : HasRightKanExtension L F ↔ HasRightKanExtension L' F :=
   (rightExtensionEquivalenceOfIso₁ iso₁ F).hasTerminal_iff
 
@@ -414,7 +415,6 @@ def leftExtensionEquivalenceOfIso₁ : LeftExtension L F ≌ LeftExtension L' F 
   StructuredArrow.mapNatIso ((whiskeringLeft C D H).mapIso iso₁)
 
 include iso₁ in
-
 lemma hasLeftExtension_iff_of_iso₁ : HasLeftKanExtension L F ↔ HasLeftKanExtension L' F :=
   (leftExtensionEquivalenceOfIso₁ iso₁ F).hasInitial_iff
 
@@ -428,7 +428,6 @@ def rightExtensionEquivalenceOfIso₂ : RightExtension L F ≌ RightExtension L 
   CostructuredArrow.mapIso iso₂
 
 include iso₂ in
-
 lemma hasRightExtension_iff_of_iso₂ : HasRightKanExtension L F ↔ HasRightKanExtension L F' :=
   (rightExtensionEquivalenceOfIso₂ L iso₂).hasTerminal_iff
 
@@ -436,7 +435,6 @@ def leftExtensionEquivalenceOfIso₂ : LeftExtension L F ≌ LeftExtension L F' 
   StructuredArrow.mapIso iso₂
 
 include iso₂ in
-
 lemma hasLeftExtension_iff_of_iso₂ : HasLeftKanExtension L F ↔ HasLeftKanExtension L F' :=
   (leftExtensionEquivalenceOfIso₂ L iso₂).hasInitial_iff
 

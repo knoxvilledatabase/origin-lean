@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.Sylow
 import Mathlib.Algebra.Group.Subgroup.Order
 import Mathlib.GroupTheory.Commutator.Finite
 
+noncomputable section
+
 /-!
 
 # Nilpotent groups
@@ -90,9 +92,6 @@ def upperCentralSeriesStep : Subgroup G where
     specialize hx y⁻¹
     rw [mul_assoc, inv_inv] at hx ⊢
     exact Subgroup.Normal.mem_comm inferInstance hx
-
-theorem mem_upperCentralSeriesStep (x : G) :
-    x ∈ upperCentralSeriesStep H ↔ ∀ y, x * y * x⁻¹ * y⁻¹ ∈ H := Iff.rfl
 
 open QuotientGroup
 
@@ -263,12 +262,6 @@ def lowerCentralSeries (G : Type*) [Group G] : ℕ → Subgroup G
   | n + 1 => ⁅lowerCentralSeries G n, ⊤⁆
 
 variable {G}
-
-@[simp]
-theorem lowerCentralSeries_zero : lowerCentralSeries G 0 = ⊤ := rfl
-
-@[simp]
-theorem lowerCentralSeries_one : lowerCentralSeries G 1 = commutator G := rfl
 
 theorem mem_lowerCentralSeries_succ_iff (n : ℕ) (q : G) :
     q ∈ lowerCentralSeries G (n + 1) ↔

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.Limits.Creates
 
+noncomputable section
+
 /-!
 # Adjunctions and limits
 
@@ -66,6 +68,11 @@ def functorialityAdjunction : Cocones.functoriality K F ⊣ functorialityRightAd
   counit := functorialityCounit adj K
 
 include adj in
+/-- A left adjoint preserves colimits.
+
+See <https://stacks.math.columbia.edu/tag/0038>.
+
+-/
 
 lemma leftAdjoint_preservesColimits : PreservesColimitsOfSize.{v, u} F where
   preservesColimitsOfShape :=
@@ -76,12 +83,12 @@ lemma leftAdjoint_preservesColimits : PreservesColimitsOfSize.{v, u} F where
                 ((adj.functorialityAdjunction _).homEquiv _ _)⟩ } }
 
 include adj in
+@[deprecated "No deprecation message was provided." (since := "2024-11-19")]
 
 lemma leftAdjointPreservesColimits : PreservesColimitsOfSize.{v, u} F :=
   adj.leftAdjoint_preservesColimits
 
 noncomputable
-
 instance colim_preservesColimits [HasColimitsOfShape J C] :
     PreservesColimits (colim (J := J) (C := C)) :=
   colimConstAdj.leftAdjoint_preservesColimits
@@ -167,6 +174,11 @@ def functorialityAdjunction' : functorialityLeftAdjoint adj K ⊣ Cones.functori
   counit := functorialityCounit' adj K
 
 include adj in
+/-- A right adjoint preserves limits.
+
+See <https://stacks.math.columbia.edu/tag/0038>.
+
+-/
 
 lemma rightAdjoint_preservesLimits : PreservesLimitsOfSize.{v, u} G where
   preservesLimitsOfShape :=
@@ -177,6 +189,7 @@ lemma rightAdjoint_preservesLimits : PreservesLimitsOfSize.{v, u} G where
                 ((adj.functorialityAdjunction' _).homEquiv _ _).symm⟩ } }
 
 include adj in
+@[deprecated "No deprecation message was provided." (since := "2024-11-19")]
 
 lemma rightAdjointPreservesLimits : PreservesLimitsOfSize.{v, u} G :=
   adj.rightAdjoint_preservesLimits

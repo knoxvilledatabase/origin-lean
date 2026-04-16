@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Kaehler.Polynomial
 import Mathlib.RingTheory.Kaehler.CotangentComplex
 import Mathlib.RingTheory.Presentation
 
+noncomputable section
+
 /-!
 # Presentation of the module of differentials
 

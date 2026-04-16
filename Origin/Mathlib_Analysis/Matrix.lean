@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Lp.PiLp
 import Mathlib.Analysis.InnerProductSpace.PiL2
 
+noncomputable section
+
 /-!
 # Matrices as a normed space
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Field.InjSurj
 import Mathlib.Algebra.Order.Nonneg.Ring
 import Mathlib.Data.Nat.Cast.Order.Ring
 
+noncomputable section
+
 /-!
 # Semifield structure on the type of nonnegative elements
 
@@ -50,21 +52,11 @@ instance inv : Inv { x : α // 0 ≤ x } :=
 protected theorem coe_inv (a : { x : α // 0 ≤ x }) : ((a⁻¹ : { x : α // 0 ≤ x }) : α) = (a : α)⁻¹ :=
   rfl
 
-@[simp]
-theorem inv_mk (hx : 0 ≤ x) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x })⁻¹ = ⟨x⁻¹, inv_nonneg.2 hx⟩ :=
-  rfl
-
 instance div : Div { x : α // 0 ≤ x } :=
   ⟨fun x y => ⟨x / y, div_nonneg x.2 y.2⟩⟩
 
 @[simp, norm_cast]
 protected theorem coe_div (a b : { x : α // 0 ≤ x }) : ((a / b : { x : α // 0 ≤ x }) : α) = a / b :=
-  rfl
-
-@[simp]
-theorem mk_div_mk (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x }) / ⟨y, hy⟩ = ⟨x / y, div_nonneg hx hy⟩ :=
   rfl
 
 instance zpow : Pow { x : α // 0 ≤ x } ℤ :=
@@ -75,11 +67,6 @@ protected theorem coe_zpow (a : { x : α // 0 ≤ x }) (n : ℤ) :
     ((a ^ n : { x : α // 0 ≤ x }) : α) = (a : α) ^ n :=
   rfl
 
-@[simp]
-theorem mk_zpow (hx : 0 ≤ x) (n : ℤ) :
-    (⟨x, hx⟩ : { x : α // 0 ≤ x }) ^ n = ⟨x ^ n, zpow_nonneg hx n⟩ :=
-  rfl
-
 instance instNNRatCast : NNRatCast {x : α // 0 ≤ x} := ⟨fun q ↦ ⟨q, q.cast_nonneg⟩⟩
 
 instance instNNRatSMul : SMul ℚ≥0 {x : α // 0 ≤ x} where
@@ -87,14 +74,8 @@ instance instNNRatSMul : SMul ℚ≥0 {x : α // 0 ≤ x} where
 
 @[simp, norm_cast] lemma coe_nnratCast (q : ℚ≥0) : (q : {x : α // 0 ≤ x}) = (q : α) := rfl
 
-@[simp] lemma mk_nnratCast (q : ℚ≥0) : (⟨q, q.cast_nonneg⟩ : {x : α // 0 ≤ x}) = q := rfl
-
 @[simp, norm_cast] lemma coe_nnqsmul (q : ℚ≥0) (a : {x : α // 0 ≤ x}) :
     ↑(q • a) = (q • a : α) := rfl
-
-@[simp] lemma mk_nnqsmul (q : ℚ≥0) (a : α) (ha : 0 ≤ a) :
-    (⟨q • a, by rw [NNRat.smul_def]; exact mul_nonneg q.cast_nonneg ha⟩ : {x : α // 0 ≤ x}) =
-      q • a := rfl
 
 instance linearOrderedSemifield : LinearOrderedSemifield { x : α // 0 ≤ x } :=
   Subtype.coe_injective.linearOrderedSemifield _ Nonneg.coe_zero Nonneg.coe_one Nonneg.coe_add

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Group/Support.lean
-Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Prod
 import Mathlib.Order.Cover
+
+noncomputable section
 
 /-!
 # Support of a function
@@ -23,11 +25,8 @@ section One
 
 variable [One M] [One N] [One P]
 
--- DISSOLVED: mulSupport
-
-@[to_additive]
-theorem mulSupport_eq_preimage (f : α → M) : mulSupport f = f ⁻¹' {1}ᶜ :=
-  rfl
+@[to_additive "`support` of a function is the set of points `x` such that `f x ≠ 0`."]
+def mulSupport (f : α → M) : Set α := {x | f x ≠ 1}
 
 @[to_additive]
 theorem nmem_mulSupport {f : α → M} {x : α} : x ∉ mulSupport f ↔ f x = 1 :=
@@ -63,7 +62,10 @@ theorem ext_iff_mulSupport {f g : α → M} :
     if hx : x ∈ f.mulSupport then exact h₂ x hx
     else rw [nmem_mulSupport.1 hx, nmem_mulSupport.1 (mt (Set.ext_iff.1 h₁ x).2 hx)]⟩
 
--- DISSOLVED: mulSupport_update_of_ne_one
+@[to_additive]
+theorem mulSupport_update_of_ne_one [DecidableEq α] (f : α → M) (x : α) {y : M} (hy : y ≠ 1) :
+    mulSupport (update f x y) = insert x (mulSupport f) := by
+  ext a; rcases eq_or_ne a x with rfl | hne <;> simp [*]
 
 @[to_additive]
 theorem mulSupport_update_one [DecidableEq α] (f : α → M) (x : α) :
@@ -254,9 +256,6 @@ open Function
 @[to_additive]
 theorem mulSupport_mulSingle_subset : mulSupport (mulSingle a b) ⊆ {a} := fun _ hx =>
   by_contra fun hx' => hx <| mulSingle_eq_of_ne hx' _
-
-@[to_additive]
-theorem mulSupport_mulSingle_one : mulSupport (mulSingle a (1 : B)) = ∅ := by simp
 
 @[to_additive (attr := simp)]
 theorem mulSupport_mulSingle_of_ne (h : b ≠ 1) : mulSupport (mulSingle a b) = {a} :=

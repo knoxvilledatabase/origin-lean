@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Fourier.Inversion
 import Mathlib.Analysis.MellinTransform
 
+noncomputable section
+
 /-!
 # Mellin inversion formula
 

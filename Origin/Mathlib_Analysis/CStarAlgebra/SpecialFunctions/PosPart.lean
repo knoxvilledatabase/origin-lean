@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.PosPart
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
 
+noncomputable section
+
 /-! # C⋆-algebraic facts about `a⁺` and `a⁻`. -/
 
 variable {A : Type*} [NonUnitalCStarAlgebra A] [PartialOrder A] [StarOrderedRing A]

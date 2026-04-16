@@ -5,6 +5,8 @@ Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Comon_
 
+noncomputable section
+
 /-!
 # The category of bimonoids in a braided monoidal category.
 
@@ -77,24 +79,12 @@ instance : Category (Bimon_ C) := inferInstanceAs (Category (Comon_ (Mon_ C)))
 @[ext] lemma ext {X Y : Bimon_ C} {f g : X ⟶ Y} (w : f.hom.hom = g.hom.hom) : f = g :=
   Comon_.Hom.ext (Mon_.Hom.ext w)
 
-@[simp] theorem id_hom' (M : Bimon_ C) : Comon_.Hom.hom (𝟙 M) = 𝟙 M.X := rfl
-
-@[simp]
-theorem comp_hom' {M N K : Bimon_ C} (f : M ⟶ N) (g : N ⟶ K) : (f ≫ g).hom = f.hom ≫ g.hom :=
-  rfl
-
 abbrev toMon_ : Bimon_ C ⥤ Mon_ C := Comon_.forget (Mon_ C)
 
 def forget : Bimon_ C ⥤ C := toMon_ C ⋙ Mon_.forget C
 
-@[simp]
-theorem toMon_forget : toMon_ C ⋙ Mon_.forget C = forget C := rfl
-
 @[simps!]
 def toComon_ : Bimon_ C ⥤ Comon_ C := (Mon_.forget C).mapComon
-
-@[simp]
-theorem toComon_forget : toComon_ C ⋙ Comon_.forget C = forget C := rfl
 
 def toMon_Comon_obj (M : Bimon_ C) : Mon_ (Comon_ C) where
   X := (toComon_ C).obj M
@@ -180,11 +170,6 @@ theorem mul_counit (M : Bimon_ C) :
     M.comul.hom ≫ (M.X.X ◁ M.comul.hom) =
       M.comul.hom ≫ (M.comul.hom ▷ M.X.X) ≫ (α_ M.X.X M.X.X M.X.X).hom := by
   simpa [- Comon_.comul_assoc] using congr_arg Mon_.Hom.hom M.comul_assoc
-
-@[reassoc] theorem comul_assoc_flip_hom (M : Bimon_ C) :
-    M.comul.hom ≫ (M.comul.hom ▷ M.X.X) =
-      M.comul.hom ≫ (M.X.X ◁ M.comul.hom) ≫ (α_ M.X.X M.X.X M.X.X).inv := by
-  simp
 
 @[reassoc] theorem hom_comul_hom {M N : Bimon_ C} (f : M ⟶ N) :
     f.hom.hom ≫ N.comul.hom = M.comul.hom ≫ (f.hom.hom ⊗ f.hom.hom) := by

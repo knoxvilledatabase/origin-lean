@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Group/Conj.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Aut
 import Mathlib.Algebra.Group.Semiconj.Units
+
+noncomputable section
 
 /-!
 # Conjugacy of group elements
@@ -130,9 +132,6 @@ theorem mk_eq_mk_iff_isConj {a b : α} : ConjClasses.mk a = ConjClasses.mk b ↔
 theorem quotient_mk_eq_mk (a : α) : ⟦a⟧ = ConjClasses.mk a :=
   rfl
 
-theorem quot_mk_eq_mk (a : α) : Quot.mk Setoid.r a = ConjClasses.mk a :=
-  rfl
-
 theorem forall_isConj {p : ConjClasses α → Prop} : (∀ a, p a) ↔ ∀ a, p (ConjClasses.mk a) :=
   Iff.intro (fun h _ => h _) fun h a => Quotient.inductionOn a h
 
@@ -141,9 +140,6 @@ theorem mk_surjective : Function.Surjective (@ConjClasses.mk α _) :=
 
 instance : One (ConjClasses α) :=
   ⟨⟦1⟧⟩
-
-theorem one_eq_mk_one : (1 : ConjClasses α) = ConjClasses.mk 1 :=
-  rfl
 
 theorem exists_rep (a : ConjClasses α) : ∃ a0 : α, ConjClasses.mk a0 = a :=
   Quot.exists_rep a
@@ -157,53 +153,6 @@ theorem map_surjective {f : α →* β} (hf : Function.Surjective f) :
   obtain ⟨b, rfl⟩ := ConjClasses.mk_surjective b
   obtain ⟨a, rfl⟩ := hf b
   exact ⟨ConjClasses.mk a, rfl⟩
-
-library_note "slow-failing instance priority"/--
-
-Certain instances trigger further searches when they are considered as candidate instances;
-
-these instances should be assigned a priority lower than the default of 1000 (for example, 900).
-
-The conditions for this rule are as follows:
-
- * a class `C` has instances `instT : C T` and `instT' : C T'`
- * types `T` and `T'` are both specializations of another type `S`
- * the parameters supplied to `S` to produce `T` are not (fully) determined by `instT`,
-   instead they have to be found by instance search
-
-If those conditions hold, the instance `instT` should be assigned lower priority.
-
-For example, suppose the search for an instance of `DecidableEq (Multiset α)` tries the
-
-candidate instance `Con.quotient.decidableEq (c : Con M) : decidableEq c.quotient`.
-
-Since `Multiset` and `Con.quotient` are both quotient types, unification will check
-
-that the relations `List.perm` and `c.toSetoid.r` unify. However, `c.toSetoid` depends on
-
-a `Mul M` instance, so this unification triggers a search for `Mul (List α)`;
-
-this will traverse all subclasses of `Mul` before failing.
-
-On the other hand, the search for an instance of `DecidableEq (Con.quotient c)` for `c : Con M`
-
-can quickly reject the candidate instance `Multiset.decidableEq` because the type of
-
-`List.perm : List ?m_1 → List ?m_1 → Prop` does not unify with `M → M → Prop`.
-
-Therefore, we should assign `Con.quotient.decidableEq` a lower priority because it fails slowly.
-
-(In terms of the rules above, `C := DecidableEq`, `T := Con.quotient`,
-
-`instT := Con.quotient.decidableEq`, `T' := Multiset`, `instT' := Multiset.decidableEq`,
-
-and `S := Quot`.)
-
-If the type involved is a free variable (rather than an instantiation of some type `S`),
-
-the instance priority should be even lower, see Note [lower instance priority].
-
--/
 
 instance (priority := 900) [DecidableRel (IsConj : α → α → Prop)] : DecidableEq (ConjClasses α) :=
   inferInstanceAs <| DecidableEq <| Quotient (IsConj.setoid α)

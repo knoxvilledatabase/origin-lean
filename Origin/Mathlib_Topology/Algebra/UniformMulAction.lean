@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Opposite
 import Mathlib.Topology.UniformSpace.Completion
 import Mathlib.Topology.Algebra.UniformGroup.Defs
 
+noncomputable section
+
 /-!
 # Multiplicative action on the completion of a uniform space
 
@@ -152,10 +154,6 @@ variable [SMul M X]
 @[to_additive]
 noncomputable instance : SMul M (Completion X) :=
   ⟨fun c => Completion.map (c • ·)⟩
-
-@[to_additive]
-theorem smul_def (c : M) (x : Completion X) : c • x = Completion.map (c • ·) x :=
-  rfl
 
 @[to_additive]
 instance : UniformContinuousConstSMul M (Completion X) :=

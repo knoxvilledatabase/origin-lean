@@ -7,6 +7,8 @@ import Mathlib.Topology.Category.TopCat.Basic
 import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 
+noncomputable section
+
 /-!
 # The category of topological spaces has all limits and colimits
 

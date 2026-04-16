@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Multiequalizer
 
+noncomputable section
+
 /-!
 # Ends and coends
 
@@ -57,9 +59,6 @@ variable (pt : C) (π : ∀ (j : J), pt ⟶ (F.obj (op j)).obj j)
 @[simps! pt]
 abbrev mk : Wedge F :=
   Multifork.ofι _ pt π (fun f ↦ hπ f.hom)
-
-@[simp]
-lemma mk_ι (j : J) : (mk pt π hπ).ι j = π j := rfl
 
 end Constructor
 

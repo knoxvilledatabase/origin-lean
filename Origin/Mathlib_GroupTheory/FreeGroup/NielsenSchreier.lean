@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.Quiver.Arborescence
 import Mathlib.Combinatorics.Quiver.ConnectedComponent
 import Mathlib.GroupTheory.FreeGroup.IsFreeGroup
 
+noncomputable section
+
 /-!
 # The Nielsen-Schreier theorem
 
@@ -80,6 +82,15 @@ theorem ext_functor {G} [Groupoid.{v} G] [IsFreeGroupoid G] {X : Type v} [Group 
   _root_.trans (u _ h) (u _ fun _ _ _ => rfl).symm
 
 set_option linter.unusedVariables false in
+/-- An action groupoid over a free group is free. More generally, one could show that the groupoid
+
+of elements over a free groupoid is free, but this version is easier to prove and suffices for our
+
+purposes.
+
+Analogous to the fact that a covering space of a graph is a graph. (A free groupoid is like a graph,
+
+and a groupoid of elements is like a covering space.) -/
 
 instance actionGroupoidIsFree {G A : Type u} [Group G] [IsFreeGroup G] [MulAction G A] :
     IsFreeGroupoid (ActionCategory G A) where

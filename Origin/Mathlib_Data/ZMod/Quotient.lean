@@ -1,6 +1,6 @@
 /-
 Extracted from Data/ZMod/Quotient.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags
@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Int.Basic
 import Mathlib.RingTheory.ZMod
+
+noncomputable section
 
 /-!
 # `ZMod n` and quotient groups / rings
@@ -97,11 +99,6 @@ noncomputable def zmultiplesQuotientStabilizerEquiv :
             induction_on q fun ⟨_, n, rfl⟩ => ⟨n, rfl⟩⟩).symm.trans
     (Int.quotientZMultiplesNatEquivZMod (minimalPeriod (a +ᵥ ·) b))
 
-theorem zmultiplesQuotientStabilizerEquiv_symm_apply (n : ZMod (minimalPeriod (a +ᵥ ·) b)) :
-    (zmultiplesQuotientStabilizerEquiv a b).symm n =
-      (cast n : ℤ) • (⟨a, mem_zmultiples a⟩ : zmultiples a) :=
-  rfl
-
 end AddAction
 
 namespace MulAction
@@ -114,10 +111,6 @@ noncomputable def zpowersQuotientStabilizerEquiv :
     zpowers a ⧸ stabilizer (zpowers a) b ≃* Multiplicative (ZMod (minimalPeriod (a • ·) b)) :=
   letI f := zmultiplesQuotientStabilizerEquiv (Additive.ofMul a) b
   AddEquiv.toMultiplicative f
-
-theorem zpowersQuotientStabilizerEquiv_symm_apply (n : ZMod (minimalPeriod (a • ·) b)) :
-    (zpowersQuotientStabilizerEquiv a b).symm n = (⟨a, mem_zpowers a⟩ : zpowers a) ^ (cast n : ℤ) :=
-  rfl
 
 noncomputable def orbitZPowersEquiv : orbit (zpowers a) b ≃ ZMod (minimalPeriod (a • ·) b) :=
   (orbitEquivQuotientStabilizer _ b).trans (zpowersQuotientStabilizerEquiv a b).toEquiv
@@ -193,6 +186,7 @@ lemma finite_zpowers : (zpowers a : Set α).Finite ↔ IsOfFinOrder a := by
 @[to_additive (attr := simp)]
 lemma infinite_zpowers : (zpowers a : Set α).Infinite ↔ ¬IsOfFinOrder a := finite_zpowers.not
 
+@[to_additive]
 protected alias ⟨_, IsOfFinOrder.finite_zpowers⟩ := finite_zpowers
 
 end Group

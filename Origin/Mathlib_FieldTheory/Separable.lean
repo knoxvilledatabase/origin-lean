@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Separable.lean
-Genuine: 52 | Conflates: 7 | Dissolved: 13 | Infrastructure: 12
+Genuine: 62 | Conflates: 9 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Expand
@@ -10,6 +10,8 @@ import Mathlib.FieldTheory.IntermediateField.Basic
 import Mathlib.FieldTheory.Minpoly.Field
 import Mathlib.RingTheory.Polynomial.Content
 import Mathlib.RingTheory.PowerBasis
+
+noncomputable section
 
 /-!
 
@@ -45,15 +47,14 @@ def Separable (f : R[X]) : Prop :=
 theorem separable_def (f : R[X]) : f.Separable ↔ IsCoprime f (derivative f) :=
   Iff.rfl
 
-theorem separable_def' (f : R[X]) : f.Separable ↔ ∃ a b : R[X], a * f + b * (derivative f) = 1 :=
-  Iff.rfl
-
 -- CONFLATES (assumes ground = zero): not_separable_zero
 theorem not_separable_zero [Nontrivial R] : ¬Separable (0 : R[X]) := by
   rintro ⟨x, y, h⟩
   simp only [derivative_zero, mul_zero, add_zero, zero_ne_one] at h
 
--- DISSOLVED: Separable.ne_zero
+-- CONFLATES (assumes ground = zero): Separable.ne_zero
+theorem Separable.ne_zero [Nontrivial R] {f : R[X]} (h : f.Separable) : f ≠ 0 :=
+  (not_separable_zero <| · ▸ h)
 
 @[simp]
 theorem separable_one : (1 : R[X]).Separable :=
@@ -109,7 +110,9 @@ theorem Separable.of_pow' {f : R[X]} :
     rw [pow_succ, pow_succ] at h
     exact Or.inl (isCoprime_self.1 h.isCoprime.of_mul_left_right)
 
--- DISSOLVED: Separable.of_pow
+theorem Separable.of_pow {f : R[X]} (hf : ¬IsUnit f) {n : ℕ} (hn : n ≠ 0)
+    (hfs : (f ^ n).Separable) : f.Separable ∧ n = 1 :=
+  (hfs.of_pow'.resolve_left hf).resolve_right hn
 
 theorem Separable.map {p : R[X]} (h : p.Separable) {f : R →+* S} : (p.map f).Separable :=
   let ⟨a, b, H⟩ := h
@@ -139,9 +142,20 @@ theorem Separable.mul_unit {f g : R[X]} (hf : f.Separable) (hg : IsUnit g) : (f 
 theorem Separable.unit_mul {f g : R[X]} (hf : IsUnit f) (hg : g.Separable) : (f * g).Separable :=
   (associated_unit_mul_right g f hf).separable hg
 
--- DISSOLVED: Separable.eval₂_derivative_ne_zero
+-- CONFLATES (assumes ground = zero): Separable.eval₂_derivative_ne_zero
+theorem Separable.eval₂_derivative_ne_zero [Nontrivial S] (f : R →+* S) {p : R[X]}
+    (h : p.Separable) {x : S} (hx : p.eval₂ f x = 0) :
+    (derivative p).eval₂ f x ≠ 0 := by
+  intro hx'
+  obtain ⟨a, b, e⟩ := h
+  apply_fun Polynomial.eval₂ f x at e
+  simp only [eval₂_add, eval₂_mul, hx, mul_zero, hx', add_zero, eval₂_one, zero_ne_one] at e
 
--- DISSOLVED: Separable.aeval_derivative_ne_zero
+-- CONFLATES (assumes ground = zero): Separable.aeval_derivative_ne_zero
+theorem Separable.aeval_derivative_ne_zero [Nontrivial S] [Algebra R S] {p : R[X]}
+    (h : p.Separable) {x : S} (hx : aeval x p = 0) :
+    aeval x (derivative p) ≠ 0 :=
+  h.eval₂_derivative_ne_zero (algebraMap R S) hx
 
 variable (p q : ℕ)
 
@@ -290,11 +304,18 @@ section Field
 
 variable {F : Type u} [Field F] {K : Type v} [Field K]
 
--- DISSOLVED: separable_iff_derivative_ne_zero
+theorem separable_iff_derivative_ne_zero {f : F[X]} (hf : Irreducible f) :
+    f.Separable ↔ derivative f ≠ 0 :=
+  ⟨fun h1 h2 => hf.not_unit <| isCoprime_zero_right.1 <| h2 ▸ h1, fun h =>
+    EuclideanDomain.isCoprime_of_dvd (mt And.right h) fun g hg1 _hg2 ⟨p, hg3⟩ hg4 =>
+      let ⟨u, hu⟩ := (hf.isUnit_or_isUnit hg3).resolve_left hg1
+      have : f ∣ derivative f := by
+        conv_lhs => rw [hg3, ← hu]
+        rwa [Units.mul_right_dvd]
+      not_lt_of_le (natDegree_le_of_dvd this h) <|
+        natDegree_derivative_lt <| mt derivative_of_natDegree_zero h⟩
 
 attribute [local instance] Ideal.Quotient.field in
-
--- CONFLATES (assumes ground = zero): separable_map
 theorem separable_map {S} [CommRing S] [Nontrivial S] (f : F →+* S) {p : F[X]} :
     (p.map f).Separable ↔ p.Separable := by
   refine ⟨fun H ↦ ?_, fun H ↦ H.map⟩
@@ -338,9 +359,41 @@ theorem separable_or {f : F[X]} (hf : Irreducible f) :
           expand_contract p H hp.ne'⟩
   else Or.inl <| (separable_iff_derivative_ne_zero hf).2 H
 
--- DISSOLVED: exists_separable_of_irreducible
+theorem exists_separable_of_irreducible {f : F[X]} (hf : Irreducible f) (hp : p ≠ 0) :
+    ∃ (n : ℕ) (g : F[X]), g.Separable ∧ expand F (p ^ n) g = f := by
+  replace hp : p.Prime := (CharP.char_is_prime_or_zero F p).resolve_right hp
+  induction' hn : f.natDegree using Nat.strong_induction_on with N ih generalizing f
+  rcases separable_or p hf with (h | ⟨h1, g, hg, hgf⟩)
+  · refine ⟨0, f, h, ?_⟩
+    rw [pow_zero, expand_one]
+  · cases' N with N
+    · rw [natDegree_eq_zero_iff_degree_le_zero, degree_le_zero_iff] at hn
+      rw [hn, separable_C, isUnit_iff_ne_zero, Classical.not_not] at h1
+      have hf0 : f ≠ 0 := hf.ne_zero
+      rw [h1, C_0] at hn
+      exact absurd hn hf0
+    have hg1 : g.natDegree * p = N.succ := by rwa [← natDegree_expand, hgf]
+    have hg2 : g.natDegree ≠ 0 := by
+      intro this
+      rw [this, zero_mul] at hg1
+      cases hg1
+    have hg3 : g.natDegree < N.succ := by
+      rw [← mul_one g.natDegree, ← hg1]
+      exact Nat.mul_lt_mul_of_pos_left hp.one_lt hg2.bot_lt
+    rcases ih _ hg3 hg rfl with ⟨n, g, hg4, rfl⟩
+    refine ⟨n + 1, g, hg4, ?_⟩
+    rw [← hgf, expand_expand, pow_succ']
 
--- DISSOLVED: isUnit_or_eq_zero_of_separable_expand
+theorem isUnit_or_eq_zero_of_separable_expand {f : F[X]} (n : ℕ) (hp : 0 < p)
+    (hf : (expand F (p ^ n) f).Separable) : IsUnit f ∨ n = 0 := by
+  rw [or_iff_not_imp_right]
+  rintro hn : n ≠ 0
+  have hf2 : derivative (expand F (p ^ n) f) = 0 := by
+    rw [derivative_expand, Nat.cast_pow, CharP.cast_eq_zero, zero_pow hn, zero_mul, mul_zero]
+  rw [separable_def, hf2, isCoprime_zero_right, isUnit_iff] at hf
+  rcases hf with ⟨r, hr, hrf⟩
+  rw [eq_comm, expand_eq_C (pow_pos hp _)] at hrf
+  rwa [hrf, isUnit_C]
 
 theorem unique_separable_of_irreducible {f : F[X]} (hf : Irreducible f) (hp : 0 < p) (n₁ : ℕ)
     (g₁ : F[X]) (hg₁ : g₁.Separable) (hgf₁ : expand F (p ^ n₁) g₁ = f) (n₂ : ℕ) (g₂ : F[X])
@@ -366,11 +419,21 @@ theorem unique_separable_of_irreducible {f : F[X]} (hf : Irreducible f) (hp : 0 
 
 end CharP
 
--- DISSOLVED: separable_X_pow_sub_C
+theorem separable_X_pow_sub_C {n : ℕ} (a : F) (hn : (n : F) ≠ 0) (ha : a ≠ 0) :
+    Separable (X ^ n - C a) :=
+  separable_X_pow_sub_C_unit (Units.mk0 a ha) (IsUnit.mk0 (n : F) hn)
 
--- DISSOLVED: separable_X_pow_sub_C'
+theorem separable_X_pow_sub_C' (p n : ℕ) (a : F) [CharP F p] (hn : ¬p ∣ n) (ha : a ≠ 0) :
+    Separable (X ^ n - C a) :=
+  separable_X_pow_sub_C a (by rwa [← CharP.cast_eq_zero_iff F p n] at hn) ha
 
--- DISSOLVED: X_pow_sub_one_separable_iff
+theorem X_pow_sub_one_separable_iff {n : ℕ} : (X ^ n - 1 : F[X]).Separable ↔ (n : F) ≠ 0 := by
+  refine ⟨?_, fun h => separable_X_pow_sub_C_unit 1 (IsUnit.mk0 _ h)⟩
+  rw [separable_def', derivative_sub, derivative_X_pow, derivative_one, sub_zero]
+  -- Suppose `(n : F) = 0`, then the derivative is `0`, so `X ^ n - 1` is a unit, contradiction.
+  rintro (h : IsCoprime _ _) hn'
+  rw [hn', C_0, zero_mul, isCoprime_zero_right] at h
+  exact not_isUnit_X_pow_sub_one F n h
 
 section Splits
 
@@ -380,11 +443,27 @@ theorem card_rootSet_eq_natDegree [Algebra F K] {p : F[X]} (hsep : p.Separable)
   simp_rw [rootSet_def, Finset.coe_sort_coe, Fintype.card_coe]
   rw [Multiset.toFinset_card_of_nodup (nodup_roots hsep.map), ← natDegree_eq_card_roots hsplit]
 
--- DISSOLVED: nodup_roots_iff_of_splits
+theorem nodup_roots_iff_of_splits {f : F[X]} (hf : f ≠ 0) (h : f.Splits (RingHom.id F)) :
+    f.roots.Nodup ↔ f.Separable := by
+  classical
+  refine ⟨(fun hnsep ↦ ?_).mtr, nodup_roots⟩
+  rw [Separable, ← gcd_isUnit_iff, isUnit_iff_degree_eq_zero] at hnsep
+  obtain ⟨x, hx⟩ := exists_root_of_splits _
+    (splits_of_splits_of_dvd _ hf h (gcd_dvd_left f _)) hnsep
+  simp_rw [Multiset.nodup_iff_count_le_one, not_forall, not_le]
+  exact ⟨x, ((one_lt_rootMultiplicity_iff_isRoot_gcd hf).2 hx).trans_eq f.count_roots.symm⟩
 
--- DISSOLVED: nodup_aroots_iff_of_splits
+@[stacks 09H3 "Here we only require `f` splits instead of `K` is algebraically closed."]
+theorem nodup_aroots_iff_of_splits [Algebra F K] {f : F[X]} (hf : f ≠ 0)
+    (h : f.Splits (algebraMap F K)) : (f.aroots K).Nodup ↔ f.Separable := by
+  rw [← (algebraMap F K).id_comp, ← splits_map_iff] at h
+  rw [nodup_roots_iff_of_splits (map_ne_zero hf) h, separable_map]
 
--- DISSOLVED: card_rootSet_eq_natDegree_iff_of_splits
+theorem card_rootSet_eq_natDegree_iff_of_splits [Algebra F K] {f : F[X]} (hf : f ≠ 0)
+    (h : f.Splits (algebraMap F K)) : Fintype.card (f.rootSet K) = f.natDegree ↔ f.Separable := by
+  classical
+  simp_rw [rootSet_def, Finset.coe_sort_coe, Fintype.card_coe, natDegree_eq_card_roots h,
+    Multiset.toFinset_card_eq_card_iff_nodup, nodup_aroots_iff_of_splits hf h]
 
 variable {i : F →+* K}
 

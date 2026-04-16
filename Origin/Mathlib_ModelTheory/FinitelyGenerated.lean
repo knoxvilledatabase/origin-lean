@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Finite.Lemmas
 import Mathlib.ModelTheory.Substructures
 
+noncomputable section
+
 /-!
 # Finitely Generated First-Order Structures
 

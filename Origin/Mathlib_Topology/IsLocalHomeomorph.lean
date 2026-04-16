@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.PartialHomeomorph
 import Mathlib.Topology.SeparatedMap
 
+noncomputable section
+
 /-!
 # Local homeomorphisms
 

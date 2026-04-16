@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.AdjoinRoot
 import Mathlib.RingTheory.Localization.Away.Basic
 
+noncomputable section
+
 /-!
 The `R`-`AlgEquiv` between the localization of `R` away from `r` and
 `R` with an inverse of `r` adjoined.

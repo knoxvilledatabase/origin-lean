@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.NatIso
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Full and faithful functors
 

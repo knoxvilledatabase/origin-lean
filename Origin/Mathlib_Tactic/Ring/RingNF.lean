@@ -8,6 +8,8 @@ import Mathlib.Tactic.TryThis
 import Mathlib.Tactic.Conv
 import Mathlib.Util.Qq
 
+noncomputable section
+
 /-!
 # `ring_nf` tactic
 
@@ -178,34 +180,29 @@ def ringNFLocalDecl (s : IO.Ref AtomM.State) (cfg : Config) (fvarId : FVarId) :
   | some (_, newGoal) => replaceMainGoal [newGoal]
 
 elab (name := ringNF) "ring_nf" tk:"!"? cfg:optConfig loc:(location)? : tactic => do
-
   let mut cfg ← elabConfig cfg
-
   if tk.isSome then cfg := { cfg with red := .default }
-
   let loc := (loc.map expandLocation).getD (.targets #[] true)
-
   let s ← IO.mkRef {}
-
   withLocation loc (ringNFLocalDecl s cfg) (ringNFTarget s cfg)
-
     fun _ ↦ throwError "ring_nf failed"
+
+@[inherit_doc ringNF] macro "ring_nf!" cfg:optConfig loc:(location)? : tactic =>
 
   `(tactic| ring_nf ! $cfg:optConfig $(loc)?)
 
+@[inherit_doc ringNF] syntax (name := ringNFConv) "ring_nf" "!"? optConfig : conv
+
 elab (name := ring1NF) "ring1_nf" tk:"!"? cfg:optConfig : tactic => do
-
   let mut cfg ← elabConfig cfg
-
   if tk.isSome then cfg := { cfg with red := .default }
-
   let s ← IO.mkRef {}
-
   liftMetaMAtMain fun g ↦ M.run s cfg <| proveEq g
+
+@[inherit_doc ring1NF] macro "ring1_nf!" cfg:optConfig : tactic =>
 
   `(tactic| ring1_nf ! $cfg:optConfig)
 
-@[inherit_doc ring1NF] macro "ring1_nf!" cfg:optConfig : tactic =>
 @[tactic ringNFConv] def elabRingNFConv : Tactic := fun stx ↦ match stx with
   | `(conv| ring_nf $[!%$tk]? $cfg:optConfig) => withMainContext do
     let mut cfg ← elabConfig cfg
@@ -214,17 +211,21 @@ elab (name := ring1NF) "ring1_nf" tk:"!"? cfg:optConfig : tactic => do
     Conv.applySimpResult (← M.run s cfg <| rewrite (← instantiateMVars (← Conv.getLhs)))
   | _ => Elab.throwUnsupportedSyntax
 
+@[inherit_doc ringNF] macro "ring_nf!" cfg:optConfig : conv =>
+
   `(conv| ring_nf ! $cfg:optConfig)
 
 macro (name := ring) "ring" : tactic =>
-
   `(tactic| first | ring1 | try_this ring_nf)
+
+@[inherit_doc ring] macro "ring!" : tactic =>
 
   `(tactic| first | ring1! | try_this ring_nf!)
 
 macro (name := ringConv) "ring" : conv =>
-
   `(conv| first | discharge => ring1 | try_this ring_nf)
+
+@[inherit_doc ringConv] macro "ring!" : conv =>
 
   `(conv| first | discharge => ring1! | try_this ring_nf!)
 

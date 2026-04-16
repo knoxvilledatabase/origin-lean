@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Coherent.CoherentSheaves
 import Mathlib.Condensed.Light.Basic
 
+noncomputable section
+
 /-!
 # Functors from categories of topological spaces to light condensed sets
 

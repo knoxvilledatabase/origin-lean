@@ -12,6 +12,8 @@ import Mathlib.RingTheory.SimpleModule
 import Mathlib.Tactic.RSuffices
 import Mathlib.Tactic.StacksAttribute
 
+noncomputable section
+
 /-!
 # Artinian rings and modules
 

@@ -8,6 +8,8 @@ import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Topology.Metrizable.Basic
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 # Urysohn's Metrization Theorem
 

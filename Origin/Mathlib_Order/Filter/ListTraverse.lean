@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Traversable.Instances
 import Mathlib.Order.Filter.Basic
 
+noncomputable section
+
 /-!
 # Properties of `Traversable.traverse` on `List`s and `Filter`s
 

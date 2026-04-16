@@ -1,9 +1,11 @@
 /-
 Extracted from GroupTheory/Order/Min.lean
-Genuine: 6 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
+Genuine: 8 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Torsion
+
+noncomputable section
 
 /-!
 # Minimum order of an element
@@ -39,6 +41,7 @@ variable {α} {a : α}
 lemma minOrder_eq_top : minOrder α = ⊤ ↔ IsTorsionFree α := by simp [minOrder, IsTorsionFree]
 
 @[to_additive (attr := simp)] protected alias ⟨_, IsTorsionFree.minOrder⟩ := minOrder_eq_top
+
 @[to_additive (attr := simp)]
 lemma le_minOrder {n : ℕ∞} :
     n ≤ minOrder α ↔ ∀ ⦃a : α⦄, a ≠ 1 → IsOfFinOrder a → n ≤ orderOf a := by simp [minOrder]
@@ -72,7 +75,22 @@ open AddMonoid AddSubgroup Nat Set
 
 namespace ZMod
 
--- DISSOLVED: minOrder
+@[simp]
+protected lemma minOrder {n : ℕ} (hn : n ≠ 0) (hn₁ : n ≠ 1) : minOrder (ZMod n) = n.minFac := by
+  have : Fact (1 < n) := ⟨one_lt_iff_ne_zero_and_ne_one.mpr ⟨hn, hn₁⟩⟩
+  classical
+  have : (↑(n / n.minFac) : ZMod n) ≠ 0 := by
+    rw [Ne, ringChar.spec, ringChar.eq (ZMod n) n]
+    exact
+      not_dvd_of_pos_of_lt (Nat.div_pos (minFac_le hn.bot_lt) n.minFac_pos)
+        (div_lt_self hn.bot_lt (minFac_prime hn₁).one_lt)
+  refine ((minOrder_le_natCard (zmultiples_eq_bot.not.2 this) <| toFinite _).trans ?_).antisymm <|
+    le_minOrder_iff_forall_addSubgroup.2 fun s hs _ ↦ ?_
+  · rw [Nat.card_zmultiples, ZMod.addOrderOf_coe _ hn,
+      gcd_eq_right (div_dvd_of_dvd n.minFac_dvd), Nat.div_div_self n.minFac_dvd hn]
+  · haveI : Nontrivial s := s.bot_or_nontrivial.resolve_left hs
+    exact WithTop.coe_le_coe.2 <| minFac_le_of_dvd Finite.one_lt_card <|
+      (card_addSubgroup_dvd_card _).trans n.card_zmod.dvd
 
 @[simp]
 lemma minOrder_of_prime {p : ℕ} (hp : p.Prime) : minOrder (ZMod p) = p := by

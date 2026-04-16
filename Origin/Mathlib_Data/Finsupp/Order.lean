@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Finsupp/Order.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 2 | Infrastructure: 31
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Module.Defs
 import Mathlib.Algebra.Order.Pi
 import Mathlib.Data.Finsupp.Basic
+
+noncomputable section
 
 /-!
 # Pointwise order on finitely supported functions
@@ -62,10 +64,6 @@ def orderEmbeddingToFun : (ι →₀ α) ↪o (ι → α) where
       rw [h]
   map_rel_iff' := coe_le_coe
 
-@[simp]
-theorem orderEmbeddingToFun_apply {f : ι →₀ α} {i : ι} : orderEmbeddingToFun f i = f i :=
-  rfl
-
 end LE
 
 section Preorder
@@ -79,8 +77,6 @@ instance preorder : Preorder (ι →₀ α) :=
 
 lemma lt_def : f < g ↔ f ≤ g ∧ ∃ i, f i < g i := Pi.lt_def
 
-@[simp, norm_cast] lemma coe_lt_coe : ⇑f < g ↔ f < g := Iff.rfl
-
 lemma coe_mono : Monotone (Finsupp.toFun : (ι →₀ α) → ι → α) := fun _ _ ↦ id
 
 lemma coe_strictMono : Monotone (Finsupp.toFun : (ι →₀ α) → ι → α) := fun _ _ ↦ id
@@ -90,11 +86,14 @@ lemma coe_strictMono : Monotone (Finsupp.toFun : (ι →₀ α) → ι → α) :
 
 lemma single_mono : Monotone (single i : α → ι →₀ α) := fun _ _ ↦ single_le_single.2
 
+@[gcongr] protected alias ⟨_, GCongr.single_mono⟩ := single_le_single
+
+@[simp] lemma single_nonneg : 0 ≤ single i a ↔ 0 ≤ a := by classical exact Pi.single_nonneg
+
+@[simp] lemma single_nonpos : single i a ≤ 0 ↔ a ≤ 0 := by classical exact Pi.single_nonpos
+
 variable [OrderedAddCommMonoid β]
 
-@[gcongr] protected alias ⟨_, GCongr.single_mono⟩ := single_le_single
-@[simp] lemma single_nonneg : 0 ≤ single i a ↔ 0 ≤ a := by classical exact Pi.single_nonneg
-@[simp] lemma single_nonpos : single i a ≤ 0 ↔ a ≤ 0 := by classical exact Pi.single_nonpos
 lemma sum_le_sum_index [DecidableEq ι] {f₁ f₂ : ι →₀ α} {h : ι → α → β} (hf : f₁ ≤ f₂)
     (hh : ∀ i ∈ f₁.support ∪ f₂.support, Monotone (h i))
     (hh₀ : ∀ i ∈ f₁.support ∪ f₂.support, h i 0 = 0) : f₁.sum h ≤ f₂.sum h := by
@@ -315,9 +314,13 @@ end CanonicallyLinearOrderedAddCommMonoid
 
 section Nat
 
--- DISSOLVED: sub_single_one_add
+theorem sub_single_one_add {a : ι} {u u' : ι →₀ ℕ} (h : u a ≠ 0) :
+    u - single a 1 + u' = u + u' - single a 1 :=
+  tsub_add_eq_add_tsub <| single_le_iff.mpr <| Nat.one_le_iff_ne_zero.mpr h
 
--- DISSOLVED: add_sub_single_one
+theorem add_sub_single_one {a : ι} {u u' : ι →₀ ℕ} (h : u' a ≠ 0) :
+    u + (u' - single a 1) = u + u' - single a 1 :=
+  (add_tsub_assoc_of_le (single_le_iff.mpr <| Nat.one_le_iff_ne_zero.mpr h) _).symm
 
 end Nat
 

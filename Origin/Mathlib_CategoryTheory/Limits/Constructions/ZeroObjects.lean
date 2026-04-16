@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms
 import Mathlib.CategoryTheory.Limits.Constructions.BinaryProducts
 
+noncomputable section
+
 /-!
 # Limits involving zero objects
 
@@ -39,10 +41,6 @@ def zeroProdIso (X : C) : (0 : C) ⨯ X ≅ X :=
   limit.isoLimitCone ⟨_, binaryFanZeroLeftIsLimit X⟩
 
 @[simp]
-theorem zeroProdIso_hom (X : C) : (zeroProdIso X).hom = prod.snd :=
-  rfl
-
-@[simp]
 theorem zeroProdIso_inv_snd (X : C) : (zeroProdIso X).inv ≫ prod.snd = 𝟙 X := by
   dsimp [zeroProdIso, binaryFanZeroLeft]
   simp
@@ -59,10 +57,6 @@ instance hasBinaryProduct_zero_right (X : C) : HasBinaryProduct X (0 : C) :=
 
 def prodZeroIso (X : C) : X ⨯ (0 : C) ≅ X :=
   limit.isoLimitCone ⟨_, binaryFanZeroRightIsLimit X⟩
-
-@[simp]
-theorem prodZeroIso_hom (X : C) : (prodZeroIso X).hom = prod.fst :=
-  rfl
 
 @[simp]
 theorem prodZeroIso_iso_inv_snd (X : C) : (prodZeroIso X).inv ≫ prod.fst = 𝟙 X := by
@@ -87,10 +81,6 @@ theorem inr_zeroCoprodIso_hom (X : C) : coprod.inr ≫ (zeroCoprodIso X).hom = �
   dsimp [zeroCoprodIso, binaryCofanZeroLeft]
   simp
 
-@[simp]
-theorem zeroCoprodIso_inv (X : C) : (zeroCoprodIso X).inv = coprod.inr :=
-  rfl
-
 def binaryCofanZeroRight (X : C) : BinaryCofan X (0 : C) :=
   BinaryCofan.mk (𝟙 X) 0
 
@@ -108,10 +98,6 @@ def coprodZeroIso (X : C) : X ⨿ (0 : C) ≅ X :=
 theorem inr_coprodZeroIso_hom (X : C) : coprod.inl ≫ (coprodZeroIso X).hom = 𝟙 X := by
   dsimp [coprodZeroIso, binaryCofanZeroRight]
   simp
-
-@[simp]
-theorem coprodZeroIso_inv (X : C) : (coprodZeroIso X).inv = coprod.inl :=
-  rfl
 
 instance hasPullback_over_zero (X Y : C) [HasBinaryProduct X Y] :
     HasPullback (0 : X ⟶ 0) (0 : Y ⟶ 0) :=

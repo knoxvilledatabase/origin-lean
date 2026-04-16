@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Algebra/Basic.lean
-Genuine: 26 | Conflates: 3 | Dissolved: 3 | Infrastructure: 31
+Genuine: 27 | Conflates: 3 | Dissolved: 2 | Infrastructure: 31
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
@@ -13,6 +13,8 @@ import Mathlib.Algebra.NoZeroSMulDivisors.Basic
 import Mathlib.Algebra.Ring.Subring.Basic
 import Mathlib.Data.Nat.Cast.Order.Basic
 import Mathlib.Data.Int.CharZero
+
+noncomputable section
 
 /-!
 # Further basic results about `Algebra`.
@@ -43,10 +45,6 @@ instance _root_.PUnit.algebra : Algebra R PUnit.{v + 1} where
   commutes' _ _ := rfl
   smul_def' _ _ := rfl
 
-@[simp]
-theorem algebraMap_pUnit (r : R) : algebraMap R PUnit r = PUnit.unit :=
-  rfl
-
 end PUnit
 
 section ULift
@@ -58,14 +56,6 @@ instance _root_.ULift.algebra : Algebra R (ULift A) :=
     commutes' := fun r x => ULift.down_injective <| Algebra.commutes r x.down
     smul_def' := fun r x => ULift.down_injective <| Algebra.smul_def' r x.down }
 
-theorem _root_.ULift.algebraMap_eq (r : R) :
-    algebraMap R (ULift A) r = ULift.up (algebraMap R A r) :=
-  rfl
-
-@[simp]
-theorem _root_.ULift.down_algebraMap (r : R) : (algebraMap R (ULift A) r).down = algebraMap R A r :=
-  rfl
-
 end ULift
 
 instance ofSubsemiring (S : Subsemiring R) : Algebra S A where
@@ -74,34 +64,12 @@ instance ofSubsemiring (S : Subsemiring R) : Algebra S A where
   commutes' r x := Algebra.commutes (r : R) x
   smul_def' r x := Algebra.smul_def (r : R) x
 
-theorem algebraMap_ofSubsemiring (S : Subsemiring R) :
-    (algebraMap S R : S →+* R) = Subsemiring.subtype S :=
-  rfl
-
-theorem coe_algebraMap_ofSubsemiring (S : Subsemiring R) : (algebraMap S R : S → R) = Subtype.val :=
-  rfl
-
-theorem algebraMap_ofSubsemiring_apply (S : Subsemiring R) (x : S) : algebraMap S R x = x :=
-  rfl
-
 instance ofSubring {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (S : Subring R) :
     Algebra S A where -- Porting note: don't use `toSubsemiring` because of a timeout
   toRingHom := (algebraMap R A).comp S.subtype
   smul := (· • ·)
   commutes' r x := Algebra.commutes (r : R) x
   smul_def' r x := Algebra.smul_def (r : R) x
-
-theorem algebraMap_ofSubring {R : Type*} [CommRing R] (S : Subring R) :
-    (algebraMap S R : S →+* R) = Subring.subtype S :=
-  rfl
-
-theorem coe_algebraMap_ofSubring {R : Type*} [CommRing R] (S : Subring R) :
-    (algebraMap S R : S → R) = Subtype.val :=
-  rfl
-
-theorem algebraMap_ofSubring_apply {R : Type*} [CommRing R] (S : Subring R) (x : S) :
-    algebraMap S R x = x :=
-  rfl
 
 def algebraMapSubmonoid (S : Type*) [Semiring S] [Algebra R S] (M : Submonoid R) : Submonoid S :=
   M.map (algebraMap R S)
@@ -165,14 +133,10 @@ instance End.instAlgebra : Algebra R (Module.End S M) :=
 
 example : Algebra R (Module.End R M) := End.instAlgebra _ _ _
 
-theorem algebraMap_end_eq_smul_id (a : R) : algebraMap R (End S M) a = a • LinearMap.id :=
-  rfl
-
 @[simp]
-theorem algebraMap_end_apply (a : R) (m : M) : algebraMap R (End S M) a m = a • m :=
-  rfl
-
--- DISSOLVED: ker_algebraMap_end
+theorem ker_algebraMap_end (K : Type u) (V : Type v) [Field K] [AddCommGroup V] [Module K V] (a : K)
+    (ha : a ≠ 0) : LinearMap.ker ((algebraMap K (End K V)) a) = ⊥ :=
+  LinearMap.ker_smul _ _ ha
 
 section
 
@@ -237,10 +201,6 @@ instance (priority := 99) Ring.toIntAlgebra : Algebra ℤ R where
   commutes' := Int.cast_commute
   smul_def' _ _ := zsmul_eq_mul _ _
   toRingHom := Int.castRingHom R
-
-@[simp]
-theorem algebraMap_int_eq : algebraMap ℤ R = Int.castRingHom R :=
-  rfl
 
 variable {R}
 
@@ -335,12 +295,6 @@ namespace LinearMap
 
 variable (R)
 
-def ltoFun (R : Type u) (M : Type v) (A : Type w) [CommSemiring R] [AddCommMonoid M] [Module R M]
-    [CommSemiring A] [Algebra R A] : (M →ₗ[R] A) →ₗ[A] M → A where
-  toFun f := f.toFun
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
 end LinearMap
 
 end IsScalarTower
@@ -356,11 +310,6 @@ variable (R : Type*) {S M N : Type*} [Semiring R] [Semiring S] [SMul R S]
 variable [AddCommMonoid M] [Module R M] [Module S M] [IsScalarTower R S M]
 
 variable [AddCommMonoid N] [Module R N] [Module S N] [IsScalarTower R S N]
-
-@[simp]
-theorem LinearMap.ker_restrictScalars (f : M →ₗ[S] N) :
-    LinearMap.ker (f.restrictScalars R) = f.ker.restrictScalars R :=
-  rfl
 
 end Module
 
@@ -427,15 +376,6 @@ variable {M N} [AddCommMonoid M] [AddCommMonoid N] [Module R M] [Module S M] [Is
 
 variable [Module R N] [Module S N] [IsScalarTower R S N]
 
-def LinearMap.extendScalarsOfSurjectiveEquiv (h : Function.Surjective (algebraMap R S)) :
-    (M →ₗ[R] N) ≃ₗ[R] (M →ₗ[S] N) where
-  toFun f := { __ := f, map_smul' := fun r x ↦ by obtain ⟨r, rfl⟩ := h r; simp }
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  invFun f := f.restrictScalars S
-  left_inv _ := rfl
-  right_inv _ := rfl
-
 abbrev LinearMap.extendScalarsOfSurjective (h : Function.Surjective (algebraMap R S))
     (l : M →ₗ[R] N) : M →ₗ[S] N :=
   extendScalarsOfSurjectiveEquiv h l
@@ -446,18 +386,6 @@ def LinearEquiv.extendScalarsOfSurjective (h : Function.Surjective (algebraMap R
   map_smul' r x := by obtain ⟨r, rfl⟩ := h r; simp
 
 variable (h : Function.Surjective (algebraMap R S))
-
-@[simp]
-lemma LinearMap.extendScalarsOfSurjective_apply (l : M →ₗ[R] N) (x) :
-    l.extendScalarsOfSurjective h x = l x := rfl
-
-@[simp]
-lemma LinearEquiv.extendScalarsOfSurjective_apply (f : M ≃ₗ[R] N) (x) :
-    f.extendScalarsOfSurjective h x = f x := rfl
-
-@[simp]
-lemma LinearEquiv.extendScalarsOfSurjective_symm (f : M ≃ₗ[R] N) :
-    (f.extendScalarsOfSurjective h).symm = f.symm.extendScalarsOfSurjective h := rfl
 
 end surjective
 

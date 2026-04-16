@@ -10,6 +10,8 @@ import Lean.Meta.Tactic.Rfl
 import Mathlib.Lean.Meta.CongrTheorems
 import Mathlib.Logic.Basic
 
+noncomputable section
+
 /-!
 # The `congr!` tactic
 
@@ -563,7 +565,6 @@ namespace Congr!
 declare_config_elab elabConfig Config
 
 syntax (name := congr!) "congr!" Parser.Tactic.optConfig (ppSpace num)?
-
   (" with" (ppSpace colGt rintroPat)*)? : tactic
 
 elab_rules : tactic

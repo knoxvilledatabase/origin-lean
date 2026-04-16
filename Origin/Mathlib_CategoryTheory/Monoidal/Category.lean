@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Functor.Trifunctor
 import Mathlib.CategoryTheory.Products.Basic
 
+noncomputable section
+
 /-!
 # Monoidal categories
 
@@ -333,10 +335,6 @@ lemma whiskerLeftIso_trans (W : C) {X Y Z : C} (f : X ≅ Y) (g : Y ≅ Z) :
     whiskerLeftIso W (f ≪≫ g) = whiskerLeftIso W f ≪≫ whiskerLeftIso W g :=
   Iso.ext (whiskerLeft_comp W f.hom g.hom)
 
-@[simp]
-lemma whiskerLeftIso_symm (W : C) {X Y : C} (f : X ≅ Y) :
-    (whiskerLeftIso W f).symm = whiskerLeftIso W f.symm := rfl
-
 @[simps!]
 def whiskerRightIso {X Y : C} (f : X ≅ Y) (Z : C) : X ⊗ Z ≅ Y ⊗ Z where
   hom := f.hom ▷ Z
@@ -359,10 +357,6 @@ lemma whiskerRightIso_refl (X W : C) :
 lemma whiskerRightIso_trans {X Y Z : C} (f : X ≅ Y) (g : Y ≅ Z) (W : C) :
     whiskerRightIso (f ≪≫ g) W = whiskerRightIso f W ≪≫ whiskerRightIso g W :=
   Iso.ext (comp_whiskerRight f.hom g.hom W)
-
-@[simp]
-lemma whiskerRightIso_symm {X Y : C} (f : X ≅ Y) (W : C) :
-    (whiskerRightIso f W).symm = whiskerRightIso f.symm W := rfl
 
 @[simps]
 def tensorIso {X Y X' Y' : C} (f : X ≅ Y)
@@ -427,14 +421,6 @@ theorem associator_naturality_left {X X' : C} (f : X ⟶ X') (Y Z : C) :
     f ▷ Y ▷ Z ≫ (α_ X' Y Z).hom = (α_ X Y Z).hom ≫ f ▷ (Y ⊗ Z) := by simp
 
 @[reassoc]
-theorem associator_inv_naturality_left {X X' : C} (f : X ⟶ X') (Y Z : C) :
-    f ▷ (Y ⊗ Z) ≫ (α_ X' Y Z).inv = (α_ X Y Z).inv ≫ f ▷ Y ▷ Z := by simp
-
-@[reassoc]
-theorem whiskerRight_tensor_symm {X X' : C} (f : X ⟶ X') (Y Z : C) :
-    f ▷ Y ▷ Z = (α_ X Y Z).hom ≫ f ▷ (Y ⊗ Z) ≫ (α_ X' Y Z).inv := by simp
-
-@[reassoc]
 theorem associator_naturality_middle (X : C) {Y Y' : C} (f : Y ⟶ Y') (Z : C) :
     (X ◁ f) ▷ Z ≫ (α_ X Y' Z).hom = (α_ X Y Z).hom ≫ X ◁ f ▷ Z := by simp
 
@@ -443,38 +429,13 @@ theorem associator_inv_naturality_middle (X : C) {Y Y' : C} (f : Y ⟶ Y') (Z : 
     X ◁ f ▷ Z ≫ (α_ X Y' Z).inv = (α_ X Y Z).inv ≫ (X ◁ f) ▷ Z := by simp
 
 @[reassoc]
-theorem whisker_assoc_symm (X : C) {Y Y' : C} (f : Y ⟶ Y') (Z : C) :
-    X ◁ f ▷ Z = (α_ X Y Z).inv ≫ (X ◁ f) ▷ Z ≫ (α_ X Y' Z).hom := by simp
-
-@[reassoc]
-theorem associator_naturality_right (X Y : C) {Z Z' : C} (f : Z ⟶ Z') :
-    (X ⊗ Y) ◁ f ≫ (α_ X Y Z').hom = (α_ X Y Z).hom ≫ X ◁ Y ◁ f := by simp
-
-@[reassoc]
 theorem associator_inv_naturality_right (X Y : C) {Z Z' : C} (f : Z ⟶ Z') :
     X ◁ Y ◁ f ≫ (α_ X Y Z').inv = (α_ X Y Z).inv ≫ (X ⊗ Y) ◁ f := by simp
-
-@[reassoc]
-theorem tensor_whiskerLeft_symm (X Y : C) {Z Z' : C} (f : Z ⟶ Z') :
-    X ◁ Y ◁ f = (α_ X Y Z).inv ≫ (X ⊗ Y) ◁ f ≫ (α_ X Y Z').hom := by simp
-
-@[reassoc]
-theorem leftUnitor_inv_naturality {X Y : C} (f : X ⟶ Y) :
-    f ≫ (λ_ Y).inv = (λ_ X).inv ≫ _ ◁ f := by simp
 
 @[reassoc]
 theorem id_whiskerLeft_symm {X X' : C} (f : X ⟶ X') :
     f = (λ_ X).inv ≫ 𝟙_ C ◁ f ≫ (λ_ X').hom := by
   simp only [id_whiskerLeft, assoc, inv_hom_id, comp_id, inv_hom_id_assoc]
-
-@[reassoc]
-theorem rightUnitor_inv_naturality {X X' : C} (f : X ⟶ X') :
-    f ≫ (ρ_ X').inv = (ρ_ X).inv ≫ f ▷ _ := by simp
-
-@[reassoc]
-theorem whiskerRight_id_symm {X Y : C} (f : X ⟶ Y) :
-    f = (ρ_ X).inv ≫ f ▷ 𝟙_ C ≫ (ρ_ Y).hom := by
-  simp
 
 theorem whiskerLeft_iff {X Y : C} (f g : X ⟶ Y) : 𝟙_ C ◁ f = 𝟙_ C ◁ g ↔ f = g := by simp
 
@@ -580,22 +541,6 @@ theorem whiskerLeft_rightUnitor (X Y : C) :
 theorem whiskerLeft_rightUnitor_inv (X Y : C) :
     X ◁ (ρ_ Y).inv = (ρ_ (X ⊗ Y)).inv ≫ (α_ X Y (𝟙_ C)).hom :=
   eq_of_inv_eq_inv (by simp)
-
-@[reassoc]
-theorem leftUnitor_tensor (X Y : C) :
-    (λ_ (X ⊗ Y)).hom = (α_ (𝟙_ C) X Y).inv ≫ (λ_ X).hom ▷ Y := by simp
-
-@[reassoc]
-theorem leftUnitor_tensor_inv (X Y : C) :
-    (λ_ (X ⊗ Y)).inv = (λ_ X).inv ▷ Y ≫ (α_ (𝟙_ C) X Y).hom := by simp
-
-@[reassoc]
-theorem rightUnitor_tensor (X Y : C) :
-    (ρ_ (X ⊗ Y)).hom = (α_ X Y (𝟙_ C)).hom ≫ X ◁ (ρ_ Y).hom := by simp
-
-@[reassoc]
-theorem rightUnitor_tensor_inv (X Y : C) :
-    (ρ_ (X ⊗ Y)).inv = X ◁ (ρ_ Y).inv ≫ (α_ X Y (𝟙_ C)).inv := by simp
 
 end
 
@@ -707,14 +652,6 @@ abbrev ofTensorHom [MonoidalCategoryStruct C]
   triangle := by intros; simp [← id_tensorHom, ← tensorHom_id, triangle]
 
 @[reassoc]
-theorem comp_tensor_id (f : W ⟶ X) (g : X ⟶ Y) : f ≫ g ⊗ 𝟙 Z = (f ⊗ 𝟙 Z) ≫ (g ⊗ 𝟙 Z) := by
-  simp
-
-@[reassoc]
-theorem id_tensor_comp (f : W ⟶ X) (g : X ⟶ Y) : 𝟙 Z ⊗ f ≫ g = (𝟙 Z ⊗ f) ≫ (𝟙 Z ⊗ g) := by
-  simp
-
-@[reassoc]
 theorem id_tensor_comp_tensor_id (f : W ⟶ X) (g : Y ⟶ Z) : (𝟙 Y ⊗ f) ≫ (g ⊗ 𝟙 X) = g ⊗ f := by
   rw [← tensor_comp]
   simp
@@ -723,10 +660,6 @@ theorem id_tensor_comp_tensor_id (f : W ⟶ X) (g : Y ⟶ Z) : (𝟙 Y ⊗ f) �
 theorem tensor_id_comp_id_tensor (f : W ⟶ X) (g : Y ⟶ Z) : (g ⊗ 𝟙 W) ≫ (𝟙 Z ⊗ f) = g ⊗ f := by
   rw [← tensor_comp]
   simp
-
-theorem tensor_left_iff {X Y : C} (f g : X ⟶ Y) : 𝟙 (𝟙_ C) ⊗ f = 𝟙 (𝟙_ C) ⊗ g ↔ f = g := by simp
-
-theorem tensor_right_iff {X Y : C} (f g : X ⟶ Y) : f ⊗ 𝟙 (𝟙_ C) = g ⊗ 𝟙 (𝟙_ C) ↔ f = g := by simp
 
 section
 
@@ -743,25 +676,9 @@ def leftAssocTensor : C × C × C ⥤ C where
   obj X := (X.1 ⊗ X.2.1) ⊗ X.2.2
   map {X Y : C × C × C} (f : X ⟶ Y) := (f.1 ⊗ f.2.1) ⊗ f.2.2
 
-@[simp]
-theorem leftAssocTensor_obj (X) : (leftAssocTensor C).obj X = (X.1 ⊗ X.2.1) ⊗ X.2.2 :=
-  rfl
-
-@[simp]
-theorem leftAssocTensor_map {X Y} (f : X ⟶ Y) : (leftAssocTensor C).map f = (f.1 ⊗ f.2.1) ⊗ f.2.2 :=
-  rfl
-
 def rightAssocTensor : C × C × C ⥤ C where
   obj X := X.1 ⊗ X.2.1 ⊗ X.2.2
   map {X Y : C × C × C} (f : X ⟶ Y) := f.1 ⊗ f.2.1 ⊗ f.2.2
-
-@[simp]
-theorem rightAssocTensor_obj (X) : (rightAssocTensor C).obj X = X.1 ⊗ X.2.1 ⊗ X.2.2 :=
-  rfl
-
-@[simp]
-theorem rightAssocTensor_map {X Y} (f : X ⟶ Y) : (rightAssocTensor C).map f = f.1 ⊗ f.2.1 ⊗ f.2.2 :=
-  rfl
 
 @[simps]
 def curriedTensor : C ⥤ C ⥤ C where
@@ -812,11 +729,6 @@ def tensorLeftTensor (X Y : C) : tensorLeft (X ⊗ Y) ≅ tensorLeft Y ⋙ tenso
   NatIso.ofComponents (associator _ _) fun {Z} {Z'} f => by simp
 
 @[simp]
-theorem tensorLeftTensor_hom_app (X Y Z : C) :
-    (tensorLeftTensor X Y).hom.app Z = (associator X Y Z).hom :=
-  rfl
-
-@[simp]
 theorem tensorLeftTensor_inv_app (X Y Z : C) :
     (tensorLeftTensor X Y).inv.app Z = (associator X Y Z).inv := by simp [tensorLeftTensor]
 
@@ -842,11 +754,6 @@ variable {C}
 
 def tensorRightTensor (X Y : C) : tensorRight (X ⊗ Y) ≅ tensorRight X ⋙ tensorRight Y :=
   NatIso.ofComponents (fun Z => (associator Z X Y).symm) fun {Z} {Z'} f => by simp
-
-@[simp]
-theorem tensorRightTensor_hom_app (X Y Z : C) :
-    (tensorRightTensor X Y).hom.app Z = (associator Z X Y).inv :=
-  rfl
 
 @[simp]
 theorem tensorRightTensor_inv_app (X Y Z : C) :

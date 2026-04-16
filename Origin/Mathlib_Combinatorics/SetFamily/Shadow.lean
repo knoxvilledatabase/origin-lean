@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Grade
 import Mathlib.Data.Finset.Sups
 import Mathlib.Logic.Function.Iterate
 
+noncomputable section
+
 /-!
 # Shadows
 
@@ -54,6 +56,8 @@ variable [DecidableEq α] {𝒜 ℬ : Finset (Finset α)} {s t : Finset α} {a :
 def shadow (𝒜 : Finset (Finset α)) : Finset (Finset α) :=
   𝒜.sup fun s => s.image (erase s)
 
+@[inherit_doc] scoped[FinsetFamily] notation:max "∂ " => Finset.shadow
+
 open FinsetFamily
 
 @[simp]
@@ -62,10 +66,6 @@ theorem shadow_empty : ∂ (∅ : Finset (Finset α)) = ∅ :=
 
 @[simp] lemma shadow_iterate_empty (k : ℕ) : ∂^[k] (∅ : Finset (Finset α)) = ∅ := by
   induction' k <;> simp [*, shadow_empty]
-
-@[simp]
-theorem shadow_singleton_empty : ∂ ({∅} : Finset (Finset α)) = ∅ :=
-  rfl
 
 @[simp]
 theorem shadow_singleton (a : α) : ∂ {{a}} = {∅} := by
@@ -153,9 +153,7 @@ variable [DecidableEq α] [Fintype α] {𝒜 : Finset (Finset α)} {s t : Finset
 def upShadow (𝒜 : Finset (Finset α)) : Finset (Finset α) :=
   𝒜.sup fun s => sᶜ.image fun a => insert a s
 
-@[simp]
-theorem upShadow_empty : ∂⁺ (∅ : Finset (Finset α)) = ∅ :=
-  rfl
+@[inherit_doc] scoped[FinsetFamily] notation:max "∂⁺ " => Finset.upShadow
 
 @[mono]
 theorem upShadow_monotone : Monotone (upShadow : Finset (Finset α) → Finset (Finset α)) :=

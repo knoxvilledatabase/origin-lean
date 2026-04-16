@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Unramified/Field.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.PurelyInseparable
@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Artinian
 import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.Algebra.Polynomial.Taylor
 import Mathlib.RingTheory.Unramified.Finite
+
+noncomputable section
 
 /-!
 # Unramified algebras over fields
@@ -125,7 +127,6 @@ alias bijective_of_isAlgClosed_of_localRing := bijective_of_isAlgClosed_of_isLoc
 alias isField_of_isAlgClosed_of_localRing := isField_of_isAlgClosed_of_isLocalRing
 
 include K in
-
 theorem isReduced_of_field :
     IsReduced A := by
   constructor

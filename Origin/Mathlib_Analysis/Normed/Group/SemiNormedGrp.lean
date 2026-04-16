@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.ZeroMorphisms
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
 import Mathlib.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # The category of seminormed groups
 
@@ -59,19 +61,6 @@ instance toAddMonoidHomClass {V W : SemiNormedGrp} : AddMonoidHomClass (V ⟶ W)
 lemma ext {M N : SemiNormedGrp} {f₁ f₂ : M ⟶ N} (h : ∀ (x : M), f₁ x = f₂ x) : f₁ = f₂ :=
   DFunLike.ext _ _ h
 
-@[simp]
-theorem coe_of (V : Type u) [SeminormedAddCommGroup V] : (SemiNormedGrp.of V : Type u) = V :=
-  rfl
-
-@[simp (high)]
-theorem coe_id (V : SemiNormedGrp) : (𝟙 V : V → V) = id :=
-  rfl
-
-@[simp (high)]
-theorem coe_comp {M N K : SemiNormedGrp} (f : M ⟶ N) (g : N ⟶ K) :
-    (f ≫ g : M → K) = g ∘ f :=
-  rfl
-
 instance : Inhabited SemiNormedGrp :=
   ⟨of PUnit⟩
 
@@ -81,10 +70,6 @@ instance ofUnique (V : Type u) [SeminormedAddCommGroup V] [i : Unique V] :
 
 instance {M N : SemiNormedGrp} : Zero (M ⟶ N) :=
   NormedAddGroupHom.zero
-
-@[simp]
-theorem zero_apply {V W : SemiNormedGrp} (x : V) : (0 : V ⟶ W) x = 0 :=
-  rfl
 
 instance : Limits.HasZeroMorphisms.{u, u + 1} SemiNormedGrp where
 
@@ -149,10 +134,6 @@ def mkHom {M N : SemiNormedGrp} (f : M ⟶ N) (i : f.NormNoninc) :
     SemiNormedGrp₁.of M ⟶ SemiNormedGrp₁.of N :=
   ⟨f, i⟩
 
-theorem mkHom_apply {M N : SemiNormedGrp} (f : M ⟶ N) (i : f.NormNoninc) (x) :
-    mkHom f i x = f x :=
-  rfl
-
 @[simps]
 def mkIso {M N : SemiNormedGrp} (f : M ≅ N) (i : f.hom.NormNoninc) (i' : f.inv.NormNoninc) :
     SemiNormedGrp₁.of M ≅ SemiNormedGrp₁.of N where
@@ -166,19 +147,6 @@ instance : HasForget₂ SemiNormedGrp₁ SemiNormedGrp where
     { obj := fun X => X
       map := fun f => f.1 }
 
-@[simp]
-theorem coe_of (V : Type u) [SeminormedAddCommGroup V] : (SemiNormedGrp₁.of V : Type u) = V :=
-  rfl
-
-@[simp (high)]
-theorem coe_id (V : SemiNormedGrp₁) : ⇑(𝟙 V) = id :=
-  rfl
-
-@[simp (high)]
-theorem coe_comp {M N K : SemiNormedGrp₁} (f : M ⟶ N) (g : N ⟶ K) :
-    (f ≫ g : M → K) = g ∘ f :=
-  rfl
-
 instance : Inhabited SemiNormedGrp₁ :=
   ⟨of PUnit⟩
 
@@ -188,10 +156,6 @@ instance ofUnique (V : Type u) [SeminormedAddCommGroup V] [i : Unique V] :
 
 instance (X Y : SemiNormedGrp₁) : Zero (X ⟶ Y) where
   zero := ⟨0, NormedAddGroupHom.NormNoninc.zero⟩
-
-@[simp]
-theorem zero_apply {V W : SemiNormedGrp₁} (x : V) : (0 : V ⟶ W) x = 0 :=
-  rfl
 
 instance : Limits.HasZeroMorphisms.{u, u + 1} SemiNormedGrp₁ where
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.Sets.Compacts
 
+noncomputable section
+
 /-!
 # Additional results on topological groups
 

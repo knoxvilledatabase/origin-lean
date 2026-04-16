@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Split
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Mul
 
+noncomputable section
+
 /-!
 # Box additive functions
 
@@ -44,6 +46,8 @@ structure BoxAdditiveMap (ι M : Type*) [AddCommMonoid M] (I : WithTop (Box ι))
 
 scoped notation:25 ι " →ᵇᵃ " M => BoxIntegral.BoxAdditiveMap ι M ⊤
 
+@[inherit_doc] scoped notation:25 ι " →ᵇᵃ[" I "] " M => BoxIntegral.BoxAdditiveMap ι M I
+
 namespace BoxAdditiveMap
 
 open Box Prepartition Finset
@@ -56,9 +60,6 @@ instance : FunLike (ι →ᵇᵃ[I₀] M) (Box ι) M where
   coe_injective' f g h := by cases f; cases g; congr
 
 initialize_simps_projections BoxIntegral.BoxAdditiveMap (toFun → apply)
-
-@[simp]
-theorem coe_mk (f h) : ⇑(mk f h : ι →ᵇᵃ[I₀] M) = f := rfl
 
 theorem coe_injective : Injective fun (f : ι →ᵇᵃ[I₀] M) x => f x :=
   DFunLike.coe_injective
@@ -148,9 +149,6 @@ variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
 def toSMul (f : ι →ᵇᵃ[I₀] ℝ) : ι →ᵇᵃ[I₀] E →L[ℝ] E :=
   f.map (ContinuousLinearMap.lsmul ℝ ℝ).toLinearMap.toAddMonoidHom
-
-@[simp]
-theorem toSMul_apply (f : ι →ᵇᵃ[I₀] ℝ) (I : Box ι) (x : E) : f.toSMul I x = f I • x := rfl
 
 end ToSMul
 

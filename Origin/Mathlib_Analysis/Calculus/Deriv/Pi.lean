@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Pi
 import Mathlib.Analysis.Calculus.Deriv.Basic
 
+noncomputable section
+
 /-!
 # One-dimensional derivatives on pi-types.
 -/

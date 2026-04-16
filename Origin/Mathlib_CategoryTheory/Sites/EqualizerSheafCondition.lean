@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Sites.IsSheafFor
 import Mathlib.CategoryTheory.Limits.Shapes.Types
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # The equalizer diagram sheaf condition for a presieve
 

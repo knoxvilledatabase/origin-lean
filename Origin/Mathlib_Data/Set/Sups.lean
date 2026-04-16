@@ -7,6 +7,8 @@ import Mathlib.Data.Set.NAry
 import Mathlib.Order.UpperLower.Basic
 import Mathlib.Order.SupClosed
 
+noncomputable section
+
 /-!
 # Set family operations
 
@@ -157,9 +159,6 @@ theorem iUnion_image_sup_left : ⋃ a ∈ s, (· ⊔ ·) a '' t = s ⊻ t :=
 
 theorem iUnion_image_sup_right : ⋃ b ∈ t, (· ⊔ b) '' s = s ⊻ t :=
   iUnion_image_right _
-
-@[simp]
-theorem image_sup_prod (s t : Set α) : Set.image2 (· ⊔ ·) s t = s ⊻ t := rfl
 
 theorem sups_assoc : s ⊻ t ⊻ u = s ⊻ (t ⊻ u) := image2_assoc sup_assoc
 

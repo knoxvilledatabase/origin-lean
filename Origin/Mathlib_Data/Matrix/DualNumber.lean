@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.DualNumber
 import Mathlib.Data.Matrix.Basic
 
+noncomputable section
+
 /-!
 # Matrices of dual numbers are isomorphic to dual numbers over matrices
 

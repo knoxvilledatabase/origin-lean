@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/FreeLocus.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
@@ -10,6 +10,8 @@ import Mathlib.RingTheory.LocalRing.Module
 import Mathlib.RingTheory.Localization.Free
 import Mathlib.RingTheory.Localization.LocalizationLocalization
 import Mathlib.Topology.LocallyConstant.Basic
+
+noncomputable section
 
 /-!
 
@@ -47,7 +49,6 @@ lemma mem_freeLocus {p} : p ∈ freeLocus R M ↔
   Iff.rfl
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
-
 lemma mem_freeLocus_of_isLocalization (p : PrimeSpectrum R)
     (Rₚ Mₚ) [CommRing Rₚ] [Algebra R Rₚ] [IsLocalization.AtPrime Rₚ p.asIdeal]
     [AddCommGroup Mₚ] [Module R Mₚ] (f : M →ₗ[R] Mₚ) [IsLocalizedModule p.asIdeal.primeCompl f]
@@ -67,7 +68,6 @@ lemma mem_freeLocus_of_isLocalization (p : PrimeSpectrum R)
     IsLocalization.map_id_mk']
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
-
 lemma mem_freeLocus_iff_tensor (p : PrimeSpectrum R)
     (Rₚ) [CommRing Rₚ] [Algebra R Rₚ] [IsLocalization.AtPrime Rₚ p.asIdeal] :
     p ∈ freeLocus R M ↔ Module.Free Rₚ (Rₚ ⊗[R] M) := by
@@ -179,7 +179,6 @@ lemma isOpen_freeLocus [Module.FinitePresentation R M] :
 variable (M) in
 
 noncomputable
-
 def rankAtStalk (p : PrimeSpectrum R) : ℕ :=
   Module.finrank (Localization.AtPrime p.asIdeal) (LocalizedModule p.asIdeal.primeCompl M)
 

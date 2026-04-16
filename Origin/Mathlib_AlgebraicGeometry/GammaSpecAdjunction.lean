@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Restrict
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Adjunction.Reflective
 
+noncomputable section
+
 /-!
 # Adjunction between `Γ` and `Spec`
 
@@ -287,33 +289,10 @@ def locallyRingedSpaceAdjunction : Γ.rightOp ⊣ Spec.toLocallyRingedSpace.{u} 
       Spec.toLocallyRingedSpace_map, Quiver.Hom.unop_op]
     exact right_triangle R.unop
 
-lemma locallyRingedSpaceAdjunction_unit :
-    locallyRingedSpaceAdjunction.unit = identityToΓSpec := rfl
-
-lemma locallyRingedSpaceAdjunction_counit :
-    locallyRingedSpaceAdjunction.counit = (NatIso.op SpecΓIdentity.{u}).inv := rfl
-
 @[simp]
 lemma locallyRingedSpaceAdjunction_counit_app (R : CommRingCatᵒᵖ) :
     locallyRingedSpaceAdjunction.counit.app R =
       (toOpen R.unop ⊤).op := rfl
-
-@[simp]
-lemma locallyRingedSpaceAdjunction_counit_app' (R : Type u) [CommRing R] :
-    locallyRingedSpaceAdjunction.counit.app (op <| CommRingCat.of R) =
-      (toOpen R ⊤).op := rfl
-
-lemma locallyRingedSpaceAdjunction_homEquiv_apply
-    {X : LocallyRingedSpace} {R : CommRingCatᵒᵖ}
-    (f : Γ.rightOp.obj X ⟶ R) :
-    locallyRingedSpaceAdjunction.homEquiv X R f =
-      identityToΓSpec.app X ≫ Spec.locallyRingedSpaceMap f.unop := rfl
-
-lemma locallyRingedSpaceAdjunction_homEquiv_apply'
-    {X : LocallyRingedSpace} {R : Type u} [CommRing R]
-    (f : CommRingCat.of R ⟶ Γ.obj <| op X) :
-    locallyRingedSpaceAdjunction.homEquiv X (op <| CommRingCat.of R) (op f) =
-      identityToΓSpec.app X ≫ Spec.locallyRingedSpaceMap f := rfl
 
 lemma toOpen_comp_locallyRingedSpaceAdjunction_homEquiv_app
     {X : LocallyRingedSpace} {R : Type u} [CommRing R]
@@ -341,28 +320,12 @@ def adjunction : Scheme.Γ.rightOp ⊣ Scheme.Spec.{u} where
   right_triangle_components R :=
     Scheme.Hom.ext' <| locallyRingedSpaceAdjunction.right_triangle_components R
 
-theorem adjunction_homEquiv_apply {X : Scheme} {R : CommRingCatᵒᵖ}
-    (f : (op <| Scheme.Γ.obj <| op X) ⟶ R) :
-    ΓSpec.adjunction.homEquiv X R f = ⟨locallyRingedSpaceAdjunction.homEquiv X.1 R f⟩ := rfl
-
-theorem adjunction_homEquiv_symm_apply {X : Scheme} {R : CommRingCatᵒᵖ}
-    (f : X ⟶ Scheme.Spec.obj R) :
-    (ΓSpec.adjunction.homEquiv X R).symm f =
-      (locallyRingedSpaceAdjunction.homEquiv X.1 R).symm f.toLRSHom := rfl
-
-theorem adjunction_counit_app' {R : CommRingCatᵒᵖ} :
-    ΓSpec.adjunction.counit.app R = locallyRingedSpaceAdjunction.counit.app R := rfl
-
 @[simp]
 theorem adjunction_counit_app {R : CommRingCatᵒᵖ} :
     ΓSpec.adjunction.counit.app R = (Scheme.ΓSpecIso (unop R)).inv.op := rfl
 
 def _root_.AlgebraicGeometry.Scheme.toSpecΓ (X : Scheme.{u}) : X ⟶ Spec Γ(X, ⊤) :=
   ΓSpec.adjunction.unit.app X
-
-@[simp]
-theorem adjunction_unit_app {X : Scheme} :
-    ΓSpec.adjunction.unit.app X = X.toSpecΓ := rfl
 
 instance isIso_locallyRingedSpaceAdjunction_counit :
     IsIso.{u + 1, u + 1} locallyRingedSpaceAdjunction.counit :=
@@ -375,10 +338,6 @@ instance isIso_adjunction_counit : IsIso ΓSpec.adjunction.counit := by
   infer_instance
 
 end ΓSpec
-
-theorem Scheme.toSpecΓ_base (X : Scheme.{u}) (x) :
-    (Scheme.toSpecΓ X).base x =
-      (Spec.map (X.presheaf.germ ⊤ x trivial)).base (IsLocalRing.closedPoint _) := rfl
 
 @[reassoc (attr := simp)]
 theorem Scheme.toSpecΓ_naturality {X Y : Scheme.{u}} (f : X ⟶ Y) :
@@ -429,10 +388,6 @@ lemma ΓSpecIso_inv_ΓSpec_adjunction_homEquiv {X : Scheme.{u}} {B : CommRingCat
 lemma ΓSpec_adjunction_homEquiv_eq {X : Scheme.{u}} {B : CommRingCat} (φ : B ⟶ Γ(X, ⊤)) :
     ((ΓSpec.adjunction.homEquiv X (op B)) φ.op).appTop = (Scheme.ΓSpecIso B).hom ≫ φ := by
   rw [← Iso.inv_comp_eq, ΓSpecIso_inv_ΓSpec_adjunction_homEquiv]
-
-theorem ΓSpecIso_obj_hom {X : Scheme.{u}} (U : X.Opens) :
-    (Scheme.ΓSpecIso Γ(X, U)).hom = (Spec.map U.topIso.inv).appTop ≫
-      U.toScheme.toSpecΓ.appTop ≫ U.topIso.hom := by simp
 
 alias ΓSpec.adjunction_unit_naturality := Scheme.toSpecΓ_naturality
 

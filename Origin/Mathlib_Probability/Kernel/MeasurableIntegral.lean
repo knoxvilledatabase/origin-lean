@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.Probability.Kernel.Basic
 
+noncomputable section
+
 /-!
 # Measurability of the integral against a kernel
 

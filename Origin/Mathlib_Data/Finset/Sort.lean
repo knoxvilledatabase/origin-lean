@@ -9,6 +9,8 @@ import Mathlib.Data.List.NodupEquivFin
 import Mathlib.Data.Finset.Max
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 # Construct a sorted list from a finset.
 -/
@@ -152,15 +154,6 @@ def orderIsoOfFin (s : Finset α) {k : ℕ} (h : s.card = k) : Fin k ≃o s :=
 
 def orderEmbOfFin (s : Finset α) {k : ℕ} (h : s.card = k) : Fin k ↪o α :=
   (orderIsoOfFin s h).toOrderEmbedding.trans (OrderEmbedding.subtype _)
-
-@[simp]
-theorem coe_orderIsoOfFin_apply (s : Finset α) {k : ℕ} (h : s.card = k) (i : Fin k) :
-    ↑(orderIsoOfFin s h i) = orderEmbOfFin s h i :=
-  rfl
-
-theorem orderIsoOfFin_symm_apply (s : Finset α) {k : ℕ} (h : s.card = k) (x : s) :
-    ↑((s.orderIsoOfFin h).symm x) = (s.sort (· ≤ ·)).indexOf ↑x :=
-  rfl
 
 theorem orderEmbOfFin_apply (s : Finset α) {k : ℕ} (h : s.card = k) (i : Fin k) :
     s.orderEmbOfFin h i = (s.sort (· ≤ ·))[i]'(by rw [length_sort, h]; exact i.2) :=

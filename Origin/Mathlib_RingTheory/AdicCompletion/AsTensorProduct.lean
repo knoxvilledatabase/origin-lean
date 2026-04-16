@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.RingTheory.AdicCompletion.Exactness
 import Mathlib.RingTheory.Flat.Algebra
 
+noncomputable section
+
 /-!
 
 # Adic completion as tensor product
@@ -49,7 +51,6 @@ open TensorProduct
 namespace AdicCompletion
 
 private
-
 def ofTensorProductBil : AdicCompletion I R →ₗ[AdicCompletion I R] M →ₗ[R] AdicCompletion I M where
   toFun r := LinearMap.lsmul (AdicCompletion I R) (AdicCompletion I M) r ∘ₗ of I M
   map_add' x y := by
@@ -60,11 +61,6 @@ def ofTensorProductBil : AdicCompletion I R →ₗ[AdicCompletion I R] M →ₗ[
     intro y
     ext n
     simp [mul_smul (r.val n)]
-
-@[simp]
-private lemma ofTensorProductBil_apply_apply (r : AdicCompletion I R) (x : M) :
-    ((AdicCompletion.ofTensorProductBil I M) r) x = r • (of I M) x :=
-  rfl
 
 def ofTensorProduct : AdicCompletion I R ⊗[R] M →ₗ[AdicCompletion I R] AdicCompletion I M :=
   TensorProduct.AlgebraTensorModule.lift (ofTensorProductBil I M)
@@ -196,7 +192,6 @@ section
 variable {ι : Type} (f : (ι → R) →ₗ[R] M)
 
 private
-
 def lTensorKerIncl : AdicCompletion I R ⊗[R] LinearMap.ker f →ₗ[AdicCompletion I R]
     AdicCompletion I R ⊗[R] (ι → R) :=
   AlgebraTensorModule.map LinearMap.id (LinearMap.ker f).subtype
@@ -297,7 +292,6 @@ private lemma ofTensorProduct_iso [Fintype ι] [IsNoetherianRing R] :
     rfl
 
 private
-
 lemma ofTensorProduct_bijective_of_map_from_fin [Fintype ι] [IsNoetherianRing R] :
     Function.Bijective (ofTensorProduct I M) := by
   have : IsIso (ModuleCat.asHom (ofTensorProduct I M)) :=
@@ -318,20 +312,6 @@ def ofTensorProductEquivOfFiniteNoetherian [Module.Finite R M] :
     AdicCompletion I R ⊗[R] M ≃ₗ[AdicCompletion I R] AdicCompletion I M :=
   LinearEquiv.ofBijective (ofTensorProduct I M)
     (ofTensorProduct_bijective_of_finite_of_isNoetherian I M)
-
-@[simp]
-lemma ofTensorProductEquivOfFiniteNoetherian_apply [Module.Finite R M]
-    (x : AdicCompletion I R ⊗[R] M) :
-    ofTensorProductEquivOfFiniteNoetherian I M x = ofTensorProduct I M x :=
-  rfl
-
-@[simp]
-lemma ofTensorProductEquivOfFiniteNoetherian_symm_of
-    [Module.Finite R M] (x : M) :
-    (ofTensorProductEquivOfFiniteNoetherian I M).symm ((of I M) x) = 1 ⊗ₜ x := by
-  have h : (of I M) x = ofTensorProductEquivOfFiniteNoetherian I M (1 ⊗ₜ x) := by
-    simp
-  rw [h, LinearEquiv.symm_apply_apply]
 
 section
 

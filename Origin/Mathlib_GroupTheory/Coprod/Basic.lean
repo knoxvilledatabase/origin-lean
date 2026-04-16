@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Submonoid.Membership
 import Mathlib.Algebra.PUnitInstances.Algebra
 import Mathlib.GroupTheory.Congruence.Basic
 
+noncomputable section
+
 /-!
 # Coproduct (free product) of two monoids or groups
 
@@ -209,21 +211,6 @@ def clift (f : FreeMonoid (M ⊕ N) →* P)
   Con.lift _ f <| sInf_le ⟨hM, hN, hM₁.trans (map_one f).symm, hN₁.trans (map_one f).symm⟩
 
 @[to_additive (attr := simp)]
-theorem clift_apply_inl (f : FreeMonoid (M ⊕ N) →* P) (hM₁ hN₁ hM hN) (x : M) :
-    clift f hM₁ hN₁ hM hN (inl x) = f (of (.inl x)) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem clift_apply_inr (f : FreeMonoid (M ⊕ N) →* P) (hM₁ hN₁ hM hN) (x : N) :
-    clift f hM₁ hN₁ hM hN (inr x) = f (of (.inr x)) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem clift_apply_mk (f : FreeMonoid (M ⊕ N) →* P) (hM₁ hN₁ hM hN w) :
-    clift f hM₁ hN₁ hM hN (mk w) = f w :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem clift_comp_mk (f : FreeMonoid (M ⊕ N) →* P) (hM₁ hN₁ hM hN) :
     (clift f hM₁ hN₁ hM hN).comp mk = f :=
   DFunLike.ext' rfl
@@ -274,23 +261,6 @@ def map (f : M →* M') (g : N →* N') : M ∗ N →* M' ∗ N' :=
     fun x y => by simp only [MonoidHom.comp_apply, map_of, Sum.map_inr, map_mul, mk_of_inr]
 
 @[to_additive (attr := simp)]
-theorem map_mk_ofList (f : M →* M') (g : N →* N') (l : List (M ⊕ N)) :
-    map f g (mk (ofList l)) = mk (ofList (l.map (Sum.map f g))) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem map_apply_inl (f : M →* M') (g : N →* N') (x : M) : map f g (inl x) = inl (f x) := rfl
-
-@[to_additive (attr := simp)]
-theorem map_apply_inr (f : M →* M') (g : N →* N') (x : N) : map f g (inr x) = inr (g x) := rfl
-
-@[to_additive (attr := simp)]
-theorem map_comp_inl (f : M →* M') (g : N →* N') : (map f g).comp inl = inl.comp f := rfl
-
-@[to_additive (attr := simp)]
-theorem map_comp_inr (f : M →* M') (g : N →* N') : (map f g).comp inr = inr.comp g := rfl
-
-@[to_additive (attr := simp)]
 theorem map_id_id : map (.id M) (.id N) = .id (M ∗ N) := hom_ext rfl rfl
 
 @[to_additive]
@@ -335,11 +305,7 @@ theorem swap_map (f : M →* M') (g : N →* N') (x : M ∗ N) :
     swap M' N' (map f g x) = map g f (swap M N x) :=
   DFunLike.congr_fun (swap_comp_map f g) x
 
-@[to_additive (attr := simp)] theorem swap_comp_inl : (swap M N).comp inl = inr := rfl
-
 @[to_additive (attr := simp)] theorem swap_inl (x : M) : swap M N (inl x) = inr x := rfl
-
-@[to_additive (attr := simp)] theorem swap_comp_inr : (swap M N).comp inr = inl := rfl
 
 @[to_additive (attr := simp)] theorem swap_inr (x : N) : swap M N (inr x) = inl x := rfl
 
@@ -378,15 +344,6 @@ and works for an `AddZeroClass` codomain."]
 def lift (f : M →* P) (g : N →* P) : (M ∗ N) →* P :=
   clift (FreeMonoid.lift <| Sum.elim f g) (map_one f) (map_one g) (map_mul f) (map_mul g)
 
-@[to_additive (attr := simp)]
-theorem lift_apply_mk (f : M →* P) (g : N →* P) (x : FreeMonoid (M ⊕ N)) :
-    lift f g (mk x) = FreeMonoid.lift (Sum.elim f g) x :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem lift_apply_inl (f : M →* P) (g : N →* P) (x : M) : lift f g (inl x) = f x :=
-  rfl
-
 @[to_additive]
 theorem lift_unique {f : M →* P} {g : N →* P} {fg : M ∗ N →* P} (h₁ : fg.comp inl = f)
     (h₂ : fg.comp inr = g) : fg = lift f g :=
@@ -394,10 +351,6 @@ theorem lift_unique {f : M →* P} {g : N →* P} {fg : M ∗ N →* P} (h₁ : 
 
 @[to_additive (attr := simp)]
 theorem lift_comp_inl (f : M →* P) (g : N →* P) : (lift f g).comp inl = f := rfl
-
-@[to_additive (attr := simp)]
-theorem lift_apply_inr (f : M →* P) (g : N →* P) (x : N) : lift f g (inr x) = g x :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem lift_comp_inr (f : M →* P) (g : N →* P) : (lift f g).comp inr = g := rfl
@@ -452,23 +405,9 @@ def toProd : M ∗ N →* M × N := lift (.inl _ _) (.inr _ _)
 
 @[to_additive (attr := simp)] theorem fst_apply_inl (x : M) : fst (inl x : M ∗ N) = x := rfl
 
-@[to_additive (attr := simp)] theorem fst_comp_inr : (fst : M ∗ N →* M).comp inr = 1 := rfl
-
-@[to_additive (attr := simp)] theorem fst_apply_inr (x : N) : fst (inr x : M ∗ N) = 1 := rfl
-
-@[to_additive (attr := simp)] theorem snd_comp_inl : (snd : M ∗ N →* N).comp inl = 1 := rfl
-
-@[to_additive (attr := simp)] theorem snd_apply_inl (x : M) : snd (inl x : M ∗ N) = 1 := rfl
-
 @[to_additive (attr := simp)] theorem snd_comp_inr : (snd : M ∗ N →* N).comp inr = .id _ := rfl
 
 @[to_additive (attr := simp)] theorem snd_apply_inr (x : N) : snd (inr x : M ∗ N) = x := rfl
-
-@[to_additive (attr := simp)]
-theorem toProd_comp_inl : (toProd : M ∗ N →* M × N).comp inl = .inl _ _ := rfl
-
-@[to_additive (attr := simp)]
-theorem toProd_comp_inr : (toProd : M ∗ N →* M × N).comp inr = .inr _ _ := rfl
 
 @[to_additive (attr := simp)]
 theorem toProd_apply_inl (x : M) : toProd (inl x : M ∗ N) = (x, 1) := rfl
@@ -560,11 +499,6 @@ instance : Inv (G ∗ H) where
     (coprodCon G H).map_of_mul_left_rel_one _ con_inv_mul_cancel
 
 @[to_additive]
-theorem inv_def (w : FreeMonoid (G ⊕ H)) :
-    (mk w)⁻¹ = mk (ofList (w.toList.map (Sum.map Inv.inv Inv.inv)).reverse) :=
-  rfl
-
-@[to_additive]
 instance : Group (G ∗ H) where
   inv_mul_cancel := mk_surjective.forall.2 fun x => mk_eq_mk.2 (con_inv_mul_cancel x)
 
@@ -638,29 +572,6 @@ def coprodAssoc : (M ∗ N) ∗ P ≃* M ∗ (N ∗ P) :=
     (by ext <;> rfl) (by ext <;> rfl)
 
 variable {M N P}
-
-@[to_additive (attr := simp)]
-theorem coprodAssoc_apply_inl_inl (x : M) : coprodAssoc M N P (inl (inl x)) = inl x := rfl
-
-@[to_additive (attr := simp)]
-theorem coprodAssoc_apply_inl_inr (x : N) : coprodAssoc M N P (inl (inr x)) = inr (inl x) := rfl
-
-@[to_additive (attr := simp)]
-theorem coprodAssoc_apply_inr (x : P) : coprodAssoc M N P (inr x) = inr (inr x) := rfl
-
-@[to_additive (attr := simp)]
-theorem coprodAssoc_symm_apply_inl (x : M) : (coprodAssoc M N P).symm (inl x) = inl (inl x) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coprodAssoc_symm_apply_inr_inl (x : N) :
-    (coprodAssoc M N P).symm (inr (inl x)) = inl (inr x) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coprodAssoc_symm_apply_inr_inr (x : P) :
-    (coprodAssoc M N P).symm (inr (inr x)) = inr x :=
-  rfl
 
 variable (M)
 

@@ -5,6 +5,8 @@ Genuine: 58 | Conflates: 24 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Basic
 
+noncomputable section
+
 /-!
 # Infimum separation
 

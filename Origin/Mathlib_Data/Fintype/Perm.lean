@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.Perm.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Data.Nat.Factorial.Basic
 
+noncomputable section
+
 /-!
 # `Fintype` instances for `Equiv` and `Perm`
 

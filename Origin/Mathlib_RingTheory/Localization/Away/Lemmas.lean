@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Localization.Away.Basic
 import Mathlib.RingTheory.Localization.Submodule
 
+noncomputable section
+
 /-!
 # More lemmas on localization away
 

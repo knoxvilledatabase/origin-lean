@@ -5,6 +5,8 @@ Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Logic.Function.Conjugate
 
+noncomputable section
+
 /-!
 # Iterations of a function
 
@@ -45,9 +47,6 @@ variable (f : α → α)
 
 @[simp]
 theorem iterate_zero : f^[0] = id :=
-  rfl
-
-theorem iterate_zero_apply (x : α) : f^[0] x = x :=
   rfl
 
 @[simp]
@@ -171,10 +170,6 @@ def Iterate.rec (p : α → Sort*) {f : α → α} (h : ∀ a, p a → p (f a)) 
   match n with
   | 0 => ha
   | m+1 => Iterate.rec p h (h _ ha) m
-
-theorem Iterate.rec_zero (p : α → Sort*) {f : α → α} (h : ∀ a, p a → p (f a)) {a : α} (ha : p a) :
-    Iterate.rec p h ha 0 = ha :=
-  rfl
 
 variable {f} {m n : ℕ} {a : α}
 

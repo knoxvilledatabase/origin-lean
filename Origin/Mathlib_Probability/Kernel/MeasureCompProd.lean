@@ -5,6 +5,8 @@ Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Probability.Kernel.IntegralCompProd
 
+noncomputable section
+
 /-!
 # Composition-Product of a measure and a kernel
 
@@ -33,7 +35,6 @@ variable {α β : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β}
   {μ ν : Measure α} {κ η : Kernel α β}
 
 noncomputable
-
 def compProd (μ : Measure α) (κ : Kernel α β) : Measure (α × β) :=
   (Kernel.const Unit μ ⊗ₖ Kernel.prodMkLeft Unit κ) ()
 
@@ -182,9 +183,6 @@ lemma dirac_unit_compProd (κ : Kernel Unit β) [IsSFiniteKernel κ] :
 lemma dirac_unit_compProd_const (μ : Measure β) [IsFiniteMeasure μ] :
     Measure.dirac () ⊗ₘ Kernel.const Unit μ = μ.map (Prod.mk ()) := by
   rw [dirac_unit_compProd, Kernel.const_apply]
-
-lemma snd_dirac_unit_compProd_const (μ : Measure β) [IsFiniteMeasure μ] :
-    snd (Measure.dirac () ⊗ₘ Kernel.const Unit μ) = μ := by simp
 
 instance : SFinite (μ ⊗ₘ κ) := by rw [compProd]; infer_instance
 

@@ -5,6 +5,8 @@ Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 
+noncomputable section
+
 /-!
 # Almost everywhere disjoint sets
 

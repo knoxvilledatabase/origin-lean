@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Set.Finite.Range
 import Mathlib.Logic.Equiv.Embedding
 
+noncomputable section
+
 /-!
 # Number of embeddings
 

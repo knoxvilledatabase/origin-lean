@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.EssentiallySmall
 
+noncomputable section
+
 /-!
 # Limits over essentially small indexing categories
 

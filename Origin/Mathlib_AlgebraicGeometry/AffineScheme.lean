@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/AffineScheme.lean
-Genuine: 97 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Cover.Open
@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Opposites
 import Mathlib.RingTheory.Localization.InvSubmonoid
 import Mathlib.RingTheory.RingHom.Surjective
 import Mathlib.Topology.Sheaves.CommRingCat
+
+noncomputable section
 
 /-!
 # Affine schemes
@@ -98,7 +100,6 @@ theorem isAffine_of_isIso {X Y : Scheme} (f : X ⟶ Y) [IsIso f] [h : IsAffine Y
   rw [← mem_Spec_essImage] at h ⊢; exact Functor.essImage.ofIso (asIso f).symm h
 
 noncomputable
-
 def arrowIsoSpecΓOfIsAffine {X Y : Scheme} [IsAffine X] [IsAffine Y] (f : X ⟶ Y) :
     Arrow.mk f ≅ Arrow.mk (Spec.map f.appTop) :=
   Arrow.isoMk X.isoSpec Y.isoSpec (ΓSpec.adjunction.unit_naturality _)
@@ -251,7 +252,6 @@ theorem isBasis_basicOpen (X : Scheme) [IsAffine X] :
     exact congr_arg Opens.carrier (Scheme.toSpecΓ_preimage_basicOpen _ _).symm
 
 noncomputable
-
 def Scheme.Opens.toSpecΓ {X : Scheme.{u}} (U : X.Opens) :
     U.toScheme ⟶ Spec Γ(X, U) :=
   U.toScheme.toSpecΓ ≫ Spec.map U.topIso.inv
@@ -272,6 +272,7 @@ namespace IsAffineOpen
 variable {X Y : Scheme.{u}} {U : X.Opens} (hU : IsAffineOpen U) (f : Γ(X, U))
 
 attribute [-simp] eqToHom_op in
+/-- The isomorphism `U ≅ Spec Γ(X, U)` for an affine `U`. -/
 
 @[simps! (config := .lemmasOnly) inv]
 def isoSpec :
@@ -317,9 +318,6 @@ instance isOpenImmersion_fromSpec :
     IsOpenImmersion hU.fromSpec := by
   delta fromSpec
   infer_instance
-
-@[reassoc (attr := simp)]
-lemma isoSpec_inv_ι : hU.isoSpec.inv ≫ U.ι = hU.fromSpec := rfl
 
 @[simp]
 theorem range_fromSpec :
@@ -375,7 +373,6 @@ lemma fromSpec_app_of_le (V : X.Opens) (h : U ≤ V) :
   rfl
 
 include hU in
-
 protected theorem isCompact :
     IsCompact (U : Set X) := by
   convert @IsCompact.image _ _ _ _ Set.univ hU.fromSpec.base PrimeSpectrum.compactSpace.1
@@ -384,7 +381,6 @@ protected theorem isCompact :
   exact Set.image_univ
 
 include hU in
-
 theorem image_of_isOpenImmersion (f : X ⟶ Y) [H : IsOpenImmersion f] :
     IsAffineOpen (f ''ᵁ U) := by
   have : IsAffine _ := hU
@@ -422,11 +418,6 @@ def _root_.AlgebraicGeometry.IsOpenImmersion.affineOpensEquiv (f : X ⟶ Y) [H :
 def _root_.AlgebraicGeometry.affineOpensRestrict {X : Scheme.{u}} (U : X.Opens) :
     U.toScheme.affineOpens ≃ { V : X.affineOpens // V ≤ U } :=
   (IsOpenImmersion.affineOpensEquiv U.ι).trans (Equiv.subtypeEquivProp (by simp))
-
-@[simp]
-lemma _root_.AlgebraicGeometry.affineOpensRestrict_symm_apply_coe
-    {X : Scheme.{u}} (U : X.Opens) (V) :
-    ((affineOpensRestrict U).symm V).1 = U.ι ⁻¹ᵁ V := rfl
 
 instance (priority := 100) _root_.AlgebraicGeometry.Scheme.compactSpace_of_isAffine
     (X : Scheme) [IsAffine X] :
@@ -478,7 +469,6 @@ theorem basicOpen_fromSpec_app :
   rw [← hU.fromSpec_preimage_basicOpen, Scheme.preimage_basicOpen]
 
 include hU in
-
 theorem basicOpen :
     IsAffineOpen (X.basicOpen f) := by
   rw [← hU.fromSpec_image_basicOpen, Scheme.Hom.isAffineOpen_iff_of_isOpenImmersion]
@@ -494,7 +484,6 @@ instance [IsAffine X] (r : Γ(X, ⊤)) : IsAffine (X.basicOpen r) :=
   (isAffineOpen_top X).basicOpen _
 
 include hU in
-
 theorem ι_basicOpen_preimage (r : Γ(X, ⊤)) :
     IsAffineOpen ((X.basicOpen r).ι ⁻¹ᵁ U) := by
   apply (X.basicOpen r).ι.isAffineOpen_iff_of_isOpenImmersion.mp
@@ -504,7 +493,6 @@ theorem ι_basicOpen_preimage (r : Γ(X, ⊤)) :
   exact hU.basicOpen _
 
 include hU in
-
 theorem exists_basicOpen_le {V : X.Opens} (x : V) (h : ↑x ∈ U) :
     ∃ f : Γ(X, U), X.basicOpen f ≤ V ∧ ↑x ∈ X.basicOpen f := by
   have : IsAffine _ := hU
@@ -523,13 +511,8 @@ theorem exists_basicOpen_le {V : X.Opens} (x : V) (h : ↑x ∈ U) :
   exact ⟨Set.image_subset_iff.mpr h₂, ⟨_, h⟩, h₁, rfl⟩
 
 noncomputable
-
 instance {R : CommRingCat} {U} : Algebra R Γ(Spec R, U) :=
   ((Scheme.ΓSpecIso R).inv ≫ (Spec R).presheaf.map (homOfLE le_top).op).toAlgebra
-
-@[simp]
-lemma algebraMap_Spec_obj {R : CommRingCat} {U} : algebraMap R Γ(Spec R, U) =
-    (Scheme.ΓSpecIso R).inv ≫ (Spec R).presheaf.map (homOfLE le_top).op := rfl
 
 instance {R : CommRingCat} {f : R} :
     IsLocalization.Away f Γ(Spec R, PrimeSpectrum.basicOpen f) :=
@@ -550,7 +533,6 @@ instance basicOpenSectionsToAffine_isIso :
   exact RingedSpace.basicOpen_le _ _
 
 include hU in
-
 theorem isLocalization_basicOpen :
     IsLocalization.Away f Γ(X, X.basicOpen f) := by
   apply
@@ -614,7 +596,6 @@ def appBasicOpenIsoAwayMap {X Y : Scheme.{u}} (f : X ⟶ Y) {U : Y.Opens}
     simp [hU.app_basicOpen_eq_away_map f h]
 
 include hU in
-
 theorem isLocalization_of_eq_basicOpen {V : X.Opens} (i : V ⟶ U) (e : V = X.basicOpen f) :
     @IsLocalization.Away _ _ f Γ(X, V) _ (X.presheaf.map i.op).toAlgebra := by
   subst e; convert isLocalization_basicOpen hU f using 3
@@ -625,7 +606,6 @@ instance _root_.AlgebraicGeometry.Γ_restrict_isLocalization
   (isAffineOpen_top X).isLocalization_of_eq_basicOpen r _ (Opens.isOpenEmbedding_obj_top _)
 
 include hU in
-
 theorem basicOpen_basicOpen_is_basicOpen (g : Γ(X, X.basicOpen f)) :
     ∃ f' : Γ(X, U), X.basicOpen f' = X.basicOpen g := by
   have := isLocalization_basicOpen hU f
@@ -643,7 +623,6 @@ theorem basicOpen_basicOpen_is_basicOpen (g : Γ(X, X.basicOpen f)) :
         _).prop
 
 include hU in
-
 theorem _root_.AlgebraicGeometry.exists_basicOpen_le_affine_inter
     {V : X.Opens} (hV : IsAffineOpen V) (x : X) (hx : x ∈ U ⊓ V) :
     ∃ (f : Γ(X, U)) (g : Γ(X, V)), X.basicOpen f = X.basicOpen g ∧ x ∈ X.basicOpen f := by
@@ -715,6 +694,13 @@ def _root_.AlgebraicGeometry.Scheme.affineBasicOpen
   ⟨X.basicOpen f, U.prop.basicOpen f⟩
 
 include hU in
+/--
+
+In an affine open set `U`, a family of basic open covers `U` iff the sections span `Γ(X, U)`.
+
+See `iSup_basicOpen_of_span_eq_top` for the inverse direction without the affine-ness assumption.
+
+-/
 
 theorem basicOpen_union_eq_self_iff (s : Set Γ(X, U)) :
     ⨆ f : s, X.basicOpen (f : Γ(X, U)) = U ↔ Ideal.span s = ⊤ := by
@@ -745,7 +731,6 @@ theorem basicOpen_union_eq_self_iff (s : Set Γ(X, U)) :
     simp only [Set.iUnion_singleton_eq_range, Subtype.range_val_subtype, Set.setOf_mem_eq]
 
 include hU in
-
 theorem self_le_basicOpen_union_iff (s : Set Γ(X, U)) :
     (U ≤ ⨆ f : s, X.basicOpen f.1) ↔ Ideal.span s = ⊤ := by
   rw [← hU.basicOpen_union_eq_self_iff, @comm _ Eq]
@@ -759,7 +744,6 @@ end IsAffineOpen
 open _root_.PrimeSpectrum in
 
 noncomputable
-
 def SpecMapRestrictBasicOpenIso {R S : CommRingCat} (f : R ⟶ S) (r : R) :
     Arrow.mk (Spec.map f ∣_ (PrimeSpectrum.basicOpen r)) ≅
       Arrow.mk (Spec.map <| CommRingCat.ofHom (Localization.awayMap f r)) := by

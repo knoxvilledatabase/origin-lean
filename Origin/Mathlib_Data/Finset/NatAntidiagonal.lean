@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Nat
 import Mathlib.Data.Finset.Card
 import Mathlib.Data.Multiset.NatAntidiagonal
 
+noncomputable section
+
 /-!
 # Antidiagonals in ℕ × ℕ as finsets
 
@@ -51,9 +53,6 @@ lemma antidiagonal_eq_image' (n : ℕ) :
 
 @[simp]
 theorem card_antidiagonal (n : ℕ) : (antidiagonal n).card = n + 1 := by simp [antidiagonal]
-
-@[simp]
-theorem antidiagonal_zero : antidiagonal 0 = {(0, 0)} := rfl
 
 theorem antidiagonal_succ (n : ℕ) :
     antidiagonal (n + 1) =
@@ -106,18 +105,6 @@ theorem antidiagonal.snd_lt {n : ℕ} {kl : ℕ × ℕ} (hlk : kl ∈ antidiagon
     rw [add_assoc, add_comm, add_assoc, add_comm j l, hl]
     exact Nat.sub_add_cancel h
 
-@[simp] lemma antidiagonal_filter_fst_le_of_le {n k : ℕ} (h : k ≤ n) :
-    (antidiagonal n).filter (fun a ↦ a.fst ≤ k) = (antidiagonal k).map
-      (Embedding.prodMap (Embedding.refl ℕ) ⟨_, add_left_injective (n - k)⟩) := by
-  have aux₁ : fun a ↦ a.fst ≤ k = (fun a ↦ a.snd ≤ k) ∘ (Equiv.prodComm ℕ ℕ).symm := rfl
-  have aux₂ : ∀ i j, (∃ a b, a + b = k ∧ b = i ∧ a + (n - k) = j) ↔
-                      ∃ a b, a + b = k ∧ a = i ∧ b + (n - k) = j :=
-    fun i j ↦ by rw [exists_comm]; exact exists₂_congr (fun a b ↦ by rw [add_comm])
-  rw [← map_prodComm_antidiagonal]
-  simp_rw [aux₁, ← map_filter, antidiagonal_filter_snd_le_of_le h, map_map]
-  ext ⟨i, j⟩
-  simpa using aux₂ i j
-
 @[simp] lemma antidiagonal_filter_le_fst_of_le {n k : ℕ} (h : k ≤ n) :
     (antidiagonal n).filter (fun a ↦ k ≤ a.fst) = (antidiagonal (n - k)).map
       (Embedding.prodMap ⟨_, add_left_injective k⟩ (Embedding.refl ℕ)) := by
@@ -129,27 +116,6 @@ theorem antidiagonal.snd_lt {n : ℕ} {kl : ℕ × ℕ} (hlk : kl ∈ antidiagon
     refine ⟨?_, Nat.le_add_left k l⟩
     rw [add_right_comm, hl]
     exact tsub_add_cancel_of_le h
-
-@[simp] lemma antidiagonal_filter_le_snd_of_le {n k : ℕ} (h : k ≤ n) :
-    (antidiagonal n).filter (fun a ↦ k ≤ a.snd) = (antidiagonal (n - k)).map
-      (Embedding.prodMap (Embedding.refl ℕ) ⟨_, add_left_injective k⟩) := by
-  have aux₁ : fun a ↦ k ≤ a.snd = (fun a ↦ k ≤ a.fst) ∘ (Equiv.prodComm ℕ ℕ).symm := rfl
-  have aux₂ : ∀ i j, (∃ a b, a + b = n - k ∧ b = i ∧ a + k = j) ↔
-                      ∃ a b, a + b = n - k ∧ a = i ∧ b + k = j :=
-    fun i j ↦ by rw [exists_comm]; exact exists₂_congr (fun a b ↦ by rw [add_comm])
-  rw [← map_prodComm_antidiagonal]
-  simp_rw [aux₁, ← map_filter, antidiagonal_filter_le_fst_of_le h, map_map]
-  ext ⟨i, j⟩
-  simpa using aux₂ i j
-
-@[simps]
-def antidiagonalEquivFin (n : ℕ) : antidiagonal n ≃ Fin (n + 1) where
-  toFun := fun ⟨⟨i, _⟩, h⟩ ↦ ⟨i, antidiagonal.fst_lt h⟩
-  invFun := fun ⟨i, h⟩ ↦ ⟨⟨i, n - i⟩, by
-    rw [mem_antidiagonal, add_comm, Nat.sub_add_cancel]
-    exact Nat.le_of_lt_succ h⟩
-  left_inv := by rintro ⟨⟨i, j⟩, h⟩; ext; rfl
-  right_inv _ := rfl
 
 end Nat
 

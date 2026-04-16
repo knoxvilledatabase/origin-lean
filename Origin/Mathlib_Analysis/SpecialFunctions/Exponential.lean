@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Topology.MetricSpace.CauSeqFilter
 
+noncomputable section
+
 /-!
 # Calculus results on exponential in a Banach algebra
 

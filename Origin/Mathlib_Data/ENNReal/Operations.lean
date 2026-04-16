@@ -1,12 +1,14 @@
 /-
 Extracted from Data/ENNReal/Operations.lean
-Genuine: 92 | Conflates: 0 | Dissolved: 27 | Infrastructure: 10
+Genuine: 119 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.WithTop
 import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Data.ENNReal.Basic
 import Mathlib.Data.NNReal.Basic
+
+noncomputable section
 
 /-!
 # Properties of addition, multiplication and subtraction on extended non-negative real numbers
@@ -34,35 +36,55 @@ protected theorem mul_left_mono : Monotone (a * ·) := mul_left_mono
 
 protected theorem mul_right_mono : Monotone (· * a) := mul_right_mono
 
--- DISSOLVED: pow_right_strictMono
+protected lemma pow_right_strictMono {n : ℕ} (hn : n ≠ 0) : StrictMono fun a : ℝ≥0∞ ↦ a ^ n :=
+  WithTop.pow_right_strictMono hn
 
--- DISSOLVED: pow_lt_pow_left
+@[gcongr] protected lemma pow_lt_pow_left (hab : a < b) {n : ℕ} (hn : n ≠ 0) : a ^ n < b ^ n :=
+  WithTop.pow_lt_pow_left hab hn
 
 protected theorem max_mul : max a b * c = max (a * c) (b * c) := mul_right_mono.map_max
 
 protected theorem mul_max : a * max b c = max (a * b) (a * c) := mul_left_mono.map_max
 
--- DISSOLVED: mul_left_strictMono
+theorem mul_left_strictMono (h0 : a ≠ 0) (hinf : a ≠ ∞) : StrictMono (a * ·) := by
+  lift a to ℝ≥0 using hinf
+  rw [coe_ne_zero] at h0
+  intro x y h
+  contrapose! h
+  simpa only [← mul_assoc, ← coe_mul, inv_mul_cancel₀ h0, coe_one, one_mul]
+    using mul_le_mul_left' h (↑a⁻¹)
 
--- DISSOLVED: mul_lt_mul_left'
+@[gcongr] protected theorem mul_lt_mul_left' (h0 : a ≠ 0) (hinf : a ≠ ⊤) (bc : b < c) :
+    a * b < a * c :=
+  ENNReal.mul_left_strictMono h0 hinf bc
 
--- DISSOLVED: mul_lt_mul_right'
+@[gcongr] protected theorem mul_lt_mul_right' (h0 : a ≠ 0) (hinf : a ≠ ⊤) (bc : b < c) :
+    b * a < c * a :=
+  mul_comm b a ▸ mul_comm c a ▸ ENNReal.mul_left_strictMono h0 hinf bc
 
--- DISSOLVED: mul_eq_mul_left
+theorem mul_eq_mul_left (h0 : a ≠ 0) (hinf : a ≠ ∞) : a * b = a * c ↔ b = c :=
+  (mul_left_strictMono h0 hinf).injective.eq_iff
 
--- DISSOLVED: mul_eq_mul_right
+theorem mul_eq_mul_right : c ≠ 0 → c ≠ ∞ → (a * c = b * c ↔ a = b) :=
+  mul_comm c a ▸ mul_comm c b ▸ mul_eq_mul_left
 
--- DISSOLVED: mul_le_mul_left
+theorem mul_le_mul_left (h0 : a ≠ 0) (hinf : a ≠ ∞) : a * b ≤ a * c ↔ b ≤ c :=
+  (mul_left_strictMono h0 hinf).le_iff_le
 
--- DISSOLVED: mul_le_mul_right
+theorem mul_le_mul_right : c ≠ 0 → c ≠ ∞ → (a * c ≤ b * c ↔ a ≤ b) :=
+  mul_comm c a ▸ mul_comm c b ▸ mul_le_mul_left
 
--- DISSOLVED: mul_lt_mul_left
+theorem mul_lt_mul_left (h0 : a ≠ 0) (hinf : a ≠ ∞) : a * b < a * c ↔ b < c :=
+  (mul_left_strictMono h0 hinf).lt_iff_lt
 
--- DISSOLVED: mul_lt_mul_right
+theorem mul_lt_mul_right : c ≠ 0 → c ≠ ∞ → (a * c < b * c ↔ a < b) :=
+  mul_comm c a ▸ mul_comm c b ▸ mul_lt_mul_left
 
--- DISSOLVED: mul_eq_left
+protected lemma mul_eq_left (ha₀ : a ≠ 0) (ha : a ≠ ∞) : a * b = a ↔ b = 1 := by
+  simpa using ENNReal.mul_eq_mul_left ha₀ ha (c := 1)
 
--- DISSOLVED: mul_eq_right
+protected lemma mul_eq_right (hb₀ : b ≠ 0) (hb : b ≠ ∞) : a * b = b ↔ a = 1 := by
+  simpa using ENNReal.mul_eq_mul_right hb₀ hb (b := 1)
 
 end Mul
 
@@ -71,9 +93,8 @@ section OperationsAndOrder
 protected theorem pow_pos : 0 < a → ∀ n : ℕ, 0 < a ^ n :=
   CanonicallyOrderedCommSemiring.pow_pos
 
--- DISSOLVED: pow_ne_zero
-
-theorem not_lt_zero : ¬a < 0 := by simp
+protected theorem pow_ne_zero : a ≠ 0 → ∀ n : ℕ, a ^ n ≠ 0 := by
+  simpa only [pos_iff_ne_zero] using ENNReal.pow_pos
 
 protected theorem le_of_add_le_add_left : a ≠ ∞ → a + b ≤ a + c → b ≤ c :=
   WithTop.le_of_add_le_add_left
@@ -108,7 +129,8 @@ protected theorem add_lt_add_of_lt_of_le : c ≠ ∞ → a < b → c ≤ d → a
 instance addLeftReflectLT : AddLeftReflectLT ℝ≥0∞ :=
   WithTop.addLeftReflectLT
 
--- DISSOLVED: lt_add_right
+theorem lt_add_right (ha : a ≠ ∞) (hb : b ≠ 0) : a < a + b := by
+  rwa [← pos_iff_ne_zero, ← ENNReal.add_lt_add_iff_left ha, add_zero] at hb
 
 end OperationsAndOrder
 
@@ -136,26 +158,29 @@ protected lemma Finiteness.add_ne_top {a b : ℝ≥0∞} (ha : a ≠ ∞) (hb : 
 
 theorem mul_top' : a * ∞ = if a = 0 then 0 else ∞ := by convert WithTop.mul_top' a
 
--- DISSOLVED: mul_top
+@[simp] theorem mul_top (h : a ≠ 0) : a * ∞ = ∞ := WithTop.mul_top h
 
 theorem top_mul' : ∞ * a = if a = 0 then 0 else ∞ := by convert WithTop.top_mul' a
 
--- DISSOLVED: top_mul
+@[simp] theorem top_mul (h : a ≠ 0) : ∞ * a = ∞ := WithTop.top_mul h
 
 theorem top_mul_top : ∞ * ∞ = ∞ := WithTop.top_mul_top
 
 theorem top_pow {n : ℕ} (n_pos : 0 < n) : (∞ : ℝ≥0∞) ^ n = ∞ := WithTop.top_pow n_pos
 
--- DISSOLVED: mul_eq_top
+theorem mul_eq_top : a * b = ∞ ↔ a ≠ 0 ∧ b = ∞ ∨ a = ∞ ∧ b ≠ 0 :=
+  WithTop.mul_eq_top_iff
 
 theorem mul_lt_top : a < ∞ → b < ∞ → a * b < ∞ := WithTop.mul_lt_top
 
 @[aesop (rule_sets := [finiteness]) unsafe 75% apply]
 theorem mul_ne_top : a ≠ ∞ → b ≠ ∞ → a * b ≠ ∞ := WithTop.mul_ne_top
 
--- DISSOLVED: lt_top_of_mul_ne_top_left
+theorem lt_top_of_mul_ne_top_left (h : a * b ≠ ∞) (hb : b ≠ 0) : a < ∞ :=
+  lt_top_iff_ne_top.2 fun ha => h <| mul_eq_top.2 (Or.inr ⟨ha, hb⟩)
 
--- DISSOLVED: lt_top_of_mul_ne_top_right
+theorem lt_top_of_mul_ne_top_right (h : a * b ≠ ∞) (ha : a ≠ 0) : b < ∞ :=
+  lt_top_of_mul_ne_top_left (by rwa [mul_comm]) ha
 
 theorem mul_lt_top_iff {a b : ℝ≥0∞} : a * b < ∞ ↔ a < ∞ ∧ b < ∞ ∨ a = 0 ∨ b = 0 := by
   constructor
@@ -173,9 +198,15 @@ theorem mul_self_lt_top_iff {a : ℝ≥0∞} : a * a < ⊤ ↔ a < ⊤ := by
 theorem mul_pos_iff : 0 < a * b ↔ 0 < a ∧ 0 < b :=
   CanonicallyOrderedCommSemiring.mul_pos
 
--- DISSOLVED: mul_pos
+theorem mul_pos (ha : a ≠ 0) (hb : b ≠ 0) : 0 < a * b :=
+  mul_pos_iff.2 ⟨pos_iff_ne_zero.2 ha, pos_iff_ne_zero.2 hb⟩
 
--- DISSOLVED: pow_eq_top_iff
+@[simp] theorem pow_eq_top_iff {n : ℕ} : a ^ n = ∞ ↔ a = ∞ ∧ n ≠ 0 := by
+  rcases n.eq_zero_or_pos with rfl | (hn : 0 < n)
+  · simp
+  · induction a
+    · simp only [Ne, hn.ne', top_pow hn, not_false_eq_true, and_self]
+    · simp only [← coe_pow, coe_ne_top, false_and]
 
 theorem pow_eq_top (n : ℕ) (h : a ^ n = ∞) : a = ∞ :=
   (pow_eq_top_iff.1 h).1
@@ -319,7 +350,8 @@ protected theorem sub_lt_of_lt_add (hac : c ≤ a) (h : a < b + c) : a - c < b :
 protected theorem sub_lt_iff_lt_right (hb : b ≠ ∞) (hab : b ≤ a) : a - b < c ↔ a < c + b :=
   (cancel_of_ne hb).tsub_lt_iff_right hab
 
--- DISSOLVED: sub_lt_self
+protected theorem sub_lt_self (ha : a ≠ ∞) (ha₀ : a ≠ 0) (hb : b ≠ 0) : a - b < a :=
+  (cancel_of_ne ha).tsub_lt_self (pos_iff_ne_zero.2 ha₀) (pos_iff_ne_zero.2 hb)
 
 protected theorem sub_lt_self_iff (ha : a ≠ ∞) : a - b < a ↔ 0 < a ∧ 0 < b :=
   (cancel_of_ne ha).tsub_lt_self_iff
@@ -409,9 +441,10 @@ variable {x y z : ℝ≥0∞} {ε ε₁ ε₂ : ℝ≥0∞} {s : Set ℝ≥0∞}
 protected theorem Ico_eq_Iio : Ico 0 y = Iio y :=
   Ico_bot
 
--- DISSOLVED: mem_Iio_self_add
+theorem mem_Iio_self_add : x ≠ ∞ → ε ≠ 0 → x ∈ Iio (x + ε) := fun xt ε0 => lt_add_right xt ε0
 
--- DISSOLVED: mem_Ioo_self_sub_add
+theorem mem_Ioo_self_sub_add : x ≠ ∞ → x ≠ 0 → ε₁ ≠ 0 → ε₂ ≠ 0 → x ∈ Ioo (x - ε₁) (x + ε₂) :=
+  fun xt x0 ε0 ε0' => ⟨ENNReal.sub_lt_self xt x0 ε0, lt_add_right xt ε0'⟩
 
 end Interval
 
@@ -465,9 +498,11 @@ lemma nnreal_smul_lt_top {x : ℝ≥0} {y : ℝ≥0∞} (hy : y < ⊤) : x • y
 
 lemma nnreal_smul_ne_top {x : ℝ≥0} {y : ℝ≥0∞} (hy : y ≠ ⊤) : x • y ≠ ⊤ := mul_ne_top (by simp) hy
 
--- DISSOLVED: nnreal_smul_ne_top_iff
+lemma nnreal_smul_ne_top_iff {x : ℝ≥0} {y : ℝ≥0∞} (hx : x ≠ 0) : x • y ≠ ⊤ ↔ y ≠ ⊤ :=
+  ⟨by rintro h rfl; simp [smul_top, hx] at h, nnreal_smul_ne_top⟩
 
--- DISSOLVED: nnreal_smul_lt_top_iff
+lemma nnreal_smul_lt_top_iff {x : ℝ≥0} {y : ℝ≥0∞} (hx : x ≠ 0) : x • y < ⊤ ↔ y < ⊤ := by
+  rw [lt_top_iff_ne_top, lt_top_iff_ne_top, nnreal_smul_ne_top_iff hx]
 
 end Actions
 

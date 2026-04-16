@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.Algebra.Polynomial.Eval.SMul
 import Mathlib.Algebra.Polynomial.HasseDeriv
 
+noncomputable section
+
 /-!
 # Taylor expansions of polynomials
 

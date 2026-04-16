@@ -10,6 +10,8 @@ import Mathlib.Logic.Relator
 import Mathlib.Util.CompileInductive
 import Aesop
 
+noncomputable section
+
 /-!
 # Option of a type
 
@@ -37,21 +39,10 @@ namespace Option
 
 variable {α β γ δ : Type*}
 
-theorem coe_def : (fun a ↦ ↑a : α → Option α) = some :=
-  rfl
-
-theorem mem_map {f : α → β} {y : β} {o : Option α} : y ∈ o.map f ↔ ∃ x ∈ o, f x = y := by simp
-
 @[simp 1100, nolint simpNF]
 theorem mem_map_of_injective {f : α → β} (H : Function.Injective f) {a : α} {o : Option α} :
     f a ∈ o.map f ↔ a ∈ o := by
   aesop
-
-theorem forall_mem_map {f : α → β} {o : Option α} {p : β → Prop} :
-    (∀ y ∈ o.map f, p y) ↔ ∀ x ∈ o, p (f x) := by simp
-
-theorem exists_mem_map {f : α → β} {o : Option α} {p : β → Prop} :
-    (∃ y ∈ o.map f, p y) ↔ ∃ x ∈ o, p (f x) := by simp
 
 theorem coe_get {o : Option α} (h : o.isSome) : ((Option.get _ h : α) : Option α) = o :=
   Option.some_get h
@@ -68,18 +59,6 @@ theorem map_injective {f : α → β} (Hf : Function.Injective f) : Function.Inj
   | none, none, _ => rfl
   | some a₁, some a₂, H => by rw [Hf (Option.some.inj H)]
 
-@[simp]
-theorem map_comp_some (f : α → β) : Option.map f ∘ some = some ∘ f :=
-  rfl
-
-@[simp]
-theorem none_bind' (f : α → Option β) : none.bind f = none :=
-  rfl
-
-@[simp]
-theorem some_bind' (a : α) (f : α → Option β) : (some a).bind f = f a :=
-  rfl
-
 theorem bind_eq_some' {x : Option α} {f : α → Option β} {b : β} :
     x.bind f = some b ↔ ∃ a, x = some a ∧ f a = some b := by
   cases x <;> simp
@@ -95,16 +74,6 @@ theorem bind_congr' {f g : α → Option β} {x y : Option α} (hx : x = y)
 
 theorem joinM_eq_join : joinM = @join α :=
   funext fun _ ↦ rfl
-
-theorem bind_eq_bind' {α β : Type u} {f : α → Option β} {x : Option α} : x >>= f = x.bind f :=
-  rfl
-
-theorem map_coe {α β} {a : α} {f : α → β} : f <$> (a : Option α) = ↑(f a) :=
-  rfl
-
-@[simp]
-theorem map_coe' {a : α} {f : α → β} : Option.map f (a : Option α) = ↑(f a) :=
-  rfl
 
 theorem map_injective' : Function.Injective (@Option.map α β) := fun f g h ↦
   funext fun x ↦ some_injective _ <| by simp only [← map_some', h]
@@ -189,14 +158,6 @@ theorem join_pmap_eq_pmap_join {f : ∀ a, p a → β} {x : Option (Option α)} 
 end pmap
 
 @[simp]
-theorem seq_some {α β} {a : α} {f : α → β} : some f <*> some a = some (f a) :=
-  rfl
-
-@[simp]
-theorem some_orElse' (a : α) (x : Option α) : (some a).orElse (fun _ ↦ x) = some a :=
-  rfl
-
-@[simp]
 theorem none_orElse' (x : Option α) : none.orElse (fun _ ↦ x) = x := by cases x <;> rfl
 
 @[simp]
@@ -229,18 +190,6 @@ theorem liftOrGet_choice {f : α → α → α} (h : ∀ a b, f a b = a ∨ f a 
 def casesOn' : Option α → β → (α → β) → β
   | none, n, _ => n
   | some a, _, s => s a
-
-@[simp]
-theorem casesOn'_none (x : β) (f : α → β) : casesOn' none x f = x :=
-  rfl
-
-@[simp]
-theorem casesOn'_some (x : β) (f : α → β) (a : α) : casesOn' (some a) x f = f a :=
-  rfl
-
-@[simp]
-theorem casesOn'_coe (x : β) (f : α → β) (a : α) : casesOn' (a : Option α) x f = f a :=
-  rfl
 
 theorem casesOn'_none_coe (f : Option α → β) (o : Option α) :
     casesOn' o (f none) (f ∘ (fun a ↦ ↑a)) = f o := by cases o <;> rfl

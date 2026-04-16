@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/Factorization/Defs.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 9 | Infrastructure: 2
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Multiset
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.Nat.PrimeFin
 import Mathlib.NumberTheory.Padics.PadicVal.Defs
+
+noncomputable section
 
 /-!
 # Prime factorizations
@@ -75,17 +77,29 @@ theorem factorization_eq_primeFactorsList_multiset (n : ℕ) :
 
 alias factorization_eq_factors_multiset := factorization_eq_primeFactorsList_multiset
 
--- DISSOLVED: Prime.factorization_pos_of_dvd
+theorem Prime.factorization_pos_of_dvd {n p : ℕ} (hp : p.Prime) (hn : n ≠ 0) (h : p ∣ n) :
+    0 < n.factorization p := by
+    rwa [← primeFactorsList_count_eq, count_pos_iff, mem_primeFactorsList_iff_dvd hn hp]
 
--- DISSOLVED: multiplicity_eq_factorization
+theorem multiplicity_eq_factorization {n p : ℕ} (pp : p.Prime) (hn : n ≠ 0) :
+    multiplicity p n = n.factorization p := by
+  simp [factorization, pp, padicValNat_def' pp.ne_one hn.bot_lt]
 
 /-! ### Basic facts about factorization -/
 
--- DISSOLVED: factorization_prod_pow_eq_self
+@[simp]
+theorem factorization_prod_pow_eq_self {n : ℕ} (hn : n ≠ 0) : n.factorization.prod (· ^ ·) = n := by
+  rw [factorization_eq_primeFactorsList_multiset n]
+  simp only [← prod_toMultiset, factorization, Multiset.prod_coe, Multiset.toFinsupp_toMultiset]
+  exact prod_primeFactorsList hn
 
--- DISSOLVED: eq_of_factorization_eq
+theorem eq_of_factorization_eq {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (h : ∀ p : ℕ, a.factorization p = b.factorization p) : a = b :=
+  eq_of_perm_primeFactorsList ha hb
+    (by simpa only [List.perm_iff_count, primeFactorsList_count_eq] using h)
 
--- DISSOLVED: factorization_inj
+theorem factorization_inj : Set.InjOn factorization { x : ℕ | x ≠ 0 } := fun a ha b hb h =>
+  eq_of_factorization_eq ha hb fun p => by simp [h]
 
 @[simp]
 theorem factorization_zero : factorization 0 = 0 := by ext; simp [factorization]
@@ -117,11 +131,34 @@ theorem factorization_eq_zero_of_remainder {p r : ℕ} (i : ℕ) (hr : ¬p ∣ r
 
 /-! ## Lemmas about factorizations of products and powers -/
 
--- DISSOLVED: factorization_mul
+@[simp]
+theorem factorization_mul {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0) :
+    (a * b).factorization = a.factorization + b.factorization := by
+  ext p
+  simp only [add_apply, ← primeFactorsList_count_eq,
+    perm_iff_count.mp (perm_primeFactorsList_mul ha hb) p, count_append]
 
--- DISSOLVED: factorization_le_iff_dvd
+theorem factorization_le_iff_dvd {d n : ℕ} (hd : d ≠ 0) (hn : n ≠ 0) :
+    d.factorization ≤ n.factorization ↔ d ∣ n := by
+  constructor
+  · intro hdn
+    set K := n.factorization - d.factorization with hK
+    use K.prod (· ^ ·)
+    rw [← factorization_prod_pow_eq_self hn, ← factorization_prod_pow_eq_self hd,
+        ← Finsupp.prod_add_index' pow_zero pow_add, hK, add_tsub_cancel_of_le hdn]
+  · rintro ⟨c, rfl⟩
+    rw [factorization_mul hd (right_ne_zero_of_mul hn)]
+    simp
 
--- DISSOLVED: factorization_prod
+theorem factorization_prod {α : Type*} {S : Finset α} {g : α → ℕ} (hS : ∀ x ∈ S, g x ≠ 0) :
+    (S.prod g).factorization = S.sum fun x => (g x).factorization := by
+  classical
+    ext p
+    refine Finset.induction_on' S ?_ ?_
+    · simp
+    · intro x T hxS hTS hxT IH
+      have hT : T.prod g ≠ 0 := prod_ne_zero_iff.mpr fun x hx => hS x (hTS hx)
+      simp [prod_insert hxT, sum_insert hxT, IH, factorization_mul (hS x hxS) hT]
 
 @[simp]
 theorem factorization_pow (n k : ℕ) : factorization (n ^ k) = k • n.factorization := by
@@ -142,7 +179,11 @@ protected theorem Prime.factorization {p : ℕ} (hp : Prime p) : p.factorization
 theorem Prime.factorization_pow {p k : ℕ} (hp : Prime p) : (p ^ k).factorization = single p k := by
   simp [hp]
 
--- DISSOLVED: pow_succ_factorization_not_dvd
+theorem pow_succ_factorization_not_dvd {n p : ℕ} (hn : n ≠ 0) (hp : p.Prime) :
+    ¬p ^ (n.factorization p + 1) ∣ n := by
+  intro h
+  rw [← factorization_le_iff_dvd (pow_pos hp.pos _).ne' hn] at h
+  simpa [hp.factorization] using h p
 
 /-! ### Equivalence between `ℕ+` and `ℕ →₀ ℕ` with support in the primes. -/
 

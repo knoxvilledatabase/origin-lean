@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.CoreM
 import Lean.Util.FoldConsts
 
+noncomputable section
+
 /-!
 A rudimentary export format, adapted from
 <https://github.com/leanprover-community/lean/blob/master/doc/export_format.md>

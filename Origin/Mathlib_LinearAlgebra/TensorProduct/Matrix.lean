@@ -7,6 +7,8 @@ import Mathlib.Data.Matrix.Kronecker
 import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.LinearAlgebra.TensorProduct.Basis
 
+noncomputable section
+
 /-!
 # Connections between `TensorProduct` and `Matrix`
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
 import Mathlib.Algebra.Homology.Additive
 
+noncomputable section
+
 /-! Binary biproducts of homological complexes
 
 In this file, it is shown that if two homological complex `K` and `L` in

@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/QuadraticDiscriminant.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 7 | Infrastructure: 1
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Order.Filter.AtTopBot.Field
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Linarith.Frontend
+
+noncomputable section
 
 /-!
 # Quadratic discriminants and roots of a quadratic
@@ -51,9 +53,18 @@ lemma discrim_eq_sq_of_quadratic_eq_zero {x : R} (h : a * (x * x) + b * x + c = 
   rw [discrim]
   linear_combination -4 * a * h
 
--- DISSOLVED: quadratic_eq_zero_iff_discrim_eq_sq
+theorem quadratic_eq_zero_iff_discrim_eq_sq [NeZero (2 : R)] [NoZeroDivisors R]
+    (ha : a ≠ 0) (x : R) :
+    a * (x * x) + b * x + c = 0 ↔ discrim a b c = (2 * a * x + b) ^ 2 := by
+  refine ⟨discrim_eq_sq_of_quadratic_eq_zero, fun h ↦ ?_⟩
+  rw [discrim] at h
+  have ha : 2 * 2 * a ≠ 0 := mul_ne_zero (mul_ne_zero (NeZero.ne _) (NeZero.ne _)) ha
+  apply mul_left_cancel₀ ha
+  linear_combination -h
 
--- DISSOLVED: quadratic_ne_zero_of_discrim_ne_sq
+theorem quadratic_ne_zero_of_discrim_ne_sq (h : ∀ s : R, discrim a b c ≠ s^2) (x : R) :
+    a * (x * x) + b * x + c ≠ 0 :=
+  mt discrim_eq_sq_of_quadratic_eq_zero (h _)
 
 end Ring
 
@@ -61,11 +72,25 @@ section Field
 
 variable {K : Type*} [Field K] [NeZero (2 : K)] {a b c : K}
 
--- DISSOLVED: quadratic_eq_zero_iff
+theorem quadratic_eq_zero_iff (ha : a ≠ 0) {s : K} (h : discrim a b c = s * s) (x : K) :
+    a * (x * x) + b * x + c = 0 ↔ x = (-b + s) / (2 * a) ∨ x = (-b - s) / (2 * a) := by
+  rw [quadratic_eq_zero_iff_discrim_eq_sq ha, h, sq, mul_self_eq_mul_self_iff]
+  field_simp
+  apply or_congr
+  · constructor <;> intro h' <;> linear_combination -h'
+  · constructor <;> intro h' <;> linear_combination h'
 
--- DISSOLVED: exists_quadratic_eq_zero
+theorem exists_quadratic_eq_zero (ha : a ≠ 0) (h : ∃ s, discrim a b c = s * s) :
+    ∃ x, a * (x * x) + b * x + c = 0 := by
+  rcases h with ⟨s, hs⟩
+  use (-b + s) / (2 * a)
+  rw [quadratic_eq_zero_iff ha hs]
+  simp
 
--- DISSOLVED: quadratic_eq_zero_iff_of_discrim_eq_zero
+theorem quadratic_eq_zero_iff_of_discrim_eq_zero (ha : a ≠ 0) (h : discrim a b c = 0) (x : K) :
+    a * (x * x) + b * x + c = 0 ↔ x = -b / (2 * a) := by
+  have : discrim a b c = 0 * 0 := by rw [h, mul_zero]
+  rw [quadratic_eq_zero_iff ha this, add_zero, sub_zero, or_self_iff]
 
 end Field
 
@@ -98,8 +123,18 @@ theorem discrim_le_zero (h : ∀ x : K, 0 ≤ a * (x * x) + b * x + c) : discrim
 lemma discrim_le_zero_of_nonpos (h : ∀ x : K, a * (x * x) + b * x + c ≤ 0) : discrim a b c ≤ 0 :=
   discrim_neg a b c ▸ discrim_le_zero <| by simpa only [neg_mul, ← neg_add, neg_nonneg]
 
--- DISSOLVED: discrim_lt_zero
+theorem discrim_lt_zero (ha : a ≠ 0) (h : ∀ x : K, 0 < a * (x * x) + b * x + c) :
+    discrim a b c < 0 := by
+  have : ∀ x : K, 0 ≤ a * (x * x) + b * x + c := fun x => le_of_lt (h x)
+  refine lt_of_le_of_ne (discrim_le_zero this) fun h' ↦ ?_
+  have := h (-b / (2 * a))
+  have : a * (-b / (2 * a)) * (-b / (2 * a)) + b * (-b / (2 * a)) + c = 0 := by
+    rw [mul_assoc, quadratic_eq_zero_iff_of_discrim_eq_zero ha h' (-b / (2 * a))]
+  linarith
 
--- DISSOLVED: discrim_lt_zero_of_neg
+lemma discrim_lt_zero_of_neg (ha : a ≠ 0) (h : ∀ x : K, a * (x * x) + b * x + c < 0) :
+    discrim a b c < 0 :=
+  discrim_neg a b c ▸ discrim_lt_zero (neg_ne_zero.2 ha) <| by
+    simpa only [neg_mul, ← neg_add, neg_pos]
 
 end LinearOrderedField

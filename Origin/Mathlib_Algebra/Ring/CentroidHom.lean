@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.RingTheory.NonUnitalSubsemiring.Basic
 import Mathlib.Algebra.Ring.Subsemiring.Basic
 
+noncomputable section
+
 /-!
 # Centroid homomorphisms
 
@@ -100,14 +102,6 @@ theorem toFun_eq_coe {f : CentroidHom α} : f.toFun = f := rfl
 theorem ext {f g : CentroidHom α} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
-@[simp, norm_cast]
-theorem coe_toAddMonoidHom (f : CentroidHom α) : ⇑(f : α →+ α) = f :=
-  rfl
-
-@[simp]
-theorem toAddMonoidHom_eq_coe (f : CentroidHom α) : f.toAddMonoidHom = f :=
-  rfl
-
 theorem coe_toAddMonoidHom_injective : Injective ((↑) : CentroidHom α → α →+ α) :=
   fun _f _g h => ext fun a ↦
     haveI := DFunLike.congr_fun h a
@@ -125,10 +119,6 @@ protected def copy (f : CentroidHom α) (f' : α → α) (h : f' = f) : Centroid
     map_mul_left' := fun a b ↦ by simp_rw [h, map_mul_left]
     map_mul_right' := fun a b ↦ by simp_rw [h, map_mul_right] }
 
-@[simp]
-theorem coe_copy (f : CentroidHom α) (f' : α → α) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : CentroidHom α) (f' : α → α) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -142,19 +132,7 @@ protected def id : CentroidHom α :=
 instance : Inhabited (CentroidHom α) :=
   ⟨CentroidHom.id α⟩
 
-@[simp, norm_cast]
-theorem coe_id : ⇑(CentroidHom.id α) = id :=
-  rfl
-
-@[simp, norm_cast]
-theorem toAddMonoidHom_id : (CentroidHom.id α : α →+ α) = AddMonoidHom.id α :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : CentroidHom.id α a = a :=
-  rfl
 
 def comp (g f : CentroidHom α) : CentroidHom α :=
   { g.toAddMonoidHom.comp f.toAddMonoidHom with
@@ -162,28 +140,8 @@ def comp (g f : CentroidHom α) : CentroidHom α :=
     map_mul_right' := fun _a _b ↦
       (congr_arg g <| f.map_mul_right' _ _).trans <| g.map_mul_right' _ _ }
 
-@[simp, norm_cast]
-theorem coe_comp (g f : CentroidHom α) : ⇑(g.comp f) = g ∘ f :=
-  rfl
-
 @[simp]
 theorem comp_apply (g f : CentroidHom α) (a : α) : g.comp f a = g (f a) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_comp_addMonoidHom (g f : CentroidHom α) : (g.comp f : α →+ α) = (g : α →+ α).comp f :=
-  rfl
-
-@[simp]
-theorem comp_assoc (h g f : CentroidHom α) : (h.comp g).comp f = h.comp (g.comp f) :=
-  rfl
-
-@[simp]
-theorem comp_id (f : CentroidHom α) : f.comp (CentroidHom.id α) = f :=
-  rfl
-
-@[simp]
-theorem id_comp (f : CentroidHom α) : (CentroidHom.id α).comp f = f :=
   rfl
 
 @[simp]
@@ -268,39 +226,7 @@ theorem coe_zero : ⇑(0 : CentroidHom α) = 0 :=
   rfl
 
 @[simp, norm_cast]
-theorem coe_one : ⇑(1 : CentroidHom α) = id :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_add (f g : CentroidHom α) : ⇑(f + g) = f + g :=
-  rfl
-
-@[simp, norm_cast]
 theorem coe_mul (f g : CentroidHom α) : ⇑(f * g) = f ∘ g :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_smul (n : M) (f : CentroidHom α) : ⇑(n • f) = n • ⇑f :=
-  rfl
-
-@[simp]
-theorem zero_apply (a : α) : (0 : CentroidHom α) a = 0 :=
-  rfl
-
-@[simp]
-theorem one_apply (a : α) : (1 : CentroidHom α) a = a :=
-  rfl
-
-@[simp]
-theorem add_apply (f g : CentroidHom α) (a : α) : (f + g) a = f a + g a :=
-  rfl
-
-@[simp]
-theorem mul_apply (f g : CentroidHom α) (a : α) : (f * g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem smul_apply (n : M) (f : CentroidHom α) (a : α) : (n • f) a = n • f a :=
   rfl
 
 example : SMul ℕ (CentroidHom α) := instSMul
@@ -388,9 +314,6 @@ instance applyModule : Module (CentroidHom α) α where
   smul_zero := map_zero
   smul_add := map_add
 
-@[simp]
-lemma smul_def (T : CentroidHom α) (a : α) : T • a = T a := rfl
-
 instance : SMulCommClass (CentroidHom α) α α where
   smul_comm _ _ _ := map_mul_left _ _ _
 
@@ -460,9 +383,6 @@ instance : FunLike (Subsemiring.center (CentroidHom α)) α α where
     cases g
     congr with x
     exact congrFun h x
-
-lemma centerToCentroidCenter_apply (z : NonUnitalSubsemiring.center α) (a : α) :
-    (centerToCentroidCenter z) a = z * a := rfl
 
 def centerToCentroid : NonUnitalSubsemiring.center α →ₙ+* CentroidHom α :=
   NonUnitalRingHom.comp
@@ -566,22 +486,6 @@ theorem toEnd_sub (x y : CentroidHom α) : (x - y).toEnd = x.toEnd - y.toEnd :=
 instance : AddCommGroup (CentroidHom α) :=
   toEnd_injective.addCommGroup _
     toEnd_zero toEnd_add toEnd_neg toEnd_sub (swap toEnd_smul) (swap toEnd_smul)
-
-@[simp, norm_cast]
-theorem coe_neg (f : CentroidHom α) : ⇑(-f) = -f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_sub (f g : CentroidHom α) : ⇑(f - g) = f - g :=
-  rfl
-
-@[simp]
-theorem neg_apply (f : CentroidHom α) (a : α) : (-f) a = -f a :=
-  rfl
-
-@[simp]
-theorem sub_apply (f g : CentroidHom α) (a : α) : (f - g) a = f a - g a :=
-  rfl
 
 @[simp, norm_cast]
 theorem toEnd_intCast (z : ℤ) : (z : CentroidHom α).toEnd = ↑z :=

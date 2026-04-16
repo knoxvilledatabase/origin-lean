@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.Const
 import Mathlib.CategoryTheory.DiscreteCategory
 
+noncomputable section
+
 /-!
 # The category `Discrete PUnit`
 

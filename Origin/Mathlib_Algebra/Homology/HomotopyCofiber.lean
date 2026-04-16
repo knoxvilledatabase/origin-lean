@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Homology/HomotopyCofiber.lean
-Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplexBiprod
 import Mathlib.Algebra.Homology.Homotopy
 import Mathlib.CategoryTheory.MorphismProperty.IsInvertedBy
+
+noncomputable section
 
 /-! The homotopy cofiber of a morphism of homological complexes
 
@@ -500,7 +502,6 @@ noncomputable def homotopy₀₁ : Homotopy (ι₀ K) (ι₁ K) :=
     (Homotopy.ofEq (by simp)))
 
 include hc in
-
 lemma map_ι₀_eq_map_ι₁ {D : Type*} [Category D] (H : HomologicalComplex C c ⥤ D)
     (hH : (homotopyEquivalences C c).IsInvertedBy H) :
     H.map (ι₀ K) = H.map (ι₁ K) := by

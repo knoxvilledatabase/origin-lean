@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Basic.lean
-Genuine: 34 | Conflates: 1 | Dissolved: 10 | Infrastructure: 0
+Genuine: 44 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Units
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Tactic.Bound.Attribute
+
+noncomputable section
 
 /-!
 # Basic lemmas about ordered rings
@@ -35,7 +37,24 @@ section OrderedSemiring
 
 variable [OrderedSemiring R] {a b x y : R} {n : ℕ}
 
--- DISSOLVED: pow_add_pow_le
+theorem pow_add_pow_le (hx : 0 ≤ x) (hy : 0 ≤ y) (hn : n ≠ 0) : x ^ n + y ^ n ≤ (x + y) ^ n := by
+  rcases Nat.exists_eq_add_one_of_ne_zero hn with ⟨k, rfl⟩
+  induction k with
+  | zero => simp only [zero_add, pow_one, le_refl]
+  | succ k ih =>
+    let n := k.succ
+    have h1 := add_nonneg (mul_nonneg hx (pow_nonneg hy n)) (mul_nonneg hy (pow_nonneg hx n))
+    have h2 := add_nonneg hx hy
+    calc
+      x ^ (n + 1) + y ^ (n + 1) ≤ x * x ^ n + y * y ^ n + (x * y ^ n + y * x ^ n) := by
+        rw [pow_succ' _ n, pow_succ' _ n]
+        exact le_add_of_nonneg_right h1
+      _ = (x + y) * (x ^ n + y ^ n) := by
+        rw [add_mul, mul_add, mul_add, add_comm (y * x ^ n), ← add_assoc, ← add_assoc,
+          add_assoc (x * x ^ n) (x * y ^ n), add_comm (x * y ^ n) (y * y ^ n), ← add_assoc]
+      _ ≤ (x + y) ^ (n + 1) := by
+        rw [pow_succ' _ n]
+        exact mul_le_mul_of_nonneg_left (ih (Nat.succ_ne_zero k)) h2
 
 attribute [bound] pow_le_one₀ one_le_pow₀
 
@@ -60,9 +79,11 @@ section StrictOrderedSemiring
 
 variable [StrictOrderedSemiring R] {a x y : R} {n m : ℕ}
 
--- DISSOLVED: pow_lt_pow_left
+theorem pow_lt_pow_left (h : x < y) (hx : 0 ≤ x) : ∀ {n : ℕ}, n ≠ 0 → x ^ n < y ^ n :=
+  pow_lt_pow_left₀ h hx
 
--- DISSOLVED: pow_left_strictMonoOn
+lemma pow_left_strictMonoOn (hn : n ≠ 0) : StrictMonoOn (· ^ n : R → R) {a | 0 ≤ a} :=
+  pow_left_strictMonoOn₀ hn
 
 lemma pow_right_strictMono (h : 1 < a) : StrictMono (a ^ ·) :=
   pow_right_strictMono₀ h
@@ -102,11 +123,14 @@ section LinearOrderedSemiring
 
 variable [LinearOrderedSemiring R] {a b : R} {m n : ℕ}
 
--- DISSOLVED: pow_le_pow_iff_left
+lemma pow_le_pow_iff_left (ha : 0 ≤ a) (hb : 0 ≤ b) (hn : n ≠ 0) : a ^ n ≤ b ^ n ↔ a ≤ b :=
+  pow_le_pow_iff_left₀ ha hb hn
 
--- DISSOLVED: pow_lt_pow_iff_left
+lemma pow_lt_pow_iff_left (ha : 0 ≤ a) (hb : 0 ≤ b) (hn : n ≠ 0) : a ^ n < b ^ n ↔ a < b :=
+  pow_lt_pow_iff_left₀ ha hb hn
 
--- DISSOLVED: pow_left_inj
+lemma pow_left_inj (ha : 0 ≤ a) (hb : 0 ≤ b) (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b :=
+  pow_left_inj₀ ha hb hn
 
 lemma pow_right_injective (ha₀ : 0 < a) (ha₁ : a ≠ 1) : Injective (a ^ ·) :=
   pow_right_injective₀ ha₀ ha₁
@@ -124,7 +148,8 @@ theorem one_lt_sq_iff {a : R} (ha : 0 ≤ a) : 1 < a ^ 2 ↔ 1 < a := one_lt_sq_
 theorem lt_of_pow_lt_pow_left (n : ℕ) (hb : 0 ≤ b) (h : a ^ n < b ^ n) : a < b :=
   lt_of_pow_lt_pow_left₀ n hb h
 
--- DISSOLVED: le_of_pow_le_pow_left
+theorem le_of_pow_le_pow_left (hn : n ≠ 0) (hb : 0 ≤ b) (h : a ^ n ≤ b ^ n) : a ≤ b :=
+  le_of_pow_le_pow_left₀ hn hb h
 
 theorem sq_eq_sq {a b : R} (ha : 0 ≤ a) (hb : 0 ≤ b) : a ^ 2 = b ^ 2 ↔ a = b := sq_eq_sq₀ ha hb
 
@@ -190,9 +215,11 @@ protected lemma Even.add_pow_le (hn : Even n) :
 lemma Even.pow_nonneg (hn : Even n) (a : R) : 0 ≤ a ^ n := by
   obtain ⟨k, rfl⟩ := hn; rw [pow_add]; exact mul_self_nonneg _
 
--- DISSOLVED: Even.pow_pos
+lemma Even.pow_pos (hn : Even n) (ha : a ≠ 0) : 0 < a ^ n :=
+  (hn.pow_nonneg _).lt_of_ne' (pow_ne_zero _ ha)
 
--- DISSOLVED: Even.pow_pos_iff
+lemma Even.pow_pos_iff (hn : Even n) (h₀ : n ≠ 0) : 0 < a ^ n ↔ a ≠ 0 := by
+  obtain ⟨k, rfl⟩ := hn; rw [pow_add, mul_self_pos (α := R), pow_ne_zero_iff (by simpa using h₀)]
 
 lemma Odd.pow_neg_iff (hn : Odd n) : a ^ n < 0 ↔ a < 0 := by
   refine ⟨lt_imp_lt_of_le_imp_le (pow_nonneg · _), fun ha ↦ ?_⟩
@@ -233,7 +260,7 @@ lemma Odd.strictMono_pow (hn : Odd n) : StrictMono fun a : R => a ^ n := by
   refine lt_of_add_lt_add_right (a := a + b) ?_
   rwa [add_rotate', ← hbd, add_zero, add_left_comm, ← add_assoc, ← hac, zero_add]
 
--- DISSOLVED: sq_pos_iff
+lemma sq_pos_iff {a : R} : 0 < a ^ 2 ↔ a ≠ 0 := even_two.pow_pos_iff two_ne_zero
 
 alias ⟨_, sq_pos_of_ne_zero⟩ := sq_pos_iff
 

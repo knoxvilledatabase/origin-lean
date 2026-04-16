@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/MvPolynomial/Variables.lean
-Genuine: 28 | Conflates: 1 | Dissolved: 3 | Infrastructure: 0
+Genuine: 31 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Lex
 import Mathlib.Algebra.MvPolynomial.Degrees
+
+noncomputable section
 
 /-!
 # Variables of polynomials
@@ -71,7 +73,9 @@ theorem vars_def [DecidableEq σ] (p : MvPolynomial σ R) : p.vars = p.degrees.t
 theorem vars_0 : (0 : MvPolynomial σ R).vars = ∅ := by
   classical rw [vars_def, degrees_zero, Multiset.toFinset_zero]
 
--- DISSOLVED: vars_monomial
+@[simp]
+theorem vars_monomial (h : r ≠ 0) : (monomial s r).vars = s.support := by
+  classical rw [vars_def, degrees_monomial_eq _ _ h, Finsupp.toFinset_toMultiset]
 
 @[simp]
 theorem vars_C : (C r : MvPolynomial σ R).vars = ∅ := by
@@ -135,7 +139,14 @@ section IsDomain
 
 variable {A : Type*} [CommRing A] [NoZeroDivisors A]
 
--- DISSOLVED: vars_C_mul
+theorem vars_C_mul (a : A) (ha : a ≠ 0) (φ : MvPolynomial σ A) :
+    (C a * φ : MvPolynomial σ A).vars = φ.vars := by
+  ext1 i
+  simp only [mem_vars, exists_prop, mem_support_iff]
+  apply exists_congr
+  intro d
+  apply and_congr _ Iff.rfl
+  rw [coeff_C_mul, mul_ne_zero_iff, eq_true ha, true_and]
 
 end IsDomain
 
@@ -188,7 +199,9 @@ variable {f}
 theorem vars_map_of_injective (hf : Injective f) : (map f p).vars = p.vars := by
   simp [vars, degrees_map_of_injective _ hf]
 
--- DISSOLVED: vars_monomial_single
+theorem vars_monomial_single (i : σ) {e : ℕ} {r : R} (he : e ≠ 0) (hr : r ≠ 0) :
+    (monomial (Finsupp.single i e) r).vars = {i} := by
+  rw [vars_monomial hr, Finsupp.support_single_ne_zero _ he]
 
 theorem vars_eq_support_biUnion_support [DecidableEq σ] :
     p.vars = p.support.biUnion Finsupp.support := by

@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Convex/Integral.lean
-Genuine: 9 | Conflates: 0 | Dissolved: 13 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Function
 import Mathlib.Analysis.Convex.StrictConvexSpace
 import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 import Mathlib.MeasureTheory.Integral.Average
+
+noncomputable section
 
 /-!
 # Jensen's inequality for integrals
@@ -72,27 +74,66 @@ theorem Convex.integral_mem [IsProbabilityMeasure μ] (hs : Convex ℝ s) (hsc :
     apply (range g).inter_subset_right
     exact SimpleFunc.approxOn_mem hgm.measurable h₀ _ _
 
--- DISSOLVED: Convex.average_mem
+theorem Convex.average_mem [IsFiniteMeasure μ] [NeZero μ] (hs : Convex ℝ s) (hsc : IsClosed s)
+    (hfs : ∀ᵐ x ∂μ, f x ∈ s) (hfi : Integrable f μ) : (⨍ x, f x ∂μ) ∈ s :=
+  hs.integral_mem hsc (ae_mono' smul_absolutelyContinuous hfs) hfi.to_average
 
--- DISSOLVED: Convex.set_average_mem
+theorem Convex.set_average_mem (hs : Convex ℝ s) (hsc : IsClosed s) (h0 : μ t ≠ 0) (ht : μ t ≠ ∞)
+    (hfs : ∀ᵐ x ∂μ.restrict t, f x ∈ s) (hfi : IntegrableOn f t μ) : (⨍ x in t, f x ∂μ) ∈ s :=
+  have := Fact.mk ht.lt_top
+  have := NeZero.mk h0
+  hs.average_mem hsc hfs hfi
 
--- DISSOLVED: Convex.set_average_mem_closure
+theorem Convex.set_average_mem_closure (hs : Convex ℝ s) (h0 : μ t ≠ 0) (ht : μ t ≠ ∞)
+    (hfs : ∀ᵐ x ∂μ.restrict t, f x ∈ s) (hfi : IntegrableOn f t μ) :
+    (⨍ x in t, f x ∂μ) ∈ closure s :=
+  hs.closure.set_average_mem isClosed_closure h0 ht (hfs.mono fun _ hx => subset_closure hx) hfi
 
--- DISSOLVED: ConvexOn.average_mem_epigraph
+theorem ConvexOn.average_mem_epigraph [IsFiniteMeasure μ] [NeZero μ] (hg : ConvexOn ℝ s g)
+    (hgc : ContinuousOn g s) (hsc : IsClosed s) (hfs : ∀ᵐ x ∂μ, f x ∈ s)
+    (hfi : Integrable f μ) (hgi : Integrable (g ∘ f) μ) :
+    (⨍ x, f x ∂μ, ⨍ x, g (f x) ∂μ) ∈ {p : E × ℝ | p.1 ∈ s ∧ g p.1 ≤ p.2} := by
+  have ht_mem : ∀ᵐ x ∂μ, (f x, g (f x)) ∈ {p : E × ℝ | p.1 ∈ s ∧ g p.1 ≤ p.2} :=
+    hfs.mono fun x hx => ⟨hx, le_rfl⟩
+  exact average_pair hfi hgi ▸
+    hg.convex_epigraph.average_mem (hsc.epigraph hgc) ht_mem (hfi.prod_mk hgi)
 
 -- DISSOLVED: ConcaveOn.average_mem_hypograph
 
--- DISSOLVED: ConvexOn.map_average_le
+theorem ConvexOn.map_average_le [IsFiniteMeasure μ] [NeZero μ]
+    (hg : ConvexOn ℝ s g) (hgc : ContinuousOn g s) (hsc : IsClosed s)
+    (hfs : ∀ᵐ x ∂μ, f x ∈ s) (hfi : Integrable f μ) (hgi : Integrable (g ∘ f) μ) :
+    g (⨍ x, f x ∂μ) ≤ ⨍ x, g (f x) ∂μ :=
+  (hg.average_mem_epigraph hgc hsc hfs hfi hgi).2
 
 -- DISSOLVED: ConcaveOn.le_map_average
 
--- DISSOLVED: ConvexOn.set_average_mem_epigraph
+theorem ConvexOn.set_average_mem_epigraph (hg : ConvexOn ℝ s g) (hgc : ContinuousOn g s)
+    (hsc : IsClosed s) (h0 : μ t ≠ 0) (ht : μ t ≠ ∞) (hfs : ∀ᵐ x ∂μ.restrict t, f x ∈ s)
+    (hfi : IntegrableOn f t μ) (hgi : IntegrableOn (g ∘ f) t μ) :
+    (⨍ x in t, f x ∂μ, ⨍ x in t, g (f x) ∂μ) ∈ {p : E × ℝ | p.1 ∈ s ∧ g p.1 ≤ p.2} :=
+  have := Fact.mk ht.lt_top
+  have := NeZero.mk h0
+  hg.average_mem_epigraph hgc hsc hfs hfi hgi
 
--- DISSOLVED: ConcaveOn.set_average_mem_hypograph
+theorem ConcaveOn.set_average_mem_hypograph (hg : ConcaveOn ℝ s g) (hgc : ContinuousOn g s)
+    (hsc : IsClosed s) (h0 : μ t ≠ 0) (ht : μ t ≠ ∞) (hfs : ∀ᵐ x ∂μ.restrict t, f x ∈ s)
+    (hfi : IntegrableOn f t μ) (hgi : IntegrableOn (g ∘ f) t μ) :
+    (⨍ x in t, f x ∂μ, ⨍ x in t, g (f x) ∂μ) ∈ {p : E × ℝ | p.1 ∈ s ∧ p.2 ≤ g p.1} := by
+  simpa only [mem_setOf_eq, Pi.neg_apply, average_neg, neg_le_neg_iff] using
+    hg.neg.set_average_mem_epigraph hgc.neg hsc h0 ht hfs hfi hgi.neg
 
--- DISSOLVED: ConvexOn.map_set_average_le
+theorem ConvexOn.map_set_average_le (hg : ConvexOn ℝ s g) (hgc : ContinuousOn g s)
+    (hsc : IsClosed s) (h0 : μ t ≠ 0) (ht : μ t ≠ ∞) (hfs : ∀ᵐ x ∂μ.restrict t, f x ∈ s)
+    (hfi : IntegrableOn f t μ) (hgi : IntegrableOn (g ∘ f) t μ) :
+    g (⨍ x in t, f x ∂μ) ≤ ⨍ x in t, g (f x) ∂μ :=
+  (hg.set_average_mem_epigraph hgc hsc h0 ht hfs hfi hgi).2
 
--- DISSOLVED: ConcaveOn.le_map_set_average
+theorem ConcaveOn.le_map_set_average (hg : ConcaveOn ℝ s g) (hgc : ContinuousOn g s)
+    (hsc : IsClosed s) (h0 : μ t ≠ 0) (ht : μ t ≠ ∞) (hfs : ∀ᵐ x ∂μ.restrict t, f x ∈ s)
+    (hfi : IntegrableOn f t μ) (hgi : IntegrableOn (g ∘ f) t μ) :
+    (⨍ x in t, g (f x) ∂μ) ≤ g (⨍ x in t, f x ∂μ) :=
+  (hg.set_average_mem_hypograph hgc hsc h0 ht hfs hfi hgi).2
 
 theorem ConvexOn.map_integral_le [IsProbabilityMeasure μ] (hg : ConvexOn ℝ s g)
     (hgc : ContinuousOn g s) (hsc : IsClosed s) (hfs : ∀ᵐ x ∂μ, f x ∈ s) (hfi : Integrable f μ)
@@ -108,9 +149,34 @@ theorem ConcaveOn.le_map_integral [IsProbabilityMeasure μ] (hg : ConcaveOn ℝ 
 ### Strict Jensen's inequality
 -/
 
--- DISSOLVED: ae_eq_const_or_exists_average_ne_compl
+theorem ae_eq_const_or_exists_average_ne_compl [IsFiniteMeasure μ] (hfi : Integrable f μ) :
+    f =ᵐ[μ] const α (⨍ x, f x ∂μ) ∨
+      ∃ t, MeasurableSet t ∧ μ t ≠ 0 ∧ μ tᶜ ≠ 0 ∧ (⨍ x in t, f x ∂μ) ≠ ⨍ x in tᶜ, f x ∂μ := by
+  refine or_iff_not_imp_right.mpr fun H => ?_; push_neg at H
+  refine hfi.ae_eq_of_forall_setIntegral_eq _ _ (integrable_const _) fun t ht ht' => ?_; clear ht'
+  simp only [const_apply, setIntegral_const]
+  by_cases h₀ : μ t = 0
+  · rw [restrict_eq_zero.2 h₀, integral_zero_measure, h₀, ENNReal.zero_toReal, zero_smul]
+  by_cases h₀' : μ tᶜ = 0
+  · rw [← ae_eq_univ] at h₀'
+    rw [restrict_congr_set h₀', restrict_univ, measure_congr h₀', measure_smul_average]
+  have := average_mem_openSegment_compl_self ht.nullMeasurableSet h₀ h₀' hfi
+  rw [← H t ht h₀ h₀', openSegment_same, mem_singleton_iff] at this
+  rw [this, measure_smul_setAverage _ (measure_ne_top μ _)]
 
--- DISSOLVED: Convex.average_mem_interior_of_set
+theorem Convex.average_mem_interior_of_set [IsFiniteMeasure μ] (hs : Convex ℝ s) (h0 : μ t ≠ 0)
+    (hfs : ∀ᵐ x ∂μ, f x ∈ s) (hfi : Integrable f μ) (ht : (⨍ x in t, f x ∂μ) ∈ interior s) :
+    (⨍ x, f x ∂μ) ∈ interior s := by
+  rw [← measure_toMeasurable] at h0; rw [← restrict_toMeasurable (measure_ne_top μ t)] at ht
+  by_cases h0' : μ (toMeasurable μ t)ᶜ = 0
+  · rw [← ae_eq_univ] at h0'
+    rwa [restrict_congr_set h0', restrict_univ] at ht
+  exact
+    hs.openSegment_interior_closure_subset_interior ht
+      (hs.set_average_mem_closure h0' (measure_ne_top _ _) (ae_restrict_of_ae hfs)
+        hfi.integrableOn)
+      (average_mem_openSegment_compl_self (measurableSet_toMeasurable μ t).nullMeasurableSet h0
+        h0' hfi)
 
 theorem StrictConvex.ae_eq_const_or_average_mem_interior [IsFiniteMeasure μ] (hs : StrictConvex ℝ s)
     (hsc : IsClosed s) (hfs : ∀ᵐ x ∂μ, f x ∈ s) (hfi : Integrable f μ) :

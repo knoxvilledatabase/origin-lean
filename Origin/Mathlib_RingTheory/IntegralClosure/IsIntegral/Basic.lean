@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Expand
 import Mathlib.RingTheory.Finiteness.Subalgebra
 import Mathlib.RingTheory.Polynomial.Tower
 
+noncomputable section
+
 /-!
 # Properties of integral elements.
 

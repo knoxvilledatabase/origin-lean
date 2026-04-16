@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Analytic
 import Mathlib.Analysis.Calculus.ContDiff.Defs
 
+noncomputable section
+
 /-!
 # Higher smoothness of continuously polynomial functions
 

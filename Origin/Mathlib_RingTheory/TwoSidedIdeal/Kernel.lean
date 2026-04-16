@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.TwoSidedIdeal.Basic
 import Mathlib.RingTheory.TwoSidedIdeal.Lattice
 
+noncomputable section
+
 /-!
 # Kernel of a ring homomorphism as a two-sided ideal
 

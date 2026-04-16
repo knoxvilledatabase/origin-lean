@@ -7,6 +7,8 @@ import Mathlib.Algebra.Exact
 import Mathlib.RingTheory.LocalProperties.Submodule
 import Mathlib.RingTheory.Localization.Away.Basic
 
+noncomputable section
+
 /-!
 # Local properties about linear maps
 

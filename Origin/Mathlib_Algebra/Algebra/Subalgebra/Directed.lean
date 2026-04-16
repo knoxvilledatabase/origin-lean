@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Data.Set.UnionLift
 
+noncomputable section
+
 /-!
 # Subalgebras and directed Unions of sets
 

@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Combination.lean
-Genuine: 103 | Conflates: 4 | Dissolved: 8 | Infrastructure: 7
+Genuine: 111 | Conflates: 4 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators
@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.AffineSpace.AffineMap
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
 import Mathlib.Tactic.FinCases
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+
+noncomputable section
 
 /-!
 # Affine combinations of points
@@ -178,7 +180,14 @@ theorem weightedVSubOfPoint_subtype_eq_filter (w : ι → k) (p : ι → P) (b :
       {x ∈ s | pred x}.weightedVSubOfPoint p b w := by
   rw [weightedVSubOfPoint_apply, weightedVSubOfPoint_apply, ← sum_subtype_eq_sum_filter]
 
--- DISSOLVED: weightedVSubOfPoint_filter_of_ne
+theorem weightedVSubOfPoint_filter_of_ne (w : ι → k) (p : ι → P) (b : P) {pred : ι → Prop}
+    [DecidablePred pred] (h : ∀ i ∈ s, w i ≠ 0 → pred i) :
+    {x ∈ s | pred x}.weightedVSubOfPoint p b w = s.weightedVSubOfPoint p b w := by
+  rw [weightedVSubOfPoint_apply, weightedVSubOfPoint_apply, sum_filter_of_ne]
+  intro i hi hne
+  refine h i hi ?_
+  intro hw
+  simp [hw] at hne
 
 theorem weightedVSubOfPoint_const_smul (w : ι → k) (p : ι → P) (b : P) (c : k) :
     s.weightedVSubOfPoint p b (c • w) = c • s.weightedVSubOfPoint p b w := by
@@ -253,7 +262,9 @@ theorem weightedVSub_subtype_eq_filter (w : ι → k) (p : ι → P) (pred : ι 
       {x ∈ s | pred x}.weightedVSub p w :=
   s.weightedVSubOfPoint_subtype_eq_filter _ _ _ _
 
--- DISSOLVED: weightedVSub_filter_of_ne
+theorem weightedVSub_filter_of_ne (w : ι → k) (p : ι → P) {pred : ι → Prop} [DecidablePred pred]
+    (h : ∀ i ∈ s, w i ≠ 0 → pred i) : {x ∈ s | pred x}.weightedVSub p w = s.weightedVSub p w :=
+  s.weightedVSubOfPoint_filter_of_ne _ _ _ h
 
 theorem weightedVSub_const_smul (w : ι → k) (p : ι → P) (c : k) :
     s.weightedVSub p (c • w) = c • s.weightedVSub p w :=
@@ -393,7 +404,11 @@ theorem affineCombination_subtype_eq_filter (w : ι → k) (p : ι → P) (pred 
       {x ∈ s | pred x}.affineCombination k p w := by
   rw [affineCombination_apply, affineCombination_apply, weightedVSubOfPoint_subtype_eq_filter]
 
--- DISSOLVED: affineCombination_filter_of_ne
+theorem affineCombination_filter_of_ne (w : ι → k) (p : ι → P) {pred : ι → Prop}
+    [DecidablePred pred] (h : ∀ i ∈ s, w i ≠ 0 → pred i) :
+    {x ∈ s | pred x}.affineCombination k p w = s.affineCombination k p w := by
+  rw [affineCombination_apply, affineCombination_apply,
+    s.weightedVSubOfPoint_filter_of_ne _ _ _ h]
 
 theorem eq_weightedVSubOfPoint_subset_iff_eq_weightedVSubOfPoint_subtype {v : V} {x : k} {s : Set ι}
     {p : ι → P} {b : P} :
@@ -562,16 +577,19 @@ def centroidWeights : ι → k :=
 theorem centroidWeights_apply (i : ι) : s.centroidWeights k i = (#s : k)⁻¹ :=
   rfl
 
-theorem centroidWeights_eq_const : s.centroidWeights k = Function.const ι (#s : k)⁻¹ :=
-  rfl
-
 variable {k}
 
--- DISSOLVED: sum_centroidWeights_eq_one_of_cast_card_ne_zero
+theorem sum_centroidWeights_eq_one_of_cast_card_ne_zero (h : (#s : k) ≠ 0) :
+    ∑ i ∈ s, s.centroidWeights k i = 1 := by simp [h]
 
 variable (k)
 
--- DISSOLVED: sum_centroidWeights_eq_one_of_card_ne_zero
+theorem sum_centroidWeights_eq_one_of_card_ne_zero [CharZero k] (h : #s ≠ 0) :
+    ∑ i ∈ s, s.centroidWeights k i = 1 := by
+  -- Porting note: `simp` cannot find `mul_inv_cancel` and does not use `norm_cast`
+  simp only [centroidWeights_apply, sum_const, nsmul_eq_mul, ne_eq, Nat.cast_eq_zero, card_eq_zero]
+  refine mul_inv_cancel₀ ?_
+  norm_cast
 
 theorem sum_centroidWeights_eq_one_of_nonempty [CharZero k] (h : s.Nonempty) :
     ∑ i ∈ s, s.centroidWeights k i = 1 :=
@@ -622,15 +640,14 @@ theorem centroid_map (e : ι₂ ↪ ι) (p : ι → P) :
 def centroidWeightsIndicator : ι → k :=
   Set.indicator (↑s) (s.centroidWeights k)
 
-theorem centroidWeightsIndicator_def :
-    s.centroidWeightsIndicator k = Set.indicator (↑s) (s.centroidWeights k) :=
-  rfl
-
 theorem sum_centroidWeightsIndicator [Fintype ι] :
     ∑ i, s.centroidWeightsIndicator k i = ∑ i ∈ s, s.centroidWeights k i :=
   sum_indicator_subset _ (subset_univ _)
 
--- DISSOLVED: sum_centroidWeightsIndicator_eq_one_of_card_ne_zero
+theorem sum_centroidWeightsIndicator_eq_one_of_card_ne_zero [CharZero k] [Fintype ι]
+    (h : #s ≠ 0) : ∑ i, s.centroidWeightsIndicator k i = 1 := by
+  rw [sum_centroidWeightsIndicator]
+  exact s.sum_centroidWeights_eq_one_of_card_ne_zero k h
 
 theorem sum_centroidWeightsIndicator_eq_one_of_nonempty [CharZero k] [Fintype ι] (h : s.Nonempty) :
     ∑ i, s.centroidWeightsIndicator k i = 1 := by
@@ -872,11 +889,15 @@ variable [AffineSpace V P] {ι : Type*}
 
 open Set Finset
 
--- DISSOLVED: centroid_mem_affineSpan_of_cast_card_ne_zero
+theorem centroid_mem_affineSpan_of_cast_card_ne_zero {s : Finset ι} (p : ι → P)
+    (h : (#s : k) ≠ 0) : s.centroid k p ∈ affineSpan k (range p) :=
+  affineCombination_mem_affineSpan (s.sum_centroidWeights_eq_one_of_cast_card_ne_zero h) p
 
 variable (k)
 
--- DISSOLVED: centroid_mem_affineSpan_of_card_ne_zero
+theorem centroid_mem_affineSpan_of_card_ne_zero [CharZero k] {s : Finset ι} (p : ι → P)
+    (h : #s ≠ 0) : s.centroid k p ∈ affineSpan k (range p) :=
+  affineCombination_mem_affineSpan (s.sum_centroidWeights_eq_one_of_card_ne_zero k h) p
 
 theorem centroid_mem_affineSpan_of_nonempty [CharZero k] {s : Finset ι} (p : ι → P)
     (h : s.Nonempty) : s.centroid k p ∈ affineSpan k (range p) :=

@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Data.Finset.NAry
 import Mathlib.Data.Multiset.Functor
 
+noncomputable section
+
 /-!
 # Functoriality of `Finset`
 
@@ -138,10 +140,6 @@ variable [∀ P, Decidable P]
 
 instance : Monad Finset :=
   { Finset.applicative with bind := sup }
-
-@[simp]
-theorem bind_def {α β} : (· >>= ·) = sup (α := Finset α) (β := β) :=
-  rfl
 
 instance : LawfulMonad Finset :=
   { Finset.lawfulApplicative with

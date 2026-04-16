@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.SuccPred.Archimedean
 import Mathlib.Order.BoundedOrder.Lattice
 
+noncomputable section
+
 /-!
 # Successor and predecessor limits
 
@@ -157,8 +159,6 @@ alias isSuccLimit_iff_of_noMax := isSuccPrelimit_iff_of_noMax
 theorem not_isSuccLimit_of_noMax : ¬ IsSuccLimit a :=
   fun h ↦ h.not_isMin h.isSuccPrelimit.isMin_of_noMax
 
-theorem not_isSuccPrelimit_of_noMax [NoMinOrder α] : ¬ IsSuccPrelimit a := by simp
-
 end IsSuccArchimedean
 
 end Preorder
@@ -256,8 +256,6 @@ theorem isSuccPrelimit_iff : IsSuccPrelimit a ↔ IsMin a :=
 @[simp]
 theorem not_isSuccLimit : ¬ IsSuccLimit a :=
   fun h ↦ h.not_isMin <| h.isSuccPrelimit.isMin
-
-theorem not_isSuccPrelimit [NoMinOrder α] : ¬ IsSuccPrelimit a := by simp
 
 end IsSuccArchimedean
 
@@ -423,8 +421,6 @@ theorem isPredPrelimit_iff_of_noMin : IsPredPrelimit a ↔ IsMax a :=
 
 alias isPredLimit_iff_of_noMin := isPredPrelimit_iff_of_noMin
 
-theorem not_isPredPrelimit_of_noMin [NoMaxOrder α] : ¬ IsPredPrelimit a := by simp
-
 @[simp]
 theorem not_isPredLimit_of_noMin : ¬ IsPredLimit a :=
   fun h ↦ h.not_isMax h.isPredPrelimit.isMax_of_noMin
@@ -513,8 +509,6 @@ theorem isPredPrelimit_iff : IsPredPrelimit a ↔ IsMax a :=
 @[simp]
 theorem not_isPredLimit : ¬ IsPredLimit a :=
   fun h ↦ h.not_isMax <| h.isPredPrelimit.isMax
-
-theorem not_isPredPrelimit [NoMaxOrder α] : ¬ IsPredPrelimit a := by simp
 
 end IsPredArchimedean
 

@@ -8,6 +8,8 @@ import Mathlib.Topology.Sheaves.LocalPredicate
 import Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace
 
+noncomputable section
+
 /-!
 # The structure sheaf on `ProjectiveSpectrum 𝒜`.
 
@@ -206,18 +208,6 @@ theorem Proj.res_apply (x) : ((Proj.structureSheaf 𝒜).1.map i s).1 x = s.1 (i
 
 @[ext] theorem Proj.ext (h : s.1 = t.1) : s = t := Subtype.ext h
 
-@[simp] theorem Proj.add_apply : (s + t).1 x = s.1 x + t.1 x := rfl
-
-@[simp] theorem Proj.mul_apply : (s * t).1 x = s.1 x * t.1 x := rfl
-
-@[simp] theorem Proj.sub_apply : (s - t).1 x = s.1 x - t.1 x := rfl
-
-@[simp] theorem Proj.pow_apply (n : ℕ) : (s ^ n).1 x = s.1 x ^ n := rfl
-
-@[simp] theorem Proj.zero_apply : (0 : (Proj.structureSheaf 𝒜).1.obj V).1 x = 0 := rfl
-
-@[simp] theorem Proj.one_apply : (1 : (Proj.structureSheaf 𝒜).1.obj V).1 x = 1 := rfl
-
 end
 
 def Proj.toSheafedSpace : SheafedSpace CommRingCat where
@@ -323,11 +313,6 @@ theorem Proj.stalkIso'_germ (U : Opens (ProjectiveSpectrum.top 𝒜))
     (x : ProjectiveSpectrum.top 𝒜) (hx : x ∈ U) (s : (Proj.structureSheaf 𝒜).1.obj (op U)) :
     Proj.stalkIso' 𝒜 x ((Proj.structureSheaf 𝒜).presheaf.germ _ x hx s) = s.1 ⟨x, hx⟩ :=
   stalkToFiberRingHom_germ 𝒜 U x hx s
-
-@[simp]
-theorem Proj.stalkIso'_symm_mk (x) (f) :
-    (Proj.stalkIso' 𝒜 x).symm (.mk f) = (Proj.structureSheaf 𝒜).presheaf.germ _
-      x (mem_basicOpen_den _ x f) (sectionInBasicOpen _ x f) := rfl
 
 def Proj.toLocallyRingedSpace : LocallyRingedSpace :=
   { Proj.toSheafedSpace 𝒜 with

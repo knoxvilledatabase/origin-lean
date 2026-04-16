@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Hom.Defs
 import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.GroupTheory.Congruence.Defs
 
+noncomputable section
+
 /-!
 # Congruence relations on rings
 
@@ -62,13 +64,6 @@ instance : FunLike (RingCon R) R (R → Prop) where
     rw [Setoid.ext_iff, (show ⇑x = ⇑y from h)]
     simp
 
-theorem rel_eq_coe : c.r = c :=
-  rfl
-
-@[simp]
-theorem toCon_coe_eq_coe : (c.toCon : R → R → Prop) = c :=
-  rfl
-
 protected theorem refl (x) : c x x :=
   c.refl' x
 
@@ -98,10 +93,6 @@ protected theorem zsmul {S : Type*} [AddGroup S] [Mul S] (t : RingCon S)
 
 instance : Inhabited (RingCon R) :=
   ⟨ringConGen EmptyRelation⟩
-
-@[simp]
-theorem rel_mk {s : Con R} {h a b} : RingCon.mk s h a b ↔ s a b :=
-  Iff.rfl
 
 theorem ext' {c d : RingCon R} (H : ⇑c = ⇑d) : c = d := DFunLike.coe_injective H
 
@@ -140,10 +131,6 @@ instance (priority := 500) [_d : ∀ a b, Decidable (c a b)] : DecidableEq c.Quo
   inferInstanceAs (DecidableEq (Quotient c.toSetoid))
 
 @[simp]
-theorem quot_mk_eq_coe (x : R) : Quot.mk c x = (x : c.Quotient) :=
-  rfl
-
-@[simp]
 protected theorem eq {a b : R} : (a : c.Quotient) = (b : c.Quotient) ↔ c a b :=
   Quotient.eq''
 
@@ -162,15 +149,7 @@ variable [Add R] [Mul R] (c : RingCon R)
 
 instance : Add c.Quotient := inferInstanceAs (Add c.toAddCon.Quotient)
 
-@[simp, norm_cast]
-theorem coe_add (x y : R) : (↑(x + y) : c.Quotient) = ↑x + ↑y :=
-  rfl
-
 instance : Mul c.Quotient := inferInstanceAs (Mul c.toCon.Quotient)
-
-@[simp, norm_cast]
-theorem coe_mul (x y : R) : (↑(x * y) : c.Quotient) = ↑x * ↑y :=
-  rfl
 
 end add_mul
 
@@ -180,10 +159,6 @@ variable [AddZeroClass R] [Mul R] (c : RingCon R)
 
 instance : Zero c.Quotient := inferInstanceAs (Zero c.toAddCon.Quotient)
 
-@[simp, norm_cast]
-theorem coe_zero : (↑(0 : R) : c.Quotient) = 0 :=
-  rfl
-
 end Zero
 
 section One
@@ -191,10 +166,6 @@ section One
 variable [Add R] [MulOneClass R] (c : RingCon R)
 
 instance : One c.Quotient := inferInstanceAs (One c.toCon.Quotient)
-
-@[simp, norm_cast]
-theorem coe_one : (↑(1 : R) : c.Quotient) = 1 :=
-  rfl
 
 end One
 
@@ -204,21 +175,9 @@ variable [AddGroup R] [Mul R] (c : RingCon R)
 
 instance : Neg c.Quotient := inferInstanceAs (Neg c.toAddCon.Quotient)
 
-@[simp, norm_cast]
-theorem coe_neg (x : R) : (↑(-x) : c.Quotient) = -x :=
-  rfl
-
 instance : Sub c.Quotient := inferInstanceAs (Sub c.toAddCon.Quotient)
 
-@[simp, norm_cast]
-theorem coe_sub (x y : R) : (↑(x - y) : c.Quotient) = x - y :=
-  rfl
-
 instance hasZSMul : SMul ℤ c.Quotient := inferInstanceAs (SMul ℤ c.toAddCon.Quotient)
-
-@[simp, norm_cast]
-theorem coe_zsmul (z : ℤ) (x : R) : (↑(z • x) : c.Quotient) = z • (x : c.Quotient) :=
-  rfl
 
 end NegSubZSMul
 
@@ -228,10 +187,6 @@ variable [AddMonoid R] [Mul R] (c : RingCon R)
 
 instance hasNSMul : SMul ℕ c.Quotient := inferInstanceAs (SMul ℕ c.toAddCon.Quotient)
 
-@[simp, norm_cast]
-theorem coe_nsmul (n : ℕ) (x : R) : (↑(n • x) : c.Quotient) = n • (x : c.Quotient) :=
-  rfl
-
 end NSMul
 
 section Pow
@@ -239,10 +194,6 @@ section Pow
 variable [Add R] [Monoid R] (c : RingCon R)
 
 instance : Pow c.Quotient ℕ := inferInstanceAs (Pow c.toCon.Quotient ℕ)
-
-@[simp, norm_cast]
-theorem coe_pow (x : R) (n : ℕ) : (↑(x ^ n) : c.Quotient) = (x : c.Quotient) ^ n :=
-  rfl
 
 end Pow
 
@@ -332,13 +283,6 @@ instance [CommRing R] (c : RingCon R) : CommRing c.Quotient :=
     (fun _ _ => rfl) (fun _ => rfl) fun _ => rfl
 
 end Algebraic
-
-def mk' [NonAssocSemiring R] (c : RingCon R) : R →+* c.Quotient where
-  toFun := toQuotient
-  map_zero' := rfl
-  map_one' := rfl
-  map_add' _ _ := rfl
-  map_mul' _ _ := rfl
 
 end Quotient
 

@@ -10,6 +10,8 @@ import Mathlib.MeasureTheory.Covering.DensityTheorem
 import Mathlib.MeasureTheory.Group.AddCircle
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 
+noncomputable section
+
 /-!
 # Ergodic maps of the additive circle
 

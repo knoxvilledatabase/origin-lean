@@ -8,6 +8,8 @@ import Mathlib.Probability.Process.HittingTime
 import Mathlib.Probability.Martingale.Basic
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 
 # Doob's upcrossing estimate

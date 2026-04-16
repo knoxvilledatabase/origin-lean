@@ -5,6 +5,8 @@ Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.LocalizerMorphism
 
+noncomputable section
+
 /-!
 # Resolutions for a morphism of localizers
 
@@ -111,13 +113,6 @@ instance : Category (Φ.RightResolution X₂) where
   id := Hom.id
   comp := Hom.comp
 
-@[simp]
-lemma id_f (R : Φ.RightResolution X₂) : Hom.f (𝟙 R) = 𝟙 R.X₁ := rfl
-
-@[simp, reassoc]
-lemma comp_f {R R' R'' : Φ.RightResolution X₂} (φ : R ⟶ R') (ψ : R' ⟶ R'') :
-    (φ ≫ ψ).f = φ.f ≫ ψ.f := rfl
-
 @[ext]
 lemma hom_ext {R R' : Φ.RightResolution X₂} {φ₁ φ₂ : R ⟶ R'} (h : φ₁.f = φ₂.f) :
     φ₁ = φ₂ :=
@@ -156,13 +151,6 @@ instance : Category (Φ.LeftResolution X₂) where
   Hom := Hom
   id := Hom.id
   comp := Hom.comp
-
-@[simp]
-lemma id_f (L : Φ.LeftResolution X₂) : Hom.f (𝟙 L) = 𝟙 L.X₁ := rfl
-
-@[simp, reassoc]
-lemma comp_f {L L' L'' : Φ.LeftResolution X₂} (φ : L ⟶ L') (ψ : L' ⟶ L'') :
-    (φ ≫ ψ).f = φ.f ≫ ψ.f := rfl
 
 @[ext]
 lemma hom_ext {L L' : Φ.LeftResolution X₂} {φ₁ φ₂ : L ⟶ L'} (h : φ₁.f = φ₂.f) :

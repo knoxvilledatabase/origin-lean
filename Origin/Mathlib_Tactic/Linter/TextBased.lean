@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Data.String.Matcher
 import Mathlib.Data.Nat.Notation
 
+noncomputable section
+
 /-!
 ## Text-based linters
 

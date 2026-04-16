@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Abelian/InjectiveResolution.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.InjectiveResolution
 import Mathlib.Algebra.Homology.HomotopyCategory
 import Mathlib.Data.Set.Subsingleton
 import Mathlib.Tactic.AdaptationNote
+
+noncomputable section
 
 /-!
 # Abelian categories with enough injectives have injective resolutions
@@ -65,7 +67,11 @@ def descFOne {Y Z : C} (f : Z ⟶ Y) (I : InjectiveResolution Y) (J : InjectiveR
   J.exact₀.descToInjective (descFZero f I J ≫ I.cocomplex.d 0 1)
     (by dsimp; simp only [← assoc, descFZero]; simp [assoc])
 
--- DISSOLVED: descFOne_zero_comm
+@[simp]
+theorem descFOne_zero_comm {Y Z : C} (f : Z ⟶ Y) (I : InjectiveResolution Y)
+    (J : InjectiveResolution Z) :
+    J.cocomplex.d 0 1 ≫ descFOne f I J = descFZero f I J ≫ I.cocomplex.d 0 1 := by
+  apply J.exact₀.comp_descToInjective
 
 def descFSucc {Y Z : C} (I : InjectiveResolution Y) (J : InjectiveResolution Z) (n : ℕ)
     (g : J.cocomplex.X n ⟶ I.cocomplex.X n) (g' : J.cocomplex.X (n + 1) ⟶ I.cocomplex.X (n + 1))

@@ -7,6 +7,8 @@ import Mathlib.Topology.Homeomorph
 import Mathlib.Topology.UniformSpace.UniformEmbedding
 import Mathlib.Topology.UniformSpace.Pi
 
+noncomputable section
+
 /-!
 # Uniform isomorphisms
 
@@ -49,10 +51,6 @@ instance : EquivLike (α ≃ᵤ β) α β where
   right_inv h := h.right_inv
   coe_injective' _ _ H _ := toEquiv_injective <| DFunLike.ext' H
 
-@[simp]
-theorem uniformEquiv_mk_coe (a : Equiv α β) (b c) : (UniformEquiv.mk a b c : α → β) = a :=
-  rfl
-
 protected def symm (h : α ≃ᵤ β) : β ≃ᵤ α where
   uniformContinuous_toFun := h.uniformContinuous_invFun
   uniformContinuous_invFun := h.uniformContinuous_toFun
@@ -65,14 +63,6 @@ def Simps.symm_apply (h : α ≃ᵤ β) : β → α :=
   h.symm
 
 initialize_simps_projections UniformEquiv (toFun → apply, invFun → symm_apply)
-
-@[simp]
-theorem coe_toEquiv (h : α ≃ᵤ β) : ⇑h.toEquiv = h :=
-  rfl
-
-@[simp]
-theorem coe_symm_toEquiv (h : α ≃ᵤ β) : ⇑h.toEquiv.symm = h.symm :=
-  rfl
 
 @[ext]
 theorem ext {h h' : α ≃ᵤ β} (H : ∀ x, h x = h' x) : h = h' :=
@@ -88,19 +78,6 @@ protected def trans (h₁ : α ≃ᵤ β) (h₂ : β ≃ᵤ γ) : α ≃ᵤ γ w
   uniformContinuous_toFun := h₂.uniformContinuous_toFun.comp h₁.uniformContinuous_toFun
   uniformContinuous_invFun := h₁.uniformContinuous_invFun.comp h₂.uniformContinuous_invFun
   toEquiv := Equiv.trans h₁.toEquiv h₂.toEquiv
-
-@[simp]
-theorem trans_apply (h₁ : α ≃ᵤ β) (h₂ : β ≃ᵤ γ) (a : α) : h₁.trans h₂ a = h₂ (h₁ a) :=
-  rfl
-
-@[simp]
-theorem uniformEquiv_mk_coe_symm (a : Equiv α β) (b c) :
-    ((UniformEquiv.mk a b c).symm : β → α) = a.symm :=
-  rfl
-
-@[simp]
-theorem refl_symm : (UniformEquiv.refl α).symm = UniformEquiv.refl α :=
-  rfl
 
 protected theorem uniformContinuous (h : α ≃ᵤ β) : UniformContinuous h :=
   h.uniformContinuous_toFun
@@ -120,10 +97,6 @@ protected def toHomeomorph (e : α ≃ᵤ β) : α ≃ₜ β :=
   { e.toEquiv with
     continuous_toFun := e.continuous
     continuous_invFun := e.continuous_symm }
-
-lemma toHomeomorph_apply (e : α ≃ᵤ β) : (e.toHomeomorph : α → β) = e := rfl
-
-lemma toHomeomorph_symm_apply (e : α ≃ᵤ β) : (e.toHomeomorph.symm : β → α) = e.symm := rfl
 
 @[simp]
 theorem apply_symm_apply (h : α ≃ᵤ β) (x : β) : h (h.symm x) = x :=
@@ -217,15 +190,6 @@ def prodCongr (h₁ : α ≃ᵤ β) (h₂ : γ ≃ᵤ δ) : α × γ ≃ᵤ β �
       (h₂.symm.uniformContinuous.comp uniformContinuous_snd)
   toEquiv := h₁.toEquiv.prodCongr h₂.toEquiv
 
-@[simp]
-theorem prodCongr_symm (h₁ : α ≃ᵤ β) (h₂ : γ ≃ᵤ δ) :
-    (h₁.prodCongr h₂).symm = h₁.symm.prodCongr h₂.symm :=
-  rfl
-
-@[simp]
-theorem coe_prodCongr (h₁ : α ≃ᵤ β) (h₂ : γ ≃ᵤ δ) : ⇑(h₁.prodCongr h₂) = Prod.map h₁ h₂ :=
-  rfl
-
 section
 
 variable (α β γ)
@@ -234,14 +198,6 @@ def prodComm : α × β ≃ᵤ β × α where
   uniformContinuous_toFun := uniformContinuous_snd.prod_mk uniformContinuous_fst
   uniformContinuous_invFun := uniformContinuous_snd.prod_mk uniformContinuous_fst
   toEquiv := Equiv.prodComm α β
-
-@[simp]
-theorem prodComm_symm : (prodComm α β).symm = prodComm β α :=
-  rfl
-
-@[simp]
-theorem coe_prodComm : ⇑(prodComm α β) = Prod.swap :=
-  rfl
 
 def prodAssoc : (α × β) × γ ≃ᵤ α × β × γ where
   uniformContinuous_toFun :=
@@ -262,10 +218,6 @@ def prodPunit : α × PUnit ≃ᵤ α where
 def punitProd : PUnit × α ≃ᵤ α :=
   (prodComm _ _).trans (prodPunit _)
 
-@[simp]
-theorem coe_punitProd : ⇑(punitProd α) = Prod.snd :=
-  rfl
-
 @[simps! apply toEquiv]
 def piCongrLeft {ι ι' : Type*} {β : ι' → Type*} [∀ j, UniformSpace (β j)]
     (e : ι ≃ ι') : (∀ i, β (e i)) ≃ᵤ ∀ j, β j where
@@ -281,12 +233,6 @@ def piCongrRight {ι : Type*} {β₁ β₂ : ι → Type*} [∀ i, UniformSpace 
   uniformContinuous_toFun := Pi.uniformContinuous_postcomp' _ fun i ↦ (F i).uniformContinuous
   uniformContinuous_invFun := Pi.uniformContinuous_postcomp' _ fun i ↦ (F i).symm.uniformContinuous
   toEquiv := Equiv.piCongrRight fun i => (F i).toEquiv
-
-@[simp]
-theorem piCongrRight_symm {ι : Type*} {β₁ β₂ : ι → Type*} [∀ i, UniformSpace (β₁ i)]
-    [∀ i, UniformSpace (β₂ i)] (F : ∀ i, β₁ i ≃ᵤ β₂ i) :
-    (piCongrRight F).symm = piCongrRight fun i => (F i).symm :=
-  rfl
 
 @[simps! apply toEquiv]
 def piCongr {ι₁ ι₂ : Type*} {β₁ : ι₁ → Type*} {β₂ : ι₂ → Type*}

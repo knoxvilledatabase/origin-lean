@@ -1,9 +1,11 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Pointwise.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
+Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
+
+noncomputable section
 
 /-! # Pointwise instances on `AffineSubspace`s
 
@@ -117,7 +119,11 @@ section Field
 
 variable [Field k] [AddCommGroup V] [Module k V] {a : k}
 
--- DISSOLVED: direction_smul
+@[simp]
+lemma direction_smul (ha : a ≠ 0) (s : AffineSubspace k V) : (a • s).direction = s.direction := by
+  rw [smul_eq_map, map_direction]
+  change Submodule.map (a • LinearMap.id) _ = _
+  simp [Submodule.map_smul, ha]
 
 end Field
 

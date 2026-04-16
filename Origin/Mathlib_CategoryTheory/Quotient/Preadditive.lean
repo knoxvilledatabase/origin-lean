@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Quotient
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 
+noncomputable section
+
 /-!
 # The quotient category is preadditive
 
@@ -71,13 +73,6 @@ def preadditive
   comp_add := by
     rintro _ _ _ ⟨_⟩ ⟨_⟩ ⟨_⟩
     exact congr_arg (functor r).map (by apply Preadditive.comp_add)
-
-lemma functor_additive
-    (hr : ∀ ⦃X Y : C⦄ (f₁ f₂ g₁ g₂ : X ⟶ Y) (_ : r f₁ f₂) (_ : r g₁ g₂), r (f₁ + g₁) (f₂ + g₂)) :
-    letI := preadditive r hr
-    (functor r).Additive :=
-  letI := preadditive r hr
-  { map_add := rfl }
 
 end Quotient
 

@@ -7,6 +7,8 @@ import Mathlib.Analysis.NormedSpace.Real
 import Mathlib.Analysis.Seminorm
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 
+noncomputable section
+
 /-!
 # Applications of the Hausdorff distance in normed spaces
 

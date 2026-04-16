@@ -5,6 +5,8 @@ Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Data.Finset.Defs
 
+noncomputable section
+
 /-!
 # Empty and nonempty finite sets
 
@@ -92,10 +94,6 @@ theorem not_mem_empty (a : α) : a ∉ (∅ : Finset α) := by
 @[simp]
 theorem not_nonempty_empty : ¬(∅ : Finset α).Nonempty := fun ⟨x, hx⟩ => not_mem_empty x hx
 
-@[simp]
-theorem mk_zero : (⟨0, nodup_zero⟩ : Finset α) = ∅ :=
-  rfl
-
 theorem ne_empty_of_mem {a : α} {s : Finset α} (h : a ∈ s) : s ≠ ∅ := fun e =>
   not_mem_empty a <| e ▸ h
 
@@ -157,10 +155,6 @@ theorem eq_empty_of_isEmpty [IsEmpty α] (s : Finset α) : s = ∅ :=
 instance : OrderBot (Finset α) where
   bot := ∅
   bot_le := empty_subset
-
-@[simp]
-theorem bot_eq_empty : (⊥ : Finset α) = ∅ :=
-  rfl
 
 @[simp]
 theorem empty_ssubset : ∅ ⊂ s ↔ s.Nonempty :=

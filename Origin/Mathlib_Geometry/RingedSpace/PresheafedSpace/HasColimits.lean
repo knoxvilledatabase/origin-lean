@@ -8,6 +8,8 @@ import Mathlib.Topology.Category.TopCat.Limits.Basic
 import Mathlib.Topology.Sheaves.Limits
 import Mathlib.CategoryTheory.ConcreteCategory.Elementwise
 
+noncomputable section
+
 /-!
 # `PresheafedSpace C` has colimits.
 
@@ -114,16 +116,6 @@ variable [∀ X : TopCat.{v}, HasLimitsOfShape Jᵒᵖ (X.Presheaf C)]
 def colimit (F : J ⥤ PresheafedSpace.{_, _, v} C) : PresheafedSpace C where
   carrier := Limits.colimit (F ⋙ PresheafedSpace.forget C)
   presheaf := limit (pushforwardDiagramToColimit F).leftOp
-
-@[simp]
-theorem colimit_carrier (F : J ⥤ PresheafedSpace.{_, _, v} C) :
-    (colimit F).carrier = Limits.colimit (F ⋙ PresheafedSpace.forget C) :=
-  rfl
-
-@[simp]
-theorem colimit_presheaf (F : J ⥤ PresheafedSpace.{_, _, v} C) :
-    (colimit F).presheaf = limit (pushforwardDiagramToColimit F).leftOp :=
-  rfl
 
 @[simps]
 def colimitCocone (F : J ⥤ PresheafedSpace.{_, _, v} C) : Cocone F where

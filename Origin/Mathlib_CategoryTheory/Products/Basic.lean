@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.Const
 import Mathlib.CategoryTheory.Opposites
 import Mathlib.Data.Prod.Basic
 
+noncomputable section
+
 /-!
 # Cartesian products of categories
 
@@ -199,14 +201,6 @@ variable (C)
 def diag : C ⥤ C × C :=
   (𝟭 C).prod' (𝟭 C)
 
-@[simp]
-theorem diag_obj (X : C) : (diag C).obj X = (X, X) :=
-  rfl
-
-@[simp]
-theorem diag_map {X Y : C} (f : X ⟶ Y) : (diag C).map f = (f, f) :=
-  rfl
-
 end
 
 end Functor
@@ -229,10 +223,6 @@ variable {F G : A ⥤ C} {H K : A ⥤ D} (α : F ⟶ G) (β : H ⟶ K)
 
 def prod' : F.prod' H ⟶ G.prod' K where
   app X := (α.app X, β.app X)
-
-@[simp] lemma prod'_app_fst (X : A) : ((prod' α β).app X).1 = α.app X := rfl
-
-@[simp] lemma prod'_app_snd (X : A) : ((prod' α β).app X).2 = β.app X := rfl
 
 end
 
@@ -268,35 +258,19 @@ end Equivalence
 def flipCompEvaluation (F : A ⥤ B ⥤ C) (a) : F.flip ⋙ (evaluation _ _).obj a ≅ F.obj a :=
   NatIso.ofComponents fun b => Iso.refl _
 
-theorem flip_comp_evaluation (F : A ⥤ B ⥤ C) (a) : F.flip ⋙ (evaluation _ _).obj a = F.obj a :=
-  rfl
-
 @[simps!]
 def compEvaluation (F : A ⥤ B ⥤ C) (b) : F ⋙ (evaluation _ _).obj b ≅ F.flip.obj b :=
   NatIso.ofComponents fun a => Iso.refl _
-
-theorem comp_evaluation (F : A ⥤ B ⥤ C) (b) : F ⋙ (evaluation _ _).obj b = F.flip.obj b :=
-  rfl
 
 @[simps!]
 def whiskeringLeftCompEvaluation (F : A ⥤ B) (a : A) :
     (whiskeringLeft A B C).obj F ⋙ (evaluation A C).obj a ≅ (evaluation B C).obj (F.obj a) :=
   Iso.refl _
 
-@[simp]
-theorem whiskeringLeft_comp_evaluation (F : A ⥤ B) (a : A) :
-    (whiskeringLeft A B C).obj F ⋙ (evaluation A C).obj a = (evaluation B C).obj (F.obj a) :=
-  rfl
-
 @[simps!]
 def whiskeringRightCompEvaluation (F : B ⥤ C) (a : A) :
     (whiskeringRight A B C).obj F ⋙ (evaluation _ _).obj a ≅ (evaluation _ _).obj a ⋙ F :=
   Iso.refl _
-
-@[simp]
-theorem whiskeringRight_comp_evaluation (F : B ⥤ C) (a : A) :
-    (whiskeringRight A B C).obj F ⋙ (evaluation _ _).obj a = (evaluation _ _).obj a ⋙ F :=
-  rfl
 
 variable (A B C)
 

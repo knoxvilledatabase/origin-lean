@@ -5,6 +5,8 @@ Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Finset.Insert
 
+noncomputable section
+
 /-!
 # Disjoint finite sets
 

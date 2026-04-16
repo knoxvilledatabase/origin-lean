@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Pi.Basic
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # Limits in the category of indexed families of objects.
 

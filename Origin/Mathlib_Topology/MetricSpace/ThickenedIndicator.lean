@@ -7,6 +7,8 @@ import Mathlib.Data.ENNReal.Lemmas
 import Mathlib.Topology.MetricSpace.Thickening
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 # Thickened indicators
 

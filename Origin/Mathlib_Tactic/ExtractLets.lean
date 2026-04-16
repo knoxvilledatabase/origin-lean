@@ -7,6 +7,8 @@ import Mathlib.Lean.Expr.Basic
 import Mathlib.Tactic.Basic
 import Batteries.Tactic.Lint.Misc
 
+noncomputable section
+
 /-!
 # The `extract_lets at` tactic
 

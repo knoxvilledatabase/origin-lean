@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Prod
 
+noncomputable section
+
 /-!
 # The derivative of bounded bilinear maps
 

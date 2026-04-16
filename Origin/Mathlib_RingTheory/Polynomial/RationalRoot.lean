@@ -7,6 +7,8 @@ import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Localization.NumDen
 import Mathlib.RingTheory.Polynomial.ScaleRoots
 
+noncomputable section
+
 /-!
 # Rational root theorem and integral root theorem
 

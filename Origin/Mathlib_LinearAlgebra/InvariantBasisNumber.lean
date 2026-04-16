@@ -9,6 +9,8 @@ import Mathlib.RingTheory.OrzechProperty
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.LinearAlgebra.Finsupp.Pi
 
+noncomputable section
+
 /-!
 # Invariant basis number property
 

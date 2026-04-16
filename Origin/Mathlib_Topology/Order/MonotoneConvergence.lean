@@ -5,6 +5,8 @@ Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 import Origin.Core
 import Mathlib.Topology.Order.Basic
 
+noncomputable section
+
 /-!
 # Bounded monotone sequences converge
 

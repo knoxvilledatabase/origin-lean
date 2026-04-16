@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Norm.Defs
 import Mathlib.RingTheory.Trace.Defs
 
+noncomputable section
+
 /-!
 
 # Relation between Norms and Traces

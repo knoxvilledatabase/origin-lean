@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Function/LpSeminorm/TriangleInequality.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
 import Mathlib.MeasureTheory.Integral.MeanInequalities
+
+noncomputable section
 
 /-!
 # Triangle inequality for `Lp`-seminorm
@@ -103,7 +105,23 @@ alias snorm_add_le' := eLpNorm_add_le'
 
 variable (μ E)
 
--- DISSOLVED: exists_Lp_half
+theorem exists_Lp_half (p : ℝ≥0∞) {δ : ℝ≥0∞} (hδ : δ ≠ 0) :
+    ∃ η : ℝ≥0∞,
+      0 < η ∧
+        ∀ (f g : α → E), AEStronglyMeasurable f μ → AEStronglyMeasurable g μ →
+          eLpNorm f p μ ≤ η → eLpNorm g p μ ≤ η → eLpNorm (f + g) p μ < δ := by
+  have :
+    Tendsto (fun η : ℝ≥0∞ => LpAddConst p * (η + η)) (𝓝[>] 0) (𝓝 (LpAddConst p * (0 + 0))) :=
+    (ENNReal.Tendsto.const_mul (tendsto_id.add tendsto_id)
+          (Or.inr (LpAddConst_lt_top p).ne)).mono_left
+      nhdsWithin_le_nhds
+  simp only [add_zero, mul_zero] at this
+  rcases (((tendsto_order.1 this).2 δ hδ.bot_lt).and self_mem_nhdsWithin).exists with ⟨η, hη, ηpos⟩
+  refine ⟨η, ηpos, fun f g hf hg Hf Hg => ?_⟩
+  calc
+    eLpNorm (f + g) p μ ≤ LpAddConst p * (eLpNorm f p μ + eLpNorm g p μ) := eLpNorm_add_le' hf hg p
+    _ ≤ LpAddConst p * (η + η) := by gcongr
+    _ < δ := hη
 
 variable {μ E}
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.End
 import Mathlib.CategoryTheory.Monoidal.Functor
 
+noncomputable section
+
 /-!
 # Promoting a monoidal category to a single object bicategory.
 

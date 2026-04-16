@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Order.Basic
 import Mathlib.Analysis.Asymptotics.Asymptotics
 import Mathlib.Analysis.Normed.Module.Basic
 
+noncomputable section
+
 /-!
 # A collection of specific asymptotic results
 

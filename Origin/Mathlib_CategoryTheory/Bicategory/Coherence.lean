@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Functor.FullyFaithful
 import Mathlib.CategoryTheory.Bicategory.Free
 import Mathlib.CategoryTheory.Bicategory.LocallyDiscrete
 
+noncomputable section
+
 /-!
 # The coherence theorem for bicategories
 
@@ -64,10 +66,6 @@ def preinclusion (B : Type u) [Quiver.{v + 1} B] :
   obj a := a.as
   map {a b} f := (@inclusionPath B _ a.as b.as).obj f
   map₂ η := (inclusionPath _ _).map η
-
-@[simp]
-theorem preinclusion_obj (a : B) : (preinclusion B).obj ⟨a⟩ = a :=
-  rfl
 
 @[simp]
 theorem preinclusion_map₂ {a b : B} (f g : Discrete (Path.{v + 1} a b)) (η : f ⟶ g) :

@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Trunc.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.MvPowerSeries.Basic
 import Mathlib.Data.Finsupp.Interval
+
+noncomputable section
 
 /-!
 
@@ -64,9 +66,31 @@ theorem coeff_trunc (m : σ →₀ ℕ) (φ : MvPowerSeries σ R) :
     (trunc R n φ).coeff m = if m < n then coeff R m φ else 0 := by
   classical simp [trunc, coeff_truncFun]
 
--- DISSOLVED: trunc_one
+@[simp]
+theorem trunc_one (n : σ →₀ ℕ) (hnn : n ≠ 0) : trunc R n 1 = 1 :=
+  MvPolynomial.ext _ _ fun m => by
+    classical
+    rw [coeff_trunc, coeff_one]
+    split_ifs with H H'
+    · subst m
+      simp
+    · symm
+      rw [MvPolynomial.coeff_one]
+      exact if_neg (Ne.symm H')
+    · symm
+      rw [MvPolynomial.coeff_one]
+      refine if_neg ?_
+      rintro rfl
+      apply H
+      exact Ne.bot_lt hnn
 
--- DISSOLVED: trunc_c
+@[simp]
+theorem trunc_c (n : σ →₀ ℕ) (hnn : n ≠ 0) (a : R) : trunc R n (C σ R a) = MvPolynomial.C a :=
+  MvPolynomial.ext _ _ fun m => by
+    classical
+    rw [coeff_trunc, coeff_C, MvPolynomial.coeff_C]
+    split_ifs with H <;> first |rfl|try simp_all only [ne_eq, not_true_eq_false]
+    exfalso; apply H; subst m; exact Ne.bot_lt hnn
 
 end Trunc
 

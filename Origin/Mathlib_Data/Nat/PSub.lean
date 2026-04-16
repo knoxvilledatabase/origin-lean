@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Group.Nat.Basic
 
+noncomputable section
+
 /-!
 # Partial predecessor and partial subtraction on the natural numbers
 
@@ -25,12 +27,6 @@ namespace Nat
 def ppred : ℕ → Option ℕ
   | 0 => none
   | n + 1 => some n
-
-@[simp]
-theorem ppred_zero : ppred 0 = none := rfl
-
-@[simp]
-theorem ppred_succ {n : ℕ} : ppred (succ n) = some n := rfl
 
 def psub (m : ℕ) : ℕ → Option ℕ
   | 0 => some m

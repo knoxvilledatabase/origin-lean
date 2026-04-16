@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/IsomOfJ.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.NormalForms
 import Mathlib.FieldTheory.IsSepClosed
+
+noncomputable section
 
 /-!
 
@@ -31,8 +33,24 @@ section CharTwo
 variable [CharP F 2]
 
 omit [E.IsElliptic] [E'.IsElliptic] in
-
--- DISSOLVED: exists_variableChange_of_char_two_of_j_ne_zero
+private lemma exists_variableChange_of_char_two_of_j_ne_zero
+    [E.IsCharTwoJNeZeroNF] [E'.IsCharTwoJNeZeroNF] (heq : E.a₆ = E'.a₆) :
+    ∃ C : VariableChange F, E.variableChange C = E' := by
+  obtain ⟨s, hs⟩ := IsSepClosed.exists_root_C_mul_X_pow_add_C_mul_X_add_C' 2 2
+    1 1 (E.a₂ + E'.a₂) (by norm_num) (by norm_num) one_ne_zero
+  use ⟨1, 0, s, 0⟩
+  ext
+  · simp_rw [variableChange_a₁, inv_one, Units.val_one, a₁_of_isCharTwoJNeZeroNF]
+    linear_combination s * CharP.cast_eq_zero F 2
+  · simp_rw [variableChange_a₂, inv_one, Units.val_one, a₁_of_isCharTwoJNeZeroNF]
+    linear_combination -hs + E.a₂ * CharP.cast_eq_zero F 2
+  · simp_rw [variableChange_a₃, inv_one, Units.val_one, a₃_of_isCharTwoJNeZeroNF]
+    ring1
+  · simp_rw [variableChange_a₄, inv_one, Units.val_one, a₃_of_isCharTwoJNeZeroNF,
+      a₄_of_isCharTwoJNeZeroNF]
+    ring1
+  · simp_rw [variableChange_a₆, inv_one, Units.val_one, heq]
+    ring1
 
 private lemma exists_variableChange_of_char_two_of_j_eq_zero
     [E.IsCharTwoJEqZeroNF] [E'.IsCharTwoJEqZeroNF] :
@@ -99,7 +117,42 @@ section CharThree
 
 variable [CharP F 3]
 
--- DISSOLVED: exists_variableChange_of_char_three_of_j_ne_zero
+private lemma exists_variableChange_of_char_three_of_j_ne_zero
+    [E.IsCharThreeJNeZeroNF] [E'.IsCharThreeJNeZeroNF] (heq : E.j = E'.j) :
+    ∃ C : VariableChange F, E.variableChange C = E' := by
+  have h := E.Δ'.ne_zero
+  rw [E.coe_Δ', Δ_of_isCharThreeJNeZeroNF_of_char_three, mul_ne_zero_iff, neg_ne_zero,
+    pow_ne_zero_iff three_ne_zero] at h
+  obtain ⟨ha₂, ha₆⟩ := h
+  have h := E'.Δ'.ne_zero
+  rw [E'.coe_Δ', Δ_of_isCharThreeJNeZeroNF_of_char_three, mul_ne_zero_iff, neg_ne_zero,
+    pow_ne_zero_iff three_ne_zero] at h
+  obtain ⟨ha₂', ha₆'⟩ := h
+  haveI : NeZero (2 : F) := NeZero.mk <| by
+    rw [show (2 : F) = -1 by linear_combination CharP.cast_eq_zero F 3, neg_ne_zero]
+    exact one_ne_zero
+  obtain ⟨u, hu⟩ := IsSepClosed.exists_pow_nat_eq (E.a₂ / E'.a₂) 2
+  have hu0 : u ≠ 0 := by
+    rw [← pow_ne_zero_iff two_ne_zero, hu, div_ne_zero_iff]
+    exact ⟨ha₂, ha₂'⟩
+  use ⟨Units.mk0 u hu0, 0, 0, 0⟩
+  ext
+  · simp_rw [variableChange_a₁, a₁_of_isCharThreeJNeZeroNF]
+    ring1
+  · simp_rw [variableChange_a₂, a₁_of_isCharThreeJNeZeroNF, Units.val_inv_eq_inv_val,
+      Units.val_mk0, inv_pow, inv_mul_eq_div, hu]
+    field_simp
+  · simp_rw [variableChange_a₃, a₁_of_isCharThreeJNeZeroNF, a₃_of_isCharThreeJNeZeroNF]
+    ring1
+  · simp_rw [variableChange_a₄, a₁_of_isCharThreeJNeZeroNF, a₃_of_isCharThreeJNeZeroNF,
+      a₄_of_isCharThreeJNeZeroNF]
+    ring1
+  · simp_rw [j_of_isCharThreeJNeZeroNF_of_char_three, div_eq_div_iff ha₆ ha₆'] at heq
+    simp_rw [variableChange_a₆, a₁_of_isCharThreeJNeZeroNF, a₃_of_isCharThreeJNeZeroNF,
+      a₄_of_isCharThreeJNeZeroNF, Units.val_inv_eq_inv_val, Units.val_mk0,
+      inv_pow, inv_mul_eq_div, pow_mul u 2 3, hu]
+    field_simp
+    linear_combination heq
 
 private lemma exists_variableChange_of_char_three_of_j_eq_zero
     [E.IsShortNF] [E'.IsShortNF] :

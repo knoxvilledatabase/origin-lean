@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Subsemigroup.Centralizer
 import Mathlib.GroupTheory.Submonoid.Center
 
+noncomputable section
+
 /-!
 # Centralizers of magmas and monoids
 
@@ -36,10 +38,6 @@ theorem coe_centralizer : ↑(centralizer S) = S.centralizer :=
   rfl
 
 theorem centralizer_toSubsemigroup : (centralizer S).toSubsemigroup = Subsemigroup.centralizer S :=
-  rfl
-
-theorem _root_.AddSubmonoid.centralizer_toAddSubsemigroup {M} [AddMonoid M] (S : Set M) :
-    (AddSubmonoid.centralizer S).toAddSubsemigroup = AddSubsemigroup.centralizer S :=
   rfl
 
 attribute [to_additive existing AddSubmonoid.centralizer_toAddSubsemigroup]

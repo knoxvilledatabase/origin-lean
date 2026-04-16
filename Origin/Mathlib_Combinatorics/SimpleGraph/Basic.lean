@@ -9,6 +9,8 @@ import Mathlib.Data.Rel
 import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Data.Sym.Sym2
 
+noncomputable section
+
 /-!
 # Simple graphs
 
@@ -42,33 +44,21 @@ attribute [aesop norm unfold (rule_sets := [SimpleGraph])] Symmetric
 attribute [aesop norm unfold (rule_sets := [SimpleGraph])] Irreflexive
 
 macro (name := aesop_graph) "aesop_graph" c:Aesop.tactic_clause* : tactic =>
-
   `(tactic|
-
     aesop $c*
-
       (config := { introsTransparency? := some .default, terminal := true })
-
       (rule_sets := [$(Lean.mkIdent `SimpleGraph):ident]))
 
 macro (name := aesop_graph?) "aesop_graph?" c:Aesop.tactic_clause* : tactic =>
-
   `(tactic|
-
     aesop? $c*
-
       (config := { introsTransparency? := some .default, terminal := true })
-
       (rule_sets := [$(Lean.mkIdent `SimpleGraph):ident]))
 
 macro (name := aesop_graph_nonterminal) "aesop_graph_nonterminal" c:Aesop.tactic_clause* : tactic =>
-
   `(tactic|
-
     aesop $c*
-
       (config := { introsTransparency? := some .default, warnOnNonterminal := false })
-
       (rule_sets := [$(Lean.mkIdent `SimpleGraph):ident]))
 
 open Finset Function
@@ -114,11 +104,6 @@ def SimpleGraph.fromRel {V : Type u} (r : V → V → Prop) : SimpleGraph V wher
   Adj a b := a ≠ b ∧ (r a b ∨ r b a)
   symm := fun _ _ ⟨hn, hr⟩ => ⟨hn.symm, hr.symm⟩
   loopless := fun _ ⟨hn, _⟩ => hn rfl
-
-@[simp]
-theorem SimpleGraph.fromRel_adj {V : Type u} (r : V → V → Prop) (v w : V) :
-    (SimpleGraph.fromRel r).Adj v w ↔ v ≠ w ∧ (r v w ∨ r w v) :=
-  Iff.rfl
 
 attribute [aesop safe (rule_sets := [SimpleGraph])] Ne.symm
 
@@ -180,18 +165,10 @@ def IsSubgraph (x y : SimpleGraph V) : Prop :=
 instance : LE (SimpleGraph V) :=
   ⟨IsSubgraph⟩
 
-@[simp]
-theorem isSubgraph_eq_le : (IsSubgraph : SimpleGraph V → SimpleGraph V → Prop) = (· ≤ ·) :=
-  rfl
-
 instance : Max (SimpleGraph V) where
   max x y :=
     { Adj := x.Adj ⊔ y.Adj
       symm := fun v w h => by rwa [Pi.sup_apply, Pi.sup_apply, x.adj_comm, y.adj_comm] }
-
-@[simp]
-theorem sup_adj (x y : SimpleGraph V) (v w : V) : (x ⊔ y).Adj v w ↔ x.Adj v w ∨ y.Adj v w :=
-  Iff.rfl
 
 instance : Min (SimpleGraph V) where
   min x y :=
@@ -217,10 +194,6 @@ instance sdiff : SDiff (SimpleGraph V) where
     { Adj := x.Adj \ y.Adj
       symm := fun v w h => by change x.Adj w v ∧ ¬y.Adj w v; rwa [x.adj_comm, y.adj_comm] }
 
-@[simp]
-theorem sdiff_adj (x y : SimpleGraph V) (v w : V) : (x \ y).Adj v w ↔ x.Adj v w ∧ ¬y.Adj v w :=
-  Iff.rfl
-
 instance supSet : SupSet (SimpleGraph V) where
   sSup s :=
     { Adj := fun a b => ∃ G ∈ s, Adj G a b
@@ -234,10 +207,6 @@ instance infSet : InfSet (SimpleGraph V) where
     { Adj := fun a b => (∀ ⦃G⦄, G ∈ s → Adj G a b) ∧ a ≠ b
       symm := fun _ _ => And.imp (forall₂_imp fun _ _ => Adj.symm) Ne.symm
       loopless := fun _ h => h.2 rfl }
-
-@[simp]
-theorem sSup_adj {s : Set (SimpleGraph V)} {a b : V} : (sSup s).Adj a b ↔ ∃ G ∈ s, Adj G a b :=
-  Iff.rfl
 
 @[simp]
 theorem sInf_adj {s : Set (SimpleGraph V)} : (sInf s).Adj a b ↔ (∀ G ∈ s, Adj G a b) ∧ a ≠ b :=
@@ -305,14 +274,6 @@ theorem top_adj (v w : V) : (⊤ : SimpleGraph V).Adj v w ↔ v ≠ w :=
 theorem bot_adj (v w : V) : (⊥ : SimpleGraph V).Adj v w ↔ False :=
   Iff.rfl
 
-@[simp]
-theorem completeGraph_eq_top (V : Type u) : completeGraph V = ⊤ :=
-  rfl
-
-@[simp]
-theorem emptyGraph_eq_bot (V : Type u) : emptyGraph V = ⊥ :=
-  rfl
-
 @[simps]
 instance (V : Type u) : Inhabited (SimpleGraph V) :=
   ⟨⊥⟩
@@ -355,9 +316,6 @@ end Order
 
 def support : Set V :=
   Rel.dom G.Adj
-
-theorem mem_support {v : V} : v ∈ G.support ↔ ∃ w, G.Adj v w :=
-  Iff.rfl
 
 theorem support_mono {G G' : SimpleGraph V} (h : G ≤ G') : G.support ⊆ G'.support :=
   Rel.dom_mono h
@@ -616,8 +574,6 @@ instance decidableMemIncidenceSet [DecidableEq V] [DecidableRel G.Adj] (v : V) :
 theorem mem_neighborSet (v w : V) : w ∈ G.neighborSet v ↔ G.Adj v w :=
   Iff.rfl
 
-lemma not_mem_neighborSet_self : a ∉ G.neighborSet a := by simp
-
 @[simp]
 theorem mem_incidenceSet (v w : V) : s(v, w) ∈ G.incidenceSet v ↔ G.Adj v w := by
   simp [incidenceSet]
@@ -663,12 +619,6 @@ theorem neighborSet_compl (G : SimpleGraph V) (v : V) :
 
 def commonNeighbors (v w : V) : Set V :=
   G.neighborSet v ∩ G.neighborSet w
-
-theorem commonNeighbors_eq (v w : V) : G.commonNeighbors v w = G.neighborSet v ∩ G.neighborSet w :=
-  rfl
-
-theorem mem_commonNeighbors {u v w : V} : u ∈ G.commonNeighbors v w ↔ G.Adj v u ∧ G.Adj w u :=
-  Iff.rfl
 
 theorem commonNeighbors_symm (v w : V) : G.commonNeighbors v w = G.commonNeighbors w v :=
   Set.inter_comm _ _

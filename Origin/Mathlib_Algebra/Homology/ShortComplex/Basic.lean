@@ -5,6 +5,8 @@ Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
 
+noncomputable section
+
 /-!
 # Short complexes
 
@@ -89,12 +91,6 @@ def homMk {S₁ S₂ : ShortComplex C} (τ₁ : S₁.X₁ ⟶ S₂.X₁) (τ₂ 
     (τ₃ : S₁.X₃ ⟶ S₂.X₃) (comm₁₂ : τ₁ ≫ S₂.f = S₁.f ≫ τ₂)
     (comm₂₃ : τ₂ ≫ S₂.g = S₁.g ≫ τ₃) : S₁ ⟶ S₂ := ⟨τ₁, τ₂, τ₃, comm₁₂, comm₂₃⟩
 
-@[simp] lemma id_τ₁ : Hom.τ₁ (𝟙 S) = 𝟙 _ := rfl
-
-@[simp] lemma id_τ₂ : Hom.τ₂ (𝟙 S) = 𝟙 _ := rfl
-
-@[simp] lemma id_τ₃ : Hom.τ₃ (𝟙 S) = 𝟙 _ := rfl
-
 @[reassoc] lemma comp_τ₁ (φ₁₂ : S₁ ⟶ S₂) (φ₂₃ : S₂ ⟶ S₃) :
     (φ₁₂ ≫ φ₂₃).τ₁ = φ₁₂.τ₁ ≫ φ₂₃.τ₁ := rfl
 
@@ -109,12 +105,6 @@ attribute [simp] comp_τ₁ comp_τ₂ comp_τ₃
 instance : Zero (S₁ ⟶ S₂) := ⟨{ τ₁ := 0, τ₂ := 0, τ₃ := 0 }⟩
 
 variable (S₁ S₂)
-
-@[simp] lemma zero_τ₁ : Hom.τ₁ (0 : S₁ ⟶ S₂) = 0 := rfl
-
-@[simp] lemma zero_τ₂ : Hom.τ₂ (0 : S₁ ⟶ S₂) = 0 := rfl
-
-@[simp] lemma zero_τ₃ : Hom.τ₃ (0 : S₁ ⟶ S₂) = 0 := rfl
 
 variable {S₁ S₂}
 
@@ -223,9 +213,6 @@ def opMap (φ : S₁ ⟶ S₂) : S₂.op ⟶ S₁.op where
     dsimp
     simp only [← op_comp, φ.comm₁₂]
 
-@[simp]
-lemma opMap_id : opMap (𝟙 S) = 𝟙 S.op := rfl
-
 @[simps]
 def unop (S : ShortComplex Cᵒᵖ) : ShortComplex C :=
   mk S.g.unop S.f.unop (by simp only [← unop_comp, S.zero]; rfl)
@@ -241,9 +228,6 @@ def unopMap {S₁ S₂ : ShortComplex Cᵒᵖ} (φ : S₁ ⟶ S₂) : S₂.unop 
   comm₂₃ := by
     dsimp
     simp only [← unop_comp, φ.comm₁₂]
-
-@[simp]
-lemma unopMap_id (S : ShortComplex Cᵒᵖ) : unopMap (𝟙 S) = 𝟙 S.unop := rfl
 
 variable (C)
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.CharP.Lemmas
 import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.Polynomial.Basic
 
+noncomputable section
+
 /-!
 # Lucas's theorem
 

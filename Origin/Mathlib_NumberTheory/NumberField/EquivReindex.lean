@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/NumberField/EquivReindex.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
+
+noncomputable section
 
 /-!
 
@@ -31,7 +33,18 @@ abbrev equivReindex : (K →+* ℂ) ≃ (ChooseBasisIndex ℤ (𝓞 K)) :=
 abbrev basisMatrix : Matrix (K →+* ℂ) (K →+* ℂ) ℂ :=
   (Matrix.of fun i ↦ latticeBasis K (equivReindex K i))
 
--- DISSOLVED: det_of_basisMatrix_non_zero
+theorem det_of_basisMatrix_non_zero [DecidableEq (K →+* ℂ)] : (basisMatrix K).det ≠ 0 := by
+  let e : (K →+* ℂ) ≃ ChooseBasisIndex ℤ (𝓞 K) := equivReindex K
+  let N := Algebra.embeddingsMatrixReindex ℚ ℂ (fun i => integralBasis K (e i))
+    RingHom.equivRatAlgHom
+  rw [show (basisMatrix K) = N by
+    ext:2; simp only [N, transpose_apply, latticeBasis_apply, integralBasis_apply,
+    of_apply, apply_at]; rfl, ← pow_ne_zero_iff two_ne_zero]
+  convert (map_ne_zero_iff _ (algebraMap ℚ ℂ).injective).mpr
+    (Algebra.discr_not_zero_of_basis ℚ (integralBasis K))
+  rw [← Algebra.discr_reindex ℚ (integralBasis K) e.symm]
+  exact (Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ ℂ
+    (fun _ => integralBasis K (e _)) RingHom.equivRatAlgHom).symm
 
 instance [DecidableEq (K →+* ℂ)] : Invertible (basisMatrix K) := invertibleOfIsUnitDet _
     (Ne.isUnit (det_of_basisMatrix_non_zero K))

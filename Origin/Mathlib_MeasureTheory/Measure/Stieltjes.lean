@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 import Mathlib.Topology.Order.LeftRightLim
 
+noncomputable section
+
 /-!
 # Stieltjes measures on the real line
 
@@ -92,8 +94,6 @@ protected def const (c : ℝ) : StieltjesFunction where
   mono' _ _ := by simp
   right_continuous' _ := continuousWithinAt_const
 
-@[simp] lemma const_apply (c x : ℝ) : (StieltjesFunction.const c) x = c := rfl
-
 protected def add (f g : StieltjesFunction) : StieltjesFunction where
   toFun := fun x => f x + g x
   mono' := f.mono.add g.mono
@@ -143,10 +143,6 @@ noncomputable def _root_.Monotone.stieltjesFunction {f : ℝ → ℝ} (hf : Mono
     calc
       rightLim f z ≤ f a := hf.rightLim_le za
       _ < u := (h'y ⟨hz.1.trans_lt za, ay.le⟩).2
-
-theorem _root_.Monotone.stieltjesFunction_eq {f : ℝ → ℝ} (hf : Monotone f) (x : ℝ) :
-    hf.stieltjesFunction x = rightLim f x :=
-  rfl
 
 theorem countable_leftLim_ne (f : StieltjesFunction) : Set.Countable { x | leftLim f x ≠ f x } := by
   refine Countable.mono ?_ f.mono.countable_not_continuousAt
@@ -368,32 +364,6 @@ theorem measure_singleton (a : ℝ) : f.measure {a} = ofReal (f a - leftLim f a)
           (Eventually.of_forall fun n => u_lt_a n)
     exact ENNReal.continuous_ofReal.continuousAt.tendsto.comp (tendsto_const_nhds.sub this)
   exact tendsto_nhds_unique L1 L2
-
-@[simp]
-theorem measure_Icc (a b : ℝ) : f.measure (Icc a b) = ofReal (f b - leftLim f a) := by
-  rcases le_or_lt a b with (hab | hab)
-  · have A : Disjoint {a} (Ioc a b) := by simp
-    simp [← Icc_union_Ioc_eq_Icc le_rfl hab, -singleton_union, ← ENNReal.ofReal_add,
-      f.mono.leftLim_le, measure_union A measurableSet_Ioc, f.mono hab]
-  · simp only [hab, measure_empty, Icc_eq_empty, not_le]
-    symm
-    simp [ENNReal.ofReal_eq_zero, f.mono.le_leftLim hab]
-
-@[simp]
-theorem measure_Ioo {a b : ℝ} : f.measure (Ioo a b) = ofReal (leftLim f b - f a) := by
-  rcases le_or_lt b a with (hab | hab)
-  · simp only [hab, measure_empty, Ioo_eq_empty, not_lt]
-    symm
-    simp [ENNReal.ofReal_eq_zero, f.mono.leftLim_le hab]
-  · have A : Disjoint (Ioo a b) {b} := by simp
-    have D : f b - f a = f b - leftLim f b + (leftLim f b - f a) := by abel
-    have := f.measure_Ioc a b
-    simp only [← Ioo_union_Icc_eq_Ioc hab le_rfl, measure_singleton,
-      measure_union A (measurableSet_singleton b), Icc_self] at this
-    rw [D, ENNReal.ofReal_add, add_comm] at this
-    · simpa only [ENNReal.add_right_inj ENNReal.ofReal_ne_top]
-    · simp only [f.mono.leftLim_le le_rfl, sub_nonneg]
-    · simp only [f.mono.le_leftLim hab, sub_nonneg]
 
 @[simp]
 theorem measure_Ico (a b : ℝ) : f.measure (Ico a b) = ofReal (leftLim f b - leftLim f a) := by

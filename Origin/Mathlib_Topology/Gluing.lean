@@ -10,6 +10,8 @@ import Mathlib.Tactic.Generalize
 import Mathlib.CategoryTheory.Elementwise
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono
 
+noncomputable section
+
 /-!
 # Gluing Topological spaces
 

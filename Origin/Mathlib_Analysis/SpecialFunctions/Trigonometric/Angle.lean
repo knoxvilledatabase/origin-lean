@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Angle.lean
-Genuine: 138 | Conflates: 0 | Dissolved: 15 | Infrastructure: 16
+Genuine: 153 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.Normed.Group.AddCircle
 import Mathlib.Algebra.CharZero.Quotient
 import Mathlib.Topology.Instances.Sign
+
+noncomputable section
 
 /-!
 # The type of angles
@@ -46,10 +48,6 @@ theorem continuous_coe : Continuous ((↑) : ℝ → Angle) :=
 
 def coeHom : ℝ →+ Angle :=
   QuotientAddGroup.mk' _
-
-@[simp]
-theorem coe_coeHom : (coeHom : ℝ → Angle) = ((↑) : ℝ → Angle) :=
-  rfl
 
 @[elab_as_elim]
 protected theorem induction_on {p : Angle → Prop} (θ : Angle) (h : ∀ x : ℝ, p x) : p θ :=
@@ -129,9 +127,13 @@ theorem two_zsmul_coe_pi : (2 : ℤ) • (π : Angle) = 0 := by simp [← intCas
 @[simp]
 theorem coe_pi_add_coe_pi : (π : Real.Angle) + π = 0 := by rw [← two_nsmul, two_nsmul_coe_pi]
 
--- DISSOLVED: zsmul_eq_iff
+theorem zsmul_eq_iff {ψ θ : Angle} {z : ℤ} (hz : z ≠ 0) :
+    z • ψ = z • θ ↔ ∃ k : Fin z.natAbs, ψ = θ + (k : ℕ) • (2 * π / z : ℝ) :=
+  QuotientAddGroup.zmultiples_zsmul_eq_zsmul_iff hz
 
--- DISSOLVED: nsmul_eq_iff
+theorem nsmul_eq_iff {ψ θ : Angle} {n : ℕ} (hz : n ≠ 0) :
+    n • ψ = n • θ ↔ ∃ k : Fin n, ψ = θ + (k : ℕ) • (2 * π / n : ℝ) :=
+  QuotientAddGroup.zmultiples_nsmul_eq_nsmul_iff hz
 
 theorem two_zsmul_eq_iff {ψ θ : Angle} : (2 : ℤ) • ψ = (2 : ℤ) • θ ↔ ψ = θ ∨ ψ = θ + ↑π := by
   have : Int.natAbs 2 = 2 := rfl
@@ -145,21 +147,25 @@ theorem two_nsmul_eq_iff {ψ θ : Angle} : (2 : ℕ) • ψ = (2 : ℕ) • θ �
 theorem two_nsmul_eq_zero_iff {θ : Angle} : (2 : ℕ) • θ = 0 ↔ θ = 0 ∨ θ = π := by
   convert two_nsmul_eq_iff <;> simp
 
--- DISSOLVED: two_nsmul_ne_zero_iff
+theorem two_nsmul_ne_zero_iff {θ : Angle} : (2 : ℕ) • θ ≠ 0 ↔ θ ≠ 0 ∧ θ ≠ π := by
+  rw [← not_or, ← two_nsmul_eq_zero_iff]
 
 theorem two_zsmul_eq_zero_iff {θ : Angle} : (2 : ℤ) • θ = 0 ↔ θ = 0 ∨ θ = π := by
   simp_rw [two_zsmul, ← two_nsmul, two_nsmul_eq_zero_iff]
 
--- DISSOLVED: two_zsmul_ne_zero_iff
+theorem two_zsmul_ne_zero_iff {θ : Angle} : (2 : ℤ) • θ ≠ 0 ↔ θ ≠ 0 ∧ θ ≠ π := by
+  rw [← not_or, ← two_zsmul_eq_zero_iff]
 
 theorem eq_neg_self_iff {θ : Angle} : θ = -θ ↔ θ = 0 ∨ θ = π := by
   rw [← add_eq_zero_iff_eq_neg, ← two_nsmul, two_nsmul_eq_zero_iff]
 
--- DISSOLVED: ne_neg_self_iff
+theorem ne_neg_self_iff {θ : Angle} : θ ≠ -θ ↔ θ ≠ 0 ∧ θ ≠ π := by
+  rw [← not_or, ← eq_neg_self_iff.not]
 
 theorem neg_eq_self_iff {θ : Angle} : -θ = θ ↔ θ = 0 ∨ θ = π := by rw [eq_comm, eq_neg_self_iff]
 
--- DISSOLVED: neg_ne_self_iff
+theorem neg_ne_self_iff {θ : Angle} : -θ ≠ θ ↔ θ ≠ 0 ∧ θ ≠ π := by
+  rw [← not_or, ← neg_eq_self_iff.not]
 
 theorem two_nsmul_eq_pi_iff {θ : Angle} : (2 : ℕ) • θ = π ↔ θ = (π / 2 : ℝ) ∨ θ = (-π / 2 : ℝ) := by
   have h : (π : Angle) = ((2 : ℕ) • (π / 2 : ℝ):) := by rw [two_nsmul, add_halves]
@@ -282,7 +288,8 @@ theorem sin_eq_zero_iff {θ : Angle} : sin θ = 0 ↔ θ = 0 ∨ θ = π := by
   rw [sin_eq_iff_eq_or_add_eq_pi]
   simp
 
--- DISSOLVED: sin_ne_zero_iff
+theorem sin_ne_zero_iff {θ : Angle} : sin θ ≠ 0 ↔ θ ≠ 0 ∧ θ ≠ π := by
+  rw [← not_or, ← sin_eq_zero_iff]
 
 @[simp]
 theorem sin_neg (θ : Angle) : sin (-θ) = -sin θ := by
@@ -472,7 +479,9 @@ theorem toReal_pi : (π : Angle).toReal = π := by
 @[simp]
 theorem toReal_eq_pi_iff {θ : Angle} : θ.toReal = π ↔ θ = π := by rw [← toReal_inj, toReal_pi]
 
--- DISSOLVED: pi_ne_zero
+theorem pi_ne_zero : (π : Angle) ≠ 0 := by
+  rw [← toReal_injective.ne_iff, toReal_pi, toReal_zero]
+  exact Real.pi_ne_zero
 
 @[simp]
 theorem toReal_pi_div_two : ((π / 2 : ℝ) : Angle).toReal = π / 2 :=
@@ -490,9 +499,13 @@ theorem toReal_neg_pi_div_two : ((-π / 2 : ℝ) : Angle).toReal = -π / 2 :=
 theorem toReal_eq_neg_pi_div_two_iff {θ : Angle} : θ.toReal = -π / 2 ↔ θ = (-π / 2 : ℝ) := by
   rw [← toReal_inj, toReal_neg_pi_div_two]
 
--- DISSOLVED: pi_div_two_ne_zero
+theorem pi_div_two_ne_zero : ((π / 2 : ℝ) : Angle) ≠ 0 := by
+  rw [← toReal_injective.ne_iff, toReal_pi_div_two, toReal_zero]
+  exact div_ne_zero Real.pi_ne_zero two_ne_zero
 
--- DISSOLVED: neg_pi_div_two_ne_zero
+theorem neg_pi_div_two_ne_zero : ((-π / 2 : ℝ) : Angle) ≠ 0 := by
+  rw [← toReal_injective.ne_iff, toReal_neg_pi_div_two, toReal_zero]
+  exact div_ne_zero (neg_ne_zero.2 Real.pi_ne_zero) two_ne_zero
 
 theorem abs_toReal_coe_eq_self_iff {θ : ℝ} : |(θ : Angle).toReal| = θ ↔ 0 ≤ θ ∧ θ ≤ π :=
   ⟨fun h => h ▸ ⟨abs_nonneg _, abs_toReal_le_pi _⟩, fun h =>
@@ -512,7 +525,12 @@ theorem abs_toReal_eq_pi_div_two_iff {θ : Angle} :
   rw [abs_eq (div_nonneg Real.pi_pos.le two_pos.le), ← neg_div, toReal_eq_pi_div_two_iff,
     toReal_eq_neg_pi_div_two_iff]
 
--- DISSOLVED: nsmul_toReal_eq_mul
+theorem nsmul_toReal_eq_mul {n : ℕ} (h : n ≠ 0) {θ : Angle} :
+    (n • θ).toReal = n * θ.toReal ↔ θ.toReal ∈ Set.Ioc (-π / n) (π / n) := by
+  nth_rw 1 [← coe_toReal θ]
+  have h' : 0 < (n : ℝ) := mod_cast Nat.pos_of_ne_zero h
+  rw [← coe_nsmul, nsmul_eq_mul, toReal_coe_eq_self_iff, Set.mem_Ioc, div_lt_iff₀' h',
+    le_div_iff₀' h']
 
 theorem two_nsmul_toReal_eq_two_mul {θ : Angle} :
     ((2 : ℕ) • θ).toReal = 2 * θ.toReal ↔ θ.toReal ∈ Set.Ioc (-π / 2) (π / 2) :=
@@ -696,7 +714,8 @@ theorem sign_pi_sub (θ : Angle) : ((π : Angle) - θ).sign = θ.sign := by
 theorem sign_eq_zero_iff {θ : Angle} : θ.sign = 0 ↔ θ = 0 ∨ θ = π := by
   rw [sign, _root_.sign_eq_zero_iff, sin_eq_zero_iff]
 
--- DISSOLVED: sign_ne_zero_iff
+theorem sign_ne_zero_iff {θ : Angle} : θ.sign ≠ 0 ↔ θ ≠ 0 ∧ θ ≠ π := by
+  rw [← not_or, ← sign_eq_zero_iff]
 
 theorem toReal_neg_iff_sign_neg {θ : Angle} : θ.toReal < 0 ↔ θ.sign = -1 := by
   rw [sign, ← sin_toReal, sign_eq_neg_one_iff]
@@ -822,11 +841,21 @@ theorem sign_two_zsmul_eq_sign_iff {θ : Angle} :
     ((2 : ℤ) • θ).sign = θ.sign ↔ θ = π ∨ |θ.toReal| < π / 2 := by
   rw [two_zsmul, ← two_nsmul, sign_two_nsmul_eq_sign_iff]
 
--- DISSOLVED: continuousAt_sign
+theorem continuousAt_sign {θ : Angle} (h0 : θ ≠ 0) (hpi : θ ≠ π) : ContinuousAt sign θ :=
+  (continuousAt_sign_of_ne_zero (sin_ne_zero_iff.2 ⟨h0, hpi⟩)).comp continuous_sin.continuousAt
 
--- DISSOLVED: _root_.ContinuousOn.angle_sign_comp
+theorem _root_.ContinuousOn.angle_sign_comp {α : Type*} [TopologicalSpace α] {f : α → Angle}
+    {s : Set α} (hf : ContinuousOn f s) (hs : ∀ z ∈ s, f z ≠ 0 ∧ f z ≠ π) :
+    ContinuousOn (sign ∘ f) s := by
+  refine (continuousOn_of_forall_continuousAt fun θ hθ => ?_).comp hf (Set.mapsTo_image f s)
+  obtain ⟨z, hz, rfl⟩ := hθ
+  exact continuousAt_sign (hs _ hz).1 (hs _ hz).2
 
--- DISSOLVED: sign_eq_of_continuousOn
+theorem sign_eq_of_continuousOn {α : Type*} [TopologicalSpace α] {f : α → Angle} {s : Set α}
+    {x y : α} (hc : IsConnected s) (hf : ContinuousOn f s) (hs : ∀ z ∈ s, f z ≠ 0 ∧ f z ≠ π)
+    (hx : x ∈ s) (hy : y ∈ s) : (f y).sign = (f x).sign :=
+  (hc.image _ (hf.angle_sign_comp hs)).isPreconnected.subsingleton (Set.mem_image_of_mem _ hy)
+    (Set.mem_image_of_mem _ hx)
 
 end Angle
 

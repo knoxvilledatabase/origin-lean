@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.ConcreteCategory.Basic
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.Tactic.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 
 # Colimits in concrete categories with algebraic structures

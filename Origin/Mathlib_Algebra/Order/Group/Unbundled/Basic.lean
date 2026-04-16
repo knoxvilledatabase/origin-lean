@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 import Mathlib.Algebra.Order.Sub.Defs
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-!
 # Ordered groups
 

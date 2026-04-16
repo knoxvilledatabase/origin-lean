@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.Directed
 
+noncomputable section
+
 /-!
 # Union lift
 This file defines `Set.iUnionLift` to glue together functions defined on each of a collection of

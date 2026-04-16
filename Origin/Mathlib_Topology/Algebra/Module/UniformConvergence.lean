@@ -7,6 +7,8 @@ import Mathlib.Analysis.LocallyConvex.Bounded
 import Mathlib.Topology.Algebra.FilterBasis
 import Mathlib.Topology.Algebra.UniformConvergence
 
+noncomputable section
+
 /-!
 # Algebraic facts about the topology of uniform convergence
 

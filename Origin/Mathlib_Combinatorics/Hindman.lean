@@ -8,6 +8,8 @@ import Mathlib.Data.Stream.Init
 import Mathlib.Topology.Algebra.Semigroup
 import Mathlib.Topology.StoneCech
 
+noncomputable section
+
 /-!
 # Hindman's theorem on finite sums
 

@@ -7,6 +7,8 @@ import Mathlib.AlgebraicTopology.SplitSimplicialObject
 import Mathlib.AlgebraicTopology.DoldKan.Degeneracies
 import Mathlib.AlgebraicTopology.DoldKan.FunctorN
 
+noncomputable section
+
 /-!
 
 # Split simplicial objects in preadditive categories

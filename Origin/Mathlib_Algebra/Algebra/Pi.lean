@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv
 
+noncomputable section
+
 /-!
 # The R-algebra structure on families of R-algebras
 
@@ -37,15 +39,6 @@ instance algebra {r : CommSemiring R} [s : ∀ i, Semiring (f i)] [∀ i, Algebr
     commutes' := fun a f => by ext; simp [Algebra.commutes]
     smul_def' := fun a f => by ext; simp [Algebra.smul_def] }
 
-theorem algebraMap_def {_ : CommSemiring R} [_s : ∀ i, Semiring (f i)] [∀ i, Algebra R (f i)]
-    (a : R) : algebraMap R (∀ i, f i) a = fun i => algebraMap R (f i) a :=
-  rfl
-
-@[simp]
-theorem algebraMap_apply {_ : CommSemiring R} [_s : ∀ i, Semiring (f i)] [∀ i, Algebra R (f i)]
-    (a : R) (i : I) : algebraMap R (∀ i, f i) a i = algebraMap R (f i) a :=
-  rfl
-
 variable {I} (R)
 
 @[simps!]
@@ -69,14 +62,6 @@ def constAlgHom : B →ₐ[R] A → B :=
   { Pi.constRingHom A B with
     toFun := Function.const _
     commutes' := fun _ => rfl }
-
-@[simp]
-theorem constRingHom_eq_algebraMap : constRingHom A R = algebraMap R (A → R) :=
-  rfl
-
-@[simp]
-theorem constAlgHom_eq_algebra_ofId : constAlgHom R A R = Algebra.ofId R (A → R) :=
-  rfl
 
 end Pi
 
@@ -114,25 +99,5 @@ def piCongrRight {R ι : Type*} {A₁ A₂ : ι → Type*} [CommSemiring R] [∀
     commutes' := fun r => by
       ext i
       simp }
-
-@[simp]
-theorem piCongrRight_refl {R ι : Type*} {A : ι → Type*} [CommSemiring R] [∀ i, Semiring (A i)]
-    [∀ i, Algebra R (A i)] :
-    (piCongrRight fun i => (AlgEquiv.refl : A i ≃ₐ[R] A i)) = AlgEquiv.refl :=
-  rfl
-
-@[simp]
-theorem piCongrRight_symm {R ι : Type*} {A₁ A₂ : ι → Type*} [CommSemiring R]
-    [∀ i, Semiring (A₁ i)] [∀ i, Semiring (A₂ i)] [∀ i, Algebra R (A₁ i)] [∀ i, Algebra R (A₂ i)]
-    (e : ∀ i, A₁ i ≃ₐ[R] A₂ i) : (piCongrRight e).symm = piCongrRight fun i => (e i).symm :=
-  rfl
-
-@[simp]
-theorem piCongrRight_trans {R ι : Type*} {A₁ A₂ A₃ : ι → Type*} [CommSemiring R]
-    [∀ i, Semiring (A₁ i)] [∀ i, Semiring (A₂ i)] [∀ i, Semiring (A₃ i)] [∀ i, Algebra R (A₁ i)]
-    [∀ i, Algebra R (A₂ i)] [∀ i, Algebra R (A₃ i)] (e₁ : ∀ i, A₁ i ≃ₐ[R] A₂ i)
-    (e₂ : ∀ i, A₂ i ≃ₐ[R] A₃ i) :
-    (piCongrRight e₁).trans (piCongrRight e₂) = piCongrRight fun i => (e₁ i).trans (e₂ i) :=
-  rfl
 
 end AlgEquiv

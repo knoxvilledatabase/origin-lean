@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Submonoid/Pointwise.lean
-Genuine: 87 | Conflates: 0 | Dissolved: 12 | Infrastructure: 7
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Hom.End
@@ -9,6 +9,8 @@ import Mathlib.Algebra.GroupWithZero.Action.End
 import Mathlib.Algebra.Order.BigOperators.Group.List
 import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Order.WellFoundedSet
+
+noncomputable section
 
 /-! # Pointwise instances on `Submonoid`s and `AddSubmonoid`s
 
@@ -62,8 +64,8 @@ lemma coe_mul_coe [SetLike S M] [SubmonoidClass S M] (H : S) : H * H = (H : Set 
   aesop (add simp mem_mul)
 
 set_option linter.unusedVariables false in
-
 @[to_additive (attr := simp)]
+
 lemma coe_set_pow [SetLike S M] [SubmonoidClass S M] :
     ∀ {n} (hn : n ≠ 0) (H : S), (H ^ n : Set M) = H
   | 1, _, H => by simp
@@ -205,10 +207,6 @@ protected def pointwiseMulAction : MulAction α (Submonoid M) where
 
 scoped[Pointwise] attribute [instance] Submonoid.pointwiseMulAction
 
-@[simp]
-theorem coe_pointwise_smul (a : α) (S : Submonoid M) : ↑(a • S) = a • (S : Set M) :=
-  rfl
-
 theorem smul_mem_pointwise_smul (m : M) (a : α) (S : Submonoid M) : m ∈ S → a • m ∈ a • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ a • (S : Set M))
 
@@ -268,17 +266,29 @@ section GroupWithZero
 
 variable [GroupWithZero α] [MulDistribMulAction α M]
 
--- DISSOLVED: smul_mem_pointwise_smul_iff₀
+@[simp]
+theorem smul_mem_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : Submonoid M) (x : M) :
+    a • x ∈ a • S ↔ x ∈ S :=
+  smul_mem_smul_set_iff₀ ha (S : Set M) x
 
--- DISSOLVED: mem_pointwise_smul_iff_inv_smul_mem₀
+theorem mem_pointwise_smul_iff_inv_smul_mem₀ {a : α} (ha : a ≠ 0) (S : Submonoid M) (x : M) :
+    x ∈ a • S ↔ a⁻¹ • x ∈ S :=
+  mem_smul_set_iff_inv_smul_mem₀ ha (S : Set M) x
 
--- DISSOLVED: mem_inv_pointwise_smul_iff₀
+theorem mem_inv_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : Submonoid M) (x : M) :
+    x ∈ a⁻¹ • S ↔ a • x ∈ S :=
+  mem_inv_smul_set_iff₀ ha (S : Set M) x
 
--- DISSOLVED: pointwise_smul_le_pointwise_smul_iff₀
+@[simp]
+theorem pointwise_smul_le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : Submonoid M} :
+    a • S ≤ a • T ↔ S ≤ T :=
+  set_smul_subset_set_smul_iff₀ ha
 
--- DISSOLVED: pointwise_smul_le_iff₀
+theorem pointwise_smul_le_iff₀ {a : α} (ha : a ≠ 0) {S T : Submonoid M} : a • S ≤ T ↔ S ≤ a⁻¹ • T :=
+  set_smul_subset_iff₀ ha
 
--- DISSOLVED: le_pointwise_smul_iff₀
+theorem le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : Submonoid M} : S ≤ a • T ↔ a⁻¹ • S ≤ T :=
+  subset_set_smul_iff₀ ha
 
 end GroupWithZero
 
@@ -303,10 +313,6 @@ protected def pointwiseMulAction : MulAction α (AddSubmonoid A) where
       (S.map_map _ _).symm
 
 scoped[Pointwise] attribute [instance] AddSubmonoid.pointwiseMulAction
-
-@[simp]
-theorem coe_pointwise_smul (a : α) (S : AddSubmonoid A) : ↑(a • S) = a • (S : Set A) :=
-  rfl
 
 theorem smul_mem_pointwise_smul (m : A) (a : α) (S : AddSubmonoid A) : m ∈ S → a • m ∈ a • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ a • (S : Set A))
@@ -367,17 +373,31 @@ section GroupWithZero
 
 variable [GroupWithZero α] [DistribMulAction α A]
 
--- DISSOLVED: smul_mem_pointwise_smul_iff₀
+@[simp]
+theorem smul_mem_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : AddSubmonoid A) (x : A) :
+    a • x ∈ a • S ↔ x ∈ S :=
+  smul_mem_smul_set_iff₀ ha (S : Set A) x
 
--- DISSOLVED: mem_pointwise_smul_iff_inv_smul_mem₀
+theorem mem_pointwise_smul_iff_inv_smul_mem₀ {a : α} (ha : a ≠ 0) (S : AddSubmonoid A) (x : A) :
+    x ∈ a • S ↔ a⁻¹ • x ∈ S :=
+  mem_smul_set_iff_inv_smul_mem₀ ha (S : Set A) x
 
--- DISSOLVED: mem_inv_pointwise_smul_iff₀
+theorem mem_inv_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) (S : AddSubmonoid A) (x : A) :
+    x ∈ a⁻¹ • S ↔ a • x ∈ S :=
+  mem_inv_smul_set_iff₀ ha (S : Set A) x
 
--- DISSOLVED: pointwise_smul_le_pointwise_smul_iff₀
+@[simp]
+theorem pointwise_smul_le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : AddSubmonoid A} :
+    a • S ≤ a • T ↔ S ≤ T :=
+  set_smul_subset_set_smul_iff₀ ha
 
--- DISSOLVED: pointwise_smul_le_iff₀
+theorem pointwise_smul_le_iff₀ {a : α} (ha : a ≠ 0) {S T : AddSubmonoid A} :
+    a • S ≤ T ↔ S ≤ a⁻¹ • T :=
+  set_smul_subset_iff₀ ha
 
--- DISSOLVED: le_pointwise_smul_iff₀
+theorem le_pointwise_smul_iff₀ {a : α} (ha : a ≠ 0) {S T : AddSubmonoid A} :
+    S ≤ a • T ↔ a⁻¹ • S ≤ T :=
+  subset_set_smul_iff₀ ha
 
 end GroupWithZero
 
@@ -404,10 +424,6 @@ theorem one_eq_mrange : (1 : AddSubmonoid R) = AddMonoidHom.mrange (Nat.castAddM
 
 theorem natCast_mem_one (n : ℕ) : (n : R) ∈ (1 : AddSubmonoid R) :=
   ⟨_, rfl⟩
-
-@[simp]
-theorem mem_one {x : R} : x ∈ (1 : AddSubmonoid R) ↔ ∃ n : ℕ, ↑n = x :=
-  Iff.rfl
 
 theorem one_eq_closure : (1 : AddSubmonoid R) = closure {1} := by
   rw [closure_singleton_eq, one_eq_mrange]

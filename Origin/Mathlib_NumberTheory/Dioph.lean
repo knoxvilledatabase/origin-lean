@@ -8,6 +8,8 @@ import Mathlib.Data.PFun
 import Mathlib.Data.Vector3
 import Mathlib.NumberTheory.PellMatiyasevic
 
+noncomputable section
+
 /-!
 # Diophantine functions and Matiyasevic's theorem
 
@@ -95,13 +97,7 @@ theorem ext {f g : Poly α} : (∀ x, f x = g x) → f = g := DFunLike.ext _ _
 
 def proj (i : α) : Poly α := ⟨_, IsPoly.proj i⟩
 
-@[simp]
-theorem proj_apply (i : α) (x) : proj i x = x i := rfl
-
 def const (n : ℤ) : Poly α := ⟨_, IsPoly.const n⟩
-
-@[simp]
-theorem const_apply (n) (x : α → ℕ) : const n x = n := rfl
 
 instance : Zero (Poly α) := ⟨const 0⟩
 
@@ -116,24 +112,6 @@ instance : Sub (Poly α) := ⟨fun f g => ⟨f - g, f.2.sub g.2⟩⟩
 instance : Mul (Poly α) := ⟨fun f g => ⟨f * g, f.2.mul g.2⟩⟩
 
 @[simp]
-theorem coe_zero : ⇑(0 : Poly α) = const 0 := rfl
-
-@[simp]
-theorem coe_one : ⇑(1 : Poly α) = const 1 := rfl
-
-@[simp]
-theorem coe_neg (f : Poly α) : ⇑(-f) = -f := rfl
-
-@[simp]
-theorem coe_add (f g : Poly α) : ⇑(f + g) = f + g := rfl
-
-@[simp]
-theorem coe_sub (f g : Poly α) : ⇑(f - g) = f - g := rfl
-
-@[simp]
-theorem coe_mul (f g : Poly α) : ⇑(f * g) = f * g := rfl
-
-@[simp]
 theorem zero_apply (x) : (0 : Poly α) x = 0 := rfl
 
 @[simp]
@@ -144,9 +122,6 @@ theorem neg_apply (f : Poly α) (x) : (-f) x = -f x := rfl
 
 @[simp]
 theorem add_apply (f g : Poly α) (x : α → ℕ) : (f + g) x = f x + g x := rfl
-
-@[simp]
-theorem sub_apply (f g : Poly α) (x : α → ℕ) : (f - g) x = f x - g x := rfl
 
 @[simp]
 theorem mul_apply (f g : Poly α) (x : α → ℕ) : (f * g) x = f x * g x := rfl
@@ -418,7 +393,6 @@ open Vector3
 open scoped Vector3
 
 set_option allowUnsafeReducibility true in
-
 attribute [local reducible] Vector3
 
 theorem diophFn_vec_comp1 {S : Set (Vector3 ℕ (succ n))} (d : Dioph S) {f : Vector3 ℕ n → ℕ}
@@ -651,34 +625,6 @@ theorem xn_dioph : DiophPFun fun v : Vector3 ℕ 2 => ⟨1 < v &0, fun h => xn h
     (D∃) 3 D_pell
   (diophPFun_vec _).2 <|
     Dioph.ext this fun _ => ⟨fun ⟨_, h, xe, _⟩ => ⟨h, xe⟩, fun ⟨h, xe⟩ => ⟨_, h, xe, rfl⟩⟩
-
-theorem pow_dioph {f g : (α → ℕ) → ℕ} (df : DiophFn f) (dg : DiophFn g) :
-    DiophFn fun v => f v ^ g v := by
-  have proof :=
-    let D_pell := pell_dioph.reindex_dioph (Fin2 9) [&4, &8, &1, &0]
-    (D&2 D= D.0 D∧ D&0 D= D.1) D∨ (D.0 D< D&2 D∧
-    ((D&1 D= D.0 D∧ D&0 D= D.0) D∨ (D.0 D< D&1 D∧
-    ((D∃) 3 <| (D∃) 4 <| (D∃) 5 <| (D∃) 6 <| (D∃) 7 <| (D∃) 8 <| D_pell D∧
-    (D≡ (D&1) (D&0 D* (D&4 D- D&7) D+ D&6) (D&3)) D∧
-    D.2 D* D&4 D* D&7 D= D&3 D+ (D&7 D* D&7 D+ D.1) D∧
-    D&6 D< D&3 D∧ D&7 D≤ D&5 D∧ D&8 D≤ D&5 D∧
-    D&4 D* D&4 D- ((D&5 D+ D.1) D* (D&5 D+ D.1) D- D.1) D* (D&5 D* D&2) D* (D&5 D* D&2) D= D.1))))
-  -- Porting note: copying directly `proof` in the proof of the following have fails
-  have : Dioph {v : Vector3 ℕ 3 |
-    v &2 = 0 ∧ v &0 = 1 ∨ 0 < v &2 ∧
-    (v &1 = 0 ∧ v &0 = 0 ∨ 0 < v &1 ∧
-    ∃ w a t z x y : ℕ,
-      (∃ a1 : 1 < a, xn a1 (v &2) = x ∧ yn a1 (v &2) = y) ∧
-      x ≡ y * (a - v &1) + v &0 [MOD t] ∧
-      2 * a * v &1 = t + (v &1 * v &1 + 1) ∧
-      v &0 < t ∧ v &1 ≤ w ∧ v &2 ≤ w ∧
-      a * a - ((w + 1) * (w + 1) - 1) * (w * z) * (w * z) = 1)} := by
-    exact proof
-  exact diophFn_comp2 df dg <| (diophFn_vec _).2 <| Dioph.ext this fun v => Iff.symm <|
-    eq_pow_of_pell.trans <| or_congr Iff.rfl <| and_congr Iff.rfl <| or_congr Iff.rfl <|
-       and_congr Iff.rfl <|
-        ⟨fun ⟨w, a, t, z, a1, h⟩ => ⟨w, a, t, z, _, _, ⟨a1, rfl, rfl⟩, h⟩,
-        fun ⟨w, a, t, z, _, _, ⟨a1, rfl, rfl⟩, h⟩ => ⟨w, a, t, z, a1, h⟩⟩
 
 end
 

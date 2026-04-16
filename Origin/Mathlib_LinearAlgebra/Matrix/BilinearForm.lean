@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Matrix/BilinearForm.lean
-Genuine: 58 | Conflates: 0 | Dissolved: 4 | Infrastructure: 3
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Properties
 import Mathlib.LinearAlgebra.Matrix.SesquilinearForm
+
+noncomputable section
 
 /-!
 # Bilinear form
@@ -82,10 +84,6 @@ def LinearMap.BilinForm.toMatrix' : BilinForm R₁ (n → R₁) ≃ₗ[R₁] Mat
 def Matrix.toBilin' : Matrix n n R₁ ≃ₗ[R₁] BilinForm R₁ (n → R₁) :=
   BilinForm.toMatrix'.symm
 
-@[simp]
-theorem Matrix.toBilin'Aux_eq (M : Matrix n n R₁) : Matrix.toBilin'Aux M = Matrix.toBilin' M :=
-  rfl
-
 theorem Matrix.toBilin'_apply (M : Matrix n n R₁) (x y : n → R₁) :
     Matrix.toBilin' M x y = ∑ i, ∑ j, x i * M i j * y j :=
   (Matrix.toLinearMap₂'_apply _ _ _).trans
@@ -100,17 +98,12 @@ theorem Matrix.toBilin'_single (M : Matrix n n R₁) (i j : n) :
   simp [Matrix.toBilin'_apply, Pi.single_apply]
 
 set_option linter.deprecated false in
-
 @[simp, deprecated Matrix.toBilin'_single (since := "2024-08-09")]
+
 theorem Matrix.toBilin'_stdBasis (M : Matrix n n R₁) (i j : n) :
     Matrix.toBilin' M
       (LinearMap.stdBasis R₁ (fun _ ↦ R₁) i 1)
       (LinearMap.stdBasis R₁ (fun _ ↦ R₁) j 1) = M i j := Matrix.toBilin'_single _ _ _
-
-@[simp]
-theorem LinearMap.BilinForm.toMatrix'_symm :
-    (BilinForm.toMatrix'.symm : Matrix n n R₁ ≃ₗ[R₁] _) = Matrix.toBilin' :=
-  rfl
 
 @[simp]
 theorem Matrix.toBilin'_symm :
@@ -200,10 +193,6 @@ theorem Matrix.toBilin_apply (M : Matrix n n R₁) (x y : M₁) :
 theorem BilinearForm.toMatrixAux_eq (B : BilinForm R₁ M₁) :
     BilinForm.toMatrixAux (R₁ := R₁) b B = BilinForm.toMatrix b B :=
   LinearMap.toMatrix₂Aux_eq _ _ B
-
-@[simp]
-theorem BilinForm.toMatrix_symm : (BilinForm.toMatrix b).symm = Matrix.toBilin b :=
-  rfl
 
 @[simp]
 theorem Matrix.toBilin_symm : (Matrix.toBilin b).symm = BilinForm.toMatrix b :=
@@ -388,13 +377,21 @@ theorem Nondegenerate.toMatrix {B : BilinForm R₂ M₂} (h : B.Nondegenerate) (
 
 /-! Some shorthands for combining the above with `Matrix.nondegenerate_of_det_ne_zero` -/
 
--- DISSOLVED: nondegenerate_toBilin'_iff_det_ne_zero
+theorem nondegenerate_toBilin'_iff_det_ne_zero {M : Matrix ι ι A} :
+    M.toBilin'.Nondegenerate ↔ M.det ≠ 0 := by
+  rw [Matrix.nondegenerate_toBilin'_iff, Matrix.nondegenerate_iff_det_ne_zero]
 
--- DISSOLVED: nondegenerate_toBilin'_of_det_ne_zero'
+theorem nondegenerate_toBilin'_of_det_ne_zero' (M : Matrix ι ι A) (h : M.det ≠ 0) :
+    M.toBilin'.Nondegenerate :=
+  nondegenerate_toBilin'_iff_det_ne_zero.mpr h
 
--- DISSOLVED: nondegenerate_iff_det_ne_zero
+theorem nondegenerate_iff_det_ne_zero {B : BilinForm A M₂} (b : Basis ι A M₂) :
+    B.Nondegenerate ↔ (BilinForm.toMatrix b B).det ≠ 0 := by
+  rw [← Matrix.nondegenerate_iff_det_ne_zero, nondegenerate_toMatrix_iff]
 
--- DISSOLVED: nondegenerate_of_det_ne_zero
+theorem nondegenerate_of_det_ne_zero (b : Basis ι A M₂) (h : (BilinForm.toMatrix b B₃).det ≠ 0) :
+    B₃.Nondegenerate :=
+  (nondegenerate_iff_det_ne_zero b).mpr h
 
 end Det
 

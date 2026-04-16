@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Convex/Hull.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Basic
 import Mathlib.Order.Closure
+
+noncomputable section
 
 /-!
 # Convex hull

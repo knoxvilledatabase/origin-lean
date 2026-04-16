@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Set.Card
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.RingTheory.Adjoin.Basic
 
+noncomputable section
+
 /-!
 # Some results on dimensions of algebra adjoin
 

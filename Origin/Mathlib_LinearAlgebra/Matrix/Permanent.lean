@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Perm
 import Mathlib.Data.Matrix.RowCol
 
+noncomputable section
+
 /-!
 # Permanent of a matrix
 

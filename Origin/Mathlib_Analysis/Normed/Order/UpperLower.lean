@@ -10,6 +10,8 @@ import Mathlib.Analysis.Normed.Order.Basic
 import Mathlib.Topology.Algebra.Order.UpperLower
 import Mathlib.Topology.MetricSpace.Sequences
 
+noncomputable section
+
 /-!
 # Upper/lower/order-connected sets in normed groups
 

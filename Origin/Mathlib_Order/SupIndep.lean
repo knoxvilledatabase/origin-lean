@@ -1,6 +1,6 @@
 /-
 Extracted from Order/SupIndep.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Sigma
@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.Pairwise
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Order.CompleteLatticeIntervals
+
+noncomputable section
 
 /-!
 # Supremum independence
@@ -159,12 +161,6 @@ theorem supIndep_univ_bool (f : Bool → α) :
   haveI : true ≠ false := by simp only [Ne, not_false_iff, reduceCtorEq]
   (supIndep_pair this).trans disjoint_comm
 
-@[simp]
-theorem supIndep_univ_fin_two (f : Fin 2 → α) :
-    (Finset.univ : Finset (Fin 2)).SupIndep f ↔ Disjoint (f 0) (f 1) :=
-  haveI : (0 : Fin 2) ≠ 1 := by simp
-  supIndep_pair this
-
 theorem SupIndep.attach (hs : s.SupIndep f) : s.attach.SupIndep fun a => f a := by
   intro t _ i _ hi
   classical
@@ -277,11 +273,11 @@ theorem sSupIndep_empty : sSupIndep (∅ : Set α) := fun x hx =>
   (Set.not_mem_empty x hx).elim
 
 include hs in
-
 theorem sSupIndep.mono {t : Set α} (hst : t ⊆ s) : sSupIndep t := fun _ ha =>
   (hs (hst ha)).mono_right (sSup_le_sSup (diff_subset_diff_left hst))
 
 include hs in
+/-- If the elements of a set are independent, then any pair within that set is disjoint. -/
 
 theorem sSupIndep.pairwiseDisjoint : s.PairwiseDisjoint id := fun _ hx y hy h =>
   disjoint_sSup_right (hs hx) ((mem_diff y).mpr ⟨hy, h.symm⟩)
@@ -305,6 +301,9 @@ theorem sSupIndep_pair {a b : α} (hab : a ≠ b) :
       simp [hab, sSup_singleton]
 
 include hs in
+/-- If the elements of a set are independent, then any element is disjoint from the `sSup` of some
+
+subset of the rest. -/
 
 theorem sSupIndep.disjoint_sSup {x : α} {y : Set α} (hx : x ∈ s) (hy : y ⊆ s) (hxy : x ∉ y) :
     Disjoint x (sSup y) := by
@@ -346,6 +345,7 @@ theorem iSupIndep_pempty (t : PEmpty → α) : iSupIndep t :=
   nofun
 
 include ht in
+/-- If the elements of a set are independent, then any pair within that set is disjoint. -/
 
 theorem iSupIndep.pairwiseDisjoint : Pairwise (Disjoint on t) := fun x y h =>
   disjoint_sSup_right (ht x) ⟨y, iSup_pos h.symm⟩

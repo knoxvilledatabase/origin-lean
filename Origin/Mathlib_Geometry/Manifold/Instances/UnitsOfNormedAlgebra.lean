@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.LieGroup
 
+noncomputable section
+
 /-!
 # Units of a normed algebra
 
@@ -35,12 +37,6 @@ variable {R : Type*} [NormedRing R] [CompleteSpace R]
 
 instance : ChartedSpace R Rˣ :=
   isOpenEmbedding_val.singletonChartedSpace
-
-theorem chartAt_apply {a : Rˣ} {b : Rˣ} : chartAt R a b = b :=
-  rfl
-
-theorem chartAt_source {a : Rˣ} : (chartAt R a).source = Set.univ :=
-  rfl
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 R]
 

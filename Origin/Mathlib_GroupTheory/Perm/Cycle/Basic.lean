@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/Perm/Cycle/Basic.lean
-Genuine: 105 | Conflates: 3 | Dissolved: 1 | Infrastructure: 9
+Genuine: 106 | Conflates: 3 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators
 import Mathlib.Data.Fintype.Perm
 import Mathlib.GroupTheory.Perm.Finite
 import Mathlib.GroupTheory.Perm.List
+
+noncomputable section
 
 /-!
 # Cycles of a permutation
@@ -225,7 +227,7 @@ variable {f g : Perm α} {x y : α}
 def IsCycle (f : Perm α) : Prop :=
   ∃ x, f x ≠ x ∧ ∀ ⦃y⦄, f y ≠ y → SameCycle f x y
 
--- DISSOLVED: IsCycle.ne_one
+theorem IsCycle.ne_one (h : IsCycle f) : f ≠ 1 := fun hf => by simp [hf, IsCycle] at h
 
 @[simp]
 theorem not_isCycle_one : ¬(1 : Perm α).IsCycle := fun H => H.ne_one rfl
@@ -331,13 +333,6 @@ noncomputable def IsCycle.zpowersEquivSupport {σ : Perm α} (hσ : IsCycle σ) 
         exact ⟨⟨σ ^ n, n, rfl⟩, rfl⟩)
 
 @[simp]
-theorem IsCycle.zpowersEquivSupport_apply {σ : Perm α} (hσ : IsCycle σ) {n : ℕ} :
-    hσ.zpowersEquivSupport ⟨σ ^ n, n, rfl⟩ =
-      ⟨(σ ^ n) (Classical.choose hσ),
-        pow_apply_mem_support.2 (mem_support.2 (Classical.choose_spec hσ).1)⟩ :=
-  rfl
-
-@[simp]
 theorem IsCycle.zpowersEquivSupport_symm_apply {σ : Perm α} (hσ : IsCycle σ) (n : ℕ) :
     hσ.zpowersEquivSupport.symm
         ⟨(σ ^ n) (Classical.choose hσ),
@@ -418,19 +413,6 @@ theorem IsCycle.eq_swap_of_apply_apply_eq_self {α : Type*} [DecidableEq α] {f 
           tauto
         · rw [← hj, hji] at hfyx
           tauto
-
-theorem IsCycle.swap_mul {α : Type*} [DecidableEq α] {f : Perm α} (hf : IsCycle f) {x : α}
-    (hx : f x ≠ x) (hffx : f (f x) ≠ x) : IsCycle (swap x (f x) * f) :=
-  ⟨f x, by simp [swap_apply_def, mul_apply, if_neg hffx, f.injective.eq_iff, if_neg hx, hx],
-    fun y hy =>
-    let ⟨i, hi⟩ := hf.exists_zpow_eq hx (ne_and_ne_of_swap_mul_apply_ne_self hy).1
-    -- Porting note: Needed to add Perm α typehint, otherwise does not know how to coerce to fun
-    have hi : (f ^ (i - 1) : Perm α) (f x) = y :=
-      calc
-        (f ^ (i - 1) : Perm α) (f x) = (f ^ (i - 1) * f ^ (1 : ℤ) : Perm α) x := by simp
-        _ = y := by rwa [← zpow_add, sub_add_cancel]
-
-    isCycle_swap_mul_aux₂ (i - 1) hy hi⟩
 
 theorem IsCycle.sign {f : Perm α} (hf : IsCycle f) : sign f = -(-1) ^ #f.support :=
   let ⟨x, hx⟩ := hf

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Rigid.Basic
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 
+noncomputable section
+
 /-!
 # Deriving `RigidCategory` instance for braided and left/right rigid categories.
 -/

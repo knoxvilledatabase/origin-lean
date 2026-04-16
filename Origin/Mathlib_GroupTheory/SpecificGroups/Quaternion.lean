@@ -1,12 +1,14 @@
 /-
 Extracted from GroupTheory/SpecificGroups/Quaternion.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 9
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic.IntervalCases
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+
+noncomputable section
 
 /-!
 # Quaternion Groups
@@ -100,10 +102,6 @@ theorem a_mul_xa (i j : ZMod (2 * n)) : a i * xa j = xa (j - i) :=
   rfl
 
 @[simp]
-theorem xa_mul_a (i j : ZMod (2 * n)) : xa i * a j = xa (i + j) :=
-  rfl
-
-@[simp]
 theorem xa_mul_xa (i j : ZMod (2 * n)) : xa i * xa j = a ((n : ZMod (2 * n)) + j - i) :=
   rfl
 
@@ -142,7 +140,9 @@ instance [NeZero n] : Fintype (QuaternionGroup n) :=
 instance : Nontrivial (QuaternionGroup n) :=
   ⟨⟨a 0, xa 0, by revert n; simp⟩⟩ -- Porting note: `revert n; simp` was `decide`
 
--- DISSOLVED: card
+theorem card [NeZero n] : Fintype.card (QuaternionGroup n) = 4 * n := by
+  rw [← Fintype.card_eq.mpr ⟨fintypeHelper⟩, Fintype.card_sum, ZMod.card, two_mul]
+  ring
 
 @[simp]
 theorem a_one_pow (k : ℕ) : (a 1 : QuaternionGroup n) ^ k = a k := by
@@ -168,7 +168,19 @@ theorem xa_pow_four (i : ZMod (2 * n)) : xa i ^ 4 = 1 := by
   rw [← two_mul]
   simp [one_def]
 
--- DISSOLVED: orderOf_xa
+@[simp]
+theorem orderOf_xa [NeZero n] (i : ZMod (2 * n)) : orderOf (xa i) = 4 := by
+  change _ = 2 ^ 2
+  haveI : Fact (Nat.Prime 2) := Fact.mk Nat.prime_two
+  apply orderOf_eq_prime_pow
+  · intro h
+    simp only [pow_one, xa_sq] at h
+    injection h with h'
+    apply_fun ZMod.val at h'
+    apply_fun (· / n) at h'
+    simp only [ZMod.val_natCast, ZMod.val_zero, Nat.zero_div, Nat.mod_mul_left_div_self,
+      Nat.div_self (NeZero.pos n), reduceCtorEq] at h'
+  · norm_num
 
 theorem quaternionGroup_one_isCyclic : IsCyclic (QuaternionGroup 1) := by
   apply isCyclic_of_orderOf_eq_card
@@ -194,7 +206,10 @@ theorem orderOf_a_one : orderOf (a 1 : QuaternionGroup n) = 2 * n := by
   rw [← ZMod.val_eq_zero, ZMod.val_natCast, Nat.mod_eq_of_lt h] at h2
   exact absurd h2.symm (orderOf_pos _).ne
 
--- DISSOLVED: orderOf_a
+theorem orderOf_a [NeZero n] (i : ZMod (2 * n)) :
+    orderOf (a i) = 2 * n / Nat.gcd (2 * n) i.val := by
+  conv_lhs => rw [← ZMod.natCast_zmod_val i]
+  rw [← a_one_pow, orderOf_pow, orderOf_a_one]
 
 theorem exponent : Monoid.exponent (QuaternionGroup n) = 2 * lcm n 2 := by
   rw [← normalize_eq 2, ← lcm_mul_left, normalize_eq]

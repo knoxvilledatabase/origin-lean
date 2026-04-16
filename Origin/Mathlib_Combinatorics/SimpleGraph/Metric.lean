@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Metric.lean
-Genuine: 42 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Path
 import Mathlib.Data.ENat.Lattice
+
+noncomputable section
 
 /-!
 # Graph metric
@@ -170,8 +172,6 @@ theorem dist_le (p : G.Walk u v) : G.dist u v ≤ p.length :=
 theorem dist_eq_zero_iff_eq_or_not_reachable :
     G.dist u v = 0 ↔ u = v ∨ ¬G.Reachable u v := by simp [dist_eq_sInf, Nat.sInf_eq_zero, Reachable]
 
-theorem dist_self : dist G v v = 0 := by simp
-
 protected theorem Reachable.dist_eq_zero_iff (hr : G.Reachable u v) :
     G.dist u v = 0 ↔ u = v := by simp [hr]
 
@@ -205,11 +205,16 @@ protected theorem Connected.dist_triangle (hconn : G.Connected) :
 theorem dist_comm : G.dist u v = G.dist v u := by
   rw [dist, dist, edist_comm]
 
--- DISSOLVED: dist_ne_zero_iff_ne_and_reachable
+lemma dist_ne_zero_iff_ne_and_reachable : G.dist u v ≠ 0 ↔ u ≠ v ∧ G.Reachable u v := by
+  rw [ne_eq, dist_eq_zero_iff_eq_or_not_reachable.not]
+  push_neg; rfl
 
--- DISSOLVED: Reachable.of_dist_ne_zero
+lemma Reachable.of_dist_ne_zero (h : G.dist u v ≠ 0) : G.Reachable u v :=
+  (dist_ne_zero_iff_ne_and_reachable.mp h).2
 
--- DISSOLVED: exists_walk_of_dist_ne_zero
+lemma exists_walk_of_dist_ne_zero (h : G.dist u v ≠ 0) :
+    ∃ p : G.Walk u v, p.length = G.dist u v :=
+  (Reachable.of_dist_ne_zero h).exists_walk_length_eq_dist
 
 @[simp]
 theorem dist_eq_one_iff_adj : G.dist u v = 1 ↔ G.Adj u v := by

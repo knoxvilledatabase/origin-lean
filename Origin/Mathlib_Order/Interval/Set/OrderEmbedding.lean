@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Set.UnorderedInterval
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # Preimages of intervals under order embeddings
 

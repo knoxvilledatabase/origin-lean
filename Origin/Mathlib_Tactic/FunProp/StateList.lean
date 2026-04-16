@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 The combined state and list monad transformer.
 `StateListT σ α` is equivalent to `StateT σ (ListT α)` but more efficient.

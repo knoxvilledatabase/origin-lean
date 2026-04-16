@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.ULift
 import Mathlib.Algebra.PUnitInstances.Algebra
 import Mathlib.Analysis.Normed.Group.Basic
 
+noncomputable section
+
 /-!
 # Product of normed groups and other constructions
 
@@ -26,8 +28,6 @@ instance normedAddCommGroup : NormedAddCommGroup PUnit where
   norm := Function.const _ 0
   dist_eq _ _ := rfl
 
-@[simp] lemma norm_eq_zero (x : PUnit) : ‖x‖ = 0 := rfl
-
 end PUnit
 
 /-! ### `ULift` -/
@@ -42,10 +42,6 @@ instance norm : Norm (ULift E) where norm x := ‖x.down‖
 
 lemma norm_def (x : ULift E) : ‖x‖ = ‖x.down‖ := rfl
 
-@[simp] lemma norm_up (x : E) : ‖ULift.up x‖ = ‖x‖ := rfl
-
-@[simp] lemma norm_down (x : ULift E) : ‖x.down‖ = ‖x‖ := rfl
-
 end Norm
 
 section NNNorm
@@ -55,10 +51,6 @@ variable [NNNorm E]
 instance nnnorm : NNNorm (ULift E) where nnnorm x := ‖x.down‖₊
 
 lemma nnnorm_def (x : ULift E) : ‖x‖₊ = ‖x.down‖₊ := rfl
-
-@[simp] lemma nnnorm_up (x : E) : ‖ULift.up x‖₊ = ‖x‖₊ := rfl
-
-@[simp] lemma nnnorm_down (x : ULift E) : ‖x.down‖₊ = ‖x‖₊ := rfl
 
 end NNNorm
 
@@ -108,14 +100,6 @@ instance Additive.toNorm : Norm (Additive E) := ‹Norm E›
 
 instance Multiplicative.toNorm : Norm (Multiplicative E) := ‹Norm E›
 
-@[simp] lemma norm_toMul (x : Additive E) : ‖(x.toMul : E)‖ = ‖x‖ := rfl
-
-@[simp] lemma norm_ofMul (x : E) : ‖ofMul x‖ = ‖x‖ := rfl
-
-@[simp] lemma norm_toAdd (x : Multiplicative E) : ‖(x.toAdd : E)‖ = ‖x‖ := rfl
-
-@[simp] lemma norm_ofAdd (x : E) : ‖ofAdd x‖ = ‖x‖ := rfl
-
 end Norm
 
 section NNNorm
@@ -125,14 +109,6 @@ variable [NNNorm E]
 instance Additive.toNNNorm : NNNorm (Additive E) := ‹NNNorm E›
 
 instance Multiplicative.toNNNorm : NNNorm (Multiplicative E) := ‹NNNorm E›
-
-@[simp] lemma nnnorm_toMul (x : Additive E) : ‖(x.toMul : E)‖₊ = ‖x‖₊ := rfl
-
-@[simp] lemma nnnorm_ofMul (x : E) : ‖ofMul x‖₊ = ‖x‖₊ := rfl
-
-@[simp] lemma nnnorm_toAdd (x : Multiplicative E) : ‖(x.toAdd : E)‖₊ = ‖x‖₊ := rfl
-
-@[simp] lemma nnnorm_ofAdd (x : E) : ‖ofAdd x‖₊ = ‖x‖₊ := rfl
 
 end NNNorm
 
@@ -186,10 +162,6 @@ variable [Norm E]
 
 instance OrderDual.toNorm : Norm Eᵒᵈ := ‹Norm E›
 
-@[simp] lemma norm_toDual (x : E) : ‖toDual x‖ = ‖x‖ := rfl
-
-@[simp] lemma norm_ofDual (x : Eᵒᵈ) : ‖ofDual x‖ = ‖x‖ := rfl
-
 end Norm
 
 section NNNorm
@@ -197,10 +169,6 @@ section NNNorm
 variable [NNNorm E]
 
 instance OrderDual.toNNNorm : NNNorm Eᵒᵈ := ‹NNNorm E›
-
-@[simp] lemma nnnorm_toDual (x : E) : ‖toDual x‖₊ = ‖x‖₊ := rfl
-
-@[simp] lemma nnnorm_ofDual (x : Eᵒᵈ) : ‖ofDual x‖₊ = ‖x‖₊ := rfl
 
 end NNNorm
 
@@ -252,9 +220,6 @@ instance Prod.seminormedGroup : SeminormedGroup (E × F) where
   dist_eq x y := by
     simp only [Prod.norm_def, Prod.dist_eq, dist_eq_norm_div, Prod.fst_div, Prod.snd_div]
 
-@[to_additive Prod.nnnorm_def']
-lemma Prod.nnorm_def (x : E × F) : ‖x‖₊ = max ‖x.1‖₊ ‖x.2‖₊ := rfl
-
 end SeminormedGroup
 
 namespace Prod
@@ -295,9 +260,6 @@ instance Pi.seminormedGroup : SeminormedGroup (∀ i, π i) where
     congr_arg (toReal : ℝ≥0 → ℝ) <|
       congr_arg (Finset.sup Finset.univ) <|
         funext fun a => show nndist (x a) (y a) = ‖x a / y a‖₊ from nndist_eq_nnnorm_div (x a) (y a)
-
-@[to_additive Pi.norm_def]
-lemma Pi.norm_def' : ‖f‖ = ↑(Finset.univ.sup fun b => ‖f b‖₊) := rfl
 
 @[to_additive Pi.nnnorm_def]
 lemma Pi.nnnorm_def' : ‖f‖₊ = Finset.univ.sup fun b => ‖f b‖₊ := Subtype.eta _ _
@@ -402,14 +364,6 @@ instance instSeminormedAddGroup [SeminormedAddGroup E] : SeminormedAddGroup Eᵐ
   __ := instPseudoMetricSpace
   norm x := ‖x.unop‖
   dist_eq _ _ := dist_eq_norm _ _
-
-lemma norm_op [SeminormedAddGroup E] (a : E) : ‖MulOpposite.op a‖ = ‖a‖ := rfl
-
-lemma norm_unop [SeminormedAddGroup E] (a : Eᵐᵒᵖ) : ‖MulOpposite.unop a‖ = ‖a‖ := rfl
-
-lemma nnnorm_op [SeminormedAddGroup E] (a : E) : ‖MulOpposite.op a‖₊ = ‖a‖₊ := rfl
-
-lemma nnnorm_unop [SeminormedAddGroup E] (a : Eᵐᵒᵖ) : ‖MulOpposite.unop a‖₊ = ‖a‖₊ := rfl
 
 instance instNormedAddGroup [NormedAddGroup E] : NormedAddGroup Eᵐᵒᵖ where
   __ := instMetricSpace

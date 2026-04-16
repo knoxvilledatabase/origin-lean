@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Homology/Embedding/ExtendHomology.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.Embedding.Extend
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
+
+noncomputable section
 
 /-!
 # Homology of the extension of an homological complex
@@ -33,7 +35,6 @@ variable {i j k : ι} {i' j' k' : ι'} (hj' : e.f j = j')
   (hi : c.prev j = i) (hi' : c'.prev j' = i') (hk : c.next j = k) (hk' : c'.next j' = k')
 
 include hk hk' in
-
 lemma comp_d_eq_zero_iff ⦃W : C⦄ (φ : W ⟶ K.X j) :
     φ ≫ K.d j k = 0 ↔ φ ≫ (K.extendXIso e hj').inv ≫ (K.extend e).d j' k' = 0 := by
   by_cases hjk : c.Rel j k
@@ -62,6 +63,7 @@ variable (cocone : CokernelCofork (hcone.lift (KernelFork.ofι (K.d i j) (K.d_co
   (hcocone : IsColimit cocone)
 
 include hi hi' hcone in
+/-- Auxiliary lemma for `lift_d_comp_eq_zero_iff`. -/
 
 lemma lift_d_comp_eq_zero_iff' ⦃W : C⦄ (f' : K.X i ⟶ cone.pt)
     (hf' : f' ≫ cone.ι = K.d i j)
@@ -89,7 +91,6 @@ lemma lift_d_comp_eq_zero_iff' ⦃W : C⦄ (f' : K.X i ⟶ cone.pt)
     simp [h₁, h₂]
 
 include hi hi' in
-
 lemma lift_d_comp_eq_zero_iff ⦃W : C⦄ (φ : cone.pt ⟶ W) :
     hcone.lift (KernelFork.ofι (K.d i j) (K.d_comp_d i j k)) ≫ φ = 0 ↔
       ((isLimitKernelFork K e hj' hk hk' cone hcone).lift

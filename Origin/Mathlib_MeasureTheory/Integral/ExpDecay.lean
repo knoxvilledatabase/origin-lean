@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Integral.Asymptotics
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
+noncomputable section
+
 /-!
 # Integrals with exponential decay at ∞
 

@@ -5,6 +5,8 @@ Genuine: 130 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # Preservation and reflection of (co)limits.
 

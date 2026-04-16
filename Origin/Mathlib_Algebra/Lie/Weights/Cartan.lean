@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.CartanSubalgebra
 import Mathlib.Algebra.Lie.Weights.Basic
 
+noncomputable section
+
 /-!
 # Weights and roots of Lie modules and Lie algebras with respect to Cartan subalgebras
 

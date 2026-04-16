@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Clique
 import Mathlib.Order.Partition.Equipartition
 
+noncomputable section
+
 /-!
 # Turán's theorem
 

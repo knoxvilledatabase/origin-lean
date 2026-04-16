@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Unoriented/Basic.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 12 | Infrastructure: 0
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Inverse
+
+noncomputable section
 
 /-!
 # Angles between vectors
@@ -35,9 +37,17 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] {x y : V}
 def angle (x y : V) : ℝ :=
   Real.arccos (⟪x, y⟫ / (‖x‖ * ‖y‖))
 
--- DISSOLVED: continuousAt_angle
+theorem continuousAt_angle {x : V × V} (hx1 : x.1 ≠ 0) (hx2 : x.2 ≠ 0) :
+    ContinuousAt (fun y : V × V => angle y.1 y.2) x :=
+  Real.continuous_arccos.continuousAt.comp <|
+    continuous_inner.continuousAt.div
+      ((continuous_norm.comp continuous_fst).mul (continuous_norm.comp continuous_snd)).continuousAt
+      (by simp [hx1, hx2])
 
--- DISSOLVED: angle_smul_smul
+theorem angle_smul_smul {c : ℝ} (hc : c ≠ 0) (x y : V) : angle (c • x) (c • y) = angle x y := by
+  have : c * c ≠ 0 := mul_ne_zero hc hc
+  rw [angle, angle, real_inner_smul_left, inner_smul_right, norm_smul, norm_smul, Real.norm_eq_abs,
+    mul_mul_mul_comm _ ‖x‖, abs_mul_abs_self, ← mul_assoc c c, mul_div_mul_left _ _ this]
 
 @[simp]
 theorem _root_.LinearIsometry.angle_map {E F : Type*} [NormedAddCommGroup E] [NormedAddCommGroup F]
@@ -88,11 +98,19 @@ theorem angle_zero_right (x : V) : angle x 0 = π / 2 := by
   unfold angle
   rw [inner_zero_right, zero_div, Real.arccos_zero]
 
--- DISSOLVED: angle_self
+@[simp]
+theorem angle_self {x : V} (hx : x ≠ 0) : angle x x = 0 := by
+  unfold angle
+  rw [← real_inner_self_eq_norm_mul_norm, div_self (inner_self_ne_zero.2 hx : ⟪x, x⟫ ≠ 0),
+    Real.arccos_one]
 
--- DISSOLVED: angle_self_neg_of_nonzero
+@[simp]
+theorem angle_self_neg_of_nonzero {x : V} (hx : x ≠ 0) : angle x (-x) = π := by
+  rw [angle_neg_right, angle_self hx, sub_zero]
 
--- DISSOLVED: angle_neg_self_of_nonzero
+@[simp]
+theorem angle_neg_self_of_nonzero {x : V} (hx : x ≠ 0) : angle (-x) x = π := by
+  rw [angle_comm, angle_self_neg_of_nonzero hx]
 
 @[simp]
 theorem angle_smul_right_of_pos (x y : V) {r : ℝ} (hr : 0 < r) : angle x (r • y) = angle x y := by
@@ -137,9 +155,14 @@ theorem sin_angle_mul_norm_mul_norm (x y : V) :
     field_simp [h]
     ring_nf
 
--- DISSOLVED: angle_eq_zero_iff
+theorem angle_eq_zero_iff {x y : V} : angle x y = 0 ↔ x ≠ 0 ∧ ∃ r : ℝ, 0 < r ∧ y = r • x := by
+  rw [angle, ← real_inner_div_norm_mul_norm_eq_one_iff, Real.arccos_eq_zero, LE.le.le_iff_eq,
+    eq_comm]
+  exact (abs_le.mp (abs_real_inner_div_norm_mul_norm_le_one x y)).2
 
--- DISSOLVED: angle_eq_pi_iff
+theorem angle_eq_pi_iff {x y : V} : angle x y = π ↔ x ≠ 0 ∧ ∃ r : ℝ, r < 0 ∧ y = r • x := by
+  rw [angle, ← real_inner_div_norm_mul_norm_eq_neg_one_iff, Real.arccos_eq_pi, LE.le.le_iff_eq]
+  exact (abs_le.mp (abs_real_inner_div_norm_mul_norm_le_one x y)).1
 
 theorem angle_add_angle_eq_pi_of_angle_eq_pi {x y : V} (z : V) (h : angle x y = π) :
     angle x z + angle y z = π := by
@@ -156,9 +179,17 @@ theorem inner_eq_neg_mul_norm_of_angle_eq_pi {x y : V} (h : angle x y = π) :
 theorem inner_eq_mul_norm_of_angle_eq_zero {x y : V} (h : angle x y = 0) : ⟪x, y⟫ = ‖x‖ * ‖y‖ := by
   simp [← cos_angle_mul_norm_mul_norm, h]
 
--- DISSOLVED: inner_eq_neg_mul_norm_iff_angle_eq_pi
+theorem inner_eq_neg_mul_norm_iff_angle_eq_pi {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ⟪x, y⟫ = -(‖x‖ * ‖y‖) ↔ angle x y = π := by
+  refine ⟨fun h => ?_, inner_eq_neg_mul_norm_of_angle_eq_pi⟩
+  have h₁ : ‖x‖ * ‖y‖ ≠ 0 := (mul_pos (norm_pos_iff.mpr hx) (norm_pos_iff.mpr hy)).ne'
+  rw [angle, h, neg_div, div_self h₁, Real.arccos_neg_one]
 
--- DISSOLVED: inner_eq_mul_norm_iff_angle_eq_zero
+theorem inner_eq_mul_norm_iff_angle_eq_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ⟪x, y⟫ = ‖x‖ * ‖y‖ ↔ angle x y = 0 := by
+  refine ⟨fun h => ?_, inner_eq_mul_norm_of_angle_eq_zero⟩
+  have h₁ : ‖x‖ * ‖y‖ ≠ 0 := (mul_pos (norm_pos_iff.mpr hx) (norm_pos_iff.mpr hy)).ne'
+  rw [angle, h, div_self h₁, Real.arccos_one]
 
 theorem norm_sub_eq_add_norm_of_angle_eq_pi {x y : V} (h : angle x y = π) :
     ‖x - y‖ = ‖x‖ + ‖y‖ := by
@@ -178,11 +209,37 @@ theorem norm_sub_eq_abs_sub_norm_of_angle_eq_zero {x y : V} (h : angle x y = 0) 
     inner_eq_mul_norm_of_angle_eq_zero h, sq_abs (‖x‖ - ‖y‖)]
   ring
 
--- DISSOLVED: norm_sub_eq_add_norm_iff_angle_eq_pi
+theorem norm_sub_eq_add_norm_iff_angle_eq_pi {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ‖x - y‖ = ‖x‖ + ‖y‖ ↔ angle x y = π := by
+  refine ⟨fun h => ?_, norm_sub_eq_add_norm_of_angle_eq_pi⟩
+  rw [← inner_eq_neg_mul_norm_iff_angle_eq_pi hx hy]
+  obtain ⟨hxy₁, hxy₂⟩ := norm_nonneg (x - y), add_nonneg (norm_nonneg x) (norm_nonneg y)
+  rw [← sq_eq_sq₀ hxy₁ hxy₂, norm_sub_pow_two_real] at h
+  calc
+    ⟪x, y⟫ = (‖x‖ ^ 2 + ‖y‖ ^ 2 - (‖x‖ + ‖y‖) ^ 2) / 2 := by linarith
+    _ = -(‖x‖ * ‖y‖) := by ring
 
--- DISSOLVED: norm_add_eq_add_norm_iff_angle_eq_zero
+theorem norm_add_eq_add_norm_iff_angle_eq_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ‖x + y‖ = ‖x‖ + ‖y‖ ↔ angle x y = 0 := by
+  refine ⟨fun h => ?_, norm_add_eq_add_norm_of_angle_eq_zero⟩
+  rw [← inner_eq_mul_norm_iff_angle_eq_zero hx hy]
+  obtain ⟨hxy₁, hxy₂⟩ := norm_nonneg (x + y), add_nonneg (norm_nonneg x) (norm_nonneg y)
+  rw [← sq_eq_sq₀ hxy₁ hxy₂, norm_add_pow_two_real] at h
+  calc
+    ⟪x, y⟫ = ((‖x‖ + ‖y‖) ^ 2 - ‖x‖ ^ 2 - ‖y‖ ^ 2) / 2 := by linarith
+    _ = ‖x‖ * ‖y‖ := by ring
 
--- DISSOLVED: norm_sub_eq_abs_sub_norm_iff_angle_eq_zero
+theorem norm_sub_eq_abs_sub_norm_iff_angle_eq_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    ‖x - y‖ = |‖x‖ - ‖y‖| ↔ angle x y = 0 := by
+  refine ⟨fun h => ?_, norm_sub_eq_abs_sub_norm_of_angle_eq_zero⟩
+  rw [← inner_eq_mul_norm_iff_angle_eq_zero hx hy]
+  have h1 : ‖x - y‖ ^ 2 = (‖x‖ - ‖y‖) ^ 2 := by
+    rw [h]
+    exact sq_abs (‖x‖ - ‖y‖)
+  rw [norm_sub_pow_two_real] at h1
+  calc
+    ⟪x, y⟫ = ((‖x‖ + ‖y‖) ^ 2 - ‖x‖ ^ 2 - ‖y‖ ^ 2) / 2 := by linarith
+    _ = ‖x‖ * ‖y‖ := by ring
 
 theorem norm_add_eq_norm_sub_iff_angle_eq_pi_div_two (x y : V) :
     ‖x + y‖ = ‖x - y‖ ↔ angle x y = π / 2 := by

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Adjunction.Reflective
 import Mathlib.CategoryTheory.Adjunction.Restrict
 import Mathlib.CategoryTheory.Limits.Shapes.Images
 
+noncomputable section
+
 /-!
 # Monomorphisms over a fixed object
 
@@ -62,24 +64,8 @@ def forget (X : C) : MonoOver X ⥤ Over X :=
 
 instance : CoeOut (MonoOver X) C where coe Y := Y.obj.left
 
-@[simp]
-theorem forget_obj_left {f} : ((forget X).obj f).left = (f : C) :=
-  rfl
-
-@[simp]
-theorem mk'_coe' {X A : C} (f : A ⟶ X) [Mono f] : (mk' f : C) = A :=
-  rfl
-
 abbrev arrow (f : MonoOver X) : (f : C) ⟶ X :=
   ((forget X).obj f).hom
-
-@[simp]
-theorem mk'_arrow {X A : C} (f : A ⟶ X) [Mono f] : (mk' f).arrow = f :=
-  rfl
-
-@[simp]
-theorem forget_obj_hom {f} : ((forget X).obj f).hom = f.arrow :=
-  rfl
 
 def fullyFaithfulForget (X : C) : (forget X).FullyFaithful :=
   fullyFaithfulFullSubcategoryInclusion _
@@ -134,18 +120,6 @@ def liftComp {X Z : C} {Y : D} (F : Over X ⥤ Over Y) (G : Over Y ⥤ Over Z) (
 def liftId : (lift (𝟭 (Over X)) fun f => f.2) ≅ 𝟭 _ :=
   Functor.fullyFaithfulCancelRight (MonoOver.forget _) (Iso.refl _)
 
-@[simp]
-theorem lift_comm (F : Over Y ⥤ Over X)
-    (h : ∀ f : MonoOver Y, Mono (F.obj ((MonoOver.forget Y).obj f)).hom) :
-    lift F h ⋙ MonoOver.forget X = MonoOver.forget Y ⋙ F :=
-  rfl
-
-@[simp]
-theorem lift_obj_arrow {Y : D} (F : Over Y ⥤ Over X)
-    (h : ∀ f : MonoOver Y, Mono (F.obj ((MonoOver.forget Y).obj f)).hom) (f : MonoOver Y) :
-    ((lift F h).obj f).arrow = (F.obj ((forget Y).obj f)).hom :=
-  rfl
-
 def slice {A : C} {f : Over A}
     (h₁ : ∀ (g : MonoOver f),
       Mono ((Over.iteratedSliceEquiv f).functor.obj ((forget f).obj g)).hom)
@@ -176,16 +150,6 @@ def pullbackComp (f : X ⟶ Y) (g : Y ⟶ Z) : pullback (f ≫ g) ≅ pullback g
 def pullbackId : pullback (𝟙 X) ≅ 𝟭 _ :=
   liftIso _ _ Over.pullbackId ≪≫ liftId
 
-@[simp]
-theorem pullback_obj_left (f : X ⟶ Y) (g : MonoOver Y) :
-    ((pullback f).obj g : C) = Limits.pullback g.arrow f :=
-  rfl
-
-@[simp]
-theorem pullback_obj_arrow (f : X ⟶ Y) (g : MonoOver Y) :
-    ((pullback f).obj g).arrow = pullback.snd _ _ :=
-  rfl
-
 end Pullback
 
 section Map
@@ -202,14 +166,6 @@ def mapId : map (𝟙 X) ≅ 𝟭 _ :=
   liftIso _ _ (Over.mapId X) ≪≫ liftId
 
 variable {X}
-
-@[simp]
-theorem map_obj_left (f : X ⟶ Y) [Mono f] (g : MonoOver X) : ((map f).obj g : C) = g.obj.left :=
-  rfl
-
-@[simp]
-theorem map_obj_arrow (f : X ⟶ Y) [Mono f] (g : MonoOver X) : ((map f).obj g).arrow = g.arrow ≫ f :=
-  rfl
 
 instance full_map (f : X ⟶ Y) [Mono f] : Functor.Full (map f) where
   map_surjective {g h} e := by
@@ -267,10 +223,6 @@ variable (f : X ⟶ Y) [HasImage f]
 
 def imageMonoOver (f : X ⟶ Y) [HasImage f] : MonoOver Y :=
   MonoOver.mk' (image.ι f)
-
-@[simp]
-theorem imageMonoOver_arrow (f : X ⟶ Y) [HasImage f] : (imageMonoOver f).arrow = image.ι f :=
-  rfl
 
 end Image
 

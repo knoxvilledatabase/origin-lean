@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Algebra.Star.Basic
 
+noncomputable section
+
 /-!
 # Morphisms of star rings
 
@@ -94,15 +96,6 @@ def Simps.apply (f : A →⋆ₙ+* B) : A → B := f
 
 initialize_simps_projections NonUnitalStarRingHom (toFun → apply)
 
-@[simp]
-protected theorem coe_coe {F : Type*} [FunLike F A B] [NonUnitalRingHomClass F A B]
-    [NonUnitalStarRingHomClass F A B] (f : F) : ⇑(f : A →⋆ₙ+* B) = f :=
-  rfl
-
-@[simp]
-theorem coe_toNonUnitalRingHom (f : A →⋆ₙ+* B) : ⇑f.toNonUnitalRingHom = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : A →⋆ₙ+* B} (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext _ _ h
@@ -114,17 +107,8 @@ protected def copy (f : A →⋆ₙ+* B) (f' : A → B) (h : f' = f) : A →⋆�
   map_mul' := h.symm ▸ map_mul f
   map_star' := h.symm ▸ map_star f
 
-@[simp]
-theorem coe_copy (f : A →⋆ₙ+* B) (f' : A → B) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : A →⋆ₙ+* B) (f' : A → B) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
-
-@[simp]
-theorem coe_mk (f : A →ₙ+* B) (h) :
-    ((⟨f, h⟩ : A  →⋆ₙ+* B) : A → B) = f :=
-  rfl
 
 @[simp]
 theorem mk_coe (f : A →⋆ₙ+* B) (h₁ h₂ h₃ h₄) :
@@ -139,23 +123,11 @@ variable (A)
 protected def id : A →⋆ₙ+* A :=
   { (1 : A →ₙ+* A) with map_star' := fun _ => rfl }
 
-@[simp]
-theorem coe_id : ⇑(NonUnitalStarRingHom.id A) = id :=
-  rfl
-
 end
 
 def comp (f : B →⋆ₙ+* C) (g : A →⋆ₙ+* B) : A →⋆ₙ+* C :=
   { f.toNonUnitalRingHom.comp g.toNonUnitalRingHom with
     map_star' := fun a => by simp [Function.comp_def, map_star, map_star] }
-
-@[simp]
-theorem coe_comp (f : B →⋆ₙ+* C) (g : A →⋆ₙ+* B) : ⇑(comp f g) = f ∘ g :=
-  rfl
-
-@[simp]
-theorem comp_apply (f : B →⋆ₙ+* C) (g : A →⋆ₙ+* B) (a : A) : comp f g a = f (g a) :=
-  rfl
 
 @[simp]
 theorem comp_assoc (f : C →⋆ₙ+* D) (g : B →⋆ₙ+* C) (h : A →⋆ₙ+* B) :
@@ -177,13 +149,6 @@ instance : Monoid (A →⋆ₙ+* A) where
   one_mul := id_comp
   mul_one := comp_id
 
-@[simp]
-theorem coe_one : ((1 : A →⋆ₙ+* A) : A → A) = id :=
-  rfl
-
-theorem one_apply (a : A) : (1 : A →⋆ₙ+* A) a = a :=
-  rfl
-
 end Basic
 
 section Zero
@@ -204,13 +169,6 @@ instance : MonoidWithZero (A →⋆ₙ+* A) where
   zero_mul := fun _ => ext fun _ => rfl
   mul_zero := fun f => ext fun _ => map_zero f
 
-@[simp]
-theorem coe_zero : ((0 : A →⋆ₙ+* B) : A → B) = 0 :=
-  rfl
-
-theorem zero_apply (a : A) : (0 : A →⋆ₙ+* B) a = 0 :=
-  rfl
-
 end Zero
 
 end NonUnitalStarRingHom
@@ -221,6 +179,8 @@ structure StarRingEquiv (A B : Type*) [Add A] [Add B] [Mul A] [Mul B] [Star A] [
     extends A ≃+* B where
   /-- By definition, a ⋆-ring equivalence preserves the `star` operation. -/
   map_star' : ∀ a : A, toFun (star a) = star (toFun a)
+
+@[inherit_doc] notation:25 A " ≃⋆+* " B => StarRingEquiv A B
 
 class StarRingEquivClass (F : Type*) (A B : outParam Type*)
     [Add A] [Mul A] [Star A] [Add B] [Mul B] [Star B] [EquivLike F A B]
@@ -279,10 +239,6 @@ instance : FunLike (A ≃⋆+* B) A B where
   coe f := f.toFun
   coe_injective' := DFunLike.coe_injective
 
-@[simp]
-theorem toRingEquiv_eq_coe (e : A ≃⋆+* B) : e.toRingEquiv = e :=
-  rfl
-
 @[ext]
 theorem ext {f g : A ≃⋆+* B} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -294,10 +250,6 @@ def refl : A ≃⋆+* A :=
 
 instance : Inhabited (A ≃⋆+* A) :=
   ⟨refl⟩
-
-@[simp]
-theorem coe_refl : ⇑(refl : A ≃⋆+* A) = id :=
-  rfl
 
 @[symm]
 nonrec def symm (e : A ≃⋆+* B) : B ≃⋆+* A :=
@@ -314,16 +266,10 @@ def Simps.symm_apply (e : A ≃⋆+* B) : B → A :=
 initialize_simps_projections StarRingEquiv (toFun → apply, invFun → symm_apply)
 
 @[simp]
-theorem invFun_eq_symm {e : A ≃⋆+* B} : EquivLike.inv e = e.symm :=
-  rfl
-
-@[simp]
 theorem symm_symm (e : A ≃⋆+* B) : e.symm.symm = e := rfl
 
 theorem symm_bijective : Function.Bijective (symm : (A ≃⋆+* B) → B ≃⋆+* A) :=
   Function.bijective_iff_has_inverse.mpr ⟨_, symm_symm, symm_symm⟩
-
-theorem coe_mk (e h₁) : ⇑(⟨e, h₁⟩ : A ≃⋆+* B) = e := rfl
 
 @[simp]
 theorem mk_coe (e : A ≃⋆+* B) (e' h₁ h₂ h₃ h₄ h₅) :
@@ -340,10 +286,6 @@ theorem symm_mk (f f') (h₁ h₂ h₃ h₄ h₅) :
         invFun := f } :=
   rfl
 
-@[simp]
-theorem refl_symm : (StarRingEquiv.refl : A ≃⋆+* A).symm = StarRingEquiv.refl :=
-  rfl
-
 @[trans]
 def trans (e₁ : A≃⋆+* B) (e₂ : B ≃⋆+* C) : A ≃⋆+* C :=
   { e₁.toRingEquiv.trans e₂.toRingEquiv with
@@ -358,19 +300,6 @@ theorem apply_symm_apply (e : A ≃⋆+* B) : ∀ x, e (e.symm x) = x :=
 @[simp]
 theorem symm_apply_apply (e : A ≃⋆+* B) : ∀ x, e.symm (e x) = x :=
   e.toRingEquiv.symm_apply_apply
-
-@[simp]
-theorem symm_trans_apply (e₁ : A ≃⋆+* B) (e₂ : B≃⋆+* C) (x : C) :
-    (e₁.trans e₂).symm x = e₁.symm (e₂.symm x) :=
-  rfl
-
-@[simp]
-theorem coe_trans (e₁ : A ≃⋆+* B) (e₂ : B ≃⋆+* C) : ⇑(e₁.trans e₂) = e₂ ∘ e₁ :=
-  rfl
-
-@[simp]
-theorem trans_apply (e₁ : A ≃⋆+* B) (e₂ : B ≃⋆+* C) (x : A) : (e₁.trans e₂) x = e₂ (e₁ x) :=
-  rfl
 
 theorem leftInverse_symm (e : A ≃⋆+* B) : Function.LeftInverse e.symm e :=
   e.left_inv
@@ -406,15 +335,6 @@ noncomputable def ofBijective (f : F) (hf : Function.Bijective f) : A ≃⋆+* B
   { RingEquiv.ofBijective f (hf : Function.Bijective (f : A → B)) with
     toFun := f
     map_star' := map_star f }
-
-@[simp]
-theorem coe_ofBijective {f : F} (hf : Function.Bijective f) :
-    (StarRingEquiv.ofBijective f hf : A → B) = f :=
-  rfl
-
-theorem ofBijective_apply {f : F} (hf : Function.Bijective f) (a : A) :
-    (StarRingEquiv.ofBijective f hf) a = f a :=
-  rfl
 
 end Bijective
 

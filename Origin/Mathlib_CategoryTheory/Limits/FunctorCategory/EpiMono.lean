@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 
+noncomputable section
+
 /-!
 # Monomorphisms and epimorphisms in functor categories
 

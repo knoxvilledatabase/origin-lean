@@ -9,6 +9,8 @@ import Mathlib.Tactic.Lemma
 import Mathlib.Tactic.Linarith.Frontend
 import Mathlib.Tactic.NormNum.Core
 
+noncomputable section
+
 /-!
 ## The `bound` tactic
 
@@ -219,9 +221,6 @@ elab_rules : tactic
     liftMetaTactic fun g ↦ do return (← Lean.Elab.runTactic g tac.raw).1
 
 macro_rules
-
   | `(tactic| bound%$tk [$[$ts],*]) => do
-
     let haves ← ts.mapM fun (t : Term) => withRef t `(tactic| have := $t)
-
     `(tactic| ($haves;*; bound%$tk))

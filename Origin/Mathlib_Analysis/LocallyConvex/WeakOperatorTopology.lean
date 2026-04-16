@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Analysis.NormedSpace.HahnBanach.SeparatingDual
 
+noncomputable section
+
 /-!
 # The weak operator topology
 
@@ -101,9 +103,6 @@ instance instContinuousLinearMapClass : ContinuousLinearMapClass (E →WOT[𝕜]
   map_smulₛₗ f r x := by simp only [DFunLike.coe]; simp
   map_continuous f := ContinuousLinearMap.continuous ((ContinuousLinearMap.toWOT 𝕜 E F).symm f)
 
-lemma _root_.ContinuousLinearMap.toWOT_apply {A : E →L[𝕜] F} {x : E} :
-    ((ContinuousLinearMap.toWOT 𝕜 E F) A) x = A x := rfl
-
 unseal ContinuousLinearMapWOT in
 
 lemma ext {A B : E →WOT[𝕜] F} (h : ∀ x, A x = B x) : A = B := ContinuousLinearMap.ext h
@@ -159,11 +158,6 @@ def inducingFn : (E →WOT[𝕜] F) →ₗ[𝕜] (E × F⋆ → 𝕜) where
   toFun := fun A ⟨x, y⟩ => y (A x)
   map_add' := fun x y => by ext; simp
   map_smul' := fun x y => by ext; simp
-
-@[simp]
-lemma inducingFn_apply {f : E →WOT[𝕜] F} {x : E} {y : F⋆} :
-    inducingFn 𝕜 E F f (x, y) = y (f x) :=
-  rfl
 
 instance instTopologicalSpace : TopologicalSpace (E →WOT[𝕜] F) :=
   .induced (inducingFn _ _ _) Pi.topologicalSpace

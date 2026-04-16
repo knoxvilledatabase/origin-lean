@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Measure.Haar.Quotient
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.Topology.Algebra.Order.Floor
 
+noncomputable section
+
 /-!
 # Integrals of periodic functions
 
@@ -128,6 +130,9 @@ noncomputable def measurableEquivIco (a : ℝ) : AddCircle T ≃ᵐ Ico a (a + T
   measurable_invFun := AddCircle.measurable_mk'.comp measurable_subtype_coe
 
 attribute [local instance] Subtype.measureSpace in
+/-- The lower integral of a function over `AddCircle T` is equal to the lower integral over an
+
+interval (t, t + T] in `ℝ` of its lift to `ℝ`. -/
 
 protected theorem lintegral_preimage (t : ℝ) (f : AddCircle T → ℝ≥0∞) :
     (∫⁻ a in Ioc t (t + T), f a) = ∫⁻ b : AddCircle T, f b := by
@@ -149,6 +154,9 @@ protected theorem lintegral_preimage (t : ℝ) (f : AddCircle T → ℝ≥0∞) 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
 attribute [local instance] Subtype.measureSpace in
+/-- The integral of an almost-everywhere strongly measurable function over `AddCircle T` is equal
+
+to the integral over an interval (t, t + T] in `ℝ` of its lift to `ℝ`. -/
 
 protected theorem integral_preimage (t : ℝ) (f : AddCircle T → E) :
     (∫ a in Ioc t (t + T), f a) = ∫ b : AddCircle T, f b := by

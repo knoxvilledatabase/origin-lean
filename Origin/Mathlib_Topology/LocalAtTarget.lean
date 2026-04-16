@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/LocalAtTarget.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Topology.LocallyClosed
+
+noncomputable section
 
 /-!
 # Properties of maps that are local at the target.
@@ -177,6 +179,17 @@ theorem isEmbedding_iff_of_iSup_eq_top (h : Continuous f) :
     simp
 
 omit hU in
+/--
+
+Given a continuous map `f : X → Y` between topological spaces.
+
+Suppose we have an open cover `V i` of the range of `f`, and an open cover `U i` of `X` that is
+
+coarser than the pullback of `V` under `f`.
+
+To check that `f` is an embedding it suffices to check that `U i → Y` is an embedding for all `i`.
+
+-/
 
 theorem isEmbedding_of_iSup_eq_top_of_preimage_subset_range
     {X Y} [TopologicalSpace X] [TopologicalSpace Y]
@@ -236,7 +249,6 @@ theorem isClosedEmbedding_iff_isClosedEmbedding_of_iSup_eq_top (h : Continuous f
     apply isClosed_iff_coe_preimage_of_iSup_eq_top hU
 
 omit [TopologicalSpace α] in
-
 theorem denseRange_iff_denseRange_of_iSup_eq_top :
     DenseRange f ↔ ∀ i, DenseRange ((U i).1.restrictPreimage f) := by
   simp_rw [denseRange_iff_closure_range, Set.range_restrictPreimage,

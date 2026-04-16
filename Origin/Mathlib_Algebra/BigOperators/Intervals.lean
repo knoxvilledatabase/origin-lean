@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Interval.Finset
 import Mathlib.Order.Interval.Finset.Nat
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # Results about big operators over intervals
 

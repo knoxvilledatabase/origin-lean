@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 import Origin.Core
 import Mathlib.Order.RelClasses
 
+noncomputable section
+
 /-!
 # Lexicographic order on a sigma type
 

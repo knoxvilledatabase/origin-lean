@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Countable.Small
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 # Fintype instance for `Shrink`
 -/

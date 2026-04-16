@@ -5,6 +5,8 @@ Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 import Origin.Core
 import Mathlib.Analysis.Convex.Hull
 
+noncomputable section
+
 /-!
 # Convex cones
 
@@ -75,10 +77,6 @@ instance : SetLike (ConvexCone 𝕜 E) E where
   coe_injective' S T h := by cases S; cases T; congr
 
 @[simp]
-theorem coe_mk {s : Set E} {h₁ h₂} : ↑(@mk 𝕜 _ _ _ _ s h₁ h₂) = s :=
-  rfl
-
-@[simp]
 theorem mem_mk {s : Set E} {h₁ h₂ x} : x ∈ @mk 𝕜 _ _ _ _ s h₁ h₂ ↔ x ∈ s :=
   Iff.rfl
 
@@ -100,22 +98,11 @@ instance : Min (ConvexCone 𝕜 E) :=
     ⟨S ∩ T, fun _ hc _ hx => ⟨S.smul_mem hc hx.1, T.smul_mem hc hx.2⟩, fun _ hx _ hy =>
       ⟨S.add_mem hx.1 hy.1, T.add_mem hx.2 hy.2⟩⟩⟩
 
-@[simp]
-theorem coe_inf : ((S ⊓ T : ConvexCone 𝕜 E) : Set E) = ↑S ∩ ↑T :=
-  rfl
-
-theorem mem_inf {x} : x ∈ S ⊓ T ↔ x ∈ S ∧ x ∈ T :=
-  Iff.rfl
-
 instance : InfSet (ConvexCone 𝕜 E) :=
   ⟨fun S =>
     ⟨⋂ s ∈ S, ↑s, fun _ hc _ hx => mem_biInter fun s hs => s.smul_mem hc <| mem_iInter₂.1 hx s hs,
       fun _ hx _ hy =>
       mem_biInter fun s hs => s.add_mem (mem_iInter₂.1 hx s hs) (mem_iInter₂.1 hy s hs)⟩⟩
-
-@[simp]
-theorem coe_sInf (S : Set (ConvexCone 𝕜 E)) : ↑(sInf S) = ⋂ s ∈ S, (s : Set E) :=
-  rfl
 
 theorem mem_sInf {x : E} {S : Set (ConvexCone 𝕜 E)} : x ∈ sInf S ↔ ∀ s ∈ S, x ∈ s :=
   mem_iInter₂
@@ -132,22 +119,11 @@ variable (𝕜)
 instance : Bot (ConvexCone 𝕜 E) :=
   ⟨⟨∅, fun _ _ _ => False.elim, fun _ => False.elim⟩⟩
 
-theorem mem_bot (x : E) : (x ∈ (⊥ : ConvexCone 𝕜 E)) = False :=
-  rfl
-
-@[simp]
-theorem coe_bot : ↑(⊥ : ConvexCone 𝕜 E) = (∅ : Set E) :=
-  rfl
-
 instance : Top (ConvexCone 𝕜 E) :=
   ⟨⟨univ, fun _ _ _ _ => mem_univ _, fun _ _ _ _ => mem_univ _⟩⟩
 
 theorem mem_top (x : E) : x ∈ (⊤ : ConvexCone 𝕜 E) :=
   mem_univ x
-
-@[simp]
-theorem coe_top : ↑(⊤ : ConvexCone 𝕜 E) = (univ : Set E) :=
-  rfl
 
 instance : CompleteLattice (ConvexCone 𝕜 E) :=
   { SetLike.instPartialOrder with
@@ -199,10 +175,6 @@ def map (f : E →ₗ[𝕜] F) (S : ConvexCone 𝕜 E) : ConvexCone 𝕜 F where
   add_mem' := fun _ ⟨x₁, hx₁, hy₁⟩ _ ⟨x₂, hx₂, hy₂⟩ =>
     hy₁ ▸ hy₂ ▸ f.map_add x₁ x₂ ▸ mem_image_of_mem f (S.add_mem hx₁ hx₂)
 
-@[simp, norm_cast]
-theorem coe_map (S : ConvexCone 𝕜 E) (f : E →ₗ[𝕜] F) : (S.map f : Set F) = f '' S :=
-  rfl
-
 @[simp]
 theorem mem_map {f : E →ₗ[𝕜] F} {S : ConvexCone 𝕜 E} {y : F} : y ∈ S.map f ↔ ∃ x ∈ S, f x = y :=
   Set.mem_image f S y
@@ -223,22 +195,6 @@ def comap (f : E →ₗ[𝕜] F) (S : ConvexCone 𝕜 F) : ConvexCone 𝕜 E whe
   add_mem' x hx y hy := by
     rw [mem_preimage, f.map_add]
     exact S.add_mem hx hy
-
-@[simp]
-theorem coe_comap (f : E →ₗ[𝕜] F) (S : ConvexCone 𝕜 F) : (S.comap f : Set E) = f ⁻¹' S :=
-  rfl
-
-@[simp] -- Porting note: was not a `dsimp` lemma
-theorem comap_id (S : ConvexCone 𝕜 E) : S.comap LinearMap.id = S :=
-  rfl
-
-theorem comap_comap (g : F →ₗ[𝕜] G) (f : E →ₗ[𝕜] F) (S : ConvexCone 𝕜 G) :
-    (S.comap g).comap f = S.comap (g.comp f) :=
-  rfl
-
-@[simp]
-theorem mem_comap {f : E →ₗ[𝕜] F} {S : ConvexCone 𝕜 F} {x : E} : x ∈ S.comap f ↔ f x ∈ S :=
-  Iff.rfl
 
 end Maps
 
@@ -368,10 +324,6 @@ instance : Zero (ConvexCone 𝕜 E) :=
 theorem mem_zero (x : E) : x ∈ (0 : ConvexCone 𝕜 E) ↔ x = 0 :=
   Iff.rfl
 
-@[simp]
-theorem coe_zero : ((0 : ConvexCone 𝕜 E) : Set E) = 0 :=
-  rfl
-
 theorem pointed_zero : (0 : ConvexCone 𝕜 E).Pointed := by rw [Pointed, mem_zero]
 
 instance instAdd : Add (ConvexCone 𝕜 E) :=
@@ -385,11 +337,6 @@ instance instAdd : Add (ConvexCone 𝕜 E) :=
         rintro _ ⟨x₁, hx₁, x₂, hx₂, rfl⟩ y ⟨y₁, hy₁, y₂, hy₂, rfl⟩
         use x₁ + y₁, K₁.add_mem hx₁ hy₁, x₂ + y₂, K₂.add_mem hx₂ hy₂
         abel }⟩
-
-@[simp]
-theorem mem_add {K₁ K₂ : ConvexCone 𝕜 E} {a : E} :
-    a ∈ K₁ + K₂ ↔ ∃ x ∈ K₁, ∃ y ∈ K₂, x + y = a :=
-  Iff.rfl
 
 instance instAddZeroClass : AddZeroClass (ConvexCone 𝕜 E) where
   zero_add _ := by ext; simp
@@ -424,31 +371,6 @@ def toConvexCone (S : Submodule 𝕜 E) : ConvexCone 𝕜 E where
   add_mem' _ hx _ hy := S.add_mem hx hy
 
 @[simp]
-theorem coe_toConvexCone (S : Submodule 𝕜 E) : ↑S.toConvexCone = (S : Set E) :=
-  rfl
-
-@[simp]
-theorem mem_toConvexCone {x : E} {S : Submodule 𝕜 E} : x ∈ S.toConvexCone ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
-theorem toConvexCone_le_iff {S T : Submodule 𝕜 E} : S.toConvexCone ≤ T.toConvexCone ↔ S ≤ T :=
-  Iff.rfl
-
-@[simp]
-theorem toConvexCone_bot : (⊥ : Submodule 𝕜 E).toConvexCone = 0 :=
-  rfl
-
-@[simp]
-theorem toConvexCone_top : (⊤ : Submodule 𝕜 E).toConvexCone = ⊤ :=
-  rfl
-
-@[simp]
-theorem toConvexCone_inf (S T : Submodule 𝕜 E) :
-    (S ⊓ T).toConvexCone = S.toConvexCone ⊓ T.toConvexCone :=
-  rfl
-
-@[simp]
 theorem pointed_toConvexCone (S : Submodule 𝕜 E) : S.toConvexCone.Pointed :=
   S.zero_mem
 
@@ -471,14 +393,6 @@ def positive : ConvexCone 𝕜 E where
   smul_mem' _ hc _ (hx : _ ≤ _) := smul_nonneg hc.le hx
   add_mem' _ (hx : _ ≤ _) _ (hy : _ ≤ _) := add_nonneg hx hy
 
-@[simp]
-theorem mem_positive {x : E} : x ∈ positive 𝕜 E ↔ 0 ≤ x :=
-  Iff.rfl
-
-@[simp]
-theorem coe_positive : ↑(positive 𝕜 E) = Set.Ici (0 : E) :=
-  rfl
-
 theorem salient_positive : Salient (positive 𝕜 E) := fun x xs hx hx' =>
   lt_irrefl (0 : E)
     (calc
@@ -494,14 +408,6 @@ def strictlyPositive : ConvexCone 𝕜 E where
   carrier := Set.Ioi 0
   smul_mem' _ hc _ (hx : _ < _) := smul_pos hc hx
   add_mem' _ hx _ hy := add_pos hx hy
-
-@[simp]
-theorem mem_strictlyPositive {x : E} : x ∈ strictlyPositive 𝕜 E ↔ 0 < x :=
-  Iff.rfl
-
-@[simp]
-theorem coe_strictlyPositive : ↑(strictlyPositive 𝕜 E) = Set.Ioi (0 : E) :=
-  rfl
 
 theorem positive_le_strictlyPositive : strictlyPositive 𝕜 E ≤ positive 𝕜 E := fun _ => le_of_lt
 

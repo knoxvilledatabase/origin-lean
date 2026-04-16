@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.RingTheory.WittVector.Basic
 
+noncomputable section
+
 /-!
 # Teichmüller lifts
 
@@ -89,10 +91,6 @@ def teichmuller : R →* 𝕎 R where
     rcases counit_surjective R x with ⟨x, rfl⟩
     rcases counit_surjective R y with ⟨y, rfl⟩
     simp only [← map_teichmullerFun, ← RingHom.map_mul, teichmuller_mul_aux₂]
-
-@[simp]
-theorem teichmuller_coeff_zero (r : R) : (teichmuller p r).coeff 0 = r :=
-  rfl
 
 @[simp]
 theorem teichmuller_coeff_pos (r : R) : ∀ (n : ℕ) (_ : 0 < n), (teichmuller p r).coeff n = 0

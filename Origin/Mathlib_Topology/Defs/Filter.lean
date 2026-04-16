@@ -8,6 +8,8 @@ import Mathlib.Data.Setoid.Basic
 import Mathlib.Order.Filter.Defs
 import Mathlib.Tactic.IrreducibleDef
 
+noncomputable section
+
 /-!
 # Definitions about filters in topological spaces
 
@@ -139,6 +141,8 @@ scoped[Topology] notation3 "𝓝[<] " x:100 => nhdsWithin x (Set.Iio x)
 
 def nhdsSet (s : Set X) : Filter X :=
   sSup (nhds '' s)
+
+@[inherit_doc] scoped[Topology] notation "𝓝ˢ" => nhdsSet
 
 def exterior (s : Set X) : Set X := (𝓝ˢ s).ker
 

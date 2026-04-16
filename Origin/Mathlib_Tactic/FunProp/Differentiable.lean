@@ -14,6 +14,8 @@ import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Tactic.FunProp
 
+noncomputable section
+
 /-!
 ## `funProp` minimal setup for Differentiable(At/On)
 -/

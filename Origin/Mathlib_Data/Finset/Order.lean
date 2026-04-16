@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Defs
 import Mathlib.Order.Directed
 
+noncomputable section
+
 /-!
 # Finsets of ordered types
 -/

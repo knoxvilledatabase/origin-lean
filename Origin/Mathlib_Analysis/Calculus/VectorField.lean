@@ -5,6 +5,8 @@ Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 
+noncomputable section
+
 /-!
 # Vector fields in vector spaces
 
@@ -59,9 +61,6 @@ variable (𝕜) in
 
 def lieBracketWithin (V W : E → E) (s : Set E) (x : E) : E :=
   fderivWithin 𝕜 W s x (V x) - fderivWithin 𝕜 V s x (W x)
-
-lemma lieBracket_eq :
-    lieBracket 𝕜 V W = fun x ↦ fderiv 𝕜 W x (V x) - fderiv 𝕜 V x (W x) := rfl
 
 lemma lieBracketWithin_eq :
     lieBracketWithin 𝕜 V W s =

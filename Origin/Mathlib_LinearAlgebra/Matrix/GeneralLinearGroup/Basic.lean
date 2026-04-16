@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 
+noncomputable section
+
 /-!
 # Basic lemmas about the general linear group $GL(n, R)$
 

@@ -8,6 +8,8 @@ import Lean.Meta.Tactic.TryThis
 import Batteries.Linter.UnreachableTactic
 import Qq.Match
 
+noncomputable section
+
 /-!
 # The `says` tactic combinator.
 

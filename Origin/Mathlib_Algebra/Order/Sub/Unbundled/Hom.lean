@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Algebra.Ring.Basic
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about subtraction in unbundled canonically ordered monoids
 -/

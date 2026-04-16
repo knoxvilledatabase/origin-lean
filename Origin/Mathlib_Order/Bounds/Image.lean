@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.NAry
 import Mathlib.Order.Bounds.Defs
 
+noncomputable section
+
 /-!
 
 # Images of upper/lower bounds under monotone functions

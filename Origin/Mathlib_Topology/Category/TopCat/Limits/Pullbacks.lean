@@ -5,6 +5,8 @@ Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Category.TopCat.Limits.Products
 
+noncomputable section
+
 /-!
 # Pullbacks and pushouts in the category of topological spaces
 -/
@@ -36,8 +38,6 @@ lemma pullbackFst_apply (f : X ⟶ Z) (g : Y ⟶ Z) (x) : pullbackFst f g x = x.
 abbrev pullbackSnd (f : X ⟶ Z) (g : Y ⟶ Z) : TopCat.of { p : X × Y // f p.1 = g p.2 } ⟶ Y :=
   ⟨Prod.snd ∘ Subtype.val, by
     apply Continuous.comp <;> set_option tactic.skipAssignedInstances false in continuity⟩
-
-lemma pullbackSnd_apply (f : X ⟶ Z) (g : Y ⟶ Z) (x) : pullbackSnd f g x = x.1.2 := rfl
 
 def pullbackCone (f : X ⟶ Z) (g : Y ⟶ Z) : PullbackCone f g :=
   PullbackCone.mk (pullbackFst f g) (pullbackSnd f g)
@@ -151,7 +151,6 @@ theorem range_pullback_to_prod {X Y Z : TopCat} (f : X ⟶ Z) (g : Y ⟶ Z) :
     aesop_cat
 
 noncomputable
-
 def pullbackHomeoPreimage
     {X Y Z : Type*} [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace Z]
     (f : X → Z) (hf : Continuous f) (g : Y → Z) (hg : IsEmbedding g) :

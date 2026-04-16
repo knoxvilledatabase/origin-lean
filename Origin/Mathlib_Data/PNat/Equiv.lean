@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.PNat.Defs
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # The equivalence between `ℕ+` and `ℕ`
 -/

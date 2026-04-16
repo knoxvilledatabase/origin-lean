@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 import Mathlib.MeasureTheory.PiSystem
 
+noncomputable section
+
 /-!
 # The product sigma algebra
 

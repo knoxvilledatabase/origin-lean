@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # The `recover` tactic modifier
 
@@ -50,23 +52,14 @@ partial def getUnassignedGoalMVarDependencies (mvarId : MVarId) :
           go pendingMVarId
 
 elab "recover " tacs:tacticSeq : tactic => do
-
   let originalGoals ← getGoals
-
   evalTactic tacs
-
   let mut unassigned : Std.HashSet MVarId := {}
-
   for mvarId in originalGoals do
-
     unless ← mvarId.isAssigned <||> mvarId.isDelayedAssigned do
-
       unassigned := unassigned.insert mvarId
-
     let unassignedMVarDependencies ← getUnassignedGoalMVarDependencies mvarId
-
     unassigned := unassigned.insertMany unassignedMVarDependencies.toList
-
   setGoals <| ((← getGoals) ++ unassigned.toList).eraseDups
 
 end Mathlib.Tactic

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Invertible
 import Mathlib.Algebra.Ring.Defs
 
+noncomputable section
+
 /-!
 # Theorems about invertible elements in rings
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.RelClasses
 import Mathlib.Data.List.Basic
 
+noncomputable section
+
 /-!
 # Lexicographic ordering of lists.
 

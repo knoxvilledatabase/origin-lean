@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gaussian.FourierTransform
 import Mathlib.Analysis.Fourier.PoissonSummation
 
+noncomputable section
+
 /-!
 # Poisson summation applied to the Gaussian
 

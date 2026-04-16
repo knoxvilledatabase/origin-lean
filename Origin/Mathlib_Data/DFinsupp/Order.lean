@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Module.Defs
 import Mathlib.Data.DFinsupp.Module
 
+noncomputable section
+
 /-!
 # Pointwise order on finitely supported dependent functions
 
@@ -53,13 +55,6 @@ def orderEmbeddingToFun : (Π₀ i, α i) ↪o ∀ i, α i where
     -/
     Iff.rfl
 
-@[simp, norm_cast]
-lemma coe_orderEmbeddingToFun : ⇑(orderEmbeddingToFun (α := α)) = DFunLike.coe := rfl
-
-theorem orderEmbeddingToFun_apply {f : Π₀ i, α i} {i : ι} :
-    (@orderEmbeddingToFun ι α _ _ f) i = f i :=
-  rfl
-
 end LE
 
 section Preorder
@@ -72,8 +67,6 @@ instance : Preorder (Π₀ i, α i) :=
     le_trans := fun _ _ _ hfg hgh i ↦ (hfg i).trans (hgh i) }
 
 lemma lt_def : f < g ↔ f ≤ g ∧ ∃ i, f i < g i := Pi.lt_def
-
-@[simp, norm_cast] lemma coe_lt_coe : ⇑f < g ↔ f < g := Iff.rfl
 
 lemma coe_mono : Monotone ((⇑) : (Π₀ i, α i) → ∀ i, α i) := fun _ _ ↦ id
 
@@ -92,9 +85,6 @@ instance [∀ i, SemilatticeInf (α i)] : SemilatticeInf (Π₀ i, α i) :=
     inf_le_right := fun _ _ _ ↦ inf_le_right
     le_inf := fun _ _ _ hf hg i ↦ le_inf (hf i) (hg i) }
 
-@[simp, norm_cast]
-lemma coe_inf [∀ i, SemilatticeInf (α i)] (f g : Π₀ i, α i) : f ⊓ g = ⇑f ⊓ g := rfl
-
 theorem inf_apply [∀ i, SemilatticeInf (α i)] (f g : Π₀ i, α i) (i : ι) : (f ⊓ g) i = f i ⊓ g i :=
   zipWith_apply _ _ _ _ _
 
@@ -104,9 +94,6 @@ instance [∀ i, SemilatticeSup (α i)] : SemilatticeSup (Π₀ i, α i) :=
     le_sup_left := fun _ _ _ ↦ le_sup_left
     le_sup_right := fun _ _ _ ↦ le_sup_right
     sup_le := fun _ _ _ hf hg i ↦ sup_le (hf i) (hg i) }
-
-@[simp, norm_cast]
-lemma coe_sup [∀ i, SemilatticeSup (α i)] (f g : Π₀ i, α i) : f ⊔ g = ⇑f ⊔ g := rfl
 
 theorem sup_apply [∀ i, SemilatticeSup (α i)] (f g : Π₀ i, α i) (i : ι) : (f ⊔ g) i = f i ⊔ g i :=
   zipWith_apply _ _ _ _ _

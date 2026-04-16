@@ -1,12 +1,14 @@
 /-
 Extracted from FieldTheory/NormalClosure.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.FieldTheory.Normal
 import Mathlib.Order.Closure
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+
+noncomputable section
 
 /-!
 # Normal closures
@@ -68,7 +70,6 @@ lemma normalClosure_le_iSup_adjoin :
 variable (splits : ∀ x : K, (minpoly F x).Splits (algebraMap F L))
 
 include splits in
-
 lemma normalClosure_eq_iSup_adjoin_of_splits :
     normalClosure F K L = ⨆ x : K, IntermediateField.adjoin F ((minpoly F x).rootSet L) :=
   normalClosure_le_iSup_adjoin.antisymm <|
@@ -83,6 +84,8 @@ lemma isNormalClosure_iff : IsNormalClosure F K L ↔
     simpa only [normalClosure_eq_iSup_adjoin_of_splits splits] using h
 
 include splits in
+/-- `normalClosure F K L` is a valid normal closure if `K/F` is algebraic
+  and all minimal polynomials of `K/F` splits in `L/F`. -/
 
 lemma isNormalClosure_normalClosure : IsNormalClosure F K (normalClosure F K L) := by
   rw [isNormalClosure_iff]; constructor

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.LocalContext
 
+noncomputable section
+
 /-!
 # Additional methods about `LocalContext`
 -/

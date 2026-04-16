@@ -9,6 +9,8 @@ import Mathlib.Algebra.Category.Grp.Preadditive
 import Mathlib.Tactic.Linarith
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 
+noncomputable section
+
 /-! The cochain complex of homomorphisms between cochain complexes
 
 If `F` and `G` are cochain complexes (indexed by `ℤ`) in a preadditive category,
@@ -113,10 +115,6 @@ lemma neg_v {n : ℤ} (z : Cochain F G n) (p q : ℤ) (hpq : p + n = q) :
 lemma smul_v {n : ℤ} (k : R) (z : Cochain F G n) (p q : ℤ) (hpq : p + n = q) :
     (k • z).v p q hpq = k • (z.v p q hpq) := rfl
 
-@[simp]
-lemma units_smul_v {n : ℤ} (k : Rˣ) (z : Cochain F G n) (p q : ℤ) (hpq : p + n = q) :
-    (k • z).v p q hpq = k • (z.v p q hpq) := rfl
-
 def ofHoms (ψ : ∀ (p : ℤ), F.X p ⟶ G.X p) : Cochain F G 0 :=
   Cochain.mk (fun p q hpq => ψ p ≫ eqToHom (by rw [← hpq, add_zero]))
 
@@ -180,14 +178,6 @@ lemma ofHom_neg (φ : F ⟶ G) :
 
 def ofHomotopy {φ₁ φ₂ : F ⟶ G} (ho : Homotopy φ₁ φ₂) : Cochain F G (-1) :=
   Cochain.mk (fun p q _ => ho.hom p q)
-
-@[simp]
-lemma ofHomotopy_ofEq {φ₁ φ₂ : F ⟶ G} (h : φ₁ = φ₂) :
-    ofHomotopy (Homotopy.ofEq h) = 0 := rfl
-
-@[simp]
-lemma ofHomotopy_refl (φ : F ⟶ G) :
-    ofHomotopy (Homotopy.refl φ) = 0 := rfl
 
 @[reassoc]
 lemma v_comp_XIsoOfEq_hom
@@ -585,30 +575,7 @@ instance : SMul R (Cocycle F G n) where
 
 variable (F G n)
 
-@[simp]
-lemma coe_zero : (↑(0 : Cocycle F G n) : Cochain F G n) = 0 := by rfl
-
 variable {F G n}
-
-@[simp]
-lemma coe_add (z₁ z₂ : Cocycle F G n) :
-    (↑(z₁ + z₂) : Cochain F G n) = (z₁ : Cochain F G n) + (z₂ : Cochain F G n) := rfl
-
-@[simp]
-lemma coe_neg (z : Cocycle F G n) :
-    (↑(-z) : Cochain F G n) = -(z : Cochain F G n) := rfl
-
-@[simp]
-lemma coe_smul (z : Cocycle F G n) (x : R) :
-    (↑(x • z) : Cochain F G n) = x • (z : Cochain F G n) := rfl
-
-@[simp]
-lemma coe_units_smul (z : Cocycle F G n) (x : Rˣ) :
-    (↑(x • z) : Cochain F G n) = x • (z : Cochain F G n) := rfl
-
-@[simp]
-lemma coe_sub (z₁ z₂ : Cocycle F G n) :
-    (↑(z₁ - z₂) : Cochain F G n) = (z₁ : Cochain F G n) - (z₂ : Cochain F G n) := rfl
 
 instance : Module R (Cocycle F G n) where
   one_smul _ := by aesop
@@ -706,36 +673,6 @@ lemma δ_ofHom_comp {n : ℤ} (f : F ⟶ G) (z : Cochain G K n) (m : ℤ) :
   rw [← Cocycle.ofHom_coe, δ_zero_cocycle_comp]
 
 namespace Cochain
-
-@[simps]
-def equivHomotopy (φ₁ φ₂ : F ⟶ G) :
-    Homotopy φ₁ φ₂ ≃
-      { z : Cochain F G (-1) // Cochain.ofHom φ₁ = δ (-1) 0 z + Cochain.ofHom φ₂ } where
-  toFun ho := ⟨Cochain.ofHomotopy ho, by simp only [δ_ofHomotopy, sub_add_cancel]⟩
-  invFun z :=
-    { hom := fun i j => if hij : i + (-1) = j then z.1.v i j hij else 0
-      zero := fun i j (hij : j + 1 ≠ i) => dif_neg (fun _ => hij (by omega))
-      comm := fun p => by
-        have eq := Cochain.congr_v z.2 p p (add_zero p)
-        have h₁ : (ComplexShape.up ℤ).Rel (p - 1) p := by simp
-        have h₂ : (ComplexShape.up ℤ).Rel p (p + 1) := by simp
-        simp only [δ_neg_one_cochain, Cochain.ofHom_v, ComplexShape.up_Rel, Cochain.add_v,
-          Homotopy.nullHomotopicMap'_f h₁ h₂] at eq
-        rw [dNext_eq _ h₂, prevD_eq _ h₁, eq, dif_pos, dif_pos] }
-  left_inv := fun ho => by
-    ext i j
-    dsimp
-    split_ifs with h
-    · rfl
-    · rw [ho.zero i j (fun h' => h (by dsimp at h'; omega))]
-  right_inv := fun z => by
-    ext p q hpq
-    dsimp [Cochain.ofHomotopy]
-    rw [dif_pos hpq]
-
-@[simp]
-lemma equivHomotopy_apply_of_eq {φ₁ φ₂ : F ⟶ G} (h : φ₁ = φ₂) :
-    (equivHomotopy _ _ (Homotopy.ofEq h)).1 = 0 := rfl
 
 lemma ofHom_injective {f₁ f₂ : F ⟶ G} (h : ofHom f₁ = ofHom f₂) : f₁ = f₂ :=
   (Cocycle.equivHom F G).injective (by ext1; exact h)

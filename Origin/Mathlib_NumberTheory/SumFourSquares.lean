@@ -9,6 +9,8 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.ZMod.Basic
 import Mathlib.FieldTheory.Finite.Basic
 
+noncomputable section
+
 /-!
 # Lagrange's four square theorem
 

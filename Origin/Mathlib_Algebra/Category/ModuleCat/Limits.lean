@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.Category.Grp.Limits
 import Mathlib.Algebra.DirectLimit
 
+noncomputable section
+
 /-!
 # The category of R-modules has all limits
 

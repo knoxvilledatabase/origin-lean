@@ -5,6 +5,8 @@ Genuine: 38 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.LinearAlgebra.LinearIndependent
 
+noncomputable section
+
 /-!
 # Dimension of modules and vector spaces
 

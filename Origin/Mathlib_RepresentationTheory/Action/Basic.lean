@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Basic
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Conj
 
+noncomputable section
+
 /-!
 # `Action V G`, the category of actions of a monoid `G` inside some category `V`.
 

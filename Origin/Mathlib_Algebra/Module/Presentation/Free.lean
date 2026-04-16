@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Presentation.Basic
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.Logic.UnivLE
 
+noncomputable section
+
 /-!
 # Presentation of free modules
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Real.ConjExponents
 import Mathlib.Data.Real.Irrational
 
+noncomputable section
+
 /-!
 # Rayleigh's theorem on Beatty sequences
 

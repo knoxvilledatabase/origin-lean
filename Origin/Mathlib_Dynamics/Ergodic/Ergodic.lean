@@ -5,6 +5,8 @@ Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
 
+noncomputable section
+
 /-!
 # Ergodic maps and measures
 
@@ -70,9 +72,6 @@ theorem smul_measure {R : Type*} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞
     (hf : PreErgodic f μ) (c : R) : PreErgodic f (c • μ) where
   aeconst_set _s hs hfs := (hf.aeconst_set hs hfs).anti <| ae_smul_measure_le _
 
-theorem zero_measure (f : α → α) : @PreErgodic α m f 0 where
-  aeconst_set _ _ _ := by simp
-
 end PreErgodic
 
 namespace MeasureTheory.MeasurePreserving
@@ -124,11 +123,6 @@ theorem smul_measure {R : Type*} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞
     (hf : QuasiErgodic f μ) (c : R) : QuasiErgodic f (c • μ) :=
   ⟨hf.1.smul_measure _, hf.2.smul_measure _⟩
 
-theorem zero_measure {f : α → α} (hf : Measurable f) : @QuasiErgodic α m f 0 where
-  measurable := hf
-  absolutelyContinuous := by simp
-  toPreErgodic := .zero_measure f
-
 end QuasiErgodic
 
 namespace Ergodic
@@ -158,11 +152,6 @@ theorem ae_empty_or_univ_of_image_ae_le' (hf : Ergodic f μ) (hs : NullMeasurabl
 theorem smul_measure {R : Type*} [SMul R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
     (hf : Ergodic f μ) (c : R) : Ergodic f (c • μ) :=
   ⟨hf.1.smul_measure _, hf.2.smul_measure _⟩
-
-theorem zero_measure {f : α → α} (hf : Measurable f) : @Ergodic α m f 0 where
-  measurable := hf
-  map_eq := by simp
-  toPreErgodic := .zero_measure f
 
 section IsFiniteMeasure
 

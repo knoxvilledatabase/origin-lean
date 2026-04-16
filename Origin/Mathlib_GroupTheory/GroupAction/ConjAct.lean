@@ -11,6 +11,8 @@ import Mathlib.GroupTheory.GroupAction.Defs
 import Mathlib.GroupTheory.Subgroup.Centralizer
 import Mathlib.Algebra.Group.Subgroup.ZPowers.Basic
 
+noncomputable section
+
 /-!
 # Conjugation action of a group on itself
 
@@ -54,10 +56,6 @@ instance [GroupWithZero G] : GroupWithZero (ConjAct G) := ‹GroupWithZero G›
 
 instance [Fintype G] : Fintype (ConjAct G) := ‹Fintype G›
 
-@[simp]
-theorem card [Fintype G] : Fintype.card (ConjAct G) = Fintype.card G :=
-  rfl
-
 section DivInvMonoid
 
 variable [DivInvMonoid G]
@@ -82,42 +80,6 @@ protected def rec {C : ConjAct G → Sort*} (h : ∀ g, C (toConjAct g)) : ∀ g
 @[simp]
 theorem «forall» (p : ConjAct G → Prop) : (∀ x : ConjAct G, p x) ↔ ∀ x : G, p (toConjAct x) :=
   id Iff.rfl
-
-@[simp]
-theorem of_mul_symm_eq : (@ofConjAct G _).symm = toConjAct :=
-  rfl
-
-@[simp]
-theorem to_mul_symm_eq : (@toConjAct G _).symm = ofConjAct :=
-  rfl
-
-@[simp]
-theorem toConjAct_ofConjAct (x : ConjAct G) : toConjAct (ofConjAct x) = x :=
-  rfl
-
-@[simp]
-theorem ofConjAct_toConjAct (x : G) : ofConjAct (toConjAct x) = x :=
-  rfl
-
-theorem ofConjAct_one : ofConjAct (1 : ConjAct G) = 1 :=
-  rfl
-
-theorem toConjAct_one : toConjAct (1 : G) = 1 :=
-  rfl
-
-@[simp]
-theorem ofConjAct_inv (x : ConjAct G) : ofConjAct x⁻¹ = (ofConjAct x)⁻¹ :=
-  rfl
-
-@[simp]
-theorem toConjAct_inv (x : G) : toConjAct x⁻¹ = (toConjAct x)⁻¹ :=
-  rfl
-
-theorem ofConjAct_mul (x y : ConjAct G) : ofConjAct (x * y) = ofConjAct x * ofConjAct y :=
-  rfl
-
-theorem toConjAct_mul (x y : G) : toConjAct (x * y) = toConjAct x * toConjAct y :=
-  rfl
 
 instance : SMul (ConjAct G) G where smul g h := ofConjAct g * h * (ofConjAct g)⁻¹
 
@@ -174,12 +136,6 @@ section GroupWithZero
 
 variable [GroupWithZero G₀]
 
-theorem ofConjAct_zero : ofConjAct (0 : ConjAct G₀) = 0 :=
-  rfl
-
-theorem toConjAct_zero : toConjAct (0 : G₀) = 0 :=
-  rfl
-
 instance mulAction₀ : MulAction (ConjAct G₀) G₀ where
   one_smul := by simp [smul_def]
   mul_smul := by simp [smul_def, mul_assoc]
@@ -222,9 +178,6 @@ instance smulCommClass' [SMul α G] [SMulCommClass G α G] [IsScalarTower α G G
     SMulCommClass (ConjAct G) α G :=
   haveI := SMulCommClass.symm G α G
   SMulCommClass.symm _ _ _
-
-theorem smul_eq_mulAut_conj (g : ConjAct G) (h : G) : g • h = MulAut.conj (ofConjAct g) h :=
-  rfl
 
 theorem fixedPoints_eq_center : fixedPoints (ConjAct G) G = center G := by
   ext x
@@ -273,11 +226,6 @@ def _root_.MulAut.conjNormal {H : Subgroup G} [H.Normal] : G →* MulAut H :=
   (MulDistribMulAction.toMulAut (ConjAct G) H).comp toConjAct.toMonoidHom
 
 @[simp]
-theorem _root_.MulAut.conjNormal_apply {H : Subgroup G} [H.Normal] (g : G) (h : H) :
-    ↑(MulAut.conjNormal g h) = g * h * g⁻¹ :=
-  rfl
-
-@[simp]
 theorem _root_.MulAut.conjNormal_symm_apply {H : Subgroup G} [H.Normal] (g : G) (h : H) :
     ↑((MulAut.conjNormal g).symm h) = g⁻¹ * h * g := by
   change _ * _⁻¹⁻¹ = _
@@ -305,25 +253,5 @@ end ConjAct
 section Units
 
 variable [Monoid M]
-
-@[simps! apply_coe_val symm_apply_val_coe]
-def unitsCentralizerEquiv (x : Mˣ) :
-    (Submonoid.centralizer ({↑x} : Set M))ˣ ≃* MulAction.stabilizer (ConjAct Mˣ) x :=
-  MulEquiv.symm
-  { toFun := MonoidHom.toHomUnits <|
-      { toFun := fun u ↦ ⟨↑(ConjAct.ofConjAct u.1 : Mˣ), by
-          rintro x ⟨rfl⟩
-          have : (u : ConjAct Mˣ) • x = x := u.2
-          rwa [ConjAct.smul_def, mul_inv_eq_iff_eq_mul, Units.ext_iff, eq_comm] at this⟩,
-        map_one' := rfl,
-        map_mul' := fun _ _ ↦ rfl }
-    invFun := fun u ↦
-      ⟨ConjAct.toConjAct (Units.map (Submonoid.centralizer ({↑x} : Set M)).subtype u), by
-      change _ • _ = _
-      simp only [ConjAct.smul_def, ConjAct.ofConjAct_toConjAct, mul_inv_eq_iff_eq_mul]
-      exact Units.ext <| (u.1.2 x <| Set.mem_singleton _).symm⟩
-    left_inv := fun _ ↦ by ext; rfl
-    right_inv := fun _ ↦ by ext; rfl
-    map_mul' := map_mul _ }
 
 end Units

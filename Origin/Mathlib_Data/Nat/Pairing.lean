@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Prod
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Nat.Sqrt
 
+noncomputable section
+
 /-!
 # Naturals pairing function
 

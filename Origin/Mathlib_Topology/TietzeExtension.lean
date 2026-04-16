@@ -8,6 +8,8 @@ import Mathlib.Order.Interval.Set.IsoIoo
 import Mathlib.Topology.Order.MonotoneContinuity
 import Mathlib.Topology.UrysohnsBounded
 
+noncomputable section
+
 /-!
 # Tietze extension theorem
 
@@ -180,51 +182,6 @@ theorem tietze_extension_step (f : X →ᵇ ℝ) (e : C(X, Y)) (he : IsClosedEmb
             rw [hg₂ (mem_image_of_mem _ hle₂), abs_sub_comm, Function.const_apply,
               abs_of_nonneg (sub_nonneg.2 hle₂)]
           _ ≤ 2 / 3 * ‖f‖ := by linarith
-
-theorem exists_extension_norm_eq_of_isClosedEmbedding' (f : X →ᵇ ℝ) (e : C(X, Y))
-    (he : IsClosedEmbedding e) : ∃ g : Y →ᵇ ℝ, ‖g‖ = ‖f‖ ∧ g.compContinuous e = f := by
-  /- For the proof, we iterate `tietze_extension_step`. Each time we apply it to the difference
-    between the previous approximation and `f`. -/
-  choose F hF_norm hF_dist using fun f : X →ᵇ ℝ => tietze_extension_step f e he
-  set g : ℕ → Y →ᵇ ℝ := fun n => (fun g => g + F (f - g.compContinuous e))^[n] 0
-  have g0 : g 0 = 0 := rfl
-  have g_succ : ∀ n, g (n + 1) = g n + F (f - (g n).compContinuous e) := fun n =>
-    Function.iterate_succ_apply' _ _ _
-  have hgf : ∀ n, dist ((g n).compContinuous e) f ≤ (2 / 3) ^ n * ‖f‖ := by
-    intro n
-    induction n with
-    | zero => simp [g0]
-    | succ n ihn =>
-      rw [g_succ n, add_compContinuous, ← dist_sub_right, add_sub_cancel_left, pow_succ', mul_assoc]
-      refine (hF_dist _).trans (mul_le_mul_of_nonneg_left ?_ (by norm_num1))
-      rwa [← dist_eq_norm']
-  have hg_dist : ∀ n, dist (g n) (g (n + 1)) ≤ 1 / 3 * ‖f‖ * (2 / 3) ^ n := by
-    intro n
-    calc
-      dist (g n) (g (n + 1)) = ‖F (f - (g n).compContinuous e)‖ := by
-        rw [g_succ, dist_eq_norm', add_sub_cancel_left]
-      _ ≤ ‖f - (g n).compContinuous e‖ / 3 := hF_norm _
-      _ = 1 / 3 * dist ((g n).compContinuous e) f := by rw [dist_eq_norm', one_div, div_eq_inv_mul]
-      _ ≤ 1 / 3 * ((2 / 3) ^ n * ‖f‖) := mul_le_mul_of_nonneg_left (hgf n) (by norm_num1)
-      _ = 1 / 3 * ‖f‖ * (2 / 3) ^ n := by ac_rfl
-  have hg_cau : CauchySeq g := cauchySeq_of_le_geometric _ _ (by norm_num1) hg_dist
-  have :
-    Tendsto (fun n => (g n).compContinuous e) atTop
-      (𝓝 <| (limUnder atTop g).compContinuous e) :=
-    ((continuous_compContinuous e).tendsto _).comp hg_cau.tendsto_limUnder
-  have hge : (limUnder atTop g).compContinuous e = f := by
-    refine tendsto_nhds_unique this (tendsto_iff_dist_tendsto_zero.2 ?_)
-    refine squeeze_zero (fun _ => dist_nonneg) hgf ?_
-    rw [← zero_mul ‖f‖]
-    refine (tendsto_pow_atTop_nhds_zero_of_lt_one ?_ ?_).mul tendsto_const_nhds <;> norm_num1
-  refine ⟨limUnder atTop g, le_antisymm ?_ ?_, hge⟩
-  · rw [← dist_zero_left, ← g0]
-    refine
-      (dist_le_of_le_geometric_of_tendsto₀ _ _ (by norm_num1)
-        hg_dist hg_cau.tendsto_limUnder).trans_eq ?_
-    field_simp [show (3 - 2 : ℝ) = 1 by norm_num1]
-  · rw [← hge]
-    exact norm_compContinuous_le _ _
 
 alias exists_extension_norm_eq_of_closedEmbedding' := exists_extension_norm_eq_of_isClosedEmbedding'
 

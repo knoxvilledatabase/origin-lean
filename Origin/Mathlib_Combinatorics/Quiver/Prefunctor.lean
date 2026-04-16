@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Combinatorics.Quiver.Basic
 
+noncomputable section
+
 /-!
 # Morphisms of quivers
 -/
@@ -18,12 +20,6 @@ structure Prefunctor (V : Type u₁) [Quiver.{v₁} V] (W : Type u₂) [Quiver.{
   map : ∀ {X Y : V}, (X ⟶ Y) → (obj X ⟶ obj Y)
 
 namespace Prefunctor
-
-lemma mk_obj {V W : Type*} [Quiver V] [Quiver W] {obj : V → W} {map} {X : V} :
-    (Prefunctor.mk obj map).obj X = obj X := rfl
-
-lemma mk_map {V W : Type*} [Quiver V] [Quiver W] {obj : V → W} {map} {X Y : V} {f : X ⟶ Y} :
-    (Prefunctor.mk obj map).map f = map f := rfl
 
 @[ext (iff := false)]
 theorem ext {V : Type u} [Quiver.{v₁} V] {W : Type u₂} [Quiver.{v₂} W] {F G : Prefunctor V W}
@@ -52,20 +48,6 @@ def comp {U : Type*} [Quiver U] {V : Type*} [Quiver V] {W : Type*} [Quiver W]
     (F : Prefunctor U V) (G : Prefunctor V W) : Prefunctor U W where
   obj X := G.obj (F.obj X)
   map f := G.map (F.map f)
-
-@[simp]
-theorem comp_id {U V : Type*} [Quiver U] [Quiver V] (F : Prefunctor U V) :
-    F.comp (id _) = F := rfl
-
-@[simp]
-theorem id_comp {U V : Type*} [Quiver U] [Quiver V] (F : Prefunctor U V) :
-    (id _).comp F = F := rfl
-
-@[simp]
-theorem comp_assoc {U V W Z : Type*} [Quiver U] [Quiver V] [Quiver W] [Quiver Z]
-    (F : Prefunctor U V) (G : Prefunctor V W) (H : Prefunctor W Z) :
-    (F.comp G).comp H = F.comp (G.comp H) :=
-  rfl
 
 infixl:50 " ⥤q " => Prefunctor
 

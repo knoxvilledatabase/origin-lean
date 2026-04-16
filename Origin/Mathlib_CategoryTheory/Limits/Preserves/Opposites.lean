@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Opposites
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 
+noncomputable section
+
 /-!
 # Limit preservation properties of `Functor.op` and related constructions
 

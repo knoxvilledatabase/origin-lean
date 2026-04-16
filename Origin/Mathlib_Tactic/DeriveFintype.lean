@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Sigma
 import Mathlib.Data.Fintype.Sum
 
+noncomputable section
+
 /-!
 # The `Fintype` derive handler
 

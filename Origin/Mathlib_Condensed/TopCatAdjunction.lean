@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Condensed.TopComparison
 import Mathlib.Topology.Category.CompactlyGenerated
 
+noncomputable section
+
 /-!
 
 # The adjunction between condensed sets and topological spaces

@@ -506,6 +506,8 @@ class Extractor:
         self.parser = parser or Parser(self.classifier)
         # Load compression patterns
         try:
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent))
             from compress.patterns import get_patterns
             self.patterns = get_patterns()
         except ImportError:
@@ -543,16 +545,57 @@ class Extractor:
         imports = [b.text for b in blocks if b.kind == "import"]
         parts = []
 
-        # Dependency guard for compression: collect text from all non-compressed
-        # declarations so we can check if a compressed decl is referenced.
+        # Dependency guard for compression: collect text from ALL blocks that
+        # will survive (non-dissolved decls that aren't compressed, plus all
+        # other/variable/open blocks) so we can check if a compressed decl
+        # is referenced anywhere in the surviving output.
         if self.patterns:
-            non_compressed_text = "\n".join(
-                b.text for b in blocks
-                if b.kind == "decl" and b.classification not in ("dissolves", "infra_name")
-                and not any(p.match(b) for p in self.patterns)
-            )
+            surviving_parts = []
+            for b in blocks:
+                if b.kind == "decl":
+                    if b.classification in ("dissolves", "infra_name"):
+                        continue  # dissolved — skip
+                    if any(p.match(b) for p in self.patterns):
+                        continue  # would be compressed — skip
+                    surviving_parts.append(b.text)
+                elif b.kind in ("other", "variable", "open"):
+                    surviving_parts.append(b.text)
+            non_compressed_text = "\n".join(surviving_parts)
         else:
             non_compressed_text = ""
+
+        # Iterative dependency guard: rescue compressed decls that surviving
+        # code references. Iterate because rescuing A may make B's reference
+        # to A visible, requiring B to be rescued too.
+        if self.patterns:
+            compressed = {b.name: b for b in blocks
+                          if b.kind == "decl" and b.name
+                          and any(p.match(b) for p in self.patterns)}
+            rescued = set()
+            changed = True
+            while changed:
+                changed = False
+                # Rebuild surviving text including rescued decls
+                surv = []
+                for b in blocks:
+                    if b.kind == "decl":
+                        if b.classification in ("dissolves", "infra_name"):
+                            continue
+                        if b.name in compressed and b.name not in rescued:
+                            continue
+                        surv.append(b.text)
+                    elif b.kind in ("other", "variable", "open"):
+                        surv.append(b.text)
+                surv_text = "\n".join(surv)
+                for name in list(compressed.keys()):
+                    if name in rescued:
+                        continue
+                    if re.search(r'\b' + re.escape(name) + r'\b', surv_text):
+                        rescued.add(name)
+                        changed = True
+        else:
+            compressed = {}
+            rescued = set()
 
         last_dissolved = False
         for b in blocks:
@@ -562,11 +605,10 @@ class Extractor:
                 if s.startswith("{") or s.startswith("where") or s.startswith("|"):
                     continue
             last_dissolved = (b.kind == "decl" and b.classification in ("dissolves", "infra_name"))
+            # Apply compression — but rescue if dependency guard saved it
+            if b.kind == "decl" and b.name in compressed and b.name not in rescued:
+                continue  # compressed away — safe to delete
             text_out = self._emit_block(b)
-            # Dependency guard: if compression deleted it but others reference it, keep it
-            if text_out is None and b.kind == "decl" and b.name and self.patterns:
-                if re.search(r'\b' + re.escape(b.name) + r'\b', non_compressed_text):
-                    text_out = b.text  # keep — it's referenced
             if text_out is not None:
                 parts.append(text_out)
 
@@ -611,16 +653,9 @@ class Extractor:
                     del dissolved[name]
                     changed = True
 
-    def _apply_compression(self, b: Block) -> str | None:
-        """Apply compression patterns. Returns sentinel _COMPRESSED to delete,
-        compressed text to replace, or None if no pattern matched."""
-        for pattern in self.patterns:
-            if pattern.match(b):
-                return pattern.compress(b)
-        return b.text  # no pattern matched — keep as-is
-
     def _emit_block(self, b: Block) -> str | None:
-        """Emit a block. Compression patterns live in scripts/compress/."""
+        """Emit a block. Compression deletion is handled by the dependency
+        guard loop above. This method handles everything else."""
         if b.kind == "comment":
             return b.text if "/-!" in b.text else None
         if b.kind == "import":
@@ -632,7 +667,7 @@ class Extractor:
                 return f"-- DISSOLVED: {b.name}"
             if b.classification == "conflates":
                 return f"-- CONFLATES (assumes ground = zero): {b.name}\n{b.text}"
-            return self._apply_compression(b)
+            return b.text
         if b.kind == "other":
             return b.text
         return None

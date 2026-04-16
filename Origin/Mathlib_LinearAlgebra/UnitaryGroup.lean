@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.Algebra.Star.Unitary
 
+noncomputable section
+
 /-!
 # The Unitary Group
 
@@ -100,18 +102,6 @@ section CoeLemmas
 
 variable (A B : unitaryGroup n α)
 
-@[simp] theorem inv_val : ↑A⁻¹ = (star A : Matrix n n α) := rfl
-
-@[simp] theorem inv_apply : ⇑A⁻¹ = (star A : Matrix n n α) := rfl
-
-@[simp] theorem mul_val : ↑(A * B) = A.1 * B.1 := rfl
-
-@[simp] theorem mul_apply : ⇑(A * B) = A.1 * B.1 := rfl
-
-@[simp] theorem one_val : ↑(1 : unitaryGroup n α) = (1 : Matrix n n α) := rfl
-
-@[simp] theorem one_apply : ⇑(1 : unitaryGroup n α) = (1 : Matrix n n α) := rfl
-
 @[simp]
 theorem toLin'_mul : toLin' (A * B) = (toLin' A).comp (toLin' B) :=
   Matrix.toLin'_mul A.1 B.1
@@ -165,10 +155,6 @@ abbrev specialUnitaryGroup := unitaryGroup n α ⊓ MonoidHom.mker detMonoidHom
 
 variable {n} {α}
 
-theorem mem_specialUnitaryGroup_iff :
-    A ∈ specialUnitaryGroup n α ↔ A ∈ unitaryGroup n α ∧ A.det = 1 :=
-  Iff.rfl
-
 end specialUnitaryGroup
 
 section OrthogonalGroup
@@ -200,10 +186,6 @@ attribute [local instance] starRingOfComm
 abbrev specialOrthogonalGroup := specialUnitaryGroup n β
 
 variable {n} {β} {A : Matrix n n β}
-
-theorem mem_specialOrthogonalGroup_iff :
-    A ∈ specialOrthogonalGroup n β ↔ A ∈ orthogonalGroup n β ∧ A.det = 1 :=
-  Iff.rfl
 
 end specialOrthogonalGroup
 

@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Order.Basic
 
+noncomputable section
+
 /-!
 # Typeclass expressing `0 ≤ 1`.
 -/

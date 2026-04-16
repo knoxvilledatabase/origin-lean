@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Data.Nat.Prime.Basic
 
+noncomputable section
+
 /-!
 # Prime numbers in the naturals and the integers
 

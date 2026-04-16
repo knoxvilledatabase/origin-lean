@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Game/Nim.lean
-Genuine: 47 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.SetTheory.Game.Birthday
 import Mathlib.SetTheory.Game.Impartial
 import Mathlib.SetTheory.Nimber.Basic
+
+noncomputable section
 
 /-!
 # Nim and the Sprague-Grundy theorem
@@ -125,16 +127,6 @@ noncomputable instance uniqueNimOneRightMoves : Unique (nim 1).RightMoves :=
   (Equiv.cast <| rightMoves_nim 1).unique
 
 @[simp]
-theorem default_nim_one_leftMoves_eq :
-    (default : (nim 1).LeftMoves) = @toLeftMovesNim 1 ⟨0, Set.mem_Iio.mpr zero_lt_one⟩ :=
-  rfl
-
-@[simp]
-theorem default_nim_one_rightMoves_eq :
-    (default : (nim 1).RightMoves) = @toRightMovesNim 1 ⟨0, Set.mem_Iio.mpr zero_lt_one⟩ :=
-  rfl
-
-@[simp]
 theorem toLeftMovesNim_one_symm (i) :
     (@toLeftMovesNim 1).symm i = ⟨0, Set.mem_Iio.mpr zero_lt_one⟩ := by
   simp [eq_iff_true_of_subsingleton]
@@ -143,10 +135,6 @@ theorem toLeftMovesNim_one_symm (i) :
 theorem toRightMovesNim_one_symm (i) :
     (@toRightMovesNim 1).symm i = ⟨0, Set.mem_Iio.mpr zero_lt_one⟩ := by
   simp [eq_iff_true_of_subsingleton]
-
-theorem nim_one_moveLeft (x) : (nim 1).moveLeft x = nim 0 := by simp
-
-theorem nim_one_moveRight (x) : (nim 1).moveRight x = nim 0 := by simp
 
 def nimOneRelabelling : nim 1 ≡r star := by
   rw [nim_def]
@@ -176,7 +164,10 @@ instance nim_impartial (o : Ordinal) : Impartial (nim o) := by
   rw [impartial_def, neg_nim]
   refine ⟨equiv_rfl, fun i => ?_, fun i => ?_⟩ <;> simpa using IH _ (typein_lt_self _)
 
--- DISSOLVED: nim_fuzzy_zero_of_ne_zero
+theorem nim_fuzzy_zero_of_ne_zero {o : Ordinal} (ho : o ≠ 0) : nim o ‖ 0 := by
+  rw [Impartial.fuzzy_zero_iff_lf, lf_zero_le]
+  use toRightMovesNim ⟨0, Ordinal.pos_iff_ne_zero.2 ho⟩
+  simp
 
 @[simp]
 theorem nim_add_equiv_zero_iff (o₁ o₂ : Ordinal) : (nim o₁ + nim o₂ ≈ 0) ↔ o₁ = o₂ := by
@@ -208,6 +199,7 @@ theorem grundyValue_eq_sInf_moveLeft (G : PGame) :
   rw [grundyValue]; rfl
 
 set_option linter.deprecated false in
+@[deprecated grundyValue_eq_sInf_moveLeft (since := "2024-09-16")]
 
 theorem grundyValue_eq_mex_left (G : PGame) :
     grundyValue G = Ordinal.mex fun i => grundyValue (G.moveLeft i) :=
@@ -293,6 +285,7 @@ theorem grundyValue_eq_sInf_moveRight (G : PGame) [G.Impartial] :
   exact @grundyValue_neg _ (@Impartial.moveRight_impartial ⟨l, r, L, R⟩ _ _)
 
 set_option linter.deprecated false in
+@[deprecated grundyValue_eq_sInf_moveRight (since := "2024-09-16")]
 
 theorem grundyValue_eq_mex_right (G : PGame) [G.Impartial] :
     grundyValue G = Ordinal.mex.{u, u} fun i => grundyValue (G.moveRight i) :=

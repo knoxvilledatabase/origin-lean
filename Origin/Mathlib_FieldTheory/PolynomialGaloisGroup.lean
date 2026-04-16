@@ -1,9 +1,11 @@
 /-
 Extracted from FieldTheory/PolynomialGaloisGroup.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 5 | Infrastructure: 18
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Galois.Basic
+
+noncomputable section
 
 /-!
 # Galois Groups of Polynomials
@@ -220,7 +222,14 @@ theorem restrictDvd_def [Decidable (q = 0)] (hpq : p ∣ q) :
   unfold restrictDvd
   convert rfl
 
--- DISSOLVED: restrictDvd_surjective
+theorem restrictDvd_surjective (hpq : p ∣ q) (hq : q ≠ 0) :
+    Function.Surjective (restrictDvd hpq) := by
+  classical
+    -- Porting note: was `simp only [restrictDvd_def, dif_neg hq, restrict_surjective]`
+    haveI := Fact.mk <|
+      splits_of_splits_of_dvd (algebraMap F q.SplittingField) hq (SplittingField.splits q) hpq
+    simp only [restrictDvd_def, dif_neg hq]
+    exact restrict_surjective _ _
 
 variable (p q)
 
@@ -259,13 +268,79 @@ theorem restrictProd_injective : Function.Injective (restrictProd p q) := by
     rw [key, ← AlgEquiv.restrictNormal_commutes, ← AlgEquiv.restrictNormal_commutes]
     exact congr_arg _ (AlgEquiv.ext_iff.mp hfg.2 _)
 
--- DISSOLVED: mul_splits_in_splittingField_of_mul
+theorem mul_splits_in_splittingField_of_mul {p₁ q₁ p₂ q₂ : F[X]} (hq₁ : q₁ ≠ 0) (hq₂ : q₂ ≠ 0)
+    (h₁ : p₁.Splits (algebraMap F q₁.SplittingField))
+    (h₂ : p₂.Splits (algebraMap F q₂.SplittingField)) :
+    (p₁ * p₂).Splits (algebraMap F (q₁ * q₂).SplittingField) := by
+  apply splits_mul
+  · rw [←
+      (SplittingField.lift q₁
+          (splits_of_splits_of_dvd (algebraMap F (q₁ * q₂).SplittingField) (mul_ne_zero hq₁ hq₂)
+            (SplittingField.splits _) (dvd_mul_right q₁ q₂))).comp_algebraMap]
+    exact splits_comp_of_splits _ _ h₁
+  · rw [←
+      (SplittingField.lift q₂
+          (splits_of_splits_of_dvd (algebraMap F (q₁ * q₂).SplittingField) (mul_ne_zero hq₁ hq₂)
+            (SplittingField.splits _) (dvd_mul_left q₂ q₁))).comp_algebraMap]
+    exact splits_comp_of_splits _ _ h₂
 
--- DISSOLVED: splits_in_splittingField_of_comp
+theorem splits_in_splittingField_of_comp (hq : q.natDegree ≠ 0) :
+    p.Splits (algebraMap F (p.comp q).SplittingField) := by
+  let P : F[X] → Prop := fun r => r.Splits (algebraMap F (r.comp q).SplittingField)
+  have key1 : ∀ {r : F[X]}, Irreducible r → P r := by
+    intro r hr
+    by_cases hr' : natDegree r = 0
+    · exact splits_of_natDegree_le_one _ (le_trans (le_of_eq hr') zero_le_one)
+    obtain ⟨x, hx⟩ :=
+      exists_root_of_splits _ (SplittingField.splits (r.comp q)) fun h =>
+        hr'
+          ((mul_eq_zero.mp
+                (natDegree_comp.symm.trans (natDegree_eq_of_degree_eq_some h))).resolve_right
+            hq)
+    rw [← aeval_def, aeval_comp] at hx
+    have h_normal : Normal F (r.comp q).SplittingField := SplittingField.instNormal (r.comp q)
+    have qx_int := Normal.isIntegral h_normal (aeval x q)
+    exact
+      splits_of_splits_of_dvd _ (minpoly.ne_zero qx_int) (Normal.splits h_normal _)
+        ((minpoly.irreducible qx_int).dvd_symm hr (minpoly.dvd F _ hx))
+  have key2 : ∀ {p₁ p₂ : F[X]}, P p₁ → P p₂ → P (p₁ * p₂) := by
+    intro p₁ p₂ hp₁ hp₂
+    by_cases h₁ : p₁.comp q = 0
+    · cases' comp_eq_zero_iff.mp h₁ with h h
+      · rw [h, zero_mul]
+        exact splits_zero _
+      · exact False.elim (hq (by rw [h.2, natDegree_C]))
+    by_cases h₂ : p₂.comp q = 0
+    · cases' comp_eq_zero_iff.mp h₂ with h h
+      · rw [h, mul_zero]
+        exact splits_zero _
+      · exact False.elim (hq (by rw [h.2, natDegree_C]))
+    have key := mul_splits_in_splittingField_of_mul h₁ h₂ hp₁ hp₂
+    rwa [← mul_comp] at key
+  -- Porting note: the last part of the proof needs to be unfolded to avoid timeout
+  -- original proof
+  -- exact
+  --  WfDvdMonoid.induction_on_irreducible p (splits_zero _) (fun _ => splits_of_isUnit _)
+  --    fun _ _ _ h => key2 (key1 h)
+  induction p using WfDvdMonoid.induction_on_irreducible with
+  | h0 => exact splits_zero _
+  | hu u hu => exact splits_of_isUnit (algebraMap F (SplittingField (comp u q))) hu
+  -- Porting note: using `exact` instead of `apply` times out
+  | hi p₁ p₂ _ hp₂ hp₁ => apply key2 (key1 hp₂) hp₁
 
--- DISSOLVED: restrictComp
+def restrictComp (hq : q.natDegree ≠ 0) : (p.comp q).Gal →* p.Gal :=
+  let h : Fact (Splits (algebraMap F (p.comp q).SplittingField) p) :=
+    ⟨splits_in_splittingField_of_comp p q hq⟩
+  @restrict F _ p _ _ _ h
 
--- DISSOLVED: restrictComp_surjective
+theorem restrictComp_surjective (hq : q.natDegree ≠ 0) :
+    Function.Surjective (restrictComp p q hq) := by
+  -- Porting note: was
+  -- simp only [restrictComp, restrict_surjective]
+  haveI : Fact (Splits (algebraMap F (SplittingField (comp p q))) p) :=
+    ⟨splits_in_splittingField_of_comp p q hq⟩
+  rw [restrictComp]
+  exact restrict_surjective _ _
 
 variable {p q}
 

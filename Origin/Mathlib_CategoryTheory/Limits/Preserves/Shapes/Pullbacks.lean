@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Basic
 import Mathlib.CategoryTheory.Limits.Opposites
 import Mathlib.CategoryTheory.Limits.Yoneda
 
+noncomputable section
+
 /-!
 # Preserving pullbacks
 

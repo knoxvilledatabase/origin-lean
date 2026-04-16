@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Antidiag/Finsupp.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Antidiag.Pi
 import Mathlib.Data.Finsupp.Basic
+
+noncomputable section
 
 /-!
 # Antidiagonal of finitely supported functions as finsets
@@ -52,7 +54,9 @@ lemma mem_finsuppAntidiag' :
 @[simp] lemma finsuppAntidiag_empty_zero : finsuppAntidiag (∅ : Finset ι) (0 : μ) = {0} := by
   ext f; simp [finsuppAntidiag, ← DFunLike.coe_fn_eq (g := f), eq_comm]
 
--- DISSOLVED: finsuppAntidiag_empty_of_ne_zero
+@[simp] lemma finsuppAntidiag_empty_of_ne_zero (hn : n ≠ 0) :
+    finsuppAntidiag (∅ : Finset ι) n = ∅ :=
+  eq_empty_of_forall_not_mem (by simp [@eq_comm _ 0, hn.symm])
 
 lemma finsuppAntidiag_empty (n : μ) :
     finsuppAntidiag (∅ : Finset ι) n = if n = 0 then {0} else ∅ := by split_ifs with hn <;> simp [*]

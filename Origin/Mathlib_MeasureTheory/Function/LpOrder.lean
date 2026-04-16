@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Order.Lattice
 import Mathlib.MeasureTheory.Function.LpSpace
 
+noncomputable section
+
 /-!
 # Order related properties of Lp spaces
 

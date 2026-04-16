@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/FreeModule/PID.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.Matrix.ToLin
+
+noncomputable section
 
 /-! # Free modules over PID
 
@@ -527,7 +529,13 @@ theorem Ideal.selfBasis_def (b : Basis ι R S) (I : Ideal S) (hI : I ≠ ⊥) :
     ∀ i, (Ideal.selfBasis b I hI i : S) = Ideal.smithCoeffs b I hI i • Ideal.ringBasis b I hI i :=
   (Ideal.exists_smith_normal_form b I hI).choose_spec.choose_spec.choose_spec
 
--- DISSOLVED: Ideal.smithCoeffs_ne_zero
+@[simp]
+theorem Ideal.smithCoeffs_ne_zero (b : Basis ι R S) (I : Ideal S) (hI : I ≠ ⊥) (i) :
+    Ideal.smithCoeffs b I hI i ≠ 0 := by
+  intro hi
+  apply Basis.ne_zero (Ideal.selfBasis b I hI) i
+  refine Subtype.coe_injective ?_
+  simp [hi]
 
 end Ideal
 

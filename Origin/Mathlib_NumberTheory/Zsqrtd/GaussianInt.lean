@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/Zsqrtd/GaussianInt.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 4 | Infrastructure: 9
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Zsqrtd.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Archimedean
+
+noncomputable section
 
 /-!
 # Gaussian integers
@@ -138,7 +140,8 @@ theorem norm_nonneg (x : ℤ[i]) : 0 ≤ norm x :=
 @[simp]
 theorem norm_eq_zero {x : ℤ[i]} : norm x = 0 ↔ x = 0 := by rw [← @Int.cast_inj ℝ _ _ _]; simp
 
--- DISSOLVED: norm_pos
+theorem norm_pos {x : ℤ[i]} : 0 < norm x ↔ x ≠ 0 := by
+  rw [lt_iff_le_and_ne, Ne, eq_comm, norm_eq_zero]; simp [norm_nonneg]
 
 theorem abs_natCast_norm (x : ℤ[i]) : (x.norm.natAbs : ℤ) = x.norm :=
   Int.natAbs_of_nonneg (norm_nonneg _)
@@ -200,11 +203,27 @@ instance : Mod ℤ[i] :=
 theorem mod_def (x y : ℤ[i]) : x % y = x - y * (x / y) :=
   rfl
 
--- DISSOLVED: norm_mod_lt
+theorem norm_mod_lt (x : ℤ[i]) {y : ℤ[i]} (hy : y ≠ 0) : (x % y).norm < y.norm :=
+  have : (y : ℂ) ≠ 0 := by rwa [Ne, ← toComplex_zero, toComplex_inj]
+  (@Int.cast_lt ℝ _ _ _ _).1 <|
+    calc
+      ↑(Zsqrtd.norm (x % y)) = Complex.normSq (x - y * (x / y : ℤ[i]) : ℂ) := by simp [mod_def]
+      _ = Complex.normSq (y : ℂ) * Complex.normSq (x / y - (x / y : ℤ[i]) : ℂ) := by
+        rw [← normSq_mul, mul_sub, mul_div_cancel₀ _ this]
+      _ < Complex.normSq (y : ℂ) * 1 :=
+        (mul_lt_mul_of_pos_left (normSq_div_sub_div_lt_one _ _) (normSq_pos.2 this))
+      _ = Zsqrtd.norm y := by simp
 
--- DISSOLVED: natAbs_norm_mod_lt
+theorem natAbs_norm_mod_lt (x : ℤ[i]) {y : ℤ[i]} (hy : y ≠ 0) :
+    (x % y).norm.natAbs < y.norm.natAbs :=
+  Int.ofNat_lt.1 (by simp [-Int.ofNat_lt, norm_mod_lt x hy])
 
--- DISSOLVED: norm_le_norm_mul_left
+theorem norm_le_norm_mul_left (x : ℤ[i]) {y : ℤ[i]} (hy : y ≠ 0) :
+    (norm x).natAbs ≤ (norm (x * y)).natAbs := by
+  rw [Zsqrtd.norm_mul, Int.natAbs_mul]
+  exact le_mul_of_one_le_right (Nat.zero_le _) (Int.ofNat_le.1 (by
+    rw [abs_natCast_norm]
+    exact Int.add_one_le_of_lt (norm_pos.2 hy)))
 
 instance instNontrivial : Nontrivial ℤ[i] :=
   ⟨⟨0, 1, by decide⟩⟩

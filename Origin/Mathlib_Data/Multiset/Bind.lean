@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Multiset
 import Mathlib.Data.Multiset.Dedup
 
+noncomputable section
+
 /-!
 # Bind operation for multisets
 
@@ -35,10 +37,6 @@ theorem coe_join : ∀ L : List (List α), join (L.map ((↑) : List α → Mult
   | [] => rfl
   | l :: L => by
       exact congr_arg (fun s : Multiset α => ↑l + s) (coe_join L)
-
-@[simp]
-theorem join_zero : @join α 0 = 0 :=
-  rfl
 
 @[simp]
 theorem join_cons (s S) : @join α (s ::ₘ S) = s + join S :=
@@ -232,10 +230,6 @@ theorem coe_product (l₁ : List α) (l₂ : List β) :
   simp
 
 @[simp]
-theorem zero_product : (0 : Multiset α) ×ˢ t = 0 :=
-  rfl
-
-@[simp]
 theorem cons_product : (a ::ₘ s) ×ˢ t = map (Prod.mk a) t + s ×ˢ t := by simp [SProd.sprod, product]
 
 @[simp]
@@ -288,17 +282,8 @@ theorem coe_sigma (l₁ : List α) (l₂ : ∀ a, List (σ a)) :
   simp
 
 @[simp]
-theorem zero_sigma : @Multiset.sigma α σ 0 t = 0 :=
-  rfl
-
-@[simp]
 theorem cons_sigma : (a ::ₘ s).sigma t = (t a).map (Sigma.mk a) + s.sigma t := by
   simp [Multiset.sigma]
-
-@[simp]
-theorem sigma_singleton (b : α → β) :
-    (({a} : Multiset α).sigma fun a => ({b a} : Multiset β)) = {⟨a, b a⟩} :=
-  rfl
 
 @[simp]
 theorem add_sigma (s t : Multiset α) (u : ∀ a, Multiset (σ a)) :

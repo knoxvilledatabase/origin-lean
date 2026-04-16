@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Submonoid.MulOpposite
 import Mathlib.Algebra.Ring.Subsemiring.Basic
 import Mathlib.Algebra.Ring.Opposite
 
+noncomputable section
+
 /-!
 
 # Subsemiring of opposite semirings
@@ -27,9 +29,6 @@ protected def op (S : Subsemiring R) : Subsemiring Rᵐᵒᵖ where
 
 attribute [norm_cast] coe_op
 
-@[simp]
-theorem mem_op {x : Rᵐᵒᵖ} {S : Subsemiring R} : x ∈ S.op ↔ x.unop ∈ S := Iff.rfl
-
 @[simps! coe toSubmonoid]
 protected def unop (S : Subsemiring Rᵐᵒᵖ) : Subsemiring R where
   toSubmonoid := S.toSubmonoid.unop
@@ -38,9 +37,6 @@ protected def unop (S : Subsemiring Rᵐᵒᵖ) : Subsemiring R where
   zero_mem' := zero_mem S
 
 attribute [norm_cast] coe_unop
-
-@[simp]
-theorem mem_unop {x : R} {S : Subsemiring Rᵐᵒᵖ} : x ∈ S.unop ↔ MulOpposite.op x ∈ S := Iff.rfl
 
 @[simp]
 theorem unop_op (S : Subsemiring R) : S.op.unop = S := rfl
@@ -111,10 +107,6 @@ theorem op_sup (S₁ S₂ : Subsemiring R) : (S₁ ⊔ S₂).op = S₁.op ⊔ S�
 theorem unop_sup (S₁ S₂ : Subsemiring Rᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
   opEquiv.symm.map_sup _ _
 
-theorem op_inf (S₁ S₂ : Subsemiring R) : (S₁ ⊓ S₂).op = S₁.op ⊓ S₂.op := rfl
-
-theorem unop_inf (S₁ S₂ : Subsemiring Rᵐᵒᵖ) : (S₁ ⊓ S₂).unop = S₁.unop ⊓ S₂.unop := rfl
-
 theorem op_sSup (S : Set (Subsemiring R)) : (sSup S).op = sSup (.unop ⁻¹' S) :=
   opEquiv.map_sSup_eq_sSup_symm_preimage _
 
@@ -145,20 +137,5 @@ theorem op_closure (s : Set R) : (closure s).op = closure (MulOpposite.unop ⁻�
 theorem unop_closure (s : Set Rᵐᵒᵖ) : (closure s).unop = closure (MulOpposite.op ⁻¹' s) := by
   rw [← op_inj, op_unop, op_closure]
   simp_rw [Set.preimage_preimage, MulOpposite.op_unop, Set.preimage_id']
-
-@[simps!]
-def addEquivOp (S : Subsemiring R) : S ≃+ S.op where
-  toEquiv := S.toSubmonoid.equivOp
-  map_add' _ _ := rfl
-
-@[simps!]
-def ringEquivOpMop (S : Subsemiring R) : S ≃+* (S.op)ᵐᵒᵖ where
-  __ := S.addEquivOp.trans MulOpposite.opAddEquiv
-  map_mul' _ _ := rfl
-
-@[simps!]
-def mopRingEquivOp (S : Subsemiring R) : Sᵐᵒᵖ ≃+* S.op where
-  __ := MulOpposite.opAddEquiv.symm.trans S.addEquivOp
-  map_mul' _ _ := rfl
 
 end Subsemiring

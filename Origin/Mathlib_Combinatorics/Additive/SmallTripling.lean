@@ -12,6 +12,8 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity.Finset
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # Small tripling implies small powers
 

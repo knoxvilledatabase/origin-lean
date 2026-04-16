@@ -9,6 +9,8 @@ import Mathlib.Algebra.Homology.HomotopyCategory.Shift
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 import Mathlib.Algebra.Homology.QuasiIso
 
+noncomputable section
+
 /-! # Compatibilities of the homology functor with the shift
 
 This files studies how homology of cochain complexes behaves with respect to
@@ -137,10 +139,6 @@ instance : (HomologicalComplex.quasiIso C (ComplexShape.up ℤ)).IsCompatibleWit
   condition n := by ext; apply quasiIso_shift_iff
 
 variable (C) in
-
-lemma homologyFunctor_shift (n : ℤ) :
-    (homologyFunctor C (ComplexShape.up ℤ) 0).shift n =
-      homologyFunctor C (ComplexShape.up ℤ) n := rfl
 
 @[reassoc]
 lemma liftCycles_shift_homologyπ

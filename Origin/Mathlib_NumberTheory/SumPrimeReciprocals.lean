@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.SmoothNumbers
 import Mathlib.Analysis.PSeries
 
+noncomputable section
+
 /-!
 # The sum of the reciprocals of the primes diverges
 

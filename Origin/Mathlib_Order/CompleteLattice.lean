@@ -12,6 +12,8 @@ import Mathlib.Order.Bounds.Basic
 import Mathlib.Order.Hom.Set
 import Mathlib.Order.SetNotation
 
+noncomputable section
+
 /-!
 # Theory of complete lattices
 
@@ -267,38 +269,6 @@ open OrderDual
 section
 
 section OrderDual
-
-@[simp]
-theorem toDual_sSup [SupSet α] (s : Set α) : toDual (sSup s) = sInf (ofDual ⁻¹' s) :=
-  rfl
-
-@[simp]
-theorem toDual_sInf [InfSet α] (s : Set α) : toDual (sInf s) = sSup (ofDual ⁻¹' s) :=
-  rfl
-
-@[simp]
-theorem ofDual_sSup [InfSet α] (s : Set αᵒᵈ) : ofDual (sSup s) = sInf (toDual ⁻¹' s) :=
-  rfl
-
-@[simp]
-theorem ofDual_sInf [SupSet α] (s : Set αᵒᵈ) : ofDual (sInf s) = sSup (toDual ⁻¹' s) :=
-  rfl
-
-@[simp]
-theorem toDual_iSup [SupSet α] (f : ι → α) : toDual (⨆ i, f i) = ⨅ i, toDual (f i) :=
-  rfl
-
-@[simp]
-theorem toDual_iInf [InfSet α] (f : ι → α) : toDual (⨅ i, f i) = ⨆ i, toDual (f i) :=
-  rfl
-
-@[simp]
-theorem ofDual_iSup [InfSet α] (f : ι → αᵒᵈ) : ofDual (⨆ i, f i) = ⨅ i, ofDual (f i) :=
-  rfl
-
-@[simp]
-theorem ofDual_iInf [SupSet α] (f : ι → αᵒᵈ) : ofDual (⨅ i, f i) = ⨆ i, ofDual (f i) :=
-  rfl
 
 end OrderDual
 
@@ -807,12 +777,6 @@ theorem iInf_eq_top : iInf s = ⊤ ↔ ∀ i, s i = ⊤ :=
 
 @[simp] lemma iInf_lt_top : ⨅ i, s i < ⊤ ↔ ∃ i, s i < ⊤ := by simp [lt_top_iff_ne_top]
 
-theorem iSup₂_eq_bot {f : ∀ i, κ i → α} : ⨆ (i) (j), f i j = ⊥ ↔ ∀ i j, f i j = ⊥ := by
-  simp
-
-theorem iInf₂_eq_top {f : ∀ i, κ i → α} : ⨅ (i) (j), f i j = ⊤ ↔ ∀ i j, f i j = ⊤ := by
-  simp
-
 @[simp]
 theorem iSup_pos {p : Prop} {f : p → α} (hp : p) : ⨆ h : p, f h = f hp :=
   le_antisymm (iSup_le fun _ => le_rfl) (le_iSup _ _)
@@ -1010,10 +974,6 @@ lemma biInf_ge_eq_iInf {ι : Type*} [Preorder ι] {f : ι → α} : ⨅ (i) (j �
 
 /-! ### `iSup` and `iInf` under `Prop` -/
 
-theorem iSup_false {s : False → α} : iSup s = ⊥ := by simp
-
-theorem iInf_false {s : False → α} : iInf s = ⊤ := by simp
-
 theorem iSup_true {s : True → α} : iSup s = s trivial :=
   iSup_pos trivial
 
@@ -1102,13 +1062,7 @@ theorem OrderIso.map_sInf_eq_sInf_symm_preimage [CompleteLattice β] (f : α ≃
     f (sInf s) = sInf (f.symm ⁻¹' s) := by
   rw [map_sInf, ← sInf_image, f.image_eq_preimage]
 
-theorem iSup_emptyset {f : β → α} : ⨆ x ∈ (∅ : Set β), f x = ⊥ := by simp
-
-theorem iInf_emptyset {f : β → α} : ⨅ x ∈ (∅ : Set β), f x = ⊤ := by simp
-
 theorem iSup_univ {f : β → α} : ⨆ x ∈ (univ : Set β), f x = ⨆ x, f x := by simp
-
-theorem iInf_univ {f : β → α} : ⨅ x ∈ (univ : Set β), f x = ⨅ x, f x := by simp
 
 theorem iSup_union {f : β → α} {s t : Set β} :
     ⨆ x ∈ s ∪ t, f x = (⨆ x ∈ s, f x) ⊔ ⨆ x ∈ t, f x := by
@@ -1390,14 +1344,6 @@ noncomputable instance Prop.instCompleteLinearOrder : CompleteLinearOrder Prop w
   __ := BooleanAlgebra.toBiheytingAlgebra
 
 @[simp]
-theorem sSup_Prop_eq {s : Set Prop} : sSup s = ∃ p ∈ s, p :=
-  rfl
-
-@[simp]
-theorem sInf_Prop_eq {s : Set Prop} : sInf s = ∀ p ∈ s, p :=
-  rfl
-
-@[simp]
 theorem iSup_Prop_eq {p : ι → Prop} : ⨆ i, p i = ∃ i, p i :=
   le_antisymm (fun ⟨_, ⟨i, (eq : p i = _)⟩, hq⟩ => ⟨i, eq.symm ▸ hq⟩) fun ⟨i, hi⟩ =>
     ⟨p i, ⟨i, rfl⟩, hi⟩
@@ -1503,21 +1449,9 @@ instance infSet [InfSet α] [InfSet β] : InfSet (α × β) :=
 
 variable {α β}
 
-theorem fst_sInf [InfSet α] [InfSet β] (s : Set (α × β)) : (sInf s).fst = sInf (Prod.fst '' s) :=
-  rfl
-
-theorem snd_sInf [InfSet α] [InfSet β] (s : Set (α × β)) : (sInf s).snd = sInf (Prod.snd '' s) :=
-  rfl
-
 theorem swap_sInf [InfSet α] [InfSet β] (s : Set (α × β)) : (sInf s).swap = sInf (Prod.swap '' s) :=
   Prod.ext (congr_arg sInf <| image_comp Prod.fst swap s)
     (congr_arg sInf <| image_comp Prod.snd swap s)
-
-theorem fst_sSup [SupSet α] [SupSet β] (s : Set (α × β)) : (sSup s).fst = sSup (Prod.fst '' s) :=
-  rfl
-
-theorem snd_sSup [SupSet α] [SupSet β] (s : Set (α × β)) : (sSup s).snd = sSup (Prod.snd '' s) :=
-  rfl
 
 theorem swap_sSup [SupSet α] [SupSet β] (s : Set (α × β)) : (sSup s).swap = sSup (Prod.swap '' s) :=
   Prod.ext (congr_arg sSup <| image_comp Prod.fst swap s)
@@ -1626,15 +1560,7 @@ universe v
 
 instance supSet [SupSet α] : SupSet (ULift.{v} α) where sSup s := ULift.up (sSup <| ULift.up ⁻¹' s)
 
-theorem down_sSup [SupSet α] (s : Set (ULift.{v} α)) : (sSup s).down = sSup (ULift.up ⁻¹' s) := rfl
-
-theorem up_sSup [SupSet α] (s : Set α) : up (sSup s) = sSup (ULift.down ⁻¹' s) := rfl
-
 instance infSet [InfSet α] : InfSet (ULift.{v} α) where sInf s := ULift.up (sInf <| ULift.up ⁻¹' s)
-
-theorem down_sInf [InfSet α] (s : Set (ULift.{v} α)) : (sInf s).down = sInf (ULift.up ⁻¹' s) := rfl
-
-theorem up_sInf [InfSet α] (s : Set α) : up (sInf s) = sInf (ULift.down ⁻¹' s) := rfl
 
 theorem down_iSup [SupSet α] (f : ι → ULift.{v} α) : (⨆ i, f i).down = ⨆ i, (f i).down :=
   congr_arg sSup <| (preimage_eq_iff_eq_image ULift.up_bijective).mpr <|

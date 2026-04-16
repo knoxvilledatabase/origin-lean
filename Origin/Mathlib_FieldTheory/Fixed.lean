@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Fixed.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 11
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.GroupRingAction
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Ring.Action.Invariant
 import Mathlib.FieldTheory.Normal
 import Mathlib.FieldTheory.Separable
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+
+noncomputable section
 
 /-!
 # Fixed field under a group action.
@@ -175,7 +177,9 @@ theorem eval₂' :
     Polynomial.eval₂ (Subfield.subtype <| FixedPoints.subfield G F) x (minpoly G F x) = 0 :=
   eval₂ G F x
 
--- DISSOLVED: ne_one
+theorem ne_one : minpoly G F x ≠ (1 : Polynomial (FixedPoints.subfield G F)) := fun H =>
+  have := eval₂ G F x
+  (one_ne_zero : (1 : F) ≠ 0) <| by rwa [H, Polynomial.eval₂_one] at this
 
 theorem of_eval₂ (f : Polynomial (FixedPoints.subfield G F))
     (hf : Polynomial.eval₂ (Subfield.subtype <| FixedPoints.subfield G F) x f = 0) :

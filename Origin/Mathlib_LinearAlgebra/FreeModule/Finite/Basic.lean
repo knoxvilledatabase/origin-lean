@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.Matrix.StdBasis
 import Mathlib.RingTheory.Finiteness.Cardinality
 
+noncomputable section
+
 /-!
 # Finite and free modules
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.LinearAlgebra.Determinant
 
+noncomputable section
+
 /-!
 # The determinant of a continuous linear map.
 -/

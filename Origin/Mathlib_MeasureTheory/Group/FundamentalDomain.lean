@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Group/FundamentalDomain.lean
-Genuine: 64 | Conflates: 1 | Dissolved: 3 | Infrastructure: 15
+Genuine: 67 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Action
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Group.Pointwise
+
+noncomputable section
 
 /-!
 # Fundamental domain of a group action
@@ -80,7 +82,15 @@ theorem mk' (h_meas : NullMeasurableSet s μ) (h_exists : ∀ x : α, ∃! g : G
     rw [mem_smul_set_iff_inv_smul_mem] at hxa hxb
     exact hab (inv_injective <| (h_exists x).unique hxa hxb)
 
--- DISSOLVED: mk''
+@[to_additive "For `s` to be a fundamental domain, it's enough to check
+  `MeasureTheory.AEDisjoint (g +ᵥ s) s` for `g ≠ 0`."]
+theorem mk'' (h_meas : NullMeasurableSet s μ) (h_ae_covers : ∀ᵐ x ∂μ, ∃ g : G, g • x ∈ s)
+    (h_ae_disjoint : ∀ g, g ≠ (1 : G) → AEDisjoint μ (g • s) s)
+    (h_qmp : ∀ g : G, QuasiMeasurePreserving ((g • ·) : α → α) μ μ) :
+    IsFundamentalDomain G s μ where
+  nullMeasurableSet := h_meas
+  ae_covers := h_ae_covers
+  aedisjoint := pairwise_aedisjoint_of_aedisjoint_forall_ne_one h_ae_disjoint h_qmp
 
 @[to_additive
   "If a measurable space has a finite measure `μ` and a countable additive group `G` acts
@@ -110,7 +120,14 @@ theorem iUnion_smul_ae_eq (h : IsFundamentalDomain G s μ) : ⋃ g : G, g • s 
   eventuallyEq_univ.2 <| h.ae_covers.mono fun _ ⟨g, hg⟩ =>
     mem_iUnion.2 ⟨g⁻¹, _, hg, inv_smul_smul _ _⟩
 
--- DISSOLVED: measure_ne_zero
+@[to_additive]
+theorem measure_ne_zero [Countable G] [SMulInvariantMeasure G α μ]
+    (hμ : μ ≠ 0) (h : IsFundamentalDomain G s μ) : μ s ≠ 0 := by
+  have hc := measure_univ_pos.mpr hμ
+  contrapose! hc
+  rw [← measure_congr h.iUnion_smul_ae_eq]
+  refine le_trans (measure_iUnion_le _) ?_
+  simp_rw [measure_smul, hc, tsum_zero, le_refl]
 
 @[to_additive]
 theorem mono (h : IsFundamentalDomain G s μ) {ν : Measure α} (hle : ν ≪ μ) :
@@ -405,7 +422,19 @@ theorem measure_le_of_pairwise_disjoint (hs : IsFundamentalDomain G s μ)
       (ht.smul _).inter hs.nullMeasurableSet
     _ ≤ μ s := measure_mono (iUnion_subset fun _ => inter_subset_right)
 
--- DISSOLVED: exists_ne_one_smul_eq
+@[to_additive "If the additive action of a countable group `G` admits an invariant measure `μ` with
+  a fundamental domain `s`, then every null-measurable set `t` of measure strictly greater than
+  `μ s` contains two points `x y` such that `g +ᵥ x = y` for some `g ≠ 0`."]
+theorem exists_ne_one_smul_eq (hs : IsFundamentalDomain G s μ) (htm : NullMeasurableSet t μ)
+    (ht : μ s < μ t) : ∃ x ∈ t, ∃ y ∈ t, ∃ g, g ≠ (1 : G) ∧ g • x = y := by
+  contrapose! ht
+  refine hs.measure_le_of_pairwise_disjoint htm (Pairwise.aedisjoint fun g₁ g₂ hne => ?_)
+  dsimp [Function.onFun]
+  refine (Disjoint.inf_left _ ?_).inf_right _
+  rw [Set.disjoint_left]
+  rintro _ ⟨x, hx, rfl⟩ ⟨y, hy, hxy : g₂ • y = g₁ • x⟩
+  refine ht x hx y hy (g₂⁻¹ * g₁) (mt inv_mul_eq_one.1 hne.symm) ?_
+  rw [mul_smul, ← hxy, inv_smul_smul]
 
 @[to_additive "If `f` is invariant under the action of a countable additive group `G`, and `μ` is a
   `G`-invariant measure with a fundamental domain `s`, then the `essSup` of `f` restricted to `s`

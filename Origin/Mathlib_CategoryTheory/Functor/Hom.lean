@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Products.Basic
 import Mathlib.CategoryTheory.Types
 
+noncomputable section
+
 /-!
 The hom functor, sending `(X, Y)` to the type `X ⟶ Y`.
 -/

@@ -5,6 +5,8 @@ Genuine: 57 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Order.Filter.Basic
 
+noncomputable section
+
 /-!
 # Convergence in terms of filters
 
@@ -25,10 +27,6 @@ namespace Filter
 
 theorem tendsto_def {f : α → β} {l₁ : Filter α} {l₂ : Filter β} :
     Tendsto f l₁ l₂ ↔ ∀ s ∈ l₂, f ⁻¹' s ∈ l₁ :=
-  Iff.rfl
-
-theorem tendsto_iff_eventually {f : α → β} {l₁ : Filter α} {l₂ : Filter β} :
-    Tendsto f l₁ l₂ ↔ ∀ ⦃p : β → Prop⦄, (∀ᶠ y in l₂, p y) → ∀ᶠ x in l₁, p (f x) :=
   Iff.rfl
 
 theorem tendsto_iff_forall_eventually_mem {f : α → β} {l₁ : Filter α} {l₂ : Filter β} :
@@ -104,9 +102,6 @@ theorem tendsto_congr {f₁ f₂ : α → β} {l₁ : Filter α} {l₂ : Filter 
 theorem Tendsto.congr {f₁ f₂ : α → β} {l₁ : Filter α} {l₂ : Filter β} (h : ∀ x, f₁ x = f₂ x) :
     Tendsto f₁ l₁ l₂ → Tendsto f₂ l₁ l₂ :=
   (tendsto_congr h).1
-
-theorem tendsto_id' {x y : Filter α} : Tendsto id x y ↔ x ≤ y :=
-  Iff.rfl
 
 theorem tendsto_id {x : Filter α} : Tendsto id x x :=
   le_refl x
@@ -237,13 +232,6 @@ theorem tendsto_pure_pure (f : α → β) (a : α) : Tendsto f (pure a) (pure (f
 
 theorem tendsto_const_pure {a : Filter α} {b : β} : Tendsto (fun _ => b) a (pure b) :=
   tendsto_pure.2 <| univ_mem' fun _ => rfl
-
-theorem pure_le_iff {a : α} {l : Filter α} : pure a ≤ l ↔ ∀ s ∈ l, a ∈ s :=
-  Iff.rfl
-
-theorem tendsto_pure_left {f : α → β} {a : α} {l : Filter β} :
-    Tendsto f (pure a) l ↔ ∀ s ∈ l, f a ∈ s :=
-  Iff.rfl
 
 @[simp]
 theorem map_inf_principal_preimage {f : α → β} {s : Set β} {l : Filter α} :

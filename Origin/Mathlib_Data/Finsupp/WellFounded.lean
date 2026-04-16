@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.DFinsupp.WellFounded
 import Mathlib.Data.Finsupp.Lex
 
+noncomputable section
+
 /-!
 # Well-foundedness of the lexicographic and product orders on `Finsupp`
 

@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
+noncomputable section
+
 /-!
 # Simultaneous eigenvectors and eigenvalues for families of endomorphisms
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Basic
 import Mathlib.Algebra.Order.Monoid.Unbundled.OrderDual
 import Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE
 
+noncomputable section
+
 /-!
 # Lemmas about densely linearly ordered groups.
 -/

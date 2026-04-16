@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Polynomial/Monic.lean
-Genuine: 57 | Conflates: 5 | Dissolved: 11 | Infrastructure: 1
+Genuine: 68 | Conflates: 5 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.Algebra.Polynomial.Reverse
 import Mathlib.Algebra.Regular.SMul
+
+noncomputable section
 
 /-!
 # Theory of monic polynomials
@@ -49,7 +51,11 @@ theorem Monic.as_sum (hp : p.Monic) :
   suffices C (p.coeff p.natDegree) = 1 by rw [this, one_mul]
   exact congr_arg C hp
 
--- DISSOLVED: ne_zero_of_ne_zero_of_monic
+theorem ne_zero_of_ne_zero_of_monic (hp : p ≠ 0) (hq : Monic q) : q ≠ 0 := by
+  rintro rfl
+  rw [Monic.def, leadingCoeff_zero] at hq
+  rw [← mul_one p, ← C_1, ← hq, C_0, mul_zero] at hp
+  exact hp rfl
 
 theorem Monic.map [Semiring S] (f : R →+* S) (hp : Monic p) : Monic (p.map f) := by
   unfold Monic
@@ -86,7 +92,9 @@ theorem monic_X_pow_add {n : ℕ} (H : degree p < n) : Monic (X ^ n + p) :=
 
 variable (a) in
 
--- DISSOLVED: monic_X_pow_add_C
+theorem monic_X_pow_add_C {n : ℕ} (h : n ≠ 0) : (X ^ n + C a).Monic :=
+   monic_X_pow_add <| (lt_of_le_of_lt degree_C_le
+     (by simp only [Nat.cast_pos, Nat.pos_iff_ne_zero, ne_eq, h, not_false_eq_true]))
 
 theorem monic_X_add_C (x : R) : Monic (X + C x) :=
   pow_one (X : R[X]) ▸ monic_X_pow_add_C x one_ne_zero
@@ -125,7 +133,12 @@ theorem Monic.of_mul_monic_right (hq : q.Monic) (hpq : (p * q).Monic) : p.Monic 
 
 namespace Monic
 
--- DISSOLVED: comp
+lemma comp (hp : p.Monic) (hq : q.Monic) (h : q.natDegree ≠ 0) : (p.comp q).Monic := by
+  nontriviality R
+  have : (p.comp q).natDegree = p.natDegree * q.natDegree :=
+    natDegree_comp_eq_of_mul_ne_zero <| by simp [hp.leadingCoeff, hq.leadingCoeff]
+  rw [Monic.def, Polynomial.leadingCoeff, this, coeff_comp_degree_mul_degree h, hp.leadingCoeff,
+    hq.leadingCoeff, one_pow, mul_one]
 
 lemma comp_X_add_C (hp : p.Monic) (r : R) : (p.comp (X + C r)).Monic := by
   nontriviality R
@@ -162,7 +175,10 @@ theorem degree_mul_comm (hp : p.Monic) (q : R[X]) : (p * q).degree = (q * p).deg
   · exact add_comm _ _
   · rwa [hp.leadingCoeff, one_mul, leadingCoeff_ne_zero]
 
--- DISSOLVED: natDegree_mul'
+nonrec theorem natDegree_mul' (hp : p.Monic) (hq : q ≠ 0) :
+    (p * q).natDegree = p.natDegree + q.natDegree := by
+  rw [natDegree_mul']
+  simpa [hp.leadingCoeff, leadingCoeff_ne_zero]
 
 theorem natDegree_mul_comm (hp : p.Monic) (q : R[X]) : (p * q).natDegree = (q * p).natDegree := by
   by_cases h : q = 0
@@ -170,9 +186,14 @@ theorem natDegree_mul_comm (hp : p.Monic) (q : R[X]) : (p * q).natDegree = (q * 
   rw [hp.natDegree_mul' h, Polynomial.natDegree_mul', add_comm]
   simpa [hp.leadingCoeff, leadingCoeff_ne_zero]
 
--- DISSOLVED: not_dvd_of_natDegree_lt
+theorem not_dvd_of_natDegree_lt (hp : Monic p) (h0 : q ≠ 0) (hl : natDegree q < natDegree p) :
+    ¬p ∣ q := by
+  rintro ⟨r, rfl⟩
+  rw [hp.natDegree_mul' <| right_ne_zero_of_mul h0] at hl
+  exact hl.not_le (Nat.le_add_right _ _)
 
--- DISSOLVED: not_dvd_of_degree_lt
+theorem not_dvd_of_degree_lt (hp : Monic p) (h0 : q ≠ 0) (hl : degree q < degree p) : ¬p ∣ q :=
+  Monic.not_dvd_of_natDegree_lt hp h0 <| natDegree_lt_natDegree h0 hl
 
 theorem nextCoeff_mul (hp : Monic p) (hq : Monic q) :
     nextCoeff (p * q) = nextCoeff p + nextCoeff q := by
@@ -408,7 +429,9 @@ theorem monic_X_sub_C (x : R) : Monic (X - C x) := by
 theorem monic_X_pow_sub {n : ℕ} (H : degree p < n) : Monic (X ^ n - p) := by
   simpa [sub_eq_add_neg] using monic_X_pow_add (show degree (-p) < n by rwa [← degree_neg p] at H)
 
--- DISSOLVED: monic_X_pow_sub_C
+theorem monic_X_pow_sub_C {R : Type u} [Ring R] (a : R) {n : ℕ} (h : n ≠ 0) :
+    (X ^ n - C a).Monic := by
+  simpa only [map_neg, ← sub_eq_add_neg] using monic_X_pow_add_C (-a) h
 
 -- CONFLATES (assumes ground = zero): not_isUnit_X_pow_sub_one
 theorem not_isUnit_X_pow_sub_one (R : Type*) [CommRing R] [Nontrivial R] (n : ℕ) :
@@ -452,9 +475,24 @@ section NotZeroDivisor
 
 variable [Semiring R] {p : R[X]}
 
--- DISSOLVED: Monic.mul_left_ne_zero
+theorem Monic.mul_left_ne_zero (hp : Monic p) {q : R[X]} (hq : q ≠ 0) : q * p ≠ 0 := by
+  by_cases h : p = 1
+  · simpa [h]
+  rw [Ne, ← degree_eq_bot, hp.degree_mul, WithBot.add_eq_bot, not_or, degree_eq_bot]
+  refine ⟨hq, ?_⟩
+  rw [← hp.degree_le_zero_iff_eq_one, not_le] at h
+  refine (lt_trans ?_ h).ne'
+  simp
 
--- DISSOLVED: Monic.mul_right_ne_zero
+theorem Monic.mul_right_ne_zero (hp : Monic p) {q : R[X]} (hq : q ≠ 0) : p * q ≠ 0 := by
+  by_cases h : p = 1
+  · simpa [h]
+  rw [Ne, ← degree_eq_bot, hp.degree_mul_comm, hp.degree_mul, WithBot.add_eq_bot, not_or,
+    degree_eq_bot]
+  refine ⟨hq, ?_⟩
+  rw [← hp.degree_le_zero_iff_eq_one, not_le] at h
+  refine (lt_trans ?_ h).ne'
+  simp
 
 theorem Monic.mul_natDegree_lt_iff (h : Monic p) {q : R[X]} :
     (p * q).natDegree < p.natDegree ↔ p ≠ 1 ∧ q = 0 := by
@@ -513,9 +551,32 @@ theorem monic_of_isUnit_leadingCoeff_inv_smul (h : IsUnit p.leadingCoeff) :
   simp only [← hk, smul_eq_mul, ← Units.val_mul, Units.val_eq_one, inv_mul_eq_iff_eq_mul]
   simp [Units.ext_iff, IsUnit.unit_spec]
 
--- DISSOLVED: isUnit_leadingCoeff_mul_right_eq_zero_iff
+theorem isUnit_leadingCoeff_mul_right_eq_zero_iff (h : IsUnit p.leadingCoeff) {q : R[X]} :
+    p * q = 0 ↔ q = 0 := by
+  constructor
+  · intro hp
+    rw [← smul_eq_zero_iff_eq h.unit⁻¹] at hp
+    have : h.unit⁻¹ • (p * q) = h.unit⁻¹ • p * q := by
+      ext
+      simp only [Units.smul_def, coeff_smul, coeff_mul, smul_eq_mul, mul_sum]
+      refine sum_congr rfl fun x _ => ?_
+      rw [← mul_assoc]
+    rwa [this, Monic.mul_right_eq_zero_iff] at hp
+    exact monic_of_isUnit_leadingCoeff_inv_smul _
+  · rintro rfl
+    simp
 
--- DISSOLVED: isUnit_leadingCoeff_mul_left_eq_zero_iff
+theorem isUnit_leadingCoeff_mul_left_eq_zero_iff (h : IsUnit p.leadingCoeff) {q : R[X]} :
+    q * p = 0 ↔ q = 0 := by
+  constructor
+  · intro hp
+    replace hp := congr_arg (· * C ↑h.unit⁻¹) hp
+    simp only [zero_mul] at hp
+    rwa [mul_assoc, Monic.mul_left_eq_zero_iff] at hp
+    refine monic_mul_C_of_leadingCoeff_mul_eq_one ?_
+    simp [Units.mul_inv_eq_iff_eq_mul, IsUnit.unit_spec]
+  · rintro rfl
+    rw [zero_mul]
 
 end NotZeroDivisor
 

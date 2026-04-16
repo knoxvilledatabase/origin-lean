@@ -7,6 +7,8 @@ import Mathlib.Topology.Perfect
 import Mathlib.Topology.MetricSpace.Polish
 import Mathlib.Topology.MetricSpace.CantorScheme
 
+noncomputable section
+
 /-!
 # Perfect Sets
 

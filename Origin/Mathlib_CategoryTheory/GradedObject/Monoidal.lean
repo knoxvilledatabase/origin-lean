@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/GradedObject/Monoidal.lean
-Genuine: 48 | Conflates: 0 | Dissolved: 1 | Infrastructure: 9
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Unitor
 import Mathlib.Data.Fintype.Prod
+
+noncomputable section
 
 /-!
 # The monoidal category structures on graded objects
@@ -444,7 +446,9 @@ noncomputable def tensorUnit : GradedObject I C := (single₀ I).obj (𝟙_ C)
 noncomputable def tensorUnit₀ : (tensorUnit : GradedObject I C) 0 ≅ 𝟙_ C :=
   singleObjApplyIso (0 : I) (𝟙_ C)
 
--- DISSOLVED: isInitialTensorUnitApply
+noncomputable def isInitialTensorUnitApply (i : I) (hi : i ≠ 0) :
+    IsInitial ((tensorUnit : GradedObject I C) i) :=
+  isInitialSingleObjApply _ _ _ hi
 
 end TensorUnit
 
@@ -464,10 +468,6 @@ instance : HasMap (((mapBifunctor (curriedTensor C) I I).obj
 noncomputable def leftUnitor : tensorObj tensorUnit X ≅ X :=
     mapBifunctorLeftUnitor (curriedTensor C) (𝟙_ C)
       (leftUnitorNatIso C) (fun (⟨i₁, i₂⟩ : I × I) => i₁ + i₂) zero_add X
-
-lemma leftUnitor_inv_apply (i : I) :
-    (leftUnitor X).inv i = (λ_ (X i)).inv ≫ tensorUnit₀.inv ▷ (X i) ≫
-      ιTensorObj tensorUnit X 0 i i (zero_add i) := rfl
 
 variable {X X'}
 
@@ -496,10 +496,6 @@ instance : HasMap (((mapBifunctor (curriedTensor C) I I).obj X).obj
 noncomputable def rightUnitor : tensorObj X tensorUnit ≅ X :=
     mapBifunctorRightUnitor (curriedTensor C) (𝟙_ C)
       (rightUnitorNatIso C) (fun (⟨i₁, i₂⟩ : I × I) => i₁ + i₂) add_zero X
-
-lemma rightUnitor_inv_apply (i : I) :
-    (rightUnitor X).inv i = (ρ_ (X i)).inv ≫ (X i) ◁ tensorUnit₀.inv ≫
-      ιTensorObj X tensorUnit i 0 i (add_zero i) := rfl
 
 variable {X X'}
 

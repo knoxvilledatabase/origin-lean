@@ -5,6 +5,8 @@ Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 import Origin.Core
 import Mathlib.Algebra.Module.Pi
 
+noncomputable section
+
 /-!
 # Matrices
 
@@ -65,20 +67,8 @@ end Ext
 def of : (m → n → α) ≃ Matrix m n α :=
   Equiv.refl _
 
-@[simp]
-theorem of_apply (f : m → n → α) (i j) : of f i j = f i j :=
-  rfl
-
-@[simp]
-theorem of_symm_apply (f : Matrix m n α) (i j) : of.symm f i j = f i j :=
-  rfl
-
 def map (M : Matrix m n α) (f : α → β) : Matrix m n β :=
   of fun i j => f (M i j)
-
-@[simp]
-theorem map_apply {M : Matrix m n α} {f : α → β} {i : m} {j : n} : M.map f i j = f (M i j) :=
-  rfl
 
 @[simp]
 theorem map_id (M : Matrix m n α) : M.map id = M := by
@@ -100,10 +90,6 @@ theorem map_injective {f : α → β} (hf : Function.Injective f) :
 
 def transpose (M : Matrix m n α) : Matrix n m α :=
   of fun x y => M y x
-
-@[simp]
-theorem transpose_apply (M : Matrix m n α) (i j) : transpose M i j = M j i :=
-  rfl
 
 scoped postfix:1024 "ᵀ" => Matrix.transpose
 
@@ -179,48 +165,9 @@ instance module [Semiring R] [AddCommMonoid α] [Module R α] : Module R (Matrix
 
 section
 
-@[simp, nolint simpNF]
-theorem zero_apply [Zero α] (i : m) (j : n) : (0 : Matrix m n α) i j = 0 := rfl
-
-@[simp]
-theorem add_apply [Add α] (A B : Matrix m n α) (i : m) (j : n) :
-    (A + B) i j = (A i j) + (B i j) := rfl
-
-@[simp]
-theorem smul_apply [SMul β α] (r : β) (A : Matrix m n α) (i : m) (j : n) :
-    (r • A) i j = r • (A i j) := rfl
-
-@[simp]
-theorem sub_apply [Sub α] (A B : Matrix m n α) (i : m) (j : n) :
-    (A - B) i j = (A i j) - (B i j) := rfl
-
-@[simp]
-theorem neg_apply [Neg α] (A : Matrix m n α) (i : m) (j : n) :
-    (-A) i j = -(A i j) := rfl
-
 end
 
 /-! simp-normal form pulls `of` to the outside. -/
-
-@[simp]
-theorem of_zero [Zero α] : of (0 : m → n → α) = 0 :=
-  rfl
-
-@[simp]
-theorem of_add_of [Add α] (f g : m → n → α) : of f + of g = of (f + g) :=
-  rfl
-
-@[simp]
-theorem of_sub_of [Sub α] (f g : m → n → α) : of f - of g = of (f - g) :=
-  rfl
-
-@[simp]
-theorem neg_of [Neg α] (f : m → n → α) : -of f = of (-f) :=
-  rfl
-
-@[simp]
-theorem smul_of [SMul R α] (r : R) (f : m → n → α) : r • of f = of (r • f) :=
-  rfl
 
 @[simp]
 protected theorem map_zero [Zero α] [Zero β] (f : α → β) (h : f 0 = 0) :
@@ -267,16 +214,6 @@ instance subsingleton_of_empty_right [IsEmpty n] : Subsingleton (Matrix m n α) 
     ext i j
     exact isEmptyElim j⟩
 
-def ofAddEquiv [Add α] : (m → n → α) ≃+ Matrix m n α where
-  __ := of
-  map_add' _ _ := rfl
-
-@[simp] lemma coe_ofAddEquiv [Add α] :
-    ⇑(ofAddEquiv : (m → n → α) ≃+ Matrix m n α) = of := rfl
-
-@[simp] lemma coe_ofAddEquiv_symm [Add α] :
-    ⇑(ofAddEquiv.symm : Matrix m n α ≃+ (m → n → α)) = of.symm := rfl
-
 end Matrix
 
 open Matrix
@@ -296,9 +233,6 @@ theorem transpose_injective : Function.Injective (transpose : Matrix m n α → 
   fun _ _ h => ext fun i j => ext_iff.2 h j i
 
 @[simp] theorem transpose_inj {A B : Matrix m n α} : Aᵀ = Bᵀ ↔ A = B := transpose_injective.eq_iff
-
-@[simp]
-theorem transpose_zero [Zero α] : (0 : Matrix m n α)ᵀ = 0 := rfl
 
 @[simp]
 theorem transpose_eq_zero [Zero α] {M : Matrix m n α} : Mᵀ = 0 ↔ M = 0 := transpose_inj
@@ -333,11 +267,6 @@ def submatrix (A : Matrix m n α) (r_reindex : l → m) (c_reindex : o → n) : 
   of fun i j => A (r_reindex i) (c_reindex j)
 
 @[simp]
-theorem submatrix_apply (A : Matrix m n α) (r_reindex : l → m) (c_reindex : o → n) (i j) :
-    A.submatrix r_reindex c_reindex i j = A (r_reindex i) (c_reindex j) :=
-  rfl
-
-@[simp]
 theorem submatrix_id_id (A : Matrix m n α) : A.submatrix id id = A :=
   ext fun _ _ => rfl
 
@@ -352,59 +281,20 @@ theorem transpose_submatrix (A : Matrix m n α) (r_reindex : l → m) (c_reindex
     (A.submatrix r_reindex c_reindex)ᵀ = Aᵀ.submatrix c_reindex r_reindex :=
   ext fun _ _ => rfl
 
-theorem submatrix_add [Add α] (A B : Matrix m n α) :
-    ((A + B).submatrix : (l → m) → (o → n) → Matrix l o α) = A.submatrix + B.submatrix :=
-  rfl
-
-theorem submatrix_neg [Neg α] (A : Matrix m n α) :
-    ((-A).submatrix : (l → m) → (o → n) → Matrix l o α) = -A.submatrix :=
-  rfl
-
-theorem submatrix_sub [Sub α] (A B : Matrix m n α) :
-    ((A - B).submatrix : (l → m) → (o → n) → Matrix l o α) = A.submatrix - B.submatrix :=
-  rfl
-
-@[simp]
-theorem submatrix_zero [Zero α] :
-    ((0 : Matrix m n α).submatrix : (l → m) → (o → n) → Matrix l o α) = 0 :=
-  rfl
-
-theorem submatrix_smul {R : Type*} [SMul R α] (r : R) (A : Matrix m n α) :
-    ((r • A : Matrix m n α).submatrix : (l → m) → (o → n) → Matrix l o α) = r • A.submatrix :=
-  rfl
-
-theorem submatrix_map (f : α → β) (e₁ : l → m) (e₂ : o → n) (A : Matrix m n α) :
-    (A.map f).submatrix e₁ e₂ = (A.submatrix e₁ e₂).map f :=
-  rfl
-
 def reindex (eₘ : m ≃ l) (eₙ : n ≃ o) : Matrix m n α ≃ Matrix l o α where
   toFun M := M.submatrix eₘ.symm eₙ.symm
   invFun M := M.submatrix eₘ eₙ
   left_inv M := by simp
   right_inv M := by simp
 
-@[simp]
-theorem reindex_apply (eₘ : m ≃ l) (eₙ : n ≃ o) (M : Matrix m n α) :
-    reindex eₘ eₙ M = M.submatrix eₘ.symm eₙ.symm :=
-  rfl
-
 theorem reindex_refl_refl (A : Matrix m n α) : reindex (Equiv.refl _) (Equiv.refl _) A = A :=
   A.submatrix_id_id
-
-@[simp]
-theorem reindex_symm (eₘ : m ≃ l) (eₙ : n ≃ o) :
-    (reindex eₘ eₙ).symm = (reindex eₘ.symm eₙ.symm : Matrix l o α ≃ _) :=
-  rfl
 
 @[simp]
 theorem reindex_trans {l₂ o₂ : Type*} (eₘ : m ≃ l) (eₙ : n ≃ o) (eₘ₂ : l ≃ l₂) (eₙ₂ : o ≃ o₂) :
     (reindex eₘ eₙ).trans (reindex eₘ₂ eₙ₂) =
       (reindex (eₘ.trans eₘ₂) (eₙ.trans eₙ₂) : Matrix m n α ≃ _) :=
   Equiv.ext fun A => (A.submatrix_submatrix eₘ.symm eₙ.symm eₘ₂.symm eₙ₂.symm : _)
-
-theorem transpose_reindex (eₘ : m ≃ l) (eₙ : n ≃ o) (M : Matrix m n α) :
-    (reindex eₘ eₙ M)ᵀ = reindex eₙ eₘ Mᵀ :=
-  rfl
 
 abbrev subLeft {m l r : Nat} (A : Matrix (Fin m) (Fin (l + r)) α) : Matrix (Fin m) (Fin l) α :=
   submatrix A id (Fin.castAdd r)

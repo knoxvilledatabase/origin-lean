@@ -7,6 +7,8 @@ import Mathlib.Analysis.BoxIntegral.Basic
 import Mathlib.Analysis.BoxIntegral.Partition.Additive
 import Mathlib.Analysis.Calculus.FDeriv.Prod
 
+noncomputable section
+
 /-!
 # Divergence integral for Henstock-Kurzweil integral
 

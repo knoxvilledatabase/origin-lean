@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Star
 import Mathlib.Algebra.Star.StarAlgHom
 import Mathlib.Topology.ContinuousMap.Algebra
 
+noncomputable section
+
 /-!
 # Star structures on continuous maps.
 
@@ -38,14 +40,6 @@ section Star
 variable [Star β] [ContinuousStar β]
 
 instance : Star C(α, β) where star f := starContinuousMap.comp f
-
-@[simp]
-theorem coe_star (f : C(α, β)) : ⇑(star f) = star (⇑f) :=
-  rfl
-
-@[simp]
-theorem star_apply (f : C(α, β)) (x : α) : star f x = star (f x) :=
-  rfl
 
 instance instTrivialStar [TrivialStar β] : TrivialStar C(α, β) where
   star_trivial _ := ext fun _ => star_trivial _
@@ -128,13 +122,6 @@ def compStarAlgHom (φ : A →⋆ₐ[𝕜] B) (hφ : Continuous φ) :
   map_add' f g := ext fun x => map_add φ (f x) (g x)
   commutes' r := ext fun _x => AlgHomClass.commutes φ r
   map_star' f := ext fun x => map_star φ (f x)
-
-lemma compStarAlgHom_id : compStarAlgHom X (.id 𝕜 A) continuous_id = .id 𝕜 C(X, A) := rfl
-
-lemma compStarAlgHom_comp (φ : A →⋆ₐ[𝕜] B) (ψ : B →⋆ₐ[𝕜] C) (hφ : Continuous φ)
-    (hψ : Continuous ψ) : compStarAlgHom X (ψ.comp φ) (hψ.comp hφ) =
-      (compStarAlgHom X ψ hψ).comp (compStarAlgHom X φ hφ) :=
-  rfl
 
 end Postcomposition
 

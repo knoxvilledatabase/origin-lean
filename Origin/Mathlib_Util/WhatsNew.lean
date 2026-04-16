@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 Defines a command wrapper that prints the changes the command makes to the
 environment.
@@ -108,17 +110,11 @@ def whatsNew (old new : Environment) : CoreM MessageData := do
   pure <| MessageData.joinSep diffs.toList "\n\n"
 
 elab "whatsnew " "in" ppLine cmd:command : command => do
-
   let oldEnv ← getEnv
-
   try
-
     elabCommand cmd
-
   finally
-
     let newEnv ← getEnv
-
     logInfo (← liftCoreM <| whatsNew oldEnv newEnv)
 
 end Mathlib.WhatsNew

@@ -8,6 +8,8 @@ import Mathlib.AlgebraicTopology.FundamentalGroupoid.Basic
 import Mathlib.Topology.Category.TopCat.Limits.Products
 import Mathlib.Topology.Homotopy.Product
 
+noncomputable section
+
 /-!
 # Fundamental groupoid preserves products
 In this file, we give the following definitions/theorems:
@@ -38,11 +40,6 @@ variable {I : Type u} (X : I → TopCat.{u})
 
 def proj (i : I) : πₓ (TopCat.of (∀ i, X i)) ⥤ πₓ (X i) :=
   πₘ ⟨_, continuous_apply i⟩
-
-@[simp]
-theorem proj_map (i : I) (x₀ x₁ : πₓ (TopCat.of (∀ i, X i))) (p : x₀ ⟶ x₁) :
-    (proj X i).map p = @Path.Homotopic.proj _ _ _ _ _ i p :=
-  rfl
 
 @[simps]
 def piToPiTop : (∀ i, πₓ (X i)) ⥤ πₓ (TopCat.of (∀ i, X i)) where
@@ -140,11 +137,6 @@ def prodToProdTop : πₓ A × πₓ B ⥤ πₓ (TopCat.of (A × B)) where
     match x, y, z, f, g with
     | (_, _), (_, _), (_, _), (f₀, f₁), (g₀, g₁) =>
       (Path.Homotopic.comp_prod_eq_prod_comp f₀ f₁ g₀ g₁).symm
-
-theorem prodToProdTop_map {x₀ x₁ : πₓ A} {y₀ y₁ : πₓ B} (p₀ : x₀ ⟶ x₁) (p₁ : y₀ ⟶ y₁) :
-    (prodToProdTop A B).map (X := (x₀, y₀)) (Y := (x₁, y₁)) (p₀, p₁) =
-      Path.Homotopic.prod p₀ p₁ :=
-  rfl
 
 @[simps]
 def prodIso : CategoryTheory.Grpd.of (πₓ A × πₓ B) ≅ πₓ (TopCat.of (A × B)) where

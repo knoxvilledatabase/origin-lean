@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/Cyclotomic/Basic.lean
-Genuine: 33 | Conflates: 1 | Dissolved: 3 | Infrastructure: 22
+Genuine: 34 | Conflates: 1 | Dissolved: 1 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.FieldTheory.Galois.Basic
+
+noncomputable section
 
 /-!
 # Cyclotomic extensions
@@ -245,7 +247,6 @@ theorem singleton_one_of_algebraMap_bijective (h : Function.Surjective (algebraM
 variable (A B)
 
 protected
-
 theorem equiv {C : Type*} [CommRing C] [Algebra A C] [h : IsCyclotomicExtension S A B]
     (f : B ≃ₐ[A] C) : IsCyclotomicExtension S A C := by
   letI : Algebra B C := f.toAlgHom.toRingHom.toAlgebra
@@ -254,10 +255,9 @@ theorem equiv {C : Type*} [CommRing C] [Algebra A C] [h : IsCyclotomicExtension 
   exact (iff_union_singleton_one _ _ _).2 (trans S {1} A B C f.injective)
 
 protected
-
--- DISSOLVED: neZero
-
-protected
+theorem neZero [h : IsCyclotomicExtension {n} A B] [IsDomain B] : NeZero ((n : ℕ) : B) := by
+  obtain ⟨⟨r, hr⟩, -⟩ := (iff_singleton n A B).1 h
+  exact hr.neZero'
 
 -- DISSOLVED: neZero'
 
@@ -426,7 +426,6 @@ def algEquiv (L' : Type*) [Field L'] [Algebra K L'] [IsCyclotomicExtension {n} K
 scoped[Cyclotomic] attribute [instance] IsCyclotomicExtension.isSplittingField_X_pow_sub_one
 
 include n in
-
 theorem isGalois : IsGalois K L :=
   letI := isSplittingField_X_pow_sub_one n K L
   IsGalois.of_separable_splitting_field (X_pow_sub_one_separable_iff.2
@@ -660,7 +659,13 @@ section IsAlgClosed
 
 variable [IsAlgClosed K]
 
--- DISSOLVED: IsAlgClosed.isCyclotomicExtension
+theorem IsAlgClosed.isCyclotomicExtension (h : ∀ a ∈ S, NeZero ((a : ℕ) : K)) :
+    IsCyclotomicExtension S K K := by
+  refine ⟨@fun a ha => ?_, Algebra.eq_top_iff.mp <| Subsingleton.elim _ _⟩
+  obtain ⟨r, hr⟩ := IsAlgClosed.exists_aeval_eq_zero K _ (degree_cyclotomic_pos a K a.pos).ne'
+  refine ⟨r, ?_⟩
+  haveI := h a ha
+  rwa [coe_aeval_eq_eval, ← IsRoot.def, isRoot_cyclotomic_iff] at hr
 
 instance IsAlgClosedOfCharZero.isCyclotomicExtension [CharZero K] :
     ∀ S, IsCyclotomicExtension S K K := fun S =>

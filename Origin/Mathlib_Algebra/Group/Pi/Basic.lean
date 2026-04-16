@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/Pi/Basic.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 2 | Infrastructure: 51
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 51
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Data.Sum.Basic
 import Mathlib.Logic.Unique
 import Mathlib.Tactic.Spread
+
+noncomputable section
 
 /-!
 # Instances and theorems on pi types
@@ -47,36 +49,11 @@ theorem one_apply [∀ i, One <| f i] : (1 : ∀ i, f i) i = 1 :=
   rfl
 
 @[to_additive]
-theorem one_def [∀ i, One <| f i] : (1 : ∀ i, f i) = fun _ => 1 :=
-  rfl
-
-@[to_additive (attr := simp)] lemma _root_.Function.const_one [One β] : const α (1 : β) = 1 := rfl
-
-@[to_additive (attr := simp)]
-theorem one_comp [One γ] (x : α → β) : (1 : β → γ) ∘ x = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem comp_one [One β] (x : β → γ) : x ∘ (1 : α → β) = const α (x 1) :=
-  rfl
-
-@[to_additive]
 instance instMul [∀ i, Mul <| f i] : Mul (∀ i : I, f i) :=
   ⟨fun f g i => f i * g i⟩
 
 @[to_additive (attr := simp)]
 theorem mul_apply [∀ i, Mul <| f i] : (x * y) i = x i * y i :=
-  rfl
-
-@[to_additive]
-theorem mul_def [∀ i, Mul <| f i] : x * y = fun i => x i * y i :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma _root_.Function.const_mul [Mul β] (a b : β) : const α a * const α b = const α (a * b) := rfl
-
-@[to_additive]
-theorem mul_comp [Mul γ] (x y : β → γ) (z : α → β) : (x * y) ∘ z = x ∘ z * y ∘ z :=
   rfl
 
 @[to_additive]
@@ -111,34 +88,8 @@ theorem inv_apply [∀ i, Inv <| f i] : x⁻¹ i = (x i)⁻¹ :=
   rfl
 
 @[to_additive]
-theorem inv_def [∀ i, Inv <| f i] : x⁻¹ = fun i => (x i)⁻¹ :=
-  rfl
-
-@[to_additive]
-lemma _root_.Function.const_inv [Inv β] (a : β) : (const α a)⁻¹ = const α a⁻¹ := rfl
-
-@[to_additive]
-theorem inv_comp [Inv γ] (x : β → γ) (y : α → β) : x⁻¹ ∘ y = (x ∘ y)⁻¹ :=
-  rfl
-
-@[to_additive]
 instance instDiv [∀ i, Div <| f i] : Div (∀ i : I, f i) :=
   ⟨fun f g i => f i / g i⟩
-
-@[to_additive (attr := simp)]
-theorem div_apply [∀ i, Div <| f i] : (x / y) i = x i / y i :=
-  rfl
-
-@[to_additive]
-theorem div_def [∀ i, Div <| f i] : x / y = fun i => x i / y i :=
-  rfl
-
-@[to_additive]
-theorem div_comp [Div γ] (x y : β → γ) (z : α → β) : (x / y) ∘ z = x ∘ z / y ∘ z :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma _root_.Function.const_div [Div β] (a b : β) : const α a / const α b = const α (a / b) := rfl
 
 @[to_additive]
 instance semigroup [∀ i, Semigroup (f i)] : Semigroup (∀ i, f i) where
@@ -317,12 +268,6 @@ end
 protected def prod (f' : ∀ i, f i) (g' : ∀ i, g i) (i : I) : f i × g i :=
   (f' i, g' i)
 
-theorem prod_fst_snd : Pi.prod (Prod.fst : α × β → α) (Prod.snd : α × β → β) = id :=
-  rfl
-
-theorem prod_snd_fst : Pi.prod (Prod.snd : α × β → β) (Prod.fst : α × β → α) = Prod.swap :=
-  rfl
-
 end Pi
 
 namespace Function
@@ -365,7 +310,10 @@ lemma comp_eq_one_iff [One β] [One γ] (f : α → β) {g : β → γ} (hg : In
     g ∘ f = 1 ↔ f = 1 := by
   simpa [hg0, const_one] using comp_eq_const_iff 1 f hg
 
--- DISSOLVED: comp_ne_one_iff
+@[to_additive]
+lemma comp_ne_one_iff [One β] [One γ] (f : α → β) {g : β → γ} (hg : Injective g) (hg0 : g 1 = 1) :
+    g ∘ f ≠ 1 ↔ f ≠ 1 :=
+  (comp_eq_one_iff f hg hg0).ne
 
 end Function
 
@@ -383,7 +331,9 @@ namespace Sum
 
 variable (a a' : α → γ) (b b' : β → γ)
 
--- DISSOLVED: elim_one_one
+@[to_additive (attr := simp)]
+theorem elim_one_one [One γ] : Sum.elim (1 : α → γ) (1 : β → γ) = 1 :=
+  Sum.elim_const_const 1
 
 @[to_additive (attr := simp)]
 theorem elim_mulSingle_one [DecidableEq α] [DecidableEq β] [One γ] (i : α) (c : γ) :

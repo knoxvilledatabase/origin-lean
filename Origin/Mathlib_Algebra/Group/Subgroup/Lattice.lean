@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Group/Subgroup/Lattice.lean
-Genuine: 54 | Conflates: 2 | Dissolved: 4 | Infrastructure: 18
+Genuine: 56 | Conflates: 4 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.Algebra.Group.Subgroup.Defs
+
+noncomputable section
 
 /-!
 # Lattice structure of subgroups
@@ -114,21 +116,9 @@ theorem mem_top (x : G) : x ∈ (⊤ : Subgroup G) :=
 theorem coe_top : ((⊤ : Subgroup G) : Set G) = Set.univ :=
   rfl
 
-@[to_additive (attr := simp)]
-theorem coe_bot : ((⊥ : Subgroup G) : Set G) = {1} :=
-  rfl
-
 @[to_additive]
 instance : Unique (⊥ : Subgroup G) :=
   ⟨⟨1⟩, fun g => Subtype.ext g.2⟩
-
-@[to_additive (attr := simp)]
-theorem top_toSubmonoid : (⊤ : Subgroup G).toSubmonoid = ⊤ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem bot_toSubmonoid : (⊥ : Subgroup G).toSubmonoid = ⊥ :=
-  rfl
 
 @[to_additive]
 theorem eq_bot_iff_forall : H = ⊥ ↔ ∀ x ∈ H, x = (1 : G) :=
@@ -153,9 +143,17 @@ theorem coe_eq_singleton {H : Subgroup G} : (∃ g : G, (H : Set G) = {g}) ↔ H
     H.eq_bot_of_subsingleton,
     fun h => ⟨1, SetLike.ext'_iff.mp h⟩⟩
 
--- DISSOLVED: nontrivial_iff_exists_ne_one
+-- CONFLATES (assumes ground = zero): nontrivial_iff_exists_ne_one
+@[to_additive]
+theorem nontrivial_iff_exists_ne_one (H : Subgroup G) : Nontrivial H ↔ ∃ x ∈ H, x ≠ (1 : G) := by
+  rw [Subtype.nontrivial_iff_exists_ne (fun x => x ∈ H) (1 : H)]
+  simp
 
--- DISSOLVED: exists_ne_one_of_nontrivial
+-- CONFLATES (assumes ground = zero): exists_ne_one_of_nontrivial
+@[to_additive]
+theorem exists_ne_one_of_nontrivial (H : Subgroup G) [Nontrivial H] :
+    ∃ x ∈ H, x ≠ 1 := by
+  rwa [← Subgroup.nontrivial_iff_exists_ne_one]
 
 -- CONFLATES (assumes ground = zero): nontrivial_iff_ne_bot
 @[to_additive]
@@ -169,19 +167,21 @@ theorem bot_or_nontrivial (H : Subgroup G) : H = ⊥ ∨ Nontrivial H := by
   have := nontrivial_iff_ne_bot H
   tauto
 
--- DISSOLVED: bot_or_exists_ne_one
+@[to_additive "A subgroup is either the trivial subgroup or contains a nonzero element."]
+theorem bot_or_exists_ne_one (H : Subgroup G) : H = ⊥ ∨ ∃ x ∈ H, x ≠ (1 : G) := by
+  convert H.bot_or_nontrivial
+  rw [nontrivial_iff_exists_ne_one]
 
--- DISSOLVED: ne_bot_iff_exists_ne_one
+@[to_additive]
+lemma ne_bot_iff_exists_ne_one {H : Subgroup G} : H ≠ ⊥ ↔ ∃ a : ↥H, a ≠ 1 := by
+  rw [← nontrivial_iff_ne_bot, nontrivial_iff_exists_ne_one]
+  simp only [ne_eq, Subtype.exists, mk_eq_one, exists_prop]
 
 @[to_additive "The inf of two `AddSubgroup`s is their intersection."]
 instance : Min (Subgroup G) :=
   ⟨fun H₁ H₂ =>
     { H₁.toSubmonoid ⊓ H₂.toSubmonoid with
       inv_mem' := fun ⟨hx, hx'⟩ => ⟨H₁.inv_mem hx, H₂.inv_mem hx'⟩ }⟩
-
-@[to_additive (attr := simp)]
-theorem coe_inf (p p' : Subgroup G) : ((p ⊓ p' : Subgroup G) : Set G) = (p : Set G) ∩ p' :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem mem_inf {p p' : Subgroup G} {x : G} : x ∈ p ⊓ p' ↔ x ∈ p ∧ x ∈ p' :=

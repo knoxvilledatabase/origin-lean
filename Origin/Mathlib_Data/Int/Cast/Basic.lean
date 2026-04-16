@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Int.Cast.Defs
 import Mathlib.Algebra.Group.Basic
 
+noncomputable section
+
 /-!
 # Cast of integers (additional theorems)
 

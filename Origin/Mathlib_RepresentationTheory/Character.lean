@@ -7,6 +7,8 @@ import Mathlib.RepresentationTheory.FDRep
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.RepresentationTheory.Invariants
 
+noncomputable section
+
 /-!
 # Characters of representations
 

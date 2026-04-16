@@ -5,6 +5,8 @@ Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Algebra.Group.Semiconj.Defs
 
+noncomputable section
+
 /-!
 # Commuting pairs of elements in monoids
 
@@ -29,9 +31,6 @@ variable {G M S : Type*}
 @[to_additive "Two elements additively commute if `a + b = b + a`"]
 def Commute [Mul S] (a b : S) : Prop :=
   SemiconjBy a b b
-
-@[to_additive]
-theorem commute_iff_eq [Mul S] (a b : S) : Commute a b ↔ a * b = b * a := Iff.rfl
 
 namespace Commute
 

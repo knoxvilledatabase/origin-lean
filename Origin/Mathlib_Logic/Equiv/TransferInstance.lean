@@ -1,12 +1,14 @@
 /-
 Extracted from Logic/Equiv/TransferInstance.lean
-Genuine: 47 | Conflates: 1 | Dissolved: 2 | Infrastructure: 52
+Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 52
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Equiv
 import Mathlib.Algebra.Field.Basic
 import Mathlib.Logic.Equiv.Defs
 import Mathlib.Logic.Small.Defs
+
+noncomputable section
 
 /-!
 # Transfer algebraic structures across `Equiv`s
@@ -71,24 +73,12 @@ protected abbrev div [Div β] : Div α :=
   ⟨fun x y => e.symm (e x / e y)⟩
 
 @[to_additive]
-theorem div_def [Div β] (x y : α) :
-    letI := Equiv.div e
-    x / y = e.symm (e x / e y) :=
-  rfl
-
-@[to_additive]
 noncomputable instance [Small.{v} α] [Div α] : Div (Shrink.{v} α) :=
   (equivShrink α).symm.div
 
 @[to_additive "Transfer `Neg` across an `Equiv`"]
 protected abbrev Inv [Inv β] : Inv α :=
   ⟨fun x => e.symm (e x)⁻¹⟩
-
-@[to_additive]
-theorem inv_def [Inv β] (x : α) :
-    letI := Equiv.Inv e
-    x⁻¹ = e.symm (e x)⁻¹ :=
-  rfl
 
 @[to_additive]
 noncomputable instance [Small.{v} α] [Inv α] : Inv (Shrink.{v} α) :=
@@ -109,11 +99,6 @@ noncomputable instance [Small.{v} α] (R : Type*) [SMul R α] : SMul R (Shrink.{
 protected def pow (N : Type*) [Pow β N] : Pow α N :=
   ⟨fun x n => e.symm (e x ^ n)⟩
 
-theorem pow_def {N : Type*} [Pow β N] (n : N) (x : α) :
-    letI := e.pow N
-    x ^ n = e.symm (e x ^ n) :=
-  rfl
-
 noncomputable instance [Small.{v} α] (N : Type*) [Pow α N] : Pow (Shrink.{v} α) N :=
   (equivShrink α).symm.pow N
 
@@ -129,16 +114,6 @@ def mulEquiv (e : α ≃ β) [Mul β] :
       map_mul' := fun x y => by
         apply e.symm.injective
         simp [mul_def] }
-
-@[to_additive (attr := simp)]
-theorem mulEquiv_apply (e : α ≃ β) [Mul β] (a : α) : (mulEquiv e) a = e a :=
-  rfl
-
-@[to_additive]
-theorem mulEquiv_symm_apply (e : α ≃ β) [Mul β] (b : β) :
-    letI := Equiv.mul e
-    (mulEquiv e).symm b = e.symm b :=
-  rfl
 
 @[to_additive "Shrink `α` to a smaller universe preserves addition."]
 noncomputable def _root_.Shrink.mulEquiv [Small.{v} α] [Mul α] : Shrink.{v} α ≃* α :=
@@ -162,11 +137,6 @@ def ringEquiv (e : α ≃ β) [Add β] [Mul β] : by
 theorem ringEquiv_apply (e : α ≃ β) [Add β] [Mul β] (a : α) : (ringEquiv e) a = e a :=
   rfl
 
-theorem ringEquiv_symm_apply (e : α ≃ β) [Add β] [Mul β] (b : β) : by
-    letI := Equiv.add e
-    letI := Equiv.mul e
-    exact (ringEquiv e).symm b = e.symm b := rfl
-
 variable (α) in
 
 noncomputable def _root_.Shrink.ringEquiv [Small.{v} α] [Ring α] : Shrink.{v} α ≃+* α :=
@@ -181,7 +151,10 @@ protected abbrev semigroup [Semigroup β] : Semigroup α := by
 noncomputable instance [Small.{v} α] [Semigroup α] : Semigroup (Shrink.{v} α) :=
   (equivShrink α).symm.semigroup
 
--- DISSOLVED: semigroupWithZero
+protected abbrev semigroupWithZero [SemigroupWithZero β] : SemigroupWithZero α := by
+  let mul := e.mul
+  let zero := e.zero
+  apply e.injective.semigroupWithZero _ <;> intros <;> exact e.apply_symm_apply _
 
 @[to_additive]
 noncomputable instance [Small.{v} α] [SemigroupWithZero α] : SemigroupWithZero (Shrink.{v} α) :=
@@ -196,7 +169,10 @@ protected abbrev commSemigroup [CommSemigroup β] : CommSemigroup α := by
 noncomputable instance [Small.{v} α] [CommSemigroup α] : CommSemigroup (Shrink.{v} α) :=
   (equivShrink α).symm.commSemigroup
 
--- DISSOLVED: mulZeroClass
+protected abbrev mulZeroClass [MulZeroClass β] : MulZeroClass α := by
+  let zero := e.zero
+  let mul := e.mul
+  apply e.injective.mulZeroClass _ <;> intros <;> exact e.apply_symm_apply _
 
 noncomputable instance [Small.{v} α] [MulZeroClass α] : MulZeroClass (Shrink.{v} α) :=
   (equivShrink α).symm.mulZeroClass
@@ -416,6 +392,7 @@ noncomputable instance [Small.{v} α] [CommRing α] : CommRing (Shrink.{v} α) :
   (equivShrink α).symm.commRing
 
 include e in
+/-- Transfer `Nontrivial` across an `Equiv` -/
 
 -- CONFLATES (assumes ground = zero): nontrivial
 protected theorem nontrivial [Nontrivial β] : Nontrivial α :=
@@ -585,15 +562,6 @@ def algEquiv (e : α ≃ β) [Semiring β] [Algebra R β] : by
         apply e.symm.injective
         simp only [RingEquiv.toEquiv_eq_coe, toFun_as_coe, EquivLike.coe_coe, ringEquiv_apply,
           symm_apply_apply, algebraMap_def] }
-
-@[simp]
-theorem algEquiv_apply (e : α ≃ β) [Semiring β] [Algebra R β] (a : α) : (algEquiv R e) a = e a :=
-  rfl
-
-theorem algEquiv_symm_apply (e : α ≃ β) [Semiring β] [Algebra R β] (b : β) : by
-    letI := Equiv.semiring e
-    letI := Equiv.algebra R e
-    exact (algEquiv R e).symm b = e.symm b := rfl
 
 variable (α) in
 

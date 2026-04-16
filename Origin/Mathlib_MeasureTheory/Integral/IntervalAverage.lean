@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.MeasureTheory.Integral.Average
 
+noncomputable section
+
 /-!
 # Integral average over an interval
 

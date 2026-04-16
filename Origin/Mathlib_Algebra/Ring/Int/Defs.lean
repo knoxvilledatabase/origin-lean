@@ -7,6 +7,8 @@ import Mathlib.Algebra.CharZero.Defs
 import Mathlib.Algebra.Group.Int
 import Mathlib.Algebra.Ring.Defs
 
+noncomputable section
+
 /-!
 # The integers are a ring
 

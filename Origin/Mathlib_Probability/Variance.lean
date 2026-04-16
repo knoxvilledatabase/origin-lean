@@ -1,11 +1,13 @@
 /-
 Extracted from Probability/Variance.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Probability.Notation
 import Mathlib.Probability.Integration
 import Mathlib.MeasureTheory.Function.L2Space
+
+noncomputable section
 
 /-!
 # Variance of random variables
@@ -227,7 +229,21 @@ theorem evariance_def' [IsProbabilityMeasure μ] {X : Ω → ℝ} (hX : AEStrong
       or_iff_not_imp_left, not_and_or, zero_lt_two] at hℒ
     exact mod_cast hℒ fun _ => zero_le_two
 
--- DISSOLVED: meas_ge_le_evariance_div_sq
+theorem meas_ge_le_evariance_div_sq {X : Ω → ℝ} (hX : AEStronglyMeasurable X μ) {c : ℝ≥0}
+    (hc : c ≠ 0) : μ {ω | ↑c ≤ |X ω - μ[X]|} ≤ evariance X μ / c ^ 2 := by
+  have A : (c : ℝ≥0∞) ≠ 0 := by rwa [Ne, ENNReal.coe_eq_zero]
+  have B : AEStronglyMeasurable (fun _ : Ω => μ[X]) μ := aestronglyMeasurable_const
+  convert meas_ge_le_mul_pow_eLpNorm μ two_ne_zero ENNReal.two_ne_top (hX.sub B) A using 1
+  · congr
+    simp only [Pi.sub_apply, ENNReal.coe_le_coe, ← Real.norm_eq_abs, ← coe_nnnorm,
+      NNReal.coe_le_coe, ENNReal.ofReal_coe_nnreal]
+  · rw [eLpNorm_eq_lintegral_rpow_nnnorm two_ne_zero ENNReal.two_ne_top]
+    simp only [show ENNReal.ofNNReal (c ^ 2) = (ENNReal.ofNNReal c) ^ 2 by norm_cast,
+      ENNReal.toReal_ofNat, one_div, Pi.sub_apply]
+    rw [div_eq_mul_inv, ENNReal.inv_pow, mul_comm, ENNReal.rpow_two]
+    congr
+    simp_rw [← ENNReal.rpow_mul, inv_mul_cancel₀ (two_ne_zero : (2 : ℝ) ≠ 0), ENNReal.rpow_two,
+      ENNReal.rpow_one, evariance]
 
 theorem meas_ge_le_variance_div_sq [IsFiniteMeasure μ] {X : Ω → ℝ} (hX : Memℒp X 2 μ) {c : ℝ}
     (hc : 0 < c) : μ {ω | c ≤ |X ω - μ[X]|} ≤ ENNReal.ofReal (variance X μ / c ^ 2) := by

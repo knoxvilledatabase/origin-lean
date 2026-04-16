@@ -7,6 +7,8 @@ import Mathlib.Algebra.Exact
 import Mathlib.RingTheory.AdicCompletion.Functoriality
 import Mathlib.RingTheory.Filtration
 
+noncomputable section
+
 /-!
 # Exactness of adic completion
 
@@ -144,6 +146,7 @@ private noncomputable def mapExactAuxDelta {n : ℕ} {d : N}
 open Submodule
 
 include hfg in
+/- Inductively construct preimage of cauchy sequence in kernel of `g.adicCompletion I`. -/
 
 private noncomputable def mapExactAux :
     (n : ℕ) → { a : M | f a - x (k + n) ∈ (I ^ (k + n) • ⊤ : Submodule R N) }
@@ -175,6 +178,7 @@ private noncomputable def mapExactAux :
 end
 
 include hf hfg hg in
+/-- `AdicCompletion` over a Noetherian ring is exact on finitely generated modules. -/
 
 theorem map_exact : Function.Exact (map I f) (map I g) := by
   refine LinearMap.exact_of_comp_eq_zero_of_ker_le_range ?_ (fun y ↦ ?_)

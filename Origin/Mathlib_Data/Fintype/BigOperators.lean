@@ -10,6 +10,8 @@ import Mathlib.Data.Fintype.Prod
 import Mathlib.Data.Fintype.Vector
 import Mathlib.Algebra.BigOperators.Option
 
+noncomputable section
+
 /-!
 Results about "big operations" over a `Fintype`, and consequent
 results about cardinalities of certain types.
@@ -30,9 +32,6 @@ universe u v
 variable {α : Type*} {β : Type*} {γ : Type*}
 
 namespace Fintype
-
-@[to_additive]
-theorem prod_bool [CommMonoid α] (f : Bool → α) : ∏ b, f b = f true * f false := by simp
 
 theorem card_eq_sum_ones {α} [Fintype α] : Fintype.card α = ∑ _a : α, 1 :=
   Finset.card_eq_sum_ones _
@@ -151,10 +150,6 @@ lemma card_filter_piFinset_const (s : Finset κ) (i : ι) (j : κ) :
 end Fintype
 
 end Pi
-
-theorem Fintype.card_fun [DecidableEq α] [Fintype α] [Fintype β] :
-    Fintype.card (α → β) = Fintype.card β ^ Fintype.card α := by
-  simp
 
 @[simp]
 theorem card_vector [Fintype α] (n : ℕ) : Fintype.card (Vector α n) = Fintype.card α ^ n := by

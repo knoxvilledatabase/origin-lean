@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Polynomial/Degree/Support.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Support
 import Mathlib.Algebra.Polynomial.Degree.Operations
+
+noncomputable section
 
 /-!
 # Degree and support of univariate polynomials
@@ -99,7 +101,8 @@ theorem card_supp_le_succ_natDegree (p : R[X]) : #p.support ≤ p.natDegree + 1 
 theorem le_degree_of_mem_supp (a : ℕ) : a ∈ p.support → ↑a ≤ degree p :=
   le_degree_of_ne_zero ∘ mem_support_iff.mp
 
--- DISSOLVED: nonempty_support_iff
+theorem nonempty_support_iff : p.support.Nonempty ↔ p ≠ 0 := by
+  rw [Ne, nonempty_iff_ne_empty, Ne, ← support_eq_empty]
 
 end Semiring
 
@@ -107,9 +110,14 @@ section Semiring
 
 variable [Semiring R] {p q : R[X]} {ι : Type*}
 
--- DISSOLVED: natDegree_mem_support_of_nonzero
+theorem natDegree_mem_support_of_nonzero (H : p ≠ 0) : p.natDegree ∈ p.support := by
+  rw [mem_support_iff]
+  exact (not_congr leadingCoeff_eq_zero).mpr H
 
--- DISSOLVED: natDegree_eq_support_max'
+theorem natDegree_eq_support_max' (h : p ≠ 0) :
+    p.natDegree = p.support.max' (nonempty_support_iff.mpr h) :=
+  (le_max' _ _ <| natDegree_mem_support_of_nonzero h).antisymm <|
+    max'_le _ _ _ le_natDegree_of_mem_supp
 
 end Semiring
 

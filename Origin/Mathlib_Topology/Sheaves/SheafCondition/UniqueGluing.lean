@@ -7,6 +7,8 @@ import Mathlib.Topology.Sheaves.Forget
 import Mathlib.Topology.Sheaves.SheafCondition.PairwiseIntersections
 import Mathlib.CategoryTheory.Limits.Shapes.Types
 
+noncomputable section
+
 /-!
 # The sheaf condition in terms of unique gluings
 

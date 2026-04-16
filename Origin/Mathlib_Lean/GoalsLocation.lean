@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Meta.Tactic.Util
 import Lean.SubExpr
 
+noncomputable section
+
 /-! This file defines some functions for dealing with `SubExpr.GoalsLocation`. -/
 
 namespace Lean.SubExpr.GoalsLocation

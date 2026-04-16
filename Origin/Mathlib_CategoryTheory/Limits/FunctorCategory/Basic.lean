@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.Currying
 import Mathlib.CategoryTheory.Limits.Preserves.Limits
 
+noncomputable section
+
 /-!
 # (Co)limits in functor categories.
 

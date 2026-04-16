@@ -7,6 +7,8 @@ import Mathlib.Order.Interval.Set.OrdConnected
 import Mathlib.Order.Interval.Set.WithBotTop
 import Mathlib.Order.Antisymmetrization
 
+noncomputable section
+
 /-!
 # The covering relation
 

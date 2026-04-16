@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Typeclasses for commuting heterogeneous operations
 

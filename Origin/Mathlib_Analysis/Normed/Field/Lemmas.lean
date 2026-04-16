@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Field/Lemmas.lean
-Genuine: 11 | Conflates: 1 | Dissolved: 15 | Infrastructure: 22
+Genuine: 26 | Conflates: 1 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.AddChar
@@ -12,6 +12,8 @@ import Mathlib.Analysis.Normed.Group.Rat
 import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Topology.Instances.NNReal
 import Mathlib.Topology.MetricSpace.DilationEquiv
+
+noncomputable section
 
 /-!
 # Normed fields
@@ -34,7 +36,10 @@ section NonUnitalSeminormedRing
 
 variable [NonUnitalSeminormedRing α]
 
--- DISSOLVED: Filter.Tendsto.zero_mul_isBoundedUnder_le
+theorem Filter.Tendsto.zero_mul_isBoundedUnder_le {f g : ι → α} {l : Filter ι}
+    (hf : Tendsto f l (𝓝 0)) (hg : IsBoundedUnder (· ≤ ·) l ((‖·‖) ∘ g)) :
+    Tendsto (fun x => f x * g x) l (𝓝 0) :=
+  hf.op_zero_isBoundedUnder_le hg (· * ·) norm_mul_le
 
 theorem Filter.isBoundedUnder_le_mul_tendsto_zero {f g : ι → α} {l : Filter ι}
     (hf : IsBoundedUnder (· ≤ ·) l (norm ∘ f)) (hg : Tendsto g l (𝓝 0)) :
@@ -185,27 +190,54 @@ section NormedDivisionRing
 
 variable [NormedDivisionRing α] {a : α}
 
--- DISSOLVED: antilipschitzWith_mul_left
+lemma antilipschitzWith_mul_left {a : α} (ha : a ≠ 0) : AntilipschitzWith (‖a‖₊⁻¹) (a * ·) :=
+  AntilipschitzWith.of_le_mul_dist fun _ _ ↦ by simp [dist_eq_norm, ← _root_.mul_sub, ha]
 
--- DISSOLVED: antilipschitzWith_mul_right
+lemma antilipschitzWith_mul_right {a : α} (ha : a ≠ 0) : AntilipschitzWith (‖a‖₊⁻¹) (· * a) :=
+  AntilipschitzWith.of_le_mul_dist fun _ _ ↦ by
+    simp [dist_eq_norm, ← _root_.sub_mul, ← mul_comm (‖a‖), ha]
 
--- DISSOLVED: DilationEquiv.mulLeft
+@[simps!]
+def DilationEquiv.mulLeft (a : α) (ha : a ≠ 0) : α ≃ᵈ α where
+  toEquiv := Equiv.mulLeft₀ a ha
+  edist_eq' := ⟨‖a‖₊, nnnorm_ne_zero_iff.2 ha, fun x y ↦ by
+    simp [edist_nndist, nndist_eq_nnnorm, ← mul_sub]⟩
 
--- DISSOLVED: DilationEquiv.mulRight
+@[simps!]
+def DilationEquiv.mulRight (a : α) (ha : a ≠ 0) : α ≃ᵈ α where
+  toEquiv := Equiv.mulRight₀ a ha
+  edist_eq' := ⟨‖a‖₊, nnnorm_ne_zero_iff.2 ha, fun x y ↦ by
+    simp [edist_nndist, nndist_eq_nnnorm, ← sub_mul, ← mul_comm (‖a‖₊)]⟩
 
 namespace Filter
 
--- DISSOLVED: comap_mul_left_cobounded
+@[simp]
+lemma comap_mul_left_cobounded {a : α} (ha : a ≠ 0) :
+    comap (a * ·) (cobounded α) = cobounded α :=
+  Dilation.comap_cobounded (DilationEquiv.mulLeft a ha)
 
--- DISSOLVED: map_mul_left_cobounded
+@[simp]
+lemma map_mul_left_cobounded {a : α} (ha : a ≠ 0) :
+    map (a * ·) (cobounded α) = cobounded α :=
+  DilationEquiv.map_cobounded (DilationEquiv.mulLeft a ha)
 
--- DISSOLVED: comap_mul_right_cobounded
+@[simp]
+lemma comap_mul_right_cobounded {a : α} (ha : a ≠ 0) :
+    comap (· * a) (cobounded α) = cobounded α :=
+  Dilation.comap_cobounded (DilationEquiv.mulRight a ha)
 
--- DISSOLVED: map_mul_right_cobounded
+@[simp]
+lemma map_mul_right_cobounded {a : α} (ha : a ≠ 0) :
+    map (· * a) (cobounded α) = cobounded α :=
+  DilationEquiv.map_cobounded (DilationEquiv.mulRight a ha)
 
--- DISSOLVED: tendsto_mul_left_cobounded
+theorem tendsto_mul_left_cobounded {a : α} (ha : a ≠ 0) :
+    Tendsto (a * ·) (cobounded α) (cobounded α) :=
+  (map_mul_left_cobounded ha).le
 
--- DISSOLVED: tendsto_mul_right_cobounded
+theorem tendsto_mul_right_cobounded {a : α} (ha : a ≠ 0) :
+    Tendsto (· * a) (cobounded α) (cobounded α) :=
+  (map_mul_right_cobounded ha).le
 
 @[simp]
 lemma inv_cobounded₀ : (cobounded α)⁻¹ = 𝓝[≠] 0 := by
@@ -213,7 +245,9 @@ lemma inv_cobounded₀ : (cobounded α)⁻¹ = 𝓝[≠] 0 := by
     ← inv_atTop₀, ← Filter.comap_inv]
   simp only [comap_comap, Function.comp_def, norm_inv]
 
--- DISSOLVED: inv_nhdsWithin_ne_zero
+@[simp]
+lemma inv_nhdsWithin_ne_zero : (𝓝[≠] (0 : α))⁻¹ = cobounded α := by
+  rw [← inv_cobounded₀, inv_inv]
 
 lemma tendsto_inv₀_cobounded' : Tendsto Inv.inv (cobounded α) (𝓝[≠] 0) :=
   inv_cobounded₀.le
@@ -221,7 +255,8 @@ lemma tendsto_inv₀_cobounded' : Tendsto Inv.inv (cobounded α) (𝓝[≠] 0) :
 theorem tendsto_inv₀_cobounded : Tendsto Inv.inv (cobounded α) (𝓝 0) :=
   tendsto_inv₀_cobounded'.mono_right inf_le_left
 
--- DISSOLVED: tendsto_inv₀_nhdsWithin_ne_zero
+lemma tendsto_inv₀_nhdsWithin_ne_zero : Tendsto Inv.inv (𝓝[≠] 0) (cobounded α) :=
+  inv_nhdsWithin_ne_zero.le
 
 end Filter
 
@@ -308,9 +343,17 @@ section NontriviallyNormedField
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {n : ℤ} {x : 𝕜}
 
--- DISSOLVED: continuousAt_zpow
+@[simp]
+protected lemma continuousAt_zpow : ContinuousAt (fun x ↦ x ^ n) x ↔ x ≠ 0 ∨ 0 ≤ n := by
+  refine ⟨?_, continuousAt_zpow₀ _ _⟩
+  contrapose!
+  rintro ⟨rfl, hm⟩ hc
+  exact not_tendsto_atTop_of_tendsto_nhds (hc.tendsto.mono_left nhdsWithin_le_nhds).norm
+    (tendsto_norm_zpow_nhdsWithin_0_atTop hm)
 
--- DISSOLVED: continuousAt_inv
+@[simp]
+protected lemma continuousAt_inv : ContinuousAt Inv.inv x ↔ x ≠ 0 := by
+  simpa using NormedField.continuousAt_zpow (n := -1) (x := x)
 
 end NontriviallyNormedField
 

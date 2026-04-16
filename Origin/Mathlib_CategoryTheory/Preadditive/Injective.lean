@@ -5,6 +5,8 @@ Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.Projective
 
+noncomputable section
+
 /-!
 # Injective objects and categories with enough injectives
 

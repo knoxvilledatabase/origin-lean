@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.Algebra.Ring.Int.Units
 
+noncomputable section
+
 /-!
 # Associated elements and the integers
 

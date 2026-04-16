@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Preadditive.Opposite
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.Category.Grp.Preadditive
 
+noncomputable section
+
 /-!
 # The Yoneda embedding for preadditive categories
 

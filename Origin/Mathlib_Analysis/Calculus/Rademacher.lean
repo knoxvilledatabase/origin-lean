@@ -11,6 +11,8 @@ import Mathlib.MeasureTheory.Group.Integral
 import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 import Mathlib.MeasureTheory.Measure.Haar.Disintegration
 
+noncomputable section
+
 /-!
 # Rademacher's theorem: a Lipschitz function is differentiable almost everywhere
 
@@ -365,6 +367,8 @@ theorem ae_differentiableAt_norm :
     ∀ᵐ x ∂μ, DifferentiableAt ℝ (‖·‖) x := lipschitzWith_one_norm.ae_differentiableAt
 
 omit [MeasurableSpace E] in
+/-- In a real finite-dimensional normed vector space,
+  the set of points where the norm is differentiable at is dense. -/
 
 theorem dense_differentiableAt_norm :
     Dense {x : E | DifferentiableAt ℝ (‖·‖) x} :=

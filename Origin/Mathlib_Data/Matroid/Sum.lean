@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matroid.Map
 import Mathlib.Logic.Embedding.Set
 
+noncomputable section
+
 /-!
 # Sums of matroids
 

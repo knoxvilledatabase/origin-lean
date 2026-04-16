@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
+noncomputable section
+
 /-!
 # Isometric linear maps
 
@@ -67,10 +69,6 @@ initialize_simps_projections Isometry (toFun → apply)
 theorem map_app (f : Q₁ →qᵢ Q₂) (m : M₁) : Q₂ (f m) = Q₁ m :=
   f.map_app' m
 
-@[simp]
-theorem coe_toLinearMap (f : Q₁ →qᵢ Q₂) : ⇑f.toLinearMap = f :=
-  rfl
-
 @[simps!]
 def id (Q : QuadraticMap R M N) : Q →qᵢ Q where
   __ := LinearMap.id
@@ -81,19 +79,11 @@ def ofEq {Q₁ Q₂ : QuadraticMap R M₁ N} (h : Q₁ = Q₂) : Q₁ →qᵢ Q�
   __ := LinearMap.id
   map_app' _ := h ▸ rfl
 
-@[simp]
-theorem ofEq_rfl {Q : QuadraticMap R M₁ N} : ofEq (rfl : Q = Q) = .id Q := rfl
-
 @[simps]
 def comp (g : Q₂ →qᵢ Q₃) (f : Q₁ →qᵢ Q₂) : Q₁ →qᵢ Q₃ where
   toFun x := g (f x)
   map_app' x := by rw [← f.map_app, ← g.map_app]
   __ := (g.toLinearMap : M₂ →ₗ[R] M₃) ∘ₗ (f.toLinearMap : M₁ →ₗ[R] M₂)
-
-@[simp]
-theorem toLinearMap_comp (g : Q₂ →qᵢ Q₃) (f : Q₁ →qᵢ Q₂) :
-    (g.comp f).toLinearMap = g.toLinearMap.comp f.toLinearMap :=
-  rfl
 
 @[simp]
 theorem id_comp (f : Q₁ →qᵢ Q₂) : (id Q₂).comp f = f :=

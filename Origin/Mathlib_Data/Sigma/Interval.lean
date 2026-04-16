@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Sigma.Order
 import Mathlib.Order.Interval.Finset.Defs
 
+noncomputable section
+
 /-!
 # Finite intervals in a sigma type
 

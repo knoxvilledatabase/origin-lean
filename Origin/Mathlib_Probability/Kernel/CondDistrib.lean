@@ -1,10 +1,12 @@
 /-
 Extracted from Probability/Kernel/CondDistrib.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Disintegration.Unique
 import Mathlib.Probability.Notation
+
+noncomputable section
 
 /-!
 # Regular conditional probability distribution
@@ -59,7 +61,12 @@ instance [MeasurableSpace β] : IsMarkovKernel (condDistrib Y X μ) := by
 
 variable {mβ : MeasurableSpace β} {s : Set Ω} {t : Set β} {f : β × Ω → F}
 
--- DISSOLVED: condDistrib_apply_of_ne_zero
+lemma condDistrib_apply_of_ne_zero [MeasurableSingletonClass β]
+    (hY : Measurable Y) (x : β) (hX : μ.map X {x} ≠ 0) (s : Set Ω) :
+    condDistrib Y X μ x s = (μ.map X {x})⁻¹ * μ.map (fun a => (X a, Y a)) ({x} ×ˢ s) := by
+  rw [condDistrib, Measure.condKernel_apply_of_ne_zero _ s]
+  · rw [Measure.fst_map_prod_mk hY]
+  · rwa [Measure.fst_map_prod_mk hY]
 
 section Measurability
 

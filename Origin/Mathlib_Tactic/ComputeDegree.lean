@@ -1,9 +1,11 @@
 /-
 Extracted from Tactic/ComputeDegree.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Lemmas
+
+noncomputable section
 
 /-!
 
@@ -139,9 +141,22 @@ theorem coeff_smul {n : ℕ} {a : R} {f : R[X]} : (a • f).coeff n = a * f.coef
 
 section congr_lemmas
 
--- DISSOLVED: natDegree_eq_of_le_of_coeff_ne_zero'
+theorem natDegree_eq_of_le_of_coeff_ne_zero' {deg m o : ℕ} {c : R} {p : R[X]}
+    (h_natDeg_le : natDegree p ≤ m) (coeff_eq : coeff p o = c)
+    (coeff_ne_zero : c ≠ 0) (deg_eq_deg : m = deg) (coeff_eq_deg : o = deg) :
+    natDegree p = deg := by
+  subst coeff_eq deg_eq_deg coeff_eq_deg
+  exact natDegree_eq_of_le_of_coeff_ne_zero ‹_› ‹_›
 
--- DISSOLVED: degree_eq_of_le_of_coeff_ne_zero'
+theorem degree_eq_of_le_of_coeff_ne_zero' {deg m o : WithBot ℕ} {c : R} {p : R[X]}
+    (h_deg_le : degree p ≤ m) (coeff_eq : coeff p (WithBot.unbot' 0 deg) = c)
+    (coeff_ne_zero : c ≠ 0) (deg_eq_deg : m = deg) (coeff_eq_deg : o = deg) :
+    degree p = deg := by
+  subst coeff_eq coeff_eq_deg deg_eq_deg
+  rcases eq_or_ne m ⊥ with rfl|hh
+  · exact bot_unique h_deg_le
+  · obtain ⟨m, rfl⟩ := WithBot.ne_bot_iff_exists.mp hh
+    exact degree_eq_of_le_of_coeff_ne_zero ‹_› ‹_›
 
 variable {m n : ℕ} {f : R[X]} {r : R}
 
@@ -379,11 +394,9 @@ elab_rules : tactic | `(tactic| compute_degree $[!%$bang]?) => focus <| withMain
               (m!"The given degree is '{deg}'.  However,\n" :: errors) "\n"
 
 macro (name := monicityMacro) "monicity" : tactic =>
-
   `(tactic| (apply monic_of_natDegree_le_of_coeff_eq_one <;> compute_degree))
 
 macro "monicity!" : tactic =>
-
   `(tactic| (apply monic_of_natDegree_le_of_coeff_eq_one <;> compute_degree!))
 
 end Tactic

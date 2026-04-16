@@ -9,6 +9,8 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.CategoryTheory.Preadditive.Opposite
 import Mathlib.CategoryTheory.Idempotents.FunctorCategories
 
+noncomputable section
+
 /-!
 
 # The alternating face map complex of a simplicial object in a preadditive category
@@ -112,10 +114,6 @@ def obj : ChainComplex C ℕ :=
   ChainComplex.of (fun n => X _[n]) (objD X) (d_squared X)
 
 @[simp]
-theorem obj_X (X : SimplicialObject C) (n : ℕ) : (AlternatingFaceMapComplex.obj X).X n = X _[n] :=
-  rfl
-
-@[simp]
 theorem obj_d_eq (X : SimplicialObject C) (n : ℕ) :
     (AlternatingFaceMapComplex.obj X).d (n + 1) n
       = ∑ i : Fin (n + 2), (-1 : ℤ) ^ (i : ℕ) • X.δ i := by
@@ -133,10 +131,6 @@ def map (f : X ⟶ Y) : obj X ⟶ obj Y :=
     symm
     apply f.naturality
 
-@[simp]
-theorem map_f (f : X ⟶ Y) (n : ℕ) : (map f).f n = f.app (op [n]) :=
-  rfl
-
 end AlternatingFaceMapComplex
 
 variable (C : Type*) [Category C] [Preadditive C]
@@ -146,11 +140,6 @@ def alternatingFaceMapComplex : SimplicialObject C ⥤ ChainComplex C ℕ where
   map f := AlternatingFaceMapComplex.map f
 
 variable {C}
-
-@[simp]
-theorem alternatingFaceMapComplex_obj_X (X : SimplicialObject C) (n : ℕ) :
-    ((alternatingFaceMapComplex C).obj X).X n = X _[n] :=
-  rfl
 
 @[simp]
 theorem alternatingFaceMapComplex_obj_d (X : SimplicialObject C) (n : ℕ) :
@@ -217,10 +206,6 @@ def ε [Limits.HasZeroObject C] :
 lemma ε_app_f_zero [Limits.HasZeroObject C] (X : SimplicialObject.Augmented C) :
     (ε.app X).f 0 = X.hom.app (op [0]) :=
   ChainComplex.toSingle₀Equiv_symm_apply_f_zero _ _
-
-@[simp]
-lemma ε_app_f_succ [Limits.HasZeroObject C] (X : SimplicialObject.Augmented C) (n : ℕ) :
-    (ε.app X).f (n + 1) = 0 := rfl
 
 end AlternatingFaceMapComplex
 

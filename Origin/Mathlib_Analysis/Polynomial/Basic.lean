@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Polynomial/Basic.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Analysis.Asymptotics.AsymptoticEquivalent
 import Mathlib.Analysis.Asymptotics.SpecificAsymptotics
+
+noncomputable section
 
 /-!
 # Limits related to polynomial and rational functions
@@ -28,7 +30,8 @@ namespace Polynomial
 
 variable {𝕜 : Type*} [NormedLinearOrderedField 𝕜] (P Q : 𝕜[X])
 
--- DISSOLVED: eventually_no_roots
+theorem eventually_no_roots (hP : P ≠ 0) : ∀ᶠ x in atTop, ¬P.IsRoot x :=
+  atTop_le_cofinite <| (finite_setOf_isRoot hP).compl_mem_cofinite
 
 variable [OrderTopology 𝕜]
 
@@ -129,7 +132,21 @@ theorem div_tendsto_zero_of_degree_lt (hdeg : P.degree < Q.degree) :
   refine (tendsto_zpow_atTop_zero ?_).const_mul _
   omega
 
--- DISSOLVED: div_tendsto_zero_iff_degree_lt
+theorem div_tendsto_zero_iff_degree_lt (hQ : Q ≠ 0) :
+    Tendsto (fun x => eval x P / eval x Q) atTop (𝓝 0) ↔ P.degree < Q.degree := by
+  refine ⟨fun h => ?_, div_tendsto_zero_of_degree_lt P Q⟩
+  by_cases hPQ : P.leadingCoeff / Q.leadingCoeff = 0
+  · simp only [div_eq_mul_inv, inv_eq_zero, mul_eq_zero] at hPQ
+    cases' hPQ with hP0 hQ0
+    · rw [leadingCoeff_eq_zero.1 hP0, degree_zero]
+      exact bot_lt_iff_ne_bot.2 fun hQ' => hQ (degree_eq_bot.1 hQ')
+    · exact absurd (leadingCoeff_eq_zero.1 hQ0) hQ
+  · have := (isEquivalent_atTop_div P Q).tendsto_nhds h
+    rw [tendsto_const_mul_zpow_atTop_nhds_iff hPQ] at this
+    cases' this with h h
+    · exact absurd h.2 hPQ
+    · rw [sub_lt_iff_lt_add, zero_add, Int.ofNat_lt] at h
+      exact degree_lt_degree h.1
 
 theorem div_tendsto_leadingCoeff_div_of_degree_eq (hdeg : P.degree = Q.degree) :
     Tendsto (fun x => eval x P / eval x Q) atTop (𝓝 <| P.leadingCoeff / Q.leadingCoeff) := by
@@ -149,7 +166,14 @@ theorem div_tendsto_atTop_of_degree_gt' (hdeg : Q.degree < P.degree)
   apply tendsto_zpow_atTop_atTop
   omega
 
--- DISSOLVED: div_tendsto_atTop_of_degree_gt
+theorem div_tendsto_atTop_of_degree_gt (hdeg : Q.degree < P.degree) (hQ : Q ≠ 0)
+    (hnng : 0 ≤ P.leadingCoeff / Q.leadingCoeff) :
+    Tendsto (fun x => eval x P / eval x Q) atTop atTop :=
+  have ratio_pos : 0 < P.leadingCoeff / Q.leadingCoeff :=
+    lt_of_le_of_ne hnng
+      (div_ne_zero (fun h => ne_zero_of_degree_gt hdeg <| leadingCoeff_eq_zero.mp h) fun h =>
+          hQ <| leadingCoeff_eq_zero.mp h).symm
+  div_tendsto_atTop_of_degree_gt' P Q hdeg ratio_pos
 
 theorem div_tendsto_atBot_of_degree_gt' (hdeg : Q.degree < P.degree)
     (hneg : P.leadingCoeff / Q.leadingCoeff < 0) :
@@ -163,9 +187,21 @@ theorem div_tendsto_atBot_of_degree_gt' (hdeg : Q.degree < P.degree)
   apply tendsto_zpow_atTop_atTop
   omega
 
--- DISSOLVED: div_tendsto_atBot_of_degree_gt
+theorem div_tendsto_atBot_of_degree_gt (hdeg : Q.degree < P.degree) (hQ : Q ≠ 0)
+    (hnps : P.leadingCoeff / Q.leadingCoeff ≤ 0) :
+    Tendsto (fun x => eval x P / eval x Q) atTop atBot :=
+  have ratio_neg : P.leadingCoeff / Q.leadingCoeff < 0 :=
+    lt_of_le_of_ne hnps
+      (div_ne_zero (fun h => ne_zero_of_degree_gt hdeg <| leadingCoeff_eq_zero.mp h) fun h =>
+        hQ <| leadingCoeff_eq_zero.mp h)
+  div_tendsto_atBot_of_degree_gt' P Q hdeg ratio_neg
 
--- DISSOLVED: abs_div_tendsto_atTop_of_degree_gt
+theorem abs_div_tendsto_atTop_of_degree_gt (hdeg : Q.degree < P.degree) (hQ : Q ≠ 0) :
+    Tendsto (fun x => |eval x P / eval x Q|) atTop atTop := by
+  by_cases h : 0 ≤ P.leadingCoeff / Q.leadingCoeff
+  · exact tendsto_abs_atTop_atTop.comp (P.div_tendsto_atTop_of_degree_gt Q hdeg hQ h)
+  · push_neg at h
+    exact tendsto_abs_atBot_atTop.comp (P.div_tendsto_atBot_of_degree_gt Q hdeg hQ h.le)
 
 end PolynomialDivAtTop
 

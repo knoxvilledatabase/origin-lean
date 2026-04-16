@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Polynomial/UnitTrinomial.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Mirror
 import Mathlib.Algebra.Ring.Regular
 import Mathlib.Data.Int.Order.Units
 import Mathlib.RingTheory.Coprime.Basic
+
+noncomputable section
 
 /-!
 # Unit Trinomials
@@ -57,21 +59,56 @@ theorem trinomial_trailing_coeff' (hkm : k < m) (hmn : m < n) :
   rw [trinomial_def, coeff_add, coeff_add, coeff_C_mul_X_pow, coeff_C_mul_X_pow, coeff_C_mul_X_pow,
     if_pos rfl, if_neg hkm.ne, if_neg (hkm.trans hmn).ne, add_zero, add_zero]
 
--- DISSOLVED: trinomial_natDegree
+theorem trinomial_natDegree (hkm : k < m) (hmn : m < n) (hw : w ≠ 0) :
+    (trinomial k m n u v w).natDegree = n := by
+  refine
+    natDegree_eq_of_degree_eq_some
+      ((Finset.sup_le fun i h => ?_).antisymm <|
+        le_degree_of_ne_zero <| by rwa [trinomial_leading_coeff' hkm hmn])
+  replace h := support_trinomial' k m n u v w h
+  rw [mem_insert, mem_insert, mem_singleton] at h
+  rcases h with (rfl | rfl | rfl)
+  · exact WithBot.coe_le_coe.mpr (hkm.trans hmn).le
+  · exact WithBot.coe_le_coe.mpr hmn.le
+  · exact le_rfl
 
--- DISSOLVED: trinomial_natTrailingDegree
+theorem trinomial_natTrailingDegree (hkm : k < m) (hmn : m < n) (hu : u ≠ 0) :
+    (trinomial k m n u v w).natTrailingDegree = k := by
+  refine
+    natTrailingDegree_eq_of_trailingDegree_eq_some
+      ((Finset.le_inf fun i h => ?_).antisymm <|
+          trailingDegree_le_of_ne_zero <| by rwa [trinomial_trailing_coeff' hkm hmn]).symm
+  replace h := support_trinomial' k m n u v w h
+  rw [mem_insert, mem_insert, mem_singleton] at h
+  rcases h with (rfl | rfl | rfl)
+  · exact le_rfl
+  · exact WithTop.coe_le_coe.mpr hkm.le
+  · exact WithTop.coe_le_coe.mpr (hkm.trans hmn).le
 
--- DISSOLVED: trinomial_leadingCoeff
+theorem trinomial_leadingCoeff (hkm : k < m) (hmn : m < n) (hw : w ≠ 0) :
+    (trinomial k m n u v w).leadingCoeff = w := by
+  rw [leadingCoeff, trinomial_natDegree hkm hmn hw, trinomial_leading_coeff' hkm hmn]
 
--- DISSOLVED: trinomial_trailingCoeff
+theorem trinomial_trailingCoeff (hkm : k < m) (hmn : m < n) (hu : u ≠ 0) :
+    (trinomial k m n u v w).trailingCoeff = u := by
+  rw [trailingCoeff, trinomial_natTrailingDegree hkm hmn hu, trinomial_trailing_coeff' hkm hmn]
 
 theorem trinomial_monic (hkm : k < m) (hmn : m < n) : (trinomial k m n u v 1).Monic := by
   nontriviality R
   exact trinomial_leadingCoeff hkm hmn one_ne_zero
 
--- DISSOLVED: trinomial_mirror
+theorem trinomial_mirror (hkm : k < m) (hmn : m < n) (hu : u ≠ 0) (hw : w ≠ 0) :
+    (trinomial k m n u v w).mirror = trinomial k (n - m + k) n w v u := by
+  rw [mirror, trinomial_natTrailingDegree hkm hmn hu, reverse, trinomial_natDegree hkm hmn hw,
+    trinomial_def, reflect_add, reflect_add, reflect_C_mul_X_pow, reflect_C_mul_X_pow,
+    reflect_C_mul_X_pow, revAt_le (hkm.trans hmn).le, revAt_le hmn.le, revAt_le le_rfl, add_mul,
+    add_mul, mul_assoc, mul_assoc, mul_assoc, ← pow_add, ← pow_add, ← pow_add,
+    Nat.sub_add_cancel (hkm.trans hmn).le, Nat.sub_self, zero_add, add_comm, add_comm (C u * X ^ n),
+    ← add_assoc, ← trinomial_def]
 
--- DISSOLVED: trinomial_support
+theorem trinomial_support (hkm : k < m) (hmn : m < n) (hu : u ≠ 0) (hv : v ≠ 0) (hw : w ≠ 0) :
+    (trinomial k m n u v w).support = {k, m, n} :=
+  support_trinomial hkm hmn hu hv hw
 
 end Semiring
 
@@ -95,7 +132,9 @@ theorem card_support_eq_three (hp : p.IsUnitTrinomial) : #p.support = 3 := by
   obtain ⟨k, m, n, hkm, hmn, u, v, w, rfl⟩ := hp
   exact card_support_trinomial hkm hmn u.ne_zero v.ne_zero w.ne_zero
 
--- DISSOLVED: ne_zero
+theorem ne_zero (hp : p.IsUnitTrinomial) : p ≠ 0 := by
+  rintro rfl
+  simpa using hp.card_support_eq_three
 
 theorem coeff_isUnit (hp : p.IsUnitTrinomial) {k : ℕ} (hk : k ∈ p.support) :
     IsUnit (p.coeff k) := by

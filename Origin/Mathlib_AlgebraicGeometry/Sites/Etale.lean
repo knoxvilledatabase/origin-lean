@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.Etale
 import Mathlib.AlgebraicGeometry.PullbackCarrier
 import Mathlib.AlgebraicGeometry.Sites.BigZariski
 
+noncomputable section
+
 /-!
 
 # The étale site

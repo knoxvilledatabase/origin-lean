@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Algebra/Quasispectrum.lean
-Genuine: 49 | Conflates: 4 | Dissolved: 0 | Infrastructure: 14
+Genuine: 50 | Conflates: 4 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Unitization
 import Mathlib.Algebra.Algebra.Spectrum
+
+noncomputable section
 
 /-!
 # Quasiregularity and quasispectrum
@@ -77,14 +79,8 @@ def equiv : R ≃ PreQuasiregular R where
 instance instOne : One (PreQuasiregular R) where
   one := equiv 0
 
-@[simp]
-lemma val_one : (1 : PreQuasiregular R).val = 0 := rfl
-
 instance instMul : Mul (PreQuasiregular R) where
   mul x y := .mk (y.val + x.val + x.val * y.val)
-
-@[simp]
-lemma val_mul (x y : PreQuasiregular R) : (x * y).val = y.val + x.val + x.val * y.val := rfl
 
 instance instMonoid : Monoid (PreQuasiregular R) where
   one := equiv 0
@@ -403,7 +399,6 @@ theorem quasispectrum.algebraMap_mem_iff (S : Type*) {R A : Type*} [Semifield R]
   simp_rw [Unitization.quasispectrum_eq_spectrum_inr' _ S a, spectrum.algebraMap_mem_iff]
 
 protected alias ⟨quasispectrum.of_algebraMap_mem, quasispectrum.algebraMap_mem⟩ :=
-
   quasispectrum.algebraMap_mem_iff
 
 @[simp]

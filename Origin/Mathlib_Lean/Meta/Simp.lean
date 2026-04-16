@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.Tactic.Simp
 
+noncomputable section
+
 /-!
 # Helper functions for using the simplifier.
 

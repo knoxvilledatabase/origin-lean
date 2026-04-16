@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.LocallyConstant.Basic
 import Mathlib.Logic.Function.FiberPartition
 
+noncomputable section
+
 /-!
 
 This file provides some API surrounding `Function.Fiber` (see

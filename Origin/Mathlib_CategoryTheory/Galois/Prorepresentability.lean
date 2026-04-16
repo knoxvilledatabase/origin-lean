@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Galois.Decomposition
 import Mathlib.CategoryTheory.Limits.IndYoneda
 import Mathlib.CategoryTheory.Limits.Preserves.Ulift
 
+noncomputable section
+
 /-!
 # Pro-Representability of fiber functors
 
@@ -107,15 +109,6 @@ variable {F}
 lemma hom_ext {A B : PointedGaloisObject F} {f g : A ⟶ B} (h : f.val = g.val) : f = g :=
   Hom.ext h
 
-@[simp]
-lemma id_val (A : PointedGaloisObject F) : 𝟙 A = 𝟙 A.obj :=
-  rfl
-
-@[simp, reassoc]
-lemma comp_val {A B C : PointedGaloisObject F} (f : A ⟶ B) (g : B ⟶ C) :
-    (f ≫ g).val = f.val ≫ g.val :=
-  rfl
-
 variable (F)
 
 def incl : PointedGaloisObject F ⥤ C where
@@ -124,10 +117,6 @@ def incl : PointedGaloisObject F ⥤ C where
 
 @[simp]
 lemma incl_obj (A : PointedGaloisObject F) : (incl F).obj A = A :=
-  rfl
-
-@[simp]
-lemma incl_map {A B : PointedGaloisObject F} (f : A ⟶ B) : (incl F).map f = f.val :=
   rfl
 
 end General
@@ -311,10 +300,6 @@ noncomputable def autIsoFibers :
       dsimp
       erw [evaluationEquivOfIsGalois_apply, evaluationEquivOfIsGalois_apply]
       simp [-Hom.comp, ← f.comp])
-
-lemma autIsoFibers_inv_app (A : PointedGaloisObject F) (b : F.obj A) :
-    (autIsoFibers F).inv.app A b = (evaluationEquivOfIsGalois F A A.pt).symm b :=
-  rfl
 
 noncomputable def endEquivAutGalois : End F ≃ AutGalois F :=
   let e1 := endEquivSectionsFibers F

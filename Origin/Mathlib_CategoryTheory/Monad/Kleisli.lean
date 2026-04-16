@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.Monad.Basic
 
+noncomputable section
+
 /-! # Kleisli category on a (co)monad
 
 This file defines the Kleisli category on a monad `(T, η_ T, μ_ T)` as well as the co-Kleisli

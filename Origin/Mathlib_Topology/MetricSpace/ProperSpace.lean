@@ -9,6 +9,8 @@ import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 import Mathlib.Topology.MetricSpace.Pseudo.Pi
 import Mathlib.Topology.Order.IsLUB
 
+noncomputable section
+
 /-! ## Proper spaces
 
 ## Main definitions and results

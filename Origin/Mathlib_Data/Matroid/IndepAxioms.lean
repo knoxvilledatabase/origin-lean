@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 import Origin.Core
 import Mathlib.Data.Matroid.Basic
 
+noncomputable section
+
 /-!
 # Matroid Independence and Basis axioms
 
@@ -126,9 +128,6 @@ namespace IndepMatroid
     exact ssubset_insert hf.2
   maximality := M.indep_maximal
   subset_ground B hB := M.subset_ground B hB.1
-
-@[simp] theorem matroid_indep_iff {M : IndepMatroid α} {I : Set α} :
-    M.matroid.Indep I ↔ M.Indep I := Iff.rfl
 
 @[simps E] protected def ofFinitary (E : Set α) (Indep : Set α → Prop)
     (indep_empty : Indep ∅)
@@ -268,10 +267,6 @@ theorem _root_.Matroid.existsMaximalSubsetProperty_of_bdd {P : Set α → Prop}
   indep_maximal X _ := Matroid.existsMaximalSubsetProperty_of_bdd indep_bdd X
   subset_ground := subset_ground
 
-@[simp] theorem ofBdd_indep (E : Set α) Indep indep_empty indep_subset indep_aug
-    subset_ground h_bdd : (IndepMatroid.ofBdd
-      E Indep indep_empty indep_subset indep_aug subset_ground h_bdd).Indep = Indep := rfl
-
 instance (E : Set α) (Indep : Set α → Prop) indep_empty indep_subset indep_aug subset_ground h_bdd :
     FiniteRk (IndepMatroid.ofBdd
       E Indep indep_empty indep_subset indep_aug subset_ground h_bdd).matroid := by
@@ -306,14 +301,6 @@ protected def ofBddAugment (E : Set α) (Indep : Set α → Prop)
       exact hBmax.not_prop_of_ssuperset (ssubset_insert hyB) hi)
     (indep_bdd := indep_bdd) (subset_ground := subset_ground)
 
-@[simp] theorem ofBddAugment_E (E : Set α) Indep indep_empty indep_subset indep_aug
-    indep_bdd subset_ground : (IndepMatroid.ofBddAugment
-      E Indep indep_empty indep_subset indep_aug indep_bdd subset_ground).E = E := rfl
-
-@[simp] theorem ofBddAugment_indep (E : Set α) Indep indep_empty indep_subset indep_aug
-    indep_bdd subset_ground : (IndepMatroid.ofBddAugment
-      E Indep indep_empty indep_subset indep_aug indep_bdd subset_ground).Indep = Indep := rfl
-
 instance ofBddAugment_finiteRk (E : Set α) Indep indep_empty indep_subset indep_aug
     indep_bdd subset_ground : FiniteRk (IndepMatroid.ofBddAugment
       E Indep indep_empty indep_subset indep_aug indep_bdd subset_ground).matroid := by
@@ -336,14 +323,6 @@ protected def ofFinite {E : Set α} (hE : E.Finite) (Indep : Set α → Prop)
       rw [hE.cast_ncard_eq]
       exact encard_le_card <| subset_ground hI ⟩)
     (subset_ground := subset_ground)
-
-@[simp] theorem ofFinite_E {E : Set α} hE Indep indep_empty indep_subset indep_aug subset_ground :
-    (IndepMatroid.ofFinite
-      (hE : E.Finite) Indep indep_empty indep_subset indep_aug subset_ground).E = E := rfl
-
-@[simp] theorem ofFinite_indep {E : Set α} hE Indep indep_empty indep_subset indep_aug
-    subset_ground : (IndepMatroid.ofFinite
-      (hE : E.Finite) Indep indep_empty indep_subset indep_aug subset_ground).Indep = Indep := rfl
 
 instance ofFinite_finite {E : Set α} hE Indep indep_empty indep_subset indep_aug subset_ground :
     (IndepMatroid.ofFinite
@@ -369,10 +348,6 @@ protected def ofFinset [DecidableEq α] (E : Set α) (Indep : Finset α → Prop
       exact ⟨e, heJ, heI, fun K hK ↦ indep_subset hi <| Finset.coe_subset.1 (by simpa)⟩ )
     (indep_compact := fun _ h J hJ ↦ h _ hJ J.finite_toSet _ Subset.rfl )
     (subset_ground := fun I hI x hxI ↦ by simpa using subset_ground <| hI {x} (by simpa) )
-
-@[simp] theorem ofFinset_E [DecidableEq α] (E : Set α) Indep indep_empty indep_subset indep_aug
-    subset_ground : (IndepMatroid.ofFinset
-      E Indep indep_empty indep_subset indep_aug subset_ground).E = E := rfl
 
 @[simp] theorem ofFinset_indep [DecidableEq α] (E : Set α) Indep indep_empty indep_subset indep_aug
     subset_ground {I : Finset α} : (IndepMatroid.ofFinset
@@ -432,10 +407,6 @@ namespace Matroid
     exact encard_mono hYB')
   (subset_ground := subset_ground)
 
-@[simp] theorem ofExistsFiniteBase_base (E : Set α) Base exists_finite_base
-    base_exchange subset_ground : (Matroid.ofExistsFiniteBase
-      E Base exists_finite_base base_exchange subset_ground).Base = Base := rfl
-
 instance ofExistsFiniteBase_finiteRk (E : Set α) Base exists_finite_base
     base_exchange subset_ground : FiniteRk (Matroid.ofExistsFiniteBase
       E Base exists_finite_base base_exchange subset_ground) := by
@@ -451,14 +422,6 @@ protected def ofBaseOfFinite {E : Set α} (hE : E.Finite) (Base : Set α → Pro
       ⟨B, hB, hE.subset (subset_ground B hB)⟩)
     (base_exchange := base_exchange)
     (subset_ground := subset_ground)
-
-@[simp] theorem ofBaseOfFinite_E {E : Set α} (hE : E.Finite) Base exists_base base_exchange
-    subset_ground : (Matroid.ofBaseOfFinite
-      hE Base exists_base base_exchange subset_ground).E = E := rfl
-
-@[simp] theorem ofBaseOfFinite_base {E : Set α} (hE : E.Finite) Base exists_base
-    base_exchange subset_ground : (Matroid.ofBaseOfFinite
-      hE Base exists_base base_exchange subset_ground).Base = Base := rfl
 
 instance ofBaseOfFinite_finite {E : Set α} (hE : E.Finite) Base exists_base
     base_exchange subset_ground : (Matroid.ofBaseOfFinite

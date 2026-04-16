@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Idempotents in topological semigroups
 

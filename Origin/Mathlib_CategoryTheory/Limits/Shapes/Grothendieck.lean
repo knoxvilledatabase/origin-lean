@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Grothendieck
 import Mathlib.CategoryTheory.Limits.HasLimits
 
+noncomputable section
+
 /-!
 # (Co)limits on the (strict) Grothendieck Construction
 

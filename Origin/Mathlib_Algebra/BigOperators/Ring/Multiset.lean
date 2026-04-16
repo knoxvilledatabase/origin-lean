@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/BigOperators/Ring/Multiset.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Multiset
 import Mathlib.Algebra.BigOperators.Ring.List
 import Mathlib.Data.Multiset.Antidiagonal
 import Mathlib.Data.Multiset.Sections
+
+noncomputable section
 
 /-! # Lemmas about `Multiset.sum` and `Multiset.prod` requiring extra algebra imports -/
 
@@ -35,7 +37,7 @@ variable [NoZeroDivisors α] [Nontrivial α] {s : Multiset α}
 @[simp] lemma prod_eq_zero_iff : s.prod = 0 ↔ (0 : α) ∈ s :=
   Quotient.inductionOn s fun l ↦ by rw [quot_mk_to_coe, prod_coe]; exact List.prod_eq_zero_iff
 
--- DISSOLVED: prod_ne_zero
+lemma prod_ne_zero (h : (0 : α) ∉ s) : s.prod ≠ 0 := mt prod_eq_zero_iff.1 h
 
 end CommMonoidWithZero
 

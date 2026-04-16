@@ -1,9 +1,11 @@
 /-
 Extracted from Logic/Function/Conjugate.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Basic
+
+noncomputable section
 
 /-!
 # Semiconjugate and commuting maps

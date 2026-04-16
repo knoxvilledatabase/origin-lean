@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Analysis.Normed.Ring.Ultra
 import Mathlib.Data.Nat.Choose.Sum
 
+noncomputable section
+
 /-!
 ## Conditions to have an ultrametric norm on a division ring
 

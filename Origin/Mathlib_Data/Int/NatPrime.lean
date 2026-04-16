@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Int
 import Mathlib.Data.Nat.Prime.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about `Nat.Prime` using `Int`s
 -/

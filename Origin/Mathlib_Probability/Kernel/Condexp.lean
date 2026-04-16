@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Kernel.CondDistrib
 import Mathlib.Probability.ConditionalProbability
 
+noncomputable section
+
 /-!
 # Kernel associated with a conditional expectation
 

@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Matrix.CharP
 
+noncomputable section
+
 /-!
 # Results on characteristic polynomials and traces over finite fields.
 -/

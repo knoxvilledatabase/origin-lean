@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Rename
 
+noncomputable section
+
 /-!
 # `comap` operation on `MvPolynomial`
 
@@ -92,15 +94,5 @@ noncomputable def comapEquiv (f : MvPolynomial σ R ≃ₐ[R] MvPolynomial τ R)
     apply comap_eq_id_of_eq_id
     intro
     simp only [AlgHom.id_apply, AlgEquiv.symm_comp]
-
-@[simp]
-theorem comapEquiv_coe (f : MvPolynomial σ R ≃ₐ[R] MvPolynomial τ R) :
-    (comapEquiv f : (τ → R) → σ → R) = comap f :=
-  rfl
-
-@[simp]
-theorem comapEquiv_symm_coe (f : MvPolynomial σ R ≃ₐ[R] MvPolynomial τ R) :
-    ((comapEquiv f).symm : (σ → R) → τ → R) = comap f.symm :=
-  rfl
 
 end MvPolynomial

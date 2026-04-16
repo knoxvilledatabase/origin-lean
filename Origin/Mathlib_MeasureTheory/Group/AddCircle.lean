@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Integral.Periodic
 import Mathlib.Data.ZMod.Quotient
 import Mathlib.MeasureTheory.Group.AEStabilizer
 
+noncomputable section
+
 /-!
 # Measure-theoretic results about the additive circle
 

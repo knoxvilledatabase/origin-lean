@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Batteries.Data.MLList.Basic
 
+noncomputable section
+
 /-!
 # Reading from handles, files, and processes as lazy lists.
 

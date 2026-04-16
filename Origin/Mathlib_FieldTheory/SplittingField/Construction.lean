@@ -1,11 +1,13 @@
 /-
 Extracted from FieldTheory/SplittingField/Construction.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 4 | Infrastructure: 25
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Algebra
 import Mathlib.FieldTheory.SplittingField.IsSplittingField
 import Mathlib.RingTheory.Algebraic.Basic
+
+noncomputable section
 
 /-!
 # Splitting fields
@@ -64,16 +66,32 @@ theorem factor_dvd_of_not_isUnit {f : K[X]} (hf1 : ¬IsUnit f) : factor f ∣ f 
   rw [factor, dif_pos (WfDvdMonoid.exists_irreducible_factor hf1 hf2)]
   exact (Classical.choose_spec <| WfDvdMonoid.exists_irreducible_factor hf1 hf2).2
 
--- DISSOLVED: factor_dvd_of_degree_ne_zero
+theorem factor_dvd_of_degree_ne_zero {f : K[X]} (hf : f.degree ≠ 0) : factor f ∣ f :=
+  factor_dvd_of_not_isUnit (mt degree_eq_zero_of_isUnit hf)
 
--- DISSOLVED: factor_dvd_of_natDegree_ne_zero
+theorem factor_dvd_of_natDegree_ne_zero {f : K[X]} (hf : f.natDegree ≠ 0) : factor f ∣ f :=
+  factor_dvd_of_degree_ne_zero (mt natDegree_eq_of_degree_eq_some hf)
 
--- DISSOLVED: isCoprime_iff_aeval_ne_zero
+lemma isCoprime_iff_aeval_ne_zero (f g : K[X]) : IsCoprime f g ↔ ∀ {A : Type v} [CommRing A]
+    [IsDomain A] [Algebra K A] (a : A), aeval a f ≠ 0 ∨ aeval a g ≠ 0 := by
+  refine ⟨fun h => aeval_ne_zero_of_isCoprime h, fun h => isCoprime_of_dvd _ _ ?_ fun x hx _ => ?_⟩
+  · replace h := @h K _ _ _ 0
+    contrapose! h
+    rw [h.left, h.right, map_zero, and_self]
+  · rintro ⟨_, rfl⟩ ⟨_, rfl⟩
+    replace h := not_and_or.mpr <| h <| AdjoinRoot.root x.factor
+    simp only [AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero,
+      dvd_mul_of_dvd_left <| factor_dvd_of_not_isUnit hx, true_and, not_true] at h
 
 def removeFactor (f : K[X]) : Polynomial (AdjoinRoot <| factor f) :=
   map (AdjoinRoot.of f.factor) f /ₘ (X - C (AdjoinRoot.root f.factor))
 
--- DISSOLVED: X_sub_C_mul_removeFactor
+theorem X_sub_C_mul_removeFactor (f : K[X]) (hf : f.natDegree ≠ 0) :
+    (X - C (AdjoinRoot.root f.factor)) * f.removeFactor = map (AdjoinRoot.of f.factor) f := by
+  let ⟨g, hg⟩ := factor_dvd_of_natDegree_ne_zero hf
+  apply (mul_divByMonic_eq_iff_isRoot
+    (R := AdjoinRoot f.factor) (a := AdjoinRoot.root f.factor)).mpr
+  rw [IsRoot.def, eval_map, hg, eval₂_mul, ← hg, AdjoinRoot.eval₂_root, zero_mul]
 
 theorem natDegree_removeFactor (f : K[X]) : f.removeFactor.natDegree = f.natDegree - 1 := by
   -- Porting note: `(map (AdjoinRoot.of f.factor) f)` was `_`

@@ -5,6 +5,8 @@ Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Nat.Notation
 
+noncomputable section
+
 /-!
 # Definition of `Stream'` and functions on streams
 

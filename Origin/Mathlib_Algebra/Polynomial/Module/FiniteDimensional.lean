@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Polynomial/Module/FiniteDimensional.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Field
 import Mathlib.Algebra.Polynomial.Module.AEval
+
+noncomputable section
 
 /-!
 # Polynomial modules in finite dimensions
@@ -25,7 +27,12 @@ variable {R K M A : Type*} {a : A}
 
 namespace Module.AEval
 
--- DISSOLVED: isTorsion_of_aeval_eq_zero
+theorem isTorsion_of_aeval_eq_zero [CommSemiring R] [NoZeroDivisors R] [Semiring A] [Algebra R A]
+    [AddCommMonoid M] [Module A M] [Module R M] [IsScalarTower R A M]
+    {p : R[X]} (h : aeval a p = 0) (h' : p ≠ 0) :
+    IsTorsion R[X] (AEval R M a) := by
+  have hp : p ∈ nonZeroDivisors R[X] := fun q hq ↦ Or.resolve_right (mul_eq_zero.mp hq) h'
+  exact fun x ↦ ⟨⟨p, hp⟩, (of R M a).symm.injective <| by simp [h]⟩
 
 variable (K M a)
 

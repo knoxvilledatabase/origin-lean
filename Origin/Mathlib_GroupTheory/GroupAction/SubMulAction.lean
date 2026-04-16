@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/SubMulAction.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 1 | Infrastructure: 35
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Defs
@@ -8,6 +8,8 @@ import Mathlib.Data.SetLike.Basic
 import Mathlib.Data.Setoid.Basic
 import Mathlib.GroupTheory.GroupAction.Defs
 import Mathlib.GroupTheory.GroupAction.Hom
+
+noncomputable section
 
 /-!
 
@@ -88,14 +90,6 @@ instance instSMulCommClass [Mul M] [MulMemClass S M] [SMulCommClass R M M]
 protected theorem val_smul (r : R) (x : s) : (↑(r • x) : M) = r • (x : M) :=
   rfl
 
-@[to_additive (attr := simp)]
-theorem mk_smul_mk (r : R) (x : M) (hx : x ∈ s) : r • (⟨x, hx⟩ : s) = ⟨r • x, smul_mem r hx⟩ :=
-  rfl
-
-@[to_additive]
-theorem smul_def (r : R) (x : s) : r • x = ⟨r • x, smul_mem r x.2⟩ :=
-  rfl
-
 @[simp]
 theorem forall_smul_mem_iff {R M S : Type*} [Monoid R] [MulAction R M] [SetLike S M]
     [SMulMemClass S R M] {N : S} {x : M} : (∀ a : R, a • x ∈ N) ↔ x ∈ N :=
@@ -111,20 +105,6 @@ variable {N α : Type*} [SetLike S α] [SMul M N] [SMul M α] [Monoid N]
 @[to_additive "A subset closed under the additive action inherits that action."]
 instance (priority := 50) smul' : SMul M s where
   smul r x := ⟨r • x.1, smul_one_smul N r x.1 ▸ smul_mem _ x.2⟩
-
-@[to_additive (attr := simp, norm_cast)]
-protected theorem val_smul_of_tower (r : M) (x : s) : (↑(r • x) : α) = r • (x : α) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_smul_of_tower_mk (r : M) (x : α) (hx : x ∈ s) :
-    r • (⟨x, hx⟩ : s) = ⟨r • x, smul_one_smul N r x ▸ smul_mem _ hx⟩ :=
-  rfl
-
-@[to_additive]
-theorem smul_of_tower_def (r : M) (x : s) :
-    r • x = ⟨r • x, smul_one_smul N r x.1 ▸ smul_mem _ x.2⟩ :=
-  rfl
 
 end OfTower
 
@@ -145,10 +125,6 @@ instance : SetLike (SubMulAction R M) M :=
 
 instance : SMulMemClass (SubMulAction R M) R M where smul_mem := smul_mem' _
 
-@[simp]
-theorem mem_carrier {p : SubMulAction R M} {x : M} : x ∈ p.carrier ↔ x ∈ (p : Set M) :=
-  Iff.rfl
-
 @[ext]
 theorem ext {p q : SubMulAction R M} (h : ∀ x, x ∈ p ↔ x ∈ q) : p = q :=
   SetLike.ext h
@@ -156,10 +132,6 @@ theorem ext {p q : SubMulAction R M} (h : ∀ x, x ∈ p ↔ x ∈ q) : p = q :=
 protected def copy (p : SubMulAction R M) (s : Set M) (hs : s = ↑p) : SubMulAction R M where
   carrier := s
   smul_mem' := hs.symm ▸ p.smul_mem'
-
-@[simp]
-theorem coe_copy (p : SubMulAction R M) (s : Set M) (hs : s = ↑p) : (p.copy s hs : Set M) = s :=
-  rfl
 
 theorem copy_eq (p : SubMulAction R M) (s : Set M) (hs : s = ↑p) : p.copy s hs = p :=
   SetLike.coe_injective hs
@@ -197,17 +169,6 @@ theorem val_smul (r : R) (x : p) : (↑(r • x) : M) = r • (x : M) :=
 
 variable (p)
 
-protected def subtype : p →[R] M where
-  toFun := Subtype.val
-  map_smul' := by simp [val_smul]
-
-@[simp]
-theorem subtype_apply (x : p) : p.subtype x = x :=
-  rfl
-
-theorem subtype_eq_val : (SubMulAction.subtype p : p → M) = Subtype.val :=
-  rfl
-
 end SMul
 
 namespace SMulMemClass
@@ -218,13 +179,6 @@ variable [hA : SMulMemClass A R M] (S' : A)
 
 instance (priority := 75) toMulAction : MulAction R S' :=
   Subtype.coe_injective.mulAction Subtype.val (SetLike.val_smul S')
-
-protected def subtype : S' →[R] M where
-  toFun := Subtype.val; map_smul' _ _ := rfl
-
-@[simp]
-protected theorem coeSubtype : (SMulMemClass.subtype S' : S' → M) = Subtype.val :=
-  rfl
 
 end SMulMemClass
 
@@ -250,10 +204,6 @@ instance isScalarTower : IsScalarTower S R p where
 instance isScalarTower' {S' : Type*} [SMul S' R] [SMul S' S] [SMul S' M] [IsScalarTower S' R M]
     [IsScalarTower S' S M] : IsScalarTower S' S p where
   smul_assoc s r x := Subtype.ext <| smul_assoc s r (x : M)
-
-@[simp, norm_cast]
-theorem val_smul_of_tower (s : S) (x : p) : ((s • x : p) : M) = s • (x : M) :=
-  rfl
 
 @[simp]
 theorem smul_mem_iff' {G} [Group G] [SMul G R] [MulAction G M] [IsScalarTower G R M] (g : G)
@@ -359,10 +309,6 @@ theorem neg_mem_iff : -x ∈ p ↔ x ∈ p :=
 instance : Neg p :=
   ⟨fun x => ⟨-x.1, neg_mem _ x.2⟩⟩
 
-@[simp, norm_cast]
-theorem val_neg (x : p) : ((-x : p) : M) = -x :=
-  rfl
-
 end AddCommGroup
 
 end SubMulAction
@@ -375,7 +321,8 @@ variable [SMul S R] [MulAction S M] [IsScalarTower S R M]
 
 variable (p : SubMulAction R M) {s : S} {x y : M}
 
--- DISSOLVED: smul_mem_iff
+theorem smul_mem_iff (s0 : s ≠ 0) : s • x ∈ p ↔ x ∈ p :=
+  p.smul_mem_iff' (Units.mk0 s s0)
 
 end SubMulAction
 
@@ -388,9 +335,6 @@ def inclusion (s : SubMulAction M α) : s →[M] α where
   toFun := Subtype.val
 
   map_smul' _ _ := rfl
-
-theorem inclusion.toFun_eq_coe (s : SubMulAction M α) :
-    s.inclusion.toFun = Subtype.val := rfl
 
 theorem inclusion.coe_eq (s : SubMulAction M α) :
     ⇑s.inclusion = Subtype.val := rfl

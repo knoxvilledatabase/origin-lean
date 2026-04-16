@@ -9,6 +9,8 @@ import Mathlib.Algebra.MonoidAlgebra.Support
 import Mathlib.LinearAlgebra.Finsupp.SumProd
 import Mathlib.RingTheory.GradedAlgebra.Basic
 
+noncomputable section
+
 /-!
 # Internal grading of an `AddMonoidAlgebra`
 
@@ -50,8 +52,6 @@ abbrev gradeBy (f : M → ι) (i : ι) : Submodule R R[M] where
 
 abbrev grade (m : M) : Submodule R R[M] :=
   gradeBy R id m
-
-theorem gradeBy_id : gradeBy R (id : M → M) = grade R := rfl
 
 theorem mem_gradeBy_iff (f : M → ι) (i : ι) (a : R[M]) :
     a ∈ gradeBy R f i ↔ (a.support : Set M) ⊆ f ⁻¹' {i} := by rfl
@@ -167,12 +167,6 @@ instance gradeBy.gradedAlgebra : GradedAlgebra (gradeBy R f) :=
     fun i x => by rw [decomposeAux_coe f x]
 
 instance gradeBy.decomposition : DirectSum.Decomposition (gradeBy R f) := by infer_instance
-
-@[simp]
-theorem decomposeAux_eq_decompose :
-    ⇑(decomposeAux f : R[M] →ₐ[R] ⨁ i : ι, gradeBy R f i) =
-      DirectSum.decompose (gradeBy R f) :=
-  rfl
 
 theorem GradesBy.decompose_single (m : M) (r : R) :
     DirectSum.decompose (gradeBy R f) (Finsupp.single m r : R[M]) =

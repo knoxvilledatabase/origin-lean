@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 
+noncomputable section
+
 /-!
 # Split coequalizers
 
@@ -81,10 +83,6 @@ open Limits
 @[simps! pt]
 def IsSplitCoequalizer.asCofork {Z : C} {h : Y ⟶ Z} (t : IsSplitCoequalizer f g h) :
     Cofork f g := Cofork.ofπ h t.condition
-
-@[simp]
-theorem IsSplitCoequalizer.asCofork_π {Z : C} {h : Y ⟶ Z} (t : IsSplitCoequalizer f g h) :
-    t.asCofork.π = h := rfl
 
 def IsSplitCoequalizer.isCoequalizer {Z : C} {h : Y ⟶ Z} (t : IsSplitCoequalizer f g h) :
     IsColimit t.asCofork :=

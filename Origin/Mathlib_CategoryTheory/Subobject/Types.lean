@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Subobject.WellPowered
 import Mathlib.CategoryTheory.Types
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # `Type u` is well-powered
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.TypeTags
 import Mathlib.Analysis.Normed.Field.Lemmas
 
+noncomputable section
+
 /-!
 # Ordered normed spaces
 

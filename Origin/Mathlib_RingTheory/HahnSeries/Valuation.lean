@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/HahnSeries/Valuation.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.HahnSeries.Multiplication
 import Mathlib.RingTheory.Valuation.Basic
+
+noncomputable section
 
 /-!
 # Valuations on Hahn Series rings
@@ -48,9 +50,13 @@ theorem addVal_apply {x : HahnSeries Γ R} :
     addVal Γ R x = x.orderTop :=
   AddValuation.of_apply _
 
--- DISSOLVED: addVal_apply_of_ne
+@[simp]
+theorem addVal_apply_of_ne {x : HahnSeries Γ R} (hx : x ≠ 0) : addVal Γ R x = x.order :=
+  addVal_apply.trans (order_eq_orderTop_of_ne hx).symm
 
--- DISSOLVED: addVal_le_of_coeff_ne_zero
+theorem addVal_le_of_coeff_ne_zero {x : HahnSeries Γ R} {g : Γ} (h : x.coeff g ≠ 0) :
+    addVal Γ R x ≤ g :=
+  orderTop_le_of_coeff_ne_zero h
 
 end Valuation
 

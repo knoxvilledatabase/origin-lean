@@ -7,6 +7,8 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Matrix.Block
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
+noncomputable section
+
 /-! # Block Matrices from Rows and Columns
 
 This file provides the basic definitions of matrices composed from columns and rows.
@@ -40,54 +42,6 @@ def toColumns₂ (A : Matrix m (n₁ ⊕ n₂) R) : Matrix m n₂ R := of fun i 
 def toRows₁ (A : Matrix (m₁ ⊕ m₂) n R) : Matrix m₁ n R := of fun i j => (A (Sum.inl i) j)
 
 def toRows₂ (A : Matrix (m₁ ⊕ m₂) n R) : Matrix m₂ n R := of fun i j => (A (Sum.inr i) j)
-
-@[simp]
-lemma fromRows_apply_inl (A₁ : Matrix m₁ n R) (A₂ : Matrix m₂ n R) (i : m₁) (j : n) :
-    (fromRows A₁ A₂) (Sum.inl i) j = A₁ i j := rfl
-
-@[simp]
-lemma fromRows_apply_inr (A₁ : Matrix m₁ n R) (A₂ : Matrix m₂ n R) (i : m₂) (j : n) :
-    (fromRows A₁ A₂) (Sum.inr i) j = A₂ i j := rfl
-
-@[simp]
-lemma fromColumns_apply_inl (A₁ : Matrix m n₁ R) (A₂ : Matrix m n₂ R) (i : m) (j : n₁) :
-    (fromColumns A₁ A₂) i (Sum.inl j) = A₁ i j := rfl
-
-@[simp]
-lemma fromColumns_apply_inr (A₁ : Matrix m n₁ R) (A₂ : Matrix m n₂ R) (i : m) (j : n₂) :
-    (fromColumns A₁ A₂) i (Sum.inr j) = A₂ i j := rfl
-
-@[simp]
-lemma toRows₁_apply (A : Matrix (m₁ ⊕ m₂) n R) (i : m₁) (j : n) :
-    (toRows₁ A) i j = A (Sum.inl i) j := rfl
-
-@[simp]
-lemma toRows₂_apply (A : Matrix (m₁ ⊕ m₂) n R) (i : m₂) (j : n) :
-    (toRows₂ A) i j = A (Sum.inr i) j := rfl
-
-@[simp]
-lemma toRows₁_fromRows (A₁ : Matrix m₁ n R) (A₂ : Matrix m₂ n R) :
-    toRows₁ (fromRows A₁ A₂) = A₁ := rfl
-
-@[simp]
-lemma toRows₂_fromRows (A₁ : Matrix m₁ n R) (A₂ : Matrix m₂ n R) :
-    toRows₂ (fromRows A₁ A₂) = A₂ := rfl
-
-@[simp]
-lemma toColumns₁_apply (A : Matrix m (n₁ ⊕ n₂) R) (i : m) (j : n₁) :
-    (toColumns₁ A) i j = A i (Sum.inl j) := rfl
-
-@[simp]
-lemma toColumns₂_apply (A : Matrix m (n₁ ⊕ n₂) R) (i : m) (j : n₂) :
-    (toColumns₂ A) i j = A i (Sum.inr j) := rfl
-
-@[simp]
-lemma toColumns₁_fromColumns (A₁ : Matrix m n₁ R) (A₂ : Matrix m n₂ R) :
-    toColumns₁ (fromColumns A₁ A₂) = A₁ := rfl
-
-@[simp]
-lemma toColumns₂_fromColumns (A₁ : Matrix m n₁ R) (A₂ : Matrix m n₂ R) :
-    toColumns₂ (fromColumns A₁ A₂) = A₂ := rfl
 
 @[simp]
 lemma fromColumns_toColumns (A : Matrix m (n₁ ⊕ n₂) R) :

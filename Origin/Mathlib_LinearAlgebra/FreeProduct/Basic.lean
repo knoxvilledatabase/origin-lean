@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.DirectSum.Basic
 import Mathlib.LinearAlgebra.TensorAlgebra.ToTensorPower
 
+noncomputable section
+
 /-!
 # The free product of $R$-algebras
 

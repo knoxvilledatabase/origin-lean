@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/LocallyConvex/Bounded.lean
-Genuine: 48 | Conflates: 4 | Dissolved: 1 | Infrastructure: 1
+Genuine: 50 | Conflates: 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.GroupTheory.GroupAction.Pointwise
@@ -12,6 +12,8 @@ import Mathlib.Topology.Bornology.Basic
 import Mathlib.Topology.Algebra.UniformGroup.Basic
 import Mathlib.Topology.UniformSpace.Cauchy
 import Mathlib.Topology.Algebra.Module.Basic
+
+noncomputable section
 
 /-!
 # Von Neumann Boundedness
@@ -212,7 +214,25 @@ theorem IsVonNBounded.smul_tendsto_zero [NormedField 𝕜]
 variable [NontriviallyNormedField 𝕜]
   [AddCommGroup E] [Module 𝕜 E] [TopologicalSpace E] [ContinuousSMul 𝕜 E]
 
--- DISSOLVED: isVonNBounded_of_smul_tendsto_zero
+theorem isVonNBounded_of_smul_tendsto_zero {ε : ι → 𝕜} {l : Filter ι} [l.NeBot]
+    (hε : ∀ᶠ n in l, ε n ≠ 0) {S : Set E}
+    (H : ∀ x : ι → E, (∀ n, x n ∈ S) → Tendsto (ε • x) l (𝓝 0)) : IsVonNBounded 𝕜 S := by
+  rw [(nhds_basis_balanced 𝕜 E).isVonNBounded_iff]
+  by_contra! H'
+  rcases H' with ⟨V, ⟨hV, hVb⟩, hVS⟩
+  have : ∀ᶠ n in l, ∃ x : S, ε n • (x : E) ∉ V := by
+    filter_upwards [hε] with n hn
+    rw [absorbs_iff_norm] at hVS
+    push_neg at hVS
+    rcases hVS ‖(ε n)⁻¹‖ with ⟨a, haε, haS⟩
+    rcases Set.not_subset.mp haS with ⟨x, hxS, hx⟩
+    refine ⟨⟨x, hxS⟩, fun hnx => ?_⟩
+    rw [← Set.mem_inv_smul_set_iff₀ hn] at hnx
+    exact hx (hVb.smul_mono haε hnx)
+  rcases this.choice with ⟨x, hx⟩
+  refine Filter.frequently_false l (Filter.Eventually.frequently ?_)
+  filter_upwards [hx,
+    (H (_ ∘ x) fun n => (x n).2).eventually (eventually_mem_set.mpr hV)] using fun n => id
 
 theorem isVonNBounded_iff_smul_tendsto_zero {ε : ι → 𝕜} {l : Filter ι} [l.NeBot]
     (hε : Tendsto ε l (𝓝[≠] 0)) {S : Set E} :

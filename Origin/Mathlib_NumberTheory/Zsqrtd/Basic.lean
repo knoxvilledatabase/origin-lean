@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Zsqrtd/Basic.lean
-Genuine: 78 | Conflates: 0 | Dissolved: 2 | Infrastructure: 67
+Genuine: 80 | Conflates: 0 | Dissolved: 0 | Infrastructure: 67
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Star.Unitary
 import Mathlib.RingTheory.Int.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-! # ℤ[√d]
 
@@ -61,24 +63,8 @@ instance : Inhabited (ℤ√d) :=
 instance : One (ℤ√d) :=
   ⟨ofInt 1⟩
 
-@[simp]
-theorem one_re : (1 : ℤ√d).re = 1 :=
-  rfl
-
-@[simp]
-theorem one_im : (1 : ℤ√d).im = 0 :=
-  rfl
-
 def sqrtd : ℤ√d :=
   ⟨0, 1⟩
-
-@[simp]
-theorem sqrtd_re : (sqrtd : ℤ√d).re = 0 :=
-  rfl
-
-@[simp]
-theorem sqrtd_im : (sqrtd : ℤ√d).im = 1 :=
-  rfl
 
 instance : Add (ℤ√d) :=
   ⟨fun z w => ⟨z.1 + w.1, z.2 + w.2⟩⟩
@@ -97,14 +83,6 @@ theorem add_im (z w : ℤ√d) : (z + w).im = z.im + w.im :=
 
 instance : Neg (ℤ√d) :=
   ⟨fun z => ⟨-z.1, -z.2⟩⟩
-
-@[simp]
-theorem neg_re (z : ℤ√d) : (-z).re = -z.re :=
-  rfl
-
-@[simp]
-theorem neg_im (z : ℤ√d) : (-z).im = -z.im :=
-  rfl
 
 instance : Mul (ℤ√d) :=
   ⟨fun z w => ⟨z.1 * w.1 + d * z.2 * w.2, z.1 * w.2 + z.2 * w.1⟩⟩
@@ -133,14 +111,6 @@ instance addCommGroup : AddCommGroup (ℤ√d) := by
   intros <;>
   ext <;>
   simp [add_comm, add_left_comm]
-
-@[simp]
-theorem sub_re (z w : ℤ√d) : (z - w).re = z.re - w.re :=
-  rfl
-
-@[simp]
-theorem sub_im (z w : ℤ√d) : (z - w).im = z.im - w.im :=
-  rfl
 
 instance addGroupWithOne : AddGroupWithOne (ℤ√d) :=
   { Zsqrtd.addCommGroup with
@@ -192,18 +162,6 @@ instance : Distrib (ℤ√d) := by infer_instance
 instance : Star (ℤ√d) where
   star z := ⟨z.1, -z.2⟩
 
-@[simp]
-theorem star_mk (x y : ℤ) : star (⟨x, y⟩ : ℤ√d) = ⟨x, -y⟩ :=
-  rfl
-
-@[simp]
-theorem star_re (z : ℤ√d) : (star z).re = z.re :=
-  rfl
-
-@[simp]
-theorem star_im (z : ℤ√d) : (star z).im = -z.im :=
-  rfl
-
 instance : StarRing (ℤ√d) where
   star_involutive _ := Zsqrtd.ext rfl (neg_neg _)
   star_mul a b := by ext <;> simp <;> ring
@@ -211,25 +169,6 @@ instance : StarRing (ℤ√d) where
 
 instance nontrivial : Nontrivial (ℤ√d) :=
   ⟨⟨0, 1, Zsqrtd.ext_iff.not.mpr (by simp)⟩⟩
-
-@[simp]
-theorem natCast_re (n : ℕ) : (n : ℤ√d).re = n :=
-  rfl
-
-@[simp]
-theorem ofNat_re (n : ℕ) [n.AtLeastTwo] : (no_index (OfNat.ofNat n) : ℤ√d).re = n :=
-  rfl
-
-@[simp]
-theorem natCast_im (n : ℕ) : (n : ℤ√d).im = 0 :=
-  rfl
-
-@[simp]
-theorem ofNat_im (n : ℕ) [n.AtLeastTwo] : (no_index (OfNat.ofNat n) : ℤ√d).im = 0 :=
-  rfl
-
-theorem natCast_val (n : ℕ) : (n : ℤ√d) = ⟨n, 0⟩ :=
-  rfl
 
 @[simp]
 theorem intCast_re (n : ℤ) : (n : ℤ√d).re = n := by cases n <;> rfl
@@ -284,14 +223,18 @@ theorem intCast_dvd_intCast (a b : ℤ) : (a : ℤ√d) ∣ b ↔ a ∣ b := by
   · rw [intCast_re, intCast_im]
     exact fun hc => ⟨hc, dvd_zero a⟩
 
--- DISSOLVED: eq_of_smul_eq_smul_left
+protected theorem eq_of_smul_eq_smul_left {a : ℤ} {b c : ℤ√d} (ha : a ≠ 0) (h : ↑a * b = a * c) :
+    b = c := by
+  rw [Zsqrtd.ext_iff] at h ⊢
+  apply And.imp _ _ h <;> simpa only [smul_re, smul_im] using mul_left_cancel₀ ha
 
 section Gcd
 
 theorem gcd_eq_zero_iff (a : ℤ√d) : Int.gcd a.re a.im = 0 ↔ a = 0 := by
   simp only [Int.gcd_eq_zero_iff, Zsqrtd.ext_iff, eq_self_iff_true, zero_im, zero_re]
 
--- DISSOLVED: gcd_pos_iff
+theorem gcd_pos_iff (a : ℤ√d) : 0 < Int.gcd a.re a.im ↔ a ≠ 0 :=
+  pos_iff_ne_zero.trans <| not_congr a.gcd_eq_zero_iff
 
 theorem coprime_of_dvd_coprime {a b : ℤ√d} (hcoprime : IsCoprime a.re a.im) (hdvd : b ∣ a) :
     IsCoprime b.re b.im := by

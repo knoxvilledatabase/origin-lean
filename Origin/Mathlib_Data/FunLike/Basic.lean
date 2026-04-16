@@ -1,10 +1,12 @@
 /-
 Extracted from Data/FunLike/Basic.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Logic.Function.Basic
 import Mathlib.Util.CompileInductive
+
+noncomputable section
 
 /-!
 # Typeclass for a type `F` with an injective map to `A → B`
@@ -33,31 +35,26 @@ instance : FunLike (MyHom A B) A B where
 
 /-- Copy of a `MyHom` with a new `toFun` equal to the old one. Useful to fix definitional
 equalities. -/
-
 protected def copy (f : MyHom A B) (f' : A → B) (h : f' = ⇑f) : MyHom A B where
   toFun := f'
   map_op' := h.symm ▸ f.map_op'
 
 end MyHom
-
 ```
 
 This file will then provide a `CoeFun` instance and various
-
 extensionality and simp lemmas.
 
 ## Morphism classes extending `DFunLike` and `FunLike`
 
 The `FunLike` design provides further benefits if you put in a bit more work.
-
 The first step is to extend `FunLike` to create a class of those types satisfying
-
 the axioms of your new type of morphisms.
-
 Continuing the example above:
 
 ```
-
+/-- `MyHomClass F A B` states that `F` is a type of `MyClass.op`-preserving morphisms.
+You should extend this class when you extend `MyHom`. -/
 class MyHomClass (F : Type*) (A B : outParam Type*) [MyClass A] [MyClass B]
     [FunLike F A B] : Prop :=
   (map_op : ∀ (f : F) (x y : A), f (MyClass.op x y) = MyClass.op (f x) (f y))
@@ -68,25 +65,22 @@ lemma map_op {F A B : Type*} [MyClass A] [MyClass B] [FunLike F A B] [MyHomClass
     f (MyClass.op x y) = MyClass.op (f x) (f y) :=
   MyHomClass.map_op _ _ _
 
+-- You can add the below instance next to `MyHomClass.instFunLike`:
 instance : MyHomClass (MyHom A B) A B where
   map_op := MyHom.map_op'
 
+-- [Insert `ext` and `copy` here]
 ```
 
 Note that `A B` are marked as `outParam` even though they are not purely required to be so
-
 due to the `FunLike` parameter already filling them in. This is required to see through
-
 type synonyms, which is important in the category theory library. Also, it appears having them as
-
 `outParam` is slightly faster.
 
 The second step is to add instances of your new `MyHomClass` for all types extending `MyHom`.
-
 Typically, you can just declare a new class analogous to `MyHomClass`:
 
 ```
-
 structure CoolerHom (A B : Type*) [CoolClass A] [CoolClass B] extends MyHom A B where
   (map_cool' : toFun CoolClass.cool = CoolClass.cool)
 
@@ -108,39 +102,29 @@ instance : CoolerHomClass (CoolerHom A B) A B where
   map_op f := f.map_op'
   map_cool f := f.map_cool'
 
+-- [Insert `ext` and `copy` here]
 ```
 
 Then any declaration taking a specific type of morphisms as parameter can instead take the
-
 class you just defined:
-
 ```
-
+-- Compare with: lemma do_something (f : MyHom A B) : sorry := sorry
 lemma do_something {F : Type*} [FunLike F A B] [MyHomClass F A B] (f : F) : sorry :=
   sorry
-
 ```
 
 This means anything set up for `MyHom`s will automatically work for `CoolerHomClass`es,
-
 and defining `CoolerHomClass` only takes a constant amount of effort,
-
 instead of linearly increasing the work per `MyHom`-related declaration.
 
 ## Design rationale
 
 The current form of FunLike was set up in pull request https://github.com/leanprover-community/mathlib4/pull/8386:
-
 https://github.com/leanprover-community/mathlib4/pull/8386
-
 We made `FunLike` *unbundled*: child classes don't extend `FunLike`, they take a `[FunLike F A B]`
-
 parameter instead. This suits the instance synthesis algorithm better: it's easy to verify a type
-
 does **not** have a `FunLike` instance by checking the discrimination tree once instead of searching
-
 the entire `extends` hierarchy.
-
 -/
 
 @[notation_class * toFun Simps.findCoercionArgs]
@@ -172,8 +156,6 @@ run_cmd Lean.Elab.Command.liftTermElabM do
   Lean.Meta.registerCoercion ``DFunLike.coe
 
     (some { numArgs := 5, coercee := 4, type := .coeFun })
-
-theorem coe_eq_coe_fn : (DFunLike.coe (F := F)) = (fun f => ↑f) := rfl
 
 theorem coe_injective : Function.Injective (fun f : F ↦ (f : ∀ a : α, β a)) :=
   DFunLike.coe_injective'

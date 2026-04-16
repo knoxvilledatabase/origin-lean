@@ -5,6 +5,8 @@ Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Geometry.Manifold.ContMDiff.Basic
 
+noncomputable section
+
 /-!
 ## Smoothness of standard maps associated to the product of manifolds
 

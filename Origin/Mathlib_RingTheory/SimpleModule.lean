@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/SimpleModule.lean
-Genuine: 36 | Conflates: 2 | Dissolved: 8 | Infrastructure: 13
+Genuine: 42 | Conflates: 4 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.FiniteDimensional
@@ -10,6 +10,8 @@ import Mathlib.Order.Atoms.Finite
 import Mathlib.Order.CompactlyGenerated.Intervals
 import Mathlib.Order.JordanHolder
 import Mathlib.RingTheory.Ideal.Colon
+
+noncomputable section
 
 /-!
 # Simple Modules
@@ -101,7 +103,8 @@ variable [IsSimpleModule R M] (R)
 
 open LinearMap
 
--- DISSOLVED: span_singleton_eq_top
+theorem span_singleton_eq_top {m : M} (hm : m ≠ 0) : Submodule.span R {m} = ⊤ :=
+  (eq_bot_or_eq_top _).resolve_left fun h ↦ hm (h.le <| Submodule.mem_span_singleton_self m)
 
 instance (S : Submodule R M) : S.IsPrincipal where
   principal' := by
@@ -111,9 +114,14 @@ instance (S : Submodule R M) : S.IsPrincipal where
     have ⟨m, hm⟩ := exists_ne (0 : M)
     exact ⟨m, (span_singleton_eq_top R hm).symm⟩
 
--- DISSOLVED: toSpanSingleton_surjective
+theorem toSpanSingleton_surjective {m : M} (hm : m ≠ 0) :
+    Function.Surjective (toSpanSingleton R M m) := by
+  rw [← range_eq_top, ← span_singleton_eq_range, span_singleton_eq_top R hm]
 
--- DISSOLVED: ker_toSpanSingleton_isMaximal
+theorem ker_toSpanSingleton_isMaximal {m : M} (hm : m ≠ 0) :
+    Ideal.IsMaximal (ker (toSpanSingleton R M m)) := by
+  rw [Ideal.isMaximal_def, ← isSimpleModule_iff_isCoatom]
+  exact congr (quotKerEquivOfSurjective _ <| toSpanSingleton_surjective R hm)
 
 instance : IsNoetherian R M := isNoetherian_iff'.mpr inferInstance
 
@@ -135,9 +143,23 @@ theorem IsSimpleModule.annihilator_isMaximal {R} [CommRing R] [Module R M]
   have ⟨I, max, ⟨e⟩⟩ := isSimpleModule_iff_quot_maximal.mp simple
   rwa [e.annihilator_eq, I.annihilator_quotient]
 
--- DISSOLVED: isSimpleModule_iff_toSpanSingleton_surjective
+-- CONFLATES (assumes ground = zero): isSimpleModule_iff_toSpanSingleton_surjective
+theorem isSimpleModule_iff_toSpanSingleton_surjective : IsSimpleModule R M ↔
+    Nontrivial M ∧ ∀ x : M, x ≠ 0 → Function.Surjective (LinearMap.toSpanSingleton R M x) :=
+  ⟨fun h ↦ ⟨h.nontrivial, fun _ ↦ h.toSpanSingleton_surjective⟩, fun ⟨_, h⟩ ↦
+    ⟨fun m ↦ or_iff_not_imp_left.mpr fun ne_bot ↦
+      have ⟨x, hxm, hx0⟩ := m.ne_bot_iff.mp ne_bot
+      top_unique <| fun z _ ↦ by obtain ⟨y, rfl⟩ := h x hx0 z; exact m.smul_mem _ hxm⟩⟩
 
--- DISSOLVED: isSimpleModule_self_iff_isUnit
+-- CONFLATES (assumes ground = zero): isSimpleModule_self_iff_isUnit
+theorem isSimpleModule_self_iff_isUnit :
+    IsSimpleModule R R ↔ Nontrivial R ∧ ∀ x : R, x ≠ 0 → IsUnit x :=
+  isSimpleModule_iff_toSpanSingleton_surjective.trans <| and_congr_right fun _ ↦ by
+    refine ⟨fun h x hx ↦ ?_, fun h x hx ↦ (h x hx).unit.mulRight_bijective.surjective⟩
+    obtain ⟨y, hyx : y * x = 1⟩ := h x hx 1
+    have hy : y ≠ 0 := left_ne_zero_of_mul (hyx.symm ▸ one_ne_zero)
+    obtain ⟨z, hzy : z * y = 1⟩ := h y hy 1
+    exact ⟨⟨x, y, left_inv_eq_right_inv hzy hyx ▸ hzy, hyx⟩, rfl⟩
 
 theorem isSimpleModule_iff_finrank_eq_one {R} [DivisionRing R] [Module R M] :
     IsSimpleModule R M ↔ Module.finrank R M = 1 :=
@@ -331,6 +353,7 @@ proof_wanted IsSemisimpleRing.matrix [Fintype ι] [DecidableEq ι] [IsSemisimple
     IsSemisimpleRing (Matrix ι ι R)
 
 universe u in
+/-- The existence part of the Artin–Wedderburn theorem. -/
 
 proof_wanted isSemisimpleRing_iff_pi_matrix_divisionRing {R : Type u} [Ring R] :
 
@@ -349,20 +372,26 @@ theorem injective_or_eq_zero [IsSimpleModule R M] (f : M →ₗ[R] N) :
   rw [← ker_eq_bot, ← ker_eq_top]
   apply eq_bot_or_eq_top
 
--- DISSOLVED: injective_of_ne_zero
+theorem injective_of_ne_zero [IsSimpleModule R M] {f : M →ₗ[R] N} (h : f ≠ 0) :
+    Function.Injective f :=
+  f.injective_or_eq_zero.resolve_right h
 
 theorem surjective_or_eq_zero [IsSimpleModule R N] (f : M →ₗ[R] N) :
     Function.Surjective f ∨ f = 0 := by
   rw [← range_eq_top, ← range_eq_bot, or_comm]
   apply eq_bot_or_eq_top
 
--- DISSOLVED: surjective_of_ne_zero
+theorem surjective_of_ne_zero [IsSimpleModule R N] {f : M →ₗ[R] N} (h : f ≠ 0) :
+    Function.Surjective f :=
+  f.surjective_or_eq_zero.resolve_right h
 
 theorem bijective_or_eq_zero [IsSimpleModule R M] [IsSimpleModule R N] (f : M →ₗ[R] N) :
     Function.Bijective f ∨ f = 0 :=
   or_iff_not_imp_right.mpr fun h ↦ ⟨injective_of_ne_zero h, surjective_of_ne_zero h⟩
 
--- DISSOLVED: bijective_of_ne_zero
+theorem bijective_of_ne_zero [IsSimpleModule R M] [IsSimpleModule R N] {f : M →ₗ[R] N} (h : f ≠ 0) :
+    Function.Bijective f :=
+  f.bijective_or_eq_zero.resolve_right h
 
 theorem isCoatom_ker_of_surjective [IsSimpleModule R N] {f : M →ₗ[R] N}
     (hf : Function.Surjective f) : IsCoatom (LinearMap.ker f) := by

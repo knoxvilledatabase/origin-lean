@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Action.Prod
 import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Data.Nat.Cast.Basic
 
+noncomputable section
+
 /-!
 # Typeclasses for power-associative structures
 

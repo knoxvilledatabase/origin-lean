@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Coprod.Basic
 import Mathlib.GroupTheory.Complement
 
+noncomputable section
+
 /-!
 
 ## HNN Extensions of Groups
@@ -138,9 +140,6 @@ def toSubgroupEquiv (u : ℤˣ) : toSubgroup A B u ≃* toSubgroup A B (-u) :=
     cases Int.units_eq_one_or u <;> simp_all
 
 @[simp]
-theorem toSubgroupEquiv_one : toSubgroupEquiv φ 1 = φ := rfl
-
-@[simp]
 theorem toSubgroupEquiv_neg_one : toSubgroupEquiv φ (-1) = φ.symm := rfl
 
 @[simp]
@@ -269,15 +268,6 @@ def consRecOn {motive : NormalWord d → Sort*} (w : NormalWord d)
       (ih _ _ _)
 
 @[simp]
-theorem consRecOn_ofGroup {motive : NormalWord d → Sort*}
-    (g : G) (ofGroup : ∀g, motive (ofGroup g))
-    (cons : ∀ (g : G) (u : ℤˣ) (w : NormalWord d) (h1 : w.head ∈ d.set u)
-      (h2 : ∀ u' ∈ Option.map Prod.fst w.toList.head?, w.head
-        ∈ toSubgroup A B u → u = u'),
-      motive w → motive (cons g u w h1 h2)) :
-    consRecOn (.ofGroup g) ofGroup cons = ofGroup g := rfl
-
-@[simp]
 theorem consRecOn_cons {motive : NormalWord d → Sort*}
     (g : G) (u : ℤˣ) (w : NormalWord d) (h1 : w.head ∈ d.set u)
     (h2 : ∀ u' ∈ Option.map Prod.fst w.toList.head?, w.head ∈ toSubgroup A B u → u = u')
@@ -294,10 +284,6 @@ theorem smul_cons (g₁ g₂ : G) (u : ℤˣ) (w : NormalWord d) (h1 : w.head �
     (h2 : ∀ u' ∈ Option.map Prod.fst w.toList.head?, w.head ∈ toSubgroup A B u → u = u') :
     g₁ • cons g₂ u w h1 h2 = cons (g₁ * g₂) u w h1 h2 :=
   rfl
-
-@[simp]
-theorem smul_ofGroup (g₁ g₂ : G) :
-    g₁ • (ofGroup g₂ : NormalWord d) = ofGroup (g₁ * g₂) := rfl
 
 variable (d)
 

@@ -14,6 +14,8 @@ import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Topology.Algebra.InfiniteSum.Module
 import Mathlib.Topology.Instances.Matrix
 
+noncomputable section
+
 /-!
 # Finite dimensional normed spaces over complete fields
 
@@ -64,16 +66,6 @@ def toLinearIsometryEquiv (li : E₁ →ₗᵢ[R₁] F) (h : finrank R₁ E₁ =
   toLinearEquiv := li.toLinearMap.linearEquivOfInjective li.injective h
   norm_map' := li.norm_map'
 
-@[simp]
-theorem coe_toLinearIsometryEquiv (li : E₁ →ₗᵢ[R₁] F) (h : finrank R₁ E₁ = finrank R₁ F) :
-    (li.toLinearIsometryEquiv h : E₁ → F) = li :=
-  rfl
-
-@[simp]
-theorem toLinearIsometryEquiv_apply (li : E₁ →ₗᵢ[R₁] F) (h : finrank R₁ E₁ = finrank R₁ F)
-    (x : E₁) : (li.toLinearIsometryEquiv h) x = li x :=
-  rfl
-
 end LinearIsometry
 
 namespace AffineIsometry
@@ -90,16 +82,6 @@ def toAffineIsometryEquiv [Inhabited P₁] (li : P₁ →ᵃⁱ[𝕜] P₂) (h :
     P₁ ≃ᵃⁱ[𝕜] P₂ :=
   AffineIsometryEquiv.mk' li (li.linearIsometry.toLinearIsometryEquiv h)
     (Inhabited.default (α := P₁)) fun p => by simp
-
-@[simp]
-theorem coe_toAffineIsometryEquiv [Inhabited P₁] (li : P₁ →ᵃⁱ[𝕜] P₂)
-    (h : finrank 𝕜 V₁ = finrank 𝕜 V₂) : (li.toAffineIsometryEquiv h : P₁ → P₂) = li :=
-  rfl
-
-@[simp]
-theorem toAffineIsometryEquiv_apply [Inhabited P₁] (li : P₁ →ᵃⁱ[𝕜] P₂)
-    (h : finrank 𝕜 V₁ = finrank 𝕜 V₂) (x : P₁) : (li.toAffineIsometryEquiv h) x = li x :=
-  rfl
 
 end AffineIsometry
 
@@ -125,16 +107,6 @@ def AffineEquiv.toHomeomorphOfFiniteDimensional (f : PE ≃ᵃ[𝕜] PF) : PE �
   continuous_invFun :=
     haveI : FiniteDimensional 𝕜 F := f.linear.finiteDimensional
     f.symm.continuous_of_finiteDimensional
-
-@[simp]
-theorem AffineEquiv.coe_toHomeomorphOfFiniteDimensional (f : PE ≃ᵃ[𝕜] PF) :
-    ⇑f.toHomeomorphOfFiniteDimensional = f :=
-  rfl
-
-@[simp]
-theorem AffineEquiv.coe_toHomeomorphOfFiniteDimensional_symm (f : PE ≃ᵃ[𝕜] PF) :
-    ⇑f.toHomeomorphOfFiniteDimensional.symm = f.symm :=
-  rfl
 
 end Affine
 

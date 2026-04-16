@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Basic.lean
-Genuine: 85 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.InfiniteSum.Defs
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Topology.Algebra.Monoid
+
+noncomputable section
 
 /-!
 # Lemmas on infinite sums and products in topological monoids
@@ -159,7 +161,16 @@ theorem Equiv.hasProd_iff_of_mulSupport {g : γ → α} (e : mulSupport f ≃ mu
   have : (g ∘ (↑)) ∘ e = f ∘ (↑) := funext he
   rw [← hasProd_subtype_mulSupport, ← this, e.hasProd_iff, hasProd_subtype_mulSupport]
 
--- DISSOLVED: hasProd_iff_hasProd_of_ne_one_bij
+@[to_additive]
+theorem hasProd_iff_hasProd_of_ne_one_bij {g : γ → α} (i : mulSupport g → β)
+    (hi : Injective i) (hf : mulSupport f ⊆ Set.range i)
+    (hfg : ∀ x, f (i x) = g x) : HasProd f a ↔ HasProd g a :=
+  Iff.symm <|
+    Equiv.hasProd_iff_of_mulSupport
+      (Equiv.ofBijective (fun x ↦ ⟨i x, fun hx ↦ x.coe_prop <| hfg x ▸ hx⟩)
+        ⟨fun _ _ h ↦ hi <| Subtype.ext_iff.1 h, fun y ↦
+          (hf y.coe_prop).imp fun _ hx ↦ Subtype.ext hx⟩)
+      hfg
 
 @[to_additive]
 theorem Equiv.multipliable_iff_of_mulSupport {g : γ → α} (e : mulSupport f ≃ mulSupport g)
@@ -408,10 +419,6 @@ theorem Finset.tprod_subtype (s : Finset β) (f : β → α) :
     ∏' x : { x // x ∈ s }, f x = ∏ x ∈ s, f x := by
   rw [← prod_attach]; exact tprod_fintype _
 
-@[to_additive]
-theorem Finset.tprod_subtype' (s : Finset β) (f : β → α) :
-    ∏' x : (s : Set β), f x = ∏ x ∈ s, f x := by simp
-
 @[to_additive (attr := simp)]
 theorem tprod_singleton (b : β) (f : β → α) : ∏' x : ({b} : Set β), f x = f b := by
   rw [← coe_singleton, Finset.tprod_subtype', prod_singleton]
@@ -485,7 +492,11 @@ lemma tprod_eq_tprod_diff_singleton {f : β → α} (s : Set β) {b : β} (hf₀
     ∏' a : s, f a = ∏' a : (s \ {b} : Set β), f a :=
   tprod_setElem_eq_tprod_setElem_diff s {b} fun _ ha ↦ ha ▸ hf₀
 
--- DISSOLVED: tprod_eq_tprod_of_ne_one_bij
+@[to_additive]
+theorem tprod_eq_tprod_of_ne_one_bij {g : γ → α} (i : mulSupport g → β) (hi : Injective i)
+    (hf : mulSupport f ⊆ Set.range i) (hfg : ∀ x, f (i x) = g x) : ∏' x, f x = ∏' y, g y := by
+  rw [← tprod_subtype_mulSupport g, ← hi.tprod_eq hf]
+  simp only [hfg]
 
 @[to_additive]
 theorem Equiv.tprod_eq_tprod_of_mulSupport {f : β → α} {g : γ → α}

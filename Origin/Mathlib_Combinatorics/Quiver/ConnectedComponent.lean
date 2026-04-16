@@ -7,6 +7,8 @@ import Mathlib.Combinatorics.Quiver.Subquiver
 import Mathlib.Combinatorics.Quiver.Path
 import Mathlib.Combinatorics.Quiver.Symmetric
 
+noncomputable section
+
 /-!
 ## Weakly connected components
 

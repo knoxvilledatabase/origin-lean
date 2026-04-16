@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.FunProp.Core
 
+noncomputable section
+
 /-!
 ## `funProp` tactic syntax
 -/
@@ -20,7 +22,6 @@ open Lean.Parser.Tactic
 declare_config_elab elabFunPropConfig FunProp.Config
 
 syntax (name := funPropTacStx)
-
   "fun_prop" optConfig (discharger)? (" [" withoutPosition(ident,*,?) "]")? : tactic
 
 private def emptyDischarge : Expr → MetaM (Option Expr) :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.CompleteBooleanAlgebra
 import Mathlib.Data.Fintype.Pi
 
+noncomputable section
+
 /-!
 # Digraphs
 
@@ -83,43 +85,23 @@ protected def IsSubgraph (x y : Digraph V) : Prop :=
 
 instance : LE (Digraph V) := ⟨Digraph.IsSubgraph⟩
 
-@[simp]
-theorem isSubgraph_eq_le : (Digraph.IsSubgraph : Digraph V → Digraph V → Prop) = (· ≤ ·) := rfl
-
 instance : Max (Digraph V) where
   max x y := { Adj := x.Adj ⊔ y.Adj }
-
-@[simp]
-theorem sup_adj (x y : Digraph V) (v w : V) : (x ⊔ y).Adj v w ↔ x.Adj v w ∨ y.Adj v w := Iff.rfl
 
 instance : Min (Digraph V) where
   min x y := { Adj := x.Adj ⊓ y.Adj }
 
-@[simp]
-theorem inf_adj (x y : Digraph V) (v w : V) : (x ⊓ y).Adj v w ↔ x.Adj v w ∧ y.Adj v w := Iff.rfl
-
 instance hasCompl : HasCompl (Digraph V) where
   compl G := { Adj := fun v w ↦ ¬G.Adj v w }
 
-@[simp] theorem compl_adj (G : Digraph V) (v w : V) : Gᶜ.Adj v w ↔ ¬G.Adj v w := Iff.rfl
-
 instance sdiff : SDiff (Digraph V) where
   sdiff x y := { Adj := x.Adj \ y.Adj }
-
-@[simp]
-theorem sdiff_adj (x y : Digraph V) (v w : V) : (x \ y).Adj v w ↔ x.Adj v w ∧ ¬y.Adj v w := Iff.rfl
 
 instance supSet : SupSet (Digraph V) where
   sSup s := { Adj := fun a b ↦ ∃ G ∈ s, Adj G a b }
 
 instance infSet : InfSet (Digraph V) where
   sInf s := { Adj := fun a b ↦ (∀ ⦃G⦄, G ∈ s → Adj G a b) }
-
-@[simp]
-theorem sSup_adj {s : Set (Digraph V)} : (sSup s).Adj a b ↔ ∃ G ∈ s, Adj G a b := Iff.rfl
-
-@[simp]
-theorem sInf_adj {s : Set (Digraph V)} : (sInf s).Adj a b ↔ ∀ G ∈ s, Adj G a b := Iff.rfl
 
 @[simp]
 theorem iSup_adj {f : ι → Digraph V} : (⨆ i, f i).Adj a b ↔ ∃ i, (f i).Adj a b := by simp [iSup]
@@ -156,12 +138,6 @@ instance completeAtomicBooleanAlgebra : CompleteAtomicBooleanAlgebra (Digraph V)
     iInf_iSup_eq := fun f ↦ by ext; simp [Classical.skolem] }
 
 @[simp] theorem top_adj (v w : V) : (⊤ : Digraph V).Adj v w := trivial
-
-@[simp] theorem bot_adj (v w : V) : (⊥ : Digraph V).Adj v w ↔ False := Iff.rfl
-
-@[simp] theorem completeDigraph_eq_top (V : Type*) : Digraph.completeDigraph V = ⊤ := rfl
-
-@[simp] theorem emptyDigraph_eq_bot (V : Type*) : Digraph.emptyDigraph V = ⊥ := rfl
 
 @[simps] instance (V : Type*) : Inhabited (Digraph V) := ⟨⊥⟩
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.Ring.Constructions
 import Mathlib.Geometry.RingedSpace.OpenImmersion
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
 
+noncomputable section
+
 /-!
 # Colimits of LocallyRingedSpace
 

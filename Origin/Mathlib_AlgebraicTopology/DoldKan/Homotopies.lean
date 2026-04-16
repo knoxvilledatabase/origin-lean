@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Homotopy
 import Mathlib.AlgebraicTopology.DoldKan.Notations
 
+noncomputable section
+
 /-!
 
 # Construction of homotopies for the Dold-Kan correspondence

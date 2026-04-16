@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.FiniteLimits
 import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
+noncomputable section
+
 /-!
 # Limits and colimits in the category of homological complexes
 

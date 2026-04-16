@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Algebra.Spectrum
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.NonUnital
 import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
+noncomputable section
+
 /-!
 # Uniqueness of the continuous functional calculus
 
@@ -59,9 +61,6 @@ noncomputable def toNNReal (f : C(X, ℝ)) : C(X, ℝ≥0) := .realToNNReal |>.c
 
 @[fun_prop]
 lemma continuous_toNNReal : Continuous (toNNReal (X := X)) := continuous_postcomp _
-
-@[simp]
-lemma toNNReal_apply (f : C(X, ℝ)) (x : X) : f.toNNReal x = (f x).toNNReal := rfl
 
 lemma toNNReal_add_add_neg_add_neg_eq (f g : C(X, ℝ)) :
     (f + g).toNNReal + (-f).toNNReal + (-g).toNNReal =
@@ -242,9 +241,6 @@ variable {X : Type*} [TopologicalSpace X] [Zero X]
 namespace ContinuousMapZero
 
 noncomputable def toNNReal (f : C(X, ℝ)₀) : C(X, ℝ≥0)₀ := ⟨.realToNNReal |>.comp f, by simp⟩
-
-@[simp]
-lemma toNNReal_apply (f : C(X, ℝ)₀) (x : X) : f.toNNReal x = Real.toNNReal (f x) := rfl
 
 @[fun_prop]
 lemma continuous_toNNReal : Continuous (toNNReal (X := X)) := by
@@ -436,6 +432,9 @@ variable {F R S A B : Type*} {p : A → Prop} {q : B → Prop}
   [StarHomClass F A B]
 
 include S in
+/-- Non-unital star algebra homomorphisms commute with the non-unital continuous functional
+
+calculus. -/
 
 lemma NonUnitalStarAlgHomClass.map_cfcₙ (φ : F) (f : R → R) (a : A)
     [CompactSpace (quasispectrum R a)] (hf : ContinuousOn f (quasispectrum R a) := by cfc_cont_tac)
@@ -482,6 +481,7 @@ variable {F R S A B : Type*} {p : A → Prop} {q : B → Prop}
   [StarHomClass F A B]
 
 include S in
+/-- Star algebra homomorphisms commute with the continuous functional calculus. -/
 
 lemma StarAlgHomClass.map_cfc (φ : F) (f : R → R) (a : A)
     [CompactSpace (spectrum R a)] (hf : ContinuousOn f (spectrum R a) := by cfc_cont_tac)

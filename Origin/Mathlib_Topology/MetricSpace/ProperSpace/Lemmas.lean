@@ -8,6 +8,8 @@ import Mathlib.Topology.MetricSpace.ProperSpace
 import Mathlib.Topology.Order.IntermediateValue
 import Mathlib.Topology.Order.LocalExtr
 
+noncomputable section
+
 /-!
 # Proper spaces
 

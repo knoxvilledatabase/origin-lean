@@ -9,6 +9,8 @@ import Mathlib.Algebra.GroupWithZero.Action.Defs
 import Mathlib.Data.Setoid.Basic
 import Mathlib.GroupTheory.Congruence.Hom
 
+noncomputable section
+
 /-!
 # Congruence relations
 
@@ -61,10 +63,6 @@ given that the relations are equal."]
 protected def congr {c d : Con M} (h : c = d) : c.Quotient ≃* d.Quotient :=
   { Quotient.congr (Equiv.refl M) <| by apply Con.ext_iff.mp h with
     map_mul' := fun x y => by rcases x with ⟨⟩; rcases y with ⟨⟩; rfl }
-
-@[to_additive (attr := simp)]
-theorem congr_mk {c d : Con M} (h : c = d) (a : M) :
-    Con.congr h (a : c.Quotient) = (a : d.Quotient) := rfl
 
 @[to_additive]
 theorem le_comap_conGen {M N : Type*} [Mul M] [Mul N] (f : M → N)
@@ -144,10 +142,6 @@ instance toSubmonoid : Coe (Con M) (Submonoid (M × M)) :=
   ⟨fun c => c.submonoid⟩
 
 @[to_additive]
-theorem mem_coe {c : Con M} {x y} : (x, y) ∈ (↑c : Submonoid (M × M)) ↔ (x, y) ∈ c :=
-  Iff.rfl
-
-@[to_additive]
 theorem to_submonoid_inj (c d : Con M) (H : (c : Submonoid (M × M)) = d) : c = d :=
   ext fun x y => show (x, y) ∈ c.submonoid ↔ (x, y) ∈ d from H ▸ Iff.rfl
 
@@ -221,10 +215,6 @@ noncomputable def comapQuotientEquivOfSurj (c : Con M) (f : N →* M) (hf : Func
     Con.mk'_surjective.comp hf
 
 @[to_additive (attr := simp)]
-lemma comapQuotientEquivOfSurj_mk (c : Con M) {f : N →* M} (hf : Function.Surjective f) (x : N) :
-    comapQuotientEquivOfSurj c f hf x = f x := rfl
-
-@[to_additive (attr := simp)]
 lemma comapQuotientEquivOfSurj_symm_mk (c : Con M) {f : N →* M} (hf) (x : N) :
     (comapQuotientEquivOfSurj c f hf).symm (f x) = x :=
   (MulEquiv.symm_apply_eq (c.comapQuotientEquivOfSurj f hf)).mpr rfl
@@ -269,11 +259,6 @@ section Actions
 instance instSMul {α M : Type*} [MulOneClass M] [SMul α M] [IsScalarTower α M M] (c : Con M) :
     SMul α c.Quotient where
   smul a := (Quotient.map' (a • ·)) fun _ _ => c.smul a
-
-@[to_additive]
-theorem coe_smul {α M : Type*} [MulOneClass M] [SMul α M] [IsScalarTower α M M] (c : Con M)
-    (a : α) (x : M) : (↑(a • x) : c.Quotient) = a • (x : c.Quotient) :=
-  rfl
 
 @[to_additive]
 instance mulAction {α M : Type*} [Monoid α] [MulOneClass M] [MulAction α M] [IsScalarTower α M M]

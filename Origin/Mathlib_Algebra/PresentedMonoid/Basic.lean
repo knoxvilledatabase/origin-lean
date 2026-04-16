@@ -7,6 +7,8 @@ import Mathlib.Algebra.FreeMonoid.Basic
 import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.GroupTheory.Congruence.Hom
 
+noncomputable section
+
 /-!
 # Defining a monoid given by generators and relations
 
@@ -118,9 +120,6 @@ def lift : PresentedMonoid rels →* M :=
 theorem toMonoid.unique (g : MonoidHom (conGen rels).Quotient M)
     (hg : ∀ a : α, g (of rels a) = f a) : g = lift f h :=
   Con.lift_unique (Con.conGen_le h) g (FreeMonoid.hom_eq fun x ↦ let_fun this := hg x; this)
-
-@[to_additive (attr := simp)]
-theorem lift_of {x : α} : lift f h (of rels x) = f x := rfl
 
 end ToMonoid
 

@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Module/Projective.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Defs
 import Mathlib.LinearAlgebra.Finsupp.SumProd
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.TensorProduct.Tower
+
+noncomputable section
 
 /-!
 
@@ -166,7 +168,6 @@ theorem Projective.iff_split_of_projective [Module.Projective R M] (s : M →ₗ
   ⟨fun _ ↦ projective_lifting_property _ _ hs, fun ⟨i, H⟩ ↦ Projective.of_split i s H⟩
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
-
 theorem Projective.of_ringEquiv {R S} [Semiring R] [Semiring S] {M N}
     [AddCommMonoid M] [AddCommMonoid N] [Module R M] [Module S N]
     (e₁ : R ≃+* S) (e₂ : M ≃ₛₗ[RingHomClass.toRingHom e₁] N)
@@ -197,7 +198,6 @@ theorem Projective.iff_split : Module.Projective R P ↔
     fun ⟨_, _, _, _, i, s, H⟩ ↦ Projective.of_split i s H⟩
 
 set_option maxSynthPendingDepth 2 in
-
 open TensorProduct in
 
 instance Projective.tensorProduct [hM : Module.Projective R M] [hN : Module.Projective R₀ N] :

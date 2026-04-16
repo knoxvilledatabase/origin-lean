@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Indicator
 import Mathlib.Algebra.GroupWithZero.Action.End
 import Mathlib.Algebra.Order.Field.Rat
 
+noncomputable section
+
 /-!
 # Field and action structures on the nonnegative rationals
 

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Comma.Arrow
 import Mathlib.CategoryTheory.Limits.Shapes.WidePullbacks
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 
+noncomputable section
+
 /-!
 
 # The Čech Nerve

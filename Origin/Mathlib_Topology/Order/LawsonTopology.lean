@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Order.LowerUpperTopology
 import Mathlib.Topology.Order.ScottTopology
 
+noncomputable section
+
 /-!
 # Lawson topology
 
@@ -106,18 +108,6 @@ namespace WithLawson
 
 @[match_pattern] def ofLawson : WithLawson α ≃ α := Equiv.refl _
 
-@[simp] lemma to_Lawson_symm_eq : (@toLawson α).symm = ofLawson := rfl
-
-@[simp] lemma of_Lawson_symm_eq : (@ofLawson α).symm = toLawson := rfl
-
-@[simp] lemma toLawson_ofLawson (a : WithLawson α) : toLawson (ofLawson a) = a := rfl
-
-@[simp] lemma ofLawson_toLawson (a : α) : ofLawson (toLawson a) = a := rfl
-
-lemma toLawson_inj {a b : α} : toLawson a = toLawson b ↔ a = b := Iff.rfl
-
-lemma ofLawson_inj {a b : WithLawson α} : ofLawson a = ofLawson b ↔ a = b := Iff.rfl
-
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : WithLawson α → Sort*}
     (h : ∀ a, β (toLawson a)) : ∀ a, β a := fun a => h (ofLawson a)
@@ -137,14 +127,8 @@ instance instIsLawson : IsLawson (WithLawson α) := ⟨rfl⟩
 def homeomorph [TopologicalSpace α] [IsLawson α] : WithLawson α ≃ₜ α :=
   ofLawson.toHomeomorphOfIsInducing ⟨by erw [IsLawson.topology_eq_lawson (α := α), induced_id]; rfl⟩
 
-theorem isOpen_preimage_ofLawson {S : Set α} :
-    IsOpen (ofLawson ⁻¹' S) ↔ (lawson α).IsOpen S := Iff.rfl
-
 theorem isClosed_preimage_ofLawson {S : Set α} :
     IsClosed (ofLawson ⁻¹' S) ↔ IsClosed[lawson α] S := Iff.rfl
-
-theorem isOpen_def {T : Set (WithLawson α)} :
-    IsOpen T ↔ (lawson α).IsOpen (toLawson ⁻¹' T) := Iff.rfl
 
 end WithLawson
 
@@ -195,6 +179,7 @@ lemma lawsonClosed_iff_scottClosed_of_isLowerSet (s : Set α) (h : IsLowerSet s)
     (lawsonOpen_iff_scottOpen_of_isUpperSet' L S _ (isUpperSet_compl.mpr h))]
 
 include S in
+/-- A lower set is Lawson closed if and only if it is closed under sups of directed sets -/
 
 lemma lawsonClosed_iff_dirSupClosed_of_isLowerSet (s : Set α) (h : IsLowerSet s) :
     IsClosed[L] s ↔ DirSupClosed s := by

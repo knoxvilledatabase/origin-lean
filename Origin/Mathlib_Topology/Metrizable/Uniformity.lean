@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Metrizable.Basic
 import Mathlib.Data.Nat.Lattice
 
+noncomputable section
+
 /-!
 # Metrizable uniform spaces
 

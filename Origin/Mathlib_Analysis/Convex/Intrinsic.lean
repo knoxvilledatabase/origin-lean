@@ -5,6 +5,8 @@ Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Analysis.Normed.Affine.AddTorsorBases
 
+noncomputable section
+
 /-!
 # Intrinsic frontier and interior
 

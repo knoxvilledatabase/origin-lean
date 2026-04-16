@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.ExtendFrom
 import Mathlib.Topology.Order.DenselyOrdered
 
+noncomputable section
+
 /-!
 # Lemmas about `extendFrom` in an order topology.
 -/

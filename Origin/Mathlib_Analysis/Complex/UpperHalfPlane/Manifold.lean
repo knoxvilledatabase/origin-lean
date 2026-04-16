@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.UpperHalfPlane.Topology
 import Mathlib.Geometry.Manifold.ContMDiff.Atlas
 import Mathlib.Geometry.Manifold.MFDeriv.FDeriv
 
+noncomputable section
+
 /-!
 # Manifold structure on the upper half plane.
 

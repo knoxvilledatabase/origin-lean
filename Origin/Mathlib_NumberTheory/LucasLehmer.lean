@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/LucasLehmer.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 4 | Infrastructure: 32
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.RingTheory.Fintype
+
+noncomputable section
 
 /-!
 # The Lucas-Lehmer test for Mersenne primes.
@@ -41,21 +43,19 @@ theorem mersenne_lt_mersenne {p q : ℕ} : mersenne p < mersenne q ↔ p < q :=
   strictMono_mersenne.lt_iff_lt
 
 @[gcongr] protected alias ⟨_, GCongr.mersenne_lt_mersenne⟩ := mersenne_lt_mersenne
+
 @[simp]
 theorem mersenne_le_mersenne {p q : ℕ} : mersenne p ≤ mersenne q ↔ p ≤ q :=
   strictMono_mersenne.le_iff_le
 
+@[gcongr] protected alias ⟨_, GCongr.mersenne_le_mersenne⟩ := mersenne_le_mersenne
+
+@[simp] lemma mersenne_odd : ∀ {p : ℕ}, Odd (mersenne p) ↔ p ≠ 0
   | 0 => by simp
-
   | p + 1 => by
-
     simpa using Nat.Even.sub_odd (one_le_pow₀ one_le_two)
-
       (even_two.pow_of_ne_zero p.succ_ne_zero) odd_one
 
-@[gcongr] protected alias ⟨_, GCongr.mersenne_le_mersenne⟩ := mersenne_le_mersenne
-@[simp] theorem mersenne_zero : mersenne 0 = 0 := rfl
-@[simp] lemma mersenne_odd : ∀ {p : ℕ}, Odd (mersenne p) ↔ p ≠ 0
 @[simp] theorem mersenne_pos {p : ℕ} : 0 < mersenne p ↔ 0 < p := mersenne_lt_mersenne (p := 0)
 
 namespace Mathlib.Meta.Positivity
@@ -113,15 +113,24 @@ def sMod (p : ℕ) : ℕ → ℤ
   | 0 => 4 % (2 ^ p - 1)
   | i + 1 => (sMod p i ^ 2 - 2) % (2 ^ p - 1)
 
--- DISSOLVED: mersenne_int_pos
+theorem mersenne_int_pos {p : ℕ} (hp : p ≠ 0) : (0 : ℤ) < 2 ^ p - 1 :=
+  sub_pos.2 <| mod_cast Nat.one_lt_two_pow hp
 
--- DISSOLVED: mersenne_int_ne_zero
+theorem mersenne_int_ne_zero (p : ℕ) (hp : p ≠ 0) : (2 ^ p - 1 : ℤ) ≠ 0 :=
+  (mersenne_int_pos hp).ne'
 
--- DISSOLVED: sMod_nonneg
+theorem sMod_nonneg (p : ℕ) (hp : p ≠ 0) (i : ℕ) : 0 ≤ sMod p i := by
+  cases i <;> dsimp [sMod]
+  · exact sup_eq_right.mp rfl
+  · apply Int.emod_nonneg
+    exact mersenne_int_ne_zero p hp
 
 theorem sMod_mod (p i : ℕ) : sMod p i % (2 ^ p - 1) = sMod p i := by cases i <;> simp [sMod]
 
--- DISSOLVED: sMod_lt
+theorem sMod_lt (p : ℕ) (hp : p ≠ 0) (i : ℕ) : sMod p i < 2 ^ p - 1 := by
+  rw [← sMod_mod]
+  refine (Int.emod_lt _ (mersenne_int_ne_zero p hp)).trans_eq ?_
+  exact abs_of_nonneg (mersenne_int_pos hp).le
 
 theorem sZMod_eq_s (p' : ℕ) (i : ℕ) : sZMod (p' + 2) i = (s i : ZMod (2 ^ (p' + 2) - 1)) := by
   induction' i with i ih
@@ -185,45 +194,9 @@ instance : AddCommGroup (X q) := inferInstanceAs (AddCommGroup (ZMod q × ZMod q
 theorem ext {x y : X q} (h₁ : x.1 = y.1) (h₂ : x.2 = y.2) : x = y := by
   cases x; cases y; congr
 
-@[simp] theorem zero_fst : (0 : X q).1 = 0 := rfl
-
-@[simp] theorem zero_snd : (0 : X q).2 = 0 := rfl
-
-@[simp]
-theorem add_fst (x y : X q) : (x + y).1 = x.1 + y.1 :=
-  rfl
-
-@[simp]
-theorem add_snd (x y : X q) : (x + y).2 = x.2 + y.2 :=
-  rfl
-
-@[simp]
-theorem neg_fst (x : X q) : (-x).1 = -x.1 :=
-  rfl
-
-@[simp]
-theorem neg_snd (x : X q) : (-x).2 = -x.2 :=
-  rfl
-
 instance : Mul (X q) where mul x y := (x.1 * y.1 + 3 * x.2 * y.2, x.1 * y.2 + x.2 * y.1)
 
-@[simp]
-theorem mul_fst (x y : X q) : (x * y).1 = x.1 * y.1 + 3 * x.2 * y.2 :=
-  rfl
-
-@[simp]
-theorem mul_snd (x y : X q) : (x * y).2 = x.1 * y.2 + x.2 * y.1 :=
-  rfl
-
 instance : One (X q) where one := ⟨1, 0⟩
-
-@[simp]
-theorem one_fst : (1 : X q).1 = 1 :=
-  rfl
-
-@[simp]
-theorem one_snd : (1 : X q).2 = 0 :=
-  rfl
 
 instance : Monoid (X q) :=
   { inferInstanceAs (Mul (X q)), inferInstanceAs (One (X q)) with
@@ -233,18 +206,6 @@ instance : Monoid (X q) :=
 
 instance : NatCast (X q) where
     natCast := fun n => ⟨n, 0⟩
-
-@[simp] theorem fst_natCast (n : ℕ) : (n : X q).fst = (n : ZMod q) := rfl
-
-@[simp] theorem snd_natCast (n : ℕ) : (n : X q).snd = (0 : ZMod q) := rfl
-
-@[simp] theorem ofNat_fst (n : ℕ) [n.AtLeastTwo] :
-    (no_index (OfNat.ofNat n) : X q).fst = OfNat.ofNat n :=
-  rfl
-
-@[simp] theorem ofNat_snd (n : ℕ) [n.AtLeastTwo] :
-    (no_index (OfNat.ofNat n) : X q).snd = 0 :=
-  rfl
 
 instance : AddGroupWithOne (X q) :=
   { inferInstanceAs (Monoid (X q)), inferInstanceAs (AddCommGroup (X q)),
@@ -275,14 +236,6 @@ instance : CommRing (X q) :=
 
 instance [Fact (1 < (q : ℕ))] : Nontrivial (X q) :=
   ⟨⟨0, 1, ne_of_apply_ne Prod.fst zero_ne_one⟩⟩
-
-@[simp]
-theorem fst_intCast (n : ℤ) : (n : X q).fst = (n : ZMod q) :=
-  rfl
-
-@[simp]
-theorem snd_intCast (n : ℤ) : (n : X q).snd = (0 : ZMod q) :=
-  rfl
 
 @[norm_cast]
 theorem coe_mul (n m : ℤ) : ((n * m : ℤ) : X q) = (n : X q) * (m : X q) := by ext <;> simp

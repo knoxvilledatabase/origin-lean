@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Mon_
 
+noncomputable section
+
 /-!
 # The category of module objects over a monoid object.
 -/
@@ -56,15 +58,6 @@ instance : Category (Mod_ A) where
 @[ext]
 lemma hom_ext {M N : Mod_ A} (f₁ f₂ : M ⟶ N) (h : f₁.hom = f₂.hom) : f₁ = f₂ :=
   Hom.ext h
-
-@[simp]
-theorem id_hom' (M : Mod_ A) : (𝟙 M : M ⟶ M).hom = 𝟙 M.X := by
-  rfl
-
-@[simp]
-theorem comp_hom' {M N K : Mod_ A} (f : M ⟶ N) (g : N ⟶ K) :
-    (f ≫ g).hom = f.hom ≫ g.hom :=
-  rfl
 
 variable (A)
 

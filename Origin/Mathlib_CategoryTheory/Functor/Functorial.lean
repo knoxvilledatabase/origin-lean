@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.Basic
 
+noncomputable section
+
 /-!
 # Unbundled functors, as a typeclass decorating the object-level function.
 -/
@@ -28,11 +30,6 @@ def map (F : C → D) [Functorial.{v₁, v₂} F] {X Y : C} (f : X ⟶ Y) : F X 
   Functorial.map'.{v₁, v₂} f
 
 @[simp]
-theorem map'_as_map {F : C → D} [Functorial.{v₁, v₂} F] {X Y : C} {f : X ⟶ Y} :
-    Functorial.map'.{v₁, v₂} f = map F f :=
-  rfl
-
-@[simp]
 theorem Functorial.map_id {F : C → D} [Functorial.{v₁, v₂} F] {X : C} : map F (𝟙 X) = 𝟙 (F X) :=
   Functorial.map_id' X
 
@@ -51,10 +48,6 @@ end Functor
 
 instance (F : C ⥤ D) : Functorial.{v₁, v₂} F.obj :=
   { F with map' := F.map }
-
-@[simp]
-theorem map_functorial_obj (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) : map F.obj f = F.map f :=
-  rfl
 
 instance functorial_id : Functorial.{v₁, v₁} (id : C → C) where map' f := f
 

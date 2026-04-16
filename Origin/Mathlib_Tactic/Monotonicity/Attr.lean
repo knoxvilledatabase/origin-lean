@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.LabelAttribute
 
+noncomputable section
+
 /-! # The @[mono] attribute -/
 
 namespace Mathlib.Tactic.Monotonicity

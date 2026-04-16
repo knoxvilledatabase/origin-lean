@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Data.Multiset.Powerset
 
+noncomputable section
+
 /-!
 # The powerset of a finset
 -/

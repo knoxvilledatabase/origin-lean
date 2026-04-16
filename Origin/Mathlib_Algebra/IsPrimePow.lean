@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/IsPrimePow.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.NumberTheory.Divisors
+
+noncomputable section
 
 /-!
 # Prime powers
@@ -43,11 +45,15 @@ theorem not_isPrimePow_one : ¬IsPrimePow (1 : R) :=
 theorem Prime.isPrimePow {p : R} (hp : Prime p) : IsPrimePow p :=
   ⟨p, 1, hp, zero_lt_one, by simp⟩
 
--- DISSOLVED: IsPrimePow.pow
+theorem IsPrimePow.pow {n : R} (hn : IsPrimePow n) {k : ℕ} (hk : k ≠ 0) : IsPrimePow (n ^ k) :=
+  let ⟨p, k', hp, hk', hn⟩ := hn
+  ⟨p, k * k', hp, mul_pos hk.bot_lt hk', by rw [pow_mul', hn]⟩
 
--- DISSOLVED: IsPrimePow.ne_zero
+theorem IsPrimePow.ne_zero [NoZeroDivisors R] {n : R} (h : IsPrimePow n) : n ≠ 0 := fun t =>
+  not_isPrimePow_zero (t ▸ h)
 
--- DISSOLVED: IsPrimePow.ne_one
+theorem IsPrimePow.ne_one {n : R} (h : IsPrimePow n) : n ≠ 1 := fun t =>
+  not_isPrimePow_one (t ▸ h)
 
 section Nat
 

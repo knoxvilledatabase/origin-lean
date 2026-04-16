@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Archimedean.Basic
 import Mathlib.Order.Filter.AtTopBot.Group
 import Mathlib.Tactic.GCongr
 
+noncomputable section
+
 /-!
 # `Filter.atTop` filter and archimedean (semi)rings/fields
 

@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Matrix/ZPow.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 38 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Int.Bitwise
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.Symmetric
+
+noncomputable section
 
 /-!
 # Integer powers of square matrices
@@ -75,7 +77,11 @@ theorem one_zpow : ∀ n : ℤ, (1 : M) ^ n = 1
   | (n : ℕ) => by rw [zpow_natCast, one_pow]
   | -[n+1] => by rw [zpow_negSucc, one_pow, inv_one]
 
--- DISSOLVED: zero_zpow
+theorem zero_zpow : ∀ z : ℤ, z ≠ 0 → (0 : M) ^ z = 0
+  | (n : ℕ), h => by
+    rw [zpow_natCast, zero_pow]
+    exact mod_cast h
+  | -[n+1], _ => by simp [zero_pow n.succ_ne_zero]
 
 theorem zero_zpow_eq (n : ℤ) : (0 : M) ^ n = if n = 0 then 1 else 0 := by
   split_ifs with h
@@ -204,7 +210,14 @@ theorem Commute.self_zpow (A : M) (n : ℤ) : Commute A (A ^ n) :=
 theorem Commute.zpow_zpow_self (A : M) (m n : ℤ) : Commute (A ^ m) (A ^ n) :=
   Commute.zpow_zpow (Commute.refl A) _ _
 
--- DISSOLVED: zpow_add_one_of_ne_neg_one
+theorem zpow_add_one_of_ne_neg_one {A : M} : ∀ n : ℤ, n ≠ -1 → A ^ (n + 1) = A ^ n * A
+  | (n : ℕ), _ => by simp only [pow_succ, ← Nat.cast_succ, zpow_natCast]
+  | -1, h => absurd rfl h
+  | -((n : ℕ) + 2), _ => by
+    rcases nonsing_inv_cancel_or_zero A with (⟨h, _⟩ | h)
+    · apply zpow_add_one (isUnit_det_of_left_inverse h)
+    · show A ^ (-((n + 1 : ℕ) : ℤ)) = A ^ (-((n + 2 : ℕ) : ℤ)) * A
+      simp_rw [zpow_neg_natCast, ← inv_pow', h, zero_pow <| Nat.succ_ne_zero _, zero_mul]
 
 theorem zpow_mul (A : M) (h : IsUnit A.det) : ∀ m n : ℤ, A ^ (m * n) = (A ^ m) ^ n
   | (m : ℕ), (n : ℕ) => by rw [zpow_natCast, zpow_natCast, ← pow_mul, ← zpow_natCast, Int.ofNat_mul]
@@ -228,7 +241,13 @@ theorem coe_units_zpow (u : Mˣ) : ∀ n : ℤ, ((u ^ n : Mˣ) : M) = (u : M) ^ 
   | -[k+1] => by
     rw [zpow_negSucc, zpow_negSucc, ← inv_pow, u⁻¹.val_pow_eq_pow_val, ← inv_pow', coe_units_inv]
 
--- DISSOLVED: zpow_ne_zero_of_isUnit_det
+-- CONFLATES (assumes ground = zero): zpow_ne_zero_of_isUnit_det
+theorem zpow_ne_zero_of_isUnit_det [Nonempty n'] [Nontrivial R] {A : M} (ha : IsUnit A.det)
+    (z : ℤ) : A ^ z ≠ 0 := by
+  have := ha.det_zpow z
+  contrapose! this
+  rw [this, det_zero ‹_›]
+  exact not_isUnit_zero
 
 theorem zpow_sub {A : M} (ha : IsUnit A.det) (z1 z2 : ℤ) : A ^ (z1 - z2) = A ^ z1 / A ^ z2 := by
   rw [sub_eq_add_neg, zpow_add ha, zpow_neg ha, div_eq_mul_inv]

@@ -5,6 +5,8 @@ Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Basic
 
+noncomputable section
+
 /-!
 # Neighborhoods of a set
 
@@ -112,8 +114,6 @@ theorem mem_nhdsSet_interior : s ∈ 𝓝ˢ (interior s) :=
 
 @[simp]
 theorem nhdsSet_empty : 𝓝ˢ (∅ : Set X) = ⊥ := by rw [isOpen_empty.nhdsSet_eq, principal_empty]
-
-theorem mem_nhdsSet_empty : s ∈ 𝓝ˢ (∅ : Set X) := by simp
 
 @[simp]
 theorem nhdsSet_univ : 𝓝ˢ (univ : Set X) = ⊤ := by rw [isOpen_univ.nhdsSet_eq, principal_univ]

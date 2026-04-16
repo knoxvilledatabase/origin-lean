@@ -7,6 +7,8 @@ import Mathlib.Dynamics.PeriodicPts
 import Mathlib.GroupTheory.Exponent
 import Mathlib.GroupTheory.GroupAction.Basic
 
+noncomputable section
+
 /-!
 # Period of a group action
 

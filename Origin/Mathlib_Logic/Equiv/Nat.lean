@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Bits
 import Mathlib.Data.Nat.Pairing
 
+noncomputable section
+
 /-!
 # Equivalences involving `ℕ`
 

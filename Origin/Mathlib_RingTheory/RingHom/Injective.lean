@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.RingTheory.RingHomProperties
 
+noncomputable section
+
 /-! # Meta properties of injective ring homomorphisms -/
 
 lemma _root_.RingHom.injective_stableUnderComposition :

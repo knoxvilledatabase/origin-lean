@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Cylinders
 import Mathlib.MeasureTheory.Measure.Typeclasses
 
+noncomputable section
+
 /-!
 # Projective measure families and projective limits
 

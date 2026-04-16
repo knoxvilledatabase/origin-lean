@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # The topological support of a function
 

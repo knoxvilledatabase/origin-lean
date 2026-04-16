@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Seminorm.lean
-Genuine: 126 | Conflates: 0 | Dissolved: 13 | Infrastructure: 43
+Genuine: 139 | Conflates: 0 | Dissolved: 0 | Infrastructure: 43
 -/
 import Origin.Core
 import Mathlib.Data.Real.Pointwise
 import Mathlib.Analysis.Convex.Function
 import Mathlib.Analysis.LocallyConvex.Basic
+
+noncomputable section
 
 /-!
 # Seminorms
@@ -142,10 +144,6 @@ instance [SMul R ℝ] [SMul R ℝ≥0] [IsScalarTower R ℝ≥0 ℝ] [SMul R' �
     IsScalarTower R R' (Seminorm 𝕜 E) where
   smul_assoc r a p := ext fun x => smul_assoc r a (p x)
 
-theorem coe_smul [SMul R ℝ] [SMul R ℝ≥0] [IsScalarTower R ℝ≥0 ℝ] (r : R) (p : Seminorm 𝕜 E) :
-    ⇑(r • p) = r • ⇑p :=
-  rfl
-
 @[simp]
 theorem smul_apply [SMul R ℝ] [SMul R ℝ≥0] [IsScalarTower R ℝ≥0 ℝ] (r : R) (p : Seminorm 𝕜 E)
     (x : E) : (r • p) x = r • p x :=
@@ -158,10 +156,6 @@ instance instAdd : Add (Seminorm 𝕜 E) where
       smul' := fun a x => by simp only [map_smul_eq_mul, map_smul_eq_mul, mul_add] }
 
 theorem coe_add (p q : Seminorm 𝕜 E) : ⇑(p + q) = p + q :=
-  rfl
-
-@[simp]
-theorem add_apply (p q : Seminorm 𝕜 E) (x : E) : (p + q) x = p x + q x :=
   rfl
 
 instance instAddMonoid : AddMonoid (Seminorm 𝕜 E) :=
@@ -266,9 +260,6 @@ def comp (p : Seminorm 𝕜₂ E₂) (f : E →ₛₗ[σ₁₂] E₂) : Seminorm
     -- I'm not sure why this change was needed, and am worried by it!
     -- Note: https://github.com/leanprover-community/mathlib4/pull/8386 had to change `map_smulₛₗ` to `map_smulₛₗ _`
     smul' := fun _ _ => by simp only [map_smulₛₗ _]; rw [map_smul_eq_mul, RingHomIsometric.is_iso] }
-
-theorem coe_comp (p : Seminorm 𝕜₂ E₂) (f : E →ₛₗ[σ₁₂] E₂) : ⇑(p.comp f) = p ∘ f :=
-  rfl
 
 @[simp]
 theorem comp_apply (p : Seminorm 𝕜₂ E₂) (f : E →ₛₗ[σ₁₂] E₂) (x : E) : (p.comp f) x = p (f x) :=
@@ -780,9 +771,20 @@ theorem closedBall_eq_emptyset (p : Seminorm 𝕜 E) {x : E} {r : ℝ} (hr : r <
   rw [Seminorm.mem_closedBall, Set.mem_empty_iff_false, iff_false, not_le]
   exact hr.trans_le (apply_nonneg _ _)
 
--- DISSOLVED: closedBall_smul_ball
+theorem closedBall_smul_ball (p : Seminorm 𝕜 E) {r₁ : ℝ} (hr₁ : r₁ ≠ 0) (r₂ : ℝ) :
+    Metric.closedBall (0 : 𝕜) r₁ • p.ball 0 r₂ ⊆ p.ball 0 (r₁ * r₂) := by
+  simp only [smul_subset_iff, mem_ball_zero, mem_closedBall_zero_iff, map_smul_eq_mul]
+  refine fun a ha b hb ↦ mul_lt_mul' ha hb (apply_nonneg _ _) ?_
+  exact hr₁.lt_or_lt.resolve_left <| ((norm_nonneg a).trans ha).not_lt
 
--- DISSOLVED: ball_smul_closedBall
+theorem ball_smul_closedBall (p : Seminorm 𝕜 E) (r₁ : ℝ) {r₂ : ℝ} (hr₂ : r₂ ≠ 0) :
+    Metric.ball (0 : 𝕜) r₁ • p.closedBall 0 r₂ ⊆ p.ball 0 (r₁ * r₂) := by
+  simp only [smul_subset_iff, mem_ball_zero, mem_closedBall_zero, mem_ball_zero_iff,
+    map_smul_eq_mul]
+  intro a ha b hb
+  rw [mul_comm, mul_comm r₁]
+  refine mul_lt_mul' hb ha (norm_nonneg _) (hr₂.lt_or_lt.resolve_left ?_)
+  exact ((apply_nonneg p b).trans hb).not_lt
 
 theorem ball_smul_ball (p : Seminorm 𝕜 E) (r₁ r₂ : ℝ) :
     Metric.ball (0 : 𝕜) r₁ • p.ball 0 r₂ ⊆ p.ball 0 (r₁ * r₂) := by
@@ -838,7 +840,11 @@ theorem ball_norm_mul_subset {p : Seminorm 𝕜 E} {k : 𝕜} {r : ℝ} :
         div_self (ne_of_gt <| norm_pos_iff.mpr hk), one_mul]
     rw [← smul_assoc, smul_eq_mul, ← div_eq_mul_inv, div_self hk, one_smul]
 
--- DISSOLVED: smul_ball_zero
+theorem smul_ball_zero {p : Seminorm 𝕜 E} {k : 𝕜} {r : ℝ} (hk : k ≠ 0) :
+    k • p.ball 0 r = p.ball 0 (‖k‖ * r) := by
+  ext
+  rw [mem_smul_set_iff_inv_smul_mem₀ hk, p.mem_ball_zero, p.mem_ball_zero, map_smul_eq_mul,
+    norm_inv, ← div_eq_inv_mul, div_lt_iff₀ (norm_pos_iff.2 hk), mul_comm]
 
 theorem smul_closedBall_subset {p : Seminorm 𝕜 E} {k : 𝕜} {r : ℝ} :
     k • p.closedBall 0 r ⊆ p.closedBall 0 (‖k‖ * r) := by
@@ -883,7 +889,12 @@ protected theorem absorbent_closedBall (hpr : p x < r) : Absorbent 𝕜 (closedB
   rw [p.mem_closedBall_zero] at hy
   exact p.mem_closedBall.2 ((map_sub_le_add p _ _).trans <| add_le_of_le_sub_right hy)
 
--- DISSOLVED: smul_ball_preimage
+@[simp]
+theorem smul_ball_preimage (p : Seminorm 𝕜 E) (y : E) (r : ℝ) (a : 𝕜) (ha : a ≠ 0) :
+    (a • ·) ⁻¹' p.ball y r = p.ball (a⁻¹ • y) (r / ‖a‖) :=
+  Set.ext fun _ => by
+    rw [mem_preimage, mem_ball, mem_ball, lt_div_iff₀ (norm_pos_iff.mpr ha), mul_comm, ←
+      map_smul_eq_mul p, smul_sub, smul_inv_smul₀ ha]
 
 end NormedField
 
@@ -933,19 +944,6 @@ variable (𝕜) {𝕜' : Type*} [NormedField 𝕜] [SeminormedRing 𝕜'] [Norme
 protected def restrictScalars (p : Seminorm 𝕜' E) : Seminorm 𝕜 E :=
   { p with
     smul' := fun a x => by rw [← smul_one_smul 𝕜' a x, p.smul', norm_smul, norm_one, mul_one] }
-
-@[simp]
-theorem coe_restrictScalars (p : Seminorm 𝕜' E) : (p.restrictScalars 𝕜 : E → ℝ) = p :=
-  rfl
-
-@[simp]
-theorem restrictScalars_ball (p : Seminorm 𝕜' E) : (p.restrictScalars 𝕜).ball = p.ball :=
-  rfl
-
-@[simp]
-theorem restrictScalars_closedBall (p : Seminorm 𝕜' E) :
-    (p.restrictScalars 𝕜).closedBall = p.closedBall :=
-  rfl
 
 end RestrictScalars
 
@@ -1077,17 +1075,62 @@ section ShellLemmas
 
 variable [NormedField 𝕜] [AddCommGroup E] [Module 𝕜 E]
 
--- DISSOLVED: rescale_to_shell_zpow
+lemma rescale_to_shell_zpow (p : Seminorm 𝕜 E) {c : 𝕜} (hc : 1 < ‖c‖) {ε : ℝ}
+    (εpos : 0 < ε) {x : E} (hx : p x ≠ 0) : ∃ n : ℤ, c^n ≠ 0 ∧
+    p (c^n • x) < ε ∧ (ε / ‖c‖ ≤ p (c^n • x)) ∧ (‖c^n‖⁻¹ ≤ ε⁻¹ * ‖c‖ * p x) := by
+  have xεpos : 0 < (p x)/ε := by positivity
+  rcases exists_mem_Ico_zpow xεpos hc with ⟨n, hn⟩
+  have cpos : 0 < ‖c‖ := by positivity
+  have cnpos : 0 < ‖c^(n+1)‖ := by rw [norm_zpow]; exact xεpos.trans hn.2
+  refine ⟨-(n+1), ?_, ?_, ?_, ?_⟩
+  · show c ^ (-(n + 1)) ≠ 0; exact zpow_ne_zero _ (norm_pos_iff.1 cpos)
+  · show p ((c ^ (-(n + 1))) • x) < ε
+    rw [map_smul_eq_mul, zpow_neg, norm_inv, ← div_eq_inv_mul, div_lt_iff₀ cnpos, mul_comm,
+        norm_zpow]
+    exact (div_lt_iff₀ εpos).1 (hn.2)
+  · show ε / ‖c‖ ≤ p (c ^ (-(n + 1)) • x)
+    rw [zpow_neg, div_le_iff₀ cpos, map_smul_eq_mul, norm_inv, norm_zpow, zpow_add₀ (ne_of_gt cpos),
+        zpow_one, mul_inv_rev, mul_comm, ← mul_assoc, ← mul_assoc, mul_inv_cancel₀ (ne_of_gt cpos),
+        one_mul, ← div_eq_inv_mul, le_div_iff₀ (zpow_pos cpos _), mul_comm]
+    exact (le_div_iff₀ εpos).1 hn.1
+  · show ‖(c ^ (-(n + 1)))‖⁻¹ ≤ ε⁻¹ * ‖c‖ * p x
+    have : ε⁻¹ * ‖c‖ * p x = ε⁻¹ * p x * ‖c‖ := by ring
+    rw [zpow_neg, norm_inv, inv_inv, norm_zpow, zpow_add₀ (ne_of_gt cpos), zpow_one, this,
+        ← div_eq_inv_mul]
+    exact mul_le_mul_of_nonneg_right hn.1 (norm_nonneg _)
 
--- DISSOLVED: rescale_to_shell
+lemma rescale_to_shell (p : Seminorm 𝕜 E) {c : 𝕜} (hc : 1 < ‖c‖) {ε : ℝ} (εpos : 0 < ε) {x : E}
+    (hx : p x ≠ 0) :
+    ∃d : 𝕜, d ≠ 0 ∧ p (d • x) < ε ∧ (ε/‖c‖ ≤ p (d • x)) ∧ (‖d‖⁻¹ ≤ ε⁻¹ * ‖c‖ * p x) :=
 
 let ⟨_, hn⟩ := p.rescale_to_shell_zpow hc εpos hx; ⟨_, hn⟩
 
--- DISSOLVED: bound_of_shell
+lemma bound_of_shell
+    (p q : Seminorm 𝕜 E) {ε C : ℝ} (ε_pos : 0 < ε) {c : 𝕜} (hc : 1 < ‖c‖)
+    (hf : ∀ x, ε / ‖c‖ ≤ p x → p x < ε → q x ≤ C * p x) {x : E} (hx : p x ≠ 0) :
+    q x ≤ C * p x := by
+  rcases p.rescale_to_shell hc ε_pos hx with ⟨δ, hδ, δxle, leδx, -⟩
+  simpa only [map_smul_eq_mul, mul_left_comm C, mul_le_mul_left (norm_pos_iff.2 hδ)]
+    using hf (δ • x) leδx δxle
 
--- DISSOLVED: bound_of_shell_smul
+lemma bound_of_shell_smul
+    (p q : Seminorm 𝕜 E) {ε : ℝ} {C : ℝ≥0} (ε_pos : 0 < ε) {c : 𝕜} (hc : 1 < ‖c‖)
+    (hf : ∀ x, ε / ‖c‖ ≤ p x → p x < ε → q x ≤ (C • p) x) {x : E} (hx : p x ≠ 0) :
+    q x ≤ (C • p) x :=
+  Seminorm.bound_of_shell p q ε_pos hc hf hx
 
--- DISSOLVED: bound_of_shell_sup
+lemma bound_of_shell_sup (p : ι → Seminorm 𝕜 E) (s : Finset ι)
+    (q : Seminorm 𝕜 E) {ε : ℝ} {C : ℝ≥0} (ε_pos : 0 < ε) {c : 𝕜} (hc : 1 < ‖c‖)
+    (hf : ∀ x, (∀ i ∈ s, p i x < ε) → ∀ j ∈ s, ε / ‖c‖ ≤ p j x → q x ≤ (C • p j) x)
+    {x : E} (hx : ∃ j, j ∈ s ∧ p j x ≠ 0) :
+    q x ≤ (C • s.sup p) x := by
+  rcases hx with ⟨j, hj, hjx⟩
+  have : (s.sup p) x ≠ 0 :=
+    ne_of_gt ((hjx.symm.lt_of_le <| apply_nonneg _ _).trans_le (le_finset_sup_apply hj))
+  refine (s.sup p).bound_of_shell_smul q ε_pos hc (fun y hle hlt ↦ ?_) this
+  rcases exists_apply_eq_finset_sup p ⟨j, hj⟩ y with ⟨i, hi, hiy⟩
+  rw [smul_apply, hiy]
+  exact hf y (fun k hk ↦ (le_finset_sup_apply hk).trans_lt hlt) i hi (hiy ▸ hle)
 
 end ShellLemmas
 
@@ -1141,12 +1184,24 @@ theorem balanced_ball_zero : Balanced 𝕜 (Metric.ball (0 : E) r) := by
   rw [← ball_normSeminorm 𝕜]
   exact (normSeminorm _ _).balanced_ball_zero r
 
--- DISSOLVED: rescale_to_shell_semi_normed_zpow
+lemma rescale_to_shell_semi_normed_zpow {c : 𝕜} (hc : 1 < ‖c‖) {ε : ℝ} (εpos : 0 < ε) {x : E}
+    (hx : ‖x‖ ≠ 0) :
+    ∃ n : ℤ, c^n ≠ 0 ∧ ‖c^n • x‖ < ε ∧ (ε / ‖c‖ ≤ ‖c^n • x‖) ∧ (‖c^n‖⁻¹ ≤ ε⁻¹ * ‖c‖ * ‖x‖) :=
+  (normSeminorm 𝕜 E).rescale_to_shell_zpow hc εpos hx
 
--- DISSOLVED: rescale_to_shell_semi_normed
+lemma rescale_to_shell_semi_normed {c : 𝕜} (hc : 1 < ‖c‖) {ε : ℝ} (εpos : 0 < ε)
+    {x : E} (hx : ‖x‖ ≠ 0) :
+    ∃d : 𝕜, d ≠ 0 ∧ ‖d • x‖ < ε ∧ (ε/‖c‖ ≤ ‖d • x‖) ∧ (‖d‖⁻¹ ≤ ε⁻¹ * ‖c‖ * ‖x‖) :=
+  (normSeminorm 𝕜 E).rescale_to_shell hc εpos hx
 
--- DISSOLVED: rescale_to_shell_zpow
+lemma rescale_to_shell_zpow [NormedAddCommGroup F] [NormedSpace 𝕜 F] {c : 𝕜} (hc : 1 < ‖c‖)
+    {ε : ℝ} (εpos : 0 < ε) {x : F} (hx : x ≠ 0) :
+    ∃ n : ℤ, c^n ≠ 0 ∧ ‖c^n • x‖ < ε ∧ (ε / ‖c‖ ≤ ‖c^n • x‖) ∧ (‖c^n‖⁻¹ ≤ ε⁻¹ * ‖c‖ * ‖x‖) :=
+  rescale_to_shell_semi_normed_zpow hc εpos (norm_ne_zero_iff.mpr hx)
 
--- DISSOLVED: rescale_to_shell
+lemma rescale_to_shell [NormedAddCommGroup F] [NormedSpace 𝕜 F] {c : 𝕜} (hc : 1 < ‖c‖)
+    {ε : ℝ} (εpos : 0 < ε) {x : F} (hx : x ≠ 0) :
+    ∃d : 𝕜, d ≠ 0 ∧ ‖d • x‖ < ε ∧ (ε/‖c‖ ≤ ‖d • x‖) ∧ (‖d‖⁻¹ ≤ ε⁻¹ * ‖c‖ * ‖x‖) :=
+  rescale_to_shell_semi_normed hc εpos (norm_ne_zero_iff.mpr hx)
 
 end normSeminorm

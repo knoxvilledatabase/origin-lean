@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # The `ZMod n`-algebra structure on rings whose characteristic divides `n`
 -/

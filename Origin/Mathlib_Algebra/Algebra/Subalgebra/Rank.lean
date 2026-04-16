@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
+noncomputable section
+
 /-!
 
 # Some results on the ranks of subalgebras

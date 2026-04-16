@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Complex/Exponential.lean
-Genuine: 277 | Conflates: 0 | Dissolved: 10 | Infrastructure: 10
+Genuine: 288 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.CauSeq.BigOperators
@@ -9,6 +9,8 @@ import Mathlib.Data.Complex.Abs
 import Mathlib.Data.Complex.BigOperators
 import Mathlib.Data.Nat.Choose.Sum
 import Mathlib.Tactic.Bound.Attribute
+
+noncomputable section
 
 /-!
 # Exponential, trigonometric and hyperbolic trigonometric functions
@@ -186,7 +188,9 @@ theorem exp_nat_mul (x : ℂ) : ∀ n : ℕ, exp (n * x) = exp x ^ n
   | 0 => by rw [Nat.cast_zero, zero_mul, exp_zero, pow_zero]
   | Nat.succ n => by rw [pow_succ, Nat.cast_add_one, add_mul, exp_add, ← exp_nat_mul _ n, one_mul]
 
--- DISSOLVED: exp_ne_zero
+@[simp]
+theorem exp_ne_zero : exp x ≠ 0 := fun h =>
+  zero_ne_one (α := ℂ) <| by rw [← exp_zero, ← add_neg_cancel x, exp_add, h]; simp
 
 theorem exp_neg : exp (-x) = (exp x)⁻¹ := by
   rw [← mul_right_inj' (exp_ne_zero x), ← exp_add]; simp [mul_inv_cancel₀ (exp_ne_zero x)]
@@ -281,9 +285,6 @@ theorem ofReal_sinh (x : ℝ) : (Real.sinh x : ℂ) = sinh x :=
 @[simp]
 theorem sinh_ofReal_im (x : ℝ) : (sinh x).im = 0 := by rw [← ofReal_sinh_ofReal_re, ofReal_im]
 
-theorem sinh_ofReal_re (x : ℝ) : (sinh x).re = Real.sinh x :=
-  rfl
-
 theorem cosh_conj : cosh (conj x) = conj (cosh x) := by
   rw [cosh, ← RingHom.map_neg, exp_conj, exp_conj, ← RingHom.map_add, cosh, map_div₀]
   -- Porting note: not nice
@@ -298,10 +299,6 @@ theorem ofReal_cosh (x : ℝ) : (Real.cosh x : ℂ) = cosh x :=
 
 @[simp]
 theorem cosh_ofReal_im (x : ℝ) : (cosh x).im = 0 := by rw [← ofReal_cosh_ofReal_re, ofReal_im]
-
-@[simp]
-theorem cosh_ofReal_re (x : ℝ) : (cosh x).re = Real.cosh x :=
-  rfl
 
 theorem tanh_eq_sinh_div_cosh : tanh x = sinh x / cosh x :=
   rfl
@@ -325,9 +322,6 @@ theorem ofReal_tanh (x : ℝ) : (Real.tanh x : ℂ) = tanh x :=
 
 @[simp]
 theorem tanh_ofReal_im (x : ℝ) : (tanh x).im = 0 := by rw [← ofReal_tanh_ofReal_re, ofReal_im]
-
-theorem tanh_ofReal_re (x : ℝ) : (tanh x).re = Real.tanh x :=
-  rfl
 
 @[simp]
 theorem cosh_add_sinh : cosh x + sinh x = exp x := by
@@ -526,10 +520,8 @@ theorem tan_zero : tan 0 = 0 := by simp [tan]
 theorem tan_eq_sin_div_cos : tan x = sin x / cos x :=
   rfl
 
-theorem cot_eq_cos_div_sin : cot x = cos x / sin x :=
-  rfl
-
--- DISSOLVED: tan_mul_cos
+theorem tan_mul_cos {x : ℂ} (hx : cos x ≠ 0) : tan x * cos x = sin x := by
+  rw [tan_eq_sin_div_cos, div_mul_cancel₀ _ hx]
 
 @[simp]
 theorem tan_neg : tan (-x) = -tan x := by simp [tan, neg_div]
@@ -556,9 +548,6 @@ theorem ofReal_cot (x : ℝ) : (Real.cot x : ℂ) = cot x :=
 
 @[simp]
 theorem tan_ofReal_im (x : ℝ) : (tan x).im = 0 := by rw [← ofReal_tan_ofReal_re, ofReal_im]
-
-theorem tan_ofReal_re (x : ℝ) : (tan x).re = Real.tan x :=
-  rfl
 
 theorem cos_add_sin_I : cos x + sin x * I = exp (x * I) := by
   rw [← cosh_add_sinh, sinh_mul_I, cosh_mul_I]
@@ -590,9 +579,13 @@ theorem cos_sq' : cos x ^ 2 = 1 - sin x ^ 2 := by rw [← sin_sq_add_cos_sq x, a
 
 theorem sin_sq : sin x ^ 2 = 1 - cos x ^ 2 := by rw [← sin_sq_add_cos_sq x, add_sub_cancel_right]
 
--- DISSOLVED: inv_one_add_tan_sq
+theorem inv_one_add_tan_sq {x : ℂ} (hx : cos x ≠ 0) : (1 + tan x ^ 2)⁻¹ = cos x ^ 2 := by
+  rw [tan_eq_sin_div_cos, div_pow]
+  field_simp
 
--- DISSOLVED: tan_sq_div_one_add_tan_sq
+theorem tan_sq_div_one_add_tan_sq {x : ℂ} (hx : cos x ≠ 0) :
+    tan x ^ 2 / (1 + tan x ^ 2) = sin x ^ 2 := by
+  simp only [← tan_mul_cos hx, mul_pow, ← inv_one_add_tan_sq hx, div_eq_mul_inv, one_mul]
 
 theorem cos_three_mul : cos (3 * x) = 4 * cos x ^ 3 - 3 * cos x := by
   have h1 : x + 2 * x = 3 * x := by ring
@@ -676,7 +669,9 @@ lemma exp_nsmul (x : ℝ) (n : ℕ) : exp (n • x) = exp x ^ n :=
 nonrec theorem exp_nat_mul (x : ℝ) (n : ℕ) : exp (n * x) = exp x ^ n :=
   ofReal_injective (by simp [exp_nat_mul])
 
--- DISSOLVED: exp_ne_zero
+@[simp]
+nonrec theorem exp_ne_zero : exp x ≠ 0 := fun h =>
+  exp_ne_zero x <| by rw [exp, ← ofReal_inj] at h; simp_all
 
 nonrec theorem exp_neg : exp (-x) = (exp x)⁻¹ :=
   ofReal_injective <| by simp [exp_neg]
@@ -737,10 +732,8 @@ nonrec theorem tan_eq_sin_div_cos : tan x = sin x / cos x :=
   ofReal_injective <| by simp only [ofReal_tan, tan_eq_sin_div_cos, ofReal_div, ofReal_sin,
     ofReal_cos]
 
-nonrec theorem cot_eq_cos_div_sin : cot x = cos x / sin x :=
-  ofReal_injective <| by simp [cot_eq_cos_div_sin]
-
--- DISSOLVED: tan_mul_cos
+theorem tan_mul_cos {x : ℝ} (hx : cos x ≠ 0) : tan x * cos x = sin x := by
+  rw [tan_eq_sin_div_cos, div_mul_cancel₀ _ hx]
 
 @[simp]
 theorem tan_zero : tan 0 = 0 := by simp [tan]
@@ -805,9 +798,13 @@ theorem abs_sin_eq_sqrt_one_sub_cos_sq (x : ℝ) : |sin x| = √(1 - cos x ^ 2) 
 theorem abs_cos_eq_sqrt_one_sub_sin_sq (x : ℝ) : |cos x| = √(1 - sin x ^ 2) := by
   rw [← cos_sq', sqrt_sq_eq_abs]
 
--- DISSOLVED: inv_one_add_tan_sq
+theorem inv_one_add_tan_sq {x : ℝ} (hx : cos x ≠ 0) : (1 + tan x ^ 2)⁻¹ = cos x ^ 2 :=
+  have : Complex.cos x ≠ 0 := mt (congr_arg re) hx
+  ofReal_inj.1 <| by simpa using Complex.inv_one_add_tan_sq this
 
--- DISSOLVED: tan_sq_div_one_add_tan_sq
+theorem tan_sq_div_one_add_tan_sq {x : ℝ} (hx : cos x ≠ 0) :
+    tan x ^ 2 / (1 + tan x ^ 2) = sin x ^ 2 := by
+  simp only [← tan_mul_cos hx, mul_pow, ← inv_one_add_tan_sq hx, div_eq_mul_inv, one_mul]
 
 theorem inv_sqrt_one_add_tan_sq {x : ℝ} (hx : 0 < cos x) : (√(1 + tan x ^ 2))⁻¹ = cos x := by
   rw [← sqrt_sq hx.le, ← sqrt_inv, inv_one_add_tan_sq hx.ne']
@@ -1004,6 +1001,7 @@ theorem exp_eq_one_iff : exp x = 1 ↔ x = 0 :=
 theorem one_lt_exp_iff {x : ℝ} : 1 < exp x ↔ 0 < x := by rw [← exp_zero, exp_lt_exp]
 
 @[bound] private alias ⟨_, Bound.one_lt_exp_of_pos⟩ := one_lt_exp_iff
+
 @[simp]
 theorem exp_lt_one_iff {x : ℝ} : exp x < 1 ↔ x < 0 := by rw [← exp_zero, exp_lt_exp]
 
@@ -1325,23 +1323,8 @@ theorem sin_pos_of_pos_of_le_two {x : ℝ} (hx0 : 0 < x) (hx : x ≤ 2) : 0 < si
         (cos_pos_of_le_one (by rwa [_root_.abs_of_nonneg (le_of_lt (half_pos hx0))]))
     _ = sin x := by rw [← sin_two_mul, two_mul, add_halves]
 
-theorem cos_one_le : cos 1 ≤ 2 / 3 :=
-  calc
-    cos 1 ≤ |(1 : ℝ)| ^ 4 * (5 / 96) + (1 - 1 ^ 2 / 2) :=
-      sub_le_iff_le_add.1 (abs_sub_le_iff.1 (cos_bound (by simp))).1
-    _ ≤ 2 / 3 := by norm_num
-
 theorem cos_one_pos : 0 < cos 1 :=
   cos_pos_of_le_one (le_of_eq abs_one)
-
-theorem cos_two_neg : cos 2 < 0 :=
-  calc cos 2 = cos (2 * 1) := congr_arg cos (mul_one _).symm
-    _ = _ := Real.cos_two_mul 1
-    _ ≤ 2 * (2 / 3) ^ 2 - 1 := by
-      gcongr
-      · exact cos_one_pos.le
-      · apply cos_one_le
-    _ < 0 := by norm_num
 
 theorem exp_bound_div_one_sub_of_interval' {x : ℝ} (h1 : 0 < x) (h2 : x < 1) :
     Real.exp x < 1 / (1 - x) := by
@@ -1366,14 +1349,22 @@ theorem exp_bound_div_one_sub_of_interval {x : ℝ} (h1 : 0 ≤ x) (h2 : x < 1) 
   · simp
   · exact (exp_bound_div_one_sub_of_interval' h1 h2).le
 
--- DISSOLVED: add_one_lt_exp
+theorem add_one_lt_exp {x : ℝ} (hx : x ≠ 0) : x + 1 < Real.exp x := by
+  obtain hx | hx := hx.symm.lt_or_lt
+  · exact add_one_lt_exp_of_pos hx
+  obtain h' | h' := le_or_lt 1 (-x)
+  · linarith [x.exp_pos]
+  have hx' : 0 < x + 1 := by linarith
+  simpa [add_comm, exp_neg, inv_lt_inv₀ (exp_pos _) hx']
+    using exp_bound_div_one_sub_of_interval' (neg_pos.2 hx) h'
 
 theorem add_one_le_exp (x : ℝ) : x + 1 ≤ Real.exp x := by
   obtain rfl | hx := eq_or_ne x 0
   · simp
   · exact (add_one_lt_exp hx).le
 
--- DISSOLVED: one_sub_lt_exp_neg
+lemma one_sub_lt_exp_neg {x : ℝ} (hx : x ≠ 0) : 1 - x < exp (-x) :=
+  (sub_eq_neg_add _ _).trans_lt <| add_one_lt_exp <| neg_ne_zero.2 hx
 
 lemma one_sub_le_exp_neg (x : ℝ) : 1 - x ≤ exp (-x) :=
   (sub_eq_neg_add _ _).trans_le <| add_one_le_exp _

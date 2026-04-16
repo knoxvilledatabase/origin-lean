@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Algebra.Order.Module.OrderedSMul
 import Mathlib.Data.Ineq
 
+noncomputable section
+
 /-!
 # Lemmas for the linear_combination tactic
 

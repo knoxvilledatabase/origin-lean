@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.DiscreteCategory
 import Mathlib.CategoryTheory.EpiMono
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
+noncomputable section
+
 /-!
 # Binary (co)products
 
@@ -51,22 +53,6 @@ def WalkingPair.swap : WalkingPair ≃ WalkingPair where
   left_inv j := by cases j; repeat rfl
   right_inv j := by cases j; repeat rfl
 
-@[simp]
-theorem WalkingPair.swap_apply_left : WalkingPair.swap left = right :=
-  rfl
-
-@[simp]
-theorem WalkingPair.swap_apply_right : WalkingPair.swap right = left :=
-  rfl
-
-@[simp]
-theorem WalkingPair.swap_symm_apply_tt : WalkingPair.swap.symm left = right :=
-  rfl
-
-@[simp]
-theorem WalkingPair.swap_symm_apply_ff : WalkingPair.swap.symm right = left :=
-  rfl
-
 def WalkingPair.equivBool : WalkingPair ≃ Bool where
   toFun j := match j with
     | left => true
@@ -76,46 +62,14 @@ def WalkingPair.equivBool : WalkingPair ≃ Bool where
   left_inv j := by cases j; repeat rfl
   right_inv b := by cases b; repeat rfl
 
-@[simp]
-theorem WalkingPair.equivBool_apply_left : WalkingPair.equivBool left = true :=
-  rfl
-
-@[simp]
-theorem WalkingPair.equivBool_apply_right : WalkingPair.equivBool right = false :=
-  rfl
-
-@[simp]
-theorem WalkingPair.equivBool_symm_apply_true : WalkingPair.equivBool.symm true = left :=
-  rfl
-
-@[simp]
-theorem WalkingPair.equivBool_symm_apply_false : WalkingPair.equivBool.symm false = right :=
-  rfl
-
 variable {C : Type u}
 
 def pairFunction (X Y : C) : WalkingPair → C := fun j => WalkingPair.casesOn j X Y
-
-@[simp]
-theorem pairFunction_left (X Y : C) : pairFunction X Y left = X :=
-  rfl
-
-@[simp]
-theorem pairFunction_right (X Y : C) : pairFunction X Y right = Y :=
-  rfl
 
 variable [Category.{v} C]
 
 def pair (X Y : C) : Discrete WalkingPair ⥤ C :=
   Discrete.functor fun j => WalkingPair.casesOn j X Y
-
-@[simp]
-theorem pair_obj_left (X Y : C) : (pair X Y).obj ⟨left⟩ = X :=
-  rfl
-
-@[simp]
-theorem pair_obj_right (X Y : C) : (pair X Y).obj ⟨right⟩ = Y :=
-  rfl
 
 section
 
@@ -130,14 +84,6 @@ def mapPair : F ⟶ G where
     | ⟨left⟩ => f
     | ⟨right⟩ => g
   naturality := fun ⟨X⟩ ⟨Y⟩ ⟨⟨u⟩⟩ => by aesop_cat
-
-@[simp]
-theorem mapPair_left : (mapPair f g).app ⟨left⟩ = f :=
-  rfl
-
-@[simp]
-theorem mapPair_right : (mapPair f g).app ⟨right⟩ = g :=
-  rfl
 
 @[simps!]
 def mapPairIso (f : F.obj ⟨left⟩ ≅ G.obj ⟨left⟩) (g : F.obj ⟨right⟩ ≅ G.obj ⟨right⟩) : F ≅ G :=
@@ -549,9 +495,6 @@ noncomputable section ProdLemmas
 theorem prod.comp_lift {V W X Y : C} [HasBinaryProduct X Y] (f : V ⟶ W) (g : W ⟶ X) (h : W ⟶ Y) :
     f ≫ prod.lift g h = prod.lift (f ≫ g) (f ≫ h) := by ext <;> simp
 
-theorem prod.comp_diag {X Y : C} [HasBinaryProduct Y Y] (f : X ⟶ Y) :
-    f ≫ diag Y = prod.lift f f := by simp
-
 @[reassoc (attr := simp)]
 theorem prod.map_fst {W X Y Z : C} [HasBinaryProduct W X] [HasBinaryProduct Y Z] (f : W ⟶ Y)
     (g : X ⟶ Z) : prod.map f g ≫ prod.fst = prod.fst ≫ f :=
@@ -586,21 +529,6 @@ theorem prod.map_map {A₁ A₂ A₃ B₁ B₂ B₃ : C} [HasBinaryProduct A₁ 
     [HasBinaryProduct A₃ B₃] (f : A₁ ⟶ A₂) (g : B₁ ⟶ B₂) (h : A₂ ⟶ A₃) (k : B₂ ⟶ B₃) :
     prod.map f g ≫ prod.map h k = prod.map (f ≫ h) (g ≫ k) := by ext <;> simp
 
-@[reassoc]
-theorem prod.map_swap {A B X Y : C} (f : A ⟶ B) (g : X ⟶ Y)
-    [HasLimitsOfShape (Discrete WalkingPair) C] :
-    prod.map (𝟙 X) f ≫ prod.map g (𝟙 B) = prod.map g (𝟙 A) ≫ prod.map (𝟙 Y) f := by simp
-
-@[reassoc]
-theorem prod.map_comp_id {X Y Z W : C} (f : X ⟶ Y) (g : Y ⟶ Z) [HasBinaryProduct X W]
-    [HasBinaryProduct Z W] [HasBinaryProduct Y W] :
-    prod.map (f ≫ g) (𝟙 W) = prod.map f (𝟙 W) ≫ prod.map g (𝟙 W) := by simp
-
-@[reassoc]
-theorem prod.map_id_comp {X Y Z W : C} (f : X ⟶ Y) (g : Y ⟶ Z) [HasBinaryProduct W X]
-    [HasBinaryProduct W Y] [HasBinaryProduct W Z] :
-    prod.map (𝟙 W) (f ≫ g) = prod.map (𝟙 W) f ≫ prod.map (𝟙 W) g := by simp
-
 @[simps]
 def prod.mapIso {W X Y Z : C} [HasBinaryProduct W X] [HasBinaryProduct Y Z] (f : W ≅ Y)
     (g : X ≅ Z) : W ⨯ X ≅ Y ⨯ Z where
@@ -620,19 +548,6 @@ instance prod.map_mono {C : Type*} [Category C] {W X Y Z : C} (f : W ⟶ Y) (g :
     · rw [← cancel_mono g]
       simpa using congr_arg (fun f => f ≫ prod.snd) h⟩
 
-@[reassoc]
-theorem prod.diag_map {X Y : C} (f : X ⟶ Y) [HasBinaryProduct X X] [HasBinaryProduct Y Y] :
-    diag X ≫ prod.map f f = f ≫ diag Y := by simp
-
-@[reassoc]
-theorem prod.diag_map_fst_snd {X Y : C} [HasBinaryProduct X Y] [HasBinaryProduct (X ⨯ Y) (X ⨯ Y)] :
-    diag (X ⨯ Y) ≫ prod.map prod.fst prod.snd = 𝟙 (X ⨯ Y) := by simp
-
-@[reassoc]
-theorem prod.diag_map_fst_snd_comp [HasLimitsOfShape (Discrete WalkingPair) C] {X X' Y Y' : C}
-    (g : X ⟶ Y) (g' : X' ⟶ Y') :
-    diag (X ⨯ X') ≫ prod.map (prod.fst ≫ g) (prod.snd ≫ g') = prod.map g g' := by simp
-
 instance {X : C} [HasBinaryProduct X X] : IsSplitMono (diag X) :=
   IsSplitMono.mk' { retraction := prod.fst }
 
@@ -644,13 +559,6 @@ noncomputable section CoprodLemmas
 theorem coprod.desc_comp {V W X Y : C} [HasBinaryCoproduct X Y] (f : V ⟶ W) (g : X ⟶ V)
     (h : Y ⟶ V) : coprod.desc g h ≫ f = coprod.desc (g ≫ f) (h ≫ f) := by
   ext <;> simp
-
-theorem coprod.desc_comp_assoc {C : Type u} [Category C] {V W X Y : C}
-    [HasBinaryCoproduct X Y] (f : V ⟶ W) (g : X ⟶ V) (h : Y ⟶ V) {Z : C} (l : W ⟶ Z) :
-    coprod.desc g h ≫ f ≫ l = coprod.desc (g ≫ f) (h ≫ f) ≫ l := by simp
-
-theorem coprod.diag_comp {X Y : C} [HasBinaryCoproduct X X] (f : X ⟶ Y) :
-    codiag X ≫ f = coprod.desc f f := by simp
 
 @[reassoc (attr := simp)]
 theorem coprod.inl_map {W X Y Z : C} [HasBinaryCoproduct W X] [HasBinaryCoproduct Y Z] (f : W ⟶ Y)
@@ -688,21 +596,6 @@ theorem coprod.map_map {A₁ A₂ A₃ B₁ B₂ B₃ : C} [HasBinaryCoproduct A
     coprod.map f g ≫ coprod.map h k = coprod.map (f ≫ h) (g ≫ k) := by
   ext <;> simp
 
-@[reassoc]
-theorem coprod.map_swap {A B X Y : C} (f : A ⟶ B) (g : X ⟶ Y)
-    [HasColimitsOfShape (Discrete WalkingPair) C] :
-    coprod.map (𝟙 X) f ≫ coprod.map g (𝟙 B) = coprod.map g (𝟙 A) ≫ coprod.map (𝟙 Y) f := by simp
-
-@[reassoc]
-theorem coprod.map_comp_id {X Y Z W : C} (f : X ⟶ Y) (g : Y ⟶ Z) [HasBinaryCoproduct Z W]
-    [HasBinaryCoproduct Y W] [HasBinaryCoproduct X W] :
-    coprod.map (f ≫ g) (𝟙 W) = coprod.map f (𝟙 W) ≫ coprod.map g (𝟙 W) := by simp
-
-@[reassoc]
-theorem coprod.map_id_comp {X Y Z W : C} (f : X ⟶ Y) (g : Y ⟶ Z) [HasBinaryCoproduct W X]
-    [HasBinaryCoproduct W Y] [HasBinaryCoproduct W Z] :
-    coprod.map (𝟙 W) (f ≫ g) = coprod.map (𝟙 W) f ≫ coprod.map (𝟙 W) g := by simp
-
 @[simps]
 def coprod.mapIso {W X Y Z : C} [HasBinaryCoproduct W X] [HasBinaryCoproduct Y Z] (f : W ≅ Y)
     (g : X ≅ Z) : W ⨿ X ≅ Y ⨿ Z where
@@ -721,20 +614,6 @@ instance coprod.map_epi {C : Type*} [Category C] {W X Y Z : C} (f : W ⟶ Y) (g 
       simpa using congr_arg (fun f => coprod.inl ≫ f) h
     · rw [← cancel_epi g]
       simpa using congr_arg (fun f => coprod.inr ≫ f) h⟩
-
-@[reassoc]
-theorem coprod.map_codiag {X Y : C} (f : X ⟶ Y) [HasBinaryCoproduct X X] [HasBinaryCoproduct Y Y] :
-    coprod.map f f ≫ codiag Y = codiag X ≫ f := by simp
-
-@[reassoc]
-theorem coprod.map_inl_inr_codiag {X Y : C} [HasBinaryCoproduct X Y]
-    [HasBinaryCoproduct (X ⨿ Y) (X ⨿ Y)] :
-    coprod.map coprod.inl coprod.inr ≫ codiag (X ⨿ Y) = 𝟙 (X ⨿ Y) := by simp
-
-@[reassoc]
-theorem coprod.map_comp_inl_inr_codiag [HasColimitsOfShape (Discrete WalkingPair) C] {X X' Y Y' : C}
-    (g : X ⟶ Y) (g' : X' ⟶ Y') :
-    coprod.map (g ≫ coprod.inl) (g' ≫ coprod.inr) ≫ codiag (Y ⨿ Y') = coprod.map g g' := by simp
 
 end CoprodLemmas
 
@@ -764,10 +643,6 @@ def prod.braiding (P Q : C) [HasBinaryProduct P Q] [HasBinaryProduct Q P] : P �
   inv := prod.lift prod.snd prod.fst
 
 @[reassoc]
-theorem braid_natural [HasBinaryProducts C] {W X Y Z : C} (f : X ⟶ Y) (g : Z ⟶ W) :
-    prod.map f g ≫ (prod.braiding _ _).hom = (prod.braiding _ _).hom ≫ prod.map g f := by simp
-
-@[reassoc]
 theorem prod.symmetry' (P Q : C) [HasBinaryProduct P Q] [HasBinaryProduct Q P] :
     prod.lift prod.snd prod.fst ≫ prod.lift prod.snd prod.fst = 𝟙 (P ⨯ Q) :=
   (prod.braiding _ _).hom_inv_id
@@ -781,20 +656,6 @@ theorem prod.symmetry (P Q : C) [HasBinaryProduct P Q] [HasBinaryProduct Q P] :
 def prod.associator [HasBinaryProducts C] (P Q R : C) : (P ⨯ Q) ⨯ R ≅ P ⨯ Q ⨯ R where
   hom := prod.lift (prod.fst ≫ prod.fst) (prod.lift (prod.fst ≫ prod.snd) prod.snd)
   inv := prod.lift (prod.lift prod.fst (prod.snd ≫ prod.fst)) (prod.snd ≫ prod.snd)
-
-@[reassoc]
-theorem prod.pentagon [HasBinaryProducts C] (W X Y Z : C) :
-    prod.map (prod.associator W X Y).hom (𝟙 Z) ≫
-        (prod.associator W (X ⨯ Y) Z).hom ≫ prod.map (𝟙 W) (prod.associator X Y Z).hom =
-      (prod.associator (W ⨯ X) Y Z).hom ≫ (prod.associator W X (Y ⨯ Z)).hom := by
-  simp
-
-@[reassoc]
-theorem prod.associator_naturality [HasBinaryProducts C] {X₁ X₂ X₃ Y₁ Y₂ Y₃ : C} (f₁ : X₁ ⟶ Y₁)
-    (f₂ : X₂ ⟶ Y₂) (f₃ : X₃ ⟶ Y₃) :
-    prod.map (prod.map f₁ f₂) f₃ ≫ (prod.associator Y₁ Y₂ Y₃).hom =
-      (prod.associator X₁ X₂ X₃).hom ≫ prod.map f₁ (prod.map f₂ f₃) := by
-  simp
 
 variable [HasTerminal C]
 
@@ -862,18 +723,6 @@ theorem coprod.symmetry (P Q : C) : (coprod.braiding P Q).hom ≫ (coprod.braidi
 def coprod.associator (P Q R : C) : (P ⨿ Q) ⨿ R ≅ P ⨿ Q ⨿ R where
   hom := coprod.desc (coprod.desc coprod.inl (coprod.inl ≫ coprod.inr)) (coprod.inr ≫ coprod.inr)
   inv := coprod.desc (coprod.inl ≫ coprod.inl) (coprod.desc (coprod.inr ≫ coprod.inl) coprod.inr)
-
-theorem coprod.pentagon (W X Y Z : C) :
-    coprod.map (coprod.associator W X Y).hom (𝟙 Z) ≫
-        (coprod.associator W (X ⨿ Y) Z).hom ≫ coprod.map (𝟙 W) (coprod.associator X Y Z).hom =
-      (coprod.associator (W ⨿ X) Y Z).hom ≫ (coprod.associator W X (Y ⨿ Z)).hom := by
-  simp
-
-theorem coprod.associator_naturality {X₁ X₂ X₃ Y₁ Y₂ Y₃ : C} (f₁ : X₁ ⟶ Y₁) (f₂ : X₂ ⟶ Y₂)
-    (f₃ : X₃ ⟶ Y₃) :
-    coprod.map (coprod.map f₁ f₂) f₃ ≫ (coprod.associator Y₁ Y₂ Y₃).hom =
-      (coprod.associator X₁ X₂ X₃).hom ≫ coprod.map f₁ (coprod.map f₂ f₃) := by
-  simp
 
 variable [HasInitial C]
 

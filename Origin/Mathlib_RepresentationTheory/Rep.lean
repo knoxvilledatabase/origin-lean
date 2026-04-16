@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Elementwise
 import Mathlib.RepresentationTheory.Action.Monoidal
 import Mathlib.RepresentationTheory.Basic
 
+noncomputable section
+
 /-!
 # `Rep k G` is the category of `k`-linear representations of `G`.
 
@@ -70,13 +72,6 @@ theorem coe_of {V : Type u} [AddCommGroup V] [Module k V] (ρ : G →* V →ₗ[
 theorem of_ρ {V : Type u} [AddCommGroup V] [Module k V] (ρ : G →* V →ₗ[k] V) : (of ρ).ρ = ρ :=
   rfl
 
-theorem Action_ρ_eq_ρ {A : Rep k G} : Action.ρ A = A.ρ :=
-  rfl
-
-theorem of_ρ_apply {V : Type u} [AddCommGroup V] [Module k V] (ρ : Representation k G V)
-    (g : MonCat.of G) : (Rep.of ρ).ρ g = ρ (g : G) :=
-  rfl
-
 @[simp]
 theorem ρ_inv_self_apply {G : Type u} [Group G] (A : Rep k G) (g : G) (x : A) :
     A.ρ g⁻¹ (A.ρ g x) = x :=
@@ -98,10 +93,6 @@ def trivial (V : Type u) [AddCommGroup V] [Module k V] : Rep k G :=
 
 variable {k G}
 
-theorem trivial_def {V : Type u} [AddCommGroup V] [Module k V] (g : G) (v : V) :
-    (trivial k G V).ρ g v = v :=
-  rfl
-
 abbrev IsTrivial (A : Rep k G) := A.ρ.IsTrivial
 
 instance {V : Type u} [AddCommGroup V] [Module k V] :
@@ -115,14 +106,6 @@ noncomputable instance : PreservesLimits (forget₂ (Rep k G) (ModuleCat.{u} k))
 
 noncomputable instance : PreservesColimits (forget₂ (Rep k G) (ModuleCat.{u} k)) :=
   Action.preservesColimits_forget.{u} _ _
-
-theorem MonoidalCategory.braiding_hom_apply {A B : Rep k G} (x : A) (y : B) :
-    Action.Hom.hom (β_ A B).hom (TensorProduct.tmul k x y) = TensorProduct.tmul k y x :=
-  rfl
-
-theorem MonoidalCategory.braiding_inv_apply {A B : Rep k G} (x : A) (y : B) :
-    Action.Hom.hom (β_ A B).inv (TensorProduct.tmul k y x) = TensorProduct.tmul k x y :=
-  rfl
 
 section Linearization
 
@@ -153,29 +136,11 @@ theorem linearization_single (X : Action (Type u) (MonCat.of G)) (g : G) (x : X.
 
 variable {X Y : Action (Type u) (MonCat.of G)} (f : X ⟶ Y)
 
-@[simp]
-theorem linearization_map_hom : ((linearization k G).map f).hom = Finsupp.lmapDomain k k f.hom :=
-  rfl
-
 theorem linearization_map_hom_single (x : X.V) (r : k) :
     ((linearization k G).map f).hom (Finsupp.single x r) = Finsupp.single (f.hom x) r :=
   Finsupp.mapDomain_single
 
 open Functor.LaxMonoidal Functor.OplaxMonoidal Functor.Monoidal
-
-@[simp]
-theorem linearization_μ_hom (X Y : Action (Type u) (MonCat.of G)) :
-    (μ (linearization k G) X Y).hom = (finsuppTensorFinsupp' k X.V Y.V).toLinearMap :=
-  rfl
-
-@[simp]
-theorem linearization_δ_hom (X Y : Action (Type u) (MonCat.of G)) :
-    (δ (linearization k G) X Y).hom = (finsuppTensorFinsupp' k X.V Y.V).symm.toLinearMap :=
-  rfl
-
-@[simp]
-theorem linearization_ε_hom : (ε (linearization k G)).hom = Finsupp.lsingle PUnit.unit :=
-  rfl
 
 theorem linearization_η_hom_apply (r : k) :
     (η (linearization k G)).hom (Finsupp.single PUnit.unit r) = r :=
@@ -209,9 +174,6 @@ variable (k G A : Type u) [CommRing k] [Monoid G] [AddCommGroup A]
 
 def ofDistribMulAction : Rep k G := Rep.of (Representation.ofDistribMulAction k G A)
 
-@[simp] theorem ofDistribMulAction_ρ_apply_apply (g : G) (a : A) :
-    (ofDistribMulAction k G A).ρ g a = g • a := rfl
-
 @[simp] def ofAlgebraAut (R S : Type) [CommRing R] [CommRing S] [Algebra R S] :
     Rep ℤ (S ≃ₐ[R] S) := ofDistribMulAction ℤ (S ≃ₐ[R] S) S
 
@@ -222,9 +184,6 @@ section
 variable (M G : Type) [Monoid M] [CommGroup G] [MulDistribMulAction M G]
 
 def ofMulDistribMulAction : Rep ℤ M := Rep.of (Representation.ofMulDistribMulAction M G)
-
-@[simp] theorem ofMulDistribMulAction_ρ_apply_apply (g : M) (a : Additive G) :
-    (ofMulDistribMulAction M G).ρ g a = Additive.ofMul (g • a.toMul) := rfl
 
 @[simp] def ofAlgebraAutOnUnits (R S : Type) [CommRing R] [CommRing S] [Algebra R S] :
     Rep ℤ (S ≃ₐ[R] S) := Rep.ofMulDistribMulAction (S ≃ₐ[R] S) Sˣ
@@ -341,12 +300,6 @@ def homEquiv (A B C : Rep k G) : (A ⊗ B ⟶ C) ≃ (B ⟶ (Rep.ihom A).obj C) 
 
 variable {A B C}
 
-theorem homEquiv_apply_hom (f : A ⊗ B ⟶ C) :
-    (homEquiv A B C f).hom = (TensorProduct.curry f.hom).flip := rfl
-
-theorem homEquiv_symm_apply_hom (f : B ⟶ (Rep.ihom A).obj C) :
-    ((homEquiv A B C).symm f).hom = TensorProduct.uncurry k A B C f.hom.flip := rfl
-
 instance : MonoidalClosed (Rep k G) where
   closed A :=
     { rightAdj := Rep.ihom A
@@ -356,10 +309,6 @@ instance : MonoidalClosed (Rep k G) where
           (TensorProduct.ext' fun _ _ => rfl)
         homEquiv_naturality_right := fun _ _ => Action.Hom.ext (LinearMap.ext
           fun _ => LinearMap.ext fun _ => rfl) })}
-
-@[simp]
-theorem ihom_obj_ρ_def (A B : Rep k G) : ((ihom A).obj B).ρ = ((Rep.ihom A).obj B).ρ :=
-  rfl
 
 @[simp]
 theorem homEquiv_def (A B C : Rep k G) : (ihom.adjunction A).homEquiv B C = Rep.homEquiv A B C :=
@@ -387,16 +336,6 @@ def MonoidalClosed.linearHomEquivComm : (A ⊗ B ⟶ C) ≃ₗ[k] A ⟶ B ⟶[Re
 
 variable {A B C}
 
-@[simp, nolint simpNF]
-theorem MonoidalClosed.linearHomEquiv_hom (f : A ⊗ B ⟶ C) :
-    (MonoidalClosed.linearHomEquiv A B C f).hom = (TensorProduct.curry f.hom).flip :=
-  rfl
-
-@[simp, nolint simpNF]
-theorem MonoidalClosed.linearHomEquivComm_hom (f : A ⊗ B ⟶ C) :
-    (MonoidalClosed.linearHomEquivComm A B C f).hom = TensorProduct.curry f.hom :=
-  rfl
-
 theorem MonoidalClosed.linearHomEquiv_symm_hom (f : B ⟶ A ⟶[Rep k G] C) :
     ((MonoidalClosed.linearHomEquiv A B C).symm f).hom =
       TensorProduct.uncurry k A B C f.hom.flip := by
@@ -421,12 +360,6 @@ variable {k G : Type u} [CommRing k] [Monoid G] {V W : Type u} [AddCommGroup V] 
 
 def repOfTprodIso : Rep.of (ρ.tprod τ) ≅ Rep.of ρ ⊗ Rep.of τ :=
   Iso.refl _
-
-theorem repOfTprodIso_apply (x : TensorProduct k V W) : (repOfTprodIso ρ τ).hom.hom x = x :=
-  rfl
-
-theorem repOfTprodIso_inv_apply (x : TensorProduct k V W) : (repOfTprodIso ρ τ).inv.hom x = x :=
-  rfl
 
 end Representation
 
@@ -474,14 +407,6 @@ def ofModuleMonoidAlgebra : ModuleCat.{u} (MonoidAlgebra k G) ⥤ Rep k G where
   map f :=
     { hom := { f with map_smul' := fun r x => f.map_smul (algebraMap k _ r) x }
       comm := fun g => by ext; apply f.map_smul }
-
-theorem ofModuleMonoidAlgebra_obj_coe (M : ModuleCat.{u} (MonoidAlgebra k G)) :
-    (ofModuleMonoidAlgebra.obj M : Type u) = RestrictScalars k (MonoidAlgebra k G) M :=
-  rfl
-
-theorem ofModuleMonoidAlgebra_obj_ρ (M : ModuleCat.{u} (MonoidAlgebra k G)) :
-    (ofModuleMonoidAlgebra.obj M).ρ = Representation.ofModule M :=
-  rfl
 
 def counitIsoAddEquiv {M : ModuleCat.{u} (MonoidAlgebra k G)} :
     (ofModuleMonoidAlgebra ⋙ toModuleMonoidAlgebra).obj M ≃+ M := by

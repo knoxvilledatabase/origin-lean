@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Localization/CalculusOfFractions.lean
-Genuine: 78 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
+Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Opposite
+
+noncomputable section
 
 /-!
 # Calculus of fractions
@@ -625,10 +627,6 @@ end Localization
 
 section
 
-lemma map_eq {W} {X Y : C} (φ : W.LeftFraction X Y) (L : C ⥤ D) [L.IsLocalization W] :
-    φ.map L (Localization.inverts L W) =
-      L.map φ.f ≫ (Localization.isoOfHom L W φ.s φ.hs).inv := rfl
-
 lemma map_compatibility {W} {X Y : C}
     (φ : W.LeftFraction X Y) {E : Type*} [Category E]
     (L₁ : C ⥤ D) (L₂ : C ⥤ E) [L₁.IsLocalization W] [L₂.IsLocalization W] :
@@ -722,7 +720,6 @@ lemma MorphismProperty.map_eq_iff_postcomp {X Y : C} (f₁ f₂ : X ⟶ Y) :
       Localization.isoOfHom_hom, ← L.map_comp, fac]
 
 include W in
-
 lemma Localization.essSurj_mapArrow :
     L.mapArrow.EssSurj where
   mem_essImage f := by
@@ -926,7 +923,6 @@ lemma MorphismProperty.map_eq_iff_precomp {Y Z : C} (f₁ f₂ : Y ⟶ Z) :
       Localization.isoOfHom_hom, ← L.map_comp, fac]
 
 include W in
-
 lemma Localization.essSurj_mapArrow_of_hasRightCalculusOfFractions :
     L.mapArrow.EssSurj where
   mem_essImage f := by

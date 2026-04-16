@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Algebra.Lie.OfAssociative
 
+noncomputable section
+
 /-!
 # Jordan rings
 

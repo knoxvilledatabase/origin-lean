@@ -7,6 +7,8 @@ import Mathlib.Order.Interval.Set.OrderEmbedding
 import Mathlib.Order.Antichain
 import Mathlib.Order.SetNotation
 
+noncomputable section
+
 /-!
 # Order-connected sets
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.Algebra
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.NonUnital
 
+noncomputable section
+
 /-! # Restriction of the continuous functional calculus to a scalar subring
 
 The main declaration in this file is:

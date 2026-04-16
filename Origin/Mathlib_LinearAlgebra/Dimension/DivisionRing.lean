@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.SetTheory.Cardinal.Subfield
 import Mathlib.LinearAlgebra.Dimension.RankNullity
 
+noncomputable section
+
 /-!
 # Dimension of vector spaces
 

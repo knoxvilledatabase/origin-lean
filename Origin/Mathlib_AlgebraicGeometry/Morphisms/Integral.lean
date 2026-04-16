@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.AffineAnd
 import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
 import Mathlib.RingTheory.RingHom.Integral
 
+noncomputable section
+
 /-!
 
 # Integral morphisms of schemes

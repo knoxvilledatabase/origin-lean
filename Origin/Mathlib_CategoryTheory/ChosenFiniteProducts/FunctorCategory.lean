@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ChosenFiniteProducts
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 
+noncomputable section
+
 /-!
 # Functor categories have chosen finite products
 

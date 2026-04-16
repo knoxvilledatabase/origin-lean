@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Metric
 import Mathlib.Topology.Metrizable.Basic
 import Mathlib.Topology.IndicatorConstPointwise
 
+noncomputable section
+
 /-!
 # Measurable functions in (pseudo-)metrizable Borel spaces
 -/

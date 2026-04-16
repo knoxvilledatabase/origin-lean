@@ -1,10 +1,12 @@
 /-
 Extracted from Tactic/NormNum/DivMod.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Tactic.NormNum.Ineq
+
+noncomputable section
 
 /-!
 # `norm_num` extension for integer div/mod and divides
@@ -25,7 +27,8 @@ namespace Meta.NormNum
 
 open Qq
 
--- DISSOLVED: isInt_ediv_zero
+lemma isInt_ediv_zero : ∀ {a b r : ℤ}, IsInt a r → IsNat b (nat_lit 0) → IsNat (a / b) (nat_lit 0)
+  | _, _, _, ⟨rfl⟩, ⟨rfl⟩ => ⟨by simp [Int.ediv_zero]⟩
 
 lemma isInt_ediv {a b q m a' : ℤ} {b' r : ℕ}
     (ha : IsInt a a') (hb : IsNat b b')
@@ -43,6 +46,9 @@ lemma isNat_neg_of_isNegNat {a : ℤ} {b : ℕ} (h : IsInt a (.negOfNat b)) : Is
   ⟨by simp [h.out]⟩
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `Int.ediv a b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num (_ : ℤ) / _, Int.ediv _ _]
 partial def evalIntDiv : NormNumExt where eval {u α} e := do
@@ -101,6 +107,9 @@ lemma isInt_emod_neg {a b : ℤ} {r : ℕ} (h : IsNat (a % -b) r) : IsNat (a % b
   ⟨by rw [← Int.emod_neg, h.out]⟩
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `Int.emod a b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num (_ : ℤ) % _, Int.emod _ _]
 partial def evalIntMod : NormNumExt where eval {u α} e := do
@@ -155,6 +164,9 @@ theorem isInt_dvd_false : {a b : ℤ} → {a' b' : ℤ} →
   | _, _, _, _, ⟨rfl⟩, ⟨rfl⟩, e => mt Int.emod_eq_zero_of_dvd (by simpa using e)
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `(a : ℤ) ∣ b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num (_ : ℤ) ∣ _] def evalIntDvd : NormNumExt where eval {u α} e := do
   let .app (.app f (a : Q(ℤ))) (b : Q(ℤ)) ← whnfR e | failure

@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion
 import Mathlib.AlgebraicGeometry.PullbackCarrier
 import Mathlib.Topology.LocalAtTarget
 
+noncomputable section
+
 /-!
 # Universally closed morphism
 

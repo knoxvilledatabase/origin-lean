@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Integral.lean
-Genuine: 22 | Conflates: 1 | Dissolved: 1 | Infrastructure: 2
+Genuine: 23 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Algebraic.Integral
 import Mathlib.RingTheory.IntegralClosure.Algebra.Basic
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.Localization.Integer
+
+noncomputable section
 
 /-!
 # Integral and algebraic elements of a fraction field
@@ -51,7 +53,10 @@ theorem coeffIntegerNormalization_of_not_mem_support (p : S[X]) (i : ℕ) (h : c
   simp only [coeffIntegerNormalization, h, mem_support_iff, eq_self_iff_true, not_true, Ne,
     dif_neg, not_false_iff]
 
--- DISSOLVED: coeffIntegerNormalization_mem_support
+theorem coeffIntegerNormalization_mem_support (p : S[X]) (i : ℕ)
+    (h : coeffIntegerNormalization M p i ≠ 0) : i ∈ p.support := by
+  contrapose h
+  rw [Ne, Classical.not_not, coeffIntegerNormalization, dif_neg h]
 
 noncomputable def integerNormalization (p : S[X]) : R[X] :=
   ∑ i ∈ p.support, monomial i (coeffIntegerNormalization M p i)

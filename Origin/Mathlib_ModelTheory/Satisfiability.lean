@@ -7,6 +7,8 @@ import Mathlib.ModelTheory.Ultraproducts
 import Mathlib.ModelTheory.Bundled
 import Mathlib.ModelTheory.Skolem
 
+noncomputable section
+
 /-!
 # First-Order Satisfiability
 

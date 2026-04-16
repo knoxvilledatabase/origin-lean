@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Qq
 
+noncomputable section
+
 /-!
 # Extra `Qq` helpers
 

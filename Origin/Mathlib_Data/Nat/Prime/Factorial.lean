@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Data.Nat.Prime.Defs
 
+noncomputable section
+
 /-!
 # Prime natural numbers and the factorial operator
 

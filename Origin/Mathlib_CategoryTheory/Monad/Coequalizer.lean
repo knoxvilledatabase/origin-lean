@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Reflexive
 import Mathlib.CategoryTheory.Limits.Shapes.SplitCoequalizer
 import Mathlib.CategoryTheory.Monad.Algebra
 
+noncomputable section
+
 /-!
 # Special coequalizers associated to a monad
 
@@ -96,17 +98,8 @@ def beckSplitCoequalizer : IsSplitCoequalizer (T.map X.a) (T.μ.app _) X.a :=
 def beckCofork : Cofork (T.map X.a) (T.μ.app _) :=
   (beckSplitCoequalizer X).asCofork
 
-@[simp]
-theorem beckCofork_π : (beckCofork X).π = X.a :=
-  rfl
-
 def beckCoequalizer : IsColimit (beckCofork X) :=
   (beckSplitCoequalizer X).isCoequalizer
-
-@[simp]
-theorem beckCoequalizer_desc (s : Cofork (T.toFunctor.map X.a) (T.μ.app X.A)) :
-    (beckCoequalizer X).desc s = T.η.app _ ≫ s.π :=
-  rfl
 
 end Monad
 

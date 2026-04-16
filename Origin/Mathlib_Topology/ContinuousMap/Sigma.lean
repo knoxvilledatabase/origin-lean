@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.CompactOpen
 
+noncomputable section
+
 /-!
 # Equivalence between `C(X, Σ i, Y i)` and `Σ i, C(X, Y i)`
 

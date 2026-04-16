@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Comma.Arrow
 import Mathlib.Order.CompleteBooleanAlgebra
 
+noncomputable section
+
 /-!
 # Properties of morphisms
 
@@ -37,13 +39,8 @@ instance : CompleteBooleanAlgebra (MorphismProperty C) where
   le P₁ P₂ := ∀ ⦃X Y : C⦄ (f : X ⟶ Y), P₁ f → P₂ f
   __ := inferInstanceAs (CompleteBooleanAlgebra (∀ ⦃X Y : C⦄ (_ : X ⟶ Y), Prop))
 
-lemma MorphismProperty.le_def {P Q : MorphismProperty C} :
-    P ≤ Q ↔ ∀ {X Y : C} (f : X ⟶ Y), P f → Q f := Iff.rfl
-
 instance : Inhabited (MorphismProperty C) :=
   ⟨⊤⟩
-
-lemma MorphismProperty.top_eq : (⊤ : MorphismProperty C) = fun _ _ _ => True := rfl
 
 variable {C}
 
@@ -65,18 +62,8 @@ def op (P : MorphismProperty C) : MorphismProperty Cᵒᵖ := fun _ _ f => P f.u
 @[simp]
 def unop (P : MorphismProperty Cᵒᵖ) : MorphismProperty C := fun _ _ f => P f.op
 
-theorem unop_op (P : MorphismProperty C) : P.op.unop = P :=
-  rfl
-
-theorem op_unop (P : MorphismProperty Cᵒᵖ) : P.unop.op = P :=
-  rfl
-
 def inverseImage (P : MorphismProperty D) (F : C ⥤ D) : MorphismProperty C := fun _ _ f =>
   P (F.map f)
-
-@[simp]
-lemma inverseImage_iff (P : MorphismProperty D) (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) :
-    P.inverseImage F f ↔ P (F.map f) := by rfl
 
 def map (P : MorphismProperty C) (F : C ⥤ D) : MorphismProperty D := fun _ _ f =>
   ∃ (X' Y' : C) (f' : X' ⟶ Y') (_ : P f'), Nonempty (Arrow.mk (F.map f') ≅ Arrow.mk f)

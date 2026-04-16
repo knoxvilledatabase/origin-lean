@@ -1,9 +1,11 @@
 /-
 Extracted from FieldTheory/IsSepClosed.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 7 | Infrastructure: 8
+Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Galois.Basic
+
+noncomputable section
 
 /-!
 # Separably Closed Field
@@ -71,11 +73,34 @@ theorem IsSepClosed.splits_domain [IsSepClosed k] {f : k →+* K}
 
 namespace IsSepClosed
 
--- DISSOLVED: exists_root
+theorem exists_root [IsSepClosed k] (p : k[X]) (hp : p.degree ≠ 0) (hsep : p.Separable) :
+    ∃ x, IsRoot p x :=
+  exists_root_of_splits _ (IsSepClosed.splits_of_separable p hsep) hp
 
--- DISSOLVED: exists_root_C_mul_X_pow_add_C_mul_X_add_C
+theorem exists_root_C_mul_X_pow_add_C_mul_X_add_C
+    [IsSepClosed k] {n : ℕ} (a b c : k) (hn : (n : k) = 0) (hn' : 2 ≤ n) (hb : b ≠ 0) :
+    ∃ x, a * x ^ n + b * x + c = 0 := by
+  let f : k[X] := C a * X ^ n + C b * X + C c
+  have hdeg : f.degree ≠ 0 := degree_ne_of_natDegree_ne <| by
+    by_cases ha : a = 0
+    · suffices f.natDegree = 1 from this ▸ one_ne_zero
+      simp_rw [f, ha, map_zero, zero_mul, zero_add]
+      compute_degree!
+    · suffices f.natDegree = n from this ▸ (lt_of_lt_of_le zero_lt_two hn').ne'
+      simp_rw [f]
+      have h0 : n ≠ 0 := by linarith only [hn']
+      have h1 : n ≠ 1 := by linarith only [hn']
+      have : 1 ≤ n := le_trans one_le_two hn'
+      compute_degree!
+      simp [h0, h1, ha]
+  have hsep : f.Separable := separable_C_mul_X_pow_add_C_mul_X_add_C a b c hn hb.isUnit
+  obtain ⟨x, hx⟩ := exists_root f hdeg hsep
+  exact ⟨x, by simpa [f] using hx⟩
 
--- DISSOLVED: exists_root_C_mul_X_pow_add_C_mul_X_add_C'
+theorem exists_root_C_mul_X_pow_add_C_mul_X_add_C'
+    [IsSepClosed k] (p n : ℕ) (a b c : k) [CharP k p] (hn : p ∣ n) (hn' : 2 ≤ n) (hb : b ≠ 0) :
+    ∃ x, a * x ^ n + b * x + c = 0 :=
+  exists_root_C_mul_X_pow_add_C_mul_X_add_C a b c ((CharP.cast_eq_zero_iff k p n).2 hn) hn' hb
 
 variable (k) in
 
@@ -97,11 +122,18 @@ theorem roots_eq_zero_iff [IsSepClosed k] {p : k[X]} (hsep : p.Separable) :
     rw [← mem_roots (ne_zero_of_degree_gt hd), h] at hz
     simp at hz
 
--- DISSOLVED: exists_eval₂_eq_zero
+theorem exists_eval₂_eq_zero [IsSepClosed K] (f : k →+* K)
+    (p : k[X]) (hp : p.degree ≠ 0) (hsep : p.Separable) :
+    ∃ x, p.eval₂ f x = 0 :=
+  let ⟨x, hx⟩ := exists_root (p.map f) (by rwa [degree_map_eq_of_injective f.injective])
+    (Separable.map hsep)
+  ⟨x, by rwa [eval₂_eq_eval_map, ← IsRoot]⟩
 
 variable (K)
 
--- DISSOLVED: exists_aeval_eq_zero
+theorem exists_aeval_eq_zero [IsSepClosed K] [Algebra k K] (p : k[X])
+    (hp : p.degree ≠ 0) (hsep : p.Separable) : ∃ x : K, aeval x p = 0 :=
+  exists_eval₂_eq_zero (algebraMap k K) p hp hsep
 
 variable (k) {K}
 

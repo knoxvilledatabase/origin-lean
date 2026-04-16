@@ -1,12 +1,14 @@
 /-
 Extracted from Order/KrullDimension.lean
-Genuine: 87 | Conflates: 0 | Dissolved: 6 | Infrastructure: 7
+Genuine: 95 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Int
 import Mathlib.Data.ENat.Lattice
 import Mathlib.Order.Minimal
 import Mathlib.Order.RelSeries
+
+noncomputable section
 
 /-!
 # Krull dimension of a preordered set and height of an element
@@ -80,14 +82,6 @@ section height
 variable {α β : Type*}
 
 variable [Preorder α] [Preorder β]
-
-@[simp] lemma height_toDual (x : α) : height (OrderDual.toDual x) = coheight x := rfl
-
-@[simp] lemma height_ofDual (x : αᵒᵈ) : height (OrderDual.ofDual x) = coheight x := rfl
-
-@[simp] lemma coheight_toDual (x : α) : coheight (OrderDual.toDual x) = height x := rfl
-
-@[simp] lemma coheight_ofDual (x : αᵒᵈ) : coheight (OrderDual.ofDual x) = height x := rfl
 
 lemma coheight_eq (a : α) :
     coheight a = ⨆ (p : LTSeries α) (_ : a ≤ p.head), (p.length : ℕ∞) := by
@@ -337,10 +331,6 @@ protected alias ⟨_, IsMin.height_eq_zero⟩ := height_eq_zero
   height_eq_zero (α := αᵒᵈ)
 
 protected alias ⟨_, IsMax.coheight_eq_zero⟩ := coheight_eq_zero
-
-@[simp] lemma height_bot (α : Type*) [Preorder α] [OrderBot α] : height (⊥ : α) = 0 := by simp
-
-@[simp] lemma coheight_top (α : Type*) [Preorder α] [OrderTop α] : coheight (⊤ : α) = 0 := by simp
 
 lemma coe_lt_height_iff {x : α} {n : ℕ} (hfin : height x < ⊤) :
     n < height x ↔ ∃ y < x, height y = n where
@@ -615,17 +605,77 @@ lemma coheight_int (n : ℤ) : coheight n = ⊤ := coheight_of_noMaxOrder ..
 
 lemma krullDim_int : krullDim ℤ = ⊤ := krullDim_of_noMaxOrder ..
 
--- DISSOLVED: height_coe_withBot
+@[simp] lemma height_coe_withBot (x : α) : height (x : WithBot α) = height x + 1 := by
+  apply le_antisymm
+  · apply height_le
+    intro p hlast
+    wlog hlenpos : p.length ≠ 0
+    · simp_all
+    -- essentially p' := (p.drop 1).map unbot
+    let p' : LTSeries α := {
+      length := p.length - 1
+      toFun := fun ⟨i, hi⟩ => (p ⟨i+1, by omega⟩).unbot (by
+        apply LT.lt.ne_bot (a := p.head)
+        apply p.strictMono
+        exact compare_gt_iff_gt.mp rfl)
+      step := fun i => by simpa [WithBot.unbot_lt_iff] using p.step ⟨i + 1, by omega⟩ }
+    have hlast' : p'.last = x := by
+      simp only [RelSeries.last, Fin.val_last, WithBot.unbot_eq_iff, ← hlast, Fin.last]
+      congr
+      omega
+    suffices p'.length ≤ height p'.last by
+      simpa [p', hlast'] using this
+    apply length_le_height_last
+  · rw [height_add_const]
+    apply iSup₂_le
+    intro p hlast
+    let p' := (p.map _ WithBot.coe_strictMono).cons ⊥ (by simp)
+    apply le_iSup₂_of_le p' (by simp [p', hlast]) (by simp [p'])
 
--- DISSOLVED: coheight_coe_withTop
+@[simp] lemma coheight_coe_withTop (x : α) : coheight (x : WithTop α) = coheight x + 1 :=
+  height_coe_withBot (α := αᵒᵈ) x
 
--- DISSOLVED: height_coe_withTop
+@[simp] lemma height_coe_withTop (x : α) : height (x : WithTop α) = height x := by
+  apply le_antisymm
+  · apply height_le
+    intro p hlast
+    -- essentially p' := p.map untop
+    let p' : LTSeries α := {
+      length := p.length
+      toFun := fun i => (p i).untop (by
+        apply WithTop.lt_top_iff_ne_top.mp
+        apply lt_of_le_of_lt
+        · exact p.monotone (Fin.le_last _)
+        · rw [RelSeries.last] at hlast
+          simp [hlast])
+      step := fun i => by simpa only [WithTop.untop_lt_iff, WithTop.coe_untop] using p.step i }
+    have hlast' : p'.last = x := by
+      simp only [RelSeries.last, Fin.val_last, WithTop.untop_eq_iff, ← hlast]
+    suffices p'.length ≤ height p'.last by
+      rw [hlast'] at this
+      simpa [p'] using this
+    apply length_le_height_last
+  · apply height_le
+    intro p hlast
+    let p' := p.map _ WithTop.coe_strictMono
+    apply le_iSup₂_of_le p' (by simp [p', hlast]) (by simp [p'])
 
--- DISSOLVED: coheight_coe_withBot
+@[simp] lemma coheight_coe_withBot (x : α) : coheight (x : WithBot α) = coheight x :=
+  height_coe_withTop (α := αᵒᵈ) x
 
--- DISSOLVED: krullDim_WithTop
+@[simp] lemma krullDim_WithTop [Nonempty α] : krullDim (WithTop α) = krullDim α + 1 := by
+  rw [← height_top_eq_krullDim, krullDim_eq_iSup_height_of_nonempty, height_eq_iSup_lt_height]
+  norm_cast
+  simp_rw [WithTop.lt_top_iff_ne_top]
+  rw [ENat.iSup_add, iSup_subtype']
+  symm
+  apply Equiv.withTopSubtypeNe.symm.iSup_congr
+  simp
 
--- DISSOLVED: krullDim_withBot
+@[simp] lemma krullDim_withBot [Nonempty α] : krullDim (WithBot α) = krullDim α + 1 := by
+  conv_lhs => rw [← krullDim_orderDual]
+  conv_rhs => rw [← krullDim_orderDual]
+  exact krullDim_WithTop (α := αᵒᵈ)
 
 @[simp]
 lemma krullDim_enat : krullDim ℕ∞ = ⊤ := by

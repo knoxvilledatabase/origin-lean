@@ -11,6 +11,8 @@ import Mathlib.Algebra.Star.SelfAdjoint
 import Mathlib.Algebra.Star.StarRingHom
 import Mathlib.Tactic.ContinuousFunctionalCalculus
 
+noncomputable section
+
 /-! # Star ordered rings
 
 We define the class `StarOrderedRing R`, which says that the order on `R` respects the

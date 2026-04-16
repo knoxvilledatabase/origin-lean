@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.LinearAlgebra.TensorProduct.Finiteness
 
+noncomputable section
+
 /-!
 # Coalgebras
 
@@ -166,12 +168,6 @@ instance toCoalgebra : Coalgebra R R where
   rTensor_counit_comp_comul := by ext; rfl
   lTensor_counit_comp_comul := by ext; rfl
 
-@[simp]
-theorem comul_apply (r : R) : comul r = 1 ⊗ₜ[R] r := rfl
-
-@[simp]
-theorem counit_apply (r : R) : counit r = r := rfl
-
 end CommSemiring
 
 namespace Prod
@@ -189,15 +185,6 @@ instance instCoalgebraStruct : CoalgebraStruct R (A × B) where
     (TensorProduct.map (.inl R A B) (.inl R A B) ∘ₗ comul)
     (TensorProduct.map (.inr R A B) (.inr R A B) ∘ₗ comul)
   counit := .coprod counit counit
-
-@[simp]
-theorem comul_apply (r : A × B) :
-    comul r =
-      TensorProduct.map (.inl R A B) (.inl R A B) (comul r.1) +
-      TensorProduct.map (.inr R A B) (.inr R A B) (comul r.2) := rfl
-
-@[simp]
-theorem counit_apply (r : A × B) : (counit r : R) = counit r.1 + counit r.2 := rfl
 
 theorem comul_comp_inl :
     comul ∘ₗ inl R A B = TensorProduct.map (.inl R A B) (.inl R A B) ∘ₗ comul := by

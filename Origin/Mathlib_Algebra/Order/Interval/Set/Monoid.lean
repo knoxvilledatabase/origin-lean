@@ -9,6 +9,8 @@ import Mathlib.Order.Interval.Set.Basic
 import Mathlib.Algebra.Order.Monoid.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE
 
+noncomputable section
+
 /-!
 # Images of intervals under `(+ d)`
 

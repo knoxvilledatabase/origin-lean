@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Field.Ultra
 import Mathlib.Analysis.Normed.Module.Basic
 
+noncomputable section
+
 /-!
 # Normed algebra preserves ultrametricity
 

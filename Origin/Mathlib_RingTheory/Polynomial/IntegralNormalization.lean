@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Polynomial/IntegralNormalization.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Monic
 import Mathlib.RingTheory.Polynomial.ScaleRoots
+
+noncomputable section
 
 /-!
 # Theory of monic polynomials
@@ -34,7 +36,9 @@ noncomputable def integralNormalization (p : R[X]) : R[X] :=
 theorem integralNormalization_zero : integralNormalization (0 : R[X]) = 0 := by
   simp [integralNormalization]
 
--- DISSOLVED: integralNormalization_C
+@[simp]
+theorem integralNormalization_C {x : R} (hx : x ≠ 0) : integralNormalization (C x) = 1 := by
+  simp [integralNormalization, sum_def, support_C hx, degree_C hx]
 
 variable {p : R[X]}
 
@@ -55,7 +59,9 @@ alias integralNormalization_support := support_integralNormalization_subset
 theorem integralNormalization_coeff_degree {i : ℕ} (hi : p.degree = i) :
     (integralNormalization p).coeff i = 1 := by rw [integralNormalization_coeff, if_pos hi]
 
--- DISSOLVED: integralNormalization_coeff_natDegree
+theorem integralNormalization_coeff_natDegree (hp : p ≠ 0) :
+    (integralNormalization p).coeff (natDegree p) = 1 :=
+  integralNormalization_coeff_degree (degree_eq_natDegree hp)
 
 theorem integralNormalization_coeff_degree_ne {i : ℕ} (hi : p.degree ≠ i) :
     coeff (integralNormalization p) i = coeff p i * p.leadingCoeff ^ (p.natDegree - 1 - i) := by
@@ -65,7 +71,11 @@ theorem integralNormalization_coeff_ne_natDegree {i : ℕ} (hi : i ≠ natDegree
     coeff (integralNormalization p) i = coeff p i * p.leadingCoeff ^ (p.natDegree - 1 - i) :=
   integralNormalization_coeff_degree_ne (degree_ne_of_natDegree_ne hi.symm)
 
--- DISSOLVED: monic_integralNormalization
+theorem monic_integralNormalization (hp : p ≠ 0) : Monic (integralNormalization p) :=
+  monic_of_degree_le p.natDegree
+    (Finset.sup_le fun i h =>
+      WithBot.coe_le_coe.2 <| le_natDegree_of_mem_supp i <| support_integralNormalization_subset h)
+    (integralNormalization_coeff_natDegree hp)
 
 theorem integralNormalization_coeff_mul_leadingCoeff_pow (i : ℕ) (hp : 1 ≤ natDegree p) :
     (integralNormalization p).coeff i * p.leadingCoeff ^ i =

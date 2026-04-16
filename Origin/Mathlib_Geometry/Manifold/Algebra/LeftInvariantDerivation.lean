@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Derivation.Lie
 import Mathlib.Geometry.Manifold.DerivationBundle
 
+noncomputable section
+
 /-!
 
 # Left invariant derivations
@@ -56,9 +58,6 @@ instance : LinearMapClass (LeftInvariantDerivation I G) 𝕜 C^∞⟮I, G; 𝕜�
   map_smulₛₗ f := map_smul f.1.1
 
 variable {r : 𝕜} {X Y : LeftInvariantDerivation I G} {f f' : C^∞⟮I, G; 𝕜⟯}
-
-theorem toFun_eq_coe : X.toFun = ⇑X :=
-  rfl
 
 theorem coe_injective :
     @Function.Injective (LeftInvariantDerivation I G) (_ → C^∞⟮I, G; 𝕜⟯) DFunLike.coe :=
@@ -124,15 +123,6 @@ theorem coe_neg : ⇑(-X) = -X :=
 theorem coe_sub : ⇑(X - Y) = X - Y :=
   rfl
 
-@[simp, norm_cast]
-theorem lift_add : (↑(X + Y) : Derivation 𝕜 C^∞⟮I, G; 𝕜⟯ C^∞⟮I, G; 𝕜⟯) = X + Y :=
-  rfl
-
-@[simp, norm_cast]
-theorem lift_zero :
-    (↑(0 : LeftInvariantDerivation I G) : Derivation 𝕜 C^∞⟮I, G; 𝕜⟯ C^∞⟮I, G; 𝕜⟯) = 0 :=
-  rfl
-
 instance hasNatScalar : SMul ℕ (LeftInvariantDerivation I G) where
   smul r X := ⟨r • X.1, fun g => by simp_rw [LinearMap.map_smul_of_tower _ r, left_invariant']⟩
 
@@ -149,10 +139,6 @@ variable (r)
 
 @[simp]
 theorem coe_smul : ⇑(r • X) = r • ⇑X :=
-  rfl
-
-@[simp]
-theorem lift_smul (k : 𝕜) : (k • X).1 = k • X.1 :=
   rfl
 
 variable (I G)
@@ -172,10 +158,6 @@ def evalAt : LeftInvariantDerivation I G →ₗ[𝕜] PointDerivation I g where
   map_smul' _ _ := rfl
 
 theorem evalAt_apply : evalAt g X f = (X f) g :=
-  rfl
-
-@[simp]
-theorem evalAt_coe : Derivation.evalAt g ↑X = evalAt g X :=
   rfl
 
 theorem left_invariant : 𝒅ₕ (smoothLeftMul_one I g) (evalAt (1 : G) X) = evalAt g X :=
@@ -207,13 +189,6 @@ instance : Bracket (LeftInvariantDerivation I G) (LeftInvariantDerivation I G) w
       rw [coe_derivation] at hX hY ⊢
       rw [hX, hY]
       rfl⟩
-
-@[simp]
-theorem commutator_coe_derivation :
-    ⇑⁅X, Y⁆ =
-      (⁅(X : Derivation 𝕜 C^∞⟮I, G; 𝕜⟯ C^∞⟮I, G; 𝕜⟯), Y⁆ :
-        Derivation 𝕜 C^∞⟮I, G; 𝕜⟯ C^∞⟮I, G; 𝕜⟯) :=
-  rfl
 
 theorem commutator_apply : ⁅X, Y⁆ f = X (Y f) - Y (X f) :=
   rfl

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Sets.Compacts
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 #  Riesz–Markov–Kakutani representation theorem
 

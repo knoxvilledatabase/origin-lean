@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 
+noncomputable section
+
 /-!
 # Algebraic elements and algebraic extensions
 

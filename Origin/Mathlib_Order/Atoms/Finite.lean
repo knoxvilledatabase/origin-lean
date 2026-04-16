@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Order.Interval.Finset.Defs
 import Mathlib.Order.Atoms
 
+noncomputable section
+
 /-!
 # Atoms, Coatoms, Simple Lattices, and Finiteness
 

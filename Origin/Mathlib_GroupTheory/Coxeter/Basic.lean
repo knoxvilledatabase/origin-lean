@@ -11,6 +11,8 @@ import Mathlib.Tactic.NormNum.DivMod
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Use
 
+noncomputable section
+
 /-!
 # Coxeter groups and Coxeter systems
 
@@ -123,12 +125,6 @@ def reindexGroupEquiv : (M.reindex e).Group ≃* M.Group :=
         Subgroup.map_normalClosure _ _ (by simpa using (FreeGroup.freeGroupCongr e).surjective),
         MonoidHom.coe_coe])
 
-theorem reindexGroupEquiv_apply_simple (i : B') :
-    (M.reindexGroupEquiv e) ((M.reindex e).simple i) = M.simple (e.symm i) := rfl
-
-theorem reindexGroupEquiv_symm_apply_simple (i : B) :
-    (M.reindexGroupEquiv e).symm (M.simple i) = (M.reindex e).simple (e i) := rfl
-
 end CoxeterMatrix
 
 /-! ### Coxeter systems -/
@@ -169,14 +165,6 @@ protected def map (e : W ≃* H) : CoxeterSystem M H := ⟨e.symm.trans cs.mulEq
 /-! ### Simple reflections -/
 
 def simple (i : B) : W := cs.mulEquiv.symm (PresentedGroup.of i)
-
-@[simp]
-theorem _root_.CoxeterMatrix.toCoxeterSystem_simple (M : CoxeterMatrix B) :
-    M.toCoxeterSystem.simple = M.simple := rfl
-
-@[simp] theorem reindex_simple (i' : B') : (cs.reindex e).simple i' = cs.simple (e.symm i') := rfl
-
-@[simp] theorem map_simple (e : W ≃* H) (i : B) : (cs.map e).simple i = e (cs.simple i) := rfl
 
 local prefix:100 "s" => cs.simple
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Nilpotent.lean
-Genuine: 74 | Conflates: 4 | Dissolved: 0 | Infrastructure: 11
+Genuine: 72 | Conflates: 4 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Lie.BaseChange
@@ -11,6 +11,8 @@ import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.Order.Filter.AtTopBot
 import Mathlib.RingTheory.Artinian
 import Mathlib.RingTheory.Nilpotent.Lemmas
+
+noncomputable section
 
 /-!
 # Nilpotent Lie algebras
@@ -44,10 +46,6 @@ namespace LieSubmodule
 
 def lcs : LieSubmodule R L M → LieSubmodule R L M :=
   (fun N => ⁅(⊤ : LieIdeal R L), N⁆)^[k]
-
-@[simp]
-theorem lcs_zero (N : LieSubmodule R L M) : N.lcs 0 = N :=
-  rfl
 
 @[simp]
 theorem lcs_succ : N.lcs (k + 1) = ⁅(⊤ : LieIdeal R L), N.lcs k⁆ :=
@@ -432,10 +430,6 @@ def ucs (k : ℕ) : LieSubmodule R L M → LieSubmodule R L M :=
   normalizer^[k]
 
 @[simp]
-theorem ucs_zero : N.ucs 0 = N :=
-  rfl
-
-@[simp]
 theorem ucs_succ (k : ℕ) : N.ucs (k + 1) = (N.ucs k).normalizer :=
   Function.iterate_succ_apply' normalizer k N
 
@@ -514,7 +508,6 @@ variable {f : L →ₗ⁅R⁆ L₂} {g : M →ₗ[R] M₂}
 variable (hf : Surjective f) (hg : Surjective g) (hfg : ∀ x m, ⁅f x, g m⁆ = g ⁅x, m⁆)
 
 include hf hg hfg in
-
 theorem Function.Surjective.lieModule_lcs_map_eq (k : ℕ) :
     (lowerCentralSeries R L M k : Submodule R M).map g = lowerCentralSeries R L₂ M₂ k := by
   induction k with
@@ -540,7 +533,6 @@ theorem Function.Surjective.lieModule_lcs_map_eq (k : ℕ) :
       exact ⟨⁅y, n⁆, ⟨y, n, hn, rfl⟩, (hfg y n).symm⟩
 
 include hf hg hfg in
-
 theorem Function.Surjective.lieModuleIsNilpotent [IsNilpotent R L M] : IsNilpotent R L₂ M₂ := by
   obtain ⟨k, hk⟩ := id (by infer_instance : IsNilpotent R L M)
   use k
@@ -681,16 +673,6 @@ theorem LieEquiv.nilpotent_iff_equiv_nilpotent (e : L ≃ₗ⁅R⁆ L') :
 theorem LieHom.isNilpotent_range [IsNilpotent R L] (f : L →ₗ⁅R⁆ L') : IsNilpotent R f.range :=
   f.surjective_rangeRestrict.lieAlgebra_isNilpotent
 
-@[simp]
-theorem LieAlgebra.isNilpotent_range_ad_iff : IsNilpotent R (ad R L).range ↔ IsNilpotent R L := by
-  refine ⟨fun h => ?_, ?_⟩
-  · have : (ad R L).ker = center R L := by simp
-    exact
-      LieAlgebra.nilpotent_of_nilpotent_quotient (le_of_eq this)
-        ((ad R L).quotKerEquivRange.nilpotent_iff_equiv_nilpotent.mpr h)
-  · intro h
-    exact (ad R L).isNilpotent_range
-
 instance [h : LieAlgebra.IsNilpotent R L] : LieAlgebra.IsNilpotent R (⊤ : LieSubalgebra R L) :=
   LieSubalgebra.topEquiv.nilpotent_iff_equiv_nilpotent.mpr h
 
@@ -710,15 +692,8 @@ def lcs : LieSubmodule R L M :=
   (fun N => ⁅I, N⁆)^[k] ⊤
 
 @[simp]
-theorem lcs_zero : I.lcs M 0 = ⊤ :=
-  rfl
-
-@[simp]
 theorem lcs_succ : I.lcs M (k + 1) = ⁅I, I.lcs M k⁆ :=
   Function.iterate_succ_apply' (fun N => ⁅I, N⁆) k ⊤
-
-theorem lcs_top : (⊤ : LieIdeal R L).lcs M k = lowerCentralSeries R L M k :=
-  rfl
 
 theorem coe_lcs_eq [LieModule R L M] :
     LieSubmodule.toSubmodule (I.lcs M k) = lowerCentralSeries R I M k := by

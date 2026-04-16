@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.RCLike.Lemmas
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Complex
 
+noncomputable section
+
 /-!
 # Measurability of the basic `RCLike` functions
 

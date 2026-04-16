@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Radical.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 29 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Basic
 import Mathlib.RingTheory.Coprime.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
+
+noncomputable section
 
 /-!
 # Radical of an element of a unique factorization normalization monoid
@@ -113,7 +115,13 @@ theorem radical_pow_of_prime {a : M} (ha : Prime a) {n : ℕ} (hn : 0 < n) :
   rw [radical_pow a hn]
   exact radical_of_prime ha
 
--- DISSOLVED: radical_ne_zero
+-- CONFLATES (assumes ground = zero): radical_ne_zero
+theorem radical_ne_zero (a : M) [Nontrivial M] : radical a ≠ 0 := by
+  rw [radical, ← Finset.prod_val]
+  apply Multiset.prod_ne_zero
+  rw [primeFactors]
+  simp only [Multiset.toFinset_val, Multiset.mem_dedup]
+  exact zero_not_mem_normalizedFactors _
 
 end UniqueFactorizationMonoid
 
@@ -137,7 +145,13 @@ theorem disjoint_primeFactors {a b : R} (hc : IsCoprime a b) :
     Disjoint (primeFactors a) (primeFactors b) :=
   Multiset.disjoint_toFinset.mpr (disjoint_normalizedFactors hc)
 
--- DISSOLVED: mul_primeFactors_disjUnion
+theorem mul_primeFactors_disjUnion {a b : R} (ha : a ≠ 0) (hb : b ≠ 0)
+    (hc : IsCoprime a b) :
+    primeFactors (a * b) =
+    (primeFactors a).disjUnion (primeFactors b) (disjoint_primeFactors hc) := by
+  rw [Finset.disjUnion_eq_union]
+  simp_rw [primeFactors]
+  rw [normalizedFactors_mul ha hb, Multiset.toFinset_add]
 
 @[simp]
 theorem radical_neg_one : radical (-1 : R) = 1 :=
@@ -178,7 +192,9 @@ theorem divRadical_mul_radical (a : E) : divRadical a * radical a = a := by
   rw [mul_comm]
   exact radical_mul_divRadical a
 
--- DISSOLVED: divRadical_ne_zero
+theorem divRadical_ne_zero {a : E} (ha : a ≠ 0) : divRadical a ≠ 0 := by
+  rw [← radical_mul_divRadical a] at ha
+  exact right_ne_zero_of_mul ha
 
 theorem divRadical_isUnit {u : E} (hu : IsUnit u) : IsUnit (divRadical u) := by
   rwa [divRadical, radical_unit_eq_one hu, EuclideanDomain.div_one]

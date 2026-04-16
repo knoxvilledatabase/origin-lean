@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Closed.Monoidal
 import Mathlib.CategoryTheory.Linear.Yoneda
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Symmetric
 
+noncomputable section
+
 /-!
 # The monoidal closed structure on `Module R`.
 -/
@@ -46,16 +48,7 @@ instance : MonoidalClosed (ModuleCat.{u} R) where
                 intro m n
                 rfl } }
 
-theorem ihom_map_apply {M N P : ModuleCat.{u} R} (f : N ⟶ P) (g : ModuleCat.of R (M ⟶ N)) :
-    (ihom M).map f g = g ≫ f :=
-  rfl
-
 open MonoidalCategory
-
-theorem monoidalClosed_curry {M N P : ModuleCat.{u} R} (f : M ⊗ N ⟶ P) (x : M) (y : N) :
-    @DFunLike.coe _ _ _ LinearMap.instFunLike
-      ((MonoidalClosed.curry f : N →ₗ[R] M →ₗ[R] P) y) x = f (x ⊗ₜ[R] y) :=
-  rfl
 
 @[simp]
 theorem monoidalClosed_uncurry
@@ -69,13 +62,5 @@ theorem ihom_ev_app (M N : ModuleCat.{u} R) :
   rw [← MonoidalClosed.uncurry_id_eq_ev]
   apply TensorProduct.ext'
   apply monoidalClosed_uncurry
-
-theorem ihom_coev_app (M N : ModuleCat.{u} R) :
-    (ihom.coev M).app N = (TensorProduct.mk _ _ _).flip :=
-  rfl
-
-theorem monoidalClosed_pre_app {M N : ModuleCat.{u} R} (P : ModuleCat.{u} R) (f : N ⟶ M) :
-    (MonoidalClosed.pre f).app P = LinearMap.lcomp R _ f :=
-  rfl
 
 end ModuleCat

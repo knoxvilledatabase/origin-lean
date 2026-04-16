@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Idempotents.Basic
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.CategoryTheory.Equivalence
 
+noncomputable section
+
 /-!
 # The Karoubi envelope of a category
 
@@ -99,12 +101,8 @@ theorem comp_f {P Q R : Karoubi C} (f : P ⟶ Q) (g : Q ⟶ R) : (f ≫ g).f = f
 @[simp]
 theorem id_f {P : Karoubi C} : Hom.f (𝟙 P) = P.p := rfl
 
-theorem id_eq {P : Karoubi C} : 𝟙 P = ⟨P.p, by repeat' rw [P.idem]⟩ := rfl
-
 instance coe : CoeTC C (Karoubi C) :=
   ⟨fun X => ⟨X, 𝟙 X, by rw [comp_id]⟩⟩
-
-theorem coe_X (X : C) : (X : Karoubi C).X = X := rfl
 
 @[simp]
 theorem coe_p (X : C) : (X : Karoubi C).p = 𝟙 X := rfl
@@ -236,12 +234,6 @@ theorem decompId (P : Karoubi C) : 𝟙 P = decompId_i P ≫ decompId_p P := by
 theorem decomp_p (P : Karoubi C) : (toKaroubi C).map P.p = decompId_p P ≫ decompId_i P := by
   ext
   simp only [comp_f, decompId_p_f, decompId_i_f, P.idem, toKaroubi_map_f]
-
-theorem decompId_i_toKaroubi (X : C) : decompId_i ((toKaroubi C).obj X) = 𝟙 _ := by
-  rfl
-
-theorem decompId_p_toKaroubi (X : C) : decompId_p ((toKaroubi C).obj X) = 𝟙 _ := by
-  rfl
 
 theorem decompId_i_naturality {P Q : Karoubi C} (f : P ⟶ Q) :
     f ≫ decompId_i Q = decompId_i P ≫ (by exact Hom.mk f.f (by simp)) := by

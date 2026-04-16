@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 import Mathlib.Algebra.Homology.ShortComplex.SnakeLemma
 import Mathlib.CategoryTheory.Limits.Shapes.ConcreteCategory
 
+noncomputable section
+
 /-!
 # Exactness of short complexes in concrete abelian categories
 

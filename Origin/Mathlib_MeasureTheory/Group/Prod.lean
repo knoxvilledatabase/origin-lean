@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Group/Prod.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Measure
 import Mathlib.MeasureTheory.Measure.Prod
+
+noncomputable section
 
 /-!
 # Measure theory in the product of groups
@@ -185,7 +187,9 @@ theorem measure_mul_right_null (y : G) : μ ((fun x => x * y) ⁻¹' s) = 0 ↔ 
       simp_rw [← inv_preimage, preimage_preimage, mul_inv_rev, inv_inv]
     _ ↔ μ s = 0 := by simp only [measure_inv_null μ, measure_preimage_mul]
 
--- DISSOLVED: measure_mul_right_ne_zero
+@[to_additive]
+theorem measure_mul_right_ne_zero (h2s : μ s ≠ 0) (y : G) : μ ((fun x => x * y) ⁻¹' s) ≠ 0 :=
+  (not_congr (measure_mul_right_null μ y)).mpr h2s
 
 @[to_additive]
 theorem absolutelyContinuous_map_mul_right (g : G) : μ ≪ map (· * g) μ := by
@@ -217,7 +221,14 @@ theorem measure_mul_lintegral_eq [IsMulLeftInvariant ν] (sm : MeasurableSet s) 
   simp_rw [this, lintegral_mul_const _ (ms _), lintegral_indicator (measurable_mul_const _ sm),
     setLIntegral_one]
 
--- DISSOLVED: absolutelyContinuous_of_isMulLeftInvariant
+@[to_additive
+" Any two nonzero left-invariant measures are absolutely continuous w.r.t. each other. "]
+theorem absolutelyContinuous_of_isMulLeftInvariant [IsMulLeftInvariant ν] (hν : ν ≠ 0) : μ ≪ ν := by
+  refine AbsolutelyContinuous.mk fun s sm hνs => ?_
+  have h1 := measure_mul_lintegral_eq μ ν sm 1 measurable_one
+  simp_rw [Pi.one_apply, lintegral_one, mul_one, (measure_mul_right_null ν _).mpr hνs,
+    lintegral_zero, mul_eq_zero (M₀ := ℝ≥0∞), measure_univ_eq_zero.not.mpr hν, or_false] at h1
+  exact h1
 
 section SigmaFinite
 
@@ -242,13 +253,57 @@ theorem ae_measure_preimage_mul_right_lt_top (hμs : μ' s ≠ ∞) :
   rw [← lintegral_indicator hA, ← h1]
   exact ENNReal.mul_ne_top hμs h3A.ne
 
--- DISSOLVED: ae_measure_preimage_mul_right_lt_top_of_ne_zero
+@[to_additive]
+theorem ae_measure_preimage_mul_right_lt_top_of_ne_zero (h2s : ν' s ≠ 0) (h3s : ν' s ≠ ∞) :
+    ∀ᵐ x ∂μ', ν' ((fun y => y * x) ⁻¹' s) < ∞ := by
+  refine (ae_measure_preimage_mul_right_lt_top ν' ν' h3s).filter_mono ?_
+  refine (absolutelyContinuous_of_isMulLeftInvariant μ' ν' ?_).ae_le
+  refine mt ?_ h2s
+  intro hν
+  rw [hν, Measure.coe_zero, Pi.zero_apply]
 
--- DISSOLVED: measure_lintegral_div_measure
+@[to_additive
+"A technical lemma relating two different measures. This is basically [Halmos, §60 Th. A]. Note that
+if `f` is the characteristic function of a measurable set `t` this states that `μ t = c * μ s` for a
+constant `c` that does not depend on `μ`.
+Note: There is a gap in the last step of the proof in [Halmos]. In the last line, the equality
+`g(-x) + ν(s - x) = f(x)` holds if we can prove that `0 < ν(s - x) < ∞`. The first inequality
+follows from §59, Th. D, but the second inequality is not justified. We prove this inequality for
+almost all `x` in `MeasureTheory.ae_measure_preimage_add_right_lt_top_of_ne_zero`."]
+theorem measure_lintegral_div_measure (sm : MeasurableSet s) (h2s : ν' s ≠ 0) (h3s : ν' s ≠ ∞)
+    (f : G → ℝ≥0∞) (hf : Measurable f) :
+    (μ' s * ∫⁻ y, f y⁻¹ / ν' ((· * y⁻¹) ⁻¹' s) ∂ν') = ∫⁻ x, f x ∂μ' := by
+  set g := fun y => f y⁻¹ / ν' ((fun x => x * y⁻¹) ⁻¹' s)
+  have hg : Measurable g :=
+    (hf.comp measurable_inv).div ((measurable_measure_mul_right ν' sm).comp measurable_inv)
+  simp_rw [measure_mul_lintegral_eq μ' ν' sm g hg, g, inv_inv]
+  refine lintegral_congr_ae ?_
+  refine (ae_measure_preimage_mul_right_lt_top_of_ne_zero μ' ν' h2s h3s).mono fun x hx => ?_
+  simp_rw [ENNReal.mul_div_cancel' (measure_mul_right_ne_zero ν' h2s _) hx.ne]
 
--- DISSOLVED: measure_mul_measure_eq
+@[to_additive]
+theorem measure_mul_measure_eq (s t : Set G) (h2s : ν' s ≠ 0) (h3s : ν' s ≠ ∞) :
+    μ' s * ν' t = ν' s * μ' t := by
+  wlog hs : MeasurableSet s generalizing s
+  · rcases exists_measurable_superset₂ μ' ν' s with ⟨s', -, hm, hμ, hν⟩
+    rw [← hμ, ← hν, this s' _ _ hm] <;> rwa [hν]
+  wlog ht : MeasurableSet t generalizing t
+  · rcases exists_measurable_superset₂ μ' ν' t with ⟨t', -, hm, hμ, hν⟩
+    rw [← hμ, ← hν, this _ hm]
+  have h1 := measure_lintegral_div_measure ν' ν' hs h2s h3s (t.indicator fun _ => 1)
+    (measurable_const.indicator ht)
+  have h2 := measure_lintegral_div_measure μ' ν' hs h2s h3s (t.indicator fun _ => 1)
+    (measurable_const.indicator ht)
+  rw [lintegral_indicator ht, setLIntegral_one] at h1 h2
+  rw [← h1, mul_left_comm, h2]
 
--- DISSOLVED: measure_eq_div_smul
+@[to_additive
+" Left invariant Borel measures on an additive measurable group are unique (up to a scalar). "]
+theorem measure_eq_div_smul (h2s : ν' s ≠ 0) (h3s : ν' s ≠ ∞) :
+    μ' = (μ' s / ν' s) • ν' := by
+  ext1 t -
+  rw [smul_apply, smul_eq_mul, mul_comm, ← mul_div_assoc, mul_comm,
+    measure_mul_measure_eq μ' ν' s t h2s h3s, mul_div_assoc, ENNReal.mul_div_cancel' h2s h3s]
 
 end SigmaFinite
 

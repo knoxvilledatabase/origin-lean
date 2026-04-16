@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Cones
 import Mathlib.CategoryTheory.FinCategory.Basic
 
+noncomputable section
+
 /-!
 # Bicones
 

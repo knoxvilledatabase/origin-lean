@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomologicalComplex
 import Mathlib.CategoryTheory.DifferentialObject
 
+noncomputable section
+
 /-!
 # Homological complexes are differential graded objects.
 
@@ -38,10 +40,6 @@ abbrev objEqToHom {i j : β} (h : i = j) :
     X.obj i ⟶ X.obj j :=
   eqToHom (congr_arg X.obj h)
 
-@[simp]
-theorem objEqToHom_refl (i : β) : X.objEqToHom (refl i) = 𝟙 _ :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem objEqToHom_d {x y : β} (h : x = y) :
     X.objEqToHom h ≫ X.d y = X.d x ≫ X.objEqToHom (by cases h; rfl) := by cases h; dsimp; simp
@@ -70,6 +68,9 @@ theorem d_eqToHom (X : HomologicalComplex V (ComplexShape.up' b)) {x y z : β} (
 open Classical in
 
 set_option maxHeartbeats 400000 in
+/-- The functor from differential graded objects to homological complexes.
+
+-/
 
 @[simps]
 def dgoToHomologicalComplex :

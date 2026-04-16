@@ -1,10 +1,12 @@
 /-
 Extracted from Order/ConditionallyCompleteLattice/Basic.lean
-Genuine: 109 | Conflates: 0 | Dissolved: 10 | Infrastructure: 17
+Genuine: 119 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.ConditionallyCompleteLattice.Defs
+
+noncomputable section
 
 /-!
 # Theory of conditionally complete lattices
@@ -57,25 +59,59 @@ noncomputable instance WithBot.instInfSet [InfSet α] :
     InfSet (WithBot α) :=
   ⟨(WithTop.instSupSet (α := αᵒᵈ)).sSup⟩
 
--- DISSOLVED: WithTop.sSup_eq
+theorem WithTop.sSup_eq [SupSet α] {s : Set (WithTop α)} (hs : ⊤ ∉ s)
+    (hs' : BddAbove ((↑) ⁻¹' s : Set α)) : sSup s = ↑(sSup ((↑) ⁻¹' s) : α) :=
+  (if_neg hs).trans <| if_pos hs'
 
--- DISSOLVED: WithTop.sInf_eq
+theorem WithTop.sInf_eq [InfSet α] {s : Set (WithTop α)} (hs : ¬s ⊆ {⊤}) (h's : BddBelow s) :
+    sInf s = ↑(sInf ((↑) ⁻¹' s) : α) :=
+  if_neg <| by simp [hs, h's]
 
--- DISSOLVED: WithBot.sInf_eq
+theorem WithBot.sInf_eq [InfSet α] {s : Set (WithBot α)} (hs : ⊥ ∉ s)
+    (hs' : BddBelow ((↑) ⁻¹' s : Set α)) : sInf s = ↑(sInf ((↑) ⁻¹' s) : α) :=
+  (if_neg hs).trans <| if_pos hs'
 
--- DISSOLVED: WithBot.sSup_eq
+theorem WithBot.sSup_eq [SupSet α] {s : Set (WithBot α)} (hs : ¬s ⊆ {⊥}) (h's : BddAbove s) :
+    sSup s = ↑(sSup ((↑) ⁻¹' s) : α) :=
+  WithTop.sInf_eq (α := αᵒᵈ) hs h's
 
--- DISSOLVED: WithTop.sInf_empty
+@[simp]
+theorem WithTop.sInf_empty [InfSet α] : sInf (∅ : Set (WithTop α)) = ⊤ :=
+  if_pos <| by simp
 
--- DISSOLVED: WithTop.coe_sInf'
+theorem WithTop.coe_sInf' [InfSet α] {s : Set α} (hs : s.Nonempty) (h's : BddBelow s) :
+    ↑(sInf s) = (sInf ((fun (a : α) ↦ ↑a) '' s) : WithTop α) := by
+  classical
+  obtain ⟨x, hx⟩ := hs
+  change _ = ite _ _ _
+  split_ifs with h
+  · rcases h with h1 | h2
+    · cases h1 (mem_image_of_mem _ hx)
+    · exact (h2 (Monotone.map_bddBelow coe_mono h's)).elim
+  · rw [preimage_image_eq]
+    exact Option.some_injective _
 
--- DISSOLVED: WithTop.coe_sSup'
+theorem WithTop.coe_sSup' [SupSet α] {s : Set α} (hs : BddAbove s) :
+    ↑(sSup s) = (sSup ((fun (a : α) ↦ ↑a) '' s) : WithTop α) := by
+  classical
+  change _ = ite _ _ _
+  rw [if_neg, preimage_image_eq, if_pos hs]
+  · exact Option.some_injective _
+  · rintro ⟨x, _, ⟨⟩⟩
 
--- DISSOLVED: WithBot.sSup_empty
+@[simp]
+theorem WithBot.sSup_empty [SupSet α] : sSup (∅ : Set (WithBot α)) = ⊥ :=
+  WithTop.sInf_empty (α := αᵒᵈ)
 
--- DISSOLVED: WithBot.coe_sSup'
+@[norm_cast]
+theorem WithBot.coe_sSup' [SupSet α] {s : Set α} (hs : s.Nonempty) (h's : BddAbove s) :
+    ↑(sSup s) = (sSup ((fun (a : α) ↦ ↑a) '' s) : WithBot α) :=
+  WithTop.coe_sInf' (α := αᵒᵈ) hs h's
 
--- DISSOLVED: WithBot.coe_sInf'
+@[norm_cast]
+theorem WithBot.coe_sInf' [InfSet α] {s : Set α} (hs : BddBelow s) :
+    ↑(sInf s) = (sInf ((fun (a : α) ↦ ↑a) '' s) : WithBot α) :=
+  WithTop.coe_sSup' (α := αᵒᵈ) hs
 
 end
 

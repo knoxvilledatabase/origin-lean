@@ -7,6 +7,8 @@ import Mathlib.Lean.Expr.Basic
 import Mathlib.Order.Monotone.Basic
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # The `apply_fun` tactic.
 

@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
+noncomputable section
+
 /-!
 # Changing the index type of a matrix
 
@@ -39,16 +41,6 @@ def reindexLinearEquiv (eₘ : m ≃ m') (eₙ : n ≃ n') : Matrix m n A ≃ₗ
   { reindex eₘ eₙ with
     map_add' := fun _ _ => rfl
     map_smul' := fun _ _ => rfl }
-
-@[simp]
-theorem reindexLinearEquiv_apply (eₘ : m ≃ m') (eₙ : n ≃ n') (M : Matrix m n A) :
-    reindexLinearEquiv R A eₘ eₙ M = reindex eₘ eₙ M :=
-  rfl
-
-@[simp]
-theorem reindexLinearEquiv_symm (eₘ : m ≃ m') (eₙ : n ≃ n') :
-    (reindexLinearEquiv R A eₘ eₙ).symm = reindexLinearEquiv R A eₘ.symm eₙ.symm :=
-  rfl
 
 @[simp]
 theorem reindexLinearEquiv_refl_refl :
@@ -109,16 +101,6 @@ def reindexAlgEquiv (e : m ≃ n) : Matrix m m A ≃ₐ[R] Matrix n n A :=
     map_mul' := fun a b => (reindexLinearEquiv_mul A A e e e a b).symm
     -- Porting note: `submatrix_smul` needed help
     commutes' := fun r => by simp [algebraMap, Algebra.toRingHom, submatrix_smul _ 1] }
-
-@[simp]
-theorem reindexAlgEquiv_apply (e : m ≃ n) (M : Matrix m m A) :
-    reindexAlgEquiv R A e M = reindex e e M :=
-  rfl
-
-@[simp]
-theorem reindexAlgEquiv_symm (e : m ≃ n) : (reindexAlgEquiv R A e).symm =
-    reindexAlgEquiv R A e.symm :=
-  rfl
 
 @[simp]
 theorem reindexAlgEquiv_refl : reindexAlgEquiv R A (Equiv.refl m) = AlgEquiv.refl :=

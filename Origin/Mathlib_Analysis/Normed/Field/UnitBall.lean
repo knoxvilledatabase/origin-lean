@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Field.Lemmas
 import Mathlib.Analysis.Normed.Group.BallSphere
 
+noncomputable section
+
 /-!
 # Algebraic structures on unit balls and spheres
 
@@ -39,11 +41,6 @@ instance Metric.unitBall.hasDistribNeg [NonUnitalSeminormedRing 𝕜] :
     HasDistribNeg (ball (0 : 𝕜) 1) :=
   Subtype.coe_injective.hasDistribNeg ((↑) : ball (0 : 𝕜) 1 → 𝕜) (fun _ => rfl) fun _ _ => rfl
 
-@[simp, norm_cast]
-theorem coe_mul_unitBall [NonUnitalSeminormedRing 𝕜] (x y : ball (0 : 𝕜) 1) :
-    ↑(x * y) = (x * y : 𝕜) :=
-  rfl
-
 def Subsemigroup.unitClosedBall (𝕜 : Type*) [NonUnitalSeminormedRing 𝕜] : Subsemigroup 𝕜 where
   carrier := closedBall 0 1
   mul_mem' hx hy := by
@@ -62,11 +59,6 @@ instance Metric.unitClosedBall.continuousMul [NonUnitalSeminormedRing 𝕜] :
     ContinuousMul (closedBall (0 : 𝕜) 1) :=
   (Subsemigroup.unitClosedBall 𝕜).continuousMul
 
-@[simp, norm_cast]
-theorem coe_mul_unitClosedBall [NonUnitalSeminormedRing 𝕜] (x y : closedBall (0 : 𝕜) 1) :
-    ↑(x * y) = (x * y : 𝕜) :=
-  rfl
-
 def Submonoid.unitClosedBall (𝕜 : Type*) [SeminormedRing 𝕜] [NormOneClass 𝕜] : Submonoid 𝕜 :=
   { Subsemigroup.unitClosedBall 𝕜 with
     carrier := closedBall 0 1
@@ -79,16 +71,6 @@ instance Metric.unitClosedBall.monoid [SeminormedRing 𝕜] [NormOneClass 𝕜] 
 instance Metric.unitClosedBall.commMonoid [SeminormedCommRing 𝕜] [NormOneClass 𝕜] :
     CommMonoid (closedBall (0 : 𝕜) 1) :=
   SubmonoidClass.toCommMonoid (Submonoid.unitClosedBall 𝕜)
-
-@[simp, norm_cast]
-theorem coe_one_unitClosedBall [SeminormedRing 𝕜] [NormOneClass 𝕜] :
-    ((1 : closedBall (0 : 𝕜) 1) : 𝕜) = 1 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_pow_unitClosedBall [SeminormedRing 𝕜] [NormOneClass 𝕜] (x : closedBall (0 : 𝕜) 1)
-    (n : ℕ) : ↑(x ^ n) = (x : 𝕜) ^ n :=
-  rfl
 
 @[simps]
 def Submonoid.unitSphere (𝕜 : Type*) [NormedDivisionRing 𝕜] : Submonoid 𝕜 where
@@ -104,10 +86,6 @@ instance Metric.unitSphere.inv [NormedDivisionRing 𝕜] : Inv (sphere (0 : 𝕜
       mem_sphere_zero_iff_norm.2 <| by
         rw [norm_inv, mem_sphere_zero_iff_norm.1 x.coe_prop, inv_one]⟩⟩
 
-@[simp, norm_cast]
-theorem coe_inv_unitSphere [NormedDivisionRing 𝕜] (x : sphere (0 : 𝕜) 1) : ↑x⁻¹ = (x⁻¹ : 𝕜) :=
-  rfl
-
 instance Metric.unitSphere.div [NormedDivisionRing 𝕜] : Div (sphere (0 : 𝕜) 1) :=
   ⟨fun x y =>
     ⟨x / y,
@@ -115,46 +93,17 @@ instance Metric.unitSphere.div [NormedDivisionRing 𝕜] : Div (sphere (0 : 𝕜
         rw [norm_div, mem_sphere_zero_iff_norm.1 x.coe_prop, mem_sphere_zero_iff_norm.1 y.coe_prop,
           div_one]⟩⟩
 
-@[simp, norm_cast]
-theorem coe_div_unitSphere [NormedDivisionRing 𝕜] (x y : sphere (0 : 𝕜) 1) :
-    ↑(x / y) = (x / y : 𝕜) :=
-  rfl
-
 instance Metric.unitSphere.pow [NormedDivisionRing 𝕜] : Pow (sphere (0 : 𝕜) 1) ℤ :=
   ⟨fun x n =>
     ⟨(x : 𝕜) ^ n, by
       rw [mem_sphere_zero_iff_norm, norm_zpow, mem_sphere_zero_iff_norm.1 x.coe_prop, one_zpow]⟩⟩
 
-@[simp, norm_cast]
-theorem coe_zpow_unitSphere [NormedDivisionRing 𝕜] (x : sphere (0 : 𝕜) 1) (n : ℤ) :
-    ↑(x ^ n) = (x : 𝕜) ^ n :=
-  rfl
-
 instance Metric.unitSphere.monoid [NormedDivisionRing 𝕜] : Monoid (sphere (0 : 𝕜) 1) :=
   SubmonoidClass.toMonoid (Submonoid.unitSphere 𝕜)
-
-@[simp, norm_cast]
-theorem coe_one_unitSphere [NormedDivisionRing 𝕜] : ((1 : sphere (0 : 𝕜) 1) : 𝕜) = 1 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_mul_unitSphere [NormedDivisionRing 𝕜] (x y : sphere (0 : 𝕜) 1) :
-    ↑(x * y) = (x * y : 𝕜) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_pow_unitSphere [NormedDivisionRing 𝕜] (x : sphere (0 : 𝕜) 1) (n : ℕ) :
-    ↑(x ^ n) = (x : 𝕜) ^ n :=
-  rfl
 
 def unitSphereToUnits (𝕜 : Type*) [NormedDivisionRing 𝕜] : sphere (0 : 𝕜) 1 →* Units 𝕜 :=
   Units.liftRight (Submonoid.unitSphere 𝕜).subtype
     (fun x => Units.mk0 x <| ne_zero_of_mem_unit_sphere _) fun _x => rfl
-
-@[simp]
-theorem unitSphereToUnits_apply_coe [NormedDivisionRing 𝕜] (x : sphere (0 : 𝕜) 1) :
-    (unitSphereToUnits 𝕜 x : 𝕜) = x :=
-  rfl
 
 theorem unitSphereToUnits_injective [NormedDivisionRing 𝕜] :
     Function.Injective (unitSphereToUnits 𝕜) := fun x y h =>

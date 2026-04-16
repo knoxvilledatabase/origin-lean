@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/PartENat.lean
-Genuine: 71 | Conflates: 0 | Dissolved: 34 | Infrastructure: 44
+Genuine: 87 | Conflates: 0 | Dissolved: 0 | Infrastructure: 62
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Data.ENat.Lattice
 import Mathlib.Data.Part
 import Mathlib.Tactic.NormNum
+
+noncomputable section
 
 /-!
 # Natural numbers with infinity
@@ -169,18 +171,6 @@ theorem coe_add_get {x : ℕ} {y : PartENat} (h : ((x : PartENat) + y).Dom) :
   rfl
 
 @[simp]
-theorem get_add {x y : PartENat} (h : (x + y).Dom) : get (x + y) h = x.get h.1 + y.get h.2 :=
-  rfl
-
-@[simp]
-theorem get_zero (h : (0 : PartENat).Dom) : (0 : PartENat).get h = 0 :=
-  rfl
-
-@[simp]
-theorem get_one (h : (1 : PartENat).Dom) : (1 : PartENat).get h = 1 :=
-  rfl
-
-@[simp]
 theorem get_ofNat' (x : ℕ) [x.AtLeastTwo] (h : (no_index (OfNat.ofNat x : PartENat)).Dom) :
     Part.get (no_index (OfNat.ofNat x : PartENat)) h = (no_index (OfNat.ofNat x)) :=
   get_natCast' x h
@@ -292,13 +282,11 @@ theorem coe_lt_iff (n : ℕ) (x : PartENat) : (n : PartENat) < x ↔ ∀ h : x.D
 nonrec theorem eq_zero_iff {x : PartENat} : x = 0 ↔ x ≤ 0 :=
   eq_bot_iff
 
--- DISSOLVED: ne_zero_iff
+theorem ne_zero_iff {x : PartENat} : x ≠ 0 ↔ ⊥ < x :=
+  bot_lt_iff_ne_bot.symm
 
 theorem dom_of_lt {x y : PartENat} : x < y → x.Dom :=
   PartENat.casesOn x not_top_lt fun _ _ => dom_natCast _
-
-theorem top_eq_none : (⊤ : PartENat) = Part.none :=
-  rfl
 
 @[simp]
 theorem natCast_lt_top (x : ℕ) : (x : PartENat) < ⊤ :=
@@ -494,31 +482,65 @@ protected theorem add_left_cancel_iff {a b c : PartENat} (ha : a ≠ ⊤) : a + 
 
 section WithTop
 
--- DISSOLVED: toWithTop
+def toWithTop (x : PartENat) [Decidable x.Dom] : ℕ∞ :=
+  x.toOption
 
--- DISSOLVED: toWithTop_top
+theorem toWithTop_top :
+    have : Decidable (⊤ : PartENat).Dom := Part.noneDecidable
+    toWithTop ⊤ = ⊤ :=
+  rfl
 
--- DISSOLVED: toWithTop_top'
+@[simp]
+theorem toWithTop_top' {h : Decidable (⊤ : PartENat).Dom} : toWithTop ⊤ = ⊤ := by
+  convert toWithTop_top
 
--- DISSOLVED: toWithTop_zero
+theorem toWithTop_zero :
+    have : Decidable (0 : PartENat).Dom := someDecidable 0
+    toWithTop 0 = 0 :=
+  rfl
 
--- DISSOLVED: toWithTop_zero'
+@[simp]
+theorem toWithTop_zero' {h : Decidable (0 : PartENat).Dom} : toWithTop 0 = 0 := by
+  convert toWithTop_zero
 
--- DISSOLVED: toWithTop_one
+theorem toWithTop_one :
+    have : Decidable (1 : PartENat).Dom := someDecidable 1
+    toWithTop 1 = 1 :=
+  rfl
 
--- DISSOLVED: toWithTop_one'
+@[simp]
+theorem toWithTop_one' {h : Decidable (1 : PartENat).Dom} : toWithTop 1 = 1 := by
+  convert toWithTop_one
 
--- DISSOLVED: toWithTop_some
+theorem toWithTop_some (n : ℕ) : toWithTop (some n) = n :=
+  rfl
 
--- DISSOLVED: toWithTop_natCast
+theorem toWithTop_natCast (n : ℕ) {_ : Decidable (n : PartENat).Dom} : toWithTop n = n := by
+  simp only [← toWithTop_some]
+  congr
 
--- DISSOLVED: toWithTop_natCast'
+@[simp]
+theorem toWithTop_natCast' (n : ℕ) {_ : Decidable (n : PartENat).Dom} :
+    toWithTop (n : PartENat) = n := by
+  rw [toWithTop_natCast n]
 
--- DISSOLVED: toWithTop_ofNat
+@[simp]
+theorem toWithTop_ofNat (n : ℕ) [n.AtLeastTwo] {_ : Decidable (OfNat.ofNat n : PartENat).Dom} :
+    toWithTop (no_index (OfNat.ofNat n : PartENat)) = OfNat.ofNat n := toWithTop_natCast' n
 
--- DISSOLVED: toWithTop_le
+@[simp]
+theorem toWithTop_le {x y : PartENat} [hx : Decidable x.Dom] [hy : Decidable y.Dom] :
+    toWithTop x ≤ toWithTop y ↔ x ≤ y := by
+  induction y using PartENat.casesOn generalizing hy
+  · simp
+  induction x using PartENat.casesOn generalizing hx
+  · simp
+  · simp -- Porting note: this takes too long.
 
--- DISSOLVED: toWithTop_lt
+@[simp]
+theorem toWithTop_lt {x y : PartENat} [Decidable x.Dom] [Decidable y.Dom] :
+    toWithTop x < toWithTop y ↔ x < y :=
+  lt_iff_lt_of_le_iff_le toWithTop_le
 
 end WithTop
 
@@ -533,24 +555,14 @@ instance : Coe ℕ∞ PartENat := ⟨ofENat⟩
 example (n : ℕ) : ((n : ℕ∞) : PartENat) = ↑n := rfl
 
 @[simp, norm_cast]
-lemma ofENat_top : ofENat ⊤ = ⊤ := rfl
+theorem toWithTop_ofENat (n : ℕ∞) {_ : Decidable (n : PartENat).Dom} : toWithTop (↑n) = n := by
+  cases n with
+  | top => simp
+  | coe n => simp
 
 @[simp, norm_cast]
-lemma ofENat_coe (n : ℕ) : ofENat n = n := rfl
-
-@[simp, norm_cast]
-theorem ofENat_zero : ofENat 0 = 0 := rfl
-
-@[simp, norm_cast]
-theorem ofENat_one : ofENat 1 = 1 := rfl
-
-@[simp, norm_cast]
-theorem ofENat_ofNat (n : Nat) [n.AtLeastTwo] : ofENat (no_index (OfNat.ofNat n)) = OfNat.ofNat n :=
-  rfl
-
--- DISSOLVED: toWithTop_ofENat
-
--- DISSOLVED: ofENat_toWithTop
+theorem ofENat_toWithTop (x : PartENat) {_ : Decidable (x : PartENat).Dom} : toWithTop x = x := by
+  induction x using PartENat.casesOn <;> simp
 
 @[simp, norm_cast]
 theorem ofENat_le {x y : ℕ∞} : ofENat x ≤ ofENat y ↔ x ≤ y := by
@@ -566,41 +578,36 @@ section WithTopEquiv
 
 open scoped Classical
 
--- DISSOLVED: toWithTop_add
+@[simp]
+theorem toWithTop_add {x y : PartENat} : toWithTop (x + y) = toWithTop x + toWithTop y := by
+  refine PartENat.casesOn y ?_ ?_ <;> refine PartENat.casesOn x ?_ ?_
+  -- Porting note: was `simp [← Nat.cast_add, ← ENat.coe_add]`
+  · simp only [add_top, toWithTop_top', _root_.add_top]
+  · simp only [add_top, toWithTop_top', toWithTop_natCast', _root_.add_top, forall_const]
+  · simp only [top_add, toWithTop_top', toWithTop_natCast', _root_.top_add, forall_const]
+  · simp_rw [toWithTop_natCast', ← Nat.cast_add, toWithTop_natCast', forall_const]
 
--- DISSOLVED: withTopEquiv
+@[simps]
+noncomputable def withTopEquiv : PartENat ≃ ℕ∞ where
+  toFun x := toWithTop x
+  invFun x := ↑x
+  left_inv x := by simp
+  right_inv x := by simp
 
--- DISSOLVED: withTopEquiv_top
+theorem withTopEquiv_le {x y : PartENat} : withTopEquiv x ≤ withTopEquiv y ↔ x ≤ y := by
+  simp
 
--- DISSOLVED: withTopEquiv_natCast
+theorem withTopEquiv_lt {x y : PartENat} : withTopEquiv x < withTopEquiv y ↔ x < y := by
+  simp
 
--- DISSOLVED: withTopEquiv_zero
+noncomputable def withTopOrderIso : PartENat ≃o ℕ∞ :=
+  { withTopEquiv with map_rel_iff' := @fun _ _ => withTopEquiv_le }
 
--- DISSOLVED: withTopEquiv_one
-
--- DISSOLVED: withTopEquiv_ofNat
-
--- DISSOLVED: withTopEquiv_le
-
--- DISSOLVED: withTopEquiv_lt
-
--- DISSOLVED: withTopEquiv_symm_top
-
--- DISSOLVED: withTopEquiv_symm_coe
-
--- DISSOLVED: withTopEquiv_symm_zero
-
--- DISSOLVED: withTopEquiv_symm_one
-
--- DISSOLVED: withTopEquiv_symm_ofNat
-
--- DISSOLVED: withTopEquiv_symm_le
-
--- DISSOLVED: withTopEquiv_symm_lt
-
--- DISSOLVED: withTopOrderIso
-
--- DISSOLVED: withTopAddEquiv
+noncomputable def withTopAddEquiv : PartENat ≃+ ℕ∞ :=
+  { withTopEquiv with
+    map_add' := fun x y => by
+      simp only [withTopEquiv]
+      exact toWithTop_add }
 
 end WithTopEquiv
 

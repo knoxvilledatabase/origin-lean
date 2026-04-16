@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf
 import Mathlib.AlgebraicGeometry.Scheme
 import Mathlib.CategoryTheory.Sites.Whiskering
 
+noncomputable section
+
 /-!
 # The category of presheaves of modules over a scheme
 

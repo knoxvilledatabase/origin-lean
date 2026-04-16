@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.QuadraticForm.IsometryEquiv
 import Mathlib.LinearAlgebra.QuadraticForm.Prod
 import Mathlib.LinearAlgebra.Dual
 
+noncomputable section
+
 /-!
 # Quadratic form structures related to `Module.Dual`
 

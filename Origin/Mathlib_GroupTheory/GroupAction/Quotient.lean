@@ -13,6 +13,8 @@ import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.GroupTheory.GroupAction.ConjAct
 import Mathlib.GroupTheory.GroupAction.Hom
 
+noncomputable section
+
 /-!
 # Properties of group actions involving quotient groups
 
@@ -127,11 +129,6 @@ open QuotientGroup
 def _root_.MulActionHom.toQuotient (H : Subgroup α) : α →[α] α ⧸ H where
   toFun := (↑); map_smul' := Quotient.smul_coe H
 
-@[simp]
-theorem _root_.MulActionHom.toQuotient_apply (H : Subgroup α) (g : α) :
-    MulActionHom.toQuotient H g = g :=
-  rfl
-
 @[to_additive]
 instance mulLeftCosetsCompSubtypeVal (H I : Subgroup α) : MulAction I (α ⧸ H) :=
   MulAction.compHom (α ⧸ H) (Subgroup.subtype I)
@@ -146,10 +143,6 @@ def ofQuotientStabilizer (g : α ⧸ MulAction.stabilizer α x) : β :=
     calc
       g1 • x = g1 • (g1⁻¹ * g2) • x := congr_arg _ (leftRel_apply.mp H).symm
       _ = g2 • x := by rw [smul_smul, mul_inv_cancel_left]
-
-@[to_additive (attr := simp)]
-theorem ofQuotientStabilizer_mk (g : α) : ofQuotientStabilizer α x (QuotientGroup.mk g) = g • x :=
-  rfl
 
 @[to_additive]
 theorem ofQuotientStabilizer_mem_orbit (g) : ofQuotientStabilizer α x g ∈ orbit α x :=
@@ -186,11 +179,6 @@ theorem card_orbit_mul_card_stabilizer_eq_card_group (b : β) [Fintype α] [Fint
     [Fintype <| stabilizer α b] :
     Fintype.card (orbit α b) * Fintype.card (stabilizer α b) = Fintype.card α := by
   rw [← Fintype.card_prod, Fintype.card_congr (orbitProdStabilizerEquivGroup α b)]
-
-@[to_additive (attr := simp)]
-theorem orbitEquivQuotientStabilizer_symm_apply (b : β) (a : α) :
-    ((orbitEquivQuotientStabilizer α b).symm a : β) = a • b :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem stabilizer_quotient {G} [Group G] (H : Subgroup G) :
@@ -437,18 +425,10 @@ noncomputable def quotientCentralizerEmbedding (g : G) :
         ⟨x, g, rfl⟩⟩,
       fun _ _ => Subtype.ext ∘ mul_right_cancel ∘ Subtype.ext_iff.mp⟩
 
-theorem quotientCentralizerEmbedding_apply (g : G) (x : G) :
-    quotientCentralizerEmbedding g x = ⟨⁅x, g⁆, x, g, rfl⟩ :=
-  rfl
-
 noncomputable def quotientCenterEmbedding {S : Set G} (hS : closure S = ⊤) :
     G ⧸ center G ↪ S → commutatorSet G :=
   (quotientEquivOfEq (center_eq_infi' S hS)).toEmbedding.trans
     ((quotientiInfEmbedding _).trans
       (Function.Embedding.piCongrRight fun g => quotientCentralizerEmbedding (g : G)))
-
-theorem quotientCenterEmbedding_apply {S : Set G} (hS : closure S = ⊤) (g : G) (s : S) :
-    quotientCenterEmbedding hS g s = ⟨⁅g, s⁆, g, s, rfl⟩ :=
-  rfl
 
 end Subgroup

@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Field/Basic.lean
-Genuine: 90 | Conflates: 6 | Dissolved: 6 | Infrastructure: 71
+Genuine: 95 | Conflates: 7 | Dissolved: 0 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.NonUnitalSubalgebra
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Field.Subfield.Defs
 import Mathlib.Algebra.Order.Group.Pointwise.Interval
 import Mathlib.Analysis.Normed.Group.Constructions
 import Mathlib.Analysis.Normed.Group.Submodule
+
+noncomputable section
 
 /-!
 # Normed fields
@@ -600,13 +602,22 @@ theorem norm_zpow : ∀ (a : α) (n : ℤ), ‖a ^ n‖ = ‖a‖ ^ n :=
 theorem nnnorm_zpow : ∀ (a : α) (n : ℤ), ‖a ^ n‖₊ = ‖a‖₊ ^ n :=
   map_zpow₀ (nnnormHom : α →*₀ ℝ≥0)
 
--- DISSOLVED: dist_inv_inv₀
+theorem dist_inv_inv₀ {z w : α} (hz : z ≠ 0) (hw : w ≠ 0) :
+    dist z⁻¹ w⁻¹ = dist z w / (‖z‖ * ‖w‖) := by
+  rw [dist_eq_norm, inv_sub_inv' hz hw, norm_mul, norm_mul, norm_inv, norm_inv, mul_comm ‖z‖⁻¹,
+    mul_assoc, dist_eq_norm', div_eq_mul_inv, mul_inv]
 
--- DISSOLVED: nndist_inv_inv₀
+theorem nndist_inv_inv₀ {z w : α} (hz : z ≠ 0) (hw : w ≠ 0) :
+    nndist z⁻¹ w⁻¹ = nndist z w / (‖z‖₊ * ‖w‖₊) :=
+  NNReal.eq <| dist_inv_inv₀ hz hw
 
--- DISSOLVED: norm_commutator_sub_one_le
+lemma norm_commutator_sub_one_le (ha : a ≠ 0) (hb : b ≠ 0) :
+    ‖a * b * a⁻¹ * b⁻¹ - 1‖ ≤ 2 * ‖a‖⁻¹ * ‖b‖⁻¹ * ‖a - 1‖ * ‖b - 1‖ := by
+  simpa using norm_commutator_units_sub_one_le (.mk0 a ha) (.mk0 b hb)
 
--- DISSOLVED: nnnorm_commutator_sub_one_le
+lemma nnnorm_commutator_sub_one_le (ha : a ≠ 0) (hb : b ≠ 0) :
+    ‖a * b * a⁻¹ * b⁻¹ - 1‖₊ ≤ 2 * ‖a‖₊⁻¹ * ‖b‖₊⁻¹ * ‖a - 1‖₊ * ‖b - 1‖₊ := by
+  simpa using nnnorm_commutator_units_sub_one_le (.mk0 a ha) (.mk0 b hb)
 
 namespace NormedDivisionRing
 
@@ -614,7 +625,24 @@ section Discrete
 
 variable {𝕜 : Type*} [NormedDivisionRing 𝕜] [DiscreteTopology 𝕜]
 
--- DISSOLVED: norm_eq_one_iff_ne_zero_of_discrete
+lemma norm_eq_one_iff_ne_zero_of_discrete {x : 𝕜} : ‖x‖ = 1 ↔ x ≠ 0 := by
+  constructor <;> intro hx
+  · contrapose! hx
+    simp [hx]
+  · have : IsOpen {(0 : 𝕜)} := isOpen_discrete {0}
+    simp_rw [Metric.isOpen_singleton_iff, dist_eq_norm, sub_zero] at this
+    obtain ⟨ε, εpos, h'⟩ := this
+    wlog h : ‖x‖ < 1 generalizing 𝕜 with H
+    · push_neg at h
+      rcases h.eq_or_lt with h|h
+      · rw [h]
+      replace h := norm_inv x ▸ inv_lt_one_of_one_lt₀ h
+      rw [← inv_inj, inv_one, ← norm_inv]
+      exact H (by simpa) h' h
+    obtain ⟨k, hk⟩ : ∃ k : ℕ, ‖x‖ ^ k < ε := exists_pow_lt_of_lt_one εpos h
+    rw [← norm_pow] at hk
+    specialize h' _ hk
+    simp [hx] at h'
 
 @[simp]
 lemma norm_le_one_of_discrete
@@ -737,7 +765,17 @@ end Densely
 
 end NormedField
 
--- DISSOLVED: NontriviallyNormedField.ofNormNeOne
+-- CONFLATES (assumes ground = zero): NontriviallyNormedField.ofNormNeOne
+def NontriviallyNormedField.ofNormNeOne {𝕜 : Type*} [h' : NormedField 𝕜]
+    (h : ∃ x : 𝕜, x ≠ 0 ∧ ‖x‖ ≠ 1) : NontriviallyNormedField 𝕜 where
+  toNormedField := h'
+  non_trivial := by
+    rcases h with ⟨x, hx, hx1⟩
+    rcases hx1.lt_or_lt with hlt | hlt
+    · use x⁻¹
+      rw [norm_inv]
+      exact (one_lt_inv₀ (norm_pos_iff.2 hx)).2 hlt
+    · exact ⟨x, hlt⟩
 
 instance Real.normedCommRing : NormedCommRing ℝ :=
   { Real.normedAddCommGroup, Real.commRing with norm_mul := fun x y => (abs_mul x y).le }

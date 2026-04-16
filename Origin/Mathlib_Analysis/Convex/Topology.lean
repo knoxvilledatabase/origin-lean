@@ -9,6 +9,8 @@ import Mathlib.Topology.Connected.PathConnected
 import Mathlib.Topology.Algebra.Affine
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Topological properties of convex sets
 

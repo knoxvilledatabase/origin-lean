@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ClosedUnderIsomorphisms
 import Mathlib.CategoryTheory.Shift.Basic
 
+noncomputable section
+
 /-!
 # Predicates on categories equipped with shift
 
@@ -22,8 +24,6 @@ variable {C : Type*} [Category C] (P : C → Prop)
   {A : Type*} [AddMonoid A] [HasShift C A]
 
 def PredicateShift (a : A) : C → Prop := fun X => P (X⟦a⟧)
-
-lemma predicateShift_iff (a : A) (X : C) : PredicateShift P a X ↔ P (X⟦a⟧) := Iff.rfl
 
 instance predicateShift_closedUnderIsomorphisms (a : A) [ClosedUnderIsomorphisms P] :
     ClosedUnderIsomorphisms (PredicateShift P a) where

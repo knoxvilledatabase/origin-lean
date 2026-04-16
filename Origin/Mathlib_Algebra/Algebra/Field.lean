@@ -7,6 +7,8 @@ import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Data.Rat.Cast.Defs
 
+noncomputable section
+
 /-!
 # Facts about `algebraMap` when the coefficient ring is a field.
 -/

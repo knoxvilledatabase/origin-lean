@@ -15,6 +15,8 @@ import Mathlib.Data.Set.Finite.Range
 import Mathlib.GroupTheory.Subsemigroup.Centralizer
 import Mathlib.RingTheory.NonUnitalSubsemiring.Defs
 
+noncomputable section
+
 /-!
 # Bundled non-unital subsemirings
 
@@ -63,28 +65,11 @@ def comap (f : F) (s : NonUnitalSubsemiring S) : NonUnitalSubsemiring R :=
     carrier := f ⁻¹' s }
 
 @[simp]
-theorem coe_comap (s : NonUnitalSubsemiring S) (f : F) : (s.comap f : Set R) = f ⁻¹' s :=
-  rfl
-
-@[simp]
 theorem mem_comap {s : NonUnitalSubsemiring S} {f : F} {x : R} : x ∈ s.comap f ↔ f x ∈ s :=
   Iff.rfl
 
-theorem comap_comap (s : NonUnitalSubsemiring T) (g : G) (f : F) :
-    ((s.comap g : NonUnitalSubsemiring S).comap f : NonUnitalSubsemiring R) =
-      s.comap ((g : S →ₙ+* T).comp (f : R →ₙ+* S)) :=
-  rfl
-
 def map (f : F) (s : NonUnitalSubsemiring R) : NonUnitalSubsemiring S :=
   { s.toSubsemigroup.map (f : R →ₙ* S), s.toAddSubmonoid.map (f : R →+ S) with carrier := f '' s }
-
-@[simp]
-theorem coe_map (f : F) (s : NonUnitalSubsemiring R) : (s.map f : Set S) = f '' s :=
-  rfl
-
-@[simp]
-theorem mem_map {f : F} {s : NonUnitalSubsemiring R} {y : S} : y ∈ s.map f ↔ ∃ x ∈ s, f x = y :=
-  Iff.rfl
 
 @[simp]
 theorem map_id : s.map (NonUnitalRingHom.id R) = s :=
@@ -107,11 +92,6 @@ noncomputable def equivMapOfInjective (f : F) (hf : Function.Injective (f : R �
   { Equiv.Set.image f s hf with
     map_mul' := fun _ _ => Subtype.ext (map_mul f _ _)
     map_add' := fun _ _ => Subtype.ext (map_add f _ _) }
-
-@[simp]
-theorem coe_equivMapOfInjective_apply (f : F) (hf : Function.Injective f) (x : s) :
-    (equivMapOfInjective s f hf x : S) = f x :=
-  rfl
 
 end NonUnitalSubsemiring
 
@@ -209,14 +189,6 @@ def center : NonUnitalSubsemiring R :=
     zero_mem' := Set.zero_mem_center
     add_mem' := Set.add_mem_center }
 
-theorem coe_center : ↑(center R) = Set.center R :=
-  rfl
-
-@[simp]
-theorem center_toSubsemigroup :
-    (center R).toSubsemigroup = Subsemigroup.center R :=
-  rfl
-
 instance center.instNonUnitalCommSemiring : NonUnitalCommSemiring (center R) :=
   { Subsemigroup.center.commSemigroup,
     NonUnitalSubsemiringClass.toNonUnitalNonAssocSemiring (center R) with }
@@ -259,19 +231,6 @@ def centralizer {R} [NonUnitalSemiring R] (s : Set R) : NonUnitalSubsemiring R :
     carrier := s.centralizer
     zero_mem' := Set.zero_mem_centralizer
     add_mem' := Set.add_mem_centralizer }
-
-@[simp, norm_cast]
-theorem coe_centralizer {R} [NonUnitalSemiring R] (s : Set R) :
-    (centralizer s : Set R) = s.centralizer :=
-  rfl
-
-theorem centralizer_toSubsemigroup {R} [NonUnitalSemiring R] (s : Set R) :
-    (centralizer s).toSubsemigroup = Subsemigroup.centralizer s :=
-  rfl
-
-theorem mem_centralizer_iff {R} [NonUnitalSemiring R] {s : Set R} {z : R} :
-    z ∈ centralizer s ↔ ∀ g ∈ s, g * z = z * g :=
-  Iff.rfl
 
 theorem center_le_centralizer {R} [NonUnitalSemiring R] (s) : center R ≤ centralizer s :=
   s.center_subset_centralizer
@@ -347,10 +306,6 @@ namespace Subsemigroup
 
 def nonUnitalSubsemiringClosure (M : Subsemigroup R) : NonUnitalSubsemiring R :=
   { AddSubmonoid.closure (M : Set R) with mul_mem' := MulMemClass.mul_mem_add_closure }
-
-theorem nonUnitalSubsemiringClosure_coe :
-    (M.nonUnitalSubsemiringClosure : Set R) = AddSubmonoid.closure (M : Set R) :=
-  rfl
 
 theorem nonUnitalSubsemiringClosure_toAddSubmonoid :
     M.nonUnitalSubsemiringClosure.toAddSubmonoid = AddSubmonoid.closure (M : Set R) :=
@@ -502,11 +457,6 @@ def prod (s : NonUnitalSubsemiring R) (t : NonUnitalSubsemiring S) : NonUnitalSu
   { s.toSubsemigroup.prod t.toSubsemigroup, s.toAddSubmonoid.prod t.toAddSubmonoid with
     carrier := (s : Set R) ×ˢ (t : Set S) }
 
-@[norm_cast]
-theorem coe_prod (s : NonUnitalSubsemiring R) (t : NonUnitalSubsemiring S) :
-    (s.prod t : Set (R × S)) = (s : Set R) ×ˢ (t : Set S) :=
-  rfl
-
 theorem mem_prod {s : NonUnitalSubsemiring R} {t : NonUnitalSubsemiring S} {p : R × S} :
     p ∈ s.prod t ↔ p.1 ∈ s ∧ p.2 ∈ t :=
   Iff.rfl
@@ -583,10 +533,6 @@ open NonUnitalSubsemiringClass NonUnitalSubsemiring
 
 def srangeRestrict (f : F) : R →ₙ+* (srange f : NonUnitalSubsemiring S) :=
   codRestrict f (srange f) (mem_srange_self f)
-
-@[simp]
-theorem coe_srangeRestrict (f : F) (x : R) : (srangeRestrict f x : S) = f x :=
-  rfl
 
 theorem srangeRestrict_surjective (f : F) :
     Function.Surjective (srangeRestrict f : R → (srange f : NonUnitalSubsemiring S)) :=
@@ -665,16 +611,6 @@ def sofLeftInverse' {g : S → R} {f : F} (h : Function.LeftInverse g f) : R ≃
       Subtype.ext <|
         let ⟨x', hx'⟩ := NonUnitalRingHom.mem_srange.mp x.prop
         show f (g x) = x by rw [← hx', h x'] }
-
-@[simp]
-theorem sofLeftInverse'_apply {g : S → R} {f : F} (h : Function.LeftInverse g f) (x : R) :
-    ↑(sofLeftInverse' h x) = f x :=
-  rfl
-
-@[simp]
-theorem sofLeftInverse'_symm_apply {g : S → R} {f : F} (h : Function.LeftInverse g f)
-    (x : srange f) : (sofLeftInverse' h).symm x = g x :=
-  rfl
 
 @[simps!]
 def nonUnitalSubsemiringMap (e : R ≃+* S) (s : NonUnitalSubsemiring R) :

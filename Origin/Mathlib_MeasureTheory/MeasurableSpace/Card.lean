@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.MeasurableSpace.Defs
 import Mathlib.SetTheory.Cardinal.Cofinality
 import Mathlib.SetTheory.Cardinal.Continuum
 
+noncomputable section
+
 /-!
 # Cardinal of sigma-algebras
 

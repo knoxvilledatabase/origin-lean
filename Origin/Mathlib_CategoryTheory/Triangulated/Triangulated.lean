@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.Triangulated.Pretriangulated
 
+noncomputable section
+
 /-!
 # Triangulated Categories
 
@@ -29,6 +31,9 @@ namespace Triangulated
 variable {C}
 
 set_option genInjectivity false in
+/-- An octahedron is a type of datum whose existence is asserted by
+
+the octahedron axiom (TR 4), see https://stacks.math.columbia.edu/tag/05QK -/
 
 structure Octahedron
   {X₁ X₂ X₃ Z₁₂ Z₂₃ Z₁₃ : C}

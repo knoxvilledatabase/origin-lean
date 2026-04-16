@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.Module.Defs
 import Mathlib.Order.Bounds.OrderIso
 
+noncomputable section
+
 /-!
 # Bounds on scalar multiplication of set
 

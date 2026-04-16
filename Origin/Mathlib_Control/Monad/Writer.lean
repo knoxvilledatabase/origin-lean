@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Writer monads
 
@@ -126,6 +128,9 @@ instance [Monad m] : MonadWriterAdapter ω (WriterT ω m) where
   adaptWriter := WriterT.adapt
 
 universe u₀ u₁ v₀ v₁ in
+/-- reduce the equivalence between two writer monads to the equivalence between
+
+their underlying monad -/
 
 def WriterT.equiv {m₁ : Type u₀ → Type v₀} {m₂ : Type u₁ → Type v₁}
     {α₁ ω₁ : Type u₀} {α₂ ω₂ : Type u₁} (F : (m₁ (α₁ × ω₁)) ≃ (m₂ (α₂ × ω₂))) :

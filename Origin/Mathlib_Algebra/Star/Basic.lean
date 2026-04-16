@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Star/Basic.lean
-Genuine: 56 | Conflates: 0 | Dissolved: 4 | Infrastructure: 29
+Genuine: 59 | Conflates: 0 | Dissolved: 1 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Invertible.Defs
@@ -11,6 +11,8 @@ import Mathlib.Algebra.Ring.CompTypeclasses
 import Mathlib.Algebra.Ring.Opposite
 import Mathlib.Data.Int.Cast.Lemmas
 import Mathlib.Data.SetLike.Basic
+
+noncomputable section
 
 /-!
 # Star monoids, rings, and modules
@@ -184,9 +186,6 @@ section
 
 attribute [local instance] starMulOfComm
 
-theorem star_id_of_comm {R : Type*} [CommSemiring R] {x : R} : star x = x :=
-  rfl
-
 end
 
 class StarAddMonoid (R : Type u) [AddMonoid R] extends InvolutiveStar R where
@@ -215,7 +214,8 @@ variable {R}
 theorem star_eq_zero [AddMonoid R] [StarAddMonoid R] {x : R} : star x = 0 ↔ x = 0 :=
   starAddEquiv.map_eq_zero_iff (M := R)
 
--- DISSOLVED: star_ne_zero
+theorem star_ne_zero [AddMonoid R] [StarAddMonoid R] {x : R} : star x ≠ 0 ↔ x ≠ 0 := by
+  simp only [ne_eq, star_eq_zero]
 
 @[simp]
 theorem star_neg [AddGroup R] [StarAddMonoid R] (r : R) : star (-r) = -star r :=
@@ -278,8 +278,6 @@ variable {R}
 
 scoped[ComplexConjugate] notation "conj" => starRingEnd _
 
-theorem starRingEnd_apply (x : R) : starRingEnd R x = star x := rfl
-
 theorem starRingEnd_self_apply (x : R) : starRingEnd R (starRingEnd R x) = x := star_star x
 
 instance RingHom.involutiveStar {S : Type*} [NonAssocSemiring S] : InvolutiveStar (S →+* R) where
@@ -288,12 +286,6 @@ instance RingHom.involutiveStar {S : Type*} [NonAssocSemiring S] : InvolutiveSta
     intro
     ext
     simp only [RingHom.coe_comp, Function.comp_apply, starRingEnd_self_apply]
-
-theorem RingHom.star_def {S : Type*} [NonAssocSemiring S] (f : S →+* R) :
-    Star.star f = RingHom.comp (starRingEnd R) f := rfl
-
-theorem RingHom.star_apply {S : Type*} [NonAssocSemiring S] (f : S →+* R) (s : S) :
-    star f s = star (f s) := rfl
 
 alias Complex.conj_conj := starRingEnd_self_apply
 
@@ -305,11 +297,16 @@ open scoped ComplexConjugate
 
 end CommSemiring
 
--- DISSOLVED: star_inv₀
+@[simp]
+theorem star_inv₀ [GroupWithZero R] [StarMul R] (x : R) : star x⁻¹ = (star x)⁻¹ :=
+  op_injective <| (map_inv₀ (starMulEquiv : R ≃* Rᵐᵒᵖ) x).trans (op_inv (star x)).symm
 
 -- DISSOLVED: star_zpow₀
 
--- DISSOLVED: star_div₀
+@[simp]
+theorem star_div₀ [CommGroupWithZero R] [StarMul R] (x y : R) : star (x / y) = star x / star y := by
+  apply op_injective
+  rw [division_def, op_div, mul_comm, star_mul, star_inv₀, op_mul, op_inv]
 
 abbrev starRingOfComm {R : Type*} [CommSemiring R] : StarRing R :=
   { starMulOfComm with
@@ -447,14 +444,6 @@ end Regular
 namespace MulOpposite
 
 instance [Star R] : Star Rᵐᵒᵖ where star r := op (star r.unop)
-
-@[simp]
-theorem unop_star [Star R] (r : Rᵐᵒᵖ) : unop (star r) = star (unop r) :=
-  rfl
-
-@[simp]
-theorem op_star [Star R] (r : R) : op (star r) = star (op r) :=
-  rfl
 
 instance [InvolutiveStar R] : InvolutiveStar Rᵐᵒᵖ where
   star_involutive r := unop_injective (star_star r.unop)

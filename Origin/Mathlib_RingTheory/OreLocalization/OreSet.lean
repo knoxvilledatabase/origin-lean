@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.Basic
 import Mathlib.Algebra.Ring.Regular
 import Mathlib.GroupTheory.OreLocalization.OreSet
 
+noncomputable section
+
 /-!
 
 # (Left) Ore sets and rings

@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.Index
 import Mathlib.Topology.Algebra.ClosedSubgroup
 import Mathlib.Topology.Algebra.OpenSubgroup
 
+noncomputable section
+
 /-!
 # Existence of an open normal subgroup in any clopen neighborhood of the neutral element
 

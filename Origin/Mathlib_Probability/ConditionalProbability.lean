@@ -1,9 +1,11 @@
 /-
 Extracted from Probability/ConditionalProbability.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses
+
+noncomputable section
 
 /-!
 # Conditional Probability
@@ -68,6 +70,10 @@ variable (μ) in
 def cond (s : Set Ω) : Measure Ω :=
   (μ s)⁻¹ • μ.restrict s
 
+@[inherit_doc] scoped notation:max μ "[|" s "]" => ProbabilityTheory.cond μ s
+
+@[inherit_doc cond] scoped notation3:max μ "[" t " | " s "]" => ProbabilityTheory.cond μ s t
+
 scoped notation:max μ "[|" X " in " s "]" => μ[|X ⁻¹' s]
 
 scoped notation:max μ "[" s " | "  X " in " t "]" => μ[s | X ⁻¹' t]
@@ -76,9 +82,16 @@ scoped notation:max μ "[|" X " ← " x "]" => μ[|X in {x}]
 
 scoped notation:max μ "[" s " | "  X " ← " x "]" => μ[s | X in {x}]
 
--- DISSOLVED: cond_isProbabilityMeasure_of_finite
+theorem cond_isProbabilityMeasure_of_finite (hcs : μ s ≠ 0) (hs : μ s ≠ ∞) :
+    IsProbabilityMeasure μ[|s] :=
+  ⟨by
+    unfold ProbabilityTheory.cond
+    simp only [Measure.coe_smul, Pi.smul_apply, MeasurableSet.univ, Measure.restrict_apply,
+      Set.univ_inter, smul_eq_mul]
+    exact ENNReal.inv_mul_cancel hcs hs⟩
 
--- DISSOLVED: cond_isProbabilityMeasure
+theorem cond_isProbabilityMeasure [IsFiniteMeasure μ] (hcs : μ s ≠ 0) :
+    IsProbabilityMeasure μ[|s] := cond_isProbabilityMeasure_of_finite hcs (measure_ne_top μ s)
 
 instance : IsZeroOrProbabilityMeasure μ[|s] := by
   constructor
@@ -129,15 +142,23 @@ theorem cond_apply (hms : MeasurableSet s) (μ : Measure Ω) (t : Set Ω) :
 theorem cond_apply' (ht : MeasurableSet t) (μ : Measure Ω) : μ[t|s] = (μ s)⁻¹ * μ (s ∩ t) := by
   rw [cond, Measure.smul_apply, Measure.restrict_apply ht, Set.inter_comm, smul_eq_mul]
 
--- DISSOLVED: cond_apply_self
+@[simp] lemma cond_apply_self (hs₀ : μ s ≠ 0) (hs : μ s ≠ ∞) : μ[s|s] = 1 := by
+  simpa [cond] using ENNReal.inv_mul_cancel hs₀ hs
 
 theorem cond_inter_self (hms : MeasurableSet s) (t : Set Ω) (μ : Measure Ω) :
     μ[s ∩ t|s] = μ[t|s] := by
   rw [cond_apply hms, ← Set.inter_assoc, Set.inter_self, ← cond_apply hms]
 
--- DISSOLVED: inter_pos_of_cond_ne_zero
+theorem inter_pos_of_cond_ne_zero (hms : MeasurableSet s) (hcst : μ[t|s] ≠ 0) : 0 < μ (s ∩ t) := by
+  refine pos_iff_ne_zero.mpr (right_ne_zero_of_mul (a := (μ s)⁻¹) ?_)
+  convert hcst
+  simp [hms, Set.inter_comm, cond]
 
--- DISSOLVED: cond_pos_of_inter_ne_zero
+lemma cond_pos_of_inter_ne_zero [IsFiniteMeasure μ] (hms : MeasurableSet s) (hci : μ (s ∩ t) ≠ 0) :
+    0 < μ[t | s] := by
+  rw [cond_apply hms]
+  refine ENNReal.mul_pos ?_ hci
+  exact ENNReal.inv_ne_zero.mpr (measure_ne_top _ _)
 
 lemma cond_cond_eq_cond_inter' (hms : MeasurableSet s) (hmt : MeasurableSet t) (hcs : μ s ≠ ∞) :
     μ[|s][|t] = μ[|s ∩ t] := by

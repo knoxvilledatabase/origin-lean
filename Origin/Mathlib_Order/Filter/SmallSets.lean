@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Lift
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # The filter of small sets
 

@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.Action.Units
 import Mathlib.Algebra.Group.Units.Opposite
 import Mathlib.Algebra.Module.Opposite
 
+noncomputable section
+
 /-!
 # Multiplication on the left/right as additive automorphisms
 
@@ -28,13 +30,5 @@ def mulLeft : Rˣ →* AddAut R :=
 
 def mulRight (u : Rˣ) : AddAut R :=
   DistribMulAction.toAddAut Rᵐᵒᵖˣ R (Units.opEquiv.symm <| MulOpposite.op u)
-
-@[simp]
-theorem mulRight_apply (u : Rˣ) (x : R) : mulRight u x = x * u :=
-  rfl
-
-@[simp]
-theorem mulRight_symm_apply (u : Rˣ) (x : R) : (mulRight u).symm x = x * u⁻¹ :=
-  rfl
 
 end AddAut

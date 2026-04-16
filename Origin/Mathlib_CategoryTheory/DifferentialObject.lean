@@ -8,6 +8,8 @@ import Mathlib.Data.Int.Cast.Defs
 import Mathlib.CategoryTheory.Shift.Basic
 import Mathlib.CategoryTheory.ConcreteCategory.Basic
 
+noncomputable section
+
 /-!
 # Differential objects in a category.
 
@@ -104,9 +106,6 @@ variable [(shiftFunctor C (1 : S)).PreservesZeroMorphisms]
 
 instance {X Y : DifferentialObject S C} : Zero (X ⟶ Y) := ⟨{f := 0}⟩
 
-@[simp]
-theorem zero_f (P Q : DifferentialObject S C) : (0 : P ⟶ Q).f = 0 := rfl
-
 instance hasZeroMorphisms : HasZeroMorphisms (DifferentialObject S C) where
 
 end
@@ -117,17 +116,6 @@ def isoApp {X Y : DifferentialObject S C} (f : X ≅ Y) : X.obj ≅ Y.obj where
   inv := f.inv.f
   hom_inv_id := by rw [← comp_f, Iso.hom_inv_id, id_f]
   inv_hom_id := by rw [← comp_f, Iso.inv_hom_id, id_f]
-
-@[simp]
-theorem isoApp_refl (X : DifferentialObject S C) : isoApp (Iso.refl X) = Iso.refl X.obj := rfl
-
-@[simp]
-theorem isoApp_symm {X Y : DifferentialObject S C} (f : X ≅ Y) : isoApp f.symm = (isoApp f).symm :=
-  rfl
-
-@[simp]
-theorem isoApp_trans {X Y Z : DifferentialObject S C} (f : X ≅ Y) (g : Y ≅ Z) :
-    isoApp (f ≪≫ g) = isoApp f ≪≫ isoApp g := rfl
 
 @[simps]
 def mkIso {X Y : DifferentialObject S C} (f : X.obj ≅ Y.obj) (hf : X.d ≫ f.hom⟦1⟧' = f.hom ≫ Y.d) :

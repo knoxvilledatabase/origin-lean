@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Free
 import Mathlib.Algebra.Lie.Quotient
 import Mathlib.Data.Matrix.Notation
 
+noncomputable section
+
 /-!
 # Lie algebras from Cartan matrices
 
@@ -129,14 +131,6 @@ def adE : B × B → FreeLieAlgebra R (Generators B) :=
 
 def adF : B × B → FreeLieAlgebra R (Generators B) :=
   uncurry fun i j => ad (F i) ^ (-A i j).toNat <| ⁅F i, F j⁆
-
-private theorem adE_of_eq_eq_zero (i : B) (h : A i i = 2) : adE R A ⟨i, i⟩ = 0 := by
-  have h' : (-2 : ℤ).toNat = 0 := rfl
-  simp [adE, h, h']
-
-private theorem adF_of_eq_eq_zero (i : B) (h : A i i = 2) : adF R A ⟨i, i⟩ = 0 := by
-  have h' : (-2 : ℤ).toNat = 0 := rfl
-  simp [adF, h, h']
 
 def toSet [DecidableEq B] : Set (FreeLieAlgebra R (Generators B)) :=
   (Set.range <| HH R) ∪ (Set.range <| EF R) ∪ (Set.range <| HE R A) ∪ (Set.range <| HF R A) ∪

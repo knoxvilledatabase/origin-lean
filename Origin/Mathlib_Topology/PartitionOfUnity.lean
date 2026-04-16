@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/PartitionOfUnity.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 3 | Infrastructure: 7
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finprod
@@ -10,6 +10,8 @@ import Mathlib.Topology.Compactness.Paracompact
 import Mathlib.Topology.ShrinkingLemma
 import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Topology.ContinuousMap.Ordered
+
+noncomputable section
 
 /-!
 # Continuous partition of unity
@@ -269,15 +271,14 @@ instance : FunLike (BumpCovering ι X s) ι C(X, ℝ) where
   coe := toFun
   coe_injective' f g h := by cases f; cases g; congr
 
-@[simp] lemma toFun_eq_coe : f.toFun = f := rfl
-
 protected theorem locallyFinite : LocallyFinite fun i => support (f i) :=
   f.locallyFinite'
 
 theorem locallyFinite_tsupport : LocallyFinite fun i => tsupport (f i) :=
   f.locallyFinite.closure
 
--- DISSOLVED: point_finite
+protected theorem point_finite (x : X) : { i | f i x ≠ 0 }.Finite :=
+  f.locallyFinite.point_finite x
 
 theorem nonneg (i : ι) (x : X) : 0 ≤ f i x :=
   f.nonneg' i x
@@ -300,10 +301,6 @@ protected def single (i : ι) (s : Set X) : BumpCovering ι X s where
   eventuallyEq_one' x _ := ⟨i, by rw [Pi.single_eq_same, ContinuousMap.coe_one]⟩
 
 open Classical in
-
-@[simp]
-theorem coe_single (i : ι) (s : Set X) : ⇑(BumpCovering.single i s) = Pi.single i 1 := by
-  rfl
 
 instance [Inhabited ι] : Inhabited (BumpCovering ι X s) :=
   ⟨BumpCovering.single default s⟩
@@ -416,7 +413,13 @@ theorem support_toPOUFun_subset (i : ι) : support (f.toPOUFun i) ⊆ support (f
 
 open Classical in
 
--- DISSOLVED: toPOUFun_eq_mul_prod
+theorem toPOUFun_eq_mul_prod (i : ι) (x : X) (t : Finset ι)
+    (ht : ∀ j, WellOrderingRel j i → f j x ≠ 0 → j ∈ t) :
+    f.toPOUFun i x = f i x * ∏ j ∈ t.filter fun j => WellOrderingRel j i, (1 - f j x) := by
+  refine congr_arg _ (finprod_cond_eq_prod_of_cond_iff _ fun {j} hj => ?_)
+  rw [Ne, sub_eq_self] at hj
+  rw [Finset.mem_filter, Iff.comm, and_iff_right_iff_imp]
+  exact flip (ht j) hj
 
 theorem sum_toPOUFun_eq (x : X) : ∑ᶠ i, f.toPOUFun i x = 1 - ∏ᶠ i, (1 - f i x) := by
   set s := (f.point_finite x).toFinset
@@ -468,12 +471,12 @@ def toPartitionOfUnity : PartitionOfUnity ι X s where
     simp only [ContinuousMap.coe_mk, sum_toPOUFun_eq, sub_le_self_iff]
     exact finprod_nonneg fun i => sub_nonneg.2 <| f.le_one i x
 
-theorem toPartitionOfUnity_apply (i : ι) (x : X) :
-    f.toPartitionOfUnity i x = f i x * ∏ᶠ (j) (_ : WellOrderingRel j i), (1 - f j x) := rfl
-
 open Classical in
 
--- DISSOLVED: toPartitionOfUnity_eq_mul_prod
+theorem toPartitionOfUnity_eq_mul_prod (i : ι) (x : X) (t : Finset ι)
+    (ht : ∀ j, WellOrderingRel j i → f j x ≠ 0 → j ∈ t) :
+    f.toPartitionOfUnity i x = f i x * ∏ j ∈ t.filter fun j => WellOrderingRel j i, (1 - f j x) :=
+  f.toPOUFun_eq_mul_prod i x t ht
 
 open Classical in
 

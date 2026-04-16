@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Affine.ContinuousAffineMap
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 
+noncomputable section
+
 /-!
 # Smooth affine maps
 

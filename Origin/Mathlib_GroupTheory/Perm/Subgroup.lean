@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Data.Fintype.Perm
 import Mathlib.GroupTheory.Perm.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about subgroups within the permutations (self-equivalences) of a type `α`
 

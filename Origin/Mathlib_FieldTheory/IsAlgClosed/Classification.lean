@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/IsAlgClosed/Classification.lean
-Genuine: 5 | Conflates: 1 | Dissolved: 1 | Infrastructure: 0
+Genuine: 6 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.ZMod
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Polynomial.Cardinal
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.Algebraic.Cardinality
 import Mathlib.RingTheory.AlgebraicIndependent
+
+noncomputable section
 
 /-!
 # Classification of Algebraically closed fields
@@ -108,7 +110,18 @@ end Cardinal
 
 variable {K L : Type} [Field K] [Field L] [IsAlgClosed K] [IsAlgClosed L]
 
--- DISSOLVED: ringEquivOfCardinalEqOfCharZero
+theorem ringEquivOfCardinalEqOfCharZero [CharZero K] [CharZero L] (hK : ℵ₀ < #K)
+    (hKL : #K = #L) : Nonempty (K ≃+* L) := by
+  cases' exists_isTranscendenceBasis ℤ
+    (show Function.Injective (algebraMap ℤ K) from Int.cast_injective) with s hs
+  cases' exists_isTranscendenceBasis ℤ
+    (show Function.Injective (algebraMap ℤ L) from Int.cast_injective) with t ht
+  have : #s = #t := by
+    rw [← cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt _ hs (le_of_eq mk_int) hK, ←
+      cardinal_eq_cardinal_transcendence_basis_of_aleph0_lt _ ht (le_of_eq mk_int), hKL]
+    rwa [← hKL]
+  cases' Cardinal.eq.1 this with e
+  exact ⟨equivOfTranscendenceBasis _ _ e hs ht⟩
 
 private theorem ringEquivOfCardinalEqOfCharP (p : ℕ) [Fact p.Prime] [CharP K p] [CharP L p]
     (hK : ℵ₀ < #K) (hKL : #K = #L) : Nonempty (K ≃+* L) := by

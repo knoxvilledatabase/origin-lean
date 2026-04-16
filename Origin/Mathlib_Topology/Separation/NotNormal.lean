@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Real.Cardinality
 import Mathlib.Topology.TietzeExtension
 
+noncomputable section
+
 /-!
 # Not normal topological spaces
 

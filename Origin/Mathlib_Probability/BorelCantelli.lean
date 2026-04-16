@@ -7,6 +7,8 @@ import Mathlib.Probability.Martingale.BorelCantelli
 import Mathlib.Probability.ConditionalExpectation
 import Mathlib.Probability.Independence.Basic
 
+noncomputable section
+
 /-!
 
 # The second Borel-Cantelli lemma

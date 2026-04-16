@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.Additive.Corner.Defs
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Tripartite
 
+noncomputable section
+
 /-!
 # The corners theorem and Roth's theorem
 
@@ -89,39 +91,6 @@ theorem corners_theorem (ε : ℝ) (hε : 0 < ε) (hG : cornersTheoremBound ε �
   have h₁ := (farFromTriangleFree_graph hAε).le_card_cliqueFinset
   rw [card_triangles, card_triangleIndices] at h₁
   convert h₁.trans (Nat.cast_le.2 <| card_le_univ _) using 1 <;> simp <;> ring
-
-theorem corners_theorem_nat (hε : 0 < ε) (hn : cornersTheoremBound (ε / 9) ≤ n)
-    (A : Finset (ℕ × ℕ)) (hAn : A ⊆ range n ×ˢ range n) (hAε : ε * n ^ 2 ≤ #A) :
-    ¬ IsCornerFree (A : Set (ℕ × ℕ)) := by
-  rintro hA
-  rw [← coe_subset, coe_product] at hAn
-  have : A = Prod.map Fin.val Fin.val ''
-      (Prod.map Nat.cast Nat.cast '' A : Set (Fin (2 * n).succ × Fin (2 * n).succ)) := by
-    rw [Set.image_image, Set.image_congr, Set.image_id]
-    simp only [mem_coe, Nat.succ_eq_add_one, Prod.map_apply, Fin.val_natCast, id_eq, Prod.forall,
-      Prod.mk.injEq, Nat.mod_succ_eq_iff_lt]
-    rintro a b hab
-    have := hAn hab
-    simp at this
-    omega
-  rw [this] at hA
-  have := Fin.isAddFreimanIso_Iio two_ne_zero (le_refl (2 * n))
-  have := hA.of_image this.isAddFreimanHom Fin.val_injective.injOn <| by
-    refine Set.image_subset_iff.2 <| hAn.trans fun x hx ↦ ?_
-    simp only [coe_range, Set.mem_prod, Set.mem_Iio] at hx
-    exact ⟨Fin.natCast_strictMono (by omega) hx.1, Fin.natCast_strictMono (by omega) hx.2⟩
-  rw [← coe_image] at this
-  refine corners_theorem (ε / 9) (by positivity) (by simp; omega) _ ?_ this
-  calc
-    _ = ε / 9 * (2 * n + 1) ^ 2 := by simp
-    _ ≤ ε / 9 * (2 * n + n) ^ 2 := by gcongr; simp; unfold cornersTheoremBound at hn; omega
-    _ = ε * n ^ 2 := by ring
-    _ ≤ #A := hAε
-    _ = _ := by
-      rw [card_image_of_injOn]
-      have : Set.InjOn Nat.cast (range n) :=
-        (CharP.natCast_injOn_Iio (Fin (2 * n).succ) (2 * n).succ).mono (by simp; omega)
-      exact (this.prodMap this).mono hAn
 
 theorem roth_3ap_theorem (ε : ℝ) (hε : 0 < ε) (hG : cornersTheoremBound ε ≤ card G)
     (A : Finset G) (hAε : ε * card G ≤ #A) : ¬ ThreeAPFree (A : Set G) := by

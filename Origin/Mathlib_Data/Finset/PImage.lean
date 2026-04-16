@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Option
 import Mathlib.Data.PFun
 import Mathlib.Data.Part
 
+noncomputable section
+
 /-!
 # Image of a `Finset α` under a partially defined function
 

@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Predicate
 
+noncomputable section
+
 /-! Morphism properties equipped with a localized category
 
 If `C : Type u` is a category (with `[Category.{v} C]`), and

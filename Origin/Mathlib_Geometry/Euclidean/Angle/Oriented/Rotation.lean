@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/Rotation.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 11 | Infrastructure: 4
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 import Mathlib.Geometry.Euclidean.Angle.Oriented.Basic
+
+noncomputable section
 
 /-!
 # Rotations by oriented angles.
@@ -86,7 +88,17 @@ theorem rotation_symm_apply (θ : Real.Angle) (x : V) :
     (o.rotation θ).symm x = Real.Angle.cos θ • x - Real.Angle.sin θ • J x :=
   rfl
 
--- DISSOLVED: rotation_eq_matrix_toLin
+theorem rotation_eq_matrix_toLin (θ : Real.Angle) {x : V} (hx : x ≠ 0) :
+    (o.rotation θ).toLinearMap =
+      Matrix.toLin (o.basisRightAngleRotation x hx) (o.basisRightAngleRotation x hx)
+        !![θ.cos, -θ.sin; θ.sin, θ.cos] := by
+  apply (o.basisRightAngleRotation x hx).ext
+  intro i
+  fin_cases i
+  · rw [Matrix.toLin_self]
+    simp [rotation_apply, Fin.sum_univ_succ]
+  · rw [Matrix.toLin_self]
+    simp [rotation_apply, Fin.sum_univ_succ, add_comm]
 
 @[simp]
 theorem det_rotation (θ : Real.Angle) : LinearMap.det (o.rotation θ).toLinearMap = 1 := by
@@ -166,13 +178,31 @@ theorem kahler_rotation_right (x y : V) (θ : Real.Angle) :
     kahler_rightAngleRotation_right, Real.Angle.coe_toCircle]
   ring
 
--- DISSOLVED: oangle_rotation_left
+@[simp]
+theorem oangle_rotation_left {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) (θ : Real.Angle) :
+    o.oangle (o.rotation θ x) y = o.oangle x y - θ := by
+  simp only [oangle, o.kahler_rotation_left']
+  rw [Complex.arg_mul_coe_angle, Real.Angle.arg_toCircle]
+  · abel
+  · exact Circle.coe_ne_zero _
+  · exact o.kahler_ne_zero hx hy
 
--- DISSOLVED: oangle_rotation_right
+@[simp]
+theorem oangle_rotation_right {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) (θ : Real.Angle) :
+    o.oangle x (o.rotation θ y) = o.oangle x y + θ := by
+  simp only [oangle, o.kahler_rotation_right]
+  rw [Complex.arg_mul_coe_angle, Real.Angle.arg_toCircle]
+  · abel
+  · exact Circle.coe_ne_zero _
+  · exact o.kahler_ne_zero hx hy
 
--- DISSOLVED: oangle_rotation_self_left
+@[simp]
+theorem oangle_rotation_self_left {x : V} (hx : x ≠ 0) (θ : Real.Angle) :
+    o.oangle (o.rotation θ x) x = -θ := by simp [hx]
 
--- DISSOLVED: oangle_rotation_self_right
+@[simp]
+theorem oangle_rotation_self_right {x : V} (hx : x ≠ 0) (θ : Real.Angle) :
+    o.oangle x (o.rotation θ x) = θ := by simp [hx]
 
 @[simp]
 theorem oangle_rotation_oangle_left (x y : V) : o.oangle (o.rotation (o.oangle x y) x) y = 0 := by
@@ -192,9 +222,19 @@ theorem oangle_rotation (x y : V) (θ : Real.Angle) :
     o.oangle (o.rotation θ x) (o.rotation θ y) = o.oangle x y := by
   by_cases hx : x = 0 <;> by_cases hy : y = 0 <;> simp [hx, hy]
 
--- DISSOLVED: rotation_eq_self_iff_angle_eq_zero
+@[simp]
+theorem rotation_eq_self_iff_angle_eq_zero {x : V} (hx : x ≠ 0) (θ : Real.Angle) :
+    o.rotation θ x = x ↔ θ = 0 := by
+  constructor
+  · intro h
+    rw [eq_comm]
+    simpa [hx, h] using o.oangle_rotation_right hx hx θ
+  · intro h
+    simp [h]
 
--- DISSOLVED: eq_rotation_self_iff_angle_eq_zero
+@[simp]
+theorem eq_rotation_self_iff_angle_eq_zero {x : V} (hx : x ≠ 0) (θ : Real.Angle) :
+    x = o.rotation θ x ↔ θ = 0 := by rw [← o.rotation_eq_self_iff_angle_eq_zero hx, eq_comm]
 
 theorem rotation_eq_self_iff (x : V) (θ : Real.Angle) : o.rotation θ x = x ↔ x = 0 ∨ θ = 0 := by
   by_cases h : x = 0 <;> simp [h]
@@ -210,13 +250,45 @@ theorem rotation_oangle_eq_iff_norm_eq (x y : V) : o.rotation (o.oangle x y) x =
   · intro h
     rw [o.eq_iff_oangle_eq_zero_of_norm_eq] <;> simp [h]
 
--- DISSOLVED: oangle_eq_iff_eq_norm_div_norm_smul_rotation_of_ne_zero
+theorem oangle_eq_iff_eq_norm_div_norm_smul_rotation_of_ne_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0)
+    (θ : Real.Angle) : o.oangle x y = θ ↔ y = (‖y‖ / ‖x‖) • o.rotation θ x := by
+  have hp := div_pos (norm_pos_iff.2 hy) (norm_pos_iff.2 hx)
+  constructor
+  · rintro rfl
+    rw [← LinearIsometryEquiv.map_smul, ← o.oangle_smul_left_of_pos x y hp, eq_comm,
+      rotation_oangle_eq_iff_norm_eq, norm_smul, Real.norm_of_nonneg hp.le,
+      div_mul_cancel₀ _ (norm_ne_zero_iff.2 hx)]
+  · intro hye
+    rw [hye, o.oangle_smul_right_of_pos _ _ hp, o.oangle_rotation_self_right hx]
 
--- DISSOLVED: oangle_eq_iff_eq_pos_smul_rotation_of_ne_zero
+theorem oangle_eq_iff_eq_pos_smul_rotation_of_ne_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0)
+    (θ : Real.Angle) : o.oangle x y = θ ↔ ∃ r : ℝ, 0 < r ∧ y = r • o.rotation θ x := by
+  constructor
+  · intro h
+    rw [o.oangle_eq_iff_eq_norm_div_norm_smul_rotation_of_ne_zero hx hy] at h
+    exact ⟨‖y‖ / ‖x‖, div_pos (norm_pos_iff.2 hy) (norm_pos_iff.2 hx), h⟩
+  · rintro ⟨r, hr, rfl⟩
+    rw [o.oangle_smul_right_of_pos _ _ hr, o.oangle_rotation_self_right hx]
 
--- DISSOLVED: oangle_eq_iff_eq_norm_div_norm_smul_rotation_or_eq_zero
+theorem oangle_eq_iff_eq_norm_div_norm_smul_rotation_or_eq_zero {x y : V} (θ : Real.Angle) :
+    o.oangle x y = θ ↔
+      x ≠ 0 ∧ y ≠ 0 ∧ y = (‖y‖ / ‖x‖) • o.rotation θ x ∨ θ = 0 ∧ (x = 0 ∨ y = 0) := by
+  by_cases hx : x = 0
+  · simp [hx, eq_comm]
+  · by_cases hy : y = 0
+    · simp [hy, eq_comm]
+    · rw [o.oangle_eq_iff_eq_norm_div_norm_smul_rotation_of_ne_zero hx hy]
+      simp [hx, hy]
 
--- DISSOLVED: oangle_eq_iff_eq_pos_smul_rotation_or_eq_zero
+theorem oangle_eq_iff_eq_pos_smul_rotation_or_eq_zero {x y : V} (θ : Real.Angle) :
+    o.oangle x y = θ ↔
+      (x ≠ 0 ∧ y ≠ 0 ∧ ∃ r : ℝ, 0 < r ∧ y = r • o.rotation θ x) ∨ θ = 0 ∧ (x = 0 ∨ y = 0) := by
+  by_cases hx : x = 0
+  · simp [hx, eq_comm]
+  · by_cases hy : y = 0
+    · simp [hy, eq_comm]
+    · rw [o.oangle_eq_iff_eq_pos_smul_rotation_of_ne_zero hx hy]
+      simp [hx, hy]
 
 theorem exists_linearIsometryEquiv_eq_of_det_pos {f : V ≃ₗᵢ[ℝ] V}
     (hd : 0 < LinearMap.det (f.toLinearEquiv : V →ₗ[ℝ] V)) :

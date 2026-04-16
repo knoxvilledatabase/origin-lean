@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.IsLocalHomeomorph
 import Mathlib.Topology.FiberBundle.Basic
 
+noncomputable section
+
 /-!
 # Covering Maps
 

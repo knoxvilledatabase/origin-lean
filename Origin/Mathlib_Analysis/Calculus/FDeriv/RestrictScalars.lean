@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Basic
 
+noncomputable section
+
 /-!
 # The derivative of the scalar restriction of a linear map
 

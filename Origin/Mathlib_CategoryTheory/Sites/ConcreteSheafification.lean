@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Plus
 import Mathlib.CategoryTheory.Limits.Shapes.ConcreteCategory
 
+noncomputable section
+
 /-!
 
 # Sheafification
@@ -69,11 +71,6 @@ def refine {X : C} {P : Cᵒᵖ ⥤ D} {S T : J.Cover X} (x : Meq P T) (e : S �
   ⟨fun I => x ⟨I.Y, I.f, (leOfHom e) _ I.hf⟩, fun I =>
     x.condition (GrothendieckTopology.Cover.Relation.mk' (I.r.map e))⟩
 
-@[simp]
-theorem refine_apply {X : C} {P : Cᵒᵖ ⥤ D} {S T : J.Cover X} (x : Meq P T) (e : S ⟶ T)
-    (I : S.Arrow) : x.refine e I = x ⟨I.Y, I.f, (leOfHom e) _ I.hf⟩ :=
-  rfl
-
 def pullback {Y X : C} {P : Cᵒᵖ ⥤ D} {S : J.Cover X} (x : Meq P S) (f : Y ⟶ X) :
     Meq P ((J.pullback f).obj S) :=
   ⟨fun I => x ⟨_, I.f ≫ f, I.hf⟩, fun I =>
@@ -84,19 +81,10 @@ theorem pullback_apply {Y X : C} {P : Cᵒᵖ ⥤ D} {S : J.Cover X} (x : Meq P 
     (I : ((J.pullback f).obj S).Arrow) : x.pullback f I = x ⟨_, I.f ≫ f, I.hf⟩ :=
   rfl
 
-@[simp]
-theorem pullback_refine {Y X : C} {P : Cᵒᵖ ⥤ D} {S T : J.Cover X} (h : S ⟶ T) (f : Y ⟶ X)
-    (x : Meq P T) : (x.pullback f).refine ((J.pullback f).map h) = (refine x h).pullback _ :=
-  rfl
-
 def mk {X : C} {P : Cᵒᵖ ⥤ D} (S : J.Cover X) (x : P.obj (op X)) : Meq P S :=
   ⟨fun I => P.map I.f.op x, fun I => by
     dsimp
     simp only [← comp_apply, ← P.map_comp, ← op_comp, I.r.w]⟩
-
-theorem mk_apply {X : C} {P : Cᵒᵖ ⥤ D} (S : J.Cover X) (x : P.obj (op X)) (I : S.Arrow) :
-    mk S x I = P.map I.f.op x :=
-  rfl
 
 variable [PreservesLimits (forget D)]
 
@@ -444,22 +432,8 @@ variable (D)
 noncomputable def sheafification : (Cᵒᵖ ⥤ D) ⥤ Cᵒᵖ ⥤ D :=
   J.plusFunctor D ⋙ J.plusFunctor D
 
-@[simp]
-theorem sheafification_obj (P : Cᵒᵖ ⥤ D) : (J.sheafification D).obj P = J.sheafify P :=
-  rfl
-
-@[simp]
-theorem sheafification_map {P Q : Cᵒᵖ ⥤ D} (η : P ⟶ Q) :
-    (J.sheafification D).map η = J.sheafifyMap η :=
-  rfl
-
 noncomputable def toSheafification : 𝟭 _ ⟶ sheafification J D :=
   J.toPlusNatTrans D ≫ whiskerRight (J.toPlusNatTrans D) (J.plusFunctor D)
-
-@[simp]
-theorem toSheafification_app (P : Cᵒᵖ ⥤ D) :
-    (J.toSheafification D).app P = J.toSheafify P :=
-  rfl
 
 variable {D}
 
@@ -472,11 +446,6 @@ theorem isIso_toSheafify {P : Cᵒᵖ ⥤ D} (hP : Presheaf.IsSheaf J P) : IsIso
 noncomputable def isoSheafify {P : Cᵒᵖ ⥤ D} (hP : Presheaf.IsSheaf J P) : P ≅ J.sheafify P :=
   letI := isIso_toSheafify J hP
   asIso (J.toSheafify P)
-
-@[simp]
-theorem isoSheafify_hom {P : Cᵒᵖ ⥤ D} (hP : Presheaf.IsSheaf J P) :
-    (J.isoSheafify hP).hom = J.toSheafify P :=
-  rfl
 
 noncomputable def sheafifyLift {P Q : Cᵒᵖ ⥤ D} (η : P ⟶ Q) (hQ : Presheaf.IsSheaf J Q) :
     J.sheafify P ⟶ Q :=

@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Polynomial/Cyclotomic/Basic.lean
-Genuine: 48 | Conflates: 3 | Dissolved: 3 | Infrastructure: 1
+Genuine: 50 | Conflates: 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Splits
 import Mathlib.FieldTheory.RatFunc.AsPolynomial
 import Mathlib.NumberTheory.ArithmeticFunction
 import Mathlib.RingTheory.RootsOfUnity.Complex
+
+noncomputable section
 
 /-!
 # Cyclotomic polynomials.
@@ -79,7 +81,8 @@ theorem cyclotomic'.monic (n : ℕ) (R : Type*) [CommRing R] [IsDomain R] :
     (cyclotomic' n R).Monic :=
   monic_prod_of_monic _ _ fun _ _ => monic_X_sub_C _
 
--- DISSOLVED: cyclotomic'_ne_zero
+theorem cyclotomic'_ne_zero (n : ℕ) (R : Type*) [CommRing R] [IsDomain R] : cyclotomic' n R ≠ 0 :=
+  (cyclotomic'.monic n R).ne_zero
 
 theorem natDegree_cyclotomic' {ζ : R} {n : ℕ} (h : IsPrimitiveRoot ζ n) :
     (cyclotomic' n R).natDegree = Nat.totient n := by
@@ -202,7 +205,11 @@ def cyclotomic (n : ℕ) (R : Type*) [Ring R] : R[X] :=
   if h : n = 0 then 1
   else map (Int.castRingHom R) (int_coeff_of_cyclotomic' (Complex.isPrimitiveRoot_exp n h)).choose
 
--- DISSOLVED: int_cyclotomic_rw
+theorem int_cyclotomic_rw {n : ℕ} (h : n ≠ 0) :
+    cyclotomic n ℤ = (int_coeff_of_cyclotomic' (Complex.isPrimitiveRoot_exp n h)).choose := by
+  simp only [cyclotomic, h, dif_neg, not_false_iff]
+  ext i
+  simp only [coeff_map, Int.cast_id, eq_intCast]
 
 theorem map_cyclotomic_int (n : ℕ) (R : Type*) [Ring R] :
     map (Int.castRingHom R) (cyclotomic n ℤ) = cyclotomic n R := by
@@ -254,7 +261,9 @@ theorem cyclotomic.monic (n : ℕ) (R : Type*) [Ring R] : (cyclotomic n R).Monic
 theorem cyclotomic.isPrimitive (n : ℕ) (R : Type*) [CommRing R] : (cyclotomic n R).IsPrimitive :=
   (cyclotomic.monic n R).isPrimitive
 
--- DISSOLVED: cyclotomic_ne_zero
+-- CONFLATES (assumes ground = zero): cyclotomic_ne_zero
+theorem cyclotomic_ne_zero (n : ℕ) (R : Type*) [Ring R] [Nontrivial R] : cyclotomic n R ≠ 0 :=
+  (cyclotomic.monic n R).ne_zero
 
 -- CONFLATES (assumes ground = zero): degree_cyclotomic
 theorem degree_cyclotomic (n : ℕ) (R : Type*) [Ring R] [Nontrivial R] :

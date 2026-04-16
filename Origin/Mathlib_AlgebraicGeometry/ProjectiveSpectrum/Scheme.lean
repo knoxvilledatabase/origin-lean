@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.ProjectiveSpectrum.StructureSheaf
 import Mathlib.AlgebraicGeometry.GammaSpecAdjunction
 import Mathlib.RingTheory.GradedAlgebra.Radical
 
+noncomputable section
+
 /-!
 # Proj as a scheme
 
@@ -120,9 +122,7 @@ local notation3 "Proj.T" => PresheafedSpace.carrier <| SheafedSpace.toPresheafed
   <| LocallyRingedSpace.toSheafedSpace <| Proj.toLocallyRingedSpace 𝒜
 
 macro "Proj| " U:term : term =>
-
   `((Proj.toLocallyRingedSpace 𝒜).restrict
-
     (Opens.isOpenEmbedding (X := Proj.T) ($U : Opens Proj.T)))
 
 local notation "Proj.T| " U => PresheafedSpace.carrier <| SheafedSpace.toPresheafedSpace
@@ -221,15 +221,11 @@ variable {f : A} {m : ℕ} (f_deg : f ∈ 𝒜 m)
 open Lean Meta Elab Tactic
 
 macro "mem_tac_aux" : tactic =>
-
   `(tactic| first | exact pow_mem_graded _ (Submodule.coe_mem _) | exact natCast_mem_graded _ _ |
-
     exact pow_mem_graded _ f_deg)
 
 macro "mem_tac" : tactic =>
-
   `(tactic| first | mem_tac_aux |
-
     repeat (all_goals (apply SetLike.GradedMonoid.toGradedMul.mul_mem)); mem_tac_aux)
 
 def carrier (f_deg : f ∈ 𝒜 m) (q : Spec.T A⁰_ f) : Set A :=

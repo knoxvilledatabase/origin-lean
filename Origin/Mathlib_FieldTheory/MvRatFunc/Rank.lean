@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Algebraic.MvPolynomial
 import Mathlib.RingTheory.Localization.Cardinality
 import Mathlib.RingTheory.MvPolynomial
 
+noncomputable section
+
 /-!
 # Rank of multivariate rational function field
 -/

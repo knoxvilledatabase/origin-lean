@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.SubboxInduction
 import Mathlib.Analysis.BoxIntegral.Partition.Split
 
+noncomputable section
+
 /-!
 # Filters used in box-based integrals
 
@@ -220,10 +222,6 @@ def McShane : IntegrationParams :=
 
 def GP : IntegrationParams := ⊥
 
-theorem henstock_le_riemann : Henstock ≤ Riemann := by trivial
-
-theorem henstock_le_mcShane : Henstock ≤ McShane := by trivial
-
 theorem gp_le : GP ≤ l :=
   bot_le
 
@@ -420,12 +418,6 @@ theorem exists_memBaseSet_le_iUnion_eq (l : IntegrationParams) (π₀ : Preparti
   rcases π₀.exists_tagged_le_isHenstock_isSubordinate_iUnion_eq r with ⟨π, hle, hH, hr, hd, hU⟩
   refine ⟨π, ⟨hr, fun _ => hH, fun _ => hd.trans_le hc₁, fun _ => ⟨π₀.compl, ?_, hc₂⟩⟩, ⟨hle, hU⟩⟩
   exact Prepartition.compl_congr hU ▸ π.toPrepartition.iUnion_compl
-
-theorem exists_memBaseSet_isPartition (l : IntegrationParams) (I : Box ι) (hc : I.distortion ≤ c)
-    (r : (ι → ℝ) → Ioi (0 : ℝ)) : ∃ π, l.MemBaseSet I c r π ∧ π.IsPartition := by
-  rw [← Prepartition.distortion_top] at hc
-  have hc' : (⊤ : Prepartition I).compl.distortion ≤ c := by simp
-  simpa [isPartition_iff_iUnion_eq] using l.exists_memBaseSet_le_iUnion_eq ⊤ hc hc' r
 
 theorem toFilterDistortioniUnion_neBot (l : IntegrationParams) (I : Box ι) (π₀ : Prepartition I)
     (hc₁ : π₀.distortion ≤ c) (hc₂ : π₀.compl.distortion ≤ c) :

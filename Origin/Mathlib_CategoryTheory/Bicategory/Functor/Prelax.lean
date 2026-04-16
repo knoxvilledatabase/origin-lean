@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Basic
 
+noncomputable section
+
 /-!
 
 # Prelax functors
@@ -133,11 +135,6 @@ def mapFunctor (a b : B) : (a ⟶ b) ⥤ (F.obj a ⟶ F.obj b) where
   obj f := F.map f
   map η := F.map₂ η
 
-@[simp]
-lemma mkOfHomFunctors_mapFunctor (F : B → C) (F' : (a : B) → (b : B) → (a ⟶ b) ⥤ (F a ⟶ F b))
-    (a b : B) : (mkOfHomFunctors F F').mapFunctor a b = F' a b :=
-  rfl
-
 section
 
 variable {a b : B}
@@ -159,20 +156,10 @@ lemma map₂_hom_inv {f g : a ⟶ b} (η : f ≅ g) :
     F.map₂ η.hom ≫ F.map₂ η.inv = 𝟙 (F.map f) := by
   rw [← F.map₂_comp, Iso.hom_inv_id, F.map₂_id]
 
-@[reassoc]
-lemma map₂_hom_inv_isIso {f g : a ⟶ b} (η : f ⟶ g) [IsIso η] :
-    F.map₂ η ≫ F.map₂ (inv η) = 𝟙 (F.map f) := by
-  simp
-
 @[reassoc, simp]
 lemma map₂_inv_hom {f g : a ⟶ b} (η : f ≅ g) :
     F.map₂ η.inv ≫ F.map₂ η.hom = 𝟙 (F.map g) := by
   rw [← F.map₂_comp, Iso.inv_hom_id, F.map₂_id]
-
-@[reassoc]
-lemma map₂_inv_hom_isIso {f g : a ⟶ b} (η : f ⟶ g) [IsIso η] :
-    F.map₂ (inv η) ≫ F.map₂ η = 𝟙 (F.map g) := by
-  simp
 
 end
 

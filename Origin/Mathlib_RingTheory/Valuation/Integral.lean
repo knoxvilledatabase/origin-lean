@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/Valuation/Integral.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.Valuation.Integers
+
+noncomputable section
 
 /-!
 # Integral elements over the ring of integers of a valuation
@@ -59,7 +61,6 @@ variable [Algebra O K] [IsFractionRing O K]
 variable (hv : Integers v O)
 
 include hv in
-
 theorem integrallyClosed : IsIntegrallyClosed O :=
   (IsIntegrallyClosed.integralClosure_eq_bot_iff K).mp (Valuation.Integers.integralClosure hv)
 

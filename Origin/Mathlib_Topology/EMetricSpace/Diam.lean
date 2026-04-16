@@ -5,6 +5,8 @@ Genuine: 22 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Topology.EMetricSpace.Pi
 
+noncomputable section
+
 /-!
 # Diameters of sets in extended metric spaces
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.PFunctor.Multivariate.Basic
 import Mathlib.Data.QPF.Multivariate.Basic
 
+noncomputable section
+
 /-!
 # The composition of QPFs is itself a QPF
 

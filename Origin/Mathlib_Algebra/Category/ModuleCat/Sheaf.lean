@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Limits
 import Mathlib.CategoryTheory.Sites.LocallyBijective
 import Mathlib.CategoryTheory.Sites.Whiskering
 
+noncomputable section
+
 /-!
 # Sheaves of modules over a sheaf of rings
 
@@ -45,13 +47,6 @@ instance : Category (SheafOfModules.{v} R) where
 @[ext]
 lemma hom_ext {X Y : SheafOfModules.{v} R} {f g : X ⟶ Y} (h : f.val = g.val) : f = g :=
   Hom.ext h
-
-@[simp]
-lemma id_val (X : SheafOfModules.{v} R) : Hom.val (𝟙 X) = 𝟙 X.val := rfl
-
-@[simp, reassoc]
-lemma comp_val {X Y Z : SheafOfModules.{v} R} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).val = f.val ≫ g.val := rfl
 
 variable (R)
 
@@ -97,10 +92,6 @@ instance : (toSheaf.{v} R).Faithful :=
 instance (M N : SheafOfModules.{v} R) : AddCommGroup (M ⟶ N) :=
   (fullyFaithfulForget R).homEquiv.addCommGroup
 
-@[simp]
-lemma add_val {M N : SheafOfModules.{v} R} (f g : M ⟶ N) :
-    (f + g).val = f.val + g.val := rfl
-
 instance : Preadditive (SheafOfModules.{v} R) where
   add_comp := by intros; ext1; dsimp; simp only [Preadditive.add_comp]
   comp_add := by intros; ext1; dsimp; simp only [Preadditive.comp_add]
@@ -115,14 +106,6 @@ abbrev sections (M : SheafOfModules.{v} R) : Type _ := M.val.sections
 
 abbrev sectionsMap {M N : SheafOfModules.{v} R} (f : M ⟶ N) (s : M.sections) : N.sections :=
   PresheafOfModules.sectionsMap f.val s
-
-@[simp]
-lemma sectionsMap_comp {M N P : SheafOfModules.{v} R} (f : M ⟶ N) (g : N ⟶ P) (s : M.sections) :
-    sectionsMap (f ≫ g) s = sectionsMap g (sectionsMap f s) := rfl
-
-@[simp]
-lemma sectionsMap_id {M : SheafOfModules.{v} R} (s : M.sections) :
-    sectionsMap (𝟙 M) s = s := rfl
 
 variable (R) in
 
@@ -143,10 +126,6 @@ def unit : SheafOfModules R where
 def unitHomEquiv (M : SheafOfModules R) :
     (unit R ⟶ M) ≃ M.sections :=
   (fullyFaithfulForget R).homEquiv.trans M.val.unitHomEquiv
-
-@[simp]
-lemma unitHomEquiv_apply_coe (M : SheafOfModules R) (f : unit R ⟶ M) (X : Cᵒᵖ) :
-    (M.unitHomEquiv f).val X = f.val.app X (1 : R.val.obj X) := rfl
 
 lemma unitHomEquiv_comp_apply {M N : SheafOfModules.{u} R}
     (f : unit R ⟶ M) (p : M ⟶ N) :

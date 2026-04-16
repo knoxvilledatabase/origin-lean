@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/IsPrimary.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.RingTheory.Ideal.Operations
+
+noncomputable section
 
 /-!
 # Primary submodules
@@ -52,7 +54,15 @@ section CommRing
 
 variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] {S : Submodule R M}
 
--- DISSOLVED: isPrimary_iff_zero_divisor_quotient_imp_nilpotent_smul
+lemma isPrimary_iff_zero_divisor_quotient_imp_nilpotent_smul :
+    S.IsPrimary ↔ S ≠ ⊤ ∧ ∀ (r : R) (x : M ⧸ S), x ≠ 0 → r • x = 0 →
+      ∃ n : ℕ, r ^ n • (⊤ : Submodule R (M ⧸ S)) = ⊥ := by
+  refine (and_congr_right fun _ ↦ ?_)
+  simp_rw [S.mkQ_surjective.forall, ← map_smul, ne_eq, ← LinearMap.mem_ker, ker_mkQ]
+  congr! 2
+  rw [forall_comm, ← or_iff_not_imp_left,
+    ← LinearMap.range_eq_top.mpr S.mkQ_surjective, ← map_top]
+  simp_rw [eq_bot_iff, ← map_pointwise_smul, map_le_iff_le_comap, comap_bot, ker_mkQ]
 
 end CommRing
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.Category.TopCat.Basic
 
+noncomputable section
+
 /-!
 # Euclidean spheres
 

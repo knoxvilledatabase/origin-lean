@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.LinearAlgebra.RootSystem.Defs
 
+noncomputable section
+
 /-!
 # Root-positive bilinear forms on root pairings
 

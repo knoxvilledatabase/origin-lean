@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Divisibility.Basic
 import Mathlib.Algebra.Group.Units.Basic
 
+noncomputable section
+
 /-!
 # Divisibility and units
 

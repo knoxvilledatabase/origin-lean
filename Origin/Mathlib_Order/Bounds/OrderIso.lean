@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Bounds.Image
 import Mathlib.Order.Hom.Set
 
+noncomputable section
+
 /-!
 # Order isomorphisms and bounds.
 -/

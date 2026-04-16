@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.Sheaf.Smooth
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace
 
+noncomputable section
+
 /-! # Smooth manifolds as locally ringed spaces
 
 This file equips a smooth manifold-with-corners with the structure of a locally ringed space.

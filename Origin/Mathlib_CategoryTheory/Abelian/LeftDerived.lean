@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Additive
 import Mathlib.CategoryTheory.Abelian.ProjectiveResolution
 
+noncomputable section
+
 /-!
 # Left-derived functors
 
@@ -174,17 +176,6 @@ lemma ProjectiveResolution.leftDerivedToHomotopyCategory_app_eq
   dsimp
   simp only [← Functor.map_comp, NatTrans.mapHomologicalComplex_naturality]
   rfl
-
-@[simp]
-lemma NatTrans.leftDerivedToHomotopyCategory_id (F : C ⥤ D) [F.Additive] :
-    NatTrans.leftDerivedToHomotopyCategory (𝟙 F) = 𝟙 _ := rfl
-
-@[simp, reassoc]
-lemma NatTrans.leftDerivedToHomotopyCategory_comp {F G H : C ⥤ D} (α : F ⟶ G) (β : G ⟶ H)
-    [F.Additive] [G.Additive] [H.Additive] :
-    NatTrans.leftDerivedToHomotopyCategory (α ≫ β) =
-      NatTrans.leftDerivedToHomotopyCategory α ≫
-        NatTrans.leftDerivedToHomotopyCategory β := rfl
 
 noncomputable def NatTrans.leftDerived
     {F G : C ⥤ D} [F.Additive] [G.Additive] (α : F ⟶ G) (n : ℕ) :

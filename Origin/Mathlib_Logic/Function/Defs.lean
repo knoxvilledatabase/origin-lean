@@ -10,6 +10,8 @@ import Mathlib.Tactic.Eqns
 import Mathlib.Tactic.TypeStar
 import Batteries.Logic
 
+noncomputable section
+
 /-!
 # General operations on functions
 -/
@@ -19,16 +21,6 @@ universe u₁ u₂ u₃ u₄ u₅
 namespace Function
 
 variable {α : Sort u₁} {β : Sort u₂} {φ : Sort u₃} {δ : Sort u₄} {ζ : Sort u₅}
-
-lemma flip_def {f : α → β → φ} : flip f = fun b a => f a b := rfl
-
-Because of changes in how equation lemmas are generated,
-
-`@[eqns]` will only work properly when used immediately after the definition
-
-(and when none of the default equation lemmas are needed).
-
-Thus this usage is no longer allowed: -/
 
 @[inline, reducible]
 def dcomp {β : α → Sort u₂} {φ : ∀ {x : α}, β x → Sort u₃} (f : ∀ {x : α} (y : β x), φ y)
@@ -42,17 +34,6 @@ infixl:2 " on " => onFun
 
 @[inherit_doc onFun]
 abbrev swap {φ : α → β → Sort u₃} (f : ∀ x y, φ x y) : ∀ y x, φ x y := fun y x => f x y
-
-theorem swap_def {φ : α → β → Sort u₃} (f : ∀ x y, φ x y) : swap f = fun y x => f x y := rfl
-
-@[simp, mfld_simps]
-theorem id_comp (f : α → β) : id ∘ f = f := rfl
-
-@[simp, mfld_simps]
-theorem comp_id (f : α → β) : f ∘ id = f := rfl
-
-theorem comp_assoc (f : φ → δ) (g : β → φ) (h : α → β) : (f ∘ g) ∘ h = f ∘ g ∘ h :=
-  rfl
 
 def Injective (f : α → β) : Prop :=
   ∀ ⦃a₁ a₂⦄, f a₁ = f a₂ → a₁ = a₂
@@ -144,8 +125,5 @@ namespace Pi
 variable {ι : Sort*} {α β : ι → Sort*}
 
 protected def map (f : ∀ i, α i → β i) : (∀ i, α i) → (∀ i, β i) := fun a i ↦ f i (a i)
-
-@[simp]
-lemma map_apply (f : ∀ i, α i → β i) (a : ∀ i, α i) (i : ι) : Pi.map f a i = f i (a i) := rfl
 
 end Pi

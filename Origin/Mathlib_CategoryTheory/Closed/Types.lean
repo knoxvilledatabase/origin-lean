@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Closed.Cartesian
 import Mathlib.CategoryTheory.Monoidal.Types.Basic
 import Mathlib.CategoryTheory.ChosenFiniteProducts.FunctorCategory
 
+noncomputable section
+
 /-!
 # Cartesian closure of Type
 

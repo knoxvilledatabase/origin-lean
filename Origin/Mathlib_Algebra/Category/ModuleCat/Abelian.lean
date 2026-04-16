@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Kernels
 import Mathlib.Algebra.Category.ModuleCat.Limits
 import Mathlib.CategoryTheory.Abelian.Basic
 
+noncomputable section
+
 /-!
 # The category of left R-modules is abelian.
 

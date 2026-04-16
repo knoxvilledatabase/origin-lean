@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Algebra/Module/Alternating/Topology.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.Multilinear.Topology
 import Mathlib.Topology.Algebra.Module.Alternating.Basic
+
+noncomputable section
 
 /-!
 # Topology on continuous alternating maps
@@ -215,13 +217,6 @@ theorem continuous_restrictScalars :
 
 variable (𝕜') in
 
-@[simps (config := .asFn) apply]
-def restrictScalarsCLM [ContinuousConstSMul 𝕜' F] :
-    E [⋀^ι]→L[𝕜] F →L[𝕜'] E [⋀^ι]→L[𝕜'] F where
-  toFun := restrictScalars 𝕜'
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
 end RestrictScalars
 
 variable (𝕜 E F)
@@ -233,10 +228,6 @@ def apply [ContinuousConstSMul 𝕜 F] (m : ι → E) : E [⋀^ι]→L[𝕜] F �
   cont := continuous_eval_const m
 
 variable {𝕜 E F}
-
-@[simp]
-lemma apply_apply [ContinuousConstSMul 𝕜 F] {m : ι → E} {c : E [⋀^ι]→L[𝕜] F} :
-    apply 𝕜 E F m c = c m := rfl
 
 theorem hasSum_eval {α : Type*} {p : α → E [⋀^ι]→L[𝕜] F}
     {q : E [⋀^ι]→L[𝕜] F} (h : HasSum p q) (m : ι → E) :

@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Invertible
 import Mathlib.Algebra.Order.Monoid.WithTop
 import Mathlib.Algebra.Order.Ring.Cast
 
+noncomputable section
+
 /-!
 # `norm_num` extensions for inequalities.
 -/
@@ -104,6 +106,9 @@ theorem isInt_lt_false [OrderedRing α] {a b : α} {a' b' : ℤ}
   not_lt_of_le (isInt_le_true hb ha h)
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a ≤ b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num _ ≤ _] def evalLE : NormNumExt where eval {v β} e := do
   haveI' : v =QL 0 := ⟨⟩; haveI' : $β =Q Prop := ⟨⟩
@@ -168,6 +173,9 @@ where
       intArm
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `norm_num` extension which identifies expressions of the form `a < b`,
+
+such that `norm_num` successfully recognises both `a` and `b`. -/
 
 @[norm_num _ < _] def evalLT : NormNumExt where eval {v β} e := do
   haveI' : v =QL 0 := ⟨⟩; haveI' : $β =Q Prop := ⟨⟩

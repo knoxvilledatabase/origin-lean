@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Compactness.CompactlyGeneratedSpace
 import Mathlib.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 
 # Compactly generated topological spaces

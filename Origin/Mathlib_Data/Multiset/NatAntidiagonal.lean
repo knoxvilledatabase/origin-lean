@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Multiset.Nodup
 import Mathlib.Data.List.NatAntidiagonal
 
+noncomputable section
+
 /-!
 # Antidiagonals in ℕ × ℕ as multisets
 
@@ -33,10 +35,6 @@ theorem mem_antidiagonal {n : ℕ} {x : ℕ × ℕ} : x ∈ antidiagonal n ↔ x
 @[simp]
 theorem card_antidiagonal (n : ℕ) : card (antidiagonal n) = n + 1 := by
   rw [antidiagonal, coe_card, List.Nat.length_antidiagonal]
-
-@[simp]
-theorem antidiagonal_zero : antidiagonal 0 = {(0, 0)} :=
-  rfl
 
 @[simp]
 theorem nodup_antidiagonal (n : ℕ) : Nodup (antidiagonal n) :=

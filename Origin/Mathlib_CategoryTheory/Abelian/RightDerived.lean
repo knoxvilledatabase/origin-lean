@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Additive
 import Mathlib.CategoryTheory.Abelian.InjectiveResolution
 
+noncomputable section
+
 /-!
 # Right-derived functors
 
@@ -175,17 +177,6 @@ lemma InjectiveResolution.rightDerivedToHomotopyCategory_app_eq
   dsimp
   simp only [← Functor.map_comp, NatTrans.mapHomologicalComplex_naturality]
   rfl
-
-@[simp]
-lemma NatTrans.rightDerivedToHomotopyCategory_id (F : C ⥤ D) [F.Additive] :
-    NatTrans.rightDerivedToHomotopyCategory (𝟙 F) = 𝟙 _ := rfl
-
-@[simp, reassoc]
-lemma NatTrans.rightDerivedToHomotopyCategory_comp {F G H : C ⥤ D} (α : F ⟶ G) (β : G ⟶ H)
-    [F.Additive] [G.Additive] [H.Additive] :
-    NatTrans.rightDerivedToHomotopyCategory (α ≫ β) =
-      NatTrans.rightDerivedToHomotopyCategory α ≫
-        NatTrans.rightDerivedToHomotopyCategory β := rfl
 
 noncomputable def NatTrans.rightDerived
     {F G : C ⥤ D} [F.Additive] [G.Additive] (α : F ⟶ G) (n : ℕ) :

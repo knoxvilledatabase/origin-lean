@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Data.List.OfFn
 import Mathlib.Data.Fin.Tuple.Basic
 
+noncomputable section
+
 /-!
 # Take operations on tuples
 

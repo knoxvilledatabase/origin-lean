@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Pointwise/Finset/Basic.lean
-Genuine: 302 | Conflates: 3 | Dissolved: 7 | Infrastructure: 46
+Genuine: 306 | Conflates: 4 | Dissolved: 0 | Infrastructure: 46
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
@@ -11,6 +11,8 @@ import Mathlib.Data.Finset.Density
 import Mathlib.Data.Finset.Max
 import Mathlib.Data.Finset.NAry
 import Mathlib.Data.Set.Pointwise.SMul
+
+noncomputable section
 
 /-!
 # Pointwise operations of finsets
@@ -125,14 +127,6 @@ theorem card_one : (1 : Finset α).card = 1 :=
 def singletonOneHom : OneHom α (Finset α) where
   toFun := singleton; map_one' := singleton_one
 
-@[to_additive (attr := simp)]
-theorem coe_singletonOneHom : (singletonOneHom : α → Finset α) = singleton :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem singletonOneHom_apply (a : α) : singletonOneHom a = {a} :=
-  rfl
-
 @[to_additive (attr := simps) "Lift a `ZeroHom` to `Finset` via `image`"]
 def imageOneHom [DecidableEq β] [One β] [FunLike F α β] [OneHomClass F α β] (f : F) :
     OneHom (Finset α) (Finset β) where
@@ -143,31 +137,7 @@ def imageOneHom [DecidableEq β] [One β] [FunLike F α β] [OneHomClass F α β
 lemma sup_one [SemilatticeSup β] [OrderBot β] (f : α → β) : sup 1 f = f 1 := sup_singleton
 
 @[to_additive (attr := simp)]
-lemma sup'_one [SemilatticeSup β] (f : α → β) : sup' 1 one_nonempty f = f 1 := rfl
-
-@[to_additive (attr := simp)]
 lemma inf_one [SemilatticeInf β] [OrderTop β] (f : α → β) : inf 1 f = f 1 := inf_singleton
-
-@[to_additive (attr := simp)]
-lemma inf'_one [SemilatticeInf β] (f : α → β) : inf' 1 one_nonempty f = f 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma max_one [LinearOrder α] : (1 : Finset α).max = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma min_one [LinearOrder α] : (1 : Finset α).min = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma max'_one [LinearOrder α] : (1 : Finset α).max' one_nonempty = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma min'_one [LinearOrder α] : (1 : Finset α).min' one_nonempty = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma image_op_one [DecidableEq α] : (1 : Finset α).image op = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma map_op_one : (1 : Finset α).map opEquiv.toEmbedding = 1 := rfl
 
 end One
 
@@ -183,10 +153,6 @@ protected def inv : Inv (Finset α) :=
   ⟨image Inv.inv⟩
 
 scoped[Pointwise] attribute [instance] Finset.inv Finset.neg
-
-@[to_additive]
-theorem inv_def : s⁻¹ = s.image fun x => x⁻¹ :=
-  rfl
 
 @[to_additive] lemma image_inv_eq_inv (s : Finset α) : s.image (·⁻¹) = s⁻¹ := rfl
 
@@ -299,11 +265,6 @@ variable [DecidableEq β] [SMul α β] {s s₁ s₂ : Finset α} {t t₁ t₂ u 
 protected def smul : SMul (Finset α) (Finset β) := ⟨image₂ (· • ·)⟩
 
 scoped[Pointwise] attribute [instance] Finset.smul Finset.vadd
-
-@[to_additive] lemma smul_def : s • t = (s ×ˢ t).image fun p : α × β => p.1 • p.2 := rfl
-
-@[to_additive]
-lemma image_smul_product : ((s ×ˢ t).image fun x : α × β => x.fst • x.snd) = s • t := rfl
 
 @[to_additive] lemma mem_smul {x : β} : x ∈ s • t ↔ ∃ y ∈ s, ∃ z ∈ t, y • z = x := mem_image₂
 
@@ -464,14 +425,6 @@ protected def mul : Mul (Finset α) :=
 scoped[Pointwise] attribute [instance] Finset.mul Finset.add
 
 @[to_additive]
-theorem mul_def : s * t = (s ×ˢ t).image fun p : α × α => p.1 * p.2 :=
-  rfl
-
-@[to_additive]
-theorem image_mul_product : ((s ×ˢ t).image fun x : α × α => x.fst * x.snd) = s * t :=
-  rfl
-
-@[to_additive]
 theorem mem_mul {x : α} : x ∈ s * t ↔ ∃ y ∈ s, ∃ z ∈ t, y * z = x := mem_image₂
 
 @[to_additive (attr := simp, norm_cast)]
@@ -597,14 +550,6 @@ lemma map_op_mul (s t : Finset α) :
 def singletonMulHom : α →ₙ* Finset α where
   toFun := singleton; map_mul' _ _ := (singleton_mul_singleton _ _).symm
 
-@[to_additive (attr := simp)]
-theorem coe_singletonMulHom : (singletonMulHom : α → Finset α) = singleton :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem singletonMulHom_apply (a : α) : singletonMulHom a = {a} :=
-  rfl
-
 @[to_additive (attr := simps) "Lift an `AddHom` to `Finset` via `image`"]
 def imageMulHom [DecidableEq β] : Finset α →ₙ* Finset β where
   toFun := Finset.image f
@@ -655,14 +600,6 @@ protected def div : Div (Finset α) :=
   ⟨image₂ (· / ·)⟩
 
 scoped[Pointwise] attribute [instance] Finset.div Finset.sub
-
-@[to_additive]
-theorem div_def : s / t = (s ×ˢ t).image fun p : α × α => p.1 / p.2 :=
-  rfl
-
-@[to_additive]
-theorem image_div_product : ((s ×ˢ t).image fun x : α × α => x.fst / x.snd) = s / t :=
-  rfl
 
 @[to_additive]
 theorem mem_div : a ∈ s / t ↔ ∃ b ∈ s, ∃ c ∈ t, b / c = a :=
@@ -870,27 +807,11 @@ theorem subset_mul_right {s : Finset α} (t : Finset α) (hs : (1 : α) ∈ s) :
 def singletonMonoidHom : α →* Finset α :=
   { singletonMulHom, singletonOneHom with }
 
-@[to_additive (attr := simp)]
-theorem coe_singletonMonoidHom : (singletonMonoidHom : α → Finset α) = singleton :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem singletonMonoidHom_apply (a : α) : singletonMonoidHom a = {a} :=
-  rfl
-
 @[to_additive "The coercion from `Finset` to `set` as an `AddMonoidHom`."]
 noncomputable def coeMonoidHom : Finset α →* Set α where
   toFun := CoeTC.coe
   map_one' := coe_one
   map_mul' := coe_mul
-
-@[to_additive (attr := simp)]
-theorem coe_coeMonoidHom : (coeMonoidHom : Finset α → Set α) = CoeTC.coe :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem coeMonoidHom_apply (s : Finset α) : coeMonoidHom s = s :=
-  rfl
 
 @[to_additive (attr := simps) "Lift an `add_monoid_hom` to `Finset` via `image`"]
 def imageMonoidHom [MulOneClass β] [FunLike F α β] [MonoidHomClass F α β] (f : F) :
@@ -931,11 +852,15 @@ lemma pow_subset_pow_right (hs : 1 ∈ s) (hmn : m ≤ n) : s ^ m ⊆ s ^ n :=
 lemma pow_subset_pow (hst : s ⊆ t) (ht : 1 ∈ t) (hmn : m ≤ n) : s ^ m ⊆ t ^ n :=
   (pow_subset_pow_left hst).trans (pow_subset_pow_right ht hmn)
 
--- DISSOLVED: subset_pow
+@[to_additive]
+lemma subset_pow (hs : 1 ∈ s) (hn : n ≠ 0) : s ⊆ s ^ n := by
+  simpa using pow_subset_pow_right hs <| Nat.one_le_iff_ne_zero.2 hn
 
 alias nsmul_subset_nsmul_of_zero_mem := nsmul_subset_nsmul_right
 
--- DISSOLVED: pow_subset_pow_mul_of_sq_subset_mul
+@[to_additive]
+lemma pow_subset_pow_mul_of_sq_subset_mul (hst : s ^ 2 ⊆ t * s) (hn : n ≠ 0) :
+    s ^ n ⊆ t ^ (n - 1) * s := pow_le_pow_mul_of_sq_le_mul hst hn
 
 @[to_additive (attr := simp) nsmul_empty]
 lemma empty_pow (hn : n ≠ 0) : (∅ : Finset α) ^ n = ∅ := match n with | n + 1 => by simp [pow_succ]
@@ -946,7 +871,6 @@ lemma Nonempty.pow (hs : s.Nonempty) : ∀ {n}, (s ^ n).Nonempty
   | n + 1 => by rw [pow_succ]; exact hs.pow.mul hs
 
 set_option push_neg.use_distrib true in
-
 @[to_additive (attr := simp)] lemma pow_eq_empty : s ^ n = ∅ ↔ s = ∅ ∧ n ≠ 0 := by
   constructor
   · contrapose!
@@ -1100,7 +1024,6 @@ lemma Nonempty.zpow (hs : s.Nonempty) : ∀ {n : ℤ}, (s ^ n).Nonempty
   | .negSucc n => by simpa using hs.pow
 
 set_option push_neg.use_distrib true in
-
 @[to_additive (attr := simp)] lemma zpow_eq_empty : s ^ n = ∅ ↔ s = ∅ ∧ n ≠ 0 := by
   constructor
   · contrapose!
@@ -1174,15 +1097,6 @@ theorem image_mul_right : image (· * b) t = preimage t (· * b⁻¹) (mul_left_
   coe_injective <| by simp
 
 @[to_additive]
-theorem image_mul_left' :
-    image (fun b => a⁻¹ * b) t = preimage t (fun b => a * b) (mul_right_injective _).injOn := by
-  simp
-
-@[to_additive]
-theorem image_mul_right' :
-    image (· * b⁻¹) t = preimage t (· * b) (mul_left_injective _).injOn := by simp
-
-@[to_additive]
 lemma image_inv (f : F) (s : Finset α) : s⁻¹.image f = (s.image f)⁻¹ := image_comm (map_inv _)
 
 theorem image_div : (s / t).image (f : α → β) = s.image f / t.image f :=
@@ -1234,13 +1148,6 @@ protected def vsub : VSub (Finset α) (Finset β) :=
   ⟨image₂ (· -ᵥ ·)⟩
 
 scoped[Pointwise] attribute [instance] Finset.vsub
-
-theorem vsub_def : s -ᵥ t = image₂ (· -ᵥ ·) s t :=
-  rfl
-
-@[simp]
-theorem image_vsub_product : image₂ (· -ᵥ ·) s t = s -ᵥ t :=
-  rfl
 
 theorem mem_vsub : a ∈ s -ᵥ t ↔ ∃ b ∈ s, ∃ c ∈ t, b -ᵥ c = a :=
   mem_image₂
@@ -1434,9 +1341,16 @@ section Monoid
 
 variable [DecidableEq α] [DecidableEq β] [Monoid α] [Monoid β] [FunLike F α β]
 
--- DISSOLVED: image_pow_of_ne_zero
+@[to_additive]
+lemma image_pow_of_ne_zero [MulHomClass F α β] :
+    ∀ {n}, n ≠ 0 → ∀ (f : F) (s : Finset α), (s ^ n).image f = s.image f ^ n
+  | 1, _ => by simp
+  | n + 2, _ => by simp [image_mul, pow_succ _ n.succ, image_pow_of_ne_zero]
 
--- DISSOLVED: image_pow
+@[to_additive]
+lemma image_pow [MonoidHomClass F α β] (f : F) (s : Finset α) : ∀ n, (s ^ n).image f = s.image f ^ n
+  | 0 => by simp [singleton_one]
+  | n + 1 => image_pow_of_ne_zero n.succ_ne_zero ..
 
 end Monoid
 
@@ -1527,15 +1441,25 @@ section CancelMonoid
 
 variable [DecidableEq α] [CancelMonoid α] {s : Finset α} {m n : ℕ}
 
--- DISSOLVED: Nontrivial.pow
+-- CONFLATES (assumes ground = zero): Nontrivial.pow
+@[to_additive]
+lemma Nontrivial.pow (hs : s.Nontrivial) : ∀ {n}, n ≠ 0 → (s ^ n).Nontrivial
+  | 1, _ => by simpa
+  | n + 2, _ => by simpa [pow_succ] using (hs.pow n.succ_ne_zero).mul hs
 
 @[to_additive "See `Finset.card_nsmul_mono` for a version that works for the empty set."]
 protected lemma Nonempty.card_pow_mono (hs : s.Nonempty) : Monotone fun n : ℕ ↦ (s ^ n).card :=
   monotone_nat_of_le_succ fun n ↦ by rw [pow_succ]; exact card_le_card_mul_right hs
 
--- DISSOLVED: card_pow_mono
+@[to_additive "See `Finset.Nonempty.card_nsmul_mono` for a version that works for zero scalars."]
+lemma card_pow_mono (hm : m ≠ 0) (hmn : m ≤ n) : (s ^ m).card ≤ (s ^ n).card := by
+  obtain rfl | hs := s.eq_empty_or_nonempty
+  · simp [hm]
+  · exact hs.card_pow_mono hmn
 
--- DISSOLVED: card_le_card_pow
+@[to_additive]
+lemma card_le_card_pow (hn : n ≠ 0) : s.card ≤ (s ^ n).card := by
+  simpa using card_pow_mono (s := s) one_ne_zero (Nat.one_le_iff_ne_zero.2 hn)
 
 end CancelMonoid
 

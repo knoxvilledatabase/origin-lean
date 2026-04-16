@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Matrix.Block
 
+noncomputable section
+
 /-!
 # Symmetric matrices
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Module.Rat
 import Mathlib.Algebra.Module.LinearMap.Defs
 
+noncomputable section
+
 /-!
 # Reinterpret an additive homomorphism as a `ℚ`-linear map.
 -/
@@ -23,8 +25,3 @@ theorem AddMonoidHom.toRatLinearMap_injective [AddCommGroup M] [Module ℚ M] [A
   intro f g h
   ext x
   exact LinearMap.congr_fun h x
-
-@[simp]
-theorem AddMonoidHom.coe_toRatLinearMap [AddCommGroup M] [Module ℚ M] [AddCommGroup M₂]
-    [Module ℚ M₂] (f : M →+ M₂) : ⇑f.toRatLinearMap = f :=
-  rfl

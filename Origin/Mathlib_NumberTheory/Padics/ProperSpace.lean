@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Field.ProperSpace
 import Mathlib.NumberTheory.Padics.RingHoms
 
+noncomputable section
+
 /-!
 # Properness of the p-adic numbers
 

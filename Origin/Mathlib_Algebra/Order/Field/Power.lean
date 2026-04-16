@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Field/Power.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharZero.Lemmas
@@ -8,6 +8,8 @@ import Mathlib.Algebra.GroupWithZero.Commute
 import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.Algebra.Order.Ring.Pow
 import Mathlib.Algebra.Ring.Int.Parity
+
+noncomputable section
 
 /-!
 # Lemmas about powers in ordered fields.
@@ -34,7 +36,8 @@ theorem one_le_zpow_of_nonneg (ha : 1 ≤ a) (hn : 0 ≤ n) : 1 ≤ a ^ n :=
 protected theorem Nat.zpow_pos_of_pos {a : ℕ} (h : 0 < a) (n : ℤ) : 0 < (a : α) ^ n :=
   zpow_pos (mod_cast h) _
 
--- DISSOLVED: Nat.zpow_ne_zero_of_pos
+theorem Nat.zpow_ne_zero_of_pos {a : ℕ} (h : 0 < a) (n : ℤ) : (a : α) ^ n ≠ 0 :=
+  zpow_ne_zero _ (mod_cast h.ne')
 
 theorem zpow_strictMono (hx : 1 < a) : StrictMono (a ^ · : ℤ → α) :=
   zpow_right_strictMono₀ hx
@@ -79,11 +82,14 @@ lemma zpow_two_nonneg (a : α) : 0 ≤ a ^ (2 : ℤ) := even_two.zpow_nonneg _
 
 lemma zpow_neg_two_nonneg (a : α) : 0 ≤ a ^ (-2 : ℤ) := even_neg_two.zpow_nonneg _
 
--- DISSOLVED: Even.zpow_pos
+protected lemma Even.zpow_pos (hn : Even n) (ha : a ≠ 0) : 0 < a ^ n :=
+  (hn.zpow_nonneg _).lt_of_ne' (zpow_ne_zero _ ha)
 
--- DISSOLVED: zpow_two_pos_of_ne_zero
+lemma zpow_two_pos_of_ne_zero (ha : a ≠ 0) : 0 < a ^ (2 : ℤ) := even_two.zpow_pos ha
 
--- DISSOLVED: Even.zpow_pos_iff
+theorem Even.zpow_pos_iff (hn : Even n) (h : n ≠ 0) : 0 < a ^ n ↔ a ≠ 0 := by
+  obtain ⟨k, rfl⟩ := hn
+  rw [zpow_add' (by simp [em']), mul_self_pos, zpow_ne_zero_iff (by simpa using h)]
 
 theorem Odd.zpow_neg_iff (hn : Odd n) : a ^ n < 0 ↔ a < 0 := by
   refine ⟨lt_imp_lt_of_le_imp_le (zpow_nonneg · _), fun ha ↦ ?_⟩

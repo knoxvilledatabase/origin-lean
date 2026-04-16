@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Preadditive.FunctorCategory
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Finite
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 
+noncomputable section
+
 /-!
 # If `D` is abelian, then the functor category `C ⥤ D` is also abelian.
 

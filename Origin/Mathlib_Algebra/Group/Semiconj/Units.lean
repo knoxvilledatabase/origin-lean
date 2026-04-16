@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Semiconj.Defs
 import Mathlib.Algebra.Group.Units.Basic
 
+noncomputable section
+
 /-!
 # Semiconjugate elements of a semigroup
 

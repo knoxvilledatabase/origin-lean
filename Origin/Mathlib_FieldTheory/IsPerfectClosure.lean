@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.FieldTheory.PurelyInseparable
 import Mathlib.FieldTheory.PerfectClosure
 
+noncomputable section
+
 /-!
 
 # `IsPerfectClosure` predicate
@@ -328,10 +330,6 @@ def liftEquiv : (K →+* M) ≃ (L →+* M) where
   left_inv f := lift_comp i f p
   right_inv f := comp_lift i f p
 
-theorem liftEquiv_apply : liftEquiv M i p j = lift i j p := rfl
-
-theorem liftEquiv_symm_apply : (liftEquiv M i p).symm f = f.comp i := rfl
-
 theorem liftEquiv_id_apply : liftEquiv M (RingHom.id K) p j = j :=
   lift_id j p
 
@@ -397,13 +395,8 @@ def equiv : L ≃+* M where
   left_inv := PerfectRing.lift_comp_lift_apply_eq_self i j p
   right_inv := PerfectRing.lift_comp_lift_apply_eq_self j i p
 
-theorem equiv_toRingHom : (equiv i j p).toRingHom = PerfectRing.lift i j p := rfl
-
 @[simp]
 theorem equiv_symm : (equiv i j p).symm = equiv j i p := rfl
-
-theorem equiv_symm_toRingHom :
-    (equiv i j p).symm.toRingHom = PerfectRing.lift j i p := rfl
 
 theorem equiv_apply (x : L) (n : ℕ) (y : K) (h : i y = x ^ p ^ n) :
     equiv i j p x = (iterateFrobeniusEquiv M p n).symm (j y) :=

@@ -8,6 +8,8 @@ import Mathlib.Data.Num.Lemmas
 import Mathlib.Data.Option.Basic
 import Mathlib.SetTheory.Cardinal.Basic
 
+noncomputable section
+
 /-!
 # Encodings
 

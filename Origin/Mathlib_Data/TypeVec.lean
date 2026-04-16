@@ -7,6 +7,8 @@ import Mathlib.Data.Fin.Fin2
 import Mathlib.Logic.Function.Basic
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 
 # Tuples of types, and their categorical structure.
@@ -46,6 +48,8 @@ variable {n : ℕ}
 def Arrow (α β : TypeVec n) :=
   ∀ i : Fin2 n, α i → β i
 
+@[inherit_doc] scoped[MvFunctor] infixl:40 " ⟹ " => TypeVec.Arrow
+
 open MvFunctor
 
 @[ext]
@@ -60,13 +64,7 @@ def id {α : TypeVec n} : α ⟹ α := fun _ x => x
 
 def comp {α β γ : TypeVec n} (g : β ⟹ γ) (f : α ⟹ β) : α ⟹ γ := fun i x => g i (f i x)
 
-@[simp]
-theorem id_comp {α β : TypeVec n} (f : α ⟹ β) : id ⊚ f = f :=
-  rfl
-
-@[simp]
-theorem comp_id {α β : TypeVec n} (f : α ⟹ β) : f ⊚ id = f :=
-  rfl
+@[inherit_doc] scoped[MvFunctor] infixr:80 " ⊚ " => TypeVec.comp -- type as \oo
 
 theorem comp_assoc {α β γ δ : TypeVec n} (h : γ ⟹ δ) (g : β ⟹ γ) (f : α ⟹ β) :
     (h ⊚ g) ⊚ f = h ⊚ g ⊚ f :=
@@ -75,6 +73,8 @@ theorem comp_assoc {α β γ δ : TypeVec n} (h : γ ⟹ δ) (g : β ⟹ γ) (f 
 def append1 (α : TypeVec n) (β : Type*) : TypeVec (n + 1)
   | Fin2.fs i => α i
   | Fin2.fz => β
+
+@[inherit_doc] infixl:67 " ::: " => append1
 
 def drop (α : TypeVec.{u} (n + 1)) : TypeVec n := fun i => α i.fs
 
@@ -90,9 +90,6 @@ theorem drop_append1 {α : TypeVec n} {β : Type*} {i : Fin2 n} : drop (append1 
 theorem drop_append1' {α : TypeVec n} {β : Type*} : drop (append1 α β) = α :=
   funext fun _ => drop_append1
 
-theorem last_append1 {α : TypeVec n} {β : Type*} : last (append1 α β) = β :=
-  rfl
-
 @[simp]
 theorem append1_drop_last (α : TypeVec (n + 1)) : append1 (drop α) (last α) = α :=
   funext fun i => by cases i <;> rfl
@@ -101,11 +98,6 @@ theorem append1_drop_last (α : TypeVec (n + 1)) : append1 (drop α) (last α) =
 def append1Cases {C : TypeVec (n + 1) → Sort u} (H : ∀ α β, C (append1 α β)) (γ) : C γ := by
   rw [← @append1_drop_last _ γ]; apply H
 
-@[simp]
-theorem append1_cases_append1 {C : TypeVec (n + 1) → Sort u} (H : ∀ α β, C (append1 α β)) (α β) :
-    @append1Cases _ C H (append1 α β) = H α β :=
-  rfl
-
 def splitFun {α α' : TypeVec (n + 1)} (f : drop α ⟹ drop α') (g : last α → last α') : α ⟹ α'
   | Fin2.fs i => f i
   | Fin2.fz => g
@@ -113,6 +105,8 @@ def splitFun {α α' : TypeVec (n + 1)} (f : drop α ⟹ drop α') (g : last α 
 def appendFun {α α' : TypeVec n} {β β' : Type*} (f : α ⟹ α') (g : β → β') :
     append1 α β ⟹ append1 α' β' :=
   splitFun f g
+
+@[inherit_doc] infixl:0 " ::: " => appendFun
 
 def dropFun {α β : TypeVec (n + 1)} (f : α ⟹ β) : drop α ⟹ drop β := fun i => f i.fs
 
@@ -149,16 +143,6 @@ def fromAppend1DropLast {α : TypeVec (n + 1)} : (drop α ::: last α) ⟹ α :=
 @[simp]
 theorem lastFun_splitFun {α α' : TypeVec (n + 1)} (f : drop α ⟹ drop α') (g : last α → last α') :
     lastFun (splitFun f g) = g :=
-  rfl
-
-@[simp]
-theorem dropFun_appendFun {α α' : TypeVec n} {β β' : Type*} (f : α ⟹ α') (g : β → β') :
-    dropFun (f ::: g) = f :=
-  rfl
-
-@[simp]
-theorem lastFun_appendFun {α α' : TypeVec n} {β β' : Type*} (f : α ⟹ α') (g : β → β') :
-    lastFun (f ::: g) = g :=
   rfl
 
 theorem split_dropFun_lastFun {α α' : TypeVec (n + 1)} (f : α ⟹ α') :
@@ -203,16 +187,6 @@ theorem appendFun_comp_id {α : TypeVec n} {β₀ β₁ β₂ : Type u} (g₀ : 
     (@id _ α ::: g₁ ∘ g₀) = (id ::: g₁) ⊚ (id ::: g₀) :=
   eq_of_drop_last_eq rfl rfl
 
-@[simp]
-theorem dropFun_comp {α₀ α₁ α₂ : TypeVec (n + 1)} (f₀ : α₀ ⟹ α₁) (f₁ : α₁ ⟹ α₂) :
-    dropFun (f₁ ⊚ f₀) = dropFun f₁ ⊚ dropFun f₀ :=
-  rfl
-
-@[simp]
-theorem lastFun_comp {α₀ α₁ α₂ : TypeVec (n + 1)} (f₀ : α₀ ⟹ α₁) (f₁ : α₁ ⟹ α₂) :
-    lastFun (f₁ ⊚ f₀) = lastFun f₁ ∘ lastFun f₀ :=
-  rfl
-
 theorem appendFun_aux {α α' : TypeVec n} {β β' : Type*} (f : (α ::: β) ⟹ (α' ::: β')) :
     (dropFun f ::: lastFun f) = f :=
   eq_of_drop_last_eq rfl rfl
@@ -231,15 +205,6 @@ protected def casesCons (n : ℕ) {β : TypeVec (n + 1) → Sort*}
     (f : ∀ (t) (v : TypeVec n), β (v ::: t)) :
     ∀ v, β v :=
   fun v : TypeVec (n + 1) => cast (by simp) (f v.last v.drop)
-
-protected theorem casesNil_append1 {β : TypeVec 0 → Sort*} (f : β Fin2.elim0) :
-    TypeVec.casesNil f Fin2.elim0 = f :=
-  rfl
-
-protected theorem casesCons_append1 (n : ℕ) {β : TypeVec (n + 1) → Sort*}
-    (f : ∀ (t) (v : TypeVec n), β (v ::: t)) (v : TypeVec n) (α) :
-    TypeVec.casesCons n f (v ::: α) = f α v :=
-  rfl
 
 def typevecCasesNil₃ {β : ∀ v v' : TypeVec 0, v ⟹ v' → Sort*}
     (f : β Fin2.elim0 Fin2.elim0 nilFun) :
@@ -272,17 +237,6 @@ def typevecCasesCons₂ (n : ℕ) (t t' : Type*) (v v' : TypeVec n)
   rw [← split_dropFun_lastFun fs]
   apply F
 
-theorem typevecCasesNil₂_appendFun {β : Fin2.elim0 ⟹ Fin2.elim0 → Sort*} (f : β nilFun) :
-    typevecCasesNil₂ f nilFun = f :=
-  rfl
-
-theorem typevecCasesCons₂_appendFun (n : ℕ) (t t' : Type*) (v v' : TypeVec n)
-    {β : (v ::: t) ⟹ (v' ::: t') → Sort*}
-    (F : ∀ (f : t → t') (fs : v ⟹ v'), β (fs ::: f))
-    (f fs) :
-    typevecCasesCons₂ n t t' v v' F (fs ::: f) = F f fs :=
-  rfl
-
 def PredLast (α : TypeVec n) {β : Type*} (p : β → Prop) : ∀ ⦃i⦄, (α.append1 β) i → Prop
   | Fin2.fs _ => fun _ => True
   | Fin2.fz => p
@@ -303,6 +257,8 @@ def «repeat» : ∀ (n : ℕ), Sort _ → TypeVec n
 def prod : ∀ {n}, TypeVec.{u} n → TypeVec.{u} n → TypeVec n
   | 0,     _, _ => Fin2.elim0
   | n + 1, α, β => (@prod n (drop α) (drop β)) ::: (last α × last β)
+
+@[inherit_doc] scoped[MvFunctor] infixl:45 " ⊗ " => TypeVec.prod
 
 protected def const {β} (x : β) : ∀ {n} (α : TypeVec n), α ⟹ «repeat» _ β
   | succ _, α, Fin2.fs _ => TypeVec.const x (drop α) _
@@ -407,6 +363,8 @@ protected def prod.map : ∀ {n} {α α' β β' : TypeVec.{u} n}, α ⟹ β → 
     @prod.map _ (drop α) (drop α') (drop β) (drop β') (dropFun x) (dropFun y) _ a
   | succ _, _, _, _, _, x, y, Fin2.fz, a => (x _ a.1, y _ a.2)
 
+@[inherit_doc] scoped[MvFunctor] infixl:45 " ⊗' " => TypeVec.prod.map
+
 theorem fst_prod_mk {α α' β β' : TypeVec n} (f : α ⟹ β) (g : α' ⟹ β') :
     TypeVec.prod.fst ⊚ (f ⊗' g) = f ⊚ TypeVec.prod.fst := by
   funext i; induction i with
@@ -502,16 +460,6 @@ theorem dropFun_diag {α} : dropFun (@prod.diag (n + 1) α) = prod.diag := by
   induction i <;> simp [dropFun, *] <;> rfl
 
 @[simp]
-theorem dropFun_subtypeVal {α} (p : α ⟹ «repeat» (n + 1) Prop) :
-    dropFun (subtypeVal p) = subtypeVal _ :=
-  rfl
-
-@[simp]
-theorem lastFun_subtypeVal {α} (p : α ⟹ «repeat» (n + 1) Prop) :
-    lastFun (subtypeVal p) = Subtype.val :=
-  rfl
-
-@[simp]
 theorem dropFun_toSubtype {α} (p : α ⟹ «repeat» (n + 1) Prop) :
     dropFun (toSubtype p) = toSubtype _ := by
   ext i
@@ -529,15 +477,6 @@ theorem dropFun_of_subtype {α} (p : α ⟹ «repeat» (n + 1) Prop) :
   ext i : 2
   induction i <;> simp [dropFun, *] <;> rfl
 
-@[simp]
-theorem lastFun_of_subtype {α} (p : α ⟹ «repeat» (n + 1) Prop) :
-    lastFun (ofSubtype p) = _root_.id := rfl
-
-@[simp]
-theorem dropFun_RelLast' {α : TypeVec n} {β} (R : β → β → Prop) :
-    dropFun (RelLast' α R) = repeatEq α :=
-  rfl
-
 attribute [simp] drop_append1'
 
 open MvFunctor
@@ -553,16 +492,6 @@ theorem lastFun_prod {α α' β β' : TypeVec (n + 1)} (f : α ⟹ β) (f' : α'
     lastFun (f ⊗' f') = Prod.map (lastFun f) (lastFun f') := by
   ext i : 1
   induction i; simp [lastFun, *]; rfl
-
-@[simp]
-theorem dropFun_from_append1_drop_last {α : TypeVec (n + 1)} :
-    dropFun (@fromAppend1DropLast _ α) = id :=
-  rfl
-
-@[simp]
-theorem lastFun_from_append1_drop_last {α : TypeVec (n + 1)} :
-    lastFun (@fromAppend1DropLast _ α) = _root_.id :=
-  rfl
 
 @[simp]
 theorem dropFun_id {α : TypeVec (n + 1)} : dropFun (@TypeVec.id _ α) = id :=

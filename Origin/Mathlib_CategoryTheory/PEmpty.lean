@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.CategoryTheory.DiscreteCategory
 
+noncomputable section
+
 /-!
 # The empty category
 

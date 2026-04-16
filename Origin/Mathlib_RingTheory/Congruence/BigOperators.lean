@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Congruence.BigOperators
 import Mathlib.RingTheory.Congruence.Defs
 
+noncomputable section
+
 /-!
 # Interactions between `∑, ∏` and `RingCon`
 

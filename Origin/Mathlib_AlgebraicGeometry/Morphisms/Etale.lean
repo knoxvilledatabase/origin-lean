@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Smooth
 import Mathlib.CategoryTheory.MorphismProperty.Comma
 
+noncomputable section
+
 /-!
 
 # Etale morphisms

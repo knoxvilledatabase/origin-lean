@@ -9,6 +9,8 @@ import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Finite.Powerset
 import Mathlib.Logic.Embedding.Set
 
+noncomputable section
+
 /-!
 # Lemmas on finiteness of sets
 

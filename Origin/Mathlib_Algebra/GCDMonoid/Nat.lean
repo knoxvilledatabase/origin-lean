@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Int
 import Mathlib.Algebra.Ring.Int.Units
 import Mathlib.Data.Int.GCD
 
+noncomputable section
+
 /-!
 # ℕ and ℤ are normalized GCD monoids.
 
@@ -32,12 +34,6 @@ instance : GCDMonoid ℕ where
   gcd_mul_lcm a b := by rw [Nat.gcd_mul_lcm]; rfl
   lcm_zero_left := Nat.lcm_zero_left
   lcm_zero_right := Nat.lcm_zero_right
-
-theorem gcd_eq_nat_gcd (m n : ℕ) : gcd m n = Nat.gcd m n :=
-  rfl
-
-theorem lcm_eq_nat_lcm (m n : ℕ) : lcm m n = Nat.lcm m n :=
-  rfl
 
 instance : NormalizedGCDMonoid ℕ :=
   { (inferInstance : GCDMonoid ℕ),
@@ -112,18 +108,6 @@ instance : NormalizedGCDMonoid ℤ :=
     normalize_gcd := fun _ _ => normalize_coe_nat _
     normalize_lcm := fun _ _ => normalize_coe_nat _ }
 
-theorem coe_gcd (i j : ℤ) : ↑(Int.gcd i j) = GCDMonoid.gcd i j :=
-  rfl
-
-theorem coe_lcm (i j : ℤ) : ↑(Int.lcm i j) = GCDMonoid.lcm i j :=
-  rfl
-
-theorem natAbs_gcd (i j : ℤ) : natAbs (GCDMonoid.gcd i j) = Int.gcd i j :=
-  rfl
-
-theorem natAbs_lcm (i j : ℤ) : natAbs (GCDMonoid.lcm i j) = Int.lcm i j :=
-  rfl
-
 end GCDMonoid
 
 theorem exists_unit_of_abs (a : ℤ) : ∃ (u : ℤ) (_ : IsUnit u), (Int.natAbs a : ℤ) = u * a := by
@@ -133,9 +117,6 @@ theorem exists_unit_of_abs (a : ℤ) : ∃ (u : ℤ) (_ : IsUnit u), (Int.natAbs
   · use -1, isUnit_one.neg
     rw [← neg_eq_iff_eq_neg.mpr h]
     simp only [neg_mul, one_mul]
-
-theorem gcd_eq_natAbs {a b : ℤ} : Int.gcd a b = Nat.gcd a.natAbs b.natAbs :=
-  rfl
 
 end Int
 

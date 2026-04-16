@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Box.SubboxInduction
 import Mathlib.Analysis.BoxIntegral.Partition.Tagged
 
+noncomputable section
+
 /-!
 # Induction on subboxes
 
@@ -161,11 +163,6 @@ theorem isPartition_unionComplToSubordinate (π₁ : TaggedPrepartition I) (π�
     (hU : π₂.iUnion = ↑I \ π₁.iUnion) (r : (ι → ℝ) → Ioi (0 : ℝ)) :
     IsPartition (π₁.unionComplToSubordinate π₂ hU r) :=
   Prepartition.isPartitionDisjUnionOfEqDiff ((π₂.iUnion_toSubordinate r).trans hU)
-
-@[simp]
-theorem unionComplToSubordinate_boxes (π₁ : TaggedPrepartition I) (π₂ : Prepartition I)
-    (hU : π₂.iUnion = ↑I \ π₁.iUnion) (r : (ι → ℝ) → Ioi (0 : ℝ)) :
-    (π₁.unionComplToSubordinate π₂ hU r).boxes = π₁.boxes ∪ (π₂.toSubordinate r).boxes := rfl
 
 @[simp]
 theorem iUnion_unionComplToSubordinate_boxes (π₁ : TaggedPrepartition I) (π₂ : Prepartition I)

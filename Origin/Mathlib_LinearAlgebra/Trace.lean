@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Finiteness.Prod
 import Mathlib.RingTheory.Finiteness.TensorProduct
 import Mathlib.RingTheory.TensorProduct.Free
 
+noncomputable section
+
 /-!
 # Trace of a linear map
 

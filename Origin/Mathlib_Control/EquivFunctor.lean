@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Equiv.Defs
 import Mathlib.Tactic.Convert
 
+noncomputable section
+
 /-!
 # Functions functorial with respect to equivalences
 
@@ -44,10 +46,6 @@ def mapEquiv : f α ≃ f β where
   right_inv y := by
     convert (congr_fun (EquivFunctor.map_trans' e.symm e) y).symm
     simp
-
-@[simp]
-theorem mapEquiv_apply (x : f α) : mapEquiv f e x = EquivFunctor.map e x :=
-  rfl
 
 theorem mapEquiv_symm_apply (y : f β) : (mapEquiv f e).symm y = EquivFunctor.map e.symm y :=
   rfl

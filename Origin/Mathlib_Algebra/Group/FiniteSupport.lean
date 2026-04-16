@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Support
 import Mathlib.Data.Set.Finite.Basic
 
+noncomputable section
+
 /-!
 # Finiteness of support
 -/

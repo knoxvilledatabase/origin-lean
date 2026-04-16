@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/TrivSqZeroExt.lean
-Genuine: 81 | Conflates: 0 | Dissolved: 4 | Infrastructure: 79
+Genuine: 85 | Conflates: 0 | Dissolved: 0 | Infrastructure: 79
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 import Mathlib.LinearAlgebra.Prod
 import Mathlib.Algebra.BigOperators.Pi
+
+noncomputable section
 
 /-!
 # Trivial Square-Zero Extension
@@ -80,14 +82,6 @@ def fst (x : tsze R M) : R :=
 def snd (x : tsze R M) : M :=
   x.2
 
-@[simp]
-theorem fst_mk (r : R) (m : M) : fst (r, m) = r :=
-  rfl
-
-@[simp]
-theorem snd_mk (r : R) (m : M) : snd (r, m) = m :=
-  rfl
-
 @[ext]
 theorem ext {x y : tsze R M} (h1 : x.fst = y.fst) (h2 : x.snd = y.snd) : x = y :=
   Prod.ext h1 h2
@@ -104,14 +98,6 @@ theorem fst_inl [Zero M] (r : R) : (inl r : tsze R M).fst = r :=
 theorem snd_inl [Zero M] (r : R) : (inl r : tsze R M).snd = 0 :=
   rfl
 
-@[simp]
-theorem fst_comp_inl [Zero M] : fst ∘ (inl : R → tsze R M) = id :=
-  rfl
-
-@[simp]
-theorem snd_comp_inl [Zero M] : snd ∘ (inl : R → tsze R M) = 0 :=
-  rfl
-
 end
 
 section
@@ -124,14 +110,6 @@ theorem fst_inr [Zero R] (m : M) : (inr m : tsze R M).fst = 0 :=
 
 @[simp]
 theorem snd_inr [Zero R] (m : M) : (inr m : tsze R M).snd = m :=
-  rfl
-
-@[simp]
-theorem fst_comp_inr [Zero R] : fst ∘ (inr : M → tsze R M) = 0 :=
-  rfl
-
-@[simp]
-theorem snd_comp_inr [Zero R] : snd ∘ (inr : M → tsze R M) = id :=
   rfl
 
 end
@@ -240,34 +218,6 @@ theorem snd_zero [Zero R] [Zero M] : (0 : tsze R M).snd = 0 :=
 theorem fst_add [Add R] [Add M] (x₁ x₂ : tsze R M) : (x₁ + x₂).fst = x₁.fst + x₂.fst :=
   rfl
 
-@[simp]
-theorem snd_add [Add R] [Add M] (x₁ x₂ : tsze R M) : (x₁ + x₂).snd = x₁.snd + x₂.snd :=
-  rfl
-
-@[simp]
-theorem fst_neg [Neg R] [Neg M] (x : tsze R M) : (-x).fst = -x.fst :=
-  rfl
-
-@[simp]
-theorem snd_neg [Neg R] [Neg M] (x : tsze R M) : (-x).snd = -x.snd :=
-  rfl
-
-@[simp]
-theorem fst_sub [Sub R] [Sub M] (x₁ x₂ : tsze R M) : (x₁ - x₂).fst = x₁.fst - x₂.fst :=
-  rfl
-
-@[simp]
-theorem snd_sub [Sub R] [Sub M] (x₁ x₂ : tsze R M) : (x₁ - x₂).snd = x₁.snd - x₂.snd :=
-  rfl
-
-@[simp]
-theorem fst_smul [SMul S R] [SMul S M] (s : S) (x : tsze R M) : (s • x).fst = s • x.fst :=
-  rfl
-
-@[simp]
-theorem snd_smul [SMul S R] [SMul S M] (s : S) (x : tsze R M) : (s • x).snd = s • x.snd :=
-  rfl
-
 theorem fst_sum {ι} [AddCommMonoid R] [AddCommMonoid M] (s : Finset ι) (f : ι → tsze R M) :
     (∑ i ∈ s, f i).fst = ∑ i ∈ s, (f i).fst :=
   Prod.fst_sum
@@ -312,10 +262,6 @@ end
 section
 
 variable (R)
-
-@[simp]
-theorem inr_zero [Zero R] [Zero M] : (inr 0 : tsze R M) = 0 :=
-  rfl
 
 @[simp]
 theorem inr_add [AddZeroClass R] [AddZeroClass M] (m₁ m₂ : M) :
@@ -382,10 +328,6 @@ instance mul [Mul R] [Add M] [SMul R M] [SMul Rᵐᵒᵖ M] : Mul (tsze R M) :=
 
 @[simp]
 theorem fst_one [One R] [Zero M] : (1 : tsze R M).fst = 1 :=
-  rfl
-
-@[simp]
-theorem snd_one [One R] [Zero M] : (1 : tsze R M).snd = 0 :=
   rfl
 
 @[simp]
@@ -765,13 +707,17 @@ theorem inv_inr (m : M) : (inr m)⁻¹ = (0 : tsze R M) := by
   · rw [fst_inv, fst_inr, fst_zero, inv_zero]
   · rw [snd_inv, snd_inr, fst_inr, inv_zero, op_zero, zero_smul, snd_zero, neg_zero]
 
--- DISSOLVED: inv_zero
+@[simp]
+protected theorem inv_zero : (0 : tsze R M)⁻¹ = (0 : tsze R M) := by
+  rw [← inl_zero, TrivSqZeroExt.inv_inl, inv_zero]
 
 @[simp]
 protected theorem inv_one : (1 : tsze R M)⁻¹ = (1 : tsze R M) := by
   rw [← inl_one, TrivSqZeroExt.inv_inl, inv_one]
 
--- DISSOLVED: inv_mul_cancel
+protected theorem inv_mul_cancel {x : tsze R M} (hx : fst x ≠ 0) : x⁻¹ * x = 1 := by
+  convert mul_left_eq_one _ _ (_root_.inv_mul_cancel₀ hx) using 2
+  ext <;> simp
 
 variable [SMulCommClass R Rᵐᵒᵖ M]
 
@@ -779,7 +725,10 @@ variable [SMulCommClass R Rᵐᵒᵖ M]
   letI := invertibleFstOfInvertible x
   ext <;> simp [fst_invOf, snd_invOf]
 
--- DISSOLVED: mul_inv_cancel
+protected theorem mul_inv_cancel {x : tsze R M} (hx : fst x ≠ 0) : x * x⁻¹ = 1 := by
+  have : Invertible x.fst := Units.invertible (.mk0 _ hx)
+  have := invertibleOfInvertibleFst x
+  rw [← invOf_eq_inv, mul_invOf_self]
 
 protected theorem mul_inv_rev (a b : tsze R M) :
     (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
@@ -794,7 +743,15 @@ protected theorem mul_inv_rev (a b : tsze R M) :
     · simp [hb0]
     rw [inv_mul_cancel_right₀ ha, mul_inv_cancel_left₀ hb]
 
--- DISSOLVED: inv_inv
+protected theorem inv_inv {x : tsze R M} (hx : fst x ≠ 0) : x⁻¹⁻¹ = x :=
+  -- adapted from `Matrix.nonsing_inv_nonsing_inv`
+  calc
+    x⁻¹⁻¹ = 1 * x⁻¹⁻¹ := by rw [one_mul]
+    _ = x * x⁻¹ * x⁻¹⁻¹ := by rw [TrivSqZeroExt.mul_inv_cancel hx]
+    _ = x := by
+      rw [mul_assoc, TrivSqZeroExt.mul_inv_cancel, mul_one]
+      rw [fst_inv]
+      apply inv_ne_zero hx
 
 @[simp]
 theorem isUnit_inv_iff {x : tsze R M} : IsUnit x⁻¹ ↔ IsUnit x := by
@@ -844,12 +801,6 @@ instance : Algebra R' (tsze R' M) :=
   TrivSqZeroExt.algebra' _ _ _
 
 theorem algebraMap_eq_inl : ⇑(algebraMap R' (tsze R' M)) = inl :=
-  rfl
-
-theorem algebraMap_eq_inlHom : algebraMap R' (tsze R' M) = inlHom R' M :=
-  rfl
-
-theorem algebraMap_eq_inl' (s : S) : algebraMap S (tsze R M) s = inl (algebraMap S R s) :=
   rfl
 
 @[simps]

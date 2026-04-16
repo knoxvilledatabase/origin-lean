@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/VonMangoldt.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.IsPrimePow
 import Mathlib.NumberTheory.ArithmeticFunction
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+noncomputable section
 
 /-!
 # The von Mangoldt Function
@@ -48,6 +50,12 @@ theorem log_apply {n : ℕ} : log n = Real.log n :=
 noncomputable def vonMangoldt : ArithmeticFunction ℝ :=
   ⟨fun n => if IsPrimePow n then Real.log (minFac n) else 0, if_neg not_isPrimePow_zero⟩
 
+@[inherit_doc] scoped[ArithmeticFunction] notation "Λ" => ArithmeticFunction.vonMangoldt
+
+@[inherit_doc] scoped[ArithmeticFunction.vonMangoldt] notation "Λ" =>
+
+  ArithmeticFunction.vonMangoldt
+
 theorem vonMangoldt_apply {n : ℕ} : Λ n = if IsPrimePow n then Real.log (minFac n) else 0 :=
   rfl
 
@@ -61,12 +69,15 @@ theorem vonMangoldt_nonneg {n : ℕ} : 0 ≤ Λ n := by
   · exact Real.log_nonneg (one_le_cast.2 (Nat.minFac_pos n))
   rfl
 
--- DISSOLVED: vonMangoldt_apply_pow
+theorem vonMangoldt_apply_pow {n k : ℕ} (hk : k ≠ 0) : Λ (n ^ k) = Λ n := by
+  simp only [vonMangoldt_apply, isPrimePow_pow_iff hk, pow_minFac hk]
 
 theorem vonMangoldt_apply_prime {p : ℕ} (hp : p.Prime) : Λ p = Real.log p := by
   rw [vonMangoldt_apply, Prime.minFac_eq hp, if_pos hp.prime.isPrimePow]
 
--- DISSOLVED: vonMangoldt_ne_zero_iff
+theorem vonMangoldt_ne_zero_iff {n : ℕ} : Λ n ≠ 0 ↔ IsPrimePow n := by
+  rcases eq_or_ne n 1 with (rfl | hn); · simp [not_isPrimePow_one]
+  exact (Real.log_pos (one_lt_cast.2 (minFac_prime hn).one_lt)).ne'.ite_ne_right_iff
 
 theorem vonMangoldt_pos_iff {n : ℕ} : 0 < Λ n ↔ IsPrimePow n :=
   vonMangoldt_nonneg.lt_iff_ne.trans (ne_comm.trans vonMangoldt_ne_zero_iff)
@@ -120,6 +131,11 @@ theorem sum_moebius_mul_log_eq {n : ℕ} : (∑ d ∈ n.divisors, (μ d : ℝ) *
     moebius_mul_coe_zeta]
   rcases eq_or_ne n 1 with (hn | hn) <;> simp [hn]
 
--- DISSOLVED: vonMangoldt_le_log
+theorem vonMangoldt_le_log : ∀ {n : ℕ}, Λ n ≤ Real.log (n : ℝ)
+  | 0 => by simp
+  | n + 1 => by
+    rw [← vonMangoldt_sum]
+    exact single_le_sum (by exact fun _ _ => vonMangoldt_nonneg)
+      (mem_divisors_self _ n.succ_ne_zero)
 
 end ArithmeticFunction

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Action.Units
 import Mathlib.Algebra.Group.Invertible.Basic
 import Mathlib.GroupTheory.Perm.Basic
 
+noncomputable section
+
 /-!
 # More lemmas about group actions
 
@@ -48,10 +50,6 @@ instance Equiv.Perm.applyMulAction (α : Type*) : MulAction (Equiv.Perm α) α w
   smul f a := f a
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
-
-@[simp]
-protected lemma Equiv.Perm.smul_def {α : Type*} (f : Equiv.Perm α) (a : α) : f • a = f a :=
-  rfl
 
 instance Equiv.Perm.applyFaithfulSMul (α : Type*) : FaithfulSMul (Equiv.Perm α) α :=
   ⟨Equiv.ext⟩

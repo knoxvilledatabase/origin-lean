@@ -9,6 +9,8 @@ import Mathlib.RingTheory.Generators
 import Mathlib.RingTheory.MvPolynomial.Localization
 import Mathlib.RingTheory.TensorProduct.MvPolynomial
 
+noncomputable section
+
 /-!
 
 # Presentations of algebras
@@ -71,14 +73,6 @@ protected abbrev Quotient : Type (max w u) := P.Ring ⧸ P.ker
 
 def quotientEquiv : P.Quotient ≃ₐ[P.Ring] S :=
   Ideal.quotientKerAlgEquivOfRightInverse (f := Algebra.ofId P.Ring S) P.aeval_val_σ
-
-@[simp]
-lemma quotientEquiv_mk (p : P.Ring) : P.quotientEquiv p = algebraMap P.Ring S p :=
-  rfl
-
-@[simp]
-lemma quotientEquiv_symm (x : S) : P.quotientEquiv.symm x = P.σ x :=
-  rfl
 
 noncomputable def dimension : ℕ :=
   Nat.card P.vars - Nat.card P.rels
@@ -235,9 +229,8 @@ private lemma span_range_relation_eq_ker_baseChange :
       TensorProduct.includeRight_apply, TensorProduct.lift_tmul, map_one, mapAlgHom_apply, one_mul]
     rfl
 
-noncomputable
-
 @[simps relation, simps (config := .lemmasOnly) rels]
+noncomputable
 def baseChange : Presentation T (T ⊗[R] S) where
   __ := Generators.baseChange P.toGenerators
   rels := P.rels
@@ -383,11 +376,6 @@ noncomputable def comp : Presentation R T where
   relation := Sum.elim (Q.comp_relation_aux P)
     (fun rp ↦ MvPolynomial.rename Sum.inr <| P.relation rp)
   span_range_relation_eq_ker := Q.span_range_relation_eq_ker_comp P
-
-@[simp]
-lemma comp_relation_inr (r : P.rels) :
-    (Q.comp P).relation (Sum.inr r) = rename Sum.inr (P.relation r) :=
-  rfl
 
 lemma comp_aeval_relation_inl (r : Q.rels) :
     aeval (Sum.elim X (MvPolynomial.C ∘ P.val)) ((Q.comp P).relation (Sum.inl r)) =

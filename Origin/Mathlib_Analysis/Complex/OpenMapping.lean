@@ -8,6 +8,8 @@ import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.Complex.AbsMax
 import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
 
+noncomputable section
+
 /-!
 # The open mapping theorem for holomorphic functions
 

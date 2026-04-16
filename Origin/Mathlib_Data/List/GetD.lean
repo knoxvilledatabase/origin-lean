@@ -7,6 +7,8 @@ import Mathlib.Data.List.Defs
 import Mathlib.Data.Option.Basic
 import Mathlib.Util.AssertExists
 
+noncomputable section
+
 /-! # getD and getI
 
 This file provides theorems for working with the `getD` and `getI` functions. These are used to
@@ -36,8 +38,6 @@ theorem getD_eq_getElem {n : ℕ} (hn : n < l.length) : l.getD n d = l[n] := by
 
 theorem getD_eq_get {n : ℕ} (hn : n < l.length) : l.getD n d = l.get ⟨n, hn⟩ :=
   getD_eq_getElem l d hn
-
-theorem getD_map {n : ℕ} (f : α → β) : (map f l).getD n (f d) = f (l.getD n d) := by simp
 
 theorem getD_eq_default {n : ℕ} (hn : l.length ≤ n) : l.getD n d = d := by
   induction l generalizing n with
@@ -87,18 +87,6 @@ end getD
 section getI
 
 variable [Inhabited α]
-
-@[simp]
-theorem getI_nil : getI ([] : List α) n = default :=
-  rfl
-
-@[simp]
-theorem getI_cons_zero : getI (x :: xs) 0 = x :=
-  rfl
-
-@[simp]
-theorem getI_cons_succ : getI (x :: xs) (n + 1) = getI xs n :=
-  rfl
 
 theorem getI_eq_getElem {n : ℕ} (hn : n < l.length) : l.getI n = l[n] :=
   getD_eq_getElem l default hn

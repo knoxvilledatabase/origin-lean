@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Elab.Command
 import Lean.Server.InfoUtils
 
+noncomputable section
+
 /-!
 #  The `have` vs `let` linter
 

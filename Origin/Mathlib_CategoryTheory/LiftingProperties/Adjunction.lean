@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.LiftingProperties.Basic
 import Mathlib.CategoryTheory.Adjunction.Basic
 
+noncomputable section
+
 /-!
 
 # Lifting properties and adjunction

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Defs
 import Mathlib.Topology.UniformSpace.Basic
 
+noncomputable section
+
 /-!
 # Construct a `UniformSpace` from a `dist`-like function
 

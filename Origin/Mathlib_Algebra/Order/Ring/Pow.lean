@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Cast.Commute
 import Mathlib.Data.Nat.Cast.Order.Ring
 
+noncomputable section
+
 /-! # Bernoulli's inequality -/
 
 variable {R : Type*}

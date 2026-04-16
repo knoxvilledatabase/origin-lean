@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Hom.Basic
 import Mathlib.Order.BoundedOrder.Lattice
 
+noncomputable section
+
 /-!
 # Bounded order homomorphisms
 
@@ -177,10 +179,6 @@ protected def copy (f : TopHom α β) (f' : α → β) (h : f' = f) :
   toFun := f'
   map_top' := h.symm ▸ f.map_top'
 
-@[simp]
-theorem coe_copy (f : TopHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : TopHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -192,15 +190,7 @@ variable (α)
 protected def id : TopHom α α :=
   ⟨id, rfl⟩
 
-@[simp]
-theorem coe_id : ⇑(TopHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : TopHom.id α a = a :=
-  rfl
 
 def comp (f : TopHom β γ) (g : TopHom α β) :
     TopHom α γ where
@@ -208,16 +198,7 @@ def comp (f : TopHom β γ) (g : TopHom α β) :
   map_top' := by rw [comp_apply, map_top, map_top]
 
 @[simp]
-theorem coe_comp (f : TopHom β γ) (g : TopHom α β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : TopHom β γ) (g : TopHom α β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : TopHom γ δ) (g : TopHom β γ) (h : TopHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -258,14 +239,6 @@ instance : OrderTop (TopHom α β) where
   top := ⟨⊤, rfl⟩
   le_top := fun _ => @le_top (α → β) _ _ _
 
-@[simp]
-theorem coe_top : ⇑(⊤ : TopHom α β) = ⊤ :=
-  rfl
-
-@[simp]
-theorem top_apply (a : α) : (⊤ : TopHom α β) a = ⊤ :=
-  rfl
-
 end OrderTop
 
 section SemilatticeInf
@@ -277,10 +250,6 @@ instance : Min (TopHom α β) :=
 
 instance : SemilatticeInf (TopHom α β) :=
   (DFunLike.coe_injective.semilatticeInf _) fun _ _ => rfl
-
-@[simp]
-theorem coe_inf : ⇑(f ⊓ g) = ⇑f ⊓ ⇑g :=
-  rfl
 
 @[simp]
 theorem inf_apply (a : α) : (f ⊓ g) a = f a ⊓ g a :=
@@ -297,10 +266,6 @@ instance : Max (TopHom α β) :=
 
 instance : SemilatticeSup (TopHom α β) :=
   (DFunLike.coe_injective.semilatticeSup _) fun _ _ => rfl
-
-@[simp]
-theorem coe_sup : ⇑(f ⊔ g) = ⇑f ⊔ ⇑g :=
-  rfl
 
 @[simp]
 theorem sup_apply (a : α) : (f ⊔ g) a = f a ⊔ g a :=
@@ -344,10 +309,6 @@ protected def copy (f : BotHom α β) (f' : α → β) (h : f' = f) :
   toFun := f'
   map_bot' := h.symm ▸ f.map_bot'
 
-@[simp]
-theorem coe_copy (f : BotHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : BotHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -359,15 +320,7 @@ variable (α)
 protected def id : BotHom α α :=
   ⟨id, rfl⟩
 
-@[simp]
-theorem coe_id : ⇑(BotHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : BotHom.id α a = a :=
-  rfl
 
 def comp (f : BotHom β γ) (g : BotHom α β) :
     BotHom α γ where
@@ -375,16 +328,7 @@ def comp (f : BotHom β γ) (g : BotHom α β) :
   map_bot' := by rw [comp_apply, map_bot, map_bot]
 
 @[simp]
-theorem coe_comp (f : BotHom β γ) (g : BotHom α β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : BotHom β γ) (g : BotHom α β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : BotHom γ δ) (g : BotHom β γ) (h : BotHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -425,14 +369,6 @@ instance : OrderBot (BotHom α β) where
   bot := ⟨⊥, rfl⟩
   bot_le := fun _ => @bot_le (α → β) _ _ _
 
-@[simp]
-theorem coe_bot : ⇑(⊥ : BotHom α β) = ⊥ :=
-  rfl
-
-@[simp]
-theorem bot_apply (a : α) : (⊥ : BotHom α β) a = ⊥ :=
-  rfl
-
 end OrderBot
 
 section SemilatticeInf
@@ -444,10 +380,6 @@ instance : Min (BotHom α β) :=
 
 instance : SemilatticeInf (BotHom α β) :=
   (DFunLike.coe_injective.semilatticeInf _) fun _ _ => rfl
-
-@[simp]
-theorem coe_inf : ⇑(f ⊓ g) = ⇑f ⊓ ⇑g :=
-  rfl
 
 @[simp]
 theorem inf_apply (a : α) : (f ⊓ g) a = f a ⊓ g a :=
@@ -464,10 +396,6 @@ instance : Max (BotHom α β) :=
 
 instance : SemilatticeSup (BotHom α β) :=
   (DFunLike.coe_injective.semilatticeSup _) fun _ _ => rfl
-
-@[simp]
-theorem coe_sup : ⇑(f ⊔ g) = ⇑f ⊔ ⇑g :=
-  rfl
 
 @[simp]
 theorem sup_apply (a : α) : (f ⊔ g) a = f a ⊔ g a :=
@@ -514,10 +442,6 @@ theorem ext {f g : BoundedOrderHom α β} (h : ∀ a, f a = g a) : f = g :=
 protected def copy (f : BoundedOrderHom α β) (f' : α → β) (h : f' = f) : BoundedOrderHom α β :=
   { f.toOrderHom.copy f' h, f.toTopHom.copy f' h, f.toBotHom.copy f' h with }
 
-@[simp]
-theorem coe_copy (f : BoundedOrderHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : BoundedOrderHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -529,46 +453,14 @@ protected def id : BoundedOrderHom α α :=
 instance : Inhabited (BoundedOrderHom α α) :=
   ⟨BoundedOrderHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(BoundedOrderHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : BoundedOrderHom.id α a = a :=
-  rfl
 
 def comp (f : BoundedOrderHom β γ) (g : BoundedOrderHom α β) : BoundedOrderHom α γ :=
   { f.toOrderHom.comp g.toOrderHom, f.toTopHom.comp g.toTopHom, f.toBotHom.comp g.toBotHom with }
 
 @[simp]
-theorem coe_comp (f : BoundedOrderHom β γ) (g : BoundedOrderHom α β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : BoundedOrderHom β γ) (g : BoundedOrderHom α β) (a : α) :
     (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem coe_comp_orderHom (f : BoundedOrderHom β γ) (g : BoundedOrderHom α β) :
-    (f.comp g : OrderHom α γ) = (f : OrderHom β γ).comp g :=
-  rfl
-
-@[simp]
-theorem coe_comp_topHom (f : BoundedOrderHom β γ) (g : BoundedOrderHom α β) :
-    (f.comp g : TopHom α γ) = (f : TopHom β γ).comp g :=
-  rfl
-
-@[simp]
-theorem coe_comp_botHom (f : BoundedOrderHom β γ) (g : BoundedOrderHom α β) :
-    (f.comp g : BotHom α γ) = (f : BotHom β γ).comp g :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : BoundedOrderHom γ δ) (g : BoundedOrderHom β γ) (h : BoundedOrderHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -609,24 +501,6 @@ protected def dual :
   left_inv _ := TopHom.ext fun _ => rfl
   right_inv _ := BotHom.ext fun _ => rfl
 
-@[simp]
-theorem dual_id : TopHom.dual (TopHom.id α) = BotHom.id _ :=
-  rfl
-
-@[simp]
-theorem dual_comp (g : TopHom β γ) (f : TopHom α β) :
-    TopHom.dual (g.comp f) = g.dual.comp (TopHom.dual f) :=
-  rfl
-
-@[simp]
-theorem symm_dual_id : TopHom.dual.symm (BotHom.id _) = TopHom.id α :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : BotHom βᵒᵈ γᵒᵈ) (f : BotHom αᵒᵈ βᵒᵈ) :
-    TopHom.dual.symm (g.comp f) = (TopHom.dual.symm g).comp (TopHom.dual.symm f) :=
-  rfl
-
 end TopHom
 
 namespace BotHom
@@ -640,24 +514,6 @@ protected def dual :
   invFun f := ⟨f, f.map_top'⟩
   left_inv _ := BotHom.ext fun _ => rfl
   right_inv _ := TopHom.ext fun _ => rfl
-
-@[simp]
-theorem dual_id : BotHom.dual (BotHom.id α) = TopHom.id _ :=
-  rfl
-
-@[simp]
-theorem dual_comp (g : BotHom β γ) (f : BotHom α β) :
-    BotHom.dual (g.comp f) = g.dual.comp (BotHom.dual f) :=
-  rfl
-
-@[simp]
-theorem symm_dual_id : BotHom.dual.symm (TopHom.id _) = BotHom.id α :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : TopHom βᵒᵈ γᵒᵈ) (f : TopHom αᵒᵈ βᵒᵈ) :
-    BotHom.dual.symm (g.comp f) = (BotHom.dual.symm g).comp (BotHom.dual.symm f) :=
-  rfl
 
 end BotHom
 
@@ -674,24 +530,5 @@ protected def dual :
   invFun f := ⟨OrderHom.dual.symm f.toOrderHom, f.map_bot', f.map_top'⟩
   left_inv _ := ext fun _ => rfl
   right_inv _ := ext fun _ => rfl
-
-@[simp]
-theorem dual_id : (BoundedOrderHom.id α).dual = BoundedOrderHom.id _ :=
-  rfl
-
-@[simp]
-theorem dual_comp (g : BoundedOrderHom β γ) (f : BoundedOrderHom α β) :
-    (g.comp f).dual = g.dual.comp f.dual :=
-  rfl
-
-@[simp]
-theorem symm_dual_id : BoundedOrderHom.dual.symm (BoundedOrderHom.id _) = BoundedOrderHom.id α :=
-  rfl
-
-@[simp]
-theorem symm_dual_comp (g : BoundedOrderHom βᵒᵈ γᵒᵈ) (f : BoundedOrderHom αᵒᵈ βᵒᵈ) :
-    BoundedOrderHom.dual.symm (g.comp f) =
-      (BoundedOrderHom.dual.symm g).comp (BoundedOrderHom.dual.symm f) :=
-  rfl
 
 end BoundedOrderHom

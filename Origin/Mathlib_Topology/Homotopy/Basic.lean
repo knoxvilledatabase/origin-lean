@@ -8,6 +8,8 @@ import Mathlib.Topology.ContinuousMap.Ordered
 import Mathlib.Topology.CompactOpen
 import Mathlib.Topology.UnitInterval
 
+noncomputable section
+
 /-!
 # Homotopy between functions
 
@@ -120,16 +122,8 @@ theorem apply_zero (F : Homotopy f₀ f₁) (x : X) : F (0, x) = f₀ x :=
 theorem apply_one (F : Homotopy f₀ f₁) (x : X) : F (1, x) = f₁ x :=
   F.map_one_left x
 
-@[simp]
-theorem coe_toContinuousMap (F : Homotopy f₀ f₁) : ⇑F.toContinuousMap = F :=
-  rfl
-
 def curry (F : Homotopy f₀ f₁) : C(I, C(X, Y)) :=
   F.toContinuousMap.curry
-
-@[simp]
-theorem curry_apply (F : Homotopy f₀ f₁) (t : I) (x : X) : F.curry t x = F (t, x) :=
-  rfl
 
 def extend (F : Homotopy f₀ f₁) : C(ℝ, C(X, Y)) :=
   F.curry.IccExtend zero_le_one
@@ -360,13 +354,6 @@ theorem apply_zero (F : HomotopyWith f₀ f₁ P) (x : X) : F (0, x) = f₀ x :=
 @[simp]
 theorem apply_one (F : HomotopyWith f₀ f₁ P) (x : X) : F (1, x) = f₁ x :=
   F.map_one_left x
-
-theorem coe_toContinuousMap (F : HomotopyWith f₀ f₁ P) : ⇑F.toContinuousMap = F :=
-  rfl
-
-@[simp]
-theorem coe_toHomotopy (F : HomotopyWith f₀ f₁ P) : ⇑F.toHomotopy = F :=
-  rfl
 
 theorem prop (F : HomotopyWith f₀ f₁ P) (t : I) : P (F.toHomotopy.curry t) := F.prop' t
 

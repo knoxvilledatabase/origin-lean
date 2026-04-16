@@ -1,10 +1,12 @@
 /-
 Extracted from SetTheory/Nimber/Basic.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 3 | Infrastructure: 39
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Bitwise
 import Mathlib.SetTheory.Ordinal.Arithmetic
+
+noncomputable section
 
 /-!
 # Nimbers
@@ -73,14 +75,6 @@ namespace Nimber
 
 open Ordinal
 
-@[simp]
-theorem toOrdinal_symm_eq : Nimber.toOrdinal.symm = Ordinal.toNimber :=
-  rfl
-
-@[simp]
-theorem toOrdinal_toNimber (a : Nimber) : ∗(Nimber.toOrdinal a) = a :=
-  rfl
-
 theorem lt_wf : @WellFounded Nimber (· < ·) :=
   Ordinal.lt_wf
 
@@ -89,37 +83,6 @@ instance : WellFoundedLT Nimber :=
 
 instance : ConditionallyCompleteLinearOrderBot Nimber :=
   WellFoundedLT.conditionallyCompleteLinearOrderBot _
-
-@[simp]
-theorem bot_eq_zero : ⊥ = 0 :=
-  rfl
-
-@[simp]
-theorem toOrdinal_zero : toOrdinal 0 = 0 :=
-  rfl
-
-@[simp]
-theorem toOrdinal_one : toOrdinal 1 = 1 :=
-  rfl
-
-@[simp]
-theorem toOrdinal_eq_zero {a} : toOrdinal a = 0 ↔ a = 0 :=
-  Iff.rfl
-
-@[simp]
-theorem toOrdinal_eq_one {a} : toOrdinal a = 1 ↔ a = 1 :=
-  Iff.rfl
-
-@[simp]
-theorem toOrdinal_max (a b : Nimber) : toOrdinal (max a b) = max (toOrdinal a) (toOrdinal b) :=
-  rfl
-
-@[simp]
-theorem toOrdinal_min (a b : Nimber) : toOrdinal (min a b) = min (toOrdinal a) (toOrdinal b) :=
-  rfl
-
-theorem succ_def (a : Nimber) : succ a = ∗(toOrdinal a + 1) :=
-  rfl
 
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : Nimber → Sort*} (h : ∀ a, β (∗a)) : ∀ a, β a := fun a =>
@@ -134,7 +97,8 @@ protected theorem le_zero {a : Nimber} : a ≤ 0 ↔ a = 0 :=
 protected theorem not_lt_zero (a : Nimber) : ¬ a < 0 :=
   Ordinal.not_lt_zero a
 
--- DISSOLVED: pos_iff_ne_zero
+protected theorem pos_iff_ne_zero {a : Nimber} : 0 < a ↔ a ≠ 0 :=
+  Ordinal.pos_iff_ne_zero
 
 theorem lt_one_iff_zero {a : Nimber} : a < 1 ↔ a = 0 :=
   Ordinal.lt_one_iff_zero
@@ -165,38 +129,6 @@ theorem not_small_nimber : ¬ Small.{u} Nimber.{max u v} :=
 open Nimber
 
 namespace Ordinal
-
-@[simp]
-theorem toNimber_symm_eq : toNimber.symm = Nimber.toOrdinal :=
-  rfl
-
-@[simp]
-theorem toNimber_toOrdinal (a : Ordinal) : Nimber.toOrdinal (∗a) = a :=
-  rfl
-
-@[simp]
-theorem toNimber_zero : ∗0 = 0 :=
-  rfl
-
-@[simp]
-theorem toNimber_one : ∗1 = 1 :=
-  rfl
-
-@[simp]
-theorem toNimber_eq_zero {a} : ∗a = 0 ↔ a = 0 :=
-  Iff.rfl
-
-@[simp]
-theorem toNimber_eq_one {a} : ∗a = 1 ↔ a = 1 :=
-  Iff.rfl
-
-@[simp]
-theorem toNimber_max (a b : Ordinal) : ∗(max a b) = max (∗a) (∗b) :=
-  rfl
-
-@[simp]
-theorem toNimber_min (a b : Ordinal) : ∗(min a b) = min (∗a) (∗b) :=
-  rfl
 
 end Ordinal
 
@@ -288,7 +220,8 @@ theorem add_eq_zero {a b : Nimber} : a + b = 0 ↔ a = b := by
 
 termination_by (a, b)
 
--- DISSOLVED: add_ne_zero_iff
+theorem add_ne_zero_iff : a + b ≠ 0 ↔ a ≠ b :=
+  add_eq_zero.not
 
 @[simp]
 theorem add_self (a : Nimber) : a + a = 0 :=
@@ -331,10 +264,6 @@ protected theorem zero_add (a : Nimber) : 0 + a = a := by
 instance : Neg Nimber :=
   ⟨id⟩
 
-@[simp]
-protected theorem neg_eq (a : Nimber) : -a = a :=
-  rfl
-
 instance : AddCommGroupWithOne Nimber where
   add_assoc := Nimber.add_assoc
   add_zero := Nimber.add_zero
@@ -352,7 +281,18 @@ theorem add_cancel_right (a b : Nimber) : a + b + b = a := by
 theorem add_cancel_left (a b : Nimber) : a + (a + b) = b := by
   rw [← add_assoc, add_self, zero_add]
 
--- DISSOLVED: add_trichotomy
+theorem add_trichotomy {a b c : Nimber} (h : a + b + c ≠ 0) :
+    b + c < a ∨ c + a < b ∨ a + b < c := by
+  rw [← Nimber.pos_iff_ne_zero] at h
+  obtain ⟨x, hx, hx'⟩ | ⟨x, hx, hx'⟩ := exists_of_lt_add h <;>
+  rw [add_eq_zero] at hx'
+  · obtain ⟨x, hx, hx'⟩ | ⟨x, hx, hx'⟩ := exists_of_lt_add (hx' ▸ hx)
+    · rw [← hx', add_comm, add_cancel_right]
+      exact Or.inl hx
+    · rw [← hx', add_comm a, add_cancel_right]
+      exact Or.inr <| Or.inl hx
+  · rw [← hx'] at hx
+    exact Or.inr <| Or.inr hx
 
 theorem lt_add_cases {a b c : Nimber} (h : a < b + c) : a + c < b ∨ a + b < c := by
   obtain ha | hb | hc := add_trichotomy <| add_assoc a b c ▸ add_ne_zero_iff.2 h.ne

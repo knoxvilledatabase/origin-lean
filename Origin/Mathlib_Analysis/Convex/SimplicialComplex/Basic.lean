@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Hull
 import Mathlib.LinearAlgebra.AffineSpace.Independent
 
+noncomputable section
+
 /-!
 # Simplicial complexes
 
@@ -124,8 +126,6 @@ def ofSubcomplex (K : SimplicialComplex 𝕜 E) (faces : Set (Finset E)) (subset
 def vertices (K : SimplicialComplex 𝕜 E) : Set E :=
   { x | {x} ∈ K.faces }
 
-theorem mem_vertices : x ∈ K.vertices ↔ {x} ∈ K.faces := Iff.rfl
-
 theorem vertices_eq : K.vertices = ⋃ k ∈ K.faces, (k : Set E) := by
   ext x
   refine ⟨fun h => mem_biUnion h <| mem_coe.2 <| mem_singleton_self x, fun h => ?_⟩
@@ -209,8 +209,6 @@ instance : Inhabited (SimplicialComplex 𝕜 E) :=
   ⟨⊥⟩
 
 variable {𝕜 E}
-
-theorem faces_bot : (⊥ : SimplicialComplex 𝕜 E).faces = ∅ := rfl
 
 theorem space_bot : (⊥ : SimplicialComplex 𝕜 E).space = ∅ :=
   Set.biUnion_empty _

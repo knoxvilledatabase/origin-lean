@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.Lebesgue
 import Mathlib.Topology.MetricSpace.ThickenedIndicator
 
+noncomputable section
+
 /-!
 # Spaces where indicators of closed sets have decreasing approximations by continuous functions
 

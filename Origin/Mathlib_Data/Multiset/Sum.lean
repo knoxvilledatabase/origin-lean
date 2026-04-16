@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Multiset.Nodup
 
+noncomputable section
+
 /-!
 # Disjoint sum of multisets
 

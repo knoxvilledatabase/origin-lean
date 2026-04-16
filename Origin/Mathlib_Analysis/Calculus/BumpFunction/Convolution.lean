@@ -10,6 +10,8 @@ import Mathlib.MeasureTheory.Covering.Differentiation
 import Mathlib.MeasureTheory.Covering.BesicovitchVectorSpace
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 
+noncomputable section
+
 /-!
 # Convolution with a bump function
 

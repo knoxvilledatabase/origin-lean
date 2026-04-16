@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic
 
+noncomputable section
+
 /-!
 # Equivalence between `Group` and `AddGroup`
 

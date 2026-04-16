@@ -1,11 +1,13 @@
 /-
 Extracted from Combinatorics/Configuration.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Hall.Basic
 import Mathlib.Data.Matrix.Rank
 import Mathlib.LinearAlgebra.Projectivization.Constructions
+
+noncomputable section
 
 /-!
 # Configurations of Points and lines
@@ -50,7 +52,6 @@ instance [h : Fintype P] : Fintype (Dual P) :=
   h
 
 set_option synthInstance.checkSynthOrder false in
-
 instance : Membership (Dual L) (Dual P) :=
   ⟨Function.swap (Membership.mem : L → P → Prop)⟩
 

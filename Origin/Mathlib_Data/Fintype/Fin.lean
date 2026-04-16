@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Finset.Fin
 import Mathlib.Data.Vector.Basic
 
+noncomputable section
+
 /-!
 # The structure of `Fintype (Fin n)`
 

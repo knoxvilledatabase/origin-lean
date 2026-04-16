@@ -12,6 +12,8 @@ import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Finset.Sym
 import Mathlib.Data.Finsupp.Multiset
 
+noncomputable section
+
 /-!
 # Multinomial
 

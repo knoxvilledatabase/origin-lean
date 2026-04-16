@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Data.Fin.VecNotation
 
+noncomputable section
+
 /-! # Function types of a given heterogeneous arity
 
 This provides `Function.FromTypes`, such that `FromTypes ![α, β] τ = α → β → τ`.
@@ -56,17 +58,6 @@ namespace FromTypes
 def const : {n : ℕ} → (p : Fin n → Type u) → {τ : Type u} → (t : τ) → FromTypes p τ
   | 0,     _, _, t => t
   | n + 1, p, τ, t => fun _ => @const n (vecTail p) τ t
-
-@[simp]
-theorem const_zero (p : Fin 0 → Type u) {τ : Type u} (t : τ) : const p t = t :=
-  rfl
-
-@[simp]
-theorem const_succ {n} (p : Fin (n + 1) → Type u) {τ : Type u} (t : τ) :
-    const p t = fun _ => const (vecTail p) t := rfl
-
-theorem const_succ_apply {n} (p : Fin (n + 1) → Type u) {τ : Type u} (t : τ)
-    (x : p 0) : const p t x = const (vecTail p) t := rfl
 
 instance inhabited {n} {p : Fin n → Type u} {τ} [Inhabited τ] :
     Inhabited (FromTypes p τ) := ⟨const p default⟩

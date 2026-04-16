@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Topology.UniformSpace.Cauchy
 import Mathlib.Topology.Algebra.UniformGroup.Defs
 
+noncomputable section
+
 /-!
 # Infinite sums and products in topological groups
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Ring Homomorphisms surjective on stalks
 

@@ -8,6 +8,8 @@ import ProofWidgets.Component.MakeEditLink
 import ProofWidgets.Component.OfRpcMethod -- needed in all files using this one.
 import Mathlib.Tactic.Widget.SelectInsertParamsClass
 
+noncomputable section
+
 /-! # Selection panel utilities
 
 The main declaration is `mkSelectionPanelRPC` which helps creating rpc methods for widgets

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Num.Basic
 import Mathlib.Data.Vector.Basic
 
+noncomputable section
+
 /-!
 # Bitwise operations using binary representation of integers
 
@@ -32,8 +34,6 @@ def lor : PosNum → PosNum → PosNum
 
 instance : OrOp PosNum where or := PosNum.lor
 
-@[simp] lemma lor_eq_or (p q : PosNum) : p.lor q = p ||| q := rfl
-
 def land : PosNum → PosNum → Num
   | 1, bit0 _ => 0
   | 1, _ => 1
@@ -45,8 +45,6 @@ def land : PosNum → PosNum → Num
   | bit1 p, bit1 q => Num.bit1 (land p q)
 
 instance : HAnd PosNum PosNum Num where hAnd := PosNum.land
-
-@[simp] lemma land_eq_and (p q : PosNum) : p.land q = p &&& q := rfl
 
 def ldiff : PosNum → PosNum → Num
   | 1, bit0 _ => 1
@@ -71,8 +69,6 @@ def lxor : PosNum → PosNum → Num
 
 instance : HXor PosNum PosNum Num where hXor := PosNum.lxor
 
-@[simp] lemma lxor_eq_xor (p q : PosNum) : p.lxor q = p ^^^ q := rfl
-
 def testBit : PosNum → Nat → Bool
   | 1, 0 => true
   | 1, _ => false
@@ -92,8 +88,6 @@ def shiftl : PosNum → Nat → PosNum
 
 instance : HShiftLeft PosNum Nat PosNum where hShiftLeft := PosNum.shiftl
 
-@[simp] lemma shiftl_eq_shiftLeft (p : PosNum) (n : Nat) : p.shiftl n = p <<< n := rfl
-
 theorem shiftl_succ_eq_bit0_shiftl : ∀ (p : PosNum) (n : Nat), p <<< n.succ = bit0 (p <<< n)
   | _, 0       => rfl
   | p, .succ n => shiftl_succ_eq_bit0_shiftl p.bit0 n
@@ -106,8 +100,6 @@ def shiftr : PosNum → Nat → Num
 
 instance : HShiftRight PosNum Nat Num where hShiftRight := PosNum.shiftr
 
-@[simp] lemma shiftr_eq_shiftRight (p : PosNum) (n : Nat) : p.shiftr n = p >>> n := rfl
-
 end PosNum
 
 namespace Num
@@ -119,16 +111,12 @@ protected def lor : Num → Num → Num
 
 instance : OrOp Num where or := Num.lor
 
-@[simp] lemma lor_eq_or (p q : Num) : p.lor q = p ||| q := rfl
-
 def land : Num → Num → Num
   | 0, _ => 0
   | _, 0 => 0
   | pos p, pos q => p &&& q
 
 instance : AndOp Num where and := Num.land
-
-@[simp] lemma land_eq_and (p q : Num) : p.land q = p &&& q := rfl
 
 def ldiff : Num → Num → Num
   | 0, _ => 0
@@ -142,23 +130,17 @@ def lxor : Num → Num → Num
 
 instance : Xor Num where xor := Num.lxor
 
-@[simp] lemma lxor_eq_xor (p q : Num) : p.lxor q = p ^^^ q := rfl
-
 def shiftl : Num → Nat → Num
   | 0, _ => 0
   | pos p, n => pos (p <<< n)
 
 instance : HShiftLeft Num Nat Num where hShiftLeft := Num.shiftl
 
-@[simp] lemma shiftl_eq_shiftLeft (p : Num) (n : Nat) : p.shiftl n = p <<< n := rfl
-
 def shiftr : Num → Nat → Num
   | 0, _ => 0
   | pos p, n => p >>> n
 
 instance : HShiftRight Num Nat Num where hShiftRight := Num.shiftr
-
-@[simp] lemma shiftr_eq_shiftRight (p : Num) (n : Nat) : p.shiftr n = p >>> n := rfl
 
 def testBit : Num → Nat → Bool
   | 0, _ => false

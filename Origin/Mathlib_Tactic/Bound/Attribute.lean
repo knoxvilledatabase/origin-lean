@@ -8,6 +8,8 @@ import Mathlib.Tactic.Bound.Init
 import Qq
 import Aesop
 
+noncomputable section
+
 /-!
 # The `bound` attribute
 
@@ -103,7 +105,6 @@ initialize Lean.registerBuiltinAttribute {
 }
 
 macro "bound_forward" : attr =>
-
   `(attr|aesop safe forward (rule_sets := [$(Lean.mkIdent `Bound):ident]))
 
 end Mathlib.Tactic.Bound

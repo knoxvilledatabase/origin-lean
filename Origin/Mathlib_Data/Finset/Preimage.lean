@@ -7,6 +7,8 @@ import Mathlib.Data.Finset.Sigma
 import Mathlib.Data.Finset.Sum
 import Mathlib.Data.Set.Finite.Basic
 
+noncomputable section
+
 /-!
 # Preimage of a `Finset` under an injective map.
 -/

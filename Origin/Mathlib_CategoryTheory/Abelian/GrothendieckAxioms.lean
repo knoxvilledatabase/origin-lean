@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.Filtered
 import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
 
+noncomputable section
+
 /-!
 
 # Grothendieck Axioms

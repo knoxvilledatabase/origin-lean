@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.WittVector.Basic
 import Mathlib.RingTheory.WittVector.IsPoly
 
+noncomputable section
+
 /-!
 ## The Verschiebung operator
 
@@ -113,18 +115,6 @@ theorem ghostComponent_zero_verschiebung (x : 𝕎 R) : ghostComponent 0 (versch
 theorem ghostComponent_verschiebung (x : 𝕎 R) (n : ℕ) :
     ghostComponent (n + 1) (verschiebung x) = p * ghostComponent n x :=
   ghostComponent_verschiebungFun _ _
-
-@[simp]
-theorem verschiebung_coeff_zero (x : 𝕎 R) : (verschiebung x).coeff 0 = 0 :=
-  rfl
-
-theorem verschiebung_coeff_add_one (x : 𝕎 R) (n : ℕ) :
-    (verschiebung x).coeff (n + 1) = x.coeff n :=
-  rfl
-
-@[simp]
-theorem verschiebung_coeff_succ (x : 𝕎 R) (n : ℕ) : (verschiebung x).coeff n.succ = x.coeff n :=
-  rfl
 
 theorem aeval_verschiebungPoly (x : 𝕎 R) (n : ℕ) :
     aeval x.coeff (verschiebungPoly n) = (verschiebung x).coeff n :=

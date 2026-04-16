@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.FilteredColimitCommutesProduct
 import Mathlib.CategoryTheory.Limits.Indization.FilteredColimits
 
+noncomputable section
+
 /-!
 # Ind-objects are closed under products
 

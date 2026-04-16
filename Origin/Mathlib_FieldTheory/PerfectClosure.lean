@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.CharP.ExpChar
 import Mathlib.FieldTheory.Perfect
 
+noncomputable section
+
 /-!
 
 # The perfect closure of a characteristic `p` ring
@@ -218,10 +220,6 @@ theorem zero_def : (0 : PerfectClosure K p) = mk K p (0, 0) :=
   rfl
 
 @[simp]
-theorem mk_zero : mk K p 0 = 0 :=
-  rfl
-
-@[simp]
 theorem mk_zero_right (n : ℕ) : mk K p (n, 0) = 0 := by
   induction' n with n ih
   · rfl
@@ -380,9 +378,6 @@ def of : K →+* PerfectClosure K p where
   map_mul' _ _ := rfl
   map_zero' := rfl
   map_add' _ _ := rfl
-
-theorem of_apply (x : K) : of K p x = mk _ _ (0, x) :=
-  rfl
 
 instance instReduced : IsReduced (PerfectClosure K p) where
   eq_zero x := induction_on x fun x ⟨n, h⟩ ↦ by

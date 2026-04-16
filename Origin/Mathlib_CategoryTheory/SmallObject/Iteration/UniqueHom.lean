@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.SmallObject.Iteration.Basic
 
+noncomputable section
+
 /-!
 # Uniqueness of morphisms in the category of iterations of functors
 

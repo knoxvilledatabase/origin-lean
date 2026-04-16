@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Adjoin.Basic
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Algebra.Polynomial.Derivative
 
+noncomputable section
+
 /-!
 # Derivations
 
@@ -62,9 +64,6 @@ instance : AddMonoidHomClass (Derivation R A M) A M where
   map_add D := D.toLinearMap.map_add'
   map_zero D := D.toLinearMap.map_zero
 
-theorem toFun_eq_coe : D.toFun = ⇑D :=
-  rfl
-
 def Simps.apply (D : Derivation R A M) : A → M := D
 
 initialize_simps_projections Derivation (toFun → apply)
@@ -73,10 +72,6 @@ attribute [coe] toLinearMap
 
 instance hasCoeToLinearMap : Coe (Derivation R A M) (A →ₗ[R] M) :=
   ⟨fun D => D.toLinearMap⟩
-
-@[simp]
-theorem mk_coe (f : A →ₗ[R] M) (h₁ h₂) : ((⟨f, h₁, h₂⟩ : Derivation R A M) : A → M) = f :=
-  rfl
 
 @[simp, norm_cast]
 theorem coeFn_coe (f : Derivation R A M) : ⇑(f : A →ₗ[R] M) = f :=
@@ -161,10 +156,6 @@ instance : Zero (Derivation R A M) :=
 theorem coe_zero : ⇑(0 : Derivation R A M) = 0 :=
   rfl
 
-@[simp]
-theorem coe_zero_linearMap : ↑(0 : Derivation R A M) = (0 : A →ₗ[R] M) :=
-  rfl
-
 theorem zero_apply (a : A) : (0 : Derivation R A M) a = 0 :=
   rfl
 
@@ -177,10 +168,6 @@ instance : Add (Derivation R A M) :=
 
 @[simp]
 theorem coe_add (D1 D2 : Derivation R A M) : ⇑(D1 + D2) = D1 + D2 :=
-  rfl
-
-@[simp]
-theorem coe_add_linearMap (D1 D2 : Derivation R A M) : ↑(D1 + D2) = (D1 + D2 : A →ₗ[R] M) :=
   rfl
 
 theorem add_apply : (D1 + D2) a = D1 a + D2 a :=
@@ -206,10 +193,6 @@ instance : SMul S (Derivation R A M) :=
 
 @[simp]
 theorem coe_smul (r : S) (D : Derivation R A M) : ⇑(r • D) = r • ⇑D :=
-  rfl
-
-@[simp]
-theorem coe_smul_linearMap (r : S) (D : Derivation R A M) : ↑(r • D) = r • (D : A →ₗ[R] M) :=
   rfl
 
 theorem smul_apply (r : S) (D : Derivation R A M) : (r • D) a = r • D a :=
@@ -259,14 +242,6 @@ def _root_.LinearMap.compDer : Derivation R A M →ₗ[R] Derivation R A N where
   map_add' D₁ D₂ := by ext; exact LinearMap.map_add _ _ _
   map_smul' r D := by dsimp; ext; exact LinearMap.map_smul (f : M →ₗ[R] N) _ _
 
-@[simp]
-theorem coe_to_linearMap_comp : (f.compDer D : A →ₗ[R] N) = (f : M →ₗ[R] N).comp (D : A →ₗ[R] M) :=
-  rfl
-
-@[simp]
-theorem coe_comp : (f.compDer D : A → N) = (f : M →ₗ[R] N).comp (D : A →ₗ[R] M) :=
-  rfl
-
 @[simps]
 def llcomp : (M →ₗ[A] N) →ₗ[A] Derivation R A M →ₗ[R] Derivation R A N where
   toFun f := f.compDer
@@ -279,26 +254,9 @@ def _root_.LinearEquiv.compDer : Derivation R A M ≃ₗ[R] Derivation R A N :=
     left_inv := fun D => by ext a; exact e.symm_apply_apply (D a)
     right_inv := fun D => by ext a; exact e.apply_symm_apply (D a) }
 
-@[simp]
-theorem linearEquiv_coe_to_linearMap_comp :
-    (e.compDer D : A →ₗ[R] N) = (e.toLinearMap : M →ₗ[R] N).comp (D : A →ₗ[R] M) :=
-  rfl
-
-@[simp]
-theorem linearEquiv_coe_comp :
-    (e.compDer D : A → N) = (e.toLinearMap : M →ₗ[R] N).comp (D : A →ₗ[R] M) :=
-  rfl
-
 end PushForward
 
 variable (A) in
-
-@[simps!]
-def compAlgebraMap [Algebra A B] [IsScalarTower R A B] [IsScalarTower A B M]
-    (d : Derivation R B M) : Derivation R A M where
-  map_one_eq_zero' := by simp
-  leibniz' a b := by simp
-  toLinearMap := d.toLinearMap.comp (IsScalarTower.toAlgHom R A B).toLinearMap
 
 section RestrictScalars
 
@@ -314,9 +272,6 @@ protected def restrictScalars (d : Derivation S A M) : Derivation R A M where
   toLinearMap := d.toLinearMap.restrictScalars R
 
 lemma coe_restrictScalars (d : Derivation S A M) : ⇑(d.restrictScalars R) = ⇑d := rfl
-
-@[simp]
-lemma restrictScalars_apply (d : Derivation S A M) (x : A) : d.restrictScalars R x = d x := rfl
 
 end RestrictScalars
 
@@ -371,10 +326,6 @@ noncomputable abbrev liftOfSurjective {f : F} (hf : Function.Surjective f)
     ⦃d : Derivation R A A⦄ (hd : ∀ x, f x = 0 → f (d x) = 0) : Derivation R M M :=
   d.liftOfRightInverse (Function.rightInverse_surjInv hf) hd
 
-lemma liftOfSurjective_apply {f : F} (hf : Function.Surjective f)
-    {d : Derivation R A A} (hd : ∀ x, f x = 0 → f (d x) = 0) (x : A) :
-    Derivation.liftOfSurjective hf hd (f x) = f (d x) := by simp
-
 end Lift
 
 section Cancel
@@ -387,14 +338,6 @@ def mk' (D : A →ₗ[R] M) (h : ∀ a b, D (a * b) = a • D b + b • D a) : D
   map_one_eq_zero' := (add_right_eq_self (a := D 1)).1 <| by
     simpa only [one_smul, one_mul] using (h 1 1).symm
   leibniz' := h
-
-@[simp]
-theorem coe_mk' (D : A →ₗ[R] M) (h) : ⇑(mk' D h) = D :=
-  rfl
-
-@[simp]
-theorem coe_mk'_linearMap (D : A →ₗ[R] M) (h) : (mk' D h : A →ₗ[R] M) = D :=
-  rfl
 
 end Cancel
 
@@ -483,10 +426,6 @@ instance : Neg (Derivation R A M) :=
 theorem coe_neg (D : Derivation R A M) : ⇑(-D) = -D :=
   rfl
 
-@[simp]
-theorem coe_neg_linearMap (D : Derivation R A M) : ↑(-D) = (-D : A →ₗ[R] M) :=
-  rfl
-
 theorem neg_apply : (-D) a = -D a :=
   rfl
 
@@ -497,10 +436,6 @@ instance : Sub (Derivation R A M) :=
 
 @[simp]
 theorem coe_sub (D1 D2 : Derivation R A M) : ⇑(D1 - D2) = D1 - D2 :=
-  rfl
-
-@[simp]
-theorem coe_sub_linearMap (D1 D2 : Derivation R A M) : ↑(D1 - D2) = (D1 - D2 : A →ₗ[R] M) :=
   rfl
 
 theorem sub_apply : (D1 - D2) a = D1 a - D2 a :=

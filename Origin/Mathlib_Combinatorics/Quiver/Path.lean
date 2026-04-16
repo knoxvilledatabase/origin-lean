@@ -7,6 +7,8 @@ import Mathlib.Combinatorics.Quiver.Prefunctor
 import Mathlib.Logic.Lemmas
 import Batteries.Data.List.Basic
 
+noncomputable section
+
 /-!
 # Paths in quivers
 
@@ -56,10 +58,6 @@ instance {a : V} : Inhabited (Path a a) :=
   ⟨nil⟩
 
 @[simp]
-theorem length_nil {a : V} : (nil : Path a a).length = 0 :=
-  rfl
-
-@[simp]
 theorem length_cons (a b c : V) (p : Path a b) (e : b ⟶ c) : (p.cons e).length = p.length + 1 :=
   rfl
 
@@ -80,10 +78,6 @@ def comp {a b : V} : ∀ {c}, Path a b → Path b c → Path a c
 @[simp]
 theorem comp_cons {a b c d : V} (p : Path a b) (q : Path b c) (e : c ⟶ d) :
     p.comp (q.cons e) = (p.comp q).cons e :=
-  rfl
-
-@[simp]
-theorem comp_nil {a b : V} (p : Path a b) : p.comp Path.nil = p :=
   rfl
 
 @[simp]
@@ -200,22 +194,9 @@ def mapPath {a : V} : ∀ {b : V}, Path a b → Path (F.obj a) (F.obj b)
   | _, Path.cons p e => Path.cons (mapPath p) (F.map e)
 
 @[simp]
-theorem mapPath_nil (a : V) : F.mapPath (Path.nil : Path a a) = Path.nil :=
-  rfl
-
-@[simp]
-theorem mapPath_cons {a b c : V} (p : Path a b) (e : b ⟶ c) :
-    F.mapPath (Path.cons p e) = Path.cons (F.mapPath p) (F.map e) :=
-  rfl
-
-@[simp]
 theorem mapPath_comp {a b : V} (p : Path a b) :
     ∀ {c : V} (q : Path b c), F.mapPath (p.comp q) = (F.mapPath p).comp (F.mapPath q)
   | _, Path.nil => rfl
   | c, Path.cons q e => by dsimp; rw [mapPath_comp p q]
-
-@[simp]
-theorem mapPath_toPath {a b : V} (f : a ⟶ b) : F.mapPath f.toPath = (F.map f).toPath :=
-  rfl
 
 end Prefunctor

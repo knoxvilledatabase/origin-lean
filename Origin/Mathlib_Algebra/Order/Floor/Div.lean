@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Pi
 import Mathlib.Data.Finsupp.Order
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # Flooring, ceiling division
 
@@ -74,6 +76,10 @@ class CeilDiv where
   /-- Do not use this. Use `zero_ceilDiv` instead. -/
   protected zero_ceilDiv (a) : ceilDiv 0 a = 0
 
+@[inherit_doc] infixl:70 " ⌊/⌋ "   => FloorDiv.floorDiv
+
+@[inherit_doc] infixl:70 " ⌈/⌉ "   => CeilDiv.ceilDiv
+
 variable {α β}
 
 section FloorDiv
@@ -87,8 +93,6 @@ lemma gc_floorDiv_smul (ha : 0 < a) : GaloisConnection (a • · : β → β) (�
   (gc_floorDiv_smul ha _ _).symm
 
 @[simp] lemma floorDiv_of_nonpos (ha : a ≤ 0) (b : β) : b ⌊/⌋ a = 0 := FloorDiv.floorDiv_nonpos ha _
-
-lemma floorDiv_zero (b : β) : b ⌊/⌋ (0 : α) = 0 := by simp
 
 @[simp] lemma zero_floorDiv (a : α) : (0 : β) ⌊/⌋ a = 0 := FloorDiv.zero_floorDiv _
 
@@ -107,8 +111,6 @@ lemma gc_smul_ceilDiv (ha : 0 < a) : GaloisConnection (· ⌈/⌉ a) (a • · :
 lemma ceilDiv_le_iff_le_smul (ha : 0 < a) : b ⌈/⌉ a ≤ c ↔ b ≤ a • c := gc_smul_ceilDiv ha _ _
 
 @[simp] lemma ceilDiv_of_nonpos (ha : a ≤ 0) (b : β) : b ⌈/⌉ a = 0 := CeilDiv.ceilDiv_nonpos ha _
-
-lemma ceilDiv_zero (b : β) : b ⌈/⌉ (0 : α) = 0 := by simp
 
 @[simp] lemma zero_ceilDiv (a : α) : (0 : β) ⌈/⌉ a = 0 := CeilDiv.zero_ceilDiv _
 
@@ -199,10 +201,6 @@ instance instCeilDiv : CeilDiv ℕ ℕ where
   ceilDiv_nonpos a ha b := by simp_rw [ha.antisymm <| zero_le _, Nat.div_zero]
   zero_ceilDiv a := by cases a <;> simp [Nat.div_eq_zero_iff]
 
-@[simp] lemma floorDiv_eq_div (a b : ℕ) : a ⌊/⌋ b = a / b := rfl
-
-lemma ceilDiv_eq_add_pred_div (a b : ℕ) : a ⌈/⌉ b = (a + b - 1) / b := rfl
-
 end Nat
 
 namespace Pi
@@ -220,10 +218,6 @@ instance instFloorDiv : FloorDiv α (∀ i, π i) where
   floorDiv_nonpos a ha f := by ext i; exact floorDiv_of_nonpos ha _
   zero_floorDiv a := by ext i; exact zero_floorDiv a
 
-lemma floorDiv_def (f : ∀ i, π i) (a : α) : f ⌊/⌋ a = fun i ↦ f i ⌊/⌋ a := rfl
-
-@[simp] lemma floorDiv_apply (f : ∀ i, π i) (a : α) (i : ι) : (f ⌊/⌋ a) i = f i ⌊/⌋ a := rfl
-
 end FloorDiv
 
 section CeilDiv
@@ -235,10 +229,6 @@ instance instCeilDiv : CeilDiv α (∀ i, π i) where
   ceilDiv_gc _a ha _f _g := forall_congr' fun _i ↦ gc_smul_ceilDiv ha _ _
   ceilDiv_nonpos a ha f := by ext i; exact ceilDiv_of_nonpos ha _
   zero_ceilDiv a := by ext; exact zero_ceilDiv _
-
-lemma ceilDiv_def (f : ∀ i, π i) (a : α) : f ⌈/⌉ a = fun i ↦ f i ⌈/⌉ a := rfl
-
-@[simp] lemma ceilDiv_apply (f : ∀ i, π i) (a : α) (i : ι) : (f ⌈/⌉ a) i = f i ⌈/⌉ a := rfl
 
 end CeilDiv
 
@@ -259,12 +249,6 @@ noncomputable instance instFloorDiv : FloorDiv α (ι →₀ β) where
   floorDiv_nonpos a ha f := by ext i; exact floorDiv_of_nonpos ha _
   zero_floorDiv a := by ext; exact zero_floorDiv _
 
-lemma floorDiv_def (f : ι →₀ β) (a : α) : f ⌊/⌋ a = f.mapRange (· ⌊/⌋ a) (zero_floorDiv _) := rfl
-
-@[norm_cast] lemma coe_floorDiv (f : ι →₀ β) (a : α) : f ⌊/⌋ a = fun i ↦ f i ⌊/⌋ a := rfl
-
-@[simp] lemma floorDiv_apply (f : ι →₀ β) (a : α) (i : ι) : (f ⌊/⌋ a) i = f i ⌊/⌋ a := rfl
-
 lemma support_floorDiv_subset : (f ⌊/⌋ a).support ⊆ f.support := by
   simp +contextual [Finset.subset_iff, not_imp_not]
 
@@ -280,12 +264,6 @@ noncomputable instance instCeilDiv : CeilDiv α (ι →₀ β) where
     simpa only [coe_smul, Pi.smul_apply, mapRange_apply] using gc_smul_ceilDiv ha (f i) _
   ceilDiv_nonpos a ha f := by ext i; exact ceilDiv_of_nonpos ha _
   zero_ceilDiv a := by ext; exact zero_ceilDiv _
-
-lemma ceilDiv_def (f : ι →₀ β) (a : α) : f ⌈/⌉ a = f.mapRange (· ⌈/⌉ a) (zero_ceilDiv _) := rfl
-
-@[norm_cast] lemma coe_ceilDiv_def (f : ι →₀ β) (a : α) : f ⌈/⌉ a = fun i ↦ f i ⌈/⌉ a := rfl
-
-@[simp] lemma ceilDiv_apply (f : ι →₀ β) (a : α) (i : ι) : (f ⌈/⌉ a) i = f i ⌈/⌉ a := rfl
 
 lemma support_ceilDiv_subset : (f ⌈/⌉ a).support ⊆ f.support := by
   simp +contextual [Finset.subset_iff, not_imp_not]

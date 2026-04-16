@@ -7,6 +7,8 @@ import Mathlib.Data.ENNReal.Inv
 import Mathlib.Topology.UniformSpace.OfFun
 import Mathlib.Topology.Bases
 
+noncomputable section
+
 /-!
 # Extended metric spaces
 
@@ -221,8 +223,6 @@ abbrev PseudoEMetricSpace.induced {α β} (f : α → β) (m : PseudoEMetricSpac
 instance {α : Type*} {p : α → Prop} [PseudoEMetricSpace α] : PseudoEMetricSpace (Subtype p) :=
   PseudoEMetricSpace.induced Subtype.val ‹_›
 
-theorem Subtype.edist_eq {p : α → Prop} (x y : Subtype p) : edist x y = edist (x : α) y := rfl
-
 namespace MulOpposite
 
 @[to_additive "Pseudoemetric space instance on the additive opposite of a pseudoemetric space."]
@@ -230,22 +230,11 @@ namespace MulOpposite
 instance {α : Type*} [PseudoEMetricSpace α] : PseudoEMetricSpace αᵐᵒᵖ :=
   PseudoEMetricSpace.induced unop ‹_›
 
-@[to_additive]
-theorem edist_unop (x y : αᵐᵒᵖ) : edist (unop x) (unop y) = edist x y := rfl
-
-@[to_additive]
-theorem edist_op (x y : α) : edist (op x) (op y) = edist x y := rfl
-
 end MulOpposite
 
 section ULift
 
 instance : PseudoEMetricSpace (ULift α) := PseudoEMetricSpace.induced ULift.down ‹_›
-
-theorem ULift.edist_eq (x y : ULift α) : edist x y = edist x.down y.down := rfl
-
-@[simp]
-theorem ULift.edist_up_up (x y : α) : edist (ULift.up x) (ULift.up y) = edist x y := rfl
 
 end ULift
 
@@ -563,22 +552,6 @@ instance : EDist (Additive X) := ‹EDist X›
 
 instance : EDist (Multiplicative X) := ‹EDist X›
 
-@[simp]
-theorem edist_ofMul (a b : X) : edist (ofMul a) (ofMul b) = edist a b :=
-  rfl
-
-@[simp]
-theorem edist_ofAdd (a b : X) : edist (ofAdd a) (ofAdd b) = edist a b :=
-  rfl
-
-@[simp]
-theorem edist_toMul (a b : Additive X) : edist a.toMul b.toMul = edist a b :=
-  rfl
-
-@[simp]
-theorem edist_toAdd (a b : Multiplicative X) : edist a.toAdd b.toAdd = edist a b :=
-  rfl
-
 end
 
 instance [PseudoEMetricSpace X] : PseudoEMetricSpace (Additive X) := ‹PseudoEMetricSpace X›
@@ -602,14 +575,6 @@ section
 variable [EDist X]
 
 instance : EDist Xᵒᵈ := ‹EDist X›
-
-@[simp]
-theorem edist_toDual (a b : X) : edist (toDual a) (toDual b) = edist a b :=
-  rfl
-
-@[simp]
-theorem edist_ofDual (a b : Xᵒᵈ) : edist (ofDual a) (ofDual b) = edist a b :=
-  rfl
 
 end
 

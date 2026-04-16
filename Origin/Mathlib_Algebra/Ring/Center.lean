@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Center
 import Mathlib.Data.Int.Cast.Lemmas
 
+noncomputable section
+
 /-!
 # Centers of rings
 

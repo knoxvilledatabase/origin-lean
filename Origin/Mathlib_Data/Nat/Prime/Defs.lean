@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Prime/Defs.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 4 | Infrastructure: 11
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Batteries.Data.Nat.Gcd
@@ -9,6 +9,8 @@ import Mathlib.Algebra.GroupWithZero.Nat
 import Mathlib.Algebra.Prime.Defs
 import Mathlib.Data.Nat.Sqrt
 import Mathlib.Order.Basic
+
+noncomputable section
 
 /-!
 # Prime numbers
@@ -36,15 +38,14 @@ variable {n : ℕ}
 def Prime (p : ℕ) :=
   Irreducible p
 
-theorem irreducible_iff_nat_prime (a : ℕ) : Irreducible a ↔ Nat.Prime a :=
-  Iff.rfl
-
--- DISSOLVED: not_prime_zero
+@[aesop safe destruct] theorem not_prime_zero : ¬Prime 0
+  | h => h.ne_zero rfl
 
 @[aesop safe destruct] theorem not_prime_one : ¬Prime 1
   | h => h.ne_one rfl
 
--- DISSOLVED: Prime.ne_zero
+theorem Prime.ne_zero {n : ℕ} (h : Prime n) : n ≠ 0 :=
+  Irreducible.ne_zero h
 
 theorem Prime.pos {p : ℕ} (pp : Prime p) : 0 < p :=
   Nat.pos_of_ne_zero pp.ne_zero
@@ -62,7 +63,8 @@ lemma Prime.one_le {p : ℕ} (hp : p.Prime) : 1 ≤ p := hp.one_lt.le
 instance Prime.one_lt' (p : ℕ) [hp : Fact p.Prime] : Fact (1 < p) :=
   ⟨hp.1.one_lt⟩
 
--- DISSOLVED: Prime.ne_one
+theorem Prime.ne_one {p : ℕ} (hp : p.Prime) : p ≠ 1 :=
+  hp.one_lt.ne'
 
 theorem Prime.eq_one_or_self_of_dvd {p : ℕ} (pp : p.Prime) (m : ℕ) (hm : m ∣ p) :
     m = 1 ∨ m = p := by
@@ -119,7 +121,13 @@ theorem prime_def_le_sqrt {p : ℕ} : Prime p ↔ 2 ≤ p ∧ ∀ m, 2 ≤ m →
           refine this km (Nat.lt_of_mul_lt_mul_right (a := m) ?_) e
           rwa [one_mul, ← e]⟩
 
--- DISSOLVED: prime_of_coprime
+theorem prime_of_coprime (n : ℕ) (h1 : 1 < n) (h : ∀ m < n, m ≠ 0 → n.Coprime m) : Prime n := by
+  refine prime_def_lt.mpr ⟨h1, fun m mlt mdvd => ?_⟩
+  have hm : m ≠ 0 := by
+    rintro rfl
+    rw [zero_dvd_iff] at mdvd
+    exact mlt.ne' mdvd
+  exact (h m mlt hm).symm.eq_one_of_dvd mdvd
 
 section
 
@@ -167,10 +175,6 @@ decreasing_by simp_wf; apply minFac_lemma n k; assumption
 
 def minFac (n : ℕ) : ℕ :=
   if 2 ∣ n then 2 else minFacAux n 3
-
-@[simp]
-theorem minFac_zero : minFac 0 = 2 :=
-  rfl
 
 @[simp]
 theorem minFac_one : minFac 1 = 1 := by

@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/OuterMeasure/Induced.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Caratheodory
+
+noncomputable section
 
 /-!
 # Induced Outer Measure
@@ -46,7 +48,15 @@ theorem extend_eq {s : α} (h : P s) : extend m s = m s h := by simp [extend, h]
 
 theorem extend_eq_top {s : α} (h : ¬P s) : extend m s = ∞ := by simp [extend, h]
 
--- DISSOLVED: smul_extend
+theorem smul_extend {R} [Zero R] [SMulWithZero R ℝ≥0∞] [IsScalarTower R ℝ≥0∞ ℝ≥0∞]
+    [NoZeroSMulDivisors R ℝ≥0∞] {c : R} (hc : c ≠ 0) :
+    c • extend m = extend fun s h => c • m s h := by
+  classical
+  ext1 s
+  dsimp [extend]
+  by_cases h : P s
+  · simp [h]
+  · simp [h, ENNReal.smul_top, hc]
 
 theorem le_extend {s : α} (h : P s) : m s h ≤ extend m s := by
   simp only [extend, le_iInf_iff]
@@ -92,14 +102,12 @@ theorem extend_iUnion_nat {f : ℕ → Set α} (hm : ∀ i, P (f i))
       rw [extend_eq]
 
 include P0 m0 in
-
 theorem extend_empty : extend m ∅ = 0 :=
   (extend_eq _ P0).trans m0
 
 section Subadditive
 
 include PU msU in
-
 theorem extend_iUnion_le_tsum_nat' (s : ℕ → Set α) :
     extend m (⋃ i, s i) ≤ ∑' i, extend m (s i) := by
   by_cases h : ∀ i, P (s i)
@@ -115,7 +123,6 @@ end Subadditive
 section Mono
 
 include m_mono in
-
 theorem extend_mono' ⦃s₁ s₂ : Set α⦄ (h₁ : P s₁) (hs : s₁ ⊆ s₂) : extend m s₁ ≤ extend m s₂ := by
   refine le_iInf ?_
   intro h₂
@@ -127,7 +134,6 @@ end Mono
 section Unions
 
 include P0 m0 PU mU in
-
 theorem extend_iUnion {β} [Countable β] {f : β → Set α} (hd : Pairwise (Disjoint on f))
     (hm : ∀ i, P (f i)) : extend m (⋃ i, f i) = ∑' i, extend m (f i) := by
   cases nonempty_encodable β
@@ -138,7 +144,6 @@ theorem extend_iUnion {β} [Countable β] {f : β → Set α} (hd : Pairwise (Di
   · exact extend_empty P0 m0
 
 include P0 m0 PU mU in
-
 theorem extend_union {s₁ s₂ : Set α} (hd : Disjoint s₁ s₂) (h₁ : P s₁) (h₂ : P s₂) :
     extend m (s₁ ∪ s₂) = extend m s₁ + extend m s₂ := by
   rw [union_eq_iUnion,
@@ -199,7 +204,18 @@ theorem inducedOuterMeasure_preimage (f : α ≃ α) (Pm : ∀ s : Set α, P (f 
     refine iInf_congr_Prop f.surjective.preimage_subset_preimage_iff ?_
     intro _; exact mm s hs
 
--- DISSOLVED: inducedOuterMeasure_exists_set
+theorem inducedOuterMeasure_exists_set {s : Set α} (hs : inducedOuterMeasure m P0 m0 s ≠ ∞)
+    {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ t : Set α,
+      P t ∧ s ⊆ t ∧ inducedOuterMeasure m P0 m0 t ≤ inducedOuterMeasure m P0 m0 s + ε := by
+  have h := ENNReal.lt_add_right hs hε
+  conv at h =>
+    lhs
+    rw [inducedOuterMeasure_eq_iInf _ msU m_mono]
+  simp only [iInf_lt_iff] at h
+  rcases h with ⟨t, h1t, h2t, h3t⟩
+  exact
+    ⟨t, h1t, h2t, le_trans (le_of_eq <| inducedOuterMeasure_eq' _ msU m_mono h1t) (le_of_lt h3t)⟩
 
 theorem inducedOuterMeasure_caratheodory (s : Set α) :
     MeasurableSet[(inducedOuterMeasure m P0 m0).caratheodory] s ↔

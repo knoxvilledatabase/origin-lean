@@ -11,6 +11,8 @@ import Mathlib.GroupTheory.GroupAction.Defs
 import Mathlib.GroupTheory.GroupAction.DomAct.Basic
 import Mathlib.SetTheory.Cardinal.Finite
 
+noncomputable section
+
 /-!  Subgroup of `Equiv.Perm α` preserving a function
 
 Let `α` and `ι` by types and let `f : α → ι`
@@ -77,9 +79,6 @@ def stabilizerMulEquiv : (stabilizer (Perm α)ᵈᵐᵃ f)ᵐᵒᵖ ≃* (∀ i,
 
 variable {f}
 
-lemma stabilizerMulEquiv_apply (g : (stabilizer (Perm α)ᵈᵐᵃ f)ᵐᵒᵖ) {a : α} {i : ι} (h : f a = i) :
-    ((stabilizerMulEquiv f)) g i ⟨a, h⟩ = (mk.symm g.unop : Equiv.Perm α) a := rfl
-
 section Fintype
 
 variable [Fintype α]
@@ -99,6 +98,7 @@ theorem stabilizer_card [DecidableEq α] [DecidableEq ι] [Fintype ι] :
   · rfl
 
 omit [Fintype α] in
+/-- The cardinality of the set of permutations preserving a function -/
 
 theorem stabilizer_ncard [Finite α] [Fintype ι] :
     Set.ncard {g : Perm α | f ∘ g = f} = ∏ i, (Set.ncard {a | f a = i})! := by

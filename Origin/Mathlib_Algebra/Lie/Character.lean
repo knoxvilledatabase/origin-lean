@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Abelian
 import Mathlib.Algebra.Lie.Solvable
 import Mathlib.LinearAlgebra.Dual
 
+noncomputable section
+
 /-!
 # Characters of Lie algebras
 

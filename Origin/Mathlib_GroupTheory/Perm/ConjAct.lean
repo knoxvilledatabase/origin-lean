@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.Perm.Cycle.Basic
 import Mathlib.GroupTheory.Perm.Cycle.Factors
 import Mathlib.GroupTheory.Perm.Support
 
+noncomputable section
+
 /-! # Some lemmas pertaining to the action of `ConjAct (Perm α)` on `Perm α`
 
 We prove some lemmas related to the action of `ConjAct (Perm α)` on `Perm α`:

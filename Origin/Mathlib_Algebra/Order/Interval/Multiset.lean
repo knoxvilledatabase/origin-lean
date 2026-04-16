@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Interval.Finset
 import Mathlib.Order.Interval.Multiset
 
+noncomputable section
+
 /-!
 # Algebraic properties of multiset intervals
 

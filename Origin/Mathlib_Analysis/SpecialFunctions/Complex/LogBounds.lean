@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.Convex
 import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.Analysis.Calculus.Deriv.Shift
 
+noncomputable section
+
 /-!
 # Estimates for the complex logarithm
 
@@ -54,7 +56,6 @@ lemma log_inv_eq_integral {z : ℂ} (hz : 1 - z ∈ slitPlane) :
 -/
 
 noncomputable
-
 def logTaylor (n : ℕ) : ℂ → ℂ := fun z ↦ ∑ j ∈ Finset.range n, (-1) ^ (j + 1) * z ^ j / j
 
 lemma logTaylor_zero : logTaylor 0 = fun _ ↦ 0 := by

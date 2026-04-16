@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/EuclideanDomain/Basic.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 6 | Infrastructure: 3
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.EuclideanDomain.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Ring.Divisibility.Basic
 import Mathlib.Algebra.Ring.Regular
 import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Algebra.Ring.Basic
+
+noncomputable section
 
 /-!
 # Lemmas about Euclidean domains
@@ -62,13 +64,20 @@ theorem mod_one (a : R) : a % 1 = 0 :=
 theorem zero_mod (b : R) : 0 % b = 0 :=
   mod_eq_zero.2 (dvd_zero _)
 
--- DISSOLVED: zero_div
+@[simp]
+theorem zero_div {a : R} : 0 / a = 0 :=
+  by_cases (fun a0 : a = 0 => a0.symm ▸ div_zero 0) fun a0 => by
+    simpa only [zero_mul] using mul_div_cancel_right₀ 0 a0
 
--- DISSOLVED: div_self
+@[simp]
+theorem div_self {a : R} (a0 : a ≠ 0) : a / a = 1 := by
+  simpa only [one_mul] using mul_div_cancel_right₀ 1 a0
 
--- DISSOLVED: eq_div_of_mul_eq_left
+theorem eq_div_of_mul_eq_left {a b c : R} (hb : b ≠ 0) (h : a * b = c) : a = c / b := by
+  rw [← h, mul_div_cancel_right₀ _ hb]
 
--- DISSOLVED: eq_div_of_mul_eq_right
+theorem eq_div_of_mul_eq_right {a b c : R} (ha : a ≠ 0) (h : a * b = c) : b = c / a := by
+  rw [← h, mul_div_cancel_left₀ _ ha]
 
 theorem mul_div_assoc (x : R) {y z : R} (h : z ∣ y) : x * y / z = x * (y / z) := by
   by_cases hz : z = 0
@@ -77,7 +86,8 @@ theorem mul_div_assoc (x : R) {y z : R} (h : z ∣ y) : x * y / z = x * (y / z) 
   rcases h with ⟨p, rfl⟩
   rw [mul_div_cancel_left₀ _ hz, mul_left_comm, mul_div_cancel_left₀ _ hz]
 
--- DISSOLVED: mul_div_cancel'
+protected theorem mul_div_cancel' {a b : R} (hb : b ≠ 0) (hab : b ∣ a) : b * (a / b) = a := by
+  rw [← mul_div_assoc _ hab, mul_div_cancel_left₀ _ hb]
 
 @[simp]
 theorem div_one (p : R) : p / 1 = p :=
@@ -281,7 +291,11 @@ end LCM
 
 section Div
 
--- DISSOLVED: mul_div_mul_cancel
+theorem mul_div_mul_cancel {a b c : R} (ha : a ≠ 0) (hcb : c ∣ b) : a * b / (a * c) = b / c := by
+  by_cases hc : c = 0; · simp [hc]
+  refine eq_div_of_mul_eq_right hc (mul_left_cancel₀ ha ?_)
+  rw [← mul_assoc, ← mul_div_assoc _ (mul_dvd_mul_left a hcb),
+    mul_div_cancel_left₀ _ (mul_ne_zero ha hc)]
 
 theorem mul_div_mul_comm_of_dvd_dvd {a b c d : R} (hac : c ∣ a) (hbd : d ∣ b) :
     a * b / (c * d) = a / c * (b / d) := by

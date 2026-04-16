@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.Linear
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Chain homotopies
 
@@ -35,11 +37,6 @@ def dNext (i : ι) : (∀ i j, C.X i ⟶ D.X j) →+ (C.X i ⟶ D.X i) :=
 
 def fromNext (i : ι) : (∀ i j, C.X i ⟶ D.X j) →+ (C.xNext i ⟶ D.X i) :=
   AddMonoidHom.mk' (fun f => f (c.next i) i) fun _ _ => rfl
-
-@[simp]
-theorem dNext_eq_dFrom_fromNext (f : ∀ i j, C.X i ⟶ D.X j) (i : ι) :
-    dNext i f = C.dFrom i ≫ fromNext i f :=
-  rfl
 
 theorem dNext_eq (f : ∀ i j, C.X i ⟶ D.X j) {i i' : ι} (w : c.Rel i i') :
     dNext i f = C.d i i' ≫ f i' i := by
@@ -72,11 +69,6 @@ lemma prevD_eq_zero (f : ∀ i j, C.X i ⟶ D.X j) (i : ι) (hi : ¬ c.Rel (c.pr
 
 def toPrev (j : ι) : (∀ i j, C.X i ⟶ D.X j) →+ (C.X j ⟶ D.xPrev j) :=
   AddMonoidHom.mk' (fun f => f j (c.prev j)) fun _ _ => rfl
-
-@[simp]
-theorem prevD_eq_toPrev_dTo (f : ∀ i j, C.X i ⟶ D.X j) (j : ι) :
-    prevD j f = toPrev j f ≫ D.dTo j :=
-  rfl
 
 theorem prevD_eq (f : ∀ i j, C.X i ⟶ D.X j) {j j' : ι} (w : c.Rel j' j) :
     prevD j f = f j j' ≫ D.d j' j := by
@@ -439,18 +431,6 @@ def mkInductiveAux₂ :
       one comm_one succ n
     ⟨(P.xNextIso rfl).hom ≫ I.1, I.2.1 ≫ (Q.xPrevIso rfl).inv, by simpa using I.2.2⟩
 
-@[simp] theorem mkInductiveAux₂_zero :
-    mkInductiveAux₂ e zero comm_zero one comm_one succ 0 =
-      ⟨0, zero ≫ (Q.xPrevIso rfl).inv, mkInductiveAux₂.proof_2 e zero comm_zero⟩ :=
-  rfl
-
-@[simp] theorem mkInductiveAux₂_add_one (n) :
-    mkInductiveAux₂ e zero comm_zero one comm_one succ (n + 1) =
-      let I := mkInductiveAux₁ e zero one comm_one succ n
-      ⟨(P.xNextIso rfl).hom ≫ I.1, I.2.1 ≫ (Q.xPrevIso rfl).inv,
-        mkInductiveAux₂.proof_5 e zero one comm_one succ n⟩ :=
-  rfl
-
 theorem mkInductiveAux₃ (i j : ℕ) (h : i + 1 = j) :
     (mkInductiveAux₂ e zero comm_zero one comm_one succ i).2.1 ≫ (Q.xPrevIso h).hom =
       (P.xNextIso h).inv ≫ (mkInductiveAux₂ e zero comm_zero one comm_one succ j).1 := by
@@ -542,18 +522,6 @@ def mkCoinductiveAux₂ :
   | n + 1 =>
     let I := mkCoinductiveAux₁ e zero one comm_one succ n
     ⟨I.1 ≫ (Q.xPrevIso rfl).inv, (P.xNextIso rfl).hom ≫ I.2.1, by simpa using I.2.2⟩
-
-@[simp] theorem mkCoinductiveAux₂_zero :
-    mkCoinductiveAux₂ e zero comm_zero one comm_one succ 0 =
-      ⟨0, (P.xNextIso rfl).hom ≫ zero, mkCoinductiveAux₂.proof_2 e zero comm_zero⟩ :=
-  rfl
-
-@[simp] theorem mkCoinductiveAux₂_add_one (n) :
-    mkCoinductiveAux₂ e zero comm_zero one comm_one succ (n + 1) =
-      let I := mkCoinductiveAux₁ e zero one comm_one succ n
-      ⟨I.1 ≫ (Q.xPrevIso rfl).inv, (P.xNextIso rfl).hom ≫ I.2.1,
-        mkCoinductiveAux₂.proof_5 e zero one comm_one succ n⟩ :=
-  rfl
 
 theorem mkCoinductiveAux₃ (i j : ℕ) (h : i + 1 = j) :
     (P.xNextIso h).inv ≫ (mkCoinductiveAux₂ e zero comm_zero one comm_one succ i).2.1 =

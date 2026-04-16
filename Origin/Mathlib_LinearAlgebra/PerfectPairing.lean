@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/PerfectPairing.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dual
 import Mathlib.LinearAlgebra.Matrix.Basis
 import Mathlib.LinearAlgebra.Matrix.BaseChange
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
+
+noncomputable section
 
 /-!
 # Perfect pairings of modules
@@ -92,10 +94,6 @@ protected def flip : PerfectPairing R N M where
   bijectiveRight := p.bijectiveLeft
 
 @[simp]
-lemma flip_apply_apply {x : M} {y : N} : p.flip y x = p x y :=
-  rfl
-
-@[simp]
 lemma flip_flip : p.flip.flip = p :=
   rfl
 
@@ -148,19 +146,16 @@ theorem bijective_toDualRight_symm_toDualLeft :
     (LinearEquiv.bijective p.toDualLeft)
 
 include p in
-
 theorem reflexive_left : IsReflexive R M where
   bijective_dual_eval' := by
     rw [← p.toDualRight_symm_comp_toDualLeft]
     exact p.bijective_toDualRight_symm_toDualLeft
 
 include p in
-
 theorem reflexive_right : IsReflexive R N :=
   p.flip.reflexive_left
 
 include p in
-
 theorem finrank_eq [Module.Finite R M] [Module.Free R M] :
     finrank R M = finrank R N :=
   ((Module.Free.chooseBasis R M).toDualEquiv.trans p.toDualRight.symm).finrank_eq
@@ -353,11 +348,6 @@ def IsReflexive.toPerfectPairingDual : PerfectPairing R (Dual R M) M where
   bijectiveLeft := bijective_id
   bijectiveRight := bijective_dual_eval R M
 
-@[simp]
-lemma IsReflexive.toPerfectPairingDual_apply {f : Dual R M} {x : M} :
-    IsReflexive.toPerfectPairingDual (R := R) f x = f x :=
-  rfl
-
 variable (e : N ≃ₗ[R] Dual R M)
 
 namespace LinearEquiv
@@ -367,14 +357,13 @@ def flip : M ≃ₗ[R] Dual R N :=
 
 @[simp] lemma coe_toLinearMap_flip : e.flip = (↑e : N →ₗ[R] Dual R M).flip := rfl
 
-@[simp] lemma flip_apply (m : M) (n : N) : e.flip m n = e n m := rfl
-
 lemma symm_flip : e.flip.symm = e.symm.dualMap.trans (evalEquiv R M).symm := rfl
 
 lemma trans_dualMap_symm_flip : e.trans e.flip.symm.dualMap = Dual.eval R N := by
   ext; simp [symm_flip]
 
 include e in
+/-- If `N` is in perfect pairing with `M`, then it is reflexive. -/
 
 lemma isReflexive_of_equiv_dual_of_isReflexive : IsReflexive R N := by
   constructor

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ExactSequence
 import Mathlib.Algebra.Homology.ShortComplex.Limits
 import Mathlib.CategoryTheory.Abelian.Refinements
 
+noncomputable section
+
 /-!
 # The snake lemma
 
@@ -401,25 +403,9 @@ instance : Category (SnakeInput C) where
 
 variable {S₁ S₂ S₃}
 
-@[simp] lemma id_f₀ : Hom.f₀ (𝟙 S) = 𝟙 _ := rfl
-
-@[simp] lemma id_f₁ : Hom.f₁ (𝟙 S) = 𝟙 _ := rfl
-
-@[simp] lemma id_f₂ : Hom.f₂ (𝟙 S) = 𝟙 _ := rfl
-
-@[simp] lemma id_f₃ : Hom.f₃ (𝟙 S) = 𝟙 _ := rfl
-
 section
 
 variable (f : S₁ ⟶ S₂) (g : S₂ ⟶ S₃)
-
-@[simp, reassoc] lemma comp_f₀ : (f ≫ g).f₀ = f.f₀ ≫ g.f₀ := rfl
-
-@[simp, reassoc] lemma comp_f₁ : (f ≫ g).f₁ = f.f₁ ≫ g.f₁ := rfl
-
-@[simp, reassoc] lemma comp_f₂ : (f ≫ g).f₂ = f.f₂ ≫ g.f₂ := rfl
-
-@[simp, reassoc] lemma comp_f₃ : (f ≫ g).f₃ = f.f₃ ≫ g.f₃ := rfl
 
 end
 

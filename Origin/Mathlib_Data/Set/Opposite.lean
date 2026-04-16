@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Opposite
 import Mathlib.Data.Set.Operations
 
+noncomputable section
+
 /-!
 # The opposite of a set
 
@@ -23,20 +25,6 @@ protected def op (s : Set α) : Set αᵒᵖ :=
 
 protected def unop (s : Set αᵒᵖ) : Set α :=
   op ⁻¹' s
-
-@[simp]
-theorem mem_op {s : Set α} {a : αᵒᵖ} : a ∈ s.op ↔ unop a ∈ s :=
-  Iff.rfl
-
-@[simp 1100]
-theorem op_mem_op {s : Set α} {a : α} : op a ∈ s.op ↔ a ∈ s := by rfl
-
-@[simp]
-theorem mem_unop {s : Set αᵒᵖ} {a : α} : a ∈ s.unop ↔ op a ∈ s :=
-  Iff.rfl
-
-@[simp 1100]
-theorem unop_mem_unop {s : Set αᵒᵖ} {a : αᵒᵖ} : unop a ∈ s.unop ↔ a ∈ s := by rfl
 
 @[simp]
 theorem op_unop (s : Set α) : s.op.unop = s := rfl

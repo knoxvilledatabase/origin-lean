@@ -1,12 +1,14 @@
 /-
 Extracted from Order/UpperLower/Basic.lean
-Genuine: 307 | Conflates: 0 | Dissolved: 0 | Infrastructure: 92
+Genuine: 309 | Conflates: 0 | Dissolved: 0 | Infrastructure: 92
 -/
 import Origin.Core
 import Mathlib.Data.SetLike.Basic
 import Mathlib.Data.Set.Lattice
 import Mathlib.Order.Interval.Set.OrdConnected
 import Mathlib.Order.Interval.Set.OrderIso
+
+noncomputable section
 
 /-!
 # Up-sets and down-sets
@@ -245,16 +247,8 @@ theorem OrderEmbedding.image_Iio (e : α ↪o β) (he : IsLowerSet (range e)) (a
   e.dual.image_Ioi he a
 
 @[simp]
-theorem Set.monotone_mem : Monotone (· ∈ s) ↔ IsUpperSet s :=
-  Iff.rfl
-
-@[simp]
 theorem Set.antitone_mem : Antitone (· ∈ s) ↔ IsLowerSet s :=
   forall_swap
-
-@[simp]
-theorem isUpperSet_setOf : IsUpperSet { a | p a } ↔ Monotone p :=
-  Iff.rfl
 
 @[simp]
 theorem isLowerSet_setOf : IsLowerSet { a | p a } ↔ Antitone p :=
@@ -434,15 +428,7 @@ initialize_simps_projections UpperSet (carrier → coe)
 theorem ext {s t : UpperSet α} : (s : Set α) = t → s = t :=
   SetLike.ext'
 
-@[simp]
-theorem carrier_eq_coe (s : UpperSet α) : s.carrier = s :=
-  rfl
-
 @[simp] protected lemma upper (s : UpperSet α) : IsUpperSet (s : Set α) := s.upper'
-
-@[simp, norm_cast] lemma coe_mk (s : Set α) (hs) : mk s hs = s := rfl
-
-@[simp] lemma mem_mk {s : Set α} (hs) {a : α} : a ∈ mk s hs ↔ a ∈ s := Iff.rfl
 
 end UpperSet
 
@@ -460,15 +446,7 @@ initialize_simps_projections LowerSet (carrier → coe)
 theorem ext {s t : LowerSet α} : (s : Set α) = t → s = t :=
   SetLike.ext'
 
-@[simp]
-theorem carrier_eq_coe (s : LowerSet α) : s.carrier = s :=
-  rfl
-
 @[simp] protected lemma lower (s : LowerSet α) : IsLowerSet (s : Set α) := s.lower'
-
-@[simp, norm_cast] lemma coe_mk (s : Set α) (hs) : mk s hs = s := rfl
-
-@[simp] lemma mem_mk {s : Set α} (hs) {a : α} : a ∈ mk s hs ↔ a ∈ s := Iff.rfl
 
 end LowerSet
 
@@ -512,16 +490,6 @@ instance : Inhabited (UpperSet α) :=
 theorem coe_subset_coe : (s : Set α) ⊆ t ↔ t ≤ s :=
   Iff.rfl
 
-@[simp 1100, norm_cast] lemma coe_ssubset_coe : (s : Set α) ⊂ t ↔ t < s := Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_top : ((⊤ : UpperSet α) : Set α) = ∅ :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_bot : ((⊥ : UpperSet α) : Set α) = univ :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_eq_univ : (s : Set α) = univ ↔ s = ⊥ := by simp [SetLike.ext'_iff]
 
@@ -530,14 +498,6 @@ theorem coe_eq_empty : (s : Set α) = ∅ ↔ s = ⊤ := by simp [SetLike.ext'_i
 
 @[simp, norm_cast] lemma coe_nonempty : (s : Set α).Nonempty ↔ s ≠ ⊤ :=
   nonempty_iff_ne_empty.trans coe_eq_empty.not
-
-@[simp, norm_cast]
-theorem coe_sup (s t : UpperSet α) : (↑(s ⊔ t) : Set α) = (s : Set α) ∩ t :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inf (s t : UpperSet α) : (↑(s ⊓ t) : Set α) = (s : Set α) ∪ t :=
-  rfl
 
 @[simp, norm_cast]
 theorem coe_sSup (S : Set (UpperSet α)) : (↑(sSup S) : Set α) = ⋂ s ∈ S, ↑s :=
@@ -568,14 +528,6 @@ theorem not_mem_top : a ∉ (⊤ : UpperSet α) :=
 @[simp]
 theorem mem_bot : a ∈ (⊥ : UpperSet α) :=
   trivial
-
-@[simp]
-theorem mem_sup_iff : a ∈ s ⊔ t ↔ a ∈ s ∧ a ∈ t :=
-  Iff.rfl
-
-@[simp]
-theorem mem_inf_iff : a ∈ s ⊓ t ↔ a ∈ s ∨ a ∈ t :=
-  Iff.rfl
 
 @[simp]
 theorem mem_sSup_iff : a ∈ sSup S ↔ ∀ s ∈ S, a ∈ s :=
@@ -642,16 +594,6 @@ instance : Inhabited (LowerSet α) :=
 
 @[norm_cast] lemma coe_subset_coe : (s : Set α) ⊆ t ↔ s ≤ t := Iff.rfl
 
-@[norm_cast] lemma coe_ssubset_coe : (s : Set α) ⊂ t ↔ s < t := Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_top : ((⊤ : LowerSet α) : Set α) = univ :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_bot : ((⊥ : LowerSet α) : Set α) = ∅ :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_eq_univ : (s : Set α) = univ ↔ s = ⊤ := by simp [SetLike.ext'_iff]
 
@@ -660,14 +602,6 @@ theorem coe_eq_empty : (s : Set α) = ∅ ↔ s = ⊥ := by simp [SetLike.ext'_i
 
 @[simp, norm_cast] lemma coe_nonempty : (s : Set α).Nonempty ↔ s ≠ ⊥ :=
   nonempty_iff_ne_empty.trans coe_eq_empty.not
-
-@[simp, norm_cast]
-theorem coe_sup (s t : LowerSet α) : (↑(s ⊔ t) : Set α) = (s : Set α) ∪ t :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inf (s t : LowerSet α) : (↑(s ⊓ t) : Set α) = (s : Set α) ∩ t :=
-  rfl
 
 @[simp, norm_cast]
 theorem coe_sSup (S : Set (LowerSet α)) : (↑(sSup S) : Set α) = ⋃ s ∈ S, ↑s :=
@@ -700,14 +634,6 @@ theorem mem_top : a ∈ (⊤ : LowerSet α) :=
 @[simp]
 theorem not_mem_bot : a ∉ (⊥ : LowerSet α) :=
   id
-
-@[simp]
-theorem mem_sup_iff : a ∈ s ⊔ t ↔ a ∈ s ∨ a ∈ t :=
-  Iff.rfl
-
-@[simp]
-theorem mem_inf_iff : a ∈ s ⊓ t ↔ a ∈ s ∧ a ∈ t :=
-  Iff.rfl
 
 @[simp]
 theorem mem_sSup_iff : a ∈ sSup S ↔ ∃ s ∈ S, a ∈ s :=
@@ -754,10 +680,6 @@ variable {s t : UpperSet α} {a : α}
 @[simp]
 theorem coe_compl (s : UpperSet α) : (s.compl : Set α) = (↑s)ᶜ :=
   rfl
-
-@[simp]
-theorem mem_compl_iff : a ∈ s.compl ↔ a ∉ s :=
-  Iff.rfl
 
 @[simp]
 nonrec theorem compl_compl (s : UpperSet α) : s.compl.compl = s :=
@@ -814,10 +736,6 @@ variable {s t : LowerSet α} {a : α}
 @[simp]
 theorem coe_compl (s : LowerSet α) : (s.compl : Set α) = (↑s)ᶜ :=
   rfl
-
-@[simp]
-theorem mem_compl_iff : a ∈ s.compl ↔ a ∉ s :=
-  Iff.rfl
 
 @[simp]
 nonrec theorem compl_compl (s : LowerSet α) : s.compl.compl = s :=
@@ -931,10 +849,6 @@ theorem map_map (g : β ≃o γ) (f : α ≃o β) : map g (map f s) = map (f.tra
 
 variable (f s t)
 
-@[simp, norm_cast]
-theorem coe_map : (map f s : Set β) = f '' s :=
-  rfl
-
 end UpperSet
 
 namespace LowerSet
@@ -968,10 +882,6 @@ theorem map_map (g : β ≃o γ) (f : α ≃o β) : map g (map f s) = map (f.tra
   simp
 
 variable (f s t)
-
-@[simp, norm_cast]
-theorem coe_map : (map f s : Set β) = f '' s :=
-  rfl
 
 end LowerSet
 
@@ -1008,19 +918,7 @@ nonrec def Ioi (a : α) : UpperSet α :=
   ⟨Ioi a, isUpperSet_Ioi a⟩
 
 @[simp]
-theorem coe_Ici (a : α) : ↑(Ici a) = Set.Ici a :=
-  rfl
-
-@[simp]
-theorem coe_Ioi (a : α) : ↑(Ioi a) = Set.Ioi a :=
-  rfl
-
-@[simp]
 theorem mem_Ici_iff : b ∈ Ici a ↔ a ≤ b :=
-  Iff.rfl
-
-@[simp]
-theorem mem_Ioi_iff : b ∈ Ioi a ↔ a < b :=
   Iff.rfl
 
 @[simp]
@@ -1101,19 +999,7 @@ nonrec def Iio (a : α) : LowerSet α :=
   ⟨Iio a, isLowerSet_Iio a⟩
 
 @[simp]
-theorem coe_Iic (a : α) : ↑(Iic a) = Set.Iic a :=
-  rfl
-
-@[simp]
-theorem coe_Iio (a : α) : ↑(Iio a) = Set.Iio a :=
-  rfl
-
-@[simp]
 theorem mem_Iic_iff : b ∈ Iic a ↔ b ≤ a :=
-  Iff.rfl
-
-@[simp]
-theorem mem_Iio_iff : b ∈ Iio a ↔ b < a :=
   Iff.rfl
 
 @[simp]
@@ -1193,10 +1079,6 @@ def lowerClosure (s : Set α) : LowerSet α :=
 
 @[simp]
 theorem mem_upperClosure : x ∈ upperClosure s ↔ ∃ a ∈ s, a ≤ x :=
-  Iff.rfl
-
-@[simp]
-theorem mem_lowerClosure : x ∈ lowerClosure s ↔ ∃ a ∈ s, x ≤ a :=
   Iff.rfl
 
 @[norm_cast]
@@ -1428,12 +1310,6 @@ def erase (s : LowerSet α) (a : α) : LowerSet α where
   carrier := s \ UpperSet.Ici a
   lower' := s.lower.sdiff_of_isUpperSet (UpperSet.Ici a).upper
 
-@[simp, norm_cast]
-lemma coe_sdiff (s : LowerSet α) (t : Set α) : s.sdiff t = (s : Set α) \ upperClosure t := rfl
-
-@[simp, norm_cast]
-lemma coe_erase (s : LowerSet α) (a : α) : s.erase a = (s : Set α) \ UpperSet.Ici a := rfl
-
 @[simp] lemma sdiff_singleton (s : LowerSet α) (a : α) : s.sdiff {a} = s.erase a := by
   simp [sdiff, erase]
 
@@ -1488,12 +1364,6 @@ def sdiff (s : UpperSet α) (t : Set α) : UpperSet α where
 def erase (s : UpperSet α) (a : α) : UpperSet α where
   carrier := s \ LowerSet.Iic a
   upper' := s.upper.sdiff_of_isLowerSet (LowerSet.Iic a).lower
-
-@[simp, norm_cast]
-lemma coe_sdiff (s : UpperSet α) (t : Set α) : s.sdiff t = (s : Set α) \ lowerClosure t := rfl
-
-@[simp, norm_cast]
-lemma coe_erase (s : UpperSet α) (a : α) : s.erase a = (s : Set α) \ LowerSet.Iic a := rfl
 
 @[simp] lemma sdiff_singleton (s : UpperSet α) (a : α) : s.sdiff {a} = s.erase a := by
   simp [sdiff, erase]
@@ -1565,21 +1435,6 @@ def prod : UpperSet (α × β) :=
 
 instance instSProd : SProd (UpperSet α) (UpperSet β) (UpperSet (α × β)) where
   sprod := UpperSet.prod
-
-@[simp, norm_cast]
-theorem coe_prod : ((s ×ˢ t : UpperSet (α × β)) : Set (α × β)) = (s : Set α) ×ˢ t :=
-  rfl
-
-@[simp]
-theorem mem_prod {s : UpperSet α} {t : UpperSet β} : x ∈ s ×ˢ t ↔ x.1 ∈ s ∧ x.2 ∈ t :=
-  Iff.rfl
-
-theorem Ici_prod (x : α × β) : Ici x = Ici x.1 ×ˢ Ici x.2 :=
-  rfl
-
-@[simp]
-theorem Ici_prod_Ici (a : α) (b : β) : Ici a ×ˢ Ici b = Ici (a, b) :=
-  rfl
 
 @[simp]
 theorem prod_top : s ×ˢ (⊤ : UpperSet β) = ⊤ :=
@@ -1655,20 +1510,6 @@ def prod : LowerSet (α × β) := ⟨s ×ˢ t, s.2.prod t.2⟩
 
 instance instSProd : SProd (LowerSet α) (LowerSet β) (LowerSet (α × β)) where
   sprod := LowerSet.prod
-
-@[simp, norm_cast]
-theorem coe_prod : ((s ×ˢ t : LowerSet (α × β)) : Set (α × β)) = (s : Set α) ×ˢ t := rfl
-
-@[simp]
-theorem mem_prod {s : LowerSet α} {t : LowerSet β} : x ∈ s ×ˢ t ↔ x.1 ∈ s ∧ x.2 ∈ t :=
-  Iff.rfl
-
-theorem Iic_prod (x : α × β) : Iic x = Iic x.1 ×ˢ Iic x.2 :=
-  rfl
-
-@[simp]
-theorem Ici_prod_Ici (a : α) (b : β) : Iic a ×ˢ Iic b = Iic (a, b) :=
-  rfl
 
 @[simp]
 theorem prod_bot : s ×ˢ (⊥ : LowerSet β) = ⊥ :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Cover
 import Mathlib.Order.Interval.Finset.Defs
 
+noncomputable section
+
 /-!
 # Intervals as finsets
 
@@ -820,9 +822,6 @@ end DistribLattice
 section LinearOrder
 
 variable [LinearOrder α] [LocallyFiniteOrder α] {a a₁ a₂ b b₁ b₂ c : α}
-
-theorem Icc_min_max : Icc (min a b) (max a b) = [[a, b]] :=
-  rfl
 
 theorem uIcc_of_not_le (h : ¬a ≤ b) : [[a, b]] = Icc b a :=
   uIcc_of_ge <| le_of_not_ge h

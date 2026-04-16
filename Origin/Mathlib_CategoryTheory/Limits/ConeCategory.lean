@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
 import Mathlib.CategoryTheory.Limits.Shapes.Equivalence
 
+noncomputable section
+
 /-!
 # Limits and the category of (co)cones
 
@@ -59,20 +61,10 @@ def Cone.toStructuredArrowCompProj {F : J ⥤ C} (c : Cone F) :
     c.toStructuredArrow ⋙ StructuredArrow.proj _ _ ≅ 𝟭 J :=
   Iso.refl _
 
-@[simp]
-lemma Cone.toStructuredArrow_comp_proj {F : J ⥤ C} (c : Cone F) :
-    c.toStructuredArrow ⋙ StructuredArrow.proj _ _ = 𝟭 J :=
-  rfl
-
 @[simps!]
 def Cone.toStructuredArrowCompToUnderCompForget {F : J ⥤ C} (c : Cone F) :
     c.toStructuredArrow ⋙ StructuredArrow.toUnder _ _ ⋙ Under.forget _ ≅ F :=
   Iso.refl _
-
-@[simp]
-lemma Cone.toStructuredArrow_comp_toUnder_comp_forget {F : J ⥤ C} (c : Cone F) :
-    c.toStructuredArrow ⋙ StructuredArrow.toUnder _ _ ⋙ Under.forget _ = F :=
-  rfl
 
 @[simps]
 def Cone.toUnder {F : J ⥤ C} (c : Cone F) :
@@ -189,20 +181,10 @@ def Cocone.toCostructuredArrowCompProj {F : J ⥤ C} (c : Cocone F) :
     c.toCostructuredArrow ⋙ CostructuredArrow.proj _ _ ≅ 𝟭 J :=
   Iso.refl _
 
-@[simp]
-lemma Cocone.toCostructuredArrow_comp_proj {F : J ⥤ C} (c : Cocone F) :
-    c.toCostructuredArrow ⋙ CostructuredArrow.proj _ _ = 𝟭 J :=
-  rfl
-
 @[simps!]
 def Cocone.toCostructuredArrowCompToOverCompForget {F : J ⥤ C} (c : Cocone F) :
     c.toCostructuredArrow ⋙ CostructuredArrow.toOver _ _ ⋙ Over.forget _ ≅ F :=
   Iso.refl _
-
-@[simp]
-lemma Cocone.toCostructuredArrow_comp_toOver_comp_forget {F : J ⥤ C} (c : Cocone F) :
-    c.toCostructuredArrow ⋙ CostructuredArrow.toOver _ _ ⋙ Over.forget _ = F :=
-  rfl
 
 @[simps]
 def Cocone.toOver {F : J ⥤ C} (c : Cocone F) :

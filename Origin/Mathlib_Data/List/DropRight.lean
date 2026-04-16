@@ -5,6 +5,8 @@ Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.List.Basic
 
+noncomputable section
+
 /-!
 
 # Dropping or taking from lists on the right

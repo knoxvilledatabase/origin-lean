@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Module/Defs.lean
-Genuine: 131 | Conflates: 0 | Dissolved: 2 | Infrastructure: 39
+Genuine: 133 | Conflates: 0 | Dissolved: 0 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Algebra.NoZeroSMulDivisors.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Algebra.Order.GroupWithZero.Action.Synonym
 import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Positivity.Core
+
+noncomputable section
 
 /-!
 # Monotonicity of scalar multiplication by positive elements
@@ -1162,9 +1164,11 @@ section NoZeroSMulDivisors
 
 variable [Zero α] [Zero β] [SMul α β] [NoZeroSMulDivisors α β] {a : α} {b : β}
 
--- DISSOLVED: smul_ne_zero_of_pos_of_ne_zero
+private theorem smul_ne_zero_of_pos_of_ne_zero [Preorder α] (ha : 0 < a) (hb : b ≠ 0) : a • b ≠ 0 :=
+  smul_ne_zero ha.ne' hb
 
--- DISSOLVED: smul_ne_zero_of_ne_zero_of_pos
+private theorem smul_ne_zero_of_ne_zero_of_pos [Preorder β] (ha : a ≠ 0) (hb : 0 < b) : a • b ≠ 0 :=
+  smul_ne_zero ha hb.ne'
 
 end NoZeroSMulDivisors
 

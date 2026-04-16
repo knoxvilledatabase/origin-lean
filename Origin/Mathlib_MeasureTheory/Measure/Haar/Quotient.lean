@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Quotient.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Opposite
@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Constructions.Polish.Basic
 import Mathlib.MeasureTheory.Group.FundamentalDomain
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Measure.Haar.Basic
+
+noncomputable section
 
 /-!
 # Haar quotient measure
@@ -133,7 +135,37 @@ variable [Countable Γ] [IsMulRightInvariant ν] [SigmaFinite ν]
 
 local notation "π" => @QuotientGroup.mk G _ Γ
 
--- DISSOLVED: MeasureTheory.Measure.IsMulLeftInvariant.quotientMeasureEqMeasurePreimage_of_set
+@[to_additive
+"Assume that a measure `μ` is `IsAddLeftInvariant`, that the action of `Γ` on `G` has a
+measurable fundamental domain `s` with positive finite volume, and that there is a single measurable
+set `V ⊆ G ⧸ Γ` along which the pullback of `μ` and `ν` agree (so the scaling is right). Then
+`μ` satisfies `AddQuotientMeasureEqMeasurePreimage`. The main tool of the proof is the uniqueness of
+left invariant measures, if normalized by a single positive finite-measured set."]
+theorem MeasureTheory.Measure.IsMulLeftInvariant.quotientMeasureEqMeasurePreimage_of_set {s : Set G}
+    (fund_dom_s : IsFundamentalDomain Γ.op s ν) {V : Set (G ⧸ Γ)}
+    (meas_V : MeasurableSet V) (neZeroV : μ V ≠ 0) (hV : μ V = ν (π ⁻¹' V ∩ s))
+    (neTopV : μ V ≠ ⊤) : QuotientMeasureEqMeasurePreimage ν μ := by
+  apply fund_dom_s.quotientMeasureEqMeasurePreimage
+  ext U _
+  have meas_π : Measurable (QuotientGroup.mk : G → G ⧸ Γ) := continuous_quotient_mk'.measurable
+  let μ' : Measure (G ⧸ Γ) := (ν.restrict s).map π
+  haveI has_fund : HasFundamentalDomain Γ.op G ν := ⟨⟨s, fund_dom_s⟩⟩
+  have i : QuotientMeasureEqMeasurePreimage ν μ' :=
+    fund_dom_s.quotientMeasureEqMeasurePreimage_quotientMeasure
+  have : μ'.IsMulLeftInvariant :=
+    MeasureTheory.QuotientMeasureEqMeasurePreimage.mulInvariantMeasure_quotient ν
+  suffices μ = μ' by
+    rw [this]
+    rfl
+  have : SigmaFinite μ' := i.sigmaFiniteQuotient
+  rw [measure_eq_div_smul μ' μ neZeroV neTopV, hV]
+  symm
+  suffices (μ' V / ν (QuotientGroup.mk ⁻¹' V ∩ s)) = 1 by rw [this, one_smul]
+  rw [Measure.map_apply meas_π meas_V, Measure.restrict_apply]
+  · convert ENNReal.div_self ..
+    · exact trans hV.symm neZeroV
+    · exact trans hV.symm neTopV
+  exact measurableSet_quotient.mp meas_V
 
 @[to_additive "If a measure `μ` is
 left-invariant and satisfies the right scaling condition, then it satisfies

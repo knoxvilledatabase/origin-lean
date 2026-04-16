@@ -11,6 +11,8 @@ import Mathlib.Tactic.NormNum.Core
 import Mathlib.Util.DischargerAsTactic
 import Qq
 
+noncomputable section
+
 /-!
 # `field_simp` tactic
 
@@ -83,7 +85,6 @@ partial def discharge (prop : Expr) : SimpM (Option Expr) :=
 elab "field_simp_discharge" : tactic => wrapSimpDischarger Mathlib.Tactic.FieldSimp.discharge
 
 syntax (name := fieldSimp) "field_simp" optConfig (discharger)? (&" only")?
-
   (simpArgs)? (location)? : tactic
 
 elab_rules : tactic

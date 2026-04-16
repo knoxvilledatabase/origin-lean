@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupWithZero.Indicator
 import Mathlib.Tactic.FinCases
 import Mathlib.Topology.Sets.Closeds
 
+noncomputable section
+
 /-!
 # Locally constant functions
 
@@ -214,10 +216,6 @@ def Simps.apply (f : LocallyConstant X Y) : X → Y := f
 initialize_simps_projections LocallyConstant (toFun → apply)
 
 @[simp]
-theorem toFun_eq_coe (f : LocallyConstant X Y) : f.toFun = f :=
-  rfl
-
-@[simp]
 theorem coe_mk (f : X → Y) (h) : ⇑(⟨f, h⟩ : LocallyConstant X Y) = f :=
   rfl
 
@@ -250,8 +248,6 @@ protected theorem continuous : Continuous f :=
 
 instance : Coe (LocallyConstant X Y) C(X, Y) := ⟨toContinuousMap⟩
 
-@[simp] theorem coe_continuousMap : ((f : C(X, Y)) : X → Y) = (f : X → Y) := rfl
-
 theorem toContinuousMap_injective :
     Function.Injective (toContinuousMap : LocallyConstant X Y → C(X, Y)) := fun _ _ h =>
   ext (ContinuousMap.congr_fun h)
@@ -260,10 +256,6 @@ end CodomainTopologicalSpace
 
 def const (X : Type*) {Y : Type*} [TopologicalSpace X] (y : Y) : LocallyConstant X Y :=
   ⟨Function.const X y, IsLocallyConstant.const _⟩
-
-@[simp]
-theorem coe_const (y : Y) : (const X y : X → Y) = Function.const X y :=
-  rfl
 
 def ofIsClopen {X : Type*} [TopologicalSpace X] {U : Set X} [∀ x, Decidable (x ∈ U)]
     (hU : IsClopen U) : LocallyConstant X (Fin 2) where
@@ -324,17 +316,6 @@ theorem exists_eq_const [PreconnectedSpace X] [Nonempty Y] (f : LocallyConstant 
 def map (f : Y → Z) (g : LocallyConstant X Y) : LocallyConstant X Z :=
   ⟨f ∘ g, g.isLocallyConstant.comp f⟩
 
-@[simp]
-theorem map_apply (f : Y → Z) (g : LocallyConstant X Y) : ⇑(map f g) = f ∘ g :=
-  rfl
-
-@[simp]
-theorem map_id : @map X Y Y _ id = id := rfl
-
-@[simp]
-theorem map_comp {Y₁ Y₂ Y₃ : Type*} (g : Y₂ → Y₃) (f : Y₁ → Y₂) :
-    @map X _ _ _ g ∘ map f = map (g ∘ f) := rfl
-
 def flip {X α β : Type*} [TopologicalSpace X] (f : LocallyConstant X (α → β)) (a : α) :
     LocallyConstant X β :=
   f.map fun f => f a
@@ -348,14 +329,6 @@ def unflip {X α β : Type*} [Finite α] [TopologicalSpace X] (f : α → Locall
     rw [this]
     exact isOpen_iInter_of_finite fun a => (f a).isLocallyConstant _
 
-@[simp]
-theorem unflip_flip {X α β : Type*} [Finite α] [TopologicalSpace X]
-    (f : LocallyConstant X (α → β)) : unflip f.flip = f := rfl
-
-@[simp]
-theorem flip_unflip {X α β : Type*} [Finite α] [TopologicalSpace X]
-    (f : α → LocallyConstant X β) : (unflip f).flip = f := rfl
-
 section Comap
 
 variable [TopologicalSpace Y]
@@ -366,15 +339,6 @@ def comap (f : C(X, Y)) (g : LocallyConstant Y Z) : LocallyConstant X Z :=
 @[simp]
 theorem coe_comap (f : C(X, Y)) (g : LocallyConstant Y Z) :
     (comap f g) = g ∘ f := rfl
-
-theorem coe_comap_apply (f : C(X, Y)) (g : LocallyConstant Y Z) (x : X) :
-    comap f g x = g (f x) := rfl
-
-@[simp]
-theorem comap_id : comap (@ContinuousMap.id X _) = @id (LocallyConstant X Z) := rfl
-
-theorem comap_comp {W : Type*} [TopologicalSpace W] (f : C(W, X)) (g : C(X, Y)) :
-    comap (Z := Z) (g.comp f) = comap f ∘ comap g := rfl
 
 theorem comap_comap {W : Type*} [TopologicalSpace W] (f : C(W, X)) (g : C(X, Y))
     (x : LocallyConstant Y Z) : comap f (comap g x) = comap (g.comp f) x := rfl
@@ -398,12 +362,6 @@ def desc {X α β : Type*} [TopologicalSpace X] {g : α → β} (f : X → α) (
     (cond : g ∘ f = h) (inj : Function.Injective g) : LocallyConstant X α where
   toFun := f
   isLocallyConstant := IsLocallyConstant.desc _ g (cond.symm ▸ h.isLocallyConstant) inj
-
-@[simp]
-theorem coe_desc {X α β : Type*} [TopologicalSpace X] (f : X → α) (g : α → β)
-    (h : LocallyConstant X β) (cond : g ∘ f = h) (inj : Function.Injective g) :
-    ⇑(desc f h cond inj) = f :=
-  rfl
 
 end Desc
 
@@ -462,13 +420,6 @@ def congrRight (e : Y ≃ Z) : LocallyConstant X Y ≃ LocallyConstant X Z where
   right_inv := by intro; ext; simp
 
 variable (X) in
-
-def equivClopens [∀ (s : Set X) x, Decidable (x ∈ s)] :
-    LocallyConstant X (Fin 2) ≃ TopologicalSpace.Clopens X where
-  toFun f := ⟨f ⁻¹' {0}, f.2.isClopen_fiber _⟩
-  invFun s := ofIsClopen s.2
-  left_inv _ := locallyConstant_eq_of_fiber_zero_eq _ _ (by simp)
-  right_inv _ := by simp
 
 end Equiv
 

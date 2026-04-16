@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Lie/Weights/Basic.lean
-Genuine: 63 | Conflates: 4 | Dissolved: 2 | Infrastructure: 17
+Genuine: 64 | Conflates: 5 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Ring.Divisibility.Lemmas
@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Eigenspace.Pi
 import Mathlib.RingTheory.Artinian
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.FreeModule.PID
+
+noncomputable section
 
 /-!
 # Weight spaces of Lie modules of nilpotent Lie algebras
@@ -203,10 +205,6 @@ instance instFunLike : FunLike (Weight R L M) L R where
   coe χ := χ.1
   coe_injective' χ₁ χ₂ h := by cases χ₁; cases χ₂; simp_all
 
-@[simp] lemma coe_weight_mk (χ : L → R) (h) :
-    (↑(⟨χ, h⟩ : Weight R L M) : L → R) = χ :=
-  rfl
-
 lemma genWeightSpace_ne_bot (χ : Weight R L M) : genWeightSpace M χ ≠ ⊥ := χ.genWeightSpace_ne_bot'
 
 variable {M}
@@ -216,7 +214,9 @@ variable {M}
 
 lemma ext_iff' {χ₁ χ₂ : Weight R L M} : (χ₁ : L → R) = χ₂ ↔ χ₁ = χ₂ := by aesop
 
--- DISSOLVED: exists_ne_zero
+lemma exists_ne_zero (χ : Weight R L M) :
+    ∃ x ∈ genWeightSpace M χ, x ≠ 0 := by
+  simpa [LieSubmodule.eq_bot_iff] using χ.genWeightSpace_ne_bot
 
 instance [Subsingleton M] : IsEmpty (Weight R L M) :=
   ⟨fun h ↦ h.2 (Subsingleton.elim _ _)⟩
@@ -235,8 +235,6 @@ def IsZero (χ : Weight R L M) := (χ : L → R) = 0
 
 @[simp] lemma IsZero.eq {χ : Weight R L M} (hχ : χ.IsZero) : (χ : L → R) = 0 := hχ
 
-@[simp] lemma coe_eq_zero_iff (χ : Weight R L M) : (χ : L → R) = 0 ↔ χ.IsZero := Iff.rfl
-
 -- CONFLATES (assumes ground = zero): isZero_iff_eq_zero
 lemma isZero_iff_eq_zero [Nontrivial (genWeightSpace M (0 : L → R))] {χ : Weight R L M} :
     χ.IsZero ↔ χ = 0 := Weight.ext_iff' (χ₂ := 0)
@@ -246,7 +244,9 @@ lemma isZero_zero [Nontrivial (genWeightSpace M (0 : L → R))] : IsZero (0 : We
 
 abbrev IsNonZero (χ : Weight R L M) := ¬ IsZero (χ : Weight R L M)
 
--- DISSOLVED: isNonZero_iff_ne_zero
+-- CONFLATES (assumes ground = zero): isNonZero_iff_ne_zero
+lemma isNonZero_iff_ne_zero [Nontrivial (genWeightSpace M (0 : L → R))] {χ : Weight R L M} :
+    χ.IsNonZero ↔ χ ≠ 0 := isZero_iff_eq_zero.not
 
 noncomputable instance : DecidablePred (IsNonZero (R := R) (L := L) (M := M)) := Classical.decPred _
 
@@ -417,10 +417,6 @@ variable (L)
 
 def posFittingComp : LieSubmodule R L M :=
   ⨆ x, posFittingCompOf R M x
-
-lemma mem_posFittingComp (m : M) :
-    m ∈ posFittingComp R L M ↔ m ∈ ⨆ (x : L), posFittingCompOf R M x := by
-  rfl
 
 lemma posFittingCompOf_le_posFittingComp (x : L) :
     posFittingCompOf R M x ≤ posFittingComp R L M := by

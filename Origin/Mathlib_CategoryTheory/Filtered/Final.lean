@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Filtered.Connected
 import Mathlib.CategoryTheory.Limits.TypesFiltered
 import Mathlib.CategoryTheory.Limits.Final
 
+noncomputable section
+
 /-!
 # Final functors with filtered (co)domain
 

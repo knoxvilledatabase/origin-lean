@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SimpleGraph.Connectivity.WalkCounting
 import Mathlib.Data.Fintype.Order
 import Mathlib.Data.Set.Functor
 
+noncomputable section
+
 /-!
 # Matchings
 

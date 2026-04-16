@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Algebra.Module.Equiv.Basic
 
+noncomputable section
+
 /-!
 # The general linear group of linear maps
 
@@ -55,10 +57,6 @@ def generalLinearEquiv : GeneralLinearGroup R M ≃* M ≃ₗ[R] M where
 @[simp]
 theorem generalLinearEquiv_to_linearMap (f : GeneralLinearGroup R M) :
     (generalLinearEquiv R M f : M →ₗ[R] M) = f := by ext; rfl
-
-@[simp]
-theorem coeFn_generalLinearEquiv (f : GeneralLinearGroup R M) :
-    (generalLinearEquiv R M f) = (f : M → M) := rfl
 
 end GeneralLinearGroup
 

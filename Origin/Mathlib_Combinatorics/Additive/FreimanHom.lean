@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Additive/FreimanHom.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Group.Submonoid.Defs
 import Mathlib.Algebra.Order.BigOperators.Group.Multiset
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.ZMod.Defs
+
+noncomputable section
 
 /-!
 # Freiman homomorphisms
@@ -153,10 +155,6 @@ lemma isMulFreimanIso_two :
 @[to_additive] lemma isMulFreimanHom_id (hA : A₁ ⊆ A₂) : IsMulFreimanHom n A₁ A₂ id where
   mapsTo := hA
   map_prod_eq_map_prod s t _ _ _ _ h := by simpa using h
-
-@[to_additive] lemma isMulFreimanIso_id : IsMulFreimanIso n A A id where
-  bijOn := bijOn_id _
-  map_prod_eq_map_prod s t _ _ _ _ := by simp
 
 @[to_additive] lemma IsMulFreimanHom.comp (hg : IsMulFreimanHom n B C g)
     (hf : IsMulFreimanHom n A B f) : IsMulFreimanHom n A C (g ∘ f) where
@@ -375,10 +373,35 @@ namespace Fin
 
 variable {k m n : ℕ}
 
--- DISSOLVED: aux
+private lemma aux (hm : m ≠ 0) (hkmn : m * k ≤ n) : k < (n + 1) :=
+  Nat.lt_succ_iff.2 <| le_trans (Nat.le_mul_of_pos_left _ hm.bot_lt) hkmn
 
--- DISSOLVED: isAddFreimanIso_Iic
+lemma isAddFreimanIso_Iic (hm : m ≠ 0) (hkmn : m * k ≤ n) :
+    IsAddFreimanIso m (Iic (k : Fin (n + 1))) (Iic k) val where
+  bijOn.left := by simp [MapsTo, Fin.le_iff_val_le_val, Nat.mod_eq_of_lt, aux hm hkmn]
+  bijOn.right.left := val_injective.injOn
+  bijOn.right.right x (hx : x ≤ _) :=
+    ⟨x, by simpa [le_iff_val_le_val, -val_fin_le, Nat.mod_eq_of_lt, aux hm hkmn, hx.trans_lt]⟩
+  map_sum_eq_map_sum s t hsA htA hs ht := by
+    have (u : Multiset (Fin (n + 1))) : Nat.castRingHom _ (u.map val).sum = u.sum := by simp
+    rw [← this, ← this]
+    have {u : Multiset (Fin (n + 1))} (huk : ∀ x ∈ u, x ≤ k) (hu : card u = m) :
+        (u.map val).sum < (n + 1) := Nat.lt_succ_iff.2 <| hkmn.trans' <| by
+      rw [← hu, ← card_map]
+      refine sum_le_card_nsmul (u.map val) k ?_
+      simpa [le_iff_val_le_val, -val_fin_le, Nat.mod_eq_of_lt, aux hm hkmn] using huk
+    exact ⟨congr_arg _, CharP.natCast_injOn_Iio _ (n + 1) (this hsA hs) (this htA ht)⟩
 
--- DISSOLVED: isAddFreimanIso_Iio
+lemma isAddFreimanIso_Iio (hm : m ≠ 0) (hkmn : m * k ≤ n) :
+    IsAddFreimanIso m (Iio (k : Fin (n + 1))) (Iio k) val := by
+  obtain _ | k := k
+  · simp [← bot_eq_zero]; simp [← _root_.bot_eq_zero, -Nat.bot_eq_zero, -bot_eq_zero']
+  have hkmn' : m * k ≤ n := (Nat.mul_le_mul_left _ k.le_succ).trans hkmn
+  convert isAddFreimanIso_Iic hm hkmn' using 1 <;> ext x
+  · simp [lt_iff_val_lt_val, le_iff_val_le_val, -val_fin_le, -val_fin_lt, Nat.mod_eq_of_lt,
+      aux hm hkmn']
+    simp_rw [← Nat.cast_add_one]
+    rw [Fin.val_cast_of_lt (aux hm hkmn), Nat.lt_succ_iff]
+  · simp [Nat.lt_succ_iff]
 
 end Fin

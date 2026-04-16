@@ -5,6 +5,8 @@ Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.Lie.Submodule
 
+noncomputable section
+
 /-!
 # Ideal operations for Lie algebras
 

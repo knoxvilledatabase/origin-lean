@@ -9,6 +9,8 @@ import Mathlib.Data.Sigma.Basic
 import Mathlib.Logic.Equiv.Basic
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Covering
 
@@ -70,17 +72,6 @@ def Prefunctor.costar (u : U) : Quiver.Costar u → Quiver.Costar (φ.obj u) := 
 @[simp]
 theorem Prefunctor.star_apply {u v : U} (e : u ⟶ v) :
     φ.star u (Quiver.Star.mk e) = Quiver.Star.mk (φ.map e) :=
-  rfl
-
-@[simp]
-theorem Prefunctor.costar_apply {u v : U} (e : u ⟶ v) :
-    φ.costar v (Quiver.Costar.mk e) = Quiver.Costar.mk (φ.map e) :=
-  rfl
-
-theorem Prefunctor.star_comp (u : U) : (φ ⋙q ψ).star u = ψ.star (φ.obj u) ∘ φ.star u :=
-  rfl
-
-theorem Prefunctor.costar_comp (u : U) : (φ ⋙q ψ).costar u = ψ.costar (φ.obj u) ∘ φ.costar u :=
   rfl
 
 protected structure Prefunctor.IsCovering : Prop where
@@ -240,16 +231,6 @@ def Quiver.starEquivCostar (u : U) : Quiver.Star u ≃ Quiver.Costar u where
   invFun e := ⟨e.1, reverse e.2⟩
   left_inv e := by simp [Sigma.ext_iff]
   right_inv e := by simp [Sigma.ext_iff]
-
-@[simp]
-theorem Quiver.starEquivCostar_apply {u v : U} (e : u ⟶ v) :
-    Quiver.starEquivCostar u (Quiver.Star.mk e) = Quiver.Costar.mk (reverse e) :=
-  rfl
-
-@[simp]
-theorem Quiver.starEquivCostar_symm_apply {u v : U} (e : u ⟶ v) :
-    (Quiver.starEquivCostar v).symm (Quiver.Costar.mk e) = Quiver.Star.mk (reverse e) :=
-  rfl
 
 variable [Prefunctor.MapReverse φ]
 

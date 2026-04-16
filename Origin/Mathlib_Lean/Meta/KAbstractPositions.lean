@@ -8,6 +8,8 @@ import Lean.HeadIndex
 import Lean.Meta.ExprLens
 import Lean.Meta.Check
 
+noncomputable section
+
 /-!
 
 # Find the positions of a pattern in an expression

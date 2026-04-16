@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.CompleteLattice
 import Mathlib.Order.CompactlyGenerated.Basic
 
+noncomputable section
+
 /-!
 # Generators for boolean algebras
 
@@ -141,7 +143,6 @@ lemma complementedLattice_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S 
   apply complementedLattice_of_isAtomistic
 
 noncomputable
-
 def booleanAlgebra_of_sSup_eq_top (hS : BooleanGenerators S) (h : sSup S = ⊤) : BooleanAlgebra α :=
   let _i := hS.distribLattice_of_sSup_eq_top h
   have := hS.complementedLattice_of_sSup_eq_top h

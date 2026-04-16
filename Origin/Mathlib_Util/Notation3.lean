@@ -12,6 +12,8 @@ import Batteries.Linter.UnreachableTactic
 import Batteries.Util.ExtendedBinder
 import Batteries.Lean.Syntax
 
+noncomputable section
+
 /-!
 # The notation3 macro, simulating Lean 3's notation.
 -/
@@ -29,63 +31,37 @@ initialize registerTraceClass `notation3
 syntax "expand_binders% " "(" ident " => " term ")" extBinders ", " term : term
 
 macro_rules
-
   | `(expand_binders% ($x => $term) $y:extBinder, $res) =>
-
     `(expand_binders% ($x => $term) ($y:extBinder), $res)
-
   | `(expand_binders% ($_ => $_), $res) => pure res
 
 macro_rules
-
   | `(expand_binders% ($x => $term) ($y:ident $[: $ty]?) $binders*, $res) => do
-
     let ty := ty.getD (← `(_))
-
     term.replaceM fun x' ↦ do
-
       unless x == x' do return none
-
       `(fun $y:ident : $ty ↦ expand_binders% ($x => $term) $[$binders]*, $res)
-
   | `(expand_binders% ($x => $term) (_%$ph $[: $ty]?) $binders*, $res) => do
-
     let ty := ty.getD (← `(_))
-
     term.replaceM fun x' ↦ do
-
       unless x == x' do return none
-
       `(fun _%$ph : $ty ↦ expand_binders% ($x => $term) $[$binders]*, $res)
-
   | `(expand_binders% ($x => $term) ($y:ident $pred:binderPred) $binders*, $res) =>
-
     term.replaceM fun x' ↦ do
-
       unless x == x' do return none
-
       `(fun $y:ident ↦ expand_binders% ($x => $term) (h : satisfies_binder_pred% $y $pred)
-
         $[$binders]*, $res)
 
 macro (name := expandFoldl) "expand_foldl% "
-
   "(" x:ident ppSpace y:ident " => " term:term ") " init:term:max " [" args:term,* "]" : term =>
-
   args.getElems.foldlM (init := init) fun res arg ↦ do
-
     term.replaceM fun e ↦
-
       return if e == x then some res else if e == y then some arg else none
 
 macro (name := expandFoldr) "expand_foldr% "
-
   "(" x:ident ppSpace y:ident " => " term:term ") " init:term:max " [" args:term,* "]" : term =>
-
   args.getElems.foldrM (init := init) fun arg res ↦ do
-
     term.replaceM fun e ↦
-
       return if e == x then some arg else if e == y then some res else none
 
 syntax foldKind := &"foldl" <|> &"foldr"
@@ -93,11 +69,9 @@ syntax foldKind := &"foldl" <|> &"foldr"
 syntax bindersItem := atomic("(" "..." ")")
 
 syntax foldAction := "(" ident ppSpace strLit "*" (precedence)? " => " foldKind
-
   " (" ident ppSpace ident " => " term ") " term ")"
 
 syntax identOptScoped :=
-
   ident (notFollowedBy(":" "(" "scoped") precedence)? (":" "(" "scoped " ident " => " term ")")?
 
 syntax notation3Item := strLit <|> bindersItem <|> identOptScoped <|> foldAction
@@ -400,145 +374,93 @@ def getPrettyPrintOpt (opt? : Option (TSyntax ``prettyPrintOpt)) : Bool :=
     true
 
 elab (name := notation3) doc:(docComment)? attrs?:(Parser.Term.attributes)? attrKind:Term.attrKind
-
     "notation3" prec?:(precedence)? name?:(namedName)? prio?:(namedPrio)?
-
     pp?:(ppSpace prettyPrintOpt)? items:(ppSpace notation3Item)+ " => " val:term : command => do
-
+  -- We use raw `Name`s for variables. This maps variable names back to the
+  -- identifiers that appear in `items`
   let mut boundIdents : Std.HashMap Name Ident := {}
-
+  -- Replacements to use for the `macro`
   let mut boundValues : Std.HashMap Name Syntax := {}
-
+  -- The names of the bound names in order, used when constructing patterns for delaboration.
   let mut boundNames : Array Name := #[]
-
+  -- The normal/foldl/foldr type of each variable (for delaborator)
   let mut boundType : Std.HashMap Name BoundValueType := {}
-
+  -- Function to update `syntaxArgs` and `pattArgs` using `macroArg` syntax
   let pushMacro (syntaxArgs : Array (TSyntax `stx)) (pattArgs : Array Syntax)
-
       (mac : TSyntax ``macroArg) := do
-
     let (syntaxArg, pattArg) ← expandMacroArg mac
-
     return (syntaxArgs.push syntaxArg, pattArgs.push pattArg)
-
+  -- Arguments for the `syntax` command
   let mut syntaxArgs := #[]
-
+  -- Arguments for the LHS pattern in the `macro`. Also used to construct the syntax
+  -- when delaborating
   let mut pattArgs := #[]
-
+  -- The matchers to assemble into a delaborator
   let mut matchers := #[]
-
+  -- Whether we've seen a `(...)` item
   let mut hasBindersItem := false
-
+  -- Whether we've seen a `scoped` item
   let mut hasScoped := false
-
   for item in items do
-
     match item with
-
     | `(notation3Item| $lit:str) =>
-
+      -- Can't use `pushMacro` since it inserts an extra variable into the pattern for `str`, which
+      -- breaks our delaborator
       syntaxArgs := syntaxArgs.push (← `(stx| $lit:str))
-
       pattArgs := pattArgs.push <| mkAtomFrom lit lit.1.isStrLit?.get!
-
     | `(notation3Item| $_:bindersItem) =>
-
       if hasBindersItem then
-
         throwErrorAt item "Cannot have more than one `(...)` item."
-
       hasBindersItem := true
-
+      -- HACK: Lean 3 traditionally puts a space after the main binder atom, resulting in
+      -- notation3 "∑ "(...)", "r:(scoped f => sum f) => r
+      -- but extBinders already has a space before it so we strip the trailing space of "∑ "
       if let `(stx| $lit:str) := syntaxArgs.back! then
-
         syntaxArgs := syntaxArgs.pop.push (← `(stx| $(quote lit.getString.trimRight):str))
-
       (syntaxArgs, pattArgs) ← pushMacro syntaxArgs pattArgs (← `(macroArg| binders:extBinders))
-
     | `(notation3Item| ($id:ident $sep:str* $(prec?)? => $kind ($x $y => $scopedTerm) $init)) =>
-
       (syntaxArgs, pattArgs) ← pushMacro syntaxArgs pattArgs <| ←
-
         `(macroArg| $id:ident:sepBy(term $(prec?)?, $sep:str))
-
+      -- N.B. `Syntax.getId` returns `.anonymous` for non-idents
       let scopedTerm' ← scopedTerm.replaceM fun s => pure boundValues[s.getId]?
-
       let init' ← init.replaceM fun s => pure boundValues[s.getId]?
-
       boundIdents := boundIdents.insert id.getId id
-
       match kind with
-
         | `(foldKind| foldl) =>
-
           boundValues := boundValues.insert id.getId <| ←
-
             `(expand_foldl% ($x $y => $scopedTerm') $init' [$$(.ofElems $id),*])
-
           boundNames := boundNames.push id.getId
-
           boundType := boundType.insert id.getId .foldl
-
           matchers := matchers.push <|
-
             mkFoldlMatcher id.getId x.getId y.getId scopedTerm init boundNames
-
         | `(foldKind| foldr) =>
-
           boundValues := boundValues.insert id.getId <| ←
-
             `(expand_foldr% ($x $y => $scopedTerm') $init' [$$(.ofElems $id),*])
-
           boundNames := boundNames.push id.getId
-
           boundType := boundType.insert id.getId .foldr
-
           matchers := matchers.push <|
-
             mkFoldrMatcher id.getId x.getId y.getId scopedTerm init boundNames
-
         | _ => throwUnsupportedSyntax
-
     | `(notation3Item| $lit:ident $(prec?)? : (scoped $scopedId:ident => $scopedTerm)) =>
-
       hasScoped := true
-
       (syntaxArgs, pattArgs) ← pushMacro syntaxArgs pattArgs <|←
-
         `(macroArg| $lit:ident:term $(prec?)?)
-
       matchers := matchers.push <|
-
         mkScopedMatcher lit.getId scopedId.getId scopedTerm boundNames
-
       let scopedTerm' ← scopedTerm.replaceM fun s => pure boundValues[s.getId]?
-
       boundIdents := boundIdents.insert lit.getId lit
-
       boundValues := boundValues.insert lit.getId <| ←
-
         `(expand_binders% ($scopedId => $scopedTerm') $$binders:extBinders,
-
           $(⟨lit.1.mkAntiquotNode `term⟩):term)
-
       boundNames := boundNames.push lit.getId
-
     | `(notation3Item| $lit:ident $(prec?)?) =>
-
       (syntaxArgs, pattArgs) ← pushMacro syntaxArgs pattArgs <|←
-
         `(macroArg| $lit:ident:term $(prec?)?)
-
       boundIdents := boundIdents.insert lit.getId lit
-
       boundValues := boundValues.insert lit.getId <| lit.1.mkAntiquotNode `term
-
       boundNames := boundNames.push lit.getId
-
     | _stx => throwUnsupportedSyntax
-
   if hasScoped && !hasBindersItem then
-
     throwError "If there is a `scoped` item then there must be a `(...)` item for binders."
 
   let name ← mkNameFromSyntax name? syntaxArgs attrKind
@@ -636,11 +558,8 @@ initialize Batteries.Linter.UnreachableTactic.addIgnoreTacticKind ``«notation3�
 /-! `scoped[ns]` support -/
 
 macro_rules
-
   | `($[$doc]? $(attr)? scoped[$ns] notation3 $(prec)? $(n)? $(prio)? $(pp)? $items* => $t) =>
-
     `(with_weak_namespace $(mkIdentFrom ns <| rootNamespace ++ ns.getId)
-
       $[$doc]? $(attr)? scoped notation3 $(prec)? $(n)? $(prio)? $(pp)? $items* => $t)
 
 end Notation3

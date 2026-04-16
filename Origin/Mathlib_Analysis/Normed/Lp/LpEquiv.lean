@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Analysis.Normed.Lp.PiLp
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 # Equivalences among $L^p$ spaces
 
@@ -57,21 +59,8 @@ def Equiv.lpPiLp : lp E p ≃ PiLp p E where
   left_inv _f := rfl
   right_inv _f := rfl
 
-theorem coe_equiv_lpPiLp (f : lp E p) : Equiv.lpPiLp f = ⇑f :=
-  rfl
-
-theorem coe_equiv_lpPiLp_symm (f : PiLp p E) : (Equiv.lpPiLp.symm f : ∀ i, E i) = f :=
-  rfl
-
 def AddEquiv.lpPiLp : lp E p ≃+ PiLp p E :=
   { Equiv.lpPiLp with map_add' := fun _f _g ↦ rfl }
-
-theorem coe_addEquiv_lpPiLp (f : lp E p) : AddEquiv.lpPiLp f = ⇑f :=
-  rfl
-
-theorem coe_addEquiv_lpPiLp_symm (f : PiLp p E) :
-    (AddEquiv.lpPiLp.symm f : ∀ i, E i) = f :=
-  rfl
 
 end Finite
 
@@ -93,13 +82,6 @@ noncomputable def lpPiLpₗᵢ [Fact (1 ≤ p)] : lp E p ≃ₗᵢ[𝕜] PiLp p 
     norm_map' := equiv_lpPiLp_norm }
 
 variable {𝕜 E}
-
-theorem coe_lpPiLpₗᵢ [Fact (1 ≤ p)] (f : lp E p) : (lpPiLpₗᵢ E 𝕜 f : ∀ i, E i) = ⇑f :=
-  rfl
-
-theorem coe_lpPiLpₗᵢ_symm [Fact (1 ≤ p)] (f : PiLp p E) :
-    ((lpPiLpₗᵢ E 𝕜).symm f : ∀ i, E i) = f :=
-  rfl
 
 end Equivₗᵢ
 
@@ -126,12 +108,6 @@ noncomputable def AddEquiv.lpBCF : lp (fun _ : α ↦ E) ∞ ≃+ (α →ᵇ E) 
   right_inv _f := rfl
   map_add' _f _g := rfl
 
-theorem coe_addEquiv_lpBCF (f : lp (fun _ : α ↦ E) ∞) : (AddEquiv.lpBCF f : α → E) = f :=
-  rfl
-
-theorem coe_addEquiv_lpBCF_symm (f : α →ᵇ E) : (AddEquiv.lpBCF.symm f : α → E) = f :=
-  rfl
-
 variable (E)
 
 noncomputable def lpBCFₗᵢ : lp (fun _ : α ↦ E) ∞ ≃ₗᵢ[𝕜] α →ᵇ E :=
@@ -140,12 +116,6 @@ noncomputable def lpBCFₗᵢ : lp (fun _ : α ↦ E) ∞ ≃ₗᵢ[𝕜] α →
     norm_map' := fun f ↦ by simp only [norm_eq_iSup_norm, lp.norm_eq_ciSup]; rfl }
 
 variable {𝕜 E}
-
-theorem coe_lpBCFₗᵢ (f : lp (fun _ : α ↦ E) ∞) : (lpBCFₗᵢ E 𝕜 f : α → E) = f :=
-  rfl
-
-theorem coe_lpBCFₗᵢ_symm (f : α →ᵇ E) : ((lpBCFₗᵢ E 𝕜).symm f : α → E) = f :=
-  rfl
 
 end NormedAddCommGroup
 
@@ -157,24 +127,12 @@ noncomputable def RingEquiv.lpBCF : lp (fun _ : α ↦ R) ∞ ≃+* (α →ᵇ R
 
 variable {R}
 
-theorem coe_ringEquiv_lpBCF (f : lp (fun _ : α ↦ R) ∞) : (RingEquiv.lpBCF R f : α → R) = f :=
-  rfl
-
-theorem coe_ringEquiv_lpBCF_symm (f : α →ᵇ R) : ((RingEquiv.lpBCF R).symm f : α → R) = f :=
-  rfl
-
 variable (α)
 
 noncomputable def AlgEquiv.lpBCF : lp (fun _ : α ↦ A) ∞ ≃ₐ[𝕜] α →ᵇ A :=
   { RingEquiv.lpBCF A with commutes' := fun _k ↦ rfl }
 
 variable {α A 𝕜}
-
-theorem coe_algEquiv_lpBCF (f : lp (fun _ : α ↦ A) ∞) : (AlgEquiv.lpBCF α A 𝕜 f : α → A) = f :=
-  rfl
-
-theorem coe_algEquiv_lpBCF_symm (f : α →ᵇ A) : ((AlgEquiv.lpBCF α A 𝕜).symm f : α → A) = f :=
-  rfl
 
 end RingAlgebra
 

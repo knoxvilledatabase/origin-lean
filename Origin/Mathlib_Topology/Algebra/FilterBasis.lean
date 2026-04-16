@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Bases
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # Group and ring filter bases
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.FullyFaithful
 import Mathlib.CategoryTheory.Functor.EpiMono
 import Mathlib.CategoryTheory.HomCongr
 
+noncomputable section
+
 /-!
 # Reflective functors
 
@@ -119,7 +121,6 @@ instance [Reflective i] (X : Functor.EssImageSubcategory i) :
 Functor.essImage.unit_isIso X.property
 
 attribute [local simp 900] Functor.essImageInclusion_map in
-
 attribute [local ext] Functor.essImage_ext in
 
 @[simps]

@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Multilinear/DFinsupp.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Quotient
 import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.LinearAlgebra.Multilinear.Basic
+
+noncomputable section
 
 /-!
 # Interactions between finitely-supported functions and multilinear maps
@@ -100,7 +102,17 @@ def dfinsuppFamily
     simp_rw [Function.apply_update (fun i m => m (p i)) m, DFinsupp.smul_apply,
       (f p).map_update_smul]
 
--- DISSOLVED: support_dfinsuppFamily_subset
+theorem support_dfinsuppFamily_subset
+    [∀ i, DecidableEq (κ i)]
+    [∀ i j, (x : M i j) → Decidable (x ≠ 0)] [∀ i, (x : N i) → Decidable (x ≠ 0)]
+    (f : Π (p : Π i, κ i), MultilinearMap R (fun i ↦ M i (p i)) (N p))
+    (x : ∀ i, Π₀ j : κ i, M i j) :
+    (dfinsuppFamily f x).support ⊆ Fintype.piFinset fun i => (x i).support := by
+  intro p hp
+  simp only [DFinsupp.mem_support_toFun, dfinsuppFamily_apply_toFun, ne_eq,
+    Fintype.mem_piFinset] at hp ⊢
+  intro i
+  exact mt ((f p).map_coord_zero (m := fun i => x i _) i) hp
 
 @[simp]
 theorem dfinsuppFamily_single [∀ i, DecidableEq (κ i)]

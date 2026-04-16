@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Analytic.OfScalars
 import Mathlib.Analysis.SpecificLimits.RCLike
 
+noncomputable section
+
 /-!
 # Ordinary hypergeometric function in a Banach algebra
 

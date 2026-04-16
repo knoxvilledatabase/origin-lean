@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Monad
 import Mathlib.AlgebraicGeometry.Limits
 
+noncomputable section
+
 /-!
 # Affine space
 

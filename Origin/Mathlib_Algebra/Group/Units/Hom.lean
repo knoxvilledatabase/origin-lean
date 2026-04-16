@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs
 import Mathlib.Algebra.Group.Units.Basic
 
+noncomputable section
+
 /-!
 # Monoid homomorphisms and units
 
@@ -66,15 +68,6 @@ def map (f : M →* N) : Mˣ →* Nˣ :=
       by rw [← f.map_mul, u.inv_val, f.map_one]⟩)
     fun x y => ext (f.map_mul x y)
 
-@[to_additive (attr := simp)]
-theorem coe_map (f : M →* N) (x : Mˣ) : ↑(map f x) = f x := rfl
-
-@[to_additive (attr := simp)]
-theorem coe_map_inv (f : M →* N) (u : Mˣ) : ↑(map f u)⁻¹ = f ↑u⁻¹ := rfl
-
-@[to_additive (attr := simp)]
-theorem map_comp (f : M →* N) (g : N →* P) : map (g.comp f) = (map g).comp (map f) := rfl
-
 @[to_additive]
 lemma map_injective {f : M →* N} (hf : Function.Injective f) :
     Function.Injective (map f) := fun _ _ e => ext (hf (congr_arg val e))
@@ -89,9 +82,6 @@ def coeHom : Mˣ →* M where
   toFun := Units.val; map_one' := val_one; map_mul' := val_mul
 
 variable {M}
-
-@[to_additive (attr := simp)]
-theorem coeHom_apply (x : Mˣ) : coeHom M x = ↑x := rfl
 
 section DivisionMonoid
 
@@ -142,10 +132,6 @@ def toHomUnits {G M : Type*} [Group G] [Monoid M] (f : G →* M) : G →* Mˣ :=
   Units.liftRight f (fun g => ⟨f g, f g⁻¹, map_mul_eq_one f (mul_inv_cancel _),
     map_mul_eq_one f (inv_mul_cancel _)⟩)
     fun _ => rfl
-
-@[to_additive (attr := simp)]
-theorem coe_toHomUnits {G M : Type*} [Group G] [Monoid M] (f : G →* M) (g : G) :
-    (f.toHomUnits g : M) = f g := rfl
 
 end MonoidHom
 

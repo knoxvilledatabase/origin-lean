@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/LSeries/AbstractFuncEq.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.MellinTransform
+
+noncomputable section
 
 /-!
 # Abstract functional equations for Mellin transforms
@@ -65,7 +67,22 @@ variable (E : Type*) [NormedAddCommGroup E] [NormedSpace ℂ E]
 ## Definitions and symmetry
 -/
 
--- DISSOLVED: WeakFEPair
+structure WeakFEPair where
+  /-- The functions whose Mellin transform we study -/
+  (f g : ℝ → E)
+  /-- Weight (exponent in the functional equation) -/
+  (k : ℝ)
+  /-- Root number -/
+  (ε : ℂ)
+  /-- Constant terms at `∞` -/
+  (f₀ g₀ : E)
+  (hf_int : LocallyIntegrableOn f (Ioi 0))
+  (hg_int : LocallyIntegrableOn g (Ioi 0))
+  (hk : 0 < k)
+  (hε : ε ≠ 0)
+  (h_feq : ∀ x ∈ Ioi 0, f (1 / x) = (ε * ↑(x ^ k)) • g x)
+  (hf_top (r : ℝ) : (f · - f₀) =O[atTop] (· ^ r))
+  (hg_top (r : ℝ) : (g · - g₀) =O[atTop] (· ^ r))
 
 structure StrongFEPair extends WeakFEPair E where (hf₀ : f₀ = 0) (hg₀ : g₀ = 0)
 
@@ -340,7 +357,17 @@ lemma symm_Λ₀_eq (s : ℂ) :
 
 theorem differentiable_Λ₀ : Differentiable ℂ P.Λ₀ := P.toStrongFEPair.differentiable_Λ
 
--- DISSOLVED: differentiableAt_Λ
+theorem differentiableAt_Λ {s : ℂ} (hs : s ≠ 0 ∨ P.f₀ = 0) (hs' : s ≠ P.k ∨ P.g₀ = 0) :
+    DifferentiableAt ℂ P.Λ s := by
+  refine ((P.differentiable_Λ₀ s).sub ?_).sub ?_
+  · rcases hs with hs | hs
+    · simpa only [one_div] using (differentiableAt_inv hs).smul_const P.f₀
+    · simpa only [hs, smul_zero] using differentiableAt_const (0 : E)
+  · rcases hs' with hs' | hs'
+    · apply DifferentiableAt.smul_const
+      apply (differentiableAt_const _).div ((differentiableAt_const _).sub (differentiable_id _))
+      rwa [sub_ne_zero, ne_comm]
+    · simpa only [hs', smul_zero] using differentiableAt_const (0 : E)
 
 theorem hasMellin [CompleteSpace E]
     {s : ℂ} (hs : P.k < s.re) : HasMellin (P.f · - P.f₀) s (P.Λ s) := by

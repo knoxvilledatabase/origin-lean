@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Totient.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
+Genuine: 31 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Two
@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Factorization.Induction
 import Mathlib.Data.Nat.Periodic
 import Mathlib.Data.ZMod.Basic
 import Mathlib.NumberTheory.Divisors
+
+noncomputable section
 
 /-!
 # Euler's totient function
@@ -238,7 +240,13 @@ theorem dvd_two_of_totient_le_one {a : ℕ} (han : 0 < a) (ha : a.totient ≤ 1)
 
 We prove several different statements of this formula. -/
 
--- DISSOLVED: totient_eq_prod_factorization
+theorem totient_eq_prod_factorization {n : ℕ} (hn : n ≠ 0) :
+    φ n = n.factorization.prod fun p k => p ^ (k - 1) * (p - 1) := by
+  rw [multiplicative_factorization φ (@totient_mul) totient_one hn]
+  apply Finsupp.prod_congr _
+  intro p hp
+  have h := zero_lt_iff.mpr (Finsupp.mem_support_iff.mp hp)
+  rw [totient_prime_pow (prime_of_mem_primeFactors hp) h]
 
 theorem totient_mul_prod_primeFactors (n : ℕ) :
     (φ n * ∏ p ∈ n.primeFactors, p) = n * ∏ p ∈ n.primeFactors, (p - 1) := by

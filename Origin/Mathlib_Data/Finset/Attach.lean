@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Finset.Defs
 
+noncomputable section
+
 /-!
 # Attaching a proof of membership to a finite set
 
@@ -33,10 +35,6 @@ attribute [local trans] Subset.trans Superset.trans
 
 def attach (s : Finset α) : Finset { x // x ∈ s } :=
   ⟨Multiset.attach s.1, nodup_attach.2 s.2⟩
-
-@[simp]
-theorem attach_val (s : Finset α) : s.attach.1 = s.1.attach :=
-  rfl
 
 @[simp]
 theorem mem_attach (s : Finset α) : ∀ x, x ∈ s.attach :=

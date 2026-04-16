@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 
+noncomputable section
+
 /-!
 # Tannery's theorem
 

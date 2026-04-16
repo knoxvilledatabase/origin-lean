@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Defs
 import Mathlib.Order.RelIso.Basic
 
+noncomputable section
+
 /-!
 # Relation isomorphisms form a group
 -/
@@ -22,17 +24,6 @@ instance : Group (r ≃r r) where
   one_mul _ := ext fun _ => rfl
   mul_one _ := ext fun _ => rfl
   inv_mul_cancel f := ext f.symm_apply_apply
-
-@[simp]
-theorem coe_one : ((1 : r ≃r r) : α → α) = id :=
-  rfl
-
-@[simp]
-theorem coe_mul (e₁ e₂ : r ≃r r) : ((e₁ * e₂) : α → α) = e₁ ∘ e₂ :=
-  rfl
-
-theorem mul_apply (e₁ e₂ : r ≃r r) (x : α) : (e₁ * e₂) x = e₁ (e₂ x) :=
-  rfl
 
 @[simp]
 theorem inv_apply_self (e : r ≃r r) (x) : e⁻¹ (e x) = x :=

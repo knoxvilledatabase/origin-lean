@@ -7,6 +7,8 @@ import Mathlib.Probability.Kernel.Composition
 import Mathlib.Probability.Martingale.Convergence
 import Mathlib.Probability.Process.PartitionFiltration
 
+noncomputable section
+
 /-!
 # Kernel density
 
@@ -87,15 +89,9 @@ variable {α β γ : Type*} {mα : MeasurableSpace α} {mβ : MeasurableSpace β
 section DensityProcess
 
 noncomputable
-
 def densityProcess (κ : Kernel α (γ × β)) (ν : Kernel α γ) (n : ℕ) (a : α) (x : γ) (s : Set β) :
     ℝ :=
   (κ a (countablePartitionSet n x ×ˢ s) / ν a (countablePartitionSet n x)).toReal
-
-lemma densityProcess_def (κ : Kernel α (γ × β)) (ν : Kernel α γ) (n : ℕ) (a : α) (s : Set β) :
-    (fun t ↦ densityProcess κ ν n a t s)
-      = fun t ↦ (κ a (countablePartitionSet n t ×ˢ s) / ν a (countablePartitionSet n t)).toReal :=
-  rfl
 
 lemma measurable_densityProcess_countableFiltration_aux (κ : Kernel α (γ × β)) (ν : Kernel α γ)
     (n : ℕ) {s : Set β} (hs : MeasurableSet s) :
@@ -431,7 +427,6 @@ end DensityProcess
 section Density
 
 noncomputable
-
 def density (κ : Kernel α (γ × β)) (ν : Kernel α γ) (a : α) (x : γ) (s : Set β) : ℝ :=
   limsup (fun n ↦ densityProcess κ ν n a x s) atTop
 

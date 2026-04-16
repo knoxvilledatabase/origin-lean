@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.ULift
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 
+noncomputable section
+
 /-!
 # Presentations of modules
 
@@ -179,9 +181,6 @@ def postcomp : relations.Solution N where
 lemma postcomp_comp {N' : Type v''} [AddCommGroup N'] [Module A N'] (g : N →ₗ[A] N') :
     solution.postcomp (g.comp f) = (solution.postcomp f).postcomp g := rfl
 
-@[simp]
-lemma postcomp_id : solution.postcomp LinearMap.id = solution := rfl
-
 variable {solution}
 
 lemma congr_var {solution' : relations.Solution M} (h : solution = solution') (g : relations.G) :
@@ -267,10 +266,6 @@ variable {solution : relations.Solution M} (h : solution.IsPresentation)
 include h
 
 noncomputable def linearEquiv : relations.Quotient ≃ₗ[A] M := LinearEquiv.ofBijective _ h.bijective
-
-@[simp]
-lemma linearEquiv_apply (x : relations.Quotient) :
-    h.linearEquiv x = solution.fromQuotient x := rfl
 
 @[simp]
 lemma linearEquiv_symm_var (g : relations.G) :

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Fin.Basic
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Circulant matrices
 
@@ -127,9 +129,6 @@ theorem Fin.circulant_mul_comm [CommSemigroup α] [AddCommMonoid α] :
     ∀ {n} (v w : Fin n → α), circulant v * circulant w = circulant w * circulant v
   | 0 => by simp [Injective]
   | _ + 1 => Matrix.circulant_mul_comm
-
-theorem circulant_smul [Sub n] [SMul R α] (k : R) (v : n → α) :
-    circulant (k • v) = k • circulant v := rfl
 
 @[simp]
 theorem circulant_single_one (α n) [Zero α] [One α] [DecidableEq n] [AddGroup n] :

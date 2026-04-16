@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matrix.Basis
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 We show `Matrix n n A ≃ₐ[R] (A ⊗[R] Matrix n n R)`.
 -/
@@ -109,18 +111,8 @@ def matrixEquivTensor : Matrix n n A ≃ₐ[R] A ⊗[R] Matrix n n R :=
 
 open MatrixEquivTensor
 
-@[simp]
-theorem matrixEquivTensor_apply (M : Matrix n n A) :
-    matrixEquivTensor R A n M = ∑ p : n × n, M p.1 p.2 ⊗ₜ stdBasisMatrix p.1 p.2 1 :=
-  rfl
-
 @[simp (high)]
 theorem matrixEquivTensor_apply_stdBasisMatrix (i j : n) (x : A) :
     matrixEquivTensor R A n (stdBasisMatrix i j x) = x ⊗ₜ stdBasisMatrix i j 1 := by
   have t : ∀ p : n × n, i = p.1 ∧ j = p.2 ↔ p = (i, j) := by aesop
   simp [ite_tmul, t, stdBasisMatrix]
-
-@[simp]
-theorem matrixEquivTensor_apply_symm (a : A) (M : Matrix n n R) :
-    (matrixEquivTensor R A n).symm (a ⊗ₜ M) = M.map fun x => a * algebraMap R A x :=
-  rfl

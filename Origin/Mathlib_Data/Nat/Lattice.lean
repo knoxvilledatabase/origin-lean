@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Finset
 import Mathlib.Order.Interval.Finset.Nat
 
+noncomputable section
+
 /-!
 # Conditionally complete linear order structure on `ℕ`
 

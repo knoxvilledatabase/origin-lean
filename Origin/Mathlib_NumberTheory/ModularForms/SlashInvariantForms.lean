@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 29
 import Origin.Core
 import Mathlib.NumberTheory.ModularForms.SlashActions
 
+noncomputable section
+
 /-!
 # Slash invariant forms
 
@@ -42,13 +44,6 @@ instance (priority := 100) SlashInvariantFormClass.slashInvariantForm :
   slash_action_eq := SlashInvariantForm.slash_action_eq'
 
 variable {F Γ k}
-
-@[simp]
-theorem SlashInvariantForm.toFun_eq_coe {f : SlashInvariantForm Γ k} : f.toFun = (f : ℍ → ℂ) :=
-  rfl
-
-@[simp]
-theorem SlashInvariantForm.coe_mk (f : ℍ → ℂ) (hf : ∀ γ ∈ Γ, f ∣[k] γ = f) : ⇑(mk f hf) = f := rfl
 
 @[ext]
 theorem SlashInvariantForm.ext {f g : SlashInvariantForm Γ k} (h : ∀ x, f x = g x) : f = g :=
@@ -96,17 +91,9 @@ instance instAdd : Add (SlashInvariantForm Γ k) :=
 theorem coe_add (f g : SlashInvariantForm Γ k) : ⇑(f + g) = f + g :=
   rfl
 
-@[simp]
-theorem add_apply (f g : SlashInvariantForm Γ k) (z : ℍ) : (f + g) z = f z + g z :=
-  rfl
-
 instance instZero : Zero (SlashInvariantForm Γ k) :=
   ⟨{toFun := 0
     slash_action_eq' := fun _ _ ↦ SlashAction.zero_slash _ _}⟩
-
-@[simp]
-theorem coe_zero : ⇑(0 : SlashInvariantForm Γ k) = (0 : ℍ → ℂ) :=
-  rfl
 
 section
 
@@ -122,10 +109,6 @@ instance instSMul : SMul α (SlashInvariantForm Γ k) :=
 theorem coe_smul (f : SlashInvariantForm Γ k) (n : α) : ⇑(n • f) = n • ⇑f :=
   rfl
 
-@[simp]
-theorem smul_apply (f : SlashInvariantForm Γ k) (n : α) (z : ℍ) : (n • f) z = n • f z :=
-  rfl
-
 end
 
 instance instNeg : Neg (SlashInvariantForm Γ k) :=
@@ -137,19 +120,11 @@ instance instNeg : Neg (SlashInvariantForm Γ k) :=
 theorem coe_neg (f : SlashInvariantForm Γ k) : ⇑(-f) = -f :=
   rfl
 
-@[simp]
-theorem neg_apply (f : SlashInvariantForm Γ k) (z : ℍ) : (-f) z = -f z :=
-  rfl
-
 instance instSub : Sub (SlashInvariantForm Γ k) :=
   ⟨fun f g => f + -g⟩
 
 @[simp]
 theorem coe_sub (f g : SlashInvariantForm Γ k) : ⇑(f - g) = f - g :=
-  rfl
-
-@[simp]
-theorem sub_apply (f g : SlashInvariantForm Γ k) (z : ℍ) : (f - g) z = f z - g z :=
   rfl
 
 instance : AddCommGroup (SlashInvariantForm Γ k) :=
@@ -174,10 +149,6 @@ def const (x : ℂ) : SlashInvariantForm Γ 0 where
 instance : One (SlashInvariantForm Γ 0) where
   one := { const 1 with toFun := 1 }
 
-@[simp]
-theorem one_coe_eq_one : ((1 : SlashInvariantForm Γ 0) : ℍ → ℂ) = 1 :=
-  rfl
-
 instance : Inhabited (SlashInvariantForm Γ k) :=
   ⟨0⟩
 
@@ -187,21 +158,10 @@ def mul {k₁ k₂ : ℤ} {Γ : Subgroup SL(2, ℤ)} (f : SlashInvariantForm Γ 
   slash_action_eq' A hA := by rw [ModularForm.mul_slash_SL2,
     SlashInvariantFormClass.slash_action_eq f A hA, SlashInvariantFormClass.slash_action_eq g A hA]
 
-@[simp]
-theorem coe_mul {k₁ k₂ : ℤ} {Γ : Subgroup SL(2, ℤ)} (f : SlashInvariantForm Γ k₁)
-    (g : SlashInvariantForm Γ k₂) : ⇑(f.mul g) = ⇑f * ⇑g :=
-  rfl
-
 instance (Γ : Subgroup SL(2, ℤ)) : NatCast (SlashInvariantForm Γ 0) where
   natCast n := const n
 
-@[simp, norm_cast]
-theorem coe_natCast (n : ℕ) : ⇑(n : SlashInvariantForm Γ 0) = n := rfl
-
 instance (Γ : Subgroup SL(2, ℤ)) : IntCast (SlashInvariantForm Γ 0) where
   intCast z := const z
-
-@[simp, norm_cast]
-theorem coe_intCast (z : ℤ) : ⇑(z : SlashInvariantForm Γ 0) = z := rfl
 
 end SlashInvariantForm

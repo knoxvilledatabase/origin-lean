@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Ordering.Basic
 import Mathlib.Order.Defs.Unbundled
 
+noncomputable section
+
 /-!
 # Some `Ordering` lemmas
 -/
@@ -46,8 +48,5 @@ theorem cmpUsing_eq_gt [IsStrictOrder α lt] (a b : α) : cmpUsing lt a b = Orde
   simp only [cmpUsing, Ordering.ite_eq_gt_distrib, if_false_right, and_true, if_false_left,
     and_iff_right_iff_imp, reduceCtorEq]
   exact fun hba hab ↦ (irrefl a) (_root_.trans hab hba)
-
-@[simp]
-theorem cmpUsing_eq_eq (a b : α) : cmpUsing lt a b = Ordering.eq ↔ ¬lt a b ∧ ¬lt b a := by simp
 
 end

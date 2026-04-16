@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Derivation.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 
+noncomputable section
+
 /-!
 # Results
 
@@ -63,11 +65,6 @@ def derivationToSquareZeroOfLift [IsScalarTower R A B]  (hI : I ^ 2 = ⊥) (f : 
     ring
 
 variable (hI : I ^ 2 = ⊥)
-
-theorem derivationToSquareZeroOfLift_apply [IsScalarTower R A B] (f : A →ₐ[R] B)
-    (e : (Ideal.Quotient.mkₐ R I).comp f = IsScalarTower.toAlgHom R A (B ⧸ I)) (x : A) :
-    (derivationToSquareZeroOfLift I hI f e x : B) = f x - algebraMap A B x :=
-  rfl
 
 @[simps (config := .lemmasOnly)]
 def liftOfDerivationToSquareZero [IsScalarTower R A B]  (hI : I ^ 2 = ⊥) (f : Derivation R A I) :

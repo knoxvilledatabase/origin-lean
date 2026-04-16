@@ -1,11 +1,13 @@
 /-
 Extracted from GroupTheory/Goursat.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Graph
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.QuotientGroup.Defs
+
+noncomputable section
 
 /-!
 # Goursat's lemma for subgroups
@@ -52,16 +54,14 @@ lemma mem_goursatFst {g : G} : g ∈ I.goursatFst ↔ (g, 1) ∈ I := by simp [g
 lemma mem_goursatSnd {h : H} : h ∈ I.goursatSnd ↔ (1, h) ∈ I := by simp [goursatSnd]
 
 include hI₁ in
-
 @[to_additive] lemma normal_goursatFst : I.goursatFst.Normal := .map inferInstance _ hI₁
 
 include hI₂ in
-
 @[to_additive] lemma normal_goursatSnd : I.goursatSnd.Normal := .map inferInstance _ hI₂
 
 include hI₁ hI₂ in
-
 @[to_additive]
+
 lemma mk_goursatFst_eq_iff_mk_goursatSnd_eq {x y : G × H} (hx : x ∈ I) (hy : y ∈ I) :
     (x.1 : G ⧸ I.goursatFst) = y.1 ↔ (x.2 : H ⧸ I.goursatSnd) = y.2 := by
   have := normal_goursatFst hI₁

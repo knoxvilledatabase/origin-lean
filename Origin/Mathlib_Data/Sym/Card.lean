@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.Sym
 import Mathlib.Data.Fintype.Sum
 import Mathlib.Data.Fintype.Prod
 
+noncomputable section
+
 /-!
 # Stars and bars
 

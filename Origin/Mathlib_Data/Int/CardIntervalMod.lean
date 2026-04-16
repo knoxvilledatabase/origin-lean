@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Count
 import Mathlib.Data.Rat.Floor
 import Mathlib.Order.Interval.Finset.Nat
 
+noncomputable section
+
 /-!
 # Counting elements in an interval with given residue
 

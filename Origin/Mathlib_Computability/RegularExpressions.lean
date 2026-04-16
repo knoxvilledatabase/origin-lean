@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Computability.Language
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Regular Expressions
 
@@ -92,15 +94,7 @@ def matches' : RegularExpression α → Language α
   | star P => P.matches'∗
 
 @[simp]
-theorem matches'_zero : (0 : RegularExpression α).matches' = 0 :=
-  rfl
-
-@[simp]
 theorem matches'_epsilon : (1 : RegularExpression α).matches' = 1 :=
-  rfl
-
-@[simp]
-theorem matches'_char (a : α) : (char a).matches' = {[a]} :=
   rfl
 
 @[simp]
@@ -160,10 +154,6 @@ theorem deriv_char_of_ne (h : a ≠ b) : deriv (char a) b = 0 :=
 
 @[simp]
 theorem deriv_add (P Q : RegularExpression α) (a : α) : deriv (P + Q) a = deriv P a + deriv Q a :=
-  rfl
-
-@[simp]
-theorem deriv_star (P : RegularExpression α) (a : α) : deriv P.star a = deriv P a * star P :=
   rfl
 
 def rmatch : RegularExpression α → List α → Bool

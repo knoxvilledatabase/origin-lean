@@ -7,6 +7,8 @@ import Mathlib.Data.List.Lattice
 import Mathlib.Data.Bool.Basic
 import Mathlib.Order.Lattice
 
+noncomputable section
+
 /-!
 # Intervals in ℕ
 
@@ -117,8 +119,6 @@ theorem chain'_succ (n m : ℕ) : Chain' (fun a b => b = succ a) (Ico n m) := by
     exact chain_succ_range' _ _ 1
   · rw [eq_nil_of_le (le_of_not_gt h)]
     trivial
-
-theorem not_mem_top {n m : ℕ} : m ∉ Ico n m := by simp
 
 theorem filter_lt_of_top_le {n m l : ℕ} (hml : m ≤ l) :
     ((Ico n m).filter fun x => x < l) = Ico n m :=

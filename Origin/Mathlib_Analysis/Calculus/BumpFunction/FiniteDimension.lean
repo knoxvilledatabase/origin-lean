@@ -11,6 +11,8 @@ import Mathlib.Data.Set.Pointwise.Support
 import Mathlib.MeasureTheory.Measure.Haar.NormedSpace
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 
+noncomputable section
+
 /-!
 # Bump functions in finite-dimensional vector spaces
 

@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/Ext/ExactSequences.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Exact
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.ExtClass
 import Mathlib.Algebra.Homology.ShortComplex.Ab
 import Mathlib.CategoryTheory.Triangulated.Yoneda
+
+noncomputable section
 
 /-!
 # Long exact sequences of `Ext`-groups
@@ -54,6 +56,7 @@ lemma preadditiveCoyoneda_homologySequenceδ_singleTriangle_apply
 variable (X)
 
 include hS in
+/-- Alternative formulation of `covariant_sequence_exact₂` -/
 
 lemma covariant_sequence_exact₂' (n : ℕ) :
     (ShortComplex.mk (AddCommGrp.ofHom ((mk₀ S.f).postcomp X (add_zero n)))
@@ -137,7 +140,6 @@ lemma covariant_sequence_exact₁ {n₁ : ℕ} (x₁ : Ext X S.X₁ n₁)
   exact this x₁ hx₁
 
 include hS in
-
 lemma covariant_sequence_exact₂ {n : ℕ} (x₂ : Ext X S.X₂ n)
     (hx₂ : x₂.comp (mk₀ S.g) (add_zero n) = 0) :
     ∃ (x₁ : Ext X S.X₁ n), x₁.comp (mk₀ S.f) (add_zero n) = x₂ := by
@@ -175,6 +177,7 @@ lemma preadditiveYoneda_homologySequenceδ_singleTriangle_apply
   rfl
 
 include hS in
+/-- Alternative formulation of `contravariant_sequence_exact₂` -/
 
 lemma contravariant_sequence_exact₂' (n : ℕ) :
     (ShortComplex.mk (AddCommGrp.ofHom ((mk₀ S.g).precomp Y (zero_add n)))
@@ -253,7 +256,6 @@ lemma contravariant_sequence_exact₁ {n₀ : ℕ} (x₁ : Ext S.X₁ Y n₀) {n
   exact this x₁ hx₁
 
 include hS in
-
 lemma contravariant_sequence_exact₂ {n : ℕ} (x₂ : Ext S.X₂ Y n)
     (hx₂ : (mk₀ S.f).comp x₂ (zero_add n) = 0) :
     ∃ (x₁ : Ext S.X₃ Y n), (mk₀ S.g).comp x₁ (zero_add n) = x₂ := by

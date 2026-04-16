@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Group/Ultra.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Uniform
@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Nonarchimedean.Basic
 import Mathlib.Topology.MetricSpace.Ultra.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Group
 import Mathlib.Topology.Algebra.Order.LiminfLimsup
+
+noncomputable section
 
 /-!
 # Ultrametric norms
@@ -246,7 +248,26 @@ theorem exists_norm_finset_prod_le (t : Finset ι) [Nonempty ι] (f : ι → M) 
   · simp
   exact (fun ⟨i, h, h'⟩ => ⟨i, fun _ ↦ h, h'⟩) <| exists_norm_finset_prod_le_of_nonempty ht f
 
--- DISSOLVED: exists_norm_multiset_prod_le
+@[to_additive "Given a function `f : ι → M` and a multiset `t : Multiset ι`, we can always find
+`i : ι`, belonging to `t` if `t` is nonempty, such that `‖(s.map f).sum‖ ≤ ‖f i‖`."]
+theorem exists_norm_multiset_prod_le (s : Multiset ι) [Nonempty ι] {f : ι → M} :
+    ∃ i : ι, (s ≠ 0 → i ∈ s) ∧ ‖(s.map f).prod‖ ≤ ‖f i‖ := by
+  inhabit ι
+  induction s using Multiset.induction_on with
+  | empty => simp
+  | @cons a t hM =>
+      obtain ⟨M, hMs, hM⟩ := hM
+      by_cases hMa : ‖f M‖ ≤ ‖f a‖
+      · refine ⟨a, by simp, ?_⟩
+        · rw [Multiset.map_cons, Multiset.prod_cons]
+          exact le_trans (norm_mul_le_max _ _) (max_le (le_refl _) (le_trans hM hMa))
+      · rw [not_le] at hMa
+        rcases eq_or_ne t 0 with rfl|ht
+        · exact ⟨a, by simp, by simp⟩
+        · refine ⟨M, ?_, ?_⟩
+          · simp [hMs ht]
+          rw [Multiset.map_cons, Multiset.prod_cons]
+          exact le_trans (norm_mul_le_max _ _) (max_le hMa.le hM)
 
 @[to_additive]
 lemma norm_tprod_le (f : ι → M) : ‖∏' i, f i‖ ≤ ⨆ i, ‖f i‖ := by

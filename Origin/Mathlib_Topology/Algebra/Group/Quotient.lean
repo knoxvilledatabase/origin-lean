@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.QuotientGroup.Defs
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.Maps.OpenQuotient
 
+noncomputable section
+
 /-!
 # Topology on the quotient group
 

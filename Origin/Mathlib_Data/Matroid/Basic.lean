@@ -8,6 +8,8 @@ import Mathlib.Data.Matroid.Init
 import Mathlib.Data.Set.Card
 import Mathlib.Order.Minimal
 
+noncomputable section
+
 /-!
 # Matroids
 
@@ -331,10 +333,6 @@ private theorem insert_subset_ground {e : α} {X : Set α} {M : Matroid α}
     (he : e ∈ M.E) (hX : X ⊆ M.E) : insert e X ⊆ M.E :=
     insert_subset he hX
 
-@[aesop safe (rule_sets := [Matroid])]
-private theorem ground_subset_ground {M : Matroid α} : M.E ⊆ M.E :=
-  rfl.subset
-
 attribute [aesop safe (rule_sets := [Matroid])] empty_subset union_subset iUnion_subset
 
 end aesop
@@ -474,8 +472,6 @@ theorem Indep.exists_base_superset (hI : M.Indep I) : ∃ B, M.Base B ∧ I ⊆ 
   indep_iff.1 hI
 
 theorem dep_iff : M.Dep D ↔ ¬M.Indep D ∧ D ⊆ M.E := Iff.rfl
-
-theorem setOf_dep_eq (M : Matroid α) : {D | M.Dep D} = {I | M.Indep I}ᶜ ∩ Iic M.E := rfl
 
 @[aesop unsafe 30% (rule_sets := [Matroid])]
 theorem Indep.subset_ground (hI : M.Indep I) : I ⊆ M.E := by

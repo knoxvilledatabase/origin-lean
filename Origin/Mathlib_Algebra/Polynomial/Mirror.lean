@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.NatAntidiagonal
 import Mathlib.Algebra.Polynomial.Reverse
 
+noncomputable section
+
 /-!
 # "Mirror" of a univariate polynomial
 

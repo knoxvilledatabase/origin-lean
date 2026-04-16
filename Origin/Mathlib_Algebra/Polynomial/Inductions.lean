@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Polynomial/Inductions.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MonoidAlgebra.Division
 import Mathlib.Algebra.Polynomial.Degree.Operations
 import Mathlib.Algebra.Polynomial.EraseLead
 import Mathlib.Order.Interval.Finset.Nat
+
+noncomputable section
 
 /-!
 # Induction on polynomials
@@ -74,7 +76,6 @@ theorem divX_X_pow : divX (X ^ n : R[X]) = if (n = 0) then 0 else X ^ (n - 1) :=
     simp [coeff_X_pow]
 
 noncomputable
-
 def divX_hom : R[X] →+ R[X] :=
   { toFun := divX
     map_zero' := divX_zero
@@ -98,15 +99,94 @@ theorem natDegree_divX_le : p.divX.natDegree ≤ p.natDegree :=
 theorem divX_C_mul_X_pow : divX (C a * X ^ n) = if n = 0 then 0 else C a * X ^ (n - 1) := by
   simp only [divX_C_mul, divX_X_pow, mul_ite, mul_zero]
 
--- DISSOLVED: degree_divX_lt
+theorem degree_divX_lt (hp0 : p ≠ 0) : (divX p).degree < p.degree := by
+  haveI := Nontrivial.of_polynomial_ne hp0
+  calc
+    degree (divX p) < (divX p * X + C (p.coeff 0)).degree :=
+      if h : degree p ≤ 0 then by
+        have h' : C (p.coeff 0) ≠ 0 := by rwa [← eq_C_of_degree_le_zero h]
+        rw [eq_C_of_degree_le_zero h, divX_C, degree_zero, zero_mul, zero_add]
+        exact lt_of_le_of_ne bot_le (Ne.symm (mt degree_eq_bot.1 <| by simpa using h'))
+      else by
+        have hXp0 : divX p ≠ 0 := by
+          simpa [divX_eq_zero_iff, -not_le, degree_le_zero_iff] using h
+        have : leadingCoeff (divX p) * leadingCoeff X ≠ 0 := by simpa
+        have : degree (C (p.coeff 0)) < degree (divX p * X) :=
+          calc
+            degree (C (p.coeff 0)) ≤ 0 := degree_C_le
+            _ < 1 := by decide
+            _ = degree (X : R[X]) := degree_X.symm
+            _ ≤ degree (divX p * X) := by
+              rw [← zero_add (degree X), degree_mul' this]
+              exact add_le_add
+                (by rw [zero_le_degree_iff, Ne, divX_eq_zero_iff]
+                    exact fun h0 => h (h0.symm ▸ degree_C_le))
+                    le_rfl
+        rw [degree_add_eq_left_of_degree_lt this]; exact degree_lt_degree_mul_X hXp0
+    _ = degree p := congr_arg _ (divX_mul_X_add _)
 
--- DISSOLVED: recOnHorner
+@[elab_as_elim]
+noncomputable def recOnHorner {M : R[X] → Sort*} (p : R[X]) (M0 : M 0)
+    (MC : ∀ p a, coeff p 0 = 0 → a ≠ 0 → M p → M (p + C a))
+    (MX : ∀ p, p ≠ 0 → M p → M (p * X)) : M p :=
+  letI := Classical.decEq R
+  if hp : p = 0 then hp ▸ M0
+  else by
+    have wf : degree (divX p) < degree p := degree_divX_lt hp
+    rw [← divX_mul_X_add p] at *
+    exact
+      if hcp0 : coeff p 0 = 0 then by
+        rw [hcp0, C_0, add_zero]
+        exact
+          MX _ (fun h : divX p = 0 => by simp [h, hcp0] at hp) (recOnHorner (divX p) M0 MC MX)
+      else
+        MC _ _ (coeff_mul_X_zero _) hcp0
+          (if hpX0 : divX p = 0 then show M (divX p * X) by rw [hpX0, zero_mul]; exact M0
+          else MX (divX p) hpX0 (recOnHorner _ M0 MC MX))
 
 termination_by p.degree
 
--- DISSOLVED: degree_pos_induction_on
+@[elab_as_elim]
+theorem degree_pos_induction_on {P : R[X] → Prop} (p : R[X]) (h0 : 0 < degree p)
+    (hC : ∀ {a}, a ≠ 0 → P (C a * X)) (hX : ∀ {p}, 0 < degree p → P p → P (p * X))
+    (hadd : ∀ {p} {a}, 0 < degree p → P p → P (p + C a)) : P p :=
+  recOnHorner p (fun h => by rw [degree_zero] at h; exact absurd h (by decide))
+    (fun p a heq0 _ ih h0 =>
+      (have : 0 < degree p :=
+        (lt_of_not_ge fun h =>
+          not_lt_of_ge (degree_C_le (a := a)) <|
+            by rwa [eq_C_of_degree_le_zero h, ← C_add,heq0,zero_add] at h0)
+      hadd this (ih this)))
+    (fun p _ ih h0' =>
+      if h0 : 0 < degree p then hX h0 (ih h0)
+      else by
+        rw [eq_C_of_degree_le_zero (le_of_not_gt h0)] at h0' ⊢
+        exact hC fun h : coeff p 0 = 0 => by simp [h, Nat.not_lt_zero] at h0')
+    h0
 
--- DISSOLVED: natDegree_ne_zero_induction_on
+@[elab_as_elim]
+theorem natDegree_ne_zero_induction_on {M : R[X] → Prop} {f : R[X]} (f0 : f.natDegree ≠ 0)
+    (h_C_add : ∀ {a p}, M p → M (C a + p)) (h_add : ∀ {p q}, M p → M q → M (p + q))
+    (h_monomial : ∀ {n : ℕ} {a : R}, a ≠ 0 → n ≠ 0 → M (monomial n a)) : M f := by
+  suffices f.natDegree = 0 ∨ M f from Or.recOn this (fun h => (f0 h).elim) id
+  refine Polynomial.induction_on f ?_ ?_ ?_
+  · exact fun a => Or.inl (natDegree_C _)
+  · rintro p q (hp | hp) (hq | hq)
+    · refine Or.inl ?_
+      rw [eq_C_of_natDegree_eq_zero hp, eq_C_of_natDegree_eq_zero hq, ← C_add, natDegree_C]
+    · refine Or.inr ?_
+      rw [eq_C_of_natDegree_eq_zero hp]
+      exact h_C_add hq
+    · refine Or.inr ?_
+      rw [eq_C_of_natDegree_eq_zero hq, add_comm]
+      exact h_C_add hp
+    · exact Or.inr (h_add hp hq)
+  · intro n a _
+    by_cases a0 : a = 0
+    · exact Or.inl (by rw [a0, C_0, zero_mul, natDegree_zero])
+    · refine Or.inr ?_
+      rw [C_mul_X_pow_eq_monomial]
+      exact h_monomial a0 n.succ_ne_zero
 
 end Semiring
 

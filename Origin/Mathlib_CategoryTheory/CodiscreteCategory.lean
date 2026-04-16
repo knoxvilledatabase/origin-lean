@@ -9,6 +9,8 @@ import Mathlib.Data.ULift
 import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.CategoryTheory.Adjunction.Basic
 
+noncomputable section
+
 /-!
 # Codiscrete categories
 
@@ -35,9 +37,6 @@ structure Codiscrete (α : Type u) where
   /-- A wrapper for promoting any type to a category,
   with a unique morphisms between any two objects of the category. -/
   as : α
-
-@[simp]
-theorem Codiscrete.mk_as {α : Type u} (X : Codiscrete α) : Codiscrete.mk X.as = X := rfl
 
 @[simps]
 def codiscreteEquiv {α : Type u} : Codiscrete α ≃ α where
@@ -110,20 +109,6 @@ def adj : objects ⊣ functorToCat := mkOfHomEquiv {
 def unitApp (C : Type u) [Category.{v} C] : C ⥤ Codiscrete C := functor id
 
 def counitApp (A : Type u) : Codiscrete A → A := Codiscrete.as
-
-lemma adj_unit_app (X : Cat.{0, u}) :
-    adj.unit.app X = unitApp X := rfl
-
-lemma adj_counit_app (A : Type u) :
-    adj.counit.app A = counitApp A := rfl
-
-lemma left_triangle_components (C : Type u) [Category.{v} C] :
-    (counitApp C).comp (unitApp C).obj = id :=
-  rfl
-
-lemma right_triangle_components (X : Type u) :
-    unitApp (Codiscrete X) ⋙ functorOfFun (counitApp X) = 𝟭 (Codiscrete X) :=
-  rfl
 
 end Codiscrete
 

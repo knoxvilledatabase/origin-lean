@@ -10,6 +10,8 @@ import Mathlib.Data.Finite.Prod
 import Mathlib.Data.Matrix.Mul
 import Mathlib.LinearAlgebra.Pi
 
+noncomputable section
+
 /-!
 # Matrices
 
@@ -48,16 +50,6 @@ instance {n m} [Finite m] [Finite n] (α) [Finite α] :
 section
 
 variable (R)
-
-def ofLinearEquiv [Semiring R] [AddCommMonoid α] [Module R α] : (m → n → α) ≃ₗ[R] Matrix m n α where
-  __ := ofAddEquiv
-  map_smul' _ _ := rfl
-
-@[simp] lemma coe_ofLinearEquiv [Semiring R] [AddCommMonoid α] [Module R α] :
-    ⇑(ofLinearEquiv _ : (m → n → α) ≃ₗ[R] Matrix m n α) = of := rfl
-
-@[simp] lemma coe_ofLinearEquiv_symm [Semiring R] [AddCommMonoid α] [Module R α] :
-    ⇑((ofLinearEquiv _).symm : Matrix m n α ≃ₗ[R] (m → n → α)) = of.symm := rfl
 
 end
 
@@ -219,9 +211,6 @@ theorem algebraMap_matrix_apply {r : R} {i j : n} :
 theorem algebraMap_eq_diagonal (r : R) :
     algebraMap R (Matrix n n α) r = diagonal (algebraMap R (n → α) r) := rfl
 
-theorem algebraMap_eq_diagonalRingHom :
-    algebraMap R (Matrix n n α) = (diagonalRingHom n α).comp (algebraMap R _) := rfl
-
 @[simp]
 theorem map_algebraMap (r : R) (f : α → β) (hf : f 0 = 0)
     (hf₂ : f (algebraMap R α r) = algebraMap R β r) :
@@ -253,17 +242,6 @@ variable [Add α]
 
 variable (R α) in
 
-@[simps]
-def entryAddHom (i : m) (j : n) : AddHom (Matrix m n α) α where
-  toFun M := M i j
-  map_add' _ _ := rfl
-
-lemma entryAddHom_eq_comp {i : m} {j : n} :
-    entryAddHom α i j =
-      ((Pi.evalAddHom (fun _ => α) j).comp (Pi.evalAddHom _ i)).comp
-        (AddHomClass.toAddHom ofAddEquiv.symm) :=
-  rfl
-
 end AddHom
 
 section AddMonoidHom
@@ -278,18 +256,9 @@ def entryAddMonoidHom (i : m) (j : n) : Matrix m n α →+ α where
   map_add' _ _ := rfl
   map_zero' := rfl
 
-lemma entryAddMonoidHom_eq_comp {i : m} {j : n} :
-    entryAddMonoidHom α i j =
-      ((Pi.evalAddMonoidHom (fun _ => α) j).comp (Pi.evalAddMonoidHom _ i)).comp
-        (AddMonoidHomClass.toAddMonoidHom ofAddEquiv.symm) := by
-  rfl
-
 @[simp] lemma evalAddMonoidHom_comp_diagAddMonoidHom (i : m) :
     (Pi.evalAddMonoidHom _ i).comp (diagAddMonoidHom m α) = entryAddMonoidHom α i i := by
   simp [AddMonoidHom.ext_iff]
-
-@[simp] lemma entryAddMonoidHom_toAddHom {i : m} {j : n} :
-  (entryAddMonoidHom α i j : AddHom _ _) = entryAddHom α i j := rfl
 
 end AddMonoidHom
 
@@ -306,20 +275,9 @@ def entryLinearMap (i : m) (j : n) :
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-lemma entryLinearMap_eq_comp {i : m} {j : n} :
-    entryLinearMap R α i j =
-      LinearMap.proj j ∘ₗ LinearMap.proj i ∘ₗ (ofLinearEquiv R).symm.toLinearMap := by
-  rfl
-
 @[simp] lemma proj_comp_diagLinearMap (i : m) :
     LinearMap.proj i ∘ₗ diagLinearMap m R α = entryLinearMap R α i i := by
   simp [LinearMap.ext_iff]
-
-@[simp] lemma entryLinearMap_toAddMonoidHom {i : m} {j : n} :
-    (entryLinearMap R α i j : _ →+ _) = entryAddMonoidHom α i j := rfl
-
-@[simp] lemma entryLinearMap_toAddHom {i : m} {j : n} :
-    (entryLinearMap R α i j : AddHom _ _) = entryAddHom α i j := rfl
 
 end LinearMap
 
@@ -331,79 +289,17 @@ end Matrix
 
 namespace Equiv
 
-@[simps apply]
-def mapMatrix (f : α ≃ β) : Matrix m n α ≃ Matrix m n β where
-  toFun M := M.map f
-  invFun M := M.map f.symm
-  left_inv _ := Matrix.ext fun _ _ => f.symm_apply_apply _
-  right_inv _ := Matrix.ext fun _ _ => f.apply_symm_apply _
-
-@[simp]
-theorem mapMatrix_refl : (Equiv.refl α).mapMatrix = Equiv.refl (Matrix m n α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_symm (f : α ≃ β) : f.mapMatrix.symm = (f.symm.mapMatrix : Matrix m n β ≃ _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_trans (f : α ≃ β) (g : β ≃ γ) :
-    f.mapMatrix.trans g.mapMatrix = ((f.trans g).mapMatrix : Matrix m n α ≃ _) :=
-  rfl
-
 end Equiv
 
 namespace AddMonoidHom
 
 variable [AddZeroClass α] [AddZeroClass β] [AddZeroClass γ]
 
-@[simps]
-def mapMatrix (f : α →+ β) : Matrix m n α →+ Matrix m n β where
-  toFun M := M.map f
-  map_zero' := Matrix.map_zero f f.map_zero
-  map_add' := Matrix.map_add f f.map_add
-
-@[simp]
-theorem mapMatrix_id : (AddMonoidHom.id α).mapMatrix = AddMonoidHom.id (Matrix m n α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_comp (f : β →+ γ) (g : α →+ β) :
-    f.mapMatrix.comp g.mapMatrix = ((f.comp g).mapMatrix : Matrix m n α →+ _) :=
-  rfl
-
-@[simp] lemma entryAddMonoidHom_comp_mapMatrix (f : α →+ β) (i : m) (j : n) :
-    (entryAddMonoidHom β i j).comp f.mapMatrix = f.comp (entryAddMonoidHom α i j) := rfl
-
 end AddMonoidHom
 
 namespace AddEquiv
 
 variable [Add α] [Add β] [Add γ]
-
-@[simps apply]
-def mapMatrix (f : α ≃+ β) : Matrix m n α ≃+ Matrix m n β :=
-  { f.toEquiv.mapMatrix with
-    toFun := fun M => M.map f
-    invFun := fun M => M.map f.symm
-    map_add' := Matrix.map_add f (map_add f) }
-
-@[simp]
-theorem mapMatrix_refl : (AddEquiv.refl α).mapMatrix = AddEquiv.refl (Matrix m n α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_symm (f : α ≃+ β) : f.mapMatrix.symm = (f.symm.mapMatrix : Matrix m n β ≃+ _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_trans (f : α ≃+ β) (g : β ≃+ γ) :
-    f.mapMatrix.trans g.mapMatrix = ((f.trans g).mapMatrix : Matrix m n α ≃+ _) :=
-  rfl
-
-@[simp] lemma entryAddHom_comp_mapMatrix (f : α ≃+ β) (i : m) (j : n) :
-    (entryAddHom β i j).comp (AddHomClass.toAddHom f.mapMatrix) =
-      (f : AddHom α β).comp (entryAddHom _ i j) := rfl
 
 end AddEquiv
 
@@ -413,24 +309,6 @@ variable [Semiring R] [AddCommMonoid α] [AddCommMonoid β] [AddCommMonoid γ]
 
 variable [Module R α] [Module R β] [Module R γ]
 
-@[simps]
-def mapMatrix (f : α →ₗ[R] β) : Matrix m n α →ₗ[R] Matrix m n β where
-  toFun M := M.map f
-  map_add' := Matrix.map_add f f.map_add
-  map_smul' r := Matrix.map_smul f r (f.map_smul r)
-
-@[simp]
-theorem mapMatrix_id : LinearMap.id.mapMatrix = (LinearMap.id : Matrix m n α →ₗ[R] _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_comp (f : β →ₗ[R] γ) (g : α →ₗ[R] β) :
-    f.mapMatrix.comp g.mapMatrix = ((f.comp g).mapMatrix : Matrix m n α →ₗ[R] _) :=
-  rfl
-
-@[simp] lemma entryLinearMap_comp_mapMatrix (f : α →ₗ[R] β) (i : m) (j : n) :
-    entryLinearMap R _ i j ∘ₗ f.mapMatrix = f ∘ₗ entryLinearMap R _ i j := rfl
-
 end LinearMap
 
 namespace LinearEquiv
@@ -438,36 +316,6 @@ namespace LinearEquiv
 variable [Semiring R] [AddCommMonoid α] [AddCommMonoid β] [AddCommMonoid γ]
 
 variable [Module R α] [Module R β] [Module R γ]
-
-@[simps apply]
-def mapMatrix (f : α ≃ₗ[R] β) : Matrix m n α ≃ₗ[R] Matrix m n β :=
-  { f.toEquiv.mapMatrix,
-    f.toLinearMap.mapMatrix with
-    toFun := fun M => M.map f
-    invFun := fun M => M.map f.symm }
-
-@[simp]
-theorem mapMatrix_refl : (LinearEquiv.refl R α).mapMatrix = LinearEquiv.refl R (Matrix m n α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_symm (f : α ≃ₗ[R] β) :
-    f.mapMatrix.symm = (f.symm.mapMatrix : Matrix m n β ≃ₗ[R] _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_trans (f : α ≃ₗ[R] β) (g : β ≃ₗ[R] γ) :
-    f.mapMatrix.trans g.mapMatrix = ((f.trans g).mapMatrix : Matrix m n α ≃ₗ[R] _) :=
-  rfl
-
-@[simp] lemma mapMatrix_toLinearMap (f : α ≃ₗ[R] β) :
-    (f.mapMatrix : _ ≃ₗ[R] Matrix m n β).toLinearMap = f.toLinearMap.mapMatrix := by
-  rfl
-
-@[simp] lemma entryLinearMap_comp_mapMatrix (f : α ≃ₗ[R] β) (i : m) (j : n) :
-    entryLinearMap R _ i j ∘ₗ f.mapMatrix.toLinearMap =
-      f.toLinearMap ∘ₗ entryLinearMap R _ i j := by
-  simp only [mapMatrix_toLinearMap, LinearMap.entryLinearMap_comp_mapMatrix]
 
 end LinearEquiv
 
@@ -477,22 +325,6 @@ variable [Fintype m] [DecidableEq m]
 
 variable [NonAssocSemiring α] [NonAssocSemiring β] [NonAssocSemiring γ]
 
-@[simps]
-def mapMatrix (f : α →+* β) : Matrix m m α →+* Matrix m m β :=
-  { f.toAddMonoidHom.mapMatrix with
-    toFun := fun M => M.map f
-    map_one' := by simp
-    map_mul' := fun _ _ => Matrix.map_mul }
-
-@[simp]
-theorem mapMatrix_id : (RingHom.id α).mapMatrix = RingHom.id (Matrix m m α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_comp (f : β →+* γ) (g : α →+* β) :
-    f.mapMatrix.comp g.mapMatrix = ((f.comp g).mapMatrix : Matrix m m α →+* _) :=
-  rfl
-
 end RingHom
 
 namespace RingEquiv
@@ -500,26 +332,6 @@ namespace RingEquiv
 variable [Fintype m] [DecidableEq m]
 
 variable [NonAssocSemiring α] [NonAssocSemiring β] [NonAssocSemiring γ]
-
-@[simps apply]
-def mapMatrix (f : α ≃+* β) : Matrix m m α ≃+* Matrix m m β :=
-  { f.toRingHom.mapMatrix,
-    f.toAddEquiv.mapMatrix with
-    toFun := fun M => M.map f
-    invFun := fun M => M.map f.symm }
-
-@[simp]
-theorem mapMatrix_refl : (RingEquiv.refl α).mapMatrix = RingEquiv.refl (Matrix m m α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_symm (f : α ≃+* β) : f.mapMatrix.symm = (f.symm.mapMatrix : Matrix m m β ≃+* _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_trans (f : α ≃+* β) (g : β ≃+* γ) :
-    f.mapMatrix.trans g.mapMatrix = ((f.trans g).mapMatrix : Matrix m m α ≃+* _) :=
-  rfl
 
 open MulOpposite in
 
@@ -542,21 +354,6 @@ variable [CommSemiring R] [Semiring α] [Semiring β] [Semiring γ]
 
 variable [Algebra R α] [Algebra R β] [Algebra R γ]
 
-@[simps]
-def mapMatrix (f : α →ₐ[R] β) : Matrix m m α →ₐ[R] Matrix m m β :=
-  { f.toRingHom.mapMatrix with
-    toFun := fun M => M.map f
-    commutes' := fun r => Matrix.map_algebraMap r f (map_zero _) (f.commutes r) }
-
-@[simp]
-theorem mapMatrix_id : (AlgHom.id R α).mapMatrix = AlgHom.id R (Matrix m m α) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_comp (f : β →ₐ[R] γ) (g : α →ₐ[R] β) :
-    f.mapMatrix.comp g.mapMatrix = ((f.comp g).mapMatrix : Matrix m m α →ₐ[R] _) :=
-  rfl
-
 end AlgHom
 
 namespace AlgEquiv
@@ -566,27 +363,6 @@ variable [Fintype m] [DecidableEq m]
 variable [CommSemiring R] [Semiring α] [Semiring β] [Semiring γ]
 
 variable [Algebra R α] [Algebra R β] [Algebra R γ]
-
-@[simps apply]
-def mapMatrix (f : α ≃ₐ[R] β) : Matrix m m α ≃ₐ[R] Matrix m m β :=
-  { f.toAlgHom.mapMatrix,
-    f.toRingEquiv.mapMatrix with
-    toFun := fun M => M.map f
-    invFun := fun M => M.map f.symm }
-
-@[simp]
-theorem mapMatrix_refl : AlgEquiv.refl.mapMatrix = (AlgEquiv.refl : Matrix m m α ≃ₐ[R] _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_symm (f : α ≃ₐ[R] β) :
-    f.mapMatrix.symm = (f.symm.mapMatrix : Matrix m m β ≃ₐ[R] _) :=
-  rfl
-
-@[simp]
-theorem mapMatrix_trans (f : α ≃ₐ[R] β) (g : β ≃ₐ[R] γ) :
-    f.mapMatrix.trans g.mapMatrix = ((f.trans g).mapMatrix : Matrix m m α ≃ₐ[R] _) :=
-  rfl
 
 end AlgEquiv
 
@@ -608,10 +384,6 @@ def transposeAddEquiv [Add α] : Matrix m n α ≃+ Matrix n m α where
   right_inv := transpose_transpose
   map_add' := transpose_add
 
-@[simp]
-theorem transposeAddEquiv_symm [Add α] : (transposeAddEquiv m n α).symm = transposeAddEquiv n m α :=
-  rfl
-
 variable {m n α}
 
 theorem transpose_list_sum [AddMonoid α] (l : List (Matrix m n α)) :
@@ -632,11 +404,6 @@ variable (m n R α)
 def transposeLinearEquiv [Semiring R] [AddCommMonoid α] [Module R α] :
     Matrix m n α ≃ₗ[R] Matrix n m α :=
   { transposeAddEquiv m n α with map_smul' := transpose_smul }
-
-@[simp]
-theorem transposeLinearEquiv_symm [Semiring R] [AddCommMonoid α] [Module R α] :
-    (transposeLinearEquiv m n R α).symm = transposeLinearEquiv n m R α :=
-  rfl
 
 variable {m n R α}
 

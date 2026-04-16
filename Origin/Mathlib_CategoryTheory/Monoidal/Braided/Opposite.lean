@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Monoidal.Opposite
 
+noncomputable section
+
 /-!
 # If `C` is braided, so is `Cᵒᵖ`.
 

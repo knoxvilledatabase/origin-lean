@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/Euclidean/Inversion/ImageHyperplane.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 8 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Inversion.Basic
 import Mathlib.Geometry.Euclidean.PerpBisector
+
+noncomputable section
 
 /-!
 # Image of a hyperplane under inversion
@@ -33,23 +35,52 @@ variable {V P : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [MetricS
 
 namespace EuclideanGeometry
 
--- DISSOLVED: inversion_mem_perpBisector_inversion_iff
+theorem inversion_mem_perpBisector_inversion_iff (hR : R ≠ 0) (hx : x ≠ c) (hy : y ≠ c) :
+    inversion c R x ∈ perpBisector c (inversion c R y) ↔ dist x y = dist y c := by
+  rw [mem_perpBisector_iff_dist_eq, dist_inversion_inversion hx hy, dist_inversion_center]
+  have hx' := dist_ne_zero.2 hx
+  have hy' := dist_ne_zero.2 hy
+  -- takes 300ms, but the "equivalent" simp call fails -> hard to speed up
+  field_simp [mul_assoc, mul_comm, hx, hx.symm, eq_comm]
 
--- DISSOLVED: inversion_mem_perpBisector_inversion_iff'
+theorem inversion_mem_perpBisector_inversion_iff' (hR : R ≠ 0) (hy : y ≠ c) :
+    inversion c R x ∈ perpBisector c (inversion c R y) ↔ dist x y = dist y c ∧ x ≠ c := by
+  rcases eq_or_ne x c with rfl | hx
+  · simp [*]
+  · simp [inversion_mem_perpBisector_inversion_iff hR hx hy, hx]
 
--- DISSOLVED: preimage_inversion_perpBisector_inversion
+theorem preimage_inversion_perpBisector_inversion (hR : R ≠ 0) (hy : y ≠ c) :
+    inversion c R ⁻¹' perpBisector c (inversion c R y) = sphere y (dist y c) \ {c} :=
+  Set.ext fun _ ↦ inversion_mem_perpBisector_inversion_iff' hR hy
 
--- DISSOLVED: preimage_inversion_perpBisector
+theorem preimage_inversion_perpBisector (hR : R ≠ 0) (hy : y ≠ c) :
+    inversion c R ⁻¹' perpBisector c y = sphere (inversion c R y) (R ^ 2 / dist y c) \ {c} := by
+  rw [← dist_inversion_center, ← preimage_inversion_perpBisector_inversion hR,
+    inversion_inversion] <;> simp [*]
 
--- DISSOLVED: image_inversion_perpBisector
+theorem image_inversion_perpBisector (hR : R ≠ 0) (hy : y ≠ c) :
+    inversion c R '' perpBisector c y = sphere (inversion c R y) (R ^ 2 / dist y c) \ {c} := by
+  rw [image_eq_preimage_of_inverse (inversion_involutive _ hR) (inversion_involutive _ hR),
+    preimage_inversion_perpBisector hR hy]
 
--- DISSOLVED: preimage_inversion_sphere_dist_center
+theorem preimage_inversion_sphere_dist_center (hR : R ≠ 0) (hy : y ≠ c) :
+    inversion c R ⁻¹' sphere y (dist y c) =
+      insert c (perpBisector c (inversion c R y) : Set P) := by
+  ext x
+  rcases eq_or_ne x c with rfl | hx; · simp [dist_comm]
+  rw [mem_preimage, mem_sphere, ← inversion_mem_perpBisector_inversion_iff hR] <;> simp [*]
 
--- DISSOLVED: image_inversion_sphere_dist_center
+theorem image_inversion_sphere_dist_center (hR : R ≠ 0) (hy : y ≠ c) :
+    inversion c R '' sphere y (dist y c) = insert c (perpBisector c (inversion c R y) : Set P) := by
+  rw [image_eq_preimage_of_inverse (inversion_involutive _ hR) (inversion_involutive _ hR),
+    preimage_inversion_sphere_dist_center hR hy]
 
 theorem mapsTo_inversion_affineSubspace_of_mem {p : AffineSubspace ℝ P} (hp : c ∈ p) :
     MapsTo (inversion c R) p p := fun _ ↦ AffineMap.lineMap_mem _ hp
 
--- DISSOLVED: image_inversion_affineSubspace_of_mem
+theorem image_inversion_affineSubspace_of_mem {p : AffineSubspace ℝ P} (hR : R ≠ 0) (hp : c ∈ p) :
+    inversion c R '' p = p :=
+  (mapsTo_inversion_affineSubspace_of_mem hp).image_subset.antisymm fun x hx ↦
+    ⟨inversion c R x, mapsTo_inversion_affineSubspace_of_mem hp hx, inversion_inversion _ hR _⟩
 
 end EuclideanGeometry

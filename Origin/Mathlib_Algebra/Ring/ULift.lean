@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.ULift
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # `ULift` instances for ring
 
@@ -56,14 +58,6 @@ instance semiring [Semiring α] : Semiring (ULift α) :=
       npow := Monoid.npow, natCast := fun n => ULift.up n, add_comm, left_distrib, right_distrib,
       zero_mul, mul_zero, mul_assoc, one_mul, mul_one, npow_zero := fun _ => Monoid.npow_zero _,
       npow_succ := fun _ _ => Monoid.npow_succ _ _ }
-
-def ringEquiv [NonUnitalNonAssocSemiring α] : ULift α ≃+* α where
-  toFun := ULift.down
-  invFun := ULift.up
-  map_mul' _ _ := rfl
-  map_add' _ _ := rfl
-  left_inv := fun _ => rfl
-  right_inv := fun _ => rfl
 
 instance nonUnitalCommSemiring [NonUnitalCommSemiring α] : NonUnitalCommSemiring (ULift α) :=
   { zero := (0 : ULift α), add := (· + ·), mul := (· * ·), nsmul := AddMonoid.nsmul, add_assoc,

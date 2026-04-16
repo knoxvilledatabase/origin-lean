@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Pi
 import Mathlib.LinearAlgebra.TensorProduct.Pi
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Tensor product and products of algebras
 
@@ -23,9 +25,6 @@ variable (R S A : Type*) [CommSemiring R] [CommSemiring S] [Algebra R S] [CommSe
   [Algebra R A] [Algebra S A] [IsScalarTower R S A]
 
 variable {ι : Type*} (B : ι → Type*) [∀ i, CommSemiring (B i)] [∀ i, Algebra R (B i)]
-
-@[simp]
-lemma piRightHom_one : piRightHom R S A B 1 = 1 := rfl
 
 variable {R S A B} in
 
@@ -49,9 +48,5 @@ variable [Fintype ι] [DecidableEq ι]
 noncomputable def Algebra.TensorProduct.piRight :
     A ⊗[R] (∀ i, B i) ≃ₐ[S] ∀ i, A ⊗[R] B i :=
   AlgEquiv.ofLinearEquiv (_root_.TensorProduct.piRight R S A B) (by simp) (by simp)
-
-@[simp]
-lemma Algebra.TensorProduct.piRight_tmul (x : A) (f : ∀ i, B i) :
-    piRight R S A B (x ⊗ₜ f) = (fun j ↦ x ⊗ₜ f j) := rfl
 
 end

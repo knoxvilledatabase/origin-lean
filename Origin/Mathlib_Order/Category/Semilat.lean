@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Category.PartOrd
 import Mathlib.Order.Hom.Lattice
 
+noncomputable section
+
 /-!
 # The categories of semilattices
 
@@ -43,10 +45,6 @@ attribute [instance] isSemilatticeSup isOrderBot
 def of (α : Type*) [SemilatticeSup α] [OrderBot α] : SemilatSupCat :=
   ⟨α⟩
 
-@[simp]
-theorem coe_of (α : Type*) [SemilatticeSup α] [OrderBot α] : ↥(of α) = α :=
-  rfl
-
 instance : Inhabited SemilatSupCat :=
   ⟨of PUnit⟩
 
@@ -74,11 +72,6 @@ instance hasForgetToPartOrd : HasForget₂ SemilatSupCat PartOrd where
       -- Porting note: was `map := fun f => f`
       map := fun f => ⟨f.toSupHom, OrderHomClass.mono f.toSupHom⟩ }
 
-@[simp]
-theorem coe_forget_to_partOrd (X : SemilatSupCat) :
-    ↥((forget₂ SemilatSupCat PartOrd).obj X) = ↥X :=
-  rfl
-
 end SemilatSupCat
 
 namespace SemilatInfCat
@@ -90,10 +83,6 @@ attribute [instance] isSemilatticeInf isOrderTop
 
 def of (α : Type*) [SemilatticeInf α] [OrderTop α] : SemilatInfCat :=
   ⟨α⟩
-
-@[simp]
-theorem coe_of (α : Type*) [SemilatticeInf α] [OrderTop α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited SemilatInfCat :=
   ⟨of PUnit⟩
@@ -120,11 +109,6 @@ instance hasForgetToPartOrd : HasForget₂ SemilatInfCat PartOrd where
     { obj := fun X => ⟨X, inferInstance⟩
       -- Porting note: was `map := fun f => f`
       map := fun f => ⟨f.toInfHom, OrderHomClass.mono f.toInfHom⟩ }
-
-@[simp]
-theorem coe_forget_to_partOrd (X : SemilatInfCat) :
-    ↥((forget₂ SemilatInfCat PartOrd).obj X) = ↥X :=
-  rfl
 
 end SemilatInfCat
 
@@ -168,13 +152,3 @@ def SemilatSupCatEquivSemilatInfCat : SemilatSupCat ≌ SemilatInfCat where
   inverse := SemilatInfCat.dual
   unitIso := NatIso.ofComponents fun X => SemilatSupCat.Iso.mk <| OrderIso.dualDual X
   counitIso := NatIso.ofComponents fun X => SemilatInfCat.Iso.mk <| OrderIso.dualDual X
-
-theorem SemilatSupCat_dual_comp_forget_to_partOrd :
-    SemilatSupCat.dual ⋙ forget₂ SemilatInfCat PartOrd =
-      forget₂ SemilatSupCat PartOrd ⋙ PartOrd.dual :=
-  rfl
-
-theorem SemilatInfCat_dual_comp_forget_to_partOrd :
-    SemilatInfCat.dual ⋙ forget₂ SemilatSupCat PartOrd =
-      forget₂ SemilatInfCat PartOrd ⋙ PartOrd.dual :=
-  rfl

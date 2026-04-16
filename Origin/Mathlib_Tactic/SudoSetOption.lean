@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.ElabRules
 
+noncomputable section
+
 /-!
 # Defines the `sudo set_option` command.
 
@@ -29,21 +31,14 @@ private def setOption {m : Type → Type} [Monad m] [MonadError m]
 open Elab.Command in
 
 elab "sudo " "set_option " n:ident ppSpace val:term : command => do
-
   let options ← setOption n val (← getOptions)
-
   modify fun s ↦ { s with maxRecDepth := maxRecDepth.get options }
-
   modifyScope fun scope ↦ { scope with opts := options }
 
 open Elab.Term in
 
 elab "sudo " "set_option " n:ident ppSpace val:term " in " body:term : term <= expectedType => do
-
   let options ← setOption n val (← getOptions)
-
   withTheReader Core.Context (fun ctx ↦
-
       { ctx with maxRecDepth := maxRecDepth.get options, options := options }) do
-
     elabTerm body expectedType

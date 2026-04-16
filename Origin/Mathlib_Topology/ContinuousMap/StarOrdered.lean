@@ -8,6 +8,8 @@ import Mathlib.Data.Real.StarOrdered
 import Mathlib.Topology.ContinuousMap.Lattice
 import Mathlib.Topology.ContinuousMap.ContinuousMapZero
 
+noncomputable section
+
 /-! # Continuous functions as a star-ordered ring -/
 
 open scoped NNReal

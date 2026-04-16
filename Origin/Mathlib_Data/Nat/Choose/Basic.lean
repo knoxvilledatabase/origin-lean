@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Order.Monotone.Basic
 
+noncomputable section
+
 /-!
 # Binomial coefficients
 
@@ -52,9 +54,6 @@ theorem choose_zero_succ (k : ℕ) : choose 0 (succ k) = 0 :=
   rfl
 
 theorem choose_succ_succ (n k : ℕ) : choose (succ n) (succ k) = choose n k + choose n (succ k) :=
-  rfl
-
-theorem choose_succ_succ' (n k : ℕ) : choose (n + 1) (k + 1) = choose n k + choose n (k + 1) :=
   rfl
 
 theorem choose_succ_left (n k : ℕ) (hk : 0 < k) :

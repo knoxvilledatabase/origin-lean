@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Module/Submodule/Range.lean
-Genuine: 48 | Conflates: 0 | Dissolved: 2 | Infrastructure: 9
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Ker
 import Mathlib.Data.Set.Finite.Range
+
+noncomputable section
 
 /-!
 # Range of linear maps
@@ -61,10 +63,6 @@ def range [RingHomSurjective τ₁₂] (f : F) : Submodule R₂ M₂ :=
 theorem range_coe [RingHomSurjective τ₁₂] (f : F) : (range f : Set M₂) = Set.range f :=
   rfl
 
-theorem range_toAddSubmonoid [RingHomSurjective τ₁₂] (f : M →ₛₗ[τ₁₂] M₂) :
-    f.range.toAddSubmonoid = AddMonoidHom.mrange f :=
-  rfl
-
 @[simp]
 theorem mem_range [RingHomSurjective τ₁₂] {f : F} {x} : x ∈ range f ↔ ∃ y, f y = x :=
   Iff.rfl
@@ -115,11 +113,6 @@ lemma range_domRestrict_le_range [RingHomSurjective τ₁₂] (f : M →ₛₗ[�
     LinearMap.range (f.domRestrict S) ≤ LinearMap.range f := by
   rintro x ⟨⟨y, hy⟩, rfl⟩
   exact LinearMap.mem_range_self f y
-
-@[simp]
-theorem _root_.AddMonoidHom.coe_toIntLinearMap_range {M M₂ : Type*} [AddCommGroup M]
-    [AddCommGroup M₂] (f : M →+ M₂) :
-    LinearMap.range f.toIntLinearMap = AddSubgroup.toIntSubmodule f.range := rfl
 
 lemma _root_.Submodule.map_comap_eq_of_le [RingHomSurjective τ₁₂] {f : F} {p : Submodule R₂ M₂}
     (h : p ≤ LinearMap.range f) : (p.comap f).map f = p :=
@@ -211,10 +204,6 @@ variable {f : F}
 
 open Submodule
 
-theorem range_toAddSubgroup [RingHomSurjective τ₁₂] (f : M →ₛₗ[τ₁₂] M₂) :
-    (range f).toAddSubgroup = f.toAddMonoidHom.range :=
-  rfl
-
 theorem ker_le_iff [RingHomSurjective τ₁₂] {p : Submodule R M} :
     ker f ≤ p ↔ ∃ y ∈ range f, f ⁻¹' {y} ⊆ p := by
   constructor
@@ -245,9 +234,12 @@ variable [AddCommMonoid V] [Module K V]
 
 variable [AddCommMonoid V₂] [Module K V₂]
 
--- DISSOLVED: range_smul
+theorem range_smul (f : V →ₗ[K] V₂) (a : K) (h : a ≠ 0) : range (a • f) = range f := by
+  simpa only [range_eq_map] using Submodule.map_smul f _ a h
 
--- DISSOLVED: range_smul'
+theorem range_smul' (f : V →ₗ[K] V₂) (a : K) :
+    range (a • f) = ⨆ _ : a ≠ 0, range f := by
+  simpa only [range_eq_map] using Submodule.map_smul' f _ a
 
 end Semifield
 
@@ -317,19 +309,9 @@ def MapSubtype.orderEmbedding : Submodule R p ↪o Submodule R M :=
   (RelIso.toRelEmbedding <| MapSubtype.relIso p).trans <|
     Subtype.relEmbedding (X := Submodule R M) (fun p p' ↦ p ≤ p') _
 
-@[simp]
-theorem map_subtype_embedding_eq (p' : Submodule R p) :
-    MapSubtype.orderEmbedding p p' = map p.subtype p' :=
-  rfl
-
 def mapIic (p : Submodule R M) :
     Submodule R p ≃o Set.Iic p :=
   Submodule.MapSubtype.relIso p
-
-@[simp] lemma coe_mapIic_apply
-    (p : Submodule R M) (q : Submodule R p) :
-    (p.mapIic q : Submodule R M) = q.map p.subtype :=
-  rfl
 
 end AddCommMonoid
 

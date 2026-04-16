@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 
+noncomputable section
+
 /-!
 # Vitali families
 

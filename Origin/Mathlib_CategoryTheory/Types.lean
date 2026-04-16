@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Functor.FullyFaithful
 import Mathlib.Data.Set.Operations
 import Mathlib.Tactic.PPWithUniv
 
+noncomputable section
+
 /-!
 # The category `Type`.
 
@@ -40,9 +42,6 @@ instance types : LargeCategory (Type u) where
   id _ := id
   comp f g := g ∘ f
 
-theorem types_hom {α β : Type u} : (α ⟶ β) = (α → β) :=
-  rfl
-
 @[ext] theorem types_ext {α β : Type u} (f g : α ⟶ β) (h : ∀ a : α, f a = g a) : f = g := by
   funext x
   exact h x
@@ -51,14 +50,6 @@ theorem types_id (X : Type u) : 𝟙 X = id :=
   rfl
 
 theorem types_comp {X Y Z : Type u} (f : X ⟶ Y) (g : Y ⟶ Z) : f ≫ g = g ∘ f :=
-  rfl
-
-@[simp]
-theorem types_id_apply (X : Type u) (x : X) : (𝟙 X : X → X) x = x :=
-  rfl
-
-@[simp]
-theorem types_comp_apply {X Y Z : Type u} (f : X ⟶ Y) (g : Y ⟶ Z) (x : X) : (f ≫ g) x = g (f x) :=
   rfl
 
 @[simp]
@@ -140,10 +131,6 @@ theorem eqToHom_map_comp_apply (p : X = Y) (q : Y = Z) (x : F.obj X) :
 variable {D : Type u'} [𝒟 : Category.{u'} D] (I J : D ⥤ C) (ρ : I ⟶ J) {W : D}
 
 @[simp]
-theorem hcomp (x : (I ⋙ F).obj W) : (ρ ◫ σ).app W x = (G.map (ρ.app W)) (σ.app (I.obj W) x) :=
-  rfl
-
-@[simp]
 theorem map_inv_map_hom_apply (f : X ≅ Y) (x : F.obj X) : F.map f.inv (F.map f.hom x) = x :=
   congr_fun (F.mapIso f).hom_inv_id x
 
@@ -169,15 +156,6 @@ def uliftTrivial (V : Type u) : ULift.{u} V ≅ V where
 def uliftFunctor : Type u ⥤ Type max u v where
   obj X := ULift.{v} X
   map {X} {_} f := fun x : ULift.{v} X => ULift.up (f x.down)
-
-@[simp]
-theorem uliftFunctor_obj {X : Type u} : uliftFunctor.obj.{v} X = ULift.{v} X :=
-  rfl
-
-@[simp]
-theorem uliftFunctor_map {X Y : Type u} (f : X ⟶ Y) (x : ULift.{v} X) :
-    uliftFunctor.map f x = ULift.up (f x.down) :=
-  rfl
 
 instance uliftFunctor_full : Functor.Full.{u} uliftFunctor where
   map_surjective f := ⟨fun x => (f (ULift.up x)).down, rfl⟩
@@ -230,15 +208,6 @@ def ofTypeFunctor (m : Type u → Type v) [_root_.Functor m] [LawfulFunctor m] :
 
 variable (m : Type u → Type v) [_root_.Functor m] [LawfulFunctor m]
 
-@[simp]
-theorem ofTypeFunctor_obj : (ofTypeFunctor m).obj = m :=
-  rfl
-
-@[simp]
-theorem ofTypeFunctor_map {α β} (f : α → β) :
-    (ofTypeFunctor m).map f = (Functor.map f : m α → m β) :=
-  rfl
-
 end
 
 end CategoryTheory
@@ -255,14 +224,6 @@ def toIso (e : X ≃ Y) : X ≅ Y where
   hom_inv_id := funext e.left_inv
   inv_hom_id := funext e.right_inv
 
-@[simp]
-theorem toIso_hom {e : X ≃ Y} : e.toIso.hom = e :=
-  rfl
-
-@[simp]
-theorem toIso_inv {e : X ≃ Y} : e.toIso.inv = e.symm :=
-  rfl
-
 end Equiv
 
 universe u
@@ -278,23 +239,6 @@ def toEquiv (i : X ≅ Y) : X ≃ Y where
   invFun := i.inv
   left_inv x := congr_fun i.hom_inv_id x
   right_inv y := congr_fun i.inv_hom_id y
-
-@[simp]
-theorem toEquiv_fun (i : X ≅ Y) : (i.toEquiv : X → Y) = i.hom :=
-  rfl
-
-@[simp]
-theorem toEquiv_symm_fun (i : X ≅ Y) : (i.toEquiv.symm : Y → X) = i.inv :=
-  rfl
-
-@[simp]
-theorem toEquiv_id (X : Type u) : (Iso.refl X).toEquiv = Equiv.refl X :=
-  rfl
-
-@[simp]
-theorem toEquiv_comp {X Y Z : Type u} (f : X ≅ Y) (g : Y ≅ Z) :
-    (f ≪≫ g).toEquiv = f.toEquiv.trans g.toEquiv :=
-  rfl
 
 end CategoryTheory.Iso
 
@@ -319,11 +263,3 @@ def equivIsoIso {X Y : Type u} : X ≃ Y ≅ X ≅ Y where
 
 def equivEquivIso {X Y : Type u} : X ≃ Y ≃ (X ≅ Y) :=
   equivIsoIso.toEquiv
-
-@[simp]
-theorem equivEquivIso_hom {X Y : Type u} (e : X ≃ Y) : equivEquivIso e = e.toIso :=
-  rfl
-
-@[simp]
-theorem equivEquivIso_inv {X Y : Type u} (e : X ≅ Y) : equivEquivIso.symm e = e.toEquiv :=
-  rfl

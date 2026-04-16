@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.Tactic.ComputeDegree
 
+noncomputable section
+
 /-!
 # Cancel the leading terms of two polynomials
 

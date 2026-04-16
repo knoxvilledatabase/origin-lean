@@ -8,6 +8,8 @@ import Mathlib.Algebra.FreeAlgebra
 import Mathlib.Algebra.Category.Ring.Basic
 import Mathlib.Algebra.Category.ModuleCat.Basic
 
+noncomputable section
+
 /-!
 # Category instance for algebras over a commutative ring
 
@@ -46,9 +48,6 @@ attribute [coe] AlgebraCat.carrier
 abbrev of (X : Type v) [Ring X] [Algebra R X] : AlgebraCat.{v} R :=
   ⟨X⟩
 
-lemma coe_of (X : Type v) [Ring X] [Algebra R X] : (of R X : Type v) = X :=
-  rfl
-
 variable {R} in
 
 @[ext]
@@ -65,16 +64,6 @@ instance : Category (AlgebraCat.{v} R) where
 instance {M N : AlgebraCat.{v} R} : CoeFun (M ⟶ N) (fun _ ↦ M → N) where
   coe f := f.hom
 
-@[simp]
-lemma hom_id {A : AlgebraCat.{v} R} : (𝟙 A : A ⟶ A).hom = AlgHom.id R A := rfl
-
-lemma id_apply (A : AlgebraCat.{v} R) (a : A) :
-    (𝟙 A : A ⟶ A) a = a := by simp
-
-@[simp]
-lemma hom_comp {A B C : AlgebraCat.{v} R} (f : A ⟶ B) (g : B ⟶ C) :
-    (f ≫ g).hom = g.hom.comp f.hom := rfl
-
 lemma comp_apply {A B C : AlgebraCat.{v} R} (f : A ⟶ B) (g : B ⟶ C) (a : A) :
     (f ≫ g) a = g (f a) := by simp
 
@@ -85,25 +74,6 @@ lemma hom_ext {A B : AlgebraCat.{v} R} {f g : A ⟶ B} (hf : f.hom = g.hom) : f 
 abbrev ofHom {R : Type u} [CommRing R] {X Y : Type v} [Ring X] [Algebra R X] [Ring Y] [Algebra R Y]
     (f : X →ₐ[R] Y) : of R X ⟶ of R Y :=
   ⟨f⟩
-
-lemma hom_ofHom {R : Type u} [CommRing R] {X Y : Type v} [Ring X] [Algebra R X] [Ring Y]
-    [Algebra R Y] (f : X →ₐ[R] Y) : (ofHom f).hom = f := rfl
-
-@[simp]
-lemma ofHom_hom {A B : AlgebraCat.{v} R} (f : A ⟶ B) :
-    ofHom (Hom.hom f) = f := rfl
-
-@[simp]
-lemma ofHom_id {X : Type v} [Ring X] [Algebra R X] : ofHom (AlgHom.id R X) = 𝟙 (of R X) := rfl
-
-@[simp]
-lemma ofHom_comp {X Y Z : Type v} [Ring X] [Ring Y] [Ring Z] [Algebra R X] [Algebra R Y]
-    [Algebra R Z] (f : X →ₐ[R] Y) (g : Y →ₐ[R] Z) :
-    ofHom (g.comp f) = ofHom f ≫ ofHom g :=
-  rfl
-
-lemma ofHom_apply {R : Type u} [CommRing R] {X Y : Type v} [Ring X] [Algebra R X] [Ring Y]
-    [Algebra R Y] (f : X →ₐ[R] Y) (x : X) : ofHom f x = f x := rfl
 
 @[simp]
 lemma inv_hom_apply {A B : AlgebraCat.{v} R} (e : A ≅ B) (x : A) : e.inv (e.hom x) = x := by
@@ -145,16 +115,6 @@ instance hasForgetToModule : HasForget₂ (AlgebraCat.{v} R) (ModuleCat.{v} R) w
   forget₂ :=
     { obj := fun M => ModuleCat.of R M
       map := fun f => ModuleCat.asHom f.hom.toLinearMap }
-
-@[simp]
-lemma forget₂_module_obj (X : AlgebraCat.{v} R) :
-    (forget₂ (AlgebraCat.{v} R) (ModuleCat.{v} R)).obj X = ModuleCat.of R X :=
-  rfl
-
-@[simp]
-lemma forget₂_module_map {X Y : AlgebraCat.{v} R} (f : X ⟶ Y) :
-    (forget₂ (AlgebraCat.{v} R) (ModuleCat.{v} R)).map f = ModuleCat.asHom f.hom.toLinearMap :=
-  rfl
 
 variable {R} in
 

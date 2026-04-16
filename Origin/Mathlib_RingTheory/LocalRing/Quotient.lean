@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.RingTheory.Ideal.Over
 import Mathlib.RingTheory.Nakayama
 
+noncomputable section
+
 /-!
 
 We gather results about the quotients of local rings.
@@ -75,7 +77,6 @@ theorem finrank_quotient_map :
     exact b.span_eq
 
 noncomputable
-
 def basisQuotient [Fintype ι] (b : Basis ι R S) : Basis ι (R ⧸ p) (S ⧸ pS) :=
   basisOfTopLeSpanOfCardEqFinrank (Ideal.Quotient.mk pS ∘ b)
     (by

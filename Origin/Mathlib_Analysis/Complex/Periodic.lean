@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Complex/Periodic.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.RemovableSingularity
 import Mathlib.Analysis.Calculus.InverseFunctionTheorem.Deriv
 import Mathlib.Order.Filter.ZeroAndBoundedAtFilter
+
+noncomputable section
 
 /-!
 # Periodic holomorphic functions
@@ -52,9 +54,16 @@ theorem im_invQParam (q : ℂ) : im (invQParam h q) = -h / (2 * π) * Real.log (
 
 variable {h} -- next few theorems all assume h ≠ 0 or 0 < h
 
--- DISSOLVED: qParam_right_inv
+theorem qParam_right_inv (hh : h ≠ 0) {q : ℂ} (hq : q ≠ 0) : 𝕢 h (invQParam h q) = q := by
+  simp only [qParam, invQParam, ← mul_assoc, mul_div_cancel₀ _ two_pi_I_ne_zero,
+    mul_div_cancel_left₀ _ (ofReal_ne_zero.mpr hh), exp_log hq]
 
--- DISSOLVED: qParam_left_inv_mod_period
+theorem qParam_left_inv_mod_period (hh : h ≠ 0) (z : ℂ) :
+    ∃ m : ℤ, invQParam h (𝕢 h z) = z + m * h := by
+  dsimp only [qParam, invQParam]
+  obtain ⟨m, hm⟩ := log_exp_exists (2 * ↑π * I * z / ↑h)
+  refine ⟨m, by rw [hm, mul_div_assoc, mul_comm (m : ℂ), ← mul_add, ← mul_assoc,
+    div_mul_cancel₀ _ two_pi_I_ne_zero, mul_add, mul_div_cancel₀ _ (mod_cast hh), mul_comm]⟩
 
 theorem abs_qParam_lt_iff (hh : 0 < h) (A : ℝ) (z : ℂ) :
     abs (qParam h z) < Real.exp (-2 * π * A / h) ↔ A < im z := by
@@ -84,7 +93,9 @@ variable (h : ℝ) (f : ℂ → ℂ)
 def cuspFunction : ℂ → ℂ :=
   update (f ∘ invQParam h) 0 (limUnder (𝓝[≠] 0) (f ∘ invQParam h))
 
--- DISSOLVED: cuspFunction_eq_of_nonzero
+theorem cuspFunction_eq_of_nonzero {q : ℂ} (hq : q ≠ 0) :
+    cuspFunction h f q = f (invQParam h q) :=
+  update_noteq hq ..
 
 theorem cuspFunction_zero_eq_limUnder_nhds_ne :
     cuspFunction h f 0 = limUnder (𝓝[≠] 0) (cuspFunction h f) := by
@@ -94,7 +105,13 @@ theorem cuspFunction_zero_eq_limUnder_nhds_ne :
 
 variable {f h}
 
--- DISSOLVED: eq_cuspFunction
+theorem eq_cuspFunction (hh : h ≠ 0) (hf : Periodic f h) (z : ℂ) :
+    (cuspFunction h f) (𝕢 h z) = f z := by
+  have : (cuspFunction h f) (𝕢 h z) = f (invQParam h (𝕢 h z)) := by
+    rw [cuspFunction, update_noteq, comp_apply]
+    exact exp_ne_zero _
+  obtain ⟨m, hm⟩ := qParam_left_inv_mod_period hh z
+  simpa only [this, hm] using hf.int_mul m z
 
 end PeriodicOnℂ
 
@@ -102,9 +119,36 @@ section HoloOnC
 
 variable {h : ℝ} {f : ℂ → ℂ}
 
--- DISSOLVED: differentiableAt_cuspFunction
+theorem differentiableAt_cuspFunction (hh : h ≠ 0) (hf : Periodic f h)
+    {z : ℂ} (hol_z : DifferentiableAt ℂ f z) :
+    DifferentiableAt ℂ (cuspFunction h f) (𝕢 h z) := by
+  let q := 𝕢 h z
+  have qdiff : HasStrictDerivAt (𝕢 h) (q * (2 * π * I / h)) z := by
+    simpa only [id_eq, mul_one] using (((hasStrictDerivAt_id z).const_mul _).div_const _).cexp
+  -- Now show that the q-map has a differentiable local inverse at z, say L : ℂ → ℂ with L q = z.
+  have diff_ne : q * (2 * π * I / h) ≠ 0 :=
+    mul_ne_zero (exp_ne_zero _) (div_ne_zero two_pi_I_ne_zero <| mod_cast hh)
+  let L := (qdiff.localInverse (𝕢 h) _ z) diff_ne
+  have diff_L : DifferentiableAt ℂ L q := (qdiff.to_localInverse diff_ne).differentiableAt
+  have hL : 𝕢 h ∘ L =ᶠ[𝓝 q] (id : ℂ → ℂ) :=
+    (qdiff.hasStrictFDerivAt_equiv diff_ne).eventually_right_inverse
+  -- Thus, if F = cuspFunction h f, we have F q' = f (L q') for q' near q.
+  -- Since L is differentiable at q, and f is diff'ble at L q [ = z], we conclude
+  -- that F is differentiable at q.
+  have hF := hL.fun_comp (cuspFunction h f)
+  have : cuspFunction h f ∘ 𝕢 h ∘ L = f ∘ L := funext fun z ↦ eq_cuspFunction hh hf (L z)
+  rw [this] at hF
+  rw [← EventuallyEq.eq_of_nhds (qdiff.hasStrictFDerivAt_equiv diff_ne).eventually_left_inverse]
+    at hol_z
+  exact (hol_z.comp q diff_L).congr_of_eventuallyEq hF.symm
 
--- DISSOLVED: eventually_differentiableAt_cuspFunction_nhds_ne_zero
+theorem eventually_differentiableAt_cuspFunction_nhds_ne_zero (hh : 0 < h) (hf : Periodic f h)
+    (h_hol : ∀ᶠ z in I∞, DifferentiableAt ℂ f z) :
+    ∀ᶠ q in 𝓝[≠] 0, DifferentiableAt ℂ (cuspFunction h f) q := by
+  refine ((invQParam_tendsto hh).eventually h_hol).mp ?_
+  refine eventually_nhdsWithin_of_forall (fun q hq h_diff ↦ ?_)
+  rw [← qParam_right_inv hh.ne' hq]
+  exact differentiableAt_cuspFunction hh.ne' hf h_diff
 
 end HoloOnC
 

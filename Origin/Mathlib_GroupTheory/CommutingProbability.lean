@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/CommutingProbability.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.GroupTheory.Abelianization
@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Qify
+
+noncomputable section
 
 /-!
 # Commuting Probability
@@ -132,9 +134,12 @@ lemma commProb_odd {n : ℕ} (hn : Odd n) :
   congr
   norm_num
 
--- DISSOLVED: div_two_lt
+private lemma div_two_lt {n : ℕ} (h0 : n ≠ 0) : n / 2 < n :=
+  Nat.div_lt_self (Nat.pos_of_ne_zero h0) (lt_add_one 1)
 
--- DISSOLVED: div_four_lt
+private lemma div_four_lt : {n : ℕ} → (h0 : n ≠ 0) → (h1 : n ≠ 1) → n / 4 + 1 < n
+  | 0 | 1 | 2 | 3 => by decide
+  | n + 4 => by omega
 
 def reciprocalFactors (n : ℕ) : List ℕ :=
   if _ : n = 0 then [0]
@@ -150,7 +155,12 @@ def reciprocalFactors (n : ℕ) : List ℕ :=
 @[simp] lemma reciprocalFactors_one : reciprocalFactors 1 = [] := by
   unfold reciprocalFactors; rfl
 
--- DISSOLVED: reciprocalFactors_even
+lemma reciprocalFactors_even {n : ℕ} (h0 : n ≠ 0) (h2 : Even n) :
+    reciprocalFactors n = 3 :: reciprocalFactors (n / 2) := by
+  have h1 : n ≠ 1 := by
+    rintro rfl
+    norm_num at h2
+  rw [reciprocalFactors, dif_neg h0, dif_neg h1, if_pos h2]
 
 lemma reciprocalFactors_odd {n : ℕ} (h1 : n ≠ 1) (h2 : Odd n) :
     reciprocalFactors n = n % 4 * n :: reciprocalFactors (n / 4 + 1) := by

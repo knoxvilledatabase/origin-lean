@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Fold
 
+noncomputable section
+
 /-!
 # Relations holding pairwise on finite sets
 

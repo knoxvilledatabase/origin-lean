@@ -8,6 +8,8 @@ import Mathlib.Topology.ContinuousOn
 import Mathlib.Topology.Maps.OpenQuotient
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Inseparable points in a topological space
 
@@ -404,9 +406,6 @@ lemma GeneralizingMap.comp {f : X → Y} {g : Y → Z}
 
 local infixl:0 " ~ᵢ " => Inseparable
 
-theorem inseparable_def : (x ~ᵢ y) ↔ 𝓝 x = 𝓝 y :=
-  Iff.rfl
-
 theorem inseparable_iff_specializes_and : (x ~ᵢ y) ↔ x ⤳ y ∧ y ⤳ x :=
   le_antisymm_iff
 
@@ -421,8 +420,6 @@ theorem inseparable_iff_forall_isOpen : (x ~ᵢ y) ↔ ∀ s : Set X, IsOpen s �
   simp only [inseparable_iff_specializes_and, specializes_iff_forall_open, ← forall_and, ← iff_def,
     Iff.comm]
 
-inseparable_iff_forall_open := inseparable_iff_forall_isOpen
-
 theorem not_inseparable_iff_exists_open :
     ¬(x ~ᵢ y) ↔ ∃ s : Set X, IsOpen s ∧ Xor' (x ∈ s) (y ∈ s) := by
   simp [inseparable_iff_forall_isOpen, ← xor_iff_not_iff]
@@ -430,8 +427,6 @@ theorem not_inseparable_iff_exists_open :
 theorem inseparable_iff_forall_isClosed : (x ~ᵢ y) ↔ ∀ s : Set X, IsClosed s → (x ∈ s ↔ y ∈ s) := by
   simp only [inseparable_iff_specializes_and, specializes_iff_forall_closed, ← forall_and, ←
     iff_def]
-
-inseparable_iff_forall_closed := inseparable_iff_forall_isClosed
 
 theorem inseparable_iff_mem_closure :
     (x ~ᵢ y) ↔ x ∈ closure ({y} : Set X) ∧ y ∈ closure ({x} : Set X) :=
@@ -552,8 +547,6 @@ instance [Subsingleton X] : Subsingleton (SeparationQuotient X) :=
 
 @[to_additive] instance [One X] : One (SeparationQuotient X) := ⟨mk 1⟩
 
-@[to_additive (attr := simp)] theorem mk_one [One X] : mk (1 : X) = 1 := rfl
-
 theorem preimage_image_mk_open (hs : IsOpen s) : mk ⁻¹' (mk '' s) = s := by
   refine Subset.antisymm ?_ (subset_preimage_image _ _)
   rintro x ⟨y, hys, hxy⟩
@@ -624,10 +617,6 @@ def lift (f : X → α) (hf : ∀ x y, (x ~ᵢ y) → f x = f y) : SeparationQuo
   Quotient.liftOn' x f hf
 
 @[simp]
-theorem lift_mk {f : X → α} (hf : ∀ x y, (x ~ᵢ y) → f x = f y) (x : X) : lift f hf (mk x) = f x :=
-  rfl
-
-@[simp]
 theorem lift_comp_mk {f : X → α} (hf : ∀ x y, (x ~ᵢ y) → f x = f y) : lift f hf ∘ mk = f :=
   rfl
 
@@ -665,11 +654,6 @@ theorem continuous_lift {hf : ∀ x y, (x ~ᵢ y) → f x = f y} :
 
 def lift₂ (f : X → Y → α) (hf : ∀ a b c d, (a ~ᵢ c) → (b ~ᵢ d) → f a b = f c d) :
     SeparationQuotient X → SeparationQuotient Y → α := fun x y => Quotient.liftOn₂' x y f hf
-
-@[simp]
-theorem lift₂_mk {f : X → Y → α} (hf : ∀ a b c d, (a ~ᵢ c) → (b ~ᵢ d) → f a b = f c d) (x : X)
-    (y : Y) : lift₂ f hf (mk x) (mk y) = f x y :=
-  rfl
 
 @[simp]
 theorem tendsto_lift₂_nhds {f : X → Y → α} {hf : ∀ a b c d, (a ~ᵢ c) → (b ~ᵢ d) → f a b = f c d}

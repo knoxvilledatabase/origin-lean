@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/PythagoreanTriples.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Basic
@@ -10,6 +10,8 @@ import Mathlib.Tactic.Ring
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Data.Int.NatPrime
 import Mathlib.Data.ZMod.Basic
+
+noncomputable section
 
 /-!
 # Pythagorean Triples
@@ -63,7 +65,13 @@ theorem mul (h : PythagoreanTriple x y z) (k : ℤ) : PythagoreanTriple (k * x) 
     _ = k ^ 2 * (z * z) := by rw [h.eq]
     _ = k * z * (k * z) := by ring
 
--- DISSOLVED: mul_iff
+theorem mul_iff (k : ℤ) (hk : k ≠ 0) :
+    PythagoreanTriple (k * x) (k * y) (k * z) ↔ PythagoreanTriple x y z := by
+  refine ⟨?_, fun h => h.mul k⟩
+  simp only [PythagoreanTriple]
+  intro h
+  rw [← mul_left_inj' (mul_ne_zero hk hk)]
+  convert h using 1 <;> ring
 
 @[nolint unusedArguments]
 def IsClassified (_ : PythagoreanTriple x y z) :=
@@ -184,7 +192,17 @@ theorem isClassified_of_normalize_isPrimitiveClassified (hc : h.normalize.IsPrim
   · exact Int.gcd_dvd_right
   · exact h.gcd_dvd
 
--- DISSOLVED: ne_zero_of_coprime
+theorem ne_zero_of_coprime (hc : Int.gcd x y = 1) : z ≠ 0 := by
+  suffices 0 < z * z by
+    rintro rfl
+    norm_num at this
+  rw [← h.eq, ← sq, ← sq]
+  have hc' : Int.gcd x y ≠ 0 := by
+    rw [hc]
+    exact one_ne_zero
+  cases' Int.ne_zero_of_gcd hc' with hxz hyz
+  · apply lt_add_of_pos_of_le (sq_pos_of_ne_zero hxz) (sq_nonneg y)
+  · apply lt_add_of_le_of_pos (sq_nonneg x) (sq_pos_of_ne_zero hyz)
 
 theorem isPrimitiveClassified_of_coprime_of_zero_left (hc : Int.gcd x y = 1) (hx : x = 0) :
     h.IsPrimitiveClassified := by
@@ -221,11 +239,38 @@ For the classification of Pythagorean triples, we will use a parametrization of 
 
 variable {K : Type*} [Field K]
 
--- DISSOLVED: circleEquivGen
-
--- DISSOLVED: circleEquivGen_apply
-
--- DISSOLVED: circleEquivGen_symm_apply
+def circleEquivGen (hk : ∀ x : K, 1 + x ^ 2 ≠ 0) :
+    K ≃ { p : K × K // p.1 ^ 2 + p.2 ^ 2 = 1 ∧ p.2 ≠ -1 } where
+  toFun x :=
+    ⟨⟨2 * x / (1 + x ^ 2), (1 - x ^ 2) / (1 + x ^ 2)⟩, by
+      field_simp [hk x, div_pow]
+      ring, by
+      simp only [Ne, div_eq_iff (hk x), neg_mul, one_mul, neg_add, sub_eq_add_neg, add_left_inj]
+      simpa only [eq_neg_iff_add_eq_zero, one_pow] using hk 1⟩
+  invFun p := (p : K × K).1 / ((p : K × K).2 + 1)
+  left_inv x := by
+    have h2 : (1 + 1 : K) = 2 := by norm_num -- Porting note: rfl is not enough to close this
+    have h3 : (2 : K) ≠ 0 := by
+      convert hk 1
+      rw [one_pow 2, h2]
+    field_simp [hk x, h2, add_assoc, add_comm, add_sub_cancel, mul_comm]
+  right_inv := fun ⟨⟨x, y⟩, hxy, hy⟩ => by
+    change x ^ 2 + y ^ 2 = 1 at hxy
+    have h2 : y + 1 ≠ 0 := mt eq_neg_of_add_eq_zero_left hy
+    have h3 : (y + 1) ^ 2 + x ^ 2 = 2 * (y + 1) := by
+      rw [(add_neg_eq_iff_eq_add.mpr hxy.symm).symm]
+      ring
+    have h4 : (2 : K) ≠ 0 := by
+      convert hk 1
+      rw [one_pow 2]
+      ring -- Porting note: rfl is not enough to close this
+    simp only [Prod.mk.inj_iff, Subtype.mk_eq_mk]
+    constructor
+    · field_simp [h3]
+      ring
+    · field_simp [h3]
+      rw [← add_neg_eq_iff_eq_add.mpr hxy.symm]
+      ring
 
 end circleEquivGen
 

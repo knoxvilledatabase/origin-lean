@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/Enumerative/DyckWord.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 3 | Infrastructure: 13
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Enumerative.Catalan
 import Mathlib.Tactic.Positivity
+
+noncomputable section
 
 /-!
 # Dyck words
@@ -87,7 +89,7 @@ variable {p q : DyckWord}
 
 lemma toList_eq_nil : p.toList = [] ↔ p = 0 := by rw [DyckWord.ext_iff]; rfl
 
--- DISSOLVED: toList_ne_nil
+lemma toList_ne_nil : p.toList ≠ [] ↔ p ≠ 0 := toList_eq_nil.ne
 
 instance : Unique (AddUnits DyckWord) where
   uniq p := by
@@ -113,7 +115,6 @@ lemma getLast_eq_D (p : DyckWord) (h) : p.toList.getLast h = D := by
   have := p.count_D_le_count_U (p.toList.length - 1); omega
 
 include h in
-
 lemma cons_tail_dropLast_concat : U :: p.toList.dropLast.tail ++ [D] = p := by
   have h' := toList_ne_nil.mpr h
   have : p.toList.dropLast.take 1 = [p.toList.head h'] := by
@@ -162,7 +163,7 @@ def nest : DyckWord where
     rw [add_comm]
     exact add_le_add (zero_le _) ((count_le_length _ _).trans (by simp))
 
--- DISSOLVED: nest_ne_zero
+@[simp] lemma nest_ne_zero : p.nest ≠ 0 := by simp [← toList_ne_nil, nest]
 
 variable (p) in
 
@@ -222,8 +223,6 @@ variable (p) in
 
 def semilength : ℕ := p.toList.count U
 
-@[simp] lemma semilength_zero : semilength 0 = 0 := rfl
-
 @[simp] lemma semilength_add : (p + q).semilength = p.semilength + q.semilength := count_append ..
 
 @[simp] lemma semilength_nest : p.nest.semilength = p.semilength + 1 := by simp [semilength, nest]
@@ -247,10 +246,7 @@ def firstReturn : ℕ :=
   (range p.toList.length).findIdx fun i ↦
     (p.toList.take (i + 1)).count U = (p.toList.take (i + 1)).count D
 
-@[simp] lemma firstReturn_zero : firstReturn 0 = 0 := rfl
-
 include h in
-
 lemma firstReturn_pos : 0 < p.firstReturn := by
   by_contra! f
   rw [Nat.le_zero, firstReturn, findIdx_eq] at f
@@ -268,7 +264,6 @@ lemma firstReturn_pos : 0 < p.firstReturn := by
     simp at f
 
 include h in
-
 lemma firstReturn_lt_length : p.firstReturn < p.toList.length := by
   have lp := length_pos_of_ne_nil (toList_ne_nil.mpr h)
   rw [← length_range p.toList.length]
@@ -279,7 +274,6 @@ lemma firstReturn_lt_length : p.firstReturn < p.toList.length := by
     p.count_U_eq_count_D]⟩
 
 include h in
-
 lemma count_take_firstReturn_add_one :
     (p.toList.take (p.firstReturn + 1)).count U = (p.toList.take (p.firstReturn + 1)).count D := by
   have := findIdx_getElem (w := (length_range p.toList.length).symm ▸ firstReturn_lt_length h)
@@ -348,8 +342,8 @@ def outsidePart : DyckWord :=
 @[simp] lemma outsidePart_zero : outsidePart 0 = 0 := by simp [outsidePart]
 
 include h in
-
 @[simp]
+
 lemma insidePart_add : (p + q).insidePart = p.insidePart := by
   simp_rw [insidePart, firstReturn_add, add_eq_zero', h, false_and, dite_false, ite_false,
     DyckWord.ext_iff, take]
@@ -357,8 +351,8 @@ lemma insidePart_add : (p + q).insidePart = p.insidePart := by
   exact take_append_of_le_length (firstReturn_lt_length h)
 
 include h in
-
 @[simp]
+
 lemma outsidePart_add : (p + q).outsidePart = p.outsidePart + q := by
   simp_rw [outsidePart, firstReturn_add, add_eq_zero', h, false_and, dite_false, ite_false,
     DyckWord.ext_iff, drop]
@@ -377,27 +371,24 @@ lemma outsidePart_nest : p.nest.outsidePart = 0 := by
   simp_rw [nest, length_append, length_singleton]; omega
 
 include h in
-
 @[simp]
+
 theorem nest_insidePart_add_outsidePart : p.insidePart.nest + p.outsidePart = p := by
   simp_rw [insidePart, outsidePart, h, dite_false, nest_denest, DyckWord.ext_iff]
   apply take_append_drop
 
 include h in
-
 lemma semilength_insidePart_add_semilength_outsidePart_add_one :
     p.insidePart.semilength + p.outsidePart.semilength + 1 = p.semilength := by
   rw [← congrArg semilength (nest_insidePart_add_outsidePart h), semilength_add, semilength_nest,
     add_right_comm]
 
 include h in
-
 theorem semilength_insidePart_lt : p.insidePart.semilength < p.semilength := by
   have := semilength_insidePart_add_semilength_outsidePart_add_one h
   omega
 
 include h in
-
 theorem semilength_outsidePart_lt : p.outsidePart.semilength < p.semilength := by
   have := semilength_insidePart_add_semilength_outsidePart_add_one h
   omega
@@ -459,7 +450,9 @@ instance : PartialOrder DyckWord where
     have h₂ := infix_of_le qp
     exact DyckWord.ext <| h₁.eq_of_length <| h₁.length_le.antisymm h₂.length_le
 
--- DISSOLVED: pos_iff_ne_zero
+protected lemma pos_iff_ne_zero : 0 < p ↔ p ≠ 0 := by
+  rw [ne_comm, iff_comm, ne_iff_lt_iff_le]
+  exact DyckWord.zero_le p
 
 lemma monotone_semilength : Monotone semilength := fun p q pq ↦ by
   induction pq with

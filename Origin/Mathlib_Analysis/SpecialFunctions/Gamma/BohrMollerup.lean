@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/BohrMollerup.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gamma.Deriv
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
+
+noncomputable section
 
 /-! # Convexity properties of the Gamma function
 
@@ -135,7 +137,16 @@ def logGammaSeq (x : ℝ) (n : ℕ) : ℝ :=
 
 variable {f : ℝ → ℝ} {x : ℝ} {n : ℕ}
 
--- DISSOLVED: f_nat_eq
+theorem f_nat_eq (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y) (hn : n ≠ 0) :
+    f n = f 1 + log (n - 1)! := by
+  refine Nat.le_induction (by simp) (fun m hm IH => ?_) n (Nat.one_le_iff_ne_zero.2 hn)
+  have A : 0 < (m : ℝ) := Nat.cast_pos.2 hm
+  simp only [hf_feq A, Nat.cast_add, Nat.cast_one, Nat.add_succ_sub_one, add_zero]
+  rw [IH, add_assoc, ← log_mul (Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)) A.ne', ←
+    Nat.cast_mul]
+  conv_rhs => rw [← Nat.succ_pred_eq_of_pos hm, Nat.factorial_succ, mul_comm]
+  congr
+  exact (Nat.succ_pred_eq_of_pos hm).symm
 
 theorem f_add_nat_eq (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y) (hx : 0 < x) (n : ℕ) :
     f (x + n) = f x + ∑ m ∈ Finset.range n, log (x + m) := by
@@ -148,7 +159,14 @@ theorem f_add_nat_eq (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y)
       abel
     · linarith [(Nat.cast_nonneg n : 0 ≤ (n : ℝ))]
 
--- DISSOLVED: f_add_nat_le
+theorem f_add_nat_le (hf_conv : ConvexOn ℝ (Ioi 0) f)
+    (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y) (hn : n ≠ 0) (hx : 0 < x) (hx' : x ≤ 1) :
+    f (n + x) ≤ f n + x * log n := by
+  have hn' : 0 < (n : ℝ) := Nat.cast_pos.mpr (Nat.pos_of_ne_zero hn)
+  have : f n + x * log n = (1 - x) * f n + x * f (n + 1) := by rw [hf_feq hn']; ring
+  rw [this, (by ring : (n : ℝ) + x = (1 - x) * n + x * (n + 1))]
+  simpa only [smul_eq_mul] using
+    hf_conv.2 hn' (by linarith : 0 < (n + 1 : ℝ)) (by linarith : 0 ≤ 1 - x) hx.le (by linarith)
 
 theorem f_add_nat_ge (hf_conv : ConvexOn ℝ (Ioi 0) f)
     (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y) (hn : 2 ≤ n) (hx : 0 < x) :
@@ -189,7 +207,16 @@ theorem le_logGammaSeq (hf_conv : ConvexOn ℝ (Ioi 0) f)
   rw [f_nat_eq @hf_feq (by linarith : n + 1 ≠ 0), Nat.add_sub_cancel, Nat.cast_add_one]
   ring
 
--- DISSOLVED: ge_logGammaSeq
+theorem ge_logGammaSeq (hf_conv : ConvexOn ℝ (Ioi 0) f)
+    (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y) (hx : 0 < x) (hn : n ≠ 0) :
+    f 1 + logGammaSeq x n ≤ f x := by
+  dsimp [logGammaSeq]
+  rw [← add_sub_assoc, sub_le_iff_le_add, ← f_add_nat_eq (@hf_feq) hx, add_comm x _]
+  refine le_trans (le_of_eq ?_) (f_add_nat_ge hf_conv @hf_feq ?_ hx)
+  · rw [f_nat_eq @hf_feq, Nat.add_sub_cancel, Nat.cast_add_one, add_sub_cancel_right]
+    · ring
+    · exact Nat.succ_ne_zero _
+  · omega
 
 theorem tendsto_logGammaSeq_of_le_one (hf_conv : ConvexOn ℝ (Ioi 0) f)
     (hf_feq : ∀ {y : ℝ}, 0 < y → f (y + 1) = f y + log y) (hx : 0 < x) (hx' : x ≤ 1) :
@@ -332,7 +359,11 @@ multiple of `Gamma`, and we can compute the constant by specialising at `s = 1`.
 def doublingGamma (s : ℝ) : ℝ :=
   Gamma (s / 2) * Gamma (s / 2 + 1 / 2) * 2 ^ (s - 1) / √π
 
--- DISSOLVED: doublingGamma_add_one
+theorem doublingGamma_add_one (s : ℝ) (hs : s ≠ 0) :
+    doublingGamma (s + 1) = s * doublingGamma s := by
+  rw [doublingGamma, doublingGamma, (by abel : s + 1 - 1 = s - 1 + 1), add_div, add_assoc,
+    add_halves (1 : ℝ), Gamma_add_one (div_ne_zero hs two_ne_zero), rpow_add two_pos, rpow_one]
+  ring
 
 theorem doublingGamma_one : doublingGamma 1 = 1 := by
   simp_rw [doublingGamma, Gamma_one_half_eq, add_halves (1 : ℝ), sub_self, Gamma_one, mul_one,

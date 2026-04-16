@@ -5,6 +5,8 @@ Genuine: 28 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Matrix.Basic
 
+noncomputable section
+
 /-!
 # Matrices with a single non-zero element.
 

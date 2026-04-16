@@ -1,11 +1,13 @@
 /-
 Extracted from GroupTheory/GroupAction/Hom.lean
-Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Ring.Action.Basic
 import Mathlib.Algebra.Group.Hom.CompTypeclasses
+
+noncomputable section
 
 /-!
 # Equivariant homomorphisms
@@ -175,15 +177,6 @@ def ofEq {φ' : M → N} (h : φ = φ') (f : X →ₑ[φ] Y) : X →ₑ[φ'] Y w
   toFun := f.toFun
   map_smul' m a := h ▸ f.map_smul' m a
 
-@[to_additive (attr := simp)]
-theorem ofEq_coe {φ' : M → N} (h : φ = φ') (f : X →ₑ[φ] Y) :
-    (f.ofEq h).toFun = f.toFun := rfl
-
-@[to_additive (attr := simp)]
-theorem ofEq_apply {φ' : M → N} (h : φ = φ') (f : X →ₑ[φ] Y) (a : X) :
-    (f.ofEq h) a = f a :=
-  rfl
-
 variable {ψ χ} (M N)
 
 @[to_additive "The identity map as an equivariant map."]
@@ -264,12 +257,6 @@ def inverse' (f : X →ₑ[φ] Y) (g : Y → X) (k : Function.RightInverse φ' �
       _ = g ((φ (φ' m)) • f (g x)) := by rw [k]
       _ = g (f (φ' m • g x)) := by rw [map_smulₛₗ]
       _ = φ' m • g x := by rw [h₁]
-
-@[to_additive]
-lemma inverse_eq_inverse' (f : X →[M] Y₁) (g : Y₁ → X)
-    (h₁ : Function.LeftInverse g f) (h₂ : Function.RightInverse g f) :
-  inverse f g h₁ h₂ =  inverse' f g (congrFun rfl) h₁ h₂ := by
-  rfl
 
 @[to_additive]
 theorem inverse'_inverse'
@@ -391,17 +378,6 @@ def _root_.SMulCommClass.toDistribMulActionHom {M} (N A : Type*) [Monoid N] [Add
     DistribSMul.toAddMonoidHom _ c with
     toFun := (c • ·) }
 
-@[simp]
-theorem toFun_eq_coe (f : A →ₑ+[φ] B) : f.toFun = f := rfl
-
-@[norm_cast]
-theorem coe_fn_coe (f : A →ₑ+[φ] B) : ⇑(f : A →+ B) = f :=
-  rfl
-
-@[norm_cast]
-theorem coe_fn_coe' (f : A →ₑ+[φ] B) : ⇑(f : A →ₑ[φ] B) = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : A →ₑ+[φ] B} : (∀ x, f x = g x) → f = g :=
   DFunLike.ext f g
@@ -450,24 +426,11 @@ instance : Zero (A →ₑ+[φ] B) :=
 instance : One (A →+[M] A) :=
   ⟨DistribMulActionHom.id M⟩
 
-@[simp]
-theorem coe_zero : ⇑(0 : A →ₑ+[φ] B) = 0 :=
-  rfl
-
-@[simp]
-theorem coe_one : ⇑(1 : A →+[M] A) = id :=
-  rfl
-
-theorem zero_apply (a : A) : (0 : A →ₑ+[φ] B) a = 0 :=
-  rfl
-
-theorem one_apply (a : A) : (1 : A →+[M] A) a = a :=
-  rfl
-
 instance : Inhabited (A →ₑ+[φ] B) :=
   ⟨0⟩
 
 set_option linter.unusedVariables false in
+/-- Composition of two equivariant additive monoid homomorphisms. -/
 
 def comp (g : B →ₑ+[ψ] C) (f : A →ₑ+[φ] B) [κ : MonoidHom.CompTriple φ ψ χ] :
     A →ₑ+[χ] C :=
@@ -536,13 +499,6 @@ variable (T : Type*) [Semiring T] [MulSemiringAction P T]
 
 structure MulSemiringActionHom extends R →ₑ+[φ] S, R →+* S
 
-abbrev MulSemiringActionHom
-  (M : Type*) [Monoid M]
-  (R : Type*) [Semiring R] [MulSemiringAction M R]
-  (S : Type*) [Semiring S] [MulSemiringAction M S]:= MulSemiringActionHom (MonoidHom.id M) R S
-
--/
-
 notation:25 (name := «MulSemiringActionHomLocal≺»)
 
   R " →ₑ+*[" φ:25 "] " S:0 => MulSemiringActionHom φ R S
@@ -593,14 +549,6 @@ def _root_.MulSemiringActionHomClass.toMulSemiringActionHom
 instance [MulSemiringActionSemiHomClass F φ R S] :
     CoeTC F (R →ₑ+*[φ] S) :=
   ⟨MulSemiringActionHomClass.toMulSemiringActionHom⟩
-
-@[norm_cast]
-theorem coe_fn_coe (f : R →ₑ+*[φ] S) : ⇑(f : R →+* S) = f :=
-  rfl
-
-@[norm_cast]
-theorem coe_fn_coe' (f : R →ₑ+*[φ] S) : ⇑(f : R →ₑ+[φ] S) = f :=
-  rfl
 
 @[ext]
 theorem ext {f g : R →ₑ+*[φ] S} : (∀ x, f x = g x) → f = g :=
@@ -655,6 +603,7 @@ variable {R S T}
 variable {φ φ' ψ χ}
 
 set_option linter.unusedVariables false in
+/-- Composition of two equivariant additive ring homomorphisms. -/
 
 def comp (g : S →ₑ+*[ψ] T) (f : R →ₑ+*[φ] S) [κ : MonoidHom.CompTriple φ ψ χ] : R →ₑ+*[χ] T :=
   { DistribMulActionHom.comp (g : S →ₑ+[ψ] T) (f : R →ₑ+[φ] S),

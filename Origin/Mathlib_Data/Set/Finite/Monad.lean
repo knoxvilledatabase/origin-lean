@@ -7,6 +7,8 @@ import Mathlib.Data.Finite.Prod
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Data.Set.Functor
 
+noncomputable section
+
 /-!
 # Finiteness of the Set monad operations
 

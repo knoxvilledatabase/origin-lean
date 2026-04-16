@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/Real.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Periodic
@@ -12,6 +12,8 @@ import Mathlib.Topology.Algebra.UniformMulAction
 import Mathlib.Topology.Instances.Int
 import Mathlib.Topology.Order.Bornology
 import Mathlib.Topology.Algebra.UniformGroup.Defs
+
+noncomputable section
 
 /-!
 # Topological properties of ℝ
@@ -88,7 +90,8 @@ theorem Real.uniformContinuous_abs : UniformContinuous (abs : ℝ → ℝ) :=
   Metric.uniformContinuous_iff.2 fun ε ε0 =>
     ⟨ε, ε0, fun _ _ ↦ lt_of_le_of_lt (abs_abs_sub_abs_le_abs_sub _ _)⟩
 
--- DISSOLVED: Real.continuous_inv
+theorem Real.continuous_inv : Continuous fun a : { r : ℝ // r ≠ 0 } => a.val⁻¹ :=
+  continuousOn_inv₀.restrict
 
 theorem Real.uniformContinuous_const_mul {x : ℝ} : UniformContinuous (x * ·) :=
   uniformContinuous_const_smul x
@@ -147,9 +150,14 @@ section Periodic
 
 namespace Function
 
--- DISSOLVED: Periodic.compact_of_continuous
+theorem Periodic.compact_of_continuous [TopologicalSpace α] {f : ℝ → α} {c : ℝ} (hp : Periodic f c)
+    (hc : c ≠ 0) (hf : Continuous f) : IsCompact (range f) := by
+  rw [← hp.image_uIcc hc 0]
+  exact isCompact_uIcc.image hf
 
--- DISSOLVED: Periodic.isBounded_of_continuous
+theorem Periodic.isBounded_of_continuous [PseudoMetricSpace α] {f : ℝ → α} {c : ℝ}
+    (hp : Periodic f c) (hc : c ≠ 0) (hf : Continuous f) : IsBounded (range f) :=
+  (hp.compact_of_continuous hc hf).isBounded
 
 end Function
 

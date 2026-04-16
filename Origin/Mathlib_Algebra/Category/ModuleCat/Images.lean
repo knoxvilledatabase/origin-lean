@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Abelian
 import Mathlib.CategoryTheory.Limits.Shapes.Images
 
+noncomputable section
+
 /-!
 # The category of R-modules has images.
 

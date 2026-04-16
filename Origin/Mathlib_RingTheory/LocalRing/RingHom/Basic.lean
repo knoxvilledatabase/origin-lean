@@ -8,6 +8,8 @@ import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.Logic.Equiv.TransferInstance
 
+noncomputable section
+
 /-!
 
 # Local rings homomorphisms

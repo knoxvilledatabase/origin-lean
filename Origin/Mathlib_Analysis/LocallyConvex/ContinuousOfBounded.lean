@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Bounded
 import Mathlib.Analysis.RCLike.Basic
 
+noncomputable section
+
 /-!
 # Continuity and Von Neumann boundedness
 
@@ -64,17 +66,6 @@ def LinearMap.clmOfExistsBoundedImage (f : E →ₗ[𝕜] F)
     -- Using this inclusion, it suffices to show that `x⁻¹ • V` is in `𝓝 0`, which is trivial.
     refine mem_of_superset ?_ this
     rwa [set_smul_mem_nhds_zero_iff (inv_ne_zero x_ne)]⟩
-
-theorem LinearMap.clmOfExistsBoundedImage_coe {f : E →ₗ[𝕜] F}
-    {h : ∃ V ∈ 𝓝 (0 : E), Bornology.IsVonNBounded 𝕜 (f '' V)} :
-    (f.clmOfExistsBoundedImage h : E →ₗ[𝕜] F) = f :=
-  rfl
-
-@[simp]
-theorem LinearMap.clmOfExistsBoundedImage_apply {f : E →ₗ[𝕜] F}
-    {h : ∃ V ∈ 𝓝 (0 : E), Bornology.IsVonNBounded 𝕜 (f '' V)} {x : E} :
-    f.clmOfExistsBoundedImage h x = f x :=
-  rfl
 
 end NontriviallyNormedField
 

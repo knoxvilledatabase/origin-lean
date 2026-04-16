@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Splits
 import Mathlib.RingTheory.MvPolynomial.Symmetric.Defs
 
+noncomputable section
+
 /-!
 # Vieta's Formula
 

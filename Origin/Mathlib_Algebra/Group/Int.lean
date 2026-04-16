@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Group/Int.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 5 | Infrastructure: 14
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Nat.Even
 import Mathlib.Algebra.Group.Nat.Units
 import Mathlib.Algebra.Group.Units.Basic
 import Mathlib.Data.Int.Sqrt
+
+noncomputable section
 
 /-!
 # The integers form a group
@@ -160,11 +162,11 @@ lemma eq_one_or_neg_one_of_mul_eq_neg_one (h : u * v = -1) : u = 1 ∨ u = -1 :=
 
 variable {m n : ℤ}
 
--- DISSOLVED: emod_two_ne_one
+@[simp] lemma emod_two_ne_one : ¬n % 2 = 1 ↔ n % 2 = 0 := by
+  cases' emod_two_eq_zero_or_one n with h h <;> simp [h]
 
-@[simp] lemma one_emod_two : (1 : Int) % 2 = 1 := rfl
-
--- DISSOLVED: emod_two_ne_zero
+@[local simp] lemma emod_two_ne_zero : ¬n % 2 = 0 ↔ n % 2 = 1 := by
+  cases' emod_two_eq_zero_or_one n with h h <;> simp [h]
 
 lemma even_iff : Even n ↔ n % 2 = 0 where
   mp := fun ⟨m, hm⟩ ↦ by simp [← Int.two_mul, hm]
@@ -172,7 +174,8 @@ lemma even_iff : Even n ↔ n % 2 = 0 where
 
 lemma not_even_iff : ¬Even n ↔ n % 2 = 1 := by rw [even_iff, emod_two_ne_zero]
 
--- DISSOLVED: two_dvd_ne_zero
+@[simp] lemma two_dvd_ne_zero : ¬2 ∣ n ↔ n % 2 = 1 :=
+  (even_iff_exists_two_nsmul _).symm.not.trans not_even_iff
 
 instance : DecidablePred (Even : ℤ → Prop) := fun _ ↦ decidable_of_iff _ even_iff.symm
 
@@ -201,9 +204,10 @@ lemma even_sub : Even (m - n) ↔ (Even m ↔ Even n) := by simp [sub_eq_add_neg
   cases' emod_two_eq_zero_or_one n with h₂ h₂ <;>
   simp [even_iff, h₁, h₂, Int.mul_emod]
 
--- DISSOLVED: even_pow
+@[parity_simps] lemma even_pow {n : ℕ} : Even (m ^ n) ↔ Even m ∧ n ≠ 0 := by
+  induction n <;> simp [*, even_mul, pow_succ]; tauto
 
--- DISSOLVED: even_pow'
+lemma even_pow' {n : ℕ} (h : n ≠ 0) : Even (m ^ n) ↔ Even m := even_pow.trans <| and_iff_left h
 
 @[simp, norm_cast] lemma even_coe_nat (n : ℕ) : Even (n : ℤ) ↔ Even n := by
   rw_mod_cast [even_iff, Nat.even_iff]
@@ -220,7 +224,5 @@ example (m n : ℤ) (h : Even m) : ¬Even (n + 3) ↔ Even (m ^ 2 + m + n) := by
 example : ¬Even (25394535 : ℤ) := by decide
 
 end Int
-
-lemma zsmul_int_int (a b : ℤ) : a • b = a * b := rfl
 
 lemma zsmul_int_one (n : ℤ) : n • (1 : ℤ) = n := mul_one _

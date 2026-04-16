@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
+noncomputable section
+
 /-!
 # Construction for the small object argument
 

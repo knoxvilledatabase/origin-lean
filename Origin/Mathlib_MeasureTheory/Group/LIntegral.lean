@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Measure
 
+noncomputable section
+
 /-!
 # Lebesgue Integration on Groups
 

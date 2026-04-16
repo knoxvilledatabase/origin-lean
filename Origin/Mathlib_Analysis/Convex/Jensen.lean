@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Convex/Jensen.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Combination
 import Mathlib.Analysis.Convex.Function
 import Mathlib.Tactic.FieldSimp
+
+noncomputable section
 
 /-!
 # Jensen's inequality and maximum principle for convex functions
@@ -167,9 +169,22 @@ lemma StrictConcaveOn.map_sum_eq_iff (hf : StrictConcaveOn 𝕜 s f) (h₀ : ∀
     f (∑ i ∈ t, w i • p i) = ∑ i ∈ t, w i • f (p i) ↔ ∀ j ∈ t, p j = ∑ i ∈ t, w i • p i := by
   simpa using hf.neg.map_sum_eq_iff h₀ h₁ hmem
 
--- DISSOLVED: StrictConvexOn.map_sum_eq_iff'
+lemma StrictConvexOn.map_sum_eq_iff' (hf : StrictConvexOn 𝕜 s f) (h₀ : ∀ i ∈ t, 0 ≤ w i)
+    (h₁ : ∑ i ∈ t, w i = 1) (hmem : ∀ i ∈ t, p i ∈ s) :
+    f (∑ i ∈ t, w i • p i) = ∑ i ∈ t, w i • f (p i) ↔
+      ∀ j ∈ t, w j ≠ 0 → p j = ∑ i ∈ t, w i • p i := by
+  have hw (i) (_ : i ∈ t) : w i • p i ≠ 0 → w i ≠ 0 := by aesop
+  have hw' (i) (_ : i ∈ t) : w i • f (p i) ≠ 0 → w i ≠ 0 := by aesop
+  rw [← sum_filter_of_ne hw, ← sum_filter_of_ne hw', hf.map_sum_eq_iff]
+  · simp
+  · simp +contextual [(h₀ _ _).gt_iff_ne]
+  · rwa [sum_filter_ne_zero]
+  · simp +contextual [hmem _ _]
 
--- DISSOLVED: StrictConcaveOn.map_sum_eq_iff'
+lemma StrictConcaveOn.map_sum_eq_iff' (hf : StrictConcaveOn 𝕜 s f) (h₀ : ∀ i ∈ t, 0 ≤ w i)
+    (h₁ : ∑ i ∈ t, w i = 1) (hmem : ∀ i ∈ t, p i ∈ s) :
+    f (∑ i ∈ t, w i • p i) = ∑ i ∈ t, w i • f (p i) ↔
+      ∀ j ∈ t, w j ≠ 0 → p j = ∑ i ∈ t, w i • p i := hf.dual.map_sum_eq_iff' h₀ h₁ hmem
 
 end Jensen
 

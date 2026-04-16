@@ -12,6 +12,8 @@ import Mathlib.Algebra.Module.Submodule.Range
 import Mathlib.Algebra.Module.Equiv.Basic
 import Mathlib.Logic.Equiv.Fin
 
+noncomputable section
+
 /-!
 # Pi types of modules
 
@@ -112,10 +114,6 @@ def single [DecidableEq ι] (i : ι) : φ i →ₗ[R] (i : ι) → φ i :=
   { AddMonoidHom.single φ i with
     toFun := Pi.single i
     map_smul' := Pi.single_smul i }
-
-lemma single_apply [DecidableEq ι] {i : ι} (v : φ i) :
-    single R φ i v = Pi.single i v :=
-  rfl
 
 @[simp]
 theorem coe_single [DecidableEq ι] (i : ι) :
@@ -317,10 +315,6 @@ variable {I : Set ι} {p q : (i : ι) → Submodule R (φ i)} {x : (i : ι) → 
 theorem mem_pi : x ∈ pi I p ↔ ∀ i ∈ I, x i ∈ p i :=
   Iff.rfl
 
-@[simp, norm_cast]
-theorem coe_pi : (pi I p : Set ((i : ι) → φ i)) = Set.pi I fun i => p i :=
-  rfl
-
 @[simp]
 theorem pi_empty (p : (i : ι) → Submodule R (φ i)) : pi ∅ p = ⊤ :=
   SetLike.coe_injective <| Set.empty_pi _
@@ -380,24 +374,6 @@ def piCongrRight (e : (i : ι) → φ i ≃ₗ[R] ψ i) : ((i : ι) → φ i) �
     invFun := fun f i => (e i).symm (f i)
     map_smul' := fun c f => by ext; simp }
 
-@[simp]
-theorem piCongrRight_apply (e : (i : ι) → φ i ≃ₗ[R] ψ i) (f i) :
-    piCongrRight e f i = e i (f i) := rfl
-
-@[simp]
-theorem piCongrRight_refl : (piCongrRight fun j => refl R (φ j)) = refl _ _ :=
-  rfl
-
-@[simp]
-theorem piCongrRight_symm (e : (i : ι) → φ i ≃ₗ[R] ψ i) :
-    (piCongrRight e).symm = piCongrRight fun i => (e i).symm :=
-  rfl
-
-@[simp]
-theorem piCongrRight_trans (e : (i : ι) → φ i ≃ₗ[R] ψ i) (f : (i : ι) → ψ i ≃ₗ[R] χ i) :
-    (piCongrRight e).trans (piCongrRight f) = piCongrRight fun i => (e i).trans (f i) :=
-  rfl
-
 variable (R φ)
 
 @[simps (config := { simpRhs := true })]
@@ -408,25 +384,6 @@ def piCongrLeft' (e : ι ≃ ι') : ((i' : ι) → φ i') ≃ₗ[R] (i : ι') �
 
 def piCongrLeft (e : ι' ≃ ι) : ((i' : ι') → φ (e i')) ≃ₗ[R] (i : ι) → φ i :=
   (piCongrLeft' R φ e.symm).symm
-
-def piCurry {ι : Type*} {κ : ι → Type*} (α : ∀ i, κ i → Type*)
-    [∀ i k, AddCommMonoid (α i k)] [∀ i k, Module R (α i k)] :
-    (Π i : Sigma κ, α i.1 i.2) ≃ₗ[R] Π i j, α i j where
-  __ := Equiv.piCurry α
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-@[simp] theorem piCurry_apply {ι : Type*} {κ : ι → Type*} (α : ∀ i, κ i → Type*)
-    [∀ i k, AddCommMonoid (α i k)] [∀ i k, Module R (α i k)]
-    (f : ∀ x : Σ i, κ i, α x.1 x.2) :
-    piCurry R α f = Sigma.curry f :=
-  rfl
-
-@[simp] theorem piCurry_symm_apply {ι : Type*} {κ : ι → Type*} (α : ∀ i, κ i → Type*)
-    [∀ i k, AddCommMonoid (α i k)] [∀ i k, Module R (α i k)]
-    (f : ∀ a b, α a b) :
-    (piCurry R α).symm f = Sigma.uncurry f :=
-  rfl
 
 def piOptionEquivProd {ι : Type*} {M : Option ι → Type*} [(i : Option ι) → AddCommGroup (M i)]
     [(i : Option ι) → Module R (M i)] :
@@ -445,10 +402,6 @@ def piRing : ((ι → R) →ₗ[R] M) ≃ₗ[S] ι → M :=
 variable {ι R M}
 
 @[simp]
-theorem piRing_apply (f : (ι → R) →ₗ[R] M) (i : ι) : piRing R M ι S f i = f (Pi.single i 1) :=
-  rfl
-
-@[simp]
 theorem piRing_symm_apply (f : ι → M) (g : ι → R) : (piRing R M ι S).symm f g = ∑ i, g i • f i := by
   simp [piRing, LinearMap.lsum_apply]
 
@@ -463,36 +416,12 @@ def sumArrowLequivProdArrow (α β R M : Type*) [Semiring R] [AddCommMonoid M] [
       intro r f
       ext <;> rfl }
 
-@[simp]
-theorem sumArrowLequivProdArrow_apply_fst {α β} (f : α ⊕ β → M) (a : α) :
-    (sumArrowLequivProdArrow α β R M f).1 a = f (Sum.inl a) :=
-  rfl
-
-@[simp]
-theorem sumArrowLequivProdArrow_apply_snd {α β} (f : α ⊕ β → M) (b : β) :
-    (sumArrowLequivProdArrow α β R M f).2 b = f (Sum.inr b) :=
-  rfl
-
-@[simp]
-theorem sumArrowLequivProdArrow_symm_apply_inl {α β} (f : α → M) (g : β → M) (a : α) :
-    ((sumArrowLequivProdArrow α β R M).symm (f, g)) (Sum.inl a) = f a :=
-  rfl
-
-@[simp]
-theorem sumArrowLequivProdArrow_symm_apply_inr {α β} (f : α → M) (g : β → M) (b : β) :
-    ((sumArrowLequivProdArrow α β R M).symm (f, g)) (Sum.inr b) = g b :=
-  rfl
-
 @[simps (config := { simpRhs := true, fullyApplied := false }) symm_apply]
 def funUnique (ι R M : Type*) [Unique ι] [Semiring R] [AddCommMonoid M] [Module R M] :
     (ι → M) ≃ₗ[R] M :=
   { Equiv.funUnique ι M with
     map_add' := fun _ _ => rfl
     map_smul' := fun _ _ => rfl }
-
-@[simp]
-theorem funUnique_apply (ι R M : Type*) [Unique ι] [Semiring R] [AddCommMonoid M] [Module R M] :
-    (funUnique ι R M : (ι → M) → M) = eval default := rfl
 
 variable (R M)
 
@@ -503,11 +432,6 @@ def piFinTwo (M : Fin 2 → Type v)
   { piFinTwoEquiv M with
     map_add' := fun _ _ => rfl
     map_smul' := fun _ _ => rfl }
-
-@[simp]
-theorem piFinTwo_apply (M : Fin 2 → Type v)
-    [(i : Fin 2) → AddCommMonoid (M i)] [(i : Fin 2) → Module R (M i)] :
-    (piFinTwo R M : ((i : Fin 2) → M i) → M 0 × M 1) = fun f => (f 0, f 1) := rfl
 
 @[simps! (config := .asFn)]
 def finTwoArrow : (Fin 2 → M) ≃ₗ[R] M × M :=
@@ -552,10 +476,6 @@ def LinearMap.vecEmpty : M →ₗ[R] Fin 0 → M₃ where
   toFun _ := Matrix.vecEmpty
   map_add' _ _ := Subsingleton.elim _ _
   map_smul' _ _ := Subsingleton.elim _ _
-
-@[simp]
-theorem LinearMap.vecEmpty_apply (m : M) : (LinearMap.vecEmpty : M →ₗ[R] Fin 0 → M₃) m = ![] :=
-  rfl
 
 def LinearMap.vecCons {n} (f : M →ₗ[R] M₂) (g : M →ₗ[R] Fin n → M₂) : M →ₗ[R] Fin n.succ → M₂ where
   toFun m := Matrix.vecCons (f m) (g m)

@@ -9,6 +9,8 @@ import Mathlib.Order.Bounds.OrderIso
 import Mathlib.Order.OrdContinuous
 import Mathlib.Order.RelIso.Group
 
+noncomputable section
+
 /-!
 # Semiconjugate by `sSup`
 

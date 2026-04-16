@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Topology.Algebra.InfiniteSum.Order
 import Mathlib.Topology.Instances.ENNReal
 
+noncomputable section
+
 /-!
 # Infinite sum in the reals
 

@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Group/MeasurableEquiv.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 14 | Infrastructure: 5
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Arithmetic
+
+noncomputable section
 
 /-!
 # (Scalar) multiplication and (vector) addition as measurable equivalences
@@ -55,13 +57,17 @@ theorem _root_.measurableEmbedding_const_smul (c : G) : MeasurableEmbedding (c �
 theorem symm_smul (c : G) : (smul c : α ≃ᵐ α).symm = smul c⁻¹ :=
   ext rfl
 
--- DISSOLVED: smul₀
+def smul₀ (c : G₀) (hc : c ≠ 0) : α ≃ᵐ α :=
+  MeasurableEquiv.smul (Units.mk0 c hc)
 
--- DISSOLVED: coe_smul₀
+@[simp]
+theorem symm_smul₀ {c : G₀} (hc : c ≠ 0) :
+    (smul₀ c hc : α ≃ᵐ α).symm = smul₀ c⁻¹ (inv_ne_zero hc) :=
+  ext rfl
 
--- DISSOLVED: symm_smul₀
-
--- DISSOLVED: _root_.measurableEmbedding_const_smul₀
+theorem _root_.measurableEmbedding_const_smul₀ {c : G₀} (hc : c ≠ 0) :
+    MeasurableEmbedding (c • · : α → α) :=
+  (smul₀ c hc).measurableEmbedding
 
 section Mul
 
@@ -74,16 +80,8 @@ def mulLeft (g : G) : G ≃ᵐ G :=
   smul g
 
 @[to_additive (attr := simp)]
-theorem coe_mulLeft (g : G) : ⇑(mulLeft g) = (g * ·) :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem symm_mulLeft (g : G) : (mulLeft g).symm = mulLeft g⁻¹ :=
   ext rfl
-
-@[to_additive (attr := simp)]
-theorem toEquiv_mulLeft (g : G) : (mulLeft g).toEquiv = Equiv.mulLeft g :=
-  rfl
 
 @[to_additive]
 theorem _root_.measurableEmbedding_mulLeft (g : G) : MeasurableEmbedding (g * ·) :=
@@ -102,36 +100,34 @@ theorem _root_.measurableEmbedding_mulRight (g : G) : MeasurableEmbedding fun x 
   (mulRight g).measurableEmbedding
 
 @[to_additive (attr := simp)]
-theorem coe_mulRight (g : G) : ⇑(mulRight g) = fun x => x * g :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem symm_mulRight (g : G) : (mulRight g).symm = mulRight g⁻¹ :=
   ext rfl
 
-@[to_additive (attr := simp)]
-theorem toEquiv_mulRight (g : G) : (mulRight g).toEquiv = Equiv.mulRight g :=
-  rfl
+def mulLeft₀ (g : G₀) (hg : g ≠ 0) : G₀ ≃ᵐ G₀ :=
+  smul₀ g hg
 
--- DISSOLVED: mulLeft₀
+theorem _root_.measurableEmbedding_mulLeft₀ {g : G₀} (hg : g ≠ 0) :
+    MeasurableEmbedding (g * ·) :=
+  (mulLeft₀ g hg).measurableEmbedding
 
--- DISSOLVED: _root_.measurableEmbedding_mulLeft₀
+@[simp]
+theorem symm_mulLeft₀ {g : G₀} (hg : g ≠ 0) :
+    (mulLeft₀ g hg).symm = mulLeft₀ g⁻¹ (inv_ne_zero hg) :=
+  ext rfl
 
--- DISSOLVED: coe_mulLeft₀
+def mulRight₀ (g : G₀) (hg : g ≠ 0) : G₀ ≃ᵐ G₀ where
+  toEquiv := Equiv.mulRight₀ g hg
+  measurable_toFun := measurable_mul_const g
+  measurable_invFun := measurable_mul_const g⁻¹
 
--- DISSOLVED: symm_mulLeft₀
+theorem _root_.measurableEmbedding_mulRight₀ {g : G₀} (hg : g ≠ 0) :
+    MeasurableEmbedding fun x => x * g :=
+  (mulRight₀ g hg).measurableEmbedding
 
--- DISSOLVED: toEquiv_mulLeft₀
-
--- DISSOLVED: mulRight₀
-
--- DISSOLVED: _root_.measurableEmbedding_mulRight₀
-
--- DISSOLVED: coe_mulRight₀
-
--- DISSOLVED: symm_mulRight₀
-
--- DISSOLVED: toEquiv_mulRight₀
+@[simp]
+theorem symm_mulRight₀ {g : G₀} (hg : g ≠ 0) :
+    (mulRight₀ g hg).symm = mulRight₀ g⁻¹ (inv_ne_zero hg) :=
+  ext rfl
 
 end Mul
 
@@ -141,11 +137,6 @@ def inv (G) [MeasurableSpace G] [InvolutiveInv G] [MeasurableInv G] : G ≃ᵐ G
   toEquiv := Equiv.inv G
   measurable_toFun := measurable_inv
   measurable_invFun := measurable_inv
-
-@[to_additive (attr := simp)]
-theorem symm_inv {G} [MeasurableSpace G] [InvolutiveInv G] [MeasurableInv G] :
-    (inv G).symm = inv G :=
-  rfl
 
 @[to_additive " `equiv.subRight` as a `MeasurableEquiv` "]
 def divRight [MeasurableMul G] (g : G) : G ≃ᵐ G where

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.Defs
 import Mathlib.Logic.Function.Basic
 
+noncomputable section
+
 /-!
 # Sigma types
 
@@ -108,9 +110,6 @@ theorem fst_injective_iff : Injective (fst : (Σ a, β a) → α) ↔ ∀ a, Sub
 def map (f₁ : α₁ → α₂) (f₂ : ∀ a, β₁ a → β₂ (f₁ a)) (x : Sigma β₁) : Sigma β₂ :=
   ⟨f₁ x.1, f₂ x.1 x.2⟩
 
-lemma map_mk (f₁ : α₁ → α₂) (f₂ : ∀ a, β₁ a → β₂ (f₁ a)) (x : α₁) (y : β₁ x) :
-    map f₁ f₂ ⟨x, y⟩ = ⟨f₁ x, f₂ x y⟩ := rfl
-
 end Sigma
 
 theorem Function.Injective.sigma_map {f₁ : α₁ → α₂} {f₂ : ∀ a, β₁ a → β₂ (f₁ a)}
@@ -144,11 +143,6 @@ theorem Sigma.uncurry_curry {γ : ∀ a, β a → Type*} (f : ∀ x : Sigma β, 
     Sigma.uncurry (Sigma.curry f) = f :=
   funext fun ⟨_, _⟩ ↦ rfl
 
-@[simp]
-theorem Sigma.curry_uncurry {γ : ∀ a, β a → Type*} (f : ∀ (x) (y : β x), γ x y) :
-    Sigma.curry (Sigma.uncurry f) = f :=
-  rfl
-
 theorem Sigma.curry_update {γ : ∀ a, β a → Type*} [DecidableEq α] [∀ a, DecidableEq (β a)]
     (i : Σ a, β a) (f : (i : Σ a, β a) → γ i.1 i.2) (x : γ i.1 i.2) :
     Sigma.curry (Function.update f i x) =
@@ -170,22 +164,6 @@ theorem Sigma.curry_update {γ : ∀ a, β a → Type*} [DecidableEq α] [∀ a,
 def Prod.toSigma {α β} (p : α × β) : Σ_ : α, β :=
   ⟨p.1, p.2⟩
 
-@[simp]
-theorem Prod.fst_comp_toSigma {α β} : Sigma.fst ∘ @Prod.toSigma α β = Prod.fst :=
-  rfl
-
-@[simp]
-theorem Prod.fst_toSigma {α β} (x : α × β) : (Prod.toSigma x).fst = x.fst :=
-  rfl
-
-@[simp]
-theorem Prod.snd_toSigma {α β} (x : α × β) : (Prod.toSigma x).snd = x.snd :=
-  rfl
-
-@[simp]
-theorem Prod.toSigma_mk {α β} (x : α) (y : β) : (x, y).toSigma = ⟨x, y⟩ :=
-  rfl
-
 end Sigma
 
 namespace PSigma
@@ -194,10 +172,6 @@ variable {α : Sort*} {β : α → Sort*}
 
 def elim {γ} (f : ∀ a, β a → γ) (a : PSigma β) : γ :=
   PSigma.casesOn a f
-
-@[simp]
-theorem elim_val {γ} (f : ∀ a, β a → γ) (a b) : PSigma.elim f ⟨a, b⟩ = f a b :=
-  rfl
 
 instance [Inhabited α] [Inhabited (β default)] : Inhabited (PSigma β) :=
   ⟨⟨default, default⟩⟩

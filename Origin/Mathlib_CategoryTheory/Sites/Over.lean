@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.CoverLifting
 import Mathlib.CategoryTheory.Sites.CoverPreserving
 
+noncomputable section
+
 /-! Localization
 
 In this file, given a Grothendieck topology `J` on a category `C` and `X : C`, we construct
@@ -86,11 +88,6 @@ lemma overEquiv_pullback {X : C} {Y₁ Y₂ : Over X} (f : Y₁ ⟶ Y₂) (S : S
     refine ⟨T, c, 𝟙 Z, ?_, by simp [c]⟩
     rw [show c ≫ f = d ≫ a by ext; exact w]
     exact S.downward_closed h _
-
-@[simp]
-lemma overEquiv_symm_iff {X : C} {Y : Over X} (S : Sieve Y.left) {Z : Over X} (f : Z ⟶ Y) :
-    (overEquiv Y).symm S f ↔ S f.left := by
-  rfl
 
 lemma overEquiv_iff {X : C} {Y : Over X} (S : Sieve Y) {Z : C} (f : Z ⟶ Y.left) :
     overEquiv Y S f ↔ S (Over.homMk f : Over.mk (f ≫ Y.hom) ⟶ Y) := by

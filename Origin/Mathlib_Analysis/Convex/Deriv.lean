@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Convex/Deriv.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 84 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Convex.Slope
+
+noncomputable section
 
 /-!
 # Convexity of functions and derivatives
@@ -56,7 +58,17 @@ theorem AntitoneOn.concaveOn_of_deriv {D : Set ℝ} (hD : Convex ℝ D) {f : ℝ
     simpa only [← deriv.neg] using h_anti.neg
   neg_convexOn_iff.mp (this.convexOn_of_deriv hD hf.neg hf'.neg)
 
--- DISSOLVED: StrictMonoOn.exists_slope_lt_deriv_aux
+theorem StrictMonoOn.exists_slope_lt_deriv_aux {x y : ℝ} {f : ℝ → ℝ} (hf : ContinuousOn f (Icc x y))
+    (hxy : x < y) (hf'_mono : StrictMonoOn (deriv f) (Ioo x y)) (h : ∀ w ∈ Ioo x y, deriv f w ≠ 0) :
+    ∃ a ∈ Ioo x y, (f y - f x) / (y - x) < deriv f a := by
+  have A : DifferentiableOn ℝ f (Ioo x y) := fun w wmem =>
+    (differentiableAt_of_deriv_ne_zero (h w wmem)).differentiableWithinAt
+  obtain ⟨a, ⟨hxa, hay⟩, ha⟩ : ∃ a ∈ Ioo x y, deriv f a = (f y - f x) / (y - x) :=
+    exists_deriv_eq_slope f hxy hf A
+  rcases nonempty_Ioo.2 hay with ⟨b, ⟨hab, hby⟩⟩
+  refine ⟨b, ⟨hxa.trans hab, hby⟩, ?_⟩
+  rw [← ha]
+  exact hf'_mono ⟨hxa, hay⟩ ⟨hxa.trans hab, hby⟩ hab
 
 theorem StrictMonoOn.exists_slope_lt_deriv {x y : ℝ} {f : ℝ → ℝ} (hf : ContinuousOn f (Icc x y))
     (hxy : x < y) (hf'_mono : StrictMonoOn (deriv f) (Ioo x y)) :
@@ -90,7 +102,17 @@ theorem StrictMonoOn.exists_slope_lt_deriv {x y : ℝ} {f : ℝ → ℝ} (hf : C
         exact (hf'_mono ⟨hxw, hwy⟩ ⟨hxw.trans hwb, hby⟩ hwb).le
     linarith
 
--- DISSOLVED: StrictMonoOn.exists_deriv_lt_slope_aux
+theorem StrictMonoOn.exists_deriv_lt_slope_aux {x y : ℝ} {f : ℝ → ℝ} (hf : ContinuousOn f (Icc x y))
+    (hxy : x < y) (hf'_mono : StrictMonoOn (deriv f) (Ioo x y)) (h : ∀ w ∈ Ioo x y, deriv f w ≠ 0) :
+    ∃ a ∈ Ioo x y, deriv f a < (f y - f x) / (y - x) := by
+  have A : DifferentiableOn ℝ f (Ioo x y) := fun w wmem =>
+    (differentiableAt_of_deriv_ne_zero (h w wmem)).differentiableWithinAt
+  obtain ⟨a, ⟨hxa, hay⟩, ha⟩ : ∃ a ∈ Ioo x y, deriv f a = (f y - f x) / (y - x) :=
+    exists_deriv_eq_slope f hxy hf A
+  rcases nonempty_Ioo.2 hxa with ⟨b, ⟨hxb, hba⟩⟩
+  refine ⟨b, ⟨hxb, hba.trans hay⟩, ?_⟩
+  rw [← ha]
+  exact hf'_mono ⟨hxb, hba.trans hay⟩ ⟨hxa, hay⟩ hba
 
 theorem StrictMonoOn.exists_deriv_lt_slope {x y : ℝ} {f : ℝ → ℝ} (hf : ContinuousOn f (Icc x y))
     (hxy : x < y) (hf'_mono : StrictMonoOn (deriv f) (Ioo x y)) :

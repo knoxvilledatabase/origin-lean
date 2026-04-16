@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Generator
 import Mathlib.CategoryTheory.Preadditive.Yoneda.Basic
 
+noncomputable section
+
 /-!
 # Separators in preadditive categories
 

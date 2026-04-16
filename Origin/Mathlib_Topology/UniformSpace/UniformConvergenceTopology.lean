@@ -8,6 +8,8 @@ import Mathlib.Topology.UniformSpace.Pi
 import Mathlib.Topology.UniformSpace.Equiv
 import Mathlib.Topology.RestrictGen
 
+noncomputable section
+
 /-!
 # Topology and uniform structure of uniform convergence
 
@@ -146,6 +148,10 @@ def UniformFun (α β : Type*) :=
 def UniformOnFun (α β : Type*) (_ : Set (Set α)) :=
   α → β
 
+@[inherit_doc] scoped[UniformConvergence] notation:25 α " →ᵤ " β:0 => UniformFun α β
+
+@[inherit_doc] scoped[UniformConvergence] notation:25 α " →ᵤ[" 𝔖 "] " β:0 => UniformOnFun α β 𝔖
+
 open UniformConvergence
 
 variable {α β : Type*} {𝔖 : Set (Set α)}
@@ -173,12 +179,6 @@ def UniformOnFun.toFun (𝔖) : (α →ᵤ[𝔖] β) ≃ (α → β) :=
   (UniformOnFun.ofFun 𝔖).symm
 
 @[simp] lemma UniformFun.toFun_ofFun (f : α → β) : toFun (ofFun f) = f := rfl
-
-@[simp] lemma UniformFun.ofFun_toFun (f : α →ᵤ β) : ofFun (toFun f) = f := rfl
-
-@[simp] lemma UniformOnFun.toFun_ofFun (f : α → β) : toFun 𝔖 (ofFun 𝔖 f) = f := rfl
-
-@[simp] lemma UniformOnFun.ofFun_toFun (f : α →ᵤ[𝔖] β) : ofFun 𝔖 (toFun 𝔖 f) = f := rfl
 
 end TypeAlias
 

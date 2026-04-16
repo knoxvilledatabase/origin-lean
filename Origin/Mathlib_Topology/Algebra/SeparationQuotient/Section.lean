@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.Topology.Algebra.SeparationQuotient.Basic
 import Mathlib.Topology.Maps.OpenQuotient
 
+noncomputable section
+
 /-!
 # Algebraic operations on `SeparationQuotient`
 

@@ -5,6 +5,8 @@ Genuine: 134 | Conflates: 3 | Dissolved: 0 | Infrastructure: 15
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Operations
 
+noncomputable section
+
 /-!
 # Maps on modules and ideals
 
@@ -47,8 +49,6 @@ def comap [RingHomClass F R S] (I : Ideal S) : Ideal R where
 
 @[simp]
 theorem coe_comap [RingHomClass F R S] (I : Ideal S) : (comap f I : Set R) = f ⁻¹' I := rfl
-
-lemma comap_coe [RingHomClass F R S] (I : Ideal S) : I.comap (f : R →+* S) = I.comap f := rfl
 
 variable {f}
 
@@ -189,9 +189,6 @@ theorem comap_map_comap : ((K.comap f).map f).comap f = K.comap f :=
 theorem map_sup : (I ⊔ J).map f = I.map f ⊔ J.map f :=
   (gc_map_comap f : GaloisConnection (map f) (comap f)).l_sup
 
-theorem comap_inf : comap f (K ⊓ L) = comap f K ⊓ comap f L :=
-  rfl
-
 variable {ι : Sort*}
 
 theorem map_iSup (K : ι → Ideal R) : (iSup K).map f = ⨆ i, (K i).map f :=
@@ -239,17 +236,6 @@ theorem smul_top_eq_map {R S : Type*} [CommSemiring R] [CommSemiring S] [Algebra
     (I : Ideal R) : I • (⊤ : Submodule R S) = (I.map (algebraMap R S)).restrictScalars R :=
   Eq.trans (smul_restrictScalars I (⊤ : Ideal S)).symm <|
     congrArg _ <| Eq.trans (Ideal.smul_eq_mul _ _) (Ideal.mul_top _)
-
-@[simp]
-theorem coe_restrictScalars {R S : Type*} [Semiring R] [Semiring S] [Module R S]
-    [IsScalarTower R S S] (I : Ideal S) : (I.restrictScalars R : Set S) = ↑I :=
-  rfl
-
-@[simp]
-theorem restrictScalars_mul {R S : Type*} [Semiring R] [Semiring S] [Module R S]
-    [IsScalarTower R S S] (I J : Ideal S) :
-    (I * J).restrictScalars R = I.restrictScalars R * J.restrictScalars R :=
-  rfl
 
 section Surjective
 
@@ -925,11 +911,6 @@ namespace AlgHom
 
 variable {R A B : Type*} [CommSemiring R] [Semiring A] [Semiring B]
     [Algebra R A] [Algebra R B] (f : A →ₐ[R] B)
-
-lemma coe_ker : RingHom.ker f = RingHom.ker (f : A →+* B) := rfl
-
-lemma coe_ideal_map (I : Ideal A) :
-    Ideal.map f I = Ideal.map (f : A →+* B) I := rfl
 
 lemma comap_ker {C : Type*} [Semiring C] [Algebra R C] (f : B →ₐ[R] C) (g : A →ₐ[R] B) :
     (RingHom.ker f).comap g = RingHom.ker (f.comp g) :=

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Expect.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Rat
@@ -11,6 +11,8 @@ import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Module.Pi
 import Mathlib.Data.Finset.Density
 import Mathlib.Data.Fintype.BigOperators
+
+noncomputable section
 
 /-!
 # Average over a finset
@@ -133,7 +135,8 @@ lemma expect_comm (s : Finset ι) (t : Finset κ) (f : ι → κ → M) :
 lemma expect_eq_zero (h : ∀ i ∈ s, f i = 0) : 𝔼 i ∈ s, f i = 0 :=
   (expect_congr rfl h).trans s.expect_const_zero
 
--- DISSOLVED: exists_ne_zero_of_expect_ne_zero
+lemma exists_ne_zero_of_expect_ne_zero (h : 𝔼 i ∈ s, f i ≠ 0) : ∃ i ∈ s, f i ≠ 0 := by
+  contrapose! h; exact expect_eq_zero h
 
 lemma expect_add_distrib (s : Finset ι) (f g : ι → M) :
     𝔼 i ∈ s, (f i + g i) = 𝔼 i ∈ s, f i + 𝔼 i ∈ s, g i := by

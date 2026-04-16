@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.IsConnected
 import Mathlib.CategoryTheory.Sigma.Basic
 import Mathlib.CategoryTheory.FullSubcategory
 
+noncomputable section
+
 /-!
 # Connected components of a category
 
@@ -39,10 +41,6 @@ def Functor.mapConnectedComponents {K : Type u₂} [Category.{v₂} K] (F : J �
     (x : ConnectedComponents J) : ConnectedComponents K :=
   x |> Quotient.lift (Quotient.mk (Zigzag.setoid _) ∘ F.obj)
     (fun _ _ ↦ Quot.sound ∘ zigzag_obj_of_zigzag F)
-
-@[simp]
-lemma Functor.mapConnectedComponents_mk {K : Type u₂} [Category.{v₂} K] (F : J ⥤ K) (j : J) :
-    F.mapConnectedComponents (Quotient.mk _ j) = Quotient.mk _ (F.obj j) := rfl
 
 instance [Inhabited J] : Inhabited (ConnectedComponents J) :=
   ⟨Quotient.mk'' default⟩
@@ -126,11 +124,6 @@ abbrev inclusion (j : ConnectedComponents J) : Component j ⥤ Decomposed J :=
 @[simps!]
 def decomposedTo (J : Type u₁) [Category.{v₁} J] : Decomposed J ⥤ J :=
   Sigma.desc Component.ι
-
-@[simp]
-theorem inclusion_comp_decomposedTo (j : ConnectedComponents J) :
-    inclusion j ⋙ decomposedTo J = Component.ι j :=
-  rfl
 
 instance : (decomposedTo J).Full where
   map_surjective := by

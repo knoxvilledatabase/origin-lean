@@ -5,6 +5,8 @@ Genuine: 94 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 import Origin.Core
 import Mathlib.Data.Matrix.ConjTranspose
 
+noncomputable section
+
 /-!
 # Block Matrices
 
@@ -40,26 +42,6 @@ def fromBlocks (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α) (D : 
     Matrix (n ⊕ o) (l ⊕ m) α :=
   of <| Sum.elim (fun i => Sum.elim (A i) (B i)) (fun j => Sum.elim (C j) (D j))
 
-@[simp]
-theorem fromBlocks_apply₁₁ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) (i : n) (j : l) : fromBlocks A B C D (Sum.inl i) (Sum.inl j) = A i j :=
-  rfl
-
-@[simp]
-theorem fromBlocks_apply₁₂ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) (i : n) (j : m) : fromBlocks A B C D (Sum.inl i) (Sum.inr j) = B i j :=
-  rfl
-
-@[simp]
-theorem fromBlocks_apply₂₁ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) (i : o) (j : l) : fromBlocks A B C D (Sum.inr i) (Sum.inl j) = C i j :=
-  rfl
-
-@[simp]
-theorem fromBlocks_apply₂₂ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) (i : o) (j : m) : fromBlocks A B C D (Sum.inr i) (Sum.inr j) = D i j :=
-  rfl
-
 def toBlocks₁₁ (M : Matrix (n ⊕ o) (l ⊕ m) α) : Matrix n l α :=
   of fun i j => M (Sum.inl i) (Sum.inl j)
 
@@ -76,26 +58,6 @@ theorem fromBlocks_toBlocks (M : Matrix (n ⊕ o) (l ⊕ m) α) :
     fromBlocks M.toBlocks₁₁ M.toBlocks₁₂ M.toBlocks₂₁ M.toBlocks₂₂ = M := by
   ext i j
   rcases i with ⟨⟩ <;> rcases j with ⟨⟩ <;> rfl
-
-@[simp]
-theorem toBlocks_fromBlocks₁₁ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) : (fromBlocks A B C D).toBlocks₁₁ = A :=
-  rfl
-
-@[simp]
-theorem toBlocks_fromBlocks₁₂ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) : (fromBlocks A B C D).toBlocks₁₂ = B :=
-  rfl
-
-@[simp]
-theorem toBlocks_fromBlocks₂₁ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) : (fromBlocks A B C D).toBlocks₂₁ = C :=
-  rfl
-
-@[simp]
-theorem toBlocks_fromBlocks₂₂ (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
-    (D : Matrix o m α) : (fromBlocks A B C D).toBlocks₂₂ = D :=
-  rfl
 
 theorem ext_iff_blocks {A B : Matrix (n ⊕ o) (l ⊕ m) α} :
     A = B ↔
@@ -138,10 +100,6 @@ theorem fromBlocks_submatrix_sum_swap_right (A : Matrix n l α) (B : Matrix n m 
   ext i j
   cases j <;> dsimp <;> cases f i <;> rfl
 
-theorem fromBlocks_submatrix_sum_swap_sum_swap {l m n o α : Type*} (A : Matrix n l α)
-    (B : Matrix n m α) (C : Matrix o l α) (D : Matrix o m α) :
-    (fromBlocks A B C D).submatrix Sum.swap Sum.swap = fromBlocks D C B A := by simp
-
 def IsTwoBlockDiagonal [Zero α] (A : Matrix (n ⊕ o) (l ⊕ m) α) : Prop :=
   toBlocks₁₂ A = 0 ∧ toBlocks₂₁ A = 0
 
@@ -156,19 +114,9 @@ theorem toBlock_apply (M : Matrix m n α) (p : m → Prop) (q : n → Prop) (i :
 def toSquareBlockProp (M : Matrix m m α) (p : m → Prop) : Matrix { a // p a } { a // p a } α :=
   toBlock M _ _
 
-theorem toSquareBlockProp_def (M : Matrix m m α) (p : m → Prop) :
-    -- Porting note: added missing `of`
-    toSquareBlockProp M p = of (fun i j : { a // p a } => M ↑i ↑j) :=
-  rfl
-
 def toSquareBlock (M : Matrix m m α) (b : m → β) (k : β) :
     Matrix { a // b a = k } { a // b a = k } α :=
   toSquareBlockProp M _
-
-theorem toSquareBlock_def (M : Matrix m m α) (b : m → β) (k : β) :
-    -- Porting note: added missing `of`
-    toSquareBlock M b k = of (fun i j : { a // b a = k } => M ↑i ↑j) :=
-  rfl
 
 theorem fromBlocks_smul [SMul R α] (x : R) (A : Matrix n l α) (B : Matrix n m α) (C : Matrix o l α)
     (D : Matrix o m α) : x • fromBlocks A B C D = fromBlocks (x • A) (x • B) (x • C) (x • D) := by
@@ -254,12 +202,6 @@ lemma toBlocks₂₂_diagonal (v : l ⊕ m → α) :
   funext i j
   simp only [ne_eq, Sum.inr.injEq, of_apply, diagonal_apply]
 
-@[simp]
-lemma toBlocks₁₂_diagonal (v : l ⊕ m → α) : toBlocks₁₂ (diagonal v) = 0 := rfl
-
-@[simp]
-lemma toBlocks₂₁_diagonal (v : l ⊕ m → α) : toBlocks₂₁ (diagonal v) = 0 := rfl
-
 end Zero
 
 section HasZeroHasOne
@@ -293,10 +235,6 @@ variable [Zero α] [Zero β]
 
 def blockDiagonal (M : o → Matrix m n α) : Matrix (m × o) (n × o) α :=
   of <| (fun ⟨i, k⟩ ⟨j, k'⟩ => if k = k' then M k i j else 0 : m × o → n × o → α)
-
-theorem blockDiagonal_apply' (M : o → Matrix m n α) (i k j k') :
-    blockDiagonal M ⟨i, k⟩ ⟨j, k'⟩ = if k = k' then M k i j else 0 :=
-  rfl
 
 theorem blockDiagonal_apply (M : o → Matrix m n α) (ik jk) :
     blockDiagonal M ik jk = if ik.2 = jk.2 then M ik.2 ik.1 jk.1 else 0 := by
@@ -429,10 +367,6 @@ theorem blockDiag_apply (M : Matrix (m × o) (n × o) α) (k : o) (i j) :
     blockDiag M k i j = M (i, k) (j, k) :=
   rfl
 
-theorem blockDiag_map (M : Matrix (m × o) (n × o) α) (f : α → β) :
-    blockDiag (M.map f) = fun k => (blockDiag M k).map f :=
-  rfl
-
 @[simp]
 theorem blockDiag_transpose (M : Matrix (m × o) (n × o) α) (k : o) :
     blockDiag Mᵀ k = (blockDiag M k)ᵀ :=
@@ -507,11 +441,6 @@ theorem blockDiag_sub [AddGroup α] (M N : Matrix (m × o) (n × o) α) :
     blockDiag (M - N) = blockDiag M - blockDiag N :=
   map_sub (blockDiagAddMonoidHom m n o α) M N
 
-@[simp]
-theorem blockDiag_smul {R : Type*} [Monoid R] [AddMonoid α] [DistribMulAction R α] (x : R)
-    (M : Matrix (m × o) (n × o) α) : blockDiag (x • M) = x • blockDiag M :=
-  rfl
-
 end BlockDiag
 
 section BlockDiagonal'
@@ -526,15 +455,6 @@ def blockDiagonal' (M : ∀ i, Matrix (m' i) (n' i) α) : Matrix (Σi, m' i) (Σ
   of <|
     (fun ⟨k, i⟩ ⟨k', j⟩ => if h : k = k' then M k i (cast (congr_arg n' h.symm) j) else 0 :
       (Σi, m' i) → (Σi, n' i) → α)
-
-theorem blockDiagonal'_apply' (M : ∀ i, Matrix (m' i) (n' i) α) (k i k' j) :
-    blockDiagonal' M ⟨k, i⟩ ⟨k', j⟩ =
-      if h : k = k' then M k i (cast (congr_arg n' h.symm) j) else 0 :=
-  rfl
-
-theorem blockDiagonal'_eq_blockDiagonal (M : o → Matrix m n α) {k k'} (i j) :
-    blockDiagonal M (i, k) (j, k') = blockDiagonal' M ⟨k, i⟩ ⟨k', j⟩ :=
-  rfl
 
 theorem blockDiagonal'_submatrix_eq_blockDiagonal (M : o → Matrix m n α) :
     (blockDiagonal' M).submatrix (Prod.toSigma ∘ Prod.swap) (Prod.toSigma ∘ Prod.swap) =
@@ -677,10 +597,6 @@ theorem blockDiag'_apply (M : Matrix (Σi, m' i) (Σi, n' i) α) (k : o) (i j) :
     blockDiag' M k i j = M ⟨k, i⟩ ⟨k, j⟩ :=
   rfl
 
-theorem blockDiag'_map (M : Matrix (Σi, m' i) (Σi, n' i) α) (f : α → β) :
-    blockDiag' (M.map f) = fun k => (blockDiag' M k).map f :=
-  rfl
-
 @[simp]
 theorem blockDiag'_transpose (M : Matrix (Σi, m' i) (Σi, n' i) α) (k : o) :
     blockDiag' Mᵀ k = (blockDiag' M k)ᵀ :=
@@ -757,11 +673,6 @@ theorem blockDiag'_neg [AddGroup α] (M : Matrix (Σi, m' i) (Σi, n' i) α) :
 theorem blockDiag'_sub [AddGroup α] (M N : Matrix (Σi, m' i) (Σi, n' i) α) :
     blockDiag' (M - N) = blockDiag' M - blockDiag' N :=
   map_sub (blockDiag'AddMonoidHom m' n' α) M N
-
-@[simp]
-theorem blockDiag'_smul {R : Type*} [Monoid R] [AddMonoid α] [DistribMulAction R α] (x : R)
-    (M : Matrix (Σi, m' i) (Σi, n' i) α) : blockDiag' (x • M) = x • blockDiag' M :=
-  rfl
 
 end BlockDiag'
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.Digraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
+noncomputable section
+
 /-!
 
 # Graph Orientation

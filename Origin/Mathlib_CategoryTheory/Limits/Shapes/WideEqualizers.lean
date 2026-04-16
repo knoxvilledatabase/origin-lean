@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits
 import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 
+noncomputable section
+
 /-!
 # Wide equalizers and wide coequalizers
 
@@ -89,11 +91,6 @@ instance WalkingParallelFamily.category : SmallCategory (WalkingParallelFamily J
   assoc f g h := by cases f <;> cases g <;> cases h <;> aesop_cat
   comp_id f := by cases f <;> aesop_cat
 
-@[simp]
-theorem WalkingParallelFamily.hom_id (X : WalkingParallelFamily J) :
-    WalkingParallelFamily.Hom.id X = 𝟙 X :=
-  rfl
-
 variable {C : Type u} [Category.{v} C]
 
 variable {X Y : C} (f : J → (X ⟶ Y))
@@ -107,14 +104,6 @@ def parallelFamily : WalkingParallelFamily J ⥤ C where
   map_comp := by
     rintro _ _ _ ⟨⟩ ⟨⟩ <;>
       · aesop_cat
-
-@[simp]
-theorem parallelFamily_obj_zero : (parallelFamily f).obj zero = X :=
-  rfl
-
-@[simp]
-theorem parallelFamily_obj_one : (parallelFamily f).obj one = Y :=
-  rfl
 
 @[simp]
 theorem parallelFamily_map_left {j : J} : (parallelFamily f).map (line j) = f j :=
@@ -152,14 +141,6 @@ abbrev Trident.ι (t : Trident f) :=
 abbrev Cotrident.π (t : Cotrident f) :=
   t.ι.app one
 
-@[simp]
-theorem Trident.ι_eq_app_zero (t : Trident f) : t.ι = t.π.app zero :=
-  rfl
-
-@[simp]
-theorem Cotrident.π_eq_app_one (t : Cotrident f) : t.π = t.ι.app one :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem Trident.app_zero (s : Trident f) (j : J) : s.π.app zero ≫ f j = s.π.app one := by
   rw [← s.w (line j), parallelFamily_map_left]
@@ -191,14 +172,6 @@ def Cotrident.ofπ [Nonempty J] {P : C} (π : Y ⟶ P) (w : ∀ j₁ j₂, f j�
         cases' f with _ k
         · simp
         · simp [w (Classical.arbitrary J) k] }
-
-theorem Trident.ι_ofι [Nonempty J] {P : C} (ι : P ⟶ X) (w : ∀ j₁ j₂, ι ≫ f j₁ = ι ≫ f j₂) :
-    (Trident.ofι ι w).ι = ι :=
-  rfl
-
-theorem Cotrident.π_ofπ [Nonempty J] {P : C} (π : Y ⟶ P) (w : ∀ j₁ j₂, f j₁ ≫ π = f j₂ ≫ π) :
-    (Cotrident.ofπ π w).π = π :=
-  rfl
 
 @[reassoc]
 theorem Trident.condition (j₁ j₂ : J) (t : Trident f) : t.ι ≫ f j₁ = t.ι ≫ f j₂ := by
@@ -313,17 +286,6 @@ def Cocone.ofCotrident {F : WalkingParallelFamily J ⥤ C} (t : Cotrident fun j 
     { app := fun X => eqToHom (by cases X <;> aesop_cat) ≫ t.ι.app X
       naturality := fun j j' g => by cases g <;> dsimp <;> simp [Cotrident.app_one t] }
 
-@[simp]
-theorem Cone.ofTrident_π {F : WalkingParallelFamily J ⥤ C} (t : Trident fun j => F.map (line j))
-    (j) : (Cone.ofTrident t).π.app j = t.π.app j ≫ eqToHom (by cases j <;> aesop_cat) :=
-  rfl
-
-@[simp]
-theorem Cocone.ofCotrident_ι {F : WalkingParallelFamily J ⥤ C}
-    (t : Cotrident fun j => F.map (line j)) (j) :
-    (Cocone.ofCotrident t).ι.app j = eqToHom (by cases j <;> aesop_cat) ≫ t.ι.app j :=
-  rfl
-
 def Trident.ofCone {F : WalkingParallelFamily J ⥤ C} (t : Cone F) :
     Trident fun j => F.map (line j) where
   pt := t.pt
@@ -337,16 +299,6 @@ def Cotrident.ofCocone {F : WalkingParallelFamily J ⥤ C} (t : Cocone F) :
   ι :=
     { app := fun X => eqToHom (by cases X <;> aesop_cat) ≫ t.ι.app X
       naturality := by rintro _ _ (_|_) <;> aesop_cat }
-
-@[simp]
-theorem Trident.ofCone_π {F : WalkingParallelFamily J ⥤ C} (t : Cone F) (j) :
-    (Trident.ofCone t).π.app j = t.π.app j ≫ eqToHom (by cases j <;> aesop_cat) :=
-  rfl
-
-@[simp]
-theorem Cotrident.ofCocone_ι {F : WalkingParallelFamily J ⥤ C} (t : Cocone F) (j) :
-    (Cotrident.ofCocone t).ι.app j = eqToHom (by cases j <;> aesop_cat) ≫ t.ι.app j :=
-  rfl
 
 @[simps]
 def Trident.mkHom [Nonempty J] {s t : Trident f} (k : s.pt ⟶ t.pt)
@@ -394,15 +346,6 @@ abbrev wideEqualizer.ι : wideEqualizer f ⟶ X :=
 
 abbrev wideEqualizer.trident : Trident f :=
   limit.cone (parallelFamily f)
-
-@[simp]
-theorem wideEqualizer.trident_ι : (wideEqualizer.trident f).ι = wideEqualizer.ι f :=
-  rfl
-
-@[simp 1100]
-theorem wideEqualizer.trident_π_app_zero :
-    (wideEqualizer.trident f).π.app zero = wideEqualizer.ι f :=
-  rfl
 
 @[reassoc]
 theorem wideEqualizer.condition (j₁ j₂ : J) : wideEqualizer.ι f ≫ f j₁ = wideEqualizer.ι f ≫ f j₂ :=
@@ -463,15 +406,6 @@ abbrev wideCoequalizer.π : Y ⟶ wideCoequalizer f :=
 
 abbrev wideCoequalizer.cotrident : Cotrident f :=
   colimit.cocone (parallelFamily f)
-
-@[simp]
-theorem wideCoequalizer.cotrident_π : (wideCoequalizer.cotrident f).π = wideCoequalizer.π f :=
-  rfl
-
-@[simp 1100]
-theorem wideCoequalizer.cotrident_ι_app_one :
-    (wideCoequalizer.cotrident f).ι.app one = wideCoequalizer.π f :=
-  rfl
 
 @[reassoc]
 theorem wideCoequalizer.condition (j₁ j₂ : J) :

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Kernels
 import Mathlib.CategoryTheory.Subobject.WellPowered
 import Mathlib.CategoryTheory.Subobject.Limits
 
+noncomputable section
+
 /-!
 # Subobjects in the category of `R`-modules
 

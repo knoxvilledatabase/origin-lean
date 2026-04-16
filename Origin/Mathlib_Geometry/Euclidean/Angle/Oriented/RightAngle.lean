@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/RightAngle.lean
-Genuine: 72 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 78 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Euclidean.Angle.Oriented.Affine
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.RightAngle
+
+noncomputable section
 
 /-!
 # Oriented angles in right-angled triangles.
@@ -363,17 +365,67 @@ theorem norm_div_tan_oangle_sub_left_of_oangle_eq_pi_div_two {x y : V}
   rw [← neg_inj, oangle_rev, ← oangle_neg_orientation_eq_neg, neg_inj] at h ⊢
   exact (-o).norm_div_tan_oangle_sub_right_of_oangle_eq_pi_div_two h
 
--- DISSOLVED: oangle_add_right_smul_rotation_pi_div_two
+theorem oangle_add_right_smul_rotation_pi_div_two {x : V} (h : x ≠ 0) (r : ℝ) :
+    o.oangle x (x + r • o.rotation (π / 2 : ℝ) x) = Real.arctan r := by
+  rcases lt_trichotomy r 0 with (hr | rfl | hr)
+  · have ha : o.oangle x (r • o.rotation (π / 2 : ℝ) x) = -(π / 2 : ℝ) := by
+      rw [o.oangle_smul_right_of_neg _ _ hr, o.oangle_neg_right h, o.oangle_rotation_self_right h, ←
+        sub_eq_zero, add_comm, sub_neg_eq_add, ← Real.Angle.coe_add, ← Real.Angle.coe_add,
+        add_assoc, add_halves, ← two_mul, Real.Angle.coe_two_pi]
+      simpa using h
+    -- Porting note: if the type is not given in `neg_neg` then Lean "forgets" about the instance
+    -- `Neg (Orientation ℝ V (Fin 2))`
+    rw [← neg_inj, ← oangle_neg_orientation_eq_neg, @neg_neg Real.Angle] at ha
+    rw [← neg_inj, oangle_rev, ← oangle_neg_orientation_eq_neg, neg_inj, oangle_rev,
+      (-o).oangle_add_right_eq_arctan_of_oangle_eq_pi_div_two ha, norm_smul,
+      LinearIsometryEquiv.norm_map, mul_div_assoc, div_self (norm_ne_zero_iff.2 h), mul_one,
+      Real.norm_eq_abs, abs_of_neg hr, Real.arctan_neg, Real.Angle.coe_neg, neg_neg]
+  · rw [zero_smul, add_zero, oangle_self, Real.arctan_zero, Real.Angle.coe_zero]
+  · have ha : o.oangle x (r • o.rotation (π / 2 : ℝ) x) = (π / 2 : ℝ) := by
+      rw [o.oangle_smul_right_of_pos _ _ hr, o.oangle_rotation_self_right h]
+    rw [o.oangle_add_right_eq_arctan_of_oangle_eq_pi_div_two ha, norm_smul,
+      LinearIsometryEquiv.norm_map, mul_div_assoc, div_self (norm_ne_zero_iff.2 h), mul_one,
+      Real.norm_eq_abs, abs_of_pos hr]
 
--- DISSOLVED: oangle_add_left_smul_rotation_pi_div_two
+theorem oangle_add_left_smul_rotation_pi_div_two {x : V} (h : x ≠ 0) (r : ℝ) :
+    o.oangle (x + r • o.rotation (π / 2 : ℝ) x) (r • o.rotation (π / 2 : ℝ) x)
+      = Real.arctan r⁻¹ := by
+  by_cases hr : r = 0; · simp [hr]
+  rw [← neg_inj, oangle_rev, ← oangle_neg_orientation_eq_neg, neg_inj, ←
+    neg_neg ((π / 2 : ℝ) : Real.Angle), ← rotation_neg_orientation_eq_neg, add_comm]
+  have hx : x = r⁻¹ • (-o).rotation (π / 2 : ℝ) (r • (-o).rotation (-(π / 2 : ℝ)) x) := by simp [hr]
+  nth_rw 3 [hx]
+  refine (-o).oangle_add_right_smul_rotation_pi_div_two ?_ _
+  simp [hr, h]
 
--- DISSOLVED: tan_oangle_add_right_smul_rotation_pi_div_two
+theorem tan_oangle_add_right_smul_rotation_pi_div_two {x : V} (h : x ≠ 0) (r : ℝ) :
+    Real.Angle.tan (o.oangle x (x + r • o.rotation (π / 2 : ℝ) x)) = r := by
+  rw [o.oangle_add_right_smul_rotation_pi_div_two h, Real.Angle.tan_coe, Real.tan_arctan]
 
--- DISSOLVED: tan_oangle_add_left_smul_rotation_pi_div_two
+theorem tan_oangle_add_left_smul_rotation_pi_div_two {x : V} (h : x ≠ 0) (r : ℝ) :
+    Real.Angle.tan (o.oangle (x + r • o.rotation (π / 2 : ℝ) x) (r • o.rotation (π / 2 : ℝ) x)) =
+      r⁻¹ := by
+  rw [o.oangle_add_left_smul_rotation_pi_div_two h, Real.Angle.tan_coe, Real.tan_arctan]
 
--- DISSOLVED: oangle_sub_right_smul_rotation_pi_div_two
+theorem oangle_sub_right_smul_rotation_pi_div_two {x : V} (h : x ≠ 0) (r : ℝ) :
+    o.oangle (r • o.rotation (π / 2 : ℝ) x) (r • o.rotation (π / 2 : ℝ) x - x)
+      = Real.arctan r⁻¹ := by
+  by_cases hr : r = 0; · simp [hr]
+  have hx : -x = r⁻¹ • o.rotation (π / 2 : ℝ) (r • o.rotation (π / 2 : ℝ) x) := by
+    simp [hr, ← Real.Angle.coe_add]
+  rw [sub_eq_add_neg, hx, o.oangle_add_right_smul_rotation_pi_div_two]
+  simpa [hr] using h
 
--- DISSOLVED: oangle_sub_left_smul_rotation_pi_div_two
+theorem oangle_sub_left_smul_rotation_pi_div_two {x : V} (h : x ≠ 0) (r : ℝ) :
+    o.oangle (x - r • o.rotation (π / 2 : ℝ) x) x = Real.arctan r := by
+  by_cases hr : r = 0; · simp [hr]
+  have hx : x = r⁻¹ • o.rotation (π / 2 : ℝ) (-(r • o.rotation (π / 2 : ℝ) x)) := by
+    simp [hr, ← Real.Angle.coe_add]
+  rw [sub_eq_add_neg, add_comm]
+  nth_rw 3 [hx]
+  nth_rw 2 [hx]
+  rw [o.oangle_add_left_smul_rotation_pi_div_two, inv_inv]
+  simpa [hr] using h
 
 end Orientation
 

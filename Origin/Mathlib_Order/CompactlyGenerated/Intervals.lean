@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.CompleteLatticeIntervals
 import Mathlib.Order.CompactlyGenerated.Basic
 
+noncomputable section
+
 /-!
 # Results about compactness properties for intervals in complete lattices
 -/

@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Data.Finsupp.Indicator
 import Mathlib.Data.Fintype.BigOperators
 
+noncomputable section
+
 /-!
 # Finitely supported product of finsets
 

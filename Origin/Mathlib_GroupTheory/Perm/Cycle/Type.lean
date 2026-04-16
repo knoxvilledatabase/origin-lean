@@ -11,6 +11,8 @@ import Mathlib.GroupTheory.Perm.Closure
 import Mathlib.Algebra.GCDMonoid.Nat
 import Mathlib.Tactic.NormNum.GCD
 
+noncomputable section
+
 /-!
 # Cycle Types
 

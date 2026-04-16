@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/Padics/Hensel.lean
-Genuine: 50 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 54 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Identities
@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.NumberTheory.Padics.PadicIntegers
 import Mathlib.Topology.Algebra.Polynomial
 import Mathlib.Topology.MetricSpace.CauSeqFilter
+
+noncomputable section
 
 /-!
 # Hensel's lemma on ℤ_p
@@ -110,20 +112,23 @@ include hnorm
 private theorem deriv_sq_norm_pos : 0 < ‖F.derivative.eval a‖ ^ 2 :=
   lt_of_le_of_lt (norm_nonneg _) hnorm
 
--- DISSOLVED: deriv_sq_norm_ne_zero
+private theorem deriv_sq_norm_ne_zero : ‖F.derivative.eval a‖ ^ 2 ≠ 0 :=
+  ne_of_gt (deriv_sq_norm_pos hnorm)
 
--- DISSOLVED: deriv_norm_ne_zero
+private theorem deriv_norm_ne_zero : ‖F.derivative.eval a‖ ≠ 0 := fun h =>
+  deriv_sq_norm_ne_zero hnorm (by simp [*, sq])
 
 private theorem deriv_norm_pos : 0 < ‖F.derivative.eval a‖ :=
   lt_of_le_of_ne (norm_nonneg _) (Ne.symm (deriv_norm_ne_zero hnorm))
 
--- DISSOLVED: deriv_ne_zero
+private theorem deriv_ne_zero : F.derivative.eval a ≠ 0 :=
+  mt norm_eq_zero.2 (deriv_norm_ne_zero hnorm)
 
 private theorem T_lt_one : T < 1 := by
   have h := (div_lt_one (deriv_sq_norm_pos hnorm)).2 hnorm
   rw [T_def]; exact h
 
--- DISSOLVED: T_pow
+private theorem T_pow {n : ℕ} (hn : n ≠ 0) : T ^ n < 1 := pow_lt_one₀ T_nonneg (T_lt_one hnorm) hn
 
 private theorem T_pow' (n : ℕ) : T ^ 2 ^ n < 1 := T_pow hnorm (pow_ne_zero _ two_ne_zero)
 

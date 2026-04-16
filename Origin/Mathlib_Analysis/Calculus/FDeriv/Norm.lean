@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Calculus/FDeriv/Norm.lean
-Genuine: 10 | Conflates: 2 | Dissolved: 5 | Infrastructure: 0
+Genuine: 11 | Conflates: 2 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Abs
 import Mathlib.Analysis.Calculus.LineDeriv.Basic
+
+noncomputable section
 
 /-!
 # Differentiability of the norm in a real normed vector space
@@ -56,9 +58,22 @@ theorem not_differentiableAt_norm_zero [Nontrivial E] :
     exact this.const_mul _
   exact not_differentiableAt_abs_zero this
 
--- DISSOLVED: ContDiffAt.contDiffAt_norm_smul
+theorem ContDiffAt.contDiffAt_norm_smul (ht : t ≠ 0) (h : ContDiffAt ℝ n (‖·‖) x) :
+    ContDiffAt ℝ n (‖·‖) (t • x) := by
+  have h1 : ContDiffAt ℝ n (fun y ↦ t⁻¹ • y) (t • x) := (contDiff_const_smul t⁻¹).contDiffAt
+  have h2 : ContDiffAt ℝ n (fun y ↦ |t| * ‖y‖) x := h.const_smul |t|
+  conv at h2 => enter [4]; rw [← one_smul ℝ x, ← inv_mul_cancel₀ ht, mul_smul]
+  convert h2.comp (t • x) h1 using 1
+  ext y
+  simp only [Function.comp_apply]
+  rw [norm_smul, ← mul_assoc, norm_eq_abs, ← abs_mul, mul_inv_cancel₀ ht, abs_one, one_mul]
 
--- DISSOLVED: contDiffAt_norm_smul_iff
+theorem contDiffAt_norm_smul_iff (ht : t ≠ 0) :
+    ContDiffAt ℝ n (‖·‖) x ↔ ContDiffAt ℝ n (‖·‖) (t • x) where
+  mp h := h.contDiffAt_norm_smul ht
+  mpr hd := by
+    convert hd.contDiffAt_norm_smul (inv_ne_zero ht)
+    rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
 
 theorem ContDiffAt.contDiffAt_norm_of_smul (h : ContDiffAt ℝ n (‖·‖) (t • x)) :
     ContDiffAt ℝ n (‖·‖) x := by
@@ -76,7 +91,19 @@ theorem ContDiffAt.contDiffAt_norm_of_smul (h : ContDiffAt ℝ n (‖·‖) (t �
       exact contDiffAt_const
   · exact contDiffAt_norm_smul_iff ht |>.2 h
 
--- DISSOLVED: HasStrictFDerivAt.hasStrictFDerivAt_norm_smul
+theorem HasStrictFDerivAt.hasStrictFDerivAt_norm_smul
+    (ht : t ≠ 0) (h : HasStrictFDerivAt (‖·‖) f x) :
+    HasStrictFDerivAt (‖·‖) ((SignType.sign t : ℝ) • f) (t • x) := by
+  have h1 : HasStrictFDerivAt (fun y ↦ t⁻¹ • y) (t⁻¹ • ContinuousLinearMap.id ℝ E) (t • x) :=
+    hasStrictFDerivAt_id (t • x) |>.const_smul t⁻¹
+  have h2 : HasStrictFDerivAt (fun y ↦ |t| * ‖y‖) (|t| • f) x := h.const_smul |t|
+  conv at h2 => enter [3]; rw [← one_smul ℝ x, ← inv_mul_cancel₀ ht, mul_smul]
+  convert h2.comp (t • x) h1 with y
+  · rw [norm_smul, ← mul_assoc, norm_eq_abs, ← abs_mul, mul_inv_cancel₀ ht, abs_one, one_mul]
+  ext y
+  simp only [coe_smul', Pi.smul_apply, smul_eq_mul, comp_smulₛₗ, map_inv₀, RingHom.id_apply,
+    comp_id]
+  rw [eq_inv_mul_iff_mul_eq₀ ht, ← mul_assoc, self_mul_sign]
 
 theorem HasStrictFDerivAt.hasStrictDerivAt_norm_smul_neg
     (ht : t < 0) (h : HasStrictFDerivAt (‖·‖) f x) :
@@ -88,7 +115,20 @@ theorem HasStrictFDerivAt.hasStrictDerivAt_norm_smul_pos
     HasStrictFDerivAt (‖·‖) f (t • x) := by
   simpa [ht] using h.hasStrictFDerivAt_norm_smul ht.ne'
 
--- DISSOLVED: HasFDerivAt.hasFDerivAt_norm_smul
+theorem HasFDerivAt.hasFDerivAt_norm_smul
+    (ht : t ≠ 0) (h : HasFDerivAt (‖·‖) f x) :
+    HasFDerivAt (‖·‖) ((SignType.sign t : ℝ) • f) (t • x) := by
+  have h1 : HasFDerivAt (fun y ↦ t⁻¹ • y) (t⁻¹ • ContinuousLinearMap.id ℝ E) (t • x) :=
+    hasFDerivAt_id (t • x) |>.const_smul t⁻¹
+  have h2 : HasFDerivAt (fun y ↦ |t| * ‖y‖) (|t| • f) x := h.const_smul |t|
+  conv at h2 => enter [3]; rw [← one_smul ℝ x, ← inv_mul_cancel₀ ht, mul_smul]
+  convert h2.comp (t • x) h1 using 2 with y
+  · simp only [Function.comp_apply]
+    rw [norm_smul, ← mul_assoc, norm_eq_abs, ← abs_mul, mul_inv_cancel₀ ht, abs_one, one_mul]
+  · ext y
+    simp only [coe_smul', Pi.smul_apply, smul_eq_mul, comp_smulₛₗ, map_inv₀, RingHom.id_apply,
+      comp_id]
+    rw [eq_inv_mul_iff_mul_eq₀ ht, ← mul_assoc, self_mul_sign]
 
 theorem HasFDerivAt.hasFDerivAt_norm_smul_neg
     (ht : t < 0) (h : HasFDerivAt (‖·‖) f x) :
@@ -100,7 +140,12 @@ theorem HasFDerivAt.hasFDerivAt_norm_smul_pos
     HasFDerivAt (‖·‖) f (t • x) := by
   simpa [ht] using h.hasFDerivAt_norm_smul ht.ne'
 
--- DISSOLVED: differentiableAt_norm_smul
+theorem differentiableAt_norm_smul (ht : t ≠ 0) :
+    DifferentiableAt ℝ (‖·‖) x ↔ DifferentiableAt ℝ (‖·‖) (t • x) where
+  mp hd := (hd.hasFDerivAt.hasFDerivAt_norm_smul ht).differentiableAt
+  mpr hd := by
+    convert (hd.hasFDerivAt.hasFDerivAt_norm_smul (inv_ne_zero ht)).differentiableAt
+    rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
 
 theorem DifferentiableAt.differentiableAt_norm_of_smul (h : DifferentiableAt ℝ (‖·‖) (t • x)) :
     DifferentiableAt ℝ (‖·‖) x := by

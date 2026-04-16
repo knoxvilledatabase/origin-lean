@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicTopology/DoldKan/Faces.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.Homotopies
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 
@@ -40,7 +42,13 @@ def HigherFacesVanish {Y : C} {n : ℕ} (q : ℕ) (φ : Y ⟶ X _[n + 1]) : Prop
 
 namespace HigherFacesVanish
 
--- DISSOLVED: comp_δ_eq_zero
+@[reassoc]
+theorem comp_δ_eq_zero {Y : C} {n : ℕ} {q : ℕ} {φ : Y ⟶ X _[n + 1]} (v : HigherFacesVanish q φ)
+    (j : Fin (n + 2)) (hj₁ : j ≠ 0) (hj₂ : n + 2 ≤ (j : ℕ) + q) : φ ≫ X.δ j = 0 := by
+  obtain ⟨i, rfl⟩ := Fin.eq_succ_of_ne_zero hj₁
+  apply v i
+  simp only [Fin.val_succ] at hj₂
+  omega
 
 theorem of_succ {Y : C} {n q : ℕ} {φ : Y ⟶ X _[n + 1]} (v : HigherFacesVanish (q + 1) φ) :
     HigherFacesVanish q φ := fun j hj => v j (by simpa only [← add_assoc] using le_add_right hj)

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.SetTheory.Ordinal.Rank
 import Mathlib.SetTheory.ZFC.Basic
 
+noncomputable section
+
 /-!
 # Ordinal ranks of PSet and ZFSet
 
@@ -77,9 +79,6 @@ theorem rank_insert : rank (insert x y) = max (succ (rank x)) (rank y) := by
 theorem rank_singleton : rank {x} = succ (rank x) :=
   rank_insert.trans (by simp)
 
-theorem rank_pair : rank {x, y} = max (succ (rank x)) (succ (rank y)) := by
-  simp
-
 @[simp]
 theorem rank_powerset : rank (powerset x) = succ (rank x) := by
   apply le_antisymm
@@ -149,9 +148,6 @@ theorem rank_insert : rank (insert x y) = max (succ (rank x)) (rank y) :=
 @[simp]
 theorem rank_singleton : rank {x} = succ (rank x) :=
   rank_insert.trans (by simp)
-
-theorem rank_pair : rank {x, y} = max (succ (rank x)) (succ (rank y)) := by
-  simp
 
 @[simp]
 theorem rank_union : rank (x ∪ y) = max (rank x) (rank y) := by

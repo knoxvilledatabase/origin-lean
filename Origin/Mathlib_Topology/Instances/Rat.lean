@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Order.Archimedean
 import Mathlib.Topology.Instances.Nat
 import Mathlib.Topology.Instances.Real
 
+noncomputable section
+
 /-!
 # Topology on the rational numbers
 

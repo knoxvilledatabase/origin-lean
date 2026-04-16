@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.CliffordAlgebra.Conjugation
 import Mathlib.LinearAlgebra.CliffordAlgebra.Star
 import Mathlib.LinearAlgebra.QuadraticForm.Prod
 
+noncomputable section
+
 /-!
 # Other constructions isomorphic to Clifford Algebras
 
@@ -262,13 +264,6 @@ theorem toQuaternion_star (c : CliffordAlgebra (Q c₁ c₂)) :
 
 def ofQuaternion : ℍ[R,c₁,c₂] →ₐ[R] CliffordAlgebra (Q c₁ c₂) :=
   (quaternionBasis c₁ c₂).liftHom
-
-@[simp]
-theorem ofQuaternion_mk (a₁ a₂ a₃ a₄ : R) :
-    ofQuaternion (⟨a₁, a₂, a₃, a₄⟩ : ℍ[R,c₁,c₂]) =
-      algebraMap R _ a₁ + a₂ • ι (Q c₁ c₂) (1, 0) + a₃ • ι (Q c₁ c₂) (0, 1) +
-        a₄ • (ι (Q c₁ c₂) (1, 0) * ι (Q c₁ c₂) (0, 1)) :=
-  rfl
 
 @[simp]
 theorem ofQuaternion_comp_toQuaternion :

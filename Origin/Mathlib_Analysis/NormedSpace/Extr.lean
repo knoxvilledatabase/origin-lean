@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Module.Ray
 import Mathlib.Topology.Order.LocalExtr
 
+noncomputable section
+
 /-!
 # (Local) maximums in a normed space
 

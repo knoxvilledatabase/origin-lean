@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.PrettyPrinter.Delaborator.Basic
 
+noncomputable section
+
 /-!
 # Additions to the delaborator
 -/

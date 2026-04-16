@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Shift.Basic
 import Mathlib.CategoryTheory.Preadditive.Opposite
 
+noncomputable section
+
 /-!
 # The (naive) shift on the opposite category
 

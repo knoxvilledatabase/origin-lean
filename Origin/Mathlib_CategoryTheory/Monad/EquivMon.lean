@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monad.Basic
 import Mathlib.CategoryTheory.Monoidal.End
 import Mathlib.CategoryTheory.Monoidal.Mon_
 
+noncomputable section
+
 /-!
 
 # The equivalence between `Monad C` and `Mon_ (C ⥤ C)`.

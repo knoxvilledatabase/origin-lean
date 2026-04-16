@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Set/Card.lean
-Genuine: 164 | Conflates: 0 | Dissolved: 6 | Infrastructure: 9
+Genuine: 172 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Finite
+
+noncomputable section
 
 /-!
 # Noncomputable Set Cardinality
@@ -89,9 +91,11 @@ theorem Infinite.encard_eq {s : Set α} (h : s.Infinite) : s.encard = ⊤ := by
 @[simp] theorem encard_empty : (∅ : Set α).encard = 0 := by
   rw [encard_eq_zero]
 
--- DISSOLVED: nonempty_of_encard_ne_zero
+theorem nonempty_of_encard_ne_zero (h : s.encard ≠ 0) : s.Nonempty := by
+  rwa [nonempty_iff_ne_empty, Ne, ← encard_eq_zero]
 
--- DISSOLVED: encard_ne_zero
+theorem encard_ne_zero : s.encard ≠ 0 ↔ s.Nonempty := by
+  rw [ne_eq, encard_eq_zero, nonempty_iff_ne_empty]
 
 @[simp] theorem encard_pos : 0 < s.encard ↔ s.Nonempty := by
   rw [pos_iff_ne_zero, encard_ne_zero]
@@ -451,15 +455,12 @@ open Nat
 syntax "toFinite_tac" : tactic
 
 macro_rules
-
   | `(tactic| toFinite_tac) => `(tactic| apply Set.toFinite)
 
 syntax "to_encard_tac" : tactic
 
 macro_rules
-
   | `(tactic| to_encard_tac) => `(tactic|
-
       simp only [← Nat.cast_le (α := ℕ∞), ← Nat.cast_inj (R := ℕ∞), Nat.cast_add, Nat.cast_one])
 
 noncomputable def ncard (s : Set α) : ℕ := ENat.toNat s.encard
@@ -524,14 +525,17 @@ theorem ncard_pos (hs : s.Finite := by toFinite_tac) : 0 < s.ncard ↔ s.Nonempt
 
 protected alias ⟨_, Nonempty.ncard_pos⟩ := ncard_pos
 
--- DISSOLVED: ncard_ne_zero_of_mem
+theorem ncard_ne_zero_of_mem {a : α} (h : a ∈ s) (hs : s.Finite := by toFinite_tac) : s.ncard ≠ 0 :=
+  ((ncard_pos hs).mpr ⟨a, h⟩).ne.symm
 
--- DISSOLVED: finite_of_ncard_ne_zero
+theorem finite_of_ncard_ne_zero (hs : s.ncard ≠ 0) : s.Finite :=
+  s.finite_or_infinite.elim id fun h ↦ (hs h.ncard).elim
 
 theorem finite_of_ncard_pos (hs : 0 < s.ncard) : s.Finite :=
   finite_of_ncard_ne_zero hs.ne.symm
 
--- DISSOLVED: nonempty_of_ncard_ne_zero
+theorem nonempty_of_ncard_ne_zero (hs : s.ncard ≠ 0) : s.Nonempty := by
+  rw [nonempty_iff_ne_empty]; rintro rfl; simp at hs
 
 @[simp] theorem ncard_singleton (a : α) : ({a} : Set α).ncard = 1 := by
   simp [ncard]
@@ -643,7 +647,12 @@ theorem ncard_preimage_of_injective_subset_range {s : Set β} (H : f.Injective)
     (f ⁻¹' s).ncard = s.ncard := by
   rw [← ncard_image_of_injective _ H, image_preimage_eq_iff.mpr hs]
 
--- DISSOLVED: fiber_ncard_ne_zero_iff_mem_image
+theorem fiber_ncard_ne_zero_iff_mem_image {y : β} (hs : s.Finite := by toFinite_tac) :
+    { x ∈ s | f x = y }.ncard ≠ 0 ↔ y ∈ f '' s := by
+  refine ⟨nonempty_of_ncard_ne_zero, ?_⟩
+  rintro ⟨z, hz, rfl⟩
+  exact @ncard_ne_zero_of_mem _ ({ x ∈ s | f x = f z }) z (mem_sep hz rfl)
+    (hs.subset (sep_subset _ _))
 
 @[simp] theorem ncard_map (f : α ↪ β) : (f '' s).ncard = s.ncard :=
   ncard_image_of_injective _ f.inj'

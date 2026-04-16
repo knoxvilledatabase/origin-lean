@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/ZeroMorphisms.lean
-Genuine: 68 | Conflates: 0 | Dissolved: 1 | Infrastructure: 18
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pi.Basic
@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Shapes.Images
 import Mathlib.CategoryTheory.IsomorphismClasses
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroObjects
+
+noncomputable section
 
 /-!
 # Zero morphisms and zero objects
@@ -110,10 +112,6 @@ section
 
 variable [HasZeroMorphisms C]
 
-@[simp] lemma op_zero (X Y : C) : (0 : X ⟶ Y).op = 0 := rfl
-
-@[simp] lemma unop_zero (X Y : Cᵒᵖ) : (0 : X ⟶ Y).unop = 0 := rfl
-
 theorem zero_of_comp_mono {X Y Z : C} {f : X ⟶ Y} (g : Y ⟶ Z) [Mono g] (h : f ≫ g = 0) : f = 0 := by
   rw [← zero_comp, cancel_mono] at h
   exact h
@@ -125,7 +123,8 @@ theorem zero_of_epi_comp {X Y Z : C} (f : X ⟶ Y) {g : Y ⟶ Z} [Epi f] (h : f 
 theorem eq_zero_of_image_eq_zero {X Y : C} {f : X ⟶ Y} [HasImage f] (w : image.ι f = 0) :
     f = 0 := by rw [← image.fac f, w, HasZeroMorphisms.comp_zero]
 
--- DISSOLVED: nonzero_image_of_nonzero
+theorem nonzero_image_of_nonzero {X Y : C} {f : X ⟶ Y} [HasImage f] (w : f ≠ 0) : image.ι f ≠ 0 :=
+  fun h => w (eq_zero_of_image_eq_zero h)
 
 end
 
@@ -139,9 +138,6 @@ instance : HasZeroMorphisms (C ⥤ D) where
     ext X; dsimp; apply comp_zero
   zero_comp := fun F {G H} η => by
     ext X; dsimp; apply zero_comp
-
-@[simp]
-theorem zero_app (F G : C ⥤ D) (j : C) : (0 : F ⟶ G).app j = 0 := rfl
 
 end
 
@@ -335,14 +331,6 @@ def idZeroEquivIsoZero (X : C) : 𝟙 X = 0 ≃ (X ≅ 0) where
   left_inv := by aesop_cat
   right_inv := by aesop_cat
 
-@[simp]
-theorem idZeroEquivIsoZero_apply_hom (X : C) (h : 𝟙 X = 0) : ((idZeroEquivIsoZero X) h).hom = 0 :=
-  rfl
-
-@[simp]
-theorem idZeroEquivIsoZero_apply_inv (X : C) (h : 𝟙 X = 0) : ((idZeroEquivIsoZero X) h).inv = 0 :=
-  rfl
-
 @[simps]
 def isoZeroOfMonoZero {X Y : C} (_ : Mono (0 : X ⟶ Y)) : X ≅ 0 where
   hom := 0
@@ -362,17 +350,6 @@ def isoZeroOfMonoEqZero {X Y : C} {f : X ⟶ Y} [Mono f] (h : f = 0) : X ≅ 0 :
 def isoZeroOfEpiEqZero {X Y : C} {f : X ⟶ Y} [Epi f] (h : f = 0) : Y ≅ 0 := by
   subst h
   apply isoZeroOfEpiZero ‹_›
-
-def isoOfIsIsomorphicZero {X : C} (P : IsIsomorphic X 0) : X ≅ 0 where
-  hom := 0
-  inv := 0
-  hom_inv_id := by
-    cases' P with P
-    rw [← P.hom_inv_id, ← Category.id_comp P.inv]
-    apply Eq.symm
-    simp only [id_comp, Iso.hom_inv_id, comp_zero]
-    apply (idZeroEquivIsoZero X).invFun P
-  inv_hom_id := by simp
 
 end
 

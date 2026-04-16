@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.KrullDimension
 import Mathlib.Topology.Sets.Closeds
 
+noncomputable section
+
 /-!
 # The Krull dimension of a topological space
 

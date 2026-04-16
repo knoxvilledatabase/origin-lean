@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Additive
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 
+noncomputable section
+
 /-!
 # Box-additive functions defined by measures
 

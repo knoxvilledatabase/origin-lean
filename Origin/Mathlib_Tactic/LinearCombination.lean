@@ -8,6 +8,8 @@ import Mathlib.Tactic.Positivity.Core
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Ring.Compare
 
+noncomputable section
+
 /-!
 # linear_combination Tactic
 
@@ -185,7 +187,6 @@ syntax normStx := atomic(" (" &"norm" " := ") withoutPosition(tactic) ")"
 syntax expStx := atomic(" (" &"exp" " := ") withoutPosition(num) ")"
 
 syntax (name := linearCombination) "linear_combination"
-
   (normStx)? (expStx)? (ppSpace colGt term)? : tactic
 
 elab_rules : tactic

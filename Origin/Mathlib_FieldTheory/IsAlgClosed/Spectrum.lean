@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Spectrum
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 
+noncomputable section
+
 /-!
 # Spectrum mapping theorem
 

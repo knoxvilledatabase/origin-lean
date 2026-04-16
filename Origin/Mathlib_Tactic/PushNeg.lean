@@ -9,6 +9,8 @@ import Mathlib.Logic.Basic
 import Mathlib.Order.Defs.LinearOrder
 import Mathlib.Tactic.Conv
 
+noncomputable section
+
 /-!
 # The `push_neg` tactic
 
@@ -184,15 +186,10 @@ def pushNegLocalDecl (fvarId : FVarId) : TacticM Unit := withMainContext do
   replaceMainGoal [newGoal]
 
 elab "push_neg" loc:(location)? : tactic =>
-
   let loc := (loc.map expandLocation).getD (.targets #[] true)
-
   withLocation loc
-
     pushNegLocalDecl
-
     pushNegTarget
-
     (fun _ ↦ logInfo "push_neg couldn't find a negation to push")
 
 end Mathlib.Tactic.PushNeg

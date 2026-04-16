@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Category.LightProfinite.Basic
 
+noncomputable section
+
 /-!
 # Light profinite sets as limits of finite sets.
 

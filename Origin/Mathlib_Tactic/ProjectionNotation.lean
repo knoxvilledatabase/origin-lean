@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.AuxDef
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Pretty printing projection notation
 

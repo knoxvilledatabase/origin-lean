@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Products
 import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 import Mathlib.CategoryTheory.Shift.Basic
 
+noncomputable section
+
 /-!
 # Triangles
 

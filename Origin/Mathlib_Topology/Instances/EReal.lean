@@ -1,12 +1,14 @@
 /-
 Extracted from Topology/Instances/EReal.lean
-Genuine: 57 | Conflates: 0 | Dissolved: 2 | Infrastructure: 6
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Data.Rat.Encodable
 import Mathlib.Data.Real.EReal
 import Mathlib.Topology.Instances.ENNReal
 import Mathlib.Topology.Order.MonotoneContinuity
+
+noncomputable section
 
 /-!
 # Topological structure on `EReal`
@@ -402,8 +404,29 @@ private lemma continuousAt_mul_top_pos {a : ℝ} (h : 0 < a) :
   · simp
   · simp [h]
 
--- DISSOLVED: continuousAt_mul_top_ne_zero
+private lemma continuousAt_mul_top_ne_zero {a : ℝ} (h : a ≠ 0) :
+    ContinuousAt (fun p : EReal × EReal ↦ p.1 * p.2) (⊤, a) := by
+  rcases lt_or_gt_of_ne h with a_neg | a_pos
+  · exact neg_neg a ▸ continuousAt_mul_symm2 (continuousAt_mul_top_pos (neg_pos.2 a_neg))
+  · exact continuousAt_mul_top_pos a_pos
 
--- DISSOLVED: continuousAt_mul
+theorem continuousAt_mul {p : EReal × EReal} (h₁ : p.1 ≠ 0 ∨ p.2 ≠ ⊥)
+    (h₂ : p.1 ≠ 0 ∨ p.2 ≠ ⊤) (h₃ : p.1 ≠ ⊥ ∨ p.2 ≠ 0) (h₄ : p.1 ≠ ⊤ ∨ p.2 ≠ 0) :
+    ContinuousAt (fun p : EReal × EReal ↦ p.1 * p.2) p := by
+  rcases p with ⟨x, y⟩
+  induction x <;> induction y
+  · exact continuousAt_mul_symm3 continuousAt_mul_top_top
+  · simp only [ne_eq, not_true_eq_false, EReal.coe_eq_zero, false_or] at h₃
+    exact continuousAt_mul_symm1 (continuousAt_mul_top_ne_zero h₃)
+  · exact EReal.neg_top ▸ continuousAt_mul_symm1 continuousAt_mul_top_top
+  · simp only [ne_eq, EReal.coe_eq_zero, not_true_eq_false, or_false] at h₁
+    exact continuousAt_mul_symm2 (continuousAt_mul_swap (continuousAt_mul_top_ne_zero h₁))
+  · exact continuousAt_mul_coe_coe _ _
+  · simp only [ne_eq, EReal.coe_eq_zero, not_true_eq_false, or_false] at h₂
+    exact continuousAt_mul_swap (continuousAt_mul_top_ne_zero h₂)
+  · exact continuousAt_mul_symm2 continuousAt_mul_top_top
+  · simp only [ne_eq, not_true_eq_false, EReal.coe_eq_zero, false_or] at h₄
+    exact continuousAt_mul_top_ne_zero h₄
+  · exact continuousAt_mul_top_top
 
 end EReal

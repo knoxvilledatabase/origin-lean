@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
 
+noncomputable section
+
 /-! # Properties of C⋆-algebra homomorphisms
 
 Here we collect properties of C⋆-algebra homomorphisms.
@@ -16,31 +18,6 @@ Here we collect properties of C⋆-algebra homomorphisms.
 -/
 
 open CStarAlgebra in
-
-lemma IsSelfAdjoint.map_spectrum_real {F A B : Type*} [CStarAlgebra A] [CStarAlgebra B]
-    [FunLike F A B] [AlgHomClass F ℂ A B] [StarHomClass F A B]
-    {a : A} (ha : IsSelfAdjoint a) (φ : F) (hφ : Function.Injective φ) :
-    spectrum ℝ (φ a) = spectrum ℝ a := by
-  have h_spec := AlgHom.spectrum_apply_subset ((φ : A →⋆ₐ[ℂ] B).restrictScalars ℝ) a
-  refine Set.eq_of_subset_of_subset h_spec fun x hx ↦ ?_
-  /- we prove the reverse inclusion by contradiction, so assume that `x ∈ spectrum ℝ a`, but
-  `x ∉ spectrum ℝ (φ a)`. Then by Urysohn's lemma we can get a function for which `f x = 1`, but
-  `f = 0` on `spectrum ℝ a`. -/
-  by_contra hx'
-  obtain ⟨f, h_eqOn, h_eqOn_x, -⟩ := exists_continuous_zero_one_of_isClosed
-    (spectrum.isClosed (𝕜 := ℝ) (φ a)) (isClosed_singleton (x := x)) <| by simpa
-  /- it suffices to show that `φ (f a) = 0`, for if so, then `f a = 0` by injectivity of `φ`, and
-  hence `f = 0` on `spectrum ℝ a`, contradicting the fact that `f x = 1`. -/
-  suffices φ (cfc f a) = 0 by
-    rw [map_eq_zero_iff φ hφ, ← cfc_zero ℝ a, cfc_eq_cfc_iff_eqOn] at this
-    exact zero_ne_one <| calc
-      0 = f x := (this hx).symm
-      _ = 1 := h_eqOn_x <| Set.mem_singleton x
-  /- Finally, `φ (f a) = f (φ a) = 0`, where the last equality follows since `f = 0` on
-  `spectrum ℝ (φ a)`. -/
-  calc φ (cfc f a) = cfc f (φ a) := StarAlgHomClass.map_cfc φ f a
-    _ = cfc (0 : ℝ → ℝ) (φ a) := cfc_congr h_eqOn
-    _ = 0 := by simp
 
 namespace NonUnitalStarAlgHom
 

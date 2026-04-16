@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Pairwise.Lattice
 import Mathlib.MeasureTheory.PiSystem
 
+noncomputable section
+
 /-! # Semirings and rings of sets
 
 A semi-ring of sets `C` (in the sense of measure theory) is a family of sets containing `∅`,

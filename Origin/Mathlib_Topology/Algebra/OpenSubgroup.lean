@@ -10,6 +10,8 @@ import Mathlib.Topology.Algebra.Group.Quotient
 import Mathlib.Topology.Algebra.Ring.Basic
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # Open subgroups of a topological groups
 
@@ -75,19 +77,6 @@ def toOpens (U : OpenSubgroup G) : Opens G := ⟨U, U.isOpen'⟩
 @[to_additive]
 instance hasCoeOpens : CoeTC (OpenSubgroup G) (Opens G) := ⟨toOpens⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_toOpens : ((U : Opens G) : Set G) = U :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_toSubgroup : ((U : Subgroup G) : Set G) = U := rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem mem_toOpens : g ∈ (U : Opens G) ↔ g ∈ U := Iff.rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem mem_toSubgroup : g ∈ (U : Subgroup G) ↔ g ∈ U := Iff.rfl
-
 @[to_additive (attr := ext)]
 theorem ext (h : ∀ x, x ∈ U ↔ x ∈ V) : U = V :=
   SetLike.ext h
@@ -109,18 +98,6 @@ variable {U}
 @[to_additive (attr := simp)]
 theorem mem_top (x : G) : x ∈ (⊤ : OpenSubgroup G) :=
   trivial
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_top : ((⊤ : OpenSubgroup G) : Set G) = Set.univ :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toSubgroup_top : ((⊤ : OpenSubgroup G) : Subgroup G) = ⊤ :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toOpens_top : ((⊤ : OpenSubgroup G) : Opens G) = ⊤ :=
-  rfl
 
 @[to_additive]
 instance : Inhabited (OpenSubgroup G) :=
@@ -149,37 +126,11 @@ variable {H : Type*} [Group H] [TopologicalSpace H]
 def prod (U : OpenSubgroup G) (V : OpenSubgroup H) : OpenSubgroup (G × H) :=
   ⟨.prod U V, U.isOpen.prod V.isOpen⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_prod (U : OpenSubgroup G) (V : OpenSubgroup H) :
-    (U.prod V : Set (G × H)) = (U : Set G) ×ˢ (V : Set H) :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toSubgroup_prod (U : OpenSubgroup G) (V : OpenSubgroup H) :
-    (U.prod V : Subgroup (G × H)) = (U : Subgroup G).prod V :=
-  rfl
-
 end
 
 @[to_additive]
 instance instInfOpenSubgroup : Min (OpenSubgroup G) :=
   ⟨fun U V ↦ ⟨U ⊓ V, U.isOpen.inter V.isOpen⟩⟩
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_inf : (↑(U ⊓ V) : Set G) = (U : Set G) ∩ V :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toSubgroup_inf : (↑(U ⊓ V) : Subgroup G) = ↑U ⊓ ↑V :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toOpens_inf : (↑(U ⊓ V) : Opens G) = ↑U ⊓ ↑V :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mem_inf {x} : x ∈ U ⊓ V ↔ x ∈ U ∧ x ∈ V :=
-  Iff.rfl
 
 @[to_additive]
 instance instPartialOrderOpenSubgroup : PartialOrder (OpenSubgroup G) := inferInstance
@@ -194,37 +145,12 @@ instance : OrderTop (OpenSubgroup G) where
   top := ⊤
   le_top _ := Set.subset_univ _
 
-@[to_additive (attr := simp, norm_cast)]
-theorem toSubgroup_le : (U : Subgroup G) ≤ (V : Subgroup G) ↔ U ≤ V :=
-  Iff.rfl
-
 variable {N : Type*} [Group N] [TopologicalSpace N]
 
 @[to_additive "The preimage of an `OpenAddSubgroup` along a continuous `AddMonoid` homomorphism
 is an `OpenAddSubgroup`."]
 def comap (f : G →* N) (hf : Continuous f) (H : OpenSubgroup N) : OpenSubgroup G :=
   ⟨.comap f H, H.isOpen.preimage hf⟩
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_comap (H : OpenSubgroup N) (f : G →* N) (hf : Continuous f) :
-    (H.comap f hf : Set G) = f ⁻¹' H :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toSubgroup_comap (H : OpenSubgroup N) (f : G →* N) (hf : Continuous f) :
-    (H.comap f hf : Subgroup G) = (H : Subgroup N).comap f :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mem_comap {H : OpenSubgroup N} {f : G →* N} {hf : Continuous f} {x : G} :
-    x ∈ H.comap f hf ↔ f x ∈ H :=
-  Iff.rfl
-
-@[to_additive]
-theorem comap_comap {P : Type*} [Group P] [TopologicalSpace P] (K : OpenSubgroup P) (f₂ : N →* P)
-    (hf₂ : Continuous f₂) (f₁ : G →* N) (hf₁ : Continuous f₁) :
-    (K.comap f₂ hf₂).comap f₁ hf₁ = K.comap (f₂.comp f₁) (hf₂.comp hf₁) :=
-  rfl
 
 end OpenSubgroup
 
@@ -317,9 +243,6 @@ variable {G : Type*} [Group G] [TopologicalSpace G] [ContinuousMul G]
 @[to_additive]
 instance : Max (OpenSubgroup G) :=
   ⟨fun U V ↦ ⟨U ⊔ V, Subgroup.isOpen_mono (le_sup_left : U.1 ≤ U.1 ⊔ V.1) U.isOpen⟩⟩
-
-@[to_additive (attr := simp, norm_cast)]
-theorem toSubgroup_sup (U V : OpenSubgroup G) : (↑(U ⊔ V) : Subgroup G) = ↑U ⊔ ↑V := rfl
 
 @[to_additive]
 instance : Lattice (OpenSubgroup G) :=

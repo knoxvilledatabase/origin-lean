@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/ArithmeticFunction.lean
-Genuine: 100 | Conflates: 2 | Dissolved: 20 | Infrastructure: 41
+Genuine: 119 | Conflates: 2 | Dissolved: 0 | Infrastructure: 42
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
@@ -10,6 +10,8 @@ import Mathlib.Data.Nat.Squarefree
 import Mathlib.Data.Nat.GCD.BigOperators
 import Mathlib.Data.Nat.Factorization.Induction
 import Mathlib.Tactic.ArithMult
+
+noncomputable section
 
 /-!
 # Arithmetic Functions and Dirichlet Convolution
@@ -93,9 +95,6 @@ instance : FunLike (ArithmeticFunction R) ℕ R :=
   inferInstanceAs (FunLike (ZeroHom ℕ R) ℕ R)
 
 @[simp]
-theorem toFun_eq (f : ArithmeticFunction R) : f.toFun = f := rfl
-
-@[simp]
 theorem coe_mk (f : ℕ → R) (hf) : @DFunLike.coe (ArithmeticFunction R) _ _ _
     (ZeroHom.mk f hf) = f := rfl
 
@@ -123,8 +122,6 @@ instance one : One (ArithmeticFunction R) :=
 
 theorem one_apply {x : ℕ} : (1 : ArithmeticFunction R) x = ite (x = 1) 1 0 :=
   rfl
-
--- DISSOLVED: one_one
 
 @[simp]
 theorem one_apply_ne {x : ℕ} (h : x ≠ 1) : (1 : ArithmeticFunction R) x = 0 :=
@@ -249,8 +246,6 @@ instance [Semiring R] : Mul (ArithmeticFunction R) :=
 theorem mul_apply [Semiring R] {f g : ArithmeticFunction R} {n : ℕ} :
     (f * g) n = ∑ x ∈ divisorsAntidiagonal n, f x.fst * g x.snd :=
   rfl
-
-theorem mul_apply_one [Semiring R] {f g : ArithmeticFunction R} : (f * g) 1 = f 1 * g 1 := by simp
 
 @[simp, norm_cast]
 theorem natCoe_mul [Semiring R] {f g : ArithmeticFunction ℕ} :
@@ -383,11 +378,8 @@ scoped[ArithmeticFunction] notation "ζ" => ArithmeticFunction.zeta
 
 scoped[ArithmeticFunction.zeta] notation "ζ" => ArithmeticFunction.zeta
 
-@[simp]
-theorem zeta_apply {x : ℕ} : ζ x = if x = 0 then 0 else 1 :=
-  rfl
-
--- DISSOLVED: zeta_apply_ne
+theorem zeta_apply_ne {x : ℕ} (h : x ≠ 0) : ζ x = 1 :=
+  if_neg h
 
 theorem coe_zeta_smul_apply {M} [Semiring R] [AddCommMonoid M] [Module R M]
     {f : ArithmeticFunction M} {x : ℕ} :
@@ -488,9 +480,12 @@ end Pmul
 
 section Pdiv
 
--- DISSOLVED: pdiv
+def pdiv [GroupWithZero R] (f g : ArithmeticFunction R) : ArithmeticFunction R :=
+  ⟨fun n => f n / g n, by simp only [map_zero, ne_eq, not_true, div_zero]⟩
 
--- DISSOLVED: pdiv_apply
+@[simp]
+theorem pdiv_apply [GroupWithZero R] (f g : ArithmeticFunction R) (n : ℕ) :
+    pdiv f g n = f n / g n := rfl
 
 @[simp]
 theorem pdiv_zeta [DivisionSemiring R] (f : ArithmeticFunction R) :
@@ -513,7 +508,10 @@ scoped syntax (name := bigproddvd) "∏ᵖ " extBinder " ∣ " term ", " term:67
 scoped macro_rules (kind := bigproddvd)
   | `(∏ᵖ $x:ident ∣ $n, $r) => `(prodPrimeFactors (fun $x ↦ $r) $n)
 
--- DISSOLVED: prodPrimeFactors_apply
+@[simp]
+theorem prodPrimeFactors_apply [CommMonoidWithZero R] {f : ℕ → R} {n : ℕ} (hn : n ≠ 0) :
+    ∏ᵖ p ∣ n, f p = ∏ p ∈ n.primeFactors, f p :=
+  if_neg hn
 
 end ProdPrimeFactors
 
@@ -643,13 +641,30 @@ theorem pmul [CommSemiring R] {f g : ArithmeticFunction R} (hf : f.IsMultiplicat
     simp only [pmul_apply, hf.map_mul_of_coprime cop, hg.map_mul_of_coprime cop]
     ring⟩
 
--- DISSOLVED: pdiv
+@[arith_mult]
+theorem pdiv [CommGroupWithZero R] {f g : ArithmeticFunction R} (hf : IsMultiplicative f)
+    (hg : IsMultiplicative g) : IsMultiplicative (pdiv f g) :=
+  ⟨ by simp [hf, hg], fun {m n} cop => by
+    simp only [pdiv_apply, map_mul_of_coprime hf cop, map_mul_of_coprime hg cop,
+      div_eq_mul_inv, mul_inv]
+    apply mul_mul_mul_comm ⟩
 
 nonrec  -- Porting note: added
 
--- DISSOLVED: multiplicative_factorization
+theorem multiplicative_factorization [CommMonoidWithZero R] (f : ArithmeticFunction R)
+    (hf : f.IsMultiplicative) {n : ℕ} (hn : n ≠ 0) :
+    f n = n.factorization.prod fun p k => f (p ^ k) :=
+  multiplicative_factorization f (fun _ _ => hf.2) hf.1 hn
 
--- DISSOLVED: iff_ne_zero
+theorem iff_ne_zero [MonoidWithZero R] {f : ArithmeticFunction R} :
+    IsMultiplicative f ↔
+      f 1 = 1 ∧ ∀ {m n : ℕ}, m ≠ 0 → n ≠ 0 → m.Coprime n → f (m * n) = f m * f n := by
+  refine and_congr_right' (forall₂_congr fun m n => ⟨fun h _ _ => h, fun h hmn => ?_⟩)
+  rcases eq_or_ne m 0 with (rfl | hm)
+  · simp
+  rcases eq_or_ne n 0 with (rfl | hn)
+  · simp
+  exact h hm hn hmn
 
 theorem eq_iff_eq_on_prime_powers [CommMonoidWithZero R] (f : ArithmeticFunction R)
     (hf : f.IsMultiplicative) (g : ArithmeticFunction R) (hg : g.IsMultiplicative) :
@@ -725,10 +740,6 @@ nonrec  -- Porting note (https://github.com/leanprover-community/mathlib4/issues
 
 def id : ArithmeticFunction ℕ :=
   ⟨id, rfl⟩
-
-@[simp]
-theorem id_apply {x : ℕ} : id x = x :=
-  rfl
 
 def pow (k : ℕ) : ArithmeticFunction ℕ :=
   id.ppow k
@@ -824,8 +835,6 @@ scoped[ArithmeticFunction.Omega] notation "Ω" => ArithmeticFunction.cardFactors
 theorem cardFactors_apply {n : ℕ} : Ω n = n.primeFactorsList.length :=
   rfl
 
-lemma cardFactors_zero : Ω 0 = 0 := by simp
-
 @[simp] theorem cardFactors_one : Ω 1 = 0 := by simp [cardFactors_apply]
 
 @[simp]
@@ -838,9 +847,16 @@ theorem cardFactors_eq_one_iff_prime {n : ℕ} : Ω n = 1 ↔ n.Prime := by
   apply prime_of_mem_primeFactorsList
   rw [hx, List.mem_singleton]
 
--- DISSOLVED: cardFactors_mul
+theorem cardFactors_mul {m n : ℕ} (m0 : m ≠ 0) (n0 : n ≠ 0) : Ω (m * n) = Ω m + Ω n := by
+  rw [cardFactors_apply, cardFactors_apply, cardFactors_apply, ← Multiset.coe_card, ← factors_eq,
+    UniqueFactorizationMonoid.normalizedFactors_mul m0 n0, factors_eq, factors_eq,
+    Multiset.card_add, Multiset.coe_card, Multiset.coe_card]
 
--- DISSOLVED: cardFactors_multiset_prod
+theorem cardFactors_multiset_prod {s : Multiset ℕ} (h0 : s.prod ≠ 0) :
+    Ω s.prod = (Multiset.map Ω s).sum := by
+  induction s using Multiset.induction_on with
+  | empty => simp
+  | cons ih => simp_all [cardFactors_mul, not_or]
 
 @[simp]
 theorem cardFactors_apply_prime {p : ℕ} (hp : p.Prime) : Ω p = 1 :=
@@ -857,17 +873,26 @@ scoped[ArithmeticFunction] notation "ω" => ArithmeticFunction.cardDistinctFacto
 
 scoped[ArithmeticFunction.omega] notation "ω" => ArithmeticFunction.cardDistinctFactors
 
-theorem cardDistinctFactors_zero : ω 0 = 0 := by simp
-
 @[simp]
 theorem cardDistinctFactors_one : ω 1 = 0 := by simp [cardDistinctFactors]
 
 theorem cardDistinctFactors_apply {n : ℕ} : ω n = n.primeFactorsList.dedup.length :=
   rfl
 
--- DISSOLVED: cardDistinctFactors_eq_cardFactors_iff_squarefree
+theorem cardDistinctFactors_eq_cardFactors_iff_squarefree {n : ℕ} (h0 : n ≠ 0) :
+    ω n = Ω n ↔ Squarefree n := by
+  rw [squarefree_iff_nodup_primeFactorsList h0, cardDistinctFactors_apply]
+  constructor <;> intro h
+  · rw [← n.primeFactorsList.dedup_sublist.eq_of_length h]
+    apply List.nodup_dedup
+  · rw [h.dedup]
+    rfl
 
--- DISSOLVED: cardDistinctFactors_apply_prime_pow
+@[simp]
+theorem cardDistinctFactors_apply_prime_pow {p k : ℕ} (hp : p.Prime) (hk : k ≠ 0) :
+    ω (p ^ k) = 1 := by
+  rw [cardDistinctFactors_apply, hp.primeFactorsList_pow, List.replicate_dedup hk,
+    List.length_singleton]
 
 @[simp]
 theorem cardDistinctFactors_apply_prime {p : ℕ} (hp : p.Prime) : ω p = 1 := by
@@ -890,7 +915,11 @@ theorem moebius_eq_zero_of_not_squarefree {n : ℕ} (h : ¬Squarefree n) : μ n 
 
 theorem moebius_apply_one : μ 1 = 1 := by simp
 
--- DISSOLVED: moebius_ne_zero_iff_squarefree
+theorem moebius_ne_zero_iff_squarefree {n : ℕ} : μ n ≠ 0 ↔ Squarefree n := by
+  constructor <;> intro h
+  · contrapose! h
+    simp [h]
+  · simp [h, pow_ne_zero]
 
 theorem moebius_eq_or (n : ℕ) : μ n = 0 ∨ μ n = 1 ∨ μ n = -1 := by
   simp only [moebius, coe_mk]
@@ -900,7 +929,9 @@ theorem moebius_eq_or (n : ℕ) : μ n = 0 ∨ μ n = 1 ∨ μ n = -1 := by
   · left
     rfl
 
--- DISSOLVED: moebius_ne_zero_iff_eq_or
+theorem moebius_ne_zero_iff_eq_or {n : ℕ} : μ n ≠ 0 ↔ μ n = 1 ∨ μ n = -1 := by
+  have := moebius_eq_or n
+  aesop
 
 theorem moebius_sq_eq_one_of_squarefree {l : ℕ} (hl : Squarefree l) : μ l ^ 2 = 1 := by
   rw [moebius_apply_of_squarefree hl, ← pow_mul, mul_comm, pow_mul, neg_one_sq, one_pow]
@@ -928,7 +959,13 @@ theorem abs_moebius_le_one {n : ℕ} : |μ n| ≤ 1 := by
 theorem moebius_apply_prime {p : ℕ} (hp : p.Prime) : μ p = -1 := by
   rw [moebius_apply_of_squarefree hp.squarefree, cardFactors_apply_prime hp, pow_one]
 
--- DISSOLVED: moebius_apply_prime_pow
+theorem moebius_apply_prime_pow {p k : ℕ} (hp : p.Prime) (hk : k ≠ 0) :
+    μ (p ^ k) = if k = 1 then -1 else 0 := by
+  split_ifs with h
+  · rw [h, pow_one, moebius_apply_prime hp]
+  rw [moebius_eq_zero_of_not_squarefree]
+  rw [squarefree_pow_iff hp.ne_one hk, not_and_or]
+  exact Or.inr h
 
 theorem moebius_apply_isPrimePow_not_prime {n : ℕ} (hn : IsPrimePow n) (hn' : ¬n.Prime) :
     μ n = 0 := by
@@ -1012,14 +1049,6 @@ instance : Invertible (ζ : ArithmeticFunction R) where
 def zetaUnit : (ArithmeticFunction R)ˣ :=
   ⟨ζ, μ, coe_zeta_mul_coe_moebius, coe_moebius_mul_coe_zeta⟩
 
-@[simp]
-theorem coe_zetaUnit : ((zetaUnit : (ArithmeticFunction R)ˣ) : ArithmeticFunction R) = ζ :=
-  rfl
-
-@[simp]
-theorem inv_zetaUnit : ((zetaUnit⁻¹ : (ArithmeticFunction R)ˣ) : ArithmeticFunction R) = μ :=
-  rfl
-
 end CommRing
 
 theorem sum_eq_iff_sum_smul_moebius_eq [AddCommGroup R] {f g : ℕ → R} :
@@ -1069,7 +1098,29 @@ theorem prod_eq_iff_prod_pow_moebius_eq [CommGroup R] {f g : ℕ → R} :
       ∀ n > 0, ∏ x ∈ n.divisorsAntidiagonal, g x.snd ^ μ x.fst = f n :=
   @sum_eq_iff_sum_smul_moebius_eq (Additive R) _ _ _
 
--- DISSOLVED: prod_eq_iff_prod_pow_moebius_eq_of_nonzero
+theorem prod_eq_iff_prod_pow_moebius_eq_of_nonzero [CommGroupWithZero R] {f g : ℕ → R}
+    (hf : ∀ n : ℕ, 0 < n → f n ≠ 0) (hg : ∀ n : ℕ, 0 < n → g n ≠ 0) :
+    (∀ n > 0, ∏ i ∈ n.divisors, f i = g n) ↔
+      ∀ n > 0, ∏ x ∈ n.divisorsAntidiagonal, g x.snd ^ μ x.fst = f n := by
+  refine
+      Iff.trans
+        (Iff.trans (forall_congr' fun n => ?_)
+          (@prod_eq_iff_prod_pow_moebius_eq Rˣ _
+            (fun n => if h : 0 < n then Units.mk0 (f n) (hf n h) else 1) fun n =>
+            if h : 0 < n then Units.mk0 (g n) (hg n h) else 1))
+        (forall_congr' fun n => ?_) <;>
+    refine imp_congr_right fun hn => ?_
+  · dsimp
+    rw [dif_pos hn, ← Units.eq_iff, ← Units.coeHom_apply, map_prod, Units.val_mk0,
+      prod_congr rfl _]
+    intro x hx
+    rw [dif_pos (Nat.pos_of_mem_divisors hx), Units.coeHom_apply, Units.val_mk0]
+  · dsimp
+    rw [dif_pos hn, ← Units.eq_iff, ← Units.coeHom_apply, map_prod, Units.val_mk0,
+      prod_congr rfl _]
+    intro x hx
+    rw [dif_pos (Nat.pos_of_mem_divisors (Nat.snd_mem_divisors_of_mem_antidiagonal hx)),
+      Units.coeHom_apply, Units.val_zpow_eq_zpow_val, Units.val_mk0]
 
 theorem sum_eq_iff_sum_smul_moebius_eq_on [AddCommGroup R] {f g : ℕ → R}
     (s : Set ℕ) (hs : ∀ m n, m ∣ n → n ∈ s → m ∈ s) :
@@ -1123,15 +1174,48 @@ theorem prod_eq_iff_prod_pow_moebius_eq_on [CommGroup R] {f g : ℕ → R}
       ∀ n > 0, n ∈ s → (∏ x ∈ n.divisorsAntidiagonal, g x.snd ^ μ x.fst) = f n :=
   @sum_eq_iff_sum_smul_moebius_eq_on (Additive R) _ _ _ s hs
 
--- DISSOLVED: prod_eq_iff_prod_pow_moebius_eq_on_of_nonzero
+theorem prod_eq_iff_prod_pow_moebius_eq_on_of_nonzero [CommGroupWithZero R]
+    (s : Set ℕ) (hs : ∀ m n, m ∣ n → n ∈ s → m ∈ s) {f g : ℕ → R}
+    (hf : ∀ n > 0, f n ≠ 0) (hg : ∀ n > 0, g n ≠ 0) :
+    (∀ n > 0, n ∈ s → (∏ i ∈ n.divisors, f i) = g n) ↔
+      ∀ n > 0, n ∈ s → (∏ x ∈ n.divisorsAntidiagonal, g x.snd ^ μ x.fst) = f n := by
+  refine
+      Iff.trans
+        (Iff.trans (forall_congr' fun n => ?_)
+          (@prod_eq_iff_prod_pow_moebius_eq_on Rˣ _
+            (fun n => if h : 0 < n then Units.mk0 (f n) (hf n h) else 1)
+            (fun n => if h : 0 < n then Units.mk0 (g n) (hg n h) else 1)
+            s hs) )
+        (forall_congr' fun n => ?_) <;>
+    refine imp_congr_right fun hn => ?_
+  · dsimp
+    rw [dif_pos hn, ← Units.eq_iff, ← Units.coeHom_apply, map_prod, Units.val_mk0,
+      prod_congr rfl _]
+    intro x hx
+    rw [dif_pos (Nat.pos_of_mem_divisors hx), Units.coeHom_apply, Units.val_mk0]
+  · dsimp
+    rw [dif_pos hn, ← Units.eq_iff, ← Units.coeHom_apply, map_prod, Units.val_mk0,
+      prod_congr rfl _]
+    intro x hx
+    rw [dif_pos (Nat.pos_of_mem_divisors (Nat.snd_mem_divisors_of_mem_antidiagonal hx)),
+      Units.coeHom_apply, Units.val_zpow_eq_zpow_val, Units.val_mk0]
 
 end SpecialFunctions
 
--- DISSOLVED: _root_.Nat.card_divisors
+theorem _root_.Nat.card_divisors {n : ℕ} (hn : n ≠ 0) :
+    #n.divisors = n.primeFactors.prod (n.factorization · + 1) := by
+  rw [← sigma_zero_apply, isMultiplicative_sigma.multiplicative_factorization _ hn]
+  exact Finset.prod_congr n.support_factorization fun _ h =>
+    sigma_zero_apply_prime_pow <| Nat.prime_of_mem_primeFactors h
 
--- DISSOLVED: card_divisors
+theorem card_divisors (n : ℕ) (hn : n ≠ 0) :
+    #n.divisors = n.primeFactors.prod (n.factorization · + 1) := Nat.card_divisors hn
 
--- DISSOLVED: _root_.Nat.sum_divisors
+theorem _root_.Nat.sum_divisors {n : ℕ} (hn : n ≠ 0) :
+    ∑ d ∈ n.divisors, d = ∏ p ∈ n.primeFactors, ∑ k ∈ .range (n.factorization p + 1), p ^ k := by
+  rw [← sigma_one_apply, isMultiplicative_sigma.multiplicative_factorization _ hn]
+  exact Finset.prod_congr n.support_factorization fun _ h =>
+    sigma_one_apply_prime_pow <| Nat.prime_of_mem_primeFactors h
 
 end ArithmeticFunction
 

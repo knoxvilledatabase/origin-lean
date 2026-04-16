@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.Cone
 import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.Algebra.Ring.Subsemiring.Order
 
+noncomputable section
+
 /-!
 # Construct ordered rings from rings with a specified positive cone.
 
@@ -44,14 +46,6 @@ variable (T) in
 def nonneg : RingCone T where
   __ := Subsemiring.nonneg T
   eq_zero_of_mem_of_neg_mem' {a} := by simpa using ge_antisymm
-
-@[simp] lemma nonneg_toSubsemiring : (nonneg T).toSubsemiring = .nonneg T := rfl
-
-@[simp] lemma nonneg_toAddGroupCone : (nonneg T).toAddGroupCone = .nonneg T := rfl
-
-@[simp] lemma mem_nonneg : a ∈ nonneg T ↔ 0 ≤ a := Iff.rfl
-
-@[simp, norm_cast] lemma coe_nonneg : nonneg T = {x : T | 0 ≤ x} := rfl
 
 instance nonneg.isMaxCone {T : Type*} [LinearOrderedRing T] : IsMaxCone (nonneg T) where
   mem_or_neg_mem := mem_or_neg_mem (C := AddGroupCone.nonneg T)

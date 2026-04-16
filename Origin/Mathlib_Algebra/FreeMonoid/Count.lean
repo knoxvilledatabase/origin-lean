@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.FreeMonoid.Basic
 import Mathlib.Algebra.Group.TypeTags.Hom
 
+noncomputable section
+
 /-!
 # `List.count` as a bundled homomorphism
 
@@ -28,16 +30,11 @@ def countP : FreeAddMonoid α →+ ℕ where
 theorem countP_of (x : α) : countP p (of x) = if p x = true then 1 else 0 := by
   simp [countP, List.countP, List.countP.go]
 
-theorem countP_apply (l : FreeAddMonoid α) : countP p l = List.countP p l := rfl
-
 def count [DecidableEq α] (x : α) : FreeAddMonoid α →+ ℕ := countP (· = x)
 
 theorem count_of [DecidableEq α] (x y : α) : count x (of y) = (Pi.single x 1 : α → ℕ) y := by
   simp [Pi.single, Function.update, count, countP, List.countP, List.countP.go,
     Bool.beq_eq_decide_eq]
-
-theorem count_apply [DecidableEq α] (x : α) (l : FreeAddMonoid α) : count x l = List.count x l :=
-  rfl
 
 end FreeAddMonoid
 
@@ -54,13 +51,7 @@ theorem countP_of' (x : α) :
 theorem countP_of (x : α) : countP p (of x) = if p x then Multiplicative.ofAdd 1 else 1 := by
   rw [countP_of', ofAdd_zero]
 
-theorem countP_apply (l : FreeAddMonoid α) : countP p l = Multiplicative.ofAdd (List.countP p l) :=
-  rfl
-
 def count [DecidableEq α] (x : α) : FreeMonoid α →* Multiplicative ℕ := countP (· = x)
-
-theorem count_apply [DecidableEq α] (x : α) (l : FreeAddMonoid α) :
-    count x l = Multiplicative.ofAdd (List.count x l) := rfl
 
 theorem count_of [DecidableEq α] (x y : α) :
     count x (of y) = @Pi.mulSingle α (fun _ => Multiplicative ℕ) _ _ x (Multiplicative.ofAdd 1) y :=

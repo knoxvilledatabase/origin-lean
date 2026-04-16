@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Derivation/MapCoeffs.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.RingTheory.Derivation.DifferentialRing
 import Mathlib.Algebra.Polynomial.Module.Basic
 import Mathlib.Algebra.Polynomial.Derivation
 import Mathlib.FieldTheory.Separable
+
+noncomputable section
 
 /-!
 # Coefficient-wise derivation on polynomials
@@ -47,10 +49,6 @@ def mapCoeffs : Derivation R A[X] (PolynomialModule A M) where
         erw [PolynomialModule.monomial_smul_single, PolynomialModule.monomial_smul_single]
         simp only [AddMonoidAlgebra.single_apply, apply_ite d, leibniz, map_zero, coeFn_coe,
           PolynomialModule.single_apply, ite_add_zero, add_comm m n]
-
-@[simp]
-lemma mapCoeffs_apply (p : A[X]) (i) :
-    d.mapCoeffs p i = d (coeff p i) := rfl
 
 @[simp]
 lemma mapCoeffs_monomial (n : ℕ) (x : A) :
@@ -103,10 +101,6 @@ variable {A : Type*} [CommRing A] [Differential A]
 
 def mapCoeffs : Derivation ℤ A[X] A[X] :=
   PolynomialModule.equivPolynomialSelf.compDer Differential.deriv.mapCoeffs
-
-@[simp]
-lemma coeff_mapCoeffs (p : A[X]) (i) :
-    coeff (mapCoeffs p) i = (coeff p i)′ := rfl
 
 @[simp]
 lemma mapCoeffs_monomial (n : ℕ) (x : A) :
@@ -166,7 +160,6 @@ lemma algHom_deriv (f : R →ₐ[A] R') (hf : Function.Injective f) (x : R) (h :
     minpoly.aeval, map_zero, p]
 
 omit [Nontrivial R] in
-
 lemma algEquiv_deriv (f : R ≃ₐ[A] R') (x : R) (h : IsSeparable A x) :
     f (x′) = (f x)′ :=
   haveI := f.nontrivial
@@ -178,6 +171,11 @@ lemma algHom_deriv' (f : R →ₐ[A] R') (hf : Function.Injective f) (x : R) :
     f (x′) = (f x)′ := algHom_deriv f hf x (Algebra.IsSeparable.isSeparable' x)
 
 omit [Nontrivial R] in
+/--
+
+`algEquiv_deriv` in a separable algebra
+
+-/
 
 lemma algEquiv_deriv' (f : R ≃ₐ[A] R') (x : R) :
     f (x′) = (f x)′ :=

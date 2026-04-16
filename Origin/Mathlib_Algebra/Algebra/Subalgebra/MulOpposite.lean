@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Subring.MulOpposite
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 
+noncomputable section
+
 /-!
 
 # Subalgebras of opposite rings
@@ -28,18 +30,12 @@ protected def op (S : Subalgebra R A) : Subalgebra R Aᵐᵒᵖ where
 
 attribute [norm_cast] coe_op
 
-@[simp]
-theorem mem_op {x : Aᵐᵒᵖ} {S : Subalgebra R A} : x ∈ S.op ↔ x.unop ∈ S := Iff.rfl
-
 @[simps! coe toSubsemiring]
 protected def unop (S : Subalgebra R Aᵐᵒᵖ) : Subalgebra R A where
   toSubsemiring := S.toSubsemiring.unop
   algebraMap_mem' := S.algebraMap_mem
 
 attribute [norm_cast] coe_unop
-
-@[simp]
-theorem mem_unop {x : A} {S : Subalgebra R Aᵐᵒᵖ} : x ∈ S.unop ↔ MulOpposite.op x ∈ S := Iff.rfl
 
 @[simp]
 theorem unop_op (S : Subalgebra R A) : S.op.unop = S := rfl
@@ -132,32 +128,11 @@ theorem unop_adjoin (s : Set Aᵐᵒᵖ) :
   congr with x
   simp
 
-@[simps!]
-def linearEquivOp (S : Subalgebra R A) : S ≃ₗ[R] S.op where
-  __ := S.toSubsemiring.addEquivOp
-  map_smul' _ _ := rfl
-
-@[simps!]
-def algEquivOpMop (S : Subalgebra R A) : S ≃ₐ[R] (S.op)ᵐᵒᵖ where
-  __ := S.toSubsemiring.ringEquivOpMop
-  commutes' _ := rfl
-
-@[simps!]
-def mopAlgEquivOp (S : Subalgebra R A) : Sᵐᵒᵖ ≃ₐ[R] S.op where
-  __ := S.toSubsemiring.mopRingEquivOp
-  commutes' _ := rfl
-
 end Semiring
 
 section Ring
 
 variable {R A : Type*} [CommRing R] [Ring A] [Algebra R A]
-
-@[simp]
-theorem op_toSubring (S : Subalgebra R A) : S.op.toSubring = S.toSubring.op := rfl
-
-@[simp]
-theorem unop_toSubring (S : Subalgebra R Aᵐᵒᵖ) : S.unop.toSubring = S.toSubring.unop := rfl
 
 end Ring
 

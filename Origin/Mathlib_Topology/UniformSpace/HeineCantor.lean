@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Support
 import Mathlib.Topology.UniformSpace.Compact
 import Mathlib.Topology.UniformSpace.Equicontinuity
 
+noncomputable section
+
 /-!
 # Compact separated uniform spaces
 

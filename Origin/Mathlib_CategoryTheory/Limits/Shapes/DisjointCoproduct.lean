@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.HasPullback
 
+noncomputable section
+
 /-!
 # Disjoint coproducts
 

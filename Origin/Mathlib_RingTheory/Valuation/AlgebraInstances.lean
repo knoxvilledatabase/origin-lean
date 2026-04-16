@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.TypeTags
 import Mathlib.RingTheory.IntegralClosure.IsIntegralClosure.Basic
 import Mathlib.RingTheory.Valuation.ValuationSubring
 
+noncomputable section
+
 /-!
 # Algebra instances
 

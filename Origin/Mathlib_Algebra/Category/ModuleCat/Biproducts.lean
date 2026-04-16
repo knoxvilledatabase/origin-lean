@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 import Mathlib.Algebra.Category.ModuleCat.Abelian
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 
+noncomputable section
+
 /-!
 # The category of `R`-modules has finite biproducts
 -/
@@ -43,16 +45,6 @@ def binaryProductLimitCone (M N : ModuleCat.{v} R) : Limits.LimitCone (pair M N)
       uniq := fun s m w => by
         simp_rw [← w ⟨WalkingPair.left⟩, ← w ⟨WalkingPair.right⟩]
         rfl }
-
-@[simp]
-theorem binaryProductLimitCone_cone_π_app_left (M N : ModuleCat.{v} R) :
-    (binaryProductLimitCone M N).cone.π.app ⟨WalkingPair.left⟩ = LinearMap.fst R M N :=
-  rfl
-
-@[simp]
-theorem binaryProductLimitCone_cone_π_app_right (M N : ModuleCat.{v} R) :
-    (binaryProductLimitCone M N).cone.π.app ⟨WalkingPair.right⟩ = LinearMap.snd R M N :=
-  rfl
 
 noncomputable def biprodIsoProd (M N : ModuleCat.{v} R) :
     (M ⊞ N : ModuleCat.{v} R) ≅ ModuleCat.of R (M × N) :=

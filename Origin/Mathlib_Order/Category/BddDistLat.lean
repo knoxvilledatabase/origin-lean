@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Category.BddLat
 import Mathlib.Order.Category.DistLat
 
+noncomputable section
+
 /-!
 # The category of bounded distributive lattices
 
@@ -39,19 +41,11 @@ def of (α : Type*) [DistribLattice α] [BoundedOrder α] : BddDistLat :=
   -- see https://github.com/leanprover-community/mathlib4/issues/4998
   ⟨{α := α}⟩
 
-@[simp]
-theorem coe_of (α : Type*) [DistribLattice α] [BoundedOrder α] : ↥(of α) = α :=
-  rfl
-
 instance : Inhabited BddDistLat :=
   ⟨of PUnit⟩
 
 def toBddLat (X : BddDistLat) : BddLat :=
   BddLat.of X
-
-@[simp]
-theorem coe_toBddLat (X : BddDistLat) : ↥X.toBddLat = ↥X :=
-  rfl
 
 instance : LargeCategory.{u} BddDistLat :=
   InducedCategory.category toBddLat
@@ -68,11 +62,6 @@ instance hasForgetToDistLat : HasForget₂ BddDistLat DistLat where
 
 instance hasForgetToBddLat : HasForget₂ BddDistLat BddLat :=
   InducedCategory.hasForget₂ toBddLat
-
-theorem forget_bddLat_lat_eq_forget_distLat_lat :
-    forget₂ BddDistLat BddLat ⋙ forget₂ BddLat Lat =
-      forget₂ BddDistLat DistLat ⋙ forget₂ DistLat Lat :=
-  rfl
 
 @[simps]
 def Iso.mk {α β : BddDistLat.{u}} (e : α ≃o β) : α ≅ β where
@@ -94,8 +83,3 @@ def dualEquiv : BddDistLat ≌ BddDistLat where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end BddDistLat
-
-theorem bddDistLat_dual_comp_forget_to_distLat :
-    BddDistLat.dual ⋙ forget₂ BddDistLat DistLat =
-      forget₂ BddDistLat DistLat ⋙ DistLat.dual :=
-  rfl

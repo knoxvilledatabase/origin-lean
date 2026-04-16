@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.ClassNumber.AdmissibleAbs
 import Mathlib.NumberTheory.ClassNumber.Finite
 import Mathlib.NumberTheory.NumberField.Discriminant.Basic
 
+noncomputable section
+
 /-!
 # Class numbers of number fields
 

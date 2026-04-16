@@ -5,6 +5,8 @@ Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Basic
 
+noncomputable section
+
 /-!
 # Tagged partitions
 
@@ -49,19 +51,8 @@ instance : Membership (Box ι) (TaggedPrepartition I) :=
 @[simp]
 theorem mem_toPrepartition {π : TaggedPrepartition I} : J ∈ π.toPrepartition ↔ J ∈ π := Iff.rfl
 
-@[simp]
-theorem mem_mk (π : Prepartition I) (f h) : J ∈ mk π f h ↔ J ∈ π := Iff.rfl
-
 def iUnion : Set (ι → ℝ) :=
   π.toPrepartition.iUnion
-
-theorem iUnion_def : π.iUnion = ⋃ J ∈ π, ↑J := rfl
-
-@[simp]
-theorem iUnion_mk (π : Prepartition I) (f h) : (mk π f h).iUnion = π.iUnion := rfl
-
-@[simp]
-theorem iUnion_toPrepartition : π.toPrepartition.iUnion = π.iUnion := rfl
 
 @[simp]
 theorem mem_iUnion : x ∈ π.iUnion ↔ ∃ J ∈ π, x ∈ J := by
@@ -269,10 +260,6 @@ def disjUnion (π₁ π₂ : TaggedPrepartition I) (h : Disjoint π₁.iUnion π
     dsimp only [Finset.piecewise]
     split_ifs
     exacts [π₁.tag_mem_Icc J, π₂.tag_mem_Icc J]
-
-@[simp]
-theorem disjUnion_boxes (h : Disjoint π₁.iUnion π₂.iUnion) :
-    (π₁.disjUnion π₂ h).boxes = π₁.boxes ∪ π₂.boxes := rfl
 
 @[simp]
 theorem mem_disjUnion (h : Disjoint π₁.iUnion π₂.iUnion) :

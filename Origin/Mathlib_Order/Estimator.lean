@@ -9,6 +9,8 @@ import Mathlib.Order.RelClasses
 import Mathlib.Order.Hom.Basic
 import Mathlib.Lean.Thunk
 
+noncomputable section
+
 /-!
 # Improvable lower bounds.
 
@@ -80,6 +82,7 @@ section improveUntil
 variable [Preorder α]
 
 attribute [local instance] WellFoundedGT.toWellFoundedRelation in
+/-- Implementation of `Estimator.improveUntil`. -/
 
 def Estimator.improveUntilAux
     (a : Thunk α) (p : α → Bool) [Estimator a ε]
@@ -101,6 +104,13 @@ def Estimator.improveUntil (a : Thunk α) (p : α → Bool)
   Estimator.improveUntilAux a p e false
 
 attribute [local instance] WellFoundedGT.toWellFoundedRelation in
+/--
+
+If `Estimator.improveUntil a p e` returns `some e'`, then `bound a e'` satisfies `p`.
+
+Otherwise, that value `a` must not satisfy `p`.
+
+-/
 
 theorem Estimator.improveUntilAux_spec (a : Thunk α) (p : α → Bool)
     [Estimator a ε] [WellFoundedGT (range (bound a : ε → α))] (e : ε) (r : Bool) :

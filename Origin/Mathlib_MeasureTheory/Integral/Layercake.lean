@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 
+noncomputable section
+
 /-!
 # The layer cake formula / Cavalieri's principle / tail probability formula
 

@@ -9,6 +9,8 @@ import Mathlib.Algebra.Ring.Regular
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Tactic.Polyrith
 
+noncomputable section
+
 /-!
 # The Clauser-Horne-Shimony-Holt inequality and Tsirelson's inequality.
 

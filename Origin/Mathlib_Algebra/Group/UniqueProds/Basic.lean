@@ -9,6 +9,8 @@ import Mathlib.Algebra.Group.ULift
 import Mathlib.Data.DFinsupp.Defs
 import Mathlib.Data.Finsupp.Defs
 
+noncomputable section
+
 /-!
 # Unique products and related notions
 

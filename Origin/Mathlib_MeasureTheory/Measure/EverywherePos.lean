@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Measure/EverywherePos.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Group.Measure
 import Mathlib.Topology.UrysohnsLemma
+
+noncomputable section
 
 /-!
 # Everywhere positive sets in measure spaces
@@ -143,9 +145,13 @@ lemma isEverywherePos_everywherePosSubset_of_measure_ne_top
   rw [← B.measure_eq] at A
   exact A.trans_le (measure_mono hu)
 
--- DISSOLVED: IsEverywherePos.smul_measure
+lemma IsEverywherePos.smul_measure (hs : IsEverywherePos μ s) {c : ℝ≥0∞} (hc : c ≠ 0) :
+    IsEverywherePos (c • μ) s :=
+  fun x hx n hn ↦ by simpa [hc.bot_lt, hs x hx n hn] using hc.bot_lt
 
--- DISSOLVED: IsEverywherePos.smul_measure_nnreal
+lemma IsEverywherePos.smul_measure_nnreal (hs : IsEverywherePos μ s) {c : ℝ≥0} (hc : c ≠ 0) :
+    IsEverywherePos (c • μ) s :=
+  hs.smul_measure (by simpa using hc)
 
 lemma IsEverywherePos.of_forall_exists_nhds_eq (hs : IsEverywherePos μ s)
     (h : ∀ x ∈ s, ∃ t ∈ 𝓝 x, ∀ u ⊆ t, ν u = μ u) : IsEverywherePos ν s := by

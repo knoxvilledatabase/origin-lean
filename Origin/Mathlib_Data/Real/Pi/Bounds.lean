@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 
+noncomputable section
+
 /-!
 # Pi
 
@@ -93,39 +95,23 @@ section Tactic
 open Lean Elab Tactic Qq
 
 elab "pi_lower_bound " "[" l:term,* "]" : tactic => do
-
   have els := l.getElems
-
   let n := quote els.size
-
   evalTactic (← `(tactic| apply pi_lower_bound_start $n))
-
   for l in els do
-
     let {num, den, ..} ← unsafe Meta.evalExpr ℚ q(ℚ) (← Term.elabTermAndSynthesize l (some q(ℚ)))
-
     evalTactic (← `(tactic| apply sqrtTwoAddSeries_step_up $(quote num.toNat) $(quote den)))
-
   evalTactic (← `(tactic| simp [sqrtTwoAddSeries]))
-
   allGoals <| evalTactic (← `(tactic| norm_num1))
 
 elab "pi_upper_bound " "[" l:term,* "]" : tactic => do
-
   have els := l.getElems
-
   let n := quote els.size
-
   evalTactic (← `(tactic| apply pi_upper_bound_start $n))
-
   for l in els do
-
     let {num, den, ..} ← unsafe Meta.evalExpr ℚ q(ℚ) (← Term.elabTermAndSynthesize l (some q(ℚ)))
-
     evalTactic (← `(tactic| apply sqrtTwoAddSeries_step_down $(quote num.toNat) $(quote den)))
-
   evalTactic (← `(tactic| simp [sqrtTwoAddSeries]))
-
   allGoals <| evalTactic (← `(tactic| norm_num1))
 
 end Tactic

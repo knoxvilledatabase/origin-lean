@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Opposites
 import Mathlib.GroupTheory.Congruence.Defs
 
+noncomputable section
+
 /-!
 # Congruences on the opposite of a group
 

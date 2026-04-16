@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Symmetrized.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 45
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 45
 -/
 import Origin.Core
 import Mathlib.Algebra.Jordan.Basic
 import Mathlib.Algebra.Module.Defs
+
+noncomputable section
 
 /-!
 # Symmetrized algebra
@@ -52,22 +54,6 @@ theorem unsym_sym (a : α) : unsym (sym a) = a :=
 
 @[simp]
 theorem sym_unsym (a : α) : sym (unsym a) = a :=
-  rfl
-
-@[simp]
-theorem sym_comp_unsym : (sym : α → αˢʸᵐ) ∘ unsym = id :=
-  rfl
-
-@[simp]
-theorem unsym_comp_sym : (unsym : αˢʸᵐ → α) ∘ sym = id :=
-  rfl
-
-@[simp]
-theorem sym_symm : (@sym α).symm = unsym :=
-  rfl
-
-@[simp]
-theorem unsym_symm : (@unsym α).symm = sym :=
   rfl
 
 theorem sym_bijective : Bijective (sym : α → αˢʸᵐ) :=
@@ -143,15 +129,7 @@ theorem unsym_add [Add α] (a b : αˢʸᵐ) : unsym (a + b) = unsym a + unsym b
   rfl
 
 @[simp]
-theorem sym_sub [Sub α] (a b : α) : sym (a - b) = sym a - sym b :=
-  rfl
-
-@[simp]
 theorem unsym_sub [Sub α] (a b : αˢʸᵐ) : unsym (a - b) = unsym a - unsym b :=
-  rfl
-
-@[simp]
-theorem sym_neg [Neg α] (a : α) : sym (-a) = -sym a :=
   rfl
 
 @[simp]
@@ -161,28 +139,15 @@ theorem unsym_neg [Neg α] (a : αˢʸᵐ) : unsym (-a) = -unsym a :=
 theorem mul_def [Add α] [Mul α] [One α] [OfNat α 2] [Invertible (2 : α)] (a b : αˢʸᵐ) :
     a * b = sym (⅟ 2 * (unsym a * unsym b + unsym b * unsym a)) := rfl
 
-theorem unsym_mul [Mul α] [Add α] [One α] [OfNat α 2] [Invertible (2 : α)] (a b : αˢʸᵐ) :
-    unsym (a * b) = ⅟ 2 * (unsym a * unsym b + unsym b * unsym a) := rfl
-
 theorem sym_mul_sym [Mul α] [Add α] [One α] [OfNat α 2] [Invertible (2 : α)] (a b : α) :
     sym a * sym b = sym (⅟ 2 * (a * b + b * a)) :=
   rfl
 
 set_option linter.existingAttributeWarning false in
-
 @[simp, to_additive existing]
-theorem sym_inv [Inv α] (a : α) : sym a⁻¹ = (sym a)⁻¹ :=
-  rfl
 
 set_option linter.existingAttributeWarning false in
-
 @[simp, to_additive existing]
-theorem unsym_inv [Inv α] (a : αˢʸᵐ) : unsym a⁻¹ = (unsym a)⁻¹ :=
-  rfl
-
-@[simp]
-theorem sym_smul {R : Type*} [SMul R α] (c : R) (a : α) : sym (c • a) = c • sym a :=
-  rfl
 
 @[simp]
 theorem unsym_smul {R : Type*} [SMul R α] (c : R) (a : αˢʸᵐ) : unsym (c • a) = c • unsym a :=
@@ -196,9 +161,13 @@ theorem unsym_eq_one_iff [One α] (a : αˢʸᵐ) : unsym a = 1 ↔ a = 1 :=
 theorem sym_eq_one_iff [One α] (a : α) : sym a = 1 ↔ a = 1 :=
   sym_injective.eq_iff' rfl
 
--- DISSOLVED: unsym_ne_one_iff
+@[to_additive]
+theorem unsym_ne_one_iff [One α] (a : αˢʸᵐ) : unsym a ≠ (1 : α) ↔ a ≠ (1 : αˢʸᵐ) :=
+  not_congr <| unsym_eq_one_iff a
 
--- DISSOLVED: sym_ne_one_iff
+@[to_additive]
+theorem sym_ne_one_iff [One α] (a : α) : sym a ≠ (1 : αˢʸᵐ) ↔ a ≠ (1 : α) :=
+  not_congr <| sym_eq_one_iff a
 
 instance addCommSemigroup [AddCommSemigroup α] : AddCommSemigroup αˢʸᵐ :=
   unsym_injective.addCommSemigroup _ unsym_add
@@ -226,11 +195,6 @@ instance [Mul α] [AddMonoidWithOne α] [Invertible (2 : α)] (a : α) [Invertib
     rw [sym_mul_sym, mul_invOf_self, invOf_mul_self, one_add_one_eq_two, invOf_mul_self, sym_one]
   mul_invOf_self := by
     rw [sym_mul_sym, mul_invOf_self, invOf_mul_self, one_add_one_eq_two, invOf_mul_self, sym_one]
-
-@[simp]
-theorem invOf_sym [Mul α] [AddMonoidWithOne α] [Invertible (2 : α)] (a : α) [Invertible a] :
-    ⅟ (sym a) = sym (⅟ a) :=
-  rfl
 
 instance nonAssocSemiring [Semiring α] [Invertible (2 : α)] : NonAssocSemiring αˢʸᵐ :=
   { SymAlg.addCommMonoid with

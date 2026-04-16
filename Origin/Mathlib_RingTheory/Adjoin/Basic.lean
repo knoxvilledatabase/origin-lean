@@ -11,6 +11,8 @@ import Mathlib.LinearAlgebra.Basis.Defs
 import Mathlib.LinearAlgebra.Finsupp.SumProd
 import Mathlib.LinearAlgebra.Prod
 
+noncomputable section
+
 /-!
 # Adjoining elements to form subalgebras
 
@@ -309,16 +311,6 @@ theorem adjoin_algebraMap_image_union_eq_adjoin_adjoin (s : Set S) (t : Set A) :
         Algebra.adjoin_algebraMap R A s ▸ ⟨x, x.prop, rfl⟩)
         (Set.Subset.trans Set.subset_union_right subset_adjoin))
 
-theorem adjoin_adjoin_of_tower (s : Set A) : adjoin S (adjoin R s : Set A) = adjoin S s := by
-  apply le_antisymm (adjoin_le _)
-  · exact adjoin_mono subset_adjoin
-  · change adjoin R s ≤ (adjoin S s).restrictScalars R
-    refine adjoin_le ?_
-    -- Porting note: unclear why this was broken
-    have : (Subalgebra.restrictScalars R (adjoin S s) : Set A) = adjoin S s := rfl
-    rw [this]
-    exact subset_adjoin
-
 @[simp]
 theorem adjoin_top {A} [Semiring A] [Algebra S A] (t : Set A) :
     adjoin (⊤ : Subalgebra R S) t = (adjoin S t).restrictScalars (⊤ : Subalgebra R S) :=
@@ -436,11 +428,6 @@ theorem adjoin_le_equalizer (φ₁ φ₂ : A →ₐ[R] B) {s : Set A} (h : s.EqO
 theorem ext_of_adjoin_eq_top {s : Set A} (h : adjoin R s = ⊤) ⦃φ₁ φ₂ : A →ₐ[R] B⦄
     (hs : s.EqOn φ₁ φ₂) : φ₁ = φ₂ :=
   ext fun _x => adjoin_le_equalizer φ₁ φ₂ hs <| h.symm ▸ trivial
-
-theorem eqOn_adjoin_iff {φ ψ : A →ₐ[R] B} {s : Set A}  :
-    Set.EqOn φ ψ (adjoin R s) ↔ Set.EqOn φ ψ s := by
-  have (S : Set A) : S ≤ equalizer φ ψ ↔ Set.EqOn φ ψ S := Iff.rfl
-  simp only [← this, Set.le_eq_subset, SetLike.coe_subset_coe, adjoin_le_iff]
 
 theorem adjoin_ext {s : Set A} ⦃φ₁ φ₂ : adjoin R s →ₐ[R] B⦄
     (h : ∀ x hx, φ₁ ⟨x, subset_adjoin hx⟩ = φ₂ ⟨x, subset_adjoin hx⟩) : φ₁ = φ₂ :=

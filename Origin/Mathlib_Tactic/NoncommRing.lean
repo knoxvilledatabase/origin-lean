@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-! # The `noncomm_ring` tactic
 
 Solve goals in not necessarily commutative rings.
@@ -35,39 +37,32 @@ end nat_lit_mul
 open Lean.Parser.Tactic
 
 syntax (name := noncomm_ring) "noncomm_ring" optConfig (discharger)?
-
   (" [" ((simpStar <|> simpErase <|> simpLemma),*,?) "]")? : tactic
 
 macro_rules
-
   | `(tactic| noncomm_ring $cfg:optConfig $[$disch]? $[[$rules,*]]?) => do
-
     let rules' := rules.getD ⟨#[]⟩
-
     let tac ← `(tactic|
-
       (first | simp $cfg:optConfig $(disch)? only [
-
+          -- Expand everything out.
           add_mul, mul_add, sub_eq_add_neg,
-
+          -- Right associate all products.
           mul_assoc,
-
+          -- Expand powers to numerals.
           pow_one, pow_zero, pow_succ,
-
+          -- Replace multiplication by numerals with `zsmul`.
           one_mul, mul_one, zero_mul, mul_zero,
-
           nat_lit_mul_eq_nsmul, mul_nat_lit_eq_nsmul,
-
+          -- Pull `zsmul n` out the front so `abel` can see them.
           mul_smul_comm, smul_mul_assoc,
-
+          -- Pull out negations.
           neg_mul, mul_neg,
-
+          -- user-specified simp lemmas
           $rules',*] |
-
         fail "`noncomm_ring` simp lemmas don't apply; try `abel` instead") <;>
-
       first | abel1 | abel_nf)
-
+    -- if a manual rewrite rule is provided, we repeat the tactic
+    -- (since abel might simplify and allow the rewrite to apply again)
     if rules.isSome then `(tactic| repeat1 ($tac;)) else `(tactic| $tac)
 
 end Mathlib.Tactic.NoncommRing

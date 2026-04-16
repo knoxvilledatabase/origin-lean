@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Rat/Cast/Order.lean
-Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Field.Rat
 import Mathlib.Data.Rat.Cast.CharZero
 import Mathlib.Tactic.Positivity.Core
+
+noncomputable section
 
 /-!
 # Casts of rational numbers into linear ordered fields.
@@ -46,11 +48,17 @@ def castOrderEmbedding : ℚ ↪o K :=
 @[simp, norm_cast] lemma cast_lt : (p : K) < q ↔ p < q := cast_strictMono.lt_iff_lt
 
 @[gcongr] alias ⟨_, _root_.GCongr.ratCast_le_ratCast⟩ := cast_le
+
 @[gcongr] alias ⟨_, _root_.GCongr.ratCast_lt_ratCast⟩ := cast_lt
+
 @[simp] lemma cast_nonneg : 0 ≤ (q : K) ↔ 0 ≤ q := by norm_cast
+
 @[simp] lemma cast_nonpos : (q : K) ≤ 0 ↔ q ≤ 0 := by norm_cast
+
 @[simp] lemma cast_pos : (0 : K) < q ↔ 0 < q := by norm_cast
+
 @[simp] lemma cast_lt_zero : (q : K) < 0 ↔ q < 0 := by norm_cast
+
 @[simp, norm_cast]
 theorem cast_le_natCast {m : ℚ} {n : ℕ} : (m : K) ≤ n ↔ m ≤ (n : ℚ) := by
   rw [← cast_le (K := K), cast_natCast]

@@ -7,6 +7,8 @@ import Mathlib.Logic.Equiv.Defs
 import Mathlib.Logic.Nontrivial.Defs
 import Mathlib.Order.Basic
 
+noncomputable section
+
 /-!
 # Type synonyms
 
@@ -49,26 +51,6 @@ def ofDual : αᵒᵈ ≃ α :=
   Equiv.refl _
 
 @[simp]
-theorem toDual_symm_eq : (@toDual α).symm = ofDual := rfl
-
-@[simp]
-theorem ofDual_symm_eq : (@ofDual α).symm = toDual := rfl
-
-@[simp]
-theorem toDual_ofDual (a : αᵒᵈ) : toDual (ofDual a) = a :=
-  rfl
-
-@[simp]
-theorem ofDual_toDual (a : α) : ofDual (toDual a) = a :=
-  rfl
-
-theorem toDual_inj {a b : α} : toDual a = toDual b ↔ a = b :=
-  Iff.rfl
-
-theorem ofDual_inj {a b : αᵒᵈ} : ofDual a = ofDual b ↔ a = b :=
-  Iff.rfl
-
-@[simp]
 theorem toDual_le_toDual [LE α] {a b : α} : toDual a ≤ toDual b ↔ b ≤ a :=
   Iff.rfl
 
@@ -84,29 +66,9 @@ theorem ofDual_le_ofDual [LE α] {a b : αᵒᵈ} : ofDual a ≤ ofDual b ↔ b 
 theorem ofDual_lt_ofDual [LT α] {a b : αᵒᵈ} : ofDual a < ofDual b ↔ b < a :=
   Iff.rfl
 
-theorem le_toDual [LE α] {a : αᵒᵈ} {b : α} : a ≤ toDual b ↔ b ≤ ofDual a :=
-  Iff.rfl
-
-theorem lt_toDual [LT α] {a : αᵒᵈ} {b : α} : a < toDual b ↔ b < ofDual a :=
-  Iff.rfl
-
-theorem toDual_le [LE α] {a : α} {b : αᵒᵈ} : toDual a ≤ b ↔ ofDual b ≤ a :=
-  Iff.rfl
-
-theorem toDual_lt [LT α] {a : α} {b : αᵒᵈ} : toDual a < b ↔ ofDual b < a :=
-  Iff.rfl
-
 @[elab_as_elim]
 protected def rec {C : αᵒᵈ → Sort*} (h₂ : ∀ a : α, C (toDual a)) : ∀ a : αᵒᵈ, C a :=
   h₂
-
-@[simp]
-protected theorem «forall» {p : αᵒᵈ → Prop} : (∀ a, p a) ↔ ∀ a, p (toDual a) :=
-  Iff.rfl
-
-@[simp]
-protected theorem «exists» {p : αᵒᵈ → Prop} : (∃ a, p a) ↔ ∃ a, p (toDual a) :=
-  Iff.rfl
 
 alias ⟨_, _root_.LE.le.dual⟩ := toDual_le_toDual
 
@@ -131,28 +93,6 @@ def toLex : α ≃ Lex α :=
 def ofLex : Lex α ≃ α :=
   Equiv.refl _
 
-@[simp]
-theorem toLex_symm_eq : (@toLex α).symm = ofLex :=
-  rfl
-
-@[simp]
-theorem ofLex_symm_eq : (@ofLex α).symm = toLex :=
-  rfl
-
-@[simp]
-theorem toLex_ofLex (a : Lex α) : toLex (ofLex a) = a :=
-  rfl
-
-@[simp]
-theorem ofLex_toLex (a : α) : ofLex (toLex a) = a :=
-  rfl
-
-theorem toLex_inj {a b : α} : toLex a = toLex b ↔ a = b :=
-  Iff.rfl
-
-theorem ofLex_inj {a b : Lex α} : ofLex a = ofLex b ↔ a = b :=
-  Iff.rfl
-
 instance (α : Type*) [BEq α] : BEq (Lex α) where
   beq a b := ofLex a == ofLex b
 
@@ -167,7 +107,3 @@ instance (α : Type*) [Inhabited α] : Inhabited (Lex α) :=
 
 @[elab_as_elim, induction_eliminator, cases_eliminator]
 protected def Lex.rec {β : Lex α → Sort*} (h : ∀ a, β (toLex a)) : ∀ a, β a := fun a => h (ofLex a)
-
-@[simp] lemma Lex.forall {p : Lex α → Prop} : (∀ a, p a) ↔ ∀ a, p (toLex a) := Iff.rfl
-
-@[simp] lemma Lex.exists {p : Lex α → Prop} : (∃ a, p a) ↔ ∃ a, p (toLex a) := Iff.rfl

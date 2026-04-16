@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Eigenspace.Pi
 import Mathlib.LinearAlgebra.Eigenspace.Semisimple
 import Mathlib.Analysis.InnerProductSpace.Semisimple
 
+noncomputable section
+
 /-! # Joint eigenspaces of commuting symmetric operators
 
 This file collects various decomposition results for joint eigenspaces of commuting

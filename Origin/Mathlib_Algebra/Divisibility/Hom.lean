@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Divisibility.Basic
 import Mathlib.Algebra.Group.Hom.Defs
 
+noncomputable section
+
 /-!
 # Mapping divisibility across multiplication-preserving homomorphisms
 

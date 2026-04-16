@@ -8,6 +8,8 @@ import Mathlib.Algebra.GradedMulAction
 import Mathlib.Algebra.DirectSum.Decomposition
 import Mathlib.Algebra.Module.BigOperators
 
+noncomputable section
+
 /-!
 # Graded Module
 
@@ -85,10 +87,6 @@ theorem smulAddMonoidHom_apply_of_of [DecidableEq ιA] [DecidableEq ιB] [GMonoi
     {i j} (x : A i) (y : M j) :
     smulAddMonoidHom A M (DirectSum.of A i x) (of M j y) = of M (i +ᵥ j) (GSMul.smul x y) := by
   simp [smulAddMonoidHom]
-
-theorem of_smul_of [DecidableEq ιA] [DecidableEq ιB] [GMonoid A] [Gmodule A M]
-    {i j} (x : A i) (y : M j) :
-    DirectSum.of A i x • of M j y = of M (i +ᵥ j) (GSMul.smul x y) := by simp
 
 open AddMonoidHom
 

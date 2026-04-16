@@ -7,6 +7,8 @@ import Mathlib.Topology.MetricSpace.Gluing
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 # The Gromov-Hausdorff distance is realized
 
@@ -354,28 +356,6 @@ theorem candidatesBDist_mem_candidatesB :
 
 private theorem candidatesB_nonempty : (candidatesB X Y).Nonempty :=
   ⟨_, candidatesBDist_mem_candidatesB⟩
-
-theorem HD_candidatesBDist_le :
-    HD (candidatesBDist X Y) ≤ diam (univ : Set X) + 1 + diam (univ : Set Y) := by
-  refine max_le (ciSup_le fun x => ?_) (ciSup_le fun y => ?_)
-  · have A : ⨅ y, candidatesBDist X Y (inl x, inr y) ≤ candidatesBDist X Y (inl x, inr default) :=
-      ciInf_le (by simpa using HD_below_aux1 0) default
-    have B : dist (inl x) (inr default) ≤ diam (univ : Set X) + 1 + diam (univ : Set Y) :=
-      calc
-        dist (inl x) (inr (default : Y)) = dist x (default : X) + 1 + dist default default := rfl
-        _ ≤ diam (univ : Set X) + 1 + diam (univ : Set Y) := by
-          gcongr <;>
-            exact dist_le_diam_of_mem isBounded_of_compactSpace (mem_univ _) (mem_univ _)
-    exact le_trans A B
-  · have A : ⨅ x, candidatesBDist X Y (inl x, inr y) ≤ candidatesBDist X Y (inl default, inr y) :=
-      ciInf_le (by simpa using HD_below_aux2 0) default
-    have B : dist (inl default) (inr y) ≤ diam (univ : Set X) + 1 + diam (univ : Set Y) :=
-      calc
-        dist (inl (default : X)) (inr y) = dist default default + 1 + dist default y := rfl
-        _ ≤ diam (univ : Set X) + 1 + diam (univ : Set Y) := by
-          gcongr <;>
-            exact dist_le_diam_of_mem isBounded_of_compactSpace (mem_univ _) (mem_univ _)
-    exact le_trans A B
 
 end Constructions
 

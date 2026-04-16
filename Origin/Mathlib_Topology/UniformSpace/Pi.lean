@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Topology.UniformSpace.UniformEmbedding
 
+noncomputable section
+
 /-!
 # Indexed product of uniform spaces
 -/

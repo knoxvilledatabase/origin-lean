@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import Mathlib.GroupTheory.SpecificGroups.Dihedral
 
+noncomputable section
+
 /-!
 # Klein Four Group
 

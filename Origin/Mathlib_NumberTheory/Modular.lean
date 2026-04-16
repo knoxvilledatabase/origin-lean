@@ -10,6 +10,8 @@ import Mathlib.Topology.Instances.Matrix
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 import Mathlib.Topology.Instances.ZMultiples
 
+noncomputable section
+
 /-!
 # The action of the modular group SL(2, ℤ) on the upper half-plane
 

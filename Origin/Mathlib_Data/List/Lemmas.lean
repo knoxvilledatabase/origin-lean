@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Image
 import Mathlib.Data.List.InsertIdx
 
+noncomputable section
+
 /-! # Some lemmas about lists involving sets
 
 Split out from `Data.List.Basic` to reduce its dependencies.

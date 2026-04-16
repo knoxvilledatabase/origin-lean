@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.List.Duplicate
 import Mathlib.Data.List.Sort
 
+noncomputable section
+
 /-!
 # Equivalence between `Fin (length l)` and elements of a list
 
@@ -48,14 +50,6 @@ def getEquiv (l : List α) (H : Nodup l) : Fin (length l) ≃ { x // x ∈ l } w
   left_inv i := by simp only [List.get_indexOf, eq_self_iff_true, Fin.eta, Subtype.coe_mk, H]
   right_inv x := by simp
 
-@[simps]
-def getEquivOfForallMemList (l : List α) (nd : l.Nodup) (h : ∀ x : α, x ∈ l) :
-    Fin l.length ≃ α where
-  toFun i := l.get i
-  invFun a := ⟨_, indexOf_lt_length.2 (h a)⟩
-  left_inv i := by simp [List.indexOf_getElem, nd]
-  right_inv a := by simp
-
 end Nodup
 
 namespace Sorted
@@ -73,14 +67,6 @@ def getIso (l : List α) (H : Sorted (· < ·) l) : Fin (length l) ≃o { x // x
   map_rel_iff' := H.get_strictMono.le_iff_le
 
 variable (H : Sorted (· < ·) l) {x : { x // x ∈ l }} {i : Fin l.length}
-
-@[simp]
-theorem coe_getIso_apply : (H.getIso l i : α) = get l i :=
-  rfl
-
-@[simp]
-theorem coe_getIso_symm_apply : ((H.getIso l).symm x : ℕ) = indexOf (↑x) l :=
-  rfl
 
 end Sorted
 

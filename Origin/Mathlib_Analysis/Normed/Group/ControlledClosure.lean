@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Hom
 import Mathlib.Analysis.SpecificLimits.Normed
 
+noncomputable section
+
 /-! # Extending a backward bound on a normed group homomorphism from a dense set
 
 Possible TODO (from the PR's review, https://github.com/leanprover-community/mathlib/pull/8498):

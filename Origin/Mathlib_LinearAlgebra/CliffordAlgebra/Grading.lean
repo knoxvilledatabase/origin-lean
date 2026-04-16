@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.CliffordAlgebra.Basic
 import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.GradedAlgebra.Basic
 
+noncomputable section
+
 /-!
 # Results about the grading structure of the clifford algebra
 
@@ -125,11 +127,6 @@ theorem iSup_ι_range_eq_top : ⨆ i : ℕ, LinearMap.range (ι Q) ^ i = ⊤ := 
       rw [iSup_sigma]
     _ = ⨆ i : ℕ, LinearMap.range (ι Q) ^ i :=
       Function.Surjective.iSup_congr (fun i => i.2) (fun i => ⟨⟨_, i, rfl⟩, rfl⟩) fun _ => rfl
-
-theorem evenOdd_isCompl : IsCompl (evenOdd Q 0) (evenOdd Q 1) :=
-  (DirectSum.Decomposition.isInternal (evenOdd Q)).isCompl zero_ne_one <| by
-    have : (Finset.univ : Finset (ZMod 2)) = {0, 1} := rfl
-    simpa using congr_arg ((↑) : Finset (ZMod 2) → Set (ZMod 2)) this
 
 @[elab_as_elim]
 theorem evenOdd_induction (n : ZMod 2) {motive : ∀ x, x ∈ evenOdd Q n → Prop}

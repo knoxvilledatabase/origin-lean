@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.DiscreteCategory
 import Mathlib.CategoryTheory.Yoneda
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 
+noncomputable section
+
 /-!
 # Cones and cocones
 

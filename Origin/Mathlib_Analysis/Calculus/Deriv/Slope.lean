@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.LinearAlgebra.AffineSpace.Slope
 
+noncomputable section
+
 /-!
 # Derivative as the limit of the slope
 

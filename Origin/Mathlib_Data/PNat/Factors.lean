@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Factors
 import Mathlib.Data.Multiset.OrderedMonoid
 import Mathlib.Data.Multiset.Sort
 
+noncomputable section
+
 /-!
 # Prime factors of nonzero naturals
 
@@ -49,15 +51,8 @@ instance coeNat : Coe PrimeMultiset (Multiset ℕ) :=
 def coeNatMonoidHom : PrimeMultiset →+ Multiset ℕ :=
   { Multiset.mapAddMonoidHom Coe.coe with toFun := Coe.coe }
 
-@[simp]
-theorem coe_coeNatMonoidHom : (coeNatMonoidHom : PrimeMultiset → Multiset ℕ) = Coe.coe :=
-  rfl
-
 theorem coeNat_injective : Function.Injective (Coe.coe : PrimeMultiset → Multiset ℕ) :=
   Multiset.map_injective Nat.Primes.coe_nat_injective
-
-theorem coeNat_ofPrime (p : Nat.Primes) : (ofPrime p : Multiset ℕ) = {(p : ℕ)} :=
-  rfl
 
 theorem coeNat_prime (v : PrimeMultiset) (p : ℕ) (h : p ∈ (v : Multiset ℕ)) : p.Prime := by
   rcases Multiset.mem_map.mp h with ⟨⟨_, hp'⟩, ⟨_, h_eq⟩⟩
@@ -71,15 +66,8 @@ instance coePNat : Coe PrimeMultiset (Multiset ℕ+) :=
 def coePNatMonoidHom : PrimeMultiset →+ Multiset ℕ+ :=
   { Multiset.mapAddMonoidHom Coe.coe with toFun := Coe.coe }
 
-@[simp]
-theorem coe_coePNatMonoidHom : (coePNatMonoidHom : PrimeMultiset → Multiset ℕ+) = Coe.coe :=
-  rfl
-
 theorem coePNat_injective : Function.Injective (Coe.coe : PrimeMultiset → Multiset ℕ+) :=
   Multiset.map_injective Nat.Primes.coe_pnat_injective
-
-theorem coePNat_ofPrime (p : Nat.Primes) : (ofPrime p : Multiset ℕ+) = {(p : ℕ+)} :=
-  rfl
 
 theorem coePNat_prime (v : PrimeMultiset) (p : ℕ+) (h : p ∈ (v : Multiset ℕ+)) : p.Prime := by
   rcases Multiset.mem_map.mp h with ⟨⟨_, hp'⟩, ⟨_, h_eq⟩⟩

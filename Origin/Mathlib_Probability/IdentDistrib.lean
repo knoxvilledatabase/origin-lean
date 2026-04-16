@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Variance
 import Mathlib.MeasureTheory.Function.UniformIntegrable
 
+noncomputable section
+
 /-!
 # Identically distributed random variables
 
@@ -71,11 +73,6 @@ namespace IdentDistrib
 open TopologicalSpace
 
 variable {μ : Measure α} {ν : Measure β} {f : α → γ} {g : β → γ}
-
-protected theorem refl (hf : AEMeasurable f μ) : IdentDistrib f f μ μ :=
-  { aemeasurable_fst := hf
-    aemeasurable_snd := hf
-    map_eq := rfl }
 
 protected theorem symm (h : IdentDistrib f g μ ν) : IdentDistrib g f ν μ :=
   { aemeasurable_fst := h.aemeasurable_snd

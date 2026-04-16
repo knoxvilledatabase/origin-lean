@@ -5,6 +5,8 @@ Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Basic
 
+noncomputable section
+
 /-!
 # Construct a tripartite graph from its triangles
 

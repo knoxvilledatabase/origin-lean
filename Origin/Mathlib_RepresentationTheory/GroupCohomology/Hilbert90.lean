@@ -1,11 +1,13 @@
 /-
 Extracted from RepresentationTheory/GroupCohomology/Hilbert90.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Fixed
 import Mathlib.RepresentationTheory.GroupCohomology.LowDegree
 import Mathlib.LinearAlgebra.LinearIndependent
+
+noncomputable section
 
 /-!
 # Hilbert's Theorem 90
@@ -57,7 +59,7 @@ noncomputable def aux (f : (L ≃ₐ[K] L) → Lˣ) : L → L :=
   Finsupp.linearCombination L (fun φ : L ≃ₐ[K] L ↦ (φ : L → L))
     (Finsupp.equivFunOnFinite.symm (fun φ => (f φ : L)))
 
--- DISSOLVED: aux_ne_zero
+theorem aux_ne_zero (f : (L ≃ₐ[K] L) → Lˣ) : aux f ≠ 0 :=
 
   have : LinearIndependent L (fun (f : L ≃ₐ[K] L) => (f : L → L)) :=
 

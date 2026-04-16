@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Kernels
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.Tactic.TFAE
 
+noncomputable section
+
 /-!
 # Exact sequences in abelian categories
 

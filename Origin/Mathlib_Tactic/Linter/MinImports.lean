@@ -6,6 +6,8 @@ import Origin.Core
 import ImportGraph.Imports
 import Mathlib.Tactic.MinImports
 
+noncomputable section
+
 /-! # The `minImports` linter
 
 The `minImports` linter incrementally computes the minimal imports needed for each file to build.

@@ -7,6 +7,8 @@ import Mathlib.FieldTheory.KrullTopology
 import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.Topology.Algebra.Group.TopologicalAbelianization
 
+noncomputable section
+
 /-!
 # The topological abelianization of the absolute Galois group.
 

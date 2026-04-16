@@ -9,6 +9,8 @@ import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.MeasureTheory.Integral.Prod
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
+noncomputable section
+
 /-!
 # Generalized polar coordinate change
 

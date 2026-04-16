@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Group.Submonoid.Basic
 import Mathlib.Algebra.Order.Ring.Defs
 
+noncomputable section
+
 /-!
 # Sums of squares
 

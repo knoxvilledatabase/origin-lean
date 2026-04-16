@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Prod
 import Mathlib.Tactic.Abel
 import Mathlib.Algebra.Module.LinearMap.Defs
 
+noncomputable section
+
 /-!
 # Addition and subtraction are linear maps from the product space
 

@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Real/ConjExponents.lean
-Genuine: 57 | Conflates: 0 | Dissolved: 11 | Infrastructure: 7
+Genuine: 62 | Conflates: 2 | Dissolved: 2 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Real
+
+noncomputable section
 
 /-!
 # Real conjugate exponents
@@ -56,19 +58,20 @@ theorem nonneg : 0 ≤ p := le_of_lt h.pos
 
 theorem sub_one_pos : 0 < p - 1 := sub_pos.2 h.one_lt
 
--- DISSOLVED: sub_one_ne_zero
+-- CONFLATES (assumes ground = zero): sub_one_ne_zero
+theorem sub_one_ne_zero : p - 1 ≠ 0 := ne_of_gt h.sub_one_pos
 
 protected lemma inv_pos : 0 < p⁻¹ := inv_pos.2 h.pos
 
 protected lemma inv_nonneg : 0 ≤ p⁻¹ := h.inv_pos.le
 
--- DISSOLVED: inv_ne_zero
+protected lemma inv_ne_zero : p⁻¹ ≠ 0 := h.inv_pos.ne'
 
 theorem one_div_pos : 0 < 1 / p := _root_.one_div_pos.2 h.pos
 
 theorem one_div_nonneg : 0 ≤ 1 / p := le_of_lt h.one_div_pos
 
--- DISSOLVED: one_div_ne_zero
+theorem one_div_ne_zero : 1 / p ≠ 0 := ne_of_gt h.one_div_pos
 
 theorem conj_eq : q = p / (p - 1) := by
   have := h.inv_add_inv_conj
@@ -156,11 +159,12 @@ lemma pos : 0 < p := zero_lt_one.trans h.one_lt
 
 lemma sub_one_pos : 0 < p - 1 := tsub_pos_of_lt h.one_lt
 
--- DISSOLVED: sub_one_ne_zero
+-- CONFLATES (assumes ground = zero): sub_one_ne_zero
+lemma sub_one_ne_zero : p - 1 ≠ 0 := h.sub_one_pos.ne'
 
 lemma inv_pos : 0 < p⁻¹ := _root_.inv_pos.2 h.pos
 
--- DISSOLVED: inv_ne_zero
+lemma inv_ne_zero : p⁻¹ ≠ 0 := h.inv_pos.ne'
 
 lemma one_sub_inv : 1 - p⁻¹ = q⁻¹ := tsub_eq_of_eq_add_rev h.inv_add_inv_conj.symm
 
@@ -188,11 +192,16 @@ lemma inv_add_inv_conj_ennreal : (p⁻¹ + q⁻¹ : ℝ≥0∞) = 1 := by norm_c
 
 end
 
--- DISSOLVED: inv_inv
+protected lemma inv_inv (ha : a ≠ 0) (hb : b ≠ 0) (hab : a + b = 1) :
+    a⁻¹.IsConjExponent b⁻¹ :=
+  ⟨(one_lt_inv₀ ha.bot_lt).2 <| by rw [← hab]; exact lt_add_of_pos_right _ hb.bot_lt, by
+    simpa only [inv_inv] using hab⟩
 
--- DISSOLVED: inv_one_sub_inv
+lemma inv_one_sub_inv (ha₀ : a ≠ 0) (ha₁ : a < 1) : a⁻¹.IsConjExponent (1 - a)⁻¹ :=
+  .inv_inv ha₀ (tsub_pos_of_lt ha₁).ne' <| add_tsub_cancel_of_le ha₁.le
 
--- DISSOLVED: one_sub_inv_inv
+lemma one_sub_inv_inv (ha₀ : a ≠ 0) (ha₁ : a < 1) : (1 - a)⁻¹.IsConjExponent a⁻¹ :=
+  (inv_one_sub_inv ha₀ ha₁).symm
 
 end IsConjExponent
 
@@ -277,7 +286,7 @@ lemma one_le : 1 ≤ p := ENNReal.inv_le_one.1 <| by
 
 lemma pos : 0 < p := zero_lt_one.trans_le h.one_le
 
--- DISSOLVED: ne_zero
+lemma ne_zero : p ≠ 0 := h.pos.ne'
 
 lemma one_sub_inv : 1 - p⁻¹ = q⁻¹ :=
   ENNReal.sub_eq_of_eq_add_rev' one_ne_top h.inv_add_inv_conj.symm

@@ -16,6 +16,8 @@ import Mathlib.GroupTheory.Perm.Support
 import Mathlib.Logic.Equiv.Fin
 import Mathlib.Tactic.NormNum.Ineq
 
+noncomputable section
+
 /-!
 # Sign of a permutation
 
@@ -224,30 +226,6 @@ theorem signAux_mul {n : ℕ} (f g : Perm (Fin n)) : signAux (f * g) = signAux f
       rfl
     · rw [if_neg h₁, if_pos (lt_of_not_ge h₁).le]
       rfl
-
-private theorem signAux_swap_zero_one' (n : ℕ) : signAux (swap (0 : Fin (n + 2)) 1) = -1 :=
-  show _ = ∏ x ∈ {(⟨1, 0⟩ : Σ _ : Fin (n + 2), Fin (n + 2))},
-      if (Equiv.swap 0 1) x.1 ≤ swap 0 1 x.2 then (-1 : ℤˣ) else 1 by
-    refine Eq.symm (prod_subset (fun ⟨x₁, x₂⟩ => by
-      simp +contextual [mem_finPairsLT, Fin.one_pos]) fun a ha₁ ha₂ => ?_)
-    rcases a with ⟨a₁, a₂⟩
-    replace ha₁ : a₂ < a₁ := mem_finPairsLT.1 ha₁
-    dsimp only
-    rcases a₁.zero_le.eq_or_lt with (rfl | H)
-    · exact absurd a₂.zero_le ha₁.not_le
-    rcases a₂.zero_le.eq_or_lt with (rfl | H')
-    · simp only [and_true, eq_self_iff_true, heq_iff_eq, mem_singleton, Sigma.mk.inj_iff] at ha₂
-      have : 1 < a₁ := lt_of_le_of_ne (Nat.succ_le_of_lt ha₁)
-        (Ne.symm (by intro h; apply ha₂; simp [h]))
-      have h01 : Equiv.swap (0 : Fin (n + 2)) 1 0 = 1 := by simp
-      rw [swap_apply_of_ne_of_ne (ne_of_gt H) ha₂, h01, if_neg this.not_le]
-    · have le : 1 ≤ a₂ := Nat.succ_le_of_lt H'
-      have lt : 1 < a₁ := le.trans_lt ha₁
-      have h01 : Equiv.swap (0 : Fin (n + 2)) 1 1 = 0 := by simp only [swap_apply_right]
-      rcases le.eq_or_lt with (rfl | lt')
-      · rw [swap_apply_of_ne_of_ne H.ne' lt.ne', h01, if_neg H.not_le]
-      · rw [swap_apply_of_ne_of_ne (ne_of_gt H) (ne_of_gt lt),
-          swap_apply_of_ne_of_ne (ne_of_gt H') (ne_of_gt lt'), if_neg ha₁.not_le]
 
 private theorem signAux_swap_zero_one {n : ℕ} (hn : 2 ≤ n) :
     signAux (swap (⟨0, lt_of_lt_of_le (by decide) hn⟩ : Fin n) ⟨1, lt_of_lt_of_le (by decide) hn⟩) =

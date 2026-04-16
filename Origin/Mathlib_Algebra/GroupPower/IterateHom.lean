@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Int
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Iterates of monoid homomorphisms
 

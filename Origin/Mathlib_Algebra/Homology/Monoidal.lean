@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.Single
 import Mathlib.CategoryTheory.GradedObject.Monoidal
 import Mathlib.CategoryTheory.Monoidal.Transport
 
+noncomputable section
+
 /-!
 # The monoidal category structure on homological complexes
 

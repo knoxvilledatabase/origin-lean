@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Countable.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Final
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 import Mathlib.CategoryTheory.Countable
 import Mathlib.Data.Countable.Defs
+
+noncomputable section
 
 /-!
 # Countable limits and colimits
@@ -45,7 +47,6 @@ instance (priority := 100) hasCountableLimits_of_hasLimits [HasLimits C] :
   out := inferInstance
 
 universe v in
-
 instance [Category.{v} J] [CountableCategory J] [HasCountableLimits C] : HasLimitsOfShape J C :=
   have : HasLimitsOfShape (HomAsType J) C := HasCountableLimits.out (HomAsType J)
   hasLimitsOfShape_of_equivalence (homAsTypeEquiv J)
@@ -86,7 +87,6 @@ instance (priority := 100) hasCountableColimits_of_hasColimits [HasColimits C] :
   out := inferInstance
 
 universe v in
-
 instance [Category.{v} J] [CountableCategory J] [HasCountableColimits C] : HasColimitsOfShape J C :=
   have : HasColimitsOfShape (HomAsType J) C := HasCountableColimits.out (HomAsType J)
   hasColimitsOfShape_of_equivalence (homAsTypeEquiv J)

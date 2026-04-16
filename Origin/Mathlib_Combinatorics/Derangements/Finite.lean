@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.Derangements.Basic
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # Derangements on fintypes
 
@@ -62,14 +64,6 @@ def numDerangements : ℕ → ℕ
   | 0 => 1
   | 1 => 0
   | n + 2 => (n + 1) * (numDerangements n + numDerangements (n + 1))
-
-@[simp]
-theorem numDerangements_zero : numDerangements 0 = 1 :=
-  rfl
-
-@[simp]
-theorem numDerangements_one : numDerangements 1 = 0 :=
-  rfl
 
 theorem numDerangements_add_two (n : ℕ) :
     numDerangements (n + 2) = (n + 1) * (numDerangements n + numDerangements (n + 1)) :=

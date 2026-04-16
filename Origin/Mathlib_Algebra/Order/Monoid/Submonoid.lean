@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Monoid.Basic
 import Mathlib.Algebra.Group.Submonoid.Defs
 import Mathlib.Order.Interval.Set.Defs
 
+noncomputable section
+
 /-!
 # Ordered instances on submonoids
 -/
@@ -85,8 +87,6 @@ def oneLE : Submonoid M where
   one_mem' := le_rfl
 
 variable {M}
-
-@[to_additive (attr := simp) mem_nonneg] lemma mem_oneLE : a ∈ oneLE M ↔ 1 ≤ a := Iff.rfl
 
 end Preorder
 

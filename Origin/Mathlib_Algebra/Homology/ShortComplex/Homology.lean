@@ -5,6 +5,8 @@ Genuine: 131 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.RightHomology
 
+noncomputable section
+
 /-!
 # Homology of short complexes
 

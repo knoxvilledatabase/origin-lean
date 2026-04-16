@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Localization/Defs.lean
-Genuine: 109 | Conflates: 0 | Dissolved: 6 | Infrastructure: 12
+Genuine: 110 | Conflates: 3 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Data.Fintype.Prod
@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.MonoidLocalization.MonoidWithZero
 import Mathlib.RingTheory.OreLocalization.Ring
 import Mathlib.Tactic.ApplyFun
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 # Localizations of commutative rings
@@ -146,17 +148,16 @@ theorem of_le_of_exists_dvd (N : Submonoid R) (h₁ : M ≤ N) (h₂ : ∀ n ∈
 
 variable (S)
 
--- DISSOLVED: toLocalizationWithZeroMap
+@[simps]
+def toLocalizationWithZeroMap : Submonoid.LocalizationWithZeroMap M S where
+  __ := algebraMap R S
+  toFun := algebraMap R S
+  map_units' := IsLocalization.map_units _
+  surj' := IsLocalization.surj _
+  exists_of_eq _ _ := IsLocalization.exists_of_eq
 
 abbrev toLocalizationMap : Submonoid.LocalizationMap M S :=
   (toLocalizationWithZeroMap M S).toLocalizationMap
-
-@[simp]
-theorem toLocalizationMap_toMap : (toLocalizationMap M S).toMap = (algebraMap R S : R →*₀ S) :=
-  rfl
-
-theorem toLocalizationMap_toMap_apply (x) : (toLocalizationMap M S).toMap x = algebraMap R S x :=
-  rfl
 
 theorem surj₂ : ∀ z w : S, ∃ z' w' : R, ∃ d : M,
     (z * algebraMap R S d = algebraMap R S z') ∧ (w * algebraMap R S d = algebraMap R S w') :=
@@ -300,7 +301,9 @@ theorem mk'_eq_zero_iff (x : R) (s : M) : mk' S x s = 0 ↔ ∃ m : M, ↑m * x 
 theorem mk'_zero (s : M) : IsLocalization.mk' S 0 s = 0 := by
   rw [eq_comm, IsLocalization.eq_mk'_iff_mul_eq, zero_mul, map_zero]
 
--- DISSOLVED: ne_zero_of_mk'_ne_zero
+theorem ne_zero_of_mk'_ne_zero {x : R} {y : M} (hxy : IsLocalization.mk' S x y ≠ 0) : x ≠ 0 := by
+  rintro rfl
+  exact hxy (IsLocalization.mk'_zero _)
 
 section Ext
 
@@ -504,7 +507,6 @@ theorem lift_injective_iff :
 variable (M) in
 
 include M in
-
 lemma injective_iff_map_algebraMap_eq {T} [CommRing T] (f : S →+* T) :
     Function.Injective f ↔ ∀ x y,
       algebraMap R S x = algebraMap R S y ↔ f (algebraMap R S x) = f (algebraMap R S y) := by
@@ -598,26 +600,10 @@ noncomputable def ringEquivOfRingEquiv (h : R ≃+* P) (H : M.map h.toMonoidHom 
 
 end
 
-theorem ringEquivOfRingEquiv_eq_map {j : R ≃+* P} (H : M.map j.toMonoidHom = T) :
-    (ringEquivOfRingEquiv S Q j H : S →+* Q) =
-      map Q (j : R →+* P) (M.le_comap_of_map_le (le_of_eq H)) :=
-  rfl
-
-theorem ringEquivOfRingEquiv_eq {j : R ≃+* P} (H : M.map j.toMonoidHom = T) (x) :
-    ringEquivOfRingEquiv S Q j H ((algebraMap R S) x) = algebraMap P Q (j x) := by
-  simp
-
 theorem ringEquivOfRingEquiv_mk' {j : R ≃+* P} (H : M.map j.toMonoidHom = T) (x : R) (y : M) :
     ringEquivOfRingEquiv S Q j H (mk' S x y) =
       mk' Q (j x) ⟨j y, show j y ∈ T from H ▸ Set.mem_image_of_mem j y.2⟩ := by
   simp [map_mk']
-
-@[simp]
-theorem ringEquivOfRingEquiv_symm {j : R ≃+* P} (H : M.map j.toMonoidHom = T) :
-    (ringEquivOfRingEquiv S Q j H).symm =
-      ringEquivOfRingEquiv Q S j.symm (show T.map j.symm.toMonoidHom = M by
-        erw [← H, ← Submonoid.comap_equiv_eq_map_symm,
-          Submonoid.comap_map_eq_of_injective j.injective]) := rfl
 
 end Map
 
@@ -762,12 +748,6 @@ end
 theorem toLocalizationMap_eq_monoidOf : toLocalizationMap M (Localization M) = monoidOf M :=
   rfl
 
-theorem monoidOf_eq_algebraMap (x) : (monoidOf M).toMap x = algebraMap R (Localization M) x :=
-  rfl
-
-theorem mk_one_eq_algebraMap (x) : mk x 1 = algebraMap R (Localization M) x :=
-  rfl
-
 theorem mk_eq_mk'_apply (x y) : mk x y = IsLocalization.mk' (Localization M) x y := by
   rw [mk_eq_monoidOf_mk'_apply, mk', toLocalizationMap_eq_monoidOf]
 
@@ -803,7 +783,6 @@ namespace IsLocalization
 variable {K : Type*} [IsLocalization M S]
 
 include M in
-
 lemma injective_of_map_algebraMap_zero {T} [CommRing T] (f : S →+* T)
     (h : ∀ x, f (algebraMap R S x) = 0 → algebraMap R S x = 0) :
     Function.Injective f := by
@@ -826,19 +805,45 @@ protected theorem injective (hM : M ≤ nonZeroDivisors R) : Injective (algebraM
   intro a ha
   rwa [to_map_eq_zero_iff S hM] at ha
 
--- DISSOLVED: to_map_ne_zero_of_mem_nonZeroDivisors
+-- CONFLATES (assumes ground = zero): to_map_ne_zero_of_mem_nonZeroDivisors
+protected theorem to_map_ne_zero_of_mem_nonZeroDivisors [Nontrivial R] (hM : M ≤ nonZeroDivisors R)
+    {x : R} (hx : x ∈ nonZeroDivisors R) : algebraMap R S x ≠ 0 :=
+  show (algebraMap R S).toMonoidWithZeroHom x ≠ 0 from
+    map_ne_zero_of_mem_nonZeroDivisors (algebraMap R S) (IsLocalization.injective S hM) hx
 
 variable {S}
 
--- DISSOLVED: sec_snd_ne_zero
+-- CONFLATES (assumes ground = zero): sec_snd_ne_zero
+theorem sec_snd_ne_zero [Nontrivial R] (hM : M ≤ nonZeroDivisors R) (x : S) :
+    ((sec M x).snd : R) ≠ 0 :=
+  nonZeroDivisors.coe_ne_zero ⟨(sec M x).snd.val, hM (sec M x).snd.property⟩
 
--- DISSOLVED: sec_fst_ne_zero
+-- CONFLATES (assumes ground = zero): sec_fst_ne_zero
+theorem sec_fst_ne_zero [Nontrivial R] [NoZeroDivisors S] (hM : M ≤ nonZeroDivisors R) {x : S}
+    (hx : x ≠ 0) : (sec M x).fst ≠ 0 := by
+  have hsec := sec_spec M x
+  intro hfst
+  rw [hfst, map_zero, mul_eq_zero, _root_.map_eq_zero_iff] at hsec
+  · exact Or.elim hsec hx (sec_snd_ne_zero hM x)
+  · exact IsLocalization.injective S hM
 
 variable {Q : Type*} [CommRing Q] {g : R →+* P} [Algebra P Q]
 
 variable (A : Type*) [CommRing A] [IsDomain A]
 
--- DISSOLVED: noZeroDivisors_of_le_nonZeroDivisors
+theorem noZeroDivisors_of_le_nonZeroDivisors [Algebra A S] {M : Submonoid A} [IsLocalization M S]
+    (hM : M ≤ nonZeroDivisors A) : NoZeroDivisors S :=
+  { eq_zero_or_eq_zero_of_mul_eq_zero := by
+      intro z w h
+      cases' surj M z with x hx
+      cases' surj M w with y hy
+      have :
+        z * w * algebraMap A S y.2 * algebraMap A S x.2 = algebraMap A S x.1 * algebraMap A S y.1 :=
+        by rw [mul_assoc z, hy, ← hx]; ring
+      rw [h, zero_mul, zero_mul, ← (algebraMap A S).map_mul] at this
+      cases' eq_zero_or_eq_zero_of_mul_eq_zero ((to_map_eq_zero_iff S hM).mp this.symm) with H H
+      · exact Or.inl (eq_zero_of_fst_eq_zero hx H)
+      · exact Or.inr (eq_zero_of_fst_eq_zero hy H) }
 
 theorem isDomain_of_le_nonZeroDivisors [Algebra A S] {M : Submonoid A} [IsLocalization M S]
     (hM : M ≤ nonZeroDivisors A) : IsDomain S := by

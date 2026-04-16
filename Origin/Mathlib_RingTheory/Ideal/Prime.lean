@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Regular
 import Mathlib.RingTheory.Ideal.Lattice
 
+noncomputable section
+
 /-!
 
 # Prime ideals

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Constructions.LimitsOfProductsAndEqualizers
 import Mathlib.CategoryTheory.Limits.Opposites
 
+noncomputable section
+
 /-!
 # Constructing colimits from finite colimits and filtered colimits
 

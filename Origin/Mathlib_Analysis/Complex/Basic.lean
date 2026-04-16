@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Complex/Basic.lean
-Genuine: 118 | Conflates: 0 | Dissolved: 6 | Infrastructure: 30
+Genuine: 124 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Data.Complex.Module
@@ -10,6 +10,8 @@ import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Field
 import Mathlib.Topology.Algebra.InfiniteSum.Module
 import Mathlib.Topology.Instances.RealVectorSpace
+
+noncomputable section
 
 /-!
 
@@ -178,9 +180,11 @@ theorem continuous_abs : Continuous abs :=
 theorem continuous_normSq : Continuous normSq := by
   simpa [← normSq_eq_abs] using continuous_abs.pow 2
 
--- DISSOLVED: nnnorm_eq_one_of_pow_eq_one
+theorem nnnorm_eq_one_of_pow_eq_one {ζ : ℂ} {n : ℕ} (h : ζ ^ n = 1) (hn : n ≠ 0) : ‖ζ‖₊ = 1 :=
+  (pow_left_inj₀ zero_le' zero_le' hn).1 <| by rw [← nnnorm_pow, h, nnnorm_one, one_pow]
 
--- DISSOLVED: norm_eq_one_of_pow_eq_one
+theorem norm_eq_one_of_pow_eq_one {ζ : ℂ} {n : ℕ} (h : ζ ^ n = 1) (hn : n ≠ 0) : ‖ζ‖ = 1 :=
+  congr_arg Subtype.val (nnnorm_eq_one_of_pow_eq_one h hn)
 
 lemma le_of_eq_sum_of_eq_sum_norm {ι : Type*} {a b : ℝ} (f : ι → ℂ) (s : Finset ι) (ha₀ : 0 ≤ a)
     (ha : a = ∑ i ∈ s, f i) (hb : b = ∑ i ∈ s, (‖f i‖ : ℂ)) : a ≤ b := by
@@ -240,10 +244,6 @@ lemma uniformlyContinuous_re : UniformContinuous re :=
   reCLM.uniformContinuous
 
 @[simp]
-theorem reCLM_coe : (reCLM : ℂ →ₗ[ℝ] ℝ) = reLm :=
-  rfl
-
-@[simp]
 theorem reCLM_apply (z : ℂ) : (reCLM : ℂ → ℝ) z = z.re :=
   rfl
 
@@ -256,14 +256,6 @@ theorem continuous_im : Continuous im :=
 
 lemma uniformlyContinuous_im : UniformContinuous im :=
   imCLM.uniformContinuous
-
-@[simp]
-theorem imCLM_coe : (imCLM : ℂ →ₗ[ℝ] ℝ) = imLm :=
-  rfl
-
-@[simp]
-theorem imCLM_apply (z : ℂ) : (imCLM : ℂ → ℝ) z = z.im :=
-  rfl
 
 theorem restrictScalars_one_smulRight' (x : E) :
     ContinuousLinearMap.restrictScalars ℝ ((1 : ℂ →L[ℂ] ℂ).smulRight x : ℂ →L[ℂ] E) =
@@ -280,14 +272,6 @@ theorem restrictScalars_one_smulRight (x : ℂ) :
 
 def conjLIE : ℂ ≃ₗᵢ[ℝ] ℂ :=
   ⟨conjAe.toLinearEquiv, abs_conj⟩
-
-@[simp]
-theorem conjLIE_apply (z : ℂ) : conjLIE z = conj z :=
-  rfl
-
-@[simp]
-theorem conjLIE_symm : conjLIE.symm = conjLIE :=
-  rfl
 
 theorem isometry_conj : Isometry (conj : ℂ → ℂ) :=
   conjLIE.isometry
@@ -320,14 +304,6 @@ theorem ringHom_eq_id_or_conj_of_continuous {f : ℂ →+* ℂ} (hf : Continuous
 def conjCLE : ℂ ≃L[ℝ] ℂ :=
   conjLIE
 
-@[simp]
-theorem conjCLE_coe : conjCLE.toLinearEquiv = conjAe.toLinearEquiv :=
-  rfl
-
-@[simp]
-theorem conjCLE_apply (z : ℂ) : conjCLE z = conj z :=
-  rfl
-
 def ofRealLI : ℝ →ₗᵢ[ℝ] ℂ :=
   ⟨ofRealAm.toLinearMap, norm_real⟩
 
@@ -356,14 +332,6 @@ theorem ringHom_eq_ofReal_of_continuous {f : ℝ →+* ℂ} (h : Continuous f) :
 def ofRealCLM : ℝ →L[ℝ] ℂ :=
   ofRealLI.toContinuousLinearMap
 
-@[simp]
-theorem ofRealCLM_coe : (ofRealCLM : ℝ →ₗ[ℝ] ℂ) = ofRealAm.toLinearMap :=
-  rfl
-
-@[simp]
-theorem ofRealCLM_apply (x : ℝ) : ofRealCLM x = x :=
-  rfl
-
 noncomputable instance : RCLike ℂ where
   re := ⟨⟨Complex.re, Complex.zero_re⟩, Complex.add_re⟩
   im := ⟨⟨Complex.im, Complex.zero_im⟩, Complex.add_im⟩
@@ -383,12 +351,6 @@ noncomputable instance : RCLike ℂ where
   toPartialOrder := Complex.partialOrder
   le_iff_re_im := Iff.rfl
 
-theorem _root_.RCLike.re_eq_complex_re : ⇑(RCLike.re : ℂ →+ ℝ) = Complex.re :=
-  rfl
-
-theorem _root_.RCLike.im_eq_complex_im : ⇑(RCLike.im : ℂ →+ ℝ) = Complex.im :=
-  rfl
-
 lemma mul_conj' (z : ℂ) : z * conj z = ‖z‖ ^ 2 := RCLike.mul_conj z
 
 lemma conj_mul' (z : ℂ) : conj z * z = ‖z‖ ^ 2 := RCLike.conj_mul z
@@ -400,20 +362,6 @@ lemma exists_norm_eq_mul_self (z : ℂ) : ∃ c, ‖c‖ = 1 ∧ ‖z‖ = c * z
 
 lemma exists_norm_mul_eq_self (z : ℂ) : ∃ c, ‖c‖ = 1 ∧ c * ‖z‖ = z :=
   RCLike.exists_norm_mul_eq_self _
-
-@[simps]
-def _root_.RCLike.complexRingEquiv {𝕜 : Type*} [RCLike 𝕜]
-    (h : RCLike.im (RCLike.I : 𝕜) = 1) : 𝕜 ≃+* ℂ where
-  toFun x := RCLike.re x + RCLike.im x * I
-  invFun x := re x + im x * RCLike.I
-  left_inv x := by simp
-  right_inv x := by simp [h]
-  map_add' x y := by simp only [map_add, ofReal_add]; ring
-  map_mul' x y := by
-    simp only [RCLike.mul_re, ofReal_sub, ofReal_mul, RCLike.mul_im, ofReal_add]
-    ring_nf
-    rw [I_sq]
-    ring
 
 @[simps]
 def _root_.RCLike.complexLinearIsometryEquiv {𝕜 : Type*} [RCLike 𝕜]
@@ -468,22 +416,6 @@ local notation "imC" => @RCLike.im ℂ _
 local notation "IC" => @RCLike.I ℂ _
 
 local notation "norm_sqC" => @RCLike.normSq ℂ _
-
-@[simp]
-theorem re_to_complex {x : ℂ} : reC x = x.re :=
-  rfl
-
-@[simp]
-theorem im_to_complex {x : ℂ} : imC x = x.im :=
-  rfl
-
-@[simp]
-theorem I_to_complex : IC = Complex.I :=
-  rfl
-
-@[simp]
-theorem normSq_to_complex {x : ℂ} : norm_sqC x = Complex.normSq x :=
-  rfl
 
 section tsum
 
@@ -632,9 +564,9 @@ open scoped ComplexOrder
 
 def slitPlane : Set ℂ := {z | 0 < z.re ∨ z.im ≠ 0}
 
--- DISSOLVED: mem_slitPlane_iff
+lemma mem_slitPlane_iff {z : ℂ} : z ∈ slitPlane ↔ 0 < z.re ∨ z.im ≠ 0 := Set.mem_setOf
 
--- DISSOLVED: slitPlane_eq_union
+lemma slitPlane_eq_union : slitPlane = {z | 0 < z.re} ∪ {z | z.im ≠ 0} := Set.setOf_or.symm
 
 lemma isOpen_slitPlane : IsOpen slitPlane :=
   (isOpen_lt continuous_const continuous_re).union (isOpen_ne_fun continuous_im continuous_const)
@@ -651,7 +583,9 @@ lemma neg_ofReal_mem_slitPlane {x : ℝ} : -↑x ∈ slitPlane ↔ x < 0 := by
 @[simp]
 lemma zero_not_mem_slitPlane : 0 ∉ slitPlane := mt ofReal_mem_slitPlane.1 (lt_irrefl _)
 
--- DISSOLVED: natCast_mem_slitPlane
+@[simp]
+lemma natCast_mem_slitPlane {n : ℕ} : ↑n ∈ slitPlane ↔ n ≠ 0 := by
+  simpa [pos_iff_ne_zero] using @ofReal_mem_slitPlane n
 
 alias nat_cast_mem_slitPlane := natCast_mem_slitPlane
 
@@ -665,7 +599,8 @@ lemma mem_slitPlane_iff_not_le_zero {z : ℂ} : z ∈ slitPlane ↔ ¬z ≤ 0 :=
 protected lemma compl_Iic_zero : (Set.Iic 0)ᶜ = slitPlane := Set.ext fun _ ↦
   mem_slitPlane_iff_not_le_zero.symm
 
--- DISSOLVED: slitPlane_ne_zero
+lemma slitPlane_ne_zero {z : ℂ} (hz : z ∈ slitPlane) : z ≠ 0 :=
+  ne_of_mem_of_not_mem hz zero_not_mem_slitPlane
 
 lemma ball_one_subset_slitPlane : Metric.ball 1 1 ⊆ slitPlane := fun z hz ↦ .inl <|
   have : -1 < z.re - 1 := neg_lt_of_abs_lt <| (abs_re_le_abs _).trans_lt hz

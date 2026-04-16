@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Support
 import Mathlib.Topology.ContinuousMap.CocompactMap
 import Mathlib.Topology.ContinuousMap.ZeroAtInfty
 
+noncomputable section
+
 /-!
 # Compactly supported continuous functions
 
@@ -69,17 +71,9 @@ instance : CompactlySupportedContinuousMapClass C_c(α, β) α β where
   map_continuous f := f.continuous_toFun
   hasCompactSupport f := f.hasCompactSupport'
 
-@[simp]
-theorem coe_toContinuousMap (f : C_c(α, β)) : (f.toContinuousMap : α → β) = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : C_c(α, β)} (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext _ _ h
-
-@[simp]
-theorem coe_mk (f : C(α, β)) (h : HasCompactSupport f) : ⇑(⟨f, h⟩ : C_c(α, β)) = f :=
-  rfl
 
 protected def copy (f : C_c(α, β)) (f' : α → β) (h : f' = f) : C_c(α, β) where
   toFun := f'
@@ -90,24 +84,11 @@ protected def copy (f : C_c(α, β)) (f' : α → β) (h : f' = f) : C_c(α, β)
     simp_rw [h]
     exact f.hasCompactSupport'
 
-@[simp]
-theorem coe_copy (f : C_c(α, β)) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : C_c(α, β)) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
 theorem eq_of_empty [IsEmpty α] (f g : C_c(α, β)) : f = g :=
   ext <| IsEmpty.elim ‹_›
-
-@[simps]
-def ContinuousMap.liftCompactlySupported [CompactSpace α] : C(α, β) ≃ C_c(α, β) where
-  toFun f :=
-    { toFun := f
-      hasCompactSupport' := HasCompactSupport.of_compactSpace f }
-  invFun f := f
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 end Basics
 
@@ -132,9 +113,6 @@ instance [Zero β] : Inhabited C_c(α, β) :=
 
 @[simp]
 theorem coe_zero [Zero β] : ⇑(0 : C_c(α, β)) = 0 :=
-  rfl
-
-theorem zero_apply [Zero β] : (0 : C_c(α, β)) x = 0 :=
   rfl
 
 instance [MulZeroClass β] [ContinuousMul β] : Mul C_c(α, β) :=
@@ -181,9 +159,6 @@ instance [AddZeroClass β] [ContinuousAdd β] : Add C_c(α, β) :=
 theorem coe_add [AddZeroClass β] [ContinuousAdd β] (f g : C_c(α, β)) : ⇑(f + g) = f + g :=
   rfl
 
-theorem add_apply [AddZeroClass β] [ContinuousAdd β] (f g : C_c(α, β)) : (f + g) x = f x + g x :=
-  rfl
-
 instance [AddZeroClass β] [ContinuousAdd β] : AddZeroClass C_c(α, β) :=
   DFunLike.coe_injective.addZeroClass _ coe_zero coe_add
 
@@ -222,9 +197,6 @@ theorem coe_sum [AddCommMonoid β] [ContinuousAdd β] {ι : Type*} (s : Finset �
     ⇑(∑ i in s, f i) = ∑ i in s, (f i : α → β) :=
   map_sum coeFnMonoidHom f s
 
-theorem sum_apply [AddCommMonoid β] [ContinuousAdd β] {ι : Type*} (s : Finset ι) (f : ι → C_c(α, β))
-    (a : α) : (∑ i in s, f i) a = ∑ i in s, f i a := by simp
-
 section AddGroup
 
 variable [AddGroup β] [TopologicalAddGroup β] (f g : C_c(α, β))
@@ -238,9 +210,6 @@ instance : Neg C_c(α, β) where
 theorem coe_neg : ⇑(-f) = -f :=
   rfl
 
-theorem neg_apply : (-f) x = -f x :=
-  rfl
-
 instance : Sub C_c(α, β) where
   sub f g := { toFun := f.1 - g.1
                continuous_toFun := map_continuous (f.1 - g.1)
@@ -249,9 +218,6 @@ instance : Sub C_c(α, β) where
 
 @[simp]
 theorem coe_sub : ⇑(f - g) = f - g :=
-  rfl
-
-theorem sub_apply : (f - g) x = f x - g x :=
   rfl
 
 instance : AddGroup C_c(α, β) :=
@@ -349,13 +315,6 @@ instance : Star C_c(α, β) where
         rw [support_star]
         exact f.2 }
 
-@[simp]
-theorem coe_star (f : C_c(α, β)) : ⇑(star f) = star (⇑f) :=
-  rfl
-
-theorem star_apply (f : C_c(α, β)) (x : α) : (star f) x = star (f x) :=
-  rfl
-
 instance [TrivialStar β] : TrivialStar C_c(α, β) where
     star_trivial f := ext fun x => star_trivial (f x)
 
@@ -413,47 +372,14 @@ def comp (f : C_c(γ, δ)) (g : β →co γ) : C_c(β, δ) where
     exact ⟨g y, hy⟩
 
 @[simp]
-theorem coe_comp_to_continuous_fun (f : C_c(γ, δ)) (g : β →co γ) : ((f.comp g) : β → δ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_id (f : C_c(γ, δ)) : f.comp (CocompactMap.id γ) = f :=
   ext fun _ => rfl
 
-@[simp]
-theorem comp_assoc (f : C_c(γ, δ)) (g : β →co γ) (h : α →co β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
-  rfl
-
-@[simp]
-theorem zero_comp (g : β →co γ) : (0 : C_c(γ, δ)).comp g = 0 :=
-  rfl
-
 end
-
-def compAddMonoidHom [AddMonoid δ] [ContinuousAdd δ] (g : β →co γ) : C_c(γ, δ) →+ C_c(β, δ) where
-  toFun f := f.comp g
-  map_zero' := zero_comp g
-  map_add' _ _ := rfl
 
 -- CONFLATES (assumes ground = zero): compMulHom
 def compMulHom [MulZeroClass δ] [ContinuousMul δ] (g : β →co γ) : C_c(γ, δ) →ₙ* C_c(β, δ) where
   toFun f := f.comp g
-  map_mul' _ _ := rfl
-
-def compLinearMap [AddCommMonoid δ] [ContinuousAdd δ] {R : Type*} [Semiring R] [Module R δ]
-    [ContinuousConstSMul R δ] (g : β →co γ) : C_c(γ, δ) →ₗ[R] C_c(β, δ) where
-  toFun f := f.comp g
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-def compNonUnitalAlgHom {R : Type*} [Semiring R] [NonUnitalNonAssocSemiring δ]
-    [TopologicalSemiring δ] [Module R δ] [ContinuousConstSMul R δ] (g : β →co γ) :
-    C_c(γ, δ) →ₙₐ[R] C_c(β, δ) where
-  toFun f := f.comp g
-  map_smul' _ _ := rfl
-  map_zero' := rfl
-  map_add' _ _ := rfl
   map_mul' _ _ := rfl
 
 end CompactlySupportedContinuousMap

@@ -13,6 +13,8 @@ import Mathlib.Order.Filter.SmallSets
 import Mathlib.Tactic.FinCases
 import Mathlib.Order.LiminfLimsup
 
+noncomputable section
+
 /-!
 # Measurable spaces and measurable functions
 
@@ -358,12 +360,6 @@ instance _root_.ULift.instMeasurableSpace : MeasurableSpace (ULift α) :=
 lemma measurable_down : Measurable (ULift.down : ULift α → α) := fun _ ↦ id
 
 lemma measurable_up : Measurable (ULift.up : α → ULift α) := fun _ ↦ id
-
-@[simp] lemma measurableSet_preimage_down {s : Set α} :
-    MeasurableSet (ULift.down ⁻¹' s) ↔ MeasurableSet s := Iff.rfl
-
-@[simp] lemma measurableSet_preimage_up {s : Set (ULift α)} :
-    MeasurableSet (ULift.up ⁻¹' s) ↔ MeasurableSet s := Iff.rfl
 
 end ULift
 
@@ -1325,34 +1321,16 @@ protected theorem iInter_of_antitone {ι : Type*} [Preorder ι] [IsDirected ι (
 instance Subtype.instMembership : Membership α (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun s a => a ∈ (s : Set α)⟩
 
-@[simp]
-theorem mem_coe (a : α) (s : Subtype (MeasurableSet : Set α → Prop)) : a ∈ (s : Set α) ↔ a ∈ s :=
-  Iff.rfl
-
 instance Subtype.instEmptyCollection : EmptyCollection (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨⟨∅, MeasurableSet.empty⟩⟩
-
-@[simp]
-theorem coe_empty : ↑(∅ : Subtype (MeasurableSet : Set α → Prop)) = (∅ : Set α) :=
-  rfl
 
 instance Subtype.instInsert [MeasurableSingletonClass α] :
     Insert α (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun a s => ⟨insert a (s : Set α), s.prop.insert a⟩⟩
 
-@[simp]
-theorem coe_insert [MeasurableSingletonClass α] (a : α)
-    (s : Subtype (MeasurableSet : Set α → Prop)) :
-    ↑(Insert.insert a s) = (Insert.insert a s : Set α) :=
-  rfl
-
 instance Subtype.instSingleton [MeasurableSingletonClass α] :
     Singleton α (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun a => ⟨{a}, .singleton _⟩⟩
-
-@[simp] theorem coe_singleton [MeasurableSingletonClass α] (a : α) :
-    ↑({a} : Subtype (MeasurableSet : Set α → Prop)) = ({a} : Set α) :=
-  rfl
 
 instance Subtype.instLawfulSingleton [MeasurableSingletonClass α] :
     LawfulSingleton α (Subtype (MeasurableSet : Set α → Prop)) :=
@@ -1375,9 +1353,6 @@ theorem coe_union (s t : Subtype (MeasurableSet : Set α → Prop)) : ↑(s ∪ 
 instance Subtype.instSup : Max (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun x y => x ∪ y⟩
 
-@[simp]
-protected theorem sup_eq_union (s t : {s : Set α // MeasurableSet s}) : s ⊔ t = s ∪ t := rfl
-
 instance Subtype.instInter : Inter (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun x y => ⟨x ∩ y, x.prop.inter y.prop⟩⟩
 
@@ -1387,9 +1362,6 @@ theorem coe_inter (s t : Subtype (MeasurableSet : Set α → Prop)) : ↑(s ∩ 
 
 instance Subtype.instInf : Min (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun x y => x ∩ y⟩
-
-@[simp]
-protected theorem inf_eq_inter (s t : {s : Set α // MeasurableSet s}) : s ⊓ t = s ∩ t := rfl
 
 instance Subtype.instSDiff : SDiff (Subtype (MeasurableSet : Set α → Prop)) :=
   ⟨fun x y => ⟨x \ y, x.prop.diff y.prop⟩⟩

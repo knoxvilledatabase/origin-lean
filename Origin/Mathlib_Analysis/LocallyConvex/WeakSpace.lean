@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Dual
 import Mathlib.Analysis.NormedSpace.HahnBanach.Separation
 import Mathlib.Topology.Algebra.Module.WeakDual
 
+noncomputable section
+
 /-! # Closures of convex sets in locally convex spaces
 
 This file contains the standard result that if `E` is a vector space with two locally convex

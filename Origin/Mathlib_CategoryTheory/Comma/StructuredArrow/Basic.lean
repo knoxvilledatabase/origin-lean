@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Comma.Basic
 import Mathlib.CategoryTheory.PUnit
 import Mathlib.CategoryTheory.Limits.Shapes.IsTerminal
 
+noncomputable section
+
 /-!
 # The category of "structured arrows"
 
@@ -76,9 +78,6 @@ theorem eqToHom_right {X Y : StructuredArrow S T} (h : X = Y) :
     (eqToHom h).right = eqToHom (by rw [h]) := by
   subst h
   simp only [eqToHom_refl, id_right]
-
-@[simp]
-theorem left_eq_id {X Y : StructuredArrow S T} (f : X ⟶ Y) : f.left = 𝟙 X.left := rfl
 
 @[simps]
 def homMk {f f' : StructuredArrow S T} (g : f.right ⟶ f'.right)
@@ -175,10 +174,6 @@ lemma mk_surjective (f : StructuredArrow S T) :
 @[simps!]
 def map (f : S ⟶ S') : StructuredArrow S' T ⥤ StructuredArrow S T :=
   Comma.mapLeft _ ((Functor.const _).map f)
-
-@[simp]
-theorem map_mk {f : S' ⟶ T.obj Y} (g : S ⟶ S') : (map g).obj (mk f) = mk (g ≫ f) :=
-  rfl
 
 @[simp]
 theorem map_id {f : StructuredArrow S T} : (map (𝟙 S)).obj f = f := by
@@ -364,9 +359,6 @@ theorem eqToHom_left {X Y : CostructuredArrow S T} (h : X = Y) :
   subst h
   simp only [eqToHom_refl, id_left]
 
-@[simp]
-theorem right_eq_id {X Y : CostructuredArrow S T} (f : X ⟶ Y) : f.right = 𝟙 X.right := rfl
-
 @[simps!]
 def homMk {f f' : CostructuredArrow S T} (g : f.left ⟶ f'.left)
     (w : S.map g ≫ f'.hom = f.hom := by aesop_cat) : f ⟶ f' where
@@ -457,10 +449,6 @@ lemma mk_surjective (f : CostructuredArrow S T) :
 @[simps!]
 def map (f : T ⟶ T') : CostructuredArrow S T ⥤ CostructuredArrow S T' :=
   Comma.mapRight _ ((Functor.const _).map f)
-
-@[simp]
-theorem map_mk {f : S.obj Y ⟶ T} (g : T ⟶ T') : (map g).obj (mk f) = mk (f ≫ g) :=
-  rfl
 
 @[simp]
 theorem map_id {f : CostructuredArrow S T} : (map (𝟙 T)).obj f = f := by
@@ -608,12 +596,6 @@ def toStructuredArrowCompProj (G : E ⥤ C) (X : D) (F : C ⥤ D) (f : (Y : E) �
     (h : ∀ {Y Z : E} (g : Y ⟶ Z), f Y ≫ F.map (G.map g) = f Z) :
     G.toStructuredArrow X F f h ⋙ StructuredArrow.proj _ _ ≅ G :=
   Iso.refl _
-
-@[simp]
-lemma toStructuredArrow_comp_proj (G : E ⥤ C) (X : D) (F : C ⥤ D)
-    (f : (Y : E) → X ⟶ F.obj (G.obj Y)) (h : ∀ {Y Z : E} (g : Y ⟶ Z), f Y ≫ F.map (G.map g) = f Z) :
-    G.toStructuredArrow X F f h ⋙ StructuredArrow.proj _ _ = G :=
-  rfl
 
 @[simps]
 def toCostructuredArrow (G : E ⥤ C) (F : C ⥤ D) (X : D) (f : (Y : E) → F.obj (G.obj Y) ⟶ X)

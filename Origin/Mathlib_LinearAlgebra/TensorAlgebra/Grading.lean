@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
 import Mathlib.RingTheory.GradedAlgebra.Basic
 
+noncomputable section
+
 /-!
 # Results about the grading structure of the tensor algebra
 

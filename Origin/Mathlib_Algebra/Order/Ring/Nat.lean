@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Ring.Canonical
 import Mathlib.Algebra.Ring.Nat
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 # The natural numbers form an ordered semiring
 

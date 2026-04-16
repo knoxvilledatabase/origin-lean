@@ -10,6 +10,8 @@ import Mathlib.Topology.Category.CompHaus.Basic
 import Mathlib.Topology.Category.Profinite.Basic
 import Mathlib.Data.Set.Constructions
 
+noncomputable section
+
 /-!
 
 # Compacta and Compact Hausdorff Spaces

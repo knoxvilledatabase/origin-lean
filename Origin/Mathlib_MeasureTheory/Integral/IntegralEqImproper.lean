@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Integral/IntegralEqImproper.lean
-Genuine: 106 | Conflates: 0 | Dissolved: 3 | Infrastructure: 4
+Genuine: 99 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Support
@@ -10,6 +10,8 @@ import Mathlib.Order.Filter.AtTopBot
 import Mathlib.MeasureTheory.Function.Jacobian
 import Mathlib.MeasureTheory.Measure.Haar.NormedSpace
 import Mathlib.MeasureTheory.Measure.Haar.Unique
+
+noncomputable section
 
 /-!
 # Links between an integral and its "improper" version
@@ -161,13 +163,11 @@ variable [LinearOrder α] [TopologicalSpace α] [OrderClosedTopology α] [OpensM
   {a b : ι → α} (ha : Tendsto a l atBot) (hb : Tendsto b l atTop)
 
 include ha in
-
 theorem aecover_Ioi [NoMinOrder α] : AECover μ l fun i => Ioi (a i) where
   ae_eventually_mem := ae_of_all μ ha.eventually_lt_atBot
   measurableSet _ := measurableSet_Ioi
 
 include hb in
-
 theorem aecover_Iio [NoMaxOrder α] : AECover μ l fun i => Iio (b i) := aecover_Ioi (α := αᵒᵈ) hb
 
 include ha hb
@@ -189,45 +189,37 @@ variable [LinearOrder α] [TopologicalSpace α] [OrderClosedTopology α] [OpensM
   {a b : ι → α} {A B : α} (ha : Tendsto a l (𝓝 A)) (hb : Tendsto b l (𝓝 B))
 
 include ha in
-
 theorem aecover_Ioi_of_Ioi : AECover (μ.restrict (Ioi A)) l fun i ↦ Ioi (a i) where
   ae_eventually_mem := (ae_restrict_mem measurableSet_Ioi).mono fun _x hx ↦ ha.eventually <|
     eventually_lt_nhds hx
   measurableSet _ := measurableSet_Ioi
 
 include hb in
-
 theorem aecover_Iio_of_Iio : AECover (μ.restrict (Iio B)) l fun i ↦ Iio (b i) :=
   aecover_Ioi_of_Ioi (α := αᵒᵈ) hb
 
 include ha in
-
 theorem aecover_Ioi_of_Ici : AECover (μ.restrict (Ioi A)) l fun i ↦ Ici (a i) :=
   (aecover_Ioi_of_Ioi ha).superset (fun _ ↦ Ioi_subset_Ici_self) fun _ ↦ measurableSet_Ici
 
 include hb in
-
 theorem aecover_Iio_of_Iic : AECover (μ.restrict (Iio B)) l fun i ↦ Iic (b i) :=
   aecover_Ioi_of_Ici (α := αᵒᵈ) hb
 
 include ha hb in
-
 theorem aecover_Ioo_of_Ioo : AECover (μ.restrict <| Ioo A B) l fun i => Ioo (a i) (b i) :=
   ((aecover_Ioi_of_Ioi ha).mono <| Measure.restrict_mono Ioo_subset_Ioi_self le_rfl).inter
     ((aecover_Iio_of_Iio hb).mono <| Measure.restrict_mono Ioo_subset_Iio_self le_rfl)
 
 include ha hb in
-
 theorem aecover_Ioo_of_Icc : AECover (μ.restrict <| Ioo A B) l fun i => Icc (a i) (b i) :=
   (aecover_Ioo_of_Ioo ha hb).superset (fun _ ↦ Ioo_subset_Icc_self) fun _ ↦ measurableSet_Icc
 
 include ha hb in
-
 theorem aecover_Ioo_of_Ico : AECover (μ.restrict <| Ioo A B) l fun i => Ico (a i) (b i) :=
   (aecover_Ioo_of_Ioo ha hb).superset (fun _ ↦ Ioo_subset_Ico_self) fun _ ↦ measurableSet_Ico
 
 include ha hb in
-
 theorem aecover_Ioo_of_Ioc : AECover (μ.restrict <| Ioo A B) l fun i => Ioc (a i) (b i) :=
   (aecover_Ioo_of_Ioo ha hb).superset (fun _ ↦ Ioo_subset_Ioc_self) fun _ ↦ measurableSet_Ioc
 
@@ -972,7 +964,29 @@ theorem integral_comp_mul_deriv_Ioi {f f' : ℝ → ℝ} {g : ℝ → ℝ} {a : 
   have hg2' : IntegrableOn (fun x => f' x • (g ∘ f) x) (Ici a) := by simpa [mul_comm] using hg2
   simpa [mul_comm] using integral_comp_smul_deriv_Ioi hf hft hff' hg_cont hg1 hg2'
 
--- DISSOLVED: integral_comp_rpow_Ioi
+theorem integral_comp_rpow_Ioi (g : ℝ → E) {p : ℝ} (hp : p ≠ 0) :
+    (∫ x in Ioi 0, (|p| * x ^ (p - 1)) • g (x ^ p)) = ∫ y in Ioi 0, g y := by
+  let S := Ioi (0 : ℝ)
+  have a1 : ∀ x : ℝ, x ∈ S → HasDerivWithinAt (fun t : ℝ => t ^ p) (p * x ^ (p - 1)) S x :=
+    fun x hx => (hasDerivAt_rpow_const (Or.inl (mem_Ioi.mp hx).ne')).hasDerivWithinAt
+  have a2 : InjOn (fun x : ℝ => x ^ p) S := by
+    rcases lt_or_gt_of_ne hp with (h | h)
+    · apply StrictAntiOn.injOn
+      intro x hx y hy hxy
+      rw [← inv_lt_inv₀ (rpow_pos_of_pos hx p) (rpow_pos_of_pos hy p), ← rpow_neg (le_of_lt hx),
+        ← rpow_neg (le_of_lt hy)]
+      exact rpow_lt_rpow (le_of_lt hx) hxy (neg_pos.mpr h)
+    exact StrictMonoOn.injOn fun x hx y _ hxy => rpow_lt_rpow (mem_Ioi.mp hx).le hxy h
+  have a3 : (fun t : ℝ => t ^ p) '' S = S := by
+    ext1 x; rw [mem_image]; constructor
+    · rintro ⟨y, hy, rfl⟩; exact rpow_pos_of_pos hy p
+    · intro hx; refine ⟨x ^ (1 / p), rpow_pos_of_pos hx _, ?_⟩
+      rw [← rpow_mul (le_of_lt hx), one_div_mul_cancel hp, rpow_one]
+  have := integral_image_eq_integral_abs_deriv_smul measurableSet_Ioi a1 a2 g
+  rw [a3] at this; rw [this]
+  refine setIntegral_congr_fun measurableSet_Ioi ?_
+  intro x hx; dsimp only
+  rw [abs_mul, abs_of_nonneg (rpow_nonneg (le_of_lt hx) _)]
 
 theorem integral_comp_rpow_Ioi_of_pos {g : ℝ → E} {p : ℝ} (hp : 0 < p) :
     (∫ x in Ioi 0, (p * x ^ (p - 1)) • g (x ^ p)) = ∫ y in Ioi 0, g y := by
@@ -1003,9 +1017,34 @@ open scoped Interval
 
 variable {E : Type*} [NormedAddCommGroup E]
 
--- DISSOLVED: integrableOn_Ioi_comp_rpow_iff
+theorem integrableOn_Ioi_comp_rpow_iff [NormedSpace ℝ E] (f : ℝ → E) {p : ℝ} (hp : p ≠ 0) :
+    IntegrableOn (fun x => (|p| * x ^ (p - 1)) • f (x ^ p)) (Ioi 0) ↔ IntegrableOn f (Ioi 0) := by
+  let S := Ioi (0 : ℝ)
+  have a1 : ∀ x : ℝ, x ∈ S → HasDerivWithinAt (fun t : ℝ => t ^ p) (p * x ^ (p - 1)) S x :=
+    fun x hx => (hasDerivAt_rpow_const (Or.inl (mem_Ioi.mp hx).ne')).hasDerivWithinAt
+  have a2 : InjOn (fun x : ℝ => x ^ p) S := by
+    rcases lt_or_gt_of_ne hp with (h | h)
+    · apply StrictAntiOn.injOn
+      intro x hx y hy hxy
+      rw [← inv_lt_inv₀ (rpow_pos_of_pos hx p) (rpow_pos_of_pos hy p), ← rpow_neg (le_of_lt hx), ←
+        rpow_neg (le_of_lt hy)]
+      exact rpow_lt_rpow (le_of_lt hx) hxy (neg_pos.mpr h)
+    exact StrictMonoOn.injOn fun x hx y _hy hxy => rpow_lt_rpow (mem_Ioi.mp hx).le hxy h
+  have a3 : (fun t : ℝ => t ^ p) '' S = S := by
+    ext1 x; rw [mem_image]; constructor
+    · rintro ⟨y, hy, rfl⟩; exact rpow_pos_of_pos hy p
+    · intro hx; refine ⟨x ^ (1 / p), rpow_pos_of_pos hx _, ?_⟩
+      rw [← rpow_mul (le_of_lt hx), one_div_mul_cancel hp, rpow_one]
+  have := integrableOn_image_iff_integrableOn_abs_deriv_smul measurableSet_Ioi a1 a2 f
+  rw [a3] at this
+  rw [this]
+  refine integrableOn_congr_fun (fun x hx => ?_) measurableSet_Ioi
+  simp_rw [abs_mul, abs_of_nonneg (rpow_nonneg (le_of_lt hx) _)]
 
--- DISSOLVED: integrableOn_Ioi_comp_rpow_iff'
+theorem integrableOn_Ioi_comp_rpow_iff' [NormedSpace ℝ E] (f : ℝ → E) {p : ℝ} (hp : p ≠ 0) :
+    IntegrableOn (fun x => x ^ (p - 1) • f (x ^ p)) (Ioi 0) ↔ IntegrableOn f (Ioi 0) := by
+  simpa only [← integrableOn_Ioi_comp_rpow_iff f hp, mul_smul] using
+    (integrable_smul_iff (abs_pos.mpr hp).ne' _).symm
 
 theorem integrableOn_Ioi_comp_mul_left_iff (f : ℝ → E) (c : ℝ) {a : ℝ} (ha : 0 < a) :
     IntegrableOn (fun x => f (a * x)) (Ioi c) ↔ IntegrableOn f (Ioi <| a * c) := by

@@ -5,6 +5,8 @@ Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.Basic
 
+noncomputable section
+
 /-!
 # Operations on outer measures
 
@@ -62,9 +64,6 @@ instance instAdd : Add (OuterMeasure α) :=
 
 @[simp]
 theorem coe_add (m₁ m₂ : OuterMeasure α) : ⇑(m₁ + m₂) = m₁ + m₂ :=
-  rfl
-
-theorem add_apply (m₁ m₂ : OuterMeasure α) (s : Set α) : (m₁ + m₂) s = m₁ s + m₂ s :=
   rfl
 
 section SMul
@@ -245,17 +244,6 @@ def dirac (a : α) : OuterMeasure α where
 
 @[simp]
 theorem dirac_apply (a : α) (s : Set α) : dirac a s = indicator s (fun _ => 1) a :=
-  rfl
-
-def sum {ι} (f : ι → OuterMeasure α) : OuterMeasure α where
-  measureOf s := ∑' i, f i s
-  empty := by simp
-  mono {_ _} h := ENNReal.tsum_le_tsum fun _ => measure_mono h
-  iUnion_nat s _ := by
-    rw [ENNReal.tsum_comm]; exact ENNReal.tsum_le_tsum fun i => measure_iUnion_le _
-
-@[simp]
-theorem sum_apply {ι} (f : ι → OuterMeasure α) (s : Set α) : sum f s = ∑' i, f i s :=
   rfl
 
 theorem smul_dirac_apply (a : ℝ≥0∞) (b : α) (s : Set α) :

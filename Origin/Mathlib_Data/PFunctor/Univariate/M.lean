@@ -5,6 +5,8 @@ Genuine: 65 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Data.PFunctor.Univariate.Basic
 
+noncomputable section
+
 /-!
 # M-types
 

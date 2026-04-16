@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Matrix/Kronecker.lean
-Genuine: 60 | Conflates: 5 | Dissolved: 1 | Infrastructure: 3
+Genuine: 61 | Conflates: 5 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Basic
@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import Mathlib.RingTheory.TensorProduct.Basic
+
+noncomputable section
 
 /-!
 # Kronecker product of matrices
@@ -125,7 +127,11 @@ theorem kroneckerMap_diagonal_left [Zero α] [Zero γ] [DecidableEq l] (f : α �
   ext ⟨i₁, i₂⟩ ⟨j₁, j₂⟩
   simp [diagonal, blockDiagonal, apply_ite f, ite_apply, hf]
 
--- DISSOLVED: kroneckerMap_one_one
+@[simp]
+theorem kroneckerMap_one_one [Zero α] [Zero β] [Zero γ] [One α] [One β] [One γ] [DecidableEq m]
+    [DecidableEq n] (f : α → β → γ) (hf₁ : ∀ b, f 0 b = 0) (hf₂ : ∀ a, f a 0 = 0)
+    (hf₃ : f 1 1 = 1) : kroneckerMap f (1 : Matrix m m α) (1 : Matrix n n β) = 1 :=
+  (kroneckerMap_diagonal_diagonal _ hf₁ hf₂ _ _).trans <| by simp only [hf₃, diagonal_one]
 
 theorem kroneckerMap_reindex (f : α → β → γ) (el : l ≃ l') (em : m ≃ m') (en : n ≃ n') (ep : p ≃ p')
     (M : Matrix l m α) (N : Matrix n p β) :
@@ -224,11 +230,6 @@ def kronecker [Mul α] : Matrix l m α → Matrix n p α → Matrix (l × n) (m 
 scoped[Kronecker] infixl:100 " ⊗ₖ " => Matrix.kroneckerMap (· * ·)
 
 open Kronecker
-
-@[simp]
-theorem kronecker_apply [Mul α] (A : Matrix l m α) (B : Matrix n p α) (i₁ i₂ j₁ j₂) :
-    (A ⊗ₖ B) (i₁, i₂) (j₁, j₂) = A i₁ j₁ * B i₂ j₂ :=
-  rfl
 
 def kroneckerBilinear [CommSemiring R] [Semiring α] [Algebra R α] :
     Matrix l m α →ₗ[R] Matrix n p α →ₗ[R] Matrix (l × n) (m × p) α :=
@@ -404,11 +405,6 @@ scoped[Kronecker]
   notation:100 x " ⊗ₖₜ[" R "] " y:100 => Matrix.kroneckerMap (TensorProduct.tmul R) x y
 
 open Kronecker
-
-@[simp]
-theorem kroneckerTMul_apply (A : Matrix l m α) (B : Matrix n p β) (i₁ i₂ j₁ j₂) :
-    (A ⊗ₖₜ B) (i₁, i₂) (j₁, j₂) = A i₁ j₁ ⊗ₜ[R] B i₂ j₂ :=
-  rfl
 
 def kroneckerTMulBilinear :
     Matrix l m α →ₗ[R] Matrix n p β →ₗ[R] Matrix (l × n) (m × p) (α ⊗[R] β) :=

@@ -5,6 +5,8 @@ Genuine: 49 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Data.Finset.Lattice.Lemmas
 
+noncomputable section
+
 /-!
 # Difference of finite sets
 
@@ -36,10 +38,6 @@ variable [DecidableEq α] {s t u v : Finset α} {a b : α}
 
 instance : SDiff (Finset α) :=
   ⟨fun s₁ s₂ => ⟨s₁.1 - s₂.1, nodup_of_le (Multiset.sub_le_self ..) s₁.2⟩⟩
-
-@[simp]
-theorem sdiff_val (s₁ s₂ : Finset α) : (s₁ \ s₂).val = s₁.val - s₂.val :=
-  rfl
 
 @[simp]
 theorem mem_sdiff : a ∈ s \ t ↔ a ∈ s ∧ a ∉ t :=

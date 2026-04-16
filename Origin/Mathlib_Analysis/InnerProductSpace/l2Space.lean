@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Analysis.Normed.Lp.lpSpace
 import Mathlib.Analysis.InnerProductSpace.PiL2
 
+noncomputable section
+
 /-!
 # Hilbert sum of a family of inner product spaces
 
@@ -148,9 +150,6 @@ instance instInnerProductSpace : InnerProductSpace 𝕜 (lp G 2) :=
       · simp only [coeFn_smul, Pi.smul_apply]
       · congr }
 
-theorem inner_eq_tsum (f g : lp G 2) : ⟪f, g⟫ = ∑' i, ⟪f i, g i⟫ :=
-  rfl
-
 theorem hasSum_inner (f g : lp G 2) : HasSum (fun i => ⟪f i, g i⟫) ⟪f, g⟫ :=
   (summable_inner f g).hasSum
 
@@ -221,10 +220,6 @@ protected theorem linearIsometry_apply_single [DecidableEq ι] {i : ι} (x : G i
   split_ifs with h
   · subst h; simp
   · simp [h]
-
-protected theorem linearIsometry_apply_dfinsupp_sum_single [DecidableEq ι] [∀ i, DecidableEq (G i)]
-    (W₀ : Π₀ i : ι, G i) : hV.linearIsometry (W₀.sum (lp.single 2)) = W₀.sum fun i => V i := by
-  simp
 
 protected theorem range_linearIsometry [∀ i, CompleteSpace (G i)] :
     LinearMap.range hV.linearIsometry.toLinearMap =

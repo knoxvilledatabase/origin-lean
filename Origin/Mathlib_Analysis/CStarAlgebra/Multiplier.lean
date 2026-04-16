@@ -8,6 +8,8 @@ import Mathlib.Analysis.CStarAlgebra.Unitization
 import Mathlib.Analysis.CStarAlgebra.Classes
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 
+noncomputable section
+
 /-!
 # Multiplier Algebra of a C⋆-algebra
 
@@ -140,16 +142,6 @@ instance instSMul : SMul S 𝓜(𝕜, A) where
         show (s • a.snd) x * y = x * (s • a.fst) y by
           simp only [ContinuousLinearMap.smul_apply, mul_smul_comm, smul_mul_assoc, central] }
 
-@[simp]
-theorem smul_toProd (s : S) (a : 𝓜(𝕜, A)) : (s • a).toProd = s • a.toProd :=
-  rfl
-
-theorem smul_fst (s : S) (a : 𝓜(𝕜, A)) : (s • a).fst = s • a.fst :=
-  rfl
-
-theorem smul_snd (s : S) (a : 𝓜(𝕜, A)) : (s • a).snd = s • a.snd :=
-  rfl
-
 variable {T : Type*} [Monoid T] [DistribMulAction T A] [SMulCommClass 𝕜 T A]
   [ContinuousConstSMul T A] [IsScalarTower T A A] [SMulCommClass T A A]
 
@@ -198,26 +190,6 @@ instance instInhabited : Inhabited 𝓜(𝕜, A) :=
   ⟨0⟩
 
 @[simp]
-theorem add_toProd (a b : 𝓜(𝕜, A)) : (a + b).toProd = a.toProd + b.toProd :=
-  rfl
-
-@[simp]
-theorem zero_toProd : (0 : 𝓜(𝕜, A)).toProd = 0 :=
-  rfl
-
-@[simp]
-theorem neg_toProd (a : 𝓜(𝕜, A)) : (-a).toProd = -a.toProd :=
-  rfl
-
-@[simp]
-theorem sub_toProd (a b : 𝓜(𝕜, A)) : (a - b).toProd = a.toProd - b.toProd :=
-  rfl
-
-@[simp]
-theorem one_toProd : (1 : 𝓜(𝕜, A)).toProd = 1 :=
-  rfl
-
-@[simp]
 theorem natCast_toProd (n : ℕ) : (n : 𝓜(𝕜, A)).toProd = n :=
   rfl
 
@@ -229,38 +201,10 @@ theorem intCast_toProd (n : ℤ) : (n : 𝓜(𝕜, A)).toProd = n :=
 
 alias int_cast_toProd := intCast_toProd
 
-@[simp]
-theorem pow_toProd (n : ℕ) (a : 𝓜(𝕜, A)) : (a ^ n).toProd = a.toProd ^ n :=
-  rfl
-
 theorem add_fst (a b : 𝓜(𝕜, A)) : (a + b).fst = a.fst + b.fst :=
   rfl
 
 theorem add_snd (a b : 𝓜(𝕜, A)) : (a + b).snd = a.snd + b.snd :=
-  rfl
-
-theorem zero_fst : (0 : 𝓜(𝕜, A)).fst = 0 :=
-  rfl
-
-theorem zero_snd : (0 : 𝓜(𝕜, A)).snd = 0 :=
-  rfl
-
-theorem neg_fst (a : 𝓜(𝕜, A)) : (-a).fst = -a.fst :=
-  rfl
-
-theorem neg_snd (a : 𝓜(𝕜, A)) : (-a).snd = -a.snd :=
-  rfl
-
-theorem sub_fst (a b : 𝓜(𝕜, A)) : (a - b).fst = a.fst - b.fst :=
-  rfl
-
-theorem sub_snd (a b : 𝓜(𝕜, A)) : (a - b).snd = a.snd - b.snd :=
-  rfl
-
-theorem one_fst : (1 : 𝓜(𝕜, A)).fst = 1 :=
-  rfl
-
-theorem one_snd : (1 : 𝓜(𝕜, A)).snd = 1 :=
   rfl
 
 @[simp]
@@ -357,16 +301,6 @@ instance instAlgebra : Algebra 𝕜 𝓜(𝕜, A) where
   smul_def' _ _ := ext (𝕜 := 𝕜) (A := A) _ _ <|
     Prod.ext (Algebra.smul_def _ _) ((Algebra.smul_def _ _).trans <| Algebra.commutes _ _)
 
-@[simp]
-theorem algebraMap_toProd (k : 𝕜) : (algebraMap 𝕜 𝓜(𝕜, A) k).toProd = algebraMap 𝕜 _ k :=
-  rfl
-
-theorem algebraMap_fst (k : 𝕜) : (algebraMap 𝕜 𝓜(𝕜, A) k).fst = algebraMap 𝕜 _ k :=
-  rfl
-
-theorem algebraMap_snd (k : 𝕜) : (algebraMap 𝕜 𝓜(𝕜, A) k).snd = algebraMap 𝕜 _ k :=
-  rfl
-
 /-!
 ### Star structure
 -/
@@ -431,14 +365,6 @@ variable {𝕜}
 noncomputable instance : CoeTC A 𝓜(𝕜, A) where
   coe := DoubleCentralizer.coe 𝕜
 
-@[simp, norm_cast]
-theorem coe_fst (a : A) : (a : 𝓜(𝕜, A)).fst = ContinuousLinearMap.mul 𝕜 A a :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_snd (a : A) : (a : 𝓜(𝕜, A)).snd = (ContinuousLinearMap.mul 𝕜 A).flip a :=
-  rfl
-
 theorem coe_eq_algebraMap : (DoubleCentralizer.coe 𝕜 : 𝕜 → 𝓜(𝕜, 𝕜)) = algebraMap 𝕜 𝓜(𝕜, 𝕜) := by
   ext x : 3
   · rfl -- `fst` is defeq
@@ -475,15 +401,6 @@ noncomputable instance : NormedRing 𝓜(𝕜, A) :=
     (by simpa using toProdMulOpposite_injective)
 
 theorem norm_def (a : 𝓜(𝕜, A)) : ‖a‖ = ‖toProdHom a‖ :=
-  rfl
-
-theorem nnnorm_def (a : 𝓜(𝕜, A)) : ‖a‖₊ = ‖toProdHom a‖₊ :=
-  rfl
-
-theorem norm_def' (a : 𝓜(𝕜, A)) : ‖a‖ = ‖toProdMulOppositeHom a‖ :=
-  rfl
-
-theorem nnnorm_def' (a : 𝓜(𝕜, A)) : ‖a‖₊ = ‖toProdMulOppositeHom a‖₊ :=
   rfl
 
 instance instNormedSpace : NormedSpace 𝕜 𝓜(𝕜, A) :=

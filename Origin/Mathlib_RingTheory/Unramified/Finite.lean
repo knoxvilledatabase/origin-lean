@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Ideal.IdempotentFG
 import Mathlib.RingTheory.Unramified.Basic
 import Mathlib.RingTheory.Flat.Stability
 
+noncomputable section
+
 /-!
 # Various results about unramified algebras
 
@@ -120,7 +122,6 @@ variable [FormallyUnramified R S] [EssFiniteType R S]
 variable (R S) in
 
 noncomputable
-
 def elem : S ⊗[R] S :=
   (iff_exists_tensorProduct.mp inferInstance).choose
 
@@ -217,7 +218,6 @@ lemma finite_of_free [Module.Free R S] : Module.Finite R S := by
   use j, hj, i, hi
 
 noncomputable
-
 def sec :
     M →ₗ[S] S ⊗[R] M where
   __ := ((TensorProduct.AlgebraTensorModule.mapBilinear R S S S S S M

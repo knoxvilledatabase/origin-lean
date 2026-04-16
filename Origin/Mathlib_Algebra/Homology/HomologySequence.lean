@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Homology/HomologySequence.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 import Mathlib.Algebra.Homology.ShortComplex.SnakeLemma
 import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 import Mathlib.Algebra.Homology.HomologicalComplexLimits
+
+noncomputable section
 
 /-!
 # The homology sequence
@@ -106,22 +108,16 @@ instance [K.HasHomology i] [K.HasHomology j] :
   dsimp
   infer_instance
 
-We turn off simprocs here.
-
-Ideally someone will investigate whether `simp` lemmas can be rearranged
-
-so that this works without the `set_option`,
-
-*or* come up with a proposal regarding finer control of disabling simprocs. -/
-
 set_option simprocs false in
-
 instance [K.HasHomology i] [K.HasHomology j] :
     Epi ((composableArrows₃ K i j).map' 2 3) := by
   dsimp
   infer_instance
 
 include hij in
+/-- The diagram `K.homology i ⟶ K.opcycles i ⟶ K.cycles j ⟶ K.homology j` is exact
+
+when `c.Rel i j`. -/
 
 lemma composableArrows₃_exact [CategoryWithHomology C] :
     (composableArrows₃ K i j).Exact := by
@@ -151,15 +147,10 @@ variable (C)
 
 attribute [local simp] homologyMap_comp cyclesMap_comp opcyclesMap_comp
 
-We turn off simprocs here.
-
-Ideally someone will investigate whether `simp` lemmas can be rearranged
-
-so that this works without the `set_option`,
-
-*or* come up with a proposal regarding finer control of disabling simprocs. -/
-
 set_option simprocs false in
+/-- The functor `HomologicalComplex C c ⥤ ComposableArrows C 3` that maps `K` to the
+
+diagram `K.homology i ⟶ K.opcycles i ⟶ K.cycles j ⟶ K.homology j`. -/
 
 @[simps]
 noncomputable def composableArrows₃Functor [CategoryWithHomology C] :
@@ -284,6 +275,7 @@ lemma homology_exact₁ : (ShortComplex.mk _ _ (δ_comp hS i j hij)).Exact :=
   (snakeInput hS i j hij).L₂'_exact
 
 include hS in
+/-- Exactness of `S.X₁.homology i ⟶ S.X₂.homology i ⟶ S.X₃.homology i`. -/
 
 lemma homology_exact₂ : (ShortComplex.mk (HomologicalComplex.homologyMap S.f i)
     (HomologicalComplex.homologyMap S.g i) (by rw [← HomologicalComplex.homologyMap_comp,

@@ -8,6 +8,8 @@ import Mathlib.Topology.Category.TopCat.Sphere
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.CategoryTheory.Functor.OfSequence
 
+noncomputable section
+
 /-!
 # CW-complexes
 

@@ -1,9 +1,11 @@
 /-
 Extracted from Topology/MetricSpace/Defs.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 21
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Pseudo.Defs
+
+noncomputable section
 
 /-!
 # Metric spaces
@@ -63,7 +65,8 @@ theorem dist_eq_zero {x y : γ} : dist x y = 0 ↔ x = y :=
 @[simp]
 theorem zero_eq_dist {x y : γ} : 0 = dist x y ↔ x = y := by rw [eq_comm, dist_eq_zero]
 
--- DISSOLVED: dist_ne_zero
+theorem dist_ne_zero {x y : γ} : dist x y ≠ 0 ↔ x ≠ y := by
+  simpa only [not_iff_not] using dist_eq_zero
 
 @[simp]
 theorem dist_le_zero {x y : γ} : dist x y ≤ 0 ↔ x = y := by
@@ -172,28 +175,11 @@ instance : Dist (Additive X) := ‹Dist X›
 
 instance : Dist (Multiplicative X) := ‹Dist X›
 
-@[simp] theorem dist_ofMul (a b : X) : dist (ofMul a) (ofMul b) = dist a b := rfl
-
-@[simp] theorem dist_ofAdd (a b : X) : dist (ofAdd a) (ofAdd b) = dist a b := rfl
-
-@[simp] theorem dist_toMul (a b : Additive X) : dist a.toMul b.toMul = dist a b := rfl
-
-@[simp] theorem dist_toAdd (a b : Multiplicative X) : dist a.toAdd b.toAdd = dist a b := rfl
-
 end
 
 section
 
 variable [PseudoMetricSpace X]
-
-@[simp] theorem nndist_ofMul (a b : X) : nndist (ofMul a) (ofMul b) = nndist a b := rfl
-
-@[simp] theorem nndist_ofAdd (a b : X) : nndist (ofAdd a) (ofAdd b) = nndist a b := rfl
-
-@[simp] theorem nndist_toMul (a b : Additive X) : nndist a.toMul b.toMul = nndist a b := rfl
-
-@[simp]
-theorem nndist_toAdd (a b : Multiplicative X) : nndist a.toAdd b.toAdd = nndist a b := rfl
 
 end
 
@@ -215,10 +201,6 @@ variable [Dist X]
 
 instance : Dist Xᵒᵈ := ‹Dist X›
 
-@[simp] theorem dist_toDual (a b : X) : dist (toDual a) (toDual b) = dist a b := rfl
-
-@[simp] theorem dist_ofDual (a b : Xᵒᵈ) : dist (ofDual a) (ofDual b) = dist a b := rfl
-
 end
 
 section
@@ -226,10 +208,6 @@ section
 variable [PseudoMetricSpace X]
 
 instance : PseudoMetricSpace Xᵒᵈ := ‹PseudoMetricSpace X›
-
-@[simp] theorem nndist_toDual (a b : X) : nndist (toDual a) (toDual b) = nndist a b := rfl
-
-@[simp] theorem nndist_ofDual (a b : Xᵒᵈ) : nndist (ofDual a) (ofDual b) = nndist a b := rfl
 
 end
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Opposite
 import Mathlib.Algebra.Ring.Hom.Defs
 
+noncomputable section
+
 /-!
 # Ring structures on the multiplicative opposite
 -/

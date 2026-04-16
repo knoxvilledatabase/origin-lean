@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.ConjFinite
 import Mathlib.GroupTheory.GroupAction.Quotient
 
+noncomputable section
+
 /-!
 # A consequence of Burnside's lemma
 

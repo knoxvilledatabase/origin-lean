@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Algebra.Polynomial.Eval.Subring
 import Mathlib.Algebra.Polynomial.Monic
 
+noncomputable section
+
 /-!
 # Polynomials that lift
 

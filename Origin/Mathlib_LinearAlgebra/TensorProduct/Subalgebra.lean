@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Submodule
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 
 # Some results on tensor product of subalgebras
@@ -74,9 +76,6 @@ theorem lTensorBot_tmul (x : R) (a : A) : A.lTensorBot (algebraMap R _ x ⊗ₜ[
 theorem lTensorBot_one_tmul (a : A) : A.lTensorBot (1 ⊗ₜ[R] a) = a :=
   (toSubmodule A).lTensorOne_one_tmul a
 
-@[simp]
-theorem lTensorBot_symm_apply (a : A) : A.lTensorBot.symm a = 1 ⊗ₜ[R] a := rfl
-
 variable (A)
 
 def rTensorBot : A ⊗[R] (⊥ : Subalgebra R S) ≃ₐ[R] A := by
@@ -103,9 +102,6 @@ theorem rTensorBot_tmul (x : R) (a : A) : A.rTensorBot (a ⊗ₜ[R] algebraMap R
 theorem rTensorBot_tmul_one (a : A) : A.rTensorBot (a ⊗ₜ[R] 1) = a :=
   (toSubmodule A).rTensorOne_tmul_one a
 
-@[simp]
-theorem rTensorBot_symm_apply (a : A) : A.rTensorBot.symm a = a ⊗ₜ[R] 1 := rfl
-
 variable (A)
 
 @[simp]
@@ -128,12 +124,6 @@ variable (A B : Subalgebra R S)
 
 def mulMap : A ⊗[R] B →ₐ[R] S := Algebra.TensorProduct.productMap A.val B.val
 
-@[simp]
-theorem mulMap_tmul (a : A) (b : B) : mulMap A B (a ⊗ₜ[R] b) = a.1 * b.1 := rfl
-
-theorem mulMap_toLinearMap : (A.mulMap B).toLinearMap = (toSubmodule A).mulMap (toSubmodule B) :=
-  rfl
-
 theorem mulMap_comm : mulMap B A = (mulMap A B).comp (Algebra.TensorProduct.comm R B A) := by
   ext <;> simp
 
@@ -150,9 +140,6 @@ def mulMap' : A ⊗[R] B →ₐ[R] ↥(A ⊔ B) :=
   (equivOfEq _ _ (mulMap_range A B)).toAlgHom.comp (mulMap A B).rangeRestrict
 
 variable {A B} in
-
-@[simp]
-theorem val_mulMap'_tmul (a : A) (b : B) : (mulMap' A B (a ⊗ₜ[R] b) : S) = a.1 * b.1 := rfl
 
 theorem mulMap'_surjective : Function.Surjective (mulMap' A B) := by
   simp_rw [mulMap', AlgEquiv.toAlgHom_eq_coe, AlgHom.coe_comp, AlgHom.coe_coe,

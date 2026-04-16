@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Group/Prod.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 1 | Infrastructure: 70
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 71
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Opposite
 import Mathlib.Algebra.Group.Units.Hom
+
+noncomputable section
 
 /-!
 # Monoid, group etc structures on `M × N`
@@ -38,24 +40,8 @@ instance instMul [Mul M] [Mul N] : Mul (M × N) :=
   ⟨fun p q => ⟨p.1 * q.1, p.2 * q.2⟩⟩
 
 @[to_additive (attr := simp)]
-theorem fst_mul [Mul M] [Mul N] (p q : M × N) : (p * q).1 = p.1 * q.1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_mul [Mul M] [Mul N] (p q : M × N) : (p * q).2 = p.2 * q.2 :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem mk_mul_mk [Mul M] [Mul N] (a₁ a₂ : M) (b₁ b₂ : N) :
     (a₁, b₁) * (a₂, b₂) = (a₁ * a₂, b₁ * b₂) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem swap_mul [Mul M] [Mul N] (p q : M × N) : (p * q).swap = p.swap * q.swap :=
-  rfl
-
-@[to_additive]
-theorem mul_def [Mul M] [Mul N] (p q : M × N) : p * q = (p.1 * q.1, p.2 * q.2) :=
   rfl
 
 @[to_additive]
@@ -73,26 +59,8 @@ instance instOne [One M] [One N] : One (M × N) :=
   ⟨(1, 1)⟩
 
 @[to_additive (attr := simp)]
-theorem fst_one [One M] [One N] : (1 : M × N).1 = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_one [One M] [One N] : (1 : M × N).2 = 1 :=
-  rfl
-
-@[to_additive]
-theorem one_eq_mk [One M] [One N] : (1 : M × N) = (1, 1) :=
-  rfl
-
--- DISSOLVED: mk_one_one
-
-@[to_additive (attr := simp)]
 theorem mk_eq_one [One M] [One N] {x : M} {y : N} : (x, y) = 1 ↔ x = 1 ∧ y = 1 :=
   mk.inj_iff
-
-@[to_additive (attr := simp)]
-theorem swap_one [One M] [One N] : (1 : M × N).swap = 1 :=
-  rfl
 
 @[to_additive]
 theorem fst_mul_snd [MulOneClass M] [MulOneClass N] (p : M × N) : (p.fst, 1) * (1, p.snd) = p :=
@@ -102,22 +70,6 @@ theorem fst_mul_snd [MulOneClass M] [MulOneClass N] (p : M × N) : (p.fst, 1) * 
 instance instInv [Inv M] [Inv N] : Inv (M × N) :=
   ⟨fun p => (p.1⁻¹, p.2⁻¹)⟩
 
-@[to_additive (attr := simp)]
-theorem fst_inv [Inv G] [Inv H] (p : G × H) : p⁻¹.1 = p.1⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_inv [Inv G] [Inv H] (p : G × H) : p⁻¹.2 = p.2⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem inv_mk [Inv G] [Inv H] (a : G) (b : H) : (a, b)⁻¹ = (a⁻¹, b⁻¹) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem swap_inv [Inv G] [Inv H] (p : G × H) : p⁻¹.swap = p.swap⁻¹ :=
-  rfl
-
 @[to_additive]
 instance [InvolutiveInv M] [InvolutiveInv N] : InvolutiveInv (M × N) :=
   { inv_inv := fun _ => Prod.ext (inv_inv _) (inv_inv _) }
@@ -125,25 +77,6 @@ instance [InvolutiveInv M] [InvolutiveInv N] : InvolutiveInv (M × N) :=
 @[to_additive]
 instance instDiv [Div M] [Div N] : Div (M × N) :=
   ⟨fun p q => ⟨p.1 / q.1, p.2 / q.2⟩⟩
-
-@[to_additive (attr := simp)]
-theorem fst_div [Div G] [Div H] (a b : G × H) : (a / b).1 = a.1 / b.1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_div [Div G] [Div H] (a b : G × H) : (a / b).2 = a.2 / b.2 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_div_mk [Div G] [Div H] (x₁ x₂ : G) (y₁ y₂ : H) :
-    (x₁, y₁) / (x₂, y₂) = (x₁ / x₂, y₁ / y₂) :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem swap_div [Div G] [Div H] (a b : G × H) : (a / b).swap = a.swap / b.swap :=
-  rfl
-
-@[to_additive] lemma div_def [Div M] [Div N] (a b : M × N) : a / b = (a.1 / b.1, a.2 / b.2) := rfl
 
 @[to_additive]
 instance instSemigroup [Semigroup M] [Semigroup N] : Semigroup (M × N) :=
@@ -300,10 +233,6 @@ protected def prod (f : M →ₙ* N) (g : M →ₙ* P) :
   toFun := Pi.prod f g
   map_mul' x y := Prod.ext (f.map_mul x y) (g.map_mul x y)
 
-@[to_additive coe_prod]
-theorem coe_prod (f : M →ₙ* N) (g : M →ₙ* P) : ⇑(f.prod g) = Pi.prod f g :=
-  rfl
-
 @[to_additive (attr := simp) prod_apply]
 theorem prod_apply (f : M →ₙ* N) (g : M →ₙ* P) (x) : f.prod g x = (f x, g x) :=
   rfl
@@ -330,19 +259,6 @@ variable {M' : Type*} {N' : Type*} [Mul M] [Mul N] [Mul M'] [Mul N'] [Mul P] (f 
 @[to_additive prodMap "`Prod.map` as an `AddMonoidHom`"]
 def prodMap : M × N →ₙ* M' × N' :=
   (f.comp (fst M N)).prod (g.comp (snd M N))
-
-@[to_additive prodMap_def]
-theorem prodMap_def : prodMap f g = (f.comp (fst M N)).prod (g.comp (snd M N)) :=
-  rfl
-
-@[to_additive (attr := simp) coe_prodMap]
-theorem coe_prodMap : ⇑(prodMap f g) = Prod.map f g :=
-  rfl
-
-@[to_additive prod_comp_prodMap]
-theorem prod_comp_prodMap (f : P →ₙ* M) (g : P →ₙ* N) (f' : M →ₙ* M') (g' : N →ₙ* N') :
-    (f'.prodMap g').comp (f.prod g) = (f'.comp f).prod (g'.comp g) :=
-  rfl
 
 end prodMap
 
@@ -424,22 +340,6 @@ theorem inl_apply (x) : inl M N x = (x, 1) :=
 theorem inr_apply (y) : inr M N y = (1, y) :=
   rfl
 
-@[to_additive (attr := simp)]
-theorem fst_comp_inl : (fst M N).comp (inl M N) = id M :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_comp_inl : (snd M N).comp (inl M N) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem fst_comp_inr : (fst M N).comp (inr M N) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem snd_comp_inr : (snd M N).comp (inr M N) = id N :=
-  rfl
-
 @[to_additive]
 theorem commute_inl_inr (m : M) (n : N) : Commute (inl M N m) (inr M N n) :=
   Commute.prod (.one_right m) (.one_left n)
@@ -456,10 +356,6 @@ protected def prod (f : M →* N) (g : M →* P) :
   toFun := Pi.prod f g
   map_one' := Prod.ext f.map_one g.map_one
   map_mul' x y := Prod.ext (f.map_mul x y) (g.map_mul x y)
-
-@[to_additive coe_prod]
-theorem coe_prod (f : M →* N) (g : M →* P) : ⇑(f.prod g) = Pi.prod f g :=
-  rfl
 
 @[to_additive (attr := simp) prod_apply]
 theorem prod_apply (f : M →* N) (g : M →* P) (x) : f.prod g x = (f x, g x) :=
@@ -487,19 +383,6 @@ variable {M' : Type*} {N' : Type*} [MulOneClass M'] [MulOneClass N'] [MulOneClas
 @[to_additive prodMap "`prod.map` as an `AddMonoidHom`."]
 def prodMap : M × N →* M' × N' :=
   (f.comp (fst M N)).prod (g.comp (snd M N))
-
-@[to_additive prodMap_def]
-theorem prodMap_def : prodMap f g = (f.comp (fst M N)).prod (g.comp (snd M N)) :=
-  rfl
-
-@[to_additive (attr := simp) coe_prodMap]
-theorem coe_prodMap : ⇑(prodMap f g) = Prod.map f g :=
-  rfl
-
-@[to_additive prod_comp_prodMap]
-theorem prod_comp_prodMap (f : P →* M) (g : P →* N) (f' : M →* M') (g' : N →* N') :
-    (f'.prodMap g').comp (f.prod g) = (f'.comp f).prod (g'.comp g) :=
-  rfl
 
 end prodMap
 
@@ -556,29 +439,12 @@ variable [MulOneClass M] [MulOneClass N]
 def prodComm : M × N ≃* N × M :=
   { Equiv.prodComm M N with map_mul' := fun ⟨_, _⟩ ⟨_, _⟩ => rfl }
 
-@[to_additive (attr := simp) coe_prodComm]
-theorem coe_prodComm : ⇑(prodComm : M × N ≃* N × M) = Prod.swap :=
-  rfl
-
-@[to_additive (attr := simp) coe_prodComm_symm]
-theorem coe_prodComm_symm : ⇑(prodComm : M × N ≃* N × M).symm = Prod.swap :=
-  rfl
-
 variable [MulOneClass P]
 
 @[to_additive prodAssoc
       "The equivalence between `(M × N) × P` and `M × (N × P)` is additive."]
 def prodAssoc : (M × N) × P ≃* M × (N × P) :=
   { Equiv.prodAssoc M N P with map_mul' := fun ⟨_, _⟩ ⟨_, _⟩ => rfl }
-
-@[to_additive (attr := simp) coe_prodAssoc]
-theorem coe_prodAssoc : ⇑(prodAssoc : (M × N) × P ≃* M × (N × P)) = Equiv.prodAssoc M N P :=
-  rfl
-
-@[to_additive (attr := simp) coe_prodAssoc_symm]
-theorem coe_prodAssoc_symm :
-    ⇑(prodAssoc : (M × N) × P ≃* M × (N × P)).symm = (Equiv.prodAssoc M N P).symm :=
-  rfl
 
 variable {M' : Type*} {N' : Type*} [MulOneClass N'] [MulOneClass M']
 
@@ -597,10 +463,6 @@ def prodProdProdComm : (M × N) × M' × N' ≃* (M × M') × N × N' :=
 @[to_additive (attr := simp) prodProdProdComm_toEquiv]
 theorem prodProdProdComm_toEquiv :
     (prodProdProdComm M N M' N' : _ ≃ _) = Equiv.prodProdProdComm M N M' N' :=
-  rfl
-
-@[simp]
-theorem prodProdProdComm_symm : (prodProdProdComm M N M' N').symm = prodProdProdComm M M' N N' :=
   rfl
 
 end

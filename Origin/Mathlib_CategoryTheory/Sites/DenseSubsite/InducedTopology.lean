@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.DenseSubsite.SheafEquiv
 
+noncomputable section
+
 /-!
 # Induced Topology
 
@@ -92,11 +94,6 @@ def inducedTopology : GrothendieckTopology C where
     rintro W _ ⟨Z', g', i', hg, rfl⟩
     refine ⟨Z', g' ≫ g , i', hg, ?_⟩
     simp
-
-@[simp]
-lemma mem_inducedTopology_sieves_iff {X : C} (S : Sieve X) :
-    S ∈ (G.inducedTopology K) X ↔ (S.functorPushforward G) ∈ K (G.obj X) :=
-  Iff.rfl
 
 instance inducedTopology_isCocontinuous : G.IsCocontinuous (G.inducedTopology K) K :=
   ⟨@fun _ S hS => LocallyCoverDense.functorPushforward_functorPullback_mem ⟨S, hS⟩⟩

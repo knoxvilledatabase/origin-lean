@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Data.Rat.Floor
 
+noncomputable section
+
 /-!
 # Floor Function for Non-negative Rational Numbers
 
@@ -27,12 +29,6 @@ instance : FloorSemiring ℚ≥0 where
   floor_of_neg h := by simpa using h.trans zero_lt_one
   gc_floor {a n} h := by rw [← NNRat.coe_le_coe, Nat.le_floor_iff] <;> norm_cast
   gc_ceil {a b} := by rw [← NNRat.coe_le_coe, Nat.ceil_le]; norm_cast
-
-@[simp, norm_cast]
-theorem floor_coe (q : ℚ≥0) : ⌊(q : ℚ)⌋₊ = ⌊q⌋₊ := rfl
-
-@[simp, norm_cast]
-theorem ceil_coe (q : ℚ≥0) : ⌈(q : ℚ)⌉₊ = ⌈q⌉₊ := rfl
 
 @[simp, norm_cast]
 theorem coe_floor (q : ℚ≥0) : ↑⌊q⌋₊ = ⌊(q : ℚ)⌋ := Int.natCast_floor_eq_floor q.coe_nonneg

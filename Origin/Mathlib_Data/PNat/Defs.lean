@@ -1,6 +1,6 @@
 /-
 Extracted from Data/PNat/Defs.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 1 | Infrastructure: 19
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Defs
@@ -9,6 +9,8 @@ import Mathlib.Order.Basic
 import Mathlib.Tactic.Coe
 import Mathlib.Tactic.Lift
 import Mathlib.Data.Int.Order.Basic
+
+noncomputable section
 
 /-!
 # The positive natural numbers
@@ -27,16 +29,8 @@ instance (n : ℕ) [NeZero n] : OfNat ℕ+ n :=
 
 namespace PNat
 
-@[simp]
-theorem mk_coe (n h) : (PNat.val (⟨n, h⟩ : ℕ+) : ℕ) = n :=
-  rfl
-
 def natPred (i : ℕ+) : ℕ :=
   i - 1
-
-@[simp]
-theorem natPred_eq_pred {n : ℕ} (h : 0 < n) : natPred (⟨n, h⟩ : ℕ+) = n.pred :=
-  rfl
 
 end PNat
 
@@ -49,22 +43,11 @@ def succPNat (n : ℕ) : ℕ+ :=
   ⟨succ n, succ_pos n⟩
 
 @[simp]
-theorem succPNat_coe (n : ℕ) : (succPNat n : ℕ) = succ n :=
-  rfl
-
-@[simp]
-theorem natPred_succPNat (n : ℕ) : n.succPNat.natPred = n :=
-  rfl
-
-@[simp]
 theorem _root_.PNat.succPNat_natPred (n : ℕ+) : n.natPred.succPNat = n :=
   Subtype.eq <| succ_pred_eq_of_pos n.2
 
 def toPNat' (n : ℕ) : ℕ+ :=
   succPNat (pred n)
-
-@[simp]
-theorem toPNat'_zero : Nat.toPNat' 0 = 1 := rfl
 
 @[simp]
 theorem toPNat'_coe : ∀ n : ℕ, (toPNat' n : ℕ) = ite (0 < n) n 1
@@ -79,20 +62,6 @@ namespace PNat
 
 open Nat
 
-theorem mk_le_mk (n k : ℕ) (hn : 0 < n) (hk : 0 < k) : (⟨n, hn⟩ : ℕ+) ≤ ⟨k, hk⟩ ↔ n ≤ k :=
-  Iff.rfl
-
-theorem mk_lt_mk (n k : ℕ) (hn : 0 < n) (hk : 0 < k) : (⟨n, hn⟩ : ℕ+) < ⟨k, hk⟩ ↔ n < k :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_le_coe (n k : ℕ+) : (n : ℕ) ≤ k ↔ n ≤ k :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_lt_coe (n k : ℕ+) : (n : ℕ) < k ↔ n < k :=
-  Iff.rfl
-
 @[simp]
 theorem pos (n : ℕ+) : 0 < (n : ℕ) :=
   n.2
@@ -103,7 +72,9 @@ theorem eq {m n : ℕ+} : (m : ℕ) = n → m = n :=
 theorem coe_injective : Function.Injective PNat.val :=
   Subtype.coe_injective
 
--- DISSOLVED: ne_zero
+@[simp]
+theorem ne_zero (n : ℕ+) : (n : ℕ) ≠ 0 :=
+  n.2.ne'
 
 instance _root_.NeZero.pnat {a : ℕ+} : NeZero (a : ℕ) :=
   ⟨a.ne_zero⟩
@@ -125,10 +96,6 @@ theorem not_lt_one (n : ℕ+) : ¬n < 1 :=
 
 instance : Inhabited ℕ+ :=
   ⟨1⟩
-
-@[simp]
-theorem mk_one {h} : (⟨1, h⟩ : ℕ+) = (1 : ℕ+) :=
-  rfl
 
 @[norm_cast]
 theorem one_coe : ((1 : ℕ+) : ℕ) = 1 :=

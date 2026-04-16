@@ -10,6 +10,8 @@ import Mathlib.Algebra.Module.End
 import Mathlib.CategoryTheory.Endomorphism
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 
+noncomputable section
+
 /-!
 # Preadditive categories
 
@@ -131,9 +133,6 @@ theorem neg_comp : (-f) ≫ g = -f ≫ g :=
 @[reassoc, simp]
 theorem comp_neg : f ≫ (-g) = -f ≫ g :=
   map_neg (leftComp R f) g
-
-@[reassoc]
-theorem neg_comp_neg : (-f) ≫ (-g) = f ≫ g := by simp
 
 theorem nsmul_comp (n : ℕ) : (n • f) ≫ g = n • f ≫ g :=
   map_nsmul (rightComp P g) n f
@@ -268,31 +267,13 @@ variable {X Y : C} {f : X ⟶ Y} {g : X ⟶ Y}
 def forkOfKernelFork (c : KernelFork (f - g)) : Fork f g :=
   Fork.ofι c.ι <| by rw [← sub_eq_zero, ← comp_sub, c.condition]
 
-@[simp]
-theorem forkOfKernelFork_ι (c : KernelFork (f - g)) : (forkOfKernelFork c).ι = c.ι :=
-  rfl
-
 def kernelForkOfFork (c : Fork f g) : KernelFork (f - g) :=
   Fork.ofι c.ι <| by rw [comp_sub, comp_zero, sub_eq_zero, c.condition]
-
-@[simp]
-theorem kernelForkOfFork_ι (c : Fork f g) : (kernelForkOfFork c).ι = c.ι :=
-  rfl
-
-@[simp]
-theorem kernelForkOfFork_ofι {P : C} (ι : P ⟶ X) (w : ι ≫ f = ι ≫ g) :
-    kernelForkOfFork (Fork.ofι ι w) = KernelFork.ofι ι (by simp [w]) :=
-  rfl
 
 def isLimitForkOfKernelFork {c : KernelFork (f - g)} (i : IsLimit c) :
     IsLimit (forkOfKernelFork c) :=
   Fork.IsLimit.mk' _ fun s =>
     ⟨i.lift (kernelForkOfFork s), i.fac _ _, fun h => by apply Fork.IsLimit.hom_ext i; aesop_cat⟩
-
-@[simp]
-theorem isLimitForkOfKernelFork_lift {c : KernelFork (f - g)} (i : IsLimit c) (s : Fork f g) :
-    (isLimitForkOfKernelFork i).lift s = i.lift (kernelForkOfFork s) :=
-  rfl
 
 def isLimitKernelForkOfFork {c : Fork f g} (i : IsLimit c) : IsLimit (kernelForkOfFork c) :=
   Fork.IsLimit.mk' _ fun s =>
@@ -316,34 +297,14 @@ variable {f g}
 def coforkOfCokernelCofork (c : CokernelCofork (f - g)) : Cofork f g :=
   Cofork.ofπ c.π <| by rw [← sub_eq_zero, ← sub_comp, c.condition]
 
-@[simp]
-theorem coforkOfCokernelCofork_π (c : CokernelCofork (f - g)) :
-    (coforkOfCokernelCofork c).π = c.π :=
-  rfl
-
 def cokernelCoforkOfCofork (c : Cofork f g) : CokernelCofork (f - g) :=
   Cofork.ofπ c.π <| by rw [sub_comp, zero_comp, sub_eq_zero, c.condition]
-
-@[simp]
-theorem cokernelCoforkOfCofork_π (c : Cofork f g) : (cokernelCoforkOfCofork c).π = c.π :=
-  rfl
-
-@[simp]
-theorem cokernelCoforkOfCofork_ofπ {P : C} (π : Y ⟶ P) (w : f ≫ π = g ≫ π) :
-    cokernelCoforkOfCofork (Cofork.ofπ π w) = CokernelCofork.ofπ π (by simp [w]) :=
-  rfl
 
 def isColimitCoforkOfCokernelCofork {c : CokernelCofork (f - g)} (i : IsColimit c) :
     IsColimit (coforkOfCokernelCofork c) :=
   Cofork.IsColimit.mk' _ fun s =>
     ⟨i.desc (cokernelCoforkOfCofork s), i.fac _ _, fun h => by
       apply Cofork.IsColimit.hom_ext i; aesop_cat⟩
-
-@[simp]
-theorem isColimitCoforkOfCokernelCofork_desc {c : CokernelCofork (f - g)} (i : IsColimit c)
-    (s : Cofork f g) :
-    (isColimitCoforkOfCokernelCofork i).desc s = i.desc (cokernelCoforkOfCofork s) :=
-  rfl
 
 def isColimitCokernelCoforkOfCofork {c : Cofork f g} (i : IsColimit c) :
     IsColimit (cokernelCoforkOfCofork c) :=
@@ -387,22 +348,10 @@ instance : SMul (Units ℤ) (X ≅ Y) where
       inv_hom_id := by
         simp only [comp_zsmul, zsmul_comp, smul_smul, Units.mul_inv, one_smul, e.inv_hom_id] }
 
-@[simp]
-lemma smul_iso_hom (a : Units ℤ) (e : X ≅ Y) : (a • e).hom = a • e.hom := rfl
-
-@[simp]
-lemma smul_iso_inv (a : Units ℤ) (e : X ≅ Y) : (a • e).inv = a⁻¹ • e.inv := rfl
-
 instance : Neg (X ≅ Y) where
   neg e :=
     { hom := -e.hom
       inv := -e.inv }
-
-@[simp]
-lemma neg_iso_hom (e : X ≅ Y) : (-e).hom = -e.hom := rfl
-
-@[simp]
-lemma neg_iso_inv (e : X ≅ Y) : (-e).inv = -e.inv := rfl
 
 end
 

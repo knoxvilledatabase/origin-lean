@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Dual
 
+noncomputable section
+
 /-!
 # The Lax-Milgram Theorem
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Finite.Basic
 import Mathlib.Order.Interval.Set.Basic
 
+noncomputable section
+
 /-!
 # Infinitude of intervals
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/List/OfFn.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Batteries.Data.List.OfFn
 import Mathlib.Data.Fin.Tuple.Basic
+
+noncomputable section
 
 /-!
 # Lists from functions
@@ -31,9 +33,6 @@ namespace List
 
 theorem get_ofFn {n} (f : Fin n → α) (i) : get (ofFn f) i = f (Fin.cast (by simp) i) := by
   simp; congr
-
-theorem get?_ofFn {n} (f : Fin n → α) (i) : get? (ofFn f) i = ofFnNthVal f i := by
-  simp
 
 @[simp]
 theorem map_ofFn {β : Type*} {n : ℕ} (f : Fin n → α) (g : α → β) :
@@ -123,9 +122,6 @@ theorem ofFn_getElem_eq_map {β : Type*} (l : List α) (f : α → β) :
     ofFn (fun i : Fin l.length => f <| l[(i : Nat)]) = l.map f := by
   rw [← Function.comp_def, ← map_ofFn, ofFn_getElem]
 
-theorem ofFn_get_eq_map {β : Type*} (l : List α) (f : α → β) : ofFn (f <| l.get ·) = l.map f := by
-  simp
-
 theorem mem_ofFn {n} (f : Fin n → α) (a : α) : a ∈ ofFn f ↔ a ∈ Set.range f := by
   simp only [mem_iff_get, Set.mem_range, get_ofFn]
   exact ⟨fun ⟨i, hi⟩ => ⟨Fin.cast (by simp) i, hi⟩, fun ⟨i, hi⟩ => ⟨Fin.cast (by simp) i, hi⟩⟩
@@ -152,13 +148,18 @@ theorem pairwise_ofFn {R : α → α → Prop} {n} {f : Fin n → α} :
     (Fin.rightInverse_cast (length_ofFn f)).surjective.forall, Fin.forall_iff, Fin.cast_mk,
     Fin.mk_lt_mk, forall_comm (α := (_ : Prop)) (β := ℕ)]
 
--- DISSOLVED: head_ofFn
+lemma head_ofFn {n} (f : Fin n → α) (h : ofFn f ≠ []) :
+    (ofFn f).head h = f ⟨0, Nat.pos_of_ne_zero (mt ofFn_eq_nil_iff.2 h)⟩ := by
+  rw [← getElem_zero (length_ofFn _ ▸ Nat.pos_of_ne_zero (mt ofFn_eq_nil_iff.2 h)),
+    List.getElem_ofFn]
 
 lemma getLast_ofFn {n} (f : Fin n → α) (h : ofFn f ≠ []) :
     (ofFn f).getLast h = f ⟨n - 1, Nat.sub_one_lt (mt ofFn_eq_nil_iff.2 h)⟩ := by
   simp [getLast_eq_getElem]
 
--- DISSOLVED: getLast_ofFn_succ
+lemma getLast_ofFn_succ {n : ℕ} (f : Fin n.succ → α) :
+    (ofFn f).getLast (mt ofFn_eq_nil_iff.1 (Nat.succ_ne_zero _)) = f (Fin.last _) :=
+  getLast_ofFn f _
 
 theorem last_ofFn {n : ℕ} (f : Fin n → α) (h : ofFn f ≠ [])
     (hn : n - 1 < n := Nat.pred_lt <| ofFn_eq_nil_iff.not.mp h) :

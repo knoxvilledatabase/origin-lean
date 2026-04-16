@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.Abelianization
 import Mathlib.GroupTheory.Perm.ViaEmbedding
 import Mathlib.GroupTheory.Subgroup.Simple
 
+noncomputable section
+
 /-!
 # Solvable Groups
 
@@ -32,10 +34,6 @@ variable (G)
 def derivedSeries : ℕ → Subgroup G
   | 0 => ⊤
   | n + 1 => ⁅derivedSeries n, derivedSeries n⁆
-
-@[simp]
-theorem derivedSeries_zero : derivedSeries G 0 = ⊤ :=
-  rfl
 
 @[simp]
 theorem derivedSeries_succ (n : ℕ) :

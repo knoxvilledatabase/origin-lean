@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/LinearDisjoint.lean
-Genuine: 45 | Conflates: 3 | Dissolved: 0 | Infrastructure: 3
+Genuine: 40 | Conflates: 3 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.MulOpposite
@@ -13,6 +13,8 @@ import Mathlib.RingTheory.Adjoin.Dimension
 import Mathlib.RingTheory.IntegralClosure.Algebra.Defs
 import Mathlib.RingTheory.IntegralClosure.IsIntegral.Basic
 import Mathlib.RingTheory.TensorProduct.Finite
+
+noncomputable section
 
 /-!
 
@@ -177,9 +179,6 @@ include H
 protected def mulMap :=
   (AlgEquiv.ofInjective (A.mulMap B) H.injective).trans (equivOfEq _ _ (mulMap_range A B))
 
-@[simp]
-theorem val_mulMap_tmul (a : A) (b : B) : (H.mulMap (a ⊗ₜ[R] b) : S) = a.1 * b.1 := rfl
-
 theorem sup_free_of_free [Module.Free R A] [Module.Free R B] : Module.Free R ↥(A ⊔ B) :=
   Module.Free.of_equiv H.mulMap.toLinearEquiv
 
@@ -196,7 +195,6 @@ variable [CommRing R] [Ring S] [Algebra R S]
 variable (A B : Subalgebra R S)
 
 set_option maxSynthPendingDepth 2 in
-
 lemma mulLeftMap_ker_eq_bot_iff_linearIndependent_op {ι : Type*} (a : ι → A) :
     LinearMap.ker (Submodule.mulLeftMap (M := toSubmodule A) (toSubmodule B) a) = ⊥ ↔
     LinearIndependent B.op (MulOpposite.op ∘ A.val ∘ a) := by
@@ -232,7 +230,6 @@ theorem of_basis_left_op {ι : Type*} (a : Basis ι R A)
   exact Submodule.LinearDisjoint.of_basis_left _ _ a H
 
 set_option maxSynthPendingDepth 2 in
-
 lemma mulRightMap_ker_eq_bot_iff_linearIndependent {ι : Type*} (b : ι → B) :
     LinearMap.ker (Submodule.mulRightMap (toSubmodule A) (N := toSubmodule B) b) = ⊥ ↔
     LinearIndependent A (B.val ∘ b) := by
@@ -379,19 +376,16 @@ variable {A B}
 variable (H : A.LinearDisjoint B)
 
 include H in
-
 theorem rank_inf_eq_one_of_flat_of_inj (hf : Module.Flat R A ∨ Module.Flat R B)
     (hinj : Function.Injective (algebraMap R S)) : Module.rank R ↥(A ⊓ B) = 1 :=
   H.rank_inf_eq_one_of_commute_of_flat_of_inj hf (fun _ _ ↦ mul_comm _ _) hinj
 
 include H in
-
 theorem rank_inf_eq_one_of_flat_left_of_inj [Module.Flat R A]
     (hinj : Function.Injective (algebraMap R S)) : Module.rank R ↥(A ⊓ B) = 1 :=
   H.rank_inf_eq_one_of_commute_of_flat_left_of_inj (fun _ _ ↦ mul_comm _ _) hinj
 
 include H in
-
 theorem rank_inf_eq_one_of_flat_right_of_inj [Module.Flat R B]
     (hinj : Function.Injective (algebraMap R S)) : Module.rank R ↥(A ⊓ B) = 1 :=
   H.rank_inf_eq_one_of_commute_of_flat_right_of_inj (fun _ _ ↦ mul_comm _ _) hinj
@@ -401,6 +395,9 @@ theorem rank_eq_one_of_flat_of_self_of_inj (H : A.LinearDisjoint A) [Module.Flat
   H.rank_eq_one_of_commute_of_flat_of_self_of_inj (fun _ _ ↦ mul_comm _ _) hinj
 
 include H in
+/-- In a commutative ring, if subalgebras `A` and `B` are linearly disjoint and they are
+
+free modules, then the rank of `A ⊔ B` is equal to the product of the rank of `A` and `B`. -/
 
 theorem rank_sup_of_free [Module.Free R A] [Module.Free R B] :
     Module.rank R ↥(A ⊔ B) = Module.rank R A * Module.rank R B := by
@@ -408,6 +405,9 @@ theorem rank_sup_of_free [Module.Free R A] [Module.Free R B] :
   rw [← rank_tensorProduct', H.mulMap.toLinearEquiv.rank_eq]
 
 include H in
+/-- In a commutative ring, if subalgebras `A` and `B` are linearly disjoint and they are
+
+free modules, then the rank of `A ⊔ B` is equal to the product of the rank of `A` and `B`. -/
 
 theorem finrank_sup_of_free [Module.Free R A] [Module.Free R B] :
     Module.finrank R ↥(A ⊔ B) = Module.finrank R A * Module.finrank R B := by
@@ -430,6 +430,9 @@ theorem of_finrank_sup_of_free [Module.Free R A] [Module.Free R B]
   exact Subtype.val_injective.comp (OrzechProperty.injective_of_surjective_of_injective j' _ hj hf)
 
 include H in
+/-- If `A` and `B` are linearly disjoint, if `A` is free and `B` is flat,
+
+then `[B[A] : B] = [A : R]`. See also `Subalgebra.adjoin_rank_le`. -/
 
 -- CONFLATES (assumes ground = zero): adjoin_rank_eq_rank_left
 theorem adjoin_rank_eq_rank_left [Module.Free R A] [Module.Flat R B]
@@ -442,6 +445,9 @@ theorem adjoin_rank_eq_rank_left [Module.Free R A] [Module.Flat R B]
   rw [rank_span this, Cardinal.mk_range_eq _ this.injective]
 
 include H in
+/-- If `A` and `B` are linearly disjoint, if `B` is free and `A` is flat,
+
+then `[A[B] : A] = [B : R]`. See also `Subalgebra.adjoin_rank_le`. -/
 
 -- CONFLATES (assumes ground = zero): adjoin_rank_eq_rank_right
 theorem adjoin_rank_eq_rank_right [Module.Free R B] [Module.Flat R A]

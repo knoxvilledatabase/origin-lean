@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Analysis.Calculus.Deriv.Linear
 import Mathlib.LinearAlgebra.AffineSpace.AffineMap
 
+noncomputable section
+
 /-!
 # Derivatives of affine maps
 

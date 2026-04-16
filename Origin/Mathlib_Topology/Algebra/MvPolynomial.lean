@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.Topology.Algebra.Ring.Basic
 
+noncomputable section
+
 /-!
 # Multivariate polynomials and continuity
 

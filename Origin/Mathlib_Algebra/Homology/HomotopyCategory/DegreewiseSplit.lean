@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.Pretriangulated
 
+noncomputable section
+
 /-! Degreewise split exact sequences of cochain complexes
 
 The main result of this file is the lemma

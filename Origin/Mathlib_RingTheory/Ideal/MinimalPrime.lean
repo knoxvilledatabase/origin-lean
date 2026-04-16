@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Ideal.IsPrimary
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.Order.Minimal
 
+noncomputable section
+
 /-!
 
 # Minimal primes

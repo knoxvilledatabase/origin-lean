@@ -1,11 +1,13 @@
 /-
 Extracted from Computability/Ackermann.lean
-Genuine: 39 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 40 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Computability.Primrec
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
+
+noncomputable section
 
 /-!
 # Ackermann function
@@ -74,17 +76,6 @@ theorem ack_two (n : ℕ) : ack 2 n = 2 * n + 3 := by
   · simp
   · simpa [mul_succ]
 
-@[simp]
-theorem ack_three (n : ℕ) : ack 3 n = 2 ^ (n + 3) - 3 := by
-  induction' n with n IH
-  · simp
-  · rw [ack_succ_succ, IH, ack_two, Nat.succ_add, Nat.pow_succ 2 (n + 3), mul_comm _ 2,
-        Nat.mul_sub_left_distrib, ← Nat.sub_add_comm, two_mul 3, Nat.add_sub_add_right]
-    have H : 2 * 3 ≤ 2 * 2 ^ 3 := by norm_num
-    apply H.trans
-    rw [_root_.mul_le_mul_left two_pos]
-    exact pow_right_mono₀ one_le_two (Nat.le_add_left 3 n)
-
 theorem ack_pos : ∀ m n, 0 < ack m n
   | 0, n => by simp
   | m + 1, 0 => by
@@ -103,7 +94,13 @@ theorem one_lt_ack_succ_left : ∀ m n, 1 < ack (m + 1) n
     rw [ack_succ_succ]
     apply one_lt_ack_succ_left
 
--- DISSOLVED: one_lt_ack_succ_right
+theorem one_lt_ack_succ_right : ∀ m n, 1 < ack m (n + 1)
+  | 0, n => by simp
+  | m + 1, n => by
+    rw [ack_succ_succ]
+    cases' exists_eq_succ_of_ne_zero (ack_pos (m + 1) n).ne' with h h
+    rw [h]
+    apply one_lt_ack_succ_right
 
 theorem ack_strictMono_right : ∀ m, StrictMono (ack m)
   | 0, n₁, n₂, h => by simpa using h

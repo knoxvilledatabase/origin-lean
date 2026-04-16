@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Sym.Sym2
 import Mathlib.Logic.Relation
 
+noncomputable section
+
 /-!
 # Game addition relation
 

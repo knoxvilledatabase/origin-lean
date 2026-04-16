@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.CofilteredSystem
 import Mathlib.Combinatorics.SimpleGraph.Subgraph
 
+noncomputable section
+
 /-!
 # Homomorphisms from finite subgraphs
 

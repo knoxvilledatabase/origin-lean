@@ -10,6 +10,8 @@ import Mathlib.Analysis.Seminorm
 import Mathlib.Tactic.Peel
 import Mathlib.Topology.Instances.ENNReal
 
+noncomputable section
+
 /-!
 # Asymptotics in a Topological Vector Space
 

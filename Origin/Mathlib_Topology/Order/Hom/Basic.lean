@@ -7,6 +7,8 @@ import Mathlib.Order.Hom.Basic
 import Mathlib.Topology.Basic
 import Mathlib.Topology.ContinuousMap.Defs
 
+noncomputable section
+
 /-!
 # Continuous order homomorphisms
 
@@ -88,20 +90,12 @@ instance : ContinuousOrderHomClass (α →Co β) α β where
   map_monotone f := f.monotone'
   map_continuous f := f.continuous_toFun
 
-@[simp] theorem coe_toOrderHom (f : α →Co β) : ⇑f.toOrderHom = f := rfl
-
-theorem toFun_eq_coe {f : α →Co β} : f.toFun = (f : α → β) := rfl
-
 @[ext]
 theorem ext {f g : α →Co β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
 
 protected def copy (f : α →Co β) (f' : α → β) (h : f' = f) : α →Co β :=
   ⟨f.toOrderHom.copy f' h, h.symm.subst f.continuous_toFun⟩
-
-@[simp]
-theorem coe_copy (f : α →Co β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : α →Co β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -114,30 +108,13 @@ protected def id : α →Co α :=
 instance : Inhabited (α →Co α) :=
   ⟨ContinuousOrderHom.id _⟩
 
-@[simp]
-theorem coe_id : ⇑(ContinuousOrderHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : ContinuousOrderHom.id α a = a :=
-  rfl
 
 def comp (f : β →Co γ) (g : α →Co β) : ContinuousOrderHom α γ :=
   ⟨f.toOrderHom.comp g.toOrderHom, f.continuous_toFun.comp g.continuous_toFun⟩
 
 @[simp]
-theorem coe_comp (f : β →Co γ) (g : α →Co β) : (f.comp g : α → γ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : β →Co γ) (g : α →Co β) (a : α) : (f.comp g) a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : γ →Co δ) (g : β →Co γ) (h : α →Co β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]

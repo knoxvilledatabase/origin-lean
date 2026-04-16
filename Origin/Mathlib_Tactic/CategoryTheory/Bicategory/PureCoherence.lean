@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Coherence.PureCoherence
 import Mathlib.Tactic.CategoryTheory.Bicategory.Datatypes
 
+noncomputable section
+
 /-!
 # Coherence tactic for bicategories
 
@@ -267,7 +269,6 @@ def pureCoherence (mvarId : MVarId) : MetaM (List MVarId) :=
   BicategoryLike.pureCoherence Bicategory.Context `bicategory mvarId
 
 elab "bicategory_coherence" : tactic => withMainContext do
-
   replaceMainGoal <| ← Bicategory.pureCoherence <| ← getMainGoal
 
 end Mathlib.Tactic.Bicategory

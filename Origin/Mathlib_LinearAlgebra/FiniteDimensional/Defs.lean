@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/FiniteDimensional/Defs.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 11 | Infrastructure: 21
+Genuine: 60 | Conflates: 0 | Dissolved: 0 | Infrastructure: 21
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Projective
 import Mathlib.FieldTheory.Finiteness
 import Mathlib.RingTheory.Finiteness.Subalgebra
+
+noncomputable section
 
 /-!
 # Finite dimensional vector spaces
@@ -157,7 +159,10 @@ variable {K V}
 theorem finrank_of_infinite_dimensional (h : ¬FiniteDimensional K V) : finrank K V = 0 :=
   Module.finrank_of_not_finite h
 
--- DISSOLVED: finiteDimensional_iff_of_rank_eq_nsmul
+theorem finiteDimensional_iff_of_rank_eq_nsmul {W} [AddCommGroup W] [Module K W] {n : ℕ}
+    (hn : n ≠ 0) (hVW : Module.rank K V = n • Module.rank K W) :
+    FiniteDimensional K V ↔ FiniteDimensional K W :=
+  Module.finite_iff_of_rank_eq_nsmul hn hVW
 
 theorem finrank_eq_card_basis' [FiniteDimensional K V] {ι : Type w} (h : Basis ι K V) :
     (finrank K V : Cardinal.{w}) = #ι :=
@@ -239,11 +244,37 @@ theorem exists_relation_sum_zero_pos_coefficient_of_finrank_succ_lt_card [Finite
 
 end
 
--- DISSOLVED: basisSingleton
+@[simps repr_apply]
+noncomputable def basisSingleton (ι : Type*) [Unique ι] (h : finrank K V = 1) (v : V)
+    (hv : v ≠ 0) : Basis ι K V :=
+  let b := Module.basisUnique ι h
+  let h : b.repr v default ≠ 0 := mt Module.basisUnique_repr_eq_zero_iff.mp hv
+  Basis.ofRepr
+    { toFun := fun w => Finsupp.single default (b.repr w default / b.repr v default)
+      invFun := fun f => f default • v
+      map_add' := by simp [add_div]
+      map_smul' := by simp [mul_div]
+      left_inv := fun w => by
+        apply_fun b.repr using b.repr.toEquiv.injective
+        apply_fun Equiv.finsuppUnique
+        simp only [LinearEquiv.map_smulₛₗ, Finsupp.coe_smul, Finsupp.single_eq_same,
+          smul_eq_mul, Pi.smul_apply, Equiv.finsuppUnique_apply]
+        exact div_mul_cancel₀ _ h
+      right_inv := fun f => by
+        ext
+        simp only [LinearEquiv.map_smulₛₗ, Finsupp.coe_smul, Finsupp.single_eq_same,
+          RingHom.id_apply, smul_eq_mul, Pi.smul_apply]
+        exact mul_div_cancel_right₀ _ h }
 
--- DISSOLVED: basisSingleton_apply
+@[simp]
+theorem basisSingleton_apply (ι : Type*) [Unique ι] (h : finrank K V = 1) (v : V) (hv : v ≠ 0)
+    (i : ι) : basisSingleton ι h v hv i = v := by
+  cases Unique.uniq ‹Unique ι› i
+  simp [basisSingleton]
 
--- DISSOLVED: range_basisSingleton
+@[simp]
+theorem range_basisSingleton (ι : Type*) [Unique ι] (h : finrank K V = 1) (v : V) (hv : v ≠ 0) :
+    Set.range (basisSingleton ι h v hv) = {v} := by rw [Set.range_unique, basisSingleton_apply]
 
 end DivisionRing
 
@@ -497,11 +528,6 @@ noncomputable def ofInjectiveEndo (f : V →ₗ[K] V) (h_inj : Injective f) : V 
   LinearEquiv.ofBijective f ⟨h_inj, LinearMap.injective_iff_surjective.mp h_inj⟩
 
 @[simp]
-theorem coe_ofInjectiveEndo (f : V →ₗ[K] V) (h_inj : Injective f) :
-    ⇑(ofInjectiveEndo f h_inj) = f :=
-  rfl
-
-@[simp]
 theorem ofInjectiveEndo_right_inv (f : V →ₗ[K] V) (h_inj : Injective f) :
     f * (ofInjectiveEndo f h_inj).symm = 1 :=
   LinearMap.ext <| (ofInjectiveEndo f h_inj).apply_symm_apply
@@ -552,7 +578,11 @@ end
 
 section
 
--- DISSOLVED: FiniteDimensional.exists_mul_eq_one
+lemma FiniteDimensional.exists_mul_eq_one (F : Type*) {K : Type*} [Field F] [Ring K] [IsDomain K]
+    [Algebra F K] [FiniteDimensional F K] {x : K} (H : x ≠ 0) : ∃ y, x * y = 1 := by
+  have : Function.Surjective (LinearMap.mulLeft F x) :=
+    LinearMap.injective_iff_surjective.1 fun y z => ((mul_right_inj' H).1 : x * y = x * z → y = z)
+  exact this 1
 
 noncomputable def divisionRingOfFiniteDimensional (F K : Type*) [Field F] [Ring K] [IsDomain K]
     [Algebra F K] [FiniteDimensional F K] : DivisionRing K where
@@ -569,7 +599,9 @@ noncomputable def divisionRingOfFiniteDimensional (F K : Type*) [Field F] [Ring 
   qsmul := _
   qsmul_def := fun _ _ => rfl
 
--- DISSOLVED: FiniteDimensional.isUnit
+lemma FiniteDimensional.isUnit (F : Type*) {K : Type*} [Field F] [Ring K] [IsDomain K]
+    [Algebra F K] [FiniteDimensional F K] {x : K} (H : x ≠ 0) : IsUnit x :=
+  let _ := divisionRingOfFiniteDimensional F K; H.isUnit
 
 noncomputable def fieldOfFiniteDimensional (F K : Type*) [Field F] [h : CommRing K] [IsDomain K]
     [Algebra F K] [FiniteDimensional F K] : Field K :=
@@ -586,9 +618,24 @@ section Span
 
 open Submodule
 
--- DISSOLVED: finrank_span_singleton
+theorem finrank_span_singleton {v : V} (hv : v ≠ 0) : finrank K (K ∙ v) = 1 := by
+  apply le_antisymm
+  · exact finrank_span_le_card ({v} : Set V)
+  · rw [Nat.succ_le_iff, finrank_pos_iff]
+    use ⟨v, mem_span_singleton_self v⟩, 0
+    apply Subtype.coe_ne_coe.mp
+    simp [hv]
 
--- DISSOLVED: exists_smul_eq_of_finrank_eq_one
+lemma exists_smul_eq_of_finrank_eq_one
+    (h : finrank K V = 1) {x : V} (hx : x ≠ 0) (y : V) :
+    ∃ (c : K), c • x = y := by
+  have : Submodule.span K {x} = ⊤ := by
+    have : FiniteDimensional K V := .of_finrank_eq_succ h
+    apply eq_top_of_finrank_eq
+    rw [h]
+    exact finrank_span_singleton hx
+  have : y ∈ Submodule.span K {x} := by rw [this]; exact mem_top
+  exact mem_span_singleton.1 this
 
 theorem Set.finrank_mono [FiniteDimensional K V] {s t : Set V} (h : s ⊆ t) :
     s.finrank K ≤ t.finrank K :=
@@ -602,11 +649,28 @@ We now give characterisations of `finrank K V = 1` and `finrank K V ≤ 1`.
 
 section finrank_eq_one
 
--- DISSOLVED: finrank_eq_one_iff_of_nonzero
+theorem finrank_eq_one_iff_of_nonzero (v : V) (nz : v ≠ 0) :
+    finrank K V = 1 ↔ span K ({v} : Set V) = ⊤ :=
+  ⟨fun h => by simpa using (basisSingleton Unit h v nz).span_eq, fun s =>
+    finrank_eq_card_basis
+      (Basis.mk (linearIndependent_singleton nz)
+        (by
+          convert s.ge  -- Porting note: added `.ge` to make things easier for `convert`
+          simp))⟩
 
--- DISSOLVED: finrank_eq_one_iff_of_nonzero'
+theorem finrank_eq_one_iff_of_nonzero' (v : V) (nz : v ≠ 0) :
+    finrank K V = 1 ↔ ∀ w : V, ∃ c : K, c • v = w := by
+  rw [finrank_eq_one_iff_of_nonzero v nz]
+  apply span_singleton_eq_top_iff
 
--- DISSOLVED: surjective_of_nonzero_of_finrank_eq_one
+theorem surjective_of_nonzero_of_finrank_eq_one {W A : Type*} [Semiring A] [Module A V]
+    [AddCommGroup W] [Module K W] [Module A W] [LinearMap.CompatibleSMul V W K A]
+    (h : finrank K W = 1) {f : V →ₗ[A] W} (w : f ≠ 0) : Surjective f := by
+  change Surjective (f.restrictScalars K)
+  obtain ⟨v, n⟩ := DFunLike.ne_iff.mp w
+  intro z
+  obtain ⟨c, rfl⟩ := (finrank_eq_one_iff_of_nonzero' (f v) n).mp h z
+  exact ⟨c • v, by simp⟩
 
 end finrank_eq_one
 

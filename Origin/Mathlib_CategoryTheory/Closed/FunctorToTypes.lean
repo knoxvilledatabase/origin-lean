@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Functor.FunctorHom
 import Mathlib.CategoryTheory.Closed.Monoidal
 
+noncomputable section
+
 /-!
 # Functors to Type are closed.
 

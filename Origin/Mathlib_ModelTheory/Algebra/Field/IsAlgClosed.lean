@@ -9,6 +9,8 @@ import Mathlib.FieldTheory.IsAlgClosed.Classification
 import Mathlib.ModelTheory.Algebra.Field.CharP
 import Mathlib.ModelTheory.Satisfiability
 
+noncomputable section
+
 /-!
 
 # The First Order Theory of Algebraically Closed Fields

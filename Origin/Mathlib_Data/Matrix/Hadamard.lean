@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Trace
 
+noncomputable section
+
 /-!
 # Hadamard product of matrices
 
@@ -35,11 +37,6 @@ namespace Matrix
 
 def hadamard [Mul α] (A : Matrix m n α) (B : Matrix m n α) : Matrix m n α :=
   of fun i j => A i j * B i j
-
-@[simp]
-theorem hadamard_apply [Mul α] (A : Matrix m n α) (B : Matrix m n α) (i j) :
-    hadamard A B i j = A i j * B i j :=
-  rfl
 
 scoped infixl:100 " ⊙ " => Matrix.hadamard
 

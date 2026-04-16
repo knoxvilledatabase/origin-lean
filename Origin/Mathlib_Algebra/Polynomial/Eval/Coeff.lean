@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Polynomial/Eval/Coeff.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Coeff
 import Mathlib.Algebra.Polynomial.Eval.Defs
+
+noncomputable section
 
 /-!
 # Evaluation of polynomials
@@ -118,7 +120,8 @@ variable {f}
 protected theorem map_eq_zero_iff (hf : Function.Injective f) : p.map f = 0 ↔ p = 0 :=
   map_eq_zero_iff (mapRingHom f) (map_injective f hf)
 
--- DISSOLVED: map_ne_zero_iff
+protected theorem map_ne_zero_iff (hf : Function.Injective f) : p.map f ≠ 0 ↔ p ≠ 0 :=
+  (Polynomial.map_eq_zero_iff hf).not
 
 variable (f)
 

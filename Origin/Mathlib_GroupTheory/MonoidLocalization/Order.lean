@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Monoid.Defs
 import Mathlib.GroupTheory.MonoidLocalization.Basic
 
+noncomputable section
+
 /-!
 # Ordered structures on localizations of commutative monoids
 

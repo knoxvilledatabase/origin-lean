@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/Manifold/Instances/Real.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 7 | Infrastructure: 8
+Genuine: 12 | Conflates: 0 | Dissolved: 5 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
 import Mathlib.Analysis.InnerProductSpace.PiL2
+
+noncomputable section
 
 /-!
 # Constructing examples of manifolds over ℝ
@@ -43,7 +45,8 @@ open Set Function
 
 open scoped Manifold ContDiff
 
--- DISSOLVED: EuclideanHalfSpace
+def EuclideanHalfSpace (n : ℕ) [NeZero n] : Type :=
+  { x : EuclideanSpace ℝ (Fin n) // 0 ≤ x 0 }
 
 def EuclideanQuadrant (n : ℕ) : Type :=
   { x : EuclideanSpace ℝ (Fin n) // ∀ i : Fin n, 0 ≤ x i }
@@ -117,47 +120,39 @@ theorem range_euclideanQuadrant (n : ℕ) :
 
 end
 
--- DISSOLVED: modelWithCornersEuclideanHalfSpace
-
-def modelWithCornersEuclideanQuadrant (n : ℕ) :
-    ModelWithCorners ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanQuadrant n) where
+def modelWithCornersEuclideanHalfSpace (n : ℕ) [NeZero n] :
+    ModelWithCorners ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanHalfSpace n) where
   toFun := Subtype.val
-  invFun x := ⟨fun i => max (x i) 0, fun i => by simp only [le_refl, or_true, le_max_iff]⟩
+  invFun x := ⟨update x 0 (max (x 0) 0), by simp [le_refl]⟩
   source := univ
-  target := { x | ∀ i, 0 ≤ x i }
+  target := { x | 0 ≤ x 0 }
   map_source' x _ := x.property
   map_target' _ _ := mem_univ _
-  left_inv' x _ := by ext i; simp only [Subtype.coe_mk, x.2 i, max_eq_left]
-  right_inv' x hx := by ext1 i; simp only [hx i, max_eq_left]
+  left_inv' := fun ⟨xval, xprop⟩ _ => by
+    rw [Subtype.mk_eq_mk, update_eq_iff]
+    exact ⟨max_eq_left xprop, fun i _ => rfl⟩
+  right_inv' _ hx := update_eq_iff.2 ⟨max_eq_left hx, fun _ _ => rfl⟩
   source_eq := rfl
   uniqueDiffOn' := by
-    have this : UniqueDiffOn ℝ _ :=
-      UniqueDiffOn.univ_pi (Fin n) (fun _ => ℝ) _ fun _ => uniqueDiffOn_Ici 0
-    simpa only [pi_univ_Ici] using this
-  target_subset_closure_interior := by
-    have : {x : EuclideanSpace ℝ (Fin n) | ∀ (i : Fin n), 0 ≤ x i}
-      = Set.pi univ (fun i ↦ Ici 0) := by aesop
-    simp only [this, interior_pi_set finite_univ]
-    rw [closure_pi_set]
-    simp
+    have : UniqueDiffOn ℝ _ :=
+      UniqueDiffOn.pi (Fin n) (fun _ => ℝ) _ _ fun i (_ : i ∈ ({0} : Set (Fin n))) =>
+        uniqueDiffOn_Ici 0
+    simpa only [singleton_pi] using this
+  target_subset_closure_interior := by simp
   continuous_toFun := continuous_subtype_val
-  continuous_invFun := Continuous.subtype_mk
-    (continuous_pi fun i => (continuous_id.max continuous_const).comp (continuous_apply i)) _
+  continuous_invFun := by
+    exact (continuous_id.update 0 <| (continuous_apply 0).max continuous_const).subtype_mk _
 
 scoped[Manifold]
 
   notation "𝓡 " n =>
-
     (modelWithCornersSelf ℝ (EuclideanSpace ℝ (Fin n)) :
-
       ModelWithCorners ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanSpace ℝ (Fin n)))
 
 scoped[Manifold]
 
   notation "𝓡∂ " n =>
-
     (modelWithCornersEuclideanHalfSpace n :
-
       ModelWithCorners ℝ (EuclideanSpace ℝ (Fin n)) (EuclideanHalfSpace n))
 
 -- DISSOLVED: range_modelWithCornersEuclideanHalfSpace

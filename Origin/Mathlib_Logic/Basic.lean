@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Basic.lean
-Genuine: 208 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
+Genuine: 207 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Tactic.Attr.Register
@@ -10,6 +10,8 @@ import Batteries.Tactic.Trans
 import Batteries.Util.LibraryNote
 import Mathlib.Data.Nat.Notation
 import Mathlib.Data.Int.Notation
+
+noncomputable section
 
 /-!
 # Basic logic properties
@@ -63,16 +65,6 @@ class Fact (p : Prop) : Prop where
   /-- `Fact.out` contains the unwrapped witness for the fact represented by the instance of
   `Fact p`. -/
   out : p
-
-library_note "fact non-instances"/--
-
-In most cases, we should not have global instances of `Fact`; typeclass search only reads the head
-
-symbol and then tries any instances, which means that adding any such instance will cause slowdowns
-
-everywhere. We instead make them as lemmata and make them local instances as required.
-
--/
 
 theorem Fact.elim {p : Prop} (h : Fact p) : p := h.1
 
@@ -134,38 +126,6 @@ theorem by_cases {p q : Prop} (hpq : p → q) (hnpq : ¬p → q) : q :=
 if hp : p then hpq hp else hnpq hp
 
 alias by_contra := by_contradiction
-
-library_note "decidable namespace"/--
-
-In most of mathlib, we use the law of excluded middle (LEM) and the axiom of choice (AC) freely.
-
-The `Decidable` namespace contains versions of lemmas from the root namespace that explicitly
-
-attempt to avoid the axiom of choice, usually by adding decidability assumptions on the inputs.
-
-You can check if a lemma uses the axiom of choice by using `#print axioms foo` and seeing if
-
-`Classical.choice` appears in the list.
-
--/
-
-library_note "decidable arguments"/--
-
-As mathlib is primarily classical,
-
-if the type signature of a `def` or `lemma` does not require any `Decidable` instances to state,
-
-it is preferable not to introduce any `Decidable` instances that are needed in the proof
-
-as arguments, but rather to use the `classical` tactic as needed.
-
-In the other direction, when `Decidable` instances do appear in the type signature,
-
-it is better to use explicitly introduced ones rather than allowing Lean to automatically infer
-
-classical ones, as these may cause instance mismatch errors later.
-
--/
 
 export Classical (not_not)
 
@@ -268,8 +228,6 @@ theorem imp_iff_or_not {b a : Prop} : b → a ↔ a ∨ ¬b := Decidable.imp_iff
 
 theorem not_imp_not : ¬a → ¬b ↔ b → a := Decidable.not_imp_not
 
-theorem imp_and_neg_imp_iff (p q : Prop) : (p → q) ∧ (¬p → q) ↔ q := by simp
-
 protected theorem Function.mtr : (¬a → ¬b) → b → a := not_imp_not.mp
 
 theorem or_congr_left' {c a b : Prop} (h : ¬c → (a ↔ b)) : a ∨ c ↔ b ∨ c :=
@@ -282,8 +240,6 @@ theorem or_congr_right' {c : Prop} (h : ¬a → (b ↔ c)) : a ∨ b ↔ a ∨ c
 /-! Declarations about `iff` -/
 
 alias Iff.iff := iff_congr
-
-theorem iff_mpr_iff_true_intro {P : Prop} (h : P) : Iff.mpr (iff_true_intro h) True.intro = h := rfl
 
 theorem imp_or {a b c : Prop} : a → b ∨ c ↔ (a → b) ∨ (a → c) := Decidable.imp_or
 
@@ -356,22 +312,6 @@ theorem eq_equivalence {α : Sort*} : Equivalence (@Eq α) :=
   ⟨Eq.refl, @Eq.symm _, @Eq.trans _⟩
 
 attribute [simp] eq_mp_eq_cast eq_mpr_eq_cast
-
-theorem congr_refl_left {α β : Sort*} (f : α → β) {a b : α} (h : a = b) :
-    congr (Eq.refl f) h = congr_arg f h := rfl
-
-theorem congr_refl_right {α β : Sort*} {f g : α → β} (h : f = g) (a : α) :
-    congr h (Eq.refl a) = congr_fun h a := rfl
-
-theorem congr_arg_refl {α β : Sort*} (f : α → β) (a : α) :
-    congr_arg f (Eq.refl a) = Eq.refl (f a) :=
-  rfl
-
-theorem congr_fun_rfl {α β : Sort*} (f : α → β) (a : α) : congr_fun (Eq.refl f) a = Eq.refl (f a) :=
-  rfl
-
-theorem congr_fun_congr_arg {α β γ : Sort*} (f : α → β → γ) {a a' : α} (p : a = a') (b : β) :
-    congr_fun (congr_arg f p) b = congr_arg (fun a ↦ f a b) p := rfl
 
 theorem Eq.rec_eq_cast {α : Sort _} {P : α → Sort _} {x y : α} (h : x = y) (z : P x) :
     h ▸ z = cast (congr_arg P h) z := by induction h; rfl
@@ -472,11 +412,6 @@ theorem forall_true_iff : (α → True) ↔ True := imp_true_iff _
 theorem forall_true_iff' (h : ∀ a, p a ↔ True) : (∀ a, p a) ↔ True :=
   iff_true_intro fun _ ↦ of_iff_true (h _)
 
-theorem forall₂_true_iff {β : α → Sort*} : (∀ a, β a → True) ↔ True := by simp
-
-theorem forall₃_true_iff {β : α → Sort*} {γ : ∀ a, β a → Sort*} :
-    (∀ (a) (b : β a), γ a b → True) ↔ True := by simp
-
 theorem Decidable.and_forall_ne [DecidableEq α] (a : α) {p : α → Prop} :
     (p a ∧ ∀ b, b ≠ a → p b) ↔ ∀ b, p b := by
   simp only [← @forall_eq _ p a, ← forall_and, ← or_imp, Decidable.em, forall_const]
@@ -529,12 +464,6 @@ theorem exists_apply_eq (a : α) (b : β) : ∃ f : α → β, f a = b := ⟨fun
     (∃ c, (∃ a, ∃ b, f a b = c) ∧ p c) ↔ ∃ a, ∃ b, p (f a b) :=
   ⟨fun ⟨_, ⟨a, b, hab⟩, hc⟩ ↦ ⟨a, b, hab.symm ▸ hc⟩,
     fun ⟨a, b, hab⟩ ↦ ⟨f a b, ⟨a, b, rfl⟩, hab⟩⟩
-
-theorem forall_apply_eq_imp_iff' {f : α → β} {p : β → Prop} :
-    (∀ a b, f a = b → p b) ↔ ∀ a, p (f a) := by simp
-
-theorem forall_eq_apply_imp_iff' {f : α → β} {p : β → Prop} :
-    (∀ a b, b = f a → p b) ↔ ∀ a, p (f a) := by simp
 
 theorem exists₂_comm
     {ι₁ ι₂ : Sort*} {κ₁ : ι₁ → Sort*} {κ₂ : ι₂ → Sort*} {p : ∀ i₁, κ₁ i₁ → ∀ i₂, κ₂ i₂ → Prop} :
@@ -600,6 +529,7 @@ lemma eq_true_intro {a : Prop} (h : a) : a = True := propext (iff_true_intro h)
 lemma eq_false_intro {a : Prop} (h : ¬a) : a = False := propext (iff_false_intro h)
 
 @[nolint defLemma] alias Iff.eq := propext
+
 lemma iff_eq_eq {a b : Prop} : (a ↔ b) = (a = b) := propext ⟨propext, Eq.to_iff⟩
 
 @[simp] theorem forall_true_left (p : True → Prop) : (∀ x, p x) ↔ p True.intro :=
@@ -658,11 +588,13 @@ theorem cases_true_false (p : Prop → Prop)
 theorem eq_false_or_eq_true (a : Prop) : a = False ∨ a = True := (prop_complete a).symm
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-07-27")]
 
 theorem cases_on (a : Prop) {p : Prop → Prop} (h1 : p True) (h2 : p False) : p a :=
   @cases_true_false p h1 h2 a
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-07-27")]
 
 theorem cases {p : Prop → Prop} (h1 : p True) (h2 : p False) (a) : p a := cases_on a h1 h2
 

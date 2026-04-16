@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/Module/FiniteDimension.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 5 | Infrastructure: 15
+Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.BalancedCoreHull
@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.Module.Simple
 import Mathlib.Topology.Algebra.Module.Determinant
 import Mathlib.RingTheory.LocalRing.Basic
 import Mathlib.RingTheory.Localization.FractionRing
+
+noncomputable section
 
 /-!
 # Finite dimensional topological vector spaces over complete fields
@@ -168,7 +170,14 @@ theorem LinearMap.continuous_iff_isClosed_ker (l : E →ₗ[𝕜] 𝕜) :
     Continuous l ↔ IsClosed (LinearMap.ker l : Set E) :=
   ⟨fun h => isClosed_singleton.preimage h, l.continuous_of_isClosed_ker⟩
 
--- DISSOLVED: LinearMap.continuous_of_nonzero_on_open
+theorem LinearMap.continuous_of_nonzero_on_open (l : E →ₗ[𝕜] 𝕜) (s : Set E) (hs₁ : IsOpen s)
+    (hs₂ : s.Nonempty) (hs₃ : ∀ x ∈ s, l x ≠ 0) : Continuous l := by
+  refine l.continuous_of_isClosed_ker (l.isClosed_or_dense_ker.resolve_right fun hl => ?_)
+  rcases hs₂ with ⟨x, hx⟩
+  have : x ∈ interior (LinearMap.ker l : Set E)ᶜ := by
+    rw [mem_interior_iff_mem_nhds]
+    exact mem_of_superset (hs₁.mem_nhds hx) hs₃
+  rwa [hl.interior_compl] at this
 
 variable [CompleteSpace 𝕜]
 
@@ -261,36 +270,6 @@ def _root_.Module.End.toContinuousLinearMap (E : Type v) [NormedAddCommGroup E]
     map_mul' := fun _ _ ↦ rfl
     commutes' := fun _ ↦ rfl }
 
-@[simp]
-theorem coe_toContinuousLinearMap' (f : E →ₗ[𝕜] F') : ⇑(LinearMap.toContinuousLinearMap f) = f :=
-  rfl
-
-@[simp]
-theorem coe_toContinuousLinearMap (f : E →ₗ[𝕜] F') :
-    ((LinearMap.toContinuousLinearMap f) : E →ₗ[𝕜] F') = f :=
-  rfl
-
-@[simp]
-theorem coe_toContinuousLinearMap_symm :
-    ⇑(toContinuousLinearMap : (E →ₗ[𝕜] F') ≃ₗ[𝕜] E →L[𝕜] F').symm =
-      ((↑) : (E →L[𝕜] F') → E →ₗ[𝕜] F') :=
-  rfl
-
-@[simp]
-theorem det_toContinuousLinearMap (f : E →ₗ[𝕜] E) :
-    (LinearMap.toContinuousLinearMap f).det = LinearMap.det f :=
-  rfl
-
-@[simp]
-theorem ker_toContinuousLinearMap (f : E →ₗ[𝕜] F') :
-    ker (LinearMap.toContinuousLinearMap f) = ker f :=
-  rfl
-
-@[simp]
-theorem range_toContinuousLinearMap (f : E →ₗ[𝕜] F') :
-    range (LinearMap.toContinuousLinearMap f) = range f :=
-  rfl
-
 theorem isOpenMap_of_finiteDimensional (f : F →ₗ[𝕜] E) (hf : Function.Surjective f) :
     IsOpenMap f := by
   obtain ⟨g, hg⟩ := f.exists_rightInverse_of_surjective (LinearMap.range_eq_top.2 hf)
@@ -319,24 +298,6 @@ def toContinuousLinearEquiv (e : E ≃ₗ[𝕜] F) : E ≃L[𝕜] F :=
     continuous_invFun :=
       haveI : FiniteDimensional 𝕜 F := e.finiteDimensional
       e.symm.toLinearMap.continuous_of_finiteDimensional }
-
-@[simp]
-theorem coe_toContinuousLinearEquiv (e : E ≃ₗ[𝕜] F) : (e.toContinuousLinearEquiv : E →ₗ[𝕜] F) = e :=
-  rfl
-
-@[simp]
-theorem coe_toContinuousLinearEquiv' (e : E ≃ₗ[𝕜] F) : (e.toContinuousLinearEquiv : E → F) = e :=
-  rfl
-
-@[simp]
-theorem coe_toContinuousLinearEquiv_symm (e : E ≃ₗ[𝕜] F) :
-    (e.toContinuousLinearEquiv.symm : F →ₗ[𝕜] E) = e.symm :=
-  rfl
-
-@[simp]
-theorem coe_toContinuousLinearEquiv_symm' (e : E ≃ₗ[𝕜] F) :
-    (e.toContinuousLinearEquiv.symm : F → E) = e.symm :=
-  rfl
 
 @[simp]
 theorem toLinearEquiv_toContinuousLinearEquiv (e : E ≃ₗ[𝕜] F) :
@@ -379,10 +340,6 @@ def constrL (v : Basis ι 𝕜 E) (f : ι → F) : E →L[𝕜] F :=
   haveI : FiniteDimensional 𝕜 E := FiniteDimensional.of_fintype_basis v
   LinearMap.toContinuousLinearMap (v.constr 𝕜 f)
 
-@[simp] -- Porting note: removed `norm_cast`
-theorem coe_constrL (v : Basis ι 𝕜 E) (f : ι → F) : (v.constrL f : E →ₗ[𝕜] F) = v.constr 𝕜 f :=
-  rfl
-
 @[simps! apply]
 def equivFunL (v : Basis ι 𝕜 E) : E ≃L[𝕜] ι → 𝕜 :=
   { v.equivFun with
@@ -413,11 +370,14 @@ namespace ContinuousLinearMap
 
 variable [T2Space E] [FiniteDimensional 𝕜 E]
 
--- DISSOLVED: toContinuousLinearEquivOfDetNeZero
+def toContinuousLinearEquivOfDetNeZero (f : E →L[𝕜] E) (hf : f.det ≠ 0) : E ≃L[𝕜] E :=
+  ((f : E →ₗ[𝕜] E).equivOfDetNeZero hf).toContinuousLinearEquiv
 
--- DISSOLVED: coe_toContinuousLinearEquivOfDetNeZero
-
--- DISSOLVED: toContinuousLinearEquivOfDetNeZero_apply
+@[simp]
+theorem coe_toContinuousLinearEquivOfDetNeZero (f : E →L[𝕜] E) (hf : f.det ≠ 0) :
+    (f.toContinuousLinearEquivOfDetNeZero hf : E →L[𝕜] E) = f := by
+  ext x
+  rfl
 
 theorem _root_.Matrix.toLin_finTwoProd_toContinuousLinearMap (a b c d : 𝕜) :
     LinearMap.toContinuousLinearMap
@@ -437,7 +397,6 @@ variable (𝕜 E : Type*) [NontriviallyNormedField 𝕜]
   [Module 𝕜 E] [ContinuousSMul 𝕜 E]
 
 include 𝕜 in
-
 theorem FiniteDimensional.complete [FiniteDimensional 𝕜 E] : CompleteSpace E := by
   set e := ContinuousLinearEquiv.ofFinrankEq (@finrank_fin_fun 𝕜 _ _ (finrank 𝕜 E)).symm
   have : IsUniformEmbedding e.toEquiv.symm := e.symm.isUniformEmbedding
@@ -475,7 +434,9 @@ theorem LinearMap.isClosedEmbedding_of_injective [T2Space E] [FiniteDimensional 
 
 alias LinearMap.closedEmbedding_of_injective := LinearMap.isClosedEmbedding_of_injective
 
--- DISSOLVED: isClosedEmbedding_smul_left
+theorem isClosedEmbedding_smul_left [T2Space E] {c : E} (hc : c ≠ 0) :
+    IsClosedEmbedding fun x : 𝕜 => x • c :=
+  LinearMap.isClosedEmbedding_of_injective (LinearMap.ker_toSpanSingleton 𝕜 E hc)
 
 alias closedEmbedding_smul_left := isClosedEmbedding_smul_left
 

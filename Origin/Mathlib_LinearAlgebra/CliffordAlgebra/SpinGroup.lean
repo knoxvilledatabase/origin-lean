@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.CliffordAlgebra.Star
 import Mathlib.LinearAlgebra.CliffordAlgebra.Even
 import Mathlib.LinearAlgebra.CliffordAlgebra.Inversion
 
+noncomputable section
+
 /-!
 # The Pin group and the Spin group
 
@@ -244,12 +246,6 @@ instance : StarMul (pinGroup Q) where
 instance : Inhabited (pinGroup Q) :=
   ⟨1⟩
 
-theorem star_eq_inv (x : pinGroup Q) : star x = x⁻¹ :=
-  rfl
-
-theorem star_eq_inv' : (star : pinGroup Q → pinGroup Q) = Inv.inv :=
-  rfl
-
 @[simps]
 def toUnits : pinGroup Q →* (CliffordAlgebra Q)ˣ where
   toFun x := ⟨x, ↑x⁻¹, coe_mul_star_self x, coe_star_mul_self x⟩
@@ -360,12 +356,6 @@ instance : StarMul (spinGroup Q) where
 
 instance : Inhabited (spinGroup Q) :=
   ⟨1⟩
-
-theorem star_eq_inv (x : spinGroup Q) : star x = x⁻¹ :=
-  rfl
-
-theorem star_eq_inv' : (star : spinGroup Q → spinGroup Q) = Inv.inv :=
-  rfl
 
 @[simps]
 def toUnits : spinGroup Q →* (CliffordAlgebra Q)ˣ where

@@ -13,6 +13,8 @@ import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Positivity
 
+noncomputable section
+
 /-!
 # Catalan numbers
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Interval.Set.Disjoint
 import Mathlib.Order.SuccPred.Archimedean
 
+noncomputable section
+
 /-!
 # Monotonicity on intervals
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.GroupPower.IterateHom
 import Mathlib.Algebra.Regular.Basic
 
+noncomputable section
+
 /-!
 # Regular elements
 

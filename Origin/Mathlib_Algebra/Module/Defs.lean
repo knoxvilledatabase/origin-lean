@@ -9,6 +9,8 @@ import Mathlib.Algebra.GroupWithZero.Action.Defs
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Algebra.SMulWithZero
 
+noncomputable section
+
 /-!
 # Modules over a ring
 
@@ -126,8 +128,6 @@ theorem neg_smul : -r • x = -(r • x) :=
 theorem neg_smul_neg : -r • -x = r • x := by rw [neg_smul, smul_neg, neg_neg]
 
 variable (R)
-
-theorem neg_one_smul (x : M) : (-1 : R) • x = -x := by simp
 
 variable {R}
 

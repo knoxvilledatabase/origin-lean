@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Support
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 
+noncomputable section
+
 /-!
 
 # Subsets of prime spectra related to modules

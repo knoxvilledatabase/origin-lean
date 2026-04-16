@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Basic
 import Mathlib.Order.OmegaCompletePartialOrder
 import Mathlib.Topology.Sheaves.SheafCondition.OpensLeCover
 
+noncomputable section
+
 /-!
 # Equivalent formulations of the sheaf condition
 
@@ -241,20 +243,6 @@ def interUnionPullbackCone :
   PullbackCone.mk (F.1.map (homOfLE le_sup_left).op) (F.1.map (homOfLE le_sup_right).op) <| by
     rw [← F.1.map_comp, ← F.1.map_comp]
     congr 1
-
-@[simp]
-theorem interUnionPullbackCone_pt : (interUnionPullbackCone F U V).pt = F.1.obj (op <| U ⊔ V) :=
-  rfl
-
-@[simp]
-theorem interUnionPullbackCone_fst :
-    (interUnionPullbackCone F U V).fst = F.1.map (homOfLE le_sup_left).op :=
-  rfl
-
-@[simp]
-theorem interUnionPullbackCone_snd :
-    (interUnionPullbackCone F U V).snd = F.1.map (homOfLE le_sup_right).op :=
-  rfl
 
 variable
   (s :

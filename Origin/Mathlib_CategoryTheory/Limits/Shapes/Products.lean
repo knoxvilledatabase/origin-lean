@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits
 import Mathlib.CategoryTheory.DiscreteCategory
 
+noncomputable section
+
 /-!
 # Categorical (co)products
 
@@ -64,10 +66,6 @@ def Fan.proj {f : β → C} (p : Fan f) (j : β) : p.pt ⟶ f j :=
 
 def Cofan.inj {f : β → C} (p : Cofan f) (j : β) : f j ⟶ p.pt :=
   p.ι.app (Discrete.mk j)
-
-@[simp]
-theorem fan_mk_proj {f : β → C} (P : C) (p : ∀ b, P ⟶ f b) (j : β) : (Fan.mk P p).proj j = p j :=
-  rfl
 
 @[simp]
 theorem cofan_mk_inj {f : β → C} (P : C) (p : ∀ b, f b ⟶ P) (j : β) :
@@ -289,11 +287,6 @@ lemma Pi.map'_comp_π {f : α → C} {g : β → C} [HasProduct f] [HasProduct g
 lemma Pi.map'_id_id {f : α → C} [HasProduct f] : Pi.map' id (fun a => 𝟙 (f a)) = 𝟙 (∏ᶜ f) := by
   ext; simp
 
-@[simp]
-lemma Pi.map'_id {f g : α → C} [HasProduct f] [HasProduct g] (p : ∀ b, f b ⟶ g b) :
-    Pi.map' id p = Pi.map p :=
-  rfl
-
 lemma Pi.map'_comp_map' {f : α → C} {g : β → C} {h : γ → C} [HasProduct f] [HasProduct g]
     [HasProduct h] (p : β → α) (p' : γ → β) (q : ∀ (b : β), f (p b) ⟶ g b)
     (q' : ∀ (c : γ), g (p' c) ⟶ h c) :
@@ -330,16 +323,6 @@ variable (X : Discrete α ⥤ C) [HasProduct (fun j => X.obj (Discrete.mk j))]
 def Pi.cone : Cone X where
   pt := ∏ᶜ (fun j => X.obj (Discrete.mk j))
   π := Discrete.natTrans (fun _ => Pi.π _ _)
-
-def productIsProduct' :
-    IsLimit (Pi.cone X) where
-  lift s := Pi.lift (fun j => s.π.app ⟨j⟩)
-  fac s := by simp
-  uniq s m hm := by
-    dsimp
-    ext
-    simp only [limit.lift_π, Fan.mk_pt, Fan.mk_π_app]
-    apply hm
 
 variable [HasLimit X]
 
@@ -391,11 +374,6 @@ lemma Sigma.map'_id_id {f : α → C} [HasCoproduct f] :
     Sigma.map' id (fun a => 𝟙 (f a)) = 𝟙 (∐ f) := by
   ext; simp
 
-@[simp]
-lemma Sigma.map'_id {f g : α → C} [HasCoproduct f] [HasCoproduct g] (p : ∀ b, f b ⟶ g b) :
-    Sigma.map' id p = Sigma.map p :=
-  rfl
-
 lemma Sigma.map'_comp_map' {f : α → C} {g : β → C} {h : γ → C} [HasCoproduct f] [HasCoproduct g]
     [HasCoproduct h] (p : α → β) (p' : β → γ) (q : ∀ (a : α), f a ⟶ g (p a))
     (q' : ∀ (b : β), g b ⟶ h (p' b)) :
@@ -434,16 +412,6 @@ def Sigma.cocone : Cocone X where
   pt := ∐ (fun j => X.obj (Discrete.mk j))
   ι := Discrete.natTrans (fun _ => Sigma.ι (fun j ↦ X.obj ⟨j⟩) _)
 
-def coproductIsCoproduct' :
-    IsColimit (Sigma.cocone X) where
-  desc s := Sigma.desc (fun j => s.ι.app ⟨j⟩)
-  fac s := by simp
-  uniq s m hm := by
-    dsimp
-    ext
-    simp only [colimit.ι_desc, Cofan.mk_pt, Cofan.mk_ι_app]
-    apply hm
-
 variable [HasColimit X]
 
 def Sigma.isoColimit :
@@ -474,8 +442,6 @@ def Sigma.whiskerEquiv {J K : Type*} {f : J → C} {g : K → C} (e : J ≃ K) (
   hom := Sigma.map' e fun j => (w j).inv
   inv := Sigma.map' e.symm fun k => eqToHom (by simp) ≫ (w (e.symm k)).hom
 
-The last proof was previously by `aesop_cat`. -/
-
 instance {ι : Type*} (f : ι → Type*) (g : (i : ι) → (f i) → C)
     [∀ i, HasProduct (g i)] [HasProduct fun i => ∏ᶜ g i] :
     HasProduct fun p : Σ i, f i => g p.1 p.2 where
@@ -491,8 +457,6 @@ def piPiIso {ι : Type*} (f : ι → Type*) (g : (i : ι) → (f i) → C)
     (∏ᶜ fun i => ∏ᶜ g i) ≅ (∏ᶜ fun p : Σ i, f i => g p.1 p.2) where
   hom := Pi.lift fun ⟨i, x⟩ => Pi.π _ i ≫ Pi.π _ x
   inv := Pi.lift fun i => Pi.lift fun x => Pi.π _ (⟨i, x⟩ : Σ i, f i)
-
-The last proof was previously by `aesop_cat`. -/
 
 instance {ι : Type*} (f : ι → Type*) (g : (i : ι) → (f i) → C)
     [∀ i, HasCoproduct (g i)] [HasCoproduct fun i => ∐ g i] :

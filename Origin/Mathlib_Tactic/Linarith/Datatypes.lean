@@ -7,6 +7,8 @@ import Mathlib.Tactic.Linarith.Lemmas
 import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Util.SynthesizeUsing
 
+noncomputable section
+
 /-!
 # Datatypes for `linarith`
 

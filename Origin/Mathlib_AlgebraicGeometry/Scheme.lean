@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Spec
 import Mathlib.Algebra.Category.Ring.Constructions
 import Mathlib.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # The category of schemes
 
@@ -165,10 +167,6 @@ lemma preimage_le_preimage_of_le {U U' : Y.Opens} (hUU' : U ≤ U') :
 
 end Hom
 
-@[simp]
-lemma preimage_comp {X Y Z : Scheme.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) (U) :
-    (f ≫ g) ⁻¹ᵁ U = f ⁻¹ᵁ g ⁻¹ᵁ U := rfl
-
 @[simps!]
 def forgetToLocallyRingedSpace : Scheme ⥤ LocallyRingedSpace where
   obj := toLocallyRingedSpace
@@ -192,23 +190,11 @@ def forgetToTop : Scheme ⥤ TopCat :=
 noncomputable def homeoOfIso {X Y : Scheme.{u}} (e : X ≅ Y) : X ≃ₜ Y :=
   TopCat.homeoOfIso (forgetToTop.mapIso e)
 
-@[simp]
-lemma homeoOfIso_symm {X Y : Scheme} (e : X ≅ Y) :
-    (homeoOfIso e).symm = homeoOfIso e.symm := rfl
-
-@[simp]
-lemma homeoOfIso_apply {X Y : Scheme} (e : X ≅ Y) (x : X) :
-    homeoOfIso e x = e.hom.base x := rfl
-
 alias _root_.CategoryTheory.Iso.schemeIsoToHomeo := homeoOfIso
 
 noncomputable def Hom.homeomorph {X Y : Scheme.{u}} (f : X.Hom Y) [IsIso (C := Scheme) f] :
     X ≃ₜ Y :=
   (asIso f).schemeIsoToHomeo
-
-@[simp]
-lemma Hom.homeomorph_apply {X Y : Scheme.{u}} (f : X.Hom Y) [IsIso (C := Scheme) f] (x) :
-    f.homeomorph x = f.base x := rfl
 
 instance hasCoeToTopCat : CoeOut Scheme TopCat where
   coe X := X.carrier
@@ -218,37 +204,10 @@ unif_hint forgetToTop_obj_eq_coe (X : Scheme) where ⊢
   forgetToTop.obj X ≟ (X : TopCat)
 
 @[simp]
-theorem id.base (X : Scheme) : (𝟙 X : _).base = 𝟙 _ :=
-  rfl
-
-@[simp]
 theorem id_app {X : Scheme} (U : X.Opens) :
     (𝟙 X : _).app U = 𝟙 _ := rfl
 
-@[simp]
-theorem id_appTop {X : Scheme} :
-    (𝟙 X : _).appTop = 𝟙 _ :=
-  rfl
-
-@[reassoc]
-theorem comp_toLRSHom {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).toLRSHom = f.toLRSHom ≫ g.toLRSHom :=
-  rfl
-
 @[simp, reassoc] -- reassoc lemma does not need `simp`
-
-theorem comp_coeBase {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).base = f.base ≫ g.base :=
-  rfl
-
-@[reassoc]
-theorem comp_base {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).base = f.base ≫ g.base :=
-  rfl
-
-theorem comp_base_apply {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) (x : X) :
-    (f ≫ g).base x = g.base (f.base x) := by
-  simp
 
 @[simp, reassoc] -- reassoc lemma does not need `simp`
 
@@ -257,10 +216,6 @@ theorem comp_app {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) (U) :
   rfl
 
 @[simp, reassoc] -- reassoc lemma does not need `simp`
-
-theorem comp_appTop {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).appTop = g.appTop ≫ f.appTop :=
-  rfl
 
 theorem appLE_comp_appLE {X Y Z : Scheme} (f : X ⟶ Y) (g : Y ⟶ Z) (U V W e₁ e₂) :
     g.appLE U V e₁ ≫ f.appLE V W e₂ =
@@ -317,18 +272,11 @@ theorem inv_app {X Y : Scheme} (f : X ⟶ Y) [IsIso f] (U : X.Opens) :
   rw [IsIso.eq_comp_inv, ← Scheme.comp_app, Scheme.congr_app (IsIso.hom_inv_id f),
     Scheme.id_app, Category.id_comp]
 
-theorem inv_appTop {X Y : Scheme} (f : X ⟶ Y) [IsIso f] :
-    (inv f).appTop = inv (f.appTop) := by simp
-
 end Scheme
 
 def Spec (R : CommRingCat) : Scheme where
   local_affine _ := ⟨⟨⊤, trivial⟩, R, ⟨(Spec.toLocallyRingedSpace.obj (op R)).restrictTopIso⟩⟩
   toLocallyRingedSpace := Spec.locallyRingedSpaceObj R
-
-theorem Spec_toLocallyRingedSpace (R : CommRingCat) :
-    (Spec R).toLocallyRingedSpace = Spec.locallyRingedSpaceObj R :=
-  rfl
 
 def Spec.map {R S : CommRingCat} (f : R ⟶ S) : Spec S ⟶ Spec R :=
   ⟨Spec.locallyRingedSpaceMap f⟩
@@ -366,22 +314,6 @@ section
 
 variable {R S : CommRingCat.{u}} (f : R ⟶ S)
 
-lemma Spec_carrier (R : CommRingCat.{u}) : (Spec R).carrier = PrimeSpectrum R := rfl
-
-lemma Spec_sheaf (R : CommRingCat.{u}) : (Spec R).sheaf = Spec.structureSheaf R := rfl
-
-lemma Spec_presheaf (R : CommRingCat.{u}) : (Spec R).presheaf = (Spec.structureSheaf R).1 := rfl
-
-lemma Spec.map_base : (Spec.map f).base = PrimeSpectrum.comap f := rfl
-
-lemma Spec.map_base_apply (x : Spec S) : (Spec.map f).base x = PrimeSpectrum.comap f x := rfl
-
-lemma Spec.map_app (U) :
-    (Spec.map f).app U = StructureSheaf.comap f U (Spec.map f ⁻¹ᵁ U) le_rfl := rfl
-
-lemma Spec.map_appLE {U V} (e : U ≤ Spec.map f ⁻¹ᵁ V) :
-    (Spec.map f).appLE V U e = StructureSheaf.comap f V U e := rfl
-
 instance {A : CommRingCat} [Nontrivial A] : Nonempty (Spec A) :=
   inferInstanceAs <| Nonempty (PrimeSpectrum A)
 
@@ -406,23 +338,6 @@ instance : Inhabited Scheme :=
 def Γ : Schemeᵒᵖ ⥤ CommRingCat :=
   Scheme.forgetToLocallyRingedSpace.op ⋙ LocallyRingedSpace.Γ
 
-theorem Γ_def : Γ = Scheme.forgetToLocallyRingedSpace.op ⋙ LocallyRingedSpace.Γ :=
-  rfl
-
-@[simp]
-theorem Γ_obj (X : Schemeᵒᵖ) : Γ.obj X = Γ(unop X, ⊤) :=
-  rfl
-
-theorem Γ_obj_op (X : Scheme) : Γ.obj (op X) = Γ(X, ⊤) :=
-  rfl
-
-@[simp]
-theorem Γ_map {X Y : Schemeᵒᵖ} (f : X ⟶ Y) : Γ.map f = f.unop.appTop :=
-  rfl
-
-theorem Γ_map_op {X Y : Scheme} (f : X ⟶ Y) : Γ.map f.op = f.appTop :=
-  rfl
-
 def SpecΓIdentity : Scheme.Spec.rightOp ⋙ Scheme.Γ ≅ 𝟭 _ :=
   Iso.symm <| NatIso.ofComponents.{u,u,u+1,u+1}
     (fun R => asIso (StructureSheaf.toOpen R ⊤))
@@ -432,12 +347,6 @@ variable (R : CommRingCat.{u})
 
 def ΓSpecIso : Γ(Spec R, ⊤) ≅ R := SpecΓIdentity.app R
 
-@[simp] lemma SpecΓIdentity_app : SpecΓIdentity.app R = ΓSpecIso R := rfl
-
-@[simp] lemma SpecΓIdentity_hom_app : SpecΓIdentity.hom.app R = (ΓSpecIso R).hom := rfl
-
-@[simp] lemma SpecΓIdentity_inv_app : SpecΓIdentity.inv.app R = (ΓSpecIso R).inv := rfl
-
 @[reassoc (attr := simp)]
 lemma ΓSpecIso_naturality {R S : CommRingCat.{u}} (f : R ⟶ S) :
     (Spec.map f).appTop ≫ (ΓSpecIso S).hom = (ΓSpecIso R).hom ≫ f := SpecΓIdentity.hom.naturality f
@@ -446,17 +355,8 @@ lemma ΓSpecIso_naturality {R S : CommRingCat.{u}} (f : R ⟶ S) :
 lemma ΓSpecIso_inv_naturality {R S : CommRingCat.{u}} (f : R ⟶ S) :
     f ≫ (ΓSpecIso S).inv = (ΓSpecIso R).inv ≫ (Spec.map f).appTop := SpecΓIdentity.inv.naturality f
 
-lemma ΓSpecIso_inv : (ΓSpecIso R).inv = StructureSheaf.toOpen R ⊤ := rfl
-
-lemma toOpen_eq (U) :
-    (by exact StructureSheaf.toOpen R U) =
-    (ΓSpecIso R).inv ≫ (Spec R).presheaf.map (homOfLE le_top).op := rfl
-
 instance {K} [Field K] : Unique (Spec (.of K)) :=
   inferInstanceAs <| Unique (PrimeSpectrum K)
-
-@[simp]
-lemma default_asIdeal {K} [Field K] : (default : Spec (.of K)).asIdeal = ⊥ := rfl
 
 section BasicOpen
 
@@ -472,10 +372,6 @@ theorem mem_basicOpen (x : X) (hx : x ∈ U) :
 @[simp]
 theorem mem_basicOpen' (x : U) : ↑x ∈ X.basicOpen f ↔ IsUnit (X.presheaf.germ U x x.2 f) :=
   RingedSpace.mem_basicOpen _ _ _ _
-
-theorem mem_basicOpen'' {U : X.Opens} (f : Γ(X, U)) (x : X) :
-    x ∈ X.basicOpen f ↔ ∃ (m : x ∈ U), IsUnit (X.presheaf.germ U x m f) :=
-  Iff.rfl
 
 @[simp]
 theorem mem_basicOpen_top (f : Γ(X, ⊤)) (x : X) :
@@ -540,10 +436,6 @@ section ZeroLocus
 variable (X : Scheme.{u})
 
 def zeroLocus {U : X.Opens} (s : Set Γ(X, U)) : Set X := X.toRingedSpace.zeroLocus s
-
-lemma zeroLocus_def {U : X.Opens} (s : Set Γ(X, U)) :
-    X.zeroLocus s = ⋂ f ∈ s, (X.basicOpen f).carrierᶜ :=
-  rfl
 
 lemma zeroLocus_isClosed {U : X.Opens} (s : Set Γ(X, U)) :
     IsClosed (X.zeroLocus s) :=

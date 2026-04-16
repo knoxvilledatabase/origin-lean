@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.LinearAlgebra.StdBasis
 import Mathlib.LinearAlgebra.Finsupp.Span
 
+noncomputable section
+
 /-!
 # Linear structures on function with finite support `ι →₀ M`
 
@@ -162,6 +164,7 @@ theorem equivFun_symm_single [Finite n] (b : Basis n R M) (i : n) :
   simp [Pi.single_apply]
 
 set_option linter.deprecated false in
+@[deprecated equivFun_symm_single (since := "2024-08-09")]
 
 theorem equivFun_symm_stdBasis [Finite n] (b : Basis n R M) (i : n) :
     b.equivFun.symm (LinearMap.stdBasis R (fun _ => R) i 1) = b i :=

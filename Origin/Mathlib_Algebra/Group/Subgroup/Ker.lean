@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Map
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Kernel and range of group homomorphisms
 
@@ -92,11 +94,6 @@ theorem coe_rangeRestrict (f : G →* N) (g : G) : (f.rangeRestrict g : N) = f g
   rfl
 
 @[to_additive]
-theorem coe_comp_rangeRestrict (f : G →* N) :
-    ((↑) : f.range → N) ∘ (⇑f.rangeRestrict : G → f.range) = f :=
-  rfl
-
-@[to_additive]
 theorem subtype_comp_rangeRestrict (f : G →* N) : f.range.subtype.comp f.rangeRestrict = f :=
   ext <| f.coe_rangeRestrict
 
@@ -160,16 +157,6 @@ def ofLeftInverse {f : G →* N} {g : N →* G} (h : Function.LeftInverse g f) :
       apply Subtype.ext
       rw [coe_rangeRestrict, Function.comp_apply, Subgroup.coeSubtype, Subtype.coe_mk, h] }
 
-@[to_additive (attr := simp)]
-theorem ofLeftInverse_apply {f : G →* N} {g : N →* G} (h : Function.LeftInverse g f) (x : G) :
-    ↑(ofLeftInverse h x) = f x :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem ofLeftInverse_symm_apply {f : G →* N} {g : N →* G} (h : Function.LeftInverse g f)
-    (x : f.range) : (ofLeftInverse h).symm x = g x :=
-  rfl
-
 @[to_additive "The range of an injective additive group homomorphism is isomorphic to its
 domain."]
 noncomputable def ofInjective {f : G →* N} (hf : Function.Injective f) : G ≃* f.range :=
@@ -178,23 +165,10 @@ noncomputable def ofInjective {f : G →* N} (hf : Function.Injective f) : G ≃
       rintro ⟨x, y, rfl⟩
       exact ⟨y, rfl⟩⟩
 
-@[to_additive]
-theorem ofInjective_apply {f : G →* N} (hf : Function.Injective f) {x : G} :
-    ↑(ofInjective hf x) = f x :=
-  rfl
-
 @[to_additive (attr := simp)]
 theorem apply_ofInjective_symm {f : G →* N} (hf : Function.Injective f) (x : f.range) :
     f ((ofInjective hf).symm x) = x :=
   Subtype.ext_iff.1 <| (ofInjective hf).apply_symm_apply x
-
-@[simp]
-theorem coe_toAdditive_range (f : G →* G') :
-    (MonoidHom.toAdditive f).range = Subgroup.toAddSubgroup f.range := rfl
-
-@[simp]
-theorem coe_toMultiplicative_range {A A' : Type*} [AddGroup A] [AddGroup A'] (f : A →+ A') :
-    (AddMonoidHom.toMultiplicative f).range = AddSubgroup.toSubgroup f.range := rfl
 
 section Ker
 
@@ -218,10 +192,6 @@ theorem mem_ker {f : G →* M} {x : G} : x ∈ f.ker ↔ f x = 1 :=
 theorem div_mem_ker_iff (f : G →* N) {x y : G} : x / y ∈ ker f ↔ f x = f y := by
   rw [mem_ker, map_div, div_eq_one]
 
-@[to_additive]
-theorem coe_ker (f : G →* M) : (f.ker : Set G) = (f : G → M) ⁻¹' {1} :=
-  rfl
-
 @[to_additive (attr := simp)]
 theorem ker_toHomUnits {M} [Monoid M] (f : G →* M) : f.toHomUnits.ker = f.ker := by
   ext x
@@ -237,16 +207,8 @@ theorem eq_iff (f : G →* M) {x y : G} : f x = f y ↔ y⁻¹ * x ∈ f.ker := 
 instance decidableMemKer [DecidableEq M] (f : G →* M) : DecidablePred (· ∈ f.ker) := fun x =>
   decidable_of_iff (f x = 1) f.mem_ker
 
-@[to_additive]
-theorem comap_ker (g : N →* P) (f : G →* N) : g.ker.comap f = (g.comp f).ker :=
-  rfl
-
 @[to_additive (attr := simp)]
 theorem comap_bot (f : G →* N) : (⊥ : Subgroup N).comap f = f.ker :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem ker_restrict (f : G →* N) : (f.restrict K).ker = f.ker.subgroupOf K :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -261,10 +223,6 @@ theorem ker_rangeRestrict (f : G →* N) : ker (rangeRestrict f) = ker f :=
 @[to_additive (attr := simp)]
 theorem ker_one : (1 : G →* M).ker = ⊤ :=
   SetLike.ext fun _x => eq_self_iff_true _
-
-@[to_additive (attr := simp)]
-theorem ker_id : (MonoidHom.id G).ker = ⊥ :=
-  rfl
 
 @[to_additive]
 theorem ker_eq_bot_iff (f : G →* M) : f.ker = ⊥ ↔ Function.Injective f :=
@@ -292,14 +250,6 @@ theorem range_le_ker_iff (f : G →* G') (g : G' →* G'') : f.range ≤ g.ker �
 instance (priority := 100) normal_ker (f : G →* M) : f.ker.Normal :=
   ⟨fun x hx y => by
     rw [mem_ker, map_mul, map_mul, mem_ker.1 hx, mul_one, map_mul_eq_one f (mul_inv_cancel y)]⟩
-
-@[simp]
-theorem coe_toAdditive_ker (f : G →* G') :
-    (MonoidHom.toAdditive f).ker = Subgroup.toAddSubgroup f.ker := rfl
-
-@[simp]
-theorem coe_toMultiplicative_ker {A A' : Type*} [AddGroup A] [AddGroup A'] (f : A →+ A') :
-    (AddMonoidHom.toMultiplicative f).ker = AddSubgroup.toSubgroup f.ker := rfl
 
 end Ker
 

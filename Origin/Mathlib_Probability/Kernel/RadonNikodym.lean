@@ -1,10 +1,12 @@
 /-
 Extracted from Probability/Kernel/RadonNikodym.lean
-Genuine: 58 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.Disintegration.Density
 import Mathlib.Probability.Kernel.WithDensity
+
+noncomputable section
 
 /-!
 # Radon-Nikodym derivative and Lebesgue decomposition for kernels
@@ -81,7 +83,6 @@ variable {α γ : Type*} {mα : MeasurableSpace α} {mγ : MeasurableSpace γ} {
 open Classical in
 
 noncomputable
-
 def rnDerivAux (κ η : Kernel α γ) (a : α) (x : γ) : ℝ :=
   if hα : Countable α then ((κ a).rnDeriv (η a) x).toReal
   else haveI := hαγ.countableOrCountablyGenerated.resolve_left hα
@@ -221,7 +222,6 @@ lemma measure_mutuallySingularSetSlice (κ η : Kernel α γ) [IsFiniteKernel κ
   simp [hx]
 
 noncomputable
-
 irreducible_def rnDeriv (κ η : Kernel α γ) (a : α) (x : γ) : ℝ≥0∞ :=
   ENNReal.ofReal (rnDerivAux κ (κ + η) a x) / ENNReal.ofReal (1 - rnDerivAux κ (κ + η) a x)
 
@@ -252,7 +252,6 @@ lemma rnDeriv_eq_top_iff' (κ η : Kernel α γ) (a : α) (x : γ) :
   rw [rnDeriv_eq_top_iff, mutuallySingularSet, mutuallySingularSetSlice, mem_setOf, mem_setOf]
 
 noncomputable
-
 irreducible_def singularPart (κ η : Kernel α γ) [IsSFiniteKernel κ] [IsSFiniteKernel η] :
     Kernel α γ :=
   withDensity (κ + η) (fun a x ↦ Real.toNNReal (rnDerivAux κ (κ + η) a x)
@@ -480,7 +479,6 @@ section Unique
 variable {ξ : Kernel α γ} {f : α → γ → ℝ≥0∞} [IsFiniteKernel η]
 
 omit hαγ in
-
 lemma eq_rnDeriv_measure (h : κ = η.withDensity f + ξ)
     (hf : Measurable (Function.uncurry f)) (a : α) (hξ : ξ a ⟂ₘ η a) :
     f a =ᵐ[η a] ∂(κ a)/∂(η a) := by
@@ -489,7 +487,6 @@ lemma eq_rnDeriv_measure (h : κ = η.withDensity f + ξ)
   exact (κ a).eq_rnDeriv₀ (hf.comp measurable_prod_mk_left).aemeasurable hξ this
 
 omit hαγ in
-
 lemma eq_singularPart_measure (h : κ = η.withDensity f + ξ)
     (hf : Measurable (Function.uncurry f)) (a : α) (hξ : ξ a ⟂ₘ η a) :
     ξ a = (κ a).singularPart (η a) := by

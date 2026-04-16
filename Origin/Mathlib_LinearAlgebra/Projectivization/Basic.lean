@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Projectivization/Basic.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 13 | Infrastructure: 2
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+
+noncomputable section
 
 /-!
 
@@ -34,7 +36,8 @@ We have three ways to construct terms of `ℙ K V`:
 
 variable (K V : Type*) [DivisionRing K] [AddCommGroup V] [Module K V]
 
--- DISSOLVED: projectivizationSetoid
+def projectivizationSetoid : Setoid { v : V // v ≠ 0 } :=
+  (MulAction.orbitRel Kˣ V).comap (↑)
 
 def Projectivization := Quotient (projectivizationSetoid K V)
 
@@ -46,11 +49,11 @@ open scoped LinearAlgebra.Projectivization
 
 variable {V}
 
--- DISSOLVED: mk
+def mk (v : V) (hv : v ≠ 0) : ℙ K V :=
+  Quotient.mk'' ⟨v, hv⟩
 
--- DISSOLVED: mk'
-
--- DISSOLVED: mk'_eq_mk
+def mk' (v : { v : V // v ≠ 0 }) : ℙ K V :=
+  Quotient.mk'' v
 
 instance [Nontrivial V] : Nonempty (ℙ K V) :=
   let ⟨v, hv⟩ := exists_ne (0 : V)
@@ -58,14 +61,16 @@ instance [Nontrivial V] : Nonempty (ℙ K V) :=
 
 variable {K}
 
--- DISSOLVED: lift
-
--- DISSOLVED: lift_mk
+protected def lift {α : Type*} (f : { v : V // v ≠ 0 } → α)
+    (hf : ∀ (a b : { v : V // v ≠ 0 }) (t : K), a = t • (b : V) → f a = f b)
+    (x : ℙ K V) : α :=
+  Quotient.lift f (by rintro ⟨-, hv⟩ ⟨w, hw⟩ ⟨⟨t, -⟩, rfl⟩; exact hf ⟨_, hv⟩ ⟨w, hw⟩ t rfl) x
 
 protected noncomputable def rep (v : ℙ K V) : V :=
   v.out
 
--- DISSOLVED: rep_nonzero
+theorem rep_nonzero (v : ℙ K V) : v.rep ≠ 0 :=
+  v.out.2
 
 @[simp]
 theorem mk_rep (v : ℙ K V) : mk K v.rep v.rep_nonzero = v := Quotient.out_eq' _
@@ -79,17 +84,32 @@ protected def submodule (v : ℙ K V) : Submodule K V :=
 
 variable (K)
 
--- DISSOLVED: mk_eq_mk_iff
+theorem mk_eq_mk_iff (v w : V) (hv : v ≠ 0) (hw : w ≠ 0) :
+    mk K v hv = mk K w hw ↔ ∃ a : Kˣ, a • w = v :=
+  Quotient.eq''
 
--- DISSOLVED: mk_eq_mk_iff'
+theorem mk_eq_mk_iff' (v w : V) (hv : v ≠ 0) (hw : w ≠ 0) :
+    mk K v hv = mk K w hw ↔ ∃ a : K, a • w = v := by
+  rw [mk_eq_mk_iff K v w hv hw]
+  constructor
+  · rintro ⟨a, ha⟩
+    exact ⟨a, ha⟩
+  · rintro ⟨a, ha⟩
+    refine ⟨Units.mk0 a fun c => hv.symm ?_, ha⟩
+    rwa [c, zero_smul] at ha
 
--- DISSOLVED: exists_smul_eq_mk_rep
+theorem exists_smul_eq_mk_rep (v : V) (hv : v ≠ 0) : ∃ a : Kˣ, a • v = (mk K v hv).rep :=
+  (mk_eq_mk_iff K _ _ (rep_nonzero _) hv).1 (mk_rep _)
 
 variable {K}
 
--- DISSOLVED: ind
+@[elab_as_elim, cases_eliminator, induction_eliminator]
+theorem ind {P : ℙ K V → Prop} (h : ∀ (v : V) (h : v ≠ 0), P (mk K v h)) : ∀ p, P p :=
+  Quotient.ind' <| Subtype.rec <| h
 
--- DISSOLVED: submodule_mk
+@[simp]
+theorem submodule_mk (v : V) (hv : v ≠ 0) : (mk K v hv).submodule = K ∙ v :=
+  rfl
 
 theorem submodule_eq (v : ℙ K V) : v.submodule = K ∙ v.rep := by
   conv_lhs => rw [← v.mk_rep]
@@ -148,7 +168,9 @@ def map {σ : K →+* L} (f : V →ₛₗ[σ] W) (hf : Function.Injective f) : �
       dsimp at ha ⊢
       erw [← f.map_smulₛₗ, ha])
 
--- DISSOLVED: map_mk
+theorem map_mk {σ : K →+* L} (f : V →ₛₗ[σ] W) (hf : Function.Injective f) (v : V) (hv : v ≠ 0) :
+    map f hf (mk K v hv) = mk L (f v) (map_zero f ▸ hf.ne hv) :=
+  rfl
 
 theorem map_injective {σ : K →+* L} {τ : L →+* K} [RingHomInvPair σ τ] (f : V →ₛₗ[σ] W)
     (hf : Function.Injective f) : Function.Injective (map f hf) := fun u v h ↦ by

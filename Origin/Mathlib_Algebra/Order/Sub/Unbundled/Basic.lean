@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Sub.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.ExistsOfLE
 
+noncomputable section
+
 /-!
 # Lemmas about subtraction in an unbundled canonically ordered monoids
 -/

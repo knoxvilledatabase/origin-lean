@@ -8,6 +8,8 @@ import Mathlib.Topology.EMetricSpace.Defs
 import Mathlib.Topology.UniformSpace.UniformConvergence
 import Mathlib.Topology.UniformSpace.UniformEmbedding
 
+noncomputable section
+
 /-!
 # Extended metric spaces
 
@@ -233,10 +235,6 @@ end EMetric
 instance [PseudoEMetricSpace X] : EDist (SeparationQuotient X) where
   edist := SeparationQuotient.lift₂ edist fun _ _ _ _ hx hy =>
     edist_congr (EMetric.inseparable_iff.1 hx) (EMetric.inseparable_iff.1 hy)
-
-@[simp] theorem SeparationQuotient.edist_mk [PseudoEMetricSpace X] (x y : X) :
-    edist (mk x) (mk y) = edist x y :=
-  rfl
 
 open SeparationQuotient in
 

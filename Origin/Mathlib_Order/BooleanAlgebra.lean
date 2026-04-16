@@ -5,6 +5,8 @@ Genuine: 103 | Conflates: 1 | Dissolved: 0 | Infrastructure: 17
 import Origin.Core
 import Mathlib.Order.Heyting.Basic
 
+noncomputable section
+
 /-!
 # (Generalized) Boolean algebras
 
@@ -519,10 +521,6 @@ instance (priority := 100) BooleanAlgebra.toBiheytingAlgebra : BiheytingAlgebra 
   himp_bot _ := _root_.himp_eq.trans (bot_sup_eq _)
   top_sdiff a := by rw [sdiff_eq, top_inf_eq]; rfl
 
-@[simp]
-theorem hnot_eq_compl : ￢x = xᶜ :=
-  rfl
-
 theorem top_sdiff : ⊤ \ x = xᶜ :=
   top_sdiff' x
 
@@ -690,10 +688,6 @@ theorem Bool.sup_eq_bor : (· ⊔ ·) = or := by dsimp
 
 theorem Bool.inf_eq_band : (· ⊓ ·) = and := by dsimp
 
-@[simp]
-theorem Bool.compl_eq_bnot : HasCompl.compl = not :=
-  rfl
-
 section lift
 
 protected abbrev Function.Injective.generalizedBooleanAlgebra [Max α] [Min α] [Bot α] [SDiff α]
@@ -738,7 +732,6 @@ namespace DistribLattice
 variable (α) [DistribLattice α]
 
 noncomputable
-
 def booleanAlgebraOfComplemented [BoundedOrder α] [ComplementedLattice α] : BooleanAlgebra α where
   __ := (inferInstanceAs (DistribLattice α))
   __ := (inferInstanceAs (BoundedOrder α))

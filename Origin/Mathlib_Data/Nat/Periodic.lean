@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.Count
 import Mathlib.Data.Nat.GCD.Basic
 import Mathlib.Order.Interval.Finset.Nat
 
+noncomputable section
+
 /-!
 # Periodic Functions on ℕ
 

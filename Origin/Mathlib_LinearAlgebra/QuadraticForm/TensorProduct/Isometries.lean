@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.QuadraticForm.TensorProduct
 import Mathlib.LinearAlgebra.QuadraticForm.IsometryEquiv
 
+noncomputable section
+
 /-!
 # Linear equivalences of tensor products as isometries
 
@@ -65,14 +67,6 @@ def _root_.QuadraticMap.Isometry.tmul
   toLinearMap := TensorProduct.map f.toLinearMap g.toLinearMap
   map_app' := tmul_tensorMap_apply f g
 
-@[simp]
-theorem _root_.QuadraticMap.Isometry.tmul_apply
-    {Q₁ : QuadraticForm R M₁} {Q₂ : QuadraticForm R M₂}
-    {Q₃ : QuadraticForm R M₃} {Q₄ : QuadraticForm R M₄}
-    (f : Q₁ →qᵢ Q₂) (g : Q₃ →qᵢ Q₄) (x : M₁ ⊗[R] M₃) :
-    f.tmul g x = TensorProduct.map f.toLinearMap g.toLinearMap x :=
-  rfl
-
 end Isometry
 
 section tensorComm
@@ -97,15 +91,6 @@ def tensorComm (Q₁ : QuadraticForm R M₁) (Q₂ : QuadraticForm R M₂) :
     (Q₁.tmul Q₂).IsometryEquiv (Q₂.tmul Q₁) where
   toLinearEquiv := TensorProduct.comm R M₁ M₂
   map_app' := tmul_tensorComm_apply Q₁ Q₂
-
-@[simp] lemma tensorComm_apply (Q₁ : QuadraticForm R M₁) (Q₂ : QuadraticForm R M₂)
-    (x : M₁ ⊗[R] M₂) :
-    tensorComm Q₁ Q₂ x = TensorProduct.comm R M₁ M₂ x :=
-  rfl
-
-@[simp] lemma tensorComm_symm (Q₁ : QuadraticForm R M₁) (Q₂ : QuadraticForm R M₂) :
-    (tensorComm Q₁ Q₂).symm = tensorComm Q₂ Q₁ :=
-  rfl
 
 end tensorComm
 
@@ -134,18 +119,6 @@ def tensorAssoc (Q₁ : QuadraticForm R M₁) (Q₂ : QuadraticForm R M₂) (Q�
   toLinearEquiv := TensorProduct.assoc R M₁ M₂ M₃
   map_app' := tmul_tensorAssoc_apply Q₁ Q₂ Q₃
 
-@[simp] lemma tensorAssoc_apply
-    (Q₁ : QuadraticForm R M₁) (Q₂ : QuadraticForm R M₂) (Q₃ : QuadraticForm R M₃)
-    (x : (M₁ ⊗[R] M₂) ⊗[R] M₃) :
-    tensorAssoc Q₁ Q₂ Q₃ x = TensorProduct.assoc R M₁ M₂ M₃ x :=
-  rfl
-
-@[simp] lemma tensorAssoc_symm_apply
-    (Q₁ : QuadraticForm R M₁) (Q₂ : QuadraticForm R M₂) (Q₃ : QuadraticForm R M₃)
-    (x : M₁ ⊗[R] (M₂ ⊗[R] M₃)) :
-    (tensorAssoc Q₁ Q₂ Q₃).symm x = (TensorProduct.assoc R M₁ M₂ M₃).symm x :=
-  rfl
-
 end tensorAssoc
 
 section tensorRId
@@ -170,14 +143,6 @@ def tensorRId (Q₁ : QuadraticForm R M₁) :
   toLinearEquiv := TensorProduct.rid R M₁
   map_app' := tmul_tensorRId_apply Q₁
 
-@[simp] lemma tensorRId_apply (Q₁ : QuadraticForm R M₁) (x : M₁ ⊗[R] R) :
-    tensorRId Q₁ x = TensorProduct.rid R M₁ x :=
-  rfl
-
-@[simp] lemma tensorRId_symm_apply (Q₁ : QuadraticForm R M₁) (x : M₁) :
-    (tensorRId Q₁).symm x = (TensorProduct.rid R M₁).symm x :=
-  rfl
-
 end tensorRId
 
 section tensorLId
@@ -201,14 +166,6 @@ def tensorLId (Q₂ : QuadraticForm R M₂) :
     (QuadraticForm.tmul (sq (R := R)) Q₂).IsometryEquiv Q₂ where
   toLinearEquiv := TensorProduct.lid R M₂
   map_app' := tmul_tensorLId_apply Q₂
-
-@[simp] lemma tensorLId_apply (Q₂ : QuadraticForm R M₂) (x : R ⊗[R] M₂) :
-    tensorLId Q₂ x = TensorProduct.lid R M₂ x :=
-  rfl
-
-@[simp] lemma tensorLId_symm_apply (Q₂ : QuadraticForm R M₂) (x : M₂) :
-    (tensorLId Q₂).symm x = (TensorProduct.lid R M₂).symm x :=
-  rfl
 
 end tensorLId
 

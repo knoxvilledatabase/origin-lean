@@ -1,11 +1,13 @@
 /-
 Extracted from Probability/Density.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.RadonNikodym
 import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 import Mathlib.Probability.Independence.Basic
+
+noncomputable section
 
 /-!
 # Probability density function
@@ -125,9 +127,18 @@ theorem pdf_of_not_haveLebesgueDecomposition {_ : MeasurableSpace Ω} {ℙ : Mea
     {μ : Measure E} {X : Ω → E} (h : ¬(map X ℙ).HaveLebesgueDecomposition μ) : pdf X ℙ μ = 0 :=
   rnDeriv_of_not_haveLebesgueDecomposition h
 
--- DISSOLVED: aemeasurable_of_pdf_ne_zero
+theorem aemeasurable_of_pdf_ne_zero {m : MeasurableSpace Ω} {ℙ : Measure Ω} {μ : Measure E}
+    (X : Ω → E) (h : ¬pdf X ℙ μ =ᵐ[μ] 0) : AEMeasurable X ℙ := by
+  contrapose! h
+  exact pdf_of_not_aemeasurable h
 
--- DISSOLVED: hasPDF_of_pdf_ne_zero
+theorem hasPDF_of_pdf_ne_zero {m : MeasurableSpace Ω} {ℙ : Measure Ω} {μ : Measure E} {X : Ω → E}
+    (hac : map X ℙ ≪ μ) (hpdf : ¬pdf X ℙ μ =ᵐ[μ] 0) : HasPDF X ℙ μ := by
+  refine ⟨?_, ?_, hac⟩
+  · exact aemeasurable_of_pdf_ne_zero X hpdf
+  · contrapose! hpdf
+    have := pdf_of_not_haveLebesgueDecomposition hpdf
+    filter_upwards using congrFun this
 
 @[measurability]
 theorem measurable_pdf {m : MeasurableSpace Ω} (X : Ω → E) (ℙ : Measure Ω)

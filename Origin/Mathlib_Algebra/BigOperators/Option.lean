@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.Finset.Option
 
+noncomputable section
+
 /-!
 # Lemmas about products and sums over finite sets in `Option α`
 

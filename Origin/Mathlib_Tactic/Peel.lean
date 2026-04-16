@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.Basic
 import Mathlib.Tactic.Basic
 
+noncomputable section
+
 /-!
 # The `peel` tactic
 
@@ -26,9 +28,7 @@ namespace Mathlib.Tactic.Peel
 open Lean Expr Meta Elab Tactic
 
 syntax (name := peel)
-
   "peel" (num)? (ppSpace colGt term)?
-
   (" with" (ppSpace colGt (ident <|> hole))+)? (usingArg)? : tactic
 
 private lemma and_imp_left_of_imp_imp {p q r : Prop} (h : r → p → q) : r ∧ p → r ∧ q := by tauto
@@ -168,9 +168,7 @@ elab_rules : tactic
   | `(tactic| peel with $args*) => peelArgsIff (args.map getNameOfIdent').toList
 
 macro_rules
-
   | `(tactic| peel $[$n:num]? $[$e:term]? $[with $h*]? using $u:term) =>
-
     `(tactic| peel $[$n:num]? $[$e:term]? $[with $h*]?; exact $u)
 
 end Mathlib.Tactic.Peel

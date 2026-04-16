@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Basic.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Content
 import Mathlib.MeasureTheory.Group.Prod
 import Mathlib.Topology.Algebra.Group.Compact
+
+noncomputable section
 
 /-!
 # Haar measure
@@ -592,7 +594,20 @@ see the file `MeasureTheory.Measure.Haar.Unique`.
 
 variable [SecondCountableTopology G]
 
--- DISSOLVED: haarMeasure_unique
+@[to_additive
+"**Uniqueness of left-invariant measures**: In a second-countable locally compact additive group,
+  any σ-finite left-invariant measure is a scalar multiple of the additive Haar measure.
+  This is slightly weaker than assuming that `μ` is a additive Haar measure (in particular we don't
+  require `μ ≠ 0`).
+  See also `isAddLeftInvariant_eq_smul_of_regular`
+  for a statement not assuming second-countability."]
+theorem haarMeasure_unique (μ : Measure G) [SigmaFinite μ] [IsMulLeftInvariant μ]
+    (K₀ : PositiveCompacts G) : μ = μ K₀ • haarMeasure K₀ := by
+  have A : Set.Nonempty (interior (closure (K₀ : Set G))) :=
+    K₀.interior_nonempty.mono (interior_mono subset_closure)
+  have := measure_eq_div_smul μ (haarMeasure K₀)
+    (measure_pos_of_nonempty_interior _ A).ne' K₀.isCompact.closure.measure_ne_top
+  rwa [haarMeasure_closure_self, div_one, K₀.isCompact.measure_closure] at this
 
 @[to_additive]
 theorem haarMeasure_eq_iff (K₀ : PositiveCompacts G) (μ : Measure G) [SigmaFinite μ]

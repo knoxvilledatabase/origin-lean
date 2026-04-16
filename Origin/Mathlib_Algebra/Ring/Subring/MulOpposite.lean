@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Subsemiring.MulOpposite
 import Mathlib.Algebra.Ring.Subring.Basic
 
+noncomputable section
+
 /-!
 
 # Subring of opposite rings
@@ -25,18 +27,12 @@ protected def op (S : Subring R) : Subring Rᵐᵒᵖ where
 
 attribute [norm_cast] coe_op
 
-@[simp]
-theorem mem_op {x : Rᵐᵒᵖ} {S : Subring R} : x ∈ S.op ↔ x.unop ∈ S := Iff.rfl
-
 @[simps! coe toSubsemiring]
 protected def unop (S : Subring Rᵐᵒᵖ) : Subring R where
   toSubsemiring := S.toSubsemiring.unop
   neg_mem' {x} hx := neg_mem (show MulOpposite.op x ∈ S from hx)
 
 attribute [norm_cast] coe_unop
-
-@[simp]
-theorem mem_unop {x : R} {S : Subring Rᵐᵒᵖ} : x ∈ S.unop ↔ MulOpposite.op x ∈ S := Iff.rfl
 
 @[simp]
 theorem unop_op (S : Subring R) : S.op.unop = S := rfl
@@ -105,10 +101,6 @@ theorem op_sup (S₁ S₂ : Subring R) : (S₁ ⊔ S₂).op = S₁.op ⊔ S₂.o
 
 theorem unop_sup (S₁ S₂ : Subring Rᵐᵒᵖ) : (S₁ ⊔ S₂).unop = S₁.unop ⊔ S₂.unop :=
   opEquiv.symm.map_sup _ _
-
-theorem op_inf (S₁ S₂ : Subring R) : (S₁ ⊓ S₂).op = S₁.op ⊓ S₂.op := rfl
-
-theorem unop_inf (S₁ S₂ : Subring Rᵐᵒᵖ) : (S₁ ⊓ S₂).unop = S₁.unop ⊓ S₂.unop := rfl
 
 theorem op_sSup (S : Set (Subring R)) : (sSup S).op = sSup (.unop ⁻¹' S) :=
   opEquiv.map_sSup_eq_sSup_symm_preimage _

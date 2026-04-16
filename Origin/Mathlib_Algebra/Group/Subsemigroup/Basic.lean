@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subsemigroup.Defs
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Subsemigroups: `CompleteLattice` structure
 
@@ -251,11 +253,6 @@ def ofDense {M N} [Semigroup M] [Semigroup N] {s : Set M} (f : M → N) (hs : cl
   map_mul' x y :=
     dense_induction _ hs (fun y hy x => hmul x y hy)
       (fun y₁ y₂ h₁ h₂ x => by simp only [← mul_assoc, h₁, h₂]) y x
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_ofDense [Semigroup M] [Semigroup N] {s : Set M} (f : M → N) (hs : closure s = ⊤)
-    (hmul) : (ofDense f hs hmul : M → N) = f :=
-  rfl
 
 end MulHom
 

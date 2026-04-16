@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Category.ULift
 import Mathlib.CategoryTheory.EssentiallySmall
 import Mathlib.Logic.Equiv.Basic
 
+noncomputable section
+
 /-!
 # Existence of limits and colimits
 
@@ -130,14 +132,6 @@ theorem limit.π_comp_eqToHom (F : J ⥤ C) [HasLimit F] {j j' : J} (hj : j = j'
   subst hj
   simp
 
-@[simp]
-theorem limit.cone_x {F : J ⥤ C} [HasLimit F] : (limit.cone F).pt = limit F :=
-  rfl
-
-@[simp]
-theorem limit.cone_π {F : J ⥤ C} [HasLimit F] : (limit.cone F).π.app = limit.π _ :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem limit.w (F : J ⥤ C) [HasLimit F] {j j' : J} (f : j ⟶ j') :
     limit.π F j ≫ F.map f = limit.π F j' :=
@@ -148,11 +142,6 @@ def limit.isLimit (F : J ⥤ C) [HasLimit F] : IsLimit (limit.cone F) :=
 
 def limit.lift (F : J ⥤ C) [HasLimit F] (c : Cone F) : c.pt ⟶ limit F :=
   (limit.isLimit F).lift c
-
-@[simp]
-theorem limit.isLimit_lift {F : J ⥤ C} [HasLimit F] (c : Cone F) :
-    (limit.isLimit F).lift c = limit.lift F c :=
-  rfl
 
 @[reassoc (attr := simp)]
 theorem limit.lift_π {F : J ⥤ C} [HasLimit F] (c : Cone F) (j : J) :
@@ -169,14 +158,6 @@ theorem limMap_π {F G : J ⥤ C} [HasLimit F] [HasLimit G] (α : F ⟶ G) (j : 
 
 def limit.coneMorphism {F : J ⥤ C} [HasLimit F] (c : Cone F) : c ⟶ limit.cone F :=
   (limit.isLimit F).liftConeMorphism c
-
-@[simp]
-theorem limit.coneMorphism_hom {F : J ⥤ C} [HasLimit F] (c : Cone F) :
-    (limit.coneMorphism c).hom = limit.lift F c :=
-  rfl
-
-theorem limit.coneMorphism_π {F : J ⥤ C} [HasLimit F] (c : Cone F) (j : J) :
-    (limit.coneMorphism c).hom ≫ limit.π F j = c.π.app j := by simp
 
 @[reassoc (attr := simp)]
 theorem limit.conePointUniqueUpToIso_hom_comp {F : J ⥤ C} [HasLimit F] {c : Cone F} (hc : IsLimit c)
@@ -558,15 +539,6 @@ theorem colimit.eqToHom_comp_ι (F : J ⥤ C) [HasColimit F] {j j' : J} (hj : j 
   subst hj
   simp
 
-@[simp]
-theorem colimit.cocone_ι {F : J ⥤ C} [HasColimit F] (j : J) :
-    (colimit.cocone F).ι.app j = colimit.ι _ j :=
-  rfl
-
-@[simp]
-theorem colimit.cocone_x {F : J ⥤ C} [HasColimit F] : (colimit.cocone F).pt = colimit F :=
-  rfl
-
 @[reassoc (attr := simp)]
 theorem colimit.w (F : J ⥤ C) [HasColimit F] {j j' : J} (f : j ⟶ j') :
     F.map f ≫ colimit.ι F j' = colimit.ι F j :=
@@ -577,11 +549,6 @@ def colimit.isColimit (F : J ⥤ C) [HasColimit F] : IsColimit (colimit.cocone F
 
 def colimit.desc (F : J ⥤ C) [HasColimit F] (c : Cocone F) : colimit F ⟶ c.pt :=
   (colimit.isColimit F).desc c
-
-@[simp]
-theorem colimit.isColimit_desc {F : J ⥤ C} [HasColimit F] (c : Cocone F) :
-    (colimit.isColimit F).desc c = colimit.desc F c :=
-  rfl
 
 @[reassoc (attr := simp)]
 theorem colimit.ι_desc {F : J ⥤ C} [HasColimit F] (c : Cocone F) (j : J) :
@@ -598,14 +565,6 @@ theorem ι_colimMap {F G : J ⥤ C} [HasColimit F] [HasColimit G] (α : F ⟶ G)
 
 def colimit.coconeMorphism {F : J ⥤ C} [HasColimit F] (c : Cocone F) : colimit.cocone F ⟶ c :=
   (colimit.isColimit F).descCoconeMorphism c
-
-@[simp]
-theorem colimit.coconeMorphism_hom {F : J ⥤ C} [HasColimit F] (c : Cocone F) :
-    (colimit.coconeMorphism c).hom = colimit.desc F c :=
-  rfl
-
-theorem colimit.ι_coconeMorphism {F : J ⥤ C} [HasColimit F] (c : Cocone F) (j : J) :
-    colimit.ι F j ≫ (colimit.coconeMorphism c).hom = c.ι.app j := by simp
 
 @[reassoc (attr := simp)]
 theorem colimit.comp_coconePointUniqueUpToIso_hom {F : J ⥤ C} [HasColimit F] {c : Cocone F}

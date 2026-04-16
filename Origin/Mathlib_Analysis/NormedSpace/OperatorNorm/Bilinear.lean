@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Bilinear.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Analysis.Normed.Operator.LinearIsometry
 import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
+
+noncomputable section
 
 /-!
 # Operator norm: bilinear maps
@@ -99,11 +101,6 @@ def mkContinuous₂ (f : E →ₛₗ[σ₁₃] F →ₛₗ[σ₂₃] G) (C : ℝ
     E →SL[σ₁₃] F →SL[σ₂₃] G :=
   mkContinuousOfExistsBound₂ f ⟨C, hC⟩
 
-@[simp]
-theorem mkContinuous₂_apply (f : E →ₛₗ[σ₁₃] F →ₛₗ[σ₂₃] G) {C : ℝ}
-    (hC : ∀ x y, ‖f x y‖ ≤ C * ‖x‖ * ‖y‖) (x : E) (y : F) : f.mkContinuous₂ C hC x y = f x y :=
-  rfl
-
 theorem mkContinuous₂_norm_le' (f : E →ₛₗ[σ₁₃] F →ₛₗ[σ₂₃] G) {C : ℝ}
     (hC : ∀ x y, ‖f x y‖ ≤ C * ‖x‖ * ‖y‖) : ‖f.mkContinuous₂ C hC‖ ≤ max C 0 :=
   mkContinuous_norm_le _ (le_max_iff.2 <| Or.inr le_rfl) (norm_mkContinuous₂_aux f C hC)
@@ -138,10 +135,6 @@ private theorem le_norm_flip (f : E →SL[σ₁₃] F →SL[σ₂₃] G) : ‖f�
     exact (flip f).le_opNorm₂ y x
 
 @[simp]
-theorem flip_apply (f : E →SL[σ₁₃] F →SL[σ₂₃] G) (x : E) (y : F) : f.flip y x = f x y :=
-  rfl
-
-@[simp]
 theorem flip_flip (f : E →SL[σ₁₃] F →SL[σ₂₃] G) : f.flip.flip = f := by
   ext
   rfl
@@ -171,14 +164,6 @@ def flipₗᵢ' : (E →SL[σ₁₃] F →SL[σ₂₃] G) ≃ₗᵢ[𝕜₃] F �
 
 variable {E F G σ₁₃ σ₂₃}
 
-@[simp]
-theorem flipₗᵢ'_symm : (flipₗᵢ' E F G σ₂₃ σ₁₃).symm = flipₗᵢ' F E G σ₁₃ σ₂₃ :=
-  rfl
-
-@[simp]
-theorem coe_flipₗᵢ' : ⇑(flipₗᵢ' E F G σ₂₃ σ₁₃) = flip :=
-  rfl
-
 variable (𝕜 E Fₗ Gₗ)
 
 def flipₗᵢ : (E →L[𝕜] Fₗ →L[𝕜] Gₗ) ≃ₗᵢ[𝕜] Fₗ →L[𝕜] E →L[𝕜] Gₗ where
@@ -192,14 +177,6 @@ def flipₗᵢ : (E →L[𝕜] Fₗ →L[𝕜] Gₗ) ≃ₗᵢ[𝕜] Fₗ →L[�
 
 variable {𝕜 E Fₗ Gₗ}
 
-@[simp]
-theorem flipₗᵢ_symm : (flipₗᵢ 𝕜 E Fₗ Gₗ).symm = flipₗᵢ 𝕜 Fₗ E Gₗ :=
-  rfl
-
-@[simp]
-theorem coe_flipₗᵢ : ⇑(flipₗᵢ 𝕜 E Fₗ Gₗ) = flip :=
-  rfl
-
 variable (F σ₁₂)
 
 variable [RingHomIsometric σ₁₂]
@@ -209,20 +186,12 @@ def apply' : E →SL[σ₁₂] (E →SL[σ₁₂] F) →L[𝕜₂] F :=
 
 variable {F σ₁₂}
 
-@[simp]
-theorem apply_apply' (v : E) (f : E →SL[σ₁₂] F) : apply' F σ₁₂ v f = f v :=
-  rfl
-
 variable (𝕜 Fₗ)
 
 def apply : E →L[𝕜] (E →L[𝕜] Fₗ) →L[𝕜] Fₗ :=
   flip (id 𝕜 (E →L[𝕜] Fₗ))
 
 variable {𝕜 Fₗ}
-
-@[simp]
-theorem apply_apply (v : E) (f : E →L[𝕜] Fₗ) : apply 𝕜 Fₗ v f = f v :=
-  rfl
 
 variable (σ₁₂ σ₂₃ E F G)
 
@@ -235,15 +204,10 @@ def compSL : (F →SL[σ₂₃] G) →L[𝕜₃] (E →SL[σ₁₂] F) →SL[σ�
     1 fun f g => by simpa only [one_mul] using opNorm_comp_le f g
 
 set_option maxSynthPendingDepth 2 in
-
 theorem norm_compSL_le : ‖compSL E F G σ₁₂ σ₂₃‖ ≤ 1 :=
   LinearMap.mkContinuous₂_norm_le _ zero_le_one _
 
 variable {σ₁₂ σ₂₃ E F G}
-
-@[simp]
-theorem compSL_apply (f : F →SL[σ₂₃] G) (g : E →SL[σ₁₂] F) : compSL E F G σ₁₂ σ₂₃ f g = f.comp g :=
-  rfl
 
 theorem _root_.Continuous.const_clm_comp {X} [TopologicalSpace X] {f : X → E →SL[σ₁₂] F}
     (hf : Continuous f) (g : F →SL[σ₂₃] G) :
@@ -262,13 +226,8 @@ def compL : (Fₗ →L[𝕜] Gₗ) →L[𝕜] (E →L[𝕜] Fₗ) →L[𝕜] E �
   compSL E Fₗ Gₗ (RingHom.id 𝕜) (RingHom.id 𝕜)
 
 set_option maxSynthPendingDepth 2 in
-
 theorem norm_compL_le : ‖compL 𝕜 E Fₗ Gₗ‖ ≤ 1 :=
   norm_compSL_le _ _ _ _ _
-
-@[simp]
-theorem compL_apply (f : Fₗ →L[𝕜] Gₗ) (g : E →L[𝕜] Fₗ) : compL 𝕜 E Fₗ Gₗ f g = f.comp g :=
-  rfl
 
 variable (Eₗ) {𝕜 E Fₗ Gₗ}
 
@@ -279,11 +238,7 @@ def precompR (L : E →L[𝕜] Fₗ →L[𝕜] Gₗ) : E →L[𝕜] (Eₗ →L[�
 def precompL (L : E →L[𝕜] Fₗ →L[𝕜] Gₗ) : (Eₗ →L[𝕜] E) →L[𝕜] Fₗ →L[𝕜] Eₗ →L[𝕜] Gₗ :=
   (precompR Eₗ (flip L)).flip
 
-@[simp] lemma precompL_apply (L : E →L[𝕜] Fₗ →L[𝕜] Gₗ) (u : Eₗ →L[𝕜] E) (f : Fₗ) (g : Eₗ) :
-    precompL Eₗ L u f g = L (u g) f := rfl
-
 set_option maxSynthPendingDepth 2 in
-
 theorem norm_precompR_le (L : E →L[𝕜] Fₗ →L[𝕜] Gₗ) : ‖precompR Eₗ L‖ ≤ ‖L‖ :=
   calc
     ‖precompR Eₗ L‖ ≤ ‖compL 𝕜 Eₗ Fₗ Gₗ‖ * ‖L‖ := opNorm_comp_le _ _
@@ -291,7 +246,6 @@ theorem norm_precompR_le (L : E →L[𝕜] Fₗ →L[𝕜] Gₗ) : ‖precompR E
     _ = ‖L‖ := by rw [one_mul]
 
 set_option maxSynthPendingDepth 2 in
-
 theorem norm_precompL_le (L : E →L[𝕜] Fₗ →L[𝕜] Gₗ) : ‖precompL Eₗ L‖ ≤ ‖L‖ := by
   rw [precompL, opNorm_flip, ← opNorm_flip L]
   exact norm_precompR_le _ L.flip
@@ -312,11 +266,6 @@ variable {𝕜₁' : Type*} {𝕜₂' : Type*} [NontriviallyNormedField 𝕜₁'
 def bilinearComp (f : E →SL[σ₁₃] F →SL[σ₂₃] G) (gE : E' →SL[σ₁'] E) (gF : F' →SL[σ₂'] F) :
     E' →SL[σ₁₃'] F' →SL[σ₂₃'] G :=
   ((f.comp gE).flip.comp gF).flip
-
-@[simp]
-theorem bilinearComp_apply (f : E →SL[σ₁₃] F →SL[σ₂₃] G) (gE : E' →SL[σ₁'] E) (gF : F' →SL[σ₂'] F)
-    (x : E') (y : F') : f.bilinearComp gE gF x y = f (gE x) (gF y) :=
-  rfl
 
 variable [RingHomIsometric σ₁₃] [RingHomIsometric σ₁'] [RingHomIsometric σ₂']
 

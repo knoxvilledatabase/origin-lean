@@ -5,6 +5,8 @@ Genuine: 40 | Conflates: 4 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Instances
 
+noncomputable section
+
 /-! # Isometric continuous functional calculus
 
 This file adds a class for an *isometric* continuous functional calculus. This is separate from the

@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Basic
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 
+noncomputable section
+
 /-!
 # Convex bodies
 
@@ -71,10 +73,6 @@ protected theorem nonempty (K : ConvexBody V) : (K : Set V).Nonempty :=
 @[ext]
 protected theorem ext {K L : ConvexBody V} (h : (K : Set V) = L) : K = L :=
   SetLike.ext' h
-
-@[simp]
-theorem coe_mk (s : Set V) (h₁ h₂ h₃) : (mk s h₁ h₂ h₃ : Set V) = s :=
-  rfl
 
 theorem zero_mem_of_symmetric (K : ConvexBody V) (h_symm : ∀ x ∈ K, - x ∈ K) : 0 ∈ K := by
   obtain ⟨x, hx⟩ := K.nonempty
@@ -172,10 +170,6 @@ noncomputable instance : PseudoMetricSpace (ConvexBody V) where
   dist_self _ := Metric.hausdorffDist_self_zero
   dist_comm _ _ := Metric.hausdorffDist_comm
   dist_triangle _ _ _ := Metric.hausdorffDist_triangle hausdorffEdist_ne_top
-
-@[simp, norm_cast]
-theorem hausdorffDist_coe : Metric.hausdorffDist (K : Set V) L = dist K L :=
-  rfl
 
 @[simp, norm_cast]
 theorem hausdorffEdist_coe : EMetric.hausdorffEdist (K : Set V) L = edist K L := by

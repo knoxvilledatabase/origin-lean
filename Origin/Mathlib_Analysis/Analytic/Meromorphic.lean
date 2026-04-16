@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Analytic/Meromorphic.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.Algebra.Order.AddGroupWithTop
+
+noncomputable section
 
 /-!
 # Meromorphic functions
@@ -179,7 +181,32 @@ lemma order_eq_top_iff {f : 𝕜 → E} {x : 𝕜} (hf : MeromorphicAt f x) :
     filter_upwards [h] with z hfz
     rw [hfz, smul_zero]
 
--- DISSOLVED: order_eq_int_iff
+lemma order_eq_int_iff {f : 𝕜 → E} {x : 𝕜} (hf : MeromorphicAt f x) (n : ℤ) : hf.order = n ↔
+    ∃ g : 𝕜 → E, AnalyticAt 𝕜 g x ∧ g x ≠ 0 ∧ ∀ᶠ z in 𝓝[≠] x, f z = (z - x) ^ n • g z := by
+  unfold order
+  by_cases h : hf.choose_spec.order = ⊤
+  · rw [h, WithTop.map_top, ← WithTop.coe_natCast, top_sub,
+      eq_false_intro WithTop.top_ne_coe, false_iff]
+    rw [AnalyticAt.order_eq_top_iff] at h
+    refine fun ⟨g, hg_an, hg_ne, hg_eq⟩ ↦ hg_ne ?_
+    apply EventuallyEq.eq_of_nhds
+    rw [EventuallyEq, ← AnalyticAt.frequently_eq_iff_eventually_eq hg_an analyticAt_const]
+    apply Eventually.frequently
+    rw [eventually_nhdsWithin_iff] at hg_eq ⊢
+    filter_upwards [h, hg_eq] with z hfz hfz_eq hz
+    rwa [hfz_eq hz, ← mul_smul, smul_eq_zero_iff_right] at hfz
+    exact mul_ne_zero (pow_ne_zero _ (sub_ne_zero.mpr hz)) (zpow_ne_zero _ (sub_ne_zero.mpr hz))
+  · obtain ⟨m, h⟩ := WithTop.ne_top_iff_exists.mp h
+    rw [← h, WithTop.map_coe, ← WithTop.coe_natCast, ← coe_sub, WithTop.coe_inj]
+    obtain ⟨g, hg_an, hg_ne, hg_eq⟩ := (AnalyticAt.order_eq_nat_iff _ _).mp h.symm
+    replace hg_eq : ∀ᶠ (z : 𝕜) in 𝓝[≠] x, f z = (z - x) ^ (↑m - ↑hf.choose : ℤ) • g z := by
+      rw [eventually_nhdsWithin_iff]
+      filter_upwards [hg_eq] with z hg_eq hz
+      rwa [← smul_right_inj <| zpow_ne_zero _ (sub_ne_zero.mpr hz), ← mul_smul,
+        ← zpow_add₀ (sub_ne_zero.mpr hz), ← add_sub_assoc, add_sub_cancel_left, zpow_natCast,
+        zpow_natCast]
+    exact ⟨fun h ↦ ⟨g, hg_an, hg_ne, h ▸ hg_eq⟩,
+      AnalyticAt.unique_eventuallyEq_zpow_smul_nonzero ⟨g, hg_an, hg_ne, hg_eq⟩⟩
 
 lemma _root_.AnalyticAt.meromorphicAt_order {f : 𝕜 → E} {x : 𝕜} (hf : AnalyticAt 𝕜 f x) :
     hf.meromorphicAt.order = hf.order.map (↑) := by
@@ -224,55 +251,44 @@ lemma const (e : E) {U : Set 𝕜} : MeromorphicOn (fun _ ↦ e) U :=
 section arithmetic
 
 include hf in
-
 lemma mono_set {V : Set 𝕜} (hv : V ⊆ U) : MeromorphicOn f V := fun x hx ↦ hf x (hv hx)
 
 include hf hg in
-
 lemma add : MeromorphicOn (f + g) U := fun x hx ↦ (hf x hx).add (hg x hx)
 
 include hf hg in
-
 lemma sub : MeromorphicOn (f - g) U := fun x hx ↦ (hf x hx).sub (hg x hx)
 
 include hf in
-
 lemma neg : MeromorphicOn (-f) U := fun x hx ↦ (hf x hx).neg
 
 @[simp] lemma neg_iff : MeromorphicOn (-f) U ↔ MeromorphicOn f U :=
   ⟨fun h ↦ by simpa only [neg_neg] using h.neg, neg⟩
 
 include hs hf in
-
 lemma smul : MeromorphicOn (s • f) U := fun x hx ↦ (hs x hx).smul (hf x hx)
 
 include hs ht in
-
 lemma mul : MeromorphicOn (s * t) U := fun x hx ↦ (hs x hx).mul (ht x hx)
 
 include hs in
-
 lemma inv : MeromorphicOn s⁻¹ U := fun x hx ↦ (hs x hx).inv
 
 @[simp] lemma inv_iff : MeromorphicOn s⁻¹ U ↔ MeromorphicOn s U :=
   ⟨fun h ↦ by simpa only [inv_inv] using h.inv, inv⟩
 
 include hs ht in
-
 lemma div : MeromorphicOn (s / t) U := fun x hx ↦ (hs x hx).div (ht x hx)
 
 include hs in
-
 lemma pow (n : ℕ) : MeromorphicOn (s ^ n) U := fun x hx ↦ (hs x hx).pow _
 
 include hs in
-
 lemma zpow (n : ℤ) : MeromorphicOn (s ^ n) U := fun x hx ↦ (hs x hx).zpow _
 
 end arithmetic
 
 include hf in
-
 lemma congr (h_eq : Set.EqOn f g U) (hu : IsOpen U) : MeromorphicOn g U := by
   refine fun x hx ↦ (hf x hx).congr (EventuallyEq.filter_mono ?_ nhdsWithin_le_nhds)
   exact eventually_of_mem (hu.mem_nhds hx) h_eq

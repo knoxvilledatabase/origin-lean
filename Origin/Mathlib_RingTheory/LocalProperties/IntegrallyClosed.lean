@@ -7,6 +7,8 @@ import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
 import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.RingTheory.Localization.LocalizationLocalization
 
+noncomputable section
+
 /-!
 # `IsIntegrallyClosed` is a local property
 

@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/IntegralClosure/IntegralRestrict.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 import Mathlib.RingTheory.RingHom.Finite
 import Mathlib.RingTheory.Localization.LocalizationLocalization
 import Mathlib.RingTheory.Localization.NormTrace
+
+noncomputable section
 
 /-!
 # Restriction of various maps between fields to integrally closed subrings.
@@ -34,7 +36,6 @@ variable (A K L B : Type*) [CommRing A] [CommRing B] [Algebra A B] [Field K] [Fi
 section galois
 
 noncomputable
-
 def galLift (σ : B →ₐ[A] B) : L →ₐ[K] L :=
   haveI := (IsFractionRing.injective A K).isDomain
   haveI := NoZeroSMulDivisors.trans A K L
@@ -54,7 +55,6 @@ def galLift (σ : B →ₐ[A] B) : L →ₐ[K] L :=
   { IsLocalization.lift (S := L) H with commutes' := DFunLike.congr_fun H_eq }
 
 noncomputable
-
 def galRestrictHom : (L →ₐ[K] L) ≃* (B →ₐ[A] B) where
   toFun := fun f ↦ (IsIntegralClosure.equiv A (integralClosure A L) L B).toAlgHom.comp
       (((f.restrictScalars A).comp (IsScalarTower.toAlgHom A B L)).codRestrict
@@ -94,20 +94,13 @@ lemma galRestrictHom_symm_algebraMap_apply (σ : B →ₐ[A] B) (x : B) :
   simp [galRestrictHom, galLift, Subalgebra.algebraMap_eq]
 
 noncomputable
-
 def galRestrict : (L ≃ₐ[K] L) ≃* (B ≃ₐ[A] B) :=
   (AlgEquiv.algHomUnitsEquiv K L).symm.trans
     ((Units.mapEquiv <| galRestrictHom A K L B).trans (AlgEquiv.algHomUnitsEquiv A B))
 
 variable {K L}
 
-lemma coe_galRestrict_apply (σ : L ≃ₐ[K] L) :
-    (galRestrict A K L B σ : B →ₐ[A] B) = galRestrictHom A K L B σ := rfl
-
 variable {B}
-
-lemma galRestrict_apply (σ : L ≃ₐ[K] L) (x : B) :
-    galRestrict A K L B σ x = galRestrictHom A K L B σ x := rfl
 
 lemma algebraMap_galRestrict_apply (σ : L ≃ₐ[K] L) (x : B) :
     algebraMap B L (galRestrict A K L B σ x) = σ (algebraMap B L x) :=
@@ -129,7 +122,6 @@ end galois
 attribute [local instance] FractionRing.liftAlgebra FractionRing.isScalarTower_liftAlgebra
 
 noncomputable
-
 instance (priority := 900) [IsDomain A] [IsDomain B] [IsIntegrallyClosed B]
     [Module.Finite A B] [NoZeroSMulDivisors A B] : Fintype (B ≃ₐ[A] B) :=
   haveI : IsIntegralClosure B A (FractionRing B) :=
@@ -151,7 +143,6 @@ variable [IsLocalization (Algebra.algebraMapSubmonoid B M) Bₘ]
 section trace
 
 noncomputable
-
 def Algebra.intTraceAux [IsIntegrallyClosed A] :
     B →ₗ[A] A :=
   (IsIntegralClosure.equiv A (integralClosure A K) K A).toLinearMap.comp
@@ -173,7 +164,6 @@ variable [IsDomain A] [IsIntegrallyClosed A] [IsDomain B] [IsIntegrallyClosed B]
 variable [Module.Finite A B] [NoZeroSMulDivisors A B]
 
 noncomputable
-
 def Algebra.intTrace : B →ₗ[A] A :=
   haveI : IsIntegralClosure B A (FractionRing B) :=
     IsIntegralClosure.of_isIntegrallyClosed _ _ _
@@ -232,7 +222,6 @@ variable [IsDomain Aₘ] [IsIntegrallyClosed Aₘ] [IsDomain Bₘ] [IsIntegrally
 variable [NoZeroSMulDivisors Aₘ Bₘ] [Module.Finite Aₘ Bₘ]
 
 include M in
-
 lemma Algebra.intTrace_eq_of_isLocalization
     (x : B) :
     algebraMap A Aₘ (Algebra.intTrace A B x) = Algebra.intTrace Aₘ Bₘ (algebraMap B Bₘ x) := by
@@ -281,7 +270,6 @@ section norm
 variable [IsIntegrallyClosed A]
 
 noncomputable
-
 def Algebra.intNormAux [Algebra.IsSeparable K L] :
     B →* A where
   toFun := fun s ↦ IsIntegralClosure.mk' (R := A) A (Algebra.norm K (algebraMap B L s))
@@ -306,7 +294,6 @@ variable [Module.Finite A B] [NoZeroSMulDivisors A B]
 variable [Algebra.IsSeparable (FractionRing A) (FractionRing B)] -- TODO: remove this
 
 noncomputable
-
 def Algebra.intNorm : B →* A :=
   haveI : IsIntegralClosure B A (FractionRing B) :=
     IsIntegralClosure.of_isIntegrallyClosed _ _ _
@@ -384,8 +371,6 @@ lemma Algebra.intNorm_eq_zero {x : B} : Algebra.intNorm A B x = 0 ↔ x = 0 := b
     ← (IsFractionRing.injective B (FractionRing B)).eq_iff]
   simp only [algebraMap_intNorm_fractionRing, map_zero, norm_eq_zero_iff]
 
--- DISSOLVED: Algebra.intNorm_ne_zero
-
 variable [IsDomain Aₘ] [IsIntegrallyClosed Aₘ] [IsDomain Bₘ] [IsIntegrallyClosed Bₘ]
 
 variable [NoZeroSMulDivisors Aₘ Bₘ] [Module.Finite Aₘ Bₘ]
@@ -393,7 +378,6 @@ variable [NoZeroSMulDivisors Aₘ Bₘ] [Module.Finite Aₘ Bₘ]
 variable [Algebra.IsSeparable (FractionRing Aₘ) (FractionRing Bₘ)]
 
 include M in
-
 lemma Algebra.intNorm_eq_of_isLocalization (x : B) :
     algebraMap A Aₘ (Algebra.intNorm A B x) = Algebra.intNorm Aₘ Bₘ (algebraMap B Bₘ x) := by
   by_cases hM : 0 ∈ M

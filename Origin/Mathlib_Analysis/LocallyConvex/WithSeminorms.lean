@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/LocallyConvex/WithSeminorms.lean
-Genuine: 68 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 72 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.LocallyConvex.Bounded
@@ -10,6 +10,8 @@ import Mathlib.Topology.Algebra.Equicontinuity
 import Mathlib.Topology.MetricSpace.Equicontinuity
 import Mathlib.Topology.Algebra.FilterBasis
 import Mathlib.Topology.Algebra.Module.LocallyConvex
+
+noncomputable section
 
 /-!
 # Topology induced by a family of seminorms
@@ -308,11 +310,30 @@ theorem WithSeminorms.isOpen_iff_mem_balls (hp : WithSeminorms p) (U : Set E) :
     IsOpen U ↔ ∀ x ∈ U, ∃ s : Finset ι, ∃ r > 0, (s.sup p).ball x r ⊆ U := by
   simp_rw [← WithSeminorms.mem_nhds_iff hp _ U, isOpen_iff_mem_nhds]
 
--- DISSOLVED: WithSeminorms.T1_of_separating
+theorem WithSeminorms.T1_of_separating (hp : WithSeminorms p)
+    (h : ∀ x, x ≠ 0 → ∃ i, p i x ≠ 0) : T1Space E := by
+  have := hp.topologicalAddGroup
+  refine TopologicalAddGroup.t1Space _ ?_
+  rw [← isOpen_compl_iff, hp.isOpen_iff_mem_balls]
+  rintro x (hx : x ≠ 0)
+  cases' h x hx with i pi_nonzero
+  refine ⟨{i}, p i x, by positivity, subset_compl_singleton_iff.mpr ?_⟩
+  rw [Finset.sup_singleton, mem_ball, zero_sub, map_neg_eq_map, not_lt]
 
--- DISSOLVED: WithSeminorms.separating_of_T1
+theorem WithSeminorms.separating_of_T1 [T1Space E] (hp : WithSeminorms p) (x : E) (hx : x ≠ 0) :
+    ∃ i, p i x ≠ 0 := by
+  have := ((t1Space_TFAE E).out 0 9).mp (inferInstanceAs <| T1Space E)
+  by_contra! h
+  refine hx (this ?_)
+  rw [hp.hasBasis_zero_ball.specializes_iff]
+  rintro ⟨s, r⟩ (hr : 0 < r)
+  simp only [ball_finset_sup_eq_iInter _ _ _ hr, mem_iInter₂, mem_ball_zero, h, hr, forall_true_iff]
 
--- DISSOLVED: WithSeminorms.separating_iff_T1
+theorem WithSeminorms.separating_iff_T1 (hp : WithSeminorms p) :
+    (∀ x, x ≠ 0 → ∃ i, p i x ≠ 0) ↔ T1Space E := by
+  refine ⟨WithSeminorms.T1_of_separating hp, ?_⟩
+  intro
+  exact WithSeminorms.separating_of_T1 hp
 
 end Topology
 
@@ -704,7 +725,27 @@ lemma bound_of_continuous_normedSpace (q : Seminorm 𝕜 F)
     refine (le_of_lt <| show q x < _ from hε hlt).trans ?_
     rwa [← div_le_iff₀' this, one_div_div]
 
--- DISSOLVED: bound_of_continuous
+lemma bound_of_continuous [Nonempty ι] [t : TopologicalSpace E] (hp : WithSeminorms p)
+    (q : Seminorm 𝕜 E) (hq : Continuous q) :
+    ∃ s : Finset ι, ∃ C : ℝ≥0, C ≠ 0 ∧ q ≤ C • s.sup p := by
+  -- The continuity of `q` gives us a finset `s` and a real `ε > 0`
+  -- such that `hε : (s.sup p).ball 0 ε ⊆ q.ball 0 1`.
+  rcases hp.hasBasis.mem_iff.mp (ball_mem_nhds hq one_pos) with ⟨V, hV, hε⟩
+  rcases p.basisSets_iff.mp hV with ⟨s, ε, ε_pos, rfl⟩
+  -- Now forget that `E` already had a topology and view it as the (semi)normed space
+  -- `(E, s.sup p)`.
+  clear hp hq t
+  let _ : SeminormedAddCommGroup E := (s.sup p).toSeminormedAddCommGroup
+  let _ : NormedSpace 𝕜 E := { norm_smul_le := fun a b ↦ le_of_eq (map_smul_eq_mul (s.sup p) a b) }
+  -- The inclusion `hε` tells us exactly that `q` is *still* continuous for this new topology
+  have : Continuous q :=
+    Seminorm.continuous (r := 1) (mem_of_superset (Metric.ball_mem_nhds _ ε_pos) hε)
+  -- Hence we can conclude by applying `bound_of_continuous_normedSpace`.
+  rcases bound_of_continuous_normedSpace q this with ⟨C, C_pos, hC⟩
+  exact ⟨s, ⟨C, C_pos.le⟩, fun H ↦ C_pos.ne.symm (congr_arg NNReal.toReal H), hC⟩
+  -- Note that the key ingredient for this proof is that, by scaling arguments hidden in
+  -- `Seminorm.continuous`, we only have to look at the `q`-ball of radius one, and the `s` we get
+  -- from that will automatically work for all other radii.
 
 end Seminorm
 
@@ -754,10 +795,6 @@ variable {σ₁₂ : 𝕜 →+* 𝕜₂} [RingHomIsometric σ₁₂]
 
 def SeminormFamily.comp (q : SeminormFamily 𝕜₂ F ι) (f : E →ₛₗ[σ₁₂] F) : SeminormFamily 𝕜 E ι :=
   fun i => (q i).comp f
-
-theorem SeminormFamily.comp_apply (q : SeminormFamily 𝕜₂ F ι) (i : ι) (f : E →ₛₗ[σ₁₂] F) :
-    q.comp f i = (q i).comp f :=
-  rfl
 
 theorem SeminormFamily.finset_sup_comp (q : SeminormFamily 𝕜₂ F ι) (s : Finset ι)
     (f : E →ₛₗ[σ₁₂] F) : (s.sup q).comp f = s.sup (q.comp f) := by
@@ -826,7 +863,5 @@ theorem WithSeminorms.firstCountableTopology (hp : WithSeminorms p) :
     exact Filter.iInf.isCountablyGenerated _
   have : (uniformity E).IsCountablyGenerated := UniformAddGroup.uniformity_countably_generated
   exact UniformSpace.firstCountableTopology E
-
-WithSeminorms.first_countable := WithSeminorms.firstCountableTopology
 
 end TopologicalProperties

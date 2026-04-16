@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/SetFamily/LYM.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Ring
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.Algebra.Order.Field.Rat
 import Mathlib.Combinatorics.Enumerative.DoubleCounting
 import Mathlib.Combinatorics.SetFamily.Shadow
+
+noncomputable section
 
 /-!
 # Lubell-Yamamoto-Meshalkin inequality and Sperner's theorem
@@ -82,7 +84,24 @@ theorem card_mul_le_card_shadow_mul (h𝒜 : (𝒜 : Set (Finset α)).Sized r) :
   rcases h with ⟨a, ha, rfl⟩
   exact mem_image_of_mem _ (mem_compl.2 ha)
 
--- DISSOLVED: card_div_choose_le_card_shadow_div_choose
+theorem card_div_choose_le_card_shadow_div_choose (hr : r ≠ 0)
+    (h𝒜 : (𝒜 : Set (Finset α)).Sized r) : (#𝒜 : 𝕜) / (Fintype.card α).choose r
+    ≤ #(∂ 𝒜) / (Fintype.card α).choose (r - 1) := by
+  obtain hr' | hr' := lt_or_le (Fintype.card α) r
+  · rw [choose_eq_zero_of_lt hr', cast_zero, div_zero]
+    exact div_nonneg (cast_nonneg _) (cast_nonneg _)
+  replace h𝒜 := card_mul_le_card_shadow_mul h𝒜
+  rw [div_le_div_iff₀] <;> norm_cast
+  · cases' r with r
+    · exact (hr rfl).elim
+    rw [tsub_add_eq_add_tsub hr', add_tsub_add_eq_tsub_right] at h𝒜
+    apply le_of_mul_le_mul_right _ (pos_iff_ne_zero.2 hr)
+    convert Nat.mul_le_mul_right ((Fintype.card α).choose r) h𝒜 using 1
+    · simpa [mul_assoc, Nat.choose_succ_right_eq] using Or.inl (mul_comm _ _)
+    · simp only [mul_assoc, choose_succ_right_eq, mul_eq_mul_left_iff]
+      exact Or.inl (mul_comm _ _)
+  · exact Nat.choose_pos hr'
+  · exact Nat.choose_pos (r.pred_le.trans hr')
 
 end LocalLYM
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.ContinuousMap.Bounded.Star
 import Mathlib.Topology.ContinuousMap.CocompactMap
 
+noncomputable section
+
 /-!
 # Continuous functions vanishing at infinity
 
@@ -74,20 +76,9 @@ instance instCoeTC : CoeTC F C₀(α, β) :=
       continuous_toFun := map_continuous f
       zero_at_infty' := zero_at_infty f }⟩
 
-@[simp]
-theorem coe_toContinuousMap (f : C₀(α, β)) : (f.toContinuousMap : α → β) = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : C₀(α, β)} (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext _ _ h
-
-@[simp]
-lemma coe_mk {f : α → β} (hf : Continuous f) (hf' : Tendsto f (cocompact α) (𝓝 0)) :
-    { toFun := f,
-      continuous_toFun := hf,
-      zero_at_infty' := hf' : ZeroAtInftyContinuousMap α β} = f :=
-  rfl
 
 protected def copy (f : C₀(α, β)) (f' : α → β) (h : f' = f) : C₀(α, β) where
   toFun := f'
@@ -97,10 +88,6 @@ protected def copy (f : C₀(α, β)) (f' : α → β) (h : f' = f) : C₀(α, �
   zero_at_infty' := by
     simp_rw [h]
     exact f.zero_at_infty'
-
-@[simp]
-theorem coe_copy (f : C₀(α, β)) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : C₀(α, β)) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -121,11 +108,6 @@ def ContinuousMap.liftZeroAtInfty [CompactSpace α] : C(α, β) ≃ C₀(α, β)
   right_inv f := by
     ext
     rfl
-
-lemma zeroAtInftyContinuousMapClass.ofCompact {G : Type*} [FunLike G α β]
-    [ContinuousMapClass G α β] [CompactSpace α] : ZeroAtInftyContinuousMapClass G α β where
-  map_continuous := map_continuous
-  zero_at_infty := by simp
 
 end Basics
 
@@ -148,9 +130,6 @@ instance instInhabited [Zero β] : Inhabited C₀(α, β) :=
 
 @[simp]
 theorem coe_zero [Zero β] : ⇑(0 : C₀(α, β)) = 0 :=
-  rfl
-
-theorem zero_apply [Zero β] : (0 : C₀(α, β)) x = 0 :=
   rfl
 
 instance instMul [MulZeroClass β] [ContinuousMul β] : Mul C₀(α, β) :=
@@ -178,9 +157,6 @@ instance instAdd [AddZeroClass β] [ContinuousAdd β] : Add C₀(α, β) :=
 
 @[simp]
 theorem coe_add [AddZeroClass β] [ContinuousAdd β] (f g : C₀(α, β)) : ⇑(f + g) = f + g :=
-  rfl
-
-theorem add_apply [AddZeroClass β] [ContinuousAdd β] (f g : C₀(α, β)) : (f + g) x = f x + g x :=
   rfl
 
 instance instAddZeroClass [AddZeroClass β] [ContinuousAdd β] : AddZeroClass C₀(α, β) :=
@@ -224,17 +200,11 @@ instance instNeg : Neg C₀(α, β) :=
 theorem coe_neg : ⇑(-f) = -f :=
   rfl
 
-theorem neg_apply : (-f) x = -f x :=
-  rfl
-
 instance instSub : Sub C₀(α, β) :=
   ⟨fun f g => ⟨f - g, by simpa only [sub_zero] using (zero_at_infty f).sub (zero_at_infty g)⟩⟩
 
 @[simp]
 theorem coe_sub : ⇑(f - g) = f - g :=
-  rfl
-
-theorem sub_apply : (f - g) x = f x - g x :=
   rfl
 
 instance instAddGroup : AddGroup C₀(α, β) :=
@@ -377,10 +347,6 @@ noncomputable instance instMetricSpace {β : Type*} [MetricSpace β] [Zero β] :
     MetricSpace C₀(α, β) :=
   MetricSpace.induced _ (toBCF_injective α β) inferInstance
 
-@[simp]
-theorem dist_toBCF_eq_dist {f g : C₀(α, β)} : dist f.toBCF g.toBCF = dist f g :=
-  rfl
-
 open BoundedContinuousFunction
 
 theorem tendsto_iff_tendstoUniformly {ι : Type*} {F : ι → C₀(α, β)} {f : C₀(α, β)} {l : Filter ι} :
@@ -433,10 +399,6 @@ noncomputable instance instNormedAddCommGroup [NormedAddCommGroup β] :
 
 variable [SeminormedAddCommGroup β] {𝕜 : Type*} [NormedField 𝕜] [NormedSpace 𝕜 β]
 
-@[simp]
-theorem norm_toBCF_eq_norm {f : C₀(α, β)} : ‖f.toBCF‖ = ‖f‖ :=
-  rfl
-
 instance : NormedSpace 𝕜 C₀(α, β) where norm_smul_le k f := (norm_smul_le k f.toBCF : _)
 
 end NormedSpace
@@ -485,13 +447,6 @@ instance instStar : Star C₀(α, β) where
       continuous_toFun := (map_continuous f).star
       zero_at_infty' := by
         simpa only [star_zero] using (continuous_star.tendsto (0 : β)).comp (zero_at_infty f) }
-
-@[simp]
-theorem coe_star (f : C₀(α, β)) : ⇑(star f) = star (⇑f) :=
-  rfl
-
-theorem star_apply (f : C₀(α, β)) (x : α) : (star f) x = star (f x) :=
-  rfl
 
 instance instStarAddMonoid [ContinuousAdd β] : StarAddMonoid C₀(α, β) where
   star_involutive f := ext fun x => star_star (f x)
@@ -555,47 +510,14 @@ def comp (f : C₀(γ, δ)) (g : β →co γ) : C₀(β, δ) where
   zero_at_infty' := (zero_at_infty f).comp (cocompact_tendsto g)
 
 @[simp]
-theorem coe_comp_to_continuous_fun (f : C₀(γ, δ)) (g : β →co γ) : ((f.comp g) : β → δ) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_id (f : C₀(γ, δ)) : f.comp (CocompactMap.id γ) = f :=
   ext fun _ => rfl
 
-@[simp]
-theorem comp_assoc (f : C₀(γ, δ)) (g : β →co γ) (h : α →co β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
-  rfl
-
-@[simp]
-theorem zero_comp (g : β →co γ) : (0 : C₀(γ, δ)).comp g = 0 :=
-  rfl
-
 end
-
-def compAddMonoidHom [AddMonoid δ] [ContinuousAdd δ] (g : β →co γ) : C₀(γ, δ) →+ C₀(β, δ) where
-  toFun f := f.comp g
-  map_zero' := zero_comp g
-  map_add' _ _ := rfl
 
 -- CONFLATES (assumes ground = zero): compMulHom
 def compMulHom [MulZeroClass δ] [ContinuousMul δ] (g : β →co γ) : C₀(γ, δ) →ₙ* C₀(β, δ) where
   toFun f := f.comp g
-  map_mul' _ _ := rfl
-
-def compLinearMap [AddCommMonoid δ] [ContinuousAdd δ] {R : Type*} [Semiring R] [Module R δ]
-    [ContinuousConstSMul R δ] (g : β →co γ) : C₀(γ, δ) →ₗ[R] C₀(β, δ) where
-  toFun f := f.comp g
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-def compNonUnitalAlgHom {R : Type*} [Semiring R] [NonUnitalNonAssocSemiring δ]
-    [TopologicalSemiring δ] [Module R δ] [ContinuousConstSMul R δ] (g : β →co γ) :
-    C₀(γ, δ) →ₙₐ[R] C₀(β, δ) where
-  toFun f := f.comp g
-  map_smul' _ _ := rfl
-  map_zero' := rfl
-  map_add' _ _ := rfl
   map_mul' _ _ := rfl
 
 end ZeroAtInftyContinuousMap

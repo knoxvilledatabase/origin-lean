@@ -1,10 +1,12 @@
 /-
 Extracted from Data/ENNReal/Real.lean
-Genuine: 102 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
+Genuine: 108 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.ENNReal.Inv
 import Mathlib.Tactic.Bound.Attribute
+
+noncomputable section
 
 /-!
 # Maps between real and extended non-negative real numbers
@@ -141,12 +143,14 @@ theorem toReal_inf {a b : ℝ≥0∞} : a ≠ ∞ → b ≠ ∞ → (a ⊓ b).to
 theorem toNNReal_pos_iff : 0 < a.toNNReal ↔ 0 < a ∧ a < ∞ := by
   induction a <;> simp
 
--- DISSOLVED: toNNReal_pos
+theorem toNNReal_pos {a : ℝ≥0∞} (ha₀ : a ≠ 0) (ha_top : a ≠ ∞) : 0 < a.toNNReal :=
+  toNNReal_pos_iff.mpr ⟨bot_lt_iff_ne_bot.mpr ha₀, lt_top_iff_ne_top.mpr ha_top⟩
 
 theorem toReal_pos_iff : 0 < a.toReal ↔ 0 < a ∧ a < ∞ :=
   NNReal.coe_pos.trans toNNReal_pos_iff
 
--- DISSOLVED: toReal_pos
+theorem toReal_pos {a : ℝ≥0∞} (ha₀ : a ≠ 0) (ha_top : a ≠ ∞) : 0 < a.toReal :=
+  toReal_pos_iff.mpr ⟨bot_lt_iff_ne_bot.mpr ha₀, lt_top_iff_ne_top.mpr ha_top⟩
 
 @[gcongr, bound]
 theorem ofReal_le_ofReal {p q : ℝ} (h : p ≤ q) : ENNReal.ofReal p ≤ ENNReal.ofReal q := by
@@ -185,6 +189,7 @@ theorem ofReal_lt_ofReal_iff_of_nonneg {p q : ℝ} (hp : 0 ≤ p) :
 theorem ofReal_pos {p : ℝ} : 0 < ENNReal.ofReal p ↔ 0 < p := by simp [ENNReal.ofReal]
 
 @[bound] private alias ⟨_, Bound.ofReal_pos_of_pos⟩ := ofReal_pos
+
 @[simp]
 theorem ofReal_eq_zero {p : ℝ} : ENNReal.ofReal p = 0 ↔ p ≤ 0 := by simp [ENNReal.ofReal]
 
@@ -194,7 +199,9 @@ theorem zero_eq_ofReal {p : ℝ} : 0 = ENNReal.ofReal p ↔ p ≤ 0 :=
 
 alias ⟨_, ofReal_of_nonpos⟩ := ofReal_eq_zero
 
--- DISSOLVED: ofReal_lt_natCast
+@[simp]
+lemma ofReal_lt_natCast {p : ℝ} {n : ℕ} (hn : n ≠ 0) : ENNReal.ofReal p < n ↔ p < n := by
+  exact mod_cast ofReal_lt_ofReal_iff (Nat.cast_pos.2 hn.bot_lt)
 
 alias ofReal_lt_nat_cast := ofReal_lt_natCast
 
@@ -207,7 +214,9 @@ lemma ofReal_lt_ofNat {p : ℝ} {n : ℕ} [n.AtLeastTwo] :
     ENNReal.ofReal p < no_index (OfNat.ofNat n) ↔ p < OfNat.ofNat n :=
   ofReal_lt_natCast (NeZero.ne n)
 
--- DISSOLVED: natCast_le_ofReal
+@[simp]
+lemma natCast_le_ofReal {n : ℕ} {p : ℝ} (hn : n ≠ 0) : n ≤ ENNReal.ofReal p ↔ n ≤ p := by
+  simp only [← not_lt, ofReal_lt_natCast hn]
 
 alias nat_cast_le_ofReal := natCast_le_ofReal
 
@@ -249,7 +258,9 @@ lemma ofNat_lt_ofReal {n : ℕ} [n.AtLeastTwo] {r : ℝ} :
     no_index (OfNat.ofNat n) < ENNReal.ofReal r ↔ OfNat.ofNat n < r :=
   natCast_lt_ofReal
 
--- DISSOLVED: ofReal_eq_natCast
+@[simp]
+lemma ofReal_eq_natCast {r : ℝ} {n : ℕ} (h : n ≠ 0) : ENNReal.ofReal r = n ↔ r = n :=
+  ENNReal.coe_inj.trans <| Real.toNNReal_eq_natCast h
 
 alias ofReal_eq_nat_cast := ofReal_eq_natCast
 
@@ -327,10 +338,6 @@ theorem ofReal_div_of_pos {x y : ℝ} (hy : 0 < y) :
 theorem toNNReal_mul {a b : ℝ≥0∞} : (a * b).toNNReal = a.toNNReal * b.toNNReal :=
   WithTop.untop'_zero_mul a b
 
-theorem toNNReal_mul_top (a : ℝ≥0∞) : ENNReal.toNNReal (a * ∞) = 0 := by simp
-
-theorem toNNReal_top_mul (a : ℝ≥0∞) : ENNReal.toNNReal (∞ * a) = 0 := by simp
-
 @[simp]
 theorem smul_toNNReal (a : ℝ≥0) (b : ℝ≥0∞) : (a • b).toNNReal = a * b.toNNReal := by
   change ((a : ℝ≥0∞) * b).toNNReal = a * b.toNNReal
@@ -356,8 +363,6 @@ def toRealHom : ℝ≥0∞ →* ℝ :=
 @[simp]
 theorem toReal_mul : (a * b).toReal = a.toReal * b.toReal :=
   toRealHom.map_mul a b
-
-theorem toReal_nsmul (a : ℝ≥0∞) (n : ℕ) : (n • a).toReal = n • a.toReal := by simp
 
 @[simp]
 theorem toReal_pow (a : ℝ≥0∞) (n : ℕ) : (a ^ n).toReal = a.toReal ^ n :=

@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Matrix/NonsingularInverse.lean
-Genuine: 107 | Conflates: 0 | Dissolved: 3 | Infrastructure: 7
+Genuine: 107 | Conflates: 2 | Dissolved: 1 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Invertible
 import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.LinearAlgebra.Matrix.Adjugate
 import Mathlib.LinearAlgebra.Matrix.Trace
+
+noncomputable section
 
 /-!
 # Nonsingular inverses
@@ -156,9 +158,13 @@ theorem isUnit_det_of_left_inverse (h : B * A = 1) : IsUnit A.det :=
 theorem isUnit_det_of_right_inverse (h : A * B = 1) : IsUnit A.det :=
   @isUnit_of_invertible _ _ _ (detInvertibleOfRightInverse _ _ h)
 
--- DISSOLVED: det_ne_zero_of_left_inverse
+-- CONFLATES (assumes ground = zero): det_ne_zero_of_left_inverse
+theorem det_ne_zero_of_left_inverse [Nontrivial α] (h : B * A = 1) : A.det ≠ 0 :=
+  (isUnit_det_of_left_inverse h).ne_zero
 
--- DISSOLVED: det_ne_zero_of_right_inverse
+-- CONFLATES (assumes ground = zero): det_ne_zero_of_right_inverse
+theorem det_ne_zero_of_right_inverse [Nontrivial α] (h : A * B = 1) : A.det ≠ 0 :=
+  (isUnit_det_of_right_inverse h).ne_zero
 
 end Invertible
 

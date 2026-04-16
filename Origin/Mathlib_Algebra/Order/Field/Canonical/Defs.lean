@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Field.Defs
 import Mathlib.Algebra.Order.Ring.Canonical
 import Mathlib.Algebra.Order.GroupWithZero.Canonical
 
+noncomputable section
+
 /-!
 # Canonically ordered semifields
 -/

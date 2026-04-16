@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Products.Basic
 import Mathlib.CategoryTheory.Functor.Currying
 import Mathlib.CategoryTheory.Products.Bifunctor
 
+noncomputable section
+
 /-!
 # A Fubini theorem for categorical (co)limits
 
@@ -229,11 +231,6 @@ noncomputable def DiagramOfCones.mkOfHasLimits : DiagramOfCones F where
 noncomputable instance diagramOfConesInhabited : Inhabited (DiagramOfCones F) :=
   ⟨DiagramOfCones.mkOfHasLimits F⟩
 
-@[simp]
-theorem DiagramOfCones.mkOfHasLimits_conePoints :
-    (DiagramOfCones.mkOfHasLimits F).conePoints = F ⋙ lim :=
-  rfl
-
 variable [HasLimit (uncurry.obj F)]
 
 variable [HasLimit (F ⋙ lim)]
@@ -275,11 +272,6 @@ noncomputable def DiagramOfCocones.mkOfHasColimits : DiagramOfCocones F where
 
 noncomputable instance diagramOfCoconesInhabited : Inhabited (DiagramOfCocones F) :=
   ⟨DiagramOfCocones.mkOfHasColimits F⟩
-
-@[simp]
-theorem DiagramOfCocones.mkOfHasColimits_coconePoints :
-    (DiagramOfCocones.mkOfHasColimits F).coconePoints = F ⋙ colim :=
-  rfl
 
 variable [HasColimit (uncurry.obj F)]
 

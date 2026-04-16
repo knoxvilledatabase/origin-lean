@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Algebra/Exponential.lean
-Genuine: 84 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 86 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.ChangeOrigin
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Complex.Basic
 import Mathlib.Data.Nat.Choose.Cast
 import Mathlib.Analysis.Analytic.OfScalars
 import Mathlib.Analysis.SpecificLimits.RCLike
+
+noncomputable section
 
 /-!
 # Exponential in a Banach algebra
@@ -552,9 +554,11 @@ theorem exp_zsmul (z : ℤ) (x : 𝔸) : exp 𝕂 (z • x) = exp 𝕂 x ^ z := 
   · rw [zpow_natCast, natCast_zsmul, exp_nsmul]
   · rw [zpow_neg, zpow_natCast, neg_smul, exp_neg, natCast_zsmul, exp_nsmul]
 
--- DISSOLVED: exp_conj
+theorem exp_conj (y : 𝔸) (x : 𝔸) (hy : y ≠ 0) : exp 𝕂 (y * x * y⁻¹) = y * exp 𝕂 x * y⁻¹ :=
+  exp_units_conj _ (Units.mk0 y hy) x
 
--- DISSOLVED: exp_conj'
+theorem exp_conj' (y : 𝔸) (x : 𝔸) (hy : y ≠ 0) : exp 𝕂 (y⁻¹ * x * y) = y⁻¹ * exp 𝕂 x * y :=
+  exp_units_conj' _ (Units.mk0 y hy) x
 
 end DivisionAlgebra
 

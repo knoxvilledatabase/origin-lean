@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.CommRing
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.RingTheory.MvPolynomial.Basic
+
+noncomputable section
 
 /-!
 # Multivariate polynomials over fields
@@ -49,7 +51,6 @@ theorem finrank_eq_zero [Nonempty σ] : Module.finrank K (MvPolynomial σ K) = 0
   (basisMonomials σ K).linearIndependent.finrank_eq_zero_of_infinite
 
 omit [Nontrivial K] in
-
 theorem finrank_eq_one [IsEmpty σ] : Module.finrank K (MvPolynomial σ K) = 1 :=
   Module.rank_eq_one_iff_finrank_eq_one.mp <| by
     cases subsingleton_or_nontrivial K <;> simp [rank_eq_lift]

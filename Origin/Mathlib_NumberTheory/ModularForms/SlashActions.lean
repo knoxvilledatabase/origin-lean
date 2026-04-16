@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Slash actions
 

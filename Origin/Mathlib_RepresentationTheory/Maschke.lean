@@ -7,6 +7,8 @@ import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.RingTheory.SimpleModule
 
+noncomputable section
+
 /-!
 # Maschke's theorem
 

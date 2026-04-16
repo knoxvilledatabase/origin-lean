@@ -23,9 +23,11 @@ To add a new pattern:
 """
 
 import re
-import sys
-sys.path.insert(0, str(__import__('pathlib').Path(__file__).parent.parent))
-from origin2 import Block
+from typing import Any
+
+# Block type is imported from origin2 at runtime.
+# We use Any here to avoid circular imports.
+Block = Any
 
 
 class CompressionPattern:

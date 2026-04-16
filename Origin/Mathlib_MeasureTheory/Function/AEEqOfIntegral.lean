@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/AEEqOfIntegral.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Lp
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Order.Filter.Ring
+
+noncomputable section
 
 /-! # From equality of integrals to equality of functions
 
@@ -473,12 +475,23 @@ theorem AEFinStronglyMeasurable.ae_eq_of_forall_setIntegral_eq {f g : α → E}
 alias AEFinStronglyMeasurable.ae_eq_of_forall_set_integral_eq :=
   AEFinStronglyMeasurable.ae_eq_of_forall_setIntegral_eq
 
--- DISSOLVED: Lp.ae_eq_zero_of_forall_setIntegral_eq_zero
+theorem Lp.ae_eq_zero_of_forall_setIntegral_eq_zero (f : Lp E p μ) (hp_ne_zero : p ≠ 0)
+    (hp_ne_top : p ≠ ∞) (hf_int_finite : ∀ s, MeasurableSet s → μ s < ∞ → IntegrableOn f s μ)
+    (hf_zero : ∀ s : Set α, MeasurableSet s → μ s < ∞ → ∫ x in s, f x ∂μ = 0) : f =ᵐ[μ] 0 :=
+  AEFinStronglyMeasurable.ae_eq_zero_of_forall_setIntegral_eq_zero hf_int_finite hf_zero
+    (Lp.finStronglyMeasurable _ hp_ne_zero hp_ne_top).aefinStronglyMeasurable
 
 alias Lp.ae_eq_zero_of_forall_set_integral_eq_zero :=
   Lp.ae_eq_zero_of_forall_setIntegral_eq_zero
 
--- DISSOLVED: Lp.ae_eq_of_forall_setIntegral_eq
+theorem Lp.ae_eq_of_forall_setIntegral_eq (f g : Lp E p μ) (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞)
+    (hf_int_finite : ∀ s, MeasurableSet s → μ s < ∞ → IntegrableOn f s μ)
+    (hg_int_finite : ∀ s, MeasurableSet s → μ s < ∞ → IntegrableOn g s μ)
+    (hfg : ∀ s : Set α, MeasurableSet s → μ s < ∞ → ∫ x in s, f x ∂μ = ∫ x in s, g x ∂μ) :
+    f =ᵐ[μ] g :=
+  AEFinStronglyMeasurable.ae_eq_of_forall_setIntegral_eq hf_int_finite hg_int_finite hfg
+    (Lp.finStronglyMeasurable _ hp_ne_zero hp_ne_top).aefinStronglyMeasurable
+    (Lp.finStronglyMeasurable _ hp_ne_zero hp_ne_top).aefinStronglyMeasurable
 
 alias Lp.ae_eq_of_forall_set_integral_eq := Lp.ae_eq_of_forall_setIntegral_eq
 

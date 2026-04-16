@@ -7,6 +7,8 @@ import Mathlib.Algebra.Divisibility.Basic
 import Mathlib.Algebra.Group.Prod
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Lemmas about the divisibility relation in product (semi)groups
 -/

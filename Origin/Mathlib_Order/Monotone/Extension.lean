@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
+noncomputable section
+
 /-!
 # Extension of a monotone function from a set to the whole space
 

@@ -5,6 +5,8 @@ Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Data.Nat.ModEq
 
+noncomputable section
+
 /-!
 
 # Congruences modulo an integer

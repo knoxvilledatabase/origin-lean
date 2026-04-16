@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Int.Parity
 import Mathlib.Algebra.Ring.Int.Units
 import Mathlib.Data.ZMod.IntUnitsPower
 
+noncomputable section
+
 /-!
 # Integer powers of (-1)
 
@@ -21,14 +23,9 @@ namespace Int
 
 def negOnePow (n : ℤ) : ℤˣ := (-1 : ℤˣ) ^ n
 
-lemma negOnePow_def (n : ℤ) : n.negOnePow = (-1 : ℤˣ) ^ n := rfl
-
 lemma negOnePow_add (n₁ n₂ : ℤ) :
     (n₁ + n₂).negOnePow =  n₁.negOnePow * n₂.negOnePow :=
   zpow_add _ _ _
-
-@[simp]
-lemma negOnePow_zero : negOnePow 0 = 1 := rfl
 
 @[simp]
 lemma negOnePow_one : negOnePow 1 = -1 := rfl

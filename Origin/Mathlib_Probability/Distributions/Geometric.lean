@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.ProbabilityMassFunction.Basic
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 
+noncomputable section
+
 /-! # Geometric distributions over ℕ
 
 Define the geometric measure over the natural numbers
@@ -30,7 +32,6 @@ variable {p : ℝ}
 section GeometricPMF
 
 noncomputable
-
 def geometricPMFReal (p : ℝ) (n : ℕ) : ℝ := (1-p) ^ n * p
 
 lemma geometricPMFRealSum (hp_pos : 0 < p) (hp_le_one : p ≤ 1) :
@@ -55,7 +56,6 @@ lemma geometricPMFReal_nonneg {n : ℕ} (hp_pos : 0 < p) (hp_le_one : p ≤ 1) :
   positivity
 
 noncomputable
-
 def geometricPMF (hp_pos : 0 < p) (hp_le_one : p ≤ 1) : PMF ℕ :=
   ⟨fun n ↦ ENNReal.ofReal (geometricPMFReal p n), by
     apply ENNReal.hasSum_coe.mpr
@@ -74,7 +74,6 @@ lemma stronglyMeasurable_geometricPMFReal : StronglyMeasurable (geometricPMFReal
 end GeometricPMF
 
 noncomputable
-
 def geometricMeasure (hp_pos : 0 < p) (hp_le_one : p ≤ 1) : Measure ℕ :=
   (geometricPMF hp_pos hp_le_one).toMeasure
 

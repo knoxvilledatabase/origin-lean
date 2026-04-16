@@ -14,6 +14,8 @@ import Mathlib.Tactic.StacksAttribute
 import Mathlib.Topology.KrullDimension
 import Mathlib.Topology.Sober
 
+noncomputable section
+
 /-!
 # The Zariski topology on the prime spectrum of a commutative (semi)ring
 
@@ -255,10 +257,6 @@ theorem comap_id : comap (RingHom.id R) = ContinuousMap.id _ := by
 theorem comap_comp (f : R →+* S) (g : S →+* S') : comap (g.comp f) = (comap f).comp (comap g) :=
   rfl
 
-theorem comap_comp_apply (f : R →+* S) (g : S →+* S') (x : PrimeSpectrum S') :
-    PrimeSpectrum.comap (g.comp f) x = (PrimeSpectrum.comap f) (PrimeSpectrum.comap g x) :=
-  rfl
-
 @[simp]
 theorem preimage_comap_zeroLocus (s : Set R) : comap f ⁻¹' zeroLocus s = zeroLocus (f '' s) :=
   preimage_specComap_zeroLocus_aux f s
@@ -369,7 +367,6 @@ lemma primeSpectrumProd_symm_inr (x) :
   ext; simp [Ideal.prod]
 
 noncomputable
-
 def primeSpectrumProdHomeo :
     PrimeSpectrum (R × S) ≃ₜ PrimeSpectrum R ⊕ PrimeSpectrum S := by
   refine ((primeSpectrumProd R S).symm.toHomeomorphOfIsInducing ?_).symm
@@ -492,10 +489,6 @@ alias localization_away_openEmbedding := localization_away_isOpenEmbedding
 theorem isCompact_basicOpen (f : R) : IsCompact (basicOpen f : Set (PrimeSpectrum R)) := by
   rw [← localization_away_comap_range (Localization (Submonoid.powers f))]
   exact isCompact_range (map_continuous _)
-
-lemma comap_basicOpen (f : R →+* S) (x : R) :
-    TopologicalSpace.Opens.comap (comap f) (basicOpen x) = basicOpen (f x) :=
-  rfl
 
 open TopologicalSpace in
 
@@ -1061,9 +1054,6 @@ lemma basicOpen_isIdempotentElemEquivClopens_symm (s) :
 
 lemma coe_isIdempotentElemEquivClopens_apply (e) :
     (isIdempotentElemEquivClopens e : Set (PrimeSpectrum R)) = basicOpen (e.1 : R) := rfl
-
-lemma isIdempotentElemEquivClopens_apply_toOpens (e) :
-    (isIdempotentElemEquivClopens e).toOpens = basicOpen (e.1 : R) := rfl
 
 lemma isIdempotentElemEquivClopens_mul (e₁ e₂ : {e : R | IsIdempotentElem e}) :
     isIdempotentElemEquivClopens ⟨_, e₁.2.mul e₂.2⟩ =

@@ -8,6 +8,8 @@ import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.RingTheory.MvPolynomial
 import Mathlib.RingTheory.PrimeSpectrum
 
+noncomputable section
+
 /-!
 # Nullstellensatz
 This file establishes a version of Hilbert's classical Nullstellensatz for `MvPolynomial`s.
@@ -35,11 +37,6 @@ variable {σ : Type*}
 def zeroLocus (I : Ideal (MvPolynomial σ k)) : Set (σ → k) :=
   {x : σ → k | ∀ p ∈ I, eval x p = 0}
 
-@[simp]
-theorem mem_zeroLocus_iff {I : Ideal (MvPolynomial σ k)} {x : σ → k} :
-    x ∈ zeroLocus I ↔ ∀ p ∈ I, eval x p = 0 :=
-  Iff.rfl
-
 theorem zeroLocus_anti_mono {I J : Ideal (MvPolynomial σ k)} (h : I ≤ J) :
     zeroLocus J ≤ zeroLocus I := fun _ hx p hp => hx p <| h hp
 
@@ -57,11 +54,6 @@ def vanishingIdeal (V : Set (σ → k)) : Ideal (MvPolynomial σ k) where
   add_mem' {p q} hp hq x hx := by simp only [hq x hx, hp x hx, add_zero, RingHom.map_add]
   smul_mem' p q hq x hx := by
     simp only [hq x hx, Algebra.id.smul_eq_mul, mul_zero, RingHom.map_mul]
-
-@[simp]
-theorem mem_vanishingIdeal_iff {V : Set (σ → k)} {p : MvPolynomial σ k} :
-    p ∈ vanishingIdeal V ↔ ∀ x ∈ V, eval x p = 0 :=
-  Iff.rfl
 
 theorem vanishingIdeal_anti_mono {A B : Set (σ → k)} (h : A ≤ B) :
     vanishingIdeal B ≤ vanishingIdeal A := fun _ hp x hx => hp x <| h hx

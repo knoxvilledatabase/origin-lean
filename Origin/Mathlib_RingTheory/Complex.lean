@@ -7,6 +7,8 @@ import Mathlib.Data.Complex.Module
 import Mathlib.RingTheory.Norm.Defs
 import Mathlib.RingTheory.Trace.Defs
 
+noncomputable section
+
 /-! # Lemmas about `Algebra.trace` and `Algebra.norm` on `ℂ` -/
 
 open Complex

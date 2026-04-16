@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Ideal.Quotient.Basic
 import Mathlib.RingTheory.Polynomial.Quotient
 import Mathlib.RingTheory.TwoSidedIdeal.Operations
 
+noncomputable section
+
 /-!
 # Jacobson radical
 

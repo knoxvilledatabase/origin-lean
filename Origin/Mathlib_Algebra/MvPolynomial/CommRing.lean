@@ -5,6 +5,8 @@ Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Variables
 
+noncomputable section
+
 /-!
 # Multivariate polynomials over a ring
 

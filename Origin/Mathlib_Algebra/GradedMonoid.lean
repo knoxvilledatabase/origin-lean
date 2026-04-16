@@ -12,6 +12,8 @@ import Mathlib.Data.Sigma.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Lean.Elab.Tactic
 
+noncomputable section
+
 /-!
 # Additively-graded multiplicative structures
 
@@ -111,16 +113,6 @@ variable {α β} {A : ι → Type*}
 instance [∀ i, SMul α (A i)] : SMul α (GradedMonoid A) where
   smul r g := GradedMonoid.mk g.1 (r • g.2)
 
-@[simp] theorem fst_smul [∀ i, SMul α (A i)] (a : α) (x : GradedMonoid A) :
-    (a • x).fst = x.fst := rfl
-
-@[simp] theorem snd_smul [∀ i, SMul α (A i)] (a : α) (x : GradedMonoid A) :
-    (a • x).snd = a • x.snd := rfl
-
-theorem smul_mk [∀ i, SMul α (A i)] {i} (c : α) (a : A i) :
-    c • mk i a = mk i (c • a) :=
-  rfl
-
 instance [∀ i, SMul α (A i)] [∀ i, SMul β (A i)]
     [∀ i, SMulCommClass α β (A i)] :
     SMulCommClass α β (GradedMonoid A) where
@@ -151,22 +143,12 @@ class GOne [Zero ι] where
 instance GOne.toOne [Zero ι] [GOne A] : One (GradedMonoid A) :=
   ⟨⟨_, GOne.one⟩⟩
 
-@[simp] theorem fst_one [Zero ι] [GOne A] : (1 : GradedMonoid A).fst = 0 := rfl
-
-@[simp] theorem snd_one [Zero ι] [GOne A] : (1 : GradedMonoid A).snd = GOne.one := rfl
-
 class GMul [Add ι] where
   /-- The homogeneous multiplication map `mul` -/
   mul {i j} : A i → A j → A (i + j)
 
 instance GMul.toMul [Add ι] [GMul A] : Mul (GradedMonoid A) :=
   ⟨fun x y : GradedMonoid A => ⟨_, GMul.mul x.snd y.snd⟩⟩
-
-@[simp] theorem fst_mul [Add ι] [GMul A] (x y : GradedMonoid A) :
-    (x * y).fst = x.fst + y.fst := rfl
-
-@[simp] theorem snd_mul [Add ι] [GMul A] (x y : GradedMonoid A) :
-    (x * y).snd = GMul.mul x.snd y.snd := rfl
 
 theorem mk_mul_mk [Add ι] [GMul A] {i j} (a : A i) (b : A j) :
     mk i a * mk j b = mk (i + j) (GMul.mul a b) :=
@@ -225,15 +207,6 @@ instance GMonoid.toMonoid [AddMonoid ι] [GMonoid A] : Monoid (GradedMonoid A) w
   mul_one := GMonoid.mul_one
   mul_assoc := GMonoid.mul_assoc
 
-@[simp] theorem fst_pow [AddMonoid ι] [GMonoid A] (x : GradedMonoid A) (n : ℕ) :
-    (x ^ n).fst = n • x.fst := rfl
-
-@[simp] theorem snd_pow [AddMonoid ι] [GMonoid A] (x : GradedMonoid A) (n : ℕ) :
-    (x ^ n).snd = GMonoid.gnpow n x.snd := rfl
-
-theorem mk_pow [AddMonoid ι] [GMonoid A] {i} (a : A i) (n : ℕ) :
-    mk i a ^ n = mk (n • i) (GMonoid.gnpow _ a) := rfl
-
 class GCommMonoid [AddCommMonoid ι] extends GMonoid A where
   /-- Multiplication is commutative -/
   mul_comm (a : GradedMonoid A) (b : GradedMonoid A) : a * b = b * a
@@ -277,10 +250,6 @@ variable {A}
 @[simp]
 theorem mk_zero_smul {i} (a : A 0) (b : A i) : mk _ (a • b) = mk _ a * mk _ b :=
   Sigma.ext (zero_add _).symm <| eqRec_heq _ _
-
-@[scoped simp]
-theorem GradeZero.smul_eq_mul (a b : A 0) : a • b = a * b :=
-  rfl
 
 end Mul
 
@@ -343,11 +312,6 @@ def List.dProdIndex (l : List α) (fι : α → ι) : ι :=
 
 @[simp]
 theorem List.dProdIndex_nil (fι : α → ι) : ([] : List α).dProdIndex fι = 0 :=
-  rfl
-
-@[simp]
-theorem List.dProdIndex_cons (a : α) (l : List α) (fι : α → ι) :
-    (a :: l).dProdIndex fι = fι a + l.dProdIndex fι :=
   rfl
 
 theorem List.dProdIndex_eq_map_sum (l : List α) (fι : α → ι) :
@@ -448,11 +412,6 @@ instance SetLike.gOne {S : Type*} [SetLike S R] [One R] [Zero ι] (A : ι → S)
     [SetLike.GradedOne A] : GradedMonoid.GOne fun i => A i where
   one := ⟨1, SetLike.one_mem_graded _⟩
 
-@[simp]
-theorem SetLike.coe_gOne {S : Type*} [SetLike S R] [One R] [Zero ι] (A : ι → S)
-    [SetLike.GradedOne A] : ↑(@GradedMonoid.GOne.one _ (fun i => A i) _ _) = (1 : R) :=
-  rfl
-
 class SetLike.GradedMul {S : Type*} [SetLike S R] [Mul R] [Add ι] (A : ι → S) : Prop where
   /-- Multiplication is homogeneous -/
   mul_mem : ∀ ⦃i j⦄ {gi gj}, gi ∈ A i → gj ∈ A j → gi * gj ∈ A (i + j)
@@ -464,12 +423,6 @@ theorem SetLike.mul_mem_graded {S : Type*} [SetLike S R] [Mul R] [Add ι] {A : �
 instance SetLike.gMul {S : Type*} [SetLike S R] [Mul R] [Add ι] (A : ι → S)
     [SetLike.GradedMul A] : GradedMonoid.GMul fun i => A i where
   mul := fun a b => ⟨(a * b : R), SetLike.mul_mem_graded a.prop b.prop⟩
-
-@[simp]
-theorem SetLike.coe_gMul {S : Type*} [SetLike S R] [Mul R] [Add ι] (A : ι → S)
-    [SetLike.GradedMul A] {i j : ι} (x : A i) (y : A j) :
-    ↑(@GradedMonoid.GMul.mul _ (fun i => A i) _ _ _ _ x y) = (x * y : R) :=
-  rfl
 
 class SetLike.GradedMonoid {S : Type*} [SetLike S R] [Monoid R] [AddMonoid ι] (A : ι → S) extends
   SetLike.GradedOne A, SetLike.GradedMul A : Prop
@@ -497,12 +450,6 @@ instance instCommMonoid
     {A : ι → S} [SetLike.GradedMonoid A] :
     CommMonoid (A 0) :=
   inferInstanceAs <| CommMonoid (GradeZero.submonoid A)
-
-@[simp, norm_cast] theorem coe_one : ↑(1 : A 0) = (1 : R) := rfl
-
-@[simp, norm_cast] theorem coe_mul (a b : A 0) : ↑(a * b) = (↑a * ↑b : R) := rfl
-
-@[simp, norm_cast] theorem coe_pow (a : A 0) (n : ℕ) : ↑(a ^ n) = (↑a : R) ^ n := rfl
 
 end GradeZero
 
@@ -545,12 +492,6 @@ instance SetLike.gMonoid {S : Type*} [SetLike S R] [Monoid R] [AddMonoid ι] (A 
     gnpow := fun n _ a => ⟨(a:R)^n, SetLike.pow_mem_graded n a.prop⟩
     gnpow_zero' := fun _ => Sigma.subtype_ext (zero_nsmul _) (pow_zero _)
     gnpow_succ' := fun _ _ => Sigma.subtype_ext (succ_nsmul _ _) (pow_succ _ _) }
-
-@[simp]
-theorem SetLike.coe_gnpow {S : Type*} [SetLike S R] [Monoid R] [AddMonoid ι] (A : ι → S)
-    [SetLike.GradedMonoid A] {i : ι} (x : A i) (n : ℕ) :
-    ↑(@GradedMonoid.GMonoid.gnpow _ (fun i => A i) _ _ n _ x) = (x:R)^n :=
-  rfl
 
 instance SetLike.gCommMonoid {S : Type*} [SetLike S R] [CommMonoid R] [AddCommMonoid ι] (A : ι → S)
     [SetLike.GradedMonoid A] : GradedMonoid.GCommMonoid fun i => A i :=

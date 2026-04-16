@@ -12,6 +12,8 @@ import Mathlib.CategoryTheory.Sites.Adjunction
 import Mathlib.CategoryTheory.Sites.Equivalence
 import Mathlib.Condensed.Light.Basic
 
+noncomputable section
+
 /-!
 
 # Light condensed `R`-modules
@@ -40,12 +42,10 @@ def LightCondensed.forget : LightCondMod R ⥤ LightCondSet :=
   sheafCompose _ (CategoryTheory.forget _)
 
 noncomputable
-
 def LightCondensed.free : LightCondSet ⥤ LightCondMod R :=
   Sheaf.composeAndSheafify _ (ModuleCat.free R)
 
 noncomputable
-
 def LightCondensed.freeForgetAdjunction : free R ⊣ forget R :=  Sheaf.adjunction _ (ModuleCat.adj R)
 
 abbrev LightCondAb := LightCondMod ℤ

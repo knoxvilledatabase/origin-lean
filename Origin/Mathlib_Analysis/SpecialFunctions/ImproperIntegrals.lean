@@ -9,6 +9,8 @@ import Mathlib.MeasureTheory.Group.Integral
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 import Mathlib.MeasureTheory.Measure.Lebesgue.Integral
 
+noncomputable section
+
 /-!
 # Evaluation of specific improper integrals
 

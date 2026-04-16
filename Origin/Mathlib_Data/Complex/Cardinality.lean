@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Cardinality
 
+noncomputable section
+
 /-!
 # The cardinality of the complex numbers
 

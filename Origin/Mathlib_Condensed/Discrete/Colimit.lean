@@ -7,6 +7,8 @@ import Mathlib.Condensed.Discrete.LocallyConstant
 import Mathlib.Condensed.Equivalence
 import Mathlib.Topology.Category.LightProfinite.Extend
 
+noncomputable section
+
 /-!
 
 # The condensed set given by left Kan extension from `FintypeCat` to `Profinite`.

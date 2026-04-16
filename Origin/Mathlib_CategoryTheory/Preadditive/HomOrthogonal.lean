@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Preadditive.Biproducts
 import Mathlib.LinearAlgebra.Matrix.InvariantBasisNumber
 import Mathlib.Data.Set.Subsingleton
 
+noncomputable section
+
 /-!
 # Hom orthogonal families.
 

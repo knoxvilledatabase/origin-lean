@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 import Mathlib.CategoryTheory.Limits.Preserves.Limits
 import Mathlib.CategoryTheory.Limits.Shapes.Types
 
+noncomputable section
+
 /-!
 # Gluing data
 
@@ -116,38 +118,6 @@ def diagram : MultispanIndex C where
   fst := fun ⟨i, j⟩ => D.f i j
   snd := fun ⟨i, j⟩ => D.t i j ≫ D.f j i
 
-@[simp]
-theorem diagram_l : D.diagram.L = (D.J × D.J) :=
-  rfl
-
-@[simp]
-theorem diagram_r : D.diagram.R = D.J :=
-  rfl
-
-@[simp]
-theorem diagram_fstFrom (i j : D.J) : D.diagram.fstFrom ⟨i, j⟩ = i :=
-  rfl
-
-@[simp]
-theorem diagram_sndFrom (i j : D.J) : D.diagram.sndFrom ⟨i, j⟩ = j :=
-  rfl
-
-@[simp]
-theorem diagram_fst (i j : D.J) : D.diagram.fst ⟨i, j⟩ = D.f i j :=
-  rfl
-
-@[simp]
-theorem diagram_snd (i j : D.J) : D.diagram.snd ⟨i, j⟩ = D.t i j ≫ D.f j i :=
-  rfl
-
-@[simp]
-theorem diagram_left : D.diagram.left = D.V :=
-  rfl
-
-@[simp]
-theorem diagram_right : D.diagram.right = D.U :=
-  rfl
-
 section
 
 variable [HasMulticoequalizer D.diagram]
@@ -237,36 +207,6 @@ def diagramIso : D.diagram.multispan ⋙ F ≅ (D.mapGlueData F).diagram.multisp
         rfl
       · erw [Category.comp_id, Category.id_comp, Functor.map_id]
         rfl)
-
-@[simp]
-theorem diagramIso_app_left (i : D.J × D.J) :
-    (D.diagramIso F).app (WalkingMultispan.left i) = Iso.refl _ :=
-  rfl
-
-@[simp]
-theorem diagramIso_app_right (i : D.J) :
-    (D.diagramIso F).app (WalkingMultispan.right i) = Iso.refl _ :=
-  rfl
-
-@[simp]
-theorem diagramIso_hom_app_left (i : D.J × D.J) :
-    (D.diagramIso F).hom.app (WalkingMultispan.left i) = 𝟙 _ :=
-  rfl
-
-@[simp]
-theorem diagramIso_hom_app_right (i : D.J) :
-    (D.diagramIso F).hom.app (WalkingMultispan.right i) = 𝟙 _ :=
-  rfl
-
-@[simp]
-theorem diagramIso_inv_app_left (i : D.J × D.J) :
-    (D.diagramIso F).inv.app (WalkingMultispan.left i) = 𝟙 _ :=
-  rfl
-
-@[simp]
-theorem diagramIso_inv_app_right (i : D.J) :
-    (D.diagramIso F).inv.app (WalkingMultispan.right i) = 𝟙 _ :=
-  rfl
 
 end
 
@@ -410,43 +350,6 @@ def GlueData'.t'' (D : GlueData' C) (i j k : D.J) :
       D.t' i j k hij hik hjk ≫
       pullback.map _ _ _ _ (eqToHom (by aesop)) (eqToHom (by aesop)) (eqToHom (by aesop))
         (by delta f'; aesop) (by delta f'; aesop)
-
-def GlueData.ofGlueData' (D : GlueData' C) : GlueData C where
-  J := D.J
-  U := D.U
-  V ij := if h : ij.1 = ij.2 then D.U ij.1 else D.V ij.1 ij.2 h
-  f i j := D.f' i j
-  f_id i := by simp only [↓reduceDIte, GlueData'.f']; infer_instance
-  t i j := if h : i = j then eqToHom (by simp [h]) else
-    eqToHom (dif_neg h) ≫ D.t i j h ≫ eqToHom (dif_neg (Ne.symm h)).symm
-  t_id i := by simp
-  t' := D.t''
-  t_fac i j k := by
-    delta GlueData'.t''
-    split_ifs
-    · simp [*]
-    · cases ‹i ≠ j› (‹i = k›.trans ‹j = k›.symm)
-    · simp [‹j ≠ k›.symm, *]
-    · simp [*]
-    · simp [*, reassoc_of% D.t_fac]
-  cocycle i j k := by
-    delta GlueData'.t''
-    if hij : i = j then
-      subst hij
-      if hik : i = k then
-        subst hik
-        ext <;> simp
-      else
-        simp [hik, Ne.symm hik, fst_eq_snd_of_mono_eq]
-    else if hik : i = k then
-      subst hik
-      ext <;> simp [hij, Ne.symm hij, fst_eq_snd_of_mono_eq, pullback.condition_assoc]
-    else if hjk : j = k then
-      subst hjk
-      ext <;> simp [hij, Ne.symm hij, fst_eq_snd_of_mono_eq, pullback.condition_assoc]
-    else
-      ext <;> simp [hij, Ne.symm hij, hik, Ne.symm hik, hjk, Ne.symm hjk,
-        pullback.map_comp_assoc]
 
 end GlueData'
 

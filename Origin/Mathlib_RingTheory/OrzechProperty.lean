@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Equiv.TransferInstance
 import Mathlib.RingTheory.Finiteness.Cardinality
 
+noncomputable section
+
 /-!
 
 # Orzech property of rings

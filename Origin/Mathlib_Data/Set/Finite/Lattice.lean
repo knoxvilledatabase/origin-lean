@@ -7,6 +7,8 @@ import Mathlib.Data.Finite.Sigma
 import Mathlib.Data.Set.Finite.Powerset
 import Mathlib.Data.Set.Finite.Range
 
+noncomputable section
+
 /-!
 # Finiteness of unions and intersections
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Set/Finite/Basic.lean
-Genuine: 135 | Conflates: 2 | Dissolved: 0 | Infrastructure: 37
+Genuine: 139 | Conflates: 2 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Data.Finite.Defs
 import Mathlib.Data.Fintype.Card
+
+noncomputable section
 
 /-!
 # Finite sets
@@ -179,16 +181,9 @@ protected theorem toFinset_compl [DecidableEq α] [Fintype α] (hs : s.Finite) (
   ext
   simp
 
-protected theorem toFinset_univ [Fintype α] (h : (Set.univ : Set α).Finite) :
-    h.toFinset = Finset.univ := by
-  simp
-
 @[simp]
 protected theorem toFinset_eq_empty {h : s.Finite} : h.toFinset = ∅ ↔ s = ∅ :=
   @toFinset_eq_empty _ _ h.fintype
-
-protected theorem toFinset_empty (h : (∅ : Set α).Finite) : h.toFinset = ∅ := by
-  simp
 
 @[simp]
 protected theorem toFinset_eq_univ [Fintype α] {h : s.Finite} :
@@ -662,12 +657,6 @@ theorem seq_of_forall_finite_exists {γ : Type*} {P : γ → Set γ → Prop}
 end
 
 /-! ### Cardinality -/
-
-theorem empty_card : Fintype.card (∅ : Set α) = 0 :=
-  rfl
-
-theorem empty_card' {h : Fintype.{u} (∅ : Set α)} : @Fintype.card (∅ : Set α) h = 0 := by
-  simp
 
 theorem card_fintypeInsertOfNotMem {a : α} (s : Set α) [Fintype s] (h : a ∉ s) :
     @Fintype.card _ (fintypeInsertOfNotMem s h) = Fintype.card s + 1 := by

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
 
+noncomputable section
+
 /-!
 # Absolute values in ordered groups
 

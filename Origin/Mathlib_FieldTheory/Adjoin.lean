@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/Adjoin.lean
-Genuine: 195 | Conflates: 0 | Dissolved: 9 | Infrastructure: 40
+Genuine: 200 | Conflates: 0 | Dissolved: 0 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Subalgebra.Directed
@@ -12,6 +12,8 @@ import Mathlib.RingTheory.Adjoin.Dimension
 import Mathlib.RingTheory.Finiteness.TensorProduct
 import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.SetTheory.Cardinal.Subfield
+
+noncomputable section
 
 /-!
 # Adjoining Elements to Fields
@@ -112,50 +114,15 @@ instance : Unique (IntermediateField F F) :=
   { inferInstanceAs (Inhabited (IntermediateField F F)) with
     uniq := fun _ ↦ toSubalgebra_injective <| Subsingleton.elim _ _ }
 
-theorem coe_bot : ↑(⊥ : IntermediateField F E) = Set.range (algebraMap F E) := rfl
-
 theorem mem_bot {x : E} : x ∈ (⊥ : IntermediateField F E) ↔ x ∈ Set.range (algebraMap F E) :=
   Iff.rfl
 
 @[simp]
 theorem bot_toSubalgebra : (⊥ : IntermediateField F E).toSubalgebra = ⊥ := rfl
 
-theorem bot_toSubfield : (⊥ : IntermediateField F E).toSubfield = (algebraMap F E).fieldRange :=
-  rfl
-
-@[simp]
-theorem coe_top : ↑(⊤ : IntermediateField F E) = (Set.univ : Set E) :=
-  rfl
-
 @[simp]
 theorem mem_top {x : E} : x ∈ (⊤ : IntermediateField F E) :=
   trivial
-
-@[simp]
-theorem top_toSubalgebra : (⊤ : IntermediateField F E).toSubalgebra = ⊤ :=
-  rfl
-
-@[simp]
-theorem top_toSubfield : (⊤ : IntermediateField F E).toSubfield = ⊤ :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inf (S T : IntermediateField F E) : (↑(S ⊓ T) : Set E) = (S : Set E) ∩ T :=
-  rfl
-
-@[simp]
-theorem mem_inf {S T : IntermediateField F E} {x : E} : x ∈ S ⊓ T ↔ x ∈ S ∧ x ∈ T :=
-  Iff.rfl
-
-@[simp]
-theorem inf_toSubalgebra (S T : IntermediateField F E) :
-    (S ⊓ T).toSubalgebra = S.toSubalgebra ⊓ T.toSubalgebra :=
-  rfl
-
-@[simp]
-theorem inf_toSubfield (S T : IntermediateField F E) :
-    (S ⊓ T).toSubfield = S.toSubfield ⊓ T.toSubfield :=
-  rfl
 
 @[simp]
 theorem sup_toSubfield (S T : IntermediateField F E) :
@@ -166,11 +133,6 @@ theorem sup_toSubfield (S T : IntermediateField F E) :
   rw [Set.union_eq_right]
   rintro _ ⟨x, rfl⟩
   exact Set.mem_union_left _ (algebraMap_mem S x)
-
-@[simp, norm_cast]
-theorem coe_sInf (S : Set (IntermediateField F E)) : (↑(sInf S) : Set E) =
-    sInf ((fun (x : IntermediateField F E) => (x : Set E)) '' S) :=
-  rfl
 
 @[simp]
 theorem sInf_toSubalgebra (S : Set (IntermediateField F E)) :
@@ -221,18 +183,8 @@ def equivOfEq {S T : IntermediateField F E} (h : S = T) : S ≃ₐ[F] T :=
   Subalgebra.equivOfEq _ _ (congr_arg toSubalgebra h)
 
 @[simp]
-theorem equivOfEq_symm {S T : IntermediateField F E} (h : S = T) :
-    (equivOfEq h).symm = equivOfEq h.symm :=
-  rfl
-
-@[simp]
 theorem equivOfEq_rfl (S : IntermediateField F E) : equivOfEq (rfl : S = S) = AlgEquiv.refl := by
   ext; rfl
-
-@[simp]
-theorem equivOfEq_trans {S T U : IntermediateField F E} (hST : S = T) (hTU : T = U) :
-    (equivOfEq hST).trans (equivOfEq hTU) = equivOfEq (hST.trans hTU) :=
-  rfl
 
 variable (F E)
 
@@ -240,9 +192,6 @@ noncomputable def botEquiv : (⊥ : IntermediateField F E) ≃ₐ[F] F :=
   (Subalgebra.equivOfEq _ _ bot_toSubalgebra).trans (Algebra.botEquiv F E)
 
 variable {F E}
-
-theorem botEquiv_def (x : F) : botEquiv F E (algebraMap F (⊥ : IntermediateField F E) x) = x := by
-  simp
 
 @[simp]
 theorem botEquiv_symm (x : F) : (botEquiv F E).symm x = algebraMap F _ x :=
@@ -288,9 +237,6 @@ variable (L L' : IntermediateField F E)
 theorem restrictScalars_sup :
     L.restrictScalars K ⊔ L'.restrictScalars K = (L ⊔ L').restrictScalars K :=
   toSubfield_injective (by simp)
-
-theorem restrictScalars_inf :
-    L.restrictScalars K ⊓ L'.restrictScalars K = (L ⊓ L').restrictScalars K := rfl
 
 end RestrictScalars
 
@@ -345,9 +291,6 @@ theorem fieldRange_comp_val : (f.comp L.val).fieldRange = L.map f := toSubalgebr
 
 noncomputable def equivMap : L ≃ₐ[F] L.map f :=
   (AlgEquiv.ofInjective _ (f.comp L.val).injective).trans (equivOfEq (fieldRange_comp_val L f))
-
-@[simp]
-theorem coe_equivMap_apply (x : L) : ↑(equivMap L f x) = f x := rfl
 
 end equivMap
 
@@ -610,10 +553,6 @@ theorem mem_adjoin_simple_self : α ∈ F⟮α⟯ :=
 def AdjoinSimple.gen : F⟮α⟯ :=
   ⟨α, mem_adjoin_simple_self F α⟩
 
-@[simp]
-theorem AdjoinSimple.coe_gen : (AdjoinSimple.gen F α : E) = α :=
-  rfl
-
 theorem AdjoinSimple.algebraMap_gen : algebraMap F⟮α⟯ E (AdjoinSimple.gen F α) = α :=
   rfl
 
@@ -772,7 +711,19 @@ theorem finiteDimensional_iSup_of_finset'
   have := Subtype.forall'.mp h
   iSup_subtype'' s t ▸ IntermediateField.finiteDimensional_iSup_of_finite
 
--- DISSOLVED: isSplittingField_iSup
+theorem isSplittingField_iSup {p : ι → K[X]}
+    {s : Finset ι} (h0 : ∏ i ∈ s, p i ≠ 0) (h : ∀ i ∈ s, (p i).IsSplittingField K (t i)) :
+    (∏ i ∈ s, p i).IsSplittingField K (⨆ i ∈ s, t i : IntermediateField K L) := by
+  let F : IntermediateField K L := ⨆ i ∈ s, t i
+  have hF : ∀ i ∈ s, t i ≤ F := fun i hi ↦ le_iSup_of_le i (le_iSup (fun _ ↦ t i) hi)
+  simp only [isSplittingField_iff] at h ⊢
+  refine
+    ⟨splits_prod (algebraMap K F) fun i hi ↦
+        splits_comp_of_splits (algebraMap K (t i)) (inclusion (hF i hi)).toRingHom
+          (h i hi).1,
+      ?_⟩
+  simp only [rootSet_prod p s h0, ← Set.iSup_eq_iUnion, (@gc K _ L _ _).l_iSup₂]
+  exact iSup_congr fun i ↦ iSup_congr fun hi ↦ (h i hi).2
 
 end Supremum
 
@@ -1343,29 +1294,47 @@ noncomputable def algHomOfDvd {p q : K[X]} (hpq : q ∣ p) :
     AdjoinRoot p →ₐ[K] AdjoinRoot q :=
   (liftHom p (root q) (by simp only [aeval_eq, mk_eq_zero, hpq]))
 
-theorem coe_algHomOfDvd {p q : K[X]} (hpq : q ∣ p) :
-    (algHomOfDvd hpq).toFun = liftHom p (root q) (by simp only [aeval_eq, mk_eq_zero, hpq]) :=
-  rfl
-
 theorem algHomOfDvd_apply_root {p q : K[X]} (hpq : q ∣ p) :
     algHomOfDvd hpq (root p) = root q := by
   rw [algHomOfDvd, liftHom_root]
 
--- DISSOLVED: algEquivOfEq
+noncomputable def algEquivOfEq {p q : K[X]} (hp : p ≠ 0) (h_eq : p = q) :
+    AdjoinRoot p ≃ₐ[K] AdjoinRoot q :=
+  ofAlgHom (algHomOfDvd (dvd_of_eq h_eq.symm)) (algHomOfDvd (dvd_of_eq h_eq))
+    (PowerBasis.algHom_ext (powerBasis (h_eq ▸ hp))
+      (by rw [algHomOfDvd, powerBasis_gen (h_eq ▸ hp), AlgHom.coe_comp, Function.comp_apply,
+        algHomOfDvd, liftHom_root, liftHom_root, AlgHom.coe_id, id_eq]))
+    (PowerBasis.algHom_ext (powerBasis hp)
+      (by rw [algHomOfDvd, powerBasis_gen hp, AlgHom.coe_comp, Function.comp_apply, algHomOfDvd,
+          liftHom_root, liftHom_root, AlgHom.coe_id, id_eq]))
 
--- DISSOLVED: coe_algEquivOfEq
+theorem algEquivOfEq_toAlgHom {p q : K[X]} (hp : p ≠ 0) (h_eq : p = q) :
+    (algEquivOfEq hp h_eq).toAlgHom = liftHom p (root q) (by rw [h_eq, aeval_eq, mk_self]) :=
+  rfl
 
--- DISSOLVED: algEquivOfEq_toAlgHom
+theorem algEquivOfEq_apply_root {p q : K[X]} (hp : p ≠ 0) (h_eq : p = q) :
+    algEquivOfEq hp h_eq (root p) = root q := by
+  rw [← coe_algHom, algEquivOfEq_toAlgHom, liftHom_root]
 
--- DISSOLVED: algEquivOfEq_apply_root
+noncomputable def algEquivOfAssociated {p q : K[X]} (hp : p ≠ 0) (hpq : Associated p q) :
+    AdjoinRoot p ≃ₐ[K] AdjoinRoot q :=
+  ofAlgHom (liftHom p (root q) (by simp only [aeval_eq, mk_eq_zero, hpq.symm.dvd] ))
+    (liftHom q (root p) (by simp only [aeval_eq, mk_eq_zero, hpq.dvd]))
+    ( PowerBasis.algHom_ext (powerBasis (hpq.ne_zero_iff.mp hp))
+        (by rw [powerBasis_gen (hpq.ne_zero_iff.mp hp), AlgHom.coe_comp, Function.comp_apply,
+          liftHom_root, liftHom_root, AlgHom.coe_id, id_eq]))
+    (PowerBasis.algHom_ext (powerBasis hp)
+      (by rw [powerBasis_gen hp, AlgHom.coe_comp, Function.comp_apply, liftHom_root, liftHom_root,
+          AlgHom.coe_id, id_eq]))
 
--- DISSOLVED: algEquivOfAssociated
+theorem algEquivOfAssociated_toAlgHom {p q : K[X]} (hp : p ≠ 0) (hpq : Associated p q) :
+    (algEquivOfAssociated hp hpq).toAlgHom =
+      liftHom p (root q) (by simp only [aeval_eq, mk_eq_zero, hpq.symm.dvd]) :=
+  rfl
 
--- DISSOLVED: coe_algEquivOfAssociated
-
--- DISSOLVED: algEquivOfAssociated_toAlgHom
-
--- DISSOLVED: algEquivOfAssociated_apply_root
+theorem algEquivOfAssociated_apply_root {p q : K[X]} (hp : p ≠ 0) (hpq : Associated p q) :
+    algEquivOfAssociated hp hpq (root p) = root q := by
+  rw [← coe_algHom, algEquivOfAssociated_toAlgHom, liftHom_root]
 
 end AdjoinRoot
 

@@ -8,6 +8,8 @@ import Mathlib.Data.Subtype
 import Mathlib.Order.Notation
 import Mathlib.Util.CompileInductive
 
+noncomputable section
+
 /-!
 # Basic definitions about sets
 
@@ -79,17 +81,9 @@ namespace Set
 
 variable {α : Type u} {β : Type v} {γ : Type w}
 
-@[simp, mfld_simps] theorem mem_setOf_eq {x : α} {p : α → Prop} : (x ∈ {y | p y}) = p x := rfl
-
 @[simp, mfld_simps] theorem mem_univ (x : α) : x ∈ @univ α := trivial
 
 instance : HasCompl (Set α) := ⟨fun s ↦ {x | x ∉ s}⟩
-
-@[simp] theorem mem_compl_iff (s : Set α) (x : α) : x ∈ sᶜ ↔ x ∉ s := Iff.rfl
-
-theorem diff_eq (s t : Set α) : s \ t = s ∩ tᶜ := rfl
-
-@[simp] theorem mem_diff {s t : Set α} (x : α) : x ∈ s \ t ↔ x ∈ s ∧ x ∉ t := Iff.rfl
 
 theorem mem_diff_of_mem {s t : Set α} {x : α} (h1 : x ∈ s) (h2 : x ∉ t) : x ∈ s \ t := ⟨h1, h2⟩
 
@@ -101,14 +95,7 @@ def preimage (f : α → β) (s : Set β) : Set α := {x | f x ∈ s}
 
 infixl:80 " ⁻¹' " => preimage
 
-@[simp, mfld_simps]
-theorem mem_preimage {f : α → β} {s : Set β} {a : α} : a ∈ f ⁻¹' s ↔ f a ∈ s := Iff.rfl
-
 infixl:80 " '' " => image
-
-@[simp]
-theorem mem_image (f : α → β) (s : Set α) (y : β) : y ∈ f '' s ↔ ∃ x ∈ s, f x = y :=
-  Iff.rfl
 
 @[mfld_simps]
 theorem mem_image_of_mem (f : α → β) {x : α} {a : Set α} (h : x ∈ a) : f x ∈ f '' a :=
@@ -128,8 +115,6 @@ section Range
 variable {ι : Sort*} {f : ι → α}
 
 def range (f : ι → α) : Set α := {x | ∃ y, f y = x}
-
-@[simp] theorem mem_range {x : α} : x ∈ range f ↔ ∃ y, f y = x := Iff.rfl
 
 @[mfld_simps] theorem mem_range_self (i : ι) : f i ∈ range f := ⟨i, rfl⟩
 
@@ -156,17 +141,10 @@ def prod (s : Set α) (t : Set β) : Set (α × β) := {p | p.1 ∈ s ∧ p.2 �
 instance instSProd : SProd (Set α) (Set β) (Set (α × β)) where
   sprod := Set.prod
 
-theorem prod_eq (s : Set α) (t : Set β) : s ×ˢ t = Prod.fst ⁻¹' s ∩ Prod.snd ⁻¹' t := rfl
-
 variable {a : α} {b : β} {s : Set α} {t : Set β} {p : α × β}
-
-theorem mem_prod_eq : (p ∈ s ×ˢ t) = (p.1 ∈ s ∧ p.2 ∈ t) := rfl
 
 @[simp, mfld_simps]
 theorem mem_prod : p ∈ s ×ˢ t ↔ p.1 ∈ s ∧ p.2 ∈ t := .rfl
-
-@[mfld_simps]
-theorem prod_mk_mem_set_prod_eq : ((a, b) ∈ s ×ˢ t) = (a ∈ s ∧ b ∈ t) := rfl
 
 theorem mk_mem_prod (ha : a ∈ s) (hb : b ∈ t) : (a, b) ∈ s ×ˢ t := ⟨ha, hb⟩
 
@@ -176,15 +154,9 @@ section Diagonal
 
 def diagonal (α : Type*) : Set (α × α) := {p | p.1 = p.2}
 
-theorem mem_diagonal (x : α) : (x, x) ∈ diagonal α := rfl
-
 @[simp] theorem mem_diagonal_iff {x : α × α} : x ∈ diagonal α ↔ x.1 = x.2 := .rfl
 
 def offDiag (s : Set α) : Set (α × α) := {x | x.1 ∈ s ∧ x.2 ∈ s ∧ x.1 ≠ x.2}
-
-@[simp]
-theorem mem_offDiag {x : α × α} {s : Set α} : x ∈ s.offDiag ↔ x.1 ∈ s ∧ x.2 ∈ s ∧ x.1 ≠ x.2 :=
-  Iff.rfl
 
 end Diagonal
 
@@ -197,8 +169,6 @@ def pi (s : Set ι) (t : ∀ i, Set (α i)) : Set (∀ i, α i) := {f | ∀ i �
 variable {s : Set ι} {t : ∀ i, Set (α i)} {f : ∀ i, α i}
 
 @[simp] theorem mem_pi : f ∈ s.pi t ↔ ∀ i ∈ s, f i ∈ t i := .rfl
-
-theorem mem_univ_pi : f ∈ pi univ t ↔ ∀ i, f i ∈ t i := by simp
 
 end Pi
 
@@ -247,12 +217,5 @@ theorem mem_image2_of_mem (ha : a ∈ s) (hb : b ∈ t) : f a b ∈ image2 f s t
 end image2
 
 def seq (s : Set (α → β)) (t : Set α) : Set β := image2 (fun f ↦ f) s t
-
-@[simp]
-theorem mem_seq_iff {s : Set (α → β)} {t : Set α} {b : β} :
-    b ∈ seq s t ↔ ∃ f ∈ s, ∃ a ∈ t, (f : α → β) a = b :=
-  Iff.rfl
-
-lemma seq_eq_image2 (s : Set (α → β)) (t : Set α) : seq s t = image2 (fun f a ↦ f a) s t := rfl
 
 end Set

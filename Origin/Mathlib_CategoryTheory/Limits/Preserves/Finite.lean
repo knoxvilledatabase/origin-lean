@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 
+noncomputable section
+
 /-!
 # Preservation of finite (co)limits.
 

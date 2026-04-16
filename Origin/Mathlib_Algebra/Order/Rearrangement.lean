@@ -13,6 +13,8 @@ import Mathlib.GroupTheory.Perm.Support
 import Mathlib.Order.Monotone.Monovary
 import Mathlib.Tactic.Abel
 
+noncomputable section
+
 /-!
 # Rearrangement inequality
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Log.Base
 import Mathlib.MeasureTheory.Measure.MeasureSpaceDef
 
+noncomputable section
+
 /-!
 # Uniformly locally doubling measures
 

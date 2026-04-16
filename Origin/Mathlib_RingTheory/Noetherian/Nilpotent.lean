@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Finiteness.Ideal
 import Mathlib.RingTheory.Nilpotent.Lemmas
 import Mathlib.RingTheory.Noetherian.Defs
 
+noncomputable section
+
 /-!
 # Nilpotent ideals in Noetherian rings
 

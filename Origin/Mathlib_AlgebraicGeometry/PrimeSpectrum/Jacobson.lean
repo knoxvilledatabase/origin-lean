@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.PrimeSpectrum.Noetherian
 import Mathlib.RingTheory.Jacobson
 import Mathlib.Topology.JacobsonSpace
 
+noncomputable section
+
 /-!
 # The prime spectrum of a jacobson ring
 

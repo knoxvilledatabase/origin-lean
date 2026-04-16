@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.HomologicalComplex
 import Mathlib.AlgebraicTopology.SimplicialObject.Basic
 import Mathlib.CategoryTheory.Abelian.Basic
 
+noncomputable section
+
 /-!
 ## Moore complex
 
@@ -54,13 +56,6 @@ variable (X : SimplicialObject C)
 def objX : ∀ n : ℕ, Subobject (X.obj (op (SimplexCategory.mk n)))
   | 0 => ⊤
   | n + 1 => Finset.univ.inf fun k : Fin (n + 1) => kernelSubobject (X.δ k.succ)
-
-@[simp] theorem objX_zero : objX X 0 = ⊤ :=
-  rfl
-
-@[simp] theorem objX_add_one (n) :
-    objX X (n + 1) = Finset.univ.inf fun k : Fin (n + 1) => kernelSubobject (X.δ k.succ) :=
-  rfl
 
 @[simp]
 def objD : ∀ n : ℕ, (objX X (n + 1) : C) ⟶ (objX X n : C)

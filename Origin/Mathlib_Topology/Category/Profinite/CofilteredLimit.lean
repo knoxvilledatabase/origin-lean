@@ -9,6 +9,8 @@ import Mathlib.Topology.DiscreteQuotient
 import Mathlib.Topology.Category.TopCat.Limits.Cofiltered
 import Mathlib.Topology.Category.TopCat.Limits.Konig
 
+noncomputable section
+
 /-!
 # Cofiltered limits of profinite sets.
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Lean.Meta
 
+noncomputable section
+
 /-!
 
 #  `move_add` a tactic for moving summands in expressions
@@ -217,10 +219,6 @@ def permuteExpr (tgt : Expr) (instructions : List (Expr × Bool)) : MetaM Expr :
     permTgt := permTgt.replace (if · == old then new else none)
   return permTgt
 
-```
-
--/
-
 def pairUp : List (Expr × Bool × Syntax) → List Expr →
     MetaM ((List (Expr × Bool)) × List (Expr × Bool × Syntax))
   | (m::ms), l => do
@@ -284,33 +282,24 @@ def parseArrows : TSyntax `Lean.Parser.Tactic.rwRuleSeq → TermElabM (Array (Ex
 initialize registerTraceClass `Tactic.move_oper
 
 elab (name := moveOperTac) "move_oper" id:ident rws:rwRuleSeq : tactic => withMainContext do
-
+  -- parse the operation
   let op := id.getId
-
+  -- parse the list of terms
   let (instr, (unmatched, stxs), dbgMsg) ← unifyMovements op (← parseArrows rws)
-
                                                               (← instantiateMVars (← getMainTarget))
-
   unless unmatched.length = 0 do
-
     let _ ← stxs.mapM (logErrorAt · "") -- underline all non-matching terms
-
     trace[Tactic.move_oper] dbgMsg.foldl (fun x y => (x.compose y).compose "\n\n---\n") ""
-
     throwErrorAt stxs[0]! m!"Errors:\nThe terms in '{unmatched}' were not matched to any atom"
-
+  -- move around the operands
   replaceMainGoal (← reorderAndSimp op (← getMainGoal) instr)
 
 elab "move_add" rws:rwRuleSeq : tactic => do
-
   let hadd := mkIdent ``HAdd.hAdd
-
   evalTactic (← `(tactic| move_oper $hadd $rws))
 
 elab "move_mul" rws:rwRuleSeq : tactic => do
-
   let hmul := mkIdent ``HMul.hMul
-
   evalTactic (← `(tactic| move_oper $hmul $rws))
 
 end parsing

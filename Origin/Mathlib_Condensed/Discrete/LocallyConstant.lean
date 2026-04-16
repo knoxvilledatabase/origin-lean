@@ -8,6 +8,8 @@ import Mathlib.Condensed.TopComparison
 import Mathlib.Topology.Category.CompHausLike.SigmaComparison
 import Mathlib.Topology.FiberPartition
 
+noncomputable section
+
 /-!
 
 # The sheaf of locally constant maps on `CompHausLike P`

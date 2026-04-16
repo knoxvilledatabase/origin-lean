@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Group/Pointwise/Set/Finite.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Action.Basic
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Data.Finite.Prod
+
+noncomputable section
 
 /-! # Finiteness lemmas for pointwise operations on sets -/
 
@@ -115,13 +117,14 @@ variable [InvolutiveInv α] {s : Set α}
 
 @[to_additive (attr := simp)] lemma infinite_inv : s⁻¹.Infinite ↔ s.Infinite := finite_inv.not
 
+@[to_additive] alias ⟨Finite.of_inv, Finite.inv⟩ := finite_inv
+
 end InvolutiveInv
 
 section Div
 
 variable [Div α] {s t : Set α}
 
-@[to_additive] alias ⟨Finite.of_inv, Finite.inv⟩ := finite_inv
 @[to_additive] lemma Finite.div : s.Finite → t.Finite → (s / t).Finite := .image2 _
 
 @[to_additive "Subtraction preserves finiteness."]
@@ -151,6 +154,10 @@ theorem finite_smul_set : (a • s).Finite ↔ s.Finite :=
 @[to_additive (attr := simp)]
 theorem infinite_smul_set : (a • s).Infinite ↔ s.Infinite :=
   infinite_image_iff (MulAction.injective _).injOn
+
+@[to_additive] alias ⟨Finite.of_smul_set, _⟩ := finite_smul_set
+
+@[to_additive] alias ⟨_, Infinite.smul_set⟩ := infinite_smul_set
 
 end Group
 

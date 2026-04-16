@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/ODE/Gronwall.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+
+noncomputable section
 
 /-!
 # Grönwall's inequality
@@ -41,7 +43,9 @@ noncomputable def gronwallBound (δ K ε x : ℝ) : ℝ :=
 theorem gronwallBound_K0 (δ ε : ℝ) : gronwallBound δ 0 ε = fun x => δ + ε * x :=
   funext fun _ => if_pos rfl
 
--- DISSOLVED: gronwallBound_of_K_ne_0
+theorem gronwallBound_of_K_ne_0 {δ K ε : ℝ} (hK : K ≠ 0) :
+    gronwallBound δ K ε = fun x => δ * exp (K * x) + ε / K * (exp (K * x) - 1) :=
+  funext fun _ => if_neg hK
 
 theorem hasDerivAt_gronwallBound (δ K ε x : ℝ) :
     HasDerivAt (gronwallBound δ K ε) (K * gronwallBound δ K ε x + ε) x := by
@@ -116,6 +120,15 @@ variable {v : ℝ → E → E} {s : ℝ → Set E} {K : ℝ≥0} {f g f' g' : �
   (hv : ∀ t, LipschitzOnWith K (v t) (s t))
 
 include hv in
+/-- If `f` and `g` are two approximate solutions of the same ODE, then the distance between them
+
+can't grow faster than exponentially. This is a simple corollary of Grönwall's inequality, and some
+
+people call this Grönwall's inequality too.
+
+This version assumes all inequalities to be true in some time-dependent set `s t`,
+
+and assumes that the solutions never leave this set. -/
 
 theorem dist_le_of_approx_trajectories_ODE_of_mem
     (hf : ContinuousOn f (Icc a b))
@@ -154,6 +167,15 @@ theorem dist_le_of_approx_trajectories_ODE
     f_bound hfs hg hg' g_bound (fun _ _ => trivial) ha
 
 include hv in
+/-- If `f` and `g` are two exact solutions of the same ODE, then the distance between them
+
+can't grow faster than exponentially. This is a simple corollary of Grönwall's inequality, and some
+
+people call this Grönwall's inequality too.
+
+This version assumes all inequalities to be true in some time-dependent set `s t`,
+
+and assumes that the solutions never leave this set. -/
 
 theorem dist_le_of_trajectories_ODE_of_mem
     (hf : ContinuousOn f (Icc a b))
@@ -182,6 +204,13 @@ theorem dist_le_of_trajectories_ODE
     hg' (fun _ _ => trivial) ha
 
 include hv in
+/-- There exists only one solution of an ODE \(\dot x=v(t, x)\) in a set `s ⊆ ℝ × E` with
+
+a given initial value provided that the RHS is Lipschitz continuous in `x` within `s`,
+
+and we consider only solutions included in `s`.
+
+This version shows uniqueness in a closed interval `Icc a b`, where `a` is the initial time. -/
 
 theorem ODE_solution_unique_of_mem_Icc_right
     (hf : ContinuousOn f (Icc a b))
@@ -196,6 +225,9 @@ theorem ODE_solution_unique_of_mem_Icc_right
   rwa [zero_mul, dist_le_zero] at this
 
 include hv in
+/-- A time-reversed version of `ODE_solution_unique_of_mem_Icc_right`. Uniqueness is shown in a
+
+closed interval `Icc a b`, where `b` is the "initial" time. -/
 
 theorem ODE_solution_unique_of_mem_Icc_left
     (hf : ContinuousOn f (Icc a b))
@@ -232,6 +264,9 @@ theorem ODE_solution_unique_of_mem_Icc_left
     simp
 
 include hv in
+/-- A version of `ODE_solution_unique_of_mem_Icc_right` for uniqueness in a closed interval whose
+
+interior contains the initial time. -/
 
 theorem ODE_solution_unique_of_mem_Icc
     (ht : t₀ ∈ Ioo a b)
@@ -259,6 +294,7 @@ theorem ODE_solution_unique_of_mem_Icc
       (fun _ ht' ↦ (hg' _ (hss ht')).hasDerivWithinAt) (fun _ ht' ↦ (hgs _ (hss ht'))) heq
 
 include hv in
+/-- A version of `ODE_solution_unique_of_mem_Icc` for uniqueness in an open interval. -/
 
 theorem ODE_solution_unique_of_mem_Ioo
     (ht : t₀ ∈ Ioo a b)
@@ -290,6 +326,7 @@ theorem ODE_solution_unique_of_mem_Ioo
       ⟨h, le_rfl⟩
 
 include hv in
+/-- Local unqueness of ODE solutions. -/
 
 theorem ODE_solution_unique_of_eventually
     (hf : ∀ᶠ t in 𝓝 t₀, HasDerivAt f (v t (f t)) t ∧ f t ∈ s t)

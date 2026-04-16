@@ -9,6 +9,8 @@ import Mathlib.ModelTheory.Algebra.Field.IsAlgClosed
 import Mathlib.ModelTheory.Algebra.Ring.Definability
 import Mathlib.RingTheory.Polynomial.Basic
 
+noncomputable section
+
 /-!
 # Ax-Grothendieck
 

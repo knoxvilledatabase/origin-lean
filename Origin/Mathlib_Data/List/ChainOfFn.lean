@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.List.Chain
 import Mathlib.Data.List.OfFn
 
+noncomputable section
+
 /-!
 # Lemmas about `Chain'` and `OfFn`
 

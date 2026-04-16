@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupPower.IterateHom
 import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Dynamics.FixedPoints.Basic
 
+noncomputable section
+
 /-!
 # Results about pointwise operations on sets with iteration.
 -/

@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Polynomial.Basic
 
+noncomputable section
+
 /-!
 # Quotients of polynomial rings
 -/
@@ -32,16 +34,6 @@ noncomputable def quotientSpanXSubCAlgEquivAux1 (x : R) :
 noncomputable def quotientSpanXSubCAlgEquiv (x : R) :
     (R[X] ⧸ Ideal.span ({X - C x} : Set R[X])) ≃ₐ[R] R :=
   (quotientSpanXSubCAlgEquivAux1 x).trans (quotientSpanXSubCAlgEquivAux2 x)
-
-@[simp]
-theorem quotientSpanXSubCAlgEquiv_mk (x : R) (p : R[X]) :
-    quotientSpanXSubCAlgEquiv x (Ideal.Quotient.mk _ p) = p.eval x :=
-  rfl
-
-@[simp]
-theorem quotientSpanXSubCAlgEquiv_symm_apply (x : R) (y : R) :
-    (quotientSpanXSubCAlgEquiv x).symm y = algebraMap R _ y :=
-  rfl
 
 noncomputable def quotientSpanCXSubCAlgEquiv (x y : R) :
     (R[X] ⧸ (Ideal.span {C x, X - C y} : Ideal R[X])) ≃ₐ[R] R ⧸ (Ideal.span {x} : Ideal R) :=

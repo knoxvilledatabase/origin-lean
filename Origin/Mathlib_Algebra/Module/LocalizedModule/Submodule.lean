@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.LocalizedModule.Basic
 import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.RingTheory.Localization.Module
 
+noncomputable section
+
 /-!
 # Localization of Submodules
 
@@ -58,14 +60,6 @@ def localized' : Submodule S N where
 lemma mem_localized₀ (x : N) :
     x ∈ localized₀ p f M' ↔ ∃ m ∈ M', ∃ s : p, IsLocalizedModule.mk' f m s = x :=
   Iff.rfl
-
-lemma mem_localized' (x : N) :
-    x ∈ localized' S p f M' ↔ ∃ m ∈ M', ∃ s : p, IsLocalizedModule.mk' f m s = x :=
-  Iff.rfl
-
-lemma restrictScalars_localized' :
-    (localized' S p f M').restrictScalars R = localized₀ p f M' :=
-  rfl
 
 abbrev localized : Submodule (Localization p) (LocalizedModule p M) :=
   M'.localized' (Localization p) p (LocalizedModule.mkLinearMap p M)
@@ -155,10 +149,6 @@ def Submodule.toLocalizedQuotient' : M ⧸ M' →ₗ[R] N ⧸ M'.localized' S p 
 abbrev Submodule.toLocalizedQuotient : M ⧸ M' →ₗ[R] LocalizedModule p M ⧸ M'.localized p :=
   M'.toLocalizedQuotient' (Localization p) p (LocalizedModule.mkLinearMap p M)
 
-@[simp]
-lemma Submodule.toLocalizedQuotient'_mk (x : M) :
-    M'.toLocalizedQuotient' S p f (Submodule.Quotient.mk x) = Submodule.Quotient.mk (f x) := rfl
-
 open Submodule Submodule.Quotient IsLocalization in
 
 instance IsLocalizedModule.toLocalizedQuotient' (M' : Submodule R M) :
@@ -224,6 +214,9 @@ noncomputable def toKerIsLocalized (g : M →ₗ[R] P) :
   f.restrict (fun x hx ↦ by simp [mem_ker, mem_ker.mp hx])
 
 include S in
+/-- The canonical map to the kernel of the localization of `g` is localizing.
+
+In other words, localization commutes with kernels. -/
 
 lemma toKerLocalized_isLocalizedModule (g : M →ₗ[R] P) :
     IsLocalizedModule p (toKerIsLocalized p f f' g) :=

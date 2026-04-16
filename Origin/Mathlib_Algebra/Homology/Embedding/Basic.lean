@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.ComplexShape
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Algebra.Ring.Int.Defs
 
+noncomputable section
+
 /-! # Embeddings of complex shapes
 
 Given two complex shapes `c : ComplexShape ι` and `c' : ComplexShape ι'`,

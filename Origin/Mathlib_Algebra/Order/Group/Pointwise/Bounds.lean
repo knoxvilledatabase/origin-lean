@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Order/Group/Pointwise/Bounds.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Algebra.Order.Group.OrderIso
 import Mathlib.Algebra.Order.Monoid.Unbundled.OrderDual
 import Mathlib.Order.Bounds.OrderIso
+
+noncomputable section
 
 /-!
 # Upper/lower bounds in ordered monoids and groups
@@ -49,6 +51,8 @@ lemma BddAbove.mul (hs : BddAbove s) (ht : BddAbove t) : BddAbove (s * t) :=
 @[to_additive]
 lemma BddBelow.mul (hs : BddBelow s) (ht : BddBelow t) : BddBelow (s * t) :=
   (Nonempty.mul hs ht).mono (subset_lowerBounds_mul s t)
+
+@[to_additive] alias Set.BddAbove.mul := BddAbove.mul
 
 attribute [deprecated BddAbove.mul (since := "2024-11-13")] Set.BddAbove.mul
 

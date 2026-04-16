@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.CompHausLike.Limits
 import Mathlib.Topology.Category.LightProfinite.Basic
 
+noncomputable section
+
 /-!
 
 # Explicit limits and colimits

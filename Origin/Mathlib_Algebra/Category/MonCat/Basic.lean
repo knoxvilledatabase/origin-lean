@@ -9,6 +9,8 @@ import Mathlib.Algebra.Group.ULift
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 import Mathlib.Algebra.Ring.Action.Group
 
+noncomputable section
+
 /-!
 # Category instances for `Monoid`, `AddMonoid`, `CommMonoid`, and `AddCommMmonoid`.
 
@@ -67,15 +69,6 @@ instance instFunLike (X Y : MonCat) : FunLike (X ⟶ Y) X Y :=
 instance instMonoidHomClass (X Y : MonCat) : MonoidHomClass (X ⟶ Y) X Y :=
   inferInstanceAs <| MonoidHomClass (X →* Y) X Y
 
-@[to_additive (attr := simp)]
-lemma coe_id {X : MonCat} : (𝟙 X : X → X) = id := rfl
-
-@[to_additive (attr := simp)]
-lemma coe_comp {X Y Z : MonCat} {f : X ⟶ Y} {g : Y ⟶ Z} : (f ≫ g : X → Z) = g ∘ f := rfl
-
-@[to_additive (attr := simp)] lemma forget_map {X Y : MonCat} (f : X ⟶ Y) :
-    (forget MonCat).map f = f := rfl
-
 @[to_additive (attr := ext)]
 lemma ext {X Y : MonCat} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
   MonoidHom.ext w
@@ -83,9 +76,6 @@ lemma ext {X Y : MonCat} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
 @[to_additive]
 def of (M : Type u) [Monoid M] : MonCat :=
   Bundled.of M
-
-@[to_additive]
-theorem coe_of (R : Type u) [Monoid R] : (MonCat.of R : Type u) = R := rfl
 
 @[to_additive]
 instance : Inhabited MonCat :=
@@ -96,22 +86,8 @@ instance : Inhabited MonCat :=
 @[to_additive]
 def ofHom {X Y : Type u} [Monoid X] [Monoid Y] (f : X →* Y) : of X ⟶ of Y := f
 
-@[to_additive (attr := simp)]
-lemma ofHom_apply {X Y : Type u} [Monoid X] [Monoid Y] (f : X →* Y) (x : X) :
-    (ofHom f) x = f x := rfl
-
 @[to_additive]
 instance (X Y : MonCat.{u}) : One (X ⟶ Y) := ⟨ofHom 1⟩
-
-@[to_additive (attr := simp)]
-lemma oneHom_apply (X Y : MonCat.{u}) (x : X) : (1 : X ⟶ Y) x = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma one_of {A : Type*} [Monoid A] : (1 : MonCat.of A) = (1 : A) := rfl
-
-@[to_additive (attr := simp)]
-lemma mul_of {A : Type*} [Monoid A] (a b : A) :
-    @HMul.hMul (MonCat.of A) (MonCat.of A) (MonCat.of A) _ a b = a * b := rfl
 
 @[to_additive]
 instance {G : Type*} [Group G] : Group (MonCat.of G) := by assumption
@@ -160,17 +136,6 @@ instance {X Y : CommMonCat} : CoeFun (X ⟶ Y) fun _ => X → Y where
 instance instFunLike (X Y : CommMonCat) : FunLike (X ⟶ Y) X Y :=
   show FunLike (X →* Y) X Y by infer_instance
 
-@[to_additive (attr := simp)]
-lemma coe_id {X : CommMonCat} : (𝟙 X : X → X) = id := rfl
-
-@[to_additive (attr := simp)]
-lemma coe_comp {X Y Z : CommMonCat} {f : X ⟶ Y} {g : Y ⟶ Z} : (f ≫ g : X → Z) = g ∘ f := rfl
-
-@[to_additive (attr := simp)]
-lemma forget_map {X Y : CommMonCat} (f : X ⟶ Y) :
-    (forget CommMonCat).map f = (f : X → Y) :=
-  rfl
-
 @[to_additive (attr := ext)]
 lemma ext {X Y : CommMonCat} {f g : X ⟶ Y} (w : ∀ x : X, f x = g x) : f = g :=
   MonoidHom.ext w
@@ -184,10 +149,6 @@ instance : Inhabited CommMonCat :=
   -- The default instance for `CommMonoid PUnit` is derived via `CommRing` which breaks to_additive
   ⟨@of PUnit (@CommGroup.toCommMonoid _ PUnit.commGroup)⟩
 
-@[to_additive]
-theorem coe_of (R : Type u) [CommMonoid R] : (CommMonCat.of R : Type u) = R :=
-  rfl
-
 @[to_additive hasForgetToAddMonCat]
 instance hasForgetToMonCat : HasForget₂ CommMonCat MonCat :=
   BundledHom.forget₂ _ _
@@ -197,10 +158,6 @@ instance : Coe CommMonCat.{u} MonCat.{u} where coe := (forget₂ CommMonCat MonC
 
 @[to_additive]
 def ofHom {X Y : Type u} [CommMonoid X] [CommMonoid Y] (f : X →* Y) : of X ⟶ of Y := f
-
-@[to_additive (attr := simp)]
-lemma ofHom_apply {X Y : Type u} [CommMonoid X] [CommMonoid Y] (f : X →* Y) (x : X) :
-    (ofHom f) x = f x := rfl
 
 @[to_additive (attr := simps)
   "Universe lift functor for additive commutative monoids."]

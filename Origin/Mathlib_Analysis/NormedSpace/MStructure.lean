@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Order.Basic
 import Mathlib.Tactic.NoncommRing
 
+noncomputable section
+
 /-!
 # M-structure
 
@@ -194,16 +196,8 @@ instance Subtype.zero : Zero { P : M // IsLprojection X P } :=
   ⟨⟨0, ⟨by rw [IsIdempotentElem, zero_mul], fun x => by
         simp only [zero_smul, norm_zero, sub_zero, one_smul, zero_add]⟩⟩⟩
 
-@[simp]
-theorem coe_zero : ↑(0 : { P : M // IsLprojection X P }) = (0 : M) :=
-  rfl
-
 instance Subtype.one : One { P : M // IsLprojection X P } :=
   ⟨⟨1, sub_zero (1 : M) ▸ (0 : { P : M // IsLprojection X P }).prop.Lcomplement⟩⟩
-
-@[simp]
-theorem coe_one : ↑(1 : { P : M // IsLprojection X P }) = (1 : M) :=
-  rfl
 
 instance Subtype.boundedOrder [FaithfulSMul M X] :
     BoundedOrder { P : M // IsLprojection X P } where

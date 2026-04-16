@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Sum
 import Mathlib.Logic.Embedding.Set
 
+noncomputable section
+
 /-!
 ## Instances
 
@@ -22,11 +24,6 @@ open Finset
 instance (α : Type u) (β : Type v) [Fintype α] [Fintype β] : Fintype (α ⊕ β) where
   elems := univ.disjSum univ
   complete := by rintro (_ | _) <;> simp
-
-@[simp]
-theorem Finset.univ_disjSum_univ {α β : Type*} [Fintype α] [Fintype β] :
-    univ.disjSum univ = (univ : Finset (α ⊕ β)) :=
-  rfl
 
 @[simp]
 theorem Fintype.card_sum [Fintype α] [Fintype β] :

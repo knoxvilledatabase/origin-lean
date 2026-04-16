@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Process.Filtration
 import Mathlib.Topology.Instances.Discrete
 
+noncomputable section
+
 /-!
 # Adapted and progressively measurable processes
 

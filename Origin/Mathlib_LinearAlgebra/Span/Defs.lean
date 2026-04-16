@@ -1,9 +1,11 @@
 /-
 Extracted from LinearAlgebra/Span/Defs.lean
-Genuine: 74 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 75 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Lattice
+
+noncomputable section
 
 /-!
 # The span of a set of vectors, as a submodule
@@ -353,7 +355,13 @@ end
 theorem mem_span_singleton_self (x : M) : x ∈ R ∙ x :=
   subset_span rfl
 
--- DISSOLVED: nontrivial_span_singleton
+-- CONFLATES (assumes ground = zero): nontrivial_span_singleton
+theorem nontrivial_span_singleton {x : M} (h : x ≠ 0) : Nontrivial (R ∙ x) :=
+  ⟨by
+    use 0, ⟨x, Submodule.mem_span_singleton_self x⟩
+    intro H
+    rw [eq_comm, Submodule.mk_eq_zero] at H
+    exact h H⟩
 
 theorem mem_span_singleton {y : M} : (x ∈ R ∙ y) ↔ ∃ a : R, a • y = x :=
   ⟨fun h => by
@@ -446,9 +454,18 @@ theorem iSup_span {ι : Sort*} (p : ι → Set M) : ⨆ i, span R (p i) = span R
 theorem iSup_eq_span {ι : Sort*} (p : ι → Submodule R M) : ⨆ i, p i = span R (⋃ i, ↑(p i)) := by
   simp_rw [← iSup_span, span_eq]
 
--- DISSOLVED: submodule_eq_sSup_le_nonzero_spans
-
-theorem lt_sup_iff_not_mem {I : Submodule R M} {a : M} : (I < I ⊔ R ∙ a) ↔ a ∉ I := by simp
+theorem submodule_eq_sSup_le_nonzero_spans (p : Submodule R M) :
+    p = sSup { T : Submodule R M | ∃ m ∈ p, m ≠ 0 ∧ T = span R {m} } := by
+  let S := { T : Submodule R M | ∃ m ∈ p, m ≠ 0 ∧ T = span R {m} }
+  apply le_antisymm
+  · intro m hm
+    by_cases h : m = 0
+    · rw [h]
+      simp
+    · exact @le_sSup _ _ S _ ⟨m, ⟨hm, ⟨h, rfl⟩⟩⟩ m (mem_span_singleton_self m)
+  · rw [sSup_le_iff]
+    rintro S ⟨_, ⟨_, ⟨_, rfl⟩⟩⟩
+    rwa [span_singleton_le_iff_mem]
 
 theorem mem_iSup {ι : Sort*} (p : ι → Submodule R M) {m : M} :
     (m ∈ ⨆ i, p i) ↔ ∀ N, (∀ i, p i ≤ N) → m ∈ N := by

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Subgroup.Finite
 import Mathlib.Data.Finite.Prod
 import Mathlib.GroupTheory.QuotientGroup.Basic
 
+noncomputable section
+
 /-!
 # Deducing finiteness of a group.
 -/

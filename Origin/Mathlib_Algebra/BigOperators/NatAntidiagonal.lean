@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.Finset.NatAntidiagonal
 
+noncomputable section
+
 /-!
 # Big operators for `NatAntidiagonal`
 

@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/ExteriorAlgebra/Grading.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.ExteriorAlgebra.Basic
 import Mathlib.RingTheory.GradedAlgebra.Basic
+
+noncomputable section
 
 /-!
 # Results about the grading structure of the exterior algebra
@@ -38,7 +40,6 @@ instance : SetLike.GradedMonoid fun i : ℕ ↦ ⋀[R]^i M :=
   Submodule.nat_power_gradedMonoid (LinearMap.range (ι R : M →ₗ[R] ExteriorAlgebra R M))
 
 attribute [local instance 1100] MulZeroClass.toZero in
-
 theorem GradedAlgebra.ι_sq_zero (m : M) : GradedAlgebra.ι R M m * GradedAlgebra.ι R M m = 0 := by
   rw [GradedAlgebra.ι_apply, DirectSum.of_mul_of]
   exact DFinsupp.single_eq_zero.mpr (Subtype.ext <| ExteriorAlgebra.ι_sq_zero _)

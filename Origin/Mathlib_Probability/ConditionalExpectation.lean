@@ -7,6 +7,8 @@ import Mathlib.Probability.Notation
 import Mathlib.Probability.Independence.Basic
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.Basic
 
+noncomputable section
+
 /-!
 
 # Probabilistic properties of the conditional expectation

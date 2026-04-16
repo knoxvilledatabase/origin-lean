@@ -7,6 +7,8 @@ import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.RingTheory.Smooth.StandardSmooth
 import Mathlib.Tactic.Algebraize
 
+noncomputable section
+
 /-!
 # Standard smooth ring homomorphisms
 

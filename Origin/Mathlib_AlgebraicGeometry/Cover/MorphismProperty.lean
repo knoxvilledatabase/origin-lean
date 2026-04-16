@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.OpenImmersion
 import Mathlib.CategoryTheory.MorphismProperty.Limits
 
+noncomputable section
+
 /-!
 # Covers of schemes
 
@@ -285,24 +287,6 @@ instance Cover.category [P.IsMultiplicative] {X : Scheme.{u}} : Category (Cover.
   comp f g := f.comp g
 
 variable [P.IsMultiplicative]
-
-@[simp]
-lemma Cover.id_idx_apply {X : Scheme.{u}} (𝒰 : X.Cover P) (j : 𝒰.J) :
-    (𝟙 𝒰 : 𝒰 ⟶ 𝒰).idx j = j := rfl
-
-@[simp]
-lemma Cover.id_app {X : Scheme.{u}} (𝒰 : X.Cover P) (j : 𝒰.J) :
-    (𝟙 𝒰 : 𝒰 ⟶ 𝒰).app j = 𝟙 _ := rfl
-
-@[simp]
-lemma Cover.comp_idx_apply {X : Scheme.{u}} {𝒰 𝒱 𝒲 : X.Cover P}
-    (f : 𝒰 ⟶ 𝒱) (g : 𝒱 ⟶ 𝒲) (j : 𝒰.J) :
-    (f ≫ g).idx j = g.idx (f.idx j) := rfl
-
-@[simp]
-lemma Cover.comp_app {X : Scheme.{u}} {𝒰 𝒱 𝒲 : X.Cover P}
-    (f : 𝒰 ⟶ 𝒱) (g : 𝒱 ⟶ 𝒲) (j : 𝒰.J) :
-    (f ≫ g).app j = f.app j ≫ g.app _ := rfl
 
 end category
 

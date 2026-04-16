@@ -1,10 +1,12 @@
 /-
 Extracted from Tactic/ToExpr.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
+Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Tactic.DeriveToExpr
 import Mathlib.Util.WhatsNew
+
+noncomputable section
 
 /-! # `ToExpr` instances for Mathlib
 
@@ -23,19 +25,16 @@ namespace Lean
 attribute [-instance] Lean.instToExprOption
 
 set_option autoImplicit true in
-
 deriving instance ToExpr for Option
 
 attribute [-instance] Lean.instToExprList
 
 set_option autoImplicit true in
-
 deriving instance ToExpr for List
 
 attribute [-instance] Lean.instToExprArray
 
 universe u in
-
 instance {α : Type u} [ToExpr α] [ToLevel.{u}] : ToExpr (Array α) :=
   let type := toTypeExpr α
   { toExpr     := fun as => mkApp2 (mkConst ``List.toArray [toLevel.{u}]) type (toExpr as.toList)
@@ -44,7 +43,6 @@ instance {α : Type u} [ToExpr α] [ToLevel.{u}] : ToExpr (Array α) :=
 attribute [-instance] Lean.instToExprProd
 
 set_option autoImplicit true in
-
 deriving instance ToExpr for Prod
 
 deriving instance ToExpr for System.FilePath
@@ -58,10 +56,10 @@ namespace Mathlib
 open Lean
 
 set_option autoImplicit true in
-
 deriving instance ToExpr for ULift
 
 universe u in
+/-- Hand-written instance since `PUnit` is a `Sort` rather than a `Type`. -/
 
 instance [ToLevel.{u}] : ToExpr PUnit.{u+1} where
   toExpr _ := mkConst ``PUnit.unit [toLevel.{u+1}]

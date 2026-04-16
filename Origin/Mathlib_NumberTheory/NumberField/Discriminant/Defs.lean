@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/NumberField/Discriminant/Defs.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Init.Data.ULift
@@ -10,6 +10,8 @@ import Init.Data.List.Nat.Range
 import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.RingTheory.Localization.NormTrace
 import Mathlib.Analysis.Normed.Field.Lemmas
+
+noncomputable section
 
 /-!
 # Number field discriminant
@@ -32,7 +34,9 @@ noncomputable abbrev discr : ℤ := Algebra.discr ℤ (RingOfIntegers.basis K)
 theorem coe_discr : (discr K : ℚ) = Algebra.discr ℚ (integralBasis K) :=
   (Algebra.discr_localizationLocalization ℤ _ K (RingOfIntegers.basis K)).symm
 
--- DISSOLVED: discr_ne_zero
+theorem discr_ne_zero : discr K ≠ 0 := by
+  rw [← (Int.cast_injective (α := ℚ)).ne_iff, coe_discr]
+  exact Algebra.discr_not_zero_of_basis ℚ (integralBasis K)
 
 theorem discr_eq_discr {ι : Type*} [Fintype ι] [DecidableEq ι] (b : Basis ι ℤ (𝓞 K)) :
     Algebra.discr ℤ b = discr K := by

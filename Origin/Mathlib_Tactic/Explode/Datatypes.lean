@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Util.Trace
 
+noncomputable section
+
 /-!
 # Explode command: datatypes
 

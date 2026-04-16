@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.Embedding.Basic
 import Mathlib.Algebra.Homology.HomologicalComplex
 
+noncomputable section
+
 /-!
 # Boundary of an embedding of complex shapes
 

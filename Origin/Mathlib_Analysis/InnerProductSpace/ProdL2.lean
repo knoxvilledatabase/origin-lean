@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Normed.Lp.ProdLp
 
+noncomputable section
+
 /-!
 # `L²` inner product space structure on products of inner product spaces
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.SurjectiveOnStalks
 import Mathlib.AlgebraicGeometry.PrimeSpectrum.Basic
 
+noncomputable section
+
 /-!
 
 # Lemmas regarding the prime spectrum of tensor products
@@ -24,7 +26,6 @@ variable [CommRing T] [Algebra R T]
 open TensorProduct Topology
 
 noncomputable
-
 def PrimeSpectrum.tensorProductTo (x : PrimeSpectrum (S ⊗[R] T)) :
     PrimeSpectrum S × PrimeSpectrum T :=
   ⟨comap (algebraMap _ _) x, comap Algebra.TensorProduct.includeRight.toRingHom x⟩

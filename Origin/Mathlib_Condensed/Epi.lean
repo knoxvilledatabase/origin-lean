@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Sites.EpiMono
 import Mathlib.Condensed.Equivalence
 import Mathlib.Condensed.Module
 
+noncomputable section
+
 /-!
 
 # Epimorphisms of condensed objects

@@ -11,6 +11,8 @@ import Mathlib.Logic.Equiv.Nat
 import Mathlib.Order.Directed
 import Mathlib.Order.RelIso.Basic
 
+noncomputable section
+
 /-!
 # Encodable types
 
@@ -84,10 +86,6 @@ def ofLeftInverse [Encodable α] (f : β → α) (finv : α → β) (linv : ∀ 
 def ofEquiv (α) [Encodable α] (e : β ≃ α) : Encodable β :=
   ofLeftInverse e e.symm e.left_inv
 
-theorem encode_ofEquiv {α β} [Encodable α] (e : β ≃ α) (b : β) :
-    @encode _ (ofEquiv _ e) b = encode (e b) :=
-  rfl
-
 theorem decode_ofEquiv {α β} [Encodable α] (e : β ≃ α) (n : ℕ) :
     @decode _ (ofEquiv _ e) n = (decode n).map e.symm :=
   show Option.bind _ _ = Option.map _ _
@@ -96,53 +94,16 @@ theorem decode_ofEquiv {α β} [Encodable α] (e : β ≃ α) (n : ℕ) :
 instance _root_.Nat.encodable : Encodable ℕ :=
   ⟨id, some, fun _ => rfl⟩
 
-@[simp]
-theorem encode_nat (n : ℕ) : encode n = n :=
-  rfl
-
-@[simp 1100]
-theorem decode_nat (n : ℕ) : decode n = some n :=
-  rfl
-
 instance (priority := 100) _root_.IsEmpty.toEncodable [IsEmpty α] : Encodable α :=
   ⟨isEmptyElim, fun _ => none, isEmptyElim⟩
 
 instance _root_.PUnit.encodable : Encodable PUnit :=
   ⟨fun _ => 0, fun n => Nat.casesOn n (some PUnit.unit) fun _ => none, fun _ => by simp⟩
 
-@[simp]
-theorem encode_star : encode PUnit.unit = 0 :=
-  rfl
-
-@[simp]
-theorem decode_unit_zero : decode 0 = some PUnit.unit :=
-  rfl
-
-@[simp]
-theorem decode_unit_succ (n) : decode (succ n) = (none : Option PUnit) :=
-  rfl
-
 instance _root_.Option.encodable {α : Type*} [h : Encodable α] : Encodable (Option α) :=
   ⟨fun o => Option.casesOn o Nat.zero fun a => succ (encode a), fun n =>
     Nat.casesOn n (some none) fun m => (decode m).map some, fun o => by
     cases o <;> dsimp; simp [encodek, Nat.succ_ne_zero]⟩
-
-@[simp]
-theorem encode_none [Encodable α] : encode (@none α) = 0 :=
-  rfl
-
-@[simp]
-theorem encode_some [Encodable α] (a : α) : encode (some a) = succ (encode a) :=
-  rfl
-
-@[simp]
-theorem decode_option_zero [Encodable α] : (decode 0 : Option (Option α))= some none :=
-  rfl
-
-@[simp]
-theorem decode_option_succ [Encodable α] (n) :
-    (decode (succ n) : Option (Option α)) = (decode n).map some :=
-  rfl
 
 def decode₂ (α) [Encodable α] (n : ℕ) : Option α :=
   (decode n).bind (Option.guard fun a => encode a = n)
@@ -217,38 +178,10 @@ def decodeSum (n : ℕ) : Option (α ⊕ β) :=
 instance _root_.Sum.encodable : Encodable (α ⊕ β) :=
   ⟨encodeSum, decodeSum, fun s => by cases s <;> simp [encodeSum, div2_val, decodeSum, encodek]⟩
 
-@[simp]
-theorem encode_inl (a : α) : @encode (α ⊕ β) _ (Sum.inl a) = 2 * (encode a) :=
-  rfl
-
-@[simp]
-theorem encode_inr (b : β) : @encode (α ⊕ β) _ (Sum.inr b) = 2 * (encode b) + 1 :=
-  rfl
-
-@[simp]
-theorem decode_sum_val (n : ℕ) : (decode n : Option (α ⊕ β)) = decodeSum n :=
-  rfl
-
 end Sum
 
 instance _root_.Bool.encodable : Encodable Bool :=
   ofEquiv (Unit ⊕ Unit) Equiv.boolEquivPUnitSumPUnit
-
-@[simp]
-theorem encode_true : encode true = 1 :=
-  rfl
-
-@[simp]
-theorem encode_false : encode false = 0 :=
-  rfl
-
-@[simp]
-theorem decode_zero : (decode 0 : Option Bool) = some false :=
-  rfl
-
-@[simp]
-theorem decode_one : (decode 1 : Option Bool) = some true :=
-  rfl
 
 theorem decode_ge_two (n) (h : 2 ≤ n) : (decode n : Option Bool) = none := by
   suffices decodeSum n = none by
@@ -285,10 +218,6 @@ theorem decode_sigma_val (n : ℕ) :
       (decode n.unpair.1).bind fun a => (decode n.unpair.2).map <| Sigma.mk a :=
   rfl
 
-@[simp]
-theorem encode_sigma_val (a b) : @encode (Sigma γ) _ ⟨a, b⟩ = pair (encode a) (encode b) :=
-  rfl
-
 end Sigma
 
 section Prod
@@ -305,10 +234,6 @@ theorem decode_prod_val (n : ℕ) :
   simp only [decode_ofEquiv, Equiv.symm_symm, decode_sigma_val]
   cases (decode n.unpair.1 : Option α) <;> cases (decode n.unpair.2 : Option β)
   <;> rfl
-
-@[simp]
-theorem encode_prod_val (a b) : @encode (α × β) _ (a, b) = pair (encode a) (encode b) :=
-  rfl
 
 end Prod
 

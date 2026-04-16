@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Finite
 import Mathlib.CategoryTheory.Limits.Yoneda
 import Mathlib.CategoryTheory.Limits.Presheaf
 
+noncomputable section
+
 /-!
 # Preservation of (co)limits in the functor category
 

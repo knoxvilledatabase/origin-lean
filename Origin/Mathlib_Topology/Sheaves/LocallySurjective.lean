@@ -8,6 +8,8 @@ import Mathlib.Topology.Sheaves.Stalks
 import Mathlib.CategoryTheory.Limits.Preserves.Filtered
 import Mathlib.CategoryTheory.Sites.LocallySurjective
 
+noncomputable section
+
 /-!
 
 # Locally surjective maps of presheaves.

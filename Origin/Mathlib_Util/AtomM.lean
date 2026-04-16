@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Meta.Tactic.Simp.Types
 import Qq
 
+noncomputable section
+
 /-!
 # A monad for tracking and deduplicating atoms
 

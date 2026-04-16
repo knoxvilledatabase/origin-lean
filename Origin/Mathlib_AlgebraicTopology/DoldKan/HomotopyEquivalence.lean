@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.Normalized
 
+noncomputable section
+
 /-!
 
 # The normalized Moore complex and the alternating face map complex are homotopy equivalent

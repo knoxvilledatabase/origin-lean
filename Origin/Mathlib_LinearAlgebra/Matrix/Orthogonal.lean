@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 import Origin.Core
 import Mathlib.Data.Matrix.Mul
 
+noncomputable section
+
 /-!
 # Orthogonal
 
@@ -37,16 +39,6 @@ def HasOrthogonalRows [Fintype n] : Prop :=
 
 def HasOrthogonalCols [Fintype m] : Prop :=
   HasOrthogonalRows Aᵀ
-
-@[simp]
-theorem transpose_hasOrthogonalRows_iff_hasOrthogonalCols [Fintype m] :
-    Aᵀ.HasOrthogonalRows ↔ A.HasOrthogonalCols :=
-  Iff.rfl
-
-@[simp]
-theorem transpose_hasOrthogonalCols_iff_hasOrthogonalRows [Fintype n] :
-    Aᵀ.HasOrthogonalCols ↔ A.HasOrthogonalRows :=
-  Iff.rfl
 
 variable {A}
 

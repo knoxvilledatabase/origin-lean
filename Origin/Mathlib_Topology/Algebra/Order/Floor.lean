@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.AtTopBot.Floor
 import Mathlib.Topology.Algebra.Order.Group
 
+noncomputable section
+
 /-!
 # Topological facts about `Int.floor`, `Int.ceil` and `Int.fract`
 

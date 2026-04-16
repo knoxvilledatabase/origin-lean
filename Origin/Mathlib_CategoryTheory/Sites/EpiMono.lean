@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.MorphismProperty.Concrete
 import Mathlib.CategoryTheory.Sites.LocallyBijective
 
+noncomputable section
+
 /-!
 # Morphisms of sheaves factor as a locally surjective followed by a locally injective morphism
 

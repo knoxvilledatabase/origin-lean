@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.Set.Pairwise.Basic
 
+noncomputable section
+
 /-!
 # Relations holding pairwise
 

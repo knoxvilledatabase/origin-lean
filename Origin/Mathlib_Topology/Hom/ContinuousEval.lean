@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Hom.ContinuousEvalConst
 import Mathlib.Topology.ContinuousMap.Defs
 
+noncomputable section
+
 /-!
 # Bundled maps with evaluation continuous in both variables
 

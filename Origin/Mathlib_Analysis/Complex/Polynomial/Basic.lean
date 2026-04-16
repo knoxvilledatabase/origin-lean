@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Complex/Polynomial/Basic.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Liouville
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.FieldTheory.PolynomialGaloisGroup
 import Mathlib.Topology.Algebra.Polynomial
+
+noncomputable section
 
 /-!
 # The fundamental theorem of algebra
@@ -168,9 +170,12 @@ end Rationals
 
 end Polynomial.Gal
 
--- DISSOLVED: Polynomial.mul_star_dvd_of_aeval_eq_zero_im_ne_zero
-
--- DISSOLVED: Polynomial.quadratic_dvd_of_aeval_eq_zero_im_ne_zero
+lemma Polynomial.mul_star_dvd_of_aeval_eq_zero_im_ne_zero (p : ℝ[X]) {z : ℂ} (h0 : aeval z p = 0)
+    (hz : z.im ≠ 0) : (X - C ((starRingEnd ℂ) z)) * (X - C z) ∣ map (algebraMap ℝ ℂ) p := by
+  apply IsCoprime.mul_dvd
+  · exact isCoprime_X_sub_C_of_isUnit_sub <| .mk0 _ <| sub_ne_zero.2 <| mt conj_eq_iff_im.1 hz
+  · simpa [dvd_iff_isRoot, aeval_conj]
+  · simpa [dvd_iff_isRoot]
 
 lemma Irreducible.degree_le_two {p : ℝ[X]} (hp : Irreducible p) : degree p ≤ 2 := by
   obtain ⟨z, hz⟩ : ∃ z : ℂ, aeval z p = 0 :=

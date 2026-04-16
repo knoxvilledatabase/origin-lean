@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Biproducts
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
 
+noncomputable section
+
 /-!
 # Preservation of biproducts
 
@@ -57,10 +59,6 @@ def mapBicone {f : J → C} (b : Bicone f) : Bicone (F.obj ∘ f) where
     · subst h
       simp only [bicone_ι_π_self, CategoryTheory.Functor.map_id, eqToHom_refl]; dsimp
     · rw [bicone_ι_π_ne _ h, F.map_zero]
-
-theorem mapBicone_whisker {K : Type w₂} {g : K ≃ J} {f : J → C} (c : Bicone f) :
-    F.mapBicone (c.whisker g) = (F.mapBicone c).whisker g :=
-  rfl
 
 end Bicone
 
@@ -305,12 +303,6 @@ instance hasBinaryBiproduct_of_preserves : HasBinaryBiproduct (F.obj X) (F.obj Y
 @[simp]
 def mapBiprod : F.obj (X ⊞ Y) ≅ F.obj X ⊞ F.obj Y :=
   biprod.uniqueUpToIso _ _ (isBinaryBilimitOfPreserves F (BinaryBiproduct.isBilimit _ _))
-
-theorem mapBiprod_hom : (mapBiprod F X Y).hom = biprod.lift (F.map biprod.fst) (F.map biprod.snd) :=
-  rfl
-
-theorem mapBiprod_inv : (mapBiprod F X Y).inv = biprod.desc (F.map biprod.inl) (F.map biprod.inr) :=
-  rfl
 
 end Functor
 

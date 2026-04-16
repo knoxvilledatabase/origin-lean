@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Integral/Average.lean
-Genuine: 58 | Conflates: 0 | Dissolved: 30 | Infrastructure: 3
+Genuine: 86 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Integral.SetIntegral
+
+noncomputable section
 
 /-!
 # Integral average of a function
@@ -76,8 +78,6 @@ theorem laverage_zero : ⨍⁻ _x, (0 : ℝ≥0∞) ∂μ = 0 := by rw [laverage
 @[simp]
 theorem laverage_zero_measure (f : α → ℝ≥0∞) : ⨍⁻ x, f x ∂(0 : Measure α) = 0 := by simp [laverage]
 
-theorem laverage_eq' (f : α → ℝ≥0∞) : ⨍⁻ x, f x ∂μ = ∫⁻ x, f x ∂(μ univ)⁻¹ • μ := rfl
-
 theorem laverage_eq (f : α → ℝ≥0∞) : ⨍⁻ x, f x ∂μ = (∫⁻ x, f x ∂μ) / μ univ := by
   rw [laverage_eq', lintegral_smul_measure, ENNReal.div_eq_inv_mul]
 
@@ -142,7 +142,14 @@ theorem laverage_union (hd : AEDisjoint μ s t) (ht : NullMeasurableSet t μ) :
       μ s / (μ s + μ t) * ⨍⁻ x in s, f x ∂μ + μ t / (μ s + μ t) * ⨍⁻ x in t, f x ∂μ := by
   rw [restrict_union₀ hd ht, laverage_add_measure, restrict_apply_univ, restrict_apply_univ]
 
--- DISSOLVED: laverage_union_mem_openSegment
+theorem laverage_union_mem_openSegment (hd : AEDisjoint μ s t) (ht : NullMeasurableSet t μ)
+    (hs₀ : μ s ≠ 0) (ht₀ : μ t ≠ 0) (hsμ : μ s ≠ ∞) (htμ : μ t ≠ ∞) :
+    ⨍⁻ x in s ∪ t, f x ∂μ ∈ openSegment ℝ≥0∞ (⨍⁻ x in s, f x ∂μ) (⨍⁻ x in t, f x ∂μ) := by
+  refine
+    ⟨μ s / (μ s + μ t), μ t / (μ s + μ t), ENNReal.div_pos hs₀ <| add_ne_top.2 ⟨hsμ, htμ⟩,
+      ENNReal.div_pos ht₀ <| add_ne_top.2 ⟨hsμ, htμ⟩, ?_, (laverage_union hd ht).symm⟩
+  rw [← ENNReal.add_div,
+    ENNReal.div_self (add_eq_zero.not.2 fun h => hs₀ h.1) (add_ne_top.2 ⟨hsμ, htμ⟩)]
 
 theorem laverage_union_mem_segment (hd : AEDisjoint μ s t) (ht : NullMeasurableSet t μ)
     (hsμ : μ s ≠ ∞) (htμ : μ t ≠ ∞) :
@@ -156,15 +163,23 @@ theorem laverage_union_mem_segment (hd : AEDisjoint μ s t) (ht : NullMeasurable
     rw [← ENNReal.add_div,
       ENNReal.div_self (add_eq_zero.not.2 fun h => hs₀ h.1) (add_ne_top.2 ⟨hsμ, htμ⟩)]
 
--- DISSOLVED: laverage_mem_openSegment_compl_self
+theorem laverage_mem_openSegment_compl_self [IsFiniteMeasure μ] (hs : NullMeasurableSet s μ)
+    (hs₀ : μ s ≠ 0) (hsc₀ : μ sᶜ ≠ 0) :
+    ⨍⁻ x, f x ∂μ ∈ openSegment ℝ≥0∞ (⨍⁻ x in s, f x ∂μ) (⨍⁻ x in sᶜ, f x ∂μ) := by
+  simpa only [union_compl_self, restrict_univ] using
+    laverage_union_mem_openSegment aedisjoint_compl_right hs.compl hs₀ hsc₀ (measure_ne_top _ _)
+      (measure_ne_top _ _)
 
 -- DISSOLVED: laverage_const
 
--- DISSOLVED: setLaverage_const
+theorem setLaverage_const (hs₀ : μ s ≠ 0) (hs : μ s ≠ ∞) (c : ℝ≥0∞) : ⨍⁻ _x in s, c ∂μ = c := by
+  simp only [setLaverage_eq, lintegral_const, Measure.restrict_apply, MeasurableSet.univ,
+    univ_inter, div_eq_mul_inv, mul_assoc, ENNReal.mul_inv_cancel hs₀ hs, mul_one]
 
 -- DISSOLVED: laverage_one
 
--- DISSOLVED: setLaverage_one
+theorem setLaverage_one (hs₀ : μ s ≠ 0) (hs : μ s ≠ ∞) : ⨍⁻ _x in s, (1 : ℝ≥0∞) ∂μ = 1 :=
+  setLaverage_const hs₀ hs _
 
 theorem lintegral_laverage (μ : Measure α) [IsFiniteMeasure μ] (f : α → ℝ≥0∞) :
     ∫⁻ _x, ⨍⁻ a, f a ∂μ ∂μ = ∫⁻ x, f x ∂μ := by
@@ -206,9 +221,6 @@ theorem average_zero_measure (f : α → E) : ⨍ x, f x ∂(0 : Measure α) = 0
 @[simp]
 theorem average_neg (f : α → E) : ⨍ x, -f x ∂μ = -⨍ x, f x ∂μ :=
   integral_neg f
-
-theorem average_eq' (f : α → E) : ⨍ x, f x ∂μ = ∫ x, f x ∂(μ univ)⁻¹ • μ :=
-  rfl
 
 theorem average_eq (f : α → E) : ⨍ x, f x ∂μ = (μ univ).toReal⁻¹ • ∫ x, f x ∂μ := by
   rw [average_eq', integral_smul_measure, ENNReal.toReal_inv]
@@ -270,7 +282,14 @@ theorem average_union {f : α → E} {s t : Set α} (hd : AEDisjoint μ s t) (ht
   haveI := Fact.mk hsμ.lt_top; haveI := Fact.mk htμ.lt_top
   rw [restrict_union₀ hd ht, average_add_measure hfs hft, restrict_apply_univ, restrict_apply_univ]
 
--- DISSOLVED: average_union_mem_openSegment
+theorem average_union_mem_openSegment {f : α → E} {s t : Set α} (hd : AEDisjoint μ s t)
+    (ht : NullMeasurableSet t μ) (hs₀ : μ s ≠ 0) (ht₀ : μ t ≠ 0) (hsμ : μ s ≠ ∞) (htμ : μ t ≠ ∞)
+    (hfs : IntegrableOn f s μ) (hft : IntegrableOn f t μ) :
+    ⨍ x in s ∪ t, f x ∂μ ∈ openSegment ℝ (⨍ x in s, f x ∂μ) (⨍ x in t, f x ∂μ) := by
+  replace hs₀ : 0 < (μ s).toReal := ENNReal.toReal_pos hs₀ hsμ
+  replace ht₀ : 0 < (μ t).toReal := ENNReal.toReal_pos ht₀ htμ
+  exact mem_openSegment_iff_div.mpr
+    ⟨(μ s).toReal, (μ t).toReal, hs₀, ht₀, (average_union hd ht hsμ htμ hfs hft).symm⟩
 
 theorem average_union_mem_segment {f : α → E} {s t : Set α} (hd : AEDisjoint μ s t)
     (ht : NullMeasurableSet t μ) (hsμ : μ s ≠ ∞) (htμ : μ t ≠ ∞) (hfs : IntegrableOn f s μ)
@@ -288,13 +307,23 @@ theorem average_union_mem_segment {f : α → E} {s t : Set α} (hd : AEDisjoint
       0 < (μ s).toReal := ENNReal.toReal_pos hse hsμ
       _ ≤ _ := le_add_of_nonneg_right ENNReal.toReal_nonneg
 
--- DISSOLVED: average_mem_openSegment_compl_self
+theorem average_mem_openSegment_compl_self [IsFiniteMeasure μ] {f : α → E} {s : Set α}
+    (hs : NullMeasurableSet s μ) (hs₀ : μ s ≠ 0) (hsc₀ : μ sᶜ ≠ 0) (hfi : Integrable f μ) :
+    ⨍ x, f x ∂μ ∈ openSegment ℝ (⨍ x in s, f x ∂μ) (⨍ x in sᶜ, f x ∂μ) := by
+  simpa only [union_compl_self, restrict_univ] using
+    average_union_mem_openSegment aedisjoint_compl_right hs.compl hs₀ hsc₀ (measure_ne_top _ _)
+      (measure_ne_top _ _) hfi.integrableOn hfi.integrableOn
 
 variable [CompleteSpace E]
 
--- DISSOLVED: average_const
+@[simp]
+theorem average_const (μ : Measure α) [IsFiniteMeasure μ] [h : NeZero μ] (c : E) :
+    ⨍ _x, c ∂μ = c := by
+  rw [average, integral_const, measure_univ, ENNReal.one_toReal, one_smul]
 
--- DISSOLVED: setAverage_const
+theorem setAverage_const {s : Set α} (hs₀ : μ s ≠ 0) (hs : μ s ≠ ∞) (c : E) :
+    ⨍ _ in s, c ∂μ = c :=
+  have := NeZero.mk hs₀; have := Fact.mk hs.lt_top; average_const _ _
 
 theorem integral_average (μ : Measure α) [IsFiniteMeasure μ] (f : α → E) :
     ∫ _, ⨍ a, f a ∂μ ∂μ = ∫ x, f x ∂μ := by simp
@@ -355,29 +384,69 @@ section FirstMomentReal
 
 variable {N : Set α} {f : α → ℝ}
 
--- DISSOLVED: measure_le_setAverage_pos
+theorem measure_le_setAverage_pos (hμ : μ s ≠ 0) (hμ₁ : μ s ≠ ∞) (hf : IntegrableOn f s μ) :
+    0 < μ ({x ∈ s | f x ≤ ⨍ a in s, f a ∂μ}) := by
+  refine pos_iff_ne_zero.2 fun H => ?_
+  replace H : (μ.restrict s) {x | f x ≤ ⨍ a in s, f a ∂μ} = 0 := by
+    rwa [restrict_apply₀, inter_comm]
+    exact AEStronglyMeasurable.nullMeasurableSet_le hf.1 aestronglyMeasurable_const
+  haveI := Fact.mk hμ₁.lt_top
+  refine (integral_sub_average (μ.restrict s) f).not_gt ?_
+  refine (setIntegral_pos_iff_support_of_nonneg_ae ?_ ?_).2 ?_
+  · refine measure_mono_null (fun x hx ↦ ?_) H
+    simp only [Pi.zero_apply, sub_nonneg, mem_compl_iff, mem_setOf_eq, not_le] at hx
+    exact hx.le
+  · exact hf.sub (integrableOn_const.2 <| Or.inr <| lt_top_iff_ne_top.2 hμ₁)
+  · rwa [pos_iff_ne_zero, inter_comm, ← diff_compl, ← diff_inter_self_eq_diff, measure_diff_null]
+    refine measure_mono_null ?_ (measure_inter_eq_zero_of_restrict H)
+    exact inter_subset_inter_left _ fun a ha => (sub_eq_zero.1 <| of_not_not ha).le
 
--- DISSOLVED: measure_setAverage_le_pos
+theorem measure_setAverage_le_pos (hμ : μ s ≠ 0) (hμ₁ : μ s ≠ ∞) (hf : IntegrableOn f s μ) :
+    0 < μ ({x ∈ s | ⨍ a in s, f a ∂μ ≤ f x}) := by
+  simpa [integral_neg, neg_div] using measure_le_setAverage_pos hμ hμ₁ hf.neg
 
--- DISSOLVED: exists_le_setAverage
+theorem exists_le_setAverage (hμ : μ s ≠ 0) (hμ₁ : μ s ≠ ∞) (hf : IntegrableOn f s μ) :
+    ∃ x ∈ s, f x ≤ ⨍ a in s, f a ∂μ :=
+  let ⟨x, hx, h⟩ := nonempty_of_measure_ne_zero (measure_le_setAverage_pos hμ hμ₁ hf).ne'
+  ⟨x, hx, h⟩
 
--- DISSOLVED: exists_setAverage_le
+theorem exists_setAverage_le (hμ : μ s ≠ 0) (hμ₁ : μ s ≠ ∞) (hf : IntegrableOn f s μ) :
+    ∃ x ∈ s, ⨍ a in s, f a ∂μ ≤ f x :=
+  let ⟨x, hx, h⟩ := nonempty_of_measure_ne_zero (measure_setAverage_le_pos hμ hμ₁ hf).ne'
+  ⟨x, hx, h⟩
 
 section FiniteMeasure
 
 variable [IsFiniteMeasure μ]
 
--- DISSOLVED: measure_le_average_pos
+theorem measure_le_average_pos (hμ : μ ≠ 0) (hf : Integrable f μ) :
+    0 < μ {x | f x ≤ ⨍ a, f a ∂μ} := by
+  simpa using measure_le_setAverage_pos (Measure.measure_univ_ne_zero.2 hμ) (measure_ne_top _ _)
+    hf.integrableOn
 
--- DISSOLVED: measure_average_le_pos
+theorem measure_average_le_pos (hμ : μ ≠ 0) (hf : Integrable f μ) :
+    0 < μ {x | ⨍ a, f a ∂μ ≤ f x} := by
+  simpa using measure_setAverage_le_pos (Measure.measure_univ_ne_zero.2 hμ) (measure_ne_top _ _)
+    hf.integrableOn
 
--- DISSOLVED: exists_le_average
+theorem exists_le_average (hμ : μ ≠ 0) (hf : Integrable f μ) : ∃ x, f x ≤ ⨍ a, f a ∂μ :=
+  let ⟨x, hx⟩ := nonempty_of_measure_ne_zero (measure_le_average_pos hμ hf).ne'
+  ⟨x, hx⟩
 
--- DISSOLVED: exists_average_le
+theorem exists_average_le (hμ : μ ≠ 0) (hf : Integrable f μ) : ∃ x, ⨍ a, f a ∂μ ≤ f x :=
+  let ⟨x, hx⟩ := nonempty_of_measure_ne_zero (measure_average_le_pos hμ hf).ne'
+  ⟨x, hx⟩
 
--- DISSOLVED: exists_not_mem_null_le_average
+theorem exists_not_mem_null_le_average (hμ : μ ≠ 0) (hf : Integrable f μ) (hN : μ N = 0) :
+    ∃ x, x ∉ N ∧ f x ≤ ⨍ a, f a ∂μ := by
+  have := measure_le_average_pos hμ hf
+  rw [← measure_diff_null hN] at this
+  obtain ⟨x, hx, hxN⟩ := nonempty_of_measure_ne_zero this.ne'
+  exact ⟨x, hxN, hx⟩
 
--- DISSOLVED: exists_not_mem_null_average_le
+theorem exists_not_mem_null_average_le (hμ : μ ≠ 0) (hf : Integrable f μ) (hN : μ N = 0) :
+    ∃ x, x ∉ N ∧ ⨍ a, f a ∂μ ≤ f x := by
+  simpa [integral_neg, neg_div] using exists_not_mem_null_le_average hμ hf.neg hN
 
 end FiniteMeasure
 
@@ -417,29 +486,88 @@ section FirstMomentENNReal
 
 variable {N : Set α} {f : α → ℝ≥0∞}
 
--- DISSOLVED: measure_le_setLaverage_pos
+theorem measure_le_setLaverage_pos (hμ : μ s ≠ 0) (hμ₁ : μ s ≠ ∞)
+    (hf : AEMeasurable f (μ.restrict s)) : 0 < μ {x ∈ s | f x ≤ ⨍⁻ a in s, f a ∂μ} := by
+  obtain h | h := eq_or_ne (∫⁻ a in s, f a ∂μ) ∞
+  · simpa [mul_top, hμ₁, laverage, h, top_div_of_ne_top hμ₁, pos_iff_ne_zero] using hμ
+  have := measure_le_setAverage_pos hμ hμ₁ (integrable_toReal_of_lintegral_ne_top hf h)
+  rw [← setOf_inter_eq_sep, ← Measure.restrict_apply₀
+    (hf.aestronglyMeasurable.nullMeasurableSet_le aestronglyMeasurable_const)]
+  rw [← setOf_inter_eq_sep, ← Measure.restrict_apply₀
+    (hf.ennreal_toReal.aestronglyMeasurable.nullMeasurableSet_le aestronglyMeasurable_const),
+    ← measure_diff_null (measure_eq_top_of_lintegral_ne_top hf h)] at this
+  refine this.trans_le (measure_mono ?_)
+  rintro x ⟨hfx, hx⟩
+  dsimp at hfx
+  rwa [← toReal_laverage hf, toReal_le_toReal hx (setLaverage_lt_top h).ne] at hfx
+  simp_rw [ae_iff, not_ne_iff]
+  exact measure_eq_top_of_lintegral_ne_top hf h
 
--- DISSOLVED: measure_setLaverage_le_pos
+theorem measure_setLaverage_le_pos (hμ : μ s ≠ 0) (hs : NullMeasurableSet s μ)
+    (hint : ∫⁻ a in s, f a ∂μ ≠ ∞) : 0 < μ {x ∈ s | ⨍⁻ a in s, f a ∂μ ≤ f x} := by
+  obtain hμ₁ | hμ₁ := eq_or_ne (μ s) ∞
+  · simp [setLaverage_eq, hμ₁]
+  obtain ⟨g, hg, hgf, hfg⟩ := exists_measurable_le_lintegral_eq (μ.restrict s) f
+  have hfg' : ⨍⁻ a in s, f a ∂μ = ⨍⁻ a in s, g a ∂μ := by simp_rw [laverage_eq, hfg]
+  rw [hfg] at hint
+  have :=
+    measure_setAverage_le_pos hμ hμ₁ (integrable_toReal_of_lintegral_ne_top hg.aemeasurable hint)
+  simp_rw [← setOf_inter_eq_sep, ← Measure.restrict_apply₀' hs, hfg']
+  rw [← setOf_inter_eq_sep, ← Measure.restrict_apply₀' hs, ←
+    measure_diff_null (measure_eq_top_of_lintegral_ne_top hg.aemeasurable hint)] at this
+  refine this.trans_le (measure_mono ?_)
+  rintro x ⟨hfx, hx⟩
+  dsimp at hfx
+  rw [← toReal_laverage hg.aemeasurable, toReal_le_toReal (setLaverage_lt_top hint).ne hx] at hfx
+  · exact hfx.trans (hgf _)
+  · simp_rw [ae_iff, not_ne_iff]
+    exact measure_eq_top_of_lintegral_ne_top hg.aemeasurable hint
 
--- DISSOLVED: exists_le_setLaverage
+theorem exists_le_setLaverage (hμ : μ s ≠ 0) (hμ₁ : μ s ≠ ∞) (hf : AEMeasurable f (μ.restrict s)) :
+    ∃ x ∈ s, f x ≤ ⨍⁻ a in s, f a ∂μ :=
+  let ⟨x, hx, h⟩ := nonempty_of_measure_ne_zero (measure_le_setLaverage_pos hμ hμ₁ hf).ne'
+  ⟨x, hx, h⟩
 
--- DISSOLVED: exists_setLaverage_le
+theorem exists_setLaverage_le (hμ : μ s ≠ 0) (hs : NullMeasurableSet s μ)
+    (hint : ∫⁻ a in s, f a ∂μ ≠ ∞) : ∃ x ∈ s, ⨍⁻ a in s, f a ∂μ ≤ f x :=
+  let ⟨x, hx, h⟩ := nonempty_of_measure_ne_zero (measure_setLaverage_le_pos hμ hs hint).ne'
+  ⟨x, hx, h⟩
 
--- DISSOLVED: measure_laverage_le_pos
+theorem measure_laverage_le_pos (hμ : μ ≠ 0) (hint : ∫⁻ a, f a ∂μ ≠ ∞) :
+    0 < μ {x | ⨍⁻ a, f a ∂μ ≤ f x} := by
+  simpa [hint] using
+    @measure_setLaverage_le_pos _ _ _ _ f (measure_univ_ne_zero.2 hμ) nullMeasurableSet_univ
 
--- DISSOLVED: exists_laverage_le
+theorem exists_laverage_le (hμ : μ ≠ 0) (hint : ∫⁻ a, f a ∂μ ≠ ∞) : ∃ x, ⨍⁻ a, f a ∂μ ≤ f x :=
+  let ⟨x, hx⟩ := nonempty_of_measure_ne_zero (measure_laverage_le_pos hμ hint).ne'
+  ⟨x, hx⟩
 
--- DISSOLVED: exists_not_mem_null_laverage_le
+theorem exists_not_mem_null_laverage_le (hμ : μ ≠ 0) (hint : ∫⁻ a : α, f a ∂μ ≠ ∞) (hN : μ N = 0) :
+    ∃ x, x ∉ N ∧ ⨍⁻ a, f a ∂μ ≤ f x := by
+  have := measure_laverage_le_pos hμ hint
+  rw [← measure_diff_null hN] at this
+  obtain ⟨x, hx, hxN⟩ := nonempty_of_measure_ne_zero this.ne'
+  exact ⟨x, hxN, hx⟩
 
 section FiniteMeasure
 
 variable [IsFiniteMeasure μ]
 
--- DISSOLVED: measure_le_laverage_pos
+theorem measure_le_laverage_pos (hμ : μ ≠ 0) (hf : AEMeasurable f μ) :
+    0 < μ {x | f x ≤ ⨍⁻ a, f a ∂μ} := by
+  simpa using
+    measure_le_setLaverage_pos (measure_univ_ne_zero.2 hμ) (measure_ne_top _ _) hf.restrict
 
--- DISSOLVED: exists_le_laverage
+theorem exists_le_laverage (hμ : μ ≠ 0) (hf : AEMeasurable f μ) : ∃ x, f x ≤ ⨍⁻ a, f a ∂μ :=
+  let ⟨x, hx⟩ := nonempty_of_measure_ne_zero (measure_le_laverage_pos hμ hf).ne'
+  ⟨x, hx⟩
 
--- DISSOLVED: exists_not_mem_null_le_laverage
+theorem exists_not_mem_null_le_laverage (hμ : μ ≠ 0) (hf : AEMeasurable f μ) (hN : μ N = 0) :
+    ∃ x, x ∉ N ∧ f x ≤ ⨍⁻ a, f a ∂μ := by
+  have := measure_le_laverage_pos hμ hf
+  rw [← measure_diff_null hN] at this
+  obtain ⟨x, hx, hxN⟩ := nonempty_of_measure_ne_zero this.ne'
+  exact ⟨x, hxN, hx⟩
 
 end FiniteMeasure
 

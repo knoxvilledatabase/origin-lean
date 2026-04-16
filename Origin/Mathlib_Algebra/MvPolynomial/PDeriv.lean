@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Derivation
 import Mathlib.Algebra.MvPolynomial.Variables
 
+noncomputable section
+
 /-!
 # Partial derivatives of polynomials
 
@@ -90,9 +92,6 @@ theorem pderiv_X_of_ne {i j : σ} (h : j ≠ i) : pderiv i (X j : MvPolynomial �
 theorem pderiv_eq_zero_of_not_mem_vars {i : σ} {f : MvPolynomial σ R} (h : i ∉ f.vars) :
     pderiv i f = 0 :=
   derivation_eq_zero_of_forall_mem_vars fun _ hj => pderiv_X_of_ne <| ne_of_mem_of_not_mem hj h
-
-theorem pderiv_monomial_single {i : σ} {n : ℕ} : pderiv i (monomial (single i n) a) =
-    monomial (single i (n - 1)) (a * n) := by simp
 
 theorem pderiv_mul {i : σ} {f g : MvPolynomial σ R} :
     pderiv i (f * g) = pderiv i f * g + f * pderiv i g := by

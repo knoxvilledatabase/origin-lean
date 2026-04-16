@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.Functor.Const
 
+noncomputable section
+
 /-!
 # Monoidal structure on `C ⥤ D` when `D` is monoidal.
 
@@ -73,67 +75,6 @@ instance functorCategoryMonoidalStruct : MonoidalCategoryStruct (C ⥤ D) where
   leftUnitor F := NatIso.ofComponents fun X => λ_ (F.obj X)
   rightUnitor F := NatIso.ofComponents fun X => ρ_ (F.obj X)
   associator F G H := NatIso.ofComponents fun X => α_ (F.obj X) (G.obj X) (H.obj X)
-
-@[simp]
-theorem tensorUnit_obj {X} : (𝟙_ (C ⥤ D)).obj X = 𝟙_ D :=
-  rfl
-
-@[simp]
-theorem tensorUnit_map {X Y} {f : X ⟶ Y} : (𝟙_ (C ⥤ D)).map f = 𝟙 (𝟙_ D) :=
-  rfl
-
-@[simp]
-theorem tensorObj_obj {F G : C ⥤ D} {X} : (F ⊗ G).obj X = F.obj X ⊗ G.obj X :=
-  rfl
-
-@[simp]
-theorem tensorObj_map {F G : C ⥤ D} {X Y} {f : X ⟶ Y} : (F ⊗ G).map f = F.map f ⊗ G.map f :=
-  rfl
-
-@[simp]
-theorem tensorHom_app {F G F' G' : C ⥤ D} {α : F ⟶ G} {β : F' ⟶ G'} {X} :
-    (α ⊗ β).app X = α.app X ⊗ β.app X :=
-  rfl
-
-@[simp]
-theorem whiskerLeft_app {F F' G' : C ⥤ D} {β : F' ⟶ G'} {X} :
-    (F ◁ β).app X = F.obj X ◁ β.app X :=
-  rfl
-
-@[simp]
-theorem whiskerRight_app {F G F' : C ⥤ D} {α : F ⟶ G} {X} :
-    (α ▷ F').app X = α.app X ▷ F'.obj X :=
-  rfl
-
-@[simp]
-theorem leftUnitor_hom_app {F : C ⥤ D} {X} :
-    ((λ_ F).hom : 𝟙_ _ ⊗ F ⟶ F).app X = (λ_ (F.obj X)).hom :=
-  rfl
-
-@[simp]
-theorem leftUnitor_inv_app {F : C ⥤ D} {X} :
-    ((λ_ F).inv : F ⟶ 𝟙_ _ ⊗ F).app X = (λ_ (F.obj X)).inv :=
-  rfl
-
-@[simp]
-theorem rightUnitor_hom_app {F : C ⥤ D} {X} :
-    ((ρ_ F).hom : F ⊗ 𝟙_ _ ⟶ F).app X = (ρ_ (F.obj X)).hom :=
-  rfl
-
-@[simp]
-theorem rightUnitor_inv_app {F : C ⥤ D} {X} :
-    ((ρ_ F).inv : F ⟶ F ⊗ 𝟙_ _).app X = (ρ_ (F.obj X)).inv :=
-  rfl
-
-@[simp]
-theorem associator_hom_app {F G H : C ⥤ D} {X} :
-    ((α_ F G H).hom : (F ⊗ G) ⊗ H ⟶ F ⊗ G ⊗ H).app X = (α_ (F.obj X) (G.obj X) (H.obj X)).hom :=
-  rfl
-
-@[simp]
-theorem associator_inv_app {F G H : C ⥤ D} {X} :
-    ((α_ F G H).inv : F ⊗ G ⊗ H ⟶ (F ⊗ G) ⊗ H).app X = (α_ (F.obj X) (G.obj X) (H.obj X)).inv :=
-  rfl
 
 instance functorCategoryMonoidal : MonoidalCategory (C ⥤ D) where
   tensorHom_def := by intros; ext; simp [tensorHom_def]

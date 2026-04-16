@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/Transcendental/Liouville/LiouvilleWith.lean
-Genuine: 34 | Conflates: 0 | Dissolved: 12 | Infrastructure: 2
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 import Mathlib.NumberTheory.Transcendental.Liouville.Basic
 import Mathlib.Topology.Instances.Irrational
+
+noncomputable section
 
 /-!
 # Liouville numbers with a given exponent
@@ -89,29 +91,57 @@ theorem frequently_lt_rpow_neg (h : LiouvilleWith p x) (hlt : q < p) :
   refine ⟨m, hne, hlt.trans <| (div_lt_iff₀ <| rpow_pos_of_pos hn _).2 ?_⟩
   rwa [mul_comm, ← rpow_add hn, ← sub_eq_add_neg]
 
--- DISSOLVED: mul_rat
+theorem mul_rat (h : LiouvilleWith p x) (hr : r ≠ 0) : LiouvilleWith p (x * r) := by
+  rcases h.exists_pos with ⟨C, _hC₀, hC⟩
+  refine ⟨r.den ^ p * (|r| * C), (tendsto_id.nsmul_atTop r.pos).frequently (hC.mono ?_)⟩
+  rintro n ⟨_hn, m, hne, hlt⟩
+  have A : (↑(r.num * m) : ℝ) / ↑(r.den • id n) = m / n * r := by
+    simp [← div_mul_div_comm, ← r.cast_def, mul_comm]
+  refine ⟨r.num * m, ?_, ?_⟩
+  · rw [A]; simp [hne, hr]
+  · rw [A, ← sub_mul, abs_mul]
+    simp only [smul_eq_mul, id, Nat.cast_mul]
+    calc _ < C / ↑n ^ p * |↑r| := by gcongr
+      _ = ↑r.den ^ p * (↑|r| * C) / (↑r.den * ↑n) ^ p := ?_
+    rw [mul_rpow, mul_div_mul_left, mul_comm, mul_div_assoc]
+    · simp only [Rat.cast_abs, le_refl]
+    all_goals positivity
 
--- DISSOLVED: mul_rat_iff
+theorem mul_rat_iff (hr : r ≠ 0) : LiouvilleWith p (x * r) ↔ LiouvilleWith p x :=
+  ⟨fun h => by
+    simpa only [mul_assoc, ← Rat.cast_mul, mul_inv_cancel₀ hr, Rat.cast_one, mul_one] using
+      h.mul_rat (inv_ne_zero hr),
+    fun h => h.mul_rat hr⟩
 
--- DISSOLVED: rat_mul_iff
+theorem rat_mul_iff (hr : r ≠ 0) : LiouvilleWith p (r * x) ↔ LiouvilleWith p x := by
+  rw [mul_comm, mul_rat_iff hr]
 
--- DISSOLVED: rat_mul
+theorem rat_mul (h : LiouvilleWith p x) (hr : r ≠ 0) : LiouvilleWith p (r * x) :=
+  (rat_mul_iff hr).2 h
 
--- DISSOLVED: mul_int_iff
+theorem mul_int_iff (hm : m ≠ 0) : LiouvilleWith p (x * m) ↔ LiouvilleWith p x := by
+  rw [← Rat.cast_intCast, mul_rat_iff (Int.cast_ne_zero.2 hm)]
 
--- DISSOLVED: mul_int
+theorem mul_int (h : LiouvilleWith p x) (hm : m ≠ 0) : LiouvilleWith p (x * m) :=
+  (mul_int_iff hm).2 h
 
--- DISSOLVED: int_mul_iff
+theorem int_mul_iff (hm : m ≠ 0) : LiouvilleWith p (m * x) ↔ LiouvilleWith p x := by
+  rw [mul_comm, mul_int_iff hm]
 
--- DISSOLVED: int_mul
+theorem int_mul (h : LiouvilleWith p x) (hm : m ≠ 0) : LiouvilleWith p (m * x) :=
+  (int_mul_iff hm).2 h
 
--- DISSOLVED: mul_nat_iff
+theorem mul_nat_iff (hn : n ≠ 0) : LiouvilleWith p (x * n) ↔ LiouvilleWith p x := by
+  rw [← Rat.cast_natCast, mul_rat_iff (Nat.cast_ne_zero.2 hn)]
 
--- DISSOLVED: mul_nat
+theorem mul_nat (h : LiouvilleWith p x) (hn : n ≠ 0) : LiouvilleWith p (x * n) :=
+  (mul_nat_iff hn).2 h
 
--- DISSOLVED: nat_mul_iff
+theorem nat_mul_iff (hn : n ≠ 0) : LiouvilleWith p (n * x) ↔ LiouvilleWith p x := by
+  rw [mul_comm, mul_nat_iff hn]
 
--- DISSOLVED: nat_mul
+theorem nat_mul (h : LiouvilleWith p x) (hn : n ≠ 0) : LiouvilleWith p (n * x) := by
+  rw [mul_comm]; exact h.mul_nat hn
 
 theorem add_rat (h : LiouvilleWith p x) (r : ℚ) : LiouvilleWith p (x + r) := by
   rcases h.exists_pos with ⟨C, _hC₀, hC⟩

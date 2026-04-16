@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Elab.DeclarationRange
 import Lean.Elab.Term
 
+noncomputable section
+
 /-!
 # `addRelatedDecl`
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Order/Ring/Abs.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Abs
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Ring.Int
 import Mathlib.Algebra.Ring.Divisibility.Basic
 import Mathlib.Algebra.Ring.Int.Units
 import Mathlib.Data.Nat.Cast.Order.Ring
+
+noncomputable section
 
 /-!
 # Absolute values in linear ordered rings.
@@ -63,7 +65,9 @@ lemma Even.pow_abs (hn : Even n) (a : α) : |a| ^ n = a ^ n := by
 
 lemma abs_neg_one_pow (n : ℕ) : |(-1 : α) ^ n| = 1 := by rw [← pow_abs, abs_neg, abs_one, one_pow]
 
--- DISSOLVED: abs_pow_eq_one
+lemma abs_pow_eq_one (a : α) (h : n ≠ 0) : |a ^ n| = 1 ↔ |a| = 1 := by
+  convert pow_left_inj₀ (abs_nonneg a) zero_le_one h
+  exacts [(pow_abs _ _).symm, (one_pow _).symm]
 
 @[simp] lemma abs_mul_abs_self (a : α) : |a| * |a| = a * a :=
   abs_by_cases (fun x => x * x = a * a) rfl (neg_mul_neg a a)
@@ -182,17 +186,28 @@ section LinearOrderedRing
 
 variable {R : Type*} [LinearOrderedRing R] {a b : R} {n : ℕ}
 
--- DISSOLVED: pow_eq_pow_iff_of_ne_zero
+lemma pow_eq_pow_iff_of_ne_zero (hn : n ≠ 0) : a ^ n = b ^ n ↔ a = b ∨ a = -b ∧ Even n :=
+  match n.even_xor_odd with
+  | .inl hne => by simp only [*, and_true, ← abs_eq_abs,
+    ← pow_left_inj₀ (abs_nonneg a) (abs_nonneg b) hn, hne.1.pow_abs]
+  | .inr hn => by simp [hn, (hn.1.strictMono_pow (R := R)).injective.eq_iff]
 
 lemma pow_eq_pow_iff_cases : a ^ n = b ^ n ↔ n = 0 ∨ a = b ∨ a = -b ∧ Even n := by
   rcases eq_or_ne n 0 with rfl | hn <;> simp [pow_eq_pow_iff_of_ne_zero, *]
 
--- DISSOLVED: pow_eq_one_iff_of_ne_zero
+lemma pow_eq_one_iff_of_ne_zero (hn : n ≠ 0) : a ^ n = 1 ↔ a = 1 ∨ a = -1 ∧ Even n := by
+  simp [← pow_eq_pow_iff_of_ne_zero hn]
 
 lemma pow_eq_one_iff_cases : a ^ n = 1 ↔ n = 0 ∨ a = 1 ∨ a = -1 ∧ Even n := by
   simp [← pow_eq_pow_iff_cases]
 
--- DISSOLVED: pow_eq_neg_pow_iff
+lemma pow_eq_neg_pow_iff (hb : b ≠ 0) : a ^ n = -b ^ n ↔ a = -b ∧ Odd n :=
+  match n.even_or_odd with
+  | .inl he =>
+    suffices a ^ n > -b ^ n by simpa [he, not_odd_iff_even.2 he] using this.ne'
+    lt_of_lt_of_le (by simp [he.pow_pos hb]) (he.pow_nonneg _)
+  | .inr ho => by
+    simp only [ho, and_true, ← ho.neg_pow, (ho.strictMono_pow (R := R)).injective.eq_iff]
 
 lemma pow_eq_neg_one_iff : a ^ n = -1 ↔ a = -1 ∧ Odd n := by
   simpa using pow_eq_neg_pow_iff (R := R) one_ne_zero

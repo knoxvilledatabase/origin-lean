@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.LinearAlgebra.Semisimple
 
+noncomputable section
+
 /-!
 # Eigenspaces of semisimple linear endomorphisms
 

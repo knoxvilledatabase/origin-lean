@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.HomotopyCategory.Pretriangulated
 import Mathlib.CategoryTheory.Triangulated.Triangulated
 import Mathlib.CategoryTheory.ComposableArrows
 
+noncomputable section
+
 /-! The triangulated structure on the homotopy category of complexes
 
 In this file, we show that for any additive category `C`,
@@ -73,6 +75,13 @@ lemma hom_inv_id : hom f g ≫ inv f g = 𝟙 _ := by
   simp [hom, inv, lift_desc_f _ _ _ _ _ _ _ n (n+1) rfl, ext_from_iff _ (n + 1) _ rfl]
 
 set_option maxHeartbeats 400000 in
+/-- Given two composable morphisms `f` and `g` in the category of cochain complexes,
+
+this is the `homotopyInvHomId` field of the homotopy equivalence
+
+`mappingConeCompHomotopyEquiv f g` between `mappingCone g` and the mapping cone of
+
+the morphism `mappingCone f ⟶ mappingCone (f ≫ g)`. -/
 
 noncomputable def homotopyInvHomId : Homotopy (inv f g ≫ hom f g) (𝟙 _) :=
   (Cochain.equivHomotopy _ _).symm ⟨-((snd _).comp ((fst (f ≫ g)).1.comp

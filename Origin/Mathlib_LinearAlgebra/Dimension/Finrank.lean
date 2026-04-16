@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.Basic
 import Mathlib.SetTheory.Cardinal.ToNat
 
+noncomputable section
+
 /-!
 # Finite dimension of vector spaces
 

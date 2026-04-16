@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Function
 import Mathlib.Logic.Equiv.Defs
 import Mathlib.Tactic.Says
 
+noncomputable section
+
 /-!
 # Equivalences and sets
 
@@ -191,16 +193,6 @@ theorem union_apply_right {α} {s t : Set α} [DecidablePred fun x => x ∈ s] (
     {a : (s ∪ t : Set α)} (ha : ↑a ∈ t) : Equiv.Set.union H a = Sum.inr ⟨a, ha⟩ :=
   dif_neg fun h => Set.disjoint_left.mp H h ha
 
-@[simp]
-theorem union_symm_apply_left {α} {s t : Set α} [DecidablePred fun x => x ∈ s] (H : Disjoint s t)
-    (a : s) : (Equiv.Set.union H).symm (Sum.inl a) = ⟨a, by simp⟩ :=
-  rfl
-
-@[simp]
-theorem union_symm_apply_right {α} {s t : Set α} [DecidablePred fun x => x ∈ s] (H : Disjoint s t)
-    (a : t) : (Equiv.Set.union H).symm (Sum.inr a) = ⟨a, by simp⟩ :=
-  rfl
-
 protected def singleton {α} (a : α) : ({a} : Set α) ≃ PUnit.{u} :=
   ⟨fun _ => PUnit.unit, fun _ => ⟨a, mem_singleton _⟩, fun ⟨x, h⟩ => by
     simp? at h says simp only [mem_singleton_iff] at h
@@ -220,16 +212,6 @@ protected def insert {α} {s : Set.{u} α} [DecidablePred (· ∈ s)] {a : α} (
     (insert a s : Set α) ≃ ↥(s ∪ {a}) := Equiv.Set.ofEq (by simp)
     _ ≃ s ⊕ ({a} : Set α) := Equiv.Set.union <| by simpa
     _ ≃ s ⊕ PUnit.{u + 1} := sumCongr (Equiv.refl _) (Equiv.Set.singleton _)
-
-@[simp]
-theorem insert_symm_apply_inl {α} {s : Set.{u} α} [DecidablePred (· ∈ s)] {a : α} (H : a ∉ s)
-    (b : s) : (Equiv.Set.insert H).symm (Sum.inl b) = ⟨b, Or.inr b.2⟩ :=
-  rfl
-
-@[simp]
-theorem insert_symm_apply_inr {α} {s : Set.{u} α} [DecidablePred (· ∈ s)] {a : α} (H : a ∉ s)
-    (b : PUnit.{u + 1}) : (Equiv.Set.insert H).symm (Sum.inr b) = ⟨a, Or.inl rfl⟩ :=
-  rfl
 
 @[simp]
 theorem insert_apply_left {α} {s : Set.{u} α} [DecidablePred (· ∈ s)] {a : α} (H : a ∉ s) :
@@ -418,32 +400,6 @@ noncomputable def rangeSplittingImageEquiv {α β : Type*} (f : α → β) (s : 
     rcases x with ⟨x, ⟨y, ⟨m, rfl⟩⟩⟩
     simp [apply_rangeSplitting f]
   right_inv x := by simp [apply_rangeSplitting f]
-
-@[simps symm_apply_coe]
-def rangeInl (α β : Type*) : Set.range (Sum.inl : α → α ⊕ β) ≃ α where
-  toFun
-  | ⟨.inl x, _⟩ => x
-  | ⟨.inr _, h⟩ => False.elim <| by rcases h with ⟨x, h'⟩; cases h'
-  invFun x := ⟨.inl x, mem_range_self _⟩
-  left_inv := fun ⟨_, _, rfl⟩ => rfl
-  right_inv _ := rfl
-
-@[simp] lemma rangeInl_apply_inl {α : Type*} (β : Type*) (x : α) :
-    (rangeInl α β) ⟨.inl x, mem_range_self _⟩ = x :=
-  rfl
-
-@[simps symm_apply_coe]
-def rangeInr (α β : Type*) : Set.range (Sum.inr : β → α ⊕ β) ≃ β where
-  toFun
-  | ⟨.inl _, h⟩ => False.elim <| by rcases h with ⟨x, h'⟩; cases h'
-  | ⟨.inr x, _⟩ => x
-  invFun x := ⟨.inr x, mem_range_self _⟩
-  left_inv := fun ⟨_, _, rfl⟩ => rfl
-  right_inv _ := rfl
-
-@[simp] lemma rangeInr_apply_inr (α : Type*) {β : Type*} (x : β) :
-    (rangeInr α β) ⟨.inr x, mem_range_self _⟩ = x :=
-  rfl
 
 end Set
 

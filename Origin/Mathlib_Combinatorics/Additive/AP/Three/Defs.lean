@@ -1,12 +1,14 @@
 /-
 Extracted from Combinatorics/Additive/AP/Three/Defs.lean
-Genuine: 40 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Interval.Finset
 import Mathlib.Algebra.SMulWithZero
 import Mathlib.Combinatorics.Additive.FreimanHom
 import Mathlib.Order.Interval.Finset.Fin
+
+noncomputable section
 
 /-!
 # Sets without arithmetic progressions of length three and Roth numbers
@@ -119,6 +121,8 @@ lemma threeGPFree_image (hf : IsMulFreimanIso 2 s t f) (hAs : A ⊆ s) :
     [((hf.bijOn.injOn.mono hAs).bijOn_image (f := f)).forall,
     hf.mul_eq_mul (hAs _) (hAs _) (hAs _) (hAs _), this.injOn.eq_iff]
 
+@[to_additive] alias ⟨_, ThreeGPFree.image⟩ := threeGPFree_image
+
 @[to_additive
 "Arithmetic progressions of length three are reflected under `2`-Freiman homomorphisms."]
 lemma IsMulFreimanHom.threeGPFree (hf : IsMulFreimanHom 2 s t f) (hf' : s.InjOn f)
@@ -201,9 +205,16 @@ section CancelCommMonoidWithZero
 
 variable [CancelCommMonoidWithZero α] [NoZeroDivisors α] {s : Set α} {a : α}
 
--- DISSOLVED: ThreeGPFree.smul_set₀
+lemma ThreeGPFree.smul_set₀ (hs : ThreeGPFree s) (ha : a ≠ 0) : ThreeGPFree (a • s) := by
+  rintro _ ⟨b, hb, rfl⟩ _ ⟨c, hc, rfl⟩ _ ⟨d, hd, rfl⟩ h
+  exact congr_arg (a • ·) <| hs hb hc hd <| by simpa [mul_mul_mul_comm _ _ a, ha] using h
 
--- DISSOLVED: threeGPFree_smul_set₀
+theorem threeGPFree_smul_set₀ (ha : a ≠ 0) : ThreeGPFree (a • s) ↔ ThreeGPFree s :=
+  ⟨fun hs b hb c hc d hd h ↦
+    mul_left_cancel₀ ha
+      (hs (Set.mem_image_of_mem _ hb) (Set.mem_image_of_mem _ hc) (Set.mem_image_of_mem _ hd) <| by
+        rw [smul_eq_mul, smul_eq_mul, mul_mul_mul_comm, h, mul_mul_mul_comm]),
+    fun hs => hs.smul_set₀ ha⟩
 
 end CancelCommMonoidWithZero
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Idempotents
 import Mathlib.RingTheory.Smooth.Basic
 
+noncomputable section
+
 /-!
 
 # Formal-smoothness of finite products of rings

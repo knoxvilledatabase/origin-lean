@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.DFinsupp.Module
 import Mathlib.Data.Fintype.Quotient
 
+noncomputable section
+
 /-!
 # `DFinsupp` on `Sigma` types
 
@@ -52,11 +54,6 @@ def sigmaCurry [∀ i j, Zero (δ i j)] (f : Π₀ (i : Σ _, _), δ i.1 i.2) :
 @[simp]
 theorem sigmaCurry_apply [∀ i j, Zero (δ i j)] (f : Π₀ (i : Σ _, _), δ i.1 i.2) (i : ι) (j : α i) :
     sigmaCurry f i j = f ⟨i, j⟩ :=
-  rfl
-
-@[simp]
-theorem sigmaCurry_zero [∀ i j, Zero (δ i j)] :
-    sigmaCurry (0 : Π₀ (i : Σ _, _), δ i.1 i.2) = 0 :=
   rfl
 
 @[simp]
@@ -113,11 +110,6 @@ def sigmaUncurry [∀ i j, Zero (δ i j)] [DecidableEq ι] (f : Π₀ (i) (j), �
 theorem sigmaUncurry_apply [∀ i j, Zero (δ i j)]
     (f : Π₀ (i) (j), δ i j) (i : ι) (j : α i) :
     sigmaUncurry f ⟨i, j⟩ = f i j :=
-  rfl
-
-@[simp]
-theorem sigmaUncurry_zero [∀ i j, Zero (δ i j)] :
-    sigmaUncurry (0 : Π₀ (i) (j), δ i j) = 0 :=
   rfl
 
 @[simp]

@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/Finsupp/LinearCombination.lean
-Genuine: 43 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Equiv
 import Mathlib.LinearAlgebra.Finsupp.Supported
+
+noncomputable section
 
 /-!
 # `Finsupp.linearCombination`
@@ -228,7 +230,15 @@ theorem linearCombination_comapDomain (f : α → α') (l : α' →₀ R)
       (l.support.preimage f hf).sum fun i => l (f i) • v i := by
   rw [linearCombination_apply]; rfl
 
--- DISSOLVED: linearCombination_onFinset
+theorem linearCombination_onFinset {s : Finset α} {f : α → R} (g : α → M)
+    (hf : ∀ a, f a ≠ 0 → a ∈ s) :
+    linearCombination R g (Finsupp.onFinset s f hf) = Finset.sum s fun x : α => f x • g x := by
+  classical
+  simp only [linearCombination_apply, Finsupp.sum, Finsupp.onFinset_apply, Finsupp.support_onFinset]
+  rw [Finset.sum_filter_of_ne]
+  intro x _ h
+  contrapose! h
+  simp [h]
 
 end LinearCombination
 

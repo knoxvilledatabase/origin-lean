@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.FieldTheory.SeparableDegree
 import Mathlib.FieldTheory.IsSepClosed
 
+noncomputable section
+
 /-!
 
 # Separable closure
@@ -215,8 +217,6 @@ def sepDegree := Module.rank F (separableClosure F E)
 def insepDegree := Module.rank (separableClosure F E) E
 
 def finInsepDegree : ℕ := finrank (separableClosure F E) E
-
-theorem finInsepDegree_def' : finInsepDegree F E = Cardinal.toNat (insepDegree F E) := rfl
 
 instance instNeZeroSepDegree : NeZero (sepDegree F E) := ⟨rank_pos.ne'⟩
 

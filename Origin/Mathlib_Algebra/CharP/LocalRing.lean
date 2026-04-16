@@ -7,6 +7,8 @@ import Mathlib.Algebra.IsPrimePow
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.RingTheory.LocalRing.ResidueField.Defs
 
+noncomputable section
+
 /-!
 # Characteristics of local rings
 

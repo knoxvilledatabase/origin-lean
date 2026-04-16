@@ -1,11 +1,13 @@
 /-
 Extracted from MeasureTheory/Measure/FiniteMeasure.lean
-Genuine: 62 | Conflates: 0 | Dissolved: 2 | Infrastructure: 26
+Genuine: 64 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
 -/
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.WeakDual
 import Mathlib.MeasureTheory.Integral.BoundedContinuousFunction
 import Mathlib.MeasureTheory.Measure.HasOuterApproxClosed
+
+noncomputable section
 
 /-!
 # Finite measures
@@ -115,9 +117,6 @@ instance instCoe : Coe (FiniteMeasure Ω) (MeasureTheory.Measure Ω) := { coe :=
 
 instance isFiniteMeasure (μ : FiniteMeasure Ω) : IsFiniteMeasure (μ : Measure Ω) := μ.prop
 
-@[simp]
-theorem val_eq_toMeasure (ν : FiniteMeasure Ω) : ν.val = (ν : Measure Ω) := rfl
-
 theorem toMeasure_injective : Function.Injective ((↑) : FiniteMeasure Ω → Measure Ω) :=
   Subtype.coe_injective
 
@@ -125,15 +124,6 @@ instance instFunLike : FunLike (FiniteMeasure Ω) (Set Ω) ℝ≥0 where
   coe μ s := ((μ : Measure Ω) s).toNNReal
   coe_injective' μ ν h := toMeasure_injective <| Measure.ext fun s _ ↦ by
     simpa [ENNReal.toNNReal_eq_toNNReal_iff, measure_ne_top] using congr_fun h s
-
-lemma coeFn_def (μ : FiniteMeasure Ω) : μ = fun s ↦ ((μ : Measure Ω) s).toNNReal := rfl
-
-lemma coeFn_mk (μ : Measure Ω) (hμ) :
-    DFunLike.coe (F := FiniteMeasure Ω) ⟨μ, hμ⟩ = fun s ↦ (μ s).toNNReal := rfl
-
-@[simp, norm_cast]
-lemma mk_apply (μ : Measure Ω) (hμ) (s : Set Ω) :
-    DFunLike.coe (F := FiniteMeasure Ω) ⟨μ, hμ⟩ s = (μ s).toNNReal := rfl
 
 @[simp]
 theorem ennreal_coeFn_eq_coeFn_toMeasure (ν : FiniteMeasure Ω) (s : Set Ω) :
@@ -160,8 +150,6 @@ theorem ennreal_mass {μ : FiniteMeasure Ω} : (μ.mass : ℝ≥0∞) = (μ : Me
 
 instance instZero : Zero (FiniteMeasure Ω) where zero := ⟨0, MeasureTheory.isFiniteMeasureZero⟩
 
-@[simp, norm_cast] lemma coeFn_zero : ⇑(0 : FiniteMeasure Ω) = 0 := rfl
-
 @[simp]
 theorem zero_mass : (0 : FiniteMeasure Ω).mass = 0 := rfl
 
@@ -172,7 +160,8 @@ theorem mass_zero_iff (μ : FiniteMeasure Ω) : μ.mass = 0 ↔ μ = 0 := by
   apply Measure.measure_univ_eq_zero.mp
   rwa [← ennreal_mass, ENNReal.coe_eq_zero]
 
--- DISSOLVED: mass_nonzero_iff
+theorem mass_nonzero_iff (μ : FiniteMeasure Ω) : μ.mass ≠ 0 ↔ μ ≠ 0 :=
+  not_iff_not.mpr <| FiniteMeasure.mass_zero_iff μ
 
 @[ext]
 theorem eq_of_forall_toMeasure_apply_eq (μ ν : FiniteMeasure Ω)
@@ -239,9 +228,6 @@ def restrict (μ : FiniteMeasure Ω) (A : Set Ω) : FiniteMeasure Ω where
   val := (μ : Measure Ω).restrict A
   property := MeasureTheory.isFiniteMeasureRestrict (μ : Measure Ω) A
 
-theorem restrict_measure_eq (μ : FiniteMeasure Ω) (A : Set Ω) :
-    (μ.restrict A : Measure Ω) = (μ : Measure Ω).restrict A := rfl
-
 theorem restrict_apply_measure (μ : FiniteMeasure Ω) (A : Set Ω) {s : Set Ω}
     (s_mble : MeasurableSet s) : (μ.restrict A : Measure Ω) s = (μ : Measure Ω) (s ∩ A) :=
   Measure.restrict_apply s_mble
@@ -257,7 +243,8 @@ theorem restrict_mass (μ : FiniteMeasure Ω) (A : Set Ω) : (μ.restrict A).mas
 theorem restrict_eq_zero_iff (μ : FiniteMeasure Ω) (A : Set Ω) : μ.restrict A = 0 ↔ μ A = 0 := by
   rw [← mass_zero_iff, restrict_mass]
 
--- DISSOLVED: restrict_nonzero_iff
+theorem restrict_nonzero_iff (μ : FiniteMeasure Ω) (A : Set Ω) : μ.restrict A ≠ 0 ↔ μ A ≠ 0 := by
+  rw [← mass_nonzero_iff, restrict_mass]
 
 variable [TopologicalSpace Ω]
 
@@ -366,10 +353,6 @@ def toWeakDualBCNN (μ : FiniteMeasure Ω) : WeakDual ℝ≥0 (Ω →ᵇ ℝ≥0
   map_add' := testAgainstNN_add μ
   map_smul' := testAgainstNN_smul μ
   cont := μ.testAgainstNN_lipschitz.continuous
-
-@[simp]
-theorem coe_toWeakDualBCNN (μ : FiniteMeasure Ω) : ⇑μ.toWeakDualBCNN = μ.testAgainstNN :=
-  rfl
 
 @[simp]
 theorem toWeakDualBCNN_apply (μ : FiniteMeasure Ω) (f : Ω →ᵇ ℝ≥0) :
@@ -586,9 +569,6 @@ noncomputable def map (ν : FiniteMeasure Ω) (f : Ω → Ω') : FiniteMeasure �
     · rw [Measure.map_apply_of_aemeasurable f_aemble MeasurableSet.univ]
       exact measure_lt_top (↑ν) (f ⁻¹' univ)
     · simp [Measure.map, f_aemble]⟩
-
-@[simp] lemma toMeasure_map (ν : FiniteMeasure Ω) (f : Ω → Ω') :
-    (ν.map f).toMeasure = ν.toMeasure.map f := rfl
 
 lemma map_apply' (ν : FiniteMeasure Ω) {f : Ω → Ω'} (f_aemble : AEMeasurable f ν)
     {A : Set Ω'} (A_mble : MeasurableSet A) :

@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.StrictInitial
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts
 
+noncomputable section
+
 /-!
 
 # Universal colimits and van Kampen colimits

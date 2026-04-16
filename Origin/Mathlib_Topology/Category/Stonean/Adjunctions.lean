@@ -7,6 +7,8 @@ import Mathlib.Topology.Category.Stonean.Basic
 import Mathlib.Topology.Category.TopCat.Adjunctions
 import Mathlib.Topology.StoneCech
 
+noncomputable section
+
 /-!
 # Adjunctions involving the category of Stonean spaces
 

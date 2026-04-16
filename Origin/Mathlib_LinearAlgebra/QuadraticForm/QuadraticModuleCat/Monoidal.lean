@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 import Mathlib.LinearAlgebra.QuadraticForm.QuadraticModuleCat
 import Mathlib.LinearAlgebra.QuadraticForm.TensorProduct.Isometries
 
+noncomputable section
+
 /-!
 # The monoidal category structure on quadratic R-modules
 
@@ -68,10 +70,6 @@ instance : MonoidalCategoryStruct (QuadraticModuleCat.{u} R) where
 theorem forget₂_map_associator_hom (X Y Z : QuadraticModuleCat.{u} R) :
     (forget₂ (QuadraticModuleCat R) (ModuleCat R)).map (α_ X Y Z).hom =
       (α_ X.toModuleCat Y.toModuleCat Z.toModuleCat).hom := rfl
-
-theorem forget₂_map_associator_inv (X Y Z : QuadraticModuleCat.{u} R) :
-    (forget₂ (QuadraticModuleCat R) (ModuleCat R)).map (α_ X Y Z).inv =
-      (α_ X.toModuleCat Y.toModuleCat Z.toModuleCat).inv := rfl
 
 noncomputable instance instMonoidalCategory : MonoidalCategory (QuadraticModuleCat.{u} R) :=
   Monoidal.induced

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.TwoSidedIdeal.Lattice
 import Mathlib.Topology.ContinuousMap.Bounded.Basic
 
+noncomputable section
+
 /-!
 # Compactly supported bounded continuous functions
 

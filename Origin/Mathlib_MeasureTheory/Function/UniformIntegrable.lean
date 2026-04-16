@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Function/UniformIntegrable.lean
-Genuine: 43 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.ConvergenceInMeasure
 import Mathlib.MeasureTheory.Function.L1Space
+
+noncomputable section
 
 /-!
 # Uniform integrability
@@ -794,9 +796,55 @@ theorem uniformIntegrable_of [IsFiniteMeasure μ] (hp : 1 ≤ p) (hp' : p ≠ �
   · rw [Set.indicator_of_not_mem hfx, Set.indicator_of_not_mem]
     rwa [Set.mem_setOf, hx] at hfx
 
--- DISSOLVED: UniformIntegrable.spec'
+theorem UniformIntegrable.spec' (hp : p ≠ 0) (hp' : p ≠ ∞) (hf : ∀ i, StronglyMeasurable (f i))
+    (hfu : UniformIntegrable f p μ) {ε : ℝ} (hε : 0 < ε) :
+    ∃ C : ℝ≥0, ∀ i, eLpNorm ({ x | C ≤ ‖f i x‖₊ }.indicator (f i)) p μ ≤ ENNReal.ofReal ε := by
+  obtain ⟨-, hfu, M, hM⟩ := hfu
+  obtain ⟨δ, hδpos, hδ⟩ := hfu hε
+  obtain ⟨C, hC⟩ : ∃ C : ℝ≥0, ∀ i, μ { x | C ≤ ‖f i x‖₊ } ≤ ENNReal.ofReal δ := by
+    by_contra hcon; push_neg at hcon
+    choose ℐ hℐ using hcon
+    lift δ to ℝ≥0 using hδpos.le
+    have : ∀ C : ℝ≥0, C • (δ : ℝ≥0∞) ^ (1 / p.toReal) ≤ eLpNorm (f (ℐ C)) p μ := by
+      intro C
+      calc
+        C • (δ : ℝ≥0∞) ^ (1 / p.toReal) ≤ C • μ { x | C ≤ ‖f (ℐ C) x‖₊ } ^ (1 / p.toReal) := by
+          rw [ENNReal.smul_def, ENNReal.smul_def, smul_eq_mul, smul_eq_mul]
+          simp_rw [ENNReal.ofReal_coe_nnreal] at hℐ
+          refine mul_le_mul' le_rfl
+            (ENNReal.rpow_le_rpow (hℐ C).le (one_div_nonneg.2 ENNReal.toReal_nonneg))
+        _ ≤ eLpNorm ({ x | C ≤ ‖f (ℐ C) x‖₊ }.indicator (f (ℐ C))) p μ := by
+          refine le_eLpNorm_of_bddBelow hp hp' _
+            (measurableSet_le measurable_const (hf _).nnnorm.measurable)
+            (Eventually.of_forall fun x hx => ?_)
+          rwa [nnnorm_indicator_eq_indicator_nnnorm, Set.indicator_of_mem hx]
+        _ ≤ eLpNorm (f (ℐ C)) p μ := eLpNorm_indicator_le _
+    specialize this (2 * max M 1 * δ⁻¹ ^ (1 / p.toReal))
+    rw [← ENNReal.coe_rpow_of_nonneg _ (one_div_nonneg.2 ENNReal.toReal_nonneg), ← ENNReal.coe_smul,
+      smul_eq_mul, mul_assoc, NNReal.inv_rpow,
+      inv_mul_cancel₀ (NNReal.rpow_pos (NNReal.coe_pos.1 hδpos)).ne.symm, mul_one, ENNReal.coe_mul,
+      ← NNReal.inv_rpow] at this
+    refine (lt_of_le_of_lt (le_trans
+      (hM <| ℐ <| 2 * max M 1 * δ⁻¹ ^ (1 / p.toReal)) (le_max_left (M : ℝ≥0∞) 1))
+        (lt_of_lt_of_le ?_ this)).ne rfl
+    rw [← ENNReal.coe_one, ← ENNReal.coe_max, ← ENNReal.coe_mul, ENNReal.coe_lt_coe]
+    exact lt_two_mul_self (lt_max_of_lt_right one_pos)
+  exact ⟨C, fun i => hδ i _ (measurableSet_le measurable_const (hf i).nnnorm.measurable) (hC i)⟩
 
--- DISSOLVED: UniformIntegrable.spec
+theorem UniformIntegrable.spec (hp : p ≠ 0) (hp' : p ≠ ∞) (hfu : UniformIntegrable f p μ) {ε : ℝ}
+    (hε : 0 < ε) :
+    ∃ C : ℝ≥0, ∀ i, eLpNorm ({ x | C ≤ ‖f i x‖₊ }.indicator (f i)) p μ ≤ ENNReal.ofReal ε := by
+  set g : ι → α → β := fun i => (hfu.1 i).choose
+  have hgmeas : ∀ i, StronglyMeasurable (g i) := fun i => (Exists.choose_spec <| hfu.1 i).1
+  have hgunif : UniformIntegrable g p μ := hfu.ae_eq fun i => (Exists.choose_spec <| hfu.1 i).2
+  obtain ⟨C, hC⟩ := hgunif.spec' hp hp' hgmeas hε
+  refine ⟨C, fun i => le_trans (le_of_eq <| eLpNorm_congr_ae ?_) (hC i)⟩
+  filter_upwards [(Exists.choose_spec <| hfu.1 i).2] with x hx
+  by_cases hfx : x ∈ { x | C ≤ ‖f i x‖₊ }
+  · rw [Set.indicator_of_mem hfx, Set.indicator_of_mem, hx]
+    rwa [Set.mem_setOf, hx] at hfx
+  · rw [Set.indicator_of_not_mem hfx, Set.indicator_of_not_mem]
+    rwa [Set.mem_setOf, hx] at hfx
 
 theorem uniformIntegrable_iff [IsFiniteMeasure μ] (hp : 1 ≤ p) (hp' : p ≠ ∞) :
     UniformIntegrable f p μ ↔

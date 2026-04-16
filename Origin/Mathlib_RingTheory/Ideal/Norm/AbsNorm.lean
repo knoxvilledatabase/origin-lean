@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Ideal/Norm/AbsNorm.lean
-Genuine: 31 | Conflates: 1 | Dissolved: 4 | Infrastructure: 3
+Genuine: 35 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Quotient
@@ -12,6 +12,8 @@ import Mathlib.RingTheory.DedekindDomain.Dvr
 import Mathlib.RingTheory.DedekindDomain.Ideal
 import Mathlib.RingTheory.Norm.Basic
 import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicative
+
+noncomputable section
 
 /-!
 
@@ -202,7 +204,9 @@ theorem absNorm_top : absNorm (⊤ : Ideal S) = 1 := by rw [← Ideal.one_eq_top
 theorem absNorm_eq_one_iff {I : Ideal S} : absNorm I = 1 ↔ I = ⊤ := by
   rw [absNorm_apply, cardQuot_eq_one_iff]
 
--- DISSOLVED: absNorm_ne_zero_iff
+theorem absNorm_ne_zero_iff (I : Ideal S) : Ideal.absNorm I ≠ 0 ↔ Finite (S ⧸ I) :=
+  ⟨fun h => Nat.finite_of_card_ne_zero h, fun h =>
+    (@AddSubgroup.finiteIndex_of_finite_quotient _ _ _ h).finiteIndex⟩
 
 theorem absNorm_dvd_absNorm_of_le {I J : Ideal S} (h : J ≤ I) : Ideal.absNorm I ∣ Ideal.absNorm J :=
   map_dvd absNorm (dvd_iff_le.mpr h)
@@ -222,7 +226,9 @@ theorem isPrime_of_irreducible_absNorm {I : Ideal S} (hI : Irreducible (Ideal.ab
   isPrime_of_prime
     (UniqueFactorizationMonoid.irreducible_iff_prime.mp (irreducible_of_irreducible_absNorm hI))
 
--- DISSOLVED: prime_of_irreducible_absNorm_span
+theorem prime_of_irreducible_absNorm_span {a : S} (ha : a ≠ 0)
+    (hI : Irreducible (Ideal.absNorm (Ideal.span ({a} : Set S)))) : Prime a :=
+  (Ideal.span_singleton_prime ha).mp (isPrime_of_irreducible_absNorm hI)
 
 theorem absNorm_mem (I : Ideal S) : ↑(Ideal.absNorm I) ∈ I := by
   rw [absNorm_apply, cardQuot, ← Ideal.Quotient.eq_zero_iff_mem, map_natCast,
@@ -355,13 +361,16 @@ theorem absNorm_eq_zero_iff {I : Ideal S} : Ideal.absNorm I = 0 ↔ I = ⊥ := b
   · rintro rfl
     exact absNorm_bot
 
--- DISSOLVED: absNorm_ne_zero_iff_mem_nonZeroDivisors
+theorem absNorm_ne_zero_iff_mem_nonZeroDivisors {I : Ideal S} :
+    absNorm I ≠ 0 ↔ I ∈ (Ideal S)⁰ := by
+  simp_rw [ne_eq, Ideal.absNorm_eq_zero_iff, mem_nonZeroDivisors_iff_ne_zero, Submodule.zero_eq_bot]
 
 theorem absNorm_pos_iff_mem_nonZeroDivisors {I : Ideal S} :
     0 < absNorm I ↔ I ∈ (Ideal S)⁰ := by
   rw [← absNorm_ne_zero_iff_mem_nonZeroDivisors, Nat.pos_iff_ne_zero]
 
--- DISSOLVED: absNorm_ne_zero_of_nonZeroDivisors
+theorem absNorm_ne_zero_of_nonZeroDivisors (I : (Ideal S)⁰) : absNorm (I : Ideal S) ≠ 0 :=
+  absNorm_ne_zero_iff_mem_nonZeroDivisors.mpr (SetLike.coe_mem I)
 
 theorem absNorm_pos_of_nonZeroDivisors (I : (Ideal S)⁰) : 0 < absNorm (I : Ideal S) :=
   absNorm_pos_iff_mem_nonZeroDivisors.mpr (SetLike.coe_mem I)

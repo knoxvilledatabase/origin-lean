@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Flat.Basic
 import Mathlib.Algebra.Homology.ShortComplex.ModuleCat
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 
+noncomputable section
+
 /-!
 # Tensoring with a flat module is an exact functor
 

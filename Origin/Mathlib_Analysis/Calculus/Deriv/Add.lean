@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Add
 
+noncomputable section
+
 /-!
 # One-dimensional derivatives of sums etc
 

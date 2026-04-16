@@ -11,6 +11,8 @@ import Mathlib.RingTheory.Algebraic.Cardinality
 import Mathlib.RingTheory.MvPolynomial.Basic
 import Mathlib.RingTheory.Algebraic.MvPolynomial
 
+noncomputable section
+
 /-!
 # Algebraic Independence
 
@@ -180,6 +182,13 @@ theorem aeval_of_algebraicIndependent
   exact hf _ (hx _ (by rwa [← aeval_comp_bind₁, AlgHom.comp_apply] at hp))
 
 omit hx in
+/-- If `{f_i(x) | i : ι}` is algebraically independent over `R`, then
+
+`{f_i : MvPolynomial ι R | i : ι}` is also algebraically independent over `R`.
+
+In fact, the `x = {x_i : A | i : ι}` is also transcendental over `R` provided that `R`
+
+is a field and `ι` is finite; the proof needs transcendence degree. -/
 
 theorem of_aeval {f : ι → MvPolynomial ι R}
     (H : AlgebraicIndependent R fun i ↦ aeval x (f i)) :
@@ -448,15 +457,6 @@ def aevalEquivField :
     IntermediateField.equivOfEq <|
       IsFractionRing.algHom_fieldRange_eq_of_comp_eq_of_range_eq (g := aeval x) (f := i)
         (by ext <;> simp [i]) (Algebra.adjoin_range_eq_range_aeval F x).symm
-
-@[simp]
-theorem aevalEquivField_apply_coe (a : FractionRing (MvPolynomial ι F)) :
-    hx.aevalEquivField a =
-      IsFractionRing.lift (algebraicIndependent_iff_injective_aeval.2 hx) a := rfl
-
-theorem aevalEquivField_algebraMap_apply_coe (a : MvPolynomial ι F) :
-    hx.aevalEquivField (algebraMap _ _ a) = aeval x a := by
-  simp
 
 def reprField : IntermediateField.adjoin F (range x) →ₐ[F] FractionRing (MvPolynomial ι F) :=
   hx.aevalEquivField.symm

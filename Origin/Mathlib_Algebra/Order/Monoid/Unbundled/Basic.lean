@@ -9,6 +9,8 @@ import Mathlib.Order.MinMax
 import Mathlib.Tactic.Contrapose
 import Mathlib.Tactic.Use
 
+noncomputable section
+
 /-!
 # Ordered monoids
 

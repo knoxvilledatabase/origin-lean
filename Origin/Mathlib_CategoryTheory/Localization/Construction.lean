@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.MorphismProperty.Composition
 import Mathlib.CategoryTheory.MorphismProperty.IsInvertedBy
 import Mathlib.CategoryTheory.Category.Quiv
 
+noncomputable section
+
 /-!
 
 # Construction of the localized category

@@ -1,9 +1,11 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Equitabilise.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Order.Partition.Equipartition
+
+noncomputable section
 
 /-!
 # Equitabilising a partition
@@ -149,9 +151,28 @@ variable (P h)
 theorem card_filter_equitabilise_big : #{u ∈ (P.equitabilise h).parts | #u = m + 1} = b :=
   (P.equitabilise_aux h).choose_spec.2.2
 
--- DISSOLVED: card_filter_equitabilise_small
+theorem card_filter_equitabilise_small (hm : m ≠ 0) :
+    #{u ∈ (P.equitabilise h).parts | #u = m} = a := by
+  refine (mul_eq_mul_right_iff.1 <| (add_left_inj (b * (m + 1))).1 ?_).resolve_right hm
+  rw [h, ← (P.equitabilise h).sum_card_parts]
+  have hunion :
+    (P.equitabilise h).parts =
+      {u ∈ (P.equitabilise h).parts | #u = m} ∪ {u ∈ (P.equitabilise h).parts | #u = m + 1} := by
+    rw [← filter_or, filter_true_of_mem]
+    exact fun x => card_eq_of_mem_parts_equitabilise
+  nth_rw 2 [hunion]
+  rw [sum_union, sum_const_nat fun x hx => (mem_filter.1 hx).2,
+    sum_const_nat fun x hx => (mem_filter.1 hx).2, P.card_filter_equitabilise_big]
+  refine disjoint_filter_filter' _ _ ?_
+  intro x ha hb i h
+  apply succ_ne_self m _
+  exact (hb i h).symm.trans (ha i h)
 
--- DISSOLVED: card_parts_equitabilise
+theorem card_parts_equitabilise (hm : m ≠ 0) : #(P.equitabilise h).parts = a + b := by
+  rw [← filter_true_of_mem fun x => card_eq_of_mem_parts_equitabilise, filter_or,
+    card_union_of_disjoint, P.card_filter_equitabilise_small _ hm, P.card_filter_equitabilise_big]
+  -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11187): was `infer_instance`
+  exact disjoint_filter.2 fun x _ h₀ h₁ => Nat.succ_ne_self m <| h₁.symm.trans h₀
 
 theorem card_parts_equitabilise_subset_le :
     t ∈ P.parts → #(t \ {u ∈ (P.equitabilise h).parts | u ⊆ t}.biUnion id) ≤ m :=
@@ -159,6 +180,16 @@ theorem card_parts_equitabilise_subset_le :
 
 variable (s)
 
--- DISSOLVED: exists_equipartition_card_eq
+theorem exists_equipartition_card_eq (hn : n ≠ 0) (hs : n ≤ #s) :
+    ∃ P : Finpartition s, P.IsEquipartition ∧ #P.parts = n := by
+  rw [← pos_iff_ne_zero] at hn
+  have : (n - #s % n) * (#s / n) + #s % n * (#s / n + 1) = #s := by
+    rw [tsub_mul, mul_add, ← add_assoc,
+      tsub_add_cancel_of_le (Nat.mul_le_mul_right _ (mod_lt _ hn).le), mul_one, add_comm,
+      mod_add_div]
+  refine
+    ⟨(indiscrete (card_pos.1 <| hn.trans_le hs).ne_empty).equitabilise this,
+      equitabilise_isEquipartition, ?_⟩
+  rw [card_parts_equitabilise _ _ (Nat.div_pos hs hn).ne', tsub_add_cancel_of_le (mod_lt _ hn).le]
 
 end Finpartition

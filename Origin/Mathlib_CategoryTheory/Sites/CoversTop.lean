@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheaf
 
+noncomputable section
+
 /-! Objects which cover the terminal object
 
 In this file, given a site `(C, J)`, we introduce the notion of a family

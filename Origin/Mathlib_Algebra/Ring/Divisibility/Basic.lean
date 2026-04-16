@@ -7,6 +7,8 @@ import Mathlib.Algebra.Divisibility.Hom
 import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Algebra.Ring.Defs
 
+noncomputable section
+
 /-!
 # Lemmas about divisibility in rings
 

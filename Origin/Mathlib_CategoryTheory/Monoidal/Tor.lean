@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Abelian.LeftDerived
 import Mathlib.CategoryTheory.Monoidal.Preadditive
 
+noncomputable section
+
 /-!
 # Tor, the left-derived functor of tensor product
 
@@ -42,15 +44,6 @@ def Tor' (n : ℕ) : C ⥤ C ⥤ C :=
   Functor.flip
     { obj := fun X => Functor.leftDerived ((tensoringRight C).obj X) n
       map := fun f => NatTrans.leftDerived ((tensoringRight C).map f) n }
-
-@[simp]
-lemma Tor'_map_app' (n : ℕ) {X Y : C} (f : X ⟶ Y) (Z : C) :
-    ((Tor' C n).map f).app Z = (Functor.leftDerived ((tensoringRight C).obj Z) n).map f := by
-  rfl
-
-@[simp]
-lemma Tor'_obj_map (n : ℕ) {X Y : C} (Z : C) (f : X ⟶ Y) :
-    ((Tor' C n).obj Z).map f = (NatTrans.leftDerived ((tensoringRight C).map f) n).app Z := rfl
 
 lemma isZero_Tor_succ_of_projective (X Y : C) [Projective Y] (n : ℕ) :
     IsZero (((Tor C (n + 1)).obj X).obj Y) := by

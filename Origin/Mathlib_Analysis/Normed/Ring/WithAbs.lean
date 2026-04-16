@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.AbsoluteValue
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Analysis.Normed.Module.Completion
 
+noncomputable section
+
 /-!
 # WithAbs
 
@@ -60,42 +62,6 @@ instance normedField (v : AbsoluteValue K ℝ) : NormedField (WithAbs v) :=
 /-! `WithAbs.equiv` preserves the ring structure. -/
 
 variable (x y : WithAbs v) (r s : R)
-
-@[simp]
-theorem equiv_zero : WithAbs.equiv v 0 = 0 := rfl
-
-@[simp]
-theorem equiv_symm_zero : (WithAbs.equiv v).symm 0 = 0 := rfl
-
-@[simp]
-theorem equiv_add : WithAbs.equiv v (x + y) = WithAbs.equiv v x + WithAbs.equiv v y := rfl
-
-@[simp]
-theorem equiv_symm_add :
-    (WithAbs.equiv v).symm (r + s) = (WithAbs.equiv v).symm r + (WithAbs.equiv v).symm s :=
-  rfl
-
-@[simp]
-theorem equiv_sub [Ring R] : WithAbs.equiv v (x - y) = WithAbs.equiv v x - WithAbs.equiv v y := rfl
-
-@[simp]
-theorem equiv_symm_sub [Ring R] :
-    (WithAbs.equiv v).symm (r - s) = (WithAbs.equiv v).symm r - (WithAbs.equiv v).symm s :=
-  rfl
-
-@[simp]
-theorem equiv_neg [Ring R] : WithAbs.equiv v (-x) = - WithAbs.equiv v x := rfl
-
-@[simp]
-theorem equiv_symm_neg [Ring R] : (WithAbs.equiv v).symm (-r) = - (WithAbs.equiv v).symm r := rfl
-
-@[simp]
-theorem equiv_mul : WithAbs.equiv v (x * y) = WithAbs.equiv v x * WithAbs.equiv v y := rfl
-
-@[simp]
-theorem equiv_symm_mul :
-    (WithAbs.equiv v).symm (x * y) = (WithAbs.equiv v).symm x * (WithAbs.equiv v).symm y :=
-  rfl
 
 def ringEquiv : WithAbs v ≃+* R := RingEquiv.refl _
 

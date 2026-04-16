@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.CategoryTheory.IsConnected
 
+noncomputable section
+
 /-!
 # Connected limits in the over category
 

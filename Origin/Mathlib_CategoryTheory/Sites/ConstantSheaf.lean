@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Sheafification
 import Mathlib.CategoryTheory.Sites.DenseSubsite.SheafEquiv
 
+noncomputable section
+
 /-!
 
 # The constant sheaf
@@ -130,6 +132,13 @@ noncomputable def equivCommuteConstant' :
     isoWhiskerRight (equivCommuteConstant J D K G hT hT') (sheafEquiv G J K D).inverse
 
 include hT hT' in
+/--
+
+The property of a sheaf of being constant is invariant under equivalence of sheaf
+
+categories.
+
+-/
 
 lemma Sheaf.isConstant_iff_of_equivalence (F : Sheaf K D) :
     ((sheafEquiv G J K D).inverse.obj F).IsConstant J ↔ IsConstant K F := by

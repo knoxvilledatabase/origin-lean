@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Smooth.Basic
 import Mathlib.Algebra.Module.Projective
 import Mathlib.Tactic.StacksAttribute
 
+noncomputable section
+
 /-!
 # Relation of smoothness and `Ω[S⁄R]`
 
@@ -106,7 +108,6 @@ lemma isScalarTower_of_section_of_ker_sqZero :
   simpa [RingHom.mem_ker, sub_eq_zero] using AlgHom.congr_fun hg (algebraMap P S p)
 
 noncomputable
-
 def retractionOfSectionOfKerSqZero : S ⊗[P] Ω[P⁄R] →ₗ[P] RingHom.ker (algebraMap P S) :=
   letI := g.toRingHom.toAlgebra
   haveI := isScalarTower_of_section_of_ker_sqZero g hf' hg
@@ -154,7 +155,6 @@ variable (hf' : (RingHom.ker (algebraMap P S)) ^ 2 = ⊥)
 include hf'
 
 noncomputable
-
 def sectionOfRetractionKerToTensorAux : S →ₐ[R] P where
   toFun x := σ x - l (1 ⊗ₜ .D _ _ (σ x))
   map_one' := by simp [sectionOfRetractionKerToTensorAux_prop l hl (σ 1) 1 (by simp [hσ])]
@@ -209,7 +209,6 @@ variable [Algebra R S] [IsScalarTower R P S]
 variable (hf' : (RingHom.ker (algebraMap P S)) ^ 2 = ⊥) (hf : Surjective (algebraMap P S))
 
 noncomputable
-
 def retractionKerToTensorEquivSection :
     { l // l ∘ₗ (kerToTensor R P S) = LinearMap.id } ≃
       { g // (IsScalarTower.toAlgHom R P S).comp g = AlgHom.id R S } where
@@ -232,7 +231,6 @@ def retractionKerToTensorEquivSection :
 variable (R P S) in
 
 noncomputable
-
 def derivationQuotKerSq :
     Derivation R (P ⧸ (RingHom.ker (algebraMap P S) ^ 2)) (S ⊗[P] Ω[P⁄R]) := by
   letI := Submodule.liftQ ((RingHom.ker (algebraMap P S) ^ 2).restrictScalars R)
@@ -257,14 +255,9 @@ def derivationQuotKerSq :
     simp only [← Ideal.Quotient.algebraMap_eq, IsScalarTower.algebraMap_smul,
       Derivation.leibniz, tmul_add, tmul_smul]
 
-@[simp]
-lemma derivationQuotKerSq_mk (x : P) :
-    derivationQuotKerSq R P S x = 1 ⊗ₜ .D R P x := rfl
-
 variable (R P S) in
 
 noncomputable
-
 def tensorKaehlerQuotKerSqEquiv :
     S ⊗[P ⧸ (RingHom.ker (algebraMap P S) ^ 2)] Ω[(P ⧸ (RingHom.ker (algebraMap P S) ^ 2))⁄R] ≃ₗ[S]
       S ⊗[P] Ω[P⁄R] :=
@@ -299,7 +292,6 @@ lemma tensorKaehlerQuotKerSqEquiv_symm_tmul_D (s t) :
   simp
 
 noncomputable
-
 def retractionKerCotangentToTensorEquivSection :
     { l // l ∘ₗ (kerCotangentToTensor R P S) = LinearMap.id } ≃
       { g // (IsScalarTower.toAlgHom R P S).kerSquareLift.comp g = AlgHom.id R S } := by
@@ -351,6 +343,15 @@ def retractionKerCotangentToTensorEquivSection :
 variable [Algebra.FormallySmooth R P]
 
 include hf in
+/--
+
+Given a formally smooth `R`-algebra `P` and a surjective algebra homomorphism `f : P →ₐ[R] S`
+
+with kernel `I` (typically a presentation `R[X] → S`),
+
+`S` is formally smooth iff the `P`-linear map `I/I² → S ⊗[P] Ω[P⁄R]` is split injective.
+
+-/
 
 @[stacks 031I]
 theorem Algebra.FormallySmooth.iff_split_injection :
@@ -360,6 +361,17 @@ theorem Algebra.FormallySmooth.iff_split_injection :
   rw [this, ← Algebra.FormallySmooth.iff_split_surjection _ hf]
 
 include hf in
+/--
+
+Given a formally smooth `R`-algebra `P` and a surjective algebra homomorphism `f : P →ₐ[R] S`
+
+with kernel `I` (typically a presentation `R[X] → S`),
+
+then `S` is formally smooth iff `I/I² → S ⊗[P] Ω[S⁄R]` is injective and
+
+`S ⊗[P] Ω[P⁄R] → Ω[S⁄R]` is split surjective.
+
+-/
 
 theorem Algebra.FormallySmooth.iff_injective_and_split :
     Algebra.FormallySmooth R S ↔ Function.Injective (kerCotangentToTensor R P S) ∧
@@ -389,6 +401,15 @@ instance : Module.Projective P (Ω[P⁄R]) :=
   (Algebra.FormallySmooth.iff_injective_and_projective'.mp ‹_›).2
 
 include hf in
+/--
+
+Given a formally smooth `R`-algebra `P` and a surjective algebra homomorphism `f : P →ₐ[R] S`
+
+with kernel `I` (typically a presentation `R[X] → S`),
+
+then `S` is formally smooth iff `I/I² → S ⊗[P] Ω[P⁄R]` is injective and `Ω[S/R]` is projective.
+
+-/
 
 theorem Algebra.FormallySmooth.iff_injective_and_projective :
     Algebra.FormallySmooth R S ↔

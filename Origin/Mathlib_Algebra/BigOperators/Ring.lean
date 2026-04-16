@@ -10,6 +10,8 @@ import Mathlib.Data.Finset.Max
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Int.Cast.Lemmas
 
+noncomputable section
+
 /-!
 # Results about big operators with values in a (semi)ring
 
@@ -85,12 +87,6 @@ end NonUnitalSemiring
 section NonAssocSemiring
 
 variable [NonAssocSemiring α] [DecidableEq ι]
-
-lemma sum_mul_boole (s : Finset ι) (f : ι → α) (i : ι) :
-    ∑ j ∈ s, f j * ite (i = j) 1 0 = ite (i ∈ s) (f i) 0 := by simp
-
-lemma sum_boole_mul (s : Finset ι) (f : ι → α) (i : ι) :
-    ∑ j ∈ s, ite (i = j) 1 0 * f j = ite (i ∈ s) (f i) 0 := by simp
 
 end NonAssocSemiring
 

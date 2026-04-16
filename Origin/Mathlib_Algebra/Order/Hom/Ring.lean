@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Hom.Monoid
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # Ordered ring homomorphisms
 
@@ -115,9 +117,6 @@ instance : RingHomClass (α →+*o β) α β where
   map_add f := f.map_add'
   map_zero f := f.map_zero'
 
-theorem toFun_eq_coe (f : α →+*o β) : f.toFun = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : α →+*o β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -126,38 +125,14 @@ theorem ext {f g : α →+*o β} (h : ∀ a, f a = g a) : f = g :=
 theorem toRingHom_eq_coe (f : α →+*o β) : f.toRingHom = f :=
   RingHom.ext fun _ => rfl
 
-@[simp]
-theorem toOrderAddMonoidHom_eq_coe (f : α →+*o β) : f.toOrderAddMonoidHom = f :=
-  rfl
-
 -- DISSOLVED: toOrderMonoidWithZeroHom_eq_coe
 
-@[simp]
-theorem coe_coe_ringHom (f : α →+*o β) : ⇑(f : α →+* β) = f :=
-  rfl
-
-@[simp]
-theorem coe_coe_orderAddMonoidHom (f : α →+*o β) : ⇑(f : α →+o β) = f :=
-  rfl
-
 -- DISSOLVED: coe_coe_orderMonoidWithZeroHom
-
-@[norm_cast]
-theorem coe_ringHom_apply (f : α →+*o β) (a : α) : (f : α →+* β) a = f a :=
-  rfl
-
-@[norm_cast]
-theorem coe_orderAddMonoidHom_apply (f : α →+*o β) (a : α) : (f : α →+o β) a = f a :=
-  rfl
 
 -- DISSOLVED: coe_orderMonoidWithZeroHom_apply
 
 protected def copy (f : α →+*o β) (f' : α → β) (h : f' = f) : α →+*o β :=
   { f.toRingHom.copy f' h, f.toOrderAddMonoidHom.copy f' h with }
-
-@[simp]
-theorem coe_copy (f : α →+*o β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : α →+*o β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -170,23 +145,7 @@ protected def id : α →+*o α :=
 instance : Inhabited (α →+*o α) :=
   ⟨OrderRingHom.id α⟩
 
-@[simp]
-theorem coe_id : ⇑(OrderRingHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : OrderRingHom.id α a = a :=
-  rfl
-
-@[simp]
-theorem coe_ringHom_id : (OrderRingHom.id α : α →+* α) = RingHom.id α :=
-  rfl
-
-@[simp]
-theorem coe_orderAddMonoidHom_id : (OrderRingHom.id α : α →+o α) = OrderAddMonoidHom.id α :=
-  rfl
 
 -- DISSOLVED: coe_orderMonoidWithZeroHom_id
 
@@ -194,23 +153,7 @@ protected def comp (f : β →+*o γ) (g : α →+*o β) : α →+*o γ :=
   { f.toRingHom.comp g.toRingHom, f.toOrderAddMonoidHom.comp g.toOrderAddMonoidHom with }
 
 @[simp]
-theorem coe_comp (f : β →+*o γ) (g : α →+*o β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : β →+*o γ) (g : α →+*o β) (a : α) : f.comp g a = f (g a) :=
-  rfl
-
-theorem comp_assoc (f : γ →+*o δ) (g : β →+*o γ) (h : α →+*o β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
-  rfl
-
-@[simp]
-theorem comp_id (f : α →+*o β) : f.comp (OrderRingHom.id α) = f :=
-  rfl
-
-@[simp]
-theorem id_comp (f : α →+*o β) : (OrderRingHom.id β).comp f = f :=
   rfl
 
 @[simp]
@@ -264,16 +207,9 @@ instance : RingEquivClass (α ≃+*o β) α β where
   map_mul f := f.map_mul'
   map_add f := f.map_add'
 
-theorem toFun_eq_coe (f : α ≃+*o β) : f.toFun = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : α ≃+*o β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
-
-@[simp]
-theorem coe_mk (e : α ≃+* β) (h) : ⇑(⟨e, h⟩ : α ≃+*o β) = e :=
-  rfl
 
 @[simp]
 theorem mk_coe (e : α ≃+*o β) (h) : (⟨e, h⟩ : α ≃+*o β) = e :=
@@ -287,14 +223,6 @@ theorem toRingEquiv_eq_coe (f : α ≃+*o β) : f.toRingEquiv = f :=
 theorem toOrderIso_eq_coe (f : α ≃+*o β) : f.toOrderIso = f :=
   OrderIso.ext rfl
 
-@[simp, norm_cast]
-theorem coe_toRingEquiv (f : α ≃+*o β) : ⇑(f : α ≃+* β) = f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_toOrderIso (f : α ≃+*o β) : DFunLike.coe (f : α ≃o β) = f :=
-  rfl
-
 variable (α)
 
 @[refl]
@@ -303,18 +231,6 @@ protected def refl : α ≃+*o α :=
 
 instance : Inhabited (α ≃+*o α) :=
   ⟨OrderRingIso.refl α⟩
-
-@[simp]
-theorem refl_apply (x : α) : OrderRingIso.refl α x = x := by
-  rfl
-
-@[simp]
-theorem coe_ringEquiv_refl : (OrderRingIso.refl α : α ≃+* α) = RingEquiv.refl α :=
-  rfl
-
-@[simp]
-theorem coe_orderIso_refl : (OrderRingIso.refl α : α ≃o α) = OrderIso.refl α :=
-  rfl
 
 variable {α}
 
@@ -333,20 +249,6 @@ theorem symm_symm (e : α ≃+*o β) : e.symm.symm = e := rfl
 @[trans]
 protected def trans (f : α ≃+*o β) (g : β ≃+*o γ) : α ≃+*o γ :=
   ⟨f.toRingEquiv.trans g.toRingEquiv, (map_le_map_iff g).trans (map_le_map_iff f)⟩
-
-theorem trans_toRingEquiv (f : α ≃+*o β) (g : β ≃+*o γ) :
-    (OrderRingIso.trans f g).toRingEquiv = RingEquiv.trans f.toRingEquiv g.toRingEquiv :=
-  rfl
-
-@[simp]
-theorem trans_toRingEquiv_aux (f : α ≃+*o β) (g : β ≃+*o γ) :
-    RingEquivClass.toRingEquiv (OrderRingIso.trans f g)
-      = RingEquiv.trans f.toRingEquiv g.toRingEquiv :=
-  rfl
-
-@[simp]
-theorem trans_apply (f : α ≃+*o β) (g : β ≃+*o γ) (a : α) : f.trans g a = g (f a) :=
-  rfl
 
 @[simp]
 theorem self_trans_symm (e : α ≃+*o β) : e.trans e.symm = OrderRingIso.refl α :=
@@ -367,18 +269,6 @@ variable [NonAssocSemiring α] [Preorder α] [NonAssocSemiring β] [Preorder β]
 
 def toOrderRingHom (f : α ≃+*o β) : α →+*o β :=
   ⟨f.toRingEquiv.toRingHom, fun _ _ => (map_le_map_iff f).2⟩
-
-@[simp]
-theorem toOrderRingHom_eq_coe (f : α ≃+*o β) : f.toOrderRingHom = f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_toOrderRingHom (f : α ≃+*o β) : ⇑(f : α →+*o β) = f :=
-  rfl
-
-@[simp]
-theorem coe_toOrderRingHom_refl : (OrderRingIso.refl α : α →+*o α) = OrderRingHom.id α :=
-  rfl
 
 theorem toOrderRingHom_injective : Injective (toOrderRingHom : α ≃+*o β → α →+*o β) :=
   fun f g h => DFunLike.coe_injective <| by convert DFunLike.ext'_iff.1 h using 0

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.ENNReal.Basic
 import Mathlib.RingTheory.Finiteness.Defs
 
+noncomputable section
+
 /-! # The `WithLp` type synonym
 
 `WithLp p V` is a copy of `V` with exactly the same vector space structure, but with the Lp norm
@@ -78,48 +80,6 @@ variable [Module K V]
 variable (c : K) (x y : WithLp p V) (x' y' : V)
 
 /-! `WithLp.equiv` preserves the module structure. -/
-
-@[simp]
-theorem equiv_zero : WithLp.equiv p V 0 = 0 :=
-  rfl
-
-@[simp]
-theorem equiv_symm_zero : (WithLp.equiv p V).symm 0 = 0 :=
-  rfl
-
-@[simp]
-theorem equiv_add : WithLp.equiv p V (x + y) = WithLp.equiv p V x + WithLp.equiv p V y :=
-  rfl
-
-@[simp]
-theorem equiv_symm_add :
-    (WithLp.equiv p V).symm (x' + y') = (WithLp.equiv p V).symm x' + (WithLp.equiv p V).symm y' :=
-  rfl
-
-@[simp]
-theorem equiv_sub : WithLp.equiv p V (x - y) = WithLp.equiv p V x - WithLp.equiv p V y :=
-  rfl
-
-@[simp]
-theorem equiv_symm_sub :
-    (WithLp.equiv p V).symm (x' - y') = (WithLp.equiv p V).symm x' - (WithLp.equiv p V).symm y' :=
-  rfl
-
-@[simp]
-theorem equiv_neg : WithLp.equiv p V (-x) = -WithLp.equiv p V x :=
-  rfl
-
-@[simp]
-theorem equiv_symm_neg : (WithLp.equiv p V).symm (-x') = -(WithLp.equiv p V).symm x' :=
-  rfl
-
-@[simp]
-theorem equiv_smul : WithLp.equiv p V (c • x) = c • WithLp.equiv p V x :=
-  rfl
-
-@[simp]
-theorem equiv_symm_smul : (WithLp.equiv p V).symm (c • x') = c • (WithLp.equiv p V).symm x' :=
-  rfl
 
 variable (K V)
 

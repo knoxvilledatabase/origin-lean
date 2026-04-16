@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Finsupp/AList.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.Data.List.AList
+
+noncomputable section
 
 /-!
 # Connections between `Finsupp` and `AList`
@@ -38,7 +40,9 @@ theorem toAList_keys_toFinset [DecidableEq α] (f : α →₀ M) :
   ext
   simp [toAList, AList.mem_keys, AList.keys, List.keys]
 
--- DISSOLVED: mem_toAlist
+@[simp]
+theorem mem_toAlist {f : α →₀ M} {x : α} : x ∈ f.toAList ↔ f x ≠ 0 := by
+  classical rw [AList.mem_keys, ← List.mem_toFinset, toAList_keys_toFinset, mem_support_iff]
 
 end Finsupp
 
@@ -65,9 +69,16 @@ theorem lookupFinsupp_apply [DecidableEq α] (l : AList fun _x : α => M) (a : �
     l.lookupFinsupp a = (l.lookup a).getD 0 := by
     convert rfl; congr
 
--- DISSOLVED: lookupFinsupp_support
+@[simp]
+theorem lookupFinsupp_support [DecidableEq α] [DecidableEq M] (l : AList fun _x : α => M) :
+    l.lookupFinsupp.support = (l.1.filter fun x => Sigma.snd x ≠ 0).keys.toFinset := by
+  dsimp only [lookupFinsupp]
+  congr!
 
--- DISSOLVED: lookupFinsupp_eq_iff_of_ne_zero
+theorem lookupFinsupp_eq_iff_of_ne_zero [DecidableEq α] {l : AList fun _x : α => M} {a : α} {x : M}
+    (hx : x ≠ 0) : l.lookupFinsupp a = x ↔ x ∈ l.lookup a := by
+  rw [lookupFinsupp_apply]
+  cases' lookup a l with m <;> simp [hx.symm]
 
 theorem lookupFinsupp_eq_zero_iff [DecidableEq α] {l : AList fun _x : α => M} {a : α} :
     l.lookupFinsupp a = 0 ↔ a ∉ l ∨ (0 : M) ∈ l.lookup a := by

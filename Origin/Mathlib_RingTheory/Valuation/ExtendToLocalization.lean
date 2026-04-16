@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Localization.AtPrime
 import Mathlib.RingTheory.Valuation.Basic
 
+noncomputable section
+
 /-!
 
 # Extending valuations to a localization

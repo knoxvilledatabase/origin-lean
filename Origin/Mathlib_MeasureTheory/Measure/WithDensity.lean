@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Measure/WithDensity.lean
-Genuine: 53 | Conflates: 0 | Dissolved: 10 | Infrastructure: 4
+Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Decomposition.Exhaustion
 import Mathlib.MeasureTheory.Integral.Lebesgue
+
+noncomputable section
 
 /-!
 # Measure with a given density with respect to another measure
@@ -29,7 +31,6 @@ namespace MeasureTheory
 variable {α : Type*} {m0 : MeasurableSpace α} {μ : Measure α}
 
 noncomputable
-
 def Measure.withDensity {m : MeasurableSpace α} (μ : Measure α) (f : α → ℝ≥0∞) : Measure α :=
   Measure.ofMeasurable (fun s _ => ∫⁻ a in s, f a ∂μ) (by simp) fun _ hs hd =>
     lintegral_iUnion hs hd _
@@ -218,17 +219,82 @@ theorem withDensity_eq_zero_iff {f : α → ℝ≥0∞} (hf : AEMeasurable f μ)
 
 alias ⟨withDensity_eq_zero, _⟩ := withDensity_eq_zero_iff
 
--- DISSOLVED: withDensity_apply_eq_zero'
+theorem withDensity_apply_eq_zero' {f : α → ℝ≥0∞} {s : Set α} (hf : AEMeasurable f μ) :
+    μ.withDensity f s = 0 ↔ μ ({ x | f x ≠ 0 } ∩ s) = 0 := by
+  constructor
+  · intro hs
+    let t := toMeasurable (μ.withDensity f) s
+    apply measure_mono_null (inter_subset_inter_right _ (subset_toMeasurable (μ.withDensity f) s))
+    have A : μ.withDensity f t = 0 := by rw [measure_toMeasurable, hs]
+    rw [withDensity_apply f (measurableSet_toMeasurable _ s),
+      lintegral_eq_zero_iff' (AEMeasurable.restrict hf),
+      EventuallyEq, ae_restrict_iff'₀, ae_iff] at A
+    swap
+    · simp only [measurableSet_toMeasurable, MeasurableSet.nullMeasurableSet]
+    simp only [Pi.zero_apply, mem_setOf_eq, Filter.mem_mk] at A
+    convert A using 2
+    ext x
+    simp only [and_comm, exists_prop, mem_inter_iff, mem_setOf_eq,
+      mem_compl_iff, not_forall]
+  · intro hs
+    let t := toMeasurable μ ({ x | f x ≠ 0 } ∩ s)
+    have A : s ⊆ t ∪ { x | f x = 0 } := by
+      intro x hx
+      rcases eq_or_ne (f x) 0 with (fx | fx)
+      · simp only [fx, mem_union, mem_setOf_eq, eq_self_iff_true, or_true]
+      · left
+        apply subset_toMeasurable _ _
+        exact ⟨fx, hx⟩
+    apply measure_mono_null A (measure_union_null _ _)
+    · apply withDensity_absolutelyContinuous
+      rwa [measure_toMeasurable]
+    rcases hf with ⟨g, hg, hfg⟩
+    have t : {x | f x = 0} =ᵐ[μ.withDensity f] {x | g x = 0} := by
+      apply withDensity_absolutelyContinuous
+      filter_upwards [hfg] with a ha
+      rw [eq_iff_iff]
+      exact ⟨fun h ↦ by rw [h] at ha; exact ha.symm,
+             fun h ↦ by rw [h] at ha; exact ha⟩
+    rw [measure_congr t, withDensity_congr_ae hfg]
+    have M : MeasurableSet { x : α | g x = 0 } := hg (measurableSet_singleton _)
+    rw [withDensity_apply _ M, lintegral_eq_zero_iff hg]
+    filter_upwards [ae_restrict_mem M]
+    simp only [imp_self, Pi.zero_apply, imp_true_iff]
 
--- DISSOLVED: withDensity_apply_eq_zero
+theorem withDensity_apply_eq_zero {f : α → ℝ≥0∞} {s : Set α} (hf : Measurable f) :
+    μ.withDensity f s = 0 ↔ μ ({ x | f x ≠ 0 } ∩ s) = 0 :=
+  withDensity_apply_eq_zero' <| hf.aemeasurable
 
--- DISSOLVED: ae_withDensity_iff'
+theorem ae_withDensity_iff' {p : α → Prop} {f : α → ℝ≥0∞} (hf : AEMeasurable f μ) :
+    (∀ᵐ x ∂μ.withDensity f, p x) ↔ ∀ᵐ x ∂μ, f x ≠ 0 → p x := by
+  rw [ae_iff, ae_iff, withDensity_apply_eq_zero' hf, iff_iff_eq]
+  congr
+  ext x
+  simp only [exists_prop, mem_inter_iff, mem_setOf_eq, not_forall]
 
--- DISSOLVED: ae_withDensity_iff
+theorem ae_withDensity_iff {p : α → Prop} {f : α → ℝ≥0∞} (hf : Measurable f) :
+    (∀ᵐ x ∂μ.withDensity f, p x) ↔ ∀ᵐ x ∂μ, f x ≠ 0 → p x :=
+  ae_withDensity_iff' <| hf.aemeasurable
 
--- DISSOLVED: ae_withDensity_iff_ae_restrict'
+theorem ae_withDensity_iff_ae_restrict' {p : α → Prop} {f : α → ℝ≥0∞}
+    (hf : AEMeasurable f μ) :
+    (∀ᵐ x ∂μ.withDensity f, p x) ↔ ∀ᵐ x ∂μ.restrict { x | f x ≠ 0 }, p x := by
+  rw [ae_withDensity_iff' hf, ae_restrict_iff'₀]
+  · simp only [mem_setOf]
+  · rcases hf with ⟨g, hg, hfg⟩
+    have nonneg_eq_ae : {x | g x ≠ 0} =ᵐ[μ] {x | f x ≠ 0} := by
+      filter_upwards [hfg] with a ha
+      simp only [eq_iff_iff]
+      exact ⟨fun (h : g a ≠ 0) ↦ by rwa [← ha] at h,
+             fun (h : f a ≠ 0) ↦ by rwa [ha] at h⟩
+    exact NullMeasurableSet.congr
+      (MeasurableSet.nullMeasurableSet
+        <| hg (measurableSet_singleton _)).compl
+      nonneg_eq_ae
 
--- DISSOLVED: ae_withDensity_iff_ae_restrict
+theorem ae_withDensity_iff_ae_restrict {p : α → Prop} {f : α → ℝ≥0∞} (hf : Measurable f) :
+    (∀ᵐ x ∂μ.withDensity f, p x) ↔ ∀ᵐ x ∂μ.restrict { x | f x ≠ 0 }, p x :=
+  ae_withDensity_iff_ae_restrict' <| hf.aemeasurable
 
 theorem aemeasurable_withDensity_ennreal_iff' {f : α → ℝ≥0}
     (hf : AEMeasurable f μ) {g : α → ℝ≥0∞} :
@@ -445,13 +511,42 @@ lemma withDensity_inv_same_le {μ : Measure α} {f : α → ℝ≥0∞} (hf : AE
   · simp only [hx_zero, ENNReal.inv_zero, zero_mul, zero_le]
   rw [ENNReal.mul_inv_cancel hx_zero hx_top]
 
--- DISSOLVED: withDensity_inv_same₀
+lemma withDensity_inv_same₀ {μ : Measure α} {f : α → ℝ≥0∞}
+    (hf : AEMeasurable f μ) (hf_ne_zero : ∀ᵐ x ∂μ, f x ≠ 0) (hf_ne_top : ∀ᵐ x ∂μ, f x ≠ ∞) :
+    (μ.withDensity f).withDensity (fun x ↦ (f x)⁻¹) = μ := by
+  rw [← withDensity_mul₀ hf hf.inv]
+  suffices (f * fun x ↦ (f x)⁻¹) =ᵐ[μ] 1 by
+    rw [withDensity_congr_ae this, withDensity_one]
+  filter_upwards [hf_ne_zero, hf_ne_top] with x hf_ne_zero hf_ne_top
+  simp only [Pi.mul_apply]
+  rw [ENNReal.mul_inv_cancel hf_ne_zero hf_ne_top, Pi.one_apply]
 
--- DISSOLVED: withDensity_inv_same
+lemma withDensity_inv_same {μ : Measure α} {f : α → ℝ≥0∞}
+    (hf : Measurable f) (hf_ne_zero : ∀ᵐ x ∂μ, f x ≠ 0) (hf_ne_top : ∀ᵐ x ∂μ, f x ≠ ∞) :
+    (μ.withDensity f).withDensity (fun x ↦ (f x)⁻¹) = μ :=
+  withDensity_inv_same₀ hf.aemeasurable hf_ne_zero hf_ne_top
 
--- DISSOLVED: withDensity_absolutelyContinuous'
+lemma withDensity_absolutelyContinuous' {μ : Measure α} {f : α → ℝ≥0∞}
+    (hf : AEMeasurable f μ) (hf_ne_zero : ∀ᵐ x ∂μ, f x ≠ 0) :
+    μ ≪ μ.withDensity f := by
+  refine Measure.AbsolutelyContinuous.mk (fun s hs hμs ↦ ?_)
+  rw [withDensity_apply _ hs, lintegral_eq_zero_iff' hf.restrict,
+    ae_eq_restrict_iff_indicator_ae_eq hs, Set.indicator_zero', Filter.EventuallyEq, ae_iff] at hμs
+  simp only [ae_iff, ne_eq, not_not] at hf_ne_zero
+  simp only [Pi.zero_apply, Set.indicator_apply_eq_zero, not_forall, exists_prop] at hμs
+  have hle : s ⊆ {a | a ∈ s ∧ ¬f a = 0} ∪ {a | f a = 0} :=
+    fun x hx ↦ or_iff_not_imp_right.mpr <| fun hnx ↦ ⟨hx, hnx⟩
+  exact measure_mono_null hle <| nonpos_iff_eq_zero.1 <| le_trans (measure_union_le _ _)
+    <| hμs.symm ▸ zero_add _ |>.symm ▸ hf_ne_zero.le
 
--- DISSOLVED: withDensity_ae_eq
+theorem withDensity_ae_eq {β : Type} {f g : α → β} {d : α → ℝ≥0∞}
+    (hd : AEMeasurable d μ) (h_ae_nonneg : ∀ᵐ x ∂μ, d x ≠ 0) :
+    f =ᵐ[μ.withDensity d] g ↔ f =ᵐ[μ] g :=
+  Iff.intro
+  (fun h ↦ Measure.AbsolutelyContinuous.ae_eq
+    (withDensity_absolutelyContinuous' hd h_ae_nonneg) h)
+  (fun h ↦ Measure.AbsolutelyContinuous.ae_eq
+    (withDensity_absolutelyContinuous μ d) h)
 
 protected instance SigmaFinite.withDensity [SigmaFinite μ] (f : α → ℝ≥0) :
     SigmaFinite (μ.withDensity (fun x ↦ f x)) := by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Taylor
 import Mathlib.FieldTheory.RatFunc.AsPolynomial
 
+noncomputable section
+
 /-!
 # Laurent expansions of rational functions
 

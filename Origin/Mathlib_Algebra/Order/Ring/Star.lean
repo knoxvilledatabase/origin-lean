@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Order.Star.Basic
 
+noncomputable section
+
 /-!
 # Commutative star-ordered rings are ordered rings
 

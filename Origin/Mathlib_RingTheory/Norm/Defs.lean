@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.LinearAlgebra.Determinant
 
+noncomputable section
+
 /-!
 # Norm for (finite) ring extensions
 

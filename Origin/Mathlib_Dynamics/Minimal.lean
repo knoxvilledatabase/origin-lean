@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Topology.Algebra.ConstMulAction
 
+noncomputable section
+
 /-!
 # Minimal action of a group
 
@@ -96,5 +98,3 @@ theorem isMinimal_iff_isClosed_smul_invariant [ContinuousConstSMul M α] :
   refine fun H ↦ ⟨fun _ ↦ dense_iff_closure_eq.2 <| (H _ ?_ ?_).resolve_left ?_⟩
   exacts [isClosed_closure, fun _ ↦ smul_closure_orbit_subset _ _,
     (orbit_nonempty _).closure.ne_empty]
-
-isMinimal_iff_closed_smul_invariant := isMinimal_iff_isClosed_smul_invariant

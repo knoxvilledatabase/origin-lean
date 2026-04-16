@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.GramSchmidtOrtho
 import Mathlib.LinearAlgebra.Orientation
 
+noncomputable section
+
 /-!
 # Orientations of real inner product spaces.
 

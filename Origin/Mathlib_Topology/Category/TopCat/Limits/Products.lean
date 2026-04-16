@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.ConcreteCategory.Basic
 import Mathlib.Data.Set.Subsingleton
 import Mathlib.Tactic.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # Products and coproducts in the category of topological spaces
 -/

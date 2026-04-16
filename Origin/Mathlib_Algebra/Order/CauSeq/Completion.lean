@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/CauSeq/Completion.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 5 | Infrastructure: 35
+Genuine: 34 | Conflates: 2 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.CauSeq.Basic
 import Mathlib.Data.Rat.Cast.Defs
+
+noncomputable section
 
 /-!
 # Cauchy completion
@@ -198,19 +200,33 @@ noncomputable instance : Inv (Cauchy abv) :=
         rw [mk_eq.2 fg, ← Ig] at If
         rw [← mul_one (mk (inv f hf)), ← Ig', ← mul_assoc, If, mul_assoc, Ig', mul_one]⟩
 
--- DISSOLVED: inv_zero
+theorem inv_zero : (0 : (Cauchy abv))⁻¹ = 0 :=
+  congr_arg mk <| by rw [dif_pos] <;> [rfl; exact zero_limZero]
 
 @[simp]
 theorem inv_mk {f} (hf) : (mk (abv := abv) f)⁻¹ = mk (inv f hf) :=
   congr_arg mk <| by rw [dif_neg]
 
--- DISSOLVED: cau_seq_zero_ne_one
+-- CONFLATES (assumes ground = zero): cau_seq_zero_ne_one
+theorem cau_seq_zero_ne_one : ¬(0 : CauSeq _ abv) ≈ 1 := fun h =>
+  have : LimZero (1 - 0 : CauSeq _ abv) := Setoid.symm h
+  have : LimZero (1 : CauSeq _ abv) := by simpa
+  by apply one_ne_zero <| const_limZero.1 this
 
--- DISSOLVED: zero_ne_one
+-- CONFLATES (assumes ground = zero): zero_ne_one
+theorem zero_ne_one : (0 : (Cauchy abv)) ≠ 1 := fun h => cau_seq_zero_ne_one <| mk_eq.1 h
 
--- DISSOLVED: inv_mul_cancel
+protected theorem inv_mul_cancel {x : (Cauchy abv)} : x ≠ 0 → x⁻¹ * x = 1 :=
+  Quotient.inductionOn x fun f hf => by
+    simp only [mk_eq_mk, ne_eq, mk_eq_zero] at hf
+    simp only [mk_eq_mk, hf, not_false_eq_true, inv_mk, mk_mul]
+    exact Quotient.sound (CauSeq.inv_mul_cancel hf)
 
--- DISSOLVED: mul_inv_cancel
+protected theorem mul_inv_cancel {x : (Cauchy abv)} : x ≠ 0 → x * x⁻¹ = 1 :=
+  Quotient.inductionOn x fun f hf => by
+    simp only [mk_eq_mk, ne_eq, mk_eq_zero] at hf
+    simp only [mk_eq_mk, hf, not_false_eq_true, inv_mk, mk_mul]
+    exact Quotient.sound (CauSeq.mul_inv_cancel hf)
 
 theorem ofRat_inv (x : β) : ofRat x⁻¹ = ((ofRat x)⁻¹ : (Cauchy abv)) :=
   congr_arg mk <| by split_ifs with h <;>

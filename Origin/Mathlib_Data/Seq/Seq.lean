@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Option.NAry
 import Mathlib.Data.Seq.Computation
 
+noncomputable section
+
 /-!
 # Possibly infinite lists
 
@@ -43,19 +45,11 @@ def cons (a : α) (s : Seq α) : Seq α :=
     · contradiction
     · exact s.2 h⟩
 
-@[simp]
-theorem val_cons (s : Seq α) (x : α) : (cons x s).val = some x::s.val :=
-  rfl
-
 def get? : Seq α → ℕ → Option α :=
   Subtype.val
 
 @[simp]
 theorem get?_mk (f hf) : @get? α ⟨f, hf⟩ = f :=
-  rfl
-
-@[simp]
-theorem get?_nil (n : ℕ) : (@nil α).get? n = none :=
   rfl
 
 @[simp]
@@ -180,16 +174,8 @@ theorem head_eq_destruct (s : Seq α) : head.{u} s = Prod.fst.{u} <$> destruct.{
   unfold destruct head; cases get? s 0 <;> rfl
 
 @[simp]
-theorem head_nil : head (nil : Seq α) = none :=
-  rfl
-
-@[simp]
 theorem head_cons (a : α) (s) : head (cons a s) = some a := by
   rw [head_eq_destruct, destruct_cons, Option.map_eq_map, Option.map_some']
-
-@[simp]
-theorem tail_nil : tail (nil : Seq α) = nil :=
-  rfl
 
 @[simp]
 theorem tail_cons (a : α) (s) : tail (cons a s) = s := by
@@ -348,14 +334,6 @@ instance coeList : Coe (List α) (Seq α) :=
   ⟨ofList⟩
 
 @[simp]
-theorem ofList_nil : ofList [] = (nil : Seq α) :=
-  rfl
-
-@[simp]
-theorem ofList_get (l : List α) (n : ℕ) : (ofList l).get? n = l.get? n :=
-  rfl
-
-@[simp]
 theorem ofList_cons (a : α) (l : List α) : ofList (a::l) = cons a (ofList l) := by
   ext1 (_ | n) <;> rfl
 
@@ -393,10 +371,6 @@ unsafe def forceToList (s : Seq α) : List α :=
 
 def nats : Seq ℕ :=
   Stream'.nats
-
-@[simp]
-theorem nats_get? (n : ℕ) : nats.get? n = some n :=
-  rfl
 
 def append (s₁ s₂ : Seq α) : Seq α :=
   @corec α (Seq α × Seq α)
@@ -478,10 +452,6 @@ def enum (s : Seq α) : Seq (ℕ × α) :=
 theorem get?_enum (s : Seq α) (n : ℕ) : get? (enum s) n = Option.map (Prod.mk n) (get? s n) :=
   get?_zip _ _ _
 
-@[simp]
-theorem enum_nil : enum (nil : Seq α) = nil :=
-  rfl
-
 def length (s : Seq α) (h : s.Terminates) : ℕ :=
   Nat.find h
 
@@ -529,13 +499,8 @@ theorem terminatedAt_ofList (l : List α) :
 theorem terminates_ofList (l : List α) : (ofList l).Terminates :=
   ⟨_, terminatedAt_ofList l⟩
 
-theorem terminatedAt_nil : TerminatedAt (nil : Seq α) 0 := rfl
-
 @[simp]
 theorem terminates_nil : Terminates (nil : Seq α) := ⟨0, rfl⟩
-
-@[simp]
-theorem length_nil : length (nil : Seq α) terminates_nil = 0 := rfl
 
 @[simp]
 theorem get?_zero_eq_none {s : Seq α} : s.get? 0 = none ↔ s = nil := by
@@ -734,10 +699,6 @@ instance : LawfulFunctor Seq where
   comp_map := @map_comp
   map_const := rfl
 
-@[simp]
-theorem join_nil : join nil = (nil : Seq α) :=
-  destruct_eq_nil rfl
-
 theorem join_cons_nil (a : α) (S) : join (cons (a, nil) S) = cons a (join S) :=
   destruct_eq_cons <| by simp [join]
 
@@ -889,10 +850,6 @@ def join : Seq1 (Seq1 α) → Seq1 α
     match destruct s with
     | none => (a, Seq.join S)
     | some s' => (a, Seq.join (Seq.cons s' S))
-
-@[simp]
-theorem join_nil (a : α) (S) : join ((a, nil), S) = (a, Seq.join S) :=
-  rfl
 
 @[simp]
 theorem join_cons (a b : α) (s S) :

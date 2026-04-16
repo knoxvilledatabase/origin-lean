@@ -8,6 +8,8 @@ import Batteries.Data.List.Perm
 import Batteries.Data.List.FinRange
 import Mathlib.Data.List.Nodup
 
+noncomputable section
+
 /-!
 # Lists of elements of `Fin n`
 

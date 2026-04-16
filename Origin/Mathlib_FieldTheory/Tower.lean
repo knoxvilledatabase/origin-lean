@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.RingTheory.Noetherian.Basic
 
+noncomputable section
+
 /-!
 # Finiteness of `IsScalarTower`
 

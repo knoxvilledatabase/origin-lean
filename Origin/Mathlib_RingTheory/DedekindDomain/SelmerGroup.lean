@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/DedekindDomain/SelmerGroup.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 7 | Infrastructure: 0
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags
 import Mathlib.Data.ZMod.Quotient
 import Mathlib.RingTheory.DedekindDomain.AdicValuation
+
+noncomputable section
 
 /-!
 # Selmer groups of fraction fields of Dedekind domains
@@ -81,19 +83,67 @@ namespace HeightOneSpectrum
 
 open Classical in
 
--- DISSOLVED: valuationOfNeZeroToFun
+def valuationOfNeZeroToFun (x : Kˣ) : Multiplicative ℤ :=
+  let hx := IsLocalization.sec R⁰ (x : K)
+  Multiplicative.ofAdd <|
+    (-(Associates.mk v.asIdeal).count (Associates.mk <| Ideal.span {hx.fst}).factors : ℤ) -
+      (-(Associates.mk v.asIdeal).count (Associates.mk <| Ideal.span {(hx.snd : R)}).factors : ℤ)
 
--- DISSOLVED: valuationOfNeZeroToFun_eq
+@[simp]
+theorem valuationOfNeZeroToFun_eq (x : Kˣ) :
+    (v.valuationOfNeZeroToFun x : ℤₘ₀) = v.valuation (x : K) := by
+  classical
+  rw [show v.valuation (x : K) = _ * _ by rfl]
+  rw [Units.val_inv_eq_inv_val]
+  change _ = ite _ _ _ * (ite _ _ _)⁻¹
+  simp_rw [IsLocalization.toLocalizationMap_sec, SubmonoidClass.coe_subtype,
+    if_neg <| IsLocalization.sec_fst_ne_zero le_rfl x.ne_zero,
+    if_neg (nonZeroDivisors.coe_ne_zero _),
+    valuationOfNeZeroToFun, ofAdd_sub, ofAdd_neg, div_inv_eq_mul, WithZero.coe_mul,
+    WithZero.coe_inv, inv_inv]
 
--- DISSOLVED: valuationOfNeZero
+def valuationOfNeZero : Kˣ →* Multiplicative ℤ where
+  toFun := v.valuationOfNeZeroToFun
+  map_one' := by rw [← WithZero.coe_inj, valuationOfNeZeroToFun_eq]; exact map_one _
+  map_mul' _ _ := by
+    rw [← WithZero.coe_inj, WithZero.coe_mul]
+    simp only [valuationOfNeZeroToFun_eq]; exact map_mul _ _ _
 
--- DISSOLVED: valuationOfNeZero_eq
+@[simp]
+theorem valuationOfNeZero_eq (x : Kˣ) : (v.valuationOfNeZero x : ℤₘ₀) = v.valuation (x : K) :=
+  valuationOfNeZeroToFun_eq v x
 
--- DISSOLVED: valuation_of_unit_eq
+@[simp]
+theorem valuation_of_unit_eq (x : Rˣ) :
+    v.valuationOfNeZero (Units.map (algebraMap R K : R →* K) x) = 1 := by
+  rw [← WithZero.coe_inj, valuationOfNeZero_eq, Units.coe_map, eq_iff_le_not_lt]
+  constructor
+  · exact v.valuation_le_one x
+  · cases' x with x _ hx _
+    change ¬v.valuation (algebraMap R K x) < 1
+    apply_fun v.intValuation at hx
+    rw [map_one, map_mul] at hx
+    rw [not_lt, ← hx, ← mul_one <| v.valuation _, valuation_of_algebraMap,
+      mul_le_mul_left <| zero_lt_iff.2 <| left_ne_zero_of_mul_eq_one hx]
+    exact v.intValuation_le_one _
 
--- DISSOLVED: valuationOfNeZeroMod
+def valuationOfNeZeroMod (n : ℕ) : (K/n) →* Multiplicative (ZMod n) :=
+  (Int.quotientZMultiplesNatEquivZMod n).toMultiplicative.toMonoidHom.comp <|
+    QuotientGroup.map (powMonoidHom n : Kˣ →* Kˣ).range
+      (AddSubgroup.toSubgroup (AddSubgroup.zmultiples (n : ℤ)))
+      v.valuationOfNeZero
+      (by
+        rintro _ ⟨x, rfl⟩
+        exact
+          ⟨v.valuationOfNeZero x, by simp only [powMonoidHom_apply, map_pow, Int.toAdd_pow]; rfl⟩)
 
--- DISSOLVED: valuation_of_unit_mod_eq
+@[simp]
+theorem valuation_of_unit_mod_eq (n : ℕ) (x : Rˣ) :
+    v.valuationOfNeZeroMod n (Units.map (algebraMap R K : R →* K) x : K/n) = 1 := by
+  -- This used to be `rw`, but we need `erw` after https://github.com/leanprover/lean4/pull/2644
+  erw [valuationOfNeZeroMod, MonoidHom.comp_apply, ← QuotientGroup.coe_mk',
+    QuotientGroup.map_mk' (G := Kˣ) (N := MonoidHom.range (powMonoidHom n)),
+    valuation_of_unit_eq, QuotientGroup.mk_one, map_one]
 
 end HeightOneSpectrum
 

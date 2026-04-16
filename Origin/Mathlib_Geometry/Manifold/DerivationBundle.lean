@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.Algebra.SmoothFunctions
 import Mathlib.RingTheory.Derivation.Basic
 
+noncomputable section
+
 /-!
 
 # Derivation bundle
@@ -99,9 +101,6 @@ variable {I}
 def evalAt (x : M) : Derivation 𝕜 C^∞⟮I, M; 𝕜⟯ C^∞⟮I, M; 𝕜⟯ →ₗ[𝕜] PointDerivation I x :=
   (SmoothFunction.evalAt I x).compDer
 
-theorem evalAt_apply (x : M) : evalAt x X f = (X f) x :=
-  rfl
-
 end Derivation
 
 variable {I} {E' : Type*} [NormedAddCommGroup E'] [NormedSpace 𝕜 E'] {H' : Type*}
@@ -133,23 +132,8 @@ scoped[Manifold] notation "𝒅" => fdifferential
 
 scoped[Manifold] notation "𝒅ₕ" => hfdifferential
 
-@[simp]
-theorem fdifferential_apply (f : C^∞⟮I, M; I', M'⟯) {x : M} (v : PointDerivation I x)
-    (g : C^∞⟮I', M'; 𝕜⟯) : 𝒅 f x v g = v (g.comp f) :=
-  rfl
-
-@[simp]
-theorem hfdifferential_apply {f : C^∞⟮I, M; I', M'⟯} {x : M} {y : M'} (h : f x = y)
-    (v : PointDerivation I x) (g : C^∞⟮I', M'; 𝕜⟯) : 𝒅ₕ h v g = 𝒅 f x v g :=
-  rfl
-
 variable {E'' : Type*} [NormedAddCommGroup E''] [NormedSpace 𝕜 E''] {H'' : Type*}
   [TopologicalSpace H''] {I'' : ModelWithCorners 𝕜 E'' H''} {M'' : Type*} [TopologicalSpace M'']
   [ChartedSpace H'' M'']
-
-@[simp]
-theorem fdifferential_comp (g : C^∞⟮I', M'; I'', M''⟯) (f : C^∞⟮I, M; I', M'⟯) (x : M) :
-    𝒅 (g.comp f) x = (𝒅 g (f x)).comp (𝒅 f x) :=
-  rfl
 
 end

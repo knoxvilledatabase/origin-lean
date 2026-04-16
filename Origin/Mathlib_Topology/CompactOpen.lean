@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Hom.ContinuousEval
 import Mathlib.Topology.ContinuousMap.Basic
 
+noncomputable section
+
 /-!
 # The compact-open topology
 
@@ -300,8 +302,6 @@ def coev (b : Y) : C(X, Y × X) :=
 
 variable {X Y}
 
-theorem image_coev {y : Y} (s : Set X) : coev X Y y '' s = {y} ×ˢ s := by simp
-
 theorem continuous_coev : Continuous (coev X Y) := by
   have : ∀ {a K U}, MapsTo (coev X Y a) K U ↔ {a} ×ˢ K ⊆ U := by simp [mapsTo']
   simp only [continuous_iff_continuousAt, ContinuousAt, tendsto_nhds_compactOpen, this]
@@ -318,13 +318,10 @@ def curry (f : C(X × Y, Z)) : C(X, C(Y, Z)) where
   toFun a := ⟨Function.curry f a, f.continuous.comp <| by fun_prop⟩
   continuous_toFun := (continuous_postcomp f).comp continuous_coev
 
-@[simp]
-theorem curry_apply (f : C(X × Y, Z)) (a : X) (b : Y) : f.curry a b = f (a, b) :=
-  rfl
-
 def curry' (f : C(X × Y, Z)) (a : X) : C(Y, Z) := curry f a
 
 set_option linter.deprecated false in
+/-- If a map `α × β → γ` is continuous, then its curried form `α → C(β, γ)` is continuous. -/
 
 theorem continuous_curry' (f : C(X × Y, Z)) : Continuous (curry' f) := (curry f).continuous
 
@@ -357,10 +354,6 @@ theorem continuous_uncurry [LocallyCompactSpace X] [LocallyCompactSpace Y] :
 def const' : C(Y, C(X, Y)) :=
   curry ContinuousMap.fst
 
-@[simp]
-theorem coe_const' : (const' : Y → C(X, Y)) = const X :=
-  rfl
-
 theorem continuous_const' : Continuous (const X : Y → C(X, Y)) :=
   const'.continuous
 
@@ -381,26 +374,6 @@ variable [TopologicalSpace X] [TopologicalSpace Y] [TopologicalSpace Z]
 def curry [LocallyCompactSpace X] [LocallyCompactSpace Y] : C(X × Y, Z) ≃ₜ C(X, C(Y, Z)) :=
   ⟨⟨ContinuousMap.curry, uncurry, by intro; ext; rfl, by intro; ext; rfl⟩,
     continuous_curry, continuous_uncurry⟩
-
-def continuousMapOfUnique [Unique X] : Y ≃ₜ C(X, Y) where
-  toFun := const X
-  invFun f := f default
-  left_inv _ := rfl
-  right_inv f := by
-    ext x
-    rw [Unique.eq_default x]
-    rfl
-  continuous_toFun := continuous_const'
-  continuous_invFun := continuous_eval_const _
-
-@[simp]
-theorem continuousMapOfUnique_apply [Unique X] (y : Y) (x : X) : continuousMapOfUnique y x = y :=
-  rfl
-
-@[simp]
-theorem continuousMapOfUnique_symm_apply [Unique X] (f : C(X, Y)) :
-    continuousMapOfUnique.symm f = f default :=
-  rfl
 
 end Homeomorph
 

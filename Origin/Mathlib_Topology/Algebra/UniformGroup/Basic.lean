@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/UniformGroup/Basic.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Topology.UniformSpace.UniformConvergence
@@ -12,6 +12,8 @@ import Mathlib.Topology.Algebra.UniformGroup.Defs
 import Mathlib.Topology.Algebra.Group.Quotient
 import Mathlib.Topology.DiscreteSubset
 import Mathlib.Tactic.Abel
+
+noncomputable section
 
 /-!
 # Uniform structure on topological groups
@@ -277,7 +279,6 @@ variable {W' : Set G} (W'_nhd : W' ∈ 𝓝 (0 : G))
 include de hφ
 
 include W'_nhd in
-
 private theorem extend_Z_bilin_aux (x₀ : α) (y₁ : δ) : ∃ U₂ ∈ comap e (𝓝 x₀), ∀ x ∈ U₂, ∀ x' ∈ U₂,
     (fun p : β × δ => φ p.1 p.2) (x' - x, y₁) ∈ W' := by
   let Nx := 𝓝 x₀
@@ -298,7 +299,6 @@ private theorem extend_Z_bilin_aux (x₀ : α) (y₁ : δ) : ∃ U₂ ∈ comap 
 variable [UniformAddGroup G]
 
 include df W'_nhd in
-
 private theorem extend_Z_bilin_key (x₀ : α) (y₀ : γ) : ∃ U ∈ comap e (𝓝 x₀), ∃ V ∈ comap f (𝓝 y₀),
     ∀ x ∈ U, ∀ x' ∈ U, ∀ (y) (_ : y ∈ V) (y') (_ : y' ∈ V),
     (fun p : β × δ => φ p.1 p.2) (x', y') - (fun p : β × δ => φ p.1 p.2) (x, y) ∈ W' := by

@@ -11,6 +11,8 @@ import Mathlib.MeasureTheory.Group.Integral
 import Mathlib.MeasureTheory.Group.Prod
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 
+noncomputable section
+
 /-!
 # Convolution of functions
 
@@ -408,14 +410,6 @@ scoped[Convolution]
 open scoped Convolution
 
 theorem convolution_def [Sub G] : (f ⋆[L, μ] g) x = ∫ t, L (f t) (g (x - t)) ∂μ :=
-  rfl
-
-theorem convolution_lsmul [Sub G] {f : G → 𝕜} {g : G → F} :
-    (f ⋆[lsmul 𝕜 𝕜, μ] g : G → F) x = ∫ t, f t • g (x - t) ∂μ :=
-  rfl
-
-theorem convolution_mul [Sub G] [NormedSpace ℝ 𝕜] {f : G → 𝕜} {g : G → 𝕜} :
-    (f ⋆[mul 𝕜 𝕜, μ] g) x = ∫ t, f t * g (x - t) ∂μ :=
   rfl
 
 section Group
@@ -819,27 +813,6 @@ theorem integral_convolution [MeasurableAdd₂ G] [MeasurableNeg G] [NormedSpace
   exact (L.flip (∫ x, g x ∂μ)).integral_comp_comm hf
 
 variable [MeasurableAdd₂ G] [IsAddRightInvariant ν] [MeasurableNeg G]
-
-theorem convolution_assoc' (hL : ∀ (x : E) (y : E') (z : E''), L₂ (L x y) z = L₃ x (L₄ y z))
-    {x₀ : G} (hfg : ∀ᵐ y ∂μ, ConvolutionExistsAt f g y L ν)
-    (hgk : ∀ᵐ x ∂ν, ConvolutionExistsAt g k x L₄ μ)
-    (hi : Integrable (uncurry fun x y => (L₃ (f y)) ((L₄ (g (x - y))) (k (x₀ - x)))) (μ.prod ν)) :
-    ((f ⋆[L, ν] g) ⋆[L₂, μ] k) x₀ = (f ⋆[L₃, ν] g ⋆[L₄, μ] k) x₀ :=
-  calc
-    ((f ⋆[L, ν] g) ⋆[L₂, μ] k) x₀ = ∫ t, L₂ (∫ s, L (f s) (g (t - s)) ∂ν) (k (x₀ - t)) ∂μ := rfl
-    _ = ∫ t, ∫ s, L₂ (L (f s) (g (t - s))) (k (x₀ - t)) ∂ν ∂μ :=
-      (integral_congr_ae (hfg.mono fun t ht => ((L₂.flip (k (x₀ - t))).integral_comp_comm ht).symm))
-    _ = ∫ t, ∫ s, L₃ (f s) (L₄ (g (t - s)) (k (x₀ - t))) ∂ν ∂μ := by simp_rw [hL]
-    _ = ∫ s, ∫ t, L₃ (f s) (L₄ (g (t - s)) (k (x₀ - t))) ∂μ ∂ν := by rw [integral_integral_swap hi]
-    _ = ∫ s, ∫ u, L₃ (f s) (L₄ (g u) (k (x₀ - s - u))) ∂μ ∂ν := by
-      congr; ext t
-      rw [eq_comm, ← integral_sub_right_eq_self _ t]
-      simp_rw [sub_sub_sub_cancel_right]
-    _ = ∫ s, L₃ (f s) (∫ u, L₄ (g u) (k (x₀ - s - u)) ∂μ) ∂ν := by
-      refine integral_congr_ae ?_
-      refine ((quasiMeasurePreserving_sub_left_of_right_invariant ν x₀).ae hgk).mono fun t ht => ?_
-      exact (L₃ (f t)).integral_comp_comm ht
-    _ = (f ⋆[L₃, ν] g ⋆[L₄, μ] k) x₀ := rfl
 
 theorem convolution_assoc (hL : ∀ (x : E) (y : E') (z : E''), L₂ (L x y) z = L₃ x (L₄ y z)) {x₀ : G}
     (hf : AEStronglyMeasurable f ν) (hg : AEStronglyMeasurable g μ) (hk : AEStronglyMeasurable k μ)

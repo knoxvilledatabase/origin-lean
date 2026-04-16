@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Lie/Weights/Chain.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.LinearMap
 import Mathlib.Algebra.Lie.Weights.Cartan
 import Mathlib.Data.Int.Interval
 import Mathlib.LinearAlgebra.Trace
+
+noncomputable section
 
 /-!
 # Chains of roots and weights
@@ -95,11 +97,6 @@ lemma genWeightSpaceChain_def :
     genWeightSpaceChain M χ₁ χ₂ p q = ⨆ k ∈ Ioo p q, genWeightSpace M (k • χ₁ + χ₂) :=
   rfl
 
-lemma genWeightSpaceChain_def' :
-    genWeightSpaceChain M χ₁ χ₂ p q = ⨆ k ∈ Finset.Ioo p q, genWeightSpace M (k • χ₁ + χ₂) := by
-  have : ∀ (k : ℤ), k ∈ Ioo p q ↔ k ∈ Finset.Ioo p q := by simp
-  simp_rw [genWeightSpaceChain_def, this]
-
 @[simp]
 lemma genWeightSpaceChain_neg :
     genWeightSpaceChain M (-χ₁) χ₂ (-q) (-p) = genWeightSpaceChain M χ₁ χ₂ p q := by
@@ -181,7 +178,39 @@ lemma trace_toEnd_genWeightSpaceChain_eq_zero
   · simp_all
   · simp_all
 
--- DISSOLVED: exists_forall_mem_corootSpace_smul_add_eq_zero
+lemma exists_forall_mem_corootSpace_smul_add_eq_zero
+    [IsDomain R] [IsPrincipalIdealRing R] [CharZero R] [NoZeroSMulDivisors R M] [IsNoetherian R M]
+    (hα : α ≠ 0) (hχ : genWeightSpace M χ ≠ ⊥) :
+    ∃ a b : ℤ, 0 < b ∧ ∀ x ∈ corootSpace α, (a • α + b • χ) x = 0 := by
+  obtain ⟨p, hp₀, q, hq₀, hp, hq⟩ := exists₂_genWeightSpace_smul_add_eq_bot M α χ hα
+  let a := ∑ i ∈ Finset.Ioo p q, finrank R (genWeightSpace M (i • α + χ)) • i
+  let b := ∑ i ∈ Finset.Ioo p q, finrank R (genWeightSpace M (i • α + χ))
+  have hb : 0 < b := by
+    replace hχ : Nontrivial (genWeightSpace M χ) := by rwa [LieSubmodule.nontrivial_iff_ne_bot]
+    refine Finset.sum_pos' (fun _ _ ↦ zero_le _) ⟨0, Finset.mem_Ioo.mpr ⟨hp₀, hq₀⟩, ?_⟩
+    rw [zero_smul, zero_add]
+    exact finrank_pos
+  refine ⟨a, b, Int.ofNat_pos.mpr hb, fun x hx ↦ ?_⟩
+  let N : ℤ → Submodule R M := fun k ↦ genWeightSpace M (k • α + χ)
+  have h₁ : iSupIndep fun (i : Finset.Ioo p q) ↦ N i := by
+    rw [← LieSubmodule.iSupIndep_iff_coe_toSubmodule]
+    refine (iSupIndep_genWeightSpace R H M).comp fun i j hij ↦ ?_
+    exact SetCoe.ext <| smul_left_injective ℤ hα <| by rwa [add_left_inj] at hij
+  have h₂ : ∀ i, MapsTo (toEnd R H M x) ↑(N i) ↑(N i) := fun _ _ ↦ LieSubmodule.lie_mem _
+  have h₃ : genWeightSpaceChain M α χ p q = ⨆ i ∈ Finset.Ioo p q, N i := by
+    simp_rw [genWeightSpaceChain_def', LieSubmodule.iSup_coe_toSubmodule]
+  rw [← trace_toEnd_genWeightSpaceChain_eq_zero M α χ p q hp hq hx,
+    ← LieSubmodule.toEnd_restrict_eq_toEnd]
+  -- The lines below illustrate the cost of treating `LieSubmodule` as both a
+  -- `Submodule` and a `LieSubmodule` simultaneously.
+  erw [LinearMap.trace_eq_sum_trace_restrict_of_eq_biSup _ h₁ h₂ (genWeightSpaceChain M α χ p q) h₃]
+  simp_rw [LieSubmodule.toEnd_restrict_eq_toEnd]
+  dsimp [N]
+  convert_to _ =
+    ∑ k ∈ Finset.Ioo p q, (LinearMap.trace R { x // x ∈ (genWeightSpace M (k • α + χ)) })
+      ((toEnd R { x // x ∈ H } { x // x ∈ genWeightSpace M (k • α + χ) }) x)
+  simp_rw [trace_toEnd_genWeightSpace, Pi.add_apply, Pi.smul_apply, smul_add, ← smul_assoc,
+    Finset.sum_add_distrib, ← Finset.sum_smul, natCast_zsmul]
 
 end IsCartanSubalgebra
 
@@ -198,7 +227,6 @@ variable [NoZeroSMulDivisors ℤ R] [NoZeroSMulDivisors R M] [IsNoetherian R M]
 variable (α : L → R) (β : Weight R L M)
 
 noncomputable
-
 def chainTopCoeff : ℕ :=
   letI := Classical.propDecidable
   if hα : α = 0 then 0 else
@@ -206,7 +234,6 @@ def chainTopCoeff : ℕ :=
     (eventually_genWeightSpace_smul_add_eq_bot M α β hα).exists)
 
 noncomputable
-
 def chainBotCoeff : ℕ := chainTopCoeff (-α) β
 
 @[simp] lemma chainTopCoeff_neg : chainTopCoeff (-α) β = chainBotCoeff α β := rfl
@@ -279,21 +306,15 @@ lemma genWeightSpace_neg_zsmul_add_ne_bot {n : ℕ} (hn : n ≤ chainBotCoeff α
   apply genWeightSpace_zsmul_add_ne_bot α β <;> omega
 
 noncomputable
-
 def chainTop (α : L → R) (β : Weight R L M) : Weight R L M :=
   ⟨chainTopCoeff α β • α + β, genWeightSpace_nsmul_add_ne_bot_of_le α β le_rfl⟩
 
 noncomputable
-
 def chainBot (α : L → R) (β : Weight R L M) : Weight R L M :=
   ⟨(- chainBotCoeff α β : ℤ) • α + β, genWeightSpace_neg_zsmul_add_ne_bot α β le_rfl⟩
 
-lemma coe_chainTop' : (chainTop α β : L → R) = chainTopCoeff α β • α + β := rfl
-
 @[simp] lemma coe_chainTop : (chainTop α β : L → R) = (chainTopCoeff α β : ℤ) • α + β := by
   rw [Nat.cast_smul_eq_nsmul ℤ]; rfl
-
-@[simp] lemma coe_chainBot : (chainBot α β : L → R) = (-chainBotCoeff α β : ℤ) • α + β := rfl
 
 @[simp] lemma chainTop_neg : chainTop (-α) β = chainBot α β := by ext; simp
 

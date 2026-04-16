@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Filter.EventuallyConst
 import Mathlib.RingTheory.Noetherian.Defs
 
+noncomputable section
+
 /-!
 # Noetherian modules and finiteness of chains
 

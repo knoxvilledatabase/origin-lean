@@ -7,6 +7,8 @@ import Mathlib.Init
 import Batteries.Util.ExtendedBinder
 import Lean.Elab.Term
 
+noncomputable section
+
 /-!
 # Sets
 
@@ -89,17 +91,13 @@ def setOf.unexpander : Lean.PrettyPrinter.Unexpander
 open Batteries.ExtendedBinder in
 
 macro (priority := low) "{" t:term " | " bs:extBinders "}" : term =>
-
   `({x | ∃ᵉ $bs:extBinders, $t = x})
 
 macro (name := macroPattSetBuilder) (priority := low-1)
-
   "{" pat:term " : " t:term " | " p:term "}" : term =>
-
   `({ x : $t | match x with | $pat => $p })
 
 macro (priority := low-1) "{" pat:term " | " p:term "}" : term =>
-
   `({ x | match x with | $pat => $p })
 
 @[app_unexpander setOf]
@@ -146,7 +144,12 @@ instance : SDiff (Set α) := ⟨Set.diff⟩
 
 def powerset (s : Set α) : Set (Set α) := {t | t ⊆ s}
 
+@[inherit_doc] prefix:100 "𝒫" => powerset
+
 universe v in
+/-- The image of `s : Set α` by `f : α → β`, written `f '' s`, is the set of `b : β` such that
+
+`f a = b` for some `a ∈ s`. -/
 
 def image {β : Type v} (f : α → β) (s : Set α) : Set β := {f a | a ∈ s}
 

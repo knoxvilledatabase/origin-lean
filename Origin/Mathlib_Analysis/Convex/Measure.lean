@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Topology
 import Mathlib.Analysis.Normed.Affine.AddTorsorBases
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 
+noncomputable section
+
 /-!
 # Convex sets are null-measurable
 

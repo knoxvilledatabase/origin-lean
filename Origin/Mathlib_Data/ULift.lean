@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.ULift
 import Mathlib.Logic.Equiv.Basic
 
+noncomputable section
+
 /-!
 # Extra lemmas about `ULift` and `PLift`
 

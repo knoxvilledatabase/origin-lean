@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.HomComplex
 import Mathlib.Algebra.Homology.HomotopyCofiber
 
+noncomputable section
+
 /-! # The mapping cone of a morphism of cochain complexes
 
 In this file, we study the homotopy cofiber `HomologicalComplex.homotopyCofiber`
@@ -357,10 +359,6 @@ lemma inl_v_desc_f (p q : ℤ) (h : p + (-1) = q) :
     (inl φ).v p q h ≫ (desc φ α β eq).f q = α.v p q h := by
   simp [desc]
 
-lemma inl_desc :
-    (inl φ).comp (Cochain.ofHom (desc φ α β eq)) (add_zero _) = α := by
-  simp
-
 @[reassoc (attr := simp)]
 lemma inr_f_desc_f (p : ℤ) :
     (inr φ).f p ≫ (desc φ α β eq).f p = β.f p := by
@@ -462,17 +460,11 @@ lemma lift_f_fst_v (p q : ℤ) (hpq : p + 1 = q) :
     (lift φ α β eq).f p ≫ (fst φ).1.v p q hpq = α.1.v p q hpq := by
   simp [lift]
 
-lemma lift_fst :
-    (Cochain.ofHom (lift φ α β eq)).comp (fst φ).1 (zero_add 1) = α.1 := by simp
-
 @[reassoc (attr := simp)]
 lemma lift_f_snd_v (p q : ℤ) (hpq : p + 0 = q) :
     (lift φ α β eq).f p ≫ (snd φ).v p q hpq = β.v p q hpq := by
   obtain rfl : q = p := by omega
   simp [lift]
-
-lemma lift_snd :
-    (Cochain.ofHom (lift φ α β eq)).comp (snd φ) (zero_add 0) = β := by simp
 
 lemma lift_f (p q : ℤ) (hpq : p + 1 = q) :
     (lift φ α β eq).f p = α.1.v p q hpq ≫

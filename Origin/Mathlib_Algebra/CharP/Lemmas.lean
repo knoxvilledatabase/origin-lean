@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/CharP/Lemmas.lean
-Genuine: 64 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
+Genuine: 66 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
 import Mathlib.Algebra.GroupPower.IterateHom
 import Mathlib.Data.Nat.Multiplicity
 import Mathlib.Data.Nat.Choose.Sum
+
+noncomputable section
 
 /-!
 # Characteristic of semirings
@@ -270,9 +272,14 @@ section
 
 variable (R) [NonAssocRing R]
 
--- DISSOLVED: char_ne_zero_of_finite
+theorem char_ne_zero_of_finite (p : ℕ) [CharP R p] [Finite R] : p ≠ 0 := by
+  rintro rfl
+  haveI : CharZero R := charP_to_charZero R
+  cases nonempty_fintype R
+  exact absurd Nat.cast_injective (not_injective_infinite_finite ((↑) : ℕ → R))
 
--- DISSOLVED: ringChar_ne_zero_of_finite
+theorem ringChar_ne_zero_of_finite [Finite R] : ringChar R ≠ 0 :=
+  char_ne_zero_of_finite R (ringChar R)
 
 end
 
@@ -311,8 +318,6 @@ def iterateFrobenius : R →+* R where
   __ := powMonoidHom (p ^ n)
   map_zero' := zero_pow (expChar_pow_pos R p n).ne'
   map_add' _ _ := add_pow_expChar_pow ..
-
-lemma frobenius_def : frobenius R p x = x ^ p := rfl
 
 lemma iterateFrobenius_def : iterateFrobenius R p n x = x ^ p ^ n := rfl
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.BooleanAlgebra
 import Mathlib.Logic.Equiv.Basic
 
+noncomputable section
+
 /-!
 # Symmetric difference and bi-implication
 
@@ -68,12 +70,6 @@ open scoped symmDiff
 theorem symmDiff_def [Max α] [SDiff α] (a b : α) : a ∆ b = a \ b ⊔ b \ a :=
   rfl
 
-theorem bihimp_def [Min α] [HImp α] (a b : α) : a ⇔ b = (b ⇨ a) ⊓ (a ⇨ b) :=
-  rfl
-
-theorem symmDiff_eq_Xor' (p q : Prop) : p ∆ q = Xor' p q :=
-  rfl
-
 @[simp]
 theorem bihimp_iff_iff {p q : Prop} : p ⇔ q ↔ (p ↔ q) :=
   iff_iff_implies_and_implies.symm.trans Iff.comm
@@ -84,14 +80,6 @@ theorem Bool.symmDiff_eq_xor : ∀ p q : Bool, p ∆ q = xor p q := by decide
 section GeneralizedCoheytingAlgebra
 
 variable [GeneralizedCoheytingAlgebra α] (a b c : α)
-
-@[simp]
-theorem toDual_symmDiff : toDual (a ∆ b) = toDual a ⇔ toDual b :=
-  rfl
-
-@[simp]
-theorem ofDual_bihimp (a b : αᵒᵈ) : ofDual (a ⇔ b) = ofDual a ∆ ofDual b :=
-  rfl
 
 theorem symmDiff_comm : a ∆ b = b ∆ a := by simp only [symmDiff, sup_comm]
 
@@ -187,14 +175,6 @@ end GeneralizedCoheytingAlgebra
 section GeneralizedHeytingAlgebra
 
 variable [GeneralizedHeytingAlgebra α] (a b c : α)
-
-@[simp]
-theorem toDual_bihimp : toDual (a ⇔ b) = toDual a ∆ toDual b :=
-  rfl
-
-@[simp]
-theorem ofDual_symmDiff (a b : αᵒᵈ) : ofDual (a ∆ b) = ofDual a ⇔ ofDual b :=
-  rfl
 
 theorem bihimp_comm : a ⇔ b = b ⇔ a := by simp only [(· ⇔ ·), inf_comm]
 
@@ -663,26 +643,6 @@ end BooleanAlgebra
 
 section Prod
 
-@[simp]
-theorem symmDiff_fst [GeneralizedCoheytingAlgebra α] [GeneralizedCoheytingAlgebra β]
-    (a b : α × β) : (a ∆ b).1 = a.1 ∆ b.1 :=
-  rfl
-
-@[simp]
-theorem symmDiff_snd [GeneralizedCoheytingAlgebra α] [GeneralizedCoheytingAlgebra β]
-    (a b : α × β) : (a ∆ b).2 = a.2 ∆ b.2 :=
-  rfl
-
-@[simp]
-theorem bihimp_fst [GeneralizedHeytingAlgebra α] [GeneralizedHeytingAlgebra β] (a b : α × β) :
-    (a ⇔ b).1 = a.1 ⇔ b.1 :=
-  rfl
-
-@[simp]
-theorem bihimp_snd [GeneralizedHeytingAlgebra α] [GeneralizedHeytingAlgebra β] (a b : α × β) :
-    (a ⇔ b).2 = a.2 ⇔ b.2 :=
-  rfl
-
 end Prod
 
 /-! ### Pi -/
@@ -691,20 +651,6 @@ namespace Pi
 
 theorem symmDiff_def [∀ i, GeneralizedCoheytingAlgebra (π i)] (a b : ∀ i, π i) :
     a ∆ b = fun i => a i ∆ b i :=
-  rfl
-
-theorem bihimp_def [∀ i, GeneralizedHeytingAlgebra (π i)] (a b : ∀ i, π i) :
-    a ⇔ b = fun i => a i ⇔ b i :=
-  rfl
-
-@[simp]
-theorem symmDiff_apply [∀ i, GeneralizedCoheytingAlgebra (π i)] (a b : ∀ i, π i) (i : ι) :
-    (a ∆ b) i = a i ∆ b i :=
-  rfl
-
-@[simp]
-theorem bihimp_apply [∀ i, GeneralizedHeytingAlgebra (π i)] (a b : ∀ i, π i) (i : ι) :
-    (a ⇔ b) i = a i ⇔ b i :=
   rfl
 
 end Pi

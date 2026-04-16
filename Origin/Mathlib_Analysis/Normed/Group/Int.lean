@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Topology.Instances.Int
 
+noncomputable section
+
 /-! # ℤ as a normed group -/
 
 open NNReal
@@ -17,10 +19,6 @@ namespace Int
 instance instNormedAddCommGroup : NormedAddCommGroup ℤ where
   norm n := ‖(n : ℝ)‖
   dist_eq m n := by simp only [Int.dist_eq, norm, Int.cast_sub]
-
-@[norm_cast]
-theorem norm_cast_real (m : ℤ) : ‖(m : ℝ)‖ = ‖m‖ :=
-  rfl
 
 theorem norm_eq_abs (n : ℤ) : ‖n‖ = |(n : ℝ)| :=
   rfl

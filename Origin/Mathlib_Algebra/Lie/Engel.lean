@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.Nilpotent
 import Mathlib.Algebra.Lie.Normalizer
 
+noncomputable section
+
 /-!
 # Engel's theorem
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.DirectSum.Finsupp
 import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 
+noncomputable section
+
 /-!
 # Bases and dimensionality of tensor products of modules
 
@@ -50,7 +52,6 @@ theorem Basis.tensorProduct_repr_tmul_apply (b : Basis ι S M) (c : Basis κ R N
 variable (S : Type*) [Semiring S] [Algebra R S]
 
 noncomputable
-
 def Basis.baseChange (b : Basis ι R M) : Basis ι S (S ⊗[R] M) :=
   ((Basis.singleton Unit S).tensorProduct b).reindex (Equiv.punitProd ι)
 

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Groupoid
 import Mathlib.CategoryTheory.PathCategory.Basic
 import Mathlib.Combinatorics.Quiver.Path
 
+noncomputable section
+
 /-!
 # Vertex group
 

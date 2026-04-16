@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.List.Chain
 
+noncomputable section
+
 /-!
 # Ranges of naturals as lists
 
@@ -23,9 +25,6 @@ open Nat
 namespace List
 
 variable {α : Type u}
-
-theorem getElem_range'_1 {n m} (i) (H : i < (range' n m).length) :
-    (range' n m)[i] = n + i := by simp
 
 theorem chain'_range_succ (r : ℕ → ℕ → Prop) (n : ℕ) :
     Chain' r (range n.succ) ↔ ∀ m < n, r m m.succ := by
@@ -79,12 +78,16 @@ theorem ranges_length (l : List ℕ) :
     simp only [Function.comp_apply, length_map]
 
 set_option linter.deprecated false in
+/-- See `List.ranges_flatten` for the version about `List.sum`. -/
 
 lemma ranges_flatten' : ∀ l : List ℕ, l.ranges.flatten = range (Nat.sum l)
   | [] => rfl
   | a :: l => by simp only [Nat.sum_cons, flatten, ← map_flatten, ranges_flatten', range_add]
 
 set_option linter.deprecated false in
+/-- Any entry of any member of `l.ranges` is strictly smaller than `Nat.sum l`.
+
+See `List.mem_mem_ranges_iff_lt_sum` for the version about `List.sum`. -/
 
 lemma mem_mem_ranges_iff_lt_natSum (l : List ℕ) {n : ℕ} :
     (∃ s ∈ l.ranges, n ∈ s) ↔ n < Nat.sum l := by

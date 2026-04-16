@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Groupoid
 import Mathlib.Combinatorics.Quiver.Basic
 
+noncomputable section
+
 /-!
 This file defines a few basic properties of groupoids.
 -/

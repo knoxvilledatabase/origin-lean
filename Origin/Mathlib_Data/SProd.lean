@@ -5,6 +5,8 @@ Genuine: 1 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.FBinop
 
+noncomputable section
+
 /-!
 # Set Product Notation
 This file provides notation for a product of sets, and other similar types.
@@ -25,5 +27,7 @@ universe u v w
 class SProd (α : Type u) (β : Type v) (γ : outParam (Type w)) where
   /-- The cartesian product `s ×ˢ t` is the set of `(a, b)` such that `a ∈ s` and `b ∈ t`. -/
   sprod : α → β → γ
+
+@[inherit_doc SProd.sprod] infixr:82 " ×ˢ " => SProd.sprod
 
 macro_rules | `($x ×ˢ $y)   => `(fbinop% SProd.sprod $x $y)

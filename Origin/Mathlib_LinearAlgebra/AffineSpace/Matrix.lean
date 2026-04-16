@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.Basis
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
+noncomputable section
+
 /-!
 # Matrix results for barycentric co-ordinates
 
@@ -42,9 +44,6 @@ theorem toMatrix_self [DecidableEq ι] : b.toMatrix b = (1 : Matrix ι ι k) := 
   rw [toMatrix_apply, coord_apply, Matrix.one_eq_pi_single, Pi.single_apply]
 
 variable {ι' : Type*}
-
-theorem toMatrix_row_sum_one [Fintype ι] (q : ι' → P) (i : ι') : ∑ j, b.toMatrix q i j = 1 := by
-  simp
 
 theorem affineIndependent_of_toMatrix_right_inv [Fintype ι] [Finite ι'] [DecidableEq ι']
     (p : ι' → P) {A : Matrix ι ι' k} (hA : b.toMatrix p * A = 1) : AffineIndependent k p := by

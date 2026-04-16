@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Independence.Basic
 import Mathlib.Probability.Independence.Conditional
 
+noncomputable section
+
 /-!
 # Kolmogorov's 0-1 law
 

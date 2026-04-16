@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Reflection.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LinearMap.Basic
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.LinearAlgebra.Dual
 import Mathlib.LinearAlgebra.FiniteSpan
+
+noncomputable section
 
 /-!
 # Reflections in linear algebra
@@ -94,11 +96,6 @@ lemma involutive_reflection (h : f x = 2) :
     Involutive (reflection h) :=
   involutive_preReflection h
 
-@[simp]
-lemma reflection_symm (h : f x = 2) :
-    (reflection h).symm = reflection h :=
-  rfl
-
 lemma invOn_reflection_of_mapsTo {Φ : Set M} (h : f x = 2) :
     InvOn (reflection h) (reflection h) Φ Φ :=
   ⟨fun x _ ↦ involutive_reflection h x, fun x _ ↦ involutive_reflection h x⟩
@@ -107,9 +104,59 @@ lemma bijOn_reflection_of_mapsTo {Φ : Set M} (h : f x = 2) (h' : MapsTo (reflec
     BijOn (reflection h) Φ Φ :=
   (invOn_reflection_of_mapsTo h).bijOn h' h'
 
--- DISSOLVED: Dual.eq_of_preReflection_mapsTo
+lemma Dual.eq_of_preReflection_mapsTo [CharZero R] [NoZeroSMulDivisors R M]
+    {x : M} (hx : x ≠ 0) {Φ : Set M} (hΦ₁ : Φ.Finite) (hΦ₂ : span R Φ = ⊤) {f g : Dual R M}
+    (hf₁ : f x = 2) (hf₂ : MapsTo (preReflection x f) Φ Φ)
+    (hg₁ : g x = 2) (hg₂ : MapsTo (preReflection x g) Φ Φ) :
+    f = g := by
+  let u := reflection hg₁ * reflection hf₁
+  have hu : u = LinearMap.id (R := R) (M := M) + (f - g).smulRight x := by
+    ext y
+    simp only [u, reflection_apply, hg₁, two_smul, LinearEquiv.coe_toLinearMap_mul,
+      LinearMap.id_coe, LinearEquiv.coe_coe, LinearMap.mul_apply, LinearMap.add_apply, id_eq,
+      LinearMap.coe_smulRight, LinearMap.sub_apply, map_sub, map_smul, sub_add_cancel_left,
+      smul_neg, sub_neg_eq_add, sub_smul]
+    abel
+  replace hu : ∀ (n : ℕ),
+      ↑(u ^ n) = LinearMap.id (R := R) (M := M) + (n : R) • (f - g).smulRight x := by
+    intros n
+    induction n with
+    | zero => simp
+    | succ n ih =>
+      have : ((f - g).smulRight x).comp ((n : R) • (f - g).smulRight x) = 0 := by
+        ext; simp [hf₁, hg₁]
+      rw [pow_succ', LinearEquiv.coe_toLinearMap_mul, ih, hu, add_mul, mul_add, mul_add]
+      simp_rw [LinearMap.mul_eq_comp, LinearMap.comp_id, LinearMap.id_comp, this, add_zero,
+        add_assoc, Nat.cast_succ, add_smul, one_smul]
+  suffices IsOfFinOrder u by
+    obtain ⟨n, hn₀, hn₁⟩ := isOfFinOrder_iff_pow_eq_one.mp this
+    replace hn₁ : (↑(u ^ n) : M →ₗ[R] M) = LinearMap.id := LinearEquiv.toLinearMap_inj.mpr hn₁
+    simpa [hn₁, hn₀.ne', hx, sub_eq_zero] using hu n
+  exact u.isOfFinOrder_of_finite_of_span_eq_top_of_mapsTo hΦ₁ hΦ₂ (hg₂.comp hf₂)
 
--- DISSOLVED: Dual.eq_of_preReflection_mapsTo'
+lemma Dual.eq_of_preReflection_mapsTo' [CharZero R] [NoZeroSMulDivisors R M]
+    {x : M} (hx : x ≠ 0) {Φ : Set M} (hΦ₁ : Φ.Finite) (hx' : x ∈ span R Φ) {f g : Dual R M}
+    (hf₁ : f x = 2) (hf₂ : MapsTo (preReflection x f) Φ Φ)
+    (hg₁ : g x = 2) (hg₂ : MapsTo (preReflection x g) Φ Φ) :
+    (span R Φ).subtype.dualMap f = (span R Φ).subtype.dualMap g := by
+  set Φ' : Set (span R Φ) := range (inclusion <| Submodule.subset_span (R := R) (s := Φ))
+  rw [← finite_coe_iff] at hΦ₁
+  have hΦ'₁ : Φ'.Finite := finite_range (inclusion Submodule.subset_span)
+  have hΦ'₂ : span R Φ' = ⊤ := by
+    simp only [Φ']
+    rw [range_inclusion]
+    simp
+  let x' : span R Φ := ⟨x, hx'⟩
+  have hx' : x' ≠ 0 := Subtype.coe_ne_coe.1 hx
+  have this : ∀ {F : Dual R M}, MapsTo (preReflection x F) Φ Φ →
+      MapsTo (preReflection x' ((span R Φ).subtype.dualMap F)) Φ' Φ' := by
+    intro F hF ⟨y, hy⟩ hy'
+    simp only [Φ'] at hy' ⊢
+    rw [range_inclusion] at hy'
+    simp only [SetLike.coe_sort_coe, mem_setOf_eq] at hy' ⊢
+    rw [range_inclusion]
+    exact hF hy'
+  exact eq_of_preReflection_mapsTo hx' hΦ'₁ hΦ'₂ hf₁ (this hf₂) hg₁ (this hg₂)
 
 variable {y}
 

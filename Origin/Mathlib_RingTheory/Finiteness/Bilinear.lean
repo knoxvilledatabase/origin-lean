@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Finiteness.Defs
 import Mathlib.Algebra.Module.Submodule.Bilinear
 
+noncomputable section
+
 /-!
 # Finitely generated submodules and bilinear maps
 

@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.List.Nodup
 
+noncomputable section
+
 /-!
 # Antidiagonals in ℕ × ℕ as lists
 
@@ -42,10 +44,6 @@ theorem mem_antidiagonal {n : ℕ} {x : ℕ × ℕ} : x ∈ antidiagonal n ↔ x
 @[simp]
 theorem length_antidiagonal (n : ℕ) : (antidiagonal n).length = n + 1 := by
   rw [antidiagonal, length_map, length_range]
-
-@[simp]
-theorem antidiagonal_zero : antidiagonal 0 = [(0, 0)] :=
-  rfl
 
 theorem nodup_antidiagonal (n : ℕ) : Nodup (antidiagonal n) :=
   (nodup_range _).map ((@LeftInverse.injective ℕ (ℕ × ℕ) Prod.fst fun i ↦ (i, n - i)) fun _ ↦ rfl)

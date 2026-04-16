@@ -8,6 +8,8 @@ import Mathlib.Order.Bounds.Basic
 import Mathlib.Order.Directed
 import Mathlib.Order.Hom.Set
 
+noncomputable section
+
 /-!
 # Antichains
 

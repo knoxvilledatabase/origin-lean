@@ -5,6 +5,8 @@ Genuine: 126 | Conflates: 0 | Dissolved: 0 | Infrastructure: 61
 import Origin.Core
 import Mathlib.Probability.Kernel.MeasurableIntegral
 
+noncomputable section
+
 /-!
 # Product and composition of kernels
 
@@ -661,14 +663,7 @@ def comap (κ : Kernel α β) (g : γ → α) (hg : Measurable g) : Kernel γ β
   toFun a := κ (g a)
   measurable' := κ.measurable.comp hg
 
-@[simp, norm_cast]
-lemma coe_comap (κ : Kernel α β) (g : γ → α) (hg : Measurable g) : κ.comap g hg = κ ∘ g := rfl
-
 theorem comap_apply (κ : Kernel α β) (hg : Measurable g) (c : γ) : comap κ g hg c = κ (g c) :=
-  rfl
-
-theorem comap_apply' (κ : Kernel α β) (hg : Measurable g) (c : γ) (s : Set β) :
-    comap κ g hg c s = κ (g c) s :=
   rfl
 
 @[simp]
@@ -735,13 +730,6 @@ theorem prodMkLeft_apply (κ : Kernel α β) (ca : γ × α) : prodMkLeft γ κ 
 @[simp]
 theorem prodMkRight_apply (κ : Kernel α β) (ca : α × γ) : prodMkRight γ κ ca = κ ca.fst := rfl
 
-theorem prodMkLeft_apply' (κ : Kernel α β) (ca : γ × α) (s : Set β) :
-    prodMkLeft γ κ ca s = κ ca.snd s :=
-  rfl
-
-theorem prodMkRight_apply' (κ : Kernel α β) (ca : α × γ) (s : Set β) :
-    prodMkRight γ κ ca s = κ ca.fst s := rfl
-
 @[simp]
 lemma prodMkLeft_zero : Kernel.prodMkLeft α (0 : Kernel β γ) = 0 := by
   ext x s _; simp
@@ -760,9 +748,6 @@ lemma prodMkRight_add (κ η : Kernel α β) :
 
 theorem lintegral_prodMkLeft (κ : Kernel α β) (ca : γ × α) (g : β → ℝ≥0∞) :
     ∫⁻ b, g b ∂prodMkLeft γ κ ca = ∫⁻ b, g b ∂κ ca.snd := rfl
-
-theorem lintegral_prodMkRight (κ : Kernel α β) (ca : α × γ) (g : β → ℝ≥0∞) :
-    ∫⁻ b, g b ∂prodMkRight γ κ ca = ∫⁻ b, g b ∂κ ca.fst := rfl
 
 instance IsMarkovKernel.prodMkLeft (κ : Kernel α β) [IsMarkovKernel κ] :
     IsMarkovKernel (prodMkLeft γ κ) := by rw [Kernel.prodMkLeft]; infer_instance
@@ -814,9 +799,6 @@ def swapLeft (κ : Kernel (α × β) γ) : Kernel (β × α) γ :=
 @[simp]
 theorem swapLeft_apply (κ : Kernel (α × β) γ) (a : β × α) : swapLeft κ a = κ a.swap := rfl
 
-theorem swapLeft_apply' (κ : Kernel (α × β) γ) (a : β × α) (s : Set γ) :
-    swapLeft κ a s = κ a.swap s := rfl
-
 theorem lintegral_swapLeft (κ : Kernel (α × β) γ) (a : β × α) (g : γ → ℝ≥0∞) :
     ∫⁻ c, g c ∂swapLeft κ a = ∫⁻ c, g c ∂κ a.swap := by
   rw [swapLeft_apply]
@@ -832,9 +814,6 @@ instance IsSFiniteKernel.swapLeft (κ : Kernel (α × β) γ) [IsSFiniteKernel �
 
 @[simp] lemma swapLeft_prodMkLeft (κ : Kernel α β) (γ : Type*) {_ : MeasurableSpace γ} :
     swapLeft (prodMkLeft γ κ) = prodMkRight γ κ := rfl
-
-@[simp] lemma swapLeft_prodMkRight (κ : Kernel α β) (γ : Type*) {_ : MeasurableSpace γ} :
-    swapLeft (prodMkRight γ κ) = prodMkLeft γ κ := rfl
 
 noncomputable def swapRight (κ : Kernel α (β × γ)) : Kernel α (γ × β) :=
   mapOfMeasurable κ Prod.swap measurable_swap
@@ -934,12 +913,6 @@ lemma fst_compProd (κ : Kernel α β) (η : Kernel (α × β) γ) [IsSFiniteKer
   simp_rw [this]
   rw [lintegral_indicator_const hs, one_mul]
 
-lemma fst_prodMkLeft (δ : Type*) [MeasurableSpace δ] (κ : Kernel α (β × γ)) :
-    fst (prodMkLeft δ κ) = prodMkLeft δ (fst κ) := rfl
-
-lemma fst_prodMkRight (κ : Kernel α (β × γ)) (δ : Type*) [MeasurableSpace δ] :
-    fst (prodMkRight δ κ) = prodMkRight δ (fst κ) := rfl
-
 noncomputable def snd (κ : Kernel α (β × γ)) : Kernel α γ :=
   mapOfMeasurable κ Prod.snd measurable_snd
 
@@ -993,12 +966,6 @@ lemma snd_map_prod_id (κ : Kernel α β) {γ : Type*} {mγ : MeasurableSpace γ
     {f : β → γ} (hf : Measurable f) :
     snd (map κ (fun a ↦ (f a, a))) = κ := by
   rw [snd_map_prod _ hf, Kernel.map_id']
-
-lemma snd_prodMkLeft (δ : Type*) [MeasurableSpace δ] (κ : Kernel α (β × γ)) :
-    snd (prodMkLeft δ κ) = prodMkLeft δ (snd κ) := rfl
-
-lemma snd_prodMkRight (κ : Kernel α (β × γ)) (δ : Type*) [MeasurableSpace δ] :
-    snd (prodMkRight δ κ) = prodMkRight δ (snd κ) := rfl
 
 @[simp]
 lemma fst_swapRight (κ : Kernel α (β × γ)) : fst (swapRight κ) = snd κ := by

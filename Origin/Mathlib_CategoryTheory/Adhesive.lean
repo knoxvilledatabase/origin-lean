@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Extensive
 import Mathlib.CategoryTheory.Limits.Shapes.KernelPair
 import Mathlib.CategoryTheory.Limits.Constructions.EpiMono
 
+noncomputable section
+
 /-!
 
 # Adhesive categories

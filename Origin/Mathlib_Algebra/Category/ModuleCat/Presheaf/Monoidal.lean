@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Presheaf
 import Mathlib.Algebra.Category.ModuleCat.Monoidal.Basic
 
+noncomputable section
+
 /-!
 # The monoidal category structure on presheaves of modules
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/LinearMap/Polynomial.lean
-Genuine: 46 | Conflates: 5 | Dissolved: 5 | Infrastructure: 0
+Genuine: 48 | Conflates: 7 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Monad
@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Univ
 import Mathlib.RingTheory.Finiteness.TensorProduct
 import Mathlib.RingTheory.TensorProduct.Free
+
+noncomputable section
 
 /-!
 # Characteristic polynomials of linear families of endomorphisms
@@ -73,7 +75,6 @@ variable [Fintype n] [Fintype o] [CommSemiring R] [CommSemiring S]
 open MvPolynomial
 
 noncomputable
-
 def toMvPolynomial (M : Matrix m n R) (i : m) : MvPolynomial n R :=
   ∑ j, monomial (.single j 1) (M i j)
 
@@ -151,7 +152,6 @@ variable [DecidableEq ι₁]
 variable (b₁ : Basis ι₁ R M₁) (b₂ : Basis ι₂ R M₂)
 
 noncomputable
-
 def toMvPolynomial (f : M₁ →ₗ[R] M₂) (i : ι₂) :
     MvPolynomial ι₁ R :=
   (toMatrix b₁ b₂ f).toMvPolynomial i
@@ -232,7 +232,6 @@ variable [DecidableEq ιM] (b : Basis ι R L) (bₘ : Basis ιM R M)
 open Matrix
 
 noncomputable
-
 def polyCharpolyAux : Polynomial (MvPolynomial ι R) :=
   (charpoly.univ R ιM).map <| MvPolynomial.bind₁ (φ.toMvPolynomial b bₘ.end)
 
@@ -352,7 +351,6 @@ open Module Matrix
 variable [Module.Free R M] [Module.Finite R M] (b : Basis ι R L)
 
 noncomputable
-
 def polyCharpoly : Polynomial (MvPolynomial ι R) :=
   φ.polyCharpolyAux b (Module.Free.chooseBasis R M)
 
@@ -365,7 +363,9 @@ lemma polyCharpoly_eq_of_basis [DecidableEq ιM] (bₘ : Basis ιM R M) :
 lemma polyCharpoly_monic : (polyCharpoly φ b).Monic :=
   (charpoly.univ_monic R _).map _
 
--- DISSOLVED: polyCharpoly_ne_zero
+-- CONFLATES (assumes ground = zero): polyCharpoly_ne_zero
+lemma polyCharpoly_ne_zero [Nontrivial R] : (polyCharpoly φ b) ≠ 0 :=
+  (polyCharpoly_monic _ _).ne_zero
 
 -- CONFLATES (assumes ground = zero): polyCharpoly_natDegree
 @[simp]
@@ -420,11 +420,14 @@ lemma polyCharpoly_coeff_eq_zero_iff_of_basis (b : Basis ι R L) (b' : Basis ι'
 section aux
 
 noncomputable
-
 def nilRankAux (φ : L →ₗ[R] Module.End R M) (b : Basis ι R L) : ℕ :=
   (polyCharpoly φ b).natTrailingDegree
 
--- DISSOLVED: polyCharpoly_coeff_nilRankAux_ne_zero
+-- CONFLATES (assumes ground = zero): polyCharpoly_coeff_nilRankAux_ne_zero
+lemma polyCharpoly_coeff_nilRankAux_ne_zero [Nontrivial R] :
+    (polyCharpoly φ b).coeff (nilRankAux φ b) ≠ 0 := by
+  apply Polynomial.trailingCoeff_nonzero_iff_nonzero.mpr
+  apply polyCharpoly_ne_zero
 
 -- CONFLATES (assumes ground = zero): nilRankAux_le
 lemma nilRankAux_le [Nontrivial R] (b : Basis ι R L) (b' : Basis ι' R L) :
@@ -443,7 +446,6 @@ end aux
 variable [Module.Finite R L] [Module.Free R L]
 
 noncomputable
-
 def nilRank (φ : L →ₗ[R] Module.End R M) : ℕ :=
   nilRankAux φ (Module.Free.chooseBasis R L)
 
@@ -455,7 +457,10 @@ lemma nilRank_eq_polyCharpoly_natTrailingDegree (b : Basis ι R L) :
     nilRank φ = (polyCharpoly φ b).natTrailingDegree := by
   apply nilRankAux_basis_indep
 
--- DISSOLVED: polyCharpoly_coeff_nilRank_ne_zero
+lemma polyCharpoly_coeff_nilRank_ne_zero :
+    (polyCharpoly φ b).coeff (nilRank φ) ≠ 0 := by
+  rw [nilRank_eq_polyCharpoly_natTrailingDegree _ b]
+  apply polyCharpoly_coeff_nilRankAux_ne_zero
 
 open Module Module.Free
 
@@ -484,9 +489,14 @@ def IsNilRegular (x : L) : Prop :=
 
 variable (x : L)
 
--- DISSOLVED: isNilRegular_def
+lemma isNilRegular_def :
+    IsNilRegular φ x ↔ (Polynomial.coeff (φ x).charpoly (nilRank φ) ≠ 0) := Iff.rfl
 
--- DISSOLVED: isNilRegular_iff_coeff_polyCharpoly_nilRank_ne_zero
+lemma isNilRegular_iff_coeff_polyCharpoly_nilRank_ne_zero :
+    IsNilRegular φ x ↔
+    MvPolynomial.eval (b.repr x)
+      ((polyCharpoly φ b).coeff (nilRank φ)) ≠ 0 := by
+  rw [IsNilRegular, polyCharpoly_coeff_eval]
 
 -- CONFLATES (assumes ground = zero): isNilRegular_iff_natTrailingDegree_charpoly_eq_nilRank
 lemma isNilRegular_iff_natTrailingDegree_charpoly_eq_nilRank [Nontrivial R] :

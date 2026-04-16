@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Grading
 import Mathlib.Algebra.Module.Opposite
 
+noncomputable section
+
 /-!
 # Conjugations
 
@@ -82,16 +84,8 @@ def reverseOpEquiv : CliffordAlgebra Q ≃ₐ[R] (CliffordAlgebra Q)ᵐᵒᵖ :=
     (AlgHom.unop.injective <| hom_ext <| LinearMap.ext fun _ => by simp)
     (hom_ext <| LinearMap.ext fun _ => by simp)
 
-@[simp]
-theorem reverseOpEquiv_opComm :
-    AlgEquiv.opComm (reverseOpEquiv (Q := Q)) = reverseOpEquiv.symm := rfl
-
 def reverse : CliffordAlgebra Q →ₗ[R] CliffordAlgebra Q :=
   (opLinearEquiv R).symm.toLinearMap.comp reverseOp.toLinearMap
-
-@[simp] theorem unop_reverseOp (x : CliffordAlgebra Q) : (reverseOp x).unop = reverse x := rfl
-
-@[simp] theorem op_reverse (x : CliffordAlgebra Q) : op (reverse x) = reverseOp x := rfl
 
 @[simp]
 theorem reverse_ι (m : M) : reverse (ι Q m) = ι Q m := by simp [reverse]

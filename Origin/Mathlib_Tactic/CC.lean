@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Tactic.CC.Addition
 
+noncomputable section
+
 /-!
 # Congruence closure
 
@@ -180,9 +182,7 @@ declare_config_elab elabCCConfig CCConfig
 open Parser.Tactic in
 
 elab (name := _root_.Mathlib.Tactic.cc) "cc" cfg:optConfig : tactic => do
-
   let cfg ← elabCCConfig cfg
-
   withMainContext <| liftMetaFinishingTactic (·.cc cfg)
 
 end Mathlib.Tactic.CC

@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/AffineSpace/Basis.lean
-Genuine: 30 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
+Genuine: 29 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.Independent
 import Mathlib.LinearAlgebra.AffineSpace.Pointwise
+
+noncomputable section
 
 /-!
 # Affine bases and barycentric coordinates
@@ -76,7 +78,6 @@ theorem tot : affineSpan k (range b) = ⊤ :=
   b.tot'
 
 include b in
-
 protected theorem nonempty : Nonempty ι :=
   not_isEmpty_iff.mp fun hι => by
     simpa only [@range_eq_empty _ _ hι, AffineSubspace.span_empty, bot_ne_top] using b.tot
@@ -85,14 +86,6 @@ def reindex (e : ι ≃ ι') : AffineBasis ι' k P :=
   ⟨b ∘ e.symm, b.ind.comp_embedding e.symm.toEmbedding, by
     rw [e.symm.surjective.range_comp]
     exact b.3⟩
-
-@[simp, norm_cast]
-theorem coe_reindex : ⇑(b.reindex e) = b ∘ e.symm :=
-  rfl
-
-@[simp]
-theorem reindex_apply (i' : ι') : b.reindex e i' = b (e.symm i') :=
-  rfl
 
 @[simp]
 theorem reindex_refl : b.reindex (Equiv.refl _) = b :=
@@ -128,10 +121,6 @@ noncomputable def coord (i : ι) : P →ᵃ[k] k where
     dsimp only
     rw [vadd_vsub_assoc, LinearMap.map_add, vadd_eq_add, LinearMap.neg_apply,
       sub_add_eq_sub_sub_swap, add_comm, sub_eq_add_neg]
-
-@[simp]
-theorem linear_eq_sumCoords (i : ι) : (b.coord i).linear = -(b.basisOf i).sumCoords :=
-  rfl
 
 @[simp]
 theorem coord_reindex (i : ι') : (b.reindex e).coord i = b.coord (e.symm i) := by
@@ -235,10 +224,6 @@ noncomputable def coords : P →ᵃ[k] ι → k where
       map_smul' := fun t v => by ext; simp }
   map_vadd' p v := by ext; simp
 
-@[simp]
-theorem coords_apply (q : P) (i : ι) : b.coords q i = b.coord i q :=
-  rfl
-
 instance instVAdd : VAdd V (AffineBasis ι k P) where
   vadd x b :=
     { toFun := x +ᵥ ⇑b,
@@ -290,10 +275,6 @@ instance [SMul G G'] [IsScalarTower G G' V] : IsScalarTower G G' (AffineBasis ι
 
 @[simp] lemma basisOf_smul (a : G) (b : AffineBasis ι k V) (i : ι) :
     (a • b).basisOf i = a • b.basisOf i := by ext j; simp [smul_sub]
-
-@[simp] lemma reindex_smul (a : G) (b : AffineBasis ι k V) (e : ι ≃ ι') :
-    (a • b).reindex e = a • b.reindex e :=
-  rfl
 
 @[simp] lemma coord_smul (a : G) (b : AffineBasis ι k V) (i : ι) :
     (a • b).coord i = (b.coord i).comp (DistribMulAction.toLinearEquiv _ _ a).symm.toAffineMap := by

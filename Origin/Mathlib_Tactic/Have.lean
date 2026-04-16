@@ -8,6 +8,8 @@ import Lean.Elab.Binders
 import Lean.Elab.SyntheticMVars
 import Lean.Meta.Tactic.Assert
 
+noncomputable section
+
 /-!
 # Extending `have`, `let` and `suffices`
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/Order.lean
-Genuine: 147 | Conflates: 1 | Dissolved: 0 | Infrastructure: 29
+Genuine: 146 | Conflates: 1 | Dissolved: 0 | Infrastructure: 29
 -/
 import Origin.Core
 import Mathlib.Topology.Defs.Induced
 import Mathlib.Topology.Basic
+
+noncomputable section
 
 /-!
 # Ordering on topologies and (co)induced topologies
@@ -136,9 +138,6 @@ instance : PartialOrder (TopologicalSpace α) :=
   { PartialOrder.lift (fun t => OrderDual.toDual IsOpen[t]) (fun _ _ => TopologicalSpace.ext) with
     le := fun s t => ∀ U, IsOpen[t] U → IsOpen[s] U }
 
-protected theorem le_def {α} {t s : TopologicalSpace α} : t ≤ s ↔ IsOpen[s] ≤ IsOpen[t] :=
-  Iff.rfl
-
 theorem le_generateFrom_iff_subset_isOpen {g : Set (Set α)} {t : TopologicalSpace α} :
     t ≤ generateFrom g ↔ g ⊆ { s | IsOpen[t] s } :=
   ⟨fun ht s hs => ht _ <| .basic s hs, fun hg _s hs =>
@@ -205,9 +204,6 @@ theorem IsClosed.mono (hs : IsClosed[t₂] s) (h : t₁ ≤ t₂) : IsClosed[t�
 
 theorem closure.mono (h : t₁ ≤ t₂) : closure[t₁] s ⊆ closure[t₂] s :=
   @closure_minimal _ s (@closure _ t₂ s) t₁ subset_closure (IsClosed.mono isClosed_closure h)
-
-theorem isOpen_implies_isOpen_iff : (∀ s, IsOpen[t₁] s → IsOpen[t₂] s) ↔ t₂ ≤ t₁ :=
-  Iff.rfl
 
 theorem TopologicalSpace.isOpen_top_iff {α} (U : Set α) : IsOpen[⊤] U ↔ U = ∅ ∨ U = univ :=
   ⟨fun h => by
@@ -590,10 +586,6 @@ theorem nhds_inf {t₁ t₂ : TopologicalSpace α} {a : α} :
 theorem nhds_top {a : α} : @nhds α ⊤ a = ⊤ :=
   (gc_nhds a).u_top
 
-theorem isOpen_sup {t₁ t₂ : TopologicalSpace α} {s : Set α} :
-    IsOpen[t₁ ⊔ t₂] s ↔ IsOpen[t₁] s ∧ IsOpen[t₂] s :=
-  Iff.rfl
-
 open TopologicalSpace
 
 variable {γ : Type*} {f : α → β} {ι : Sort*}
@@ -751,10 +743,6 @@ variable {α : Type*} {β : Type*}
 
 variable [t : TopologicalSpace β] {f : α → β}
 
-theorem isOpen_induced_eq {s : Set α} :
-    IsOpen[induced f t] s ↔ s ∈ preimage f '' { s | IsOpen s } :=
-  Iff.rfl
-
 theorem isOpen_induced {s : Set β} (h : IsOpen s) : IsOpen[induced f t] (f ⁻¹' s) :=
   ⟨s, h, rfl⟩
 
@@ -792,9 +780,6 @@ theorem nhds_true : 𝓝 True = pure True :=
 theorem nhds_false : 𝓝 False = ⊤ :=
   TopologicalSpace.nhds_generateFrom.trans <| by simp [@and_comm (_ ∈ _), iInter_and]
 
-theorem tendsto_nhds_true {l : Filter α} {p : α → Prop} :
-    Tendsto p l (𝓝 True) ↔ ∀ᶠ x in l, p x := by simp
-
 theorem tendsto_nhds_Prop {l : Filter α} {p : α → Prop} {q : Prop} :
     Tendsto p l (𝓝 q) ↔ (q → ∀ᶠ x in l, p x) := by
   by_cases q <;> simp [*]
@@ -818,10 +803,6 @@ variable {α : Type u} {ι : Sort v}
 theorem generateFrom_union (a₁ a₂ : Set (Set α)) :
     generateFrom (a₁ ∪ a₂) = generateFrom a₁ ⊓ generateFrom a₂ :=
   (gc_generateFrom α).u_inf
-
-theorem setOf_isOpen_sup (t₁ t₂ : TopologicalSpace α) :
-    { s | IsOpen[t₁ ⊔ t₂] s } = { s | IsOpen[t₁] s } ∩ { s | IsOpen[t₂] s } :=
-  rfl
 
 theorem generateFrom_iUnion {f : ι → Set (Set α)} :
     generateFrom (⋃ i, f i) = ⨅ i, generateFrom (f i) :=
@@ -871,7 +852,6 @@ theorem isOpen_sSup_iff {s : Set α} {T : Set (TopologicalSpace α)} :
   simp only [sSup_eq_iSup, isOpen_iSup_iff]
 
 set_option tactic.skipAssignedInstances false in
-
 theorem isClosed_iSup_iff {s : Set α} : IsClosed[⨆ i, t i] s ↔ ∀ i, IsClosed[t i] s := by
   simp [← @isOpen_compl_iff _ _ (⨆ i, t i), ← @isOpen_compl_iff _ _ (t _), isOpen_iSup_iff]
 

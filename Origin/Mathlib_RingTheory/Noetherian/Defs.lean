@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.RingTheory.Finiteness.Basic
 
+noncomputable section
+
 /-!
 # Noetherian rings and modules
 

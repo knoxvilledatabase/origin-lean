@@ -8,6 +8,8 @@ import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Shift
 import Mathlib.Analysis.Calculus.IteratedDeriv.Defs
 
+noncomputable section
+
 /-!
 # One-dimensional iterated derivatives
 

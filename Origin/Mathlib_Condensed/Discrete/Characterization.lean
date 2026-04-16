@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Condensed.Discrete.Colimit
 import Mathlib.Condensed.Discrete.Module
 
+noncomputable section
+
 /-!
 
 # Characterizing discrete condensed sets and `R`-modules.

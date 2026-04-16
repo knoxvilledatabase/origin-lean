@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Congruence.BigOperators
 import Mathlib.RingTheory.TwoSidedIdeal.Basic
 
+noncomputable section
+
 /-!
 # Interactions between `∑, ∏` and two sided ideals
 

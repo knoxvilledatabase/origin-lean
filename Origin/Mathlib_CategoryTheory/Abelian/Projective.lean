@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Preadditive.Yoneda.Limits
 import Mathlib.Algebra.Category.ModuleCat.EpiMono
 import Mathlib.Algebra.Homology.ShortComplex.ExactFunctor
 
+noncomputable section
+
 /-!
 # Projective objects in abelian categories
 

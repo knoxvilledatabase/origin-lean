@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.CompHaus.Limits
 import Mathlib.Topology.Category.CompHausLike.EffectiveEpi
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms in `CompHaus`

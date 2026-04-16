@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Free
 import Mathlib.Algebra.MonoidAlgebra.Basic
 
+noncomputable section
+
 /-!
 # Free algebras
 
@@ -57,10 +59,6 @@ variable [Module R A] [IsScalarTower R A A] [SMulCommClass R A A]
 
 def lift : (X → A) ≃ (FreeNonUnitalNonAssocAlgebra R X →ₙₐ[R] A) :=
   FreeMagma.lift.trans (MonoidAlgebra.liftMagma R)
-
-@[simp]
-theorem lift_symm_apply (F : FreeNonUnitalNonAssocAlgebra R X →ₙₐ[R] A) :
-    (lift R).symm F = F ∘ of R := rfl
 
 @[simp]
 theorem of_comp_lift (f : X → A) : lift R f ∘ of R = f :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.EquivalencePseudoabelian
 import Mathlib.AlgebraicTopology.DoldKan.Normalized
 
+noncomputable section
+
 /-!
 
 # The Dold-Kan correspondence
@@ -154,9 +156,6 @@ def comparisonN : (N : SimplicialObject A ⥤ _) ≅ Idempotents.DoldKan.N :=
 @[simps! functor]
 def equivalence : SimplicialObject A ≌ ChainComplex A ℕ :=
   (Idempotents.DoldKan.equivalence (C := A)).changeFunctor comparisonN.symm
-
-theorem equivalence_inverse : (equivalence : SimplicialObject A ≌ _).inverse = Γ :=
-  rfl
 
 end DoldKan
 

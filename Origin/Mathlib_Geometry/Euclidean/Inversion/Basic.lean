@@ -1,11 +1,13 @@
 /-
 Extracted from Geometry/Euclidean/Inversion/Basic.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.AddTorsor
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Tactic.AdaptationNote
+
+noncomputable section
 
 /-!
 # Inversion in an affine space
@@ -37,10 +39,6 @@ variable {c x y : P} {R : ℝ}
 
 def inversion (c : P) (R : ℝ) (x : P) : P :=
   (R / dist x c) ^ 2 • (x -ᵥ c) +ᵥ c
-
-theorem inversion_def :
-    inversion = fun (c : P) (R : ℝ) (x : P) => (R / dist x c) ^ 2 • (x -ᵥ c) +ᵥ c :=
-  rfl
 
 /-!
 ### Basic properties
@@ -97,23 +95,37 @@ theorem dist_inversion_center (c x : P) (R : ℝ) : dist (inversion c R x) c = R
 theorem dist_center_inversion (c x : P) (R : ℝ) : dist c (inversion c R x) = R ^ 2 / dist c x := by
   rw [dist_comm c, dist_comm c, dist_inversion_center]
 
--- DISSOLVED: inversion_inversion
+@[simp]
+theorem inversion_inversion (c : P) {R : ℝ} (hR : R ≠ 0) (x : P) :
+    inversion c R (inversion c R x) = x := by
+  rcases eq_or_ne x c with (rfl | hne)
+  · rw [inversion_self, inversion_self]
+  · rw [inversion, dist_inversion_center, inversion_vsub_center, smul_smul, ← mul_pow,
+      div_mul_div_comm, div_mul_cancel₀ _ (dist_ne_zero.2 hne), ← sq, div_self, one_pow, one_smul,
+      vsub_vadd]
+    exact pow_ne_zero _ hR
 
--- DISSOLVED: inversion_involutive
+theorem inversion_involutive (c : P) {R : ℝ} (hR : R ≠ 0) : Involutive (inversion c R) :=
+  inversion_inversion c hR
 
--- DISSOLVED: inversion_surjective
+theorem inversion_surjective (c : P) {R : ℝ} (hR : R ≠ 0) : Surjective (inversion c R) :=
+  (inversion_involutive c hR).surjective
 
--- DISSOLVED: inversion_injective
+theorem inversion_injective (c : P) {R : ℝ} (hR : R ≠ 0) : Injective (inversion c R) :=
+  (inversion_involutive c hR).injective
 
--- DISSOLVED: inversion_bijective
+theorem inversion_bijective (c : P) {R : ℝ} (hR : R ≠ 0) : Bijective (inversion c R) :=
+  (inversion_involutive c hR).bijective
 
--- DISSOLVED: inversion_eq_center
+theorem inversion_eq_center (hR : R ≠ 0) : inversion c R x = c ↔ x = c :=
+  (inversion_injective c hR).eq_iff' <| inversion_self _ _
 
 @[simp]
 theorem inversion_eq_center' : inversion c R x = c ↔ x = c ∨ R = 0 := by
   by_cases hR : R = 0 <;> simp [inversion_eq_center, hR]
 
--- DISSOLVED: center_eq_inversion
+theorem center_eq_inversion (hR : R ≠ 0) : c = inversion c R x ↔ x = c :=
+  eq_comm.trans (inversion_eq_center hR)
 
 @[simp]
 theorem center_eq_inversion' : c = inversion c R x ↔ x = c ∨ R = 0 :=
@@ -153,6 +165,11 @@ theorem dist_inversion_mul_dist_center_eq (hx : x ≠ c) (hy : y ≠ c) :
 -/
 
 include V in
+/-- **Ptolemy's inequality**: in a quadrangle `ABCD`, `|AC| * |BD| ≤ |AB| * |CD| + |BC| * |AD|`. If
+
+`ABCD` is a convex cyclic polygon, then this inequality becomes an equality, see
+
+`EuclideanGeometry.mul_dist_add_mul_dist_eq_mul_dist_of_cospherical`. -/
 
 theorem mul_dist_le_mul_dist_add_mul_dist (a b c d : P) :
     dist a c * dist b d ≤ dist a b * dist c d + dist b c * dist a d := by

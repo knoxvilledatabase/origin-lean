@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.GroupTheory.Perm.Sign
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-! # Equivalence between fintypes
 
 This file contains some basic results on equivalences where one or both
@@ -31,11 +33,6 @@ variable {α β : Type*} [Fintype α] [DecidableEq β] (e : Equiv.Perm α) (f : 
 
 def Function.Embedding.toEquivRange : α ≃ Set.range f :=
   ⟨fun a => ⟨f a, Set.mem_range_self a⟩, f.invOfMemRange, fun _ => by simp, fun _ => by simp⟩
-
-@[simp]
-theorem Function.Embedding.toEquivRange_apply (a : α) :
-    f.toEquivRange a = ⟨f a, Set.mem_range_self a⟩ :=
-  rfl
 
 @[simp]
 theorem Function.Embedding.toEquivRange_symm_apply_self (a : α) :

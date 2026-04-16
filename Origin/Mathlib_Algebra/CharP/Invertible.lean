@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
 
+noncomputable section
+
 /-!
 # Invertibility of elements given a characteristic
 

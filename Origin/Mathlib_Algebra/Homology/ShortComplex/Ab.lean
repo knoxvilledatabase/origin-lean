@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.Grp.Abelian
 import Mathlib.Algebra.Category.Grp.Kernels
 import Mathlib.Algebra.Exact
 
+noncomputable section
+
 /-!
 # Homology and exactness of short complexes of abelian groups
 
@@ -60,9 +62,6 @@ def abLeftHomologyData : S.LeftHomologyData where
     rw [AddMonoidHom.mem_range]
     apply exists_apply_eq_apply
   hπ := AddCommGrp.cokernelIsColimit (AddCommGrp.ofHom S.abToCycles)
-
-@[simp]
-lemma abLeftHomologyData_f' : S.abLeftHomologyData.f' = S.abToCycles := rfl
 
 noncomputable def abCyclesIso : S.cycles ≅ AddCommGrp.of (AddMonoidHom.ker S.g) :=
   S.abLeftHomologyData.cyclesIso

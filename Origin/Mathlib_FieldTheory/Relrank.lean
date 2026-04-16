@@ -5,6 +5,8 @@ Genuine: 108 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.FieldTheory.Adjoin
 
+noncomputable section
+
 /-!
 
 # Relative rank of subfields and intermediate fields

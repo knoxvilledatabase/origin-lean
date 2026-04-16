@@ -8,6 +8,8 @@ import Mathlib.Order.WellFounded
 import Mathlib.Order.PiLex
 import Mathlib.Data.Finite.Prod
 
+noncomputable section
+
 /-!
 # "Bubble sort" induction
 

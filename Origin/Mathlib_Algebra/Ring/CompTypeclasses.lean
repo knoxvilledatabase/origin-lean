@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Algebra.Ring.Equiv
 
+noncomputable section
+
 /-!
 # Propositional typeclasses on several ring homs
 

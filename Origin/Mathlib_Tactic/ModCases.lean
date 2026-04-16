@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Int.ModEq
 import Mathlib.Tactic.HaveI
 
+noncomputable section
+
 /-! # `mod_cases` tactic
 
 The `mod_cases` tactic does case disjunction on `e % n`, where `e : ℤ` or `e : ℕ`,

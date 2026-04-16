@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Finiteness.Defs
 import Mathlib.Topology.Bornology.Constructions
 import Mathlib.Topology.UniformSpace.Equiv
 
+noncomputable section
+
 /-! # Type synonym for types with a `CStarModule` structure
 
 It is often the case that we want to construct a `CStarModule` instance on a type that is already
@@ -101,49 +103,7 @@ section AddCommGroup
 
 variable [AddCommGroup E]
 
-@[simp]
-theorem equiv_zero : equiv E 0 = 0 :=
-  rfl
-
-@[simp]
-theorem equiv_symm_zero : (equiv E).symm 0 = 0 :=
-  rfl
-
-@[simp]
-theorem equiv_add : equiv E (x + y) = equiv E x + equiv E y :=
-  rfl
-
-@[simp]
-theorem equiv_symm_add :
-    (equiv E).symm (x' + y') = (equiv E).symm x' + (equiv E).symm y' :=
-  rfl
-
-@[simp]
-theorem equiv_sub : equiv E (x - y) = equiv E x - equiv E y :=
-  rfl
-
-@[simp]
-theorem equiv_symm_sub :
-    (equiv E).symm (x' - y') = (equiv E).symm x' - (equiv E).symm y' :=
-  rfl
-
-@[simp]
-theorem equiv_neg : equiv E (-x) = -equiv E x :=
-  rfl
-
-@[simp]
-theorem equiv_symm_neg : (equiv E).symm (-x') = -(equiv E).symm x' :=
-  rfl
-
 end AddCommGroup
-
-@[simp]
-theorem equiv_smul : equiv E (c • x) = c • equiv E x :=
-  rfl
-
-@[simp]
-theorem equiv_symm_smul : (equiv E).symm (c • x') = c • (equiv E).symm x' :=
-  rfl
 
 end Equiv
 
@@ -186,66 +146,10 @@ section AddCommGroup
 
 variable [AddCommGroup E] [AddCommGroup F]
 
-@[simp]
-theorem zero_fst : (0 : C⋆ᵐᵒᵈ (E × F)).fst = 0 :=
-  rfl
-
-@[simp]
-theorem zero_snd : (0 : C⋆ᵐᵒᵈ (E × F)).snd = 0 :=
-  rfl
-
-@[simp]
-theorem add_fst : (x + y).fst = x.fst + y.fst :=
-  rfl
-
-@[simp]
-theorem add_snd : (x + y).snd = x.snd + y.snd :=
-  rfl
-
-@[simp]
-theorem sub_fst : (x - y).fst = x.fst - y.fst :=
-  rfl
-
-@[simp]
-theorem sub_snd : (x - y).snd = x.snd - y.snd :=
-  rfl
-
-@[simp]
-theorem neg_fst : (-x).fst = -x.fst :=
-  rfl
-
-@[simp]
-theorem neg_snd : (-x).snd = -x.snd :=
-  rfl
-
 end AddCommGroup
-
-@[simp]
-theorem smul_fst : (c • x).fst = c • x.fst :=
-  rfl
-
-@[simp]
-theorem smul_snd : (c • x).snd = c • x.snd :=
-  rfl
 
 /-! Note that the unapplied versions of these lemmas are deliberately omitted, as they break
 the use of the type synonym. -/
-
-@[simp]
-theorem equiv_fst (x : C⋆ᵐᵒᵈ (E × F)) : (equiv (E × F) x).fst = x.fst :=
-  rfl
-
-@[simp]
-theorem equiv_snd (x : C⋆ᵐᵒᵈ (E × F)) : (equiv (E × F) x).snd = x.snd :=
-  rfl
-
-@[simp]
-theorem equiv_symm_fst (x : E × F) : ((equiv (E × F)).symm x).fst = x.fst :=
-  rfl
-
-@[simp]
-theorem equiv_symm_snd (x : E × F) : ((equiv (E × F)).symm x).snd = x.snd :=
-  rfl
 
 end Prod
 
@@ -276,39 +180,10 @@ section AddCommGroup
 
 variable [∀ i, AddCommGroup (E i)]
 
-@[simp]
-theorem zero_apply : (0 : C⋆ᵐᵒᵈ (Π i, E i)) i = 0 :=
-  rfl
-
-@[simp]
-theorem add_apply : (x + y) i = x i + y i :=
-  rfl
-
-@[simp]
-theorem sub_apply : (x - y) i = x i - y i :=
-  rfl
-
-@[simp]
-theorem neg_apply : (-x) i = -x i :=
-  rfl
-
 end AddCommGroup
-
-@[simp]
-theorem smul_apply : (c • x) i = c • x i :=
-  rfl
 
 /-! Note that the unapplied versions of these lemmas are deliberately omitted, as they break
 the use of the type synonym. -/
-
-@[simp]
-theorem equiv_pi_apply (i : ι) : equiv _ x i = x i :=
-  rfl
-
-@[simp]
-theorem equiv_symm_pi_apply (x : ∀ i, E i) (i : ι) :
-    (WithCStarModule.equiv _).symm x i = x i :=
-  rfl
 
 end Pi
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.OuterMeasure.OfFunction
 import Mathlib.MeasureTheory.PiSystem
 
+noncomputable section
+
 /-!
 # The Caratheodory σ-algebra of an outer measure
 

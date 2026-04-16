@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.Classes
 import Mathlib.Analysis.Normed.Algebra.Unitization
 
+noncomputable section
+
 /-! # The minimal unitization of a C⋆-algebra
 
 This file shows that when `E` is a C⋆-algebra (over a densely normed field `𝕜`), that the minimal

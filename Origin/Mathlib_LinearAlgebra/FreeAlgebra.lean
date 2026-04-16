@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
+noncomputable section
+
 /-!
 # Linear algebra properties of `FreeAlgebra R X`
 

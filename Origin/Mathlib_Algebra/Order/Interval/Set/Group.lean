@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Order.Interval.Set.Basic
 import Mathlib.Logic.Pairwise
 
+noncomputable section
+
 /-! ### Lemmas about arithmetic operations and intervals. -/
 
 variable {α : Type*}

@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Sheaves/Stalks.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
+Genuine: 47 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Pullback
 import Mathlib.Topology.Category.TopCat.OpenNhds
 import Mathlib.Topology.Sheaves.SheafCondition.UniqueGluing
+
+noncomputable section
 
 /-!
 # Stalks
@@ -73,10 +75,6 @@ variable {C}
 def stalk (ℱ : X.Presheaf C) (x : X) : C :=
   (stalkFunctor C x).obj ℱ
 
-@[simp]
-theorem stalkFunctor_obj (ℱ : X.Presheaf C) (x : X) : (stalkFunctor C x).obj ℱ = ℱ.stalk x :=
-  rfl
-
 def germ (F : X.Presheaf C) (U : Opens X) (x : X) (hx : x ∈ U) : F.obj (op U) ⟶ stalk F x :=
   colimit.ι ((OpenNhds.inclusion x).op ⋙ F) (op ⟨U, hx⟩)
 
@@ -101,19 +99,16 @@ lemma map_germ_eq_Γgerm (F : X.Presheaf C) {U : Opens X} {i : U ⟶ ⊤} (x : X
   germ_res F i x hx
 
 attribute [local instance] ConcreteCategory.instFunLike in
-
 theorem germ_res_apply (F : X.Presheaf C)
     {U V : Opens X} (i : U ⟶ V) (x : X) (hx : x ∈ U) [ConcreteCategory C] (s) :
   F.germ U x hx (F.map i.op s) = F.germ V x (i.le hx) s := by rw [← comp_apply, germ_res]
 
 attribute [local instance] ConcreteCategory.instFunLike in
-
 theorem germ_res_apply' (F : X.Presheaf C)
     {U V : Opens X} (i : op V ⟶ op U) (x : X) (hx : x ∈ U) [ConcreteCategory C] (s) :
   F.germ U x hx (F.map i s) = F.germ V x (i.unop.le hx) s := by rw [← comp_apply, germ_res']
 
 attribute [local instance] ConcreteCategory.instFunLike in
-
 lemma Γgerm_res_apply (F : X.Presheaf C)
     {U : Opens X} {i : U ⟶ ⊤} (x : X) (hx : x ∈ U) [ConcreteCategory C] (s) :
   F.germ U x hx (F.map i.op s) = F.Γgerm x s := F.germ_res_apply i x hx s
@@ -130,7 +125,6 @@ theorem stalkFunctor_map_germ {F G : X.Presheaf C} (U : Opens X) (x : X) (hx : x
   colimit.ι_map (whiskerLeft (OpenNhds.inclusion x).op f) (op ⟨U, hx⟩)
 
 attribute [local instance] ConcreteCategory.instFunLike in
-
 theorem stalkFunctor_map_germ_apply [ConcreteCategory C]
     {F G : X.Presheaf C} (U : Opens X) (x : X) (hx : x ∈ U) (f : F ⟶ G) (s) :
     (stalkFunctor C x).map f (F.germ U x hx s) = G.germ U x hx (f.app (op U) s) := by
@@ -138,8 +132,8 @@ theorem stalkFunctor_map_germ_apply [ConcreteCategory C]
   exact (comp_apply _ _ _).symm
 
 attribute [local instance] ConcreteCategory.instFunLike in
-
 @[simp]
+
 theorem stalkFunctor_map_germ_apply' [ConcreteCategory C]
     {F G : X.Presheaf C} (U : Opens X) (x : X) (hx : x ∈ U) (f : F ⟶ G) (s) :
     DFunLike.coe (F := F.stalk x ⟶ G.stalk x) ((stalkFunctor C x).map f) (F.germ U x hx s) =

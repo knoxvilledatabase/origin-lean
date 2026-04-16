@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Groupoid
 import Mathlib.CategoryTheory.Whiskering
 import Mathlib.CategoryTheory.Types
 
+noncomputable section
+
 /-!
 # The core of a category
 
@@ -36,14 +38,6 @@ instance coreCategory : Groupoid.{v₁} (Core C) where
   inv {_ _} f := Iso.symm f
 
 namespace Core
-
-@[simp]
-theorem id_hom (X : C) : Iso.hom (coreCategory.id X) = @CategoryStruct.id C _ X := by
-  rfl
-
-@[simp]
-theorem comp_hom {X Y Z : Core C} (f : X ⟶ Y) (g : Y ⟶ Z) : (f ≫ g).hom = f.hom ≫ g.hom :=
-  rfl
 
 variable (C)
 

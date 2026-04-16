@@ -8,6 +8,8 @@ import Mathlib.Analysis.Complex.UpperHalfPlane.Manifold
 import Mathlib.Analysis.Complex.LocallyUniformLimit
 import Mathlib.Geometry.Manifold.MFDeriv.FDeriv
 
+noncomputable section
+
 /-!
 # Holomorphicity of Eisenstein series
 

@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Reflexive
 import Mathlib.CategoryTheory.Monad.Coequalizer
 import Mathlib.CategoryTheory.Monad.Limits
 
+noncomputable section
+
 /-!
 # Monadicity theorems
 
@@ -72,6 +74,13 @@ def comparisonLeftAdjointObj (A : adj.toMonad.Algebra)
   coequalizer (F.map A.a) (adj.counit.app _)
 
 set_option linter.unusedVariables false in
+/--
+
+We have a bijection of homsets which will be used to construct the left adjoint to the comparison
+
+functor.
+
+-/
 
 @[simps!]
 def comparisonLeftAdjointHomEquiv (A : adj.toMonad.Algebra) (B : D)

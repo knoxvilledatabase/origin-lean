@@ -1,12 +1,14 @@
 /-
 Extracted from Logic/Lemmas.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Logic.Basic
 import Mathlib.Tactic.Convert
 import Mathlib.Tactic.SplitIfs
 import Mathlib.Tactic.Tauto
+
+noncomputable section
 
 /-!
 # More basic logic properties

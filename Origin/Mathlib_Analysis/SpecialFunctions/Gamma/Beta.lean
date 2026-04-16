@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gamma/Beta.lean
-Genuine: 22 | Conflates: 0 | Dissolved: 5 | Infrastructure: 0
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convolution
@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.EulerSineProd
 import Mathlib.Analysis.SpecialFunctions.Gamma.BohrMollerup
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.Analysis.Complex.CauchyIntegral
+
+noncomputable section
 
 /-!
 # The Beta function, and further properties of the Gamma function
@@ -224,9 +226,40 @@ theorem GammaSeq_eq_betaIntegral_of_re_pos {s : ℂ} (hs : 0 < re s) (n : ℕ) :
     GammaSeq s n = (n : ℂ) ^ s * betaIntegral s (n + 1) := by
   rw [GammaSeq, betaIntegral_eval_nat_add_one_right hs n, ← mul_div_assoc]
 
--- DISSOLVED: GammaSeq_add_one_left
+theorem GammaSeq_add_one_left (s : ℂ) {n : ℕ} (hn : n ≠ 0) :
+    GammaSeq (s + 1) n / s = n / (n + 1 + s) * GammaSeq s n := by
+  conv_lhs => rw [GammaSeq, Finset.prod_range_succ, div_div]
+  conv_rhs =>
+    rw [GammaSeq, Finset.prod_range_succ', Nat.cast_zero, add_zero, div_mul_div_comm, ← mul_assoc,
+      ← mul_assoc, mul_comm _ (Finset.prod _ _)]
+  congr 3
+  · rw [cpow_add _ _ (Nat.cast_ne_zero.mpr hn), cpow_one, mul_comm]
+  · refine Finset.prod_congr (by rfl) fun x _ => ?_
+    push_cast; ring
+  · abel
 
--- DISSOLVED: GammaSeq_eq_approx_Gamma_integral
+theorem GammaSeq_eq_approx_Gamma_integral {s : ℂ} (hs : 0 < re s) {n : ℕ} (hn : n ≠ 0) :
+    GammaSeq s n = ∫ x : ℝ in (0)..n, ↑((1 - x / n) ^ n) * (x : ℂ) ^ (s - 1) := by
+  have : ∀ x : ℝ, x = x / n * n := by intro x; rw [div_mul_cancel₀]; exact Nat.cast_ne_zero.mpr hn
+  conv_rhs => enter [1, x, 2, 1]; rw [this x]
+  rw [GammaSeq_eq_betaIntegral_of_re_pos hs]
+  have := intervalIntegral.integral_comp_div (a := 0) (b := n)
+    (fun x => ↑((1 - x) ^ n) * ↑(x * ↑n) ^ (s - 1) : ℝ → ℂ) (Nat.cast_ne_zero.mpr hn)
+  dsimp only at this
+  rw [betaIntegral, this, real_smul, zero_div, div_self, add_sub_cancel_right,
+    ← intervalIntegral.integral_const_mul, ← intervalIntegral.integral_const_mul]
+  swap; · exact Nat.cast_ne_zero.mpr hn
+  simp_rw [intervalIntegral.integral_of_le zero_le_one]
+  refine setIntegral_congr_fun measurableSet_Ioc fun x hx => ?_
+  push_cast
+  have hn' : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hn
+  have A : (n : ℂ) ^ s = (n : ℂ) ^ (s - 1) * n := by
+    conv_lhs => rw [(by ring : s = s - 1 + 1), cpow_add _ _ hn']
+    simp
+  have B : ((x : ℂ) * ↑n) ^ (s - 1) = (x : ℂ) ^ (s - 1) * (n : ℂ) ^ (s - 1) := by
+    rw [← ofReal_natCast,
+      mul_cpow_ofReal_nonneg hx.1.le (Nat.cast_pos.mpr (Nat.pos_of_ne_zero hn)).le]
+  rw [A, B, cpow_natCast]; ring
 
 theorem approx_Gamma_integral_tendsto_Gamma_integral {s : ℂ} (hs : 0 < re s) :
     Tendsto (fun n : ℕ => ∫ x : ℝ in (0)..n, ((1 - x / n) ^ n : ℝ) * (x : ℂ) ^ (s - 1)) atTop
@@ -330,7 +363,28 @@ section GammaReflection
 
 namespace Complex
 
--- DISSOLVED: GammaSeq_mul
+theorem GammaSeq_mul (z : ℂ) {n : ℕ} (hn : n ≠ 0) :
+    GammaSeq z n * GammaSeq (1 - z) n =
+      n / (n + ↑1 - z) * (↑1 / (z * ∏ j ∈ Finset.range n, (↑1 - z ^ 2 / ((j : ℂ) + 1) ^ 2))) := by
+  -- also true for n = 0 but we don't need it
+  have aux : ∀ a b c d : ℂ, a * b * (c * d) = a * c * (b * d) := by intros; ring
+  rw [GammaSeq, GammaSeq, div_mul_div_comm, aux, ← pow_two]
+  have : (n : ℂ) ^ z * (n : ℂ) ^ (1 - z) = n := by
+    rw [← cpow_add _ _ (Nat.cast_ne_zero.mpr hn), add_sub_cancel, cpow_one]
+  rw [this, Finset.prod_range_succ', Finset.prod_range_succ, aux, ← Finset.prod_mul_distrib,
+    Nat.cast_zero, add_zero, add_comm (1 - z) n, ← add_sub_assoc]
+  have : ∀ j : ℕ, (z + ↑(j + 1)) * (↑1 - z + ↑j) =
+      ((j + 1) ^ 2 :) * (↑1 - z ^ 2 / ((j : ℂ) + 1) ^ 2) := by
+    intro j
+    push_cast
+    have : (j : ℂ) + 1 ≠ 0 := by rw [← Nat.cast_succ, Nat.cast_ne_zero]; exact Nat.succ_ne_zero j
+    field_simp; ring
+  simp_rw [this]
+  rw [Finset.prod_mul_distrib, ← Nat.cast_prod, Finset.prod_pow,
+    Finset.prod_range_add_one_eq_factorial, Nat.cast_pow,
+    (by intros; ring : ∀ a b c d : ℂ, a * b * (c * d) = a * (d * (b * c))), ← div_div,
+    mul_div_cancel_right₀, ← div_div, mul_comm z _, mul_one_div]
+  exact pow_ne_zero 2 (Nat.cast_ne_zero.mpr <| Nat.factorial_ne_zero n)
 
 theorem Gamma_mul_Gamma_one_sub (z : ℂ) : Gamma z * Gamma (1 - z) = π / sin (π * z) := by
   have pi_ne : (π : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr pi_ne_zero
@@ -357,14 +411,35 @@ theorem Gamma_mul_Gamma_one_sub (z : ℂ) : Gamma z * Gamma (1 - z) = π / sin (
     convert tendsto_euler_sin_prod z using 1
     ext1 n; rw [mul_comm, ← mul_assoc]
 
--- DISSOLVED: Gamma_ne_zero
+theorem Gamma_ne_zero {s : ℂ} (hs : ∀ m : ℕ, s ≠ -m) : Gamma s ≠ 0 := by
+  by_cases h_im : s.im = 0
+  · have : s = ↑s.re := by
+      conv_lhs => rw [← Complex.re_add_im s]
+      rw [h_im, ofReal_zero, zero_mul, add_zero]
+    rw [this, Gamma_ofReal, ofReal_ne_zero]
+    refine Real.Gamma_ne_zero fun n => ?_
+    specialize hs n
+    contrapose! hs
+    rwa [this, ← ofReal_natCast, ← ofReal_neg, ofReal_inj]
+  · have : sin (↑π * s) ≠ 0 := by
+      rw [Complex.sin_ne_zero_iff]
+      intro k
+      apply_fun im
+      rw [im_ofReal_mul, ← ofReal_intCast, ← ofReal_mul, ofReal_im]
+      exact mul_ne_zero Real.pi_pos.ne' h_im
+    have A := div_ne_zero (ofReal_ne_zero.mpr Real.pi_pos.ne') this
+    rw [← Complex.Gamma_mul_Gamma_one_sub s, mul_ne_zero_iff] at A
+    exact A.1
 
 theorem Gamma_eq_zero_iff (s : ℂ) : Gamma s = 0 ↔ ∃ m : ℕ, s = -m := by
   constructor
   · contrapose!; exact Gamma_ne_zero
   · rintro ⟨m, rfl⟩; exact Gamma_neg_nat_eq_zero m
 
--- DISSOLVED: Gamma_ne_zero_of_re_pos
+theorem Gamma_ne_zero_of_re_pos {s : ℂ} (hs : 0 < re s) : Gamma s ≠ 0 := by
+  refine Gamma_ne_zero fun m => ?_
+  contrapose! hs
+  simpa only [hs, neg_re, ← ofReal_natCast, ofReal_re, neg_nonpos] using Nat.cast_nonneg _
 
 end Complex
 

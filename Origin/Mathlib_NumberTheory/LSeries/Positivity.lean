@@ -8,6 +8,8 @@ import Mathlib.Analysis.Complex.Positivity
 import Mathlib.NumberTheory.ArithmeticFunction
 import Mathlib.NumberTheory.LSeries.Deriv
 
+noncomputable section
+
 /-!
 # Positivity of values of L-series
 

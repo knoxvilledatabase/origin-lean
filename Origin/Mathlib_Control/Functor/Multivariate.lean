@@ -7,6 +7,8 @@ import Mathlib.Data.Fin.Fin2
 import Mathlib.Data.TypeVec
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 
 # Functors between the category of tuples of types, and the category Type

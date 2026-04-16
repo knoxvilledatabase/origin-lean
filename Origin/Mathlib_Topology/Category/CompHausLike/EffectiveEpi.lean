@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Coherent.Comparison
 import Mathlib.Topology.Category.CompHausLike.Limits
 
+noncomputable section
+
 /-!
 
 # Effective epimorphisms in `CompHausLike`
@@ -29,7 +31,6 @@ namespace CompHausLike
 variable {P : TopCat.{u} → Prop}
 
 noncomputable
-
 def effectiveEpiStruct {B X : CompHausLike P} (π : X ⟶ B) (hπ : Function.Surjective π) :
     EffectiveEpiStruct π where
   desc e h := (IsQuotientMap.of_surjective_continuous hπ π.continuous).lift e fun a b hab ↦

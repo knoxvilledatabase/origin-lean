@@ -1,10 +1,12 @@
 /-
 Extracted from Topology/MetricSpace/Isometry.lean
-Genuine: 79 | Conflates: 1 | Dissolved: 0 | Infrastructure: 36
+Genuine: 78 | Conflates: 1 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Topology.MetricSpace.Antilipschitz
 import Mathlib.Data.Fintype.Lattice
+
+noncomputable section
 
 /-!
 # Isometries
@@ -244,12 +246,6 @@ instance : EquivLike (α ≃ᵢ β) α β where
   right_inv e := e.right_inv
   coe_injective' _ _ h _ := toEquiv_injective <| DFunLike.ext' h
 
-theorem coe_eq_toEquiv (h : α ≃ᵢ β) (a : α) : h a = h.toEquiv a := rfl
-
-@[simp] theorem coe_toEquiv (h : α ≃ᵢ β) : ⇑h.toEquiv = h := rfl
-
-@[simp] theorem coe_mk (e : α ≃ β) (h) : ⇑(mk e h) = e := rfl
-
 protected theorem isometry (h : α ≃ᵢ β) : Isometry h :=
   h.isometry_toFun
 
@@ -299,10 +295,6 @@ protected def trans (h₁ : α ≃ᵢ β) (h₂ : β ≃ᵢ γ) : α ≃ᵢ γ :
   { Equiv.trans h₁.toEquiv h₂.toEquiv with
     isometry_toFun := h₂.isometry_toFun.comp h₁.isometry_toFun }
 
-@[simp]
-theorem trans_apply (h₁ : α ≃ᵢ β) (h₂ : β ≃ᵢ γ) (x : α) : h₁.trans h₂ x = h₂ (h₁ x) :=
-  rfl
-
 protected def symm (h : α ≃ᵢ β) : β ≃ᵢ α where
   isometry_toFun := h.isometry.right_inv h.right_inv
   toEquiv := h.toEquiv.symm
@@ -348,11 +340,6 @@ theorem image_symm (h : α ≃ᵢ β) : image h.symm = preimage h :=
 theorem preimage_symm (h : α ≃ᵢ β) : preimage h.symm = image h :=
   (image_eq_preimage_of_inverse h.toEquiv.left_inv h.toEquiv.right_inv).symm
 
-@[simp]
-theorem symm_trans_apply (h₁ : α ≃ᵢ β) (h₂ : β ≃ᵢ γ) (x : γ) :
-    (h₁.trans h₂).symm x = h₁.symm (h₂.symm x) :=
-  rfl
-
 theorem ediam_univ (h : α ≃ᵢ β) : EMetric.diam (univ : Set α) = EMetric.diam (univ : Set β) := by
   rw [← h.range_eq_univ, h.isometry.ediam_range]
 
@@ -387,14 +374,6 @@ protected def toHomeomorph (h : α ≃ᵢ β) : α ≃ₜ β where
   toEquiv := h.toEquiv
 
 @[simp]
-theorem coe_toHomeomorph (h : α ≃ᵢ β) : ⇑h.toHomeomorph = h :=
-  rfl
-
-@[simp]
-theorem coe_toHomeomorph_symm (h : α ≃ᵢ β) : ⇑h.toHomeomorph.symm = h.symm :=
-  rfl
-
-@[simp]
 theorem comp_continuousOn_iff {γ} [TopologicalSpace γ] (h : α ≃ᵢ β) {f : γ → α} {s : Set γ} :
     ContinuousOn (h ∘ f) s ↔ ContinuousOn f s :=
   h.toHomeomorph.comp_continuousOn_iff _ _
@@ -419,10 +398,6 @@ instance : Group (α ≃ᵢ α) where
   inv_mul_cancel e := ext e.symm_apply_apply
 
 @[simp] theorem coe_one : ⇑(1 : α ≃ᵢ α) = id := rfl
-
-@[simp] theorem coe_mul (e₁ e₂ : α ≃ᵢ α) : ⇑(e₁ * e₂) = e₁ ∘ e₂ := rfl
-
-theorem mul_apply (e₁ e₂ : α ≃ᵢ α) (x : α) : (e₁ * e₂) x = e₁ (e₂ x) := rfl
 
 @[simp] theorem inv_apply_self (e : α ≃ᵢ α) (x : α) : e⁻¹ (e x) = x := e.symm_apply_apply x
 
@@ -453,12 +428,6 @@ def sumArrowIsometryEquivProdArrow [Fintype α] [Fintype β] : (α ⊕ β → γ
   toEquiv := Equiv.sumArrowEquivProdArrow _ _ _
   isometry_toFun _ _ := by simp [Prod.edist_eq, edist_pi_def, Finset.sup_univ_eq_iSup, iSup_sum]
 
-@[simp]
-theorem sumArrowIsometryEquivProdArrow_toHomeomorph {α β : Type*} [Fintype α] [Fintype β] :
-    sumArrowIsometryEquivProdArrow.toHomeomorph
-    = Homeomorph.sumArrowHomeomorphProdArrow (ι := α) (ι' := β) (X := γ) :=
-  rfl
-
 theorem _root_.Fin.edist_append_eq_max_edist (m n : ℕ) {x x2 : Fin m → α} {y y2 : Fin n → α} :
     edist (Fin.append x y) (Fin.append x2 y2) = max (edist x x2) (edist y y2) := by
   simp [edist_pi_def, Finset.sup_univ_eq_iSup, ← Equiv.iSup_comp (e := finSumFinEquiv),
@@ -468,11 +437,6 @@ theorem _root_.Fin.edist_append_eq_max_edist (m n : ℕ) {x x2 : Fin m → α} {
 def _root_.Fin.appendIsometry (m n : ℕ) : (Fin m → α) × (Fin n → α) ≃ᵢ (Fin (m + n) → α) where
   toEquiv := Fin.appendEquiv _ _
   isometry_toFun _ _ := by simp_rw [Fin.appendEquiv, Fin.edist_append_eq_max_edist, Prod.edist_eq]
-
-@[simp]
-theorem _root_.Fin.appendIsometry_toHomeomorph (m n : ℕ) :
-    (Fin.appendIsometry m n).toHomeomorph = Fin.appendHomeomorph (X := α) m n :=
-  rfl
 
 variable (ι α)
 
@@ -501,7 +465,6 @@ theorem diam_preimage (s : Set β) : Metric.diam (h ⁻¹' s) = Metric.diam s :=
   rw [← image_symm, diam_image]
 
 include h in
-
 theorem diam_univ : Metric.diam (univ : Set α) = Metric.diam (univ : Set β) :=
   congr_arg ENNReal.toReal h.ediam_univ
 

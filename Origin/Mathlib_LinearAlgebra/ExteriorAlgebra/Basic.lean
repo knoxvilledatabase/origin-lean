@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/ExteriorAlgebra/Basic.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 52 | Conflates: 1 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Basic
 import Mathlib.LinearAlgebra.Alternating.Basic
+
+noncomputable section
 
 /-!
 # Exterior Algebras
@@ -205,7 +207,11 @@ theorem ι_eq_algebraMap_iff (x : M) (r : R) : ι R x = algebraMap R _ r ↔ x =
   · rintro ⟨rfl, rfl⟩
     rw [LinearMap.map_zero, RingHom.map_zero]
 
--- DISSOLVED: ι_ne_one
+-- CONFLATES (assumes ground = zero): ι_ne_one
+@[simp]
+theorem ι_ne_one [Nontrivial R] (x : M) : ι R x ≠ 1 := by
+  rw [← (algebraMap R (ExteriorAlgebra R M)).map_one, Ne, ι_eq_algebraMap_iff]
+  exact one_ne_zero ∘ And.right
 
 theorem ι_range_disjoint_one :
     Disjoint (LinearMap.range (ι R : M →ₗ[R] ExteriorAlgebra R M))

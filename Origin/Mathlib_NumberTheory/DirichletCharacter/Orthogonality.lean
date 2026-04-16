@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/DirichletCharacter/Orthogonality.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 5 | Conflates: 1 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.NumberTheory.DirichletCharacter.Basic
 import Mathlib.NumberTheory.MulChar.Duality
+
+noncomputable section
 
 /-!
 # Orthogonality relations for Dirichlet characters
@@ -35,7 +37,10 @@ lemma card_eq_totient_of_hasEnoughRootsOfUnity :
 
 variable {n}
 
--- DISSOLVED: exists_apply_ne_one_of_hasEnoughRootsOfUnity
+-- CONFLATES (assumes ground = zero): exists_apply_ne_one_of_hasEnoughRootsOfUnity
+theorem exists_apply_ne_one_of_hasEnoughRootsOfUnity [Nontrivial R] ⦃a : ZMod n⦄ (ha : a ≠ 1) :
+    ∃ χ : DirichletCharacter R n, χ a ≠ 1 :=
+  MulChar.exists_apply_ne_one_of_hasEnoughRootsOfUnity (ZMod n) R ha
 
 variable [IsDomain R]
 

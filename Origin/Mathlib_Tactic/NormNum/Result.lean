@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/NormNum/Result.lean
-Genuine: 54 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Field.Defs
@@ -9,6 +9,8 @@ import Mathlib.Data.Sigma.Basic
 import Mathlib.Algebra.Ring.Nat
 import Mathlib.Data.Int.Cast.Basic
 import Qq.MetaM
+
+noncomputable section
 
 /-!
 ## The `Result` type for `norm_num`
@@ -167,9 +169,13 @@ theorem IsRat.nonneg_to_eq {α} [DivisionRing α] {n d} :
     {a n' d' : α} → IsRat a (.ofNat n) d → n = n' → d = d' → a = n' / d'
   | _, _, _, ⟨_, rfl⟩, rfl, rfl => by simp [div_eq_mul_inv]
 
--- DISSOLVED: IsRat.of_raw
+theorem IsRat.of_raw (α) [DivisionRing α] (n : ℤ) (d : ℕ)
+    (h : (d : α) ≠ 0) : IsRat (Rat.rawCast n d : α) n d :=
+  have := invertibleOfNonzero h
+  ⟨this, by simp [div_eq_mul_inv]⟩
 
--- DISSOLVED: IsRat.den_nz
+theorem IsRat.den_nz {α} [DivisionRing α] {a n d} : IsRat (a : α) n d → (d : α) ≠ 0
+  | ⟨_, _⟩ => Invertible.ne_zero (d : α)
 
 inductive Result' where
   /-- Untyped version of `Result.isBool`. -/

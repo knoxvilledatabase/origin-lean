@@ -8,6 +8,8 @@ import Mathlib.Data.Option.Basic
 import Mathlib.Data.Subtype
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Equivalences for `Option α`
 
@@ -41,17 +43,9 @@ theorem optionCongr_refl : optionCongr (Equiv.refl α) = Equiv.refl _ :=
   ext <| congr_fun Option.map_id
 
 @[simp]
-theorem optionCongr_symm (e : α ≃ β) : (optionCongr e).symm = optionCongr e.symm :=
-  rfl
-
-@[simp]
 theorem optionCongr_trans (e₁ : α ≃ β) (e₂ : β ≃ γ) :
     (optionCongr e₁).trans (optionCongr e₂) = optionCongr (e₁.trans e₂) :=
   ext <| Option.map_map _ _
-
-theorem optionCongr_eq_equivFunctor_mapEquiv {α β : Type u} (e : α ≃ β) :
-    optionCongr e = EquivFunctor.mapEquiv Option e :=
-  rfl
 
 end OptionCongr
 
@@ -99,10 +93,6 @@ def removeNone : α ≃ β where
   invFun := removeNone_aux e.symm
   left_inv := removeNone_aux_inv e
   right_inv := removeNone_aux_inv e.symm
-
-@[simp]
-theorem removeNone_symm : (removeNone e).symm = removeNone e.symm :=
-  rfl
 
 theorem removeNone_some {x : α} (h : ∃ x', e (some x) = some x') :
     some (removeNone e x) = e (some x) :=
@@ -176,45 +166,12 @@ def optionSubtype [DecidableEq β] (x : β) :
     rfl
 
 @[simp]
-theorem optionSubtype_apply_apply
-    [DecidableEq β] (x : β)
-    (e : { e : Option α ≃ β // e none = x })
-    (a : α)
-    (h) : optionSubtype x e a = ⟨(e : Option α ≃ β) a, h⟩ := rfl
-
-@[simp]
-theorem coe_optionSubtype_apply_apply
-    [DecidableEq β] (x : β)
-    (e : { e : Option α ≃ β // e none = x })
-    (a : α) : ↑(optionSubtype x e a) = (e : Option α ≃ β) a := rfl
-
-@[simp]
 theorem optionSubtype_apply_symm_apply
     [DecidableEq β] (x : β)
     (e : { e : Option α ≃ β // e none = x })
     (b : { y : β // y ≠ x }) : ↑((optionSubtype x e).symm b) = (e : Option α ≃ β).symm b := by
   dsimp only [optionSubtype]
   simp
-
-@[simp]
-theorem optionSubtype_symm_apply_apply_coe [DecidableEq β] (x : β) (e : α ≃ { y : β // y ≠ x })
-    (a : α) : ((optionSubtype x).symm e : Option α ≃ β) a = e a :=
-  rfl
-
-@[simp]
-theorem optionSubtype_symm_apply_apply_some
-    [DecidableEq β]
-    (x : β)
-    (e : α ≃ { y : β // y ≠ x })
-    (a : α) : ((optionSubtype x).symm e : Option α ≃ β) (some a) = e a :=
-  rfl
-
-@[simp]
-theorem optionSubtype_symm_apply_apply_none
-    [DecidableEq β]
-    (x : β)
-    (e : α ≃ { y : β // y ≠ x }) : ((optionSubtype x).symm e : Option α ≃ β) none = x :=
-  rfl
 
 @[simp]
 theorem optionSubtype_symm_apply_symm_apply [DecidableEq β] (x : β) (e : α ≃ { y : β // y ≠ x })
@@ -228,13 +185,7 @@ variable [DecidableEq α] {a b : α}
 @[simps!]
 def optionSubtypeNe (a : α) : Option {b // b ≠ a} ≃ α := optionSubtype a |>.symm (.refl _) |>.1
 
-lemma optionSubtypeNe_symm_self (a : α) : (optionSubtypeNe a).symm a = none := by simp
-
 lemma optionSubtypeNe_symm_of_ne (hba : b ≠ a) : (optionSubtypeNe a).symm b = some ⟨b, hba⟩ := by
   simp [hba]
-
-@[simp] lemma optionSubtypeNe_none (a : α) : optionSubtypeNe a none = a := rfl
-
-@[simp] lemma optionSubtypeNe_some (a : α) (b) : optionSubtypeNe a (some b) = b := rfl
 
 end Equiv

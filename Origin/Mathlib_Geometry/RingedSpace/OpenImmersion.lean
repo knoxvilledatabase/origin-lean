@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.TopCat.Limits.Pullbacks
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace
 
+noncomputable section
+
 /-!
 # Open immersions of structured spaces
 
@@ -490,20 +492,8 @@ def toSheafedSpace (f : X ⟶ Y.toPresheafedSpace) [H : IsOpenImmersion f] : She
 
 variable (f : X ⟶ Y.toPresheafedSpace) [H : IsOpenImmersion f]
 
-@[simp]
-theorem toSheafedSpace_toPresheafedSpace : (toSheafedSpace Y f).toPresheafedSpace = X :=
-  rfl
-
 def toSheafedSpaceHom : toSheafedSpace Y f ⟶ Y :=
   f
-
-@[simp]
-theorem toSheafedSpaceHom_base : (toSheafedSpaceHom Y f).base = f.base :=
-  rfl
-
-@[simp]
-theorem toSheafedSpaceHom_c : (toSheafedSpaceHom Y f).c = f.c :=
-  rfl
 
 instance toSheafedSpace_isOpenImmersion : SheafedSpace.IsOpenImmersion (toSheafedSpaceHom Y f) :=
   H
@@ -526,17 +516,8 @@ def toLocallyRingedSpace : LocallyRingedSpace where
     haveI : IsLocalRing (Y.presheaf.stalk (f.base x)) := Y.isLocalRing _
     (asIso (f.stalkMap x)).commRingCatIsoToRingEquiv.isLocalRing
 
-@[simp]
-theorem toLocallyRingedSpace_toSheafedSpace :
-    (toLocallyRingedSpace Y f).toSheafedSpace = toSheafedSpace Y.1 f :=
-  rfl
-
 def toLocallyRingedSpaceHom : toLocallyRingedSpace Y f ⟶ Y :=
   ⟨f, fun _ => inferInstance⟩
-
-@[simp]
-theorem toLocallyRingedSpaceHom_val : (toLocallyRingedSpaceHom Y f).toShHom = f :=
-  rfl
 
 instance toLocallyRingedSpace_isOpenImmersion :
     LocallyRingedSpace.IsOpenImmersion (toLocallyRingedSpaceHom Y f) :=
@@ -897,6 +878,7 @@ instance : SheafedSpace.IsOpenImmersion (LocallyRingedSpace.forgetToSheafedSpace
   H
 
 set_option synthInstance.maxHeartbeats 40000 in
+/-- An explicit pullback cone over `cospan f g` if `f` is an open immersion. -/
 
 def pullbackConeOfLeft : PullbackCone f g := by
   refine PullbackCone.mk ?_
@@ -916,6 +898,7 @@ instance : LocallyRingedSpace.IsOpenImmersion (pullbackConeOfLeft f g).snd :=
   show PresheafedSpace.IsOpenImmersion (Y.toPresheafedSpace.ofRestrict _) by infer_instance
 
 set_option synthInstance.maxHeartbeats 40000 in
+/-- The constructed `pullbackConeOfLeft` is indeed limiting. -/
 
 def pullbackConeOfLeftIsLimit : IsLimit (pullbackConeOfLeft f g) :=
   PullbackCone.isLimitAux' _ fun s => by

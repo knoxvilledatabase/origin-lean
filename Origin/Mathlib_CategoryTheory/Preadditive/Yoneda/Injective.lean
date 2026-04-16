@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Preadditive.Injective
 import Mathlib.Algebra.Category.Grp.EpiMono
 import Mathlib.Algebra.Category.ModuleCat.EpiMono
 
+noncomputable section
+
 /-!
 An object is injective iff the preadditive yoneda functor on it preserves epimorphisms.
 -/

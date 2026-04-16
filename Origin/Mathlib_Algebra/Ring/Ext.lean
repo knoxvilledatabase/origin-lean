@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Defs
 import Mathlib.Algebra.Group.Ext
 
+noncomputable section
+
 /-!
 # Extensionality lemmas for rings and similar structures
 

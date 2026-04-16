@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Command
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # The `stacks` and `kerodon` attributes
 
@@ -189,11 +191,9 @@ def traceStacksTags (db : Database) (verbose : Bool := false) :
   logInfo msg
 
 elab (name := stacksTags) "#stacks_tags" tk:("!")?: command =>
-
   traceStacksTags .stacks (tk.isSome)
 
 elab (name := kerodonTags) "#kerodon_tags" tk:("!")?: command =>
-
   traceStacksTags .kerodon (tk.isSome)
 
 end Mathlib.StacksTag

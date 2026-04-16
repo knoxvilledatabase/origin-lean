@@ -1,10 +1,12 @@
 /-
 Extracted from Probability/ProbabilityMassFunction/Constructions.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 7 | Infrastructure: 14
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.Probability.ProbabilityMassFunction.Monad
 import Mathlib.Control.ULiftable
+
+noncomputable section
 
 /-!
 # Specific Constructions of Probability Mass Functions
@@ -43,16 +45,12 @@ def map (f : α → β) (p : PMF α) : PMF β :=
 
 variable (f : α → β) (p : PMF α) (b : β)
 
-theorem monad_map_eq_map {α β : Type u} (f : α → β) (p : PMF α) : f <$> p = p.map f := rfl
-
 @[simp]
 theorem map_apply : (map f p) b = ∑' a, if b = f a then p a else 0 := by simp [map]
 
 @[simp]
 theorem support_map : (map f p).support = f '' p.support :=
   Set.ext fun b => by simp [map, @eq_comm β b]
-
-theorem mem_support_map_iff : b ∈ (map f p).support ↔ ∃ a ∈ p.support, f a = b := by simp
 
 theorem bind_pure_comp : bind p (pure ∘ f) = map f p := rfl
 
@@ -107,8 +105,6 @@ def seq (q : PMF (α → β)) (p : PMF α) : PMF β :=
 
 variable (q : PMF (α → β)) (p : PMF α) (b : β)
 
-theorem monad_seq_eq_seq {α β : Type u} (q : PMF (α → β)) (p : PMF α) : q <*> p = q.seq p := rfl
-
 @[simp]
 theorem seq_apply : (seq q p) b = ∑' (f : α → β) (a : α), if b = f a then q f * p a else 0 := by
   simp only [seq, mul_boole, bind_apply, pure_apply]
@@ -118,8 +114,6 @@ theorem seq_apply : (seq q p) b = ∑' (f : α → β) (a : α), if b = f a then
 @[simp]
 theorem support_seq : (seq q p).support = ⋃ f ∈ q.support, f '' p.support :=
   Set.ext fun b => by simp [-mem_support_iff, seq, @eq_comm β b]
-
-theorem mem_support_seq_iff : b ∈ (seq q p).support ↔ ∃ f ∈ q.support, b ∈ f '' p.support := by simp
 
 end Seq
 
@@ -149,13 +143,8 @@ def ofFinset (f : α → ℝ≥0∞) (s : Finset α) (h : ∑ a ∈ s, f a = 1)
 variable {f : α → ℝ≥0∞} {s : Finset α} (h : ∑ a ∈ s, f a = 1) (h' : ∀ (a) (_ : a ∉ s), f a = 0)
 
 @[simp]
-theorem ofFinset_apply (a : α) : ofFinset f s h h' a = f a := rfl
-
-@[simp]
 theorem support_ofFinset : (ofFinset f s h h').support = ↑s ∩ Function.support f :=
   Set.ext fun a => by simpa [mem_support_iff] using mt (h' a)
-
--- DISSOLVED: mem_support_ofFinset_iff
 
 theorem ofFinset_apply_of_not_mem {a : α} (ha : a ∉ s) : ofFinset f s h h' a = 0 :=
   h' a ha
@@ -189,11 +178,6 @@ variable [Fintype α] {f : α → ℝ≥0∞} (h : ∑ a, f a = 1)
 theorem ofFintype_apply (a : α) : ofFintype f h a = f a := rfl
 
 @[simp]
-theorem support_ofFintype : (ofFintype f h).support = Function.support f := rfl
-
--- DISSOLVED: mem_support_ofFintype_iff
-
-@[simp]
 lemma map_ofFintype [Fintype β] (f : α → ℝ≥0∞) (h : ∑ a, f a = 1) (g : α → β) :
     (ofFintype f h).map g = ofFintype (fun b ↦ ∑ a with g a = b, f a)
       (by simpa [Finset.sum_fiberwise_eq_sum_filter univ univ g f]) := by
@@ -220,7 +204,9 @@ end OfFintype
 
 section normalize
 
--- DISSOLVED: normalize
+def normalize (f : α → ℝ≥0∞) (hf0 : tsum f ≠ 0) (hf : tsum f ≠ ∞) : PMF α :=
+  ⟨fun a => f a * (∑' x, f x)⁻¹,
+    ENNReal.summable.hasSum_iff.2 (ENNReal.tsum_mul_right.trans (ENNReal.mul_inv_cancel hf0 hf))⟩
 
 variable {f : α → ℝ≥0∞} (hf0 : tsum f ≠ 0) (hf : tsum f ≠ ∞)
 
@@ -231,7 +217,7 @@ theorem normalize_apply (a : α) : (normalize f hf0 hf) a = f a * (∑' x, f x)�
 theorem support_normalize : (normalize f hf0 hf).support = Function.support f :=
   Set.ext fun a => by simp [hf, mem_support_iff]
 
--- DISSOLVED: mem_support_normalize_iff
+theorem mem_support_normalize_iff (a : α) : a ∈ (normalize f hf0 hf).support ↔ f a ≠ 0 := by simp
 
 end normalize
 
@@ -260,7 +246,8 @@ theorem support_filter : (p.filter s h).support = s ∩ p.support :=
 theorem filter_apply_eq_zero_iff (a : α) : (p.filter s h) a = 0 ↔ a ∉ s ∨ a ∉ p.support := by
   rw [apply_eq_zero_iff, support_filter, Set.mem_inter_iff, not_and_or]
 
--- DISSOLVED: filter_apply_ne_zero_iff
+theorem filter_apply_ne_zero_iff (a : α) : (p.filter s h) a ≠ 0 ↔ a ∈ s ∧ a ∈ p.support := by
+  rw [Ne, filter_apply_eq_zero_iff, not_or, Classical.not_not, Classical.not_not]
 
 end Filter
 
@@ -274,9 +261,13 @@ variable {p : ℝ≥0∞} (h : p ≤ 1) (b : Bool)
 @[simp]
 theorem bernoulli_apply : bernoulli p h b = cond b p (1 - p) := rfl
 
--- DISSOLVED: support_bernoulli
-
--- DISSOLVED: mem_support_bernoulli_iff
+@[simp]
+theorem support_bernoulli : (bernoulli p h).support = { b | cond b (p ≠ 0) (p ≠ 1) } := by
+  refine Set.ext fun b => ?_
+  induction b
+  · simp_rw [mem_support_iff, bernoulli_apply, Bool.cond_false, Ne, tsub_eq_zero_iff_le, not_le]
+    exact ⟨ne_of_lt, lt_of_le_of_ne h⟩
+  · simp only [mem_support_iff, bernoulli_apply, Bool.cond_true, Set.mem_setOf_eq]
 
 end bernoulli
 

@@ -10,6 +10,8 @@ import Mathlib.Logic.Equiv.Basic
 import Mathlib.Logic.Equiv.Functor
 import Mathlib.Control.Lawful
 
+noncomputable section
+
 /-!
 # Universe lifting for type families
 

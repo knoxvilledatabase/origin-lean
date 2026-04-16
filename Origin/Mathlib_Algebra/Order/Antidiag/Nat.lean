@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Antidiag/Nat.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Antidiag.Pi
 import Mathlib.NumberTheory.ArithmeticFunction
+
+noncomputable section
 
 /-!
 # Sets of tuples with a fixed product
@@ -67,11 +69,26 @@ def finMulAntidiag (d : ℕ) (n : ℕ) : Finset (Fin d → ℕ) :=
   else
     ∅
 
--- DISSOLVED: mem_finMulAntidiag
-
 @[simp]
-theorem finMulAntidiag_zero_right (d : ℕ) :
-    finMulAntidiag d 0 = ∅ := rfl
+theorem mem_finMulAntidiag {d n : ℕ} {f : Fin d → ℕ} :
+    f ∈ finMulAntidiag d n ↔ ∏ i, f i = n ∧ n ≠ 0 := by
+  unfold finMulAntidiag
+  split_ifs with h
+  · simp_rw [mem_map, mem_finAntidiagonal, Function.Embedding.arrowCongrRight_apply,
+      Function.comp_def, Function.Embedding.trans_apply, Equiv.coe_toEmbedding,
+      Function.Embedding.coeFn_mk, ← Additive.ofMul.symm_apply_eq, Additive.ofMul_symm_eq,
+      toMul_sum, (Equiv.piCongrRight fun _=> Additive.ofMul).surjective.exists,
+      Equiv.piCongrRight_apply, Pi.map_apply, toMul_ofMul, ← PNat.coe_inj, PNat.mk_coe,
+      PNat.coe_prod]
+    constructor
+    · rintro ⟨a, ha_mem, rfl⟩
+      exact ⟨ha_mem, h.ne.symm⟩
+    · rintro ⟨rfl, _⟩
+      refine ⟨fun i ↦ ⟨f i, ?_⟩, rfl, funext fun _ => rfl⟩
+      apply Nat.pos_of_ne_zero
+      exact Finset.prod_ne_zero_iff.mp h.ne.symm _ (mem_univ _)
+  · simp only [not_lt, nonpos_iff_eq_zero] at h
+    simp only [h, not_mem_empty, ne_eq, not_true_eq_false, and_false]
 
 theorem finMulAntidiag_one {d : ℕ} :
     finMulAntidiag d 1 = {fun _ => 1} := by
@@ -96,13 +113,26 @@ theorem dvd_of_mem_finMulAntidiag {n d : ℕ} {f : Fin d → ℕ} (hf : f ∈ fi
   rw [← hf.1]
   exact dvd_prod_of_mem f (mem_univ i)
 
--- DISSOLVED: ne_zero_of_mem_finMulAntidiag
+theorem ne_zero_of_mem_finMulAntidiag {d n : ℕ} {f : Fin d → ℕ}
+    (hf : f ∈ finMulAntidiag d n) (i : Fin d) : f i ≠ 0 :=
+  ne_zero_of_dvd_ne_zero (mem_finMulAntidiag.mp hf).2 (dvd_of_mem_finMulAntidiag hf i)
 
 theorem prod_eq_of_mem_finMulAntidiag {d n : ℕ} {f : Fin d → ℕ}
     (hf : f ∈ finMulAntidiag d n) : ∏ i, f i = n :=
   (mem_finMulAntidiag.mp hf).1
 
--- DISSOLVED: finMulAntidiag_eq_piFinset_divisors_filter
+theorem finMulAntidiag_eq_piFinset_divisors_filter {d m n : ℕ} (hmn : m ∣ n) (hn : n ≠ 0) :
+    finMulAntidiag d m =
+      {f ∈ Fintype.piFinset fun _ : Fin d => n.divisors | ∏ i, f i = m} := by
+  ext f
+  simp only [mem_univ, not_true, IsEmpty.forall_iff, implies_true, ne_eq, true_and,
+    Fintype.mem_piFinset, mem_divisors, Nat.isUnit_iff, mem_filter]
+  constructor
+  · intro hf
+    refine ⟨?_, prod_eq_of_mem_finMulAntidiag hf⟩
+    exact fun i => ⟨(dvd_of_mem_finMulAntidiag hf i).trans hmn, hn⟩
+  · rw [mem_finMulAntidiag]
+    exact fun ⟨_, hprod⟩ => ⟨hprod, ne_zero_of_dvd_ne_zero hn hmn⟩
 
 lemma image_apply_finMulAntidiag {d n : ℕ} {i : Fin d} (hd : d ≠ 1) :
     (finMulAntidiag d n).image (fun f => f i) = divisors n := by

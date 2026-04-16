@@ -11,6 +11,8 @@ import Mathlib.RingTheory.Localization.Away.AdjoinRoot
 import Mathlib.RingTheory.Localization.Away.Basic
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 
 # Smooth morphisms

@@ -11,6 +11,8 @@ import Mathlib.Data.Finset.Sym
 import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Positivity
 
+noncomputable section
+
 /-!
 # Triangles in graphs
 

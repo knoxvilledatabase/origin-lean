@@ -1,9 +1,11 @@
 /-
 Extracted from Probability/Moments.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Probability.Variance
+
+noncomputable section
 
 /-!
 # Moments and moment generating function
@@ -51,9 +53,15 @@ def centralMoment (X : Ω → ℝ) (p : ℕ) (μ : Measure Ω) : ℝ := by
   have m := fun (x : Ω) => μ[X] -- Porting note: Lean deems `μ[(X - fun x => μ[X]) ^ p]` ambiguous
   exact μ[(X - m) ^ p]
 
--- DISSOLVED: moment_zero
+@[simp]
+theorem moment_zero (hp : p ≠ 0) : moment 0 p μ = 0 := by
+  simp only [moment, hp, zero_pow, Ne, not_false_iff, Pi.zero_apply, integral_const,
+    smul_eq_mul, mul_zero, integral_zero]
 
--- DISSOLVED: centralMoment_zero
+@[simp]
+theorem centralMoment_zero (hp : p ≠ 0) : centralMoment 0 p μ = 0 := by
+  simp only [centralMoment, hp, Pi.zero_apply, integral_const, smul_eq_mul,
+    mul_zero, zero_sub, Pi.pow_apply, Pi.neg_apply, neg_zero, zero_pow, Ne, not_false_iff]
 
 theorem centralMoment_one' [IsFiniteMeasure μ] (h_int : Integrable X μ) :
     centralMoment X 1 μ = (1 - (μ Set.univ).toReal) * μ[X] := by
@@ -110,7 +118,14 @@ theorem mgf_const' (c : ℝ) : mgf (fun _ => c) μ t = (μ Set.univ).toReal * ex
 theorem mgf_const (c : ℝ) [IsProbabilityMeasure μ] : mgf (fun _ => c) μ t = exp (t * c) := by
   simp only [mgf_const', measure_univ, ENNReal.one_toReal, one_mul]
 
--- DISSOLVED: cgf_const'
+@[simp]
+theorem cgf_const' [IsFiniteMeasure μ] (hμ : μ ≠ 0) (c : ℝ) :
+    cgf (fun _ => c) μ t = log (μ Set.univ).toReal + t * c := by
+  simp only [cgf, mgf_const']
+  rw [log_mul _ (exp_pos _).ne']
+  · rw [log_exp _]
+  · rw [Ne, ENNReal.toReal_eq_zero_iff, Measure.measure_univ_eq_zero]
+    simp only [hμ, measure_ne_top μ Set.univ, or_self_iff, not_false_iff]
 
 @[simp]
 theorem cgf_const [IsProbabilityMeasure μ] (c : ℝ) : cgf (fun _ => c) μ t = t * c := by
@@ -138,7 +153,23 @@ theorem cgf_undef (hX : ¬Integrable (fun ω => exp (t * X ω)) μ) : cgf X μ t
 theorem mgf_nonneg : 0 ≤ mgf X μ t := by
   unfold mgf; positivity
 
--- DISSOLVED: mgf_pos'
+theorem mgf_pos' (hμ : μ ≠ 0) (h_int_X : Integrable (fun ω => exp (t * X ω)) μ) :
+    0 < mgf X μ t := by
+  simp_rw [mgf]
+  have : ∫ x : Ω, exp (t * X x) ∂μ = ∫ x : Ω in Set.univ, exp (t * X x) ∂μ := by
+    simp only [Measure.restrict_univ]
+  rw [this, setIntegral_pos_iff_support_of_nonneg_ae _ _]
+  · have h_eq_univ : (Function.support fun x : Ω => exp (t * X x)) = Set.univ := by
+      ext1 x
+      simp only [Function.mem_support, Set.mem_univ, iff_true]
+      exact (exp_pos _).ne'
+    rw [h_eq_univ, Set.inter_univ _]
+    refine Ne.bot_lt ?_
+    simp only [hμ, ENNReal.bot_eq_zero, Ne, Measure.measure_univ_eq_zero, not_false_iff]
+  · filter_upwards with x
+    rw [Pi.zero_apply]
+    exact (exp_pos _).le
+  · rwa [integrableOn_univ]
 
 theorem mgf_pos [IsProbabilityMeasure μ] (h_int_X : Integrable (fun ω => exp (t * X ω)) μ) :
     0 < mgf X μ t :=

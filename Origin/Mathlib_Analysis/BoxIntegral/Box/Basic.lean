@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoxIntegral/Box/Basic.lean
-Genuine: 51 | Conflates: 0 | Dissolved: 4 | Infrastructure: 20
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Order.Fin.Tuple
@@ -9,6 +9,8 @@ import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.MetricSpace.Bounded
 import Mathlib.Topology.Order.MonotoneConvergence
 import Mathlib.Topology.MetricSpace.Pseudo.Real
+
+noncomputable section
 
 /-!
 # Rectangular boxes in `ℝⁿ`
@@ -96,9 +98,6 @@ def toSet (I : Box ι) : Set (ι → ℝ) := { x | x ∈ I }
 instance : CoeTC (Box ι) (Set <| ι → ℝ) :=
   ⟨toSet⟩
 
-@[simp]
-theorem mem_mk {l u x : ι → ℝ} {H} : x ∈ mk l u H ↔ ∀ i, x i ∈ Ioc (l i) (u i) := Iff.rfl
-
 @[simp, norm_cast]
 theorem mem_coe : x ∈ (I : Set (ι → ℝ)) ↔ x ∈ I := Iff.rfl
 
@@ -174,8 +173,6 @@ instance : PartialOrder (Box ι) :=
 protected def Icc : Box ι ↪o Set (ι → ℝ) :=
   OrderEmbedding.ofMapLEIff (fun I : Box ι ↦ Icc I.lower I.upper) fun I J ↦ (le_TFAE I J).out 2 0
 
-theorem Icc_def : Box.Icc I = Icc I.lower I.upper := rfl
-
 @[simp]
 theorem upper_mem_Icc (I : Box ι) : I.upper ∈ Box.Icc I :=
   right_mem_Icc.2 I.lower_le_upper
@@ -228,7 +225,8 @@ instance : SemilatticeSup (Box ι) :=
 In this section we define coercion from `WithBot (Box ι)` to `Set (ι → ℝ)` by sending `⊥` to `∅`.
 -/
 
--- DISSOLVED: withBotToSet
+@[coe]
+def withBotToSet (o : WithBot (Box ι)) : Set (ι → ℝ) := o.elim ∅ (↑)
 
 instance withBotCoe : CoeTC (WithBot (Box ι)) (Set (ι → ℝ)) :=
   ⟨withBotToSet⟩
@@ -251,9 +249,15 @@ theorem biUnion_coe_eq_coe (I : WithBot (Box ι)) :
     ⋃ (J : Box ι) (_ : ↑J = I), (J : Set (ι → ℝ)) = I := by
   induction I <;> simp [WithBot.coe_eq_coe]
 
--- DISSOLVED: withBotCoe_subset_iff
+@[simp, norm_cast]
+theorem withBotCoe_subset_iff {I J : WithBot (Box ι)} : (I : Set (ι → ℝ)) ⊆ J ↔ I ≤ J := by
+  induction I; · simp
+  induction J; · simp [subset_empty_iff]
+  simp [le_def]
 
--- DISSOLVED: withBotCoe_inj
+@[simp, norm_cast]
+theorem withBotCoe_inj {I J : WithBot (Box ι)} : (I : Set (ι → ℝ)) = J ↔ I = J := by
+  simp only [Subset.antisymm_iff, ← le_antisymm_iff, withBotCoe_subset_iff]
 
 def mk' (l u : ι → ℝ) : WithBot (Box ι) :=
   if h : ∀ i, l i < u i then ↑(⟨l, u, h⟩ : Box ι) else ⊥
@@ -308,7 +312,11 @@ instance : Lattice (WithBot (Box ι)) :=
       simp only [← withBotCoe_subset_iff, coe_inf] at *
       exact subset_inter h₁ h₂ }
 
--- DISSOLVED: disjoint_withBotCoe
+@[simp, norm_cast]
+theorem disjoint_withBotCoe {I J : WithBot (Box ι)} :
+    Disjoint (I : Set (ι → ℝ)) J ↔ Disjoint I J := by
+  simp only [disjoint_iff_inf_le, ← withBotCoe_subset_iff, coe_inf]
+  rfl
 
 theorem disjoint_coe : Disjoint (I : WithBot (Box ι)) J ↔ Disjoint (I : Set (ι → ℝ)) J :=
   disjoint_withBotCoe.symm
@@ -324,10 +332,6 @@ theorem not_disjoint_coe_iff_nonempty_inter :
 @[simps (config := { simpRhs := true })]
 def face {n} (I : Box (Fin (n + 1))) (i : Fin (n + 1)) : Box (Fin n) :=
   ⟨I.lower ∘ Fin.succAbove i, I.upper ∘ Fin.succAbove i, fun _ ↦ I.lower_lt_upper _⟩
-
-@[simp]
-theorem face_mk {n} (l u : Fin (n + 1) → ℝ) (h : ∀ i, l i < u i) (i : Fin (n + 1)) :
-    face ⟨l, u, h⟩ i = ⟨l ∘ Fin.succAbove i, u ∘ Fin.succAbove i, fun _ ↦ h _⟩ := rfl
 
 @[mono]
 theorem face_mono {n} {I J : Box (Fin (n + 1))} (h : I ≤ J) (i : Fin (n + 1)) :

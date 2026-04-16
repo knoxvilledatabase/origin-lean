@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Measure.Prod
 
+noncomputable section
+
 /-!
 # Integration with respect to the product measure
 

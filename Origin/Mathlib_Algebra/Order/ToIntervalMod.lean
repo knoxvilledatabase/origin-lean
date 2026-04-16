@@ -12,6 +12,8 @@ import Mathlib.Order.Circular
 import Mathlib.Data.List.TFAE
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Reducing to an interval modulo its length
 
@@ -87,14 +89,6 @@ theorem toIcoMod_lt_right (a b : α) : toIcoMod hp a b < a + p :=
 
 theorem toIocMod_le_right (a b : α) : toIocMod hp a b ≤ a + p :=
   (Set.mem_Ioc.1 (toIocMod_mem_Ioc hp a b)).2
-
-@[simp]
-theorem self_sub_toIcoDiv_zsmul (a b : α) : b - toIcoDiv hp a b • p = toIcoMod hp a b :=
-  rfl
-
-@[simp]
-theorem self_sub_toIocDiv_zsmul (a b : α) : b - toIocDiv hp a b • p = toIocMod hp a b :=
-  rfl
 
 @[simp]
 theorem toIcoDiv_zsmul_sub_self (a b : α) : toIcoDiv hp a b • p - b = -toIcoMod hp a b := by
@@ -665,16 +659,6 @@ def QuotientAddGroup.equivIcoMod (a : α) : α ⧸ AddSubgroup.zmultiples p ≃ 
     rw [QuotientAddGroup.eq_iff_sub_mem, toIcoMod_sub_self]
     apply AddSubgroup.zsmul_mem_zmultiples
 
-@[simp]
-theorem QuotientAddGroup.equivIcoMod_coe (a b : α) :
-    QuotientAddGroup.equivIcoMod hp a ↑b = ⟨toIcoMod hp a b, toIcoMod_mem_Ico hp a _⟩ :=
-  rfl
-
-@[simp]
-theorem QuotientAddGroup.equivIcoMod_zero (a : α) :
-    QuotientAddGroup.equivIcoMod hp a 0 = ⟨toIcoMod hp a 0, toIcoMod_mem_Ico hp a _⟩ :=
-  rfl
-
 @[simps symm_apply]
 def QuotientAddGroup.equivIocMod (a : α) : α ⧸ AddSubgroup.zmultiples p ≃ Set.Ioc a (a + p) where
   toFun b :=
@@ -686,16 +670,6 @@ def QuotientAddGroup.equivIocMod (a : α) : α ⧸ AddSubgroup.zmultiples p ≃ 
     dsimp
     rw [QuotientAddGroup.eq_iff_sub_mem, toIocMod_sub_self]
     apply AddSubgroup.zsmul_mem_zmultiples
-
-@[simp]
-theorem QuotientAddGroup.equivIocMod_coe (a b : α) :
-    QuotientAddGroup.equivIocMod hp a ↑b = ⟨toIocMod hp a b, toIocMod_mem_Ioc hp a _⟩ :=
-  rfl
-
-@[simp]
-theorem QuotientAddGroup.equivIocMod_zero (a : α) :
-    QuotientAddGroup.equivIocMod hp a 0 = ⟨toIocMod hp a 0, toIocMod_mem_Ioc hp a _⟩ :=
-  rfl
 
 end
 
@@ -783,11 +757,6 @@ variable [hp' : Fact (0 < p)]
 
 instance : Btw (α ⧸ AddSubgroup.zmultiples p) where
   btw x₁ x₂ x₃ := (equivIcoMod hp'.out 0 (x₂ - x₁) : α) ≤ equivIocMod hp'.out 0 (x₃ - x₁)
-
-theorem btw_coe_iff' {x₁ x₂ x₃ : α} :
-    Btw.btw (x₁ : α ⧸ AddSubgroup.zmultiples p) x₂ x₃ ↔
-      toIcoMod hp'.out 0 (x₂ - x₁) ≤ toIocMod hp'.out 0 (x₃ - x₁) :=
-  Iff.rfl
 
 theorem btw_coe_iff {x₁ x₂ x₃ : α} :
     Btw.btw (x₁ : α ⧸ AddSubgroup.zmultiples p) x₂ x₃ ↔

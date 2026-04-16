@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Insert
 import Mathlib.Data.Finset.Lattice.Basic
 
+noncomputable section
+
 /-!
 # Lemmas about the lattice structure of finite sets
 

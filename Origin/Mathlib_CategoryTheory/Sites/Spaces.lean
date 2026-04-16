@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Sites.Pretopology
 import Mathlib.CategoryTheory.Limits.Lattice
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # Grothendieck topology on a topological space
 

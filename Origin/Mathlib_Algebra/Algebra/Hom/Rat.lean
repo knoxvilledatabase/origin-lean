@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Hom
 import Mathlib.Algebra.Algebra.Rat
 
+noncomputable section
+
 /-!
 # Homomorphisms of `ℚ`-algebras
 

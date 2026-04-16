@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Action.Faithful
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Group.Units.Defs
 
+noncomputable section
+
 /-! # Group actions on and by `Mˣ`
 
 This file provides the action of a unit on a type `α`, `SMul Mˣ α`, in the presence of
@@ -25,15 +27,6 @@ variable {G H M N α : Type*}
 namespace Units
 
 @[to_additive] instance [Monoid M] [SMul M α] : SMul Mˣ α where smul m a := (m : M) • a
-
-@[to_additive] lemma smul_def [Monoid M] [SMul M α] (m : Mˣ) (a : α) : m • a = (m : M) • a := rfl
-
-@[to_additive, simp]
-lemma smul_mk_apply {M α : Type*} [Monoid M] [SMul M α] (m n : M) (h₁) (h₂) (a : α) :
-    (⟨m, n, h₁, h₂⟩ : Mˣ) • a = m • a := rfl
-
-@[simp]
-lemma smul_isUnit [Monoid M] [SMul M α] {m : M} (hm : IsUnit m) (a : α) : hm.unit • a = m • a := rfl
 
 @[to_additive]
 lemma _root_.IsUnit.inv_smul [Monoid α] {a : α} (h : IsUnit a) : h.unit⁻¹ • a = 1 := h.val_inv_mul

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineMap
 import Mathlib.Tactic.FieldSimp
 
+noncomputable section
+
 /-!
 # Slope of a function
 
@@ -25,9 +27,6 @@ variable {k E PE : Type*} [Field k] [AddCommGroup E] [Module k E] [AddTorsor E P
 
 def slope (f : k → PE) (a b : k) : E :=
   (b - a)⁻¹ • (f b -ᵥ f a)
-
-theorem slope_fun_def (f : k → PE) : slope f = fun a b => (b - a)⁻¹ • (f b -ᵥ f a) :=
-  rfl
 
 theorem slope_def_field (f : k → k) (a b : k) : slope f a b = (f b - f a) / (b - a) :=
   (div_eq_inv_mul _ _).symm

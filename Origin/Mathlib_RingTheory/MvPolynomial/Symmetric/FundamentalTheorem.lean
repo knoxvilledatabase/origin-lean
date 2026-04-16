@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/MvPolynomial/Symmetric/FundamentalTheorem.lean
-Genuine: 22 | Conflates: 2 | Dissolved: 1 | Infrastructure: 2
+Genuine: 23 | Conflates: 2 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.MvPolynomial.Symmetric.Defs
 import Mathlib.RingTheory.MvPolynomial.Tower
 import Mathlib.Data.Finsupp.Notation
 import Mathlib.Data.Finsupp.WellFounded
+
+noncomputable section
 
 /-!
 # The Fundamental Theorem of Symmetric Polynomials
@@ -218,10 +220,23 @@ lemma leadingCoeff_esymmAlgHomMonomial (t : Fin n →₀ ℕ) (hnm : n ≤ m) :
         ih]
     exacts [toLex.injective, toLex_add]
 
--- DISSOLVED: supDegree_esymmAlgHomMonomial
+lemma supDegree_esymmAlgHomMonomial (hr : r ≠ 0) (t : Fin n →₀ ℕ) (hnm : n ≤ m) :
+    ofLex (supDegree toLex <| esymmAlgHomMonomial (Fin m) t r) = accumulate n m t := by
+  nontriviality R
+  induction t using Finsupp.induction₂ with
+  | h0 => simp_rw [esymmAlgHom_zero, supDegree_toLex_C, ofLex_zero, Finsupp.coe_zero, map_zero]
+  | ha  i _ _ _ _ ih =>
+    have := i.2.trans_le hnm
+    rw [esymmAlgHomMonomial_add, esymmAlgHomMonomial_single_one,
+        Monic.supDegree_mul_of_ne_zero_left toLex.injective toLex_add, ofLex_add, Finsupp.coe_add,
+        ih, Finsupp.coe_add, map_add, Monic.supDegree_pow rfl toLex_add toLex.injective, ofLex_smul,
+        Finsupp.coe_smul, supDegree_esymm this, ← map_nsmul, ← Finsupp.coe_smul,
+        Finsupp.smul_single, nsmul_one, Nat.cast_id]
+    · exact monic_esymm this
+    · exact (monic_esymm this).pow toLex_add toLex.injective
+    · rwa [Ne, ← leadingCoeff_eq_zero toLex.injective, leadingCoeff_esymmAlgHomMonomial _ hnm]
 
 omit [Fintype σ] in
-
 lemma IsSymmetric.antitone_supDegree [LinearOrder σ] {p : MvPolynomial σ R} (hp : p.IsSymmetric) :
     Antitone ↑(ofLex <| p.supDegree toLex) := by
   obtain rfl | h0 := eq_or_ne p 0

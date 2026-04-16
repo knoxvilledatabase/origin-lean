@@ -8,6 +8,8 @@ import Mathlib.Order.Monotone.Basic
 import Mathlib.Order.ULift
 import Mathlib.Tactic.GCongr.CoreAttrs
 
+noncomputable section
+
 /-!
 # (Semi-)lattices
 
@@ -183,10 +185,6 @@ instance : Std.Associative (α := α) (· ⊔ ·) := ⟨sup_assoc⟩
 
 theorem sup_left_right_swap (a b c : α) : a ⊔ b ⊔ c = c ⊔ b ⊔ a := by
   rw [sup_comm, sup_comm a, sup_assoc]
-
-theorem sup_left_idem (a b : α) : a ⊔ (a ⊔ b) = a ⊔ b := by simp
-
-theorem sup_right_idem (a b : α) : a ⊔ b ⊔ b = a ⊔ b := by simp
 
 theorem sup_left_comm (a b c : α) : a ⊔ (b ⊔ c) = b ⊔ (a ⊔ c) := by
   rw [← sup_assoc, ← sup_assoc, @sup_comm α _ a]
@@ -369,10 +367,6 @@ instance : Std.Associative (α := α) (· ⊓ ·) := ⟨inf_assoc⟩
 
 theorem inf_left_right_swap (a b c : α) : a ⊓ b ⊓ c = c ⊓ b ⊓ a :=
   @sup_left_right_swap αᵒᵈ _ _ _ _
-
-theorem inf_left_idem (a b : α) : a ⊓ (a ⊓ b) = a ⊓ b := by simp
-
-theorem inf_right_idem (a b : α) : a ⊓ b ⊓ b = a ⊓ b := by simp
 
 theorem inf_left_comm (a b c : α) : a ⊓ (b ⊓ c) = b ⊓ (a ⊓ c) :=
   @sup_left_comm αᵒᵈ _ a b c
@@ -605,12 +599,6 @@ section LinearOrder
 
 variable [LinearOrder α] {a b c d : α}
 
-theorem sup_eq_max : a ⊔ b = max a b :=
-  rfl
-
-theorem inf_eq_min : a ⊓ b = min a b :=
-  rfl
-
 theorem sup_ind (a b : α) {p : α → Prop} (ha : p a) (hb : p b) : p (a ⊔ b) :=
   (IsTotal.total a b).elim (fun h : a ≤ b => by rwa [sup_eq_right.2 h]) fun h => by
   rwa [sup_eq_left.2 h]
@@ -703,41 +691,9 @@ instance : Lattice ℤ := inferInstance
 
 open OrderDual
 
-@[simp]
-theorem ofDual_inf [Max α] (a b : αᵒᵈ) : ofDual (a ⊓ b) = ofDual a ⊔ ofDual b :=
-  rfl
-
-@[simp]
-theorem ofDual_sup [Min α] (a b : αᵒᵈ) : ofDual (a ⊔ b) = ofDual a ⊓ ofDual b :=
-  rfl
-
-@[simp]
-theorem toDual_inf [Min α] (a b : α) : toDual (a ⊓ b) = toDual a ⊔ toDual b :=
-  rfl
-
-@[simp]
-theorem toDual_sup [Max α] (a b : α) : toDual (a ⊔ b) = toDual a ⊓ toDual b :=
-  rfl
-
 section LinearOrder
 
 variable [LinearOrder α]
-
-@[simp]
-theorem ofDual_min (a b : αᵒᵈ) : ofDual (min a b) = max (ofDual a) (ofDual b) :=
-  rfl
-
-@[simp]
-theorem ofDual_max (a b : αᵒᵈ) : ofDual (max a b) = min (ofDual a) (ofDual b) :=
-  rfl
-
-@[simp]
-theorem toDual_min (a b : α) : toDual (min a b) = max (toDual a) (toDual b) :=
-  rfl
-
-@[simp]
-theorem toDual_max (a b : α) : toDual (max a b) = min (toDual a) (toDual b) :=
-  rfl
 
 end LinearOrder
 
@@ -750,22 +706,8 @@ variable {ι : Type*} {α' : ι → Type*}
 instance [∀ i, Max (α' i)] : Max (∀ i, α' i) :=
   ⟨fun f g i => f i ⊔ g i⟩
 
-@[simp]
-theorem sup_apply [∀ i, Max (α' i)] (f g : ∀ i, α' i) (i : ι) : (f ⊔ g) i = f i ⊔ g i :=
-  rfl
-
-theorem sup_def [∀ i, Max (α' i)] (f g : ∀ i, α' i) : f ⊔ g = fun i => f i ⊔ g i :=
-  rfl
-
 instance [∀ i, Min (α' i)] : Min (∀ i, α' i) :=
   ⟨fun f g i => f i ⊓ g i⟩
-
-@[simp]
-theorem inf_apply [∀ i, Min (α' i)] (f g : ∀ i, α' i) (i : ι) : (f ⊓ g) i = f i ⊓ g i :=
-  rfl
-
-theorem inf_def [∀ i, Min (α' i)] (f g : ∀ i, α' i) : f ⊓ g = fun i => f i ⊓ g i :=
-  rfl
 
 instance instSemilatticeSup [∀ i, SemilatticeSup (α' i)] : SemilatticeSup (∀ i, α' i) where
   le_sup_left _ _ _ := le_sup_left
@@ -1011,46 +953,6 @@ instance [Max α] [Max β] : Max (α × β) :=
 instance [Min α] [Min β] : Min (α × β) :=
   ⟨fun p q => ⟨p.1 ⊓ q.1, p.2 ⊓ q.2⟩⟩
 
-@[simp]
-theorem mk_sup_mk [Max α] [Max β] (a₁ a₂ : α) (b₁ b₂ : β) :
-    (a₁, b₁) ⊔ (a₂, b₂) = (a₁ ⊔ a₂, b₁ ⊔ b₂) :=
-  rfl
-
-@[simp]
-theorem mk_inf_mk [Min α] [Min β] (a₁ a₂ : α) (b₁ b₂ : β) :
-    (a₁, b₁) ⊓ (a₂, b₂) = (a₁ ⊓ a₂, b₁ ⊓ b₂) :=
-  rfl
-
-@[simp]
-theorem fst_sup [Max α] [Max β] (p q : α × β) : (p ⊔ q).fst = p.fst ⊔ q.fst :=
-  rfl
-
-@[simp]
-theorem fst_inf [Min α] [Min β] (p q : α × β) : (p ⊓ q).fst = p.fst ⊓ q.fst :=
-  rfl
-
-@[simp]
-theorem snd_sup [Max α] [Max β] (p q : α × β) : (p ⊔ q).snd = p.snd ⊔ q.snd :=
-  rfl
-
-@[simp]
-theorem snd_inf [Min α] [Min β] (p q : α × β) : (p ⊓ q).snd = p.snd ⊓ q.snd :=
-  rfl
-
-@[simp]
-theorem swap_sup [Max α] [Max β] (p q : α × β) : (p ⊔ q).swap = p.swap ⊔ q.swap :=
-  rfl
-
-@[simp]
-theorem swap_inf [Min α] [Min β] (p q : α × β) : (p ⊓ q).swap = p.swap ⊓ q.swap :=
-  rfl
-
-theorem sup_def [Max α] [Max β] (p q : α × β) : p ⊔ q = (p.fst ⊔ q.fst, p.snd ⊔ q.snd) :=
-  rfl
-
-theorem inf_def [Min α] [Min β] (p q : α × β) : p ⊓ q = (p.fst ⊓ q.fst, p.snd ⊓ q.snd) :=
-  rfl
-
 instance instSemilatticeSup [SemilatticeSup α] [SemilatticeSup β] : SemilatticeSup (α × β) where
   __ := inferInstanceAs (PartialOrder (α × β))
   sup a b := ⟨a.1 ⊔ b.1, a.2 ⊔ b.2⟩
@@ -1101,32 +1003,6 @@ protected abbrev lattice [Lattice α] {P : α → Prop} (Psup : ∀ ⦃x y⦄, P
     (Pinf : ∀ ⦃x y⦄, P x → P y → P (x ⊓ y)) : Lattice { x : α // P x } where
   __ := Subtype.semilatticeInf Pinf
   __ := Subtype.semilatticeSup Psup
-
-@[simp, norm_cast]
-theorem coe_sup [SemilatticeSup α] {P : α → Prop}
-    (Psup : ∀ ⦃x y⦄, P x → P y → P (x ⊔ y)) (x y : Subtype P) :
-    (haveI := Subtype.semilatticeSup Psup; (x ⊔ y : Subtype P) : α) = (x ⊔ y : α) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inf [SemilatticeInf α] {P : α → Prop}
-    (Pinf : ∀ ⦃x y⦄, P x → P y → P (x ⊓ y)) (x y : Subtype P) :
-    (haveI := Subtype.semilatticeInf Pinf; (x ⊓ y : Subtype P) : α) = (x ⊓ y : α) :=
-  rfl
-
-@[simp]
-theorem mk_sup_mk [SemilatticeSup α] {P : α → Prop}
-    (Psup : ∀ ⦃x y⦄, P x → P y → P (x ⊔ y)) {x y : α} (hx : P x) (hy : P y) :
-    (haveI := Subtype.semilatticeSup Psup; (⟨x, hx⟩ ⊔ ⟨y, hy⟩ : Subtype P)) =
-      ⟨x ⊔ y, Psup hx hy⟩ :=
-  rfl
-
-@[simp]
-theorem mk_inf_mk [SemilatticeInf α] {P : α → Prop}
-    (Pinf : ∀ ⦃x y⦄, P x → P y → P (x ⊓ y)) {x y : α} (hx : P x) (hy : P y) :
-    (haveI := Subtype.semilatticeInf Pinf; (⟨x, hx⟩ ⊓ ⟨y, hy⟩ : Subtype P)) =
-      ⟨x ⊓ y, Pinf hx hy⟩ :=
-  rfl
 
 end Subtype
 

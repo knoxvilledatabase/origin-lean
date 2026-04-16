@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.MvPolynomial.Basic
 
+noncomputable section
+
 /-!
 ## Counit morphisms for multivariate polynomials
 

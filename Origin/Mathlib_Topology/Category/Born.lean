@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.BundledHom
 import Mathlib.Topology.Bornology.Hom
 
+noncomputable section
+
 /-!
 # The category of bornologies
 

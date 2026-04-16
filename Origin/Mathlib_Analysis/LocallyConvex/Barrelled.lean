@@ -7,6 +7,8 @@ import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Topology.Semicontinuous
 import Mathlib.Topology.Baire.Lemmas
 
+noncomputable section
+
 /-!
 # Barrelled spaces and the Banach-Steinhaus theorem / Uniform Boundedness Principle
 

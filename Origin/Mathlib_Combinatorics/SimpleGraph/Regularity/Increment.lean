@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Regularity.Chunk
 import Mathlib.Combinatorics.SimpleGraph.Regularity.Energy
 
+noncomputable section
+
 /-!
 # Increment partition for Szemerédi Regularity Lemma
 

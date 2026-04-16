@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/RCLike/Inner.lean
-Genuine: 29 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 31 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2
+
+noncomputable section
 
 /-!
 # L2 inner product of finite sequences
@@ -38,6 +40,8 @@ variable [∀ i, SeminormedAddCommGroup (E i)] [∀ i, InnerProductSpace 𝕜 (E
 def wInner (w : ι → ℝ) (f g : ∀ i, E i) : 𝕜 := ∑ i, w i • inner (f i) (g i)
 
 noncomputable abbrev cWeight : ι → ℝ := Function.const _ (Fintype.card ι)⁻¹
+
+@[inherit_doc] notation "⟪" f ", " g "⟫_[" 𝕝 ", " w "]" => wInner (𝕜 := 𝕝) w f g
 
 notation "⟪" f ", " g "⟫_[" 𝕝 "]" => ⟪f, g⟫_[𝕝, 1]
 
@@ -130,9 +134,19 @@ lemma wInner_one_eq_inner (f g : ι → 𝕜) :
 lemma inner_eq_wInner_one (f g : PiLp 2 fun _i : ι ↦ 𝕜) :
     inner f g = ⟪WithLp.equiv 2 _ f, WithLp.equiv 2 _ g⟫_[𝕜, 1] := by simp [wInner]
 
--- DISSOLVED: linearIndependent_of_ne_zero_of_wInner_one_eq_zero
+lemma linearIndependent_of_ne_zero_of_wInner_one_eq_zero {f : κ → ι → 𝕜} (hf : ∀ k, f k ≠ 0)
+    (hinner : Pairwise fun k₁ k₂ ↦ ⟪f k₁, f k₂⟫_[𝕜] = 0) : LinearIndependent 𝕜 f := by
+  simp_rw [wInner_one_eq_inner] at hinner
+  have := linearIndependent_of_ne_zero_of_inner_eq_zero ?_ hinner
+  exacts [this, hf]
 
--- DISSOLVED: linearIndependent_of_ne_zero_of_wInner_cWeight_eq_zero
+lemma linearIndependent_of_ne_zero_of_wInner_cWeight_eq_zero {f : κ → ι → 𝕜} (hf : ∀ k, f k ≠ 0)
+    (hinner : Pairwise fun k₁ k₂ ↦ ⟪f k₁, f k₂⟫ₙ_[𝕜] = 0) : LinearIndependent 𝕜 f := by
+  cases isEmpty_or_nonempty ι
+  · have : IsEmpty κ := ⟨fun k ↦ hf k <| Subsingleton.elim ..⟩
+    exact linearIndependent_empty_type
+  · exact linearIndependent_of_ne_zero_of_wInner_one_eq_zero hf <| by
+      simpa [wInner_cWeight_eq_smul_wInner_one, ← NNRat.cast_smul_eq_nnqsmul 𝕜] using hinner
 
 lemma wInner_nonneg (hw : 0 ≤ w) (hf : 0 ≤ f) (hg : 0 ≤ g) : 0 ≤ ⟪f, g⟫_[𝕜, w] :=
   sum_nonneg fun _ _ ↦ smul_nonneg (hw _) <| mul_nonneg (star_nonneg_iff.2 (hf _)) (hg _)

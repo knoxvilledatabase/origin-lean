@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Subset
 import Mathlib.Topology.Clopen
 import Mathlib.Topology.Connected.Basic
 
+noncomputable section
+
 /-!
 # Connected subsets and their relation to clopen sets
 

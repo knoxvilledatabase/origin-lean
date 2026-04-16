@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/SesquilinearForm.lean
-Genuine: 70 | Conflates: 5 | Dissolved: 3 | Infrastructure: 7
+Genuine: 72 | Conflates: 6 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.Basis.Basic
+
+noncomputable section
 
 /-!
 # Sesquilinear maps
@@ -85,9 +87,28 @@ variable [Field K] [AddCommGroup V] [Module K V] [Field K₁] [AddCommGroup V₁
   [Field K₂] [AddCommGroup V₂] [Module K₂ V₂]
   {I₁ : K₁ →+* K} {I₂ : K₂ →+* K} {I₁' : K₁ →+* K} {J₁ : K →+* K} {J₂ : K →+* K}
 
--- DISSOLVED: ortho_smul_left
+theorem ortho_smul_left {B : V₁ →ₛₗ[I₁] V₂ →ₛₗ[I₂] V} {x y} {a : K₁} (ha : a ≠ 0) :
+    IsOrtho B x y ↔ IsOrtho B (a • x) y := by
+  dsimp only [IsOrtho]
+  constructor <;> intro H
+  · rw [map_smulₛₗ₂, H, smul_zero]
+  · rw [map_smulₛₗ₂, smul_eq_zero] at H
+    cases' H with H H
+    · rw [map_eq_zero I₁] at H
+      trivial
+    · exact H
 
--- DISSOLVED: ortho_smul_right
+theorem ortho_smul_right {B : V₁ →ₛₗ[I₁] V₂ →ₛₗ[I₂] V} {x y} {a : K₂} {ha : a ≠ 0} :
+    IsOrtho B x y ↔ IsOrtho B x (a • y) := by
+  dsimp only [IsOrtho]
+  constructor <;> intro H
+  · rw [map_smulₛₗ, H, smul_zero]
+  · rw [map_smulₛₗ, smul_eq_zero] at H
+    cases' H with H H
+    · simp only [map_eq_zero] at H
+      exfalso
+      exact ha H
+    · exact H
 
 theorem linearIndependent_of_isOrthoᵢ {B : V₁ →ₛₗ[I₁] V₁ →ₛₗ[I₁'] V} {v : n → V₁}
     (hv₁ : B.IsOrthoᵢ v) (hv₂ : ∀ i, ¬B.IsOrtho (v i) (v i)) : LinearIndependent K₁ v := by
@@ -504,11 +525,6 @@ def skewAdjointSubmodule :=
 
 variable {B F}
 
-@[simp]
-theorem mem_isPairSelfAdjointSubmodule (f : Module.End R M) :
-    f ∈ isPairSelfAdjointSubmodule B F ↔ IsPairSelfAdjoint B F f :=
-  Iff.rfl
-
 theorem isPairSelfAdjoint_equiv (e : M₁ ≃ₗ[R] M) (f : Module.End R M) :
     IsPairSelfAdjoint B F f ↔
       IsPairSelfAdjoint (B.compl₁₂ ↑e ↑e) (F.compl₁₂ ↑e ↑e) (e.symm.conj f) := by
@@ -530,11 +546,6 @@ theorem isPairSelfAdjoint_equiv (e : M₁ ≃ₗ[R] M) (f : Module.End R M) :
 theorem isSkewAdjoint_iff_neg_self_adjoint (f : Module.End R M) :
     B.IsSkewAdjoint f ↔ IsAdjointPair (-B) B f f :=
   show (∀ x y, B (f x) y = B x ((-f) y)) ↔ ∀ x y, B (f x) y = (-B) x (f y) by simp
-
-@[simp]
-theorem mem_selfAdjointSubmodule (f : Module.End R M) :
-    f ∈ B.selfAdjointSubmodule ↔ B.IsSelfAdjoint f :=
-  Iff.rfl
 
 @[simp]
 theorem mem_skewAdjointSubmodule (f : Module.End R M) :
@@ -568,7 +579,9 @@ theorem not_separatingLeft_zero [Nontrivial M₁] : ¬(0 : M₁ →ₛₗ[I₁] 
 
 variable {M₁ M₂ I₁ I₂}
 
--- DISSOLVED: SeparatingLeft.ne_zero
+-- CONFLATES (assumes ground = zero): SeparatingLeft.ne_zero
+theorem SeparatingLeft.ne_zero [Nontrivial M₁] {B : M₁ →ₛₗ[I₁] M₂ →ₛₗ[I₂] M}
+    (h : B.SeparatingLeft) : B ≠ 0 := fun h0 ↦ not_separatingLeft_zero M₁ M₂ I₁ I₂ <| h0 ▸ h
 
 section Linear
 

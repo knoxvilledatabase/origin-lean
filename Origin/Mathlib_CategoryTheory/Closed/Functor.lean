@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Closed.Cartesian
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful
 
+noncomputable section
+
 /-!
 # Cartesian closed functors
 

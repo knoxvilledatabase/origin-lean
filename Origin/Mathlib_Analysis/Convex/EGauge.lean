@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Convex/EGauge.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Seminorm
+
+noncomputable section
 
 /-!
 # The Minkowski functional, normed field version
@@ -58,7 +60,10 @@ section SMulZero
 
 variable (𝕜 : Type*) [NNNorm 𝕜] [Nonempty 𝕜] {E : Type*} [Zero E] [SMulZeroClass 𝕜 E] {x : E}
 
--- DISSOLVED: egauge_zero_left_eq_top
+@[simp] lemma egauge_zero_left_eq_top : egauge 𝕜 0 x = ∞ ↔ x ≠ 0 := by
+  simp [egauge_eq_top]
+
+@[simp] alias ⟨_, egauge_zero_left⟩ := egauge_zero_left_eq_top
 
 end SMulZero
 
@@ -67,7 +72,6 @@ section Module
 variable {𝕜 : Type*} [NormedDivisionRing 𝕜] {E : Type*} [AddCommGroup E] [Module 𝕜 E]
     {c : 𝕜} {s : Set E} {x : E}
 
-@[simp] alias ⟨_, egauge_zero_left⟩ := egauge_zero_left_eq_top
 lemma egauge_le_of_smul_mem_of_ne (h : c • x ∈ s) (hc : c ≠ 0) :
     egauge 𝕜 s x ≤ ↑(‖c‖₊⁻¹ : ℝ≥0) := by
   rw [← nnnorm_inv]
@@ -94,8 +98,6 @@ lemma egauge_zero_right (hs : s.Nonempty) : egauge 𝕜 s 0 = 0 := by
   have : 0 ∈ (0 : 𝕜) • s := by simp [zero_smul_set hs]
   simpa using egauge_le_of_mem_smul this
 
-lemma egauge_zero_zero : egauge 𝕜 (0 : Set E) 0 = 0 := by simp
-
 lemma egauge_le_one (h : x ∈ s) : egauge 𝕜 s x ≤ 1 := by
   rw [← one_smul 𝕜 s] at h
   simpa using egauge_le_of_mem_smul h
@@ -110,7 +112,15 @@ lemma le_egauge_smul_left (c : 𝕜) (s : Set E) (x : E) :
   rw [← ENNReal.coe_mul, ← nnnorm_mul]
   exact egauge_le_of_mem_smul <| smul_mem_smul_set hx
 
--- DISSOLVED: egauge_smul_left
+lemma egauge_smul_left (hc : c ≠ 0) (s : Set E) (x : E) :
+    egauge 𝕜 (c • s) x = egauge 𝕜 s x / ‖c‖₊ := by
+  refine le_antisymm ?_ (le_egauge_smul_left _ _ _)
+  rw [ENNReal.le_div_iff_mul_le (by simp [*]) (by simp)]
+  calc
+    egauge 𝕜 (c • s) x * ‖c‖₊ = egauge 𝕜 (c • s) x / ‖c⁻¹‖₊ := by
+      rw [nnnorm_inv, ENNReal.coe_inv (by simpa), div_eq_mul_inv, inv_inv]
+    _ ≤ egauge 𝕜 (c⁻¹ • c • s) x := le_egauge_smul_left _ _ _
+    _ = egauge 𝕜 s x := by rw [inv_smul_smul₀ hc]
 
 lemma le_egauge_smul_right (c : 𝕜) (s : Set E) (x : E) :
     ‖c‖₊ * egauge 𝕜 s x ≤ egauge 𝕜 s (c • x) := by
@@ -160,7 +170,25 @@ variable {𝕜}
 
 variable {c : 𝕜} {x : E} {r : ℝ≥0}
 
--- DISSOLVED: egauge_ball_le_of_one_lt_norm
+lemma egauge_ball_le_of_one_lt_norm (hc : 1 < ‖c‖) (h₀ : r ≠ 0 ∨ ‖x‖ ≠ 0) :
+    egauge 𝕜 (ball 0 r) x ≤ ‖c‖₊ * ‖x‖₊ / r := by
+  letI : NontriviallyNormedField 𝕜 := ⟨c, hc⟩
+  rcases (zero_le r).eq_or_lt with rfl | hr
+  · rw [ENNReal.coe_zero, ENNReal.div_zero (mul_ne_zero _ _)]
+    · apply le_top
+    · simpa using one_pos.trans hc
+    · simpa [← NNReal.coe_eq_zero] using h₀
+  · rcases eq_or_ne ‖x‖ 0 with hx | hx
+    · have hx' : ‖x‖₊ = 0 := by rwa [← coe_nnnorm, NNReal.coe_eq_zero] at hx
+      simp [egauge_eq_zero_iff, hx']
+      refine (frequently_iff_neBot.2 (inferInstance : NeBot (𝓝[≠] (0 : 𝕜)))).mono fun c hc ↦ ?_
+      simp [mem_smul_set_iff_inv_smul_mem₀ hc, norm_smul, hx, hr]
+    · rcases rescale_to_shell_semi_normed hc hr hx with ⟨a, ha₀, har, -, hainv⟩
+      calc
+        egauge 𝕜 (ball 0 r) x ≤ ↑(‖a‖₊⁻¹) :=
+          egauge_le_of_smul_mem_of_ne (mem_ball_zero_iff.2 har) ha₀
+        _ ≤ ↑(‖c‖₊ * ‖x‖₊ / r) := by rwa [ENNReal.coe_le_coe, div_eq_inv_mul, ← mul_assoc]
+        _ ≤ ‖c‖₊ * ‖x‖₊ / r := ENNReal.coe_div_le.trans <| by rw [ENNReal.coe_mul]
 
 lemma egauge_ball_one_le_of_one_lt_norm (hc : 1 < ‖c‖) (x : E) :
     egauge 𝕜 (ball 0 1) x ≤ ‖c‖₊ * ‖x‖₊ := by

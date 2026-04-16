@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Data.Multiset.Fintype
 import Mathlib.FieldTheory.ChevalleyWarning
 
+noncomputable section
+
 /-!
 # The Erdős–Ginzburg–Ziv theorem
 
@@ -29,6 +31,7 @@ section prime
 variable {p : ℕ} [Fact p.Prime] {s : Finset ι}
 
 set_option linter.unusedVariables false in
+/-- The first multivariate polynomial used in the proof of Erdős–Ginzburg–Ziv. -/
 
 private noncomputable def f₁ (s : Finset ι) (a : ι → ZMod p) : MvPolynomial s (ZMod p) :=
   ∑ i, X i ^ (p - 1)

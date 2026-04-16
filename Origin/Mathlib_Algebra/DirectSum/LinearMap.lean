@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.LinearAlgebra.Trace
 
+noncomputable section
+
 /-!
 # Linear maps between direct sums
 

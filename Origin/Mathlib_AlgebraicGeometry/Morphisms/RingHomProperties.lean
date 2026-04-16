@@ -1,11 +1,13 @@
 /-
 Extracted from AlgebraicGeometry/Morphisms/RingHomProperties.lean
-Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Constructors
 import Mathlib.RingTheory.LocalProperties.Basic
 import Mathlib.RingTheory.RingHom.Locally
+
+noncomputable section
 
 /-!
 
@@ -257,7 +259,6 @@ theorem appTop (H : P f) [IsAffine X] [IsAffine Y] : Q f.appTop := by
   exact appLE P f H ⟨_, isAffineOpen_top _⟩ ⟨_, isAffineOpen_top _⟩ _
 
 include Q in
-
 theorem comp_of_isOpenImmersion [IsOpenImmersion f] (H : P g) :
     P (f ≫ g) := by
   rw [eq_affineLocally P, affineLocally_iff_affineOpens_le] at H ⊢
@@ -474,7 +475,6 @@ lemma isMultiplicative (hPc : RingHom.StableUnderComposition Q)
   id_mem := (containsIdentities hPi).id_mem
 
 include Q in
-
 lemma of_isOpenImmersion (hP : RingHom.ContainsIdentities Q) [IsOpenImmersion f] : P f :=
   haveI : P.ContainsIdentities := containsIdentities hP
   IsLocalAtSource.of_isOpenImmersion f
@@ -497,7 +497,6 @@ lemma isStableUnderBaseChange (hP : RingHom.IsStableUnderBaseChange Q) :
   exact hP.pullback_fst_appTop _ (isLocal_ringHomProperty P).respectsIso _ _ H
 
 include Q in
-
 private lemma respects_isOpenImmersion_aux
     (hQ : RingHom.StableUnderCompositionWithLocalizationAwaySource Q)
     {X Y : Scheme.{u}} [IsAffine Y] {U : Y.Opens}
@@ -549,6 +548,9 @@ lemma respects_isOpenImmersion (hQ : RingHom.StableUnderCompositionWithLocalizat
 open RingHom
 
 omit [HasRingHomProperty P Q] in
+/-- If `P` is induced by `Locally Q`, it suffices to check `Q` on affine open sets locally around
+
+points of the source. -/
 
 lemma iff_exists_appLE_locally
     (hQ : RingHom.StableUnderCompositionWithLocalizationAwaySource Q)
@@ -597,7 +599,6 @@ lemma iff_exists_appLE
   apply (isLocal_ringHomProperty P (Q := Q)).respectsIso
 
 omit [HasRingHomProperty P Q] in
-
 lemma locally_of_iff (hQl : LocalizationAwayPreserves Q)
     (hQa : StableUnderCompositionWithLocalizationAway Q)
     (h : ∀ {X Y : Scheme.{u}} (f : X ⟶ Y), P f ↔

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.CStarAlgebra.GelfandDuality
 import Mathlib.Topology.Algebra.StarSubalgebra
 
+noncomputable section
+
 /-! # Continuous functional calculus
 
 In this file we construct the `continuousFunctionalCalculus` for a normal element `a` of a

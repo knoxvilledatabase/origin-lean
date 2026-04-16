@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Dynamics.BirkhoffSum.NormedSpace
 
+noncomputable section
+
 /-!
 # Von Neumann Mean Ergodic Theorem in a Hilbert Space
 

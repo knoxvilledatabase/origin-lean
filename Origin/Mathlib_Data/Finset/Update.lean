@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Data.Finset.Basic
 
+noncomputable section
+
 /-!
 # Update a function on a set of values
 
@@ -23,13 +25,6 @@ def updateFinset (x : ∀ i, π i) (s : Finset ι) (y : ∀ i : ↥s, π i) (i :
   if hi : i ∈ s then y ⟨i, hi⟩ else x i
 
 open Finset Equiv
-
-theorem updateFinset_def {s : Finset ι} {y} :
-    updateFinset x s y = fun i ↦ if hi : i ∈ s then y ⟨i, hi⟩ else x i :=
-  rfl
-
-@[simp] theorem updateFinset_empty {y} : updateFinset x ∅ y = x :=
-  rfl
 
 theorem updateFinset_singleton {i y} :
     updateFinset x {i} y = Function.update x i (y ⟨i, mem_singleton_self i⟩) := by

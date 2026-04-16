@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Degree.Definitions
 import Mathlib.Algebra.Polynomial.Monomial
 import Mathlib.Data.Nat.SuccPred
 
+noncomputable section
+
 /-!
 # Degree of univariate monomials
 -/

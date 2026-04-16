@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/Enumerative/Partition.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 2 | Infrastructure: 5
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Combinatorics.Enumerative.Composition
 import Mathlib.Tactic.ApplyFun
+
+noncomputable section
 
 /-!
 # Partitions
@@ -112,7 +114,8 @@ def indiscrete (n : ℕ) : Partition n := ofSums n {n} rfl
 
 instance {n : ℕ} : Inhabited (Partition n) := ⟨indiscrete n⟩
 
--- DISSOLVED: indiscrete_parts
+@[simp] lemma indiscrete_parts {n : ℕ} (hn : n ≠ 0) : (indiscrete n).parts = {n} := by
+  simp [indiscrete, filter_eq_self, hn]
 
 @[simp] lemma partition_zero_parts (p : Partition 0) : p.parts = 0 :=
   eq_zero_of_forall_not_mem fun _ h => (p.parts_pos h).ne' <| sum_eq_zero_iff.1 p.parts_sum _ h
@@ -132,7 +135,9 @@ instance UniquePartitionOne : Unique (Partition 1) where
 @[simp] lemma ofSym_one (s : Sym σ 1) : ofSym s = indiscrete 1 := by
   ext; simp
 
--- DISSOLVED: count_ofSums_of_ne_zero
+theorem count_ofSums_of_ne_zero {n : ℕ} {l : Multiset ℕ} (hl : l.sum = n) {i : ℕ} (hi : i ≠ 0) :
+    (ofSums n l hl).parts.count i = l.count i :=
+  count_filter_of_pos hi
 
 theorem count_ofSums_zero {n : ℕ} {l : Multiset ℕ} (hl : l.sum = n) :
     (ofSums n l hl).parts.count 0 = 0 :=

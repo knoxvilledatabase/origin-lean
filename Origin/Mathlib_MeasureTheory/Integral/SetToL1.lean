@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Integral/SetToL1.lean
-Genuine: 162 | Conflates: 1 | Dissolved: 3 | Infrastructure: 4
+Genuine: 165 | Conflates: 1 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.SimpleFuncDenseLp
+
+noncomputable section
 
 /-!
 # Extension of a linear function from indicators to L1
@@ -117,9 +119,16 @@ theorem of_smul_measure (c : ℝ≥0∞) (hc_ne_top : c ≠ ∞) (hT : FinMeasAd
   simp only [hc_ne_top, or_false, Ne, false_and] at hμs
   exact hμs.2
 
--- DISSOLVED: smul_measure
+theorem smul_measure (c : ℝ≥0∞) (hc_ne_zero : c ≠ 0) (hT : FinMeasAdditive μ T) :
+    FinMeasAdditive (c • μ) T := by
+  refine of_eq_top_imp_eq_top (fun s _ hμs => ?_) hT
+  rw [Measure.smul_apply, smul_eq_mul, ENNReal.mul_eq_top]
+  simp only [hc_ne_zero, true_and, Ne, not_false_iff]
+  exact Or.inl hμs
 
--- DISSOLVED: smul_measure_iff
+theorem smul_measure_iff (c : ℝ≥0∞) (hc_ne_zero : c ≠ 0) (hc_ne_top : c ≠ ∞) :
+    FinMeasAdditive (c • μ) T ↔ FinMeasAdditive μ T :=
+  ⟨fun hT => of_smul_measure c hc_ne_top hT, fun hT => smul_measure c hc_ne_zero hT⟩
 
 theorem map_empty_eq_zero {β} [AddCancelMonoid β] {T : Set α → β} (hT : FinMeasAdditive μ T) :
     T ∅ = 0 := by
@@ -263,7 +272,13 @@ theorem setToSimpleFunc_zero_apply {m : MeasurableSpace α} (T : Set α → F �
     setToSimpleFunc T (0 : α →ₛ F) = 0 := by
   cases isEmpty_or_nonempty α <;> simp [setToSimpleFunc]
 
--- DISSOLVED: setToSimpleFunc_eq_sum_filter
+theorem setToSimpleFunc_eq_sum_filter [DecidablePred fun x ↦ x ≠ (0 : F)]
+    {m : MeasurableSpace α} (T : Set α → F →L[ℝ] F') (f : α →ₛ F) :
+    setToSimpleFunc T f = ∑ x ∈ f.range with x ≠ 0, T (f ⁻¹' {x}) x := by
+  symm
+  refine sum_filter_of_ne fun x _ => mt fun hx0 => ?_
+  rw [hx0]
+  exact ContinuousLinearMap.map_zero _
 
 theorem map_setToSimpleFunc (T : Set α → F →L[ℝ] F') (h_add : FinMeasAdditive μ T) {f : α →ₛ G}
     (hf : Integrable f μ) {g : G → F} (hg : g 0 = 0) :
@@ -905,11 +920,6 @@ theorem setToL1_eq_setToL1SCLM (hT : DominatedFinMeasAdditive μ T C) (f : α �
     setToL1 hT f = setToL1SCLM α E μ hT f :=
   uniformly_extend_of_ind simpleFunc.isUniformInducing (simpleFunc.denseRange one_ne_top)
     (setToL1SCLM α E μ hT).uniformContinuous _
-
-theorem setToL1_eq_setToL1' (hT : DominatedFinMeasAdditive μ T C)
-    (h_smul : ∀ c : 𝕜, ∀ s x, T s (c • x) = c • T s x) (f : α →₁[μ] E) :
-    setToL1 hT f = setToL1' 𝕜 hT h_smul f :=
-  rfl
 
 @[simp]
 theorem setToL1_zero_left (hT : DominatedFinMeasAdditive μ (0 : Set α → E →L[ℝ] F) C)

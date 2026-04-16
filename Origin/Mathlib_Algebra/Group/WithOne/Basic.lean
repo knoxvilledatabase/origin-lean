@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Algebra.Group.WithOne.Defs
 
+noncomputable section
+
 /-!
 # More operations on `WithOne` and `WithZero`
 
@@ -56,14 +58,6 @@ def lift : (α →ₙ* β) ≃ (WithOne α →* β) where
 
 variable (f : α →ₙ* β)
 
-@[to_additive (attr := simp)]
-theorem lift_coe (x : α) : lift f x = f x :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem lift_one : lift f 1 = 1 :=
-  rfl
-
 @[to_additive]
 theorem lift_unique (f : WithOne α →* β) : f = lift (f.toMulHom.comp coeMulHom) :=
   (lift.apply_symm_apply f).symm
@@ -78,10 +72,6 @@ variable [Mul α] [Mul β] [Mul γ]
 `WithZero α` to `WithZero β`"]
 def map (f : α →ₙ* β) : WithOne α →* WithOne β :=
   lift (coeMulHom.comp f)
-
-@[to_additive (attr := simp)]
-theorem map_coe (f : α →ₙ* β) (a : α) : map f (a : WithOne α) = f a :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem map_id : map (MulHom.id α) = MonoidHom.id (WithOne α) := by
@@ -106,11 +96,6 @@ def _root_.MulEquiv.withOneCongr (e : α ≃* β) : WithOne α ≃* WithOne β :
 @[to_additive (attr := simp)]
 theorem _root_.MulEquiv.withOneCongr_refl : (MulEquiv.refl α).withOneCongr = MulEquiv.refl _ :=
   MulEquiv.toMonoidHom_injective map_id
-
-@[to_additive (attr := simp)]
-theorem _root_.MulEquiv.withOneCongr_symm (e : α ≃* β) :
-    e.withOneCongr.symm = e.symm.withOneCongr :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem _root_.MulEquiv.withOneCongr_trans (e₁ : α ≃* β) (e₂ : β ≃* γ) :

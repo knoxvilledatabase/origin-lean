@@ -8,6 +8,8 @@ import Mathlib.Analysis.Convex.Mul
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 
+noncomputable section
+
 /-!
 # Mean value inequalities
 

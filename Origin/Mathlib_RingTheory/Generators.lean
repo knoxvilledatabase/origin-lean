@@ -9,6 +9,8 @@ import Mathlib.RingTheory.MvPolynomial.Tower
 import Mathlib.RingTheory.TensorProduct.Basic
 import Mathlib.RingTheory.Extension
 
+noncomputable section
+
 /-!
 
 # Generators of algebras
@@ -57,7 +59,6 @@ variable {R S}
 variable (P : Generators.{w} R S)
 
 protected
-
 abbrev Ring : Type (max w u) := MvPolynomial P.vars R
 
 def σ : S → P.Ring := P.σ'
@@ -92,9 +93,8 @@ lemma algebraMap_surjective : Function.Surjective (algebraMap P.Ring S) := (⟨_
 
 section Construction
 
-noncomputable
-
 @[simps val, simps (config := .lemmasOnly) vars]
+noncomputable
 def ofSurjective {vars} (val : vars → S) (h : Function.Surjective (aeval (R := R) val)) :
     Generators R S where
   vars := vars
@@ -113,13 +113,11 @@ noncomputable def id : Generators.{w} R R := ofSurjectiveAlgebraMap <| by
   exact RingHomSurjective.is_surjective
 
 noncomputable
-
 def ofAlgHom {I} (f : MvPolynomial I R →ₐ[R] S) (h : Function.Surjective f) :
     Generators R S :=
   ofSurjective (f ∘ X) (by rwa [show aeval (f ∘ X) = f by ext; simp])
 
 noncomputable
-
 def ofSet {s : Set S} (hs : Algebra.adjoin R s = ⊤) : Generators R S := by
   refine ofSurjective (Subtype.val : s → S) ?_
   rwa [← AlgHom.range_eq_top, ← Algebra.adjoin_range_eq_range_aeval,
@@ -127,18 +125,16 @@ def ofSet {s : Set S} (hs : Algebra.adjoin R s = ⊤) : Generators R S := by
 
 variable (R S) in
 
-noncomputable
-
 @[simps]
+noncomputable
 def self : Generators R S where
   vars := S
   val := _root_.id
   σ' := X
   aeval_val_σ' := aeval_X _
 
-noncomputable
-
 @[simps]
+noncomputable
 def toExtension : Extension R S where
   Ring := P.Ring
   σ := P.σ
@@ -148,9 +144,8 @@ section Localization
 
 variable (r : R) [IsLocalization.Away r S]
 
-noncomputable
-
 @[simps val, simps (config := .lemmasOnly) vars σ]
+noncomputable
 def localizationAway : Generators R S where
   vars := Unit
   val _ := IsLocalization.Away.invSelf r
@@ -170,9 +165,8 @@ end Localization
 
 variable {T} [CommRing T] [Algebra R T] [Algebra S T] [IsScalarTower R S T]
 
-noncomputable
-
 @[simps val, simps (config := .lemmasOnly) vars σ]
+noncomputable
 def comp (Q : Generators S T) (P : Generators R S) : Generators R T where
   vars := Q.vars ⊕ P.vars
   val := Sum.elim Q.val (algebraMap S T ∘ P.val)
@@ -187,18 +181,16 @@ def comp (Q : Generators S T) (P : Generators R S) : Generators R T where
 
 variable (S) in
 
-noncomputable
-
 @[simps val, simps (config := .lemmasOnly) vars]
+noncomputable
 def extendScalars (P : Generators R T) : Generators S T where
   vars := P.vars
   val := P.val
   σ' x := map (algebraMap R S) (P.σ x)
   aeval_val_σ' s := by simp [@aeval_def S, ← IsScalarTower.algebraMap_eq, ← @aeval_def R]
 
-noncomputable
-
 @[simps! val, simps! (config := .lemmasOnly) vars]
+noncomputable
 def baseChange {T} [CommRing T] [Algebra R T] (P : Generators R S) : Generators T (T ⊗[R] S) := by
   apply Generators.ofSurjective (fun x ↦ 1 ⊗ₜ[R] P.val x)
   intro x
@@ -249,7 +241,6 @@ attribute [simp] Hom.aeval_val
 variable {P P'}
 
 noncomputable
-
 def Hom.toAlgHom (f : Hom P P') : P.Ring →ₐ[R] P'.Ring := MvPolynomial.aeval f.val
 
 variable [Algebra R S'] [IsScalarTower R R' S'] [IsScalarTower R S S'] in
@@ -277,9 +268,8 @@ lemma Hom.toAlgHom_monomial (f : Generators.Hom P P') (v r) :
 
 variable [Algebra R S'] [IsScalarTower R R' S'] [IsScalarTower R S S'] in
 
-noncomputable
-
 @[simps]
+noncomputable
 def Hom.equivAlgHom :
     Hom P P' ≃ { f : P.Ring →ₐ[R] P'.Ring //
       ∀ x, aeval P'.val (f x) = algebraMap S S' (aeval P.val x) } where
@@ -342,32 +332,16 @@ lemma Hom.toAlgHom_comp_apply
 
 variable {T} [CommRing T] [Algebra R T] [Algebra S T] [IsScalarTower R S T]
 
-noncomputable
-
 @[simps]
-def toComp (Q : Generators S T) (P : Generators R S) : Hom P (Q.comp P) where
-  val i := X (.inr i)
-  aeval_val i := by simp
-
 noncomputable
-
-@[simps]
 def ofComp (Q : Generators S T) (P : Generators R S) : Hom (Q.comp P) Q where
   val i := i.elim X (C ∘ P.val)
   aeval_val i := by cases i <;> simp
 
-noncomputable
-
-@[simps]
-def toExtendScalars (P : Generators R T) : Hom P (P.extendScalars S) where
-  val := X
-  aeval_val i := by simp
-
 variable {P P'} in
 
-noncomputable
-
 @[simps]
+noncomputable
 def Hom.toExtensionHom [Algebra R S'] [IsScalarTower R R' S'] [IsScalarTower R S S']
     (f : P.Hom P') : P.toExtension.Hom P'.toExtension where
   toRingHom := f.toAlgHom.toRingHom
@@ -388,8 +362,5 @@ lemma Hom.toExtensionHom_comp [Algebra R S'] [IsScalarTower R S S']
 end Hom
 
 noncomputable abbrev ker : Ideal P.Ring := P.toExtension.ker
-
-lemma ker_eq_ker_aeval_val : P.ker = RingHom.ker (aeval P.val) :=
-  rfl
 
 end Algebra.Generators

@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Category.Locale
 
+noncomputable section
+
 /-!
 # Adjunction between Locales and Topological Spaces
 
@@ -66,8 +68,6 @@ instance instTopologicalSpace : TopologicalSpace (PT L) where
     choose f hf using hS
     use ⨆ t, ⨆ ht, f t ht
     simp_rw [map_iSup, iSup_Prop_eq, setOf_exists, hf, sUnion_eq_biUnion]
-
-lemma isOpen_iff (U : Set (PT L)) : IsOpen U ↔ ∃ u : L, {x | x u} = U := Iff.rfl
 
 end PT
 

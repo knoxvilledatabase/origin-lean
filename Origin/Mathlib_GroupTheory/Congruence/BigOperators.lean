@@ -8,6 +8,8 @@ import Mathlib.Algebra.BigOperators.Group.Multiset
 import Mathlib.Algebra.BigOperators.Group.List
 import Mathlib.GroupTheory.Congruence.Defs
 
+noncomputable section
+
 /-!
 # Interactions between `∑, ∏` and `(Add)Con`
 

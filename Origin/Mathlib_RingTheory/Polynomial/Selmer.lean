@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.Polynomial.UnitTrinomial
 import Mathlib.RingTheory.Polynomial.GaussLemma
 import Mathlib.Tactic.LinearCombination
 
+noncomputable section
+
 /-!
 # Irreducibility of Selmer Polynomials
 

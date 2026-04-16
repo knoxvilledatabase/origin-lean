@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Control.Bifunctor
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Functor and bifunctors can be applied to `Equiv`s.
 
@@ -42,11 +44,6 @@ theorem mapEquiv_apply (h : α ≃ β) (x : f α) : (mapEquiv f h : f α ≃ f �
   rfl
 
 @[simp]
-theorem mapEquiv_symm_apply (h : α ≃ β) (y : f β) :
-    (mapEquiv f h : f α ≃ f β).symm y = map h.symm y :=
-  rfl
-
-@[simp]
 theorem mapEquiv_refl : mapEquiv f (Equiv.refl α) = Equiv.refl (f α) := by
   ext x
   simp only [mapEquiv_apply, refl_apply]
@@ -67,11 +64,6 @@ def mapEquiv (h : α ≃ β) (h' : α' ≃ β') : F α α' ≃ F β β' where
 @[simp]
 theorem mapEquiv_apply (h : α ≃ β) (h' : α' ≃ β') (x : F α α') :
     (mapEquiv F h h' : F α α' ≃ F β β') x = bimap h h' x :=
-  rfl
-
-@[simp]
-theorem mapEquiv_symm_apply (h : α ≃ β) (h' : α' ≃ β') (y : F β β') :
-    (mapEquiv F h h' : F α α' ≃ F β β').symm y = bimap h.symm h'.symm y :=
   rfl
 
 @[simp]

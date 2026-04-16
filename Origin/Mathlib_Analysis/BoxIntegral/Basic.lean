@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/BoxIntegral/Basic.lean
-Genuine: 61 | Conflates: 0 | Dissolved: 1 | Infrastructure: 7
+Genuine: 62 | Conflates: 0 | Dissolved: 0 | Infrastructure: 7
 -/
 import Origin.Core
 import Mathlib.Analysis.BoxIntegral.Partition.Filter
@@ -8,6 +8,8 @@ import Mathlib.Analysis.BoxIntegral.Partition.Measure
 import Mathlib.Analysis.Oscillation
 import Mathlib.Topology.UniformSpace.Compact
 import Mathlib.Data.Bool.Basic
+
+noncomputable section
 
 /-!
 # Integrals of Riemann, Henstock-Kurzweil, and McShane
@@ -294,7 +296,9 @@ theorem HasIntegral.smul (hf : HasIntegral I l f vol y) (c : ℝ) :
 theorem Integrable.smul (hf : Integrable I l f vol) (c : ℝ) : Integrable I l (c • f) vol :=
   (hf.hasIntegral.smul c).integrable
 
--- DISSOLVED: Integrable.of_smul
+theorem Integrable.of_smul {c : ℝ} (hf : Integrable I l (c • f) vol) (hc : c ≠ 0) :
+    Integrable I l f vol := by
+  simpa [inv_smul_smul₀ hc] using hf.smul c⁻¹
 
 @[simp]
 theorem integral_smul (c : ℝ) : integral I l (fun x => c • f x) vol = c • integral I l f vol := by

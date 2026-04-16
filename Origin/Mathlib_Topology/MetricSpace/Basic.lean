@@ -8,6 +8,8 @@ import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 import Mathlib.Topology.MetricSpace.Pseudo.Pi
 import Mathlib.Topology.MetricSpace.Defs
 
+noncomputable section
+
 /-!
 # Basic properties of metric spaces, and instances.
 
@@ -164,10 +166,6 @@ instance SeparationQuotient.instDist {α : Type u} [PseudoMetricSpace α] :
     Dist (SeparationQuotient α) where
   dist := lift₂ dist fun x y x' y' hx hy ↦ by rw [dist_edist, dist_edist, ← edist_mk x,
     ← edist_mk x', mk_eq_mk.2 hx, mk_eq_mk.2 hy]
-
-theorem SeparationQuotient.dist_mk {α : Type u} [PseudoMetricSpace α] (p q : α) :
-    dist (mk p) (mk q) = dist p q :=
-  rfl
 
 instance SeparationQuotient.instMetricSpace {α : Type u} [PseudoMetricSpace α] :
     MetricSpace (SeparationQuotient α) :=

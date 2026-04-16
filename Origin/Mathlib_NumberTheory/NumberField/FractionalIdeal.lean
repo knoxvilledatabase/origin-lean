@@ -7,6 +7,8 @@ import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.RingTheory.FractionalIdeal.Norm
 import Mathlib.RingTheory.FractionalIdeal.Operations
 
+noncomputable section
+
 /-!
 
 # Fractional ideals of number fields

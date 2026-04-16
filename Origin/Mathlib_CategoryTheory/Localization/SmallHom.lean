@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/Localization/SmallHom.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.HomEquiv
 import Mathlib.Logic.Small.Defs
+
+noncomputable section
 
 /-!
 # Shrinking morphisms in localized categories
@@ -53,7 +55,6 @@ lemma hasSmallLocalizedHom_iff :
     exact ⟨small_map (homEquiv W W.Q L)⟩
 
 include L in
-
 lemma hasSmallLocalizedHom_of_isLocalization :
     HasSmallLocalizedHom.{v₂} W X Y := by
   rw [hasSmallLocalizedHom_iff W L]

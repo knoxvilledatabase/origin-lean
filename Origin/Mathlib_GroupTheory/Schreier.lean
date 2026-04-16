@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.GroupTheory.Abelianization
 import Mathlib.GroupTheory.Transfer
 
+noncomputable section
+
 /-!
 # Schreier's Lemma
 

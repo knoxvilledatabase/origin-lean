@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Defs.Filter
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # Sequences in topological spaces
 

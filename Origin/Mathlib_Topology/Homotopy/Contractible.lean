@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Homotopy.Path
 import Mathlib.Topology.Homotopy.Equiv
 
+noncomputable section
+
 /-!
 # Contractible spaces
 

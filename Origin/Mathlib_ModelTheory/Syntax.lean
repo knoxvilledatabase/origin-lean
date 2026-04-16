@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Prod
 import Mathlib.Logic.Equiv.Fin
 import Mathlib.ModelTheory.LanguageMap
 
+noncomputable section
+
 /-!
 # Basics on First-Order Syntax
 
@@ -195,16 +197,6 @@ def constantsVarsEquiv : L[[γ]].Term α ≃ L.Term (γ ⊕ α) :=
 
 def constantsVarsEquivLeft : L[[γ]].Term (α ⊕ β) ≃ L.Term ((γ ⊕ α) ⊕ β) :=
   constantsVarsEquiv.trans (relabelEquiv (Equiv.sumAssoc _ _ _)).symm
-
-@[simp]
-theorem constantsVarsEquivLeft_apply (t : L[[γ]].Term (α ⊕ β)) :
-    constantsVarsEquivLeft t = (constantsToVars t).relabel (Equiv.sumAssoc _ _ _).symm :=
-  rfl
-
-@[simp]
-theorem constantsVarsEquivLeft_symm_apply (t : L.Term ((γ ⊕ α) ⊕ β)) :
-    constantsVarsEquivLeft.symm t = varsToConstants (t.relabel (Equiv.sumAssoc _ _ _)) :=
-  rfl
 
 instance inhabitedOfVar [Inhabited α] : Inhabited (L.Term α) :=
   ⟨var default⟩
@@ -481,20 +473,6 @@ def relabelEquiv (g : α ≃ β) {k} : L.BoundedFormula α k ≃ L.BoundedFormul
     fun _n => _root_.Equiv.refl _
 
 @[simp]
-theorem relabel_falsum (g : α → β ⊕ (Fin n)) {k} :
-    (falsum : L.BoundedFormula α k).relabel g = falsum :=
-  rfl
-
-@[simp]
-theorem relabel_bot (g : α → β ⊕ (Fin n)) {k} : (⊥ : L.BoundedFormula α k).relabel g = ⊥ :=
-  rfl
-
-@[simp]
-theorem relabel_imp (g : α → β ⊕ (Fin n)) {k} (φ ψ : L.BoundedFormula α k) :
-    (φ.imp ψ).relabel g = (φ.relabel g).imp (ψ.relabel g) :=
-  rfl
-
-@[simp]
 theorem relabel_not (g : α → β ⊕ (Fin n)) {k} (φ : L.BoundedFormula α k) :
     φ.not.relabel g = (φ.relabel g).not := by simp [BoundedFormula.not]
 
@@ -609,23 +587,8 @@ def onBoundedFormula (φ : L ≃ᴸ L') : L.BoundedFormula α n ≃ L'.BoundedFo
     rw [Function.rightInverse_iff_comp, ← LHom.comp_onBoundedFormula, φ.right_inv,
       LHom.id_onBoundedFormula]
 
-theorem onBoundedFormula_symm (φ : L ≃ᴸ L') :
-    (φ.onBoundedFormula.symm : L'.BoundedFormula α n ≃ L.BoundedFormula α n) =
-      φ.symm.onBoundedFormula :=
-  rfl
-
 def onFormula (φ : L ≃ᴸ L') : L.Formula α ≃ L'.Formula α :=
   φ.onBoundedFormula
-
-@[simp]
-theorem onFormula_apply (φ : L ≃ᴸ L') :
-    (φ.onFormula : L.Formula α → L'.Formula α) = φ.toLHom.onFormula :=
-  rfl
-
-@[simp]
-theorem onFormula_symm (φ : L ≃ᴸ L') :
-    (φ.onFormula.symm : L'.Formula α ≃ L.Formula α) = φ.symm.onFormula :=
-  rfl
 
 @[simps!] -- Porting note: add `!` to `simps`
 def onSentence (φ : L ≃ᴸ L') : L.Sentence ≃ L'.Sentence :=
@@ -674,13 +637,6 @@ protected nonrec abbrev iff (φ ψ : L.Formula α) : L.Formula α :=
 
 def equivSentence : L.Formula α ≃ L[[α]].Sentence :=
   (BoundedFormula.constantsVarsEquiv.trans (BoundedFormula.relabelEquiv (Equiv.sumEmpty _ _))).symm
-
-theorem equivSentence_not (φ : L.Formula α) : equivSentence φ.not = (equivSentence φ).not :=
-  rfl
-
-theorem equivSentence_inf (φ ψ : L.Formula α) :
-    equivSentence (φ ⊓ ψ) = equivSentence φ ⊓ equivSentence ψ :=
-  rfl
 
 end Formula
 

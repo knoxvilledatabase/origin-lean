@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 import Mathlib.FieldTheory.PolynomialGaloisGroup
 
+noncomputable section
+
 /-!
 # Galois group of cyclotomic extensions
 

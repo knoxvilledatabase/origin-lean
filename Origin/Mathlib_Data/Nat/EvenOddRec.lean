@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Data.Nat.BinaryRec
 
+noncomputable section
+
 /-! # A recursion principle based on even and odd numbers. -/
 
 namespace Nat

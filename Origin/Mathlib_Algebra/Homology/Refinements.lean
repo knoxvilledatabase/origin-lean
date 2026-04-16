@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Abelian.Refinements
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 
+noncomputable section
+
 /-!
 # Refinements
 

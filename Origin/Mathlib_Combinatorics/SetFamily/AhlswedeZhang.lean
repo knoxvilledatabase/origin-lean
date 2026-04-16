@@ -11,6 +11,8 @@ import Mathlib.Data.Finset.Sups
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # The Ahlswede-Zhang identity
 

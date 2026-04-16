@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Cardinal/Finite.lean
-Genuine: 79 | Conflates: 2 | Dissolved: 3 | Infrastructure: 2
+Genuine: 83 | Conflates: 2 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.ULift
 import Mathlib.Data.ZMod.Defs
 import Mathlib.SetTheory.Cardinal.PartENat
+
+noncomputable section
 
 /-!
 # Finite Cardinality Functions
@@ -59,14 +61,14 @@ lemma _root_.Set.Infinite.card_eq_zero {s : Set α} (hs : s.Infinite) : Nat.card
 lemma card_eq_zero : Nat.card α = 0 ↔ IsEmpty α ∨ Infinite α := by
   simp [Nat.card, mk_eq_zero_iff, aleph0_le_mk_iff]
 
--- DISSOLVED: card_ne_zero
+lemma card_ne_zero : Nat.card α ≠ 0 ↔ Nonempty α ∧ Finite α := by simp [card_eq_zero, not_or]
 
 lemma card_pos_iff : 0 < Nat.card α ↔ Nonempty α ∧ Finite α := by
   simp [Nat.card, mk_eq_zero_iff, mk_lt_aleph0_iff]
 
 @[simp] lemma card_pos [Nonempty α] [Finite α] : 0 < Nat.card α := card_pos_iff.2 ⟨‹_›, ‹_›⟩
 
--- DISSOLVED: finite_of_card_ne_zero
+theorem finite_of_card_ne_zero (h : Nat.card α ≠ 0) : Finite α := (card_ne_zero.1 h).2
 
 theorem card_congr (f : α ≃ β) : Nat.card α = Nat.card β :=
   Cardinal.toNat_congr f
@@ -162,7 +164,10 @@ lemma card_range_of_injective {f : α → β} (hf : Injective f) :
 
 end Set
 
--- DISSOLVED: equivFinOfCardPos
+def equivFinOfCardPos {α : Type*} (h : Nat.card α ≠ 0) : α ≃ Fin (Nat.card α) := by
+  cases fintypeOrInfinite α
+  · simpa only [card_eq_fintype_card] using Fintype.equivFin α
+  · simp only [card_eq_zero_of_infinite, ne_eq, not_true_eq_false] at h
 
 theorem card_of_subsingleton (a : α) [Subsingleton α] : Nat.card α = 1 := by
   letI := Fintype.ofSubsingleton a
@@ -275,17 +280,11 @@ theorem _root_.Cardinal.natCast_le_toENat_iff {n : ℕ} {c : Cardinal} :
     ↑n ≤ toENat c ↔ ↑n ≤ c := by
   rw [← toENat_nat n, toENat_le_iff_of_le_aleph0 (le_of_lt (nat_lt_aleph0 n))]
 
-theorem _root_.Cardinal.toENat_le_natCast_iff {c : Cardinal} {n : ℕ} :
-    toENat c ≤ n ↔ c ≤ n := by simp
-
 @[simp]
 theorem _root_.Cardinal.natCast_eq_toENat_iff {n : ℕ} {c : Cardinal} :
     ↑n = toENat c ↔ ↑n = c := by
   rw [le_antisymm_iff, le_antisymm_iff, Cardinal.toENat_le_natCast_iff,
     Cardinal.natCast_le_toENat_iff]
-
-theorem _root_.Cardinal.toENat_eq_natCast_iff {c : Cardinal} {n : ℕ} :
-    Cardinal.toENat c = n ↔ c = n := by simp
 
 @[simp]
 theorem _root_.Cardinal.natCast_lt_toENat_iff {n : ℕ} {c : Cardinal} :

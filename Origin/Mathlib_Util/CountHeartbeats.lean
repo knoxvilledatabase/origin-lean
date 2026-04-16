@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Util.Heartbeats
 import Lean.Meta.Tactic.TryThis
 
+noncomputable section
+
 /-!
 Defines a command wrapper that prints the number of heartbeats used in the enclosed command.
 
@@ -51,85 +53,50 @@ def logVariation {m} [Monad m] [MonadLog m] [AddMessageContext m] [MonadOptions 
   logInfo s!"Min: {min / 1000} Max: {max / 1000} StdDev: {stddev / 10}%"
 
 elab "count_heartbeats " tac:tacticSeq : tactic => do
-
   logInfo s!"{← runTacForHeartbeats tac (revert := false)}"
 
 elab "count_heartbeats! " n:(num)? "in" ppLine tac:tacticSeq : tactic => do
-
   let n := match n with
-
            | some j => j.getNat
-
            | none => 10
-
+  -- First run the tactic `n-1` times, reverting the state.
   let counts ← (List.range (n - 1)).mapM fun _ => runTacForHeartbeats tac
-
+  -- Then run once more, keeping the state.
   let counts := (← runTacForHeartbeats tac (revert := false)) :: counts
-
   logVariation counts
 
 elab "count_heartbeats " "in" ppLine cmd:command : command => do
-
   let start ← IO.getNumHeartbeats
-
   try
-
     elabCommand (← `(command| set_option maxHeartbeats 0 in $cmd))
-
   finally
-
     let finish ← IO.getNumHeartbeats
-
     let elapsed := (finish - start) / 1000
-
     let max := (← Command.liftCoreM getMaxHeartbeats) / 1000
-
     if elapsed < max then
-
       logInfo m!"Used {elapsed} heartbeats, which is less than the current maximum of {max}."
-
     else
-
       let mut max' := max
-
       while max' < elapsed do
-
         max' := 2 * max'
-
       logInfo m!"Used {elapsed} heartbeats, which is greater than the current maximum of {max}."
-
       let m : TSyntax `num := quote max'
-
       Command.liftCoreM <| MetaM.run' do
-
         Lean.Meta.Tactic.TryThis.addSuggestion (← getRef)
-
           (← set_option hygiene false in `(command| set_option maxHeartbeats $m in $cmd))
 
 elab "guard_min_heartbeats " n:(num)? "in" ppLine cmd:command : command => do
-
   let max := (← Command.liftCoreM getMaxHeartbeats) / 1000
-
   let n := match n with
-
            | some j => j.getNat
-
            | none => max
-
   let start ← IO.getNumHeartbeats
-
   try
-
     elabCommand (← `(command| set_option maxHeartbeats 0 in $cmd))
-
   finally
-
     let finish ← IO.getNumHeartbeats
-
     let elapsed := (finish - start) / 1000
-
     if elapsed < n then
-
       logInfo m!"Used {elapsed} heartbeats, which is less than the minimum of {n}."
 
 def elabForHeartbeats (cmd : TSyntax `command) (revert : Bool := true) : CommandElabM Nat := do
@@ -140,17 +107,13 @@ def elabForHeartbeats (cmd : TSyntax `command) (revert : Bool := true) : Command
   return (← IO.getNumHeartbeats) - start
 
 elab "count_heartbeats! " n:(num)? "in" ppLine cmd:command : command => do
-
   let n := match n with
-
            | some j => j.getNat
-
            | none => 10
-
+  -- First run the command `n-1` times, reverting the state.
   let counts ← (List.range (n - 1)).mapM fun _ => elabForHeartbeats cmd
-
+  -- Then run once more, keeping the state.
   let counts := (← elabForHeartbeats cmd (revert := false)) :: counts
-
   logVariation counts
 
 end CountHeartbeats

@@ -5,6 +5,8 @@ Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.RingTheory.Bialgebra.Basic
 
+noncomputable section
+
 /-!
 # Hopf algebras
 
@@ -105,8 +107,5 @@ instance toHopfAlgebra : HopfAlgebra R R where
   antipode := .id
   mul_antipode_rTensor_comul := by ext; simp
   mul_antipode_lTensor_comul := by ext; simp
-
-@[simp]
-theorem antipode_eq_id : antipode (R := R) (A := R) = .id := rfl
 
 end CommSemiring

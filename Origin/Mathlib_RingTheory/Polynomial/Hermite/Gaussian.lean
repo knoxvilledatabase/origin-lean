@@ -9,6 +9,8 @@ import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 
+noncomputable section
+
 /-!
 # Hermite polynomials and Gaussians
 

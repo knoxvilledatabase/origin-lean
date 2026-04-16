@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Abelian.Basic
 
+noncomputable section
+
 /-!
 # Idempotent complete categories
 

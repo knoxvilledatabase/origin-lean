@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Lattice.lean
-Genuine: 39 | Conflates: 2 | Dissolved: 2 | Infrastructure: 25
+Genuine: 41 | Conflates: 2 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Lattice
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Algebra.PUnitInstances.Module
 import Mathlib.Data.Set.Subsingleton
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
+
+noncomputable section
 
 /-!
 # The lattice structure on `Submodule`s
@@ -55,16 +57,8 @@ instance inhabited' : Inhabited (Submodule R M) :=
   ⟨⊥⟩
 
 @[simp]
-theorem bot_coe : ((⊥ : Submodule R M) : Set M) = {0} :=
-  rfl
-
-@[simp]
 theorem bot_toAddSubmonoid : (⊥ : Submodule R M).toAddSubmonoid = ⊥ :=
   rfl
-
-@[simp]
-lemma bot_toAddSubgroup {R M} [Ring R] [AddCommGroup M] [Module R M] :
-    (⊥ : Submodule R M).toAddSubgroup = ⊥ := rfl
 
 variable (R) in
 
@@ -92,18 +86,13 @@ protected theorem bot_ext (x y : (⊥ : Submodule R M)) : x = y := by
 protected theorem ne_bot_iff (p : Submodule R M) : p ≠ ⊥ ↔ ∃ x ∈ p, x ≠ (0 : M) := by
   simp only [ne_eq, p.eq_bot_iff, not_forall, exists_prop]
 
--- DISSOLVED: nonzero_mem_of_bot_lt
+theorem nonzero_mem_of_bot_lt {p : Submodule R M} (bot_lt : ⊥ < p) : ∃ a : p, a ≠ 0 :=
+  let ⟨b, hb₁, hb₂⟩ := p.ne_bot_iff.mp bot_lt.ne'
+  ⟨⟨b, hb₁⟩, hb₂ ∘ congr_arg Subtype.val⟩
 
--- DISSOLVED: exists_mem_ne_zero_of_ne_bot
-
-@[simps]
-def botEquivPUnit : (⊥ : Submodule R M) ≃ₗ[R] PUnit.{v+1} where
-  toFun _ := PUnit.unit
-  invFun _ := 0
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  left_inv _ := Subsingleton.elim _ _
-  right_inv _ := rfl
+theorem exists_mem_ne_zero_of_ne_bot {p : Submodule R M} (h : p ≠ ⊥) : ∃ b : M, b ∈ p ∧ b ≠ 0 :=
+  let ⟨b, hb₁, hb₂⟩ := p.ne_bot_iff.mp h
+  ⟨b, hb₁, hb₂⟩
 
 theorem subsingleton_iff_eq_bot : Subsingleton p ↔ p = ⊥ := by
   rw [subsingleton_iff, Submodule.eq_bot_iff]
@@ -127,16 +116,8 @@ instance : Top (Submodule R M) :=
       smul_mem' := fun _ _ _ ↦ trivial }⟩
 
 @[simp]
-theorem top_coe : ((⊤ : Submodule R M) : Set M) = Set.univ :=
-  rfl
-
-@[simp]
 theorem top_toAddSubmonoid : (⊤ : Submodule R M).toAddSubmonoid = ⊤ :=
   rfl
-
-@[simp]
-lemma top_toAddSubgroup {R M} [Ring R] [AddCommGroup M] [Module R M] :
-    (⊤ : Submodule R M).toAddSubgroup = ⊤ := rfl
 
 @[simp]
 theorem mem_top {x : M} : x ∈ (⊤ : Submodule R M) :=
@@ -148,15 +129,6 @@ instance : OrderTop (Submodule R M) where
 
 theorem eq_top_iff' {p : Submodule R M} : p = ⊤ ↔ ∀ x, x ∈ p :=
   eq_top_iff.trans ⟨fun h _ ↦ h trivial, fun h x _ ↦ h x⟩
-
-@[simps]
-def topEquiv : (⊤ : Submodule R M) ≃ₗ[R] M where
-  toFun x := x
-  invFun x := ⟨x, mem_top⟩
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  left_inv _ := rfl
-  right_inv _ := rfl
 
 /-!
 ## Infima & suprema in a submodule
@@ -201,10 +173,6 @@ instance completeLattice : CompleteLattice (Submodule R M) :=
 @[simp]
 theorem inf_coe : ↑(p ⊓ q) = (p ∩ q : Set M) :=
   rfl
-
-@[simp]
-theorem mem_inf {p q : Submodule R M} {x : M} : x ∈ p ⊓ q ↔ x ∈ p ∧ x ∈ q :=
-  Iff.rfl
 
 @[simp]
 theorem sInf_coe (P : Set (Submodule R M)) : (↑(sInf P) : Set M) = ⋂ p ∈ P, ↑p :=
@@ -366,16 +334,6 @@ def AddSubmonoid.toNatSubmodule : AddSubmonoid M ≃o Submodule ℕ M where
   map_rel_iff' := Iff.rfl
 
 @[simp]
-theorem AddSubmonoid.toNatSubmodule_symm :
-    ⇑(AddSubmonoid.toNatSubmodule.symm : _ ≃o AddSubmonoid M) = Submodule.toAddSubmonoid :=
-  rfl
-
-@[simp]
-theorem AddSubmonoid.coe_toNatSubmodule (S : AddSubmonoid M) :
-    (AddSubmonoid.toNatSubmodule S : Set M) = S :=
-  rfl
-
-@[simp]
 theorem AddSubmonoid.toNatSubmodule_toAddSubmonoid (S : AddSubmonoid M) :
     S.toNatSubmodule.toAddSubmonoid = S :=
   AddSubmonoid.toNatSubmodule.symm_apply_apply S
@@ -403,16 +361,6 @@ def AddSubgroup.toIntSubmodule : AddSubgroup M ≃o Submodule ℤ M where
   left_inv _ := rfl
   right_inv _ := rfl
   map_rel_iff' := Iff.rfl
-
-@[simp]
-theorem AddSubgroup.toIntSubmodule_symm :
-    ⇑(AddSubgroup.toIntSubmodule.symm : _ ≃o AddSubgroup M) = Submodule.toAddSubgroup :=
-  rfl
-
-@[simp]
-theorem AddSubgroup.coe_toIntSubmodule (S : AddSubgroup M) :
-    (AddSubgroup.toIntSubmodule S : Set M) = S :=
-  rfl
 
 @[simp]
 theorem AddSubgroup.toIntSubmodule_toAddSubgroup (S : AddSubgroup M) :

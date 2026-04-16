@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Conformal.NormedSpace
 import Mathlib.Geometry.Manifold.ChartedSpace
 
+noncomputable section
+
 /-!
 # Conformal Groupoid
 

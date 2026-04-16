@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.Algebra.Group.Units.Hom
 import Mathlib.Algebra.Ring.Hom.Defs
 
+noncomputable section
+
 /-!
 # Units in semirings and rings
 
@@ -29,10 +31,6 @@ instance : Neg αˣ :=
 
 @[simp, norm_cast]
 protected theorem val_neg (u : αˣ) : (↑(-u) : α) = -u :=
-  rfl
-
-@[simp, norm_cast]
-protected theorem coe_neg_one : ((-1 : αˣ) : α) = -1 :=
   rfl
 
 instance : HasDistribNeg αˣ :=

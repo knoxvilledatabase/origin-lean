@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Order.Category.Lat
 
+noncomputable section
+
 /-!
 # Category of linear orders
 
@@ -33,10 +35,6 @@ instance : CoeSort LinOrd Type* :=
 
 def of (α : Type*) [LinearOrder α] : LinOrd :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [LinearOrder α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited LinOrd :=
   ⟨of PUnit⟩
@@ -73,7 +71,3 @@ def dualEquiv : LinOrd ≌ LinOrd where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end LinOrd
-
-theorem linOrd_dual_comp_forget_to_Lat :
-    LinOrd.dual ⋙ forget₂ LinOrd Lat = forget₂ LinOrd Lat ⋙ Lat.dual :=
-  rfl

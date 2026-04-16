@@ -10,6 +10,8 @@ import Mathlib.Algebra.Star.Pointwise
 import Mathlib.Algebra.Star.Module
 import Mathlib.RingTheory.Adjoin.Basic
 
+noncomputable section
+
 /-!
 # Star subalgebras
 
@@ -76,9 +78,6 @@ theorem ext {S T : StarSubalgebra R A} (h : ∀ x : A, x ∈ S ↔ x ∈ T) : S 
   SetLike.ext h
 
 @[simp]
-lemma coe_mk (S : Subalgebra R A) (h) : ((⟨S, h⟩ : StarSubalgebra R A) : Set A) = S := rfl
-
-@[simp]
 theorem mem_toSubalgebra {S : StarSubalgebra R A} {x} : x ∈ S.toSubalgebra ↔ x ∈ S :=
   Iff.rfl
 
@@ -100,10 +99,6 @@ theorem toSubalgebra_le_iff {S₁ S₂ : StarSubalgebra R A} :
 protected def copy (S : StarSubalgebra R A) (s : Set A) (hs : s = ↑S) : StarSubalgebra R A where
   toSubalgebra := Subalgebra.copy S.toSubalgebra s hs
   star_mem' {a} ha := hs ▸ S.star_mem' (by simpa [hs] using ha)
-
-@[simp]
-theorem coe_copy (S : StarSubalgebra R A) (s : Set A) (hs : s = ↑S) : (S.copy s hs : Set A) = s :=
-  rfl
 
 theorem copy_eq (S : StarSubalgebra R A) (s : Set A) (hs : s = ↑S) : S.copy s hs = S :=
   SetLike.coe_injective hs
@@ -133,17 +128,6 @@ def subtype : S →⋆ₐ[R] A where
   commutes' _ := rfl
   map_star' _ := rfl
 
-@[simp]
-theorem coe_subtype : (S.subtype : S → A) = Subtype.val :=
-  rfl
-
-theorem subtype_apply (x : S) : S.subtype x = (x : A) :=
-  rfl
-
-@[simp]
-theorem toSubalgebra_subtype : S.toSubalgebra.val = S.subtype.toAlgHom :=
-  rfl
-
 @[simps]
 def inclusion {S₁ S₂ : StarSubalgebra R A} (h : S₁ ≤ S₂) : S₁ →⋆ₐ[R] S₂ where
   toFun := Subtype.map id h
@@ -157,11 +141,6 @@ def inclusion {S₁ S₂ : StarSubalgebra R A} (h : S₁ ≤ S₂) : S₁ →⋆
 theorem inclusion_injective {S₁ S₂ : StarSubalgebra R A} (h : S₁ ≤ S₂) :
     Function.Injective <| inclusion h :=
   Set.inclusion_injective h
-
-@[simp]
-theorem subtype_comp_inclusion {S₁ S₂ : StarSubalgebra R A} (h : S₁ ≤ S₂) :
-    S₂.subtype.comp (inclusion h) = S₁.subtype :=
-  rfl
 
 section Map
 
@@ -195,10 +174,6 @@ theorem map_toSubalgebra {S : StarSubalgebra R A} {f : A →⋆ₐ[R] B} :
     (S.map f).toSubalgebra = S.toSubalgebra.map f.toAlgHom :=
   SetLike.coe_injective rfl
 
-@[simp]
-theorem coe_map (S : StarSubalgebra R A) (f : A →⋆ₐ[R] B) : (S.map f : Set B) = f '' S :=
-  rfl
-
 def comap (f : A →⋆ₐ[R] B) (S : StarSubalgebra R B) : StarSubalgebra R A :=
   { S.toSubalgebra.comap f.toAlgHom with
     star_mem' := @fun a ha => show f (star a) ∈ S from (map_star f a).symm ▸ star_mem ha }
@@ -229,15 +204,6 @@ theorem comap_comap (S : StarSubalgebra R C) (g : B →⋆ₐ[R] C) (f : A →�
     (S.comap g).comap f = S.comap (g.comp f) :=
   SetLike.coe_injective <| by exact Set.preimage_preimage
   -- Porting note: the `by exact` trick still works sometimes
-
-@[simp]
-theorem mem_comap (S : StarSubalgebra R B) (f : A →⋆ₐ[R] B) (x : A) : x ∈ S.comap f ↔ f x ∈ S :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_comap (S : StarSubalgebra R B) (f : A →⋆ₐ[R] B) :
-    (S.comap f : Set A) = f ⁻¹' (S : Set B) :=
-  rfl
 
 end Map
 
@@ -311,10 +277,6 @@ theorem mem_star_iff (S : Subalgebra R A) (x : A) : x ∈ star S ↔ star x ∈ 
 theorem star_mem_star_iff (S : Subalgebra R A) (x : A) : star x ∈ star S ↔ x ∈ S := by
   simp only [mem_star_iff, star_star]
 
-@[simp]
-theorem coe_star (S : Subalgebra R A) : ((star S : Subalgebra R A) : Set A) = star (S : Set A) :=
-  rfl
-
 theorem star_mono : Monotone (star : Subalgebra R A → Subalgebra R A) := fun _ _ h _ hx => h hx
 
 variable (R)
@@ -333,9 +295,6 @@ def starClosure (S : Subalgebra R A) : StarSubalgebra R A where
     simp only [Subalgebra.mem_carrier, ← (@Algebra.gi R A _ _ _).l_sup_u _ _] at *
     rw [← mem_star_iff _ a, star_adjoin_comm, sup_comm]
     simpa using ha
-
-theorem starClosure_toSubalgebra (S : Subalgebra R A) : S.starClosure.toSubalgebra = S ⊔ star S :=
-  rfl
 
 theorem starClosure_le {S₁ : Subalgebra R A} {S₂ : StarSubalgebra R A} (h : S₁ ≤ S₂.toSubalgebra) :
     S₁.starClosure ≤ S₂ :=
@@ -558,10 +517,6 @@ instance inhabited : Inhabited (StarSubalgebra R A) :=
   ⟨⊤⟩
 
 @[simp]
-theorem coe_top : (↑(⊤ : StarSubalgebra R A) : Set A) = Set.univ :=
-  rfl
-
-@[simp]
 theorem mem_top {x : A} : x ∈ (⊤ : StarSubalgebra R A) :=
   Set.mem_univ x
 
@@ -587,14 +542,6 @@ theorem map_sup (f : A →⋆ₐ[R] B) (S T : StarSubalgebra R A) : map f (S ⊔
 
 theorem map_inf (f : A →⋆ₐ[R] B) (hf : Function.Injective f) (S T : StarSubalgebra R A) :
     map f (S ⊓ T) = map f S ⊓ map f T := SetLike.coe_injective (Set.image_inter hf)
-
-@[simp, norm_cast]
-theorem coe_inf (S T : StarSubalgebra R A) : (↑(S ⊓ T) : Set A) = (S : Set A) ∩ T :=
-  rfl
-
-@[simp]
-theorem mem_inf {S T : StarSubalgebra R A} {x : A} : x ∈ S ⊓ T ↔ x ∈ S ∧ x ∈ T :=
-  Iff.rfl
 
 @[simp]
 theorem inf_toSubalgebra (S T : StarSubalgebra R A) :
@@ -629,13 +576,6 @@ theorem map_iInf {ι : Sort*} [Nonempty ι] (f : A →⋆ₐ[R] B) (hf : Functio
 theorem iInf_toSubalgebra {ι : Sort*} (S : ι → StarSubalgebra R A) :
     (⨅ i, S i).toSubalgebra = ⨅ i, (S i).toSubalgebra :=
   SetLike.coe_injective <| by simp
-
-theorem bot_toSubalgebra : (⊥ : StarSubalgebra R A).toSubalgebra = ⊥ := rfl
-
-theorem mem_bot {x : A} : x ∈ (⊥ : StarSubalgebra R A) ↔ x ∈ Set.range (algebraMap R A) := Iff.rfl
-
-@[simp]
-theorem coe_bot : ((⊥ : StarSubalgebra R A) : Set A) = Set.range (algebraMap R A) := rfl
 
 theorem eq_top_iff {S : StarSubalgebra R A} : S = ⊤ ↔ ∀ x : A, x ∈ S :=
   ⟨fun h x => by rw [h]; exact mem_top,
@@ -683,10 +623,6 @@ variable [FunLike F A B] [AlgHomClass F R A B] [StarHomClass F A B] (f g : F)
 def equalizer : StarSubalgebra R A where
   toSubalgebra := AlgHom.equalizer (f : A →ₐ[R] B) g
   star_mem' {a} (ha : f a = g a) := by simpa only [← map_star] using congrArg star ha
-
-@[simp]
-theorem mem_equalizer (x : A) : x ∈ StarAlgHom.equalizer f g ↔ f x = g x :=
-  Iff.rfl
 
 theorem adjoin_le_equalizer {s : Set A} (h : s.EqOn f g) : adjoin R s ≤ StarAlgHom.equalizer f g :=
   adjoin_le h

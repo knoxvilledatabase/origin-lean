@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Logic.Function.FromTypes
 
+noncomputable section
+
 /-! # Function types of a given arity
 
 This provides `Function.OfArity`, such that `OfArity α β 2 = α → α → β`.
@@ -52,9 +54,6 @@ instance inhabited {α β n} [Inhabited β] : Inhabited (OfArity α β n) :=
 end OfArity
 
 namespace FromTypes
-
-lemma fromTypes_fin_const (α β : Type u) (n : ℕ) :
-    FromTypes (fun (_ : Fin n) => α) β = OfArity α β n := rfl
 
 def fromTypes_fin_const_equiv (α β : Type u) (n : ℕ) :
     FromTypes (fun (_ : Fin n) => α) β ≃ OfArity α β n := .refl _

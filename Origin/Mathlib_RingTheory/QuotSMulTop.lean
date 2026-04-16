@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.LinearAlgebra.TensorProduct.Quotient
 import Mathlib.LinearAlgebra.DFinsupp
 
+noncomputable section
+
 /-!
 # Reducing a module modulo an element of the ring
 
@@ -49,11 +51,6 @@ def map : (M →ₗ[R] M') →ₗ[R] QuotSMulTop r M →ₗ[R] QuotSMulTop r M' 
   Submodule.mapQLinear _ _ ∘ₗ LinearMap.id.codRestrict _ fun _ =>
     map_le_iff_le_comap.mp <| le_of_eq_of_le (map_pointwise_smul _ _ _) <|
       smul_mono_right r le_top
-
-@[simp]
-lemma map_apply_mk (f : M →ₗ[R] M') (x : M) :
-    map r f (Submodule.Quotient.mk x) =
-      (Submodule.Quotient.mk (f x) : QuotSMulTop r M') := rfl
 
 lemma map_comp_mkQ (f : M →ₗ[R] M') :
     map r f ∘ₗ mkQ (r • ⊤) = mkQ (r • ⊤) ∘ₗ f := by

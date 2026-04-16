@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.MetricSpace.HausdorffDistance
 import Mathlib.Topology.Sets.Compacts
 
+noncomputable section
+
 /-!
 # Closed subsets
 
@@ -68,9 +70,6 @@ theorem isClosed_subsets_of_isClosed (hs : IsClosed s) :
     obtain ⟨y : α, hy : y ∈ u, Dxy : edist x y < ε⟩ := exists_edist_lt_of_hausdorffEdist_lt hx Dtu
     exact ⟨y, hu hy, Dxy⟩
   rwa [hs.closure_eq] at this
-
-theorem Closeds.edist_eq {s t : Closeds α} : edist s t = hausdorffEdist (s : Set α) t :=
-  rfl
 
 instance Closeds.completeSpace [CompleteSpace α] : CompleteSpace (Closeds α) := by
   /- We will show that, if a sequence of sets `s n` satisfies
@@ -363,10 +362,6 @@ instance NonemptyCompacts.metricSpace : MetricSpace (NonemptyCompacts α) :=
   EMetricSpace.toMetricSpace fun x y =>
     hausdorffEdist_ne_top_of_nonempty_of_bounded x.nonempty y.nonempty x.isCompact.isBounded
       y.isCompact.isBounded
-
-theorem NonemptyCompacts.dist_eq {x y : NonemptyCompacts α} :
-    dist x y = hausdorffDist (x : Set α) y :=
-  rfl
 
 theorem lipschitz_infDist_set (x : α) : LipschitzWith 1 fun s : NonemptyCompacts α => infDist x s :=
   LipschitzWith.of_le_add fun s t => by

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Algebra.Defs
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.Algebra.DirectSum.Ring
 
+noncomputable section
+
 /-! # Additively-graded algebra structures on `⨁ i, A i`
 
 This file provides `R`-algebra structures on external direct sums of `R`-modules.
@@ -90,14 +92,6 @@ instance : Algebra R (⨁ i, A i) where
       AddMonoidHom.mul_apply]
     rw [DirectSum.of_mul_of, ← of_smul]
     apply DFinsupp.single_eq_of_sigma_eq (GAlgebra.smul_def r ⟨i, xi⟩)
-
-theorem algebraMap_apply (r : R) :
-    algebraMap R (⨁ i, A i) r = DirectSum.of A 0 (GAlgebra.toFun r) :=
-  rfl
-
-theorem algebraMap_toAddMonoid_hom :
-    ↑(algebraMap R (⨁ i, A i)) = (DirectSum.of A 0).comp (GAlgebra.toFun : R →+ A 0) :=
-  rfl
 
 @[simps]
 def toAlgebra (f : ∀ i, A i →ₗ[R] B) (hone : f _ GradedMonoid.GOne.one = 1)

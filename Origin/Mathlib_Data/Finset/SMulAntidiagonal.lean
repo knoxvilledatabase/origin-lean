@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Data.Set.SMulAntidiagonal
 
+noncomputable section
+
 /-!
 # Antidiagonal for scalar multiplication as a `Finset`.
 

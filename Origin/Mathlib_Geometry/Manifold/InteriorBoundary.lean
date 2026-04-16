@@ -5,6 +5,8 @@ Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 5
 import Origin.Core
 import Mathlib.Geometry.Manifold.SmoothManifoldWithCorners
 
+noncomputable section
+
 /-!
 # Interior and boundary of a manifold
 Define the interior and boundary of a manifold.

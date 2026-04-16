@@ -5,6 +5,8 @@ Genuine: 120 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Topology.UniformSpace.UniformConvergenceTopology
 
+noncomputable section
+
 /-!
 # Equicontinuity of a family of functions
 

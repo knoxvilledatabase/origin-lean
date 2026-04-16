@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.Cyclotomic.Rat
 import Mathlib.NumberTheory.NumberField.Units.DirichletTheorem
 import Mathlib.RingTheory.Fintype
 
+noncomputable section
+
 /-!
 # Third Cyclotomic Field
 We gather various results about the third cyclotomic field. The following notations are used in this

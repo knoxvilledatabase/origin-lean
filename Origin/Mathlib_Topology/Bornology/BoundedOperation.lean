@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Analysis.Normed.Field.Lemmas
 
+noncomputable section
+
 /-!
 # Bounded operations
 

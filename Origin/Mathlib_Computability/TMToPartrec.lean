@@ -8,6 +8,8 @@ import Mathlib.Computability.TuringMachine
 import Mathlib.Data.Num.Lemmas
 import Mathlib.Tactic.DeriveFintype
 
+noncomputable section
+
 /-!
 # Modelling partial recursive functions using Turing machines
 
@@ -823,61 +825,6 @@ def tr : Λ' → Stmt'
         cond (natEnd s.iget) (Λ'.ret k) <| Λ'.clear natEnd main <| trNormal f (Cont'.fix f k)
   | Λ'.ret Cont'.halt => (load fun _ => none) <| halt
 
-@[simp]
-theorem tr_move (p k₁ k₂ q) : tr (Λ'.move p k₁ k₂ q) =
-    pop' k₁ (branch (fun s => s.elim true p) (goto fun _ => q)
-      (push' k₂ <| goto fun _ => Λ'.move p k₁ k₂ q)) := rfl
-
-@[simp]
-theorem tr_push (k f q) : tr (Λ'.push k f q) = branch (fun s => (f s).isSome)
-    ((push k fun s => (f s).iget) <| goto fun _ => q) (goto fun _ => q) := rfl
-
-@[simp]
-theorem tr_read (q) : tr (Λ'.read q) = goto q := rfl
-
-@[simp]
-theorem tr_clear (p k q) : tr (Λ'.clear p k q) = pop' k (branch
-    (fun s => s.elim true p) (goto fun _ => q) (goto fun _ => Λ'.clear p k q)) := rfl
-
-@[simp]
-theorem tr_copy (q) : tr (Λ'.copy q) = pop' rev (branch Option.isSome
-    (push' main <| push' stack <| goto fun _ => Λ'.copy q) (goto fun _ => q)) := rfl
-
-@[simp]
-theorem tr_succ (q) : tr (Λ'.succ q) = pop' main (branch (fun s => s = some Γ'.bit1)
-    ((push rev fun _ => Γ'.bit0) <| goto fun _ => Λ'.succ q) <|
-      branch (fun s => s = some Γ'.cons)
-        ((push main fun _ => Γ'.cons) <| (push main fun _ => Γ'.bit1) <| goto fun _ => unrev q)
-        ((push main fun _ => Γ'.bit1) <| goto fun _ => unrev q)) := rfl
-
-@[simp]
-theorem tr_pred (q₁ q₂) : tr (Λ'.pred q₁ q₂) = pop' main (branch (fun s => s = some Γ'.bit0)
-    ((push rev fun _ => Γ'.bit1) <| goto fun _ => Λ'.pred q₁ q₂) <|
-    branch (fun s => natEnd s.iget) (goto fun _ => q₁)
-      (peek' main <|
-        branch (fun s => natEnd s.iget) (goto fun _ => unrev q₂)
-          ((push rev fun _ => Γ'.bit0) <| goto fun _ => unrev q₂))) := rfl
-
-@[simp]
-theorem tr_ret_cons₁ (fs k) : tr (Λ'.ret (Cont'.cons₁ fs k)) = goto fun _ =>
-    move₂ (fun _ => false) main aux <|
-      move₂ (fun s => s = Γ'.consₗ) stack main <|
-        move₂ (fun _ => false) aux stack <| trNormal fs (Cont'.cons₂ k) := rfl
-
-@[simp]
-theorem tr_ret_cons₂ (k) : tr (Λ'.ret (Cont'.cons₂ k)) =
-    goto fun _ => head stack <| Λ'.ret k := rfl
-
-@[simp]
-theorem tr_ret_comp (f k) : tr (Λ'.ret (Cont'.comp f k)) = goto fun _ => trNormal f k := rfl
-
-@[simp]
-theorem tr_ret_fix (f k) : tr (Λ'.ret (Cont'.fix f k)) = pop' main (goto fun s =>
-    cond (natEnd s.iget) (Λ'.ret k) <| Λ'.clear natEnd main <| trNormal f (Cont'.fix f k)) := rfl
-
-@[simp]
-theorem tr_ret_halt : tr (Λ'.ret Cont'.halt) = (load fun _ => none) halt := rfl
-
 def trCont : Cont → Cont'
   | Cont.halt => Cont'.halt
   | Cont.cons₁ c _ k => Cont'.cons₁ c (trCont k)
@@ -929,14 +876,6 @@ def K'.elim (a b c d : List Γ') : K' → List Γ'
   | K'.rev => b
   | K'.aux => c
   | K'.stack => d
-
-theorem K'.elim_main (a b c d) : K'.elim a b c d K'.main = a := rfl
-
-theorem K'.elim_rev (a b c d) : K'.elim a b c d K'.rev = b := rfl
-
-theorem K'.elim_aux (a b c d) : K'.elim a b c d K'.aux = c := rfl
-
-theorem K'.elim_stack (a b c d) : K'.elim a b c d K'.stack = d := rfl
 
 attribute [simp] K'.elim
 
@@ -1438,18 +1377,6 @@ def codeSupp (c : Code) (k : Cont') : Finset Λ' :=
 @[simp]
 theorem codeSupp_self (c k) : trStmts₁ (trNormal c k) ⊆ codeSupp c k :=
   Finset.Subset.trans (codeSupp'_self _ _) (Finset.union_subset_left fun _ a ↦ a)
-
-@[simp]
-theorem codeSupp_zero (k) : codeSupp Code.zero' k = trStmts₁ (trNormal Code.zero' k) ∪ contSupp k :=
-  rfl
-
-@[simp]
-theorem codeSupp_succ (k) : codeSupp Code.succ k = trStmts₁ (trNormal Code.succ k) ∪ contSupp k :=
-  rfl
-
-@[simp]
-theorem codeSupp_tail (k) : codeSupp Code.tail k = trStmts₁ (trNormal Code.tail k) ∪ contSupp k :=
-  rfl
 
 @[simp]
 theorem codeSupp_cons (f fs k) :

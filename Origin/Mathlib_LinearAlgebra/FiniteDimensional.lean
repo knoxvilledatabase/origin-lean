@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.FiniteDimensional.Defs
 import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 import Mathlib.LinearAlgebra.Dimension.DivisionRing
 
+noncomputable section
+
 /-!
 # Finite dimensional vector spaces
 
@@ -150,12 +152,6 @@ noncomputable def linearEquivOfInjective [FiniteDimensional K V] [FiniteDimensio
     (f : V →ₗ[K] V₂) (hf : Injective f) (hdim : finrank K V = finrank K V₂) : V ≃ₗ[K] V₂ :=
   LinearEquiv.ofBijective f
     ⟨hf, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mp hf⟩
-
-@[simp]
-theorem linearEquivOfInjective_apply [FiniteDimensional K V] [FiniteDimensional K V₂]
-    {f : V →ₗ[K] V₂} (hf : Injective f) (hdim : finrank K V = finrank K V₂) (x : V) :
-    f.linearEquivOfInjective hf hdim x = f x :=
-  rfl
 
 end LinearMap
 

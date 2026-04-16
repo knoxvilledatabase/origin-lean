@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Comma.Presheaf.Basic
 import Mathlib.CategoryTheory.Limits.Preserves.Yoneda
 import Mathlib.CategoryTheory.Limits.Over
 
+noncomputable section
+
 /-!
 # Relative Yoneda preserves certain colimits
 

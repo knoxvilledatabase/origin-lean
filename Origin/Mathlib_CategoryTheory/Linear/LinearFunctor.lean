@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.CategoryTheory.Linear.Basic
 import Mathlib.Algebra.Module.LinearMap.Rat
 
+noncomputable section
+
 /-!
 # Linear Functors
 
@@ -59,8 +61,6 @@ variable (R)
 @[simps]
 def mapLinearMap {X Y : C} : (X ⟶ Y) →ₗ[R] F.obj X ⟶ F.obj Y :=
   { F.mapAddHom with map_smul' := fun r f => F.map_smul r f }
-
-theorem coe_mapLinearMap {X Y : C} : ⇑(F.mapLinearMap R : (X ⟶ Y) →ₗ[R] _) = F.map := rfl
 
 end
 

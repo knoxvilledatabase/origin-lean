@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 import Origin.Core
 import Mathlib.Algebra.GradedMonoid
 
+noncomputable section
+
 /-!
 # Additively-graded multiplicative action structures
 
@@ -63,10 +65,6 @@ instance GMul.toGSMul [Add ιA] [GMul A] : GSMul A A where smul := GMul.mul
 instance GSMul.toSMul [VAdd ιA ιM] [GSMul A M] : SMul (GradedMonoid A) (GradedMonoid M) :=
   ⟨fun x y ↦ ⟨_, GSMul.smul x.snd y.snd⟩⟩
 
-theorem mk_smul_mk [VAdd ιA ιM] [GSMul A M] {i j} (a : A i) (b : M j) :
-    mk i a • mk j b = mk (i +ᵥ j) (GSMul.smul a b) :=
-  rfl
-
 class GMulAction [AddMonoid ιA] [VAdd ιA ιM] [GMonoid A] extends GSMul A M where
   /-- One is the neutral element for `•` -/
   one_smul (b : GradedMonoid M) : (1 : GradedMonoid A) • b = b
@@ -102,12 +100,6 @@ instance SetLike.toGSMul {S R N M : Type*} [SetLike S R] [SetLike N M] [SMul R M
     (A : ιA → S) (B : ιB → N) [SetLike.GradedSMul A B] :
     GradedMonoid.GSMul (fun i ↦ A i) fun i ↦ B i where
   smul a b := ⟨a.1 • b.1, SetLike.GradedSMul.smul_mem a.2 b.2⟩
-
-@[simp]
-theorem SetLike.coe_GSMul {S R N M : Type*} [SetLike S R] [SetLike N M] [SMul R M] [VAdd ιA ιB]
-    (A : ιA → S) (B : ιB → N) [SetLike.GradedSMul A B] {i : ιA} {j : ιB} (x : A i) (y : B j) :
-    (@GradedMonoid.GSMul.smul ιA ιB (fun i ↦ A i) (fun i ↦ B i) _ _ i j x y : M) = x.1 • y.1 :=
-  rfl
 
 instance SetLike.GradedMul.toGradedSMul [AddMonoid ιA] [Monoid R] {S : Type*} [SetLike S R]
     (A : ιA → S) [SetLike.GradedMonoid A] : SetLike.GradedSMul A A where

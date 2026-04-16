@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/MvPolynomial/Homogeneous.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 4 | Infrastructure: 3
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Internal
@@ -10,6 +10,8 @@ import Mathlib.Algebra.MvPolynomial.Equiv
 import Mathlib.Algebra.MvPolynomial.Variables
 import Mathlib.RingTheory.MvPolynomial.WeightedHomogeneous
 import Mathlib.Algebra.Polynomial.Roots
+
+noncomputable section
 
 /-!
 # Homogeneous polynomials
@@ -64,15 +66,7 @@ def homogeneousSubmodule (n : ℕ) : Submodule R (MvPolynomial σ R) where
     · exact ha h
     · exact hb h
 
-@[simp]
-lemma weightedHomogeneousSubmodule_one (n : ℕ) :
-    weightedHomogeneousSubmodule R 1 n = homogeneousSubmodule σ R n := rfl
-
 variable {σ R}
-
-@[simp]
-theorem mem_homogeneousSubmodule (n : ℕ) (p : MvPolynomial σ R) :
-    p ∈ homogeneousSubmodule σ R n ↔ p.IsHomogeneous n := Iff.rfl
 
 variable (σ R)
 
@@ -138,7 +132,9 @@ theorem coeff_eq_zero (hφ : IsHomogeneous φ n) {d : σ →₀ ℕ} (hd : d.deg
   rw [degree_eq_weight_one] at hd
   exact IsWeightedHomogeneous.coeff_eq_zero hφ d hd
 
--- DISSOLVED: inj_right
+theorem inj_right (hm : IsHomogeneous φ m) (hn : IsHomogeneous φ n) (hφ : φ ≠ 0) : m = n := by
+  obtain ⟨d, hd⟩ : ∃ d, coeff d φ ≠ 0 := exists_coeff_ne_zero hφ
+  rw [← hm hd, ← hn hd]
 
 theorem add (hφ : IsHomogeneous φ n) (hψ : IsHomogeneous ψ n) : IsHomogeneous (φ + ψ) n :=
   (homogeneousSubmodule σ R n).add_mem hφ hψ
@@ -227,7 +223,14 @@ lemma totalDegree_le (hφ : IsHomogeneous φ n) : φ.totalDegree ≤ n := by
   simp_rw [Finsupp.sum, ← hφ hd, weight_apply, Pi.one_apply, smul_eq_mul, mul_one, Finsupp.sum,
     le_rfl]
 
--- DISSOLVED: totalDegree
+theorem totalDegree (hφ : IsHomogeneous φ n) (h : φ ≠ 0) : totalDegree φ = n := by
+  apply le_antisymm hφ.totalDegree_le
+  obtain ⟨d, hd⟩ : ∃ d, coeff d φ ≠ 0 := exists_coeff_ne_zero h
+  simp only [← hφ hd, MvPolynomial.totalDegree, Finsupp.sum]
+  replace hd := Finsupp.mem_support_iff.mpr hd
+  simp only [weight_apply, Pi.one_apply, smul_eq_mul, mul_one]
+  -- Porting note: Original proof did not define `f`
+  exact Finset.le_sup (f := fun s ↦ ∑ x ∈ s.support, s x) hd
 
 theorem rename_isHomogeneous {f : σ → τ} (h : φ.IsHomogeneous n) :
     (rename f φ).IsHomogeneous n := by
@@ -278,8 +281,37 @@ lemma coeff_isHomogeneous_of_optionEquivLeft_symm
 open Polynomial in
 
 private
-
--- DISSOLVED: exists_eval_ne_zero_of_coeff_finSuccEquiv_ne_zero_aux
+lemma exists_eval_ne_zero_of_coeff_finSuccEquiv_ne_zero_aux
+    {N : ℕ} {F : MvPolynomial (Fin (Nat.succ N)) R} {n : ℕ} (hF : IsHomogeneous F n)
+    (hFn : ((finSuccEquiv R N) F).coeff n ≠ 0) :
+    ∃ r, eval r F ≠ 0 := by
+  have hF₀ : F ≠ 0 := by contrapose! hFn; simp [hFn]
+  have hdeg : natDegree (finSuccEquiv R N F) < n + 1 := by
+    linarith [natDegree_finSuccEquiv F, degreeOf_le_totalDegree F 0, hF.totalDegree hF₀]
+  use Fin.cons 1 0
+  have aux : ∀ i ∈ Finset.range n, constantCoeff ((finSuccEquiv R N F).coeff i) = 0 := by
+    intro i hi
+    rw [Finset.mem_range] at hi
+    apply (hF.finSuccEquiv_coeff_isHomogeneous i (n-i) (by omega)).coeff_eq_zero
+    simp only [Finsupp.degree_zero]
+    rw [← Nat.sub_ne_zero_iff_lt] at hi
+    exact hi.symm
+  simp_rw [eval_eq_eval_mv_eval', eval_one_map, Polynomial.eval_eq_sum_range' hdeg,
+    eval_zero, one_pow, mul_one, map_sum, Finset.sum_range_succ, Finset.sum_eq_zero aux, zero_add]
+  contrapose! hFn
+  ext d
+  rw [coeff_zero]
+  obtain rfl | hd := eq_or_ne d 0
+  · apply hFn
+  · contrapose! hd
+    ext i
+    rw [Finsupp.coe_zero, Pi.zero_apply]
+    by_cases hi : i ∈ d.support
+    · have := hF.finSuccEquiv_coeff_isHomogeneous n 0 (add_zero _) hd
+      simp only [weight_apply, Pi.one_apply, smul_eq_mul, mul_one, Finsupp.sum] at this
+      rw [Finset.sum_eq_zero_iff_of_nonneg (fun _ _ ↦ zero_le')] at this
+      exact this i hi
+    · simpa using hi
 
 section IsDomain
 
@@ -288,8 +320,45 @@ variable {R σ : Type*} [CommRing R] [IsDomain R] {F G : MvPolynomial σ R} {n :
 open Cardinal Polynomial
 
 private
-
--- DISSOLVED: exists_eval_ne_zero_of_totalDegree_le_card_aux
+lemma exists_eval_ne_zero_of_totalDegree_le_card_aux {N : ℕ} {F : MvPolynomial (Fin N) R} {n : ℕ}
+    (hF : F.IsHomogeneous n) (hF₀ : F ≠ 0) (hnR : n ≤ #R) :
+    ∃ r, eval r F ≠ 0 := by
+  induction N generalizing n with
+  | zero =>
+    use 0
+    contrapose! hF₀
+    ext d
+    simpa only [Subsingleton.elim d 0, eval_zero, coeff_zero] using hF₀
+  | succ N IH =>
+    have hdeg : natDegree (finSuccEquiv R N F) < n + 1 := by
+      linarith [natDegree_finSuccEquiv F, degreeOf_le_totalDegree F 0, hF.totalDegree hF₀]
+    obtain ⟨i, hi⟩ : ∃ i : ℕ, (finSuccEquiv R N F).coeff i ≠ 0 := by
+      contrapose! hF₀
+      exact (finSuccEquiv _ _).injective <| Polynomial.ext <| by simpa using hF₀
+    have hin : i ≤ n := by
+      contrapose! hi
+      exact coeff_eq_zero_of_natDegree_lt <| (Nat.le_of_lt_succ hdeg).trans_lt hi
+    obtain hFn | hFn := ne_or_eq ((finSuccEquiv R N F).coeff n) 0
+    · exact hF.exists_eval_ne_zero_of_coeff_finSuccEquiv_ne_zero_aux hFn
+    have hin : i < n := hin.lt_or_eq.elim id <| by aesop
+    obtain ⟨j, hj⟩ : ∃ j, i + (j + 1) = n := (Nat.exists_eq_add_of_lt hin).imp <| by intros; omega
+    obtain ⟨r, hr⟩ : ∃ r, (eval r) (Polynomial.coeff ((finSuccEquiv R N) F) i) ≠ 0 :=
+      IH (hF.finSuccEquiv_coeff_isHomogeneous _ _ hj) hi (.trans (by norm_cast; omega) hnR)
+    set φ : R[X] := Polynomial.map (eval r) (finSuccEquiv _ _ F) with hφ
+    have hφ₀ : φ ≠ 0 := fun hφ₀ ↦ hr <| by
+      rw [← coeff_eval_eq_eval_coeff, ← hφ, hφ₀, Polynomial.coeff_zero]
+    have hφR : φ.natDegree < #R := by
+      refine lt_of_lt_of_le ?_ hnR
+      norm_cast
+      refine lt_of_le_of_lt natDegree_map_le ?_
+      suffices (finSuccEquiv _ _ F).natDegree ≠ n by omega
+      rintro rfl
+      refine leadingCoeff_ne_zero.mpr ?_ hFn
+      simpa using (finSuccEquiv R N).injective.ne hF₀
+    obtain ⟨r₀, hr₀⟩ : ∃ r₀, Polynomial.eval r₀ φ ≠ 0 :=
+      φ.exists_eval_ne_zero_of_natDegree_lt_card hφ₀ hφR
+    use Fin.cons r₀ r
+    rwa [eval_eq_eval_mv_eval']
 
 lemma eq_zero_of_forall_eval_eq_zero_of_le_card
     (hF : F.IsHomogeneous n) (h : ∀ r : σ → R, eval r F = 0) (hnR : n ≤ #R) :

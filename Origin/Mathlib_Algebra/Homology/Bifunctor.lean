@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.TotalComplex
 import Mathlib.CategoryTheory.GradedObject.Bifunctor
 
+noncomputable section
+
 /-!
 # The action of a bifunctor on homological complexes
 
@@ -79,12 +81,6 @@ def mapBifunctorHomologicalComplex :
           simp only [← NatTrans.comp_app, ← F.map_comp, f.comm]) (by simp) }
 
 variable {c₁ c₂}
-
-@[simp]
-lemma mapBifunctorHomologicalComplex_obj_obj_toGradedObject
-    (K₁ : HomologicalComplex C₁ c₁) (K₂ : HomologicalComplex C₂ c₂) :
-    (((mapBifunctorHomologicalComplex F c₁ c₂).obj K₁).obj K₂).toGradedObject =
-      ((GradedObject.mapBifunctor F I₁ I₂).obj K₁.X).obj K₂.X := rfl
 
 end Functor
 
@@ -163,9 +159,6 @@ noncomputable def D₁ :
 noncomputable def D₂ :
     (mapBifunctor K₁ K₂ F c).X j ⟶ (mapBifunctor K₁ K₂ F c).X j' :=
   (((F.mapBifunctorHomologicalComplex c₁ c₂).obj K₁).obj K₂).D₂ c j j'
-
-lemma d_eq :
-    (mapBifunctor K₁ K₂ F c).d j j' = D₁ K₁ K₂ F c j j' + D₂ K₁ K₂ F c j j' := rfl
 
 end
 

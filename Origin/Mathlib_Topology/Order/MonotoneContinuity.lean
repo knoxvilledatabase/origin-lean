@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Homeomorph
 import Mathlib.Topology.Order.LeftRightNhds
 
+noncomputable section
+
 /-!
 # Continuity of monotone functions
 
@@ -216,13 +218,5 @@ def toHomeomorph (e : α ≃o β) : α ≃ₜ β :=
   { e with
     continuous_toFun := e.continuous
     continuous_invFun := e.symm.continuous }
-
-@[simp]
-theorem coe_toHomeomorph (e : α ≃o β) : ⇑e.toHomeomorph = e :=
-  rfl
-
-@[simp]
-theorem coe_toHomeomorph_symm (e : α ≃o β) : ⇑e.toHomeomorph.symm = e.symm :=
-  rfl
 
 end OrderIso

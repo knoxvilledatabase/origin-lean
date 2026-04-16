@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.RingTheory.DedekindDomain.PID
 import Mathlib.RingTheory.Localization.NormTrace
 
+noncomputable section
+
 /-!
 
 # Ideal norms
@@ -181,12 +183,6 @@ def relNorm : Ideal S →*₀ Ideal R where
   map_zero' := spanNorm_bot R
   map_one' := by dsimp only; rw [one_eq_top, spanNorm_top R, one_eq_top]
   map_mul' := spanNorm_mul R
-
-theorem relNorm_apply (I : Ideal S) : relNorm R I = span (Algebra.norm R '' (I : Set S) : Set R) :=
-  rfl
-
-@[simp]
-theorem spanNorm_eq (I : Ideal S) : spanNorm R I = relNorm R I := rfl
 
 @[simp]
 theorem relNorm_bot : relNorm R (⊥ : Ideal S) = ⊥ := by

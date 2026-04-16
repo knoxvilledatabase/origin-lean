@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.GammaCompN
 import Mathlib.AlgebraicTopology.DoldKan.NReflectsIso
 
+noncomputable section
+
 /-! The unit isomorphism of the Dold-Kan equivalence
 
 In order to construct the unit isomorphism of the Dold-Kan equivalence,

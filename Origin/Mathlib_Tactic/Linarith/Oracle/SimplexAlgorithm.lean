@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Linarith.Datatypes
 import Mathlib.Tactic.Linarith.Oracle.SimplexAlgorithm.PositiveVector
 
+noncomputable section
+
 /-!
 # The oracle based on Simplex Algorithm
 

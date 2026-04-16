@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Products.Basic
 import Mathlib.Data.ULift
 import Mathlib.Logic.Function.ULift
 
+noncomputable section
+
 /-!
 # The Yoneda embedding
 
@@ -59,9 +61,6 @@ theorem naturality {X Y : C} (α : yoneda.obj X ⟶ yoneda.obj Y) {Z Z' : C} (f 
 def fullyFaithful : (yoneda (C := C)).FullyFaithful where
   preimage f := f.app _ (𝟙 _)
 
-lemma fullyFaithful_preimage {X Y : C} (f : yoneda.obj X ⟶ yoneda.obj Y) :
-    fullyFaithful.preimage f = f.app (op X) (𝟙 X) := rfl
-
 instance yoneda_full : (yoneda : C ⥤ Cᵒᵖ ⥤ Type v₁).Full :=
   fullyFaithful.full
 
@@ -91,9 +90,6 @@ theorem naturality {X Y : Cᵒᵖ} (α : coyoneda.obj X ⟶ coyoneda.obj Y) {Z Z
 
 def fullyFaithful : (coyoneda (C := C)).FullyFaithful where
   preimage f := (f.app _ (𝟙 _)).op
-
-lemma fullyFaithful_preimage {X Y : Cᵒᵖ} (f : coyoneda.obj X ⟶ coyoneda.obj Y) :
-    fullyFaithful.preimage f = (f.app X.unop (𝟙 X.unop)).op := rfl
 
 def preimage {X Y : Cᵒᵖ} (f : coyoneda.obj X ⟶ coyoneda.obj Y) : X ⟶ Y :=
   (f.app _ (𝟙 X.unop)).op
@@ -401,13 +397,7 @@ lemma yonedaPairingExt {X : Cᵒᵖ × (Cᵒᵖ ⥤ Type v₁)} {x y : (yonedaPa
     (w : ∀ Y, x.app Y = y.app Y) : x = y :=
   NatTrans.ext (funext w)
 
-@[simp]
-theorem yonedaPairing_map (P Q : Cᵒᵖ × (Cᵒᵖ ⥤ Type v₁)) (α : P ⟶ Q) (β : (yonedaPairing C).obj P) :
-    (yonedaPairing C).map α β = yoneda.map α.1.unop ≫ β ≫ α.2 :=
-  rfl
-
 universe w in
-
 variable {C} in
 
 def yonedaCompUliftFunctorEquiv (F : Cᵒᵖ ⥤ Type max v₁ w) (X : C) :
@@ -514,11 +504,6 @@ theorem coyonedaEquiv_apply {X : C} {F : C ⥤ Type v₁} (f : coyoneda.obj (op 
     coyonedaEquiv f = f.app X (𝟙 X) :=
   rfl
 
-@[simp]
-theorem coyonedaEquiv_symm_app_apply {X : C} {F : C ⥤ Type v₁} (x : F.obj X) (Y : C)
-    (f : X ⟶ Y) : (coyonedaEquiv.symm x).app Y f = F.map f x :=
-  rfl
-
 lemma coyonedaEquiv_naturality {X Y : C} {F : C ⥤ Type v₁} (f : coyoneda.obj (op X) ⟶ F)
     (g : X ⟶ Y) : F.map g (coyonedaEquiv f) = coyonedaEquiv (coyoneda.map g.op ≫ f) := by
   change (f.app X ≫ F.map g) (𝟙 X) = f.app Y (g ≫ 𝟙 Y)
@@ -563,13 +548,7 @@ lemma coyonedaPairingExt {X : C × (C ⥤ Type v₁)} {x y : (coyonedaPairing C)
     (w : ∀ Y, x.app Y = y.app Y) : x = y :=
   NatTrans.ext (funext w)
 
-@[simp]
-theorem coyonedaPairing_map (P Q : C × (C ⥤ Type v₁)) (α : P ⟶ Q) (β : (coyonedaPairing C).obj P) :
-    (coyonedaPairing C).map α β = coyoneda.map α.1.op ≫ β ≫ α.2 :=
-  rfl
-
 universe w in
-
 variable {C} in
 
 def coyonedaCompUliftFunctorEquiv (F : C ⥤ Type max v₁ w) (X : Cᵒᵖ) :
@@ -664,10 +643,6 @@ variable {D : Type*} [Category.{v₁} D] (F : C ⥤ D)
 
 def yonedaMap (X : C) : yoneda.obj X ⟶ F.op ⋙ yoneda.obj (F.obj X) where
   app _ f := F.map f
-
-@[simp]
-lemma yonedaMap_app_apply {Y : C} {X : Cᵒᵖ} (f : X.unop ⟶ Y) :
-    (yonedaMap F Y).app X f = F.map f := rfl
 
 end
 

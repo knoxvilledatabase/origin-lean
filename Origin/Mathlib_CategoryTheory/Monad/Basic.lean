@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.Functor.FullyFaithful
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 
+noncomputable section
+
 /-!
 # Monads
 
@@ -122,26 +124,8 @@ instance : Category (Comonad C) where
 instance {T : Monad C} : Inhabited (MonadHom T T) :=
   ⟨𝟙 T⟩
 
-@[simp]
-theorem MonadHom.id_toNatTrans (T : Monad C) : (𝟙 T : T ⟶ T).toNatTrans = 𝟙 (T : C ⥤ C) :=
-  rfl
-
-@[simp]
-theorem MonadHom.comp_toNatTrans {T₁ T₂ T₃ : Monad C} (f : T₁ ⟶ T₂) (g : T₂ ⟶ T₃) :
-    (f ≫ g).toNatTrans = ((f.toNatTrans : _ ⟶ (T₂ : C ⥤ C)) ≫ g.toNatTrans : (T₁ : C ⥤ C) ⟶ T₃) :=
-  rfl
-
 instance {G : Comonad C} : Inhabited (ComonadHom G G) :=
   ⟨𝟙 G⟩
-
-@[simp]
-theorem ComonadHom.id_toNatTrans (T : Comonad C) : (𝟙 T : T ⟶ T).toNatTrans = 𝟙 (T : C ⥤ C) :=
-  rfl
-
-@[simp]
-theorem comp_toNatTrans {T₁ T₂ T₃ : Comonad C} (f : T₁ ⟶ T₂) (g : T₂ ⟶ T₃) :
-    (f ≫ g).toNatTrans = ((f.toNatTrans : _ ⟶ (T₂ : C ⥤ C)) ≫ g.toNatTrans : (T₁ : C ⥤ C) ⟶ T₃) :=
-  rfl
 
 @[simps]
 def MonadIso.mk {M N : Monad C} (f : (M : C ⥤ C) ≅ N)

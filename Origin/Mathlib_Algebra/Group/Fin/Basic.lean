@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Cast.Defs
 import Mathlib.Data.Nat.Defs
 import Mathlib.Data.Fin.Basic
 
+noncomputable section
+
 /-!
 # Fin is a group
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.HasLimits
 import Mathlib.CategoryTheory.Thin
 
+noncomputable section
+
 /-!
 # Wide pullbacks
 

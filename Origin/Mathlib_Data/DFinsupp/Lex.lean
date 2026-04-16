@@ -8,6 +8,8 @@ import Mathlib.Data.DFinsupp.Order
 import Mathlib.Data.DFinsupp.NeLocus
 import Mathlib.Order.WellFoundedSet
 
+noncomputable section
+
 /-!
 # Lexicographic order on finitely supported dependent functions
 
@@ -24,14 +26,6 @@ variable [∀ i, Zero (α i)]
 
 protected def Lex (r : ι → ι → Prop) (s : ∀ i, α i → α i → Prop) (x y : Π₀ i, α i) : Prop :=
   Pi.Lex r (s _) x y
-
-theorem _root_.Pi.lex_eq_dfinsupp_lex {r : ι → ι → Prop} {s : ∀ i, α i → α i → Prop}
-    (a b : Π₀ i, α i) : Pi.Lex r (s _) (a : ∀ i, α i) b = DFinsupp.Lex r s a b :=
-  rfl
-
-theorem lex_def {r : ι → ι → Prop} {s : ∀ i, α i → α i → Prop} {a b : Π₀ i, α i} :
-    DFinsupp.Lex r s a b ↔ ∃ j, (∀ d, r d j → a d = b d) ∧ s j (a j) (b j) :=
-  Iff.rfl
 
 instance [LT ι] [∀ i, LT (α i)] : LT (Lex (Π₀ i, α i)) :=
   ⟨fun f g ↦ DFinsupp.Lex (· < ·) (fun _ ↦ (· < ·)) (ofLex f) (ofLex g)⟩

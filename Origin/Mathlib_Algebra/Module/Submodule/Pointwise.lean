@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Submodule/Pointwise.lean
-Genuine: 44 | Conflates: 0 | Dissolved: 1 | Infrastructure: 17
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.BigOperators
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Order.Group.Action
 import Mathlib.RingTheory.Ideal.Span
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
+
+noncomputable section
 
 /-! # Pointwise instances on `Submodule`s
 
@@ -62,10 +64,6 @@ open Pointwise
 
 @[simp]
 theorem coe_set_neg (S : Submodule R M) : ↑(-S) = -(S : Set M) :=
-  rfl
-
-@[simp]
-theorem neg_toAddSubmonoid (S : Submodule R M) : (-S).toAddSubmonoid = -S.toAddSubmonoid :=
   rfl
 
 @[simp]
@@ -149,10 +147,6 @@ instance pointwiseAddCommMonoid : AddCommMonoid (Submodule R M) where
 theorem add_eq_sup (p q : Submodule R M) : p + q = p ⊔ q :=
   rfl
 
-@[simp]
-theorem zero_eq_bot : (0 : Submodule R M) = ⊥ :=
-  rfl
-
 instance : CanonicallyOrderedAddCommMonoid (Submodule R M) :=
   { Submodule.pointwiseAddCommMonoid,
     Submodule.completeLattice with
@@ -177,21 +171,6 @@ protected def pointwiseDistribMulAction : DistribMulAction α (Submodule R M) wh
 scoped[Pointwise] attribute [instance] Submodule.pointwiseDistribMulAction
 
 open Pointwise
-
-@[simp]
-theorem coe_pointwise_smul (a : α) (S : Submodule R M) : ↑(a • S) = a • (S : Set M) :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toAddSubmonoid (a : α) (S : Submodule R M) :
-    (a • S).toAddSubmonoid = a • S.toAddSubmonoid :=
-  rfl
-
-@[simp]
-theorem pointwise_smul_toAddSubgroup {R M : Type*} [Ring R] [AddCommGroup M] [DistribMulAction α M]
-    [Module R M] [SMulCommClass α R M] (a : α) (S : Submodule R M) :
-    (a • S).toAddSubgroup = a • S.toAddSubgroup :=
-  rfl
 
 theorem smul_mem_pointwise_smul (m : M) (a : α) (S : Submodule R M) : m ∈ S → a • m ∈ a • S :=
   (Set.smul_mem_smul_set : _ → _ ∈ a • (S : Set M))
@@ -230,7 +209,10 @@ section
 
 variable [Semiring α] [Module α M] [SMulCommClass α R M]
 
--- DISSOLVED: pointwiseMulActionWithZero
+protected def pointwiseMulActionWithZero : MulActionWithZero α (Submodule R M) :=
+  { Submodule.pointwiseDistribMulAction with
+    zero_smul := fun S =>
+      (congr_arg (fun f : M →ₗ[R] M => S.map f) (LinearMap.ext <| zero_smul α)).trans S.map_zero }
 
 scoped[Pointwise] attribute [instance] Submodule.pointwiseMulActionWithZero
 

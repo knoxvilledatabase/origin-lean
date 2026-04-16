@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Normed/Group/Uniform.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Topology.Algebra.UniformGroup.Basic
 import Mathlib.Topology.MetricSpace.Algebra
 import Mathlib.Topology.MetricSpace.IsometricSMul
+
+noncomputable section
 
 /-!
 # Normed groups are uniform groups
@@ -258,6 +260,14 @@ lemma locallyLipschitz_inv_iff : LocallyLipschitz f⁻¹ ↔ LocallyLipschitz f 
 lemma locallyLipschitzOn_inv_iff : LocallyLipschitzOn s f⁻¹ ↔ LocallyLipschitzOn s f := by
   simp [LocallyLipschitzOn]
 
+@[to_additive] alias ⟨LipschitzWith.of_inv, LipschitzWith.inv⟩ := lipschitzWith_inv_iff
+
+@[to_additive] alias ⟨AntilipschitzWith.of_inv, AntilipschitzWith.inv⟩ := antilipschitzWith_inv_iff
+
+@[to_additive] alias ⟨LipschitzOnWith.of_inv, LipschitzOnWith.inv⟩ := lipschitzOnWith_inv_iff
+
+@[to_additive] alias ⟨LocallyLipschitz.of_inv, LocallyLipschitz.inv⟩ := locallyLipschitz_inv_iff
+
 alias ⟨LocallyLipschitzOn.of_inv, LocallyLipschitzOn.inv⟩ := locallyLipschitzOn_inv_iff
 
 @[to_additive]
@@ -357,9 +367,7 @@ instance instMulNorm : Norm (SeparationQuotient E) where
   norm := lift Norm.norm fun _ _ h => h.norm_eq_norm'
 
 set_option linter.docPrime false in
-
 @[to_additive (attr := simp) norm_mk]
-theorem norm_mk' (p : E) : ‖mk p‖ = ‖p‖ := rfl
 
 @[to_additive]
 instance : NormedCommGroup (SeparationQuotient E) where
@@ -371,9 +379,7 @@ theorem mk_eq_one_iff {p : E} : mk p = 1 ↔ ‖p‖ = 0 := by
   rw [← norm_mk', norm_eq_zero']
 
 set_option linter.docPrime false in
-
 @[to_additive (attr := simp) nnnorm_mk]
-theorem nnnorm_mk' (p : E) : ‖mk p‖₊ = ‖p‖₊ := rfl
 
 end SeparationQuotient
 

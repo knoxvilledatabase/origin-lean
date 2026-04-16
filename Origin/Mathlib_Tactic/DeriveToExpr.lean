@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Deriving.Ord
 import Mathlib.Tactic.ToLevel
 
+noncomputable section
+
 /-!
 # A `ToExpr` derive handler
 

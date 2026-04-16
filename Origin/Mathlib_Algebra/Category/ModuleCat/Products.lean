@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Pi
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.Tactic.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # The concrete products in the category of modules are products in the categorical sense.
 -/

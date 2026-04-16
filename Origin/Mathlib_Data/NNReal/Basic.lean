@@ -11,6 +11,8 @@ import Mathlib.Data.Real.Pointwise
 import Mathlib.Data.NNReal.Defs
 import Mathlib.Order.ConditionallyCompleteLattice.Group
 
+noncomputable section
+
 /-!
 # Basic results on nonnegative real numbers
 

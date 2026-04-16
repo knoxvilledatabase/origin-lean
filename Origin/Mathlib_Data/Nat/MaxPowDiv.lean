@@ -7,6 +7,8 @@ import Mathlib.Algebra.Divisibility.Units
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # The maximal power of one natural number dividing another
 

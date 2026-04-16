@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Category.HeytAlg
 import Mathlib.Order.Hom.CompleteLattice
 
+noncomputable section
+
 /-!
 # The category of boolean algebras
 
@@ -32,19 +34,11 @@ instance instBooleanAlgebra (X : BoolAlg) : BooleanAlgebra X :=
 def of (α : Type*) [BooleanAlgebra α] : BoolAlg :=
   Bundled.of α
 
-@[simp]
-theorem coe_of (α : Type*) [BooleanAlgebra α] : ↥(of α) = α :=
-  rfl
-
 instance : Inhabited BoolAlg :=
   ⟨of PUnit⟩
 
 def toBddDistLat (X : BoolAlg) : BddDistLat :=
   BddDistLat.of X
-
-@[simp]
-theorem coe_toBddDistLat (X : BoolAlg) : ↥X.toBddDistLat = ↥X :=
-  rfl
 
 instance : LargeCategory.{u} BoolAlg :=
   InducedCategory.category toBddDistLat
@@ -90,11 +84,6 @@ def dualEquiv : BoolAlg ≌ BoolAlg where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end BoolAlg
-
-theorem boolAlg_dual_comp_forget_to_bddDistLat :
-    BoolAlg.dual ⋙ forget₂ BoolAlg BddDistLat =
-    forget₂ BoolAlg BddDistLat ⋙ BddDistLat.dual :=
-  rfl
 
 @[simps]
 def typeToBoolAlgOp : Type u ⥤ BoolAlgᵒᵖ where

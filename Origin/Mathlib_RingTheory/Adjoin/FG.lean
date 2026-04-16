@@ -8,6 +8,8 @@ import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.RingTheory.Polynomial.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
 
+noncomputable section
+
 /-!
 # Adjoining elements to form subalgebras
 

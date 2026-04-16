@@ -7,6 +7,8 @@ import Mathlib.Order.SetNotation
 import Mathlib.Tactic.Continuity
 import Mathlib.Tactic.FunProp
 
+noncomputable section
+
 /-!
 # Basic definitions about topological spaces
 

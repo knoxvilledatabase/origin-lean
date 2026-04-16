@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Span.Basic
 import Mathlib.LinearAlgebra.BilinearMap
 
+noncomputable section
+
 /-!
 # Images of pairs of submodules under bilinear maps
 

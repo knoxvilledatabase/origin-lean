@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Algebra.Star.NonUnitalSubalgebra
 
+noncomputable section
+
 /-! # Classes of C⋆-algebras
 
 This file defines classes for complex C⋆-algebras. These are (unital or non-unital, commutative or

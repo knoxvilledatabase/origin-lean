@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Ker
 
+noncomputable section
+
 /-!
 # Vertical line test for group homs
 
@@ -46,7 +48,6 @@ attribute [simps! coe] mgraph
 attribute [simps! coe] AddMonoidHom.mgraph
 
 set_option linter.existingAttributeWarning false in
-
 attribute [to_additive existing] coe_mgraph
 
 @[to_additive (attr := simp)]
@@ -134,7 +135,6 @@ attribute [simps! coe toSubmonoid] graph
 attribute [simps! coe toAddSubmonoid] AddMonoidHom.graph
 
 set_option linter.existingAttributeWarning false in
-
 attribute [to_additive existing] coe_graph graph_toSubmonoid
 
 @[to_additive]

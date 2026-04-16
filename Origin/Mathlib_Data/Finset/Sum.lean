@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Multiset.Sum
 import Mathlib.Data.Finset.Card
 
+noncomputable section
+
 /-!
 # Disjoint sum of finsets
 
@@ -29,10 +31,6 @@ def disjSum : Finset (α ⊕ β) :=
   ⟨s.1.disjSum t.1, s.2.disjSum t.2⟩
 
 @[simp]
-theorem val_disjSum : (s.disjSum t).1 = s.1.disjSum t.1 :=
-  rfl
-
-@[simp]
 theorem empty_disjSum : (∅ : Finset α).disjSum t = t.map Embedding.inr :=
   val_inj.1 <| Multiset.zero_disjSum _
 
@@ -47,12 +45,6 @@ theorem card_disjSum : (s.disjSum t).card = s.card + t.card :=
 theorem disjoint_map_inl_map_inr : Disjoint (s.map Embedding.inl) (t.map Embedding.inr) := by
   simp_rw [disjoint_left, mem_map]
   rintro x ⟨a, _, rfl⟩ ⟨b, _, ⟨⟩⟩
-
-@[simp]
-theorem map_inl_disjUnion_map_inr :
-    (s.map Embedding.inl).disjUnion (t.map Embedding.inr) (disjoint_map_inl_map_inr _ _) =
-      s.disjSum t :=
-  rfl
 
 variable {s t} {s₁ s₂ : Finset α} {t₁ t₂ : Finset β} {a : α} {b : β} {x : α ⊕ β}
 

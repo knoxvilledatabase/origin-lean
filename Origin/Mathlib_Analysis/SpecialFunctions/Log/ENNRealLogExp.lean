@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Log.ENNRealLog
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Basic
 import Mathlib.Topology.MetricSpace.Polish
 
+noncomputable section
+
 /-!
 # Properties of the extended logarithm and exponential
 
@@ -69,7 +71,6 @@ namespace ENNReal
 section OrderIso
 
 noncomputable
-
 def logOrderIso : ℝ≥0∞ ≃o EReal where
   toFun := log
   invFun := exp
@@ -77,17 +78,8 @@ def logOrderIso : ℝ≥0∞ ≃o EReal where
   right_inv x := log_exp x
   map_rel_iff' := by simp only [Equiv.coe_fn_mk, log_le_log_iff, forall_const]
 
-@[simp] lemma logOrderIso_apply (x : ℝ≥0∞) : logOrderIso x = log x := rfl
-
 noncomputable
-
 def _root_.EReal.expOrderIso := logOrderIso.symm
-
-@[simp] lemma _root_.EReal.expOrderIso_apply (x : EReal) : expOrderIso x = exp x := rfl
-
-@[simp] lemma logOrderIso_symm : logOrderIso.symm = expOrderIso := rfl
-
-@[simp] lemma _root_.EReal.expOrderIso_symm : expOrderIso.symm = logOrderIso := rfl
 
 end OrderIso
 
@@ -95,15 +87,7 @@ section Continuity
 
 noncomputable def logHomeomorph : ℝ≥0∞ ≃ₜ EReal := logOrderIso.toHomeomorph
 
-@[simp] lemma logHomeomorph_apply (x : ℝ≥0∞) : logHomeomorph x = log x := rfl
-
 noncomputable def _root_.EReal.expHomeomorph : EReal ≃ₜ ℝ≥0∞ := expOrderIso.toHomeomorph
-
-@[simp] lemma _root_.EReal.expHomeomorph_apply (x : EReal) : expHomeomorph x = exp x := rfl
-
-@[simp] lemma logHomeomorph_symm : logHomeomorph.symm = expHomeomorph := rfl
-
-@[simp] lemma _root_.EReal.expHomeomorph_symm : expHomeomorph.symm = logHomeomorph := rfl
 
 @[continuity, fun_prop]
 lemma continuous_log : Continuous log := logOrderIso.continuous

@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/SpecialFunctions/Complex/Arctan.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
+
+noncomputable section
 
 /-!
 # Complex arctangent
@@ -43,7 +45,19 @@ theorem tan_arctan {z : ℂ} (h₁ : z ≠ I) (h₂ : z ≠ -I) : tan (arctan z)
   rw [key, ← mul_div_mul_right _ _ z₂, sub_mul, add_mul, div_mul_cancel₀ _ z₂, one_mul,
     show _ / _ * I = -(I * I) * z by ring, I_mul_I, neg_neg, one_mul]
 
--- DISSOLVED: cos_ne_zero_of_arctan_bounds
+lemma cos_ne_zero_of_arctan_bounds {z : ℂ} (h₀ : z ≠ π / 2) (h₁ : -(π / 2) < z.re)
+    (h₂ : z.re ≤ π / 2) : cos z ≠ 0 := by
+  refine cos_ne_zero_iff.mpr (fun k ↦ ?_)
+  rw [ne_eq, Complex.ext_iff, not_and_or] at h₀ ⊢
+  norm_cast at h₀ ⊢
+  cases' h₀ with nr ni
+  · left; contrapose! nr
+    rw [nr, mul_div_assoc, neg_eq_neg_one_mul, mul_lt_mul_iff_of_pos_right (by positivity)] at h₁
+    rw [nr, ← one_mul (π / 2), mul_div_assoc, mul_le_mul_iff_of_pos_right (by positivity)] at h₂
+    norm_cast at h₁ h₂
+    change -1 < _ at h₁
+    rwa [show 2 * k + 1 = 1 by omega, Int.cast_one, one_mul] at nr
+  · exact Or.inr ni
 
 theorem arctan_tan {z : ℂ} (h₀ : z ≠ π / 2) (h₁ : -(π / 2) < z.re) (h₂ : z.re ≤ π / 2) :
     arctan (tan z) = z := by

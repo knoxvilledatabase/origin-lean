@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.FreeAlgebra
 import Mathlib.SetTheory.Cardinal.Free
 
+noncomputable section
+
 /-!
 # Cardinality of free algebras
 
@@ -55,9 +57,6 @@ variable (X : Type u)
 
 -- CONFLATES (assumes ground = zero): cardinalMk_eq_max
 theorem cardinalMk_eq_max [Nonempty X] [Nontrivial R] : #(FreeAlgebra R X) = #R ⊔ #X ⊔ ℵ₀ := by
-  simp
-
-theorem cardinalMk_eq [IsEmpty X] : #(FreeAlgebra R X) = #R := by
   simp
 
 theorem cardinalMk_le_max : #(FreeAlgebra R X) ≤ #R ⊔ #X ⊔ ℵ₀ := by

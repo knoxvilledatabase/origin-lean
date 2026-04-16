@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/FreeModule/Basic.lean
-Genuine: 11 | Conflates: 1 | Dissolved: 0 | Infrastructure: 16
+Genuine: 10 | Conflates: 1 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Data.Finsupp.Fintype
 import Mathlib.Data.Matrix.Defs
 import Mathlib.LinearAlgebra.Basis.Basic
 import Mathlib.LinearAlgebra.TensorProduct.Basis
+
+noncomputable section
 
 /-!
 # Free modules
@@ -97,7 +99,6 @@ theorem of_equiv' {P : Type v} [AddCommMonoid P] [Module R P] (_ : Module.Free R
   of_equiv e
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
-
 lemma of_ringEquiv {R R' M M'} [Semiring R] [AddCommMonoid M] [Module R M]
     [Semiring R'] [AddCommMonoid M'] [Module R' M']
     (e₁ : R ≃+* R') (e₂ : M ≃ₛₗ[RingHomClass.toRingHom e₁] M') [Module.Free R M] :
@@ -112,7 +113,6 @@ lemma of_ringEquiv {R R' M M'} [Semiring R] [AddCommMonoid M] [Module R M]
   exact of_basis (.ofRepr e')
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
-
 lemma iff_of_ringEquiv {R R' M M'} [Semiring R] [AddCommMonoid M] [Module R M]
     [Semiring R'] [AddCommMonoid M'] [Module R' M']
     (e₁ : R ≃+* R') (e₂ : M ≃ₛₗ[RingHomClass.toRingHom e₁] M') :

@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/PowerSeries/Order.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 11 | Infrastructure: 0
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
 import Mathlib.RingTheory.Multiplicity
 import Mathlib.RingTheory.PowerSeries.Basic
+
+noncomputable section
 
 /-! # Formal power series (in one variable) - Order
 
@@ -42,7 +44,10 @@ open multiplicity
 
 variable [Semiring R] {φ : R⟦X⟧}
 
--- DISSOLVED: exists_coeff_ne_zero_iff_ne_zero
+theorem exists_coeff_ne_zero_iff_ne_zero : (∃ n : ℕ, coeff R n φ ≠ 0) ↔ φ ≠ 0 := by
+  refine not_iff_not.mp ?_
+  push_neg
+  simp [(coeff R _).map_zero]
 
 def order (φ : R⟦X⟧) : ℕ∞ :=
   letI := Classical.decEq R
@@ -53,11 +58,26 @@ def order (φ : R⟦X⟧) : ℕ∞ :=
 theorem order_zero : order (0 : R⟦X⟧) = ⊤ :=
   dif_pos rfl
 
--- DISSOLVED: order_finite_iff_ne_zero
+theorem order_finite_iff_ne_zero : (order φ < ⊤) ↔ φ ≠ 0 := by
+  simp only [order]
+  constructor
+  · split_ifs with h <;> intro H
+    · simp at H
+    · exact h
+  · intro h
+    simp [h]
 
--- DISSOLVED: coeff_order
+theorem coeff_order (h : order φ < ⊤) : coeff R (φ.order.lift h) φ ≠ 0 := by
+  classical
+  simp only [order, order_finite_iff_ne_zero.mp h, not_false_iff, dif_neg]
+  generalize_proofs h
+  exact Nat.find_spec h
 
--- DISSOLVED: order_le
+theorem order_le (n : ℕ) (h : coeff R n φ ≠ 0) : order φ ≤ n := by
+  classical
+  rw [order, dif_neg]
+  · simpa using ⟨n, le_rfl, h⟩
+  · exact exists_coeff_ne_zero_iff_ne_zero.mp ⟨n, h⟩
 
 theorem coeff_of_lt_order (n : ℕ) (h : ↑n < order φ) : coeff R n φ = 0 := by
   contrapose! h
@@ -81,9 +101,18 @@ theorem le_order (φ : R⟦X⟧) (n : ℕ∞) (h : ∀ i : ℕ, ↑i < n → coe
     convert nat_le_order φ n _
     simpa using h
 
--- DISSOLVED: order_eq_nat
+theorem order_eq_nat {φ : R⟦X⟧} {n : ℕ} :
+    order φ = n ↔ coeff R n φ ≠ 0 ∧ ∀ i, i < n → coeff R i φ = 0 := by
+  classical
+  rcases eq_or_ne φ 0 with (rfl | hφ)
+  · simp
+  simp [order, dif_neg hφ, Nat.find_eq_iff]
 
--- DISSOLVED: order_eq
+theorem order_eq {φ : R⟦X⟧} {n : ℕ∞} :
+    order φ = n ↔ (∀ i : ℕ, ↑i = n → coeff R i φ ≠ 0) ∧ ∀ i : ℕ, ↑i < n → coeff R i φ = 0 := by
+  cases n with
+  | top => simp [ext_iff]
+  | coe n => simp [order_eq_nat]
 
 theorem min_order_le_order_add (φ ψ : R⟦X⟧) : min (order φ) (order ψ) ≤ order (φ + ψ) := by
   refine le_order _ _ ?_
@@ -140,7 +169,9 @@ theorem order_monomial (n : ℕ) (a : R) [Decidable (a = 0)] :
       rw [coeff_monomial, if_neg]
       exact ne_of_lt hi
 
--- DISSOLVED: order_monomial_of_ne_zero
+theorem order_monomial_of_ne_zero (n : ℕ) (a : R) (h : a ≠ 0) : order (monomial R n a) = n := by
+  classical
+  rw [order_monomial, if_neg h]
 
 theorem coeff_mul_of_lt_order {φ ψ : R⟦X⟧} {n : ℕ} (h : ↑n < ψ.order) :
     coeff R n (φ * ψ) = 0 := by
@@ -205,9 +236,13 @@ theorem order_eq_emultiplicity_X {R : Type*} [Semiring R] (φ : R⟦X⟧) :
         · rw [← hn, ENat.coe_lt_coe]
           simp
 
--- DISSOLVED: divided_by_X_pow_order
+def divided_by_X_pow_order {f : PowerSeries R} (hf : f ≠ 0) : R⟦X⟧ :=
+  (exists_eq_mul_right_of_dvd (X_pow_order_dvd (order_finite_iff_ne_zero.2 hf))).choose
 
--- DISSOLVED: self_eq_X_pow_order_mul_divided_by_X_pow_order
+theorem self_eq_X_pow_order_mul_divided_by_X_pow_order {f : R⟦X⟧} (hf : f ≠ 0) :
+    X ^ f.order.lift (order_finite_iff_ne_zero.mpr hf) * divided_by_X_pow_order hf = f :=
+  haveI dvd := X_pow_order_dvd (order_finite_iff_ne_zero.mpr hf)
+  (exists_eq_mul_right_of_dvd dvd).choose_spec.symm
 
 end OrderBasic
 
@@ -245,9 +280,32 @@ theorem order_mul (φ ψ : R⟦X⟧) : order (φ * ψ) = order φ + order ψ := 
   simp only [order_eq_emultiplicity_X]
   rw [emultiplicity_mul X_prime]
 
--- DISSOLVED: divided_by_X_pow_order_of_X_eq_one
+@[simp]
+theorem divided_by_X_pow_order_of_X_eq_one : divided_by_X_pow_order X_ne_zero = (1 : R⟦X⟧) := by
+  rw [← mul_eq_left₀ X_ne_zero]
+  simpa using self_eq_X_pow_order_mul_divided_by_X_pow_order (@X_ne_zero R _ _)
 
--- DISSOLVED: divided_by_X_pow_orderMul
+theorem divided_by_X_pow_orderMul {f g : R⟦X⟧} (hf : f ≠ 0) (hg : g ≠ 0) :
+    divided_by_X_pow_order hf * divided_by_X_pow_order hg =
+      divided_by_X_pow_order (mul_ne_zero hf hg) := by
+  set df := f.order.lift (order_finite_iff_ne_zero.mpr hf)
+  set dg := g.order.lift (order_finite_iff_ne_zero.mpr hg)
+  set dfg := (f * g).order.lift (order_finite_iff_ne_zero.mpr (mul_ne_zero hf hg)) with hdfg
+  have H_add_d : df + dg = dfg := by
+    simp_all [order_mul f g]
+  have H := self_eq_X_pow_order_mul_divided_by_X_pow_order (mul_ne_zero hf hg)
+  have : f * g = X ^ dfg * (divided_by_X_pow_order hf * divided_by_X_pow_order hg) := by
+    calc
+      f * g = X ^ df * divided_by_X_pow_order hf * (X ^ dg * divided_by_X_pow_order hg) := by
+        rw [self_eq_X_pow_order_mul_divided_by_X_pow_order,
+          self_eq_X_pow_order_mul_divided_by_X_pow_order]
+      _ = X ^ df * X ^ dg * divided_by_X_pow_order hf * divided_by_X_pow_order hg := by ring
+      _ = X ^ (df + dg) * divided_by_X_pow_order hf * divided_by_X_pow_order hg := by rw [pow_add]
+      _ = X ^ dfg * divided_by_X_pow_order hf * divided_by_X_pow_order hg := by rw [H_add_d]
+      _ = X ^ dfg * (divided_by_X_pow_order hf * divided_by_X_pow_order hg) := by rw [mul_assoc]
+  refine (IsLeftCancelMulZero.mul_left_cancel_of_ne_zero (pow_ne_zero dfg X_ne_zero) ?_).symm
+  simp only [this] at H
+  convert H
 
 end OrderIsDomain
 

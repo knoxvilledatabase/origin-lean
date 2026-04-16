@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Matrix/SpecialLinearGroup.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 3 | Infrastructure: 28
+Genuine: 34 | Conflates: 2 | Dissolved: 0 | Infrastructure: 28
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.Adjugate
 import Mathlib.LinearAlgebra.Matrix.Transvection
 import Mathlib.RingTheory.RootsOfUnity.Basic
+
+noncomputable section
 
 /-!
 # The Special Linear group $SL(n, R)$
@@ -121,9 +123,6 @@ section CoeLemmas
 
 variable (A B : SpecialLinearGroup n R)
 
-theorem coe_mk (A : Matrix n n R) (h : det A = 1) : ↑(⟨A, h⟩ : SpecialLinearGroup n R) = A :=
-  rfl
-
 @[simp]
 theorem coe_inv : ↑ₘ(A⁻¹) = adjugate A :=
   rfl
@@ -144,13 +143,14 @@ theorem det_coe : det ↑ₘA = 1 :=
 theorem coe_pow (m : ℕ) : ↑ₘ(A ^ m) = ↑ₘA ^ m :=
   rfl
 
-@[simp]
-lemma coe_transpose (A : SpecialLinearGroup n R) : ↑ₘAᵀ = (↑ₘA)ᵀ :=
-  rfl
+-- CONFLATES (assumes ground = zero): det_ne_zero
+theorem det_ne_zero [Nontrivial R] (g : SpecialLinearGroup n R) : det ↑ₘg ≠ 0 := by
+  rw [g.det_coe]
+  norm_num
 
--- DISSOLVED: det_ne_zero
-
--- DISSOLVED: row_ne_zero
+-- CONFLATES (assumes ground = zero): row_ne_zero
+theorem row_ne_zero [Nontrivial R] (g : SpecialLinearGroup n R) (i : n) : g i ≠ 0 := fun h =>
+  g.det_ne_zero <| det_eq_zero_of_row_eq_zero i <| by simp [h]
 
 end CoeLemmas
 
@@ -170,22 +170,6 @@ def toLin' : SpecialLinearGroup n R →* (n → R) ≃ₗ[R] n → R where
       (by rw [← toLin'_mul, ← coe_mul, inv_mul_cancel, coe_one, toLin'_one])
   map_one' := LinearEquiv.toLinearMap_injective Matrix.toLin'_one
   map_mul' A B := LinearEquiv.toLinearMap_injective <| Matrix.toLin'_mul ↑ₘA ↑ₘB
-
-theorem toLin'_apply (A : SpecialLinearGroup n R) (v : n → R) :
-    SpecialLinearGroup.toLin' A v = Matrix.toLin' (↑ₘA) v :=
-  rfl
-
-theorem toLin'_to_linearMap (A : SpecialLinearGroup n R) :
-    ↑(SpecialLinearGroup.toLin' A) = Matrix.toLin' ↑ₘA :=
-  rfl
-
-theorem toLin'_symm_apply (A : SpecialLinearGroup n R) (v : n → R) :
-    A.toLin'.symm v = Matrix.toLin' (↑ₘA⁻¹) v :=
-  rfl
-
-theorem toLin'_symm_to_linearMap (A : SpecialLinearGroup n R) :
-    ↑A.toLin'.symm = Matrix.toLin' ↑ₘA⁻¹ :=
-  rfl
 
 theorem toLin'_injective :
     Function.Injective ↑(toLin' : SpecialLinearGroup n R →* (n → R) ≃ₗ[R] n → R) := fun _ _ h =>
@@ -332,7 +316,14 @@ theorem fin_two_induction (P : SL(2, R) → Prop)
   convert h (m 0 0) (m 0 1) (m 1 0) (m 1 1) (by rwa [det_fin_two] at hm)
   ext i j; fin_cases i <;> fin_cases j <;> rfl
 
--- DISSOLVED: fin_two_exists_eq_mk_of_apply_zero_one_eq_zero
+theorem fin_two_exists_eq_mk_of_apply_zero_one_eq_zero {R : Type*} [Field R] (g : SL(2, R))
+    (hg : g 1 0 = 0) :
+    ∃ (a b : R) (h : a ≠ 0), g = (⟨!![a, b; 0, a⁻¹], by simp [h]⟩ : SL(2, R)) := by
+  induction' g using Matrix.SpecialLinearGroup.fin_two_induction with a b c d h_det
+  replace hg : c = 0 := by simpa using hg
+  have had : a * d = 1 := by rwa [hg, mul_zero, sub_zero] at h_det
+  refine ⟨a, b, left_ne_zero_of_mul_eq_one had, ?_⟩
+  simp_rw [eq_inv_of_mul_eq_one_right had, hg]
 
 lemma isCoprime_row (A : SL(2, R)) (i : Fin 2) : IsCoprime (A i 0) (A i 1) := by
   refine match i with
@@ -401,9 +392,6 @@ def S : SL(2, ℤ) :=
 
 def T : SL(2, ℤ) :=
   ⟨!![1, 1; 0, 1], by norm_num [Matrix.det_fin_two_of]⟩
-
-theorem coe_S : ↑S = !![0, -1; 1, 0] :=
-  rfl
 
 theorem coe_T : ↑T = (!![1, 1; 0, 1] : Matrix _ _ ℤ) :=
   rfl

@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 import Origin.Core
 import Mathlib.Topology.Specialization
 
+noncomputable section
+
 /-!
 # Category of Alexandrov-discrete topological spaces
 
@@ -38,14 +40,7 @@ instance forgetToTop_full : (forget₂ AlexDisc TopCat).Full := BundledHom.forge
 
 instance forgetToTop_faithful : (forget₂ AlexDisc TopCat).Faithful where
 
-@[simp] lemma coe_forgetToTop (X : AlexDisc) : ↥((forget₂ _ TopCat).obj X) = X := rfl
-
 def of (α : Type*) [TopologicalSpace α] [AlexandrovDiscrete α] : AlexDisc := ⟨α, ⟨⟩⟩
-
-@[simp] lemma coe_of (α : Type*) [TopologicalSpace α] [AlexandrovDiscrete α] : ↥(of α) = α := rfl
-
-@[simp] lemma forgetToTop_of (α : Type*) [TopologicalSpace α] [AlexandrovDiscrete α] :
-  (forget₂ AlexDisc TopCat).obj (of α) = TopCat.of α := rfl
 
 attribute [local instance] CategoryTheory.ConcreteCategory.instFunLike
 

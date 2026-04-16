@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Meta.DiscrTree
 
+noncomputable section
+
 /-!
 # Additions to `Lean.Meta.DiscrTree`
 -/

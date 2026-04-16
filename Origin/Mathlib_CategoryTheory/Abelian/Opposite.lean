@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Abelian.Basic
 import Mathlib.CategoryTheory.Preadditive.Opposite
 import Mathlib.CategoryTheory.Limits.Opposites
 
+noncomputable section
+
 /-!
 # The opposite of an abelian category is abelian.
 -/
@@ -92,10 +94,6 @@ def cokernelOpOp : cokernel f.op ≅ Opposite.op (kernel f) :=
 @[simps!]
 def kernelUnopUnop : kernel g.unop ≅ (cokernel g).unop :=
   (kernelUnopOp g).unop.symm
-
-theorem kernel.ι_unop :
-    (kernel.ι g.unop).op = eqToHom (Opposite.op_unop _) ≫ cokernel.π g ≫ (kernelUnopOp g).inv := by
-  simp
 
 theorem cokernel.π_unop :
     (cokernel.π g.unop).op =

@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/FreeMonoid/Basic.lean
-Genuine: 44 | Conflates: 0 | Dissolved: 1 | Infrastructure: 35
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 35
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.List
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Algebra.Group.Units.Basic
+
+noncomputable section
 
 /-!
 # Free monoid over a given alphabet
@@ -33,22 +35,7 @@ def toList : FreeMonoid α ≃ List α := Equiv.refl _
 def ofList : List α ≃ FreeMonoid α := Equiv.refl _
 
 @[to_additive (attr := simp)]
-theorem toList_symm : (@toList α).symm = ofList := rfl
-
-@[to_additive (attr := simp)]
-theorem ofList_symm : (@ofList α).symm = toList := rfl
-
-@[to_additive (attr := simp)]
 theorem toList_ofList (l : List α) : toList (ofList l) = l := rfl
-
-@[to_additive (attr := simp)]
-theorem ofList_toList (xs : FreeMonoid α) : ofList (toList xs) = xs := rfl
-
-@[to_additive (attr := simp)]
-theorem toList_comp_ofList : @toList α ∘ ofList = id := rfl
-
-@[to_additive (attr := simp)]
-theorem ofList_comp_toList : @ofList α ∘ toList = id := rfl
 
 @[to_additive]
 instance : CancelMonoid (FreeMonoid α) where
@@ -67,16 +54,7 @@ instance : Inhabited (FreeMonoid α) := ⟨1⟩
 instance [IsEmpty α] : Unique (FreeMonoid α) := inferInstanceAs <| Unique (List α)
 
 @[to_additive (attr := simp)]
-theorem toList_one : toList (1 : FreeMonoid α) = [] := rfl
-
-@[to_additive (attr := simp)]
-theorem ofList_nil : ofList ([] : List α) = 1 := rfl
-
-@[to_additive (attr := simp)]
 theorem toList_mul (xs ys : FreeMonoid α) : toList (xs * ys) = toList xs ++ toList ys := rfl
-
-@[to_additive (attr := simp)]
-theorem ofList_append (xs ys : List α) : ofList (xs ++ ys) = ofList xs * ofList ys := rfl
 
 @[to_additive (attr := simp)]
 theorem toList_prod (xs : List (FreeMonoid α)) : toList xs.prod = (xs.map toList).flatten := by
@@ -90,18 +68,6 @@ alias _root_.FreeAddMonoid.ofList_join := _root_.FreeAddMonoid.ofList_flatten
 
 @[to_additive "Embeds an element of `α` into `FreeAddMonoid α` as a singleton list."]
 def of (x : α) : FreeMonoid α := ofList [x]
-
-@[to_additive (attr := simp)]
-theorem toList_of (x : α) : toList (of x) = [x] := rfl
-
-@[to_additive]
-theorem ofList_singleton (x : α) : ofList [x] = of x := rfl
-
-@[to_additive (attr := simp)]
-theorem ofList_cons (x : α) (xs : List α) : ofList (x :: xs) = of x * ofList xs := rfl
-
-@[to_additive]
-theorem toList_of_mul (x : α) (xs : FreeMonoid α) : toList (of x * xs) = x :: toList xs := rfl
 
 @[to_additive]
 theorem of_injective : Function.Injective (@of α) := List.singleton_injective
@@ -141,7 +107,11 @@ theorem length_eq_three {v : FreeMonoid α} : v.length = 3 ↔ ∃ (a b c : α),
 theorem length_mul (a b : FreeMonoid α) : (a * b).length = a.length + b.length :=
   List.length_append _ _
 
--- DISSOLVED: of_ne_one
+@[to_additive (attr := simp)]
+theorem of_ne_one (a : α) : of a ≠ 1 := by
+  intro h
+  have := congrArg FreeMonoid.length h
+  simp only [length_of, length_one, Nat.succ_ne_self] at this
 
 @[to_additive (attr := simp)]
 theorem one_ne_of (a : α) : 1 ≠ of a := of_ne_one _ |>.symm
@@ -178,15 +148,6 @@ end Mem
 def recOn {C : FreeMonoid α → Sort*} (xs : FreeMonoid α) (h0 : C 1)
     (ih : ∀ x xs, C xs → C (of x * xs)) : C xs := List.rec h0 ih xs
 
-@[to_additive (attr := simp)]
-theorem recOn_one {C : FreeMonoid α → Sort*} (h0 : C 1) (ih : ∀ x xs, C xs → C (of x * xs)) :
-    @recOn α C 1 h0 ih = h0 := rfl
-
-@[to_additive (attr := simp)]
-theorem recOn_of_mul {C : FreeMonoid α → Sort*} (x : α) (xs : FreeMonoid α) (h0 : C 1)
-    (ih : ∀ x xs, C xs → C (of x * xs)) : @recOn α C (of x * xs) h0 ih = ih x xs (recOn xs h0 ih) :=
-  rfl
-
 /-! ### Induction -/
 
 section induction_principles
@@ -210,14 +171,6 @@ end induction_principles
   `FreeAddMonoid.of x + xs` instead of `[]` and `x :: xs`."]
 def casesOn {C : FreeMonoid α → Sort*} (xs : FreeMonoid α) (h0 : C 1)
     (ih : ∀ x xs, C (of x * xs)) : C xs := List.casesOn xs h0 ih
-
-@[to_additive (attr := simp)]
-theorem casesOn_one {C : FreeMonoid α → Sort*} (h0 : C 1) (ih : ∀ x xs, C (of x * xs)) :
-    @casesOn α C 1 h0 ih = h0 := rfl
-
-@[to_additive (attr := simp)]
-theorem casesOn_of_mul {C : FreeMonoid α → Sort*} (x : α) (xs : FreeMonoid α) (h0 : C 1)
-    (ih : ∀ x xs, C (of x * xs)) : @casesOn α C (of x * xs) h0 ih = ih x xs := rfl
 
 @[to_additive (attr := ext)]
 theorem hom_eq ⦃f g : FreeMonoid α →* M⦄ (h : ∀ x, f (of x) = g (of x)) : f = g :=
@@ -250,15 +203,9 @@ def lift : (α → M) ≃ (FreeMonoid α →* M) where
 theorem lift_ofList (f : α → M) (l : List α) : lift f (ofList l) = (l.map f).prod :=
   prodAux_eq _
 
-@[to_additive (attr := simp)]
-theorem lift_symm_apply (f : FreeMonoid α →* M) : lift.symm f = f ∘ of := rfl
-
 @[to_additive]
 theorem lift_apply (f : α → M) (l : FreeMonoid α) : lift f l = ((toList l).map f).prod :=
   prodAux_eq _
-
-@[to_additive]
-theorem lift_comp_of (f : α → M) : lift f ∘ of = f := rfl
 
 @[to_additive (attr := simp)]
 theorem lift_eval_of (f : α → M) (x : α) : lift f (of x) = f x := rfl
@@ -280,21 +227,6 @@ def mkMulAction (f : α → β → β) : MulAction (FreeMonoid α) β where
   smul l b := l.toList.foldr f b
   one_smul _ := rfl
   mul_smul _ _ _ := List.foldr_append _ _ _ _
-
-@[to_additive]
-theorem smul_def (f : α → β → β) (l : FreeMonoid α) (b : β) :
-    haveI := mkMulAction f
-    l • b = l.toList.foldr f b := rfl
-
-@[to_additive]
-theorem ofList_smul (f : α → β → β) (l : List α) (b : β) :
-    haveI := mkMulAction f
-    ofList l • b = l.foldr f b := rfl
-
-@[to_additive (attr := simp)]
-theorem of_smul (f : α → β → β) (x : α) (y : β) :
-    (haveI := mkMulAction f
-    of x • y) = f x y := rfl
 
 /-! ### map -/
 
@@ -320,12 +252,6 @@ theorem map_map {α₁ : Type*} {g : α₁ → α} {x : FreeMonoid α₁} :
     map f (map g x) = map (f ∘ g) x := by
   unfold map
   simp only [MonoidHom.coe_mk, OneHom.coe_mk, toList_ofList, List.map_map]
-
-@[to_additive]
-theorem toList_map (f : α → β) (xs : FreeMonoid α) : toList (map f xs) = xs.toList.map f := rfl
-
-@[to_additive]
-theorem ofList_map (f : α → β) (xs : List α) : ofList (xs.map f) = map f (ofList xs) := rfl
 
 @[to_additive]
 theorem lift_of_comp_eq_map (f : α → β) : (lift fun x ↦ of (f x)) = map f := hom_eq fun _ ↦ rfl
@@ -374,9 +300,6 @@ section Reverse
 
 @[to_additive "reverses the symbols in an additive free monoid element"]
 def reverse : FreeMonoid α → FreeMonoid α := List.reverse
-
-@[to_additive (attr := simp)]
-theorem reverse_of (a : α) : reverse (of a) = of a := rfl
 
 @[to_additive]
 theorem reverse_mul {a b : FreeMonoid α} : reverse (a * b) = reverse b * reverse a :=

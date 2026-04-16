@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Notation
 import Mathlib.Data.String.Defs
 import Mathlib.Tactic.Basic
 
+noncomputable section
+
 /-!
 # Miscellaneous lemmas about strings
 -/

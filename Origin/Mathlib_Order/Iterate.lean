@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Order.Monotone.Basic
 
+noncomputable section
+
 /-!
 # Inequalities on iterates
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupWithZero.Indicator
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Topology.Instances.ENNReal
 
+noncomputable section
+
 /-!
 # Semicontinuous maps
 

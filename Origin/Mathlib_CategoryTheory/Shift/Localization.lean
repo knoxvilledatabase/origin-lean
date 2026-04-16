@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Shift.Induced
 import Mathlib.CategoryTheory.Localization.HasLocalization
 import Mathlib.CategoryTheory.Localization.LocalizerMorphism
 
+noncomputable section
+
 /-!
 # The shift induced on a localized category
 

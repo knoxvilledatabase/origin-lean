@@ -1,10 +1,12 @@
 /-
 Extracted from Order/Fin/Basic.lean
-Genuine: 37 | Conflates: 0 | Dissolved: 5 | Infrastructure: 10
+Genuine: 39 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Fin.Basic
 import Mathlib.Order.Hom.Set
+
+noncomputable section
 
 /-!
 # `Fin n` forms a bounded linear order
@@ -63,8 +65,6 @@ instance instLattice      : Lattice (Fin n)      := inferInstance
 
 /-! ### Miscellaneous lemmas -/
 
-lemma top_eq_last (n : ℕ) : ⊤ = Fin.last n := rfl
-
 lemma bot_eq_zero (n : ℕ) : ⊥ = (0 : Fin (n + 1)) := rfl
 
 -- DISSOLVED: rev_bot
@@ -79,9 +79,11 @@ section ToFin
 
 variable {α : Type*} [Preorder α] {f : α → Fin (n + 1)}
 
--- DISSOLVED: strictMono_pred_comp
+lemma strictMono_pred_comp (hf : ∀ a, f a ≠ 0) (hf₂ : StrictMono f) :
+    StrictMono (fun a => pred (f a) (hf a)) := fun _ _ h => pred_lt_pred_iff.2 (hf₂ h)
 
--- DISSOLVED: monotone_pred_comp
+lemma monotone_pred_comp (hf : ∀ a, f a ≠ 0) (hf₂ : Monotone f) :
+    Monotone (fun a => pred (f a) (hf a)) := fun _ _ h => pred_le_pred_iff.2 (hf₂ h)
 
 lemma strictMono_castPred_comp (hf : ∀ a, f a ≠ last n) (hf₂ : StrictMono f) :
     StrictMono (fun a => castPred (f a) (hf a)) := fun _ _ h => castPred_lt_castPred_iff.2 (hf₂ h)
@@ -179,17 +181,11 @@ def castOrderIso (eq : n = m) : Fin n ≃o Fin m where
 @[simp]
 lemma symm_castOrderIso (h : n = m) : (castOrderIso h).symm = castOrderIso h.symm := by subst h; rfl
 
-@[simp]
-lemma castOrderIso_refl (h : n = n := rfl) : castOrderIso h = OrderIso.refl (Fin n) := by ext; simp
-
 lemma castOrderIso_toEquiv (h : n = m) : (castOrderIso h).toEquiv = Equiv.cast (h ▸ rfl) := by
   subst h; rfl
 
 @[simps! apply toEquiv]
 def revOrderIso : (Fin n)ᵒᵈ ≃o Fin n := ⟨OrderDual.ofDual.trans revPerm, rev_le_rev⟩
-
-@[simp]
-lemma revOrderIso_symm_apply (i : Fin n) : revOrderIso.symm i = OrderDual.toDual (rev i) := rfl
 
 /-! #### Order embeddings -/
 
@@ -199,8 +195,6 @@ def valOrderEmb (n) : Fin n ↪o ℕ := ⟨valEmbedding, Iff.rfl⟩
 instance Lt.isWellOrder (n) : IsWellOrder (Fin n) (· < ·) := (valOrderEmb n).isWellOrder
 
 def succOrderEmb (n : ℕ) : Fin n ↪o Fin (n + 1) := .ofStrictMono succ strictMono_succ
-
-@[simp, norm_cast] lemma coe_succOrderEmb : ⇑(succOrderEmb n) = Fin.succ := rfl
 
 @[simps! apply toEmbedding]
 def castLEOrderEmb (h : n ≤ m) : Fin n ↪o Fin m := .ofStrictMono (castLE h) (strictMono_castLE h)

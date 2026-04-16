@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Int/Defs.lean
-Genuine: 104 | Conflates: 0 | Dissolved: 11 | Infrastructure: 19
+Genuine: 113 | Conflates: 1 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Data.Int.Notation
@@ -9,6 +9,8 @@ import Mathlib.Algebra.Group.ZeroOne
 import Mathlib.Logic.Nontrivial.Defs
 import Mathlib.Tactic.Convert
 import Mathlib.Tactic.Lift
+
+noncomputable section
 
 /-!
 # Basic operations on the integers
@@ -60,7 +62,8 @@ attribute [simp] natAbs_pos
 
 protected lemma one_pos : 0 < (1 : Int) := Int.zero_lt_one
 
--- DISSOLVED: one_ne_zero
+-- CONFLATES (assumes ground = zero): one_ne_zero
+protected lemma one_ne_zero : (1 : ℤ) ≠ 0 := by decide
 
 protected lemma one_nonneg : 0 ≤ (1 : ℤ) := Int.le_of_lt Int.zero_lt_one
 
@@ -89,30 +92,20 @@ protected lemma sub_nonneg : 0 ≤ a - b ↔ b ≤ a := ⟨Int.le_of_sub_nonneg,
 
 instance instNontrivial : Nontrivial ℤ := ⟨⟨0, 1, Int.zero_ne_one⟩⟩
 
-protected theorem ofNat_add_out (m n : ℕ) : ↑m + ↑n = (↑(m + n) : ℤ) := rfl
-
-protected theorem ofNat_mul_out (m n : ℕ) : ↑m * ↑n = (↑(m * n) : ℤ) := rfl
-
-protected theorem ofNat_add_one_out (n : ℕ) : ↑n + (1 : ℤ) = ↑(succ n) := rfl
-
 @[simp] lemma ofNat_injective : Function.Injective ofNat := @Int.ofNat.inj
 
 @[simp] lemma ofNat_eq_natCast (n : ℕ) : Int.ofNat n = n := rfl
 
-protected lemma natCast_eq_ofNat (n : ℕ) : ↑n = Int.ofNat n := rfl
-
 @[norm_cast] lemma natCast_inj {m n : ℕ} : (m : ℤ) = (n : ℤ) ↔ m = n := ofNat_inj
-
-@[simp, norm_cast] lemma natAbs_cast (n : ℕ) : natAbs ↑n = n := rfl
 
 @[norm_cast]
 protected lemma natCast_sub {n m : ℕ} : n ≤ m → (↑(m - n) : ℤ) = ↑m - ↑n := ofNat_sub
 
 @[simp, nolint simpNF] lemma natCast_eq_zero {n : ℕ} : (n : ℤ) = 0 ↔ n = 0 := by omega
 
--- DISSOLVED: natCast_ne_zero
+lemma natCast_ne_zero {n : ℕ} : (n : ℤ) ≠ 0 ↔ n ≠ 0 := by omega
 
--- DISSOLVED: natCast_ne_zero_iff_pos
+lemma natCast_ne_zero_iff_pos {n : ℕ} : (n : ℤ) ≠ 0 ↔ 0 < n := by omega
 
 @[simp, nolint simpNF] lemma natCast_pos {n : ℕ} : (0 : ℤ) < n ↔ 0 < n := by omega
 
@@ -121,10 +114,6 @@ lemma natCast_succ_pos (n : ℕ) : 0 < (n.succ : ℤ) := natCast_pos.2 n.succ_po
 @[simp, nolint simpNF] lemma natCast_nonpos_iff {n : ℕ} : (n : ℤ) ≤ 0 ↔ n = 0 := by omega
 
 lemma natCast_nonneg (n : ℕ) : 0 ≤ (n : ℤ) := ofNat_le.2 (Nat.zero_le _)
-
-@[simp] lemma sign_natCast_add_one (n : ℕ) : sign (n + 1) = 1 := rfl
-
-@[simp, norm_cast] lemma cast_id {n : ℤ} : Int.cast n = n := rfl
 
 protected lemma two_mul : ∀ n : ℤ, 2 * n = n + n
   | (n : ℕ) => by norm_cast; exact n.two_mul
@@ -144,8 +133,6 @@ protected lemma mul_nonneg_iff_of_pos_right (hb : 0 < b) : 0 ≤ a * b ↔ 0 ≤
 def succ (a : ℤ) := a + 1
 
 def pred (a : ℤ) := a - 1
-
-lemma natCast_succ (n : ℕ) : (Nat.succ n : ℤ) = Int.succ n := rfl
 
 lemma pred_succ (a : ℤ) : pred (succ a) = a := Int.add_sub_cancel _ _
 
@@ -322,8 +309,6 @@ end strongRec
 
 /-! ### nat abs -/
 
-@[simp] lemma natAbs_ofNat' (n : ℕ) : natAbs (ofNat n) = n := rfl
-
 lemma natAbs_add_of_nonneg : ∀ {a b : Int}, 0 ≤ a → 0 ≤ b → natAbs (a + b) = natAbs a + natAbs b
   | ofNat _, ofNat _, _, _ => rfl
 
@@ -350,18 +335,12 @@ alias natAbs_pow_two := natAbs_sq
 
 /-! ### `/`  -/
 
-@[simp, norm_cast] lemma natCast_div (m n : ℕ) : ((m / n : ℕ) : ℤ) = m / n := rfl
-
-lemma natCast_ediv (m n : ℕ) : ((m / n : ℕ) : ℤ) = ediv m n := rfl
-
 lemma ediv_of_neg_of_pos {a b : ℤ} (Ha : a < 0) (Hb : 0 < b) : ediv a b = -((-a - 1) / b + 1) :=
   match a, b, eq_negSucc_of_lt_zero Ha, eq_succ_of_zero_lt Hb with
   | _, _, ⟨m, rfl⟩, ⟨n, rfl⟩ => by
     rw [show (- -[m+1] : ℤ) = (m + 1 : ℤ) by rfl]; rw [Int.add_sub_cancel]; rfl
 
 /-! ### mod -/
-
-@[simp, norm_cast] lemma natCast_mod (m n : ℕ) : (↑(m % n) : ℤ) = ↑m % ↑n := rfl
 
 lemma add_emod_eq_add_mod_right {m n k : ℤ} (i : ℤ) (H : m % n = k % n) :
     (m + i) % n = (k + i) % n := by rw [← emod_add_emod, ← emod_add_emod k, H]
@@ -399,7 +378,11 @@ lemma dvd_mul_of_div_dvd (h : b ∣ a) (hdiv : a / b ∣ c) : a ∣ b * c := by
   rw [← Int.mul_assoc, Int.mul_comm _ (a / b), Int.ediv_mul_cancel h]
   exact Int.dvd_mul_right a e
 
--- DISSOLVED: div_dvd_iff_dvd_mul
+@[simp] lemma div_dvd_iff_dvd_mul (h : b ∣ a) (hb : b ≠ 0) : a / b ∣ c ↔ a ∣ b * c :=
+  exists_congr <| fun d ↦ by
+  have := Int.dvd_trans (Int.dvd_mul_left _ _) (Int.mul_dvd_mul_left d h)
+  rw [eq_comm, Int.mul_comm, ← Int.mul_ediv_assoc d h, Int.ediv_eq_iff_eq_mul_right hb this,
+    Int.mul_comm, eq_comm]
 
 lemma mul_dvd_of_dvd_div (hcb : c ∣ b) (h : a ∣ b / c) : c * a ∣ b :=
   have ⟨d, hd⟩ := h
@@ -467,11 +450,19 @@ lemma natAbs_ediv (a b : ℤ) (H : b ∣ a) : natAbs (a / b) = natAbs a / natAbs
     _ = natAbs (a / b * b) / natAbs b := by rw [natAbs_mul (a / b) b]
     _ = natAbs a / natAbs b := by rw [Int.ediv_mul_cancel H]
 
--- DISSOLVED: dvd_of_mul_dvd_mul_left
+lemma dvd_of_mul_dvd_mul_left (ha : a ≠ 0) (h : a * m ∣ a * n) : m ∣ n := by
+  obtain ⟨b, hb⟩ := h
+  rw [Int.mul_assoc, Int.mul_eq_mul_left_iff ha] at hb
+  exact ⟨_, hb⟩
 
--- DISSOLVED: dvd_of_mul_dvd_mul_right
+lemma dvd_of_mul_dvd_mul_right (ha : a ≠ 0) (h : m * a ∣ n * a) : m ∣ n :=
+  dvd_of_mul_dvd_mul_left ha (by simpa [Int.mul_comm] using h)
 
--- DISSOLVED: eq_mul_div_of_mul_eq_mul_of_dvd_left
+lemma eq_mul_div_of_mul_eq_mul_of_dvd_left (hb : b ≠ 0) (hbc : b ∣ c) (h : b * a = c * d) :
+    a = c / b * d := by
+  obtain ⟨k, rfl⟩ := hbc
+  rw [Int.mul_ediv_cancel_left _ hb]
+  rwa [Int.mul_assoc, Int.mul_eq_mul_left_iff hb] at h
 
 lemma eq_zero_of_dvd_of_natAbs_lt_natAbs (hmn : m ∣ n) (hnm : natAbs n < natAbs m) : n = 0 := by
   rw [← natAbs_dvd, ← dvd_natAbs, natCast_dvd_natCast] at hmn
@@ -490,7 +481,8 @@ lemma ofNat_add_negSucc_of_ge {m n : ℕ} (h : n.succ ≤ m) :
   rw [negSucc_eq, ofNat_eq_natCast, ofNat_eq_natCast, ← natCast_one, ← natCast_add,
     ← Int.sub_eq_add_neg, ← Int.natCast_sub h]
 
--- DISSOLVED: natAbs_le_of_dvd_ne_zero
+lemma natAbs_le_of_dvd_ne_zero (hmn : m ∣ n) (hn : n ≠ 0) : natAbs m ≤ natAbs n :=
+  not_lt.mp (mt (eq_zero_of_dvd_of_natAbs_lt_natAbs hmn) hn)
 
 /-! #### `/` and ordering -/
 
@@ -511,7 +503,7 @@ lemma le_add_iff_lt_of_dvd_sub (ha : 0 < a) (hab : a ∣ c - b) : a + b ≤ c �
 
 /-! ### sign -/
 
--- DISSOLVED: sign_natCast_of_ne_zero
+lemma sign_natCast_of_ne_zero {n : ℕ} (hn : n ≠ 0) : Int.sign n = 1 := sign_ofNat_of_nonzero hn
 
 lemma sign_add_eq_of_sign_eq : ∀ {m n : ℤ}, m.sign = n.sign → (m + n).sign = n.sign := by
   have : (1 : ℤ) ≠ -1 := by decide
@@ -522,8 +514,6 @@ lemma sign_add_eq_of_sign_eq : ∀ {m n : ℤ}, m.sign = n.sign → (m + n).sign
 /-! ### toNat -/
 
 @[simp] lemma toNat_natCast (n : ℕ) : toNat ↑n = n := rfl
-
-@[simp] lemma toNat_natCast_add_one {n : ℕ} : ((n : ℤ) + 1).toNat = n + 1 := rfl
 
 @[simp] lemma toNat_le {n : ℕ} : toNat m ≤ n ↔ m ≤ n := by
   rw [ofNat_le.symm, toNat_eq_max, Int.max_le]; exact and_iff_left (ofNat_zero_le _)
@@ -551,14 +541,14 @@ lemma lt_of_toNat_lt {a b : ℤ} (h : toNat a < toNat b) : a < b :=
 theorem toNat_sub_of_le {a b : ℤ} (h : b ≤ a) : (toNat (a - b) : ℤ) = a - b :=
   Int.toNat_of_nonneg (Int.sub_nonneg_of_le h)
 
--- DISSOLVED: toNat_lt'
+lemma toNat_lt' {n : ℕ} (hn : n ≠ 0) : m.toNat < n ↔ m < n := by
+  rw [← toNat_lt_toNat, toNat_natCast]; omega
 
 def natMod (m n : ℤ) : ℕ := (m % n).toNat
 
--- DISSOLVED: natMod_lt
+lemma natMod_lt {n : ℕ} (hn : n ≠ 0) : m.natMod n < n :=
+  (toNat_lt' hn).2 <| emod_lt_of_pos _ <| by omega
 
 attribute [simp] natCast_pow
-
-@[simp] lemma pow_eq (m : ℤ) (n : ℕ) : m.pow n = m ^ n := rfl
 
 end Int

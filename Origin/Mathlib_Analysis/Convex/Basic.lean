@@ -11,6 +11,8 @@ import Mathlib.LinearAlgebra.AffineSpace.AffineSubspace
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.NoncommRing
 
+noncomputable section
+
 /-!
 # Convex sets and functions in vector spaces
 
@@ -187,15 +189,7 @@ def convexAddSubmonoid : AddSubmonoid (Set E) where
   zero_mem' := convex_zero
   add_mem' := Convex.add
 
-@[simp, norm_cast]
-theorem coe_convexAddSubmonoid : ↑(convexAddSubmonoid 𝕜 E) = {s : Set E | Convex 𝕜 s} :=
-  rfl
-
 variable {𝕜 E}
-
-@[simp]
-theorem mem_convexAddSubmonoid {s : Set E} : s ∈ convexAddSubmonoid 𝕜 E ↔ Convex 𝕜 s :=
-  Iff.rfl
 
 theorem convex_list_sum {l : List (Set E)} (h : ∀ i ∈ l, Convex 𝕜 i) : Convex 𝕜 l.sum :=
   (convexAddSubmonoid 𝕜 E).list_sum_mem h
@@ -604,8 +598,6 @@ theorem single_mem_stdSimplex (i : ι) : Pi.single i 1 ∈ stdSimplex 𝕜 ι :=
 
 theorem ite_eq_mem_stdSimplex (i : ι) : (if i = · then (1 : 𝕜) else 0) ∈ stdSimplex 𝕜 ι := by
   simpa only [@eq_comm _ i, ← Pi.single_apply] using single_mem_stdSimplex 𝕜 i
-
-following two lemmas. -/
 
 lemma segment_single_subset_stdSimplex (i j : ι) :
     ([Pi.single i 1 -[𝕜] Pi.single j 1] : Set (ι → 𝕜)) ⊆ stdSimplex 𝕜 ι :=

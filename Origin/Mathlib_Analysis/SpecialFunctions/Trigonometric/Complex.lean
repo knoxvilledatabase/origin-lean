@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Trigonometric/Complex.lean
-Genuine: 27 | Conflates: 0 | Dissolved: 9 | Infrastructure: 0
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.QuadraticDiscriminant
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
+
+noncomputable section
 
 /-!
 # Complex trigonometric functions
@@ -35,7 +37,8 @@ theorem cos_eq_zero_iff {θ : ℂ} : cos θ = 0 ↔ ∃ k : ℤ, θ = (2 * k + 1
   refine (iff_of_eq <| congr_arg _ ?_).trans (mul_right_inj' <| mul_ne_zero two_ne_zero I_ne_zero)
   field_simp; ring
 
--- DISSOLVED: cos_ne_zero_iff
+theorem cos_ne_zero_iff {θ : ℂ} : cos θ ≠ 0 ↔ ∀ k : ℤ, θ ≠ (2 * k + 1) * π / 2 := by
+  rw [← not_exists, not_iff_not, cos_eq_zero_iff]
 
 theorem sin_eq_zero_iff {θ : ℂ} : sin θ = 0 ↔ ∃ k : ℤ, θ = k * π := by
   rw [← Complex.cos_sub_pi_div_two, cos_eq_zero_iff]
@@ -49,19 +52,22 @@ theorem sin_eq_zero_iff {θ : ℂ} : sin θ = 0 ↔ ∃ k : ℤ, θ = k * π := 
     field_simp
     ring
 
--- DISSOLVED: sin_ne_zero_iff
+theorem sin_ne_zero_iff {θ : ℂ} : sin θ ≠ 0 ↔ ∀ k : ℤ, θ ≠ k * π := by
+  rw [← not_exists, not_iff_not, sin_eq_zero_iff]
 
 theorem tan_eq_zero_iff {θ : ℂ} : tan θ = 0 ↔ ∃ k : ℤ, k * π / 2 = θ := by
   rw [tan, div_eq_zero_iff, ← mul_eq_zero, ← mul_right_inj' two_ne_zero, mul_zero,
     ← mul_assoc, ← sin_two_mul, sin_eq_zero_iff]
   field_simp [mul_comm, eq_comm]
 
--- DISSOLVED: tan_ne_zero_iff
+theorem tan_ne_zero_iff {θ : ℂ} : tan θ ≠ 0 ↔ ∀ k : ℤ, (k * π / 2 : ℂ) ≠ θ := by
+  rw [← not_exists, not_iff_not, tan_eq_zero_iff]
 
 theorem tan_int_mul_pi_div_two (n : ℤ) : tan (n * π / 2) = 0 :=
   tan_eq_zero_iff.mpr (by use n)
 
--- DISSOLVED: tan_eq_zero_iff'
+theorem tan_eq_zero_iff' {θ : ℂ} (hθ : cos θ ≠ 0) : tan θ = 0 ↔ ∃ k : ℤ, k * π = θ := by
+  simp only [tan, hθ, div_eq_zero_iff, sin_eq_zero_iff]; simp [eq_comm]
 
 theorem cos_eq_cos_iff {x y : ℂ} : cos x = cos y ↔ ∃ k : ℤ, y = 2 * k * π + x ∨ y = 2 * k * π - x :=
   calc
@@ -142,9 +148,12 @@ theorem tan_eq {z : ℂ}
 
 open scoped Topology
 
--- DISSOLVED: continuousOn_tan
+theorem continuousOn_tan : ContinuousOn tan {x | cos x ≠ 0} :=
+  continuousOn_sin.div continuousOn_cos fun _x => id
 
--- DISSOLVED: continuous_tan
+@[continuity]
+theorem continuous_tan : Continuous fun x : {x | cos x ≠ 0} => tan x :=
+  continuousOn_iff_continuous_restrict.1 continuousOn_tan
 
 theorem cos_eq_iff_quadratic {z w : ℂ} :
     cos z = w ↔ exp (z * I) ^ 2 - 2 * w * exp (z * I) + 1 = 0 := by
@@ -189,7 +198,8 @@ open scoped Real
 theorem cos_eq_zero_iff {θ : ℝ} : cos θ = 0 ↔ ∃ k : ℤ, θ = (2 * k + 1) * π / 2 :=
   mod_cast @Complex.cos_eq_zero_iff θ
 
--- DISSOLVED: cos_ne_zero_iff
+theorem cos_ne_zero_iff {θ : ℝ} : cos θ ≠ 0 ↔ ∀ k : ℤ, θ ≠ (2 * k + 1) * π / 2 :=
+  mod_cast @Complex.cos_ne_zero_iff θ
 
 theorem cos_eq_cos_iff {x y : ℝ} : cos x = cos y ↔ ∃ k : ℤ, y = 2 * k * π + x ∨ y = 2 * k * π - x :=
   mod_cast @Complex.cos_eq_cos_iff x y
@@ -210,8 +220,11 @@ theorem sin_eq_neg_one_iff {x : ℝ} : sin x = -1 ↔ ∃ k : ℤ, -(π / 2) + k
 theorem tan_eq_zero_iff {θ : ℝ} : tan θ = 0 ↔ ∃ k : ℤ, k * π / 2 = θ :=
   mod_cast @Complex.tan_eq_zero_iff θ
 
--- DISSOLVED: tan_eq_zero_iff'
+theorem tan_eq_zero_iff' {θ : ℝ} (hθ : cos θ ≠ 0) : tan θ = 0 ↔ ∃ k : ℤ, k * π = θ := by
+  revert hθ
+  exact_mod_cast @Complex.tan_eq_zero_iff' θ
 
--- DISSOLVED: tan_ne_zero_iff
+theorem tan_ne_zero_iff {θ : ℝ} : tan θ ≠ 0 ↔ ∀ k : ℤ, k * π / 2 ≠ θ :=
+  mod_cast @Complex.tan_ne_zero_iff θ
 
 end Real

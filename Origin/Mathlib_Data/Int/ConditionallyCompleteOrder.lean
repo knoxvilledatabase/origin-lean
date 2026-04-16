@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 import Mathlib.Data.Int.LeastGreatest
 
+noncomputable section
+
 /-!
 ## `ℤ` forms a conditionally complete linear order
 

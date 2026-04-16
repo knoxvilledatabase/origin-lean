@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Squarefree.Basic
 import Mathlib.GroupTheory.Sylow
 
+noncomputable section
+
 /-!
 # Z-Groups
 

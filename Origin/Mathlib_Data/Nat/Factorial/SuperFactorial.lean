@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.RingTheory.Polynomial.Pochhammer
 
+noncomputable section
+
 /-!
 # Superfactorial
 
@@ -30,19 +32,7 @@ scoped notation "sf" n:60 => Nat.superFactorial n
 
 section SuperFactorial
 
-@[simp]
-theorem superFactorial_zero : sf 0 = 1 :=
-  rfl
-
 theorem superFactorial_succ (n : ℕ) : (sf n.succ) = (n + 1)! * sf n :=
-  rfl
-
-@[simp]
-theorem superFactorial_one : sf 1 = 1 :=
-  rfl
-
-@[simp]
-theorem superFactorial_two : sf 2 = 2 :=
   rfl
 
 open Finset

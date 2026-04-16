@@ -8,6 +8,8 @@ import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.RingTheory.MvPolynomial.Basic
 
+noncomputable section
+
 /-!
 ## Polynomials over finite fields
 -/

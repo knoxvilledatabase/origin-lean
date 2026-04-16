@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.SeparationQuotient.Basic
 import Mathlib.Topology.Algebra.UniformMulAction
 import Mathlib.Topology.MetricSpace.Lipschitz
 
+noncomputable section
+
 /-!
 # Compatibility of algebraic operations with metric space structures
 

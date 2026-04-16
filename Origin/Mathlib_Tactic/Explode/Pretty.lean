@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Meta.Basic
 import Mathlib.Tactic.Explode.Datatypes
 
+noncomputable section
+
 /-!
 # Explode command: pretty
 

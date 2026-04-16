@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
 
+noncomputable section
+
 /-!
 # Additive characters valued in the unit circle
 
@@ -63,8 +65,6 @@ noncomputable def stdAddChar : AddChar (ZMod N) ℂ := Circle.coeHom.compAddChar
 
 lemma stdAddChar_coe (j : ℤ) :
     stdAddChar (j : ZMod N) = exp (2 * π * I * j / N) := by simp [stdAddChar, toCircle_intCast]
-
-lemma stdAddChar_apply (j : ZMod N) : stdAddChar j = ↑(toCircle j) := rfl
 
 lemma injective_stdAddChar : Injective (stdAddChar : AddChar (ZMod N) ℂ) :=
   Subtype.coe_injective.comp injective_toCircle

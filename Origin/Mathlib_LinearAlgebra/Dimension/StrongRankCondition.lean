@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Basis.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.LinearAlgebra.InvariantBasisNumber
 
+noncomputable section
+
 /-!
 # Lemmas about rank and finrank in rings satisfying strong rank condition.
 

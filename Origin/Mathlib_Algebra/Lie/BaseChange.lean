@@ -8,6 +8,8 @@ import Mathlib.Algebra.Lie.TensorProduct
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.RingTheory.TensorProduct.Basic
 
+noncomputable section
+
 /-!
 # Extension and restriction of scalars for Lie algebras and Lie modules
 
@@ -187,11 +189,6 @@ variable {R A L M} in
 lemma tmul_mem_baseChange_of_mem (a : A) {m : M} (hm : m ∈ N) :
     a ⊗ₜ[R] m ∈ N.baseChange A :=
   (N : Submodule R M).tmul_mem_baseChange_of_mem a hm
-
-lemma mem_baseChange_iff {m : A ⊗[R] M} :
-    m ∈ N.baseChange A ↔
-    m ∈ Submodule.span A ((N : Submodule R M).map (TensorProduct.mk R A M 1)) :=
-  Iff.rfl
 
 @[simp]
 lemma baseChange_bot : (⊥ : LieSubmodule R L M).baseChange A = ⊥ := by

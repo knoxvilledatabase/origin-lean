@@ -1,10 +1,12 @@
 /-
 Extracted from Combinatorics/Enumerative/Bell.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.Data.Nat.Choose.Mul
+
+noncomputable section
 
 /-! # Bell numbers for multisets
 
@@ -43,10 +45,22 @@ def bell (m : Multiset ℕ) : ℕ :=
   Nat.multinomial m.toFinset (fun k ↦ k * m.count k) *
     ∏ k ∈ m.toFinset.erase 0, ∏ j ∈ .range (m.count k), (j * k + k - 1).choose (k - 1)
 
-@[simp]
-theorem bell_zero : bell 0 = 1 := rfl
-
--- DISSOLVED: bell_mul_eq_lemma
+private theorem bell_mul_eq_lemma {x : ℕ} (hx : x ≠ 0) :
+    ∀ c, x ! ^ c * c ! * ∏ j ∈ Finset.range c, (j * x + x - 1).choose (x - 1) = (x * c)!
+  | 0 => by simp
+  | c + 1 => calc
+      x ! ^ (c + 1) * (c + 1)! * ∏ j ∈ Finset.range (c + 1), (j * x + x - 1).choose (x - 1)
+        = x ! * (c + 1) * x ! ^ c * c ! *
+            ∏ j ∈ Finset.range (c + 1), (j * x + x - 1).choose (x - 1) := by
+        rw [factorial_succ, pow_succ]; ring
+      _ = (x ! ^ c * c ! * ∏ j in Finset.range c, (j * x + x - 1).choose (x - 1)) *
+            (c * x + x - 1).choose (x - 1) * x ! * (c + 1)  := by
+        rw [Finset.prod_range_succ]; ring
+      _ = (c + 1) * (c * x + x - 1).choose (x - 1) * (x * c)! * x ! := by
+        rw [bell_mul_eq_lemma hx]; ring
+      _ = (x * (c + 1))! := by
+        rw [← Nat.choose_mul_add hx, mul_comm c x, Nat.add_choose_mul_factorial_mul_factorial]
+        ring_nf
 
 theorem bell_mul_eq (m : Multiset ℕ) :
     m.bell * (m.map (fun j ↦ j !)).prod * ∏ j ∈ (m.toFinset.erase 0), (m.count j)!
@@ -129,8 +143,23 @@ theorem uniformBell_one_right (m : ℕ) : uniformBell m 1 = 1 := by
   simp only [uniformBell_eq, mul_one, add_tsub_cancel_right, ge_iff_le, le_refl,
     tsub_eq_zero_of_le, choose_zero_right, Finset.prod_const_one]
 
--- DISSOLVED: uniformBell_mul_eq
+theorem uniformBell_mul_eq (m : ℕ) {n : ℕ} (hn : n ≠ 0) :
+    uniformBell m n * n ! ^ m * m ! = (m * n)! := by
+  convert bell_mul_eq (replicate m n)
+  · simp only [map_replicate, prod_replicate]
+  · simp only [toFinset_replicate]
+    split_ifs with hm
+    · rw [hm, factorial_zero, eq_comm]
+      rw [show (∅ : Finset ℕ).erase 0 = ∅ from rfl,  Finset.prod_empty]
+    · rw [show ({n} : Finset ℕ).erase 0 = {n} by simp [Ne.symm hn]]
+      simp only [Finset.prod_singleton, count_replicate_self]
+  · simp
 
--- DISSOLVED: uniformBell_eq_div
+theorem uniformBell_eq_div (m : ℕ) {n : ℕ} (hn : n ≠ 0) :
+    uniformBell m n = (m * n) ! / (n ! ^ m * m !) := by
+  rw [eq_comm]
+  apply Nat.div_eq_of_eq_mul_left
+  · exact Nat.mul_pos (Nat.pow_pos (Nat.factorial_pos n)) m.factorial_pos
+  · rw [← mul_assoc, ← uniformBell_mul_eq _ hn]
 
 end Nat

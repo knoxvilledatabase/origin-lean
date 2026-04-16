@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Nat/Choose/Sum.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Intervals
@@ -9,6 +9,8 @@ import Mathlib.Algebra.BigOperators.Ring
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
+
+noncomputable section
 
 /-!
 # Sums of binomial coefficients
@@ -112,14 +114,6 @@ theorem choose_middle_le_pow (n : ℕ) : (2 * n + 1).choose n ≤ 4 ^ n := by
     single_le_sum (fun x _ ↦ by omega) (self_mem_range_succ n)
   simpa [sum_range_choose_halfway n] using t
 
-theorem four_pow_le_two_mul_add_one_mul_central_binom (n : ℕ) :
-    4 ^ n ≤ (2 * n + 1) * (2 * n).choose n :=
-  calc
-    4 ^ n = (1 + 1) ^ (2 * n) := by norm_num [pow_mul]
-    _ = ∑ m ∈ range (2 * n + 1), (2 * n).choose m := by set_option simprocs false in simp [add_pow]
-    _ ≤ ∑ _ ∈ range (2 * n + 1), (2 * n).choose (2 * n / 2) := by gcongr; apply choose_le_middle
-    _ = (2 * n + 1) * choose (2 * n) n := by simp
-
 theorem sum_Icc_choose (n k : ℕ) : ∑ m ∈ Icc k n, m.choose k = (n + 1).choose (k + 1) := by
   rcases lt_or_le n k with h | h
   · rw [choose_eq_zero_of_lt (by omega), Icc_eq_empty_of_lt h, sum_empty]
@@ -146,7 +140,9 @@ theorem Int.alternating_sum_range_choose {n : ℕ} :
     simp only [one_pow, mul_one, neg_add_cancel] at h
     rw [← h, zero_pow n.succ_ne_zero, if_neg n.succ_ne_zero]
 
--- DISSOLVED: Int.alternating_sum_range_choose_of_ne
+theorem Int.alternating_sum_range_choose_of_ne {n : ℕ} (h0 : n ≠ 0) :
+    (∑ m ∈ range (n + 1), ((-1) ^ m * n.choose m : ℤ)) = 0 := by
+  rw [Int.alternating_sum_range_choose, if_neg h0]
 
 namespace Finset
 

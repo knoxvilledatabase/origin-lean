@@ -10,6 +10,8 @@ import Mathlib.Algebra.Module.LinearMap.Star
 import Mathlib.Algebra.Module.Rat
 import Mathlib.LinearAlgebra.Prod
 
+noncomputable section
+
 /-!
 # The star operation, bundled as a star-linear equiv
 

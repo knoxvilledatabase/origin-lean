@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.MeanInequalities
 import Mathlib.Analysis.Normed.Lp.WithLp
 
+noncomputable section
+
 /-!
 # `L^p` distance on products of two metric spaces
 Given two metric spaces, one can put the max distance on their product, but there is also
@@ -51,47 +53,7 @@ variable [Semiring 𝕜] [AddCommGroup α] [AddCommGroup β]
 
 variable (x y : WithLp p (α × β)) (c : 𝕜)
 
-@[simp]
-theorem zero_fst : (0 : WithLp p (α × β)).fst = 0 :=
-  rfl
-
-@[simp]
-theorem zero_snd : (0 : WithLp p (α × β)).snd = 0 :=
-  rfl
-
-@[simp]
-theorem add_fst : (x + y).fst = x.fst + y.fst :=
-  rfl
-
-@[simp]
-theorem add_snd : (x + y).snd = x.snd + y.snd :=
-  rfl
-
-@[simp]
-theorem sub_fst : (x - y).fst = x.fst - y.fst :=
-  rfl
-
-@[simp]
-theorem sub_snd : (x - y).snd = x.snd - y.snd :=
-  rfl
-
-@[simp]
-theorem neg_fst : (-x).fst = -x.fst :=
-  rfl
-
-@[simp]
-theorem neg_snd : (-x).snd = -x.snd :=
-  rfl
-
 variable [Module 𝕜 α] [Module 𝕜 β]
-
-@[simp]
-theorem smul_fst : (c • x).fst = c • x.fst :=
-  rfl
-
-@[simp]
-theorem smul_snd : (c • x).snd = c • x.snd :=
-  rfl
 
 end algebra
 
@@ -108,14 +70,6 @@ theorem equiv_fst (x : WithLp p (α × β)) : (WithLp.equiv p (α × β) x).fst 
 
 @[simp]
 theorem equiv_snd (x : WithLp p (α × β)) : (WithLp.equiv p (α × β) x).snd = x.snd :=
-  rfl
-
-@[simp]
-theorem equiv_symm_fst (x : α × β) : ((WithLp.equiv p (α × β)).symm x).fst = x.fst :=
-  rfl
-
-@[simp]
-theorem equiv_symm_snd (x : α × β) : ((WithLp.equiv p (α × β)).symm x).snd = x.snd :=
   rfl
 
 end equiv
@@ -697,12 +651,6 @@ instance instProdBoundedSMul : BoundedSMul 𝕜 (WithLp p (α × β)) :=
         (NNReal.rpow_le_rpow (nnnorm_smul_le _ _) hp0.le)
 
 variable {𝕜 p α β}
-
-def prodEquivₗᵢ : WithLp ∞ (α × β) ≃ₗᵢ[𝕜] α × β where
-  __ := WithLp.equiv ∞ (α × β)
-  map_add' _f _g := rfl
-  map_smul' _c _f := rfl
-  norm_map' := prod_norm_equiv
 
 end BoundedSMul
 

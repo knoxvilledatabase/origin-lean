@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Dynamics.TopologicalEntropy.CoverEntropy
 
+noncomputable section
+
 /-!
 # Topological entropy of the image of a set under a semiconjugacy
 Consider two dynamical systems `(X, S)` and `(Y, T)` together with a semiconjugacy `φ`:

@@ -9,6 +9,8 @@ import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 # Definition of `ZMod n` + basic results.
 

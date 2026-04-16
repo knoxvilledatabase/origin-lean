@@ -1,12 +1,14 @@
 /-
 Extracted from Order/GaloisConnection.lean
-Genuine: 133 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 134 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Order.CompleteLattice
 import Mathlib.Order.Synonym
 import Mathlib.Order.Hom.Set
 import Mathlib.Order.Bounds.Image
+
+noncomputable section
 
 /-!
 # Galois connections, insertions and coinsertions
@@ -415,13 +417,6 @@ def GaloisInsertion.monotoneIntro {α β : Type*} [Preorder α] [Preorder β] {l
   le_l_u b := le_of_eq <| (hlu b).symm
   choice_eq _ _ := rfl
 
-protected def OrderIso.toGaloisInsertion [Preorder α] [Preorder β] (oi : α ≃o β) :
-    GaloisInsertion oi oi.symm where
-  choice b _ := oi b
-  gc := oi.to_galoisConnection
-  le_l_u g := le_of_eq (oi.right_inv g).symm
-  choice_eq _ _ := rfl
-
 def GaloisConnection.toGaloisInsertion {α β : Type*} [Preorder α] [Preorder β] {l : α → β}
     {u : β → α} (gc : GaloisConnection l u) (h : ∀ b, b ≤ l (u b)) : GaloisInsertion l u :=
   { choice := fun x _ => l x
@@ -602,13 +597,6 @@ def GaloisInsertion.ofDual [Preorder α] [Preorder β] {l : αᵒᵈ → βᵒ�
     GaloisInsertion l u → GaloisCoinsertion (ofDual ∘ u ∘ toDual) (ofDual ∘ l ∘ toDual) :=
   fun x => ⟨x.1, x.2.dual, x.3, x.4⟩
 
-protected def OrderIso.toGaloisCoinsertion [Preorder α] [Preorder β] (oi : α ≃o β) :
-    GaloisCoinsertion oi oi.symm where
-  choice b _ := oi.symm b
-  gc := oi.to_galoisConnection
-  u_l_le g := le_of_eq (oi.left_inv g)
-  choice_eq _ _ := rfl
-
 def GaloisCoinsertion.monotoneIntro [Preorder α] [Preorder β] {l : α → β} {u : β → α}
     (hu : Monotone u) (hl : Monotone l) (hlu : ∀ b, l (u b) ≤ b) (hul : ∀ a, u (l a) = a) :
     GaloisCoinsertion l u :=
@@ -753,5 +741,3 @@ def gi_sSup_Iic [CompleteSemilatticeSup α] :
 def gci_Ici_sInf [CompleteSemilatticeInf α] :
     GaloisCoinsertion (toDual ∘ Ici : α → (Set α)ᵒᵈ) (sInf ∘ ofDual : (Set α)ᵒᵈ → α) :=
   gc_Ici_sInf.toGaloisCoinsertion fun _ ↦ sInf_le le_rfl
-
--- DISSOLVED: WithBot.giUnbot'Bot

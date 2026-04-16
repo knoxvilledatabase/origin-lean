@@ -9,6 +9,8 @@ import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.GroupTheory.QuotientGroup.Defs
 import Mathlib.RepresentationTheory.Action.Basic
 
+noncomputable section
+
 /-!
 # Constructors for `Action V G` for some concrete categories
 
@@ -112,9 +114,6 @@ def toEndHom [N.Normal] : G →* End (G ⧸ₐ N) where
     show ⟦x * (σ * τ)⁻¹⟧ = ⟦x * τ⁻¹ * σ⁻¹⟧
     rw [mul_inv_rev, mul_assoc]
 
-@[simp]
-lemma toEndHom_apply [N.Normal] (g h : G) : (toEndHom N g).hom ⟦h⟧ = ⟦h * g⁻¹⟧ := rfl
-
 variable {N} in
 
 lemma toEndHom_trivial_of_mem [N.Normal] {n : G} (hn : n ∈ N) : toEndHom N n = 𝟙 (G ⧸ₐ N) := by
@@ -127,11 +126,6 @@ def quotientToEndHom [N.Normal] : H ⧸ Subgroup.subgroupOf N H →* End (G ⧸�
   QuotientGroup.lift (Subgroup.subgroupOf N H) ((toEndHom N).comp H.subtype) <| fun _ uinU' ↦
     toEndHom_trivial_of_mem uinU'
 
-@[simp]
-lemma quotientToEndHom_mk [N.Normal] (x : H) (g : G) :
-    (quotientToEndHom H N ⟦x⟧).hom ⟦g⟧ = ⟦g * x⁻¹⟧ :=
-  rfl
-
 def quotientToQuotientOfLE [Fintype (G ⧸ H)] (h : N ≤ H) : (G ⧸ₐ N) ⟶ (G ⧸ₐ H) where
   hom := Quotient.lift _ <| fun _ _ hab ↦ Quotient.sound <|
     (QuotientGroup.leftRel_apply).mpr (h <| (QuotientGroup.leftRel_apply).mp hab)
@@ -139,11 +133,6 @@ def quotientToQuotientOfLE [Fintype (G ⧸ H)] (h : N ≤ H) : (G ⧸ₐ N) ⟶ 
     ext (x : G ⧸ N)
     induction' x using Quotient.inductionOn with μ
     rfl
-
-@[simp]
-lemma quotientToQuotientOfLE_hom_mk [Fintype (G ⧸ H)] (h : N ≤ H) (x : G) :
-    (quotientToQuotientOfLE H N h).hom ⟦x⟧ = ⟦x⟧ :=
-  rfl
 
 end
 

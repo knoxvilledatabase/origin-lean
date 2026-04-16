@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Finsupp/Basic.lean
-Genuine: 175 | Conflates: 5 | Dissolved: 10 | Infrastructure: 37
+Genuine: 185 | Conflates: 5 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finsupp
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Action.Basic
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Regular.SMul
 import Mathlib.Data.Rat.BigOperators
+
+noncomputable section
 
 /-!
 # Miscellaneous definitions, lemmas, and constructions using finsupp
@@ -56,9 +58,18 @@ variable [Zero M]
 def graph (f : α →₀ M) : Finset (α × M) :=
   f.support.map ⟨fun a => Prod.mk a (f a), fun _ _ h => (Prod.mk.inj h).1⟩
 
--- DISSOLVED: mk_mem_graph_iff
+theorem mk_mem_graph_iff {a : α} {m : M} {f : α →₀ M} : (a, m) ∈ f.graph ↔ f a = m ∧ m ≠ 0 := by
+  simp_rw [graph, mem_map, mem_support_iff]
+  constructor
+  · rintro ⟨b, ha, rfl, -⟩
+    exact ⟨rfl, ha⟩
+  · rintro ⟨rfl, ha⟩
+    exact ⟨a, ha, rfl⟩
 
--- DISSOLVED: mem_graph_iff
+@[simp]
+theorem mem_graph_iff {c : α × M} {f : α →₀ M} : c ∈ f.graph ↔ f c.1 = c.2 ∧ c.2 ≠ 0 := by
+  cases c
+  exact mk_mem_graph_iff
 
 theorem mk_mem_graph (f : α →₀ M) {a : α} (ha : a ∈ f.support) : (a, f a) ∈ f.graph :=
   mk_mem_graph_iff.2 ⟨rfl, mem_support_iff.1 ha⟩
@@ -142,11 +153,19 @@ section ZeroHom
 
 variable [Zero M] [Zero N] [Zero P]
 
--- DISSOLVED: mapRange.zeroHom
+@[simps]
+def mapRange.zeroHom (f : ZeroHom M N) : ZeroHom (α →₀ M) (α →₀ N) where
+  toFun := (mapRange f f.map_zero : (α →₀ M) → α →₀ N)
+  map_zero' := mapRange_zero
 
--- DISSOLVED: mapRange.zeroHom_id
+@[simp]
+theorem mapRange.zeroHom_id : mapRange.zeroHom (ZeroHom.id M) = ZeroHom.id (α →₀ M) :=
+  ZeroHom.ext mapRange_id
 
--- DISSOLVED: mapRange.zeroHom_comp
+theorem mapRange.zeroHom_comp (f : ZeroHom N P) (f₂ : ZeroHom M N) :
+    (mapRange.zeroHom (f.comp f₂) : ZeroHom (α →₀ _) _) =
+      (mapRange.zeroHom f).comp (mapRange.zeroHom f₂) :=
+  ZeroHom.ext <| mapRange_comp f (map_zero f) f₂ (map_zero f₂) (by simp only [comp_apply, map_zero])
 
 end ZeroHom
 
@@ -173,7 +192,10 @@ theorem mapRange.addMonoidHom_comp (f : N →+ P) (f₂ : M →+ N) :
   AddMonoidHom.ext <|
     mapRange_comp f (map_zero f) f₂ (map_zero f₂) (by simp only [comp_apply, map_zero])
 
--- DISSOLVED: mapRange.addMonoidHom_toZeroHom
+@[simp]
+theorem mapRange.addMonoidHom_toZeroHom (f : M →+ N) :
+    (mapRange.addMonoidHom f).toZeroHom = (mapRange.zeroHom f.toZeroHom : ZeroHom (α →₀ _) _) :=
+  ZeroHom.ext fun _ => rfl
 
 theorem mapRange_multiset_sum (f : F) (m : Multiset (α →₀ M)) :
     mapRange f (map_zero f) m.sum = (m.map fun x => mapRange f (map_zero f) x).sum :=
@@ -247,10 +269,6 @@ theorem equivMapDomain_apply (f : α ≃ β) (l : α →₀ M) (b : β) :
     equivMapDomain f l b = l (f.symm b) :=
   rfl
 
-theorem equivMapDomain_symm_apply (f : α ≃ β) (l : β →₀ M) (a : α) :
-    equivMapDomain f.symm l a = l (f a) :=
-  rfl
-
 @[simp]
 theorem equivMapDomain_refl (l : α →₀ M) : equivMapDomain (Equiv.refl _) l = l := by ext x; rfl
 
@@ -282,15 +300,6 @@ def equivCongrLeft (f : α ≃ β) : (α →₀ M) ≃ (β →₀ M) := by
   refine ⟨equivMapDomain f, equivMapDomain f.symm, fun f => ?_, fun f => ?_⟩ <;> ext x <;>
     simp only [equivMapDomain_apply, Equiv.symm_symm, Equiv.symm_apply_apply,
       Equiv.apply_symm_apply]
-
-@[simp]
-theorem equivCongrLeft_apply (f : α ≃ β) (l : α →₀ M) : equivCongrLeft f l = equivMapDomain f l :=
-  rfl
-
-@[simp]
-theorem equivCongrLeft_symm (f : α ≃ β) :
-    (@equivCongrLeft _ _ M _ f).symm = equivCongrLeft f.symm :=
-  rfl
 
 end Finsupp
 
@@ -652,10 +661,6 @@ def some [Zero M] (f : Option α →₀ M) : α →₀ M :=
   f.comapDomain Option.some fun _ => by simp
 
 @[simp]
-theorem some_apply [Zero M] (f : Option α →₀ M) (a : α) : f.some a = f (Option.some a) :=
-  rfl
-
-@[simp]
 theorem some_zero [Zero M] : (0 : Option α →₀ M).some = 0 := by
   ext
   simp
@@ -726,7 +731,9 @@ theorem filter_eq_zero_iff : f.filter p = 0 ↔ ∀ x, p x → f x = 0 := by
   simp only [DFunLike.ext_iff, filter_eq_indicator, zero_apply, Set.indicator_apply_eq_zero,
     Set.mem_setOf_eq]
 
--- DISSOLVED: filter_eq_self_iff
+theorem filter_eq_self_iff : f.filter p = f ↔ ∀ x, f x ≠ 0 → p x := by
+  simp only [DFunLike.ext_iff, filter_eq_indicator, Set.indicator_apply_eq_self, Set.mem_setOf_eq,
+    not_imp_comm]
 
 @[simp]
 theorem filter_apply_pos {a : α} (h : p a) : f.filter p a = f a := if_pos h
@@ -788,7 +795,12 @@ def frange (f : α →₀ M) : Finset M :=
   haveI := Classical.decEq M
   Finset.image f f.support
 
--- DISSOLVED: mem_frange
+theorem mem_frange {f : α →₀ M} {y : M} : y ∈ f.frange ↔ y ≠ 0 ∧ ∃ x, f x = y := by
+  rw [frange, @Finset.mem_image _ _ (Classical.decEq _) _ f.support]
+  exact ⟨fun ⟨x, hx1, hx2⟩ => ⟨hx2 ▸ mem_support_iff.1 hx1, x, hx2⟩, fun ⟨hy, x, hx⟩ =>
+    ⟨x, mem_support_iff.2 (hx.symm ▸ hy), hx⟩⟩
+  -- Porting note: maybe there is a better way to fix this, but (1) it wasn't seeing past `frange`
+  -- the definition, and (2) it needed the `Classical.decEq` instance again.
 
 theorem zero_not_mem_frange {f : α →₀ M} : (0 : M) ∉ f.frange := fun H => (mem_frange.1 H).1 rfl
 
@@ -821,10 +833,6 @@ def subtypeDomain (p : α → Prop) (f : α →₀ M) : Subtype p →₀ M where
 @[simp]
 theorem support_subtypeDomain [D : DecidablePred p] {f : α →₀ M} :
     (subtypeDomain p f).support = f.support.subtype p := by rw [Subsingleton.elim D] <;> rfl
-
-@[simp]
-theorem subtypeDomain_apply {a : Subtype p} {v : α →₀ M} : (subtypeDomain p v) a = v a.val :=
-  rfl
 
 @[simp]
 theorem subtypeDomain_zero : subtypeDomain p (0 : α →₀ M) = 0 :=
@@ -1049,23 +1057,6 @@ def sumElim {α β γ : Type*} [Zero γ] (f : α →₀ γ) (g : β →₀ γ) :
     simp only [Sum.elim_inl, Sum.elim_inr] at h <;>
     simpa
 
-@[simp, norm_cast]
-theorem coe_sumElim {α β γ : Type*} [Zero γ] (f : α →₀ γ) (g : β →₀ γ) :
-    ⇑(sumElim f g) = Sum.elim f g :=
-  rfl
-
-theorem sumElim_apply {α β γ : Type*} [Zero γ] (f : α →₀ γ) (g : β →₀ γ) (x : α ⊕ β) :
-    sumElim f g x = Sum.elim f g x :=
-  rfl
-
-theorem sumElim_inl {α β γ : Type*} [Zero γ] (f : α →₀ γ) (g : β →₀ γ) (x : α) :
-    sumElim f g (Sum.inl x) = f x :=
-  rfl
-
-theorem sumElim_inr {α β γ : Type*} [Zero γ] (f : α →₀ γ) (g : β →₀ γ) (x : β) :
-    sumElim f g (Sum.inr x) = g x :=
-  rfl
-
 @[simps apply symm_apply]
 def sumFinsuppEquivProdFinsupp {α β γ : Type*} [Zero γ] : (α ⊕ β →₀ γ) ≃ (α →₀ γ) × (β →₀ γ) where
   toFun f :=
@@ -1085,14 +1076,6 @@ theorem snd_sumFinsuppEquivProdFinsupp {α β γ : Type*} [Zero γ] (f : α ⊕ 
     (sumFinsuppEquivProdFinsupp f).2 y = f (Sum.inr y) :=
   rfl
 
-theorem sumFinsuppEquivProdFinsupp_symm_inl {α β γ : Type*} [Zero γ] (fg : (α →₀ γ) × (β →₀ γ))
-    (x : α) : (sumFinsuppEquivProdFinsupp.symm fg) (Sum.inl x) = fg.1 x :=
-  rfl
-
-theorem sumFinsuppEquivProdFinsupp_symm_inr {α β γ : Type*} [Zero γ] (fg : (α →₀ γ) × (β →₀ γ))
-    (y : β) : (sumFinsuppEquivProdFinsupp.symm fg) (Sum.inr y) = fg.2 y :=
-  rfl
-
 variable [AddMonoid M]
 
 @[simps! apply symm_apply]
@@ -1103,22 +1086,6 @@ def sumFinsuppAddEquivProdFinsupp {α β : Type*} : (α ⊕ β →₀ M) ≃+ (�
       ext <;>
         simp only [Equiv.toFun_as_coe, Prod.fst_add, Prod.snd_add, add_apply,
           snd_sumFinsuppEquivProdFinsupp, fst_sumFinsuppEquivProdFinsupp] }
-
-theorem fst_sumFinsuppAddEquivProdFinsupp {α β : Type*} (f : α ⊕ β →₀ M) (x : α) :
-    (sumFinsuppAddEquivProdFinsupp f).1 x = f (Sum.inl x) :=
-  rfl
-
-theorem snd_sumFinsuppAddEquivProdFinsupp {α β : Type*} (f : α ⊕ β →₀ M) (y : β) :
-    (sumFinsuppAddEquivProdFinsupp f).2 y = f (Sum.inr y) :=
-  rfl
-
-theorem sumFinsuppAddEquivProdFinsupp_symm_inl {α β : Type*} (fg : (α →₀ M) × (β →₀ M)) (x : α) :
-    (sumFinsuppAddEquivProdFinsupp.symm fg) (Sum.inl x) = fg.1 x :=
-  rfl
-
-theorem sumFinsuppAddEquivProdFinsupp_symm_inr {α β : Type*} (fg : (α →₀ M) × (β →₀ M)) (y : β) :
-    (sumFinsuppAddEquivProdFinsupp.symm fg) (Sum.inr y) = fg.2 y :=
-  rfl
 
 end Sum
 
@@ -1256,7 +1223,10 @@ theorem support_smul [AddMonoid M] [SMulZeroClass R M] {b : R} {g : α →₀ M}
   simp only [smul_apply, mem_support_iff, Ne]
   exact mt fun h => h.symm ▸ smul_zero _
 
--- DISSOLVED: support_smul_eq
+@[simp]
+theorem support_smul_eq [Semiring R] [AddCommMonoid M] [Module R M] [NoZeroSMulDivisors R M] {b : R}
+    (hb : b ≠ 0) {g : α →₀ M} : (b • g).support = g.support :=
+  Finset.ext fun a => by simp [Finsupp.smul_apply, hb]
 
 section
 
@@ -1504,7 +1474,12 @@ def splitSupport (l : (Σi, αs i) →₀ M) : Finset ι :=
   haveI := Classical.decEq ι
   l.support.image Sigma.fst
 
--- DISSOLVED: mem_splitSupport_iff_nonzero
+theorem mem_splitSupport_iff_nonzero (i : ι) : i ∈ splitSupport l ↔ split l i ≠ 0 := by
+  rw [splitSupport, @mem_image _ _ (Classical.decEq _), Ne, ← support_eq_empty, ← Ne, ←
+    Finset.nonempty_iff_ne_empty, split, comapDomain, Finset.Nonempty]
+  -- Porting note (https://github.com/leanprover-community/mathlib4/issues/10754): had to add the `Classical.decEq` instance manually
+  simp only [exists_prop, Finset.mem_preimage, exists_and_right, exists_eq_right, mem_support_iff,
+    Sigma.exists, Ne]
 
 def splitComp [Zero N] (g : ∀ i, (αs i →₀ M) → N) (hg : ∀ i x, x = 0 ↔ g i x = 0) : ι →₀ N where
   support := splitSupport l
@@ -1537,22 +1512,12 @@ noncomputable def sigmaFinsuppEquivPiFinsupp : ((Σj, ιs j) →₀ α) ≃ ∀ 
     ext
     simp [split]
 
-@[simp]
-theorem sigmaFinsuppEquivPiFinsupp_apply (f : (Σj, ιs j) →₀ α) (j i) :
-    sigmaFinsuppEquivPiFinsupp f j i = f ⟨j, i⟩ :=
-  rfl
-
 noncomputable def sigmaFinsuppAddEquivPiFinsupp {α : Type*} {ιs : η → Type*} [AddMonoid α] :
     ((Σj, ιs j) →₀ α) ≃+ ∀ j, ιs j →₀ α :=
   { sigmaFinsuppEquivPiFinsupp with
     map_add' := fun f g => by
       ext
       simp }
-
-@[simp]
-theorem sigmaFinsuppAddEquivPiFinsupp_apply {α : Type*} {ιs : η → Type*} [AddMonoid α]
-    (f : (Σj, ιs j) →₀ α) (j i) : sigmaFinsuppAddEquivPiFinsupp f j i = f ⟨j, i⟩ :=
-  rfl
 
 end Sigma
 

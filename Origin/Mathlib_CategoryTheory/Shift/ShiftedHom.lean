@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Shift.CommShift
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 
+noncomputable section
+
 /-! Shifted morphisms
 
 Given a category `C` endowed with a shift by an additive monoid `M` and two

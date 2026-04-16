@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monad.Adjunction
 import Mathlib.CategoryTheory.Monad.Coequalizer
 
+noncomputable section
+
 /-!
 # Adjoint lifting
 
@@ -105,6 +107,7 @@ noncomputable def constructLeftAdjointObj (Y : B) : A :=
   coequalizer (F'.map (U.map (adj₁.counit.app Y))) (otherMap _ _ adj₁ adj₂ Y)
 
 set_option linter.unusedVariables false in
+/-- The homset equivalence which helps show that `R` is a right adjoint. -/
 
 @[simps!] -- Porting note: Originally `@[simps (config := { rhsMd := semireducible })]`
 noncomputable def constructLeftAdjointEquiv [∀ X : B, RegularEpi (adj₁.counit.app X)] (Y : A)

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
 
+noncomputable section
+
 /-!
 # Exp on the upper half plane
 

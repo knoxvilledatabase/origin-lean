@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Module.Basic
 import Mathlib.Topology.Instances.Rat
 import Mathlib.Algebra.Module.Rat
 
+noncomputable section
+
 /-!
 # Continuous additive maps are `ℝ`-linear
 
@@ -30,10 +32,6 @@ def toRealLinearMap (f : E →+ F) (hf : Continuous f) : E →L[ℝ] F :=
   ⟨{  toFun := f
       map_add' := f.map_add
       map_smul' := map_real_smul f hf }, hf⟩
-
-@[simp]
-theorem coe_toRealLinearMap (f : E →+ F) (hf : Continuous f) : ⇑(f.toRealLinearMap hf) = f :=
-  rfl
 
 end AddMonoidHom
 

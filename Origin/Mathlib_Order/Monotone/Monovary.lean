@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Operations
 import Mathlib.Order.Lattice
 
+noncomputable section
+
 /-!
 # Monovariance of functions
 
@@ -192,32 +194,16 @@ theorem AntivaryOn.dual_right : AntivaryOn f g s → MonovaryOn f (toDual ∘ g)
   swap₂
 
 @[simp]
-theorem monovary_toDual_left : Monovary (toDual ∘ f) g ↔ Antivary f g :=
-  Iff.rfl
-
-@[simp]
 theorem monovary_toDual_right : Monovary f (toDual ∘ g) ↔ Antivary f g :=
   forall_swap
-
-@[simp]
-theorem antivary_toDual_left : Antivary (toDual ∘ f) g ↔ Monovary f g :=
-  Iff.rfl
 
 @[simp]
 theorem antivary_toDual_right : Antivary f (toDual ∘ g) ↔ Monovary f g :=
   forall_swap
 
 @[simp]
-theorem monovaryOn_toDual_left : MonovaryOn (toDual ∘ f) g s ↔ AntivaryOn f g s :=
-  Iff.rfl
-
-@[simp]
 theorem monovaryOn_toDual_right : MonovaryOn f (toDual ∘ g) s ↔ AntivaryOn f g s :=
   forall₂_swap
-
-@[simp]
-theorem antivaryOn_toDual_left : AntivaryOn (toDual ∘ f) g s ↔ MonovaryOn f g s :=
-  Iff.rfl
 
 @[simp]
 theorem antivaryOn_toDual_right : AntivaryOn f (toDual ∘ g) s ↔ MonovaryOn f g s :=

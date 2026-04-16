@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.List.Sort
 import Mathlib.Data.Multiset.Range
 
+noncomputable section
+
 /-!
 # Construct a sorted list from a multiset.
 -/
@@ -29,10 +31,6 @@ def sort (s : Multiset α) : List α :=
         (fun a b => by simpa using IsTotal.total a b) _)
       (sorted_mergeSort IsTrans.trans
         (fun a b => by simpa using IsTotal.total a b) _)
-
-@[simp]
-theorem coe_sort (l : List α) : sort r l = mergeSort l (r · ·) :=
-  rfl
 
 @[simp]
 theorem sort_sorted (s : Multiset α) : Sorted r (sort r s) :=

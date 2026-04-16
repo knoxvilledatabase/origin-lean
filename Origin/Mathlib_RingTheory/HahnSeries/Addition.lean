@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/HahnSeries/Addition.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 4 | Infrastructure: 18
+Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 18
 -/
 import Origin.Core
 import Mathlib.RingTheory.HahnSeries.Basic
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Module.LinearMap.Defs
+
+noncomputable section
 
 /-!
 # Additive properties of Hahn series
@@ -57,10 +59,6 @@ instance : AddMonoid (HahnSeries Γ R) where
   add_zero x := by
     ext
     apply add_zero
-
-@[simp]
-theorem add_coeff' {x y : HahnSeries Γ R} : (x + y).coeff = x.coeff + y.coeff :=
-  rfl
 
 theorem add_coeff {x y : HahnSeries Γ R} {a : Γ} : (x + y).coeff a = x.coeff a + y.coeff a :=
   rfl
@@ -138,7 +136,13 @@ theorem support_add_subset {x y : HahnSeries Γ R} : support (x + y) ⊆ support
   contrapose! ha
   rw [ha.1, ha.2, add_zero]
 
--- DISSOLVED: min_le_min_add
+protected theorem min_le_min_add {Γ} [LinearOrder Γ] {x y : HahnSeries Γ R} (hx : x ≠ 0)
+    (hy : y ≠ 0) (hxy : x + y ≠ 0) :
+    min (Set.IsWF.min x.isWF_support (support_nonempty_iff.2 hx))
+      (Set.IsWF.min y.isWF_support (support_nonempty_iff.2 hy)) ≤
+      Set.IsWF.min (x + y).isWF_support (support_nonempty_iff.2 hxy) := by
+  rw [← Set.IsWF.min_union]
+  exact Set.IsWF.min_le_min_of_subset (support_add_subset (x := x) (y := y))
 
 theorem min_orderTop_le_orderTop_add {Γ} [LinearOrder Γ] {x y : HahnSeries Γ R} :
     min x.orderTop y.orderTop ≤ (x + y).orderTop := by
@@ -149,7 +153,12 @@ theorem min_orderTop_le_orderTop_add {Γ} [LinearOrder Γ] {x y : HahnSeries Γ 
     WithTop.coe_le_coe]
   exact HahnSeries.min_le_min_add hx hy hxy
 
--- DISSOLVED: min_order_le_order_add
+theorem min_order_le_order_add {Γ} [Zero Γ] [LinearOrder Γ] {x y : HahnSeries Γ R}
+    (hxy : x + y ≠ 0) : min x.order y.order ≤ (x + y).order := by
+  by_cases hx : x = 0; · simp [hx]
+  by_cases hy : y = 0; · simp [hy]
+  rw [order_of_ne hx, order_of_ne hy, order_of_ne hxy]
+  exact HahnSeries.min_le_min_add hx hy hxy
 
 theorem orderTop_add_eq_left {Γ} [LinearOrder Γ] {x y : HahnSeries Γ R}
     (hxy : x.orderTop < y.orderTop) : (x + y).orderTop = x.orderTop := by
@@ -241,13 +250,6 @@ instance : AddGroup (HahnSeries Γ R) :=
       apply neg_add_cancel }
 
 @[simp]
-theorem neg_coeff' {x : HahnSeries Γ R} : (-x).coeff = -x.coeff :=
-  rfl
-
-theorem neg_coeff {x : HahnSeries Γ R} {a : Γ} : (-x).coeff a = -x.coeff a :=
-  rfl
-
-@[simp]
 theorem support_neg {x : HahnSeries Γ R} : (-x).support = x.support := by
   ext
   simp
@@ -332,9 +334,15 @@ theorem orderTop_smul_not_lt (r : R) (x : HahnSeries Γ V) : ¬ (r • x).orderT
     exact Set.IsWF.min_of_subset_not_lt_min
       (Function.support_smul_subset_right (fun _ => r) x.coeff)
 
--- DISSOLVED: order_smul_not_lt
+theorem order_smul_not_lt [Zero Γ] (r : R) (x : HahnSeries Γ V) (h : r • x ≠ 0) :
+    ¬ (r • x).order < x.order := by
+  have hx : x ≠ 0 := right_ne_zero_of_smul h
+  simp_all only [order, dite_false]
+  exact Set.IsWF.min_of_subset_not_lt_min (Function.support_smul_subset_right (fun _ => r) x.coeff)
 
--- DISSOLVED: le_order_smul
+theorem le_order_smul {Γ} [Zero Γ] [LinearOrder Γ] (r : R) (x : HahnSeries Γ V) (h : r • x ≠ 0) :
+    x.order ≤ (r • x).order :=
+  le_of_not_lt (order_smul_not_lt r x h)
 
 end SMulZeroClass
 

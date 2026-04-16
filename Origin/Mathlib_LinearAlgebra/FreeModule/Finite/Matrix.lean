@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.LinearMap
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 
+noncomputable section
+
 /-!
 # Finite and free modules using matrices
 

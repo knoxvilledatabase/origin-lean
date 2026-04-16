@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/RamificationInertia/Basic.lean
-Genuine: 41 | Conflates: 1 | Dissolved: 8 | Infrastructure: 10
+Genuine: 48 | Conflates: 1 | Dissolved: 1 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Dimension.DivisionRing
 import Mathlib.RingTheory.DedekindDomain.Ideal
+
+noncomputable section
 
 /-!
 # Ramification index and inertia degree
@@ -101,7 +103,9 @@ theorem ramificationIdx_bot : ramificationIdx f ⊥ P = 0 :=
 theorem ramificationIdx_of_not_le (h : ¬map f p ≤ P) : ramificationIdx f p P = 0 :=
   ramificationIdx_spec (by simp) (by simpa using h)
 
--- DISSOLVED: ramificationIdx_ne_zero
+theorem ramificationIdx_ne_zero {e : ℕ} (he : e ≠ 0) (hle : map f p ≤ P ^ e)
+    (hnle : ¬map f p ≤ P ^ (e + 1)) : ramificationIdx f p P ≠ 0 := by
+  rwa [ramificationIdx_spec hle hnle]
 
 theorem le_pow_of_le_ramificationIdx {n : ℕ} (hn : n ≤ ramificationIdx f p P) :
     map f p ≤ P ^ n := by
@@ -114,7 +118,8 @@ theorem le_pow_ramificationIdx : map f p ≤ P ^ ramificationIdx f p P :=
 theorem le_comap_pow_ramificationIdx : p ≤ comap f (P ^ ramificationIdx f p P) :=
   map_le_iff_le_comap.mp le_pow_ramificationIdx
 
--- DISSOLVED: le_comap_of_ramificationIdx_ne_zero
+theorem le_comap_of_ramificationIdx_ne_zero (h : ramificationIdx f p P ≠ 0) : p ≤ comap f P :=
+  Ideal.map_le_iff_le_comap.mp <| le_pow_ramificationIdx.trans <| Ideal.pow_le_self <| h
 
 variable {S₁: Type*} [CommRing S₁] [Algebra R S₁]
 
@@ -159,7 +164,17 @@ theorem ramificationIdx_eq_factors_count [DecidableEq (Ideal S)]
   rw [IsDedekindDomain.ramificationIdx_eq_normalizedFactors_count hp0 hP hP0,
     factors_eq_normalizedFactors]
 
--- DISSOLVED: ramificationIdx_ne_zero
+theorem ramificationIdx_ne_zero (hp0 : map f p ≠ ⊥) (hP : P.IsPrime) (le : map f p ≤ P) :
+    ramificationIdx f p P ≠ 0 := by
+  classical
+  have hP0 : P ≠ ⊥ := by
+    rintro rfl
+    exact hp0 (le_bot_iff.mp le)
+  have hPirr := (Ideal.prime_of_isPrime hP0 hP).irreducible
+  rw [IsDedekindDomain.ramificationIdx_eq_normalizedFactors_count hp0 hP hP0]
+  obtain ⟨P', hP', P'_eq⟩ :=
+    exists_mem_normalizedFactors_of_dvd hp0 hPirr (Ideal.dvd_iff_le.mpr le)
+  rwa [Multiset.count_ne_zero, associated_iff_eq.mp P'_eq]
 
 end IsDedekindDomain
 
@@ -419,7 +434,9 @@ noncomputable instance Quotient.algebraQuotientPowRamificationIdx : Algebra (R �
 theorem Quotient.algebraMap_quotient_pow_ramificationIdx (x : R) :
     algebraMap (R ⧸ p) (S ⧸ P ^ e) (Ideal.Quotient.mk p x) = Ideal.Quotient.mk (P ^ e) (f x) := rfl
 
--- DISSOLVED: Quotient.algebraQuotientOfRamificationIdxNeZero
+def Quotient.algebraQuotientOfRamificationIdxNeZero [hfp : NeZero (ramificationIdx f p P)] :
+    Algebra (R ⧸ p) (S ⧸ P) :=
+  Quotient.algebraQuotientOfLEComap (le_comap_of_ramificationIdx_ne_zero hfp.out)
 
 set_option synthInstance.checkSynthOrder false -- Porting note: this is okay by the remark below
 
@@ -585,9 +602,36 @@ theorem rank_pow_quot [IsDedekindDomain S] [p.IsMaximal] [P.IsPrime] (hP0 : P �
 
 end
 
--- DISSOLVED: rank_prime_pow_ramificationIdx
+theorem rank_prime_pow_ramificationIdx [IsDedekindDomain S] [p.IsMaximal] [P.IsPrime]
+    (hP0 : P ≠ ⊥) (he : e ≠ 0) :
+    Module.rank (R ⧸ p) (S ⧸ P ^ e) =
+      e •
+        @Module.rank (R ⧸ p) (S ⧸ P) _ _
+          (@Algebra.toModule _ _ _ _ <|
+            @Quotient.algebraQuotientOfRamificationIdxNeZero _ _ _ _ _ _ _ ⟨he⟩) := by
+  letI : NeZero e := ⟨he⟩
+  have := rank_pow_quot f p P hP0 0 (Nat.zero_le e)
+  rw [pow_zero, Nat.sub_zero, Ideal.one_eq_top, Ideal.map_top] at this
+  exact (rank_top (R ⧸ p) _).symm.trans this
 
--- DISSOLVED: finrank_prime_pow_ramificationIdx
+theorem finrank_prime_pow_ramificationIdx [IsDedekindDomain S] (hP0 : P ≠ ⊥)
+    [p.IsMaximal] [P.IsPrime] (he : e ≠ 0) :
+    finrank (R ⧸ p) (S ⧸ P ^ e) =
+      e *
+        @finrank (R ⧸ p) (S ⧸ P) _ _
+          (@Algebra.toModule _ _ _ _ <|
+            @Quotient.algebraQuotientOfRamificationIdxNeZero _ _ _ _ _ _ _ ⟨he⟩) := by
+  letI : NeZero e := ⟨he⟩
+  letI : Algebra (R ⧸ p) (S ⧸ P) := Quotient.algebraQuotientOfRamificationIdxNeZero f p P
+  have hdim := rank_prime_pow_ramificationIdx _ _ _ hP0 he
+  by_cases hP : FiniteDimensional (R ⧸ p) (S ⧸ P)
+  · haveI := hP
+    haveI := (finiteDimensional_iff_of_rank_eq_nsmul he hdim).mpr hP
+    apply @Nat.cast_injective Cardinal
+    rw [finrank_eq_rank', Nat.cast_mul, finrank_eq_rank', hdim, nsmul_eq_mul]
+  have hPe := mt (finiteDimensional_iff_of_rank_eq_nsmul he hdim).mp hP
+  simp only [finrank_of_infinite_dimensional hP, finrank_of_infinite_dimensional hPe,
+    mul_zero]
 
 end FactLeComap
 
@@ -606,7 +650,10 @@ instance Factors.isPrime (P : (factors (map (algebraMap R S) p)).toFinset) :
     IsPrime (P : Ideal S) :=
   Ideal.isPrime_of_prime (prime_of_factor _ (Multiset.mem_toFinset.mp P.2))
 
--- DISSOLVED: Factors.ramificationIdx_ne_zero
+theorem Factors.ramificationIdx_ne_zero (P : (factors (map (algebraMap R S) p)).toFinset) :
+    ramificationIdx (algebraMap R S) p P ≠ 0 :=
+  IsDedekindDomain.ramificationIdx_ne_zero (ne_zero_of_mem_factors (Multiset.mem_toFinset.mp P.2))
+    (Factors.isPrime p P) (Ideal.le_of_dvd (dvd_of_mem_factors (Multiset.mem_toFinset.mp P.2)))
 
 instance Factors.fact_ramificationIdx_neZero (P : (factors (map (algebraMap R S) p)).toFinset) :
     NeZero (ramificationIdx (algebraMap R S) p P) :=
@@ -652,15 +699,6 @@ noncomputable def Factors.piQuotientEquiv (p : Ideal R) (hp : map (algebraMap R 
       Ideal.quotEquivOfEq <| by
         rw [IsDedekindDomain.ramificationIdx_eq_factors_count hp (Factors.isPrime p P)
             (Factors.ne_bot p P)]
-
-@[simp]
-theorem Factors.piQuotientEquiv_mk (p : Ideal R) (hp : map (algebraMap R S) p ≠ ⊥) (x : S) :
-    Factors.piQuotientEquiv p hp (Ideal.Quotient.mk _ x) = fun _ => Ideal.Quotient.mk _ x := rfl
-
-@[simp]
-theorem Factors.piQuotientEquiv_map (p : Ideal R) (hp : map (algebraMap R S) p ≠ ⊥) (x : R) :
-    Factors.piQuotientEquiv p hp (algebraMap _ _ x) = fun _ =>
-      Ideal.Quotient.mk _ (algebraMap _ _ x) := rfl
 
 variable (S)
 

@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Pairwise.Basic
 import Mathlib.Data.Set.Lattice
 import Mathlib.Data.SetLike.Basic
 
+noncomputable section
+
 /-!
 # Chains and flags
 
@@ -277,13 +279,6 @@ instance : SetLike (Flag α) α where
 theorem ext : (s : Set α) = t → s = t :=
   SetLike.ext'
 
-theorem mem_coe_iff : a ∈ (s : Set α) ↔ a ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem coe_mk (s : Set α) (h₁ h₂) : (mk s h₁ h₂ : Set α) = s :=
-  rfl
-
 @[simp]
 theorem mk_coe (s : Flag α) : mk (s : Set α) s.Chain' s.max_chain' = s :=
   ext rfl
@@ -301,9 +296,6 @@ theorem bot_mem [OrderBot α] (s : Flag α) : (⊥ : α) ∈ s :=
   s.maxChain.bot_mem
 
 def ofIsMaxChain (c : Set α) (hc : IsMaxChain (· ≤ ·) c) : Flag α := ⟨c, hc.isChain, hc.2⟩
-
-@[simp, norm_cast]
-lemma coe_ofIsMaxChain (c : Set α) (hc) : ofIsMaxChain c hc = c := rfl
 
 end LE
 
@@ -335,10 +327,6 @@ def map (e : α ≃o β) : Flag α ≃ Flag β
   invFun s := ofIsMaxChain _ (s.maxChain.image e.symm)
   left_inv s := ext <| e.symm_image_image s
   right_inv s := ext <| e.image_symm_image s
-
-@[simp, norm_cast] lemma coe_map (e : α ≃o β) (s : Flag α) : ↑(map e s) = e '' s := rfl
-
-@[simp] lemma symm_map (e : α ≃o β) : (map e).symm = map e.symm := rfl
 
 end Preorder
 

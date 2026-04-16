@@ -5,6 +5,8 @@ Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 46
 import Origin.Core
 import Mathlib.Order.Hom.Lattice
 
+noncomputable section
+
 /-!
 # Heyting algebra morphisms
 
@@ -221,13 +223,6 @@ instance instHeytingHomClass : HeytingHomClass (HeytingHom α β) α β where
   map_bot f := f.map_bot'
   map_himp := HeytingHom.map_himp'
 
-theorem toFun_eq_coe {f : HeytingHom α β} : f.toFun = ⇑f :=
-  rfl
-
-@[simp]
-theorem toFun_eq_coe_aux {f : HeytingHom α β} : (↑f.toLatticeHom) = ⇑f :=
-  rfl
-
 @[ext]
 theorem ext {f g : HeytingHom α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -239,10 +234,6 @@ protected def copy (f : HeytingHom α β) (f' : α → β) (h : f' = f) : Heytin
   map_bot' := by simpa only [h] using map_bot f
   map_himp' := by simpa only [h] using map_himp f
 
-@[simp]
-theorem coe_copy (f : HeytingHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : HeytingHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -253,15 +244,7 @@ protected def id : HeytingHom α α :=
     toLatticeHom := LatticeHom.id _
     map_himp' := fun _ _ => rfl }
 
-@[simp]
-theorem coe_id : ⇑(HeytingHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : HeytingHom.id α a = a :=
-  rfl
 
 instance : Inhabited (HeytingHom α α) :=
   ⟨HeytingHom.id _⟩
@@ -278,16 +261,7 @@ def comp (f : HeytingHom β γ) (g : HeytingHom α β) : HeytingHom α γ :=
 variable {f f₁ f₂ : HeytingHom α β} {g g₁ g₂ : HeytingHom β γ}
 
 @[simp]
-theorem coe_comp (f : HeytingHom β γ) (g : HeytingHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : HeytingHom β γ) (g : HeytingHom α β) (a : α) : f.comp g a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : HeytingHom γ δ) (g : HeytingHom β γ) (h : HeytingHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -322,13 +296,6 @@ instance : CoheytingHomClass (CoheytingHom α β) α β where
   map_top f := f.map_top'
   map_sdiff := CoheytingHom.map_sdiff'
 
-theorem toFun_eq_coe {f : CoheytingHom α β} : f.toFun = (f : α → β) :=
-  rfl
-
-@[simp]
-theorem toFun_eq_coe_aux {f : CoheytingHom α β} : (↑f.toLatticeHom) = ⇑f :=
-  rfl
-
 @[ext]
 theorem ext {f g : CoheytingHom α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -340,10 +307,6 @@ protected def copy (f : CoheytingHom α β) (f' : α → β) (h : f' = f) : Cohe
   map_top' := by simpa only [h] using map_top f
   map_sdiff' := by simpa only [h] using map_sdiff f
 
-@[simp]
-theorem coe_copy (f : CoheytingHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : CoheytingHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -354,15 +317,7 @@ protected def id : CoheytingHom α α :=
     toLatticeHom := LatticeHom.id _
     map_sdiff' := fun _ _ => rfl }
 
-@[simp]
-theorem coe_id : ⇑(CoheytingHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : CoheytingHom.id α a = a :=
-  rfl
 
 instance : Inhabited (CoheytingHom α α) :=
   ⟨CoheytingHom.id _⟩
@@ -379,16 +334,7 @@ def comp (f : CoheytingHom β γ) (g : CoheytingHom α β) : CoheytingHom α γ 
 variable {f f₁ f₂ : CoheytingHom α β} {g g₁ g₂ : CoheytingHom β γ}
 
 @[simp]
-theorem coe_comp (f : CoheytingHom β γ) (g : CoheytingHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : CoheytingHom β γ) (g : CoheytingHom α β) (a : α) : f.comp g a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : CoheytingHom γ δ) (g : CoheytingHom β γ) (h : CoheytingHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]
@@ -423,13 +369,6 @@ instance : BiheytingHomClass (BiheytingHom α β) α β where
   map_himp f := f.map_himp'
   map_sdiff f := f.map_sdiff'
 
-theorem toFun_eq_coe {f : BiheytingHom α β} : f.toFun = (f : α → β) :=
-  rfl
-
-@[simp]
-theorem toFun_eq_coe_aux {f : BiheytingHom α β} : (↑f.toLatticeHom) = ⇑f :=
-  rfl
-
 @[ext]
 theorem ext {f g : BiheytingHom α β} (h : ∀ a, f a = g a) : f = g :=
   DFunLike.ext f g h
@@ -441,10 +380,6 @@ protected def copy (f : BiheytingHom α β) (f' : α → β) (h : f' = f) : Bihe
   map_himp' := by simpa only [h] using map_himp f
   map_sdiff' := by simpa only [h] using map_sdiff f
 
-@[simp]
-theorem coe_copy (f : BiheytingHom α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : BiheytingHom α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
 
@@ -453,15 +388,7 @@ variable (α)
 protected def id : BiheytingHom α α :=
   { HeytingHom.id _, CoheytingHom.id _ with toLatticeHom := LatticeHom.id _ }
 
-@[simp]
-theorem coe_id : ⇑(BiheytingHom.id α) = id :=
-  rfl
-
 variable {α}
-
-@[simp]
-theorem id_apply (a : α) : BiheytingHom.id α a = a :=
-  rfl
 
 instance : Inhabited (BiheytingHom α α) :=
   ⟨BiheytingHom.id _⟩
@@ -478,16 +405,7 @@ def comp (f : BiheytingHom β γ) (g : BiheytingHom α β) : BiheytingHom α γ 
 variable {f f₁ f₂ : BiheytingHom α β} {g g₁ g₂ : BiheytingHom β γ}
 
 @[simp]
-theorem coe_comp (f : BiheytingHom β γ) (g : BiheytingHom α β) : ⇑(f.comp g) = f ∘ g :=
-  rfl
-
-@[simp]
 theorem comp_apply (f : BiheytingHom β γ) (g : BiheytingHom α β) (a : α) : f.comp g a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : BiheytingHom γ δ) (g : BiheytingHom β γ) (h : BiheytingHom α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
   rfl
 
 @[simp]

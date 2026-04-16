@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/InnerProductSpace/GramSchmidtOrtho.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.LinearAlgebra.Matrix.Block
+
+noncomputable section
 
 /-!
 # Gram-Schmidt Orthogonalization and Orthonormalization
@@ -177,9 +179,27 @@ theorem gramSchmidt_of_orthogonal {f : ι → E} (hf : Pairwise fun i j => ⟪f 
 
 variable {𝕜}
 
--- DISSOLVED: gramSchmidt_ne_zero_coe
+theorem gramSchmidt_ne_zero_coe {f : ι → E} (n : ι)
+    (h₀ : LinearIndependent 𝕜 (f ∘ ((↑) : Set.Iic n → ι))) : gramSchmidt 𝕜 f n ≠ 0 := by
+  by_contra h
+  have h₁ : f n ∈ span 𝕜 (f '' Set.Iio n) := by
+    rw [← span_gramSchmidt_Iio 𝕜 f n, gramSchmidt_def' 𝕜 f, h, zero_add]
+    apply Submodule.sum_mem _ _
+    intro a ha
+    simp only [Set.mem_image, Set.mem_Iio, orthogonalProjection_singleton]
+    apply Submodule.smul_mem _ _ _
+    rw [Finset.mem_Iio] at ha
+    exact subset_span ⟨a, ha, by rfl⟩
+  have h₂ : (f ∘ ((↑) : Set.Iic n → ι)) ⟨n, le_refl n⟩ ∈
+      span 𝕜 (f ∘ ((↑) : Set.Iic n → ι) '' Set.Iio ⟨n, le_refl n⟩) := by
+    rw [image_comp]
+    simpa using h₁
+  apply LinearIndependent.not_mem_span_image h₀ _ h₂
+  simp only [Set.mem_Iio, lt_self_iff_false, not_false_iff]
 
--- DISSOLVED: gramSchmidt_ne_zero
+theorem gramSchmidt_ne_zero {f : ι → E} (n : ι) (h₀ : LinearIndependent 𝕜 f) :
+    gramSchmidt 𝕜 f n ≠ 0 :=
+  gramSchmidt_ne_zero_coe _ (LinearIndependent.comp h₀ _ Subtype.coe_injective)
 
 theorem gramSchmidt_triangular {i j : ι} (hij : i < j) (b : Basis ι 𝕜 E) :
     b.repr (gramSchmidt 𝕜 b i) j = 0 := by
@@ -218,7 +238,11 @@ theorem gramSchmidtNormed_unit_length {f : ι → E} (n : ι) (h₀ : LinearInde
     ‖gramSchmidtNormed 𝕜 f n‖ = 1 :=
   gramSchmidtNormed_unit_length_coe _ (LinearIndependent.comp h₀ _ Subtype.coe_injective)
 
--- DISSOLVED: gramSchmidtNormed_unit_length'
+theorem gramSchmidtNormed_unit_length' {f : ι → E} {n : ι} (hn : gramSchmidtNormed 𝕜 f n ≠ 0) :
+    ‖gramSchmidtNormed 𝕜 f n‖ = 1 := by
+  rw [gramSchmidtNormed] at *
+  rw [norm_smul_inv_norm]
+  simpa using hn
 
 theorem gramSchmidt_orthonormal {f : ι → E} (h₀ : LinearIndependent 𝕜 f) :
     Orthonormal 𝕜 (gramSchmidtNormed 𝕜 f) := by
@@ -231,7 +255,12 @@ theorem gramSchmidt_orthonormal {f : ι → E} (h₀ : LinearIndependent 𝕜 f)
     repeat' right
     exact gramSchmidt_orthogonal 𝕜 f hij
 
--- DISSOLVED: gramSchmidt_orthonormal'
+theorem gramSchmidt_orthonormal' (f : ι → E) :
+    Orthonormal 𝕜 fun i : { i | gramSchmidtNormed 𝕜 f i ≠ 0 } => gramSchmidtNormed 𝕜 f i := by
+  refine ⟨fun i => gramSchmidtNormed_unit_length' i.prop, ?_⟩
+  rintro i j (hij : ¬_)
+  rw [Subtype.ext_iff] at hij
+  simp [gramSchmidtNormed, inner_smul_left, inner_smul_right, gramSchmidt_orthogonal 𝕜 f hij]
 
 theorem span_gramSchmidtNormed (f : ι → E) (s : Set ι) :
     span 𝕜 (gramSchmidtNormed 𝕜 f '' s) = span 𝕜 (gramSchmidt 𝕜 f '' s) := by
@@ -257,9 +286,18 @@ noncomputable def gramSchmidtOrthonormalBasis : OrthonormalBasis ι 𝕜 E :=
   ((gramSchmidt_orthonormal' f).exists_orthonormalBasis_extension_of_card_eq
     (v := gramSchmidtNormed 𝕜 f) h).choose
 
--- DISSOLVED: gramSchmidtOrthonormalBasis_apply
+theorem gramSchmidtOrthonormalBasis_apply {f : ι → E} {i : ι} (hi : gramSchmidtNormed 𝕜 f i ≠ 0) :
+    gramSchmidtOrthonormalBasis h f i = gramSchmidtNormed 𝕜 f i :=
+  ((gramSchmidt_orthonormal' f).exists_orthonormalBasis_extension_of_card_eq
+    (v := gramSchmidtNormed 𝕜 f) h).choose_spec i hi
 
--- DISSOLVED: gramSchmidtOrthonormalBasis_apply_of_orthogonal
+theorem gramSchmidtOrthonormalBasis_apply_of_orthogonal {f : ι → E}
+    (hf : Pairwise fun i j => ⟪f i, f j⟫ = 0) {i : ι} (hi : f i ≠ 0) :
+    gramSchmidtOrthonormalBasis h f i = (‖f i‖⁻¹ : 𝕜) • f i := by
+  have H : gramSchmidtNormed 𝕜 f i = (‖f i‖⁻¹ : 𝕜) • f i := by
+    rw [gramSchmidtNormed, gramSchmidt_of_orthogonal 𝕜 hf]
+  rw [gramSchmidtOrthonormalBasis_apply h, H]
+  simpa [H] using hi
 
 theorem inner_gramSchmidtOrthonormalBasis_eq_zero {f : ι → E} {i : ι}
     (hi : gramSchmidtNormed 𝕜 f i = 0) (j : ι) : ⟪gramSchmidtOrthonormalBasis h f i, f j⟫ = 0 := by

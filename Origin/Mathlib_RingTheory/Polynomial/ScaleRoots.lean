@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Polynomial/ScaleRoots.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 4 | Infrastructure: 1
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.RingTheory.Coprime.Basic
 import Mathlib.Tactic.AdaptationNote
+
+noncomputable section
 
 /-!
 # Scaling the roots of a polynomial
@@ -40,7 +42,13 @@ theorem zero_scaleRoots (s : R) : scaleRoots 0 s = 0 := by
   ext
   simp
 
--- DISSOLVED: scaleRoots_ne_zero
+theorem scaleRoots_ne_zero {p : R[X]} (hp : p ≠ 0) (s : R) : scaleRoots p s ≠ 0 := by
+  intro h
+  have : p.coeff p.natDegree ≠ 0 := mt leadingCoeff_eq_zero.mp hp
+  have : (scaleRoots p s).coeff p.natDegree = 0 :=
+    congr_fun (congr_arg (coeff : R[X] → ℕ → R) h) p.natDegree
+  rw [coeff_scaleRoots_natDegree] at this
+  contradiction
 
 theorem support_scaleRoots_le (p : R[X]) (s : R) : (scaleRoots p s).support ≤ p.support := by
   intro
@@ -73,7 +81,10 @@ theorem natDegree_scaleRoots (p : R[X]) (s : R) : natDegree (scaleRoots p s) = n
 theorem monic_scaleRoots_iff {p : R[X]} (s : R) : Monic (scaleRoots p s) ↔ Monic p := by
   simp only [Monic, leadingCoeff, natDegree_scaleRoots, coeff_scaleRoots_natDegree]
 
--- DISSOLVED: map_scaleRoots
+theorem map_scaleRoots (p : R[X]) (x : R) (f : R →+* S) (h : f p.leadingCoeff ≠ 0) :
+    (p.scaleRoots x).map f = (p.map f).scaleRoots (f x) := by
+  ext
+  simp [Polynomial.natDegree_map_of_leadingCoeff_ne_zero _ h]
 
 @[simp]
 lemma scaleRoots_C (r c : R) : (C c).scaleRoots r = C c := by
@@ -183,9 +194,16 @@ lemma mul_scaleRoots (p q : R[X]) (r : R) :
         simp only [← e, mul_assoc, mul_comm (r ^ (_ - a)), ← pow_add]
         rw [add_comm (_ - _), tsub_add_tsub_comm ha hb]
 
--- DISSOLVED: mul_scaleRoots'
+lemma mul_scaleRoots' (p q : R[X]) (r : R) (h : leadingCoeff p * leadingCoeff q ≠ 0) :
+    (p * q).scaleRoots r = p.scaleRoots r * q.scaleRoots r := by
+  rw [← mul_scaleRoots, natDegree_mul' h, tsub_self, pow_zero, one_smul]
 
--- DISSOLVED: mul_scaleRoots_of_noZeroDivisors
+lemma mul_scaleRoots_of_noZeroDivisors (p q : R[X]) (r : R) [NoZeroDivisors R] :
+    (p * q).scaleRoots r = p.scaleRoots r * q.scaleRoots r := by
+  by_cases hp : p = 0; · simp [hp]
+  by_cases hq : q = 0; · simp [hq]
+  apply mul_scaleRoots'
+  simp only [ne_eq, mul_eq_zero, leadingCoeff_eq_zero, hp, hq, or_self, not_false_eq_true]
 
 lemma add_scaleRoots_of_natDegree_eq (p q : R[X]) (r : R) (h : natDegree p = natDegree q) :
     r ^ (natDegree p - natDegree (p + q)) • (p + q).scaleRoots r =

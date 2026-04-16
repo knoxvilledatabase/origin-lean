@@ -8,6 +8,8 @@ import Mathlib.Data.List.MinMax
 import Mathlib.Data.Nat.Order.Lemmas
 import Mathlib.Logic.Encodable.Basic
 
+noncomputable section
+
 /-!
 # Denumerable types
 
@@ -95,10 +97,6 @@ def equiv₂ (α β) [Denumerable α] [Denumerable β] : α ≃ β :=
 instance nat : Denumerable ℕ :=
   ⟨fun _ => ⟨_, rfl, rfl⟩⟩
 
-@[simp]
-theorem ofNat_nat (n) : ofNat ℕ n = n :=
-  rfl
-
 instance option : Denumerable (Option α) :=
   ⟨fun n => by
     cases n with
@@ -133,9 +131,6 @@ end Sigma
 
 instance prod : Denumerable (α × β) :=
   ofEquiv _ (Equiv.sigmaEquivProd α β).symm
-
-theorem prod_ofNat_val (n : ℕ) :
-    ofNat (α × β) n = (ofNat α (unpair n).1, ofNat β (unpair n).2) := by simp
 
 @[simp]
 theorem prod_nat_ofNat : ofNat (ℕ × ℕ) = unpair := by funext; simp

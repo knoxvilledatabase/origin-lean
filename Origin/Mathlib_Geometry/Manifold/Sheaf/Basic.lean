@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.LocalInvariantProperties
 import Mathlib.Topology.Sheaves.LocalPredicate
 
+noncomputable section
+
 /-! # Generic construction of a sheaf from a `LocalInvariantProp` on a manifold
 
 This file constructs the sheaf-of-types of functions `f : M → M'` (for charted spaces `M`, `M'`)

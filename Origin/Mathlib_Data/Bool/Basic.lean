@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Bool/Basic.lean
-Genuine: 53 | Conflates: 0 | Dissolved: 2 | Infrastructure: 11
+Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Logic.Basic
 import Mathlib.Logic.Function.Defs
 import Mathlib.Order.Defs.LinearOrder
+
+noncomputable section
 
 /-!
 # Booleans
@@ -41,12 +43,6 @@ theorem eq_false_of_not_eq_true {b : Bool} : ¬b = true → b = false :=
 theorem eq_true_of_not_eq_false {b : Bool} : ¬b = false → b = true :=
   Eq.mp (eq_true_eq_not_eq_false b)
 
-theorem and_eq_true_eq_eq_true_and_eq_true (a b : Bool) :
-    ((a && b) = true) = (a = true ∧ b = true) := by simp
-
-theorem or_eq_true_eq_eq_true_or_eq_true (a b : Bool) :
-    ((a || b) = true) = (a = true ∨ b = true) := by simp
-
 theorem not_eq_true_eq_eq_false (a : Bool) : (not a = true) = (a = false) := by cases a <;> simp
 
 theorem and_eq_false_eq_eq_false_or_eq_false (a b : Bool) :
@@ -58,14 +54,6 @@ theorem or_eq_false_eq_eq_false_and_eq_false (a b : Bool) :
   cases a <;> cases b <;> simp
 
 theorem not_eq_false_eq_eq_true (a : Bool) : (not a = false) = (a = true) := by cases a <;> simp
-
-theorem coe_false : ↑false = False := by simp
-
-theorem coe_true : ↑true = True := by simp
-
-theorem coe_sort_false : (false : Prop) = False := by simp
-
-theorem coe_sort_true : (true : Prop) = True := by simp
 
 theorem decide_iff (p : Prop) [d : Decidable p] : decide p = true ↔ p := by simp
 
@@ -126,8 +114,6 @@ lemma self_ne_not : ∀ b : Bool, b ≠ !b := by decide
 
 lemma eq_or_eq_not : ∀ a b, a = b ∨ a = !b := by decide
 
-theorem not_iff_not : ∀ {b : Bool}, !b ↔ ¬b := by simp
-
 theorem eq_true_of_not_eq_false' {a : Bool} : !a = false → a = true := by
   cases a <;> decide
 
@@ -179,11 +165,11 @@ def ofNat (n : Nat) : Bool :=
 
 @[simp] lemma toNat_beq_zero (b : Bool) : (b.toNat == 0) = !b := by cases b <;> rfl
 
--- DISSOLVED: toNat_bne_zero
+@[simp] lemma toNat_bne_zero (b : Bool) : (b.toNat != 0) =  b := by simp [bne]
 
 @[simp] lemma toNat_beq_one (b : Bool) : (b.toNat == 1) =  b := by cases b <;> rfl
 
--- DISSOLVED: toNat_bne_one
+@[simp] lemma toNat_bne_one (b : Bool) : (b.toNat != 1) = !b := by simp [bne]
 
 theorem ofNat_le_ofNat {n m : Nat} (h : n ≤ m) : ofNat n ≤ ofNat m := by
   simp only [ofNat, ne_eq, _root_.decide_not]

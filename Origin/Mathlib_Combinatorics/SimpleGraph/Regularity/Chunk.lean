@@ -1,11 +1,13 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Regularity/Chunk.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Regularity.Bound
 import Mathlib.Combinatorics.SimpleGraph.Regularity.Equitabilise
 import Mathlib.Combinatorics.SimpleGraph.Regularity.Uniform
+
+noncomputable section
 
 /-!
 # Chunk of the increment partition for Szemerédi Regularity Lemma
@@ -162,7 +164,12 @@ private theorem one_sub_eps_mul_card_nonuniformWitness_le_card_star (hV : V ∈ 
 
 /-! ### `chunk` -/
 
--- DISSOLVED: card_chunk
+theorem card_chunk (hm : m ≠ 0) : #(chunk hP G ε hU).parts = 4 ^ #P.parts := by
+  unfold chunk
+  split_ifs
+  · rw [card_parts_equitabilise _ _ hm, tsub_add_cancel_of_le]
+    exact le_of_lt a_add_one_le_four_pow_parts_card
+  · rw [card_parts_equitabilise _ _ hm, tsub_add_cancel_of_le a_add_one_le_four_pow_parts_card]
 
 theorem card_eq_of_mem_parts_chunk (hs : s ∈ (chunk hP G ε hU).parts) :
     #s = m ∨ #s = m + 1 := by

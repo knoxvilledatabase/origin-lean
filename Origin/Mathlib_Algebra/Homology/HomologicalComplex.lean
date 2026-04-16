@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Homology/HomologicalComplex.lean
-Genuine: 96 | Conflates: 0 | Dissolved: 8 | Infrastructure: 30
+Genuine: 100 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.ComplexShape
 import Mathlib.CategoryTheory.Subobject.Limits
 import Mathlib.CategoryTheory.GradedObject
 import Mathlib.Algebra.Homology.ShortComplex.Basic
+
+noncomputable section
 
 /-!
 # Homological complexes.
@@ -79,10 +81,6 @@ theorem ext {C₁ C₂ : HomologicalComplex V c} (h_X : C₁.X = C₂.X)
 
 def XIsoOfEq (K : HomologicalComplex V c) {p q : ι} (h : p = q) : K.X p ≅ K.X q :=
   eqToIso (by rw [h])
-
-@[simp]
-lemma XIsoOfEq_rfl (K : HomologicalComplex V c) (p : ι) :
-    K.XIsoOfEq (rfl : p = p) = Iso.refl _ := rfl
 
 @[reassoc (attr := simp)]
 lemma XIsoOfEq_hom_comp_XIsoOfEq_hom (K : HomologicalComplex V c) {p₁ p₂ p₃ : ι}
@@ -231,15 +229,6 @@ lemma hom_ext {C D : HomologicalComplex V c} (f g : C ⟶ D)
   apply h
 
 @[simp]
-theorem id_f (C : HomologicalComplex V c) (i : ι) : Hom.f (𝟙 C) i = 𝟙 (C.X i) :=
-  rfl
-
-@[simp, reassoc]
-theorem comp_f {C₁ C₂ C₃ : HomologicalComplex V c} (f : C₁ ⟶ C₂) (g : C₂ ⟶ C₃) (i : ι) :
-    (f ≫ g).f i = f.f i ≫ g.f i :=
-  rfl
-
-@[simp]
 theorem eqToHom_f {C₁ C₂ : HomologicalComplex V c} (h : C₁ = C₂) (n : ι) :
     HomologicalComplex.Hom.f (eqToHom h) n =
       eqToHom (congr_fun (congr_arg HomologicalComplex.X h) n) := by
@@ -251,10 +240,6 @@ theorem hom_f_injective {C₁ C₂ : HomologicalComplex V c} :
 
 instance (X Y : HomologicalComplex V c) : Zero (X ⟶ Y) :=
   ⟨{ f := fun _ => 0}⟩
-
-@[simp]
-theorem zero_f (C D : HomologicalComplex V c) (i : ι) : (0 : C ⟶ D).f i = 0 :=
-  rfl
 
 instance : HasZeroMorphisms (HomologicalComplex V c) where
 
@@ -516,33 +501,8 @@ attribute [simp] comm_to_apply
 def sqFrom (f : Hom C₁ C₂) (i : ι) : Arrow.mk (C₁.dFrom i) ⟶ Arrow.mk (C₂.dFrom i) :=
   Arrow.homMk (f.comm_from i)
 
-@[simp]
-theorem sqFrom_left (f : Hom C₁ C₂) (i : ι) : (f.sqFrom i).left = f.f i :=
-  rfl
-
-@[simp]
-theorem sqFrom_right (f : Hom C₁ C₂) (i : ι) : (f.sqFrom i).right = f.next i :=
-  rfl
-
-@[simp]
-theorem sqFrom_id (C₁ : HomologicalComplex V c) (i : ι) : sqFrom (𝟙 C₁) i = 𝟙 _ :=
-  rfl
-
-@[simp]
-theorem sqFrom_comp (f : C₁ ⟶ C₂) (g : C₂ ⟶ C₃) (i : ι) :
-    sqFrom (f ≫ g) i = sqFrom f i ≫ sqFrom g i :=
-  rfl
-
 def sqTo (f : Hom C₁ C₂) (j : ι) : Arrow.mk (C₁.dTo j) ⟶ Arrow.mk (C₂.dTo j) :=
   Arrow.homMk (f.comm_to j)
-
-@[simp]
-theorem sqTo_left (f : Hom C₁ C₂) (j : ι) : (f.sqTo j).left = f.prev j :=
-  rfl
-
-@[simp]
-theorem sqTo_right (f : Hom C₁ C₂) (j : ι) : (f.sqTo j).right = f.f j :=
-  rfl
 
 end Hom
 
@@ -568,10 +528,6 @@ def of (X : α → V) (d : ∀ n, X (n + 1) ⟶ X n) (sq : ∀ n, d (n + 1) ≫ 
       simp only [eqToHom_refl, id_comp, dite_eq_ite, ite_true, sq] }
 
 variable (X : α → V) (d : ∀ n, X (n + 1) ⟶ X n) (sq : ∀ n, d (n + 1) ≫ d n = 0)
-
-@[simp]
-theorem of_x (n : α) : (of X d sq).X n = X n :=
-  rfl
 
 @[simp]
 theorem of_d (j : α) : (of X d sq).d (j + 1) j = d j := by
@@ -620,18 +576,6 @@ def mk : ChainComplex V ℕ :=
     fun n => (mkAux X₀ X₁ X₂ d₀ d₁ s succ n).zero
 
 @[simp]
-theorem mk_X_0 : (mk X₀ X₁ X₂ d₀ d₁ s succ).X 0 = X₀ :=
-  rfl
-
-@[simp]
-theorem mk_X_1 : (mk X₀ X₁ X₂ d₀ d₁ s succ).X 1 = X₁ :=
-  rfl
-
-@[simp]
-theorem mk_X_2 : (mk X₀ X₁ X₂ d₀ d₁ s succ).X 2 = X₂ :=
-  rfl
-
-@[simp]
 theorem mk_d_1_0 : (mk X₀ X₁ X₂ d₀ d₁ s succ).d 1 0 = d₀ := by
   change ite (1 = 0 + 1) (𝟙 X₁ ≫ d₀) 0 = d₀
   rw [if_pos rfl, Category.id_comp]
@@ -647,14 +591,6 @@ def mk' (X₀ X₁ : V) (d : X₁ ⟶ X₀)
   mk _ _ _ _ _ (succ' d).2.2 (fun S => succ' S.f)
 
 variable (succ' : ∀ {X₀ X₁ : V} (f : X₁ ⟶ X₀), Σ' (X₂ : V) (d : X₂ ⟶ X₁), d ≫ f = 0)
-
-@[simp]
-theorem mk'_X_0 : (mk' X₀ X₁ d₀ succ').X 0 = X₀ :=
-  rfl
-
-@[simp]
-theorem mk'_X_1 : (mk' X₀ X₁ d₀ succ').X 1 = X₁ :=
-  rfl
 
 @[simp]
 theorem mk'_d_1_0 : (mk' X₀ X₁ d₀ succ').d 1 0 = d₀ := by
@@ -676,7 +612,12 @@ variable (P Q : ChainComplex V ℕ) (zero : P.X 0 ⟶ Q.X 0) (one : P.X 1 ⟶ Q.
           f' ≫ Q.d (n + 1) n = P.d (n + 1) n ≫ f),
       Σ'f'' : P.X (n + 2) ⟶ Q.X (n + 2), f'' ≫ Q.d (n + 2) (n + 1) = P.d (n + 2) (n + 1) ≫ p.2.1)
 
--- DISSOLVED: mkHomAux
+def mkHomAux :
+    ∀ n,
+      Σ' (f : P.X n ⟶ Q.X n) (f' : P.X (n + 1) ⟶ Q.X (n + 1)),
+        f' ≫ Q.d (n + 1) n = P.d (n + 1) n ≫ f
+  | 0 => ⟨zero, one, one_zero_comm⟩
+  | n + 1 => ⟨(mkHomAux n).2.1, (succ n (mkHomAux n)).1, (succ n (mkHomAux n)).2⟩
 
 def mkHom : P ⟶ Q where
   f n := (mkHomAux P Q zero one one_zero_comm succ n).1
@@ -684,11 +625,14 @@ def mkHom : P ⟶ Q where
     rintro (rfl : m + 1 = n)
     exact (mkHomAux P Q zero one one_zero_comm succ m).2.2
 
--- DISSOLVED: mkHom_f_0
-
--- DISSOLVED: mkHom_f_1
-
--- DISSOLVED: mkHom_f_succ_succ
+@[simp]
+theorem mkHom_f_succ_succ (n : ℕ) :
+    (mkHom P Q zero one one_zero_comm succ).f (n + 2) =
+      (succ n
+          ⟨(mkHom P Q zero one one_zero_comm succ).f n,
+            (mkHom P Q zero one one_zero_comm succ).f (n + 1),
+            (mkHom P Q zero one one_zero_comm succ).comm (n + 1) n⟩).1 := by
+  dsimp [mkHom, mkHomAux]
 
 end MkHom
 
@@ -716,10 +660,6 @@ def of (X : α → V) (d : ∀ n, X n ⟶ X (n + 1)) (sq : ∀ n, d n ≫ d (n +
       all_goals simp }
 
 variable (X : α → V) (d : ∀ n, X n ⟶ X (n + 1)) (sq : ∀ n, d n ≫ d (n + 1) = 0)
-
-@[simp]
-theorem of_x (n : α) : (of X d sq).X n = X n :=
-  rfl
 
 @[simp]
 theorem of_d (j : α) : (of X d sq).d j (j + 1) = d j := by
@@ -768,18 +708,6 @@ def mk : CochainComplex V ℕ :=
     fun n => (mkAux X₀ X₁ X₂ d₀ d₁ s succ n).zero
 
 @[simp]
-theorem mk_X_0 : (mk X₀ X₁ X₂ d₀ d₁ s succ).X 0 = X₀ :=
-  rfl
-
-@[simp]
-theorem mk_X_1 : (mk X₀ X₁ X₂ d₀ d₁ s succ).X 1 = X₁ :=
-  rfl
-
-@[simp]
-theorem mk_X_2 : (mk X₀ X₁ X₂ d₀ d₁ s succ).X 2 = X₂ :=
-  rfl
-
-@[simp]
 theorem mk_d_1_0 : (mk X₀ X₁ X₂ d₀ d₁ s succ).d 0 1 = d₀ := by
   change ite (1 = 0 + 1) (d₀ ≫ 𝟙 X₁) 0 = d₀
   rw [if_pos rfl, Category.comp_id]
@@ -798,14 +726,6 @@ def mk' (X₀ X₁ : V) (d : X₀ ⟶ X₁)
 variable (succ' : ∀ {X₀ X₁ : V} (f : X₀ ⟶ X₁), Σ' (X₂ : V) (d : X₁ ⟶ X₂), f ≫ d = 0)
 
 @[simp]
-theorem mk'_X_0 : (mk' X₀ X₁ d₀ succ').X 0 = X₀ :=
-  rfl
-
-@[simp]
-theorem mk'_X_1 : (mk' X₀ X₁ d₀ succ').X 1 = X₁ :=
-  rfl
-
-@[simp]
 theorem mk'_d_1_0 : (mk' X₀ X₁ d₀ succ').d 0 1 = d₀ := by
   change ite (1 = 0 + 1) (d₀ ≫ 𝟙 X₁) 0 = d₀
   rw [if_pos rfl, Category.comp_id]
@@ -822,7 +742,12 @@ variable (P Q : CochainComplex V ℕ) (zero : P.X 0 ⟶ Q.X 0) (one : P.X 1 ⟶ 
           f ≫ Q.d n (n + 1) = P.d n (n + 1) ≫ f'),
       Σ' f'' : P.X (n + 2) ⟶ Q.X (n + 2), p.2.1 ≫ Q.d (n + 1) (n + 2) = P.d (n + 1) (n + 2) ≫ f'')
 
--- DISSOLVED: mkHomAux
+def mkHomAux :
+    ∀ n,
+      Σ' (f : P.X n ⟶ Q.X n) (f' : P.X (n + 1) ⟶ Q.X (n + 1)),
+        f ≫ Q.d n (n + 1) = P.d n (n + 1) ≫ f'
+  | 0 => ⟨zero, one, one_zero_comm⟩
+  | n + 1 => ⟨(mkHomAux n).2.1, (succ n (mkHomAux n)).1, (succ n (mkHomAux n)).2⟩
 
 def mkHom : P ⟶ Q where
   f n := (mkHomAux P Q zero one one_zero_comm succ n).1
@@ -830,11 +755,14 @@ def mkHom : P ⟶ Q where
     rintro (rfl : n + 1 = m)
     exact (mkHomAux P Q zero one one_zero_comm succ n).2.2
 
--- DISSOLVED: mkHom_f_0
-
--- DISSOLVED: mkHom_f_1
-
--- DISSOLVED: mkHom_f_succ_succ
+@[simp]
+theorem mkHom_f_succ_succ (n : ℕ) :
+    (mkHom P Q zero one one_zero_comm succ).f (n + 2) =
+      (succ n
+          ⟨(mkHom P Q zero one one_zero_comm succ).f n,
+            (mkHom P Q zero one one_zero_comm succ).f (n + 1),
+            (mkHom P Q zero one one_zero_comm succ).comm n (n + 1)⟩).1 := by
+  dsimp [mkHom, mkHomAux]
 
 end MkHom
 

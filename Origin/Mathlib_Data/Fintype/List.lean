@@ -7,6 +7,8 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.List.Permutation
 
+noncomputable section
+
 /-!
 
 # Fintype instance for nodup lists
@@ -36,10 +38,6 @@ def lists : Multiset α → Finset (List α) := fun s =>
     ext sl
     simp only [mem_permutations, List.mem_toFinset]
     exact ⟨fun hs => hs.trans h, fun hs => hs.trans h.symm⟩
-
-@[simp]
-theorem lists_coe (l : List α) : lists (l : Multiset α) = l.permutations.toFinset :=
-  rfl
 
 @[simp]
 theorem mem_lists_iff (s : Multiset α) (l : List α) : l ∈ lists s ↔ s = ⟦l⟧ := by

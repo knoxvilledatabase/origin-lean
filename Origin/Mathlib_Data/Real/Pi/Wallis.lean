@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Integrals
 
+noncomputable section
+
 /-! # The Wallis formula for Pi
 
 This file establishes the Wallis product for `π` (`Real.tendsto_prod_pi_div_two`). Our proof is

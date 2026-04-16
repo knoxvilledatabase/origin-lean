@@ -7,6 +7,8 @@ import Mathlib.Order.InitialSeg
 import Mathlib.Order.SuccPred.Limit
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Initial segments and successors
 

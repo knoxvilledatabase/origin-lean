@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/NormedSpace/OperatorNorm/Basic.lean
-Genuine: 40 | Conflates: 1 | Dissolved: 3 | Infrastructure: 11
+Genuine: 42 | Conflates: 2 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.Module.StrongTopology
 import Mathlib.Analysis.Normed.Operator.LinearIsometry
 import Mathlib.Analysis.Normed.Operator.ContinuousLinearMap
 import Mathlib.Tactic.SuppressCompilation
+
+noncomputable section
 
 /-!
 # Operator norm on the space of continuous linear maps
@@ -56,7 +58,12 @@ section
 
 variable [RingHomIsometric σ₁₂]
 
--- DISSOLVED: SemilinearMapClass.bound_of_shell_semi_normed
+theorem SemilinearMapClass.bound_of_shell_semi_normed [SemilinearMapClass 𝓕 σ₁₂ E F] (f : 𝓕)
+    {ε C : ℝ} (ε_pos : 0 < ε) {c : 𝕜} (hc : 1 < ‖c‖)
+    (hf : ∀ x, ε / ‖c‖ ≤ ‖x‖ → ‖x‖ < ε → ‖f x‖ ≤ C * ‖x‖) {x : E} (hx : ‖x‖ ≠ 0) :
+    ‖f x‖ ≤ C * ‖x‖ :=
+  (normSeminorm 𝕜 E).bound_of_shell ((normSeminorm 𝕜₂ F).comp ⟨⟨f, map_add f⟩, map_smulₛₗ f⟩)
+    ε_pos hc hf hx
 
 theorem SemilinearMapClass.bound_of_continuous [SemilinearMapClass 𝓕 σ₁₂ E F] (f : 𝓕)
     (hf : Continuous f) : ∃ C, 0 < C ∧ ∀ x : E, ‖f x‖ ≤ C * ‖x‖ :=
@@ -80,16 +87,6 @@ def _root_.LinearIsometry.toSpanSingleton {v : E} (hv : ‖v‖ = 1) : 𝕜 →�
   { LinearMap.toSpanSingleton 𝕜 E v with norm_map' := fun x => by simp [norm_smul, hv] }
 
 variable {𝕜 E}
-
-@[simp]
-theorem _root_.LinearIsometry.toSpanSingleton_apply {v : E} (hv : ‖v‖ = 1) (a : 𝕜) :
-    LinearIsometry.toSpanSingleton 𝕜 E hv a = a • v :=
-  rfl
-
-@[simp]
-theorem _root_.LinearIsometry.coe_toSpanSingleton {v : E} (hv : ‖v‖ = 1) :
-    (LinearIsometry.toSpanSingleton 𝕜 E hv).toLinearMap = LinearMap.toSpanSingleton 𝕜 E v :=
-  rfl
 
 end
 
@@ -124,7 +121,11 @@ theorem opNorm_le_bound (f : E →SL[σ₁₂] F) {M : ℝ} (hMp : 0 ≤ M) (hM 
     ‖f‖ ≤ M :=
   csInf_le bounds_bddBelow ⟨hMp, hM⟩
 
--- DISSOLVED: opNorm_le_bound'
+theorem opNorm_le_bound' (f : E →SL[σ₁₂] F) {M : ℝ} (hMp : 0 ≤ M)
+    (hM : ∀ x, ‖x‖ ≠ 0 → ‖f x‖ ≤ M * ‖x‖) : ‖f‖ ≤ M :=
+  opNorm_le_bound f hMp fun x =>
+    (ne_or_eq ‖x‖ 0).elim (hM x) fun h => by
+      simp only [h, mul_zero, norm_image_of_norm_zero f f.2 h, le_refl]
 
 theorem opNorm_le_of_lipschitz {f : E →SL[σ₁₂] F} {K : ℝ≥0} (hf : LipschitzWith K f) : ‖f‖ ≤ K :=
   f.opNorm_le_bound K.2 fun x => by
@@ -215,7 +216,12 @@ theorem opNorm_add_le : ‖f + g‖ ≤ ‖f‖ + ‖g‖ :=
   (f + g).opNorm_le_bound (add_nonneg f.opNorm_nonneg g.opNorm_nonneg) fun x =>
     (norm_add_le_of_le (f.le_opNorm x) (g.le_opNorm x)).trans_eq (add_mul _ _ _).symm
 
--- DISSOLVED: norm_id_of_nontrivial_seminorm
+-- CONFLATES (assumes ground = zero): norm_id_of_nontrivial_seminorm
+theorem norm_id_of_nontrivial_seminorm (h : ∃ x : E, ‖x‖ ≠ 0) : ‖id 𝕜 E‖ = 1 :=
+  le_antisymm norm_id_le <| by
+    let ⟨x, hx⟩ := h
+    have := (id 𝕜 E).ratio_le_opNorm x
+    rwa [id_apply, div_self hx] at this
 
 theorem opNorm_smul_le {𝕜' : Type*} [NormedField 𝕜'] [NormedSpace 𝕜' F] [SMulCommClass 𝕜₂ 𝕜' F]
     (c : 𝕜') (f : E →SL[σ₁₂] F) : ‖c • f‖ ≤ ‖c‖ * ‖f‖ :=
@@ -308,16 +314,6 @@ def restrictScalarsIsometry : (E →L[𝕜] Fₗ) →ₗᵢ[𝕜''] E →L[𝕜'
   ⟨restrictScalarsₗ 𝕜 E Fₗ 𝕜' 𝕜'', norm_restrictScalars⟩
 
 variable {𝕜''}
-
-@[simp]
-theorem coe_restrictScalarsIsometry :
-    ⇑(restrictScalarsIsometry 𝕜 E Fₗ 𝕜' 𝕜'') = restrictScalars 𝕜' :=
-  rfl
-
-@[simp]
-theorem restrictScalarsIsometry_toLinearMap :
-    (restrictScalarsIsometry 𝕜 E Fₗ 𝕜' 𝕜'').toLinearMap = restrictScalarsₗ 𝕜 E Fₗ 𝕜' 𝕜'' :=
-  rfl
 
 end RestrictScalars
 

@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.CategoryTheory.Functor.Currying
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 
+noncomputable section
+
 /-!
 # The morphism comparing a colimit of limits with the corresponding limit of colimits.
 

@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/Polynomial/RingDivision.lean
-Genuine: 19 | Conflates: 3 | Dissolved: 7 | Infrastructure: 1
+Genuine: 24 | Conflates: 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.Algebra.Polynomial.Div
+
+noncomputable section
 
 /-!
 # Theory of univariate polynomials
@@ -34,9 +36,13 @@ section
 
 variable [Semiring S]
 
--- DISSOLVED: natDegree_pos_of_aeval_root
+theorem natDegree_pos_of_aeval_root [Algebra R S] {p : R[X]} (hp : p ≠ 0) {z : S}
+    (hz : aeval z p = 0) (inj : ∀ x : R, algebraMap R S x = 0 → x = 0) : 0 < p.natDegree :=
+  natDegree_pos_of_eval₂_root hp (algebraMap R S) hz inj
 
--- DISSOLVED: degree_pos_of_aeval_root
+theorem degree_pos_of_aeval_root [Algebra R S] {p : R[X]} (hp : p ≠ 0) {z : S} (hz : aeval z p = 0)
+    (inj : ∀ x : R, algebraMap R S x = 0 → x = 0) : 0 < p.degree :=
+  natDegree_pos_iff_degree_pos.mp (natDegree_pos_of_aeval_root hp hz inj)
 
 end
 
@@ -126,7 +132,15 @@ theorem mem_nonZeroDivisors_of_leadingCoeff {p : R[X]} (h : p.leadingCoeff ∈ R
 
 end nonZeroDivisors
 
--- DISSOLVED: rootMultiplicity_mul_X_sub_C_pow
+theorem rootMultiplicity_mul_X_sub_C_pow {p : R[X]} {a : R} {n : ℕ} (h : p ≠ 0) :
+    (p * (X - C a) ^ n).rootMultiplicity a = p.rootMultiplicity a + n := by
+  have h2 := monic_X_sub_C a |>.pow n |>.mul_left_ne_zero h
+  refine le_antisymm ?_ ?_
+  · rw [rootMultiplicity_le_iff h2, add_assoc, add_comm n, ← add_assoc, pow_add,
+      dvd_cancel_right_mem_nonZeroDivisors (monic_X_sub_C a |>.pow n |>.mem_nonZeroDivisors)]
+    exact pow_rootMultiplicity_not_dvd h a
+  · rw [le_rootMultiplicity_iff h2, pow_add]
+    exact mul_dvd_mul_right (pow_rootMultiplicity_dvd p a) _
 
 -- CONFLATES (assumes ground = zero): rootMultiplicity_X_sub_C_pow
 theorem rootMultiplicity_X_sub_C_pow [Nontrivial R] (a : R) (n : ℕ) :
@@ -147,7 +161,12 @@ theorem rootMultiplicity_X_sub_C [Nontrivial R] [DecidableEq R] {x y : R} :
     exact rootMultiplicity_X_sub_C_self
   exact rootMultiplicity_eq_zero (mt root_X_sub_C.mp (Ne.symm hxy))
 
--- DISSOLVED: rootMultiplicity_mul'
+theorem rootMultiplicity_mul' {p q : R[X]} {x : R}
+    (hpq : (p /ₘ (X - C x) ^ p.rootMultiplicity x).eval x *
+      (q /ₘ (X - C x) ^ q.rootMultiplicity x).eval x ≠ 0) :
+    rootMultiplicity x (p * q) = rootMultiplicity x p + rootMultiplicity x q := by
+  simp_rw [eval_divByMonic_eq_trailingCoeff_comp] at hpq
+  simp_rw [rootMultiplicity_eq_natTrailingDegree, mul_comp, natTrailingDegree_mul' hpq]
 
 theorem Monic.neg_one_pow_natDegree_mul_comp_neg_X {p : R[X]} (hp : p.Monic) :
     ((-1) ^ p.natDegree * p.comp (-X)).Monic := by
@@ -188,7 +207,13 @@ theorem irreducible_X : Irreducible (X : R[X]) :=
 theorem Monic.irreducible_of_degree_eq_one (hp1 : degree p = 1) (hm : Monic p) : Irreducible p :=
   (hm.prime_of_degree_eq_one hp1).irreducible
 
--- DISSOLVED: aeval_ne_zero_of_isCoprime
+-- CONFLATES (assumes ground = zero): aeval_ne_zero_of_isCoprime
+lemma aeval_ne_zero_of_isCoprime {R} [CommSemiring R] [Nontrivial S] [Semiring S] [Algebra R S]
+    {p q : R[X]} (h : IsCoprime p q) (s : S) : aeval s p ≠ 0 ∨ aeval s q ≠ 0 := by
+  by_contra! hpq
+  rcases h with ⟨_, _, h⟩
+  apply_fun aeval s at h
+  simp only [map_add, map_mul, map_one, hpq.left, hpq.right, mul_zero, add_zero, zero_ne_one] at h
 
 theorem isCoprime_X_sub_C_of_isUnit_sub {R} [CommRing R] {a b : R} (h : IsUnit (a - b)) :
     IsCoprime (X - C a) (X - C b) :=
@@ -202,13 +227,63 @@ theorem pairwise_coprime_X_sub_C {K} [Field K] {I : Type v} {s : I → K} (H : F
     Pairwise (IsCoprime on fun i : I => X - C (s i)) := fun _ _ hij =>
   isCoprime_X_sub_C_of_isUnit_sub (sub_ne_zero_of_ne <| H.ne hij).isUnit
 
--- DISSOLVED: rootMultiplicity_mul
+theorem rootMultiplicity_mul {p q : R[X]} {x : R} (hpq : p * q ≠ 0) :
+    rootMultiplicity x (p * q) = rootMultiplicity x p + rootMultiplicity x q := by
+  classical
+  have hp : p ≠ 0 := left_ne_zero_of_mul hpq
+  have hq : q ≠ 0 := right_ne_zero_of_mul hpq
+  rw [rootMultiplicity_eq_multiplicity (p * q), if_neg hpq, rootMultiplicity_eq_multiplicity p,
+    if_neg hp, rootMultiplicity_eq_multiplicity q, if_neg hq,
+    multiplicity_mul (prime_X_sub_C x) (multiplicity_X_sub_C_finite _ hpq)]
 
 open Multiset in
 
 set_option linter.unusedVariables false in
-
--- DISSOLVED: exists_multiset_roots
+theorem exists_multiset_roots [DecidableEq R] :
+    ∀ {p : R[X]} (_ : p ≠ 0), ∃ s : Multiset R,
+      (Multiset.card s : WithBot ℕ) ≤ degree p ∧ ∀ a, s.count a = rootMultiplicity a p
+  | p, hp =>
+    haveI := Classical.propDecidable (∃ x, IsRoot p x)
+    if h : ∃ x, IsRoot p x then
+      let ⟨x, hx⟩ := h
+      have hpd : 0 < degree p := degree_pos_of_root hp hx
+      have hd0 : p /ₘ (X - C x) ≠ 0 := fun h => by
+        rw [← mul_divByMonic_eq_iff_isRoot.2 hx, h, mul_zero] at hp; exact hp rfl
+      #adaptation_note
+      /--
+      Since https://github.com/leanprover/lean4/pull/5338, this is considered unused,
+      because it is only used in the decreasing_by clause.
+      -/
+      have wf : degree (p /ₘ (X - C x)) < degree p :=
+        degree_divByMonic_lt _ (monic_X_sub_C x) hp ((degree_X_sub_C x).symm ▸ by decide)
+      let ⟨t, htd, htr⟩ := @exists_multiset_roots _ (p /ₘ (X - C x)) hd0
+      have hdeg : degree (X - C x) ≤ degree p := by
+        rw [degree_X_sub_C, degree_eq_natDegree hp]
+        rw [degree_eq_natDegree hp] at hpd
+        exact WithBot.coe_le_coe.2 (WithBot.coe_lt_coe.1 hpd)
+      have hdiv0 : p /ₘ (X - C x) ≠ 0 :=
+        mt (divByMonic_eq_zero_iff (monic_X_sub_C x)).1 <| not_lt.2 hdeg
+      ⟨x ::ₘ t,
+        calc
+          (card (x ::ₘ t) : WithBot ℕ) = Multiset.card t + 1 := by
+            congr
+            exact mod_cast Multiset.card_cons _ _
+          _ ≤ degree p := by
+            rw [← degree_add_divByMonic (monic_X_sub_C x) hdeg, degree_X_sub_C, add_comm]
+            exact add_le_add (le_refl (1 : WithBot ℕ)) htd,
+        by
+          change ∀ (a : R), count a (x ::ₘ t) = rootMultiplicity a p
+          intro a
+          conv_rhs => rw [← mul_divByMonic_eq_iff_isRoot.mpr hx]
+          rw [rootMultiplicity_mul (mul_ne_zero (X_sub_C_ne_zero x) hdiv0),
+            rootMultiplicity_X_sub_C, ← htr a]
+          split_ifs with ha
+          · rw [ha, count_cons_self, add_comm]
+          · rw [count_cons_of_ne ha, zero_add]⟩
+    else
+      ⟨0, (degree_eq_natDegree hp).symm ▸ WithBot.coe_le_coe.2 (Nat.zero_le _), by
+        intro a
+        rw [count_zero, rootMultiplicity_eq_zero (not_exists.mp h a)]⟩
 
 termination_by p => natDegree p
 

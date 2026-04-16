@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/GradedObject/Trifunctor.lean
-Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.GradedObject.Bifunctor
 import Mathlib.CategoryTheory.Functor.Trifunctor
+
+noncomputable section
 
 /-!
 # The action of trifunctors on graded objects
@@ -313,7 +315,6 @@ noncomputable def isColimitCofan₃MapBifunctor₁₂BifunctorMapObj (j : J) :
 variable {F₁₂ G ρ₁₂ X₁ X₂ X₃}
 
 include ρ₁₂ in
-
 lemma HasGoodTrifunctor₁₂Obj.hasMap :
     HasMap ((((mapTrifunctor (bifunctorComp₁₂ F₁₂ G) I₁ I₂ I₃).obj X₁).obj X₂).obj X₃) r :=
   fun j => ⟨_, isColimitCofan₃MapBifunctor₁₂BifunctorMapObj F₁₂ G ρ₁₂ X₁ X₂ X₃ j⟩
@@ -476,7 +477,6 @@ noncomputable def isColimitCofan₃MapBifunctorBifunctor₂₃MapObj (j : J) :
 variable {F₁₂ G ρ₁₂ X₁ X₂ X₃}
 
 include ρ₂₃ in
-
 lemma HasGoodTrifunctor₂₃Obj.hasMap :
     HasMap ((((mapTrifunctor (bifunctorComp₂₃ F G₂₃) I₁ I₂ I₃).obj X₁).obj X₂).obj X₃) r :=
   fun j => ⟨_, isColimitCofan₃MapBifunctorBifunctor₂₃MapObj F G₂₃ ρ₂₃ X₁ X₂ X₃ j⟩

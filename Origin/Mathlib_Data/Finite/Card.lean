@@ -5,6 +5,8 @@ Genuine: 31 | Conflates: 2 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Finite
 
+noncomputable section
+
 /-!
 
 # Cardinality of finite types
@@ -165,6 +167,7 @@ end ENat
 namespace PartENat
 
 set_option linter.deprecated false in
+@[deprecated ENat.card_eq_coe_natCard (since := "2024-11-30")]
 
 theorem card_eq_coe_natCard (α : Type*) [Finite α] : card α = Nat.card α := by
   unfold PartENat.card

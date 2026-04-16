@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.FunctorToTypes
 import Mathlib.CategoryTheory.Limits.Indization.IndObject
 import Mathlib.Logic.Small.Set
 
+noncomputable section
+
 /-!
 # Ind-objects are closed under filtered colimits
 

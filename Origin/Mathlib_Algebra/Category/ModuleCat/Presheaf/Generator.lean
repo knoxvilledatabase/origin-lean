@@ -10,6 +10,8 @@ import Mathlib.Algebra.Homology.ShortComplex.Exact
 import Mathlib.CategoryTheory.Elements
 import Mathlib.CategoryTheory.Generator
 
+noncomputable section
+
 /-!
 # Generators for the category of presheaves of modules
 
@@ -59,10 +61,6 @@ lemma freeYonedaEquiv_symm_app (M : PresheafOfModules.{v} R) (X : C)
   dsimp [freeYonedaEquiv, freeHomEquiv, yonedaEquiv]
   rw [ModuleCat.freeDesc_apply, op_id, M.presheaf.map_id]
   rfl
-
-lemma freeYonedaEquiv_comp {M N : PresheafOfModules.{v} R} {X : C}
-    (m : ((free R).obj (yoneda.obj X) ⟶ M)) (φ : M ⟶ N) :
-    freeYonedaEquiv (m ≫ φ) = φ.app _ (freeYonedaEquiv m) := rfl
 
 variable (R) in
 

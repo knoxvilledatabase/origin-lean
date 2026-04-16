@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Add
 import Mathlib.Analysis.Calculus.Deriv.Comp
 
+noncomputable section
+
 /-!
 ### Invariance of the derivative under translation
 

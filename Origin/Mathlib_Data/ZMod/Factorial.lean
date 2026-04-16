@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Intervals
 import Mathlib.Data.Nat.Factorial.BigOperators
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # Facts about factorials in ZMod
 

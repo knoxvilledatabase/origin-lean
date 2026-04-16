@@ -1,9 +1,11 @@
 /-
 Extracted from SetTheory/Cardinal/ToNat.lean
-Genuine: 33 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
+Genuine: 36 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.ENat
+
+noncomputable section
 
 /-!
 # Projection from cardinal numbers to natural numbers
@@ -36,9 +38,9 @@ theorem toNat_ofENat (n : ℕ∞) : toNat n = ENat.toNat n :=
 lemma toNat_eq_zero : toNat c = 0 ↔ c = 0 ∨ ℵ₀ ≤ c := by
   rw [← toNat_toENat, ENat.toNat_eq_zero, toENat_eq_zero, toENat_eq_top]
 
--- DISSOLVED: toNat_ne_zero
+lemma toNat_ne_zero : toNat c ≠ 0 ↔ c ≠ 0 ∧ c < ℵ₀ := by simp [not_or]
 
--- DISSOLVED: toNat_pos
+@[simp] lemma toNat_pos : 0 < toNat c ↔ c ≠ 0 ∧ c < ℵ₀ := pos_iff_ne_zero.trans toNat_ne_zero
 
 theorem cast_toNat_of_lt_aleph0 {c : Cardinal} (h : c < ℵ₀) : ↑(toNat c) = c := by
   lift c to ℕ using h
@@ -100,20 +102,16 @@ theorem toNat_surjective : Surjective toNat :=
   toNat_rightInverse.surjective
 
 @[simp]
-theorem mk_toNat_of_infinite [h : Infinite α] : toNat #α = 0 := by simp
-
-@[simp]
 theorem aleph0_toNat : toNat ℵ₀ = 0 :=
   toNat_apply_of_aleph0_le le_rfl
-
-theorem mk_toNat_eq_card [Fintype α] : toNat #α = Fintype.card α := by simp
 
 @[simp]
 theorem zero_toNat : toNat 0 = 0 := map_zero _
 
 theorem one_toNat : toNat 1 = 1 := map_one _
 
--- DISSOLVED: toNat_eq_iff
+theorem toNat_eq_iff {n : ℕ} (hn : n ≠ 0) : toNat c = n ↔ c = n := by
+  rw [← toNat_toENat, ENat.toNat_eq_iff hn, toENat_eq_nat]
 
 theorem toNat_eq_ofNat {n : ℕ} [Nat.AtLeastTwo n] :
     toNat c = OfNat.ofNat n ↔ c = OfNat.ofNat n :=

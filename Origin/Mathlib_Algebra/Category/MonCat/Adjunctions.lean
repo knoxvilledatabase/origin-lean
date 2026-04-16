@@ -8,6 +8,8 @@ import Mathlib.Algebra.Category.Semigrp.Basic
 import Mathlib.Algebra.Group.WithOne.Basic
 import Mathlib.Algebra.FreeMonoid.Basic
 
+noncomputable section
+
 /-!
 # Adjunctions regarding the category of monoids
 

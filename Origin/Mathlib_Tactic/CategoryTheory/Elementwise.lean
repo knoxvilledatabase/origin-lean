@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.Util.AddRelatedDecl
 import Batteries.Tactic.Lint
 
+noncomputable section
+
 /-!
 # Tools to reformulate category-theoretic lemmas in concrete categories
 
@@ -130,7 +132,6 @@ private partial def mkUnusedName (names : List Name) (baseName : Name) : Name :=
     loop 1
 
 syntax (name := elementwise) "elementwise"
-
   " nosimp"? (" (" &"attr" ":=" Parser.Term.attrInstance,* ")")? : attr
 
 initialize registerBuiltinAttribute {
@@ -172,11 +173,8 @@ initialize registerBuiltinAttribute {
   | _ => throwUnsupportedSyntax }
 
 elab "elementwise_of% " t:term : term => do
-
   let e ← Term.elabTerm t none
-
   let (pf, _) ← elementwiseExpr .anonymous (← inferType e) e (simpSides := false)
-
   return pf
 
 syntax "elementwise" (ppSpace colGt ident)* : tactic

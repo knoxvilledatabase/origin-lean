@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Enriched.Basic
 import Mathlib.CategoryTheory.Monoidal.Types.Coyoneda
 
+noncomputable section
+
 /-!
 # Enriched ordinary categories
 

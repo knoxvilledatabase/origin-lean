@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.RingTheory.PowerBasis
 
+noncomputable section
+
 /-!
 # The minimal polynomial divides the characteristic polynomial of a matrix.
 

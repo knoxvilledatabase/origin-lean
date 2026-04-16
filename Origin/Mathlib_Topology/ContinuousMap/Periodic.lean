@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Periodic
 import Mathlib.Topology.ContinuousMap.Algebra
 
+noncomputable section
+
 /-!
 # Sums of translates of a continuous function is a period continuous function.
 

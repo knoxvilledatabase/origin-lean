@@ -8,6 +8,8 @@ import Mathlib.Topology.Bases
 import Mathlib.Topology.Inseparable
 import Mathlib.Topology.Compactness.Exterior
 
+noncomputable section
+
 /-!
 # Alexandrov-discrete topological spaces
 

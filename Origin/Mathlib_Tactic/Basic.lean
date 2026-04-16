@@ -10,6 +10,8 @@ import Mathlib.Tactic.Lemma
 import Mathlib.Tactic.TypeStar
 import Mathlib.Tactic.Linter.OldObtain
 
+noncomputable section
+
 /-!
 # Basic tactics and utilities for tactic writing
 
@@ -69,25 +71,16 @@ where
 macro "assumption'" : tactic => `(tactic| any_goals assumption)
 
 elab "match_target " t:term : tactic => do
-
   withMainContext do
-
     let (val) ← elabTerm t (← inferType (← getMainTarget))
-
     if not (← isDefEq val (← getMainTarget)) then
-
       throwError "failed"
 
 elab (name := clearAuxDecl) "clear_aux_decl" : tactic => withMainContext do
-
   let mut g ← getMainGoal
-
   for ldec in ← getLCtx do
-
     if ldec.isAuxDecl then
-
       g ← g.tryClear ldec.fvarId
-
   replaceMainGoal [g]
 
 def _root_.Lean.MVarId.clearValue (mvarId : MVarId) (fvarId : FVarId) : MetaM MVarId := do
@@ -109,17 +102,11 @@ def _root_.Lean.MVarId.clearValue (mvarId : MVarId) (fvarId : FVarId) : MetaM MV
   return mvarId
 
 elab (name := clearValue) "clear_value" hs:(ppSpace colGt term:max)+ : tactic => do
-
   let fvarIds ← getFVarIds hs
-
   let fvarIds ← withMainContext <| sortFVarIds fvarIds
-
   for fvarId in fvarIds.reverse do
-
     withMainContext do
-
       let mvarId ← (← getMainGoal).clearValue fvarId
-
       replaceMainGoal [mvarId]
 
 attribute [pp_with_univ] ULift PUnit PEmpty

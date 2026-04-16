@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/MvPowerSeries/Inverse.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 7 | Infrastructure: 3
+Genuine: 23 | Conflates: 0 | Dissolved: 1 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Units.Basic
 import Mathlib.RingTheory.MvPowerSeries.Basic
 import Mathlib.RingTheory.MvPowerSeries.NoZeroDivisors
 import Mathlib.RingTheory.LocalRing.Basic
+
+noncomputable section
 
 /-!
 # Formal (multivariate) power series - Inverses
@@ -207,7 +209,10 @@ theorem inv_eq_zero {φ : MvPowerSeries σ k} : φ⁻¹ = 0 ↔ constantCoeff σ
 
 -- DISSOLVED: zero_inv
 
--- DISSOLVED: invOfUnit_eq
+@[simp]
+theorem invOfUnit_eq (φ : MvPowerSeries σ k) (h : constantCoeff σ k φ ≠ 0) :
+    invOfUnit φ (Units.mk0 _ h) = φ⁻¹ :=
+  rfl
 
 @[simp]
 theorem invOfUnit_eq' (φ : MvPowerSeries σ k) (u : Units k) (h : constantCoeff σ k φ = u) :
@@ -217,15 +222,24 @@ theorem invOfUnit_eq' (φ : MvPowerSeries σ k) (u : Units k) (h : constantCoeff
   rw [Units.ext_iff]
   exact h.symm
 
--- DISSOLVED: mul_inv_cancel
+@[simp]
+protected theorem mul_inv_cancel (φ : MvPowerSeries σ k) (h : constantCoeff σ k φ ≠ 0) :
+    φ * φ⁻¹ = 1 := by rw [← invOfUnit_eq φ h, mul_invOfUnit φ (Units.mk0 _ h) rfl]
 
--- DISSOLVED: inv_mul_cancel
+@[simp]
+protected theorem inv_mul_cancel (φ : MvPowerSeries σ k) (h : constantCoeff σ k φ ≠ 0) :
+    φ⁻¹ * φ = 1 := by rw [mul_comm, φ.mul_inv_cancel h]
 
--- DISSOLVED: eq_mul_inv_iff_mul_eq
+protected theorem eq_mul_inv_iff_mul_eq {φ₁ φ₂ φ₃ : MvPowerSeries σ k}
+    (h : constantCoeff σ k φ₃ ≠ 0) : φ₁ = φ₂ * φ₃⁻¹ ↔ φ₁ * φ₃ = φ₂ :=
+  ⟨fun k => by simp [k, mul_assoc, MvPowerSeries.inv_mul_cancel _ h], fun k => by
+    simp [← k, mul_assoc, MvPowerSeries.mul_inv_cancel _ h]⟩
 
--- DISSOLVED: eq_inv_iff_mul_eq_one
+protected theorem eq_inv_iff_mul_eq_one {φ ψ : MvPowerSeries σ k} (h : constantCoeff σ k ψ ≠ 0) :
+    φ = ψ⁻¹ ↔ φ * ψ = 1 := by rw [← MvPowerSeries.eq_mul_inv_iff_mul_eq h, one_mul]
 
--- DISSOLVED: inv_eq_iff_mul_eq_one
+protected theorem inv_eq_iff_mul_eq_one {φ ψ : MvPowerSeries σ k} (h : constantCoeff σ k ψ ≠ 0) :
+    ψ⁻¹ = φ ↔ φ * ψ = 1 := by rw [eq_comm, MvPowerSeries.eq_inv_iff_mul_eq_one h]
 
 @[simp]
 protected theorem mul_inv_rev (φ ψ : MvPowerSeries σ k) :

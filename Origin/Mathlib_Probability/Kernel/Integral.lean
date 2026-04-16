@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.Bochner
 import Mathlib.Probability.Kernel.Basic
 
+noncomputable section
+
 /-!
 # Bochner integrals of kernels
 

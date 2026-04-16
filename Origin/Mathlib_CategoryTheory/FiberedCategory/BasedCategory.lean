@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Bicategory.Strict
 import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 
+noncomputable section
+
 /-!
 # The bicategory of based categories
 
@@ -71,19 +73,6 @@ def comp {𝒵 : BasedCategory.{v₄, u₄} 𝒮} (F : 𝒳 ⥤ᵇ 𝒴) (G : �
   w := by rw [Functor.assoc, G.w, F.w]
 
 scoped infixr:80 " ⋙ " => BasedFunctor.comp
-
-@[simp]
-lemma comp_id (F : 𝒳 ⥤ᵇ 𝒴) :  F ⋙ 𝟭 𝒴 = F :=
-  rfl
-
-@[simp]
-lemma id_comp (F : 𝒳 ⥤ᵇ 𝒴) : 𝟭 𝒳 ⋙ F = F :=
-  rfl
-
-@[simp]
-lemma comp_assoc {𝒵 : BasedCategory.{v₄, u₄} 𝒮} {𝒜 : BasedCategory.{v₅, u₅} 𝒮} (F : 𝒳 ⥤ᵇ 𝒴)
-    (G : 𝒴 ⥤ᵇ 𝒵) (H : 𝒵 ⥤ᵇ 𝒜) : (F ⋙ G) ⋙ H = F ⋙ (G ⋙ H) :=
-  rfl
 
 @[simp]
 lemma w_obj (F : 𝒳 ⥤ᵇ 𝒴) (a : 𝒳.obj) : 𝒴.p.obj (F.obj a) = 𝒳.p.obj a := by

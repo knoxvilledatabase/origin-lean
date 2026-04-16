@@ -8,6 +8,8 @@ import Mathlib.FieldTheory.NormalClosure
 import Mathlib.FieldTheory.PrimitiveElement
 import Mathlib.GroupTheory.GroupAction.FixingSubgroup
 
+noncomputable section
+
 /-!
 # Galois Extensions
 
@@ -249,26 +251,6 @@ def intermediateFieldEquivSubgroup [FiniteDimensional F E] [IsGalois F E] :
     rw [← fixedField_fixingSubgroup L, IntermediateField.le_iff_le, fixedField_fixingSubgroup L]
     rfl
 
-def galoisInsertionIntermediateFieldSubgroup [FiniteDimensional F E] :
-    GaloisInsertion (OrderDual.toDual ∘
-      (IntermediateField.fixingSubgroup : IntermediateField F E → Subgroup (E ≃ₐ[F] E)))
-      ((IntermediateField.fixedField : Subgroup (E ≃ₐ[F] E) → IntermediateField F E) ∘
-        OrderDual.toDual) where
-  choice K _ := IntermediateField.fixingSubgroup K
-  gc K H := (IntermediateField.le_iff_le H K).symm
-  le_l_u H := le_of_eq (IntermediateField.fixingSubgroup_fixedField H).symm
-  choice_eq _ _ := rfl
-
-def galoisCoinsertionIntermediateFieldSubgroup [FiniteDimensional F E] [IsGalois F E] :
-    GaloisCoinsertion (OrderDual.toDual ∘
-      (IntermediateField.fixingSubgroup : IntermediateField F E → Subgroup (E ≃ₐ[F] E)))
-      ((IntermediateField.fixedField : Subgroup (E ≃ₐ[F] E) → IntermediateField F E) ∘
-        OrderDual.toDual) where
-  choice H _ := IntermediateField.fixedField H
-  gc K H := (IntermediateField.le_iff_le H K).symm
-  u_l_le K := le_of_eq (fixedField_fixingSubgroup K)
-  choice_eq _ _ := rfl
-
 end IsGalois
 
 section
@@ -303,10 +285,6 @@ noncomputable def normalAutEquivQuotient [FiniteDimensional K L] [IsGalois K L]
   (fixedField H).restrictNormalHom_ker.symm)).trans <|
   QuotientGroup.quotientKerEquivOfSurjective (restrictNormalHom (fixedField H)) <|
   restrictNormalHom_surjective L
-
-lemma normalAutEquivQuotient_apply [FiniteDimensional K L] [IsGalois K L]
-    (H : Subgroup (L ≃ₐ[K] L)) [Subgroup.Normal H] (σ : (L ≃ₐ[K] L)) :
-    normalAutEquivQuotient H σ = (restrictNormalHom (fixedField H)) σ := rfl
 
 open scoped Pointwise
 

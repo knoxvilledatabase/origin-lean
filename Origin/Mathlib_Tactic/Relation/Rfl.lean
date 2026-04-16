@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Meta.Tactic.Rfl
 
+noncomputable section
+
 /-!
 # `Lean.MVarId.liftReflToEq`
 

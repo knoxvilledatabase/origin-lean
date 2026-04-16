@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/Valuation/Integers.lean
-Genuine: 16 | Conflates: 0 | Dissolved: 1 | Infrastructure: 3
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.RingTheory.Valuation.Basic
+
+noncomputable section
 
 /-!
 # Ring of integers under a given valuation
@@ -32,8 +34,6 @@ def integer : Subring R where
   zero_mem' := by simp only [Set.mem_setOf_eq, _root_.map_zero, zero_le']
   add_mem' {x y} hx hy := le_trans (v.map_add x y) (max_le hx hy)
   neg_mem' {x} hx := by simp only [Set.mem_setOf_eq] at hx; simpa only [Set.mem_setOf_eq, map_neg]
-
-lemma mem_integer_iff (r : R) : r ∈ v.integer ↔ v r ≤ 1 := by rfl
 
 end Ring
 
@@ -134,7 +134,11 @@ lemma isUnit_iff_valuation_eq_one (hv : Integers v O) {x : O} :
     IsUnit x ↔ v (algebraMap O F x) = 1 :=
   ⟨hv.one_of_isUnit, hv.isUnit_of_one'⟩
 
--- DISSOLVED: valuation_pos_iff_ne_zero
+lemma valuation_pos_iff_ne_zero (hv : Integers v O) {x : O} :
+    0 < v (algebraMap O F x) ↔ x ≠ 0 := by
+  rw [← not_le]
+  refine not_congr ?_
+  simp [map_eq_zero_iff _ hv.hom_inj]
 
 theorem dvdNotUnit_iff_lt (hv : Integers v O) {x y : O} :
     DvdNotUnit x y ↔ v (algebraMap O F y) < v (algebraMap O F x) := by
@@ -187,31 +191,6 @@ lemma isPrincipal_iff_exists_eq_setOf_valuation_le (hv : Integers v O) {I : Idea
   · refine ⟨v (algebraMap O F x), Set.mem_image_of_mem _ ?_, ?_⟩
     · simp [hx]
     · simp [hx, mem_upperBounds]
-
-lemma not_denselyOrdered_of_isPrincipalIdealRing [IsPrincipalIdealRing O] (hv : Integers v O) :
-    ¬ DenselyOrdered (range v) := by
-  intro H
-  -- nonunits as an ideal isn't defined here, nor shown to be equivalent to `v x < 1`
-  set I : Ideal O := {
-    carrier := v ∘ algebraMap O F ⁻¹' Iio (1 : Γ₀)
-    add_mem' := fun {a b} ha hb ↦ by simpa using map_add_lt v ha hb
-    zero_mem' := by simp
-    smul_mem' := by
-      intro c x
-      simp only [mem_preimage, Function.comp_apply, mem_Iio, smul_eq_mul, _root_.map_mul]
-      intro hx
-      exact Right.mul_lt_one_of_le_of_lt (hv.map_le_one c) hx
-  }
-  obtain ⟨x, hx₁, hx⟩ :
-    ∃ x, v (algebraMap O F x) < 1 ∧
-      v (algebraMap O F x) ∈ upperBounds (Iio 1 ∩ range (v ∘ algebraMap O F)) := by
-    simpa [I, IsGreatest, hv.isPrincipal_iff_exists_isGreatest, ← image_preimage_eq_inter_range]
-      using IsPrincipalIdealRing.principal I
-  obtain ⟨y, hy, hy₁⟩ : ∃ y, v (algebraMap O F x) < v y ∧ v y < 1 := by
-    simpa only [Subtype.exists, Subtype.mk_lt_mk, exists_range_iff, exists_prop]
-      using H.dense ⟨v (algebraMap O F x), mem_range_self _⟩ ⟨1, 1, v.map_one⟩ hx₁
-  obtain ⟨z, rfl⟩ := hv.exists_of_le_one hy₁.le
-  exact hy.not_le <| hx ⟨hy₁, mem_range_self _⟩
 
 end Integers
 

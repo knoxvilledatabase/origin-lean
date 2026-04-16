@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/DirectLimit.lean
-Genuine: 60 | Conflates: 1 | Dissolved: 5 | Infrastructure: 13
+Genuine: 65 | Conflates: 1 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Module
@@ -11,6 +11,8 @@ import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 import Mathlib.Order.DirectedInverseSystem
 import Mathlib.Tactic.SuppressCompilation
+
+noncomputable section
 
 /-!
 # Direct limit of modules, abelian groups, rings, and fields.
@@ -246,9 +248,51 @@ variable [DecidableEq ι] [DirectedSystem G fun i j h => f i j h]
 
 variable {G f}
 
--- DISSOLVED: toModule_totalize_of_le
+theorem toModule_totalize_of_le [∀ i (k : G i), Decidable (k ≠ 0)] {x : DirectSum ι G} {i j : ι}
+    (hij : i ≤ j) (hx : ∀ k ∈ x.support, k ≤ i) :
+    DirectSum.toModule R ι (G j) (fun k => totalize G f k j) x =
+      f i j hij (DirectSum.toModule R ι (G i) (fun k => totalize G f k i) x) := by
+  rw [← @DFinsupp.sum_single ι G _ _ _ x]
+  unfold DFinsupp.sum
+  simp only [map_sum]
+  refine Finset.sum_congr rfl fun k hk => ?_
+  rw [DirectSum.single_eq_lof R k (x k), DirectSum.toModule_lof, DirectSum.toModule_lof,
+    totalize_of_le (hx k hk), totalize_of_le (le_trans (hx k hk) hij), DirectedSystem.map_map]
 
--- DISSOLVED: of.zero_exact_aux
+theorem of.zero_exact_aux [∀ i (k : G i), Decidable (k ≠ 0)] [Nonempty ι] [IsDirected ι (· ≤ ·)]
+    {x : DirectSum ι G} (H : (Submodule.Quotient.mk x : DirectLimit G f) = (0 : DirectLimit G f)) :
+    ∃ j,
+      (∀ k ∈ x.support, k ≤ j) ∧
+        DirectSum.toModule R ι (G j) (fun i => totalize G f i j) x = (0 : G j) :=
+  Nonempty.elim (by infer_instance) fun ind : ι =>
+    span_induction (hx := (Quotient.mk_eq_zero _).1 H)
+      (fun x ⟨i, j, hij, y, hxy⟩ =>
+        let ⟨k, hik, hjk⟩ := exists_ge_ge i j
+        ⟨k, by
+          subst hxy
+          constructor
+          · intro i0 hi0
+            rw [DFinsupp.mem_support_iff, DirectSum.sub_apply, ← DirectSum.single_eq_lof, ←
+              DirectSum.single_eq_lof, DFinsupp.single_apply, DFinsupp.single_apply] at hi0
+            split_ifs at hi0 with hi hj hj
+            · rwa [hi] at hik
+            · rwa [hi] at hik
+            · rwa [hj] at hjk
+            exfalso
+            apply hi0
+            rw [sub_zero]
+          simp [LinearMap.map_sub, totalize_of_le, hik, hjk, DirectedSystem.map_map,
+            DirectSum.apply_eq_component, DirectSum.component.of]⟩)
+      ⟨ind, fun _ h => (Finset.not_mem_empty _ h).elim, LinearMap.map_zero _⟩
+      (fun x y _ _ ⟨i, hi, hxi⟩ ⟨j, hj, hyj⟩ =>
+        let ⟨k, hik, hjk⟩ := exists_ge_ge i j
+        ⟨k, fun _ hl =>
+          (Finset.mem_union.1 (DFinsupp.support_add hl)).elim (fun hl => le_trans (hi _ hl) hik)
+            fun hl => le_trans (hj _ hl) hjk, by
+          simp [LinearMap.map_add, hxi, hyj, toModule_totalize_of_le hik hi,
+             toModule_totalize_of_le hjk hj]⟩)
+      fun a x _ ⟨i, hi, hxi⟩ =>
+      ⟨i, fun k hk => hi k (DirectSum.support_smul _ _ hk), by simp [LinearMap.map_smul, hxi]⟩
 
 open Classical in
 
@@ -832,7 +876,12 @@ instance nontrivial [DirectedSystem G fun i j h => f' i j h] :
           rw [(f' i j hij).map_one] at hf
           exact one_ne_zero hf⟩⟩
 
--- DISSOLVED: exists_inv
+theorem exists_inv {p : Ring.DirectLimit G f} : p ≠ 0 → ∃ y, p * y = 1 :=
+  Ring.DirectLimit.induction_on p fun i x H =>
+    ⟨Ring.DirectLimit.of G f i x⁻¹, by
+      rw [← (Ring.DirectLimit.of _ _ _).map_mul,
+        mul_inv_cancel₀ fun h : x = 0 => H <| by rw [h, (Ring.DirectLimit.of _ _ _).map_zero],
+        (Ring.DirectLimit.of _ _ _).map_one]⟩
 
 section
 
@@ -841,9 +890,11 @@ open Classical in
 noncomputable def inv (p : Ring.DirectLimit G f) : Ring.DirectLimit G f :=
   if H : p = 0 then 0 else Classical.choose (DirectLimit.exists_inv G f H)
 
--- DISSOLVED: mul_inv_cancel
+protected theorem mul_inv_cancel {p : Ring.DirectLimit G f} (hp : p ≠ 0) : p * inv G f p = 1 := by
+  rw [inv, dif_neg hp, Classical.choose_spec (DirectLimit.exists_inv G f hp)]
 
--- DISSOLVED: inv_mul_cancel
+protected theorem inv_mul_cancel {p : Ring.DirectLimit G f} (hp : p ≠ 0) : inv G f p * p = 1 := by
+  rw [_root_.mul_comm, DirectLimit.mul_inv_cancel G f hp]
 
 -- CONFLATES (assumes ground = zero): field
 protected noncomputable abbrev field [DirectedSystem G fun i j h => f' i j h] :

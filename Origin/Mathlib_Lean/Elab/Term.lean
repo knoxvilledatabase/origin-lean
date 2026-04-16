@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.SyntheticMVars
 
+noncomputable section
+
 /-!
 # Additions to `Lean.Elab.Term`
 -/

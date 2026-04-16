@@ -11,6 +11,8 @@ import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 
+noncomputable section
+
 /-!
 # The Fourier transform
 
@@ -259,10 +261,6 @@ section Defs
 def fourierIntegral (e : AddChar 𝕜 𝕊) (μ : Measure 𝕜) (f : 𝕜 → E) (w : 𝕜) : E :=
   VectorFourier.fourierIntegral e μ (LinearMap.mul 𝕜 𝕜) f w
 
-theorem fourierIntegral_def (e : AddChar 𝕜 𝕊) (μ : Measure 𝕜) (f : 𝕜 → E) (w : 𝕜) :
-    fourierIntegral e μ f w = ∫ v : 𝕜, e (-(v * w)) • f v ∂μ :=
-  rfl
-
 theorem fourierIntegral_const_smul (e : AddChar 𝕜 𝕊) (μ : Measure 𝕜) (f : 𝕜 → E) (r : ℂ) :
     fourierIntegral e μ (r • f) = r • fourierIntegral e μ f :=
   VectorFourier.fourierIntegral_const_smul _ _ _ _ _
@@ -288,6 +286,8 @@ def fourierChar : AddChar ℝ 𝕊 where
   toFun z := .exp (2 * π * z)
   map_zero_eq_one' := by simp only; rw [mul_zero, Circle.exp_zero]
   map_add_eq_mul' x y := by simp only; rw [mul_add, Circle.exp_add]
+
+@[inherit_doc] scoped[FourierTransform] notation "𝐞" => Real.fourierChar
 
 open FourierTransform
 
@@ -356,6 +356,10 @@ def fourierIntegral (f : V → E) (w : V) : E :=
 
 def fourierIntegralInv (f : V → E) (w : V) : E :=
   VectorFourier.fourierIntegral 𝐞 volume (-innerₗ V) f w
+
+@[inherit_doc] scoped[FourierTransform] notation "𝓕" => Real.fourierIntegral
+
+@[inherit_doc] scoped[FourierTransform] notation "𝓕⁻" => Real.fourierIntegralInv
 
 lemma fourierIntegral_eq (f : V → E) (w : V) :
     𝓕 f w = ∫ v, 𝐞 (-⟪v, w⟫) • f v := rfl

@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/LSeries/RiemannZeta.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.HurwitzZeta
 import Mathlib.Analysis.PSeriesComplex
+
+noncomputable section
 
 /-!
 # Definition of the Riemann zeta function
@@ -60,12 +62,6 @@ def completedRiemannZeta₀ (s : ℂ) : ℂ := completedHurwitzZetaEven₀ 0 s
 
 def completedRiemannZeta (s : ℂ) : ℂ := completedHurwitzZetaEven 0 s
 
-lemma HurwitzZeta.completedHurwitzZetaEven_zero (s : ℂ) :
-    completedHurwitzZetaEven 0 s = completedRiemannZeta s := rfl
-
-lemma HurwitzZeta.completedHurwitzZetaEven₀_zero (s : ℂ) :
-    completedHurwitzZetaEven₀ 0 s = completedRiemannZeta₀ s := rfl
-
 lemma HurwitzZeta.completedCosZeta_zero (s : ℂ) :
     completedCosZeta 0 s = completedRiemannZeta s := by
   rw [completedRiemannZeta, completedHurwitzZetaEven, completedCosZeta, hurwitzEvenFEPair_zero_symm]
@@ -82,7 +78,9 @@ lemma completedRiemannZeta_eq (s : ℂ) :
 theorem differentiable_completedZeta₀ : Differentiable ℂ completedRiemannZeta₀ :=
   differentiable_completedHurwitzZetaEven₀ 0
 
--- DISSOLVED: differentiableAt_completedZeta
+theorem differentiableAt_completedZeta {s : ℂ} (hs : s ≠ 0) (hs' : s ≠ 1) :
+    DifferentiableAt ℂ completedRiemannZeta s :=
+  differentiableAt_completedHurwitzZetaEven 0 (Or.inl hs) hs'
 
 theorem completedRiemannZeta₀_one_sub (s : ℂ) :
     completedRiemannZeta₀ (1 - s) = completedRiemannZeta₀ s := by
@@ -101,8 +99,6 @@ lemma completedRiemannZeta_residue_one :
 -/
 
 def riemannZeta := hurwitzZetaEven 0
-
-lemma HurwitzZeta.hurwitzZetaEven_zero : hurwitzZetaEven 0 = riemannZeta := rfl
 
 lemma HurwitzZeta.cosZeta_zero : cosZeta 0 = riemannZeta := by
   simp_rw [cosZeta, riemannZeta, hurwitzZetaEven, if_true, completedHurwitzZetaEven_zero,
@@ -123,7 +119,9 @@ theorem differentiableAt_riemannZeta {s : ℂ} (hs' : s ≠ 1) : DifferentiableA
 theorem riemannZeta_zero : riemannZeta 0 = -1 / 2 := by
   simp_rw [riemannZeta, hurwitzZetaEven, Function.update_same, if_true]
 
--- DISSOLVED: riemannZeta_def_of_ne_zero
+lemma riemannZeta_def_of_ne_zero {s : ℂ} (hs : s ≠ 0) :
+    riemannZeta s = completedRiemannZeta s / Gammaℝ s := by
+  rw [riemannZeta, hurwitzZetaEven, Function.update_noteq hs, completedHurwitzZetaEven_zero]
 
 theorem riemannZeta_neg_two_mul_nat_add_one (n : ℕ) : riemannZeta (-2 * (n + 1)) = 0 :=
   hurwitzZetaEven_neg_two_mul_nat_add_one 0 n

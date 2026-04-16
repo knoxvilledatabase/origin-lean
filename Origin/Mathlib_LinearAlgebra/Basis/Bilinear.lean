@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.Basis.Defs
 
+noncomputable section
+
 /-!
 # Lemmas about bilinear maps with a basis over each argument
 -/

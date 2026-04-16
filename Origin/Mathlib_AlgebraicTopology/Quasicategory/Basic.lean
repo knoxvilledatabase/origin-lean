@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.AlgebraicTopology.SimplicialSet.KanComplex
 
+noncomputable section
+
 /-!
 # Quasicategories
 

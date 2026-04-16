@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Prime.Infinite
 import Mathlib.Topology.Algebra.Order.Floor
 
+noncomputable section
+
 /-!
 # Existence of a sufficiently large prime for which `a * c ^ p / (p - 1)! < 1`
 

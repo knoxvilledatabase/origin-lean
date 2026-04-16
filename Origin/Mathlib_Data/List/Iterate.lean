@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.List.Defs
 import Mathlib.Data.Set.Function
 
+noncomputable section
+
 /-!
 # iterate
 
@@ -38,10 +40,6 @@ theorem get?_iterate (f : α → α) (a : α) (n i : ℕ) (h : i < n) :
 theorem getElem_iterate (f : α → α) (a : α) (n : ℕ) (i : Nat) (h : i < (iterate f a n).length) :
     (iterate f a n)[i] = f^[i] a :=
   getElem_eq_iff.2 <| getElem?_iterate _ _ _ _ <| by rwa [length_iterate] at h
-
-theorem get_iterate (f : α → α) (a : α) (n : ℕ) (i : Fin (iterate f a n).length) :
-    get (iterate f a n) i = f^[↑i] a := by
-  simp
 
 @[simp]
 theorem mem_iterate {f : α → α} {a : α} {n : ℕ} {b : α} :

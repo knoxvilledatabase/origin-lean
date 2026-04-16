@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.PUnit
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.Basic
 
+noncomputable section
+
 /-!
 # Fundamental groupoid of punit
 

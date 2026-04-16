@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecificLimits/RCLike.lean
-Genuine: 1 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.RCLike.Basic
+
+noncomputable section
 
 /-!
 # A collection of specific limit computations for `RCLike`
@@ -24,4 +26,15 @@ theorem RCLike.tendsto_inverse_atTop_nhds_zero_nat :
 
 variable {𝕜}
 
--- DISSOLVED: RCLike.tendsto_add_mul_div_add_mul_atTop_nhds
+theorem RCLike.tendsto_add_mul_div_add_mul_atTop_nhds (a b c : 𝕜) {d : 𝕜} (hd : d ≠ 0) :
+    Tendsto (fun k : ℕ ↦ (a + c * k) / (b + d * k)) atTop (𝓝 (c / d)) := by
+  apply Filter.Tendsto.congr'
+  case f₁ => exact fun k ↦ (a * (↑k)⁻¹ + c) / (b * (↑k)⁻¹ + d)
+  · refine (eventually_ne_atTop 0).mp (Eventually.of_forall ?_)
+    intro h hx
+    field_simp [hx]
+  · apply Filter.Tendsto.div _ _ hd
+    all_goals
+      apply zero_add (_ : 𝕜) ▸ Filter.Tendsto.add_const _ _
+      apply mul_zero (_ : 𝕜) ▸ Filter.Tendsto.const_mul _ _
+      exact RCLike.tendsto_inverse_atTop_nhds_zero_nat 𝕜

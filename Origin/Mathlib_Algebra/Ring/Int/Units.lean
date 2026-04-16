@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Algebra.Ring.Units
 
+noncomputable section
+
 /-!
 # Basic lemmas for `ℤˣ`.
 

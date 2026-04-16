@@ -7,6 +7,8 @@ import Mathlib.Data.Set.SymmDiff
 import Mathlib.Order.SuccPred.Relation
 import Mathlib.Topology.Irreducible
 
+noncomputable section
+
 /-!
 # Connected subsets of topological spaces
 

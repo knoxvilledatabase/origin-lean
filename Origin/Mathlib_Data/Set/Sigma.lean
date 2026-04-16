@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Image
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Sets in sigma types
 
@@ -45,10 +47,6 @@ theorem image_sigmaMk_preimage_sigmaMap {β : ι' → Type*} {f : ι → ι'} (h
   exact ⟨x, hys, rfl⟩
 
 protected def sigma (s : Set ι) (t : ∀ i, Set (α i)) : Set (Σ i, α i) := {x | x.1 ∈ s ∧ x.2 ∈ t x.1}
-
-@[simp] theorem mem_sigma_iff : x ∈ s.sigma t ↔ x.1 ∈ s ∧ x.2 ∈ t x.1 := Iff.rfl
-
-theorem mk_sigma_iff : (⟨i, a⟩ : Σ i, α i) ∈ s.sigma t ↔ i ∈ s ∧ a ∈ t i := Iff.rfl
 
 theorem mk_mem_sigma (hi : i ∈ s) (ha : a ∈ t i) : (⟨i, a⟩ : Σ i, α i) ∈ s.sigma t := ⟨hi, ha⟩
 
@@ -157,22 +155,6 @@ theorem insert_sigma : (insert i s).sigma t = Sigma.mk i '' t i ∪ s.sigma t :=
 theorem sigma_insert {a : ∀ i, α i} :
     s.sigma (fun i ↦ insert (a i) (t i)) = (fun i ↦ ⟨i, a i⟩) '' s ∪ s.sigma t := by
   simp_rw [insert_eq, sigma_union, sigma_singleton]
-
-theorem sigma_preimage_eq {f : ι' → ι} {g : ∀ i, β i → α i} :
-    (f ⁻¹' s).sigma (fun i ↦ g (f i) ⁻¹' t (f i)) =
-      (fun p : Σ i, β (f i) ↦ Sigma.mk _ (g _ p.2)) ⁻¹' s.sigma t := rfl
-
-theorem sigma_preimage_left {f : ι' → ι} :
-    ((f ⁻¹' s).sigma fun i ↦ t (f i)) = (fun p : Σ i, α (f i) ↦ Sigma.mk _ p.2) ⁻¹' s.sigma t :=
-  rfl
-
-theorem sigma_preimage_right {g : ∀ i, β i → α i} :
-    (s.sigma fun i ↦ g i ⁻¹' t i) = (fun p : Σ i, β i ↦ Sigma.mk p.1 (g _ p.2)) ⁻¹' s.sigma t :=
-  rfl
-
-theorem preimage_sigmaMap_sigma {α' : ι' → Type*} (f : ι → ι') (g : ∀ i, α i → α' (f i))
-    (s : Set ι') (t : ∀ i, Set (α' i)) :
-    Sigma.map f g ⁻¹' s.sigma t = (f ⁻¹' s).sigma fun i ↦ g i ⁻¹' t (f i) := rfl
 
 @[simp]
 theorem mk_preimage_sigma (hi : i ∈ s) : Sigma.mk i ⁻¹' s.sigma t = t i :=

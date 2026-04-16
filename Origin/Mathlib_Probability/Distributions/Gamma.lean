@@ -7,6 +7,8 @@ import Mathlib.Probability.Notation
 import Mathlib.Probability.CDF
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 
+noncomputable section
+
 /-! # Gamma distributions over ℝ
 
 Define the gamma measure over the reals.
@@ -38,12 +40,10 @@ namespace ProbabilityTheory
 section GammaPDF
 
 noncomputable
-
 def gammaPDFReal (a r x : ℝ) : ℝ :=
   if 0 ≤ x then r ^ a / (Gamma a) * x ^ (a-1) * exp (-(r * x)) else 0
 
 noncomputable
-
 def gammaPDF (a r x : ℝ) : ℝ≥0∞ :=
   ENNReal.ofReal (gammaPDFReal a r x)
 
@@ -115,7 +115,6 @@ end GammaPDF
 open MeasureTheory
 
 noncomputable
-
 def gammaMeasure (a r : ℝ) : Measure ℝ :=
   volume.withDensity (gammaPDF a r)
 
@@ -126,7 +125,6 @@ lemma isProbabilityMeasureGamma {a r : ℝ} (ha : 0 < a) (hr : 0 < r) :
 section GammaCDF
 
 noncomputable
-
 def gammaCDFReal (a r : ℝ) : StieltjesFunction :=
   cdf (gammaMeasure a r)
 

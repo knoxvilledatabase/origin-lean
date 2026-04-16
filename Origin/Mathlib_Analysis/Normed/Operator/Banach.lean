@@ -9,6 +9,8 @@ import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Analysis.Normed.Affine.Isometry
 import Mathlib.Analysis.Normed.Group.InfiniteSum
 
+noncomputable section
+
 /-!
 # Banach open mapping theorem
 
@@ -71,6 +73,17 @@ variable [CompleteSpace F]
 namespace ContinuousLinearMap
 
 include σ' in
+/-- First step of the proof of the Banach open mapping theorem (using completeness of `F`):
+
+by Baire's theorem, there exists a ball in `E` whose image closure has nonempty interior.
+
+Rescaling everything, it follows that any `y ∈ F` is arbitrarily well approached by
+
+images of elements of norm at most `C * ‖y‖`.
+
+For further use, we will only need such an element whose image
+
+is within distance `‖y‖/2` of `y`, to apply an iterative process. -/
 
 theorem exists_approx_preimage_norm_le (surj : Surjective f) :
     ∃ C ≥ 0, ∀ y, ∃ x, dist (f x) y ≤ 1 / 2 * ‖y‖ ∧ ‖x‖ ≤ C * ‖y‖ := by
@@ -311,16 +324,6 @@ def toContinuousLinearEquivOfContinuous (e : E ≃ₛₗ[σ] F) (h : Continuous 
     continuous_toFun := h
     continuous_invFun := e.continuous_symm h }
 
-@[simp]
-theorem coeFn_toContinuousLinearEquivOfContinuous (e : E ≃ₛₗ[σ] F) (h : Continuous e) :
-    ⇑(e.toContinuousLinearEquivOfContinuous h) = e :=
-  rfl
-
-@[simp]
-theorem coeFn_toContinuousLinearEquivOfContinuous_symm (e : E ≃ₛₗ[σ] F) (h : Continuous e) :
-    ⇑(e.toContinuousLinearEquivOfContinuous h).symm = e.symm :=
-  rfl
-
 end LinearEquiv
 
 namespace ContinuousLinearMap
@@ -332,16 +335,6 @@ noncomputable def equivRange (f : E →SL[σ] F) (hinj : Injective f) (hclo : Is
   have : CompleteSpace (LinearMap.range f) := hclo.completeSpace_coe
   LinearEquiv.toContinuousLinearEquivOfContinuous (LinearEquiv.ofInjective f.toLinearMap hinj) <|
     (f.continuous.codRestrict fun x ↦ LinearMap.mem_range_self f x).congr fun _ ↦ rfl
-
-@[simp]
-theorem coe_linearMap_equivRange (f : E →SL[σ] F) (hinj : Injective f) (hclo : IsClosed (range f)) :
-    f.equivRange hinj hclo = f.rangeRestrict :=
-  rfl
-
-@[simp]
-theorem coe_equivRange (f : E →SL[σ] F) (hinj : Injective f) (hclo : IsClosed (range f)) :
-    (f.equivRange hinj hclo : E → LinearMap.range f) = f.rangeRestrict :=
-  rfl
 
 end ContinuousLinearMap
 
@@ -356,11 +349,6 @@ noncomputable def ofBijective (f : E →SL[σ] F) (hinj : ker f = ⊥) (hsurj : 
           LinearMap.range_eq_top.mp hsurj⟩).toContinuousLinearEquivOfContinuous
     -- Porting note: added `by convert`
     (by convert f.continuous)
-
-@[simp]
-theorem coeFn_ofBijective (f : E →SL[σ] F) (hinj : ker f = ⊥) (hsurj : LinearMap.range f = ⊤) :
-    ⇑(ofBijective f hinj hsurj) = f :=
-  rfl
 
 theorem coe_ofBijective (f : E →SL[σ] F) (hinj : ker f = ⊥) (hsurj : LinearMap.range f = ⊤) :
     ↑(ofBijective f hinj hsurj) = f := by
@@ -462,11 +450,6 @@ def ofIsClosedGraph (hg : IsClosed (g.graph : Set <| E × F)) : E →L[𝕜] F w
   toLinearMap := g
   cont := g.continuous_of_isClosed_graph hg
 
-@[simp]
-theorem coeFn_ofIsClosedGraph (hg : IsClosed (g.graph : Set <| E × F)) :
-    ⇑(ContinuousLinearMap.ofIsClosedGraph hg) = g :=
-  rfl
-
 theorem coe_ofIsClosedGraph (hg : IsClosed (g.graph : Set <| E × F)) :
     ↑(ContinuousLinearMap.ofIsClosedGraph hg) = g := by
   ext
@@ -477,12 +460,6 @@ def ofSeqClosedGraph
     E →L[𝕜] F where
   toLinearMap := g
   cont := g.continuous_of_seq_closed_graph hg
-
-@[simp]
-theorem coeFn_ofSeqClosedGraph
-    (hg : ∀ (u : ℕ → E) (x y), Tendsto u atTop (𝓝 x) → Tendsto (g ∘ u) atTop (𝓝 y) → y = g x) :
-    ⇑(ContinuousLinearMap.ofSeqClosedGraph hg) = g :=
-  rfl
 
 theorem coe_ofSeqClosedGraph
     (hg : ∀ (u : ℕ → E) (x y), Tendsto u atTop (𝓝 x) → Tendsto (g ∘ u) atTop (𝓝 y) → y = g x) :

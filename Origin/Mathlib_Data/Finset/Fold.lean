@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Finset.Image
 import Mathlib.Data.Multiset.Fold
 
+noncomputable section
+
 /-!
 # The fold operation for a commutative associative operation over a finset.
 -/
@@ -43,10 +45,6 @@ theorem fold_insert [DecidableEq α] (h : a ∉ s) :
     (insert a s).fold op b f = f a * s.fold op b f := by
   unfold fold
   rw [insert_val, ndinsert_of_not_mem h, Multiset.map_cons, fold_cons_left]
-
-@[simp]
-theorem fold_singleton : ({a} : Finset α).fold op b f = f a * b :=
-  rfl
 
 @[simp]
 theorem fold_map {g : γ ↪ α} {s : Finset γ} : (s.map g).fold op b f = s.fold op b (f ∘ g) := by

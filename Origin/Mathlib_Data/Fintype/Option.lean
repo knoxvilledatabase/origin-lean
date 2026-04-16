@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Finset.Option
 
+noncomputable section
+
 /-!
 # fintype instances for option
 -/
@@ -22,9 +24,6 @@ open Finset Function
 
 instance {α : Type*} [Fintype α] : Fintype (Option α) :=
   ⟨Finset.insertNone univ, fun a => by simp⟩
-
-theorem univ_option (α : Type*) [Fintype α] : (univ : Finset (Option α)) = insertNone univ :=
-  rfl
 
 @[simp]
 theorem Fintype.card_option {α : Type*} [Fintype α] :

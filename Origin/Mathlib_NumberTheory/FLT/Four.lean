@@ -1,6 +1,6 @@
 /-
 Extracted from NumberTheory/FLT/Four.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Factors
@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.FLT.Basic
 import Mathlib.NumberTheory.PythagoreanTriples
 import Mathlib.RingTheory.Coprime.Lemmas
 import Mathlib.Tactic.LinearCombination
+
+noncomputable section
 
 /-!
 # Fermat's Last Theorem for the case n = 4
@@ -26,9 +28,30 @@ theorem comm {a b c : ℤ} : Fermat42 a b c ↔ Fermat42 b a c := by
   rw [add_comm]
   tauto
 
--- DISSOLVED: mul
+theorem mul {a b c k : ℤ} (hk0 : k ≠ 0) :
+    Fermat42 a b c ↔ Fermat42 (k * a) (k * b) (k ^ 2 * c) := by
+  delta Fermat42
+  constructor
+  · intro f42
+    constructor
+    · exact mul_ne_zero hk0 f42.1
+    constructor
+    · exact mul_ne_zero hk0 f42.2.1
+    · have H : a ^ 4 + b ^ 4 = c ^ 2 := f42.2.2
+      linear_combination k ^ 4 * H
+  · intro f42
+    constructor
+    · exact right_ne_zero_of_mul f42.1
+    constructor
+    · exact right_ne_zero_of_mul f42.2.1
+    apply (mul_right_inj' (pow_ne_zero 4 hk0)).mp
+    linear_combination f42.2.2
 
--- DISSOLVED: ne_zero
+theorem ne_zero {a b c : ℤ} (h : Fermat42 a b c) : c ≠ 0 := by
+  apply ne_zero_pow two_ne_zero _; apply ne_of_gt
+  rw [← h.2.2, (by ring : a ^ 4 + b ^ 4 = (a ^ 2) ^ 2 + (b ^ 2) ^ 2)]
+  exact
+    add_pos (sq_pos_of_ne_zero (pow_ne_zero 2 h.1)) (sq_pos_of_ne_zero (pow_ne_zero 2 h.2.1))
 
 def Minimal (a b c : ℤ) : Prop :=
   Fermat42 a b c ∧ ∀ a1 b1 c1 : ℤ, Fermat42 a1 b1 c1 → Int.natAbs c ≤ Int.natAbs c1
@@ -243,7 +266,11 @@ theorem not_minimal {a b c : ℤ} (h : Minimal a b c) (ha2 : a % 2 = 1) (hc : 0 
 
 end Fermat42
 
--- DISSOLVED: not_fermat_42
+theorem not_fermat_42 {a b c : ℤ} (ha : a ≠ 0) (hb : b ≠ 0) : a ^ 4 + b ^ 4 ≠ c ^ 2 := by
+  intro h
+  obtain ⟨a0, b0, c0, ⟨hf, h2, hp⟩⟩ :=
+    Fermat42.exists_pos_odd_minimal (And.intro ha (And.intro hb h))
+  apply Fermat42.not_minimal hf h2 hp
 
 theorem fermatLastTheoremFour : FermatLastTheoremFor 4 := by
   rw [fermatLastTheoremFor_iff_int]

@@ -5,6 +5,8 @@ Genuine: 63 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Order.Interval.Finset.Basic
 
+noncomputable section
+
 /-!
 # Intervals as multisets
 

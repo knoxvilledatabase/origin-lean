@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Combination
 import Mathlib.Analysis.Convex.Extreme
 
+noncomputable section
+
 /-!
 # Convex independence
 

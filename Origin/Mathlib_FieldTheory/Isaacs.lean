@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.FieldTheory.PrimitiveElement
 import Mathlib.GroupTheory.CosetCover
 
+noncomputable section
+
 /-!
 # Algebraic extensions are determined by their sets of minimal polynomials up to isomorphism
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Injective
 import Mathlib.CategoryTheory.Preadditive.Injective
 import Mathlib.Algebra.Category.ModuleCat.EpiMono
 
+noncomputable section
+
 /-!
 # Injective objects in the category of $R$-modules
 -/

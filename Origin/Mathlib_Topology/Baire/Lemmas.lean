@@ -5,6 +5,8 @@ Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.GDelta.Basic
 
+noncomputable section
+
 /-!
 # Baire spaces
 

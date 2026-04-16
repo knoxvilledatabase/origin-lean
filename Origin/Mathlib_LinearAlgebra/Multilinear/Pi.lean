@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Pi
 import Mathlib.LinearAlgebra.Multilinear.Basic
 
+noncomputable section
+
 /-!
 # Interactions between (dependent) functions and multilinear maps
 

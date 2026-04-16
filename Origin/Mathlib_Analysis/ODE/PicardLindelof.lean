@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.Topology.Algebra.Order.Floor
 import Mathlib.Topology.MetricSpace.Contracting
 
+noncomputable section
+
 /-!
 # Picard-Lindelöf (Cauchy-Lipschitz) Theorem
 

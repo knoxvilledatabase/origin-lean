@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Scheme
 import Mathlib.CategoryTheory.Comma.OverClass
 
+noncomputable section
+
 /-!
 # Typeclasses for `S`-schemes and `S`-morphisms
 

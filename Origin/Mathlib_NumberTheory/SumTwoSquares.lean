@@ -7,6 +7,8 @@ import Mathlib.Data.Nat.Squarefree
 import Mathlib.NumberTheory.Zsqrtd.QuadraticReciprocity
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 
+noncomputable section
+
 /-!
 # Sums of two squares
 

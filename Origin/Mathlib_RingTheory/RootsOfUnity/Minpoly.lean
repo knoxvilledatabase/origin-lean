@@ -9,6 +9,8 @@ import Mathlib.FieldTheory.Minpoly.IsIntegrallyClosed
 import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 import Mathlib.RingTheory.UniqueFactorizationDomain.Nat
 
+noncomputable section
+
 /-!
 # Minimal polynomial of roots of unity
 

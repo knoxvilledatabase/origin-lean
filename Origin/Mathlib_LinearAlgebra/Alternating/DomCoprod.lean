@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Multilinear.TensorProduct
 import Mathlib.GroupTheory.GroupAction.Quotient
 import Mathlib.Algebra.Group.Subgroup.Finite
 
+noncomputable section
+
 /-!
 # Exterior product of alternating maps
 
@@ -57,14 +59,6 @@ def domCoprod.summand (a : Mᵢ [⋀^ιa]→ₗ[R'] N₁) (b : Mᵢ [⋀^ιb]→
       Function.comp_apply, Perm.coe_mul]
     -- Porting note (https://github.com/leanprover-community/mathlib4/issues/11224): was `rw`.
     erw [← a.map_congr_perm fun i => v (σ₁ _), ← b.map_congr_perm fun i => v (σ₁ _)]
-
-theorem domCoprod.summand_mk'' (a : Mᵢ [⋀^ιa]→ₗ[R'] N₁) (b : Mᵢ [⋀^ιb]→ₗ[R'] N₂)
-    (σ : Equiv.Perm (ιa ⊕ ιb)) :
-    domCoprod.summand a b (Quotient.mk'' σ) =
-      Equiv.Perm.sign σ •
-        (MultilinearMap.domCoprod ↑a ↑b : MultilinearMap R' (fun _ => Mᵢ) (N₁ ⊗ N₂)).domDomCongr
-          σ :=
-  rfl
 
 theorem domCoprod.summand_add_swap_smul_eq_zero (a : Mᵢ [⋀^ιa]→ₗ[R'] N₁)
     (b : Mᵢ [⋀^ιb]→ₗ[R'] N₂) (σ : Perm.ModSumCongr ιa ιb) {v : ιa ⊕ ιb → Mᵢ}

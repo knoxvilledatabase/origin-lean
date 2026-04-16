@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Preadditive.Projective
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 
+noncomputable section
+
 /-!
 # The category of `R`-modules has enough projectives.
 -/

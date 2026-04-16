@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.Data.Real.Star
 import Mathlib.Data.ZMod.Defs
 
+noncomputable section
+
 /-!
 # Complex number as a vector space over `ℝ`
 
@@ -87,10 +89,6 @@ instance (priority := 95) instAlgebraOfReal [CommSemiring R] [Algebra R ℝ] : A
 instance : StarModule ℝ ℂ :=
   ⟨fun r x => by simp only [star_def, star_trivial, real_smul, map_mul, conj_ofReal]⟩
 
-@[simp]
-theorem coe_algebraMap : (algebraMap ℝ ℂ : ℝ → ℂ) = ((↑) : ℝ → ℂ) :=
-  rfl
-
 section
 
 variable {A : Type*} [Semiring A] [Algebra ℝ A]
@@ -154,11 +152,6 @@ example {A : Type*} [Ring A] [inst : Algebra ℂ A] :
     (inst.complexToReal).toModule = (inst.toModule).complexToReal := by
   with_reducible_and_instances rfl
 
-@[simp, norm_cast]
-theorem Complex.coe_smul {E : Type*} [AddCommGroup E] [Module ℂ E] (x : ℝ) (y : E) :
-    (x : ℂ) • y = x • y :=
-  rfl
-
 instance (priority := 900) SMulCommClass.complexToReal {M E : Type*} [AddCommGroup E] [Module ℂ E]
     [SMul M E] [SMulCommClass ℂ M E] : SMulCommClass ℝ M E where
   smul_comm r _ _ := (smul_comm (r : ℂ) _ _ : _)
@@ -182,25 +175,13 @@ def reLm : ℂ →ₗ[ℝ] ℝ where
   map_add' := add_re
   map_smul' := by simp
 
-@[simp]
-theorem reLm_coe : ⇑reLm = re :=
-  rfl
-
 def imLm : ℂ →ₗ[ℝ] ℝ where
   toFun x := x.im
   map_add' := add_im
   map_smul' := by simp
 
-@[simp]
-theorem imLm_coe : ⇑imLm = im :=
-  rfl
-
 def ofRealAm : ℝ →ₐ[ℝ] ℂ :=
   Algebra.ofId ℝ ℂ
-
-@[simp]
-theorem ofRealAm_coe : ⇑ofRealAm = ((↑) : ℝ → ℂ) :=
-  rfl
 
 def conjAe : ℂ ≃ₐ[ℝ] ℂ :=
   { conj with
@@ -208,10 +189,6 @@ def conjAe : ℂ ≃ₐ[ℝ] ℂ :=
     left_inv := star_star
     right_inv := star_star
     commutes' := conj_ofReal }
-
-@[simp]
-theorem conjAe_coe : ⇑conjAe = conj :=
-  rfl
 
 @[simp]
 theorem toMatrix_conjAe :
@@ -255,10 +232,6 @@ def liftAux (I' : A) (hf : I' * I' = -1) : ℂ →ₐ[ℝ] A :=
           RingHom.map_mul, ← RingHom.map_sub]
       · rw [Algebra.smul_def, Algebra.smul_def, Algebra.smul_def, ← Algebra.right_comm _ x₂, ←
           mul_assoc, ← add_mul, ← RingHom.map_mul, ← RingHom.map_mul, ← RingHom.map_add]
-
-@[simp]
-theorem liftAux_apply (I' : A) (hI') (z : ℂ) : liftAux I' hI' z = algebraMap ℝ A z.re + z.im • I' :=
-  rfl
 
 theorem liftAux_apply_I (I' : A) (hI') : liftAux I' hI' I = I' := by simp
 
@@ -359,10 +332,6 @@ theorem imaginaryPart_smul (z : ℂ) (a : A) : ℑ (z • a) = z.re • ℑ a + 
 lemma skewAdjointPart_eq_I_smul_imaginaryPart (x : A) :
     (skewAdjointPart ℝ x : A) = I • (imaginaryPart x : A) := by
   simp [imaginaryPart_apply_coe, smul_smul]
-
-lemma imaginaryPart_eq_neg_I_smul_skewAdjointPart (x : A) :
-    (imaginaryPart x : A) = -I • (skewAdjointPart ℝ x : A) :=
-  rfl
 
 lemma IsSelfAdjoint.coe_realPart {x : A} (hx : IsSelfAdjoint x) :
     (ℜ x : A) = x :=

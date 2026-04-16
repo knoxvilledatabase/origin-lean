@@ -8,6 +8,8 @@ import Mathlib.Lean.Meta.CongrTheorems
 import Mathlib.Logic.Basic
 import Mathlib.Tactic.CongrExclamation
 
+noncomputable section
+
 /-! # `congr(...)` congruence quotations
 
 This module defines a term elaborator for generating congruence lemmas

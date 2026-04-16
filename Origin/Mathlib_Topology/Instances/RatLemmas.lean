@@ -8,6 +8,8 @@ import Mathlib.Topology.Instances.Rat
 import Mathlib.Topology.Compactification.OnePoint
 import Mathlib.Topology.Metrizable.Uniformity
 
+noncomputable section
+
 /-!
 # Additional lemmas about the topology on rational numbers
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/MetricSpace/Lipschitz.lean
-Genuine: 48 | Conflates: 0 | Dissolved: 2 | Infrastructure: 2
+Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Order.Interval.Set.ProjIcc
@@ -9,6 +9,8 @@ import Mathlib.Topology.Bornology.Hom
 import Mathlib.Topology.EMetricSpace.Lipschitz
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.MetricSpace.Bounded
+
+noncomputable section
 
 /-!
 # Lipschitz continuous functions
@@ -96,19 +98,19 @@ theorem mapsTo_closedBall (hf : LipschitzWith K f) (x : α) (r : ℝ) :
     MapsTo f (Metric.closedBall x r) (Metric.closedBall (f x) (K * r)) := fun _y hy =>
   hf.dist_le_mul_of_le hy
 
--- DISSOLVED: dist_lt_mul_of_lt
+theorem dist_lt_mul_of_lt (hf : LipschitzWith K f) (hK : K ≠ 0) (hr : dist x y < r) :
+    dist (f x) (f y) < K * r :=
+  (hf.dist_le_mul x y).trans_lt <| (mul_lt_mul_left <| NNReal.coe_pos.2 hK.bot_lt).2 hr
 
--- DISSOLVED: mapsTo_ball
+theorem mapsTo_ball (hf : LipschitzWith K f) (hK : K ≠ 0) (x : α) (r : ℝ) :
+    MapsTo f (Metric.ball x r) (Metric.ball (f x) (K * r)) := fun _y hy =>
+  hf.dist_lt_mul_of_lt hK hy
 
 def toLocallyBoundedMap (f : α → β) (hf : LipschitzWith K f) : LocallyBoundedMap α β :=
   LocallyBoundedMap.ofMapBounded f fun _s hs =>
     let ⟨C, hC⟩ := Metric.isBounded_iff.1 hs
     Metric.isBounded_iff.2 ⟨K * C, forall_mem_image.2 fun _x hx => forall_mem_image.2 fun _y hy =>
       hf.dist_le_mul_of_le (hC hx hy)⟩
-
-@[simp]
-theorem coe_toLocallyBoundedMap (hf : LipschitzWith K f) : ⇑(hf.toLocallyBoundedMap f) = f :=
-  rfl
 
 theorem comap_cobounded_le (hf : LipschitzWith K f) :
     comap f (Bornology.cobounded β) ≤ Bornology.cobounded α :=

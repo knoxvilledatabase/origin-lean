@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Valuation/ValExtension.lean
-Genuine: 8 | Conflates: 1 | Dissolved: 1 | Infrastructure: 6
+Genuine: 9 | Conflates: 1 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.RingTheory.Valuation.Integers
 import Mathlib.Algebra.Group.Units.Hom
+
+noncomputable section
 
 /-!
 # Extension of Valuation
@@ -110,10 +112,6 @@ instance instAlgebraInteger : Algebra vR.integer vA.integer where
   smul_def' _ _ := Subtype.ext (Algebra.smul_def _ _)
 
 @[simp, norm_cast]
-theorem val_smul (r : vR.integer) (a : vA.integer) : ↑(r • a : vA.integer) = (r : R) • (a : A) := by
-  rfl
-
-@[simp, norm_cast]
 theorem val_algebraMap (r : vR.integer) :
     ((algebraMap vR.integer vA.integer) r : A) = (algebraMap R A) (r : R) := by
   rfl
@@ -137,7 +135,16 @@ theorem algebraMap_injective [IsValExtension vK vA] [Nontrivial A] :
   ext
   apply RingHom.injective (algebraMap K A) h
 
--- DISSOLVED: instIsLocalHomValuationInteger
+@[instance]
+theorem instIsLocalHomValuationInteger {S ΓS: Type*} [CommRing S]
+    [LinearOrderedCommGroupWithZero ΓS]
+    [Algebra R S] [IsLocalHom (algebraMap R S)] {vS : Valuation S ΓS}
+    [IsValExtension vR vS] : IsLocalHom (algebraMap vR.integer vS.integer) where
+  map_nonunit r hr := by
+    apply (Valuation.integer.integers (v := vR)).isUnit_of_one
+    · exact (isUnit_map_iff (algebraMap R S) _).mp (hr.map (algebraMap _ S))
+    · apply (Valuation.integer.integers (v := vS)).one_of_isUnit at hr
+      exact (val_map_eq_one_iff vR vS _).mp hr
 
 alias instIsLocalRingHomValuationInteger := instIsLocalHomValuationInteger
 

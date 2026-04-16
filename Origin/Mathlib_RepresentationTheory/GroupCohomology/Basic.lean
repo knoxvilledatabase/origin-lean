@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.Opposite
 import Mathlib.Algebra.Homology.ShortComplex.HomologicalComplex
 import Mathlib.RepresentationTheory.GroupCohomology.Resolution
 
+noncomputable section
+
 /-!
 # The group cohomology of a `k`-linear `G`-representation
 
@@ -81,10 +83,6 @@ variable [Monoid G]
 
 abbrev linearYonedaObjResolution (A : Rep k G) : CochainComplex (ModuleCat.{u} k) ℕ :=
   (groupCohomology.resolution k G).linearYonedaObj k A
-
-theorem linearYonedaObjResolution_d_apply {A : Rep k G} (i j : ℕ) (x : (resolution k G).X i ⟶ A) :
-    (linearYonedaObjResolution A).d i j x = (resolution k G).d j i ≫ x :=
-  rfl
 
 end groupCohomology
 

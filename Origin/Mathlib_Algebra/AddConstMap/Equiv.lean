@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.AddConstMap.Basic
 import Mathlib.GroupTheory.Perm.Basic
 
+noncomputable section
+
 /-!
 # Equivalences conjugating `(· + a)` to `(· + b)`
 
@@ -49,8 +51,6 @@ instance {G H : Type*} [Add G] [Add H] {a : G} {b : H} :
 lemma toEquiv_inj {e₁ e₂ : G ≃+c[a, b] H} : e₁.toEquiv = e₂.toEquiv ↔ e₁ = e₂ :=
   toEquiv_injective.eq_iff
 
-@[simp] lemma coe_toEquiv (e : G ≃+c[a, b] H) : ⇑e.toEquiv = e := rfl
-
 def symm (e : G ≃+c[a, b] H) : H ≃+c[b, a] G where
   toEquiv := e.toEquiv.symm
   map_add_const' := (AddConstMapClass.semiconj e).inverse_left e.left_inv e.right_inv
@@ -59,23 +59,15 @@ def Simps.symm_apply (e : G ≃+c[a, b] H) : H → G := e.symm
 
 initialize_simps_projections AddConstEquiv (toFun → apply, invFun → symm_apply)
 
-@[simp] lemma symm_symm (e : G ≃+c[a, b] H) : e.symm.symm = e := rfl
-
 @[simps! toEquiv apply]
 def refl (a : G) : G ≃+c[a, a] G where
   toEquiv := .refl G
   map_add_const' _ := rfl
 
-@[simp] lemma symm_refl (a : G) : (refl a).symm = refl a := rfl
-
 @[simps! (config := { simpRhs := true }) toEquiv apply]
 def trans (e₁ : G ≃+c[a, b] H) (e₂ : H ≃+c[b, c] K) : G ≃+c[a, c] K where
   toEquiv := e₁.toEquiv.trans e₂.toEquiv
   map_add_const' := (AddConstMapClass.semiconj e₁).trans (AddConstMapClass.semiconj e₂)
-
-@[simp] lemma trans_refl (e : G ≃+c[a, b] H) : e.trans (.refl b) = e := rfl
-
-@[simp] lemma refl_trans (e : G ≃+c[a, b] H) : (refl a).trans e = e := rfl
 
 @[simp]
 lemma self_trans_symm (e : G ≃+c[a, b] H) : e.trans e.symm = .refl a :=
@@ -109,21 +101,5 @@ instance instGroup : Group (G ≃+c[a, a] G) :=
 @[simps! apply]
 def toPerm : (G ≃+c[a, a] G) →* Equiv.Perm G :=
   .mk' toEquiv fun _ _ ↦ rfl
-
-@[simps! apply]
-def toAddConstMapHom : (G ≃+c[a, a] G) →* (G →+c[a, a] G) where
-  toFun := toAddConstMap
-  map_mul' _ _ := rfl
-  map_one' := rfl
-
-@[simps!]
-def equivUnits : (G ≃+c[a, a] G) ≃* (G →+c[a, a] G)ˣ where
-  toFun := toAddConstMapHom.toHomUnits
-  invFun u :=
-    { toEquiv := Equiv.Perm.equivUnitsEnd.symm <| Units.map AddConstMap.toEnd u
-      map_add_const' := u.1.2 }
-  left_inv _ := rfl
-  right_inv _ := rfl
-  map_mul' _ _ := rfl
 
 end AddConstEquiv

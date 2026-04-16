@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/AlgebraicCard.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Cardinal
 import Mathlib.RingTheory.Algebraic.Basic
+
+noncomputable section
 
 /-!
 ### Cardinality of algebraic numbers
@@ -24,9 +26,13 @@ open Cardinal Polynomial
 
 namespace Algebraic
 
--- DISSOLVED: infinite_of_charZero
+theorem infinite_of_charZero (R A : Type*) [CommRing R] [IsDomain R] [Ring A] [Algebra R A]
+    [CharZero A] : { x : A | IsAlgebraic R x }.Infinite :=
+  infinite_of_injective_forall_mem Nat.cast_injective isAlgebraic_nat
 
--- DISSOLVED: aleph0_le_cardinalMk_of_charZero
+theorem aleph0_le_cardinalMk_of_charZero (R A : Type*) [CommRing R] [IsDomain R] [Ring A]
+    [Algebra R A] [CharZero A] : ℵ₀ ≤ #{ x : A // IsAlgebraic R x } :=
+  infinite_iff.1 (Set.infinite_coe_iff.2 <| infinite_of_charZero R A)
 
 alias aleph0_le_cardinal_mk_of_charZero := aleph0_le_cardinalMk_of_charZero
 
@@ -68,7 +74,10 @@ protected theorem countable : Set.Countable { x : A | IsAlgebraic R x } := by
   apply (cardinalMk_lift_le_max R A).trans
   simp
 
--- DISSOLVED: cardinalMk_of_countable_of_charZero
+@[simp]
+theorem cardinalMk_of_countable_of_charZero [CharZero A] [IsDomain R] :
+    #{ x : A // IsAlgebraic R x } = ℵ₀ :=
+  (Algebraic.countable R A).le_aleph0.antisymm (aleph0_le_cardinalMk_of_charZero R A)
 
 alias cardinal_mk_of_countable_of_charZero := cardinalMk_of_countable_of_charZero
 

@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.DFinsupp
 import Mathlib.RingTheory.Finiteness.Basic
 import Mathlib.RingTheory.Ideal.Maps
 
+noncomputable section
+
 /-!
 # Action of the polynomial ring on module induced by an algebra element.
 
@@ -133,10 +135,6 @@ def mapSubmodule :
     m ∈ mapSubmodule R M a p ↔ (of R M a).symm m ∈ (p : Submodule R M) :=
   ⟨fun ⟨_, hm, hm'⟩ ↦ hm'.symm ▸ hm, fun hm ↦ ⟨(of R M a).symm m, hm, rfl⟩⟩
 
-@[simp] lemma mem_mapSubmodule_symm_apply {q : Submodule R[X] (AEval R M a)} {m : M} :
-    m ∈ ((mapSubmodule R M a).symm q : Submodule R M) ↔ of R M a m ∈ q :=
-  Iff.rfl
-
 variable {R M}
 
 variable (p : Submodule R M) (hp : p ∈ (Algebra.lsmul R R M a).invtSubmodule)
@@ -164,8 +162,6 @@ variable (φ : M →ₗ[R] M)
 abbrev AEval' := AEval R M φ
 
 abbrev AEval'.of : M ≃ₗ[R] AEval' φ := AEval.of R M φ
-
-lemma AEval'_def : AEval' φ = AEval R M φ := rfl
 
 lemma AEval'.X_smul_of (m : M) : (X : R[X]) • AEval'.of φ m = AEval'.of φ (φ m) :=
   AEval.X_smul_of _ _

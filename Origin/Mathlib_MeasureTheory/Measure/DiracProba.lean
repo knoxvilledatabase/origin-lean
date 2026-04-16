@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.CompletelyRegular
 import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
 
+noncomputable section
+
 /-!
 # Dirac deltas as probability measures and embedding of a space into probability measures on it
 

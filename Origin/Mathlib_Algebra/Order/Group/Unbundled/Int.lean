@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Group/Unbundled/Int.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Int
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
+
+noncomputable section
 
 /-!
 # Facts about `ℤ` as an (unbundled) ordered group
@@ -56,7 +58,8 @@ alias le_self_pow_two := le_self_sq
 theorem natAbs_sub_pos_iff {i j : ℤ} : 0 < natAbs (i - j) ↔ i ≠ j := by
   rw [natAbs_pos, ne_eq, sub_eq_zero]
 
--- DISSOLVED: natAbs_sub_ne_zero_iff
+theorem natAbs_sub_ne_zero_iff {i j : ℤ} : natAbs (i - j) ≠ 0 ↔ i ≠ j :=
+  Nat.ne_zero_iff_zero_lt.trans natAbs_sub_pos_iff
 
 @[simp]
 theorem abs_lt_one_iff {a : ℤ} : |a| < 1 ↔ a = 0 := by
@@ -72,7 +75,8 @@ theorem abs_le_one_iff {a : ℤ} : |a| ≤ 1 ↔ a = 0 ∨ a = 1 ∨ a = -1 := b
       rw [negSucc_eq']
       omega
 
--- DISSOLVED: one_le_abs
+theorem one_le_abs {z : ℤ} (h₀ : z ≠ 0) : 1 ≤ |z| :=
+  add_one_le_iff.mpr (abs_pos.mpr h₀)
 
 lemma eq_zero_of_abs_lt_dvd {m x : ℤ} (h1 : m ∣ x) (h2 : |x| < m) : x = 0 := by
   by_contra h
@@ -96,7 +100,8 @@ theorem ediv_eq_zero_of_lt_abs {a b : ℤ} (H1 : 0 ≤ a) (H2 : a < |b|) : a / b
 theorem emod_abs (a b : ℤ) : a % |b| = a % b :=
   abs_by_cases (fun i => a % i = a % b) rfl (emod_neg _ _)
 
--- DISSOLVED: emod_lt
+theorem emod_lt (a : ℤ) {b : ℤ} (H : b ≠ 0) : a % b < |b| := by
+  rw [← emod_abs]; exact emod_lt_of_pos _ (abs_pos.2 H)
 
 /-! ### properties of `/` and `%` -/
 
@@ -113,7 +118,8 @@ theorem abs_ediv_le_abs : ∀ a b : ℤ, |a / b| ≤ |a| :=
       | -[m+1], 0 => Nat.zero_le _
       | -[m+1], n + 1 => Nat.succ_le_succ (Nat.div_le_self _ _))
 
--- DISSOLVED: abs_sign_of_nonzero
+theorem abs_sign_of_nonzero {z : ℤ} (hz : z ≠ 0) : |z.sign| = 1 := by
+  rw [abs_eq_natAbs, natAbs_sign_of_nonzero hz, Int.ofNat_one]
 
 protected theorem sign_eq_ediv_abs (a : ℤ) : sign a = a / |a| :=
   if az : a = 0 then by simp [az]

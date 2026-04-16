@@ -5,6 +5,8 @@ Genuine: 43 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 import Origin.Core
 import Mathlib.RingTheory.WittVector.InitTail
 
+noncomputable section
+
 /-!
 
 # Truncated Witt vectors
@@ -175,29 +177,17 @@ theorem coeff_zero (i : Fin n) : (0 : TruncatedWittVector p n R).coeff i = 0 := 
 end TruncatedWittVector
 
 macro (name := witt_truncateFun_tac) "witt_truncateFun_tac" : tactic =>
-
   `(tactic|
-
     { show _ = WittVector.truncateFun n _
-
       apply TruncatedWittVector.out_injective
-
       iterate rw [WittVector.out_truncateFun]
-
       first
-
       | rw [WittVector.init_add]
-
       | rw [WittVector.init_mul]
-
       | rw [WittVector.init_neg]
-
       | rw [WittVector.init_sub]
-
       | rw [WittVector.init_nsmul]
-
       | rw [WittVector.init_zsmul]
-
       | rw [WittVector.init_pow]})
 
 namespace WittVector
@@ -419,8 +409,8 @@ def liftFun (s : S) : 𝕎 R :=
 variable {f}
 
 include f_compat in
-
 @[simp]
+
 theorem truncate_liftFun (s : S) : WittVector.truncate n (liftFun f s) = f n s := by
   ext i
   simp only [liftFun, TruncatedWittVector.coeff_mk, WittVector.truncate_mk']

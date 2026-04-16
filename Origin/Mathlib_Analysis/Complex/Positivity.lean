@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Complex/Positivity.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.TaylorSeries
+
+noncomputable section
 
 /-!
 # Nonnegativity of values of holomorphic functions
@@ -48,8 +50,25 @@ theorem nonneg_of_iteratedDeriv_nonneg {f : ℂ → ℂ} (hf : Differentiable �
   rw [Metric.mem_ball, dist_eq, eq_re_of_ofReal_le hz]
   simpa only [Complex.abs_of_nonneg (nonneg_iff.mp hz).1] using lt_add_one _
 
--- DISSOLVED: apply_le_of_iteratedDeriv_nonneg
+theorem apply_le_of_iteratedDeriv_nonneg {f : ℂ → ℂ} {c : ℂ} (hf : Differentiable ℂ f)
+    (h : ∀ n ≠ 0, 0 ≤ iteratedDeriv n f c) ⦃z : ℂ⦄ (hz : c ≤ z) :
+    f c ≤ f z := by
+  have h' (n : ℕ) : 0 ≤ iteratedDeriv n (f · - f c) c := by
+    cases n with
+    | zero => simp only [iteratedDeriv_zero, sub_self, le_refl]
+    | succ n =>
+      specialize h (n + 1) n.succ_ne_zero
+      rw [iteratedDeriv_succ'] at h ⊢
+      rwa [funext fun x ↦ deriv_sub_const (f := f) (x := x) (f c)]
+  exact sub_nonneg.mp <| nonneg_of_iteratedDeriv_nonneg (hf.sub_const _) h' hz
 
--- DISSOLVED: apply_le_of_iteratedDeriv_alternating
+theorem apply_le_of_iteratedDeriv_alternating {f : ℂ → ℂ} {c : ℂ} (hf : Differentiable ℂ f)
+    (h : ∀ n ≠ 0, 0 ≤ (-1) ^ n * iteratedDeriv n f c) ⦃z : ℂ⦄ (hz : z ≤ c) :
+    f c ≤ f z := by
+  convert apply_le_of_iteratedDeriv_nonneg (f := fun z ↦ f (-z))
+    (hf.comp <| differentiable_neg) (fun n hn ↦ ?_) (neg_le_neg_iff.mpr hz) using 1
+  · simp only [neg_neg]
+  · simp only [neg_neg]
+  · simpa only [iteratedDeriv_comp_neg, neg_neg, smul_eq_mul] using h n hn
 
 end Differentiable

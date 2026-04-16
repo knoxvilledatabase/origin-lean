@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.MorphismProperty.Basic
 import Mathlib.CategoryTheory.EpiMono
 
+noncomputable section
+
 /-!
 # Adjoints of fully faithful functors
 

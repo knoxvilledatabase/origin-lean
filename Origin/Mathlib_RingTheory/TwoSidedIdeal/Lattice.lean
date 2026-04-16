@@ -5,6 +5,8 @@ Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 import Origin.Core
 import Mathlib.RingTheory.TwoSidedIdeal.Basic
 
+noncomputable section
+
 /-!
 # The complete lattice structure on two-sided ideals
 -/
@@ -18,8 +20,6 @@ instance : SemilatticeSup (TwoSidedIdeal R) where
   le_sup_left I J :=  by rw [ringCon_le_iff]; exact le_sup_left
   le_sup_right I J := by rw [ringCon_le_iff]; exact le_sup_right
   sup_le I J K h1 h2 := by rw [ringCon_le_iff] at h1 h2 ⊢; exact sup_le h1 h2
-
-lemma sup_ringCon (I J : TwoSidedIdeal R) : (I ⊔ J).ringCon = I.ringCon ⊔ J.ringCon := rfl
 
 section sup
 
@@ -61,12 +61,6 @@ instance : SemilatticeInf (TwoSidedIdeal R) where
   inf_le_right I J := by rw [ringCon_le_iff]; exact inf_le_right
   le_inf I J K h1 h2 := by rw [ringCon_le_iff] at h1 h2 ⊢; exact le_inf h1 h2
 
-lemma inf_ringCon (I J : TwoSidedIdeal R) : (I ⊓ J).ringCon = I.ringCon ⊓ J.ringCon := rfl
-
-lemma mem_inf {I J : TwoSidedIdeal R} {x : R} :
-    x ∈ I ⊓ J ↔ x ∈ I ∧ x ∈ J :=
-  Iff.rfl
-
 instance : SupSet (TwoSidedIdeal R) where
   sSup s := { ringCon := sSup <| TwoSidedIdeal.ringCon '' s }
 
@@ -106,19 +100,11 @@ lemma mem_sInf {S : Set (TwoSidedIdeal R)} {x : R} :
 instance : Top (TwoSidedIdeal R) where
   top := { ringCon := ⊤ }
 
-lemma top_ringCon : (⊤ : TwoSidedIdeal R).ringCon = ⊤ := rfl
-
 @[simp]
 lemma mem_top {x : R} : x ∈ (⊤: TwoSidedIdeal R) := trivial
 
 instance : Bot (TwoSidedIdeal R) where
   bot := { ringCon := ⊥ }
-
-lemma bot_ringCon : (⊥ : TwoSidedIdeal R).ringCon = ⊥ := rfl
-
-@[simp]
-lemma mem_bot {x : R} : x ∈ (⊥ : TwoSidedIdeal R) ↔ x = 0 :=
-  Iff.rfl
 
 instance : CompleteLattice (TwoSidedIdeal R) where
   __ := (inferInstance : SemilatticeSup (TwoSidedIdeal R))

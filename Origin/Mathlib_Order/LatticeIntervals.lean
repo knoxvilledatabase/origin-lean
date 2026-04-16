@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 import Origin.Core
 import Mathlib.Order.Bounds.Basic
 
+noncomputable section
+
 /-!
 # Intervals in Lattices
 
@@ -70,18 +72,8 @@ variable {a : α}
 instance semilatticeInf [SemilatticeInf α] : SemilatticeInf (Iic a) :=
   Subtype.semilatticeInf fun _ _ hx _ => le_trans inf_le_left hx
 
-@[simp, norm_cast]
-protected lemma coe_inf [SemilatticeInf α] {x y : Iic a} :
-    (↑(x ⊓ y) : α) = (x : α) ⊓ (y : α) :=
-  rfl
-
 instance semilatticeSup [SemilatticeSup α] : SemilatticeSup (Iic a) :=
   Subtype.semilatticeSup fun _ _ hx hy => sup_le hx hy
-
-@[simp, norm_cast]
-protected lemma coe_sup [SemilatticeSup α] {x y : Iic a} :
-    (↑(x ⊔ y) : α) = (x : α) ⊔ (y : α) :=
-  rfl
 
 instance [Lattice α] : Lattice (Iic a) :=
   { Iic.semilatticeInf, Iic.semilatticeSup with }
@@ -91,10 +83,6 @@ instance orderTop [Preorder α] :
   top := ⟨a, le_refl a⟩
   le_top x := x.prop
 
-@[simp]
-theorem coe_top [Preorder α] : (⊤ : Iic a) = a :=
-  rfl
-
 protected lemma eq_top_iff [Preorder α] {x : Iic a} :
     x = ⊤ ↔ (x : α) = a := by
   simp [Subtype.ext_iff]
@@ -103,10 +91,6 @@ instance orderBot [Preorder α] [OrderBot α] :
     OrderBot (Iic a) where
   bot := ⟨⊥, bot_le⟩
   bot_le := fun ⟨_, _⟩ => Subtype.mk_le_mk.2 bot_le
-
-@[simp]
-theorem coe_bot [Preorder α] [OrderBot α] : (⊥ : Iic a) = (⊥ : α) :=
-  rfl
 
 instance [Preorder α] [OrderBot α] : BoundedOrder (Iic a) :=
   { Iic.orderTop, Iic.orderBot with }
@@ -154,18 +138,10 @@ instance orderBot [Preorder α] {a : α} :
   bot := ⟨a, le_refl a⟩
   bot_le x := x.prop
 
-@[simp]
-theorem coe_bot [Preorder α] {a : α} : ↑(⊥ : Ici a) = a :=
-  rfl
-
 instance orderTop [Preorder α] [OrderTop α] {a : α} :
     OrderTop (Ici a) where
   top := ⟨⊤, le_top⟩
   le_top := fun ⟨_, _⟩ => Subtype.mk_le_mk.2 le_top
-
-@[simp]
-theorem coe_top [Preorder α] [OrderTop α] {a : α} : ↑(⊤ : Ici a) = (⊤ : α) :=
-  rfl
 
 instance boundedOrder [Preorder α] [OrderTop α] {a : α} : BoundedOrder (Ici a) :=
   { Ici.orderTop, Ici.orderBot with }

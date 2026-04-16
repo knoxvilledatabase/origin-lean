@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Shift.ShiftedHomOpposite
 import Mathlib.CategoryTheory.Triangulated.HomologicalFunctor
 import Mathlib.CategoryTheory.Triangulated.Opposite
 
+noncomputable section
+
 /-!
 # The Yoneda functors are homological
 

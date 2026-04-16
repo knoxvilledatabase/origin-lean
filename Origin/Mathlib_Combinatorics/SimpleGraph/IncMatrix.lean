@@ -7,6 +7,8 @@ import Mathlib.Combinatorics.SimpleGraph.Finite
 import Mathlib.Data.Finset.Sym
 import Mathlib.Data.Matrix.Mul
 
+noncomputable section
+
 /-!
 # Incidence matrix of a simple graph
 

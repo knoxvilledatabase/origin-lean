@@ -1,6 +1,6 @@
 /-
 Extracted from Combinatorics/Schnirelmann.lean
-Genuine: 26 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Abs
@@ -8,6 +8,8 @@ import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Nat.Prime.Defs
 import Mathlib.Data.Real.Archimedean
 import Mathlib.Order.Interval.Finset.Nat
+
+noncomputable section
 
 /-!
 # Schnirelmann density
@@ -54,7 +56,9 @@ variable {A : Set ℕ} [DecidablePred (· ∈ A)]
 lemma schnirelmannDensity_nonneg : 0 ≤ schnirelmannDensity A :=
   Real.iInf_nonneg (fun _ => by positivity)
 
--- DISSOLVED: schnirelmannDensity_le_div
+lemma schnirelmannDensity_le_div {n : ℕ} (hn : n ≠ 0) :
+    schnirelmannDensity A ≤ #{a ∈ Ioc 0 n | a ∈ A} / n :=
+  ciInf_le ⟨0, fun _ ⟨_, hx⟩ => hx ▸ by positivity⟩ (⟨n, hn.bot_lt⟩ : {n : ℕ // 0 < n})
 
 lemma schnirelmannDensity_mul_le_card_filter {n : ℕ} :
     schnirelmannDensity A * n ≤ #{a ∈ Ioc 0 n | a ∈ A} := by
@@ -62,7 +66,9 @@ lemma schnirelmannDensity_mul_le_card_filter {n : ℕ} :
   · simp
   exact (le_div_iff₀ (by positivity)).1 (schnirelmannDensity_le_div hn)
 
--- DISSOLVED: schnirelmannDensity_le_of_le
+lemma schnirelmannDensity_le_of_le {x : ℝ} (n : ℕ) (hn : n ≠ 0)
+    (hx : #{a ∈ Ioc 0 n | a ∈ A} / n ≤ x) : schnirelmannDensity A ≤ x :=
+  (schnirelmannDensity_le_div hn).trans hx
 
 lemma schnirelmannDensity_le_one : schnirelmannDensity A ≤ 1 :=
   schnirelmannDensity_le_of_le 1 one_ne_zero <|

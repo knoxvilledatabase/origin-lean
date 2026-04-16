@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Algebra.RingQuot
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
 
+noncomputable section
+
 /-!
 # Universal enveloping algebra
 
@@ -107,11 +109,6 @@ def lift : (L →ₗ⁅R⁆ A) ≃ (UniversalEnvelopingAlgebra R L →ₐ[R] A) 
     --   RingQuot.liftAlgHom_mkAlgHom_apply, AlgHom.coe_toLieHom, LieHom.coe_mk]
     -- extra `rfl` after https://github.com/leanprover/lean4/pull/2644
     simp [mkAlgHom]; rfl
-
-@[simp]
-theorem lift_symm_apply (F : UniversalEnvelopingAlgebra R L →ₐ[R] A) :
-    (lift R).symm F = (F : UniversalEnvelopingAlgebra R L →ₗ⁅R⁆ A).comp (ι R) :=
-  rfl
 
 @[simp]
 theorem ι_comp_lift : lift R f ∘ ι R = f :=

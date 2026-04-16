@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.DenseSubsite.Basic
 import Mathlib.CategoryTheory.Sites.LocallySurjective
 
+noncomputable section
+
 /-!
 
 # Preserving and reflecting local injectivity and surjectivity

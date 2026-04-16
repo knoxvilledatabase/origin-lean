@@ -1,6 +1,6 @@
 /-
 Extracted from Logic/Embedding/Set.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Data.Set.Notation
@@ -8,6 +8,8 @@ import Mathlib.Order.SetNotation
 import Mathlib.Logic.Embedding.Basic
 import Mathlib.Logic.Pairwise
 import Mathlib.Data.Set.Image
+
+noncomputable section
 
 /-!
 # Interactions between embeddings and sets.
@@ -33,7 +35,9 @@ namespace Function
 
 namespace Embedding
 
--- DISSOLVED: coeWithTop
+@[simps]
+def coeWithTop {α} : α ↪ WithTop α :=
+  { Embedding.some with toFun := WithTop.some }
 
 @[simps]
 def optionElim {α β} (f : α ↪ β) (x : β) (h : x ∉ Set.range f) : Option α ↪ β :=
@@ -48,10 +52,6 @@ def optionEmbeddingEquiv (α β) : (Option α ↪ β) ≃ Σ f : α ↪ β, ↥(
 
 def codRestrict {α β} (p : Set β) (f : α ↪ β) (H : ∀ a, f a ∈ p) : α ↪ p :=
   ⟨fun a ↦ ⟨f a, H a⟩, fun _ _ h ↦ f.injective (congr_arg Subtype.val h)⟩
-
-@[simp]
-theorem codRestrict_apply {α β} (p) (f : α ↪ β) (H a) : codRestrict p f H a = ⟨f a, H a⟩ :=
-  rfl
 
 open Set
 
@@ -105,16 +105,6 @@ def subtypeOrEquiv (p q : α → Prop) [DecidablePred p] (h : Disjoint p q) :
           intro hp
           simpa using h.le_bot x ⟨hp, x.prop⟩
 
-@[simp]
-theorem subtypeOrEquiv_symm_inl (p q : α → Prop) [DecidablePred p] (h : Disjoint p q)
-    (x : { x // p x }) : (subtypeOrEquiv p q h).symm (Sum.inl x) = ⟨x, Or.inl x.prop⟩ :=
-  rfl
-
-@[simp]
-theorem subtypeOrEquiv_symm_inr (p q : α → Prop) [DecidablePred p] (h : Disjoint p q)
-    (x : { x // q x }) : (subtypeOrEquiv p q h).symm (Sum.inr x) = ⟨x, Or.inr x.prop⟩ :=
-  rfl
-
 end Subtype
 
 section Disjoint
@@ -129,9 +119,6 @@ variable {α ι : Type*} {s t r : Set α}
     · simpa using h.ne_of_mem ha hb
     · simpa using h.symm.ne_of_mem ha hb
     simp [Subtype.val_inj]
-
-@[norm_cast] lemma Function.Embedding.coe_sumSet (h : Disjoint s t) :
-    (Function.Embedding.sumSet h : s ⊕ t → α) = Sum.elim (↑) (↑) := rfl
 
 @[simp] theorem Function.Embedding.sumSet_preimage_inl (h : Disjoint s t) :
     .inl ⁻¹' (Function.Embedding.sumSet h ⁻¹' r) = r ∩ s := by
@@ -152,9 +139,6 @@ variable {α ι : Type*} {s t r : Set α}
     rintro ⟨i, x, hx⟩ ⟨j, -, hx'⟩ rfl
     obtain rfl : i = j := h.eq (not_disjoint_iff.2 ⟨_, hx, hx'⟩)
     rfl
-
-@[norm_cast] lemma Function.Embedding.coe_sigmaSet {s : ι → Set α} (h) :
-    (Function.Embedding.sigmaSet h : ((i : ι) × s i) → α) = fun x ↦ x.2.1 := rfl
 
 @[simp] theorem Function.Embedding.sigmaSet_preimage {s : ι → Set α}
     (h : Pairwise (Disjoint on s)) (i : ι) (r : Set α) :

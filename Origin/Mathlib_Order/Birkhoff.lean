@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Order
 import Mathlib.Order.Irreducible
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Birkhoff representation
 
@@ -114,10 +116,6 @@ def infIrredUpperSet : α ↪o {s : UpperSet α // InfIrred s} where
   inj' _ := by simp
   map_rel_iff' := by simp
 
-@[simp] lemma supIrredLowerSet_apply (a : α) : supIrredLowerSet a = ⟨Iic a, supIrred_Iic _⟩ := rfl
-
-@[simp] lemma infIrredUpperSet_apply (a : α) : infIrredUpperSet a = ⟨Ici a, infIrred_Ici _⟩ := rfl
-
 variable [Finite α]
 
 lemma supIrredLowerSet_surjective : Surjective (supIrredLowerSet (α := α)) := by
@@ -137,10 +135,6 @@ noncomputable def supIrredLowerSet : α ≃o {s : LowerSet α // SupIrred s} :=
 
 noncomputable def infIrredUpperSet : α ≃o {s : UpperSet α // InfIrred s} :=
   RelIso.ofSurjective _ OrderEmbedding.infIrredUpperSet_surjective
-
-@[simp] lemma supIrredLowerSet_apply (a : α) : supIrredLowerSet a = ⟨Iic a, supIrred_Iic _⟩ := rfl
-
-@[simp] lemma infIrredUpperSet_apply (a : α) : infIrredUpperSet a = ⟨Ici a, infIrred_Ici _⟩ := rfl
 
 end OrderIso
 

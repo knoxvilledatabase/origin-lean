@@ -10,6 +10,8 @@ import Mathlib.Algebra.Category.ModuleCat.Abelian
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Limits.ConcreteCategory.Basic
 
+noncomputable section
+
 /-!
 # The category of abelian groups is abelian
 -/

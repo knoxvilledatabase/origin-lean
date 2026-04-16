@@ -11,6 +11,8 @@ import Mathlib.Tactic.Set
 import Mathlib.Util.AssertExists
 import Mathlib.Logic.Nontrivial.Basic
 
+noncomputable section
+
 /-!
 # Type tags that turn additive structures into multiplicative, and vice versa
 
@@ -44,20 +46,6 @@ def ofMul : α ≃ Additive α :=
 
 def toMul : Additive α ≃ α := ofMul.symm
 
-@[simp]
-theorem ofMul_symm_eq : (@ofMul α).symm = toMul :=
-  rfl
-
-@[simp]
-theorem toMul_symm_eq : (@toMul α).symm = ofMul :=
-  rfl
-
-@[simp]
-protected lemma «forall» {p : Additive α → Prop} : (∀ a, p a) ↔ ∀ a, p (ofMul a) := Iff.rfl
-
-@[simp]
-protected lemma «exists» {p : Additive α → Prop} : (∃ a, p a) ↔ ∃ a, p (ofMul a) := Iff.rfl
-
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 def rec {motive : Additive α → Sort*} (ofMul : ∀ a, motive (ofMul a)) : ∀ a, motive a :=
   fun a => ofMul (a.toMul)
@@ -71,20 +59,6 @@ def ofAdd : α ≃ Multiplicative α :=
 
 def toAdd : Multiplicative α ≃ α := ofAdd.symm
 
-@[simp]
-theorem ofAdd_symm_eq : (@ofAdd α).symm = toAdd :=
-  rfl
-
-@[simp]
-theorem toAdd_symm_eq : (@toAdd α).symm = ofAdd :=
-  rfl
-
-@[simp]
-protected lemma «forall» {p : Multiplicative α → Prop} : (∀ a, p a) ↔ ∀ a, p (ofAdd a) := Iff.rfl
-
-@[simp]
-protected lemma «exists» {p : Multiplicative α → Prop} : (∃ a, p a) ↔ ∃ a, p (ofAdd a) := Iff.rfl
-
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 def rec {motive : Multiplicative α → Sort*} (ofAdd : ∀ a, motive (ofAdd a)) : ∀ a, motive a :=
   fun a => ofAdd (a.toAdd)
@@ -94,22 +68,6 @@ end Multiplicative
 open Additive (ofMul toMul)
 
 open Multiplicative (ofAdd toAdd)
-
-@[simp]
-theorem toAdd_ofAdd (x : α) : (ofAdd x).toAdd = x :=
-  rfl
-
-@[simp]
-theorem ofAdd_toAdd (x : Multiplicative α) : ofAdd x.toAdd = x :=
-  rfl
-
-@[simp]
-theorem toMul_ofMul (x : α) : (ofMul x).toMul = x :=
-  rfl
-
-@[simp]
-theorem ofMul_toMul (x : Additive α) : ofMul x.toMul = x :=
-  rfl
 
 instance [Subsingleton α] : Subsingleton (Additive α) := toMul.injective.subsingleton
 
@@ -140,18 +98,6 @@ instance Additive.add [Mul α] : Add (Additive α) where
 
 instance Multiplicative.mul [Add α] : Mul (Multiplicative α) where
   mul x y := ofAdd (x.toAdd + y.toAdd)
-
-@[simp]
-theorem ofAdd_add [Add α] (x y : α) : ofAdd (x + y) = ofAdd x * ofAdd y := rfl
-
-@[simp]
-theorem toAdd_mul [Add α] (x y : Multiplicative α) : (x * y).toAdd = x.toAdd + y.toAdd := rfl
-
-@[simp]
-theorem ofMul_mul [Mul α] (x y : α) : ofMul (x * y) = ofMul x + ofMul y := rfl
-
-@[simp]
-theorem toMul_add [Mul α] (x y : Additive α) : (x + y).toMul = x.toMul * y.toMul := rfl
 
 instance Additive.addSemigroup [Semigroup α] : AddSemigroup (Additive α) :=
   { Additive.add with add_assoc := @mul_assoc α _ }
@@ -207,36 +153,12 @@ instance [One α] : Zero (Additive α) :=
 @[simp]
 theorem ofMul_one [One α] : @Additive.ofMul α 1 = 0 := rfl
 
-@[simp]
-theorem ofMul_eq_zero {A : Type*} [One A] {x : A} : Additive.ofMul x = 0 ↔ x = 1 := Iff.rfl
-
-@[simp]
-theorem toMul_zero [One α] : (0 : Additive α).toMul = 1 := rfl
-
-@[simp]
-lemma toMul_eq_one {α : Type*} [One α] {x : Additive α} :
-    x.toMul = 1 ↔ x = 0 :=
-  Iff.rfl
-
 instance [Zero α] : One (Multiplicative α) :=
   ⟨Multiplicative.ofAdd 0⟩
 
 @[simp]
 theorem ofAdd_zero [Zero α] : @Multiplicative.ofAdd α 0 = 1 :=
   rfl
-
-@[simp]
-theorem ofAdd_eq_one {A : Type*} [Zero A] {x : A} : Multiplicative.ofAdd x = 1 ↔ x = 0 :=
-  Iff.rfl
-
-@[simp]
-theorem toAdd_one [Zero α] : (1 : Multiplicative α).toAdd = 0 :=
-  rfl
-
-@[simp]
-lemma toAdd_eq_zero {α : Type*} [Zero α] {x : Multiplicative α} :
-    x.toAdd = 0 ↔ x = 1 :=
-  Iff.rfl
 
 instance Additive.addZeroClass [MulOneClass α] : AddZeroClass (Additive α) where
   zero := 0
@@ -262,22 +184,6 @@ instance Multiplicative.monoid [h : AddMonoid α] : Monoid (Multiplicative α) :
     npow_zero := @AddMonoid.nsmul_zero α h
     npow_succ := @AddMonoid.nsmul_succ α h }
 
-@[simp]
-theorem ofMul_pow [Monoid α] (n : ℕ) (a : α) : ofMul (a ^ n) = n • ofMul a :=
-  rfl
-
-@[simp]
-theorem toMul_nsmul [Monoid α] (n : ℕ) (a : Additive α) : (n • a).toMul = a.toMul ^ n :=
-  rfl
-
-@[simp]
-theorem ofAdd_nsmul [AddMonoid α] (n : ℕ) (a : α) : ofAdd (n • a) = ofAdd a ^ n :=
-  rfl
-
-@[simp]
-theorem toAdd_pow [AddMonoid α] (a : Multiplicative α) (n : ℕ) : (a ^ n).toAdd = n • a.toAdd :=
-  rfl
-
 instance Additive.addLeftCancelMonoid [LeftCancelMonoid α] : AddLeftCancelMonoid (Additive α) :=
   { Additive.addMonoid, Additive.addLeftCancelSemigroup with }
 
@@ -301,46 +207,14 @@ instance Multiplicative.commMonoid [AddCommMonoid α] : CommMonoid (Multiplicati
 instance Additive.neg [Inv α] : Neg (Additive α) :=
   ⟨fun x => ofAdd x.toMul⁻¹⟩
 
-@[simp]
-theorem ofMul_inv [Inv α] (x : α) : ofMul x⁻¹ = -ofMul x :=
-  rfl
-
-@[simp]
-theorem toMul_neg [Inv α] (x : Additive α) : (-x).toMul = x.toMul⁻¹ :=
-  rfl
-
 instance Multiplicative.inv [Neg α] : Inv (Multiplicative α) :=
   ⟨fun x => ofMul (-x.toAdd)⟩
-
-@[simp]
-theorem ofAdd_neg [Neg α] (x : α) : ofAdd (-x) = (ofAdd x)⁻¹ :=
-  rfl
-
-@[simp]
-theorem toAdd_inv [Neg α] (x : Multiplicative α) : x⁻¹.toAdd = -x.toAdd :=
-  rfl
 
 instance Additive.sub [Div α] : Sub (Additive α) where
   sub x y := ofMul (x.toMul / y.toMul)
 
 instance Multiplicative.div [Sub α] : Div (Multiplicative α) where
   div x y := ofAdd (x.toAdd - y.toAdd)
-
-@[simp]
-theorem ofAdd_sub [Sub α] (x y : α) : ofAdd (x - y) = ofAdd x / ofAdd y :=
-  rfl
-
-@[simp]
-theorem toAdd_div [Sub α] (x y : Multiplicative α) : (x / y).toAdd = x.toAdd - y.toAdd :=
-  rfl
-
-@[simp]
-theorem ofMul_div [Div α] (x y : α) : ofMul (x / y) = ofMul x - ofMul y :=
-  rfl
-
-@[simp]
-theorem toMul_sub [Div α] (x y : Additive α) : (x - y).toMul = x.toMul / y.toMul :=
-  rfl
 
 instance Additive.involutiveNeg [InvolutiveInv α] : InvolutiveNeg (Additive α) :=
   { Additive.neg with neg_neg := @inv_inv α _ }
@@ -363,22 +237,6 @@ instance Multiplicative.divInvMonoid [SubNegMonoid α] : DivInvMonoid (Multiplic
     zpow_zero' := @SubNegMonoid.zsmul_zero' α _
     zpow_succ' := @SubNegMonoid.zsmul_succ' α _
     zpow_neg' := @SubNegMonoid.zsmul_neg' α _ }
-
-@[simp]
-theorem ofMul_zpow [DivInvMonoid α] (z : ℤ) (a : α) : ofMul (a ^ z) = z • ofMul a :=
-  rfl
-
-@[simp]
-theorem toMul_zsmul [DivInvMonoid α] (z : ℤ) (a : Additive α) : (z • a).toMul = a.toMul ^ z :=
-  rfl
-
-@[simp]
-theorem ofAdd_zsmul [SubNegMonoid α] (z : ℤ) (a : α) : ofAdd (z • a) = ofAdd a ^ z :=
-  rfl
-
-@[simp]
-theorem toAdd_zpow [SubNegMonoid α] (a : Multiplicative α) (z : ℤ) : (a ^ z).toAdd = z • a.toAdd :=
-  rfl
 
 instance Additive.subtractionMonoid [DivisionMonoid α] : SubtractionMonoid (Additive α) :=
   { Additive.subNegMonoid, Additive.involutiveNeg with

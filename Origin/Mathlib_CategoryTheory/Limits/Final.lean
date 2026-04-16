@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Limits/Final.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
+Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 23
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Filtered.Basic
 import Mathlib.CategoryTheory.Limits.Yoneda
 import Mathlib.CategoryTheory.PUnit
 import Mathlib.CategoryTheory.Grothendieck
+
+noncomputable section
 
 /-!
 # Final and initial functors
@@ -213,15 +215,6 @@ def extendCocone : Cocone (F ⋙ G) ⥤ Cocone G where
             · rw [← Functor.map_comp_assoc] } }
   map f := { hom := f.hom }
 
-lemma extendCocone_obj_ι_app' (c : Cocone (F ⋙ G)) {X : D} {Y : C} (f : X ⟶ F.obj Y) :
-    (extendCocone.obj c).ι.app X = G.map f ≫ c.ι.app Y := by
-  apply induction (k₀ := f) (z := rfl) F fun Z g =>
-    G.map g ≫ c.ι.app Z = G.map f ≫ c.ι.app Y
-  · intro _ _ _ _ _ h₁ h₂
-    simp [← h₁, ← Functor.comp_map, c.ι.naturality, h₂]
-  · intro _ _ _ _ _ h₁ h₂
-    simp [← h₂, ← h₁, ← Functor.comp_map, c.ι.naturality]
-
 @[simp]
 theorem colimit_cocone_comp_aux (s : Cocone (F ⋙ G)) (j : C) :
     G.map (homToLift F (F.obj j)) ≫ s.ι.app (lift F (F.obj j)) = s.ι.app j := by
@@ -352,23 +345,23 @@ def createsColimitOfComp {B : Type u₄} [Category.{v₄} B] {H : E ⥤ B}
     exact Cocones.ext (Iso.refl _)
 
 include F in
-
 theorem hasColimitsOfShape_of_final [HasColimitsOfShape C E] : HasColimitsOfShape D E where
   has_colimit := fun _ => hasColimit_of_comp F
 
 include F in
-
 theorem preservesColimitsOfShape_of_final {B : Type u₄} [Category.{v₄} B] (H : E ⥤ B)
     [PreservesColimitsOfShape C H] : PreservesColimitsOfShape D H where
   preservesColimit := preservesColimit_of_comp F
 
 include F in
-
 theorem reflectsColimitsOfShape_of_final {B : Type u₄} [Category.{v₄} B] (H : E ⥤ B)
     [ReflectsColimitsOfShape C H] : ReflectsColimitsOfShape D H where
   reflectsColimit := reflectsColimit_of_comp F
 
 include F in
+/-- If `H` creates colimits of shape `C` and `F : C ⥤ D` is final, then `H` creates colimits of
+
+shape `D`. -/
 
 def createsColimitsOfShapeOfFinal {B : Type u₄} [Category.{v₄} B] (H : E ⥤ B)
     [CreatesColimitsOfShape C H] : CreatesColimitsOfShape D H where
@@ -511,15 +504,6 @@ def extendCone : Cone (F ⋙ G) ⥤ Cone G where
             · rw [← Functor.map_comp] } }
   map f := { hom := f.hom }
 
-lemma extendCone_obj_π_app' (c : Cone (F ⋙ G)) {X : C} {Y : D} (f : F.obj X ⟶ Y) :
-    (extendCone.obj c).π.app Y = c.π.app X ≫ G.map f := by
-  apply induction (k₀ := f) (z := rfl) F fun Z g =>
-    c.π.app Z ≫ G.map g = c.π.app X ≫ G.map f
-  · intro _ _ _ _ _ h₁ h₂
-    simp [← h₂, ← h₁, ← Functor.comp_map, c.π.naturality]
-  · intro _ _ _ _ _ h₁ h₂
-    simp [← h₁, ← Functor.comp_map, c.π.naturality, h₂]
-
 @[simp]
 theorem limit_cone_comp_aux (s : Cone (F ⋙ G)) (j : C) :
     s.π.app (lift F (F.obj j)) ≫ G.map (homToLift F (F.obj j)) = s.π.app j := by
@@ -638,23 +622,23 @@ def createsLimitOfComp {B : Type u₄} [Category.{v₄} B] {H : E ⥤ B}
     exact Cones.ext (Iso.refl _)
 
 include F in
-
 theorem hasLimitsOfShape_of_initial [HasLimitsOfShape C E] : HasLimitsOfShape D E where
   has_limit := fun _ => hasLimit_of_comp F
 
 include F in
-
 theorem preservesLimitsOfShape_of_initial {B : Type u₄} [Category.{v₄} B] (H : E ⥤ B)
     [PreservesLimitsOfShape C H] : PreservesLimitsOfShape D H where
   preservesLimit := preservesLimit_of_comp F
 
 include F in
-
 theorem reflectsLimitsOfShape_of_initial {B : Type u₄} [Category.{v₄} B] (H : E ⥤ B)
     [ReflectsLimitsOfShape C H] : ReflectsLimitsOfShape D H where
   reflectsLimit := reflectsLimit_of_comp F
 
 include F in
+/-- If `H` creates limits of shape `C` and `F : C ⥤ D` is initial, then `H` creates limits of shape
+
+`D`. -/
 
 def createsLimitsOfShapeOfInitial {B : Type u₄} [Category.{v₄} B] (H : E ⥤ B)
     [CreatesLimitsOfShape C H] : CreatesLimitsOfShape D H where

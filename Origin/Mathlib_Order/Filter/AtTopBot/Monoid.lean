@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Monoid.OrderDual
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
 import Mathlib.Order.Filter.AtTopBot
 
+noncomputable section
+
 /-!
 # Convergence to ±infinity in ordered commutative monoids
 -/

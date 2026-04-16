@@ -11,6 +11,8 @@ import Mathlib.Data.Set.Function
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Tactic.WLOG
 
+noncomputable section
+
 /-!
 # Functions of bounded variation
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Data/PNat/Xgcd.lean
-Genuine: 58 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
+Genuine: 61 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Tactic.Ring
 import Mathlib.Data.PNat.Prime
+
+noncomputable section
 
 /-!
 # Euclidean algorithm for ℕ
@@ -131,30 +133,6 @@ def flip : XgcdType where
   ap := u.bp
   bp := u.ap
 
-@[simp]
-theorem flip_w : (flip u).w = u.z :=
-  rfl
-
-@[simp]
-theorem flip_x : (flip u).x = u.y :=
-  rfl
-
-@[simp]
-theorem flip_y : (flip u).y = u.x :=
-  rfl
-
-@[simp]
-theorem flip_z : (flip u).z = u.w :=
-  rfl
-
-@[simp]
-theorem flip_a : (flip u).a = u.b :=
-  rfl
-
-@[simp]
-theorem flip_b : (flip u).b = u.a :=
-  rfl
-
 theorem flip_isReduced : (flip u).IsReduced ↔ u.IsReduced := by
   dsimp [IsReduced, flip]
   constructor <;> intro h <;> exact h.symm
@@ -221,14 +199,28 @@ theorem finish_v (hr : u.r = 0) : u.finish.v = u.v := by
 def step : XgcdType :=
   XgcdType.mk (u.y * u.q + u.zp) u.y ((u.wp + 1) * u.q + u.x) u.wp u.bp (u.r - 1)
 
--- DISSOLVED: step_wf
+theorem step_wf (hr : u.r ≠ 0) : SizeOf.sizeOf u.step < SizeOf.sizeOf u := by
+  change u.r - 1 < u.bp
+  have h₀ : u.r - 1 + 1 = u.r := Nat.succ_pred_eq_of_pos (Nat.pos_of_ne_zero hr)
+  have h₁ : u.r < u.bp + 1 := Nat.mod_lt (u.ap + 1) u.bp.succ_pos
+  rw [← h₀] at h₁
+  exact lt_of_succ_lt_succ h₁
 
 theorem step_isSpecial (hs : u.IsSpecial) : u.step.IsSpecial := by
   dsimp [IsSpecial, step] at hs ⊢
   rw [mul_add, mul_comm u.y u.x, ← hs]
   ring
 
--- DISSOLVED: step_v
+theorem step_v (hr : u.r ≠ 0) : u.step.v = u.v.swap := by
+  let ha : u.r + u.b * u.q = u.a := u.rq_eq
+  let hr : u.r - 1 + 1 = u.r := (add_comm _ 1).trans (add_tsub_cancel_of_le (Nat.pos_of_ne_zero hr))
+  ext
+  · change ((u.y * u.q + u.z) * u.b + u.y * (u.r - 1 + 1) : ℕ) = u.y * u.a + u.z * u.b
+    rw [← ha, hr]
+    ring
+  · change ((u.w * u.q + u.x) * u.b + u.w * (u.r - 1 + 1) : ℕ) = u.w * u.a + u.x * u.b
+    rw [← ha, hr]
+    ring
 
 def reduce (u : XgcdType) : XgcdType :=
   dite (u.r = 0) (fun _ => u.finish) fun _h =>
@@ -240,7 +232,9 @@ theorem reduce_a {u : XgcdType} (h : u.r = 0) : u.reduce = u.finish := by
   rw [reduce]
   exact if_pos h
 
--- DISSOLVED: reduce_b
+theorem reduce_b {u : XgcdType} (h : u.r ≠ 0) : u.reduce = u.step.reduce.flip := by
+  rw [reduce]
+  exact if_neg h
 
 theorem reduce_isReduced : ∀ u : XgcdType, u.reduce.IsReduced
   | u =>

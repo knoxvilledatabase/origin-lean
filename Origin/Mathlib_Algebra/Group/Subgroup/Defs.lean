@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Defs
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Subgroups
 
@@ -122,10 +124,6 @@ instance inv {G : Type u_1} {S : Type u_2} [Inv G] [SetLike S G]
   [InvMemClass S G] {H : S} : Inv H :=
   ⟨fun a => ⟨a⁻¹, inv_mem a.2⟩⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_inv (x : H) : (x⁻¹).1 = x.1⁻¹ :=
-  rfl
-
 end InvMemClass
 
 namespace SubgroupClass
@@ -151,10 +149,6 @@ instance _root_.AddSubgroupClass.zsmul {M S} [SubNegMonoid M] [SetLike S M]
 instance zpow {M S} [DivInvMonoid M] [SetLike S M] [SubgroupClass S M] {H : S} : Pow H ℤ :=
   ⟨fun a n => ⟨a.1 ^ n, zpow_mem a.2 n⟩⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_div (x y : H) : (x / y).1 = x.1 / y.1 :=
-  rfl
-
 variable (H)
 
 @[to_additive "An additive subgroup of an `AddGroup` inherits an `AddGroup` structure."]
@@ -173,19 +167,7 @@ instance (priority := 75) toCommGroup {G : Type*} [CommGroup G] [SetLike S G] [S
 protected def subtype : H →* G where
   toFun := ((↑) : H → G); map_one' := rfl; map_mul' := fun _ _ => rfl
 
-@[to_additive (attr := simp)]
-theorem coeSubtype : (SubgroupClass.subtype H : H → G) = ((↑) : H → G) := by
-  rfl
-
 variable {H}
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_pow (x : H) (n : ℕ) : ((x ^ n : H) : G) = (x : G) ^ n :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_zpow (x : H) (n : ℤ) : ((x ^ n : H) : G) = (x : G) ^ n :=
-  rfl
 
 @[to_additive "The inclusion homomorphism from an additive subgroup `H` contained in `K` to `K`."]
 def inclusion {H K : S} (h : H ≤ K) : H →* K :=
@@ -194,10 +176,6 @@ def inclusion {H K : S} (h : H ≤ K) : H →* K :=
 @[to_additive (attr := simp)]
 theorem inclusion_self (x : H) : inclusion le_rfl x = x := by
   cases x
-  rfl
-
-@[to_additive (attr := simp)]
-theorem inclusion_mk {h : H ≤ K} (x : G) (hx : x ∈ H) : inclusion h ⟨x, hx⟩ = ⟨x, h hx⟩ :=
   rfl
 
 @[to_additive]
@@ -215,12 +193,6 @@ theorem inclusion_inclusion {L : S} (hHK : H ≤ K) (hKL : K ≤ L) (x : H) :
 theorem coe_inclusion {H K : S} {h : H ≤ K} (a : H) : (inclusion h a : G) = a := by
   cases a
   simp only [inclusion, MonoidHom.mk'_apply]
-
-@[to_additive (attr := simp)]
-theorem subtype_comp_inclusion {H K : S} (hH : H ≤ K) :
-    (SubgroupClass.subtype K).comp (inclusion hH) = SubgroupClass.subtype H := by
-  ext
-  simp only [MonoidHom.comp_apply, coeSubtype, coe_inclusion]
 
 end SubgroupClass
 
@@ -252,25 +224,6 @@ instance : SubgroupClass (Subgroup G) G where
   one_mem _ := (Subgroup.toSubmonoid _).one_mem'
   mul_mem := (Subgroup.toSubmonoid _).mul_mem'
 
-@[to_additive]
-theorem mem_carrier {s : Subgroup G} {x : G} : x ∈ s.carrier ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive (attr := simp)]
-theorem mem_mk {s : Set G} {x : G} (h_one) (h_mul) (h_inv) :
-    x ∈ mk ⟨⟨s, h_one⟩, h_mul⟩ h_inv ↔ x ∈ s :=
-  Iff.rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_set_mk {s : Set G} (h_one) (h_mul) (h_inv) :
-    (mk ⟨⟨s, h_one⟩, h_mul⟩ h_inv : Set G) = s :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem mk_le_mk {s t : Set G} (h_one) (h_mul) (h_inv) (h_one') (h_mul') (h_inv') :
-    mk ⟨⟨s, h_one⟩, h_mul⟩ h_inv ≤ mk ⟨⟨t, h_one'⟩, h_mul'⟩ h_inv' ↔ s ⊆ t :=
-  Iff.rfl
-
 initialize_simps_projections Subgroup (carrier → coe, as_prefix coe)
 
 initialize_simps_projections AddSubgroup (carrier → coe, as_prefix coe)
@@ -278,10 +231,6 @@ initialize_simps_projections AddSubgroup (carrier → coe, as_prefix coe)
 @[to_additive (attr := simp)]
 theorem coe_toSubmonoid (K : Subgroup G) : (K.toSubmonoid : Set G) = K :=
   rfl
-
-@[to_additive (attr := simp)]
-theorem mem_toSubmonoid (K : Subgroup G) (x : G) : x ∈ K.toSubmonoid ↔ x ∈ K :=
-  Iff.rfl
 
 @[to_additive]
 theorem toSubmonoid_injective : Function.Injective (toSubmonoid : Subgroup G → Submonoid G) :=
@@ -304,10 +253,6 @@ theorem toSubmonoid_mono : Monotone (toSubmonoid : Subgroup G → Submonoid G) :
   toSubmonoid_strictMono.monotone
 
 @[to_additive (attr := simp)]
-theorem toSubmonoid_le {p q : Subgroup G} : p.toSubmonoid ≤ q.toSubmonoid ↔ p ≤ q :=
-  Iff.rfl
-
-@[to_additive (attr := simp)]
 lemma coe_nonempty (s : Subgroup G) : (s : Set G).Nonempty := ⟨1, one_mem _⟩
 
 end Subgroup
@@ -324,10 +269,6 @@ protected def copy (K : Subgroup G) (s : Set G) (hs : s = K) : Subgroup G where
   one_mem' := hs.symm ▸ K.one_mem'
   mul_mem' := hs.symm ▸ K.mul_mem'
   inv_mem' hx := by simpa [hs] using hx -- Porting note: `▸` didn't work here
-
-@[to_additive (attr := simp)]
-theorem coe_copy (K : Subgroup G) (s : Set G) (hs : s = ↑K) : (K.copy s hs : Set G) = s :=
-  rfl
 
 @[to_additive]
 theorem copy_eq (K : Subgroup G) (s : Set G) (hs : s = ↑K) : K.copy s hs = K :=
@@ -420,32 +361,8 @@ instance _root_.AddSubgroup.zsmul {G} [AddGroup G] {H : AddSubgroup G} : SMul �
 instance zpow : Pow H ℤ :=
   ⟨fun a n => ⟨a ^ n, H.zpow_mem a.2 n⟩⟩
 
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_mul (x y : H) : (↑(x * y) : G) = ↑x * ↑y :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_one : ((1 : H) : G) = 1 :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_inv (x : H) : ↑(x⁻¹ : H) = (x⁻¹ : G) :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_div (x y : H) : (↑(x / y) : G) = ↑x / ↑y :=
-  rfl
-
 @[to_additive (attr := norm_cast)]
 theorem coe_mk (x : G) (hx : x ∈ H) : ((⟨x, hx⟩ : H) : G) = x :=
-  rfl
-
-@[to_additive (attr := simp, norm_cast)]
-theorem coe_pow (x : H) (n : ℕ) : ((x ^ n : H) : G) = (x : G) ^ n :=
-  rfl
-
-@[to_additive (attr := norm_cast)] -- Porting note (https://github.com/leanprover-community/mathlib4/issues/10685): dsimp can prove this
-theorem coe_zpow (x : H) (n : ℤ) : ((x ^ n : H) : G) = (x : G) ^ n :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -464,10 +381,6 @@ instance toCommGroup {G : Type*} [CommGroup G] (H : Subgroup G) : CommGroup H :=
 @[to_additive "The natural group hom from an `AddSubgroup` of `AddGroup` `G` to `G`."]
 protected def subtype : H →* G where
   toFun := ((↑) : H → G); map_one' := rfl; map_mul' _ _ := rfl
-
-@[to_additive (attr := simp)]
-theorem coeSubtype : ⇑ H.subtype = ((↑) : H → G) :=
-  rfl
 
 @[to_additive]
 theorem subtype_injective : Function.Injective (Subgroup.subtype H) :=
@@ -490,11 +403,6 @@ theorem inclusion_injective {H K : Subgroup G} (h : H ≤ K) : Function.Injectiv
 lemma inclusion_inj {H K : Subgroup G} (h : H ≤ K) {x y : H} :
     inclusion h x = inclusion h y ↔ x = y :=
   (inclusion_injective h).eq_iff
-
-@[to_additive (attr := simp)]
-theorem subtype_comp_inclusion {H K : Subgroup G} (hH : H ≤ K) :
-    K.subtype.comp (inclusion hH) = H.subtype :=
-  rfl
 
 open Set
 

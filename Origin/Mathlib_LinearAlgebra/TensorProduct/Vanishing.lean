@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.LinearAlgebra.TensorProduct.Finiteness
 import Mathlib.LinearAlgebra.DirectSum.Finsupp
 
+noncomputable section
+
 /-! # Vanishing of elements in a tensor product of two modules
 
 Let $M$ and $N$ be modules over a commutative ring $R$. Recall that every element of $M \otimes N$

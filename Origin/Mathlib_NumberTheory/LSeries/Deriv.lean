@@ -8,6 +8,8 @@ import Mathlib.NumberTheory.LSeries.Convergence
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
 import Mathlib.Analysis.Complex.HalfPlane
 
+noncomputable section
+
 /-!
 # Differentiability and derivatives of L-series
 

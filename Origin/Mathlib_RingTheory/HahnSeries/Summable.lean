@@ -1,9 +1,11 @@
 /-
 Extracted from RingTheory/HahnSeries/Summable.lean
-Genuine: 36 | Conflates: 0 | Dissolved: 3 | Infrastructure: 25
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 -/
 import Origin.Core
 import Mathlib.RingTheory.HahnSeries.Multiplication
+
+noncomputable section
 
 /-!
 # Summable families of Hahn Series
@@ -58,7 +60,11 @@ theorem isPWO_iUnion_support_powers [LinearOrderedCancelAddCommMonoid Γ] [Ring 
 
 section
 
--- DISSOLVED: SummableFamily
+structure SummableFamily (Γ) (R) [PartialOrder Γ] [AddCommMonoid R] (α : Type*) where
+  /-- A parametrized family of Hahn series. -/
+  toFun : α → HahnSeries Γ R
+  isPWO_iUnion_support' : Set.IsPWO (⋃ a : α, (toFun a).support)
+  finite_co_support' : ∀ g : Γ, { a | (toFun a).coeff g ≠ 0 }.Finite
 
 end
 
@@ -116,13 +122,6 @@ theorem coe_add {s t : SummableFamily Γ R α} : ⇑(s + t) = s + t :=
 theorem add_apply {s t : SummableFamily Γ R α} {a : α} : (s + t) a = s a + t a :=
   rfl
 
-@[simp]
-theorem coe_zero : ((0 : SummableFamily Γ R α) : α → HahnSeries Γ R) = 0 :=
-  rfl
-
-theorem zero_apply {a : α} : (0 : SummableFamily Γ R α) a = 0 :=
-  rfl
-
 instance : AddCommMonoid (SummableFamily Γ R α) where
   zero := 0
   nsmul := nsmulRec
@@ -144,10 +143,6 @@ def coeff (s : SummableFamily Γ R α) (g : Γ) : α →₀ R where
   support := (s.finite_co_support g).toFinset
   toFun a := (s a).coeff g
   mem_support_toFun a := by simp
-
-@[simp]
-theorem coeff_def (s : SummableFamily Γ R α) (a : α) (g : Γ) : s.coeff g a = (s a).coeff g :=
-  rfl
 
 def hsum (s : SummableFamily Γ R α) : HahnSeries Γ R where
   coeff g := ∑ᶠ i, (s i).coeff g
@@ -176,7 +171,10 @@ theorem hsum_add {s t : SummableFamily Γ R α} : (s + t).hsum = s.hsum + t.hsum
   simp only [hsum_coeff, add_coeff, add_apply]
   exact finsum_add_distrib (s.finite_co_support _) (t.finite_co_support _)
 
--- DISSOLVED: hsum_coeff_eq_sum_of_subset
+theorem hsum_coeff_eq_sum_of_subset {s : SummableFamily Γ R α} {g : Γ} {t : Finset α}
+    (h : { a | (s a).coeff g ≠ 0 } ⊆ t) : s.hsum.coeff g = ∑ i ∈ t, (s i).coeff g := by
+  simp only [hsum_coeff, finsum_eq_sum _ (s.finite_co_support _)]
+  exact sum_subset (Set.Finite.toFinset_subset.mpr h) (by simp)
 
 theorem hsum_coeff_eq_sum {s : SummableFamily Γ R α} {g : Γ} :
     s.hsum.coeff g = ∑ i ∈ (s.coeff g).support, (s i).coeff g := by
@@ -233,10 +231,6 @@ instance : AddCommGroup (SummableFamily Γ R α) :=
       ext
       apply neg_add_cancel }
 
-@[simp]
-theorem coe_neg : ⇑(-s) = -s :=
-  rfl
-
 theorem neg_apply : (-s) a = -s a :=
   rfl
 
@@ -290,7 +284,19 @@ theorem isPWO_iUnion_support_prod_smul {s : α → HahnSeries Γ R} {t : β → 
   exact fun a b => Set.vadd_subset_vadd (Set.subset_iUnion_of_subset a fun x y ↦ y)
     (Set.subset_iUnion_of_subset b fun x y ↦ y)
 
--- DISSOLVED: finite_co_support_prod_smul
+theorem finite_co_support_prod_smul (s : SummableFamily Γ R α)
+    (t : SummableFamily Γ' V β) (g : Γ') :
+    Finite {(ab : α × β) |
+      ((fun (ab : α × β) ↦ (of R).symm (s ab.1 • (of R) (t ab.2))) ab).coeff g ≠ 0} := by
+  apply ((VAddAntidiagonal s.isPWO_iUnion_support t.isPWO_iUnion_support g).finite_toSet.biUnion'
+    (fun gh _ => smul_support_finite s t gh)).subset _
+  exact fun ab hab => by
+    simp only [smul_coeff, ne_eq, Set.mem_setOf_eq] at hab
+    obtain ⟨ij, hij⟩ := Finset.exists_ne_zero_of_sum_ne_zero hab
+    simp only [mem_coe, mem_vaddAntidiagonal, Set.mem_iUnion, mem_support, ne_eq,
+      Function.mem_support, exists_prop, Prod.exists]
+    exact ⟨ij.1, ij.2, ⟨⟨ab.1, left_ne_zero_of_smul hij.2⟩, ⟨ab.2, right_ne_zero_of_smul hij.2⟩,
+      ((mem_vaddAntidiagonal _ _ _).mp hij.1).2.2⟩, hij.2⟩
 
 @[simps]
 def FamilySMul (s : SummableFamily Γ R α) (t : SummableFamily Γ' V β) :

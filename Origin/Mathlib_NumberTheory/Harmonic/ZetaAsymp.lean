@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/Harmonic/ZetaAsymp.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 20 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.NumberTheory.Harmonic.GammaDeriv
+
+noncomputable section
 
 /-!
 # Asymptotics of `ζ s` as `s → 1`
@@ -30,6 +32,8 @@ we obtain the limit along punctured neighbourhoods of 1 in `ℂ`.
 -/
 
 open Real Set MeasureTheory Filter Topology
+
+@[inherit_doc] local notation "γ" => eulerMascheroniConstant
 
 namespace ZetaAsymptotics
 
@@ -379,7 +383,17 @@ lemma _root_.completedRiemannZeta₀_one :
   rw [sub_self, div_zero, div_one, sub_zero, eq_sub_iff_add_eq] at this
   rw [← this, completedRiemannZeta_one]
 
--- DISSOLVED: _root_.riemannZeta_one_ne_zero
+-- CONFLATES (assumes ground = zero): _root_.riemannZeta_one_ne_zero
+lemma _root_.riemannZeta_one_ne_zero : riemannZeta 1 ≠ 0 := by
+  -- This one's for you, Kevin.
+  suffices (γ - (4 * π).log) / 2 ≠ 0 by
+    simpa only [riemannZeta_one, ← ofReal_ne_zero, ofReal_log (by positivity : 0 ≤ 4 * π),
+      push_cast]
+  refine div_ne_zero (sub_lt_zero.mpr (lt_trans ?_ ?_ (b := 1))).ne two_ne_zero
+  · exact Real.eulerMascheroniConstant_lt_two_thirds.trans (by norm_num)
+  · rw [lt_log_iff_exp_lt (by positivity)]
+    exact (lt_trans Real.exp_one_lt_d9 (by norm_num)).trans_le
+      <| mul_le_mul_of_nonneg_left two_le_pi (by norm_num)
 
 end val_at_one
 

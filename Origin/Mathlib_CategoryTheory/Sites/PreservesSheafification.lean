@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Sites.CompatibleSheafification
 import Mathlib.CategoryTheory.Sites.Whiskering
 import Mathlib.CategoryTheory.Sites.Sheafification
 
+noncomputable section
+
 /-! # Functors which preserve sheafification
 
 In this file, given a Grothendieck topology `J` on `C` and `F : A ⥤ B`,

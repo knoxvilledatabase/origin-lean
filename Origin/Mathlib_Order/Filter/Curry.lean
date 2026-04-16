@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Order.Filter.Prod
 
+noncomputable section
+
 /-!
 # Curried Filters
 
@@ -55,9 +57,6 @@ theorem eventually_curry_iff {p : α × β → Prop} :
 theorem frequently_curry_iff
     (p : (α × β) → Prop) : (∃ᶠ x in l.curry m, p x) ↔ ∃ᶠ x in l, ∃ᶠ y in m, p (x, y) := by
   simp_rw [Filter.Frequently, not_iff_not, not_not, eventually_curry_iff]
-
-theorem mem_curry_iff {s : Set (α × β)} :
-    s ∈ l.curry m ↔ ∀ᶠ x : α in l, ∀ᶠ y : β in m, (x, y) ∈ s := Iff.rfl
 
 theorem curry_le_prod : l.curry m ≤ l ×ˢ m := fun _ => Eventually.curry
 

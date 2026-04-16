@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.SpecialFunctions.Complex.Arg
 
+noncomputable section
+
 /-!
 # Rays in the complex numbers
 

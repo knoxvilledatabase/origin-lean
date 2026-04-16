@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Command
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # The "admit" linter
 

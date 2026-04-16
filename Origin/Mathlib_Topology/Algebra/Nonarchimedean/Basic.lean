@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.Topology.Algebra.OpenSubgroup
 import Mathlib.Topology.Algebra.Ring.Basic
 
+noncomputable section
+
 /-!
 # Nonarchimedean Topology
 

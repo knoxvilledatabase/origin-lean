@@ -10,6 +10,8 @@ import Mathlib.Data.List.MinMax
 import Mathlib.Data.Multiset.Fold
 import Mathlib.Algebra.Order.Monoid.OrderDual
 
+noncomputable section
+
 /-!
 # Big operators on a multiset in ordered groups
 

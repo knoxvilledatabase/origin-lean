@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Coherence
 import Mathlib.Tactic.CategoryTheory.BicategoricalComp
 
+noncomputable section
+
 /-!
 # A `coherence` tactic for bicategories
 
@@ -96,6 +98,7 @@ def exception' (msg : MessageData) : TacticM Unit := do
     throwError msg
 
 set_option quotPrecheck false in
+/-- Auxiliary definition for `bicategorical_coherence`. -/
 
 def mkLiftMap₂LiftExpr (e : Expr) : TermElabM Expr := do
   Term.elabTerm

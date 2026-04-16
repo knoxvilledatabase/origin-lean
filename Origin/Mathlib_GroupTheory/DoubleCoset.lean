@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.GroupTheory.Coset.Basic
 
+noncomputable section
+
 /-!
 # Double cosets
 

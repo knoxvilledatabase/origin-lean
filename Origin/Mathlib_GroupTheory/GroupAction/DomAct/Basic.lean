@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/GroupAction/DomAct/Basic.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 39
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Opposite
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Pi.Lemmas
 import Mathlib.Algebra.Group.Action.Faithful
 import Mathlib.Algebra.GroupWithZero.Action.Defs
 import Mathlib.Algebra.Ring.Defs
+
+noncomputable section
 
 /-!
 # Type tags for right action on the domain of a function
@@ -88,6 +90,10 @@ well as some bundled maps from `α`. This is a type synonym for `AddOpposite M`,
 to a right action of `M`."]
 def DomMulAct (M : Type*) := MulOpposite M
 
+@[inherit_doc] postfix:max "ᵈᵐᵃ" => DomMulAct
+
+@[inherit_doc] postfix:max "ᵈᵃᵃ" => DomAddAct
+
 namespace DomMulAct
 
 variable {M : Type*}
@@ -100,23 +106,14 @@ def mk : M ≃ Mᵈᵐᵃ := MulOpposite.opEquiv
 -/
 
 set_option hygiene false in
-
 run_cmd
-
   for n in [`Mul, `One, `Inv, `Semigroup, `CommSemigroup, `LeftCancelSemigroup,
-
     `RightCancelSemigroup, `MulOneClass, `Monoid, `CommMonoid, `LeftCancelMonoid,
-
     `RightCancelMonoid, `CancelMonoid, `CancelCommMonoid, `InvolutiveInv, `DivInvMonoid,
-
     `InvOneClass, `DivInvOneMonoid, `DivisionMonoid, `DivisionCommMonoid, `Group,
-
     `CommGroup, `NonAssocSemiring, `NonUnitalSemiring, `NonAssocSemiring, `Semiring,
-
     `Ring, `CommRing].map Lean.mkIdent do
-
   Lean.Elab.Command.elabCommand (← `(
-
     @[to_additive] instance [$n Mᵐᵒᵖ] : $n Mᵈᵐᵃ := ‹_›
   ))
 
@@ -125,36 +122,6 @@ run_cmd
 @[to_additive] instance [Mul Mᵐᵒᵖ] [IsRightCancelMul Mᵐᵒᵖ] : IsRightCancelMul Mᵈᵐᵃ := ‹_›
 
 @[to_additive] instance [Mul Mᵐᵒᵖ] [IsCancelMul Mᵐᵒᵖ] : IsCancelMul Mᵈᵐᵃ := ‹_›
-
-@[to_additive (attr := simp)]
-lemma mk_one [One M] : mk (1 : M) = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma symm_mk_one [One M] : mk.symm (1 : Mᵈᵐᵃ) = 1 := rfl
-
-@[to_additive (attr := simp)]
-lemma mk_mul [Mul M] (a b : M) : mk (a * b) = mk b * mk a := rfl
-
-@[to_additive (attr := simp)]
-lemma symm_mk_mul [Mul M] (a b : Mᵈᵐᵃ) : mk.symm (a * b) = mk.symm b * mk.symm a := rfl
-
-@[to_additive (attr := simp)]
-lemma mk_inv [Inv M] (a : M) : mk (a⁻¹) = (mk a)⁻¹ := rfl
-
-@[to_additive (attr := simp)]
-lemma symm_mk_inv [Inv M] (a : Mᵈᵐᵃ) : mk.symm (a⁻¹) = (mk.symm a)⁻¹ := rfl
-
-@[to_additive (attr := simp)]
-lemma mk_pow [Monoid M] (a : M) (n : ℕ) : mk (a ^ n) = mk a ^ n := rfl
-
-@[to_additive (attr := simp)]
-lemma symm_mk_pow [Monoid M] (a : Mᵈᵐᵃ) (n : ℕ) : mk.symm (a ^ n) = mk.symm a ^ n := rfl
-
-@[to_additive (attr := simp)]
-lemma mk_zpow [DivInvMonoid M] (a : M) (n : ℤ) : mk (a ^ n) = mk a ^ n := rfl
-
-@[to_additive (attr := simp)]
-lemma symm_mk_zpow [DivInvMonoid M] (a : Mᵈᵐᵃ) (n : ℤ) : mk.symm (a ^ n) = mk.symm a ^ n := rfl
 
 variable {β α N : Type*}
 
@@ -216,12 +183,6 @@ instance [Monoid M'] [MulDistribMulAction M' A] [SMulCommClass M M' A] :
     SMulCommClass Mᵈᵐᵃ M'ᵈᵐᵃ (A →* B) :=
   DFunLike.coe_injective.smulCommClass (fun _ _ ↦ rfl) (fun _ _ ↦ rfl)
 
-theorem smul_monoidHom_apply (c : Mᵈᵐᵃ) (f : A →* B) (a : A) : (c • f) a = f (mk.symm c • a) :=
-  rfl
-
-@[simp]
-theorem mk_smul_monoidHom_apply (c : M) (f : A →* B) (a : A) : (mk c • f) a = f (c • a) := rfl
-
 instance : MulAction Mᵈᵐᵃ (A →* B) := DFunLike.coe_injective.mulAction (⇑) fun _ _ ↦ rfl
 
 end MonoidHom
@@ -240,15 +201,6 @@ instance [DistribSMul M' A] [SMulCommClass M M' A] : SMulCommClass Mᵈᵐᵃ M'
 
 instance [DistribSMul M' B] : SMulCommClass Mᵈᵐᵃ M' (A →+ B) :=
   DFunLike.coe_injective.smulCommClass (fun _ _ ↦ rfl) (fun _ _ ↦ rfl)
-
-theorem smul_addMonoidHom_apply (c : Mᵈᵐᵃ) (f : A →+ B) (a : A) : (c • f) a = f (mk.symm c • a) :=
-  rfl
-
-@[simp]
-theorem mk_smul_addMonoidHom_apply (c : M) (f : A →+ B) (a : A) : (mk c • f) a = f (c • a) := rfl
-
-theorem coe_smul_addMonoidHom (c : Mᵈᵐᵃ) (f : A →+ B) : ⇑(c • f) = c • ⇑f :=
-  rfl
 
 end DistribSMul
 

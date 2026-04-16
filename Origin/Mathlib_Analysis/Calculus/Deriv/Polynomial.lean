@@ -8,6 +8,8 @@ import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.Deriv.Add
 
+noncomputable section
+
 /-!
 # Derivatives of polynomials
 

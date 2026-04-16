@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Subobject.Lattice
 import Mathlib.CategoryTheory.EssentiallySmall
 import Mathlib.CategoryTheory.Simple
 
+noncomputable section
+
 /-!
 # Artinian and noetherian categories
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.CharP.Basic
 import Mathlib.ModelTheory.Algebra.Ring.FreeCommRing
 import Mathlib.ModelTheory.Algebra.Field.Basic
 
+noncomputable section
+
 /-!
 # First order theory of fields
 

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/DedekindDomain/Different.lean
-Genuine: 35 | Conflates: 0 | Dissolved: 11 | Infrastructure: 1
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Ideal
@@ -9,6 +9,8 @@ import Mathlib.RingTheory.DedekindDomain.IntegralClosure
 import Mathlib.NumberTheory.KummerDedekind
 import Mathlib.RingTheory.IntegralClosure.IntegralRestrict
 import Mathlib.RingTheory.Trace.Quotient
+
+noncomputable section
 
 /-!
 # The different ideal
@@ -45,7 +47,6 @@ open nonZeroDivisors IsLocalization Matrix Algebra
 section BIsDomain
 
 noncomputable
-
 def Submodule.traceDual (I : Submodule B L) : Submodule B L where
   __ := (traceForm K L).dualSubmodule (I.restrictScalars A)
   smul_mem' c x hx a ha := by
@@ -208,7 +209,6 @@ variable [IsDomain A] [IsFractionRing B L] [Nontrivial B] [NoZeroDivisors B]
 namespace FractionalIdeal
 
 noncomputable
-
 def dual (I : FractionalIdeal B⁰ L) :
     FractionalIdeal B⁰ L :=
   if hI : I = 0 then 0 else
@@ -245,7 +245,8 @@ local notation:max I:max "ᵛ" => Submodule.traceDual A K I
 
 variable [IsDedekindDomain B] {I J : FractionalIdeal B⁰ L}
 
--- DISSOLVED: coe_dual
+lemma coe_dual (hI : I ≠ 0) :
+    (dual A K I : Submodule B L) = Iᵛ := by rw [dual, dif_neg hI, coe_mk]
 
 variable (B L)
 
@@ -261,11 +262,29 @@ lemma dual_zero :
 
 variable {A K L B}
 
--- DISSOLVED: mem_dual
+lemma mem_dual (hI : I ≠ 0) {x} :
+    x ∈ dual A K I ↔ ∀ a ∈ I, traceForm K L x a ∈ (algebraMap A K).range := by
+  rw [dual, dif_neg hI]; exact forall₂_congr fun _ _ ↦ mem_one
 
 variable (A K)
 
--- DISSOLVED: dual_ne_zero
+lemma dual_ne_zero (hI : I ≠ 0) :
+    dual A K I ≠ 0 := by
+  obtain ⟨b, hb, hb'⟩ := I.prop
+  suffices algebraMap B L b ∈ dual A K I by
+    intro e
+    rw [e, mem_zero_iff, ← (algebraMap B L).map_zero,
+      (IsIntegralClosure.algebraMap_injective B A L).eq_iff] at this
+    exact mem_nonZeroDivisors_iff_ne_zero.mp hb this
+  rw [mem_dual hI]
+  intro a ha
+  apply IsIntegrallyClosed.isIntegral_iff.mp
+  apply isIntegral_trace
+  dsimp
+  convert hb' a ha using 1
+  · ext w
+    exact IsIntegralClosure.isIntegral_iff (A := B)
+  · exact (Algebra.smul_def _ _).symm
 
 variable {A K}
 
@@ -274,17 +293,32 @@ lemma dual_eq_zero_iff :
     dual A K I = 0 ↔ I = 0 :=
   ⟨not_imp_not.mp (dual_ne_zero A K), fun e ↦ e.symm ▸ dual_zero A K L B⟩
 
--- DISSOLVED: dual_ne_zero_iff
+lemma dual_ne_zero_iff :
+    dual A K I ≠ 0 ↔ I ≠ 0 := dual_eq_zero_iff.not
 
 variable (A K)
 
--- DISSOLVED: le_dual_inv_aux
+lemma le_dual_inv_aux (hI : I ≠ 0) (hIJ : I * J ≤ 1) :
+    J ≤ dual A K I := by
+  rw [dual, dif_neg hI]
+  intro x hx y hy
+  rw [mem_one]
+  apply IsIntegrallyClosed.isIntegral_iff.mp
+  apply isIntegral_trace
+  rw [IsIntegralClosure.isIntegral_iff (A := B)]
+  have ⟨z, _, hz⟩ := hIJ (FractionalIdeal.mul_mem_mul hy hx)
+  rw [mul_comm] at hz
+  exact ⟨z, hz⟩
 
 lemma one_le_dual_one :
     1 ≤ dual A K (1 : FractionalIdeal B⁰ L) :=
   le_dual_inv_aux A K one_ne_zero (by rw [one_mul])
 
--- DISSOLVED: le_dual_iff
+lemma le_dual_iff (hJ : J ≠ 0) :
+    I ≤ dual A K J ↔ I * J ≤ dual A K 1 := by
+  by_cases hI : I = 0
+  · simp [hI, zero_le]
+  rw [← coe_le_coe, ← coe_le_coe, coe_mul, coe_dual A K hJ, coe_dual_one, le_traceDual]
 
 variable (I)
 
@@ -317,9 +351,13 @@ lemma dual_div_dual :
   · exact inv_div_inv J I
   · simp only [ne_eq, dual_eq_zero_iff, one_ne_zero, not_false_eq_true]
 
--- DISSOLVED: dual_mul_self
+lemma dual_mul_self (hI : I ≠ 0) :
+    dual A K I * I = dual A K 1 := by
+  rw [dual_eq_mul_inv, mul_assoc, inv_mul_cancel₀ hI, mul_one]
 
--- DISSOLVED: self_mul_dual
+lemma self_mul_dual (hI : I ≠ 0) :
+    I * dual A K I = dual A K 1 := by
+  rw [mul_comm, dual_mul_self A K hI]
 
 lemma dual_inv :
     dual A K I⁻¹ = dual A K 1 * I := by rw [dual_eq_mul_inv, inv_inv]
@@ -336,7 +374,11 @@ lemma dual_dual :
 
 variable {I}
 
--- DISSOLVED: dual_le_dual
+@[simp]
+lemma dual_le_dual (hI : I ≠ 0) (hJ : J ≠ 0) :
+    dual A K I ≤ dual A K J ↔ J ≤ I := by
+  nth_rewrite 2 [← dual_dual A K I]
+  rw [le_dual_iff A K hJ, le_dual_iff A K (I := J) (by rwa [dual_ne_zero_iff]), mul_comm]
 
 variable {A K}
 
@@ -421,7 +463,14 @@ variable {A K B L}
 
 open Submodule
 
--- DISSOLVED: differentialIdeal_le_fractionalIdeal_iff
+lemma differentialIdeal_le_fractionalIdeal_iff
+    {I : FractionalIdeal B⁰ L} (hI : I ≠ 0) [NoZeroSMulDivisors A B] :
+    differentIdeal A B ≤ I ↔ (((I⁻¹ : _) : Submodule B L).restrictScalars A).map
+      ((Algebra.trace K L).restrictScalars A) ≤ 1 := by
+  rw [coeIdeal_differentIdeal A K L B, FractionalIdeal.inv_le_comm (by simp) hI,
+    ← FractionalIdeal.coe_le_coe, FractionalIdeal.coe_dual_one]
+  refine le_traceDual_iff_map_le_one.trans ?_
+  simp
 
 lemma differentialIdeal_le_iff {I : Ideal B} (hI : I ≠ ⊥) [NoZeroSMulDivisors A B] :
     differentIdeal A B ≤ I ↔ (((I⁻¹ : FractionalIdeal B⁰ L) : Submodule B L).restrictScalars A).map
@@ -531,8 +580,55 @@ lemma aeval_derivative_mem_differentIdeal [NoZeroSMulDivisors A B]
 section
 
 include K L in
-
--- DISSOLVED: pow_sub_one_dvd_differentIdeal_aux
+lemma pow_sub_one_dvd_differentIdeal_aux [IsFractionRing B L] [IsDedekindDomain A]
+    [NoZeroSMulDivisors A B] [Module.Finite A B]
+    {p : Ideal A} [p.IsMaximal] (P : Ideal B) {e : ℕ} (he : e ≠ 0) (hp : p ≠ ⊥)
+    (hP : P ^ e ∣ p.map (algebraMap A B)) : P ^ (e - 1) ∣ differentIdeal A B := by
+  obtain ⟨a, ha⟩ := (pow_dvd_pow _ (Nat.sub_le e 1)).trans hP
+  have hp' := (Ideal.map_eq_bot_iff_of_injective
+    (NoZeroSMulDivisors.algebraMap_injective A B)).not.mpr hp
+  have habot : a ≠ ⊥ := fun ha' ↦ hp' (by simpa [ha'] using ha)
+  have hPbot : P ≠ ⊥ := by
+    rintro rfl; apply hp'
+    rwa [← Ideal.zero_eq_bot, zero_pow he, zero_dvd_iff, Ideal.zero_eq_bot] at hP
+  have : p.map (algebraMap A B) ∣ a ^ e := by
+    obtain ⟨b, hb⟩ := hP
+    apply_fun (· ^ e : Ideal B → _) at ha
+    apply_fun (· ^ (e - 1) : Ideal B → _) at hb
+    simp only [mul_pow, ← pow_mul, mul_comm e] at ha hb
+    conv_lhs at ha => rw [← Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr he)]
+    rw [pow_add, hb, mul_assoc, mul_right_inj' (pow_ne_zero _ hPbot), pow_one, mul_comm] at ha
+    exact ⟨_, ha.symm⟩
+  suffices ∀ x ∈ a, intTrace A B x ∈ p by
+    have hP : ((P ^ (e - 1) : _)⁻¹ : FractionalIdeal B⁰ L) = a / p.map (algebraMap A B) := by
+      apply inv_involutive.injective
+      simp only [inv_inv, ha, FractionalIdeal.coeIdeal_mul, inv_div, ne_eq,
+          FractionalIdeal.coeIdeal_eq_zero, mul_div_assoc]
+      rw [div_self (by simpa), mul_one]
+    rw [Ideal.dvd_iff_le, differentialIdeal_le_iff (K := K) (L := L) (pow_ne_zero _ hPbot), hP,
+      Submodule.map_le_iff_le_comap]
+    intro x hx
+    rw [Submodule.restrictScalars_mem, FractionalIdeal.mem_coe,
+      FractionalIdeal.mem_div_iff_of_nonzero (by simpa using hp')] at hx
+    rw [Submodule.mem_comap, LinearMap.coe_restrictScalars, ← FractionalIdeal.coe_one,
+      ← div_self (G₀ := FractionalIdeal A⁰ K) (a := p) (by simpa using hp),
+      FractionalIdeal.mem_coe, FractionalIdeal.mem_div_iff_of_nonzero (by simpa using hp)]
+    simp only [FractionalIdeal.mem_coeIdeal, forall_exists_index, and_imp,
+      forall_apply_eq_imp_iff₂] at hx
+    intro y hy'
+    obtain ⟨y, hy, rfl : algebraMap A K _ = _⟩ := (FractionalIdeal.mem_coeIdeal _).mp hy'
+    obtain ⟨z, hz, hz'⟩ := hx _ (Ideal.mem_map_of_mem _ hy)
+    have : trace K L (algebraMap B L z) ∈ (p : FractionalIdeal A⁰ K) := by
+      rw [← algebraMap_intTrace (A := A)]
+      exact ⟨intTrace A B z, this z hz, rfl⟩
+    rwa [mul_comm, ← smul_eq_mul, ← LinearMap.map_smul, smul_def, mul_comm,
+      ← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply A B L, ← hz']
+  intros x hx
+  rw [← Ideal.Quotient.eq_zero_iff_mem, ← trace_quotient_eq_of_isDedekindDomain,
+    ← isNilpotent_iff_eq_zero]
+  refine trace_isNilpotent_of_isNilpotent ⟨e, ?_⟩
+  rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]
+  exact (Ideal.dvd_iff_le.mp this) <| Ideal.pow_mem_pow hx _
 
 lemma pow_sub_one_dvd_differentIdeal [IsDedekindDomain A] [NoZeroSMulDivisors A B]
     [Module.Finite A B] [Algebra.IsSeparable (FractionRing A) (FractionRing B)]

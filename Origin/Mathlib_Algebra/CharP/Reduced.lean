@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.CharP.Lemmas
 import Mathlib.RingTheory.Nilpotent.Defs
 
+noncomputable section
+
 /-!
 # Results about characteristic p reduced rings
 -/

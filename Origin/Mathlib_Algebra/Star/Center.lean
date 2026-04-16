@@ -7,6 +7,8 @@ import Mathlib.Algebra.Star.Basic
 import Mathlib.Algebra.Star.Pointwise
 import Mathlib.Algebra.Group.Center
 
+noncomputable section
+
 /-! # `Set.center`, `Set.centralizer` and the `star` operation -/
 
 variable {R : Type*} [Mul R] [StarMul R] {a : R} {s : Set R}

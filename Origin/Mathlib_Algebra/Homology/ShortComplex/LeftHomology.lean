@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 
+noncomputable section
+
 /-!
 # Left Homology of short complexes
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Abelian
 import Mathlib.Algebra.Lie.Derivation.Basic
 import Mathlib.Algebra.Lie.OfAssociative
 
+noncomputable section
+
 /-!
 # Adjoint action of a Lie algebra on itself
 

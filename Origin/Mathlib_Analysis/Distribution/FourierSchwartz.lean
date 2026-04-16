@@ -7,6 +7,8 @@ import Mathlib.Analysis.Distribution.SchwartzSpace
 import Mathlib.Analysis.Fourier.FourierTransformDeriv
 import Mathlib.Analysis.Fourier.Inversion
 
+noncomputable section
+
 /-!
 # Fourier transform on Schwartz functions
 
@@ -74,9 +76,6 @@ noncomputable def fourierTransformCLM : 𝓢(V, E) →L[𝕜] 𝓢(V, E) := by
         apply Finset.le_sup this (f := fun p ↦ SchwartzMap.seminorm 𝕜 p.1 p.2 (E := V) (F := E))
     _ = _ := by simp [mul_assoc]
 
-@[simp] lemma fourierTransformCLM_apply (f : 𝓢(V, E)) :
-    fourierTransformCLM 𝕜 f = 𝓕 f := rfl
-
 variable [CompleteSpace E]
 
 noncomputable def fourierTransformCLE : 𝓢(V, E) ≃L[𝕜] 𝓢(V, E) where
@@ -96,9 +95,6 @@ noncomputable def fourierTransformCLE : 𝓢(V, E) ≃L[𝕜] 𝓢(V, E) where
     simp_rw [← fourierIntegralInv_eq_fourierIntegral_neg, Continuous.fourier_inversion_inv
       f.continuous f.integrable (fourierTransformCLM 𝕜 f).integrable]
   continuous_invFun := ContinuousLinearMap.continuous _
-
-@[simp] lemma fourierTransformCLE_apply (f : 𝓢(V, E)) :
-    fourierTransformCLE 𝕜 f = 𝓕 f := rfl
 
 @[simp] lemma fourierTransformCLE_symm_apply (f : 𝓢(V, E)) :
     (fourierTransformCLE 𝕜).symm f = 𝓕⁻ f := by

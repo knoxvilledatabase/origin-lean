@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Multiset/Nodup.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Multiset.Range
 import Mathlib.Data.List.Pairwise
+
+noncomputable section
 
 /-!
 # The `Nodup` predicate for multisets without duplicate elements.

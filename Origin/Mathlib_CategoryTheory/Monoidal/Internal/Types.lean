@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.MonCat.Basic
 import Mathlib.CategoryTheory.Monoidal.CommMon_
 import Mathlib.CategoryTheory.Monoidal.Types.Symmetric
 
+noncomputable section
+
 /-!
 # `Mon_ (Type u) ≌ MonCat.{u}`
 
@@ -50,28 +52,6 @@ end MonTypeEquivalenceMon
 
 open MonTypeEquivalenceMon
 
-noncomputable def monTypeEquivalenceMon : Mon_ (Type u) ≌ MonCat.{u} where
-  functor := functor
-  inverse := inverse
-  unitIso :=
-    NatIso.ofComponents
-      (fun A =>
-        { hom := { hom := 𝟙 _ }
-          inv := { hom := 𝟙 _ } })
-      (by aesop_cat)
-  counitIso :=
-    NatIso.ofComponents
-      (fun A =>
-        { hom :=
-            { toFun := id
-              map_one' := rfl
-              map_mul' := fun _ _ => rfl }
-          inv :=
-            { toFun := id
-              map_one' := rfl
-              map_mul' := fun _ _ => rfl } })
-      (by aesop_cat)
-
 noncomputable def monTypeEquivalenceMonForget :
     MonTypeEquivalenceMon.functor ⋙ forget MonCat ≅ Mon_.forget (Type u) :=
   NatIso.ofComponents (fun _ => Iso.refl _) (by aesop_cat)
@@ -100,28 +80,6 @@ noncomputable def inverse : CommMonCat.{u} ⥤ CommMon_ (Type u) where
 end CommMonTypeEquivalenceCommMon
 
 open CommMonTypeEquivalenceCommMon
-
-noncomputable def commMonTypeEquivalenceCommMon : CommMon_ (Type u) ≌ CommMonCat.{u} where
-  functor := functor
-  inverse := inverse
-  unitIso :=
-    NatIso.ofComponents
-      (fun A =>
-        { hom := { hom := 𝟙 _ }
-          inv := { hom := 𝟙 _ } })
-      (by aesop_cat)
-  counitIso :=
-    NatIso.ofComponents
-      (fun A =>
-        { hom :=
-            { toFun := id
-              map_one' := rfl
-              map_mul' := fun _ _ => rfl }
-          inv :=
-            { toFun := id
-              map_one' := rfl
-              map_mul' := fun _ _ => rfl } })
-      (by aesop_cat)
 
 noncomputable def commMonTypeEquivalenceCommMonForget :
     CommMonTypeEquivalenceCommMon.functor ⋙ forget₂ CommMonCat MonCat ≅

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.CategoryTheory.Adjunction.Basic
 
+noncomputable section
+
 /-!
 # The category of pointed types
 
@@ -34,10 +36,6 @@ instance : CoeSort Pointed Type* :=
 
 def of {X : Type*} (point : X) : Pointed :=
   ⟨X, point⟩
-
-@[simp]
-theorem coe_of {X : Type*} (point : X) : ↥(of point) = X :=
-  rfl
 
 alias _root_.Prod.Pointed := of
 
@@ -70,11 +68,6 @@ instance largeCategory : LargeCategory Pointed where
   Hom := Pointed.Hom
   id := Hom.id
   comp := @Hom.comp
-
-@[simp] lemma Hom.id_toFun' (X : Pointed.{u}) : (𝟙 X : X ⟶ X).toFun = _root_.id := rfl
-
-@[simp] lemma Hom.comp_toFun' {X Y Z : Pointed.{u}} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    (f ≫ g).toFun = g.toFun ∘ f.toFun := rfl
 
 instance concreteCategory : ConcreteCategory Pointed where
   forget :=

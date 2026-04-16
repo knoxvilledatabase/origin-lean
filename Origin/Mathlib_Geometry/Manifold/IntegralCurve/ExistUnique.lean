@@ -8,6 +8,8 @@ import Mathlib.Analysis.ODE.PicardLindelof
 import Mathlib.Geometry.Manifold.IntegralCurve.Transform
 import Mathlib.Geometry.Manifold.InteriorBoundary
 
+noncomputable section
+
 /-!
 # Existence and uniqueness of integral curves
 

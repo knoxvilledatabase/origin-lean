@@ -10,6 +10,8 @@ import Mathlib.Topology.MetricSpace.Isometry
 import Mathlib.Topology.MetricSpace.Gluing
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # Polish spaces
 

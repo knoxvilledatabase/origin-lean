@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Cone.InnerDual
 import Mathlib.Algebra.Order.Nonneg.Module
 import Mathlib.Algebra.Module.Submodule.Basic
 
+noncomputable section
+
 /-!
 # Pointed cones
 
@@ -71,16 +73,6 @@ def _root_.ConvexCone.toPointedCone {S : ConvexCone 𝕜 E} (hS : S.Pointed) : P
       · convert hpos
       · exact hx
 
-@[simp]
-lemma _root_.ConvexCone.mem_toPointedCone {S : ConvexCone 𝕜 E} (hS : S.Pointed) (x : E) :
-    x ∈ S.toPointedCone hS ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp, norm_cast]
-lemma _root_.ConvexCone.coe_toPointedCone {S : ConvexCone 𝕜 E} (hS : S.Pointed) :
-    S.toPointedCone hS = S :=
-  rfl
-
 instance canLift : CanLift (ConvexCone 𝕜 E) (PointedCone 𝕜 E) (↑) ConvexCone.Pointed where
   prf S hS := ⟨S.toPointedCone hS, rfl⟩
 
@@ -111,19 +103,6 @@ between pointed cones induced from linear maps between the ambient modules that 
 def map (f : E →ₗ[𝕜] F) (S : PointedCone 𝕜 E) : PointedCone 𝕜 F :=
   Submodule.map (f : E →ₗ[𝕜≥0] F) S
 
-@[simp, norm_cast]
-theorem toConvexCone_map (S : PointedCone 𝕜 E) (f : E →ₗ[𝕜] F) :
-    (S.map f : ConvexCone 𝕜 F) = (S : ConvexCone 𝕜 E).map f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_map (S : PointedCone 𝕜 E) (f : E →ₗ[𝕜] F) : (S.map f : Set F) = f '' S :=
-  rfl
-
-@[simp]
-theorem mem_map {f : E →ₗ[𝕜] F} {S : PointedCone 𝕜 E} {y : F} : y ∈ S.map f ↔ ∃ x ∈ S, f x = y :=
-  Iff.rfl
-
 theorem map_map (g : F →ₗ[𝕜] G) (f : E →ₗ[𝕜] F) (S : PointedCone 𝕜 E) :
     (S.map f).map g = S.map (g.comp f) :=
   SetLike.coe_injective <| Set.image_image g f S
@@ -134,22 +113,6 @@ theorem map_id (S : PointedCone 𝕜 E) : S.map LinearMap.id = S :=
 
 def comap (f : E →ₗ[𝕜] F) (S : PointedCone 𝕜 F) : PointedCone 𝕜 E :=
   Submodule.comap (f : E →ₗ[𝕜≥0] F) S
-
-@[simp, norm_cast]
-theorem coe_comap (f : E →ₗ[𝕜] F) (S : PointedCone 𝕜 F) : (S.comap f : Set E) = f ⁻¹' S :=
-  rfl
-
-@[simp]
-theorem comap_id (S : PointedCone 𝕜 E) : S.comap LinearMap.id = S :=
-  rfl
-
-theorem comap_comap (g : F →ₗ[𝕜] G) (f : E →ₗ[𝕜] F) (S : PointedCone 𝕜 G) :
-    (S.comap g).comap f = S.comap (g.comp f) :=
-  rfl
-
-@[simp]
-theorem mem_comap {f : E →ₗ[𝕜] F} {S : PointedCone 𝕜 F} {x : E} : x ∈ S.comap f ↔ f x ∈ S :=
-  Iff.rfl
 
 end Maps
 
@@ -164,14 +127,6 @@ variable [OrderedAddCommGroup E] [Module 𝕜 E] [OrderedSMul 𝕜 E]
 def positive : PointedCone 𝕜 E :=
   (ConvexCone.positive 𝕜 E).toPointedCone <| ConvexCone.pointed_positive 𝕜 E
 
-@[simp]
-theorem mem_positive {x : E} : x ∈ positive 𝕜 E ↔ 0 ≤ x :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem toConvexCone_positive : ↑(positive 𝕜 E) = ConvexCone.positive 𝕜 E :=
-  rfl
-
 end PositiveCone
 
 section Dual
@@ -181,15 +136,7 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
 def dual (S : PointedCone ℝ E) : PointedCone ℝ E :=
   ((S : Set E).innerDualCone).toPointedCone <| pointed_innerDualCone (S : Set E)
 
-@[simp, norm_cast]
-theorem toConvexCone_dual (S : PointedCone ℝ E) : ↑(dual S) = (S : Set E).innerDualCone :=
-  rfl
-
 open scoped InnerProductSpace in
-
-@[simp]
-theorem mem_dual {S : PointedCone ℝ E} {y : E} : y ∈ dual S ↔ ∀ ⦃x⦄, x ∈ S → 0 ≤ ⟪x, y⟫_ℝ := by
-  rfl
 
 end Dual
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Presheaf.Pushforward
 import Mathlib.Algebra.Category.ModuleCat.Sheaf
 import Mathlib.CategoryTheory.Sites.Over
 
+noncomputable section
+
 /-!
 # Pushforward of sheaves of modules
 

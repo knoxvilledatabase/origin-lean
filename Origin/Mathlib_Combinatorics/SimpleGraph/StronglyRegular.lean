@@ -7,6 +7,8 @@ import Mathlib.Combinatorics.Enumerative.DoubleCounting
 import Mathlib.Combinatorics.SimpleGraph.AdjMatrix
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
+noncomputable section
+
 /-!
 # Strongly regular graphs
 
@@ -45,25 +47,7 @@ structure IsSRGWith (n k ℓ μ : ℕ) : Prop where
 
 variable {G} {n k ℓ μ : ℕ}
 
-theorem bot_strongly_regular : (⊥ : SimpleGraph V).IsSRGWith (Fintype.card V) 0 ℓ 0 where
-  card := rfl
-  regular := bot_degree
-  of_adj := fun _ _ h => h.elim
-  of_not_adj := fun v w _h => by
-    simp only [card_eq_zero, Fintype.card_ofFinset, forall_true_left, not_false_iff, bot_adj]
-    ext
-    simp [mem_commonNeighbors]
-
 variable [DecidableEq V]
-
-theorem IsSRGWith.top :
-    (⊤ : SimpleGraph V).IsSRGWith (Fintype.card V) (Fintype.card V - 1) (Fintype.card V - 2) μ where
-  card := rfl
-  regular := IsRegularOfDegree.top
-  of_adj := fun v w h => by
-    rw [card_commonNeighbors_top]
-    exact h
-  of_not_adj := fun v w h h' => False.elim (h' ((top_adj v w).2 h))
 
 theorem IsSRGWith.card_neighborFinset_union_eq {v w : V} (h : G.IsSRGWith n k ℓ μ) :
     #(G.neighborFinset v ∪ G.neighborFinset w) =

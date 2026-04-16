@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Mathlib.Data.Sign
 
+noncomputable section
+
 /-!
 # Totally unimodular matrices
 

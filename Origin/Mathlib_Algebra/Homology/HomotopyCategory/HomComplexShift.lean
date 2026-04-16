@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.HomComplex
 import Mathlib.Algebra.Homology.HomotopyCategory.Shift
 
+noncomputable section
+
 /-! Shifting cochains
 
 Let `C` be a preadditive category. Given two cochain complexes (indexed by `ℤ`),

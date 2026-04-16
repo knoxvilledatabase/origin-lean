@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/BigOperators/Finsupp.lean
-Genuine: 69 | Conflates: 0 | Dissolved: 4 | Infrastructure: 5
+Genuine: 73 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Pi
@@ -9,6 +9,8 @@ import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Algebra.Group.Submonoid.Membership
 import Mathlib.Data.Finsupp.Fin
 import Mathlib.Data.Finsupp.Indicator
+
+noncomputable section
 
 /-!
 # Big operators for finsupps
@@ -57,23 +59,10 @@ theorem prod_fintype [Fintype α] (f : α →₀ M) (g : α → M → N) (h : �
     f.prod g = ∏ i, g i (f i) :=
   f.prod_of_support_subset (subset_univ _) g fun x _ => h x
 
-@[to_additive (attr := simp)]
-theorem prod_single_index {a : α} {b : M} {h : α → M → N} (h_zero : h a 0 = 1) :
-    (single a b).prod h = h a b :=
-  calc
-    (single a b).prod h = ∏ x ∈ {a}, h x (single a b x) :=
-      prod_of_support_subset _ support_single_subset h fun _ hx =>
-        (mem_singleton.1 hx).symm ▸ h_zero
-    _ = h a b := by simp
-
 @[to_additive]
 theorem prod_mapRange_index {f : M → M'} {hf : f 0 = 0} {g : α →₀ M} {h : α → M' → N}
     (h0 : ∀ a, h a 0 = 1) : (mapRange f hf g).prod h = g.prod fun a b => h a (f b) :=
   Finset.prod_subset support_mapRange fun _ _ H => by rw [not_mem_support_iff.1 H, h0]
-
-@[to_additive (attr := simp)]
-theorem prod_zero_index {h : α → M → N} : (0 : α →₀ M).prod h = 1 :=
-  rfl
 
 @[to_additive]
 theorem prod_comm (f : α →₀ M) (g : β →₀ M') (h : α → M → β → M' → N) :
@@ -116,7 +105,12 @@ theorem prod_pow [Fintype α] (f : α →₀ ℕ) (g : α → N) :
     (f.prod fun a b => g a ^ b) = ∏ a, g a ^ f a :=
   f.prod_fintype _ fun _ ↦ pow_zero _
 
--- DISSOLVED: onFinset_prod
+@[to_additive
+      "If `g` maps a second argument of 0 to 0, summing it over the
+      result of `onFinset` is the same as summing it over the original `Finset`."]
+theorem onFinset_prod {s : Finset α} {f : α → M} {g : α → M → N} (hf : ∀ a, f a ≠ 0 → a ∈ s)
+    (hg : ∀ a, g a 0 = 1) : (onFinset s f hf).prod g = ∏ a ∈ s, g a (f a) :=
+  Finset.prod_subset support_onFinset_subset <| by simp +contextual [*]
 
 @[to_additive
       " Taking a sum over `f : α →₀ M` is the same as adding the value on a
@@ -140,14 +134,25 @@ theorem mul_prod_erase' (f : α →₀ M) (y : α) (g : α → M → N) (hg : �
     · exact Finsupp.mul_prod_erase f y g hyf
     · rw [not_mem_support_iff.mp hyf, hg y, erase_of_not_mem_support hyf, one_mul]
 
--- DISSOLVED: _root_.SubmonoidClass.finsupp_prod_mem
+@[to_additive]
+theorem _root_.SubmonoidClass.finsupp_prod_mem {S : Type*} [SetLike S N] [SubmonoidClass S N]
+    (s : S) (f : α →₀ M) (g : α → M → N) (h : ∀ c, f c ≠ 0 → g c (f c) ∈ s) : f.prod g ∈ s :=
+  prod_mem fun _i hi => h _ (Finsupp.mem_support_iff.mp hi)
 
 @[to_additive]
 theorem prod_congr {f : α →₀ M} {g1 g2 : α → M → N} (h : ∀ x ∈ f.support, g1 x (f x) = g2 x (f x)) :
     f.prod g1 = f.prod g2 :=
   Finset.prod_congr rfl h
 
--- DISSOLVED: prod_eq_single
+@[to_additive]
+theorem prod_eq_single {f : α →₀ M} (a : α) {g : α → M → N}
+    (h₀ : ∀ b, f b ≠ 0 → b ≠ a → g b (f b) = 1) (h₁ : f a = 0 → g a 0 = 1) :
+    f.prod g = g a (f a) := by
+  refine Finset.prod_eq_single a (fun b hb₁ hb₂ => ?_) (fun h => ?_)
+  · exact h₀ b (mem_support_iff.mp hb₁) hb₂
+  · simp only [not_mem_support_iff] at h
+    rw [h]
+    exact h₁ h
 
 end SumProd
 
@@ -159,7 +164,7 @@ variable [Zero α] [CommMonoidWithZero β] [Nontrivial β] [NoZeroDivisors β]
 @[simp]
 lemma prod_eq_zero_iff : f.prod g = 0 ↔ ∃ i ∈ f.support, g i (f i) = 0 := Finset.prod_eq_zero_iff
 
--- DISSOLVED: prod_ne_zero_iff
+lemma prod_ne_zero_iff : f.prod g ≠ 0 ↔ ∀ i ∈ f.support, g i (f i) ≠ 0 := Finset.prod_ne_zero_iff
 
 end CommMonoidWithZero
 
@@ -312,17 +317,8 @@ def liftAddHom [AddZeroClass M] [AddCommMonoid N] : (α → M →+ N) ≃+ ((α 
     exact sum_add
 
 @[simp]
-theorem liftAddHom_apply [AddCommMonoid M] [AddCommMonoid N] (F : α → M →+ N) (f : α →₀ M) :
-    (liftAddHom (α := α) (M := M) (N := N)) F f = f.sum fun x => F x :=
-  rfl
-
-@[simp]
 theorem liftAddHom_symm_apply [AddCommMonoid M] [AddCommMonoid N] (F : (α →₀ M) →+ N) (x : α) :
     (liftAddHom (α := α) (M := M) (N := N)).symm F x = F.comp (singleAddHom x) :=
-  rfl
-
-theorem liftAddHom_symm_apply_apply [AddCommMonoid M] [AddCommMonoid N] (F : (α →₀ M) →+ N) (x : α)
-    (y : M) : (liftAddHom (α := α) (M := M) (N := N)).symm F x y = F (single x y) :=
   rfl
 
 @[simp]

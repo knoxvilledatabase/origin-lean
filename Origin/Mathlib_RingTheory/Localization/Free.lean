@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Localization.Finiteness
 import Mathlib.LinearAlgebra.FreeModule.StrongRankCondition
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
+noncomputable section
+
 /-!
 # Free modules and localization
 
@@ -32,6 +34,15 @@ variable {M' : Type*} [AddCommGroup M'] [Module R M'] (f : M →ₗ[R] M') [IsLo
 variable {N' : Type*} [AddCommGroup N'] [Module R N'] (g : N →ₗ[R] N') [IsLocalizedModule S g]
 
 include f in
+/--
+
+If `M` is a finitely presented `R`-module,
+
+then any `Rₛ`-basis of `Mₛ` for some `S : Submonoid R` can be lifted to
+
+a `Rᵣ`-basis of `Mᵣ` for some `r ∈ S`.
+
+-/
 
 lemma Module.FinitePresentation.exists_basis_localizedModule_powers
     (Rₛ) [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ M'] [IsScalarTower R Rₛ M']
@@ -65,6 +76,15 @@ lemma Module.FinitePresentation.exists_basis_localizedModule_powers
     simp
 
 include f in
+/--
+
+If `M` is a finitely presented `R`-module
+
+such that `Mₛ` is free over `Rₛ` for some `S : Submonoid R`,
+
+then `Mᵣ` is already free over `Rᵣ` for some `r ∈ S`.
+
+-/
 
 -- CONFLATES (assumes ground = zero): Module.FinitePresentation.exists_free_localizedModule_powers
 lemma Module.FinitePresentation.exists_free_localizedModule_powers

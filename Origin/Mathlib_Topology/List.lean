@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.Monoid
 import Mathlib.Order.Filter.ListTraverse
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Topology on lists and vectors
 

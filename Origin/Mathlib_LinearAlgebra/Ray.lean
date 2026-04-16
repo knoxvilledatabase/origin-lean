@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Ray.lean
-Genuine: 47 | Conflates: 2 | Dissolved: 25 | Infrastructure: 18
+Genuine: 68 | Conflates: 2 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Module.Algebra
 import Mathlib.LinearAlgebra.LinearIndependent
 import Mathlib.Algebra.Ring.Subring.Units
 import Mathlib.Tactic.Positivity.Basic
+
+noncomputable section
 
 /-!
 # Rays in modules
@@ -75,7 +77,9 @@ protected theorem rfl : SameRay R x x :=
 theorem symm (h : SameRay R x y) : SameRay R y x :=
   (or_left_comm.1 h).imp_right <| Or.imp_right fun ⟨r₁, r₂, h₁, h₂, h⟩ => ⟨r₂, r₁, h₂, h₁, h.symm⟩
 
--- DISSOLVED: exists_pos
+theorem exists_pos (h : SameRay R x y) (hx : x ≠ 0) (hy : y ≠ 0) :
+    ∃ r₁ r₂ : R, 0 < r₁ ∧ 0 < r₂ ∧ r₁ • x = r₂ • y :=
+  (h.resolve_left hx).resolve_left hy
 
 theorem sameRay_comm : SameRay R x y ↔ SameRay R y x :=
   ⟨SameRay.symm, SameRay.symm⟩
@@ -157,6 +161,9 @@ theorem add_right (hy : SameRay R x y) (hz : SameRay R x z) : SameRay R x (y + z
 end SameRay
 
 set_option linter.unusedVariables false in
+/-- Nonzero vectors, as used to define rays. This type depends on an unused argument `R` so that
+
+`RayVector.Setoid` can be an instance. -/
 
 @[nolint unusedArguments]
 def RayVector (R M : Type*) [Zero M] :=
@@ -183,23 +190,28 @@ def Module.Ray :=
 
 variable {R M}
 
-theorem equiv_iff_sameRay {v₁ v₂ : RayVector R M} : v₁ ≈ v₂ ↔ SameRay R (v₁ : M) v₂ :=
-  Iff.rfl
-
 variable (R)
 
--- DISSOLVED: rayOfNeZero
+def rayOfNeZero (v : M) (h : v ≠ 0) : Module.Ray R M :=
+  ⟦⟨v, h⟩⟧
 
--- DISSOLVED: Module.Ray.ind
+theorem Module.Ray.ind {C : Module.Ray R M → Prop} (h : ∀ (v) (hv : v ≠ 0), C (rayOfNeZero R v hv))
+    (x : Module.Ray R M) : C x :=
+  Quotient.ind (Subtype.rec <| h) x
 
 variable {R}
 
 instance [Nontrivial M] : Nonempty (Module.Ray R M) :=
   Nonempty.map Quotient.mk' inferInstance
 
--- DISSOLVED: ray_eq_iff
+theorem ray_eq_iff {v₁ v₂ : M} (hv₁ : v₁ ≠ 0) (hv₂ : v₂ ≠ 0) :
+    rayOfNeZero R _ hv₁ = rayOfNeZero R _ hv₂ ↔ SameRay R v₁ v₂ :=
+  Quotient.eq'
 
--- DISSOLVED: ray_pos_smul
+@[simp]
+theorem ray_pos_smul {v : M} (h : v ≠ 0) {r : R} (hr : 0 < r) (hrv : r • v ≠ 0) :
+    rayOfNeZero R (r • v) hrv = rayOfNeZero R v h :=
+  (ray_eq_iff _ _).2 <| SameRay.sameRay_pos_smul_left v hr
 
 def RayVector.mapLinearEquiv (e : M ≃ₗ[R] N) : RayVector R M ≃ RayVector R N :=
   Equiv.subtypeEquiv e.toEquiv fun _ => e.map_ne_zero_iff.symm
@@ -207,15 +219,9 @@ def RayVector.mapLinearEquiv (e : M ≃ₗ[R] N) : RayVector R M ≃ RayVector R
 def Module.Ray.map (e : M ≃ₗ[R] N) : Module.Ray R M ≃ Module.Ray R N :=
   Quotient.congr (RayVector.mapLinearEquiv e) fun _ _=> (SameRay.sameRay_map_iff _).symm
 
--- DISSOLVED: Module.Ray.map_apply
-
 @[simp]
 theorem Module.Ray.map_refl : (Module.Ray.map <| LinearEquiv.refl R M) = Equiv.refl _ :=
   Equiv.ext <| Module.Ray.ind R fun _ _ => rfl
-
-@[simp]
-theorem Module.Ray.map_symm (e : M ≃ₗ[R] N) : (Module.Ray.map e).symm = Module.Ray.map e.symm :=
-  rfl
 
 section Action
 
@@ -234,11 +240,9 @@ instance : MulAction G (Module.Ray R M) where
   one_smul := Quotient.ind fun _ => congr_arg Quotient.mk' <| one_smul _ _
 
 @[simp]
-theorem Module.Ray.linearEquiv_smul_eq_map (e : M ≃ₗ[R] M) (v : Module.Ray R M) :
-    e • v = Module.Ray.map e v :=
+theorem smul_rayOfNeZero (g : G) (v : M) (hv) :
+    g • rayOfNeZero R v hv = rayOfNeZero R (g • v) ((smul_ne_zero_iff_ne _).2 hv) :=
   rfl
-
--- DISSOLVED: smul_rayOfNeZero
 
 end Action
 
@@ -259,9 +263,13 @@ theorem someRayVector_ray (x : Module.Ray R M) : (⟦x.someRayVector⟧ : Module
 def someVector (x : Module.Ray R M) : M :=
   x.someRayVector
 
--- DISSOLVED: someVector_ne_zero
+@[simp]
+theorem someVector_ne_zero (x : Module.Ray R M) : x.someVector ≠ 0 :=
+  x.someRayVector.property
 
--- DISSOLVED: someVector_ray
+@[simp]
+theorem someVector_ray (x : Module.Ray R M) : rayOfNeZero R _ x.someVector_ne_zero = x :=
+  (congr_arg _ (Subtype.coe_eta _ _) : _).trans x.out_eq
 
 end Module.Ray
 
@@ -319,7 +327,10 @@ variable (R)
 instance : Neg (Module.Ray R M) :=
   ⟨Quotient.map (fun v => -v) fun _ _ => RayVector.equiv_neg_iff.2⟩
 
--- DISSOLVED: neg_rayOfNeZero
+@[simp]
+theorem neg_rayOfNeZero (v : M) (h : v ≠ 0) :
+    -rayOfNeZero R _ h = rayOfNeZero R (-v) (neg_ne_zero.2 h) :=
+  rfl
 
 namespace Module.Ray
 
@@ -379,25 +390,33 @@ theorem sameRay_smul_right_iff {v : M} {r : R} : SameRay R v (r • v) ↔ 0 ≤
   ⟨fun hrv => or_iff_not_imp_left.2 fun hr => eq_zero_of_sameRay_neg_smul_right (not_le.1 hr) hrv,
     or_imp.2 ⟨SameRay.sameRay_nonneg_smul_right v, fun h => h.symm ▸ SameRay.zero_left _⟩⟩
 
--- DISSOLVED: sameRay_smul_right_iff_of_ne
+theorem sameRay_smul_right_iff_of_ne {v : M} (hv : v ≠ 0) {r : R} (hr : r ≠ 0) :
+    SameRay R v (r • v) ↔ 0 < r := by
+  simp only [sameRay_smul_right_iff, hv, or_false, hr.symm.le_iff_lt]
 
 @[simp]
 theorem sameRay_smul_left_iff {v : M} {r : R} : SameRay R (r • v) v ↔ 0 ≤ r ∨ v = 0 :=
   SameRay.sameRay_comm.trans sameRay_smul_right_iff
 
--- DISSOLVED: sameRay_smul_left_iff_of_ne
+theorem sameRay_smul_left_iff_of_ne {v : M} (hv : v ≠ 0) {r : R} (hr : r ≠ 0) :
+    SameRay R (r • v) v ↔ 0 < r :=
+  SameRay.sameRay_comm.trans (sameRay_smul_right_iff_of_ne hv hr)
 
 @[simp]
 theorem sameRay_neg_smul_right_iff {v : M} {r : R} : SameRay R (-v) (r • v) ↔ r ≤ 0 ∨ v = 0 := by
   rw [← sameRay_neg_iff, neg_neg, ← neg_smul, sameRay_smul_right_iff, neg_nonneg]
 
--- DISSOLVED: sameRay_neg_smul_right_iff_of_ne
+theorem sameRay_neg_smul_right_iff_of_ne {v : M} {r : R} (hv : v ≠ 0) (hr : r ≠ 0) :
+    SameRay R (-v) (r • v) ↔ r < 0 := by
+  simp only [sameRay_neg_smul_right_iff, hv, or_false, hr.le_iff_lt]
 
 @[simp]
 theorem sameRay_neg_smul_left_iff {v : M} {r : R} : SameRay R (r • v) (-v) ↔ r ≤ 0 ∨ v = 0 :=
   SameRay.sameRay_comm.trans sameRay_neg_smul_right_iff
 
--- DISSOLVED: sameRay_neg_smul_left_iff_of_ne
+theorem sameRay_neg_smul_left_iff_of_ne {v : M} {r : R} (hv : v ≠ 0) (hr : r ≠ 0) :
+    SameRay R (r • v) (-v) ↔ r < 0 :=
+  SameRay.sameRay_comm.trans <| sameRay_neg_smul_right_iff_of_ne hv hr
 
 @[simp]
 theorem units_smul_eq_self_iff {u : Rˣ} {v : Module.Ray R M} : u • v = v ↔ 0 < u.1 := by
@@ -451,7 +470,11 @@ theorem sameRay_or_sameRay_neg_iff_not_linearIndependent {x y : M} :
     · refine Or.inr (Or.inr (Or.inr ⟨m 0, m 1, hm0, hm1, ?_⟩))
       rwa [smul_neg]
 
--- DISSOLVED: sameRay_or_ne_zero_and_sameRay_neg_iff_not_linearIndependent
+theorem sameRay_or_ne_zero_and_sameRay_neg_iff_not_linearIndependent {x y : M} :
+    SameRay R x y ∨ x ≠ 0 ∧ y ≠ 0 ∧ SameRay R x (-y) ↔ ¬LinearIndependent R ![x, y] := by
+  rw [← sameRay_or_sameRay_neg_iff_not_linearIndependent]
+  by_cases hx : x = 0; · simp [hx]
+  by_cases hy : y = 0 <;> simp [hx, hy]
 
 end
 
@@ -463,13 +486,22 @@ variable {R : Type*} [LinearOrderedField R]
 
 variable {M : Type*} [AddCommGroup M] [Module R M] {x y v₁ v₂ : M}
 
--- DISSOLVED: exists_pos_left
+theorem exists_pos_left (h : SameRay R x y) (hx : x ≠ 0) (hy : y ≠ 0) :
+    ∃ r : R, 0 < r ∧ r • x = y :=
+  let ⟨r₁, r₂, hr₁, hr₂, h⟩ := h.exists_pos hx hy
+  ⟨r₂⁻¹ * r₁, mul_pos (inv_pos.2 hr₂) hr₁, by rw [mul_smul, h, inv_smul_smul₀ hr₂.ne']⟩
 
--- DISSOLVED: exists_pos_right
+theorem exists_pos_right (h : SameRay R x y) (hx : x ≠ 0) (hy : y ≠ 0) :
+    ∃ r : R, 0 < r ∧ x = r • y :=
+  (h.symm.exists_pos_left hy hx).imp fun _ => And.imp_right Eq.symm
 
--- DISSOLVED: exists_nonneg_left
+theorem exists_nonneg_left (h : SameRay R x y) (hx : x ≠ 0) : ∃ r : R, 0 ≤ r ∧ r • x = y := by
+  obtain rfl | hy := eq_or_ne y 0
+  · exact ⟨0, le_rfl, zero_smul _ _⟩
+  · exact (h.exists_pos_left hx hy).imp fun _ => And.imp_left le_of_lt
 
--- DISSOLVED: exists_nonneg_right
+theorem exists_nonneg_right (h : SameRay R x y) (hy : y ≠ 0) : ∃ r : R, 0 ≤ r ∧ x = r • y :=
+  (h.symm.exists_nonneg_left hy).imp fun _ => And.imp_right Eq.symm
 
 theorem exists_eq_smul_add (h : SameRay R v₁ v₂) :
     ∃ a b : R, 0 ≤ a ∧ 0 ≤ b ∧ a + b = 1 ∧ v₁ = a • (v₁ + v₂) ∧ v₂ = b • (v₁ + v₂) := by
@@ -497,16 +529,42 @@ variable {R : Type*} [LinearOrderedField R]
 
 variable {M : Type*} [AddCommGroup M] [Module R M] {x y : M}
 
--- DISSOLVED: exists_pos_left_iff_sameRay
+theorem exists_pos_left_iff_sameRay (hx : x ≠ 0) (hy : y ≠ 0) :
+    (∃ r : R, 0 < r ∧ r • x = y) ↔ SameRay R x y := by
+  refine ⟨fun h => ?_, fun h => h.exists_pos_left hx hy⟩
+  rcases h with ⟨r, hr, rfl⟩
+  exact SameRay.sameRay_pos_smul_right x hr
 
--- DISSOLVED: exists_pos_left_iff_sameRay_and_ne_zero
+theorem exists_pos_left_iff_sameRay_and_ne_zero (hx : x ≠ 0) :
+    (∃ r : R, 0 < r ∧ r • x = y) ↔ SameRay R x y ∧ y ≠ 0 := by
+  constructor
+  · rintro ⟨r, hr, rfl⟩
+    simp [hx, hr.le, hr.ne']
+  · rintro ⟨hxy, hy⟩
+    exact (exists_pos_left_iff_sameRay hx hy).2 hxy
 
--- DISSOLVED: exists_nonneg_left_iff_sameRay
+theorem exists_nonneg_left_iff_sameRay (hx : x ≠ 0) :
+    (∃ r : R, 0 ≤ r ∧ r • x = y) ↔ SameRay R x y := by
+  refine ⟨fun h => ?_, fun h => h.exists_nonneg_left hx⟩
+  rcases h with ⟨r, hr, rfl⟩
+  exact SameRay.sameRay_nonneg_smul_right x hr
 
--- DISSOLVED: exists_pos_right_iff_sameRay
+theorem exists_pos_right_iff_sameRay (hx : x ≠ 0) (hy : y ≠ 0) :
+    (∃ r : R, 0 < r ∧ x = r • y) ↔ SameRay R x y := by
+  rw [SameRay.sameRay_comm]
+  simp_rw [eq_comm (a := x)]
+  exact exists_pos_left_iff_sameRay hy hx
 
--- DISSOLVED: exists_pos_right_iff_sameRay_and_ne_zero
+theorem exists_pos_right_iff_sameRay_and_ne_zero (hy : y ≠ 0) :
+    (∃ r : R, 0 < r ∧ x = r • y) ↔ SameRay R x y ∧ x ≠ 0 := by
+  rw [SameRay.sameRay_comm]
+  simp_rw [eq_comm (a := x)]
+  exact exists_pos_left_iff_sameRay_and_ne_zero hy
 
--- DISSOLVED: exists_nonneg_right_iff_sameRay
+theorem exists_nonneg_right_iff_sameRay (hy : y ≠ 0) :
+    (∃ r : R, 0 ≤ r ∧ x = r • y) ↔ SameRay R x y := by
+  rw [SameRay.sameRay_comm]
+  simp_rw [eq_comm (a := x)]
+  exact exists_nonneg_left_iff_sameRay (R := R) hy
 
 end LinearOrderedField

@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
 
+noncomputable section
+
 /-!
 # The homology sequence
 

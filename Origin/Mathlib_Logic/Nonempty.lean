@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.ZeroOne
 import Mathlib.Logic.Function.Defs
 
+noncomputable section
+
 /-!
 # Nonempty types
 

@@ -1,9 +1,11 @@
 /-
 Extracted from Geometry/Manifold/IntegralCurve/Transform.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 4 | Infrastructure: 0
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Geometry.Manifold.IntegralCurve.Basic
+
+noncomputable section
 
 /-!
 # Translation and scaling of integral curves
@@ -105,18 +107,46 @@ lemma IsIntegralCurveOn.comp_mul (hγ : IsIntegralCurveOn γ v s) (a : ℝ) :
   simp only [mfld_simps, hasFDerivWithinAt_univ]
   exact HasFDerivAt.mul_const' (hasFDerivAt_id _) _
 
--- DISSOLVED: isIntegralCurveOn_comp_mul_ne_zero
+lemma isIntegralCurveOn_comp_mul_ne_zero {a : ℝ} (ha : a ≠ 0) :
+    IsIntegralCurveOn γ v s ↔ IsIntegralCurveOn (γ ∘ (· * a)) (a • v) { t | t * a ∈ s } := by
+  refine ⟨fun hγ ↦ hγ.comp_mul a, fun hγ ↦ ?_⟩
+  convert hγ.comp_mul a⁻¹
+  · ext t
+    simp only [Function.comp_apply, mul_assoc, inv_mul_eq_div, div_self ha, mul_one]
+  · simp only [smul_smul, inv_mul_eq_div, div_self ha, one_smul]
+  · simp only [mem_setOf_eq, mul_assoc, inv_mul_eq_div, div_self ha, mul_one, setOf_mem_eq]
 
--- DISSOLVED: IsIntegralCurveAt.comp_mul_ne_zero
+lemma IsIntegralCurveAt.comp_mul_ne_zero (hγ : IsIntegralCurveAt γ v t₀) {a : ℝ} (ha : a ≠ 0) :
+    IsIntegralCurveAt (γ ∘ (· * a)) (a • v) (t₀ / a) := by
+  rw [isIntegralCurveAt_iff'] at *
+  obtain ⟨ε, hε, h⟩ := hγ
+  refine ⟨ε / |a|, by positivity, ?_⟩
+  convert h.comp_mul a
+  ext t
+  rw [mem_setOf_eq, Metric.mem_ball, Metric.mem_ball, Real.dist_eq, Real.dist_eq,
+    lt_div_iff₀ (abs_pos.mpr ha), ← abs_mul, sub_mul, div_mul_cancel₀ _ ha]
 
--- DISSOLVED: isIntegralCurveAt_comp_mul_ne_zero
+lemma isIntegralCurveAt_comp_mul_ne_zero {a : ℝ} (ha : a ≠ 0) :
+    IsIntegralCurveAt γ v t₀ ↔ IsIntegralCurveAt (γ ∘ (· * a)) (a • v) (t₀ / a) := by
+  refine ⟨fun hγ ↦ hγ.comp_mul_ne_zero ha, fun hγ ↦ ?_⟩
+  convert hγ.comp_mul_ne_zero (inv_ne_zero ha)
+  · ext t
+    simp only [Function.comp_apply, mul_assoc, inv_mul_eq_div, div_self ha, mul_one]
+  · simp only [smul_smul, inv_mul_eq_div, div_self ha, one_smul]
+  · simp only [div_inv_eq_mul, div_mul_cancel₀ _ ha]
 
 lemma IsIntegralCurve.comp_mul (hγ : IsIntegralCurve γ v) (a : ℝ) :
     IsIntegralCurve (γ ∘ (· * a)) (a • v) := by
   rw [isIntegralCurve_iff_isIntegralCurveOn] at *
   exact hγ.comp_mul _
 
--- DISSOLVED: isIntegralCurve_comp_mul_ne_zero
+lemma isIntegralCurve_comp_mul_ne_zero {a : ℝ} (ha : a ≠ 0) :
+    IsIntegralCurve γ v ↔ IsIntegralCurve (γ ∘ (· * a)) (a • v) := by
+  refine ⟨fun hγ ↦ hγ.comp_mul _, fun hγ ↦ ?_⟩
+  convert hγ.comp_mul a⁻¹
+  · ext t
+    simp only [Function.comp_apply, mul_assoc, inv_mul_eq_div, div_self ha, mul_one]
+  · simp only [smul_smul, inv_mul_eq_div, div_self ha, one_smul]
 
 lemma isIntegralCurve_const {x : M} (h : v x = 0) : IsIntegralCurve (fun _ ↦ x) v := by
   intro t

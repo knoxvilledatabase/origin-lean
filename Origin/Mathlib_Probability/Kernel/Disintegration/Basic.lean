@@ -1,9 +1,11 @@
 /-
 Extracted from Probability/Kernel/Disintegration/Basic.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 5 | Infrastructure: 4
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.MeasureCompProd
+
+noncomputable section
 
 /-!
 # Disintegration of measures and kernels
@@ -57,17 +59,47 @@ variable [ρ.IsCondKernel ρCond]
 
 lemma disintegrate : ρ.fst ⊗ₘ ρCond = ρ := IsCondKernel.disintegrate
 
--- DISSOLVED: IsCondKernel.isSFiniteKernel
+lemma IsCondKernel.isSFiniteKernel (hρ : ρ ≠ 0) : IsSFiniteKernel ρCond := by
+  contrapose! hρ; rwa [← ρ.disintegrate ρCond, Measure.compProd_of_not_isSFiniteKernel]
 
 variable [IsFiniteMeasure ρ]
 
--- DISSOLVED: IsCondKernel.apply_of_ne_zero_of_measurableSet
+private lemma IsCondKernel.apply_of_ne_zero_of_measurableSet [MeasurableSingletonClass α] {x : α}
+    (hx : ρ.fst {x} ≠ 0) {s : Set Ω} (hs : MeasurableSet s) :
+    ρCond x s = (ρ.fst {x})⁻¹ * ρ ({x} ×ˢ s) := by
+  have := isSFiniteKernel ρ ρCond (by rintro rfl; simp at hx)
+  nth_rewrite 2 [← ρ.disintegrate ρCond]
+  rw [Measure.compProd_apply (measurableSet_prod.mpr (Or.inl ⟨measurableSet_singleton x, hs⟩))]
+  classical
+  have (a) : ρCond a (Prod.mk a ⁻¹' {x} ×ˢ s) = ({x} : Set α).indicator (ρCond · s) a := by
+    obtain rfl | hax := eq_or_ne a x
+    · simp only [singleton_prod, mem_singleton_iff, indicator_of_mem]
+      congr with y
+      simp
+    · simp only [singleton_prod, mem_singleton_iff, hax, not_false_eq_true, indicator_of_not_mem]
+      have : Prod.mk a ⁻¹' (Prod.mk x '' s) = ∅ := by ext y; simp [Ne.symm hax]
+      simp only [this, measure_empty]
+  simp_rw [this]
+  rw [MeasureTheory.lintegral_indicator (measurableSet_singleton x)]
+  simp only [Measure.restrict_singleton, lintegral_smul_measure, lintegral_dirac]
+  rw [← mul_assoc, ENNReal.inv_mul_cancel hx (measure_ne_top _ _), one_mul]
 
--- DISSOLVED: IsCondKernel.apply_of_ne_zero
+lemma IsCondKernel.apply_of_ne_zero [MeasurableSingletonClass α] {x : α}
+    (hx : ρ.fst {x} ≠ 0) (s : Set Ω) : ρCond x s = (ρ.fst {x})⁻¹ * ρ ({x} ×ˢ s) := by
+  have : ρCond x s = ((ρ.fst {x})⁻¹ • ρ).comap (fun (y : Ω) ↦ (x, y)) s := by
+    congr 2 with s hs
+    simp [IsCondKernel.apply_of_ne_zero_of_measurableSet _ _ hx hs,
+      (measurableEmbedding_prod_mk_left x).comap_apply]
+  simp [this, (measurableEmbedding_prod_mk_left x).comap_apply, hx]
 
--- DISSOLVED: IsCondKernel.isProbabilityMeasure
+lemma IsCondKernel.isProbabilityMeasure [MeasurableSingletonClass α] {a : α} (ha : ρ.fst {a} ≠ 0) :
+    IsProbabilityMeasure (ρCond a) := by
+  constructor
+  rw [IsCondKernel.apply_of_ne_zero _ _ ha, prod_univ, ← Measure.fst_apply
+    (measurableSet_singleton _), ENNReal.inv_mul_cancel ha (measure_ne_top _ _)]
 
--- DISSOLVED: IsCondKernel.isMarkovKernel
+lemma IsCondKernel.isMarkovKernel [MeasurableSingletonClass α] (hρ : ∀ a, ρ.fst {a} ≠ 0) :
+    IsMarkovKernel ρCond := ⟨fun _ ↦ isProbabilityMeasure _ _ (hρ _)⟩
 
 end MeasureTheory.Measure
 

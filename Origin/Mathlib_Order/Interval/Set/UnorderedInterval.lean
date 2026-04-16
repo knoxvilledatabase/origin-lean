@@ -7,6 +7,8 @@ import Mathlib.Order.Interval.Set.Image
 import Mathlib.Order.Bounds.Basic
 import Mathlib.Tactic.Common
 
+noncomputable section
+
 /-!
 # Intervals without endpoints ordering
 
@@ -117,8 +119,6 @@ section Prod
 theorem uIcc_prod_uIcc (a₁ a₂ : α) (b₁ b₂ : β) :
     [[a₁, a₂]] ×ˢ [[b₁, b₂]] = [[(a₁, b₁), (a₂, b₂)]] :=
   Icc_prod_Icc _ _ _ _
-
-theorem uIcc_prod_eq (a b : α × β) : [[a, b]] = [[a.1, b.1]] ×ˢ [[a.2, b.2]] := by simp
 
 end Prod
 
@@ -329,8 +329,6 @@ lemma mem_uIoo_of_lt (ha : a < x) (hb : x < b) : x ∈ uIoo a b := Ioo_subset_uI
 lemma mem_uIoo_of_gt (hb : b < x) (ha : x < a) : x ∈ uIoo a b := Ioo_subset_uIoo' ⟨hb, ha⟩
 
 variable {a b : α}
-
-theorem Ioo_min_max : Ioo (min a b) (max a b) = uIoo a b := rfl
 
 lemma uIoo_of_not_le (h : ¬a ≤ b) : uIoo a b = Ioo b a := uIoo_of_gt <| lt_of_not_ge h
 

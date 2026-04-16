@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Lie.Basic
 import Mathlib.RingTheory.Artinian
 
+noncomputable section
+
 /-!
 # Lie subalgebras
 
@@ -136,20 +138,8 @@ theorem mem_carrier {x : L} : x ∈ L'.carrier ↔ x ∈ (L' : Set L) :=
   Iff.rfl
 
 @[simp]
-theorem mem_mk_iff (S : Set L) (h₁ h₂ h₃ h₄) {x : L} :
-    x ∈ (⟨⟨⟨⟨S, h₁⟩, h₂⟩, h₃⟩, h₄⟩ : LieSubalgebra R L) ↔ x ∈ S :=
-  Iff.rfl
-
-@[simp]
 theorem mem_coe_submodule {x : L} : x ∈ (L' : Submodule R L) ↔ x ∈ L' :=
   Iff.rfl
-
-theorem mem_coe {x : L} : x ∈ (L' : Set L) ↔ x ∈ L' :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_bracket (x y : L') : (↑⁅x, y⁆ : L) = ⁅(↑x : L), ↑y⁆ :=
-  rfl
 
 theorem ext_iff (x y : L') : x = y ↔ (x : L) = y :=
   Subtype.ext_iff
@@ -163,11 +153,6 @@ theorem ext (L₁' L₂' : LieSubalgebra R L) (h : ∀ x, x ∈ L₁' ↔ x ∈ 
 
 theorem ext_iff' (L₁' L₂' : LieSubalgebra R L) : L₁' = L₂' ↔ ∀ x, x ∈ L₁' ↔ x ∈ L₂' :=
   SetLike.ext_iff
-
-@[simp]
-theorem mk_coe (S : Set L) (h₁ h₂ h₃ h₄) :
-    ((⟨⟨⟨⟨S, h₁⟩, h₂⟩, h₃⟩, h₄⟩ : LieSubalgebra R L) : Set L) = S :=
-  rfl
 
 theorem coe_to_submodule_mk (p : Submodule R L) (h) :
     (({ p with lie_mem' := h } : LieSubalgebra R L) : Submodule R L) = p := by
@@ -221,27 +206,11 @@ instance lieModule [LieModule R L M] : LieModule R L' M where
 def _root_.LieModuleHom.restrictLie (f : M →ₗ⁅R,L⁆ N) (L' : LieSubalgebra R L) : M →ₗ⁅R,L'⁆ N :=
   { (f : M →ₗ[R] N) with map_lie' := @fun x m ↦ f.map_lie (↑x) m }
 
-@[simp]
-theorem _root_.LieModuleHom.coe_restrictLie (f : M →ₗ⁅R,L⁆ N) : ⇑(f.restrictLie L') = f :=
-  rfl
-
 end LieModule
 
 def incl : L' →ₗ⁅R⁆ L :=
   { (L' : Submodule R L).subtype with
     map_lie' := rfl }
-
-@[simp]
-theorem coe_incl : ⇑L'.incl = ((↑) : L' → L) :=
-  rfl
-
-def incl' : L' →ₗ⁅R,L'⁆ L :=
-  { (L' : Submodule R L).subtype with
-    map_lie' := rfl }
-
-@[simp]
-theorem coe_incl' : ⇑L'.incl' = ((↑) : L' → L) :=
-  rfl
 
 end LieSubalgebra
 
@@ -292,11 +261,6 @@ noncomputable def equivRangeOfInjective (h : Function.Injective f) : L ≃ₗ⁅
       simp only [Subtype.mk_eq_mk, rangeRestrict_apply] at hxy
       exact h hxy, f.surjective_rangeRestrict⟩
 
-@[simp]
-theorem equivRangeOfInjective_apply (h : Function.Injective f) (x : L) :
-    f.equivRangeOfInjective h x = ⟨f x, mem_range_self f x⟩ :=
-  rfl
-
 end LieHom
 
 theorem Submodule.exists_lieSubalgebra_coe_eq_iff (p : Submodule R L) :
@@ -332,10 +296,6 @@ def map : LieSubalgebra R L₂ :=
 theorem mem_map (x : L₂) : x ∈ K.map f ↔ ∃ y : L, y ∈ K ∧ f y = x :=
   Submodule.mem_map
 
-theorem mem_map_submodule (e : L ≃ₗ⁅R⁆ L₂) (x : L₂) :
-    x ∈ K.map (e : L →ₗ⁅R⁆ L₂) ↔ x ∈ (K : Submodule R L).map (e : L →ₗ[R] L₂) :=
-  Iff.rfl
-
 def comap : LieSubalgebra R L :=
   { (K₂ : Submodule R L₂).comap (f : L →ₗ[R] L₂) with
     lie_mem' := @fun x y hx hy ↦ by
@@ -353,20 +313,8 @@ instance : PartialOrder (LieSubalgebra R L) :=
 theorem le_def : K ≤ K' ↔ (K : Set L) ⊆ K' :=
   Iff.rfl
 
-@[simp]
-theorem coe_submodule_le_coe_submodule : (K : Submodule R L) ≤ K' ↔ K ≤ K' :=
-  Iff.rfl
-
 instance : Bot (LieSubalgebra R L) :=
   ⟨0⟩
-
-@[simp]
-theorem bot_coe : ((⊥ : LieSubalgebra R L) : Set L) = {0} :=
-  rfl
-
-@[simp]
-theorem bot_coe_submodule : ((⊥ : LieSubalgebra R L) : Submodule R L) = ⊥ :=
-  rfl
 
 @[simp]
 theorem mem_bot (x : L) : x ∈ (⊥ : LieSubalgebra R L) ↔ x = 0 :=
@@ -374,14 +322,6 @@ theorem mem_bot (x : L) : x ∈ (⊥ : LieSubalgebra R L) ↔ x = 0 :=
 
 instance : Top (LieSubalgebra R L) :=
   ⟨{ (⊤ : Submodule R L) with lie_mem' := @fun x y _ _ ↦ mem_univ ⁅x, y⁆ }⟩
-
-@[simp]
-theorem top_coe : ((⊤ : LieSubalgebra R L) : Set L) = univ :=
-  rfl
-
-@[simp]
-theorem top_coe_submodule : ((⊤ : LieSubalgebra R L) : Submodule R L) = ⊤ :=
-  rfl
 
 @[simp]
 theorem mem_top (x : L) : x ∈ (⊤ : LieSubalgebra R L) :=
@@ -404,10 +344,6 @@ instance : InfSet (LieSubalgebra R L) :=
           forall_apply_eq_imp_iff₂, exists_imp, and_imp] at hx hy ⊢
         intro K hK
         exact K.lie_mem (hx K hK) (hy K hK) }⟩
-
-@[simp]
-theorem inf_coe : (↑(K ⊓ K') : Set L) = (K : Set L) ∩ (K' : Set L) :=
-  rfl
 
 @[simp]
 theorem sInf_coe_to_submodule (S : Set (LieSubalgebra R L)) :
@@ -461,10 +397,6 @@ instance : CanonicallyOrderedAddCommMonoid (LieSubalgebra R L) :=
     le_self_add := fun _a _b ↦ le_sup_left }
 
 @[simp]
-theorem add_eq_sup : K + K' = K ⊔ K' :=
-  rfl
-
-@[simp]
 theorem inf_coe_to_submodule :
     (↑(K ⊓ K') : Submodule R L) = (K : Submodule R L) ⊓ (K' : Submodule R L) :=
   rfl
@@ -501,10 +433,6 @@ variable (h : K ≤ K')
 def inclusion : K →ₗ⁅R⁆ K' :=
   { Submodule.inclusion h with map_lie' := @fun _ _ ↦ rfl }
 
-@[simp]
-theorem coe_inclusion (x : K) : (inclusion h x : L) = x :=
-  rfl
-
 theorem inclusion_apply (x : K) : inclusion h x = ⟨x.1, h x.2⟩ :=
   rfl
 
@@ -528,16 +456,8 @@ theorem ofLe_eq_comap_incl : ofLe h = K.comap K'.incl := by
   rw [mem_ofLe]
   rfl
 
-@[simp]
-theorem coe_ofLe : (ofLe h : Submodule R K') = LinearMap.range (Submodule.inclusion h) :=
-  rfl
-
 noncomputable def equivOfLe : K ≃ₗ⁅R⁆ ofLe h :=
   (inclusion h).equivRangeOfInjective (inclusion_injective h)
-
-@[simp]
-theorem equivOfLe_apply (x : K) : equivOfLe h x = ⟨inclusion h x, (inclusion h).mem_range_self x⟩ :=
-  rfl
 
 end NestedSubalgebras
 
@@ -647,11 +567,6 @@ noncomputable def ofInjective (f : L₁ →ₗ⁅R⁆ L₂) (h : Function.Inject
   { LinearEquiv.ofInjective (f : L₁ →ₗ[R] L₂) <| by rwa [LieHom.coe_toLinearMap] with
     map_lie' := @fun x y ↦ SetCoe.ext <| f.map_lie x y }
 
-@[simp]
-theorem ofInjective_apply (f : L₁ →ₗ⁅R⁆ L₂) (h : Function.Injective f) (x : L₁) :
-    ↑(ofInjective f h x) = f x :=
-  rfl
-
 variable (L₁' L₁'' : LieSubalgebra R L₁) (L₂' : LieSubalgebra R L₂)
 
 def ofEq (h : (L₁' : Set L₁) = L₁'') : L₁' ≃ₗ⁅R⁆ L₁'' :=
@@ -661,11 +576,6 @@ def ofEq (h : (L₁' : Set L₁) = L₁'') : L₁' ≃ₗ⁅R⁆ L₁'' :=
       rw [h]) with
     map_lie' := @fun _ _ ↦ rfl }
 
-@[simp]
-theorem ofEq_apply (L L' : LieSubalgebra R L₁) (h : (L : Set L₁) = L') (x : L) :
-    (↑(ofEq L L' h x) : L₁) = x :=
-  rfl
-
 variable (e : L₁ ≃ₗ⁅R⁆ L₂)
 
 def lieSubalgebraMap : L₁'' ≃ₗ⁅R⁆ (L₁''.map e : LieSubalgebra R L₂) :=
@@ -674,10 +584,6 @@ def lieSubalgebraMap : L₁'' ≃ₗ⁅R⁆ (L₁''.map e : LieSubalgebra R L₂
       apply SetCoe.ext
       exact LieHom.map_lie (↑e : L₁ →ₗ⁅R⁆ L₂) ↑x ↑y }
 
-@[simp]
-theorem lieSubalgebraMap_apply (x : L₁'') : ↑(e.lieSubalgebraMap _ x) = e x :=
-  rfl
-
 def ofSubalgebras (h : L₁'.map ↑e = L₂') : L₁' ≃ₗ⁅R⁆ L₂' :=
   { LinearEquiv.ofSubmodules (e : L₁ ≃ₗ[R] L₂) (↑L₁') (↑L₂') (by
       rw [← h]
@@ -685,14 +591,5 @@ def ofSubalgebras (h : L₁'.map ↑e = L₂') : L₁' ≃ₗ⁅R⁆ L₂' :=
     map_lie' := @fun x y ↦ by
       apply SetCoe.ext
       exact LieHom.map_lie (↑e : L₁ →ₗ⁅R⁆ L₂) ↑x ↑y }
-
-@[simp]
-theorem ofSubalgebras_apply (h : L₁'.map ↑e = L₂') (x : L₁') : ↑(e.ofSubalgebras _ _ h x) = e x :=
-  rfl
-
-@[simp]
-theorem ofSubalgebras_symm_apply (h : L₁'.map ↑e = L₂') (x : L₂') :
-    ↑((e.ofSubalgebras _ _ h).symm x) = e.symm x :=
-  rfl
 
 end LieEquiv

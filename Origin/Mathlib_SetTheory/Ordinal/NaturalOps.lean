@@ -1,10 +1,12 @@
 /-
 Extracted from SetTheory/Ordinal/NaturalOps.lean
-Genuine: 82 | Conflates: 0 | Dissolved: 1 | Infrastructure: 39
+Genuine: 83 | Conflates: 0 | Dissolved: 0 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.Arithmetic
 import Mathlib.Tactic.Abel
+
+noncomputable section
 
 /-!
 # Natural operations on ordinals
@@ -76,10 +78,6 @@ namespace NatOrdinal
 open Ordinal
 
 @[simp]
-theorem toOrdinal_symm_eq : NatOrdinal.toOrdinal.symm = Ordinal.toNatOrdinal :=
-  rfl
-
-@[simp]
 theorem toOrdinal_toNatOrdinal (a : NatOrdinal) :
     Ordinal.toNatOrdinal (NatOrdinal.toOrdinal a) = a := rfl
 
@@ -91,37 +89,6 @@ instance : WellFoundedLT NatOrdinal :=
 
 instance : ConditionallyCompleteLinearOrderBot NatOrdinal :=
   WellFoundedLT.conditionallyCompleteLinearOrderBot _
-
-@[simp]
-theorem bot_eq_zero : ⊥ = 0 :=
-  rfl
-
-@[simp]
-theorem toOrdinal_zero : toOrdinal 0 = 0 :=
-  rfl
-
-@[simp]
-theorem toOrdinal_one : toOrdinal 1 = 1 :=
-  rfl
-
-@[simp]
-theorem toOrdinal_eq_zero {a} : toOrdinal a = 0 ↔ a = 0 :=
-  Iff.rfl
-
-@[simp]
-theorem toOrdinal_eq_one {a} : toOrdinal a = 1 ↔ a = 1 :=
-  Iff.rfl
-
-@[simp]
-theorem toOrdinal_max (a b : NatOrdinal) : toOrdinal (max a b) = max (toOrdinal a) (toOrdinal b) :=
-  rfl
-
-@[simp]
-theorem toOrdinal_min (a b : NatOrdinal) : toOrdinal (min a b) = min (toOrdinal a) (toOrdinal b) :=
-  rfl
-
-theorem succ_def (a : NatOrdinal) : succ a = toNatOrdinal (toOrdinal a + 1) :=
-  rfl
 
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : NatOrdinal → Sort*} (h : ∀ a, β (toNatOrdinal a)) : ∀ a, β a := fun a =>
@@ -135,40 +102,6 @@ end NatOrdinal
 namespace Ordinal
 
 variable {a b c : Ordinal.{u}}
-
-@[simp]
-theorem toNatOrdinal_symm_eq : toNatOrdinal.symm = NatOrdinal.toOrdinal :=
-  rfl
-
-@[simp]
-theorem toNatOrdinal_toOrdinal (a : Ordinal) :  NatOrdinal.toOrdinal (toNatOrdinal a) = a :=
-  rfl
-
-@[simp]
-theorem toNatOrdinal_zero : toNatOrdinal 0 = 0 :=
-  rfl
-
-@[simp]
-theorem toNatOrdinal_one : toNatOrdinal 1 = 1 :=
-  rfl
-
-@[simp]
-theorem toNatOrdinal_eq_zero (a) : toNatOrdinal a = 0 ↔ a = 0 :=
-  Iff.rfl
-
-@[simp]
-theorem toNatOrdinal_eq_one (a) : toNatOrdinal a = 1 ↔ a = 1 :=
-  Iff.rfl
-
-@[simp]
-theorem toNatOrdinal_max (a b : Ordinal) :
-    toNatOrdinal (max a b) = max (toNatOrdinal a) (toNatOrdinal b) :=
-  rfl
-
-@[simp]
-theorem toNatOrdinal_min (a b : Ordinal) :
-    toNatOrdinal (min a b) = min (toNatOrdinal a) (toNatOrdinal b) :=
-  rfl
 
 /-! We place the definitions of `nadd` and `nmul` before actually developing their API, as this
 guarantees we only need to open the `NaturalOps` locale once. -/
@@ -470,7 +403,10 @@ theorem nmul_comm (a b) : a ⨳ b = b ⨳ a := by
 
 termination_by (a, b)
 
--- DISSOLVED: nmul_zero
+@[simp]
+theorem nmul_zero (a) : a ⨳ 0 = 0 := by
+  rw [← Ordinal.le_zero, nmul_le_iff]
+  exact fun _ _ a ha => (Ordinal.not_lt_zero a ha).elim
 
 @[simp]
 theorem zero_nmul (a) : 0 ⨳ a = 0 := by rw [nmul_comm, nmul_zero]
@@ -673,9 +609,6 @@ instance : OrderedCommSemiring NatOrdinal.{u} :=
     mul_le_mul_of_nonneg_right := fun _ _ c h _ => nmul_le_nmul_right h c }
 
 namespace Ordinal
-
-theorem nmul_eq_mul (a b) : a ⨳ b = toOrdinal (toNatOrdinal a * toNatOrdinal b) :=
-  rfl
 
 theorem nmul_nadd_one : ∀ a b, a ⨳ (b ♯ 1) = a ⨳ b ♯ a :=
   @mul_add_one NatOrdinal _ _ _

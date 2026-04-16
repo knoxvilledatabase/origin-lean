@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Irreducible.lean
-Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Order.Minimal
 import Mathlib.Order.Zorn
+
+noncomputable section
 
 /-!
 # Irreducibility in topological spaces
@@ -233,8 +235,6 @@ theorem isPreirreducible_iff_isClosed_union_isClosed :
   refine forall₂_congr fun _ _ => ?_
   rw [← and_imp, ← not_or, not_imp_not]
 
-isPreirreducible_iff_closed_union_closed := isPreirreducible_iff_isClosed_union_isClosed
-
 theorem isIrreducible_iff_sUnion_isClosed :
     IsIrreducible s ↔
       ∀ t : Finset (Set X), (∀ z ∈ t, IsClosed z) → (s ⊆ ⋃₀ ↑t) → ∃ z ∈ t, s ⊆ z := by
@@ -246,8 +246,6 @@ theorem isIrreducible_iff_sUnion_isClosed :
   refine forall_congr' fun _ => Iff.trans ?_ not_imp_not
   simp only [not_exists, not_and, ← compl_iInter₂, ← sInter_eq_biInter,
     subset_compl_iff_disjoint_right, not_disjoint_iff_nonempty_inter]
-
-isIrreducible_iff_sUnion_closed := isIrreducible_iff_sUnion_isClosed
 
 theorem subset_closure_inter_of_isPreirreducible_of_isOpen {S U : Set X} (hS : IsPreirreducible S)
     (hU : IsOpen U) (h : (S ∩ U).Nonempty) : S ⊆ closure (S ∩ U) := by

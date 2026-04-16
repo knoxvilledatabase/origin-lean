@@ -5,6 +5,8 @@ Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.RingTheory.Ideal.Maximal
 
+noncomputable section
+
 /-!
 # The set of non-invertible elements of a monoid
 
@@ -21,10 +23,6 @@ variable {F α β : Type*} {a b : α}
 
 def nonunits (α : Type*) [Monoid α] : Set α :=
   { a | ¬IsUnit a }
-
-@[simp]
-theorem mem_nonunits_iff [Monoid α] : a ∈ nonunits α ↔ ¬IsUnit a :=
-  Iff.rfl
 
 theorem mul_mem_nonunits_right [CommMonoid α] : b ∈ nonunits α → a * b ∈ nonunits α :=
   mt isUnit_of_mul_isUnit_right

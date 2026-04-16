@@ -9,6 +9,8 @@ import Mathlib.Algebra.Group.TypeTags.Hom
 import Mathlib.Algebra.Ring.Hom.Defs
 import Mathlib.Algebra.Ring.Nat
 
+noncomputable section
+
 /-!
 # Cast of natural numbers (additional theorems)
 
@@ -33,10 +35,6 @@ def castAddMonoidHom (α : Type*) [AddMonoidWithOne α] :
   map_add' := cast_add
   map_zero' := cast_zero
 
-@[simp]
-theorem coe_castAddMonoidHom [AddMonoidWithOne α] : (castAddMonoidHom α : ℕ → α) = Nat.cast :=
-  rfl
-
 lemma _root_.Even.natCast [AddMonoidWithOne α] {n : ℕ} (hn : Even n) : Even (n : α) :=
   hn.map <| Nat.castAddMonoidHom α
 
@@ -51,8 +49,6 @@ variable (α) in
 
 def castRingHom : ℕ →+* α :=
   { castAddMonoidHom α with toFun := Nat.cast, map_one' := cast_one, map_mul' := cast_mul }
-
-@[simp, norm_cast] lemma coe_castRingHom : (castRingHom α : ℕ → α) = Nat.cast := rfl
 
 lemma _root_.nsmul_eq_mul' (a : α) (n : ℕ) : n • a = a * n := by
   induction n with
@@ -163,14 +159,6 @@ theorem eq_natCast' {R} [NonAssocSemiring R] (f : ℕ →+* R) : f = Nat.castRin
 
 end RingHom
 
-@[simp, norm_cast]
-theorem Nat.cast_id (n : ℕ) : n.cast = n :=
-  rfl
-
-@[simp]
-theorem Nat.castRingHom_nat : Nat.castRingHom ℕ = RingHom.id ℕ :=
-  rfl
-
 instance Nat.uniqueRingHom {R : Type*} [NonAssocSemiring R] : Unique (ℕ →+* R) where
   default := Nat.castRingHom R
   uniq := RingHom.eq_natCast'
@@ -230,16 +218,6 @@ def multiplesAddHom : β ≃+ (ℕ →+ β) :=
 def powersMulHom : α ≃* (Multiplicative ℕ →* α) :=
   { powersHom α with map_mul' := fun a b ↦ MonoidHom.ext fun n ↦ by simp [mul_pow] }
 
-@[simp] lemma multiplesAddHom_apply (x : β) (n : ℕ) : multiplesAddHom β x n = n • x := rfl
-
-@[simp]
-lemma powersMulHom_apply (x : α) (n : Multiplicative ℕ) : powersMulHom α x n = x ^ n.toAdd := rfl
-
-@[simp] lemma multiplesAddHom_symm_apply (f : ℕ →+ β) : (multiplesAddHom β).symm f = f 1 := rfl
-
-@[simp] lemma powersMulHom_symm_apply (f : Multiplicative ℕ →* α) :
-    (powersMulHom α).symm f = f (ofAdd 1) := rfl
-
 end CommMonoid
 
 namespace Pi
@@ -247,16 +225,6 @@ namespace Pi
 variable {π : α → Type*} [∀ a, NatCast (π a)]
 
 instance instNatCast : NatCast (∀ a, π a) where natCast n _ := n
-
-theorem natCast_apply (n : ℕ) (a : α) : (n : ∀ a, π a) a = n :=
-  rfl
-
-@[simp]
-theorem natCast_def (n : ℕ) : (n : ∀ a, π a) = fun _ ↦ ↑n :=
-  rfl
-
-@[simp]
-theorem ofNat_apply (n : ℕ) [n.AtLeastTwo] (a : α) : (OfNat.ofNat n : ∀ a, π a) a = n := rfl
 
 end Pi
 

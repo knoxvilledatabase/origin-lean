@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.Yoneda
 import Mathlib.CategoryTheory.Opposites
 
+noncomputable section
+
 /-!
 # Opposite adjunctions
 

@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.NormalMono.Equalizers
 import Mathlib.CategoryTheory.Abelian.Images
 import Mathlib.CategoryTheory.Preadditive.Basic
 
+noncomputable section
+
 /-!
 # Every NonPreadditiveAbelian category is preadditive
 

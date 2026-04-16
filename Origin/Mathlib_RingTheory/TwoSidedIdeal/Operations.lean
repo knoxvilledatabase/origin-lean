@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Congruence.Opposite
 import Mathlib.RingTheory.Ideal.Defs
 import Mathlib.RingTheory.TwoSidedIdeal.Lattice
 
+noncomputable section
+
 /-!
 # Operations on two-sided ideals
 
@@ -194,29 +196,11 @@ instance : SMul Rᵐᵒᵖ I where smul r x := ⟨r • x.1, I.mul_mem_right _ _
 instance leftModule : Module R I :=
   Function.Injective.module _ (coeAddMonoidHom I) Subtype.coe_injective fun _ _ ↦ rfl
 
-@[simp]
-lemma coe_smul {r : R} {x : I} : (r • x : R) = r * (x : R) := rfl
-
 instance rightModule : Module Rᵐᵒᵖ I :=
   Function.Injective.module _ (coeAddMonoidHom I) Subtype.coe_injective fun _ _ ↦ rfl
 
-@[simp]
-lemma coe_mop_smul {r : Rᵐᵒᵖ} {x : I} : (r • x : R) = (x : R) * r.unop := rfl
-
 instance : SMulCommClass R Rᵐᵒᵖ I where
   smul_comm r s x := Subtype.ext <| smul_comm r s x.1
-
-@[simps]
-def subtype : I →ₗ[R] R where
-  toFun x := x.1
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-@[simps]
-def subtypeMop : I →ₗ[Rᵐᵒᵖ] Rᵐᵒᵖ where
-  toFun x := MulOpposite.op x.1
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
 
 def fromIdeal : Ideal R →o TwoSidedIdeal R where
   toFun I := span I
@@ -241,9 +225,6 @@ lemma gc : GaloisConnection fromIdeal (asIdeal (R := R)) :=
   fun I J => ⟨fun h x hx ↦ h <| mem_span_iff.2 fun _ H ↦ H hx, fun h x hx ↦ by
     simp only [fromIdeal, OrderHom.coe_mk, mem_span_iff] at hx
     exact hx _ h⟩
-
-@[simp]
-lemma coe_asIdeal {I : TwoSidedIdeal R} : (asIdeal I : Set R) = I := rfl
 
 def asIdealOpposite : TwoSidedIdeal R →o Ideal Rᵐᵒᵖ where
   toFun I := asIdeal ⟨I.ringCon.op⟩

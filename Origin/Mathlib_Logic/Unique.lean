@@ -1,10 +1,12 @@
 /-
 Extracted from Logic/Unique.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 16
 -/
 import Origin.Core
 import Mathlib.Logic.IsEmpty
 import Mathlib.Tactic.Inhabit
+
+noncomputable section
 
 /-!
 # Types with a unique term
@@ -69,10 +71,6 @@ instance PUnit.unique : Unique PUnit.{u} where
   default := PUnit.unit
   uniq x := subsingleton x _
 
-@[simp, nolint simpNF]
-theorem PUnit.default_eq_unit : (default : PUnit) = PUnit.unit :=
-  rfl
-
 def uniqueProp {p : Prop} (h : p) : Unique.{0} p where
   default := h
   uniq _ := rfl
@@ -133,15 +131,6 @@ theorem unique_iff_subsingleton_and_nonempty (α : Sort u) :
 
 variable {α : Sort*}
 
-@[simp]
-theorem Pi.default_def {β : α → Sort v} [∀ a, Inhabited (β a)] :
-    @default (∀ a, β a) _ = fun a : α ↦ @default (β a) _ :=
-  rfl
-
-theorem Pi.default_apply {β : α → Sort v} [∀ a, Inhabited (β a)] (a : α) :
-    @default (∀ a, β a) _ a = default :=
-  rfl
-
 instance Pi.unique {β : α → Sort v} [∀ a, Unique (β a)] : Unique (∀ a, β a) where
   uniq := fun _ ↦ funext fun _ ↦ Unique.eq_default _
 
@@ -191,19 +180,9 @@ def uniqueElim [Unique ι] (x : α (default : ι)) (i : ι) : α i := by
   rw [Unique.eq_default i]
   exact x
 
-@[simp]
-theorem uniqueElim_default {_ : Unique ι} (x : α (default : ι)) : uniqueElim x (default : ι) = x :=
-  rfl
-
-@[simp]
-theorem uniqueElim_const {β : Sort*} {_ : Unique ι} (x : β) (i : ι) :
-    uniqueElim (α := fun _ ↦ β) x i = x :=
-  rfl
-
 end Pi
 
 attribute [local simp] eq_iff_true_of_subsingleton in
-
 theorem Unique.bijective {A B} [Unique A] [Unique B] {f : A → B} : Function.Bijective f := by
   rw [Function.bijective_iff_has_inverse]
   refine ⟨default, ?_, ?_⟩ <;> intro x <;> simp

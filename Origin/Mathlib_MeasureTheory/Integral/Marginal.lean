@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Integral.Lebesgue
 
+noncomputable section
+
 /-!
 # Marginals of multivariate functions
 

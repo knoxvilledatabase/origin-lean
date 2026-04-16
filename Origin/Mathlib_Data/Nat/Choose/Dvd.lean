@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Nat/Choose/Dvd.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Nat.Prime.Factorial
+
+noncomputable section
 
 /-!
 # Divisibility properties of binomial coefficients
@@ -27,7 +29,8 @@ lemma dvd_choose (hp : Prime p) (ha : a < p) (hab : b - a < p) (h : p ≤ b) : p
   have : a + (b - a) = b := Nat.add_sub_of_le (ha.le.trans h)
   this ▸ hp.dvd_choose_add ha hab (this.symm ▸ h)
 
--- DISSOLVED: dvd_choose_self
+lemma dvd_choose_self (hp : Prime p) (hk : k ≠ 0) (hkp : k < p) : p ∣ choose p k :=
+  hp.dvd_choose hkp (sub_lt ((zero_le _).trans_lt hkp) <| zero_lt_of_ne_zero hk) le_rfl
 
 end Prime
 

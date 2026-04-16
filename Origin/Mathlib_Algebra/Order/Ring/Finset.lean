@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Field.Canonical.Defs
 import Mathlib.Data.Finset.Lattice.Fold
 import Mathlib.Data.Nat.Cast.Order.Ring
 
+noncomputable section
+
 /-!
 # `Finset.sup` of `Nat.cast`
 -/
@@ -22,14 +24,14 @@ section LinearOrderedSemiring
 variable [LinearOrderedSemiring R] {s : Finset ι}
 
 set_option linter.docPrime false in
-
 @[simp, norm_cast]
+
 lemma cast_finsetSup' (f : ι → ℕ) (hs) : ((s.sup' hs f : ℕ) : R) = s.sup' hs fun i ↦ (f i : R) :=
   comp_sup'_eq_sup'_comp _ _ cast_max
 
 set_option linter.docPrime false in
-
 @[simp, norm_cast]
+
 lemma cast_finsetInf' (f : ι → ℕ) (hs) : (↑(s.inf' hs f) : R) = s.inf' hs fun i ↦ (f i : R) :=
   comp_inf'_eq_inf'_comp _ _ cast_min
 

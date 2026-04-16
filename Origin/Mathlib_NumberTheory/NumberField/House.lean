@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/NumberField/House.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.SiegelsLemma
 import Mathlib.NumberTheory.NumberField.CanonicalEmbedding.Basic
 import Mathlib.NumberTheory.NumberField.EquivReindex
+
+noncomputable section
 
 /-!
 
@@ -117,16 +119,37 @@ private def asiegel : Matrix (α × (K →+* ℂ)) (β × (K →+* ℂ)) ℤ := 
 variable (ha : a ≠ 0)
 
 include ha in
-
--- DISSOLVED: asiegel_ne_0
+private theorem asiegel_ne_0 : asiegel K a ≠ 0 := by
+  simp (config := { unfoldPartialApp := true }) only [asiegel, a']
+  simp only [ne_eq]
+  rw [funext_iff]; intros hs
+  simp only [Prod.forall] at hs;
+  apply ha
+  rw [← Matrix.ext_iff]; intros k' l
+  specialize hs k'
+  let ⟨b⟩ := Fintype.card_pos_iff.1 (Fintype.card_pos (α := (K →+* ℂ)))
+  have := ((newBasis K).repr.map_eq_zero_iff (x := (a k' l * (newBasis K) b))).1 <| by
+    ext b'
+    specialize hs b'
+    rw [funext_iff] at hs
+    simp only [Prod.forall] at hs
+    apply hs
+  simp only [mul_eq_zero] at this
+  exact this.resolve_right (Basis.ne_zero (newBasis K) b)
 
 variable {p q : ℕ} (h0p : 0 < p) (hpq : p < q) (x : β × (K →+* ℂ) → ℤ) (hxl : x ≠ 0)
 
 private def ξ : β → 𝓞 K := fun l => ∑ r : K →+* ℂ, x (l, r) * (newBasis K r)
 
 include hxl in
-
--- DISSOLVED: ξ_ne_0
+private theorem ξ_ne_0 : ξ K x ≠ 0 := by
+  intro H
+  apply hxl
+  ext ⟨l, r⟩
+  rw [funext_iff] at H
+  have hblin := Basis.linearIndependent (newBasis K)
+  simp only [zsmul_eq_mul, Fintype.linearIndependent_iff] at hblin
+  exact hblin (fun r ↦ x (l,r)) (H _) r
 
 private theorem lin_1 (l k r) : a k l * (newBasis K) r =
     ∑ u, (a' K a k l r u) * (newBasis K) u := by
@@ -135,35 +158,55 @@ private theorem lin_1 (l k r) : a k l * (newBasis K) r =
 variable [Fintype β] (cardβ : Fintype.card β = q) (hmulvec0 : asiegel K a *ᵥ x = 0)
 
 include hxl hmulvec0 in
-
 private theorem ξ_mulVec_eq_0 : a *ᵥ ξ K x = 0 := by
   funext k; simp only [Pi.zero_apply]; rw [eq_comm]
 
   have lin_0 : ∀ u, ∑ r, ∑ l, (a' K a k l r u * x (l, r) : 𝓞 K) = 0 := by
+
     intros u
+
     have hξ := ξ_ne_0 K x hxl
+
     rw [Ne, funext_iff, not_forall] at hξ
+
     rcases hξ with ⟨l, hξ⟩
+
     rw [funext_iff] at hmulvec0
+
     specialize hmulvec0 ⟨k, u⟩
+
     simp only [Fintype.sum_prod_type, mulVec, dotProduct, asiegel] at hmulvec0
+
     rw [sum_comm] at hmulvec0
+
     exact mod_cast hmulvec0
 
   have : 0 = ∑ u, (∑ r, ∑ l, a' K a k l r u * x (l, r) : 𝓞 K) * (newBasis K) u := by
+
     simp only [lin_0, zero_mul, sum_const_zero]
 
   have : 0 = ∑ r, ∑ l, x (l, r) * ∑ u, a' K a k l r u * (newBasis K) u := by
+
     conv at this => enter [2, 2, u]; rw [sum_mul]
+
     rw [sum_comm] at this
+
     rw [this]; congr 1; ext1 r
+
     conv => enter [1, 2, l]; rw [sum_mul]
+
     rw [sum_comm]; congr 1; ext1 r
+
     rw [mul_sum]; congr 1; ext1 r
+
     ring
+
   rw [sum_comm] at this
+
   rw [this]; congr 1; ext1 l
+
   rw [ξ, mul_sum]; congr 1; ext1 l
+
   rw [← lin_1]; ring
 
 variable {A : ℝ} (habs : ∀ k l, (house ((algebraMap (𝓞 K) K) (a k l))) ≤ A)
@@ -179,7 +222,6 @@ variable [Fintype α] (cardα : Fintype.card α = p) (Apos : 0 ≤ A)
   (hxbound : ‖x‖ ≤ (q * finrank ℚ K * ‖asiegel K a‖) ^ ((p : ℝ) / (q - p)))
 
 include habs Apos in
-
 private theorem asiegel_remark : ‖asiegel K a‖ ≤ c₂ K * A := by
   rw [Matrix.norm_le_iff]
   · intro kr lu
@@ -215,7 +257,6 @@ private theorem asiegel_remark : ‖asiegel K a‖ ≤ c₂ K * A := by
 private def c₁ := finrank ℚ K * c₂ K
 
 include habs Apos hxbound hpq in
-
 private theorem house_le_bound : ∀ l, house (ξ K x l).1 ≤ (c₁ K) *
     ((c₁ K * q * A)^((p : ℝ) / (q - p))) := by
   let h := finrank ℚ K
@@ -256,8 +297,31 @@ private theorem house_le_bound : ∀ l, house (ξ K x l).1 ≤ (c₁ K) *
   · rw [mul_comm (q : ℝ) (c₁ K)]; rfl
 
 include hpq h0p cardα cardβ ha habs in
+/-- There exists a "small" non-zero algebraic integral solution of an
+ non-trivial underdetermined system of linear equations with algebraic integer coefficients.-/
 
--- DISSOLVED: exists_ne_zero_int_vec_house_le
+theorem exists_ne_zero_int_vec_house_le :
+    ∃ (ξ : β → 𝓞 K), ξ ≠ 0 ∧ a *ᵥ ξ = 0 ∧
+    ∀ l, house (ξ l).1 ≤ c₁ K * ((c₁ K * q * A) ^ ((p : ℝ) / (q - p))) := by
+  classical
+  let h := finrank ℚ K
+  have hphqh : p * h < q * h := mul_lt_mul_of_pos_right hpq finrank_pos
+  have h0ph : 0 < p * h := by rw [mul_pos_iff]; constructor; exact ⟨h0p, finrank_pos⟩
+  have hfinp : Fintype.card (α × (K →+* ℂ)) = p * h := by
+    rw [Fintype.card_prod, cardα, Embeddings.card]
+  have hfinq : Fintype.card (β × (K →+* ℂ)) = q * h := by
+    rw [Fintype.card_prod, cardβ, Embeddings.card]
+  have ⟨x, hxl, hmulvec0, hxbound⟩ :=
+    Int.Matrix.exists_ne_zero_int_vec_norm_le' (asiegel K a)
+      (by rwa [hfinp, hfinq]) (by rwa [hfinp]) (asiegel_ne_0 K a ha)
+  simp only [hfinp, hfinq, Nat.cast_mul] at hmulvec0 hxbound
+  rw [← sub_mul, mul_div_mul_right _ _ (mod_cast finrank_pos.ne')] at hxbound
+  have Apos : 0 ≤ A := by
+    have ⟨k⟩ := Fintype.card_pos_iff.1 (cardα ▸ h0p)
+    have ⟨l⟩ := Fintype.card_pos_iff.1 (cardβ ▸ h0p.trans hpq)
+    exact le_trans (house_nonneg _) (habs k l)
+  use ξ K x, ξ_ne_0 K x hxl, ξ_mulVec_eq_0 K a x hxl hmulvec0,
+    house_le_bound K a hpq x habs Apos hxbound
 
 end
 

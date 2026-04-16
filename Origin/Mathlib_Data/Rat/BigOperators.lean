@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.Rat.Cast.CharZero
 
+noncomputable section
+
 /-! # Casting lemmas for rational numbers involving sums and products
 -/
 

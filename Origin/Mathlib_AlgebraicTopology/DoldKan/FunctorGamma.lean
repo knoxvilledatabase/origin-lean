@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicTopology.SplitSimplicialObject
 import Mathlib.AlgebraicTopology.DoldKan.PInfty
 
+noncomputable section
+
 /-!
 
 # Construction of the inverse functor of the Dold-Kan equivalence

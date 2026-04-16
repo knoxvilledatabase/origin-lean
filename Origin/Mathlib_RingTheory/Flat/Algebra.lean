@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Flat.Stability
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 
+noncomputable section
+
 /-!
 # Flat algebras and flat ring homomorphisms
 

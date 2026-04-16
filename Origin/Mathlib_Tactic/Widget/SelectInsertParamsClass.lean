@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Widget.InteractiveGoal
 import Lean.Elab.Deriving.Basic
 
+noncomputable section
+
 /-! # SelectInsertParamsClass
 
 Defines the basic class of parameters for a select and insert widget.

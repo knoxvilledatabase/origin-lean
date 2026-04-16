@@ -7,6 +7,8 @@ import Mathlib.Algebra.Homology.HomologySequence
 import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.CategoryTheory.Abelian.DiagramLemmas.Four
 
+noncomputable section
+
 /-!
 # Consequences of the homology sequence
 

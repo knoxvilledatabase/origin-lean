@@ -7,6 +7,8 @@ import Mathlib.Topology.Sheaves.SheafOfFunctions
 import Mathlib.Topology.Sheaves.Stalks
 import Mathlib.Topology.Sheaves.SheafCondition.UniqueGluing
 
+noncomputable section
+
 /-!
 # Functions satisfying a local predicate form a sheaf.
 

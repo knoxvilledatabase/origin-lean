@@ -5,6 +5,8 @@ Genuine: 123 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Topology.Order
 
+noncomputable section
+
 /-!
 # Specific classes of maps between topological spaces
 

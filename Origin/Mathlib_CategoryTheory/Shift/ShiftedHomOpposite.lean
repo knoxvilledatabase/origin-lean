@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Triangulated.Opposite
 import Mathlib.CategoryTheory.Shift.ShiftedHom
 
+noncomputable section
+
 /-! Shifted morphisms in the opposite category
 
 If `C` is a category equipped with a shift by `ℤ`, `X` and `Y` are objects
@@ -77,11 +79,6 @@ lemma opEquiv'_symm_apply {n a : ℤ} (f : Opposite.op (Y⟦a⟧) ⟶ (Opposite.
     (a' : ℤ) (h : n + a = a') :
     (opEquiv' n a a' h).symm f =
       (opEquiv n).symm f ≫ (shiftFunctorAdd' C a n a' (by omega)).inv.app _ :=
-  rfl
-
-lemma opEquiv'_apply {a' : ℤ} (f : ShiftedHom X Y a') (n a : ℤ) (h : n + a = a') :
-    opEquiv' n a a' h f =
-      opEquiv n (f ≫ (shiftFunctorAdd' C a n a' (by omega)).hom.app Y) := by
   rfl
 
 lemma opEquiv'_symm_op_opShiftFunctorEquivalence_counitIso_inv_app_op_shift

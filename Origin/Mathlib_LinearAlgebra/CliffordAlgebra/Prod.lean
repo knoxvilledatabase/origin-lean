@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.CliffordAlgebra.Grading
 import Mathlib.LinearAlgebra.TensorProduct.Graded.Internal
 import Mathlib.LinearAlgebra.QuadraticForm.Prod
 
+noncomputable section
+
 /-!
 # Clifford algebras of a direct sum of two vector spaces
 

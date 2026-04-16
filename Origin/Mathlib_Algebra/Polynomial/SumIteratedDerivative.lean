@@ -9,6 +9,8 @@ import Mathlib.Algebra.Polynomial.Degree.Lemmas
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Algebra.Polynomial.Eval.SMul
 
+noncomputable section
+
 /-!
 # Sum of iterated derivatives
 

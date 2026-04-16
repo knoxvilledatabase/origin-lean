@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Small.Defs
 import Mathlib.Logic.Equiv.Set
 
+noncomputable section
+
 /-!
 # Instances and theorems for `Small`.
 

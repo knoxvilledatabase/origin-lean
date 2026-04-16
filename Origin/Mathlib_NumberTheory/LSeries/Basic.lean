@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/LSeries/Basic.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 11 | Infrastructure: 7
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Analysis.PSeries
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Data.Complex.FiniteDimensional
+
+noncomputable section
 
 /-!
 # L-series
@@ -60,7 +62,6 @@ We set `LSeries.term f s 0 = 0`, and for positive `n`, `LSeries.term f s n = f n
 namespace LSeries
 
 noncomputable
-
 def term (f : ℕ → ℂ) (s : ℂ) (n : ℕ) : ℂ :=
   if n = 0 then 0 else f n / n ^ s
 
@@ -71,11 +72,20 @@ lemma term_def (f : ℕ → ℂ) (s : ℂ) (n : ℕ) :
 @[simp]
 lemma term_zero (f : ℕ → ℂ) (s : ℂ) : term f s 0 = 0 := rfl
 
--- DISSOLVED: term_of_ne_zero
+@[simp]
+lemma term_of_ne_zero {n : ℕ} (hn : n ≠ 0) (f : ℕ → ℂ) (s : ℂ) :
+    term f s n = f n / n ^ s :=
+  if_neg hn
 
--- DISSOLVED: term_of_ne_zero'
+lemma term_of_ne_zero' {s : ℂ} (hs : s ≠ 0) (f : ℕ → ℂ) (n : ℕ) :
+    term f s n = f n / n ^ s := by
+  rcases eq_or_ne n 0 with rfl | hn
+  · rw [term_zero, Nat.cast_zero, zero_cpow hs, div_zero]
+  · rw [term_of_ne_zero hn]
 
--- DISSOLVED: term_congr
+lemma term_congr {f g : ℕ → ℂ} (h : ∀ {n}, n ≠ 0 → f n = g n) (s : ℂ) (n : ℕ) :
+    term f s n = term g s n := by
+  rcases eq_or_ne n 0 with hn | hn <;> simp [hn, h]
 
 lemma norm_term_eq (f : ℕ → ℂ) (s : ℂ) (n : ℕ) :
     ‖term f s n‖ = if n = 0 then 0 else ‖f n‖ / n ^ s.re := by
@@ -106,7 +116,8 @@ lemma term_nonneg {a : ℕ → ℂ} {n : ℕ} (h : 0 ≤ a n) (x : ℝ) : 0 ≤ 
   split_ifs with hn
   exacts [le_rfl, mul_nonneg h (inv_natCast_cpow_ofReal_pos hn x).le]
 
--- DISSOLVED: term_pos
+lemma term_pos {a : ℕ → ℂ} {n : ℕ} (hn : n ≠ 0) (h : 0 < a n) (x : ℝ) : 0 < term a x n := by
+  simpa only [term_of_ne_zero hn] using mul_pos h <| inv_natCast_cpow_ofReal_pos hn x
 
 end positivity
 
@@ -124,16 +135,19 @@ to `a : ℂ`.
 open LSeries
 
 noncomputable
-
 def LSeries (f : ℕ → ℂ) (s : ℂ) : ℂ :=
   ∑' n, term f s n
 
--- DISSOLVED: LSeries_congr
+lemma LSeries_congr {f g : ℕ → ℂ} (s : ℂ) (h : ∀ {n}, n ≠ 0 → f n = g n) :
+    LSeries f s = LSeries g s :=
+  tsum_congr <| term_congr h s
 
 def LSeriesSummable (f : ℕ → ℂ) (s : ℂ) : Prop :=
   Summable (term f s)
 
--- DISSOLVED: LSeriesSummable_congr
+lemma LSeriesSummable_congr {f g : ℕ → ℂ} (s : ℂ) (h : ∀ {n}, n ≠ 0 → f n = g n) :
+    LSeriesSummable f s ↔ LSeriesSummable g s :=
+  summable_congr <| term_congr h s
 
 open Filter in
 
@@ -183,7 +197,9 @@ lemma LSeriesHasSum_iff {f : ℕ → ℂ} {s a : ℂ} :
     LSeriesHasSum f s a ↔ LSeriesSummable f s ∧ LSeries f s = a :=
   ⟨fun H ↦ ⟨H.LSeriesSummable, H.LSeries_eq⟩, fun ⟨H₁, H₂⟩ ↦ H₂ ▸ H₁.LSeriesHasSum⟩
 
--- DISSOLVED: LSeriesHasSum_congr
+lemma LSeriesHasSum_congr {f g : ℕ → ℂ} (s a : ℂ) (h : ∀ {n}, n ≠ 0 → f n = g n) :
+    LSeriesHasSum f s a ↔ LSeriesHasSum g s a := by
+  simp only [LSeriesHasSum_iff, LSeriesSummable_congr s h, LSeries_congr s h]
 
 lemma LSeriesSummable.of_re_le_re {f : ℕ → ℂ} {s s' : ℂ} (h : s.re ≤ s'.re)
     (hf : LSeriesSummable f s) : LSeriesSummable f s' := by
@@ -260,7 +276,15 @@ end delta
 We relate summability of L-series with bounds on the coefficients in terms of powers of `n`.
 -/
 
--- DISSOLVED: LSeriesSummable.le_const_mul_rpow
+lemma LSeriesSummable.le_const_mul_rpow {f : ℕ → ℂ} {s : ℂ} (h : LSeriesSummable f s) :
+    ∃ C, ∀ n ≠ 0, ‖f n‖ ≤ C * n ^ s.re := by
+  replace h := h.norm
+  by_contra! H
+  obtain ⟨n, hn₀, hn⟩ := H (tsum fun n ↦ ‖term f s n‖)
+  have := le_tsum h n fun _ _ ↦ norm_nonneg _
+  rw [norm_term_eq, if_neg hn₀,
+    div_le_iff₀ <| Real.rpow_pos_of_pos (Nat.cast_pos.mpr <| Nat.pos_of_ne_zero hn₀) _] at this
+  exact (this.trans_lt hn).false.elim
 
 open Filter in
 
@@ -271,7 +295,35 @@ lemma LSeriesSummable.isBigO_rpow {f : ℕ → ℂ} {s : ℂ} (h : LSeriesSummab
   convert hC n (Nat.pos_iff_ne_zero.mp hn) using 2
   rw [Real.norm_eq_abs, Real.abs_rpow_of_nonneg n.cast_nonneg, _root_.abs_of_nonneg n.cast_nonneg]
 
--- DISSOLVED: LSeriesSummable_of_le_const_mul_rpow
+lemma LSeriesSummable_of_le_const_mul_rpow {f : ℕ → ℂ} {x : ℝ} {s : ℂ} (hs : x < s.re)
+    (h : ∃ C, ∀ n ≠ 0, ‖f n‖ ≤ C * n ^ (x - 1)) :
+    LSeriesSummable f s := by
+  obtain ⟨C, hC⟩ := h
+  have hC₀ : 0 ≤ C := by
+    specialize hC 1 one_ne_zero
+    simp only [Nat.cast_one, Real.one_rpow, mul_one] at hC
+    exact (norm_nonneg _).trans hC
+  have hsum : Summable fun n : ℕ ↦ ‖(C : ℂ) / n ^ (s + (1 - x))‖ := by
+    simp_rw [div_eq_mul_inv, norm_mul, ← cpow_neg]
+    have hsx : -s.re + x - 1 < -1 := by linarith only [hs]
+    refine Summable.mul_left _ <|
+      Summable.of_norm_bounded_eventually_nat (fun n ↦ (n : ℝ) ^ (-s.re + x - 1)) ?_ ?_
+    · simp only [Real.summable_nat_rpow, hsx]
+    · simp only [neg_add_rev, neg_sub, norm_norm, Filter.eventually_atTop]
+      refine ⟨1, fun n hn ↦ ?_⟩
+      simp only [norm_natCast_cpow_of_pos hn, add_re, sub_re, neg_re, ofReal_re, one_re]
+      convert le_refl ?_ using 2
+      ring
+  refine Summable.of_norm <| hsum.of_nonneg_of_le (fun _ ↦ norm_nonneg _) (fun n ↦ ?_)
+  rcases n.eq_zero_or_pos with rfl | hn
+  · simp only [term_zero, norm_zero]
+    exact norm_nonneg _
+  have hn' : 0 < (n : ℝ) ^ s.re := Real.rpow_pos_of_pos (Nat.cast_pos.mpr hn) _
+  simp_rw [term_of_ne_zero hn.ne', norm_div, norm_natCast_cpow_of_pos hn, div_le_iff₀ hn',
+    norm_eq_abs (C : ℂ), abs_ofReal, _root_.abs_of_nonneg hC₀, div_eq_mul_inv, mul_assoc,
+    ← Real.rpow_neg <| Nat.cast_nonneg _, ← Real.rpow_add <| Nat.cast_pos.mpr hn]
+  simp only [add_re, sub_re, one_re, ofReal_re, neg_add_rev, neg_sub, neg_add_cancel_right]
+  exact hC n <| Nat.pos_iff_ne_zero.mp hn
 
 open Filter Finset Real Nat in
 
@@ -295,6 +347,13 @@ lemma LSeriesSummable_of_isBigO_rpow {f : ℕ → ℂ} {x : ℝ} {s : ℂ} (hs :
     refine (le_max' _ _ <| mem_insert_of_mem ?_).trans <| le_max_right ..
     exact mem_image.mpr ⟨n, mem_range.mpr hn, rfl⟩
 
--- DISSOLVED: LSeriesSummable_of_bounded_of_one_lt_re
+theorem LSeriesSummable_of_bounded_of_one_lt_re {f : ℕ → ℂ} {m : ℝ}
+    (h : ∀ n ≠ 0, Complex.abs (f n) ≤ m) {s : ℂ} (hs : 1 < s.re) :
+    LSeriesSummable f s := by
+  refine LSeriesSummable_of_le_const_mul_rpow hs ⟨m, fun n hn ↦ ?_⟩
+  simp only [norm_eq_abs, sub_self, Real.rpow_zero, mul_one, h n hn]
 
--- DISSOLVED: LSeriesSummable_of_bounded_of_one_lt_real
+theorem LSeriesSummable_of_bounded_of_one_lt_real {f : ℕ → ℂ} {m : ℝ}
+    (h : ∀ n ≠ 0, Complex.abs (f n) ≤ m) {s : ℝ} (hs : 1 < s) :
+    LSeriesSummable f s :=
+  LSeriesSummable_of_bounded_of_one_lt_re h <| by simp only [ofReal_re, hs]

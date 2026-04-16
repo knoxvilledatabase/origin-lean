@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/UniqueFactorizationDomain/Multiplicity.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.RingTheory.Multiplicity
 import Mathlib.RingTheory.UniqueFactorizationDomain.NormalizedFactors
+
+noncomputable section
 
 /-!
 # Unique factorization and multiplicity
@@ -20,11 +22,22 @@ variable {α : Type*}
 
 local infixl:50 " ~ᵤ " => Associated
 
--- DISSOLVED: WfDvdMonoid.max_power_factor'
+theorem WfDvdMonoid.max_power_factor' [CommMonoidWithZero α] [WfDvdMonoid α] {a₀ x : α}
+    (h : a₀ ≠ 0) (hx : ¬IsUnit x) : ∃ (n : ℕ) (a : α), ¬x ∣ a ∧ a₀ = x ^ n * a := by
+  obtain ⟨a, ⟨n, rfl⟩, hm⟩ := wellFounded_dvdNotUnit.has_min
+    {a | ∃ n, x ^ n * a = a₀} ⟨a₀, 0, by rw [pow_zero, one_mul]⟩
+  refine ⟨n, a, ?_, rfl⟩; rintro ⟨d, rfl⟩
+  exact hm d ⟨n + 1, by rw [pow_succ, mul_assoc]⟩
+    ⟨(right_ne_zero_of_mul <| right_ne_zero_of_mul h), x, hx, mul_comm _ _⟩
 
--- DISSOLVED: WfDvdMonoid.max_power_factor
+theorem WfDvdMonoid.max_power_factor [CommMonoidWithZero α] [WfDvdMonoid α] {a₀ x : α}
+    (h : a₀ ≠ 0) (hx : Irreducible x) : ∃ (n : ℕ) (a : α), ¬x ∣ a ∧ a₀ = x ^ n * a :=
+  max_power_factor' h hx.not_unit
 
--- DISSOLVED: multiplicity.finite_of_not_isUnit
+theorem multiplicity.finite_of_not_isUnit [CancelCommMonoidWithZero α] [WfDvdMonoid α]
+    {a b : α} (ha : ¬IsUnit a) (hb : b ≠ 0) : multiplicity.Finite a b := by
+  obtain ⟨n, c, ndvd, rfl⟩ := WfDvdMonoid.max_power_factor' hb ha
+  exact ⟨n, by rwa [pow_succ, mul_dvd_mul_iff_left (left_ne_zero_of_mul hb)]⟩
 
 namespace UniqueFactorizationMonoid
 
@@ -38,9 +51,32 @@ open Multiset
 
 section
 
--- DISSOLVED: le_emultiplicity_iff_replicate_le_normalizedFactors
+theorem le_emultiplicity_iff_replicate_le_normalizedFactors {a b : R} {n : ℕ} (ha : Irreducible a)
+    (hb : b ≠ 0) :
+    ↑n ≤ emultiplicity a b ↔ replicate n (normalize a) ≤ normalizedFactors b := by
+  rw [← pow_dvd_iff_le_emultiplicity]
+  revert b
+  induction' n with n ih; · simp
+  intro b hb
+  constructor
+  · rintro ⟨c, rfl⟩
+    rw [Ne, pow_succ', mul_assoc, mul_eq_zero, not_or] at hb
+    rw [pow_succ', mul_assoc, normalizedFactors_mul hb.1 hb.2, replicate_succ,
+      normalizedFactors_irreducible ha, singleton_add, cons_le_cons_iff, ← ih hb.2]
+    apply Dvd.intro _ rfl
+  · rw [Multiset.le_iff_exists_add]
+    rintro ⟨u, hu⟩
+    rw [← (normalizedFactors_prod hb).dvd_iff_dvd_right, hu, prod_add, prod_replicate]
+    exact (Associated.pow_pow <| associated_normalize a).dvd.trans (Dvd.intro u.prod rfl)
 
--- DISSOLVED: emultiplicity_eq_count_normalizedFactors
+theorem emultiplicity_eq_count_normalizedFactors [DecidableEq R] {a b : R} (ha : Irreducible a)
+    (hb : b ≠ 0) : emultiplicity a b = (normalizedFactors b).count (normalize a) := by
+  apply le_antisymm
+  · apply Order.le_of_lt_add_one
+    rw [← Nat.cast_one, ← Nat.cast_add, lt_iff_not_ge, ge_iff_le,
+      le_emultiplicity_iff_replicate_le_normalizedFactors ha hb, ← le_count_iff_replicate_le]
+    simp
+  rw [le_emultiplicity_iff_replicate_le_normalizedFactors ha hb, ← le_count_iff_replicate_le]
 
 end
 
@@ -66,6 +102,7 @@ theorem count_normalizedFactors_eq' [DecidableEq R] {p x : R} (hp : p = 0 ∨ Ir
 
 end multiplicity
 
--- DISSOLVED: max_power_factor
+theorem max_power_factor {a₀ x : R} (h : a₀ ≠ 0) (hx : Irreducible x) :
+    ∃ n : ℕ, ∃ a : R, ¬x ∣ a ∧ a₀ = x ^ n * a := WfDvdMonoid.max_power_factor h hx
 
 end UniqueFactorizationMonoid

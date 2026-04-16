@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Group.Int
 import Mathlib.Topology.Instances.Rat
 
+noncomputable section
+
 /-! # ℚ as a normed group -/
 
 namespace Rat

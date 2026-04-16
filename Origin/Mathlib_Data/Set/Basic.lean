@@ -12,6 +12,8 @@ import Mathlib.Tactic.ByContra
 import Mathlib.Util.Delaborators
 import Mathlib.Tactic.Lift
 
+noncomputable section
+
 /-!
 # Basic properties of sets
 
@@ -87,27 +89,7 @@ instance : HasSSubset (Set α) :=
   ⟨(· < ·)⟩
 
 @[simp]
-theorem top_eq_univ : (⊤ : Set α) = univ :=
-  rfl
-
-@[simp]
 theorem bot_eq_empty : (⊥ : Set α) = ∅ :=
-  rfl
-
-@[simp]
-theorem sup_eq_union : ((· ⊔ ·) : Set α → Set α → Set α) = (· ∪ ·) :=
-  rfl
-
-@[simp]
-theorem inf_eq_inter : ((· ⊓ ·) : Set α → Set α → Set α) = (· ∩ ·) :=
-  rfl
-
-@[simp]
-theorem le_eq_subset : ((· ≤ ·) : Set α → Set α → Prop) = (· ⊆ ·) :=
-  rfl
-
-@[simp]
-theorem lt_eq_ssubset : ((· < ·) : Set α → Set α → Prop) = (· ⊂ ·) :=
   rfl
 
 theorem le_iff_subset : s ≤ t ↔ s ⊆ t :=
@@ -135,13 +117,6 @@ section SetCoe
 variable {α : Type u}
 
 instance (s : Set α) : CoeTC s α := ⟨fun x => x.1⟩
-
-theorem Set.coe_eq_subtype (s : Set α) : ↥s = { x // x ∈ s } :=
-  rfl
-
-@[simp]
-theorem Set.coe_setOf (p : α → Prop) : ↥{ x | p x } = { x // p x } :=
-  rfl
 
 theorem SetCoe.forall {s : Set α} {p : s → Prop} : (∀ x : s, p x) ↔ ∀ (x) (h : x ∈ s), p ⟨x, h⟩ :=
   Subtype.forall
@@ -193,48 +168,11 @@ theorem forall_in_swap {p : α → β → Prop} : (∀ a ∈ s, ∀ (b), p a b) 
 
 /-! ### Lemmas about `mem` and `setOf` -/
 
-theorem mem_setOf {a : α} {p : α → Prop} : a ∈ { x | p x } ↔ p a :=
-  Iff.rfl
-
-theorem eq_mem_setOf (p : α → Prop) : p = (· ∈ {a | p a}) := rfl
-
 theorem _root_.Membership.mem.out {p : α → Prop} {a : α} (h : a ∈ { x | p x }) : p a :=
   h
 
-theorem nmem_setOf_iff {a : α} {p : α → Prop} : a ∉ { x | p x } ↔ ¬p a :=
-  Iff.rfl
-
-@[simp]
-theorem setOf_mem_eq {s : Set α} : { x | x ∈ s } = s :=
-  rfl
-
-theorem setOf_set {s : Set α} : setOf s = s :=
-  rfl
-
-theorem setOf_app_iff {p : α → Prop} {x : α} : { x | p x } x ↔ p x :=
-  Iff.rfl
-
-theorem mem_def {a : α} {s : Set α} : a ∈ s ↔ s a :=
-  Iff.rfl
-
 theorem setOf_bijective : Bijective (setOf : (α → Prop) → Set α) :=
   bijective_id
-
-theorem subset_setOf {p : α → Prop} {s : Set α} : s ⊆ setOf p ↔ ∀ x, x ∈ s → p x :=
-  Iff.rfl
-
-theorem setOf_subset {p : α → Prop} {s : Set α} : setOf p ⊆ s ↔ ∀ x, p x → x ∈ s :=
-  Iff.rfl
-
-@[simp]
-theorem setOf_subset_setOf {p q : α → Prop} : { a | p a } ⊆ { a | q a } ↔ ∀ a, p a → q a :=
-  Iff.rfl
-
-theorem setOf_and {p q : α → Prop} : { a | p a ∧ q a } = { a | p a } ∩ { a | q a } :=
-  rfl
-
-theorem setOf_or {p q : α → Prop} : { a | p a ∨ q a } = { a | p a } ∪ { a | q a } :=
-  rfl
 
 /-! ### Subset and strict subset relations -/
 
@@ -345,9 +283,6 @@ theorem nonempty_coe_sort {s : Set α} : Nonempty (↥s) ↔ s.Nonempty :=
 
 alias ⟨_, Nonempty.coe_sort⟩ := nonempty_coe_sort
 
-theorem nonempty_def : s.Nonempty ↔ ∃ x, x ∈ s :=
-  Iff.rfl
-
 theorem nonempty_of_mem {x} (h : x ∈ s) : s.Nonempty :=
   ⟨x, h⟩
 
@@ -423,18 +358,9 @@ theorem Nonempty.of_subtype [Nonempty (↥s)] : s.Nonempty := nonempty_subtype.m
 
 /-! ### Lemmas about the empty set -/
 
-theorem empty_def : (∅ : Set α) = { _x : α | False } :=
-  rfl
-
 @[simp]
 theorem mem_empty_iff_false (x : α) : x ∈ (∅ : Set α) ↔ False :=
   Iff.rfl
-
-@[simp]
-theorem setOf_false : { _a : α | False } = ∅ :=
-  rfl
-
-@[simp] theorem setOf_bot : { _x : α | ⊥ } = ∅ := rfl
 
 @[simp]
 theorem empty_subset (s : Set α) : ∅ ⊆ s :=
@@ -508,12 +434,6 @@ Mathematically it is the same as `α` but it has a different type.
 -/
 
 @[simp]
-theorem setOf_true : { _x : α | True } = univ :=
-  rfl
-
-@[simp] theorem setOf_top : { _x : α | ⊤ } = univ := rfl
-
-@[simp]
 theorem univ_eq_empty_iff : (univ : Set α) = ∅ ↔ IsEmpty α :=
   eq_empty_iff_forall_not_mem.trans
     ⟨fun H => ⟨fun x => H x trivial⟩, fun H x _ => @IsEmpty.false α H x⟩
@@ -562,9 +482,6 @@ instance nontrivial_of_nonempty [Nonempty α] : Nontrivial (Set α) :=
   ⟨⟨∅, univ, empty_ne_univ⟩⟩
 
 /-! ### Lemmas about union -/
-
-theorem union_def {s₁ s₂ : Set α} : s₁ ∪ s₂ = { a | a ∈ s₁ ∨ a ∈ s₂ } :=
-  rfl
 
 theorem mem_union_left {x : α} {a : Set α} (b : Set α) : x ∈ a → x ∈ a ∪ b :=
   Or.inl
@@ -683,9 +600,6 @@ theorem univ_union (s : Set α) : univ ∪ s = univ := top_sup_eq _
 
 /-! ### Lemmas about intersection -/
 
-theorem inter_def {s₁ s₂ : Set α} : s₁ ∩ s₂ = { a | a ∈ s₁ ∧ a ∈ s₂ } :=
-  rfl
-
 @[simp, mfld_simps]
 theorem mem_inter_iff (x : α) (a b : Set α) : x ∈ a ∩ b ↔ x ∈ a ∧ x ∈ b :=
   Iff.rfl
@@ -792,9 +706,6 @@ theorem union_inter_cancel_left {s t : Set α} : (s ∪ t) ∩ s = s :=
 theorem union_inter_cancel_right {s t : Set α} : (s ∪ t) ∩ t = t :=
   inter_eq_self_of_subset_right subset_union_right
 
-theorem inter_setOf_eq_sep (s : Set α) (p : α → Prop) : s ∩ {a | p a} = {a ∈ s | p a} :=
-  rfl
-
 theorem setOf_inter_eq_sep (p : α → Prop) (s : Set α) : {a | p a} ∩ s = {a ∈ s | p a} :=
   inter_comm _ _
 
@@ -835,9 +746,6 @@ theorem inter_inter_inter_comm (s t u v : Set α) : s ∩ t ∩ (u ∩ v) = s �
 
 `insert α s` is the set `{α} ∪ s`.
 -/
-
-theorem insert_def (x : α) (s : Set α) : insert x s = { y | y = x ∨ y ∈ s } :=
-  rfl
 
 @[simp]
 theorem subset_insert (x : α) (s : Set α) : s ⊆ insert x s := fun _ => Or.inr
@@ -975,9 +883,6 @@ theorem singleton_def (a : α) : ({a} : Set α) = insert a ∅ :=
 theorem mem_singleton_iff {a b : α} : a ∈ ({b} : Set α) ↔ a = b :=
   Iff.rfl
 
-theorem not_mem_singleton_iff {a b : α} : a ∉ ({b} : Set α) ↔ a ≠ b :=
-  Iff.rfl
-
 @[simp]
 theorem setOf_eq_eq_singleton {a : α} : { n | n = a } = {a} :=
   rfl
@@ -1020,11 +925,6 @@ theorem empty_ssubset_singleton : (∅ : Set α) ⊂ {a} :=
 theorem singleton_subset_iff {a : α} {s : Set α} : {a} ⊆ s ↔ a ∈ s :=
   forall_eq
 
-theorem singleton_subset_singleton : ({a} : Set α) ⊆ {b} ↔ a = b := by simp
-
-theorem set_compr_eq_eq_singleton {a : α} : { b | b = a } = {a} :=
-  rfl
-
 @[simp]
 theorem singleton_union : {a} ∪ s = insert a s :=
   rfl
@@ -1062,10 +962,6 @@ theorem eq_singleton_iff_nonempty_unique_mem : s = {a} ↔ s.Nonempty ∧ ∀ x 
   eq_singleton_iff_unique_mem.trans <|
     and_congr_left fun H => ⟨fun h' => ⟨_, h'⟩, fun ⟨x, h⟩ => H x h ▸ h⟩
 
-@[simp]
-theorem default_coe_singleton (x : α) : (default : ({x} : Set α)) = ⟨x, rfl⟩ :=
-  rfl
-
 /-! ### Lemmas about sets defined as `{x ∈ s | p x}`. -/
 
 section Sep
@@ -1074,10 +970,6 @@ variable {p q : α → Prop} {x : α}
 
 theorem mem_sep (xs : x ∈ s) (px : p x) : x ∈ { x ∈ s | p x } :=
   ⟨xs, px⟩
-
-@[simp]
-theorem sep_mem_eq : { x ∈ s | x ∈ t } = s ∩ t :=
-  rfl
 
 @[simp]
 theorem mem_sep_iff : x ∈ { x ∈ s | p x } ↔ x ∈ s ∧ p x :=
@@ -1127,10 +1019,6 @@ theorem sep_and : { x ∈ s | p x ∧ q x } = { x ∈ s | p x } ∩ { x ∈ s | 
 @[simp]
 theorem sep_or : { x ∈ s | p x ∨ q x } = { x ∈ s | p x } ∪ { x ∈ s | q x } :=
   inter_union_distrib_left s p q
-
-@[simp]
-theorem sep_setOf : { x ∈ { y | p y } | q x } = { x | p x ∧ q x } :=
-  rfl
 
 end Sep
 
@@ -1239,9 +1127,6 @@ lemma disjoint_singleton_left : Disjoint {a} s ↔ a ∉ s := by simp [Set.disjo
 lemma disjoint_singleton_right : Disjoint s {a} ↔ a ∉ s :=
   disjoint_comm.trans disjoint_singleton_left
 
-lemma disjoint_singleton : Disjoint ({a} : Set α) {b} ↔ a ≠ b := by
-  simp
-
 lemma subset_diff : s ⊆ t \ u ↔ s ⊆ t ∧ Disjoint s u := le_iff_subset.symm.trans le_sdiff
 
 lemma ssubset_iff_sdiff_singleton : s ⊂ t ↔ ∃ a ∈ t, s ⊆ t \ {a} := by
@@ -1259,14 +1144,8 @@ theorem disjoint_of_subset_iff_left_eq_empty (h : s ⊆ t) :
 
 /-! ### Lemmas about complement -/
 
-theorem compl_def (s : Set α) : sᶜ = { x | x ∉ s } :=
-  rfl
-
 theorem mem_compl {s : Set α} {x : α} (h : x ∉ s) : x ∈ sᶜ :=
   h
-
-theorem compl_setOf {α} (p : α → Prop) : { a | p a }ᶜ = { a | ¬p a } :=
-  rfl
 
 theorem not_mem_of_mem_compl {s : Set α} {x : α} (h : x ∈ sᶜ) : x ∉ s :=
   h
@@ -1315,12 +1194,6 @@ theorem nonempty_compl : sᶜ.Nonempty ↔ s ≠ univ :=
 @[simp] lemma nonempty_compl_of_nontrivial [Nontrivial α] (x : α) : Set.Nonempty {x}ᶜ := by
   obtain ⟨y, hy⟩ := exists_ne x
   exact ⟨y, by simp [hy]⟩
-
-theorem mem_compl_singleton_iff {a x : α} : x ∈ ({a} : Set α)ᶜ ↔ x ≠ a :=
-  Iff.rfl
-
-theorem compl_singleton_eq (a : α) : ({a} : Set α)ᶜ = { x | x ≠ a } :=
-  rfl
 
 @[simp]
 theorem compl_ne_eq_singleton (a : α) : ({ x | x ≠ a } : Set α)ᶜ = {a} :=
@@ -1918,10 +1791,6 @@ theorem inclusion_self (x : s) : inclusion Subset.rfl x = x := by
 theorem inclusion_eq_id (h : s ⊆ s) : inclusion h = id :=
   funext inclusion_self
 
-@[simp]
-theorem inclusion_mk {h : s ⊆ t} (a : α) (ha : a ∈ s) : inclusion h ⟨a, ha⟩ = ⟨a, h ha⟩ :=
-  rfl
-
 theorem inclusion_right (h : s ⊆ t) (x : t) (m : (x : α) ∈ s) : inclusion h ⟨x, m⟩ = x := by
   cases x
   rfl
@@ -1937,13 +1806,6 @@ theorem inclusion_comp_inclusion {α} {s t u : Set α} (hst : s ⊆ t) (htu : t 
     inclusion htu ∘ inclusion hst = inclusion (hst.trans htu) :=
   funext (inclusion_inclusion hst htu)
 
-@[simp]
-theorem coe_inclusion (h : s ⊆ t) (x : s) : (inclusion h x : α) = (x : α) :=
-  rfl
-
-theorem val_comp_inclusion (h : s ⊆ t) : Subtype.val ∘ inclusion h = Subtype.val :=
-  rfl
-
 theorem inclusion_injective (h : s ⊆ t) : Injective (inclusion h)
   | ⟨_, _⟩, ⟨_, _⟩ => Subtype.ext_iff_val.2 ∘ Subtype.ext_iff_val.1
 
@@ -1955,12 +1817,6 @@ theorem eq_of_inclusion_surjective {s t : Set α} {h : s ⊆ t}
   refine Set.Subset.antisymm h (fun x hx => ?_)
   obtain ⟨y, hy⟩ := h_surj ⟨x, hx⟩
   exact mem_of_eq_of_mem (congr_arg Subtype.val hy).symm y.prop
-
-theorem inclusion_le_inclusion [Preorder α] {s t : Set α} (h : s ⊆ t) {x y : s} :
-    inclusion h x ≤ inclusion h y ↔ x ≤ y := Iff.rfl
-
-theorem inclusion_lt_inclusion [Preorder α] {s t : Set α} (h : s ⊆ t) {x y : s} :
-    inclusion h x < inclusion h y ↔ x < y := Iff.rfl
 
 end Inclusion
 

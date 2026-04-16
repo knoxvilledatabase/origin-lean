@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Topology.Instances.ENNReal
 
+noncomputable section
+
 /-!
 # Definitions of an outer measure and the corresponding `FunLike` class
 
@@ -57,8 +59,6 @@ namespace OuterMeasure
 instance : FunLike (OuterMeasure α) (Set α) ℝ≥0∞ where
   coe m := m.measureOf
   coe_injective' | ⟨_, _, _, _⟩, ⟨_, _, _, _⟩, rfl => rfl
-
-@[simp] theorem measureOf_eq_coe (m : OuterMeasure α) : m.measureOf = m := rfl
 
 instance : OuterMeasureClass (OuterMeasure α) α where
   measure_empty f := f.empty

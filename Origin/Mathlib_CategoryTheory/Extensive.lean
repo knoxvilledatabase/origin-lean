@@ -11,6 +11,8 @@ import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts
 import Mathlib.CategoryTheory.Limits.VanKampen
 
+noncomputable section
+
 /-!
 
 # Extensive categories
@@ -133,27 +135,23 @@ namespace PreservesPullbacksOfInclusions
 variable {D : Type*} [Category D] [HasBinaryCoproducts C] (F : C ⥤ D)
 
 noncomputable
-
 instance (priority := 100) [PreservesLimitsOfShape WalkingCospan F] :
     PreservesPullbacksOfInclusions F := ⟨⟩
 
 variable [PreservesPullbacksOfInclusions F] {X Y Z : C} (f : Z ⟶ X ⨿ Y)
 
 noncomputable
-
 instance preservesPullbackInl' :
     PreservesLimit (cospan f coprod.inl) F :=
   preservesPullback_symmetry _ _ _
 
 noncomputable
-
 instance preservesPullbackInr' :
     PreservesLimit (cospan f coprod.inr) F := by
   apply preservesLimit_of_iso_diagram (K₁ := cospan (f ≫ (coprod.braiding X Y).hom) coprod.inl)
   apply cospanExt (Iso.refl _) (Iso.refl _) (coprod.braiding X Y).symm <;> simp
 
 noncomputable
-
 instance preservesPullbackInr :
     PreservesLimit (cospan coprod.inr f) F :=
   preservesPullback_symmetry _ _ _

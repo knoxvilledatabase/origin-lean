@@ -1,11 +1,13 @@
 /-
 Extracted from Data/SetLike/Basic.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Tactic.Monotonicity.Attr
 import Mathlib.Tactic.SetLike
 import Mathlib.Data.Set.Basic
+
+noncomputable section
 
 /-!
 # Typeclass for types with a set-like extensionality property
@@ -45,7 +47,6 @@ instance : SetLike (MySubobject X) X :=
 
 /-- Copy of a `MySubobject` with a new `carrier` equal to the old one. Useful to fix definitional
 equalities. See Note [range copy pattern]. -/
-
 protected def copy (p : MySubobject X) (s : Set X) (hs : s = ↑p) : MySubobject X :=
   { carrier := s
     op_mem' := hs.symm ▸ p.op_mem' }
@@ -57,24 +58,18 @@ lemma copy_eq (p : MySubobject X) (s : Set X) (hs : s = ↑p) : p.copy s hs = p 
   SetLike.coe_injective hs
 
 end MySubobject
-
 ```
 
 An alternative to `SetLike` could have been an extensional `Membership` typeclass:
-
 ```
-
 class ExtMembership (α : out_param <| Type u) (β : Type v) extends Membership α β where
   (ext_iff : ∀ {s t : β}, s = t ↔ ∀ (x : α), x ∈ s ↔ x ∈ t)
-
 ```
-
 While this is equivalent, `SetLike` conveniently uses a carrier set projection directly.
 
 ## Tags
 
 subobjects
-
 -/
 
 @[notation_class * carrier Simps.findCoercionArgs]
@@ -115,10 +110,6 @@ end Delab
 
 variable (p q : A)
 
-@[simp, norm_cast]
-theorem coe_sort_coe : ((p : Set B) : Type _) = p :=
-  rfl
-
 variable {p q}
 
 protected theorem «exists» {q : p → Prop} : (∃ x, q x) ↔ ∃ (x : B) (h : x ∈ p), q ⟨x, ‹_›⟩ :=
@@ -148,10 +139,6 @@ theorem ext (h : ∀ x, x ∈ p ↔ x ∈ q) : p = q :=
 theorem ext_iff : p = q ↔ ∀ x, x ∈ p ↔ x ∈ q :=
   coe_injective.eq_iff.symm.trans Set.ext_iff
 
-@[simp]
-theorem mem_coe {x : B} : x ∈ (p : Set B) ↔ x ∈ p :=
-  Iff.rfl
-
 @[simp, norm_cast]
 theorem coe_eq_coe {x y : p} : (x : B) = y ↔ x = y :=
   Subtype.ext_iff_val.symm
@@ -163,23 +150,18 @@ theorem coe_mem (x : p) : (x : B) ∈ p :=
 @[aesop 5% apply (rule_sets := [SetLike])]
 lemma mem_of_subset {s : Set B} (hp : s ⊆ p) {x : B} (hx : x ∈ s) : x ∈ p := hp hx
 
-protected theorem eta (x : p) (hx : (x : B) ∈ p) : (⟨x, hx⟩ : p) = x := rfl
-
-@[simp] lemma setOf_mem_eq (a : A) : {b | b ∈ a} = a := rfl
-
 instance (priority := 100) instPartialOrder : PartialOrder A :=
   { PartialOrder.lift (SetLike.coe : A → Set B) coe_injective with
     le := fun H K => ∀ ⦃x⦄, x ∈ H → x ∈ K }
-
-theorem le_def {S T : A} : S ≤ T ↔ ∀ ⦃x : B⦄, x ∈ S → x ∈ T :=
-  Iff.rfl
 
 @[simp, norm_cast] lemma coe_subset_coe {S T : A} : (S : Set B) ⊆ T ↔ S ≤ T := .rfl
 
 @[simp, norm_cast] lemma coe_ssubset_coe {S T : A} : (S : Set B) ⊂ T ↔ S < T := .rfl
 
 @[gcongr] protected alias ⟨_, GCongr.coe_subset_coe⟩ := coe_subset_coe
+
 @[gcongr] protected alias ⟨_, GCongr.coe_ssubset_coe⟩ := coe_ssubset_coe
+
 @[mono]
 theorem coe_mono : Monotone (SetLike.coe : A → Set B) := fun _ _ => coe_subset_coe.mpr
 

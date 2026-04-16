@@ -7,6 +7,8 @@ import Mathlib.Logic.Relation
 import Mathlib.Data.List.Forall2
 import Mathlib.Data.List.Lex
 
+noncomputable section
+
 /-!
 # Relation chain
 

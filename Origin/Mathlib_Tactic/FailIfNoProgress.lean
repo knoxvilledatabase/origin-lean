@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Elab.Tactic.Basic
 import Lean.Meta.Tactic.Util
 
+noncomputable section
+
 /-!
 # Fail if no progress
 

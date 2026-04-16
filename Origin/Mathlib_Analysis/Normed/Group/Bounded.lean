@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.Topology.MetricSpace.Bounded
 import Mathlib.Order.Filter.Pointwise
 
+noncomputable section
+
 /-!
 # Boundedness in normed groups
 

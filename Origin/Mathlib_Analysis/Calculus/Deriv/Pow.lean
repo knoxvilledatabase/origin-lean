@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.Deriv.Comp
 
+noncomputable section
+
 /-!
 # Derivative of `(f x) ^ n`, `n : ℕ`
 

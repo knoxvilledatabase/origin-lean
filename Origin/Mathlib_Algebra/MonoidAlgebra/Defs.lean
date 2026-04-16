@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/MonoidAlgebra/Defs.lean
-Genuine: 110 | Conflates: 2 | Dissolved: 1 | Infrastructure: 82
+Genuine: 111 | Conflates: 2 | Dissolved: 0 | Infrastructure: 82
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Finsupp
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.BigOperators
 import Mathlib.Data.Finsupp.Basic
 import Mathlib.LinearAlgebra.Finsupp.LSum
 import Mathlib.Algebra.Module.Submodule.Basic
+
+noncomputable section
 
 /-!
 # Monoid algebras
@@ -384,9 +386,6 @@ theorem distribMulActionHom_ext' {N : Type*} [Monoid R] [Semiring k] [AddMonoid 
 abbrev lsingle [Semiring R] [Semiring k] [Module R k] (a : G) :
     k →ₗ[R] MonoidAlgebra k G := Finsupp.lsingle a
 
-@[simp] lemma lsingle_apply [Semiring R] [Semiring k] [Module R k] (a : G) (b : k) :
-  lsingle (R := R) a b = single a b := rfl
-
 @[ext high]
 lemma lhom_ext' {N : Type*} [Semiring R] [Semiring k] [AddCommMonoid N] [Module R N] [Module R k]
     ⦃f g : MonoidAlgebra k G →ₗ[R] N⦄
@@ -501,12 +500,6 @@ theorem of_injective [MulOneClass G] [Nontrivial k] :
 theorem of_commute [MulOneClass G] {a : G} (h : ∀ a', Commute a a') (f : MonoidAlgebra k G) :
     Commute (of k G a) f :=
   single_commute h Commute.one_left f
-
-@[simps]
-def singleHom [MulOneClass G] : k × G →* MonoidAlgebra k G where
-  toFun a := single a.2 a.1
-  map_one' := rfl
-  map_mul' _a _b := single_mul_single.symm
 
 theorem mul_single_apply_aux [Mul G] (f : MonoidAlgebra k G) {r : k} {x y z : G}
     (H : ∀ a, a * x = z ↔ a = y) : (f * single x r) z = f y * r := by
@@ -732,12 +725,6 @@ protected noncomputable def opRingEquiv [Monoid G] :
         AddEquiv.trans_apply, AddEquiv.trans_apply, MulOpposite.opAddEquiv_symm_apply]
       rw [MulOpposite.unop_mul (α := MonoidAlgebra k G), unop_op, unop_op, single_mul_single]
       simp }
-
-theorem opRingEquiv_single [Monoid G] (r : k) (x : G) :
-    MonoidAlgebra.opRingEquiv (op (single x r)) = single (op x) (op r) := by simp
-
-theorem opRingEquiv_symm_single [Monoid G] (r : kᵐᵒᵖ) (x : Gᵐᵒᵖ) :
-    MonoidAlgebra.opRingEquiv.symm (single x r) = op (single x.unop r.unop) := by simp
 
 end Opposite
 
@@ -1103,9 +1090,6 @@ theorem distribMulActionHom_ext' {N : Type*} [Monoid R] [Semiring k] [AddMonoid 
 abbrev lsingle [Semiring R] [Semiring k] [Module R k] (a : G) :
     k →ₗ[R] AddMonoidAlgebra k G := Finsupp.lsingle a
 
-@[simp] lemma lsingle_apply [Semiring R] [Semiring k] [Module R k] (a : G) (b : k) :
-  lsingle (R := R) a b = single a b := rfl
-
 @[ext high]
 lemma lhom_ext' {N : Type*} [Semiring R] [Semiring k] [AddCommMonoid N] [Module R N] [Module R k]
     ⦃f g : AddMonoidAlgebra k G →ₗ[R] N⦄
@@ -1181,17 +1165,6 @@ def of' : G → k[G] := fun a => single a 1
 
 end
 
-@[simp]
-theorem of_apply [AddZeroClass G] (a : Multiplicative G) :
-    of k G a = single a.toAdd 1 :=
-  rfl
-
-@[simp]
-theorem of'_apply (a : G) : of' k G a = single a 1 :=
-  rfl
-
-theorem of'_eq_of [AddZeroClass G] (a : G) : of' k G a = of k G (.ofAdd a) := rfl
-
 -- CONFLATES (assumes ground = zero): of_injective
 theorem of_injective [Nontrivial k] [AddZeroClass G] : Function.Injective (of k G) :=
   MonoidAlgebra.of_injective
@@ -1200,12 +1173,6 @@ theorem of'_commute [AddZeroClass G] {a : G} (h : ∀ a', AddCommute a a')
     (f : AddMonoidAlgebra k G) :
     Commute (of' k G a) f :=
   MonoidAlgebra.of_commute (G := Multiplicative G) h f
-
-@[simps]
-def singleHom [AddZeroClass G] : k × Multiplicative G →* k[G] where
-  toFun a := single a.2.toAdd a.1
-  map_one' := rfl
-  map_mul' _a _b := single_mul_single.symm
 
 @[simp]
 theorem smul_single' (c : k) (a : G) (b : k) : c • single a b = single a (c * b) :=
@@ -1227,7 +1194,9 @@ theorem single_mul_apply_aux [Add G] (f : k[G]) (r : k) (x y z : G)
     (H : ∀ a, x + a = y ↔ a = z) : (single x r * f) y = r * f z :=
   @MonoidAlgebra.single_mul_apply_aux k (Multiplicative G) _ _ _ _ _ _ _ H
 
--- DISSOLVED: single_zero_mul_apply
+theorem single_zero_mul_apply [AddZeroClass G] (f : k[G]) (r : k) (x : G) :
+    (single (0 : G) r * f) x = r * f x :=
+  f.single_mul_apply_aux r _ _ _ fun a => by rw [zero_add]
 
 theorem single_mul_apply_of_not_exists_add [Add G] (r : k) {g g' : G} (x : k[G])
     (h : ¬∃ d, g' = g + d) : (single g r * x) g' = 0 :=
@@ -1372,12 +1341,6 @@ protected noncomputable def opRingEquiv [AddCommMonoid G] :
       dsimp
       rw [mapRange_single, single_mul_single, mapRange_single, mapRange_single]
       simp only [mapRange_single, single_mul_single, ← op_mul, add_comm] }
-
-theorem opRingEquiv_single [AddCommMonoid G] (r : k) (x : G) :
-    AddMonoidAlgebra.opRingEquiv (op (single x r)) = single x (op r) := by simp
-
-theorem opRingEquiv_symm_single [AddCommMonoid G] (r : kᵐᵒᵖ) (x : Gᵐᵒᵖ) :
-    AddMonoidAlgebra.opRingEquiv.symm (single x r) = op (single x r.unop) := by simp
 
 end Opposite
 

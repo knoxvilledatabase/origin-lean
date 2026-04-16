@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.CategoryTheory.ConcreteCategory.EpiMono
 
+noncomputable section
+
 /-!
 # Monomorphisms in `Module R`
 

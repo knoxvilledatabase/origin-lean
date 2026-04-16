@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unital
 import Mathlib.Topology.ContinuousMap.StarOrdered
 
+noncomputable section
+
 /-!
 # The exponential and logarithm based on the continuous functional calculus
 

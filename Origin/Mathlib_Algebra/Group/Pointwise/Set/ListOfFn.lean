@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.List
 import Mathlib.Algebra.Group.Pointwise.Set.Basic
 import Mathlib.Data.List.OfFn
 
+noncomputable section
+
 /-!
 # Pointwise operations with lists of sets
 

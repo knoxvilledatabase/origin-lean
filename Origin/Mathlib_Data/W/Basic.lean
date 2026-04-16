@@ -5,6 +5,8 @@ Genuine: 17 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Logic.Equiv.List
 
+noncomputable section
+
 /-!
 # W types
 

@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Pow
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 
+noncomputable section
+
 /-!
 # Symmetry of the second derivative
 

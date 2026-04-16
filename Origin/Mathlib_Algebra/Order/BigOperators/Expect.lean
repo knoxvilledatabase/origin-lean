@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.Rat
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Algebra.Order.Module.Rat
 
+noncomputable section
+
 /-!
 # Order properties of the average over a finset
 -/
@@ -176,6 +178,7 @@ open Qq Lean Meta Finset
 open scoped BigOperators
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- Positivity extension for `Finset.expect`. -/
 
 @[positivity Finset.expect _ _]
 def evalFinsetExpect : PositivityExt where eval {u α} zα pα e := do

@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Module.UniformConvergence
 import Mathlib.Topology.Algebra.SeparationQuotient.Section
 import Mathlib.Topology.Hom.ContinuousEvalConst
 
+noncomputable section
+
 /-!
 # Strong topologies on the space of continuous linear maps
 
@@ -132,11 +134,6 @@ alias embedding_coeFn := isEmbedding_coeFn
 
 instance instAddCommGroup [TopologicalSpace F] [TopologicalAddGroup F] (𝔖 : Set (Set E)) :
     AddCommGroup (UniformConvergenceCLM σ F 𝔖) := ContinuousLinearMap.addCommGroup
-
-@[simp]
-theorem coe_zero [TopologicalSpace F] [TopologicalAddGroup F] (𝔖 : Set (Set E)) :
-    ⇑(0 : UniformConvergenceCLM σ F 𝔖) = 0 :=
-  rfl
 
 instance instUniformAddGroup [UniformSpace F] [UniformAddGroup F] (𝔖 : Set (Set E)) :
     UniformAddGroup (UniformConvergenceCLM σ F 𝔖) := by
@@ -484,9 +481,6 @@ variable {𝕜 : Type*} [NormedField 𝕜] {E F G : Type*}
 
 def toLinearMap₂ (L : E →L[𝕜] F →L[𝕜] G) : E →ₗ[𝕜] F →ₗ[𝕜] G := (coeLM 𝕜).comp L.toLinearMap
 
-@[simp] lemma toLinearMap₂_apply (L : E →L[𝕜] F →L[𝕜] G) (v : E) (w : F) :
-    L.toLinearMap₂ v w = L v w := rfl
-
 end BilinearMaps
 
 section RestrictScalars
@@ -542,15 +536,6 @@ def restrictScalarsL : (E →L[𝕜] F) →L[𝕜''] E →L[𝕜'] F :=
 
 variable {𝕜 E F 𝕜' 𝕜''}
 
-@[simp]
-theorem coe_restrictScalarsL : (restrictScalarsL 𝕜 E F 𝕜' 𝕜'' : (E →L[𝕜] F) →ₗ[𝕜''] E →L[𝕜'] F) =
-    restrictScalarsₗ 𝕜 E F 𝕜' 𝕜'' :=
-  rfl
-
-@[simp]
-theorem coe_restrict_scalarsL' : ⇑(restrictScalarsL 𝕜 E F 𝕜' 𝕜'') = restrictScalars 𝕜' :=
-  rfl
-
 end RestrictScalars
 
 end ContinuousLinearMap
@@ -598,17 +583,6 @@ def arrowCongrSL (e₁₂ : E ≃SL[σ₁₂] F) (e₄₃ : H ≃SL[σ₄₃] G)
 
       (postcomp F e₄₃.symm.toContinuousLinearMap)).continuous }
 
-theorem arrowCongrSL_toLinearEquiv_apply (e₁₂ : E ≃SL[σ₁₂] F) (e₄₃ : H ≃SL[σ₄₃] G)
-    (L : E →SL[σ₁₄] H) : (e₁₂.arrowCongrSL e₄₃).toLinearEquiv L =
-      (e₄₃ : H →SL[σ₄₃] G).comp (L.comp (e₁₂.symm : F →SL[σ₂₁] E)) :=
-  rfl
-
-@[simp]
-theorem arrowCongrSL_toLinearEquiv_symm_apply (e₁₂ : E ≃SL[σ₁₂] F) (e₄₃ : H ≃SL[σ₄₃] G)
-    (L : F →SL[σ₂₃] G) : (e₁₂.arrowCongrSL e₄₃).toLinearEquiv.symm L =
-      (e₄₃.symm : G →SL[σ₃₄] H).comp (L.comp (e₁₂ : E →SL[σ₁₂] F)) :=
-  rfl
-
 end Semilinear
 
 section Linear
@@ -621,12 +595,6 @@ variable {𝕜 : Type*} {E : Type*} {F : Type*} {G : Type*} {H : Type*} [AddComm
 
 def arrowCongr (e₁ : E ≃L[𝕜] F) (e₂ : H ≃L[𝕜] G) : (E →L[𝕜] H) ≃L[𝕜] F →L[𝕜] G :=
   e₁.arrowCongrSL e₂
-
-@[simp] lemma arrowCongr_apply (e₁ : E ≃L[𝕜] F) (e₂ : H ≃L[𝕜] G) (f : E →L[𝕜] H) (x : F) :
-    e₁.arrowCongr e₂ f x = e₂ (f (e₁.symm x)) := rfl
-
-@[simp] lemma arrowCongr_symm (e₁ : E ≃L[𝕜] F) (e₂ : H ≃L[𝕜] G) :
-    (e₁.arrowCongr e₂).symm = e₁.symm.arrowCongr e₂.symm := rfl
 
 end Linear
 

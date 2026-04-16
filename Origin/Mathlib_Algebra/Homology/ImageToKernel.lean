@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Subobject.Limits
 
+noncomputable section
+
 /-!
 # Image-to-kernel comparison maps
 
@@ -39,11 +41,6 @@ def imageToKernel (w : f ≫ g = 0) : (imageSubobject f : V) ⟶ (kernelSubobjec
 instance (w : f ≫ g = 0) : Mono (imageToKernel f g w) := by
   dsimp only [imageToKernel]
   infer_instance
-
-@[simp]
-theorem subobject_ofLE_as_imageToKernel (w : f ≫ g = 0) (h) :
-    Subobject.ofLE (imageSubobject f) (kernelSubobject g) h = imageToKernel f g w :=
-  rfl
 
 attribute [local instance] ConcreteCategory.instFunLike
 

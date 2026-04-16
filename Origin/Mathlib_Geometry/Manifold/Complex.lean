@@ -8,6 +8,8 @@ import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 import Mathlib.Topology.LocallyConstant.Basic
 
+noncomputable section
+
 /-! # Holomorphic functions on complex manifolds
 
 Thanks to the rigidity of complex-differentiability compared to real-differentiability, there are

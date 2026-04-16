@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Group/Commute/Units.lean
-Genuine: 18 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
 import Mathlib.Algebra.Group.Semiconj.Units
+
+noncomputable section
 
 /-!
 # Lemmas about commuting pairs of elements involving units.
@@ -81,7 +83,11 @@ lemma Commute.units_zpow_right (h : Commute a u) (m : ℤ) : Commute a ↑(u ^ m
 lemma Commute.units_zpow_left (h : Commute ↑u a) (m : ℤ) : Commute ↑(u ^ m) a :=
   (h.symm.units_zpow_right m).symm
 
--- DISSOLVED: Units.ofPow
+@[to_additive "If a natural multiple of `x` is an additive unit, then `x` is an additive unit."]
+def Units.ofPow (u : Mˣ) (x : M) {n : ℕ} (hn : n ≠ 0) (hu : x ^ n = u) : Mˣ :=
+  u.leftOfMul x (x ^ (n - 1))
+    (by rwa [← _root_.pow_succ', Nat.sub_add_cancel (Nat.succ_le_of_lt <| Nat.pos_of_ne_zero hn)])
+    (Commute.self_pow _ _)
 
 @[to_additive (attr := simp)] lemma isUnit_pow_iff (hn : n ≠ 0) : IsUnit (a ^ n) ↔ IsUnit a :=
   ⟨fun ⟨u, hu⟩ ↦ (u.ofPow a hn hu.symm).isUnit, IsUnit.pow n⟩
@@ -96,7 +102,9 @@ def Units.ofPowEqOne (a : M) (n : ℕ) (ha : a ^ n = 1) (hn : n ≠ 0) : Mˣ := 
 lemma Units.pow_ofPowEqOne (ha : a ^ n = 1) (hn : n ≠ 0) :
     Units.ofPowEqOne _ n ha hn ^ n = 1 := Units.ext <| by simp [ha]
 
--- DISSOLVED: isUnit_ofPowEqOne
+@[to_additive]
+lemma isUnit_ofPowEqOne (ha : a ^ n = 1) (hn : n ≠ 0) : IsUnit a :=
+  (Units.ofPowEqOne _ n ha hn).isUnit
 
 end Monoid
 

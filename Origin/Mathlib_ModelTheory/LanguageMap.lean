@@ -5,6 +5,8 @@ Genuine: 50 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 import Origin.Core
 import Mathlib.ModelTheory.Basic
 
+noncomputable section
+
 /-!
 # Language Maps
 
@@ -301,9 +303,6 @@ def constantsOn : Language.{u', 0} := ⟨constantsOnFunc α, fun _ => Empty⟩
 
 variable {α}
 
-theorem constantsOn_constants : (constantsOn α).Constants = α :=
-  rfl
-
 instance isAlgebraic_constantsOn : IsAlgebraic (constantsOn α) := by
   unfold constantsOn
   infer_instance
@@ -448,10 +447,6 @@ theorem withConstants_funMap_sum_inr {a : α} {x : Fin 0 → M} :
   exact (LHom.sumInr : constantsOn α →ᴸ L.sum _).map_onFunction _ _
 
 variable {α} (A : Set M)
-
-@[simp]
-theorem coe_con {a : A} : (L.con a : M) = a :=
-  rfl
 
 variable {A} {B : Set M} (h : A ⊆ B)
 

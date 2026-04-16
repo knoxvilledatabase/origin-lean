@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Bicategory.Basic
 
+noncomputable section
+
 /-!
 # Strict bicategories
 

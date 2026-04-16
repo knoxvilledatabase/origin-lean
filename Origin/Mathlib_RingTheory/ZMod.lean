@@ -9,6 +9,8 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.Nilpotent.Lemmas
 import Mathlib.RingTheory.PrincipalIdealDomain
 
+noncomputable section
+
 /-!
 # Ring theoretic facts about `ZMod n`
 

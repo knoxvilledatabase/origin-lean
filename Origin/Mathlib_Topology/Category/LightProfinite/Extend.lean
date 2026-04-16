@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Category.LightProfinite.AsLimit
 import Mathlib.Topology.Category.Profinite.Extend
 
+noncomputable section
+
 /-!
 
 # Extending cones in `LightProfinite`
@@ -85,7 +87,6 @@ def cone (S : LightProfinite) :
 example : G.mapCone c = (cone G c.pt).whisker (functor c) := rfl
 
 noncomputable
-
 def isLimitCone (hc : IsLimit c) [∀ i, Epi (c.π.app i)] (hc' : IsLimit <| G.mapCone c) :
     IsLimit (cone G c.pt) := (functor_initial c hc).isLimitWhiskerEquiv _ _ hc'
 
@@ -112,7 +113,6 @@ example : G.mapCocone c.op = (cocone G c.pt).whisker
   ((opOpEquivalence ℕ).functor ⋙ functorOp c) := rfl
 
 noncomputable
-
 def isColimitCocone (hc : IsLimit c) [∀ i, Epi (c.π.app i)] (hc' : IsColimit <| G.mapCocone c.op) :
     IsColimit (cocone G c.pt) :=
   haveI := functorOp_final c hc

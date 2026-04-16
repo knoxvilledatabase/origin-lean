@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Elab.Term
 
+noncomputable section
+
 /-! `beta%` term elaborator
 
 The `beta% f x1 ... xn` term elaborator elaborates the expression

@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Orthogonal.lean
-Genuine: 31 | Conflates: 2 | Dissolved: 3 | Infrastructure: 4
+Genuine: 34 | Conflates: 2 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
 import Mathlib.LinearAlgebra.BilinearForm.Properties
+
+noncomputable section
 
 /-!
 # Bilinear form
@@ -57,7 +59,8 @@ theorem isOrtho_zero_left (x : M) : IsOrtho B (0 : M) x := LinearMap.isOrtho_zer
 theorem isOrtho_zero_right (x : M) : IsOrtho B x (0 : M) :=
   zero_right x
 
--- DISSOLVED: ne_zero_of_not_isOrtho_self
+theorem ne_zero_of_not_isOrtho_self {B : BilinForm K V} (x : V) (hx₁ : ¬B.IsOrtho x x) : x ≠ 0 :=
+  fun hx₂ => hx₁ (hx₂.symm ▸ isOrtho_zero_left _)
 
 theorem IsRefl.ortho_comm (H : B.IsRefl) {x y : M} : IsOrtho B x y ↔ IsOrtho B y x :=
   ⟨eq_zero H, eq_zero H⟩
@@ -81,9 +84,21 @@ variable {R₄ M₄ : Type*} [CommRing R₄] [IsDomain R₄]
 
 variable [AddCommGroup M₄] [Module R₄ M₄] {G : BilinForm R₄ M₄}
 
--- DISSOLVED: isOrtho_smul_left
+@[simp]
+theorem isOrtho_smul_left {x y : M₄} {a : R₄} (ha : a ≠ 0) :
+    IsOrtho G (a • x) y ↔ IsOrtho G x y := by
+  dsimp only [IsOrtho]
+  rw [map_smul]
+  simp only [LinearMap.smul_apply, smul_eq_mul, mul_eq_zero, or_iff_right_iff_imp]
+  exact fun a ↦ (ha a).elim
 
--- DISSOLVED: isOrtho_smul_right
+@[simp]
+theorem isOrtho_smul_right {x y : M₄} {a : R₄} (ha : a ≠ 0) :
+    IsOrtho G x (a • y) ↔ IsOrtho G x y := by
+  dsimp only [IsOrtho]
+  rw [map_smul]
+  simp only [smul_eq_mul, mul_eq_zero, or_iff_right_iff_imp]
+  exact fun a ↦ (ha a).elim
 
 theorem linearIndependent_of_iIsOrtho {n : Type w} {B : BilinForm K V} {v : n → V}
     (hv₁ : B.iIsOrtho v) (hv₂ : ∀ i, ¬B.IsOrtho (v i) (v i)) : LinearIndependent K v := by

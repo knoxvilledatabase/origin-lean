@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Ring/Defs.lean
-Genuine: 39 | Conflates: 2 | Dissolved: 2 | Infrastructure: 21
+Genuine: 40 | Conflates: 2 | Dissolved: 0 | Infrastructure: 22
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Defs
@@ -9,6 +9,8 @@ import Mathlib.Data.Int.Cast.Defs
 import Mathlib.Tactic.Spread
 import Mathlib.Util.AssertExists
 import Mathlib.Tactic.StacksAttribute
+
+noncomputable section
 
 /-!
 # Semirings and rings
@@ -159,19 +161,10 @@ section MulZeroClass
 
 variable [MulZeroClass α] (P Q : Prop) [Decidable P] [Decidable Q] (a b : α)
 
--- DISSOLVED: ite_zero_mul
-
-lemma mul_ite_zero : a * ite P b 0 = ite P (a * b) 0 := by simp
-
--- DISSOLVED: ite_zero_mul_ite_zero
+lemma ite_zero_mul_ite_zero : ite P a 0 * ite Q b 0 = ite (P ∧ Q) (a * b) 0 := by
+  simp only [← ite_and, ite_mul, mul_ite, mul_zero, zero_mul, and_comm]
 
 end MulZeroClass
-
-theorem mul_boole {α} [MulZeroOneClass α] (P : Prop) [Decidable P] (a : α) :
-    (a * if P then 1 else 0) = if P then a else 0 := by simp
-
-theorem boole_mul {α} [MulZeroOneClass α] (P : Prop) [Decidable P] (a : α) :
-    (if P then 1 else 0) * a = if P then a else 0 := by simp
 
 class NonUnitalNonAssocCommSemiring (α : Type u) extends NonUnitalNonAssocSemiring α, CommMagma α
 
@@ -224,27 +217,17 @@ theorem neg_mul (a b : α) : -a * b = -(a * b) :=
 theorem mul_neg (a b : α) : a * -b = -(a * b) :=
   HasDistribNeg.mul_neg _ _
 
-theorem neg_mul_neg (a b : α) : -a * -b = a * b := by simp
-
 theorem neg_mul_eq_neg_mul (a b : α) : -(a * b) = -a * b :=
   (neg_mul _ _).symm
 
 theorem neg_mul_eq_mul_neg (a b : α) : -(a * b) = a * -b :=
   (mul_neg _ _).symm
 
-theorem neg_mul_comm (a b : α) : -a * b = a * -b := by simp
-
 end Mul
 
 section MulOneClass
 
 variable [MulOneClass α] [HasDistribNeg α]
-
-theorem neg_eq_neg_one_mul (a : α) : -a = -1 * a := by simp
-
-theorem mul_neg_one (a : α) : a * -1 = -a := by simp
-
-theorem neg_one_mul (a : α) : -1 * a = -a := by simp
 
 end MulOneClass
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Real.Sqrt
 import Mathlib.NumberTheory.Zsqrtd.Basic
 
+noncomputable section
+
 /-!
 # Image of `Zsqrtd` in `ℝ`
 

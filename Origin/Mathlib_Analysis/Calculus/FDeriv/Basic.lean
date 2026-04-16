@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.TangentCone
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Asymptotics
 
+noncomputable section
+
 /-!
 # The Fréchet derivative
 

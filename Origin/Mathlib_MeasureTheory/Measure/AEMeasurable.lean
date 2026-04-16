@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Measure/AEMeasurable.lean
-Genuine: 44 | Conflates: 2 | Dissolved: 3 | Infrastructure: 3
+Genuine: 45 | Conflates: 2 | Dissolved: 2 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.Trim
 import Mathlib.MeasureTheory.MeasurableSpace.CountablyGenerated
+
+noncomputable section
 
 /-!
 # Almost everywhere measurable functions
@@ -250,7 +252,11 @@ theorem aemeasurable_restrict_iff_comap_subtype {s : Set α} (hs : MeasurableSet
 theorem aemeasurable_one [One β] : AEMeasurable (fun _ : α => (1 : β)) μ :=
   measurable_one.aemeasurable
 
--- DISSOLVED: aemeasurable_smul_measure_iff
+@[simp]
+theorem aemeasurable_smul_measure_iff {c : ℝ≥0∞} (hc : c ≠ 0) :
+    AEMeasurable f (c • μ) ↔ AEMeasurable f μ :=
+  ⟨fun h => ⟨h.mk f, h.measurable_mk, (ae_smul_measure_iff hc).1 h.ae_eq_mk⟩, fun h =>
+    ⟨h.mk f, h.measurable_mk, (ae_smul_measure_iff hc).2 h.ae_eq_mk⟩⟩
 
 theorem aemeasurable_of_aemeasurable_trim {α} {m m0 : MeasurableSpace α} {μ : Measure α}
     (hm : m ≤ m0) {f : α → β} (hf : AEMeasurable f (μ.trim hm)) : AEMeasurable f μ :=

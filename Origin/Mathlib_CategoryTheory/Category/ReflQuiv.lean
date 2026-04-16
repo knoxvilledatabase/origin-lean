@@ -7,6 +7,8 @@ import Mathlib.Combinatorics.Quiver.ReflQuiver
 import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.CategoryTheory.Category.Quiv
 
+noncomputable section
+
 /-!
 # The category of refl quivers
 
@@ -68,8 +70,6 @@ theorem forgetToQuiv_faithful {V W : ReflQuiv} (F G : V ⥤rq W)
 
 theorem forgetToQuiv.Faithful : Functor.Faithful (forgetToQuiv) where
   map_injective := fun hyp ↦ forgetToQuiv_faithful _ _ hyp
-
-theorem forget_forgetToQuiv : forget ⋙ forgetToQuiv = Quiv.forget := rfl
 
 end ReflQuiv
 
@@ -156,10 +156,6 @@ def adj.unit.app (V : ReflQuiv.{max u v, u}) : V ⥤rq forget.obj (Cat.freeRefl.
     Quiv.forget.map (Cat.FreeRefl.quotientFunctor V)
   map_id := fun _ => Quotient.sound _ ⟨⟩
 
-theorem adj.unit.component_eq (V : ReflQuiv.{max u v, u}) :
-    forgetToQuiv.map (adj.unit.app V) = Quiv.adj.unit.app (V.toQuiv) ≫
-    Quiv.forget.map (Y := Cat.of _) (Cat.FreeRefl.quotientFunctor V) := rfl
-
 @[simps!]
 def adj.counit.app (C : Cat) : Cat.freeRefl.obj (forget.obj C) ⥤ C := by
   fapply Quotient.lift
@@ -175,11 +171,6 @@ def adj.counit.app (C : Cat) : Cat.freeRefl.obj (forget.obj C) ⥤ C := by
 theorem adj.counit.component_eq (C : Cat) :
     Cat.FreeRefl.quotientFunctor C ⋙ adj.counit.app C =
     Quiv.adj.counit.app C := rfl
-
-@[simp]
-theorem adj.counit.component_eq' (C) [Category C] :
-    Cat.FreeRefl.quotientFunctor C ⋙ adj.counit.app (Cat.of C) =
-    Quiv.adj.counit.app (Cat.of C) := rfl
 
 nonrec def adj : Cat.freeRefl.{max u v, u} ⊣ ReflQuiv.forget :=
   Adjunction.mkOfUnitCounit {

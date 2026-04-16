@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.LocalizerMorphism
 
+noncomputable section
+
 /-!
 # Composition of localization functors
 

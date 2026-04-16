@@ -9,6 +9,8 @@ import Mathlib.Analysis.Complex.RealDeriv
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.Exponential
 
+noncomputable section
+
 /-!
 # Complex and real exponential
 

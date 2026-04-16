@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Matrix.BilinearForm
 import Mathlib.LinearAlgebra.FiniteDimensional
 import Mathlib.LinearAlgebra.Trace
 
+noncomputable section
+
 /-!
 # Trace for (finite) ring extensions.
 

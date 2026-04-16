@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.MellinTransform
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 
+noncomputable section
+
 /-!
 # Derivative of the Gamma function
 

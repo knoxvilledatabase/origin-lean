@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/OreLocalization/Basic.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 1 | Infrastructure: 10
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.DistribMulAction
 import Mathlib.GroupTheory.OreLocalization.Basic
+
+noncomputable section
 
 /-!
 
@@ -192,7 +194,9 @@ instance : AddMonoid X[S⁻¹] where
     nsmul_zero _ := by with_unfolding_all rfl
     nsmul_succ _ _ := by with_unfolding_all rfl
 
--- DISSOLVED: smul_zero
+protected theorem smul_zero (x : R[S⁻¹]) : x • (0 : X[S⁻¹]) = 0 := by
+  induction' x with r s
+  rw [OreLocalization.zero_def, smul_div_one, smul_zero, zero_oreDiv, zero_oreDiv]
 
 protected theorem smul_add (z : R[S⁻¹]) (x y : X[S⁻¹]) :
     z • (x + y) = z • x + z • y := by

@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Topology.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # A "module topology" for modules over a topological ring
 

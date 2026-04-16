@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Calculus/LogDeriv.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 5 | Infrastructure: 1
+Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.ZPow
+
+noncomputable section
 
 /-!
 # Logarithmic Derivatives
@@ -42,15 +44,40 @@ theorem logDeriv_const (a : 𝕜') : logDeriv (fun _ : 𝕜 ↦ a) = 0 := by
   ext
   simp [logDeriv_apply]
 
--- DISSOLVED: logDeriv_mul
+theorem logDeriv_mul {f g : 𝕜 → 𝕜'} (x : 𝕜) (hf : f x ≠ 0) (hg : g x ≠ 0)
+    (hdf : DifferentiableAt 𝕜 f x) (hdg : DifferentiableAt 𝕜 g x) :
+      logDeriv (fun z => f z * g z) x = logDeriv f x + logDeriv g x := by
+  simp only [logDeriv_apply, deriv_mul hdf hdg]
+  field_simp [mul_comm]
 
--- DISSOLVED: logDeriv_div
+theorem logDeriv_div {f g : 𝕜 → 𝕜'} (x : 𝕜) (hf : f x ≠ 0) (hg : g x ≠ 0)
+    (hdf : DifferentiableAt 𝕜 f x) (hdg : DifferentiableAt 𝕜 g x) :
+    logDeriv (fun z => f z / g z) x = logDeriv f x - logDeriv g x := by
+  simp only [logDeriv_apply, deriv_div hdf hdg]
+  field_simp [mul_comm]
+  ring
 
--- DISSOLVED: logDeriv_mul_const
+theorem logDeriv_mul_const {f : 𝕜 → 𝕜'} (x : 𝕜) (a : 𝕜') (ha : a ≠ 0):
+    logDeriv (fun z => f z * a) x = logDeriv f x := by
+  simp only [logDeriv_apply, deriv_mul_const_field, mul_div_mul_right _ _ ha]
 
--- DISSOLVED: logDeriv_const_mul
+theorem logDeriv_const_mul {f : 𝕜 → 𝕜'} (x : 𝕜) (a : 𝕜') (ha : a ≠ 0):
+    logDeriv (fun z => a * f z) x = logDeriv f x := by
+  simp only [logDeriv_apply, deriv_const_mul_field, mul_div_mul_left _ _ ha]
 
--- DISSOLVED: logDeriv_prod
+theorem logDeriv_prod {ι : Type*} (s : Finset ι) (f : ι → 𝕜 → 𝕜') (x : 𝕜) (hf : ∀ i ∈ s, f i x ≠ 0)
+    (hd : ∀ i ∈ s, DifferentiableAt 𝕜 (f i) x) :
+    logDeriv (∏ i ∈ s, f i ·) x = ∑ i ∈ s, logDeriv (f i) x := by
+  induction s using Finset.cons_induction with
+  | empty => simp
+  | cons a s ha ih =>
+    rw [Finset.forall_mem_cons] at hf hd
+    simp_rw [Finset.prod_cons, Finset.sum_cons]
+    rw [logDeriv_mul, ih hf.2 hd.2]
+    · exact hf.1
+    · simpa [Finset.prod_eq_zero_iff] using hf.2
+    · exact hd.1
+    · exact .finset_prod hd.2
 
 lemma logDeriv_fun_zpow {f : 𝕜 → 𝕜'} {x : 𝕜} (hdf : DifferentiableAt 𝕜 f x) (n : ℤ) :
     logDeriv (f · ^ n) x = n * logDeriv f x := by

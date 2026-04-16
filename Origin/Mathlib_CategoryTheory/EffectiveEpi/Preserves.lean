@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.EffectiveEpi.Comp
 import Mathlib.Data.Fintype.Card
 
+noncomputable section
+
 /-!
 
 # Functors preserving effective epimorphisms

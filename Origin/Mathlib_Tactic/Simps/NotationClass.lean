@@ -8,6 +8,8 @@ import Lean.Elab.Exception
 import Batteries.Lean.NameMapAttribute
 import Batteries.Tactic.Lint
 
+noncomputable section
+
 /-!
 # `@[notation_class]` attribute for `@[simps]`
 

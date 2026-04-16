@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.Separated
 import Mathlib.AlgebraicGeometry.Morphisms.UniversallyClosed
 import Mathlib.AlgebraicGeometry.Morphisms.FiniteType
 
+noncomputable section
+
 /-!
 
 # Proper morphisms

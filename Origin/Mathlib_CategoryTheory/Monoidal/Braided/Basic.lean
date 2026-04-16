@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Monoidal.Opposite
 import Mathlib.Tactic.CategoryTheory.Monoidal.Basic
 import Mathlib.CategoryTheory.CommSq
 
+noncomputable section
+
 /-!
 # Braided and symmetric monoidal categories
 
@@ -162,18 +164,6 @@ theorem hexagon_reverse_iso (X Y Z : C) :
     (α_ X Y Z).symm ≪≫ β_ (X ⊗ Y) Z ≪≫ (α_ Z X Y).symm =
       whiskerLeftIso X (β_ Y Z) ≪≫ (α_ X Z Y).symm ≪≫ whiskerRightIso (β_ X Z) Y :=
   Iso.ext (hexagon_reverse X Y Z)
-
-@[reassoc]
-theorem hexagon_forward_inv (X Y Z : C) :
-    (α_ Y Z X).inv ≫ (β_ X (Y ⊗ Z)).inv ≫ (α_ X Y Z).inv =
-      Y ◁ (β_ X Z).inv ≫ (α_ Y X Z).inv ≫ (β_ X Y).inv ▷ Z := by
-  simp
-
-@[reassoc]
-theorem hexagon_reverse_inv (X Y Z : C) :
-    (α_ Z X Y).hom ≫ (β_ (X ⊗ Y) Z).inv ≫ (α_ X Y Z).hom =
-      (β_ X Z).inv ▷ Y ≫ (α_ X Z Y).hom ≫ X ◁ (β_ Y Z).inv := by
-  simp
 
 end BraidedCategory
 
@@ -394,13 +384,6 @@ def toLaxMonoidalFunctor (F : LaxBraidedFunctor C D) : LaxMonoidalFunctor C D wh
 instance : Category (LaxBraidedFunctor C D) :=
   InducedCategory.category (toLaxMonoidalFunctor)
 
-@[simp]
-lemma id_hom (F : LaxBraidedFunctor C D) : LaxMonoidalFunctor.Hom.hom (𝟙 F) = 𝟙 _ := rfl
-
-@[reassoc, simp]
-lemma comp_hom {F G H : LaxBraidedFunctor C D} (α : F ⟶ G) (β : G ⟶ H) :
-    (α ≫ β).hom = α.hom ≫ β.hom := rfl
-
 @[ext]
 lemma hom_ext {F G : LaxBraidedFunctor C D} {α β : F ⟶ G} (h : α.hom = β.hom) : α = β :=
   LaxMonoidalFunctor.hom_ext h
@@ -436,14 +419,6 @@ def isoOfComponents :
     F ≅ G :=
   fullyFaithfulForget.preimageIso
     (LaxMonoidalFunctor.isoOfComponents e naturality unit tensor)
-
-@[simp]
-lemma isoOfComponents_hom_hom_app (X : C) :
-    (isoOfComponents e naturality unit tensor).hom.hom.app X = (e X).hom := rfl
-
-@[simp]
-lemma isoOfComponents_inv_hom_app (X : C) :
-    (isoOfComponents e naturality unit tensor).inv.hom.app X = (e X).inv := rfl
 
 end
 
@@ -608,14 +583,6 @@ instance tensorMonoidal : (tensor C).Monoidal :=
         left_unitality := fun ⟨X₁, X₂⟩ ↦ tensor_left_unitality X₁ X₂
         right_unitality := fun ⟨X₁, X₂⟩ ↦ tensor_right_unitality X₁ X₂ }
 
-@[simp] lemma tensor_ε : ε (tensor C) = (λ_ (𝟙_ C)).inv := rfl
-
-@[simp] lemma tensor_η : η (tensor C) = (λ_ (𝟙_ C)).hom := rfl
-
-@[simp] lemma tensor_μ (X Y : C × C) : μ (tensor C) X Y = tensorμ X.1 X.2 Y.1 Y.2 := rfl
-
-@[simp] lemma tensor_δ (X Y : C × C) : δ (tensor C) X Y = tensorδ X.1 X.2 Y.1 Y.2 := rfl
-
 @[reassoc]
 theorem leftUnitor_monoidal (X₁ X₂ : C) :
     (λ_ X₁).hom ⊗ (λ_ X₂).hom =
@@ -671,18 +638,6 @@ section OppositeLemmas
 
 open Opposite
 
-@[simp] lemma op_braiding (X Y : C) : (β_ X Y).op = β_ (op Y) (op X) := rfl
-
-@[simp] lemma unop_braiding (X Y : Cᵒᵖ) : (β_ X Y).unop = β_ (unop Y) (unop X) := rfl
-
-@[simp] lemma op_hom_braiding (X Y : C) : (β_ X Y).hom.op = (β_ (op Y) (op X)).hom := rfl
-
-@[simp] lemma unop_hom_braiding (X Y : Cᵒᵖ) : (β_ X Y).hom.unop = (β_ (unop Y) (unop X)).hom := rfl
-
-@[simp] lemma op_inv_braiding (X Y : C) : (β_ X Y).inv.op = (β_ (op Y) (op X)).inv := rfl
-
-@[simp] lemma unop_inv_braiding (X Y : Cᵒᵖ) : (β_ X Y).inv.unop = (β_ (unop Y) (unop X)).inv := rfl
-
 end OppositeLemmas
 
 namespace MonoidalOpposite
@@ -694,20 +649,6 @@ instance instBraiding : BraidedCategory Cᴹᵒᵖ where
 
 section MonoidalOppositeLemmas
 
-@[simp] lemma mop_braiding (X Y : C) : (β_ X Y).mop = β_ (mop Y) (mop X) := rfl
-
-@[simp] lemma unmop_braiding (X Y : Cᴹᵒᵖ) : (β_ X Y).unmop = β_ (unmop Y) (unmop X) := rfl
-
-@[simp] lemma mop_hom_braiding (X Y : C) : (β_ X Y).hom.mop = (β_ (mop Y) (mop X)).hom := rfl
-
-@[simp]
-lemma unmop_hom_braiding (X Y : Cᴹᵒᵖ) : (β_ X Y).hom.unmop = (β_ (unmop Y) (unmop X)).hom := rfl
-
-@[simp] lemma mop_inv_braiding (X Y : C) : (β_ X Y).inv.mop = (β_ (mop Y) (mop X)).inv := rfl
-
-@[simp]
-lemma unmop_inv_braiding (X Y : Cᴹᵒᵖ) : (β_ X Y).inv.unmop = (β_ (unmop Y) (unmop X)).inv := rfl
-
 end MonoidalOppositeLemmas
 
 instance : (mopFunctor C).Monoidal :=
@@ -716,29 +657,11 @@ instance : (mopFunctor C).Monoidal :=
       μIso := fun X Y ↦ β_ (mop X) (mop Y)
       associativity := fun X Y Z ↦ by simp [← yang_baxter_assoc] }
 
-@[simp] lemma mopFunctor_ε : ε (mopFunctor C) = 𝟙 _ := rfl
-
-@[simp] lemma mopFunctor_η : η (mopFunctor C) = 𝟙 _ := rfl
-
-@[simp] lemma mopFunctor_μ (X Y : C) : μ (mopFunctor C) X Y = (β_ (mop X) (mop Y)).hom := rfl
-
-@[simp] lemma mopFunctor_δ (X Y : C) : δ (mopFunctor C) X Y = (β_ (mop X) (mop Y)).inv := rfl
-
 instance : (unmopFunctor C).Monoidal :=
   Functor.CoreMonoidal.toMonoidal
     { εIso := Iso.refl _
       μIso := fun X Y ↦ β_ (unmop X) (unmop Y)
       associativity := fun X Y Z ↦ by simp [← yang_baxter_assoc] }
-
-@[simp] lemma unmopFunctor_ε : ε (unmopFunctor C) = 𝟙 _ := rfl
-
-@[simp] lemma unmopFunctor_η : η (unmopFunctor C) = 𝟙 _ := rfl
-
-@[simp] lemma unmopFunctor_μ (X Y : Cᴹᵒᵖ) :
-    μ (unmopFunctor C) X Y = (β_ (unmop X) (unmop Y)).hom := rfl
-
-@[simp] lemma unmopFunctor_δ (X Y : Cᴹᵒᵖ) :
-    δ (unmopFunctor C) X Y = (β_ (unmop X) (unmop Y)).inv := rfl
 
 instance : (mopFunctor C).Braided where
 

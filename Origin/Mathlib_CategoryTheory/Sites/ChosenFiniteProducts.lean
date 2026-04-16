@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Limits
 import Mathlib.CategoryTheory.ChosenFiniteProducts.FunctorCategory
 
+noncomputable section
+
 /-!
 # Chosen finite products on sheaves
 
@@ -73,27 +75,9 @@ noncomputable instance chosenFiniteProducts : ChosenFiniteProducts (Sheaf J A) w
             apply Sheaf.hom_ext
             exact ChosenFiniteProducts.toUnit_unique f.val _} }
 
-@[simp]
-lemma chosenFiniteProducts_fst_val : (ChosenFiniteProducts.fst X Y).val =
-    ChosenFiniteProducts.fst X.val Y.val := rfl
-
-@[simp]
-lemma chosenFiniteProducts_snd_val : (ChosenFiniteProducts.snd X Y).val =
-    ChosenFiniteProducts.snd X.val Y.val := rfl
-
 variable {X Y}
 
 variable {W : Sheaf J A} (f : W ⟶ X) (g : W ⟶ Y)
-
-@[simp]
-lemma chosenFiniteProducts_lift_val : (ChosenFiniteProducts.lift f g).val =
-    ChosenFiniteProducts.lift f.val g.val := rfl
-
-@[simp]
-lemma chosenFiniteProducts_whiskerLeft_val : (X ◁ f).val = (X.val ◁ f.val) := rfl
-
-@[simp]
-lemma chosenFiniteProducts_whiskerRight_val : (f ▷ X).val = (f.val ▷ X.val) := rfl
 
 end Sheaf
 
@@ -104,18 +88,6 @@ noncomputable instance sheafToPresheafMonoidal : (sheafToPresheaf J A).Monoidal 
 
 open Functor.LaxMonoidal Functor.OplaxMonoidal
 
-@[simp]
-lemma sheafToPresheaf_ε : ε (sheafToPresheaf J A) = 𝟙 _ := rfl
-
-@[simp]
-lemma sheafToPresheaf_η : η (sheafToPresheaf J A) = 𝟙 _ := rfl
-
 variable {J}
-
-@[simp]
-lemma sheafToPresheaf_μ (X Y : Sheaf J A) : μ (sheafToPresheaf J A) X Y = 𝟙 _ := rfl
-
-@[simp]
-lemma sheafToPresheaf_δ (X Y : Sheaf J A) : δ (sheafToPresheaf J A) X Y = 𝟙 _ := rfl
 
 end CategoryTheory

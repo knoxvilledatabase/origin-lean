@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.LocalExtr.Basic
 import Mathlib.Topology.Order.Rolle
 
+noncomputable section
+
 /-!
 # Rolle's Theorem
 

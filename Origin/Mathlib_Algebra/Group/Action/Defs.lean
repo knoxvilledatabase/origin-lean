@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Action/Defs.lean
-Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
+Genuine: 48 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
@@ -10,6 +10,8 @@ import Mathlib.Logic.Embedding.Basic
 import Mathlib.Logic.Function.Iterate
 import Mathlib.Logic.Nontrivial.Basic
 import Mathlib.Tactic.Spread
+
+noncomputable section
 
 /-!
 # Definitions of group actions
@@ -87,34 +89,6 @@ export AddAction (add_vadd)
 export SMulCommClass (smul_comm)
 
 export VAddCommClass (vadd_comm)
-
-library_note "bundled maps over different rings"/--
-
-Frequently, we find ourselves wanting to express a bilinear map `M →ₗ[R] N →ₗ[R] P` or an
-
-equivalence between maps `(M →ₗ[R] N) ≃ₗ[R] (M' →ₗ[R] N')` where the maps have an associated ring
-
-`R`. Unfortunately, using definitions like these requires that `R` satisfy `CommSemiring R`, and
-
-not just `Semiring R`. Using `M →ₗ[R] N →+ P` and `(M →ₗ[R] N) ≃+ (M' →ₗ[R] N')` avoids this
-
-problem, but throws away structure that is useful for when we _do_ have a commutative (semi)ring.
-
-To avoid making this compromise, we instead state these definitions as `M →ₗ[R] N →ₗ[S] P` or
-
-`(M →ₗ[R] N) ≃ₗ[S] (M' →ₗ[R] N')` and require `SMulCommClass S R` on the appropriate modules. When
-
-the caller has `CommSemiring R`, they can set `S = R` and `smulCommClass_self` will populate the
-
-instance. If the caller only has `Semiring R` they can still set either `R = ℕ` or `S = ℕ`, and
-
-`AddCommMonoid.nat_smulCommClass` or `AddCommMonoid.nat_smulCommClass'` will populate
-
-the typeclass, which is still sufficient to recover a `≃+` or `→+` structure.
-
-An example of where this is used is `LinearMap.prod_equiv`.
-
--/
 
 @[to_additive]
 lemma SMulCommClass.symm (M N α : Type*) [SMul M α] [SMul N α] [SMulCommClass M N α] :
@@ -410,9 +384,6 @@ variable (M α) in
 "Embedding of `α` into functions `M → α` induced by an additive action of `M` on `α`."]
 def toFun : α ↪ M → α :=
   ⟨fun y x ↦ x • y, fun y₁ y₂ H ↦ one_smul M y₁ ▸ one_smul M y₂ ▸ by convert congr_fun H 1⟩
-
-@[to_additive (attr := simp)]
-lemma toFun_apply (x : M) (y : α) : MulAction.toFun M α y x = x • y := rfl
 
 end MulAction
 

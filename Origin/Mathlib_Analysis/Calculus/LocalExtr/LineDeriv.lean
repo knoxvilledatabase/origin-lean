@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.LocalExtr.Basic
 import Mathlib.Analysis.Calculus.LineDeriv.Basic
 
+noncomputable section
+
 /-!
 # Local extremum and line derivatives
 

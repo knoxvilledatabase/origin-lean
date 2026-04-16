@@ -1,6 +1,6 @@
 /-
 Extracted from Tactic/Positivity/Basic.lean
-Genuine: 39 | Conflates: 1 | Dissolved: 6 | Infrastructure: 0
+Genuine: 50 | Conflates: 1 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.PosPart
@@ -11,6 +11,8 @@ import Mathlib.Data.NNRat.Defs
 import Mathlib.Data.PNat.Defs
 import Mathlib.Tactic.Positivity.Core
 import Qq
+
+noncomputable section
 
 /-!
 ## `positivity` core extensions
@@ -40,11 +42,15 @@ private lemma ite_nonneg_of_pos_of_nonneg [Preorder α] (ha : 0 < a) (hb : 0 ≤
 private lemma ite_nonneg_of_nonneg_of_pos [Preorder α] (ha : 0 ≤ a) (hb : 0 < b) : 0 ≤ ite p a b :=
   ite_nonneg _ ha hb.le
 
--- DISSOLVED: ite_ne_zero
+private lemma ite_ne_zero (ha : a ≠ 0) (hb : b ≠ 0) : ite p a b ≠ 0 := by by_cases p <;> simp [*]
 
--- DISSOLVED: ite_ne_zero_of_pos_of_ne_zero
+private lemma ite_ne_zero_of_pos_of_ne_zero [Preorder α] (ha : 0 < a) (hb : b ≠ 0) :
+    ite p a b ≠ 0 :=
+  ite_ne_zero _ ha.ne' hb
 
--- DISSOLVED: ite_ne_zero_of_ne_zero_of_pos
+private lemma ite_ne_zero_of_ne_zero_of_pos [Preorder α] (ha : a ≠ 0) (hb : 0 < b) :
+    ite p a b ≠ 0 :=
+  ite_ne_zero _ ha hb.ne'
 
 end ite
 
@@ -174,9 +180,13 @@ private theorem mul_nonneg_of_nonneg_of_pos [OrderedSemiring α] {a b : α}
     (ha : 0 ≤ a) (hb : 0 < b) : 0 ≤ a * b :=
   mul_nonneg ha hb.le
 
--- DISSOLVED: mul_ne_zero_of_ne_zero_of_pos
+private theorem mul_ne_zero_of_ne_zero_of_pos [OrderedSemiring α] [NoZeroDivisors α]
+    {a b : α} (ha : a ≠ 0) (hb : 0 < b) : a * b ≠ 0 :=
+  mul_ne_zero ha (ne_of_gt hb)
 
--- DISSOLVED: mul_ne_zero_of_pos_of_ne_zero
+private theorem mul_ne_zero_of_pos_of_ne_zero [OrderedSemiring α] [NoZeroDivisors α]
+    {a b : α} (ha : 0 < a) (hb : b ≠ 0) : a * b ≠ 0 :=
+  mul_ne_zero (ne_of_gt ha) hb
 
 @[positivity _ * _] def evalMul : PositivityExt where eval {u α} zα pα e := do
   let .app (.app (f : Q($α → $α → $α)) (a : Q($α))) (b : Q($α)) ← withReducible (whnf e)
@@ -285,7 +295,8 @@ def evalPow : PositivityExt where eval {u α} zα pα e := do
     | .nonzero pa => ofNonzero pa (← synthInstanceQ (_ : Q(Type u)))
     | .none => pure .none
 
--- DISSOLVED: abs_pos_of_ne_zero
+private theorem abs_pos_of_ne_zero {α : Type*} [AddGroup α] [LinearOrder α]
+    [AddLeftMono α] {a : α} : a ≠ 0 → 0 < |a| := abs_pos.mpr
 
 @[positivity |_|]
 def evalAbs : PositivityExt where eval {u} (α : Q(Type u)) zα pα (e : Q($α)) := do

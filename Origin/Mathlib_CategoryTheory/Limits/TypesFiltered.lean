@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.CategoryTheory.Filtered.Basic
 
+noncomputable section
+
 /-!
 # Filtered colimits in the category of types.
 

@@ -5,6 +5,8 @@ Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.CategoryTheory.Idempotents.Karoubi
 
+noncomputable section
+
 /-!
 # Idempotence of the Karoubi envelope
 
@@ -45,6 +47,7 @@ def unitIso : 𝟭 (Karoubi C) ≅ toKaroubi (Karoubi C) ⋙ inverse C :=
   eqToIso (Functor.ext (by aesop_cat) (by aesop_cat))
 
 attribute [local simp] p_comm_f in
+/-- The counit isomorphism of the equivalence -/
 
 @[simps]
 def counitIso : inverse C ⋙ toKaroubi (Karoubi C) ≅ 𝟭 (Karoubi (Karoubi C)) where

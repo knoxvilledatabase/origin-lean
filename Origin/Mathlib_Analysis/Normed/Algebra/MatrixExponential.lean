@@ -10,6 +10,8 @@ import Mathlib.LinearAlgebra.Matrix.Hermitian
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Topology.UniformSpace.Matrix
 
+noncomputable section
+
 /-!
 # Lemmas about the matrix exponential
 

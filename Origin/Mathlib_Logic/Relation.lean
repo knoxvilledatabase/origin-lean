@@ -9,6 +9,8 @@ import Mathlib.Tactic.Use
 import Mathlib.Tactic.MkIffOfInductiveProp
 import Mathlib.Tactic.SimpRw
 
+noncomputable section
+
 /-!
 # Relation closures
 
@@ -169,8 +171,6 @@ variable {r : α → β → Prop} {f : α → γ} {g : β → δ} {c : γ} {d : 
 
 protected def Map (r : α → β → Prop) (f : α → γ) (g : β → δ) : γ → δ → Prop := fun c d ↦
   ∃ a b, r a b ∧ f a = c ∧ g b = d
-
-lemma map_apply : Relation.Map r f g c d ↔ ∃ a b, r a b ∧ f a = c ∧ g b = d := Iff.rfl
 
 @[simp] lemma map_map (r : α → β → Prop) (f₁ : α → γ) (g₁ : β → δ) (f₂ : γ → ε) (g₂ : δ → ζ) :
     Relation.Map (Relation.Map r f₁ g₁) f₂ g₂ = Relation.Map r (f₂ ∘ f₁) (g₂ ∘ g₁) := by

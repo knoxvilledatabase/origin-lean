@@ -5,6 +5,8 @@ Genuine: 37 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Data.Fin.Tuple.Basic
 
+noncomputable section
+
 /-!
 # Matrix and vector notation
 
@@ -51,11 +53,8 @@ def vecCons {n : ℕ} (h : α) (t : Fin n → α) : Fin n.succ → α :=
 syntax (name := vecNotation) "![" term,* "]" : term
 
 macro_rules
-
   | `(![$term:term, $terms:term,*]) => `(vecCons $term ![$terms,*])
-
   | `(![$term:term]) => `(vecCons $term ![])
-
   | `(![]) => `(vecEmpty)
 
 @[app_unexpander vecCons]
@@ -93,17 +92,6 @@ theorem empty_eq (v : Fin 0 → α) : v = ![] :=
 section Val
 
 @[simp]
-theorem head_fin_const (a : α) : (vecHead fun _ : Fin (n + 1) => a) = a :=
-  rfl
-
-@[simp]
-theorem cons_val_zero (x : α) (u : Fin m → α) : vecCons x u 0 = x :=
-  rfl
-
-theorem cons_val_zero' (h : 0 < m.succ) (x : α) (u : Fin m → α) : vecCons x u ⟨0, h⟩ = x :=
-  rfl
-
-@[simp]
 theorem cons_val_succ (x : α) (u : Fin m → α) (i : Fin m) : vecCons x u i.succ = u i := by
   simp [vecCons]
 
@@ -111,10 +99,6 @@ theorem cons_val_succ (x : α) (u : Fin m → α) (i : Fin m) : vecCons x u i.su
 theorem cons_val_succ' {i : ℕ} (h : i.succ < m.succ) (x : α) (u : Fin m → α) :
     vecCons x u ⟨i.succ, h⟩ = u ⟨i, Nat.lt_of_succ_lt_succ h⟩ := by
   simp only [vecCons, Fin.cons, Fin.cases_succ']
-
-@[simp]
-theorem head_cons (x : α) (u : Fin m → α) : vecHead (vecCons x u) = x :=
-  rfl
 
 @[simp]
 theorem tail_cons (x : α) (u : Fin m → α) : vecTail (vecCons x u) = u := by
@@ -151,24 +135,6 @@ theorem vecCons_const (a : α) : (vecCons a fun _ : Fin n => a) = fun _ => a :=
 theorem vec_single_eq_const (a : α) : ![a] = fun _ => a :=
   let _ : Unique (Fin 1) := inferInstance
   funext <| Unique.forall_iff.2 rfl
-
-@[simp]
-theorem cons_val_one (x : α) (u : Fin m.succ → α) : vecCons x u 1 = vecHead u :=
-  rfl
-
-@[simp]
-theorem cons_val_two (x : α) (u : Fin m.succ.succ → α) : vecCons x u 2 = vecHead (vecTail u) :=
-  rfl
-
-@[simp]
-lemma cons_val_three (x : α) (u : Fin m.succ.succ.succ → α) :
-    vecCons x u 3 = vecHead (vecTail (vecTail u)) :=
-  rfl
-
-@[simp]
-lemma cons_val_four (x : α) (u : Fin m.succ.succ.succ.succ → α) :
-    vecCons x u 4 = vecHead (vecTail (vecTail (vecTail u))) :=
-  rfl
 
 @[simp]
 theorem cons_val_fin_one (x : α) (u : Fin 0 → α) : ∀ (i : Fin 1), vecCons x u i = x := by
@@ -274,11 +240,6 @@ theorem vecAlt1_vecAppend (v : Fin (n + 1) → α) :
         Nat.mod_eq_sub_mod h, show 1 % (n + 2) = 1 from Nat.mod_eq_of_lt (by omega)]
       refine (Nat.mod_eq_of_lt ?_).symm
       omega
-
-@[simp]
-theorem vecHead_vecAlt0 (hm : m + 2 = n + 1 + (n + 1)) (v : Fin (m + 2) → α) :
-    vecHead (vecAlt0 hm v) = v 0 :=
-  rfl
 
 @[simp]
 theorem vecHead_vecAlt1 (hm : m + 2 = n + 1 + (n + 1)) (v : Fin (m + 2) → α) :

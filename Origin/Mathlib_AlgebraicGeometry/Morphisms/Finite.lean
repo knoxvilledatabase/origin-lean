@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Integral
 import Mathlib.Algebra.Category.Ring.Epi
 
+noncomputable section
+
 /-!
 
 # Finite morphisms of schemes

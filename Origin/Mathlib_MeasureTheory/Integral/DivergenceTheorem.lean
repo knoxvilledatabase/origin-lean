@@ -10,6 +10,8 @@ import Mathlib.Analysis.Calculus.FDeriv.Equiv
 import Mathlib.MeasureTheory.Integral.Prod
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 
+noncomputable section
+
 /-!
 # Divergence theorem for Bochner integral
 

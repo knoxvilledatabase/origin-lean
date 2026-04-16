@@ -1,9 +1,11 @@
 /-
 Extracted from SetTheory/Cardinal/Continuum.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 3 | Infrastructure: 2
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.SetTheory.Cardinal.Arithmetic
+
+noncomputable section
 
 /-!
 # Cardinality of continuum
@@ -67,12 +69,11 @@ theorem beth_one : ℶ_ 1 = 𝔠 := by simpa using beth_succ 0
 theorem nat_lt_continuum (n : ℕ) : ↑n < 𝔠 :=
   (nat_lt_aleph0 n).trans aleph0_lt_continuum
 
-theorem mk_set_nat : #(Set ℕ) = 𝔠 := by simp
-
 theorem continuum_pos : 0 < 𝔠 :=
   nat_lt_continuum 0
 
--- DISSOLVED: continuum_ne_zero
+theorem continuum_ne_zero : 𝔠 ≠ 0 :=
+  continuum_pos.ne'
 
 theorem aleph_one_le_continuum : ℵ₁ ≤ 𝔠 := by
   rw [← succ_aleph0]
@@ -134,9 +135,13 @@ theorem continuum_mul_aleph0 : 𝔠 * ℵ₀ = 𝔠 :=
 theorem aleph0_mul_continuum : ℵ₀ * 𝔠 = 𝔠 :=
   (mul_comm _ _).trans continuum_mul_aleph0
 
--- DISSOLVED: nat_mul_continuum
+@[simp]
+theorem nat_mul_continuum {n : ℕ} (hn : n ≠ 0) : ↑n * 𝔠 = 𝔠 :=
+  mul_eq_right aleph0_le_continuum (nat_lt_continuum n).le (Nat.cast_ne_zero.2 hn)
 
--- DISSOLVED: continuum_mul_nat
+@[simp]
+theorem continuum_mul_nat {n : ℕ} (hn : n ≠ 0) : 𝔠 * n = 𝔠 :=
+  (mul_comm _ _).trans (nat_mul_continuum hn)
 
 @[simp]
 theorem ofNat_mul_continuum {n : ℕ} [Nat.AtLeastTwo n] : no_index (OfNat.ofNat n) * 𝔠 = 𝔠 :=

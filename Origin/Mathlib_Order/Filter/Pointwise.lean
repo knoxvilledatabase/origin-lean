@@ -1,6 +1,6 @@
 /-
 Extracted from Order/Filter/Pointwise.lean
-Genuine: 137 | Conflates: 0 | Dissolved: 6 | Infrastructure: 44
+Genuine: 143 | Conflates: 0 | Dissolved: 0 | Infrastructure: 44
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.OrderIso
 import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Order.Filter.NAry
 import Mathlib.Order.Filter.Ultrafilter
+
+noncomputable section
 
 /-!
 # Pointwise operations on filters
@@ -102,10 +104,6 @@ theorem one_neBot : (1 : Filter α).NeBot :=
 scoped[Pointwise] attribute [instance] one_neBot zero_neBot
 
 @[to_additive (attr := simp)]
-protected theorem map_one' (f : α → β) : (1 : Filter α).map f = pure (f 1) :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem le_one_iff : f ≤ 1 ↔ (1 : Set α) ∈ f :=
   le_pure_iff
 
@@ -128,14 +126,6 @@ theorem one_prod_one [One β] : (1 : Filter α) ×ˢ (1 : Filter β) = 1 :=
 @[to_additive "`pure` as a `ZeroHom`."]
 def pureOneHom : OneHom α (Filter α) where
   toFun := pure; map_one' := pure_one
-
-@[to_additive (attr := simp)]
-theorem coe_pureOneHom : (pureOneHom : α → Filter α) = pure :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem pureOneHom_apply (a : α) : pureOneHom a = pure a :=
-  rfl
 
 variable [One β]
 
@@ -238,10 +228,6 @@ protected def instMul : Mul (Filter α) :=
 
 scoped[Pointwise] attribute [instance] Filter.instMul Filter.instAdd
 
-@[to_additive (attr := simp)]
-theorem map₂_mul : map₂ (· * ·) f g = f * g :=
-  rfl
-
 @[to_additive]
 theorem mem_mul : s ∈ f * g ↔ ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ * t₂ ⊆ s :=
   Iff.rfl
@@ -316,14 +302,6 @@ protected theorem map_mul [FunLike F α β] [MulHomClass F α β] (m : F) :
 def pureMulHom : α →ₙ* Filter α where
   toFun := pure; map_mul' _ _ := pure_mul_pure.symm
 
-@[to_additive (attr := simp)]
-theorem coe_pureMulHom : (pureMulHom : α → Filter α) = pure :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem pureMulHom_apply (a : α) : pureMulHom a = pure a :=
-  rfl
-
 end Mul
 
 /-! ### Filter subtraction/division -/
@@ -339,14 +317,6 @@ protected def instDiv : Div (Filter α) :=
   fun f g => { map₂ (· / ·) f g with sets := { s | ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ / t₂ ⊆ s } }⟩
 
 scoped[Pointwise] attribute [instance] Filter.instDiv Filter.instSub
-
-@[to_additive (attr := simp)]
-theorem map₂_div : map₂ (· / ·) f g = f / g :=
-  rfl
-
-@[to_additive]
-theorem mem_div : s ∈ f / g ↔ ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ / t₂ ⊆ s :=
-  Iff.rfl
 
 @[to_additive]
 theorem div_mem_div : s ∈ f → t ∈ g → s / t ∈ f / g :=
@@ -392,9 +362,6 @@ theorem pure_div : pure a / g = g.map (a / ·) :=
 @[to_additive (attr := simp)]
 theorem div_pure : f / pure b = f.map (· / b) :=
   map₂_pure_right
-
-@[to_additive]
-theorem pure_div_pure : (pure a : Filter α) / pure b = pure (a / b) := by simp
 
 @[to_additive]
 protected theorem div_le_div : f₁ ≤ f₂ → g₁ ≤ g₂ → f₁ / g₁ ≤ f₂ / g₂ :=
@@ -490,14 +457,6 @@ theorem Tendsto.mul_mul [MulHomClass F α β] (m : F) {f₁ g₁ : Filter α} {f
 def pureMonoidHom : α →* Filter α :=
   { pureMulHom, pureOneHom with }
 
-@[to_additive (attr := simp)]
-theorem coe_pureMonoidHom : (pureMonoidHom : α → Filter α) = pure :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem pureMonoidHom_apply (a : α) : pureMonoidHom a = pure a :=
-  rfl
-
 end MulOneClass
 
 section Monoid
@@ -541,7 +500,11 @@ theorem top_mul_of_one_le (hf : 1 ≤ f) : ⊤ * f = ⊤ := by
 theorem top_mul_top : (⊤ : Filter α) * ⊤ = ⊤ :=
   mul_top_of_one_le le_top
 
--- DISSOLVED: top_pow
+@[to_additive nsmul_top]
+theorem top_pow : ∀ {n : ℕ}, n ≠ 0 → (⊤ : Filter α) ^ n = ⊤
+  | 0 => fun h => (h rfl).elim
+  | 1 => fun _ => pow_one _
+  | n + 2 => fun _ => by rw [pow_succ, top_pow n.succ_ne_zero, top_mul_top]
 
 @[to_additive]
 protected theorem _root_.IsUnit.filter : IsUnit a → IsUnit (pure a : Filter α) :=
@@ -634,9 +597,15 @@ variable [MulZeroClass α] {f g : Filter α}
 
 /-! Note that `Filter` is not a `MulZeroClass` because `0 * ⊥ ≠ 0`. -/
 
--- DISSOLVED: NeBot.mul_zero_nonneg
+theorem NeBot.mul_zero_nonneg (hf : f.NeBot) : 0 ≤ f * 0 :=
+  le_mul_iff.2 fun _ h₁ _ h₂ =>
+    let ⟨_, ha⟩ := hf.nonempty_of_mem h₁
+    ⟨_, ha, _, h₂, mul_zero _⟩
 
--- DISSOLVED: NeBot.zero_mul_nonneg
+theorem NeBot.zero_mul_nonneg (hg : g.NeBot) : 0 ≤ 0 * g :=
+  le_mul_iff.2 fun _ h₁ _ h₂ =>
+    let ⟨_, hb⟩ := hg.nonempty_of_mem h₂
+    ⟨_, h₁, _, hb, zero_mul _⟩
 
 end MulZeroClass
 
@@ -699,9 +668,15 @@ section GroupWithZero
 
 variable [GroupWithZero α] {f g : Filter α}
 
--- DISSOLVED: NeBot.div_zero_nonneg
+theorem NeBot.div_zero_nonneg (hf : f.NeBot) : 0 ≤ f / 0 :=
+  Filter.le_div_iff.2 fun _ h₁ _ h₂ =>
+    let ⟨_, ha⟩ := hf.nonempty_of_mem h₁
+    ⟨_, ha, _, h₂, div_zero _⟩
 
--- DISSOLVED: NeBot.zero_div_nonneg
+theorem NeBot.zero_div_nonneg (hg : g.NeBot) : 0 ≤ 0 / g :=
+  Filter.le_div_iff.2 fun _ h₁ _ h₂ =>
+    let ⟨_, hb⟩ := hg.nonempty_of_mem h₂
+    ⟨_, h₁, _, hb, zero_div _⟩
 
 end GroupWithZero
 
@@ -720,14 +695,6 @@ protected def instSMul : SMul (Filter α) (Filter β) :=
   fun f g => { map₂ (· • ·) f g with sets := { s | ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ • t₂ ⊆ s } }⟩
 
 scoped[Pointwise] attribute [instance] Filter.instSMul Filter.instVAdd
-
-@[to_additive (attr := simp)]
-theorem map₂_smul : map₂ (· • ·) f g = f • g :=
-  rfl
-
-@[to_additive]
-theorem mem_smul : t ∈ f • g ↔ ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ • t₂ ⊆ t :=
-  Iff.rfl
 
 @[to_additive]
 theorem smul_mem_smul : s ∈ f → t ∈ g → s • t ∈ f • g :=
@@ -775,9 +742,6 @@ theorem smul_pure : f • pure b = f.map (· • b) :=
   map₂_pure_right
 
 @[to_additive]
-theorem pure_smul_pure : (pure a : Filter α) • (pure b : Filter β) = pure (a • b) := by simp
-
-@[to_additive]
 theorem smul_le_smul : f₁ ≤ f₂ → g₁ ≤ g₂ → f₁ • g₁ ≤ f₂ • g₂ :=
   map₂_mono
 
@@ -811,13 +775,6 @@ protected def instVSub : VSub (Filter α) (Filter β) :=
   fun f g => { map₂ (· -ᵥ ·) f g with sets := { s | ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ -ᵥ t₂ ⊆ s } }⟩
 
 scoped[Pointwise] attribute [instance] Filter.instVSub
-
-@[simp]
-theorem map₂_vsub : map₂ (· -ᵥ ·) f g = f -ᵥ g :=
-  rfl
-
-theorem mem_vsub {s : Set α} : s ∈ f -ᵥ g ↔ ∃ t₁ ∈ f, ∃ t₂ ∈ g, t₁ -ᵥ t₂ ⊆ s :=
-  Iff.rfl
 
 theorem vsub_mem_vsub : s ∈ f → t ∈ g → s -ᵥ t ∈ f -ᵥ g :=
   image2_mem_map₂
@@ -858,8 +815,6 @@ theorem pure_vsub : (pure a : Filter β) -ᵥ g = g.map (a -ᵥ ·) :=
 @[simp]
 theorem vsub_pure : f -ᵥ pure b = f.map (· -ᵥ b) :=
   map₂_pure_right
-
-theorem pure_vsub_pure : (pure a : Filter β) -ᵥ pure b = (pure (a -ᵥ b) : Filter α) := by simp
 
 theorem vsub_le_vsub : f₁ ≤ f₂ → g₁ ≤ g₂ → f₁ -ᵥ g₁ ≤ f₂ -ᵥ g₂ :=
   map₂_mono
@@ -1017,7 +972,10 @@ Note that we have neither `SMulWithZero α (Filter β)` nor `SMulWithZero (Filte
 because `0 * ⊥ ≠ 0`.
 -/
 
--- DISSOLVED: NeBot.smul_zero_nonneg
+theorem NeBot.smul_zero_nonneg (hf : f.NeBot) : 0 ≤ f • (0 : Filter β) :=
+  le_smul_iff.2 fun _ h₁ _ h₂ =>
+    let ⟨_, ha⟩ := hf.nonempty_of_mem h₁
+    ⟨_, ha, _, h₂, smul_zero _⟩
 
 theorem NeBot.zero_smul_nonneg (hg : g.NeBot) : 0 ≤ (0 : Filter α) • g :=
   le_smul_iff.2 fun _ h₁ _ h₂ =>

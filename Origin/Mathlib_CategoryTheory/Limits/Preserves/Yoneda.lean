@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Limits.Preserves.Ulift
 import Mathlib.CategoryTheory.Limits.FunctorToTypes
 
+noncomputable section
+
 /-!
 # Yoneda preserves certain colimits
 

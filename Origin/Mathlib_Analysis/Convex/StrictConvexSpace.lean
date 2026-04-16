@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Convex/StrictConvexSpace.lean
-Genuine: 19 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 20 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed
 import Mathlib.Analysis.Normed.Module.Ray
+
+noncomputable section
 
 /-!
 # Strictly convex spaces
@@ -86,7 +88,18 @@ theorem StrictConvexSpace.of_norm_combo_lt_one
   rwa [AffineMap.lineMap_apply_module, interior_closedBall (0 : E) one_ne_zero, mem_ball_zero_iff,
     sub_eq_iff_eq_add.2 hab.symm]
 
--- DISSOLVED: StrictConvexSpace.of_norm_combo_ne_one
+theorem StrictConvexSpace.of_norm_combo_ne_one
+    (h :
+      ∀ x y : E,
+        ‖x‖ = 1 → ‖y‖ = 1 → x ≠ y → ∃ a b : ℝ, 0 ≤ a ∧ 0 ≤ b ∧ a + b = 1 ∧ ‖a • x + b • y‖ ≠ 1) :
+    StrictConvexSpace ℝ E := by
+  refine StrictConvexSpace.of_strictConvex_closed_unit_ball ℝ
+    ((convex_closedBall _ _).strictConvex ?_)
+  simp only [interior_closedBall _ one_ne_zero, closedBall_diff_ball, Set.Pairwise,
+    frontier_closedBall _ one_ne_zero, mem_sphere_zero_iff_norm]
+  intro x hx y hy hne
+  rcases h x y hx hy hne with ⟨a, b, ha, hb, hab, hne'⟩
+  exact ⟨_, ⟨a, b, ha, hb, hab, rfl⟩, mt mem_sphere_zero_iff_norm.1 hne'⟩
 
 theorem StrictConvexSpace.of_norm_add_ne_two
     (h : ∀ ⦃x y : E⦄, ‖x‖ = 1 → ‖y‖ = 1 → x ≠ y → ‖x + y‖ ≠ 2) : StrictConvexSpace ℝ E := by

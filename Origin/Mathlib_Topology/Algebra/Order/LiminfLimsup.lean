@@ -13,6 +13,8 @@ import Mathlib.Order.LiminfLimsup
 import Mathlib.Topology.Algebra.Group.Basic
 import Mathlib.Topology.Order.Monotone
 
+noncomputable section
+
 /-!
 # Lemmas about liminf and limsup in an order topology.
 

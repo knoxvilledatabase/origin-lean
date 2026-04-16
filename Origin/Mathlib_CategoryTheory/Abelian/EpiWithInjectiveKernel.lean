@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.ShortExact
 import Mathlib.CategoryTheory.MorphismProperty.Composition
 
+noncomputable section
+
 /-!
 # Epimorphisms with an injective kernel
 

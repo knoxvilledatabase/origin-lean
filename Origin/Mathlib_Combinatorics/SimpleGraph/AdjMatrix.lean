@@ -1,12 +1,14 @@
 /-
 Extracted from Combinatorics/SimpleGraph/AdjMatrix.lean
-Genuine: 23 | Conflates: 4 | Dissolved: 2 | Infrastructure: 4
+Genuine: 23 | Conflates: 6 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.WalkCounting
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Symmetric
+
+noncomputable section
 
 /-!
 # Adjacency Matrices
@@ -57,9 +59,15 @@ variable {A : Matrix V V α}
 theorem apply_diag_ne [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) (i : V) :
     ¬A i i = 1 := by simp [h.apply_diag i]
 
--- DISSOLVED: apply_ne_one_iff
+-- CONFLATES (assumes ground = zero): apply_ne_one_iff
+@[simp]
+theorem apply_ne_one_iff [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) (i j : V) :
+    ¬A i j = 1 ↔ A i j = 0 := by obtain h | h := h.zero_or_one i j <;> simp [h]
 
--- DISSOLVED: apply_ne_zero_iff
+-- CONFLATES (assumes ground = zero): apply_ne_zero_iff
+@[simp]
+theorem apply_ne_zero_iff [MulZeroOneClass α] [Nontrivial α] (h : IsAdjMatrix A) (i j : V) :
+    ¬A i j = 0 ↔ A i j = 1 := by rw [← apply_ne_one_iff h, Classical.not_not]
 
 -- CONFLATES (assumes ground = zero): toGraph
 @[simps]
@@ -216,9 +224,6 @@ theorem adjMatrix_mul_self_apply_self [NonAssocSemiring α] (i : V) :
     (G.adjMatrix α * G.adjMatrix α) i i = degree G i := by simp [filter_true_of_mem]
 
 variable {G}
-
-theorem adjMatrix_mulVec_const_apply [NonAssocSemiring α] {a : α} {v : V} :
-    (G.adjMatrix α *ᵥ Function.const _ a) v = G.degree v * a := by simp
 
 theorem adjMatrix_mulVec_const_apply_of_regular [NonAssocSemiring α] {d : ℕ} {a : α}
     (hd : G.IsRegularOfDegree d) {v : V} : (G.adjMatrix α *ᵥ Function.const _ a) v = d * a := by

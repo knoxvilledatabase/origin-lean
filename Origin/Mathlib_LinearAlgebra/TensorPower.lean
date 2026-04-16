@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.PiTensorProduct
 import Mathlib.Logic.Equiv.Fin
 import Mathlib.Algebra.DirectSum.Algebra
 
+noncomputable section
+
 /-!
 # Tensor power of a semimodule over a commutative semiring
 
@@ -34,6 +36,8 @@ abbrev TensorPower (R : Type*) (n : ℕ) (M : Type*) [CommSemiring R] [AddCommMo
   ⨂[R] _ : Fin n, M
 
 variable {R : Type*} {M : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M]
+
+@[inherit_doc] scoped[TensorProduct] notation:max "⨂[" R "]^" n:arg => TensorPower R n
 
 namespace PiTensorProduct
 
@@ -239,10 +243,6 @@ instance galgebra : DirectSum.GAlgebra R fun i => ⨂[R]^i M where
   smul_def r x := gradedMonoid_eq_of_cast (zero_add x.fst).symm (by
     rw [← LinearEquiv.eq_symm_apply, cast_symm]
     exact (algebraMap₀_mul r x.snd).symm)
-
-theorem galgebra_toFun_def (r : R) :
-    DirectSum.GAlgebra.toFun (A := fun i ↦ ⨂[R]^i M) r = algebraMap₀ r :=
-  rfl
 
 example : Algebra R (⨁ n : ℕ, ⨂[R]^n M) := by infer_instance
 

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/GCDMonoid/Basic.lean
-Genuine: 126 | Conflates: 0 | Dissolved: 5 | Infrastructure: 24
+Genuine: 131 | Conflates: 0 | Dissolved: 0 | Infrastructure: 24
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.Algebra.Ring.Regular
+
+noncomputable section
 
 /-!
 # Monoids with normalization functions, `gcd`, and `lcm`
@@ -62,7 +64,15 @@ divisibility, gcd, lcm, normalize
 
 variable {α : Type*}
 
--- DISSOLVED: NormalizationMonoid
+class NormalizationMonoid (α : Type*) [CancelCommMonoidWithZero α] where
+  /-- `normUnit` assigns to each element of the monoid a unit of the monoid. -/
+  normUnit : α → αˣ
+  /-- The proposition that `normUnit` maps `0` to the identity. -/
+  normUnit_zero : normUnit 0 = 1
+  /-- The proposition that `normUnit` respects multiplication of non-zero elements. -/
+  normUnit_mul : ∀ {a b}, a ≠ 0 → b ≠ 0 → normUnit (a * b) = normUnit a * normUnit b
+  /-- The proposition that `normUnit` maps units to their inverses. -/
+  normUnit_coe_units : ∀ u : αˣ, normUnit u = u⁻¹
 
 export NormalizationMonoid (normUnit normUnit_zero normUnit_mul normUnit_coe_units)
 
@@ -340,8 +350,6 @@ theorem gcd_one_left [NormalizedGCDMonoid α] (a : α) : gcd 1 a = 1 :=
 theorem isUnit_gcd_one_left [GCDMonoid α] (a : α) : IsUnit (gcd 1 a) :=
   isUnit_of_dvd_one (gcd_dvd_left _ _)
 
-theorem gcd_one_left' [GCDMonoid α] (a : α) : Associated (gcd 1 a) 1 := by simp
-
 @[simp]
 theorem gcd_one_right [NormalizedGCDMonoid α] (a : α) : gcd a 1 = 1 :=
   dvd_antisymm_of_normalize_eq (normalize_gcd _ _) normalize_one (gcd_dvd_right _ _) (one_dvd _)
@@ -349,8 +357,6 @@ theorem gcd_one_right [NormalizedGCDMonoid α] (a : α) : gcd a 1 = 1 :=
 @[simp]
 theorem isUnit_gcd_one_right [GCDMonoid α] (a : α) : IsUnit (gcd a 1) :=
   isUnit_of_dvd_one (gcd_dvd_right _ _)
-
-theorem gcd_one_right' [GCDMonoid α] (a : α) : Associated (gcd a 1) 1 := by simp
 
 theorem gcd_dvd_gcd [GCDMonoid α] {a b c d : α} (hab : a ∣ b) (hcd : c ∣ d) : gcd a c ∣ gcd b d :=
   dvd_gcd ((gcd_dvd_left _ _).trans hab) ((gcd_dvd_right _ _).trans hcd)
@@ -488,7 +494,30 @@ theorem gcd_pow_left_dvd_pow_gcd [GCDMonoid α] {a b : α} {k : ℕ} : gcd (a ^ 
     _ ∣ gcd b a ^ k := gcd_pow_right_dvd_pow_gcd
     _ ∣ gcd a b ^ k := pow_dvd_pow_of_dvd (gcd_comm' _ _).dvd _
 
--- DISSOLVED: pow_dvd_of_mul_eq_pow
+theorem pow_dvd_of_mul_eq_pow [GCDMonoid α] {a b c d₁ d₂ : α} (ha : a ≠ 0) (hab : IsUnit (gcd a b))
+    {k : ℕ} (h : a * b = c ^ k) (hc : c = d₁ * d₂) (hd₁ : d₁ ∣ a) : d₁ ^ k ≠ 0 ∧ d₁ ^ k ∣ a := by
+  have h1 : IsUnit (gcd (d₁ ^ k) b) := by
+    apply isUnit_of_dvd_one
+    trans gcd d₁ b ^ k
+    · exact gcd_pow_left_dvd_pow_gcd
+    · apply IsUnit.dvd
+      apply IsUnit.pow
+      apply isUnit_of_dvd_one
+      apply dvd_trans _ hab.dvd
+      apply gcd_dvd_gcd hd₁ (dvd_refl b)
+  have h2 : d₁ ^ k ∣ a * b := by
+    use d₂ ^ k
+    rw [h, hc]
+    exact mul_pow d₁ d₂ k
+  rw [mul_comm] at h2
+  have h3 : d₁ ^ k ∣ a := by
+    apply (dvd_gcd_mul_of_dvd_mul h2).trans
+    rw [h1.mul_left_dvd]
+  have h4 : d₁ ^ k ≠ 0 := by
+    intro hdk
+    rw [hdk] at h3
+    apply absurd (zero_dvd_iff.mp h3) ha
+  exact ⟨h4, h3⟩
 
 theorem exists_associated_pow_of_mul_eq_pow [GCDMonoid α] {a b c : α} (hab : IsUnit (gcd a b))
     {k : ℕ} (h : a * b = c ^ k) : ∃ d : α, Associated (d ^ k) a := by
@@ -547,7 +576,13 @@ theorem gcd_greatest_associated {α : Type*} [CancelCommMonoidWithZero α] [GCDM
   haveI h := hd _ (GCDMonoid.gcd_dvd_left a b) (GCDMonoid.gcd_dvd_right a b)
   associated_of_dvd_dvd (GCDMonoid.dvd_gcd hda hdb) h
 
--- DISSOLVED: isUnit_gcd_of_eq_mul_gcd
+theorem isUnit_gcd_of_eq_mul_gcd {α : Type*} [CancelCommMonoidWithZero α] [GCDMonoid α]
+    {x y x' y' : α} (ex : x = gcd x y * x') (ey : y = gcd x y * y') (h : gcd x y ≠ 0) :
+    IsUnit (gcd x' y') := by
+  rw [← associated_one_iff_isUnit]
+  refine Associated.of_mul_left ?_ (Associated.refl <| gcd x y) h
+  convert (gcd_mul_left' (gcd x y) x' y').symm using 1
+  rw [← ex, ← ey, mul_one]
 
 theorem extract_gcd {α : Type*} [CancelCommMonoidWithZero α] [GCDMonoid α] (x y : α) :
     ∃ x' y', x = gcd x y * x' ∧ y = gcd x y * y' ∧ IsUnit (gcd x' y') := by
@@ -792,10 +827,6 @@ instance subsingleton_normalizedGCDMonoid_of_unique_units : Subsingleton (Normal
     have := Subsingleton.elim a_norm b_norm
     subst this
     rfl⟩
-
-@[simp]
-theorem normUnit_eq_one (x : α) : normUnit x = 1 :=
-  rfl
 
 @[simp]
 theorem normalize_eq (x : α) : normalize x = x :=
@@ -1230,9 +1261,10 @@ instance (priority := 100) : NormalizedGCDMonoid G₀ where
   normalize_gcd a b := if h : a = 0 ∧ b = 0 then by simp [if_pos h] else by simp [if_neg h]
   normalize_lcm a b := if h : a = 0 ∨ b = 0 then by simp [if_pos h] else by simp [if_neg h]
 
--- DISSOLVED: coe_normUnit
+@[simp]
+theorem coe_normUnit {a : G₀} (h0 : a ≠ 0) : (↑(normUnit a) : G₀) = a⁻¹ := by simp [normUnit, h0]
 
--- DISSOLVED: normalize_eq_one
+theorem normalize_eq_one {a : G₀} (h0 : a ≠ 0) : normalize a = 1 := by simp [normalize_apply, h0]
 
 end CommGroupWithZero
 
@@ -1254,11 +1286,5 @@ instance instGCDMonoid : GCDMonoid (Associates α) where
     exact Quotient.sound <| gcd_mul_lcm _ _
   lcm_zero_left := by rintro ⟨a⟩; exact congr_arg Associates.mk <| lcm_zero_left _
   lcm_zero_right := by rintro ⟨a⟩; exact congr_arg Associates.mk <| lcm_zero_right _
-
-theorem gcd_mk_mk {a b : α} : gcd (Associates.mk a) (Associates.mk b) = Associates.mk (gcd a b) :=
-  rfl
-
-theorem lcm_mk_mk {a b : α} : lcm (Associates.mk a) (Associates.mk b) = Associates.mk (lcm a b) :=
-  rfl
 
 end Associates

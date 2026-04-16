@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Hom
 import Mathlib.Algebra.Module.Prod
 
+noncomputable section
+
 /-!
 # The R-algebra structure on products of R-algebras
 
@@ -69,9 +71,6 @@ def prod (f : A →ₐ[R] B) (g : A →ₐ[R] C) : A →ₐ[R] B × C :=
     commutes' := fun r => by
       simp only [toRingHom_eq_coe, RingHom.toFun_eq_coe, RingHom.prod_apply, coe_toRingHom,
         commutes, Prod.algebraMap_apply] }
-
-theorem coe_prod (f : A →ₐ[R] B) (g : A →ₐ[R] C) : ⇑(f.prod g) = Pi.prod f g :=
-  rfl
 
 @[simp]
 theorem fst_prod (f : A →ₐ[R] B) (g : A →ₐ[R] C) : (fst R B C).comp (prod f g) = f := by ext; rfl

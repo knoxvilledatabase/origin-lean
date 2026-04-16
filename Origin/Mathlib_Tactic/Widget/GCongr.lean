@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Widget.SelectPanelUtils
 import Mathlib.Tactic.GCongr
 
+noncomputable section
+
 /-! # GCongr widget
 
 This file defines a `gcongr?` tactic that displays a widget panel allowing to generate
@@ -56,9 +58,6 @@ def GCongrSelectionPanel : Component SelectInsertParams :=
 open scoped Json in
 
 elab stx:"gcongr?" : tactic => do
-
   let some replaceRange := (← getFileMap).rangeOfStx? stx | return
-
   Widget.savePanelWidgetInfo GCongrSelectionPanel.javascriptHash
-
     (pure <| json% { replaceRange: $(replaceRange) }) stx

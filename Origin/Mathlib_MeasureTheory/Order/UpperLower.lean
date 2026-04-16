@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Order.UpperLower
 import Mathlib.MeasureTheory.Covering.BesicovitchVectorSpace
 import Mathlib.Topology.Order.DenselyOrdered
 
+noncomputable section
+
 /-!
 # Order-connected sets are null-measurable
 

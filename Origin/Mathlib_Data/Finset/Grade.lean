@@ -9,6 +9,8 @@ import Mathlib.Order.Atoms
 import Mathlib.Order.Grade
 import Mathlib.Order.Nat
 
+noncomputable section
+
 /-!
 # Finsets and multisets form a graded order
 
@@ -51,8 +53,6 @@ instance instGradeMinOrder : GradeMinOrder ℕ (Multiset α) where
   grade_strictMono := card_strictMono
   covBy_grade _ _ := CovBy.card_multiset
   isMin_grade s hs := by rw [isMin_iff_eq_bot.1 hs]; exact isMin_bot
-
-@[simp] lemma grade_eq (m : Multiset α) : grade ℕ m = card m := rfl
 
 end Multiset
 
@@ -157,14 +157,10 @@ instance instGradeMinOrder_multiset : GradeMinOrder (Multiset α) (Finset α) wh
   covBy_grade _ _ := CovBy.finset_val
   isMin_grade s hs := by rw [isMin_iff_eq_bot.1 hs]; exact isMin_bot
 
-@[simp] lemma grade_multiset_eq (s : Finset α) : grade (Multiset α) s = s.1 := rfl
-
 instance instGradeMinOrder_nat : GradeMinOrder ℕ (Finset α) where
   grade := card
   grade_strictMono := card_strictMono
   covBy_grade _ _ := CovBy.card_finset
   isMin_grade s hs := by rw [isMin_iff_eq_bot.1 hs]; exact isMin_bot
-
-@[simp] lemma grade_eq (s : Finset α) : grade ℕ s = s.card := rfl
 
 end Finset

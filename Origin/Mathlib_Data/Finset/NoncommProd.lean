@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Finset/NoncommProd.lean
-Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 44 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Algebra.Group.Commute.Hom
 import Mathlib.Data.Fintype.Card
+
+noncomputable section
 
 /-!
 # Products (respectively, sums) over a finset or a multiset.
@@ -50,10 +52,6 @@ theorem noncommFoldr_coe (l : List α) (comm) (b : β) :
   rw [← List.foldr_map]
   simp [List.map_pmap]
 
-@[simp]
-theorem noncommFoldr_empty (h) (b : β) : noncommFoldr f (0 : Multiset α) h b = b :=
-  rfl
-
 theorem noncommFoldr_cons (s : Multiset α) (a : α) (h h') (b : β) :
     noncommFoldr f (a ::ₘ s) h b = f a (noncommFoldr f s h' b) := by
   induction s using Quotient.inductionOn
@@ -75,10 +73,6 @@ def noncommFold (s : Multiset α) (comm : { x | x ∈ s }.Pairwise fun x y => op
 @[simp]
 theorem noncommFold_coe (l : List α) (comm) (a : α) :
     noncommFold op (l : Multiset α) comm a = l.foldr op a := by simp [noncommFold]
-
-@[simp]
-theorem noncommFold_empty (h) (a : α) : noncommFold op (0 : Multiset α) h a = a :=
-  rfl
 
 theorem noncommFold_cons (s : Multiset α) (a : α) (h h') (x : α) :
     noncommFold op (a ::ₘ s) h x = op a (noncommFold op s h' x) := by
@@ -109,10 +103,6 @@ theorem noncommProd_coe (l : List α) (comm) : noncommProd (l : Multiset α) com
   · rw [List.prod_cons, List.foldr, hl]
     intro x hx y hy
     exact comm (List.mem_cons_of_mem _ hx) (List.mem_cons_of_mem _ hy)
-
-@[to_additive (attr := simp)]
-theorem noncommProd_empty (h) : noncommProd (0 : Multiset α) h = 1 :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem noncommProd_cons (s : Multiset α) (a : α) (comm) :
@@ -258,10 +248,6 @@ theorem noncommProd_toFinset [DecidableEq α] (l : List α) (f : α → β) (com
     noncommProd l.toFinset f comm = (l.map f).prod := by
   rw [← List.dedup_eq_self] at hl
   simp [noncommProd, hl]
-
-@[to_additive (attr := simp)]
-theorem noncommProd_empty (f : α → β) (h) : noncommProd (∅ : Finset α) f h = 1 :=
-  rfl
 
 @[to_additive (attr := simp)]
 theorem noncommProd_cons (s : Finset α) (a : α) (f : α → β)

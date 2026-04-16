@@ -1,11 +1,13 @@
 /-
 Extracted from Algebra/DirectSum/Internal.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 17
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Operations
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 import Mathlib.Algebra.DirectSum.Algebra
+
+noncomputable section
 
 /-!
 # Internally graded rings and algebras
@@ -138,9 +140,27 @@ theorem coeRingHom_of [AddMonoid ι] [SetLike.GradedMonoid A] (i : ι) (x : A i)
     (coeRingHom A : _ →+* R) (of (fun i => A i) i x) = x :=
   DirectSum.toSemiring_of _ _ _ _ _
 
--- DISSOLVED: coe_mul_apply
+theorem coe_mul_apply [AddMonoid ι] [SetLike.GradedMonoid A]
+    [∀ (i : ι) (x : A i), Decidable (x ≠ 0)] (r r' : ⨁ i, A i) (n : ι) :
+    ((r * r') n : R) =
+      ∑ ij ∈ (r.support ×ˢ r'.support).filter (fun ij : ι × ι => ij.1 + ij.2 = n),
+        (r ij.1 * r' ij.2 : R) := by
+  rw [mul_eq_sum_support_ghas_mul, DFinsupp.finset_sum_apply, AddSubmonoidClass.coe_finset_sum]
+  simp_rw [coe_of_apply, apply_ite, ZeroMemClass.coe_zero, ← Finset.sum_filter, SetLike.coe_gMul]
 
--- DISSOLVED: coe_mul_apply_eq_dfinsupp_sum
+theorem coe_mul_apply_eq_dfinsupp_sum [AddMonoid ι] [SetLike.GradedMonoid A]
+    [∀ (i : ι) (x : A i), Decidable (x ≠ 0)] (r r' : ⨁ i, A i) (n : ι) :
+    ((r * r') n : R) = r.sum fun i ri => r'.sum fun j rj => if i + j = n then (ri * rj : R)
+      else 0 := by
+  rw [mul_eq_dfinsupp_sum]
+  iterate 2 rw [DFinsupp.sum_apply, DFinsupp.sum, AddSubmonoidClass.coe_finset_sum]; congr; ext
+  dsimp only
+  split_ifs with h
+  · subst h
+    rw [of_eq_same]
+    rfl
+  · rw [of_eq_of_ne _ _ _ h]
+    rfl
 
 theorem coe_of_mul_apply_aux [AddMonoid ι] [SetLike.GradedMonoid A] {i : ι} (r : A i)
     (r' : ⨁ i, A i) {j n : ι} (H : ∀ x : ι, i + x = n ↔ x = j) :
@@ -246,12 +266,6 @@ instance galgebra [AddMonoid ι] [CommSemiring S] [Semiring R] [Algebra S R] (A 
     Sigma.subtype_ext ((zero_add i).trans (add_zero i).symm) <| Algebra.commutes _ _
   smul_def := fun _r ⟨i, _xi⟩ => Sigma.subtype_ext (zero_add i).symm <| Algebra.smul_def _ _
 
-@[simp]
-theorem setLike.coe_galgebra_toFun {ι} [AddMonoid ι] [CommSemiring S] [Semiring R] [Algebra S R]
-    (A : ι → Submodule S R) [SetLike.GradedMonoid A] (s : S) :
-    (DirectSum.GAlgebra.toFun (A := fun i => A i) s) = (algebraMap S R s : R) :=
-  rfl
-
 instance nat_power_gradedMonoid [CommSemiring S] [Semiring R] [Algebra S R] (p : Submodule S R) :
     SetLike.GradedMonoid fun i : ℕ => p ^ i where
   one_mem := by
@@ -297,11 +311,6 @@ def subsemiring : Subsemiring R where
 
 instance instSemiring : Semiring (A 0) := (subsemiring A).toSemiring
 
-@[simp, norm_cast] theorem coe_natCast (n : ℕ) : (n : A 0) = (n : R) := rfl
-
-@[simp, norm_cast] theorem coe_ofNat (n : ℕ) [n.AtLeastTwo] :
-    (no_index (OfNat.ofNat n) : A 0) = (OfNat.ofNat n : R) := rfl
-
 end Semiring
 
 section CommSemiring
@@ -327,8 +336,6 @@ def subring : Subring R where
 
 instance instRing : Ring (A 0) := (subring A).toRing
 
-theorem coe_intCast (z : ℤ) : (z : A 0) = (z : R) := rfl
-
 end Ring
 
 section CommRing
@@ -353,9 +360,6 @@ def subalgebra : Subalgebra S R where
   algebraMap_mem' := algebraMap_mem_graded A
 
 instance instAlgebra : Algebra S (A 0) := inferInstanceAs <| Algebra S (subalgebra A)
-
-@[simp, norm_cast] theorem coe_algebraMap (s : S) :
-    ↑(algebraMap _ (A 0) s) = algebraMap _ R s := rfl
 
 end Algebra
 

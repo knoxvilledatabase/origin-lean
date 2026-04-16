@@ -8,6 +8,8 @@ import Mathlib.Topology.Category.Profinite.AsLimit
 import Mathlib.Topology.Category.Profinite.CofilteredLimit
 import Mathlib.Topology.ClopenBox
 
+noncomputable section
+
 /-!
 
 # Light profinite spaces

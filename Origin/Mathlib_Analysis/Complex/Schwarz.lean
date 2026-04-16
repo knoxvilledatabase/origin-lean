@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Complex.AbsMax
 import Mathlib.Analysis.Complex.RemovableSingularity
 
+noncomputable section
+
 /-!
 # Schwarz lemma
 

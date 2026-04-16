@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.CompTypeclasses
 import Mathlib.Algebra.Group.Hom.Defs
 
+noncomputable section
+
 /-!
 # Propositional typeclasses on several monoid homs
 

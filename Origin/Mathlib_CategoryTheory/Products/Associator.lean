@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.Products.Basic
 
+noncomputable section
+
 /-!
 The associator functor `((C × D) × E) ⥤ (C × (D × E))` and its inverse form an equivalence.
 -/

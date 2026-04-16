@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Operations
 import Mathlib.GroupTheory.OreLocalization.OreSet
 
+noncomputable section
+
 /-!
 
 # Localization over left Ore sets.
@@ -169,15 +171,6 @@ def lift₂Expand {C : Sort*} (P : X → S → X → S → C)
     ext x; induction' x with r₂ s₂
     dsimp only
     rw [liftExpand_of, liftExpand_of, hP r₁ t₁ s₁ ht₁ r₂ 1 s₂ (by simp)]; simp
-
-@[to_additive (attr := simp)]
-theorem lift₂Expand_of {C : Sort*} {P : X → S → X → S → C}
-    {hP :
-      ∀ (r₁ : X) (t₁ : R) (s₁ : S) (ht₁ : t₁ * s₁ ∈ S) (r₂ : X) (t₂ : R) (s₂ : S)
-        (ht₂ : t₂ * s₂ ∈ S),
-        P r₁ s₁ r₂ s₂ = P (t₁ • r₁) ⟨t₁ * s₁, ht₁⟩ (t₂ • r₂) ⟨t₂ * s₂, ht₂⟩}
-    (r₁ : X) (s₁ : S) (r₂ : X) (s₂ : S) : lift₂Expand P hP (r₁ /ₒ s₁) (r₂ /ₒ s₂) = P r₁ s₁ r₂ s₂ :=
-  rfl
 
 @[to_additive]
 private def smul' (r₁ : R) (s₁ : S) (r₂ : X) (s₂ : S) : X[S⁻¹] :=

@@ -7,6 +7,8 @@ import Mathlib.Algebra.MvPolynomial.Funext
 import Mathlib.Algebra.Ring.ULift
 import Mathlib.RingTheory.WittVector.Basic
 
+noncomputable section
+
 /-!
 # The `IsPoly` predicate
 
@@ -349,11 +351,8 @@ open Lean Parser.Tactic Elab.Tactic
 syntax (name := ghostSimp) "ghost_simp" (simpArgs)? : tactic
 
 macro_rules
-
   | `(tactic| ghost_simp $[[$simpArgs,*]]?) => do
-
     let args := simpArgs.map (·.getElems) |>.getD #[]
-
     `(tactic| simp only [← sub_eq_add_neg, ghost_simps, $args,*])
 
 syntax (name := ghostCalc) "ghost_calc" (ppSpace colGt term:max)* : tactic

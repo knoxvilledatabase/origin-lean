@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Matrix.Basis
 import Mathlib.LinearAlgebra.StdBasis
 
+noncomputable section
+
 /-!
 # Standard basis on matrices
 

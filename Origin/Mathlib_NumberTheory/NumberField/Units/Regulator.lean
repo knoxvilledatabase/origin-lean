@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/NumberField/Units/Regulator.lean
-Genuine: 5 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ZLattice.Covolume
 import Mathlib.LinearAlgebra.Matrix.Determinant.Misc
 import Mathlib.NumberTheory.NumberField.Units.DirichletTheorem
+
+noncomputable section
 
 /-!
 # Regulator of a number field
@@ -40,7 +42,7 @@ variable [NumberField K]
 
 def regulator : ℝ := ZLattice.covolume (unitLattice K)
 
--- DISSOLVED: regulator_ne_zero
+theorem regulator_ne_zero : regulator K ≠ 0 := ZLattice.covolume_ne_zero (unitLattice K) volume
 
 theorem regulator_pos : 0 < regulator K := ZLattice.covolume_pos (unitLattice K) volume
 

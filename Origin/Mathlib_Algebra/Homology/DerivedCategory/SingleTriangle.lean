@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Homology.DerivedCategory.ShortExact
 
+noncomputable section
+
 /-!
 # The distinguished triangle of a short exact sequence in an abelian category
 

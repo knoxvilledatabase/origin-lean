@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Types
 import Mathlib.CategoryTheory.Opposites
 import Mathlib.Data.Rel
 
+noncomputable section
+
 /-!
 # Basics on the category of relations
 
@@ -43,8 +45,6 @@ namespace RelCat
 namespace Hom
 
 protected theorem rel_id (X : RelCat) : 𝟙 X = (· = ·) := rfl
-
-protected theorem rel_comp {X Y Z : RelCat} (f : X ⟶ Y) (g : Y ⟶ Z) : f ≫ g = Rel.comp f g := rfl
 
 theorem rel_id_apply₂ (X : RelCat) (x y : X) : (𝟙 X) x y ↔ x = y := by
   rw [RelCat.Hom.rel_id]
@@ -135,12 +135,6 @@ def unopFunctor : RelCatᵒᵖ ⥤ RelCat where
     ext x y
     apply exists_congr
     exact fun a => And.comm
-
-@[simp] theorem opFunctor_comp_unopFunctor_eq :
-    Functor.comp opFunctor unopFunctor = Functor.id _ := rfl
-
-@[simp] theorem unopFunctor_comp_opFunctor_eq :
-    Functor.comp unopFunctor opFunctor = Functor.id _ := rfl
 
 @[simps]
 def opEquivalence : Equivalence RelCat RelCatᵒᵖ where

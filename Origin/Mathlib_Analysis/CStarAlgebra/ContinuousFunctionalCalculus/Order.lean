@@ -8,6 +8,8 @@ import Mathlib.Analysis.CStarAlgebra.Unitization
 import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.Rpow
 import Mathlib.Topology.ContinuousMap.StarOrdered
 
+noncomputable section
+
 /-! # Facts about star-ordered rings that depend on the continuous functional calculus
 
 This file contains various basic facts about star-ordered rings (i.e. mainly C⋆-algebras)
@@ -417,13 +419,6 @@ lemma conjugate_le_norm_smul {a b : A} (hb : IsSelfAdjoint b := by cfc_tac) :
     star a * b * a ≤ star a * (algebraMap ℝ A⁺¹ ‖b‖) * a :=
       conjugate_le_conjugate hb.le_algebraMap_norm_self _
     _ = ‖b‖ • (star a * a) := by simp [Algebra.algebraMap_eq_smul_one]
-
-lemma conjugate_le_norm_smul' {a b : A} (hb : IsSelfAdjoint b := by cfc_tac) :
-    a * b * star a ≤ ‖b‖ • (a * star a) := by
-  have h₁ : a * b * star a = star (star a) * b * star a := by simp
-  have h₂ : a * star a = star (star a) * star a := by simp
-  simp only [h₁, h₂]
-  exact conjugate_le_norm_smul
 
 lemma isClosed_nonneg : IsClosed {a : A | 0 ≤ a} := by
   suffices IsClosed {a : A⁺¹ | 0 ≤ a} by

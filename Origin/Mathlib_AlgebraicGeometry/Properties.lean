@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.AffineScheme
 import Mathlib.RingTheory.LocalProperties.Reduced
 
+noncomputable section
+
 /-!
 # Basic properties of schemes
 

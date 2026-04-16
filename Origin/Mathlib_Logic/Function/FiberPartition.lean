@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Data.Set.Basic
 
+noncomputable section
+
 /-!
 
 This file defines the type `f.Fiber` of fibers of a function `f : Y → Z`, and provides some API

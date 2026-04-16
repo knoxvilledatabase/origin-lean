@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 
+noncomputable section
+
 /-!
 ### Relations between vector space derivative and manifold derivative
 
@@ -38,10 +40,6 @@ alias ⟨UniqueMDiffOn.uniqueDiffOn, UniqueDiffOn.uniqueMDiffOn⟩ := uniqueMDif
 theorem ModelWithCorners.uniqueMDiffOn {H : Type*} [TopologicalSpace H]
     (I : ModelWithCorners 𝕜 E H) : UniqueMDiffOn 𝓘(𝕜, E) (Set.range I) :=
   I.uniqueDiffOn.uniqueMDiffOn
-
-@[simp, mfld_simps]
-theorem writtenInExtChartAt_model_space : writtenInExtChartAt 𝓘(𝕜, E) 𝓘(𝕜, E') x f = f :=
-  rfl
 
 theorem hasMFDerivWithinAt_iff_hasFDerivWithinAt {f'} :
     HasMFDerivWithinAt 𝓘(𝕜, E) 𝓘(𝕜, E') f s x f' ↔ HasFDerivWithinAt f f' s x := by

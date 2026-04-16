@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Regular.Basic
 import Mathlib.GroupTheory.GroupAction.Hom
 
+noncomputable section
+
 /-!
 # Action of regular elements on a module
 
@@ -33,16 +35,9 @@ def IsSMulRegular [SMul R M] (c : R) :=
 theorem IsLeftRegular.isSMulRegular [Mul R] {c : R} (h : IsLeftRegular c) : IsSMulRegular R c :=
   h
 
-theorem isLeftRegular_iff [Mul R] {a : R} : IsLeftRegular a ↔ IsSMulRegular R a :=
-  Iff.rfl
-
 theorem IsRightRegular.isSMulRegular [Mul R] {c : R} (h : IsRightRegular c) :
     IsSMulRegular R (MulOpposite.op c) :=
   h
-
-theorem isRightRegular_iff [Mul R] {a : R} :
-    IsRightRegular a ↔ IsSMulRegular R (MulOpposite.op a) :=
-  Iff.rfl
 
 namespace IsSMulRegular
 
@@ -208,9 +203,8 @@ section SMulZeroClass
 
 variable {M}
 
-protected
-
 -- CONFLATES (assumes ground = zero): IsSMulRegular.eq_zero_of_smul_eq_zero
+protected
 lemma IsSMulRegular.eq_zero_of_smul_eq_zero [Zero M] [SMulZeroClass R M]
     {r : R} {x : M} (h1 : IsSMulRegular M r) (h2 : r • x = 0) : x = 0 :=
   h1 (h2.trans (smul_zero r).symm)

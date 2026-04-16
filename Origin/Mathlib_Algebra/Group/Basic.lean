@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Basic.lean
-Genuine: 169 | Conflates: 0 | Dissolved: 5 | Infrastructure: 36
+Genuine: 174 | Conflates: 0 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Aesop
@@ -10,6 +10,8 @@ import Mathlib.Data.Int.Defs
 import Mathlib.Logic.Function.Basic
 import Mathlib.Tactic.SimpRw
 import Mathlib.Tactic.SplitIfs
+
+noncomputable section
 
 /-!
 # Basic lemmas about semigroups, monoids, and groups
@@ -44,7 +46,6 @@ lemma ite_pow (p : Prop) [Decidable p] (a b : α) (c : β) :
     (if p then a else b) ^ c = if p then a ^ c else b ^ c := dite_pow _ _ _ _
 
 set_option linter.existingAttributeWarning false in
-
 attribute [to_additive (attr := simp)] dite_smul smul_dite ite_smul smul_ite
 
 end ite
@@ -179,9 +180,13 @@ lemma pow_mul_pow_sub (a : M) (h : m ≤ n) : a ^ m * a ^ (n - m) = a ^ n := by
 lemma pow_sub_mul_pow (a : M) (h : m ≤ n) : a ^ (n - m) * a ^ m = a ^ n := by
   rw [← pow_add, Nat.sub_add_cancel h]
 
--- DISSOLVED: mul_pow_sub_one
+@[to_additive sub_one_nsmul_add]
+lemma mul_pow_sub_one (hn : n ≠ 0) (a : M) : a * a ^ (n - 1) = a ^ n := by
+  rw [← pow_succ', Nat.sub_add_cancel <| Nat.one_le_iff_ne_zero.2 hn]
 
--- DISSOLVED: pow_sub_one_mul
+@[to_additive add_sub_one_nsmul]
+lemma pow_sub_one_mul (hn : n ≠ 0) (a : M) : a ^ (n - 1) * a = a ^ n := by
+  rw [← pow_succ, Nat.sub_add_cancel <| Nat.one_le_iff_ne_zero.2 hn]
 
 @[to_additive nsmul_eq_mod_nsmul "If `n • x = 0`, then `m • x` is the same as `(m % n) • x`"]
 lemma pow_eq_pow_mod (m : ℕ) (ha : a ^ n = 1) : a ^ m = a ^ (m % n) := by
@@ -375,21 +380,14 @@ lemma eq_of_inv_mul_eq_one (h : a⁻¹ * b = 1) : a = b := by simpa using eq_inv
 
 lemma eq_of_mul_inv_eq_one (h : a * b⁻¹ = 1) : a = b := by simpa using eq_inv_of_mul_eq_one_left h
 
--- DISSOLVED: div_ne_one_of_ne
+@[to_additive]
+theorem div_ne_one_of_ne : a ≠ b → a / b ≠ 1 :=
+  mt eq_of_div_eq_one
 
 variable (a b c)
 
-@[to_additive]
-theorem one_div_mul_one_div_rev : 1 / a * (1 / b) = 1 / (b * a) := by simp
-
-@[to_additive]
-theorem inv_div_left : a⁻¹ / b = (b * a)⁻¹ := by simp
-
 @[to_additive (attr := simp)]
 theorem inv_div : (a / b)⁻¹ = b / a := by simp
-
-@[to_additive]
-theorem one_div_div : 1 / (a / b) = b / a := by simp
 
 @[to_additive]
 theorem one_div_one_div : 1 / (1 / a) = a := by simp
@@ -451,7 +449,9 @@ theorem inv_eq_one : a⁻¹ = 1 ↔ a = 1 :=
 theorem one_eq_inv : 1 = a⁻¹ ↔ a = 1 :=
   eq_comm.trans inv_eq_one
 
--- DISSOLVED: inv_ne_one
+@[to_additive]
+theorem inv_ne_one : a⁻¹ ≠ 1 ↔ a ≠ 1 :=
+  inv_eq_one.not
 
 @[to_additive]
 theorem eq_of_one_div_eq_one_div (h : 1 / a = 1 / b) : a = b := by
@@ -499,72 +499,13 @@ attribute [local simp] mul_assoc mul_comm mul_left_comm div_eq_mul_inv
 theorem mul_inv : (a * b)⁻¹ = a⁻¹ * b⁻¹ := by simp
 
 @[to_additive]
-theorem inv_div' : (a / b)⁻¹ = a⁻¹ / b⁻¹ := by simp
-
-@[to_additive]
 theorem div_eq_inv_mul : a / b = b⁻¹ * a := by simp
-
-@[to_additive]
-theorem inv_mul_eq_div : a⁻¹ * b = b / a := by simp
-
-@[to_additive] lemma inv_div_comm (a b : α) : a⁻¹ / b = b⁻¹ / a := by simp
-
-@[to_additive]
-theorem inv_mul' : (a * b)⁻¹ = a⁻¹ / b := by simp
-
-@[to_additive]
-theorem inv_div_inv : a⁻¹ / b⁻¹ = b / a := by simp
-
-@[to_additive]
-theorem inv_inv_div_inv : (a⁻¹ / b⁻¹)⁻¹ = a / b := by simp
-
-@[to_additive]
-theorem one_div_mul_one_div : 1 / a * (1 / b) = 1 / (a * b) := by simp
-
-@[to_additive]
-theorem div_right_comm : a / b / c = a / c / b := by simp
-
-@[to_additive, field_simps]
-theorem div_div : a / b / c = a / (b * c) := by simp
 
 @[to_additive]
 theorem div_mul : a / b * c = a / (b / c) := by simp
 
-@[to_additive]
-theorem mul_div_left_comm : a * (b / c) = b * (a / c) := by simp
-
-@[to_additive]
-theorem mul_div_right_comm : a * b / c = a / c * b := by simp
-
-@[to_additive]
-theorem div_mul_eq_div_div : a / (b * c) = a / b / c := by simp
-
 @[to_additive, field_simps]
 theorem div_mul_eq_mul_div : a / b * c = a * c / b := by simp
-
-@[to_additive]
-theorem one_div_mul_eq_div : 1 / a * b = b / a := by simp
-
-@[to_additive]
-theorem mul_comm_div : a / b * c = a * (c / b) := by simp
-
-@[to_additive]
-theorem div_mul_comm : a / b * c = c / b * a := by simp
-
-@[to_additive]
-theorem div_mul_eq_div_mul_one_div : a / (b * c) = a / b * (1 / c) := by simp
-
-@[to_additive]
-theorem div_div_div_eq : a / b / (c / d) = a * d / (b * c) := by simp
-
-@[to_additive]
-theorem div_div_div_comm : a / b / (c / d) = a / c / (b / d) := by simp
-
-@[to_additive]
-theorem div_mul_div_comm : a / b * (c / d) = a * c / (b * d) := by simp
-
-@[to_additive]
-theorem mul_div_mul_comm : a * b / (c * d) = a / c * (b / d) := by simp
 
 @[to_additive zsmul_add] lemma mul_zpow : ∀ n : ℤ, (a * b) ^ n = a ^ n * b ^ n
   | (n : ℕ) => by simp_rw [zpow_natCast, mul_pow]
@@ -738,7 +679,9 @@ alias ⟨_, div_eq_one_of_eq⟩ := div_eq_one
 
 alias ⟨_, sub_eq_zero_of_eq⟩ := sub_eq_zero
 
--- DISSOLVED: div_ne_one
+@[to_additive]
+theorem div_ne_one : a / b ≠ 1 ↔ a ≠ b :=
+  not_congr div_eq_one
 
 @[to_additive (attr := simp)]
 theorem div_eq_self : a / b = a ↔ b = 1 := by rw [div_eq_mul_inv, mul_right_eq_self, inv_eq_one]
@@ -775,8 +718,8 @@ theorem leftInverse_inv_mul_mul_right (c : G) :
 lemma pow_natAbs_eq_one : a ^ n.natAbs = 1 ↔ a ^ n = 1 := by cases n <;> simp
 
 set_option linter.existingAttributeWarning false in
-
 @[to_additive, deprecated pow_natAbs_eq_one (since := "2024-02-14")]
+
 lemma exists_pow_eq_one_of_zpow_eq_one (hn : n ≠ 0) (h : a ^ n = 1) :
     ∃ n : ℕ, 0 < n ∧ a ^ n = 1 := ⟨_, Int.natAbs_pos.2 hn, pow_natAbs_eq_one.2 h⟩
 
@@ -906,18 +849,12 @@ theorem eq_mul_of_div_eq' (h : a / b = c) : a = b * c := by simp [h.symm]
 theorem mul_eq_of_eq_div' (h : b = c / a) : a * b = c := by
   rw [h, div_eq_mul_inv, mul_comm c, mul_inv_cancel_left]
 
-@[to_additive sub_sub_self]
-theorem div_div_self' (a b : G) : a / (a / b) = b := by simp
-
 @[to_additive]
 theorem div_eq_div_mul_div (a b c : G) : a / b = c / b * (a / c) := by simp [mul_left_comm c]
 
 @[to_additive (attr := simp)]
 theorem div_div_cancel (a b : G) : a / (a / b) = b :=
   div_div_self' a b
-
-@[to_additive (attr := simp)]
-theorem div_div_cancel_left (a b : G) : a / b / a = b⁻¹ := by simp
 
 @[to_additive eq_sub_iff_add_eq']
 theorem eq_div_iff_mul_eq'' : a = b / c ↔ c * a = b := by rw [eq_div_iff_mul_eq', mul_comm]

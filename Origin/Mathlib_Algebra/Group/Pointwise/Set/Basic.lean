@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Group/Pointwise/Set/Basic.lean
-Genuine: 265 | Conflates: 3 | Dissolved: 5 | Infrastructure: 32
+Genuine: 267 | Conflates: 4 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Units.Hom
 import Mathlib.Algebra.Opposites
 import Mathlib.Algebra.Order.Monoid.Unbundled.Pow
 import Mathlib.Data.Set.Lattice
+
+noncomputable section
 
 /-!
 # Pointwise operations of sets
@@ -53,26 +55,6 @@ set multiplication, set addition, pointwise addition, pointwise multiplication,
 pointwise subtraction
 -/
 
-library_note "pointwise nat action"/--
-
-Pointwise monoids (`Set`, `Finset`, `Filter`) have derived pointwise actions of the form
-
-`SMul α β → SMul α (Set β)`. When `α` is `ℕ` or `ℤ`, this action conflicts with the
-
-nat or int action coming from `Set β` being a `Monoid` or `DivInvMonoid`. For example,
-
-`2 • {a, b}` can both be `{2 • a, 2 • b}` (pointwise action, pointwise repeated addition,
-
-`Set.smulSet`) and `{a + a, a + b, b + a, b + b}` (nat or int action, repeated pointwise
-
-addition, `Set.NSMul`).
-
-Because the pointwise action can easily be spelled out in such cases, we give higher priority to the
-
-nat and int actions.
-
--/
-
 open Function MulOpposite
 
 variable {F α β γ : Type*}
@@ -96,10 +78,6 @@ open Pointwise
 @[to_additive]
 theorem singleton_one : ({1} : Set α) = 1 :=
   rfl
-
-@[to_additive (attr := simp)]
-theorem mem_one : a ∈ (1 : Set α) ↔ a = 1 :=
-  Iff.rfl
 
 @[to_additive]
 theorem one_mem_one : (1 : α) ∈ (1 : Set α) :=
@@ -129,10 +107,6 @@ theorem Nonempty.subset_one_iff (h : s.Nonempty) : s ⊆ 1 ↔ s = 1 :=
 noncomputable def singletonOneHom : OneHom α (Set α) where
   toFun := singleton; map_one' := singleton_one
 
-@[to_additive (attr := simp)]
-theorem coe_singletonOneHom : (singletonOneHom : α → Set α) = singleton :=
-  rfl
-
 @[to_additive] lemma image_op_one : (1 : Set α).image op = 1 := image_singleton
 
 end One
@@ -161,14 +135,6 @@ theorem mem_inv : a ∈ s⁻¹ ↔ a⁻¹ ∈ s :=
 
 @[to_additive (attr := simp)]
 theorem inv_preimage : Inv.inv ⁻¹' s = s⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem inv_empty : (∅ : Set α)⁻¹ = ∅ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem inv_univ : (univ : Set α)⁻¹ = univ :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -274,10 +240,6 @@ protected def mul : Mul (Set α) :=
   ⟨image2 (· * ·)⟩
 
 scoped[Pointwise] attribute [instance] Set.mul Set.add
-
-@[to_additive (attr := simp)]
-theorem image2_mul : image2 (· * ·) s t = s * t :=
-  rfl
 
 @[to_additive]
 theorem mem_mul : a ∈ s * t ↔ ∃ x ∈ s, ∃ y ∈ t, x * y = a :=
@@ -440,14 +402,6 @@ noncomputable def singletonMulHom : α →ₙ* Set α where
   toFun := singleton
   map_mul' _ _ := singleton_mul_singleton.symm
 
-@[to_additive (attr := simp)]
-theorem coe_singletonMulHom : (singletonMulHom : α → Set α) = singleton :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem singletonMulHom_apply (a : α) : singletonMulHom a = {a} :=
-  rfl
-
 open MulOpposite
 
 @[to_additive (attr := simp)]
@@ -469,10 +423,6 @@ protected def div : Div (Set α) :=
   ⟨image2 (· / ·)⟩
 
 scoped[Pointwise] attribute [instance] Set.div Set.sub
-
-@[to_additive (attr := simp)]
-theorem image2_div : image2 Div.div s t = s / t :=
-  rfl
 
 @[to_additive]
 theorem mem_div : a ∈ s / t ↔ ∃ x ∈ s, ∃ y ∈ t, x / y = a :=
@@ -650,12 +600,8 @@ section SMul
 variable {ι : Sort*} {κ : ι → Sort*} [SMul α β] {s s₁ s₂ : Set α} {t t₁ t₂ u : Set β} {a : α}
   {b : β}
 
-@[to_additive (attr := simp)] lemma image2_smul : image2 SMul.smul s t = s • t := rfl
-
 @[to_additive vadd_image_prod]
 lemma image_smul_prod : (fun x : α × β ↦ x.fst • x.snd) '' s ×ˢ t = s • t := image_prod _
-
-@[to_additive] lemma mem_smul : b ∈ s • t ↔ ∃ x ∈ s, ∃ y ∈ t, x • y = b := Iff.rfl
 
 @[to_additive] lemma smul_mem_smul : a ∈ s → b ∈ t → a • b ∈ s • t := mem_image2_of_mem
 
@@ -781,8 +727,6 @@ variable {ι : Sort*} {κ : ι → Sort*} [SMul α β] {s t t₁ t₂ : Set β} 
 
 scoped[Pointwise] attribute [simp] Set.image_smul Set.image_vadd
 
-@[to_additive] lemma mem_smul_set : x ∈ a • t ↔ ∃ y, y ∈ t ∧ a • y = x := Iff.rfl
-
 @[to_additive] lemma smul_mem_smul_set : b ∈ s → a • b ∈ a • s := mem_image_of_mem _
 
 @[to_additive (attr := simp)] lemma smul_set_empty : a • (∅ : Set β) = ∅ := image_empty _
@@ -865,11 +809,7 @@ variable {ι : Sort*} {κ : ι → Sort*} [VSub α β] {s s₁ s₂ t t₁ t₂ 
 
 instance vsub : VSub (Set α) (Set β) where vsub := image2 (· -ᵥ ·)
 
-@[simp] lemma image2_vsub : (image2 VSub.vsub s t : Set α) = s -ᵥ t := rfl
-
 lemma image_vsub_prod : (fun x : β × β ↦ x.fst -ᵥ x.snd) '' s ×ˢ t = s -ᵥ t := image_prod _
-
-lemma mem_vsub : a ∈ s -ᵥ t ↔ ∃ x ∈ s, ∃ y ∈ t, x -ᵥ y = a := Iff.rfl
 
 lemma vsub_mem_vsub (hb : b ∈ s) (hc : c ∈ t) : b -ᵥ c ∈ s -ᵥ t := mem_image2_of_mem hb hc
 
@@ -1036,14 +976,6 @@ theorem subset_mul_right {s : Set α} (t : Set α) (hs : (1 : α) ∈ s) : t ⊆
 noncomputable def singletonMonoidHom : α →* Set α :=
   { singletonMulHom, singletonOneHom with }
 
-@[to_additive (attr := simp)]
-theorem coe_singletonMonoidHom : (singletonMonoidHom : α → Set α) = singleton :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem singletonMonoidHom_apply (a : α) : singletonMonoidHom a = {a} :=
-  rfl
-
 end MulOneClass
 
 section Monoid
@@ -1071,11 +1003,15 @@ lemma pow_subset_pow_right (hs : 1 ∈ s) (hmn : m ≤ n) : s ^ m ⊆ s ^ n :=
 lemma pow_subset_pow (hst : s ⊆ t) (ht : 1 ∈ t) (hmn : m ≤ n) : s ^ m ⊆ t ^ n :=
   (pow_subset_pow_left hst).trans (pow_subset_pow_right ht hmn)
 
--- DISSOLVED: subset_pow
+@[to_additive]
+lemma subset_pow (hs : 1 ∈ s) (hn : n ≠ 0) : s ⊆ s ^ n := by
+  simpa using pow_subset_pow_right hs <| Nat.one_le_iff_ne_zero.2 hn
 
 alias nsmul_subset_nsmul_of_zero_mem := nsmul_subset_nsmul_right
 
--- DISSOLVED: pow_subset_pow_mul_of_sq_subset_mul
+@[to_additive]
+lemma pow_subset_pow_mul_of_sq_subset_mul (hst : s ^ 2 ⊆ t * s) (hn : n ≠ 0) :
+    s ^ n ⊆ t ^ (n - 1) * s := pow_le_pow_mul_of_sq_le_mul hst hn
 
 @[to_additive (attr := simp) nsmul_empty]
 lemma empty_pow (hn : n ≠ 0) : (∅ : Set α) ^ n = ∅ := match n with | n + 1 => by simp [pow_succ]
@@ -1086,7 +1022,6 @@ lemma Nonempty.pow (hs : s.Nonempty) : ∀ {n}, (s ^ n).Nonempty
   | n + 1 => by rw [pow_succ]; exact hs.pow.mul hs
 
 set_option push_neg.use_distrib true in
-
 @[to_additive (attr := simp)] lemma pow_eq_empty : s ^ n = ∅ ↔ s = ∅ ∧ n ≠ 0 := by
   constructor
   · contrapose!
@@ -1166,7 +1101,11 @@ section CancelMonoid
 
 variable [CancelMonoid α] {s t : Set α} {a : α} {n : ℕ}
 
--- DISSOLVED: Nontrivial.pow
+-- CONFLATES (assumes ground = zero): Nontrivial.pow
+@[to_additive]
+lemma Nontrivial.pow (hs : s.Nontrivial) : ∀ {n}, n ≠ 0 → (s ^ n).Nontrivial
+  | 1, _ => by simpa
+  | n + 2, _ => by simpa [pow_succ] using (hs.pow n.succ_ne_zero).mul hs
 
 end CancelMonoid
 
@@ -1241,7 +1180,6 @@ lemma Nonempty.zpow (hs : s.Nonempty) : ∀ {n : ℤ}, (s ^ n).Nonempty
   | .negSucc n => by simpa using hs.pow
 
 set_option push_neg.use_distrib true in
-
 @[to_additive (attr := simp)] lemma zpow_eq_empty : s ^ n = ∅ ↔ s = ∅ ∧ n ≠ 0 := by
   constructor
   · contrapose!
@@ -1310,12 +1248,6 @@ theorem image_mul_left : (a * ·) '' t = (a⁻¹ * ·) ⁻¹' t := by
 theorem image_mul_right : (· * b) '' t = (· * b⁻¹) ⁻¹' t := by
   rw [image_eq_preimage_of_inverse] <;> intro c <;> simp
 
-@[to_additive]
-theorem image_mul_left' : (a⁻¹ * ·) '' t = (a * ·) ⁻¹' t := by simp
-
-@[to_additive]
-theorem image_mul_right' : (· * b⁻¹) '' t = (· * b) ⁻¹' t := by simp
-
 @[to_additive (attr := simp)]
 theorem preimage_mul_left_singleton : (a * ·) ⁻¹' {b} = {a⁻¹ * b} := by
   rw [← image_mul_left', image_singleton]
@@ -1331,12 +1263,6 @@ theorem preimage_mul_left_one : (a * ·) ⁻¹' 1 = {a⁻¹} := by
 @[to_additive (attr := simp)]
 theorem preimage_mul_right_one : (· * b) ⁻¹' 1 = {b⁻¹} := by
   rw [← image_mul_right', image_one, one_mul]
-
-@[to_additive]
-theorem preimage_mul_left_one' : (a⁻¹ * ·) ⁻¹' 1 = {a} := by simp
-
-@[to_additive]
-theorem preimage_mul_right_one' : (· * b⁻¹) ⁻¹' 1 = {b} := by simp
 
 @[to_additive (attr := simp)]
 theorem mul_univ (hs : s.Nonempty) : s * (univ : Set α) = univ :=
@@ -1388,9 +1314,16 @@ section Monoid
 
 variable [Monoid α] [Monoid β] [FunLike F α β]
 
--- DISSOLVED: image_pow_of_ne_zero
+@[to_additive]
+lemma image_pow_of_ne_zero [MulHomClass F α β] :
+    ∀ {n}, n ≠ 0 → ∀ (f : F) (s : Set α), f '' (s ^ n) = (f '' s) ^ n
+  | 1, _ => by simp
+  | n + 2, _ => by simp [image_mul, pow_succ _ n.succ, image_pow_of_ne_zero]
 
--- DISSOLVED: image_pow
+@[to_additive]
+lemma image_pow [MonoidHomClass F α β] (f : F) (s : Set α) : ∀ n, f '' (s ^ n) = (f '' s) ^ n
+  | 0 => by simp [singleton_one]
+  | n + 1 => image_pow_of_ne_zero n.succ_ne_zero ..
 
 end Monoid
 

@@ -7,6 +7,8 @@ import Mathlib.Probability.ProbabilityMassFunction.Basic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 import Mathlib.MeasureTheory.Integral.Bochner
 
+noncomputable section
+
 /-!
 # Integrals with a measure derived from probability mass functions.
 

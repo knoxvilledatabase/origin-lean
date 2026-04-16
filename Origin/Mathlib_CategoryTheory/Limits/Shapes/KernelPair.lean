@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.CommSq
 import Mathlib.CategoryTheory.Limits.Shapes.RegularMono
 
+noncomputable section
+
 /-!
 # Kernel pairs
 

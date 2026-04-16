@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.Basic
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Real
 import Mathlib.Topology.MetricSpace.Thickening
 
+noncomputable section
+
 /-!
 # Borel sigma algebras on (pseudo-)metric spaces
 

@@ -1,11 +1,13 @@
 /-
 Extracted from LinearAlgebra/Matrix/SchurComplement.lean
-Genuine: 37 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Data.Matrix.Invertible
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.PosDef
+
+noncomputable section
 
 /-! # 2×2 block matrices and the Schur complement
 
@@ -151,9 +153,17 @@ def fromBlocksZero₁₂InvertibleEquiv (A : Matrix m m α) (C : Matrix n m α) 
   left_inv _ := Subsingleton.elim _ _
   right_inv _ := Subsingleton.elim _ _
 
--- DISSOLVED: isUnit_fromBlocks_zero₂₁
+@[simp]
+theorem isUnit_fromBlocks_zero₂₁ {A : Matrix m m α} {B : Matrix m n α} {D : Matrix n n α} :
+    IsUnit (fromBlocks A B 0 D) ↔ IsUnit A ∧ IsUnit D := by
+  simp only [← nonempty_invertible_iff_isUnit, ← nonempty_prod,
+    (fromBlocksZero₂₁InvertibleEquiv _ _ _).nonempty_congr]
 
--- DISSOLVED: isUnit_fromBlocks_zero₁₂
+@[simp]
+theorem isUnit_fromBlocks_zero₁₂ {A : Matrix m m α} {C : Matrix n m α} {D : Matrix n n α} :
+    IsUnit (fromBlocks A 0 C D) ↔ IsUnit A ∧ IsUnit D := by
+  simp only [← nonempty_invertible_iff_isUnit, ← nonempty_prod,
+    (fromBlocksZero₁₂InvertibleEquiv _ _ _).nonempty_congr]
 
 theorem inv_fromBlocks_zero₂₁_of_isUnit_iff (A : Matrix m m α) (B : Matrix m n α) (D : Matrix n n α)
     (hAD : IsUnit A ↔ IsUnit D) :

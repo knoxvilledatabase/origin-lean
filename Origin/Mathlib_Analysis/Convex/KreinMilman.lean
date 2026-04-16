@@ -7,6 +7,8 @@ import Mathlib.Analysis.Convex.Exposed
 import Mathlib.Analysis.NormedSpace.HahnBanach.Separation
 import Mathlib.Topology.Algebra.ContinuousAffineMap
 
+noncomputable section
+
 /-!
 # The Krein-Milman theorem
 

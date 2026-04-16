@@ -6,6 +6,8 @@ import Origin.Core
 import Batteries.Data.MLList.Basic
 import Mathlib.Data.ULift
 
+noncomputable section
+
 /-!
 # Functions for splitting monadic lazy lists.
 

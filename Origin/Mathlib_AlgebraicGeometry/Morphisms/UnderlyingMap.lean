@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.LocalAtTarget
 import Mathlib.AlgebraicGeometry.Morphisms.Constructors
 
+noncomputable section
+
 /-!
 
 ## Properties on the underlying functions of morphisms of schemes.

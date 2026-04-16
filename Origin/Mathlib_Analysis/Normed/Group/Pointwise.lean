@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.Bounded
 import Mathlib.Analysis.Normed.Group.Uniform
 import Mathlib.Topology.MetricSpace.Thickening
 
+noncomputable section
+
 /-!
 # Properties of pointwise addition of sets in normed groups
 
@@ -106,9 +108,6 @@ theorem ball_div_singleton : ball x δ / {y} = ball (x / y) δ := by
   simp_rw [div_eq_mul_inv, inv_singleton, ball_mul_singleton]
 
 @[to_additive]
-theorem singleton_mul_ball_one : {x} * ball 1 δ = ball x δ := by simp
-
-@[to_additive]
 theorem singleton_div_ball_one : {x} / ball 1 δ = ball x δ := by
   rw [singleton_div_ball, div_one]
 
@@ -140,17 +139,8 @@ theorem closedBall_div_singleton : closedBall x δ / {y} = closedBall (x / y) δ
   simp [div_eq_mul_inv]
 
 @[to_additive]
-theorem singleton_mul_closedBall_one : {x} * closedBall 1 δ = closedBall x δ := by simp
-
-@[to_additive]
 theorem singleton_div_closedBall_one : {x} / closedBall 1 δ = closedBall x δ := by
   rw [singleton_div_closedBall, div_one]
-
-@[to_additive]
-theorem closedBall_one_mul_singleton : closedBall 1 δ * {x} = closedBall x δ := by simp
-
-@[to_additive]
-theorem closedBall_one_div_singleton : closedBall 1 δ / {x} = closedBall x⁻¹ δ := by simp
 
 @[to_additive (attr := simp 1100)]
 theorem smul_closedBall_one : x • closedBall (1 : E) δ = closedBall x δ := by simp

@@ -7,6 +7,8 @@ import Mathlib.RingTheory.FiniteStability
 import Mathlib.RingTheory.Localization.InvSubmonoid
 import Mathlib.RingTheory.RingHom.Finite
 
+noncomputable section
+
 /-!
 
 # The meta properties of finite-type ring homomorphisms.

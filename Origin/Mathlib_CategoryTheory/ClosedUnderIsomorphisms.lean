@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Iso
 import Mathlib.Order.Basic
 
+noncomputable section
+
 /-! # Predicates on objects which are closed under isomorphisms
 
 This file introduces the type class `ClosedUnderIsomorphisms P` for predicates
@@ -33,9 +35,6 @@ lemma mem_iff_of_isIso [ClosedUnderIsomorphisms P] {X Y : C} (f : X ⟶ Y) [IsIs
   mem_iff_of_iso P (asIso f)
 
 def isoClosure : C → Prop := fun X => ∃ (Y : C) (_ : P Y), Nonempty (X ≅ Y)
-
-lemma mem_isoClosure_iff (X : C) :
-    isoClosure P X ↔ ∃ (Y : C) (_ : P Y), Nonempty (X ≅ Y) := by rfl
 
 variable {P} in
 

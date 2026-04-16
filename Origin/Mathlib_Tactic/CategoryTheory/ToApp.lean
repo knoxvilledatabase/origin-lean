@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.Util.AddRelatedDecl
 
+noncomputable section
+
 /-!
 # The `to_app` attribute
 
@@ -120,7 +122,6 @@ initialize registerBuiltinAttribute {
 open Term in
 
 elab "to_app_of% " t:term : term => do
-
   toAppExpr (← elabTerm t none)
 
 end CategoryTheory

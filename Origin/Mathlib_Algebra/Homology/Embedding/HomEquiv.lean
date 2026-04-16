@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.Embedding.Extend
 import Mathlib.Algebra.Homology.Embedding.Boundary
 import Mathlib.CategoryTheory.MorphismProperty.Basic
 
+noncomputable section
+
 /-!
 # Relations between `extend` and `restriction`
 
@@ -187,14 +189,6 @@ lemma homRestrict_precomp (α : K' ⟶ K) (ψ : K ⟶ L.extend e) :
   simp [homRestrict_f _ _ rfl, restrictionXIso]
 
 variable (K L)
-
-@[simps]
-noncomputable def homEquiv :
-    (K ⟶ L.extend e) ≃ { φ : K.restriction e ⟶ L // e.HasLift φ } where
-  toFun ψ := ⟨e.homRestrict ψ, e.homRestrict_hasLift ψ⟩
-  invFun φ := e.liftExtend φ.1 φ.2
-  left_inv ψ := by simp
-  right_inv φ := by simp
 
 end Embedding
 

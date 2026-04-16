@@ -7,6 +7,8 @@ import Mathlib.RingTheory.SimpleRing.Basic
 import Mathlib.Algebra.Ring.Subring.Basic
 import Mathlib.Algebra.Field.Equiv
 
+noncomputable section
+
 /-!
 # Simple ring and fields
 

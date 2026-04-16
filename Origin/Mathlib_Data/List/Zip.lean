@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Data.List.Forall2
 
+noncomputable section
+
 /-!
 # zip & unzip
 
@@ -126,17 +128,6 @@ theorem get?_zipWith_eq_some (f : α → β → γ) (l₁ : List α) (l₂ : Lis
 theorem get?_zip_eq_some (l₁ : List α) (l₂ : List β) (z : α × β) (i : ℕ) :
     (zip l₁ l₂).get? i = some z ↔ l₁.get? i = some z.1 ∧ l₂.get? i = some z.2 := by
   simp [getElem?_zip_eq_some]
-
-theorem get_zipWith {f : α → β → γ} {l : List α} {l' : List β} {i : Fin (zipWith f l l').length} :
-    (zipWith f l l').get i =
-      f (l.get ⟨i, lt_length_left_of_zipWith i.isLt⟩)
-        (l'.get ⟨i, lt_length_right_of_zipWith i.isLt⟩) := by
-  simp
-
-theorem get_zip {l : List α} {l' : List β} {i : Fin (zip l l').length} :
-    (zip l l').get i =
-      (l.get ⟨i, lt_length_left_of_zip i.isLt⟩, l'.get ⟨i, lt_length_right_of_zip i.isLt⟩) := by
-  simp
 
 theorem mem_zip_inits_tails {l : List α} {init tail : List α} :
     (init, tail) ∈ zip l.inits l.tails ↔ init ++ tail = l := by

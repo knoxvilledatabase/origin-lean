@@ -7,6 +7,8 @@ import Mathlib.Analysis.Complex.UpperHalfPlane.Topology
 import Mathlib.Analysis.SpecialFunctions.Arsinh
 import Mathlib.Geometry.Euclidean.Inversion.Basic
 
+noncomputable section
+
 /-!
 # Metric on the upper half-plane
 

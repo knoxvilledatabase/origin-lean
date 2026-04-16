@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/Divisors.lean
-Genuine: 57 | Conflates: 0 | Dissolved: 17 | Infrastructure: 0
+Genuine: 73 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Data.Nat.PrimeFin
 import Mathlib.Order.Interval.Finset.Nat
+
+noncomputable section
 
 /-!
 # Divisor Finsets
@@ -44,9 +46,17 @@ def divisorsAntidiagonal : Finset (ℕ × ℕ) :=
 
 variable {n}
 
--- DISSOLVED: filter_dvd_eq_divisors
+@[simp]
+theorem filter_dvd_eq_divisors (h : n ≠ 0) : {d ∈ range n.succ | d ∣ n} = n.divisors := by
+  ext
+  simp only [divisors, mem_filter, mem_range, mem_Ico, and_congr_left_iff, iff_and_self]
+  exact fun ha _ => succ_le_iff.mpr (pos_of_dvd_of_pos ha h.bot_lt)
 
--- DISSOLVED: filter_dvd_eq_properDivisors
+@[simp]
+theorem filter_dvd_eq_properDivisors (h : n ≠ 0) : {d ∈ range n | d ∣ n} = n.properDivisors := by
+  ext
+  simp only [properDivisors, mem_filter, mem_range, mem_Ico, and_congr_left_iff, iff_and_self]
+  exact fun ha _ => succ_le_iff.mpr (pos_of_dvd_of_pos ha h.bot_lt)
 
 theorem properDivisors.not_self_mem : ¬n ∈ properDivisors n := by simp [properDivisors]
 
@@ -55,28 +65,61 @@ theorem mem_properDivisors {m : ℕ} : n ∈ properDivisors m ↔ n ∣ m ∧ n 
   rcases eq_or_ne m 0 with (rfl | hm); · simp [properDivisors]
   simp only [and_comm, ← filter_dvd_eq_properDivisors hm, mem_filter, mem_range]
 
--- DISSOLVED: insert_self_properDivisors
+theorem insert_self_properDivisors (h : n ≠ 0) : insert n (properDivisors n) = divisors n := by
+  rw [divisors, properDivisors, Ico_succ_right_eq_insert_Ico (one_le_iff_ne_zero.2 h),
+    Finset.filter_insert, if_pos (dvd_refl n)]
 
--- DISSOLVED: cons_self_properDivisors
+theorem cons_self_properDivisors (h : n ≠ 0) :
+    cons n (properDivisors n) properDivisors.not_self_mem = divisors n := by
+  rw [cons_eq_insert, insert_self_properDivisors h]
 
--- DISSOLVED: mem_divisors
+@[simp]
+theorem mem_divisors {m : ℕ} : n ∈ divisors m ↔ n ∣ m ∧ m ≠ 0 := by
+  rcases eq_or_ne m 0 with (rfl | hm); · simp [divisors]
+  simp only [hm, Ne, not_false_iff, and_true, ← filter_dvd_eq_divisors hm, mem_filter,
+    mem_range, and_iff_right_iff_imp, Nat.lt_succ_iff]
+  exact le_of_dvd hm.bot_lt
 
--- DISSOLVED: one_mem_divisors
+theorem one_mem_divisors : 1 ∈ divisors n ↔ n ≠ 0 := by simp
 
--- DISSOLVED: mem_divisors_self
+theorem mem_divisors_self (n : ℕ) (h : n ≠ 0) : n ∈ n.divisors :=
+  mem_divisors.2 ⟨dvd_rfl, h⟩
 
 theorem dvd_of_mem_divisors {m : ℕ} (h : n ∈ divisors m) : n ∣ m := by
   cases m
   · apply dvd_zero
   · simp [mem_divisors.1 h]
 
--- DISSOLVED: mem_divisorsAntidiagonal
+@[simp]
+theorem mem_divisorsAntidiagonal {x : ℕ × ℕ} :
+    x ∈ divisorsAntidiagonal n ↔ x.fst * x.snd = n ∧ n ≠ 0 := by
+  simp only [divisorsAntidiagonal, Finset.mem_Ico, Ne, Finset.mem_filter, Finset.mem_product]
+  rw [and_comm]
+  apply and_congr_right
+  rintro rfl
+  constructor <;> intro h
+  · contrapose! h
+    simp [h]
+  · rw [Nat.lt_add_one_iff, Nat.lt_add_one_iff]
+    rw [mul_eq_zero, not_or] at h
+    simp only [succ_le_of_lt (Nat.pos_of_ne_zero h.1), succ_le_of_lt (Nat.pos_of_ne_zero h.2),
+      true_and]
+    exact
+      ⟨Nat.le_mul_of_pos_right _ (Nat.pos_of_ne_zero h.2),
+        Nat.le_mul_of_pos_left _ (Nat.pos_of_ne_zero h.1)⟩
 
--- DISSOLVED: ne_zero_of_mem_divisorsAntidiagonal
+lemma ne_zero_of_mem_divisorsAntidiagonal {p : ℕ × ℕ} (hp : p ∈ n.divisorsAntidiagonal) :
+    p.1 ≠ 0 ∧ p.2 ≠ 0 := by
+  obtain ⟨hp₁, hp₂⟩ := Nat.mem_divisorsAntidiagonal.mp hp
+  exact mul_ne_zero_iff.mp (hp₁.symm ▸ hp₂)
 
--- DISSOLVED: left_ne_zero_of_mem_divisorsAntidiagonal
+lemma left_ne_zero_of_mem_divisorsAntidiagonal {p : ℕ × ℕ} (hp : p ∈ n.divisorsAntidiagonal) :
+    p.1 ≠ 0 :=
+  (ne_zero_of_mem_divisorsAntidiagonal hp).1
 
--- DISSOLVED: right_ne_zero_of_mem_divisorsAntidiagonal
+lemma right_ne_zero_of_mem_divisorsAntidiagonal {p : ℕ × ℕ} (hp : p ∈ n.divisorsAntidiagonal) :
+    p.2 ≠ 0 :=
+  (ne_zero_of_mem_divisorsAntidiagonal hp).2
 
 theorem divisor_le {m : ℕ} : n ∈ divisors m → n ≤ m := by
   cases' m with m
@@ -84,11 +127,24 @@ theorem divisor_le {m : ℕ} : n ∈ divisors m → n ≤ m := by
   · simp only [mem_divisors, Nat.succ_ne_zero m, and_true, Ne, not_false_iff]
     exact Nat.le_of_dvd (Nat.succ_pos m)
 
--- DISSOLVED: divisors_subset_of_dvd
+theorem divisors_subset_of_dvd {m : ℕ} (hzero : n ≠ 0) (h : m ∣ n) : divisors m ⊆ divisors n :=
+  Finset.subset_iff.2 fun _x hx => Nat.mem_divisors.mpr ⟨(Nat.mem_divisors.mp hx).1.trans h, hzero⟩
 
--- DISSOLVED: divisors_subset_properDivisors
+theorem divisors_subset_properDivisors {m : ℕ} (hzero : n ≠ 0) (h : m ∣ n) (hdiff : m ≠ n) :
+    divisors m ⊆ properDivisors n := by
+  apply Finset.subset_iff.2
+  intro x hx
+  exact
+    Nat.mem_properDivisors.2
+      ⟨(Nat.mem_divisors.1 hx).1.trans h,
+        lt_of_le_of_lt (divisor_le hx)
+          (lt_of_le_of_ne (divisor_le (Nat.mem_divisors.2 ⟨h, hzero⟩)) hdiff)⟩
 
--- DISSOLVED: divisors_filter_dvd_of_dvd
+lemma divisors_filter_dvd_of_dvd {n m : ℕ} (hn : n ≠ 0) (hm : m ∣ n) :
+    {d ∈ n.divisors | d ∣ m} = m.divisors := by
+  ext k
+  simp_rw [mem_filter, mem_divisors]
+  exact ⟨fun ⟨_, hkm⟩ ↦ ⟨hkm, ne_zero_of_dvd_ne_zero hn hm⟩, fun ⟨hk, _⟩ ↦ ⟨⟨hk.trans hm, hn⟩, hk⟩⟩
 
 @[simp]
 theorem divisors_zero : divisors 0 = ∅ := by
@@ -100,7 +156,9 @@ theorem properDivisors_zero : properDivisors 0 = ∅ := by
   ext
   simp
 
--- DISSOLVED: nonempty_divisors
+@[simp]
+lemma nonempty_divisors : (divisors n).Nonempty ↔ n ≠ 0 :=
+  ⟨fun ⟨m, hm⟩ hn ↦ by simp [hn] at hm, fun hn ↦ ⟨1, one_mem_divisors.2 hn⟩⟩
 
 @[simp]
 lemma divisors_eq_empty : divisors n = ∅ ↔ n = 0 :=
@@ -144,7 +202,13 @@ lemma one_lt_div_of_mem_properDivisors {m n : ℕ} (h : m ∈ n.properDivisors) 
   obtain ⟨h_dvd, h_lt⟩ := mem_properDivisors.mp h
   rwa [Nat.lt_div_iff_mul_lt h_dvd, mul_one]
 
--- DISSOLVED: mem_properDivisors_iff_exists
+lemma mem_properDivisors_iff_exists {m n : ℕ} (hn : n ≠ 0) :
+    m ∈ n.properDivisors ↔ ∃ k > 1, n = m * k := by
+  refine ⟨fun h ↦ ⟨n / m, one_lt_div_of_mem_properDivisors h, ?_⟩, ?_⟩
+  · exact (Nat.mul_div_cancel' (mem_properDivisors.mp h).1).symm
+  · rintro ⟨k, hk, rfl⟩
+    rw [mul_ne_zero_iff] at hn
+    exact mem_properDivisors.mpr ⟨⟨k, rfl⟩, lt_mul_of_one_lt_right (Nat.pos_of_ne_zero hn.1) hk⟩
 
 @[simp]
 lemma nonempty_properDivisors : n.properDivisors.Nonempty ↔ 1 < n :=
@@ -398,7 +462,10 @@ theorem primeFactors_eq_to_filter_divisors_prime (n : ℕ) :
 
 alias prime_divisors_eq_to_filter_divisors_prime := primeFactors_eq_to_filter_divisors_prime
 
--- DISSOLVED: primeFactors_filter_dvd_of_dvd
+lemma primeFactors_filter_dvd_of_dvd {m n : ℕ} (hn : n ≠ 0) (hmn : m ∣ n) :
+    {p ∈ n.primeFactors | p ∣ m} = m.primeFactors := by
+  simp_rw [primeFactors_eq_to_filter_divisors_prime, filter_comm,
+    divisors_filter_dvd_of_dvd hn hmn]
 
 alias prime_divisors_filter_dvd_of_dvd := primeFactors_filter_dvd_of_dvd
 

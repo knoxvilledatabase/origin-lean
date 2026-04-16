@@ -7,6 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.Calculus.FDeriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
 
+noncomputable section
+
 /-!
 # Gradient
 

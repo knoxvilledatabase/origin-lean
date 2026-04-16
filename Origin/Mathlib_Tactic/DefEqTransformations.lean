@@ -5,6 +5,8 @@ Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Tactic.Basic
 
+noncomputable section
+
 /-! # Tactics that transform types into definitionally equal types
 
 This module defines a standard wrapper that can be used to create tactics that
@@ -63,13 +65,11 @@ def runDefEqConvTactic (m : Expr → MetaM Expr) : TacticM Unit := withMainConte
 /-! ### `whnf` -/
 
 elab "whnf" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (checkDefEq := false) (fun _ => whnf) loc? "whnf"
 
 /-! ### `beta_reduce` -/
 
 elab (name := betaReduceStx) "beta_reduce" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (checkDefEq := false) (fun _ e => Core.betaReduce e) loc? "beta_reduce"
 
 elab "beta_reduce" : conv => runDefEqConvTactic (Core.betaReduce ·)
@@ -77,7 +77,6 @@ elab "beta_reduce" : conv => runDefEqConvTactic (Core.betaReduce ·)
 /-! ### `reduce` -/
 
 elab "reduce" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (fun _ e => reduce e (skipTypes := false) (skipProofs := false)) loc? "reduce"
 
 /-! ### `unfold_let` -/
@@ -97,7 +96,6 @@ def unfoldFVars (fvars : Array FVarId) (e : Expr) : MetaM Expr := do
     | _ => return .continue
 
 syntax (name := unfoldLetStx) "unfold_let" (ppSpace colGt term:max)*
-
   (ppSpace Parser.Tactic.location)? : tactic
 
 elab_rules : tactic
@@ -153,7 +151,6 @@ def refoldFVars (fvars : Array FVarId) (loc? : Option FVarId) (e : Expr) : MetaM
   return e
 
 syntax (name := refoldLetStx) "refold_let" (ppSpace colGt term:max)*
-
   (ppSpace Parser.Tactic.location)? : tactic
 
 elab_rules : tactic
@@ -183,7 +180,6 @@ def unfoldProjs (e : Expr) : MetaM Expr := do
       return .continue
 
 elab (name := unfoldProjsStx) "unfold_projs" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (fun _ => unfoldProjs) loc? "unfold_projs"
 
 elab "unfold_projs" : conv => runDefEqConvTactic unfoldProjs
@@ -198,7 +194,6 @@ def etaReduceAll (e : Expr) : MetaM Expr := do
     | none => return .continue
 
 elab (name := etaReduceStx) "eta_reduce" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (fun _ => etaReduceAll) loc? "eta_reduce"
 
 elab "eta_reduce" : conv => runDefEqConvTactic etaReduceAll
@@ -226,7 +221,6 @@ partial def etaExpandAll (e : Expr) : MetaM Expr := do
     (post := (.done <$> expand ·))
 
 elab (name := etaExpandStx) "eta_expand" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (fun _ => etaExpandAll) loc? "eta_expand"
 
 elab "eta_expand" : conv => runDefEqConvTactic etaExpandAll
@@ -283,7 +277,6 @@ def etaStructAll (e : Expr) : MetaM Expr :=
       return .continue
 
 elab (name := etaStructStx) "eta_struct" loc?:(ppSpace Parser.Tactic.location)? : tactic =>
-
   runDefEqTactic (fun _ => etaStructAll) loc? "eta_struct"
 
 elab "eta_struct" : conv => runDefEqConvTactic etaStructAll

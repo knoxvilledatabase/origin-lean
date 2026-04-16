@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Nat/ModEq.lean
-Genuine: 63 | Conflates: 0 | Dissolved: 6 | Infrastructure: 8
+Genuine: 69 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Int
 import Mathlib.Algebra.Ring.Nat
 import Mathlib.Data.Int.GCD
+
+noncomputable section
 
 /-!
 # Congruences modulo a natural number
@@ -143,13 +145,23 @@ protected theorem add_right_cancel (h₁ : c ≡ d [MOD n]) (h₂ : a + c ≡ b 
 protected theorem add_right_cancel' (c : ℕ) (h : a + c ≡ b + c [MOD n]) : a ≡ b [MOD n] :=
   ModEq.rfl.add_right_cancel h
 
--- DISSOLVED: mul_left_cancel'
+protected theorem mul_left_cancel' {a b c m : ℕ} (hc : c ≠ 0) :
+    c * a ≡ c * b [MOD c * m] → a ≡ b [MOD m] := by
+  simp only [modEq_iff_dvd, Int.natCast_mul, ← Int.mul_sub]
+  exact fun h => (Int.dvd_of_mul_dvd_mul_left (Int.ofNat_ne_zero.mpr hc) h)
 
--- DISSOLVED: mul_left_cancel_iff'
+protected theorem mul_left_cancel_iff' {a b c m : ℕ} (hc : c ≠ 0) :
+    c * a ≡ c * b [MOD c * m] ↔ a ≡ b [MOD m] :=
+  ⟨ModEq.mul_left_cancel' hc, ModEq.mul_left' _⟩
 
--- DISSOLVED: mul_right_cancel'
+protected theorem mul_right_cancel' {a b c m : ℕ} (hc : c ≠ 0) :
+    a * c ≡ b * c [MOD m * c] → a ≡ b [MOD m] := by
+  simp only [modEq_iff_dvd, Int.natCast_mul, ← Int.sub_mul]
+  exact fun h => (Int.dvd_of_mul_dvd_mul_right (Int.ofNat_ne_zero.mpr hc) h)
 
--- DISSOLVED: mul_right_cancel_iff'
+protected theorem mul_right_cancel_iff' {a b c m : ℕ} (hc : c ≠ 0) :
+    a * c ≡ b * c [MOD m * c] ↔ a ≡ b [MOD m] :=
+  ⟨ModEq.mul_right_cancel' hc, ModEq.mul_right' _⟩
 
 lemma of_mul_left (m : ℕ) (h : a ≡ b [MOD m * n]) : a ≡ b [MOD n] := by
   rw [modEq_iff_dvd] at *
@@ -286,9 +298,16 @@ def chineseRemainder' (h : a ≡ b [MOD gcd n m]) : { k // k ≡ a [MOD n] ∧ k
 def chineseRemainder (co : n.Coprime m) (a b : ℕ) : { k // k ≡ a [MOD n] ∧ k ≡ b [MOD m] } :=
   chineseRemainder' (by convert @modEq_one a b)
 
--- DISSOLVED: chineseRemainder'_lt_lcm
+theorem chineseRemainder'_lt_lcm (h : a ≡ b [MOD gcd n m]) (hn : n ≠ 0) (hm : m ≠ 0) :
+    ↑(chineseRemainder' h) < lcm n m := by
+  dsimp only [chineseRemainder']
+  rw [dif_neg hn, dif_neg hm, Subtype.coe_mk, xgcd_val, ← Int.toNat_natCast (lcm n m)]
+  have lcm_pos := Int.natCast_pos.mpr (Nat.pos_of_ne_zero (lcm_ne_zero hn hm))
+  exact (Int.toNat_lt_toNat lcm_pos).mpr (Int.emod_lt_of_pos _ lcm_pos)
 
--- DISSOLVED: chineseRemainder_lt_mul
+theorem chineseRemainder_lt_mul (co : n.Coprime m) (a b : ℕ) (hn : n ≠ 0) (hm : m ≠ 0) :
+    ↑(chineseRemainder co a b) < n * m :=
+  lt_of_lt_of_le (chineseRemainder'_lt_lcm _ hn hm) (le_of_eq co.lcm_eq_mul)
 
 theorem mod_lcm (hn : a ≡ b [MOD n]) (hm : a ≡ b [MOD m]) : a ≡ b [MOD lcm n m] :=
   Nat.modEq_iff_dvd.mpr <| Int.lcm_dvd (Nat.modEq_iff_dvd.mp hn) (Nat.modEq_iff_dvd.mp hm)

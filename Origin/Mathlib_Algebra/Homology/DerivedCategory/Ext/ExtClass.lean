@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/Ext/ExtClass.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.DerivedCategory.Ext.Basic
 import Mathlib.Algebra.Homology.DerivedCategory.SingleTriangle
+
+noncomputable section
 
 /-!
 # The Ext class of a short exact sequence
@@ -28,8 +30,6 @@ open Abelian
 namespace ShortComplex
 
 variable (S : ShortComplex C)
-
-lemma ext_mk₀_f_comp_ext_mk₀_g : (Ext.mk₀ S.f).comp (Ext.mk₀ S.g) (zero_add 0) = 0 := by simp
 
 namespace ShortExact
 
@@ -58,7 +58,6 @@ instance : HasSmallLocalizedShiftedHom.{w} W ℤ (S').X₃ (S').X₁ := by
   infer_instance
 
 include hS in
-
 private lemma hasSmallLocalizedHom_S'_X₃_K :
     HasSmallLocalizedHom.{w} W (S').X₃ K := by
   rw [Localization.hasSmallLocalizedHom_iff_target W (S').X₃ qis hqis]
@@ -66,7 +65,6 @@ private lemma hasSmallLocalizedHom_S'_X₃_K :
   apply Localization.hasSmallLocalizedHom_of_hasSmallLocalizedShiftedHom₀ (M := ℤ)
 
 include hS in
-
 private lemma hasSmallLocalizedShiftedHom_K_S'_X₁ :
     HasSmallLocalizedShiftedHom.{w} W ℤ K (S').X₁ := by
   rw [Localization.hasSmallLocalizedShiftedHom_iff_source.{w} W ℤ qis hqis (S').X₁]

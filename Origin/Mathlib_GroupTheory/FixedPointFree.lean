@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.GroupTheory.Perm.Cycle.Type
 
+noncomputable section
+
 /-!
 # Fixed-point-free automorphisms
 

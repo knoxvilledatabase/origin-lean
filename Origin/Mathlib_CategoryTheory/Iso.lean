@@ -5,6 +5,8 @@ Genuine: 76 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.Tactic.CategoryTheory.Reassoc
 
+noncomputable section
+
 /-!
 # Isomorphisms
 
@@ -75,20 +77,6 @@ def symm (I : X ≅ Y) : Y ≅ X where
   inv := I.hom
 
 @[simp]
-theorem symm_hom (α : X ≅ Y) : α.symm.hom = α.inv :=
-  rfl
-
-@[simp]
-theorem symm_inv (α : X ≅ Y) : α.symm.inv = α.hom :=
-  rfl
-
-@[simp]
-theorem symm_mk {X Y : C} (hom : X ⟶ Y) (inv : Y ⟶ X) (hom_inv_id) (inv_hom_id) :
-    Iso.symm { hom, inv, hom_inv_id := hom_inv_id, inv_hom_id := inv_hom_id } =
-      { hom := inv, inv := hom, hom_inv_id := inv_hom_id, inv_hom_id := hom_inv_id } :=
-  rfl
-
-@[simp]
 theorem symm_symm_eq {X Y : C} (α : X ≅ Y) : α.symm.symm = α := rfl
 
 @[simp]
@@ -107,9 +95,6 @@ instance : Inhabited (X ≅ X) := ⟨Iso.refl X⟩
 
 theorem nonempty_iso_refl (X : C) : Nonempty (X ≅ X) := ⟨default⟩
 
-@[simp]
-theorem refl_symm (X : C) : (Iso.refl X).symm = Iso.refl X := rfl
-
 @[trans, simps]
 def trans (α : X ≅ Y) (β : Y ≅ Z) : X ≅ Z where
   hom := α.hom ≫ β.hom
@@ -120,17 +105,6 @@ instance instTransIso : Trans (α := C) (· ≅ ·) (· ≅ ·) (· ≅ ·) wher
   trans := trans
 
 infixr:80 " ≪≫ " => Iso.trans -- type as `\ll \gg`.
-
-@[simp]
-theorem trans_mk {X Y Z : C} (hom : X ⟶ Y) (inv : Y ⟶ X) (hom_inv_id) (inv_hom_id)
-    (hom' : Y ⟶ Z) (inv' : Z ⟶ Y) (hom_inv_id') (inv_hom_id') (hom_inv_id'') (inv_hom_id'') :
-    Iso.trans ⟨hom, inv, hom_inv_id, inv_hom_id⟩ ⟨hom', inv', hom_inv_id', inv_hom_id'⟩ =
-     ⟨hom ≫ hom', inv' ≫ inv, hom_inv_id'', inv_hom_id''⟩ :=
-  rfl
-
-@[simp]
-theorem trans_symm (α : X ≅ Y) (β : Y ≅ Z) : (α ≪≫ β).symm = β.symm ≪≫ α.symm :=
-  rfl
 
 @[simp]
 theorem trans_assoc {Z' : C} (α : X ≅ Y) (β : Y ≅ Z) (γ : Z ≅ Z') :
@@ -245,14 +219,6 @@ open IsIso
 
 noncomputable def asIso (f : X ⟶ Y) [IsIso f] : X ≅ Y :=
   ⟨f, inv f, hom_inv_id f, inv_hom_id f⟩
-
-@[simp]
-theorem asIso_hom (f : X ⟶ Y) {_ : IsIso f} : (asIso f).hom = f :=
-  rfl
-
-@[simp]
-theorem asIso_inv (f : X ⟶ Y) {_ : IsIso f} : (asIso f).inv = inv f :=
-  rfl
 
 namespace IsIso
 
@@ -476,10 +442,6 @@ def mapIso (F : C ⥤ D) {X Y : C} (i : X ≅ Y) : F.obj X ≅ F.obj Y where
   inv := F.map i.inv
 
 @[simp]
-theorem mapIso_symm (F : C ⥤ D) {X Y : C} (i : X ≅ Y) : F.mapIso i.symm = (F.mapIso i).symm :=
-  rfl
-
-@[simp]
 theorem mapIso_trans (F : C ⥤ D) {X Y Z : C} (i : X ≅ Y) (j : Y ≅ Z) :
     F.mapIso (i ≪≫ j) = F.mapIso i ≪≫ F.mapIso j := by
   ext; apply Functor.map_comp
@@ -495,14 +457,6 @@ instance map_isIso (F : C ⥤ D) (f : X ⟶ Y) [IsIso f] : IsIso (F.map f) :=
 theorem map_inv (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) [IsIso f] : F.map (inv f) = inv (F.map f) := by
   apply eq_inv_of_hom_inv_id
   simp [← F.map_comp]
-
-@[reassoc]
-theorem map_hom_inv (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) [IsIso f] :
-    F.map f ≫ F.map (inv f) = 𝟙 (F.obj X) := by simp
-
-@[reassoc]
-theorem map_inv_hom (F : C ⥤ D) {X Y : C} (f : X ⟶ Y) [IsIso f] :
-    F.map (inv f) ≫ F.map f = 𝟙 (F.obj Y) := by simp
 
 end Functor
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Quotient
 import Mathlib.CategoryTheory.Linear.LinearFunctor
 
+noncomputable section
+
 /-!
 # The quotient category is linear
 

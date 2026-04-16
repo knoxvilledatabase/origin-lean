@@ -1,6 +1,6 @@
 /-
 Extracted from Dynamics/Circle/RotationNumber/TranslationNumber.lean
-Genuine: 113 | Conflates: 0 | Dissolved: 1 | Infrastructure: 20
+Genuine: 114 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom
@@ -8,6 +8,8 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Order.Iterate
 import Mathlib.Order.SemiconjSup
 import Mathlib.Topology.Order.MonotoneContinuity
+
+noncomputable section
 
 /-!
 # Translation number of a monotone real map that commutes with `x ↦ x + 1`
@@ -139,8 +141,6 @@ instance : OrderHomClass CircleDeg1Lift ℝ ℝ where
 
 variable (f g : CircleDeg1Lift)
 
-@[simp] theorem coe_toOrderHom : ⇑f.toOrderHom = f := rfl
-
 protected theorem monotone : Monotone f := f.monotone'
 
 @[mono] theorem mono {x y} (h : x ≤ y) : f x ≤ f y := f.monotone h
@@ -170,10 +170,6 @@ instance : Monoid CircleDeg1Lift where
 
 instance : Inhabited CircleDeg1Lift := ⟨1⟩
 
-@[simp]
-theorem coe_mul : ⇑(f * g) = f ∘ g :=
-  rfl
-
 theorem mul_apply (x) : (f * g) x = f (g x) :=
   rfl
 
@@ -201,19 +197,6 @@ def toOrderIso : CircleDeg1Liftˣ →* ℝ ≃o ℝ where
       map_rel_iff' := ⟨fun h => by simpa using mono (↑f⁻¹) h, mono f⟩ }
   map_one' := rfl
   map_mul' _ _ := rfl
-
-@[simp]
-theorem coe_toOrderIso (f : CircleDeg1Liftˣ) : ⇑(toOrderIso f) = f :=
-  rfl
-
-@[simp]
-theorem coe_toOrderIso_symm (f : CircleDeg1Liftˣ) :
-    ⇑(toOrderIso f).symm = (f⁻¹ : CircleDeg1Liftˣ) :=
-  rfl
-
-@[simp]
-theorem coe_toOrderIso_inv (f : CircleDeg1Liftˣ) : ⇑(toOrderIso f)⁻¹ = (f⁻¹ : CircleDeg1Liftˣ) :=
-  rfl
 
 theorem isUnit_iff_bijective {f : CircleDeg1Lift} : IsUnit f ↔ Bijective f :=
   ⟨fun ⟨u, h⟩ => h ▸ (toOrderIso u).bijective, fun h =>
@@ -255,10 +238,6 @@ def translate : Multiplicative ℝ →* CircleDeg1Liftˣ := MonoidHom.toHomUnits
 
 @[simp]
 theorem translate_apply (x y : ℝ) : translate (Multiplicative.ofAdd x) y = x + y :=
-  rfl
-
-@[simp]
-theorem translate_inv_apply (x y : ℝ) : (translate <| Multiplicative.ofAdd x)⁻¹ y = -x + y :=
   rfl
 
 @[simp]
@@ -360,14 +339,6 @@ noncomputable instance : Lattice CircleDeg1Lift where
   inf_le_left f g x := min_le_left (f x) (g x)
   inf_le_right f g x := min_le_right (f x) (g x)
   le_inf _ _ _ h₂ h₃ x := le_min (h₂ x) (h₃ x)
-
-@[simp]
-theorem sup_apply (x : ℝ) : (f ⊔ g) x = max (f x) (g x) :=
-  rfl
-
-@[simp]
-theorem inf_apply (x : ℝ) : (f ⊓ g) x = min (f x) (g x) :=
-  rfl
 
 theorem iterate_monotone (n : ℕ) : Monotone fun f : CircleDeg1Lift => f^[n] := fun f _ h =>
   f.monotone.iterate_le_of_le h _
@@ -646,7 +617,9 @@ theorem translationNumber_conj_eq' (f : CircleDeg1Liftˣ) (g : CircleDeg1Lift) :
     τ (↑f⁻¹ * g * f) = τ g :=
   translationNumber_conj_eq f⁻¹ g
 
--- DISSOLVED: dist_pow_map_zero_mul_translationNumber_le
+theorem dist_pow_map_zero_mul_translationNumber_le (n : ℕ) :
+    dist ((f ^ n) 0) (n * f.translationNumber) ≤ 1 :=
+  f.translationNumber_pow n ▸ (f ^ n).dist_map_zero_translationNumber_le
 
 theorem tendsto_translation_number₀' :
     Tendsto (fun n : ℕ => (f ^ (n + 1) : CircleDeg1Lift) 0 / ((n : ℝ) + 1)) atTop (𝓝 <| τ f) := by

@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Module/Equiv/Defs.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 1 | Infrastructure: 27
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LinearMap.Defs
+
+noncomputable section
 
 /-!
 # (Semi)linear equivalences
@@ -136,10 +138,6 @@ instance : SemilinearEquivClass (M ≃ₛₗ[σ] M₂) σ M M₂ where
   map_add := (·.map_add') --map_add' Porting note (https://github.com/leanprover-community/mathlib4/issues/11215): TODO why did I need to change this?
   map_smulₛₗ := (·.map_smul') --map_smul' Porting note (https://github.com/leanprover-community/mathlib4/issues/11215): TODO why did I need to change this?
 
-@[simp]
-theorem coe_mk {to_fun inv_fun map_add map_smul left_inv right_inv} :
-    (⟨⟨⟨to_fun, map_add⟩, map_smul⟩, inv_fun, left_inv, right_inv⟩ : M ≃ₛₗ[σ] M₂) = to_fun := rfl
-
 theorem coe_injective : @Injective (M ≃ₛₗ[σ] M₂) (M → M₂) CoeFun.coe :=
   DFunLike.coe_injective
 
@@ -160,20 +158,6 @@ variable {module_M : Module R M} {module_S_M₂ : Module S M₂} {σ : R →+* S
 variable {re₁ : RingHomInvPair σ σ'} {re₂ : RingHomInvPair σ' σ}
 
 variable (e e' : M ≃ₛₗ[σ] M₂)
-
-@[simp, norm_cast]
-theorem coe_coe : ⇑(e : M →ₛₗ[σ] M₂) = e :=
-  rfl
-
-@[simp]
-theorem coe_toEquiv : ⇑(e.toEquiv) = e :=
-  rfl
-
-@[simp]
-theorem coe_toLinearMap : ⇑e.toLinearMap = e :=
-  rfl
-
-theorem toFun_eq_coe : e.toFun = e := rfl
 
 section
 
@@ -201,10 +185,6 @@ def refl [Module R M] : M ≃ₗ[R] M :=
 
 end
 
-@[simp]
-theorem refl_apply [Module R M] (x : M) : refl R M x = x :=
-  rfl
-
 @[symm]
 def symm (e : M ≃ₛₗ[σ] M₂) : M₂ ≃ₛₗ[σ'] M :=
   { e.toLinearMap.inverse e.invFun e.left_inv e.right_inv,
@@ -227,14 +207,6 @@ def Simps.symm_apply {R : Type*} {S : Type*} [Semiring R] [Semiring S]
 
 initialize_simps_projections LinearEquiv (toFun → apply, invFun → symm_apply)
 
-@[simp]
-theorem invFun_eq_symm : e.invFun = e.symm :=
-  rfl
-
-@[simp]
-theorem coe_toEquiv_symm : e.toEquiv.symm = e.symm :=
-  rfl
-
 variable {module_M₁ : Module R₁ M₁} {module_M₂ : Module R₂ M₂} {module_M₃ : Module R₃ M₃}
 
 variable {module_N₁ : Module R₁ N₁} {module_N₂ : Module R₁ N₂}
@@ -256,6 +228,7 @@ variable {re₃₂ : RingHomInvPair σ₃₂ σ₂₃} [RingHomInvPair σ₃₁ 
 variable (e₁₂ : M₁ ≃ₛₗ[σ₁₂] M₂) (e₂₃ : M₂ ≃ₛₗ[σ₂₃] M₃)
 
 set_option linter.unusedVariables false in
+/-- Linear equivalences are transitive. -/
 
 @[trans, nolint unusedArguments]
 def trans
@@ -279,38 +252,12 @@ notation3:80 (name := transNotation) e₁:80 " ≪≫ₗ " e₂:81 =>
 variable {e₁₂} {e₂₃}
 
 @[simp]
-theorem coe_toAddEquiv : e.toAddEquiv = e :=
-  rfl
-
-theorem toAddMonoidHom_commutes : e.toLinearMap.toAddMonoidHom = e.toAddEquiv.toAddMonoidHom :=
-  rfl
-
-lemma coe_toAddEquiv_symm : (e₁₂.symm : M₂ ≃+ M₁) = (e₁₂ : M₁ ≃+ M₂).symm := by
-  rfl
-
-@[simp]
-theorem trans_apply (c : M₁) : (e₁₂.trans e₂₃ : M₁ ≃ₛₗ[σ₁₃] M₃) c = e₂₃ (e₁₂ c) :=
-  rfl
-
-theorem coe_trans :
-    (e₁₂.trans e₂₃ : M₁ →ₛₗ[σ₁₃] M₃) = (e₂₃ : M₂ →ₛₗ[σ₂₃] M₃).comp (e₁₂ : M₁ →ₛₗ[σ₁₂] M₂) :=
-  rfl
-
-@[simp]
 theorem apply_symm_apply (c : M₂) : e (e.symm c) = c :=
   e.right_inv c
 
 @[simp]
 theorem symm_apply_apply (b : M) : e.symm (e b) = b :=
   e.left_inv b
-
-@[simp]
-theorem trans_symm : (e₁₂.trans e₂₃ : M₁ ≃ₛₗ[σ₁₃] M₃).symm = e₂₃.symm.trans e₁₂.symm :=
-  rfl
-
-theorem symm_trans_apply (c : M₃) :
-    (e₁₂.trans e₂₃ : M₁ ≃ₛₗ[σ₁₃] M₃).symm c = e₁₂.symm (e₂₃.symm c) :=
-  rfl
 
 @[simp]
 theorem trans_refl : e.trans (refl S M₂) = e :=
@@ -377,10 +324,6 @@ theorem eq_comp_toLinearMap_iff (f g : M₂ →ₛₗ[σ₂₃] M₃) :
   rw [(eq_comp_toLinearMap_symm g (f.comp e₁₂.toLinearMap)).mpr h.symm, eq_comp_toLinearMap_symm]
 
 @[simp]
-theorem refl_symm [Module R M] : (refl R M).symm = LinearEquiv.refl R M :=
-  rfl
-
-@[simp]
 theorem self_trans_symm (f : M₁ ≃ₛₗ[σ₁₂] M₂) : f.trans f.symm = LinearEquiv.refl R₁ M₁ := by
   ext x
   simp
@@ -389,15 +332,6 @@ theorem self_trans_symm (f : M₁ ≃ₛₗ[σ₁₂] M₂) : f.trans f.symm = L
 theorem symm_trans_self (f : M₁ ≃ₛₗ[σ₁₂] M₂) : f.symm.trans f = LinearEquiv.refl R₂ M₂ := by
   ext x
   simp
-
-@[simp]  -- Porting note: norm_cast
-theorem refl_toLinearMap [Module R M] : (LinearEquiv.refl R M : M →ₗ[R] M) = LinearMap.id :=
-  rfl
-
-@[simp]  -- Porting note: norm_cast
-theorem comp_coe [Module R M] [Module R M₂] [Module R M₃] (f : M ≃ₗ[R] M₂) (f' : M₂ ≃ₗ[R] M₃) :
-    (f' : M₂ →ₗ[R] M₃).comp (f : M →ₗ[R] M₂) = (f.trans f' : M ≃ₗ[R] M₃) :=
-  rfl
 
 @[simp]
 theorem mk_coe (f h₁ h₂) : (LinearEquiv.mk e f h₁ h₂ : M ≃ₛₗ[σ] M₂) = e :=
@@ -418,7 +352,8 @@ theorem map_smul (e : N₁ ≃ₗ[R₁] N₂) (c : R₁) (x : N₁) : e (c • x
 theorem map_eq_zero_iff {x : M} : e x = 0 ↔ x = 0 :=
   e.toAddEquiv.map_eq_zero_iff
 
--- DISSOLVED: map_ne_zero_iff
+theorem map_ne_zero_iff {x : M} : e x ≠ 0 ↔ x ≠ 0 :=
+  e.toAddEquiv.map_ne_zero_iff
 
 @[simp]
 theorem symm_symm (e : M ≃ₛₗ[σ] M₂) : e.symm.symm = e := rfl
@@ -440,12 +375,6 @@ theorem symm_mk (f h₁ h₂ h₃ h₄) :
       { symm_mk.aux e f h₁ h₂ h₃ h₄ with
         toFun := f
         invFun := e } :=
-  rfl
-
-@[simp]
-theorem coe_symm_mk [Module R M] [Module R M₂]
-    {to_fun inv_fun map_add map_smul left_inv right_inv} :
-    ⇑(⟨⟨⟨to_fun, map_add⟩, map_smul⟩, inv_fun, left_inv, right_inv⟩ : M ≃ₗ[R] M₂).symm = inv_fun :=
   rfl
 
 protected theorem bijective : Function.Bijective e :=
@@ -481,11 +410,6 @@ variable [AddCommMonoid M]
 def ofInvolutive {σ σ' : R →+* R} [RingHomInvPair σ σ'] [RingHomInvPair σ' σ]
     {_ : Module R M} (f : M →ₛₗ[σ] M) (hf : Involutive f) : M ≃ₛₗ[σ] M :=
   { f, hf.toPerm f with }
-
-@[simp]
-theorem coe_ofInvolutive {σ σ' : R →+* R} [RingHomInvPair σ σ'] [RingHomInvPair σ' σ]
-    {_ : Module R M} (f : M →ₛₗ[σ] M) (hf : Involutive f) : ⇑(ofInvolutive f hf) = f :=
-  rfl
 
 end AddCommMonoid
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/AddCircle.lean
-Genuine: 54 | Conflates: 0 | Dissolved: 6 | Infrastructure: 13
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 17
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.ToIntervalMod
@@ -10,6 +10,8 @@ import Mathlib.GroupTheory.Divisible
 import Mathlib.Topology.Connected.PathConnected
 import Mathlib.Topology.IsLocalHomeomorph
 import Mathlib.Topology.Instances.ZMultiples
+
+noncomputable section
 
 /-!
 # The additive circle
@@ -288,21 +290,19 @@ section LinearOrderedField
 
 variable [LinearOrderedField 𝕜] (p q : 𝕜)
 
--- DISSOLVED: equivAddCircle
-
--- DISSOLVED: equivAddCircle_apply_mk
-
--- DISSOLVED: equivAddCircle_symm_apply_mk
+def equivAddCircle (hp : p ≠ 0) (hq : q ≠ 0) : AddCircle p ≃+ AddCircle q :=
+  QuotientAddGroup.congr _ _ (AddAut.mulRight <| (Units.mk0 p hp)⁻¹ * Units.mk0 q hq) <| by
+    rw [AddMonoidHom.map_zmultiples, AddMonoidHom.coe_coe, AddAut.mulRight_apply, Units.val_mul,
+      Units.val_mk0, Units.val_inv_eq_inv_val, Units.val_mk0, mul_inv_cancel_left₀ hp]
 
 section
 
 variable [TopologicalSpace 𝕜] [OrderTopology 𝕜]
 
--- DISSOLVED: homeomorphAddCircle
-
--- DISSOLVED: homeomorphAddCircle_apply_mk
-
--- DISSOLVED: homeomorphAddCircle_symm_apply_mk
+def homeomorphAddCircle (hp : p ≠ 0) (hq : q ≠ 0) : AddCircle p ≃ₜ AddCircle q :=
+  ⟨equivAddCircle p q hp hq,
+    (continuous_quotient_mk'.comp (continuous_mul_right (p⁻¹ * q))).quotient_lift _,
+    (continuous_quotient_mk'.comp (continuous_mul_right (q⁻¹ * p))).quotient_lift _⟩
 
 end
 

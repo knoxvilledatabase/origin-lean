@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/Analytic/OfScalars.lean
-Genuine: 21 | Conflates: 4 | Dissolved: 5 | Infrastructure: 1
+Genuine: 26 | Conflates: 4 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.Analytic.Basic
+
+noncomputable section
 
 /-!
 # Scalar series
@@ -164,15 +166,71 @@ theorem ofScalars_norm_le (hn : n > 0) : ‖ofScalars E c n‖ ≤ ‖c n‖ := 
 theorem ofScalars_norm [NormOneClass E] : ‖ofScalars E c n‖ = ‖c n‖ := by
   simp [ofScalars_norm_eq_mul]
 
--- DISSOLVED: tendsto_succ_norm_div_norm
+private theorem tendsto_succ_norm_div_norm {r r' : ℝ≥0} (hr' : r' ≠ 0)
+    (hc : Tendsto (fun n ↦ ‖c n.succ‖ / ‖c n‖) atTop (𝓝 r)) :
+      Tendsto (fun n ↦ ‖‖c (n + 1)‖ * r' ^ (n + 1)‖ /
+        ‖‖c n‖ * r' ^ n‖) atTop (𝓝 ↑(r' * r)) := by
+  simp_rw [norm_mul, norm_norm, mul_div_mul_comm, ← norm_div, pow_succ,
+    mul_div_right_comm, div_self (pow_ne_zero _ (NNReal.coe_ne_zero.mpr hr')
+    ), one_mul, norm_div, NNReal.norm_eq]
+  exact mul_comm r' r ▸ hc.mul tendsto_const_nhds
 
--- DISSOLVED: ofScalars_radius_ge_inv_of_tendsto
+theorem ofScalars_radius_ge_inv_of_tendsto {r : ℝ≥0} (hr : r ≠ 0)
+    (hc : Tendsto (fun n ↦ ‖c n.succ‖ / ‖c n‖) atTop (𝓝 r)) :
+      (ofScalars E c).radius ≥ ofNNReal r⁻¹ := by
+  refine le_of_forall_nnreal_lt (fun r' hr' ↦ ?_)
+  rw [coe_lt_coe, NNReal.lt_inv_iff_mul_lt hr] at hr'
+  by_cases hrz : r' = 0
+  · simp [hrz]
+  apply FormalMultilinearSeries.le_radius_of_summable_norm
+  refine Summable.of_norm_bounded_eventually (fun n ↦ ‖‖c n‖ * r' ^ n‖) ?_ ?_
+  · refine summable_of_ratio_test_tendsto_lt_one hr' ?_ ?_
+    · refine (hc.eventually_ne (NNReal.coe_ne_zero.mpr hr)).mp (Eventually.of_forall ?_)
+      aesop
+    · simp_rw [norm_norm]
+      exact tendsto_succ_norm_div_norm c hrz hc
+  · filter_upwards [eventually_cofinite_ne 0] with n hn
+    simp only [norm_mul, norm_norm, norm_pow, NNReal.norm_eq]
+    gcongr
+    exact ofScalars_norm_le E c n (Nat.pos_iff_ne_zero.mpr hn)
 
--- DISSOLVED: ofScalars_radius_eq_inv_of_tendsto
+theorem ofScalars_radius_eq_inv_of_tendsto [NormOneClass E] {r : ℝ≥0} (hr : r ≠ 0)
+    (hc : Tendsto (fun n ↦ ‖c n.succ‖ / ‖c n‖) atTop (𝓝 r)) :
+      (ofScalars E c).radius = ofNNReal r⁻¹ := by
+  refine le_antisymm ?_ (ofScalars_radius_ge_inv_of_tendsto E c hr hc)
+  refine le_of_forall_nnreal_lt (fun r' hr' ↦ ?_)
+  rw [coe_le_coe, NNReal.le_inv_iff_mul_le hr]
+  have := FormalMultilinearSeries.summable_norm_mul_pow _ hr'
+  contrapose! this
+  apply not_summable_of_ratio_test_tendsto_gt_one this
+  simp_rw [ofScalars_norm]
+  exact tendsto_succ_norm_div_norm c (by aesop) hc
 
--- DISSOLVED: ofScalars_radius_eq_of_tendsto
+theorem ofScalars_radius_eq_of_tendsto [NormOneClass E] {r : NNReal} (hr : r ≠ 0)
+    (hc : Tendsto (fun n ↦ ‖c n‖ / ‖c n.succ‖) atTop (𝓝 r)) :
+      (ofScalars E c).radius = ofNNReal r := by
+  suffices Tendsto (fun n ↦ ‖c n.succ‖ / ‖c n‖) atTop (𝓝 r⁻¹) by
+    convert ofScalars_radius_eq_inv_of_tendsto E c (inv_ne_zero hr) this
+    simp
+  convert hc.inv₀ (NNReal.coe_ne_zero.mpr hr) using 1
+  simp
 
--- DISSOLVED: ofScalars_radius_eq_top_of_tendsto
+theorem ofScalars_radius_eq_top_of_tendsto (hc : ∀ᶠ n in atTop, c n ≠ 0)
+    (hc' : Tendsto (fun n ↦ ‖c n.succ‖ / ‖c n‖) atTop (𝓝 0)) : (ofScalars E c).radius = ⊤ := by
+  refine radius_eq_top_of_summable_norm _ fun r' ↦ ?_
+  by_cases hrz : r' = 0
+  · apply Summable.comp_nat_add (k := 1)
+    simp [hrz]
+    exact (summable_const_iff 0).mpr rfl
+  · refine Summable.of_norm_bounded_eventually (fun n ↦ ‖‖c n‖ * r' ^ n‖) ?_ ?_
+    · apply summable_of_ratio_test_tendsto_lt_one zero_lt_one (hc.mp (Eventually.of_forall ?_))
+      · simp only [norm_norm]
+        exact mul_zero (_ : ℝ) ▸ tendsto_succ_norm_div_norm _ hrz (NNReal.coe_zero ▸ hc')
+      · aesop
+    · filter_upwards [eventually_cofinite_ne 0] with n hn
+      simp only [norm_mul, norm_norm, norm_pow, NNReal.norm_eq]
+      gcongr
+      exact ofScalars_norm_le E c n (Nat.pos_iff_ne_zero.mpr hn)
 
 theorem ofScalars_radius_eq_zero_of_tendsto [NormOneClass E]
     (hc : Tendsto (fun n ↦ ‖c n.succ‖ / ‖c n‖) atTop atTop) : (ofScalars E c).radius = 0 := by

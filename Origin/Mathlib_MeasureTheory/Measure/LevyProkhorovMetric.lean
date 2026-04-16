@@ -8,6 +8,8 @@ import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Integral.Layercake
 import Mathlib.MeasureTheory.Integral.BoundedContinuousFunction
 
+noncomputable section
+
 /-!
 # The Lévy-Prokhorov distance on spaces of finite measures and probability measures
 

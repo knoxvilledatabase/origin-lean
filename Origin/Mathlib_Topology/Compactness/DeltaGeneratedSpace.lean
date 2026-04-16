@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed
 
+noncomputable section
+
 /-!
 # Delta-generated topological spaces
 
@@ -115,6 +117,7 @@ instance [DeltaGeneratedSpace X] : SequentialSpace X := by
 end DeltaGeneratedSpace
 
 omit tY in
+/-- Any topology coinduced by a delta-generated topology is delta-generated. -/
 
 lemma DeltaGeneratedSpace.coinduced [DeltaGeneratedSpace X] (f : X → Y) :
     @DeltaGeneratedSpace Y (tX.coinduced f) :=

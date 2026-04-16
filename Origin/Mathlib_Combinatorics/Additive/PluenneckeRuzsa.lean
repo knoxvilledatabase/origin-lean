@@ -12,6 +12,8 @@ import Mathlib.Tactic.GCongr
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
 
+noncomputable section
+
 /-!
 # The Plünnecke-Ruzsa inequality
 

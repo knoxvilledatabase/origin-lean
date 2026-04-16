@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Sites/SheafHom.lean
-Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Over
+
+noncomputable section
 
 /-! Internal hom of sheaves
 
@@ -116,7 +118,6 @@ namespace PresheafHom.IsSheafFor
 variable (x : Presieve.FamilyOfElements (presheafHom F G) S.arrows) {Y : C}
 
 include hG in
-
 lemma exists_app (hx : x.Compatible) (g : Y ⟶ X) :
     ∃ (φ : F.obj (op Y) ⟶ G.obj (op Y)),
       ∀ {Z : C} (p : Z ⟶ Y) (hp : S (p ≫ g)), φ ≫ G.map p.op =
@@ -153,7 +154,6 @@ end PresheafHom.IsSheafFor
 variable (F G S)
 
 include hG in
-
 open PresheafHom.IsSheafFor in
 
 lemma presheafHom_isSheafFor  :
@@ -223,9 +223,5 @@ def sheafHomSectionsEquiv (F G : Sheaf J A) :
     (sheafHom F G).1.sections ≃ (F ⟶ G) :=
   ((Functor.sectionsFunctor Cᵒᵖ).mapIso (sheafHom'Iso F G)).toEquiv.trans
     ((presheafHomSectionsEquiv F.1 G.1).trans Sheaf.homEquiv.symm)
-
-@[simp]
-lemma sheafHomSectionsEquiv_symm_apply_coe_apply {F G : Sheaf J A} (φ : F ⟶ G) (X : Cᵒᵖ) :
-    ((sheafHomSectionsEquiv F G).symm φ).1 X = (J.overPullback A X.unop).map φ := rfl
 
 end CategoryTheory

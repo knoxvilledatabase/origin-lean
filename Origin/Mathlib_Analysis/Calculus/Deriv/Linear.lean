@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Linear
 
+noncomputable section
+
 /-!
 # Derivatives of continuous linear maps from the base field
 

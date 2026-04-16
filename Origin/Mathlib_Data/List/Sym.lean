@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Data.Sym.Sym2
 
+noncomputable section
+
 /-! # Unordered tuples of elements of a list
 
 Defines `List.sym` and the specialized `List.sym2` for computing lists of all unordered n-tuples

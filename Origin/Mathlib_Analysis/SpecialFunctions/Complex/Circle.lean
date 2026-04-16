@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Complex/Circle.lean
-Genuine: 31 | Conflates: 0 | Dissolved: 3 | Infrastructure: 3
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.Complex.Circle
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
+
+noncomputable section
 
 /-!
 # Maps on the unit circle
@@ -149,7 +151,17 @@ theorem toCircle_add (x : AddCircle T) (y : AddCircle T) :
 theorem continuous_toCircle : Continuous (@toCircle T) :=
   continuous_coinduced_dom.mpr (Circle.exp.continuous.comp <| continuous_const.mul continuous_id')
 
--- DISSOLVED: injective_toCircle
+theorem injective_toCircle (hT : T ≠ 0) : Function.Injective (@toCircle T) := by
+  intro a b h
+  induction a using QuotientAddGroup.induction_on
+  induction b using QuotientAddGroup.induction_on
+  simp_rw [toCircle_apply_mk] at h
+  obtain ⟨m, hm⟩ := Circle.exp_eq_exp.mp h.symm
+  rw [QuotientAddGroup.eq]; simp_rw [AddSubgroup.mem_zmultiples_iff, zsmul_eq_mul]
+  use m
+  field_simp at hm
+  rw [← mul_right_inj' Real.two_pi_pos.ne']
+  linarith
 
 @[simps] noncomputable def homeomorphCircle' : AddCircle (2 * π) ≃ₜ Circle where
   toFun := Angle.toCircle
@@ -164,9 +176,15 @@ theorem continuous_toCircle : Continuous (@toCircle T) :=
 
 theorem homeomorphCircle'_apply_mk (x : ℝ) : homeomorphCircle' x = Circle.exp x := rfl
 
--- DISSOLVED: homeomorphCircle
+noncomputable def homeomorphCircle (hT : T ≠ 0) : AddCircle T ≃ₜ Circle :=
+  (homeomorphAddCircle T (2 * π) hT (by positivity)).trans homeomorphCircle'
 
--- DISSOLVED: homeomorphCircle_apply
+theorem homeomorphCircle_apply (hT : T ≠ 0) (x : AddCircle T) :
+    homeomorphCircle hT x = toCircle x := by
+  induction' x using QuotientAddGroup.induction_on with x
+  rw [homeomorphCircle, Homeomorph.trans_apply,
+    homeomorphAddCircle_apply_mk, homeomorphCircle'_apply_mk, toCircle_apply_mk]
+  ring_nf
 
 end AddCircle
 

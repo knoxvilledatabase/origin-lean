@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Normed/Group/AddCircle.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Quotient
 import Mathlib.Topology.Instances.AddCircle
+
+noncomputable section
 
 /-!
 # The additive circle as a normed group
@@ -116,7 +118,12 @@ theorem norm_eq' (hp : 0 < p) {x : ℝ} : ‖(x : AddCircle p)‖ = p * |p⁻¹ 
     rw [← abs_eq_self.mpr hp.le]
   rw [← abs_mul, mul_sub, mul_inv_cancel_left₀ hp.ne.symm, norm_eq, mul_comm p]
 
--- DISSOLVED: norm_le_half_period
+theorem norm_le_half_period {x : AddCircle p} (hp : p ≠ 0) : ‖x‖ ≤ |p| / 2 := by
+  obtain ⟨x⟩ := x
+  change ‖(x : AddCircle p)‖ ≤ |p| / 2
+  rw [norm_eq, ← mul_le_mul_left (abs_pos.mpr (inv_ne_zero hp)), ← abs_mul, mul_sub, mul_left_comm,
+    ← mul_div_assoc, ← abs_mul, inv_mul_cancel₀ hp, mul_one, abs_one]
+  exact abs_sub_round (p⁻¹ * x)
 
 @[simp]
 theorem norm_half_period_eq : ‖(↑(p / 2) : AddCircle p)‖ = |p| / 2 := by
@@ -124,11 +131,36 @@ theorem norm_half_period_eq : ‖(↑(p / 2) : AddCircle p)‖ = |p| / 2 := by
   rw [norm_eq, ← mul_div_assoc, inv_mul_cancel₀ hp, one_div, round_two_inv, Int.cast_one,
     one_mul, (by linarith : p / 2 - p = -(p / 2)), abs_neg, abs_div, abs_two]
 
--- DISSOLVED: norm_coe_eq_abs_iff
+theorem norm_coe_eq_abs_iff {x : ℝ} (hp : p ≠ 0) : ‖(x : AddCircle p)‖ = |x| ↔ |x| ≤ |p| / 2 := by
+  refine ⟨fun hx => hx ▸ norm_le_half_period p hp, fun hx => ?_⟩
+  suffices ∀ p : ℝ, 0 < p → |x| ≤ p / 2 → ‖(x : AddCircle p)‖ = |x| by
+    -- Porting note: replaced `lt_trichotomy` which had trouble substituting `p = 0`.
+    rcases hp.symm.lt_or_lt with (hp | hp)
+    · rw [abs_eq_self.mpr hp.le] at hx
+      exact this p hp hx
+    · rw [← norm_neg_period]
+      rw [abs_eq_neg_self.mpr hp.le] at hx
+      exact this (-p) (neg_pos.mpr hp) hx
+  clear hx
+  intro p hp hx
+  rcases eq_or_ne x (p / (2 : ℝ)) with (rfl | hx')
+  · simp [abs_div, abs_two]
+  suffices round (p⁻¹ * x) = 0 by simp [norm_eq, this]
+  rw [round_eq_zero_iff]
+  obtain ⟨hx₁, hx₂⟩ := abs_le.mp hx
+  replace hx₂ := Ne.lt_of_le hx' hx₂
+  constructor
+  · rwa [← mul_le_mul_left hp, ← mul_assoc, mul_inv_cancel₀ hp.ne.symm, one_mul, mul_neg, ←
+      mul_div_assoc, mul_one]
+  · rwa [← mul_lt_mul_left hp, ← mul_assoc, mul_inv_cancel₀ hp.ne.symm, one_mul, ← mul_div_assoc,
+      mul_one]
 
 open Metric
 
--- DISSOLVED: closedBall_eq_univ_of_half_period_le
+theorem closedBall_eq_univ_of_half_period_le (hp : p ≠ 0) (x : AddCircle p) {ε : ℝ}
+    (hε : |p| / 2 ≤ ε) : closedBall x ε = univ :=
+  eq_univ_iff_forall.mpr fun x => by
+    simpa only [mem_closedBall, dist_eq_norm] using (norm_le_half_period p hp).trans hε
 
 @[simp]
 theorem coe_real_preimage_closedBall_period_zero (x ε : ℝ) :
@@ -208,7 +240,17 @@ theorem exists_norm_eq_of_isOfFinAddOrder {u : AddCircle p} (hu : IsOfFinAddOrde
   refine ⟨min (m % n) (n - m % n), ?_⟩
   rw [← hm, norm_div_natCast]
 
--- DISSOLVED: le_add_order_smul_norm_of_isOfFinAddOrder
+theorem le_add_order_smul_norm_of_isOfFinAddOrder {u : AddCircle p} (hu : IsOfFinAddOrder u)
+    (hu' : u ≠ 0) : p ≤ addOrderOf u • ‖u‖ := by
+  obtain ⟨n, hn⟩ := exists_norm_eq_of_isOfFinAddOrder hu
+  replace hu : (addOrderOf u : ℝ) ≠ 0 := by
+    norm_cast
+    exact (addOrderOf_pos_iff.mpr hu).ne'
+  conv_lhs => rw [← mul_one p]
+  rw [hn, nsmul_eq_mul, ← mul_assoc, mul_comm _ p, mul_assoc, mul_div_cancel₀ _ hu,
+    mul_le_mul_left hp.out, Nat.one_le_cast, Nat.one_le_iff_ne_zero]
+  contrapose! hu'
+  simpa only [hu', Nat.cast_zero, zero_div, mul_zero, norm_eq_zero] using hn
 
 end FiniteOrderPoints
 

@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/Padics/PadicNorm.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 3 | Infrastructure: 1
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
+
+noncomputable section
 
 /-!
 # p-adic norm
@@ -42,7 +44,9 @@ open padicValRat
 
 variable {p : ℕ}
 
--- DISSOLVED: eq_zpow_of_nonzero
+@[simp]
+protected theorem eq_zpow_of_nonzero {q : ℚ} (hq : q ≠ 0) :
+    padicNorm p q = (p : ℚ) ^ (-padicValRat p q) := by simp [hq, padicNorm]
 
 protected theorem nonneg (q : ℚ) : 0 ≤ padicNorm p q :=
   if hq : q = 0 then by simp [hq, padicNorm]
@@ -77,7 +81,8 @@ theorem padicNorm_p_lt_one (hp : 1 < p) : padicNorm p p < 1 := by
 theorem padicNorm_p_lt_one_of_prime [Fact p.Prime] : padicNorm p p < 1 :=
   padicNorm_p_lt_one <| Nat.Prime.one_lt Fact.out
 
--- DISSOLVED: values_discrete
+protected theorem values_discrete {q : ℚ} (hq : q ≠ 0) : ∃ z : ℤ, padicNorm p q = (p : ℚ) ^ (-z) :=
+  ⟨padicValRat p q, by simp [padicNorm, hq]⟩
 
 @[simp]
 protected theorem neg (q : ℚ) : padicNorm p (-q) = padicNorm p q :=
@@ -85,7 +90,10 @@ protected theorem neg (q : ℚ) : padicNorm p (-q) = padicNorm p q :=
 
 variable [hp : Fact p.Prime]
 
--- DISSOLVED: nonzero
+protected theorem nonzero {q : ℚ} (hq : q ≠ 0) : padicNorm p q ≠ 0 := by
+  rw [padicNorm.eq_zpow_of_nonzero hq]
+  apply zpow_ne_zero
+  exact mod_cast ne_of_gt hp.1.pos
 
 theorem zero_of_padicNorm_eq_zero {q : ℚ} (h : padicNorm p q = 0) : q = 0 := by
   apply by_contradiction; intro hq
@@ -150,26 +158,6 @@ theorem triangle_ineq (q r : ℚ) : padicNorm p (q + r) ≤ padicNorm p q + padi
 protected theorem sub {q r : ℚ} : padicNorm p (q - r) ≤ max (padicNorm p q) (padicNorm p r) := by
   rw [sub_eq_add_neg, ← padicNorm.neg r]
   exact padicNorm.nonarchimedean
-
-theorem add_eq_max_of_ne {q r : ℚ} (hne : padicNorm p q ≠ padicNorm p r) :
-    padicNorm p (q + r) = max (padicNorm p q) (padicNorm p r) := by
-  wlog hlt : padicNorm p r < padicNorm p q
-  · rw [add_comm, max_comm]
-    exact this hne.symm (hne.lt_or_lt.resolve_right hlt)
-  have : padicNorm p q ≤ max (padicNorm p (q + r)) (padicNorm p r) :=
-    calc
-      padicNorm p q = padicNorm p (q + r + (-r)) := by ring_nf
-      _ ≤ max (padicNorm p (q + r)) (padicNorm p (-r)) := padicNorm.nonarchimedean
-      _ = max (padicNorm p (q + r)) (padicNorm p r) := by simp
-  have hnge : padicNorm p r ≤ padicNorm p (q + r) := by
-    apply le_of_not_gt
-    intro hgt
-    rw [max_eq_right_of_lt hgt] at this
-    exact not_lt_of_ge this hlt
-  have : padicNorm p q ≤ padicNorm p (q + r) := by rwa [max_eq_left hnge] at this
-  apply _root_.le_antisymm
-  · apply padicNorm.nonarchimedean
-  · rwa [max_eq_left_of_lt hlt]
 
 instance : IsAbsoluteValue (padicNorm p) where
   abv_nonneg' := padicNorm.nonneg

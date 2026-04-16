@@ -8,6 +8,8 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Algebra.DirectSum.Decomposition
 import Mathlib.LinearAlgebra.Eigenspace.Minpoly
 
+noncomputable section
+
 /-! # Spectral theory of self-adjoint operators
 
 This file covers the spectral theory of self-adjoint operators on an inner product space.
@@ -124,11 +126,6 @@ noncomputable instance directSumDecomposition [hT : Fact T.IsSymmetric] :
   haveI h : ∀ μ : Eigenvalues T, CompleteSpace (eigenspace T μ) := fun μ => by infer_instance
   hT.out.orthogonalFamily_eigenspaces'.decomposition
     (Submodule.orthogonal_eq_bot_iff.mp hT.out.orthogonalComplement_iSup_eigenspaces_eq_bot')
-
-theorem directSum_decompose_apply [_hT : Fact T.IsSymmetric] (x : E) (μ : Eigenvalues T) :
-    DirectSum.decompose (fun μ : Eigenvalues T => eigenspace T μ) x μ =
-      orthogonalProjection (eigenspace T μ) x :=
-  rfl
 
 theorem direct_sum_isInternal (hT : T.IsSymmetric) :
     DirectSum.IsInternal fun μ : Eigenvalues T => eigenspace T μ :=

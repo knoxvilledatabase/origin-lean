@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Data.Int.AbsoluteValue
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
+noncomputable section
+
 /-!
 # Absolute values and matrices
 

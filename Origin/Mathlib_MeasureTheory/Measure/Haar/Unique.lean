@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Measure/Haar/Unique.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 4 | Infrastructure: 7
+Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.LocallyIntegrable
@@ -12,6 +12,8 @@ import Mathlib.MeasureTheory.Measure.Haar.Basic
 import Mathlib.Topology.Metrizable.Urysohn
 import Mathlib.Topology.UrysohnsLemma
 import Mathlib.Topology.ContinuousMap.Ordered
+
+noncomputable section
 
 /-!
 # Uniqueness of Haar measure in locally compact groups
@@ -137,7 +139,96 @@ As one may use the same right invariant measure, this shows that two different l
 measures will give the same integral, up to some fixed scalar.
 -/
 
--- DISSOLVED: integral_isMulLeftInvariant_isMulRightInvariant_combo
+@[to_additive]
+lemma integral_isMulLeftInvariant_isMulRightInvariant_combo
+    {μ ν : Measure G} [IsFiniteMeasureOnCompacts μ] [IsFiniteMeasureOnCompacts ν]
+    [IsMulLeftInvariant μ] [IsMulRightInvariant ν] [IsOpenPosMeasure ν]
+    {f g : G → ℝ} (hf : Continuous f) (h'f : HasCompactSupport f)
+    (hg : Continuous g) (h'g : HasCompactSupport g) (g_nonneg : 0 ≤ g) {x₀ : G} (g_pos : g x₀ ≠ 0) :
+    ∫ x, f x ∂μ = (∫ y, f y * (∫ z, g (z⁻¹ * y) ∂ν)⁻¹ ∂ν) * ∫ x, g x ∂μ := by
+  -- The group has to be locally compact, otherwise all integrals vanish and the result is trivial.
+  rcases h'f.eq_zero_or_locallyCompactSpace_of_group hf with Hf|Hf
+  · simp [Hf]
+  let D : G → ℝ := fun (x : G) ↦ ∫ y, g (y⁻¹ * x) ∂ν
+  have D_cont : Continuous D := continuous_integral_apply_inv_mul hg h'g
+  have D_pos : ∀ x, 0 < D x := by
+    intro x
+    have C : Continuous (fun y ↦ g (y⁻¹ * x)) := hg.comp (continuous_inv.mul continuous_const)
+    apply (integral_pos_iff_support_of_nonneg _ _).2
+    · apply C.isOpen_support.measure_pos ν
+      exact ⟨x * x₀⁻¹, by simpa using g_pos⟩
+    · exact fun y ↦ g_nonneg (y⁻¹ * x)
+    · apply C.integrable_of_hasCompactSupport
+      exact h'g.comp_homeomorph ((Homeomorph.inv G).trans (Homeomorph.mulRight x))
+  calc
+  ∫ x, f x ∂μ = ∫ x, f x * (D x)⁻¹ * D x ∂μ := by
+    congr with x; rw [mul_assoc, inv_mul_cancel₀ (D_pos x).ne', mul_one]
+  _ = ∫ x, (∫ y, f x * (D x)⁻¹ * g (y⁻¹ * x) ∂ν) ∂μ := by simp_rw [integral_mul_left]
+  _ = ∫ y, (∫ x, f x * (D x)⁻¹ * g (y⁻¹ * x) ∂μ) ∂ν := by
+      apply integral_integral_swap_of_hasCompactSupport
+      · apply Continuous.mul
+        · exact (hf.comp continuous_fst).mul
+            ((D_cont.comp continuous_fst).inv₀ (fun x ↦ (D_pos _).ne'))
+        · exact hg.comp (continuous_snd.inv.mul continuous_fst)
+      · let K := tsupport f
+        have K_comp : IsCompact K := h'f
+        let L := tsupport g
+        have L_comp : IsCompact L := h'g
+        let M := (fun (p : G × G) ↦ p.1 * p.2⁻¹) '' (K ×ˢ L)
+        have M_comp : IsCompact M :=
+          (K_comp.prod L_comp).image (continuous_fst.mul continuous_snd.inv)
+        have M'_comp : IsCompact (closure M) := M_comp.closure
+        have : ∀ (p : G × G), p ∉ K ×ˢ closure M → f p.1 * (D p.1)⁻¹ * g (p.2⁻¹ * p.1) = 0 := by
+          rintro ⟨x, y⟩ hxy
+          by_cases H : x ∈ K; swap
+          · simp [image_eq_zero_of_nmem_tsupport H]
+          have : g (y⁻¹ * x) = 0 := by
+            apply image_eq_zero_of_nmem_tsupport
+            contrapose! hxy
+            simp only [mem_prod, H, true_and]
+            apply subset_closure
+            simp only [M, mem_image, mem_prod, Prod.exists]
+            exact ⟨x, y⁻¹ * x, ⟨H, hxy⟩, by group⟩
+          simp [this]
+        apply HasCompactSupport.intro' (K_comp.prod M'_comp) ?_ this
+        exact (isClosed_tsupport f).prod isClosed_closure
+  _ = ∫ y, (∫ x, f (y * x) * (D (y * x))⁻¹ * g x ∂μ) ∂ν := by
+      congr with y
+      rw [← integral_mul_left_eq_self _ y]
+      simp
+  _ = ∫ x, (∫ y, f (y * x) * (D (y * x))⁻¹ * g x ∂ν) ∂μ := by
+      apply (integral_integral_swap_of_hasCompactSupport _ _).symm
+      · apply Continuous.mul ?_ (hg.comp continuous_fst)
+        exact (hf.comp (continuous_snd.mul continuous_fst)).mul
+          ((D_cont.comp (continuous_snd.mul continuous_fst)).inv₀ (fun x ↦ (D_pos _).ne'))
+      · let K := tsupport f
+        have K_comp : IsCompact K := h'f
+        let L := tsupport g
+        have L_comp : IsCompact L := h'g
+        let M := (fun (p : G × G) ↦ p.1 * p.2⁻¹) '' (K ×ˢ L)
+        have M_comp : IsCompact M :=
+          (K_comp.prod L_comp).image (continuous_fst.mul continuous_snd.inv)
+        have M'_comp : IsCompact (closure M) := M_comp.closure
+        have : ∀ (p : G × G), p ∉ L ×ˢ closure M →
+            f (p.2 * p.1) * (D (p.2 * p.1))⁻¹ * g p.1 = 0 := by
+          rintro ⟨x, y⟩ hxy
+          by_cases H : x ∈ L; swap
+          · simp [image_eq_zero_of_nmem_tsupport H]
+          have : f (y * x) = 0 := by
+            apply image_eq_zero_of_nmem_tsupport
+            contrapose! hxy
+            simp only [mem_prod, H, true_and]
+            apply subset_closure
+            simp only [M, mem_image, mem_prod, Prod.exists]
+            exact ⟨y * x, x, ⟨hxy, H⟩, by group⟩
+          simp [this]
+        apply HasCompactSupport.intro' (L_comp.prod M'_comp) ?_ this
+        exact (isClosed_tsupport g).prod isClosed_closure
+  _ = ∫ x, (∫ y, f y * (D y)⁻¹ ∂ν) * g x ∂μ := by
+      simp_rw [integral_mul_right]
+      congr with x
+      conv_rhs => rw [← integral_mul_right_eq_self _ x]
+  _ = (∫ y, f y * (D y)⁻¹ ∂ν) * ∫ x, g x ∂μ := integral_mul_left _ _
 
 @[to_additive exists_integral_isAddLeftInvariant_eq_smul_of_hasCompactSupport]
 lemma exists_integral_isMulLeftInvariant_eq_smul_of_hasCompactSupport (μ' μ : Measure G)
@@ -206,7 +297,14 @@ theorem integral_isMulLeftInvariant_eq_smul_of_hasCompactSupport
     exact (exists_integral_isMulLeftInvariant_eq_smul_of_hasCompactSupport μ' μ).choose_spec
       f hf h'f
 
--- DISSOLVED: haarScalarFactor_eq_integral_div
+@[to_additive addHaarScalarFactor_eq_integral_div]
+lemma haarScalarFactor_eq_integral_div (μ' μ : Measure G) [IsHaarMeasure μ]
+    [IsFiniteMeasureOnCompacts μ'] [IsMulLeftInvariant μ'] {f : G → ℝ} (hf : Continuous f)
+    (h'f : HasCompactSupport f) (int_nonzero : ∫ x, f x ∂μ ≠ 0) :
+    haarScalarFactor μ' μ = (∫ x, f x ∂μ') / ∫ x, f x ∂μ := by
+  have := integral_isMulLeftInvariant_eq_smul_of_hasCompactSupport μ' μ hf h'f
+  rw [integral_smul_nnreal_measure] at this
+  exact EuclideanDomain.eq_div_of_mul_eq_left int_nonzero this.symm
 
 @[to_additive (attr := simp) addHaarScalarFactor_smul]
 lemma haarScalarFactor_smul [LocallyCompactSpace G] (μ' μ : Measure G) [IsHaarMeasure μ]
@@ -805,9 +903,18 @@ instance (priority := 100) IsHaarMeasure.isInvInvariant_of_innerRegular
   have : c = 1 := (ENNReal.pow_right_strictMono two_ne_zero).injective this
   rw [hc, this, one_smul]
 
--- DISSOLVED: measurePreserving_zpow
+@[to_additive]
+theorem measurePreserving_zpow [CompactSpace G] [RootableBy G ℤ] {n : ℤ} (hn : n ≠ 0) :
+    MeasurePreserving (fun g : G => g ^ n) μ μ :=
+  (zpowGroupHom n).measurePreserving (μ := μ) (continuous_zpow n)
+    (RootableBy.surjective_pow G ℤ hn) rfl
 
--- DISSOLVED: MeasurePreserving.zpow
+@[to_additive]
+theorem MeasurePreserving.zpow [CompactSpace G] [RootableBy G ℤ]
+    {n : ℤ} (hn : n ≠ 0) {X : Type*}
+    [MeasurableSpace X] {μ' : Measure X} {f : X → G} (hf : MeasurePreserving f μ' μ) :
+    MeasurePreserving (fun x => f x ^ n) μ' μ :=
+  (measurePreserving_zpow μ hn).comp hf
 
 end CommGroup
 

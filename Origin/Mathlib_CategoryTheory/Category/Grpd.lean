@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.SingleObj
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 
+noncomputable section
+
 /-!
 # Category of groupoids
 
@@ -44,10 +46,6 @@ instance : CoeSort Grpd Type* :=
 def of (C : Type u) [Groupoid.{v} C] : Grpd.{v, u} :=
   Bundled.of C
 
-@[simp]
-theorem coe_of (C : Type u) [Groupoid C] : (of C : Type u) = C :=
-  rfl
-
 instance category : LargeCategory.{max v u} Grpd.{v, u} where
   Hom C D := C ⥤ D
   id C := 𝟭 C
@@ -69,9 +67,6 @@ instance forgetToCat_full : forgetToCat.Full where map_surjective f := ⟨f, rfl
 instance forgetToCat_faithful : forgetToCat.Faithful where
 
 theorem hom_to_functor {C D E : Grpd.{v, u}} (f : C ⟶ D) (g : D ⟶ E) : f ≫ g = f ⋙ g :=
-  rfl
-
-theorem id_to_functor {C : Grpd.{v, u}} : 𝟭 C = 𝟙 C :=
   rfl
 
 section Products

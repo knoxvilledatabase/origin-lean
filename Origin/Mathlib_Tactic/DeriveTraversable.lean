@@ -8,6 +8,8 @@ import Lean.Elab.Match
 import Lean.Elab.Deriving.Basic
 import Lean.Elab.PreDefinition.Main
 
+noncomputable section
+
 /-!
 # Deriving handler for `Traversable` instances
 

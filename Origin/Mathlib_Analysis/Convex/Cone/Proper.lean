@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Cone.Closure
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 
+noncomputable section
+
 /-!
 # Proper cones
 
@@ -87,14 +89,6 @@ def positive : ProperCone 𝕜 E where
   toSubmodule := PointedCone.positive 𝕜 E
   isClosed' := isClosed_Ici
 
-@[simp]
-theorem mem_positive {x : E} : x ∈ positive 𝕜 E ↔ 0 ≤ x :=
-  Iff.rfl
-
-@[simp]
-theorem coe_positive : ↑(positive 𝕜 E) = ConvexCone.positive 𝕜 E :=
-  rfl
-
 end PositiveCone
 
 section Module
@@ -109,14 +103,6 @@ instance : Zero (ProperCone 𝕜 E) :=
 
 instance : Inhabited (ProperCone 𝕜 E) :=
   ⟨0⟩
-
-@[simp]
-theorem mem_zero (x : E) : x ∈ (0 : ProperCone 𝕜 E) ↔ x = 0 :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_zero : ↑(0 : ProperCone 𝕜 E) = (0 : ConvexCone 𝕜 E) :=
-  rfl
 
 theorem pointed_zero : ((0 : ProperCone 𝕜 E) : ConvexCone 𝕜 E).Pointed := by
   simp [ConvexCone.pointed_zero]
@@ -156,10 +142,6 @@ def dual (K : ProperCone ℝ E) : ProperCone ℝ E where
   toSubmodule := PointedCone.dual (K : PointedCone ℝ E)
   isClosed' := isClosed_innerDualCone _
 
-@[simp, norm_cast]
-theorem coe_dual (K : ProperCone ℝ E) : K.dual = (K : Set E).innerDualCone :=
-  rfl
-
 open scoped InnerProductSpace in
 
 @[simp]
@@ -173,20 +155,12 @@ noncomputable def comap (f : E →L[ℝ] F) (S : ProperCone ℝ F) : ProperCone 
     apply IsClosed.preimage f.2 S.isClosed
 
 @[simp]
-theorem coe_comap (f : E →L[ℝ] F) (S : ProperCone ℝ F) : (S.comap f : Set E) = f ⁻¹' S :=
-  rfl
-
-@[simp]
 theorem comap_id (S : ConvexCone ℝ E) : S.comap LinearMap.id = S :=
   SetLike.coe_injective preimage_id
 
 theorem comap_comap (g : F →L[ℝ] G) (f : E →L[ℝ] F) (S : ProperCone ℝ G) :
     (S.comap g).comap f = S.comap (g.comp f) :=
   SetLike.coe_injective <| by congr
-
-@[simp]
-theorem mem_comap {f : E →L[ℝ] F} {S : ProperCone ℝ F} {x : E} : x ∈ S.comap f ↔ f x ∈ S :=
-  Iff.rfl
 
 end InnerProductSpace
 

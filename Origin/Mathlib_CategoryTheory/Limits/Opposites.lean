@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 import Mathlib.CategoryTheory.DiscreteCategory
 
+noncomputable section
+
 /-!
 # Limits in `C` give colimits in `Cᵒᵖ`.
 
@@ -800,9 +802,6 @@ def unop {X Y Z : Cᵒᵖ} {f : X ⟶ Y} {g : X ⟶ Z} (c : PushoutCocone f g) :
   Cocone.unop
     ((Cocones.precompose (opCospan f.unop g.unop).hom).obj
       (Cocone.whisker walkingCospanOpEquiv.functor c))
-
-theorem unop_fst {X Y Z : Cᵒᵖ} {f : X ⟶ Y} {g : X ⟶ Z} (c : PushoutCocone f g) :
-    c.unop.fst = c.inl.unop := by simp
 
 theorem unop_snd {X Y Z : Cᵒᵖ} {f : X ⟶ Y} {g : X ⟶ Z} (c : PushoutCocone f g) :
     c.unop.snd = c.inr.unop := by aesop_cat

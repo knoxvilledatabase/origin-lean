@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Homeomorph
 import Mathlib.Data.Option.Basic
 
+noncomputable section
+
 /-!
 # Paracompact topological spaces
 

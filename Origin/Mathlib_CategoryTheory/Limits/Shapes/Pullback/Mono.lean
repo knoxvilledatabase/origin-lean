@@ -5,6 +5,8 @@ Genuine: 24 | Conflates: 0 | Dissolved: 0 | Infrastructure: 22
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.Pullback.Iso
 
+noncomputable section
+
 /-!
 # Pullbacks and monomorphisms
 

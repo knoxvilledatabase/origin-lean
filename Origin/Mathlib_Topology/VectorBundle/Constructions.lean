@@ -7,6 +7,8 @@ import Mathlib.Topology.FiberBundle.Constructions
 import Mathlib.Topology.VectorBundle.Basic
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Prod
 
+noncomputable section
+
 /-!
 # Standard constructions on vector bundles
 

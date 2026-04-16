@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Hom.Defs
 import Mathlib.GroupTheory.Congruence.Defs
 
+noncomputable section
+
 /-!
 # Congruence relations and homomorphisms
 
@@ -67,13 +69,6 @@ variable {c}
 relation is surjective."]
 theorem mk'_surjective : Surjective c.mk' :=
   Quotient.mk''_surjective
-
-@[to_additive (attr := simp)]
-theorem coe_mk' : (c.mk' : M → c.Quotient) = ((↑) : M → c.Quotient) :=
-  rfl
-
-@[to_additive]
-theorem ker_apply {f : M →* P} {x y} : ker f x y ↔ f x = f y := Iff.rfl
 
 @[to_additive "Given an `AddMonoid` homomorphism `f : N → M` and an additive congruence relation
 `c` on `M`, the additive congruence relation induced on `N` by `f` equals the kernel of `c`'s

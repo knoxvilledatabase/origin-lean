@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 import Origin.Core
 import Mathlib.CategoryTheory.Sums.Basic
 
+noncomputable section
+
 /-!
 # Associator for binary disjoint union of categories.
 
@@ -36,32 +38,6 @@ def associator : (C ⊕ D) ⊕ E ⥤ C ⊕ (D ⊕ E) where
   map_comp := by
     rintro ((_|_)|_) ((_|_)|_) ((_|_)|_) f g <;> first | cases f | cases g | aesop_cat
 
-@[simp]
-theorem associator_obj_inl_inl (X) : (associator C D E).obj (inl (inl X)) = inl X :=
-  rfl
-
-@[simp]
-theorem associator_obj_inl_inr (X) : (associator C D E).obj (inl (inr X)) = inr (inl X) :=
-  rfl
-
-@[simp]
-theorem associator_obj_inr (X) : (associator C D E).obj (inr X) = inr (inr X) :=
-  rfl
-
-@[simp]
-theorem associator_map_inl_inl {X Y : C} (f : inl (inl X) ⟶ inl (inl Y)) :
-    (associator C D E).map f = f :=
-  rfl
-
-@[simp]
-theorem associator_map_inl_inr {X Y : D} (f : inl (inr X) ⟶ inl (inr Y)) :
-    (associator C D E).map f = f :=
-  rfl
-
-@[simp]
-theorem associator_map_inr {X Y : E} (f : inr X ⟶ inr Y) : (associator C D E).map f = f :=
-  rfl
-
 def inverseAssociator : C ⊕ (D ⊕ E) ⥤ (C ⊕ D) ⊕ E where
   obj X :=
     match X with
@@ -76,34 +52,6 @@ def inverseAssociator : C ⊕ (D ⊕ E) ⥤ (C ⊕ D) ⊕ E where
   map_id := by rintro (_|(_|_)) <;> rfl
   map_comp := by
     rintro (_|(_|_)) (_|(_|_)) (_|(_|_)) f g <;> first | cases f | cases g | aesop_cat
-
-@[simp]
-theorem inverseAssociator_obj_inl (X) : (inverseAssociator C D E).obj (inl X) = inl (inl X) :=
-  rfl
-
-@[simp]
-theorem inverseAssociator_obj_inr_inl (X) :
-    (inverseAssociator C D E).obj (inr (inl X)) = inl (inr X) :=
-  rfl
-
-@[simp]
-theorem inverseAssociator_obj_inr_inr (X) : (inverseAssociator C D E).obj (inr (inr X)) = inr X :=
-  rfl
-
-@[simp]
-theorem inverseAssociator_map_inl {X Y : C} (f : inl X ⟶ inl Y) :
-    (inverseAssociator C D E).map f = f :=
-  rfl
-
-@[simp]
-theorem inverseAssociator_map_inr_inl {X Y : D} (f : inr (inl X) ⟶ inr (inl Y)) :
-    (inverseAssociator C D E).map f = f :=
-  rfl
-
-@[simp]
-theorem inverseAssociator_map_inr_inr {X Y : E} (f : inr (inr X) ⟶ inr (inr Y)) :
-    (inverseAssociator C D E).map f = f :=
-  rfl
 
 @[simps functor inverse]
 def associativity : (C ⊕ D) ⊕ E ≌ C ⊕ (D ⊕ E) where

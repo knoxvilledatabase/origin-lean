@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Convex.Basic
 import Mathlib.LinearAlgebra.Matrix.Permutation
 
+noncomputable section
+
 /-!
 # Doubly stochastic matrices
 

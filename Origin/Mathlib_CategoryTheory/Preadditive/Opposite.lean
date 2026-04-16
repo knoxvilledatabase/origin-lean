@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
 import Mathlib.Logic.Equiv.TransferInstance
 
+noncomputable section
+
 /-!
 # If `C` is preadditive, `Cᵒᵖ` has a natural preadditive structure.
 
@@ -33,23 +35,7 @@ theorem unop_add {X Y : Cᵒᵖ} (f g : X ⟶ Y) : (f + g).unop = f.unop + g.uno
   rfl
 
 @[simp]
-theorem unop_zsmul {X Y : Cᵒᵖ} (k : ℤ) (f : X ⟶ Y) : (k • f).unop = k • f.unop :=
-  rfl
-
-@[simp]
-theorem unop_neg {X Y : Cᵒᵖ} (f : X ⟶ Y) : (-f).unop = -f.unop :=
-  rfl
-
-@[simp]
 theorem op_add {X Y : C} (f g : X ⟶ Y) : (f + g).op = f.op + g.op :=
-  rfl
-
-@[simp]
-theorem op_zsmul {X Y : C} (k : ℤ) (f : X ⟶ Y) : (k • f).op = k • f.op :=
-  rfl
-
-@[simp]
-theorem op_neg {X Y : C} (f : X ⟶ Y) : (-f).op = -f.op :=
   rfl
 
 variable {C}

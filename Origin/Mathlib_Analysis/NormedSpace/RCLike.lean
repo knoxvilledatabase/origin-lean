@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/NormedSpace/RCLike.lean
-Genuine: 3 | Conflates: 1 | Dissolved: 2 | Infrastructure: 1
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.RCLike.Basic
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
 import Mathlib.Analysis.NormedSpace.Pointwise
+
+noncomputable section
 
 /-!
 # Normed spaces over R or C
@@ -34,9 +36,15 @@ theorem RCLike.norm_coe_norm {z : E} : ‖(‖z‖ : 𝕜)‖ = ‖z‖ := by si
 
 variable [NormedSpace 𝕜 E]
 
--- DISSOLVED: norm_smul_inv_norm
+@[simp]
+theorem norm_smul_inv_norm {x : E} (hx : x ≠ 0) : ‖(‖x‖⁻¹ : 𝕜) • x‖ = 1 := by
+  have : ‖x‖ ≠ 0 := by simp [hx]
+  field_simp [norm_smul]
 
--- DISSOLVED: norm_smul_inv_norm'
+theorem norm_smul_inv_norm' {r : ℝ} (r_nonneg : 0 ≤ r) {x : E} (hx : x ≠ 0) :
+    ‖((r : 𝕜) * (‖x‖ : 𝕜)⁻¹) • x‖ = r := by
+  have : ‖x‖ ≠ 0 := by simp [hx]
+  field_simp [norm_smul, r_nonneg, rclike_simps]
 
 theorem LinearMap.bound_of_sphere_bound {r : ℝ} (r_pos : 0 < r) (c : ℝ) (f : E →ₗ[𝕜] 𝕜)
     (h : ∀ z ∈ sphere (0 : E) r, ‖f z‖ ≤ c) (z : E) : ‖f z‖ ≤ c / r * ‖z‖ := by
@@ -80,8 +88,6 @@ alias ContinuousLinearMap.op_norm_bound_of_ball_bound :=
 variable (𝕜)
 
 include 𝕜 in
-
--- CONFLATES (assumes ground = zero): NormedSpace.sphere_nonempty_rclike
 theorem NormedSpace.sphere_nonempty_rclike [Nontrivial E] {r : ℝ} (hr : 0 ≤ r) :
     Nonempty (sphere (0 : E) r) :=
   letI : NormedSpace ℝ E := NormedSpace.restrictScalars ℝ 𝕜 E

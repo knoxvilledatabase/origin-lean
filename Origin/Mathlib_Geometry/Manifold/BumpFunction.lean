@@ -8,6 +8,8 @@ import Mathlib.Geometry.Manifold.ContMDiff.Atlas
 import Mathlib.Geometry.Manifold.ContMDiff.NormedSpace
 import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
 
+noncomputable section
+
 /-!
 # Smooth bump functions on a smooth manifold
 

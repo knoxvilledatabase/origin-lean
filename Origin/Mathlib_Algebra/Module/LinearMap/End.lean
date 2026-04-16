@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Module/LinearMap/End.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 2 | Infrastructure: 30
+Genuine: 27 | Conflates: 0 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupPower.IterateHom
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.Algebra.Module.Equiv.Opposite
 import Mathlib.Algebra.NoZeroSMulDivisors.Defs
+
+noncomputable section
 
 /-!
 # Endomorphisms of a module
@@ -50,12 +52,7 @@ theorem one_eq_id : (1 : Module.End R M) = id := rfl
 theorem mul_eq_comp (f g : Module.End R M) : f * g = f.comp g := rfl
 
 @[simp]
-theorem one_apply (x : M) : (1 : Module.End R M) x = x := rfl
-
-@[simp]
 theorem mul_apply (f g : Module.End R M) (x : M) : (f * g) x = f (g x) := rfl
-
-theorem coe_one : ⇑(1 : Module.End R M) = _root_.id := rfl
 
 theorem coe_mul (f g : Module.End R M) : ⇑(f * g) = f ∘ g := rfl
 
@@ -80,22 +77,11 @@ instance _root_.Module.End.semiring : Semiring (Module.End R M) :=
     natCast_zero := zero_smul ℕ (1 : M →ₗ[R] M)
     natCast_succ := fun n ↦ AddMonoid.nsmul_succ n (1 : M →ₗ[R] M) }
 
-@[simp]
-theorem _root_.Module.End.natCast_apply (n : ℕ) (m : M) : (↑n : Module.End R M) m = n • m := rfl
-
-@[simp]
-theorem _root_.Module.End.ofNat_apply (n : ℕ) [n.AtLeastTwo] (m : M) :
-    (no_index (OfNat.ofNat n) : Module.End R M) m = OfNat.ofNat n • m := rfl
-
 instance _root_.Module.End.ring : Ring (Module.End R N₁) :=
   { Module.End.semiring, LinearMap.addCommGroup with
     intCast := fun z ↦ z • (1 : N₁ →ₗ[R] N₁)
     intCast_ofNat := natCast_zsmul _
     intCast_negSucc := negSucc_zsmul _ }
-
-@[simp]
-theorem _root_.Module.End.intCast_apply (z : ℤ) (m : N₁) : (z : Module.End R N₁) m = z • m :=
-  rfl
 
 section
 
@@ -166,9 +152,15 @@ theorem iterate_bijective (h : Bijective f') : ∀ n : ℕ, Bijective (f' ^ n)
     rw [iterate_succ]
     exact (iterate_bijective h n).comp h
 
--- DISSOLVED: injective_of_iterate_injective
+theorem injective_of_iterate_injective {n : ℕ} (hn : n ≠ 0) (h : Injective (f' ^ n)) :
+    Injective f' := by
+  rw [← Nat.succ_pred_eq_of_pos (show 0 < n by omega), iterate_succ, coe_comp] at h
+  exact h.of_comp
 
--- DISSOLVED: surjective_of_iterate_surjective
+theorem surjective_of_iterate_surjective {n : ℕ} (hn : n ≠ 0) (h : Surjective (f' ^ n)) :
+    Surjective f' := by
+  rw [← Nat.succ_pred_eq_of_pos (Nat.pos_iff_ne_zero.mpr hn), pow_succ', coe_mul] at h
+  exact Surjective.of_comp h
 
 end
 
@@ -182,10 +174,6 @@ instance applyModule : Module (Module.End R M) M where
   zero_smul := (LinearMap.zero_apply : ∀ m, (0 : M →ₗ[R] M) m = 0)
   one_smul _ := rfl
   mul_smul _ _ _ := rfl
-
-@[simp]
-protected theorem smul_def (f : Module.End R M) (a : M) : f • a = f a :=
-  rfl
 
 instance apply_faithfulSMul : FaithfulSMul (Module.End R M) M :=
   ⟨LinearMap.ext⟩
@@ -257,14 +245,6 @@ def moduleEndSelfOp : R ≃+* Module.End Rᵐᵒᵖ R :=
     left_inv := mul_one
     right_inv := fun _ ↦ LinearMap.ext_ring_op <| mul_one _ }
 
-theorem End.natCast_def (n : ℕ) [AddCommMonoid N₁] [Module R N₁] :
-    (↑n : Module.End R N₁) = Module.toModuleEnd R N₁ n :=
-  rfl
-
-theorem End.intCast_def (z : ℤ) [AddCommGroup N₁] [Module R N₁] :
-    (z : Module.End R N₁) = Module.toModuleEnd R N₁ z :=
-  rfl
-
 end Module
 
 namespace LinearMap
@@ -281,13 +261,6 @@ def smulRight (f : M₁ →ₗ[R] S) (x : M) : M₁ →ₗ[R] M where
   toFun b := f b • x
   map_add' x y := by dsimp only; rw [f.map_add, add_smul]
   map_smul' b y := by dsimp; rw [map_smul, smul_assoc]
-
-@[simp]
-theorem coe_smulRight (f : M₁ →ₗ[R] S) (x : M) : (smulRight f x : M₁ → M) = fun c => f c • x :=
-  rfl
-
-theorem smulRight_apply (f : M₁ →ₗ[R] S) (x : M) (c : M₁) : smulRight f x c = f c • x :=
-  rfl
 
 @[simp]
 lemma smulRight_zero (f : M₁ →ₗ[R] S) : f.smulRight (0 : M) = 0 := by ext; simp
@@ -342,10 +315,6 @@ def compRight (f : M₂ →ₗ[R] M₃) : (M →ₗ[R] M₂) →ₗ[R] M →ₗ[
   map_add' _ _ := LinearMap.ext fun _ => map_add f _ _
   map_smul' _ _ := LinearMap.ext fun _ => map_smul f _ _
 
-@[simp]
-theorem compRight_apply (f : M₂ →ₗ[R] M₃) (g : M →ₗ[R] M₂) : compRight f g = f.comp g :=
-  rfl
-
 @[simps]
 def applyₗ : M →ₗ[R] (M →ₗ[R] M₂) →ₗ[R] M₂ :=
   { applyₗ' R with
@@ -367,11 +336,6 @@ def smulRightₗ : (M₂ →ₗ[R] R) →ₗ[R] M →ₗ[R] M₂ →ₗ[R] M whe
   map_smul' c f := by
     ext
     apply mul_smul
-
-@[simp]
-theorem smulRightₗ_apply (f : M₂ →ₗ[R] R) (x : M) (c : M₂) :
-    (smulRightₗ : (M₂ →ₗ[R] R) →ₗ[R] M →ₗ[R] M₂ →ₗ[R] M) f x c = f c • x :=
-  rfl
 
 end CommSemiring
 

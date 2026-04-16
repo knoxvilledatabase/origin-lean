@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.RingTheory.Adjoin.FG
 
+noncomputable section
+
 /-!
 # Adjoining elements and being finitely generated in an algebra tower
 

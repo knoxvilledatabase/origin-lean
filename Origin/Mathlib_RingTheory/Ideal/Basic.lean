@@ -10,6 +10,8 @@ import Mathlib.RingTheory.Ideal.Maximal
 import Mathlib.Tactic.FinCases
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 
+noncomputable section
+
 /-!
 
 # Ideals over a ring
@@ -50,9 +52,6 @@ def pi : Ideal (ι → α) where
   zero_mem' _i := I.zero_mem
   add_mem' ha hb i := I.add_mem (ha i) (hb i)
   smul_mem' a _b hb i := I.mul_mem_left (a i) (hb i)
-
-theorem mem_pi (x : ι → α) : x ∈ I.pi ι ↔ ∀ i, x i ∈ I :=
-  Iff.rfl
 
 end Pi
 

@@ -8,6 +8,8 @@ import Mathlib.Data.Real.Basic
 import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic.Positivity.Finset
 
+noncomputable section
+
 /-!
 # Ruzsa's covering lemma
 

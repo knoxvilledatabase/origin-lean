@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Constructions.Polish.Basic
 import Mathlib.MeasureTheory.Function.UniformIntegrable
 import Mathlib.Probability.Martingale.Upcrossing
 
+noncomputable section
+
 /-!
 
 # Martingale convergence theorems

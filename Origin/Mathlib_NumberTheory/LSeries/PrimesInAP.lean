@@ -1,12 +1,14 @@
 /-
 Extracted from NumberTheory/LSeries/PrimesInAP.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.DirichletCharacter.Orthogonality
 import Mathlib.NumberTheory.LSeries.Linearity
 import Mathlib.NumberTheory.LSeries.Nonvanishing
 import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+
+noncomputable section
 
 /-!
 # Dirichlet's Theorem on primes in arithmetic progression
@@ -283,12 +285,29 @@ variable (a)
 open Classical in
 
 noncomputable
-
 abbrev LFunctionResidueClassAux (s : ℂ) : ℂ :=
   (q.totient : ℂ)⁻¹ * (-deriv (LFunctionTrivChar₁ q) s / LFunctionTrivChar₁ q s -
     ∑ χ ∈ ({1}ᶜ : Finset (DirichletCharacter ℂ q)), χ a⁻¹ * deriv (LFunction χ) s / LFunction χ s)
 
--- DISSOLVED: continuousOn_LFunctionResidueClassAux'
+lemma continuousOn_LFunctionResidueClassAux' :
+    ContinuousOn (LFunctionResidueClassAux a)
+      {s | s = 1 ∨ ∀ χ : DirichletCharacter ℂ q, LFunction χ s ≠ 0} := by
+  rw [show LFunctionResidueClassAux a = fun s ↦ _ from rfl]
+  simp only [LFunctionResidueClassAux, sub_eq_add_neg]
+  refine continuousOn_const.mul <| ContinuousOn.add ?_ ?_
+  · refine (continuousOn_neg_logDeriv_LFunctionTrivChar₁ q).mono fun s hs ↦ ?_
+    have := LFunction_ne_zero_of_one_le_re (1 : DirichletCharacter ℂ q) (s := s)
+    simp only [ne_eq, Set.mem_setOf_eq] at hs
+    tauto
+  · simp only [← Finset.sum_neg_distrib, mul_div_assoc, ← mul_neg, ← neg_div]
+    refine continuousOn_finset_sum _ fun χ hχ ↦ continuousOn_const.mul ?_
+    replace hχ : χ ≠ 1 := by simpa only [ne_eq, Finset.mem_compl, Finset.mem_singleton] using hχ
+    refine (continuousOn_neg_logDeriv_LFunction_of_nontriv hχ).mono fun s hs ↦ ?_
+    simp only [ne_eq, Set.mem_setOf_eq] at hs
+    rcases hs with rfl | hs
+    · simp only [ne_eq, Set.mem_setOf_eq, one_re, le_refl,
+        LFunction_ne_zero_of_one_le_re χ (.inl hχ), not_false_eq_true]
+    · exact hs χ
 
 lemma continuousOn_LFunctionResidueClassAux :
     ContinuousOn (LFunctionResidueClassAux a) {s | 1 ≤ s.re} := by

@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Homology/HomotopyCategory/ShortExact.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.HomologicalFunctor
 import Mathlib.Algebra.Homology.HomotopyCategory.ShiftSequence
 import Mathlib.Algebra.Homology.HomologySequenceLemmas
 import Mathlib.Algebra.Homology.Refinements
+
+noncomputable section
 
 /-!
 # The mapping cone of a monomorphism, up to a quasi-isomophism
@@ -110,7 +112,6 @@ open ComposableArrows
 set_option simprocs false
 
 include hS in
-
 lemma quasiIso_descShortComplex : QuasiIso (descShortComplex S) where
   quasiIsoAt n := by
     rw [quasiIsoAt_iff_isIso_homologyMap]

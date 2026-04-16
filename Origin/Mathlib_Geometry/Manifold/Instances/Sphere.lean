@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/Instances/Sphere.lean
-Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.Analysis.Calculus.Deriv.Inv
@@ -14,6 +14,8 @@ import Mathlib.Geometry.Manifold.Algebra.LieGroup
 import Mathlib.Geometry.Manifold.Instances.Real
 import Mathlib.Geometry.Manifold.MFDeriv.Basic
 import Mathlib.Tactic.Module
+
+noncomputable section
 
 /-!
 # Manifold structure on the sphere
@@ -188,7 +190,6 @@ theorem continuous_stereoInvFun (hv : ‖v‖ = 1) : Continuous (stereoInvFun hv
 open scoped InnerProductSpace in
 
 attribute [-simp] AddSubgroupClass.coe_norm Submodule.coe_norm in
-
 theorem stereo_left_inv (hv : ‖v‖ = 1) {x : sphere (0 : E) 1} (hx : (x : E) ≠ v) :
     stereoInvFun hv (stereoToFun v x) = x := by
   ext
@@ -260,14 +261,6 @@ def stereographic (hv : ‖v‖ = 1) : PartialHomeomorph (sphere (0 : E) 1) (ℝ
 
 theorem stereographic_apply (hv : ‖v‖ = 1) (x : sphere (0 : E) 1) :
     stereographic hv x = (2 / ((1 : ℝ) - inner v x)) • orthogonalProjection (ℝ ∙ v)ᗮ x :=
-  rfl
-
-@[simp]
-theorem stereographic_source (hv : ‖v‖ = 1) : (stereographic hv).source = {⟨v, by simp [hv]⟩}ᶜ :=
-  rfl
-
-@[simp]
-theorem stereographic_target (hv : ‖v‖ = 1) : (stereographic hv).target = Set.univ :=
   rfl
 
 @[simp]

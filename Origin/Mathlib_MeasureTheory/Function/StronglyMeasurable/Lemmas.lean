@@ -1,12 +1,14 @@
 /-
 Extracted from MeasureTheory/Function/StronglyMeasurable/Lemmas.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Operator.BoundedLinearMaps
 import Mathlib.MeasureTheory.Function.StronglyMeasurable.Basic
 import Mathlib.MeasureTheory.Measure.WithDensity
 import Mathlib.Topology.Algebra.Module.FiniteDimension
+
+noncomputable section
 
 /-!
 # Strongly measurable and finitely strongly measurable functions
@@ -44,7 +46,9 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] [CompleteSpace 𝕜]
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
--- DISSOLVED: aestronglyMeasurable_smul_const_iff
+theorem aestronglyMeasurable_smul_const_iff {f : α → 𝕜} {c : E} (hc : c ≠ 0) :
+    AEStronglyMeasurable (fun x => f x • c) μ ↔ AEStronglyMeasurable f μ :=
+  (isClosedEmbedding_smul_left hc).isEmbedding.aestronglyMeasurable_comp_iff
 
 end NormedSpace
 

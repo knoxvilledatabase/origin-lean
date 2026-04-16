@@ -5,6 +5,8 @@ Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.CategoryTheory.Bicategory.Extension
 
+noncomputable section
+
 /-!
 # Kan extensions and Kan lifts in bicategories
 
@@ -76,14 +78,6 @@ theorem hom_ext (H : IsKan t) {k : b ⟶ c} {τ τ' : t.extension ⟶ k}
 def uniqueUpToIso (P : IsKan s) (Q : IsKan t) : s ≅ t :=
   Limits.IsInitial.uniqueUpToIso P Q
 
-@[simp]
-theorem uniqueUpToIso_hom_right (P : IsKan s) (Q : IsKan t) :
-    (uniqueUpToIso P Q).hom.right = P.desc t := rfl
-
-@[simp]
-theorem uniqueUpToIso_inv_right (P : IsKan s) (Q : IsKan t) :
-    (uniqueUpToIso P Q).inv.right = Q.desc s := rfl
-
 def ofIsoKan (P : IsKan s) (i : s ≅ t) : IsKan t :=
   Limits.IsInitial.ofIso P i
 
@@ -150,14 +144,6 @@ theorem hom_ext (H : IsKan t) {k : c ⟶ b} {τ τ' : t.lift ⟶ k}
 
 def uniqueUpToIso (P : IsKan s) (Q : IsKan t) : s ≅ t :=
   Limits.IsInitial.uniqueUpToIso P Q
-
-@[simp]
-theorem uniqueUpToIso_hom_right (P : IsKan s) (Q : IsKan t) :
-    (uniqueUpToIso P Q).hom.right = P.desc t := rfl
-
-@[simp]
-theorem uniqueUpToIso_inv_right (P : IsKan s) (Q : IsKan t) :
-    (uniqueUpToIso P Q).inv.right = Q.desc s := rfl
 
 def ofIsoKan (P : IsKan s) (i : s ≅ t) : IsKan t :=
   Limits.IsInitial.ofIso P i

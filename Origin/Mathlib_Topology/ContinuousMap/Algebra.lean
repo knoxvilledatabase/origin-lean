@@ -11,6 +11,8 @@ import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Topology.Algebra.Ring.Basic
 import Mathlib.Topology.UniformSpace.CompactConvergence
 
+noncomputable section
+
 /-!
 # Algebraic structures over continuous functions
 
@@ -55,10 +57,6 @@ theorem coe_mul [Mul β] [ContinuousMul β] (f g : C(α, β)) : ⇑(f * g) = f *
   rfl
 
 @[to_additive (attr := simp)]
-theorem mul_apply [Mul β] [ContinuousMul β] (f g : C(α, β)) (x : α) : (f * g) x = f x * g x :=
-  rfl
-
-@[to_additive (attr := simp)]
 theorem mul_comp [Mul γ] [ContinuousMul γ] (f₁ f₂ : C(β, γ)) (g : C(α, β)) :
     (f₁ * f₂).comp g = f₁.comp g * f₂.comp g :=
   rfl
@@ -71,10 +69,6 @@ instance [One β] : One C(α, β) :=
 
 @[to_additive (attr := norm_cast, simp)]
 theorem coe_one [One β] : ⇑(1 : C(α, β)) = 1 :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem one_apply [One β] (x : α) : (1 : C(α, β)) x = 1 :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -151,15 +145,6 @@ instance [Inv β] [ContinuousInv β] : Inv C(α, β) where inv f := ⟨f⁻¹, f
 theorem coe_inv [Inv β] [ContinuousInv β] (f : C(α, β)) : ⇑f⁻¹ = (⇑f)⁻¹ :=
   rfl
 
-@[to_additive (attr := simp)]
-theorem inv_apply [Inv β] [ContinuousInv β] (f : C(α, β)) (x : α) : f⁻¹ x = (f x)⁻¹ :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem inv_comp [Inv γ] [ContinuousInv γ] (f : C(β, γ)) (g : C(α, β)) :
-    f⁻¹.comp g = (f.comp g)⁻¹ :=
-  rfl
-
 /-! ### `div` and `sub` -/
 
 @[to_additive]
@@ -168,15 +153,6 @@ instance [Div β] [ContinuousDiv β] : Div C(α, β) where
 
 @[to_additive (attr := norm_cast, simp)]
 theorem coe_div [Div β] [ContinuousDiv β] (f g : C(α, β)) : ⇑(f / g) = f / g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem div_apply [Div β] [ContinuousDiv β] (f g : C(α, β)) (x : α) : (f / g) x = f x / g x :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem div_comp [Div γ] [ContinuousDiv γ] (f g : C(β, γ)) (h : C(α, β)) :
-    (f / g).comp h = f.comp h / g.comp h :=
   rfl
 
 /-! ### `zpow` and `zsmul` -/
@@ -312,10 +288,6 @@ def compMonoidHom' {γ : Type*} [TopologicalSpace γ] [MulOneClass γ] [Continuo
 theorem coe_prod [CommMonoid β] [ContinuousMul β] {ι : Type*} (s : Finset ι) (f : ι → C(α, β)) :
     ⇑(∏ i ∈ s, f i) = ∏ i ∈ s, (f i : α → β) :=
   map_prod coeFnMonoidHom f s
-
-@[to_additive]
-theorem prod_apply [CommMonoid β] [ContinuousMul β] {ι : Type*} (s : Finset ι) (f : ι → C(α, β))
-    (a : α) : (∏ i ∈ s, f i) a = ∏ i ∈ s, f i a := by simp
 
 @[to_additive]
 instance [Group β] [TopologicalGroup β] : Group C(α, β) :=
@@ -528,16 +500,6 @@ theorem coe_smul [SMul R M] [ContinuousConstSMul R M] (c : R) (f : C(α, M)) : �
   rfl
 
 @[to_additive]
-theorem smul_apply [SMul R M] [ContinuousConstSMul R M] (c : R) (f : C(α, M)) (a : α) :
-    (c • f) a = c • f a :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem smul_comp [SMul R M] [ContinuousConstSMul R M] (r : R) (f : C(β, M)) (g : C(α, β)) :
-    (r • f).comp g = r • f.comp g :=
-  rfl
-
-@[to_additive]
 instance [SMul R M] [ContinuousConstSMul R M] [SMul R₁ M] [ContinuousConstSMul R₁ M]
     [SMulCommClass R R₁ M] : SMulCommClass R R₁ C(α, M) where
   smul_comm _ _ _ := ext fun _ => smul_comm _ _ _
@@ -627,10 +589,6 @@ def ContinuousMap.C : R →+* C(α, A) where
   map_mul' c₁ c₂ := by ext _; exact (algebraMap R A).map_mul _ _
   map_zero' := by ext _; exact (algebraMap R A).map_zero
   map_add' c₁ c₂ := by ext _; exact (algebraMap R A).map_add _ _
-
-@[simp]
-theorem ContinuousMap.C_apply (r : R) (a : α) : ContinuousMap.C r a = algebraMap R A r :=
-  rfl
 
 instance ContinuousMap.algebra : Algebra R C(α, A) where
   toRingHom := ContinuousMap.C
@@ -747,14 +705,6 @@ variable
 instance instSMul' : SMul C(α, R) C(α, M) :=
   ⟨fun f g => ⟨fun x => f x • g x, Continuous.smul f.2 g.2⟩⟩
 
-@[simp] lemma coe_smul' (f : C(α, R)) (g : C(α, M)) :
-    ⇑(f • g) = ⇑f • ⇑g :=
-  rfl
-
-lemma smul_apply' (f : C(α, R)) (g : C(α, M)) (x : α) :
-    (f • g) x = f x • g x :=
-  rfl
-
 instance module' [TopologicalSemiring R] [ContinuousAdd M] :
     Module C(α, R) C(α, M) where
   smul := (· • ·)
@@ -774,12 +724,3 @@ end ModuleOverContinuousFunctions
 variable {X : Type*} (S R : Type*) [TopologicalSpace X] [CommSemiring S] [CommSemiring R]
 
 variable [Algebra S R] [TopologicalSpace R] [TopologicalSemiring R]
-
-@[simps]
-def ContinuousMap.evalAlgHom (x : X) : C(X, R) →ₐ[S] R where
-  toFun f := f x
-  map_zero' := rfl
-  map_one' := rfl
-  map_add' _ _ := rfl
-  map_mul' _ _ := rfl
-  commutes' _ := rfl

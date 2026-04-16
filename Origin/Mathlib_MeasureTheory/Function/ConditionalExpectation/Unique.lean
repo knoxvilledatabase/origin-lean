@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Function/ConditionalExpectation/Unique.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.AEEqOfIntegral
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.AEMeasurable
+
+noncomputable section
 
 /-!
 # Uniqueness of the conditional expectation
@@ -42,7 +44,25 @@ section UniquenessOfConditionalExpectation
 
 /-! ## Uniqueness of the conditional expectation -/
 
--- DISSOLVED: lpMeas.ae_eq_zero_of_forall_setIntegral_eq_zero
+theorem lpMeas.ae_eq_zero_of_forall_setIntegral_eq_zero (hm : m ≤ m0) (f : lpMeas E' 𝕜 m p μ)
+    (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞)
+    -- Porting note: needed to add explicit casts in the next two hypotheses
+    (hf_int_finite : ∀ s, MeasurableSet[m] s → μ s < ∞ → IntegrableOn (f : Lp E' p μ) s μ)
+    (hf_zero : ∀ s : Set α, MeasurableSet[m] s → μ s < ∞ → ∫ x in s, (f : Lp E' p μ) x ∂μ = 0) :
+    f =ᵐ[μ] (0 : α → E') := by
+  obtain ⟨g, hg_sm, hfg⟩ := lpMeas.ae_fin_strongly_measurable' hm f hp_ne_zero hp_ne_top
+  refine hfg.trans ?_
+  -- Porting note: added
+  unfold Filter.EventuallyEq at hfg
+  refine ae_eq_zero_of_forall_setIntegral_eq_of_finStronglyMeasurable_trim hm ?_ ?_ hg_sm
+  · intro s hs hμs
+    have hfg_restrict : f =ᵐ[μ.restrict s] g := ae_restrict_of_ae hfg
+    rw [IntegrableOn, integrable_congr hfg_restrict.symm]
+    exact hf_int_finite s hs hμs
+  · intro s hs hμs
+    have hfg_restrict : f =ᵐ[μ.restrict s] g := ae_restrict_of_ae hfg
+    rw [integral_congr_ae hfg_restrict.symm]
+    exact hf_zero s hs hμs
 
 alias lpMeas.ae_eq_zero_of_forall_set_integral_eq_zero :=
   lpMeas.ae_eq_zero_of_forall_setIntegral_eq_zero
@@ -50,15 +70,53 @@ alias lpMeas.ae_eq_zero_of_forall_set_integral_eq_zero :=
 variable (𝕜)
 
 include 𝕜 in
-
--- DISSOLVED: Lp.ae_eq_zero_of_forall_setIntegral_eq_zero'
+theorem Lp.ae_eq_zero_of_forall_setIntegral_eq_zero' (hm : m ≤ m0) (f : Lp E' p μ)
+    (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞)
+    (hf_int_finite : ∀ s, MeasurableSet[m] s → μ s < ∞ → IntegrableOn f s μ)
+    (hf_zero : ∀ s : Set α, MeasurableSet[m] s → μ s < ∞ → ∫ x in s, f x ∂μ = 0)
+    (hf_meas : AEStronglyMeasurable' m f μ) : f =ᵐ[μ] 0 := by
+  let f_meas : lpMeas E' 𝕜 m p μ := ⟨f, hf_meas⟩
+  -- Porting note: `simp only` does not call `rfl` to try to close the goal. See https://github.com/leanprover-community/mathlib4/issues/5025
+  have hf_f_meas : f =ᵐ[μ] f_meas := by simp only [Subtype.coe_mk]; rfl
+  refine hf_f_meas.trans ?_
+  refine lpMeas.ae_eq_zero_of_forall_setIntegral_eq_zero hm f_meas hp_ne_zero hp_ne_top ?_ ?_
+  · intro s hs hμs
+    have hfg_restrict : f =ᵐ[μ.restrict s] f_meas := ae_restrict_of_ae hf_f_meas
+    rw [IntegrableOn, integrable_congr hfg_restrict.symm]
+    exact hf_int_finite s hs hμs
+  · intro s hs hμs
+    have hfg_restrict : f =ᵐ[μ.restrict s] f_meas := ae_restrict_of_ae hf_f_meas
+    rw [integral_congr_ae hfg_restrict.symm]
+    exact hf_zero s hs hμs
 
 alias Lp.ae_eq_zero_of_forall_set_integral_eq_zero' :=
   Lp.ae_eq_zero_of_forall_setIntegral_eq_zero'
 
 include 𝕜 in
+/-- **Uniqueness of the conditional expectation** -/
 
--- DISSOLVED: Lp.ae_eq_of_forall_setIntegral_eq'
+theorem Lp.ae_eq_of_forall_setIntegral_eq' (hm : m ≤ m0) (f g : Lp E' p μ) (hp_ne_zero : p ≠ 0)
+    (hp_ne_top : p ≠ ∞) (hf_int_finite : ∀ s, MeasurableSet[m] s → μ s < ∞ → IntegrableOn f s μ)
+    (hg_int_finite : ∀ s, MeasurableSet[m] s → μ s < ∞ → IntegrableOn g s μ)
+    (hfg : ∀ s : Set α, MeasurableSet[m] s → μ s < ∞ → ∫ x in s, f x ∂μ = ∫ x in s, g x ∂μ)
+    (hf_meas : AEStronglyMeasurable' m f μ) (hg_meas : AEStronglyMeasurable' m g μ) :
+    f =ᵐ[μ] g := by
+  suffices h_sub : ⇑(f - g) =ᵐ[μ] 0 by
+    rw [← sub_ae_eq_zero]; exact (Lp.coeFn_sub f g).symm.trans h_sub
+  have hfg' : ∀ s : Set α, MeasurableSet[m] s → μ s < ∞ → (∫ x in s, (f - g) x ∂μ) = 0 := by
+    intro s hs hμs
+    rw [integral_congr_ae (ae_restrict_of_ae (Lp.coeFn_sub f g))]
+    rw [integral_sub' (hf_int_finite s hs hμs) (hg_int_finite s hs hμs)]
+    exact sub_eq_zero.mpr (hfg s hs hμs)
+  have hfg_int : ∀ s, MeasurableSet[m] s → μ s < ∞ → IntegrableOn (⇑(f - g)) s μ := by
+    intro s hs hμs
+    rw [IntegrableOn, integrable_congr (ae_restrict_of_ae (Lp.coeFn_sub f g))]
+    exact (hf_int_finite s hs hμs).sub (hg_int_finite s hs hμs)
+  have hfg_meas : AEStronglyMeasurable' m (⇑(f - g)) μ :=
+    AEStronglyMeasurable'.congr (hf_meas.sub hg_meas) (Lp.coeFn_sub f g).symm
+  exact
+    Lp.ae_eq_zero_of_forall_setIntegral_eq_zero' 𝕜 hm (f - g) hp_ne_zero hp_ne_top hfg_int hfg'
+      hfg_meas
 
 alias Lp.ae_eq_of_forall_set_integral_eq' := Lp.ae_eq_of_forall_setIntegral_eq'
 

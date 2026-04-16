@@ -7,6 +7,8 @@ import Mathlib.Data.Matrix.Defs
 import Mathlib.Topology.Algebra.UniformGroup.Basic
 import Mathlib.Topology.UniformSpace.Pi
 
+noncomputable section
+
 /-!
 # Uniform space structure on matrices
 -/

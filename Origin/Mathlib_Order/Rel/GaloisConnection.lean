@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Rel
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # The Galois Connection Induced by a Relation
 

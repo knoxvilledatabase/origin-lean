@@ -7,6 +7,8 @@ import Mathlib.Topology.UniformSpace.CompactConvergence
 import Mathlib.Topology.UniformSpace.Equicontinuity
 import Mathlib.Topology.UniformSpace.Equiv
 
+noncomputable section
+
 /-!
 # Ascoli Theorem
 

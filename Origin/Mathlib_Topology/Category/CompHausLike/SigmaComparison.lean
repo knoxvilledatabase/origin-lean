@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Topology.Category.CompHausLike.Limits
 
+noncomputable section
+
 /-!
 
 # The sigma-comparison map

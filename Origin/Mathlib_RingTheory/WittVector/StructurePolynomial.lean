@@ -7,6 +7,8 @@ import Mathlib.FieldTheory.Finite.Polynomial
 import Mathlib.NumberTheory.Basic
 import Mathlib.RingTheory.WittVector.WittPolynomial
 
+noncomputable section
+
 /-!
 # Witt structure polynomials
 
@@ -102,10 +104,12 @@ variable (p)
 variable [hp : Fact p.Prime]
 
 set_option quotPrecheck false in
+@[inherit_doc]
 
 scoped[Witt] notation "W_" => wittPolynomial p
 
 set_option quotPrecheck false in
+@[inherit_doc]
 
 scoped[Witt] notation "W" => wittPolynomial p _
 

@@ -1,9 +1,11 @@
 /-
 Extracted from SetTheory/Ordinal/Principal.lean
-Genuine: 48 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 49 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.SetTheory.Ordinal.FixedPoint
+
+noncomputable section
 
 /-!
 # Principal ordinals
@@ -121,6 +123,7 @@ theorem not_bddAbove_principal (op : Ordinal → Ordinal → Ordinal) :
   exact ((le_nfp _ _).trans (ha (principal_nfp_iSup op (succ a)))).not_lt (lt_succ a)
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-10-11")]
 
 theorem principal_nfp_blsub₂ (op : Ordinal → Ordinal → Ordinal) (o : Ordinal) :
     Principal op (nfp (fun o' => blsub₂.{u, u, u} o' o' (@fun a _ b _ => op a b)) o) := by
@@ -139,6 +142,7 @@ theorem principal_nfp_blsub₂ (op : Ordinal → Ordinal → Ordinal) (o : Ordin
     exact lt_blsub₂ (@fun a _ b _ => op a b) hm (hn.trans_le h)
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided." (since := "2024-10-11")]
 
 theorem unbounded_principal (op : Ordinal → Ordinal → Ordinal) :
     Set.Unbounded (· < ·) { o | Principal op o } := fun o =>
@@ -421,7 +425,21 @@ theorem mul_omega0_dvd (a0 : 0 < a) (ha : a < ω) : ∀ {b}, ω ∣ b → a * b 
 
 alias mul_omega_dvd := mul_omega0_dvd
 
--- DISSOLVED: mul_eq_opow_log_succ
+theorem mul_eq_opow_log_succ (ha : a ≠ 0) (hb : Principal (· * ·) b) (hb₂ : 2 < b) :
+    a * b = b ^ succ (log b a) := by
+  apply le_antisymm
+  · have hbl := isLimit_of_principal_mul hb₂ hb
+    rw [← (isNormal_mul_right (Ordinal.pos_iff_ne_zero.2 ha)).bsup_eq hbl, bsup_le_iff]
+    intro c hcb
+    have hb₁ : 1 < b := one_lt_two.trans hb₂
+    have hbo₀ : b ^ log b a ≠ 0 := Ordinal.pos_iff_ne_zero.1 (opow_pos _ (zero_lt_one.trans hb₁))
+    apply (mul_le_mul_right' (le_of_lt (lt_mul_succ_div a hbo₀)) c).trans
+    rw [mul_assoc, opow_succ]
+    refine mul_le_mul_left' (hb (hbl.2 _ ?_) hcb).le _
+    rw [div_lt hbo₀, ← opow_succ]
+    exact lt_opow_succ_log_self hb₁ _
+  · rw [opow_succ]
+    exact mul_le_mul_right' (opow_log_le_self b ha) b
 
 /-! #### Exponential principal ordinals -/
 

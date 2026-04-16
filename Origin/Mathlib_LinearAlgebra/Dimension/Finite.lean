@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Dimension/Finite.lean
-Genuine: 41 | Conflates: 11 | Dissolved: 9 | Infrastructure: 2
+Genuine: 47 | Conflates: 13 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Torsion
@@ -8,6 +8,8 @@ import Mathlib.SetTheory.Cardinal.Cofinality
 import Mathlib.LinearAlgebra.FreeModule.Finite.Basic
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Mathlib.LinearAlgebra.Dimension.Constructions
+
+noncomputable section
 
 /-!
 # Conditions for rank to be finite
@@ -40,7 +42,26 @@ theorem rank_le {n : ℕ}
 
 section RankZero
 
--- DISSOLVED: rank_eq_zero_iff
+lemma rank_eq_zero_iff :
+    Module.rank R M = 0 ↔ ∀ x : M, ∃ a : R, a ≠ 0 ∧ a • x = 0 := by
+  nontriviality R
+  constructor
+  · contrapose!
+    rintro ⟨x, hx⟩
+    rw [← Cardinal.one_le_iff_ne_zero]
+    have : LinearIndependent R (fun _ : Unit ↦ x) :=
+      linearIndependent_iff.mpr (fun l hl ↦ Finsupp.unique_ext <| not_not.mp fun H ↦
+        hx _ H ((Finsupp.linearCombination_unique _ _ _).symm.trans hl))
+    simpa using this.cardinal_lift_le_rank
+  · intro h
+    rw [← le_zero_iff, Module.rank_def]
+    apply ciSup_le'
+    intro ⟨s, hs⟩
+    rw [nonpos_iff_eq_zero, Cardinal.mk_eq_zero_iff, ← not_nonempty_iff]
+    rintro ⟨i : s⟩
+    obtain ⟨a, ha, ha'⟩ := h i
+    apply ha
+    simpa using DFunLike.congr_fun (linearIndependent_iff.mp hs (Finsupp.single i a) (by simpa)) i
 
 variable [Nontrivial R]
 
@@ -56,7 +77,9 @@ theorem rank_zero_iff_forall_zero :
 theorem rank_zero_iff : Module.rank R M = 0 ↔ Subsingleton M :=
   rank_zero_iff_forall_zero.trans (subsingleton_iff_forall_eq 0).symm
 
--- DISSOLVED: rank_pos_iff_exists_ne_zero
+theorem rank_pos_iff_exists_ne_zero : 0 < Module.rank R M ↔ ∃ x : M, x ≠ 0 := by
+  rw [← not_iff_not]
+  simpa using rank_zero_iff_forall_zero
 
 -- CONFLATES (assumes ground = zero): rank_pos_iff_nontrivial
 theorem rank_pos_iff_nontrivial : 0 < Module.rank R M ↔ Nontrivial M :=
@@ -86,7 +109,9 @@ theorem rank_bot : Module.rank R (⊥ : Submodule R M) = 0 := rank_subsingleton'
 
 variable {R M}
 
--- DISSOLVED: exists_mem_ne_zero_of_rank_pos
+theorem exists_mem_ne_zero_of_rank_pos {s : Submodule R M} (h : 0 < Module.rank R s) :
+    ∃ b : M, b ∈ s ∧ b ≠ 0 :=
+  exists_mem_ne_zero_of_ne_bot fun eq => by rw [eq, rank_bot] at h; exact lt_irrefl _ h
 
 end RankZero
 
@@ -244,17 +269,6 @@ alias CompleteLattice.Independent.subtype_ne_bot_le_rank := iSupIndep.subtype_ne
 
 variable [Module.Finite R M] [StrongRankCondition R]
 
-theorem iSupIndep.subtype_ne_bot_le_finrank_aux
-    {p : ι → Submodule R M} (hp : iSupIndep p) :
-    #{ i // p i ≠ ⊥ } ≤ (finrank R M : Cardinal.{w}) := by
-  suffices Cardinal.lift.{v} #{ i // p i ≠ ⊥ } ≤ Cardinal.lift.{v} (finrank R M : Cardinal.{w}) by
-    rwa [Cardinal.lift_le] at this
-  calc
-    Cardinal.lift.{v} #{ i // p i ≠ ⊥ } ≤ Cardinal.lift.{w} (Module.rank R M) :=
-      hp.subtype_ne_bot_le_rank
-    _ = Cardinal.lift.{w} (finrank R M : Cardinal.{v}) := by rw [finrank_eq_rank]
-    _ = Cardinal.lift.{v} (finrank R M : Cardinal.{w}) := by simp
-
 noncomputable def iSupIndep.fintypeNeBotOfFiniteDimensional
     {p : ι → Submodule R M} (hp : iSupIndep p) :
     Fintype { i : ι // p i ≠ ⊥ } := by
@@ -276,9 +290,46 @@ section
 
 open Finset
 
--- DISSOLVED: Module.exists_nontrivial_relation_of_finrank_lt_card
+-- CONFLATES (assumes ground = zero): Module.exists_nontrivial_relation_of_finrank_lt_card
+theorem Module.exists_nontrivial_relation_of_finrank_lt_card {t : Finset M}
+    (h : finrank R M < t.card) : ∃ f : M → R, ∑ e ∈ t, f e • e = 0 ∧ ∃ x ∈ t, f x ≠ 0 := by
+  obtain ⟨g, sum, z, nonzero⟩ := Fintype.not_linearIndependent_iff.mp
+    (mt LinearIndependent.finset_card_le_finrank h.not_le)
+  refine ⟨Subtype.val.extend g 0, ?_, z, z.2, by rwa [Subtype.val_injective.extend_apply]⟩
+  rw [← Finset.sum_finset_coe]; convert sum; apply Subtype.val_injective.extend_apply
 
--- DISSOLVED: Module.exists_nontrivial_relation_sum_zero_of_finrank_succ_lt_card
+-- CONFLATES (assumes ground = zero): Module.exists_nontrivial_relation_sum_zero_of_finrank_succ_lt_card
+theorem Module.exists_nontrivial_relation_sum_zero_of_finrank_succ_lt_card
+    {t : Finset M} (h : finrank R M + 1 < t.card) :
+    ∃ f : M → R, ∑ e ∈ t, f e • e = 0 ∧ ∑ e ∈ t, f e = 0 ∧ ∃ x ∈ t, f x ≠ 0 := by
+  -- Pick an element x₀ ∈ t,
+  obtain ⟨x₀, x₀_mem⟩ := card_pos.1 ((Nat.succ_pos _).trans h)
+  -- and apply the previous lemma to the {xᵢ - x₀}
+  let shift : M ↪ M := ⟨(· - x₀), sub_left_injective⟩
+  classical
+  let t' := (t.erase x₀).map shift
+  have h' : finrank R M < t'.card := by
+    rw [card_map, card_erase_of_mem x₀_mem]
+    exact Nat.lt_pred_iff.mpr h
+  -- to obtain a function `g`.
+  obtain ⟨g, gsum, x₁, x₁_mem, nz⟩ := exists_nontrivial_relation_of_finrank_lt_card h'
+  -- Then obtain `f` by translating back by `x₀`,
+  -- and setting the value of `f` at `x₀` to ensure `∑ e ∈ t, f e = 0`.
+  let f : M → R := fun z ↦ if z = x₀ then -∑ z ∈ t.erase x₀, g (z - x₀) else g (z - x₀)
+  refine ⟨f, ?_, ?_, ?_⟩
+  -- After this, it's a matter of verifying the properties,
+  -- based on the corresponding properties for `g`.
+  · rw [sum_map, Embedding.coeFn_mk] at gsum
+    simp_rw [f, ← t.sum_erase_add _ x₀_mem, if_pos, neg_smul, sum_smul,
+             ← sub_eq_add_neg, ← sum_sub_distrib, ← gsum, smul_sub]
+    refine sum_congr rfl fun x x_mem ↦ ?_
+    rw [if_neg (mem_erase.mp x_mem).1]
+  · simp_rw [f, ← t.sum_erase_add _ x₀_mem, if_pos, add_neg_eq_zero]
+    exact sum_congr rfl fun x x_mem ↦ if_neg (mem_erase.mp x_mem).1
+  · obtain ⟨x₁, x₁_mem', rfl⟩ := Finset.mem_map.mp x₁_mem
+    have := mem_erase.mp x₁_mem'
+    exact ⟨x₁, by
+      simpa only [f, Embedding.coeFn_mk, sub_add_cancel, this.2, true_and, if_neg this.1]⟩
 
 end
 
@@ -326,7 +377,10 @@ section StrongRankCondition
 
 variable [StrongRankCondition R] [Module.Finite R M]
 
--- DISSOLVED: Module.finrank_pos_iff_exists_ne_zero
+theorem Module.finrank_pos_iff_exists_ne_zero [NoZeroSMulDivisors R M] :
+    0 < finrank R M ↔ ∃ x : M, x ≠ 0 := by
+  rw [← @rank_pos_iff_exists_ne_zero R M, ← finrank_eq_rank]
+  norm_cast
 
 -- CONFLATES (assumes ground = zero): Module.finrank_pos_iff
 theorem Module.finrank_pos_iff [NoZeroSMulDivisors R M] :
@@ -339,7 +393,10 @@ theorem Module.finrank_pos [NoZeroSMulDivisors R M] [h : Nontrivial M] :
     0 < finrank R M :=
   finrank_pos_iff.mpr h
 
--- DISSOLVED: Module.finrank_eq_zero_iff
+theorem Module.finrank_eq_zero_iff :
+    finrank R M = 0 ↔ ∀ x : M, ∃ a : R, a ≠ 0 ∧ a • x = 0 := by
+  rw [← rank_eq_zero_iff (R := R), ← finrank_eq_rank]
+  norm_cast
 
 theorem Module.finrank_eq_zero_iff_isTorsion {R} [CommRing R] [StrongRankCondition R]
     [IsDomain R] [Module R M] [Module.Finite R M] :
@@ -432,9 +489,14 @@ section RankOne
 
 variable [NoZeroSMulDivisors R M] [StrongRankCondition R]
 
--- DISSOLVED: rank_eq_one
+theorem rank_eq_one (v : M) (n : v ≠ 0) (h : ∀ w : M, ∃ c : R, c • v = w) :
+    Module.rank R M = 1 := by
+  haveI := nontrivial_of_invariantBasisNumber R
+  obtain ⟨b⟩ := (Basis.basis_singleton_iff.{_, _, u} PUnit).mpr ⟨v, n, h⟩
+  rw [rank_eq_card_basis b, Fintype.card_punit, Nat.cast_one]
 
--- DISSOLVED: finrank_eq_one
+theorem finrank_eq_one (v : M) (n : v ≠ 0) (h : ∀ w : M, ∃ c : R, c • v = w) : finrank R M = 1 :=
+  finrank_eq_of_rank_eq (rank_eq_one v n h)
 
 theorem finrank_le_one (v : M) (h : ∀ w : M, ∃ c : R, c • v = w) : finrank R M ≤ 1 := by
   haveI := nontrivial_of_invariantBasisNumber R

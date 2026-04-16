@@ -5,6 +5,8 @@ Genuine: 21 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Algebra.Group.Submonoid.Pointwise
 
+noncomputable section
+
 /-!
 
 # Submonoid of inverses
@@ -43,11 +45,6 @@ noncomputable instance [Monoid M] : Group (IsUnit.submonoid M) :=
 noncomputable instance [CommMonoid M] : CommGroup (IsUnit.submonoid M) :=
   { inferInstanceAs (Group (IsUnit.submonoid M)) with
     mul_comm := fun a b ↦ by convert mul_comm a b }
-
-@[to_additive]
-theorem IsUnit.Submonoid.coe_inv [Monoid M] (x : IsUnit.submonoid M) :
-    ↑x⁻¹ = (↑x.prop.unit⁻¹ : M) :=
-  rfl
 
 section Monoid
 

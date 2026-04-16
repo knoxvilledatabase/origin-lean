@@ -1,9 +1,11 @@
 /-
 Extracted from Data/DFinsupp/Defs.lean
-Genuine: 117 | Conflates: 0 | Dissolved: 14 | Infrastructure: 53
+Genuine: 131 | Conflates: 0 | Dissolved: 0 | Infrastructure: 53
 -/
 import Origin.Core
 import Mathlib.Data.Set.Finite.Basic
+
+noncomputable section
 
 /-!
 # Dependent functions with finite support
@@ -81,8 +83,6 @@ instance : Zero (Π₀ i, β i) :=
 
 instance : Inhabited (Π₀ i, β i) :=
   ⟨0⟩
-
-@[simp, norm_cast] lemma coe_mk' (f : ∀ i, β i) (s) : ⇑(⟨f, s⟩ : Π₀ i, β i) = f := rfl
 
 @[simp, norm_cast] lemma coe_zero : ⇑(0 : Π₀ i, β i) = 0 := rfl
 
@@ -189,9 +189,6 @@ instance instIsCancelAdd [∀ i, AddZeroClass (β i)] [∀ i, IsCancelAdd (β i)
 instance hasNatScalar [∀ i, AddMonoid (β i)] : SMul ℕ (Π₀ i, β i) :=
   ⟨fun c v => v.mapRange (fun _ => (c • ·)) fun _ => nsmul_zero _⟩
 
-theorem nsmul_apply [∀ i, AddMonoid (β i)] (b : ℕ) (v : Π₀ i, β i) (i : ι) : (b • v) i = b • v i :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_nsmul [∀ i, AddMonoid (β i)] (b : ℕ) (v : Π₀ i, β i) : ⇑(b • v) = b • ⇑v :=
   rfl
@@ -227,9 +224,6 @@ theorem coe_sub [∀ i, AddGroup (β i)] (g₁ g₂ : Π₀ i, β i) : ⇑(g₁ 
 
 instance hasIntScalar [∀ i, AddGroup (β i)] : SMul ℤ (Π₀ i, β i) :=
   ⟨fun c v => v.mapRange (fun _ => (c • ·)) fun _ => zsmul_zero _⟩
-
-theorem zsmul_apply [∀ i, AddGroup (β i)] (b : ℤ) (v : Π₀ i, β i) (i : ι) : (b • v) i = b • v i :=
-  rfl
 
 @[simp, norm_cast]
 theorem coe_zsmul [∀ i, AddGroup (β i)] (b : ℤ) (v : Π₀ i, β i) : ⇑(b • v) = b • ⇑v :=
@@ -316,11 +310,6 @@ theorem subtypeDomain_zero [∀ i, Zero (β i)] {p : ι → Prop} [DecidablePred
   rfl
 
 @[simp]
-theorem subtypeDomain_apply [∀ i, Zero (β i)] {p : ι → Prop} [DecidablePred p] {i : Subtype p}
-    {v : Π₀ i, β i} : (subtypeDomain p v) i = v i :=
-  rfl
-
-@[simp]
 theorem subtypeDomain_add [∀ i, AddZeroClass (β i)] {p : ι → Prop} [DecidablePred p]
     (v v' : Π₀ i, β i) : (v + v').subtypeDomain p = v.subtypeDomain p + v'.subtypeDomain p :=
   DFunLike.coe_injective rfl
@@ -352,7 +341,9 @@ section Basic
 
 variable [∀ i, Zero (β i)]
 
--- DISSOLVED: finite_support
+theorem finite_support (f : Π₀ i, β i) : Set.Finite { i | f i ≠ 0 } :=
+  Trunc.induction_on f.support' fun xs ↦
+    xs.1.finite_toSet.subset fun i H ↦ ((xs.prop i).resolve_right H)
 
 section DecidableEq
 
@@ -447,7 +438,9 @@ theorem single_eq_single_iff (i j : ι) (xi : β i) (xj : β j) :
     · rw [eq_of_heq hxi]
     · rw [hi, hj, DFinsupp.single_zero, DFinsupp.single_zero]
 
--- DISSOLVED: single_left_injective
+theorem single_left_injective {b : ∀ i : ι, β i} (h : ∀ i, b i ≠ 0) :
+    Function.Injective (fun i => single i (b i) : ι → Π₀ i, β i) := fun _ _ H =>
+  (((single_eq_single_iff _ _ _ _).mp H).resolve_right fun hb => h _ hb.1).left
 
 @[simp]
 theorem single_eq_zero {i : ι} {xi : β i} : single i xi = 0 ↔ xi = 0 := by
@@ -575,8 +568,6 @@ def update : Π₀ i, β i :=
 
 variable (j : ι)
 
-@[simp, norm_cast] lemma coe_update : (f.update i b : ∀ i : ι, β i) = Function.update f i b := rfl
-
 @[simp]
 theorem update_self : f.update i (f i) = f := by
   ext
@@ -677,9 +668,49 @@ theorem erase_add_single (i : ι) (f : Π₀ i, β i) : f.erase i + single i (f 
     else by
       simp only [add_apply, single_apply, erase_apply, dif_neg h, if_neg (Ne.symm h), add_zero]
 
--- DISSOLVED: induction
+protected theorem induction {p : (Π₀ i, β i) → Prop} (f : Π₀ i, β i) (h0 : p 0)
+    (ha : ∀ (i b) (f : Π₀ i, β i), f i = 0 → b ≠ 0 → p f → p (single i b + f)) : p f := by
+  cases' f with f s
+  induction' s using Trunc.induction_on with s
+  cases' s with s H
+  induction' s using Multiset.induction_on with i s ih generalizing f
+  · have : f = 0 := funext fun i => (H i).resolve_left (Multiset.not_mem_zero _)
+    subst this
+    exact h0
+  have H2 : p (erase i ⟨f, Trunc.mk ⟨i ::ₘ s, H⟩⟩) := by
+    dsimp only [erase, Trunc.map, Trunc.bind, Trunc.liftOn, Trunc.lift_mk,
+      Function.comp, Subtype.coe_mk]
+    have H2 : ∀ j, j ∈ s ∨ ite (j = i) 0 (f j) = 0 := by
+      intro j
+      cases' H j with H2 H2
+      · cases' Multiset.mem_cons.1 H2 with H3 H3
+        · right; exact if_pos H3
+        · left; exact H3
+      right
+      split_ifs <;> [rfl; exact H2]
+    have H3 : ∀ aux, (⟨fun j : ι => ite (j = i) 0 (f j), Trunc.mk ⟨i ::ₘ s, aux⟩⟩ : Π₀ i, β i) =
+        ⟨fun j : ι => ite (j = i) 0 (f j), Trunc.mk ⟨s, H2⟩⟩ :=
+      fun _ ↦ ext fun _ => rfl
+    rw [H3]
+    apply ih
+  have H3 : single i _ + _ = (⟨f, Trunc.mk ⟨i ::ₘ s, H⟩⟩ : Π₀ i, β i) := single_add_erase _ _
+  rw [← H3]
+  change p (single i (f i) + _)
+  cases' Classical.em (f i = 0) with h h
+  · rw [h, single_zero, zero_add]
+    exact H2
+  refine ha _ _ _ ?_ h H2
+  rw [erase_same]
 
--- DISSOLVED: induction₂
+theorem induction₂ {p : (Π₀ i, β i) → Prop} (f : Π₀ i, β i) (h0 : p 0)
+    (ha : ∀ (i b) (f : Π₀ i, β i), f i = 0 → b ≠ 0 → p f → p (f + single i b)) : p f :=
+  DFinsupp.induction f h0 fun i b f h1 h2 h3 =>
+    have h4 : f + single i b = single i b + f := by
+      ext j; by_cases H : i = j
+      · subst H
+        simp [h1]
+      · simp [H]
+    Eq.recOn h4 <| ha i b f h1 h2 h3
 
 end AddMonoid
 
@@ -733,19 +764,40 @@ theorem support_mk'_subset {f : ∀ i, β i} {s : Multiset ι} {h} :
     (mk' f <| Trunc.mk ⟨s, h⟩).support ⊆ s.toFinset := fun i H =>
   Multiset.mem_toFinset.1 <| by simpa using (Finset.mem_filter.1 H).1
 
--- DISSOLVED: mem_support_toFun
+@[simp]
+theorem mem_support_toFun (f : Π₀ i, β i) (i) : i ∈ f.support ↔ f i ≠ 0 := by
+  cases' f with f s
+  induction' s using Trunc.induction_on with s
+  dsimp only [support, Trunc.lift_mk]
+  rw [Finset.mem_filter, Multiset.mem_toFinset, coe_mk']
+  exact and_iff_right_of_imp (s.prop i).resolve_right
 
 theorem eq_mk_support (f : Π₀ i, β i) : f = mk f.support fun i => f i := by aesop
 
--- DISSOLVED: subtypeSupportEqEquiv
+@[simps]
+def subtypeSupportEqEquiv (s : Finset ι) :
+    {f : Π₀ i, β i // f.support = s} ≃ ∀ i : s, {x : β i // x ≠ 0} where
+  toFun | ⟨f, hf⟩ => fun ⟨i, hi⟩ ↦ ⟨f i, (f.mem_support_toFun i).1 <| hf.symm ▸ hi⟩
+  invFun f := ⟨mk s fun i ↦ (f i).1, Finset.ext fun i ↦ by
+    -- TODO: `simp` fails to use `(f _).2` inside `∃ _, _`
+    calc
+      i ∈ support (mk s fun i ↦ (f i).1) ↔ ∃ h : i ∈ s, (f ⟨i, h⟩).1 ≠ 0 := by simp
+      _ ↔ ∃ _ : i ∈ s, True := exists_congr fun h ↦ (iff_true _).mpr (f _).2
+      _ ↔ i ∈ s := by simp⟩
+  left_inv := by
+    rintro ⟨f, rfl⟩
+    ext i
+    simpa using Eq.symm
+  right_inv f := by
+    ext1
+    simp [Subtype.eta]; rfl
 
--- DISSOLVED: sigmaFinsetFunEquiv
+@[simps! apply_fst apply_snd_coe]
+def sigmaFinsetFunEquiv : (Π₀ i, β i) ≃ Σ s : Finset ι, ∀ i : s, {x : β i // x ≠ 0} :=
+  (Equiv.sigmaFiberEquiv DFinsupp.support).symm.trans (.sigmaCongrRight subtypeSupportEqEquiv)
 
-@[simp]
-theorem support_zero : (0 : Π₀ i, β i).support = ∅ :=
-  rfl
-
--- DISSOLVED: mem_support_iff
+theorem mem_support_iff {f : Π₀ i, β i} {i : ι} : i ∈ f.support ↔ f i ≠ 0 :=
+  f.mem_support_toFun _
 
 theorem not_mem_support_iff {f : Π₀ i, β i} {i : ι} : i ∉ f.support ↔ f i = 0 :=
   not_iff_comm.1 mem_support_iff.symm
@@ -770,7 +822,11 @@ instance decidableZero [∀ (i) (x : β i), Decidable (x = 0)] (f : Π₀ i, β 
 theorem support_subset_iff {s : Set ι} {f : Π₀ i, β i} : ↑f.support ⊆ s ↔ ∀ i ∉ s, f i = 0 := by
   simpa [Set.subset_def] using forall_congr' fun i => not_imp_comm
 
--- DISSOLVED: support_single_ne_zero
+theorem support_single_ne_zero {i : ι} {b : β i} (hb : b ≠ 0) : (single i b).support = {i} := by
+  ext j; by_cases h : i = j
+  · subst h
+    simp [hb]
+  simp [Ne.symm h, h]
 
 theorem support_single_subset {i : ι} {b : β i} : (single i b).support ⊆ {i} :=
   support_mk'_subset
@@ -779,7 +835,11 @@ section MapRangeAndZipWith
 
 variable [∀ i, Zero (β₁ i)] [∀ i, Zero (β₂ i)]
 
--- DISSOLVED: mapRange_def
+theorem mapRange_def [∀ (i) (x : β₁ i), Decidable (x ≠ 0)] {f : ∀ i, β₁ i → β₂ i}
+    {hf : ∀ i, f i 0 = 0} {g : Π₀ i, β₁ i} :
+    mapRange f hf g = mk g.support fun i => f i.1 (g i.1) := by
+  ext i
+  by_cases h : g i ≠ 0 <;> simp at h <;> simp [h, hf]
 
 @[simp]
 theorem mapRange_single {f : ∀ i, β₁ i → β₂ i} {hf : ∀ i, f i 0 = 0} {i : ι} {b : β₁ i} :
@@ -795,7 +855,14 @@ variable [∀ (i) (x : β₁ i), Decidable (x ≠ 0)] [∀ (i) (x : β₂ i), De
 theorem support_mapRange {f : ∀ i, β₁ i → β₂ i} {hf : ∀ i, f i 0 = 0} {g : Π₀ i, β₁ i} :
     (mapRange f hf g).support ⊆ g.support := by simp [mapRange_def]
 
--- DISSOLVED: zipWith_def
+theorem zipWith_def {ι : Type u} {β : ι → Type v} {β₁ : ι → Type v₁} {β₂ : ι → Type v₂}
+    [dec : DecidableEq ι] [∀ i : ι, Zero (β i)] [∀ i : ι, Zero (β₁ i)] [∀ i : ι, Zero (β₂ i)]
+    [∀ (i : ι) (x : β₁ i), Decidable (x ≠ 0)] [∀ (i : ι) (x : β₂ i), Decidable (x ≠ 0)]
+    {f : ∀ i, β₁ i → β₂ i → β i} {hf : ∀ i, f i 0 0 = 0} {g₁ : Π₀ i, β₁ i} {g₂ : Π₀ i, β₂ i} :
+    zipWith f hf g₁ g₂ = mk (g₁.support ∪ g₂.support) fun i => f i.1 (g₁ i.1) (g₂ i.1) := by
+  ext i
+  by_cases h1 : g₁ i ≠ 0 <;> by_cases h2 : g₂ i ≠ 0 <;> simp only [not_not, Ne] at h1 h2 <;>
+    simp [h1, h2, hf]
 
 theorem support_zipWith {f : ∀ i, β₁ i → β₂ i → β i} {hf : ∀ i, f i 0 0 = 0} {g₁ : Π₀ i, β₁ i}
     {g₂ : Π₀ i, β₂ i} : (zipWith f hf g₁ g₂).support ⊆ g₁.support ∪ g₂.support := by
@@ -815,7 +882,12 @@ theorem support_erase (i : ι) (f : Π₀ i, β i) : (f.erase i).support = f.sup
       Finset.mem_erase, false_and]
   by_cases h2 : f j ≠ 0 <;> simp at h2 <;> simp [h1, h2]
 
--- DISSOLVED: support_update_ne_zero
+theorem support_update_ne_zero (f : Π₀ i, β i) (i : ι) {b : β i} (h : b ≠ 0) :
+    support (f.update i b) = insert i f.support := by
+  ext j
+  rcases eq_or_ne i j with (rfl | hi)
+  · simp [h]
+  · simp [hi.symm]
 
 theorem support_update (f : Π₀ i, β i) (i : ι) (b : β i) [Decidable (b = 0)] :
     support (f.update i b) = if b = 0 then support (f.erase i) else insert i f.support := by
@@ -850,9 +922,13 @@ end FilterAndSubtypeDomain
 
 end SupportBasic
 
--- DISSOLVED: support_add
+theorem support_add [∀ i, AddZeroClass (β i)] [∀ (i) (x : β i), Decidable (x ≠ 0)]
+    {g₁ g₂ : Π₀ i, β i} : (g₁ + g₂).support ⊆ g₁.support ∪ g₂.support :=
+  support_zipWith
 
--- DISSOLVED: support_neg
+@[simp]
+theorem support_neg [∀ i, AddGroup (β i)] [∀ (i) (x : β i), Decidable (x ≠ 0)] {f : Π₀ i, β i} :
+    support (-f) = support f := by ext i; simp
 
 instance [∀ i, Zero (β i)] [∀ i, DecidableEq (β i)] : DecidableEq (Π₀ i, β i) := fun f g =>
   decidable_of_iff (f.support = g.support ∧ ∀ i ∈ f.support, f i = g i)
@@ -1096,11 +1172,6 @@ theorem mapRange.addEquiv_trans (f : ∀ i, β i ≃+ β₁ i) (f₂ : ∀ i, β
   · intros; apply map_zero
   · intros; apply map_zero
   · intros; dsimp; simp only [map_zero]
-
-@[simp]
-theorem mapRange.addEquiv_symm (e : ∀ i, β₁ i ≃+ β₂ i) :
-    (mapRange.addEquiv e).symm = mapRange.addEquiv fun i => (e i).symm :=
-  rfl
 
 end MapRange
 

@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Card
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
 
+noncomputable section
+
 /-!
 # Permutation matrices
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.FiberedCategory.HomLift
 import Mathlib.CategoryTheory.Functor.Const
 
+noncomputable section
+
 /-!
 
 # Fibers of a functors
@@ -63,29 +65,9 @@ lemma fiberInclusion_comp_eq_const : fiberInclusion ⋙ p = (const (Fiber p S)).
 
 def mk {p : 𝒳 ⥤ 𝒮} {S : 𝒮} {a : 𝒳} (ha : p.obj a = S) : Fiber p S := ⟨a, ha⟩
 
-@[simp]
-lemma fiberInclusion_mk {p : 𝒳 ⥤ 𝒮} {S : 𝒮} {a : 𝒳} (ha : p.obj a = S) :
-    fiberInclusion.obj (mk ha) = a :=
-  rfl
-
 def homMk (p : 𝒳 ⥤ 𝒮) (S : 𝒮) {a b : 𝒳} (φ : a ⟶ b) [IsHomLift p (𝟙 S) φ] :
     mk (domain_eq p (𝟙 S) φ) ⟶ mk (codomain_eq p (𝟙 S) φ) :=
   ⟨φ, inferInstance⟩
-
-@[simp]
-lemma fiberInclusion_homMk (p : 𝒳 ⥤ 𝒮) (S : 𝒮) {a b : 𝒳} (φ : a ⟶ b) [IsHomLift p (𝟙 S) φ] :
-    fiberInclusion.map (homMk p S φ) = φ :=
-  rfl
-
-@[simp]
-lemma homMk_id (p : 𝒳 ⥤ 𝒮) (S : 𝒮) (a : 𝒳) [IsHomLift p (𝟙 S) (𝟙 a)] :
-    homMk p S (𝟙 a) = 𝟙 (mk (domain_eq p (𝟙 S) (𝟙 a))) :=
-  rfl
-
-@[simp]
-lemma homMk_comp {a b c : 𝒳} (φ : a ⟶ b) (ψ : b ⟶ c) [IsHomLift p (𝟙 S) φ]
-    [IsHomLift p (𝟙 S) ψ] : homMk p S φ ≫ homMk p S ψ = homMk p S (φ ≫ ψ) :=
-  rfl
 
 section
 
@@ -97,14 +79,8 @@ def inducedFunctor : C ⥤ Fiber p S where
   obj x := ⟨F.obj x, by simp only [← comp_obj, hF, const_obj_obj]⟩
   map φ := ⟨F.map φ, of_commsq _ _ _ _ _ <| by simpa using (eqToIso hF).hom.naturality φ⟩
 
-@[simp]
-lemma inducedFunctor_map {X Y : C} (f : X ⟶ Y) :
-    fiberInclusion.map ((inducedFunctor hF).map f) = F.map f := rfl
-
 @[simps!]
 def inducedFunctorCompIsoSelf : (inducedFunctor hF) ⋙ fiberInclusion ≅ F := Iso.refl _
-
-lemma inducedFunctor_comp : (inducedFunctor hF) ⋙ fiberInclusion = F := rfl
 
 end
 

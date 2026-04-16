@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Function.Defs
 import Mathlib.Tactic.TypeStar
 
+noncomputable section
+
 /-!
 # Nontrivial types
 

@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 
+noncomputable section
+
 /-! # Properties of integration with respect to the Lebesgue measure -/
 
 open Set Filter MeasureTheory MeasureTheory.Measure TopologicalSpace

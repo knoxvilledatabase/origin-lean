@@ -1,12 +1,14 @@
 /-
 Extracted from CategoryTheory/Shift/Basic.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 5 | Infrastructure: 6
+Genuine: 71 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Zero
 import Mathlib.CategoryTheory.Monoidal.End
 import Mathlib.CategoryTheory.Monoidal.Discrete
+
+noncomputable section
 
 /-!
 # Shift
@@ -101,7 +103,11 @@ lemma zero_add_inv_app (h : ShiftMkCore C A) (n : A) (X : C) :
     Category.assoc, ← Functor.map_comp_assoc, Iso.inv_hom_id_app, Functor.map_id,
     Category.id_comp, eqToHom_trans, eqToHom_refl]
 
--- DISSOLVED: add_zero_inv_app
+lemma add_zero_inv_app (h : ShiftMkCore C A) (n : A) (X : C) :
+    (h.add n 0).inv.app X = h.zero.hom.app ((h.F n).obj X) ≫
+      eqToHom (by dsimp; rw [add_zero]) := by
+  rw [← cancel_epi ((h.add n 0).hom.app X), Iso.hom_inv_id_app, h.add_zero_hom_app,
+    Category.assoc, Iso.inv_hom_id_app_assoc, eqToHom_trans, eqToHom_refl]
 
 end ShiftMkCore
 
@@ -181,25 +187,15 @@ end
 
 variable {C A}
 
-lemma ShiftMkCore.shiftFunctor_eq (h : ShiftMkCore C A) (a : A) :
-    letI := hasShiftMk C A h
-    shiftFunctor C a = h.F a := rfl
-
-lemma ShiftMkCore.shiftFunctorZero_eq (h : ShiftMkCore C A) :
-    letI := hasShiftMk C A h
-    shiftFunctorZero C A = h.zero := rfl
-
-lemma ShiftMkCore.shiftFunctorAdd_eq (h : ShiftMkCore C A) (a b : A) :
-    letI := hasShiftMk C A h
-    shiftFunctorAdd C a b = h.add a b := rfl
-
 set_option quotPrecheck false in
+/-- shifting an object `X` by `n` is obtained by the notation `X⟦n⟧` -/
 
 notation -- Any better notational suggestions?
 
 X "⟦" n "⟧" => (shiftFunctor _ n).obj X
 
 set_option quotPrecheck false in
+/-- shifting a morphism `f` by `n` is obtained by the notation `f⟦n⟧'` -/
 
 notation f "⟦" n "⟧'" => (shiftFunctor _ n).map f
 
@@ -283,9 +279,14 @@ lemma shiftFunctorAdd_add_zero_hom_app (a : A) (X : C) : (shiftFunctorAdd C a 0)
     eqToHom (by dsimp; rw [add_zero]) ≫ (shiftFunctorZero C A).inv.app (X⟦a⟧) := by
   simp [← shiftFunctorAdd'_add_zero_hom_app, shiftFunctorAdd']
 
--- DISSOLVED: shiftFunctorAdd'_add_zero_inv_app
+lemma shiftFunctorAdd'_add_zero_inv_app (a : A) (X : C) :
+    (shiftFunctorAdd' C a 0 a (add_zero a)).inv.app X =
+    (shiftFunctorZero C A).hom.app (X⟦a⟧) := by
+  simpa using NatTrans.congr_app (congr_arg Iso.inv (shiftFunctorAdd'_add_zero C a)) X
 
--- DISSOLVED: shiftFunctorAdd_add_zero_inv_app
+lemma shiftFunctorAdd_add_zero_inv_app (a : A) (X : C) : (shiftFunctorAdd C a 0).inv.app X =
+    (shiftFunctorZero C A).hom.app (X⟦a⟧) ≫ eqToHom (by dsimp; rw [add_zero]) := by
+  simp [← shiftFunctorAdd'_add_zero_inv_app, shiftFunctorAdd']
 
 @[reassoc]
 lemma shiftFunctorAdd'_assoc_hom_app (a₁ a₂ a₃ a₁₂ a₂₃ a₁₂₃ : A)
@@ -464,7 +465,10 @@ lemma shiftFunctorCompIsoId_zero_zero_hom_app (X : C) :
       ((shiftFunctorZero C A).hom.app X)⟦0⟧' ≫ (shiftFunctorZero C A).hom.app X := by
   simp [shiftFunctorCompIsoId, shiftFunctorAdd'_zero_add_inv_app]
 
--- DISSOLVED: shiftFunctorCompIsoId_zero_zero_inv_app
+lemma shiftFunctorCompIsoId_zero_zero_inv_app (X : C) :
+    (shiftFunctorCompIsoId C 0 0 (add_zero 0)).inv.app X =
+      (shiftFunctorZero C A).inv.app X ≫ ((shiftFunctorZero C A).inv.app X)⟦0⟧' := by
+  simp [shiftFunctorCompIsoId, shiftFunctorAdd'_zero_add_hom_app]
 
 end
 
@@ -648,7 +652,11 @@ lemma map_zero_hom_app (X : C) :
       (i 0).hom.app X ≫ (shiftFunctorZero D A).hom.app (F.obj X) := by
   simp [zero]
 
--- DISSOLVED: map_zero_inv_app
+@[simp]
+lemma map_zero_inv_app (X : C) :
+    F.map ((zero hF s i).inv.app X) =
+      (shiftFunctorZero D A).inv.app (F.obj X) ≫ (i 0).inv.app X := by
+  simp [zero]
 
 def add (a b : A) : s (a + b) ≅ s a ⋙ s b :=
   (hF.whiskeringRight C).preimageIso (i (a + b) ≪≫ isoWhiskerLeft _ (shiftFunctorAdd D a b) ≪≫

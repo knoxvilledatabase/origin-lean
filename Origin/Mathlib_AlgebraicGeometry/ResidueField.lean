@@ -1,10 +1,12 @@
 /-
 Extracted from AlgebraicGeometry/ResidueField.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
+Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.AlgebraicGeometry.Stalk
 import Mathlib.Geometry.RingedSpace.LocallyRingedSpace.ResidueField
+
+noncomputable section
 
 /-!
 
@@ -76,9 +78,6 @@ lemma residue_descResidueField {K : Type u} [Field K] {X : Scheme.{u}} {x}
 def evaluation (U : X.Opens) (x : X) (hx : x ∈ U) : Γ(X, U) ⟶ X.residueField x :=
   X.presheaf.germ U x hx ≫ X.residue _
 
-@[reassoc]
-lemma germ_residue (x hx) : X.presheaf.germ U x hx ≫ X.residue x = X.evaluation U x hx := rfl
-
 abbrev Γevaluation (x : X) : Γ(X, ⊤) ⟶ X.residueField x :=
   X.evaluation ⊤ x trivial
 
@@ -86,8 +85,6 @@ abbrev Γevaluation (x : X) : Γ(X, ⊤) ⟶ X.residueField x :=
 lemma evaluation_eq_zero_iff_not_mem_basicOpen (x : X) (hx : x ∈ U) (f : Γ(X, U)) :
     X.evaluation U x hx f = 0 ↔ x ∉ X.basicOpen f :=
   X.toLocallyRingedSpace.evaluation_eq_zero_iff_not_mem_basicOpen ⟨x, hx⟩ f
-
--- DISSOLVED: evaluation_ne_zero_iff_mem_basicOpen
 
 lemma basicOpen_eq_bot_iff_forall_evaluation_eq_zero (f : X.presheaf.obj (op U)) :
     X.basicOpen f = ⊥ ↔ ∀ (x : U), X.evaluation U x x.property f = 0 :=
@@ -146,18 +143,6 @@ section congr
 def residueFieldCongr {x y : X} (h : x = y) :
     X.residueField x ≅ X.residueField y :=
   eqToIso (by subst h; rfl)
-
-@[simp]
-lemma residueFieldCongr_refl {x : X} :
-    X.residueFieldCongr (refl x) = Iso.refl _ := rfl
-
-@[simp]
-lemma residueFieldCongr_symm {x y : X} (e : x = y) :
-    (X.residueFieldCongr e).symm = X.residueFieldCongr e.symm := rfl
-
-@[simp]
-lemma residueFieldCongr_inv {x y : X} (e : x = y) :
-    (X.residueFieldCongr e).inv = (X.residueFieldCongr e.symm).hom := rfl
 
 @[simp]
 lemma residueFieldCongr_trans {x y z : X} (e : x = y) (e' : y = z) :

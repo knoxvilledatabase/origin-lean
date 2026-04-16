@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Fourier/FiniteAbelian/Orthogonality.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.BigOperators.Expect
 import Mathlib.Algebra.Group.AddChar
 import Mathlib.Analysis.RCLike.Inner
+
+noncomputable section
 
 /-!
 # Orthogonality of characters of a finite abelian group
@@ -37,9 +39,10 @@ variable [Fintype G] [Semifield R] [IsDomain R] [CharZero R] {ψ : AddChar G R}
 lemma expect_eq_ite (ψ : AddChar G R) : 𝔼 a, ψ a = if ψ = 0 then 1 else 0 := by
   simp [Fintype.expect_eq_sum_div_card, sum_eq_ite, ite_div]
 
--- DISSOLVED: expect_eq_zero_iff_ne_zero
+lemma expect_eq_zero_iff_ne_zero : 𝔼 x, ψ x = 0 ↔ ψ ≠ 0 := by
+  rw [expect_eq_ite, one_ne_zero.ite_eq_right_iff]
 
--- DISSOLVED: expect_ne_zero_iff_eq_zero
+lemma expect_ne_zero_iff_eq_zero : 𝔼 x, ψ x ≠ 0 ↔ ψ = 0 := expect_eq_zero_iff_ne_zero.not_left
 
 end Semifield
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Equiv.PartialEquiv
 import Mathlib.Topology.Sets.Opens
 
+noncomputable section
+
 /-!
 # Partial homeomorphisms
 
@@ -88,34 +90,9 @@ protected theorem continuousOn : ContinuousOn e e.source :=
 theorem continuousOn_symm : ContinuousOn e.symm e.target :=
   e.continuousOn_invFun
 
-@[simp, mfld_simps]
-theorem mk_coe (e : PartialEquiv X Y) (a b c d) : (PartialHomeomorph.mk e a b c d : X → Y) = e :=
-  rfl
-
-@[simp, mfld_simps]
-theorem mk_coe_symm (e : PartialEquiv X Y) (a b c d) :
-    ((PartialHomeomorph.mk e a b c d).symm : Y → X) = e.symm :=
-  rfl
-
 theorem toPartialEquiv_injective :
     Injective (toPartialEquiv : PartialHomeomorph X Y → PartialEquiv X Y)
   | ⟨_, _, _, _, _⟩, ⟨_, _, _, _, _⟩, rfl => rfl
-
-@[simp, mfld_simps]
-theorem toFun_eq_coe (e : PartialHomeomorph X Y) : e.toFun = e :=
-  rfl
-
-@[simp, mfld_simps]
-theorem invFun_eq_coe (e : PartialHomeomorph X Y) : e.invFun = e.symm :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_coe : (e.toPartialEquiv : X → Y) = e :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_coe_symm : (e.toPartialEquiv.symm : Y → X) = e.symm :=
-  rfl
 
 @[simp, mfld_simps]
 theorem map_source {x : X} (h : x ∈ e.source) : e x ∈ e.target :=
@@ -263,10 +240,6 @@ theorem symm_image_target_eq_source : e.symm '' e.target = e.source :=
 protected theorem ext (e' : PartialHomeomorph X Y) (h : ∀ x, e x = e' x)
     (hinv : ∀ x, e.symm x = e'.symm x) (hs : e.source = e'.source) : e = e' :=
   toPartialEquiv_injective (PartialEquiv.ext h hinv hs)
-
-@[simp, mfld_simps]
-theorem symm_toPartialEquiv : e.symm.toPartialEquiv = e.toPartialEquiv.symm :=
-  rfl
 
 theorem symm_source : e.symm.source = e.target :=
   rfl
@@ -548,14 +521,6 @@ protected def restrOpen (s : Set X) (hs : IsOpen s) : PartialHomeomorph X Y :=
   (@IsImage.of_symm_preimage_eq X Y _ _ e s (e.symm ⁻¹' s) rfl).restr
     (IsOpen.inter e.open_source hs)
 
-@[simp, mfld_simps]
-theorem restrOpen_toPartialEquiv (s : Set X) (hs : IsOpen s) :
-    (e.restrOpen s hs).toPartialEquiv = e.toPartialEquiv.restr s :=
-  rfl
-
-theorem restrOpen_source (s : Set X) (hs : IsOpen s) : (e.restrOpen s hs).source = e.source ∩ s :=
-  rfl
-
 @[simps! (config := mfld_cfg) apply symm_apply, simps! (config := .lemmasOnly) source target]
 protected def restr (s : Set X) : PartialHomeomorph X Y :=
   e.restrOpen (interior s) isOpen_interior
@@ -589,14 +554,6 @@ theorem restr_source_inter (s : Set X) : e.restr (e.source ∩ s) = e.restr s :=
 protected def refl (X : Type*) [TopologicalSpace X] : PartialHomeomorph X X :=
   (Homeomorph.refl X).toPartialHomeomorph
 
-@[simp, mfld_simps]
-theorem refl_partialEquiv : (PartialHomeomorph.refl X).toPartialEquiv = PartialEquiv.refl X :=
-  rfl
-
-@[simp, mfld_simps]
-theorem refl_symm : (PartialHomeomorph.refl X).symm = PartialHomeomorph.refl X :=
-  rfl
-
 /-! ofSet: the identity on a set `s` -/
 
 section ofSet
@@ -610,14 +567,6 @@ def ofSet (s : Set X) (hs : IsOpen s) : PartialHomeomorph X X where
   open_target := hs
   continuousOn_toFun := continuous_id.continuousOn
   continuousOn_invFun := continuous_id.continuousOn
-
-@[simp, mfld_simps]
-theorem ofSet_toPartialEquiv : (ofSet s hs).toPartialEquiv = PartialEquiv.ofSet s :=
-  rfl
-
-@[simp, mfld_simps]
-theorem ofSet_symm : (ofSet s hs).symm = ofSet s hs :=
-  rfl
 
 @[simp, mfld_simps]
 theorem ofSet_univ_eq_refl : ofSet univ isOpen_univ = PartialHomeomorph.refl X := by ext <;> simp
@@ -646,17 +595,6 @@ protected def trans : PartialHomeomorph X Z :=
 @[simp, mfld_simps]
 theorem trans_toPartialEquiv :
     (e.trans e').toPartialEquiv = e.toPartialEquiv.trans e'.toPartialEquiv :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_trans : (e.trans e' : X → Z) = e' ∘ e :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_trans_symm : ((e.trans e').symm : Z → X) = e.symm ∘ e'.symm :=
-  rfl
-
-theorem trans_apply {x : X} : (e.trans e') x = e' (e x) :=
   rfl
 
 theorem trans_symm_eq_symm_trans_symm : (e.trans e').symm = e'.symm.trans e.symm := rfl
@@ -730,10 +668,6 @@ section EqOnSource
 def EqOnSource (e e' : PartialHomeomorph X Y) : Prop :=
   e.source = e'.source ∧ EqOn e e' e.source
 
-theorem eqOnSource_iff (e e' : PartialHomeomorph X Y) :
-    EqOnSource e e' ↔ PartialEquiv.EqOnSource e.toPartialEquiv e'.toPartialEquiv :=
-  Iff.rfl
-
 instance eqOnSourceSetoid : Setoid (PartialHomeomorph X Y) :=
   { PartialEquiv.eqOnSourceSetoid.comap toPartialEquiv with r := EqOnSource }
 
@@ -797,11 +731,6 @@ def prod (eX : PartialHomeomorph X X') (eY : PartialHomeomorph Y Y') :
   continuousOn_toFun := eX.continuousOn.prod_map eY.continuousOn
   continuousOn_invFun := eX.continuousOn_symm.prod_map eY.continuousOn_symm
   toPartialEquiv := eX.toPartialEquiv.prod eY.toPartialEquiv
-
-@[simp, mfld_simps]
-theorem prod_symm (eX : PartialHomeomorph X X') (eY : PartialHomeomorph Y Y') :
-    (eX.prod eY).symm = eX.symm.prod eY.symm :=
-  rfl
 
 @[simp]
 theorem refl_prod_refl :
@@ -869,17 +798,6 @@ def piecewise (e e' : PartialHomeomorph X Y) (s : Set X) (t : Set Y) [∀ x, Dec
     continuousOn_piecewise_ite e.continuousOn_symm e'.continuousOn_symm
       (H.frontier.inter_eq_of_inter_eq_of_eqOn H'.frontier Hs Heq)
       (H.frontier.symm_eqOn_of_inter_eq_of_eqOn Hs Heq)
-
-@[simp]
-theorem symm_piecewise (e e' : PartialHomeomorph X Y) {s : Set X} {t : Set Y}
-    [∀ x, Decidable (x ∈ s)] [∀ y, Decidable (y ∈ t)] (H : e.IsImage s t) (H' : e'.IsImage s t)
-    (Hs : e.source ∩ frontier s = e'.source ∩ frontier s)
-    (Heq : EqOn e e' (e.source ∩ frontier s)) :
-    (e.piecewise e' s t H H' Hs Heq).symm =
-      e.symm.piecewise e'.symm t s H.symm H'.symm
-        (H.frontier.inter_eq_of_inter_eq_of_eqOn H'.frontier Hs Heq)
-        (H.frontier.symm_eqOn_of_inter_eq_of_eqOn Hs Heq) :=
-  rfl
 
 def disjointUnion (e e' : PartialHomeomorph X Y) [∀ x, Decidable (x ∈ e.source)]
     [∀ y, Decidable (y ∈ e.target)] (Hs : Disjoint e.source e'.source)
@@ -1016,15 +934,6 @@ namespace Homeomorph
 variable (e : X ≃ₜ Y) (e' : Y ≃ₜ Z)
 
 @[simp, mfld_simps]
-theorem refl_toPartialHomeomorph :
-    (Homeomorph.refl X).toPartialHomeomorph = PartialHomeomorph.refl X :=
-  rfl
-
-@[simp, mfld_simps]
-theorem symm_toPartialHomeomorph : e.symm.toPartialHomeomorph = e.toPartialHomeomorph.symm :=
-  rfl
-
-@[simp, mfld_simps]
 theorem trans_toPartialHomeomorph :
     (e.trans e').toPartialHomeomorph = e.toPartialHomeomorph.trans e'.toPartialHomeomorph :=
   PartialHomeomorph.toPartialEquiv_injective <| Equiv.trans_toPartialEquiv _ _
@@ -1086,14 +995,6 @@ variable (s : Opens X) (hs : Nonempty s)
 
 noncomputable def partialHomeomorphSubtypeCoe : PartialHomeomorph s X :=
   IsOpenEmbedding.toPartialHomeomorph _ s.2.isOpenEmbedding_subtypeVal
-
-@[simp, mfld_simps]
-theorem partialHomeomorphSubtypeCoe_coe : (s.partialHomeomorphSubtypeCoe hs : s → X) = (↑) :=
-  rfl
-
-@[simp, mfld_simps]
-theorem partialHomeomorphSubtypeCoe_source : (s.partialHomeomorphSubtypeCoe hs).source = Set.univ :=
-  rfl
 
 @[simp, mfld_simps]
 theorem partialHomeomorphSubtypeCoe_target : (s.partialHomeomorphSubtypeCoe hs).target = s := by

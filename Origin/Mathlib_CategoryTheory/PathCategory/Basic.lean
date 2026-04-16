@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Quotient
 import Mathlib.Combinatorics.Quiver.Path
 
+noncomputable section
+
 /-!
 # The category paths on a quiver.
 When `C` is a quiver, `paths C` is the category of paths.
@@ -101,14 +103,6 @@ def lift {C} [Category C] (φ : V ⥤q C) : Paths V ⥤ C where
       rw [ih, Category.assoc]
 
 @[simp]
-theorem lift_nil {C} [Category C] (φ : V ⥤q C) (X : V) :
-    (lift φ).map Quiver.Path.nil = 𝟙 (φ.obj X) := rfl
-
-@[simp]
-theorem lift_cons {C} [Category C] (φ : V ⥤q C) {X Y Z : V} (p : Quiver.Path X Y) (f : Y ⟶ Z) :
-    (lift φ).map (p.cons f) = (lift φ).map p ≫ φ.map f := rfl
-
-@[simp]
 theorem lift_toPath {C} [Category C] (φ : V ⥤q C) {X Y : V} (f : X ⟶ Y) :
     (lift φ).map f.toPath = φ.map f := by
   dsimp [Quiver.Hom.toPath, lift]
@@ -178,11 +172,6 @@ def composePath {X : C} : ∀ {Y : C} (_ : Path X Y), X ⟶ Y
   | _, .nil => 𝟙 X
   | _, .cons p e => composePath p ≫ e
 
-@[simp] lemma composePath_nil {X : C} : composePath (Path.nil : Path X X) = 𝟙 X := rfl
-
-@[simp] lemma composePath_cons {X Y Z : C} (p : Path X Y) (e : Y ⟶ Z) :
-  composePath (p.cons e) = composePath p ≫ e := rfl
-
 @[simp]
 theorem composePath_toPath {X Y : C} (f : X ⟶ Y) : composePath f.toPath = f := Category.id_comp _
 
@@ -192,9 +181,6 @@ theorem composePath_comp {X Y Z : C} (f : Path X Y) (g : Path Y Z) :
   induction' g with Y' Z' g e ih
   · simp
   · simp [ih]
-
-@[simp]
-theorem composePath_id {X : Paths C} : composePath (𝟙 X) = 𝟙 (id X : C) := rfl
 
 @[simp]
 theorem composePath_comp' {X Y Z : Paths C} (f : X ⟶ Y) (g : Y ⟶ Z) :

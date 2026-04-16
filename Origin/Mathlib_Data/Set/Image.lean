@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Set/Image.lean
-Genuine: 241 | Conflates: 7 | Dissolved: 2 | Infrastructure: 30
+Genuine: 243 | Conflates: 7 | Dissolved: 0 | Infrastructure: 30
 -/
 import Origin.Core
 import Mathlib.Data.Set.Subsingleton
@@ -9,6 +9,8 @@ import Batteries.Tactic.Congr
 import Mathlib.Order.TypeTags
 import Mathlib.Data.Option.Basic
 import Mathlib.Data.Set.SymmDiff
+
+noncomputable section
 
 /-!
 # Images and preimages of sets
@@ -57,10 +59,6 @@ theorem preimage_congr {f g : α → β} {s : Set β} (h : ∀ x : α, f x = g x
 @[gcongr]
 theorem preimage_mono {s t : Set β} (h : s ⊆ t) : f ⁻¹' s ⊆ f ⁻¹' t := fun _ hx => h hx
 
-@[simp, mfld_simps]
-theorem preimage_univ : f ⁻¹' univ = univ :=
-  rfl
-
 theorem subset_preimage_univ {s : Set α} : s ⊆ f ⁻¹' univ :=
   subset_univ _
 
@@ -76,35 +74,10 @@ theorem preimage_union {s t : Set β} : f ⁻¹' (s ∪ t) = f ⁻¹' s ∪ f �
 theorem preimage_compl {s : Set β} : f ⁻¹' sᶜ = (f ⁻¹' s)ᶜ :=
   rfl
 
-@[simp]
-theorem preimage_diff (f : α → β) (s t : Set β) : f ⁻¹' (s \ t) = f ⁻¹' s \ f ⁻¹' t :=
-  rfl
-
 open scoped symmDiff in
-
-@[simp]
-lemma preimage_symmDiff {f : α → β} (s t : Set β) : f ⁻¹' (s ∆ t) = (f ⁻¹' s) ∆ (f ⁻¹' t) :=
-  rfl
-
-@[simp]
-theorem preimage_ite (f : α → β) (s t₁ t₂ : Set β) :
-    f ⁻¹' s.ite t₁ t₂ = (f ⁻¹' s).ite (f ⁻¹' t₁) (f ⁻¹' t₂) :=
-  rfl
-
-@[simp]
-theorem preimage_setOf_eq {p : α → Prop} {f : β → α} : f ⁻¹' { a | p a } = { a | p (f a) } :=
-  rfl
-
-@[simp]
-theorem preimage_id_eq : preimage (id : α → α) = id :=
-  rfl
 
 @[mfld_simps]
 theorem preimage_id {s : Set α} : id ⁻¹' s = s :=
-  rfl
-
-@[simp, mfld_simps]
-theorem preimage_id' {s : Set α} : (fun x => x) ⁻¹' s = s :=
   rfl
 
 @[simp]
@@ -185,9 +158,6 @@ theorem mem_image_iff_bex {f : α → β} {s : Set α} {y : β} :
     y ∈ f '' s ↔ ∃ (x : _) (_ : x ∈ s), f x = y :=
   bex_def.symm
 
-theorem image_eta (f : α → β) : f '' s = (fun x => f x) '' s :=
-  rfl
-
 theorem _root_.Function.Injective.mem_set_image {f : α → β} (hf : Injective f) {s : Set α} {a : α} :
     f a ∈ f '' s ↔ a ∈ s :=
   ⟨fun ⟨_, hb, Eq⟩ => hf Eq ▸ hb, mem_image_of_mem f⟩
@@ -198,9 +168,6 @@ lemma preimage_subset_of_surjOn {t : Set β} (hf : Injective f) (h : SurjOn f s 
 
 theorem forall_mem_image {f : α → β} {s : Set α} {p : β → Prop} :
     (∀ y ∈ f '' s, p y) ↔ ∀ ⦃x⦄, x ∈ s → p (f x) := by simp
-
-theorem exists_mem_image {f : α → β} {s : Set α} {p : β → Prop} :
-    (∃ y ∈ f '' s, p y) ↔ ∃ x ∈ s, p (f x) := by simp
 
 theorem mem_image_elim {f : α → β} {s : Set α} {C : β → Prop} (h : ∀ x : α, x ∈ s → C (f x)) :
     ∀ {y : β}, y ∈ f '' s → C y := forall_mem_image.2 h _
@@ -459,10 +426,6 @@ theorem union_preimage_subset (s : Set α) (t : Set β) (f : α → β) :
 theorem subset_image_union (f : α → β) (s : Set α) (t : Set β) : f '' (s ∪ f ⁻¹' t) ⊆ f '' s ∪ t :=
   image_subset_iff.2 (union_preimage_subset _ _ _)
 
-theorem preimage_subset_iff {A : Set α} {B : Set β} {f : α → β} :
-    f ⁻¹' B ⊆ A ↔ ∀ a : α, f a ∈ B → a ∈ A :=
-  Iff.rfl
-
 theorem image_eq_image {f : α → β} (hf : Injective f) : f '' s = f '' t ↔ s = t :=
   Iff.symm <|
     (Iff.intro fun eq => eq ▸ rfl) fun eq => by
@@ -669,9 +632,6 @@ theorem exists_subset_range_and_iff {f : α → β} {p : Set β → Prop} :
     (∃ s, s ⊆ range f ∧ p s) ↔ ∃ s, p (f '' s) := by
   rw [← exists_range_iff, range_image]; rfl
 
-theorem exists_subset_range_iff {f : α → β} {p : Set β → Prop} :
-    (∃ (s : _) (_ : s ⊆ range f), p s) ↔ ∃ s, p (f '' s) := by simp
-
 @[simp]
 theorem forall_subset_range_iff {f : α → β} {p : Set β → Prop} :
     (∀ s, s ⊆ range f → p s) ↔ ∀ s, p (f '' s) := by
@@ -853,9 +813,6 @@ theorem rangeFactorization_eq {f : ι → β} : Subtype.val ∘ rangeFactorizati
 @[simp]
 theorem rangeFactorization_coe (f : ι → β) (a : ι) : (rangeFactorization f a : β) = f a :=
   rfl
-
-@[simp]
-theorem coe_comp_rangeFactorization (f : ι → β) : (↑) ∘ rangeFactorization f = f := rfl
 
 theorem surjective_onto_range : Surjective (rangeFactorization f) := fun ⟨_, ⟨i, rfl⟩⟩ => ⟨i, rfl⟩
 
@@ -1225,9 +1182,13 @@ theorem range_eq {α β} (f : Option α → β) : range f = insert (f none) (ran
 
 end Option
 
--- DISSOLVED: WithBot.range_eq
+theorem WithBot.range_eq {α β} (f : WithBot α → β) :
+    range f = insert (f ⊥) (range (f ∘ WithBot.some : α → β)) :=
+  Option.range_eq f
 
--- DISSOLVED: WithTop.range_eq
+theorem WithTop.range_eq {α β} (f : WithTop α → β) :
+    range f = insert (f ⊤) (range (f ∘ WithBot.some : α → β)) :=
+  Option.range_eq f
 
 namespace Set
 

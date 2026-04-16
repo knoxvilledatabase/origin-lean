@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.AlgebraicGeometry.Morphisms.Preimmersion
 import Mathlib.AlgebraicGeometry.Morphisms.Separated
 
+noncomputable section
+
 /-!
 
 # Immersions of schemes
@@ -41,7 +43,6 @@ def Scheme.Hom.coborderRange (f : X.Hom Y) [IsImmersion f] : Y.Opens :=
   ⟨coborder (Set.range f.base), f.isLocallyClosed_range.isOpen_coborder⟩
 
 noncomputable
-
 def Scheme.Hom.liftCoborder (f : X.Hom Y) [IsImmersion f] : X ⟶ f.coborderRange :=
   IsOpenImmersion.lift f.coborderRange.ι f (by simpa using subset_coborder)
 

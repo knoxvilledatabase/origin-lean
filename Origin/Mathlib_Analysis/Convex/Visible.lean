@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Convex/Visible.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Set.Card
@@ -9,6 +9,8 @@ import Mathlib.Analysis.Convex.Combination
 import Mathlib.Topology.Algebra.Affine
 import Mathlib.Topology.MetricSpace.Pseudo.Lemmas
 import Mathlib.Topology.Order.Monotone
+
+noncomputable section
 
 /-!
 # Points in sight
@@ -42,6 +44,7 @@ def IsVisible (s : Set P) (x y : P) : Prop := ∀ ⦃z⦄, z ∈ s → ¬ Sbtw �
 lemma isVisible_comm : IsVisible 𝕜 s x y ↔ IsVisible 𝕜 s y x := by simp [IsVisible, sbtw_comm]
 
 @[symm] alias ⟨IsVisible.symm, _⟩ := isVisible_comm
+
 lemma IsVisible.mono (hst : s ⊆ t) (ht : IsVisible 𝕜 t x y) : IsVisible 𝕜 s x y :=
   fun _z hz ↦ ht <| hst hz
 
@@ -164,25 +167,5 @@ lemma IsClosed.convexHull_subset_affineSpan_isVisible (hs : IsClosed (convexHull
       hxz.mem_convexHull_isVisible hx hz) (ne_of_mem_of_not_mem hz hx).symm
 
 open Submodule in
-
-lemma rank_le_card_isVisible (hs : IsClosed (convexHull ℝ s)) (hx : x ∉ convexHull ℝ s) :
-    Module.rank ℝ (span ℝ (-x +ᵥ s)) ≤ #{y ∈ s | IsVisible ℝ (convexHull ℝ s) x y} := by
-  calc
-    Module.rank ℝ (span ℝ (-x +ᵥ s)) ≤
-      Module.rank ℝ (span ℝ
-        (-x +ᵥ affineSpan ℝ ({x} ∪ {y ∈ s | IsVisible ℝ (convexHull ℝ s) x y}) : Set V)) := by
-      push_cast
-      refine Submodule.rank_mono ?_
-      gcongr
-      exact (subset_convexHull ..).trans <| hs.convexHull_subset_affineSpan_isVisible hx
-    _ = Module.rank ℝ (span ℝ (-x +ᵥ {y ∈ s | IsVisible ℝ (convexHull ℝ s) x y})) := by
-      suffices h :
-        -x +ᵥ (affineSpan ℝ ({x} ∪ {y ∈ s | IsVisible ℝ (convexHull ℝ s) x y}) : Set V) =
-          span ℝ (-x +ᵥ {y ∈ s | IsVisible ℝ (convexHull ℝ s) x y}) by
-        rw [AffineSubspace.coe_pointwise_vadd, h, span_span]
-      simp [← AffineSubspace.coe_pointwise_vadd, AffineSubspace.pointwise_vadd_span,
-        vadd_set_insert, -coe_affineSpan, affineSpan_insert_zero]
-    _ ≤ #(-x +ᵥ {y ∈ s | IsVisible ℝ (convexHull ℝ s) x y}) := rank_span_le _
-    _ = #{y ∈ s | IsVisible ℝ (convexHull ℝ s) x y} := by simp
 
 end Real

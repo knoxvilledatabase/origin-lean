@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Nat/Factorial/Basic.lean
-Genuine: 52 | Conflates: 0 | Dissolved: 3 | Infrastructure: 10
+Genuine: 54 | Conflates: 1 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Defs
 import Mathlib.Tactic.GCongr.CoreAttrs
 import Mathlib.Tactic.Common
 import Mathlib.Tactic.Monotonicity.Attr
+
+noncomputable section
 
 /-!
 # Factorial and variants
@@ -43,9 +45,6 @@ theorem factorial_succ (n : ℕ) : (n + 1)! = (n + 1) * n ! :=
 @[simp] theorem factorial_one : 1! = 1 :=
   rfl
 
-@[simp] theorem factorial_two : 2! = 2 :=
-  rfl
-
 theorem mul_factorial_pred (hn : 0 < n) : n * (n - 1)! = n ! :=
   Nat.sub_add_cancel (Nat.succ_le_of_lt hn) ▸ rfl
 
@@ -53,7 +52,8 @@ theorem factorial_pos : ∀ n, 0 < n !
   | 0 => Nat.zero_lt_one
   | succ n => Nat.mul_pos (succ_pos _) (factorial_pos n)
 
--- DISSOLVED: factorial_ne_zero
+theorem factorial_ne_zero (n : ℕ) : n ! ≠ 0 :=
+  ne_of_gt (factorial_pos _)
 
 theorem factorial_dvd_factorial {m n} (h : m ≤ n) : m ! ∣ n ! := by
   induction h with
@@ -251,7 +251,13 @@ theorem ascFactorial_le_pow_add (n : ℕ) : ∀ k : ℕ, (n+1).ascFactorial k �
     exact Nat.mul_le_mul_right _
       (Nat.le_trans (ascFactorial_le_pow_add _ k) (Nat.pow_le_pow_left (le_succ _) _))
 
--- DISSOLVED: ascFactorial_lt_pow_add
+theorem ascFactorial_lt_pow_add (n : ℕ) : ∀ {k : ℕ}, 2 ≤ k → (n + 1).ascFactorial k < (n + k) ^ k
+  | 0 => by rintro ⟨⟩
+  | 1 => by intro; contradiction
+  | k + 2 => fun _ => by
+    rw [Nat.pow_succ, Nat.mul_comm, ascFactorial_succ, succ_add_eq_add_succ n (k + 1)]
+    exact Nat.mul_lt_mul_of_le_of_lt (le_refl _) (Nat.lt_of_le_of_lt (ascFactorial_le_pow_add n _)
+      (Nat.pow_lt_pow_left (Nat.lt_succ_self _) k.succ_ne_zero)) (succ_pos _)
 
 theorem ascFactorial_pos (n k : ℕ) : 0 < (n + 1).ascFactorial k :=
   Nat.lt_of_lt_of_le (Nat.pow_pos n.succ_pos) (pow_succ_le_ascFactorial (n + 1) k)
@@ -294,7 +300,14 @@ theorem descFactorial_self : ∀ n : ℕ, n.descFactorial n = n !
   | 0 => by rw [descFactorial_zero, factorial_zero]
   | succ n => by rw [succ_descFactorial_succ, descFactorial_self n, factorial_succ]
 
--- DISSOLVED: descFactorial_eq_zero_iff_lt
+-- CONFLATES (assumes ground = zero): descFactorial_eq_zero_iff_lt
+@[simp]
+theorem descFactorial_eq_zero_iff_lt {n : ℕ} : ∀ {k : ℕ}, n.descFactorial k = 0 ↔ n < k
+  | 0 => by simp only [descFactorial_zero, Nat.one_ne_zero, Nat.not_lt_zero]
+  | succ k => by
+    rw [descFactorial_succ, mul_eq_zero, descFactorial_eq_zero_iff_lt, Nat.lt_succ_iff,
+      Nat.sub_eq_zero_iff_le, Nat.lt_iff_le_and_ne, or_iff_left_iff_imp, and_imp]
+    exact fun h _ => h
 
 alias ⟨_, descFactorial_of_lt⟩ := descFactorial_eq_zero_iff_lt
 

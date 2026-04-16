@@ -7,6 +7,8 @@ import Mathlib.Data.ENNReal.Real
 import Mathlib.Order.WellFoundedSet
 import Mathlib.Topology.EMetricSpace.Diam
 
+noncomputable section
+
 /-!
 # Oscillation
 

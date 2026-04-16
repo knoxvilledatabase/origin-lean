@@ -7,6 +7,8 @@ import Mathlib.Order.Filter.Bases
 import Mathlib.Order.Filter.Prod
 import Mathlib.Order.ConditionallyCompleteLattice.Basic
 
+noncomputable section
+
 /-!
 # Lift filters along filter and set functions
 -/

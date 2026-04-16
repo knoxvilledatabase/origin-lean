@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.MonCat.Basic
 import Mathlib.CategoryTheory.Limits.HasLimits
 import Mathlib.CategoryTheory.ConcreteCategory.Elementwise
 
+noncomputable section
+
 /-!
 # The category of monoids has all colimits.
 

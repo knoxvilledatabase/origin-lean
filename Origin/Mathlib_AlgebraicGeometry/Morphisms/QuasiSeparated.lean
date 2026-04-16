@@ -8,6 +8,8 @@ import Mathlib.AlgebraicGeometry.Morphisms.QuasiCompact
 import Mathlib.Topology.QuasiSeparated
 import Mathlib.Topology.Sheaves.CommRingCat
 
+noncomputable section
+
 /-!
 # Quasi-separated morphisms
 

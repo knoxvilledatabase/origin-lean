@@ -12,6 +12,8 @@ import Mathlib.Tactic.CC.Datatypes
 import Mathlib.Tactic.CC.Lemmas
 import Batteries.Data.RBMap.Alter
 
+noncomputable section
+
 /-!
 # Process when an new equation is added to a congruence closure
 -/

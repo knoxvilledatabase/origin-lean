@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.Basic
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 
+noncomputable section
+
 /-!
 # Eigenvalues are characteristic polynomial roots.
 

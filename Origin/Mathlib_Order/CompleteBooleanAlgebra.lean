@@ -7,6 +7,8 @@ import Mathlib.Order.CompleteLattice
 import Mathlib.Order.Directed
 import Mathlib.Logic.Equiv.Set
 
+noncomputable section
+
 /-!
 # Frames, completely distributive lattices and complete Boolean algebras
 
@@ -736,13 +738,5 @@ instance instCompleteAtomicBooleanAlgebra : CompleteAtomicBooleanAlgebra PUnit w
   iInf_iSup_eq _ := rfl
 
 instance instCompleteBooleanAlgebra : CompleteBooleanAlgebra PUnit := inferInstance
-
-@[simp]
-theorem sSup_eq : sSup s = unit :=
-  rfl
-
-@[simp]
-theorem sInf_eq : sInf s = unit :=
-  rfl
 
 end PUnit

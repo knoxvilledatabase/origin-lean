@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/OreLocalization/Ring.lean
-Genuine: 13 | Conflates: 2 | Dissolved: 5 | Infrastructure: 12
+Genuine: 17 | Conflates: 2 | Dissolved: 1 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Algebra.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Field.Defs
 import Mathlib.Algebra.GroupWithZero.NonZeroDivisors
 import Mathlib.Algebra.Module.End
 import Mathlib.RingTheory.OreLocalization.Basic
+
+noncomputable section
 
 /-!
 
@@ -70,7 +72,8 @@ attribute [local instance] OreLocalization.oreEqv
 
 -- DISSOLVED: zero_mul
 
--- DISSOLVED: mul_zero
+protected theorem mul_zero (x : R[S⁻¹]) : x * 0 = 0 :=
+  OreLocalization.smul_zero x
 
 protected theorem left_distrib (x y z : R[S⁻¹]) : x * (y + z) = x * y + x * z :=
   OreLocalization.smul_add _ _ _
@@ -252,11 +255,24 @@ instance inv' : Inv R[R⁰⁻¹] :=
 
 open Classical in
 
--- DISSOLVED: inv_def
+protected theorem inv_def {r : R} {s : R⁰} :
+    (r /ₒ s)⁻¹ =
+      if hr : r = (0 : R) then (0 : R[R⁰⁻¹])
+      else s /ₒ ⟨r, fun _ => eq_zero_of_ne_zero_of_mul_right_eq_zero hr⟩ := by
+  with_unfolding_all rfl
 
--- DISSOLVED: mul_inv_cancel
+protected theorem mul_inv_cancel (x : R[R⁰⁻¹]) (h : x ≠ 0) : x * x⁻¹ = 1 := by
+  induction' x with r s
+  rw [OreLocalization.inv_def, OreLocalization.one_def]
+  have hr : r ≠ 0 := by
+    rintro rfl
+    simp at h
+  simp only [hr]
+  with_unfolding_all apply OreLocalization.mul_inv ⟨r, _⟩
 
--- DISSOLVED: inv_zero
+protected theorem inv_zero : (0 : R[R⁰⁻¹])⁻¹ = 0 := by
+  rw [OreLocalization.zero_def, OreLocalization.inv_def]
+  simp
 
 instance : DivisionRing R[R⁰⁻¹] where
   mul_inv_cancel := OreLocalization.mul_inv_cancel
@@ -295,7 +311,6 @@ open nonZeroDivisors
 variable {R : Type*} [CommRing R] [Nontrivial R] [NoZeroDivisors R] [OreSet R⁰]
 
 noncomputable
-
 instance : Field R[R⁰⁻¹] where
   __ := inferInstanceAs (DivisionRing R[R⁰⁻¹])
   __ := inferInstanceAs (CommMonoid R[R⁰⁻¹])

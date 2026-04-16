@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.Instances
 import Mathlib.Algebra.Order.Group.MinMax
 import Mathlib.Order.Filter.AtTopBot.Monoid
 
+noncomputable section
+
 /-!
 # Convergence to ±infinity in ordered commutative groups
 -/

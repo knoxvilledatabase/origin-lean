@@ -14,6 +14,8 @@ import Mathlib.Order.Interval.Set.OrderIso
 import Mathlib.Data.Finite.Set
 import Mathlib.Tactic.TFAE
 
+noncomputable section
+
 /-!
 # Compactness properties for complete lattices
 

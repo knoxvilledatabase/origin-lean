@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Order.Category.PartOrd
 import Mathlib.Order.Hom.Lattice
 
+noncomputable section
+
 /-!
 # The category of lattices
 
@@ -37,10 +39,6 @@ instance (X : Lat) : Lattice X :=
 
 def of (α : Type*) [Lattice α] : Lat :=
   Bundled.of α
-
-@[simp]
-theorem coe_of (α : Type*) [Lattice α] : ↥(of α) = α :=
-  rfl
 
 instance : Inhabited Lat :=
   ⟨of Bool⟩
@@ -86,7 +84,3 @@ def dualEquiv : Lat ≌ Lat where
   counitIso := NatIso.ofComponents fun X => Iso.mk <| OrderIso.dualDual X
 
 end Lat
-
-theorem Lat_dual_comp_forget_to_partOrd :
-    Lat.dual ⋙ forget₂ Lat PartOrd = forget₂ Lat PartOrd ⋙ PartOrd.dual :=
-  rfl

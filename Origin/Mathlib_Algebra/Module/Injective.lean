@@ -8,6 +8,8 @@ import Mathlib.Logic.Equiv.TransferInstance
 import Mathlib.Logic.Small.Basic
 import Mathlib.RingTheory.Ideal.Defs
 
+noncomputable section
+
 /-!
 # Injective modules
 

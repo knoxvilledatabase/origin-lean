@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Polynomial.UnitTrinomial
 import Mathlib.Analysis.Complex.Polynomial.Basic
 
+noncomputable section
+
 /-!
 # Irreducibility of unit trinomials
 

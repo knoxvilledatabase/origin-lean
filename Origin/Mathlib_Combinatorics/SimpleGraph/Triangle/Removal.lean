@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.SimpleGraph.Regularity.Lemma
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Basic
 import Mathlib.Combinatorics.SimpleGraph.Triangle.Counting
 
+noncomputable section
+
 /-!
 # Triangle removal lemma
 

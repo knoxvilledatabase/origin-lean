@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.Analysis.Convex.Function
 import Mathlib.Tactic.FieldSimp
 
+noncomputable section
+
 /-!
 # Product of convex functions
 

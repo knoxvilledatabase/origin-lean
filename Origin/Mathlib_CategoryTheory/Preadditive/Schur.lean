@@ -1,6 +1,6 @@
 /-
 Extracted from CategoryTheory/Preadditive/Schur.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 4 | Infrastructure: 2
+Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Ext
@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Simple
 import Mathlib.CategoryTheory.Linear.Basic
 import Mathlib.CategoryTheory.Endomorphism
 import Mathlib.FieldTheory.IsAlgClosed.Spectrum
+
+noncomputable section
 
 /-!
 # Schur's lemma
@@ -29,11 +31,22 @@ variable {C : Type*} [Category C]
 
 variable [Preadditive C]
 
--- DISSOLVED: mono_of_nonzero_from_simple
+theorem mono_of_nonzero_from_simple [HasKernels C] {X Y : C} [Simple X] {f : X ⟶ Y} (w : f ≠ 0) :
+    Mono f :=
+  Preadditive.mono_of_kernel_zero (kernel_zero_of_nonzero_from_simple w)
 
--- DISSOLVED: isIso_of_hom_simple
+theorem isIso_of_hom_simple
+    [HasKernels C] {X Y : C} [Simple X] [Simple Y] {f : X ⟶ Y} (w : f ≠ 0) : IsIso f :=
+  haveI := mono_of_nonzero_from_simple w
+  isIso_of_mono_of_nonzero w
 
--- DISSOLVED: isIso_iff_nonzero
+theorem isIso_iff_nonzero [HasKernels C] {X Y : C} [Simple X] [Simple Y] (f : X ⟶ Y) :
+    IsIso f ↔ f ≠ 0 :=
+  ⟨fun I => by
+    intro h
+    apply id_nonzero X
+    simp only [← IsIso.hom_inv_id f, h, zero_comp],
+   fun w => isIso_of_hom_simple w⟩
 
 open scoped Classical in
 
@@ -72,7 +85,18 @@ variable (𝕜 : Type*) [Field 𝕜]
 
 variable [IsAlgClosed 𝕜] [Linear 𝕜 C]
 
--- DISSOLVED: finrank_endomorphism_eq_one
+theorem finrank_endomorphism_eq_one {X : C} (isIso_iff_nonzero : ∀ f : X ⟶ X, IsIso f ↔ f ≠ 0)
+    [I : FiniteDimensional 𝕜 (X ⟶ X)] : finrank 𝕜 (X ⟶ X) = 1 := by
+  have id_nonzero := (isIso_iff_nonzero (𝟙 X)).mp (by infer_instance)
+  refine finrank_eq_one (𝟙 X) id_nonzero ?_
+  intro f
+  have : Nontrivial (End X) := nontrivial_of_ne _ _ id_nonzero
+  have : FiniteDimensional 𝕜 (End X) := I
+  obtain ⟨c, nu⟩ := spectrum.nonempty_of_isAlgClosed_of_finiteDimensional 𝕜 (End.of f)
+  use c
+  rw [spectrum.mem_iff, IsUnit.sub_iff, isUnit_iff_isIso, isIso_iff_nonzero, Ne,
+    Classical.not_not, sub_eq_zero, Algebra.algebraMap_eq_smul_one] at nu
+  exact nu.symm
 
 variable [HasKernels C]
 

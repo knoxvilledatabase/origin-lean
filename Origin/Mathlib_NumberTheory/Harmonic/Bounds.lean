@@ -7,6 +7,8 @@ import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.Analysis.SumIntegralComparisons
 import Mathlib.NumberTheory.Harmonic.Defs
 
+noncomputable section
+
 /-!
 
 This file proves $\log(n+1) \le H_n \le 1 + \log(n)$ for all natural numbers $n$.

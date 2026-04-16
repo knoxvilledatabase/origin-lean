@@ -10,6 +10,8 @@ import Mathlib.Algebra.MvPolynomial.Expand
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # Witt polynomials
 
@@ -79,10 +81,12 @@ theorem wittPolynomial_eq_sum_C_mul_X_pow (n : ℕ) :
 This allows us to simply write `W n` or `W_ ℤ n`. -/
 
 set_option quotPrecheck false in
+@[inherit_doc]
 
 scoped[Witt] notation "W_" => wittPolynomial p
 
 set_option quotPrecheck false in
+@[inherit_doc]
 
 scoped[Witt] notation "W" => wittPolynomial p _
 

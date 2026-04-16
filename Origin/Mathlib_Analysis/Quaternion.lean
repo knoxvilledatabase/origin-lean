@@ -8,6 +8,8 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.Algebra.Algebra
 
+noncomputable section
+
 /-!
 # Quaternions as a normed algebra
 
@@ -29,6 +31,8 @@ The following notation is available with `open Quaternion` or `open scoped Quate
 
 quaternion, normed ring, normed space, normed algebra
 -/
+
+@[inherit_doc] scoped[Quaternion] notation "ℍ" => Quaternion ℝ
 
 open scoped RealInnerProductSpace
 
@@ -96,52 +100,13 @@ instance : CStarRing ℍ where
 instance : Coe ℂ ℍ := ⟨coeComplex⟩
 
 @[simp, norm_cast]
-theorem coeComplex_re (z : ℂ) : (z : ℍ).re = z.re :=
-  rfl
-
-@[simp, norm_cast]
-theorem coeComplex_imI (z : ℂ) : (z : ℍ).imI = z.im :=
-  rfl
-
-@[simp, norm_cast]
-theorem coeComplex_imJ (z : ℂ) : (z : ℍ).imJ = 0 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coeComplex_imK (z : ℂ) : (z : ℍ).imK = 0 :=
-  rfl
-
-@[simp, norm_cast]
 theorem coeComplex_add (z w : ℂ) : ↑(z + w) = (z + w : ℍ) := by ext <;> simp
 
 @[simp, norm_cast]
 theorem coeComplex_mul (z w : ℂ) : ↑(z * w) = (z * w : ℍ) := by ext <;> simp
 
 @[simp, norm_cast]
-theorem coeComplex_zero : ((0 : ℂ) : ℍ) = 0 :=
-  rfl
-
-@[simp, norm_cast]
-theorem coeComplex_one : ((1 : ℂ) : ℍ) = 1 :=
-  rfl
-
-@[simp, norm_cast]
 theorem coe_real_complex_mul (r : ℝ) (z : ℂ) : (r • z : ℍ) = ↑r * ↑z := by ext <;> simp
-
-@[simp, norm_cast]
-theorem coeComplex_coe (r : ℝ) : ((r : ℂ) : ℍ) = r :=
-  rfl
-
-def ofComplex : ℂ →ₐ[ℝ] ℍ where
-  toFun := (↑)
-  map_one' := rfl
-  map_zero' := rfl
-  map_add' := coeComplex_add
-  map_mul' := coeComplex_mul
-  commutes' _ := rfl
-
-@[simp]
-theorem coe_ofComplex : ⇑ofComplex = coeComplex := rfl
 
 theorem norm_piLp_equiv_symm_equivTuple (x : ℍ) :
     ‖(WithLp.equiv 2 (Fin 4 → _)).symm (equivTuple ℝ x)‖ = ‖x‖ := by

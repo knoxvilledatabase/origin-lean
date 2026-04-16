@@ -6,6 +6,8 @@ import Origin.Core
 import Std.Data.HashMap.Basic
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Convenience functions for hash maps
 

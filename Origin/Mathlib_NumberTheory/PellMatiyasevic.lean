@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/PellMatiyasevic.lean
-Genuine: 70 | Conflates: 0 | Dissolved: 2 | Infrastructure: 11
+Genuine: 70 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Basic
 import Mathlib.Data.Nat.ModEq
 import Mathlib.NumberTheory.Zsqrtd.Basic
+
+noncomputable section
 
 /-!
 # Pell's equation and Matiyasevic's theorem
@@ -103,10 +105,6 @@ theorem pell_val (n : ℕ) : pell a1 n = (xn a1 n, yn a1 n) :=
     | (_, _) => rfl
 
 @[simp]
-theorem xn_zero : xn a1 0 = 1 :=
-  rfl
-
-@[simp]
 theorem yn_zero : yn a1 0 = 0 :=
   rfl
 
@@ -117,10 +115,6 @@ theorem xn_succ (n : ℕ) : xn a1 (n + 1) = xn a1 n * a + d a1 * yn a1 n :=
 @[simp]
 theorem yn_succ (n : ℕ) : yn a1 (n + 1) = xn a1 n + yn a1 n * a :=
   rfl
-
-theorem xn_one : xn a1 1 = a := by simp
-
-theorem yn_one : yn a1 1 = 1 := by simp
 
 def xz (n : ℕ) : ℤ :=
   xn a1 n
@@ -136,7 +130,6 @@ def az (a : ℕ) : ℤ :=
 end
 
 include a1 in
-
 theorem asq_pos : 0 < a * a :=
   le_trans (le_of_lt a1)
     (by have := @Nat.mul_le_mul_left 1 a a (le_of_lt a1); rwa [mul_one] at this)
@@ -145,24 +138,8 @@ theorem dz_val : ↑(d a1) = az a * az a - 1 :=
   have : 1 ≤ a * a := asq_pos a1
   by rw [Pell.d, Int.ofNat_sub this]; rfl
 
-@[simp]
-theorem xz_succ (n : ℕ) : (xz a1 (n + 1)) = xz a1 n * az a + d a1 * yz a1 n :=
-  rfl
-
-@[simp]
-theorem yz_succ (n : ℕ) : yz a1 (n + 1) = xz a1 n + yz a1 n * az a :=
-  rfl
-
 def pellZd (n : ℕ) : ℤ√(d a1) :=
   ⟨xn a1 n, yn a1 n⟩
-
-@[simp]
-theorem pellZd_re (n : ℕ) : (pellZd a1 n).re = xn a1 n :=
-  rfl
-
-@[simp]
-theorem pellZd_im (n : ℕ) : (pellZd a1 n).im = yn a1 n :=
-  rfl
 
 theorem isPell_nat {x y : ℕ} : IsPell (⟨x, y⟩ : ℤ√(d a1)) ↔ x * x - d a1 * y * y = 1 :=
   ⟨fun h =>
@@ -214,7 +191,6 @@ theorem xn_ge_a_pow : ∀ n : ℕ, a ^ n ≤ xn a1 n
     exact le_trans (Nat.mul_le_mul_right _ (xn_ge_a_pow n)) (Nat.le_add_right _ _)
 
 include a1 in
-
 theorem n_lt_a_pow : ∀ n : ℕ, n < a ^ n
   | 0 => Nat.le_refl 1
   | n + 1 => by
@@ -673,7 +649,13 @@ theorem eq_of_xn_modEq_le {i j n} (ij : i ≤ j) (j2n : j ≤ 2 * n)
               rw [n1, i2] at ij'; exact absurd ij' (by decide))
       else _root_.ne_of_lt (eq_of_xn_modEq_lem3 a1 (Nat.pos_of_ne_zero npos) ij' j2n jn ntriv) h
 
--- DISSOLVED: eq_of_xn_modEq
+theorem eq_of_xn_modEq {i j n} (i2n : i ≤ 2 * n) (j2n : j ≤ 2 * n)
+    (h : xn a1 i ≡ xn a1 j [MOD xn a1 n])
+    (ntriv : a = 2 → n = 1 → (i = 0 → j ≠ 2) ∧ (i = 2 → j ≠ 0)) : i = j :=
+  (le_total i j).elim
+    (fun ij => eq_of_xn_modEq_le a1 ij j2n h fun ⟨a2, n1, i0, j2⟩ => (ntriv a2 n1).left i0 j2)
+    fun ij =>
+    (eq_of_xn_modEq_le a1 ij i2n h.symm fun ⟨a2, n1, j0, i2⟩ => (ntriv a2 n1).right i2 j0).symm
 
 theorem eq_of_xn_modEq' {i j n} (ipos : 0 < i) (hin : i ≤ n) (j4n : j ≤ 4 * n)
     (h : xn a1 j ≡ xn a1 i [MOD xn a1 n]) : j = i ∨ j + i = 4 * n :=
@@ -820,7 +802,20 @@ theorem matiyasevic {a k x y} :
             rwa [Nat.mod_eq_of_lt (lt_of_le_of_lt (Nat.le_add_left _ _) ki),
               Nat.mod_eq_of_lt (lt_of_le_of_lt (Nat.le_add_right _ _) ki)] at this⟩⟩
 
--- DISSOLVED: eq_pow_of_pell_lem
+theorem eq_pow_of_pell_lem {a y k : ℕ} (hy0 : y ≠ 0) (hk0 : k ≠ 0) (hyk : y ^ k < a) :
+    (↑(y ^ k) : ℤ) < 2 * a * y - y * y - 1 :=
+  have hya : y < a := (Nat.le_self_pow hk0 _).trans_lt hyk
+  calc
+    (↑(y ^ k) : ℤ) < a := Nat.cast_lt.2 hyk
+    _ ≤ (a : ℤ) ^ 2 - (a - 1 : ℤ) ^ 2 - 1 := by
+      rw [sub_sq, mul_one, one_pow, sub_add, sub_sub_cancel, two_mul, sub_sub, ← add_sub,
+        le_add_iff_nonneg_right, sub_nonneg, Int.add_one_le_iff]
+      norm_cast
+      exact lt_of_le_of_lt (Nat.succ_le_of_lt (Nat.pos_of_ne_zero hy0)) hya
+    _ ≤ (a : ℤ) ^ 2 - (a - y : ℤ) ^ 2 - 1 := by
+      have := hya.le
+      gcongr <;> norm_cast <;> omega
+    _ = 2 * a * y - y * y - 1 := by ring
 
 theorem eq_pow_of_pell {m n k} :
     n ^ k = m ↔ k = 0 ∧ m = 1 ∨0 < k ∧ (n = 0 ∧ m = 0 ∨

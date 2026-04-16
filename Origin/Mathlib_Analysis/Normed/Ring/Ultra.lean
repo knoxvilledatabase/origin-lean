@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Analysis.Normed.Group.Ultra
 
+noncomputable section
+
 /-!
 # Ultrametric norms on rings where the norm of one is one
 

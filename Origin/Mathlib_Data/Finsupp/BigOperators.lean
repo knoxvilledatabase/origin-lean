@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Group.Finset
 import Mathlib.Data.Finsupp.Defs
 import Mathlib.Data.Finset.Pairwise
 
+noncomputable section
+
 /-!
 
 # Sums of collections of Finsupp, and their support

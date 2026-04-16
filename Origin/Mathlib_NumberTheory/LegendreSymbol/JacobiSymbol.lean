@@ -1,9 +1,11 @@
 /-
 Extracted from NumberTheory/LegendreSymbol/JacobiSymbol.lean
-Genuine: 47 | Conflates: 0 | Dissolved: 7 | Infrastructure: 1
+Genuine: 53 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticReciprocity
+
+noncomputable section
 
 /-!
 # The Jacobi Symbol
@@ -102,7 +104,13 @@ theorem legendreSym.to_jacobiSym (p : ℕ) [fp : Fact p.Prime] (a : ℤ) :
   simp only [jacobiSym, primeFactorsList_prime fp.1, List.prod_cons, List.prod_nil, mul_one,
     List.pmap]
 
--- DISSOLVED: mul_right'
+theorem mul_right' (a : ℤ) {b₁ b₂ : ℕ} (hb₁ : b₁ ≠ 0) (hb₂ : b₂ ≠ 0) :
+    J(a | b₁ * b₂) = J(a | b₁) * J(a | b₂) := by
+  rw [jacobiSym, ((perm_primeFactorsList_mul hb₁ hb₂).pmap _).prod_eq, List.pmap_append,
+    List.prod_append]
+  case h => exact fun p hp =>
+    (List.mem_append.mp hp).elim prime_of_mem_primeFactorsList prime_of_mem_primeFactorsList
+  case _ => rfl
 
 -- DISSOLVED: mul_right
 
@@ -131,11 +139,26 @@ theorem mul_left (a₁ a₂ : ℤ) (b : ℕ) : J(a₁ * a₂ | b) = J(a₁ | b) 
     (f := fun x ↦ @legendreSym x {out := prime_of_mem_primeFactorsList x.2} a₁)
     (g := fun x ↦ @legendreSym x {out := prime_of_mem_primeFactorsList x.2} a₂)
 
--- DISSOLVED: eq_zero_iff_not_coprime
+theorem eq_zero_iff_not_coprime {a : ℤ} {b : ℕ} [NeZero b] : J(a | b) = 0 ↔ a.gcd b ≠ 1 :=
+  List.prod_eq_zero_iff.trans
+    (by
+      rw [List.mem_pmap, Int.gcd_eq_natAbs, Ne, Prime.not_coprime_iff_dvd]
+      simp_rw [legendreSym.eq_zero_iff _ _, intCast_zmod_eq_zero_iff_dvd,
+        mem_primeFactorsList (NeZero.ne b), ← Int.natCast_dvd, Int.natCast_dvd_natCast, exists_prop,
+        and_assoc, _root_.and_comm])
 
--- DISSOLVED: ne_zero
+protected theorem ne_zero {a : ℤ} {b : ℕ} (h : a.gcd b = 1) : J(a | b) ≠ 0 := by
+  cases' eq_zero_or_neZero b with hb
+  · rw [hb, zero_right]
+    exact one_ne_zero
+  · contrapose! h; exact eq_zero_iff_not_coprime.1 h
 
--- DISSOLVED: eq_zero_iff
+theorem eq_zero_iff {a : ℤ} {b : ℕ} : J(a | b) = 0 ↔ b ≠ 0 ∧ a.gcd b ≠ 1 :=
+  ⟨fun h => by
+    rcases eq_or_ne b 0 with hb | hb
+    · rw [hb, zero_right] at h; cases h
+    exact ⟨hb, mt jacobiSym.ne_zero <| Classical.not_not.2 h⟩, fun ⟨hb, h⟩ => by
+    rw [← neZero_iff] at hb; exact eq_zero_iff_not_coprime.2 h⟩
 
 theorem zero_left {b : ℕ} (hb : 1 < b) : J(0 | b) = 0 :=
   (@eq_zero_iff_not_coprime 0 b ⟨ne_zero_of_lt hb⟩).mpr <| by
@@ -186,7 +209,17 @@ theorem list_prod_left {l : List ℤ} {n : ℕ} : J(l.prod | n) = (l.map fun a =
   · simp only [List.prod_nil, List.map_nil, one_left]
   · rw [List.map, List.prod_cons, List.prod_cons, mul_left, ih]
 
--- DISSOLVED: list_prod_right
+theorem list_prod_right {a : ℤ} {l : List ℕ} (hl : ∀ n ∈ l, n ≠ 0) :
+    J(a | l.prod) = (l.map fun n => J(a | n)).prod := by
+  induction' l with n l' ih
+  · simp only [List.prod_nil, one_right, List.map_nil]
+  · have hn := hl n (List.mem_cons_self n l')
+    -- `n ≠ 0`
+    have hl' := List.prod_ne_zero fun hf => hl 0 (List.mem_cons_of_mem _ hf) rfl
+    -- `l'.prod ≠ 0`
+    have h := fun m hm => hl m (List.mem_cons_of_mem _ hm)
+    -- `∀ (m : ℕ), m ∈ l' → m ≠ 0`
+    rw [List.map, List.prod_cons, List.prod_cons, mul_right' a hn hl', ih h]
 
 theorem eq_neg_one_at_prime_divisor_of_eq_neg_one {a : ℤ} {n : ℕ} (h : J(a | n) = -1) :
     ∃ p : ℕ, p.Prime ∧ p ∣ n ∧ J(a | p) = -1 := by
@@ -296,7 +329,9 @@ theorem sq_eq_one {m n : ℕ} (hm : Odd m) (hn : Odd n) : qrSign m n ^ 2 = 1 := 
 theorem mul_left (m₁ m₂ n : ℕ) : qrSign (m₁ * m₂) n = qrSign m₁ n * qrSign m₂ n := by
   simp_rw [qrSign, Nat.cast_mul, map_mul, jacobiSym.mul_left]
 
--- DISSOLVED: mul_right
+theorem mul_right (m n₁ n₂ : ℕ) [NeZero n₁] [NeZero n₂] :
+    qrSign m (n₁ * n₂) = qrSign m n₁ * qrSign m n₂ :=
+  jacobiSym.mul_right (χ₄ m) n₁ n₂
 
 protected theorem symm {m n : ℕ} (hm : Odd m) (hn : Odd n) : qrSign m n = qrSign n m := by
   rw [neg_one_pow hm hn, neg_one_pow hn hm, mul_comm (m / 2)]

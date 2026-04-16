@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Sites/DenseSubsite/SheafEquiv.lean
-Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.DenseSubsite.Basic
+
+noncomputable section
 
 /-!
 # The equivalence of categories of sheaves of a dense subsite
@@ -37,7 +39,6 @@ variable {A : Type w} [Category.{w'} A] [∀ X, Limits.HasLimitsOfShape (Structu
 variable [G.IsDenseSubsite J K]
 
 include K in
-
 lemma isIso_ranCounit_app_of_isDenseSubsite (Y : Sheaf J A) (U X) :
     IsIso ((yoneda.map ((G.op.ranCounit.app Y.val).app (op U))).app (op X)) := by
   rw [isIso_iff_bijective]
@@ -124,7 +125,6 @@ instance : (G.sheafPushforwardContinuous A J K).IsEquivalence :=
 variable [HasWeakSheafify J A] [HasWeakSheafify K A]
 
 noncomputable
-
 abbrev sheafEquivSheafificationCompatibility :
     (whiskeringLeft _ _ A).obj G.op ⋙ presheafToSheaf _ _ ≅
       presheafToSheaf _ _ ⋙ (sheafEquiv G J K A).inverse := by

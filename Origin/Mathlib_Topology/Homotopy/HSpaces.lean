@@ -7,6 +7,8 @@ import Mathlib.Topology.CompactOpen
 import Mathlib.Topology.Connected.PathConnected
 import Mathlib.Topology.Homotopy.Basic
 
+noncomputable section
+
 /-!
 # H-spaces
 
@@ -129,10 +131,6 @@ def toHSpace (M : Type u) [MulOneClass M] [TopologicalSpace M] [ContinuousMul M]
 instance (priority := 600) hSpace (G : Type u) [TopologicalSpace G] [Group G] [TopologicalGroup G] :
     HSpace G :=
   toHSpace G
-
-theorem one_eq_hSpace_e {G : Type u} [TopologicalSpace G] [Group G] [TopologicalGroup G] :
-    (1 : G) = HSpace.e :=
-  rfl
 
 example {G G' : Type u} [TopologicalSpace G] [Group G] [TopologicalGroup G] [TopologicalSpace G']
     [Group G'] [TopologicalGroup G'] : TopologicalGroup.hSpace (G × G') = HSpace.prod G G' := by

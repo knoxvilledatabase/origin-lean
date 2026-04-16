@@ -7,6 +7,8 @@ import Lean.Elab.Command
 import Batteries.Tactic.Unreachable
 import Mathlib.Tactic.Linter.Header
 
+noncomputable section
+
 /-!
 # The unused tactic linter
 
@@ -117,9 +119,7 @@ initialize allowedRef : IO.Ref (Std.HashSet SyntaxNodeKind) ←
     |>.insert `Mathlib.Tactic.«tacticRename_bvar_→__»
 
 elab "#allow_unused_tactic " ids:ident* : command => do
-
   let ids := ← Command.liftCoreM do ids.mapM realizeGlobalConstNoOverload
-
   allowedRef.modify (·.insertMany ids)
 
 initialize ignoreTacticKindsRef : IO.Ref NameHashSet ←

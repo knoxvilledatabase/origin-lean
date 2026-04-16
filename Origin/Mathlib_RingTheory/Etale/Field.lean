@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Etale.Basic
 import Mathlib.RingTheory.Unramified.Field
 
+noncomputable section
+
 /-!
 # Etale algebras over fields
 

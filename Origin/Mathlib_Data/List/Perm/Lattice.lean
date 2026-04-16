@@ -9,6 +9,8 @@ import Mathlib.Data.List.Basic
 import Mathlib.Data.List.Lattice
 import Mathlib.Data.List.Nodup
 
+noncomputable section
+
 /-!
 # List Permutations and list lattice operations.
 

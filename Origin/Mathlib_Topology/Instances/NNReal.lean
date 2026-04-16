@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Instances/NNReal.lean
-Genuine: 39 | Conflates: 0 | Dissolved: 2 | Infrastructure: 11
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 -/
 import Origin.Core
 import Mathlib.Data.NNReal.Star
@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.InfiniteSum.Ring
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Topology.MetricSpace.Isometry
 import Mathlib.Topology.Instances.Real
+
+noncomputable section
 
 /-!
 # Topology on `ℝ≥0`
@@ -150,7 +152,8 @@ theorem _root_.Real.tendsto_toNNReal_atTop_iff {l : Filter α} {f : α → ℝ} 
 theorem _root_.Real.tendsto_toNNReal_atTop : Tendsto Real.toNNReal atTop atTop :=
   Real.tendsto_toNNReal_atTop_iff.2 tendsto_id
 
--- DISSOLVED: nhds_zero
+theorem nhds_zero : 𝓝 (0 : ℝ≥0) = ⨅ (a : ℝ≥0) (_ : a ≠ 0), 𝓟 (Iio a) :=
+  nhds_bot_order.trans <| by simp only [bot_lt_iff_ne_bot]; rfl
 
 theorem nhds_zero_basis : (𝓝 (0 : ℝ≥0)).HasBasis (fun a : ℝ≥0 => 0 < a) fun a => Iio a :=
   nhds_bot_basis
@@ -245,7 +248,11 @@ nonrec theorem tendsto_tsum_compl_atTop_zero {α : Type*} (f : α → ℝ≥0) :
   simp_rw [← tendsto_coe, coe_tsum, NNReal.coe_zero]
   exact tendsto_tsum_compl_atTop_zero fun a : α => (f a : ℝ)
 
--- DISSOLVED: powOrderIso
+def powOrderIso (n : ℕ) (hn : n ≠ 0) : ℝ≥0 ≃o ℝ≥0 :=
+  StrictMono.orderIsoOfSurjective (fun x ↦ x ^ n) (fun x y h =>
+      pow_left_strictMonoOn₀ hn (zero_le x) (zero_le y) h) <|
+    (continuous_id.pow _).surjective (tendsto_pow_atTop hn) <| by
+      simpa [OrderBot.atBot_eq, pos_iff_ne_zero]
 
 section Monotone
 

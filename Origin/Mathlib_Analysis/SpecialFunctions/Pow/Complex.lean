@@ -1,9 +1,11 @@
 /-
 Extracted from Analysis/SpecialFunctions/Pow/Complex.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 9 | Infrastructure: 3
+Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
+
+noncomputable section
 
 /-! # Power function on `ℂ`
 
@@ -22,25 +24,41 @@ noncomputable def cpow (x y : ℂ) : ℂ :=
 noncomputable instance : Pow ℂ ℂ :=
   ⟨cpow⟩
 
-@[simp]
-theorem cpow_eq_pow (x y : ℂ) : cpow x y = x ^ y :=
-  rfl
-
 theorem cpow_def (x y : ℂ) : x ^ y = if x = 0 then if y = 0 then 1 else 0 else exp (log x * y) :=
   rfl
 
--- DISSOLVED: cpow_def_of_ne_zero
+theorem cpow_def_of_ne_zero {x : ℂ} (hx : x ≠ 0) (y : ℂ) : x ^ y = exp (log x * y) :=
+  if_neg hx
 
 @[simp]
 theorem cpow_zero (x : ℂ) : x ^ (0 : ℂ) = 1 := by simp [cpow_def]
 
--- DISSOLVED: cpow_eq_zero_iff
+@[simp]
+theorem cpow_eq_zero_iff (x y : ℂ) : x ^ y = 0 ↔ x = 0 ∧ y ≠ 0 := by
+  simp only [cpow_def]
+  split_ifs <;> simp [*, exp_ne_zero]
 
--- DISSOLVED: zero_cpow
+@[simp]
+theorem zero_cpow {x : ℂ} (h : x ≠ 0) : (0 : ℂ) ^ x = 0 := by simp [cpow_def, *]
 
--- DISSOLVED: zero_cpow_eq_iff
+theorem zero_cpow_eq_iff {x : ℂ} {a : ℂ} : (0 : ℂ) ^ x = a ↔ x ≠ 0 ∧ a = 0 ∨ x = 0 ∧ a = 1 := by
+  constructor
+  · intro hyp
+    simp only [cpow_def, eq_self_iff_true, if_true] at hyp
+    by_cases h : x = 0
+    · subst h
+      simp only [if_true, eq_self_iff_true] at hyp
+      right
+      exact ⟨rfl, hyp.symm⟩
+    · rw [if_neg h] at hyp
+      left
+      exact ⟨h, hyp.symm⟩
+  · rintro (⟨h, rfl⟩ | ⟨rfl, rfl⟩)
+    · exact zero_cpow h
+    · exact cpow_zero _
 
--- DISSOLVED: eq_zero_cpow_iff
+theorem eq_zero_cpow_iff {x : ℂ} {a : ℂ} : a = (0 : ℂ) ^ x ↔ x ≠ 0 ∧ a = 0 ∨ x = 0 ∧ a = 1 := by
+  rw [← zero_cpow_eq_iff, eq_comm]
 
 @[simp]
 theorem cpow_one (x : ℂ) : x ^ (1 : ℂ) = x :=
@@ -52,7 +70,9 @@ theorem one_cpow (x : ℂ) : (1 : ℂ) ^ x = 1 := by
   rw [cpow_def]
   split_ifs <;> simp_all [one_ne_zero]
 
--- DISSOLVED: cpow_add
+theorem cpow_add {x : ℂ} (y z : ℂ) (hx : x ≠ 0) : x ^ (y + z) = x ^ y * x ^ z := by
+  simp only [cpow_def, ite_mul, boole_mul, mul_ite, mul_boole]
+  simp_all [exp_add, mul_add]
 
 theorem cpow_mul {x y : ℂ} (z : ℂ) (h₁ : -π < (log x * y).im) (h₂ : (log x * y).im ≤ π) :
     x ^ (y * z) = (x ^ y) ^ z := by
@@ -63,7 +83,8 @@ theorem cpow_neg (x y : ℂ) : x ^ (-y) = (x ^ y)⁻¹ := by
   simp only [cpow_def, neg_eq_zero, mul_neg]
   split_ifs <;> simp [exp_neg]
 
--- DISSOLVED: cpow_sub
+theorem cpow_sub {x : ℂ} (y z : ℂ) (hx : x ≠ 0) : x ^ (y - z) = x ^ y / x ^ z := by
+  rw [sub_eq_add_neg, cpow_add _ _ hx, cpow_neg, div_eq_mul_inv]
 
 theorem cpow_neg_one (x : ℂ) : x ^ (-1 : ℂ) = x⁻¹ := by simpa using cpow_neg x 1
 
@@ -107,7 +128,10 @@ theorem cpow_intCast (x : ℂ) (n : ℤ) : x ^ (n : ℂ) = x ^ n := by simpa usi
 
 alias cpow_int_cast := cpow_intCast
 
--- DISSOLVED: cpow_nat_inv_pow
+@[simp]
+theorem cpow_nat_inv_pow (x : ℂ) {n : ℕ} (hn : n ≠ 0) : (x ^ (n⁻¹ : ℂ)) ^ n = x := by
+  rw [← cpow_nat_mul, mul_inv_cancel₀, cpow_one]
+  assumption_mod_cast
 
 @[simp]
 lemma cpow_ofNat_inv_pow (x : ℂ) (n : ℕ) [n.AtLeastTwo] :
@@ -128,7 +152,11 @@ lemma cpow_ofNat_mul' {x : ℂ} {n : ℕ} [n.AtLeastTwo] (hlt : -π < OfNat.ofNa
     x ^ (OfNat.ofNat n * y) = (x ^ (OfNat.ofNat n : ℕ)) ^ y :=
   cpow_nat_mul' hlt hle y
 
--- DISSOLVED: pow_cpow_nat_inv
+lemma pow_cpow_nat_inv {x : ℂ} {n : ℕ} (h₀ : n ≠ 0) (hlt : -(π / n) < x.arg) (hle : x.arg ≤ π / n) :
+    (x ^ n) ^ (n⁻¹ : ℂ) = x := by
+  rw [← cpow_nat_mul', mul_inv_cancel₀ (Nat.cast_ne_zero.2 h₀), cpow_one]
+  · rwa [← div_lt_iff₀' (Nat.cast_pos.2 h₀.bot_lt), neg_div]
+  · rwa [← le_div_iff₀' (Nat.cast_pos.2 h₀.bot_lt)]
 
 lemma pow_cpow_ofNat_inv {x : ℂ} {n : ℕ} [n.AtLeastTwo] (hlt : -(π / OfNat.ofNat n) < x.arg)
     (hle : x.arg ≤ π / OfNat.ofNat n) :

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Multiset.FinsetOps
 import Mathlib.Data.Multiset.Fold
 
+noncomputable section
+
 /-!
 # Lattice operations on multisets
 -/
@@ -22,10 +24,6 @@ variable [SemilatticeSup α] [OrderBot α]
 
 def sup (s : Multiset α) : α :=
   s.fold (· ⊔ ·) ⊥
-
-@[simp]
-theorem sup_coe (l : List α) : sup (l : Multiset α) = l.foldr (· ⊔ ·) ⊥ :=
-  rfl
 
 @[simp]
 theorem sup_zero : (0 : Multiset α).sup = ⊥ :=
@@ -90,10 +88,6 @@ variable [SemilatticeInf α] [OrderTop α]
 
 def inf (s : Multiset α) : α :=
   s.fold (· ⊓ ·) ⊤
-
-@[simp]
-theorem inf_coe (l : List α) : inf (l : Multiset α) = l.foldr (· ⊓ ·) ⊤ :=
-  rfl
 
 @[simp]
 theorem inf_zero : (0 : Multiset α).inf = ⊤ :=

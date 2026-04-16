@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.Hydra
 import Mathlib.SetTheory.Surreal.Basic
 
+noncomputable section
+
 /-!
 ### Surreal multiplication
 

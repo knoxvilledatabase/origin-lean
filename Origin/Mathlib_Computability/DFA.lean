@@ -8,6 +8,8 @@ import Mathlib.Data.Fintype.Card
 import Mathlib.Data.List.Indexes
 import Mathlib.Tactic.NormNum
 
+noncomputable section
+
 /-!
 # Deterministic Finite Automata
 
@@ -51,28 +53,12 @@ def evalFrom (s : σ) : List α → σ :=
   List.foldl M.step s
 
 @[simp]
-theorem evalFrom_nil (s : σ) : M.evalFrom s [] = s :=
-  rfl
-
-@[simp]
-theorem evalFrom_singleton (s : σ) (a : α) : M.evalFrom s [a] = M.step s a :=
-  rfl
-
-@[simp]
 theorem evalFrom_append_singleton (s : σ) (x : List α) (a : α) :
     M.evalFrom s (x ++ [a]) = M.step (M.evalFrom s x) a := by
   simp only [evalFrom, List.foldl_append, List.foldl_cons, List.foldl_nil]
 
 def eval : List α → σ :=
   M.evalFrom M.start
-
-@[simp]
-theorem eval_nil : M.eval [] = M.start :=
-  rfl
-
-@[simp]
-theorem eval_singleton (a : α) : M.eval [a] = M.step M.start a :=
-  rfl
 
 @[simp]
 theorem eval_append_singleton (x : List α) (a : α) : M.eval (x ++ [a]) = M.step (M.eval x) a :=
@@ -83,9 +69,6 @@ theorem evalFrom_of_append (start : σ) (x y : List α) :
   x.foldl_append _ _ y
 
 def acceptsFrom (s : σ) : Language α := {x | M.evalFrom s x ∈ M.accept}
-
-theorem mem_acceptsFrom {s : σ} {x : List α} :
-    x ∈ M.acceptsFrom s ↔ M.evalFrom s x ∈ M.accept := by rfl
 
 def accepts : Language α := M.acceptsFrom M.start
 
@@ -167,9 +150,6 @@ def comap (f : α' → α) (M : DFA α σ) : DFA α' σ where
   accept := M.accept
 
 @[simp]
-theorem comap_id : M.comap id = M := rfl
-
-@[simp]
 theorem evalFrom_comap (f : α' → α) (s : σ) (x : List α') :
     (M.comap f).evalFrom s x = M.evalFrom s (x.map f) := by
   induction x using List.list_reverse_induction with
@@ -202,12 +182,6 @@ def reindex (g : σ ≃ σ') : DFA α σ ≃ DFA α σ' where
   }
   left_inv M := by simp
   right_inv M := by simp
-
-@[simp]
-theorem reindex_refl : reindex (Equiv.refl σ) M = M := rfl
-
-@[simp]
-theorem symm_reindex (g : σ ≃ σ') : (reindex (α := α) g).symm = reindex g.symm := rfl
 
 @[simp]
 theorem evalFrom_reindex (g : σ ≃ σ') (s : σ') (x : List α) :

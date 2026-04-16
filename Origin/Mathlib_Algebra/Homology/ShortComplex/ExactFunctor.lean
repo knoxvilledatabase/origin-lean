@@ -9,6 +9,8 @@ import Mathlib.Algebra.Homology.ShortComplex.Abelian
 import Mathlib.CategoryTheory.Preadditive.LeftExact
 import Mathlib.CategoryTheory.Abelian.Exact
 
+noncomputable section
+
 /-!
 # Exact functors
 

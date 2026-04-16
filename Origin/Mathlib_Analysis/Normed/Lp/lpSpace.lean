@@ -1,6 +1,6 @@
 /-
 Extracted from Analysis/Normed/Lp/lpSpace.lean
-Genuine: 73 | Conflates: 0 | Dissolved: 6 | Infrastructure: 54
+Genuine: 79 | Conflates: 0 | Dissolved: 0 | Infrastructure: 54
 -/
 import Origin.Core
 import Mathlib.Analysis.MeanInequalities
@@ -8,6 +8,8 @@ import Mathlib.Analysis.MeanInequalitiesPow
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 import Mathlib.Data.Set.Image
 import Mathlib.Topology.Algebra.Order.LiminfLimsup
+
+noncomputable section
 
 /-!
 # ℓp space
@@ -70,9 +72,12 @@ def Memℓp (f : ∀ i, E i) (p : ℝ≥0∞) : Prop :=
   else if p = ∞ then BddAbove (Set.range fun i => ‖f i‖)
   else Summable fun i => ‖f i‖ ^ p.toReal
 
--- DISSOLVED: memℓp_zero_iff
+theorem memℓp_zero_iff {f : ∀ i, E i} : Memℓp f 0 ↔ Set.Finite { i | f i ≠ 0 } := by
+  dsimp [Memℓp]
+  rw [if_pos rfl]
 
--- DISSOLVED: memℓp_zero
+theorem memℓp_zero {f : ∀ i, E i} (hf : Set.Finite { i | f i ≠ 0 }) : Memℓp f 0 :=
+  memℓp_zero_iff.2 hf
 
 theorem memℓp_infty_iff {f : ∀ i, E i} : Memℓp f ∞ ↔ BddAbove (Set.range fun i => ‖f i‖) := by
   simp [Memℓp]
@@ -123,7 +128,8 @@ theorem zero_mem_ℓp' : Memℓp (fun i : α => (0 : E i)) p :=
 
 namespace Memℓp
 
--- DISSOLVED: finite_dsupport
+theorem finite_dsupport {f : ∀ i, E i} (hf : Memℓp f 0) : Set.Finite { i | f i ≠ 0 } :=
+  memℓp_zero_iff.1 hf
 
 theorem bddAbove {f : ∀ i, E i} (hf : Memℓp f ∞) : BddAbove (Set.range fun i => ‖f i‖) :=
   memℓp_infty_iff.1 hf
@@ -276,6 +282,10 @@ def lp (E : α → Type*) [∀ i, NormedAddCommGroup (E i)] (p : ℝ≥0∞) : A
   zero_mem' := zero_memℓp
   add_mem' := Memℓp.add
   neg_mem' := Memℓp.neg
+
+@[inherit_doc] scoped[lp] notation "ℓ^∞(" ι ", " E ")" => lp (fun i : ι => E) ∞
+
+@[inherit_doc] scoped[lp] notation "ℓ^∞(" ι ")" => lp (fun i : ι => ℝ) ∞
 
 namespace lp
 
@@ -471,7 +481,14 @@ protected theorem tsum_mul_le_mul_norm' {p q : ℝ≥0∞} (hpq : p.toReal.IsCon
 
 section ComparePointwise
 
--- DISSOLVED: norm_apply_le_norm
+theorem norm_apply_le_norm (hp : p ≠ 0) (f : lp E p) (i : α) : ‖f i‖ ≤ ‖f‖ := by
+  rcases eq_or_ne p ∞ with (rfl | hp')
+  · haveI : Nonempty α := ⟨i⟩
+    exact (isLUB_norm f).1 ⟨i, rfl⟩
+  have hp'' : 0 < p.toReal := ENNReal.toReal_pos hp hp'
+  have : ∀ i, 0 ≤ ‖f i‖ ^ p.toReal := fun i => Real.rpow_nonneg (norm_nonneg _) _
+  rw [← Real.rpow_le_rpow_iff (norm_nonneg _) (norm_nonneg' _) hp'']
+  convert le_hasSum (hasSum_norm hp'' f) i fun i _ => this i
 
 theorem sum_rpow_le_norm_rpow (hp : 0 < p.toReal) (f : lp E p) (s : Finset α) :
     ∑ i ∈ s, ‖f i‖ ^ p.toReal ≤ ‖f‖ ^ p.toReal := by
@@ -535,9 +552,6 @@ def _root_.lpSubmodule : Submodule 𝕜 (PreLp E) :=
 
 variable {E p 𝕜}
 
-theorem coe_lpSubmodule : (lpSubmodule E p 𝕜).toAddSubgroup = lp E p :=
-  rfl
-
 instance : Module 𝕜 (lp E p) :=
   { (lpSubmodule E p 𝕜).module with }
 
@@ -554,7 +568,38 @@ instance [SMul 𝕜' 𝕜] [∀ i, IsScalarTower 𝕜' 𝕜 (E i)] : IsScalarTow
 instance [∀ i, Module 𝕜ᵐᵒᵖ (E i)] [∀ i, IsCentralScalar 𝕜 (E i)] : IsCentralScalar 𝕜 (lp E p) :=
   ⟨fun _ _ => Subtype.ext <| op_smul_eq_smul _ _⟩
 
--- DISSOLVED: norm_const_smul_le
+theorem norm_const_smul_le (hp : p ≠ 0) (c : 𝕜) (f : lp E p) : ‖c • f‖ ≤ ‖c‖ * ‖f‖ := by
+  rcases p.trichotomy with (rfl | rfl | hp)
+  · exact absurd rfl hp
+  · cases isEmpty_or_nonempty α
+    · simp [lp.eq_zero' f]
+    have hcf := lp.isLUB_norm (c • f)
+    have hfc := (lp.isLUB_norm f).mul_left (norm_nonneg c)
+    simp_rw [← Set.range_comp, Function.comp_def] at hfc
+    -- TODO: some `IsLUB` API should make it a one-liner from here.
+    refine hcf.right ?_
+    have := hfc.left
+    simp_rw [mem_upperBounds, Set.mem_range,
+      forall_exists_index, forall_apply_eq_imp_iff] at this ⊢
+    intro a
+    exact (norm_smul_le _ _).trans (this a)
+  · letI inst : NNNorm (lp E p) := ⟨fun f => ⟨‖f‖, norm_nonneg' _⟩⟩
+    have coe_nnnorm : ∀ f : lp E p, ↑‖f‖₊ = ‖f‖ := fun _ => rfl
+    suffices ‖c • f‖₊ ^ p.toReal ≤ (‖c‖₊ * ‖f‖₊) ^ p.toReal by
+      rwa [NNReal.rpow_le_rpow_iff hp] at this
+    clear_value inst
+    rw [NNReal.mul_rpow]
+    have hLHS := lp.hasSum_norm hp (c • f)
+    have hRHS := (lp.hasSum_norm hp f).mul_left (‖c‖ ^ p.toReal)
+    simp_rw [← coe_nnnorm, ← _root_.coe_nnnorm, ← NNReal.coe_rpow, ← NNReal.coe_mul,
+      NNReal.hasSum_coe] at hRHS hLHS
+    refine hasSum_mono hLHS hRHS fun i => ?_
+    dsimp only
+    rw [← NNReal.mul_rpow]
+    -- Porting note: added
+    rw [lp.coeFn_smul, Pi.smul_apply]
+    gcongr
+    apply nnnorm_smul_le
 
 instance [Fact (1 ≤ p)] : BoundedSMul 𝕜 (lp E p) :=
   BoundedSMul.of_norm_smul_le <| norm_const_smul_le (zero_lt_one.trans_le <| Fact.out).ne'
@@ -567,7 +612,12 @@ variable {𝕜 : Type*}
 
 variable [NormedDivisionRing 𝕜] [∀ i, Module 𝕜 (E i)] [∀ i, BoundedSMul 𝕜 (E i)]
 
--- DISSOLVED: norm_const_smul
+theorem norm_const_smul (hp : p ≠ 0) {c : 𝕜} (f : lp E p) : ‖c • f‖ = ‖c‖ * ‖f‖ := by
+  obtain rfl | hc := eq_or_ne c 0
+  · simp
+  refine le_antisymm (norm_const_smul_le hp c f) ?_
+  have := mul_le_mul_of_nonneg_left (norm_const_smul_le hp c⁻¹ (c • f)) (norm_nonneg c)
+  rwa [inv_smul_smul₀ hc, norm_inv, mul_inv_cancel_left₀ (norm_ne_zero_iff.mpr hc)] at this
 
 end DivisionRing
 
@@ -599,10 +649,6 @@ theorem _root_.Memℓp.star_iff {f : ∀ i, E i} : Memℓp (star f) p ↔ Memℓ
 
 instance : Star (lp E p) where
   star f := ⟨(star f : ∀ i, E i), f.property.star_mem⟩
-
-@[simp]
-theorem coeFn_star (f : lp E p) : ⇑(star f) = star (⇑f) :=
-  rfl
 
 @[simp]
 protected theorem star_apply (f : lp E p) (i : α) : star f i = star (f i) :=
@@ -740,10 +786,6 @@ alias _root_.int_cast_memℓp_infty := _root_.intCast_memℓp_infty
 
 @[simp]
 theorem infty_coeFn_one : ⇑(1 : lp B ∞) = 1 :=
-  rfl
-
-@[simp]
-theorem infty_coeFn_pow (f : lp B ∞) (n : ℕ) : ⇑(f ^ n) = (⇑f) ^ n :=
   rfl
 
 @[simp]
@@ -1022,20 +1064,6 @@ section Lipschitz
 open ENNReal lp
 
 variable {ι : Type*}
-
-lemma LipschitzWith.uniformly_bounded [PseudoMetricSpace α] (g : α → ι → ℝ) {K : ℝ≥0}
-    (hg : ∀ i, LipschitzWith K (g · i)) (a₀ : α) (hga₀b : Memℓp (g a₀) ∞) (a : α) :
-    Memℓp (g a) ∞ := by
-  rcases hga₀b with ⟨M, hM⟩
-  use ↑K * dist a a₀ + M
-  rintro - ⟨i, rfl⟩
-  calc
-    |g a i| = |g a i - g a₀ i + g a₀ i| := by simp
-    _ ≤ |g a i - g a₀ i| + |g a₀ i| := abs_add _ _
-    _ ≤ ↑K * dist a a₀ + M := by
-        gcongr
-        · exact lipschitzWith_iff_dist_le_mul.1 (hg i) a a₀
-        · exact hM ⟨i, rfl⟩
 
 theorem LipschitzOnWith.coordinate [PseudoMetricSpace α] (f : α → ℓ^∞(ι)) (s : Set α) (K : ℝ≥0) :
     LipschitzOnWith K f s ↔ ∀ i : ι, LipschitzOnWith K (fun a : α ↦ f a i) s := by

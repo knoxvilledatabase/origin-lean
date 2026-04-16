@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.ContinuedFractions.Translations
 
+noncomputable section
+
 /-!
 # Stabilisation of gcf Computations Under Termination
 

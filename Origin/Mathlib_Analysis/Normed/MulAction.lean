@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Topology.MetricSpace.Algebra
 import Mathlib.Topology.Algebra.UniformMulAction
 
+noncomputable section
+
 /-!
 # Lemmas for `BoundedSMul` over normed additive groups
 

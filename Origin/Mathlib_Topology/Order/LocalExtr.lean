@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Defs
 import Mathlib.Order.Filter.Extr
 import Mathlib.Topology.ContinuousOn
 
+noncomputable section
+
 /-!
 # Local extrema of functions on topological spaces
 

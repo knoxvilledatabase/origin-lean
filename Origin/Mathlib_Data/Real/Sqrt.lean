@@ -1,10 +1,12 @@
 /-
 Extracted from Data/Real/Sqrt.lean
-Genuine: 90 | Conflates: 0 | Dissolved: 2 | Infrastructure: 4
+Genuine: 92 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Topology.Instances.NNReal
 import Mathlib.Topology.Order.MonotoneContinuity
+
+noncomputable section
 
 /-!
 # Square root of a real number
@@ -236,9 +238,9 @@ theorem sqrt_eq_zero (h : 0 ≤ x) : √x = 0 ↔ x = 0 := by simpa using sqrt_i
 theorem sqrt_eq_zero' : √x = 0 ↔ x ≤ 0 := by
   rw [sqrt, NNReal.coe_eq_zero, NNReal.sqrt_eq_zero, Real.toNNReal_eq_zero]
 
--- DISSOLVED: sqrt_ne_zero
+theorem sqrt_ne_zero (h : 0 ≤ x) : √x ≠ 0 ↔ x ≠ 0 := by rw [not_iff_not, sqrt_eq_zero h]
 
--- DISSOLVED: sqrt_ne_zero'
+theorem sqrt_ne_zero' : √x ≠ 0 ↔ 0 < x := by rw [← not_le, not_iff_not, sqrt_eq_zero']
 
 @[simp]
 theorem sqrt_pos : 0 < √x ↔ 0 < x :=

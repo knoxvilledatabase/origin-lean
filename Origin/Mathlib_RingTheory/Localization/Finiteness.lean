@@ -1,11 +1,13 @@
 /-
 Extracted from RingTheory/Localization/Finiteness.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Int
 import Mathlib.RingTheory.Localization.Algebra
 import Mathlib.RingTheory.RingHom.Finite
+
+noncomputable section
 
 /-!
 
@@ -42,7 +44,6 @@ variable {Mₚ : Type t} [AddCommMonoid Mₚ] [Module R Mₚ] [Module Rₚ Mₚ]
 variable (f : M →ₗ[R] Mₚ) [IsLocalizedModule S f]
 
 include S f in
-
 lemma of_isLocalizedModule [Module.Finite R M] : Module.Finite Rₚ Mₚ := by
   classical
   obtain ⟨T, hT⟩ := ‹Module.Finite R M›

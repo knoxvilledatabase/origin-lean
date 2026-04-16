@@ -5,6 +5,8 @@ Genuine: 5 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal
 
+noncomputable section
+
 /-!
 
 This file contains a proof that the radical of any homogeneous ideal is a homogeneous ideal
@@ -171,7 +173,3 @@ theorem Ideal.IsHomogeneous.radical {I : Ideal A} (h : I.IsHomogeneous 𝒜) :
 
 def HomogeneousIdeal.radical (I : HomogeneousIdeal 𝒜) : HomogeneousIdeal 𝒜 :=
   ⟨I.toIdeal.radical, I.isHomogeneous.radical⟩
-
-@[simp]
-theorem HomogeneousIdeal.coe_radical (I : HomogeneousIdeal 𝒜) :
-    I.radical.toIdeal = I.toIdeal.radical := rfl

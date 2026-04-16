@@ -1,12 +1,14 @@
 /-
 Extracted from Data/Sym/Basic.lean
-Genuine: 73 | Conflates: 0 | Dissolved: 4 | Infrastructure: 39
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Data.Multiset.Basic
 import Mathlib.Data.Vector.Basic
 import Mathlib.Data.Setoid.Basic
 import Mathlib.Tactic.ApplyFun
+
+noncomputable section
 
 /-!
 # Symmetric powers
@@ -74,10 +76,6 @@ abbrev mk (m : Multiset α) (h : Multiset.card m = n) : Sym α n :=
 def nil : Sym α 0 :=
   ⟨0, Multiset.card_zero⟩
 
-@[simp]
-theorem coe_nil : ↑(@Sym.nil α) = (0 : Multiset α) :=
-  rfl
-
 @[match_pattern]
 def cons (a : α) (s : Sym α n) : Sym α n.succ :=
   ⟨a ::ₘ s.1, by rw [Multiset.card_cons, s.2]⟩
@@ -95,17 +93,10 @@ theorem cons_inj_left (a a' : α) (s : Sym α n) : a ::ₛ s = a' ::ₛ s ↔ a 
 theorem cons_swap (a b : α) (s : Sym α n) : a ::ₛ b ::ₛ s = b ::ₛ a ::ₛ s :=
   Subtype.ext <| Multiset.cons_swap a b s.1
 
-theorem coe_cons (s : Sym α n) (a : α) : (a ::ₛ s : Multiset α) = a ::ₘ s :=
-  rfl
-
 def ofVector : Vector α n → Sym α n :=
   fun x => ⟨↑x.val, (Multiset.coe_card _).trans x.2⟩
 
 instance : Coe (Vector α n) (Sym α n) where coe x := ofVector x
-
-@[simp]
-theorem ofVector_nil : ↑(Vector.nil : Vector α 0) = (Sym.nil : Sym α 0) :=
-  rfl
 
 @[simp]
 theorem ofVector_cons (a : α) (v : Vector α n) : ↑(Vector.cons a v) = a ::ₛ (↑v : Sym α n) := by
@@ -122,10 +113,6 @@ instance decidableMem [DecidableEq α] (a : α) (s : Sym α n) : Decidable (a �
   s.1.decidableMem _
 
 @[simp, norm_cast] lemma coe_mk (s : Multiset α) (h : Multiset.card s = n) : mk s h = s := rfl
-
-@[simp]
-theorem mem_mk (a : α) (s : Multiset α) (h : Multiset.card s = n) : a ∈ mk s h ↔ a ∈ s :=
-  Iff.rfl
 
 lemma «forall» {p : Sym α n → Prop} :
     (∀ s : Sym α n, p s) ↔ ∀ (s : Multiset α) (hs : Multiset.card s = n), p (Sym.mk s hs) := by
@@ -167,18 +154,6 @@ def erase [DecidableEq α] (s : Sym α (n + 1)) (a : α) (h : a ∈ s) : Sym α 
   ⟨s.val.erase a, (Multiset.card_erase_of_mem h).trans <| s.property.symm ▸ n.pred_succ⟩
 
 @[simp]
-theorem erase_mk [DecidableEq α] (m : Multiset α)
-    (hc : Multiset.card m = n + 1) (a : α) (h : a ∈ m) :
-    (mk m hc).erase a h =mk (m.erase a)
-        (by rw [Multiset.card_erase_of_mem h, hc, Nat.add_one, Nat.pred_succ]) :=
-  rfl
-
-@[simp]
-theorem coe_erase [DecidableEq α] {s : Sym α n.succ} {a : α} (h : a ∈ s) :
-    (s.erase a h : Multiset α) = Multiset.erase s a :=
-  rfl
-
-@[simp]
 theorem cons_erase [DecidableEq α] {s : Sym α n.succ} {a : α} (h : a ∈ s) : a ::ₛ s.erase a h = s :=
   coe_injective <| Multiset.cons_erase h
 
@@ -206,8 +181,6 @@ theorem cons_equiv_eq_equiv_cons (α : Type*) (n : ℕ) (a : α) (s : Sym α n) 
 instance instZeroSym : Zero (Sym α 0) :=
   ⟨⟨0, rfl⟩⟩
 
-@[simp] theorem toMultiset_zero : toMultiset (0 : Sym α 0) = 0 := rfl
-
 instance : EmptyCollection (Sym α 0) :=
   ⟨0⟩
 
@@ -220,13 +193,12 @@ instance uniqueZero : Unique (Sym α 0) :=
 def replicate (n : ℕ) (a : α) : Sym α n :=
   ⟨Multiset.replicate n a, Multiset.card_replicate _ _⟩
 
-theorem replicate_succ {a : α} {n : ℕ} : replicate n.succ a = a ::ₛ replicate n a :=
-  rfl
-
 theorem coe_replicate : (replicate n a : Multiset α) = Multiset.replicate n a :=
   rfl
 
--- DISSOLVED: mem_replicate
+@[simp]
+theorem mem_replicate : b ∈ replicate n a ↔ n ≠ 0 ∧ b = a :=
+  Multiset.mem_replicate
 
 theorem eq_replicate_iff : s = replicate n a ↔ ∀ b ∈ s, b = a := by
   erw [Subtype.ext_iff, Multiset.eq_replicate]
@@ -278,9 +250,11 @@ instance (n : ℕ) [IsEmpty α] : IsEmpty (Sym α n.succ) :=
 instance (n : ℕ) [Unique α] : Unique (Sym α n) :=
   Unique.mk' _
 
--- DISSOLVED: replicate_right_inj
+theorem replicate_right_inj {a b : α} {n : ℕ} (h : n ≠ 0) : replicate n a = replicate n b ↔ a = b :=
+  Subtype.ext_iff.trans (Multiset.replicate_right_inj h)
 
--- DISSOLVED: replicate_right_injective
+theorem replicate_right_injective {n : ℕ} (h : n ≠ 0) :
+    Function.Injective (replicate n : α → Sym α n) := fun _ _ => (replicate_right_inj h).1
 
 instance (n : ℕ) [Nontrivial α] : Nontrivial (Sym α (n + 1)) :=
   (replicate_right_injective n.succ_ne_zero).nontrivial
@@ -306,25 +280,12 @@ theorem map_map {α β γ : Type*} {n : ℕ} (g : β → γ) (f : α → β) (s 
   Subtype.ext <| by dsimp only [Sym.map]; simp
 
 @[simp]
-theorem map_zero (f : α → β) : Sym.map f (0 : Sym α 0) = (0 : Sym β 0) :=
-  rfl
-
-@[simp]
 theorem map_cons {n : ℕ} (f : α → β) (a : α) (s : Sym α n) : (a ::ₛ s).map f = f a ::ₛ s.map f :=
   ext <| Multiset.map_cons _ _ _
 
 @[congr]
 theorem map_congr {f g : α → β} {s : Sym α n} (h : ∀ x ∈ s, f x = g x) : map f s = map g s :=
   Subtype.ext <| Multiset.map_congr rfl h
-
-@[simp]
-theorem map_mk {f : α → β} {m : Multiset α} {hc : Multiset.card m = n} :
-    map f (mk m hc) = mk (m.map f) (by simp [hc]) :=
-  rfl
-
-@[simp]
-theorem coe_map (s : Sym α n) (f : α → β) : ↑(s.map f) = Multiset.map f s :=
-  rfl
 
 theorem map_injective {f : α → β} (hf : Injective f) (n : ℕ) :
     Injective (map f : Sym α n → Sym β n) := fun _ _ h =>
@@ -340,26 +301,12 @@ def equivCongr (e : α ≃ β) : Sym α n ≃ Sym β n where
 def attach (s : Sym α n) : Sym { x // x ∈ s } n :=
   ⟨s.val.attach, by (conv_rhs => rw [← s.2, ← Multiset.card_attach]); rfl⟩
 
-@[simp]
-theorem attach_mk {m : Multiset α} {hc : Multiset.card m = n} :
-    attach (mk m hc) = mk m.attach (Multiset.card_attach.trans hc) :=
-  rfl
-
-@[simp]
-theorem coe_attach (s : Sym α n) : (s.attach : Multiset { a // a ∈ s }) =
-    Multiset.attach (s : Multiset α) :=
-  rfl
-
 theorem attach_map_coe (s : Sym α n) : s.attach.map (↑) = s :=
   coe_injective <| Multiset.attach_map_val _
 
 @[simp]
 theorem mem_attach (s : Sym α n) (x : { x // x ∈ s }) : x ∈ s.attach :=
   Multiset.mem_attach _ _
-
-@[simp]
-theorem attach_nil : (nil : Sym α 0).attach = nil :=
-  rfl
 
 @[simp]
 theorem attach_cons (x : α) (s : Sym α n) :
@@ -376,15 +323,6 @@ protected def cast {n m : ℕ} (h : n = m) : Sym α n ≃ Sym α m where
 @[simp]
 theorem cast_rfl : Sym.cast rfl s = s :=
   Subtype.ext rfl
-
-@[simp]
-theorem cast_cast {n'' : ℕ} (h : n = n') (h' : n' = n'') :
-    Sym.cast h' (Sym.cast h s) = Sym.cast (h.trans h') s :=
-  rfl
-
-@[simp]
-theorem coe_cast (h : n = m) : (Sym.cast h s : Multiset α) = s :=
-  rfl
 
 @[simp]
 theorem mem_cast (h : n = m) : a ∈ Sym.cast h s ↔ a ∈ s :=
@@ -406,24 +344,8 @@ theorem append_comm (s : Sym α n') (s' : Sym α n') :
   ext
   simp [append, add_comm]
 
-@[simp, norm_cast]
-theorem coe_append (s : Sym α n) (s' : Sym α n') : (s.append s' : Multiset α) = s + s' :=
-  rfl
-
 theorem mem_append_iff {s' : Sym α m} : a ∈ s.append s' ↔ a ∈ s ∨ a ∈ s' :=
   Multiset.mem_add
-
-@[simps apply]
-def oneEquiv : α ≃ Sym α 1 where
-  toFun a := ⟨{a}, by simp⟩
-  invFun s := (Equiv.subtypeQuotientEquivQuotientSubtype
-      (·.length = 1) _ (fun _ ↦ Iff.rfl) (fun l l' ↦ by rfl) s).liftOn
-    (fun l ↦ l.1.head <| List.length_pos.mp <| by simp)
-    fun ⟨_, _⟩ ⟨_, h⟩ ↦ fun perm ↦ by
-      obtain ⟨a, rfl⟩ := List.length_eq_one.mp h
-      exact List.eq_of_mem_singleton (perm.mem_iff.mp <| List.head_mem _)
-  left_inv a := by rfl
-  right_inv := by rintro ⟨⟨l⟩, h⟩; obtain ⟨a, rfl⟩ := List.length_eq_one.mp h; rfl
 
 def fill (a : α) (i : Fin (n + 1)) (m : Sym α (n - i)) : Sym α n :=
   Sym.cast (Nat.sub_add_cancel i.is_le) (m.append (replicate i a))
@@ -432,7 +354,9 @@ theorem coe_fill {a : α} {i : Fin (n + 1)} {m : Sym α (n - i)} :
     (fill a i m : Multiset α) = m + replicate i a :=
   rfl
 
--- DISSOLVED: mem_fill_iff
+theorem mem_fill_iff {a b : α} {i : Fin (n + 1)} {s : Sym α (n - i)} :
+    a ∈ Sym.fill b i s ↔ (i : ℕ) ≠ 0 ∧ a = b ∨ a ∈ s := by
+  rw [fill, mem_cast, mem_append_iff, or_comm, mem_replicate]
 
 open Multiset
 
@@ -523,14 +447,6 @@ theorem encode_of_not_none_mem [DecidableEq α] (s : Sym (Option α) n.succ) (h 
 def decode : Sym (Option α) n ⊕ Sym α n.succ → Sym (Option α) n.succ
   | Sum.inl s => none ::ₛ s
   | Sum.inr s => s.map Embedding.some
-
-@[simp]
-theorem decode_inl (s : Sym (Option α) n) : decode (Sum.inl s) = none ::ₛ s :=
-  rfl
-
-@[simp]
-theorem decode_inr (s : Sym α n.succ) : decode (Sum.inr s) = s.map Embedding.some :=
-  rfl
 
 @[simp]
 theorem decode_encode [DecidableEq α] (s : Sym (Option α) n.succ) : decode (encode s) = s := by

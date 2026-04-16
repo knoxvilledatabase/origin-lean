@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Coalgebra.Hom
 import Mathlib.RingTheory.Bialgebra.Basic
 
+noncomputable section
+
 /-!
 # Homomorphisms of `R`-bialgebras
 
@@ -118,41 +120,6 @@ def Simps.apply {R α β : Type*} [CommSemiring R]
 
 initialize_simps_projections BialgHom (toFun → apply)
 
-@[simp]
-protected theorem coe_coe {F : Type*} [FunLike F A B] [BialgHomClass F R A B] (f : F) :
-    ⇑(f : A →ₐc[R] B) = f :=
-  rfl
-
-@[simp]
-theorem coe_mk {f : A →ₗc[R] B} (h h₁) : ((⟨f, h, h₁⟩ : A →ₐc[R] B) : A → B) = f :=
-  rfl
-
-@[norm_cast]
-theorem coe_mks {f : A → B} (h₀ h₁ h₂ h₃ h₄ h₅) :
-    ⇑(⟨⟨⟨⟨f, h₀⟩, h₁⟩, h₂, h₃⟩, h₄, h₅⟩ : A →ₐc[R] B) = f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_coalgHom_mk {f : A →ₗc[R] B} (h h₁) :
-    ((⟨f, h, h₁⟩ : A →ₐc[R] B) : A →ₗc[R] B) = f := by
-  rfl
-
-@[norm_cast]
-theorem coe_toCoalgHom (f : A →ₐc[R] B) : ⇑(f : A →ₗc[R] B) = f :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_toLinearMap (f : A →ₐc[R] B) : ⇑(f : A →ₗ[R] B) = f :=
-  rfl
-
-@[norm_cast]
-theorem coe_toAlgHom (f : A →ₐc[R] B) : ⇑(f : A →ₐ[R] B) = f :=
-  rfl
-
-theorem toAlgHom_toLinearMap (f : A →ₐc[R] B) :
-    ((f : A →ₐ[R] B) : A →ₗ[R] B) = f := by
-  rfl
-
 variable (φ : A →ₐc[R] B)
 
 theorem coe_fn_injective : @Function.Injective (A →ₐc[R] B) (A → B) (↑) :=
@@ -186,19 +153,10 @@ theorem ext {φ₁ φ₂ : A →ₐc[R] B} (H : ∀ x, φ₁ x = φ₂ x) : φ�
 theorem ext_of_ring {f g : R →ₐc[R] A} (h : f 1 = g 1) : f = g :=
   coe_linearMap_injective (by ext; assumption)
 
-@[simp]
-theorem mk_coe {f : A →ₐc[R] B} (h₀ h₁ h₂ h₃ h₄ h₅) :
-    (⟨⟨⟨⟨f, h₀⟩, h₁⟩, h₂, h₃⟩, h₄, h₅⟩ : A →ₐc[R] B) = f :=
-  rfl
-
 protected def copy (f : A →ₐc[R] B) (f' : A → B) (h : f' = ⇑f) : A →ₐc[R] B :=
   { toCoalgHom := (f : A →ₗc[R] B).copy f' h
     map_one' := by simp_all
     map_mul' := by intros; simp_all }
-
-@[simp]
-theorem coe_copy (f : A →ₗc[R] B) (f' : A → B) (h : f' = ⇑f) : ⇑(f.copy f' h) = f' :=
-  rfl
 
 theorem copy_eq (f : A →ₗc[R] B) (f' : A → B) (h : f' = ⇑f) : f.copy f' h = f :=
   DFunLike.ext' h
@@ -212,36 +170,10 @@ variable (R A)
 
 variable {R A}
 
-@[simp]
-theorem coe_id : ⇑(BialgHom.id R A) = id :=
-  rfl
-
-@[simp]
-theorem id_toCoalgHom : BialgHom.id R A = CoalgHom.id R A :=
-  rfl
-
-@[simp]
-theorem id_toAlgHom : BialgHom.id R A = AlgHom.id R A :=
-  rfl
-
 end
 
 @[simps!] def comp (φ₁ : B →ₐc[R] C) (φ₂ : A →ₐc[R] B) : A →ₐc[R] C :=
   { (φ₁ : B →ₗc[R] C).comp (φ₂ : A →ₗc[R] B), (φ₁ : B →ₐ[R] C).comp (φ₂ : A →ₐ[R] B) with }
-
-@[simp]
-theorem coe_comp (φ₁ : B →ₐc[R] C) (φ₂ : A →ₐc[R] B) : ⇑(φ₁.comp φ₂) = φ₁ ∘ φ₂ :=
-  rfl
-
-@[simp]
-theorem comp_toCoalgHom (φ₁ : B →ₐc[R] C) (φ₂ : A →ₐc[R] B) :
-    φ₁.comp φ₂ = (φ₁ : B →ₗc[R] C).comp (φ₂ : A →ₗc[R] B) :=
-  rfl
-
-@[simp]
-theorem comp_toAlgHom (φ₁ : B →ₐc[R] C) (φ₂ : A →ₐc[R] B) :
-    φ₁.comp φ₂ = (φ₁ : B →ₐ[R] C).comp (φ₂ : A →ₐ[R] B) :=
-  rfl
 
 @[simp]
 theorem comp_id : φ.comp (BialgHom.id R A) = φ :=
@@ -267,14 +199,6 @@ instance End : Monoid (A →ₐc[R] A) where
   one_mul _ := ext fun _ => rfl
   mul_one _ := ext fun _ => rfl
 
-@[simp]
-theorem one_apply (x : A) : (1 : A →ₐc[R] A) x = x :=
-  rfl
-
-@[simp]
-theorem mul_apply (φ ψ : A →ₐc[R] A) (x : A) : (φ * ψ) x = φ (ψ x) :=
-  rfl
-
 end BialgHom
 
 namespace Bialgebra
@@ -285,14 +209,6 @@ variable [CommSemiring R] [Semiring A] [Bialgebra R A]
 
 def counitBialgHom : A →ₐc[R] R :=
   { Coalgebra.counitCoalgHom R A, counitAlgHom R A with }
-
-@[simp]
-theorem counitBialgHom_apply (x : A) :
-    counitBialgHom R A x = Coalgebra.counit x := rfl
-
-@[simp]
-theorem counitBialgHom_toCoalgHom :
-    counitBialgHom R A = Coalgebra.counitCoalgHom R A := rfl
 
 variable {R}
 

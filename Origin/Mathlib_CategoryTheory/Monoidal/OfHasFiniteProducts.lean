@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
 
+noncomputable section
+
 /-!
 # The natural monoidal structure on any category with finite (co)products.
 
@@ -91,22 +93,6 @@ theorem whiskerLeft (X : C) {Y Z : C} (f : Y ⟶ Z) : X ◁ f = Limits.prod.map 
 theorem whiskerRight {X Y : C} (f : X ⟶ Y) (Z : C) : f ▷ Z = Limits.prod.map f (𝟙 Z) :=
   rfl
 
-@[simp]
-theorem leftUnitor_hom (X : C) : (λ_ X).hom = Limits.prod.snd :=
-  rfl
-
-@[simp]
-theorem leftUnitor_inv (X : C) : (λ_ X).inv = prod.lift (terminal.from X) (𝟙 _) :=
-  rfl
-
-@[simp]
-theorem rightUnitor_hom (X : C) : (ρ_ X).hom = Limits.prod.fst :=
-  rfl
-
-@[simp]
-theorem rightUnitor_inv (X : C) : (ρ_ X).inv = prod.lift (𝟙 _) (terminal.from X) :=
-  rfl
-
 theorem associator_hom (X Y Z : C) :
     (α_ X Y Z).hom =
       prod.lift (Limits.prod.fst ≫ Limits.prod.fst)
@@ -143,15 +129,6 @@ section
 attribute [local instance] monoidalOfHasFiniteProducts
 
 open MonoidalCategory
-
-@[simps]
-def symmetricOfHasFiniteProducts [HasTerminal C] [HasBinaryProducts C] : SymmetricCategory C where
-  braiding X Y := Limits.prod.braiding X Y
-  braiding_naturality_left f X := by simp
-  braiding_naturality_right X _ _ f := by simp
-  hexagon_forward X Y Z := by dsimp [monoidalOfHasFiniteProducts.associator_hom]; simp
-  hexagon_reverse X Y Z := by dsimp [monoidalOfHasFiniteProducts.associator_inv]; simp
-  symmetry X Y := by dsimp; simp
 
 end
 
@@ -199,22 +176,6 @@ theorem whiskerLeft (X : C) {Y Z : C} (f : Y ⟶ Z) : X ◁ f = Limits.coprod.ma
 theorem whiskerRight {X Y : C} (f : X ⟶ Y) (Z : C) : f ▷ Z = Limits.coprod.map f (𝟙 Z) :=
   rfl
 
-@[simp]
-theorem leftUnitor_hom (X : C) : (λ_ X).hom = coprod.desc (initial.to X) (𝟙 _) :=
-  rfl
-
-@[simp]
-theorem rightUnitor_hom (X : C) : (ρ_ X).hom = coprod.desc (𝟙 _) (initial.to X) :=
-  rfl
-
-@[simp]
-theorem leftUnitor_inv (X : C) : (λ_ X).inv = Limits.coprod.inr :=
-  rfl
-
-@[simp]
-theorem rightUnitor_inv (X : C) : (ρ_ X).inv = Limits.coprod.inl :=
-  rfl
-
 theorem associator_hom (X Y Z : C) :
     (α_ X Y Z).hom =
       coprod.desc (coprod.desc coprod.inl (coprod.inl ≫ coprod.inr)) (coprod.inr ≫ coprod.inr) :=
@@ -232,16 +193,6 @@ section
 attribute [local instance] monoidalOfHasFiniteCoproducts
 
 open MonoidalCategory
-
-@[simps]
-def symmetricOfHasFiniteCoproducts [HasInitial C] [HasBinaryCoproducts C] :
-    SymmetricCategory C where
-  braiding := Limits.coprod.braiding
-  braiding_naturality_left f g := by simp
-  braiding_naturality_right f g := by simp
-  hexagon_forward X Y Z := by dsimp [monoidalOfHasFiniteCoproducts.associator_hom]; simp
-  hexagon_reverse X Y Z := by dsimp [monoidalOfHasFiniteCoproducts.associator_inv]; simp
-  symmetry X Y := by dsimp; simp
 
 end
 

@@ -5,6 +5,8 @@ Genuine: 55 | Conflates: 0 | Dissolved: 0 | Infrastructure: 19
 import Origin.Core
 import Mathlib.Data.Matroid.Dual
 
+noncomputable section
+
 /-!
 # Matroid Restriction
 
@@ -237,12 +239,6 @@ instance {α : Type*} : PartialOrder (Matroidᵣ α) where
     rw [h', restrict_ground_eq] at hR
     rw [h, restrict_ground_eq] at hR'
     rw [← Matroidᵣ.coe_inj, h, h', hR.antisymm hR', restrict_idem]
-
-@[simp] protected theorem Matroidᵣ.le_iff {M M' : Matroidᵣ α} :
-    M ≤ M' ↔ (M : Matroid α) ≤r (M' : Matroid α) := Iff.rfl
-
-@[simp] protected theorem Matroidᵣ.lt_iff {M M' : Matroidᵣ α} :
-    M < M' ↔ (M : Matroid α) <r (M' : Matroid α) := Iff.rfl
 
 theorem ofMatroid_le_iff {M M' : Matroid α} :
     Matroidᵣ.ofMatroid M ≤ Matroidᵣ.ofMatroid M' ↔ M ≤r M' := by

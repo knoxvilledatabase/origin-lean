@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Finsupp/ToDFinsupp.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 9 | Infrastructure: 4
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Data.DFinsupp.Module
 import Mathlib.Data.Finsupp.Basic
+
+noncomputable section
 
 /-!
 # Conversion between `Finsupp` and homogeneous `DFinsupp`
@@ -69,10 +71,6 @@ def Finsupp.toDFinsupp [Zero M] (f : ι →₀ M) : Π₀ _ : ι, M where
     Trunc.mk
       ⟨f.support.1, fun i => (Classical.em (f i = 0)).symm.imp_left Finsupp.mem_support_iff.mpr⟩
 
-@[simp]
-theorem Finsupp.toDFinsupp_coe [Zero M] (f : ι →₀ M) : ⇑f.toDFinsupp = f :=
-  rfl
-
 section
 
 variable [DecidableEq ι] [Zero M]
@@ -92,10 +90,6 @@ theorem toDFinsupp_support (f : ι →₀ M) : f.toDFinsupp.support = f.support 
 
 def DFinsupp.toFinsupp (f : Π₀ _ : ι, M) : ι →₀ M :=
   ⟨f.support, f, fun i => by simp only [DFinsupp.mem_support_iff]⟩
-
-@[simp]
-theorem DFinsupp.toFinsupp_coe (f : Π₀ _ : ι, M) : ⇑f.toFinsupp = f :=
-  rfl
 
 @[simp]
 theorem DFinsupp.toFinsupp_support (f : Π₀ _ : ι, M) : f.toFinsupp.support = f.support := by
@@ -155,15 +149,29 @@ namespace DFinsupp
 
 variable [DecidableEq ι]
 
--- DISSOLVED: toFinsupp_zero
+@[simp]
+theorem toFinsupp_zero [Zero M] [∀ m : M, Decidable (m ≠ 0)] : toFinsupp 0 = (0 : ι →₀ M) :=
+  DFunLike.coe_injective rfl
 
--- DISSOLVED: toFinsupp_add
+@[simp]
+theorem toFinsupp_add [AddZeroClass M] [∀ m : M, Decidable (m ≠ 0)] (f g : Π₀ _ : ι, M) :
+    (toFinsupp (f + g) : ι →₀ M) = toFinsupp f + toFinsupp g :=
+  DFunLike.coe_injective <| DFinsupp.coe_add _ _
 
--- DISSOLVED: toFinsupp_neg
+@[simp]
+theorem toFinsupp_neg [AddGroup M] [∀ m : M, Decidable (m ≠ 0)] (f : Π₀ _ : ι, M) :
+    (toFinsupp (-f) : ι →₀ M) = -toFinsupp f :=
+  DFunLike.coe_injective <| DFinsupp.coe_neg _
 
--- DISSOLVED: toFinsupp_sub
+@[simp]
+theorem toFinsupp_sub [AddGroup M] [∀ m : M, Decidable (m ≠ 0)] (f g : Π₀ _ : ι, M) :
+    (toFinsupp (f - g) : ι →₀ M) = toFinsupp f - toFinsupp g :=
+  DFunLike.coe_injective <| DFinsupp.coe_sub _ _
 
--- DISSOLVED: toFinsupp_smul
+@[simp]
+theorem toFinsupp_smul [Monoid R] [AddMonoid M] [DistribMulAction R M] [∀ m : M, Decidable (m ≠ 0)]
+    (r : R) (f : Π₀ _ : ι, M) : (toFinsupp (r • f) : ι →₀ M) = r • toFinsupp f :=
+  DFunLike.coe_injective <| DFinsupp.coe_smul _ _
 
 end DFinsupp
 
@@ -191,11 +199,13 @@ def finsuppAddEquivDFinsupp [DecidableEq ι] [AddZeroClass M] [∀ m : M, Decida
 
 variable (R)
 
--- DISSOLVED: finsuppLequivDFinsupp
-
--- DISSOLVED: finsuppLequivDFinsupp_apply_apply
-
--- DISSOLVED: finsuppLequivDFinsupp_symm_apply
+def finsuppLequivDFinsupp [DecidableEq ι] [Semiring R] [AddCommMonoid M]
+    [∀ m : M, Decidable (m ≠ 0)] [Module R M] : (ι →₀ M) ≃ₗ[R] Π₀ _ : ι, M :=
+  { finsuppEquivDFinsupp with
+    toFun := Finsupp.toDFinsupp
+    invFun := DFinsupp.toFinsupp
+    map_smul' := Finsupp.toDFinsupp_smul
+    map_add' := Finsupp.toDFinsupp_add }
 
 noncomputable section Sigma
 
@@ -224,16 +234,12 @@ def sigmaFinsuppEquivDFinsupp [Zero N] : ((Σi, η i) →₀ N) ≃ Π₀ i, η 
   right_inv f := by ext; simp [split]
 
 @[simp]
-theorem sigmaFinsuppEquivDFinsupp_apply [Zero N] (f : (Σi, η i) →₀ N) :
-    (sigmaFinsuppEquivDFinsupp f : ∀ i, η i →₀ N) = Finsupp.split f :=
-  rfl
-
-@[simp]
-theorem sigmaFinsuppEquivDFinsupp_symm_apply [Zero N] (f : Π₀ i, η i →₀ N) (s : Σi, η i) :
-    (sigmaFinsuppEquivDFinsupp.symm f : (Σi, η i) →₀ N) s = f s.1 s.2 :=
-  rfl
-
--- DISSOLVED: sigmaFinsuppEquivDFinsupp_support
+theorem sigmaFinsuppEquivDFinsupp_support [DecidableEq ι] [Zero N]
+    [∀ (i : ι) (x : η i →₀ N), Decidable (x ≠ 0)] (f : (Σi, η i) →₀ N) :
+    (sigmaFinsuppEquivDFinsupp f).support = Finsupp.splitSupport f := by
+  ext
+  rw [DFinsupp.mem_support_toFun]
+  exact (Finsupp.mem_splitSupport_iff_nonzero _ _).symm
 
 @[simp]
 theorem sigmaFinsuppEquivDFinsupp_single [DecidableEq ι] [Zero N] (a : Σi, η i) (n : N) :

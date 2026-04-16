@@ -7,6 +7,8 @@ import Mathlib.Data.List.Nodup
 import Mathlib.Data.Nat.Defs
 import Mathlib.Data.List.Infix
 
+noncomputable section
+
 /-!
 # List rotation
 
@@ -182,10 +184,6 @@ theorem zipWith_rotate_distrib {β γ : Type*} (f : α → β → γ) (l : List 
   rw [length_drop, length_drop, h]
 
 attribute [local simp] rotate_cons_succ
-
-theorem zipWith_rotate_one {β : Type*} (f : α → α → β) (x y : α) (l : List α) :
-    zipWith f (x :: y :: l) ((x :: y :: l).rotate 1) = f x y :: zipWith f (y :: l) (l ++ [x]) := by
-  simp
 
 theorem getElem?_rotate {l : List α} {n m : ℕ} (hml : m < l.length) :
     (l.rotate n)[m]? = l[(m + n) % l.length]? := by
@@ -463,10 +461,6 @@ theorem IsRotated.dropLast_tail {α}
 def cyclicPermutations : List α → List (List α)
   | [] => [[]]
   | l@(_ :: _) => dropLast (zipWith (· ++ ·) (tails l) (inits l))
-
-@[simp]
-theorem cyclicPermutations_nil : cyclicPermutations ([] : List α) = [[]] :=
-  rfl
 
 theorem cyclicPermutations_cons (x : α) (l : List α) :
     cyclicPermutations (x :: l) = dropLast (zipWith (· ++ ·) (tails (x :: l)) (inits (x :: l))) :=

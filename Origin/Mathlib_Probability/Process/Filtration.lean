@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Constructions.Cylinders
 import Mathlib.MeasureTheory.Function.ConditionalExpectation.Real
 
+noncomputable section
+
 /-!
 # Filtrations
 
@@ -69,10 +71,6 @@ def const (m' : MeasurableSpace Ω) (hm' : m' ≤ m) : Filtration ι m :=
 
 variable {ι}
 
-@[simp]
-theorem const_apply {m' : MeasurableSpace Ω} {hm' : m' ≤ m} (i : ι) : const ι m' hm' i = m' :=
-  rfl
-
 instance : Inhabited (Filtration ι m) :=
   ⟨const ι m le_rfl⟩
 
@@ -92,20 +90,12 @@ instance : Max (Filtration ι m) :=
         sup_le ((f.mono hij).trans le_sup_left) ((g.mono hij).trans le_sup_right)
       le' := fun i => sup_le (f.le i) (g.le i) }⟩
 
-@[norm_cast]
-theorem coeFn_sup {f g : Filtration ι m} : ⇑(f ⊔ g) = ⇑f ⊔ ⇑g :=
-  rfl
-
 instance : Min (Filtration ι m) :=
   ⟨fun f g =>
     { seq := fun i => f i ⊓ g i
       mono' := fun _ _ hij =>
         le_inf (inf_le_left.trans (f.mono hij)) (inf_le_right.trans (g.mono hij))
       le' := fun i => inf_le_left.trans (f.le i) }⟩
-
-@[norm_cast]
-theorem coeFn_inf {f g : Filtration ι m} : ⇑(f ⊓ g) = ⇑f ⊓ ⇑g :=
-  rfl
 
 instance : SupSet (Filtration ι m) :=
   ⟨fun s =>
@@ -124,10 +114,6 @@ instance : SupSet (Filtration ι m) :=
         obtain ⟨f, _, hfm'⟩ := hm'
         rw [← hfm']
         exact f.le i }⟩
-
-theorem sSup_def (s : Set (Filtration ι m)) (i : ι) :
-    sSup s i = sSup ((fun f : Filtration ι m => f i) '' s) :=
-  rfl
 
 noncomputable instance : InfSet (Filtration ι m) :=
   ⟨fun s =>

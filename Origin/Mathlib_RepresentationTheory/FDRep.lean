@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Preadditive.Schur
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Rep
 
+noncomputable section
+
 /-!
 # `FDRep k G` is the category of finite dimensional `k`-linear representations of `G`.
 
@@ -116,16 +118,6 @@ theorem finrank_hom_simple_simple [IsAlgClosed k] (V W : FDRep k G) [Simple V] [
     finrank k (V ⟶ W) = if Nonempty (V ≅ W) then 1 else 0 :=
   CategoryTheory.finrank_hom_simple_simple k V W
 
-def forget₂HomLinearEquiv (X Y : FDRep k G) :
-    ((forget₂ (FDRep k G) (Rep k G)).obj X ⟶
-      (forget₂ (FDRep k G) (Rep k G)).obj Y) ≃ₗ[k] X ⟶ Y where
-  toFun f := ⟨f.hom, f.comm⟩
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-  invFun f := ⟨(forget₂ (FGModuleCat k) (ModuleCat k)).map f.hom, f.comm⟩
-  left_inv _ := by ext; rfl
-  right_inv _ := by ext; rfl
-
 end FDRep
 
 namespace FDRep
@@ -162,9 +154,5 @@ noncomputable def dualTensorIsoLinHomAux :
 noncomputable def dualTensorIsoLinHom : FDRep.of ρV.dual ⊗ W ≅ FDRep.of (linHom ρV W.ρ) := by
   refine Action.mkIso (dualTensorIsoLinHomAux ρV W) ?_
   convert dualTensorHom_comm ρV W.ρ
-
-@[simp]
-theorem dualTensorIsoLinHom_hom_hom : (dualTensorIsoLinHom ρV W).hom.hom = dualTensorHom k V W :=
-  rfl
 
 end FDRep

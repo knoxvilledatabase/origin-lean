@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Adjunction.Basic
 import Mathlib.CategoryTheory.HomCongr
 import Mathlib.Tactic.ApplyFun
 
+noncomputable section
+
 /-!
 # Mate of natural transformations
 
@@ -234,12 +236,6 @@ def leftAdjointSquare.comp
     ((G₁ ⋙ G₂) ⋙ (L₅ ⋙ L₆)) ⟶ ((L₁ ⋙ L₂) ⋙ (K₁ ⋙ K₂)) :=
   leftAdjointSquare.vcomp (leftAdjointSquare.hcomp α β) (leftAdjointSquare.hcomp γ δ)
 
-theorem leftAdjointSquare.comp_vhcomp
-    (α : G₁ ⋙ L₃ ⟶ L₁ ⋙ H₁) (β : H₁ ⋙ L₄ ⟶ L₂ ⋙ K₁)
-    (γ : G₂ ⋙ L₅ ⟶ L₃ ⋙ H₂) (δ : H₂ ⋙ L₆ ⟶ L₄ ⋙ K₂) :
-    leftAdjointSquare.comp α β γ δ =
-      leftAdjointSquare.vcomp (leftAdjointSquare.hcomp α β) (leftAdjointSquare.hcomp γ δ) := rfl
-
 theorem leftAdjointSquare.comp_hvcomp
     (α : G₁ ⋙ L₃ ⟶ L₁ ⋙ H₁) (β : H₁ ⋙ L₄ ⟶ L₂ ⋙ K₁)
     (γ : G₂ ⋙ L₅ ⟶ L₃ ⋙ H₂) (δ : H₂ ⋙ L₆ ⟶ L₄ ⋙ K₂) :
@@ -258,12 +254,6 @@ def rightAdjointSquare.comp
     (γ : R₃ ⋙ G₂ ⟶ H₂ ⋙ R₅) (δ : R₄ ⋙ H₂ ⟶ K₂ ⋙ R₆) :
     ((R₂ ⋙ R₁) ⋙ (G₁ ⋙ G₂) ⟶ (K₁ ⋙ K₂) ⋙ (R₆ ⋙ R₅)) :=
   rightAdjointSquare.vcomp (rightAdjointSquare.hcomp α β) (rightAdjointSquare.hcomp γ δ)
-
-theorem rightAdjointSquare.comp_vhcomp
-    (α : R₁ ⋙ G₁ ⟶ H₁ ⋙ R₃) (β : R₂ ⋙ H₁ ⟶ K₁ ⋙ R₄)
-    (γ : R₃ ⋙ G₂ ⟶ H₂ ⋙ R₅) (δ : R₄ ⋙ H₂ ⟶ K₂ ⋙ R₆) :
-    rightAdjointSquare.comp α β γ δ =
-    rightAdjointSquare.vcomp (rightAdjointSquare.hcomp α β) (rightAdjointSquare.hcomp γ δ) := rfl
 
 theorem rightAdjointSquare.comp_hvcomp
     (α : R₁ ⋙ G₁ ⟶ H₁ ⋙ R₃) (β : R₂ ⋙ H₁ ⟶ K₁ ⋙ R₄)

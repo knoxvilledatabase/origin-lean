@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/Asymptotics/SuperpolynomialDecay.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 34 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Eval.Defs
 import Mathlib.Analysis.Asymptotics.Asymptotics
 import Mathlib.Analysis.Normed.Order.Basic
 import Mathlib.Topology.Algebra.Order.LiminfLimsup
+
+noncomputable section
 
 /-!
 # Super-Polynomial Function Decay
@@ -173,9 +175,15 @@ section Field
 
 variable [TopologicalSpace β] [Field β] (l k f)
 
--- DISSOLVED: superpolynomialDecay_mul_const_iff
+theorem superpolynomialDecay_mul_const_iff [ContinuousMul β] {c : β} (hc0 : c ≠ 0) :
+    (SuperpolynomialDecay l k fun n => f n * c) ↔ SuperpolynomialDecay l k f :=
+  ⟨fun h => (h.mul_const c⁻¹).congr fun x => by simp [mul_assoc, mul_inv_cancel₀ hc0], fun h =>
+    h.mul_const c⟩
 
--- DISSOLVED: superpolynomialDecay_const_mul_iff
+theorem superpolynomialDecay_const_mul_iff [ContinuousMul β] {c : β} (hc0 : c ≠ 0) :
+    (SuperpolynomialDecay l k fun n => c * f n) ↔ SuperpolynomialDecay l k f :=
+  ⟨fun h => (h.const_mul c⁻¹).congr fun x => by simp [← mul_assoc, inv_mul_cancel₀ hc0], fun h =>
+    h.const_mul c⟩
 
 variable {l k f}
 

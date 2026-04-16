@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Creates
 import Mathlib.CategoryTheory.Limits.Types
 import Mathlib.Logic.Small.Group
 
+noncomputable section
+
 /-!
 # The category of (commutative) (additive) monoids has all limits
 

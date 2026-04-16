@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Group.InjSurj
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Ring.InjSurj
 
+noncomputable section
+
 /-!
 # Pulling back ordered rings along injective maps
 -/

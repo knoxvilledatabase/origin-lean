@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Dual
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
+noncomputable section
+
 /-!
 # Dual space, linear maps and matrices.
 

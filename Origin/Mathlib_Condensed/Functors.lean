@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.Sites.Whiskering
 import Mathlib.Condensed.Basic
 import Mathlib.Topology.Category.Stonean.Basic
 
+noncomputable section
+
 /-!
 # Functors from categories of topological spaces to condensed sets
 

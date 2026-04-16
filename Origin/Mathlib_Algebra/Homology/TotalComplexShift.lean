@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.HomotopyCategory.Shift
 import Mathlib.Algebra.Homology.TotalComplex
 
+noncomputable section
+
 /-!
 # Behaviour of the total complex with respect to shifts
 
@@ -56,14 +58,6 @@ def shiftFunctor₁XXIso (a x a' : ℤ) (h : a' = a + x) (b : ℤ) :
 
 def shiftFunctor₂XXIso (a b y b' : ℤ) (h : b' = b + y) :
     (((shiftFunctor₂ C y).obj K).X a).X b ≅ (K.X a).X b' := eqToIso (by subst h; rfl)
-
-@[simp]
-lemma shiftFunctor₁XXIso_refl (a b x : ℤ) :
-    K.shiftFunctor₁XXIso a x (a + x) rfl b = Iso.refl _ := rfl
-
-@[simp]
-lemma shiftFunctor₂XXIso_refl (a b y : ℤ) :
-    K.shiftFunctor₂XXIso a b y (b + y) rfl = Iso.refl _ := rfl
 
 variable (x y : ℤ) [K.HasTotal (up ℤ)]
 

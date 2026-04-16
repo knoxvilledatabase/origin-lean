@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Sites.Coherent.SheafComparison
 import Mathlib.CategoryTheory.Sites.Equivalence
 
+noncomputable section
+
 /-!
 
 # Coherence and equivalence of categories

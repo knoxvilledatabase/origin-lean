@@ -7,6 +7,8 @@ import Mathlib.Algebra.Star.Subalgebra
 import Mathlib.Topology.Algebra.Algebra
 import Mathlib.Topology.Algebra.Star
 
+noncomputable section
+
 /-!
 # Topological star (sub)algebras
 
@@ -68,11 +70,6 @@ def topologicalClosure (s : StarSubalgebra R A) : StarSubalgebra R A :=
 theorem topologicalClosure_toSubalgebra_comm (s : StarSubalgebra R A) :
     s.topologicalClosure.toSubalgebra = s.toSubalgebra.topologicalClosure :=
   SetLike.coe_injective rfl
-
-@[simp]
-theorem topologicalClosure_coe (s : StarSubalgebra R A) :
-    (s.topologicalClosure : Set A) = closure (s : Set A) :=
-  rfl
 
 theorem le_topologicalClosure (s : StarSubalgebra R A) : s ≤ s.topologicalClosure :=
   subset_closure

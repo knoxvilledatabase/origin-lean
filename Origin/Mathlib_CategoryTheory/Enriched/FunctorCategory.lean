@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Enriched.Ordinary
 import Mathlib.CategoryTheory.Functor.Category
 import Mathlib.CategoryTheory.Limits.Shapes.End
 
+noncomputable section
+
 /-!
 # Functor categories are enriched
 

@@ -5,6 +5,8 @@ Genuine: 16 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 import Origin.Core
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # A type for VM-erased data
 
@@ -88,18 +90,6 @@ protected instance Monad : Monad Erased where
   pure := @mk
   bind := @bind
   map := @map
-
-@[simp]
-theorem pure_def {α} : (pure : α → Erased α) = @mk _ :=
-  rfl
-
-@[simp]
-theorem bind_def {α β} : ((· >>= ·) : Erased α → (α → Erased β) → Erased β) = @bind _ _ :=
-  rfl
-
-@[simp]
-theorem map_def {α β} : ((· <$> ·) : (α → β) → Erased α → Erased β) = @map _ _ :=
-  rfl
 
 protected instance instLawfulMonad : LawfulMonad Erased :=
   { id_map := by intros; ext; simp

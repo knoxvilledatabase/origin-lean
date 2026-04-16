@@ -10,6 +10,8 @@ import Mathlib.Algebra.Category.ModuleCat.Sheaf.Limits
 import Mathlib.CategoryTheory.Sites.LocallyBijective
 import Mathlib.CategoryTheory.Sites.Sheafification
 
+noncomputable section
+
 /-!
 # The sheafification functor for presheaves of modules
 
@@ -111,15 +113,6 @@ noncomputable def sheafificationAdjunction :
       homEquiv_naturality_right := fun {P₀ M N} f g ↦ by
         apply (toPresheaf _).map_injective
         erw [toPresheaf_map_sheafificationHomEquiv] }
-
-lemma sheafificationAdjunction_homEquiv_apply {P : PresheafOfModules.{v} R₀}
-    {F : SheafOfModules.{v} R} (f : (sheafification α).obj P ⟶ F) :
-    (sheafificationAdjunction α).homEquiv P F f = sheafificationHomEquiv α f := rfl
-
-@[simp]
-lemma toPresheaf_map_sheafificationAdjunction_unit_app (M₀ : PresheafOfModules.{v} R₀) :
-    (toPresheaf _).map ((sheafificationAdjunction α).unit.app M₀) =
-      CategoryTheory.toSheafify J M₀.presheaf := rfl
 
 instance : (sheafification.{v} α).IsLeftAdjoint :=
   (sheafificationAdjunction α).isLeftAdjoint

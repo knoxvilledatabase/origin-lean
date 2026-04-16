@@ -5,6 +5,8 @@ Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Support
 
+noncomputable section
+
 /-!  #  Interactions between `R[X]` and `Rᵐᵒᵖ[X]`
 
 This file contains the basic API for "pushing through" the isomorphism

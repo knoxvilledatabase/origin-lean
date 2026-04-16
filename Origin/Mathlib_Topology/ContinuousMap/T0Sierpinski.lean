@@ -7,6 +7,8 @@ import Mathlib.Topology.Order
 import Mathlib.Topology.Sets.Opens
 import Mathlib.Topology.ContinuousMap.Basic
 
+noncomputable section
+
 /-!
 # Any T0 space embeds in a product of copies of the Sierpinski space.
 

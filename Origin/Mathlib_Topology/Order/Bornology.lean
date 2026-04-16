@@ -5,6 +5,8 @@ Genuine: 12 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 import Origin.Core
 import Mathlib.Topology.Bornology.Constructions
 
+noncomputable section
+
 /-!
 # Bornology of order-bounded sets
 

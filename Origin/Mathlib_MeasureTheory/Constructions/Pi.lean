@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Group.Measure
 import Mathlib.MeasureTheory.Measure.Prod
 import Mathlib.Topology.Constructions
 
+noncomputable section
+
 /-!
 # Product measures
 
@@ -635,10 +637,6 @@ instance {G : ι → Type*} [∀ i, Group (G i)] [∀ i, MeasureSpace (G i)] [�
   pi.isHaarMeasure _
 
 end Measure
-
-theorem volume_pi [∀ i, MeasureSpace (α i)] :
-    (volume : Measure (∀ i, α i)) = Measure.pi fun _ => volume :=
-  rfl
 
 theorem volume_pi_pi [∀ i, MeasureSpace (α i)] [∀ i, SigmaFinite (volume : Measure (α i))]
     (s : ∀ i, Set (α i)) : volume (pi univ s) = ∏ i, volume (s i) :=

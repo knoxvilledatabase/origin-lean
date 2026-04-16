@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Galois.GaloisObjects
 import Mathlib.CategoryTheory.Limits.Shapes.CombinedProducts
 import Mathlib.Data.Finite.Sum
 
+noncomputable section
+
 /-!
 # Decomposition of objects into connected components and applications
 
@@ -281,6 +283,7 @@ lemma exists_hom_from_galois_of_fiber_nonempty (X : C) (h : Nonempty (F.obj X)) 
   exact ⟨A, f, h1⟩
 
 include F in
+/-- Any connected object admits a hom from a Galois object. -/
 
 lemma exists_hom_from_galois_of_connected (X : C) [IsConnected X] :
     ∃ (A : C) (_ : A ⟶ X), IsGalois A :=

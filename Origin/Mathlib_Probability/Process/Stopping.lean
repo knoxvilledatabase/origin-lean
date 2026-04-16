@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Process.Adapted
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 
+noncomputable section
+
 /-!
 # Stopping times, stopped processes and stopped values
 
@@ -165,16 +167,6 @@ theorem IsStoppingTime.measurableSet_lt_of_isLUB (hτ : IsStoppingTime f τ) (i 
   rw [h_lt_eq_preimage, h_Ioi_eq_Union]
   simp only [Set.preimage_iUnion, Set.preimage_setOf_eq]
   exact MeasurableSet.iUnion fun n => f.mono (h_bound n).le _ (hτ.measurableSet_le (seq n))
-
-theorem IsStoppingTime.measurableSet_lt (hτ : IsStoppingTime f τ) (i : ι) :
-    MeasurableSet[f i] {ω | τ ω < i} := by
-  obtain ⟨i', hi'_lub⟩ : ∃ i', IsLUB (Set.Iio i) i' := exists_lub_Iio i
-  cases' lub_Iio_eq_self_or_Iio_eq_Iic i hi'_lub with hi'_eq_i h_Iio_eq_Iic
-  · rw [← hi'_eq_i] at hi'_lub ⊢
-    exact hτ.measurableSet_lt_of_isLUB i' hi'_lub
-  · have h_lt_eq_preimage : {ω : Ω | τ ω < i} = τ ⁻¹' Set.Iio i := rfl
-    rw [h_lt_eq_preimage, h_Iio_eq_Iic]
-    exact f.mono (lub_Iio_le i hi'_lub) _ (hτ.measurableSet_le i')
 
 theorem IsStoppingTime.measurableSet_ge (hτ : IsStoppingTime f τ) (i : ι) :
     MeasurableSet[f i] {ω | i ≤ τ ω} := by
@@ -681,20 +673,9 @@ section LinearOrder
 
 def stoppedValue (u : ι → Ω → β) (τ : Ω → ι) : Ω → β := fun ω => u (τ ω) ω
 
-theorem stoppedValue_const (u : ι → Ω → β) (i : ι) : (stoppedValue u fun _ => i) = u i :=
-  rfl
-
 variable [LinearOrder ι]
 
 def stoppedProcess (u : ι → Ω → β) (τ : Ω → ι) : ι → Ω → β := fun i ω => u (min i (τ ω)) ω
-
-theorem stoppedProcess_eq_stoppedValue {u : ι → Ω → β} {τ : Ω → ι} :
-    stoppedProcess u τ = fun i => stoppedValue u fun ω => min i (τ ω) :=
-  rfl
-
-theorem stoppedValue_stoppedProcess {u : ι → Ω → β} {τ σ : Ω → ι} :
-    stoppedValue (stoppedProcess u τ) σ = stoppedValue u fun ω => min (σ ω) (τ ω) :=
-  rfl
 
 theorem stoppedProcess_eq_of_le {u : ι → Ω → β} {τ : Ω → ι} {i : ι} {ω : Ω} (h : i ≤ τ ω) :
     stoppedProcess u τ i ω = u i ω := by simp [stoppedProcess, min_eq_left h]

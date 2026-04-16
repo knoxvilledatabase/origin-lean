@@ -10,6 +10,8 @@ import Mathlib.Algebra.BigOperators.Pi
 import Mathlib.Algebra.Group.ULift
 import Mathlib.Topology.ContinuousMap.Defs
 
+noncomputable section
+
 /-!
 # Theory of topological monoids
 
@@ -420,10 +422,6 @@ def Subsemigroup.topologicalClosure (s : Subsemigroup M) : Subsemigroup M where
   mul_mem' ha hb := s.top_closure_mul_self_subset ⟨_, ha, _, hb, rfl⟩
 
 @[to_additive]
-theorem Subsemigroup.coe_topologicalClosure (s : Subsemigroup M) :
-    (s.topologicalClosure : Set M) = _root_.closure (s : Set M) := rfl
-
-@[to_additive]
 theorem Subsemigroup.le_topologicalClosure (s : Subsemigroup M) : s ≤ s.topologicalClosure :=
   _root_.subset_closure
 
@@ -475,10 +473,6 @@ def Submonoid.topologicalClosure (s : Submonoid M) : Submonoid M where
   carrier := _root_.closure (s : Set M)
   one_mem' := _root_.subset_closure s.one_mem
   mul_mem' ha hb := s.top_closure_mul_self_subset ⟨_, ha, _, hb, rfl⟩
-
-@[to_additive]
-theorem Submonoid.coe_topologicalClosure (s : Submonoid M) :
-    (s.topologicalClosure : Set M) = _root_.closure (s : Set M) := rfl
 
 @[to_additive]
 theorem Submonoid.le_topologicalClosure (s : Submonoid M) : s ≤ s.topologicalClosure :=
@@ -772,16 +766,8 @@ variable [Mul X] [ContinuousMul X]
 protected def mulRight (x : X) : C(X, X) :=
   mk _ (continuous_mul_right x)
 
-@[to_additive (attr := simp)]
-theorem coe_mulRight (x : X) : ⇑(ContinuousMap.mulRight x) = fun y => y * x :=
-  rfl
-
 @[to_additive "The continuous map `fun y => x + y`"]
 protected def mulLeft (x : X) : C(X, X) :=
   mk _ (continuous_mul_left x)
-
-@[to_additive (attr := simp)]
-theorem coe_mulLeft (x : X) : ⇑(ContinuousMap.mulLeft x) = fun y => x * y :=
-  rfl
 
 end ContinuousMap

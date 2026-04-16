@@ -5,6 +5,8 @@ Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.CategoryTheory.Functor.FullyFaithful
 
+noncomputable section
+
 /-!
 # Induced categories and full subcategories
 
@@ -97,21 +99,8 @@ structure FullSubcategory where
 instance FullSubcategory.category : Category.{v} (FullSubcategory Z) :=
   InducedCategory.category FullSubcategory.obj
 
-lemma FullSubcategory.id_def (X : FullSubcategory Z) : 𝟙 X = 𝟙 X.obj := rfl
-
-lemma FullSubcategory.comp_def {X Y Z : FullSubcategory Z} (f : X ⟶ Y) (g : Y ⟶ Z) :
-    f ≫ g = (f ≫ g : X.obj ⟶ Z.obj) := rfl
-
 def fullSubcategoryInclusion : FullSubcategory Z ⥤ C :=
   inducedFunctor FullSubcategory.obj
-
-@[simp]
-theorem fullSubcategoryInclusion.obj {X} : (fullSubcategoryInclusion Z).obj X = X.obj :=
-  rfl
-
-@[simp]
-theorem fullSubcategoryInclusion.map {X Y} {f : X ⟶ Y} : (fullSubcategoryInclusion Z).map f = f :=
-  rfl
 
 abbrev fullyFaithfulFullSubcategoryInclusion :
     (fullSubcategoryInclusion Z).FullyFaithful :=
@@ -136,11 +125,6 @@ instance FullSubcategory.full_map (h : ∀ ⦃X⦄, Z X → Z' X) :
 instance FullSubcategory.faithful_map (h : ∀ ⦃X⦄, Z X → Z' X) :
   (FullSubcategory.map h).Faithful where
 
-@[simp]
-theorem FullSubcategory.map_inclusion (h : ∀ ⦃X⦄, Z X → Z' X) :
-    FullSubcategory.map h ⋙ fullSubcategoryInclusion Z' = fullSubcategoryInclusion Z :=
-  rfl
-
 section lift
 
 variable {D : Type u₂} [Category.{v₂} D] (P Q : D → Prop)
@@ -150,25 +134,9 @@ def FullSubcategory.lift (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) : C ⥤ FullSub
   obj X := ⟨F.obj X, hF X⟩
   map f := F.map f
 
-@[simp]
-theorem FullSubcategory.lift_comp_inclusion_eq (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) :
-    FullSubcategory.lift P F hF ⋙ fullSubcategoryInclusion P = F :=
-  rfl
-
 def FullSubcategory.lift_comp_inclusion (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) :
     FullSubcategory.lift P F hF ⋙ fullSubcategoryInclusion P ≅ F :=
   Iso.refl _
-
-@[simp]
-theorem fullSubcategoryInclusion_obj_lift_obj (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) {X : C} :
-    (fullSubcategoryInclusion P).obj ((FullSubcategory.lift P F hF).obj X) = F.obj X :=
-  rfl
-
-@[simp]
-theorem fullSubcategoryInclusion_map_lift_map (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) {X Y : C}
-    (f : X ⟶ Y) :
-    (fullSubcategoryInclusion P).map ((FullSubcategory.lift P F hF).map f) = F.map f :=
-  rfl
 
 instance (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) [F.Faithful] :
     (FullSubcategory.lift P F hF).Faithful :=
@@ -176,12 +144,6 @@ instance (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) [F.Faithful] :
 
 instance (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) [F.Full] : (FullSubcategory.lift P F hF).Full :=
   Functor.Full.of_comp_faithful_iso (FullSubcategory.lift_comp_inclusion P F hF)
-
-@[simp]
-theorem FullSubcategory.lift_comp_map (F : C ⥤ D) (hF : ∀ X, P (F.obj X)) (h : ∀ ⦃X⦄, P X → Q X) :
-    FullSubcategory.lift P F hF ⋙ FullSubcategory.map h =
-      FullSubcategory.lift Q F fun X => h (hF X) :=
-  rfl
 
 end lift
 

@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/Polynomial/Basic.lean
-Genuine: 82 | Conflates: 2 | Dissolved: 7 | Infrastructure: 8
+Genuine: 89 | Conflates: 2 | Dissolved: 0 | Infrastructure: 8
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
@@ -9,6 +9,8 @@ import Mathlib.Algebra.MvPolynomial.CommRing
 import Mathlib.Algebra.MvPolynomial.Equiv
 import Mathlib.Algebra.Polynomial.BigOperators
 import Mathlib.RingTheory.Noetherian.Basic
+
+noncomputable section
 
 /-!
 # Ring-theoretic supplement of Algebra.Polynomial.
@@ -247,10 +249,6 @@ def coeffs (p : R[X]) : Finset R :=
   letI := Classical.decEq R
   Finset.image (fun n => p.coeff n) p.support
 
-@[simp]
-theorem coeffs_zero : coeffs (0 : R[X]) = ∅ :=
-  rfl
-
 theorem mem_coeffs_iff {p : R[X]} {c : R} : c ∈ p.coeffs ↔ ∃ n ∈ p.support, c = p.coeff n := by
   simp [coeffs, eq_comm, (Finset.mem_image)]
 
@@ -259,9 +257,14 @@ theorem coeffs_one : coeffs (1 : R[X]) ⊆ {1} := by
     simp_rw [coeffs, Finset.image_subset_iff]
     simp_all [coeff_one]
 
--- DISSOLVED: coeff_mem_coeffs
+theorem coeff_mem_coeffs (p : R[X]) (n : ℕ) (h : p.coeff n ≠ 0) : p.coeff n ∈ p.coeffs := by
+  classical
+  simp only [coeffs, exists_prop, mem_support_iff, Finset.mem_image, Ne]
+  exact ⟨n, h, rfl⟩
 
--- DISSOLVED: coeffs_monomial
+theorem coeffs_monomial (n : ℕ) {c : R} (hc : c ≠ 0) : (monomial n c).coeffs = {c} := by
+  rw [coeffs, support_monomial n hc]
+  simp
 
 theorem geom_sum_X_comp_X_add_one_eq_sum (n : ℕ) :
     (∑ i ∈ range n, (X : R[X]) ^ i).comp (X + 1) =
@@ -279,11 +282,29 @@ theorem geom_sum_X_comp_X_add_one_eq_sum (n : ℕ) :
   · simp only [geom_sum_succ', ih, add_comp, X_pow_comp, coeff_add, Nat.choose_succ_succ,
     Nat.cast_add, coeff_X_add_one_pow]
 
--- DISSOLVED: Monic.geom_sum
+theorem Monic.geom_sum {P : R[X]} (hP : P.Monic) (hdeg : 0 < P.natDegree) {n : ℕ} (hn : n ≠ 0) :
+    (∑ i ∈ range n, P ^ i).Monic := by
+  nontriviality R
+  obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn
+  rw [geom_sum_succ']
+  refine (hP.pow _).add_of_left ?_
+  refine lt_of_le_of_lt (degree_sum_le _ _) ?_
+  rw [Finset.sup_lt_iff]
+  · simp only [Finset.mem_range, degree_eq_natDegree (hP.pow _).ne_zero]
+    simp only [Nat.cast_lt, hP.natDegree_pow]
+    intro k
+    exact nsmul_lt_nsmul_left hdeg
+  · rw [bot_lt_iff_ne_bot, Ne, degree_eq_bot]
+    exact (hP.pow _).ne_zero
 
--- DISSOLVED: Monic.geom_sum'
+theorem Monic.geom_sum' {P : R[X]} (hP : P.Monic) (hdeg : 0 < P.degree) {n : ℕ} (hn : n ≠ 0) :
+    (∑ i ∈ range n, P ^ i).Monic :=
+  hP.geom_sum (natDegree_pos_iff_degree_pos.2 hdeg) hn
 
--- DISSOLVED: monic_geom_sum_X
+theorem monic_geom_sum_X {n : ℕ} (hn : n ≠ 0) : (∑ i ∈ range n, (X : R[X]) ^ i).Monic := by
+  nontriviality R
+  apply monic_X.geom_sum _ hn
+  simp only [natDegree_X, zero_lt_one]
 
 end Semiring
 
@@ -461,9 +482,6 @@ def ofPolynomial (I : Ideal R[X]) : Submodule R R[X] where
     exact I.mul_mem_left _ H
 
 variable {I : Ideal R[X]}
-
-theorem mem_ofPolynomial (x) : x ∈ I.ofPolynomial ↔ x ∈ I :=
-  Iff.rfl
 
 variable (I)
 
@@ -1018,9 +1036,18 @@ instance isNoetherianRing [Finite σ] [IsNoetherianRing R] :
     @isNoetherianRing_of_ringEquiv (MvPolynomial (Fin (Fintype.card σ)) R) _ _ _
       (renameEquiv R (Fintype.equivFin σ).symm).toRingEquiv isNoetherianRing_fin
 
--- DISSOLVED: noZeroDivisors_fin
+theorem noZeroDivisors_fin (R : Type u) [CommSemiring R] [NoZeroDivisors R] :
+    ∀ n : ℕ, NoZeroDivisors (MvPolynomial (Fin n) R)
+  | 0 => (MvPolynomial.isEmptyAlgEquiv R _).injective.noZeroDivisors _ (map_zero _) (map_mul _)
+  | n + 1 =>
+    haveI := noZeroDivisors_fin R n
+    (MvPolynomial.finSuccEquiv R n).injective.noZeroDivisors _ (map_zero _) (map_mul _)
 
--- DISSOLVED: noZeroDivisors_of_finite
+theorem noZeroDivisors_of_finite (R : Type u) (σ : Type v) [CommSemiring R] [Finite σ]
+    [NoZeroDivisors R] : NoZeroDivisors (MvPolynomial σ R) := by
+  cases nonempty_fintype σ
+  haveI := noZeroDivisors_fin R (Fintype.card σ)
+  exact (renameEquiv R (Fintype.equivFin σ)).injective.noZeroDivisors _ (map_zero _) (map_mul _)
 
 instance {R : Type u} [CommSemiring R] [NoZeroDivisors R] {σ : Type v} :
     NoZeroDivisors (MvPolynomial σ R) where

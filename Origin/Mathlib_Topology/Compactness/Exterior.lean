@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/Compactness/Exterior.lean
-Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Tactic.Peel
 import Mathlib.Topology.Compactness.Compact
 import Mathlib.Topology.Exterior
+
+noncomputable section
 
 /-!
 # Compactness of the exterior of a set

@@ -5,6 +5,8 @@ Genuine: 30 | Conflates: 0 | Dissolved: 0 | Infrastructure: 32
 import Origin.Core
 import Mathlib.MeasureTheory.Measure.GiryMonad
 
+noncomputable section
+
 /-!
 # Markov Kernels
 
@@ -67,8 +69,6 @@ instance instFunLike : FunLike (Kernel α β) α (Measure β) where
 
 lemma measurable (κ : Kernel α β) : Measurable κ := κ.measurable'
 
-@[simp, norm_cast] lemma coe_mk (f : α → Measure β) (hf) : mk f hf = f := rfl
-
 initialize_simps_projections Kernel (toFun → apply)
 
 instance instZero : Zero (Kernel α β) where zero := ⟨0, measurable_zero⟩
@@ -82,13 +82,9 @@ noncomputable instance instSMulNat : SMul ℕ (Kernel α β) where
 
 @[simp, norm_cast] lemma coe_add (κ η : Kernel α β) : ⇑(κ + η) = κ + η := rfl
 
-@[simp, norm_cast] lemma coe_nsmul (n : ℕ) (κ : Kernel α β) : ⇑(n • κ) = n • κ := rfl
-
 @[simp] lemma zero_apply (a : α) : (0 : Kernel α β) a = 0 := rfl
 
 @[simp] lemma add_apply (κ η : Kernel α β) (a : α) : (κ + η) a = κ a + η a := rfl
-
-@[simp] lemma nsmul_apply (n : ℕ) (κ : Kernel α β) (a : α) : (n • κ) a = n • κ a := rfl
 
 noncomputable instance instAddCommMonoid : AddCommMonoid (Kernel α β) :=
   DFunLike.coe_injective.addCommMonoid _ coe_zero coe_add (by intros; rfl)
@@ -100,7 +96,6 @@ instance instCovariantAddLE {α β : Type*} [MeasurableSpace α] [MeasurableSpac
   ⟨fun _ _ _ hμ a ↦ add_le_add_left (hμ a) _⟩
 
 noncomputable
-
 instance instOrderBot {α β : Type*} [MeasurableSpace α] [MeasurableSpace β] :
     OrderBot (Kernel α β) where
   bot := 0

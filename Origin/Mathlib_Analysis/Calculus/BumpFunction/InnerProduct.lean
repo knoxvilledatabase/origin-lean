@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.BumpFunction.Basic
 import Mathlib.Analysis.InnerProductSpace.Calculus
 import Mathlib.Analysis.SpecialFunctions.SmoothTransition
 
+noncomputable section
+
 /-!
 # Smooth bump functions in inner product spaces
 

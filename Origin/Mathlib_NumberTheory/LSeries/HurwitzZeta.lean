@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/LSeries/HurwitzZeta.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.HurwitzZetaEven
 import Mathlib.NumberTheory.LSeries.HurwitzZetaOdd
 import Mathlib.Analysis.SpecialFunctions.Gamma.Beta
+
+noncomputable section
 
 /-!
 # The Hurwitz zeta function
@@ -115,9 +117,15 @@ lemma hasSum_expZeta_of_one_lt_re (a : ℝ) {s : ℂ} (hs : 1 < re s) :
   simp only [mul_right_comm _ I, ← cos_add_sin_I, push_cast]
   rw [add_div, mul_div, mul_comm _ I]
 
--- DISSOLVED: differentiableAt_expZeta
+lemma differentiableAt_expZeta (a : UnitAddCircle) (s : ℂ) (hs : s ≠ 1 ∨ a ≠ 0) :
+    DifferentiableAt ℂ (expZeta a) s := by
+  apply DifferentiableAt.add
+  · exact differentiableAt_cosZeta a hs
+  · apply (differentiableAt_const _).mul (differentiableAt_sinZeta a s)
 
--- DISSOLVED: differentiable_expZeta_of_ne_zero
+lemma differentiable_expZeta_of_ne_zero {a : UnitAddCircle} (ha : a ≠ 0) :
+    Differentiable ℂ (expZeta a) :=
+  (differentiableAt_expZeta a · (Or.inr ha))
 
 lemma LSeriesHasSum_exp (a : ℝ) {s : ℂ} (hs : 1 < re s) :
     LSeriesHasSum (cexp <| 2 * π * I * a * ·) s (expZeta a s) :=
@@ -128,7 +136,20 @@ lemma LSeriesHasSum_exp (a : ℝ) {s : ℂ} (hs : 1 < re s) :
 ## The functional equation
 -/
 
--- DISSOLVED: hurwitzZeta_one_sub
+lemma hurwitzZeta_one_sub (a : UnitAddCircle) {s : ℂ}
+    (hs : ∀ (n : ℕ), s ≠ -n) (hs' : a ≠ 0 ∨ s ≠ 1) :
+    hurwitzZeta a (1 - s) = (2 * π) ^ (-s) * Gamma s *
+    (exp (-π * I * s / 2) * expZeta a s + exp (π * I * s / 2) * expZeta (-a) s) := by
+  rw [hurwitzZeta, hurwitzZetaEven_one_sub a hs hs', hurwitzZetaOdd_one_sub a hs,
+    expZeta, expZeta, Complex.cos, Complex.sin, sinZeta_neg, cosZeta_neg]
+  rw [show ↑π * I * s / 2 = ↑π * s / 2 * I by ring,
+    show -↑π * I * s / 2 = -(↑π * s / 2) * I by ring]
+  -- these `generalize` commands are not strictly needed for the `ring_nf` call to succeed, but
+  -- make it run faster:
+  generalize (2 * π : ℂ) ^ (-s) = x
+  generalize (↑π * s / 2 * I).exp = y
+  generalize (-(↑π * s / 2) * I).exp = z
+  ring_nf
 
 lemma expZeta_one_sub (a : UnitAddCircle) {s : ℂ} (hs : ∀ (n : ℕ), s ≠ 1 - n) :
     expZeta a (1 - s) = (2 * π) ^ (-s) * Gamma s *

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Topology.Order.OrderClosedExtr
 
+noncomputable section
+
 /-!
 # The First-Derivative Test
 

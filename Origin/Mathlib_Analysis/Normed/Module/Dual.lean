@@ -8,6 +8,8 @@ import Mathlib.Analysis.NormedSpace.HahnBanach.Extension
 import Mathlib.Analysis.NormedSpace.RCLike
 import Mathlib.Data.Set.Finite.Lemmas
 
+noncomputable section
+
 /-!
 # The topological dual of a normed space
 
@@ -64,10 +66,6 @@ instance : SeminormedAddCommGroup (Dual 𝕜 E) := inferInstance
 
 def inclusionInDoubleDual : E →L[𝕜] Dual 𝕜 (Dual 𝕜 E) :=
   ContinuousLinearMap.apply 𝕜 𝕜
-
-@[simp]
-theorem dual_def (x : E) (f : Dual 𝕜 E) : inclusionInDoubleDual 𝕜 E x f = f x :=
-  rfl
 
 theorem inclusionInDoubleDual_norm_eq :
     ‖inclusionInDoubleDual 𝕜 E‖ = ‖ContinuousLinearMap.id 𝕜 (Dual 𝕜 E)‖ :=

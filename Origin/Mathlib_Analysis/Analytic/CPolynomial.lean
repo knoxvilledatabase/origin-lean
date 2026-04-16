@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Analytic.ChangeOrigin
 import Mathlib.Analysis.Analytic.Constructions
 
+noncomputable section
+
 /-! We specialize the theory fo analytic functions to the case of functions that admit a
 development given by a *finite* formal multilinear series. We call them "continuously polynomial",
 which is abbreviated to `CPolynomial`. One reason to do that is that we no longer need a

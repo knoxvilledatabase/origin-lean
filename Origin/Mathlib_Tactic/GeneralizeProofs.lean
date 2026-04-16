@@ -8,6 +8,8 @@ import Lean.Elab.Tactic.Location
 import Mathlib.Lean.Expr.Basic
 import Batteries.Lean.Expr
 
+noncomputable section
+
 /-!
 # The `generalize_proofs` tactic
 
@@ -390,41 +392,24 @@ partial def _root_.Lean.MVarId.generalizeProofs
     GeneralizeProofs.generalizeProofsCore g fvars rfvars target |>.run config |>.run' s
 
 elab (name := generalizeProofsElab) "generalize_proofs" config:Parser.Tactic.optConfig
-
     hs:(ppSpace colGt binderIdent)* loc?:(location)? : tactic => withMainContext do
-
   let config ← GeneralizeProofs.elabConfig config
-
   let (fvars, target) ←
-
     match expandOptLocation (Lean.mkOptionalNode loc?) with
-
     | .wildcard => pure ((← getLCtx).getFVarIds, true)
-
     | .targets t target => pure (← getFVarIds t, target)
-
   liftMetaTactic1 fun g => do
-
     let (pfs, g) ← g.generalizeProofs fvars target config
-
+    -- Rename the proofs using `hs` and record info
     g.withContext do
-
       let mut lctx ← getLCtx
-
       for h in hs, fvar in pfs do
-
         if let `(binderIdent| $s:ident) := h then
-
           lctx := lctx.setUserName fvar.fvarId! s.getId
-
         Expr.addLocalVarInfoForBinderIdent fvar h
-
       withLCtx lctx (← getLocalInstances) do
-
         let g' ← mkFreshExprSyntheticOpaqueMVar (← g.getType) (← g.getTag)
-
         g.assign g'
-
         return g'.mvarId!
 
 end Mathlib.Tactic

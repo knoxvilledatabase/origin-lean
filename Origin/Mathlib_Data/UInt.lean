@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.Data.ZMod.Defs
 import Mathlib.Data.BitVec
 
+noncomputable section
+
 /-!
 # Adds Mathlib specific instances to the `UIntX` data types.
 
@@ -25,15 +27,10 @@ cautious here.
 example : (0 : UInt8) = ⟨0⟩ := rfl
 
 set_option hygiene false in
-
 run_cmd
-
   for typeName' in [`UInt8, `UInt16, `UInt32, `UInt64, `USize] do
-
   let typeName := Lean.mkIdent typeName'
-
   Lean.Elab.Command.elabCommand (← `(
-
     namespace $typeName
 
       instance : Neg $typeName where

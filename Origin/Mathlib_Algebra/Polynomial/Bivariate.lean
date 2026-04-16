@@ -5,6 +5,8 @@ Genuine: 35 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.RingTheory.AdjoinRoot
 
+noncomputable section
+
 /-!
 # Bivariate polynomials
 
@@ -128,8 +130,6 @@ lemma evalEval_pow (x y : R) (p : R[X][Y]) (n : ℕ) : (p ^ n).evalEval x y = p.
 
 lemma evalEval_dvd (x y : R) {p q : R[X][Y]} : p ∣ q → p.evalEval x y ∣ q.evalEval x y :=
   eval_dvd ∘ eval_dvd
-
-lemma coe_algebraMap_eq_CC : algebraMap R R[X][Y] = CC (R := R) := rfl
 
 @[simps!] abbrev evalEvalRingHom (x y : R) : R[X][Y] →+* R :=
   (evalRingHom x).comp (evalRingHom <| C y)

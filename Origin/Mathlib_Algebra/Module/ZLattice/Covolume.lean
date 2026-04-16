@@ -1,9 +1,11 @@
 /-
 Extracted from Algebra/Module/ZLattice/Covolume.lean
-Genuine: 6 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.ZLattice.Basic
+
+noncomputable section
 
 /-!
 # Covolume of ℤ-lattices
@@ -55,7 +57,11 @@ theorem covolume_eq_measure_fundamentalDomain {F : Set E} (h : IsAddFundamentalD
   have : VAddInvariantMeasure L E μ := (inferInstance : VAddInvariantMeasure L.toAddSubgroup E μ)
   exact congr_arg ENNReal.toReal (h.covolume_eq_volume μ)
 
--- DISSOLVED: covolume_ne_zero
+theorem covolume_ne_zero : covolume L μ ≠ 0 := by
+  rw [covolume_eq_measure_fundamentalDomain L μ (isAddFundamentalDomain (Free.chooseBasis ℤ L) μ),
+    ENNReal.toReal_ne_zero]
+  refine ⟨measure_fundamentalDomain_ne_zero _, ne_of_lt ?_⟩
+  exact Bornology.IsBounded.measure_lt_top (fundamentalDomain_isBounded _)
 
 theorem covolume_pos : 0 < covolume L μ :=
   lt_of_le_of_ne ENNReal.toReal_nonneg (covolume_ne_zero L μ).symm

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.FieldTheory.Adjoin
 import Mathlib.RingTheory.LinearDisjoint
 
+noncomputable section
+
 /-!
 
 # Linearly disjoint fields

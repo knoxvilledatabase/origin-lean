@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.CategoryTheory.Limits.Shapes.ZeroObjects
 
+noncomputable section
+
 /-!
 # The category of (commutative) (additive) groups has a zero object.
 

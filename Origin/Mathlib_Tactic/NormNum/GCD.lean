@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Divisibility.Basic
 import Mathlib.Data.Int.GCD
 import Mathlib.Tactic.NormNum
 
+noncomputable section
+
 /-! # `norm_num` extensions for GCD-adjacent functions
 
 This module defines some `norm_num` extensions for functions such as

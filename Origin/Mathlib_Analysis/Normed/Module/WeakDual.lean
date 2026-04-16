@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Module.Dual
 import Mathlib.Analysis.NormedSpace.OperatorNorm.Completeness
 import Mathlib.Topology.Algebra.Module.WeakDual
 
+noncomputable section
+
 /-!
 # Weak dual of normed space
 
@@ -112,10 +114,6 @@ def toWeakDual : Dual 𝕜 E ≃ₗ[𝕜] WeakDual 𝕜 E :=
   LinearEquiv.refl 𝕜 (E →L[𝕜] 𝕜)
 
 @[simp]
-theorem coe_toWeakDual (x' : Dual 𝕜 E) : toWeakDual x' = x' :=
-  rfl
-
-@[simp]
 theorem toWeakDual_eq_iff (x' y' : Dual 𝕜 E) : toWeakDual x' = toWeakDual y' ↔ x' = y' :=
   Function.Injective.eq_iff <| LinearEquiv.injective toWeakDual
 
@@ -141,13 +139,6 @@ open NormedSpace
 
 def toNormedDual : WeakDual 𝕜 E ≃ₗ[𝕜] Dual 𝕜 E :=
   NormedSpace.Dual.toWeakDual.symm
-
-theorem toNormedDual_apply (x : WeakDual 𝕜 E) (y : E) : (toNormedDual x) y = x y :=
-  rfl
-
-@[simp]
-theorem coe_toNormedDual (x' : WeakDual 𝕜 E) : toNormedDual x' = x' :=
-  rfl
 
 @[simp]
 theorem toNormedDual_eq_iff (x' y' : WeakDual 𝕜 E) : toNormedDual x' = toNormedDual y' ↔ x' = y' :=

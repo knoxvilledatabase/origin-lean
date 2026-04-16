@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Set.Function
 import Mathlib.CategoryTheory.Category.Cat
 
+noncomputable section
+
 /-!
 # Reflexive Quivers
 
@@ -31,20 +33,12 @@ scoped notation "𝟙rq" => ReflQuiver.id  -- type as \b1
 instance catToReflQuiver {C : Type u} [inst : Category.{v} C] : ReflQuiver.{v+1, u} C :=
   { inst with }
 
-@[simp] theorem ReflQuiver.id_eq_id {C : Type*} [Category C] (X : C) : 𝟙rq X = 𝟙 X := rfl
-
 structure ReflPrefunctor (V : Type u₁) [ReflQuiver.{v₁} V] (W : Type u₂) [ReflQuiver.{v₂} W]
     extends Prefunctor V W where
   /-- A functor preserves identity morphisms. -/
   map_id : ∀ X : V, map (𝟙rq X) = 𝟙rq (obj X) := by aesop_cat
 
 namespace ReflPrefunctor
-
-lemma mk_obj {V W : Type*} [ReflQuiver V] [ReflQuiver W] {obj : V → W} {map} {X : V} :
-    (Prefunctor.mk obj map).obj X = obj X := rfl
-
-lemma mk_map {V W : Type*} [ReflQuiver V] [ReflQuiver W] {obj : V → W} {map} {X Y : V} {f : X ⟶ Y} :
-    (Prefunctor.mk obj map).map f = map f := rfl
 
 theorem ext {V : Type u} [ReflQuiver.{v₁} V] {W : Type u₂} [ReflQuiver.{v₂} W]
     {F G : ReflPrefunctor V W}
@@ -72,19 +66,6 @@ def comp {U : Type*} [ReflQuiver U] {V : Type*} [ReflQuiver V] {W : Type*} [Refl
   __ := F.toPrefunctor.comp G.toPrefunctor
   map_id _ := by simp [F.map_id, G.map_id]
 
-@[simp]
-theorem comp_id {U V : Type*} [ReflQuiver U] [ReflQuiver V] (F : ReflPrefunctor U V) :
-    F.comp (id _) = F := rfl
-
-@[simp]
-theorem id_comp {U V : Type*} [ReflQuiver U] [ReflQuiver V] (F : ReflPrefunctor U V) :
-    (id _).comp F = F := rfl
-
-@[simp]
-theorem comp_assoc {U V W Z : Type*} [ReflQuiver U] [ReflQuiver V] [ReflQuiver W] [ReflQuiver Z]
-    (F : ReflPrefunctor U V) (G : ReflPrefunctor V W) (H : ReflPrefunctor W Z) :
-    (F.comp G).comp H = F.comp (G.comp H) := rfl
-
 infixl:50 " ⥤rq " => ReflPrefunctor
 
 infixl:60 " ⋙rq " => ReflPrefunctor.comp
@@ -97,10 +78,6 @@ theorem congr_map {U V : Type*} [Quiver U] [Quiver V] (F : U ⥤q V) {X Y : U} {
 end ReflPrefunctor
 
 def Functor.toReflPrefunctor {C D} [Category C] [Category D] (F : C ⥤ D) : C ⥤rq D := { F with }
-
-@[simp]
-theorem Functor.toReflPrefunctor_toPrefunctor {C D : Cat} (F : C ⥤ D) :
-    (Functor.toReflPrefunctor F).toPrefunctor = F.toPrefunctor := rfl
 
 namespace ReflQuiver
 

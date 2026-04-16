@@ -8,6 +8,8 @@ import Batteries.Util.Cache
 import Lean.HeadIndex
 import Lean.Elab.Command
 
+noncomputable section
+
 /-!
 # The `#find` command and tactic.
 
@@ -94,27 +96,19 @@ def findType (t : Expr) : TermElabM Unit := withReducible do
 open Lean.Elab.Command in
 
 elab "#find " t:term : command =>
-
   liftTermElabM do
-
     let t ← Term.elabTerm t none
-
     Term.synthesizeSyntheticMVars (postpone := .no) (ignoreStuckTC := true)
-
     findType t
 
 open Lean.Elab.Tactic
 
 elab "find" : tactic => do
-
   findType (← getMainTarget)
 
 elab "#find " t:term : tactic => do
-
   let t ← Term.elabTerm t none
-
   Term.synthesizeSyntheticMVars (postpone := .no) (ignoreStuckTC := true)
-
   findType t
 
 end Mathlib.Tactic.Find

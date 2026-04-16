@@ -5,6 +5,8 @@ Genuine: 4 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Analysis.Calculus.FDeriv.Add
 
+noncomputable section
+
 /-!
 # Derivatives on pi-types.
 -/

@@ -11,6 +11,8 @@ import Mathlib.Data.Set.Subsingleton
 import Mathlib.Order.Category.FinPartOrd
 import Mathlib.Order.Category.LinOrd
 
+noncomputable section
+
 /-!
 # Nonempty finite linear orders
 
@@ -129,9 +131,6 @@ theorem mono_iff_injective {A B : NonemptyFinLinOrd.{u}} (f : A ⟶ B) :
   rw [cancel_mono] at eq
   rw [eq]
 
-lemma forget_map_apply {A B : NonemptyFinLinOrd.{u}} (f : A ⟶ B) (a : A) :
-    (forget NonemptyFinLinOrd).map f a = (f : OrderHom A B).toFun a := rfl
-
 theorem epi_iff_surjective {A B : NonemptyFinLinOrd.{u}} (f : A ⟶ B) :
     Epi f ↔ Function.Surjective f := by
   constructor
@@ -211,11 +210,6 @@ instance : HasStrongEpiMonoFactorisations NonemptyFinLinOrd.{u} :=
     exact ⟨⟨I, m, e, rfl⟩⟩⟩
 
 end NonemptyFinLinOrd
-
-theorem nonemptyFinLinOrd_dual_comp_forget_to_linOrd :
-    NonemptyFinLinOrd.dual ⋙ forget₂ NonemptyFinLinOrd LinOrd =
-      forget₂ NonemptyFinLinOrd LinOrd ⋙ LinOrd.dual :=
-  rfl
 
 def nonemptyFinLinOrdDualCompForgetToFinPartOrd :
     NonemptyFinLinOrd.dual ⋙ forget₂ NonemptyFinLinOrd FinPartOrd ≅

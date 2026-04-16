@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.UpperLower
 import Mathlib.Topology.Algebra.Group.Basic
 
+noncomputable section
+
 /-!
 # Topological facts about upper/lower/order-connected sets
 

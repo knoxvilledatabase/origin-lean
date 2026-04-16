@@ -1,11 +1,13 @@
 /-
 Extracted from NumberTheory/NumberField/CanonicalEmbedding/FundamentalCone.lean
-Genuine: 45 | Conflates: 0 | Dissolved: 8 | Infrastructure: 12
+Genuine: 53 | Conflates: 0 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.RingTheory.Ideal.IsPrincipal
 import Mathlib.NumberTheory.NumberField.Units.DirichletTheorem
 import Mathlib.RingTheory.ClassGroup
+
+noncomputable section
 
 /-!
 # Fundamental Cone
@@ -108,7 +110,14 @@ theorem logMap_one : logMap (1 : mixedSpace K) = 0 := by
 
 variable {x y : mixedSpace K}
 
--- DISSOLVED: logMap_mul
+theorem logMap_mul (hx : mixedEmbedding.norm x ≠ 0) (hy : mixedEmbedding.norm y ≠ 0) :
+    logMap (x * y) = logMap x + logMap y := by
+  ext w
+  simp_rw [Pi.add_apply, logMap_apply]
+  rw [map_mul, map_mul, Real.log_mul, Real.log_mul hx hy, add_mul]
+  · ring
+  · exact mixedEmbedding.norm_ne_zero_iff.mp hx w
+  · exact mixedEmbedding.norm_ne_zero_iff.mp hy w
 
 theorem logMap_apply_of_norm_one (hx : mixedEmbedding.norm x = 1)
     (w : {w : InfinitePlace K // w ≠ w₀}) :
@@ -120,7 +129,9 @@ theorem logMap_eq_logEmbedding (u : (𝓞 K)ˣ) :
     logMap (mixedEmbedding K u) = logEmbedding K (Additive.ofMul u) := by
   ext; simp
 
--- DISSOLVED: logMap_unit_smul
+theorem logMap_unit_smul (u : (𝓞 K)ˣ) (hx : mixedEmbedding.norm x ≠ 0) :
+    logMap (u • x) = logEmbedding K (Additive.ofMul u) + logMap x := by
+  rw [unitSMul_smul, logMap_mul (by rw [norm_unit]; norm_num) hx, logMap_eq_logEmbedding]
 
 variable (x) in
 
@@ -137,7 +148,12 @@ theorem logMap_real (c : ℝ) :
     mul_comm (finrank ℚ K : ℝ) _, mul_assoc, mul_inv_cancel₀ (Nat.cast_ne_zero.mpr finrank_pos.ne'),
     mul_one, sub_self, mul_zero, Pi.zero_apply]
 
--- DISSOLVED: logMap_real_smul
+theorem logMap_real_smul (hx : mixedEmbedding.norm x ≠ 0) {c : ℝ} (hc : c ≠ 0) :
+    logMap (c • x) = logMap x := by
+  have : mixedEmbedding.norm (c • (1 : mixedSpace K)) ≠ 0 := by
+    rw [norm_smul, map_one, mul_one]
+    exact pow_ne_zero _ (abs_ne_zero.mpr hc)
+  rw [← smul_one_mul, logMap_mul this hx, logMap_real, zero_add]
 
 theorem logMap_eq_of_normAtPlace_eq (h : ∀ w, normAtPlace w x = normAtPlace w y) :
     logMap x = logMap y := by
@@ -178,11 +194,28 @@ theorem mem_of_normAtPlace_eq (hx : x ∈ fundamentalCone K)
   rw [Set.mem_preimage, logMap_eq_of_normAtPlace_eq hy]
   exact hx.1
 
--- DISSOLVED: smul_mem_of_mem
+theorem smul_mem_of_mem (hx : x ∈ fundamentalCone K) (hc : c ≠ 0) :
+    c • x ∈ fundamentalCone K := by
+  refine ⟨?_, ?_⟩
+  · rw [Set.mem_preimage, logMap_real_smul hx.2 hc]
+    exact hx.1
+  · rw [Set.mem_setOf_eq, mixedEmbedding.norm_smul, mul_eq_zero, not_or]
+    exact ⟨pow_ne_zero _ (abs_ne_zero.mpr hc), hx.2⟩
 
--- DISSOLVED: smul_mem_iff_mem
+theorem smul_mem_iff_mem (hc : c ≠ 0) :
+    c • x ∈ fundamentalCone K ↔ x ∈ fundamentalCone K := by
+  refine ⟨fun h ↦ ?_, fun h ↦ smul_mem_of_mem h hc⟩
+  convert smul_mem_of_mem h (inv_ne_zero hc)
+  rw [eq_inv_smul_iff₀ hc]
 
--- DISSOLVED: exists_unit_smul_mem
+theorem exists_unit_smul_mem (hx : mixedEmbedding.norm x ≠ 0) :
+    ∃ u : (𝓞 K)ˣ, u • x ∈ fundamentalCone K := by
+  classical
+  let B := (basisUnitLattice K).ofZLatticeBasis ℝ
+  rsuffices ⟨⟨_, ⟨u, _, rfl⟩⟩, hu⟩ : ∃ e : unitLattice K, e + logMap x ∈ ZSpan.fundamentalDomain B
+  · exact ⟨u, by rwa [Set.mem_preimage, logMap_unit_smul u hx], by simp [hx]⟩
+  · obtain ⟨⟨e, h₁⟩, h₂, -⟩ := ZSpan.exist_unique_vadd_mem_fundamentalDomain B (logMap x)
+    exact ⟨⟨e, by rwa [← Basis.ofZLatticeBasis_span ℝ (unitLattice K)]⟩, h₂⟩
 
 theorem torsion_smul_mem_of_mem (hx : x ∈ fundamentalCone K) {ζ : (𝓞 K)ˣ} (hζ : ζ ∈ torsion K) :
     ζ • x ∈ fundamentalCone K := by
@@ -223,7 +256,9 @@ theorem exists_unique_preimage_of_mem_integerSet {a : mixedSpace K} (ha : a ∈ 
   refine Function.Injective.existsUnique_of_mem_range ?_ (Set.mem_range_self x)
   exact (mixedEmbedding_injective K).comp RingOfIntegers.coe_injective
 
--- DISSOLVED: ne_zero_of_mem_integerSet
+theorem ne_zero_of_mem_integerSet (a : integerSet K) : (a : mixedSpace K) ≠ 0 := by
+  by_contra!
+  exact a.prop.1.2 (this.symm ▸ mixedEmbedding.norm.map_zero')
 
 open scoped nonZeroDivisors
 
@@ -244,7 +279,14 @@ theorem preimageOfMemIntegerSet_mixedEmbedding {x : (𝓞 K)}
   simp_rw [RingOfIntegers.ext_iff, ← (mixedEmbedding_injective K).eq_iff,
     mixedEmbedding_preimageOfMemIntegerSet]
 
--- DISSOLVED: exists_unitSMul_mem_integerSet
+theorem exists_unitSMul_mem_integerSet {x : mixedSpace K} (hx : x ≠ 0)
+    (hx' : x ∈ mixedEmbedding K '' (Set.range (algebraMap (𝓞 K) K))) :
+    ∃ u : (𝓞 K)ˣ, u • x ∈ integerSet K := by
+  replace hx : mixedEmbedding.norm x ≠ 0 :=
+      (norm_eq_zero_iff' (Set.mem_range_of_mem_image (mixedEmbedding K) _ hx')).not.mpr hx
+  obtain ⟨u, hu⟩ := exists_unit_smul_mem hx
+  obtain ⟨_, ⟨x, rfl⟩, _, rfl⟩ := hx'
+  exact ⟨u, mem_integerSet.mpr ⟨hu, u * x, by simp_rw [unitSMul_smul, ← map_mul]⟩⟩
 
 theorem torsion_unitSMul_mem_integerSet {x : mixedSpace K} {ζ : (𝓞 K)ˣ} (hζ : ζ ∈ torsion K)
     (hx : x ∈ integerSet K) : ζ • x ∈ integerSet K := by
@@ -275,9 +317,6 @@ def quotIntNorm :
   Quotient.lift (fun x ↦ intNorm x) fun a b ⟨u, hu⟩ ↦ by
     rw [← Nat.cast_inj (R := ℝ), intNorm_coe, intNorm_coe, ← hu, integerSetTorsionSMul_smul_coe,
       norm_unit_smul]
-
-@[simp]
-theorem quotIntNorm_apply (a : integerSet K) : quotIntNorm ⟦a⟧ = intNorm a := rfl
 
 variable (K) in
 
@@ -327,10 +366,6 @@ def integerSetQuotEquivAssociates :
           rw [Setoid.ker_def, eq_comm, integerSetToAssociates_eq_iff b a,
             MulAction.orbitRel_apply, MulAction.mem_orbit_iff],
         (Quot.surjective_lift _).mpr (integerSetToAssociates_surjective K)⟩
-
-@[simp]
-theorem integerSetQuotEquivAssociates_apply (a : integerSet K) :
-    integerSetQuotEquivAssociates K ⟦a⟧ = ⟦preimageOfMemIntegerSet a⟧ := rfl
 
 theorem integerSetTorsionSMul_stabilizer (a : integerSet K) :
     MulAction.stabilizer (torsion K) a = ⊥ := by

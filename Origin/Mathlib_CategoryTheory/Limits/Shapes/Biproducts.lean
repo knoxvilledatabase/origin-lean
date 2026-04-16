@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Limits/Shapes/Biproducts.lean
-Genuine: 193 | Conflates: 0 | Dissolved: 0 | Infrastructure: 87
+Genuine: 193 | Conflates: 0 | Dissolved: 0 | Infrastructure: 86
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Shapes.FiniteProducts
 import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
+
+noncomputable section
 
 /-!
 # Biproducts and binary biproducts
@@ -168,15 +170,9 @@ def toConeFunctor : Bicone F ⥤ Cone (Discrete.functor F) where
 abbrev toCone (B : Bicone F) : Cone (Discrete.functor F) := toConeFunctor.obj B
 
 @[simp]
-theorem toCone_pt (B : Bicone F) : B.toCone.pt = B.pt := rfl
-
-@[simp]
 theorem toCone_π_app (B : Bicone F) (j : Discrete J) : B.toCone.π.app j = B.π j.as := rfl
 
 theorem toCone_π_app_mk (B : Bicone F) (j : J) : B.toCone.π.app ⟨j⟩ = B.π j := rfl
-
-@[simp]
-theorem toCone_proj (B : Bicone F) (j : J) : Fan.proj B.toCone j = B.π j := rfl
 
 def toCoconeFunctor : Bicone F ⥤ Cocone (Discrete.functor F) where
   obj B := { pt := B.pt, ι := { app := fun j => B.ι j.as } }
@@ -184,37 +180,13 @@ def toCoconeFunctor : Bicone F ⥤ Cocone (Discrete.functor F) where
 
 abbrev toCocone (B : Bicone F) : Cocone (Discrete.functor F) := toCoconeFunctor.obj B
 
-@[simp]
-theorem toCocone_pt (B : Bicone F) : B.toCocone.pt = B.pt := rfl
-
-@[simp]
-theorem toCocone_ι_app (B : Bicone F) (j : Discrete J) : B.toCocone.ι.app j = B.ι j.as := rfl
-
-@[simp]
-theorem toCocone_inj (B : Bicone F) (j : J) : Cofan.inj B.toCocone j = B.ι j := rfl
-
 theorem toCocone_ι_app_mk (B : Bicone F) (j : J) : B.toCocone.ι.app ⟨j⟩ = B.ι j := rfl
-
-@[simps]
-def ofLimitCone {f : J → C} {t : Cone (Discrete.functor f)} (ht : IsLimit t) : Bicone f where
-  pt := t.pt
-  π j := t.π.app ⟨j⟩
-  ι j := ht.lift (Fan.mk _ fun j' => if h : j = j' then eqToHom (congr_arg f h) else 0)
-  ι_π j j' := by simp
 
 theorem ι_of_isLimit {f : J → C} {t : Bicone f} (ht : IsLimit t.toCone) (j : J) :
     t.ι j = ht.lift (Fan.mk _ fun j' => if h : j = j' then eqToHom (congr_arg f h) else 0) :=
   ht.hom_ext fun j' => by
     rw [ht.fac]
     simp [t.ι_π]
-
-@[simps]
-def ofColimitCocone {f : J → C} {t : Cocone (Discrete.functor f)} (ht : IsColimit t) :
-    Bicone f where
-  pt := t.pt
-  π j := ht.desc (Cofan.mk _ fun j' => if h : j' = j then eqToHom (congr_arg f h) else 0)
-  ι j := t.ι.app ⟨j⟩
-  ι_π j j' := by simp
 
 theorem π_of_isColimit {f : J → C} {t : Bicone f} (ht : IsColimit t.toCocone) (j : J) :
     t.π j = ht.desc (Cofan.mk _ fun j' => if h : j' = j then eqToHom (congr_arg f h) else 0) :=
@@ -608,7 +580,6 @@ lemma biproduct.whiskerEquiv_inv_eq_lift {f : J → C} {g : K → C} (e : J ≃ 
       simp at h
 
 attribute [local simp] Sigma.forall in
-
 instance {ι} (f : ι → Type*) (g : (i : ι) → (f i) → C)
     [∀ i, HasBiproduct (g i)] [HasBiproduct fun i => ⨁ g i] :
     HasBiproduct fun p : Σ i, f i => g p.1 p.2 where
@@ -953,6 +924,7 @@ section
 variable {C}
 
 attribute [local simp] eq_iff_true_of_subsingleton in
+/-- The limit bicone for the biproduct over an index type with exactly one term. -/
 
 @[simps]
 def limitBiconeOfUnique [Unique J] (f : J → C) : LimitBicone f where
@@ -1082,9 +1054,6 @@ def toCone (c : BinaryBicone P Q) : Cone (pair P Q) :=
   BinaryFan.mk c.fst c.snd
 
 @[simp]
-theorem toCone_pt (c : BinaryBicone P Q) : c.toCone.pt = c.pt := rfl
-
-@[simp]
 theorem toCone_π_app_left (c : BinaryBicone P Q) : c.toCone.π.app ⟨WalkingPair.left⟩ = c.fst :=
   rfl
 
@@ -1092,16 +1061,7 @@ theorem toCone_π_app_left (c : BinaryBicone P Q) : c.toCone.π.app ⟨WalkingPa
 theorem toCone_π_app_right (c : BinaryBicone P Q) : c.toCone.π.app ⟨WalkingPair.right⟩ = c.snd :=
   rfl
 
-@[simp]
-theorem binary_fan_fst_toCone (c : BinaryBicone P Q) : BinaryFan.fst c.toCone = c.fst := rfl
-
-@[simp]
-theorem binary_fan_snd_toCone (c : BinaryBicone P Q) : BinaryFan.snd c.toCone = c.snd := rfl
-
 def toCocone (c : BinaryBicone P Q) : Cocone (pair P Q) := BinaryCofan.mk c.inl c.inr
-
-@[simp]
-theorem toCocone_pt (c : BinaryBicone P Q) : c.toCocone.pt = c.pt := rfl
 
 @[simp]
 theorem toCocone_ι_app_left (c : BinaryBicone P Q) : c.toCocone.ι.app ⟨WalkingPair.left⟩ = c.inl :=
@@ -1110,14 +1070,6 @@ theorem toCocone_ι_app_left (c : BinaryBicone P Q) : c.toCocone.ι.app ⟨Walki
 @[simp]
 theorem toCocone_ι_app_right (c : BinaryBicone P Q) :
     c.toCocone.ι.app ⟨WalkingPair.right⟩ = c.inr := rfl
-
-@[simp]
-theorem binary_cofan_inl_toCocone (c : BinaryBicone P Q) : BinaryCofan.inl c.toCocone = c.inl :=
-  rfl
-
-@[simp]
-theorem binary_cofan_inr_toCocone (c : BinaryBicone P Q) : BinaryCofan.inr c.toCocone = c.inr :=
-  rfl
 
 instance (c : BinaryBicone P Q) : IsSplitMono c.inl :=
   IsSplitMono.mk'
@@ -1570,26 +1522,14 @@ variable {X Y : C} (c : BinaryBicone X Y)
 def BinaryBicone.fstKernelFork : KernelFork c.fst :=
   KernelFork.ofι c.inr c.inr_fst
 
-@[simp]
-theorem BinaryBicone.fstKernelFork_ι : (BinaryBicone.fstKernelFork c).ι = c.inr := rfl
-
 def BinaryBicone.sndKernelFork : KernelFork c.snd :=
   KernelFork.ofι c.inl c.inl_snd
-
-@[simp]
-theorem BinaryBicone.sndKernelFork_ι : (BinaryBicone.sndKernelFork c).ι = c.inl := rfl
 
 def BinaryBicone.inlCokernelCofork : CokernelCofork c.inl :=
   CokernelCofork.ofπ c.snd c.inl_snd
 
-@[simp]
-theorem BinaryBicone.inlCokernelCofork_π : (BinaryBicone.inlCokernelCofork c).π = c.snd := rfl
-
 def BinaryBicone.inrCokernelCofork : CokernelCofork c.inr :=
   CokernelCofork.ofπ c.fst c.inr_fst
-
-@[simp]
-theorem BinaryBicone.inrCokernelCofork_π : (BinaryBicone.inrCokernelCofork c).π = c.fst := rfl
 
 variable {c}
 
@@ -1620,19 +1560,11 @@ variable (X Y : C) [HasBinaryBiproduct X Y]
 def biprod.fstKernelFork : KernelFork (biprod.fst : X ⊞ Y ⟶ X) :=
   BinaryBicone.fstKernelFork _
 
-@[simp]
-theorem biprod.fstKernelFork_ι : Fork.ι (biprod.fstKernelFork X Y) = (biprod.inr : Y ⟶ X ⊞ Y) :=
-  rfl
-
 def biprod.isKernelFstKernelFork : IsLimit (biprod.fstKernelFork X Y) :=
   BinaryBicone.isLimitFstKernelFork (BinaryBiproduct.isLimit _ _)
 
 def biprod.sndKernelFork : KernelFork (biprod.snd : X ⊞ Y ⟶ Y) :=
   BinaryBicone.sndKernelFork _
-
-@[simp]
-theorem biprod.sndKernelFork_ι : Fork.ι (biprod.sndKernelFork X Y) = (biprod.inl : X ⟶ X ⊞ Y) :=
-  rfl
 
 def biprod.isKernelSndKernelFork : IsLimit (biprod.sndKernelFork X Y) :=
   BinaryBicone.isLimitSndKernelFork (BinaryBiproduct.isLimit _ _)
@@ -1640,19 +1572,11 @@ def biprod.isKernelSndKernelFork : IsLimit (biprod.sndKernelFork X Y) :=
 def biprod.inlCokernelCofork : CokernelCofork (biprod.inl : X ⟶ X ⊞ Y) :=
   BinaryBicone.inlCokernelCofork _
 
-@[simp]
-theorem biprod.inlCokernelCofork_π : Cofork.π (biprod.inlCokernelCofork X Y) = biprod.snd :=
-  rfl
-
 def biprod.isCokernelInlCokernelFork : IsColimit (biprod.inlCokernelCofork X Y) :=
   BinaryBicone.isColimitInlCokernelCofork (BinaryBiproduct.isColimit _ _)
 
 def biprod.inrCokernelCofork : CokernelCofork (biprod.inr : Y ⟶ X ⊞ Y) :=
   BinaryBicone.inrCokernelCofork _
-
-@[simp]
-theorem biprod.inrCokernelCofork_π : Cofork.π (biprod.inrCokernelCofork X Y) = biprod.fst :=
-  rfl
 
 def biprod.isCokernelInrCokernelFork : IsColimit (biprod.inrCokernelCofork X Y) :=
   BinaryBicone.isColimitInrCokernelCofork (BinaryBiproduct.isColimit _ _)

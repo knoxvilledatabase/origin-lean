@@ -1,6 +1,6 @@
 /-
 Extracted from MeasureTheory/Function/LpSpace.lean
-Genuine: 173 | Conflates: 2 | Dissolved: 17 | Infrastructure: 37
+Genuine: 190 | Conflates: 2 | Dissolved: 0 | Infrastructure: 37
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Hom
@@ -15,6 +15,8 @@ import Mathlib.MeasureTheory.Measure.Typeclasses
 import Mathlib.Analysis.NormedSpace.OperatorNorm.NormedSpace
 import Mathlib.Topology.ContinuousMap.Compact
 import Mathlib.Order.Filter.IndicatorFunction
+
+noncomputable section
 
 /-!
 # Lp space
@@ -114,8 +116,6 @@ namespace Memℒp
 def toLp (f : α → E) (h_mem_ℒp : Memℒp f p μ) : Lp E p μ :=
   ⟨AEEqFun.mk f h_mem_ℒp.1, h_mem_ℒp.eLpNorm_mk_lt_top⟩
 
-theorem toLp_val {f : α → E} (h : Memℒp f p μ) : (toLp f h).1 = AEEqFun.mk f h.1 := rfl
-
 theorem coeFn_toLp {f : α → E} (hf : Memℒp f p μ) : hf.toLp f =ᵐ[μ] f :=
   AEEqFun.coeFn_mk _ _
 
@@ -132,9 +132,6 @@ theorem toLp_zero (h : Memℒp (0 : α → E) p μ) : h.toLp 0 = 0 :=
 
 theorem toLp_add {f g : α → E} (hf : Memℒp f p μ) (hg : Memℒp g p μ) :
     (hf.add hg).toLp (f + g) = hf.toLp f + hg.toLp g :=
-  rfl
-
-theorem toLp_neg {f : α → E} (hf : Memℒp f p μ) : hf.neg.toLp (-f) = -hf.toLp f :=
   rfl
 
 theorem toLp_sub {f g : α → E} (hf : Memℒp f p μ) (hg : Memℒp g p μ) :
@@ -167,9 +164,6 @@ protected theorem antitone [IsFiniteMeasure μ] {p q : ℝ≥0∞} (hpq : p ≤ 
 
 @[simp]
 theorem coeFn_mk {f : α →ₘ[μ] E} (hf : eLpNorm f p μ < ∞) : ((⟨f, hf⟩ : Lp E p μ) : α → E) = f :=
-  rfl
-
-theorem coe_mk {f : α →ₘ[μ] E} (hf : eLpNorm f p μ < ∞) : ((⟨f, hf⟩ : Lp E p μ) : α →ₘ[μ] E) = f :=
   rfl
 
 @[simp]
@@ -426,9 +420,6 @@ def LpSubmodule : Submodule 𝕜 (α →ₘ[μ] E) :=
 
 variable {E p μ 𝕜}
 
-theorem coe_LpSubmodule : (LpSubmodule E p μ 𝕜).toAddSubgroup = Lp E p μ :=
-  rfl
-
 instance instModule : Module 𝕜 (Lp E p μ) :=
   { (LpSubmodule E p μ 𝕜).module with }
 
@@ -470,10 +461,6 @@ namespace Memℒp
 
 variable {𝕜 : Type*} [NormedRing 𝕜] [Module 𝕜 E] [BoundedSMul 𝕜 E]
 
-theorem toLp_const_smul {f : α → E} (c : 𝕜) (hf : Memℒp f p μ) :
-    (hf.const_smul c).toLp (c • f) = c • hf.toLp f :=
-  rfl
-
 end Memℒp
 
 /-! ### Indicator of a set as an element of Lᵖ
@@ -503,7 +490,14 @@ theorem eLpNormEssSup_indicator_const_le (s : Set α) (c : G) :
 
 alias snormEssSup_indicator_const_le := eLpNormEssSup_indicator_const_le
 
--- DISSOLVED: eLpNormEssSup_indicator_const_eq
+theorem eLpNormEssSup_indicator_const_eq (s : Set α) (c : G) (hμs : μ s ≠ 0) :
+    eLpNormEssSup (s.indicator fun _ : α => c) μ = ‖c‖₊ := by
+  refine le_antisymm (eLpNormEssSup_indicator_const_le s c) ?_
+  by_contra! h
+  have h' := ae_iff.mp (ae_lt_of_essSup_lt h)
+  push_neg at h'
+  refine hμs (measure_mono_null (fun x hx_mem => ?_) h')
+  rw [Set.mem_setOf_eq, Set.indicator_of_mem hx_mem]
 
 alias snormEssSup_indicator_const_eq := eLpNormEssSup_indicator_const_eq
 
@@ -515,15 +509,35 @@ theorem eLpNorm_indicator_le (f : α → E) : eLpNorm (s.indicator f) p μ ≤ e
 
 alias snorm_indicator_le := eLpNorm_indicator_le
 
--- DISSOLVED: eLpNorm_indicator_const₀
+lemma eLpNorm_indicator_const₀ {c : G} (hs : NullMeasurableSet s μ) (hp : p ≠ 0) (hp_top : p ≠ ∞) :
+    eLpNorm (s.indicator fun _ => c) p μ = ‖c‖₊ * μ s ^ (1 / p.toReal) :=
+  have hp_pos : 0 < p.toReal := ENNReal.toReal_pos hp hp_top
+  calc
+    eLpNorm (s.indicator fun _ => c) p μ
+      = (∫⁻ x, ((‖(s.indicator fun _ ↦ c) x‖₊ : ℝ≥0∞) ^ p.toReal) ∂μ) ^ (1 / p.toReal) :=
+          eLpNorm_eq_lintegral_rpow_nnnorm hp hp_top
+    _ = (∫⁻ x, (s.indicator fun _ ↦ (‖c‖₊ : ℝ≥0∞) ^ p.toReal) x ∂μ) ^ (1 / p.toReal) := by
+      congr 2
+      refine (Set.comp_indicator_const c (fun x : G ↦ (‖x‖₊ : ℝ≥0∞) ^ p.toReal) ?_)
+      simp [hp_pos]
+    _ = ‖c‖₊ * μ s ^ (1 / p.toReal) := by
+      rw [lintegral_indicator_const₀ hs, ENNReal.mul_rpow_of_nonneg, ← ENNReal.rpow_mul,
+        mul_one_div_cancel hp_pos.ne', ENNReal.rpow_one]
+      positivity
 
 alias snorm_indicator_const₀ := eLpNorm_indicator_const₀
 
--- DISSOLVED: eLpNorm_indicator_const
+theorem eLpNorm_indicator_const {c : G} (hs : MeasurableSet s) (hp : p ≠ 0) (hp_top : p ≠ ∞) :
+    eLpNorm (s.indicator fun _ => c) p μ = ‖c‖₊ * μ s ^ (1 / p.toReal) :=
+  eLpNorm_indicator_const₀ hs.nullMeasurableSet hp hp_top
 
 alias snorm_indicator_const := eLpNorm_indicator_const
 
--- DISSOLVED: eLpNorm_indicator_const'
+theorem eLpNorm_indicator_const' {c : G} (hs : MeasurableSet s) (hμs : μ s ≠ 0) (hp : p ≠ 0) :
+    eLpNorm (s.indicator fun _ => c) p μ = ‖c‖₊ * μ s ^ (1 / p.toReal) := by
+  by_cases hp_top : p = ∞
+  · simp [hp_top, eLpNormEssSup_indicator_const_eq s c hμs]
+  · exact eLpNorm_indicator_const hs hp hp_top
 
 alias snorm_indicator_const' := eLpNorm_indicator_const'
 
@@ -601,7 +615,30 @@ theorem memℒp_indicator_const (p : ℝ≥0∞) (hs : MeasurableSet s) (c : E) 
   · have := Fact.mk hμ.lt_top
     apply memℒp_const
 
--- DISSOLVED: exists_eLpNorm_indicator_le
+theorem exists_eLpNorm_indicator_le (hp : p ≠ ∞) (c : E) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ η : ℝ≥0, 0 < η ∧ ∀ s : Set α, μ s ≤ η → eLpNorm (s.indicator fun _ => c) p μ ≤ ε := by
+  rcases eq_or_ne p 0 with (rfl | h'p)
+  · exact ⟨1, zero_lt_one, fun s _ => by simp⟩
+  have hp₀ : 0 < p := bot_lt_iff_ne_bot.2 h'p
+  have hp₀' : 0 ≤ 1 / p.toReal := div_nonneg zero_le_one ENNReal.toReal_nonneg
+  have hp₀'' : 0 < p.toReal := ENNReal.toReal_pos hp₀.ne' hp
+  obtain ⟨η, hη_pos, hη_le⟩ :
+      ∃ η : ℝ≥0, 0 < η ∧ (‖c‖₊ : ℝ≥0∞) * (η : ℝ≥0∞) ^ (1 / p.toReal) ≤ ε := by
+    have :
+      Filter.Tendsto (fun x : ℝ≥0 => ((‖c‖₊ * x ^ (1 / p.toReal) : ℝ≥0) : ℝ≥0∞)) (𝓝 0)
+        (𝓝 (0 : ℝ≥0)) := by
+      rw [ENNReal.tendsto_coe]
+      convert (NNReal.continuousAt_rpow_const (Or.inr hp₀')).tendsto.const_mul _
+      simp [hp₀''.ne']
+    have hε' : 0 < ε := hε.bot_lt
+    obtain ⟨δ, hδ, hδε'⟩ := NNReal.nhds_zero_basis.eventually_iff.mp (this.eventually_le_const hε')
+    obtain ⟨η, hη, hηδ⟩ := exists_between hδ
+    refine ⟨η, hη, ?_⟩
+    rw [← ENNReal.coe_rpow_of_nonneg _ hp₀', ← ENNReal.coe_mul]
+    exact hδε' hηδ
+  refine ⟨η, hη_pos, fun s hs => ?_⟩
+  refine (eLpNorm_indicator_const_le _ _).trans (le_trans ?_ hη_le)
+  exact mul_le_mul_left' (ENNReal.rpow_le_rpow hs hp₀') _
 
 alias exists_snorm_indicator_le := exists_eLpNorm_indicator_le
 
@@ -682,11 +719,24 @@ theorem indicatorConstLp_coeFn_mem : ∀ᵐ x : α ∂μ, x ∈ s → indicatorC
 theorem indicatorConstLp_coeFn_nmem : ∀ᵐ x : α ∂μ, x ∉ s → indicatorConstLp p hs hμs c x = 0 :=
   indicatorConstLp_coeFn.mono fun _x hx hxs => hx.trans (Set.indicator_of_not_mem hxs _)
 
--- DISSOLVED: norm_indicatorConstLp
+theorem norm_indicatorConstLp (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞) :
+    ‖indicatorConstLp p hs hμs c‖ = ‖c‖ * (μ s).toReal ^ (1 / p.toReal) := by
+  rw [Lp.norm_def, eLpNorm_congr_ae indicatorConstLp_coeFn,
+    eLpNorm_indicator_const hs hp_ne_zero hp_ne_top, ENNReal.toReal_mul, ENNReal.toReal_rpow,
+    ENNReal.coe_toReal, coe_nnnorm]
 
--- DISSOLVED: norm_indicatorConstLp_top
+theorem norm_indicatorConstLp_top (hμs_ne_zero : μ s ≠ 0) :
+    ‖indicatorConstLp ∞ hs hμs c‖ = ‖c‖ := by
+  rw [Lp.norm_def, eLpNorm_congr_ae indicatorConstLp_coeFn,
+    eLpNorm_indicator_const' hs hμs_ne_zero ENNReal.top_ne_zero, ENNReal.top_toReal,
+    _root_.div_zero, ENNReal.rpow_zero, mul_one, ENNReal.coe_toReal, coe_nnnorm]
 
--- DISSOLVED: norm_indicatorConstLp'
+theorem norm_indicatorConstLp' (hp_pos : p ≠ 0) (hμs_pos : μ s ≠ 0) :
+    ‖indicatorConstLp p hs hμs c‖ = ‖c‖ * (μ s).toReal ^ (1 / p.toReal) := by
+  by_cases hp_top : p = ∞
+  · rw [hp_top, ENNReal.top_toReal, _root_.div_zero, Real.rpow_zero, mul_one]
+    exact norm_indicatorConstLp_top hμs_pos
+  · exact norm_indicatorConstLp hp_pos hp_top
 
 theorem norm_indicatorConstLp_le :
     ‖indicatorConstLp p hs hμs c‖ ≤ ‖c‖ * (μ s).toReal ^ (1 / p.toReal) := by
@@ -740,7 +790,10 @@ theorem indicatorConstLp_empty :
     indicatorConstLp p MeasurableSet.empty (by simp : μ ∅ ≠ ∞) c = 0 := by
   simp only [indicatorConstLp, Set.indicator_empty', Memℒp.toLp_zero]
 
--- DISSOLVED: indicatorConstLp_inj
+theorem indicatorConstLp_inj {s t : Set α} (hs : MeasurableSet s) (hsμ : μ s ≠ ∞)
+    (ht : MeasurableSet t) (htμ : μ t ≠ ∞) {c : E} (hc : c ≠ 0) :
+    indicatorConstLp p hs hsμ c = indicatorConstLp p ht htμ c ↔ s =ᵐ[μ] t := by
+  simp_rw [← indicator_const_eventuallyEq hc, indicatorConstLp, Memℒp.toLp_eq_toLp_iff]
 
 theorem memℒp_add_of_disjoint {f g : α → E} (h : Disjoint (support f) (support g))
     (hf : StronglyMeasurable f) (hg : StronglyMeasurable g) :
@@ -777,8 +830,6 @@ protected def Lp.const : E →+ Lp E p μ where
 lemma Lp.coeFn_const : Lp.const p μ c =ᵐ[μ] Function.const α c :=
   AEEqFun.coeFn_const α c
 
-@[simp] lemma Lp.const_val : (Lp.const p μ c).1 = AEEqFun.const α c := rfl
-
 @[simp]
 lemma Memℒp.toLp_const : Memℒp.toLp _ (memℒp_const c) = Lp.const p μ c := rfl
 
@@ -788,9 +839,16 @@ lemma indicatorConstLp_univ :
   rw [← Memℒp.toLp_const, indicatorConstLp]
   simp only [Set.indicator_univ, Function.const]
 
--- DISSOLVED: Lp.norm_const
+theorem Lp.norm_const [NeZero μ] (hp_zero : p ≠ 0) :
+    ‖Lp.const p μ c‖ = ‖c‖ * (μ Set.univ).toReal ^ (1 / p.toReal) := by
+  have := NeZero.ne μ
+  rw [← Memℒp.toLp_const, Lp.norm_toLp, eLpNorm_const] <;> try assumption
+  rw [ENNReal.toReal_mul, ENNReal.coe_toReal, ← ENNReal.toReal_rpow, coe_nnnorm]
 
--- DISSOLVED: Lp.norm_const'
+theorem Lp.norm_const' (hp_zero : p ≠ 0) (hp_top : p ≠ ∞) :
+    ‖Lp.const p μ c‖ = ‖c‖ * (μ Set.univ).toReal ^ (1 / p.toReal) := by
+  rw [← Memℒp.toLp_const, Lp.norm_toLp, eLpNorm_const'] <;> try assumption
+  rw [ENNReal.toReal_mul, ENNReal.coe_toReal, ← ENNReal.toReal_rpow, coe_nnnorm]
 
 theorem Lp.norm_const_le : ‖Lp.const p μ c‖ ≤ ‖c‖ * (μ Set.univ).toReal ^ (1 / p.toReal) := by
   rw [← indicatorConstLp_univ]
@@ -833,9 +891,22 @@ theorem Memℒp.norm_rpow_div {f : α → E} (hf : Memℒp f p μ) (q : ℝ≥0�
     mul_one]
   exact hf.2.ne
 
--- DISSOLVED: memℒp_norm_rpow_iff
+theorem memℒp_norm_rpow_iff {q : ℝ≥0∞} {f : α → E} (hf : AEStronglyMeasurable f μ) (q_zero : q ≠ 0)
+    (q_top : q ≠ ∞) : Memℒp (fun x : α => ‖f x‖ ^ q.toReal) (p / q) μ ↔ Memℒp f p μ := by
+  refine ⟨fun h => ?_, fun h => h.norm_rpow_div q⟩
+  apply (memℒp_norm_iff hf).1
+  convert h.norm_rpow_div q⁻¹ using 1
+  · ext x
+    rw [Real.norm_eq_abs, Real.abs_rpow_of_nonneg (norm_nonneg _), ← Real.rpow_mul (abs_nonneg _),
+      ENNReal.toReal_inv, mul_inv_cancel₀, abs_of_nonneg (norm_nonneg _), Real.rpow_one]
+    simp [ENNReal.toReal_eq_zero_iff, not_or, q_zero, q_top]
+  · rw [div_eq_mul_inv, inv_inv, div_eq_mul_inv, mul_assoc, ENNReal.inv_mul_cancel q_zero q_top,
+      mul_one]
 
--- DISSOLVED: Memℒp.norm_rpow
+theorem Memℒp.norm_rpow {f : α → E} (hf : Memℒp f p μ) (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞) :
+    Memℒp (fun x : α => ‖f x‖ ^ p.toReal) 1 μ := by
+  convert hf.norm_rpow_div p
+  rw [div_eq_mul_inv, ENNReal.mul_inv_cancel hp_ne_zero hp_ne_top]
 
 theorem AEEqFun.compMeasurePreserving_mem_Lp {β : Type*} [MeasurableSpace β]
     {μb : MeasureTheory.Measure β} {g : β →ₘ[μb] E} (hg : g ∈ Lp E p μb) {f : α → β}
@@ -856,11 +927,6 @@ def compMeasurePreserving (f : α → β) (hf : MeasurePreserving f μ μb) :
   map_zero' := rfl
   map_add' := by rintro ⟨⟨_⟩, _⟩ ⟨⟨_⟩, _⟩; rfl
 
-@[simp]
-theorem compMeasurePreserving_val (g : Lp E p μb) (hf : MeasurePreserving f μ μb) :
-    (compMeasurePreserving f hf g).1 = g.1.compMeasurePreserving f hf :=
-  rfl
-
 theorem coeFn_compMeasurePreserving (g : Lp E p μb) (hf : MeasurePreserving f μ μb) :
     compMeasurePreserving f hf g =ᵐ[μ] g ∘ f :=
   g.1.coeFn_compMeasurePreserving hf
@@ -873,16 +939,6 @@ theorem norm_compMeasurePreserving (g : Lp E p μb) (hf : MeasurePreserving f μ
 theorem isometry_compMeasurePreserving [Fact (1 ≤ p)] (hf : MeasurePreserving f μ μb) :
     Isometry (compMeasurePreserving f hf : Lp E p μb → Lp E p μ) :=
   AddMonoidHomClass.isometry_of_norm _ (norm_compMeasurePreserving · hf)
-
-theorem toLp_compMeasurePreserving {g : β → E} (hg : Memℒp g p μb) (hf : MeasurePreserving f μ μb) :
-    compMeasurePreserving f hf (hg.toLp g) = (hg.comp_measurePreserving hf).toLp _ := rfl
-
-theorem indicatorConstLp_compMeasurePreserving {s : Set β} (hs : MeasurableSet s)
-    (hμs : μb s ≠ ∞) (c : E) (hf : MeasurePreserving f μ μb) :
-    Lp.compMeasurePreserving f hf (indicatorConstLp p hs hμs c) =
-      indicatorConstLp p (hs.preimage hf.measurable)
-        (by rwa [hf.measure_preimage hs.nullMeasurableSet]) c :=
-  rfl
 
 variable (𝕜 : Type*) [NormedRing 𝕜] [Module 𝕜 E] [BoundedSMul 𝕜 E]
 
@@ -1120,10 +1176,6 @@ def posPart (f : Lp ℝ p μ) : Lp ℝ p μ :=
 
 def negPart (f : Lp ℝ p μ) : Lp ℝ p μ :=
   posPart (-f)
-
-@[norm_cast]
-theorem coe_posPart (f : Lp ℝ p μ) : (posPart f : α →ₘ[μ] ℝ) = (f : α →ₘ[μ] ℝ).posPart :=
-  rfl
 
 theorem coeFn_posPart (f : Lp ℝ p μ) : ⇑(posPart f) =ᵐ[μ] fun a => max (f a) 0 :=
   AEEqFun.coeFn_posPart _
@@ -1682,21 +1734,6 @@ theorem coeFn_toLp [NormedField 𝕜] [NormedSpace 𝕜 E] (f : C(α, E)) :
     toLp (E := E) p μ 𝕜 f =ᵐ[μ] f :=
   AEEqFun.coeFn_mk f _
 
-theorem toLp_def [NormedField 𝕜] [NormedSpace 𝕜 E] (f : C(α, E)) :
-    toLp (E := E) p μ 𝕜 f =
-      BoundedContinuousFunction.toLp (E := E) p μ 𝕜 (linearIsometryBoundedOfCompact α E 𝕜 f) :=
-  rfl
-
-@[simp]
-theorem toLp_comp_toContinuousMap [NormedField 𝕜] [NormedSpace 𝕜 E] (f : α →ᵇ E) :
-    toLp (E := E) p μ 𝕜 f.toContinuousMap = BoundedContinuousFunction.toLp (E := E) p μ 𝕜 f :=
-  rfl
-
-@[simp]
-theorem coe_toLp [NormedField 𝕜] [NormedSpace 𝕜 E] (f : C(α, E)) :
-    (toLp (E := E) p μ 𝕜 f : α →ₘ[μ] E) = f.toAEEqFun μ :=
-  rfl
-
 theorem toLp_injective [μ.IsOpenPosMeasure] [NormedField 𝕜] [NormedSpace 𝕜 E] :
     Function.Injective (⇑(toLp p μ 𝕜 : C(α, E) →L[𝕜] Lp E p μ)) :=
   (BoundedContinuousFunction.toLp_injective _).comp (linearIsometryBoundedOfCompact α E 𝕜).injective
@@ -1733,13 +1770,25 @@ namespace MeasureTheory
 
 namespace Lp
 
--- DISSOLVED: pow_mul_meas_ge_le_norm
+theorem pow_mul_meas_ge_le_norm (f : Lp E p μ) (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞) (ε : ℝ≥0∞) :
+    (ε * μ { x | ε ≤ (‖f x‖₊ : ℝ≥0∞) ^ p.toReal }) ^ (1 / p.toReal) ≤ ENNReal.ofReal ‖f‖ :=
+  (ENNReal.ofReal_toReal (eLpNorm_ne_top f)).symm ▸
+    pow_mul_meas_ge_le_eLpNorm μ hp_ne_zero hp_ne_top (Lp.aestronglyMeasurable f) ε
 
--- DISSOLVED: mul_meas_ge_le_pow_norm
+theorem mul_meas_ge_le_pow_norm (f : Lp E p μ) (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞) (ε : ℝ≥0∞) :
+    ε * μ { x | ε ≤ (‖f x‖₊ : ℝ≥0∞) ^ p.toReal } ≤ ENNReal.ofReal ‖f‖ ^ p.toReal :=
+  (ENNReal.ofReal_toReal (eLpNorm_ne_top f)).symm ▸
+    mul_meas_ge_le_pow_eLpNorm μ hp_ne_zero hp_ne_top (Lp.aestronglyMeasurable f) ε
 
--- DISSOLVED: mul_meas_ge_le_pow_norm'
+theorem mul_meas_ge_le_pow_norm' (f : Lp E p μ) (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞)
+    (ε : ℝ≥0∞) : ε ^ p.toReal * μ { x | ε ≤ ‖f x‖₊ } ≤ ENNReal.ofReal ‖f‖ ^ p.toReal :=
+  (ENNReal.ofReal_toReal (eLpNorm_ne_top f)).symm ▸
+    mul_meas_ge_le_pow_eLpNorm' μ hp_ne_zero hp_ne_top (Lp.aestronglyMeasurable f) ε
 
--- DISSOLVED: meas_ge_le_mul_pow_norm
+theorem meas_ge_le_mul_pow_norm (f : Lp E p μ) (hp_ne_zero : p ≠ 0) (hp_ne_top : p ≠ ∞) {ε : ℝ≥0∞}
+    (hε : ε ≠ 0) : μ { x | ε ≤ ‖f x‖₊ } ≤ ε⁻¹ ^ p.toReal * ENNReal.ofReal ‖f‖ ^ p.toReal :=
+  (ENNReal.ofReal_toReal (eLpNorm_ne_top f)).symm ▸
+    meas_ge_le_mul_pow_eLpNorm μ hp_ne_zero hp_ne_top (Lp.aestronglyMeasurable f) hε
 
 end Lp
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Finsupp.LSum
 import Mathlib.LinearAlgebra.Pi
 
+noncomputable section
+
 /-!
 # Properties of the module `α →₀ M`
 
@@ -36,11 +38,6 @@ noncomputable def LinearEquiv.finsuppUnique : (α →₀ M) ≃ₗ[R] M :=
     map_smul' := fun _ _ => rfl }
 
 variable {R M}
-
-@[simp]
-theorem LinearEquiv.finsuppUnique_apply (f : α →₀ M) :
-    LinearEquiv.finsuppUnique R M α f = f default :=
-  rfl
 
 variable {α}
 

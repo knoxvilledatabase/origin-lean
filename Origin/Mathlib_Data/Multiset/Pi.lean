@@ -5,6 +5,8 @@ Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Data.Multiset.Bind
 
+noncomputable section
+
 /-!
 # The cartesian product of multisets
 

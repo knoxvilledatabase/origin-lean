@@ -5,6 +5,8 @@ Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 38
 import Origin.Core
 import Mathlib.Topology.PartialHomeomorph
 
+noncomputable section
+
 /-!
 # Charted spaces
 
@@ -582,17 +584,6 @@ theorem ChartedSpace.isOpen_iff (s : Set M) :
 def achart (x : M) : atlas H M :=
   ⟨chartAt H x, chart_mem_atlas H x⟩
 
-theorem achart_def (x : M) : achart H x = ⟨chartAt H x, chart_mem_atlas H x⟩ :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_achart (x : M) : (achart H x : PartialHomeomorph M H) = chartAt H x :=
-  rfl
-
-@[simp, mfld_simps]
-theorem achart_val (x : M) : (achart H x).1 = chartAt H x :=
-  rfl
-
 theorem mem_achart_source (x : M) : x ∈ (achart H x).1.source :=
   mem_chart_source H x
 
@@ -614,8 +605,6 @@ theorem ChartedSpace.secondCountable_of_sigmaCompact [SecondCountableTopology H]
   obtain ⟨s, hsc, hsU⟩ : ∃ s, Set.Countable s ∧ ⋃ (x) (_ : x ∈ s), (chartAt H x).source = univ :=
     countable_cover_nhds_of_sigmaCompact fun x : M ↦ chart_source_mem_nhds H x
   exact ChartedSpace.secondCountable_of_countable_cover H hsU hsc
-
-ChartedSpace.secondCountable_of_sigma_compact := ChartedSpace.secondCountable_of_sigmaCompact
 
 theorem ChartedSpace.locallyCompactSpace [LocallyCompactSpace H] : LocallyCompactSpace M := by
   have : ∀ x : M, (𝓝 x).HasBasis
@@ -647,11 +636,6 @@ def ChartedSpace.comp (H : Type*) [TopologicalSpace H] (H' : Type*) [Topological
   mem_chart_source p := by simp only [mfld_simps]
   chart_mem_atlas p := ⟨chartAt _ p, chart_mem_atlas _ p, chartAt _ _, chart_mem_atlas _ _, rfl⟩
 
-theorem chartAt_comp (H : Type*) [TopologicalSpace H] (H' : Type*) [TopologicalSpace H']
-    {M : Type*} [TopologicalSpace M] [ChartedSpace H H'] [ChartedSpace H' M] (x : M) :
-    (letI := ChartedSpace.comp H H' M; chartAt H x) = chartAt H' x ≫ₕ chartAt H (chartAt H' x x) :=
-  rfl
-
 theorem ChartedSpace.t1Space [T1Space H] : T1Space M := by
   apply t1Space_iff_exists_open.2 (fun x y hxy ↦ ?_)
   by_cases hy : y ∈ (chartAt H x).source
@@ -663,30 +647,6 @@ theorem ChartedSpace.t1Space [T1Space H] : T1Space M := by
   · exact ⟨(chartAt H x).source, (chartAt H x).open_source, ChartedSpace.mem_chart_source x, hy⟩
 
 end
-
-library_note "Manifold type tags" /-- For technical reasons we introduce two type tags:
-
-* `ModelProd H H'` is the same as `H × H'`;
-
-* `ModelPi H` is the same as `∀ i, H i`, where `H : ι → Type*` and `ι` is a finite type.
-
-In both cases the reason is the same, so we explain it only in the case of the product. A charted
-
-space `M` with model `H` is a set of charts from `M` to `H` covering the space. Every space is
-
-registered as a charted space over itself, using the only chart `id`, in `chartedSpaceSelf`. You
-
-can also define a product of charted space `M` and `M'` (with model space `H × H'`) by taking the
-
-products of the charts. Now, on `H × H'`, there are two charted space structures with model space
-
-`H × H'` itself, the one coming from `chartedSpaceSelf`, and the one coming from the product of
-
-the two `chartedSpaceSelf` on each component. They are equal, but not defeq (because the product
-
-of `id` and `id` is not defeq to `id`), which is bad as we know. This expedient of renaming `H × H'`
-
-solves this problem. -/
 
 def ModelProd (H : Type*) (H' : Type*) :=
   H × H'
@@ -761,13 +721,6 @@ instance piChartedSpace {ι : Type*} [Finite ι] (H : ι → Type*) [∀ i, Topo
   chartAt f := PartialHomeomorph.pi fun i ↦ chartAt (H i) (f i)
   mem_chart_source f i _ := mem_chart_source (H i) (f i)
   chart_mem_atlas f := mem_image_of_mem _ fun i _ ↦ chart_mem_atlas (H i) (f i)
-
-@[simp, mfld_simps]
-theorem piChartedSpace_chartAt {ι : Type*} [Finite ι] (H : ι → Type*)
-    [∀ i, TopologicalSpace (H i)] (M : ι → Type*) [∀ i, TopologicalSpace (M i)]
-    [∀ i, ChartedSpace (H i) (M i)] (f : ∀ i, M i) :
-    chartAt (H := ModelPi H) f = PartialHomeomorph.pi fun i ↦ chartAt (H i) (f i) :=
-  rfl
 
 end ChartedSpace
 
@@ -975,11 +928,6 @@ def singletonChartedSpace (h : e.source = Set.univ) : ChartedSpace H α where
   mem_chart_source _ := by rw [h]; apply mem_univ
   chart_mem_atlas _ := by tauto
 
-@[simp, mfld_simps]
-theorem singletonChartedSpace_chartAt_eq (h : e.source = Set.univ) {x : α} :
-    @chartAt H _ α _ (e.singletonChartedSpace h) x = e :=
-  rfl
-
 theorem singletonChartedSpace_chartAt_source (h : e.source = Set.univ) {x : α} :
     (@chartAt H _ α _ (e.singletonChartedSpace h) x).source = Set.univ :=
   h
@@ -1007,10 +955,6 @@ variable [Nonempty α]
 
 def singletonChartedSpace {f : α → H} (h : IsOpenEmbedding f) : ChartedSpace H α :=
   (h.toPartialHomeomorph f).singletonChartedSpace (toPartialHomeomorph_source _ _)
-
-theorem singletonChartedSpace_chartAt_eq {f : α → H} (h : IsOpenEmbedding f) {x : α} :
-    ⇑(@chartAt H _ α _ h.singletonChartedSpace x) = f :=
-  rfl
 
 theorem singleton_hasGroupoid {f : α → H} (h : IsOpenEmbedding f) (G : StructureGroupoid H)
     [ClosedUnderRestriction G] : @HasGroupoid _ _ _ _ h.singletonChartedSpace G :=

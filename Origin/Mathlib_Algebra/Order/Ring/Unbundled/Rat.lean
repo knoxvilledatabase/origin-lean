@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.Group.Unbundled.Basic
 import Mathlib.Algebra.Ring.Rat
 import Mathlib.Data.Int.Order.Basic
 
+noncomputable section
+
 /-!
 # The rational numbers possess a linear order
 
@@ -54,11 +56,6 @@ theorem ofScientific_nonneg (m : ℕ) (s : Bool) (e : ℕ) :
 instance _root_.NNRatCast.toOfScientific {K} [NNRatCast K] : OfScientific K where
   ofScientific (m : ℕ) (b : Bool) (d : ℕ) :=
     NNRat.cast ⟨Rat.ofScientific m b d, ofScientific_nonneg m b d⟩
-
-@[simp, norm_cast]
-theorem _root_.NNRat.cast_ofScientific {K} [NNRatCast K] (m : ℕ) (s : Bool) (e : ℕ) :
-    (OfScientific.ofScientific m s e : ℚ≥0) = (OfScientific.ofScientific m s e : K) :=
-  rfl
 
 protected lemma add_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a + b :=
   numDenCasesOn' a fun n₁ d₁ h₁ ↦ numDenCasesOn' b fun n₂ d₂ h₂ ↦ by

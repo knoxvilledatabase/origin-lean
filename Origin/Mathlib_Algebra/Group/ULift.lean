@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Algebra.Group.InjSurj
 import Mathlib.Logic.Nontrivial.Basic
 
+noncomputable section
+
 /-!
 # `ULift` instances for groups and monoids
 
@@ -27,33 +29,17 @@ namespace ULift
 instance one [One α] : One (ULift α) :=
   ⟨⟨1⟩⟩
 
-@[to_additive (attr := simp)]
-theorem one_down [One α] : (1 : ULift α).down = 1 :=
-  rfl
-
 @[to_additive]
 instance mul [Mul α] : Mul (ULift α) :=
   ⟨fun f g => ⟨f.down * g.down⟩⟩
-
-@[to_additive (attr := simp)]
-theorem mul_down [Mul α] : (x * y).down = x.down * y.down :=
-  rfl
 
 @[to_additive]
 instance div [Div α] : Div (ULift α) :=
   ⟨fun f g => ⟨f.down / g.down⟩⟩
 
-@[to_additive (attr := simp)]
-theorem div_down [Div α] : (x / y).down = x.down / y.down :=
-  rfl
-
 @[to_additive]
 instance inv [Inv α] : Inv (ULift α) :=
   ⟨fun f => ⟨f.down⁻¹⟩⟩
-
-@[to_additive (attr := simp)]
-theorem inv_down [Inv α] : x⁻¹.down = x.down⁻¹ :=
-  rfl
 
 @[to_additive]
 instance smul [SMul α β] : SMul α (ULift β) :=
@@ -100,32 +86,6 @@ instance commMonoid [CommMonoid α] : CommMonoid (ULift α) :=
 instance instNatCast [NatCast α] : NatCast (ULift α) := ⟨(up ·)⟩
 
 instance instIntCast [IntCast α] : IntCast (ULift α) := ⟨(up ·)⟩
-
-@[simp, norm_cast]
-theorem up_natCast [NatCast α] (n : ℕ) : up (n : α) = n :=
-  rfl
-
-@[simp]
-theorem up_ofNat [NatCast α] (n : ℕ) [n.AtLeastTwo] :
-    up (no_index (OfNat.ofNat n : α)) = OfNat.ofNat n :=
-  rfl
-
-@[simp, norm_cast]
-theorem up_intCast [IntCast α] (n : ℤ) : up (n : α) = n :=
-  rfl
-
-@[simp, norm_cast]
-theorem down_natCast [NatCast α] (n : ℕ) : down (n : ULift α) = n :=
-  rfl
-
-@[simp]
-theorem down_ofNat [NatCast α] (n : ℕ) [n.AtLeastTwo] :
-    down (no_index (OfNat.ofNat n : ULift α)) = OfNat.ofNat n :=
-  rfl
-
-@[simp, norm_cast]
-theorem down_intCast [IntCast α] (n : ℤ) : down (n : ULift α) = n :=
-  rfl
 
 instance addMonoidWithOne [AddMonoidWithOne α] : AddMonoidWithOne (ULift α) :=
   { ULift.one, ULift.addMonoid with

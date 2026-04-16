@@ -8,6 +8,8 @@ import Mathlib.Topology.Instances.Rat
 import Mathlib.Topology.UniformSpace.Completion
 import Mathlib.Topology.Metrizable.Basic
 
+noncomputable section
+
 /-!
 # Comparison of Cauchy reals and Bourbaki reals
 

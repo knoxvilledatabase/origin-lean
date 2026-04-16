@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.DedekindDomain.Ideal
 import Mathlib.RingTheory.IsAdjoinRoot
 
+noncomputable section
+
 /-!
 # Kummer-Dedekind theorem
 
@@ -205,12 +207,6 @@ noncomputable def quotAdjoinEquivQuotMap (hx : (conductor R x).comap (algebraMap
       simp only [← hu']
       rfl
     · exact Ideal.Quotient.mk_surjective
-
-@[simp]
-theorem quotAdjoinEquivQuotMap_apply_mk (hx : (conductor R x).comap (algebraMap R S) ⊔ I = ⊤)
-    (h_alg : Function.Injective (algebraMap R<x> S)) (a : R<x>) :
-    quotAdjoinEquivQuotMap hx h_alg (Ideal.Quotient.mk (I.map (algebraMap R R<x>)) a) =
-      Ideal.Quotient.mk (I.map (algebraMap R S)) ↑a := rfl
 
 namespace KummerDedekind
 

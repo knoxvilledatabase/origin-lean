@@ -7,6 +7,8 @@ import Mathlib.RingTheory.Localization.Ideal
 import Mathlib.RingTheory.LocalRing.MaximalIdeal.Basic
 import Mathlib.Algebra.Group.Units.Hom
 
+noncomputable section
+
 /-!
 # Localizations of commutative rings at the complement of a prime ideal
 

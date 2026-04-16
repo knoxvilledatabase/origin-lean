@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Game/Basic.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 5 | Infrastructure: 39
+Genuine: 70 | Conflates: 0 | Dissolved: 1 | Infrastructure: 39
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.SetTheory.Game.PGame
 import Mathlib.Tactic.Abel
+
+noncomputable section
 
 /-!
 # Combinatorial games.
@@ -65,9 +67,6 @@ instance instAddCommGroupWithOneGame : AddCommGroupWithOne Game where
 instance : Inhabited Game :=
   ⟨0⟩
 
-theorem zero_def : (0 : Game) = ⟦0⟧ :=
-  rfl
-
 instance instPartialOrderGame : PartialOrder Game where
   le := Quotient.lift₂ (· ≤ ·) fun _ _ _ _ hx hy => propext (le_congr hx hy)
   le_refl := by
@@ -118,19 +117,10 @@ namespace PGame
 theorem le_iff_game_le {x y : PGame} : x ≤ y ↔ (⟦x⟧ : Game) ≤ ⟦y⟧ :=
   Iff.rfl
 
-theorem lf_iff_game_lf {x y : PGame} : x ⧏ y ↔ Game.LF ⟦x⟧ ⟦y⟧ :=
-  Iff.rfl
-
-theorem lt_iff_game_lt {x y : PGame} : x < y ↔ (⟦x⟧ : Game) < ⟦y⟧ :=
-  Iff.rfl
-
 theorem equiv_iff_game_eq {x y : PGame} : x ≈ y ↔ (⟦x⟧ : Game) = ⟦y⟧ :=
   (@Quotient.eq' _ _ x y).symm
 
 alias ⟨game_eq, _⟩ := equiv_iff_game_eq
-
-theorem fuzzy_iff_game_fuzzy {x y : PGame} : x ‖ y ↔ Game.Fuzzy ⟦x⟧ ⟦y⟧ :=
-  Iff.rfl
 
 end PGame
 
@@ -194,12 +184,6 @@ end Game
 
 namespace PGame
 
-@[simp] theorem quot_zero : (⟦0⟧ : Game) = 0 := rfl
-
-@[simp] theorem quot_one : (⟦1⟧ : Game) = 1 := rfl
-
-@[simp] theorem quot_neg (a : PGame) : (⟦-a⟧ : Game) = -⟦a⟧ := rfl
-
 @[simp] theorem quot_add (a b : PGame) : ⟦a + b⟧ = (⟦a⟧ : Game) + ⟦b⟧ := rfl
 
 @[simp] theorem quot_sub (a b : PGame) : ⟦a - b⟧ = (⟦a⟧ : Game) - ⟦b⟧ := rfl
@@ -251,12 +235,6 @@ def toRightMovesMul {x y : PGame} :
   Equiv.cast (rightMoves_mul x y).symm
 
 @[simp]
-theorem mk_mul_moveLeft_inl {xl xr yl yr} {xL xR yL yR} {i j} :
-    (mk xl xr xL xR * mk yl yr yL yR).moveLeft (Sum.inl (i, j)) =
-      xL i * mk yl yr yL yR + mk xl xr xL xR * yL j - xL i * yL j :=
-  rfl
-
-@[simp]
 theorem mul_moveLeft_inl {x y : PGame} {i j} :
     (x * y).moveLeft (toLeftMovesMul (Sum.inl (i, j))) =
       x.moveLeft i * y + x * y.moveLeft j - x.moveLeft i * y.moveLeft j := by
@@ -279,12 +257,6 @@ theorem mul_moveLeft_inr {x y : PGame} {i j} :
   rfl
 
 @[simp]
-theorem mk_mul_moveRight_inl {xl xr yl yr} {xL xR yL yR} {i j} :
-    (mk xl xr xL xR * mk yl yr yL yR).moveRight (Sum.inl (i, j)) =
-      xL i * mk yl yr yL yR + mk xl xr xL xR * yR j - xL i * yR j :=
-  rfl
-
-@[simp]
 theorem mul_moveRight_inl {x y : PGame} {i j} :
     (x * y).moveRight (toRightMovesMul (Sum.inl (i, j))) =
       x.moveLeft i * y + x * y.moveRight j - x.moveLeft i * y.moveRight j := by
@@ -293,37 +265,11 @@ theorem mul_moveRight_inl {x y : PGame} {i j} :
   rfl
 
 @[simp]
-theorem mk_mul_moveRight_inr {xl xr yl yr} {xL xR yL yR} {i j} :
-    (mk xl xr xL xR * mk yl yr yL yR).moveRight (Sum.inr (i, j)) =
-      xR i * mk yl yr yL yR + mk xl xr xL xR * yL j - xR i * yL j :=
-  rfl
-
-@[simp]
 theorem mul_moveRight_inr {x y : PGame} {i j} :
     (x * y).moveRight (toRightMovesMul (Sum.inr (i, j))) =
       x.moveRight i * y + x * y.moveLeft j - x.moveRight i * y.moveLeft j := by
   cases x
   cases y
-  rfl
-
-theorem neg_mk_mul_moveLeft_inl {xl xr yl yr} {xL xR yL yR} {i j} :
-    (-(mk xl xr xL xR * mk yl yr yL yR)).moveLeft (Sum.inl (i, j)) =
-      -(xL i * mk yl yr yL yR + mk xl xr xL xR * yR j - xL i * yR j) :=
-  rfl
-
-theorem neg_mk_mul_moveLeft_inr {xl xr yl yr} {xL xR yL yR} {i j} :
-    (-(mk xl xr xL xR * mk yl yr yL yR)).moveLeft (Sum.inr (i, j)) =
-      -(xR i * mk yl yr yL yR + mk xl xr xL xR * yL j - xR i * yL j) :=
-  rfl
-
-theorem neg_mk_mul_moveRight_inl {xl xr yl yr} {xL xR yL yR} {i j} :
-    (-(mk xl xr xL xR * mk yl yr yL yR)).moveRight (Sum.inl (i, j)) =
-      -(xL i * mk yl yr yL yR + mk xl xr xL xR * yL j - xL i * yL j) :=
-  rfl
-
-theorem neg_mk_mul_moveRight_inr {xl xr yl yr} {xL xR yL yR} {i j} :
-    (-(mk xl xr xL xR * mk yl yr yL yR)).moveRight (Sum.inr (i, j)) =
-      -(xR i * mk yl yr yL yR + mk xl xr xL xR * yR j - xR i * yR j) :=
   rfl
 
 theorem leftMoves_mul_cases {x y : PGame} (k) {P : (x * y).LeftMoves → Prop}
@@ -378,16 +324,22 @@ instance isEmpty_rightMoves_mul (x y : PGame.{u})
 def mulZeroRelabelling (x : PGame) : x * 0 ≡r 0 :=
   Relabelling.isEmpty _
 
--- DISSOLVED: mul_zero_equiv
+theorem mul_zero_equiv (x : PGame) : x * 0 ≈ 0 :=
+  (mulZeroRelabelling x).equiv
 
--- DISSOLVED: quot_mul_zero
+@[simp]
+theorem quot_mul_zero (x : PGame) : (⟦x * 0⟧ : Game) = 0 :=
+  game_eq x.mul_zero_equiv
 
 def zeroMulRelabelling (x : PGame) : 0 * x ≡r 0 :=
   Relabelling.isEmpty _
 
--- DISSOLVED: zero_mul_equiv
+theorem zero_mul_equiv (x : PGame) : 0 * x ≈ 0 :=
+  (zeroMulRelabelling x).equiv
 
--- DISSOLVED: quot_zero_mul
+@[simp]
+theorem quot_zero_mul (x : PGame) : (⟦0 * x⟧ : Game) = 0 :=
+  game_eq x.zero_mul_equiv
 
 def negMulRelabelling (x y : PGame.{u}) : -x * y ≡r -(x * y) :=
   match x, y with

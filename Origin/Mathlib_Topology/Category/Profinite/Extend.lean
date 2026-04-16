@@ -7,6 +7,8 @@ import Mathlib.Topology.Category.Profinite.AsLimit
 import Mathlib.Topology.Category.Profinite.CofilteredLimit
 import Mathlib.CategoryTheory.Filtered.Final
 
+noncomputable section
+
 /-!
 
 # Extending cones in `Profinite`
@@ -99,7 +101,6 @@ def cone (S : Profinite) :
 example : G.mapCone c = (cone G c.pt).whisker (functor c) := rfl
 
 noncomputable
-
 def isLimitCone (hc : IsLimit c) [∀ i, Epi (c.π.app i)] (hc' : IsLimit <| G.mapCone c) :
     IsLimit (cone G c.pt) := (functor_initial c hc).isLimitWhiskerEquiv _ _ hc'
 
@@ -124,7 +125,6 @@ def cocone (S : Profinite) :
 example : G.mapCocone c.op = (cocone G c.pt).whisker (functorOp c) := rfl
 
 noncomputable
-
 def isColimitCocone (hc : IsLimit c) [∀ i, Epi (c.π.app i)] (hc' : IsColimit <| G.mapCocone c.op) :
     IsColimit (cocone G c.pt) := (functorOp_final c hc).isColimitWhiskerEquiv _ _ hc'
 

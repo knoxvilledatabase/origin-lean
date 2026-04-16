@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Ring.InjSurj
 import Mathlib.Data.ZMod.Defs
 
+noncomputable section
+
 /-!
 # Basic Theorems About Bitvectors
 

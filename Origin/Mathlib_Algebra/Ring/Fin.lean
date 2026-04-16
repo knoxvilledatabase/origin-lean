@@ -7,6 +7,8 @@ import Mathlib.Algebra.Group.Prod
 import Mathlib.Algebra.Ring.Equiv
 import Mathlib.Data.Fin.Tuple.Basic
 
+noncomputable section
+
 /-!
 # Rings and `Fin`
 

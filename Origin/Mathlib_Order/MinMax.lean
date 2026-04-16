@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Logic.OpClass
 import Mathlib.Order.Lattice
 
+noncomputable section
+
 /-!
 # `max` and `min`
 

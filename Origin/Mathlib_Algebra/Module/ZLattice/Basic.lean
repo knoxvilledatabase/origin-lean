@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/ZLattice/Basic.lean
-Genuine: 58 | Conflates: 0 | Dissolved: 1 | Infrastructure: 13
+Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 13
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.Countable
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.FreeModule.PID
 import Mathlib.MeasureTheory.Group.FundamentalDomain
 import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 import Mathlib.RingTheory.Localization.Module
+
+noncomputable section
 
 /-!
 # ℤ-lattices
@@ -322,7 +324,11 @@ protected theorem isAddFundamentalDomain' [Finite ι] [MeasurableSpace E] [Opens
     IsAddFundamentalDomain (span ℤ (Set.range b)).toAddSubgroup (fundamentalDomain b) μ :=
   ZSpan.isAddFundamentalDomain b μ
 
--- DISSOLVED: measure_fundamentalDomain_ne_zero
+theorem measure_fundamentalDomain_ne_zero [Finite ι] [MeasurableSpace E] [BorelSpace E]
+    {μ : Measure E} [Measure.IsAddHaarMeasure μ] :
+    μ (fundamentalDomain b) ≠ 0 := by
+  convert (ZSpan.isAddFundamentalDomain b μ).measure_ne_zero (NeZero.ne μ)
+  exact (inferInstance : VAddInvariantMeasure (span ℤ (Set.range b)).toAddSubgroup E μ)
 
 theorem measure_fundamentalDomain [Fintype ι] [DecidableEq ι] [MeasurableSpace E] (μ : Measure E)
     [BorelSpace E] [Measure.IsAddHaarMeasure μ] (b₀ : Basis ι ℝ E) :
@@ -648,10 +654,6 @@ def ZLattice.comap_equiv (e : F ≃ₗ[K] E) :
     ⟨fun _ _ h ↦ Subtype.ext_iff_val.mpr (e.symm.injective (congr_arg Subtype.val h)),
     fun ⟨x, hx⟩ ↦ ⟨⟨e x, by rwa [← SetLike.mem_coe, ZLattice.coe_comap] at hx⟩,
       by simp [Subtype.ext_iff_val]⟩⟩
-
-@[simp]
-theorem ZLattice.comap_equiv_apply (e : F ≃ₗ[K] E) (x : L) :
-    ZLattice.comap_equiv K L e x = e.symm x := rfl
 
 def Basis.ofZLatticeComap (e : F ≃ₗ[K] E) {ι : Type*}
     (b : Basis ι ℤ L) :

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Faithful
 import Mathlib.Data.Set.Function
 
+noncomputable section
+
 /-!
 # Pi instances for multiplicative actions
 
@@ -25,14 +27,6 @@ namespace Pi
 
 @[to_additive]
 instance smul' [∀ i, SMul (α i) (β i)] : SMul (∀ i, α i) (∀ i, β i) where smul s x i := s i • x i
-
-@[to_additive]
-lemma smul_def' [∀ i, SMul (α i) (β i)] (s : ∀ i, α i) (x : ∀ i, β i) : s • x = fun i ↦ s i • x i :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma smul_apply' [∀ i, SMul (α i) (β i)] (s : ∀ i, α i) (x : ∀ i, β i) : (s • x) i = s i • x i :=
-  rfl
 
 @[to_additive Pi.vaddAssocClass]
 instance isScalarTower [SMul M N] [∀ i, SMul N (α i)] [∀ i, SMul M (α i)]

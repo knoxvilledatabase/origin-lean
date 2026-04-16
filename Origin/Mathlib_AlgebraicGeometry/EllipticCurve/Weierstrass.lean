@@ -1,6 +1,6 @@
 /-
 Extracted from AlgebraicGeometry/EllipticCurve/Weierstrass.lean
-Genuine: 64 | Conflates: 0 | Dissolved: 2 | Infrastructure: 7
+Genuine: 63 | Conflates: 2 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.CharP.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.CubicDiscriminant
 import Mathlib.RingTheory.Nilpotent.Defs
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
+
+noncomputable section
 
 /-!
 # Weierstrass equations of elliptic curves
@@ -260,13 +262,6 @@ lemma map_Δ : (W.map φ).Δ = φ W.Δ := by
   map_simp
 
 @[simp]
-lemma map_id : W.map (RingHom.id R) = W :=
-  rfl
-
-lemma map_map {B : Type w} [CommRing B] (ψ : A →+* B) : (W.map φ).map ψ = W.map (ψ.comp φ) :=
-  rfl
-
-@[simp]
 lemma map_baseChange {S : Type s} [CommRing S] [Algebra R S] {A : Type v} [CommRing A] [Algebra R A]
     [Algebra S A] [IsScalarTower R S A] {B : Type w} [CommRing B] [Algebra R B] [Algebra S B]
     [IsScalarTower R S B] (ψ : A →ₐ[S] B) : (W.baseChange A).map ψ = W.baseChange B :=
@@ -325,7 +320,10 @@ lemma twoTorsionPolynomial_disc_isUnit (hu : IsUnit (2 : R)) :
   rw [twoTorsionPolynomial_disc, IsUnit.mul_iff, show (16 : R) = 2 ^ 4 by norm_num1]
   exact and_iff_right <| hu.pow 4
 
--- DISSOLVED: twoTorsionPolynomial_disc_ne_zero
+-- CONFLATES (assumes ground = zero): twoTorsionPolynomial_disc_ne_zero
+lemma twoTorsionPolynomial_disc_ne_zero [Nontrivial R] (hu : IsUnit (2 : R)) (hΔ : IsUnit W.Δ) :
+    W.twoTorsionPolynomial.disc ≠ 0 :=
+  ((W.twoTorsionPolynomial_disc_isUnit hu).mpr hΔ).ne_zero
 
 end TorsionPolynomial
 
@@ -340,9 +338,6 @@ variable [W.IsElliptic]
 lemma isUnit_Δ : IsUnit W.Δ := IsElliptic.isUnit
 
 noncomputable def Δ' : Rˣ := W.isUnit_Δ.unit
-
-@[simp]
-lemma coe_Δ' : W.Δ' = W.Δ := rfl
 
 noncomputable def j : R :=
   W.Δ'⁻¹ * W.c₄ ^ 3
@@ -392,7 +387,10 @@ lemma j_eq_zero_iff_of_char_three [IsReduced R] : W.j = 0 ↔ W.b₂ = 0 := by
 
 end CharThree
 
--- DISSOLVED: twoTorsionPolynomial_disc_ne_zero_of_isElliptic
+-- CONFLATES (assumes ground = zero): twoTorsionPolynomial_disc_ne_zero_of_isElliptic
+lemma twoTorsionPolynomial_disc_ne_zero_of_isElliptic [Nontrivial R] (hu : IsUnit (2 : R)) :
+    W.twoTorsionPolynomial.disc ≠ 0 :=
+  W.twoTorsionPolynomial_disc_ne_zero hu W.isUnit_Δ
 
 section BaseChange
 
@@ -404,24 +402,21 @@ instance : (W.map φ).IsElliptic := by
   simp only [isElliptic_iff, map_Δ, W.isUnit_Δ.map]
 
 set_option linter.docPrime false in
-
 lemma coe_map_Δ' : (W.map φ).Δ' = φ W.Δ' := by
   rw [coe_Δ', map_Δ, coe_Δ']
 
 set_option linter.docPrime false in
-
 @[simp]
+
 lemma map_Δ' : (W.map φ).Δ' = Units.map φ W.Δ' := by
   ext
   exact W.coe_map_Δ' φ
 
 set_option linter.docPrime false in
-
 lemma coe_inv_map_Δ' : (W.map φ).Δ'⁻¹ = φ ↑W.Δ'⁻¹ := by
   simp
 
 set_option linter.docPrime false in
-
 lemma inv_map_Δ' : (W.map φ).Δ'⁻¹ = Units.map φ W.Δ'⁻¹ := by
   simp
 

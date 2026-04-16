@@ -5,6 +5,8 @@ Genuine: 181 | Conflates: 1 | Dissolved: 0 | Infrastructure: 35
 import Origin.Core
 import Mathlib.LinearAlgebra.AffineSpace.AffineEquiv
 
+noncomputable section
+
 /-!
 # Affine spaces
 
@@ -297,30 +299,10 @@ abbrev toAddTorsor (s : AffineSubspace k P) [Nonempty s] : AddTorsor s.direction
 
 attribute [local instance] toAddTorsor
 
-@[simp, norm_cast]
-theorem coe_vsub (s : AffineSubspace k P) [Nonempty s] (a b : s) : ↑(a -ᵥ b) = (a : P) -ᵥ (b : P) :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_vadd (s : AffineSubspace k P) [Nonempty s] (a : s.direction) (b : s) :
-    ↑(a +ᵥ b) = (a : V) +ᵥ (b : P) :=
-  rfl
-
 protected def subtype (s : AffineSubspace k P) [Nonempty s] : s →ᵃ[k] P where
   toFun := (↑)
   linear := s.direction.subtype
   map_vadd' _ _ := rfl
-
-@[simp]
-theorem subtype_linear (s : AffineSubspace k P) [Nonempty s] :
-    s.subtype.linear = s.direction.subtype := rfl
-
-theorem subtype_apply (s : AffineSubspace k P) [Nonempty s] (p : s) : s.subtype p = p :=
-  rfl
-
-@[simp]
-theorem coeSubtype (s : AffineSubspace k P) [Nonempty s] : (s.subtype : s → P) = ((↑) : s → P) :=
-  rfl
 
 theorem injective_subtype (s : AffineSubspace k P) [Nonempty s] : Function.Injective s.subtype :=
   Subtype.coe_injective
@@ -387,11 +369,6 @@ end AffineSubspace
 namespace Submodule
 
 variable {k V : Type*} [Ring k] [AddCommGroup V] [Module k V]
-
-@[simp]
-theorem mem_toAffineSubspace {p : Submodule k V} {x : V} :
-    x ∈ p.toAffineSubspace ↔ x ∈ p :=
-  Iff.rfl
 
 @[simp]
 theorem toAffineSubspace_direction (s : Submodule k V) : s.toAffineSubspace.direction = s := by
@@ -493,12 +470,6 @@ instance : Inhabited (AffineSubspace k P) :=
   ⟨⊤⟩
 
 theorem le_def (s1 s2 : AffineSubspace k P) : s1 ≤ s2 ↔ (s1 : Set P) ⊆ s2 :=
-  Iff.rfl
-
-theorem le_def' (s1 s2 : AffineSubspace k P) : s1 ≤ s2 ↔ ∀ p ∈ s1, p ∈ s2 :=
-  Iff.rfl
-
-theorem lt_def (s1 s2 : AffineSubspace k P) : s1 < s2 ↔ (s1 : Set P) ⊂ s2 :=
   Iff.rfl
 
 theorem not_le_iff_exists (s1 s2 : AffineSubspace k P) : ¬s1 ≤ s2 ↔ ∃ p ∈ s1, p ∉ s2 :=
@@ -641,12 +612,6 @@ attribute [local instance] toAddTorsor
 
 instance : Nonempty (⊤ : AffineSubspace k P) := inferInstanceAs (Nonempty (⊤ : Set P))
 
-@[simps! linear apply symm_apply_coe]
-def topEquiv : (⊤ : AffineSubspace k P) ≃ᵃ[k] P where
-  toEquiv := Equiv.Set.univ P
-  linear := .ofEq _ _ (direction_top _ _ _) ≪≫ₗ Submodule.topEquiv
-  map_vadd' _p _v := rfl
-
 variable {P}
 
 theorem not_mem_bot (p : P) : p ∉ (⊥ : AffineSubspace k P) :=
@@ -701,10 +666,6 @@ theorem direction_eq_top_iff_of_nonempty {s : AffineSubspace k P} (h : (s : Set 
     simp [h]
   · rintro rfl
     simp
-
-@[simp]
-theorem inf_coe (s1 s2 : AffineSubspace k P) : (s1 ⊓ s2 : Set P) = (s1 : Set P) ∩ s2 :=
-  rfl
 
 theorem mem_inf_iff (p : P) (s1 s2 : AffineSubspace k P) : p ∈ s1 ⊓ s2 ↔ p ∈ s1 ∧ p ∈ s2 :=
   Iff.rfl
@@ -1013,7 +974,6 @@ theorem mem_vectorSpan_pair_rev {p₁ p₂ : P} {v : V} :
 variable (k)
 
 notation "line[" k ", " p₁ ", " p₂ "]" =>
-
   affineSpan k (insert p₁ (@singleton _ _ Set.instSingletonSet p₂))
 
 theorem left_mem_affineSpan_pair (p₁ p₂ : P) : p₁ ∈ line[k, p₁, p₂] :=
@@ -1262,19 +1222,6 @@ variable {S₁ S₂ : AffineSubspace k P₁} [Nonempty S₁] [Nonempty S₂]
 
 attribute [local instance] AffineSubspace.toAddTorsor
 
-@[simps linear]
-def inclusion (h : S₁ ≤ S₂) : S₁ →ᵃ[k] S₂ where
-  toFun := Set.inclusion h
-  linear := Submodule.inclusion <| AffineSubspace.direction_le h
-  map_vadd' _ _ := rfl
-
-@[simp]
-theorem coe_inclusion_apply (h : S₁ ≤ S₂) (x : S₁) : (inclusion h x : P₁) = x :=
-  rfl
-
-@[simp]
-theorem inclusion_rfl : inclusion (le_refl S₁) = AffineMap.id k S₁ := rfl
-
 end inclusion
 
 end AffineSubspace
@@ -1300,23 +1247,6 @@ variable (S₁ S₂ : AffineSubspace k P₁) [Nonempty S₁] [Nonempty S₂]
 
 attribute [local instance] AffineSubspace.toAddTorsor
 
-@[simps linear]
-def ofEq (h : S₁ = S₂) : S₁ ≃ᵃ[k] S₂ where
-  toEquiv := Equiv.Set.ofEq <| congr_arg _ h
-  linear := .ofEq _ _ <| congr_arg _ h
-  map_vadd' _ _ := rfl
-
-@[simp]
-theorem coe_ofEq_apply (h : S₁ = S₂) (x : S₁) : (ofEq S₁ S₂ h x : P₁) = x :=
-  rfl
-
-@[simp]
-theorem ofEq_symm (h : S₁ = S₂) : (ofEq S₁ S₂ h).symm = ofEq S₂ S₁ h.symm :=
-  rfl
-
-@[simp]
-theorem ofEq_rfl : ofEq S₁ S₁ rfl = AffineEquiv.refl k S₁ := rfl
-
 end ofEq
 
 theorem span_eq_top_iff {s : Set P₁} (e : P₁ ≃ᵃ[k] P₂) :
@@ -1340,14 +1270,6 @@ def comap (f : P₁ →ᵃ[k] P₂) (s : AffineSubspace k P₂) : AffineSubspace
       rw [AffineMap.map_vadd, LinearMap.map_smul, AffineMap.linearMap_vsub]
       apply s.smul_vsub_vadd_mem _ hp₁ hp₂ hp₃
 
-@[simp]
-theorem coe_comap (f : P₁ →ᵃ[k] P₂) (s : AffineSubspace k P₂) : (s.comap f : Set P₁) = f ⁻¹' ↑s :=
-  rfl
-
-@[simp]
-theorem mem_comap {f : P₁ →ᵃ[k] P₂} {x : P₁} {s : AffineSubspace k P₂} : x ∈ s.comap f ↔ f x ∈ s :=
-  Iff.rfl
-
 theorem comap_mono {f : P₁ →ᵃ[k] P₂} {s t : AffineSubspace k P₂} : s ≤ t → s.comap f ≤ t.comap f :=
   preimage_mono
 
@@ -1355,16 +1277,6 @@ theorem comap_mono {f : P₁ →ᵃ[k] P₂} {s t : AffineSubspace k P₂} : s �
 theorem comap_top {f : P₁ →ᵃ[k] P₂} : (⊤ : AffineSubspace k P₂).comap f = ⊤ := by
   rw [AffineSubspace.ext_iff]
   exact preimage_univ (f := f)
-
-@[simp] theorem comap_bot (f : P₁ →ᵃ[k] P₂) : comap f ⊥ = ⊥ := rfl
-
-@[simp]
-theorem comap_id (s : AffineSubspace k P₁) : s.comap (AffineMap.id k P₁) = s :=
-  rfl
-
-theorem comap_comap (s : AffineSubspace k P₃) (f : P₁ →ᵃ[k] P₂) (g : P₂ →ᵃ[k] P₃) :
-    (s.comap g).comap f = s.comap (g.comp f) :=
-  rfl
 
 theorem map_le_iff_le_comap {f : P₁ →ᵃ[k] P₂} {s : AffineSubspace k P₁} {t : AffineSubspace k P₂} :
     s.map f ≤ t ↔ s ≤ t.comap f :=

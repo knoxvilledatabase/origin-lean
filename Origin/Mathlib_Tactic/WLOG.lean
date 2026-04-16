@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Tactic.Core
 import Lean.Meta.Tactic.Cases
 
+noncomputable section
+
 /-!
 
 # Without loss of generality tactic
@@ -96,7 +98,6 @@ def _root_.Lean.MVarId.wlog (goal : MVarId) (h : Option Name) (P : Expr)
   return ⟨reductionGoal, (HFVarId, negHyp), hGoal, hFVar, revertedFVars⟩
 
 syntax (name := wlog) "wlog " binderIdent " : " term
-
   (" generalizing" (ppSpace colGt ident)*)? (" with " binderIdent)? : tactic
 
 elab_rules : tactic

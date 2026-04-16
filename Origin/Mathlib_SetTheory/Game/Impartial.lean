@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.SetTheory.Game.Basic
 import Mathlib.Tactic.NthRewrite
 
+noncomputable section
+
 /-!
 # Basic definitions about impartial (pre-)games
 

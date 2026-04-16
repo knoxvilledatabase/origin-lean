@@ -5,6 +5,8 @@ Genuine: 2 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.CategoryTheory.Limits.Final
 
+noncomputable section
+
 /-!
 
 # Conditions for `parallelPair` to be initial

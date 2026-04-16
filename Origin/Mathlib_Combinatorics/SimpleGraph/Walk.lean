@@ -1,9 +1,11 @@
 /-
 Extracted from Combinatorics/SimpleGraph/Walk.lean
-Genuine: 180 | Conflates: 0 | Dissolved: 1 | Infrastructure: 34
+Genuine: 181 | Conflates: 0 | Dissolved: 0 | Infrastructure: 34
 -/
 import Origin.Core
 import Mathlib.Combinatorics.SimpleGraph.Maps
+
+noncomputable section
 
 /-!
 
@@ -152,16 +154,14 @@ theorem adj_getVert_succ {u v} (w : G.Walk u v) {i : ℕ} (hi : i < w.length) :
     · simp [getVert, hxy]
     · exact ih (Nat.succ_lt_succ_iff.1 hi)
 
-lemma getVert_cons_one {u v w} (q : G.Walk v w) (hadj : G.Adj u v) :
-    (q.cons hadj).getVert 1 = v := by
-  have : (q.cons hadj).getVert 1 = q.getVert 0 := rfl
-  simpa [getVert_zero] using this
-
 @[simp]
 lemma getVert_cons_succ {u v w n} (p : G.Walk v w) (h : G.Adj u v) :
     (p.cons h).getVert (n + 1) = p.getVert n := rfl
 
--- DISSOLVED: getVert_cons
+lemma getVert_cons {u v w n} (p : G.Walk v w) (h : G.Adj u v) (hn : n ≠ 0) :
+    (p.cons h).getVert n = p.getVert (n - 1) := by
+  obtain ⟨n, rfl⟩ := Nat.exists_eq_add_one_of_ne_zero hn
+  rw [getVert_cons_succ, Nat.add_sub_cancel]
 
 @[simp]
 theorem cons_append {u v w x : V} (h : G.Adj u v) (p : G.Walk v w) (q : G.Walk w x) :
@@ -224,13 +224,6 @@ theorem exists_concat_eq_cons {u v w : V} :
 
 @[simp]
 theorem reverse_nil {u : V} : (nil : G.Walk u u).reverse = nil := rfl
-
-theorem reverse_singleton {u v : V} (h : G.Adj u v) : (cons h nil).reverse = cons (G.symm h) nil :=
-  rfl
-
-@[simp]
-theorem cons_reverseAux {u v w x : V} (p : G.Walk u v) (q : G.Walk w x) (h : G.Adj w u) :
-    (cons h p).reverseAux q = p.reverseAux (cons (G.symm h) q) := rfl
 
 @[simp]
 protected theorem append_reverseAux {u v w x : V}
@@ -371,10 +364,6 @@ def concatRec {u v : V} (p : G.Walk u v) : motive u v p :=
   reverse_reverse p ▸ concatRecAux @Hnil @Hconcat p.reverse
 
 @[simp]
-theorem concatRec_nil (u : V) :
-    @concatRec _ _ motive @Hnil @Hconcat _ _ (nil : G.Walk u u) = Hnil := rfl
-
-@[simp]
 theorem concatRec_concat {u v w : V} (p : G.Walk u v) (h : G.Adj v w) :
     @concatRec _ _ motive @Hnil @Hconcat _ _ (p.concat h) =
       Hconcat p h (concatRec @Hnil @Hconcat p) := by
@@ -426,9 +415,6 @@ def darts {u v : V} : G.Walk u v → List G.Dart
   | cons h p => ⟨(u, _), h⟩ :: p.darts
 
 def edges {u v : V} (p : G.Walk u v) : List (Sym2 V) := p.darts.map Dart.edge
-
-@[simp]
-theorem support_nil {u : V} : (nil : G.Walk u u).support = [u] := rfl
 
 @[simp]
 theorem support_cons {u v w : V} (h : G.Adj u v) (p : G.Walk v w) :
@@ -564,9 +550,6 @@ theorem adj_of_mem_edges {u v x y : V} (p : G.Walk u v) (h : s(x, y) ∈ p.edges
   edges_subset_edgeSet p h
 
 @[simp]
-theorem darts_nil {u : V} : (nil : G.Walk u u).darts = [] := rfl
-
-@[simp]
 theorem darts_cons {u v w : V} (h : G.Adj u v) (p : G.Walk v w) :
     (cons h p).darts = ⟨(u, v), h⟩ :: p.darts := rfl
 
@@ -590,9 +573,6 @@ theorem darts_append {u v w : V} (p : G.Walk u v) (p' : G.Walk v w) :
 theorem darts_reverse {u v : V} (p : G.Walk u v) :
     p.reverse.darts = (p.darts.map Dart.symm).reverse := by
   induction p <;> simp [*, Sym2.eq_swap]
-
-theorem mem_darts_reverse {u v : V} {d : G.Dart} {p : G.Walk u v} :
-    d ∈ p.reverse.darts ↔ d.symm ∈ p.darts := by simp
 
 theorem cons_map_snd_darts {u v : V} (p : G.Walk u v) : (u :: p.darts.map (·.snd)) = p.support := by
   induction p <;> simp! [*]
@@ -620,9 +600,6 @@ theorem getLast_darts_snd {G : SimpleGraph V} {a b : V} (p : G.Walk a b) (hp : p
   rw [← List.getLast_map (f := fun x : G.Dart ↦ x.snd)]
   · simp_rw [p.map_snd_darts, List.getLast_tail, p.getLast_support]
   · simpa
-
-@[simp]
-theorem edges_nil {u : V} : (nil : G.Walk u u).edges = [] := rfl
 
 @[simp]
 theorem edges_cons {u v w : V} (h : G.Adj u v) (p : G.Walk v w) :
@@ -755,12 +732,6 @@ def notNilRec {motive : {u w : V} → (p : G.Walk u w) → (h : ¬ p.Nil) → So
   | nil => fun hp => absurd .nil hp
   | .cons h q => fun _ => cons h q
 
-@[simp]
-lemma notNilRec_cons {motive : {u w : V} → (p : G.Walk u w) → ¬ p.Nil → Sort*}
-    (cons : {u v w : V} → (h : G.Adj u v) → (q : G.Walk v w) →
-    motive (q.cons h) Walk.not_nil_cons) (h' : G.Adj u v) (q' : G.Walk v w) :
-    @Walk.notNilRec _ _ _ _ _ cons _ _ = cons h' q' := by rfl
-
 @[simp] lemma adj_getVert_one {p : G.Walk v w} (hp : ¬ p.Nil) :
     G.Adj v (p.getVert 1) := by
   simpa using adj_getVert_succ p (by simpa [not_nil_iff_lt_length] using hp : 0 < p.length)
@@ -773,9 +744,6 @@ def drop {u v : V} (p : G.Walk u v) (n : ℕ) : G.Walk (p.getVert n) v :=
 
 def tail (p : G.Walk u v) : G.Walk (p.getVert 1) v := p.drop 1
 
-@[simp]
-lemma tail_cons_nil (h : G.Adj u v) : (Walk.cons h .nil).tail = .nil := by rfl
-
 lemma tail_cons_eq (h : G.Adj u v) (p : G.Walk v w) :
     (p.cons h).tail = p.copy (getVert_zero p).symm rfl := by
   match p with
@@ -787,9 +755,6 @@ def firstDart (p : G.Walk v w) (hp : ¬ p.Nil) : G.Dart where
   fst := v
   snd := p.getVert 1
   adj := p.adj_getVert_one hp
-
-lemma edge_firstDart (p : G.Walk v w) (hp : ¬ p.Nil) :
-    (p.firstDart hp).edge = s(v, p.getVert 1) := rfl
 
 variable {x y : V} -- TODO: rename to u, v, w instead?
 
@@ -1067,9 +1032,6 @@ protected def map (f : G →g G') {u v : V} : G.Walk u v → G'.Walk (f u) (f v)
 variable (f : G →g G') (f' : G' →g G'') {u v u' v' : V} (p : G.Walk u v)
 
 @[simp]
-theorem map_nil : (nil : G.Walk u u).map f = nil := rfl
-
-@[simp]
 theorem map_cons {w : V} (h : G.Adj w u) : (cons h p).map f = cons (f.map_adj h) (p.map f) := rfl
 
 @[simp]
@@ -1214,17 +1176,6 @@ abbrev toDeleteEdges (s : Set (Sym2 V)) {v w : V} (p : G.Walk v w)
   p.transfer _ <| by
     simp only [edgeSet_deleteEdges, Set.mem_diff]
     exact fun e ep => ⟨edges_subset_edgeSet p ep, hp e ep⟩
-
-@[simp]
-theorem toDeleteEdges_nil (s : Set (Sym2 V)) {v : V} (hp) :
-    (Walk.nil : G.Walk v v).toDeleteEdges s hp = Walk.nil := rfl
-
-@[simp]
-theorem toDeleteEdges_cons (s : Set (Sym2 V)) {u v w : V} (h : G.Adj u v) (p : G.Walk v w) (hp) :
-    (Walk.cons h p).toDeleteEdges s hp =
-      Walk.cons (deleteEdges_adj.mpr ⟨h, hp _ (List.Mem.head _)⟩)
-        (p.toDeleteEdges s fun _ he => hp _ <| List.Mem.tail _ he) :=
-  rfl
 
 variable {v w : V}
 

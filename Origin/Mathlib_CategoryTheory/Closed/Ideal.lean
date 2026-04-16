@@ -13,6 +13,8 @@ import Mathlib.CategoryTheory.Adjunction.Reflective
 import Mathlib.CategoryTheory.Closed.Cartesian
 import Mathlib.CategoryTheory.Subterminal
 
+noncomputable section
+
 /-!
 # Exponential ideals
 

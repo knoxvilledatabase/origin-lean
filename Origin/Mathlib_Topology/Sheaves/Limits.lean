@@ -7,6 +7,8 @@ import Mathlib.Topology.Sheaves.Sheaf
 import Mathlib.CategoryTheory.Sites.Limits
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Basic
 
+noncomputable section
+
 /-!
 # Presheaves in `C` have limits and colimits when `C` does.
 -/

@@ -7,6 +7,8 @@ import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Order.Interval.Finset.Defs
 import Mathlib.Order.UpperLower.Basic
 
+noncomputable section
+
 /-!
 # Upper and lower sets in a locally finite order
 

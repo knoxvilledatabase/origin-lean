@@ -7,6 +7,8 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Mul
 import Mathlib.Analysis.Calculus.FDeriv.Add
 
+noncomputable section
+
 /-!
 # Derivative of `f x * g x`
 

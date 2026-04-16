@@ -7,6 +7,8 @@ import Mathlib.Algebra.Module.Equiv.Defs
 import Mathlib.Algebra.Module.Pi
 import Mathlib.Data.Finsupp.Basic
 
+noncomputable section
+
 /-!
 # Properties of the module `α →₀ M`
 
@@ -93,19 +95,7 @@ def lsubtypeDomain : (α →₀ M) →ₗ[R] s →₀ M where
   map_add' _ _ := subtypeDomain_add
   map_smul' _ _ := ext fun _ => rfl
 
-theorem lsubtypeDomain_apply (f : α →₀ M) :
-    (lsubtypeDomain s : (α →₀ M) →ₗ[R] s →₀ M) f = subtypeDomain (fun x => x ∈ s) f :=
-  rfl
-
 end LSubtypeDomain
-
-@[simp]
-theorem lsingle_apply (a : α) (b : M) : (lsingle a : M →ₗ[R] α →₀ M) b = single a b :=
-  rfl
-
-@[simp]
-theorem lapply_apply (a : α) (f : α →₀ M) : (lapply a : (α →₀ M) →ₗ[R] M) f = f a :=
-  rfl
 
 @[simp]
 theorem lapply_comp_lsingle_same (a : α) : lapply a ∘ₗ lsingle a = (.id : M →ₗ[R] M) := by ext; simp
@@ -122,11 +112,6 @@ def lmapDomain (f : α → α') : (α →₀ M) →ₗ[R] α' →₀ M where
   toFun := mapDomain f
   map_add' _ _ := mapDomain_add
   map_smul' := mapDomain_smul
-
-@[simp]
-theorem lmapDomain_apply (f : α → α') (l : α →₀ M) :
-    (lmapDomain M R f : (α →₀ M) →ₗ[R] α' →₀ M) l = mapDomain f l :=
-  rfl
 
 @[simp]
 theorem lmapDomain_id : (lmapDomain M R _root_.id : (α →₀ M) →ₗ[R] α →₀ M) = LinearMap.id :=
@@ -156,10 +141,6 @@ def mapRange.linearMap (f : M →ₗ[R] N) : (α →₀ M) →ₗ[R] α →₀ N
     map_smul' := fun c v => mapRange_smul (hf := f.map_zero) c v (f.map_smul c) }
 
 @[simp]
-theorem mapRange.linearMap_apply (f : M →ₗ[R] N) (g : α →₀ M) :
-    mapRange.linearMap f g = mapRange f f.map_zero g := rfl
-
-@[simp]
 theorem mapRange.linearMap_id :
     mapRange.linearMap LinearMap.id = (LinearMap.id : (α →₀ M) →ₗ[R] _) :=
   LinearMap.ext mapRange_id
@@ -181,10 +162,6 @@ def mapRange.linearEquiv (e : M ≃ₗ[R] N) : (α →₀ M) ≃ₗ[R] α →₀
     mapRange.addEquiv e.toAddEquiv with
     toFun := mapRange e e.map_zero
     invFun := mapRange e.symm e.symm.map_zero }
-
-@[simp]
-theorem mapRange.linearEquiv_apply (e : M ≃ₗ[R] N) (g : α →₀ M) :
-    mapRange.linearEquiv e g = mapRange.linearMap e.toLinearMap g := rfl
 
 @[simp]
 theorem mapRange.linearEquiv_refl :

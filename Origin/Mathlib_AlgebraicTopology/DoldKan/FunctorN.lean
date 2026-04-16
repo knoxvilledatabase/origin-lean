@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.AlgebraicTopology.DoldKan.PInfty
 
+noncomputable section
+
 /-!
 
 # Construction of functors N for the Dold-Kan correspondence
@@ -55,14 +57,6 @@ def N₂ : Karoubi (SimplicialObject C) ⥤ Karoubi (ChainComplex C ℕ) :=
 
 def toKaroubiCompN₂IsoN₁ : toKaroubi (SimplicialObject C) ⋙ N₂ ≅ N₁ :=
   (functorExtension₁CompWhiskeringLeftToKaroubiIso _ _).app N₁
-
-@[simp]
-lemma toKaroubiCompN₂IsoN₁_hom_app (X : SimplicialObject C) :
-    (toKaroubiCompN₂IsoN₁.hom.app X).f = PInfty := rfl
-
-@[simp]
-lemma toKaroubiCompN₂IsoN₁_inv_app (X : SimplicialObject C) :
-    (toKaroubiCompN₂IsoN₁.inv.app X).f = PInfty := rfl
 
 end DoldKan
 

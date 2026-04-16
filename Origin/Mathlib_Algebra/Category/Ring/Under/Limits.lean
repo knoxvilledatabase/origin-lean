@@ -10,6 +10,8 @@ import Mathlib.RingTheory.TensorProduct.Pi
 import Mathlib.RingTheory.Flat.Algebra
 import Mathlib.RingTheory.Flat.Equalizer
 
+noncomputable section
+
 /-!
 # Limits in `Under R` for a commutative ring `R`
 
@@ -113,19 +115,10 @@ def equalizerFork {A B : Under R} (f g : A ⟶ B) :
   Fork.ofι ((AlgHom.equalizer (toAlgHom f) (toAlgHom g)).val.toUnder)
     (by rw [equalizer_comp])
 
-@[simp]
-lemma equalizerFork_ι {A B : Under R} (f g : A ⟶ B) :
-    (Under.equalizerFork f g).ι = (AlgHom.equalizer (toAlgHom f) (toAlgHom g)).val.toUnder := rfl
-
 def equalizerFork' {A B : Type u} [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
     (f g : A →ₐ[R] B) :
     Fork f.toUnder g.toUnder :=
   Fork.ofι ((AlgHom.equalizer f g).val.toUnder) <| by ext a; exact a.property
-
-@[simp]
-lemma equalizerFork'_ι {A B : Type u} [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
-    (f g : A →ₐ[R] B) :
-    (Under.equalizerFork' f g).ι = (AlgHom.equalizer f g).val.toUnder := rfl
 
 def equalizerForkIsLimit {A B : Under R} (f g : A ⟶ B) :
     IsLimit (Under.equalizerFork f g) :=
@@ -143,12 +136,6 @@ def tensorProdEqualizer {A B : Under R} (f g : A ⟶ B) :
   Fork.ofι
     ((tensorProd R S).map ((AlgHom.equalizer (toAlgHom f) (toAlgHom g)).val.toUnder)) <| by
     rw [← Functor.map_comp, equalizer_comp, Functor.map_comp]
-
-@[simp]
-lemma tensorProdEqualizer_ι {A B : Under R} (f g : A ⟶ B) :
-    (tensorProdEqualizer f g).ι = (tensorProd R S).map
-      ((AlgHom.equalizer (toAlgHom f) (toAlgHom g)).val.toUnder) :=
-  rfl
 
 def equalizerForkTensorProdIso [Module.Flat R S] {A B : Under R} (f g : A ⟶ B) :
     tensorProdEqualizer f g ≅ Under.equalizerFork'

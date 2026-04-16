@@ -8,6 +8,8 @@ import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Ideal.Nonunits
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 
+noncomputable section
+
 /-!
 # Characteristic of quotients rings
 -/

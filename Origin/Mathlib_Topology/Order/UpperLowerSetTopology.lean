@@ -7,6 +7,8 @@ import Mathlib.Topology.AlexandrovDiscrete
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Topology.Order.LowerUpperTopology
 
+noncomputable section
+
 /-!
 # Upper and lower sets topologies
 
@@ -71,18 +73,6 @@ namespace WithUpperSet
 
 @[match_pattern] def ofUpperSet : WithUpperSet α ≃ α := Equiv.refl _
 
-@[simp] lemma to_WithUpperSet_symm_eq : (@toUpperSet α).symm = ofUpperSet := rfl
-
-@[simp] lemma of_WithUpperSet_symm_eq : (@ofUpperSet α).symm = toUpperSet := rfl
-
-@[simp] lemma toUpperSet_ofUpperSet (a : WithUpperSet α) : toUpperSet (ofUpperSet a) = a := rfl
-
-@[simp] lemma ofUpperSet_toUpperSet (a : α) : ofUpperSet (toUpperSet a) = a := rfl
-
-lemma toUpperSet_inj {a b : α} : toUpperSet a = toUpperSet b ↔ a = b := Iff.rfl
-
-lemma ofUpperSet_inj {a b : WithUpperSet α} : ofUpperSet a = ofUpperSet b ↔ a = b := Iff.rfl
-
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : WithUpperSet α → Sort*} (h : ∀ a, β (toUpperSet a)) : ∀ a, β a :=
   fun a => h (ofUpperSet a)
@@ -118,18 +108,6 @@ namespace WithLowerSet
 @[match_pattern] def toLowerSet : α ≃ WithLowerSet α := Equiv.refl _
 
 @[match_pattern] def ofLowerSet : WithLowerSet α ≃ α := Equiv.refl _
-
-@[simp] lemma to_WithLowerSet_symm_eq : (@toLowerSet α).symm = ofLowerSet := rfl
-
-@[simp] lemma of_WithLowerSet_symm_eq : (@ofLowerSet α).symm = toLowerSet := rfl
-
-@[simp] lemma toLowerSet_ofLowerSet (a : WithLowerSet α) : toLowerSet (ofLowerSet a) = a := rfl
-
-@[simp] lemma ofLowerSet_toLowerSet (a : α) : ofLowerSet (toLowerSet a) = a := rfl
-
-lemma toLowerSet_inj {a b : α} : toLowerSet a = toLowerSet b ↔ a = b := Iff.rfl
-
-lemma ofLowerSet_inj {a b : WithLowerSet α} : ofLowerSet a = ofLowerSet b ↔ a = b := Iff.rfl
 
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : WithLowerSet α → Sort*} (h : ∀ a, β (toLowerSet a)) : ∀ a, β a :=
@@ -345,10 +323,6 @@ def map (f : α →o β) : C(WithUpperSet α, WithUpperSet β) where
   toFun := toUpperSet ∘ f ∘ ofUpperSet
   continuous_toFun := continuous_def.2 fun _s hs ↦ IsUpperSet.preimage hs f.monotone
 
-@[simp] lemma map_id : map (OrderHom.id : α →o α) = ContinuousMap.id _ := rfl
-
-@[simp] lemma map_comp (g : β →o γ) (f : α →o β) : map (g.comp f) = (map g).comp (map f) := rfl
-
 @[simp] lemma toUpperSet_specializes_toUpperSet {a b : α} :
     toUpperSet a ⤳ toUpperSet b ↔ b ≤ a := by
   simp_rw [specializes_iff_closure_subset, IsUpperSet.closure_singleton, Iic_subset_Iic,
@@ -372,10 +346,6 @@ variable [Preorder α] [Preorder β] [Preorder γ]
 def map (f : α →o β) : C(WithLowerSet α, WithLowerSet β) where
   toFun := toLowerSet ∘ f ∘ ofLowerSet
   continuous_toFun := continuous_def.2 fun _s hs ↦ IsLowerSet.preimage hs f.monotone
-
-@[simp] lemma map_id : map (OrderHom.id : α →o α) = ContinuousMap.id _ := rfl
-
-@[simp] lemma map_comp (g : β →o γ) (f : α →o β) : map (g.comp f) = (map g).comp (map f) := rfl
 
 @[simp] lemma toLowerSet_specializes_toLowerSet {a b : α} :
   toLowerSet a ⤳ toLowerSet b ↔ a ≤ b := by

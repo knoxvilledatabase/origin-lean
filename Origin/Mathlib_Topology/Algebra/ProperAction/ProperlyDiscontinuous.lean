@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.Algebra.ProperAction.Basic
 import Mathlib.Topology.Maps.Proper.CompactlyGenerated
 
+noncomputable section
+
 /-!
 # When a proper action is properly discontinuous
 

@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Regular/Basic.lean
-Genuine: 35 | Conflates: 5 | Dissolved: 5 | Infrastructure: 1
+Genuine: 36 | Conflates: 9 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Commute.Defs
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Group.Units.Defs
 import Mathlib.Algebra.GroupWithZero.Defs
 import Mathlib.Algebra.Order.Monoid.Unbundled.Basic
 import Mathlib.Tactic.NthRewrite
+
+noncomputable section
 
 /-!
 # Regular elements
@@ -185,11 +187,23 @@ theorem isRegular_iff_subsingleton : IsRegular (0 : R) ↔ Subsingleton R :=
   ⟨fun h => h.left.subsingleton, fun h =>
     ⟨isLeftRegular_zero_iff_subsingleton.mpr h, isRightRegular_zero_iff_subsingleton.mpr h⟩⟩
 
--- DISSOLVED: IsLeftRegular.ne_zero
+-- CONFLATES (assumes ground = zero): IsLeftRegular.ne_zero
+theorem IsLeftRegular.ne_zero [Nontrivial R] (la : IsLeftRegular a) : a ≠ 0 := by
+  rintro rfl
+  rcases exists_pair_ne R with ⟨x, y, xy⟩
+  refine xy (la (?_ : 0 * x = 0 * y)) -- Porting note: lean4 seems to need the type signature
+  rw [zero_mul, zero_mul]
 
--- DISSOLVED: IsRightRegular.ne_zero
+-- CONFLATES (assumes ground = zero): IsRightRegular.ne_zero
+theorem IsRightRegular.ne_zero [Nontrivial R] (ra : IsRightRegular a) : a ≠ 0 := by
+  rintro rfl
+  rcases exists_pair_ne R with ⟨x, y, xy⟩
+  refine xy (ra (?_ : x * 0 = y * 0))
+  rw [mul_zero, mul_zero]
 
--- DISSOLVED: IsRegular.ne_zero
+-- CONFLATES (assumes ground = zero): IsRegular.ne_zero
+theorem IsRegular.ne_zero [Nontrivial R] (la : IsRegular a) : a ≠ 0 :=
+  la.left.ne_zero
 
 -- CONFLATES (assumes ground = zero): not_isLeftRegular_zero
 theorem not_isLeftRegular_zero [nR : Nontrivial R] : ¬IsLeftRegular (0 : R) :=
@@ -273,8 +287,11 @@ section CancelMonoidWithZero
 
 variable [MulZeroClass R] [IsCancelMulZero R] {a : R}
 
--- DISSOLVED: isRegular_of_ne_zero
+theorem isRegular_of_ne_zero (a0 : a ≠ 0) : IsRegular a :=
+  ⟨fun _ _ => mul_left_cancel₀ a0, fun _ _ => mul_right_cancel₀ a0⟩
 
--- DISSOLVED: isRegular_iff_ne_zero
+-- CONFLATES (assumes ground = zero): isRegular_iff_ne_zero
+theorem isRegular_iff_ne_zero [Nontrivial R] : IsRegular a ↔ a ≠ 0 :=
+  ⟨IsRegular.ne_zero, isRegular_of_ne_zero⟩
 
 end CancelMonoidWithZero

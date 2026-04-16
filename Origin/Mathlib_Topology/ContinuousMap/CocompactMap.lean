@@ -5,6 +5,8 @@ Genuine: 14 | Conflates: 0 | Dissolved: 0 | Infrastructure: 11
 import Origin.Core
 import Mathlib.Topology.ContinuousMap.Basic
 
+noncomputable section
+
 /-!
 # Cocompact continuous maps
 
@@ -68,10 +70,6 @@ instance : CocompactMapClass (CocompactMap α β) α β where
   map_continuous f := f.continuous_toFun
   cocompact_tendsto f := f.cocompact_tendsto'
 
-@[simp]
-theorem coe_toContinuousMap {f : CocompactMap α β} : (f.toContinuousMap : α → β) = f :=
-  rfl
-
 @[ext]
 theorem ext {f g : CocompactMap α β} (h : ∀ x, f x = g x) : f = g :=
   DFunLike.ext _ _ h
@@ -85,17 +83,8 @@ protected def copy (f : CocompactMap α β) (f' : α → β) (h : f' = f) : Coco
     simp_rw [h]
     exact f.cocompact_tendsto'
 
-@[simp]
-theorem coe_copy (f : CocompactMap α β) (f' : α → β) (h : f' = f) : ⇑(f.copy f' h) = f' :=
-  rfl
-
 theorem copy_eq (f : CocompactMap α β) (f' : α → β) (h : f' = f) : f.copy f' h = f :=
   DFunLike.ext' h
-
-@[simp]
-theorem coe_mk (f : C(α, β)) (h : Tendsto f (cocompact α) (cocompact β)) :
-    ⇑(⟨f, h⟩ : CocompactMap α β) = f :=
-  rfl
 
 section
 
@@ -104,10 +93,6 @@ variable (α)
 protected def id : CocompactMap α α :=
   ⟨ContinuousMap.id _, tendsto_id⟩
 
-@[simp]
-theorem coe_id : ⇑(CocompactMap.id α) = id :=
-  rfl
-
 end
 
 instance : Inhabited (CocompactMap α α) :=
@@ -115,19 +100,6 @@ instance : Inhabited (CocompactMap α α) :=
 
 def comp (f : CocompactMap β γ) (g : CocompactMap α β) : CocompactMap α γ :=
   ⟨f.toContinuousMap.comp g, (cocompact_tendsto f).comp (cocompact_tendsto g)⟩
-
-@[simp]
-theorem coe_comp (f : CocompactMap β γ) (g : CocompactMap α β) : ⇑(comp f g) = f ∘ g :=
-  rfl
-
-@[simp]
-theorem comp_apply (f : CocompactMap β γ) (g : CocompactMap α β) (a : α) : comp f g a = f (g a) :=
-  rfl
-
-@[simp]
-theorem comp_assoc (f : CocompactMap γ δ) (g : CocompactMap β γ) (h : CocompactMap α β) :
-    (f.comp g).comp h = f.comp (g.comp h) :=
-  rfl
 
 @[simp]
 theorem id_comp (f : CocompactMap α β) : (CocompactMap.id _).comp f = f :=

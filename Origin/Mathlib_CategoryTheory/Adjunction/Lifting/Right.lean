@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monad.Adjunction
 import Mathlib.CategoryTheory.Monad.Equalizer
 
+noncomputable section
+
 /-!
 # Adjoint lifting
 

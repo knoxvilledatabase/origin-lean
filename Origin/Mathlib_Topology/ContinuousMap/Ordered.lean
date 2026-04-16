@@ -7,6 +7,8 @@ import Mathlib.Topology.Order.Lattice
 import Mathlib.Topology.Order.ProjIcc
 import Mathlib.Topology.ContinuousMap.Defs
 
+noncomputable section
+
 /-!
 # Bundled continuous maps into orders, with order-compatible topology
 
@@ -38,8 +40,6 @@ instance sup : Max C(α, β) where max f g := { toFun := fun a ↦ f a ⊔ g a }
 
 @[simp, norm_cast] lemma coe_sup (f g : C(α, β)) : ⇑(f ⊔ g) = ⇑f ⊔ g := rfl
 
-@[simp] lemma sup_apply (f g : C(α, β)) (a : α) : (f ⊔ g) a = f a ⊔ g a := rfl
-
 instance semilatticeSup : SemilatticeSup C(α, β) :=
   DFunLike.coe_injective.semilatticeSup _ fun _ _ ↦ rfl
 
@@ -60,8 +60,6 @@ variable [SemilatticeInf β] [ContinuousInf β]
 instance inf : Min C(α, β) where min f g := { toFun := fun a ↦ f a ⊓ g a }
 
 @[simp, norm_cast] lemma coe_inf (f g : C(α, β)) : ⇑(f ⊓ g) = ⇑f ⊓ g := rfl
-
-@[simp] lemma inf_apply (f g : C(α, β)) (a : α) : (f ⊓ g) a = f a ⊓ g a := rfl
 
 instance semilatticeInf : SemilatticeInf C(α, β) :=
   DFunLike.coe_injective.semilatticeInf _ fun _ _ ↦ rfl
@@ -85,11 +83,6 @@ variable [LinearOrder α] [OrderTopology α] {a b : α} (h : a ≤ b)
 
 def IccExtend (f : C(Set.Icc a b, β)) : C(α, β) where
   toFun := Set.IccExtend h f
-
-@[simp]
-theorem coe_IccExtend (f : C(Set.Icc a b, β)) :
-    ((IccExtend h f : C(α, β)) : α → β) = Set.IccExtend h f :=
-  rfl
 
 end Extend
 

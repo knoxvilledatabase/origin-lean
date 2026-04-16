@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/Polynomial/Wronskian.lean
-Genuine: 13 | Conflates: 0 | Dissolved: 2 | Infrastructure: 1
+Genuine: 15 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.AlgebraMap
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.LinearAlgebra.SesquilinearForm
 import Mathlib.RingTheory.Coprime.Basic
+
+noncomputable section
 
 /-!
 # Wronskian of a pair of polynomial
@@ -76,9 +78,36 @@ theorem wronskian_neg_eq (a b : R[X]) : -wronskian a b = wronskian b a :=
 theorem wronskian_eq_of_sum_zero {a b c : R[X]} (hAdd : a + b + c = 0) :
     wronskian a b = wronskian b c := isAlt_wronskianBilin.eq_of_add_add_eq_zero hAdd
 
--- DISSOLVED: degree_wronskian_lt_add
+theorem degree_wronskian_lt_add {a b : R[X]} (ha : a ≠ 0) (hb : b ≠ 0) :
+    (wronskian a b).degree < a.degree + b.degree := by
+  calc
+    (wronskian a b).degree ≤ max (a * derivative b).degree (derivative a * b).degree :=
+      Polynomial.degree_sub_le _ _
+    _ < a.degree + b.degree := by
+      rw [max_lt_iff]
+      constructor
+      case left =>
+        apply lt_of_le_of_lt
+        · exact degree_mul_le a (derivative b)
+        · rw [← Polynomial.degree_ne_bot] at ha
+          rw [WithBot.add_lt_add_iff_left ha]
+          exact Polynomial.degree_derivative_lt hb
+      case right =>
+        apply lt_of_le_of_lt
+        · exact degree_mul_le (derivative a) b
+        · rw [← Polynomial.degree_ne_bot] at hb
+          rw [WithBot.add_lt_add_iff_right hb]
+          exact Polynomial.degree_derivative_lt ha
 
--- DISSOLVED: natDegree_wronskian_lt_add
+theorem natDegree_wronskian_lt_add {a b : R[X]} (hw : wronskian a b ≠ 0) :
+    (wronskian a b).natDegree < a.natDegree + b.natDegree := by
+  have ha : a ≠ 0 := by intro h; subst h; rw [wronskian_zero_left] at hw; exact hw rfl
+  have hb : b ≠ 0 := by intro h; subst h; rw [wronskian_zero_right] at hw; exact hw rfl
+  rw [← WithBot.coe_lt_coe, WithBot.coe_add]
+  convert ← degree_wronskian_lt_add ha hb
+  · exact Polynomial.degree_eq_natDegree hw
+  · exact Polynomial.degree_eq_natDegree ha
+  · exact Polynomial.degree_eq_natDegree hb
 
 theorem _root_.IsCoprime.wronskian_eq_zero_iff
     [NoZeroDivisors R] {a b : R[X]} (hc : IsCoprime a b) :

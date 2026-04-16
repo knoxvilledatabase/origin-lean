@@ -7,6 +7,8 @@ import Mathlib.Order.Hom.CompleteLattice
 import Mathlib.Topology.Homeomorph
 import Mathlib.Topology.Order.Lattice
 
+noncomputable section
+
 /-!
 # Lower and Upper topology
 
@@ -67,19 +69,6 @@ namespace WithLower
 
 @[match_pattern] def ofLower : WithLower α ≃ α := Equiv.refl _
 
-@[simp] lemma to_WithLower_symm_eq : (@toLower α).symm = ofLower := rfl
-
-@[simp] lemma of_WithLower_symm_eq : (@ofLower α).symm = toLower := rfl
-
-@[simp] lemma toLower_ofLower (a : WithLower α) : toLower (ofLower a) = a := rfl
-
-@[simp] lemma ofLower_toLower (a : α) : ofLower (toLower a) = a := rfl
-
-lemma toLower_inj {a b : α} : toLower a = toLower b ↔ a = b := Iff.rfl
-
-theorem ofLower_inj {a b : WithLower α} : ofLower a = ofLower b ↔ a = b :=
-  Iff.rfl
-
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : WithLower α → Sort*} (h : ∀ a, β (toLower a)) : ∀ a, β a := fun a =>
   h (ofLower a)
@@ -94,11 +83,6 @@ instance : Preorder (WithLower α) := ‹Preorder α›
 
 instance : TopologicalSpace (WithLower α) := lower α
 
-lemma isOpen_preimage_ofLower : IsOpen (ofLower ⁻¹' s) ↔ (lower α).IsOpen s := Iff.rfl
-
-lemma isOpen_def (T : Set (WithLower α)) : IsOpen T ↔ (lower α).IsOpen (WithLower.toLower ⁻¹' T) :=
-  Iff.rfl
-
 end WithLower
 
 def WithUpper (α : Type*) := α
@@ -108,18 +92,6 @@ namespace WithUpper
 @[match_pattern] def toUpper : α ≃ WithUpper α := Equiv.refl _
 
 @[match_pattern] def ofUpper : WithUpper α ≃ α := Equiv.refl _
-
-@[simp] lemma to_WithUpper_symm_eq {α} : (@toUpper α).symm = ofUpper := rfl
-
-@[simp] lemma of_WithUpper_symm_eq : (@ofUpper α).symm = toUpper := rfl
-
-@[simp] lemma toUpper_ofUpper (a : WithUpper α) : toUpper (ofUpper a) = a := rfl
-
-@[simp] lemma ofUpper_toUpper (a : α) : ofUpper (toUpper a) = a := rfl
-
-lemma toUpper_inj {a b : α} : toUpper a = toUpper b ↔ a = b := Iff.rfl
-
-lemma ofUpper_inj {a b : WithUpper α} : ofUpper a = ofUpper b ↔ a = b := Iff.rfl
 
 @[elab_as_elim, cases_eliminator, induction_eliminator]
 protected def rec {β : WithUpper α → Sort*} (h : ∀ a, β (toUpper a)) : ∀ a, β a := fun a =>
@@ -134,10 +106,6 @@ variable [Preorder α] {s : Set α}
 instance : Preorder (WithUpper α) := ‹Preorder α›
 
 instance : TopologicalSpace (WithUpper α) := upper α
-
-lemma isOpen_preimage_ofUpper : IsOpen (ofUpper ⁻¹' s) ↔ (upper α).IsOpen s := Iff.rfl
-
-lemma isOpen_def {s : Set (WithUpper α)} : IsOpen s ↔ (upper α).IsOpen (toUpper ⁻¹' s) := Iff.rfl
 
 end WithUpper
 

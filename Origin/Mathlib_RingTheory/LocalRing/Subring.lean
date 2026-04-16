@@ -7,6 +7,8 @@ import Mathlib.Tactic.FieldSimp
 import Mathlib.RingTheory.LocalRing.RingHom.Basic
 import Mathlib.RingTheory.Localization.AtPrime
 
+noncomputable section
+
 /-!
 # Local subrings of fields
 
@@ -65,9 +67,6 @@ instance : PartialOrder (LocalSubring R) where
   le_trans A B C h₁ h₂ := ⟨h₁.1.trans h₂.1, @RingHom.isLocalHom_comp _ _ _ _ _ _ _ _ h₂.2 h₁.2⟩
   le_antisymm A B h₁ h₂ := toSubring_injective (le_antisymm h₁.1 h₂.1)
 
-lemma le_def {A B : LocalSubring R} :
-    A ≤ B ↔ ∃ h : A.toSubring ≤ B.toSubring, IsLocalHom (Subring.inclusion h) := Iff.rfl
-
 lemma toSubring_mono : Monotone (toSubring (R := R)) :=
   fun _ _ e ↦ e.1
 
@@ -76,7 +75,6 @@ section ofPrime
 variable (A : Subring K) (P : Ideal A) [P.IsPrime]
 
 noncomputable
-
 def ofPrime (A : Subring K) (P : Ideal A) [P.IsPrime] : LocalSubring K :=
   range (IsLocalization.lift (M := P.primeCompl) (S := Localization.AtPrime P)
     (g := A.subtype) (by simp [Ideal.primeCompl, not_imp_not]))
@@ -86,13 +84,11 @@ lemma le_ofPrime : A ≤ (ofPrime A P).toSubring := by
   exact ⟨algebraMap A _ ⟨x, hx⟩, by simp⟩
 
 noncomputable
-
 instance : Algebra A (ofPrime A P).toSubring := (Subring.inclusion (le_ofPrime A P)).toAlgebra
 
 instance : IsScalarTower A (ofPrime A P).toSubring K := .of_algebraMap_eq (fun _ ↦ rfl)
 
 noncomputable
-
 def ofPrimeEquiv : Localization.AtPrime P ≃ₐ[A] (ofPrime A P).toSubring := by
   refine AlgEquiv.ofInjective (IsLocalization.liftAlgHom (M := P.primeCompl)
     (S := Localization.AtPrime P) (f := Algebra.ofId A K) _) ?_

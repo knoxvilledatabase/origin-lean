@@ -9,6 +9,8 @@ import Mathlib.CategoryTheory.ConcreteCategory.Basic
 import Mathlib.Tactic.ApplyFun
 import Mathlib.Tactic.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # Subobjects
 
@@ -129,11 +131,6 @@ protected def lift {α : Sort*} {X : C} (F : ∀ ⦃A : C⦄ (f : A ⟶ X) [Mono
   Quotient.liftOn' P (fun m => F m.arrow) fun m n ⟨i⟩ =>
     h m.arrow n.arrow ((MonoOver.forget X ⋙ Over.forget X).mapIso i) (Over.w i.hom)
 
-@[simp]
-protected theorem lift_mk {α : Sort*} {X : C} (F : ∀ ⦃A : C⦄ (f : A ⟶ X) [Mono f], α) {h A}
-    (f : A ⟶ X) [Mono f] : Subobject.lift F h (Subobject.mk f) = F f :=
-  rfl
-
 noncomputable def equivMonoOver (X : C) : Subobject X ≌ MonoOver X :=
   ThinSkeleton.equivalence _
 
@@ -163,14 +160,6 @@ theorem arrow_congr {A : C} (X Y : Subobject A) (h : X = Y) :
     eqToHom (congr_arg (fun X : Subobject A => (X : C)) h) ≫ Y.arrow = X.arrow := by
   induction h
   simp
-
-@[simp]
-theorem representative_coe (Y : Subobject X) : (representative.obj Y : C) = (Y : C) :=
-  rfl
-
-@[simp]
-theorem representative_arrow (Y : Subobject X) : (representative.obj Y).arrow = Y.arrow :=
-  rfl
 
 @[reassoc (attr := simp)]
 theorem underlying_arrow {X : C} {Y Z : Subobject X} (f : Y ⟶ Z) :
@@ -390,11 +379,6 @@ theorem lower_iso (F₁ F₂ : MonoOver X ⥤ MonoOver Y) (h : F₁ ≅ F₂) : 
 def lower₂ (F : MonoOver X ⥤ MonoOver Y ⥤ MonoOver Z) : Subobject X ⥤ Subobject Y ⥤ Subobject Z :=
   ThinSkeleton.map₂ F
 
-@[simp]
-theorem lower_comm (F : MonoOver Y ⥤ MonoOver X) :
-    toThinSkeleton _ ⋙ lower F = F ⋙ toThinSkeleton _ :=
-  rfl
-
 def lowerAdjunction {A : C} {B : D} {L : MonoOver A ⥤ MonoOver B} {R : MonoOver B ⥤ MonoOver A}
     (h : L ⊣ R) : lower L ⊣ lower R :=
   ThinSkeleton.lowerAdjunction _ _ h
@@ -467,16 +451,6 @@ def mapIsoToOrderIso (e : X ≅ Y) : Subobject X ≃o Subobject Y where
       apply_fun (map e.hom).obj at h
       · exact h
       · apply Functor.monotone
-
-@[simp]
-theorem mapIsoToOrderIso_apply (e : X ≅ Y) (P : Subobject X) :
-    mapIsoToOrderIso e P = (map e.hom).obj P :=
-  rfl
-
-@[simp]
-theorem mapIsoToOrderIso_symm_apply (e : X ≅ Y) (Q : Subobject Y) :
-    (mapIsoToOrderIso e).symm Q = (map e.inv).obj Q :=
-  rfl
 
 def mapPullbackAdj [HasPullbacks C] (f : X ⟶ Y) [Mono f] : map f ⊣ pullback f :=
   lowerAdjunction (MonoOver.mapPullbackAdj f)

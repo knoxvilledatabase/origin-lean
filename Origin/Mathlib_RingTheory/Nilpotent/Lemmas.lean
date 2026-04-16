@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Quotient.Basic
 import Mathlib.RingTheory.Ideal.Maps
 import Mathlib.RingTheory.Nilpotent.Defs
 
+noncomputable section
+
 /-!
 # Nilpotent elements
 

@@ -9,6 +9,8 @@ import Mathlib.Algebra.Order.Sub.Unbundled.Basic
 import Mathlib.Algebra.Group.Equiv.Basic
 import Mathlib.Algebra.Group.Even
 
+noncomputable section
+
 /-!
 # Lemmas about subtraction in unbundled canonically ordered monoids
 -/

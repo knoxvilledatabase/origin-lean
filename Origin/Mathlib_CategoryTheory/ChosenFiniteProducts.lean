@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Monoidal.OfChosenFiniteProducts.Symmetric
 import Mathlib.CategoryTheory.Limits.Constructions.FiniteProductsOfBinaryProducts
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.BinaryProducts
 
+noncomputable section
+
 /-!
 # Categories with chosen finite products
 
@@ -187,7 +189,6 @@ lemma rightUnitor_inv_snd (X : C) :
     (ρ_ X).inv ≫ snd _ _ = toUnit _ := toUnit_unique _ _
 
 noncomputable
-
 def ofFiniteProducts
     (C : Type u) [Category.{v} C] [Limits.HasFiniteProducts C] :
     ChosenFiniteProducts C where
@@ -470,10 +471,6 @@ def oplaxMonoidalOfChosenFiniteProducts : F.OplaxMonoidal where
     · exact toUnit_unique _ _
 
 attribute [local instance] oplaxMonoidalOfChosenFiniteProducts
-
-lemma η_of_chosenFiniteProducts : η F = terminalComparison F := rfl
-
-lemma δ_of_chosenFiniteProducts (X Y : C) : δ F X Y = prodComparison F X Y := rfl
 
 open Limits
 

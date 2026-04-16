@@ -7,6 +7,8 @@ import Mathlib.Topology.CompactOpen
 import Mathlib.Dynamics.Ergodic.MeasurePreserving
 import Mathlib.MeasureTheory.Measure.Regular
 
+noncomputable section
+
 /-!
 # Continuity of the preimage of a set under a measure preserving continuous function
 

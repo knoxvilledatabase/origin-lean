@@ -1,6 +1,6 @@
 /-
 Extracted from Geometry/Manifold/SmoothManifoldWithCorners.lean
-Genuine: 176 | Conflates: 14 | Dissolved: 0 | Infrastructure: 32
+Genuine: 177 | Conflates: 14 | Dissolved: 0 | Infrastructure: 32
 -/
 import Origin.Core
 import Mathlib.Analysis.Convex.Normed
@@ -8,6 +8,8 @@ import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Data.Bundle
 import Mathlib.Geometry.Manifold.ChartedSpace
+
+noncomputable section
 
 /-!
 # Smooth manifolds (possibly with boundary or corners)
@@ -160,6 +162,8 @@ def modelWithCornersSelf (𝕜 : Type*) [NontriviallyNormedField 𝕜] (E : Type
   continuous_toFun := continuous_id
   continuous_invFun := continuous_id
 
+@[inherit_doc] scoped[Manifold] notation "𝓘(" 𝕜 ", " E ")" => modelWithCornersSelf 𝕜 E
+
 scoped[Manifold] notation "𝓘(" 𝕜 ")" => modelWithCornersSelf 𝕜 𝕜
 
 section
@@ -193,17 +197,7 @@ theorem toPartialEquiv_coe : (I.toPartialEquiv : H → E) = I :=
   rfl
 
 @[simp, mfld_simps]
-theorem mk_coe (e : PartialEquiv H E) (a b c d d') :
-    ((ModelWithCorners.mk e a b c d d' : ModelWithCorners 𝕜 E H) : H → E) = (e : H → E) :=
-  rfl
-
-@[simp, mfld_simps]
 theorem toPartialEquiv_coe_symm : (I.toPartialEquiv.symm : E → H) = I.symm :=
-  rfl
-
-@[simp, mfld_simps]
-theorem mk_symm (e : PartialEquiv H E) (a b c d d') :
-    (ModelWithCorners.mk e a b c d d' : ModelWithCorners 𝕜 E H).symm = e.symm :=
   rfl
 
 @[continuity]
@@ -342,6 +336,9 @@ protected theorem secondCountableTopology [SecondCountableTopology E] (I : Model
   I.isClosedEmbedding.isEmbedding.secondCountableTopology
 
 include I in
+/-- Every smooth manifold is a Fréchet space (T1 space) -- regardless of whether it is
+
+Hausdorff. -/
 
 protected theorem t1Space (M : Type*) [TopologicalSpace M] [ChartedSpace H M] : T1Space M := by
   have : T2Space H := I.isClosedEmbedding.toIsEmbedding.t2Space
@@ -352,18 +349,6 @@ end ModelWithCorners
 section
 
 variable (𝕜 E)
-
-@[simp, mfld_simps]
-theorem modelWithCornersSelf_partialEquiv : 𝓘(𝕜, E).toPartialEquiv = PartialEquiv.refl E :=
-  rfl
-
-@[simp, mfld_simps]
-theorem modelWithCornersSelf_coe : (𝓘(𝕜, E) : E → E) = id :=
-  rfl
-
-@[simp, mfld_simps]
-theorem modelWithCornersSelf_coe_symm : (𝓘(𝕜, E).symm : E → E) = id :=
-  rfl
 
 end
 
@@ -415,22 +400,6 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCom
   {H : Type*} [TopologicalSpace H] {H' : Type*} [TopologicalSpace H'] {G : Type*}
   [TopologicalSpace G] {I : ModelWithCorners 𝕜 E H}
   {J : ModelWithCorners 𝕜 F G}
-
-@[simp, mfld_simps]
-theorem modelWithCorners_prod_toPartialEquiv :
-    (I.prod J).toPartialEquiv = I.toPartialEquiv.prod J.toPartialEquiv :=
-  rfl
-
-@[simp, mfld_simps]
-theorem modelWithCorners_prod_coe (I : ModelWithCorners 𝕜 E H) (I' : ModelWithCorners 𝕜 E' H') :
-    (I.prod I' : _ × _ → _ × _) = Prod.map I I' :=
-  rfl
-
-@[simp, mfld_simps]
-theorem modelWithCorners_prod_coe_symm (I : ModelWithCorners 𝕜 E H)
-    (I' : ModelWithCorners 𝕜 E' H') :
-    ((I.prod I').symm : _ × _ → _ × _) = Prod.map I.symm I'.symm :=
-  rfl
 
 theorem modelWithCornersSelf_prod : 𝓘(𝕜, E × F) = 𝓘(𝕜, E).prod 𝓘(𝕜, F) := by ext1 <;> simp
 
@@ -1027,12 +996,6 @@ variable (I) in
 def extChartAt (x : M) : PartialEquiv M E :=
   (chartAt H x).extend I
 
-theorem extChartAt_coe (x : M) : ⇑(extChartAt I x) = I ∘ chartAt H x :=
-  rfl
-
-theorem extChartAt_coe_symm (x : M) : ⇑(extChartAt I x).symm = (chartAt H x).symm ∘ I.symm :=
-  rfl
-
 variable (I) in
 
 theorem extChartAt_source (x : M) : (extChartAt I x).source = (chartAt H x).source :=
@@ -1135,8 +1098,6 @@ theorem extChartAt_target_union_compl_range_mem_nhds_of_mem {y : E} {x : M}
     (hy : y ∈ (extChartAt I x).target) : (extChartAt I x).target ∪ (range I)ᶜ ∈ 𝓝 y := by
   rw [← nhdsWithin_univ, ← union_compl_self (range I), nhdsWithin_union]
   exact Filter.union_mem_sup (extChartAt_target_mem_nhdsWithin_of_mem hy) self_mem_nhdsWithin
-
-extChartAt_target_union_comp_range_mem_nhds_of_mem :=
 
 extChartAt_target_union_compl_range_mem_nhds_of_mem
 
@@ -1370,17 +1331,8 @@ theorem writtenInExtChartAt_extChartAt_symm {x : M} {y : E} (h : y ∈ (extChart
 
 variable (𝕜)
 
-theorem extChartAt_self_eq {x : H} : ⇑(extChartAt I x) = I :=
-  rfl
-
-theorem extChartAt_self_apply {x y : H} : extChartAt I x y = I y :=
-  rfl
-
 theorem extChartAt_model_space_eq_id (x : E) : extChartAt 𝓘(𝕜, E) x = PartialEquiv.refl E := by
   simp only [mfld_simps]
-
-theorem ext_chart_model_space_apply {x y : E} : extChartAt 𝓘(𝕜, E) x y = y :=
-  rfl
 
 variable {𝕜}
 
@@ -1456,6 +1408,13 @@ end Topology
 section TangentSpace
 
 set_option linter.unusedVariables false in
+/-- The tangent space at a point of the manifold `M`. It is just `E`. We could use instead
+
+`(tangentBundleCore I M).to_topological_vector_bundle_core.fiber x`, but we use `E` to help the
+
+kernel.
+
+-/
 
 -- CONFLATES (assumes ground = zero): TangentSpace
 @[nolint unusedArguments]

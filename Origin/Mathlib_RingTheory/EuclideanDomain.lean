@@ -1,12 +1,14 @@
 /-
 Extracted from RingTheory/EuclideanDomain.lean
-Genuine: 4 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.GCDMonoid.Basic
 import Mathlib.Algebra.EuclideanDomain.Basic
 import Mathlib.RingTheory.Ideal.Basic
 import Mathlib.RingTheory.PrincipalIdealDomain
+
+noncomputable section
 
 /-!
 # Lemmas about Euclidean domains
@@ -28,15 +30,33 @@ section GCDMonoid
 
 variable {R : Type*} [EuclideanDomain R] [GCDMonoid R] {p q : R}
 
--- DISSOLVED: gcd_ne_zero_of_left
+theorem gcd_ne_zero_of_left (hp : p ≠ 0) : GCDMonoid.gcd p q ≠ 0 := fun h =>
+  hp <| eq_zero_of_zero_dvd (h ▸ gcd_dvd_left p q)
 
--- DISSOLVED: gcd_ne_zero_of_right
+theorem gcd_ne_zero_of_right (hp : q ≠ 0) : GCDMonoid.gcd p q ≠ 0 := fun h =>
+  hp <| eq_zero_of_zero_dvd (h ▸ gcd_dvd_right p q)
 
--- DISSOLVED: left_div_gcd_ne_zero
+theorem left_div_gcd_ne_zero {p q : R} (hp : p ≠ 0) : p / GCDMonoid.gcd p q ≠ 0 := by
+  obtain ⟨r, hr⟩ := GCDMonoid.gcd_dvd_left p q
+  obtain ⟨pq0, r0⟩ : GCDMonoid.gcd p q ≠ 0 ∧ r ≠ 0 := mul_ne_zero_iff.mp (hr ▸ hp)
+  nth_rw 1 [hr]
+  rw [mul_comm, mul_div_cancel_right₀ _ pq0]
+  exact r0
 
--- DISSOLVED: right_div_gcd_ne_zero
+theorem right_div_gcd_ne_zero {p q : R} (hq : q ≠ 0) : q / GCDMonoid.gcd p q ≠ 0 := by
+  obtain ⟨r, hr⟩ := GCDMonoid.gcd_dvd_right p q
+  obtain ⟨pq0, r0⟩ : GCDMonoid.gcd p q ≠ 0 ∧ r ≠ 0 := mul_ne_zero_iff.mp (hr ▸ hq)
+  nth_rw 1 [hr]
+  rw [mul_comm, mul_div_cancel_right₀ _ pq0]
+  exact r0
 
--- DISSOLVED: isCoprime_div_gcd_div_gcd
+theorem isCoprime_div_gcd_div_gcd (hq : q ≠ 0) :
+    IsCoprime (p / GCDMonoid.gcd p q) (q / GCDMonoid.gcd p q) :=
+  (gcd_isUnit_iff _ _).1 <|
+    isUnit_gcd_of_eq_mul_gcd
+        (EuclideanDomain.mul_div_cancel' (gcd_ne_zero_of_right hq) <| gcd_dvd_left _ _).symm
+        (EuclideanDomain.mul_div_cancel' (gcd_ne_zero_of_right hq) <| gcd_dvd_right _ _).symm <|
+      gcd_ne_zero_of_right hq
 
 end GCDMonoid
 
@@ -63,7 +83,11 @@ theorem gcd_isUnit_iff [DecidableEq α] {x y : α} : IsUnit (gcd x y) ↔ IsCopr
   letI := EuclideanDomain.gcdMonoid α
   _root_.gcd_isUnit_iff x y
 
--- DISSOLVED: isCoprime_of_dvd
+theorem isCoprime_of_dvd {x y : α} (nonzero : ¬(x = 0 ∧ y = 0))
+    (H : ∀ z ∈ nonunits α, z ≠ 0 → z ∣ x → ¬z ∣ y) : IsCoprime x y :=
+  letI := Classical.decEq α
+  letI := EuclideanDomain.gcdMonoid α
+  _root_.isCoprime_of_dvd x y nonzero H
 
 theorem dvd_or_coprime (x y : α) (h : Irreducible x) :
     x ∣ y ∨ IsCoprime x y :=

@@ -5,6 +5,8 @@ Genuine: 32 | Conflates: 0 | Dissolved: 0 | Infrastructure: 25
 import Origin.Core
 import Mathlib.Data.Set.Lattice
 
+noncomputable section
+
 /-!
 # Formal concept analysis
 
@@ -57,12 +59,6 @@ variable (r)
 theorem gc_intentClosure_extentClosure :
     GaloisConnection (toDual ∘ intentClosure r) (extentClosure r ∘ ofDual) := fun _ _ =>
   subset_intentClosure_iff_subset_extentClosure
-
-theorem intentClosure_swap (t : Set β) : intentClosure (swap r) t = extentClosure r t :=
-  rfl
-
-theorem extentClosure_swap (s : Set α) : extentClosure (swap r) s = intentClosure r s :=
-  rfl
 
 @[simp]
 theorem intentClosure_empty : intentClosure r ∅ = univ :=
@@ -253,56 +249,6 @@ instance : CompleteLattice (Concept α β r) :=
     inf := Concept.instInfConcept.min
     sInf_le := fun _ _ => biInter_subset_of_mem
     le_sInf := fun _ _ => subset_iInter₂ }
-
-@[simp]
-theorem top_fst : (⊤ : Concept α β r).fst = univ :=
-  rfl
-
-@[simp]
-theorem top_snd : (⊤ : Concept α β r).snd = intentClosure r univ :=
-  rfl
-
-@[simp]
-theorem bot_fst : (⊥ : Concept α β r).fst = extentClosure r univ :=
-  rfl
-
-@[simp]
-theorem bot_snd : (⊥ : Concept α β r).snd = univ :=
-  rfl
-
-@[simp]
-theorem sup_fst (c d : Concept α β r) : (c ⊔ d).fst = extentClosure r (c.snd ∩ d.snd) :=
-  rfl
-
-@[simp]
-theorem sup_snd (c d : Concept α β r) : (c ⊔ d).snd = c.snd ∩ d.snd :=
-  rfl
-
-@[simp]
-theorem inf_fst (c d : Concept α β r) : (c ⊓ d).fst = c.fst ∩ d.fst :=
-  rfl
-
-@[simp]
-theorem inf_snd (c d : Concept α β r) : (c ⊓ d).snd = intentClosure r (c.fst ∩ d.fst) :=
-  rfl
-
-@[simp]
-theorem sSup_fst (S : Set (Concept α β r)) :
-    (sSup S).fst = extentClosure r (⋂ c ∈ S, (c : Concept _ _ _).snd) :=
-  rfl
-
-@[simp]
-theorem sSup_snd (S : Set (Concept α β r)) : (sSup S).snd = ⋂ c ∈ S, (c : Concept _ _ _).snd :=
-  rfl
-
-@[simp]
-theorem sInf_fst (S : Set (Concept α β r)) : (sInf S).fst = ⋂ c ∈ S, (c : Concept _ _ _).fst :=
-  rfl
-
-@[simp]
-theorem sInf_snd (S : Set (Concept α β r)) :
-    (sInf S).snd = intentClosure r (⋂ c ∈ S, (c : Concept _ _ _).fst) :=
-  rfl
 
 instance : Inhabited (Concept α β r) :=
   ⟨⊥⟩

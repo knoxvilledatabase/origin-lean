@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/Normed/Group/Hom.lean
-Genuine: 88 | Conflates: 1 | Dissolved: 1 | Infrastructure: 46
+Genuine: 88 | Conflates: 2 | Dissolved: 0 | Infrastructure: 46
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Group.Int
 import Mathlib.Analysis.Normed.Group.Uniform
+
+noncomputable section
 
 /-!
 # Normed groups homomorphisms
@@ -102,14 +104,6 @@ theorem toFun_eq_coe : f.toFun = f :=
 theorem coe_mk (f) (h₁) (h₂) (h₃) : ⇑(⟨f, h₁, h₂, h₃⟩ : NormedAddGroupHom V₁ V₂) = f :=
   rfl
 
-@[simp]
-theorem coe_mkNormedAddGroupHom (f : V₁ →+ V₂) (C) (hC) : ⇑(f.mkNormedAddGroupHom C hC) = f :=
-  rfl
-
-@[simp]
-theorem coe_mkNormedAddGroupHom' (f : V₁ →+ V₂) (C) (hC) : ⇑(f.mkNormedAddGroupHom' C hC) = f :=
-  rfl
-
 def toAddMonoidHom (f : NormedAddGroupHom V₁ V₂) : V₁ →+ V₂ :=
   AddMonoidHom.mk' f f.map_add'
 
@@ -120,11 +114,6 @@ theorem coe_toAddMonoidHom : ⇑f.toAddMonoidHom = f :=
 theorem toAddMonoidHom_injective :
     Function.Injective (@NormedAddGroupHom.toAddMonoidHom V₁ V₂ _ _) := fun f g h =>
   coe_inj <| by rw [← coe_toAddMonoidHom f, ← coe_toAddMonoidHom g, h]
-
-@[simp]
-theorem mk_toAddMonoidHom (f) (h₁) (h₂) :
-    (⟨f, h₁, h₂⟩ : NormedAddGroupHom V₁ V₂).toAddMonoidHom = AddMonoidHom.mk' f h₁ :=
-  rfl
 
 theorem bound : ∃ C, 0 < C ∧ ∀ x, ‖f x‖ ≤ C * ‖x‖ :=
   let ⟨_C, hC⟩ := f.bound'
@@ -254,8 +243,6 @@ instance add : Add (NormedAddGroupHom V₁ V₂) :=
 theorem opNorm_add_le : ‖f + g‖ ≤ ‖f‖ + ‖g‖ :=
   mkNormedAddGroupHom_norm_le _ (add_nonneg (opNorm_nonneg _) (opNorm_nonneg _)) _
 
--/
-
 @[simp]
 theorem coe_add (f g : NormedAddGroupHom V₁ V₂) : ⇑(f + g) = f + g :=
   rfl
@@ -316,16 +303,18 @@ def id : NormedAddGroupHom V V :=
 theorem norm_id_le : ‖(id V : NormedAddGroupHom V V)‖ ≤ 1 :=
   opNorm_le_bound _ zero_le_one fun x => by simp
 
--- DISSOLVED: norm_id_of_nontrivial_seminorm
+-- CONFLATES (assumes ground = zero): norm_id_of_nontrivial_seminorm
+theorem norm_id_of_nontrivial_seminorm (h : ∃ x : V, ‖x‖ ≠ 0) : ‖id V‖ = 1 :=
+  le_antisymm (norm_id_le V) <| by
+    let ⟨x, hx⟩ := h
+    have := (id V).ratio_le_opNorm x
+    rwa [id_apply, div_self hx] at this
 
 -- CONFLATES (assumes ground = zero): norm_id
 theorem norm_id {V : Type*} [NormedAddCommGroup V] [Nontrivial V] : ‖id V‖ = 1 := by
   refine norm_id_of_nontrivial_seminorm V ?_
   obtain ⟨x, hx⟩ := exists_ne (0 : V)
   exact ⟨x, ne_of_gt (norm_pos_iff.2 hx)⟩
-
-theorem coe_id : (NormedAddGroupHom.id V : V → V) = _root_.id :=
-  rfl
 
 /-! ### The negation of a normed group hom -/
 
@@ -352,10 +341,6 @@ instance sub : Sub (NormedAddGroupHom V₁ V₂) :=
       bound' := by
         simp only [AddMonoidHom.sub_apply, AddMonoidHom.toFun_eq_coe, sub_eq_add_neg]
         exact (f + -g).bound' }⟩
-
-@[simp]
-theorem coe_sub (f g : NormedAddGroupHom V₁ V₂) : ⇑(f - g) = f - g :=
-  rfl
 
 @[simp]
 theorem sub_apply (f g : NormedAddGroupHom V₁ V₂) (v : V₁) :
@@ -416,14 +401,6 @@ instance nsmul : SMul ℕ (NormedAddGroupHom V₁ V₂) where
           rw [Pi.smul_apply, nsmul_eq_mul, mul_assoc]
           exact (norm_nsmul_le _ _).trans (by gcongr; apply hb)⟩ }
 
-@[simp]
-theorem coe_nsmul (r : ℕ) (f : NormedAddGroupHom V₁ V₂) : ⇑(r • f) = r • ⇑f :=
-  rfl
-
-@[simp]
-theorem nsmul_apply (r : ℕ) (f : NormedAddGroupHom V₁ V₂) (v : V₁) : (r • f) v = r • f v :=
-  rfl
-
 instance zsmul : SMul ℤ (NormedAddGroupHom V₁ V₂) where
   smul z f :=
     { toFun := z • ⇑f
@@ -433,14 +410,6 @@ instance zsmul : SMul ℤ (NormedAddGroupHom V₁ V₂) where
         ⟨‖z‖ • b, fun v => by
           rw [Pi.smul_apply, smul_eq_mul, mul_assoc]
           exact (norm_zsmul_le _ _).trans (by gcongr; apply hb)⟩ }
-
-@[simp]
-theorem coe_zsmul (r : ℤ) (f : NormedAddGroupHom V₁ V₂) : ⇑(r • f) = r • ⇑f :=
-  rfl
-
-@[simp]
-theorem zsmul_apply (r : ℤ) (f : NormedAddGroupHom V₁ V₂) (v : V₁) : (r • f) v = r • f v :=
-  rfl
 
 /-! ### Normed group structure on normed group homs -/
 
@@ -542,10 +511,6 @@ theorem comp_assoc {V₄ : Type*} [SeminormedAddCommGroup V₄] (h : NormedAddGr
   ext
   rfl
 
-theorem coe_comp (f : NormedAddGroupHom V₁ V₂) (g : NormedAddGroupHom V₂ V₃) :
-    (g.comp f : V₁ → V₃) = (g : V₂ → V₃) ∘ (f : V₁ → V₂) :=
-  rfl
-
 end NormedAddGroupHom
 
 namespace NormedAddGroupHom
@@ -558,9 +523,6 @@ def incl (s : AddSubgroup V) : NormedAddGroupHom s V where
   toFun := (Subtype.val : s → V)
   map_add' _ _ := AddSubgroup.coe_add _ _ _
   bound' := ⟨1, fun v => by rw [one_mul, AddSubgroup.coe_norm]⟩
-
-theorem norm_incl {V' : AddSubgroup V} (x : V') : ‖incl _ x‖ = ‖x‖ :=
-  rfl
 
 /-!### Kernel -/
 
@@ -607,8 +569,6 @@ variable (f : NormedAddGroupHom V₁ V₂) (g : NormedAddGroupHom V₂ V₃)
 
 def range : AddSubgroup V₂ :=
   f.toAddMonoidHom.range
-
-theorem mem_range (v : V₂) : v ∈ f.range ↔ ∃ w, f w = v := Iff.rfl
 
 @[simp]
 theorem mem_range_self (v : V₁) : f v ∈ f.range :=
@@ -716,17 +676,6 @@ theorem ι_comp_lift (φ : NormedAddGroupHom V₁ V) (h : f.comp φ = g.comp φ)
     (ι _ _).comp (lift φ h) = φ := by
   ext
   rfl
-
-@[simps]
-def liftEquiv :
-    { φ : NormedAddGroupHom V₁ V // f.comp φ = g.comp φ } ≃
-      NormedAddGroupHom V₁ (f.equalizer g) where
-  toFun φ := lift φ φ.prop
-  invFun ψ := ⟨(ι f g).comp ψ, by rw [← comp_assoc, ← comp_assoc, comp_ι_eq]⟩
-  left_inv φ := by simp
-  right_inv ψ := by
-    ext
-    rfl
 
 def map (φ : NormedAddGroupHom V₁ V₂) (ψ : NormedAddGroupHom W₁ W₂) (hf : ψ.comp f₁ = f₂.comp φ)
     (hg : ψ.comp g₁ = g₂.comp φ) : NormedAddGroupHom (f₁.equalizer g₁) (f₂.equalizer g₂) :=

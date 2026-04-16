@@ -1,6 +1,6 @@
 /-
 Extracted from Data/Num/Lemmas.lean
-Genuine: 178 | Conflates: 0 | Dissolved: 2 | Infrastructure: 40
+Genuine: 179 | Conflates: 0 | Dissolved: 1 | Infrastructure: 40
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Ring.Cast
@@ -9,6 +9,8 @@ import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.Nat.PSub
 import Mathlib.Data.Nat.Size
 import Mathlib.Data.Num.Bitwise
+
+noncomputable section
 
 /-!
 # Properties of the binary representation of integers
@@ -24,10 +26,6 @@ variable {α : Type*}
 
 @[simp, norm_cast]
 theorem cast_one [One α] [Add α] : ((1 : PosNum) : α) = 1 :=
-  rfl
-
-@[simp]
-theorem cast_one' [One α] [Add α] : (PosNum.one : α) = 1 :=
   rfl
 
 @[simp, norm_cast]
@@ -226,10 +224,6 @@ theorem add_ofNat' (m n) : Num.ofNat' (m + n) = Num.ofNat' m + Num.ofNat' n := b
 
 @[simp, norm_cast]
 theorem cast_zero [Zero α] [One α] [Add α] : ((0 : Num) : α) = 0 :=
-  rfl
-
-@[simp]
-theorem cast_zero' [Zero α] [One α] [Add α] : (Num.zero : α) = 0 :=
   rfl
 
 @[simp, norm_cast]
@@ -848,10 +842,6 @@ open PosNum
 theorem cast_zero [Zero α] [One α] [Add α] [Neg α] : ((0 : ZNum) : α) = 0 :=
   rfl
 
-@[simp]
-theorem cast_zero' [Zero α] [One α] [Add α] [Neg α] : (ZNum.zero : α) = 0 :=
-  rfl
-
 @[simp, norm_cast]
 theorem cast_one [Zero α] [One α] [Add α] [Neg α] : ((1 : ZNum) : α) = 1 :=
   rfl
@@ -871,12 +861,6 @@ theorem cast_zneg [AddGroup α] [One α] : ∀ n, ((-n : ZNum) : α) = -n
   | neg _p => (neg_neg _).symm
 
 theorem neg_zero : (-0 : ZNum) = 0 :=
-  rfl
-
-theorem zneg_pos (n : PosNum) : -pos n = neg n :=
-  rfl
-
-theorem zneg_neg (n : PosNum) : -neg n = pos n :=
   rfl
 
 theorem zneg_zneg (n : ZNum) : - -n = n := by cases n <;> rfl
@@ -1445,7 +1429,9 @@ instance PosNum.decidableDvd : DecidableRel ((· ∣ ·) : PosNum → PosNum →
 
 namespace ZNum
 
--- DISSOLVED: div_zero
+@[simp]
+protected theorem div_zero (n : ZNum) : n / 0 = 0 :=
+  show n.div 0 = 0 by cases n <;> rfl
 
 @[simp, norm_cast]
 theorem div_to_int : ∀ n d, ((n / d : ZNum) : ℤ) = n / d

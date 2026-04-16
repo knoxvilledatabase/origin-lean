@@ -1,9 +1,11 @@
 /-
 Extracted from MeasureTheory/Function/SimpleFunc.lean
-Genuine: 129 | Conflates: 0 | Dissolved: 7 | Infrastructure: 75
+Genuine: 140 | Conflates: 0 | Dissolved: 0 | Infrastructure: 75
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
+
+noncomputable section
 
 /-!
 # Simple functions
@@ -63,11 +65,6 @@ theorem finite_range (f : α →ₛ β) : (Set.range f).Finite :=
 theorem measurableSet_fiber (f : α →ₛ β) (x : β) : MeasurableSet (f ⁻¹' {x}) :=
   f.measurableSet_fiber' x
 
-@[simp] theorem coe_mk (f : α → β) (h h') : ⇑(mk f h h') = f := rfl
-
-theorem apply_mk (f : α → β) (h h') (x : α) : SimpleFunc.mk f h h' x = f x :=
-  rfl
-
 def ofFinite [Finite α] [MeasurableSingletonClass α] (f : α → β) : α →ₛ β where
   toFun := f
   measurableSet_fiber' x := (toFinite (f ⁻¹' {x})).measurableSet
@@ -89,7 +86,10 @@ theorem mem_range_self (f : α →ₛ β) (x : α) : f x ∈ f.range :=
 theorem coe_range (f : α →ₛ β) : (↑f.range : Set β) = Set.range f :=
   f.finite_range.coe_toFinset
 
--- DISSOLVED: mem_range_of_measure_ne_zero
+theorem mem_range_of_measure_ne_zero {f : α →ₛ β} {x : β} {μ : Measure α} (H : μ (f ⁻¹' {x}) ≠ 0) :
+    x ∈ f.range :=
+  let ⟨a, ha⟩ := nonempty_of_measure_ne_zero H
+  mem_range.2 ⟨a, ha⟩
 
 theorem forall_mem_range {f : α →ₛ β} {p : β → Prop} : (∀ y ∈ f.range, p y) ↔ ∀ x, p (f x) := by
   simp only [mem_range, Set.forall_mem_range]
@@ -176,10 +176,6 @@ theorem coe_piecewise {s : Set α} (hs : MeasurableSet s) (f g : α →ₛ β) :
     ⇑(piecewise s hs f g) = s.piecewise f g :=
   rfl
 
-theorem piecewise_apply {s : Set α} (hs : MeasurableSet s) (f g : α →ₛ β) (a) :
-    piecewise s hs f g a = if a ∈ s then f a else g a :=
-  rfl
-
 @[simp]
 theorem piecewise_compl {s : Set α} (hs : MeasurableSet sᶜ) (f g : α →ₛ β) :
     piecewise sᶜ hs f g = piecewise s hs.of_compl g f :=
@@ -219,17 +215,10 @@ def bind (f : α →ₛ β) (g : β → α →ₛ γ) : α →ₛ γ :=
     (f.finite_range.biUnion fun b _ => (g b).finite_range).subset <| by
       rintro _ ⟨a, rfl⟩; simp⟩
 
-@[simp]
-theorem bind_apply (f : α →ₛ β) (g : β → α →ₛ γ) (a) : f.bind g a = g (f a) a :=
-  rfl
-
 def map (g : β → γ) (f : α →ₛ β) : α →ₛ γ :=
   bind f (const α ∘ g)
 
 theorem map_apply (g : β → γ) (f : α →ₛ β) (a) : f.map g a = g (f a) :=
-  rfl
-
-theorem map_map (g : β → γ) (h : γ → δ) (f : α →ₛ β) : (f.map g).map h = f.map (h ∘ g) :=
   rfl
 
 @[simp]
@@ -239,10 +228,6 @@ theorem coe_map (g : β → γ) (f : α →ₛ β) : (f.map g : α → γ) = g �
 @[simp]
 theorem range_map [DecidableEq γ] (g : β → γ) (f : α →ₛ β) : (f.map g).range = f.range.image g :=
   Finset.coe_injective <| by simp only [coe_range, coe_map, Finset.coe_image, range_comp]
-
-@[simp]
-theorem map_const (g : β → γ) (b : β) : (const α b).map g = const α (g b) :=
-  rfl
 
 theorem map_preimage (f : α →ₛ β) (g : β → γ) (s : Set γ) :
     f.map g ⁻¹' s = f ⁻¹' ↑{b ∈ f.range | g b ∈ s} := by
@@ -301,16 +286,8 @@ theorem extend_comp_eq [MeasurableSpace β] (f₁ : α →ₛ γ) {g : α → β
 def seq (f : α →ₛ β → γ) (g : α →ₛ β) : α →ₛ γ :=
   f.bind fun f => g.map f
 
-@[simp]
-theorem seq_apply (f : α →ₛ β → γ) (g : α →ₛ β) (a : α) : f.seq g a = f a (g a) :=
-  rfl
-
 def pair (f : α →ₛ β) (g : α →ₛ γ) : α →ₛ β × γ :=
   (f.map Prod.mk).seq g
-
-@[simp]
-theorem pair_apply (f : α →ₛ β) (g : α →ₛ γ) (a) : pair f g a = (f a, g a) :=
-  rfl
 
 theorem pair_preimage (f : α →ₛ β) (g : α →ₛ γ) (s : Set β) (t : Set γ) :
     pair f g ⁻¹' s ×ˢ t = f ⁻¹' s ∩ g ⁻¹' t :=
@@ -322,8 +299,6 @@ theorem pair_preimage_singleton (f : α →ₛ β) (g : α →ₛ γ) (b : β) (
   exact pair_preimage _ _ _ _
 
 @[simp] theorem map_fst_pair (f : α →ₛ β) (g : α →ₛ γ) : (f.pair g).map Prod.fst = f := rfl
-
-@[simp] theorem map_snd_pair (f : α →ₛ β) (g : α →ₛ γ) : (f.pair g).map Prod.snd = g := rfl
 
 @[simp]
 theorem bind_const (f : α →ₛ β) : f.bind (const α) = f := by ext; simp
@@ -353,10 +328,6 @@ instance instInf [Min β] : Min (α →ₛ β) :=
 instance instLE [LE β] : LE (α →ₛ β) :=
   ⟨fun f g => ∀ a, f a ≤ g a⟩
 
-@[to_additive (attr := simp)]
-theorem const_one [One β] : const α (1 : β) = 1 :=
-  rfl
-
 @[to_additive (attr := simp, norm_cast)]
 theorem coe_one [One β] : ⇑(1 : α →ₛ β) = 1 :=
   rfl
@@ -373,34 +344,7 @@ theorem coe_inv [Inv β] (f : α →ₛ β) : ⇑(f⁻¹) = (⇑f)⁻¹ :=
 theorem coe_div [Div β] (f g : α →ₛ β) : ⇑(f / g) = ⇑f / ⇑g :=
   rfl
 
-@[simp, norm_cast]
-theorem coe_le [Preorder β] {f g : α →ₛ β} : (f : α → β) ≤ g ↔ f ≤ g :=
-  Iff.rfl
-
-@[simp, norm_cast]
-theorem coe_sup [Max β] (f g : α →ₛ β) : ⇑(f ⊔ g) = ⇑f ⊔ ⇑g :=
-  rfl
-
-@[simp, norm_cast]
-theorem coe_inf [Min β] (f g : α →ₛ β) : ⇑(f ⊓ g) = ⇑f ⊓ ⇑g :=
-  rfl
-
-@[to_additive]
-theorem mul_apply [Mul β] (f g : α →ₛ β) (a : α) : (f * g) a = f a * g a :=
-  rfl
-
-@[to_additive]
-theorem div_apply [Div β] (f g : α →ₛ β) (x : α) : (f / g) x = f x / g x :=
-  rfl
-
-@[to_additive]
-theorem inv_apply [Inv β] (f : α →ₛ β) (x : α) : f⁻¹ x = (f x)⁻¹ :=
-  rfl
-
 theorem sup_apply [Max β] (f g : α →ₛ β) (a : α) : (f ⊔ g) a = f a ⊔ g a :=
-  rfl
-
-theorem inf_apply [Min β] (f g : α →ₛ β) (a : α) : (f ⊓ g) a = f a ⊓ g a :=
   rfl
 
 @[to_additive (attr := simp)]
@@ -422,13 +366,6 @@ theorem eq_zero_of_mem_range_zero [Zero β] : ∀ {y : β}, y ∈ (0 : α →ₛ
 
 @[to_additive]
 theorem mul_eq_map₂ [Mul β] (f g : α →ₛ β) : f * g = (pair f g).map fun p : β × β => p.1 * p.2 :=
-  rfl
-
-theorem sup_eq_map₂ [Max β] (f g : α →ₛ β) : f ⊔ g = (pair f g).map fun p : β × β => p.1 ⊔ p.2 :=
-  rfl
-
-@[to_additive]
-theorem const_mul_eq_map [Mul β] (f : α →ₛ β) (b : β) : const α b * f = f.map fun a => b * a :=
   rfl
 
 @[to_additive]
@@ -460,17 +397,11 @@ instance hasNatPow [Monoid β] : Pow (α →ₛ β) ℕ :=
 theorem coe_pow [Monoid β] (f : α →ₛ β) (n : ℕ) : ⇑(f ^ n) = (⇑f) ^ n :=
   rfl
 
-theorem pow_apply [Monoid β] (n : ℕ) (f : α →ₛ β) (a : α) : (f ^ n) a = f a ^ n :=
-  rfl
-
 instance hasIntPow [DivInvMonoid β] : Pow (α →ₛ β) ℤ :=
   ⟨fun f n => f.map (· ^ n)⟩
 
 @[simp]
 theorem coe_zpow [DivInvMonoid β] (f : α →ₛ β) (z : ℤ) : ⇑(f ^ z) = (⇑f) ^ z :=
-  rfl
-
-theorem zpow_apply [DivInvMonoid β] (z : ℤ) (f : α →ₛ β) (a : α) : (f ^ z) a = f a ^ z :=
   rfl
 
 section Additive
@@ -515,9 +446,6 @@ instance instModule [Semiring K] [AddCommMonoid β] [Module K β] : Module K (α
   Function.Injective.module K ⟨⟨fun f => show α → β from f, coe_zero⟩, coe_add⟩
     coe_injective coe_smul
 
-theorem smul_eq_map [SMul K β] (k : K) (f : α →ₛ β) : k • f = f.map (k • ·) :=
-  rfl
-
 section Preorder
 
 variable [Preorder β] {s : Set α} {f f₁ f₂ g g₁ g₂ : α →ₛ β} {hs : MeasurableSet s}
@@ -533,9 +461,13 @@ instance instPreorder : Preorder (α →ₛ β) := Preorder.lift (⇑)
 @[simp] lemma mk_lt_mk {f g : α → β} {hf hg hf' hg'} : mk f hf hf' < mk g hg hg' ↔ f < g := Iff.rfl
 
 @[gcongr] protected alias ⟨_, GCongr.mk_le_mk⟩ := mk_le_mk
+
 @[gcongr] protected alias ⟨_, GCongr.mk_lt_mk⟩ := mk_lt_mk
+
 @[gcongr] protected alias ⟨_, GCongr.coe_le_coe⟩ := coe_le_coe
+
 @[gcongr] protected alias ⟨_, GCongr.coe_lt_coe⟩ := coe_lt_coe
+
 @[gcongr]
 lemma piecewise_mono (hf : ∀ a ∈ s, f₁ a ≤ f₂ a) (hg : ∀ a ∉ s, g₁ a ≤ g₂ a) :
     piecewise s hs f₁ g₁ ≤ piecewise s hs f₂ g₂ := Set.piecewise_mono hf hg
@@ -623,13 +555,20 @@ theorem restrict_preimage (f : α →ₛ β) {s : Set α} (hs : MeasurableSet s)
     (ht : (0 : β) ∉ t) : restrict f s ⁻¹' t = s ∩ f ⁻¹' t := by
   simp [hs, indicator_preimage_of_not_mem _ _ ht, inter_comm]
 
--- DISSOLVED: restrict_preimage_singleton
+theorem restrict_preimage_singleton (f : α →ₛ β) {s : Set α} (hs : MeasurableSet s) {r : β}
+    (hr : r ≠ 0) : restrict f s ⁻¹' {r} = s ∩ f ⁻¹' {r} :=
+  f.restrict_preimage hs hr.symm
 
 theorem mem_restrict_range {r : β} {s : Set α} {f : α →ₛ β} (hs : MeasurableSet s) :
     r ∈ (restrict f s).range ↔ r = 0 ∧ s ≠ univ ∨ r ∈ f '' s := by
   rw [← Finset.mem_coe, coe_range, coe_restrict _ hs, mem_range_indicator]
 
--- DISSOLVED: mem_image_of_mem_range_restrict
+theorem mem_image_of_mem_range_restrict {r : β} {s : Set α} {f : α →ₛ β}
+    (hr : r ∈ (restrict f s).range) (h0 : r ≠ 0) : r ∈ f '' s :=
+  if hs : MeasurableSet s then by simpa [mem_restrict_range hs, h0, -mem_range] using hr
+  else by
+    rw [restrict_of_not_measurable hs] at hr
+    exact (h0 <| eq_zero_of_mem_range_zero hr).elim
 
 @[mono]
 theorem restrict_mono [Preorder β] (s : Set α) {f g : α →ₛ β} (H : f ≤ g) :
@@ -773,7 +712,19 @@ variable {m : MeasurableSpace α} {μ ν : Measure α}
 def lintegral {_m : MeasurableSpace α} (f : α →ₛ ℝ≥0∞) (μ : Measure α) : ℝ≥0∞ :=
   ∑ x ∈ f.range, x * μ (f ⁻¹' {x})
 
--- DISSOLVED: lintegral_eq_of_subset
+theorem lintegral_eq_of_subset (f : α →ₛ ℝ≥0∞) {s : Finset ℝ≥0∞}
+    (hs : ∀ x, f x ≠ 0 → μ (f ⁻¹' {f x}) ≠ 0 → f x ∈ s) :
+    f.lintegral μ = ∑ x ∈ s, x * μ (f ⁻¹' {x}) := by
+  refine Finset.sum_bij_ne_zero (fun r _ _ => r) ?_ ?_ ?_ ?_
+  · simpa only [forall_mem_range, mul_ne_zero_iff, and_imp]
+  · intros
+    assumption
+  · intro b _ hb
+    refine ⟨b, ?_, hb, rfl⟩
+    rw [mem_range, ← preimage_singleton_nonempty]
+    exact nonempty_of_measure_ne_zero (mul_ne_zero_iff.1 hb).2
+  · intros
+    rfl
 
 theorem lintegral_eq_of_subset' (f : α →ₛ ℝ≥0∞) {s : Finset ℝ≥0∞} (hs : f.range \ {0} ⊆ s) :
     f.lintegral μ = ∑ x ∈ s, x * μ (f ⁻¹' {x}) :=
@@ -943,7 +894,11 @@ section FinMeasSupp
 
 open Finset Function
 
--- DISSOLVED: support_eq
+theorem support_eq [MeasurableSpace α] [Zero β] (f : α →ₛ β) :
+    support f = ⋃ y ∈ {y ∈ f.range | y ≠ 0}, f ⁻¹' {y} :=
+  Set.ext fun x => by
+    simp only [mem_support, Set.mem_preimage, mem_filter, mem_range_self, true_and, exists_prop,
+      mem_iUnion, Set.mem_range, mem_singleton_iff, exists_eq_right']
 
 variable {m : MeasurableSpace α} [Zero β] [Zero γ] {μ : Measure α} {f : α →ₛ β}
 
@@ -957,11 +912,19 @@ protected def FinMeasSupp {_m : MeasurableSpace α} (f : α →ₛ β) (μ : Mea
 theorem finMeasSupp_iff_support : f.FinMeasSupp μ ↔ μ (support f) < ∞ :=
   Iff.rfl
 
--- DISSOLVED: finMeasSupp_iff
+theorem finMeasSupp_iff : f.FinMeasSupp μ ↔ ∀ y, y ≠ 0 → μ (f ⁻¹' {y}) < ∞ := by
+  constructor
+  · refine fun h y hy => lt_of_le_of_lt (measure_mono ?_) h
+    exact fun x hx (H : f x = 0) => hy <| H ▸ Eq.symm hx
+  · intro H
+    rw [finMeasSupp_iff_support, support_eq]
+    exact measure_biUnion_lt_top (finite_toSet _) fun y hy ↦ H y (mem_filter.1 hy).2
 
 namespace FinMeasSupp
 
--- DISSOLVED: meas_preimage_singleton_ne_zero
+theorem meas_preimage_singleton_ne_zero (h : f.FinMeasSupp μ) {y : β} (hy : y ≠ 0) :
+    μ (f ⁻¹' {y}) < ∞ :=
+  finMeasSupp_iff.1 h y hy
 
 protected theorem map {g : β → γ} (hf : f.FinMeasSupp μ) (hg : g 0 = 0) : (f.map g).FinMeasSupp μ :=
   flip lt_of_le_of_lt hf (measure_mono <| support_comp_subset hg f)

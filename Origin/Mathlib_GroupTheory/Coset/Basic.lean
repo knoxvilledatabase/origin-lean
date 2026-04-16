@@ -10,6 +10,8 @@ import Mathlib.Data.Set.Pointwise.SMul
 import Mathlib.Data.Setoid.Basic
 import Mathlib.GroupTheory.Coset.Defs
 
+noncomputable section
+
 /-!
 # Cosets
 
@@ -405,12 +407,6 @@ def quotientSubgroupOfEmbeddingOfLE (H : Subgroup α) (h : s ≤ t) :
       intro a b h
       simpa only [Quotient.map'_mk'', QuotientGroup.eq] using h
 
-@[to_additive (attr := simp)]
-theorem quotientSubgroupOfEmbeddingOfLE_apply_mk (H : Subgroup α) (h : s ≤ t) (g : s) :
-    quotientSubgroupOfEmbeddingOfLE H h (QuotientGroup.mk g) =
-      (QuotientGroup.mk (inclusion h g) : (fun _ => { x // x ∈ t } ⧸ subgroupOf H t) ↑g) :=
-  rfl
-
 @[to_additive "If `s ≤ t`, then there is a map `H ⧸ s.addSubgroupOf H → H ⧸ t.addSubgroupOf H`."]
 def quotientSubgroupOfMapOfLE (H : Subgroup α) (h : s ≤ t) :
     H ⧸ s.subgroupOf H → H ⧸ t.subgroupOf H :=
@@ -445,13 +441,6 @@ def quotientiInfSubgroupOfEmbedding {ι : Type*} (f : ι → Subgroup α) (H : S
       simp_rw [funext_iff, quotientSubgroupOfMapOfLE_apply_mk, QuotientGroup.eq, mem_subgroupOf,
         mem_iInf, imp_self, forall_const]
 
-@[to_additive (attr := simp)]
-theorem quotientiInfSubgroupOfEmbedding_apply_mk {ι : Type*} (f : ι → Subgroup α) (H : Subgroup α)
-    (g : H) (i : ι) :
-    quotientiInfSubgroupOfEmbedding f H (QuotientGroup.mk g) i =
-      (QuotientGroup.mk g : { x // x ∈ H } ⧸ subgroupOf (f i) H) :=
-  rfl
-
 @[to_additive (attr := simps) "The natural embedding `α ⧸ (⨅ i, f i) ↪ Π i, α ⧸ f i`."]
 def quotientiInfEmbedding {ι : Type*} (f : ι → Subgroup α) : (α ⧸ ⨅ i, f i) ↪ ∀ i, α ⧸ f i where
   toFun q i := quotientMapOfLE (iInf_le f i) q
@@ -459,11 +448,6 @@ def quotientiInfEmbedding {ι : Type*} (f : ι → Subgroup α) : (α ⧸ ⨅ i,
     Quotient.ind₂' <| by
       simp_rw [funext_iff, quotientMapOfLE_apply_mk, QuotientGroup.eq, mem_iInf, imp_self,
         forall_const]
-
-@[to_additive (attr := simp)]
-theorem quotientiInfEmbedding_apply_mk {ι : Type*} (f : ι → Subgroup α) (g : α) (i : ι) :
-    quotientiInfEmbedding f (QuotientGroup.mk g) i = QuotientGroup.mk g :=
-  rfl
 
 end Subgroup
 
@@ -479,15 +463,6 @@ def fiberEquivKer (f : α →* H) (a : α) : f ⁻¹' {f a} ≃ f.ker :=
         smul_eq_mul, map_mul, map_inv, inv_mul_eq_one, eq_comm])
     (Subgroup.leftCosetEquivSubgroup a)
 
-@[to_additive (attr := simp)]
-lemma fiberEquivKer_apply (f : α →* H) (a : α) (g : f ⁻¹' {f a}) : f.fiberEquivKer a g = a⁻¹ * g :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma fiberEquivKer_symm_apply (f : α →* H) (a : α) (g : f.ker) :
-    (f.fiberEquivKer a).symm g = a * g :=
-  rfl
-
 @[to_additive "An equivalence between any fiber of a surjective `AddMonoidHom` and its kernel."]
 noncomputable def fiberEquivKerOfSurjective {f : α →* H} (hf : Function.Surjective f) (h : H) :
     f ⁻¹' {h} ≃ f.ker :=
@@ -496,16 +471,6 @@ noncomputable def fiberEquivKerOfSurjective {f : α →* H} (hf : Function.Surje
 @[to_additive "An equivalence between any two non-empty fibers of an `AddMonoidHom`."]
 def fiberEquiv (f : α →* H) (a b : α) : f ⁻¹' {f a} ≃ f ⁻¹' {f b} :=
   (f.fiberEquivKer a).trans (f.fiberEquivKer b).symm
-
-@[to_additive (attr := simp)]
-lemma fiberEquiv_apply (f : α →* H) (a b : α) (g : f ⁻¹' {f a}) :
-    f.fiberEquiv a b g = b * (a⁻¹ * g) :=
-  rfl
-
-@[to_additive (attr := simp)]
-lemma fiberEquiv_symm_apply (f : α →* H) (a b : α) (g : f ⁻¹' {f b}) :
-    (f.fiberEquiv a b).symm g = a * (b⁻¹ * g) :=
-  rfl
 
 @[to_additive "An equivalence between any two fibers of a surjective `AddMonoidHom`."]
 noncomputable def fiberEquivOfSurjective {f : α →* H} (hf : Function.Surjective f) (h h' : H) :

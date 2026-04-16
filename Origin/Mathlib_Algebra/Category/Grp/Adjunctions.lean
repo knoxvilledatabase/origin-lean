@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.Grp.Preadditive
 import Mathlib.GroupTheory.FreeAbelianGroup
 import Mathlib.CategoryTheory.Limits.Shapes.Types
 
+noncomputable section
+
 /-!
 # Adjunctions regarding the category of (abelian) groups
 
@@ -44,14 +46,6 @@ def free : Type u ⥤ AddCommGrp where
   map := FreeAbelianGroup.map
   map_id _ := AddMonoidHom.ext FreeAbelianGroup.map_id_apply
   map_comp _ _ := AddMonoidHom.ext FreeAbelianGroup.map_comp_apply
-
-@[simp]
-theorem free_obj_coe {α : Type u} : (free.obj α : Type u) = FreeAbelianGroup α :=
-  rfl
-
-theorem free_map_coe {α β : Type u} {f : α → β} (x : FreeAbelianGroup α) :
-    (free.map f) x = f <$> x :=
-  rfl
 
 def adj : free ⊣ forget AddCommGrp.{u} :=
   Adjunction.mkOfHomEquiv

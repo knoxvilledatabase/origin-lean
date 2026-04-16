@@ -1,9 +1,11 @@
 /-
 Extracted from Probability/ProbabilityMassFunction/Monad.lean
-Genuine: 28 | Conflates: 0 | Dissolved: 1 | Infrastructure: 6
+Genuine: 29 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Probability.ProbabilityMassFunction.Basic
+
+noncomputable section
 
 /-!
 # Monad Operations for Probability Mass Functions
@@ -216,7 +218,11 @@ theorem bindOnSupport_eq_bind (p : PMF α) (f : α → PMF β) :
   simp only [bindOnSupport_apply fun a _ => f a, p.bind_apply f, dite_eq_ite, mul_ite,
     mul_zero, this]
 
--- DISSOLVED: bindOnSupport_eq_zero_iff
+theorem bindOnSupport_eq_zero_iff (b : β) :
+    p.bindOnSupport f b = 0 ↔ ∀ (a) (ha : p a ≠ 0), f a ha b = 0 := by
+  simp only [bindOnSupport_apply, ENNReal.tsum_eq_zero, mul_eq_zero, or_iff_not_imp_left]
+  exact ⟨fun h a ha => Trans.trans (dif_neg ha).symm (h a ha),
+    fun h a ha => Trans.trans (dif_neg ha) (h a ha)⟩
 
 @[simp]
 theorem pure_bindOnSupport (a : α) (f : ∀ (a' : α) (_ : a' ∈ (pure a).support), PMF β) :

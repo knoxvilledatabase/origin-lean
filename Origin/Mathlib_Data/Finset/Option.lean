@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 import Origin.Core
 import Mathlib.Data.Finset.Card
 
+noncomputable section
+
 /-!
 # Finite sets in `Option α`
 
@@ -33,14 +35,6 @@ def toFinset (o : Option α) : Finset α :=
   o.elim ∅ singleton
 
 @[simp]
-theorem toFinset_none : none.toFinset = (∅ : Finset α) :=
-  rfl
-
-@[simp]
-theorem toFinset_some {a : α} : (some a).toFinset = {a} :=
-  rfl
-
-@[simp]
 theorem mem_toFinset {a : α} {o : Option α} : a ∈ o.toFinset ↔ a ∈ o := by
   cases o <;> simp [eq_comm]
 
@@ -61,8 +55,6 @@ theorem mem_insertNone {s : Finset α} : ∀ {o : Option α}, o ∈ insertNone s
 
 lemma forall_mem_insertNone {s : Finset α} {p : Option α → Prop} :
     (∀ a ∈ insertNone s, p a) ↔ p none ∧ ∀ a ∈ s, p a := by simp [Option.forall]
-
-theorem some_mem_insertNone {s : Finset α} {a : α} : some a ∈ insertNone s ↔ a ∈ s := by simp
 
 lemma none_mem_insertNone {s : Finset α} : none ∈ insertNone s := by simp
 

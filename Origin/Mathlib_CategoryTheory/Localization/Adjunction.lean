@@ -1,11 +1,13 @@
 /-
 Extracted from CategoryTheory/Localization/Adjunction.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.CatCommSq
 import Mathlib.CategoryTheory.Localization.Predicate
 import Mathlib.CategoryTheory.Adjunction.FullyFaithful
+
+noncomputable section
 
 /-!
 # Localization of adjunctions
@@ -119,7 +121,6 @@ lemma localization_counit_app (X₂ : C₂) :
 end
 
 include adj in
-
 lemma isLocalization [F.Full] [F.Faithful] :
     G.IsLocalization ((MorphismProperty.isomorphisms C₂).inverseImage G) := by
   let W := ((MorphismProperty.isomorphisms C₂).inverseImage G)

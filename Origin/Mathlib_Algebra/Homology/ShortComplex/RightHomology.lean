@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.ShortComplex.LeftHomology
 import Mathlib.CategoryTheory.Limits.Opposites
 
+noncomputable section
+
 /-!
 # Right Homology of short complexes
 
@@ -239,9 +241,6 @@ def op (h : S.RightHomologyData) : S.op.LeftHomologyData where
   wπ := Quiver.Hom.unop_inj h.wι
   hπ := KernelFork.IsLimit.ofιOp _ _ h.hι
 
-@[simp] lemma op_f' (h : S.RightHomologyData) :
-    h.op.f' = h.g'.op := rfl
-
 @[simps]
 def unop {S : ShortComplex Cᵒᵖ} (h : S.RightHomologyData) : S.unop.LeftHomologyData where
   K := Opposite.unop h.Q
@@ -252,9 +251,6 @@ def unop {S : ShortComplex Cᵒᵖ} (h : S.RightHomologyData) : S.unop.LeftHomol
   hi := CokernelCofork.IsColimit.ofπUnop _ _ h.hp
   wπ := Quiver.Hom.op_inj h.wι
   hπ := KernelFork.IsLimit.ofιUnop _ _ h.hι
-
-@[simp] lemma unop_f' {S : ShortComplex Cᵒᵖ} (h : S.RightHomologyData) :
-    h.unop.f' = h.g'.unop := rfl
 
 end RightHomologyData
 
@@ -271,9 +267,6 @@ def op (h : S.LeftHomologyData) : S.op.RightHomologyData where
   wι := Quiver.Hom.unop_inj h.wπ
   hι := CokernelCofork.IsColimit.ofπOp _ _ h.hπ
 
-@[simp] lemma op_g' (h : S.LeftHomologyData) :
-    h.op.g' = h.f'.op := rfl
-
 @[simps]
 def unop {S : ShortComplex Cᵒᵖ} (h : S.LeftHomologyData) : S.unop.RightHomologyData where
   Q := Opposite.unop h.K
@@ -284,9 +277,6 @@ def unop {S : ShortComplex Cᵒᵖ} (h : S.LeftHomologyData) : S.unop.RightHomol
   hp := KernelFork.IsLimit.ofιUnop _ _ h.hi
   wι := Quiver.Hom.op_inj h.wπ
   hι := CokernelCofork.IsColimit.ofπUnop _ _ h.hπ
-
-@[simp] lemma unop_g' {S : ShortComplex Cᵒᵖ} (h : S.LeftHomologyData) :
-    h.unop.g' = h.f'.unop := rfl
 
 end LeftHomologyData
 
@@ -974,14 +964,8 @@ noncomputable def ofEpiOfIsIsoOfMono : RightHomologyData S₂ := by
   haveI : Mono (opMap φ).τ₃ := by dsimp; infer_instance
   exact (LeftHomologyData.ofEpiOfIsIsoOfMono' (opMap φ) h.op).unop
 
-@[simp] lemma ofEpiOfIsIsoOfMono_Q : (ofEpiOfIsIsoOfMono φ h).Q = h.Q := rfl
-
-@[simp] lemma ofEpiOfIsIsoOfMono_H : (ofEpiOfIsIsoOfMono φ h).H = h.H := rfl
-
 @[simp] lemma ofEpiOfIsIsoOfMono_p : (ofEpiOfIsIsoOfMono φ h).p = inv φ.τ₂ ≫ h.p := by
   simp [ofEpiOfIsIsoOfMono, opMap]
-
-@[simp] lemma ofEpiOfIsIsoOfMono_ι : (ofEpiOfIsIsoOfMono φ h).ι = h.ι := rfl
 
 @[simp] lemma ofEpiOfIsIsoOfMono_g' : (ofEpiOfIsIsoOfMono φ h).g' = h.g' ≫ φ.τ₃ := by
   simp [ofEpiOfIsIsoOfMono, opMap]
@@ -998,14 +982,8 @@ noncomputable def ofEpiOfIsIsoOfMono' : RightHomologyData S₁ := by
   haveI : Mono (opMap φ).τ₃ := by dsimp; infer_instance
   exact (LeftHomologyData.ofEpiOfIsIsoOfMono (opMap φ) h.op).unop
 
-@[simp] lemma ofEpiOfIsIsoOfMono'_Q : (ofEpiOfIsIsoOfMono' φ h).Q = h.Q := rfl
-
-@[simp] lemma ofEpiOfIsIsoOfMono'_H : (ofEpiOfIsIsoOfMono' φ h).H = h.H := rfl
-
 @[simp] lemma ofEpiOfIsIsoOfMono'_p : (ofEpiOfIsIsoOfMono' φ h).p = φ.τ₂ ≫ h.p := by
   simp [ofEpiOfIsIsoOfMono', opMap]
-
-@[simp] lemma ofEpiOfIsIsoOfMono'_ι : (ofEpiOfIsIsoOfMono' φ h).ι = h.ι := rfl
 
 @[simp] lemma ofEpiOfIsIsoOfMono'_g'_τ₃ : (ofEpiOfIsIsoOfMono' φ h).g' ≫ φ.τ₃ = h.g' := by
   rw [← cancel_epi (ofEpiOfIsIsoOfMono' φ h).p, p_g'_assoc, ofEpiOfIsIsoOfMono'_p,

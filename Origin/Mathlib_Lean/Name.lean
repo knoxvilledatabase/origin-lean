@@ -8,6 +8,8 @@ import Lean.Meta.Match.MatcherInfo
 import Lean.Meta.Tactic.Delta
 import Std.Data.HashMap.Basic
 
+noncomputable section
+
 /-!
 # Additional functions on `Lean.Name`.
 

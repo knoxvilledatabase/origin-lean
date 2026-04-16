@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Archimedean.Hom
 import Mathlib.Algebra.Order.Group.Pointwise.CompleteLattice
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
+noncomputable section
+
 /-!
 # Conditionally complete linear ordered fields
 
@@ -92,9 +94,6 @@ def cutMap (a : α) : Set β :=
 theorem cutMap_mono (h : a₁ ≤ a₂) : cutMap β a₁ ⊆ cutMap β a₂ := image_subset _ fun _ => h.trans_lt'
 
 variable {β}
-
-@[simp]
-theorem mem_cutMap_iff : b ∈ cutMap β a ↔ ∃ q : ℚ, (q : α) < a ∧ (q : β) = b := Iff.rfl
 
 theorem coe_mem_cutMap_iff [CharZero β] : (q : β) ∈ cutMap β a ↔ (q : α) < a :=
   Rat.cast_injective.mem_set_image
@@ -275,12 +274,6 @@ def inducedOrderRingIso : β ≃+*o γ :=
       · rw [inducedOrderRingHom, AddMonoidHom.coe_fn_mkRingHomOfMulSelfOfTwoNeZero, inducedAddHom]
         dsimp
         rw [inducedMap_inv_self β γ _] }
-
-@[simp]
-theorem coe_inducedOrderRingIso : ⇑(inducedOrderRingIso β γ) = inducedMap β γ := rfl
-
-@[simp]
-theorem inducedOrderRingIso_symm : (inducedOrderRingIso β γ).symm = inducedOrderRingIso γ β := rfl
 
 @[simp]
 theorem inducedOrderRingIso_self : inducedOrderRingIso β β = OrderRingIso.refl β :=

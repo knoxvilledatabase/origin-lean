@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Sites.Subsheaf
 import Mathlib.CategoryTheory.Sites.CompatibleSheafification
 import Mathlib.CategoryTheory.Sites.LocallyInjective
 
+noncomputable section
+
 /-!
 
 # Locally surjective morphisms
@@ -46,14 +48,6 @@ def imageSieve {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C} (s : G.obj (op U)) : 
     rintro V W i ⟨t, ht⟩ j
     refine ⟨F.map j.op t, ?_⟩
     rw [op_comp, G.map_comp, comp_apply, ← ht, elementwise_of% f.naturality]
-
-theorem imageSieve_eq_sieveOfSection {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C} (s : G.obj (op U)) :
-    imageSieve f s = (imagePresheaf (whiskerRight f (forget A))).sieveOfSection s :=
-  rfl
-
-theorem imageSieve_whisker_forget {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C} (s : G.obj (op U)) :
-    imageSieve (whiskerRight f (forget A)) s = imageSieve f s :=
-  rfl
 
 theorem imageSieve_app {F G : Cᵒᵖ ⥤ A} (f : F ⟶ G) {U : C} (s : F.obj (op U)) :
     imageSieve f (f.app _ s) = ⊤ := by
@@ -307,9 +301,6 @@ variable {J}
 variable {F₁ F₂ F₃ : Sheaf J A} (φ : F₁ ⟶ F₂) (ψ : F₂ ⟶ F₃)
 
 abbrev IsLocallySurjective := Presheaf.IsLocallySurjective J φ.val
-
-lemma isLocallySurjective_sheafToPresheaf_map_iff :
-    Presheaf.IsLocallySurjective J ((sheafToPresheaf J A).map φ) ↔ IsLocallySurjective φ := by rfl
 
 instance isLocallySurjective_comp [IsLocallySurjective φ] [IsLocallySurjective ψ] :
     IsLocallySurjective (φ ≫ ψ) :=

@@ -7,6 +7,8 @@ import Mathlib.Init
 import Lean.Elab.Declaration
 import Lean.Elab.Notation
 
+noncomputable section
+
 /-!
 # Suppressing compilation to executable code in a file or in a section
 
@@ -59,17 +61,11 @@ def expandSuppressCompilationNotation : Macro := fun
 | _ => Macro.throwUnsupported
 
 macro "suppress_compilation" : command => do
-
   let declKind := mkIdent ``declaration
-
   let notaKind := mkIdent ``«notation»
-
   let declElab := mkCIdent ``elabSuppressCompilationDecl
-
   let notaMacro := mkCIdent ``expandSuppressCompilationNotation
-
   `(
-
   attribute [local command_elab $declKind] $declElab
   attribute [local macro $notaKind] $notaMacro
   )

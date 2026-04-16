@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Interval.Set.Monoid
 import Mathlib.Order.Interval.Finset.Defs
 
+noncomputable section
+
 /-!
 # Algebraic properties of finset intervals
 

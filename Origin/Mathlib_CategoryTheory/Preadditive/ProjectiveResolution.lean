@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Homology.QuasiIso
 import Mathlib.Algebra.Homology.SingleHomology
 
+noncomputable section
+
 /-!
 # Projective resolutions
 
@@ -78,10 +80,6 @@ theorem π_f_succ (n : ℕ) : P.π.f (n + 1) = 0 :=
 theorem complex_d_comp_π_f_zero :
     P.complex.d 1 0 ≫ P.π.f 0 = 0 := by
   rw [← P.π.comm 1 0, single_obj_d, comp_zero]
-
-theorem complex_d_succ_comp (n : ℕ) :
-    P.complex.d n (n + 1) ≫ P.complex.d (n + 1) (n + 2) = 0 := by
-  simp
 
 @[simp]
 noncomputable def cokernelCofork : CokernelCofork (P.complex.d 1 0) :=

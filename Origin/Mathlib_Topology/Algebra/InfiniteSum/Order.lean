@@ -1,6 +1,6 @@
 /-
 Extracted from Topology/Algebra/InfiniteSum/Order.lean
-Genuine: 41 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Archimedean.Basic
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Topology.Algebra.InfiniteSum.NatInt
 import Mathlib.Topology.Algebra.Order.Field
 import Mathlib.Topology.Order.MonotoneConvergence
+
+noncomputable section
 
 /-!
 # Infinite sum or product in an order
@@ -218,7 +220,9 @@ theorem hasProd_one_iff : HasProd f 1 ↔ ∀ x, f x = 1 :=
 theorem tprod_eq_one_iff (hf : Multipliable f) : ∏' i, f i = 1 ↔ ∀ x, f x = 1 := by
   rw [← hasProd_one_iff, hf.hasProd_iff]
 
--- DISSOLVED: tprod_ne_one_iff
+@[to_additive]
+theorem tprod_ne_one_iff (hf : Multipliable f) : ∏' i, f i ≠ 1 ↔ ∃ x, f x ≠ 1 := by
+  rw [Ne, tprod_eq_one_iff hf, not_forall]
 
 @[to_additive]
 theorem isLUB_hasProd' (hf : HasProd f a) : IsLUB (Set.range fun s ↦ ∏ i ∈ s, f i) a := by

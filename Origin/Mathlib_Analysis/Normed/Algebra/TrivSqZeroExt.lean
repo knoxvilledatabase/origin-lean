@@ -1,11 +1,13 @@
 /-
 Extracted from Analysis/Normed/Algebra/TrivSqZeroExt.lean
-Genuine: 17 | Conflates: 0 | Dissolved: 1 | Infrastructure: 10
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Analysis.Normed.Lp.ProdLp
 import Mathlib.Topology.Instances.TrivSqZeroExt
+
+noncomputable section
 
 /-!
 # Results on `TrivSqZeroExt R M` related to the norm
@@ -171,7 +173,10 @@ variable [Field 𝕜] [CharZero 𝕜] [Field R] [AddCommGroup M]
 
 variable [T2Space R] [T2Space M]
 
--- DISSOLVED: eq_smul_exp_of_ne_zero
+theorem eq_smul_exp_of_ne_zero (x : tsze R M) (hx : x.fst ≠ 0) :
+    x = x.fst • exp 𝕜 (x.fst⁻¹ • inr x.snd) :=
+  letI : Invertible x.fst := invertibleOfNonzero hx
+  eq_smul_exp_of_invertible _ _
 
 end Field
 

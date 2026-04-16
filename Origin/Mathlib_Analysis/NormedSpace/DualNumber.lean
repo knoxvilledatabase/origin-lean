@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.DualNumber
 import Mathlib.Analysis.Normed.Algebra.TrivSqZeroExt
 
+noncomputable section
+
 /-!
 # Results on `DualNumber R` related to the norm
 

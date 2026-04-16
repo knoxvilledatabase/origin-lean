@@ -7,6 +7,8 @@ import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.CategoryTheory.Linear.Basic
 import Mathlib.CategoryTheory.Preadditive.Yoneda.Basic
 
+noncomputable section
+
 /-!
 # The Yoneda embedding for `R`-linear categories
 
@@ -56,21 +58,8 @@ theorem whiskering_linearYoneda :
   rfl
 
 @[simp]
-theorem whiskering_linearYoneda₂ :
-    linearYoneda R C ⋙ (whiskeringRight _ _ _).obj (forget₂ (ModuleCat.{v} R) AddCommGrp.{v}) =
-      preadditiveYoneda :=
-  rfl
-
-@[simp]
 theorem whiskering_linearCoyoneda :
     linearCoyoneda R C ⋙ (whiskeringRight _ _ _).obj (forget (ModuleCat.{v} R)) = coyoneda :=
-  rfl
-
-@[simp]
-theorem whiskering_linearCoyoneda₂ :
-    linearCoyoneda R C ⋙
-        (whiskeringRight _ _ _).obj (forget₂ (ModuleCat.{v} R) AddCommGrp.{v}) =
-      preadditiveCoyoneda :=
   rfl
 
 instance full_linearYoneda : (linearYoneda R C).Full :=

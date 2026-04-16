@@ -5,6 +5,8 @@ Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 import Origin.Core
 import Mathlib.Topology.Order.IsLUB
 
+noncomputable section
+
 /-!
 # Monotone functions on an order topology
 

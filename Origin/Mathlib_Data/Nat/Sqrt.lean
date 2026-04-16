@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Nat.Defs
 import Batteries.Data.Nat.Basic
 
+noncomputable section
+
 /-!
 # Properties of the natural number square root function.
 -/
@@ -118,10 +120,6 @@ lemma sqrt_lt' : sqrt m < n ↔ m < n ^ 2 := by simp only [← not_le, le_sqrt']
 lemma sqrt_le_self (n : ℕ) : sqrt n ≤ n := le_trans (le_mul_self _) (sqrt_le n)
 
 lemma sqrt_le_sqrt (h : m ≤ n) : sqrt m ≤ sqrt n := le_sqrt.2 (le_trans (sqrt_le _) h)
-
-@[simp] lemma sqrt_zero : sqrt 0 = 0 := rfl
-
-@[simp] lemma sqrt_one : sqrt 1 = 1 := rfl
 
 lemma sqrt_eq_zero : sqrt n = 0 ↔ n = 0 :=
   ⟨fun h ↦

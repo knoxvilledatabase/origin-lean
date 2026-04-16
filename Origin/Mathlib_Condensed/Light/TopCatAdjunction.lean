@@ -7,6 +7,8 @@ import Mathlib.Condensed.Light.TopComparison
 import Mathlib.Topology.Category.Sequential
 import Mathlib.Topology.Category.LightProfinite.Sequence
 
+noncomputable section
+
 /-!
 
 # The adjunction between light condensed sets and topological spaces

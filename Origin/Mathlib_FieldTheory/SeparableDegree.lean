@@ -1,6 +1,6 @@
 /-
 Extracted from FieldTheory/SeparableDegree.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 11 | Infrastructure: 5
+Genuine: 77 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.FieldTheory.SplittingField.Construction
@@ -10,6 +10,8 @@ import Mathlib.FieldTheory.NormalClosure
 import Mathlib.RingTheory.AlgebraicIndependent
 import Mathlib.RingTheory.Polynomial.SeparableDegree
 import Mathlib.RingTheory.Polynomial.UniqueFactorization
+
+noncomputable section
 
 /-!
 
@@ -293,14 +295,25 @@ theorem natSepDegree_zero : (0 : F[X]).natSepDegree = 0 := by
 theorem natSepDegree_one : (1 : F[X]).natSepDegree = 0 := by
   rw [← C_1, natSepDegree_C]
 
--- DISSOLVED: natSepDegree_ne_zero
+theorem natSepDegree_ne_zero (h : f.natDegree ≠ 0) : f.natSepDegree ≠ 0 := by
+  rw [natSepDegree, ne_eq, Finset.card_eq_zero, ← ne_eq, ← Finset.nonempty_iff_ne_empty]
+  use rootOfSplits _ (SplittingField.splits f) (ne_of_apply_ne _ h)
+  classical
+  rw [Multiset.mem_toFinset, mem_aroots]
+  exact ⟨ne_of_apply_ne _ h, map_rootOfSplits _ (SplittingField.splits f) (ne_of_apply_ne _ h)⟩
 
 theorem natSepDegree_eq_zero_iff : f.natSepDegree = 0 ↔ f.natDegree = 0 :=
   ⟨(natSepDegree_ne_zero f).mtr, natSepDegree_eq_zero f⟩
 
--- DISSOLVED: natSepDegree_ne_zero_iff
+theorem natSepDegree_ne_zero_iff : f.natSepDegree ≠ 0 ↔ f.natDegree ≠ 0 :=
+  Iff.not <| natSepDegree_eq_zero_iff f
 
--- DISSOLVED: natSepDegree_eq_natDegree_iff
+theorem natSepDegree_eq_natDegree_iff (hf : f ≠ 0) :
+    f.natSepDegree = f.natDegree ↔ f.Separable := by
+  classical
+  simp_rw [← card_rootSet_eq_natDegree_iff_of_splits hf (SplittingField.splits f),
+    rootSet_def, Finset.coe_sort_coe, Fintype.card_coe]
+  rfl
 
 theorem natSepDegree_eq_natDegree_of_separable (h : f.Separable) :
     f.natSepDegree = f.natDegree := (natSepDegree_eq_natDegree_iff f h.ne_zero).2 h
@@ -329,9 +342,17 @@ theorem natSepDegree_map (f : E[X]) (i : E →+* K) : (f.map i).natSepDegree = f
   simp_rw [show i = algebraMap E K by rfl, natSepDegree_eq_of_isAlgClosed (AlgebraicClosure K),
     aroots_def, map_map, ← IsScalarTower.algebraMap_eq]
 
--- DISSOLVED: natSepDegree_C_mul
+@[simp]
+theorem natSepDegree_C_mul {x : F} (hx : x ≠ 0) :
+    (C x * f).natSepDegree = f.natSepDegree := by
+  classical
+  simp only [natSepDegree_eq_of_isAlgClosed (AlgebraicClosure F), aroots_C_mul _ hx]
 
--- DISSOLVED: natSepDegree_smul_nonzero
+@[simp]
+theorem natSepDegree_smul_nonzero {x : F} (hx : x ≠ 0) :
+    (x • f).natSepDegree = f.natSepDegree := by
+  classical
+  simp only [natSepDegree_eq_of_isAlgClosed (AlgebraicClosure F), aroots_smul_nonzero _ hx]
 
 @[simp]
 theorem natSepDegree_pow {n : ℕ} : (f ^ n).natSepDegree = if n = 0 then 0 else f.natSepDegree := by
@@ -341,7 +362,8 @@ theorem natSepDegree_pow {n : ℕ} : (f ^ n).natSepDegree = if n = 0 then 0 else
   · simp only [h, zero_smul, Multiset.toFinset_zero, Finset.card_empty, ite_true]
   simp only [h, Multiset.toFinset_nsmul _ n h, ite_false]
 
--- DISSOLVED: natSepDegree_pow_of_ne_zero
+theorem natSepDegree_pow_of_ne_zero {n : ℕ} (hn : n ≠ 0) :
+    (f ^ n).natSepDegree = f.natSepDegree := by simp_rw [natSepDegree_pow, hn, ite_false]
 
 theorem natSepDegree_X_pow {n : ℕ} : (X ^ n : F[X]).natSepDegree = if n = 0 then 0 else 1 := by
   simp only [natSepDegree_pow, natSepDegree_X]
@@ -350,7 +372,9 @@ theorem natSepDegree_X_sub_C_pow {x : F} {n : ℕ} :
     ((X - C x) ^ n).natSepDegree = if n = 0 then 0 else 1 := by
   simp only [natSepDegree_pow, natSepDegree_X_sub_C]
 
--- DISSOLVED: natSepDegree_C_mul_X_sub_C_pow
+theorem natSepDegree_C_mul_X_sub_C_pow {x y : F} {n : ℕ} (hx : x ≠ 0) :
+    (C x * (X - C y) ^ n).natSepDegree = if n = 0 then 0 else 1 := by
+  simp only [natSepDegree_C_mul _ hx, natSepDegree_X_sub_C_pow]
 
 theorem natSepDegree_mul (g : F[X]) :
     (f * g).natSepDegree ≤ f.natSepDegree + g.natSepDegree := by
@@ -397,7 +421,12 @@ theorem natSepDegree_mul_of_isCoprime (g : F[X]) (hc : IsCoprime f g) :
     (f * g).natSepDegree = f.natSepDegree + g.natSepDegree :=
   (natSepDegree_mul_eq_iff f g).2 (.inr hc)
 
--- DISSOLVED: natSepDegree_le_of_dvd
+theorem natSepDegree_le_of_dvd (g : F[X]) (h1 : f ∣ g) (h2 : g ≠ 0) :
+    f.natSepDegree ≤ g.natSepDegree := by
+  classical
+  simp_rw [natSepDegree_eq_of_isAlgClosed (AlgebraicClosure F)]
+  exact Finset.card_le_card <| Multiset.toFinset_subset.mpr <|
+    Multiset.Le.subset <| roots.le_of_dvd (map_ne_zero h2) <| map_dvd _ h1
 
 theorem natSepDegree_expand (q : ℕ) [hF : ExpChar F q] {n : ℕ} :
     (expand F (q ^ n) f).natSepDegree = f.natSepDegree := by
@@ -470,7 +499,16 @@ alias natSepDegree_eq_one_iff_of_irreducible' := Irreducible.natSepDegree_eq_one
 
 alias natSepDegree_eq_one_iff_of_irreducible := Irreducible.natSepDegree_eq_one_iff_of_monic
 
--- DISSOLVED: eq_X_sub_C_pow_of_natSepDegree_eq_one_of_splits
+theorem eq_X_sub_C_pow_of_natSepDegree_eq_one_of_splits (hm : f.Monic)
+    (hs : f.Splits (RingHom.id F))
+    (h : f.natSepDegree = 1) : ∃ (m : ℕ) (y : F), m ≠ 0 ∧ f = (X - C y) ^ m := by
+  classical
+  have h1 := eq_prod_roots_of_monic_of_splits_id hm hs
+  have h2 := (natSepDegree_eq_of_splits f hs).symm
+  rw [h, aroots_def, Algebra.id.map_eq_id, map_id, Multiset.toFinset_card_eq_one_iff] at h2
+  obtain ⟨h2, y, h3⟩ := h2
+  exact ⟨_, y, h2, by rwa [h3, Multiset.map_nsmul, Multiset.map_singleton, Multiset.prod_nsmul,
+    Multiset.prod_singleton] at h1⟩
 
 theorem eq_X_pow_char_pow_sub_C_of_natSepDegree_eq_one_of_irreducible (q : ℕ) [ExpChar F q]
     (hm : f.Monic) (hi : Irreducible f) (h : f.natSepDegree = 1) : ∃ (n : ℕ) (y : F),
@@ -487,9 +525,31 @@ theorem eq_X_pow_char_pow_sub_C_of_natSepDegree_eq_one_of_irreducible (q : ℕ) 
       ← sub_pow_expChar] at hi
     exact not_irreducible_pow hq.ne_one hi
 
--- DISSOLVED: eq_X_pow_char_pow_sub_C_pow_of_natSepDegree_eq_one
+theorem eq_X_pow_char_pow_sub_C_pow_of_natSepDegree_eq_one (q : ℕ) [ExpChar F q] (hm : f.Monic)
+    (h : f.natSepDegree = 1) : ∃ (m n : ℕ) (y : F),
+      m ≠ 0 ∧ (n = 0 ∨ y ∉ (frobenius F q).range) ∧ f = (X ^ q ^ n - C y) ^ m := by
+  obtain ⟨p, hM, hI, hf⟩ := exists_monic_irreducible_factor _ <| not_isUnit_of_natDegree_pos _
+    <| Nat.pos_of_ne_zero <| (natSepDegree_ne_zero_iff _).1 (h.symm ▸ Nat.one_ne_zero)
+  have hD := (h ▸ natSepDegree_le_of_dvd p f hf hm.ne_zero).antisymm <|
+    Nat.pos_of_ne_zero <| (natSepDegree_ne_zero_iff _).2 hI.natDegree_pos.ne'
+  obtain ⟨n, y, H, hp⟩ := hM.eq_X_pow_char_pow_sub_C_of_natSepDegree_eq_one_of_irreducible q hI hD
+  have hF := multiplicity_finite_of_degree_pos_of_monic (degree_pos_of_irreducible hI) hM hm.ne_zero
+  classical
+  have hne := (multiplicity_pos_of_dvd hf).ne'
+  refine ⟨_, n, y, hne, H, ?_⟩
+  obtain ⟨c, hf, H⟩ := hF.exists_eq_pow_mul_and_not_dvd
+  rw [hf, natSepDegree_mul_of_isCoprime _ c <| IsCoprime.pow_left <|
+    (hI.coprime_or_dvd c).resolve_right H, natSepDegree_pow_of_ne_zero _ hne, hD,
+    add_right_eq_self, natSepDegree_eq_zero_iff] at h
+  simpa only [eq_one_of_monic_natDegree_zero ((hM.pow _).of_mul_monic_left (hf ▸ hm)) h,
+    mul_one, ← hp] using hf
 
--- DISSOLVED: natSepDegree_eq_one_iff
+theorem natSepDegree_eq_one_iff (q : ℕ) [ExpChar F q] (hm : f.Monic) :
+    f.natSepDegree = 1 ↔ ∃ (m n : ℕ) (y : F), m ≠ 0 ∧ f = (X ^ q ^ n - C y) ^ m := by
+  refine ⟨fun h ↦ ?_, fun ⟨m, n, y, hm, h⟩ ↦ ?_⟩
+  · obtain ⟨m, n, y, hm, -, h⟩ := hm.eq_X_pow_char_pow_sub_C_pow_of_natSepDegree_eq_one q h
+    exact ⟨m, n, y, hm, h⟩
+  simp_rw [h, natSepDegree_pow, hm, ite_false, natSepDegree_X_pow_char_pow_sub_C]
 
 end Monic
 

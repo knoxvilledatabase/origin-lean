@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.SetTheory.Cardinal.Arithmetic
 import Mathlib.Order.Filter.Finite
 
+noncomputable section
+
 /-!
 # Cardinality of a set with a countable cover
 

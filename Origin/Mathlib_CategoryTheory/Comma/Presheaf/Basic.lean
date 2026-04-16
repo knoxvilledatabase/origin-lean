@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.HomCongr
 import Mathlib.CategoryTheory.Comma.Over
 import Mathlib.Tactic.CategoryTheory.Elementwise
 
+noncomputable section
+
 /-!
 # Computation of `Over A` for a presheaf `A`
 
@@ -112,11 +114,6 @@ def val {F : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {X : C} {s : yoneda.obj X ⟶ A}
     OverArrows η s → F.obj (op X) :=
   Subtype.val
 
-@[simp]
-lemma val_mk {F : Cᵒᵖ ⥤ Type v} (η : F ⟶ A) {X : C} (s : yoneda.obj X ⟶ A) (u : F.obj (op X))
-    (h : MakesOverArrow η s u) : val ⟨u, h⟩ = u :=
-  rfl
-
 @[ext]
 lemma ext {F : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {X : C} {s : yoneda.obj X ⟶ A}
     {u v : OverArrows η s} : u.val = v.val → u = v :=
@@ -136,22 +133,10 @@ def map₁ {F G : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {μ : G ⟶ A} {X : C} {s :
     (u : OverArrows η s) (ε : F ⟶ G) (hε : ε ≫ μ = η) : OverArrows μ s :=
   ⟨ε.app _ u.val, MakesOverArrow.map₁ hε u.2⟩
 
-@[simp]
-lemma map₁_val {F G : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {μ : G ⟶ A} {X : C}
-    (s : yoneda.obj X ⟶ A) (u : OverArrows η s) (ε : F ⟶ G) (hε : ε ≫ μ = η) :
-    (u.map₁ ε hε).val = ε.app _ u.val :=
-  rfl
-
 def map₂ {F : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {X Y : C} {s : yoneda.obj X ⟶ A}
     {t : yoneda.obj Y ⟶ A} (u : OverArrows η t) (f : X ⟶ Y) (hst : yoneda.map f ≫ t = s) :
     OverArrows η s :=
   ⟨F.map f.op u.val, MakesOverArrow.map₂ f hst u.2⟩
-
-@[simp]
-lemma map₂_val {F : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {X Y : C} (f : X ⟶ Y)
-    {s : yoneda.obj X ⟶ A} {t : yoneda.obj Y ⟶ A} (hst : yoneda.map f ≫ t = s)
-    (u : OverArrows η t) : (u.map₂ f hst).val = F.map f.op u.val :=
-  rfl
 
 @[simp]
 lemma map₁_map₂ {F G : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {μ : G ⟶ A} (ε : F ⟶ G)
@@ -163,11 +148,6 @@ lemma map₁_map₂ {F G : Cᵒᵖ ⥤ Type v} {η : F ⟶ A} {μ : G ⟶ A} (ε
 def yonedaArrow {Y : C} {η : yoneda.obj Y ⟶ A} {X : C} {s : yoneda.obj X ⟶ A} (f : X ⟶ Y)
     (hf : yoneda.map f ≫ η = s) : OverArrows η s :=
   ⟨f, .of_yoneda_arrow hf⟩
-
-@[simp]
-lemma yonedaArrow_val {Y : C} {η : yoneda.obj Y ⟶ A} {X : C} {s : yoneda.obj X ⟶ A} {f : X ⟶ Y}
-    (hf : yoneda.map f ≫ η = s) : (yonedaArrow f hf).val = f :=
-  rfl
 
 def costructuredArrowIso (s t : CostructuredArrow yoneda A) : OverArrows s.hom t.hom ≅ t ⟶ s where
   hom p := CostructuredArrow.homMk p.val (by aesop_cat)
@@ -425,10 +405,6 @@ lemma OverArrows.yonedaCollectionPresheafToA_val_fst (s : yoneda.obj X ⟶ A)
 def counitForward (F : (CostructuredArrow yoneda A)ᵒᵖ ⥤ Type v) (s : CostructuredArrow yoneda A) :
     F.obj (op s) → OverArrows (yonedaCollectionPresheafToA F) s.hom :=
   fun x => ⟨YonedaCollection.mk s.hom x, ⟨by simp [YonedaCollection.yonedaEquivFst_eq]⟩⟩
-
-lemma counitForward_val_fst (s : CostructuredArrow yoneda A) (x : F.obj (op s)) :
-    (counitForward F s x).val.fst = s.hom := by
-  simp
 
 @[simp]
 lemma counitForward_val_snd (s : CostructuredArrow yoneda A) (x : F.obj (op s)) :

@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Order/Antidiag/Pi.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 6 | Infrastructure: 0
+Genuine: 18 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Pointwise.Finset.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Fin.Tuple.NatAntidiagonal
 import Mathlib.Data.Finset.Sym
+
+noncomputable section
 
 /-!
 # Antidiagonal of functions as finsets
@@ -118,12 +120,24 @@ def piAntidiag (s : Finset ι) (n : μ) : Finset (ι → μ) := by
 
 variable {s : Finset ι} {n : μ} {f : ι → μ}
 
--- DISSOLVED: mem_piAntidiag
+@[simp] lemma mem_piAntidiag : f ∈ piAntidiag s n ↔ s.sum f = n ∧ ∀ i, f i ≠ 0 → i ∈ s := by
+  rw [piAntidiag]
+  induction' Fintype.truncEquivFinOfCardEq (Fintype.card_coe s) using Trunc.ind with e
+  simp only [Trunc.lift_mk, mem_map, mem_finAntidiagonal, Embedding.coeFn_mk]
+  constructor
+  · rintro ⟨f, ⟨hf, rfl⟩, rfl⟩
+    rw [sum_dite_of_true fun _ ↦ id]
+    exact ⟨Fintype.sum_equiv e _ _ (by simp), by simp +contextual⟩
+  · rintro ⟨rfl, hf⟩
+    refine ⟨f ∘ (↑) ∘ e.symm, ?_, by ext i; have := not_imp_comm.1 (hf i); aesop⟩
+    rw [← sum_attach s]
+    exact Fintype.sum_equiv e.symm _ _ (by simp)
 
 @[simp] lemma piAntidiag_empty_zero : piAntidiag (∅ : Finset ι) (0 : μ) = {0} := by
   ext; simp [Fintype.sum_eq_zero_iff_of_nonneg, funext_iff, not_imp_comm, ← forall_and]
 
--- DISSOLVED: piAntidiag_empty_of_ne_zero
+@[simp] lemma piAntidiag_empty_of_ne_zero (hn : n ≠ 0) : piAntidiag (∅ : Finset ι) n = ∅ :=
+  eq_empty_of_forall_not_mem (by simp [@eq_comm _ 0, hn.symm])
 
 lemma piAntidiag_empty (n : μ) : piAntidiag (∅ : Finset ι) n = if n = 0 then {0} else ∅ := by
   split_ifs with hn <;> simp [*]
@@ -193,13 +207,40 @@ lemma piAntidiag_univ_fin_eq_antidiagonalTuple (n k : ℕ) :
     piAntidiag univ n = Nat.antidiagonalTuple k n := by
   ext; simp [Nat.mem_antidiagonalTuple]
 
--- DISSOLVED: nsmul_piAntidiag
+lemma nsmul_piAntidiag [DecidableEq (ι → ℕ)] (s : Finset ι) (m : ℕ) {n : ℕ} (hn : n ≠ 0) :
+    n •ℕ piAntidiag s m = (piAntidiag s (n * m)).filter fun f : ι → ℕ ↦ ∀ i ∈ s, n ∣ f i := by
+  ext f
+  refine mem_smul_finset.trans ?_
+  simp only [mem_smul_finset, mem_filter, mem_piAntidiag, Function.Embedding.coeFn_mk, exists_prop,
+    and_assoc]
+  constructor
+  · rintro ⟨f, rfl, hf, rfl⟩
+    simpa [← mul_sum, hn] using hf
+  rintro ⟨hfsum, hfsup, hfdvd⟩
+  have (i) : n ∣ f i := by
+    by_cases hi : i ∈ s
+    · exact hfdvd _ hi
+    · rw [not_imp_comm.1 (hfsup _) hi]
+      exact dvd_zero _
+  refine ⟨fun i ↦ f i / n, ?_⟩
+  simpa [Nat.sum_div, Nat.div_ne_zero_iff_of_dvd, funext_iff, Nat.mul_div_cancel', ← Nat.sum_div, *]
 
--- DISSOLVED: map_nsmul_piAntidiag
+lemma map_nsmul_piAntidiag (s : Finset ι) (m : ℕ) {n : ℕ} (hn : n ≠ 0) :
+    (piAntidiag s m).map
+      ⟨(n • ·), fun _ _ h ↦ funext fun i ↦ mul_right_injective₀ hn (congr_fun h i)⟩ =
+        (piAntidiag s (n * m)).filter fun f : ι → ℕ ↦ ∀ i ∈ s, n ∣ f i := by
+  classical rw [map_eq_image]; exact nsmul_piAntidiag _ _ hn
 
--- DISSOLVED: nsmul_piAntidiag_univ
+lemma nsmul_piAntidiag_univ [Fintype ι] (m : ℕ) {n : ℕ} (hn : n ≠ 0) :
+    @SMul.smul _ _ Finset.smulFinset n (piAntidiag univ m) =
+      (piAntidiag univ (n * m)).filter fun f : ι → ℕ ↦ ∀ i, n ∣ f i := by
+  simpa using nsmul_piAntidiag (univ : Finset ι) m hn
 
--- DISSOLVED: map_nsmul_piAntidiag_univ
+lemma map_nsmul_piAntidiag_univ [Fintype ι] (m : ℕ) {n : ℕ} (hn : n ≠ 0) :
+    (piAntidiag (univ : Finset ι) m).map
+        ⟨(n • ·), fun _ _ h ↦ funext fun i ↦ mul_right_injective₀ hn (congr_fun h i)⟩ =
+      (piAntidiag univ (n * m)).filter fun f : ι → ℕ ↦ ∀ i, n ∣ f i := by
+  simpa using map_nsmul_piAntidiag (univ : Finset ι) m hn
 
 end Nat
 

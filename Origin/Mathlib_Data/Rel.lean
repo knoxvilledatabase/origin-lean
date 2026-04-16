@@ -8,6 +8,8 @@ import Mathlib.Order.GaloisConnection
 import Mathlib.Data.Set.Lattice
 import Mathlib.Tactic.AdaptationNote
 
+noncomputable section
+
 /-!
 # Relations
 
@@ -350,9 +352,6 @@ theorem Relation.is_graph_iff (r : Rel α β) : (∃! f, Function.graph f = r) �
       exact funext hf
 
 namespace Set
-
-theorem image_eq (f : α → β) (s : Set α) : f '' s = (Function.graph f).image s := by
-  rfl
 
 theorem preimage_eq (f : α → β) (s : Set β) : f ⁻¹' s = (Function.graph f).preimage s := by
   simp [Set.preimage, Rel.preimage, Rel.inv, flip, Rel.image]

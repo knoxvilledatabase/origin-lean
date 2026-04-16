@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Ker
 import Mathlib.Algebra.NoZeroSMulDivisors.Defs
 
+noncomputable section
+
 /-!
 # Saturated subgroups
 
@@ -23,11 +25,6 @@ variable {G : Type*} [Group G]
       we have `n = 0` or `g ∈ H`."]
 def Saturated (H : Subgroup G) : Prop :=
   ∀ ⦃n g⦄, g ^ n ∈ H → n = 0 ∨ g ∈ H
-
-@[to_additive]
-theorem saturated_iff_npow {H : Subgroup G} :
-    Saturated H ↔ ∀ (n : ℕ) (g : G), g ^ n ∈ H → n = 0 ∨ g ∈ H :=
-  Iff.rfl
 
 @[to_additive]
 theorem saturated_iff_zpow {H : Subgroup G} :

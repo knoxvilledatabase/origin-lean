@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/NormedSpace/ENorm.lean
-Genuine: 12 | Conflates: 0 | Dissolved: 1 | Infrastructure: 15
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 -/
 import Origin.Core
 import Mathlib.Analysis.Normed.Module.Basic
 import Mathlib.LinearAlgebra.Basis.VectorSpace
+
+noncomputable section
 
 /-!
 # Extended norm
@@ -129,7 +131,8 @@ noncomputable instance : Top (ENorm 𝕜 V) :=
 noncomputable instance : Inhabited (ENorm 𝕜 V) :=
   ⟨⊤⟩
 
--- DISSOLVED: top_map
+theorem top_map {x : V} (hx : x ≠ 0) : (⊤ : ENorm 𝕜 V) x = ⊤ :=
+  if_neg hx
 
 noncomputable instance : OrderTop (ENorm 𝕜 V) where
   top := ⊤
@@ -149,14 +152,6 @@ noncomputable instance : SemilatticeSup (ENorm 𝕜 V) :=
     le_sup_left := fun _ _ _ => le_max_left _ _
     le_sup_right := fun _ _ _ => le_max_right _ _
     sup_le := fun _ _ _ h₁ h₂ x => max_le (h₁ x) (h₂ x) }
-
-@[simp, norm_cast]
-theorem coe_max (e₁ e₂ : ENorm 𝕜 V) : ⇑(e₁ ⊔ e₂) = fun x => max (e₁ x) (e₂ x) :=
-  rfl
-
-@[norm_cast]
-theorem max_map (e₁ e₂ : ENorm 𝕜 V) (x : V) : (e₁ ⊔ e₂) x = max (e₁ x) (e₂ x) :=
-  rfl
 
 abbrev emetricSpace : EMetricSpace V where
   edist x y := e (x - y)
@@ -182,12 +177,6 @@ instance metricSpace : MetricSpace e.finiteSubspace := by
   refine EMetricSpace.toMetricSpace fun x y => ?_
   change e (x - y) ≠ ⊤
   exact ne_top_of_le_ne_top (ENNReal.add_lt_top.2 ⟨x.2, y.2⟩).ne (e.map_sub_le x y)
-
-theorem finite_dist_eq (x y : e.finiteSubspace) : dist x y = (e (x - y)).toReal :=
-  rfl
-
-theorem finite_edist_eq (x y : e.finiteSubspace) : edist x y = e (x - y) :=
-  rfl
 
 instance normedAddCommGroup : NormedAddCommGroup e.finiteSubspace :=
   { e.metricSpace with

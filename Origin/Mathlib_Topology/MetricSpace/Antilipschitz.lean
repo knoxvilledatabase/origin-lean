@@ -8,6 +8,8 @@ import Mathlib.Topology.EMetricSpace.Lipschitz
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.MetricSpace.Bounded
 
+noncomputable section
+
 /-!
 # Antilipschitz functions
 

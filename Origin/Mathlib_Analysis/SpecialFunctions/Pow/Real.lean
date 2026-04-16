@@ -1,10 +1,12 @@
 /-
 Extracted from Analysis/SpecialFunctions/Pow/Real.lean
-Genuine: 156 | Conflates: 0 | Dissolved: 41 | Infrastructure: 4
+Genuine: 197 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
 import Qq
+
+noncomputable section
 
 /-! # Power function on `ℝ`
 
@@ -27,9 +29,6 @@ noncomputable def rpow (x y : ℝ) :=
   ((x : ℂ) ^ (y : ℂ)).re
 
 noncomputable instance : Pow ℝ ℝ := ⟨rpow⟩
-
-@[simp]
-theorem rpow_eq_pow (x y : ℝ) : rpow x y = x ^ y := rfl
 
 theorem rpow_def (x y : ℝ) : x ^ y = ((x : ℂ) ^ (y : ℂ)).re := rfl
 
@@ -61,11 +60,17 @@ theorem exp_one_rpow (x : ℝ) : exp 1 ^ x = exp x := by rw [← exp_mul, one_mu
 
 @[simp] lemma exp_one_pow (n : ℕ) : exp 1 ^ n = exp n := by rw [← rpow_natCast, exp_one_rpow]
 
--- DISSOLVED: rpow_eq_zero_iff_of_nonneg
+theorem rpow_eq_zero_iff_of_nonneg (hx : 0 ≤ x) : x ^ y = 0 ↔ x = 0 ∧ y ≠ 0 := by
+  simp only [rpow_def_of_nonneg hx]
+  split_ifs <;> simp [*, exp_ne_zero]
 
--- DISSOLVED: rpow_eq_zero
+@[simp]
+lemma rpow_eq_zero (hx : 0 ≤ x) (hy : y ≠ 0) : x ^ y = 0 ↔ x = 0 := by
+  simp [rpow_eq_zero_iff_of_nonneg, *]
 
--- DISSOLVED: rpow_ne_zero
+@[simp]
+lemma rpow_ne_zero (hx : 0 ≤ x) (hy : y ≠ 0) : x ^ y ≠ 0 ↔ x ≠ 0 :=
+  Real.rpow_eq_zero hx hy |>.not
 
 open Real
 
@@ -96,11 +101,25 @@ theorem rpow_zero (x : ℝ) : x ^ (0 : ℝ) = 1 := by simp [rpow_def]
 
 theorem rpow_zero_pos (x : ℝ) : 0 < x ^ (0 : ℝ) := by simp
 
--- DISSOLVED: zero_rpow
+@[simp]
+theorem zero_rpow {x : ℝ} (h : x ≠ 0) : (0 : ℝ) ^ x = 0 := by simp [rpow_def, *]
 
--- DISSOLVED: zero_rpow_eq_iff
+theorem zero_rpow_eq_iff {x : ℝ} {a : ℝ} : 0 ^ x = a ↔ x ≠ 0 ∧ a = 0 ∨ x = 0 ∧ a = 1 := by
+  constructor
+  · intro hyp
+    simp only [rpow_def, Complex.ofReal_zero] at hyp
+    by_cases h : x = 0
+    · subst h
+      simp only [Complex.one_re, Complex.ofReal_zero, Complex.cpow_zero] at hyp
+      exact Or.inr ⟨rfl, hyp.symm⟩
+    · rw [Complex.zero_cpow (Complex.ofReal_ne_zero.mpr h)] at hyp
+      exact Or.inl ⟨h, hyp.symm⟩
+  · rintro (⟨h, rfl⟩ | ⟨rfl, rfl⟩)
+    · exact zero_rpow h
+    · exact rpow_zero _
 
--- DISSOLVED: eq_zero_rpow_iff
+theorem eq_zero_rpow_iff {x : ℝ} {a : ℝ} : a = 0 ^ x ↔ x ≠ 0 ∧ a = 0 ∨ x = 0 ∧ a = 1 := by
+  rw [← zero_rpow_eq_iff, eq_comm]
 
 @[simp]
 theorem rpow_one (x : ℝ) : x ^ (1 : ℝ) = x := by simp [rpow_def]
@@ -161,27 +180,21 @@ variable {w x y z : ℝ}
 theorem rpow_add (hx : 0 < x) (y z : ℝ) : x ^ (y + z) = x ^ y * x ^ z := by
   simp only [rpow_def_of_pos hx, mul_add, exp_add]
 
--- DISSOLVED: rpow_add'
+theorem rpow_add' (hx : 0 ≤ x) (h : y + z ≠ 0) : x ^ (y + z) = x ^ y * x ^ z := by
+  rcases hx.eq_or_lt with (rfl | pos)
+  · rw [zero_rpow h, zero_eq_mul]
+    have : y ≠ 0 ∨ z ≠ 0 := not_and_or.1 fun ⟨hy, hz⟩ => h <| hy.symm ▸ hz.symm ▸ zero_add 0
+    exact this.imp zero_rpow zero_rpow
+  · exact rpow_add pos _ _
 
--- DISSOLVED: rpow_of_add_eq
+lemma rpow_of_add_eq (hx : 0 ≤ x) (hw : w ≠ 0) (h : y + z = w) : x ^ w = x ^ y * x ^ z := by
+  rw [← h, rpow_add' hx]; rwa [h]
 
 theorem rpow_add_of_nonneg (hx : 0 ≤ x) (hy : 0 ≤ y) (hz : 0 ≤ z) :
     x ^ (y + z) = x ^ y * x ^ z := by
   rcases hy.eq_or_lt with (rfl | hy)
   · rw [zero_add, rpow_zero, one_mul]
   exact rpow_add' hx (ne_of_gt <| add_pos_of_pos_of_nonneg hy hz)
-
-theorem le_rpow_add {x : ℝ} (hx : 0 ≤ x) (y z : ℝ) : x ^ y * x ^ z ≤ x ^ (y + z) := by
-  rcases le_iff_eq_or_lt.1 hx with (H | pos)
-  · by_cases h : y + z = 0
-    · simp only [H.symm, h, rpow_zero]
-      calc
-        (0 : ℝ) ^ y * 0 ^ z ≤ 1 * 1 :=
-          mul_le_mul (zero_rpow_le_one y) (zero_rpow_le_one z) (zero_rpow_nonneg z) zero_le_one
-        _ = 1 := by simp
-
-    · simp [rpow_add', ← H, h]
-  · simp [rpow_add pos]
 
 theorem rpow_sum_of_pos {ι : Type*} {a : ℝ} (ha : 0 < a) (f : ι → ℝ) (s : Finset ι) :
     (a ^ ∑ x ∈ s, f x) = ∏ x ∈ s, a ^ f x :=
@@ -200,9 +213,13 @@ theorem rpow_neg {x : ℝ} (hx : 0 ≤ x) (y : ℝ) : x ^ (-y) = (x ^ y)⁻¹ :=
 theorem rpow_sub {x : ℝ} (hx : 0 < x) (y z : ℝ) : x ^ (y - z) = x ^ y / x ^ z := by
   simp only [sub_eq_add_neg, rpow_add hx, rpow_neg (le_of_lt hx), div_eq_mul_inv]
 
--- DISSOLVED: rpow_sub'
+theorem rpow_sub' {x : ℝ} (hx : 0 ≤ x) {y z : ℝ} (h : y - z ≠ 0) : x ^ (y - z) = x ^ y / x ^ z := by
+  simp only [sub_eq_add_neg] at h ⊢
+  simp only [rpow_add' hx h, rpow_neg hx, div_eq_mul_inv]
 
--- DISSOLVED: _root_.HasCompactSupport.rpow_const
+protected theorem _root_.HasCompactSupport.rpow_const {α : Type*} [TopologicalSpace α] {f : α → ℝ}
+    (hf : HasCompactSupport f) {r : ℝ} (hr : r ≠ 0) : HasCompactSupport (fun x ↦ f x ^ r) :=
+  hf.comp_left (g := (· ^ r)) (Real.zero_rpow hr)
 
 end Real
 
@@ -241,7 +258,10 @@ lemma cpow_ofReal_re (x : ℂ) (y : ℝ) : (x ^ (y : ℂ)).re = (abs x) ^ y * Re
 lemma cpow_ofReal_im (x : ℂ) (y : ℝ) : (x ^ (y : ℂ)).im = (abs x) ^ y * Real.sin (arg x * y) := by
   rw [cpow_ofReal]; generalize arg x * y = z; simp [Real.sin]
 
--- DISSOLVED: abs_cpow_of_ne_zero
+theorem abs_cpow_of_ne_zero {z : ℂ} (hz : z ≠ 0) (w : ℂ) :
+    abs (z ^ w) = abs z ^ w.re / Real.exp (arg z * im w) := by
+  rw [cpow_def_of_ne_zero hz, abs_exp, mul_re, log_re, log_im, Real.exp_sub,
+    Real.rpow_def_of_pos (abs.pos hz)]
 
 theorem abs_cpow_of_imp {z w : ℂ} (h : z = 0 → w.re = 0 → w = 0) :
     abs (z ^ w) = abs z ^ w.re / Real.exp (arg z * im w) := by
@@ -269,9 +289,13 @@ theorem abs_cpow_eq_rpow_re_of_pos {x : ℝ} (hx : 0 < x) (y : ℂ) : abs (x ^ y
   rw [abs_cpow_of_ne_zero (ofReal_ne_zero.mpr hx.ne'), arg_ofReal_of_nonneg hx.le,
     zero_mul, Real.exp_zero, div_one, abs_of_nonneg hx.le]
 
--- DISSOLVED: abs_cpow_eq_rpow_re_of_nonneg
+theorem abs_cpow_eq_rpow_re_of_nonneg {x : ℝ} (hx : 0 ≤ x) {y : ℂ} (hy : re y ≠ 0) :
+    abs (x ^ y) = x ^ re y := by
+  rw [abs_cpow_of_imp] <;> simp [*, arg_ofReal_of_nonneg, _root_.abs_of_nonneg]
 
--- DISSOLVED: norm_natCast_cpow_of_re_ne_zero
+lemma norm_natCast_cpow_of_re_ne_zero (n : ℕ) {s : ℂ} (hs : s.re ≠ 0) :
+    ‖(n : ℂ) ^ s‖ = (n : ℝ) ^ (s.re) := by
+  rw [norm_eq_abs, ← ofReal_natCast, abs_cpow_eq_rpow_re_of_nonneg n.cast_nonneg hs]
 
 lemma norm_natCast_cpow_of_pos {n : ℕ} (hn : 0 < n) (s : ℂ) :
     ‖(n : ℂ) ^ s‖ = (n : ℝ) ^ (s.re) := by
@@ -332,33 +356,49 @@ theorem rpow_mul {x : ℝ} (hx : 0 ≤ x) (y z : ℝ) : x ^ (y * z) = (x ^ y) ^ 
     simp only [(Complex.ofReal_mul _ _).symm, (Complex.ofReal_log hx).symm, Complex.ofReal_im,
       neg_lt_zero, pi_pos, le_of_lt pi_pos]
 
--- DISSOLVED: rpow_add_intCast
+lemma rpow_add_intCast {x : ℝ} (hx : x ≠ 0) (y : ℝ) (n : ℤ) : x ^ (y + n) = x ^ y * x ^ n := by
+  rw [rpow_def, rpow_def, Complex.ofReal_add,
+    Complex.cpow_add _ _ (Complex.ofReal_ne_zero.mpr hx), Complex.ofReal_intCast,
+    Complex.cpow_intCast, ← Complex.ofReal_zpow, mul_comm, Complex.re_ofReal_mul, mul_comm]
 
--- DISSOLVED: rpow_add_natCast
+lemma rpow_add_natCast {x : ℝ} (hx : x ≠ 0) (y : ℝ) (n : ℕ) : x ^ (y + n) = x ^ y * x ^ n := by
+  simpa using rpow_add_intCast hx y n
 
--- DISSOLVED: rpow_sub_intCast
+lemma rpow_sub_intCast {x : ℝ} (hx : x ≠ 0) (y : ℝ) (n : ℕ) : x ^ (y - n) = x ^ y / x ^ n := by
+  simpa using rpow_add_intCast hx y (-n)
 
--- DISSOLVED: rpow_sub_natCast
+lemma rpow_sub_natCast {x : ℝ} (hx : x ≠ 0) (y : ℝ) (n : ℕ) : x ^ (y - n) = x ^ y / x ^ n := by
+  simpa using rpow_sub_intCast hx y n
 
--- DISSOLVED: rpow_add_intCast'
+lemma rpow_add_intCast' (hx : 0 ≤ x) {n : ℤ} (h : y + n ≠ 0) : x ^ (y + n) = x ^ y * x ^ n := by
+  rw [rpow_add' hx h, rpow_intCast]
 
--- DISSOLVED: rpow_add_natCast'
+lemma rpow_add_natCast' (hx : 0 ≤ x) (h : y + n ≠ 0) : x ^ (y + n) = x ^ y * x ^ n := by
+  rw [rpow_add' hx h, rpow_natCast]
 
--- DISSOLVED: rpow_sub_intCast'
+lemma rpow_sub_intCast' (hx : 0 ≤ x) {n : ℤ} (h : y - n ≠ 0) : x ^ (y - n) = x ^ y / x ^ n := by
+  rw [rpow_sub' hx h, rpow_intCast]
 
--- DISSOLVED: rpow_sub_natCast'
+lemma rpow_sub_natCast' (hx : 0 ≤ x) (h : y - n ≠ 0) : x ^ (y - n) = x ^ y / x ^ n := by
+  rw [rpow_sub' hx h, rpow_natCast]
 
--- DISSOLVED: rpow_add_one
+theorem rpow_add_one {x : ℝ} (hx : x ≠ 0) (y : ℝ) : x ^ (y + 1) = x ^ y * x := by
+  simpa using rpow_add_natCast hx y 1
 
--- DISSOLVED: rpow_sub_one
+theorem rpow_sub_one {x : ℝ} (hx : x ≠ 0) (y : ℝ) : x ^ (y - 1) = x ^ y / x := by
+  simpa using rpow_sub_natCast hx y 1
 
--- DISSOLVED: rpow_add_one'
+lemma rpow_add_one' (hx : 0 ≤ x) (h : y + 1 ≠ 0) : x ^ (y + 1) = x ^ y * x := by
+  rw [rpow_add' hx h, rpow_one]
 
--- DISSOLVED: rpow_one_add'
+lemma rpow_one_add' (hx : 0 ≤ x) (h : 1 + y ≠ 0) : x ^ (1 + y) = x * x ^ y := by
+  rw [rpow_add' hx h, rpow_one]
 
--- DISSOLVED: rpow_sub_one'
+lemma rpow_sub_one' (hx : 0 ≤ x) (h : y - 1 ≠ 0) : x ^ (y - 1) = x ^ y / x := by
+  rw [rpow_sub' hx h, rpow_one]
 
--- DISSOLVED: rpow_one_sub'
+lemma rpow_one_sub' (hx : 0 ≤ x) (h : 1 - y ≠ 0) : x ^ (1 - y) = x / x ^ y := by
+  rw [rpow_sub' hx h, rpow_one]
 
 @[simp]
 theorem rpow_two (x : ℝ) : x ^ (2 : ℝ) = x ^ 2 := by
@@ -389,13 +429,19 @@ theorem mul_log_eq_log_iff {x y z : ℝ} (hx : 0 < x) (hz : 0 < z) :
   ⟨fun h ↦ log_injOn_pos (rpow_pos_of_pos hx _) hz <| log_rpow hx _ |>.trans h,
   by rintro rfl; rw [log_rpow hx]⟩
 
--- DISSOLVED: rpow_rpow_inv
+@[simp] lemma rpow_rpow_inv (hx : 0 ≤ x) (hy : y ≠ 0) : (x ^ y) ^ y⁻¹ = x := by
+  rw [← rpow_mul hx, mul_inv_cancel₀ hy, rpow_one]
 
--- DISSOLVED: rpow_inv_rpow
+@[simp] lemma rpow_inv_rpow (hx : 0 ≤ x) (hy : y ≠ 0) : (x ^ y⁻¹) ^ y = x := by
+  rw [← rpow_mul hx, inv_mul_cancel₀ hy, rpow_one]
 
--- DISSOLVED: pow_rpow_inv_natCast
+theorem pow_rpow_inv_natCast (hx : 0 ≤ x) (hn : n ≠ 0) : (x ^ n) ^ (n⁻¹ : ℝ) = x := by
+  have hn0 : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.2 hn
+  rw [← rpow_natCast, ← rpow_mul hx, mul_inv_cancel₀ hn0, rpow_one]
 
--- DISSOLVED: rpow_inv_natCast_pow
+theorem rpow_inv_natCast_pow (hx : 0 ≤ x) (hn : n ≠ 0) : (x ^ (n⁻¹ : ℝ)) ^ n = x := by
+  have hn0 : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.2 hn
+  rw [← rpow_natCast, ← rpow_mul hx, inv_mul_cancel₀ hn0, rpow_one]
 
 lemma rpow_natCast_mul (hx : 0 ≤ x) (n : ℕ) (z : ℝ) : x ^ (n * z) = (x ^ n) ^ z := by
   rw [rpow_mul hx, rpow_natCast]
@@ -592,7 +638,11 @@ theorem one_le_rpow_of_pos_of_le_one_of_nonpos (hx1 : 0 < x) (hx2 : x ≤ 1) (hz
 theorem rpow_lt_one_iff_of_pos (hx : 0 < x) : x ^ y < 1 ↔ 1 < x ∧ y < 0 ∨ x < 1 ∧ 0 < y := by
   rw [rpow_def_of_pos hx, exp_lt_one_iff, mul_neg_iff, log_pos_iff hx, log_neg_iff hx]
 
--- DISSOLVED: rpow_lt_one_iff
+theorem rpow_lt_one_iff (hx : 0 ≤ x) :
+    x ^ y < 1 ↔ x = 0 ∧ y ≠ 0 ∨ 1 < x ∧ y < 0 ∨ x < 1 ∧ 0 < y := by
+  rcases hx.eq_or_lt with (rfl | hx)
+  · rcases _root_.em (y = 0) with (rfl | hy) <;> simp [*, lt_irrefl, zero_lt_one]
+  · simp [rpow_lt_one_iff_of_pos hx, hx.ne.symm]
 
 theorem rpow_lt_one_iff' {x y : ℝ} (hx : 0 ≤ x) (hy : 0 < y) :
     x ^ y < 1 ↔ x < 1 := by
@@ -614,13 +664,18 @@ theorem rpow_le_rpow_of_exponent_ge' (hx0 : 0 ≤ x) (hx1 : x ≤ 1) (hz : 0 ≤
     rw [zero_rpow, zero_rpow] <;> linarith
   · exact rpow_le_rpow_of_exponent_ge hx0' hx1 hyz
 
--- DISSOLVED: rpow_left_injOn
+theorem rpow_left_injOn {x : ℝ} (hx : x ≠ 0) : InjOn (fun y : ℝ => y ^ x) { y : ℝ | 0 ≤ y } := by
+  rintro y hy z hz (hyz : y ^ x = z ^ x)
+  rw [← rpow_one y, ← rpow_one z, ← mul_inv_cancel₀ hx, rpow_mul hy, rpow_mul hz, hyz]
 
--- DISSOLVED: rpow_left_inj
+lemma rpow_left_inj (hx : 0 ≤ x) (hy : 0 ≤ y) (hz : z ≠ 0) : x ^ z = y ^ z ↔ x = y :=
+  (rpow_left_injOn hz).eq_iff hx hy
 
--- DISSOLVED: rpow_inv_eq
+lemma rpow_inv_eq (hx : 0 ≤ x) (hy : 0 ≤ y) (hz : z ≠ 0) : x ^ z⁻¹ = y ↔ x = y ^ z := by
+  rw [← rpow_left_inj _ hy hz, rpow_inv_rpow hx hz]; positivity
 
--- DISSOLVED: eq_rpow_inv
+lemma eq_rpow_inv (hx : 0 ≤ x) (hy : 0 ≤ y) (hz : z ≠ 0) : x = y ^ z⁻¹ ↔ x ^ z = y := by
+  rw [← rpow_left_inj hx _ hz, rpow_inv_rpow hy hz]; positivity
 
 theorem le_rpow_iff_log_le (hx : 0 < x) (hy : 0 < y) : x ≤ y ^ z ↔ log x ≤ z * log y := by
   rw [← log_le_log_iff hx (rpow_pos_of_pos hy z), log_rpow hy]
@@ -780,7 +835,13 @@ lemma norm_prime_cpow_le_one_half (p : Nat.Primes) {s : ℂ} (hs : 1 < s.re) :
   rw [one_div, ← Real.rpow_neg_one]
   exact Real.rpow_le_rpow_of_exponent_le one_le_two <| (neg_lt_neg hs).le
 
--- DISSOLVED: one_sub_prime_cpow_ne_zero
+lemma one_sub_prime_cpow_ne_zero {p : ℕ} (hp : p.Prime) {s : ℂ} (hs : 1 < s.re) :
+    1 - (p : ℂ) ^ (-s) ≠ 0 := by
+  refine sub_ne_zero_of_ne fun H ↦ ?_
+  have := norm_prime_cpow_le_one_half ⟨p, hp⟩ hs
+  simp only at this
+  rw [← H, norm_one] at this
+  norm_num at this
 
 lemma norm_natCast_cpow_le_norm_natCast_cpow_of_pos {n : ℕ} (hn : 0 < n) {w z : ℂ}
     (h : w.re ≤ z.re) :
@@ -829,11 +890,32 @@ end Sqrt
 
 variable {n : ℕ}
 
--- DISSOLVED: exists_rat_pow_btwn_rat_aux
+theorem exists_rat_pow_btwn_rat_aux (hn : n ≠ 0) (x y : ℝ) (h : x < y) (hy : 0 < y) :
+    ∃ q : ℚ, 0 < q ∧ x < (q : ℝ) ^ n ∧ (q : ℝ) ^ n < y := by
+  have hn' : 0 < (n : ℝ) := mod_cast hn.bot_lt
+  obtain ⟨q, hxq, hqy⟩ :=
+    exists_rat_btwn (rpow_lt_rpow (le_max_left 0 x) (max_lt hy h) <| inv_pos.mpr hn')
+  have := rpow_nonneg (le_max_left 0 x) n⁻¹
+  have hq := this.trans_lt hxq
+  replace hxq := rpow_lt_rpow this hxq hn'
+  replace hqy := rpow_lt_rpow hq.le hqy hn'
+  rw [rpow_natCast, rpow_natCast, rpow_inv_natCast_pow _ hn] at hxq hqy
+  · exact ⟨q, mod_cast hq, (le_max_right _ _).trans_lt hxq, hqy⟩
+  · exact hy.le
+  · exact le_max_left _ _
 
--- DISSOLVED: exists_rat_pow_btwn_rat
+theorem exists_rat_pow_btwn_rat (hn : n ≠ 0) {x y : ℚ} (h : x < y) (hy : 0 < y) :
+    ∃ q : ℚ, 0 < q ∧ x < q ^ n ∧ q ^ n < y := by
+  apply_mod_cast exists_rat_pow_btwn_rat_aux hn x y <;> assumption
 
--- DISSOLVED: exists_rat_pow_btwn
+theorem exists_rat_pow_btwn {α : Type*} [LinearOrderedField α] [Archimedean α] (hn : n ≠ 0)
+    {x y : α} (h : x < y) (hy : 0 < y) : ∃ q : ℚ, 0 < q ∧ x < (q : α) ^ n ∧ (q : α) ^ n < y := by
+  obtain ⟨q₂, hx₂, hy₂⟩ := exists_rat_btwn (max_lt h hy)
+  obtain ⟨q₁, hx₁, hq₁₂⟩ := exists_rat_btwn hx₂
+  have : (0 : α) < q₂ := (le_max_right _ _).trans_lt hx₂
+  norm_cast at hq₁₂ this
+  obtain ⟨q, hq, hq₁, hq₂⟩ := exists_rat_pow_btwn_rat hn hq₁₂ this
+  refine ⟨q, hq, (le_max_left _ _).trans_lt <| hx₁.trans ?_, hy₂.trans' ?_⟩ <;> assumption_mod_cast
 
 end Real
 
@@ -867,7 +949,11 @@ lemma abs_cpow_inv_two_im (x : ℂ) : |(x ^ (2⁻¹ : ℂ)).im| = sqrt ((abs x -
 
 open scoped ComplexOrder in
 
--- DISSOLVED: inv_natCast_cpow_ofReal_pos
+lemma inv_natCast_cpow_ofReal_pos {n : ℕ} (hn : n ≠ 0) (x : ℝ) :
+    0 < ((n : ℂ) ^ (x : ℂ))⁻¹ := by
+  refine RCLike.inv_pos_of_pos ?_
+  rw [show (n : ℂ) ^ (x : ℂ) = (n : ℝ) ^ (x : ℂ) from rfl, ← ofReal_cpow n.cast_nonneg']
+  positivity
 
 end Complex
 

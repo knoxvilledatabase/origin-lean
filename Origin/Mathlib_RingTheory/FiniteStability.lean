@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.TensorProduct.RightExactness
 import Mathlib.RingTheory.FinitePresentation
 import Mathlib.RingTheory.TensorProduct.MvPolynomial
 
+noncomputable section
+
 /-!
 
 # Stability of finiteness conditions in commutative algebra

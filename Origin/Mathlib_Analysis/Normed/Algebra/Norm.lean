@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Ring.Seminorm
 import Mathlib.Analysis.Seminorm
 
+noncomputable section
+
 /-!
 # Algebra norms
 

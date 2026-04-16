@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Homology/DerivedCategory/Ext/Basic.lean
-Genuine: 39 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
+Genuine: 38 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Algebra.Homology.DerivedCategory.Basic
 import Mathlib.CategoryTheory.Localization.SmallShiftedHom
+
+noncomputable section
 
 /-!
 # Ext groups in abelian categories
@@ -242,7 +244,6 @@ lemma mk₀_zero : mk₀ (0 : X ⟶ Y) = 0 := by
 section
 
 attribute [local instance] preservesBinaryBiproducts_of_preservesBiproducts in
-
 lemma biprod_ext {X₁ X₂ : C} {α β : Ext (X₁ ⊞ X₂) Y n}
     (h₁ : (mk₀ biprod.inl).comp α (zero_add n) = (mk₀ biprod.inl).comp β (zero_add n))
     (h₂ : (mk₀ biprod.inr).comp α (zero_add n) = (mk₀ biprod.inr).comp β (zero_add n)) :
@@ -290,15 +291,6 @@ lemma add_hom (α β : Ext X Y n) : (α + β).hom = α.hom + β.hom := by
 
 lemma neg_hom (α : Ext X Y n) : (-α).hom = -α.hom := by
   rw [← add_right_inj α.hom, ← add_hom, add_neg_cancel, add_neg_cancel, zero_hom]
-
-noncomputable def homAddEquiv {n : ℕ} :
-    Ext.{w} X Y n ≃+
-      ShiftedHom ((singleFunctor C 0).obj X) ((singleFunctor C 0).obj Y) (n : ℤ) where
-  toEquiv := homEquiv
-  map_add' := by simp
-
-@[simp]
-lemma homAddEquiv_apply (α : Ext X Y n) : homAddEquiv α = α.hom := rfl
 
 end
 

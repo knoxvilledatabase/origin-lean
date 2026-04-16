@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Ring.Nat
 import Mathlib.Geometry.RingedSpace.SheafedSpace
 import Mathlib.Topology.Sheaves.Stalks
 
+noncomputable section
+
 /-!
 # Ringed spaces
 

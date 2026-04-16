@@ -1,12 +1,14 @@
 /-
 Extracted from LinearAlgebra/Dimension/Localization.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 7 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.LocalizedModule.Submodule
 import Mathlib.LinearAlgebra.Dimension.DivisionRing
 import Mathlib.RingTheory.Localization.FractionRing
 import Mathlib.RingTheory.OreLocalization.OreSet
+
+noncomputable section
 
 /-!
 # Rank of localization
@@ -116,7 +118,6 @@ theorem rank_quotient_add_rank_of_isDomain [IsDomain R] (M' : Submodule R M) :
     ← lift_add, rank_quotient_add_rank_of_divisionRing]
 
 universe w in
-
 instance IsDomain.hasRankNullity [IsDomain R] : HasRankNullity.{w} R where
   rank_quotient_add_rank := rank_quotient_add_rank_of_isDomain
   exists_set_linearIndependent M := exists_set_linearIndependent_of_isDomain R M

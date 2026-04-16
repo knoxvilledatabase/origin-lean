@@ -7,6 +7,8 @@ import Mathlib.RingTheory.AdicCompletion.Basic
 import Mathlib.RingTheory.AdicCompletion.Algebra
 import Mathlib.Algebra.DirectSum.Basic
 
+noncomputable section
+
 /-!
 # Functoriality of adic completions
 
@@ -61,12 +63,6 @@ def reduceModIdeal (f : M →ₗ[R] N) :
       Submodule.Quotient.mk_smul, LinearMapClass.map_smul, reduceModIdealAux_apply,
       RingHomCompTriple.comp_apply]
 
-@[simp]
-theorem reduceModIdeal_apply (f : M →ₗ[R] N) (x : M) :
-    (f.reduceModIdeal I) (Submodule.Quotient.mk (p := (I • ⊤ : Submodule R M)) x) =
-      Submodule.Quotient.mk (p := (I • ⊤ : Submodule R N)) (f x) :=
-  rfl
-
 end LinearMap
 
 namespace AdicCompletion
@@ -94,20 +90,12 @@ def map (f : M →ₗ[R] N) : AdicCauchySequence I M →ₗ[R] AdicCauchySequenc
 
 variable (M) in
 
-@[simp]
-theorem map_id : map I (LinearMap.id (M := M)) = LinearMap.id :=
-  rfl
-
 theorem map_comp (f : M →ₗ[R] N) (g : N →ₗ[R] P) :
     map I g ∘ₗ map I f = map I (g ∘ₗ f) :=
   rfl
 
 theorem map_comp_apply (f : M →ₗ[R] N) (g : N →ₗ[R] P) (a : AdicCauchySequence I M) :
     map I g (map I f a) = map I (g ∘ₗ f) a :=
-  rfl
-
-@[simp]
-theorem map_zero : map I (0 : M →ₗ[R] N) = 0 :=
   rfl
 
 end AdicCauchySequence
@@ -131,11 +119,6 @@ def map (f : M →ₗ[R] N) :
     ext n
     simp only [adicCompletionAux_val_apply, smul_eval, smul_eq_mul, RingHom.id_apply]
     rw [val_smul_eq_evalₐ_smul, val_smul_eq_evalₐ_smul, map_smul]
-
-@[simp]
-theorem map_val_apply (f : M →ₗ[R] N) {n : ℕ} (x : AdicCompletion I M) :
-    (map I f x).val n = f.reduceModIdeal (I ^ n) (x.val n) :=
-  rfl
 
 theorem map_ext {N} {f g : AdicCompletion I M → N}
     (h : ∀ (a : AdicCauchySequence I M),
@@ -161,13 +144,6 @@ theorem map_ext'' {f g : AdicCompletion I M →ₗ[R] N}
 
 variable (M) in
 
-@[simp]
-theorem map_id :
-    map I (LinearMap.id (M := M)) =
-      LinearMap.id (R := AdicCompletion I R) (M := AdicCompletion I M) := by
-  ext a n
-  simp
-
 theorem map_comp (f : M →ₗ[R] N) (g : N →ₗ[R] P) :
     map I g ∘ₗ map I f = map I (g ∘ₗ f) := by
   ext
@@ -184,25 +160,10 @@ theorem map_mk (f : M →ₗ[R] N) (a : AdicCauchySequence I M) :
       AdicCompletion.mk I N (AdicCauchySequence.map I f a) :=
   rfl
 
-@[simp]
-theorem map_zero : map I (0 : M →ₗ[R] N) = 0 := by
-  ext
-  simp
-
 def congr (f : M ≃ₗ[R] N) :
     AdicCompletion I M ≃ₗ[AdicCompletion I R] AdicCompletion I N :=
   LinearEquiv.ofLinear (map I f)
     (map I f.symm) (by simp [map_comp]) (by simp [map_comp])
-
-@[simp]
-theorem congr_apply (f : M ≃ₗ[R] N) (x : AdicCompletion I M) :
-    congr I f x = map I f x :=
-  rfl
-
-@[simp]
-theorem congr_symm_apply (f : M ≃ₗ[R] N) (x : AdicCompletion I N) :
-    (congr I f).symm x = map I f.symm x :=
-  rfl
 
 section Families
 
@@ -299,16 +260,6 @@ theorem sum_comp_sumInv : sum I M ∘ₗ sumInv I M = LinearMap.id := by
 def sumEquivOfFintype :
     (⨁ j, (AdicCompletion I (M j))) ≃ₗ[AdicCompletion I R] AdicCompletion I (⨁ j, M j) :=
   LinearEquiv.ofLinear (sum I M) (sumInv I M) (sum_comp_sumInv I M) (sumInv_comp_sum I M)
-
-@[simp]
-theorem sumEquivOfFintype_apply (x : ⨁ j, (AdicCompletion I (M j))) :
-    sumEquivOfFintype I M x = sum I M x :=
-  rfl
-
-@[simp]
-theorem sumEquivOfFintype_symm_apply (x : AdicCompletion I (⨁ j, M j)) :
-    (sumEquivOfFintype I M).symm x = sumInv I M x :=
-  rfl
 
 end Sum
 

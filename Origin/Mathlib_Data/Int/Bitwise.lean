@@ -7,6 +7,8 @@ import Mathlib.Algebra.Ring.Int.Defs
 import Mathlib.Data.Nat.Bitwise
 import Mathlib.Data.Nat.Size
 
+noncomputable section
+
 /-!
 # Bitwise operations on integers
 
@@ -83,17 +85,6 @@ instance : ShiftRight ℤ where
 
 /-! ### bitwise ops -/
 
-@[simp]
-theorem bodd_zero : bodd 0 = false :=
-  rfl
-
-@[simp]
-theorem bodd_one : bodd 1 = true :=
-  rfl
-
-theorem bodd_two : bodd 2 = false :=
-  rfl
-
 @[simp, norm_cast]
 theorem bodd_coe (n : ℕ) : Int.bodd n = Nat.bodd n :=
   rfl
@@ -164,10 +155,6 @@ theorem bit_decomp (n : ℤ) : bit (bodd n) (div2 n) = n :=
 def bitCasesOn.{u} {C : ℤ → Sort u} (n) (h : ∀ b n, C (bit b n)) : C n := by
   rw [← bit_decomp n]
   apply h
-
-@[simp]
-theorem bit_zero : bit false 0 = 0 :=
-  rfl
 
 @[simp]
 theorem bit_coe_nat (b) (n : ℕ) : bit b n = Nat.bit b n := by
@@ -339,10 +326,6 @@ theorem shiftLeft_coe_nat (m n : ℕ) : (m : ℤ) <<< (n : ℤ) = ↑(m <<< n) :
 
 @[simp]
 theorem shiftRight_coe_nat (m n : ℕ) : (m : ℤ) >>> (n : ℤ) = m >>> n := by cases n <;> rfl
-
-@[simp]
-theorem shiftLeft_negSucc (m n : ℕ) : -[m+1] <<< (n : ℤ) = -[Nat.shiftLeft' true m n+1] :=
-  rfl
 
 @[simp]
 theorem shiftRight_negSucc (m n : ℕ) : -[m+1] >>> (n : ℤ) = -[m >>> n+1] := by cases n <;> rfl

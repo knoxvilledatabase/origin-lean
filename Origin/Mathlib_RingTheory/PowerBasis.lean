@@ -1,10 +1,12 @@
 /-
 Extracted from RingTheory/PowerBasis.lean
-Genuine: 38 | Conflates: 7 | Dissolved: 4 | Infrastructure: 2
+Genuine: 41 | Conflates: 8 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.FieldTheory.Minpoly.Field
 import Mathlib.LinearAlgebra.SModEq
+
+noncomputable section
 
 /-!
 # Power basis
@@ -82,9 +84,22 @@ theorem mem_span_pow' {x y : S} {d : ℕ} :
   simp_rw [@eq_comm _ y]
   exact Iff.rfl
 
--- DISSOLVED: mem_span_pow
+theorem mem_span_pow {x y : S} {d : ℕ} (hd : d ≠ 0) :
+    y ∈ Submodule.span R (Set.range fun i : Fin d => x ^ (i : ℕ)) ↔
+      ∃ f : R[X], f.natDegree < d ∧ y = aeval x f := by
+  rw [mem_span_pow']
+  constructor <;>
+    · rintro ⟨f, h, hy⟩
+      refine ⟨f, ?_, hy⟩
+      by_cases hf : f = 0
+      · simp only [hf, natDegree_zero, degree_zero] at h ⊢
+        first | exact lt_of_le_of_ne (Nat.zero_le d) hd.symm | exact WithBot.bot_lt_coe d
+      simp_all only [degree_eq_natDegree hf]
+      · first | exact WithBot.coe_lt_coe.1 h | exact WithBot.coe_lt_coe.2 h
 
--- DISSOLVED: dim_ne_zero
+-- CONFLATES (assumes ground = zero): dim_ne_zero
+theorem dim_ne_zero [Nontrivial S] (pb : PowerBasis R S) : pb.dim ≠ 0 := fun h =>
+  not_nonempty_iff.mpr (h.symm ▸ Fin.isEmpty : IsEmpty (Fin pb.dim)) pb.basis.index_nonempty
 
 -- CONFLATES (assumes ground = zero): dim_pos
 theorem dim_pos [Nontrivial S] (pb : PowerBasis R S) : 0 < pb.dim :=
@@ -150,9 +165,19 @@ theorem minpolyGen_monic (pb : PowerBasis A S) : Monic (minpolyGen pb) := by
   rw [degree_X_pow]
   exact degree_sum_fin_lt _
 
--- DISSOLVED: dim_le_natDegree_of_root
+theorem dim_le_natDegree_of_root (pb : PowerBasis A S) {p : A[X]} (ne_zero : p ≠ 0)
+    (root : aeval pb.gen p = 0) : pb.dim ≤ p.natDegree := by
+  refine le_of_not_lt fun hlt => ne_zero ?_
+  rw [p.as_sum_range' _ hlt, Finset.sum_range]
+  refine Fintype.sum_eq_zero _ fun i => ?_
+  simp_rw [aeval_eq_sum_range' hlt, Finset.sum_range, ← pb.basis_eq_pow] at root
+  have := Fintype.linearIndependent_iff.1 pb.basis.linearIndependent _ root
+  rw [this, monomial_zero_right]
 
--- DISSOLVED: dim_le_degree_of_root
+theorem dim_le_degree_of_root (h : PowerBasis A S) {p : A[X]} (ne_zero : p ≠ 0)
+    (root : aeval h.gen p = 0) : ↑h.dim ≤ p.degree := by
+  rw [degree_eq_natDegree ne_zero]
+  exact WithBot.coe_le_coe.2 (h.dim_le_natDegree_of_root ne_zero root)
 
 -- CONFLATES (assumes ground = zero): degree_minpolyGen
 theorem degree_minpolyGen [Nontrivial A] (pb : PowerBasis A S) :
@@ -309,12 +334,6 @@ theorem equivOfRoot_gen (pb : PowerBasis A S) (pb' : PowerBasis A S')
     pb.equivOfRoot pb' h₁ h₂ pb.gen = pb'.gen :=
   pb.lift_gen _ h₂
 
-@[simp]
-theorem equivOfRoot_symm (pb : PowerBasis A S) (pb' : PowerBasis A S')
-    (h₁ : aeval pb.gen (minpoly A pb'.gen) = 0) (h₂ : aeval pb'.gen (minpoly A pb.gen) = 0) :
-    (pb.equivOfRoot pb' h₁ h₂).symm = pb'.equivOfRoot pb h₂ h₁ :=
-  rfl
-
 @[simps! (config := .lemmasOnly) apply]
 noncomputable def equivOfMinpoly (pb : PowerBasis A S) (pb' : PowerBasis A S')
     (h : minpoly A pb.gen = minpoly A pb'.gen) : S ≃ₐ[A] S' :=
@@ -330,12 +349,6 @@ theorem equivOfMinpoly_aeval (pb : PowerBasis A S) (pb' : PowerBasis A S')
 theorem equivOfMinpoly_gen (pb : PowerBasis A S) (pb' : PowerBasis A S')
     (h : minpoly A pb.gen = minpoly A pb'.gen) : pb.equivOfMinpoly pb' h pb.gen = pb'.gen :=
   pb.equivOfRoot_gen pb' _ _
-
-@[simp]
-theorem equivOfMinpoly_symm (pb : PowerBasis A S) (pb' : PowerBasis A S')
-    (h : minpoly A pb.gen = minpoly A pb'.gen) :
-    (pb.equivOfMinpoly pb' h).symm = pb'.equivOfMinpoly pb h.symm :=
-  rfl
 
 end Equiv
 

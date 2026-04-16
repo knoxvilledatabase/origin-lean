@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Measure.Typeclasses
 import Mathlib.Topology.Algebra.InfiniteSum.Module
 
+noncomputable section
+
 /-!
 
 # Vector valued measures
@@ -487,10 +489,6 @@ def mapRange (v : VectorMeasure α M) (f : M →+ N) (hf : Continuous f) : Vecto
   empty' := by simp only; rw [empty, AddMonoidHom.map_zero]
   not_measurable' i hi := by simp only; rw [not_measurable v hi, AddMonoidHom.map_zero]
   m_iUnion' _ hg₁ hg₂ := HasSum.map (v.m_iUnion hg₁ hg₂) f hf
-
-@[simp]
-theorem mapRange_apply {f : M →+ N} (hf : Continuous f) {s : Set α} : v.mapRange f hf s = f (v s) :=
-  rfl
 
 @[simp]
 theorem mapRange_id : v.mapRange (AddMonoidHom.id M) continuous_id = v := by

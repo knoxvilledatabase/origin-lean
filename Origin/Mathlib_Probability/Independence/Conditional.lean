@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Independence.Kernel
 import Mathlib.Probability.Kernel.Condexp
 
+noncomputable section
+
 /-!
 # Conditional Independence
 

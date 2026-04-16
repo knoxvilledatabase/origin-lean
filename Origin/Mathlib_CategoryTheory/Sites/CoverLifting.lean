@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 import Mathlib.CategoryTheory.Sites.Continuous
 import Mathlib.CategoryTheory.Sites.Sheafification
 
+noncomputable section
+
 /-!
 # Cocontinuous functors between sites.
 
@@ -182,7 +184,6 @@ lemma fac (i : S.Arrow) : lift hF hR s ≫ R.map i.f.op = s.ι i := by
   simpa using liftAux_map hF α s (j.hom.unop ≫ i.f) (𝟙 _) i j.hom.unop (by simp)
 
 include hR hF in
-
 variable (K) in
 
 lemma hom_ext {W : A} {f g : W ⟶ R.obj (op X)}

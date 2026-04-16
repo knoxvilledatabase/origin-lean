@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.Matrix.MvPolynomial
 import Mathlib.LinearAlgebra.Matrix.Polynomial
 import Mathlib.RingTheory.Polynomial.Basic
 
+noncomputable section
+
 /-!
 # Cramer's rule and adjugate matrices
 

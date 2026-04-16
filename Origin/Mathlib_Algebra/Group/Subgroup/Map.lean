@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Subgroup.Lattice
 import Mathlib.Algebra.Group.TypeTags.Hom
 
+noncomputable section
+
 /-!
 # `map` and `comap` for subgroups
 
@@ -91,15 +93,6 @@ theorem comap_id (K : Subgroup N) : K.comap (MonoidHom.id _) = K := by
   ext
   rfl
 
-@[simp]
-theorem toAddSubgroup_comap {G₂ : Type*} [Group G₂] (f : G →* G₂) (s : Subgroup G₂) :
-    s.toAddSubgroup.comap (MonoidHom.toAdditive f) = Subgroup.toAddSubgroup (s.comap f) := rfl
-
-@[simp]
-theorem _root_.AddSubgroup.toSubgroup_comap {A A₂ : Type*} [AddGroup A] [AddGroup A₂]
-    (f : A →+ A₂) (s : AddSubgroup A₂) :
-    s.toSubgroup.comap (AddMonoidHom.toMultiplicative f) = AddSubgroup.toSubgroup (s.comap f) := rfl
-
 @[to_additive
       "The image of an `AddSubgroup` along an `AddMonoid` homomorphism
       is an `AddSubgroup`."]
@@ -113,9 +106,6 @@ def map (f : G →* N) (H : Subgroup G) : Subgroup N :=
 @[to_additive (attr := simp)]
 theorem coe_map (f : G →* N) (K : Subgroup G) : (K.map f : Set N) = f '' K :=
   rfl
-
-@[to_additive (attr := simp)]
-theorem mem_map {f : G →* N} {K : Subgroup G} {y : N} : y ∈ K.map f ↔ ∃ x ∈ K, f x = y := Iff.rfl
 
 @[to_additive]
 theorem mem_map_of_mem (f : G →* N) {K : Subgroup G} {x : G} (hx : x ∈ K) : f x ∈ K.map f :=
@@ -267,19 +257,6 @@ def subgroupOfEquivOfLe {G : Type*} [Group G] {H K : Subgroup G} (h : H ≤ K) :
   right_inv _g := Subtype.ext rfl
   map_mul' _g _h := rfl
 
-@[to_additive (attr := simp)]
-theorem comap_subtype (H K : Subgroup G) : H.comap K.subtype = H.subgroupOf K :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem comap_inclusion_subgroupOf {K₁ K₂ : Subgroup G} (h : K₁ ≤ K₂) (H : Subgroup G) :
-    (H.subgroupOf K₂).comap (inclusion h) = H.subgroupOf K₁ :=
-  rfl
-
-@[to_additive]
-theorem coe_subgroupOf (H K : Subgroup G) : (H.subgroupOf K : Set K) = K.subtype ⁻¹' H :=
-  rfl
-
 @[to_additive]
 theorem mem_subgroupOf {H K : Subgroup G} {h : K} : h ∈ H.subgroupOf K ↔ (h : G) ∈ H :=
   Iff.rfl
@@ -406,11 +383,6 @@ noncomputable def equivMapOfInjective (H : Subgroup G) (f : G →* N) (hf : Func
     H ≃* H.map f :=
   { Equiv.Set.image f H hf with map_mul' := fun _ _ => Subtype.ext (f.map_mul _ _) }
 
-@[to_additive (attr := simp)]
-theorem coe_equivMapOfInjective_apply (H : Subgroup G) (f : G →* N) (hf : Function.Injective f)
-    (h : H) : (equivMapOfInjective H f hf h : N) = f h :=
-  rfl
-
 end Subgroup
 
 variable {N : Type*} [Group N]
@@ -443,29 +415,11 @@ variable {H K : Subgroup G}
 def subgroupCongr (h : H = K) : H ≃* K :=
   { Equiv.setCongr <| congr_arg _ h with map_mul' := fun _ _ => rfl }
 
-@[to_additive (attr := simp)]
-lemma subgroupCongr_apply (h : H = K) (x) :
-    (MulEquiv.subgroupCongr h x : G) = x := rfl
-
-@[to_additive (attr := simp)]
-lemma subgroupCongr_symm_apply (h : H = K) (x) :
-    ((MulEquiv.subgroupCongr h).symm x : G) = x := rfl
-
 @[to_additive
       "An additive subgroup is isomorphic to its image under an isomorphism. If you only
       have an injective map, use `AddSubgroup.equiv_map_of_injective`."]
 def subgroupMap (e : G ≃* G') (H : Subgroup G) : H ≃* H.map (e : G →* G') :=
   MulEquiv.submonoidMap (e : G ≃* G') H.toSubmonoid
-
-@[to_additive (attr := simp)]
-theorem coe_subgroupMap_apply (e : G ≃* G') (H : Subgroup G) (g : H) :
-    ((subgroupMap e H g : H.map (e : G →* G')) : G') = e g :=
-  rfl
-
-@[to_additive (attr := simp)]
-theorem subgroupMap_symm_apply (e : G ≃* G') (H : Subgroup G) (g : H.map (e : G →* G')) :
-    (e.subgroupMap H).symm g = ⟨e.symm g, SetLike.mem_coe.1 <| Set.mem_image_equiv.1 g.2⟩ :=
-  rfl
 
 end MulEquiv
 

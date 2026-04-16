@@ -7,6 +7,8 @@ import Mathlib.Algebra.GroupWithZero.Divisibility
 import Mathlib.Data.Int.Order.Units
 import Mathlib.Data.ZMod.Basic
 
+noncomputable section
+
 /-!
 # The power operator on `ℤˣ` by `ZMod 2`, `ℕ`, and `ℤ`
 
@@ -55,11 +57,6 @@ instance Int.instUnitsPow : Pow ℤˣ R where
 example : Int.instUnitsPow = Monoid.toNatPow := rfl
 
 example : Int.instUnitsPow = DivInvMonoid.Pow := rfl
-
-@[simp] lemma ofMul_uzpow (u : ℤˣ) (r : R) : Additive.ofMul (u ^ r) = r • Additive.ofMul u := rfl
-
-@[simp] lemma toMul_uzpow (u : Additive ℤˣ) (r : R) :
-  (r • u).toMul = u.toMul ^ r := rfl
 
 @[norm_cast] lemma uzpow_natCast (u : ℤˣ) (n : ℕ) : u ^ (n : R) = u ^ n := by
   change ((n : R) • Additive.ofMul u).toMul = _

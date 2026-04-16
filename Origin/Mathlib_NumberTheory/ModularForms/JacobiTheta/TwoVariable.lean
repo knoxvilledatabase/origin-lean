@@ -8,6 +8,8 @@ import Mathlib.Analysis.NormedSpace.OperatorNorm.Prod
 import Mathlib.Analysis.SpecialFunctions.Gaussian.PoissonSummation
 import Mathlib.Data.Complex.FiniteDimensional
 
+noncomputable section
+
 /-!
 # The two-variable Jacobi theta function
 

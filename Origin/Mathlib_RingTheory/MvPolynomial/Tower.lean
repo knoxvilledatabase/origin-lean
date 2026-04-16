@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Algebra.Tower
 import Mathlib.Algebra.MvPolynomial.Basic
 
+noncomputable section
+
 /-!
 # Algebra towers for multivariate polynomial
 

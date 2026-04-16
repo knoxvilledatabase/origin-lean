@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.Action.Prod
 import Mathlib.Data.PNat.Basic
 
+noncomputable section
+
 /-!
 # Typeclasses for power-associative structures
 

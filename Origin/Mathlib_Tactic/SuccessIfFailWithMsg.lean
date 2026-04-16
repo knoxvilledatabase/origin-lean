@@ -7,6 +7,8 @@ import Lean.Elab.Eval
 import Lean.Elab.Tactic.BuiltinTactic
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # Success If Fail With Message
 

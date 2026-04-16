@@ -1,12 +1,14 @@
 /-
 Extracted from Algebra/Order/Interval/Set/Instances.lean
-Genuine: 24 | Conflates: 4 | Dissolved: 4 | Infrastructure: 36
+Genuine: 27 | Conflates: 5 | Dissolved: 0 | Infrastructure: 36
 -/
 import Origin.Core
 import Mathlib.Algebra.GroupWithZero.InjSurj
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Algebra.Ring.Regular
 import Mathlib.Order.Interval.Set.Basic
+
+noncomputable section
 
 /-!
 # Algebraic instances for unit intervals
@@ -58,27 +60,21 @@ theorem coe_zero : ↑(0 : Icc (0 : α) 1) = (0 : α) :=
 theorem coe_one : ↑(1 : Icc (0 : α) 1) = (1 : α) :=
   rfl
 
-@[simp]
-theorem mk_zero (h : (0 : α) ∈ Icc (0 : α) 1) : (⟨0, h⟩ : Icc (0 : α) 1) = 0 :=
-  rfl
-
-@[simp]
-theorem mk_one (h : (1 : α) ∈ Icc (0 : α) 1) : (⟨1, h⟩ : Icc (0 : α) 1) = 1 :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_eq_zero {x : Icc (0 : α) 1} : (x : α) = 0 ↔ x = 0 := by
   symm
   exact Subtype.ext_iff
 
--- DISSOLVED: coe_ne_zero
+theorem coe_ne_zero {x : Icc (0 : α) 1} : (x : α) ≠ 0 ↔ x ≠ 0 :=
+  not_iff_not.mpr coe_eq_zero
 
 @[simp, norm_cast]
 theorem coe_eq_one {x : Icc (0 : α) 1} : (x : α) = 1 ↔ x = 1 := by
   symm
   exact Subtype.ext_iff
 
--- DISSOLVED: coe_ne_one
+theorem coe_ne_one {x : Icc (0 : α) 1} : (x : α) ≠ 1 ↔ x ≠ 1 :=
+  not_iff_not.mpr coe_eq_one
 
 theorem coe_nonneg (x : Icc (0 : α) 1) : 0 ≤ (x : α) :=
   x.2.1
@@ -155,18 +151,15 @@ instance zero [Nontrivial α] : Zero (Ico (0 : α) 1) where zero := ⟨0, left_m
 theorem coe_zero [Nontrivial α] : ↑(0 : Ico (0 : α) 1) = (0 : α) :=
   rfl
 
--- CONFLATES (assumes ground = zero): mk_zero
-@[simp]
-theorem mk_zero [Nontrivial α] (h : (0 : α) ∈ Ico (0 : α) 1) : (⟨0, h⟩ : Ico (0 : α) 1) = 0 :=
-  rfl
-
 -- CONFLATES (assumes ground = zero): coe_eq_zero
 @[simp, norm_cast]
 theorem coe_eq_zero [Nontrivial α] {x : Ico (0 : α) 1} : (x : α) = 0 ↔ x = 0 := by
   symm
   exact Subtype.ext_iff
 
--- DISSOLVED: coe_ne_zero
+-- CONFLATES (assumes ground = zero): coe_ne_zero
+theorem coe_ne_zero [Nontrivial α] {x : Ico (0 : α) 1} : (x : α) ≠ 0 ↔ x ≠ 0 :=
+  not_iff_not.mpr coe_eq_zero
 
 theorem coe_nonneg (x : Ico (0 : α) 1) : 0 ≤ (x : α) :=
   x.2.1
@@ -208,16 +201,13 @@ instance one : One (Ioc (0 : α) 1) where one := ⟨1, ⟨zero_lt_one, le_refl 1
 theorem coe_one : ↑(1 : Ioc (0 : α) 1) = (1 : α) :=
   rfl
 
-@[simp]
-theorem mk_one (h : (1 : α) ∈ Ioc (0 : α) 1) : (⟨1, h⟩ : Ioc (0 : α) 1) = 1 :=
-  rfl
-
 @[simp, norm_cast]
 theorem coe_eq_one {x : Ioc (0 : α) 1} : (x : α) = 1 ↔ x = 1 := by
   symm
   exact Subtype.ext_iff
 
--- DISSOLVED: coe_ne_one
+theorem coe_ne_one {x : Ioc (0 : α) 1} : (x : α) ≠ 1 ↔ x ≠ 1 :=
+  not_iff_not.mpr coe_eq_one
 
 theorem coe_pos (x : Ioc (0 : α) 1) : 0 < (x : α) :=
   x.2.1

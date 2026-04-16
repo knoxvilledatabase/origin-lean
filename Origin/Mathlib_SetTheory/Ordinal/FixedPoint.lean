@@ -1,11 +1,13 @@
 /-
 Extracted from SetTheory/Ordinal/FixedPoint.lean
-Genuine: 86 | Conflates: 0 | Dissolved: 4 | Infrastructure: 6
+Genuine: 90 | Conflates: 0 | Dissolved: 0 | Infrastructure: 6
 -/
 import Origin.Core
 import Mathlib.Logic.Small.List
 import Mathlib.SetTheory.Ordinal.Enum
 import Mathlib.SetTheory.Ordinal.Exponential
+
+noncomputable section
 
 /-!
 # Fixed points of normal functions
@@ -42,10 +44,6 @@ variable {ι : Type*} {f : ι → Ordinal.{u} → Ordinal.{u}}
 
 def nfpFamily (f : ι → Ordinal.{u} → Ordinal.{u}) (a : Ordinal.{u}) : Ordinal :=
   ⨆ i, List.foldr f a i
-
-theorem nfpFamily_eq_sup (f : ι → Ordinal.{u} → Ordinal.{u}) (a : Ordinal.{u}) :
-    nfpFamily f a = ⨆ i, List.foldr f a i :=
-  rfl
 
 theorem foldr_le_nfpFamily [Small.{u} ι] (f : ι → Ordinal.{u} → Ordinal.{u}) (a l) :
     List.foldr f a l ≤ nfpFamily f a :=
@@ -214,10 +212,6 @@ def nfpBFamily (o : Ordinal.{u}) (f : ∀ b < o, Ordinal.{max u v} → Ordinal.{
     Ordinal.{max u v} → Ordinal.{max u v} :=
   nfpFamily (familyOfBFamily o f)
 
-theorem nfpBFamily_eq_nfpFamily {o : Ordinal} (f : ∀ b < o, Ordinal → Ordinal) :
-    nfpBFamily.{u, v} o f = nfpFamily (familyOfBFamily o f) :=
-  rfl
-
 theorem foldr_le_nfpBFamily {o : Ordinal}
     (f : ∀ b < o, Ordinal → Ordinal) (a l) :
     List.foldr (familyOfBFamily o f) a l ≤ nfpBFamily.{u, v} o f a :=
@@ -247,9 +241,18 @@ theorem apply_lt_nfpBFamily (H : ∀ i hi, IsNormal (f i hi)) {a b} (hb : b < nf
   rw [← familyOfBFamily_enum o f]
   apply apply_lt_nfpFamily (fun _ => H _ _) hb
 
--- DISSOLVED: apply_lt_nfpBFamily_iff
+theorem apply_lt_nfpBFamily_iff (ho : o ≠ 0) (H : ∀ i hi, IsNormal (f i hi)) {a b} :
+    (∀ i hi, f i hi b < nfpBFamily.{u, v} o f a) ↔ b < nfpBFamily.{u, v} o f a :=
+  ⟨fun h => by
+    haveI := toType_nonempty_iff_ne_zero.2 ho
+    refine (apply_lt_nfpFamily_iff ?_).1 fun _ => h _ _
+    exact fun _ => H _ _, apply_lt_nfpBFamily H⟩
 
--- DISSOLVED: nfpBFamily_le_apply
+theorem nfpBFamily_le_apply (ho : o ≠ 0) (H : ∀ i hi, IsNormal (f i hi)) {a b} :
+    (∃ i hi, nfpBFamily.{u, v} o f a ≤ f i hi b) ↔ nfpBFamily.{u, v} o f a ≤ b := by
+  rw [← not_iff_not]
+  push_neg
+  exact apply_lt_nfpBFamily_iff.{u, v} ho H
 
 theorem nfpBFamily_le_fp (H : ∀ i hi, Monotone (f i hi)) {a b} (ab : a ≤ b)
     (h : ∀ i hi, f i hi b ≤ b) : nfpBFamily.{u, v} o f a ≤ b :=
@@ -262,7 +265,13 @@ theorem nfpBFamily_fp {i hi} (H : IsNormal (f i hi)) (a) :
   rw [familyOfBFamily_enum]
   exact H
 
--- DISSOLVED: apply_le_nfpBFamily
+theorem apply_le_nfpBFamily (ho : o ≠ 0) (H : ∀ i hi, IsNormal (f i hi)) {a b} :
+    (∀ i hi, f i hi b ≤ nfpBFamily.{u, v} o f a) ↔ b ≤ nfpBFamily.{u, v} o f a := by
+  refine ⟨fun h => ?_, fun h i hi => ?_⟩
+  · have ho' : 0 < o := Ordinal.pos_iff_ne_zero.2 ho
+    exact (H 0 ho').le_apply.trans (h 0 ho')
+  · rw [← nfpBFamily_fp (H i hi)]
+    exact (H i hi).monotone h
 
 theorem nfpBFamily_eq_self {a} (h : ∀ i hi, f i hi a = a) : nfpBFamily.{u, v} o f a = a :=
   nfpFamily_eq_self fun _ => h _ _
@@ -283,10 +292,6 @@ theorem fp_bfamily_unbounded (H : ∀ i hi, IsNormal (f i hi)) :
 def derivBFamily (o : Ordinal.{u}) (f : ∀ b < o, Ordinal.{max u v} → Ordinal.{max u v}) :
     Ordinal.{max u v} → Ordinal.{max u v} :=
   derivFamily (familyOfBFamily o f)
-
-theorem derivBFamily_eq_derivFamily {o : Ordinal} (f : ∀ b < o, Ordinal → Ordinal) :
-    derivBFamily.{u, v} o f = derivFamily (familyOfBFamily o f) :=
-  rfl
 
 theorem isNormal_derivBFamily {o : Ordinal} (f : ∀ b < o, Ordinal → Ordinal) :
     IsNormal (derivBFamily o f) :=
@@ -337,9 +342,6 @@ variable {f : Ordinal.{u} → Ordinal.{u}}
 def nfp (f : Ordinal → Ordinal) : Ordinal → Ordinal :=
   nfpFamily fun _ : Unit => f
 
-theorem nfp_eq_nfpFamily (f : Ordinal → Ordinal) : nfp f = nfpFamily fun _ : Unit => f :=
-  rfl
-
 theorem iSup_iterate_eq_nfp (f : Ordinal.{u} → Ordinal.{u}) (a : Ordinal.{u}) :
     ⨆ n : ℕ, f^[n] a = nfp f a := by
   apply le_antisymm
@@ -353,6 +355,7 @@ theorem iSup_iterate_eq_nfp (f : Ordinal.{u} → Ordinal.{u}) (a : Ordinal.{u}) 
     exact Ordinal.le_iSup _ _
 
 set_option linter.deprecated false in
+@[deprecated "No deprecation message was provided."  (since := "2024-08-27")]
 
 theorem sup_iterate_eq_nfp (f : Ordinal.{u} → Ordinal.{u}) (a : Ordinal.{u}) :
     (sup fun n : ℕ => f^[n] a) = nfp f a := by
@@ -417,9 +420,6 @@ theorem not_bddAbove_fp (H : IsNormal f) : ¬ BddAbove (Function.fixedPoints f) 
 
 def deriv (f : Ordinal → Ordinal) : Ordinal → Ordinal :=
   derivFamily fun _ : Unit => f
-
-theorem deriv_eq_derivFamily (f : Ordinal → Ordinal) : deriv f = derivFamily fun _ : Unit => f :=
-  rfl
 
 @[simp]
 theorem deriv_zero_right (f) : deriv f 0 = nfp f 0 :=
@@ -540,7 +540,12 @@ theorem nfp_mul_one {a : Ordinal} (ha : 0 < a) : nfp (a * ·) 1 = a ^ ω := by
   · rw [pow_zero, iterate_zero_apply]
   · rw [iterate_succ_apply', Nat.add_comm, pow_add, pow_one, hn]
 
--- DISSOLVED: nfp_mul_zero
+@[simp]
+theorem nfp_mul_zero (a : Ordinal) : nfp (a * ·) 0 = 0 := by
+  rw [← Ordinal.le_zero, nfp_le_iff]
+  intro n
+  induction' n with n hn; · rfl
+  dsimp only; rwa [iterate_succ_apply, mul_zero]
 
 theorem nfp_mul_eq_opow_omega0 {a b : Ordinal} (hb : 0 < b) (hba : b ≤ a ^ ω) :
     nfp (a * ·) b = a ^ ω := by

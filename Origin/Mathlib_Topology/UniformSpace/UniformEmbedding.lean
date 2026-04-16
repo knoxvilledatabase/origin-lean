@@ -1,11 +1,13 @@
 /-
 Extracted from Topology/UniformSpace/UniformEmbedding.lean
-Genuine: 59 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
+Genuine: 56 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.Topology.UniformSpace.Cauchy
 import Mathlib.Topology.UniformSpace.Separation
 import Mathlib.Topology.DenseEmbedding
+
+noncomputable section
 
 /-!
 # Uniform embeddings of uniform spaces.
@@ -504,7 +506,6 @@ variable {α : Type*} {β : Type*} {γ : Type*} [UniformSpace α] [UniformSpace 
 local notation "ψ" => IsDenseInducing.extend (IsUniformInducing.isDenseInducing h_e h_dense) f
 
 include h_e h_dense h_f in
-
 theorem uniformly_extend_exists [CompleteSpace γ] (a : α) : ∃ c, Tendsto f (comap e (𝓝 a)) (𝓝 c) :=
   let de := h_e.isDenseInducing h_dense
   have : Cauchy (𝓝 a) := cauchy_nhds
@@ -531,13 +532,11 @@ theorem uniform_extend_subtype [CompleteSpace γ] {p : α → Prop} {e : α → 
   exact ⟨_, hb, by rwa [← de.isInducing.closure_eq_preimage_closure_image, hs.closure_eq]⟩
 
 include h_e h_f in
-
 theorem uniformly_extend_spec [CompleteSpace γ] (a : α) : Tendsto f (comap e (𝓝 a)) (𝓝 (ψ a)) := by
   simpa only [IsDenseInducing.extend] using
     tendsto_nhds_limUnder (uniformly_extend_exists h_e ‹_› h_f _)
 
 include h_f in
-
 theorem uniformContinuous_uniformly_extend [CompleteSpace γ] : UniformContinuous ψ := fun d hd =>
   let ⟨s, hs, hs_comp⟩ := comp3_mem_uniformity hd
   have h_pnt : ∀ {a m}, m ∈ 𝓝 a → ∃ c ∈ f '' (e ⁻¹' m), (c, ψ a) ∈ s ∧ (ψ a, c) ∈ s :=
@@ -567,7 +566,6 @@ theorem uniformContinuous_uniformly_extend [CompleteSpace γ] : UniformContinuou
 variable [T0Space γ]
 
 include h_f in
-
 theorem uniformly_extend_of_ind (b : β) : ψ (e b) = f b :=
   IsDenseInducing.extend_eq_at _ h_f.continuous.continuousAt
 

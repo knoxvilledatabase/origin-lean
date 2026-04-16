@@ -10,6 +10,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Types
 import Mathlib.Data.Finite.Prod
 import Mathlib.Data.Finite.Sigma
 
+noncomputable section
+
 /-!
 # (Co)limits in the category of finite types
 

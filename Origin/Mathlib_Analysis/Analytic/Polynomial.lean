@@ -8,6 +8,8 @@ import Mathlib.Algebra.MvPolynomial.Basic
 import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 
+noncomputable section
+
 /-!
 # Polynomials are analytic
 

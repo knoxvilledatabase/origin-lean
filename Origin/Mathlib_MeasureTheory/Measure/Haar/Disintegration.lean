@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.Measure.Haar.Basic
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.MeasureTheory.Measure.Haar.Unique
 
+noncomputable section
+
 /-!
 # Pushing a Haar measure by a linear map
 

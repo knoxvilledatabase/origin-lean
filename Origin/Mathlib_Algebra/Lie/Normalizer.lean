@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.Abelian
 import Mathlib.Algebra.Lie.IdealOperations
 import Mathlib.Algebra.Lie.Quotient
 
+noncomputable section
+
 /-!
 # The normalizer of Lie submodules and subalgebras.
 
@@ -86,19 +88,12 @@ theorem gc_top_lie_normalizer :
 
 variable (R L M) in
 
-theorem normalizer_bot_eq_maxTrivSubmodule :
-    (⊥ : LieSubmodule R L M).normalizer = LieModule.maxTrivSubmodule R L M :=
-  rfl
-
 def idealizer : LieIdeal R L where
   carrier := {x : L | ∀ m : M, ⁅x, m⁆ ∈ N}
   add_mem' := fun {x} {y} hx hy m ↦ by rw [add_lie]; exact N.add_mem (hx m) (hy m)
   zero_mem' := by simp
   smul_mem' := fun t {x} hx m ↦ by rw [smul_lie]; exact N.smul_mem t (hx m)
   lie_mem := fun {x} {y} hy m ↦ by rw [lie_lie]; exact sub_mem (N.lie_mem (hy m)) (hy ⁅x, m⁆)
-
-@[simp]
-lemma mem_idealizer {x : L} : x ∈ N.idealizer ↔ ∀ m : M, ⁅x, m⁆ ∈ N := Iff.rfl
 
 @[simp]
 lemma _root_.LieIdeal.idealizer_eq_normalizer (I : LieIdeal R L) :
@@ -127,10 +122,6 @@ theorem mem_normalizer_iff (x : L) : x ∈ H.normalizer ↔ ∀ y : L, y ∈ H �
 
 theorem le_normalizer : H ≤ H.normalizer :=
   H.toLieSubmodule.le_normalizer
-
-theorem coe_normalizer_eq_normalizer :
-    (H.toLieSubmodule.normalizer : Submodule R L) = H.normalizer :=
-  rfl
 
 variable {H}
 

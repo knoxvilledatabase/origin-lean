@@ -1,10 +1,12 @@
 /-
 Extracted from Geometry/Euclidean/Angle/Oriented/Basic.lean
-Genuine: 80 | Conflates: 0 | Dissolved: 38 | Infrastructure: 1
+Genuine: 118 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Analysis.InnerProductSpace.TwoDim
 import Mathlib.Geometry.Euclidean.Angle.Unoriented.Basic
+
+noncomputable section
 
 /-!
 # Oriented angles.
@@ -51,7 +53,12 @@ local notation "ω" => o.areaForm
 def oangle (x y : V) : Real.Angle :=
   Complex.arg (o.kahler x y)
 
--- DISSOLVED: continuousAt_oangle
+theorem continuousAt_oangle {x : V × V} (hx1 : x.1 ≠ 0) (hx2 : x.2 ≠ 0) :
+    ContinuousAt (fun y : V × V => o.oangle y.1 y.2) x := by
+  refine (Complex.continuousAt_arg_coe_angle ?_).comp ?_
+  · exact o.kahler_ne_zero hx1 hx2
+  exact ((continuous_ofReal.comp continuous_inner).add
+    ((continuous_ofReal.comp o.areaForm'.continuous₂).mul continuous_const)).continuousAt
 
 @[simp]
 theorem oangle_zero_left (x : V) : o.oangle 0 x = 0 := by simp [oangle]
@@ -66,49 +73,67 @@ theorem oangle_self (x : V) : o.oangle x x = 0 := by
   apply arg_ofReal_of_nonneg
   positivity
 
--- DISSOLVED: left_ne_zero_of_oangle_ne_zero
+theorem left_ne_zero_of_oangle_ne_zero {x y : V} (h : o.oangle x y ≠ 0) : x ≠ 0 := by
+  rintro rfl; simp at h
 
--- DISSOLVED: right_ne_zero_of_oangle_ne_zero
+theorem right_ne_zero_of_oangle_ne_zero {x y : V} (h : o.oangle x y ≠ 0) : y ≠ 0 := by
+  rintro rfl; simp at h
 
--- DISSOLVED: ne_of_oangle_ne_zero
+theorem ne_of_oangle_ne_zero {x y : V} (h : o.oangle x y ≠ 0) : x ≠ y := by
+  rintro rfl; simp at h
 
--- DISSOLVED: left_ne_zero_of_oangle_eq_pi
+theorem left_ne_zero_of_oangle_eq_pi {x y : V} (h : o.oangle x y = π) : x ≠ 0 :=
+  o.left_ne_zero_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_ne_zero : o.oangle x y ≠ 0)
 
--- DISSOLVED: right_ne_zero_of_oangle_eq_pi
+theorem right_ne_zero_of_oangle_eq_pi {x y : V} (h : o.oangle x y = π) : y ≠ 0 :=
+  o.right_ne_zero_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_ne_zero : o.oangle x y ≠ 0)
 
 theorem ne_of_oangle_eq_pi {x y : V} (h : o.oangle x y = π) : x ≠ y :=
   o.ne_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_ne_zero : o.oangle x y ≠ 0)
 
--- DISSOLVED: left_ne_zero_of_oangle_eq_pi_div_two
+theorem left_ne_zero_of_oangle_eq_pi_div_two {x y : V} (h : o.oangle x y = (π / 2 : ℝ)) : x ≠ 0 :=
+  o.left_ne_zero_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_div_two_ne_zero : o.oangle x y ≠ 0)
 
--- DISSOLVED: right_ne_zero_of_oangle_eq_pi_div_two
+theorem right_ne_zero_of_oangle_eq_pi_div_two {x y : V} (h : o.oangle x y = (π / 2 : ℝ)) : y ≠ 0 :=
+  o.right_ne_zero_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_div_two_ne_zero : o.oangle x y ≠ 0)
 
 theorem ne_of_oangle_eq_pi_div_two {x y : V} (h : o.oangle x y = (π / 2 : ℝ)) : x ≠ y :=
   o.ne_of_oangle_ne_zero (h.symm ▸ Real.Angle.pi_div_two_ne_zero : o.oangle x y ≠ 0)
 
--- DISSOLVED: left_ne_zero_of_oangle_eq_neg_pi_div_two
+theorem left_ne_zero_of_oangle_eq_neg_pi_div_two {x y : V} (h : o.oangle x y = (-π / 2 : ℝ)) :
+    x ≠ 0 :=
+  o.left_ne_zero_of_oangle_ne_zero (h.symm ▸ Real.Angle.neg_pi_div_two_ne_zero : o.oangle x y ≠ 0)
 
--- DISSOLVED: right_ne_zero_of_oangle_eq_neg_pi_div_two
+theorem right_ne_zero_of_oangle_eq_neg_pi_div_two {x y : V} (h : o.oangle x y = (-π / 2 : ℝ)) :
+    y ≠ 0 :=
+  o.right_ne_zero_of_oangle_ne_zero (h.symm ▸ Real.Angle.neg_pi_div_two_ne_zero : o.oangle x y ≠ 0)
 
 theorem ne_of_oangle_eq_neg_pi_div_two {x y : V} (h : o.oangle x y = (-π / 2 : ℝ)) : x ≠ y :=
   o.ne_of_oangle_ne_zero (h.symm ▸ Real.Angle.neg_pi_div_two_ne_zero : o.oangle x y ≠ 0)
 
--- DISSOLVED: left_ne_zero_of_oangle_sign_ne_zero
+theorem left_ne_zero_of_oangle_sign_ne_zero {x y : V} (h : (o.oangle x y).sign ≠ 0) : x ≠ 0 :=
+  o.left_ne_zero_of_oangle_ne_zero (Real.Angle.sign_ne_zero_iff.1 h).1
 
--- DISSOLVED: right_ne_zero_of_oangle_sign_ne_zero
+theorem right_ne_zero_of_oangle_sign_ne_zero {x y : V} (h : (o.oangle x y).sign ≠ 0) : y ≠ 0 :=
+  o.right_ne_zero_of_oangle_ne_zero (Real.Angle.sign_ne_zero_iff.1 h).1
 
--- DISSOLVED: ne_of_oangle_sign_ne_zero
+theorem ne_of_oangle_sign_ne_zero {x y : V} (h : (o.oangle x y).sign ≠ 0) : x ≠ y :=
+  o.ne_of_oangle_ne_zero (Real.Angle.sign_ne_zero_iff.1 h).1
 
--- DISSOLVED: left_ne_zero_of_oangle_sign_eq_one
+theorem left_ne_zero_of_oangle_sign_eq_one {x y : V} (h : (o.oangle x y).sign = 1) : x ≠ 0 :=
+  o.left_ne_zero_of_oangle_sign_ne_zero (h.symm ▸ by decide : (o.oangle x y).sign ≠ 0)
 
--- DISSOLVED: right_ne_zero_of_oangle_sign_eq_one
+theorem right_ne_zero_of_oangle_sign_eq_one {x y : V} (h : (o.oangle x y).sign = 1) : y ≠ 0 :=
+  o.right_ne_zero_of_oangle_sign_ne_zero (h.symm ▸ by decide : (o.oangle x y).sign ≠ 0)
 
 theorem ne_of_oangle_sign_eq_one {x y : V} (h : (o.oangle x y).sign = 1) : x ≠ y :=
   o.ne_of_oangle_sign_ne_zero (h.symm ▸ by decide : (o.oangle x y).sign ≠ 0)
 
--- DISSOLVED: left_ne_zero_of_oangle_sign_eq_neg_one
+theorem left_ne_zero_of_oangle_sign_eq_neg_one {x y : V} (h : (o.oangle x y).sign = -1) : x ≠ 0 :=
+  o.left_ne_zero_of_oangle_sign_ne_zero (h.symm ▸ by decide : (o.oangle x y).sign ≠ 0)
 
--- DISSOLVED: right_ne_zero_of_oangle_sign_eq_neg_one
+theorem right_ne_zero_of_oangle_sign_eq_neg_one {x y : V} (h : (o.oangle x y).sign = -1) : y ≠ 0 :=
+  o.right_ne_zero_of_oangle_sign_ne_zero (h.symm ▸ by decide : (o.oangle x y).sign ≠ 0)
 
 theorem ne_of_oangle_sign_eq_neg_one {x y : V} (h : (o.oangle x y).sign = -1) : x ≠ y :=
   o.ne_of_oangle_sign_ne_zero (h.symm ▸ by decide : (o.oangle x y).sign ≠ 0)
@@ -120,9 +145,17 @@ theorem oangle_rev (x y : V) : o.oangle y x = -o.oangle x y := by
 theorem oangle_add_oangle_rev (x y : V) : o.oangle x y + o.oangle y x = 0 := by
   simp [o.oangle_rev y x]
 
--- DISSOLVED: oangle_neg_left
+theorem oangle_neg_left {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    o.oangle (-x) y = o.oangle x y + π := by
+  simp only [oangle, map_neg]
+  convert Complex.arg_neg_coe_angle _
+  exact o.kahler_ne_zero hx hy
 
--- DISSOLVED: oangle_neg_right
+theorem oangle_neg_right {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    o.oangle x (-y) = o.oangle x y + π := by
+  simp only [oangle, map_neg]
+  convert Complex.arg_neg_coe_angle _
+  exact o.kahler_ne_zero hx hy
 
 @[simp]
 theorem two_zsmul_oangle_neg_left (x y : V) :
@@ -148,9 +181,13 @@ theorem oangle_neg_neg (x y : V) : o.oangle (-x) (-y) = o.oangle x y := by simp 
 theorem oangle_neg_left_eq_neg_right (x y : V) : o.oangle (-x) y = o.oangle x (-y) := by
   rw [← neg_neg y, oangle_neg_neg, neg_neg]
 
--- DISSOLVED: oangle_neg_self_left
+@[simp]
+theorem oangle_neg_self_left {x : V} (hx : x ≠ 0) : o.oangle (-x) x = π := by
+  simp [oangle_neg_left, hx]
 
--- DISSOLVED: oangle_neg_self_right
+@[simp]
+theorem oangle_neg_self_right {x : V} (hx : x ≠ 0) : o.oangle x (-x) = π := by
+  simp [oangle_neg_right, hx]
 
 theorem two_zsmul_oangle_neg_self_left (x : V) : (2 : ℤ) • o.oangle (-x) x = 0 := by
   by_cases hx : x = 0 <;> simp [hx]
@@ -203,9 +240,15 @@ theorem oangle_smul_smul_self_of_nonneg (x : V) {r₁ r₂ : ℝ} (hr₁ : 0 ≤
   · simp [h, hr₂]
   · simp [h.symm]
 
--- DISSOLVED: two_zsmul_oangle_smul_left_of_ne_zero
+@[simp]
+theorem two_zsmul_oangle_smul_left_of_ne_zero (x y : V) {r : ℝ} (hr : r ≠ 0) :
+    (2 : ℤ) • o.oangle (r • x) y = (2 : ℤ) • o.oangle x y := by
+  rcases hr.lt_or_lt with (h | h) <;> simp [h]
 
--- DISSOLVED: two_zsmul_oangle_smul_right_of_ne_zero
+@[simp]
+theorem two_zsmul_oangle_smul_right_of_ne_zero (x y : V) {r : ℝ} (hr : r ≠ 0) :
+    (2 : ℤ) • o.oangle x (r • y) = (2 : ℤ) • o.oangle x y := by
+  rcases hr.lt_or_lt with (h | h) <;> simp [h]
 
 @[simp]
 theorem two_zsmul_oangle_smul_left_self (x : V) {r : ℝ} : (2 : ℤ) • o.oangle (r • x) x = 0 := by
@@ -246,7 +289,17 @@ theorem oangle_eq_zero_iff_sameRay {x y : V} : o.oangle x y = 0 ↔ SameRay ℝ 
 theorem oangle_eq_pi_iff_oangle_rev_eq_pi {x y : V} : o.oangle x y = π ↔ o.oangle y x = π := by
   rw [oangle_rev, neg_eq_iff_eq_neg, Real.Angle.neg_coe_pi]
 
--- DISSOLVED: oangle_eq_pi_iff_sameRay_neg
+theorem oangle_eq_pi_iff_sameRay_neg {x y : V} :
+    o.oangle x y = π ↔ x ≠ 0 ∧ y ≠ 0 ∧ SameRay ℝ x (-y) := by
+  rw [← o.oangle_eq_zero_iff_sameRay]
+  constructor
+  · intro h
+    by_cases hx : x = 0; · simp [hx, Real.Angle.pi_ne_zero.symm] at h
+    by_cases hy : y = 0; · simp [hy, Real.Angle.pi_ne_zero.symm] at h
+    refine ⟨hx, hy, ?_⟩
+    rw [o.oangle_neg_right hx hy, h, Real.Angle.coe_pi_add_coe_pi]
+  · rintro ⟨hx, hy, h⟩
+    rwa [o.oangle_neg_right hx hy, ← Real.Angle.sub_coe_pi_eq_add_coe_pi, sub_eq_zero] at h
 
 theorem oangle_eq_zero_or_eq_pi_iff_not_linearIndependent {x y : V} :
     o.oangle x y = 0 ∨ o.oangle x y = π ↔ ¬LinearIndependent ℝ ![x, y] := by
@@ -274,7 +327,10 @@ theorem oangle_eq_zero_or_eq_pi_iff_right_eq_smul {x y : V} :
     · simp [hr]
     · exact Or.inl (SameRay.sameRay_pos_smul_right x hr)
 
--- DISSOLVED: oangle_ne_zero_and_ne_pi_iff_linearIndependent
+theorem oangle_ne_zero_and_ne_pi_iff_linearIndependent {x y : V} :
+    o.oangle x y ≠ 0 ∧ o.oangle x y ≠ π ↔ LinearIndependent ℝ ![x, y] := by
+  rw [← not_or, ← not_iff_not, Classical.not_not,
+    oangle_eq_zero_or_eq_pi_iff_not_linearIndependent]
 
 theorem eq_iff_norm_eq_and_oangle_eq_zero (x y : V) : x = y ↔ ‖x‖ = ‖y‖ ∧ o.oangle x y = 0 := by
   rw [oangle_eq_zero_iff_sameRay]
@@ -299,19 +355,48 @@ theorem eq_iff_norm_eq_of_oangle_eq_zero {x y : V} (h : o.oangle x y = 0) : x = 
   ⟨fun he => ((o.eq_iff_norm_eq_and_oangle_eq_zero x y).1 he).1, fun hn =>
     (o.eq_iff_norm_eq_and_oangle_eq_zero x y).2 ⟨hn, h⟩⟩
 
--- DISSOLVED: oangle_add
+@[simp]
+theorem oangle_add {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle x y + o.oangle y z = o.oangle x z := by
+  simp_rw [oangle]
+  rw [← Complex.arg_mul_coe_angle, o.kahler_mul y x z]
+  · congr 1
+    convert Complex.arg_real_mul _ (_ : 0 < ‖y‖ ^ 2) using 2
+    · norm_cast
+    · have : 0 < ‖y‖ := by simpa using hy
+      positivity
+  · exact o.kahler_ne_zero hx hy
+  · exact o.kahler_ne_zero hy hz
 
--- DISSOLVED: oangle_add_swap
+@[simp]
+theorem oangle_add_swap {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle y z + o.oangle x y = o.oangle x z := by rw [add_comm, o.oangle_add hx hy hz]
 
--- DISSOLVED: oangle_sub_left
+@[simp]
+theorem oangle_sub_left {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle x z - o.oangle x y = o.oangle y z := by
+  rw [sub_eq_iff_eq_add, o.oangle_add_swap hx hy hz]
 
--- DISSOLVED: oangle_sub_right
+@[simp]
+theorem oangle_sub_right {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle x z - o.oangle y z = o.oangle x y := by rw [sub_eq_iff_eq_add, o.oangle_add hx hy hz]
 
--- DISSOLVED: oangle_add_cyc3
+@[simp]
+theorem oangle_add_cyc3 {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle x y + o.oangle y z + o.oangle z x = 0 := by simp [hx, hy, hz]
 
--- DISSOLVED: oangle_add_cyc3_neg_left
+@[simp]
+theorem oangle_add_cyc3_neg_left {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle (-x) y + o.oangle (-y) z + o.oangle (-z) x = π := by
+  rw [o.oangle_neg_left hx hy, o.oangle_neg_left hy hz, o.oangle_neg_left hz hx,
+    show o.oangle x y + π + (o.oangle y z + π) + (o.oangle z x + π) =
+      o.oangle x y + o.oangle y z + o.oangle z x + (π + π + π : Real.Angle) by abel,
+    o.oangle_add_cyc3 hx hy hz, Real.Angle.coe_pi_add_coe_pi, zero_add, zero_add]
 
--- DISSOLVED: oangle_add_cyc3_neg_right
+@[simp]
+theorem oangle_add_cyc3_neg_right {x y z : V} (hx : x ≠ 0) (hy : y ≠ 0) (hz : z ≠ 0) :
+    o.oangle x (-y) + o.oangle y (-z) + o.oangle z (-x) = π := by
+  simp_rw [← oangle_neg_left_eq_neg_right, o.oangle_add_cyc3_neg_left hx hy hz]
 
 theorem oangle_sub_eq_oangle_sub_rev_of_norm_eq {x y : V} (h : ‖x‖ = ‖y‖) :
     o.oangle x (x - y) = o.oangle (y - x) y := by simp [oangle, h]
@@ -361,13 +446,29 @@ theorem inner_eq_norm_mul_norm_mul_cos_oangle (x y : V) :
       mul_div_assoc', mul_div_cancel_left₀]
   · exact o.kahler_ne_zero hx hy
 
--- DISSOLVED: cos_oangle_eq_inner_div_norm_mul_norm
+theorem cos_oangle_eq_inner_div_norm_mul_norm {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.Angle.cos (o.oangle x y) = ⟪x, y⟫ / (‖x‖ * ‖y‖) := by
+  rw [o.inner_eq_norm_mul_norm_mul_cos_oangle]
+  field_simp [norm_ne_zero_iff.2 hx, norm_ne_zero_iff.2 hy]
 
--- DISSOLVED: cos_oangle_eq_cos_angle
+theorem cos_oangle_eq_cos_angle {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    Real.Angle.cos (o.oangle x y) = Real.cos (InnerProductGeometry.angle x y) := by
+  rw [o.cos_oangle_eq_inner_div_norm_mul_norm hx hy, InnerProductGeometry.cos_angle]
 
--- DISSOLVED: oangle_eq_angle_or_eq_neg_angle
+theorem oangle_eq_angle_or_eq_neg_angle {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    o.oangle x y = InnerProductGeometry.angle x y ∨
+      o.oangle x y = -InnerProductGeometry.angle x y :=
+  Real.Angle.cos_eq_real_cos_iff_eq_or_eq_neg.1 <| o.cos_oangle_eq_cos_angle hx hy
 
--- DISSOLVED: angle_eq_abs_oangle_toReal
+theorem angle_eq_abs_oangle_toReal {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    InnerProductGeometry.angle x y = |(o.oangle x y).toReal| := by
+  have h0 := InnerProductGeometry.angle_nonneg x y
+  have hpi := InnerProductGeometry.angle_le_pi x y
+  rcases o.oangle_eq_angle_or_eq_neg_angle hx hy with (h | h)
+  · rw [h, eq_comm, Real.Angle.abs_toReal_coe_eq_self_iff]
+    exact ⟨h0, hpi⟩
+  · rw [h, eq_comm, Real.Angle.abs_toReal_neg_coe_eq_self_iff]
+    exact ⟨h0, hpi⟩
 
 theorem eq_zero_or_angle_eq_zero_or_pi_of_sign_oangle_eq_zero {x y : V}
     (h : (o.oangle x y).sign = 0) :
@@ -413,7 +514,12 @@ theorem oangle_eq_of_angle_eq_of_sign_eq {w x y z : V}
     rwa [o.angle_eq_abs_oangle_toReal h0.1.1 h0.1.2,
       o.angle_eq_abs_oangle_toReal h0.2.1 h0.2.2] at h
 
--- DISSOLVED: angle_eq_iff_oangle_eq_of_sign_eq
+theorem angle_eq_iff_oangle_eq_of_sign_eq {w x y z : V} (hw : w ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0)
+    (hz : z ≠ 0) (hs : (o.oangle w x).sign = (o.oangle y z).sign) :
+    InnerProductGeometry.angle w x = InnerProductGeometry.angle y z ↔
+    o.oangle w x = o.oangle y z := by
+  refine ⟨fun h => o.oangle_eq_of_angle_eq_of_sign_eq h hs, fun h => ?_⟩
+  rw [o.angle_eq_abs_oangle_toReal hw hx, o.angle_eq_abs_oangle_toReal hy hz, h]
 
 theorem oangle_eq_angle_of_sign_eq_one {x y : V} (h : (o.oangle x y).sign = 1) :
     o.oangle x y = InnerProductGeometry.angle x y := by
@@ -435,7 +541,13 @@ theorem oangle_eq_neg_angle_of_sign_eq_neg_one {x y : V} (h : (o.oangle x y).sig
   exact h (Real.Angle.sign_coe_nonneg_of_nonneg_of_le_pi (InnerProductGeometry.angle_nonneg _ _)
     (InnerProductGeometry.angle_le_pi _ _))
 
--- DISSOLVED: oangle_eq_zero_iff_angle_eq_zero
+theorem oangle_eq_zero_iff_angle_eq_zero {x y : V} (hx : x ≠ 0) (hy : y ≠ 0) :
+    o.oangle x y = 0 ↔ InnerProductGeometry.angle x y = 0 := by
+  refine ⟨fun h => ?_, fun h => ?_⟩
+  · simpa [o.angle_eq_abs_oangle_toReal hx hy]
+  · have ha := o.oangle_eq_angle_or_eq_neg_angle hx hy
+    rw [h] at ha
+    simpa using ha
 
 theorem oangle_eq_pi_iff_angle_eq_pi {x y : V} :
     o.oangle x y = π ↔ InnerProductGeometry.angle x y = π := by

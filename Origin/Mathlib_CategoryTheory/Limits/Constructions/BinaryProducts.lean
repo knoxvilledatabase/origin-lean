@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Pullbacks
 import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
 
+noncomputable section
+
 /-!
 # Constructing binary product from pullbacks and terminal object.
 

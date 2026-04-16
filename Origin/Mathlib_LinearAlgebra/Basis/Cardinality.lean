@@ -7,6 +7,8 @@ import Mathlib.LinearAlgebra.Basis.Defs
 import Mathlib.LinearAlgebra.LinearIndependent
 import Mathlib.SetTheory.Cardinal.Cofinality
 
+noncomputable section
+
 /-!
 # Results relating bases and cardinality.
 -/

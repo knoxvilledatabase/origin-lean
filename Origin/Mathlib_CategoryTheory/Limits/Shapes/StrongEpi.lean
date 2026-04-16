@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Balanced
 import Mathlib.CategoryTheory.LiftingProperties.Basic
 
+noncomputable section
+
 /-!
 # Strong epimorphisms
 

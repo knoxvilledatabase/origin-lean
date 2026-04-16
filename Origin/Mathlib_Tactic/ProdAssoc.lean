@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Lean.Expr.Basic
 import Mathlib.Logic.Equiv.Defs
 
+noncomputable section
+
 /-!
 # Associativity of products
 

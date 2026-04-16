@@ -5,6 +5,8 @@ Genuine: 3 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.Tactic.PPWithUniv
 
+noncomputable section
+
 /-! # `ToLevel` class
 
 This module defines `Lean.ToLevel`, which is the `Lean.Level` analogue to `Lean.ToExpr`.

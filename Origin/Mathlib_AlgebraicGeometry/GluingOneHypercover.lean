@@ -7,6 +7,8 @@ import Mathlib.AlgebraicGeometry.Gluing
 import Mathlib.AlgebraicGeometry.Sites.BigZariski
 import Mathlib.CategoryTheory.Sites.OneHypercover
 
+noncomputable section
+
 /-!
 # The 1-hypercover of a glue data
 

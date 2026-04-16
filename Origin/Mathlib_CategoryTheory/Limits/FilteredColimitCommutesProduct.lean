@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Types
 import Mathlib.CategoryTheory.Limits.TypesFiltered
 import Mathlib.CategoryTheory.Limits.FunctorCategory.Shapes.Products
 
+noncomputable section
+
 /-!
 # The IPC property
 

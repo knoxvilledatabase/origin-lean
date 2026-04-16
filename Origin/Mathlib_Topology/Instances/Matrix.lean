@@ -9,6 +9,8 @@ import Mathlib.Topology.Algebra.Star
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.Trace
 
+noncomputable section
+
 /-!
 # Topological properties of matrices
 

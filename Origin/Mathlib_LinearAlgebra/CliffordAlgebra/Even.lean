@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.CliffordAlgebra.Fold
 import Mathlib.LinearAlgebra.CliffordAlgebra.Grading
 
+noncomputable section
+
 /-!
 # The universal property of the even subalgebra
 
@@ -51,10 +53,6 @@ def even : Subalgebra R (CliffordAlgebra Q) :=
     add_zero (0 : ZMod 2) ▸ SetLike.mul_mem_graded hx hy
 
 instance : AddCommMonoid (even Q) := AddSubmonoidClass.toAddCommMonoid _
-
-@[simp]
-theorem even_toSubmodule : Subalgebra.toSubmodule (even Q) = evenOdd Q 0 :=
-  rfl
 
 variable (A)
 
@@ -148,11 +146,6 @@ private def fFold : M →ₗ[R] A × S f →ₗ[R] A × S f :=
 @[simp]
 private theorem fst_fFold_fFold (m₁ m₂ : M) (x : A × S f) :
     (fFold f m₁ (fFold f m₂ x)).fst = f.bilin m₁ m₂ * x.fst :=
-  rfl
-
-@[simp]
-private theorem snd_fFold_fFold (m₁ m₂ m₃ : M) (x : A × S f) :
-    ((fFold f m₁ (fFold f m₂ x)).snd : M →ₗ[R] A) m₃ = f.bilin m₃ m₁ * (x.snd : M →ₗ[R] A) m₂ :=
   rfl
 
 private theorem fFold_fFold (m : M) (x : A × S f) : fFold f m (fFold f m x) = Q m • x := by

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Group.ZeroOne
 import Qq
 
+noncomputable section
+
 /-! # Helpers to invoke functions involving algebra at tactic time
 
 This file provides instances on `x y : Q($α)` such that `x + y = q($x + $y)`.

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.Group.Defs
 import Mathlib.Algebra.Order.Monoid.Basic
 
+noncomputable section
+
 /-!
 # Pull back ordered groups along injective maps.
 -/

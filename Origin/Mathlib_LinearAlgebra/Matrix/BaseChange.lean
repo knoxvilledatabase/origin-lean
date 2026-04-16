@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.Algebra.Field.Subfield.Defs
 
+noncomputable section
+
 /-!
 # Matrices and base change
 

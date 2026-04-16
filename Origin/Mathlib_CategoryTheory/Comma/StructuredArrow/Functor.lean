@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Comma.StructuredArrow.Basic
 import Mathlib.CategoryTheory.Grothendieck
 
+noncomputable section
+
 /-!
 # Structured Arrow Categories as strict functor to Cat
 

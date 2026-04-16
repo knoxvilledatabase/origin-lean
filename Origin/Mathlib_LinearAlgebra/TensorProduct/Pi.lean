@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.Pi
 
+noncomputable section
+
 /-!
 
 # Tensor product and products
@@ -52,11 +54,6 @@ private noncomputable def piRightHomBil : N →ₗ[S] (∀ i, M i) →ₗ[R] ∀
 noncomputable def piRightHom : N ⊗[R] (∀ i, M i) →ₗ[S] ∀ i, N ⊗[R] M i :=
   AlgebraTensorModule.lift <| piRightHomBil R S N M
 
-@[simp]
-lemma piRightHom_tmul (x : N) (f : ∀ i, M i) :
-    piRightHom R S N M (x ⊗ₜ f) = (fun j ↦ x ⊗ₜ f j) :=
-  rfl
-
 variable [Fintype ι] [DecidableEq ι]
 
 private noncomputable
@@ -90,11 +87,6 @@ noncomputable def piRight : N ⊗[R] (∀ i, M i) ≃ₗ[S] ∀ i, N ⊗[R] M i 
     (piRightInv R S N M)
     (by ext i x m j; simp [tmul_single])
     (by ext x j m; simp)
-
-@[simp]
-lemma piRight_apply (x : N ⊗[R] (∀ i, M i)) :
-    piRight R S N M x = piRightHom R S N M x := by
-  rfl
 
 @[simp]
 lemma piRight_symm_apply (x : N) (m : ∀ i, M i) :
@@ -151,11 +143,6 @@ noncomputable def piScalarRight : N ⊗[R] (ι → R) ≃ₗ[S] (ι → N) :=
     (piScalarRightInv R S N ι)
     (by ext i x j; simp [Pi.single_apply])
     (by ext x i; simp [Pi.single_apply_smul])
-
-@[simp]
-lemma piScalarRight_apply (x : N ⊗[R] (ι → R)) :
-    piScalarRight R S N ι x = piScalarRightHom R S N ι x := by
-  rfl
 
 @[simp]
 lemma piScalarRight_symm_single (x : N) (i : ι) :

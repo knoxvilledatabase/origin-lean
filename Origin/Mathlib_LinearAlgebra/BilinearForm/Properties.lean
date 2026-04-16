@@ -1,10 +1,12 @@
 /-
 Extracted from LinearAlgebra/BilinearForm/Properties.lean
-Genuine: 72 | Conflates: 1 | Dissolved: 1 | Infrastructure: 3
+Genuine: 72 | Conflates: 2 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.BilinearForm.Hom
 import Mathlib.LinearAlgebra.Dual
+
+noncomputable section
 
 /-!
 # Bilinear form
@@ -226,10 +228,6 @@ def isPairSelfAdjointSubmodule : Submodule R (Module.End R M) where
   add_mem' hf hg := hf.add hg
   smul_mem' c _ h := h.smul c
 
-@[simp]
-theorem mem_isPairSelfAdjointSubmodule (f : Module.End R M) :
-    f ∈ isPairSelfAdjointSubmodule B₂ F₂ ↔ IsPairSelfAdjoint B₂ F₂ f := Iff.rfl
-
 theorem isPairSelfAdjoint_equiv (e : M' ≃ₗ[R] M) (f : Module.End R M) :
     IsPairSelfAdjoint B₂ F₂ f ↔
       IsPairSelfAdjoint (B₂.comp ↑e ↑e) (F₂.comp ↑e ↑e) (e.symm.conj f) := by
@@ -257,11 +255,6 @@ theorem isSkewAdjoint_iff_neg_self_adjoint (f : Module.End R₁ M₁) :
 
 def selfAdjointSubmodule :=
   isPairSelfAdjointSubmodule B B
-
-@[simp]
-theorem mem_selfAdjointSubmodule (f : Module.End R M) :
-    f ∈ B.selfAdjointSubmodule ↔ B.IsSelfAdjoint f :=
-  Iff.rfl
 
 def skewAdjointSubmodule :=
   isPairSelfAdjointSubmodule (-B₁) B₁
@@ -296,7 +289,9 @@ variable {M' : Type*}
 
 variable [AddCommMonoid M'] [Module R M']
 
--- DISSOLVED: Nondegenerate.ne_zero
+-- CONFLATES (assumes ground = zero): Nondegenerate.ne_zero
+theorem Nondegenerate.ne_zero [Nontrivial M] {B : BilinForm R M} (h : B.Nondegenerate) : B ≠ 0 :=
+  fun h0 => not_nondegenerate_zero R M <| h0 ▸ h
 
 theorem Nondegenerate.congr {B : BilinForm R M} (e : M ≃ₗ[R] M') (h : B.Nondegenerate) :
     (congr e B).Nondegenerate := fun m hm =>

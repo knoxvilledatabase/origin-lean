@@ -8,6 +8,8 @@ import Mathlib.Data.Finset.Density
 import Mathlib.Tactic.NormNum.Basic
 import Mathlib.Tactic.Positivity.Core
 
+noncomputable section
+
 /-!
 # Positivity extensions for finsets
 
@@ -48,6 +50,21 @@ def evalFinsetDens : PositivityExt where eval {u 𝕜} _ _ e := do
   | _, _, _ => throwError "not Finset.dens"
 
 attribute [local instance] monadLiftOptionMetaM in
+/-- The `positivity` extension which proves that `∑ i ∈ s, f i` is nonnegative if `f` is, and
+
+positive if each `f i` is and `s` is nonempty.
+
+TODO: The following example does not work
+
+```
+
+example (s : Finset ℕ) (f : ℕ → ℤ) (hf : ∀ n, 0 ≤ f n) : 0 ≤ s.sum f := by positivity
+
+```
+
+because `compareHyp` can't look for assumptions behind binders.
+
+-/
 
 @[positivity Finset.sum _ _]
 def evalFinsetSum : PositivityExt where eval {u α} zα pα e := do

@@ -7,6 +7,8 @@ import Mathlib.MeasureTheory.MeasurableSpace.Embedding
 import Mathlib.Data.Set.MemPartition
 import Mathlib.Order.Filter.CountableSeparatingOn
 
+noncomputable section
+
 /-!
 # Countably generated measurable spaces
 
@@ -239,7 +241,6 @@ open Function
 open Classical in
 
 noncomputable
-
 def mapNatBool [MeasurableSpace α] [CountablyGenerated α] (x : α) (n : ℕ) :
     Bool := x ∈ natGeneratingSequence α n
 

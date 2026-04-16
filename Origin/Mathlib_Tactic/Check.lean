@@ -8,6 +8,8 @@ import Lean.Elab.Tactic.Basic
 import Lean.PrettyPrinter
 import Lean.Elab.SyntheticMVars
 
+noncomputable section
+
 /-!
 # `#check` tactic
 

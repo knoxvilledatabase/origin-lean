@@ -8,6 +8,8 @@ import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Order.ConditionallyCompleteLattice.Indexed
 import Mathlib.Order.Hom.Basic
 
+noncomputable section
+
 /-!
 # The monotone sequence of partial supremums of a sequence
 
@@ -43,10 +45,6 @@ variable [SemilatticeSup α]
 def partialSups (f : ℕ → α) : ℕ →o α :=
   ⟨@Nat.rec (fun _ => α) (f 0) fun (n : ℕ) (a : α) => a ⊔ f (n + 1),
     monotone_nat_of_le_succ fun _ => le_sup_left⟩
-
-@[simp]
-theorem partialSups_zero (f : ℕ → α) : partialSups f 0 = f 0 :=
-  rfl
 
 @[simp]
 theorem partialSups_succ (f : ℕ → α) (n : ℕ) :

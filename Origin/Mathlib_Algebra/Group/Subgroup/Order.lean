@@ -9,6 +9,8 @@ import Mathlib.Algebra.Group.Subsemigroup.Operations
 import Mathlib.Algebra.Order.Group.InjSurj
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
 
+noncomputable section
+
 /-!
 # Facts about ordered structures and ordered instances on subgroups
 -/

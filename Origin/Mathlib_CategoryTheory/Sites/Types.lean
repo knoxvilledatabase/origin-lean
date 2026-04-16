@@ -5,6 +5,8 @@ Genuine: 19 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.Canonical
 
+noncomputable section
+
 /-!
 # Grothendieck Topology and Sheaves on the Category of Types
 
@@ -57,10 +59,6 @@ theorem Presheaf.isSheaf_yoneda' {α : Type u} :
 def yoneda' : Type u ⥤ Sheaf typesGrothendieckTopology (Type u) where
   obj α := ⟨yoneda.obj α, Presheaf.isSheaf_yoneda'⟩
   map f := ⟨yoneda.map f⟩
-
-@[simp]
-theorem yoneda'_comp : yoneda'.{u} ⋙ sheafToPresheaf _ _ = yoneda :=
-  rfl
 
 open Opposite
 

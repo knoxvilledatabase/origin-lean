@@ -7,6 +7,8 @@ import Mathlib.GroupTheory.Submonoid.Inverses
 import Mathlib.RingTheory.FiniteType
 import Mathlib.RingTheory.Localization.Defs
 
+noncomputable section
+
 /-!
 # Submonoid of inverses
 

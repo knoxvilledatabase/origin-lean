@@ -8,6 +8,8 @@ import Mathlib.Algebra.Lie.Subalgebra
 import Mathlib.Algebra.Lie.Submodule
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
 
+noncomputable section
+
 /-!
 # Lie algebras of associative algebras
 
@@ -48,10 +50,6 @@ instance (priority := 100) ofAssociativeRing : LieRing A where
     simp only [Ring.lie_def, mul_sub_left_distrib, mul_sub_right_distrib, mul_assoc]; abel
 
 theorem of_associative_ring_bracket (x y : A) : ⁅x, y⁆ = x * y - y * x :=
-  rfl
-
-@[simp]
-theorem lie_apply {α : Type*} (f g : α → A) (a : α) : ⁅f, g⁆ a = ⁅f a, g a⁆ :=
   rfl
 
 end LieRing
@@ -98,8 +96,6 @@ instance Module.End.instLieRingModule : LieRingModule (Module.End R M) M :=
 instance Module.End.instLieModule : LieModule R (Module.End R M) M :=
   LieModule.ofAssociativeModule
 
-@[simp] lemma Module.End.lie_apply (f : Module.End R M) (m : M) : ⁅f, m⁆ = f m := rfl
-
 end AssociativeRepresentation
 
 namespace AlgHom
@@ -114,21 +110,6 @@ def toLieHom : A →ₗ⁅R⁆ B :=
 
 instance : Coe (A →ₐ[R] B) (A →ₗ⁅R⁆ B) :=
   ⟨toLieHom⟩
-
-@[simp]
-theorem coe_toLieHom : ((f : A →ₗ⁅R⁆ B) : A → B) = f :=
-  rfl
-
-theorem toLieHom_apply (x : A) : f.toLieHom x = f x :=
-  rfl
-
-@[simp]
-theorem toLieHom_id : (AlgHom.id R A : A →ₗ⁅R⁆ A) = LieHom.id :=
-  rfl
-
-@[simp]
-theorem toLieHom_comp : (g.comp f : A →ₗ⁅R⁆ C) = (g : B →ₗ⁅R⁆ C).comp (f : A →ₗ⁅R⁆ B) :=
-  rfl
 
 theorem toLieHom_injective {f g : A →ₐ[R] B} (h : (f : A →ₗ⁅R⁆ B) = (g : A →ₗ⁅R⁆ B)) : f = g := by
   ext a; exact LieHom.congr_fun h a
@@ -161,21 +142,8 @@ def LieAlgebra.ad : L →ₗ⁅R⁆ Module.End R L :=
   LieModule.toEnd R L L
 
 @[simp]
-theorem LieAlgebra.ad_apply (x y : L) : LieAlgebra.ad R L x y = ⁅x, y⁆ :=
-  rfl
-
-@[simp]
 theorem LieModule.toEnd_module_end :
     LieModule.toEnd R (Module.End R M) M = LieHom.id := by ext g m; simp [lie_eq_smul]
-
-theorem LieSubalgebra.toEnd_eq (K : LieSubalgebra R L) {x : K} :
-    LieModule.toEnd R K M x = LieModule.toEnd R L M x :=
-  rfl
-
-@[simp]
-theorem LieSubalgebra.toEnd_mk (K : LieSubalgebra R L) {x : L} (hx : x ∈ K) :
-    LieModule.toEnd R K M ⟨x, hx⟩ = LieModule.toEnd R L M x :=
-  rfl
 
 section
 
@@ -190,9 +158,6 @@ lemma LieSubmodule.coe_toEnd_pow (N : LieSubmodule R L M) (x : L) (y : N) (n : �
   | zero => rfl
   | succ n ih => simp only [pow_succ', LinearMap.mul_apply, ih, LieSubmodule.coe_toEnd]
 
-lemma LieSubalgebra.coe_ad (H : LieSubalgebra R L) (x y : H) :
-    (ad R H x y : L) = ad R L x y := rfl
-
 lemma LieSubalgebra.coe_ad_pow (H : LieSubalgebra R L) (x y : H) (n : ℕ) :
     ((ad R H x ^ n) y : L) = (ad R L x ^ n) y :=
   LieSubmodule.coe_toEnd_pow R H L H.toLieSubmodule x y n
@@ -200,10 +165,6 @@ lemma LieSubalgebra.coe_ad_pow (H : LieSubalgebra R L) (x y : H) (n : ℕ) :
 variable {L M}
 
 local notation "φ" => LieModule.toEnd R L M
-
-lemma LieModule.toEnd_lie (x y : L) (z : M) :
-    (φ x) ⁅y, z⁆ = ⁅ad R L x y, z⁆ + ⁅y, φ x z⁆ := by
-  simp
 
 lemma LieAlgebra.ad_lie (x y z : L) :
     (ad R L x) ⁅y, z⁆ = ⁅ad R L x y, z⁆ + ⁅y, ad R L x z⁆ :=
@@ -325,14 +286,6 @@ def lieConj : Module.End R M₁ ≃ₗ⁅R⁆ Module.End R M₂ :=
         simp only [LieRing.of_associative_ring_bracket, LinearMap.mul_eq_comp, e.conj_comp,
           map_sub] }
 
-@[simp]
-theorem lieConj_apply (f : Module.End R M₁) : e.lieConj f = e.conj f :=
-  rfl
-
-@[simp]
-theorem lieConj_symm : e.lieConj.symm = e.symm.lieConj :=
-  rfl
-
 end LinearEquiv
 
 namespace AlgEquiv
@@ -342,21 +295,6 @@ variable {R : Type u} {A₁ : Type v} {A₂ : Type w}
 variable [CommRing R] [Ring A₁] [Ring A₂] [Algebra R A₁] [Algebra R A₂]
 
 variable (e : A₁ ≃ₐ[R] A₂)
-
-def toLieEquiv : A₁ ≃ₗ⁅R⁆ A₂ :=
-  { e.toLinearEquiv with
-    toFun := e.toFun
-    map_lie' := fun {x y} => by
-      have : e.toEquiv.toFun = e := rfl
-      simp_rw [LieRing.of_associative_ring_bracket, this, map_sub, map_mul] }
-
-@[simp]
-theorem toLieEquiv_apply (x : A₁) : e.toLieEquiv x = e x :=
-  rfl
-
-@[simp]
-theorem toLieEquiv_symm_apply (x : A₂) : e.toLieEquiv.symm x = e.symm x :=
-  rfl
 
 end AlgEquiv
 

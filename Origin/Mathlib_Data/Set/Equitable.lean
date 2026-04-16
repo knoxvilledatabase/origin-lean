@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Ring.Defs
 
+noncomputable section
+
 /-!
 # Equitable functions
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Lean.Elab.Command
 import Mathlib.Init
 
+noncomputable section
+
 /-!
 # `#parse` -- a command to parse text and log outputs
 -/
@@ -23,10 +25,6 @@ def captureException (env : Environment) (s : ParserFn) (input : String) : Excep
     .ok s.stxStack.back
   else
     .error ((s.mkError "end of input").toErrorMsg ictx)
-
-```
-
--/
 
 syntax (name := parseCmd) "#parse " ident " => " str : command
 

@@ -8,6 +8,8 @@ import Mathlib.Control.Functor
 import Batteries.Data.List.Basic
 import Mathlib.Control.Basic
 
+noncomputable section
+
 /-!
 # Traversable type class
 
@@ -86,14 +88,6 @@ instance : CoeFun (ApplicativeTransformation F G) fun _ => ∀ {α}, F α → G 
 
 variable {F G}
 
-theorem app_eq_coe (η : ApplicativeTransformation F G) : η.app = η :=
-  rfl
-
-@[simp]
-theorem coe_mk (f : ∀ α : Type u, F α → G α) (pp ps) :
-    (ApplicativeTransformation.mk f @pp @ps) = f :=
-  rfl
-
 protected theorem congr_fun (η η' : ApplicativeTransformation F G) (h : η = η') {α : Type u}
     (x : F α) : η x = η' x :=
   congrArg (fun η'' : ApplicativeTransformation F G => η'' x) h
@@ -158,16 +152,6 @@ def comp (η' : ApplicativeTransformation G H) (η : ApplicativeTransformation F
   -- which should suffice for the next two.
   preserves_pure' x := by simp only [preserves_pure]
   preserves_seq' x y := by simp only [preserves_seq]
-
-@[simp]
-theorem comp_apply (η' : ApplicativeTransformation G H) (η : ApplicativeTransformation F G)
-    {α : Type u} (x : F α) : η'.comp η x = η' (η x) :=
-  rfl
-
-theorem comp_assoc {I : Type u → Type t} [Applicative I]
-    (η'' : ApplicativeTransformation H I) (η' : ApplicativeTransformation G H)
-    (η : ApplicativeTransformation F G) : (η''.comp η').comp η = η''.comp (η'.comp η) :=
-  rfl
 
 @[simp]
 theorem comp_id (η : ApplicativeTransformation F G) : η.comp idTransformation = η :=

@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Order/Group/PosPart.lean
-Genuine: 41 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
+Genuine: 46 | Conflates: 0 | Dissolved: 0 | Infrastructure: 9
 -/
 import Origin.Core
 import Mathlib.Algebra.Order.Group.Unbundled.Abs
 import Mathlib.Algebra.Notation
+
+noncomputable section
 
 /-!
 # Positive & negative parts
@@ -80,6 +82,10 @@ instance instLeOnePart : LeOnePart α where
 
 @[to_additive (attr := simp)] lemma oneLePart_eq_one : a⁺ᵐ = 1 ↔ a ≤ 1 := sup_eq_right
 
+@[to_additive (attr := simp)] alias ⟨_, oneLePart_of_one_le⟩ := oneLePart_eq_self
+
+@[to_additive (attr := simp)] alias ⟨_, oneLePart_of_le_one⟩ := oneLePart_eq_one
+
 @[to_additive "See also `negPart_eq_neg`."]
 lemma leOnePart_eq_inv' : a⁻ᵐ = a⁻¹ ↔ 1 ≤ a⁻¹ := sup_eq_left
 
@@ -96,8 +102,6 @@ lemma leOnePart_le_one' : a⁻ᵐ ≤ 1 ↔ a⁻¹ ≤ 1 := by simp [leOnePart]
 @[to_additive (attr := simp) posPart_pos] lemma one_lt_oneLePart (ha : 1 < a) : 1 < a⁺ᵐ := by
   rwa [oneLePart_eq_self.2 ha.le]
 
-@[to_additive (attr := simp)] lemma oneLePart_inv (a : α) : a⁻¹⁺ᵐ = a⁻ᵐ := rfl
-
 @[to_additive (attr := simp)] lemma leOnePart_inv (a : α) : a⁻¹⁻ᵐ = a⁺ᵐ := by
   simp [oneLePart, leOnePart]
 
@@ -110,11 +114,13 @@ variable [MulLeftMono α]
 @[to_additive (attr := simp)]
 lemma leOnePart_eq_one : a⁻ᵐ = 1 ↔ 1 ≤ a := by simp [leOnePart_eq_one']
 
+@[to_additive (attr := simp)] alias ⟨_, leOnePart_of_le_one⟩ := leOnePart_eq_inv
+
+@[to_additive (attr := simp)] alias ⟨_, leOnePart_of_one_le⟩ := leOnePart_eq_one
+
+@[to_additive (attr := simp) negPart_pos] lemma one_lt_ltOnePart (ha : a < 1) : 1 < a⁻ᵐ := by
   rwa [leOnePart_eq_inv.2 ha.le, one_lt_inv']
 
-@[to_additive (attr := simp)] alias ⟨_, leOnePart_of_le_one⟩ := leOnePart_eq_inv
-@[to_additive (attr := simp)] alias ⟨_, leOnePart_of_one_le⟩ := leOnePart_eq_one
-@[to_additive (attr := simp) negPart_pos] lemma one_lt_ltOnePart (ha : a < 1) : 1 < a⁻ᵐ := by
 @[to_additive (attr := simp)] lemma oneLePart_div_leOnePart (a : α) : a⁺ᵐ / a⁻ᵐ = a := by
   rw [div_eq_mul_inv, mul_inv_eq_iff_eq_mul, leOnePart_def, mul_sup, mul_one, mul_inv_cancel,
     sup_comm, oneLePart_def]
@@ -236,10 +242,6 @@ end LinearOrder
 namespace Pi
 
 variable {ι : Type*} {α : ι → Type*} [∀ i, Lattice (α i)] [∀ i, Group (α i)]
-
-@[to_additive (attr := simp)] lemma oneLePart_apply (f : ∀ i, α i) (i : ι) : f⁺ᵐ i = (f i)⁺ᵐ := rfl
-
-@[to_additive (attr := simp)] lemma leOnePart_apply (f : ∀ i, α i) (i : ι) : f⁻ᵐ i = (f i)⁻ᵐ := rfl
 
 @[to_additive] lemma oneLePart_def (f : ∀ i, α i) : f⁺ᵐ = fun i ↦ (f i)⁺ᵐ := rfl
 

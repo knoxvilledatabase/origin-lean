@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Nat/Prime/Basic.lean
-Genuine: 42 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 45 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Associated.Basic
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Data.Nat.Prime.Defs
+
+noncomputable section
 
 /-!
 # Prime numbers
@@ -215,7 +217,14 @@ theorem eq_prime_pow_of_dvd_least_prime_pow {a p k : ℕ} (pp : Prime p) (h₁ :
   congr
   exact le_antisymm h (not_le.1 ((not_congr (pow_dvd_pow_iff_le_right (Prime.one_lt pp))).1 h₁))
 
--- DISSOLVED: ne_one_iff_exists_prime_dvd
+theorem ne_one_iff_exists_prime_dvd : ∀ {n}, n ≠ 1 ↔ ∃ p : ℕ, p.Prime ∧ p ∣ n
+  | 0 => by simpa using Exists.intro 2 Nat.prime_two
+  | 1 => by simp [Nat.not_prime_one]
+  | n + 2 => by
+    let a := n + 2
+    let ha : a ≠ 1 := Nat.succ_succ_ne_one n
+    simp only [true_iff, Ne, not_false_iff, ha]
+    exact ⟨a.minFac, Nat.minFac_prime ha, a.minFac_dvd⟩
 
 theorem eq_one_iff_not_exists_prime_dvd {n : ℕ} : n = 1 ↔ ∀ p : ℕ, p.Prime → ¬p ∣ n := by
   simpa using not_iff_not.mpr ne_one_iff_exists_prime_dvd

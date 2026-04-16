@@ -7,6 +7,8 @@ import Mathlib.Topology.Algebra.Ring.Basic
 import Mathlib.Topology.Algebra.Group.Quotient
 import Mathlib.RingTheory.Ideal.Quotient.Defs
 
+noncomputable section
+
 /-!
 # Ideals and quotients of topological rings
 
@@ -27,10 +29,6 @@ protected def Ideal.closure (I : Ideal R) : Ideal R :=
       I.toAddSubmonoid with
     carrier := closure I
     smul_mem' := fun c _ hx => map_mem_closure (mulLeft_continuous _) hx fun _ => I.mul_mem_left c }
-
-@[simp]
-theorem Ideal.coe_closure (I : Ideal R) : (I.closure : Set R) = closure I :=
-  rfl
 
 theorem Ideal.closure_eq_of_isClosed (I : Ideal R) (hI : IsClosed (I : Set R)) : I.closure = I :=
   SetLike.ext' hI.closure_eq

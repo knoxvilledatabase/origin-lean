@@ -5,6 +5,8 @@ Genuine: 107 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 import Origin.Core
 import Mathlib.Geometry.Manifold.MFDeriv.FDeriv
 
+noncomputable section
+
 /-!
 # Differentiability of specific functions
 

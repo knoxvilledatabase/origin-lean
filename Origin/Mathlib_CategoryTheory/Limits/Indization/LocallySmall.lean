@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Preserves.Ulift
 import Mathlib.CategoryTheory.Limits.IndYoneda
 import Mathlib.CategoryTheory.Limits.Indization.IndObject
 
+noncomputable section
+
 /-!
 # There are only `v`-many natural transformations between Ind-objects
 

@@ -7,6 +7,8 @@ import Mathlib.Algebra.Polynomial.Cardinal
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.RingTheory.Algebraic.Defs
 
+noncomputable section
+
 /-!
 # Cardinality of algebraic extensions
 

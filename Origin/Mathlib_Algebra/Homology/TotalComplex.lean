@@ -8,6 +8,8 @@ import Mathlib.Algebra.Homology.ComplexShapeSigns
 import Mathlib.Algebra.Homology.HomologicalBicomplex
 import Mathlib.Algebra.Module.Basic
 
+noncomputable section
+
 /-!
 # The total complex of a bicomplex
 
@@ -37,7 +39,6 @@ variable {C : Type*} [Category C] [Preadditive C]
 abbrev HasTotal := K.toGradedObject.HasMap (ComplexShape.π c₁ c₂ c₁₂)
 
 include e in
-
 variable {K L} in
 
 lemma hasTotal_of_iso [K.HasTotal c₁₂] : L.HasTotal c₁₂ :=
@@ -236,10 +237,6 @@ lemma D₂_D₁ (i₁₂ i₁₂' i₁₂'' : I₁₂) :
     · rw [K.D₁_shape c₁₂ _ _ h₂, K.D₂_shape c₁₂ _ _ h₂, comp_zero, comp_zero, neg_zero]
   · rw [K.D₁_shape c₁₂ _ _ h₁, K.D₂_shape c₁₂ _ _ h₁, zero_comp, zero_comp, neg_zero]
 
-@[reassoc]
-lemma D₁_D₂ (i₁₂ i₁₂' i₁₂'' : I₁₂) :
-    K.D₁ c₁₂ i₁₂ i₁₂' ≫ K.D₂ c₁₂ i₁₂' i₁₂'' = - K.D₂ c₁₂ i₁₂ i₁₂' ≫ K.D₁ c₁₂ i₁₂' i₁₂'' := by simp
-
 @[simps (config := .lemmasOnly) d]
 noncomputable def total : HomologicalComplex C c₁₂ where
   X := K.toGradedObject.mapObj (ComplexShape.π c₁ c₂ c₁₂)
@@ -384,11 +381,6 @@ noncomputable def map : K.total c₁₂ ⟶ L.total c₁₂ where
   comm' i₁₂ i₁₂' _ := by
     dsimp [total]
     rw [comp_add, add_comp, mapAux.mapMap_D₁, mapAux.mapMap_D₂]
-
-@[simp]
-lemma forget_map :
-    (HomologicalComplex.forget C c₁₂).map (map φ c₁₂) =
-      GradedObject.mapMap (toGradedObjectMap φ) _ := rfl
 
 variable (K) in
 

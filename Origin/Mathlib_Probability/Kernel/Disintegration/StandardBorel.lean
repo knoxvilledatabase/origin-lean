@@ -1,6 +1,6 @@
 /-
 Extracted from Probability/Kernel/Disintegration/StandardBorel.lean
-Genuine: 23 | Conflates: 0 | Dissolved: 2 | Infrastructure: 14
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 14
 -/
 import Origin.Core
 import Mathlib.Probability.Kernel.MeasureCompProd
@@ -9,6 +9,8 @@ import Mathlib.Probability.Kernel.Disintegration.CondCDF
 import Mathlib.Probability.Kernel.Disintegration.Density
 import Mathlib.Probability.Kernel.Disintegration.CDFToKernel
 import Mathlib.MeasureTheory.Constructions.Polish.EmbeddingReal
+
+noncomputable section
 
 /-!
 # Existence of disintegration of measures and kernels for standard Borel spaces
@@ -116,7 +118,6 @@ lemma isRatCondKernelCDF_density_Iic (κ : Kernel α (γ × ℝ)) [IsFiniteKerne
   (isRatCondKernelCDFAux_density_Iic κ).isRatCondKernelCDF
 
 noncomputable
-
 def condKernelCDF (κ : Kernel α (γ × ℝ)) [IsFiniteKernel κ] : α × γ → StieltjesFunction :=
   stieltjesOfMeasurableRat (fun (p : α × γ) q ↦ density κ (fst κ) p.1 p.2 (Iic q))
     (isRatCondKernelCDF_density_Iic κ).measurable
@@ -126,7 +127,6 @@ lemma isCondKernelCDF_condKernelCDF (κ : Kernel α (γ × ℝ)) [IsFiniteKernel
   isCondKernelCDF_stieltjesOfMeasurableRat (isRatCondKernelCDF_density_Iic κ)
 
 noncomputable
-
 def condKernelReal (κ : Kernel α (γ × ℝ)) [IsFiniteKernel κ] : Kernel (α × γ) ℝ :=
   (isCondKernelCDF_condKernelCDF κ).toKernel
 
@@ -140,7 +140,6 @@ lemma compProd_fst_condKernelReal (κ : Kernel α (γ × ℝ)) [IsFiniteKernel �
   rw [condKernelReal, compProd_toKernel]
 
 noncomputable
-
 def condKernelUnitReal (κ : Kernel Unit (α × ℝ)) [IsFiniteKernel κ] : Kernel (Unit × α) ℝ :=
   (isCondKernelCDF_condCDF (κ ())).toKernel
 
@@ -168,7 +167,6 @@ property on `ℝ` to all these spaces. -/
 open Classical in
 
 noncomputable
-
 def borelMarkovFromReal (Ω : Type*) [Nonempty Ω] [MeasurableSpace Ω] [StandardBorelSpace Ω]
     (η : Kernel α ℝ) :
     Kernel α Ω :=
@@ -290,7 +288,6 @@ section CountablyGenerated
 open ProbabilityTheory.Kernel
 
 noncomputable
-
 def condKernelBorel (κ : Kernel α (γ × Ω)) [IsFiniteKernel κ] : Kernel (α × γ) Ω :=
   let κ' := map κ (Prod.map (id : γ → γ) (embeddingReal Ω))
   borelMarkovFromReal Ω (condKernelReal κ')
@@ -315,7 +312,6 @@ section Unit
 variable (κ : Kernel Unit (α × Ω)) [IsFiniteKernel κ]
 
 noncomputable
-
 def condKernelUnitBorel : Kernel (Unit × α) Ω :=
   let κ' := map κ (Prod.map (id : α → α) (embeddingReal Ω))
   borelMarkovFromReal Ω (condKernelUnitReal κ')
@@ -338,7 +334,6 @@ section Measure
 variable {ρ : Measure (α × Ω)} [IsFiniteMeasure ρ]
 
 noncomputable
-
 irreducible_def _root_.MeasureTheory.Measure.condKernel (ρ : Measure (α × Ω)) [IsFiniteMeasure ρ] :
     Kernel α Ω :=
   comap (condKernelUnitBorel (const Unit ρ)) (fun a ↦ ((), a)) measurable_prod_mk_left
@@ -370,10 +365,17 @@ lemma _root_.MeasureTheory.Measure.compProd_fst_condKernel
     ρ.fst ⊗ₘ ρ.condKernel = ρ := ρ.disintegrate ρ.condKernel
 
 set_option linter.unusedVariables false in
+/-- Auxiliary lemma for `condKernel_apply_of_ne_zero`. -/
 
--- DISSOLVED: _root_.MeasureTheory.Measure.condKernel_apply_of_ne_zero_of_measurableSet
+lemma _root_.MeasureTheory.Measure.condKernel_apply_of_ne_zero_of_measurableSet
+    [MeasurableSingletonClass α] {x : α} (hx : ρ.fst {x} ≠ 0) {s : Set Ω} (hs : MeasurableSet s) :
+    ρ.condKernel x s = (ρ.fst {x})⁻¹ * ρ ({x} ×ˢ s) :=
+  Measure.IsCondKernel.apply_of_ne_zero _ _ hx _
 
--- DISSOLVED: _root_.MeasureTheory.Measure.condKernel_apply_of_ne_zero
+lemma _root_.MeasureTheory.Measure.condKernel_apply_of_ne_zero [MeasurableSingletonClass α]
+    {x : α} (hx : ρ.fst {x} ≠ 0) (s : Set Ω) :
+    ρ.condKernel x s = (ρ.fst {x})⁻¹ * ρ ({x} ×ˢ s) :=
+  Measure.IsCondKernel.apply_of_ne_zero _ _ hx _
 
 end Measure
 
@@ -394,7 +396,6 @@ variable [h : CountableOrCountablyGenerated α β] (κ : Kernel α (β × Ω)) [
 open Classical in
 
 noncomputable
-
 irreducible_def condKernel : Kernel (α × β) Ω :=
   if hα : Countable α then
     condKernelCountable (fun a ↦ (κ a).condKernel)

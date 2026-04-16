@@ -1,6 +1,6 @@
 /-
 Extracted from RingTheory/IntegralClosure/IsIntegralClosure/Basic.lean
-Genuine: 67 | Conflates: 2 | Dissolved: 1 | Infrastructure: 12
+Genuine: 68 | Conflates: 2 | Dissolved: 0 | Infrastructure: 12
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Roots
@@ -10,6 +10,8 @@ import Mathlib.RingTheory.IntegralClosure.Algebra.Basic
 import Mathlib.RingTheory.FiniteType
 import Mathlib.RingTheory.Polynomial.IntegralNormalization
 import Mathlib.RingTheory.Polynomial.ScaleRoots
+
+noncomputable section
 
 /-!
 # # Integral closure as a characteristic predicate
@@ -28,7 +30,11 @@ open Algebra
 
 variable {R S : Type*}
 
--- DISSOLVED: IsIntegral.isUnit
+theorem IsIntegral.isUnit [Field R] [Ring S] [IsDomain S] [Algebra R S] {x : S}
+    (int : IsIntegral R x) (h0 : x ≠ 0) : IsUnit x :=
+  have : FiniteDimensional R (adjoin R {x}) := ⟨(Submodule.fg_top _).mpr int.fg_adjoin_singleton⟩
+  (FiniteDimensional.isUnit R (K := adjoin R {x})
+    (x := ⟨x, subset_adjoin rfl⟩) <| mt Subtype.ext_iff.mp h0).map (adjoin R {x}).val
 
 theorem isField_of_isIntegral_of_isField' [CommRing R] [CommRing S] [IsDomain S]
     [Algebra R S] [Algebra.IsIntegral R S] (hR : IsField R) : IsField S where
@@ -147,19 +153,11 @@ def AlgHom.mapIntegralClosure [Algebra R S] (f : A →ₐ[R] S) :
     integralClosure R A →ₐ[R] integralClosure R S :=
   (f.restrictDomain (integralClosure R A)).codRestrict (integralClosure R S) (fun ⟨_, h⟩ => h.map f)
 
-@[simp]
-theorem AlgHom.coe_mapIntegralClosure [Algebra R S] (f : A →ₐ[R] S)
-    (x : integralClosure R A) : (f.mapIntegralClosure x : S) = f (x : A) := rfl
-
 def AlgEquiv.mapIntegralClosure [Algebra R S] (f : A ≃ₐ[R] S) :
     integralClosure R A ≃ₐ[R] integralClosure R S :=
   AlgEquiv.ofAlgHom (f : A →ₐ[R] S).mapIntegralClosure (f.symm : S →ₐ[R] A).mapIntegralClosure
     (AlgHom.ext fun _ ↦ Subtype.ext (f.right_inv _))
     (AlgHom.ext fun _ ↦ Subtype.ext (f.left_inv _))
-
-@[simp]
-theorem AlgEquiv.coe_mapIntegralClosure [Algebra R S] (f : A ≃ₐ[R] S)
-    (x : integralClosure R A) : (f.mapIntegralClosure x : S) = f (x : A) := rfl
 
 theorem integralClosure.isIntegral (x : integralClosure R A) : IsIntegral R x :=
   let ⟨p, hpm, hpx⟩ := x.2

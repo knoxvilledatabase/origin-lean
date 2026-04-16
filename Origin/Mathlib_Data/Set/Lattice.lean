@@ -8,6 +8,8 @@ import Mathlib.Order.CompleteBooleanAlgebra
 import Mathlib.Order.Directed
 import Mathlib.Order.GaloisConnection
 
+noncomputable section
+
 /-!
 # The set lattice
 
@@ -529,9 +531,6 @@ theorem iInter_eq_univ : ⋂ i, s i = univ ↔ ∀ i, s i = univ :=
 theorem nonempty_iUnion : (⋃ i, s i).Nonempty ↔ ∃ i, (s i).Nonempty := by
   simp [nonempty_iff_ne_empty]
 
-theorem nonempty_biUnion {t : Set α} {s : α → Set β} :
-    (⋃ i ∈ t, s i).Nonempty ↔ ∃ i ∈ t, (s i).Nonempty := by simp
-
 theorem iUnion_nonempty_index (s : Set α) (t : s.Nonempty → Set β) :
     ⋃ h, t h = ⋃ x ∈ s, t ⟨x, ‹_›⟩ :=
   iSup_exists
@@ -759,12 +758,6 @@ theorem iInter_coe_set {α β : Type*} (s : Set α) (f : s → Set β) :
     ⋂ i, f i = ⋂ i ∈ s, f ⟨i, ‹i ∈ s›⟩ :=
   iInter_subtype _ _
 
-theorem biUnion_insert (a : α) (s : Set α) (t : α → Set β) :
-    ⋃ x ∈ insert a s, t x = t a ∪ ⋃ x ∈ s, t x := by simp
-
-theorem biUnion_pair (a b : α) (s : α → Set β) : ⋃ x ∈ ({a, b} : Set α), s x = s a ∪ s b := by
-  simp
-
 theorem inter_iUnion₂ (s : Set α) (t : ∀ i, κ i → Set α) :
     (s ∩ ⋃ (i) (j), t i j) = ⋃ (i) (j), s ∩ t i j := by simp only [inter_iUnion]
 
@@ -946,10 +939,6 @@ theorem sInter_eq_empty_iff {c : Set (Set α)} : ⋂₀ c = ∅ ↔ ∀ a, ∃ b
 theorem nonempty_iInter {f : ι → Set α} : (⋂ i, f i).Nonempty ↔ ∃ x, ∀ i, x ∈ f i := by
   simp [nonempty_iff_ne_empty, iInter_eq_empty_iff]
 
-theorem nonempty_iInter₂ {s : ∀ i, κ i → Set α} :
-    (⋂ (i) (j), s i j).Nonempty ↔ ∃ a, ∀ i j, a ∈ s i j := by
-  simp
-
 @[simp]
 theorem nonempty_sInter {c : Set (Set α)} : (⋂₀ c).Nonempty ↔ ∃ a, ∀ b ∈ c, a ∈ b := by
   simp [nonempty_iff_ne_empty, sInter_eq_empty_iff]
@@ -1009,8 +998,6 @@ theorem iUnion_singleton_eq_range {α β : Type*} (f : α → β) : ⋃ x : α, 
   simp [@eq_comm _ x]
 
 theorem iUnion_of_singleton (α : Type*) : (⋃ x, {x} : Set α) = univ := by simp [Set.ext_iff]
-
-theorem iUnion_of_singleton_coe (s : Set α) : ⋃ i : s, ({(i : α)} : Set α) = s := by simp
 
 theorem sUnion_eq_biUnion {s : Set (Set α)} : ⋃₀s = ⋃ (i : Set α) (_ : i ∈ s), i := by
   rw [← sUnion_image, image_id']
@@ -1768,13 +1755,6 @@ theorem sigmaToiUnion_injective (h : Pairwise (Disjoint on t)) :
 theorem sigmaToiUnion_bijective (h : Pairwise (Disjoint on t)) :
     Bijective (sigmaToiUnion t) :=
   ⟨sigmaToiUnion_injective t h, sigmaToiUnion_surjective t⟩
-
-noncomputable def sigmaEquiv (s : α → Set β) (hs : ∀ b, ∃! i, b ∈ s i) :
-    (Σ i, s i) ≃ β where
-  toFun | ⟨_, b⟩ => b
-  invFun b := ⟨(hs b).choose, b, (hs b).choose_spec.1⟩
-  left_inv | ⟨i, b, hb⟩ => Sigma.subtype_ext ((hs b).choose_spec.2 i hb).symm rfl
-  right_inv _ := rfl
 
 noncomputable def unionEqSigmaOfDisjoint {t : α → Set β}
     (h : Pairwise (Disjoint on t)) :

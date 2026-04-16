@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.Equalizers
 import Mathlib.CategoryTheory.Limits.Shapes.Products
 import Mathlib.Topology.Sheaves.SheafCondition.PairwiseIntersections
 
+noncomputable section
+
 /-!
 # The sheaf condition in terms of an equalizer of products
 
@@ -72,20 +74,7 @@ def fork : Fork.{v} (leftRes F U) (rightRes F U) :=
   Fork.ofι _ (w F U)
 
 @[simp]
-theorem fork_pt : (fork F U).pt = F.obj (op (iSup U)) :=
-  rfl
-
-@[simp]
-theorem fork_ι : (fork F U).ι = res F U :=
-  rfl
-
-@[simp]
 theorem fork_π_app_walkingParallelPair_zero : (fork F U).π.app WalkingParallelPair.zero = res F U :=
-  rfl
-
-@[simp (high)]
-theorem fork_π_app_walkingParallelPair_one :
-    (fork F U).π.app WalkingParallelPair.one = res F U ≫ leftRes F U :=
   rfl
 
 variable {F} {G : Presheaf C X}

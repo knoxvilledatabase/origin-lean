@@ -1,11 +1,13 @@
 /-
 Extracted from Order/ConditionallyCompleteLattice/Finset.lean
-Genuine: 32 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 33 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Max
 import Mathlib.Data.Set.Finite.Lattice
 import Mathlib.Order.ConditionallyCompleteLattice.Indexed
+
+noncomputable section
 
 /-!
 # Conditionally complete lattices and finite sets.
@@ -263,7 +265,9 @@ lemma List.iSup_mem_map_of_ne_nil {l : List ι} (f : ι → α) (h : l ≠ []) :
     ⨆ x ∈ l, f x ∈ l.map f :=
   l.iSup_mem_map_of_exists_sSup_empty_le _ (by simpa using exists_mem_of_ne_nil _ h)
 
--- DISSOLVED: Multiset.iSup_mem_map_of_ne_zero
+lemma Multiset.iSup_mem_map_of_ne_zero {s : Multiset ι} (f : ι → α) (h : s ≠ 0) :
+    ⨆ x ∈ s, f x ∈ s.map f :=
+  s.iSup_mem_map_of_exists_sSup_empty_le _ (by simpa using exists_mem_of_ne_zero h)
 
 end ListMultiset
 

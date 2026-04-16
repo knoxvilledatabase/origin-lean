@@ -7,6 +7,8 @@ import Mathlib.Algebra.Order.Module.Defs
 import Mathlib.Data.NNRat.Lemmas
 import Mathlib.Data.Rat.Cast.Order
 
+noncomputable section
+
 /-!
 # Monotonicity of the action by rational numbers
 -/

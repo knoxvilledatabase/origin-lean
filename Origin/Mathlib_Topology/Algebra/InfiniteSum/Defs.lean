@@ -7,6 +7,8 @@ import Mathlib.Algebra.BigOperators.Finprod
 import Mathlib.Order.Filter.AtTopBot.BigOperators
 import Mathlib.Topology.Separation.Basic
 
+noncomputable section
+
 /-!
 # Infinite sum and product over a topological monoid
 

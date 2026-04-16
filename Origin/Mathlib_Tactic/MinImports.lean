@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import ImportGraph.Imports
 
+noncomputable section
+
 /-! # `#min_imports in` a command to find minimal imports
 
 `#min_imports in stx` scans the syntax `stx` to find a collection of minimal imports that should be

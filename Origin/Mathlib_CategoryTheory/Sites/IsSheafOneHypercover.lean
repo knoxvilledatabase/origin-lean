@@ -1,9 +1,11 @@
 /-
 Extracted from CategoryTheory/Sites/IsSheafOneHypercover.lean
-Genuine: 11 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
+Genuine: 10 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Sites.OneHypercover
+
+noncomputable section
 
 /-!
 # Characterization of sheaves using 1-hypercovers
@@ -66,7 +68,6 @@ namespace IsSheafIff
 variable (hP : ∀ ⦃X : C⦄ (E : J.OneHypercover X) (_ : H E), Nonempty (IsLimit (E.multifork P)))
 
 include hP in
-
 lemma hom_ext [H.IsGenerating] {X : C} (S : Sieve X) (hS : S ∈ J X) {T : A}
     {x y : T ⟶ P.obj (Opposite.op X)}
     (h : ∀ ⦃Y : C⦄ (f : Y ⟶ X) (_ : S f), x ≫ P.map f.op = y ≫ P.map f.op) :

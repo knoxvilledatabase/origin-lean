@@ -7,6 +7,8 @@ import Mathlib.Analysis.Normed.Group.SemiNormedGrp
 import Mathlib.Analysis.Normed.Group.Quotient
 import Mathlib.CategoryTheory.Limits.Shapes.Kernels
 
+noncomputable section
+
 /-!
 # Kernels and cokernels in SemiNormedGrp₁ and SemiNormedGrp
 
@@ -133,7 +135,6 @@ end EqualizersAndKernels
 section Cokernel
 
 noncomputable
-
 def cokernelCocone {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) : Cofork f 0 :=
   @Cofork.ofπ _ _ _ _ _ _ (SemiNormedGrp.of (Y ⧸ NormedAddGroupHom.range f)) f.range.normedMk
     (by
@@ -150,7 +151,6 @@ def cokernelCocone {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) : Cofork f 0 :=
       convert exists_apply_eq_apply f a)
 
 noncomputable
-
 def cokernelLift {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) (s : CokernelCofork f) :
     (cokernelCocone f).pt ⟶ s.pt :=
   NormedAddGroupHom.lift _ s.π
@@ -162,7 +162,6 @@ def cokernelLift {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) (s : CokernelCofork f) 
       erw [zero_apply])
 
 noncomputable
-
 def isColimitCokernelCocone {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) :
     IsColimit (cokernelCocone f) :=
   isColimitAux _ (cokernelLift f)
@@ -187,18 +186,15 @@ example : HasCokernels SemiNormedGrp := by infer_instance
 section ExplicitCokernel
 
 noncomputable
-
 def explicitCokernel {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) : SemiNormedGrp.{u} :=
   (cokernelCocone f).pt
 
 noncomputable
-
 def explicitCokernelDesc {X Y Z : SemiNormedGrp.{u}} {f : X ⟶ Y} {g : Y ⟶ Z} (w : f ≫ g = 0) :
     explicitCokernel f ⟶ Z :=
   (isColimitCokernelCocone f).desc (Cofork.ofπ g (by simp [w]))
 
 noncomputable
-
 def explicitCokernelπ {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) : Y ⟶ explicitCokernel f :=
   (cokernelCocone f).ι.app WalkingParallelPair.one
 
@@ -306,7 +302,6 @@ theorem explicitCokernelDesc_norm_le {X Y Z : SemiNormedGrp.{u}} {f : X ⟶ Y} {
   explicitCokernelDesc_norm_le_of_norm_le w ‖g‖₊ le_rfl
 
 noncomputable
-
 def explicitCokernelIso {X Y : SemiNormedGrp.{u}} (f : X ⟶ Y) :
     explicitCokernel f ≅ cokernel f :=
   (isColimitCokernelCocone f).coconePointUniqueUpToIso (colimit.isColimit _)

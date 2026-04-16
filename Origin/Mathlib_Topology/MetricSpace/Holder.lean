@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Topology.MetricSpace.Lipschitz
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
 
+noncomputable section
+
 /-!
 # Hölder continuous functions
 

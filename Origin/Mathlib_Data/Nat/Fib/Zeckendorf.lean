@@ -1,9 +1,11 @@
 /-
 Extracted from Data/Nat/Fib/Zeckendorf.lean
-Genuine: 21 | Conflates: 0 | Dissolved: 2 | Infrastructure: 0
+Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Data.Nat.Fib.Basic
+
+noncomputable section
 
 /-!
 # Zeckendorf's Theorem
@@ -89,11 +91,17 @@ lemma lt_fib_greatestFib_add_one (n : ℕ) : n < fib (greatestFib n + 1) :=
 @[simp] lemma greatestFib_eq_zero : greatestFib n = 0 ↔ n = 0 :=
   ⟨fun h ↦ by simpa using findGreatest_eq_zero_iff.1 h zero_lt_one le_add_self, by rintro rfl; rfl⟩
 
--- DISSOLVED: greatestFib_ne_zero
+lemma greatestFib_ne_zero : greatestFib n ≠ 0 ↔ n ≠ 0 := greatestFib_eq_zero.not
 
 @[simp] lemma greatestFib_pos : 0 < greatestFib n ↔ 0 < n := by simp [pos_iff_ne_zero]
 
--- DISSOLVED: greatestFib_sub_fib_greatestFib_le_greatestFib
+lemma greatestFib_sub_fib_greatestFib_le_greatestFib (hn : n ≠ 0) :
+    greatestFib (n - fib (greatestFib n)) ≤ greatestFib n - 2 := by
+  rw [← Nat.lt_succ_iff, greatestFib_lt, tsub_lt_iff_right n.fib_greatestFib_le, Nat.sub_succ,
+    succ_pred, ← fib_add_one]
+  · exact n.lt_fib_greatestFib_add_one
+  · simpa
+  · simpa [← succ_le_iff, tsub_eq_zero_iff_le] using hn.bot_lt
 
 private lemma zeckendorf_aux (hm : 0 < m) : m - fib (greatestFib m) < m :=
 

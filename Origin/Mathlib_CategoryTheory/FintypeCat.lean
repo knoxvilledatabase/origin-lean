@@ -8,6 +8,8 @@ import Mathlib.CategoryTheory.Endomorphism
 import Mathlib.CategoryTheory.Skeletal
 import Mathlib.Data.Finite.Prod
 
+noncomputable section
+
 /-!
 # The category of finite types.
 
@@ -57,10 +59,6 @@ instance concreteCategoryFintype : ConcreteCategory FintypeCat :=
   ⟨incl⟩
 
 instance : (forget FintypeCat).Full := inferInstanceAs <| FintypeCat.incl.Full
-
-@[simp]
-theorem id_apply (X : FintypeCat) (x : X) : (𝟙 X : X → X) x = x :=
-  rfl
 
 @[simp]
 theorem comp_apply {X Y Z : FintypeCat} (f : X ⟶ Y) (g : Y ⟶ Z) (x : X) : (f ≫ g) x = g (f x) :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Monoidal.Braided.Basic
 import Mathlib.CategoryTheory.Functor.ReflectsIso
 
+noncomputable section
+
 /-!
 # Half braidings and the Drinfeld center of a monoidal category
 
@@ -78,10 +80,6 @@ theorem ext {X Y : Center C} (f g : X ⟶ Y) (w : f.f = g.f) : f = g := by
 instance : Category (Center C) where
   id X := { f := 𝟙 X.1 }
   comp f g := { f := f.f ≫ g.f }
-
-@[simp]
-theorem id_f (X : Center C) : Hom.f (𝟙 X) = 𝟙 X.1 :=
-  rfl
 
 @[simp]
 theorem comp_f {X Y Z : Center C} (f : X ⟶ Y) (g : Y ⟶ Z) : (f ≫ g).f = f.f ≫ g.f :=
@@ -217,34 +215,6 @@ instance : MonoidalCategory (Center C) where
   rightUnitor := rightUnitor
 
 @[simp]
-theorem tensor_fst (X Y : Center C) : (X ⊗ Y).1 = X.1 ⊗ Y.1 :=
-  rfl
-
-@[simp]
-theorem tensor_β (X Y : Center C) (U : C) :
-    (X ⊗ Y).2.β U =
-      α_ _ _ _ ≪≫
-        (whiskerLeftIso X.1 (Y.2.β U)) ≪≫ (α_ _ _ _).symm ≪≫
-          (whiskerRightIso (X.2.β U) Y.1) ≪≫ α_ _ _ _ :=
-  rfl
-
-@[simp]
-theorem whiskerLeft_f (X : Center C) {Y₁ Y₂ : Center C} (f : Y₁ ⟶ Y₂) : (X ◁ f).f = X.1 ◁ f.f :=
-  rfl
-
-@[simp]
-theorem whiskerRight_f {X₁ X₂ : Center C} (f : X₁ ⟶ X₂) (Y : Center C) : (f ▷ Y).f = f.f ▷ Y.1 :=
-  rfl
-
-@[simp]
-theorem tensor_f {X₁ Y₁ X₂ Y₂ : Center C} (f : X₁ ⟶ Y₁) (g : X₂ ⟶ Y₂) : (f ⊗ g).f = f.f ⊗ g.f :=
-  rfl
-
-@[simp]
-theorem tensorUnit_β (U : C) : (𝟙_ (Center C)).2.β U = λ_ U ≪≫ (ρ_ U).symm :=
-  rfl
-
-@[simp]
 theorem associator_hom_f (X Y Z : Center C) : Hom.f (α_ X Y Z).hom = (α_ X.1 Y.1 Z.1).hom :=
   rfl
 
@@ -287,15 +257,7 @@ instance : (forget C).Monoidal :=
     { εIso := Iso.refl _
       μIso := fun _ _ ↦ Iso.refl _}
 
-@[simp] lemma forget_ε : ε (forget C) = 𝟙 _ := rfl
-
-@[simp] lemma forget_η : η (forget C) = 𝟙 _ := rfl
-
 variable {C}
-
-@[simp] lemma forget_μ (X Y : Center C) : μ (forget C) X Y = 𝟙 _ := rfl
-
-@[simp] lemma forget_δ (X Y : Center C) : δ (forget C) X Y = 𝟙 _ := rfl
 
 instance : (forget C).ReflectsIsomorphisms where
   reflects f i := by dsimp at i; change IsIso (isoMk f).hom; infer_instance
@@ -343,15 +305,7 @@ instance : (ofBraided C).Monoidal :=
         { hom := { f := 𝟙 _ }
           inv := { f := 𝟙 _ } } }
 
-@[simp] lemma ofBraided_ε_f : (ε (ofBraided C)).f = 𝟙 _ := rfl
-
-@[simp] lemma ofBraided_η_f : (η (ofBraided C)).f = 𝟙 _ := rfl
-
 variable {C}
-
-@[simp] lemma ofBraided_μ_f (X Y : C) : (μ (ofBraided C) X Y).f = 𝟙 _ := rfl
-
-@[simp] lemma ofBraided_δ_f (X Y : C) : (δ (ofBraided C) X Y).f = 𝟙 _ := rfl
 
 end
 

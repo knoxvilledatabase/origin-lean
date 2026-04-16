@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Polynomial/Degree/SmallDegree.lean
-Genuine: 15 | Conflates: 0 | Dissolved: 13 | Infrastructure: 0
+Genuine: 28 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Algebra.Polynomial.Degree.Operations
 import Mathlib.Data.Nat.WithBot
+
+noncomputable section
 
 /-!
 # Results on polynomials of specific small degrees
@@ -55,9 +57,11 @@ section Semiring
 
 variable [Semiring R] {p q : R[X]} {ι : Type*}
 
--- DISSOLVED: zero_le_degree_iff
+theorem zero_le_degree_iff : 0 ≤ degree p ↔ p ≠ 0 := by
+  rw [← not_lt, Nat.WithBot.lt_zero_iff, degree_eq_bot]
 
--- DISSOLVED: ne_zero_of_coe_le_degree
+theorem ne_zero_of_coe_le_degree (hdeg : ↑n ≤ p.degree) : p ≠ 0 :=
+  zero_le_degree_iff.mp <| (WithBot.coe_le_coe.mpr n.zero_le).trans hdeg
 
 theorem le_natDegree_of_coe_le_degree (hdeg : ↑n ≤ p.degree) : n ≤ p.natDegree :=
   -- Porting note: `.. ▸ ..` → `rwa [..] at ..`
@@ -70,14 +74,20 @@ theorem degree_linear_le : degree (C a * X + C b) ≤ 1 :=
 theorem degree_linear_lt : degree (C a * X + C b) < 2 :=
   degree_linear_le.trans_lt <| WithBot.coe_lt_coe.mpr one_lt_two
 
--- DISSOLVED: degree_linear
+@[simp]
+theorem degree_linear (ha : a ≠ 0) : degree (C a * X + C b) = 1 := by
+  rw [degree_add_eq_left_of_degree_lt <| degree_C_lt_degree_C_mul_X ha, degree_C_mul_X ha]
 
 theorem natDegree_linear_le : natDegree (C a * X + C b) ≤ 1 :=
   natDegree_le_of_degree_le degree_linear_le
 
--- DISSOLVED: natDegree_linear
+theorem natDegree_linear (ha : a ≠ 0) : natDegree (C a * X + C b) = 1 := by
+  rw [natDegree_add_C, natDegree_C_mul_X a ha]
 
--- DISSOLVED: leadingCoeff_linear
+@[simp]
+theorem leadingCoeff_linear (ha : a ≠ 0) : leadingCoeff (C a * X + C b) = a := by
+  rw [add_comm, leadingCoeff_add_of_degree_lt (degree_C_lt_degree_C_mul_X ha),
+    leadingCoeff_C_mul_X]
 
 theorem degree_quadratic_le : degree (C a * X ^ 2 + C b * X + C c) ≤ 2 := by
   simpa only [add_assoc] using
@@ -87,16 +97,26 @@ theorem degree_quadratic_le : degree (C a * X ^ 2 + C b * X + C c) ≤ 2 := by
 theorem degree_quadratic_lt : degree (C a * X ^ 2 + C b * X + C c) < 3 :=
   degree_quadratic_le.trans_lt <| WithBot.coe_lt_coe.mpr <| lt_add_one 2
 
--- DISSOLVED: degree_linear_lt_degree_C_mul_X_sq
+theorem degree_linear_lt_degree_C_mul_X_sq (ha : a ≠ 0) :
+    degree (C b * X + C c) < degree (C a * X ^ 2) := by
+  simpa only [degree_C_mul_X_pow 2 ha] using degree_linear_lt
 
--- DISSOLVED: degree_quadratic
+@[simp]
+theorem degree_quadratic (ha : a ≠ 0) : degree (C a * X ^ 2 + C b * X + C c) = 2 := by
+  rw [add_assoc, degree_add_eq_left_of_degree_lt <| degree_linear_lt_degree_C_mul_X_sq ha,
+    degree_C_mul_X_pow 2 ha]
+  rfl
 
 theorem natDegree_quadratic_le : natDegree (C a * X ^ 2 + C b * X + C c) ≤ 2 :=
   natDegree_le_of_degree_le degree_quadratic_le
 
--- DISSOLVED: natDegree_quadratic
+theorem natDegree_quadratic (ha : a ≠ 0) : natDegree (C a * X ^ 2 + C b * X + C c) = 2 :=
+  natDegree_eq_of_degree_eq_some <| degree_quadratic ha
 
--- DISSOLVED: leadingCoeff_quadratic
+@[simp]
+theorem leadingCoeff_quadratic (ha : a ≠ 0) : leadingCoeff (C a * X ^ 2 + C b * X + C c) = a := by
+  rw [add_assoc, add_comm, leadingCoeff_add_of_degree_lt <| degree_linear_lt_degree_C_mul_X_sq ha,
+    leadingCoeff_C_mul_X_pow]
 
 theorem degree_cubic_le : degree (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) ≤ 3 := by
   simpa only [add_assoc] using
@@ -106,16 +126,29 @@ theorem degree_cubic_le : degree (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) ≤
 theorem degree_cubic_lt : degree (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) < 4 :=
   degree_cubic_le.trans_lt <| WithBot.coe_lt_coe.mpr <| lt_add_one 3
 
--- DISSOLVED: degree_quadratic_lt_degree_C_mul_X_cb
+theorem degree_quadratic_lt_degree_C_mul_X_cb (ha : a ≠ 0) :
+    degree (C b * X ^ 2 + C c * X + C d) < degree (C a * X ^ 3) := by
+  simpa only [degree_C_mul_X_pow 3 ha] using degree_quadratic_lt
 
--- DISSOLVED: degree_cubic
+@[simp]
+theorem degree_cubic (ha : a ≠ 0) : degree (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) = 3 := by
+  rw [add_assoc, add_assoc, ← add_assoc (C b * X ^ 2),
+    degree_add_eq_left_of_degree_lt <| degree_quadratic_lt_degree_C_mul_X_cb ha,
+    degree_C_mul_X_pow 3 ha]
+  rfl
 
 theorem natDegree_cubic_le : natDegree (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) ≤ 3 :=
   natDegree_le_of_degree_le degree_cubic_le
 
--- DISSOLVED: natDegree_cubic
+theorem natDegree_cubic (ha : a ≠ 0) : natDegree (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) = 3 :=
+  natDegree_eq_of_degree_eq_some <| degree_cubic ha
 
--- DISSOLVED: leadingCoeff_cubic
+@[simp]
+theorem leadingCoeff_cubic (ha : a ≠ 0) :
+    leadingCoeff (C a * X ^ 3 + C b * X ^ 2 + C c * X + C d) = a := by
+  rw [add_assoc, add_assoc, ← add_assoc (C b * X ^ 2), add_comm,
+    leadingCoeff_add_of_degree_lt <| degree_quadratic_lt_degree_C_mul_X_cb ha,
+    leadingCoeff_C_mul_X_pow]
 
 end Semiring
 

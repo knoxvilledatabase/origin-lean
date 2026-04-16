@@ -1,12 +1,14 @@
 /-
 Extracted from Analysis/SpecialFunctions/Gaussian/FourierTransform.lean
-Genuine: 24 | Conflates: 0 | Dissolved: 1 | Infrastructure: 0
+Genuine: 25 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.Analysis.Fourier.FourierTransform
+
+noncomputable section
 
 /-!
 # Fourier transform of the Gaussian
@@ -49,7 +51,14 @@ theorem norm_cexp_neg_mul_sq_add_mul_I (b : ℂ) (c T : ℝ) :
   simp only [sq, re_add_im, mul_re, mul_im, add_re, add_im, ofReal_re, ofReal_im, I_re, I_im]
   ring_nf
 
--- DISSOLVED: norm_cexp_neg_mul_sq_add_mul_I'
+theorem norm_cexp_neg_mul_sq_add_mul_I' (hb : b.re ≠ 0) (c T : ℝ) :
+    ‖cexp (-b * (T + c * I) ^ 2)‖ =
+      exp (-(b.re * (T - b.im * c / b.re) ^ 2 - c ^ 2 * (b.im ^ 2 / b.re + b.re))) := by
+  have :
+    b.re * T ^ 2 - 2 * b.im * c * T - b.re * c ^ 2 =
+      b.re * (T - b.im * c / b.re) ^ 2 - c ^ 2 * (b.im ^ 2 / b.re + b.re) := by
+    field_simp; ring
+  rw [norm_cexp_neg_mul_sq_add_mul_I, this]
 
 theorem verticalIntegral_norm_le (hb : 0 < b.re) (c : ℝ) {T : ℝ} (hT : 0 ≤ T) :
     ‖verticalIntegral b c T‖ ≤

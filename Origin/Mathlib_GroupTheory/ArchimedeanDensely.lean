@@ -1,6 +1,6 @@
 /-
 Extracted from GroupTheory/ArchimedeanDensely.lean
-Genuine: 8 | Conflates: 4 | Dissolved: 5 | Infrastructure: 1
+Genuine: 8 | Conflates: 5 | Dissolved: 4 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.Algebra.Group.Equiv.TypeTags
@@ -10,6 +10,8 @@ import Mathlib.Algebra.Order.Group.TypeTags
 import Mathlib.Algebra.Order.Hom.Monoid
 import Mathlib.Data.Int.Interval
 import Mathlib.GroupTheory.Archimedean
+
+noncomputable section
 
 /-!
 # Archimedean groups are either discrete or densely ordered
@@ -216,7 +218,30 @@ lemma LinearOrderedCommGroup.discrete_iff_not_denselyOrdered :
   · exact ⟨MulEquiv.toAdditive' f, by simp⟩
   · exact ⟨MulEquiv.toAdditive'.symm f, by simp⟩
 
--- DISSOLVED: denselyOrdered_units_iff
+-- CONFLATES (assumes ground = zero): denselyOrdered_units_iff
+lemma denselyOrdered_units_iff {G₀ : Type*} [LinearOrderedCommGroupWithZero G₀] [Nontrivial G₀ˣ] :
+    DenselyOrdered G₀ˣ ↔ DenselyOrdered G₀ := by
+  constructor
+  · intro H
+    refine ⟨fun x y h ↦ ?_⟩
+    rcases (zero_le' (a := x)).eq_or_lt with rfl|hx
+    · lift y to G₀ˣ using h.ne'.isUnit
+      obtain ⟨z, hz⟩ := exists_ne (1 : G₀ˣ)
+      refine ⟨(y * |z|ₘ⁻¹ : G₀ˣ), ?_, ?_⟩
+      · simp [zero_lt_iff]
+      · rw [Units.val_lt_val]
+        simp [hz]
+    · obtain ⟨z, hz, hz'⟩ := H.dense (Units.mk0 x hx.ne') (Units.mk0 y (hx.trans h).ne')
+        (by simp [← Units.val_lt_val, h])
+      refine ⟨z, ?_, ?_⟩ <;>
+      simpa [← Units.val_lt_val]
+  · intro H
+    refine ⟨fun x y h ↦ ?_⟩
+    obtain ⟨z, hz⟩ := exists_between (Units.val_lt_val.mpr h)
+    rcases (zero_le' (a := z)).eq_or_lt with rfl|hz'
+    · simp at hz
+    refine ⟨Units.mk0 z hz'.ne', ?_⟩
+    simp [← Units.val_lt_val, hz]
 
 -- DISSOLVED: LinearOrderedCommGroupWithZero.discrete_or_denselyOrdered
 

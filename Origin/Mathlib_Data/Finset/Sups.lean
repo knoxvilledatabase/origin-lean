@@ -1,11 +1,13 @@
 /-
 Extracted from Data/Finset/Sups.lean
-Genuine: 174 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
+Genuine: 175 | Conflates: 0 | Dissolved: 0 | Infrastructure: 4
 -/
 import Origin.Core
 import Mathlib.Data.Finset.NAry
 import Mathlib.Data.Finset.Slice
 import Mathlib.Data.Set.Sups
+
+noncomputable section
 
 /-!
 # Set family operations
@@ -161,8 +163,6 @@ lemma sups_subset_self : s ⊻ s ⊆ s ↔ SupClosed (s : Set α) := sups_subset
 
 @[simp] lemma sups_eq_self : s ⊻ s = s ↔ SupClosed (s : Set α) := by simp [← coe_inj]
 
-@[simp] lemma univ_sups_univ [Fintype α] : (univ : Finset α) ⊻ univ = univ := by simp
-
 lemma filter_sups_le [@DecidableRel α (· ≤ ·)] (s t : Finset α) (a : α) :
     {b ∈ s ⊻ t | b ≤ a} = {b ∈ s | b ≤ a} ⊻ {b ∈ t | b ≤ a} := by
   simp only [← coe_inj, coe_filter, coe_sups, ← mem_coe, Set.sep_sups_le]
@@ -308,8 +308,6 @@ lemma subset_infs_self : s ⊆ s ⊼ s := fun _a ha ↦ mem_infs.2 ⟨_, ha, _, 
 lemma infs_self_subset : s ⊼ s ⊆ s ↔ InfClosed (s : Set α) := infs_subset_iff
 
 @[simp] lemma infs_self : s ⊼ s = s ↔ InfClosed (s : Set α) := by simp [← coe_inj]
-
-@[simp] lemma univ_infs_univ [Fintype α] : (univ : Finset α) ⊼ univ = univ := by simp
 
 lemma filter_infs_le [@DecidableRel α (· ≤ ·)] (s t : Finset α) (a : α) :
     {b ∈ s ⊼ t | a ≤ b} = {b ∈ s | a ≤ b} ⊼ {b ∈ t | a ≤ b} := by

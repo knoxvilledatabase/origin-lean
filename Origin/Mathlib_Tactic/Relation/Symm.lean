@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Init
 import Lean.Meta.Tactic.Symm
 
+noncomputable section
+
 /-!
 # `relSidesIfSymm?`
 -/

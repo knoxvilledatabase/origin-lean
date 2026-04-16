@@ -5,6 +5,8 @@ Genuine: 165 | Conflates: 3 | Dissolved: 0 | Infrastructure: 65
 import Origin.Core
 import Mathlib.Order.PropInstances
 
+noncomputable section
+
 /-!
 # Heyting algebras
 
@@ -66,38 +68,6 @@ instance Prod.instHasCompl [HasCompl α] [HasCompl β] : HasCompl (α × β) :=
 
 end
 
-@[simp]
-theorem fst_himp [HImp α] [HImp β] (a b : α × β) : (a ⇨ b).1 = a.1 ⇨ b.1 :=
-  rfl
-
-@[simp]
-theorem snd_himp [HImp α] [HImp β] (a b : α × β) : (a ⇨ b).2 = a.2 ⇨ b.2 :=
-  rfl
-
-@[simp]
-theorem fst_hnot [HNot α] [HNot β] (a : α × β) : (￢a).1 = ￢a.1 :=
-  rfl
-
-@[simp]
-theorem snd_hnot [HNot α] [HNot β] (a : α × β) : (￢a).2 = ￢a.2 :=
-  rfl
-
-@[simp]
-theorem fst_sdiff [SDiff α] [SDiff β] (a b : α × β) : (a \ b).1 = a.1 \ b.1 :=
-  rfl
-
-@[simp]
-theorem snd_sdiff [SDiff α] [SDiff β] (a b : α × β) : (a \ b).2 = a.2 \ b.2 :=
-  rfl
-
-@[simp]
-theorem fst_compl [HasCompl α] [HasCompl β] (a : α × β) : aᶜ.1 = a.1ᶜ :=
-  rfl
-
-@[simp]
-theorem snd_compl [HasCompl α] [HasCompl β] (a : α × β) : aᶜ.2 = a.2ᶜ :=
-  rfl
-
 namespace Pi
 
 variable {π : ι → Type*}
@@ -107,20 +77,6 @@ instance [∀ i, HImp (π i)] : HImp (∀ i, π i) :=
 
 instance [∀ i, HNot (π i)] : HNot (∀ i, π i) :=
   ⟨fun a i => ￢a i⟩
-
-theorem himp_def [∀ i, HImp (π i)] (a b : ∀ i, π i) : a ⇨ b = fun i => a i ⇨ b i :=
-  rfl
-
-theorem hnot_def [∀ i, HNot (π i)] (a : ∀ i, π i) : ￢a = fun i => ￢a i :=
-  rfl
-
-@[simp]
-theorem himp_apply [∀ i, HImp (π i)] (a b : ∀ i, π i) (i : ι) : (a ⇨ b) i = a i ⇨ b i :=
-  rfl
-
-@[simp]
-theorem hnot_apply [∀ i, HNot (π i)] (a : ∀ i, π i) (i : ι) : (￢a) i = ￢a i :=
-  rfl
 
 end Pi
 
@@ -700,14 +656,6 @@ instance OrderDual.instCoheytingAlgebra : CoheytingAlgebra αᵒᵈ where
   sdiff_le_iff a b c := by rw [sup_comm]; exact le_himp_iff
   top_sdiff := @himp_bot α _
 
-@[simp]
-theorem ofDual_hnot (a : αᵒᵈ) : ofDual (￢a) = (ofDual a)ᶜ :=
-  rfl
-
-@[simp]
-theorem toDual_compl (a : α) : toDual aᶜ = ￢toDual a :=
-  rfl
-
 instance Prod.instHeytingAlgebra [HeytingAlgebra β] : HeytingAlgebra (α × β) where
     himp_bot a := Prod.ext_iff.2 ⟨himp_bot a.1, himp_bot a.2⟩
 
@@ -838,22 +786,6 @@ instance OrderDual.instHeytingAlgebra : HeytingAlgebra αᵒᵈ where
   le_himp_iff a b c := by rw [inf_comm]; exact sdiff_le_iff
   himp_bot := @top_sdiff' α _
 
-@[simp]
-theorem ofDual_compl (a : αᵒᵈ) : ofDual aᶜ = ￢ofDual a :=
-  rfl
-
-@[simp]
-theorem ofDual_himp (a b : αᵒᵈ) : ofDual (a ⇨ b) = ofDual b \ ofDual a :=
-  rfl
-
-@[simp]
-theorem toDual_hnot (a : α) : toDual (￢a) = (toDual a)ᶜ :=
-  rfl
-
-@[simp]
-theorem toDual_sdiff (a b : α) : toDual (a \ b) = toDual b ⇨ toDual a :=
-  rfl
-
 instance Prod.instCoheytingAlgebra [CoheytingAlgebra β] : CoheytingAlgebra (α × β) where
   sdiff_le_iff _ _ _ := and_congr sdiff_le_iff sdiff_le_iff
   top_sdiff a := Prod.ext_iff.2 ⟨top_sdiff' a.1, top_sdiff' a.2⟩
@@ -877,14 +809,6 @@ instance Prop.instHeytingAlgebra : HeytingAlgebra Prop :=
   { Prop.instDistribLattice, Prop.instBoundedOrder with
     himp := (· → ·),
     le_himp_iff := fun _ _ _ => and_imp.symm, himp_bot := fun _ => rfl }
-
-@[simp]
-theorem himp_iff_imp (p q : Prop) : p ⇨ q ↔ p → q :=
-  Iff.rfl
-
-@[simp]
-theorem compl_iff_not (p : Prop) : pᶜ ↔ ¬p :=
-  Iff.rfl
 
 abbrev LinearOrder.toBiheytingAlgebra [LinearOrder α] [BoundedOrder α] : BiheytingAlgebra α :=
   { LinearOrder.toLattice, ‹BoundedOrder α› with
@@ -1019,35 +943,11 @@ instance instBiheytingAlgebra : BiheytingAlgebra PUnit.{u+1} :=
     sdiff_le_iff := fun _ _ _ => Iff.rfl }
 
 @[simp]
-theorem top_eq : (⊤ : PUnit) = unit :=
-  rfl
-
-@[simp]
-theorem bot_eq : (⊥ : PUnit) = unit :=
-  rfl
-
-@[simp]
-theorem sup_eq : a ⊔ b = unit :=
-  rfl
-
-@[simp]
-theorem inf_eq : a ⊓ b = unit :=
-  rfl
-
-@[simp]
 theorem compl_eq : aᶜ = unit :=
   rfl
 
 @[simp]
-theorem sdiff_eq : a \ b = unit :=
-  rfl
-
-@[simp]
 theorem hnot_eq : ￢a = unit :=
-  rfl
-
-@[simp]
-theorem himp_eq : a ⇨ b = unit :=
   rfl
 
 end PUnit

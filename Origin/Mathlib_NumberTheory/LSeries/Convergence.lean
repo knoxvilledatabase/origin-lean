@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/LSeries/Convergence.lean
-Genuine: 10 | Conflates: 0 | Dissolved: 3 | Infrastructure: 0
+Genuine: 13 | Conflates: 0 | Dissolved: 0 | Infrastructure: 0
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LSeries.Basic
 import Mathlib.Data.Real.EReal
+
+noncomputable section
 
 /-!
 # Convergence of L-series
@@ -23,7 +25,9 @@ open Complex
 noncomputable def LSeries.abscissaOfAbsConv (f : ℕ → ℂ) : EReal :=
   sInf <| Real.toEReal '' {x : ℝ | LSeriesSummable f x}
 
--- DISSOLVED: LSeries.abscissaOfAbsConv_congr
+lemma LSeries.abscissaOfAbsConv_congr {f g : ℕ → ℂ} (h : ∀ {n}, n ≠ 0 → f n = g n) :
+    abscissaOfAbsConv f = abscissaOfAbsConv g :=
+  congr_arg sInf <| congr_arg _ <| Set.ext fun x ↦ LSeriesSummable_congr x h
 
 open Filter in
 
@@ -77,7 +81,13 @@ lemma LSeries.abscissaOfAbsConv_le_of_forall_lt_LSeriesSummable' {f : ℕ → �
   · exact abscissaOfAbsConv_le_of_forall_lt_LSeriesSummable <| by exact_mod_cast h
   · exact le_top
 
--- DISSOLVED: LSeries.abscissaOfAbsConv_le_of_le_const_mul_rpow
+lemma LSeries.abscissaOfAbsConv_le_of_le_const_mul_rpow {f : ℕ → ℂ} {x : ℝ}
+    (h : ∃ C, ∀ n ≠ 0, ‖f n‖ ≤ C * n ^ x) : abscissaOfAbsConv f ≤ x + 1 := by
+  rw [show x = x + 1 - 1 by ring] at h
+  by_contra! H
+  obtain ⟨y, hy₁, hy₂⟩ := EReal.exists_between_coe_real H
+  exact (LSeriesSummable_of_le_const_mul_rpow (s := y) (EReal.coe_lt_coe_iff.mp hy₁) h
+    |>.abscissaOfAbsConv_le.trans_lt hy₂).false
 
 open Filter in
 
@@ -90,7 +100,11 @@ lemma LSeries.abscissaOfAbsConv_le_of_isBigO_rpow {f : ℕ → ℂ} {x : ℝ}
   exact (LSeriesSummable_of_isBigO_rpow (s := y) (EReal.coe_lt_coe_iff.mp hy₁) h
     |>.abscissaOfAbsConv_le.trans_lt hy₂).false
 
--- DISSOLVED: LSeries.abscissaOfAbsConv_le_of_le_const
+lemma LSeries.abscissaOfAbsConv_le_of_le_const {f : ℕ → ℂ} (h : ∃ C, ∀ n ≠ 0, ‖f n‖ ≤ C) :
+    abscissaOfAbsConv f ≤ 1 := by
+  convert abscissaOfAbsConv_le_of_le_const_mul_rpow (x := 0) ?_
+  · simp only [EReal.coe_zero, zero_add]
+  · simpa only [norm_eq_abs, Real.rpow_zero, mul_one] using h
 
 open Filter in
 

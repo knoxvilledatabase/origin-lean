@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.BigOperators.Fin
 
+noncomputable section
+
 /-!
 # Lemmas for tuples `Fin m → α`
 

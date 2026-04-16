@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.GroupWithZero.Commute
 import Mathlib.Algebra.Ring.Commute
 
+noncomputable section
+
 /-!
 # Cast of natural numbers: lemmas about `Commute`
 

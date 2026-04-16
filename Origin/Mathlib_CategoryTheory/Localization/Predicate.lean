@@ -5,6 +5,8 @@ Genuine: 42 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.CategoryTheory.Localization.Construction
 
+noncomputable section
+
 /-!
 
 # Predicate for localized categories
@@ -214,10 +216,6 @@ theorem whiskeringLeftFunctor'_eq :
 
 variable {E} in
 
-@[simp]
-theorem whiskeringLeftFunctor'_obj (F : D ⥤ E) : (whiskeringLeftFunctor' L W E).obj F = L ⋙ F :=
-  rfl
-
 instance : (whiskeringLeftFunctor' L W E).Full := by
   rw [whiskeringLeftFunctor'_eq]
   apply @Functor.Full.comp _ _ _ _ _ _ _ _ ?_ ?_
@@ -320,9 +318,6 @@ instance id : Lifting L W L (𝟭 D) :=
 @[simps]
 instance compLeft (F : D ⥤ E) : Localization.Lifting L W (L ⋙ F) F := ⟨Iso.refl _⟩
 
-@[simp]
-lemma compLeft_iso (W) (F : D ⥤ E) : Localization.Lifting.iso L W (L ⋙ F) F = Iso.refl _ := rfl
-
 @[simps]
 def ofIsos {F₁ F₂ : C ⥤ E} {F₁' F₂' : D ⥤ E} (e : F₁ ≅ F₂) (e' : F₁' ≅ F₂') [Lifting L W F₁ F₁'] :
     Lifting L W F₂ F₂' :=
@@ -380,8 +375,6 @@ variable {D₁ D₂ : Type _} [Category D₁] [Category D₂] (L₁ : C ⥤ D₁
 
 def uniq : D₁ ≌ D₂ :=
   (equivalenceFromModel L₁ W').symm.trans (equivalenceFromModel L₂ W')
-
-lemma uniq_symm : (uniq L₁ L₂ W').symm = uniq L₂ L₁ W' := rfl
 
 def compUniqFunctor : L₁ ⋙ (uniq L₁ L₂ W').functor ≅ L₂ :=
   calc

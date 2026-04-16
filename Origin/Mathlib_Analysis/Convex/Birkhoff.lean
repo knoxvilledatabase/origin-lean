@@ -8,6 +8,8 @@ import Mathlib.Combinatorics.Hall.Basic
 import Mathlib.Data.Matrix.DoublyStochastic
 import Mathlib.Tactic.Linarith
 
+noncomputable section
+
 /-!
 # Birkhoff's theorem
 

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.EqToHom
 import Mathlib.CategoryTheory.Products.Basic
 
+noncomputable section
+
 /-!
 # Curry and uncurry, as functors.
 

@@ -1,6 +1,6 @@
 /-
 Extracted from ModelTheory/Algebra/Field/Basic.lean
-Genuine: 7 | Conflates: 0 | Dissolved: 1 | Infrastructure: 1
+Genuine: 8 | Conflates: 0 | Dissolved: 0 | Infrastructure: 1
 -/
 import Origin.Core
 import Mathlib.ModelTheory.Syntax
@@ -8,6 +8,8 @@ import Mathlib.ModelTheory.Semantics
 import Mathlib.ModelTheory.Algebra.Ring.Basic
 import Mathlib.Algebra.Field.MinimalAxioms
 import Mathlib.Data.Nat.Cast.Order.Ring
+
+noncomputable section
 
 /-!
 # The First Order Theory of Fields
@@ -55,7 +57,18 @@ def FieldAxiom.toSentence : FieldAxiom → Language.ring.Sentence
   | .leftDistrib => ∀' ∀' ∀' ((&0 * (&1 + &2)) =' ((&0 * &1) + (&0 * &2)))
   | .existsPairNE => ∃' ∃' (∼(&0 =' &1))
 
--- DISSOLVED: FieldAxiom.toProp
+@[simp]
+def FieldAxiom.toProp (K : Type*) [Add K] [Mul K] [Neg K] [Zero K] [One K] :
+    FieldAxiom → Prop
+  | .addAssoc => ∀ x y z : K, (x + y) + z = x + (y + z)
+  | .zeroAdd => ∀ x : K, 0 + x = x
+  | .negAddCancel => ∀ x : K, -x + x = 0
+  | .mulAssoc => ∀ x y z : K, (x * y) * z = x * (y * z)
+  | .mulComm => ∀ x y : K, x * y = y * x
+  | .oneMul => ∀ x : K, 1 * x = x
+  | .existsInv => ∀ x : K, x ≠ 0 → ∃ y, x * y = 1
+  | .leftDistrib => ∀ x y z : K, x * (y + z) = x * y + x * z
+  | .existsPairNE => ∃ x y : K, x ≠ y
 
 def _root_.FirstOrder.Language.Theory.field : Language.ring.Theory :=
   Set.range FieldAxiom.toSentence

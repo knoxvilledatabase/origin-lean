@@ -8,6 +8,8 @@ import Mathlib.Topology.Algebra.FilterBasis
 import Mathlib.Topology.Algebra.OpenSubgroup
 import Mathlib.Tactic.ByContra
 
+noncomputable section
+
 /-!
 # Krull topology
 
@@ -112,10 +114,6 @@ def galBasis (K L : Type*) [Field K] [Field L] [Algebra K L] : FilterBasis (L �
     exact
       ⟨IntermediateField.fixingSubgroup.antimono le_sup_left,
         IntermediateField.fixingSubgroup.antimono le_sup_right⟩
-
-theorem mem_galBasis_iff (K L : Type*) [Field K] [Field L] [Algebra K L] (U : Set (L ≃ₐ[K] L)) :
-    U ∈ galBasis K L ↔ U ∈ (fun g => g.carrier) '' fixedByFinite K L :=
-  Iff.rfl
 
 def galGroupBasis (K L : Type*) [Field K] [Field L] [Algebra K L] :
     GroupFilterBasis (L ≃ₐ[K] L) where

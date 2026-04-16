@@ -1,10 +1,12 @@
 /-
 Extracted from NumberTheory/Fermat.lean
-Genuine: 20 | Conflates: 0 | Dissolved: 2 | Infrastructure: 3
+Genuine: 22 | Conflates: 0 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticReciprocity
 import Mathlib.NumberTheory.LucasPrimality
+
+noncomputable section
 
 /-!
 # Fermat numbers
@@ -30,12 +32,6 @@ open scoped BigOperators
 
 def fermatNumber (n : ℕ) : ℕ := 2 ^ (2 ^ n) + 1
 
-@[simp] theorem fermatNumber_zero : fermatNumber 0 = 3 := rfl
-
-@[simp] theorem fermatNumber_one : fermatNumber 1 = 5 := rfl
-
-@[simp] theorem fermatNumber_two : fermatNumber 2 = 17 := rfl
-
 theorem fermatNumber_strictMono : StrictMono fermatNumber := by
   intro m n
   simp only [fermatNumber, add_lt_add_iff_right, Nat.pow_lt_pow_iff_right (one_lt_two : 1 < 2),
@@ -49,7 +45,7 @@ lemma three_le_fermatNumber (n : ℕ) : 3 ≤ fermatNumber n := fermatNumber_mon
 
 lemma two_lt_fermatNumber (n : ℕ) : 2 < fermatNumber n := three_le_fermatNumber _
 
--- DISSOLVED: fermatNumber_ne_one
+lemma fermatNumber_ne_one (n : ℕ) : fermatNumber n ≠ 1 := by have := three_le_fermatNumber n; omega
 
 theorem odd_fermatNumber (n : ℕ) : Odd (fermatNumber n) :=
   (even_pow.mpr ⟨even_two, (pow_pos two_pos n).ne'⟩).add_one
@@ -115,7 +111,15 @@ lemma pairwise_coprime_fermatNumber :
 
 open ZMod
 
--- DISSOLVED: pow_of_pow_add_prime
+theorem pow_of_pow_add_prime {a n : ℕ} (ha : 1 < a) (hn : n ≠ 0) (hP : (a ^ n + 1).Prime) :
+    ∃ m : ℕ, n = 2 ^ m := by
+  obtain ⟨k, m, hm, rfl⟩ := exists_eq_two_pow_mul_odd hn
+  rw [pow_mul] at hP
+  use k
+  replace ha : 1 < a ^ 2 ^ k := one_lt_pow (pow_ne_zero k two_ne_zero) ha
+  let h := hm.nat_add_dvd_pow_add_pow (a ^ 2 ^ k) 1
+  rw [one_pow, hP.dvd_iff_eq (Nat.lt_add_right 1 ha).ne', add_left_inj, pow_eq_self_iff ha] at h
+  rw [h, mul_one]
 
 lemma pepin_primality (n : ℕ) (h : 3 ^ (2 ^ (2 ^ n - 1)) = (-1 : ZMod (fermatNumber n))) :
     (fermatNumber n).Prime := by

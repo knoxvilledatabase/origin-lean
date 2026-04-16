@@ -1,6 +1,6 @@
 /-
 Extracted from Algebra/Module/Torsion.lean
-Genuine: 77 | Conflates: 0 | Dissolved: 5 | Infrastructure: 27
+Genuine: 81 | Conflates: 1 | Dissolved: 0 | Infrastructure: 27
 -/
 import Origin.Core
 import Mathlib.Algebra.DirectSum.Module
@@ -8,6 +8,8 @@ import Mathlib.Algebra.Module.ZMod
 import Mathlib.GroupTheory.Torsion
 import Mathlib.LinearAlgebra.Isomorphisms
 import Mathlib.RingTheory.Coprime.Ideal
+
+noncomputable section
 
 /-!
 # Torsion submodules
@@ -86,9 +88,30 @@ theorem torsionOf_eq_top_iff (m : M) : torsionOf R M m = ⊤ ↔ m = 0 := by
   rw [← one_smul R m, ← mem_torsionOf_iff m (1 : R), h]
   exact Submodule.mem_top
 
--- DISSOLVED: torsionOf_eq_bot_iff_of_noZeroSMulDivisors
+-- CONFLATES (assumes ground = zero): torsionOf_eq_bot_iff_of_noZeroSMulDivisors
+@[simp]
+theorem torsionOf_eq_bot_iff_of_noZeroSMulDivisors [Nontrivial R] [NoZeroSMulDivisors R M] (m : M) :
+    torsionOf R M m = ⊥ ↔ m ≠ 0 := by
+  refine ⟨fun h contra => ?_, fun h => (Submodule.eq_bot_iff _).mpr fun r hr => ?_⟩
+  · rw [contra, torsionOf_zero] at h
+    exact bot_ne_top.symm h
+  · rw [mem_torsionOf_iff, smul_eq_zero] at hr
+    tauto
 
--- DISSOLVED: iSupIndep.linearIndependent'
+theorem iSupIndep.linearIndependent' {ι R M : Type*} {v : ι → M} [Ring R]
+    [AddCommGroup M] [Module R M] (hv : iSupIndep fun i => R ∙ v i)
+    (h_ne_zero : ∀ i, Ideal.torsionOf R M (v i) = ⊥) : LinearIndependent R v := by
+  refine linearIndependent_iff_not_smul_mem_span.mpr fun i r hi => ?_
+  replace hv := iSupIndep_def.mp hv i
+  simp only [iSup_subtype', ← Submodule.span_range_eq_iSup (ι := Subtype _), disjoint_iff] at hv
+  have : r • v i ∈ (⊥ : Submodule R M) := by
+    rw [← hv, Submodule.mem_inf]
+    refine ⟨Submodule.mem_span_singleton.mpr ⟨r, rfl⟩, ?_⟩
+    convert hi
+    ext
+    simp
+  rw [← Submodule.mem_bot R, ← h_ne_zero i]
+  simpa using this
 
 alias CompleteLattice.Independent.linear_independent' := iSupIndep.linearIndependent'
 
@@ -103,12 +126,6 @@ noncomputable def quotTorsionOfEquivSpanSingleton (x : M) : (R ⧸ torsionOf R M
     LinearEquiv.ofEq _ _ (LinearMap.span_singleton_eq_range R M x).symm
 
 variable {R M}
-
-@[simp]
-theorem quotTorsionOfEquivSpanSingleton_apply_mk (x : M) (a : R) :
-    quotTorsionOfEquivSpanSingleton R M x (Submodule.Quotient.mk a) =
-      a • ⟨x, Submodule.mem_span_singleton_self x⟩ :=
-  rfl
 
 end
 
@@ -434,12 +451,6 @@ theorem IsTorsionBySet.mk_smul (hM : IsTorsionBySet R M I) (b : R) (x : M) :
     Ideal.Quotient.mk I b • x = b • x :=
   rfl
 
-@[simp]
-theorem IsTorsionBy.mk_smul (hM : IsTorsionBy R M r) (b : R) (x : M) :
-    haveI := hM.hasSMul
-    Ideal.Quotient.mk (Ideal.span {r}) b • x = b • x :=
-  rfl
-
 def IsTorsionBySet.module (hM : IsTorsionBySet R M I) : Module (R ⧸ I) M :=
   letI := hM.hasSMul; I.mkQ_surjective.moduleLeft _ (IsTorsionBySet.mk_smul hM)
 
@@ -502,12 +513,6 @@ instance : Module (R ⧸ I) (M ⧸ I • (⊤ : Submodule R M)) :=
 instance : Module (R ⧸ Ideal.span {r}) (M ⧸ r • (⊤ : Submodule R M)) :=
   (isTorsionBy_quotient_element_smul M r).module
 
-lemma Quotient.mk_smul_mk (r : R) (m : M) :
-    Ideal.Quotient.mk I r •
-      Submodule.Quotient.mk (p := (I • ⊤ : Submodule R M)) m =
-      Submodule.Quotient.mk (p := (I • ⊤ : Submodule R M)) (r • m) :=
-  rfl
-
 end Module
 
 namespace Submodule
@@ -515,11 +520,6 @@ namespace Submodule
 instance (I : Ideal R) : Module (R ⧸ I) (torsionBySet R M I) :=
   -- Porting note: times out without the (R := R)
   Module.IsTorsionBySet.module <| torsionBySet_isTorsionBySet (R := R) I
-
-@[simp]
-theorem torsionBySet.mk_smul (I : Ideal R) (b : R) (x : torsionBySet R M I) :
-    Ideal.Quotient.mk I b • x = b • x :=
-  rfl
 
 instance (I : Ideal R) {S : Type*} [SMul S R] [SMul S M] [IsScalarTower S R M]
     [IsScalarTower S R R] : IsScalarTower S (R ⧸ I) (torsionBySet R M I) :=
@@ -531,15 +531,6 @@ instance instModuleQuotientTorsionBy (a : R) : Module (R ⧸ R ∙ a) (torsionBy
 
 instance (a : R) : Module (R ⧸ Ideal.span {a}) (torsionBy R M a) :=
    inferInstanceAs <| Module (R ⧸ R ∙ a) (torsionBy R M a)
-
-@[simp]
-theorem torsionBy.mk_ideal_smul (a b : R) (x : torsionBy R M a) :
-    (Ideal.Quotient.mk (Ideal.span {a})) b • x = b • x :=
-  rfl
-
-theorem torsionBy.mk_smul (a b : R) (x : torsionBy R M a) :
-    Ideal.Quotient.mk (R ∙ a) b • x = b • x :=
-  rfl
 
 instance (a : R) {S : Type*} [SMul S R] [SMul S M] [IsScalarTower S R M] [IsScalarTower S R R] :
     IsScalarTower S (R ⧸ R ∙ a) (torsionBy R M a) :=
@@ -572,9 +563,6 @@ variable (S : Type*) [CommMonoid S] [DistribMulAction S M] [SMulCommClass S R M]
 
 @[simp]
 theorem mem_torsion'_iff (x : M) : x ∈ torsion' R M S ↔ ∃ a : S, a • x = 0 :=
-  Iff.rfl
-
-theorem mem_torsion_iff (x : M) : x ∈ torsion R M ↔ ∃ a : R⁰, a • x = 0 :=
   Iff.rfl
 
 @[simps]
@@ -725,7 +713,20 @@ end
 
 variable [CommSemiring R] [AddCommMonoid M] [Module R M] [∀ x : M, Decidable (x = 0)]
 
--- DISSOLVED: exists_isTorsionBy
+theorem exists_isTorsionBy {p : R} (hM : IsTorsion' M <| Submonoid.powers p) (d : ℕ) (hd : d ≠ 0)
+    (s : Fin d → M) (hs : span R (Set.range s) = ⊤) :
+    ∃ j : Fin d, Module.IsTorsionBy R M (p ^ pOrder hM (s j)) := by
+  let oj := List.argmax (fun i => pOrder hM <| s i) (List.finRange d)
+  have hoj : oj.isSome :=
+    Option.ne_none_iff_isSome.mp fun eq_none =>
+      hd <| List.finRange_eq_nil.mp <| List.argmax_eq_none.mp eq_none
+  use Option.get _ hoj
+  rw [isTorsionBy_iff_torsionBy_eq_top, eq_top_iff, ← hs, Submodule.span_le,
+    Set.range_subset_iff]
+  intro i; change (p ^ pOrder hM (s (Option.get oj hoj))) • s i = 0
+  have : pOrder hM (s i) ≤ pOrder hM (s <| Option.get _ hoj) :=
+    List.le_of_mem_argmax (List.mem_finRange i) (Option.get_mem hoj)
+  rw [← Nat.sub_add_cancel this, pow_add, mul_smul, pow_pOrder_smul, smul_zero]
 
 end PTorsion
 
@@ -816,8 +817,19 @@ end AddSubgroup
 
 section InfiniteRange
 
--- DISSOLVED: infinite_range_add_smul_iff
+@[simp]
+lemma infinite_range_add_smul_iff
+    [AddCommGroup M] [Ring R] [Module R M] [Infinite R] [NoZeroSMulDivisors R M] (x y : M) :
+    (Set.range <| fun r : R ↦ x + r • y).Infinite ↔ y ≠ 0 := by
+  refine ⟨fun h hy ↦ by simp [hy] at h, fun h ↦ Set.infinite_range_of_injective fun r s hrs ↦ ?_⟩
+  rw [add_right_inj] at hrs
+  exact smul_left_injective _ h hrs
 
--- DISSOLVED: infinite_range_add_nsmul_iff
+@[simp]
+lemma infinite_range_add_nsmul_iff [AddCommGroup M] [NoZeroSMulDivisors ℤ M] (x y : M) :
+    (Set.range <| fun n : ℕ ↦ x + n • y).Infinite ↔ y ≠ 0 := by
+  refine ⟨fun h hy ↦ by simp [hy] at h, fun h ↦ Set.infinite_range_of_injective fun r s hrs ↦ ?_⟩
+  rw [add_right_inj, ← natCast_zsmul, ← natCast_zsmul] at hrs
+  simpa using smul_left_injective _ h hrs
 
 end InfiniteRange

@@ -1,10 +1,12 @@
 /-
 Extracted from CategoryTheory/Shift/ShiftSequence.lean
-Genuine: 25 | Conflates: 0 | Dissolved: 1 | Infrastructure: 2
+Genuine: 26 | Conflates: 0 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.CategoryTheory.Shift.Basic
 import Mathlib.CategoryTheory.Preadditive.AdditiveFunctor
+
+noncomputable section
 
 /-! Sequences of functors from a category equipped with a shift
 
@@ -126,7 +128,11 @@ lemma shiftIso_zero_hom_app (a : M) (X : C) :
       (shift F a).map ((shiftFunctorZero C M).hom.app X) := by
   simp [F.shiftIso_zero a]
 
--- DISSOLVED: shiftIso_zero_inv_app
+@[simp]
+lemma shiftIso_zero_inv_app (a : M) (X : C) :
+    (F.shiftIso 0 a a (zero_add a)).inv.app X =
+      (shift F a).map ((shiftFunctorZero C M).inv.app X) := by
+  simp [F.shiftIso_zero a]
 
 lemma shiftIso_add (n m a a' a'' : M) (ha' : n + a = a') (ha'' : m + a' = a'') :
     F.shiftIso (m + n) a a'' (by rw [add_assoc, ha', ha'']) =

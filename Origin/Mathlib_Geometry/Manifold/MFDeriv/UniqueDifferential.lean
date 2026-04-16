@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Geometry.Manifold.MFDeriv.Atlas
 import Mathlib.Geometry.Manifold.VectorBundle.Basic
 
+noncomputable section
+
 /-!
 # Unique derivative sets in manifolds
 

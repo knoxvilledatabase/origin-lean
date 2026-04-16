@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Localization.Bousfield
 import Mathlib.CategoryTheory.Sites.Sheafification
 
+noncomputable section
+
 /-!
 # The sheaf category as a localized category
 

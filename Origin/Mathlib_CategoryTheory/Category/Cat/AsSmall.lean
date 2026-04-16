@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Category.Cat
 import Mathlib.CategoryTheory.Category.ULift
 
+noncomputable section
+
 /-!
 # Functorially embedding `Cat` into the category of small categories
 

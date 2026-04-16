@@ -1,10 +1,12 @@
 /-
 Extracted from MeasureTheory/Function/SimpleFuncDenseLp.lean
-Genuine: 66 | Conflates: 0 | Dissolved: 13 | Infrastructure: 10
+Genuine: 80 | Conflates: 0 | Dissolved: 0 | Infrastructure: 10
 -/
 import Origin.Core
 import Mathlib.MeasureTheory.Function.L1Space
 import Mathlib.MeasureTheory.Function.SimpleFuncDense
+
+noncomputable section
 
 /-!
 # Density of simple functions
@@ -183,7 +185,25 @@ theorem tendsto_approxOn_range_Lp [BorelSpace E] {f : β → E} [hp : Fact (1 �
   simpa only [Lp.tendsto_Lp_iff_tendsto_ℒp''] using
     tendsto_approxOn_range_Lp_eLpNorm hp_ne_top fmeas hf.2
 
--- DISSOLVED: _root_.MeasureTheory.Memℒp.exists_simpleFunc_eLpNorm_sub_lt
+theorem _root_.MeasureTheory.Memℒp.exists_simpleFunc_eLpNorm_sub_lt {E : Type*}
+    [NormedAddCommGroup E] {f : β → E} {μ : Measure β} (hf : Memℒp f p μ) (hp_ne_top : p ≠ ∞)
+    {ε : ℝ≥0∞} (hε : ε ≠ 0) : ∃ g : β →ₛ E, eLpNorm (f - ⇑g) p μ < ε ∧ Memℒp g p μ := by
+  borelize E
+  let f' := hf.1.mk f
+  rsuffices ⟨g, hg, g_mem⟩ : ∃ g : β →ₛ E, eLpNorm (f' - ⇑g) p μ < ε ∧ Memℒp g p μ
+  · refine ⟨g, ?_, g_mem⟩
+    suffices eLpNorm (f - ⇑g) p μ = eLpNorm (f' - ⇑g) p μ by rwa [this]
+    apply eLpNorm_congr_ae
+    filter_upwards [hf.1.ae_eq_mk] with x hx
+    simpa only [Pi.sub_apply, sub_left_inj] using hx
+  have hf' : Memℒp f' p μ := hf.ae_eq hf.1.ae_eq_mk
+  have f'meas : Measurable f' := hf.1.measurable_mk
+  have : SeparableSpace (range f' ∪ {0} : Set E) :=
+    StronglyMeasurable.separableSpace_range_union_singleton hf.1.stronglyMeasurable_mk
+  rcases ((tendsto_approxOn_range_Lp_eLpNorm hp_ne_top f'meas hf'.2).eventually <|
+    gt_mem_nhds hε.bot_lt).exists with ⟨n, hn⟩
+  rw [← eLpNorm_neg, neg_sub] at hn
+  exact ⟨_, hn, memℒp_approxOn_range f'meas hf' _⟩
 
 alias _root_.MeasureTheory.Memℒp.exists_simpleFunc_snorm_sub_lt :=
   _root_.MeasureTheory.Memℒp.exists_simpleFunc_eLpNorm_sub_lt
@@ -262,17 +282,63 @@ protected theorem eLpNorm'_eq {p : ℝ} (f : α →ₛ F) (μ : Measure α) :
 
 protected alias snorm'_eq := SimpleFunc.eLpNorm'_eq
 
--- DISSOLVED: measure_preimage_lt_top_of_memℒp
+theorem measure_preimage_lt_top_of_memℒp (hp_pos : p ≠ 0) (hp_ne_top : p ≠ ∞) (f : α →ₛ E)
+    (hf : Memℒp f p μ) (y : E) (hy_ne : y ≠ 0) : μ (f ⁻¹' {y}) < ∞ := by
+  have hp_pos_real : 0 < p.toReal := ENNReal.toReal_pos hp_pos hp_ne_top
+  have hf_eLpNorm := Memℒp.eLpNorm_lt_top hf
+  rw [eLpNorm_eq_eLpNorm' hp_pos hp_ne_top, f.eLpNorm'_eq, one_div,
+    ← @ENNReal.lt_rpow_inv_iff _ _ p.toReal⁻¹ (by simp [hp_pos_real]),
+    @ENNReal.top_rpow_of_pos p.toReal⁻¹⁻¹ (by simp [hp_pos_real]),
+    ENNReal.sum_lt_top] at hf_eLpNorm
+  by_cases hyf : y ∈ f.range
+  swap
+  · suffices h_empty : f ⁻¹' {y} = ∅ by
+      rw [h_empty, measure_empty]; exact ENNReal.coe_lt_top
+    ext1 x
+    rw [Set.mem_preimage, Set.mem_singleton_iff, mem_empty_iff_false, iff_false]
+    refine fun hxy => hyf ?_
+    rw [mem_range, Set.mem_range]
+    exact ⟨x, hxy⟩
+  specialize hf_eLpNorm y hyf
+  rw [ENNReal.mul_lt_top_iff] at hf_eLpNorm
+  cases hf_eLpNorm with
+  | inl hf_eLpNorm => exact hf_eLpNorm.2
+  | inr hf_eLpNorm =>
+    cases hf_eLpNorm with
+    | inl hf_eLpNorm =>
+      refine absurd ?_ hy_ne
+      simpa [hp_pos_real] using hf_eLpNorm
+    | inr hf_eLpNorm => simp [hf_eLpNorm]
 
--- DISSOLVED: memℒp_of_finite_measure_preimage
+theorem memℒp_of_finite_measure_preimage (p : ℝ≥0∞) {f : α →ₛ E}
+    (hf : ∀ y, y ≠ 0 → μ (f ⁻¹' {y}) < ∞) : Memℒp f p μ := by
+  by_cases hp0 : p = 0
+  · rw [hp0, memℒp_zero_iff_aestronglyMeasurable]; exact f.aestronglyMeasurable
+  by_cases hp_top : p = ∞
+  · rw [hp_top]; exact memℒp_top f μ
+  refine ⟨f.aestronglyMeasurable, ?_⟩
+  rw [eLpNorm_eq_eLpNorm' hp0 hp_top, f.eLpNorm'_eq]
+  refine ENNReal.rpow_lt_top_of_nonneg (by simp) (ENNReal.sum_lt_top.mpr fun y _ => ?_).ne
+  by_cases hy0 : y = 0
+  · simp [hy0, ENNReal.toReal_pos hp0 hp_top]
+  · refine ENNReal.mul_lt_top ?_ (hf y hy0)
+    exact ENNReal.rpow_lt_top_of_nonneg ENNReal.toReal_nonneg ENNReal.coe_ne_top
 
--- DISSOLVED: memℒp_iff
+theorem memℒp_iff {f : α →ₛ E} (hp_pos : p ≠ 0) (hp_ne_top : p ≠ ∞) :
+    Memℒp f p μ ↔ ∀ y, y ≠ 0 → μ (f ⁻¹' {y}) < ∞ :=
+  ⟨fun h => measure_preimage_lt_top_of_memℒp hp_pos hp_ne_top f h, fun h =>
+    memℒp_of_finite_measure_preimage p h⟩
 
--- DISSOLVED: integrable_iff
+theorem integrable_iff {f : α →ₛ E} : Integrable f μ ↔ ∀ y, y ≠ 0 → μ (f ⁻¹' {y}) < ∞ :=
+  memℒp_one_iff_integrable.symm.trans <| memℒp_iff one_ne_zero ENNReal.coe_ne_top
 
--- DISSOLVED: memℒp_iff_integrable
+theorem memℒp_iff_integrable {f : α →ₛ E} (hp_pos : p ≠ 0) (hp_ne_top : p ≠ ∞) :
+    Memℒp f p μ ↔ Integrable f μ :=
+  (memℒp_iff hp_pos hp_ne_top).trans integrable_iff.symm
 
--- DISSOLVED: memℒp_iff_finMeasSupp
+theorem memℒp_iff_finMeasSupp {f : α →ₛ E} (hp_pos : p ≠ 0) (hp_ne_top : p ≠ ∞) :
+    Memℒp f p μ ↔ f.FinMeasSupp μ :=
+  (memℒp_iff hp_pos hp_ne_top).trans finMeasSupp_iff.symm
 
 theorem integrable_iff_finMeasSupp {f : α →ₛ E} : Integrable f μ ↔ f.FinMeasSupp μ :=
   integrable_iff.trans finMeasSupp_iff.symm
@@ -292,17 +358,31 @@ theorem memℒp_of_isFiniteMeasure (f : α →ₛ E) (p : ℝ≥0∞) (μ : Meas
 theorem integrable_of_isFiniteMeasure [IsFiniteMeasure μ] (f : α →ₛ E) : Integrable f μ :=
   memℒp_one_iff_integrable.mp (f.memℒp_of_isFiniteMeasure 1 μ)
 
--- DISSOLVED: measure_preimage_lt_top_of_integrable
+theorem measure_preimage_lt_top_of_integrable (f : α →ₛ E) (hf : Integrable f μ) {x : E}
+    (hx : x ≠ 0) : μ (f ⁻¹' {x}) < ∞ :=
+  integrable_iff.mp hf x hx
 
--- DISSOLVED: measure_support_lt_top
+theorem measure_support_lt_top [Zero β] (f : α →ₛ β) (hf : ∀ y, y ≠ 0 → μ (f ⁻¹' {y}) < ∞) :
+    μ (support f) < ∞ := by
+  rw [support_eq]
+  refine (measure_biUnion_finset_le _ _).trans_lt (ENNReal.sum_lt_top.mpr fun y hy => ?_)
+  rw [Finset.mem_filter] at hy
+  exact hf y hy.2
 
--- DISSOLVED: measure_support_lt_top_of_memℒp
+theorem measure_support_lt_top_of_memℒp (f : α →ₛ E) (hf : Memℒp f p μ) (hp_ne_zero : p ≠ 0)
+    (hp_ne_top : p ≠ ∞) : μ (support f) < ∞ :=
+  f.measure_support_lt_top ((memℒp_iff hp_ne_zero hp_ne_top).mp hf)
 
 theorem measure_support_lt_top_of_integrable (f : α →ₛ E) (hf : Integrable f μ) :
     μ (support f) < ∞ :=
   f.measure_support_lt_top (integrable_iff.mp hf)
 
--- DISSOLVED: measure_lt_top_of_memℒp_indicator
+theorem measure_lt_top_of_memℒp_indicator (hp_pos : p ≠ 0) (hp_ne_top : p ≠ ∞) {c : E} (hc : c ≠ 0)
+    {s : Set α} (hs : MeasurableSet s) (hcs : Memℒp ((const α c).piecewise s hs (const α 0)) p μ) :
+    μ s < ⊤ := by
+  have : Function.support (const α c) = Set.univ := Function.support_const hc
+  simpa only [memℒp_iff_finMeasSupp hp_pos hp_ne_top, finMeasSupp_iff_support,
+    support_indicator, Set.inter_univ, this] using hcs
 
 end SimpleFuncProperties
 
@@ -398,13 +478,6 @@ abbrev toLp (f : α →ₛ E) (hf : Memℒp f p μ) : Lp.simpleFunc E p μ :=
 theorem toLp_eq_toLp (f : α →ₛ E) (hf : Memℒp f p μ) : (toLp f hf : Lp E p μ) = hf.toLp f :=
   rfl
 
-theorem toLp_eq_mk (f : α →ₛ E) (hf : Memℒp f p μ) :
-    (toLp f hf : α →ₘ[μ] E) = AEEqFun.mk f f.aestronglyMeasurable :=
-  rfl
-
-theorem toLp_zero : toLp (0 : α →ₛ E) zero_memℒp = (0 : Lp.simpleFunc E p μ) :=
-  rfl
-
 theorem toLp_add (f g : α →ₛ E) (hf : Memℒp f p μ) (hg : Memℒp g p μ) :
     toLp (f + g) (hf.add hg) = toLp f hf + toLp g hg :=
   rfl
@@ -417,10 +490,6 @@ theorem toLp_sub (f g : α →ₛ E) (hf : Memℒp f p μ) (hg : Memℒp g p μ)
   simp only [sub_eq_add_neg, ← toLp_neg, ← toLp_add]
 
 variable [NormedRing 𝕜] [Module 𝕜 E] [BoundedSMul 𝕜 E]
-
-theorem toLp_smul (f : α →ₛ E) (hf : Memℒp f p μ) (c : 𝕜) :
-    toLp (c • f) (hf.const_smul c) = c • toLp f hf :=
-  rfl
 
 nonrec theorem norm_toLp [Fact (1 ≤ p)] (f : α →ₛ E) (hf : Memℒp f p μ) :
     ‖toLp f hf‖ = ENNReal.toReal (eLpNorm f p μ) :=
@@ -522,17 +591,39 @@ def indicatorConst {s : Set α} (hs : MeasurableSet s) (hμs : μ s ≠ ∞) (c 
 
 variable {p}
 
-@[simp]
-theorem coe_indicatorConst {s : Set α} (hs : MeasurableSet s) (hμs : μ s ≠ ∞) (c : E) :
-    (↑(indicatorConst p hs hμs c) : Lp E p μ) = indicatorConstLp p hs hμs c :=
-  rfl
-
 theorem toSimpleFunc_indicatorConst {s : Set α} (hs : MeasurableSet s) (hμs : μ s ≠ ∞) (c : E) :
     toSimpleFunc (indicatorConst p hs hμs c) =ᵐ[μ]
       (SimpleFunc.const _ c).piecewise s hs (SimpleFunc.const _ 0) :=
   Lp.simpleFunc.toSimpleFunc_toLp _ _
 
--- DISSOLVED: induction
+@[elab_as_elim]
+protected theorem induction (hp_pos : p ≠ 0) (hp_ne_top : p ≠ ∞) {P : Lp.simpleFunc E p μ → Prop}
+    (h_ind :
+      ∀ (c : E) {s : Set α} (hs : MeasurableSet s) (hμs : μ s < ∞),
+        P (Lp.simpleFunc.indicatorConst p hs hμs.ne c))
+    (h_add :
+      ∀ ⦃f g : α →ₛ E⦄,
+        ∀ hf : Memℒp f p μ,
+          ∀ hg : Memℒp g p μ,
+            Disjoint (support f) (support g) →
+              P (Lp.simpleFunc.toLp f hf) →
+                P (Lp.simpleFunc.toLp g hg) → P (Lp.simpleFunc.toLp f hf + Lp.simpleFunc.toLp g hg))
+    (f : Lp.simpleFunc E p μ) : P f := by
+  suffices ∀ f : α →ₛ E, ∀ hf : Memℒp f p μ, P (toLp f hf) by
+    rw [← toLp_toSimpleFunc f]
+    apply this
+  clear f
+  apply SimpleFunc.induction
+  · intro c s hs hf
+    by_cases hc : c = 0
+    · convert h_ind 0 MeasurableSet.empty (by simp) using 1
+      ext1
+      simp [hc]
+    exact h_ind c hs (SimpleFunc.measure_lt_top_of_memℒp_indicator hp_pos hp_ne_top hc hs hf)
+  · intro f g hfg hf hg hfg'
+    obtain ⟨hf', hg'⟩ : Memℒp f p μ ∧ Memℒp g p μ :=
+      (memℒp_add_of_disjoint hfg f.stronglyMeasurable g.stronglyMeasurable).mp hfg'
+    exact h_add hf' hg' hfg (hf hf') (hg hg')
 
 end Induction
 
@@ -739,16 +830,57 @@ theorem Memℒp.induction [_i : Fact (1 ≤ p)] (hp_ne_top : p ≠ ∞) (P : (α
     (Lp.simpleFunc.denseRange hp_ne_top).induction_on f h_closed this
   exact fun f hf => h_ae hf.coeFn_toLp (Lp.memℒp _) (this (hf.toLp f))
 
--- DISSOLVED: Memℒp.induction_dense
+theorem Memℒp.induction_dense (hp_ne_top : p ≠ ∞) (P : (α → E) → Prop)
+    (h0P :
+      ∀ (c : E) ⦃s : Set α⦄,
+        MeasurableSet s →
+          μ s < ∞ →
+            ∀ {ε : ℝ≥0∞}, ε ≠ 0 → ∃ g : α → E, eLpNorm (g - s.indicator fun _ => c) p μ ≤ ε ∧ P g)
+    (h1P : ∀ f g, P f → P g → P (f + g)) (h2P : ∀ f, P f → AEStronglyMeasurable f μ) {f : α → E}
+    (hf : Memℒp f p μ) {ε : ℝ≥0∞} (hε : ε ≠ 0) : ∃ g : α → E, eLpNorm (f - g) p μ ≤ ε ∧ P g := by
+  rcases eq_or_ne p 0 with (rfl | hp_pos)
+  · rcases h0P (0 : E) MeasurableSet.empty (by simp only [measure_empty, zero_lt_top])
+        hε with ⟨g, _, Pg⟩
+    exact ⟨g, by simp only [eLpNorm_exponent_zero, zero_le'], Pg⟩
+  suffices H : ∀ (f' : α →ₛ E) (δ : ℝ≥0∞) (hδ : δ ≠ 0), Memℒp f' p μ →
+      ∃ g, eLpNorm (⇑f' - g) p μ ≤ δ ∧ P g by
+    obtain ⟨η, ηpos, hη⟩ := exists_Lp_half E μ p hε
+    rcases hf.exists_simpleFunc_eLpNorm_sub_lt hp_ne_top ηpos.ne' with ⟨f', hf', f'_mem⟩
+    rcases H f' η ηpos.ne' f'_mem with ⟨g, hg, Pg⟩
+    refine ⟨g, ?_, Pg⟩
+    convert (hη _ _ (hf.aestronglyMeasurable.sub f'.aestronglyMeasurable)
+          (f'.aestronglyMeasurable.sub (h2P g Pg)) hf'.le hg).le using 2
+    simp only [sub_add_sub_cancel]
+  apply SimpleFunc.induction
+  · intro c s hs ε εpos Hs
+    rcases eq_or_ne c 0 with (rfl | hc)
+    · rcases h0P (0 : E) MeasurableSet.empty (by simp only [measure_empty, zero_lt_top])
+          εpos with ⟨g, hg, Pg⟩
+      rw [← eLpNorm_neg, neg_sub] at hg
+      refine ⟨g, ?_, Pg⟩
+      convert hg
+      ext x
+      simp only [SimpleFunc.const_zero, SimpleFunc.coe_piecewise, SimpleFunc.coe_zero,
+        piecewise_eq_indicator, indicator_zero', Pi.zero_apply, indicator_zero]
+    · have : μ s < ∞ := SimpleFunc.measure_lt_top_of_memℒp_indicator hp_pos hp_ne_top hc hs Hs
+      rcases h0P c hs this εpos with ⟨g, hg, Pg⟩
+      rw [← eLpNorm_neg, neg_sub] at hg
+      exact ⟨g, hg, Pg⟩
+  · intro f f' hff' hf hf' δ δpos int_ff'
+    obtain ⟨η, ηpos, hη⟩ := exists_Lp_half E μ p δpos
+    rw [SimpleFunc.coe_add,
+      memℒp_add_of_disjoint hff' f.stronglyMeasurable f'.stronglyMeasurable] at int_ff'
+    rcases hf η ηpos.ne' int_ff'.1 with ⟨g, hg, Pg⟩
+    rcases hf' η ηpos.ne' int_ff'.2 with ⟨g', hg', Pg'⟩
+    refine ⟨g + g', ?_, h1P g g' Pg Pg'⟩
+    convert (hη _ _ (f.aestronglyMeasurable.sub (h2P g Pg))
+          (f'.aestronglyMeasurable.sub (h2P g' Pg')) hg hg').le using 2
+    rw [SimpleFunc.coe_add]
+    abel
 
 section Integrable
 
 notation:25 α " →₁ₛ[" μ "] " E => @MeasureTheory.Lp.simpleFunc α E _ _ 1 μ
-
-@[inherit_doc MeasureTheory.Lp.simpleFunc]
-theorem L1.SimpleFunc.toLp_one_eq_toL1 (f : α →ₛ E) (hf : Integrable f μ) :
-    (Lp.simpleFunc.toLp f (memℒp_one_iff_integrable.2 hf) : α →₁[μ] E) = hf.toL1 f :=
-  rfl
 
 protected theorem L1.SimpleFunc.integrable (f : α →₁ₛ[μ] E) :
     Integrable (Lp.simpleFunc.toSimpleFunc f) μ := by

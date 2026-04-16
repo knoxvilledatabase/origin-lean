@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/GCDMonoid/Finset.lean
-Genuine: 33 | Conflates: 1 | Dissolved: 4 | Infrastructure: 2
+Genuine: 37 | Conflates: 1 | Dissolved: 0 | Infrastructure: 2
 -/
 import Origin.Core
 import Mathlib.Data.Finset.Fold
 import Mathlib.Algebra.GCDMonoid.Multiset
+
+noncomputable section
 
 /-!
 # GCD and LCM operations on finsets
@@ -183,7 +185,20 @@ theorem gcd_eq_zero_iff : s.gcd f = 0 ↔ ∀ x : β, x ∈ s → f x = 0 := by
     rcases as with ⟨b, ⟨bs, rfl⟩⟩
     apply h b (mem_def.1 bs)
 
--- DISSOLVED: gcd_eq_gcd_filter_ne_zero
+theorem gcd_eq_gcd_filter_ne_zero [DecidablePred fun x : β ↦ f x = 0] :
+    s.gcd f = (s.filter fun x ↦ f x ≠ 0).gcd f := by
+  classical
+    trans ((s.filter fun x ↦ f x = 0) ∪ s.filter fun x ↦ (f x ≠ 0)).gcd f
+    · rw [filter_union_filter_neg_eq]
+    rw [gcd_union]
+    refine Eq.trans (?_ : _ = GCDMonoid.gcd (0 : α) ?_) (?_ : GCDMonoid.gcd (0 : α) _ = _)
+    · exact (gcd (filter (fun x => (f x ≠ 0)) s) f)
+    · refine congr (congr rfl <| s.induction_on ?_ ?_) (by simp)
+      · simp
+      · intro a s _ h
+        rw [filter_insert]
+        split_ifs with h1 <;> simp [h, h1]
+    simp only [gcd_zero_left, normalize_gcd]
 
 nonrec theorem gcd_mul_left {a : α} : (s.gcd fun x ↦ a * f x) = normalize a * s.gcd f := by
   classical
@@ -201,7 +216,12 @@ nonrec theorem gcd_mul_right {a : α} : (s.gcd fun x ↦ f x * a) = s.gcd f * no
       rw [gcd_insert, gcd_insert, h, ← gcd_mul_right]
       apply ((normalize_associated a).mul_left _).gcd_eq_right
 
--- DISSOLVED: extract_gcd'
+theorem extract_gcd' (f g : β → α) (hs : ∃ x, x ∈ s ∧ f x ≠ 0)
+    (hg : ∀ b ∈ s, f b = s.gcd f * g b) : s.gcd g = 1 :=
+  ((@mul_right_eq_self₀ _ _ (s.gcd f) _).1 <| by
+        conv_lhs => rw [← normalize_gcd, ← gcd_mul_left, ← gcd_congr rfl hg]).resolve_right <| by
+    contrapose! hs
+    exact gcd_eq_zero_iff.1 hs
 
 theorem extract_gcd (f : β → α) (hs : s.Nonempty) :
     ∃ g : β → α, (∀ b ∈ s, f b = s.gcd f * g b) ∧ s.gcd g = 1 := by
@@ -218,9 +238,14 @@ theorem extract_gcd (f : β → α) (hs : s.Nonempty) :
 
 variable [Div α] [MulDivCancelClass α] {f : ι → α} {s : Finset ι} {i : ι}
 
--- DISSOLVED: gcd_div_eq_one
+lemma gcd_div_eq_one (his : i ∈ s) (hfi : f i ≠ 0) : s.gcd (fun j ↦ f j / s.gcd f) = 1 := by
+  obtain ⟨g, he, hg⟩ := Finset.extract_gcd f ⟨i, his⟩
+  refine (Finset.gcd_congr rfl fun a ha ↦ ?_).trans hg
+  rw [he a ha, mul_div_cancel_left₀]
+  exact mt Finset.gcd_eq_zero_iff.1 fun h ↦ hfi <| h i his
 
--- DISSOLVED: gcd_div_id_eq_one
+lemma gcd_div_id_eq_one {s : Finset α} {a : α} (has : a ∈ s) (ha : a ≠ 0) :
+    s.gcd (fun b ↦ b / s.gcd id) = 1 := gcd_div_eq_one has ha
 
 end gcd
 

@@ -8,6 +8,8 @@ import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
 
+noncomputable section
+
 /-!
 # Various complex special functions are analytic
 

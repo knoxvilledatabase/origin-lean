@@ -5,6 +5,8 @@ Genuine: 23 | Conflates: 0 | Dissolved: 0 | Infrastructure: 20
 import Origin.Core
 import Mathlib.Geometry.Manifold.VectorBundle.Basic
 
+noncomputable section
+
 /-! # Tangent bundles
 
 This file defines the tangent bundle as a smooth vector bundle.
@@ -102,20 +104,12 @@ def tangentBundleCore : VectorBundleCore 𝕜 M E (atlas H M) where
 @[simp high]
 theorem tangentBundleCore_baseSet (i) : (tangentBundleCore I M).baseSet i = i.1.source := rfl
 
-theorem tangentBundleCore_coordChange_achart (x x' z : M) :
-    (tangentBundleCore I M).coordChange (achart H x) (achart H x') z =
-      fderivWithin 𝕜 (extChartAt I x' ∘ (extChartAt I x).symm) (range I) (extChartAt I x z) :=
-  rfl
-
 section tangentCoordChange
 
 variable (I) in
 
 abbrev tangentCoordChange (x y : M) : M → E →L[𝕜] E :=
   (tangentBundleCore I M).coordChange (achart H x) (achart H y)
-
-lemma tangentCoordChange_def {x y z : M} : tangentCoordChange I x y z =
-    fderivWithin 𝕜 (extChartAt I y ∘ (extChartAt I x).symm) (range I) (extChartAt I x z) := rfl
 
 lemma tangentCoordChange_self {x z : M} {v : E} (h : z ∈ (extChartAt I x).source) :
     tangentCoordChange I x x z v = v := by
@@ -167,43 +161,6 @@ protected theorem chartAt (p : TM) :
         (chartAt H p.1).prod (PartialHomeomorph.refl E) :=
   rfl
 
-theorem chartAt_toPartialEquiv (p : TM) :
-    (chartAt (ModelProd H E) p).toPartialEquiv =
-      (tangentBundleCore I M).toFiberBundleCore.localTrivAsPartialEquiv (achart H p.1) ≫
-        (chartAt H p.1).toPartialEquiv.prod (PartialEquiv.refl E) :=
-  rfl
-
-theorem trivializationAt_eq_localTriv (x : M) :
-    trivializationAt E (TangentSpace I) x =
-      (tangentBundleCore I M).toFiberBundleCore.localTriv (achart H x) :=
-  rfl
-
-@[simp, mfld_simps]
-theorem trivializationAt_source (x : M) :
-    (trivializationAt E (TangentSpace I) x).source =
-      π E (TangentSpace I) ⁻¹' (chartAt H x).source :=
-  rfl
-
-@[simp, mfld_simps]
-theorem trivializationAt_target (x : M) :
-    (trivializationAt E (TangentSpace I) x).target = (chartAt H x).source ×ˢ univ :=
-  rfl
-
-@[simp, mfld_simps]
-theorem trivializationAt_baseSet (x : M) :
-    (trivializationAt E (TangentSpace I) x).baseSet = (chartAt H x).source :=
-  rfl
-
-theorem trivializationAt_apply (x : M) (z : TM) :
-    trivializationAt E (TangentSpace I) x z =
-      (z.1, fderivWithin 𝕜 ((chartAt H x).extend I ∘ ((chartAt H z.1).extend I).symm) (range I)
-        ((chartAt H z.1).extend I z.1) z.2) :=
-  rfl
-
-@[simp, mfld_simps]
-theorem trivializationAt_fst (x : M) (z : TM) : (trivializationAt E (TangentSpace I) x z).1 = z.1 :=
-  rfl
-
 @[simp, mfld_simps]
 theorem mem_chart_source_iff (p q : TM) :
     p ∈ (chartAt (ModelProd H E) q).source ↔ p.1 ∈ (chartAt H q.1).source := by
@@ -219,15 +176,6 @@ theorem mem_chart_target_iff (p : H × E) (q : TM) :
   simp only [FiberBundle.chartedSpace_chartAt, mfld_simps]
   rw [PartialEquiv.prod_symm]
   simp +contextual only [and_iff_left_iff_imp, mfld_simps]
-
-@[simp, mfld_simps]
-theorem coe_chartAt_fst (p q : TM) : ((chartAt (ModelProd H E) q) p).1 = chartAt H q.1 p.1 :=
-  rfl
-
-@[simp, mfld_simps]
-theorem coe_chartAt_symm_fst (p : H × E) (q : TM) :
-    ((chartAt (ModelProd H E) q).symm p).1 = ((chartAt H q.1).symm : H → M) p.1 :=
-  rfl
 
 @[simp, mfld_simps]
 theorem trivializationAt_continuousLinearMapAt {b₀ b : M}
@@ -329,18 +277,6 @@ def tangentBundleModelSpaceHomeomorph : TangentBundle I H ≃ₜ ModelProd H E :
         convert (chartAt (ModelProd H E) p).symm.continuousOn
         simp only [mfld_simps]
       simpa only [mfld_simps] using this }
-
-@[simp, mfld_simps]
-theorem tangentBundleModelSpaceHomeomorph_coe :
-    (tangentBundleModelSpaceHomeomorph I : TangentBundle I H → ModelProd H E) =
-      TotalSpace.toProd H E :=
-  rfl
-
-@[simp, mfld_simps]
-theorem tangentBundleModelSpaceHomeomorph_coe_symm :
-    ((tangentBundleModelSpaceHomeomorph I).symm : ModelProd H E → TangentBundle I H) =
-      (TotalSpace.toProd H E).symm :=
-  rfl
 
 section inTangentCoordinates
 

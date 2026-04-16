@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.CategoryTheory.Adjunction.Limits
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 
+noncomputable section
+
 /-!
 # Transporting existence of specific limits across equivalences
 

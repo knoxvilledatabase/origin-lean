@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Analytic.ChangeOrigin
 
+noncomputable section
+
 /-!
 # Properties of analyticity restricted to a set
 
@@ -108,6 +110,7 @@ be stitched together.
 -/
 
 set_option linter.style.multiGoal false in
+/-- `f` has power series `p` at `x` iff some local extension of `f` has that series -/
 
 lemma hasFPowerSeriesWithinOnBall_iff_exists_hasFPowerSeriesOnBall [CompleteSpace F] {f : E → F}
     {p : FormalMultilinearSeries 𝕜 E F} {s : Set E} {x : E} {r : ℝ≥0∞} :

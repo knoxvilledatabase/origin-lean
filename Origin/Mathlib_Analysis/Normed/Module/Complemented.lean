@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Analysis.Normed.Operator.Banach
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 
+noncomputable section
+
 /-!
 # Complemented subspaces of normed vector spaces
 
@@ -49,22 +51,6 @@ nonrec def equivProdOfSurjectiveOfIsCompl (f : E →L[𝕜] F) (g : E →L[𝕜]
   (f.equivProdOfSurjectiveOfIsCompl (g : E →ₗ[𝕜] G) hf hg hfg).toContinuousLinearEquivOfContinuous
     (f.continuous.prod_mk g.continuous)
 
-@[simp]
-theorem coe_equivProdOfSurjectiveOfIsCompl {f : E →L[𝕜] F} {g : E →L[𝕜] G} (hf : range f = ⊤)
-    (hg : range g = ⊤) (hfg : IsCompl (ker f) (ker g)) :
-    (equivProdOfSurjectiveOfIsCompl f g hf hg hfg : E →ₗ[𝕜] F × G) = f.prod g := rfl
-
-@[simp]
-theorem equivProdOfSurjectiveOfIsCompl_toLinearEquiv {f : E →L[𝕜] F} {g : E →L[𝕜] G}
-    (hf : range f = ⊤) (hg : range g = ⊤) (hfg : IsCompl (ker f) (ker g)) :
-    (equivProdOfSurjectiveOfIsCompl f g hf hg hfg).toLinearEquiv =
-      LinearMap.equivProdOfSurjectiveOfIsCompl f g hf hg hfg := rfl
-
-@[simp]
-theorem equivProdOfSurjectiveOfIsCompl_apply {f : E →L[𝕜] F} {g : E →L[𝕜] G} (hf : range f = ⊤)
-    (hg : range g = ⊤) (hfg : IsCompl (ker f) (ker g)) (x : E) :
-    equivProdOfSurjectiveOfIsCompl f g hf hg hfg x = (f x, g x) := rfl
-
 end ContinuousLinearMap
 
 namespace Submodule
@@ -82,26 +68,6 @@ def linearProjOfClosedCompl (h : IsCompl p q) (hp : IsClosed (p : Set E))
   ContinuousLinearMap.fst 𝕜 p q ∘L ↑(prodEquivOfClosedCompl p q h hp hq).symm
 
 variable {p q}
-
-@[simp]
-theorem coe_prodEquivOfClosedCompl (h : IsCompl p q) (hp : IsClosed (p : Set E))
-    (hq : IsClosed (q : Set E)) :
-    ⇑(p.prodEquivOfClosedCompl q h hp hq) = p.prodEquivOfIsCompl q h := rfl
-
-@[simp]
-theorem coe_prodEquivOfClosedCompl_symm (h : IsCompl p q) (hp : IsClosed (p : Set E))
-    (hq : IsClosed (q : Set E)) :
-    ⇑(p.prodEquivOfClosedCompl q h hp hq).symm = (p.prodEquivOfIsCompl q h).symm := rfl
-
-@[simp]
-theorem coe_continuous_linearProjOfClosedCompl (h : IsCompl p q) (hp : IsClosed (p : Set E))
-    (hq : IsClosed (q : Set E)) :
-    (p.linearProjOfClosedCompl q h hp hq : E →ₗ[𝕜] p) = p.linearProjOfIsCompl q h := rfl
-
-@[simp]
-theorem coe_continuous_linearProjOfClosedCompl' (h : IsCompl p q) (hp : IsClosed (p : Set E))
-    (hq : IsClosed (q : Set E)) :
-    ⇑(p.linearProjOfClosedCompl q h hp hq) = p.linearProjOfIsCompl q h := rfl
 
 theorem ClosedComplemented.of_isCompl_isClosed (h : IsCompl p q) (hp : IsClosed (p : Set E))
     (hq : IsClosed (q : Set E)) : p.ClosedComplemented :=

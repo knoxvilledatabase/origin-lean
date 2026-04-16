@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Functor.Currying
 import Mathlib.CategoryTheory.Subobject.FactorThru
 import Mathlib.CategoryTheory.Subobject.WellPowered
 
+noncomputable section
+
 /-!
 # The lattice of subobjects
 
@@ -38,14 +40,6 @@ instance {X : C} : Inhabited (MonoOver X) :=
 def leTop (f : MonoOver X) : f ⟶ ⊤ :=
   homMk f.arrow (comp_id _)
 
-@[simp]
-theorem top_left (X : C) : ((⊤ : MonoOver X) : C) = X :=
-  rfl
-
-@[simp]
-theorem top_arrow (X : C) : (⊤ : MonoOver X).arrow = 𝟙 X :=
-  rfl
-
 def mapTop (f : X ⟶ Y) [Mono f] : (map f).obj ⊤ ≅ mk' f :=
   iso_of_both_ways (homMk (𝟙 _) rfl) (homMk (𝟙 _) (by simp [id_comp f]))
 
@@ -76,10 +70,6 @@ instance {X : C} : Bot (MonoOver X) where bot := mk' (initial.to X)
 
 @[simp]
 theorem bot_left (X : C) : ((⊥ : MonoOver X) : C) = ⊥_ C :=
-  rfl
-
-@[simp]
-theorem bot_arrow {X : C} : (⊥ : MonoOver X).arrow = initial.to X :=
   rfl
 
 def botLE {X : C} (f : MonoOver X) : ⊥ ⟶ f :=
@@ -176,9 +166,6 @@ instance orderTop {X : C} : OrderTop (Subobject X) where
 instance {X : C} : Inhabited (Subobject X) :=
   ⟨⊤⟩
 
-theorem top_eq_id (B : C) : (⊤ : Subobject B) = Subobject.mk (𝟙 B) :=
-  rfl
-
 theorem underlyingIso_top_hom {B : C} : (underlyingIso (𝟙 B)).hom = (⊤ : Subobject B).arrow := by
   convert underlyingIso_hom_comp_eq_mk (𝟙 B)
   simp only [comp_id]
@@ -239,9 +226,6 @@ instance orderBot {X : C} : OrderBot (Subobject X) where
     refine Quotient.ind' fun f => ?_
     exact ⟨MonoOver.botLE f⟩
 
-theorem bot_eq_initial_to {B : C} : (⊥ : Subobject B) = Subobject.mk (initial.to B) :=
-  rfl
-
 def botCoeIsoInitial {B : C} : ((⊥ : Subobject B) : C) ≅ ⊥_ C :=
   underlyingIso _
 
@@ -264,10 +248,6 @@ variable [HasZeroMorphisms C]
 theorem bot_eq_zero {B : C} : (⊥ : Subobject B) = Subobject.mk (0 : 0 ⟶ B) :=
   mk_eq_mk_of_comm _ _ (initialIsInitial.uniqueUpToIso HasZeroObject.zeroIsInitial)
     (by simp [eq_iff_true_of_subsingleton])
-
-@[simp]
-theorem bot_arrow {B : C} : (⊥ : Subobject B).arrow = 0 :=
-  zero_of_source_iso_zero _ botCoeIsoZero
 
 theorem bot_factors_iff_zero {A B : C} (f : A ⟶ B) : (⊥ : Subobject B).Factors f ↔ f = 0 :=
   ⟨by
@@ -471,12 +451,6 @@ def wideCospan {A : C} (s : Set (Subobject A)) : WidePullbackShape (equivShrink 
   WidePullbackShape.wideCospan A
     (fun j : equivShrink _ '' s => ((equivShrink (Subobject A)).symm j : C)) fun j =>
     ((equivShrink (Subobject A)).symm j).arrow
-
-@[simp]
-theorem wideCospan_map_term {A : C} (s : Set (Subobject A)) (j) :
-    (wideCospan s).map (WidePullbackShape.Hom.term j) =
-      ((equivShrink (Subobject A)).symm j).arrow :=
-  rfl
 
 def leInfCone {A : C} (s : Set (Subobject A)) (f : Subobject A) (k : ∀ g ∈ s, f ≤ g) :
     Cone (wideCospan s) :=

@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Probability.Independence.Basic
 
+noncomputable section
+
 /-!
 # Integration in Probability Theory
 

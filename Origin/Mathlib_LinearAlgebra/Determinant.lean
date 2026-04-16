@@ -1,6 +1,6 @@
 /-
 Extracted from LinearAlgebra/Determinant.lean
-Genuine: 62 | Conflates: 2 | Dissolved: 4 | Infrastructure: 3
+Genuine: 65 | Conflates: 3 | Dissolved: 0 | Infrastructure: 3
 -/
 import Origin.Core
 import Mathlib.LinearAlgebra.GeneralLinearGroup
@@ -8,6 +8,8 @@ import Mathlib.LinearAlgebra.Matrix.Reindex
 import Mathlib.Tactic.FieldSimp
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.LinearAlgebra.Matrix.Basis
+
+noncomputable section
 
 /-!
 # Determinant of families of vectors
@@ -269,7 +271,12 @@ theorem isUnit_det {A : Type*} [CommRing A] [Module A M] (f : M →ₗ[A] M) (hf
     simp only [← LinearMap.det_comp, hg, MonoidHom.map_one]
   exact isUnit_of_mul_eq_one _ _ this
 
--- DISSOLVED: finiteDimensional_of_det_ne_one
+theorem finiteDimensional_of_det_ne_one {𝕜 : Type*} [Field 𝕜] [Module 𝕜 M] (f : M →ₗ[𝕜] M)
+    (hf : LinearMap.det f ≠ 1) : FiniteDimensional 𝕜 M := by
+  by_cases H : ∃ s : Finset M, Nonempty (Basis s 𝕜 M)
+  · rcases H with ⟨s, ⟨hs⟩⟩
+    exact FiniteDimensional.of_fintype_basis hs
+  · classical simp [LinearMap.coe_det, H] at hf
 
 theorem range_lt_top_of_det_eq_zero {𝕜 : Type*} [Field 𝕜] [Module 𝕜 M] {f : M →ₗ[𝕜] M}
     (hf : LinearMap.det f = 0) : LinearMap.range f < ⊤ := by
@@ -295,10 +302,6 @@ protected def det : (M ≃ₗ[R] M) →* Rˣ :=
 
 @[simp]
 theorem coe_det (f : M ≃ₗ[R] M) : ↑(LinearEquiv.det f) = LinearMap.det (f : M →ₗ[R] M) :=
-  rfl
-
-@[simp]
-theorem coe_inv_det (f : M ≃ₗ[R] M) : ↑(LinearEquiv.det f)⁻¹ = LinearMap.det (f.symm : M →ₗ[R] M) :=
   rfl
 
 @[simp]
@@ -371,7 +374,13 @@ theorem LinearEquiv.coe_ofIsUnitDet {f : M →ₗ[R] M'} {v : Basis ι R M} {v' 
   ext x
   rfl
 
--- DISSOLVED: LinearMap.equivOfDetNeZero
+abbrev LinearMap.equivOfDetNeZero {𝕜 : Type*} [Field 𝕜] {M : Type*} [AddCommGroup M] [Module 𝕜 M]
+    [FiniteDimensional 𝕜 M] (f : M →ₗ[𝕜] M) (hf : LinearMap.det f ≠ 0) : M ≃ₗ[𝕜] M :=
+  have : IsUnit (LinearMap.toMatrix (Module.finBasis 𝕜 M)
+      (Module.finBasis 𝕜 M) f).det := by
+    rw [LinearMap.det_toMatrix]
+    exact isUnit_iff_ne_zero.2 hf
+  LinearEquiv.ofIsUnitDet this
 
 theorem LinearMap.associated_det_of_eq_comp (e : M ≃ₗ[R] M) (f f' : M →ₗ[R] M)
     (h : ∀ x, f x = f' (e x)) : Associated (LinearMap.det f) (LinearMap.det f') := by
@@ -423,7 +432,8 @@ theorem Basis.det_isEmpty [IsEmpty ι] : e.det = AlternatingMap.constOfIsEmpty R
   ext v
   exact Matrix.det_isEmpty
 
--- DISSOLVED: Basis.det_ne_zero
+-- CONFLATES (assumes ground = zero): Basis.det_ne_zero
+theorem Basis.det_ne_zero [Nontrivial R] : e.det ≠ 0 := fun h => by simpa [h] using e.det_self
 
 theorem Basis.smul_det {G} [Group G] [DistribMulAction G M] [SMulCommClass G R M]
     (g : G) (v : ι → M) :
@@ -466,7 +476,9 @@ theorem AlternatingMap.map_basis_eq_zero_iff {ι : Type*} [Finite ι] (e : Basis
     simpa [h] using f.eq_smul_basis_det e,
    fun h => h.symm ▸ AlternatingMap.zero_apply _⟩
 
--- DISSOLVED: AlternatingMap.map_basis_ne_zero_iff
+theorem AlternatingMap.map_basis_ne_zero_iff {ι : Type*} [Finite ι] (e : Basis ι R M)
+    (f : M [⋀^ι]→ₗ[R] R) : f e ≠ 0 ↔ f ≠ 0 :=
+  not_congr <| f.map_basis_eq_zero_iff e
 
 variable {A : Type*} [CommRing A] [Module A M]
 

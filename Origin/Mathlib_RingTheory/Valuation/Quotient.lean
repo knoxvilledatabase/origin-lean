@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.RingTheory.Valuation.Basic
 
+noncomputable section
+
 /-!
 # The valuation on a quotient ring
 

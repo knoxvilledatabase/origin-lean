@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Probability.Notation
 import Mathlib.Probability.Process.Stopping
 
+noncomputable section
+
 /-!
 # Martingales
 

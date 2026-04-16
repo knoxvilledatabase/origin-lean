@@ -8,6 +8,8 @@ import Mathlib.Topology.Order.IntermediateValue
 import Mathlib.Topology.Order.IsLUB
 import Mathlib.Topology.Order.LocalExtr
 
+noncomputable section
+
 /-!
 # Compactness of a closed interval
 

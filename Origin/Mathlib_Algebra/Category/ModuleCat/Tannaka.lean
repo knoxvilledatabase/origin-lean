@@ -6,6 +6,8 @@ import Origin.Core
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.LinearAlgebra.Span.Basic
 
+noncomputable section
+
 /-!
 # Tannaka duality for rings
 

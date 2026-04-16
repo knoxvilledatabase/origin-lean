@@ -5,6 +5,8 @@ Genuine: 67 | Conflates: 0 | Dissolved: 0 | Infrastructure: 15
 import Origin.Core
 import Mathlib.Topology.UniformSpace.AbstractCompletion
 
+noncomputable section
+
 /-!
 # Hausdorff completions of uniform spaces
 
@@ -304,8 +306,6 @@ instance t0Space : T0Space (Completion α) := SeparationQuotient.instT0Space
 
 instance : Coe α (Completion α) :=
   ⟨coe' α⟩
-
-protected theorem coe_eq : ((↑) : α → Completion α) = SeparationQuotient.mk ∘ pureCauchy := rfl
 
 theorem isUniformInducing_coe : IsUniformInducing ((↑) : α → Completion α) :=
   SeparationQuotient.isUniformInducing_mk.comp isUniformInducing_pureCauchy

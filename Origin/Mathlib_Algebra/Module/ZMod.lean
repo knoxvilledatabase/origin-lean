@@ -1,10 +1,12 @@
 /-
 Extracted from Algebra/Module/ZMod.lean
-Genuine: 8 | Conflates: 0 | Dissolved: 1 | Infrastructure: 5
+Genuine: 9 | Conflates: 0 | Dissolved: 0 | Infrastructure: 5
 -/
 import Origin.Core
 import Mathlib.Algebra.Module.Submodule.Lattice
 import Mathlib.Data.ZMod.Basic
+
+noncomputable section
 
 /-!
 # The `ZMod n`-module structure on Abelian groups whose elements have order dividing `n`
@@ -12,7 +14,22 @@ import Mathlib.Data.ZMod.Basic
 
 variable {n : ℕ} {M M₁ : Type*}
 
--- DISSOLVED: AddCommMonoid.zmodModule
+abbrev AddCommMonoid.zmodModule [NeZero n] [AddCommMonoid M] (h : ∀ (x : M), n • x = 0) :
+    Module (ZMod n) M := by
+  have h_mod (c : ℕ) (x : M) : (c % n) • x = c • x := by
+    suffices (c % n + c / n * n) • x = c • x by rwa [add_nsmul, mul_nsmul, h, add_zero] at this
+    rw [Nat.mod_add_div']
+  have := NeZero.ne n
+  match n with
+  | n + 1 => exact {
+    smul := fun (c : Fin _) x ↦ c.val • x
+    smul_zero := fun _ ↦ nsmul_zero _
+    zero_smul := fun _ ↦ zero_nsmul _
+    smul_add := fun _ _ _ ↦ nsmul_add _ _ _
+    one_smul := fun _ ↦ (h_mod _ _).trans <| one_nsmul _
+    add_smul := fun _ _ _ ↦ (h_mod _ _).trans <| add_nsmul _ _ _
+    mul_smul := fun _ _ _ ↦ (h_mod _ _).trans <| mul_nsmul' _ _ _
+  }
 
 abbrev AddCommGroup.zmodModule {G : Type*} [AddCommGroup G] (h : ∀ (x : G), n • x = 0) :
     Module (ZMod n) G :=
@@ -49,9 +66,6 @@ def toZModLinearMap (f : M →+ M₁) : M →ₗ[ZMod n] M₁ := { f with map_sm
 theorem toZModLinearMap_injective : Function.Injective <| toZModLinearMap n (M := M) (M₁ := M₁) :=
   fun _ _ h ↦ ext fun x ↦ congr($h x)
 
-@[simp]
-theorem coe_toZModLinearMap (f : M →+ M₁) : ⇑(f.toZModLinearMap n) = f := rfl
-
 end AddMonoidHom
 
 namespace AddSubgroup
@@ -63,23 +77,6 @@ def toZModSubmodule : AddSubgroup M ≃o Submodule (ZMod n) M where
   right_inv _ := rfl
   map_rel_iff' := Iff.rfl
 
-@[simp]
-theorem toZModSubmodule_symm :
-    ⇑((toZModSubmodule n).symm : _ ≃o AddSubgroup M) = Submodule.toAddSubgroup :=
-  rfl
-
-@[simp] lemma coe_toZModSubmodule (S : AddSubgroup M) : (toZModSubmodule n S : Set M) = S := rfl
-
 @[simp] lemma mem_toZModSubmodule {S : AddSubgroup M} : x ∈ toZModSubmodule n S ↔ x ∈ S := .rfl
-
-@[simp]
-theorem toZModSubmodule_toAddSubgroup (S : AddSubgroup M) :
-    (toZModSubmodule n S).toAddSubgroup = S :=
-  rfl
-
-@[simp]
-theorem _root_.Submodule.toAddSubgroup_toZModSubmodule (S : Submodule (ZMod n) M) :
-    toZModSubmodule n S.toAddSubgroup = S :=
-  rfl
 
 end AddSubgroup
