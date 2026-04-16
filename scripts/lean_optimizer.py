@@ -87,7 +87,7 @@ def origin_config() -> ProjectConfig:
 
     return ProjectConfig(
         source_dir=source,
-        output_dir=root,  # Mathlib_* dirs at project root, not inside Origin/
+        output_dir=root / "extracted",  # Mathlib_* dirs in extracted/
         project_root=root,
 
         dissolution_rules=[
