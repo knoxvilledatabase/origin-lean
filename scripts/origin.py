@@ -13,6 +13,7 @@ Usage:
     python3 scripts/origin.py classify <domain>     classify declarations
     python3 scripts/origin.py suggest <domain>      show uncovered genuine declarations
     python3 scripts/origin.py stub <domain>         append uncovered as def stubs
+    python3 scripts/origin.py quality [domain]      show stub vs real declaration counts
 """
 
 import re
@@ -708,6 +709,92 @@ def cmd_stub(domain):
 
 
 # =============================================================================
+# Quality — show stub vs real declaration counts
+# =============================================================================
+
+STUB_RE = re.compile(r'^\s*def\s+\S+\s*:\s*Prop\s*:=\s*True\s*$')
+
+
+def _count_quality(filepath):
+    """Count stubs vs real declarations in an Origin file.
+
+    Returns (total, stubs, real).
+    A stub is: def name : Prop := True
+    Everything else (structures, theorems, defs with bodies) is real.
+    """
+    total = 0
+    stubs = 0
+    for line in filepath.read_text(errors="replace").split("\n"):
+        if "private " in line:
+            continue
+        if ORIGIN_DECL_RE.match(line):
+            total += 1
+            if STUB_RE.match(line):
+                stubs += 1
+    return total, stubs, total - stubs
+
+
+def cmd_quality(domain=None):
+    """Show stub vs real declaration counts per domain."""
+    skip = {"Index", "Test", "Physics"}
+
+    # Collect per-file stats
+    stats = []  # (domain_name, total, stubs, real, lines)
+    for f in sorted(ORIGIN.glob("*.lean")):
+        if f.stem in skip or f.stem == "Core":
+            continue
+        total, stubs, real = _count_quality(f)
+        line_count = sum(1 for _ in f.read_text(errors="replace").split("\n"))
+        # Derive domain name (strip trailing "2" for display)
+        dname = f.stem.rstrip("2") if f.stem.endswith("2") and f.stem != "2" else f.stem
+        stats.append((dname, f.stem, total, stubs, real, line_count))
+
+    # Filter to one domain if requested
+    if domain:
+        stats = [(d, s, t, st, r, l) for d, s, t, st, r, l in stats
+                 if d == domain or s == domain]
+        if not stats:
+            ui.fail(f"Not found: {domain}")
+            return
+
+    # Totals
+    t_total = sum(t for _, _, t, _, _, _ in stats)
+    t_stubs = sum(st for _, _, _, st, _, _ in stats)
+    t_real = sum(r for _, _, _, _, r, _ in stats)
+
+    pct = t_real / max(t_total, 1) * 100
+    ui.header("Q U A L I T Y", f"{t_real} real / {t_total} total ({pct:.0f}% real)")
+
+    print(f"  {'Domain':<26s} {'Total':>6s} {'Real':>6s} {'Stubs':>6s} {'Real%':>6s}")
+    ui.separator()
+
+    for dname, stem, total, stubs, real, line_count in stats:
+        rpct = real / max(total, 1) * 100
+        # Color: green if >80% real, yellow if >20%, red otherwise
+        if rpct >= 80:
+            color = ui.GREEN
+        elif rpct >= 20:
+            color = ui.YELLOW
+        else:
+            color = ui.RED
+        print(f"  {dname:<26s} {total:>6d} {color}{real:>6d}{ui.RESET} {stubs:>6d} {color}{rpct:>5.0f}%{ui.RESET}")
+
+    ui.separator()
+    print(f"  {'TOTAL':<26s} {t_total:>6d} {ui.GREEN}{t_real:>6d}{ui.RESET} {t_stubs:>6d} {pct:>5.0f}%")
+    print()
+
+    if not domain:
+        # Show domains most in need of upgrading (most stubs, some real)
+        by_stubs = sorted(stats, key=lambda x: x[3], reverse=True)
+        needs_work = [(d, st, r) for d, _, _, st, r, _ in by_stubs if st > 0][:5]
+        if needs_work:
+            print(f"  {ui.BOLD}Most stubs to upgrade:{ui.RESET}")
+            for dname, stubs, real in needs_work:
+                print(f"    {dname:<26s} {stubs:>6d} stubs, {real:>3d} real")
+            print()
+
+
+# =============================================================================
 # Dedup — find duplicate definitions across Origin files
 # =============================================================================
 
@@ -939,6 +1026,11 @@ def main():
             cmd_stub(sys.argv[2])
         else:
             print("Usage: origin.py stub <DOMAIN>")
+    elif cmd == "quality":
+        if len(sys.argv) > 2:
+            cmd_quality(sys.argv[2])
+        else:
+            cmd_quality()
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
