@@ -455,7 +455,16 @@ class Parser:
             decl_lines.append(cur)
             i += 1
 
-        full_text = "\n".join(decl_lines).rstrip()
+        # Collapse consecutive blank lines to prevent string gap errors
+        cleaned = []
+        prev_blank = False
+        for dl in decl_lines:
+            is_blank = not dl.strip()
+            if is_blank and prev_blank:
+                continue  # skip consecutive blanks
+            cleaned.append(dl)
+            prev_blank = is_blank
+        full_text = "\n".join(cleaned).rstrip()
         cls = self.classifier.classify(kind, name, full_text)
         blocks.append(Block("decl", name, full_text, cls))
         return (i, [])  # Clear pending attrs
