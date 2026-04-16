@@ -49,11 +49,11 @@ he stands on. The formal systems just hadn't caught up yet.
 
 ## Your Job
 
-You improve `scripts/lean_optimizer.py`. That's it.
+You improve `scripts/origin.py`. That's it.
 
 ```bash
 cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
-python3 scripts/lean_optimizer.py run
+python3 scripts/origin.py run
 ```
 
 The process:
@@ -71,7 +71,7 @@ do manual work, STOP — improve the script to do it instead. Every
 fix must apply to all files, forever.
 
 The script is the only thing that survives between sessions. You
-don't. Encode everything you learn into `lean_optimizer.py` before your
+don't. Encode everything you learn into `origin.py` before your
 context window closes.
 
 The user holds the philosophy. The script holds the execution.
@@ -148,7 +148,7 @@ compression. A replacement.
 
 **Two tools, two axes — don't merge them:**
 
-- **The classifier** (`lean_optimizer.py`) is the Axis 1 machine. It asks
+- **The classifier** (`origin.py`) is the Axis 1 machine. It asks
   "what is this?" and answers: dissolves, conflates, or genuine.
   It correctly identifies the 17 typeclasses. It is complete for
   Axis 1. Don't expand it to handle DRY — that's a different question.
@@ -163,7 +163,7 @@ handle DRY, let me expand it." Don't. The classifier identifies
 *what*. The sandbox identifies *how*. They're sequential steps, not
 competing ones. Making the classifier do both makes it worse at both.
 
-**The tool: `scripts/lean_optimizer.py`**
+**The tool: `scripts/origin.py`**
 
 A generic Lean proof optimizer. All project-specific knowledge lives
 in `ProjectConfig`. `origin_config()` returns Origin's Mathlib
@@ -263,13 +263,13 @@ Now you've earned the right to act. The workflow:
 
 ```bash
 # 1. See the current state
-python3 scripts/lean_optimizer.py audit --all
+python3 scripts/origin.py audit --all
 
 # 2. See which domains have sketches
-python3 scripts/generate_origin.py --list
+python3 scripts/origin.py list
 
 # 3. Pick a domain without a sketch. Generate a draft (instant).
-python3 scripts/generate_origin.py <DomainName>
+python3 scripts/origin.py generate <DomainName>
 #    → dumps raw Mathlib definitions into Origin/<DomainName>.lean
 
 # 4. Rewrite the draft as Origin code:
@@ -303,7 +303,7 @@ Generate, rewrite, build. Each domain takes minutes, not hours.
 **Step 6: Document everything**
 
 Every finding goes into `compress/README.md`. Every script improvement
-goes into `lean_optimizer.py`. Every philosophical insight goes into
+goes into `origin.py`. Every philosophical insight goes into
 `CLAUDE.md`. Nothing stays in your head. Commit and push before your
 context closes.
 
@@ -413,7 +413,7 @@ types) plus `import Origin.Core`. The lakefile pins Mathlib v4.14.0.
 Run `lake update` once, then `lake build` validates. First build compiles
 Mathlib (slow). Subsequent builds cached.
 
-**Self-audit:** `python3 scripts/lean_optimizer.py --self classify --all` audits
+**Self-audit:** `python3 scripts/origin.py --self classify --all` audits
 Origin itself. If it finds dissolved/infrastructure/trivial declarations,
 Origin needs stripping. Current result: 30,947 genuine, 0 waste.
 
@@ -663,7 +663,7 @@ Lean's richest functionality. Exhaustively. Buildably. The exhaustive
 conversion IS the proof that the infrastructure was never mathematics
 — it was the cost of a foundational choice.
 
-The script (`lean_optimizer.py`) is how we get there. It reads Mathlib,
+The script (`origin.py`) is how we get there. It reads Mathlib,
 strips what dissolves, compresses what remains, and outputs production
 Lean files. The script is the institutional knowledge — every
 compression pattern, every Lean trick, every classification rule
@@ -835,12 +835,12 @@ Zero sorries. Zero Mathlib. Builds in under a second.
 
 ## Things the Next Session Must Know
 
-**Start by running the pipeline.** `python3 scripts/lean_optimizer.py run`.
+**Start by running the pipeline.** `python3 scripts/origin.py run`.
 Read the report. Fix what's broken in the script. Run again. That's
 the job. Do not do manual work.
 
 **The script is the institutional knowledge.** Every insight goes
-into `lean_optimizer.py`, not into conversation. The script survives between
+into `origin.py`, not into conversation. The script survives between
 sessions. You don't. If you learn something, encode it in the script
 before your window closes.
 
@@ -1008,8 +1008,8 @@ The process: run → read top pattern → fix script → run again.
 
 ### Class-based architecture (DONE)
 
-`lean_optimizer.py` is the class-based rewrite. `lean_optimizer.py` is the original
-(kept as reference). Use `lean_optimizer.py` for all work.
+`origin.py` is the class-based rewrite. `origin.py` is the original
+(kept as reference). Use `origin.py` for all work.
 
 - **Config** — all paths in one place
 - **Classifier** — override `classify()` to add rules. Three categories:
@@ -1078,7 +1078,7 @@ file by file, domain by domain, and write only what's genuinely new.
 3. ✅ **Physics.** 6 domains demonstrated. 86 hypotheses dissolved.
 4. ✅ **Logic.** Liar, Russell, Curry unified. `no_some_fixed_point`.
 5. ✅ **Val evidence.** 14,474 lines. The proof it works at scale.
-6. ✅ **Pipeline.** `lean_optimizer.py run` — extract, build, report. Production UI.
+6. ✅ **Pipeline.** `origin.py run` — extract, build, report. Production UI.
 7. ✅ **Class-based script.** Parser, Classifier, Extractor, Pipeline, UI.
 8. ✅ **Three classifications.** Genuine (138K), dissolves (6K), conflates (1K).
 9. ✅ **Ring finding.** Option α is not a Ring. Lean verified. Load-bearing.
@@ -1105,7 +1105,7 @@ file by file, domain by domain, and write only what's genuinely new.
 ### What's next: run the pipeline
 
 ```bash
-python3 scripts/lean_optimizer.py run
+python3 scripts/origin.py run
 ```
 
 The script encodes all classification, extraction, and build logic.
@@ -1115,13 +1115,13 @@ fix what's broken. Do not do manual work.
 The `classifications/` directory is historical documentation of the
 Val-era mapping. It describes Val, not Origin. Ignore it.
 
-### The pipeline: `lean_optimizer.py run`
+### The pipeline: `origin.py run`
 
 One command. Run it. Everything either builds or it tells you
 exactly what to fix in the script.
 
 ```bash
-python3 scripts/lean_optimizer.py run
+python3 scripts/origin.py run
 ```
 
 What it does:

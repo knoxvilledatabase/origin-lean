@@ -58,24 +58,24 @@ The `origin` theorem, instances for `*` `+` `-` on `Option α`, the
 `@[simp]` set, `liftBin₂`, `no_some_fixed_point`. 166 lines. The
 entire algebraic foundation.
 
-### Level 2: Parser (DONE — lean_optimizer.py)
+### Level 2: Parser (DONE — origin.py)
 Reads Mathlib files into blocks. Handles all major Lean 4 syntax:
 alias, notation, macro, syntax, elab, infixl/r, prefix, postfix,
 library_note, set_option ... in, #adaptation_note, nested comments,
 deprecated aliases. `expected token` errors: 824 → 2.
 
-### Level 3: Classifier (DONE — lean_optimizer.py)
+### Level 3: Classifier (DONE — origin.py)
 Distinguishes ground guards from measurement constraints. `≠ 0` in
 a field theory theorem is genuine math about `some 0`. `NeZero` and
 `GroupWithZero` in a signature are infrastructure. INFRA_NAMES anchored
 with word boundaries. INFRA_SIG word-bounded. 5,713 → 260 dissolved.
 
-### Level 4: Dependency resolver (DONE — lean_optimizer.py)
+### Level 4: Dependency resolver (DONE — origin.py)
 Within-file: if a genuine proof references a dissolved declaration,
 un-dissolve it. Iterates to stability. Checks all block types.
 762+ declarations rescued.
 
-### Level 5: Extraction pipeline (DONE — lean_optimizer.py)
+### Level 5: Extraction pipeline (DONE — origin.py)
 98.3% pass rate. 4,931 / 5,015 files build clean. 84 remaining
 (13 Tactic metaprogramming, 71 cross-file cascade). `noncomputable
 section` on all extracted files. Parallel build across 10 cores.
@@ -256,7 +256,7 @@ Option α separating what rings conflate. This is already measured:
 
 ## Architecture
 
-**`lean_optimizer.py`** — generic Lean proof optimizer + config.
+**`origin.py`** — generic Lean proof optimizer + config.
 Separates Axis 2 (DRY, works on any Lean project) from Axis 1
 (dissolution rules, Origin-specific). Previous versions (`origin.py`,
 `origin2.py`) are in git history.
@@ -279,7 +279,7 @@ Layer 3: Project Config
 
 ```
 scripts/
-  lean_optimizer.py       — generic Lean optimizer (THE TOOL)
+  origin.py       — generic Lean optimizer (THE TOOL)
   compress/
     __init__.py            — imports
     proof_tester.py             — atomic unit: test one proof, Lean verifies
@@ -293,7 +293,7 @@ The config format is the API. Everything else is implementation. If
 the config format is right, the tool is extensible forever. Change
 the config, not the code.
 
-`ProjectConfig` in `lean_optimizer.py` — a Python dataclass:
+`ProjectConfig` in `origin.py` — a Python dataclass:
 
 ```python
 ProjectConfig(
@@ -340,7 +340,7 @@ The optimizer, sandbox, and audit don't change — only the config.
 
 **Three concerns, three locations:**
 - `CLAUDE.md` holds the philosophy
-- `lean_optimizer.py` holds the Mathlib-specific reference
+- `origin.py` holds the Mathlib-specific reference
 - `compress/` holds the compression knowledge
 
 Each pattern is a class inheriting `CompressionPattern`:
@@ -363,7 +363,7 @@ reference by name.
 1. Create a class in `proof_patterns.py` inheriting `CompressionPattern`
 2. Implement `match(block)` → bool and `compress(block)` → str | None
 3. Add it to `get_patterns()`
-4. Run `python3 scripts/lean_optimizer.py run`
+4. Run `python3 scripts/origin.py run`
 5. Update this file with before/after numbers
 
 ## Foundation Audit (2026-04-16)
@@ -445,7 +445,7 @@ optimizer.
 
 ### Baseline DRY Audit — All Domains (2026-04-16)
 
-Run: `python3 scripts/lean_optimizer.py audit --all`
+Run: `python3 scripts/origin.py audit --all`
 
 | Domain | Files | Lines | Genuine | Dissolved | Trivial | Multi-rw | Spec | Sketch | Reduction |
 |--------|------:|------:|--------:|----------:|--------:|---------:|-----:|-------:|----------:|
@@ -502,11 +502,11 @@ Audit → Generate → Build → Refine → Commit
   └──── Human refines → next domain ───┘
 ```
 
-**Stage 1: Audit.** `lean_optimizer.py audit <domain>` — profile
+**Stage 1: Audit.** `origin.py audit <domain>` — profile
 the Mathlib domain. What's genuine, what dissolves, what's the
 tactic profile.
 
-**Stage 2: Generate.** `lean_optimizer.py generate <domain>` — read
+**Stage 2: Generate.** `origin.py generate <domain>` — read
 the domain's genuine declarations, draft an Origin file importing
 only Core. Structure it like the existing sketches: definitions +
 `cases <;> simp` demonstrations. Skip everything derivable from Core.
@@ -537,7 +537,7 @@ same thing mechanically.
 First domain written using the Generator → Claude Code → Build workflow:
 
 ```
-Step 1: python3 scripts/lean_optimizer.py generate Probability
+Step 1: python3 scripts/origin.py generate Probability
         → 1,244 lines of raw Mathlib definitions (instant)
 
 Step 2: Claude Code rewrites as Origin
