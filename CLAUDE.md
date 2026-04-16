@@ -103,6 +103,24 @@ pick it up and run.
 
 **Always confirm with the user between steps. They hold the architecture.**
 
+### The Goal: Goal B
+
+We are replacing Mathlib's infrastructure layer, not compressing it.
+
+Goal A (compress extracted Mathlib files) was never the destination.
+It was measurement — proving how much is infrastructure. Answer:
+~91% of zero-management declarations dissolve. That measurement is
+done. The pipeline proved it.
+
+Goal B is the work: express every Mathlib domain using Core, without
+the 17 zero-management typeclasses, in minimum lines. The sketches
+show what this looks like. The metric is: same mathematics, minimum
+lines, build passes.
+
+The pipeline remains useful as a reference — it shows what Mathlib
+currently does so Origin knows what to replace. But the output is
+not the destination. The sketches are.
+
 ### Read these files before doing anything
 
 1. **This file** (`CLAUDE.md`) — your orders.
@@ -110,30 +128,32 @@ pick it up and run.
    instances, simp set. Read every line. If you don't understand why
    `none * some 5 = none` and `some 0 * some 5 = some 0`, stop and
    re-read until you do.
-3. **`scripts/compress/README.md`** — the compression work. This is
-   where the CURRENT work is. Read the progression, the sketch
-   comparison table, the foundation levels already mastered. This
-   tells you exactly what to do next.
+3. **`scripts/compress/README.md`** — the compression findings. Read
+   the foundation audit, the sketch trimming results, and the Layer 1
+   dependency guard finding. These tell you what's been learned.
 4. **`scripts/origin2.py`** — the pipeline. Read the parser, the
    classifier, the extractor. The pipeline is at 98.3% pass rate.
-   Don't fix the pipeline — compress the output.
+   Use it as a reference for what Mathlib does, not as a target.
 
 Everything else is output. Don't read Mathlib. Don't read Val.
 Don't read the domain files. The script reads Mathlib for you.
 
 ### What to do RIGHT NOW
 
-The pipeline works. 98.3% pass rate. The current work is **compression**.
+The pipeline measured the problem. The sketches prove the solution.
+The current work is **expanding the sketches** — expressing more of
+Mathlib's mathematics through Core, domain by domain.
 
-1. Read `scripts/compress/README.md` — it has the progression model
-2. Study one Origin sketch (e.g. `Origin/GroupTheory.lean`, 121 lines)
-3. Compare it to its Mathlib counterpart (38,810 lines)
-4. The sketch keeps definitions + demonstrations. Everything else is
-   derivable from Core.lean. That's the pattern. Encode it.
-5. Test on one file. Does the build pass? Then one domain. Then all.
+1. Read the sketches — 14 Origin domain files, all import Core.lean
+2. Each sketch keeps domain-specific definitions + demonstrations
+3. The extracted `Mathlib_*` directories show what Mathlib has for
+   each domain — use these as reference for what to express next
+4. Pick the sketch with the most room to grow. Add the next layer
+   of domain content. Build. Does it pass?
+5. Always audit the foundation before stacking on top of it
 
-**Do not invent compression patterns from scratch.** Reverse-engineer
-them from the sketches. The human already proved the compression works.
+**The sketches are the cartwheels.** Don't invent from scratch.
+Extend what's already proven. Each domain grows from its sketch.
 
 ### Mistakes every new Claude makes
 
