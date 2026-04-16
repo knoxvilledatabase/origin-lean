@@ -47,6 +47,44 @@ The answer to "what is the absolute least number of lines" is the
 number you get when every declaration exists exactly once and nothing
 is repeated at any level of the stack.
 
+## The Progression: Cartwheels Before Miller Straights
+
+**Read this before writing any compression code.**
+
+A world champion power tumbler doesn't start with a Miller Straight
+(two rotations, 360 + 720). They start with a forward roll, then a
+cartwheel, then a roundoff back handspring, then whips, then fulls,
+then doubles, building up over years. Each skill earns the next.
+
+The compression has the same structure. **The sketches are the
+cartwheels and handsprings.** The 15 hand-written Origin domain files
+(`Algebra.lean`, `Analysis.lean`, etc.) already import `Core.lean`
+and build clean. They ARE the compressed versions — written by the
+human to be maximally DRY.
+
+**Don't invent compression patterns from scratch.** Reverse-engineer
+them from the sketches. What did the human do to turn 1,140 lines of
+Mathlib GroupTheory into 121 lines of `GroupTheory.lean`? That's the
+pattern. Encode it.
+
+The progression:
+1. **Study one sketch** — read it, understand what makes it short
+2. **Compare to its Mathlib_ counterpart** — what was removed, what was rewritten
+3. **Identify the pattern** — is it deletion? tactic replacement? generalization?
+4. **Encode the pattern** — add a class to `patterns.py`
+5. **Test on one file** — does the build pass?
+6. **Test on one domain** — does the domain pass?
+7. **Test on all domains** — does everything pass?
+8. **Measure the line count** — how many lines did this pattern save?
+
+Each step earns the next. No global dependency passes until single-file
+deletion is proven. No two-pass pipelines until single-domain compression
+is proven. If it feels complex, you skipped a step.
+
+Does it make sense to do Calculus before Algebra? Algebra before
+Arithmetic? No. Start with the simplest domain, prove the pattern,
+then progress. The sketches tell you the order.
+
 ## The Layers
 
 Compression applies in four layers, from easiest to hardest:

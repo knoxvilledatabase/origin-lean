@@ -660,8 +660,21 @@ The process: run → read top pattern → fix script → run again.
 
 **Read `scripts/compress/README.md` first.** It has the full framing,
 the layer model, the tactic audit numbers, the pattern architecture,
-and the governing principle: declare once, reuse everywhere. No two
-lines of code should do the same thing at any level of the stack.
+the governing principle (declare once, reuse everywhere), and the
+progression model.
+
+**The sketches are the cartwheels.** The 15 hand-written Origin domain
+files (`Algebra.lean`, `Analysis.lean`, etc.) already import Core.lean,
+build clean, and ARE the compressed versions. Don't invent compression
+patterns from scratch — reverse-engineer them from the sketches. What
+did the human do to compress Mathlib GroupTheory from 1,140 to 121
+lines? That's the pattern. Encode it.
+
+**Progression, not complexity.** If your compression approach feels
+complex, you skipped a step. Start with one file, one deletion, does
+the build pass? Then one domain. Then all domains. Each step earns
+the next. A world champion tumbler starts with a forward roll, not a
+Miller Straight.
 
 The question: **What is the absolute least number of lines that can do
 everything Mathlib does with Origin?** This is a Kolmogorov complexity
