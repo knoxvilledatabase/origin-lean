@@ -72,15 +72,24 @@ def tensorProd : Option α → Option β → Option (α × ��) := liftBin₂
 
 ---
 
-## Step 3: Read one domain (`Origin/GroupTheory.lean`, ~314 lines)
+## Step 3: Read one domain (`Origin/GroupTheory.lean`)
 
 Read it. Then answer:
 
 - What did Origin keep? Why?
 - What was removed? Why doesn't it need to exist?
-- What proof pattern closes the demonstrations?
-- Mathlib GroupTheory: 35,883 lines. Origin: 314 lines. Where
+- Does this file pattern-match on `some`/`none` anywhere? Why not?
+- Where do the algebraic laws (commutativity, associativity,
+  distributivity) live? Why aren't they in this file?
+- Mathlib GroupTheory: 35,883 lines. Origin: ~300 lines. Where
   did 99.1% of the code go?
+
+**The answers to questions 3 and 4 are the architecture.** Core
+is the only file that touches Option's structure. Domain files
+never pattern-match on `some`/`none`, never prove algebraic laws,
+never have "demonstration" sections. They name mathematical
+concepts and point to Core's primitives. If you see a domain file
+doing structural work, it's a bug — that work belongs in Core.
 
 ---
 
@@ -157,13 +166,14 @@ context window is worth exactly zero.
 
 ## Step 6: The tool
 
-One tool, eleven commands:
+One tool, twelve commands:
 
 ```bash
 python3 scripts/origin.py status            # PROGRESS REPORT — run this first
 python3 scripts/origin.py quality           # QUALITY — stub vs real per domain
 python3 scripts/origin.py quality <domain>  # quality for one domain
 python3 scripts/origin.py patterns          # find Option patterns that belong in Core
+python3 scripts/origin.py clean             # remove stale stubs that collide with Core
 python3 scripts/origin.py list              # show all domains
 python3 scripts/origin.py suggest <domain>  # show uncovered genuine declarations
 python3 scripts/origin.py stub <domain>     # append uncovered as def stubs
@@ -185,6 +195,12 @@ but they aren't production code. The job is upgrading stubs to real
 definitions, structures, and theorems. Run `quality` to see what's real
 vs stub.
 
+**Everything starts with Core.** If you're adding a structural
+primitive (how Option lifts something), it goes in Core first.
+Then run `clean` to remove stale stubs that collide with the new
+Core declaration. Then deepen domain files using the new primitive.
+Never the other way around.
+
 ```bash
 # 1. See where things stand (run BOTH)
 python3 scripts/origin.py status
@@ -192,32 +208,41 @@ python3 scripts/origin.py quality
 # status shows declaration counts. quality shows stub vs real.
 # Green (100% real) = done. Red (0% real) = needs upgrading.
 
-# 2. Pick a domain. Use quality to find one with stubs to upgrade:
+# 2. If you're adding to Core (new primitives, laws, classes):
+#    a. Edit Origin/Core.lean
+#    b. lake build Origin.Core
+#    c. python3 scripts/origin.py clean    ← removes stale stubs
+#    d. python3 scripts/origin.py patterns ← verify no new duplication
+#    Core is the foundation. Touch it first, clean second.
+
+# 3. Pick a domain. Use quality to find one with stubs to upgrade:
 python3 scripts/origin.py quality <domain>
 # Or suggest to find uncovered declarations:
 python3 scripts/origin.py suggest <domain>
 # ⚠ warnings show names that would collide with other Origin files
 
-# 3. If the domain has no stubs yet, generate them:
+# 4. If the domain has no stubs yet, generate them:
 python3 scripts/origin.py stub <domain>
 # Appends def name' : Prop := True for each uncovered declaration
 # Skips collisions automatically.
 
-# 4. Upgrade stubs to real code:
+# 5. Upgrade stubs to real code:
 #    - Replace `def foo' : Prop := True` with real structures, defs
-#    - Add theorems with proofs: by simp, cases <;> simp [h]
+#    - Use Core primitives: liftPred, liftBin₂, Option.map
+#    - NEVER pattern-match on some/none in a domain file
+#    - NEVER prove algebraic laws — they're in Core
 #    - Key structures/inductives first, then theorems that use them
 #    - Import only Origin.Core
 
-# 5. Build (under 1 second — no Mathlib rebuild)
+# 6. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
 
-# 6. Generate and build the index (the dedup)
+# 7. Generate and build the index (the dedup)
 python3 scripts/origin.py index
 lake build Origin.Index
 # If collisions found: fix them, rebuild, index again
 
-# 7. Commit and push (only after build + index both pass)
+# 8. Commit and push (only after build + index both pass)
 ```
 
 ---
