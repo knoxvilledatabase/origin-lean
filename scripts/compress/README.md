@@ -262,16 +262,25 @@ Option α separating what rings conflate. This is already measured:
 - `origin2.py` — class-based, Mathlib-specific. Has pipeline,
   classifier, parser, extractor, audit, compress. All Mathlib
   knowledge hardcoded. This is the reference for origin3.
-- `origin3.py` — **the next build.** Generic Lean optimizer +
-  project-specific config. Separates Axis 2 (DRY, works on any
-  Lean project) from Axis 1 (dissolution rules, Origin-specific).
+- `origin3.py` — **built.** Generic Lean optimizer + config.
+  Separates Axis 2 (DRY, works on any Lean project) from Axis 1
+  (dissolution rules, Origin-specific).
 
-The config replaces every hardcoded Mathlib reference:
-- Source/output paths
-- Dissolution rules (regex patterns + reasons)
-- Import substitutions (strip Mathlib.X, add Origin.Core)
-- Tactic priority list
-- File skip patterns
+**Three-layer architecture:**
+
+```
+Layer 1: Generic Lean Optimizer
+         Any Lean project → shortest verified proofs
+         Axis 2 only — DRY
+
+Layer 2: Dissolution Config
+         Project-specific rules — what dissolves
+         Axis 1 — Origin's 17 typeclasses, or anyone else's equivalent
+
+Layer 3: Project Config
+         Paths, domain structure, imports
+         The specific application (Mathlib → Origin)
+```
 
 ```
 scripts/
@@ -285,9 +294,60 @@ scripts/
     README.md              — this file (the "show your work" file)
 ```
 
+### Config Format (the API)
+
+The config format is the API. Everything else is implementation. If
+the config format is right, the tool is extensible forever. Change
+the config, not the code.
+
+`ProjectConfig` in `origin3.py` — a Python dataclass:
+
+```python
+ProjectConfig(
+    # Paths — where to find source, where to write output
+    source_dir = Path("..."),
+    output_dir = Path("..."),
+    project_root = Path("..."),
+
+    # Axis 1: Dissolution rules — what dissolves
+    # Each rule: pattern (regex), scope (signature|name|file), label
+    dissolution_rules = [
+        {"pattern": r"\bNeZero\b", "scope": "signature", "label": "zero-management"},
+        {"pattern": r"^ne_zero$",  "scope": "name",      "label": "zero-management"},
+    ],
+
+    # Conflation rules — what assumes ground = zero
+    conflation_rules = [
+        {"pattern": r"MulZeroClass\b", "label": "ground=zero"},
+    ],
+
+    # File-level skip patterns — entire files that are infrastructure
+    skip_file_patterns = ["GroupWithZero", "NeZero", ...],
+
+    # Import substitutions
+    strip_imports = ["Mathlib.Algebra.GroupWithZero"],
+    add_imports = ["import Origin.Core"],
+
+    # Axis 2: Tactic priority for compression (tried in order)
+    tactics = ["by simp", "by omega", "by ring", "by decide",
+               "by aesop", "by norm_num", "by tauto"],
+
+    # Protected attributes — never compress, invisible dependencies
+    protected_attributes = ["@[simp", "@[ext", "@[aesop", ...],
+
+    # Parser directives
+    strip_commands = ["add_decl_doc ", "#align", ...],
+    passthrough_commands = ["set_option ", "attribute ", ...],
+)
+```
+
+`origin_config()` returns the Origin/Mathlib defaults. To use the
+tool on a different Lean project, write a different config function.
+The optimizer, sandbox, and audit don't change — only the config.
+
 **Three concerns, three locations:**
 - `CLAUDE.md` holds the philosophy
-- `origin2.py` holds the pipeline execution
+- `origin2.py` holds the Mathlib-specific reference
 - `compress/` holds the compression knowledge
 
 Each pattern is a class inheriting `CompressionPattern`:
