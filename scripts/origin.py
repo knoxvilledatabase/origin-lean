@@ -4,6 +4,7 @@ Origin — the toolkit for building Origin from Mathlib.
 
 Usage:
     python3 scripts/origin.py status                 PROGRESS REPORT
+    python3 scripts/origin.py dedup                  find duplicate definitions across Origin
     python3 scripts/origin.py list                  show all domains
     python3 scripts/origin.py audit <domain>        DRY audit one domain
     python3 scripts/origin.py audit --all           DRY audit all domains
@@ -409,6 +410,105 @@ def cmd_classify(path):
 
 
 # =============================================================================
+# Dedup — find duplicate definitions across Origin files
+# =============================================================================
+
+def cmd_dedup():
+    """Scan all Origin/*.lean files for duplicate definitions."""
+    decl_re = re.compile(
+        r"^\s*(?:@\[.*?\]\s*)?"
+        r"(def|theorem|structure|abbrev|inductive|class)\s+"
+        r"(\S+)"
+    )
+
+    # Collect all declarations with their bodies
+    declarations = []  # (name, kind, file, line, body)
+
+    for lean_file in sorted(ORIGIN.glob("*.lean")):
+        lines = lean_file.read_text(errors="replace").split("\n")
+        i = 0
+        while i < len(lines):
+            m = decl_re.match(lines[i])
+            if m:
+                kind, name = m.group(1), m.group(2)
+                # Collect body: from this line until next blank line or next decl
+                body_lines = [lines[i]]
+                j = i + 1
+                while j < len(lines):
+                    line = lines[j]
+                    if line.strip() == "" or line.startswith("--") and "====" in line:
+                        break
+                    if decl_re.match(line) and j > i + 1:
+                        break
+                    body_lines.append(line)
+                    j += 1
+                body = "\n".join(body_lines).strip()
+                declarations.append((name, kind, lean_file.name, i + 1, body))
+                i = j
+            else:
+                i += 1
+
+    ui.header("O R I G I N   D E D U P", "Find duplicate definitions across Origin files")
+
+    # 1. Exact name duplicates
+    from collections import defaultdict
+    name_groups = defaultdict(list)
+    for name, kind, fname, line, body in declarations:
+        # Strip namespace prefixes for comparison
+        short = name.split(".")[-1]
+        name_groups[short].append((name, kind, fname, line, body))
+
+    exact_dupes = {k: v for k, v in name_groups.items() if len(v) > 1}
+
+    if exact_dupes:
+        ui.phase("EXACT NAME DUPLICATES", f"{len(exact_dupes)} names appear in multiple files")
+        for short, entries in sorted(exact_dupes.items()):
+            print(f"\n    {ui.YELLOW}{short}{ui.RESET}")
+            for name, kind, fname, line, _ in entries:
+                print(f"      {kind:10s} {name:40s} {ui.DIM}{fname}:{line}{ui.RESET}")
+    else:
+        ui.ok("No exact name duplicates found")
+
+    # 2. Identical bodies (different names, same definition)
+    body_groups = defaultdict(list)
+    for name, kind, fname, line, body in declarations:
+        # Normalize: strip comments, collapse whitespace
+        normalized = re.sub(r"--.*", "", body)
+        normalized = re.sub(r"/\-.*?\-/", "", normalized, flags=re.DOTALL)
+        normalized = " ".join(normalized.split())
+        # Remove the declaration name to compare only the body
+        normalized = re.sub(r"^(def|theorem|structure|abbrev|inductive|class)\s+\S+", "", normalized)
+        normalized = normalized.strip()
+        if len(normalized) > 20:  # skip trivial one-liners
+            body_groups[normalized].append((name, kind, fname, line))
+
+    body_dupes = {k: v for k, v in body_groups.items() if len(v) > 1}
+
+    print()
+    if body_dupes:
+        ui.phase("IDENTICAL BODIES", f"{len(body_dupes)} definition bodies appear more than once")
+        for body_norm, entries in sorted(body_dupes.items(), key=lambda x: -len(x[1])):
+            print(f"\n    {ui.YELLOW}Body appears {len(entries)} times:{ui.RESET}")
+            for name, kind, fname, line in entries:
+                print(f"      {kind:10s} {name:40s} {ui.DIM}{fname}:{line}{ui.RESET}")
+            # Show a snippet of the body
+            snippet = body_norm[:80] + ("..." if len(body_norm) > 80 else "")
+            print(f"      {ui.DIM}→ {snippet}{ui.RESET}")
+    else:
+        ui.ok("No identical definition bodies found")
+
+    # Summary
+    print()
+    ui.separator()
+    total = len(declarations)
+    ui.stat("Total declarations", f"{total}")
+    ui.stat("Unique names", f"{len(name_groups)}")
+    ui.stat("Name duplicates", f"{ui.YELLOW}{len(exact_dupes)}{ui.RESET}" if exact_dupes else "0")
+    ui.stat("Body duplicates", f"{ui.YELLOW}{len(body_dupes)}{ui.RESET}" if body_dupes else "0")
+    print()
+
+
+# =============================================================================
 # Main
 # =============================================================================
 
@@ -421,6 +521,8 @@ def main():
 
     if cmd == "status":
         cmd_status()
+    elif cmd == "dedup":
+        cmd_dedup()
     elif cmd == "list":
         cmd_list()
     elif cmd == "audit":
