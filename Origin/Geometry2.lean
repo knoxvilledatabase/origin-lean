@@ -68,14 +68,12 @@ theorem restrict_some [Mul α] (F : PrimeIdeal α → Option α)
 -- 4. SCHEME MORPHISMS
 -- ============================================================================
 
-abbrev schemeMorphism (f : α → α) : Option α → Option α := Option.map f
-
 -- scheme_comp: composition pattern, cases v <;> simp. Derivable from Core.
 
 theorem affine_morphism [Mul α] (f : α → α)
     (h_mul : ∀ a b, f (a * b) = f a * f b) (a b : α) :
-    schemeMorphism f (some (a * b)) = some (f a * f b) := by
-  simp [schemeMorphism, h_mul]
+    Option.map f (some (a * b)) = some (f a * f b) := by
+  simp [h_mul]
 
 -- ============================================================================
 -- 5. PROJECTIVE SPACE
@@ -92,12 +90,9 @@ structure Chart (α : Type u) where
   invFun : α → α
   left_inv : ∀ a, invFun (toFun a) = a
 
-def chartMap (c : Chart α) : Option α → Option α := Option.map c.toFun
-def chartInv (c : Chart α) : Option α → Option α := Option.map c.invFun
-
 theorem chart_roundtrip (c : Chart α) (v : Option α) :
-    chartInv c (chartMap c v) = v := by
-  cases v <;> simp [chartMap, chartInv, c.left_inv]
+    Option.map c.invFun (Option.map c.toFun v) = v := by
+  cases v <;> simp [c.left_inv]
 
 -- tangent_map_comp: composition pattern, derivable from Core.
 

@@ -17,14 +17,7 @@ universe u
 variable {α : Type u}
 
 -- ============================================================================
--- 1. DIVISION: none absorbs, some computes
--- ============================================================================
-
-theorem div_none_right [Mul α] [Neg α] (n : Option α) :
-    n * (none : Option α) = none := by simp
-
--- ============================================================================
--- 2. GCD
+-- 1. GCD (binary lift — like liftBin₂)
 -- ============================================================================
 
 def optGcd (gcdF : α → α → α) : Option α → Option α → Option α
@@ -46,7 +39,7 @@ theorem optGcd_comm (gcdF : α → α → α)
   cases a <;> cases b <;> simp [optGcd, h]
 
 -- ============================================================================
--- 3. PRIMALITY
+-- 2. PRIMALITY
 -- ============================================================================
 
 def optIsPrime (primeP : α → Prop) : Option α → Prop
@@ -57,7 +50,7 @@ def optIsPrime (primeP : α → Prop) : Option α → Prop
     optIsPrime primeP (none : Option α) = False := rfl
 
 -- ============================================================================
--- 4. CONGRUENCE
+-- 3. CONGRUENCE
 -- ============================================================================
 
 def optCong (modF : α → α → α) (a b n : α) : Prop := modF a n = modF b n
@@ -72,20 +65,10 @@ theorem optCong_trans (modF : α → α → α) (a b c n : α)
     optCong modF a c n := hab.trans hbc
 
 -- ============================================================================
--- 5. LISTS
+-- 4. LISTS (binary lift for append, Option.map for the rest)
 -- ============================================================================
 
 variable {β : Type u}
-
-def optCons (a : α) : Option (List α) → Option (List α)
-  | some xs => some (a :: xs)
-  | none => none
-
-@[simp] theorem optCons_none (a : α) :
-    optCons a (none : Option (List α)) = none := rfl
-
-@[simp] theorem optCons_some (a : α) (xs : List α) :
-    optCons a (some xs) = some (a :: xs) := rfl
 
 def optAppend : Option (List α) → Option (List α) → Option (List α)
   | some xs, some ys => some (xs ++ ys)
@@ -105,38 +88,17 @@ theorem optAppend_assoc (xs ys zs : List α) :
     optAppend (some xs) (optAppend (some ys) (some zs)) := by
   simp [List.append_assoc]
 
-def optLength : Option (List α) → Option Nat
-  | some xs => some xs.length
-  | none => none
+theorem list_reverse_involutive (xs : List α) :
+    Option.map List.reverse (Option.map List.reverse (some xs)) = some xs := by
+  simp [List.reverse_reverse]
 
-@[simp] theorem optLength_none :
-    optLength (none : Option (List α)) = none := rfl
-
-@[simp] theorem optLength_some (xs : List α) :
-    optLength (some xs) = some xs.length := rfl
-
-def optReverse : Option (List α) → Option (List α)
-  | some xs => some xs.reverse
-  | none => none
-
-theorem optReverse_optReverse (xs : List α) :
-    optReverse (optReverse (some xs)) = some xs := by
-  simp [optReverse, List.reverse_reverse]
-
-def optListMap (f : α → β) : Option (List α) → Option (List β)
-  | some xs => some (xs.map f)
-  | none => none
-
-@[simp] theorem optListMap_none (f : α → β) :
-    optListMap f (none : Option (List α)) = none := rfl
-
-theorem optListMap_append (f : α → β) (xs ys : List α) :
-    optListMap f (optAppend (some xs) (some ys)) =
-    optAppend (optListMap f (some xs)) (optListMap f (some ys)) := by
-  simp [optListMap, optAppend, List.map_append]
+theorem listMap_append (f : α → β) (xs ys : List α) :
+    Option.map (List.map f) (optAppend (some xs) (some ys)) =
+    optAppend (Option.map (List.map f) (some xs)) (Option.map (List.map f) (some ys)) := by
+  simp [optAppend, List.map_append]
 
 -- ============================================================================
--- 6. SETS: predicates
+-- 5. SETS: predicates
 -- ============================================================================
 
 def optInjective (f : α → α) : Prop := ∀ a b, f a = f b → a = b
@@ -152,13 +114,7 @@ theorem bijective_comp (f g : α → α)
     exact ⟨a, by simp [Function.comp, ha, hb]⟩
 
 -- ============================================================================
--- 7. COMPLEX
--- ============================================================================
-
--- complexConj_involutive: involution pattern, derivable from Core.
-
--- ============================================================================
--- 8. EXTENDED NUMBER TYPES
+-- 6. EXTENDED NUMBER TYPES
 -- ============================================================================
 
 def optIsTop (topP : α → Prop) : Option α → Prop
@@ -169,11 +125,5 @@ def optIsBot (botP : α → Prop) : Option α → Prop
   | some a => botP a
   | none => False
 
--- ============================================================================
--- 9. PERMUTATION SIGN
--- ============================================================================
-
-def optPermSign (signF : α → α) : Option α → Option α := Option.map signF
-
-@[simp] theorem optPermSign_none (signF : α → α) :
-    optPermSign signF (none : Option α) = none := rfl
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.
+-- Option.map replaces optCons, optLength, optReverse, optListMap, optPermSign.

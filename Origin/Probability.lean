@@ -136,16 +136,7 @@ def klDivergence [Mul α]
 -- 9. MARKOV CHAINS
 -- ============================================================================
 
-/-- Transition: if current state is none, next state is none. -/
-def transition (transF : α → α) : Option α → Option α := Option.map transF
-
-theorem transition_none (transF : α → α) :
-    transition transF (none : Option α) = none := rfl
-
-theorem transition_some (transF : α → α) (a : α) :
-    transition transF (some a) = some (transF a) := rfl
-
-/-- n-step transition. -/
+/-- n-step transition: iterate Option.map. -/
 def nStepTransition (transF : α → α) : Nat → Option α → Option α
   | 0, v => v
   | n + 1, v => Option.map transF (nStepTransition transF n v)
