@@ -3,7 +3,8 @@
 Origin — the toolkit for building Origin from Mathlib.
 
 Usage:
-    python3 scripts/origin.py list                  show all domains + status
+    python3 scripts/origin.py status                 PROGRESS REPORT
+    python3 scripts/origin.py list                  show all domains
     python3 scripts/origin.py audit <domain>        DRY audit one domain
     python3 scripts/origin.py audit --all           DRY audit all domains
     python3 scripts/origin.py generate <domain>     draft Origin file from Mathlib
@@ -124,6 +125,74 @@ class Classifier:
 
 
 classifier = Classifier()
+
+
+# =============================================================================
+# Status — progress report: Origin vs Mathlib per domain
+# =============================================================================
+
+def cmd_status():
+    """Show Origin vs Mathlib line counts for every domain."""
+    domains = sorted(d.name.replace("Mathlib_", "")
+                     for d in EXTRACTED.iterdir()
+                     if d.is_dir() and d.name.startswith("Mathlib_")
+                     and d.name.replace("Mathlib_", "") not in SKIP_DOMAINS)
+
+    ui.header("O R I G I N   S T A T U S", "Origin vs Mathlib — every domain at a glance")
+
+    total_mathlib = 0
+    total_origin = 0
+    total_genuine = 0
+    rows = []
+
+    for dom in domains:
+        # Mathlib lines and genuine count
+        mathlib_dir = EXTRACTED / f"Mathlib_{dom}"
+        mathlib_lines = 0
+        genuine = 0
+        for f in mathlib_dir.rglob("*.lean"):
+            text = f.read_text(errors="replace")
+            mathlib_lines += len(text.split("\n"))
+            for line in text.split("\n")[:5]:
+                m = re.search(r'Genuine:\s*(\d+)', line)
+                if m:
+                    genuine += int(m.group(1))
+
+        # Origin lines
+        origin_lines = 0
+        for name in [f"{dom}.lean", f"{dom}2.lean"]:
+            p = ORIGIN / name
+            if p.exists():
+                origin_lines = len(p.read_text().split("\n"))
+                break
+
+        total_mathlib += mathlib_lines
+        total_origin += origin_lines
+        total_genuine += genuine
+
+        pct = (1 - origin_lines / max(mathlib_lines, 1)) * 100 if mathlib_lines else 0
+        rows.append((dom, mathlib_lines, genuine, origin_lines, pct))
+
+    # Print table
+    print(f"  {ui.BOLD}{'Domain':<24s} {'Mathlib':>10s} {'Genuine':>8s} {'Origin':>8s} {'Reduction':>10s}{ui.RESET}")
+    ui.separator()
+
+    for dom, ml, gen, ol, pct in rows:
+        # Color code: green if deep (origin > 200), yellow if sketch, dim if minimal
+        if ol > 200:
+            color = ui.GREEN
+        elif ol > 100:
+            color = ui.YELLOW
+        else:
+            color = ui.DIM
+        print(f"  {dom:<24s} {ml:>10,} {gen:>8,} {color}{ol:>8,}{ui.RESET} {pct:>9.1f}%")
+
+    ui.separator()
+    total_pct = (1 - total_origin / max(total_mathlib, 1)) * 100
+    print(f"  {ui.BOLD}{'TOTAL':<24s} {total_mathlib:>10,} {total_genuine:>8,} {ui.CYAN}{total_origin:>8,}{ui.RESET} {total_pct:>9.1f}%{ui.RESET}")
+    print()
+    ui.info(f"Green = deepened (>200 lines)  Yellow = sketch (100-200)  Dim = minimal (<100)")
+    print()
 
 
 # =============================================================================
@@ -350,7 +419,9 @@ def main():
 
     cmd = sys.argv[1]
 
-    if cmd == "list":
+    if cmd == "status":
+        cmd_status()
+    elif cmd == "list":
         cmd_list()
     elif cmd == "audit":
         if len(sys.argv) > 2:
