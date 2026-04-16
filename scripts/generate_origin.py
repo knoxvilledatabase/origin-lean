@@ -28,18 +28,25 @@ def main():
         return
 
     if sys.argv[1] == "--list":
+        # Meta/tooling domains — not mathematics, don't need sketches
+        SKIP_DOMAINS = {"Deprecated", "Lean", "Std", "Tactic", "Testing", "Util"}
+
         domains = sorted(d.name.replace("Mathlib_", "")
                          for d in EXTRACTED.iterdir()
                          if d.is_dir() and d.name.startswith("Mathlib_"))
         existing = {f.stem for f in ORIGIN.glob("*.lean")}
-        # Also check for "2" suffix variants
         existing.update(f.stem.rstrip("2") for f in ORIGIN.glob("*2.lean"))
 
-        print(f"\n  Available domains ({len(domains)}):\n")
-        for dom in domains:
+        math_domains = [d for d in domains if d not in SKIP_DOMAINS]
+        skip_domains = [d for d in domains if d in SKIP_DOMAINS]
+
+        print(f"\n  Math domains ({len(math_domains)}):\n")
+        for dom in math_domains:
             has_sketch = dom in existing or f"{dom}2" in {f.stem for f in ORIGIN.glob("*.lean")}
             marker = "  ✓" if has_sketch else "  ·"
             print(f"  {marker} {dom}")
+
+        print(f"\n  Skipped (tooling, not math): {', '.join(skip_domains)}")
         print(f"\n  ✓ = has sketch   · = needs sketch")
         return
 
