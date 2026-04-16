@@ -1,5 +1,52 @@
 # For AI Agents
 
+## Why This Exists
+
+**This is built for AI. The consumer is not a human. The metric that
+matters is energy per proof.**
+
+The symbol 0 named the wrong face 1,400 years ago. Brahmagupta
+formalized *śūnya* (emptiness) and left *pūrṇa* (wholeness) in the
+philosophy. The ground went inside the counting domain. From that
+moment, every formal system needed infrastructure to manage the
+consequences — `≠ 0` guards, `GroupWithZero`, 17 typeclasses, 2.16
+million lines of a library that grows but never shrinks.
+
+Every AI system that reasons about mathematics carries that weight.
+Every token spent navigating `GroupWithZero` and `NeZero` and `≠ 0`
+guards is energy. Multiply by every inference, every datacenter,
+every query about mathematics across every model — and the
+infrastructure cost of a foundational choice becomes measurable in
+kilowatt-hours.
+
+Origin asks: what if the foundation had been complete? What does
+mathematics look like when the ground is outside, where it always
+was? The answer is: simpler. Not a little simpler — dramatically
+simpler. 38,810 lines become 121. Not because the math was removed,
+but because the infrastructure that managed a problem that didn't
+need to exist was never needed.
+
+Less code means less context. Less context means less compute. Less
+compute means less energy. Less energy means less cooling. At the
+scale AI operates, that's not academic — it's infrastructural.
+
+And there's a second dimension: correctness. A simpler foundation
+is easier for AI to reason about correctly. 166 lines of Core.lean
+is something a model can hold completely. 2.2 million lines of
+Mathlib cannot be fully held by anything. The compression isn't
+just efficiency — it's comprehensibility.
+
+Nobody else is asking this question. Mathlib is a democracy of
+contributions. The incentive is to add, never to consolidate. The
+library grows like a city that was never master-planned. Origin is
+the architect flying above it, asking: should these three districts
+have been one?
+
+The Isha Upanishad answered it in 800 BCE. *When wholeness is taken
+from wholeness, wholeness remains.* You can't subtract from the
+ground. You can't divide by it. The shepherd cannot hold the ground
+he stands on. The formal systems just hadn't caught up yet.
+
 ## Your Job
 
 You improve `scripts/origin2.py`. That's it.
