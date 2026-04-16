@@ -76,8 +76,11 @@ Origin is the first global optimizer.
 
 **Two tools, two axes — don't merge them:**
 - The classifier (`origin.py classify`) is Axis 1: what dissolves.
-- The proof tester (`compress/proof_tester.py`) is Axis 2: how short.
-- Don't expand the classifier to handle DRY.
+  Complete. Don't expand it to handle DRY.
+- The proof tester (`compress/proof_tester.py`) is Axis 2: tests
+  whether `by simp` closes a proof against Core's simp set. Only
+  useful for Core-only scratch files (fast). Do NOT run it against
+  Mathlib imports — that rebuilds Mathlib and takes forever.
 
 **Answer:**
 - What are the two axes? Which is larger?
@@ -98,6 +101,12 @@ Every line earning its place. The Kolmogorov minimum.
 extracted Mathlib (that was Goal A — measurement, done). Write
 Origin files that import Core and build in under a second.
 
+If a theorem is derivable from Core but not stated in Origin, then
+every AI model that needs it has to derive it every time — every
+inference, every query, every datacenter. Multiply by millions of
+queries. That's compute, energy, cooling, water. Origin states every
+theorem once so no model ever re-derives it.
+
 **Two categories of Mathlib math:**
 - Category 1: Math where `none` being outside changes the expression.
   Origin re-expresses through Core.
@@ -107,23 +116,34 @@ Origin files that import Core and build in under a second.
 Both categories get restated. Category 1 changes the foundation.
 Category 2 changes the expression.
 
+**Four things survive across sessions:**
+1. The human — the architect, the solid-state memory
+2. The markdown — CLAUDE.md, compress/README.md
+3. The scripts — origin.py, compress/
+4. The Origin code — the production output
+
+Everything else is ephemeral. A brilliant insight that stays in your
+context window is worth exactly zero.
+
 **Answer:**
 - What is Goal B? Why not Goal A?
 - What are Category 1 and Category 2?
-- What four things survive across sessions?
-  (The human, the markdown, the scripts, the Origin code)
+- Why must every theorem be stated, not left for models to derive?
 
 ---
 
 ## Step 6: The tool
 
-One tool, five commands:
+One tool, seven commands:
 
 ```bash
 python3 scripts/origin.py status            # PROGRESS REPORT — run this first
-python3 scripts/origin.py list              # show all domains + status
+python3 scripts/origin.py list              # show all domains
+python3 scripts/origin.py index             # generate Origin/Index.lean (the dedup)
+python3 scripts/origin.py dedup             # find duplicate definitions (detailed)
+python3 scripts/origin.py audit <domain>    # DRY profile a Mathlib domain
 python3 scripts/origin.py audit --all       # DRY profile every domain
-python3 scripts/origin.py generate <domain> # draft Origin file (instant)
+python3 scripts/origin.py generate <domain> # draft Origin file from Mathlib
 python3 scripts/origin.py classify <domain> # show dissolved/genuine/conflates
 ```
 
@@ -134,45 +154,38 @@ python3 scripts/origin.py classify <domain> # show dissolved/genuine/conflates
 ```bash
 # 1. See where things stand (run this FIRST)
 python3 scripts/origin.py status
-# Green = deepened, Yellow = sketch, Dim = needs work
+# Green = deepened (>200 lines), Yellow = sketch, Dim = needs work
 
-# 2. Pick a domain to deepen (yellow or dim)
+# 2. Pick a yellow or dim domain to deepen
+#    Use: python3 scripts/origin.py classify <domain>
+#    to see what Mathlib has for that domain
 
-# 3. Generate a draft for a domain without a sketch (instant)
-python3 scripts/origin.py generate <DomainName>
-
-# 4. Rewrite the draft as Origin code:
-#    - Replace Mathlib types with Core + Lean stdlib types
-#    - Keep domain-specific definitions
+# 3. Deepen the sketch:
+#    - Read the extracted files in extracted/Mathlib_<domain>/
+#    - Add missing domain-specific definitions
 #    - Add demonstrations: by simp, cases <;> simp [h]
-#    - Remove everything derivable from Core
+#    - Keep every definition that any model might need
 #    - Import only Origin.Core
 
-# 5. Build (under 1 second — no Mathlib rebuild)
+# 4. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
 
-# 6. Generate and build the index (the dedup)
+# 5. Generate and build the index (the dedup)
 python3 scripts/origin.py index
 lake build Origin.Index
-# If collisions found: fix them, rebuild index
+# If collisions found: fix them, rebuild, index again
 
-# 7. Commit and push (only after build + index both pass)
+# 6. Commit and push (only after build + index both pass)
 ```
-
-**Both `lake build` and `index` must pass before every commit.**
-Build checks the code compiles. Index checks no two files export the
-same name — the compiler enforces uniqueness. If `lake build
-Origin.Index` passes, there are zero duplicates. Catching one
-collision when you create the file is one fix. Catching 14 at the
-end is a cleanup job.
-
-Proven on Probability: generator drafted 1,244 lines. Claude Code
-rewrote as 169 lines. `lake build` in under a second. 21,068 → 169
-(99.2% reduction).
 
 ---
 
 ## Step 8: The rules
+
+**Build + index must pass before every commit.** Build checks the
+code compiles. Index checks no two files export the same name — the
+compiler enforces uniqueness. If `lake build Origin.Index` passes,
+there are zero duplicates.
 
 **Don't add Origin-specific typeclasses.** Core.lean's instances ARE
 the class hierarchy. Lean's typeclass resolution IS the inheritance.
@@ -197,50 +210,6 @@ Philosophy → `CLAUDE.md`. Commit and push before your context closes.
 
 **Always confirm with the user between steps. They hold the
 architecture.** If it feels complex, stop and ask.
-
----
-
-## What's next
-
-**The sketches are the proof of concept. Full coverage is the
-destination.**
-
-If a theorem is derivable from Core but not stated in Origin, then
-every AI model that needs it has to derive it every time — every
-inference, every query, every datacenter. Multiply by millions of
-queries. That's compute, energy, cooling, water.
-
-If Origin states it once — one line, verified by Lean, stored forever
-— then every model just looks it up. Zero derivation cost. One proof,
-used by all, forever.
-
-**Origin should state every theorem that any model might need.** Not
-because the model can't derive it, but because deriving it millions
-of times wastes the exact resources Origin exists to save.
-
-The progression:
-
-1. **Sketches (done)** — proof of concept, ~10 concepts per domain
-2. **Deepen (current work)** — grow each domain toward full Mathlib
-   coverage, one theorem at a time, shortest proof each
-
-**The workflow for deepening:**
-
-```bash
-# 1. Pick the smallest domain first
-python3 scripts/origin.py audit Condensed
-
-# 2. Generate the full draft (instant)
-python3 scripts/origin.py generate Condensed
-
-# 3. Rewrite: Core imports only, shortest proofs, lake build
-# 4. Measure: 228 genuine Mathlib → how many Origin lines?
-# 5. Progress by size: Condensed → Control → ... → Algebra
-```
-
-Start small. Measure the ratio. Scale from there.
-
-**Always audit the foundation before stacking on top of it.**
 
 ---
 
