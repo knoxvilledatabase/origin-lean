@@ -151,16 +151,19 @@ python3 scripts/origin.py generate <DomainName>
 # 5. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
 
-# 6. Check for duplicates (seconds — run BEFORE committing)
-python3 scripts/origin.py dedup
-# If duplicates found: fix them, rebuild, dedup again
+# 6. Generate and build the index (the dedup)
+python3 scripts/origin.py index
+lake build Origin.Index
+# If collisions found: fix them, rebuild index
 
-# 7. Commit and push (only after build + dedup both pass)
+# 7. Commit and push (only after build + index both pass)
 ```
 
-**Both build and dedup must pass before every commit.** Build checks
-the code compiles. Dedup checks it's not duplicated. Catching one
-duplicate when you create the file is one fix. Catching 14 at the
+**Both `lake build` and `index` must pass before every commit.**
+Build checks the code compiles. Index checks no two files export the
+same name — the compiler enforces uniqueness. If `lake build
+Origin.Index` passes, there are zero duplicates. Catching one
+collision when you create the file is one fix. Catching 14 at the
 end is a cleanup job.
 
 Proven on Probability: generator drafted 1,244 lines. Claude Code
