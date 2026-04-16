@@ -78,6 +78,26 @@ The script must distinguish these. Pattern-matching on `≠ 0` alone
 is wrong. The question is: is this `≠ 0` protecting against origin
 (the ground) or constraining `some 0` (a measurement)?
 
+**You will try to delete `@[simp]` declarations.** Don't. `@[simp]`
+creates implicit dependencies — every proof that calls `simp` might
+depend on that lemma, but the dependency is invisible (no name
+reference in the proof text). The same applies to `@[ext]`, `@[aesop]`,
+`@[norm_cast]`, `@[to_additive]`, and any attribute that registers a
+lemma for tactic use. Name-based dependency guards can't detect these.
+This was learned the hard way: deleting `@[simp]` trivial proofs
+caused 716 build failures.
+
+**You will try to build complex infrastructure before proving the
+simple case.** Global dependency passes, two-pass extraction, protected
+name sets — these are Miller Straights. Start with one file, one
+deletion, does the build pass? Read `scripts/compress/README.md` for
+the progression model.
+
+**The 98.3% baseline is sacred.** Before compression, the pipeline
+passes 4,931 / 5,015 files. Any compression that drops below this
+means the compression is wrong, not that the pipeline needs more
+infrastructure. Fix the pattern, don't add complexity.
+
 **You will try to understand before acting.** Don't. Run the script.
 Read the report. Fix what's broken. Understanding comes from doing.
 
