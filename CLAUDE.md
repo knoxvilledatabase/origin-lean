@@ -105,37 +105,75 @@ pick it up and run.
 
 ### The Goal: Goal B
 
-We are replacing Mathlib's infrastructure layer, not compressing it.
+**Mathlib is the demo. Origin is production. For AI.**
 
-Goal A (compress extracted Mathlib files) was never the destination.
-It was measurement — proving how much is infrastructure. Answer:
-~91% of zero-management declarations dissolve. That measurement is
-done. The pipeline proved it.
+Mathlib proved the mathematics works. It was never designed to be a
+production system — it was designed to be correct and complete. Those
+are different goals. Mathlib was grown. Origin is designed.
 
-Goal B is the work: express every Mathlib domain using Core, without
-the 17 zero-management typeclasses, in minimum lines. The sketches
-show what this looks like. The metric is: same mathematics, minimum
-lines, build passes.
+Origin is a complete, independent restatement of Mathlib — the
+Kolmogorov minimum. Every theorem exists exactly once. Every proof is
+the shortest valid proof. Every line earns its place by expressing
+something no other line already expresses.
+
+Goal A (compress extracted Mathlib files) was measurement — proving
+how much is infrastructure. Answer: ~91% of zero-management
+declarations dissolve. That measurement is done. The pipeline proved
+it.
+
+Goal B is the work: restate everything Mathlib proves, from the
+ground up, in the absolute minimum lines. Not a patch. Not a
+compression. A replacement.
+
+**Two compression axes:**
+
+1. **The 17 typeclasses.** Zero-management infrastructure dissolves
+   when the ground is outside. `NeZero`, `GroupWithZero`, `≠ 0`
+   guards — all gone. This is Origin's thesis. Already proven.
+
+2. **DRY across all of Mathlib.** Independent of zero-management.
+   This is potentially *larger* than axis 1:
+   - 54,545 `rw` chains that `omega`/`simp`/`ring` close in one line
+   - `mul_comm` for `ℕ`, `ℤ`, `ℝ` — one generic version covers all
+   - Every `foo_nat`/`foo_int`/`foo_real` family that should be one
+     `foo [SomeClass α]`
+   - Every composition, involution, identity theorem that
+     `cases v <;> simp` already handles
+
+   Mathlib was never globally optimized. Nobody runs the optimizer.
+   Every `lemma foo_nat`, `lemma foo_int`, `lemma foo_real` that
+   should be one generic lemma is still three lemmas. Every 15-line
+   `rw` chain that `simp` could close in one line is still 15 lines.
+   Origin applies the global optimizer for the first time.
+
+When an AI system reasons about mathematics using Origin instead of
+Mathlib, it's working with less context to hold, less ambiguity about
+which version of a theorem applies, less energy per inference, and a
+foundation that was designed, not grown.
 
 The pipeline remains useful as a reference — it shows what Mathlib
-currently does so Origin knows what to replace. But the output is
-not the destination. The sketches are.
+currently does so Origin knows what to restate. The extracted
+`Mathlib_*` directories are the answer key. The sketches are the
+proof of concept. The full restatement is the work.
 
 **Two categories of Mathlib math:**
 
 - **Category 1:** Math where `none` being outside the domain changes
-  the expression. Origin re-expresses this. The sketch shows what it
-  looks like. KL divergence, field singularities, group homomorphisms
-  through Option — these are meaningful on `Option α`.
+  the expression. Origin re-expresses this through Core. KL
+  divergence, field singularities, group homomorphisms through
+  Option — these are meaningful on `Option α`.
 
 - **Category 2:** Clean Mathlib math with no infrastructure. No `≠ 0`
-  guards, no `GroupWithZero`, no zero-management. Origin imports and
-  uses it. Don't rewrite it. Hamming distance on Pi types, triangle
-  inequality, metric spaces — these are already clean.
+  guards, no `GroupWithZero`. Origin restates this in the most DRY
+  form possible — not copied verbatim, but re-expressed using Lean
+  4's full automation. One generic theorem, shortest proof, no
+  duplication.
+
+Both categories get restated. Category 1 changes the foundation.
+Category 2 changes the expression. Both compress.
 
 Before expanding any sketch, classify the domain content first. Each
-sketch file's header says which is which. The classification IS the
-work for domains where Category 2 dominates.
+sketch file's header says which is which.
 
 ### Read these files before doing anything
 
