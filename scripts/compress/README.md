@@ -532,14 +532,37 @@ What did the human keep? Definitions + demonstrations. What did
 they remove? Everything derivable from Core. The generator does the
 same thing mechanically.
 
+### Proven Workflow: Probability (2026-04-16)
+
+First domain written using the Generator → Claude Code → Build workflow:
+
+```
+Step 1: python3 scripts/lean_optimizer.py generate Probability
+        → 1,244 lines of raw Mathlib definitions (instant)
+
+Step 2: Claude Code rewrites as Origin
+        → 169 lines: definitions + demonstrations, Core imports only
+
+Step 3: lake build Origin.Probability
+        → builds in under 1 second
+
+Result: 21,068 → 169 lines (99.2% reduction)
+```
+
+The generator is a lookup tool. Claude Code is the writer. The human
+reviews and commits. This workflow produced a working Origin file in
+minutes, not hours.
+
 ### Roadmap to Full Automation (2026-04-16, corrected)
 
 **What's done:**
 - ✅ The audit command — profiles any domain's DRY opportunities
 - ✅ The classifier — identifies what dissolves vs what's genuine
 - ✅ The proof tester — tests `by simp` against Core's simp set (fast)
-- ✅ 14 sketches — proven compressed versions of 14 Mathlib domains
+- ✅ The generator — drafts Origin files from Mathlib domains (instant)
+- ✅ 15 sketches — proven compressed versions of 15 Mathlib domains
 - ✅ The pipeline — extracts and classifies at 98.3% pass rate
+- ✅ Proven workflow — Generator → Claude Code → Build (under 1 sec)
 
 **What's next:**
 
