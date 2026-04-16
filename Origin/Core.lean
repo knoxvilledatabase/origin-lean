@@ -79,6 +79,69 @@ instance [Zero α] : Zero (Option α) where
 @[simp] theorem neg_some [Neg α] (a : α) : -(some a : Option α) = some (-a) := rfl
 
 -- ============================================================================
+-- The Algebraic Laws: lifted through Option
+-- ============================================================================
+
+/-- Commutative law (addition). -/
+theorem option_add_comm [Add α] (h : ∀ a b : α, a + b = b + a)
+    (a b : Option α) : a + b = b + a := by
+  cases a <;> cases b <;> simp [h]
+
+/-- Commutative law (multiplication). -/
+theorem option_mul_comm [Mul α] (h : ∀ a b : α, a * b = b * a)
+    (a b : Option α) : a * b = b * a := by
+  cases a <;> cases b <;> simp [h]
+
+/-- Associative law (addition). none is the identity — passes through cleanly. -/
+theorem option_add_assoc [Add α] (h : ∀ a b c : α, a + b + c = a + (b + c))
+    (a b c : Option α) : a + b + c = a + (b + c) := by
+  cases a <;> cases b <;> cases c <;> simp [h]
+
+/-- Associative law (multiplication). none absorbs at every position. -/
+theorem option_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
+    (a b c : Option α) : a * b * c = a * (b * c) := by
+  cases a <;> cases b <;> cases c <;> simp [h]
+
+/-- Distributive law. The most beautiful lift:
+    none * (b + c) = none = none + none = none * b + none * c -/
+theorem option_distrib [Add α] [Mul α]
+    (h : ∀ a b c : α, a * (b + c) = a * b + a * c)
+    (a b c : Option α) : a * (b + c) = a * b + a * c := by
+  cases a <;> cases b <;> cases c <;> simp [h]
+
+/-- Right distributive law. -/
+theorem option_distrib_right [Add α] [Mul α]
+    (h : ∀ a b c : α, (a + b) * c = a * c + b * c)
+    (a b c : Option α) : (a + b) * c = a * c + b * c := by
+  cases a <;> cases b <;> cases c <;> simp [h]
+
+/-- Inverse law (addition). THIS IS WHY OPTION ISN'T A RING.
+    some a + -(some a) = some (a + (-a)), NOT none.
+    Cancellation stays in the counting domain. The zero measurement
+    is not the ground. -/
+theorem option_add_neg [Add α] [Neg α]
+    (zero : α) (h : ∀ a : α, a + (-a) = zero) (a : α) :
+    (some a : Option α) + -(some a) = some zero := by
+  simp [h]
+
+/-- Negation distributes over addition. -/
+theorem option_neg_add [Add α] [Neg α]
+    (h : ∀ a b : α, -(a + b) = -a + -b)
+    (a b : Option α) : -(a + b) = -a + -b := by
+  cases a <;> cases b <;> simp [h]
+
+/-- Multiplication by negation. -/
+theorem option_mul_neg [Mul α] [Neg α]
+    (h : ∀ a b : α, a * (-b) = -(a * b))
+    (a b : Option α) : a * (-b) = -(a * b) := by
+  cases a <;> cases b <;> simp [h]
+
+/-- Negation is an involution. -/
+theorem option_neg_neg [Neg α]
+    (h : ∀ a : α, -(-a) = a) (a : Option α) : -(-a) = a := by
+  cases a <;> simp [h]
+
+-- ============================================================================
 -- Cross-Type Lift (for physics, tensors)
 -- ============================================================================
 
