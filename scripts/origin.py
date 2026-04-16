@@ -714,6 +714,61 @@ def cmd_stub(domain):
 
 STUB_RE = re.compile(r'^\s*def\s+\S+\s*:\s*Prop\s*:=\s*True\s*$')
 
+# Tier 1: structures, classes, inductives, defs, abbrevs in Mathlib.
+# These define types and computations — stubs hiding them are the worst.
+# A model needs the actual type shape, not `Prop := True`.
+#
+# Tier 2: theorems and lemmas. `Prop := True` reserves the name.
+# The real proof is better, but the name reservation has value.
+TIER1_KINDS = {"structure", "class", "inductive", "def", "abbrev"}
+TIER2_KINDS = {"theorem", "lemma"}
+
+
+def _build_mathlib_kind_map(domain):
+    """Build a map from stub_name -> mathlib_kind for a domain.
+
+    Scans the extracted Mathlib files for the domain, collects
+    genuine declarations, and maps their stub names to their kinds.
+    """
+    d = EXTRACTED / f"Mathlib_{domain}"
+    if not d.exists():
+        return {}
+
+    mathlib_decl_re = re.compile(
+        r'^(?:.*?)?(private\s+|protected\s+)?(noncomputable\s+)?'
+        r'(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)')
+
+    kind_map = {}  # stub_name -> kind
+    for f in sorted(d.rglob("*.lean")):
+        text = f.read_text(errors="replace")
+        for line in text.split("\n"):
+            m = mathlib_decl_re.match(line.strip())
+            if m:
+                kind, name = m.group(3), m.group(4)
+                ctx = text[text.find(line):text.find(line) + 500]
+                label = classifier.classify(kind, name, ctx)
+                if label == "genuine":
+                    stub = _stub_name(name)
+                    if stub and stub not in kind_map:
+                        kind_map[_normalize_lean_name(stub)] = kind
+    return kind_map
+
+
+def _collect_stubs(filepath):
+    """Collect stub names from an Origin file.
+
+    Returns a list of normalized stub names.
+    """
+    stubs = []
+    for line in filepath.read_text(errors="replace").split("\n"):
+        if "private " in line:
+            continue
+        if STUB_RE.match(line):
+            m = ORIGIN_DECL_RE.match(line)
+            if m:
+                stubs.append(_normalize_lean_name(m.group(2)))
+    return stubs
+
 
 def _count_quality(filepath):
     """Count stubs vs real declarations in an Origin file.
@@ -735,62 +790,102 @@ def _count_quality(filepath):
 
 
 def cmd_quality(domain=None):
-    """Show stub vs real declaration counts per domain."""
+    """Show stub vs real declaration counts per domain, with tier breakdown."""
     skip = {"Index", "Test", "Physics"}
 
-    # Collect per-file stats
-    stats = []  # (domain_name, total, stubs, real, lines)
+    # Map domain stems to extracted domain names
+    stem_to_domain = {}
+    for d in EXTRACTED.iterdir():
+        if d.is_dir() and d.name.startswith("Mathlib_"):
+            dname = d.name.replace("Mathlib_", "")
+            if dname not in SKIP_DOMAINS:
+                stem_to_domain[dname] = dname
+                stem_to_domain[dname + "2"] = dname
+
+    # Collect per-file stats with tier info
+    stats = []  # (domain_name, stem, total, stubs, real, t1_stubs, t2_stubs)
     for f in sorted(ORIGIN.glob("*.lean")):
         if f.stem in skip or f.stem == "Core":
             continue
         total, stubs, real = _count_quality(f)
-        line_count = sum(1 for _ in f.read_text(errors="replace").split("\n"))
-        # Derive domain name (strip trailing "2" for display)
+
+        # Determine the Mathlib domain for this file
+        mathlib_domain = stem_to_domain.get(f.stem)
+        t1_stubs = 0
+        t2_stubs = 0
+        unknown_stubs = 0
+
+        if mathlib_domain and stubs > 0:
+            kind_map = _build_mathlib_kind_map(mathlib_domain)
+            stub_names = _collect_stubs(f)
+            for sname in stub_names:
+                mk = kind_map.get(sname, "")
+                if mk in TIER1_KINDS:
+                    t1_stubs += 1
+                elif mk in TIER2_KINDS:
+                    t2_stubs += 1
+                else:
+                    unknown_stubs += 1
+        else:
+            unknown_stubs = stubs
+
         dname = f.stem.rstrip("2") if f.stem.endswith("2") and f.stem != "2" else f.stem
-        stats.append((dname, f.stem, total, stubs, real, line_count))
+        stats.append((dname, f.stem, total, stubs, real, t1_stubs, t2_stubs))
 
     # Filter to one domain if requested
     if domain:
-        stats = [(d, s, t, st, r, l) for d, s, t, st, r, l in stats
+        stats = [(d, s, t, st, r, t1, t2) for d, s, t, st, r, t1, t2 in stats
                  if d == domain or s == domain]
         if not stats:
             ui.fail(f"Not found: {domain}")
             return
 
     # Totals
-    t_total = sum(t for _, _, t, _, _, _ in stats)
-    t_stubs = sum(st for _, _, _, st, _, _ in stats)
-    t_real = sum(r for _, _, _, _, r, _ in stats)
+    t_total = sum(t for _, _, t, _, _, _, _ in stats)
+    t_stubs = sum(st for _, _, _, st, _, _, _ in stats)
+    t_real = sum(r for _, _, _, _, r, _, _ in stats)
+    t_t1 = sum(t1 for _, _, _, _, _, t1, _ in stats)
+    t_t2 = sum(t2 for _, _, _, _, _, _, t2 in stats)
 
-    pct = t_real / max(t_total, 1) * 100
-    ui.header("Q U A L I T Y", f"{t_real} real / {t_total} total ({pct:.0f}% real)")
+    ui.header("Q U A L I T Y",
+              f"{t_real} real / {t_total} total — {t_t1} Tier 1 stubs remaining")
 
-    print(f"  {'Domain':<26s} {'Total':>6s} {'Real':>6s} {'Stubs':>6s} {'Real%':>6s}")
+    print(f"  {'Domain':<22s} {'Total':>6s} {'Real':>6s} "
+          f"{ui.BOLD}{'T1':>5s}{ui.RESET} {'T2':>5s} {'Real%':>6s}")
     ui.separator()
 
-    for dname, stem, total, stubs, real, line_count in stats:
+    for dname, stem, total, stubs, real, t1, t2 in stats:
         rpct = real / max(total, 1) * 100
-        # Color: green if >80% real, yellow if >20%, red otherwise
         if rpct >= 80:
             color = ui.GREEN
         elif rpct >= 20:
             color = ui.YELLOW
         else:
             color = ui.RED
-        print(f"  {dname:<26s} {total:>6d} {color}{real:>6d}{ui.RESET} {stubs:>6d} {color}{rpct:>5.0f}%{ui.RESET}")
+        t1_str = f"{ui.RED}{t1:>5d}{ui.RESET}" if t1 > 0 else f"{ui.GREEN}{'0':>5s}{ui.RESET}"
+        print(f"  {dname:<22s} {total:>6d} {color}{real:>6d}{ui.RESET} "
+              f"{t1_str} {t2:>5d} {color}{rpct:>5.0f}%{ui.RESET}")
 
     ui.separator()
-    print(f"  {'TOTAL':<26s} {t_total:>6d} {ui.GREEN}{t_real:>6d}{ui.RESET} {t_stubs:>6d} {pct:>5.0f}%")
+    t1_color = ui.RED if t_t1 > 0 else ui.GREEN
+    print(f"  {'TOTAL':<22s} {t_total:>6d} {ui.GREEN}{t_real:>6d}{ui.RESET} "
+          f"{t1_color}{t_t1:>5d}{ui.RESET} {t_t2:>5d} {t_real / max(t_total,1) * 100:>5.0f}%")
+    print()
+
+    print(f"  {ui.BOLD}T1{ui.RESET} = structure/class/inductive/def/abbrev stubs "
+          f"(need real types) — {ui.RED}{t_t1}{ui.RESET}")
+    print(f"  {ui.BOLD}T2{ui.RESET} = theorem/lemma stubs "
+          f"(name reserved, proof optional) — {t_t2}")
+    print(f"  {ui.BOLD}Finish line:{ui.RESET} T1 = 0")
     print()
 
     if not domain:
-        # Show domains most in need of upgrading (most stubs, some real)
-        by_stubs = sorted(stats, key=lambda x: x[3], reverse=True)
-        needs_work = [(d, st, r) for d, _, _, st, r, _ in by_stubs if st > 0][:5]
+        by_t1 = sorted(stats, key=lambda x: x[5], reverse=True)
+        needs_work = [(d, t1, r) for d, _, _, _, r, t1, _ in by_t1 if t1 > 0][:5]
         if needs_work:
-            print(f"  {ui.BOLD}Most stubs to upgrade:{ui.RESET}")
-            for dname, stubs, real in needs_work:
-                print(f"    {dname:<26s} {stubs:>6d} stubs, {real:>3d} real")
+            print(f"  {ui.BOLD}Most Tier 1 stubs to upgrade:{ui.RESET}")
+            for dname, t1, real in needs_work:
+                print(f"    {dname:<22s} {ui.RED}{t1:>5d}{ui.RESET} T1 stubs, {real:>4d} real")
             print()
 
 
