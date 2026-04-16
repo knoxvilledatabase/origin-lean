@@ -79,12 +79,6 @@ theorem curry (v : Option Bool) (hv : v.map (fun b => (!b) || false) = v) :
 -- With Option: if the sentence is none, the result is none.
 -- Option.map f none = none. Already in the standard library.
 
-theorem eval_none {α β : Type u} (f : α → β) :
-    Option.map f (none : Option α) = none := rfl
-
-theorem eval_some {α β : Type u} (f : α → β) (a : α) :
-    Option.map f (some a) = some (f a) := rfl
-
 -- Conjunction: both must be well-formed.
 def conj (p q : Option Bool) : Option Bool :=
   match p, q with

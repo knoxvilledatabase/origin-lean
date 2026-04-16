@@ -65,8 +65,6 @@ theorem condProb_some [Mul α] (pAB : α) (pB : α) (invF : α → α) :
 /-- Two events are independent if P(A ∩ B) = P(A) · P(B). -/
 def AreIndependent [Mul α] (pA pB pAB : α) : Prop := pAB = pA * pB
 
-theorem independent_product [Mul α] (pA pB : α) :
-    (some pA : Option α) * some pB = some (pA * pB) := by simp
 
 -- ============================================================================
 -- 4. RANDOM VARIABLES

@@ -70,9 +70,6 @@ def IsProbabilityMeasure (μ : S → Option α) (total : S) (one : α) : Prop :=
 
 def AreIndependent [Mul α] (pA pB pAB : α) : Prop := pAB = pA * pB
 
-theorem independent_product [Mul α] (pA pB : α) :
-    (some pA : Option α) * some pB = some (pA * pB) := by simp
-
 -- ============================================================================
 -- 6. MARTINGALES
 -- ============================================================================
@@ -80,15 +77,5 @@ theorem independent_product [Mul α] (pA pB : α) :
 def IsMartingale (X : Nat → Option α) (ceF : Nat → α → α) : Prop :=
   ∀ n a, X n = some a → Option.map (ceF n) (X (n + 1)) = some a
 
--- ============================================================================
--- 7. ENTROPY
--- ============================================================================
-
-def klDivergence [Mul α] : Option α → Option α → Option α :=
-  fun a b => a * b
-
-theorem kl_none_left [Mul α] (b : Option α) :
-    klDivergence (none : Option α) b = none := by simp [klDivergence]
-
-theorem kl_some [Mul α] (a b : α) :
-    klDivergence (some a) (some b) = some (a * b) := by simp [klDivergence]
+-- KL divergence is multiplication on Option: just use * from Core.
+-- None absorbs (mul, add): Core.lean's @[simp] set handles all cases.
