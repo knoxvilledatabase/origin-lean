@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import Origin.Foundation
+import Origin.Core
 
 /-!
 # Origin Logic: Option α Is Sufficient
@@ -20,21 +20,7 @@ are all instances.
 
 universe u
 
--- ============================================================================
--- The No-Some-Fixed-Point Theorem
--- ============================================================================
-
-/-- If f has no fixed point on α, the only fixed point of Option.map f
-    on Option α is none — which is the ground, not a value.
-
-    The formal system can't hold its own ground. The shepherd can't
-    hold the ground he stands on. The algebra proves it. -/
-theorem no_some_fixed_point {α : Type u}
-    (f : α → α) (hf : ∀ a : α, f a ≠ a)
-    (v : Option α) (hv : v.map f = v) : v = none := by
-  cases v with
-  | none => rfl
-  | some a => simp [Option.map] at hv; exact absurd hv (hf a)
+-- no_some_fixed_point is in Core.lean
 
 -- ============================================================================
 -- The Liar Paradox

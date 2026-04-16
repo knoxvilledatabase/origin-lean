@@ -18,27 +18,15 @@ universe u
 variable {α : Type u}
 
 -- ============================================================================
--- 1. COMPOSITION = multiplication
--- ============================================================================
-
-theorem comp_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
-
--- ============================================================================
--- 2. FUNCTORS
+-- 1. FUNCTORS
 -- ============================================================================
 
 def IsFunctor (F : Option α → Option α)
     (h_none : F none = none) : Prop :=
   ∀ v : Option α, v = none → F v = none
 
-theorem functor_comp (F : α → α) (G : α → α) (v : Option α) :
-    Option.map F (Option.map G v) = Option.map (F ∘ G) v := by
-  cases v <;> simp
-
 -- ============================================================================
--- 3. ADJUNCTIONS
+-- 2. ADJUNCTIONS
 -- ============================================================================
 
 def IsAdjunction (F G : Option α → Option α)
@@ -67,28 +55,7 @@ def IsAbelian (kernelF cokernelF : α → α) : Prop :=
 -- 6. MONOIDAL: associator and unitor from * instances
 -- ============================================================================
 
-theorem monoidal_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) :
-    a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
-
--- ============================================================================
--- 7. YONEDA
--- ============================================================================
-
-theorem yoneda_comp (f g : α → α) (v : Option α) :
-    Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
-  cases v <;> simp
-
--- ============================================================================
--- 8. NONE ABSORBS: the categorical ground
--- ============================================================================
-
-theorem cat_none_left [Mul α] (b : Option α) :
-    (none : Option α) * b = none := by simp
-
-theorem cat_none_right [Mul α] (a : Option α) :
-    a * (none : Option α) = none := by simp
-
-theorem cat_some_comp [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
+-- Associativity lifts: cases a <;> cases b <;> cases c <;> simp [h]
+-- Composition lifts: cases v <;> simp
+-- None absorbs: Core.lean's @[simp] mul_none_left, mul_none_right
+-- All derivable from Core. No declarations needed.

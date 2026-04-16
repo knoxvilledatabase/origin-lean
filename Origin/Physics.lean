@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import Origin.Foundation
+import Origin.Core
 
 /-!
 # Origin Physics: Option α Is Sufficient
@@ -58,29 +58,7 @@ structure Quantity (d : Dim) (α : Type u) where
   val : α
 
 -- ============================================================================
--- The Only Infrastructure: Cross-Type Lift (4 lines)
--- ============================================================================
-
-def liftBin₂ {α β γ : Type u} (f : α → β → γ) : Option α → Option β → Option γ
-  | none, _        => none
-  | _, none        => none
-  | some a, some b => some (f a b)
-
--- ============================================================================
--- Simp Set
--- ============================================================================
-
-@[simp] theorem liftBin₂_none_left {α β γ : Type u} (f : α → β → γ) (b : Option β) :
-    liftBin₂ f none b = none := by cases b <;> rfl
-
-@[simp] theorem liftBin₂_none_right {α β γ : Type u} (f : α → β → γ) (a : Option α) :
-    liftBin₂ f a none = none := by cases a <;> rfl
-
-@[simp] theorem liftBin₂_some {α β γ : Type u} (f : α → β → γ) (a : α) (b : β) :
-    liftBin₂ f (some a) (some b) = some (f a b) := rfl
-
--- ============================================================================
--- Cross-Dimensional Operations
+-- Cross-Dimensional Operations (using liftBin₂ from Core)
 -- ============================================================================
 
 variable {α : Type u}

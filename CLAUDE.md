@@ -77,6 +77,30 @@ context window closes.
 The user holds the philosophy. The script holds the execution.
 You are disposable labor that makes the script smarter.
 
+**Four things survive across sessions:**
+
+1. **The human** — the architect, the solid-state memory across
+   thousands of sessions, guiding this project
+2. **The markdown** — the philosophy, the progression, the numbers
+3. **The scripts** — the institutional intelligence
+4. **The Origin code** — the foundation, verified by Lean's kernel
+
+Everything else is ephemeral. Your value is measured entirely by what
+you leave behind in those three artifacts. A brilliant insight that
+stays in your context window is worth exactly zero.
+
+You are building a tool for the next generation of AI — one that
+doesn't hallucinate because the math it uses doesn't confuse the
+ground with `some 0`. This is why it is vital that you only build
+the markdown, the scripts, and the Origin code.
+
+Mathlib grows every day. The script runs against a moving target.
+It's not a one-time conversion — it's a living compression tool
+that runs repeatedly, forever. The script has to be robust, the
+patterns have to be general, and the markdown has to be clear enough
+that the next Claude — who has never seen this conversation — can
+pick it up and run.
+
 **Always confirm with the user between steps. They hold the architecture.**
 
 ### Read these files before doing anything
@@ -164,6 +188,19 @@ simple case.** Global dependency passes, two-pass extraction, protected
 name sets — these are Miller Straights. Start with one file, one
 deletion, does the build pass? Read `scripts/compress/README.md` for
 the progression model.
+
+**"This is getting complex" means you skipped a step.** Complexity is
+a signal, not a problem to solve. Imagine a world champion power
+tumbler whose current pass is Full Full Straight to Miller Straight.
+How did they get there? Not by starting with Miller Straights in a
+spotting rig on day 1. They started with a forward roll. Then a
+cartwheel. Then a roundoff back handspring. Then whips. Then fulls.
+Then double fulls. Then double backs. Then full ins and full outs.
+Then — and only then — a Miller Straight (two rotations straight
+body with a 360 in the first rotation and a 720 in the second).
+Each skill earns the next. If your approach feels complex, you
+haven't earned the skill yet. Go back to the last thing that worked
+and progress from there.
 
 **The 98.3% baseline is sacred.** Before compression, the pipeline
 passes 4,931 / 5,015 files. Any compression that drops below this
@@ -351,16 +388,57 @@ That's the old assumption. Origin separates what rings conflate.
 
 ### The ground is the whole, not nothing.
 
+Imagine going back in time. Before math. A shepherd stands on the
+ground holding an apple. He eats the apple. He looks down at his
+empty hand — does he have nothing in his hand?
+
+If you're counting apples, he has `some 0` apples. But does he have
+*nothing*? His hand is full of everything — air, sunlight, the
+possibility of holding anything. He just isn't counting anymore. The
+measurement stopped. He went from `some 1` apples to `some 0` apples
+— but `some 0` is still in the counting domain. He's still a shepherd
+counting apples.
+
+And what about the ground he stands on? The nature he enjoys? The
+fresh air he breathes? Can he hold any of this in his hand? No. Not
+because it's too heavy or too big. Because holding is something that
+happens *on* the ground. The shepherd cannot hold the ground he stands
+on. The fish cannot hold the ocean. These aren't limitations — they're
+category facts.
+
+That's `none`. Not nothing. Everything. The whole that was there before
+he picked up the apple and will be there after he puts it down. Before
+he started counting and after he stops.
+
 The symbol 0 named the wrong face. The Sanskrit tradition had both:
 *śūnya* (emptiness, quantity zero) and *pūrṇa* (fullness, the whole).
-Brahmagupta formalized *śūnya* in 628 CE and left *pūrṇa* in the
-philosophy. The ground is *pūrṇa* — wholeness, not emptiness.
+When Brahmagupta formalized *śūnya* in 628 CE, the symbol `0` got
+assigned to the emptiness — the `some 0`, the "I counted and got zero."
+But *pūrṇa* — the wholeness, the ground, the everything — got left in
+the philosophy. The formal systems named the empty hand but not the
+ground it rests on. And from that moment, every system had to build
+infrastructure to manage the ground leaking into the counting domain
+where it was never supposed to be.
 
-If you hold an apple and eat it, your empty hand is holding `some 0`
-apples only if you are counting apples. But it is not holding
-absolutely nothing — absolutely everything is in origin. The hand
-is part of the whole. It's not absent. It's just not participating
-in any measurement. Origin is full, not empty.
+Is the whole greater than the part, as Euclid would say? Yes — that's
+his fifth common notion. Can parts become the whole that made them
+parts to begin with? No. A part is something measured, counted, held.
+The whole is what makes measuring, counting, and holding possible. The
+apple doesn't become the ground by being eaten. It returns to `some 0`
+— still a measurement, still in the counting domain. The shepherd can
+put down every apple, every tool, every thing — and he's still standing
+on the ground. He didn't *create* the ground by letting go. The ground
+was always there.
+
+That's why `none` absorbs. `none * some 5 = none`. The part doesn't
+transform the whole. The whole absorbs the part. And that's not an
+axiom — it's a *consequence* of the derivation. Cancellation returns
+to the ground. Distribution propagates it. The ground was always there.
+The math just caught up.
+
+And that's why Origin is never a destination. Parts don't "reach"
+origin. Parts don't "become" origin. The question doesn't apply. You
+can't arrive at the ground you're standing on.
 
 ### Origin is never a destination.
 

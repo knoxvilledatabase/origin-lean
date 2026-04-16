@@ -293,6 +293,31 @@ reference by name.
 4. Run `python3 scripts/origin2.py run`
 5. Update this file with before/after numbers
 
+## Foundation Audit (2026-04-16)
+
+Before adding compression patterns, we audited whether Core.lean's
+simp set already handles common sketch patterns. Tested in a scratch
+file, `lake build` confirmed.
+
+**Finding:** Three patterns that appear 17+ times across sketches all
+close with `cases v <;> simp [h]` from Core.lean's existing simp set.
+No additions to Core needed.
+
+| Pattern | Proof | Sketch occurrences |
+|---------|-------|--------------------|
+| `Option.map f (Option.map g v) = Option.map (f ∘ g) v` | `cases v <;> simp` | 11 (7 sketches) |
+| `Option.map id v = v` | `cases v <;> simp` | 2 |
+| `Option.map f (Option.map f v) = v` given `∀ a, f (f a) = a` | `cases v <;> simp [h]` | 6 (5 sketches) |
+
+These sketch theorems are redundant — they restate what Core already
+derives. Trimming them is the first measured compression of the sketches.
+
+### Sketch trimming results (2026-04-16)
+
+| Sketch | Before | After | Removed | Reduction |
+|--------|--------|-------|---------|-----------|
+| CategoryTheory | 94 | 61 | 33 | 35% |
+
 ## Active Patterns
 
 ### 1. `core_trivial_proof` (Layer 1)

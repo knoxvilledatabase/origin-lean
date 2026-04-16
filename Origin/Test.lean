@@ -1,7 +1,7 @@
 /-
 Released under MIT license.
 -/
-import Origin.Foundation
+import Origin.Core
 
 /-!
 # Origin Test: Option Int
