@@ -47,6 +47,51 @@ The answer to "what is the absolute least number of lines" is the
 number you get when every declaration exists exactly once and nothing
 is repeated at any level of the stack.
 
+## The Foundation Already Mastered
+
+Before compression begins, these levels were completed and proven.
+**If compression breaks something at these levels, the compression
+is wrong — not the foundation.** Go back and fix the compression.
+
+### Level 1: Core.lean (DONE)
+The `origin` theorem, instances for `*` `+` `-` on `Option α`, the
+`@[simp]` set, `liftBin₂`, `no_some_fixed_point`. 166 lines. The
+entire algebraic foundation.
+
+### Level 2: Parser (DONE — origin2.py)
+Reads Mathlib files into blocks. Handles all major Lean 4 syntax:
+alias, notation, macro, syntax, elab, infixl/r, prefix, postfix,
+library_note, set_option ... in, #adaptation_note, nested comments,
+deprecated aliases. `expected token` errors: 824 → 2.
+
+### Level 3: Classifier (DONE — origin2.py)
+Distinguishes ground guards from measurement constraints. `≠ 0` in
+a field theory theorem is genuine math about `some 0`. `NeZero` and
+`GroupWithZero` in a signature are infrastructure. INFRA_NAMES anchored
+with word boundaries. INFRA_SIG word-bounded. 5,713 → 260 dissolved.
+
+### Level 4: Dependency resolver (DONE — origin2.py)
+Within-file: if a genuine proof references a dissolved declaration,
+un-dissolve it. Iterates to stability. Checks all block types.
+762+ declarations rescued.
+
+### Level 5: Extraction pipeline (DONE — origin2.py)
+98.3% pass rate. 4,931 / 5,015 files build clean. 84 remaining
+(13 Tactic metaprogramming, 71 cross-file cascade). `noncomputable
+section` on all extracted files. Parallel build across 10 cores.
+
+### Level 6: The sketches (DONE — hand-written)
+15 Origin domain files import Core.lean and build clean. These ARE
+the compressed versions. Written by the human to be maximally DRY.
+They prove compression works at the single-domain level.
+
+```
+GroupTheory:   1,140 → 121 lines (89% compression)
+Combinatorics: 1,349 → 105 lines (92%)
+CategoryTheory: 1,069 → 93 lines (91%)
+FieldTheory:     831 → 95 lines (89%)
+```
+
 ## The Progression: Cartwheels Before Miller Straights
 
 **Read this before writing any compression code.**
@@ -56,34 +101,42 @@ A world champion power tumbler doesn't start with a Miller Straight
 cartwheel, then a roundoff back handspring, then whips, then fulls,
 then doubles, building up over years. Each skill earns the next.
 
-The compression has the same structure. **The sketches are the
-cartwheels and handsprings.** The 15 hand-written Origin domain files
-(`Algebra.lean`, `Analysis.lean`, etc.) already import `Core.lean`
-and build clean. They ARE the compressed versions — written by the
-human to be maximally DRY.
+**The sketches are the cartwheels and handsprings.** They're already
+done. They prove the move is real. The compression work is encoding
+what the sketches already demonstrate into patterns the script can
+apply to ALL of Mathlib, not just the curated examples.
 
 **Don't invent compression patterns from scratch.** Reverse-engineer
 them from the sketches. What did the human do to turn 1,140 lines of
 Mathlib GroupTheory into 121 lines of `GroupTheory.lean`? That's the
 pattern. Encode it.
 
-The progression:
+### The progression for each new compression pattern:
+
 1. **Study one sketch** — read it, understand what makes it short
-2. **Compare to its Mathlib_ counterpart** — what was removed, what was rewritten
-3. **Identify the pattern** — is it deletion? tactic replacement? generalization?
+2. **Compare to its Mathlib_ counterpart** — what was removed, what
+   was rewritten, what was generalized
+3. **Identify the pattern** — is it deletion? tactic replacement?
+   lemma consolidation? generalization?
 4. **Encode the pattern** — add a class to `patterns.py`
 5. **Test on one file** — does the build pass?
 6. **Test on one domain** — does the domain pass?
 7. **Test on all domains** — does everything pass?
 8. **Measure the line count** — how many lines did this pattern save?
 
-Each step earns the next. No global dependency passes until single-file
-deletion is proven. No two-pass pipelines until single-domain compression
-is proven. If it feels complex, you skipped a step.
+Each step earns the next. **If step 5 fails, don't attempt step 6.**
+Fix the pattern until step 5 passes. If step 6 fails, don't attempt
+step 7. The failure tells you the pattern needs refinement, not that
+you need a more complex pipeline.
+
+**If it feels complex, you skipped a step.** Global dependency passes,
+two-pass extraction, protected name sets — these are Miller Straights.
+Don't attempt them until single-file and single-domain compression
+are proven and solid.
 
 Does it make sense to do Calculus before Algebra? Algebra before
-Arithmetic? No. Start with the simplest domain, prove the pattern,
-then progress. The sketches tell you the order.
+Arithmetic? No. Start with the simplest sketch, prove the pattern,
+then progress to harder domains. The sketches tell you the order.
 
 ## The Layers
 
