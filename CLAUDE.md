@@ -251,6 +251,16 @@ Option, you're duplicating Core. Name the domain concept, point to
 the primitive. Run `origin.py patterns` before committing — it
 catches structural duplication across files.
 
+**Don't re-prove algebraic laws in domain files.** Core now has
+`option_mul_comm`, `option_mul_assoc`, `option_add_comm`,
+`option_add_assoc`, `option_distrib`, `option_neg_neg`, and the
+full suite of algebraic lifts through Option. Domain files should
+NOT have their own `domain_mul_assoc` — that's Core's job. If a
+domain file has a `cases <;> simp [h]` theorem that proves a
+generic algebraic law on Option, delete it. Domain files prove
+domain-specific lifts only. ~30 legacy duplicates still exist
+across domain files from before Core had these — clean them up.
+
 **Complexity means you skipped a step.** Like a world champion power
 tumbler: forward roll → cartwheel → roundoff back handspring → whips
 → fulls → doubles → Miller Straight. Each skill earns the next. If
