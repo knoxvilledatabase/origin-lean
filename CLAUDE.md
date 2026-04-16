@@ -10,7 +10,7 @@ shouldn't exist.
 
 ---
 
-## Step 1: Read `Origin/Core.lean` (124 lines)
+## Step 1: Read `Origin/Core.lean` (138 lines)
 
 Read every line. Then answer:
 
