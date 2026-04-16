@@ -82,24 +82,43 @@ You are disposable labor that makes the script smarter.
 ### Read these files before doing anything
 
 1. **This file** (`CLAUDE.md`) — your orders.
-2. **`Origin/Core.lean`** (124 lines) — the foundation. The theorem,
+2. **`Origin/Core.lean`** (166 lines) — the foundation. The theorem,
    instances, simp set. Read every line. If you don't understand why
    `none * some 5 = none` and `some 0 * some 5 = some 0`, stop and
    re-read until you do.
-3. **`scripts/origin2.py`** — the tool you're improving. Read the
-   parser, the classifier, the extractor, the `run` pipeline. This
-   is where your work goes.
+3. **`scripts/compress/README.md`** — the compression work. This is
+   where the CURRENT work is. Read the progression, the sketch
+   comparison table, the foundation levels already mastered. This
+   tells you exactly what to do next.
+4. **`scripts/origin2.py`** — the pipeline. Read the parser, the
+   classifier, the extractor. The pipeline is at 98.3% pass rate.
+   Don't fix the pipeline — compress the output.
 
 Everything else is output. Don't read Mathlib. Don't read Val.
 Don't read the domain files. The script reads Mathlib for you.
 
+### What to do RIGHT NOW
+
+The pipeline works. 98.3% pass rate. The current work is **compression**.
+
+1. Read `scripts/compress/README.md` — it has the progression model
+2. Study one Origin sketch (e.g. `Origin/GroupTheory.lean`, 121 lines)
+3. Compare it to its Mathlib counterpart (38,810 lines)
+4. The sketch keeps definitions + demonstrations. Everything else is
+   derivable from Core.lean. That's the pattern. Encode it.
+5. Test on one file. Does the build pass? Then one domain. Then all.
+
+**Do not invent compression patterns from scratch.** Reverse-engineer
+them from the sketches. The human already proved the compression works.
+
 ### Mistakes every new Claude makes
 
-**You will start building before confirming alignment.** Don't. The
-user holds the philosophy. Every session that skipped alignment went
-sideways. Before writing code, confirm you understand: what is origin?
-what is `some 0`? what dissolves and what doesn't? If the user asks
-you a question, think before answering. The question IS the alignment.
+**You will start building before reading the progression.** Don't.
+Read `scripts/compress/README.md` first — it tells you exactly what
+to do and what's already been mastered. If the user asks you a
+question, think before answering. The question IS the alignment.
+The user holds the philosophy. Every session that skipped this went
+sideways.
 
 **You will think `b - b` is zero.** It's not. It's origin — the
 return to the ground. Not "the number zero." The whole. This
