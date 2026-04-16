@@ -370,6 +370,91 @@ multiplicative. Every domain gets both.
 The global optimizer has never run on Mathlib. Origin is that
 optimizer.
 
+### Baseline DRY Audit — All Domains (2026-04-16)
+
+Run: `python3 scripts/origin2.py audit --all`
+
+| Domain | Files | Lines | Genuine | Dissolved | Trivial | Multi-rw | Spec | Sketch | Reduction |
+|--------|------:|------:|--------:|----------:|--------:|---------:|-----:|-------:|----------:|
+| Algebra | 797 | 212,847 | 21,128 | 47 | 1,614 | 3,077 | 51 | 111 | 99.9% |
+| Analysis | 488 | 150,847 | 14,914 | 11 | 379 | 1,813 | 65 | 101 | 99.9% |
+| CategoryTheory | 580 | 141,867 | 11,878 | 0 | 780 | 1,019 | 0 | 62 | 100.0% |
+| Topology | 429 | 122,940 | 12,596 | 1 | 609 | 785 | 32 | 131 | 99.9% |
+| Data | 545 | 145,290 | 19,274 | 88 | 875 | 2,100 | 148 | 180 | 99.9% |
+| RingTheory | 380 | 99,382 | 7,963 | 32 | 374 | 1,728 | 16 | 148 | 99.9% |
+| MeasureTheory | 192 | 83,403 | 7,409 | 22 | 165 | 804 | 29 | 95 | 99.9% |
+| Order | 211 | 75,874 | 10,131 | 3 | 398 | 775 | 23 | — | — |
+| LinearAlgebra | 231 | 67,580 | 6,259 | 3 | 301 | 1,165 | 11 | 115 | 99.8% |
+| NumberTheory | 153 | 44,078 | 3,482 | 29 | 194 | 985 | 50 | 110 | 99.8% |
+| Tactic | 199 | 43,278 | 2,576 | 0 | 32 | 46 | 3 | — | — |
+| GroupTheory | 116 | 35,883 | 3,256 | 5 | 195 | 671 | 3 | 103 | 99.7% |
+| Combinatorics | 108 | 28,509 | 2,824 | 0 | 180 | 417 | 2 | 89 | 99.7% |
+| AlgebraicGeometry | 79 | 27,367 | 2,535 | 0 | 74 | 441 | 0 | — | — |
+| Geometry | 81 | 27,627 | 2,544 | 5 | 27 | 385 | 2 | 140 | 99.5% |
+| SetTheory | 46 | 23,063 | 3,144 | 1 | 41 | 324 | 31 | — | — |
+| Probability | 60 | 21,068 | 1,849 | 1 | 47 | 226 | 9 | — | — |
+| FieldTheory | 57 | 18,979 | 1,677 | 5 | 69 | 350 | 0 | 64 | 99.7% |
+| Computability | 18 | 12,491 | 1,204 | 0 | 73 | 70 | 6 | — | — |
+| Logic | 48 | 12,383 | 1,702 | 2 | 93 | 61 | 4 | 142 | 98.9% |
+| ModelTheory | 29 | 10,204 | 976 | 0 | 31 | 107 | 0 | — | — |
+| AlgebraicTopology | 42 | 8,657 | 650 | 0 | 29 | 67 | 0 | — | — |
+| Dynamics | 22 | 5,047 | 558 | 1 | 11 | 72 | 16 | — | — |
+| RepresentationTheory | 15 | 4,331 | 331 | 0 | 33 | 39 | 0 | — | — |
+| Control | 24 | 3,984 | 348 | 0 | 31 | 9 | 0 | — | — |
+| Condensed | 21 | 2,930 | 228 | 0 | 8 | 4 | 0 | — | — |
+| **TOTAL** | **4,946** | **1,449,308** | **141,586** | **256** | **6,713** | **17,584** | **501** | | |
+
+**Key numbers:** 1,449,308 lines. 17,584 multi-line rw chains. 501
+specialization families. 256 dissolved. Every sketch achieves 99.5%+
+reduction. The DRY axis dwarfs the zero-management axis.
+
+## The Automated Pipeline (Architecture)
+
+```
+Detect → Classify → Sandbox compress → Full rebuild → Report
+  ↑                                                      |
+  └──── Human exceptions → Encode patterns ──────────────┘
+```
+
+**Stage 1: Detect.** Diff Mathlib HEAD against last processed commit.
+The lakefile pins the version. When bumped, `git diff` shows what's
+new or changed.
+
+**Stage 2: Classify.** For each declaration: genuine, dissolved,
+conflates, infrastructure. Already built in `origin2.py`. Category 1
+vs Category 2 classification in sketch headers.
+
+**Stage 3: Sandbox compress.** For each declaration, extract into a
+minimal scratch file with its dependencies. Try compressions in order:
+1. `by simp`
+2. `by omega`
+3. `by ring`
+4. `by decide`
+5. `by aesop`
+6. Strip dissolved hypotheses, retry
+7. If none work: flag for human review, keep original
+8. If one works: keep the shortest
+
+Each attempt builds in isolation — a failed compression on declaration
+47 cannot contaminate declarations 48-200. `lake build` is the judge.
+
+**Stage 4: Full rebuild.** Apply all successful compressions to the
+full file. Build it. If it fails, binary search which compression
+broke it (dependency conflict), revert that one, retry. Mechanical.
+
+**Stage 5: Report.** What succeeded, what failed, what needs human
+review. Grouped by pattern. The report IS the work order for the
+human.
+
+**The human's role:** Handle exceptions the script can't automate.
+Write generic versions of specialization families. Create new domain
+definitions. Every solution gets encoded back into the script as a
+pattern. Next run, that pattern applies automatically.
+
+**The loop:** Run → report → human solves exceptions → encode →
+run again. The script gets smarter with each session. The human
+teaches through exceptions. The script remembers forever.
+
 ## Active Patterns
 
 ### 1. `core_trivial_proof` (Layer 1)
