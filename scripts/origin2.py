@@ -257,15 +257,15 @@ class Parser:
         if not stripped.startswith("/-"):
             return None
         comment_lines = [lines[i]]
-        if "-/" not in stripped[2:]:
+        # Track nesting depth for nested comments (Lean supports /- /- -/ -/)
+        depth = lines[i].count("/-") - lines[i].count("-/")
+        i += 1
+        while i < len(lines) and depth > 0:
+            comment_lines.append(lines[i])
+            depth += lines[i].count("/-") - lines[i].count("-/")
             i += 1
-            while i < len(lines) and "-/" not in lines[i]:
-                comment_lines.append(lines[i])
-                i += 1
-            if i < len(lines):
-                comment_lines.append(lines[i])
         blocks.append(Block("comment", "", "\n".join(comment_lines)))
-        return (i + 1, None)
+        return (i, None)
 
     def _try_line_comment(self, lines, i, stripped) -> tuple[int, list] | None:
         if not stripped.startswith("--"):
@@ -324,7 +324,18 @@ class Parser:
             if stripped.startswith(cmd) or stripped == cmd.strip():
                 # @[inherit_doc] attached to a notation/declaration is load-bearing
                 if cmd == "@[deprecated" and stripped.startswith("@[deprecated"):
-                    pass  # always strip deprecated
+                    # Deprecated aliases often wrap to column 0 on the next line.
+                    # Consume the whole thing including the body.
+                    i += 1
+                    # Skip indented continuation
+                    while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                        i += 1
+                    # Also consume a bare identifier on the next line (alias target at col 0)
+                    if i < len(lines) and lines[i].strip() and not lines[i].strip().startswith(("--", "/-", "@[", "theorem", "lemma", "def", "section", "end", "namespace", "open", "variable", "import", "instance", "class", "structure")):
+                        s = lines[i].strip()
+                        if re.match(r'^[a-zA-Z_][\w.\']*\s*$', s):
+                            i += 1
+                    return (i, None)
                 elif "@[inherit_doc" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
                     return None  # don't strip — let passthrough/declaration handle it
                 # Consume the stripped command and any attached doc comment.
