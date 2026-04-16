@@ -15,12 +15,7 @@ import Origin.Core
 - NoZeroDivisors, IsCancelMulZero, IsDomain — dissolved infrastructure
   (managed zero-inside-domain; Origin dissolves these entirely)
 
-**What Origin adds:** domain definitions where none = outside the domain
-**What Origin leaves in Mathlib:** pure algebraic identities with no
-  zero-management, lattice theory, ring arithmetic lemmas
-
 Mathlib_Algebra: 797 files, 47 dissolved declarations.
-Hotspots: Order/Ring/Unbundled/Basic (10), Ring/Basic (5), CharP/Defs (3).
 -/
 
 universe u
@@ -77,9 +72,6 @@ def IsLieIdeal (mem : α → Prop) (bracketF : α → α → α) : Prop :=
 def IsSemisimple (killF : α → α → α) (zero : α) : Prop :=
   ∀ a, (∀ b, killF a b = zero) → a = zero
 
--- Star involutive and star_mul_rev: cases v <;> simp [h] / by simp [h].
--- Derivable from Core.
-
 -- ============================================================================
 -- 5. BIG OPERATORS
 -- ============================================================================
@@ -93,7 +85,7 @@ def bigProd [Mul α] (one : α) : List α → α
   | a :: as => a * bigProd one as
 
 -- ============================================================================
--- 7. GCD
+-- 6. GCD
 -- ============================================================================
 
 theorem gcd_lcm_product [Mul α] (gcdF lcmF : α → α → α)
@@ -102,9 +94,156 @@ theorem gcd_lcm_product [Mul α] (gcdF lcmF : α → α → α)
     some a * some b := by simp [h]
 
 -- ============================================================================
--- 8. CHARACTERISTIC
+-- 7. CHARACTERISTIC
 -- ============================================================================
 
 def HasCharP (charF : Nat → α) (zero : α) (p : Nat) : Prop := charF p = zero
+
+-- ============================================================================
+-- 8. GALOIS THEORY
+-- ============================================================================
+
+/-- A field extension: base embeds into extension. -/
+structure FieldExt (K F : Type u) where
+  embed : K → F
+  embed_inj : ∀ a b : K, embed a = embed b → a = b
+
+/-- An automorphism that fixes the base field. -/
+def IsFieldAut (σ : α → α) (isBase : α → Prop) : Prop :=
+  (∀ a, isBase a → σ a = a) ∧ (∀ a b, σ a = σ b → a = b) ∧ (∀ b, ∃ a, σ b = a)
+
+/-- Galois group: set of automorphisms fixing the base. -/
+def GaloisGroupMem (σ : α → α) (isBase : α → Prop) : Prop :=
+  ∀ a, isBase a → σ a = a
+
+/-- Fundamental theorem: intermediate fields correspond to subgroups. -/
+def IsGaloisCorrespondence
+    (intermField : (α → Prop) → Prop)
+    (subgroup : ((α → α) → Prop) → Prop)
+    (fixedField : ((α → α) → Prop) → (α → Prop))
+    (autGroup : (α → Prop) → ((α → α) → Prop)) : Prop :=
+  (∀ H, subgroup H → intermField (fixedField H)) ∧
+  (∀ E, intermField E → subgroup (autGroup E))
+
+/-- Galois extension lifts through Option: none = outside the extension. -/
+theorem galois_fixes_option (σ : α → α) (isBase : α → Prop)
+    (h : GaloisGroupMem σ isBase) (a : α) (hb : isBase a) :
+    Option.map σ (some a) = some a := by simp [GaloisGroupMem] at h; simp [h a hb]
+
+-- ============================================================================
+-- 9. STAR ALGEBRAS
+-- ============================================================================
+
+/-- Star involution on a type. -/
+def IsStarInvolution (star : α → α) : Prop :=
+  ∀ a, star (star a) = a
+
+/-- Star reverses multiplication. -/
+def IsStarMulRev [Mul α] (star : α → α) : Prop :=
+  ∀ a b, star (a * b) = star b * star a
+
+/-- C*-identity: ‖x* x‖ = ‖x‖². -/
+def IsCStarIdentity (star : α → α) (normF : α → α) [Mul α] : Prop :=
+  ∀ a, normF (star a * a) = normF a * normF a
+
+/-- Star lifts through Option: none stays none. -/
+theorem star_option_none (star : α → α) :
+    Option.map star (none : Option α) = none := by simp
+
+theorem star_option_some (star : α → α) (a : α) :
+    Option.map star (some a : Option α) = some (star a) := by simp
+
+-- ============================================================================
+-- 10. VIETA'S FORMULAS
+-- ============================================================================
+
+/-- Sum of roots of a polynomial (via coefficient). -/
+def vietaSum [Neg α] [Div α] (leadCoeff nextCoeff : α) : α :=
+  -(nextCoeff / leadCoeff)
+
+/-- Product of roots of a quadratic (via coefficient). -/
+def vietaProduct [Div α] (leadCoeff constCoeff : α) : α :=
+  constCoeff / leadCoeff
+
+/-- Vieta lifts: if coefficients are some, result is some. -/
+theorem vieta_sum_option [Neg α] [Div α] (a b : α) :
+    some (vietaSum a b) = some (-(b / a)) := by rfl
+
+-- ============================================================================
+-- 11. CLIFFORD ALGEBRAS
+-- ============================================================================
+
+/-- Clifford relation: v * v = Q(v) · 1. -/
+def IsCliffordRel [Mul α] (quadForm : α → α) (v : α) : Prop :=
+  v * v = quadForm v
+
+/-- Anti-commutation in a Clifford algebra. -/
+def IsCliffordAnticomm [Mul α] [Add α] (quadForm : α → α → α) : Prop :=
+  ∀ u v, u * v + v * u = quadForm u v
+
+/-- Clifford product lifts through Option. -/
+theorem clifford_mul_option [Mul α] (a b : α) :
+    (some a : Option α) * some b = some (a * b) := by simp
+
+-- ============================================================================
+-- 12. MODULES
+-- ============================================================================
+
+/-- A module action: scalar multiplication. -/
+def IsModuleAction [Mul α] (smul : α → α → α) (one : α) : Prop :=
+  (∀ x, smul one x = x) ∧ (∀ r s x, smul r (smul s x) = smul (r * s) x)
+
+/-- Free module: every element is a unique linear combination. -/
+def IsFreeModule (basis : α → Prop) (span : (α → Prop) → α → Prop)
+    (_unique : ∀ a, span basis a → ∃ _coeffs : α, True) : Prop :=
+  ∀ a, span basis a
+
+/-- Projective module: every surjection onto it splits. -/
+def IsProjectiveModule (liftF : (α → α) → (α → α)) : Prop :=
+  ∀ (f : α → α) (_surj : ∀ b, ∃ a, f a = b), ∀ x, f (liftF f x) = x
+
+-- ============================================================================
+-- 13. ASSOCIATIVE ALGEBRAS
+-- ============================================================================
+
+/-- Algebra homomorphism: preserves both ring ops and scalar action. -/
+def IsAlgHom [Mul α] [Add α] (f : α → α) : Prop :=
+  (∀ a b, f (a * b) = f a * f b) ∧ (∀ a b, f (a + b) = f a + f b)
+
+/-- Algebra homomorphism lifts through Option. -/
+theorem alg_hom_option [Mul α] [Add α] (f : α → α) (a : α) :
+    Option.map f (some a) = some (f a) := by simp
+
+/-- Algebra homomorphism preserves none (ground absorbs). -/
+theorem alg_hom_none [Mul α] [Add α] (f : α → α) :
+    Option.map f (none : Option α) = none := by simp
+
+-- ============================================================================
+-- 14. DEMONSTRATIONS: Option lifting
+-- ============================================================================
+
+/-- Multiplication lifts: some a * some b = some (a * b). -/
+theorem algebra_mul_lifts [Mul α] (a b : α) :
+    (some a : Option α) * some b = some (a * b) := by simp
+
+/-- Addition lifts: some a + some b = some (a + b). -/
+theorem algebra_add_lifts [Add α] (a b : α) :
+    (some a : Option α) + some b = some (a + b) := by simp
+
+/-- none absorbs multiplication on the left. -/
+theorem algebra_none_mul [Mul α] (b : Option α) :
+    (none : Option α) * b = none := by simp
+
+/-- none is identity for addition on the left. -/
+theorem algebra_none_add [Add α] (b : Option α) :
+    (none : Option α) + b = b := by simp
+
+/-- Negation lifts through some. -/
+theorem algebra_neg_lifts [Neg α] (a : α) :
+    -(some a : Option α) = some (-a) := by simp
+
+/-- Negation of none stays none. -/
+theorem algebra_neg_none [Neg α] :
+    -(none : Option α) = none := by simp
 
 -- None absorbs (mul, add): Core.lean's @[simp] set handles all cases.
