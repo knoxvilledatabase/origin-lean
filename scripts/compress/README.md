@@ -118,7 +118,7 @@ pattern. Encode it.
    was rewritten, what was generalized
 3. **Identify the pattern** — is it deletion? tactic replacement?
    lemma consolidation? generalization?
-4. **Encode the pattern** — add a class to `patterns.py`
+4. **Encode the pattern** — add a class to `proof_patterns.py`
 5. **Test on one file** — does the build pass?
 6. **Test on one domain** — does the domain pass?
 7. **Test on all domains** — does everything pass?
@@ -282,8 +282,8 @@ scripts/
   lean_optimizer.py       — generic Lean optimizer (THE TOOL)
   compress/
     __init__.py            — imports
-    sandbox.py             — atomic unit: test one proof, Lean verifies
-    patterns.py            — every compression pattern as a class
+    proof_tester.py             — atomic unit: test one proof, Lean verifies
+    proof_patterns.py            — every compression pattern as a class
     README.md              — this file (the "show your work" file)
 ```
 
@@ -360,7 +360,7 @@ reference by name.
 
 ## How to add a pattern
 
-1. Create a class in `patterns.py` inheriting `CompressionPattern`
+1. Create a class in `proof_patterns.py` inheriting `CompressionPattern`
 2. Implement `match(block)` → bool and `compress(block)` → str | None
 3. Add it to `get_patterns()`
 4. Run `python3 scripts/lean_optimizer.py run`
@@ -531,7 +531,7 @@ teaches through exceptions. The script remembers forever.
 ### Roadmap to Full Automation (2026-04-16)
 
 **What's done:**
-- ✅ The atomic unit — `sandbox.py` tests one proof, Lean verifies
+- ✅ The atomic unit — `proof_tester.py` tests one proof, Lean verifies
 - ✅ The audit command — profiles any domain's DRY opportunities
 - ✅ The classifier — identifies what dissolves vs what's genuine
 - ✅ The pipeline — extracts and builds at 98.3% pass rate

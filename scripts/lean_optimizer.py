@@ -366,7 +366,7 @@ def _print_audit(name: str, s: dict, sketch_lines: int):
 def cmd_compress(path: str, config: ProjectConfig):
     """Compress files by trying shorter proofs in sandbox."""
     sys.path.insert(0, str(Path(__file__).parent))
-    from compress.sandbox import try_compress
+    from compress.proof_tester import try_compress
 
     output_dir = config.output_dir
 
@@ -389,7 +389,7 @@ def cmd_compress(path: str, config: ProjectConfig):
 def _compress_files(files: list[Path], config: ProjectConfig):
     """Run sandbox compression across a list of files."""
     sys.path.insert(0, str(Path(__file__).parent))
-    from compress.sandbox import try_compress
+    from compress.proof_tester import try_compress
 
     decl_re = re.compile(
         r'^((?:@\[.*?\]\s*\n)*)(?:(?:protected|private|nonrec)\s+)*(theorem|lemma)\s+(\S+)')

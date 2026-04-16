@@ -1,12 +1,12 @@
 """
-Sandbox: test proof compressions in isolation.
+Proof Tester: test proof compressions in isolation.
 
 The atomic unit of the automated pipeline. Takes one declaration,
 writes a minimal scratch file, tries a compressed proof, builds it,
 returns pass/fail.
 
 Usage:
-    from compress.sandbox import try_compress
+    from compress.proof_tester import try_compress
 
     result = try_compress(
         declaration="theorem foo (a b : Nat) : a + b = b + a := by rw [Nat.add_comm]",

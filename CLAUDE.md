@@ -153,7 +153,7 @@ compression. A replacement.
   It correctly identifies the 17 typeclasses. It is complete for
   Axis 1. Don't expand it to handle DRY — that's a different question.
 
-- **The sandbox** (`compress/sandbox.py`) is the Axis 2 machine. It
+- **The sandbox** (`compress/proof_tester.py`) is the Axis 2 machine. It
   asks "how short can this be?" and answers by trying tactics and
   letting `lake build` judge. It doesn't need to understand the math.
   It just needs to try alternatives and report what Lean accepts.
@@ -966,7 +966,7 @@ Compression applies in four layers:
 3. **Lemma consolidation** — collapse `foo_nat`/`foo_int`/`foo_real` to generic `foo`.
 4. **Foundational** — Origin's thesis. The 17 typeclasses that dissolve.
 
-Each layer is a compression pattern class in `scripts/compress/patterns.py`.
+Each layer is a compression pattern class in `scripts/compress/proof_patterns.py`.
 Each one measurable. Each one independently auditable.
 
 **Are we leveraging Lean 4 fully?** Not yet. Mathlib barely uses
