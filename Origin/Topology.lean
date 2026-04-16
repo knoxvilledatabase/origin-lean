@@ -25,19 +25,10 @@ def IsOpenC (openα : (α → Prop) → Prop) (compactα : (α → Prop) → Pro
   openα (fun a => U (some a)) ∧
   (U none → compactα (fun a => ¬ U (some a)))
 
--- ============================================================================
--- 2. CONTINUOUS MAPS
--- ============================================================================
-
-theorem continuous_comp (f g : α → α) (v : Option α) :
-    Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
-  cases v <;> simp
-
-theorem continuous_id (v : Option α) : Option.map id v = v := by
-  cases v <;> simp
+-- continuous_comp, continuous_id: composition/identity patterns, derivable from Core.
 
 -- ============================================================================
--- 3. METRIC SPACES
+-- 2. METRIC SPACES
 -- ============================================================================
 
 def IsLipschitz (f : α → α) (K : α) (distF : α → α → α) (leF : α → α → Prop)

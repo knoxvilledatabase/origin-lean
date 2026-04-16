@@ -37,12 +37,7 @@ def klDiv [Mul α] (integralF : (α → α) → α) (logF : α → α) (rnDerivF
 -- Proofs that use Option: the demonstrations
 -- ============================================================================
 
-/-- Hamming distance: none absorbs. Uses * from Core instance. -/
-theorem hamming_none_left [Mul α] (b : Option α) : (none : Option α) * b = none := by simp
-
-theorem hamming_none_right [Mul α] (a : Option α) : a * (none : Option α) = none := by simp
-
-theorem hamming_some [Mul α] (a b : α) : (some a : Option α) * some b = some (a * b) := by simp
+-- Hamming none/some: Core.lean's @[simp] set handles all cases.
 
 /-- KL(μ, μ) = 0: self-divergence. -/
 theorem klDiv_self [Mul α]

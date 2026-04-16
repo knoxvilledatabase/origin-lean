@@ -318,8 +318,19 @@ derives. Trimming them is the first measured compression of the sketches.
 |--------|--------|-------|---------|-----------|
 | CategoryTheory | 94 | 61 | 33 | 35% |
 | FieldTheory | 95 | 63 | 32 | 34% |
-| GroupTheory | 121 | 102 | 19 | 16% |
 | Analysis | 144 | 100 | 44 | 31% |
+| GroupTheory | 121 | 102 | 19 | 16% |
+| Algebra | 129 | 100 | 29 | 22% |
+| Combinatorics | 105 | 88 | 17 | 16% |
+| Geometry2 | 152 | 139 | 13 | 9% |
+| Topology | 139 | 130 | 9 | 6% |
+| LinearAlgebra2 | 122 | 114 | 8 | 7% |
+| NumberTheory | 113 | 109 | 4 | 4% |
+| InformationTheory2 | 81 | 76 | 5 | 6% |
+| MeasureTheory2 | 98 | 94 | 4 | 4% |
+| Data | 182 | 179 | 3 | 2% |
+| RingTheory2 | 147 | 147 | 0 | 0% |
+| **Total** | **1,722** | **1,502** | **220** | **13%** |
 
 ## Active Patterns
 

@@ -67,23 +67,11 @@ def IsLieIdeal (mem : α → Prop) (bracketF : α → α → α) : Prop :=
 def IsSemisimple (killF : α → α → α) (zero : α) : Prop :=
   ∀ a, (∀ b, killF a b = zero) → a = zero
 
--- ============================================================================
--- 5. STAR ALGEBRA
--- ============================================================================
-
-theorem star_involutive (starF : α → α)
-    (h : ∀ a, starF (starF a) = a) (v : Option α) :
-    Option.map starF (Option.map starF v) = v := by
-  cases v <;> simp [h]
-
-theorem star_mul_rev [Mul α] (starF : α → α)
-    (h : ∀ a b, starF (a * b) = starF b * starF a) (a b : α) :
-    Option.map starF (some a * some b) =
-    Option.map starF (some b) * Option.map starF (some a) := by
-  simp [h]
+-- Star involutive and star_mul_rev: cases v <;> simp [h] / by simp [h].
+-- Derivable from Core.
 
 -- ============================================================================
--- 6. BIG OPERATORS
+-- 5. BIG OPERATORS
 -- ============================================================================
 
 def bigSum [Add α] (zero : α) : List α → α
@@ -109,21 +97,4 @@ theorem gcd_lcm_product [Mul α] (gcdF lcmF : α → α → α)
 
 def HasCharP (charF : Nat → α) (zero : α) (p : Nat) : Prop := charF p = zero
 
--- ============================================================================
--- 9. NONE ABSORBS: the demonstrations
--- ============================================================================
-
-theorem none_mul_algebra [Mul α] (b : Option α) :
-    (none : Option α) * b = none := by simp
-
-theorem mul_none_algebra [Mul α] (a : Option α) :
-    a * (none : Option α) = none := by simp
-
-theorem none_add_algebra [Add α] (b : Option α) :
-    (none : Option α) + b = b := by simp
-
-theorem some_add_some [Add α] (a b : α) :
-    (some a : Option α) + some b = some (a + b) := by simp
-
-theorem some_mul_some [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
+-- None absorbs (mul, add): Core.lean's @[simp] set handles all cases.

@@ -55,11 +55,7 @@ def simpleIntegral [Mul α] [Add α] : List α → List α → Option α
   | v :: vs, w :: ws =>
     some (v * w) + simpleIntegral vs ws
 
-theorem integral_none_absorbs [Mul α] (f : α → α) :
-    Option.map f (none : Option α) = none := by simp
-
-theorem integral_some_computes [Mul α] (f : α → α) (a : α) :
-    Option.map f (some a) = some (f a) := by simp
+-- integral none/some: Core.lean's @[simp] set handles all cases.
 
 -- ============================================================================
 -- 4. PROBABILITY

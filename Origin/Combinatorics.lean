@@ -85,21 +85,4 @@ def isBlockDesign (blocks : List (α → Prop)) (points : α → Prop)
     (k : Nat) (lambda : Nat) : Prop :=
   (∀ B, B ∈ blocks → True) ∧ lambda > 0
 
--- ============================================================================
--- 9. NONE ABSORBS: the demonstrations
--- ============================================================================
-
-theorem comb_none_mul [Mul α] (b : Option α) :
-    (none : Option α) * b = none := by simp
-
-theorem comb_mul_none [Mul α] (a : Option α) :
-    a * (none : Option α) = none := by simp
-
-theorem comb_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-theorem comb_none_add [Add α] (b : Option α) :
-    (none : Option α) + b = b := by simp
-
-theorem comb_some_add [Add α] (a b : α) :
-    (some a : Option α) + some b = some (a + b) := by simp
+-- None absorbs (mul, add): Core.lean's @[simp] set handles all cases.

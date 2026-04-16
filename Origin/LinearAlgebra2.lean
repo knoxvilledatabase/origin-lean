@@ -88,13 +88,7 @@ def isBasis (indepF spanF : α → Prop) (a : α) : Prop := indepF a ∧ spanF a
 -- 5. DUAL SPACE
 -- ============================================================================
 
-theorem double_dual (dualF : α → α) (v : Option α) :
-    Option.map dualF (Option.map dualF v) = Option.map (dualF ∘ dualF) v := by
-  cases v <;> simp
-
-theorem reflexive (dualF : α → α) (h : ∀ a, dualF (dualF a) = a) (v : Option α) :
-    Option.map dualF (Option.map dualF v) = v := by
-  cases v <;> simp [h]
+-- double_dual, reflexive: composition/involution patterns, derivable from Core.
 
 -- ============================================================================
 -- 6. TENSOR PRODUCTS
@@ -117,6 +111,4 @@ theorem tensorProd_some (a : α) (b : β) :
 -- 7. LINEAR MAP
 -- ============================================================================
 
-theorem linearMap_comp (f g : α → α) (v : Option α) :
-    Option.map g (Option.map f v) = Option.map (g ∘ f) v := by
-  cases v <;> simp
+-- linearMap_comp: composition pattern, derivable from Core.

@@ -70,9 +70,7 @@ theorem restrict_some [Mul α] (F : PrimeIdeal α → Option α)
 
 abbrev schemeMorphism (f : α → α) : Option α → Option α := Option.map f
 
-theorem scheme_comp (f g : α → α) (v : Option α) :
-    schemeMorphism f (schemeMorphism g v) = schemeMorphism (f ∘ g) v := by
-  cases v <;> simp [schemeMorphism]
+-- scheme_comp: composition pattern, cases v <;> simp. Derivable from Core.
 
 theorem affine_morphism [Mul α] (f : α → α)
     (h_mul : ∀ a b, f (a * b) = f a * f b) (a b : α) :
@@ -101,16 +99,10 @@ theorem chart_roundtrip (c : Chart α) (v : Option α) :
     chartInv c (chartMap c v) = v := by
   cases v <;> simp [chartMap, chartInv, c.left_inv]
 
--- ============================================================================
--- 7. TANGENT VECTORS
--- ============================================================================
-
-theorem tangent_map_comp (f g : α → α) (v : Option α) :
-    Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
-  cases v <;> simp
+-- tangent_map_comp: composition pattern, derivable from Core.
 
 -- ============================================================================
--- 8. DIFFERENTIAL FORMS + DE RHAM COHOMOLOGY
+-- 7. DIFFERENTIAL FORMS + DE RHAM COHOMOLOGY
 -- ============================================================================
 
 theorem ext_deriv_sq (dF : α → α) (zero : α)
@@ -144,9 +136,4 @@ def IsOnCurve [Mul α] [Add α] (a b x y : α) (sqF cubeF : α → α) : Prop :=
 def IsGeodesic (γ : α → α) (metric : α → α → α) : Prop :=
   ∀ t₁ t₂, metric (γ t₁) (γ t₂) = metric t₁ t₂ → True
 
--- ============================================================================
--- 11. NONE ABSORBS: the demonstrations
--- ============================================================================
-
-theorem mul_none_geometry [Mul α] (b : Option α) : (none : Option α) * b = none := by simp
-theorem none_mul_geometry [Mul α] (a : Option α) : a * (none : Option α) = none := by simp
+-- None absorbs: Core.lean's @[simp] set handles all cases.

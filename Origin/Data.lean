@@ -155,10 +155,7 @@ theorem bijective_comp (f g : α → α)
 -- 7. COMPLEX
 -- ============================================================================
 
-theorem complexConj_involutive (conjF : α → α)
-    (h : ∀ z, conjF (conjF z) = z) (v : Option α) :
-    Option.map conjF (Option.map conjF v) = v := by
-  cases v <;> simp [h]
+-- complexConj_involutive: involution pattern, derivable from Core.
 
 -- ============================================================================
 -- 8. EXTENDED NUMBER TYPES

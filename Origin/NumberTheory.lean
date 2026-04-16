@@ -37,9 +37,7 @@ def isAlgInt (isIntF : α → Prop) : Option α → Prop
   | some a => isIntF a
   | none => False
 
-theorem atkin_lehner_involution (wF : α → α) (h : ∀ a, wF (wF a) = a)
-    (v : Option α) :
-    Option.map wF (Option.map wF v) = v := by cases v <;> simp [h]
+-- atkin_lehner_involution: involution pattern, derivable from Core.
 
 -- ============================================================================
 -- 3. MODULAR FORMS
@@ -75,9 +73,7 @@ def isRegularPrime (dividesF : α → α → Prop) (classNumF : α → α) : α 
 -- 7. Z[√d]
 -- ============================================================================
 
-theorem zsqrtd_conj_involution (conjF : α → α)
-    (h : ∀ a, conjF (conjF a) = a) (v : Option α) :
-    Option.map conjF (Option.map conjF v) = v := by cases v <;> simp [h]
+-- zsqrtd_conj_involution: involution pattern, derivable from Core.
 
 -- ============================================================================
 -- 8. CYCLOTOMIC
