@@ -85,6 +85,23 @@ class UI:
 
 ui = UI()
 
+# Shared regex for counting Origin declarations
+ORIGIN_DECL_RE = re.compile(
+    r'^\s*(?:@\[.*?\]\s*)?'
+    r'(?:protected\s+|private\s+|nonrec\s+|noncomputable\s+)*'
+    r'(def|theorem|lemma|structure|class|inductive|abbrev)\s+(\S+)')
+
+
+def count_origin_decls(filepath):
+    """Count exported declarations in an Origin .lean file."""
+    count = 0
+    for line in filepath.read_text(errors="replace").split("\n"):
+        if "private " in line:
+            continue
+        if ORIGIN_DECL_RE.match(line):
+            count += 1
+    return count
+
 
 # =============================================================================
 # Classifier — config-driven rule engine
@@ -145,6 +162,7 @@ def cmd_status():
     total_mathlib = 0
     total_origin = 0
     total_genuine = 0
+    total_origin_decls = 0
     rows = []
 
     for dom in domains:
@@ -160,26 +178,29 @@ def cmd_status():
                 if m:
                     genuine += int(m.group(1))
 
-        # Origin lines
+        # Origin lines and declaration count
         origin_lines = 0
+        origin_decls = 0
         for name in [f"{dom}.lean", f"{dom}2.lean"]:
             p = ORIGIN / name
             if p.exists():
                 origin_lines = len(p.read_text().split("\n"))
+                origin_decls = count_origin_decls(p)
                 break
 
         total_mathlib += mathlib_lines
         total_origin += origin_lines
         total_genuine += genuine
+        total_origin_decls += origin_decls
 
         pct = (1 - origin_lines / max(mathlib_lines, 1)) * 100 if mathlib_lines else 0
-        rows.append((dom, mathlib_lines, genuine, origin_lines, pct))
+        rows.append((dom, mathlib_lines, genuine, origin_lines, origin_decls, pct))
 
     # Print table
-    print(f"  {ui.BOLD}{'Domain':<24s} {'Mathlib':>10s} {'Genuine':>8s} {'Origin':>8s} {'Reduction':>10s}{ui.RESET}")
+    print(f"  {ui.BOLD}{'Domain':<22s} {'Mathlib':>10s} {'Genuine':>8s} {'Origin':>8s} {'Decls':>10s} {'Reduction':>10s}{ui.RESET}")
     ui.separator()
 
-    for dom, ml, gen, ol, pct in rows:
+    for dom, ml, gen, ol, od, pct in rows:
         # Color code: green if deep (origin > 200), yellow if sketch, dim if minimal
         if ol > 200:
             color = ui.GREEN
@@ -187,13 +208,16 @@ def cmd_status():
             color = ui.YELLOW
         else:
             color = ui.DIM
-        print(f"  {dom:<24s} {ml:>10,} {gen:>8,} {color}{ol:>8,}{ui.RESET} {pct:>9.1f}%")
+        decl_str = f"{od}/{gen}" if gen else f"{od}"
+        print(f"  {dom:<22s} {ml:>10,} {gen:>8,} {color}{ol:>8,}{ui.RESET} {decl_str:>10s} {pct:>9.1f}%")
 
     ui.separator()
     total_pct = (1 - total_origin / max(total_mathlib, 1)) * 100
-    print(f"  {ui.BOLD}{'TOTAL':<24s} {total_mathlib:>10,} {total_genuine:>8,} {ui.CYAN}{total_origin:>8,}{ui.RESET} {total_pct:>9.1f}%{ui.RESET}")
+    decl_total = f"{total_origin_decls}/{total_genuine}"
+    print(f"  {ui.BOLD}{'TOTAL':<22s} {total_mathlib:>10,} {total_genuine:>8,} {ui.CYAN}{total_origin:>8,}{ui.RESET} {decl_total:>10s} {total_pct:>9.1f}%{ui.RESET}")
     print()
     ui.info(f"Green = deepened (>200 lines)  Yellow = sketch (100-200)  Dim = minimal (<100)")
+    ui.info(f"Decls = Origin declarations / Mathlib genuine declarations")
     print()
 
 
@@ -520,10 +544,7 @@ def cmd_index():
     writes an index that re-exports everything. If two files export
     the same name, lake build fails — the compiler IS the dedup.
     """
-    decl_re = re.compile(
-        r'^\s*(?:@\[.*?\]\s*)?'
-        r'(?:protected\s+|private\s+|nonrec\s+|noncomputable\s+)*'
-        r'(def|theorem|lemma|structure|class|inductive|abbrev)\s+(\S+)')
+    decl_re = ORIGIN_DECL_RE
 
     # Skip files that shouldn't be in the index
     skip = {"Index", "Test"}
