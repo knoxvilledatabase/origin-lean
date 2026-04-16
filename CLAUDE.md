@@ -47,10 +47,28 @@ never supposed to be. That's `NeZero`, `GroupWithZero`, `≠ 0` guards
 Origin puts the ground outside. `Option α`: `none` is the ground,
 `some` is a value. The 17 typeclasses dissolve. That's Axis 1.
 
+**Three primitives — the vocabulary for working with Option:**
+
+- `Option.map f` — lift a unary function. `none` maps to `none`.
+- `liftBin₂ f` — lift a binary function. Either operand `none` → `none`.
+- `liftPred p` — lift a predicate. `some a` satisfies `p a`. `none`
+  gives `False`. The ground is never in a predicate.
+
+These are in `Core.lean`. **Never write a match on `some`/`none` when
+one of these three already does it.** If you're pattern-matching on
+Option in a domain file, you're probably duplicating Core. Name the
+domain concept and point to the primitive:
+
+```
+def isAnalytic (...) : Option α → Prop := liftPred (analyticF f)
+def tensorProd : Option α → Option β → Option (α × ��) := liftBin₂ Prod.mk
+```
+
 **Answer:**
 - Is the whole greater than the part? Can parts become the whole?
 - Why does `none` absorb? Is this an axiom or a consequence?
 - Why is Origin never a destination?
+- What are the three primitives? When would you use each?
 
 ---
 
@@ -139,12 +157,13 @@ context window is worth exactly zero.
 
 ## Step 6: The tool
 
-One tool, ten commands:
+One tool, eleven commands:
 
 ```bash
 python3 scripts/origin.py status            # PROGRESS REPORT — run this first
 python3 scripts/origin.py quality           # QUALITY — stub vs real per domain
 python3 scripts/origin.py quality <domain>  # quality for one domain
+python3 scripts/origin.py patterns          # find Option patterns that belong in Core
 python3 scripts/origin.py list              # show all domains
 python3 scripts/origin.py suggest <domain>  # show uncovered genuine declarations
 python3 scripts/origin.py stub <domain>     # append uncovered as def stubs
@@ -224,6 +243,13 @@ there are zero duplicates.
 the class hierarchy. Lean's typeclass resolution IS the inheritance.
 Adding classes on top would be adding infrastructure to manage a
 problem that doesn't exist — exactly what Origin dissolves in Mathlib.
+
+**Use Core primitives, don't reinvent them.** Before writing a match
+on `some`/`none` in a domain file, check if `liftPred`, `liftBin₂`,
+or `Option.map` already does it. If your def pattern-matches on
+Option, you're duplicating Core. Name the domain concept, point to
+the primitive. Run `origin.py patterns` before committing — it
+catches structural duplication across files.
 
 **Complexity means you skipped a step.** Like a world champion power
 tumbler: forward roll → cartwheel → roundoff back handspring → whips
