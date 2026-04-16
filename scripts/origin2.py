@@ -326,22 +326,25 @@ class Parser:
                     return None  # don't strip — let passthrough/declaration handle it
                 # Consume the stripped command and any attached doc comment.
                 # Pattern: library_note "..."/-- ... multi-line ... -/
-                # Also handles doc comment on the next line after strip.
+                # Also handles #adaptation_note /-- ... \n  ... -/
                 cur_line = lines[i]
-                # If /-- and -/ are both on the same line, doc is self-contained
-                doc_self_contained = "/--" in cur_line and "-/" in cur_line and cur_line.index("-/") > cur_line.index("/--")
-                has_doc = "/--" in cur_line and not doc_self_contained
+                has_doc = "/--" in cur_line
+                doc_closed = has_doc and "-/" in cur_line and cur_line.index("-/") > cur_line.index("/--")
                 i += 1
-                # Skip indented continuation lines
+                # Skip indented continuation lines, watching for doc close
                 while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
                     if "/--" in lines[i]:
                         has_doc = True
+                    if "-/" in lines[i]:
+                        doc_closed = True
+                        i += 1
+                        break
                     i += 1
                 # Check if next non-blank line starts a doc comment
-                if not has_doc and i < len(lines) and lines[i].strip().startswith("/--"):
+                if not has_doc and not doc_closed and i < len(lines) and lines[i].strip().startswith("/--"):
                     has_doc = True
-                # Consume until -/ if a multi-line doc comment was opened
-                if has_doc:
+                # Consume until -/ if a doc comment was opened but not yet closed
+                if has_doc and not doc_closed:
                     while i < len(lines) and "-/" not in lines[i]:
                         i += 1
                     if i < len(lines):
