@@ -189,26 +189,43 @@ architecture.** If it feels complex, stop and ask.
 
 ## What's next
 
-All 26 math domains have sketches. The next work is **refining them.**
+**The sketches are the proof of concept. Full coverage is the
+destination.**
 
-The original 15 sketches were hand-written and audited. The 10 newer
-sketches (AlgebraicGeometry, AlgebraicTopology, Computability,
-Condensed, Control, Dynamics, ModelTheory, Order, RepresentationTheory,
-SetTheory) were first drafts — they may have room to tighten.
+If a theorem is derivable from Core but not stated in Origin, then
+every AI model that needs it has to derive it every time — every
+inference, every query, every datacenter. Multiply by millions of
+queries. That's compute, energy, cooling, water.
 
-**The warmup:** Pick a newer sketch. Compare it to `GroupTheory.lean`
-(102 lines, hand-audited, maximally DRY). Ask:
+If Origin states it once — one line, verified by Lean, stored forever
+— then every model just looks it up. Zero derivation cost. One proof,
+used by all, forever.
 
-- Does every definition earn its place?
-- Are there redundant theorems Core already handles?
-- Can any proof be shorter? (`by simp`, `cases <;> simp [h]`)
-- Does `lake build` still pass after tightening?
+**Origin should state every theorem that any model might need.** Not
+because the model can't derive it, but because deriving it millions
+of times wastes the exact resources Origin exists to save.
 
-**After refining:** Look at `scripts/compress/README.md` for the
-baseline DRY audit numbers. The big opportunity is the generator +
-proof tester working together — the generator drafts, the proof
-tester verifies against Core's simp set, Claude Code writes the
-final Origin code. Each domain takes minutes.
+The progression:
+
+1. **Sketches (done)** — proof of concept, ~10 concepts per domain
+2. **Deepen (current work)** — grow each domain toward full Mathlib
+   coverage, one theorem at a time, shortest proof each
+
+**The workflow for deepening:**
+
+```bash
+# 1. Pick the smallest domain first
+python3 scripts/origin.py audit Condensed
+
+# 2. Generate the full draft (instant)
+python3 scripts/origin.py generate Condensed
+
+# 3. Rewrite: Core imports only, shortest proofs, lake build
+# 4. Measure: 228 genuine Mathlib → how many Origin lines?
+# 5. Progress by size: Condensed → Control → ... → Algebra
+```
+
+Start small. Measure the ratio. Scale from there.
 
 **Always audit the foundation before stacking on top of it.**
 
