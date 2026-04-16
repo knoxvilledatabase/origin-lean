@@ -349,6 +349,23 @@ derive these. Keeping them verbatim is duplication.
 - Breakdown: 14,601 `rfl`, 1,253 `Iff.rfl`, 1,251 `by simp`, 170 `by rfl`, 42 `by norm_num`
 - Line savings: ~49,000 lines (pending dependency-guarded run)
 
+**Dependency guard finding (2026-04-16):**
+Layer 1 yields ~3% actual deletions after the dependency guard.
+Tested on Mathlib_CategoryTheory (580 files, 11,878 genuine declarations):
+- 94 `rfl` declarations without `@[simp]` (compressible candidates)
+- 91 rescued by dependency guard (other proofs reference them by name)
+- 3 actually deletable
+
+Most `rfl` proofs in Mathlib are definitional unfolding lemmas — they
+look trivial but other proofs `rw [foo_def]` on them. The guard
+correctly rescues them. Layer 1 alone is not where the compression
+lives.
+
+**The real compression is in Layers 3-4.** The sketches already proved
+this: GroupTheory 38,810 → 121 lines wasn't from deleting `rfl` proofs.
+It was from recognizing that entire families of theorems are derivable
+from Core or unnecessary when the ground is outside the domain.
+
 ## Planned Patterns
 
 ### Layer 1
