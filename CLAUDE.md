@@ -257,31 +257,47 @@ Answer these without looking:
 - What four things survive across sessions?
 - What does "complexity means you skipped a step" mean?
 
-**Step 5: Warmup — one file, not 108**
+**Step 5: Build a domain — the proven workflow**
 
-Now you've earned the right to act. But start with the cartwheel,
-not the Miller Straight.
+Now you've earned the right to act. The workflow:
 
 ```bash
-# See the current state
-python3 scripts/lean_optimizer.py audit Combinatorics
+# 1. See the current state
+python3 scripts/lean_optimizer.py audit --all
 
-# Warmup: ONE file, not the whole domain
-python3 scripts/lean_optimizer.py compress extracted/Mathlib_Combinatorics/Enumerative/DoubleCounting.lean
+# 2. Pick a domain without a sketch. Generate a draft (instant).
+python3 scripts/lean_optimizer.py generate <DomainName>
+#    → dumps raw Mathlib definitions into Origin/<DomainName>.lean
+
+# 3. Rewrite the draft as Origin code:
+#    - Replace Mathlib types with Core + Lean stdlib types
+#    - Keep domain-specific definitions
+#    - Add demonstrations: by simp, cases <;> simp [h]
+#    - Remove everything derivable from Core
+#    - Import only Origin.Core
+
+# 4. Build (under 1 second — no Mathlib rebuild)
+lake build Origin.<DomainName>
+
+# 5. Commit and push
 ```
 
-One file. See what happens. Does it find anything? Does the build
-pass? How long does one file take? If one file works in 2 minutes,
-you can scale. If it takes 30 minutes, the tool needs optimization
-before scaling.
+**This workflow was proven on Probability:** the generator drafted
+1,244 lines of raw Mathlib. Claude Code rewrote it as 169 lines of
+Origin. `lake build` passed in under a second. 21,068 → 169 lines
+(99.2% reduction).
 
-**Do NOT run `compress Combinatorics` (108 files) until you've
-proven the tool works on a single file.** 108 files × multiple
-declarations × 7 tactics × `lake build` each = potentially
-thousands of builds. That's hours, not a warmup.
+**Domains with sketches (don't regenerate):** Algebra, Analysis,
+CategoryTheory, Combinatorics, Data, FieldTheory, Geometry,
+GroupTheory, InformationTheory, LinearAlgebra, MeasureTheory,
+NumberTheory, Probability, RingTheory, Topology.
 
-The progression: one file → one domain → all domains. Each step
-earns the next.
+**Domains needing sketches:** AlgebraicGeometry, AlgebraicTopology,
+Computability, Condensed, Control, Dynamics, ModelTheory, Order,
+RepresentationTheory, SetTheory.
+
+**The cartwheel:** pick one domain from the "needing sketches" list.
+Generate, rewrite, build. Each domain takes minutes, not hours.
 
 **Step 6: Document everything**
 
