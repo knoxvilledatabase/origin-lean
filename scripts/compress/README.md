@@ -178,3 +178,126 @@ After Layer 4 (foundational):     TBD lines
 
 Each layer's number is the proof. Lean's kernel verifies every line.
 The line counts are objective. The build succeeds or it doesn't.
+
+---
+
+## Appendix: Language Feature References
+
+Before writing compression patterns, you must know what both languages
+can do. The script is Python. The output is Lean 4. Maximum compression
+means leveraging 100% of both. The first Python app you build at age 20
+is hardcoded and verbose. The one you build at 40 uses every feature
+the language offers and is tiny yet powerful. We want the 40-year-old
+version — for both languages.
+
+### Python Features (the script language)
+
+**Core:** Clean syntax, dynamic typing, REPL, 3-5x shorter than Java/C++.
+
+**Data types:** int, float, complex, str, bool, bytes, list, tuple, set,
+frozenset, dict, None, arbitrary-precision integers.
+
+**Control flow:** if/elif/else, for, while, match/case (3.10+),
+comprehensions (list, dict, set, generator).
+
+**OOP:** Classes, single/multiple inheritance, dunder methods, @property,
+@staticmethod, @classmethod, abstract base classes, @dataclass.
+
+**Functional:** First-class functions, lambda, map/filter/reduce, closures,
+higher-order functions, immutable data (tuple, frozenset).
+
+**Modules:** import system, 200+ standard library modules, pip/PyPI
+(500,000+ packages), virtual environments.
+
+**Error handling:** try/except/else/finally, custom exceptions, context
+managers (with), built-in exception hierarchy.
+
+**Iterators & generators:** __iter__/__next__, yield, generator expressions,
+itertools, lazy evaluation.
+
+**Concurrency:** threading, multiprocessing, asyncio (async/await),
+concurrent.futures, GIL removal in 3.13+.
+
+**Metaprogramming:** Decorators, metaclasses, __getattr__/__setattr__,
+type() for dynamic class creation, inspect/dir/getattr/hasattr.
+
+**Type system:** Dynamic by default, optional type hints (PEP 484+),
+typing module, Protocol for structural subtyping, mypy/pyright.
+
+**I/O:** pathlib, os, shutil, json, csv, xml, sqlite3, struct/bytes.
+
+**Other:** f-strings, slicing, unpacking (*rest), walrus operator (:=),
+automatic GC, C extensions (ctypes/cffi/Cython), embeddable.
+
+### Lean 4 Features (the output language)
+
+**Every feature below is a potential compression tool.** If a Lean 4
+feature can express something in fewer lines than Mathlib's current
+approach, that's a compression pattern.
+
+**Syntax:** ML-inspired, Unicode operators (∀, ∃, →, λ), unified
+programs and proofs, do-notation for monadic code.
+
+**Dependent types:** Full dependent types (the defining feature). Pi types
+(∀ x : α, β x), Sigma types (Σ x : α, β x), propositions as types
+(Curry-Howard), proofs as programs, universe polymorphism.
+
+**Inductive types:** inductive for recursive data/propositions, mutual
+and nested inductives, structural and well-founded recursion, auto-generated
+eliminators (Rec, casesOn).
+
+**Type classes:** class/instance for ad-hoc polymorphism. Key classes:
+Functor, Monad, Applicative, BEq, Repr, ToString, Inhabited, Ord,
+Hashable. Default instances, instance priorities, `deriving` for
+automatic instance generation.
+
+**Structures:** structure keyword, single/multiple inheritance via extends,
+anonymous constructors, field access, where clauses.
+
+**Theorem proving:**
+- Tactic mode: intro, apply, exact, rw, simp, ring, omega, linarith,
+  norm_num, decide, contradiction, induction, cases, constructor, use
+- Term mode: explicit proof terms
+- Mathlib: 100,000+ theorems
+
+**Proof automation (CRITICAL for compression):**
+- `simp` — simplification with lemma sets
+- `decide` — decide propositions by computation
+- `omega` — linear arithmetic over ℤ and ℕ
+- `ring` — commutative ring identities
+- `linarith` / `polyrith` — linear and polynomial arithmetic
+- `aesop` — extensible proof search
+- `norm_num` — numerical normalization
+- `tauto` — propositional tautology checker
+- Custom tactic combinators: `<;>`, `first`, `try`, `repeat`
+- Tactic macros for extending the tactic language
+
+**Metaprogramming & macros:**
+- Hygienic macro system (headline Lean 4 feature)
+- macro_rules for pattern-based macros
+- syntax and elab for custom syntax/elaboration
+- Lean 4 is its own metaprogramming language
+- Custom notations via notation, infixl, infixr, prefix
+
+**Monads & effects:** IO monad, do-notation, StateT/ReaderT/ExceptT/OptionT,
+ST monad for mutable state with referential transparency.
+
+**Quotient types:** Quotient.mk/lift/ind, Setoid class for equivalence
+relations. Used for ℚ, ℝ, etc. in Mathlib.
+
+**Attributes & pragmas:**
+- `@[simp]` — mark for simp tactic
+- `@[ext]` — generate extensionality lemmas
+- `@[norm_cast]` — normalize coercions
+- `@[reducible]` / `@[semireducible]` / `@[irreducible]` — control unfolding
+- `@[inline]` / `@[specialize]` — compiler hints
+- `@[derive]` — auto-derive instances
+- `@[aesop]` — register for aesop
+
+**Performance:** Compiled to native code via C backend, reference counting,
+functional but in-place (FBIP), @[extern] for C FFI, unsafe escape hatch.
+
+**Key insight for compression:** Lean 4's most powerful features —
+`aesop`, `decide`, `omega`, `deriving`, custom tactic macros — are
+barely used in Mathlib (see tactic profile above). The gap between
+what Lean 4 CAN do and what Mathlib DOES is where compression lives.
