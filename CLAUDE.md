@@ -210,48 +210,72 @@ Category 2 changes the expression. Both compress.
 Before expanding any sketch, classify the domain content first. Each
 sketch file's header says which is which.
 
-### Step-by-step: what to do in order
+### Onboarding: read, then prove you understood
 
-**Step 1: Read.** Understand before acting.
+Don't skip ahead. Each step has a checkpoint question. If you can't
+answer it, re-read until you can. The question IS the alignment.
 
-1. **This file** (`CLAUDE.md`) — you're reading it. The philosophy,
-   the goal, the architecture. Read top to bottom.
-2. **`Origin/Core.lean`** (166 lines) — the foundation. Read every
-   line. If you don't understand why `none * some 5 = none` and
-   `some 0 * some 5 = some 0`, stop and re-read until you do.
-3. **`scripts/compress/README.md`** — all findings, all numbers, the
-   baseline audit, the roadmap to automation.
+**Step 1: Read `Origin/Core.lean`** (166 lines)
 
-**Step 2: Audit.** See the current state.
+Read every line. Then answer these:
+
+- What does `none * some 5` give? Why?
+- What does `some 0 * some 5` give? Why is this different from the above?
+- Is `some 0` the same as `none`? What's the difference?
+- What does the `origin` theorem prove? Is it an axiom or derived?
+- What are the three premises it derives from?
+- Why does `none` absorb? Is this an axiom or a consequence?
+
+If you can't answer all of these, re-read Core.lean. Don't proceed.
+
+**Step 2: Read one sketch** (e.g. `Origin/GroupTheory.lean`, 102 lines)
+
+Read it. Then answer:
+
+- What did the sketch keep? (Domain definitions + demonstrations)
+- What did it remove? (Everything derivable from Core)
+- What proof pattern closes the demonstrations? (`cases <;> simp`)
+- Why don't the "none absorbs" theorems need to exist in the sketch?
+
+**Step 3: Read `scripts/compress/README.md`**
+
+Read the findings. Then answer:
+
+- What are the two compression axes? Which is larger?
+- What did the Combinatorics audit prove? (99.7% reduction, zero dissolved)
+- What does the classifier do? What does the proof tester do?
+  Why are they different tools? (Axis 1 vs Axis 2)
+- What is the roadmap to full automation? How many stages?
+
+**Step 4: Understand the architecture**
+
+Answer these without looking:
+
+- What is Goal B? Why not Goal A?
+- What are Category 1 and Category 2 Mathlib math?
+- Why does Origin/ contain only production code?
+- What four things survive across sessions?
+- What does "complexity means you skipped a step" mean?
+
+**Step 5: Run the tools**
+
+Now you've earned the right to act.
 
 ```bash
+# See the current state
 python3 scripts/lean_optimizer.py audit --all
-```
 
-This shows every domain's DRY profile — lines, declarations,
-trivial proofs, multi-line rw chains, specializations. The numbers
-tell you where to work.
-
-**Step 3: Compress.** Run Stage 1 on Combinatorics first.
-
-```bash
+# The current work: Stage 1 compress on Combinatorics
 python3 scripts/lean_optimizer.py compress Combinatorics
+# Report the before/after line count.
 ```
 
-Combinatorics has zero dissolved declarations — pure DRY. This
-tests the proof tester across real Mathlib declarations, tries
-shorter proofs, lets `lake build` judge. Report before/after lines.
+**Step 6: Document everything**
 
-**Step 4: Expand.** If Stage 1 works, run it on the next domain.
-Then expand the sketches — express more of Mathlib's mathematics
-through Core. The extracted `Mathlib_*` directories show what
-Mathlib has. The sketches show what Origin keeps. Pick the sketch
-with the most room to grow.
-
-**Step 5: Document.** Every finding goes into `compress/README.md`.
-Every script improvement goes into `lean_optimizer.py`. Every
-philosophical insight goes into `CLAUDE.md`. Nothing stays in your
-head. Commit and push before your context closes.
+Every finding goes into `compress/README.md`. Every script improvement
+goes into `lean_optimizer.py`. Every philosophical insight goes into
+`CLAUDE.md`. Nothing stays in your head. Commit and push before your
+context closes.
 
 **Always audit the foundation before stacking on top of it.**
 If it feels complex, you skipped a step. Stop and ask the user.

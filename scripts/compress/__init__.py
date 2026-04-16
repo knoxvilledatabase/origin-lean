@@ -7,4 +7,4 @@ deletes them (returns None) or rewrites them (returns compressed text).
 The Extractor calls patterns in order. First match wins.
 """
 
-from .patterns import CompressionPattern, get_patterns
+from .proof_patterns import CompressionPattern, get_patterns
