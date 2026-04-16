@@ -11,6 +11,7 @@ Usage:
     python3 scripts/origin.py audit --all           DRY audit all domains
     python3 scripts/origin.py generate <domain>     draft Origin file from Mathlib
     python3 scripts/origin.py classify <domain>     classify declarations
+    python3 scripts/origin.py suggest <domain>      show uncovered genuine declarations
 """
 
 import re
@@ -435,6 +436,90 @@ def cmd_classify(path):
 
 
 # =============================================================================
+# Suggest — show uncovered Mathlib declarations for a domain
+# =============================================================================
+
+def cmd_suggest(domain):
+    """Show Mathlib genuine declarations not yet covered by Origin."""
+    d = EXTRACTED / f"Mathlib_{domain}"
+    if not d.exists():
+        ui.fail(f"Not found: {domain}")
+        return
+
+    # 1. Collect all genuine Mathlib declarations
+    mathlib_decl_re = re.compile(
+        r'^(?:.*?)?(private\s+|protected\s+)?(noncomputable\s+)?'
+        r'(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)')
+
+    mathlib_decls = []  # (kind, name, label, filename)
+    for f in sorted(d.rglob("*.lean")):
+        text = f.read_text(errors="replace")
+        fname = f.relative_to(EXTRACTED)
+        for line in text.split("\n"):
+            m = mathlib_decl_re.match(line.strip())
+            if m:
+                kind, name = m.group(3), m.group(4)
+                ctx = text[text.find(line):text.find(line) + 500]
+                label = classifier.classify(kind, name, ctx)
+                if label == "genuine":
+                    mathlib_decls.append((kind, name, str(fname)))
+
+    # 2. Collect Origin declarations (name stems)
+    origin_names = set()
+    for fname in [f"{domain}.lean", f"{domain}2.lean"]:
+        p = ORIGIN / fname
+        if p.exists():
+            for line in p.read_text(errors="replace").split("\n"):
+                m = ORIGIN_DECL_RE.match(line)
+                if m and "private " not in line:
+                    origin_names.add(m.group(2))
+
+    # 3. Match: a Mathlib declaration is "covered" if Origin has a declaration
+    #    with the same name (case-insensitive, ignoring namespace prefixes)
+    origin_stems = {n.split(".")[-1].lower() for n in origin_names}
+
+    covered = []
+    uncovered = []
+    for kind, name, fname in mathlib_decls:
+        stem = name.split(".")[-1].lower()
+        if stem in origin_stems:
+            covered.append((kind, name, fname))
+        else:
+            uncovered.append((kind, name, fname))
+
+    # 4. Display
+    total = len(mathlib_decls)
+    n_covered = len(covered)
+    n_uncovered = len(uncovered)
+
+    ui.header("S U G G E S T", f"{domain} — {n_covered}/{total} genuine covered, {n_uncovered} uncovered")
+
+    if uncovered:
+        # Group by file
+        from collections import defaultdict
+        by_file = defaultdict(list)
+        for kind, name, fname in uncovered:
+            by_file[fname].append((kind, name))
+
+        for fname in sorted(by_file.keys()):
+            decls = by_file[fname]
+            print(f"\n  {ui.BOLD}{fname}{ui.RESET} ({len(decls)} uncovered):")
+            for kind, name in decls[:15]:  # cap display at 15 per file
+                print(f"    {kind:10s} {name}")
+            if len(decls) > 15:
+                ui.info(f"    ... and {len(decls) - 15} more")
+
+    print()
+    ui.separator()
+    ui.stat("Total genuine", f"{total}")
+    ui.stat("Covered", f"{ui.GREEN}{n_covered}{ui.RESET}")
+    ui.stat("Uncovered", f"{ui.YELLOW}{n_uncovered}{ui.RESET}" if n_uncovered else "0")
+    pct = n_covered / max(total, 1) * 100
+    ui.stat("Coverage", f"{pct:.0f}%")
+    print()
+
+
+# =============================================================================
 # Dedup — find duplicate definitions across Origin files
 # =============================================================================
 
@@ -655,6 +740,11 @@ def main():
             cmd_classify(sys.argv[2])
         else:
             print("Usage: origin.py classify <DOMAIN>")
+    elif cmd == "suggest":
+        if len(sys.argv) > 2:
+            cmd_suggest(sys.argv[2])
+        else:
+            print("Usage: origin.py suggest <DOMAIN>")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
