@@ -455,6 +455,43 @@ pattern. Next run, that pattern applies automatically.
 run again. The script gets smarter with each session. The human
 teaches through exceptions. The script remembers forever.
 
+### Roadmap to Full Automation (2026-04-16)
+
+**What's done:**
+- ✅ The atomic unit — `sandbox.py` tests one proof, Lean verifies
+- ✅ The audit command — profiles any domain's DRY opportunities
+- ✅ The classifier — identifies what dissolves vs what's genuine
+- ✅ The pipeline — extracts and builds at 98.3% pass rate
+
+**What's missing:**
+
+**Stage 1 — File-level orchestration (1-2 sessions).** Take the
+sandbox and run it across every declaration in a file. Collect what
+compressed, what didn't. Apply compressions that passed. Rebuild
+the full file. Binary search if the full rebuild fails. Mechanical
+— no judgment required.
+
+**Stage 2 — Domain-level orchestration (1 session).** Run Stage 1
+across every file in a domain. Report the line count before and
+after. Commit if the build passes.
+
+**Stage 3 — Human exception handler (ongoing).** Everything Stage 1
+couldn't compress gets reported with the specific proof that failed.
+A human looks at the hardest cases, solves one, encodes the pattern.
+Next run it applies everywhere.
+
+**Stage 4 — Mathlib change detection (1 session).** When Mathlib
+updates, diff the declaration lists, classify new declarations, run
+the pipeline on just the new ones.
+
+**Honest estimate:** 2-3 focused sessions to 80% automation. The
+remaining 20% — genuinely hard theorems no single tactic closes —
+will always need human judgment. But that 20% is where the actual
+mathematics lives. Everything else is mechanical.
+
+The sandbox proving today is the roundoff back handspring. The full
+automation is the double full. Two skills away.
+
 ## Active Patterns
 
 ### 1. `core_trivial_proof` (Layer 1)
