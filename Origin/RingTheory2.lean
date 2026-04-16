@@ -35,7 +35,7 @@ def idealMem [Mul α] [Add α] (I : RingIdeal α) : Option α → Prop
 @[simp] theorem idealMem_some [Mul α] [Add α] (I : RingIdeal α) (a : α) :
     idealMem I (some a) = I.mem a := rfl
 
-def isPrime [Mul α] [Add α] (I : RingIdeal α) : Prop :=
+def isPrimeIdeal [Mul α] [Add α] (I : RingIdeal α) : Prop :=
   ∀ a b, I.mem (a * b) → I.mem a ∨ I.mem b
 
 def isMaximal [Mul α] [Add α] (I : RingIdeal α) : Prop :=
@@ -74,7 +74,7 @@ def isArtinian [Mul α] [Add α] : Prop :=
 -- ============================================================================
 
 def isDedekind [Mul α] [Add α] : Prop :=
-  isNoetherian (α := α) ∧ ∀ I : RingIdeal α, isPrime I → isMaximal I
+  isNoetherian (α := α) ∧ ∀ I : RingIdeal α, isPrimeIdeal I → isMaximal I
 
 def isPID [Mul α] [Add α] : Prop :=
   ∀ I : RingIdeal α, ∃ g, ∀ a, I.mem a → ∃ r, r * g = a

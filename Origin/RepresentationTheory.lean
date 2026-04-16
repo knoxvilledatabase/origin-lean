@@ -162,7 +162,7 @@ def AreOrthogonal (innerF : (G → α) → (G → α) → α) (zero : α)
 -- ============================================================================
 
 /-- A representation is irreducible if it has no proper subrepresentations. -/
-def IsIrreducible (act : G → α → α) (trivialPred allPred : α → Prop) : Prop :=
+def IsIrreducibleRep (act : G → α → α) (trivialPred allPred : α → Prop) : Prop :=
   ∀ mem : α → Prop, IsSubrepresentation act mem →
     (∀ a, mem a → trivialPred a) ∨ (∀ a, allPred a → mem a)
 
@@ -182,7 +182,7 @@ def IsFiniteDimensional (_ρ : Representation G α) (dim : Nat) : Prop :=
 
 /-- Maschke's theorem: group representations are semisimple when the
     characteristic doesn't divide the group order. -/
-def IsSemisimple (act : G → α → α) : Prop :=
+def IsSemisimpleRep (act : G → α → α) : Prop :=
   ∀ mem : α → Prop, IsSubrepresentation act mem →
     ∃ compl : α → Prop, IsSubrepresentation act compl ∧
       (∀ a, mem a → compl a → False)
@@ -242,7 +242,7 @@ def rightDual_ρ (ρ : Representation G α) (invF : G → G)
   transposeF (ρ.act (invF g))
 
 /-- A braiding on representations: tensor commutes. -/
-def IsBraided (swap : α × β → β × α) (ρ₁ : Representation G α)
+def IsBraidedRep (swap : α × β → β × α) (ρ₁ : Representation G α)
     (ρ₂ : Representation G β) : Prop :=
   ∀ g (a : α) (b : β), swap (ρ₁.act g a, ρ₂.act g b) =
     (ρ₂.act g (swap (a, b)).1, ρ₁.act g (swap (a, b)).2)

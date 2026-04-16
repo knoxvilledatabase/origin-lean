@@ -546,17 +546,17 @@ def cmd_index():
             modules[f.stem] = names
 
     # Check for name collisions before writing
+    # Use full names — namespaced declarations (Path'.comp vs PFun'.comp) don't collide
     all_names = {}  # name -> (module, kind)
     collisions = []
     for mod, decls in modules.items():
         for kind, name in decls:
-            short = name.split(".")[-1]  # strip any prefix
-            if short in all_names:
-                other_mod, other_kind = all_names[short]
+            if name in all_names:
+                other_mod, other_kind = all_names[name]
                 if other_mod != mod:
-                    collisions.append((short, mod, other_mod))
+                    collisions.append((name, mod, other_mod))
             else:
-                all_names[short] = (mod, kind)
+                all_names[name] = (mod, kind)
 
     if collisions:
         ui.header("I N D E X   E R R O R", "Duplicate names — fix before index can build")
