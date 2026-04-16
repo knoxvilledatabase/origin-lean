@@ -650,39 +650,33 @@ The process: run → read top pattern → fix script → run again.
   customize
 - **UI** — all terminal output in one class
 
-### Next major improvement: compression patterns
+### Compression: scripts/compress/
 
-The filter is at 84% pass rate (4,177 / 4,998 files). The remaining
-821 failures are proofs that reference dissolved content. Top patterns:
+**Read `scripts/compress/README.md` first.** It has the full framing,
+the layer model, the tactic audit numbers, and the pattern architecture.
 
-```
-630 files  tactic 'rewrite' failed  — proof references dissolved declaration
-264 files  failed to synthesize     — missing typeclass instance
- 90 files  rewrite variant          — same root cause
-```
+The question: **What is the absolute least number of lines that can do
+everything Mathlib does with Origin?** This is a Kolmogorov complexity
+question. Mathlib's 1.58M lines are one witness. Origin claims a
+dramatically shorter witness exists.
 
-To get to zero errors, two tracks:
+Compression applies in four layers:
+1. **Syntactic** — delete trivial proofs (`rfl`, `by simp`). 13.5% of declarations.
+2. **Tactic power** — replace verbose `rw` chains with `aesop`/`omega`/`ring`.
+3. **Lemma consolidation** — collapse `foo_nat`/`foo_int`/`foo_real` to generic `foo`.
+4. **Foundational** — Origin's thesis. The 17 typeclasses that dissolve.
 
-**Track 1: Classifier (DONE).** Two kinds of `≠ 0`:
-- **Ground guards** (`NeZero`, `GroupWithZero` in signature) — always
-  dissolve. These ARE the infrastructure typeclasses.
-- **Measurement constraints** (bare `≠ 0` in a field theory theorem) —
-  genuine math about `some 0`. Keep unless the declaration name is
-  also infrastructure.
-The classifier now uses `INFRA_SIG` (always dissolves) vs `BARE_NEZ`
-(only dissolves if name is also in `INFRA_NAMES`). This means thousands
-of theorems with legitimate `(h : x ≠ 0)` preconditions are now
-correctly classified as genuine.
+Each layer is a compression pattern class in `scripts/compress/patterns.py`.
+Each one measurable. Each one independently auditable.
 
-**Track 2: Compression patterns in `Extractor._emit_block()`:**
-- Dependency analysis: if a genuine proof references a dissolved decl,
-  either keep the decl or rewrite the proof
-- Typeclass resolution: if a `failed to synthesize` comes from a stripped
-  instance, keep the instance
-- Proof simplification: if `by simp` closes after removing a ground
-  guard, collapse
+**Are we leveraging Lean 4 fully?** Not yet. Mathlib barely uses
+`aesop` (not in top 25 tactics), `decide` (not in top 25), and `omega`
+(907 uses vs 54,545 `rw` uses). Before compressing, audit whether
+Lean's richest features can close proofs that Mathlib wrote verbosely.
 
-Each pattern is a method. Add it, run the pipeline, errors drop.
+The compression patterns are the institutional knowledge — every trick
+the script learns gets encoded as a class. The pipeline runs the
+patterns. `compress/README.md` shows the work.
 
 ## Progression: Go Straight to Mathlib
 
@@ -789,19 +783,33 @@ are objective. The build succeeds or it doesn't.
 
 ### The goal
 
-Take a 2.2 million line library and express the same mathematics in
-99%+ less code. Every theorem. Exhaustively. Building clean. In the
-absolute minimum lines that Lean's richest functionality allows.
+**What is the smallest program that proves everything Mathlib proves?**
 
-Origin is the 40-year veteran who takes what the new contributors
-produce (Mathlib) and compresses it to the minimum expression. The
-script is the veteran's expertise encoded as automation. Mathlib
-grows. Origin consolidates. The script is the bridge.
+Mathlib is one witness — 1.58 million lines that prove the theorems.
+But it's almost certainly not the shortest witness. Mathlib was grown,
+not designed. Nobody runs the global optimizer. Every `lemma foo_nat`,
+`lemma foo_int`, `lemma foo_real` that should be one generic lemma is
+still three lemmas. Every 15-line `rw` chain that `simp` could close
+in one line is still 15 lines.
+
+Origin is the claim that a dramatically shorter witness exists. The
+pipeline is the machine for testing that claim. The compression
+patterns are the evidence. Lean's kernel is the judge.
 
 The exhaustive conversion IS the proof. Cherry-picking easy theorems
 proves nothing. Going through every theorem in Mathlib and showing
 it builds on Origin in fewer lines — that's the evidence no one can
-argue with. Lean's kernel verifies it. The line counts are objective.
-The build succeeds or it doesn't.
+argue with. The line counts are objective. The build succeeds or it
+doesn't.
 
-Mathlib is the demo. Origin is production.
+```
+Mathlib (source):           1,583,069 lines
+After filter (no compress): 1,446,657 lines (8.6% reduction)
+After Layer 1 (trivial):          TBD lines
+After Layer 2 (tactics):          TBD lines
+After Layer 3 (consolidation):    TBD lines
+After Layer 4 (foundational):     TBD lines
+```
+
+Each layer's number is measured, not claimed. Lean verifies. Origin
+consolidates. The script is the bridge. Mathlib grows. Origin compresses.

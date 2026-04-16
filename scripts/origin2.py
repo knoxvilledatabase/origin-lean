@@ -504,6 +504,12 @@ class Extractor:
     def __init__(self, parser: Parser = None, classifier: Classifier = None):
         self.classifier = classifier or Classifier()
         self.parser = parser or Parser(self.classifier)
+        # Load compression patterns
+        try:
+            from compress.patterns import get_patterns
+            self.patterns = get_patterns()
+        except ImportError:
+            self.patterns = []
 
     def extract(self, filepath: Path) -> tuple[str, dict]:
         """Extract genuine content from a Mathlib file."""
@@ -537,6 +543,17 @@ class Extractor:
         imports = [b.text for b in blocks if b.kind == "import"]
         parts = []
 
+        # Dependency guard for compression: collect text from all non-compressed
+        # declarations so we can check if a compressed decl is referenced.
+        if self.patterns:
+            non_compressed_text = "\n".join(
+                b.text for b in blocks
+                if b.kind == "decl" and b.classification not in ("dissolves", "infra_name")
+                and not any(p.match(b) for p in self.patterns)
+            )
+        else:
+            non_compressed_text = ""
+
         last_dissolved = False
         for b in blocks:
             # Suppress orphaned bodies after dissolved declarations
@@ -546,6 +563,10 @@ class Extractor:
                     continue
             last_dissolved = (b.kind == "decl" and b.classification in ("dissolves", "infra_name"))
             text_out = self._emit_block(b)
+            # Dependency guard: if compression deleted it but others reference it, keep it
+            if text_out is None and b.kind == "decl" and b.name and self.patterns:
+                if re.search(r'\b' + re.escape(b.name) + r'\b', non_compressed_text):
+                    text_out = b.text  # keep — it's referenced
             if text_out is not None:
                 parts.append(text_out)
 
@@ -590,8 +611,16 @@ class Extractor:
                     del dissolved[name]
                     changed = True
 
+    def _apply_compression(self, b: Block) -> str | None:
+        """Apply compression patterns. Returns sentinel _COMPRESSED to delete,
+        compressed text to replace, or None if no pattern matched."""
+        for pattern in self.patterns:
+            if pattern.match(b):
+                return pattern.compress(b)
+        return b.text  # no pattern matched — keep as-is
+
     def _emit_block(self, b: Block) -> str | None:
-        """Emit a block. Override to add compression patterns."""
+        """Emit a block. Compression patterns live in scripts/compress/."""
         if b.kind == "comment":
             return b.text if "/-!" in b.text else None
         if b.kind == "import":
@@ -603,7 +632,7 @@ class Extractor:
                 return f"-- DISSOLVED: {b.name}"
             if b.classification == "conflates":
                 return f"-- CONFLATES (assumes ground = zero): {b.name}\n{b.text}"
-            return b.text
+            return self._apply_compression(b)
         if b.kind == "other":
             return b.text
         return None
