@@ -6,11 +6,21 @@ import Origin.Core
 /-!
 # Algebra on Option α (Core-based)
 
-Val/Algebra.lean: 596 lines. Polynomial, module, homological, lattice,
-Lie algebra, star algebra, big operators, category theory, GCD, characteristic.
+**Goal B classification:**
+- Polynomial roots, homological algebra, Lie algebra, big operators,
+  GCD, characteristic — Category 1 (Option-meaningful: none = no
+  polynomial, no cycle, no chain; these interact with the ground)
+- Lattice theory (join/meet), distributive/modular laws, Vieta's
+  formula, HasDistribNeg — Category 2 (clean math, no infrastructure)
+- NoZeroDivisors, IsCancelMulZero, IsDomain — dissolved infrastructure
+  (managed zero-inside-domain; Origin dissolves these entirely)
 
-This version keeps only domain-specific definitions and proofs that
-actually use Option.
+**What Origin adds:** domain definitions where none = outside the domain
+**What Origin leaves in Mathlib:** pure algebraic identities with no
+  zero-management, lattice theory, ring arithmetic lemmas
+
+Mathlib_Algebra: 797 files, 47 dissolved declarations.
+Hotspots: Order/Ring/Unbundled/Basic (10), Ring/Basic (5), CharP/Defs (3).
 -/
 
 universe u
