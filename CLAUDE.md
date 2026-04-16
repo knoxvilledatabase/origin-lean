@@ -265,21 +265,24 @@ Now you've earned the right to act. The workflow:
 # 1. See the current state
 python3 scripts/lean_optimizer.py audit --all
 
-# 2. Pick a domain without a sketch. Generate a draft (instant).
-python3 scripts/lean_optimizer.py generate <DomainName>
+# 2. See which domains have sketches
+python3 scripts/generate_origin.py --list
+
+# 3. Pick a domain without a sketch. Generate a draft (instant).
+python3 scripts/generate_origin.py <DomainName>
 #    → dumps raw Mathlib definitions into Origin/<DomainName>.lean
 
-# 3. Rewrite the draft as Origin code:
+# 4. Rewrite the draft as Origin code:
 #    - Replace Mathlib types with Core + Lean stdlib types
 #    - Keep domain-specific definitions
 #    - Add demonstrations: by simp, cases <;> simp [h]
 #    - Remove everything derivable from Core
 #    - Import only Origin.Core
 
-# 4. Build (under 1 second — no Mathlib rebuild)
+# 5. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
 
-# 5. Commit and push
+# 6. Commit and push
 ```
 
 **This workflow was proven on Probability:** the generator drafted

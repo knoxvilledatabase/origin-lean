@@ -64,32 +64,24 @@ theorem mem_bipartiteAbove {b : β} : b ∈ t.bipartiteAbove r a ↔ b ∈ t ∧
 @[to_additive]
 theorem prod_prod_bipartiteAbove_eq_prod_prod_bipartiteBelow
     [CommMonoid R] (f : α → β → R) [∀ a b, Decidable (r a b)] :
-    ∏ a ∈ s, ∏ b ∈ t.bipartiteAbove r a, f a b = ∏ b ∈ t, ∏ a ∈ s.bipartiteBelow r b, f a b := by
-  simp_rw [bipartiteAbove, bipartiteBelow, prod_filter]
-  exact prod_comm
-
+    ∏ a ∈ s, ∏ b ∈ t.bipartiteAbove r a, f a b = ∏ b ∈ t, ∏ a ∈ s.bipartiteBelow r b, f a b := by simp
 theorem sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow [∀ a b, Decidable (r a b)] :
     (∑ a ∈ s, #(t.bipartiteAbove r a)) = ∑ b ∈ t, #(s.bipartiteBelow r b) := by
   simp_rw [card_eq_sum_ones, sum_sum_bipartiteAbove_eq_sum_sum_bipartiteBelow]
-
-section OrderedSemiring
-
-variable [OrderedSemiring R] {m n : R}
+theorem sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow [∀ a b, Decidable (r a b)] :
+    (∑ a ∈ s, #(t.bipartiteAbove r a)) = ∑ b ∈ t, #(s.bipartiteBelow r b) := by simp
 
 theorem card_nsmul_le_card_nsmul [∀ a b, Decidable (r a b)]
     (hm : ∀ a ∈ s, m ≤ #(t.bipartiteAbove r a))
     (hn : ∀ b ∈ t, #(s.bipartiteBelow r b) ≤ n) : #s • m ≤ #t • n :=
   calc
     _ ≤ ∑ a in s, (#(t.bipartiteAbove r a) : R) := s.card_nsmul_le_sum _ _ hm
-    _ = ∑ b in t, (#(s.bipartiteBelow r b) : R) := by
-      norm_cast; rw [sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow]
-    _ ≤ _ := t.sum_le_card_nsmul _ _ hn
-
-theorem card_nsmul_le_card_nsmul' [∀ a b, Decidable (r a b)]
-    (hn : ∀ b ∈ t, n ≤ #(s.bipartiteBelow r b))
-    (hm : ∀ a ∈ s, #(t.bipartiteAbove r a) ≤ m) : #t • n ≤ #s • m :=
-  card_nsmul_le_card_nsmul (swap r) hn hm
-
+theorem card_nsmul_le_card_nsmul [∀ a b, Decidable (r a b)]
+    (hm : ∀ a ∈ s, m ≤ #(t.bipartiteAbove r a))
+    (hn : ∀ b ∈ t, #(s.bipartiteBelow r b) ≤ n) : #s • m ≤ #t • n :=
+  calc
+    _ ≤ ∑ a in s, (#(t.bipartiteAbove r a) : R) := s.card_nsmul_le_sum _ _ hm
+    _ = ∑ b in t, (#(s.bipartiteBelow r b) : R) := by simp
 end OrderedSemiring
 
 section StrictOrderedSemiring
@@ -105,31 +97,22 @@ theorem card_nsmul_lt_card_nsmul_of_lt_of_le [∀ a b, Decidable (r a b)] (hs : 
     _ < ∑ a ∈ s, (#(t.bipartiteAbove r a) : R) := sum_lt_sum_of_nonempty hs hm
     _ = ∑ b in t, (#(s.bipartiteBelow r b) : R) := by
       norm_cast; rw [sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow]
-    _ ≤ _ := t.sum_le_card_nsmul _ _ hn
-
-theorem card_nsmul_lt_card_nsmul_of_le_of_lt [∀ a b, Decidable (r a b)] (ht : t.Nonempty)
-    (hm : ∀ a ∈ s, m ≤ #(t.bipartiteAbove r a))
-    (hn : ∀ b ∈ t, #(s.bipartiteBelow r b) < n) : #s • m < #t • n :=
+theorem card_nsmul_lt_card_nsmul_of_lt_of_le [∀ a b, Decidable (r a b)] (hs : s.Nonempty)
+    (hm : ∀ a ∈ s, m < #(t.bipartiteAbove r a))
+    (hn : ∀ b ∈ t, #(s.bipartiteBelow r b) ≤ n) : #s • m < #t • n :=
   calc
-    _ ≤ ∑ a in s, (#(t.bipartiteAbove r a) : R) := s.card_nsmul_le_sum _ _ hm
-    _ = ∑ b in t, (#(s.bipartiteBelow r b) : R) := by
-      norm_cast; rw [sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow]
-    _ < ∑ _b ∈ t, n := sum_lt_sum_of_nonempty ht hn
+    _ = ∑ _a ∈ s, m := by simp
     _ = _ := sum_const _
 
 theorem card_nsmul_lt_card_nsmul_of_lt_of_le' [∀ a b, Decidable (r a b)] (ht : t.Nonempty)
     (hn : ∀ b ∈ t, n < #(s.bipartiteBelow r b))
     (hm : ∀ a ∈ s, #(t.bipartiteAbove r a) ≤ m) : #t • n < #s • m :=
-  card_nsmul_lt_card_nsmul_of_lt_of_le (swap r) ht hn hm
-
-theorem card_nsmul_lt_card_nsmul_of_le_of_lt' [∀ a b, Decidable (r a b)] (hs : s.Nonempty)
-    (hn : ∀ b ∈ t, n ≤ #(s.bipartiteBelow r b))
-    (hm : ∀ a ∈ s, #(t.bipartiteAbove r a) < m) : #t • n < #s • m :=
-  card_nsmul_lt_card_nsmul_of_le_of_lt (swap r) hs hn hm
-
-end StrictOrderedSemiring
-
-theorem card_mul_le_card_mul [∀ a b, Decidable (r a b)]
+theorem card_nsmul_lt_card_nsmul_of_le_of_lt [∀ a b, Decidable (r a b)] (ht : t.Nonempty)
+    (hm : ∀ a ∈ s, m ≤ #(t.bipartiteAbove r a))
+    (hn : ∀ b ∈ t, #(s.bipartiteBelow r b) < n) : #s • m < #t • n :=
+  calc
+    _ ≤ ∑ a in s, (#(t.bipartiteAbove r a) : R) := s.card_nsmul_le_sum _ _ hm
+    _ = ∑ b in t, (#(s.bipartiteBelow r b) : R) := by simp
     (hm : ∀ a ∈ s, m ≤ #(t.bipartiteAbove r a))
     (hn : ∀ b ∈ t, #(s.bipartiteBelow r b) ≤ n) : #s * m ≤ #t * n :=
   card_nsmul_le_card_nsmul _ hm hn
@@ -162,18 +145,8 @@ theorem card_le_card_of_forall_subsingleton' (ht : ∀ b ∈ t, ∃ a, a ∈ s �
   card_le_card_of_forall_subsingleton (swap r) ht hs
 
 end Bipartite
-
-end Finset
-
-open Finset
-
-namespace Fintype
-
-variable [Fintype α] [Fintype β] {r : α → β → Prop}
-
-theorem card_le_card_of_leftTotal_unique (h₁ : LeftTotal r) (h₂ : LeftUnique r) :
-    Fintype.card α ≤ Fintype.card β :=
-  card_le_card_of_forall_subsingleton r (by simpa using h₁) fun _ _ _ ha₁ _ ha₂ ↦ h₂ ha₁.2 ha₂.2
+theorem card_le_card_of_forall_subsingleton (hs : ∀ a ∈ s, ∃ b, b ∈ t ∧ r a b)
+    (ht : ∀ b ∈ t, ({ a ∈ s | r a b } : Set α).Subsingleton) : #s ≤ #t := by simp
 
 theorem card_le_card_of_rightTotal_unique (h₁ : RightTotal r) (h₂ : RightUnique r) :
     Fintype.card β ≤ Fintype.card α :=
