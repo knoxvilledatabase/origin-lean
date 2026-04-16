@@ -117,9 +117,10 @@ Category 2 changes the expression.
 
 ## Step 6: The tool
 
-One tool, four commands:
+One tool, five commands:
 
 ```bash
+python3 scripts/origin.py status            # PROGRESS REPORT — run this first
 python3 scripts/origin.py list              # show all domains + status
 python3 scripts/origin.py audit --all       # DRY profile every domain
 python3 scripts/origin.py generate <domain> # draft Origin file (instant)
@@ -131,11 +132,11 @@ python3 scripts/origin.py classify <domain> # show dissolved/genuine/conflates
 ## Step 7: The workflow
 
 ```bash
-# 1. See the current state
-python3 scripts/origin.py audit --all
+# 1. See where things stand (run this FIRST)
+python3 scripts/origin.py status
+# Green = deepened, Yellow = sketch, Dim = needs work
 
-# 2. See which domains have sketches
-python3 scripts/origin.py list
+# 2. Pick a domain to deepen (yellow or dim)
 
 # 3. Generate a draft for a domain without a sketch (instant)
 python3 scripts/origin.py generate <DomainName>
