@@ -58,24 +58,24 @@ The `origin` theorem, instances for `*` `+` `-` on `Option α`, the
 `@[simp]` set, `liftBin₂`, `no_some_fixed_point`. 166 lines. The
 entire algebraic foundation.
 
-### Level 2: Parser (DONE — origin2.py)
+### Level 2: Parser (DONE — lean_optimizer.py)
 Reads Mathlib files into blocks. Handles all major Lean 4 syntax:
 alias, notation, macro, syntax, elab, infixl/r, prefix, postfix,
 library_note, set_option ... in, #adaptation_note, nested comments,
 deprecated aliases. `expected token` errors: 824 → 2.
 
-### Level 3: Classifier (DONE — origin2.py)
+### Level 3: Classifier (DONE — lean_optimizer.py)
 Distinguishes ground guards from measurement constraints. `≠ 0` in
 a field theory theorem is genuine math about `some 0`. `NeZero` and
 `GroupWithZero` in a signature are infrastructure. INFRA_NAMES anchored
 with word boundaries. INFRA_SIG word-bounded. 5,713 → 260 dissolved.
 
-### Level 4: Dependency resolver (DONE — origin2.py)
+### Level 4: Dependency resolver (DONE — lean_optimizer.py)
 Within-file: if a genuine proof references a dissolved declaration,
 un-dissolve it. Iterates to stability. Checks all block types.
 762+ declarations rescued.
 
-### Level 5: Extraction pipeline (DONE — origin2.py)
+### Level 5: Extraction pipeline (DONE — lean_optimizer.py)
 98.3% pass rate. 4,931 / 5,015 files build clean. 84 remaining
 (13 Tactic metaprogramming, 71 cross-file cascade). `noncomputable
 section` on all extracted files. Parallel build across 10 cores.
@@ -256,15 +256,10 @@ Option α separating what rings conflate. This is already measured:
 
 ## Architecture
 
-**Three generations:**
-
-- `origin.py` — the original. Reference only.
-- `origin2.py` — class-based, Mathlib-specific. Has pipeline,
-  classifier, parser, extractor, audit, compress. All Mathlib
-  knowledge hardcoded. This is the reference for origin3.
-- `origin3.py` — **built.** Generic Lean optimizer + config.
-  Separates Axis 2 (DRY, works on any Lean project) from Axis 1
-  (dissolution rules, Origin-specific).
+**`lean_optimizer.py`** — generic Lean proof optimizer + config.
+Separates Axis 2 (DRY, works on any Lean project) from Axis 1
+(dissolution rules, Origin-specific). Previous versions (`origin.py`,
+`origin2.py`) are in git history.
 
 **Three-layer architecture:**
 
@@ -284,9 +279,7 @@ Layer 3: Project Config
 
 ```
 scripts/
-  origin.py               — original reference (don't use)
-  origin2.py              — Mathlib-specific reference
-  origin3.py              — generic Lean optimizer (THE TOOL)
+  lean_optimizer.py       — generic Lean optimizer (THE TOOL)
   compress/
     __init__.py            — imports
     sandbox.py             — atomic unit: test one proof, Lean verifies
@@ -300,7 +293,7 @@ The config format is the API. Everything else is implementation. If
 the config format is right, the tool is extensible forever. Change
 the config, not the code.
 
-`ProjectConfig` in `origin3.py` — a Python dataclass:
+`ProjectConfig` in `lean_optimizer.py` — a Python dataclass:
 
 ```python
 ProjectConfig(
@@ -347,7 +340,7 @@ The optimizer, sandbox, and audit don't change — only the config.
 
 **Three concerns, three locations:**
 - `CLAUDE.md` holds the philosophy
-- `origin2.py` holds the Mathlib-specific reference
+- `lean_optimizer.py` holds the Mathlib-specific reference
 - `compress/` holds the compression knowledge
 
 Each pattern is a class inheriting `CompressionPattern`:
@@ -370,7 +363,7 @@ reference by name.
 1. Create a class in `patterns.py` inheriting `CompressionPattern`
 2. Implement `match(block)` → bool and `compress(block)` → str | None
 3. Add it to `get_patterns()`
-4. Run `python3 scripts/origin2.py run`
+4. Run `python3 scripts/lean_optimizer.py run`
 5. Update this file with before/after numbers
 
 ## Foundation Audit (2026-04-16)
@@ -452,7 +445,7 @@ optimizer.
 
 ### Baseline DRY Audit — All Domains (2026-04-16)
 
-Run: `python3 scripts/origin2.py audit --all`
+Run: `python3 scripts/lean_optimizer.py audit --all`
 
 | Domain | Files | Lines | Genuine | Dissolved | Trivial | Multi-rw | Spec | Sketch | Reduction |
 |--------|------:|------:|--------:|----------:|--------:|---------:|-----:|-------:|----------:|
@@ -501,7 +494,7 @@ The lakefile pins the version. When bumped, `git diff` shows what's
 new or changed.
 
 **Stage 2: Classify.** For each declaration: genuine, dissolved,
-conflates, infrastructure. Already built in `origin2.py`. Category 1
+conflates, infrastructure. Already built in `lean_optimizer.py`. Category 1
 vs Category 2 classification in sketch headers.
 
 **Stage 3: Sandbox compress.** For each declaration, extract into a

@@ -49,11 +49,11 @@ he stands on. The formal systems just hadn't caught up yet.
 
 ## Your Job
 
-You improve `scripts/origin2.py`. That's it.
+You improve `scripts/lean_optimizer.py`. That's it.
 
 ```bash
 cd /Users/tallbr00/Documents/venv/original-arithmetic/origin-lean
-python3 scripts/origin2.py run
+python3 scripts/lean_optimizer.py run
 ```
 
 The process:
@@ -71,7 +71,7 @@ do manual work, STOP — improve the script to do it instead. Every
 fix must apply to all files, forever.
 
 The script is the only thing that survives between sessions. You
-don't. Encode everything you learn into `origin.py` before your
+don't. Encode everything you learn into `lean_optimizer.py` before your
 context window closes.
 
 The user holds the philosophy. The script holds the execution.
@@ -148,7 +148,7 @@ compression. A replacement.
 
 **Two tools, two axes — don't merge them:**
 
-- **The classifier** (`origin2.py`) is the Axis 1 machine. It asks
+- **The classifier** (`lean_optimizer.py`) is the Axis 1 machine. It asks
   "what is this?" and answers: dissolves, conflates, or genuine.
   It correctly identifies the 17 typeclasses. It is complete for
   Axis 1. Don't expand it to handle DRY — that's a different question.
@@ -163,38 +163,23 @@ handle DRY, let me expand it." Don't. The classifier identifies
 *what*. The sandbox identifies *how*. They're sequential steps, not
 competing ones. Making the classifier do both makes it worse at both.
 
-**Three scripts, three generations:**
+**The tool: `scripts/lean_optimizer.py`**
 
-- **`origin.py`** — the original. Kept as reference. Don't use.
-- **`origin2.py`** — class-based rewrite. Mathlib-specific. Has the
-  pipeline, classifier, parser, extractor, audit, compress. All
-  Mathlib knowledge (paths, typeclass names, domain structure) is
-  hardcoded. This is the reference for `origin3.py`.
-- **`origin3.py`** — the generic rewrite. **This is the next build.**
-
-`origin3.py` separates the generic Lean optimizer from the
-project-specific configuration:
+A generic Lean proof optimizer. All project-specific knowledge lives
+in `ProjectConfig`. `origin_config()` returns Origin's Mathlib
+defaults. To use on a different Lean project, write a different
+config function. Change the config, not the code.
 
 ```
 Generic Lean Optimizer (Axis 2 — works on any Lean project)
-  + Config file (Axis 1 — what dissolves, project-specific)
+  + Config (Axis 1 — what dissolves, project-specific)
   = Origin pipeline
 ```
 
-The optimizer takes a config object — source paths, dissolution
-rules, import substitutions, tactic list. No hardcoded Mathlib
-paths. No hardcoded typeclass names. The Mathlib-to-Origin
-configuration is just one config among possible configs.
-
-The sandbox and audit are already generic — they don't know about
-Mathlib. The parser and classifier need refactoring: the classifier
-becomes a rule engine that reads dissolution patterns from config
-instead of hardcoded regexes.
-
-**Why this matters:** the DRY optimizer (Axis 2) is useful for ANY
-Lean project. Anyone with a verbose Lean codebase can use it. Origin
-adds Axis 1 (the 17 typeclasses dissolve) as a config layer on top.
-The tool is bigger than Origin.
+The DRY optimizer (Axis 2) is useful for ANY Lean project. Anyone
+with a verbose Lean codebase can use it. Origin adds Axis 1 (the 17
+typeclasses dissolve) as a config layer on top. The tool is bigger
+than Origin.
 
 When an AI system reasons about mathematics using Origin instead of
 Mathlib, it's working with less context to hold, less ambiguity about
@@ -235,7 +220,7 @@ sketch file's header says which is which.
 3. **`scripts/compress/README.md`** — the compression findings. Read
    the foundation audit, the sketch trimming results, and the Layer 1
    dependency guard finding. These tell you what's been learned.
-4. **`scripts/origin2.py`** — the pipeline. Read the parser, the
+4. **`scripts/lean_optimizer.py`** — the pipeline. Read the parser, the
    classifier, the extractor. The pipeline is at 98.3% pass rate.
    Use it as a reference for what Mathlib does, not as a target.
 
@@ -352,7 +337,7 @@ types) plus `import Origin.Core`. The lakefile pins Mathlib v4.14.0.
 Run `lake update` once, then `lake build` validates. First build compiles
 Mathlib (slow). Subsequent builds cached.
 
-**Self-audit:** `python3 scripts/origin2.py --self classify --all` audits
+**Self-audit:** `python3 scripts/lean_optimizer.py --self classify --all` audits
 Origin itself. If it finds dissolved/infrastructure/trivial declarations,
 Origin needs stripping. Current result: 30,947 genuine, 0 waste.
 
@@ -602,7 +587,7 @@ Lean's richest functionality. Exhaustively. Buildably. The exhaustive
 conversion IS the proof that the infrastructure was never mathematics
 — it was the cost of a foundational choice.
 
-The script (`origin.py`) is how we get there. It reads Mathlib,
+The script (`lean_optimizer.py`) is how we get there. It reads Mathlib,
 strips what dissolves, compresses what remains, and outputs production
 Lean files. The script is the institutional knowledge — every
 compression pattern, every Lean trick, every classification rule
@@ -762,12 +747,12 @@ Zero sorries. Zero Mathlib. Builds in under a second.
 
 ## Things the Next Session Must Know
 
-**Start by running the pipeline.** `python3 scripts/origin2.py run`.
+**Start by running the pipeline.** `python3 scripts/lean_optimizer.py run`.
 Read the report. Fix what's broken in the script. Run again. That's
 the job. Do not do manual work.
 
 **The script is the institutional knowledge.** Every insight goes
-into `origin.py`, not into conversation. The script survives between
+into `lean_optimizer.py`, not into conversation. The script survives between
 sessions. You don't. If you learn something, encode it in the script
 before your window closes.
 
@@ -936,8 +921,8 @@ The process: run → read top pattern → fix script → run again.
 
 ### Class-based architecture (DONE)
 
-`origin2.py` is the class-based rewrite. `origin.py` is the original
-(kept as reference). Use `origin2.py` for all work.
+`lean_optimizer.py` is the class-based rewrite. `lean_optimizer.py` is the original
+(kept as reference). Use `lean_optimizer.py` for all work.
 
 - **Config** — all paths in one place
 - **Classifier** — override `classify()` to add rules. Three categories:
@@ -1006,7 +991,7 @@ file by file, domain by domain, and write only what's genuinely new.
 3. ✅ **Physics.** 6 domains demonstrated. 86 hypotheses dissolved.
 4. ✅ **Logic.** Liar, Russell, Curry unified. `no_some_fixed_point`.
 5. ✅ **Val evidence.** 14,474 lines. The proof it works at scale.
-6. ✅ **Pipeline.** `origin2.py run` — extract, build, report. Production UI.
+6. ✅ **Pipeline.** `lean_optimizer.py run` — extract, build, report. Production UI.
 7. ✅ **Class-based script.** Parser, Classifier, Extractor, Pipeline, UI.
 8. ✅ **Three classifications.** Genuine (138K), dissolves (6K), conflates (1K).
 9. ✅ **Ring finding.** Option α is not a Ring. Lean verified. Load-bearing.
@@ -1033,7 +1018,7 @@ file by file, domain by domain, and write only what's genuinely new.
 ### What's next: run the pipeline
 
 ```bash
-python3 scripts/origin2.py run
+python3 scripts/lean_optimizer.py run
 ```
 
 The script encodes all classification, extraction, and build logic.
@@ -1043,13 +1028,13 @@ fix what's broken. Do not do manual work.
 The `classifications/` directory is historical documentation of the
 Val-era mapping. It describes Val, not Origin. Ignore it.
 
-### The pipeline: `origin.py run`
+### The pipeline: `lean_optimizer.py run`
 
 One command. Run it. Everything either builds or it tells you
 exactly what to fix in the script.
 
 ```bash
-python3 scripts/origin2.py run
+python3 scripts/lean_optimizer.py run
 ```
 
 What it does:
