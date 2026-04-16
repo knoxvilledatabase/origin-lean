@@ -15,6 +15,38 @@ three lemmas.
 Origin is the claim that a dramatically shorter witness exists. This
 directory is the machine for finding it.
 
+## The Principle: Declare Once, Reuse Everywhere
+
+No two lines of code should do the same thing. Every declaration
+exists exactly once. This applies at every level:
+
+**In the Lean output:**
+- One generic `theorem foo [SomeClass α]`, not three `theorem foo_nat`,
+  `theorem foo_int`, `theorem foo_real`
+- One `cases <;> simp [h]`, not a 15-line `rw` chain
+- One instance declaration, never a wrapper around it
+- If Core.lean already proves it, it doesn't exist in the output
+
+**In the Python script:**
+- One compression pattern class, applied to every file forever
+- One classifier rule, never duplicated across methods
+- One pipeline, never hand-edited output
+
+**In the repository:**
+- One source of truth per concept — `Core.lean` for the foundation,
+  `CLAUDE.md` for the philosophy, `compress/README.md` for compression
+- The sketches are the design target — if a `Mathlib_*` file matches
+  a sketch, the sketch wins and the extracted version disappears
+
+The deepest expression: Mathlib has `lemma mul_zero` as an axiom in
+`MulZeroClass`. Origin has it as a consequence of three lines in
+`Core.lean`. Mathlib declared it once per type, per typeclass, per
+variant. Origin declares it once, for everything, forever.
+
+The answer to "what is the absolute least number of lines" is the
+number you get when every declaration exists exactly once and nothing
+is repeated at any level of the stack.
+
 ## The Layers
 
 Compression applies in four layers, from easiest to hardest:

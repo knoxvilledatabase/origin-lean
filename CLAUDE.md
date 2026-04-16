@@ -659,7 +659,9 @@ The process: run → read top pattern → fix script → run again.
 ### Compression: scripts/compress/
 
 **Read `scripts/compress/README.md` first.** It has the full framing,
-the layer model, the tactic audit numbers, and the pattern architecture.
+the layer model, the tactic audit numbers, the pattern architecture,
+and the governing principle: declare once, reuse everywhere. No two
+lines of code should do the same thing at any level of the stack.
 
 The question: **What is the absolute least number of lines that can do
 everything Mathlib does with Origin?** This is a Kolmogorov complexity
