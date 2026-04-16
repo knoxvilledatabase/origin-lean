@@ -560,10 +560,10 @@ class Extractor:
         changed = True
         while changed:
             changed = False
-            # Collect all text from non-dissolved blocks
+            # Collect all text from non-dissolved blocks (decls, aliases, other)
             live_text = "\n".join(
                 b.text for b in blocks
-                if b.kind == "decl" and b.classification not in ("dissolves", "infra_name")
+                if not (b.kind == "decl" and b.classification in ("dissolves", "infra_name"))
             )
             for name, b in list(dissolved.items()):
                 # Check if this dissolved name appears in live code
