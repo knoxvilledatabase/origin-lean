@@ -10,6 +10,7 @@ Usage:
     python3 scripts/lean_optimizer.py audit <domain>          DRY audit
     python3 scripts/lean_optimizer.py audit --all             all domains
     python3 scripts/lean_optimizer.py compress <domain>       compress domain
+    python3 scripts/lean_optimizer.py generate <domain>       GENERATE ORIGIN DRAFT
     python3 scripts/lean_optimizer.py classify <domain>       classify declarations
 
 Architecture:
@@ -464,9 +465,9 @@ def _print_audit(name: str, s: dict, sketch_lines: int):
 # =============================================================================
 
 def cmd_compress(path: str, config: ProjectConfig):
-    """Compress files by trying shorter proofs in sandbox."""
+    """Compress files by trying shorter proofs. Max 7 builds per file."""
     sys.path.insert(0, str(Path(__file__).parent))
-    from compress.proof_tester import try_compress
+    from compress.proof_tester import compress_file
 
     output_dir = config.output_dir
 
@@ -478,174 +479,46 @@ def cmd_compress(path: str, config: ProjectConfig):
     if d.exists() and d.is_dir():
         files = sorted(d.rglob("*.lean"))
     elif Path(path).exists():
-        files = [Path(path)]
+        files = [Path(path).resolve()]
     else:
-        print(f"  ✗ Not found: {path}")
+        print(f"  {ui.RED}✗{ui.RESET} Not found: {path}")
         return
 
-    _compress_files(files, config)
-
-
-def _compress_files(files: list[Path], config: ProjectConfig):
-    """Run sandbox compression across a list of files."""
-    sys.path.insert(0, str(Path(__file__).parent))
-    from compress.proof_tester import try_compress
-
-    decl_re = re.compile(
-        r'^((?:@\[.*?\]\s*\n)*)(?:(?:protected|private|nonrec)\s+)*(theorem|lemma)\s+(\S+)')
-    proof_re = re.compile(r':=\s*by\b', re.DOTALL)
+    ui.header()
+    ui.phase("COMPRESS", f"{len(files)} files")
 
     total_files = 0
     files_improved = 0
-    total_tested = 0
     total_compressed = 0
     total_lines_saved = 0
 
-    print(f"\n{'=' * 60}")
-    print(f"  COMPRESS ({len(files)} files)")
-    print(f"{'=' * 60}")
-
-    for f in files:
-        text = f.read_text(errors="replace")
-        lines = text.split("\n")
-        original_count = len(lines)
-
-        # Extract imports and preamble
-        imports = [l for l in lines if l.startswith("import ")]
-        preamble_lines = []
-        first_decl = None
-
-        for i, line in enumerate(lines):
-            if decl_re.match(line):
-                first_decl = i
-                break
-            elif not line.startswith("import ") and not line.startswith("/-") and \
-                 not line.startswith("-/") and not line.startswith("--"):
-                preamble_lines.append(line)
-
-        if first_decl is None:
-            total_files += 1
-            continue
-
-        preamble = "\n".join(preamble_lines)
-
-        # Find declarations with by-proofs
-        declarations = []
-        i = first_decl
-        while i < len(lines):
-            m = decl_re.match(lines[i])
-            if m:
-                decl_lines = [lines[i]]
-                j = i + 1
-                depth = 0
-                while j < len(lines):
-                    l = lines[j].strip()
-                    if l and (l.startswith("theorem ") or l.startswith("lemma ") or
-                              l.startswith("def ") or l.startswith("instance ") or
-                              l.startswith("@[") or l.startswith("end ") or
-                              l.startswith("section") or l.startswith("namespace") or
-                              l.startswith("variable") or l.startswith("open ")):
-                        if depth <= 0:
-                            break
-                    decl_lines.append(lines[j])
-                    depth += lines[j].count("{") + lines[j].count("where")
-                    depth -= lines[j].count("}")
-                    j += 1
-
-                decl_text = "\n".join(decl_lines)
-                name = m.group(3)
-                attrs = m.group(1) or ""
-
-                # Skip protected attributes
-                skip = any(attr in attrs or attr in decl_text
-                           for attr in config.protected_attributes)
-
-                if not skip and proof_re.search(decl_text):
-                    declarations.append({
-                        "name": name, "text": decl_text,
-                        "start_line": i, "end_line": j,
-                    })
-                i = j
-            else:
-                i += 1
-
-        if not declarations:
-            total_files += 1
-            continue
-
+    for idx, f in enumerate(files):
         total_files += 1
-        total_tested += len(declarations)
+        original_lines = len(f.read_text(errors="replace").split("\n"))
 
-        # Try compressing each declaration
-        compressions = []
-        for decl in declarations:
-            for tactic in config.tactics:
-                result = try_compress(
-                    declaration=decl["text"],
-                    imports=imports,
-                    replacement=tactic,
-                    preamble=preamble,
-                )
-                if result.passed:
-                    compressions.append({
-                        "name": decl["name"],
-                        "start_line": decl["start_line"],
-                        "end_line": decl["end_line"],
-                        "original": decl["text"],
-                        "compressed": result.compressed,
-                        "tactic": tactic,
-                    })
-                    total_compressed += 1
-                    break
+        results = compress_file(f, config.tactics, config.protected_attributes)
 
-        if not compressions:
-            continue
+        if results:
+            files_improved += 1
+            total_compressed += len(results)
+            new_lines = len(f.read_text(errors="replace").split("\n"))
+            saved = original_lines - new_lines
+            total_lines_saved += saved
+            short = str(f.relative_to(config.project_root))
+            ui.ok(f"{short}: {len(results)} compressed, {saved} lines saved")
+            for r in results:
+                print(f"      {ui.DIM}{r['name']} → {r['tactic']}{ui.RESET}")
+        elif idx < 5 or (idx + 1) % 20 == 0:
+            # Show progress for first few files and periodically
+            short = str(f.relative_to(config.project_root))
+            ui.info(f"{short}: no compressions found")
 
-        # Apply compressions (reverse order to preserve line numbers)
-        backup = text
-        new_lines = list(lines)
-        for comp in sorted(compressions, key=lambda c: c["start_line"], reverse=True):
-            new_lines[comp["start_line"]:comp["end_line"]] = comp["compressed"].split("\n")
-
-        new_text = "\n".join(new_lines)
-        lines_saved = original_count - len(new_lines)
-
-        # Write and build
-        f.write_text(new_text)
-        rel = f.relative_to(config.project_root)
-        module = str(rel).replace("/", ".").replace(".lean", "")
-
-        try:
-            result = subprocess.run(
-                ["lake", "build", module],
-                capture_output=True, text=True, timeout=180,
-                cwd=str(config.project_root),
-            )
-            if result.returncode == 0:
-                files_improved += 1
-                total_lines_saved += lines_saved
-                short = str(f.relative_to(config.output_dir))
-                print(f"  ✓ {short}: {len(compressions)} compressed, {lines_saved} lines saved")
-                for comp in compressions:
-                    print(f"      {comp['name']} → {comp['tactic']}")
-            else:
-                f.write_text(backup)
-                short = str(f.relative_to(config.output_dir))
-                print(f"  ✗ {short}: build failed, reverted")
-        except subprocess.TimeoutExpired:
-            f.write_text(backup)
-            short = str(f.relative_to(config.output_dir))
-            print(f"  ✗ {short}: timeout, reverted")
-
-    print(f"\n{'=' * 60}")
-    print(f"  RESULTS")
-    print(f"{'=' * 60}")
-    print(f"  Files scanned:          {total_files}")
-    print(f"  Files improved:         {files_improved}")
-    print(f"  Declarations tested:    {total_tested}")
-    print(f"  Declarations compressed:{total_compressed}")
-    print(f"  Lines saved:            {total_lines_saved}")
-    print(f"{'=' * 60}")
+    ui.separator()
+    ui.phase("RESULTS")
+    ui.stat("Files scanned", f"{total_files}")
+    ui.stat("Files improved", f"{files_improved}", "green" if files_improved else "")
+    ui.stat("Declarations compressed", f"{total_compressed}", "green" if total_compressed else "")
+    ui.stat("Lines saved", f"{total_lines_saved}", "cyan" if total_lines_saved else "")
 
 
 # =============================================================================
@@ -718,11 +591,18 @@ def main():
             cmd_compress(sys.argv[2], config)
         else:
             print("Usage: origin3.py compress <DOMAIN|path> | --domain <DOMAIN>")
+    elif cmd == "generate":
+        if len(sys.argv) > 2:
+            sys.path.insert(0, str(Path(__file__).parent))
+            from compress.generator import cmd_generate
+            cmd_generate(sys.argv[2], config.output_dir, config.project_root / "Origin")
+        else:
+            print("Usage: lean_optimizer.py generate <DOMAIN>")
     elif cmd == "classify":
         if len(sys.argv) > 2:
             cmd_classify(sys.argv[2], config)
         else:
-            print("Usage: origin3.py classify <DOMAIN|path>")
+            print("Usage: lean_optimizer.py classify <DOMAIN|path>")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
