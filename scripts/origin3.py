@@ -87,7 +87,7 @@ def origin_config() -> ProjectConfig:
 
     return ProjectConfig(
         source_dir=source,
-        output_dir=root / "Origin",
+        output_dir=root,  # Mathlib_* dirs at project root, not inside Origin/
         project_root=root,
 
         dissolution_rules=[
@@ -246,8 +246,9 @@ def _audit_domain(domain: str, config: ProjectConfig):
 
     # Check for sketch
     sketch_lines = 0
+    origin_dir = config.project_root / "Origin"
     for name in [f"{domain}.lean", f"{domain}2.lean"]:
-        sc = config.output_dir / name
+        sc = origin_dir / name
         if sc.exists():
             sketch_lines = len(sc.read_text().split("\n"))
             break

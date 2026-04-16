@@ -44,6 +44,8 @@ class Config:
     LAKE_MATHLIB = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean/.lake/packages/mathlib/Mathlib")
     ORIGIN_MATHLIB = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-mathlib/Mathlib")
     ORIGIN_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean/Origin")
+    # Extracted Mathlib files live at project root, not inside Origin/
+    EXTRACT_DIR = Path("/Users/tallbr00/Documents/venv/original-arithmetic/origin-lean")
 
     @classmethod
     def mathlib_dir(cls) -> Path:
@@ -52,6 +54,11 @@ class Config:
     @classmethod
     def project_root(cls) -> Path:
         return cls.ORIGIN_DIR.parent
+
+    @classmethod
+    def extract_dir(cls) -> Path:
+        """Where extracted Mathlib_* directories live."""
+        return cls.EXTRACT_DIR
 
 
 # =============================================================================
@@ -849,7 +856,7 @@ class Pipeline:
         self.extractor = Extractor(self.parser, self.classifier)
         self.ui = UI()
         self.mathlib = Config.mathlib_dir()
-        self.origin = Config.ORIGIN_DIR
+        self.origin = Config.extract_dir()  # Mathlib_* dirs at project root
         self.n_cpus = multiprocessing.cpu_count()
 
     def run(self):
@@ -1154,7 +1161,7 @@ def cmd_extract_domain(domain: str):
     if not src.is_dir():
         print(f"ERROR: {src} not found", file=sys.stderr)
         return
-    out_dir = Config.ORIGIN_DIR / f"Mathlib_{domain}"
+    out_dir = Config.extract_dir() / f"Mathlib_{domain}"
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1196,19 +1203,19 @@ def cmd_audit(domain: str):
     Usage: python3 scripts/origin2.py audit Combinatorics
            python3 scripts/origin2.py audit --all
     """
-    origin_dir = Config.ORIGIN_DIR
+    extract_dir = Config.extract_dir()
 
     if domain == "--all":
         domains = sorted(d.name.replace("Mathlib_", "")
-                         for d in origin_dir.iterdir()
+                         for d in extract_dir.iterdir()
                          if d.is_dir() and d.name.startswith("Mathlib_"))
     else:
         domains = [domain]
 
     for dom in domains:
-        d = origin_dir / f"Mathlib_{dom}"
+        d = extract_dir / f"Mathlib_{dom}"
         if not d.exists():
-            print(f"  ✗ Origin/Mathlib_{dom}/ not found")
+            print(f"  ✗ Mathlib_{dom}/ not found")
             continue
 
         files = list(d.rglob("*.lean"))
@@ -1315,8 +1322,8 @@ def cmd_audit(domain: str):
         # Check for sketch
         sketch_lines = 0
         sketch_candidates = [
-            origin_dir / f"{dom}.lean",
-            origin_dir / f"{dom}2.lean",
+            Config.ORIGIN_DIR / f"{dom}.lean",
+            Config.ORIGIN_DIR / f"{dom}2.lean",
         ]
         for sc in sketch_candidates:
             if sc.exists():
@@ -1385,10 +1392,10 @@ def cmd_compress(domain: str):
     sys.path.insert(0, str(Path(__file__).parent))
     from compress.sandbox import try_compress, CompressResult
 
-    origin_dir = Config.ORIGIN_DIR
-    d = origin_dir / f"Mathlib_{domain}"
+    extract_dir = Config.extract_dir()
+    d = extract_dir / f"Mathlib_{domain}"
     if not d.exists():
-        print(f"  ✗ Origin/Mathlib_{domain}/ not found")
+        print(f"  ✗ Mathlib_{domain}/ not found")
         return
 
     files = sorted(d.rglob("*.lean"))
@@ -1529,7 +1536,7 @@ def cmd_compress(domain: str):
         f.write_text(new_text)
 
         # Build the full file
-        rel = f.relative_to(origin_dir.parent)
+        rel = f.relative_to(extract_dir)
         module = str(rel).replace("/", ".").replace(".lean", "")
 
         try:
@@ -1542,18 +1549,18 @@ def cmd_compress(domain: str):
                 files_improved += 1
                 total_compressed += len(compressions)
                 total_lines_saved += lines_saved
-                short_path = str(f.relative_to(origin_dir))
+                short_path = str(f.relative_to(extract_dir))
                 print(f"  ✓ {short_path}: {len(compressions)} compressed, {lines_saved} lines saved")
                 for comp in compressions:
                     print(f"      {comp['name']} → {comp['tactic']}")
             else:
                 # Build failed — revert
                 f.write_text(backup)
-                short_path = str(f.relative_to(origin_dir))
+                short_path = str(f.relative_to(extract_dir))
                 print(f"  ✗ {short_path}: build failed after compression, reverted")
         except subprocess.TimeoutExpired:
             f.write_text(backup)
-            short_path = str(f.relative_to(origin_dir))
+            short_path = str(f.relative_to(extract_dir))
             print(f"  ✗ {short_path}: build timeout, reverted")
 
     print(f"\n{'=' * 60}")

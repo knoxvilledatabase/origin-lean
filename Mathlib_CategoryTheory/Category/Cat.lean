@@ -1,0 +1,163 @@
+/-
+Extracted from CategoryTheory/Category/Cat.lean
+Genuine: 6 | Conflates: 0 | Dissolved: 0 | Infrastructure: 26
+-/
+import Origin.Core
+import Mathlib.CategoryTheory.ConcreteCategory.Bundled
+import Mathlib.CategoryTheory.DiscreteCategory
+import Mathlib.CategoryTheory.Types
+import Mathlib.CategoryTheory.Bicategory.Strict
+
+noncomputable section
+
+/-!
+# Category of categories
+
+This file contains the definition of the category `Cat` of all categories.
+In this category objects are categories and
+morphisms are functors between these categories.
+
+## Implementation notes
+
+Though `Cat` is not a concrete category, we use `bundled` to define
+its carrier type.
+-/
+
+universe v u
+
+namespace CategoryTheory
+
+open Bicategory
+
+@[nolint checkUnivs]
+def Cat :=
+  Bundled Category.{v, u}
+
+namespace Cat
+
+instance : Inhabited Cat :=
+  ⟨⟨Type u, CategoryTheory.types⟩⟩
+
+instance : CoeSort Cat (Type u) :=
+  ⟨Bundled.α⟩
+
+instance str (C : Cat.{v, u}) : Category.{v, u} C :=
+  Bundled.str C
+
+def of (C : Type u) [Category.{v} C] : Cat.{v, u} :=
+  Bundled.of C
+
+instance bicategory : Bicategory.{max v u, max v u} Cat.{v, u} where
+  Hom C D := C ⥤ D
+  id C := 𝟭 C
+  comp F G := F ⋙ G
+  homCategory := fun _ _ => Functor.category
+  whiskerLeft {_} {_} {_} F _ _ η := whiskerLeft F η
+  whiskerRight {_} {_} {_} _ _ η H := whiskerRight η H
+  associator {_} {_} {_} _ := Functor.associator
+  leftUnitor {_} _ := Functor.leftUnitor
+  rightUnitor {_} _ := Functor.rightUnitor
+  pentagon := fun {_} {_} {_} {_} {_}=> Functor.pentagon
+  triangle {_} {_} {_} := Functor.triangle
+
+instance bicategory.strict : Bicategory.Strict Cat.{v, u} where
+  id_comp {C} {D} F := by cases F; rfl
+  comp_id {C} {D} F := by cases F; rfl
+  assoc := by intros; rfl
+
+instance category : LargeCategory.{max v u} Cat.{v, u} :=
+  StrictBicategory.category Cat.{v, u}
+
+@[simp]
+theorem id_obj {C : Cat} (X : C) : (𝟙 C : C ⥤ C).obj X = X :=
+  rfl
+
+@[simp]
+theorem id_map {C : Cat} {X Y : C} (f : X ⟶ Y) : (𝟙 C : C ⥤ C).map f = f :=
+  rfl
+
+@[simp]
+theorem comp_obj {C D E : Cat} (F : C ⟶ D) (G : D ⟶ E) (X : C) : (F ≫ G).obj X = G.obj (F.obj X) :=
+  rfl
+
+@[simp]
+theorem comp_map {C D E : Cat} (F : C ⟶ D) (G : D ⟶ E) {X Y : C} (f : X ⟶ Y) :
+    (F ≫ G).map f = G.map (F.map f) :=
+  rfl
+
+@[simp]
+theorem id_app {C D : Cat} (F : C ⟶ D) (X : C) : (𝟙 F : F ⟶ F).app X = 𝟙 (F.obj X) := rfl
+
+@[simp]
+theorem comp_app {C D : Cat} {F G H : C ⟶ D} (α : F ⟶ G) (β : G ⟶ H) (X : C) :
+    (α ≫ β).app X = α.app X ≫ β.app X := rfl
+
+@[simp]
+lemma whiskerLeft_app {C D E : Cat} (F : C ⟶ D) {G H : D ⟶ E} (η : G ⟶ H) (X : C) :
+    (F ◁ η).app X = η.app (F.obj X) :=
+  rfl
+
+@[simp]
+lemma whiskerRight_app {C D E : Cat} {F G : C ⟶ D} (H : D ⟶ E) (η : F ⟶ G) (X : C) :
+    (η ▷ H).app X = H.map (η.app X) :=
+  rfl
+
+@[simp]
+theorem eqToHom_app {C D : Cat} (F G : C ⟶ D) (h : F = G) (X : C) :
+    (eqToHom h).app X = eqToHom (Functor.congr_obj h X) :=
+  CategoryTheory.eqToHom_app h X
+
+@[simp] theorem of_α (C) [Category C] : (of C).α = C := rfl
+
+def objects : Cat.{v, u} ⥤ Type u where
+  obj C := C
+  map F := F.obj
+
+instance (X : Cat.{v, u}) : Category (objects.obj X) := (inferInstance : Category X)
+
+section
+
+attribute [local simp] eqToHom_map
+
+def equivOfIso {C D : Cat} (γ : C ≅ D) : C ≌ D where
+  functor := γ.hom
+  inverse := γ.inv
+  unitIso := eqToIso <| Eq.symm γ.hom_inv_id
+  counitIso := eqToIso γ.inv_hom_id
+
+end
+
+end Cat
+
+@[simps]
+def typeToCat : Type u ⥤ Cat where
+  obj X := Cat.of (Discrete X)
+  map := fun {X} {Y} f => by
+    dsimp
+    exact Discrete.functor (Discrete.mk ∘ f)
+  map_id X := by
+    apply Functor.ext
+    · intro X Y f
+      cases f
+      simp only [id_eq, eqToHom_refl, Cat.id_map, Category.comp_id, Category.id_comp]
+      apply ULift.ext
+      aesop_cat
+    · aesop_cat
+  map_comp f g := by apply Functor.ext; aesop_cat
+
+instance : Functor.Faithful typeToCat.{u} where
+  map_injective {_X} {_Y} _f _g h :=
+    funext fun x => congr_arg Discrete.as (Functor.congr_obj h ⟨x⟩)
+
+instance : Functor.Full typeToCat.{u} where
+  map_surjective F := ⟨Discrete.as ∘ F.obj ∘ Discrete.mk, by
+    apply Functor.ext
+    · intro x y f
+      dsimp
+      apply ULift.ext
+      aesop_cat
+    · rintro ⟨x⟩
+      apply Discrete.ext
+      rfl⟩
+
+end CategoryTheory
