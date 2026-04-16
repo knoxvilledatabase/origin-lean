@@ -122,11 +122,13 @@ class Classifier:
         r"nontrivial|Nontrivial"                     # often via 0 ≠ 1
     )
 
-    # Files that are ENTIRELY about zero infrastructure
+    # Files that are ENTIRELY about zero infrastructure.
+    # CharZero has useful instances for genuine math.
+    # IsUnit can contain genuine algebra.
     INFRA_FILE_PATTERNS = [
         "GroupWithZero", "NeZero", "NoZeroDivisors", "NoZeroSMul",
         "MulZeroClass", "WithZero", "WithBot", "WithTop",
-        "ZeroHom", "CharZero", "IsUnit", "Deprecated",
+        "ZeroHom", "Deprecated",
     ]
 
     def is_infra_file(self, filepath: Path) -> bool:
