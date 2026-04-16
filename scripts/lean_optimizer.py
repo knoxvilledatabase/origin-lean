@@ -1,35 +1,98 @@
 #!/usr/bin/env python3
 """
-Origin v3: Generic Lean proof optimizer.
+Lean Proof Optimizer — generic tool for compressing Lean proofs.
 
-A general-purpose tool that takes any Lean project and makes every proof
-as short as possible, verified by lake build. Project-specific rules
-(like Origin's 17 dissolved typeclasses) are configuration, not code.
+Takes any Lean project and makes every proof as short as possible,
+verified by lake build. Project-specific rules (like Origin's 17
+dissolved typeclasses) are configuration, not code.
 
 Usage:
-    python3 scripts/origin3.py audit <path>               DRY audit
-    python3 scripts/origin3.py audit --all                all domains
-    python3 scripts/origin3.py compress <path>            compress one file
-    python3 scripts/origin3.py compress --domain <name>   compress domain
-    python3 scripts/origin3.py classify <path>            classify declarations
-
-Config: reads from origin3_config.py in the same directory, or uses
-defaults for Origin's Mathlib configuration.
+    python3 scripts/lean_optimizer.py audit <domain>          DRY audit
+    python3 scripts/lean_optimizer.py audit --all             all domains
+    python3 scripts/lean_optimizer.py compress <domain>       compress domain
+    python3 scripts/lean_optimizer.py classify <domain>       classify declarations
 
 Architecture:
     Generic Lean Optimizer (Axis 2 — works on any Lean project)
       + Config (Axis 1 — dissolution rules, project-specific)
       = Origin pipeline
-
-See origin2.py for the Mathlib-specific reference implementation.
 """
 
 import re
 import sys
+import shutil
 import subprocess
 from pathlib import Path
 from dataclasses import dataclass, field
 from collections import Counter
+
+
+# =============================================================================
+# UI — production terminal output
+# =============================================================================
+
+class UI:
+    """Terminal UI with ANSI colors for humans and AI alike."""
+
+    BOLD    = "\033[1m"
+    DIM     = "\033[2m"
+    GREEN   = "\033[32m"
+    RED     = "\033[31m"
+    CYAN    = "\033[36m"
+    YELLOW  = "\033[33m"
+    WHITE   = "\033[97m"
+    MAGENTA = "\033[35m"
+    RESET   = "\033[0m"
+    CLEAR   = "\033[2K\r"
+
+    def __init__(self):
+        self.W = shutil.get_terminal_size((80, 24)).columns
+
+    def bar(self, current, total, width=30):
+        filled = int(width * current / total) if total else 0
+        return f"{self.GREEN}{'█' * filled}{self.DIM}{'░' * (width - filled)}{self.RESET}"
+
+    def header(self):
+        W = self.W
+        print()
+        print(f"  {self.BOLD}{self.CYAN}╔{'═' * (W - 6)}╗{self.RESET}")
+        print(f"  {self.BOLD}{self.CYAN}║{self.RESET}  {self.BOLD}{self.WHITE}L E A N   O P T I M I Z E R{self.RESET}"
+              f"{' ' * max(1, W - 38)}{self.BOLD}{self.CYAN}║{self.RESET}")
+        print(f"  {self.BOLD}{self.CYAN}║{self.RESET}  {self.DIM}generic proof optimizer  ·  config-driven  ·  lake build verifies{self.RESET}"
+              f"{' ' * max(1, W - 74)}{self.BOLD}{self.CYAN}║{self.RESET}")
+        print(f"  {self.BOLD}{self.CYAN}╚{'═' * (W - 6)}╝{self.RESET}")
+        print()
+
+    def phase(self, title, subtitle=""):
+        print(f"  {self.BOLD}{title}{self.RESET}  {self.DIM}{subtitle}{self.RESET}")
+        print(f"  {self.DIM}{'─' * (self.W - 4)}{self.RESET}")
+
+    def separator(self):
+        print(f"  {self.DIM}{'─' * (self.W - 4)}{self.RESET}")
+
+    def stat(self, label, value, color=""):
+        c = getattr(self, color.upper(), "") if color else ""
+        r = self.RESET if c else ""
+        print(f"    {label:<22s}{c}{value}{r}")
+
+    def ok(self, msg):
+        print(f"  {self.GREEN}✓{self.RESET} {msg}")
+
+    def fail(self, msg):
+        print(f"  {self.RED}✗{self.RESET} {msg}")
+
+    def info(self, msg):
+        print(f"  {self.DIM}{msg}{self.RESET}")
+
+    def domain_line(self, idx, total, domain, files, genuine, dissolved):
+        gen = f"{self.GREEN}{genuine:,}{self.RESET}" if genuine else f"{self.DIM}0{self.RESET}"
+        dis = f"{self.YELLOW}{dissolved:,}{self.RESET}" if dissolved else f"{self.DIM}0{self.RESET}"
+        print(f"  {self.bar(idx, total)} "
+              f"{self.BOLD}{domain:<24}{self.RESET} "
+              f"{files:>4} files  {gen:>5} genuine  {dis:>4} dissolved")
+
+
+ui = UI()
 
 
 # =============================================================================
@@ -219,6 +282,7 @@ def cmd_audit(path: str, config: ProjectConfig):
     output_dir = config.output_dir
 
     if path == "--all":
+        ui.header()
         domains = sorted(d.name.replace("Mathlib_", "")
                          for d in output_dir.iterdir()
                          if d.is_dir() and d.name.startswith("Mathlib_"))
@@ -239,21 +303,28 @@ def cmd_audit(path: str, config: ProjectConfig):
             t_spec = sum(s["spec"] for _, s in all_stats)
             t_rw = sum(s["rw"] for _, s in all_stats)
 
-            print(f"\n{'=' * 60}")
-            print(f"  TOTAL ACROSS ALL DOMAINS")
-            print(f"{'=' * 60}")
-            print(f"  Domains:            {len(all_stats)}")
-            print(f"  Files:              {t_files:,}")
-            print(f"  Lines:              {t_lines:,}")
-            print(f"  Genuine:            {t_genuine:,}")
-            print(f"  Dissolved:          {t_dissolved}")
-            print(f"  Trivial proofs:     {t_trivial:,}")
-            print(f"  Multi-line rw:      {t_multi_rw:,}")
-            print(f"  rw total:           {t_rw:,}")
-            print(f"  Specializations:    {t_spec}")
-            print(f"  Origin/:            2,157 lines")
-            print(f"{'=' * 60}")
-            print(f"\n  Start with: python3 scripts/lean_optimizer.py compress Combinatorics")
+            # Count Origin lines
+            origin_dir = config.project_root / "Origin"
+            origin_lines = sum(len(f.read_text().split("\n")) for f in origin_dir.glob("*.lean"))
+
+            print()
+            print(f"  {ui.BOLD}{ui.CYAN}╔{'═' * (ui.W - 6)}╗{ui.RESET}")
+            print(f"  {ui.BOLD}{ui.CYAN}║{ui.RESET}  {ui.BOLD}{ui.WHITE}TOTAL ACROSS ALL DOMAINS{ui.RESET}"
+                  f"{' ' * max(1, ui.W - 34)}{ui.BOLD}{ui.CYAN}║{ui.RESET}")
+            print(f"  {ui.BOLD}{ui.CYAN}╚{'═' * (ui.W - 6)}╝{ui.RESET}")
+            ui.stat("Domains", f"{len(all_stats)}")
+            ui.stat("Files", f"{t_files:,}")
+            ui.stat("Lines", f"{t_lines:,}", "yellow")
+            ui.stat("Genuine", f"{t_genuine:,}", "green")
+            ui.stat("Dissolved", f"{t_dissolved}", "yellow")
+            ui.stat("Trivial proofs", f"{t_trivial:,}")
+            ui.stat("Multi-line rw", f"{t_multi_rw:,}", "red")
+            ui.stat("rw total", f"{t_rw:,}", "yellow")
+            ui.stat("Specializations", f"{t_spec}")
+            print()
+            ui.stat("Origin/", f"{origin_lines:,} lines", "cyan")
+            ui.separator()
+            print(f"\n  {ui.BOLD}Next:{ui.RESET} python3 scripts/lean_optimizer.py compress Combinatorics")
     else:
         # Could be a domain name or a file path
         d = output_dir / f"Mathlib_{path}"
@@ -347,47 +418,45 @@ def _audit_files(files: list[Path]) -> dict:
 
 
 def _print_audit(name: str, s: dict, sketch_lines: int):
-    """Print audit results."""
+    """Print audit results with production UI."""
     trivial = s["rfl"] + s["iff_rfl"] + s["by_simp"] + s["by_rfl"] + s["by_norm_num"]
     genuine = max(s["genuine"], 1)
 
-    print(f"\n{'=' * 60}")
-    print(f"  DRY AUDIT: {name}")
-    print(f"{'=' * 60}")
-    print(f"  Files:              {s['files']:,}")
-    print(f"  Lines:              {s['lines']:,}")
-    print(f"  Genuine:            {s['genuine']:,}")
-    print(f"  Dissolved:          {s['dissolved']}")
-    print(f"  Conflates:          {s['conflates']}")
-    print(f"  Infrastructure:     {s['infra']:,}")
+    print()
+    ui.phase(f"DRY AUDIT: {name}")
+    ui.stat("Files", f"{s['files']:,}")
+    ui.stat("Lines", f"{s['lines']:,}")
+    ui.stat("Genuine", f"{s['genuine']:,}", "green")
+    ui.stat("Dissolved", f"{s['dissolved']}", "yellow" if s['dissolved'] else "")
+    ui.stat("Conflates", f"{s['conflates']}", "magenta" if s['conflates'] else "")
+    ui.stat("Infrastructure", f"{s['infra']:,}")
     if sketch_lines:
         pct = (1 - sketch_lines / max(s["lines"], 1)) * 100
-        print(f"  Sketch:             {sketch_lines} lines ({pct:.1f}% reduction)")
+        ui.stat("Sketch", f"{sketch_lines} lines ({pct:.1f}% reduction)", "cyan")
     print()
-    print(f"  Layer 1 — Trivial proofs: {trivial} ({trivial * 100 // genuine}% of genuine)")
-    print(f"    rfl:              {s['rfl']}")
-    print(f"    Iff.rfl:          {s['iff_rfl']}")
-    print(f"    by simp:          {s['by_simp']}")
-    print(f"    by rfl:           {s['by_rfl']}")
-    print(f"    by norm_num:      {s['by_norm_num']}")
-    print(f"    by exact <term>:  {s['by_exact']}")
-    print(f"    by omega:         {s['by_omega_s']}")
-    print(f"    by decide:        {s['by_decide_s']}")
+    print(f"    {ui.BOLD}Layer 1{ui.RESET} {ui.DIM}— Trivial proofs:{ui.RESET} {trivial} ({trivial * 100 // genuine}% of genuine)")
+    ui.stat("  rfl", f"{s['rfl']}")
+    ui.stat("  Iff.rfl", f"{s['iff_rfl']}")
+    ui.stat("  by simp", f"{s['by_simp']}")
+    ui.stat("  by rfl", f"{s['by_rfl']}")
+    ui.stat("  by norm_num", f"{s['by_norm_num']}")
+    ui.stat("  by exact <term>", f"{s['by_exact']}")
+    ui.stat("  by omega", f"{s['by_omega_s']}")
+    ui.stat("  by decide", f"{s['by_decide_s']}")
     print()
-    print(f"  Layer 2 — Tactic profile:")
-    print(f"    rw:               {s['rw']:,}")
-    print(f"    simp:             {s['simp']:,}")
-    print(f"    exact:            {s['exact']:,}")
-    print(f"    omega:            {s['omega']}")
-    print(f"    ring:             {s['ring']}")
-    print(f"    aesop:            {s['aesop']}")
-    print(f"    decide:           {s['decide']}")
-    print(f"    linarith:         {s['linarith']}")
-    print(f"    Multi-line rw:    {s['multi_rw']} chains (3+ rewrites)")
+    print(f"    {ui.BOLD}Layer 2{ui.RESET} {ui.DIM}— Tactic profile:{ui.RESET}")
+    ui.stat("  rw", f"{s['rw']:,}", "yellow")
+    ui.stat("  simp", f"{s['simp']:,}")
+    ui.stat("  exact", f"{s['exact']:,}")
+    ui.stat("  omega", f"{s['omega']}", "green" if s['omega'] > 50 else "")
+    ui.stat("  ring", f"{s['ring']}")
+    ui.stat("  aesop", f"{s['aesop']}")
+    ui.stat("  decide", f"{s['decide']}")
+    ui.stat("  linarith", f"{s['linarith']}")
+    ui.stat("  Multi-line rw", f"{s['multi_rw']:,} chains", "red" if s['multi_rw'] > 100 else "yellow")
     print()
-    print(f"  Layer 3 — Specialization:")
-    print(f"    foo_nat/int/real: {s['spec']}")
-    print(f"{'=' * 60}")
+    print(f"    {ui.BOLD}Layer 3{ui.RESET} {ui.DIM}— Specialization:{ui.RESET}")
+    ui.stat("  foo_nat/int/real", f"{s['spec']}", "yellow" if s['spec'] > 10 else "")
 
 
 # =============================================================================
