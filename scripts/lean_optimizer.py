@@ -222,8 +222,38 @@ def cmd_audit(path: str, config: ProjectConfig):
         domains = sorted(d.name.replace("Mathlib_", "")
                          for d in output_dir.iterdir()
                          if d.is_dir() and d.name.startswith("Mathlib_"))
+        all_stats = []
         for dom in domains:
-            _audit_domain(dom, config)
+            stats = _audit_domain(dom, config)
+            if stats:
+                all_stats.append((dom, stats))
+
+        # Print summary
+        if all_stats:
+            t_files = sum(s["files"] for _, s in all_stats)
+            t_lines = sum(s["lines"] for _, s in all_stats)
+            t_genuine = sum(s["genuine"] for _, s in all_stats)
+            t_dissolved = sum(s["dissolved"] for _, s in all_stats)
+            t_trivial = sum(s["rfl"] + s["iff_rfl"] + s["by_simp"] + s["by_rfl"] + s["by_norm_num"] for _, s in all_stats)
+            t_multi_rw = sum(s["multi_rw"] for _, s in all_stats)
+            t_spec = sum(s["spec"] for _, s in all_stats)
+            t_rw = sum(s["rw"] for _, s in all_stats)
+
+            print(f"\n{'=' * 60}")
+            print(f"  TOTAL ACROSS ALL DOMAINS")
+            print(f"{'=' * 60}")
+            print(f"  Domains:            {len(all_stats)}")
+            print(f"  Files:              {t_files:,}")
+            print(f"  Lines:              {t_lines:,}")
+            print(f"  Genuine:            {t_genuine:,}")
+            print(f"  Dissolved:          {t_dissolved}")
+            print(f"  Trivial proofs:     {t_trivial:,}")
+            print(f"  Multi-line rw:      {t_multi_rw:,}")
+            print(f"  rw total:           {t_rw:,}")
+            print(f"  Specializations:    {t_spec}")
+            print(f"  Origin/:            2,157 lines")
+            print(f"{'=' * 60}")
+            print(f"\n  Start with: python3 scripts/lean_optimizer.py compress Combinatorics")
     else:
         # Could be a domain name or a file path
         d = output_dir / f"Mathlib_{path}"
@@ -235,12 +265,12 @@ def cmd_audit(path: str, config: ProjectConfig):
             print(f"  ✗ Not found: {path}")
 
 
-def _audit_domain(domain: str, config: ProjectConfig):
-    """Audit a single domain."""
+def _audit_domain(domain: str, config: ProjectConfig) -> dict | None:
+    """Audit a single domain. Returns stats dict."""
     d = config.output_dir / f"Mathlib_{domain}"
     files = list(d.rglob("*.lean"))
     if not files:
-        return
+        return None
 
     stats = _audit_files(files)
 
@@ -254,6 +284,7 @@ def _audit_domain(domain: str, config: ProjectConfig):
             break
 
     _print_audit(domain, stats, sketch_lines)
+    return stats
 
 
 def _audit_file(filepath: Path, config: ProjectConfig):
