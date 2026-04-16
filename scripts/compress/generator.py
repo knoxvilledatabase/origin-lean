@@ -121,6 +121,24 @@ def generate_origin_draft(
 
             i += 1
 
+    # Duplicate detection: scan existing Origin files for definition names
+    existing_defs = {}  # name -> file where it's defined
+    decl_scan_re = re.compile(
+        r'^(?:protected\s+|private\s+|nonrec\s+|noncomputable\s+)*'
+        r'(?:def|structure|class|inductive|abbrev|theorem|lemma)\s+(\S+)')
+    for origin_file in origin_dir.glob("*.lean"):
+        fname = origin_file.stem
+        for line in origin_file.read_text(errors="replace").split("\n"):
+            m = decl_scan_re.match(line.strip())
+            if m:
+                existing_defs[m.group(1)] = fname
+
+    # Flag duplicates
+    duplicates = []
+    for name, kind, text, source in definitions:
+        if name in existing_defs:
+            duplicates.append((name, existing_defs[name]))
+
     # Group definitions by subdomain (based on file path)
     by_subdir = defaultdict(list)
     for name, kind, text, source in definitions:
@@ -145,11 +163,21 @@ def generate_origin_draft(
     out.append(f"Genuine: {total_genuine} | Dissolved: {total_dissolved}")
     out.append(f"Definitions extracted: {len(definitions)}")
     out.append(f"")
+    if duplicates:
+        out.append(f"**DUPLICATES DETECTED:** {len(duplicates)} definitions already exist")
+        out.append(f"in other Origin files. These should NOT be duplicated — either")
+        out.append(f"import from the existing file or move to Core.lean.")
+        out.append(f"")
+        for dup_name, dup_file in duplicates:
+            out.append(f"  - `{dup_name}` already in Origin/{dup_file}.lean")
+        out.append(f"")
     out.append(f"This is a DRAFT. Human review required:")
     out.append(f"- Verify each definition is domain-specific (not infrastructure)")
     out.append(f"- Add Goal B classification to the header")
     out.append(f"- Add demonstration theorems showing Option lift")
     out.append(f"- Remove definitions that Core.lean already handles")
+    if duplicates:
+        out.append(f"- Resolve {len(duplicates)} duplicates (move to Core or import)")
     out.append(f"- Run: lake build Origin.{domain}")
     out.append(f"-/")
     out.append("")
@@ -167,10 +195,12 @@ def generate_origin_draft(
         out.append(f"-- {section_num}. {section.upper()}")
         out.append(f"-- ============================================================================")
         out.append("")
+        dup_set = {d[0] for d in duplicates}
         for name, kind, text in defs[:10]:  # Cap at 10 per section to keep drafts manageable
-            # Clean up: remove Mathlib-specific imports from the text
-            cleaned = text
-            out.append(cleaned)
+            if name in dup_set:
+                out.append(f"-- ⚠ DUPLICATE: {name} already in Origin/{existing_defs[name]}.lean")
+                out.append(f"-- Remove this and import from there, or move to Core.lean")
+            out.append(text)
             out.append("")
         if len(defs) > 10:
             out.append(f"-- ... and {len(defs) - 10} more definitions in {section}/")
@@ -204,10 +234,16 @@ def cmd_generate(domain: str, extracted_dir: Path, origin_dir: Path):
     draft = generate_origin_draft(domain, extracted_dir, origin_dir)
     draft_lines = len(draft.split("\n"))
 
+    # Count duplicates in the draft
+    dup_count = draft.count("⚠ DUPLICATE")
+
     # Write to Origin/
     out_path = origin_dir / f"{domain}.lean"
     out_path.write_text(draft)
 
     print(f"  Generated: {out_path}")
     print(f"  Lines: {draft_lines}")
+    if dup_count:
+        print(f"  ⚠ Duplicates: {dup_count} definitions already exist in other Origin files")
+        print(f"    Resolve before building: move to Core.lean or import")
     print(f"  Next: review the draft, then run: lake build Origin.{domain}")
