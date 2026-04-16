@@ -257,18 +257,31 @@ Answer these without looking:
 - What four things survive across sessions?
 - What does "complexity means you skipped a step" mean?
 
-**Step 5: Run the tools**
+**Step 5: Warmup — one file, not 108**
 
-Now you've earned the right to act.
+Now you've earned the right to act. But start with the cartwheel,
+not the Miller Straight.
 
 ```bash
 # See the current state
-python3 scripts/lean_optimizer.py audit --all
+python3 scripts/lean_optimizer.py audit Combinatorics
 
-# The current work: Stage 1 compress on Combinatorics
-python3 scripts/lean_optimizer.py compress Combinatorics
-# Report the before/after line count.
+# Warmup: ONE file, not the whole domain
+python3 scripts/lean_optimizer.py compress extracted/Mathlib_Combinatorics/Enumerative/DoubleCounting.lean
 ```
+
+One file. See what happens. Does it find anything? Does the build
+pass? How long does one file take? If one file works in 2 minutes,
+you can scale. If it takes 30 minutes, the tool needs optimization
+before scaling.
+
+**Do NOT run `compress Combinatorics` (108 files) until you've
+proven the tool works on a single file.** 108 files × multiple
+declarations × 7 tactics × `lake build` each = potentially
+thousands of builds. That's hours, not a warmup.
+
+The progression: one file → one domain → all domains. Each step
+earns the next.
 
 **Step 6: Document everything**
 
