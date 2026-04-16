@@ -458,7 +458,7 @@ def _stub_name(mathlib_name):
     if not (stem[0].isalpha() or stem[0] == '«'):
         return None
     # Filter names with commas, backticks, braces, colons — not valid identifiers
-    if any(c in stem for c in '`,{}:;()[]'):
+    if any(c in stem for c in '`,{}:;()[]⟨⟩'):
         return None
     # Append ' to avoid collisions with Lean/Mathlib builtins
     if stem.startswith('«') and stem.endswith('»'):
