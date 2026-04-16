@@ -610,14 +610,20 @@ Run 12 (+ set_option/scoped 'in' attaches to next command, #adaptation_note fix)
 ```
 4,998 files  |  4,755 pass /   252 fail  |    569 error patterns  |  9m
 ```
-`expected token`: 824 → 2. Parser is essentially done.
 
-Top remaining error patterns after run 12:
-- `unsolved goals` (66 files) — proofs broken by missing dissolved content
-- `failed to synthesize` (41) — missing typeclass instances
-- `simp made no progress` (27) — dissolved simp lemmas
-- `unexpected identifier` (18) — parser edge cases
-- `noncomputable` (15) — defs needing noncomputable marker
+Run 20 (+ INFRA_NAMES tightened, CharZero/IsUnit unblocked, noncomputable section,
+INFRA_SIG word-bounded, #adaptation_note doc close fix):
+```
+5,016 files  |  4,893 pass /   123 fail  |    207 error patterns  |  6m
+```
+Dissolved: 1,254 → 289. Genuine: 141,015 → 141,782.
+
+Top remaining error patterns after run 20:
+- `failed to synthesize` (30 files) — cross-file typeclass dependencies
+- `unsolved goals` (29) — proofs broken by missing content
+- `unexpected identifier` (18) — Tactic metaprogramming
+- `unknown tactic` (15) — Tactic domain
+- `type mismatch` (13) — proof-level issues
 
 Each run fixes patterns in the script. Error count drops.
 The process: run → read top pattern → fix script → run again.
@@ -689,14 +695,23 @@ file by file, domain by domain, and write only what's genuinely new.
 7. ✅ **Class-based script.** Parser, Classifier, Extractor, Pipeline, UI.
 8. ✅ **Three classifications.** Genuine (138K), dissolves (6K), conflates (1K).
 9. ✅ **Ring finding.** Option α is not a Ring. Lean verified. Load-bearing.
-10. ✅ **95% pass rate.** 4,755 / 4,998 files build clean. 252 remaining.
-11. ✅ **Classifier fix.** Bare `≠ 0` only dissolves if the declaration
-    name is also infrastructure. 3,500 declarations correctly reclassified.
+10. ✅ **97.5% pass rate.** 4,893 / 5,016 files build clean. 123 remaining.
+11. ✅ **Classifier fix.** Two rounds of tightening:
+    - Bare `≠ 0` only dissolves if the declaration name is also infrastructure.
+    - INFRA_NAMES anchored (^ and $) to prevent matching inside compound
+      names like `card_ne_zero`, `X_ne_zero`, `prod_ne_zero`.
+    - INFRA_SIG word-bounded to prevent `hp_ne_zero` parameter names matching.
+    - CharZero/IsUnit unblocked from infra file skip list.
+    - Total: ~5,000 declarations correctly reclassified as genuine.
 12. ✅ **Dependency resolver.** Genuine code referencing dissolved declarations
-    un-dissolves them. 762 declarations rescued. Iterates to stability.
+    un-dissolves them. 762+ declarations rescued. Iterates to stability.
 13. ✅ **Parser essentially done.** `expected token` from 824 → 2. All major
     Lean syntax constructs handled: alias, notation, macro, syntax, elab,
-    infixl/r, prefix, postfix, library_note, set_option ... in.
+    infixl/r, prefix, postfix, library_note, set_option ... in,
+    #adaptation_note doc comments, noncomputable section.
+14. ✅ **Remaining 123 failures.** 27 are Tactic (metaprogramming — backtick
+    quasiquotation, string gaps in macros). 96 are math files with cross-file
+    dependencies or cascade errors from dissolved content in other files.
 
 ### What's next: run the pipeline
 
