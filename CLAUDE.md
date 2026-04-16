@@ -341,6 +341,16 @@ lemma for tactic use. Name-based dependency guards can't detect these.
 This was learned the hard way: deleting `@[simp]` trivial proofs
 caused 716 build failures.
 
+**You will try to add Origin-specific typeclasses.** Don't. Core.lean's
+instances (`Mul (Option α)`, `Add (Option α)`, `Neg (Option α)`) ARE
+the class hierarchy. Lean's typeclass resolution IS the inheritance
+mechanism. When Core declares `instance [Mul α] : Mul (Option α)`,
+any type with `Mul` automatically gets `Mul` on `Option` for free.
+Adding `class Absorbs` or `class OriginAlgebra` on top would be
+adding infrastructure to manage a problem that doesn't exist —
+exactly what Origin dissolves in Mathlib. The flat structure is
+correct. The instances are the classes. Don't add a layer.
+
 **You will try to build complex infrastructure before proving the
 simple case.** Global dependency passes, two-pass extraction, protected
 name sets — these are Miller Straights. Start with one file, one
