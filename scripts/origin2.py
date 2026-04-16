@@ -324,17 +324,23 @@ class Parser:
             if stripped.startswith(cmd) or stripped == cmd.strip():
                 # @[inherit_doc] attached to a notation/declaration is load-bearing
                 if cmd == "@[deprecated" and stripped.startswith("@[deprecated"):
-                    # Deprecated aliases often wrap to column 0 on the next line.
-                    # Consume the whole thing including the body.
+                    # Deprecated aliases wrap to column 0 on the next line.
+                    # Pattern: @[deprecated ...] alias\nname := target
+                    # Consume the @[deprecated] line + indented continuation +
+                    # one column-0 alias body line.
+                    all_text = lines[i]
                     i += 1
                     # Skip indented continuation
                     while i < len(lines) and lines[i].strip() and lines[i][0].isspace():
+                        all_text += " " + lines[i].strip()
                         i += 1
-                    # Also consume a bare identifier on the next line (alias target at col 0)
-                    if i < len(lines) and lines[i].strip() and not lines[i].strip().startswith(("--", "/-", "@[", "theorem", "lemma", "def", "section", "end", "namespace", "open", "variable", "import", "instance", "class", "structure")):
-                        s = lines[i].strip()
-                        if re.match(r'^[a-zA-Z_][\w.\']*\s*$', s):
+                    # If the collected text ends with 'alias', consume the next
+                    # non-blank line (the alias body at column 0)
+                    if all_text.rstrip().endswith("alias"):
+                        while i < len(lines) and not lines[i].strip():
                             i += 1
+                        if i < len(lines):
+                            i += 1  # consume the alias body line
                     return (i, None)
                 elif "@[inherit_doc" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
                     return None  # don't strip — let passthrough/declaration handle it
