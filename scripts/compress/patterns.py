@@ -95,6 +95,13 @@ class CoreTrivialProof(CompressionPattern):
             return False
         if not any(kw in block.text[:60] for kw in self.DECL_KEYWORDS):
             return False
+        # NEVER compress declarations with tactic-registered attributes.
+        # Other proofs depend on them implicitly via simp/ext/aesop/norm_cast.
+        # The dependency guard can't detect implicit tactic set membership.
+        for attr in ("@[simp", "@[ext", "@[aesop", "@[norm_cast", "@[norm_num",
+                     "@[gcongr", "@[positivity", "@[to_additive"):
+            if attr in block.text:
+                return False
         return bool(self.TRIVIAL_PROOF.search(block.text))
 
     def compress(self, block: Block) -> str | None:
