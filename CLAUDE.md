@@ -210,53 +210,51 @@ Category 2 changes the expression. Both compress.
 Before expanding any sketch, classify the domain content first. Each
 sketch file's header says which is which.
 
-### Read these files before doing anything
+### Step-by-step: what to do in order
 
-1. **This file** (`CLAUDE.md`) — your orders.
-2. **`Origin/Core.lean`** (166 lines) — the foundation. The theorem,
-   instances, simp set. Read every line. If you don't understand why
-   `none * some 5 = none` and `some 0 * some 5 = some 0`, stop and
-   re-read until you do.
-3. **`scripts/compress/README.md`** — the compression findings. Read
-   the foundation audit, the sketch trimming results, and the Layer 1
-   dependency guard finding. These tell you what's been learned.
-4. **`scripts/lean_optimizer.py`** — the pipeline. Read the parser, the
-   classifier, the extractor. The pipeline is at 98.3% pass rate.
-   Use it as a reference for what Mathlib does, not as a target.
+**Step 1: Read.** Understand before acting.
 
-Everything else is output. Don't read Mathlib. Don't read Val.
-Don't read the domain files. The script reads Mathlib for you.
+1. **This file** (`CLAUDE.md`) — you're reading it. The philosophy,
+   the goal, the architecture. Read top to bottom.
+2. **`Origin/Core.lean`** (166 lines) — the foundation. Read every
+   line. If you don't understand why `none * some 5 = none` and
+   `some 0 * some 5 = some 0`, stop and re-read until you do.
+3. **`scripts/compress/README.md`** — all findings, all numbers, the
+   baseline audit, the roadmap to automation.
 
-### What to do RIGHT NOW
-
-Run these commands first. The output tells you where things stand.
+**Step 2: Audit.** See the current state.
 
 ```bash
-# 1. See the current state
 python3 scripts/lean_optimizer.py audit --all
-
-# 2. Read the findings
-# scripts/compress/README.md — all findings documented here
-
-# 3. The current work: Stage 1 compress on Combinatorics
-python3 scripts/lean_optimizer.py compress Combinatorics
-# Report the before/after line count.
-
-# 4. If Stage 1 works, run it on the next domain.
 ```
 
-**The pipeline measured the problem. The sketches prove the solution.**
-The current work is **Stage 1 compression** — running the proof
-tester across extracted Mathlib files, trying shorter proofs, letting
-`lake build` judge. Start with Combinatorics (zero dissolved, pure
-DRY). The compress command does everything.
+This shows every domain's DRY profile — lines, declarations,
+trivial proofs, multi-line rw chains, specializations. The numbers
+tell you where to work.
 
-**After Stage 1:** expand the sketches — express more of Mathlib's
-mathematics through Core, domain by domain. The extracted `Mathlib_*`
-directories show what Mathlib has. The sketches show what Origin
-keeps. Pick the sketch with the most room to grow.
+**Step 3: Compress.** Run Stage 1 on Combinatorics first.
+
+```bash
+python3 scripts/lean_optimizer.py compress Combinatorics
+```
+
+Combinatorics has zero dissolved declarations — pure DRY. This
+tests the proof tester across real Mathlib declarations, tries
+shorter proofs, lets `lake build` judge. Report before/after lines.
+
+**Step 4: Expand.** If Stage 1 works, run it on the next domain.
+Then expand the sketches — express more of Mathlib's mathematics
+through Core. The extracted `Mathlib_*` directories show what
+Mathlib has. The sketches show what Origin keeps. Pick the sketch
+with the most room to grow.
+
+**Step 5: Document.** Every finding goes into `compress/README.md`.
+Every script improvement goes into `lean_optimizer.py`. Every
+philosophical insight goes into `CLAUDE.md`. Nothing stays in your
+head. Commit and push before your context closes.
 
 **Always audit the foundation before stacking on top of it.**
+If it feels complex, you skipped a step. Stop and ask the user.
 
 ### Mistakes every new Claude makes
 
