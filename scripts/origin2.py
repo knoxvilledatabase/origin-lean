@@ -13,6 +13,8 @@ Usage:
     python3 scripts/origin2.py extract NumberTheory/Harmonic/Int.lean
     python3 scripts/origin2.py extract --domain NumberTheory
     python3 scripts/origin2.py fruit --all 10
+    python3 scripts/origin2.py audit Combinatorics          DRY AUDIT
+    python3 scripts/origin2.py audit --all
 """
 
 import os
@@ -1175,6 +1177,191 @@ def cmd_extract_domain(domain: str):
 
 
 # =============================================================================
+# DRY Audit
+# =============================================================================
+
+def cmd_audit(domain: str):
+    """Audit a domain for DRY compression opportunities.
+
+    Scans extracted Origin/Mathlib_<domain>/ files and reports:
+    - File/line/declaration counts
+    - Dissolved/conflated/genuine breakdown
+    - Trivial proof counts (rfl, by simp, etc.)
+    - Tactic profile (rw, simp, omega, ring, etc.)
+    - Multi-line rw chain count
+    - Specialization family count (foo_nat/foo_int/foo_real)
+
+    Usage: python3 scripts/origin2.py audit Combinatorics
+           python3 scripts/origin2.py audit --all
+    """
+    origin_dir = Config.ORIGIN_DIR
+
+    if domain == "--all":
+        domains = sorted(d.name.replace("Mathlib_", "")
+                         for d in origin_dir.iterdir()
+                         if d.is_dir() and d.name.startswith("Mathlib_"))
+    else:
+        domains = [domain]
+
+    for dom in domains:
+        d = origin_dir / f"Mathlib_{dom}"
+        if not d.exists():
+            print(f"  ✗ Origin/Mathlib_{dom}/ not found")
+            continue
+
+        files = list(d.rglob("*.lean"))
+        if not files:
+            continue
+
+        # Counters
+        total_lines = 0
+        genuine = 0
+        dissolved = 0
+        conflates = 0
+        infra = 0
+
+        # Trivial proofs
+        rfl_count = 0
+        iff_rfl_count = 0
+        by_simp_count = 0
+        by_rfl_count = 0
+        by_norm_num_count = 0
+        by_omega_standalone = 0
+        by_decide_standalone = 0
+        by_exact_count = 0
+
+        # Tactic uses
+        rw_uses = 0
+        simp_uses = 0
+        exact_uses = 0
+        omega_uses = 0
+        ring_uses = 0
+        aesop_uses = 0
+        decide_uses = 0
+        linarith_uses = 0
+
+        # Multi-line rw chains (3+ rewrites)
+        multi_rw = 0
+
+        # Specialization families
+        spec_families = 0
+
+        re_rfl = re.compile(r':=\s+rfl\s*$')
+        re_iff_rfl = re.compile(r':=\s+Iff\.rfl\s*$')
+        re_by_simp = re.compile(r'by\s+simp\s*$')
+        re_by_rfl = re.compile(r'by\s+rfl\s*$')
+        re_by_norm_num = re.compile(r'by\s+norm_num\s*$')
+        re_by_omega = re.compile(r'by\s+omega\s*$')
+        re_by_decide = re.compile(r'by\s+decide\s*$')
+        re_by_exact = re.compile(r'by\s+exact\s+\S+\s*$')
+        re_multi_rw = re.compile(r'rw\s*\[.*,.*,.*\]')
+        re_spec = re.compile(r'^(?:theorem|lemma|def|abbrev)\s+\w+_(?:nat|int|real|fin)\b')
+        re_rw = re.compile(r'\brw\b')
+        re_simp = re.compile(r'\bsimp\b')
+        re_exact = re.compile(r'\bexact\b')
+        re_omega = re.compile(r'\bomega\b')
+        re_ring = re.compile(r'\bring\b')
+        re_aesop = re.compile(r'\baesop\b')
+        re_decide = re.compile(r'\bdecide\b')
+        re_linarith = re.compile(r'\blinarith\b')
+
+        for f in files:
+            text = f.read_text(errors="replace")
+            lines = text.split("\n")
+            total_lines += len(lines)
+
+            # Header stats
+            for line in lines[:5]:
+                m = re.search(r'Genuine:\s*(\d+)', line)
+                if m: genuine += int(m.group(1))
+                m = re.search(r'Dissolved:\s*(\d+)', line)
+                if m: dissolved += int(m.group(1))
+                m = re.search(r'Conflates:\s*(\d+)', line)
+                if m: conflates += int(m.group(1))
+                m = re.search(r'Infrastructure:\s*(\d+)', line)
+                if m: infra += int(m.group(1))
+
+            for line in lines:
+                # Trivial proofs
+                if re_rfl.search(line): rfl_count += 1
+                if re_iff_rfl.search(line): iff_rfl_count += 1
+                if re_by_simp.search(line): by_simp_count += 1
+                if re_by_rfl.search(line): by_rfl_count += 1
+                if re_by_norm_num.search(line): by_norm_num_count += 1
+                if re_by_omega.search(line): by_omega_standalone += 1
+                if re_by_decide.search(line): by_decide_standalone += 1
+                if re_by_exact.search(line): by_exact_count += 1
+
+                # Tactic uses
+                rw_uses += len(re_rw.findall(line))
+                simp_uses += len(re_simp.findall(line))
+                exact_uses += len(re_exact.findall(line))
+                omega_uses += len(re_omega.findall(line))
+                ring_uses += len(re_ring.findall(line))
+                aesop_uses += len(re_aesop.findall(line))
+                decide_uses += len(re_decide.findall(line))
+                linarith_uses += len(re_linarith.findall(line))
+
+                # Multi-line rw
+                if re_multi_rw.search(line): multi_rw += 1
+
+                # Specialization families
+                if re_spec.match(line.strip()): spec_families += 1
+
+        trivial_total = rfl_count + iff_rfl_count + by_simp_count + by_rfl_count + by_norm_num_count
+
+        # Check for sketch
+        sketch_lines = 0
+        sketch_candidates = [
+            origin_dir / f"{dom}.lean",
+            origin_dir / f"{dom}2.lean",
+        ]
+        for sc in sketch_candidates:
+            if sc.exists():
+                sketch_lines = len(sc.read_text().split("\n"))
+                break
+
+        # Report
+        print(f"\n{'=' * 60}")
+        print(f"  DRY AUDIT: {dom}")
+        print(f"{'=' * 60}")
+        print(f"  Files:              {len(files):,}")
+        print(f"  Lines:              {total_lines:,}")
+        print(f"  Genuine:            {genuine:,}")
+        print(f"  Dissolved:          {dissolved}")
+        print(f"  Conflates:          {conflates}")
+        print(f"  Infrastructure:     {infra:,}")
+        if sketch_lines:
+            pct = (1 - sketch_lines / total_lines) * 100 if total_lines else 0
+            print(f"  Sketch:             {sketch_lines} lines ({pct:.1f}% reduction)")
+        print()
+        print(f"  Layer 1 — Trivial proofs: {trivial_total} ({trivial_total*100//max(genuine,1)}% of genuine)")
+        print(f"    rfl:              {rfl_count}")
+        print(f"    Iff.rfl:          {iff_rfl_count}")
+        print(f"    by simp:          {by_simp_count}")
+        print(f"    by rfl:           {by_rfl_count}")
+        print(f"    by norm_num:      {by_norm_num_count}")
+        print(f"    by exact <term>:  {by_exact_count}")
+        print(f"    by omega:         {by_omega_standalone}")
+        print(f"    by decide:        {by_decide_standalone}")
+        print()
+        print(f"  Layer 2 — Tactic profile:")
+        print(f"    rw:               {rw_uses:,}")
+        print(f"    simp:             {simp_uses:,}")
+        print(f"    exact:            {exact_uses:,}")
+        print(f"    omega:            {omega_uses}")
+        print(f"    ring:             {ring_uses}")
+        print(f"    aesop:            {aesop_uses}")
+        print(f"    decide:           {decide_uses}")
+        print(f"    linarith:         {linarith_uses}")
+        print(f"    Multi-line rw:    {multi_rw} chains (3+ rewrites)")
+        print()
+        print(f"  Layer 3 — Specialization:")
+        print(f"    foo_nat/int/real: {spec_families}")
+        print(f"{'=' * 60}")
+
+
+# =============================================================================
 # Main
 # =============================================================================
 
@@ -1216,6 +1403,11 @@ def main():
             cmd_extract(Path(sys.argv[2]))
         else:
             print("Usage: origin2.py extract <file.lean> | --domain <DOMAIN>")
+    elif cmd == "audit":
+        if len(sys.argv) > 2:
+            cmd_audit(sys.argv[2])
+        else:
+            print("Usage: origin2.py audit <DOMAIN> | --all")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
