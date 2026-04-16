@@ -87,23 +87,12 @@ structure Game' where
   rightMoves : Type u
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: a domain law lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication. -/
-theorem set_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem set_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Cardinal addition lifts through Option. -/
-theorem set_add_none [Add α] (b : Option α) :
-    none + b = b := by simp
-
-/-- A law lifts through Option. -/
 theorem set_mul_assoc [Mul α]
     (h : ∀ a b c : α, a * b * c = a * (b * c))
     (a b c : Option α) : a * b * c = a * (b * c) := by
   cases a <;> cases b <;> cases c <;> simp [h]
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

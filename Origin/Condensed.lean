@@ -73,27 +73,12 @@ def Condensed.ground (h : Prop) : Condensed (Option α) :=
   ⟨none, h⟩
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: a domain law lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication for condensed values. -/
-theorem condensed_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem condensed_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Mapping preserves origin. -/
-theorem condensed_map_none (f : α → β) :
-    Option.map f none = (none : Option β) := by simp
-
-/-- Mapping computes on values. -/
-theorem condensed_map_some (f : α → β) (a : α) :
-    Option.map f (some a) = some (f a) := by simp
-
-/-- A domain law lifts through Option. -/
 theorem condensed_mul_assoc [Mul α]
     (h : ∀ a b c : α, a * b * c = a * (b * c))
     (a b c : Option α) : a * b * c = a * (b * c) := by
   cases a <;> cases b <;> cases c <;> simp [h]
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

@@ -69,22 +69,11 @@ def IsIrreducible (act : G → α → α) (trivialPred allPred : α → Prop) : 
     (∀ a, mem a → trivialPred a) ∨ (∀ a, allPred a → mem a)
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: a group action lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication. -/
-theorem rep_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem rep_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Mapping preserves origin. -/
-theorem rep_map_none (f : α → β) :
-    Option.map f none = (none : Option β) := by simp
-
-/-- A group action lifts through Option. -/
 theorem rep_action_option (act : α → α) (v : Option α) :
     Option.map act v = match v with | none => none | some a => some (act a) := by
   cases v <;> simp
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

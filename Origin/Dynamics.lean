@@ -97,22 +97,11 @@ def IsMinimalAction (act : G → α → α) (isDense : (α → Prop) → Prop) :
   ∀ x, isDense (fun y => ∃ g, act g x = y)
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: composition lifts through Option
 -- ============================================================================
 
-/-- Fixed points lift through Option: none is always fixed. -/
-theorem dyn_map_none (f : α → α) :
-    Option.map f none = (none : Option α) := by simp
-
-/-- Iteration computes on values. -/
-theorem dyn_map_some (f : α → α) (a : α) :
-    Option.map f (some a) = some (f a) := by simp
-
-/-- none absorbs under multiplication. -/
-theorem dyn_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- Composition lifts through Option. -/
 theorem dyn_map_comp (f g : α → α) (v : Option α) :
     Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
   cases v <;> simp
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

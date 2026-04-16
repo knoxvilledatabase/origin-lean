@@ -89,23 +89,12 @@ def IsElementarilyEquivalent (L : Language')
   ∀ φ, φ S₁ ↔ transfer φ S₂
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: a domain law lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication. -/
-theorem model_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem model_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Mapping preserves origin. -/
-theorem model_map_none (f : α → β) :
-    Option.map f none = (none : Option β) := by simp
-
-/-- A law lifts through Option. -/
 theorem model_mul_assoc [Mul α]
     (h : ∀ a b c : α, a * b * c = a * (b * c))
     (a b c : Option α) : a * b * c = a * (b * c) := by
   cases a <;> cases b <;> cases c <;> simp [h]
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

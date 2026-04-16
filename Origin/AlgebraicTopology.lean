@@ -87,22 +87,11 @@ def NerveSimplex (n : Nat) (morph : α → α → Type u) :=
   { chain : Fin (n + 1) → α // ∀ i : Fin n, Nonempty (morph (chain i.castSucc) (chain i.succ)) }
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: composition lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication. -/
-theorem algtop_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem algtop_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Mapping preserves origin. -/
-theorem algtop_map_none (f : α → β) :
-    Option.map f none = (none : Option β) := by simp
-
-/-- Composition lifts through Option. -/
 theorem algtop_map_comp (f g : α → α) (v : Option α) :
     Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
   cases v <;> simp
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

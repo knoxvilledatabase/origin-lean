@@ -82,23 +82,12 @@ def IsCommApplicative (F : Type u → Type u) [Applicative F] : Prop :=
     Prod.mk <$> a <*> b = (fun (b : β) a => (a, b)) <$> b <*> a
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: a domain law lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication. -/
-theorem control_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem control_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Mapping preserves origin. -/
-theorem control_map_none (f : α → β) :
-    Option.map f none = (none : Option β) := by simp
-
-/-- A domain law lifts through Option. -/
 theorem control_mul_comm [Mul α]
     (h : ∀ a b : α, a * b = b * a)
     (a b : Option α) : a * b = b * a := by
   cases a <;> cases b <;> simp [h]
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

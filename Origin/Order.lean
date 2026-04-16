@@ -116,23 +116,12 @@ def IsWellFounded' (r : α → α → Prop) : Prop :=
   ∀ P : α → Prop, (∀ a, (∀ b, r b a → P b) → P a) → ∀ a, P a
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATION: a domain law lifts through Option
 -- ============================================================================
 
-/-- none absorbs under multiplication. -/
-theorem order_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem order_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Addition identity: none + b = b. -/
-theorem order_none_add [Add α] (b : Option α) :
-    none + b = b := by simp
-
-/-- A law lifts through Option. -/
 theorem order_mul_assoc [Mul α]
     (h : ∀ a b c : α, a * b * c = a * (b * c))
     (a b c : Option α) : a * b * c = a * (b * c) := by
   cases a <;> cases b <;> cases c <;> simp [h]
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

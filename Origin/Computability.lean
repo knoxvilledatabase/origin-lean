@@ -87,7 +87,7 @@ structure TMConfig (σ : Type u) (γ : Type u) where
 def TMStep (σ γ : Type u) := σ → γ → Option (σ × γ × Bool)
 
 -- ============================================================================
--- DEMONSTRATIONS: Option lift works for this domain
+-- DEMONSTRATIONS: domain-specific Option behavior
 -- ============================================================================
 
 /-- Partial function composition preserves undefinedness. -/
@@ -95,20 +95,10 @@ theorem pfun_comp_none (g : PFun' β γ) :
     PFun'.comp g (fun (_ : α) => none) = fun _ => (none : Option γ) := by
   funext a; simp [PFun'.comp]
 
-/-- none absorbs under multiplication. -/
-theorem comp_none_mul [Mul α] (b : Option α) :
-    none * b = (none : Option α) := by simp
-
-/-- some values compute. -/
-theorem comp_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-/-- Mapping preserves origin. -/
-theorem comp_map_none (f : α → β) :
-    Option.map f none = (none : Option β) := by simp
-
 /-- A law lifts through Option. -/
 theorem comp_mul_comm [Mul α]
     (h : ∀ a b : α, a * b = b * a)
     (a b : Option α) : a * b = b * a := by
   cases a <;> cases b <;> simp [h]
+
+-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.
