@@ -229,20 +229,34 @@ Don't read the domain files. The script reads Mathlib for you.
 
 ### What to do RIGHT NOW
 
-The pipeline measured the problem. The sketches prove the solution.
-The current work is **expanding the sketches** — expressing more of
-Mathlib's mathematics through Core, domain by domain.
+Run these commands first. The output tells you where things stand.
 
-1. Read the sketches — 14 Origin domain files, all import Core.lean
-2. Each sketch keeps domain-specific definitions + demonstrations
-3. The extracted `Mathlib_*` directories show what Mathlib has for
-   each domain — use these as reference for what to express next
-4. Pick the sketch with the most room to grow. Add the next layer
-   of domain content. Build. Does it pass?
-5. Always audit the foundation before stacking on top of it
+```bash
+# 1. See the current state
+python3 scripts/lean_optimizer.py audit --all
 
-**The sketches are the cartwheels.** Don't invent from scratch.
-Extend what's already proven. Each domain grows from its sketch.
+# 2. Read the findings
+# scripts/compress/README.md — all findings documented here
+
+# 3. The current work: Stage 1 compress on Combinatorics
+python3 scripts/lean_optimizer.py compress Combinatorics
+# Report the before/after line count.
+
+# 4. If Stage 1 works, run it on the next domain.
+```
+
+**The pipeline measured the problem. The sketches prove the solution.**
+The current work is **Stage 1 compression** — running the proof
+tester across extracted Mathlib files, trying shorter proofs, letting
+`lake build` judge. Start with Combinatorics (zero dissolved, pure
+DRY). The compress command does everything.
+
+**After Stage 1:** expand the sketches — express more of Mathlib's
+mathematics through Core, domain by domain. The extracted `Mathlib_*`
+directories show what Mathlib has. The sketches show what Origin
+keeps. Pick the sketch with the most room to grow.
+
+**Always audit the foundation before stacking on top of it.**
 
 ### Mistakes every new Claude makes
 
