@@ -121,6 +121,22 @@ The pipeline remains useful as a reference — it shows what Mathlib
 currently does so Origin knows what to replace. But the output is
 not the destination. The sketches are.
 
+**Two categories of Mathlib math:**
+
+- **Category 1:** Math where `none` being outside the domain changes
+  the expression. Origin re-expresses this. The sketch shows what it
+  looks like. KL divergence, field singularities, group homomorphisms
+  through Option — these are meaningful on `Option α`.
+
+- **Category 2:** Clean Mathlib math with no infrastructure. No `≠ 0`
+  guards, no `GroupWithZero`, no zero-management. Origin imports and
+  uses it. Don't rewrite it. Hamming distance on Pi types, triangle
+  inequality, metric spaces — these are already clean.
+
+Before expanding any sketch, classify the domain content first. Each
+sketch file's header says which is which. The classification IS the
+work for domains where Category 2 dominates.
+
 ### Read these files before doing anything
 
 1. **This file** (`CLAUDE.md`) — your orders.

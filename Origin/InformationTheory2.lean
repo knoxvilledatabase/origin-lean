@@ -6,8 +6,12 @@ import Origin.Core
 /-!
 # Information Theory on Option α (Core-based)
 
-The previous version was 179 lines. Most of it was hypothesis-passing
-theorems that returned their own hypotheses — adding zero value.
+**Goal B classification:**
+- KL divergence, Kraft sum, unique decodability — Category 1 (Option-meaningful)
+- Hamming distance, Pi types, MetricSpace — Category 2 (clean Mathlib math, don't touch)
+
+**What Origin adds:** probabilistic concepts where none = undefined distribution
+**What Origin leaves in Mathlib:** metric/normed space machinery, Hamming on Pi types
 
 This version keeps only: definitions (domain content), proofs that
 actually use Option (the demonstrations), and nothing else. Standard
