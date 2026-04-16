@@ -487,10 +487,16 @@ discuss. They see things you won't see. Listen.
 `.lake/packages/mathlib/Mathlib/` is the source (pinned v4.14.0).
 Also mirrored at `origin-mathlib/Mathlib/` (read-only archive).
 
-**Old Origin files are superseded.** `Origin/Ring.lean`, `Origin/Field.lean`,
-`Origin/OrderedField.lean`, `Origin/Module.lean`, `Origin/Foundation.lean`,
-and the domain files WITHOUT "2" suffix — written before Core.lean.
-The Core-based versions are current. The old files should be cleaned up.
+**Pre-Core files are deleted.** `Ring.lean`, `Field.lean`, `OrderedField.lean`,
+`Module.lean`, `Foundation.lean`, and the unsuffixed domain files that had
+Core-based replacements — all removed. The "2" suffix on `Geometry2.lean`,
+`InformationTheory2.lean`, `LinearAlgebra2.lean`, `MeasureTheory2.lean`,
+`RingTheory2.lean` is a historical artifact — these are now the only
+sketches for those domains. The unsuffixed versions are gone.
+
+**Physics.lean, Logic.lean, Test.lean** still import Foundation (pre-Core).
+They will be migrated to Core after math compression is complete.
+Mathematics first, then up the stack.
 
 **Origin replaces the infrastructure layer. It borrows the mathematical
 content.** Mathlib has two things: mathematical content (`ℕ`, `Nat.gcd`,
