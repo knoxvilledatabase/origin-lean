@@ -17,15 +17,7 @@ universe u
 variable {α : Type u}
 
 -- ============================================================================
--- 1. FIELD EXTENSION
--- ============================================================================
-
-theorem fieldEmbed_comp (iota₁ iota₂ : α → α) (v : Option α) :
-    Option.map iota₂ (Option.map iota₁ v) = Option.map (iota₂ ∘ iota₁) v := by
-  cases v <;> simp
-
--- ============================================================================
--- 2. GALOIS THEORY
+-- 1. GALOIS THEORY
 -- ============================================================================
 
 theorem galois_fixes_base (sigma iota : α → α)
@@ -33,31 +25,11 @@ theorem galois_fixes_base (sigma iota : α → α)
     Option.map sigma (Option.map iota (some a)) = Option.map iota (some a) := by
   simp [h]
 
-theorem galois_comp (sigma tau : α → α) (v : Option α) :
-    Option.map sigma (Option.map tau v) = Option.map (sigma ∘ tau) v := by
-  cases v <;> simp
-
-theorem galois_inv (sigma invS : α → α)
-    (h : ∀ a, sigma (invS a) = a) (a : α) :
-    Option.map sigma (Option.map invS (some a)) = some a := by simp [h]
-
-theorem galois_id (v : Option α) : Option.map id v = v := by
-  cases v <;> simp
+-- Composition, identity, inverse, correspondence all close with
+-- cases v <;> simp [h] from Core's simp set. No declarations needed.
 
 -- ============================================================================
--- 3. GALOIS CORRESPONDENCE
--- ============================================================================
-
-theorem galois_corr_left (fixF unfixF : α → α)
-    (h : ∀ a, fixF (unfixF a) = a) (a : α) :
-    Option.map fixF (Option.map unfixF (some a)) = some a := by simp [h]
-
-theorem galois_corr_right (fixF unfixF : α → α)
-    (h : ∀ a, unfixF (fixF a) = a) (a : α) :
-    Option.map unfixF (Option.map fixF (some a)) = some a := by simp [h]
-
--- ============================================================================
--- 4. INTERMEDIATE FIELDS
+-- 2. INTERMEDIATE FIELDS
 -- ============================================================================
 
 def isInIntField (mem : α → Prop) : Option α → Prop
@@ -82,10 +54,6 @@ def linDisjoint (tensorF : α → α → α) (injF : α → Prop) (e₁ e₂ : �
 -- ============================================================================
 -- 6. FROBENIUS
 -- ============================================================================
-
-theorem frobenius_comp (frobF : α → α) (v : Option α) :
-    Option.map frobF (Option.map frobF v) = Option.map (frobF ∘ frobF) v := by
-  cases v <;> simp
 
 theorem perfect_frob_bij (frobF invFrob : α → α)
     (h₁ : ∀ a, frobF (invFrob a) = a) (h₂ : ∀ a, invFrob (frobF a) = a)

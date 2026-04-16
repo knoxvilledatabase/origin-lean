@@ -317,6 +317,7 @@ derives. Trimming them is the first measured compression of the sketches.
 | Sketch | Before | After | Removed | Reduction |
 |--------|--------|-------|---------|-----------|
 | CategoryTheory | 94 | 61 | 33 | 35% |
+| FieldTheory | 95 | 63 | 32 | 34% |
 
 ## Active Patterns
 
