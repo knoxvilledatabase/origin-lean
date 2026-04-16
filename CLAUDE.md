@@ -151,8 +151,17 @@ python3 scripts/origin.py generate <DomainName>
 # 5. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
 
-# 6. Commit and push
+# 6. Check for duplicates (seconds — run BEFORE committing)
+python3 scripts/origin.py dedup
+# If duplicates found: fix them, rebuild, dedup again
+
+# 7. Commit and push (only after build + dedup both pass)
 ```
+
+**Both build and dedup must pass before every commit.** Build checks
+the code compiles. Dedup checks it's not duplicated. Catching one
+duplicate when you create the file is one fix. Catching 14 at the
+end is a cleanup job.
 
 Proven on Probability: generator drafted 1,244 lines. Claude Code
 rewrote as 169 lines. `lake build` in under a second. 21,068 → 169
