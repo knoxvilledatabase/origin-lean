@@ -91,6 +91,16 @@ never have "demonstration" sections. They name mathematical
 concepts and point to Core's primitives. If you see a domain file
 doing structural work, it's a bug — that work belongs in Core.
 
+**Core is to domain files what an abstract base class is to
+concrete models.** If every domain needs it (algebraic laws,
+primitives, `@[simp]` lemmas), it goes in Core once. Domain files
+inherit it. The test for any new addition: does this exist because
+of *how Option works* (mechanism → Core), or because of *what a
+domain studies* (mathematics → domain file)? `option_mul_comm` is
+mechanism. `IsMartingale` is mathematics. Core stays small —
+mechanism only. Domains stay pure — mathematics only. The index
+handles cross-domain visibility.
+
 ---
 
 ## Step 4: Understand the two compression axes
@@ -147,6 +157,26 @@ theorem once so no model ever re-derives it.
 
 Both categories get restated. Category 1 changes the foundation.
 Category 2 changes the expression.
+
+**The question is: what is the Kolmogorov minimum for Mathlib's
+mathematics?** Mathlib was grown, not designed. Nobody ran the
+global optimizer. So there's redundancy at every level:
+1. Per-type duplication: `mul_comm` for `ℕ`, `ℤ`, `ℝ` — three
+   lemmas where one generic version covers all.
+2. Verbose proofs: 54,545 `rw` chains that `omega`/`simp` close
+   in one step.
+3. Infrastructure: the 17 typeclasses, the 9,682 `≠ 0` guards —
+   code that exists only because the ground was inside.
+4. Redundant lemmas: theorems that are consequences of other
+   theorems already stated.
+
+Origin eliminates all four. Core absorbs everything generic.
+Domain files contain only what's domain-specific. Every definition
+earns its place by expressing something no other line already
+expresses. Lean's kernel is the judge. The build passes or it
+doesn't. The honest boundary: if a theorem genuinely can't be
+shortened, it stays. The goal isn't to minimize by cutting math —
+it's to minimize by cutting everything that isn't math.
 
 **Four things survive across sessions:**
 1. The human — the architect, the solid-state memory
