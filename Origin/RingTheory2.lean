@@ -83,9 +83,8 @@ def isPID [Mul α] [Add α] : Prop :=
 -- 5. POLYNOMIAL
 -- ============================================================================
 
-def isRoot (evalF : α → α) (zero : α) (a : α) : Prop := evalF a = zero
-
-def isIrreducible (irredF : α → Prop) (p : α) : Prop := irredF p
+-- Polynomial roots: see Algebra.IsRoot
+-- Irreducibility: see Algebra.IsIrreducible
 
 -- ============================================================================
 -- 6. GRADED RINGS

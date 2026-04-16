@@ -163,16 +163,8 @@ theorem lorentz_q_none [Mul α]
 -- Quantum Mechanics: ⟨ψ|Â|ψ⟩
 -- ============================================================================
 
-def expectation [Mul α] (coupling : α) (state : Option α) : Option α :=
-  state.map (coupling * ·)
-
-/-- Vacuum: counting doesn't apply. -/
-theorem expect_none [Mul α] (c : α) :
-    expectation c (none : Option α) = none := rfl
-
-/-- Occupied: computes. -/
-theorem expect_some [Mul α] (c a : α) :
-    expectation c (some a) = some (c * a) := rfl
+-- Expectation: see Probability.expectation
+-- ⟨ψ|Â|ψ⟩ is expectation with coupling = operator matrix element.
 
 -- ============================================================================
 -- Two Sources: Independent Boundaries

@@ -37,10 +37,7 @@ def IsProbMeasure (μ : α → Option α) (total : α) (one : α) : Prop :=
 def IsNullEvent (μ : α → Option α) (zero : α) (event : α) : Prop :=
   μ event = some zero
 
-/-- Null is not none — the key disambiguation. -/
-theorem null_ne_none (μ : α → Option α) (zero : α) (event : α)
-    (h : IsNullEvent μ zero event) : μ event ≠ none := by
-  rw [IsNullEvent] at h; rw [h]; simp
+-- Null ≠ none: see MeasureTheory2.null_ne_none
 
 -- ============================================================================
 -- 2. CONDITIONAL PROBABILITY
@@ -58,13 +55,7 @@ theorem condProb_none_right [Mul α] (pAB : Option α) (invF : α → α) :
 theorem condProb_some [Mul α] (pAB : α) (pB : α) (invF : α → α) :
     condProb (some pAB) (some pB) invF = some (pAB * invF pB) := rfl
 
--- ============================================================================
--- 3. INDEPENDENCE
--- ============================================================================
-
-/-- Two events are independent if P(A ∩ B) = P(A) · P(B). -/
-def AreIndependent [Mul α] (pA pB pAB : α) : Prop := pAB = pA * pB
-
+-- Independence: see MeasureTheory2.AreIndependent
 
 -- ============================================================================
 -- 4. RANDOM VARIABLES
@@ -102,9 +93,7 @@ theorem cdf_is_some (cdfF : α → α) (x : α) :
 -- 6. MARTINGALES
 -- ============================================================================
 
-/-- A martingale: E[X_{n+1} | F_n] = X_n. -/
-def IsMartingale (X : Nat → Option α) (ceF : Nat → α → α) : Prop :=
-  ∀ n a, X n = some a → Option.map (ceF n) (X (n + 1)) = some a
+-- Martingales: see MeasureTheory2.IsMartingale
 
 -- ============================================================================
 -- 7. BAYES' THEOREM
@@ -118,17 +107,8 @@ def bayesUpdate [Mul α] (pBA pA pB : α) (invF : α → α) : α :=
 -- 8. ENTROPY
 -- ============================================================================
 
-/-- Shannon entropy: -∑ p log p. -/
-def shannonEntropy [Mul α] [Add α] [Neg α]
-    (logF : α → α) (sumF : (α → α) → α)
-    (probs : α → α) : Option α :=
-  some (-(sumF (fun x => probs x * logF (probs x))))
-
-/-- KL divergence: ∑ p log(p/q). -/
-def klDivergence [Mul α]
-    (integralF : (α → α) → α) (logF : α → α)
-    (rnDerivF : α → α) : Option α :=
-  some (integralF (fun x => rnDerivF x * logF (rnDerivF x)))
+-- Shannon entropy: see InformationTheory2.shannonEntropy
+-- KL divergence: see InformationTheory2.klDiv
 
 -- ============================================================================
 -- 9. MARKOV CHAINS

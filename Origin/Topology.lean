@@ -56,11 +56,8 @@ def IsUltrafilter (F : OptFilter α) : Prop :=
 -- 5. ORDER THEORY
 -- ============================================================================
 
-def IsGaloisConnection (l u : α → α) (leF : α → α → Prop) : Prop :=
-  ∀ a b, leF (l a) b ↔ leF a (u b)
-
-def IsWellOrder (leF : α → α → Prop) : Prop :=
-  ∀ S : α → Prop, (∃ a, S a) → ∃ m, S m ∧ ∀ a, S a → leF m a
+-- Galois connections: see Order.IsGaloisConnection
+-- Well-orderings: see SetTheory.IsWellOrder
 
 -- ============================================================================
 -- 6. HOMOTOPY
@@ -108,15 +105,8 @@ def IsNormal (openα : (α → Prop) → Prop) : Prop :=
 -- 9. DYNAMICS
 -- ============================================================================
 
-def orbit (f : α → α) : Nat → α → α
-  | 0, a => a
-  | n + 1, a => f (orbit f n a)
-
-def IsFixedPoint (f : α → α) (a : α) : Prop := f a = a
-def IsPeriodicPoint (f : α → α) (n : Nat) (a : α) : Prop := orbit f n a = a
-
-def IsErgodic (f : α → α) (inv : (α → Prop) → Prop) : Prop :=
-  ∀ S, inv S → (∀ a, S a → S (f a)) → (∀ a, S a) ∨ (∀ a, ¬S a)
+-- Orbits, fixed points, periodic points: see Dynamics.lean
+-- Ergodicity: see Dynamics.IsErgodic
 
 -- ============================================================================
 -- 10. BAIRE CATEGORY
