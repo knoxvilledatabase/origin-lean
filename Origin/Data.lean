@@ -18,9 +18,7 @@ variable {α : Type u}
 -- 1. GCD
 -- ============================================================================
 
-def optGcd (gcdF : α → α → α) : Option α → Option α → Option α
-  | some a, some b => some (gcdF a b)
-  | _, _ => none
+def optGcd (gcdF : α → α → α) : Option α → Option α → Option α := liftBin₂ gcdF
 @[simp] theorem optGcd_none_left (gcdF : α → α → α) (b : Option α) :
     optGcd gcdF none b = none := by cases b <;> rfl
 @[simp] theorem optGcd_none_right (gcdF : α → α → α) (a : Option α) :
@@ -36,9 +34,7 @@ theorem optGcd_comm (gcdF : α → α → α)
 -- 2. PRIMALITY
 -- ============================================================================
 
-def optIsPrime (primeP : α → Prop) : Option α → Prop
-  | some a => primeP a
-  | none => False
+def optIsPrime (primeP : α → Prop) : Option α → Prop := liftPred primeP
 @[simp] theorem optIsPrime_none (primeP : α → Prop) :
     optIsPrime primeP (none : Option α) = False := rfl
 
@@ -60,9 +56,7 @@ theorem optCong_trans (modF : α → α → α) (a b c n : α)
 
 variable {β : Type u}
 
-def optAppend : Option (List α) → Option (List α) → Option (List α)
-  | some xs, some ys => some (xs ++ ys)
-  | _, _ => none
+def optAppend : Option (List α) → Option (List α) → Option (List α) := liftBin₂ (· ++ ·)
 @[simp] theorem optAppend_none_left (ys : Option (List α)) :
     optAppend none ys = none := by cases ys <;> rfl
 @[simp] theorem optAppend_none_right (xs : Option (List α)) :
@@ -100,20 +94,14 @@ theorem bijective_comp (f g : α → α)
 -- 6. EXTENDED NUMBER TYPES
 -- ============================================================================
 
-def optIsTop (topP : α → Prop) : Option α → Prop
-  | some a => topP a
-  | none => False
-def optIsBot (botP : α → Prop) : Option α → Prop
-  | some a => botP a
-  | none => False
+def optIsTop (topP : α → Prop) : Option α → Prop := liftPred topP
+def optIsBot (botP : α → Prop) : Option α → Prop := liftPred botP
 
 -- ============================================================================
 -- 7. MULTISETS (bags — unordered collections with multiplicity)
 -- ============================================================================
 
-def optMsetUnion : Option (List α) → Option (List α) → Option (List α)
-  | some xs, some ys => some (xs ++ ys)
-  | _, _ => none
+def optMsetUnion : Option (List α) → Option (List α) → Option (List α) := liftBin₂ (· ++ ·)
 @[simp] theorem optMsetUnion_none_left (b : Option (List α)) :
     optMsetUnion none b = none := by cases b <;> rfl
 @[simp] theorem optMsetUnion_none_right (a : Option (List α)) :
@@ -135,12 +123,10 @@ theorem optMsetCard_union (xs ys : List α) :
 -- 8. FINSETS (finite sets as filtered lists on Option)
 -- ============================================================================
 
-def optFinsetMem [DecidableEq α] (a : α) : Option (List α) → Prop
-  | some xs => a ∈ xs
-  | none => False
-def optFinsetInter [DecidableEq α] : Option (List α) → Option (List α) → Option (List α)
-  | some xs, some ys => some (xs.filter (· ∈ ys))
-  | _, _ => none
+def optFinsetMem [DecidableEq α] (a : α) : Option (List α) → Prop :=
+  liftPred (a ∈ ·)
+def optFinsetInter [DecidableEq α] : Option (List α) → Option (List α) → Option (List α) :=
+  liftBin₂ (fun xs ys => xs.filter (· ∈ ys))
 @[simp] theorem optFinsetInter_none_left [DecidableEq α] (b : Option (List α)) :
     optFinsetInter none b = none := by cases b <;> rfl
 @[simp] theorem optFinsetInter_none_right [DecidableEq α] (a : Option (List α)) :

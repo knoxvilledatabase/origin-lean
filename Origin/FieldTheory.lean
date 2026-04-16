@@ -48,9 +48,7 @@ def IsKrullTopology (_topF : (α → α) → Prop) : Prop :=
 -- ============================================================================
 
 /-- An intermediate field: a subfield between base and extension. -/
-def isInIntField (mem : α → Prop) : Option α → Prop
-  | some a => mem a
-  | none => False
+def isInIntField (mem : α → Prop) : Option α → Prop := liftPred mem
 
 @[simp] theorem none_not_in_intField (mem : α → Prop) :
     ¬ isInIntField mem (none : Option α) := by simp [isInIntField]

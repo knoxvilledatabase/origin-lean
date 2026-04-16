@@ -130,9 +130,8 @@ def IsHilbert (isInnerProd isComplete : Prop) : Prop :=
 -- ============================================================================
 
 /-- A function is analytic at a point: has a convergent power series. -/
-def isAnalytic (analyticF : (α → α) → α → Prop) (f : α → α) : Option α → Prop
-  | some a => analyticF f a
-  | none => False
+def isAnalytic (analyticF : (α → α) → α → Prop) (f : α → α) : Option α → Prop :=
+  liftPred (analyticF f)
 
 /-- Radius of convergence of a power series. -/
 def radiusOfConvergence (coeffs : Nat → α) (radiusF : (Nat → α) → α) : α :=
@@ -159,9 +158,8 @@ def jensen (isConvex : Prop) (fExpected expectedF : α)
 -- ============================================================================
 
 /-- A function is holomorphic (complex differentiable). -/
-def isHolomorphic (holoF : (α → α) → α → Prop) (f : α → α) : Option α → Prop
-  | some a => holoF f a
-  | none => False
+def isHolomorphic (holoF : (α → α) → α → Prop) (f : α → α) : Option α → Prop :=
+  liftPred (holoF f)
 
 /-- Cauchy integral formula (abstract). -/
 def cauchyIntegral (f : α → α) (contourIntF : (α → α) → α → α)

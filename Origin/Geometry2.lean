@@ -30,9 +30,7 @@ structure PrimeIdeal (α : Type u) [Mul α] where
   proper : ∃ a, ¬mem a
 
 /-- Membership lifts to Option: none is not in any ideal. -/
-def inIdeal (mem : α → Prop) : Option α → Prop
-  | some a => mem a
-  | none => False
+def inIdeal (mem : α → Prop) : Option α → Prop := liftPred mem
 
 @[simp] theorem none_not_in_ideal (mem : α → Prop) :
     ¬ inIdeal mem (none : Option α) := by simp [inIdeal]

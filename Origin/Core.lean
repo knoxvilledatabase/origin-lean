@@ -97,6 +97,20 @@ def liftBin₂ (f : α → β → γ) : Option α → Option β → Option γ
     liftBin₂ f (some a) (some b) = some (f a b) := rfl
 
 -- ============================================================================
+-- Predicate Lift (for domain predicates on Option)
+-- ============================================================================
+
+/-- Lift a predicate to Option: some satisfies it, none does not.
+    The ground is never in a predicate — predicates are for parts. -/
+def liftPred (p : α → Prop) : Option α → Prop
+  | some a => p a
+  | none => False
+
+@[simp] theorem liftPred_none (p : α → Prop) : liftPred p none = False := rfl
+@[simp] theorem liftPred_some (p : α → Prop) (a : α) :
+    liftPred p (some a) = p a := rfl
+
+-- ============================================================================
 -- The No-Some-Fixed-Point Theorem (for logic)
 -- ============================================================================
 
@@ -114,7 +128,7 @@ theorem no_some_fixed_point
 -- ============================================================================
 
 -- One theorem (origin). Instances for *, +, -. A simp set. liftBin₂.
--- no_some_fixed_point. Standard notation. Everything else follows.
+-- liftPred. no_some_fixed_point. Standard notation. Everything else follows.
 --
 -- none is the whole. some is a part. * + - work on Option with
 -- standard notation. The ground absorbs. The parts compute.

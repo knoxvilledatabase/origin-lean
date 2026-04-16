@@ -94,9 +94,7 @@ def cayleyHamilton (charPolyF : α → α) (evalAtMatrix : (α → α) → α)
 -- ============================================================================
 
 /-- Bilinear form on Option: none absorbs. -/
-def bilinear (bilF : α → α → α) : Option α → Option α → Option α
-  | some u, some v => some (bilF u v)
-  | _, _ => none
+def bilinear (bilF : α → α → α) : Option α → Option α → Option α := liftBin₂ bilF
 
 @[simp] theorem bilinear_none_left (bilF : α → α → α) (v : Option α) :
     bilinear bilF none v = none := by cases v <;> rfl
@@ -192,9 +190,7 @@ def gramSchmidt (orthogonalize : (Nat → α) → Nat → α) (ip : α → α �
 -- ============================================================================
 
 /-- Tensor product on Option: none absorbs. -/
-def tensorProd : Option α → Option β → Option (α × β)
-  | some a, some b => some (a, b)
-  | _, _ => none
+def tensorProd : Option α → Option β → Option (α × β) := liftBin₂ Prod.mk
 
 @[simp] theorem tensorProd_none_left (b : Option β) :
     tensorProd (none : Option α) b = none := by cases b <;> rfl

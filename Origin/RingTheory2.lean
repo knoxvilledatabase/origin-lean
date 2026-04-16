@@ -31,9 +31,8 @@ structure RingIdeal (α : Type u) [Mul α] [Add α] where
   mul_absorb : ∀ r a, mem a → mem (r * a)
 
 /-- Ideal membership on Option: none is not in any ideal. -/
-def idealMem [Mul α] [Add α] (I : RingIdeal α) : Option α → Prop
-  | some a => I.mem a
-  | none => False
+def idealMem [Mul α] [Add α] (I : RingIdeal α) : Option α → Prop :=
+  liftPred I.mem
 
 @[simp] theorem idealMem_none [Mul α] [Add α] (I : RingIdeal α) :
     idealMem I none = False := rfl

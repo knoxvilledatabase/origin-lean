@@ -31,9 +31,8 @@ theorem padic_val_mul [Mul α] [Add α] (vpF : α → α)
     Option.map vpF (some a) + Option.map vpF (some b) := by simp [h]
 
 /-- p-adic integer: non-negative valuation. -/
-def isPadicInt (vpF : α → α) (leF : α → α → Prop) (zeroV : α) : Option α → Prop
-  | some a => leF zeroV (vpF a)
-  | none => False
+def isPadicInt (vpF : α → α) (leF : α → α → Prop) (zeroV : α) : Option α → Prop :=
+  liftPred (fun a => leF zeroV (vpF a))
 
 /-- p-adic norm: |x|_p = p^(-v_p(x)). -/
 def padicNorm (vpF : α → Nat) (p : Nat) : Option α → Option Nat
@@ -49,9 +48,7 @@ def ostrowski (isArch isNonarchimedean : Prop) : Prop :=
 -- ============================================================================
 
 /-- An algebraic integer: root of a monic polynomial with integer coefficients. -/
-def isAlgInt (isIntF : α → Prop) : Option α → Prop
-  | some a => isIntF a
-  | none => False
+def isAlgInt (isIntF : α → Prop) : Option α → Prop := liftPred isIntF
 
 /-- The ring of integers O_K of a number field K. -/
 def ringOfIntegers (isIntF : α → Prop) : α → Prop := isIntF
@@ -122,9 +119,7 @@ def mobiusInversion (f g : α → α) (sumF : (α → α) → α → α)
 -- ============================================================================
 
 /-- Quadratic residue: a is a square mod p. -/
-def isQuadResidue (qrF : α → Prop) : Option α → Prop
-  | some a => qrF a
-  | none => False
+def isQuadResidue (qrF : α → Prop) : Option α → Prop := liftPred qrF
 
 /-- The Legendre symbol (a/p): 1 if QR, -1 if QNR, 0 if p | a. -/
 def legendreSymbol (legF : α → α → Int) : α → α → Int := legF
@@ -159,9 +154,8 @@ def kummer (isReg : α → Prop) (fltForP : α → Prop) : Prop :=
 -- ============================================================================
 
 /-- A primitive n-th root of unity: minimal order n. -/
-def isPrimitiveRoot (orderF : α → α) (n : α) : Option α → Prop
-  | some a => orderF a = n
-  | none => False
+def isPrimitiveRoot (orderF : α → α) (n : α) : Option α → Prop :=
+  liftPred (fun a => orderF a = n)
 
 /-- The n-th cyclotomic polynomial Φ_n. -/
 def cyclotomicPoly (polyF : Nat → α → α) : Nat → α → α := polyF
@@ -203,9 +197,7 @@ def lagrange_four_squares [Mul α] [Add α] : Prop :=
 -- ============================================================================
 
 /-- Primality lifts to Option: none is not prime. -/
-def isPrime' (primeF : α → Prop) : Option α → Prop
-  | some a => primeF a
-  | none => False
+def isPrime' (primeF : α → Prop) : Option α → Prop := liftPred primeF
 
 /-- Wilson's theorem: (p-1)! ≡ -1 mod p for prime p. -/
 def wilson (factF : Nat → Nat) (p : Nat) : Prop :=
