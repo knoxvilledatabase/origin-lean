@@ -187,6 +187,33 @@ architecture.** If it feels complex, stop and ask.
 
 ---
 
+## What's next
+
+All 26 math domains have sketches. The next work is **refining them.**
+
+The original 15 sketches were hand-written and audited. The 10 newer
+sketches (AlgebraicGeometry, AlgebraicTopology, Computability,
+Condensed, Control, Dynamics, ModelTheory, Order, RepresentationTheory,
+SetTheory) were first drafts — they may have room to tighten.
+
+**The warmup:** Pick a newer sketch. Compare it to `GroupTheory.lean`
+(102 lines, hand-audited, maximally DRY). Ask:
+
+- Does every definition earn its place?
+- Are there redundant theorems Core already handles?
+- Can any proof be shorter? (`by simp`, `cases <;> simp [h]`)
+- Does `lake build` still pass after tightening?
+
+**After refining:** Look at `scripts/compress/README.md` for the
+baseline DRY audit numbers. The big opportunity is the generator +
+proof tester working together — the generator drafts, the proof
+tester verifies against Core's simp set, Claude Code writes the
+final Origin code. Each domain takes minutes.
+
+**Always audit the foundation before stacking on top of it.**
+
+---
+
 ## Reference
 
 For the full history — pipeline run logs, parser bugs, detailed
