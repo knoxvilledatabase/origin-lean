@@ -57,7 +57,28 @@ instance [Neg α] : Neg (Option α) where
 instance [Zero α] : Zero (Option α) where
   zero := none
 
--- One requires Mathlib; omitted. some(1) is the multiplicative identity.
+/-- Multiplicative identity. Lean's stdlib doesn't provide One, so Origin
+    defines its own. some(1) is a measurement — the unit, inside the
+    counting domain. Not the ground. -/
+class One' (α : Type u) where
+  one : α
+
+notation "𝟙" => One'.one
+
+instance [One' α] : One' (Option α) where
+  one := some 𝟙
+
+/-- Multiplicative inverse. Origin defines its own — no Mathlib needed.
+    none⁻¹ = none. You can't invert the ground. -/
+class Inv' (α : Type u) where
+  inv : α → α
+
+postfix:max "⁻¹'" => Inv'.inv
+
+instance [Inv' α] : Inv' (Option α) where
+  inv a := match a with
+    | none => none
+    | some a => some (a⁻¹')
 
 -- ============================================================================
 -- Simp Set: the ground rules
@@ -77,6 +98,11 @@ instance [Zero α] : Zero (Option α) where
 
 @[simp] theorem neg_none [Neg α] : -(none : Option α) = none := rfl
 @[simp] theorem neg_some [Neg α] (a : α) : -(some a : Option α) = some (-a) := rfl
+
+@[simp] theorem one_some [One' α] : (𝟙 : Option α) = some 𝟙 := rfl
+
+@[simp] theorem inv_none [Inv' α] : (none : Option α)⁻¹' = none := rfl
+@[simp] theorem inv_some [Inv' α] (a : α) : (some a : Option α)⁻¹' = some (a⁻¹') := rfl
 
 -- ============================================================================
 -- The Algebraic Laws: lifted through Option
@@ -140,6 +166,52 @@ theorem option_mul_neg [Mul α] [Neg α]
 theorem option_neg_neg [Neg α]
     (h : ∀ a : α, -(-a) = a) (a : Option α) : -(-a) = a := by
   cases a <;> simp [h]
+
+/-- Left multiplication by negation. -/
+theorem option_neg_mul [Mul α] [Neg α]
+    (h : ∀ a b : α, (-a) * b = -(a * b))
+    (a b : Option α) : (-a) * b = -(a * b) := by
+  cases a <;> cases b <;> simp [h]
+
+/-- Negative times negative is positive. -/
+theorem option_neg_mul_neg [Mul α] [Neg α]
+    (h : ∀ a b : α, (-a) * (-b) = a * b)
+    (a b : Option α) : (-a) * (-b) = a * b := by
+  cases a <;> cases b <;> simp [h]
+
+/-- No zero divisors at the Option level. If a * b = none, then
+    a = none or b = none. You can't reach the ground by multiplying
+    parts — the instance guarantees some * some = some. -/
+theorem option_mul_eq_none [Mul α] {a b : Option α}
+    (h : a * b = none) : a = none ∨ b = none := by
+  cases a with
+  | none => left; rfl
+  | some x => cases b with
+    | none => right; rfl
+    | some y => simp at h
+
+/-- Multiplicative identity (left). some(1) is the unit measurement. -/
+theorem option_one_mul [Mul α] [One' α]
+    (h : ∀ a : α, 𝟙 * a = a) (a : Option α) :
+    some 𝟙 * a = a := by
+  cases a <;> simp [h]
+
+/-- Multiplicative identity (right). -/
+theorem option_mul_one [Mul α] [One' α]
+    (h : ∀ a : α, a * 𝟙 = a) (a : Option α) :
+    a * some 𝟙 = a := by
+  cases a <;> simp [h]
+
+/-- Multiplicative inverse. Like additive inverse, stays in the
+    counting domain: some a * some (a⁻¹) = some 1, NOT none. -/
+theorem option_mul_inv [Mul α] [Inv' α] [One' α]
+    (h : ∀ a : α, a * a⁻¹' = 𝟙) (a : α) :
+    (some a : Option α) * some (a⁻¹') = some 𝟙 := by
+  simp [h]
+
+/-- Inverse of none is none. You can't invert the ground. -/
+theorem option_inv_none' [Inv' α] :
+    (none : Option α)⁻¹' = none := rfl
 
 -- ============================================================================
 -- Cross-Type Lift (for physics, tensors)
