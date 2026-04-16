@@ -1,7 +1,9 @@
 # For AI Agents — Onboarding Exercise
 
-**Do not skip steps. Each step has checkpoint questions. If you can't
-answer them, re-read until you can. The questions ARE the alignment.**
+**Work through all steps now. Don't ask for permission — just do it.
+Read each file, answer the checkpoint questions, show your answers.
+If you can't answer them, re-read until you can. The questions ARE
+the alignment.**
 
 ---
 
