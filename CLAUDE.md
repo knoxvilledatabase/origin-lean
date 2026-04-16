@@ -48,6 +48,12 @@ Don't read the domain files. The script reads Mathlib for you.
 
 ### Mistakes every new Claude makes
 
+**You will start building before confirming alignment.** Don't. The
+user holds the philosophy. Every session that skipped alignment went
+sideways. Before writing code, confirm you understand: what is origin?
+what is `some 0`? what dissolves and what doesn't? If the user asks
+you a question, think before answering. The question IS the alignment.
+
 **You will think `b - b` is zero.** It's not. It's origin — the
 return to the ground. Not "the number zero." The whole. This
 distinction IS the project. Read the derivation until you feel it.
