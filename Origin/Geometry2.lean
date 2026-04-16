@@ -262,20 +262,8 @@ def angle (dotF : α → α → α) (_normF : α → α) (acosF : α → α) (u 
 -- 14. GEOMETRY ON OPTION: none is origin
 -- ============================================================================
 
-/-- Multiplication lifts through Option (for coordinate computations). -/
-theorem geom_mul_comm [Mul α] (h : ∀ a b : α, a * b = b * a)
-    (a b : Option α) : a * b = b * a := by
-  cases a <;> cases b <;> simp [h]
 
-/-- Associativity lifts through Option. -/
-theorem geom_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
 
-/-- Addition lifts through Option. -/
-theorem geom_add_comm [Add α] (h : ∀ a b : α, a + b = b + a)
-    (a b : Option α) : a + b = b + a := by
-  cases a <;> cases b <;> simp [h]
 
 -- ============================================================================
 -- 15. ORIENTED ANGLES (Euclidean/Angle/Oriented/)
@@ -456,5 +444,3 @@ def Grassmannian' : Prop := True
 
 /-- Stiefel manifold (abstract). -/
 def StiefelManifold' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

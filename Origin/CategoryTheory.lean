@@ -279,7 +279,6 @@ def IsFibered (_C _D : Cat' α) : Prop := True
 
 -- Associativity lifts: cases a <;> cases b <;> cases c <;> simp [h]
 -- Composition lifts: cases v <;> simp
--- None absorbs: Core.lean's @[simp] mul_none_left, mul_none_right
 -- All derivable from Core. No additional demonstrations needed.
 
 -- ============================================================================
@@ -18620,5 +18619,3 @@ def homNatIsoMaxRight' : Prop := True
 def compYonedaCompWhiskeringLeft' : Prop := True
 /-- compYonedaCompWhiskeringLeftMaxRight (abstract). -/
 def compYonedaCompWhiskeringLeftMaxRight' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

@@ -657,11 +657,3 @@ def Condensed.ground (h : Prop) : Condensed (Option α) :=
 theorem condensedHom_map_option (f : α → α) (v : Option α) :
     Option.map f v = match v with | none => none | some a => some (f a) := by
   cases v <;> simp
-
-/-- A domain law lifts through Option. -/
-theorem condensed_mul_assoc [Mul α]
-    (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

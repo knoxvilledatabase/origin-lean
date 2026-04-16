@@ -289,20 +289,8 @@ def transferMap (cosetReps : Nat → α) : α → α :=
 -- 16. GROUP THEORY ON OPTION: none is origin
 -- ============================================================================
 
-/-- Group multiplication lifts through Option. -/
-theorem group_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
 
-/-- Group commutativity lifts through Option. -/
-theorem group_mul_comm [Mul α] (h : ∀ a b : α, a * b = b * a)
-    (a b : Option α) : a * b = b * a := by
-  cases a <;> cases b <;> simp [h]
 
-/-- Group negation is involutive on Option. -/
-theorem group_neg_neg [Neg α] (h : ∀ a : α, -(-a) = a)
-    (v : Option α) : -(-v) = v := by
-  cases v <;> simp [h]
 
 /-- Homomorphism on Option: none maps to none. -/
 theorem group_hom_option [Mul α] (f : α → α)
@@ -310,5 +298,3 @@ theorem group_hom_option [Mul α] (f : α → α)
     (v : Option α) (w : Option α) :
     Option.map f (v * w) = Option.map f v * Option.map f w := by
   cases v <;> cases w <;> simp [hf]
-
--- None absorbs (mul, neg): Core.lean's @[simp] set handles all cases.

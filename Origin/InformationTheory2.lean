@@ -245,15 +245,3 @@ theorem hammingDist_option (eq : α → α → Bool) (x y : List (Option α)) :
 theorem mutualInfo_option_none [Add α] [Neg α] (hY hXY : Option α) :
     mutualInfo' (none : Option α) hY hXY = hY + -hXY := by
   simp [mutualInfo']
-
-/-- A domain law lifts through Option. -/
-theorem info_add_comm [Add α] (h : ∀ a b : α, a + b = b + a)
-    (a b : Option α) : a + b = b + a := by
-  cases a <;> cases b <;> simp [h]
-
-/-- Multiplication lifts through Option (for entropy computations). -/
-theorem info_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

@@ -272,20 +272,12 @@ def IsAkraBazziSolution (_T : Nat → Nat) (_g : Nat → Nat)
     (_p : Nat) : Prop :=
   True  -- abstracted; full statement involves integral condition
 
--- ============================================================================
--- DEMONSTRATIONS: domain-specific Option behavior
--- ============================================================================
 
 /-- Partial function composition preserves undefinedness. -/
 theorem pfun_comp_none (g : PFun' β γ) :
     PFun'.comp g (fun (_ : α) => none) = fun _ => (none : Option γ) := by
   funext a; simp [PFun'.comp]
 
-/-- A law lifts through Option. -/
-theorem comp_mul_comm [Mul α]
-    (h : ∀ a b : α, a * b = b * a)
-    (a b : Option α) : a * b = b * a := by
-  cases a <;> cases b <;> simp [h]
 
 -- ============================================================================
 -- 14. ACKERMANN PROPERTIES (Ackermann.lean)
@@ -573,5 +565,3 @@ def primrec_ite' : Prop := True
 
 /-- Primrec.list_length (abstract). -/
 def primrec_list_length' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

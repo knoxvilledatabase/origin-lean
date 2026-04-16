@@ -231,13 +231,7 @@ def HasExtraDegeneracy (_X : SimplicialObject α)
     (_extraDegen : Nat → α → α) : Prop :=
   True  -- abstracted; the full condition involves compatibility
 
--- ============================================================================
--- DEMONSTRATION: composition lifts through Option
--- ============================================================================
 
-theorem algtop_map_comp (f g : α → α) (v : Option α) :
-    Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
-  cases v <;> simp
 
 -- ============================================================================
 -- 14. ALTERNATING FACE MAP COMPLEX (AlternatingFaceMapComplex.lean)
@@ -493,7 +487,6 @@ def toTopSimplex' : Prop := True
 /-- TopologicalSimplex.coordSum_eq_one (abstract). -/
 def topSimplex_coordSum_eq_one' : Prop := True
 
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.
 
 -- ============================================================================
 -- 25. SIMPLEX CATEGORY — STRUCTURES
@@ -1070,5 +1063,3 @@ def Splitting''_nondeg {X : SimplicialObject α} (s : Splitting'' X)
 
 structure SSet_MonoidalStructure (α : Type u) where tensor : α → α → α
 structure SSet_MonoidalClosedStructure (α : Type u) where internal_hom : α → α → α
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

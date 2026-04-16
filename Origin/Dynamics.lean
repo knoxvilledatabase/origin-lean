@@ -967,13 +967,3 @@ def newtonStep (f derivF : α → α) (divF : α → α → α) (x : α) : α :=
 def newtonConverges (_f _derivF : α → α) (_divF : α → α → α)
     (_root : α) : Prop :=
   True  -- abstracted; full proof involves contraction mapping
-
--- ============================================================================
--- DEMONSTRATION: composition lifts through Option
--- ============================================================================
-
-theorem dyn_map_comp (f g : α → α) (v : Option α) :
-    Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
-  cases v <;> simp
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

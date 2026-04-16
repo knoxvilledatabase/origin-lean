@@ -536,5 +536,3 @@ def luroth' : Prop := True
 
 /-- Polynomial ring lemmas (abstract). -/
 def polynomialRing_lemmas' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

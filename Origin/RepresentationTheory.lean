@@ -555,11 +555,3 @@ def Representation.liftOpt (ρ : Representation G α) :
 theorem rep_action_option (act : α → α) (v : Option α) :
     Option.map act v = match v with | none => none | some a => some (act a) := by
   cases v <;> simp
-
-/-- A domain law lifts through Option. -/
-theorem rep_mul_assoc [Mul α]
-    (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

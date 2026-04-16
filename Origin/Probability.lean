@@ -269,15 +269,7 @@ def IsCoupling (joint : α → α → Option α)
 theorem expect_mul_absorbs [Mul α] (w : α) (v : Option α) :
     expectation w v = v.map (w * ·) := rfl
 
-/-- Multiplication lifts through Option (for probability computations). -/
-theorem prob_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
 
-/-- Addition lifts through Option. -/
-theorem prob_add_comm [Add α] (h : ∀ a b : α, a + b = b + a)
-    (a b : Option α) : a + b = b + a := by
-  cases a <;> cases b <;> simp [h]
 
 -- ============================================================================
 -- 15. CDF PROPERTIES (CDF.lean)
@@ -671,5 +663,3 @@ def IdentDistrib_comp' : Prop := True
 
 /-- IdentDistrib.variance_eq (abstract). -/
 def IdentDistrib_variance_eq' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

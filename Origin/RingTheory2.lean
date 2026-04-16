@@ -13440,5 +13440,3 @@ def ker_intCastRingHom' : Prop := True
 def ringHom_eq_of_ker_eq' : Prop := True
 /-- isReduced_zmod (abstract). -/
 def isReduced_zmod' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

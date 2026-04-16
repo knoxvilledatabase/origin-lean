@@ -15,6 +15,7 @@ Usage:
     python3 scripts/origin.py stub <domain>         append uncovered as def stubs
     python3 scripts/origin.py quality [domain]      show stub vs real declaration counts
     python3 scripts/origin.py patterns             find patterns that consolidate to Core
+    python3 scripts/origin.py clean                remove stale stubs that collide with Core
 """
 
 import re
@@ -891,6 +892,84 @@ def cmd_quality(domain=None):
 
 
 # =============================================================================
+# Clean — remove stale stubs that now collide with Core
+# =============================================================================
+
+def cmd_clean():
+    """Remove stubs from domain files that collide with Core declarations.
+
+    When Core evolves (new classes, theorems, primitives), existing stubs
+    in domain files become collisions. This command finds and removes them.
+    Core is the foundation — it always wins.
+    """
+    core_path = ORIGIN / "Core.lean"
+    if not core_path.exists():
+        ui.fail("Core.lean not found")
+        return
+
+    # Collect all Core declaration names (normalized)
+    core_names = set()
+    for line in core_path.read_text(errors="replace").split("\n"):
+        m = ORIGIN_DECL_RE.match(line)
+        if m and "private " not in line:
+            core_names.add(_normalize_lean_name(m.group(2)))
+
+    skip = {"Core.lean", "Index.lean", "Test.lean", "Physics.lean"}
+    total_removed = 0
+    files_changed = 0
+
+    for f in sorted(ORIGIN.glob("*.lean")):
+        if f.name in skip:
+            continue
+
+        lines = f.read_text(errors="replace").split("\n")
+        new_lines = []
+        removed = []
+        i = 0
+
+        while i < len(lines):
+            line = lines[i]
+
+            # Check if this is a stub that collides with Core
+            if STUB_RE.match(line):
+                m = ORIGIN_DECL_RE.match(line)
+                if m:
+                    norm = _normalize_lean_name(m.group(2))
+                    if norm in core_names:
+                        # Remove the stub and its docstring
+                        if new_lines and new_lines[-1].strip().startswith("/--"):
+                            new_lines.pop()
+                        removed.append(m.group(2))
+                        i += 1
+                        continue
+
+            new_lines.append(line)
+            i += 1
+
+        if removed:
+            # Clean trailing blank lines
+            while new_lines and new_lines[-1].strip() == "":
+                new_lines.pop()
+            new_lines.append("")
+            f.write_text("\n".join(new_lines))
+            total_removed += len(removed)
+            files_changed += 1
+            print(f"  {f.stem}: removed {len(removed)} stale stubs")
+            for name in removed[:5]:
+                print(f"    {ui.DIM}{name}{ui.RESET}")
+            if len(removed) > 5:
+                ui.info(f"    ... and {len(removed) - 5} more")
+
+    if total_removed == 0:
+        ui.ok("No stale stubs found — all clean")
+    else:
+        print()
+        ui.stat("Stubs removed", f"{ui.GREEN}{total_removed}{ui.RESET}")
+        ui.stat("Files changed", f"{files_changed}")
+        print()
+
+
+# =============================================================================
 # Patterns — find structural patterns that could consolidate to Core
 # =============================================================================
 
@@ -1265,6 +1344,8 @@ def main():
             cmd_quality()
     elif cmd == "patterns":
         cmd_patterns()
+    elif cmd == "clean":
+        cmd_clean()
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)

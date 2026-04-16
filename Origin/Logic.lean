@@ -1236,5 +1236,3 @@ theorem forall_or_right_logic {p : α → Prop} {q : Prop} :
 theorem exists_and_right_logic {p : α → Prop} {q : Prop} :
     (∃ a, p a ∧ q) ↔ (∃ a, p a) ∧ q :=
   ⟨fun ⟨a, hp, hq⟩ => ⟨⟨a, hp⟩, hq⟩, fun ⟨⟨a, hp⟩, hq⟩ => ⟨a, hp, hq⟩⟩
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

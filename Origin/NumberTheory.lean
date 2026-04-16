@@ -253,15 +253,7 @@ theorem nt_val_option [Mul α] [Add α] (vpF : α → α)
     Option.map vpF (some a * some b) =
     Option.map vpF (some a) + Option.map vpF (some b) := by simp [h]
 
-/-- Multiplicativity lifts through Option. -/
-theorem nt_mul_assoc [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
 
-/-- Addition lifts through Option. -/
-theorem nt_add_comm [Add α] (h : ∀ a b : α, a + b = b + a)
-    (a b : Option α) : a + b = b + a := by
-  cases a <;> cases b <;> simp [h]
 
 -- ============================================================================
 -- 15. ARITHMETIC FUNCTIONS (ArithmeticFunction.lean)
@@ -593,5 +585,3 @@ def chevalleyWarning' : Prop := True
 
 /-- Bertrand's postulate (abstract). -/
 def bertrandPostulate' : Prop := True
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

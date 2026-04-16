@@ -775,14 +775,3 @@ def functor_map_comp_law (F : Type u → Type u) [Functor F] : Prop :=
 def functor_ext_law (F : Type u → Type u)
     (map₁ map₂ : (α → β) → F α → F β) : Prop :=
   (∀ (f : α → β) (x : F α), map₁ f x = map₂ f x) → map₁ = map₂
-
--- ============================================================================
--- DEMONSTRATION: domain laws lift through Option
--- ============================================================================
-
-theorem control_mul_comm [Mul α]
-    (h : ∀ a b : α, a * b = b * a)
-    (a b : Option α) : a * b = b * a := by
-  cases a <;> cases b <;> simp [h]
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.

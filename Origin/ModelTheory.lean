@@ -679,14 +679,3 @@ def DLO_categorical' : Prop := True
 
 /-- Simple graph structure (abstract). -/
 def SimpleGraph_structure' : Prop := True
-
--- ============================================================================
--- DEMONSTRATION: a domain law lifts through Option
--- ============================================================================
-
-theorem model_mul_assoc [Mul α]
-    (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := by
-  cases a <;> cases b <;> cases c <;> simp [h]
-
--- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.
