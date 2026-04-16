@@ -189,6 +189,16 @@ lake build Origin.Index
 
 ## Step 8: The rules
 
+**NEVER use agents (subprocesses) for Origin work.** Agents don't
+read CLAUDE.md. They don't go through the onboarding. They don't
+understand that `none` is the whole, not nothing. They will
+misclassify `≠ 0`, duplicate names across files, add typeclasses
+that shouldn't exist, and produce code that looks right but is
+architecturally wrong. This was tested — agents messed up files
+across multiple domains and required starting over. The onboarding
+can't be delegated. If you need parallelism, the human runs
+separate Claude Code sessions, each fully onboarded independently.
+
 **Build + index must pass before every commit.** Build checks the
 code compiles. Index checks no two files export the same name — the
 compiler enforces uniqueness. If `lake build Origin.Index` passes,
