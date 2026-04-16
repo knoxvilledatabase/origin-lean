@@ -440,6 +440,13 @@ def cmd_classify(path):
 # Suggest — show uncovered Mathlib declarations for a domain
 # =============================================================================
 
+def _normalize_lean_name(name):
+    """Strip guillemets so «foo'» and foo' compare equal, as Lean sees them."""
+    if name.startswith('«') and name.endswith('»'):
+        return name[1:-1]
+    return name
+
+
 def _stub_name(mathlib_name):
     """Convert a Mathlib declaration name to a stub name for Origin.
 
@@ -511,14 +518,16 @@ def _get_uncovered(domain):
     origin_stems = {n.split(".")[-1].lower() for n in origin_names}
 
     # 3. Collect ALL Origin names across all files (for collision detection)
-    all_origin_names = {}  # name -> module
+    #    Normalize guillemets: «foo'» and foo' are the same to Lean
+    all_origin_names = {}  # normalized_name -> module
     for lean_file in sorted(ORIGIN.glob("*.lean")):
         if lean_file.stem in {"Index", "Test"}:
             continue
         for line in lean_file.read_text(errors="replace").split("\n"):
             m = ORIGIN_DECL_RE.match(line)
             if m and "private " not in line:
-                all_origin_names[m.group(2)] = lean_file.stem
+                norm = _normalize_lean_name(m.group(2))
+                all_origin_names[norm] = lean_file.stem
 
     # 4. Partition into covered/uncovered
     covered = []
@@ -547,12 +556,14 @@ def cmd_suggest(domain):
 
     ui.header("S U G G E S T", f"{domain} — {n_covered}/{total} genuine covered, {n_uncovered} uncovered")
 
-    # Check for potential name collisions
+    # Check for potential name collisions (normalize guillemets)
     collisions = []
     for kind, name, fname in uncovered:
         stub_name = _stub_name(name)
-        if stub_name and stub_name in all_origin_names:
-            collisions.append((stub_name, all_origin_names[stub_name]))
+        if stub_name:
+            norm = _normalize_lean_name(stub_name)
+            if norm in all_origin_names:
+                collisions.append((norm, all_origin_names[norm]))
 
     if uncovered:
         # Group by file
@@ -567,8 +578,10 @@ def cmd_suggest(domain):
             for kind, name in decls[:15]:  # cap display at 15 per file
                 stub = _stub_name(name)
                 warn = ""
-                if stub and stub in all_origin_names:
-                    warn = f"  {ui.YELLOW}⚠ collision: {all_origin_names[stub]}.lean{ui.RESET}"
+                if stub:
+                    norm = _normalize_lean_name(stub)
+                    if norm in all_origin_names:
+                        warn = f"  {ui.YELLOW}⚠ collision: {all_origin_names[norm]}.lean{ui.RESET}"
                 print(f"    {kind:10s} {name}{warn}")
             if len(decls) > 15:
                 ui.info(f"    ... and {len(decls) - 15} more")
@@ -653,15 +666,18 @@ def cmd_stub(domain):
                 n_skipped_dup += 1
                 continue
 
+            # Normalize for collision checking (guillemets)
+            norm_stub = _normalize_lean_name(stub)
+
             # Skip if we've already generated this stub name
-            if stub in seen_names:
+            if norm_stub in seen_names:
                 n_skipped_dup += 1
                 continue
-            seen_names.add(stub)
+            seen_names.add(norm_stub)
 
-            # Check for collision with existing Origin declarations
-            if stub in all_origin_names:
-                lines.append(f"-- COLLISION: {stub} already in {all_origin_names[stub]}.lean — rename needed")
+            # Check for collision with existing Origin declarations (any file)
+            if norm_stub in all_origin_names:
+                lines.append(f"-- COLLISION: {stub} already in {all_origin_names[norm_stub]}.lean — rename needed")
                 n_skipped_collision += 1
                 continue
 
@@ -824,17 +840,18 @@ def cmd_index():
             modules[f.stem] = names
 
     # Check for name collisions before writing
-    # Use full names — namespaced declarations (Path'.comp vs PFun'.comp) don't collide
-    all_names = {}  # name -> (module, kind)
+    # Normalize guillemets: «foo'» and foo' are the same to Lean
+    all_names = {}  # normalized_name -> (module, kind)
     collisions = []
     for mod, decls in modules.items():
         for kind, name in decls:
-            if name in all_names:
-                other_mod, other_kind = all_names[name]
+            norm = _normalize_lean_name(name)
+            if norm in all_names:
+                other_mod, other_kind = all_names[norm]
                 if other_mod != mod:
                     collisions.append((name, mod, other_mod))
             else:
-                all_names[name] = (mod, kind)
+                all_names[norm] = (mod, kind)
 
     if collisions:
         ui.header("I N D E X   E R R O R", "Duplicate names — fix before index can build")
