@@ -481,89 +481,85 @@ Run: `python3 scripts/lean_optimizer.py audit --all`
 specialization families. 256 dissolved. Every sketch achieves 99.5%+
 reduction. The DRY axis dwarfs the zero-management axis.
 
-## The Automated Pipeline (Architecture)
+## Corrected Architecture (2026-04-16)
+
+The sandbox/proof_tester was testing Goal A: "can this Mathlib proof
+be shorter inside Mathlib?" Wrong question. Too slow. Rebuilds
+Mathlib (~5 minutes per file). Three course corrections led here:
+
+1. Sandbox building against Mathlib → too slow, wrong target
+2. Goal A compression → not the destination
+3. Proof tester against Mathlib imports → still Goal A thinking
+
+Each correction came from pushing against the actual constraint and
+following it back to the architecture.
+
+**The correct tool is a Generator:**
 
 ```
-Detect → Classify → Sandbox compress → Full rebuild → Report
-  ↑                                                      |
-  └──── Human exceptions → Encode patterns ──────────────┘
+Audit → Generate → Build → Refine → Commit
+  ↑                                    |
+  └──── Human refines → next domain ───┘
 ```
 
-**Stage 1: Detect.** Diff Mathlib HEAD against last processed commit.
-The lakefile pins the version. When bumped, `git diff` shows what's
-new or changed.
+**Stage 1: Audit.** `lean_optimizer.py audit <domain>` — profile
+the Mathlib domain. What's genuine, what dissolves, what's the
+tactic profile.
 
-**Stage 2: Classify.** For each declaration: genuine, dissolved,
-conflates, infrastructure. Already built in `lean_optimizer.py`. Category 1
-vs Category 2 classification in sketch headers.
+**Stage 2: Generate.** `lean_optimizer.py generate <domain>` — read
+the domain's genuine declarations, draft an Origin file importing
+only Core. Structure it like the existing sketches: definitions +
+`cases <;> simp` demonstrations. Skip everything derivable from Core.
 
-**Stage 3: Sandbox compress.** For each declaration, extract into a
-minimal scratch file with its dependencies. Try compressions in order:
-1. `by simp`
-2. `by omega`
-3. `by ring`
-4. `by decide`
-5. `by aesop`
-6. Strip dissolved hypotheses, retry
-7. If none work: flag for human review, keep original
-8. If one works: keep the shortest
+**Stage 3: Build.** `lake build Origin.<Domain>` — under a second.
+No Mathlib rebuild. Origin files import Core and Lean's stdlib. If
+it fails, the generator missed something. Iterate.
 
-Each attempt builds in isolation — a failed compression on declaration
-47 cannot contaminate declarations 48-200. `lake build` is the judge.
+**Stage 4: Refine.** Human adjusts what the generator missed. Adds
+domain-specific definitions. Writes proofs the generator couldn't
+automate. Each refinement teaches the generator a new pattern.
 
-**Stage 4: Full rebuild.** Apply all successful compressions to the
-full file. Build it. If it fails, binary search which compression
-broke it (dependency conflict), revert that one, retry. Mechanical.
+**Stage 5: Commit.** The Origin file is production. Push it.
 
-**Stage 5: Report.** What succeeded, what failed, what needs human
-review. Grouped by pattern. The report IS the work order for the
-human.
+**The proof_tester is still useful for one thing:** testing whether
+`by simp` closes a proof against Core's simp set in a scratch file
+importing only Core. That's fast (under a second). That's the right
+scope. Don't use it against Mathlib imports.
 
-**The human's role:** Handle exceptions the script can't automate.
-Write generic versions of specialization families. Create new domain
-definitions. Every solution gets encoded back into the script as a
-pattern. Next run, that pattern applies automatically.
+**The generator reverse-engineers the sketch pattern** and applies
+it to domains without sketches yet. The sketches are the answer key.
+What did the human keep? Definitions + demonstrations. What did
+they remove? Everything derivable from Core. The generator does the
+same thing mechanically.
 
-**The loop:** Run → report → human solves exceptions → encode →
-run again. The script gets smarter with each session. The human
-teaches through exceptions. The script remembers forever.
-
-### Roadmap to Full Automation (2026-04-16)
+### Roadmap to Full Automation (2026-04-16, corrected)
 
 **What's done:**
-- ✅ The atomic unit — `proof_tester.py` tests one proof, Lean verifies
 - ✅ The audit command — profiles any domain's DRY opportunities
 - ✅ The classifier — identifies what dissolves vs what's genuine
-- ✅ The pipeline — extracts and builds at 98.3% pass rate
+- ✅ The proof tester — tests `by simp` against Core's simp set (fast)
+- ✅ 14 sketches — proven compressed versions of 14 Mathlib domains
+- ✅ The pipeline — extracts and classifies at 98.3% pass rate
 
-**What's missing:**
+**What's next:**
 
-**Stage 1 — File-level orchestration (1-2 sessions).** Take the
-sandbox and run it across every declaration in a file. Collect what
-compressed, what didn't. Apply compressions that passed. Rebuild
-the full file. Binary search if the full rebuild fails. Mechanical
-— no judgment required.
+**Step 1 — Generator (1-2 sessions).** `generate_origin_draft(domain)`
+reads a Mathlib domain's genuine declarations, drafts an Origin file
+structured like the sketches. Definitions + demonstrations. Imports
+Core only. Builds in under a second.
 
-**Stage 2 — Domain-level orchestration (1 session).** Run Stage 1
-across every file in a domain. Report the line count before and
-after. Commit if the build passes.
+**Step 2 — Human refinement (ongoing).** The generator drafts, the
+human refines. Each refinement teaches the generator a new pattern.
+The generator gets smarter with each domain.
 
-**Stage 3 — Human exception handler (ongoing).** Everything Stage 1
-couldn't compress gets reported with the specific proof that failed.
-A human looks at the hardest cases, solves one, encodes the pattern.
-Next run it applies everywhere.
+**Step 3 — Mathlib change detection (1 session).** When Mathlib
+updates, diff declaration lists, classify new declarations, run the
+generator on just the new ones.
 
-**Stage 4 — Mathlib change detection (1 session).** When Mathlib
-updates, diff the declaration lists, classify new declarations, run
-the pipeline on just the new ones.
-
-**Honest estimate:** 2-3 focused sessions to 80% automation. The
-remaining 20% — genuinely hard theorems no single tactic closes —
-will always need human judgment. But that 20% is where the actual
-mathematics lives. Everything else is mechanical.
-
-The sandbox proving today is the roundoff back handspring. The full
-automation is the double full. Two skills away.
+**Honest estimate:** the generator produces 80% of each Origin file
+automatically. The remaining 20% — domain-specific definitions,
+non-trivial proofs — needs human judgment. But that 20% is where
+the actual mathematics lives. Everything else is mechanical.
 
 ## Active Patterns
 
