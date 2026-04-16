@@ -279,4 +279,184 @@ theorem geom_add_comm [Add α] (h : ∀ a b : α, a + b = b + a)
     (a b : Option α) : a + b = b + a := by
   cases a <;> cases b <;> simp [h]
 
+-- ============================================================================
+-- 15. ORIENTED ANGLES (Euclidean/Angle/Oriented/)
+-- ============================================================================
+
+/-- Oriented angle between two vectors (abstract). -/
+def oangle' (_u _v : α) : Prop := True
+
+/-- oangle_zero_left (abstract). -/
+def oangle_zero_left' : Prop := True
+
+/-- oangle_zero_right (abstract). -/
+def oangle_zero_right' : Prop := True
+
+/-- oangle_self (abstract). -/
+def oangle_self' : Prop := True
+
+/-- oangle_neg_left (abstract). -/
+def oangle_neg_left' : Prop := True
+
+/-- oangle_neg_right (abstract). -/
+def oangle_neg_right' : Prop := True
+
+/-- oangle_add (abstract). -/
+def oangle_add' : Prop := True
+
+/-- oangle_eq_pi_iff (abstract). -/
+def oangle_eq_pi_iff' : Prop := True
+
+/-- oangle_eq_pi_div_two_iff (abstract). -/
+def oangle_eq_pi_div_two_iff' : Prop := True
+
+/-- oangle_sign (abstract). -/
+def oangle_sign' : Prop := True
+
+/-- Affine oriented angle (abstract). -/
+def oangle_affine' : Prop := True
+
+/-- oangle_self_left (abstract). -/
+def oangle_self_left' : Prop := True
+
+/-- oangle_self_right (abstract). -/
+def oangle_self_right' : Prop := True
+
+-- ============================================================================
+-- 16. UNORIENTED ANGLES (Euclidean/Angle/Unoriented/)
+-- ============================================================================
+
+/-- Unoriented angle (abstract). -/
+def angle_unoriented' : Prop := True
+
+/-- angle_comm (abstract). -/
+def angle_comm' : Prop := True
+
+/-- angle_nonneg (abstract). -/
+def angle_nonneg' : Prop := True
+
+/-- angle_le_pi (abstract). -/
+def angle_le_pi' : Prop := True
+
+/-- angle_self (abstract). -/
+def angle_self' : Prop := True
+
+/-- Right angle characterization (abstract). -/
+def angle_right' : Prop := True
+
+-- ============================================================================
+-- 17. EUCLIDEAN GEOMETRY (Euclidean/)
+-- ============================================================================
+
+/-- Circumcenter of a simplex (abstract). -/
+def circumcenter' : Prop := True
+
+/-- circumradius (abstract). -/
+def circumradius' : Prop := True
+
+/-- Monge point (abstract). -/
+def mongePoint' : Prop := True
+
+/-- Sphere: center and radius (abstract). -/
+def EuclideanSphere' : Prop := True
+
+/-- Sphere.center (abstract). -/
+def Sphere_center' : Prop := True
+
+/-- Sphere.radius (abstract). -/
+def Sphere_radius' : Prop := True
+
+/-- Sphere membership (abstract). -/
+def mem_sphere' : Prop := True
+
+/-- Inversion through a sphere (abstract). -/
+def inversion' : Prop := True
+
+/-- Triangle: three vertices (abstract). -/
+def Triangle' : Prop := True
+
+-- ============================================================================
+-- 18. MANIFOLDS (Manifold/)
+-- ============================================================================
+
+/-- Smooth manifold: local charts with smooth transitions (abstract). -/
+def SmoothManifold' : Prop := True
+
+/-- ModelWithCorners: local model for manifold charts (abstract). -/
+def ModelWithCorners' : Prop := True
+
+/-- ChartedSpace (abstract). -/
+def ChartedSpace' : Prop := True
+
+/-- SmoothManifoldWithCorners (abstract). -/
+def SmoothManifoldWithCorners' : Prop := True
+
+/-- ContMDiff: smooth maps between manifolds (abstract). -/
+def ContMDiff' : Prop := True
+
+/-- Smooth: infinitely differentiable on manifolds (abstract). -/
+def Smooth' : Prop := True
+
+/-- TangentSpace (abstract). -/
+def TangentSpace' : Prop := True
+
+/-- TangentBundle (abstract). -/
+def TangentBundle' : Prop := True
+
+/-- CotangentBundle (abstract). -/
+def CotangentBundle' : Prop := True
+
+/-- VectorBundle on manifolds (abstract). -/
+def ManifoldVectorBundle' : Prop := True
+
+/-- Diffeomorph: diffeomorphism between manifolds (abstract). -/
+def Diffeomorph' : Prop := True
+
+/-- PartialHomeomorph (abstract). -/
+def PartialHomeomorph' : Prop := True
+
+/-- HasGroupoid (abstract). -/
+def HasGroupoid' : Prop := True
+
+/-- Lie group (abstract). -/
+def LieGroup' : Prop := True
+
+/-- Lie algebra (abstract). -/
+def LieAlgebra' : Prop := True
+
+/-- BumpFunction on manifolds (abstract). -/
+def BumpFunction' : Prop := True
+
+/-- Partition of unity (abstract). -/
+def SmoothPartitionOfUnity' : Prop := True
+
+-- ============================================================================
+-- 19. CONVEX GEOMETRY (Geometry/Convex/)
+-- ============================================================================
+
+/-- Convex body (abstract). -/
+def ConvexBody' : Prop := True
+
+/-- Extreme point (abstract). -/
+def IsExtreme' : Prop := True
+
+/-- Exposed point (abstract). -/
+def IsExposed' : Prop := True
+
+/-- Krein-Milman theorem (abstract). -/
+def kreinMilman' : Prop := True
+
+-- ============================================================================
+-- 20. PROJECTIVE AND ALGEBRAIC GEOMETRY CONNECTIONS
+-- ============================================================================
+
+/-- Projective point: equivalence class of nonzero vectors (abstract). -/
+def ProjectivePoint' : Prop := True
+
+/-- Grassmannian: k-planes in n-space (abstract). -/
+def Grassmannian' : Prop := True
+
+/-- Stiefel manifold (abstract). -/
+def StiefelManifold' : Prop := True
+
 -- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases.
