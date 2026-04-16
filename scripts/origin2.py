@@ -87,20 +87,21 @@ class Classifier:
         r"≠\s*0|NeZero|ne_zero|GroupWithZero|\.ne'|inv_ne_zero|"
         r"cast_ne_zero|succ_ne_zero|pos_of_ne_zero")
 
-    # Declaration names that ARE zero-management infrastructure
+    # Declaration names that ARE zero-management infrastructure.
+    # Uses ^ or \b to prevent matching inside compound names like card_ne_zero.
+    # card_ne_zero proves a card is nonzero — genuine math.
+    # ne_zero / NeZero are the typeclass — infrastructure.
     INFRA_NAMES = re.compile(
-        r"ne_zero|NeZero|neZero|ne_one|"
+        r"^ne_zero$|^NeZero|^neZero|^ne_one$|"
         r"GroupWithZero|groupWithZero|"
         r"NoZeroDivisors|noZeroDivisors|"
         r"NoZeroSMulDivisors|"
         r"MulZeroClass|mulZeroClass|"
-        r"IsUnit.*zero|isUnit.*zero|"
         r"not_isUnit_zero|"
-        r"zero_mul|mul_zero|zero_div|div_zero|"
-        r"inv_zero|zero_inv|"
-        r"WithZero|withZero|WithBot|withBot|WithTop|withTop|"
-        r"ZeroHom|zeroHom|"
-        r"CharZero|charZero")
+        r"^zero_mul$|^mul_zero$|^zero_div$|^div_zero$|"
+        r"^inv_zero$|^zero_inv$|"
+        r"WithZero|withZero|"
+        r"^ZeroHom$|^zeroHom$")
 
     # Trivial proof patterns
     TRIVIAL_RE = re.compile(
