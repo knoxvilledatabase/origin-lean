@@ -146,6 +146,23 @@ compression. A replacement.
    `rw` chain that `simp` could close in one line is still 15 lines.
    Origin applies the global optimizer for the first time.
 
+**Two tools, two axes — don't merge them:**
+
+- **The classifier** (`origin2.py`) is the Axis 1 machine. It asks
+  "what is this?" and answers: dissolves, conflates, or genuine.
+  It correctly identifies the 17 typeclasses. It is complete for
+  Axis 1. Don't expand it to handle DRY — that's a different question.
+
+- **The sandbox** (`compress/sandbox.py`) is the Axis 2 machine. It
+  asks "how short can this be?" and answers by trying tactics and
+  letting `lake build` judge. It doesn't need to understand the math.
+  It just needs to try alternatives and report what Lean accepts.
+
+A fresh session will look at the classifier and think "this doesn't
+handle DRY, let me expand it." Don't. The classifier identifies
+*what*. The sandbox identifies *how*. They're sequential steps, not
+competing ones. Making the classifier do both makes it worse at both.
+
 When an AI system reasons about mathematics using Origin instead of
 Mathlib, it's working with less context to hold, less ambiguity about
 which version of a theorem applies, less energy per inference, and a

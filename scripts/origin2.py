@@ -15,6 +15,8 @@ Usage:
     python3 scripts/origin2.py fruit --all 10
     python3 scripts/origin2.py audit Combinatorics          DRY AUDIT
     python3 scripts/origin2.py audit --all
+    python3 scripts/origin2.py compress Combinatorics       STAGE 1 COMPRESS
+    python3 scripts/origin2.py compress --domain Combinatorics
 """
 
 import os
@@ -1362,6 +1364,210 @@ def cmd_audit(domain: str):
 
 
 # =============================================================================
+# Stage 1: File-Level Compression
+# =============================================================================
+
+def cmd_compress(domain: str):
+    """Compress an extracted domain by trying shorter proofs.
+
+    For each file in Origin/Mathlib_<domain>/:
+      1. Find declarations with proofs (`:= by ...` or `:= <term>`)
+      2. For each, try: by simp, by omega, by ring, by decide, by aesop
+      3. Test each attempt in the sandbox (isolation)
+      4. Apply all successful compressions to the file
+      5. Build the full compressed file with lake build
+      6. If build passes: keep, report lines saved
+      7. If build fails: revert, report what broke
+
+    Usage: python3 scripts/origin2.py compress --domain Combinatorics
+    """
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from compress.sandbox import try_compress, CompressResult
+
+    origin_dir = Config.ORIGIN_DIR
+    d = origin_dir / f"Mathlib_{domain}"
+    if not d.exists():
+        print(f"  ✗ Origin/Mathlib_{domain}/ not found")
+        return
+
+    files = sorted(d.rglob("*.lean"))
+    print(f"\n{'=' * 60}")
+    print(f"  COMPRESS: {domain} ({len(files)} files)")
+    print(f"{'=' * 60}")
+
+    # Regex to find declarations with proofs
+    decl_start_re = re.compile(r'^((?:@\[.*?\]\s*\n)*)(?:(?:protected|private|nonrec)\s+)*(theorem|lemma)\s+(\S+)')
+    proof_re = re.compile(r':=\s*by\b', re.DOTALL)
+
+    tactics = ["by simp", "by omega", "by ring", "by decide", "by aesop", "by norm_num", "by tauto"]
+
+    total_files = 0
+    total_compressed = 0
+    total_lines_saved = 0
+    total_declarations_tested = 0
+    total_declarations_compressed = 0
+    files_improved = 0
+
+    for f in files:
+        text = f.read_text(errors="replace")
+        lines = text.split("\n")
+        original_line_count = len(lines)
+
+        # Extract imports and preamble (everything before first theorem/lemma)
+        imports = []
+        preamble_lines = []
+        first_decl_line = None
+
+        for i, line in enumerate(lines):
+            if line.startswith("import "):
+                imports.append(line)
+            elif decl_start_re.match(line):
+                first_decl_line = i
+                break
+            elif not line.startswith("/-") and not line.startswith("-/") and not line.startswith("--"):
+                preamble_lines.append(line)
+
+        if first_decl_line is None:
+            continue
+
+        preamble = "\n".join(preamble_lines)
+
+        # Find declarations with by-proofs
+        declarations = []
+        i = first_decl_line
+        while i < len(lines):
+            m = decl_start_re.match(lines[i])
+            if m:
+                # Collect the full declaration
+                decl_lines = [lines[i]]
+                j = i + 1
+                depth = 0
+                while j < len(lines):
+                    l = lines[j].strip()
+                    if l.startswith("theorem ") or l.startswith("lemma ") or \
+                       l.startswith("def ") or l.startswith("instance ") or \
+                       l.startswith("@[") or l.startswith("end ") or \
+                       l.startswith("section") or l.startswith("namespace") or \
+                       l.startswith("variable") or l.startswith("open "):
+                        if depth <= 0:
+                            break
+                    decl_lines.append(lines[j])
+                    # Track brace/where depth roughly
+                    depth += lines[j].count("{") + lines[j].count("where")
+                    depth -= lines[j].count("}")
+                    j += 1
+
+                decl_text = "\n".join(decl_lines)
+                name = m.group(3)
+                attrs = m.group(1) or ""
+
+                # Skip @[simp] and friends — invisible dependencies
+                skip = False
+                for attr in ("@[simp", "@[ext", "@[aesop", "@[norm_cast",
+                             "@[norm_num", "@[gcongr", "@[positivity", "@[to_additive"):
+                    if attr in attrs or attr in decl_text:
+                        skip = True
+                        break
+
+                if not skip and proof_re.search(decl_text):
+                    declarations.append({
+                        "name": name,
+                        "text": decl_text,
+                        "start_line": i,
+                        "end_line": j,
+                    })
+                i = j
+            else:
+                i += 1
+
+        if not declarations:
+            total_files += 1
+            continue
+
+        total_files += 1
+        total_declarations_tested += len(declarations)
+
+        # Try compressing each declaration in the sandbox
+        compressions = []
+        for decl in declarations:
+            for tactic in tactics:
+                result = try_compress(
+                    declaration=decl["text"],
+                    imports=imports,
+                    replacement=tactic,
+                    preamble=preamble,
+                )
+                if result.passed:
+                    compressions.append({
+                        "name": decl["name"],
+                        "start_line": decl["start_line"],
+                        "end_line": decl["end_line"],
+                        "original": decl["text"],
+                        "compressed": result.compressed,
+                        "tactic": tactic,
+                    })
+                    total_declarations_compressed += 1
+                    break  # first tactic wins
+
+        if not compressions:
+            continue
+
+        # Apply compressions to the file
+        backup = text
+        new_lines = list(lines)
+        # Apply in reverse order so line numbers stay valid
+        for comp in sorted(compressions, key=lambda c: c["start_line"], reverse=True):
+            compressed_lines = comp["compressed"].split("\n")
+            new_lines[comp["start_line"]:comp["end_line"]] = compressed_lines
+
+        new_text = "\n".join(new_lines)
+        new_line_count = len(new_lines)
+        lines_saved = original_line_count - new_line_count
+
+        # Write compressed version
+        f.write_text(new_text)
+
+        # Build the full file
+        rel = f.relative_to(origin_dir.parent)
+        module = str(rel).replace("/", ".").replace(".lean", "")
+
+        try:
+            result = subprocess.run(
+                ["lake", "build", module],
+                capture_output=True, text=True, timeout=180,
+                cwd=str(Config.project_root()),
+            )
+            if result.returncode == 0:
+                files_improved += 1
+                total_compressed += len(compressions)
+                total_lines_saved += lines_saved
+                short_path = str(f.relative_to(origin_dir))
+                print(f"  ✓ {short_path}: {len(compressions)} compressed, {lines_saved} lines saved")
+                for comp in compressions:
+                    print(f"      {comp['name']} → {comp['tactic']}")
+            else:
+                # Build failed — revert
+                f.write_text(backup)
+                short_path = str(f.relative_to(origin_dir))
+                print(f"  ✗ {short_path}: build failed after compression, reverted")
+        except subprocess.TimeoutExpired:
+            f.write_text(backup)
+            short_path = str(f.relative_to(origin_dir))
+            print(f"  ✗ {short_path}: build timeout, reverted")
+
+    print(f"\n{'=' * 60}")
+    print(f"  RESULTS: {domain}")
+    print(f"{'=' * 60}")
+    print(f"  Files scanned:          {total_files}")
+    print(f"  Files improved:         {files_improved}")
+    print(f"  Declarations tested:    {total_declarations_tested}")
+    print(f"  Declarations compressed:{total_declarations_compressed}")
+    print(f"  Lines saved:            {total_lines_saved}")
+    print(f"{'=' * 60}")
+
+
+# =============================================================================
 # Main
 # =============================================================================
 
@@ -1408,6 +1614,13 @@ def main():
             cmd_audit(sys.argv[2])
         else:
             print("Usage: origin2.py audit <DOMAIN> | --all")
+    elif cmd == "compress":
+        if len(sys.argv) > 2 and sys.argv[2] == "--domain":
+            cmd_compress(sys.argv[3]) if len(sys.argv) > 3 else print("Usage: origin2.py compress --domain <DOMAIN>")
+        elif len(sys.argv) > 2:
+            cmd_compress(sys.argv[2])
+        else:
+            print("Usage: origin2.py compress --domain <DOMAIN>")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
